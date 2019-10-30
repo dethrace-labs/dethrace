@@ -1,5 +1,8 @@
 #include "dr_types.h"
 #include "br_types.h"
+
+extern br_filesystem *_BrDefaultFilesystem;
+
 // Offset: 18
 // Size: 40
 br_uint_32 BrStdioAttributes();
