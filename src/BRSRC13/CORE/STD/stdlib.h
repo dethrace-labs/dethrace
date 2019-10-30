@@ -50,7 +50,7 @@ char* BrStrRChr(char *s1, char c);
 
 // Offset: 703
 // Size: 35
-void BrAbort();
+void BrAbort(void);
 
 // Offset: 747
 // Size: 44
