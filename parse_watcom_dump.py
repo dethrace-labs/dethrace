@@ -368,6 +368,8 @@ def resolve_type_str(module, type_idx, var_name, decl=True):
     else:
       if indirections != '':
         indirections = ' ' + indirections
+      else:
+        indirections = ' '
       return t['value'] + indirections + var_name + bounds
   else:
     t2 = get_child_reference(module, type_idx)
@@ -578,10 +580,10 @@ def generate_c_skeleton():
   global dr_types_file
   global br_types_file
 
-  mkdir_p('generated/types')
+  mkdir_p('src/types')
 
-  dr_types_file = open('generated/types/dr_types.h', 'w')
-  br_types_file = open('generated/types/br_types.h', 'w')
+  dr_types_file = open('src/types/dr_types.h', 'w')
+  br_types_file = open('src/types/br_types.h', 'w')
 
   dr_types_file.write("#ifndef DR_TYPES_H\n")
   dr_types_file.write("#define DR_TYPES_H\n\n")
@@ -604,7 +606,7 @@ def generate_c_skeleton():
   dr_types_file.write("\n#endif")
 
 def generate_h_file(module):
-  filename = 'generated/' + module['name'][3:].replace('\\', '/').replace('.c', '.h')
+  filename = 'src/' + module['name'][3:].replace('\\', '/').replace('.c', '.h')
 
   dir = os.path.dirname(filename)
   mkdir_p(dir)
@@ -618,7 +620,7 @@ def generate_h_file(module):
     h_file.write('\n\n')
 
 def generate_c_file(module):
-  filename = 'generated/' + module['name'][3:].replace('\\', '/')
+  filename = 'src/' + module['name'][3:].replace('\\', '/')
 
   c_file = open(filename, 'w')
   c_file.write('#include \"')
@@ -683,10 +685,18 @@ def generate_types_header(module):
       continue
 
 
+    if type_name == 'br_value_tag':
+      print ('!!br_value_tag', type_name in generated_type_names)
+    if type_name == 'br_value':
+      print ('!!br_value', type_name in generated_type_names)
+
+
     # get type that this name references
     t = module['types'][t['type_idx']]
     if t is None:
       continue
+
+    generated_type_names[type_name] = 1
 
     if t['type'] == 'ENUM_LIST':
       s = '\ntypedef enum {} {{'.format(type_name)
@@ -719,20 +729,6 @@ def generate_types_header(module):
         print ('got empty s')
     else:
       print('ignoring type', type_name, t)
-      continue
-
-    # if type_name.startswith("br"):
-    #   if s.startswith('typedef'):
-    #     br_forward_decl.append(s)
-    #   else:
-    #     br_decl.append(s)
-    # else:
-    #   if s.startswith('typedef'):
-    #     dr_forward_decl.append(s)
-    #   else:
-    #     dr_decl.append(s)
-
-    generated_type_names[type_name] = 1
 
   for type_name, s in typedefs.items():
     if 'br' in type_name:
