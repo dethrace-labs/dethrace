@@ -2,7 +2,7 @@
 #include "br_types.h"
 // Offset: 8
 // Size: 560
-void BrQsort(void *basep, unsigned int nelems, unsigned int size, br_qsort_cbfn *comp);
+void BrQsort(void *basep, unsigned int nelems, unsigned int size, br_qsort_cbfn comp);
 
 // Offset: 579
 // Size: 81
