@@ -1,4 +1,6 @@
 #include "diag.h"
+#include "stdlib.h"
+#include <stdarg.h>
 
 // Global variables
 char _diag_scratch[128];
@@ -6,32 +8,76 @@ char rscid[49];
 
 // Offset: 10
 // Size: 118
-void BrFailure(char *s, ...) {
-  va_list args;
-  char failure_header[10];
+void BrFailure(const char *s, ...) {
+    va_list args;
+    const char failure_header[10] = "Failure: ";
+
+    va_start(args, s);
+    BrStrCpy(_diag_scratch, failure_header);
+    BrVSprintf(&_diag_scratch[sizeof(failure_header) - 1], s, args);
+
+    if (fw.diag->failure == NULL) {
+        BrAbort();
+    }
+    
+    fw.diag->failure(_diag_scratch);
+    va_end(args);
 }
 
 // Offset: 138
 // Size: 118
-void BrWarning(char *s, ...) {
-  va_list args;
-  char warning_header[10];
+void BrWarning(const char *s, ...) {
+    va_list args;
+    const char warning_header[10] = "Warning: ";
+
+    va_start(args, s);
+    BrStrCpy(_diag_scratch, warning_header);
+    BrVSprintf(&_diag_scratch[sizeof(warning_header) - 1], s, args);
+
+    if (fw.diag->warning == NULL) {
+        BrAbort();
+    }
+    
+    fw.diag->warning(_diag_scratch);
+    va_end(args);
 }
 
 // Offset: 264
 // Size: 132
-void BrFatal(char *name, int line, char *s, ...) {
-  va_list args;
-  int n;
+void BrFatal(const char *name, int line, const char *s, ...) {
+    va_list args;
+    int n;
+
+    va_start(args, s);
+    n = BrSprintF(_diag_scratch, "FATAL %s:%d\n", name, line);
+    BrVSprintf(&_diag_scratch[n], s, args);
+    if (fw.diag->failure == NULL) {
+        BrAbort();
+    }
+    
+    fw.diag->failure(_diag_scratch);
+    va_end(args);
 }
 
 // Offset: 406
 // Size: 95
-void _BrAssert(char *condition, char *file, unsigned int line) {
+void _BrAssert(const char *condition, const char *file, unsigned int line) {
+    if (fw.diag->error == NULL) {
+        BrAbort();
+    }
+    
+    BrSprintf(_diag_scratch, "ASSERTION FAILED %s:%d: \"%s\"\n", file, line, condition);
+    fw.diag->error(_diag_scratch);
 }
 
 // Offset: 512
 // Size: 95
-void _BrUAssert(char *condition, char *file, unsigned int line) {
+void _BrUAssert(const char *condition, const char *file, unsigned int line) {
+    if (fw.diag->error == NULL) {
+        BrAbort();
+    }
+    
+    BrSprintf(_diag_scratch, "ASSERTION FAILED %s:%d: \"%s\"\n", file, line, condition);
+    fw.diag->error(_diag_scratch);
 }
 
