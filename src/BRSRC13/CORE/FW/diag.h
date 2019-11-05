@@ -2,21 +2,21 @@
 #include "br_types.h"
 // Offset: 10
 // Size: 118
-void BrFailure(char *s, ...);
+void BrFailure(const char *s, ...);
 
 // Offset: 138
 // Size: 118
-void BrWarning(char *s, ...);
+void BrWarning(const char *s, ...);
 
 // Offset: 264
 // Size: 132
-void BrFatal(char *name, int line, char *s, ...);
+void BrFatal(const char *name, int line, const char *s, ...);
 
 // Offset: 406
 // Size: 95
-void _BrAssert(char *condition, char *file, unsigned int line);
+void _BrAssert(const char *condition, const char *file, unsigned int line);
 
 // Offset: 512
 // Size: 95
-void _BrUAssert(char *condition, char *file, unsigned int line);
+void _BrUAssert(const char *condition, const char *file, unsigned int line);
 
