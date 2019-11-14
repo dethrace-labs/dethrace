@@ -1,5 +1,9 @@
+#ifndef _STDLIB_H_
+#define _STDLIB_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 9
 // Size: 50
 int BrMemCmp(void *s1, void *s2, size_t n);
@@ -99,4 +103,6 @@ br_int_32 BrVSprintfN(char *buf, br_size_t buf_size, char *fmt, char **args);
 // Offset: 1513
 // Size: 50
 br_int_32 BrVSScanf(char *buf, char *fmt, char **args);
+
+#endif
 
