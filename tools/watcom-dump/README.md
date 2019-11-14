@@ -1,34 +1,46 @@
-# Dethrace Watcom dump tools
+# Watcom dump tools
 
 ### parse_dump.py
 
-Takes an (exedump)[https://github.com/jeff-1amstudios/open-watcom-v2/tree/master/bld/exedump] output file and generates _almost-compilable_ skeleton "c" project files.
+Takes an [exedump](https://github.com/jeff-1amstudios/open-watcom-v2/tree/master/bld/exedump) output file and generates skeleton "c" project files containing functions, structs, enums and global variables.
 
-Used to generate (src)[../../src]
+It was used to generate the first commits of [src](../../src) directory.
 
-Example output of a single function:
+Example output:
 ```c
-// Offset: 4876
-// Size: 1321
-// EAX: pWorld
-// EDX: pTrack_spec
-// EBX: pCamera
-// ECX: pCamera_to_world
-void RenderTrack(br_actor *pWorld, tTrack_spec *pTrack_spec, br_actor *pCamera, br_matrix34 *pCamera_to_world, int pRender_blends) {
-  tU8 column_x;
-  tU8 column_z;
-  tU8 min_x;
-  tU8 max_x;
-  tU8 min_z;
-  tU8 max_z;
-  br_vector3 edge_before;
-  br_vector3 edge_after;
-  br_camera *camera;
-  br_scalar tan_fov_ish;
-  br_actor *result;
+
+typedef enum tPowerup_type {
+    ePowerup_dummy = 0,
+    ePowerup_instantaneous = 1,
+    ePowerup_timed = 2,
+    ePowerup_whole_race = 3
+} tPowerup_type;
+
+struct tPedestrian_action {
+    float danger_level;
+    float percentage_chance;
+    int number_of_bearings;
+    int number_of_sounds;
+    int sounds[3];
+    tBearing_sequence sequences[7];
+    float initial_speed;
+    float looping_speed;
+    tU32 reaction_time;
+};
+
+// Offset: 9548
+// Size: 1603
+// EAX: c
+void CalcEngineForce(tCar_spec *c, br_scalar dt) {
+    br_scalar torque;
+    br_scalar ts;
+    br_scalar ts2;
+    br_scalar brake_temp;
+    int sign;
+    tS32 temp_for_swap;
 }
 ```
 
 ### split-dump.sh
-Takes an (exedump)[https://github.com/jeff-1amstudios/open-watcom-v2/tree/master/bld/exedump] output file and splits it into a single file per module for easier debugging.
+Takes a [exedump](https://github.com/jeff-1amstudios/open-watcom-v2/tree/master/bld/exedump) output file and splits it into a single file per module for easier debugging.
 
