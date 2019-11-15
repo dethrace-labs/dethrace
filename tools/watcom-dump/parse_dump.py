@@ -579,7 +579,10 @@ def generate_c_skeleton():
   global dr_types_file
   global br_types_file
 
-  shutil.rmtree(BASE_OUTPUT_DIR)
+  try:
+    shutil.rmtree(BASE_OUTPUT_DIR)
+  except:
+    pass
   mkdir_p(BASE_OUTPUT_DIR + '/types')
 
   dr_types_file = open(BASE_OUTPUT_DIR + '/types/dr_types.h', 'w')
@@ -720,9 +723,9 @@ def generate_types_header(module):
       type_name = get_struct_name(module, t)
       tag_name = get_struct_tag_name(module, t)
       s = 'typedef struct ' + tag_name + ' ' + type_name + ';\n'
-      typedefs[type_name] = s
+      #typedefs[type_name] = s
 
-      s = get_type_declaration(module, t, type_name) + ';\n\n'
+      s = 'typedef ' + get_type_declaration(module, t, type_name) + ' ' + type_name + ';\n\n'
       structs[type_name] = s
     elif t['type'] == 'SCALAR' or t['type'] == 'NAME':
       s = 'typedef ' + get_type_declaration(module, t, type_name) + ';\n'

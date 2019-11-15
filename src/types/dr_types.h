@@ -9,13 +9,7 @@ typedef unsigned int size_t;
 typedef char * __va_list[1];
 typedef __iobuf FILE;
 typedef long fpos_t;
-typedef struct div_t div_t;
-typedef struct ldiv_t ldiv_t;
 typedef void * onexit_t();
-typedef struct _complex _complex;
-typedef struct complex complex;
-typedef struct exception exception;
-typedef struct ot_vertex ot_vertex;
 typedef short SHORT;
 typedef unsigned short USHORT;
 typedef int INT;
@@ -49,26 +43,17 @@ typedef _tagBREGS _HMI_BREGS;
 typedef _tagWREGS _HMI_WREGS;
 typedef _tagDREGS _HMI_DREGS;
 typedef _tagSREGS _HMI_SREGS;
-typedef struct _HMI_REGS _HMI_REGS;
 typedef _tagIPX_HEADER _IPX_HEADER;
-typedef struct _PACKET _PACKET;
-typedef struct _REAL_PACKET _REAL_PACKET;
-typedef struct _ECB_PACKET _ECB_PACKET;
 typedef _tagIPX_ECB _IPX_ECB;
 typedef _tagIPX_INTERNET_ADDR _IPX_INTERNET_ADDR;
 typedef _tagIPX_NETWORK_ADDR _IPX_NETWORK_ADDR;
 typedef _tagIPX_LOCAL_TARGET _IPX_LOCAL_TARGET;
 typedef _tagIPX_ELEMENT _IPX_ELEMENT;
-typedef struct _PROT_PTR _PROT_PTR;
-typedef struct _REAL_PTR _REAL_PTR;
-typedef struct _PTR _PTR;
 typedef _tag_NETBIOS_NCB _NETBIOS_NCB;
 typedef _tagNETBIOS_ADAPTER_STATUS _NETBIOS_ADAPTER_STATUS;
 typedef _tagNETBIOS_ELEMENT _NETBIOS_ELEMENT;
 typedef _tagNETBIOS_LOCAL_TARGET _NETBIOS_LOCAL_TARGET;
 typedef _tagXFER_BLOCK_HEADER _XFER_BLOCK_HEADER;
-typedef struct _NETNOW_NODE_ADDR _NETNOW_NODE_ADDR;
-typedef struct tPD_net_player_info tPD_net_player_info;
 typedef unsigned char tU8;
 typedef signed char tS8;
 typedef unsigned short tU16;
@@ -79,85 +64,13 @@ typedef float tF32;
 typedef double tF64;
 typedef short tX88;
 typedef long tX1616;
-typedef struct tTrack_spec tTrack_spec;
-typedef struct tCrush_neighbour tCrush_neighbour;
-typedef struct tCrush_point_spec tCrush_point_spec;
-typedef struct tCrush_data tCrush_data;
-typedef struct tSpecial_volume tSpecial_volume;
 typedef tU8 tNet_message_type;
-typedef struct tReduced_matrix tReduced_matrix;
-typedef struct tCar_controls tCar_controls;
-typedef struct tNet_message_mechanics_info tNet_message_mechanics_info;
-typedef tCar_spec_struct tCar_spec;
-typedef struct tDamage_unit tDamage_unit;
-typedef struct tDamage_condition tDamage_condition;
-typedef struct tDamage_effect tDamage_effect;
-typedef struct tDamage_clause tDamage_clause;
-typedef struct tDamage_program tDamage_program;
-typedef struct tHeadup_slot tHeadup_slot;
-typedef struct tPart_info tPart_info;
-typedef struct tParts_spec tParts_spec;
-typedef struct tCar_actor tCar_actor;
-typedef struct tJoystick tJoystick;
 typedef char * tS3_sound_source_ptr;
-typedef struct tPursuee_trail tPursuee_trail;
 typedef int tS3_sound_tag;
-typedef struct tOppo_psyche tOppo_psyche;
-typedef struct tComplete_race_data tComplete_race_data;
-typedef struct tReturn_to_start_data tReturn_to_start_data;
+typedef tCar_spec_struct tCar_spec;
 typedef tPath_node_struct tPath_node;
 typedef tPath_section_struct tPath_section;
-typedef struct tPursue_car_data tPursue_car_data;
-typedef struct tFollow_path_data tFollow_path_data;
-typedef struct tLevitate_data tLevitate_data;
-typedef struct tRun_away_data tRun_away_data;
-typedef struct tRoute_section tRoute_section;
-typedef struct tOpponent_spec tOpponent_spec;
-typedef struct tIntelligent_vehicles tIntelligent_vehicles;
-typedef struct tBounds tBounds;
-typedef struct tFace_ref tFace_ref;
 typedef tU32 tPlayer_ID;
-typedef struct tNet_game_player_info tNet_game_player_info;
-typedef struct tNet_game_options tNet_game_options;
-typedef struct tNet_game_status tNet_game_status;
-typedef struct tNet_game_details tNet_game_details;
-typedef struct tNet_message_send_me_details tNet_message_send_me_details;
-typedef struct tNet_message_my_details tNet_message_my_details;
-typedef struct tNet_message_join tNet_message_join;
-typedef struct tNet_message_leave tNet_message_leave;
-typedef struct tNet_message_host_pissing_off tNet_message_host_pissing_off;
-typedef struct tNet_message_new_player_list tNet_message_new_player_list;
-typedef struct tNet_message_race_over tNet_message_race_over;
-typedef struct tNet_message_status_report tNet_message_status_report;
-typedef struct tGrid_spec tGrid_spec;
-typedef struct tNet_message_start_race tNet_message_start_race;
-typedef struct tNet_message_guarantee_reply tNet_message_guarantee_reply;
-typedef struct tNet_message_headup tNet_message_headup;
-typedef struct tNet_message_host_query tNet_message_host_query;
-typedef struct tNet_message_host_reply tNet_message_host_reply;
-typedef struct tNet_message_cop_info tNet_message_cop_info;
-typedef struct tNet_message_non_car_info tNet_message_non_car_info;
-typedef struct tNet_message_non_car_position tNet_message_non_car_position;
-typedef struct tNet_message_time_sync tNet_message_time_sync;
-typedef struct tNet_message_players_confirm tNet_message_players_confirm;
-typedef struct tNet_message_disable_car tNet_message_disable_car;
-typedef struct tNet_message_enable_car tNet_message_enable_car;
-typedef struct tNet_message_powerup tNet_message_powerup;
-typedef struct tNet_message_recover tNet_message_recover;
-typedef struct tNet_message_scores tNet_message_scores;
-typedef struct tNet_message_wasted tNet_message_wasted;
-typedef struct tNet_message_gameplay tNet_message_gameplay;
-typedef struct tNet_message_pedestrian tNet_message_pedestrian;
-typedef struct tNet_message_car_details_req tNet_message_car_details_req;
-typedef struct tCar_details tCar_details;
-typedef struct tNet_message_car_details tNet_message_car_details;
-typedef struct tGame_scores tGame_scores;
-typedef struct tNet_message_game_scores tNet_message_game_scores;
-typedef struct tNet_message_oil_spill tNet_message_oil_spill;
-typedef struct tNet_message_crush_point tNet_message_crush_point;
-typedef struct tNet_contents tNet_contents;
-typedef struct tNet_message tNet_message;
-typedef struct tCar_detail_info tCar_detail_info;
 typedef int tS3_sound_id;
 typedef int tS3_type;
 typedef int tS3_repeats;
@@ -167,51 +80,19 @@ typedef long tS3_priority;
 typedef long tS3_pitch;
 typedef long tS3_speed;
 typedef char * tS3_outlet_ptr;
-typedef struct tS3_vector3 tS3_vector3;
-typedef struct tWav_header tWav_header;
 typedef void * tPipe_reset_proc();
-typedef struct tPowerup tPowerup;
 typedef int * tGot_proc(tPowerup*, tCar_spec*);
 typedef void * tLose_proc(tPowerup*, tCar_spec*);
 typedef void * tPeriodic_proc(tPowerup*, tU32);
-typedef struct tDepth_effect tDepth_effect;
-typedef struct tPlane_spec tPlane_spec;
-typedef struct tMaterial_modifiers tMaterial_modifiers;
-typedef struct tSpecial_screen tSpecial_screen;
-typedef struct tRace_list_spec tRace_list_spec;
-typedef struct tRace_save_info tRace_save_info;
-typedef struct tGraf_spec tGraf_spec;
 typedef char tPath_name[256];
-typedef struct tCollision_info tCollision_info;
-typedef struct tNon_car_spec tNon_car_spec;
-typedef struct tOpp_spec tOpp_spec;
-typedef struct tCheckpoint tCheckpoint;
-typedef struct tNet_starts tNet_starts;
-typedef struct tText_chunk tText_chunk;
-typedef struct tRace_info tRace_info;
-typedef struct tOpponent_save_info tOpponent_save_info;
-typedef struct tOpponent tOpponent;
-typedef struct tProgram_state tProgram_state;
-typedef struct tDR_font tDR_font;
-typedef struct tGraf_data tGraf_data;
-typedef struct tRolling_letter tRolling_letter;
-typedef struct tFlic_descriptor tFlic_descriptor;
 typedef tFlic_descriptor * tFlic_descriptor_ptr;
-typedef struct tBrender_storage tBrender_storage;
-typedef struct tSave_game tSave_game;
-typedef struct tPed_subs tPed_subs;
-typedef struct tRadio_bastards tRadio_bastards;
-typedef exception_struct tException_node;
 typedef exception_struct * tException_list;
-typedef struct tPixelmap_user_data tPixelmap_user_data;
+typedef exception_struct tException_node;
 typedef int tKey_array[123];
 typedef tS32 tJoy_array[8];
 typedef void * tPMFM2CB(br_material*);
-typedef fmt_vertex DR_VERTEX;
 typedef v11face DR_FACE;
-typedef struct v11group v11group;
-typedef struct v11model v11model;
-typedef struct tMatrix_and_actor tMatrix_and_actor;
+typedef fmt_vertex DR_VERTEX;
 
 typedef enum tDriver {
     eDriver_non_car_unused_slot = 0,
@@ -596,7 +477,7 @@ typedef enum tSmear_type {
 typedef void zs_order_table_traversal_cbfn(int, ot_vertex*, ot_vertex*, ot_vertex*);
 typedef void tS3_outlet_callback(tS3_outlet_ptr, tS3_sound_tag, tS3_termination_reason);
 typedef void tS3_sample_filter(tS3_effect_tag, tS3_sound_tag);
-struct __iobuf {
+typedef struct __iobuf {
     unsigned char *_ptr;
     int _cnt;
     unsigned char *_base;
@@ -605,43 +486,43 @@ struct __iobuf {
     unsigned int _bufsize;
     unsigned char _ungotten;
     unsigned char _tmpfchar;
-};
+} FILE;
 
-struct div_t {
+typedef struct div_t {
     int quot;
     int rem;
-};
+} div_t;
 
-struct ldiv_t {
+typedef struct ldiv_t {
     long quot;
     long rem;
-};
+} ldiv_t;
 
-struct _complex {
+typedef struct _complex {
     double x;
     double y;
-};
+} _complex;
 
-struct complex {
+typedef struct complex {
     double x;
     double y;
-};
+} complex;
 
-struct exception {
+typedef struct exception {
     int type;
     char *name;
     double arg1;
     double arg2;
     double retval;
-};
+} exception;
 
-struct ot_vertex {
+typedef struct ot_vertex {
     br_scalar screenX;
     br_scalar screenY;
     br_scalar distanceZ;
-};
+} ot_vertex;
 
-struct _tagRMI_REGS {
+typedef struct _tagRMI_REGS {
     long EDI;
     long ESI;
     long EBP;
@@ -659,9 +540,9 @@ struct _tagRMI_REGS {
     short CS;
     short SP;
     short SS;
-};
+} _RMI_REGS;
 
-struct _tagBREGS {
+typedef struct _tagBREGS {
     char al;
     char ah;
     unsigned short _1;
@@ -674,9 +555,9 @@ struct _tagBREGS {
     char dl;
     char dh;
     unsigned short _4;
-};
+} _HMI_BREGS;
 
-struct _tagWREGS {
+typedef struct _tagWREGS {
     unsigned short ax;
     unsigned short _1;
     unsigned short bx;
@@ -689,9 +570,9 @@ struct _tagWREGS {
     unsigned short _5;
     unsigned short di;
     unsigned short _6;
-};
+} _HMI_WREGS;
 
-struct _tagDREGS {
+typedef struct _tagDREGS {
     unsigned int eax;
     unsigned int ebx;
     unsigned int ecx;
@@ -699,24 +580,24 @@ struct _tagDREGS {
     unsigned int esi;
     unsigned int edi;
     unsigned int cflags;
-};
+} _HMI_DREGS;
 
-struct _tagSREGS {
+typedef struct _tagSREGS {
     unsigned short es;
     unsigned short cs;
     unsigned short ss;
     unsigned short ds;
     unsigned short fs;
     unsigned short gs;
-};
+} _HMI_SREGS;
 
-struct _HMI_REGS {
+typedef struct _HMI_REGS {
     _HMI_DREGS x;
     _HMI_WREGS w;
     _HMI_BREGS h;
-};
+} _HMI_REGS;
 
-struct _tagIPX_HEADER {
+typedef struct _tagIPX_HEADER {
     USHORT wChecksum;
     USHORT wLength;
     BYTE bTransportControl;
@@ -727,25 +608,25 @@ struct _tagIPX_HEADER {
     BYTE bSourceNetworkNumber[4];
     BYTE bSourceNetworkNode[6];
     USHORT wSourceNetworkSocket;
-};
+} _IPX_HEADER;
 
-struct _PACKET {
+typedef struct _PACKET {
     PSTR pData;
     USHORT wLength;
-};
+} _PACKET;
 
-struct _REAL_PACKET {
+typedef struct _REAL_PACKET {
     SHORT wOffset;
     SHORT wSegment;
     USHORT wLength;
-};
+} _REAL_PACKET;
 
-struct _ECB_PACKET {
+typedef struct _ECB_PACKET {
     _PACKET sPacket;
     _REAL_PACKET sRealPacket;
-};
+} _ECB_PACKET;
 
-struct _tagIPX_ECB {
+typedef struct _tagIPX_ECB {
     PSTR pLinkAddress;
     PSTR pESRRoutine;
     BYTE bInUse;
@@ -757,24 +638,24 @@ struct _tagIPX_ECB {
     BYTE bImmediateAddress[6];
     USHORT wPacketCount;
     _ECB_PACKET sPacket[2];
-};
+} _IPX_ECB;
 
-struct _tagIPX_INTERNET_ADDR {
+typedef struct _tagIPX_INTERNET_ADDR {
     BYTE bNetwork[4];
     BYTE bNode[6];
-};
+} _IPX_INTERNET_ADDR;
 
-struct _tagIPX_NETWORK_ADDR {
+typedef struct _tagIPX_NETWORK_ADDR {
     _IPX_INTERNET_ADDR sInternetAddr;
     BYTE bSocket[2];
-};
+} _IPX_NETWORK_ADDR;
 
-struct _tagIPX_LOCAL_TARGET {
+typedef struct _tagIPX_LOCAL_TARGET {
     _IPX_INTERNET_ADDR sInternetAddr;
     BYTE bImmediate[6];
-};
+} _IPX_LOCAL_TARGET;
 
-struct _tagIPX_ELEMENT {
+typedef struct _tagIPX_ELEMENT {
     USHORT wFlags;
     USHORT wOffset;
     _IPX_HEADER sHeader;
@@ -783,23 +664,23 @@ struct _tagIPX_ELEMENT {
     _IPX_HEADER *pIPXHeader;
     PSTR pHeader;
     USHORT wHSize;
-};
+} _IPX_ELEMENT;
 
-struct _PROT_PTR {
+typedef struct _PROT_PTR {
     PSTR pData;
-};
+} _PROT_PTR;
 
-struct _REAL_PTR {
+typedef struct _REAL_PTR {
     SHORT wOffset;
     SHORT wSegment;
-};
+} _REAL_PTR;
 
-struct _PTR {
+typedef struct _PTR {
     _PROT_PTR sPointer;
     _REAL_PTR sRealPtr;
-};
+} _PTR;
 
-struct _tag_NETBIOS_NCB {
+typedef struct _tag_NETBIOS_NCB {
     BYTE bCommand;
     BYTE bReturnCode;
     BYTE bLocalSession;
@@ -814,9 +695,9 @@ struct _tag_NETBIOS_NCB {
     BYTE bAdapter;
     BYTE bCompletionCode;
     BYTE bReserve[14];
-};
+} _NETBIOS_NCB;
 
-struct _tagNETBIOS_ADAPTER_STATUS {
+typedef struct _tagNETBIOS_ADAPTER_STATUS {
     BYTE bCardID[6];
     BYTE bReleaseLevel;
     BYTE bReserved1;
@@ -849,40 +730,40 @@ struct _tagNETBIOS_ADAPTER_STATUS {
         BYTE bNameNumber;
         BYTE bNameStatus;
     };
-};
+} _NETBIOS_ADAPTER_STATUS;
 
-struct _tagNETBIOS_ELEMENT {
+typedef struct _tagNETBIOS_ELEMENT {
     USHORT wFlags;
     USHORT wOffset;
     _NETBIOS_NCB sNCB;
     _NETBIOS_NCB *pNCB;
     PSTR pHeader;
     USHORT wHSize;
-};
+} _NETBIOS_ELEMENT;
 
-struct _tagNETBIOS_LOCAL_TARGET {
+typedef struct _tagNETBIOS_LOCAL_TARGET {
     BYTE bNode[16];
-};
+} _NETBIOS_LOCAL_TARGET;
 
-struct _tagXFER_BLOCK_HEADER {
+typedef struct _tagXFER_BLOCK_HEADER {
     W32 wSequence;
     W32 wType;
     W32 wID;
     W32 wLength;
     W32 wNode;
     W32 wUser1;
-};
+} _XFER_BLOCK_HEADER;
 
-struct _NETNOW_NODE_ADDR {
+typedef struct _NETNOW_NODE_ADDR {
     _IPX_LOCAL_TARGET sIPX;
     _NETBIOS_LOCAL_TARGET sNETBIOS;
-};
+} _NETNOW_NODE_ADDR;
 
-struct tPD_net_player_info {
+typedef struct tPD_net_player_info {
     _IPX_LOCAL_TARGET addr_ipx;
-};
+} tPD_net_player_info;
 
-struct tTrack_spec {
+typedef struct tTrack_spec {
     tU8 ncolumns_x;
     tU8 ncolumns_z;
     br_scalar column_size_x;
@@ -895,14 +776,14 @@ struct tTrack_spec {
     br_actor ***blends;
     int ampersand_digits;
     br_actor **non_car_list;
-};
+} tTrack_spec;
 
-struct tCrush_neighbour {
+typedef struct tCrush_neighbour {
     br_uint_8 vertex_index;
     br_uint_8 factor;
-};
+} tCrush_neighbour;
 
-struct tCrush_point_spec {
+typedef struct tCrush_point_spec {
     br_uint_16 vertex_index;
     br_uint_16 number_of_neighbours;
     br_vector3 limits_neg;
@@ -910,9 +791,9 @@ struct tCrush_point_spec {
     br_vector3 softness_neg;
     br_vector3 softness_pos;
     tCrush_neighbour *neighbours;
-};
+} tCrush_point_spec;
 
-struct tCrush_data {
+typedef struct tCrush_data {
     int number_of_crush_points;
     float softness_factor;
     float min_fold_factor;
@@ -922,9 +803,9 @@ struct tCrush_data {
     float split_chance;
     br_scalar min_y_fold_down;
     tCrush_point_spec *crush_points;
-};
+} tCrush_data;
 
-struct tSpecial_volume {
+typedef struct tSpecial_volume {
     br_matrix34 mat;
     br_matrix34 inv_mat;
     br_bounds bounds;
@@ -940,15 +821,15 @@ struct tSpecial_volume {
     int engine_noise_index;
     br_material *screen_material;
     int material_modifier_index;
-};
+} tSpecial_volume;
 
-struct tReduced_matrix {
+typedef struct tReduced_matrix {
     br_vector3 row1;
     br_vector3 row2;
     br_vector3 translation;
-};
+} tReduced_matrix;
 
-struct tCar_controls {
+typedef struct tCar_controls {
     int joystick_acc: 8;
     int joystick_dec: 8;
     unsigned int left: 1;
@@ -963,9 +844,9 @@ struct tCar_controls {
     unsigned int change_up: 1;
     unsigned int change_down: 1;
     unsigned int horn: 1;
-};
+} tCar_controls;
 
-struct tNet_message_mechanics_info {
+typedef struct tNet_message_mechanics_info {
     tU8 contents_size;
     tNet_message_type type;
     tU32 ID;
@@ -984,9 +865,9 @@ struct tNet_message_mechanics_info {
     tU8 damage[12];
     tU16 powerups;
     br_scalar wheel_dam_offset[4];
-};
+} tNet_message_mechanics_info;
 
-struct tCar_spec_struct {
+typedef struct tCar_spec_struct {
     int index;
     int disabled;
     tDriver driver;
@@ -1263,9 +1144,9 @@ struct tCar_spec_struct {
     tU32 repair_time;
     int power_up_levels[3];
     tS3_sound_tag horn_sound_tag;
-};
+} tCar_spec;
 
-struct tDamage_unit {
+typedef struct tDamage_unit {
     int x_coord;
     int y_coord;
     int damage_level;
@@ -1273,32 +1154,32 @@ struct tDamage_unit {
     int smoke_last_level;
     int periods[5];
     br_pixelmap *images;
-};
+} tDamage_unit;
 
-struct tDamage_condition {
+typedef struct tDamage_condition {
     tAxis_comp axis_comp;
     tCondition_operator condition_operator;
     float comparitor;
-};
+} tDamage_condition;
 
-struct tDamage_effect {
+typedef struct tDamage_effect {
     tDamage_type type;
     float weakness_factor;
-};
+} tDamage_effect;
 
-struct tDamage_clause {
+typedef struct tDamage_clause {
     tDamage_condition conditions[2];
     int effect_count;
     int condition_count;
     tDamage_effect effects[4];
-};
+} tDamage_clause;
 
-struct tDamage_program {
+typedef struct tDamage_program {
     int clause_count;
     tDamage_clause *clauses;
-};
+} tDamage_program;
 
-struct tHeadup_slot {
+typedef struct tHeadup_slot {
     int x;
     int y;
     int colour;
@@ -1309,36 +1190,36 @@ struct tHeadup_slot {
     int dim_right;
     int dim_bottom;
     tJustification justification;
-};
+} tHeadup_slot;
 
-struct tPart_info {
+typedef struct tPart_info {
     char part_name[14];
     tU8 *data_ptr;
     tU32 data_length;
     int rank_required;
     int prices[3];
-};
+} tPart_info;
 
-struct tParts_spec {
+typedef struct tParts_spec {
     int number_of_parts;
     tPart_info info[6];
-};
+} tParts_spec;
 
-struct tCar_actor {
+typedef struct tCar_actor {
     br_actor *actor;
     br_scalar min_distance_squared;
     tCrush_data crush_data;
     br_vertex *undamaged_vertices;
-};
+} tCar_actor;
 
-struct tJoystick {
+typedef struct tJoystick {
     tS32 left;
     tS32 right;
     tS32 acc;
     tS32 dec;
-};
+} tJoystick;
 
-struct tPursuee_trail {
+typedef struct tPursuee_trail {
     br_vector3 trail_nodes[25];
     br_vector3 base_heading;
     tU32 time_of_next_recording;
@@ -1346,30 +1227,30 @@ struct tPursuee_trail {
     tU8 number_of_nodes;
     tU8 has_deviated_recently;
     tU8 nodes_shifted_this_frame;
-};
+} tPursuee_trail;
 
-struct tOppo_psyche {
+typedef struct tOppo_psyche {
     tU8 grudge_against_player;
-};
+} tOppo_psyche;
 
-struct tComplete_race_data {
+typedef struct tComplete_race_data {
     tU8 finished_calcing_race_route;
     tU8 found_race_section;
-};
+} tComplete_race_data;
 
-struct tReturn_to_start_data {
+typedef struct tReturn_to_start_data {
     br_vector3 nearest_path_point;
     tS16 section_no;
     tU8 waiting_near_start;
-};
+} tReturn_to_start_data;
 
-struct tPath_node_struct {
+typedef struct tPath_node_struct {
     br_vector3 p;
     tS16 sections[8];
     tU8 number_of_sections;
-};
+} tPath_node;
 
-struct tPath_section_struct {
+typedef struct tPath_section_struct {
     tS16 node_indices[2];
     tU8 min_speed[2];
     tU8 max_speed[2];
@@ -1377,9 +1258,9 @@ struct tPath_section_struct {
     br_scalar length;
     tU8 type;
     tU8 one_way;
-};
+} tPath_section;
 
-struct tPursue_car_data {
+typedef struct tPursue_car_data {
     tCar_spec *pursuee;
     tU32 time_of_next_visibility_check;
     tU32 start_backup_time;
@@ -1389,9 +1270,9 @@ struct tPursue_car_data {
     tPath_node direct_line_nodes[2];
     tPath_section direct_line_section;
     tU8 state;
-};
+} tPursue_car_data;
 
-struct tFollow_path_data {
+typedef struct tFollow_path_data {
     tU32 struggle_time;
     tU32 last_finished_struggle_time;
     tU32 toggle_time;
@@ -1417,24 +1298,24 @@ struct tFollow_path_data {
     br_scalar corner_size;
     br_scalar corner_width;
     int section_after;
-};
+} tFollow_path_data;
 
-struct tLevitate_data {
+typedef struct tLevitate_data {
     br_scalar initial_y;
     tU32 time_started;
     unsigned int waiting_to_levitate: 1;
-};
+} tLevitate_data;
 
-struct tRun_away_data {
+typedef struct tRun_away_data {
     tU32 time_to_stop;
-};
+} tRun_away_data;
 
-struct tRoute_section {
+typedef struct tRoute_section {
     tS16 section_no;
     tU8 direction;
-};
+} tRoute_section;
 
-struct tOpponent_spec {
+typedef struct tOpponent_spec {
     int index;
     tOpponent_objective_type current_objective;
     tCar_spec *car_spec;
@@ -1476,9 +1357,9 @@ struct tOpponent_spec {
     tLevitate_data levitate_data;
     tRun_away_data run_away_data;
     tReturn_to_start_data return_to_start_data;
-};
+} tOpponent_spec;
 
-struct tIntelligent_vehicles {
+typedef struct tIntelligent_vehicles {
     int number_of_opponents;
     int number_of_cops;
     int number_of_path_nodes;
@@ -1489,26 +1370,26 @@ struct tIntelligent_vehicles {
     tOpponent_spec cops[10];
     tPath_node *path_nodes;
     tPath_section *path_sections;
-};
+} tIntelligent_vehicles;
 
-struct tBounds {
+typedef struct tBounds {
     br_matrix34 *mat;
     br_bounds original_bounds;
     br_vector3 box_centre;
     br_scalar radius;
     br_bounds real_bounds;
-};
+} tBounds;
 
-struct tFace_ref {
+typedef struct tFace_ref {
     br_material *material;
     br_vector3 v[3];
     br_vector2 *map[3];
     br_vector3 normal;
     int flags;
     br_scalar d;
-};
+} tFace_ref;
 
-struct tNet_game_player_info {
+typedef struct tNet_game_player_info {
     tPD_net_player_info pd_net_info;
     tU32 this_players_time_stamp;
     tU32 last_heard_from_him;
@@ -1536,9 +1417,9 @@ struct tNet_game_player_info {
     int last_score_index;
     br_matrix34 initial_position;
     tCar_spec *car;
-};
+} tNet_game_player_info;
 
-struct tNet_game_options {
+typedef struct tNet_game_options {
     int show_players_on_map;
     int show_peds_on_map;
     int enable_text_messages;
@@ -1551,13 +1432,13 @@ struct tNet_game_options {
     int random_car_choice;
     tNet_sequence_type race_sequence_type;
     tCar_choice car_choice;
-};
+} tNet_game_options;
 
-struct tNet_game_status {
+typedef struct tNet_game_status {
     tNet_game_stage stage;
-};
+} tNet_game_status;
 
-struct tNet_game_details {
+typedef struct tNet_game_details {
     tPD_net_player_info pd_net_info;
     char host_name[32];
     tPlayer_ID host_ID;
@@ -1567,97 +1448,97 @@ struct tNet_game_details {
     tNet_game_status status;
     tNet_game_options options;
     tNet_game_type type;
-};
+} tNet_game_details;
 
-struct tNet_message_send_me_details {
+typedef struct tNet_message_send_me_details {
     tU8 contents_size;
     tNet_message_type type;
-};
+} tNet_message_send_me_details;
 
-struct tNet_message_my_details {
+typedef struct tNet_message_my_details {
     tU8 contents_size;
     tNet_message_type type;
     tNet_game_details details;
-};
+} tNet_message_my_details;
 
-struct tNet_message_join {
+typedef struct tNet_message_join {
     tU8 contents_size;
     tNet_message_type type;
     tNet_game_player_info player_info;
-};
+} tNet_message_join;
 
-struct tNet_message_leave {
+typedef struct tNet_message_leave {
     tU8 contents_size;
     tNet_message_type type;
-};
+} tNet_message_leave;
 
-struct tNet_message_host_pissing_off {
+typedef struct tNet_message_host_pissing_off {
     tU8 contents_size;
     tNet_message_type type;
-};
+} tNet_message_host_pissing_off;
 
-struct tNet_message_new_player_list {
+typedef struct tNet_message_new_player_list {
     tU8 contents_size;
     tNet_message_type type;
     int number_of_players;
     int this_index;
     int batch_number;
     tNet_game_player_info player;
-};
+} tNet_message_new_player_list;
 
-struct tNet_message_race_over {
+typedef struct tNet_message_race_over {
     tU8 contents_size;
     tNet_message_type type;
     tRace_over_reason reason;
-};
+} tNet_message_race_over;
 
-struct tNet_message_status_report {
+typedef struct tNet_message_status_report {
     tU8 contents_size;
     tNet_message_type type;
     tPlayer_status status;
-};
+} tNet_message_status_report;
 
-struct tGrid_spec {
+typedef struct tGrid_spec {
     int index;
     int next_car_index;
     br_matrix34 mat;
-};
+} tGrid_spec;
 
-struct tNet_message_start_race {
+typedef struct tNet_message_start_race {
     tU8 contents_size;
     tNet_message_type type;
     int car_count;
     int racing;
     int next_race;
     tGrid_spec car_list[6];
-};
+} tNet_message_start_race;
 
-struct tNet_message_guarantee_reply {
+typedef struct tNet_message_guarantee_reply {
     tU8 contents_size;
     tNet_message_type type;
     tU32 guarantee_number;
-};
+} tNet_message_guarantee_reply;
 
-struct tNet_message_headup {
+typedef struct tNet_message_headup {
     tU8 contents_size;
     tNet_message_type type;
     char text[128];
-};
+} tNet_message_headup;
 
-struct tNet_message_host_query {
+typedef struct tNet_message_host_query {
     tU8 contents_size;
     tNet_message_type type;
-};
+} tNet_message_host_query;
 
-struct tNet_message_host_reply {
+typedef struct tNet_message_host_reply {
     tU8 contents_size;
     tNet_message_type type;
     int race_has_started;
     int race_index;
     int pending_race;
-};
+} tNet_message_host_reply;
 
-struct tNet_message_cop_info {
+typedef struct tNet_message_cop_info {
     tU8 contents_size;
     tNet_message_type type;
     tU32 ID;
@@ -1668,9 +1549,9 @@ struct tNet_message_cop_info {
     br_scalar curvature;
     br_scalar d[4];
     tU8 damage[12];
-};
+} tNet_message_cop_info;
 
-struct tNet_message_non_car_info {
+typedef struct tNet_message_non_car_info {
     tU8 contents_size;
     tNet_message_type type;
     tU32 ID;
@@ -1680,71 +1561,71 @@ struct tNet_message_non_car_info {
     br_vector3 omega;
     tU32 cc_coll_time;
     tU16 flags;
-};
+} tNet_message_non_car_info;
 
-struct tNet_message_non_car_position {
+typedef struct tNet_message_non_car_position {
     tU8 contents_size;
     tNet_message_type type;
     tU32 ID;
     br_matrix34 mat;
     tU16 flags;
-};
+} tNet_message_non_car_position;
 
-struct tNet_message_time_sync {
+typedef struct tNet_message_time_sync {
     tU8 contents_size;
     tNet_message_type type;
     int race_start_time;
-};
+} tNet_message_time_sync;
 
-struct tNet_message_players_confirm {
+typedef struct tNet_message_players_confirm {
     tU8 contents_size;
     tNet_message_type type;
     tPlayer_ID player;
-};
+} tNet_message_players_confirm;
 
-struct tNet_message_disable_car {
+typedef struct tNet_message_disable_car {
     tU8 contents_size;
     tNet_message_type type;
     tPlayer_ID player;
-};
+} tNet_message_disable_car;
 
-struct tNet_message_enable_car {
+typedef struct tNet_message_enable_car {
     tU8 contents_size;
     tNet_message_type type;
     tPlayer_ID player;
-};
+} tNet_message_enable_car;
 
-struct tNet_message_powerup {
+typedef struct tNet_message_powerup {
     tU8 contents_size;
     tNet_message_type type;
     tPlayer_ID player;
     int powerup_index;
     tU32 time_left;
     tPowerup_event event;
-};
+} tNet_message_powerup;
 
-struct tNet_message_recover {
+typedef struct tNet_message_recover {
     tU8 contents_size;
     tNet_message_type type;
     tU32 ID;
     int time_to_recover;
-};
+} tNet_message_recover;
 
-struct tNet_message_scores {
+typedef struct tNet_message_scores {
     tU8 contents_size;
     tNet_message_type type;
     int general_score;
     int scores[6];
-};
+} tNet_message_scores;
 
-struct tNet_message_wasted {
+typedef struct tNet_message_wasted {
     tU8 contents_size;
     tNet_message_type type;
     tPlayer_ID victim;
     tPlayer_ID culprit;
-};
+} tNet_message_wasted;
 
-struct tNet_message_gameplay {
+typedef struct tNet_message_gameplay {
     tU8 contents_size;
     tNet_message_type type;
     tNet_gameplay_mess mess;
@@ -1752,9 +1633,9 @@ struct tNet_message_gameplay {
     tU32 param_2;
     tU32 param_3;
     tU32 param_4;
-};
+} tNet_message_gameplay;
 
-struct tNet_message_pedestrian {
+typedef struct tNet_message_pedestrian {
     tU8 contents_size;
     tNet_message_type type;
     tS8 action_instruction;
@@ -1767,55 +1648,55 @@ struct tNet_message_pedestrian {
     tPlayer_ID murderer;
     tU32 respawn_time_or_spin_period;
     tS8 frame;
-};
+} tNet_message_pedestrian;
 
-struct tNet_message_car_details_req {
+typedef struct tNet_message_car_details_req {
     tU8 contents_size;
     tNet_message_type type;
-};
+} tNet_message_car_details_req;
 
-struct tCar_details {
+typedef struct tCar_details {
     int car_index;
     char owner[16];
-};
+} tCar_details;
 
-struct tNet_message_car_details {
+typedef struct tNet_message_car_details {
     tU8 contents_size;
     tNet_message_type type;
     int count;
     tCar_details details[6];
-};
+} tNet_message_car_details;
 
-struct tGame_scores {
+typedef struct tGame_scores {
     int played;
     int won;
     int score;
-};
+} tGame_scores;
 
-struct tNet_message_game_scores {
+typedef struct tNet_message_game_scores {
     tU8 contents_size;
     tNet_message_type type;
     tGame_scores scores[6];
-};
+} tNet_message_game_scores;
 
-struct tNet_message_oil_spill {
+typedef struct tNet_message_oil_spill {
     tU8 contents_size;
     tNet_message_type type;
     tPlayer_ID player;
     br_scalar full_size;
     br_scalar grow_rate;
     br_scalar current_size;
-};
+} tNet_message_oil_spill;
 
-struct tNet_message_crush_point {
+typedef struct tNet_message_crush_point {
     tU8 contents_size;
     tNet_message_type type;
     tPlayer_ID id;
     tU16 vertex;
     br_vector3 energy_vector;
-};
+} tNet_message_crush_point;
 
-struct tNet_contents {
+typedef struct tNet_contents {
     struct {
         tU8 contents_size;
         tNet_message_type type;
@@ -1854,9 +1735,9 @@ struct tNet_contents {
         tNet_message_oil_spill oil_spill;
         tNet_message_crush_point crush;
     };
-};
+} tNet_contents;
 
-struct tNet_message {
+typedef struct tNet_message {
     tU32 pd_stuff_so_DO_NOT_USE;
     tU32 magic_number;
     tU32 guarantee_number;
@@ -1866,20 +1747,20 @@ struct tNet_message {
     tU16 num_contents;
     tU16 overall_size;
     tNet_contents contents;
-};
+} tNet_message;
 
-struct tCar_detail_info {
+typedef struct tCar_detail_info {
     tCar_detail_ownership ownership;
     char name[16];
-};
+} tCar_detail_info;
 
-struct tS3_vector3 {
+typedef struct tS3_vector3 {
     tF32 x;
     tF32 y;
     tF32 z;
-};
+} tS3_vector3;
 
-struct tWav_header {
+typedef struct tWav_header {
     char quote_RIFF[4];
     tU32 format_length;
     tU8 wave[4];
@@ -1893,9 +1774,9 @@ struct tWav_header {
     tU16 bits_per_sample;
     tU8 data[4];
     tU32 data_length;
-};
+} tWav_header;
 
-struct tPowerup {
+typedef struct tPowerup {
     tPowerup_type type;
     tU32 got_time;
     tU32 duration;
@@ -1915,22 +1796,22 @@ struct tPowerup {
     float *float_params;
     tCar_spec *car;
     char message[64];
-};
+} tPowerup;
 
-struct tDepth_effect {
+typedef struct tDepth_effect {
     tDepth_effect_type type;
     int start;
     int end;
     br_pixelmap *sky_texture;
-};
+} tDepth_effect;
 
-struct tPlane_spec {
+typedef struct tPlane_spec {
     tPlane_type plane_type;
     br_fvector3 n;
     br_scalar d;
-};
+} tPlane_spec;
 
-struct tMaterial_modifiers {
+typedef struct tMaterial_modifiers {
     br_scalar car_wall_friction;
     br_scalar tyre_road_friction;
     br_scalar down_force;
@@ -1941,29 +1822,29 @@ struct tMaterial_modifiers {
     br_scalar sparkiness;
     int smoke_type;
     br_material *skid_mark_material;
-};
+} tMaterial_modifiers;
 
-struct tSpecial_screen {
+typedef struct tSpecial_screen {
     br_material *material;
     br_scalar min_x;
     br_scalar min_z;
     br_scalar max_x;
     br_scalar max_z;
-};
+} tSpecial_screen;
 
-struct tRace_list_spec {
+typedef struct tRace_list_spec {
     char name[32];
     int rank_required;
     int best_rank;
     int suggested_rank;
     int been_there_done_that;
-};
+} tRace_list_spec;
 
-struct tRace_save_info {
+typedef struct tRace_save_info {
     tU32 been_there_done_that;
-};
+} tRace_save_info;
 
-struct tGraf_spec {
+typedef struct tGraf_spec {
     int depth_bits;
     int depth_bytes;
     int doubled;
@@ -1977,9 +1858,9 @@ struct tGraf_spec {
     int phys_width;
     int phys_height;
     void *base_addr;
-};
+} tGraf_spec;
 
-struct tCollision_info {
+typedef struct tCollision_info {
     int index;
     int disabled;
     tDriver driver;
@@ -2031,9 +1912,9 @@ struct tCollision_info {
     tU32 last_car_car_collision;
     br_scalar dt;
     tCar_spec_struct *who_last_hit_me;
-};
+} tCollision_info;
 
-struct tNon_car_spec {
+typedef struct tNon_car_spec {
     tCollision_info collision_info;
     br_scalar free_mass;
     br_scalar attached_mass;
@@ -2042,16 +1923,16 @@ struct tNon_car_spec {
     br_scalar min_torque_squared;
     br_scalar snap_off_cosine;
     br_vector3 I_over_M;
-};
+} tNon_car_spec;
 
-struct tOpp_spec {
+typedef struct tOpp_spec {
     int index;
     int ranking;
     int net_player_index;
     tCar_spec *car_spec;
-};
+} tOpp_spec;
 
-struct tCheckpoint {
+typedef struct tCheckpoint {
     int time_value[3];
     int quad_count;
     br_vector3 vertices[4][4];
@@ -2060,23 +1941,23 @@ struct tCheckpoint {
     int map_top[2];
     int map_right[2];
     int map_bottom[2];
-};
+} tCheckpoint;
 
-struct tNet_starts {
+typedef struct tNet_starts {
     br_vector3 pos;
     br_scalar yaw;
-};
+} tNet_starts;
 
-struct tText_chunk {
+typedef struct tText_chunk {
     int frame_cue;
     int frame_end;
     int x_coord;
     int y_coord;
     int line_count;
     char *text[8];
-};
+} tText_chunk;
 
-struct tRace_info {
+typedef struct tRace_info {
     char name[32];
     char track_file_name[14];
     int rank_required;
@@ -2104,13 +1985,13 @@ struct tRace_info {
     br_matrix34 map_transformation;
     tText_chunk *text_chunks;
     tMaterial_modifiers material_modifiers[11];
-};
+} tRace_info;
 
-struct tOpponent_save_info {
+typedef struct tOpponent_save_info {
     tU32 dead;
-};
+} tOpponent_save_info;
 
-struct tOpponent {
+typedef struct tOpponent {
     char name[24];
     char abbrev_name[24];
     char mug_shot_name[14];
@@ -2129,9 +2010,9 @@ struct tOpponent {
     br_pixelmap *grid_icon_image;
     tOppo_psyche psyche;
     tText_chunk *text_chunks;
-};
+} tOpponent;
 
-struct tProgram_state {
+typedef struct tProgram_state {
     tS32 credits;
     tS32 credits_earned;
     tS32 credits_lost;
@@ -2196,9 +2077,9 @@ struct tProgram_state {
     tIntelligent_vehicles AI_vehicles;
     tNon_car_spec *non_cars;
     int num_non_car_spaces;
-};
+} tProgram_state;
 
-struct tDR_font {
+typedef struct tDR_font {
     br_pixelmap *images;
     int file_read_once;
     int height;
@@ -2207,9 +2088,9 @@ struct tDR_font {
     int offset;
     int num_entries;
     int width_table[224];
-};
+} tDR_font;
 
-struct tGraf_data {
+typedef struct tGraf_data {
     int width;
     int height;
     int rolling_letter_y_pitch;
@@ -2449,18 +2330,18 @@ struct tGraf_data {
     int net_message_enter_y;
     int eval_x;
     int eval_y;
-};
+} tGraf_data;
 
-struct tRolling_letter {
+typedef struct tRolling_letter {
     int letters[9];
     int x_coord;
     int y_coord;
     int number_of_letters;
     tRolling_type rolling_type;
     float current_offset;
-};
+} tRolling_letter;
 
-struct tFlic_descriptor {
+typedef struct tFlic_descriptor {
     char *data;
     char *data_start;
     char file_name[32];
@@ -2482,9 +2363,9 @@ struct tFlic_descriptor {
     int bytes_in_buffer;
     FILE *f;
     tFlic_descriptor_ptr next;
-};
+} tFlic_descriptor;
 
-struct tBrender_storage {
+typedef struct tBrender_storage {
     int models_count;
     int materials_count;
     int shade_tables_count;
@@ -2498,9 +2379,9 @@ struct tBrender_storage {
     br_pixelmap **shade_tables;
     br_material **materials;
     br_pixelmap **saved_colour_maps;
-};
+} tBrender_storage;
 
-struct tSave_game {
+typedef struct tSave_game {
     char slot_name[16];
     char car_name[16];
     char player_name[2][14];
@@ -2519,44 +2400,44 @@ struct tSave_game {
     tU32 power_up_levels[3];
     tU32 version;
     tU32 checksum;
-};
+} tSave_game;
 
-struct tPed_subs {
+typedef struct tPed_subs {
     int orig;
     int subs;
-};
+} tPed_subs;
 
-struct tRadio_bastards {
+typedef struct tRadio_bastards {
     int count;
     int top;
     int current_value;
     int left[5];
-};
+} tRadio_bastards;
 
-struct exception_struct {
+typedef struct exception_struct {
     tException_list next;
     char *name;
     int flags;
-};
+} tException_node;
 
-struct tPixelmap_user_data {
+typedef struct tPixelmap_user_data {
     tU16 orig_width;
     tU16 orig_height;
-};
+} tPixelmap_user_data;
 
-struct fmt_vertex {
+typedef struct fmt_vertex {
     br_vector3 p;
     br_vector2 map;
     br_vector3 n;
-};
+} DR_VERTEX;
 
-struct v11face {
+typedef struct v11face {
     br_uint_16 vertices[3];
     br_uint_16 edges[3];
     br_vector4 eqn;
-};
+} DR_FACE;
 
-struct v11group {
+typedef struct v11group {
     void *stored;
     v11face *faces;
     br_colour *face_colours;
@@ -2567,62 +2448,22 @@ struct v11group {
     br_uint_16 nfaces;
     br_uint_16 nvertices;
     br_uint_16 nedges;
-};
+} v11group;
 
-struct v11model {
+typedef struct v11model {
     br_size_t size;
     br_uint_32 flags;
     br_uint_16 ngroups;
     br_vector3 pivot;
     v11group *groups;
-};
+} v11model;
 
-struct tMatrix_and_actor {
+typedef struct tMatrix_and_actor {
     br_matrix34 *m;
     br_actor *a;
-};
+} tMatrix_and_actor;
 
-typedef struct tReduced_pos tReduced_pos;
-typedef struct tIncident_info tIncident_info;
 typedef tU16 tChunk_subject_index;
-typedef struct tChanged_vertex tChanged_vertex;
-typedef struct tPipe_actor_rstyle_data tPipe_actor_rstyle_data;
-typedef struct tPipe_actor_translate_data tPipe_actor_translate_data;
-typedef struct tPipe_actor_transform_data tPipe_actor_transform_data;
-typedef struct tPipe_actor_create_data tPipe_actor_create_data;
-typedef struct tPipe_actor_destroy_data tPipe_actor_destroy_data;
-typedef struct tPipe_actor_relink_data tPipe_actor_relink_data;
-typedef struct tPipe_actor_material_data tPipe_actor_material_data;
-typedef struct tPipe_face_material_data tPipe_face_material_data;
-typedef struct tPipe_material_trans_data tPipe_material_trans_data;
-typedef struct tPipe_material_pixelmap_data tPipe_material_pixelmap_data;
-typedef struct tPipe_model_geometry_data tPipe_model_geometry_data;
-typedef struct tSmudged_vertex tSmudged_vertex;
-typedef struct tPipe_smudge_data tPipe_smudge_data;
-typedef struct tPipe_pedestrian_data tPipe_pedestrian_data;
-typedef struct tPipe_frame_boundary_data tPipe_frame_boundary_data;
-typedef struct tPipe_car_data tPipe_car_data;
-typedef struct tPipe_sound_data tPipe_sound_data;
-typedef struct tPipe_damage_data tPipe_damage_data;
-typedef struct tPipe_special_data tPipe_special_data;
-typedef struct tPipe_ped_gib_data tPipe_ped_gib_data;
-typedef struct tPipe_incident_data tPipe_incident_data;
-typedef struct tPipe_spark_data tPipe_spark_data;
-typedef struct tPipe_shrapnel_data tPipe_shrapnel_data;
-typedef struct tPipe_screen_shake_data tPipe_screen_shake_data;
-typedef struct tPipe_non_car_data tPipe_non_car_data;
-typedef struct tPipe_smoke_data tPipe_smoke_data;
-typedef struct tPipe_smoke_column_data tPipe_smoke_column_data;
-typedef struct tPipe_flame_data tPipe_flame_data;
-typedef struct tPipe_splash_data tPipe_splash_data;
-typedef struct tPipe_prox_ray_data tPipe_prox_ray_data;
-typedef struct tPipe_oil_spill_data tPipe_oil_spill_data;
-typedef struct tPipe_groove_stop_data tPipe_groove_stop_data;
-typedef struct tPipe_skid_adjustment tPipe_skid_adjustment;
-typedef struct tPipe_chunk tPipe_chunk;
-typedef struct tPipe_session tPipe_session;
-typedef struct tCollison_data tCollison_data;
-typedef struct tSave_camera tSave_camera;
 
 typedef enum tShadow_level {
     eShadow_none = 0,
@@ -2695,11 +2536,11 @@ typedef enum tKey_down_result {
     tKey_down_repeat = 3
 } tKey_down_result;
 typedef int dr_pick2d_cbfn(br_actor*, br_model*, br_material*, br_vector3*, br_vector3*, br_scalar, br_scalar, void*);
-struct tReduced_pos {
+typedef struct tReduced_pos {
     tS16 v[3];
-};
+} tReduced_pos;
 
-struct tIncident_info {
+typedef struct tIncident_info {
     struct {
         tCar_spec *car;
         br_vector3 impact_point;
@@ -2711,72 +2552,72 @@ struct tIncident_info {
     struct {
         br_vector3 pos;
     };
-};
+} tIncident_info;
 
-struct tChanged_vertex {
+typedef struct tChanged_vertex {
     tU16 vertex_index;
     br_vector3 delta_coordinates;
-};
+} tChanged_vertex;
 
-struct tPipe_actor_rstyle_data {
+typedef struct tPipe_actor_rstyle_data {
     tU8 new_rstyle;
-};
+} tPipe_actor_rstyle_data;
 
-struct tPipe_actor_translate_data {
+typedef struct tPipe_actor_translate_data {
     br_vector3 new_translation;
-};
+} tPipe_actor_translate_data;
 
-struct tPipe_actor_transform_data {
+typedef struct tPipe_actor_transform_data {
     br_matrix34 new_transformation;
-};
+} tPipe_actor_transform_data;
 
-struct tPipe_actor_create_data {
+typedef struct tPipe_actor_create_data {
     tU8 dummy;
-};
+} tPipe_actor_create_data;
 
-struct tPipe_actor_destroy_data {
+typedef struct tPipe_actor_destroy_data {
     tU8 dummy;
-};
+} tPipe_actor_destroy_data;
 
-struct tPipe_actor_relink_data {
+typedef struct tPipe_actor_relink_data {
     tChunk_subject_index new_parent;
-};
+} tPipe_actor_relink_data;
 
-struct tPipe_actor_material_data {
+typedef struct tPipe_actor_material_data {
     tChunk_subject_index new_material;
-};
+} tPipe_actor_material_data;
 
-struct tPipe_face_material_data {
+typedef struct tPipe_face_material_data {
     tU16 face_index;
     tChunk_subject_index new_material;
-};
+} tPipe_face_material_data;
 
-struct tPipe_material_trans_data {
+typedef struct tPipe_material_trans_data {
     br_matrix23 new_transformation;
-};
+} tPipe_material_trans_data;
 
-struct tPipe_material_pixelmap_data {
+typedef struct tPipe_material_pixelmap_data {
     tChunk_subject_index new_pixelmap;
-};
+} tPipe_material_pixelmap_data;
 
-struct tPipe_model_geometry_data {
+typedef struct tPipe_model_geometry_data {
     tU16 vertex_count;
     int model_index;
     tChanged_vertex vertex_changes[1];
-};
+} tPipe_model_geometry_data;
 
-struct tSmudged_vertex {
+typedef struct tSmudged_vertex {
     tU16 vertex_index;
     tU16 light_index;
-};
+} tSmudged_vertex;
 
-struct tPipe_smudge_data {
+typedef struct tPipe_smudge_data {
     tU16 vertex_count;
     int model_index;
     tSmudged_vertex vertex_changes[1];
-};
+} tPipe_smudge_data;
 
-struct tPipe_pedestrian_data {
+typedef struct tPipe_pedestrian_data {
     tU8 action_and_frame_index;
     tS8 hit_points;
     tU16 parent;
@@ -2785,13 +2626,13 @@ struct tPipe_pedestrian_data {
     br_actor *parent_actor;
     br_vector3 offset;
     br_scalar jump_magnitude;
-};
+} tPipe_pedestrian_data;
 
-struct tPipe_frame_boundary_data {
+typedef struct tPipe_frame_boundary_data {
     tU32 time;
-};
+} tPipe_frame_boundary_data;
 
-struct tPipe_car_data {
+typedef struct tPipe_car_data {
     br_matrix34 transformation;
     br_vector3 velocity;
     tS16 speedo_speed;
@@ -2801,32 +2642,32 @@ struct tPipe_car_data {
     tS8 rf_sus_position;
     tS8 lr_sus_position;
     tS8 rr_sus_position;
-};
+} tPipe_car_data;
 
-struct tPipe_sound_data {
+typedef struct tPipe_sound_data {
     tS3_pitch pitch;
     br_vector3 position;
     tU16 outlet_index;
     tU16 volume;
-};
+} tPipe_sound_data;
 
-struct tPipe_damage_data {
+typedef struct tPipe_damage_data {
     tS8 damage_delta[12];
-};
+} tPipe_damage_data;
 
-struct tPipe_special_data {
+typedef struct tPipe_special_data {
     tU8 dummy;
     tS8 padding;
-};
+} tPipe_special_data;
 
-struct tPipe_ped_gib_data {
+typedef struct tPipe_ped_gib_data {
     tU16 ped_parent_index;
     tU8 size;
     tU8 gib_index;
     br_matrix34 transform;
-};
+} tPipe_ped_gib_data;
 
-struct tPipe_incident_data {
+typedef struct tPipe_incident_data {
     float severity;
     struct {
         struct {
@@ -2841,61 +2682,61 @@ struct tPipe_incident_data {
             br_vector3 pos;
         };
     };
-};
+} tPipe_incident_data;
 
-struct tPipe_spark_data {
+typedef struct tPipe_spark_data {
     br_vector3 pos;
     br_vector3 v;
-};
+} tPipe_spark_data;
 
-struct tPipe_shrapnel_data {
+typedef struct tPipe_shrapnel_data {
     br_vector3 pos;
     tU16 age;
     br_material *material;
-};
+} tPipe_shrapnel_data;
 
-struct tPipe_screen_shake_data {
+typedef struct tPipe_screen_shake_data {
     tS8 wobble_x;
     tS8 wobble_y;
-};
+} tPipe_screen_shake_data;
 
-struct tPipe_non_car_data {
+typedef struct tPipe_non_car_data {
     br_actor *actor;
     br_matrix34 mat;
-};
+} tPipe_non_car_data;
 
-struct tPipe_smoke_data {
+typedef struct tPipe_smoke_data {
     tReduced_pos pos;
     tU16 radius;
     tU8 strength;
     tU8 type;
-};
+} tPipe_smoke_data;
 
-struct tPipe_smoke_column_data {
+typedef struct tPipe_smoke_column_data {
     int car_ID;
     tU16 vertex;
-};
+} tPipe_smoke_column_data;
 
-struct tPipe_flame_data {
+typedef struct tPipe_flame_data {
     tS16 frame_count;
     br_scalar scale_x;
     br_scalar scale_y;
     br_scalar offset_x;
     br_scalar offset_z;
-};
+} tPipe_flame_data;
 
-struct tPipe_splash_data {
+typedef struct tPipe_splash_data {
     br_scalar d;
     br_vector3 normal;
-};
+} tPipe_splash_data;
 
-struct tPipe_prox_ray_data {
+typedef struct tPipe_prox_ray_data {
     tU16 ped_index;
     tU16 car_ID;
     tU32 time;
-};
+} tPipe_prox_ray_data;
 
-struct tPipe_oil_spill_data {
+typedef struct tPipe_oil_spill_data {
     br_matrix34 mat;
     br_scalar full_size;
     br_scalar grow_rate;
@@ -2904,22 +2745,22 @@ struct tPipe_oil_spill_data {
     tCar_spec *car;
     br_vector3 original_pos;
     br_pixelmap *pixelmap;
-};
+} tPipe_oil_spill_data;
 
-struct tPipe_groove_stop_data {
+typedef struct tPipe_groove_stop_data {
     int path_interrupt;
     int object_interrupt;
     float path_resumption;
     float object_resumption;
     br_matrix34 matrix;
-};
+} tPipe_groove_stop_data;
 
-struct tPipe_skid_adjustment {
+typedef struct tPipe_skid_adjustment {
     br_matrix34 matrix;
     int material_index;
-};
+} tPipe_skid_adjustment;
 
-struct tPipe_chunk {
+typedef struct tPipe_chunk {
     tChunk_subject_index subject_index;
     struct {
         tPipe_actor_rstyle_data actor_rstyle_data;
@@ -2955,28 +2796,26 @@ struct tPipe_chunk {
         tPipe_prox_ray_data prox_ray_data;
         tPipe_skid_adjustment skid_adjustment;
     };
-};
+} tPipe_chunk;
 
-struct tPipe_session {
+typedef struct tPipe_session {
     tPipe_chunk_type chunk_type;
     tU8 number_of_chunks;
     tPipe_chunk chunks;
-};
+} tPipe_session;
 
-struct tCollison_data {
+typedef struct tCollison_data {
     int ref;
     tCollision_info *car;
-};
+} tCollison_data;
 
-struct tSave_camera {
+typedef struct tSave_camera {
     int saved;
     br_scalar zoom;
     br_angle yaw;
-};
+} tSave_camera;
 
-typedef struct tToggle_element tToggle_element;
 typedef void * tEdit_func();
-typedef struct tCheat tCheat;
 
 typedef enum tEdit_mode {
     eEdit_mode_cheat = 0,
@@ -2991,21 +2830,21 @@ typedef enum tEdit_mode {
     eEdit_mode_options = 9,
     eEdit_mode_count = 10
 } tEdit_mode;
-struct tToggle_element {
+typedef struct tToggle_element {
     int key1;
     int key2;
     int in_game_only;
     int exact_modifiers;
     int on_last_time;
     void (*action_proc)();
-};
+} tToggle_element;
 
-struct tCheat {
+typedef struct tCheat {
     tU32 code;
     tU32 code2;
     void (*action_proc)(int);
     int num;
-};
+} tCheat;
 
 typedef _tag_sos_evds_struct _SOS_EVDS_STRUCT;
 typedef _tag_sos_vds_struct _SOS_VDS_STRUCT;
@@ -3013,13 +2852,10 @@ typedef _tag_sos_sample _SOS_SAMPLE;
 typedef _SOS_SAMPLE * PSOSSAMPLE;
 typedef _tagCAPABILITIES _SOS_CAPABILITIES;
 typedef _SOS_CAPABILITIES * PSOSCAPABILITIES;
-typedef struct _SOS_HARDWARE _SOS_HARDWARE;
 typedef _SOS_HARDWARE * PSOSHARDWARE;
 typedef _tag_sos_driver _SOS_DIGI_DRIVER;
 typedef _SOS_DIGI_DRIVER * PSOSDIGIDRIVER;
-typedef struct _SOS_DRV_FILEHEADER _SOS_DRV_FILEHEADER;
 typedef _SOS_DRV_FILEHEADER * PSOSDRVFILEHEADER;
-typedef struct _SOS_DRV_DRIVERHEADER _SOS_DRV_DRIVERHEADER;
 typedef _SOS_DRV_DRIVERHEADER * PSOSDRVDRIVERHEADER;
 typedef _tag_sos_system _SOS_SYSTEM;
 typedef _SOS_SYSTEM * PSOSSYSTEM;
@@ -3034,24 +2870,24 @@ typedef void * SmackTimerSetupType();
 typedef unsigned long * SmackTimerReadType();
 typedef void * SmackTimerDoneType();
 typedef _heapinfo _HEAPINFO;
-struct _tag_sos_evds_struct {
+typedef struct _tag_sos_evds_struct {
     unsigned int region_size;
     unsigned int offset;
     unsigned int segment;
     unsigned short number_available;
     unsigned short number_used;
     unsigned int page0;
-};
+} _SOS_EVDS_STRUCT;
 
-struct _tag_sos_vds_struct {
+typedef struct _tag_sos_vds_struct {
     unsigned int region_size;
     unsigned int offset;
     unsigned short segment;
     unsigned short ID;
     unsigned int physical;
-};
+} _SOS_VDS_STRUCT;
 
-struct _tag_sos_sample {
+typedef struct _tag_sos_sample {
     PSTR pSample;
     PSTR pSampleCurrent;
     PSTR pSampleLoop;
@@ -3082,9 +2918,9 @@ struct _tag_sos_sample {
     DWORD wUser[16];
     _tag_sos_sample *pLink;
     _tag_sos_sample *pNext;
-};
+} _SOS_SAMPLE;
 
-struct _tagCAPABILITIES {
+typedef struct _tagCAPABILITIES {
     BYTE szDeviceName[32];
     W32 wDeviceVersion;
     W32 wBitsPerSample;
@@ -3101,16 +2937,16 @@ struct _tagCAPABILITIES {
     W32 fBackground;
     W32 wID;
     W32 wTimerID;
-};
+} _SOS_CAPABILITIES;
 
-struct _SOS_HARDWARE {
+typedef struct _SOS_HARDWARE {
     W32 wPort;
     W32 wIRQ;
     W32 wDMA;
     W32 wParam;
-};
+} _SOS_HARDWARE;
 
-struct _tag_sos_driver {
+typedef struct _tag_sos_driver {
     W32 wFlags;
     DWORD wDriverRate;
     DWORD wDriverChannels;
@@ -3145,24 +2981,24 @@ struct _tag_sos_driver {
     W32 wDMARealSeg;
     W32 wID;
     void (*pfnMixFunction)();
-};
+} _SOS_DIGI_DRIVER;
 
-struct _SOS_DRV_FILEHEADER {
+typedef struct _SOS_DRV_FILEHEADER {
     BYTE szName[32];
     W32 wDrivers;
     W32 lOffset;
     W32 lFileSize;
-};
+} _SOS_DRV_FILEHEADER;
 
-struct _SOS_DRV_DRIVERHEADER {
+typedef struct _SOS_DRV_DRIVERHEADER {
     BYTE szName[32];
     W32 lNextDriver;
     W32 wSize;
     W32 wDeviceID;
     W32 wExtenderType;
-};
+} _SOS_DRV_DRIVERHEADER;
 
-struct _tag_sos_system {
+typedef struct _tag_sos_system {
     W32 wFlags;
     BYTE szDriverPath[128];
     BYTE szTempDriverPath[128];
@@ -3172,9 +3008,9 @@ struct _tag_sos_system {
     _SOS_DRV_DRIVERHEADER sDriverHeader;
     PSTR (*pMemAllocFunction)(DWORD);
     void (*pMemFreeFunction)(PSTR, W32);
-};
+} _SOS_SYSTEM;
 
-struct _tag_sos_det_system {
+typedef struct _tag_sos_det_system {
     W32 wFlags;
     BYTE szDriverPath[128];
     BYTE szTempDriverPath[128];
@@ -3189,9 +3025,9 @@ struct _tag_sos_det_system {
     W32 wDriverIndexCur;
     W32 hMemory;
     DWORD dwLinear;
-};
+} _SOS_DET_SYSTEM;
 
-struct _tag_sos_timer_system {
+typedef struct _tag_sos_timer_system {
     W32 wFlags;
     W32 wChipDivisor;
     void (*pfnEvent[16])();
@@ -3200,9 +3036,9 @@ struct _tag_sos_timer_system {
     DWORD dwCurrentSummation[16];
     W32 wMIDIEventSongHandle[16];
     W32 wMIDIActiveSongHandle;
-};
+} _SOS_TIMER_SYSTEM;
 
-struct SmackTag {
+typedef struct SmackTag {
     unsigned long Version;
     unsigned long Width;
     unsigned long Height;
@@ -3232,9 +3068,9 @@ struct SmackTag {
     unsigned long TopOfs;
     unsigned long ReadError;
     unsigned long addr32;
-};
+} Smack;
 
-struct SmackSumTag {
+typedef struct SmackSumTag {
     unsigned long TotalTime;
     unsigned long MS100PerFrame;
     unsigned long TotalOpenTime;
@@ -3256,13 +3092,13 @@ struct SmackSumTag {
     unsigned long HighestMemAmount;
     unsigned long TotalExtraMemory;
     unsigned long HighestExtraUsed;
-};
+} SmackSum;
 
-struct _heapinfo {
+typedef struct _heapinfo {
     void *_pentry;
     size_t _size;
     int _useflag;
-};
+} _HEAPINFO;
 
 
 typedef enum tSpec_vol_depth_effect {
@@ -3276,8 +3112,6 @@ typedef enum tSpec_vol_depth_effect {
 typedef enum tSpec_vol_cam_effect {
     eSpec_cam_wobble = 0
 } tSpec_vol_cam_effect;
-typedef struct tHeadup tHeadup;
-typedef struct tQueued_headup tQueued_headup;
 
 typedef enum tHeadup_type {
     eHeadup_unused = 0,
@@ -3295,7 +3129,7 @@ typedef enum tFancy_stage {
     eFancy_stage_readying = 3,
     eFancy_stage_leaving = 4
 } tFancy_stage;
-struct tHeadup {
+typedef struct tHeadup {
     tHeadup_type type;
     int x;
     int y;
@@ -3336,29 +3170,24 @@ struct tHeadup {
             tU32 start_time;
         };
     };
-};
+} tHeadup;
 
-struct tQueued_headup {
+typedef struct tQueued_headup {
     int flash_rate;
     int lifetime;
     int font_index;
     char text[256];
-};
+} tQueued_headup;
 
-typedef struct tFlicette tFlicette;
-typedef struct tMouse_area tMouse_area;
-typedef struct tRectile tRectile;
-typedef struct tInterface_spec tInterface_spec;
 typedef unsigned long time_t;
 typedef unsigned long clock_t;
-typedef struct tm tm;
-struct tFlicette {
+typedef struct tFlicette {
     int flic_index;
     int x[2];
     int y[2];
-};
+} tFlicette;
 
-struct tMouse_area {
+typedef struct tMouse_area {
     int left[2];
     int top[2];
     int right[2];
@@ -3367,16 +3196,16 @@ struct tMouse_area {
     int new_mode;
     int available_when_typing;
     int (*mouse_click)(int*, int*, int, int);
-};
+} tMouse_area;
 
-struct tRectile {
+typedef struct tRectile {
     int left[2];
     int top[2];
     int right[2];
     int bottom[2];
-};
+} tRectile;
 
-struct tInterface_spec {
+typedef struct tInterface_spec {
     int initial_imode;
     int first_opening_flic;
     int second_opening_flic;
@@ -3427,9 +3256,9 @@ struct tInterface_spec {
     tMouse_area *mouse_areas;
     int number_of_recopy_areas;
     tRectile *recopy_areas;
-};
+} tInterface_spec;
 
-struct tm {
+typedef struct tm {
     int tm_sec;
     int tm_min;
     int tm_hour;
@@ -3439,9 +3268,8 @@ struct tm {
     int tm_wday;
     int tm_yday;
     int tm_isdst;
-};
+} tm;
 
-typedef struct fw_fn_table fw_fn_table;
 
 typedef enum view_to_screen_type {
     BR_VTOS_PARALLEL = 0,
@@ -3463,7 +3291,7 @@ typedef br_pixelmap* dev_clone_cbfn(br_device*, br_pixelmap*);
 typedef void dev_free_cbfn(br_device*, br_pixelmap*);
 typedef int dr_modelpick2d_cbfn(br_model*, br_material*, br_vector3*, br_vector3*, br_scalar, int, int, int, br_vector3*, br_vector2*, void*);
 typedef int dr_pick3d_cbfn(br_actor*, br_model*, br_material*, br_matrix34*, br_bounds*, void*);
-struct fw_fn_table {
+typedef struct fw_fn_table {
     br_surface_fn *light;
     br_surface_fn *light_material;
     br_surface_fn *light_vertex;
@@ -3474,12 +3302,9 @@ struct fw_fn_table {
     br_light_sub_fn *point_attn;
     br_light_sub_fn *spot;
     br_light_sub_fn *spot_attn;
-};
+} fw_fn_table;
 
-typedef struct tFlic_spec tFlic_spec;
-typedef struct tFlic_bunch tFlic_bunch;
-typedef struct tTranslation_record tTranslation_record;
-struct tFlic_spec {
+typedef struct tFlic_spec {
     char *file_name;
     int interruptable;
     int queued;
@@ -3489,14 +3314,14 @@ struct tFlic_spec {
     int y_offset;
     tS8 *data_ptr;
     tU32 the_size;
-};
+} tFlic_spec;
 
-struct tFlic_bunch {
+typedef struct tFlic_bunch {
     char count;
     int *indexes;
-};
+} tFlic_bunch;
 
-struct tTranslation_record {
+typedef struct tTranslation_record {
     int flic_index;
     int x;
     int y;
@@ -3505,7 +3330,7 @@ struct tTranslation_record {
     int every_frame;
     tJustification justification;
     char *text;
-};
+} tTranslation_record;
 
 
 typedef enum tVehicle_category {
@@ -3514,22 +3339,16 @@ typedef enum tVehicle_category {
     eVehicle_rozzer = 2,
     eVehicle_drone = 3
 } tVehicle_category;
-typedef struct tTransient_bm tTransient_bm;
-typedef struct tCursor_giblet tCursor_giblet;
-typedef struct tWobble_spec tWobble_spec;
-typedef struct tConcussion tConcussion;
-typedef struct tSaved_table tSaved_table;
-typedef struct tClip_details tClip_details;
-struct tTransient_bm {
+typedef struct tTransient_bm {
     br_pixelmap *pixmap;
     int in_use;
     int x_coord;
     int y_coord;
     int order_number;
     int user_data;
-};
+} tTransient_bm;
 
-struct tCursor_giblet {
+typedef struct tCursor_giblet {
     int current_giblet;
     int sequence_index;
     int landed;
@@ -3542,45 +3361,39 @@ struct tCursor_giblet {
     tU32 last_giblet_change;
     tU32 giblet_change_period;
     tU32 e_t_a;
-};
+} tCursor_giblet;
 
-struct tWobble_spec {
+typedef struct tWobble_spec {
     float amplitude_x;
     float amplitude_y;
     float period;
     int time_started;
-};
+} tWobble_spec;
 
-struct tConcussion {
+typedef struct tConcussion {
     int concussed;
     br_matrix34 amplitudes;
     br_matrix34 periods;
     tU32 time_started;
-};
+} tConcussion;
 
-struct tSaved_table {
+typedef struct tSaved_table {
     br_pixelmap *original;
     br_pixelmap *copy;
-};
+} tSaved_table;
 
-struct tClip_details {
+typedef struct tClip_details {
     br_actor *clip;
     br_scalar length;
-};
+} tClip_details;
 
-typedef struct tS3_channel tS3_channel;
-typedef struct tS3_outlet tS3_outlet;
-typedef struct tS3_descriptor tS3_descriptor;
-typedef struct tS3_sound_source tS3_sound_source;
-typedef struct tS3_sample tS3_sample;
-typedef struct tS3_hardware_info tS3_hardware_info;
 
 typedef enum tS3_sound_type {
     eS3_ST_sample = 0,
     eS3_ST_midi = 1,
     eS3_ST_cda = 2
 } tS3_sound_type;
-struct tS3_channel {
+typedef struct tS3_channel {
     int active;
     int termination_reason;
     int needs_service;
@@ -3606,9 +3419,9 @@ struct tS3_channel {
     char *type_struct_midi;
     char *type_struct_cda;
     tS3_sound_source *sound_source_ptr;
-};
+} tS3_channel;
 
-struct tS3_outlet {
+typedef struct tS3_outlet {
     int id;
     int max_channels;
     int independent_pitch;
@@ -3616,9 +3429,9 @@ struct tS3_outlet {
     tS3_outlet *prev;
     tS3_outlet *next;
     tS3_outlet_callback *callback;
-};
+} tS3_outlet;
 
-struct tS3_descriptor {
+typedef struct tS3_descriptor {
     tS3_sound_id id;
     tS3_type type;
     tS3_priority priority;
@@ -3637,9 +3450,9 @@ struct tS3_descriptor {
     int memory_proxy;
     char *sound_data;
     char *filename;
-};
+} tS3_descriptor;
 
-struct tS3_sound_source {
+typedef struct tS3_sound_source {
     tS3_channel *channel;
     int brender_vector;
     void *position_ptr;
@@ -3657,18 +3470,18 @@ struct tS3_sound_source {
     tS3_pitch pitch;
     tS3_speed speed;
     tS3_sound_tag tag;
-};
+} tS3_sound_source;
 
-struct tS3_sample {
+typedef struct tS3_sample {
     int size;
     int rate;
     int resolution;
     int channels;
     char *dataptr;
     void *freeptr;
-};
+} tS3_sample;
 
-struct tS3_hardware_info {
+typedef struct tS3_hardware_info {
     int device_installed;
     int timer_installed;
     int num_channels;
@@ -3677,10 +3490,8 @@ struct tS3_hardware_info {
     int max_sample_rate;
     int min_sample_rate;
     int independent_pitch;
-};
+} tS3_hardware_info;
 
-typedef struct tModel_pool tModel_pool;
-typedef struct tHeadup_info tHeadup_info;
 
 typedef enum tNet_head_avail {
     eNet_or_otherwise = 0,
@@ -3688,15 +3499,15 @@ typedef enum tNet_head_avail {
     eNot_net = 2,
     eNot_ever_ever_ever = 3
 } tNet_head_avail;
-struct tModel_pool {
+typedef struct tModel_pool {
     br_model **model_array;
     int model_count;
-};
+} tModel_pool;
 
-struct tHeadup_info {
+typedef struct tHeadup_info {
     char *name;
     tNet_head_avail avail;
-};
+} tHeadup_info;
 
 
 typedef enum tTime_bonus_state {
@@ -3715,30 +3526,25 @@ typedef enum tInfo_mode {
     eInfo_nearby_mat = 2,
     eInfo_count = 3
 } tInfo_mode;
-typedef struct tHeadup_pair tHeadup_pair;
-struct tHeadup_pair {
+typedef struct tHeadup_pair {
     int player_index;
     int score;
     int out_of_game;
-};
+} tHeadup_pair;
 
-typedef struct tMax_message tMax_message;
-typedef struct tMid_message tMid_message;
-typedef struct tMin_message tMin_message;
-typedef struct tGuaranteed_message tGuaranteed_message;
-struct tMax_message {
+typedef struct tMax_message {
     char buffer[516];
-};
+} tMax_message;
 
-struct tMid_message {
+typedef struct tMid_message {
     char buffer[132];
-};
+} tMid_message;
 
-struct tMin_message {
+typedef struct tMin_message {
     char buffer[36];
-};
+} tMin_message;
 
-struct tGuaranteed_message {
+typedef struct tGuaranteed_message {
     tNet_message *message;
     tU32 send_time;
     tU32 next_resend_time;
@@ -3747,22 +3553,20 @@ struct tGuaranteed_message {
     tPD_net_player_info pd_address;
     int (*NotifyFail)(tU32, tNet_message*);
     tU32 guarantee_number;
-};
+} tGuaranteed_message;
 
-typedef struct tJoinable_game tJoinable_game;
 
 typedef enum tJoin_or_host_result {
     eJoin_or_host_cancel = 0,
     eJoin_or_host_join = 1,
     eJoin_or_host_host = 2
 } tJoin_or_host_result;
-struct tJoinable_game {
+typedef struct tJoinable_game {
     tNet_game_details *game;
     tU32 time;
-};
+} tJoinable_game;
 
-typedef struct tOil_spill_info tOil_spill_info;
-struct tOil_spill_info {
+typedef struct tOil_spill_info {
     br_actor *actor;
     tCar_spec *car;
     tU32 spill_time;
@@ -3772,7 +3576,7 @@ struct tOil_spill_info {
     br_scalar grow_rate;
     br_vector3 original_pos;
     br_vector3 pos;
-};
+} tOil_spill_info;
 
 
 typedef enum tJoy_calib_stage {
@@ -3783,16 +3587,6 @@ typedef enum tJoy_calib_stage {
     eJoy_calib_br_2 = 4,
     eJoy_calib_cn_2 = 5
 } tJoy_calib_stage;
-typedef struct tPed_choice tPed_choice;
-typedef struct tPedestrian_instruction tPedestrian_instruction;
-typedef struct tBearing_sequence tBearing_sequence;
-typedef struct tPedestrian_action tPedestrian_action;
-typedef struct tPed_frame_info tPed_frame_info;
-typedef struct tPedestrian_sequence tPedestrian_sequence;
-typedef struct tPedestrian_data tPedestrian_data;
-typedef struct tPed_gib tPed_gib;
-typedef struct tPed_gib_materials tPed_gib_materials;
-typedef struct tProximity_ray tProximity_ray;
 
 typedef enum tPed_instruc_type {
     ePed_instruc_point = 0,
@@ -3825,13 +3619,13 @@ typedef enum tPed_hit_position {
     ePed_hit_rside = 3,
     ePed_hit_lside = 4
 } tPed_hit_position;
-struct tPed_choice {
+typedef struct tPed_choice {
     tU16 danger_level;
     tU8 percentage_chance;
     tU8 marker_ref;
-};
+} tPed_choice;
 
-struct tPedestrian_instruction {
+typedef struct tPedestrian_instruction {
     tPed_instruc_type type;
     struct {
         struct {
@@ -3852,14 +3646,14 @@ struct tPedestrian_instruction {
             int action_index;
         };
     };
-};
+} tPedestrian_instruction;
 
-struct tBearing_sequence {
+typedef struct tBearing_sequence {
     int sequence_index;
     float max_bearing;
-};
+} tBearing_sequence;
 
-struct tPedestrian_action {
+typedef struct tPedestrian_action {
     float danger_level;
     float percentage_chance;
     int number_of_bearings;
@@ -3869,24 +3663,24 @@ struct tPedestrian_action {
     float initial_speed;
     float looping_speed;
     tU32 reaction_time;
-};
+} tPedestrian_action;
 
-struct tPed_frame_info {
+typedef struct tPed_frame_info {
     br_vector2 offset;
     int flipped;
     br_pixelmap *pixelmap;
-};
+} tPed_frame_info;
 
-struct tPedestrian_sequence {
+typedef struct tPedestrian_sequence {
     tPed_frame_rate_type frame_rate_type;
     float frame_rate_factor1;
     float frame_rate_factor2;
     int number_of_frames;
     int looping_frame_start;
     tPed_frame_info frames[10];
-};
+} tPedestrian_sequence;
 
-struct tPedestrian_data {
+typedef struct tPedestrian_data {
     int magic_number;
     br_scalar height;
     br_scalar jump_magnitude;
@@ -3954,9 +3748,9 @@ struct tPedestrian_data {
     tPedestrian_sequence *sequences;
     tS3_sound_tag last_sound;
     br_pixelmap *colour_map;
-};
+} tPedestrian_data;
 
-struct tPed_gib {
+typedef struct tPed_gib {
     br_actor *actor;
     br_scalar x_speed;
     br_scalar y_speed;
@@ -3967,63 +3761,57 @@ struct tPed_gib {
     tU32 start_time;
     tU32 end_time;
     tU32 flip_period;
-};
+} tPed_gib;
 
-struct tPed_gib_materials {
+typedef struct tPed_gib_materials {
     int count;
     br_material *materials[5];
-};
+} tPed_gib_materials;
 
-struct tProximity_ray {
+typedef struct tProximity_ray {
     tCar_spec *car;
     tPedestrian_data *ped;
     tU32 start_time;
-};
+} tProximity_ray;
 
-typedef struct tPiped_registration_snapshot tPiped_registration_snapshot;
-struct tPiped_registration_snapshot {
+typedef struct tPiped_registration_snapshot {
     int piped_actors_count;
     int piped_models_count;
     int piped_materials_count;
     int piped_pixelmaps_count;
-};
+} tPiped_registration_snapshot;
 
-typedef struct tHeadup_icon tHeadup_icon;
-struct tHeadup_icon {
+typedef struct tHeadup_icon {
     tPowerup *powerup;
     int fizzle_stage;
     int fizzle_direction;
     tU32 fizzle_start;
-};
+} tHeadup_icon;
 
-typedef struct tPrat_flic_spec tPrat_flic_spec;
-typedef struct tPrat_alternative tPrat_alternative;
-typedef struct tPrat_flic_chunk tPrat_flic_chunk;
-typedef struct tPrat_sequence tPrat_sequence;
-struct tPrat_flic_spec {
+typedef struct tPrat_flic_spec {
     char *data;
     tU32 data_length;
-};
+} tPrat_flic_spec;
 
-struct tPrat_alternative {
+typedef struct tPrat_alternative {
     int ref;
     int chance;
     int number_of_sounds;
     int sound_ids[8];
     int sound_chance;
-};
+} tPrat_alternative;
 
-struct tPrat_flic_chunk {
+typedef struct tPrat_flic_chunk {
     int number_of_alternatives;
     tPrat_alternative alternatives[6];
-};
+} tPrat_flic_chunk;
 
-struct tPrat_sequence {
+typedef struct tPrat_sequence {
     int number_of_chunks;
     int precedence;
     int repeat_chunk;
     tPrat_flic_chunk chunks[6];
-};
+} tPrat_sequence;
 
 
 typedef enum tGrid_draw {
@@ -4037,8 +3825,7 @@ typedef enum tNet_synch_mode {
     eNet_synch_host_subsequent = 1,
     eNet_synch_client = 2
 } tNet_synch_mode;
-typedef struct tWreck_info tWreck_info;
-struct tWreck_info {
+typedef struct tWreck_info {
     br_actor *actor;
     br_matrix34 rotation;
     br_matrix34 original_matrix;
@@ -4048,30 +3835,22 @@ struct tWreck_info {
     float pos_y;
     tVehicle_type car_type;
     br_scalar scaling_factor;
-};
+} tWreck_info;
 
-typedef struct tRectangle tRectangle;
-struct tRectangle {
+typedef struct tRectangle {
     int left;
     int top;
     int right;
     int bottom;
-};
+} tRectangle;
 
-typedef struct tSkid tSkid;
-struct tSkid {
+typedef struct tSkid {
     br_actor *actor;
     br_vector3 normal;
     br_vector3 pos;
-};
+} tSkid;
 
-typedef struct tSpark tSpark;
-typedef struct tShrapnel tShrapnel;
-typedef struct tSmoke tSmoke;
-typedef struct tSmoke_column tSmoke_column;
-typedef struct tSplash tSplash;
-typedef struct tBRender_smoke tBRender_smoke;
-struct tSpark {
+typedef struct tSpark {
     int count;
     br_vector3 pos;
     br_vector3 v;
@@ -4080,9 +3859,9 @@ struct tSpark {
     tU32 time_sync;
     tCar_spec *car;
     tU8 colour;
-};
+} tSpark;
 
-struct tShrapnel {
+typedef struct tShrapnel {
     br_actor *actor;
     br_vector3 v;
     tU32 time_sync;
@@ -4090,9 +3869,9 @@ struct tShrapnel {
     br_scalar shear1;
     br_scalar shear2;
     br_vector3 axis;
-};
+} tShrapnel;
 
-struct tSmoke {
+typedef struct tSmoke {
     tU32 time_sync;
     br_vector3 pos;
     br_vector3 v;
@@ -4101,9 +3880,9 @@ struct tSmoke {
     br_scalar decay_factor;
     tU8 type;
     tU8 pipe_me;
-};
+} tSmoke;
 
-struct tSmoke_column {
+typedef struct tSmoke_column {
     tCar_spec *car;
     tU32 time;
     tU32 lifetime;
@@ -4120,33 +3899,30 @@ struct tSmoke_column {
     tU32 smudge_timer;
     int vertex_index;
     int upright;
-};
+} tSmoke_column;
 
-struct tSplash {
+typedef struct tSplash {
     br_actor *actor;
     br_vector3 v;
     int just_done;
     br_scalar size;
     br_scalar scale_x;
-};
+} tSplash;
 
-struct tBRender_smoke {
+typedef struct tBRender_smoke {
     br_vector3 pos;
     br_scalar r;
     br_scalar strength;
     br_colour col;
     br_scalar aspect;
-};
+} tBRender_smoke;
 
-typedef struct tRGB_colour tRGB_colour;
-struct tRGB_colour {
+typedef struct tRGB_colour {
     int red;
     int green;
     int blue;
-};
+} tRGB_colour;
 
-typedef struct tFunkotronic_spec tFunkotronic_spec;
-typedef struct tGroovidelic_spec tGroovidelic_spec;
 typedef br_material* * tPMFMCB(br_model*, tU16);
 
 typedef enum tMatrix_mod_type {
@@ -4229,7 +4005,7 @@ typedef enum tScale_mode {
     eScale_mode_y = 2,
     eScale_mode_z = 3
 } tScale_mode;
-struct tFunkotronic_spec {
+typedef struct tFunkotronic_spec {
     int owner;
     br_material *material;
     tFunk_trigger_mode mode;
@@ -4291,9 +4067,9 @@ struct tFunkotronic_spec {
     };
     int proximity_count;
     br_vector3 *proximity_array;
-};
+} tFunkotronic_spec;
 
-struct tGroovidelic_spec {
+typedef struct tGroovidelic_spec {
     int owner;
     int done_this_frame;
     br_actor *actor;
@@ -4352,31 +4128,9 @@ struct tGroovidelic_spec {
             float z_magnitude;
         };
     };
-};
+} tGroovidelic_spec;
 
-typedef struct DWORDREGS DWORDREGS;
-typedef struct WORDREGS WORDREGS;
-typedef struct BYTEREGS BYTEREGS;
-typedef struct REGS REGS;
-typedef struct SREGS SREGS;
-typedef struct REGPACKB REGPACKB;
-typedef struct REGPACKW REGPACKW;
-typedef struct REGPACKX REGPACKX;
-typedef struct REGPACK REGPACK;
-typedef struct INTPACKX INTPACKX;
-typedef struct INTPACKW INTPACKW;
-typedef struct INTPACKB INTPACKB;
-typedef struct INTPACK INTPACK;
-typedef struct _DOSERROR _DOSERROR;
-typedef struct DOSERROR DOSERROR;
-typedef struct dosdate_t dosdate_t;
-typedef struct dostime_t dostime_t;
-typedef struct find_t find_t;
-typedef struct _diskfree_t _diskfree_t;
-typedef struct tPD_net_game_info tPD_net_game_info;
-typedef struct tIPX_netnum tIPX_netnum;
-typedef struct tRM_info tRM_info;
-struct DWORDREGS {
+typedef struct DWORDREGS {
     unsigned int eax;
     unsigned int ebx;
     unsigned int ecx;
@@ -4384,9 +4138,9 @@ struct DWORDREGS {
     unsigned int esi;
     unsigned int edi;
     unsigned int cflag;
-};
+} DWORDREGS;
 
-struct WORDREGS {
+typedef struct WORDREGS {
     unsigned short ax;
     unsigned short _1;
     unsigned short bx;
@@ -4400,9 +4154,9 @@ struct WORDREGS {
     unsigned short di;
     unsigned short _6;
     unsigned int cflag;
-};
+} WORDREGS;
 
-struct BYTEREGS {
+typedef struct BYTEREGS {
     unsigned char al;
     unsigned char ah;
     unsigned short _1;
@@ -4415,24 +4169,24 @@ struct BYTEREGS {
     unsigned char dl;
     unsigned char dh;
     unsigned short _4;
-};
+} BYTEREGS;
 
-struct REGS {
+typedef struct REGS {
     DWORDREGS x;
     WORDREGS w;
     BYTEREGS h;
-};
+} REGS;
 
-struct SREGS {
+typedef struct SREGS {
     unsigned short es;
     unsigned short cs;
     unsigned short ss;
     unsigned short ds;
     unsigned short fs;
     unsigned short gs;
-};
+} SREGS;
 
-struct REGPACKB {
+typedef struct REGPACKB {
     unsigned char al;
     unsigned char ah;
     unsigned short _1;
@@ -4445,9 +4199,9 @@ struct REGPACKB {
     unsigned char dl;
     unsigned char dh;
     unsigned short _4;
-};
+} REGPACKB;
 
-struct REGPACKW {
+typedef struct REGPACKW {
     unsigned short ax;
     unsigned short _1;
     unsigned short bx;
@@ -4467,9 +4221,9 @@ struct REGPACKW {
     unsigned short fs;
     unsigned short gs;
     unsigned int flags;
-};
+} REGPACKW;
 
-struct REGPACKX {
+typedef struct REGPACKX {
     unsigned int eax;
     unsigned int ebx;
     unsigned int ecx;
@@ -4482,15 +4236,15 @@ struct REGPACKX {
     unsigned short fs;
     unsigned short gs;
     unsigned int flags;
-};
+} REGPACKX;
 
-struct REGPACK {
+typedef struct REGPACK {
     REGPACKB h;
     REGPACKW w;
     REGPACKX x;
-};
+} REGPACK;
 
-struct INTPACKX {
+typedef struct INTPACKX {
     unsigned int gs;
     unsigned int fs;
     unsigned int es;
@@ -4506,9 +4260,9 @@ struct INTPACKX {
     unsigned int eip;
     unsigned int cs;
     unsigned int flags;
-};
+} INTPACKX;
 
-struct INTPACKW {
+typedef struct INTPACKW {
     unsigned short gs;
     unsigned short _1;
     unsigned short fs;
@@ -4538,9 +4292,9 @@ struct INTPACKW {
     unsigned short cs;
     unsigned short _e;
     unsigned int flags;
-};
+} INTPACKW;
 
-struct INTPACKB {
+typedef struct INTPACKB {
     unsigned char bl;
     unsigned char bh;
     unsigned short _1;
@@ -4553,68 +4307,68 @@ struct INTPACKB {
     unsigned char al;
     unsigned char ah;
     unsigned short _4;
-};
+} INTPACKB;
 
-struct INTPACK {
+typedef struct INTPACK {
     INTPACKB h;
     INTPACKW w;
     INTPACKX x;
-};
+} INTPACK;
 
-struct _DOSERROR {
+typedef struct _DOSERROR {
     int exterror;
     char errclass;
     char action;
     char locus;
-};
+} _DOSERROR;
 
-struct DOSERROR {
+typedef struct DOSERROR {
     int exterror;
     char class;
     char action;
     char locus;
-};
+} DOSERROR;
 
-struct dosdate_t {
+typedef struct dosdate_t {
     unsigned char day;
     unsigned char month;
     unsigned short year;
     unsigned char dayofweek;
-};
+} dosdate_t;
 
-struct dostime_t {
+typedef struct dostime_t {
     unsigned char hour;
     unsigned char minute;
     unsigned char second;
     unsigned char hsecond;
-};
+} dostime_t;
 
-struct find_t {
+typedef struct find_t {
     char reserved[21];
     char attrib;
     unsigned short wr_time;
     unsigned short wr_date;
     unsigned long size;
     char name[13];
-};
+} find_t;
 
-struct _diskfree_t {
+typedef struct _diskfree_t {
     unsigned short total_clusters;
     unsigned short avail_clusters;
     unsigned short sectors_per_cluster;
     unsigned short bytes_per_sector;
-};
+} _diskfree_t;
 
-struct tPD_net_game_info {
+typedef struct tPD_net_game_info {
     _IPX_LOCAL_TARGET addr_ipx;
     tU32 last_response;
-};
+} tPD_net_game_info;
 
-struct tIPX_netnum {
+typedef struct tIPX_netnum {
     BYTE bNetwork[4];
-};
+} tIPX_netnum;
 
-struct tRM_info {
+typedef struct tRM_info {
     unsigned long EDI;
     unsigned long ESI;
     unsigned long EBP;
@@ -4632,17 +4386,12 @@ struct tRM_info {
     unsigned short CS;
     unsigned short SP;
     unsigned short SS;
-};
+} tRM_info;
 
 typedef unsigned int ino_t;
 typedef int dev_t;
 typedef long off_t;
 typedef dirent DIR;
-typedef struct dosio_event dosio_event;
-typedef struct dosio_event_queue dosio_event_queue;
-typedef struct _stat _stat;
-typedef struct stat stat;
-typedef struct tMem_info tMem_info;
 
 typedef enum dosio_event_type {
     DOSIO_EVENT_KEY_DOWN = 0,
@@ -4662,7 +4411,7 @@ typedef enum dosio_event_qual {
     DOSIO_QUAL_CONTROL = 2,
     DOSIO_QUAL_ALT = 4
 } dosio_event_qual;
-struct dirent {
+typedef struct dirent {
     char d_dta[21];
     char d_attr;
     unsigned short d_time;
@@ -4671,24 +4420,24 @@ struct dirent {
     char d_name[13];
     unsigned short d_ino;
     char d_first;
-};
+} DIR;
 
-struct dosio_event {
+typedef struct dosio_event {
     br_uint_16 type;
     br_uint_16 qualifiers;
     br_uint_32 value_1;
     br_uint_32 value_2;
-};
+} dosio_event;
 
-struct dosio_event_queue {
+typedef struct dosio_event_queue {
     br_uint_16 total;
     br_uint_16 count;
     br_uint_16 head;
     br_uint_16 tail;
     dosio_event slots[1];
-};
+} dosio_event_queue;
 
-struct _stat {
+typedef struct _stat {
     dev_t st_dev;
     ino_t st_ino;
     unsigned short st_mode;
@@ -4707,9 +4456,9 @@ struct _stat {
     unsigned short st_inheritedRightsMask;
     unsigned char st_originatingNameSpace;
     unsigned char st_name[13];
-};
+} _stat;
 
-struct stat {
+typedef struct stat {
     dev_t st_dev;
     ino_t st_ino;
     unsigned short st_mode;
@@ -4728,9 +4477,9 @@ struct stat {
     unsigned short st_inheritedRightsMask;
     unsigned char st_originatingNameSpace;
     unsigned char st_name[13];
-};
+} stat;
 
-struct tMem_info {
+typedef struct tMem_info {
     unsigned int largest_block_avail;
     unsigned int max_unlocked_page;
     unsigned int largest_lockable_page;
@@ -4741,40 +4490,35 @@ struct tMem_info {
     unsigned int free_lin_addr_space;
     unsigned int size_of_page_file;
     unsigned int reserved[3];
-};
+} tMem_info;
 
 typedef unsigned int jmp_buf[13];
-typedef struct pm_temp_edge pm_temp_edge;
-typedef struct prep_vertex prep_vertex;
-struct pm_temp_edge {
+typedef struct pm_temp_edge {
     pm_temp_edge *next;
     br_uint_16 first;
     br_uint_16 last;
     char other;
-};
+} pm_temp_edge;
 
-struct prep_vertex {
+typedef struct prep_vertex {
     br_vector3 n;
     br_uint_16 v;
     br_uint_16 f;
-};
+} prep_vertex;
 
-typedef struct order_info order_info;
-struct order_info {
+typedef struct order_info {
     br_uint_8 a0;
     br_uint_8 a1;
     br_uint_8 a2;
     br_uint_8 _pad[1];
-};
+} order_info;
 
-typedef struct transform_type transform_type;
-struct transform_type {
+typedef struct transform_type {
     br_uint_32 id;
     br_file_struct *fs;
-};
+} transform_type;
 
-typedef struct resource_header resource_header;
-struct resource_header {
+typedef struct resource_header {
     br_simple_node node;
     br_simple_list children;
     br_uint_8 size_l;
@@ -4783,20 +4527,17 @@ struct resource_header {
     br_uint_8 class;
     void *magic_ptr;
     int magic_num;
-};
+} resource_header;
 
-typedef struct host_real_memory host_real_memory;
-typedef struct host_regs host_regs;
-typedef struct host_info host_info;
-struct host_real_memory {
+typedef struct host_real_memory {
     br_uint_32 pm_off;
     br_uint_16 pm_seg;
     br_uint_16 _reserved;
     br_uint_16 rm_off;
     br_uint_16 rm_seg;
-};
+} host_real_memory;
 
-struct host_regs {
+typedef struct host_regs {
     struct {
         br_uint_32 edi;
         br_uint_32 esi;
@@ -4862,75 +4603,61 @@ struct host_regs {
         br_uint_8 _pad7;
         br_uint_8 _pad8;
     };
-};
+} host_regs;
 
-struct host_info {
+typedef struct host_info {
     br_uint_32 size;
     char identifier[40];
     br_uint_32 capabilities;
     br_token processor_family;
     br_token processor_type;
-};
+} host_info;
 
-typedef struct file_info file_info;
-struct file_info {
+typedef struct file_info {
     br_uint_32 type;
     br_uint_32 version;
-};
+} file_info;
 
-typedef struct pm_type_info pm_type_info;
-typedef struct match_tokens match_tokens;
-struct pm_type_info {
+typedef struct pm_type_info {
     br_uint_16 bits;
     br_uint_16 file_size;
     br_uint_16 align;
     br_uint_16 channels;
-};
+} pm_type_info;
 
-struct match_tokens {
+typedef struct match_tokens {
     br_token use;
     br_uint_8 pixel_type;
     br_int_32 pixel_bits;
     br_int_32 width;
     br_int_32 height;
     br_object *renderer;
-};
+} match_tokens;
 
-typedef struct object_list object_list;
-typedef struct object_list_entry object_list_entry;
-typedef struct token_match token_match;
-struct object_list {
+typedef struct object_list {
     br_simple_list l;
-};
+} object_list;
 
-struct object_list_entry {
+typedef struct object_list_entry {
     br_simple_node n;
     br_object *h;
-};
+} object_list_entry;
 
-struct token_match {
+typedef struct token_match {
     br_token_value *original;
     br_token_value *query;
     br_int_32 n;
     void *extra;
     br_size_t extra_size;
-};
+} token_match;
 
-typedef struct token_type token_type;
-struct token_type {
+typedef struct token_type {
     char *identifier;
     br_token type;
     int length;
-};
+} token_type;
 
-typedef struct export_directory export_directory;
-typedef struct import_directory import_directory;
-typedef struct basereloc_header basereloc_header;
-typedef struct msdos_header msdos_header;
-typedef struct coff_header coff_header;
-typedef struct nt_optional_header nt_optional_header;
-typedef struct section_header section_header;
-struct export_directory {
+typedef struct export_directory {
     br_uint_32 flags;
     br_uint_32 timestamp;
     br_uint_16 major_version;
@@ -4942,22 +4669,22 @@ struct export_directory {
     br_uint_32 export_table;
     br_uint_32 name_table;
     br_uint_32 ordinal_table;
-};
+} export_directory;
 
-struct import_directory {
+typedef struct import_directory {
     br_uint_32 lookup_table;
     br_uint_32 timestamp;
     br_uint_32 forwarder;
     br_uint_32 name;
     br_uint_32 address_table;
-};
+} import_directory;
 
-struct basereloc_header {
+typedef struct basereloc_header {
     br_uint_32 rva;
     br_uint_32 size;
-};
+} basereloc_header;
 
-struct msdos_header {
+typedef struct msdos_header {
     br_uint_16 magic;
     br_uint_16 last_page_bytes;
     br_uint_16 pages;
@@ -4977,9 +4704,9 @@ struct msdos_header {
     br_uint_16 oem_info;
     br_uint_16 _reserved1[10];
     br_uint_32 new_header_offset;
-};
+} msdos_header;
 
-struct coff_header {
+typedef struct coff_header {
     br_uint_16 machine;
     br_uint_16 n_sections;
     br_uint_32 time_date;
@@ -4987,9 +4714,9 @@ struct coff_header {
     br_uint_32 n_symbols;
     br_uint_16 opt_header_size;
     br_uint_16 flags;
-};
+} coff_header;
 
-struct nt_optional_header {
+typedef struct nt_optional_header {
     br_uint_16 magic;
     br_uint_8 l_major;
     br_uint_8 l_minor;
@@ -5024,9 +4751,9 @@ struct nt_optional_header {
         br_uint_32 rva;
         br_uint_32 size;
     };
-};
+} nt_optional_header;
 
-struct section_header {
+typedef struct section_header {
     br_uint_8 section_name[8];
     br_uint_32 virtual_size;
     br_uint_32 rva;
@@ -5037,27 +4764,24 @@ struct section_header {
     br_uint_16 n_relocs;
     br_uint_16 n_linenums;
     br_uint_32 flags;
-};
+} section_header;
 
-typedef struct host_interrupt_hook host_interrupt_hook;
-typedef struct host_exception_hook host_exception_hook;
-struct host_interrupt_hook {
+typedef struct host_interrupt_hook {
     br_uint_8 vector;
     br_boolean active;
     br_uint_32 old_offset;
     br_uint_16 old_sel;
-};
+} host_interrupt_hook;
 
-struct host_exception_hook {
+typedef struct host_exception_hook {
     br_uint_8 exception;
     br_boolean active;
     br_uint_32 old_offset;
     br_uint_16 old_sel;
     br_uint_8 scratch[256];
-};
+} host_exception_hook;
 
-typedef struct ldt ldt;
-struct ldt {
+typedef struct ldt {
     unsigned long limit_0: 10;
     unsigned long base_0: 10;
     unsigned long base_1: 8;
@@ -5071,7 +4795,7 @@ struct ldt {
     unsigned long use32: 1;
     unsigned long granularity: 1;
     unsigned long base_2: 8;
-};
+} ldt;
 
 
 #endif
