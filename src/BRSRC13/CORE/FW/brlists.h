@@ -1,5 +1,9 @@
+#ifndef _BRLISTS_H_
+#define _BRLISTS_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 10
 // Size: 60
 void BrNewList(br_list *list);
@@ -48,3 +52,4 @@ void BrSimpleInsert(br_simple_list *list, br_simple_node *here, br_simple_node *
 // Size: 93
 br_simple_node* BrSimpleRemove(br_simple_node *node);
 
+#endif

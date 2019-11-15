@@ -1,6 +1,5 @@
 #include "pixelmap.h"
 
-// Global variables
 char rscid[50];
 
 // Offset: 19

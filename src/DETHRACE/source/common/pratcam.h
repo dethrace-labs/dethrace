@@ -1,5 +1,9 @@
+#ifndef _PRATCAM_H_
+#define _PRATCAM_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 45
 int PratcamGetCurrent();
@@ -118,3 +122,4 @@ void PratCam8();
 // Size: 44
 void PratCam9();
 
+#endif

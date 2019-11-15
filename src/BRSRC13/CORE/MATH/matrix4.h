@@ -1,5 +1,9 @@
+#ifndef _MATRIX4_H_
+#define _MATRIX4_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 14
 // Size: 276
 void BrMatrix4Copy(br_matrix4 *A, br_matrix4 *B);
@@ -62,17 +66,18 @@ void BrMatrix4TApplyV(br_vector4 *A, br_vector3 *B, br_matrix4 *C);
 
 // Offset: 7297
 // Size: 274
-void BrMatrix4Copy34(br_matrix4 *A, br_matrix34 *B, unsigned short __unk2__);
+void BrMatrix4Copy34(br_matrix4 *A, br_matrix34 *B);
 
 // Offset: 7586
 // Size: 882
-void BrMatrix4Mul34(br_matrix4 *A, br_matrix34 *B, br_matrix4 *C, short __unk3__);
+void BrMatrix4Mul34(br_matrix4 *A, br_matrix34 *B, br_matrix4 *C);
 
 // Offset: 8483
 // Size: 125
-void BrMatrix4Pre34(br_matrix4 *A, br_matrix34 *B, unsigned short C);
+void BrMatrix4Pre34(br_matrix4 *A, br_matrix34 *B);
 
 // Offset: 8624
 // Size: 218
 void BrMatrix4ShearZ(br_matrix4 *mat, br_scalar sx, br_scalar sy);
 
+#endif

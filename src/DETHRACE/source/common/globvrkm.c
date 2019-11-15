@@ -1,6 +1,5 @@
 #include "globvrkm.h"
 
-// Global variables
 br_actor *gCamera_list[2];
 tCar_spec *gActive_car_list[25];
 int gNum_active_cars;

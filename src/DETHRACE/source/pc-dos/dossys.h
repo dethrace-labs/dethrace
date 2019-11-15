@@ -1,5 +1,9 @@
+#ifndef _DOSSYS_H_
+#define _DOSSYS_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 291
 void KeyboardHandler();
@@ -33,7 +37,7 @@ int KeyDown22(int pKey_index);
 // Size: 141
 // EAX: pKeys
 // EDX: pMark
-void PDSetKeyArray(int *pKeys);
+void PDSetKeyArray(int *pKeys, int pMark);
 
 // Offset: 2612
 // Size: 73
@@ -70,7 +74,7 @@ void PDRevertPalette();
 // Size: 90
 // EAX: pArgc
 // EDX: pArgv
-int PDInitScreenVars(int pArgc, char **pArgv, unsigned int __unk2__);
+int PDInitScreenVars(int pArgc, char **pArgv);
 
 // Offset: 3300
 // Size: 24
@@ -133,7 +137,7 @@ void PDScreenBufferSwap(int pRendering_area_only);
 // EDX: dx
 // EBX: dy
 // ECX: src
-void PDPixelmapToScreenRectangleCopy(br_pixelmap *dst, br_int_16 dx, br_int_16 dy, br_pixelmap *src, br_int_16 sx);
+void PDPixelmapToScreenRectangleCopy(br_pixelmap *dst, br_int_16 dx, br_int_16 dy, br_pixelmap *src, br_int_16 sx, br_int_16 sy, br_uint_16 w, br_uint_16 h);
 
 // Offset: 5104
 // Size: 68
@@ -141,7 +145,7 @@ void PDPixelmapToScreenRectangleCopy(br_pixelmap *dst, br_int_16 dx, br_int_16 d
 // EDX: x1
 // EBX: y1
 // ECX: x2
-void PDPixelmapHLineOnScreen(br_pixelmap *dst, br_int_16 x1, br_int_16 y1);
+void PDPixelmapHLineOnScreen(br_pixelmap *dst, br_int_16 x1, br_int_16 y1, br_int_16 x2, br_int_16 y2, br_uint_32 colour);
 
 // Offset: 5172
 // Size: 68
@@ -149,7 +153,7 @@ void PDPixelmapHLineOnScreen(br_pixelmap *dst, br_int_16 x1, br_int_16 y1);
 // EDX: x1
 // EBX: y1
 // ECX: x2
-void PDPixelmapVLineOnScreen(br_pixelmap *dst, br_int_16 x1, br_int_16 y1);
+void PDPixelmapVLineOnScreen(br_pixelmap *dst, br_int_16 x1, br_int_16 y1, br_int_16 x2, br_int_16 y2, br_uint_32 colour);
 
 // Offset: 5240
 // Size: 24
@@ -168,7 +172,7 @@ void PDBuildAppPath(char *pThe_path);
 // Size: 133
 // EAX: pThe_path
 // EDX: pAction_routine
-void PDForEveryFile(char *pThe_path, void (*pAction_routine)(char*), signed char find_path);
+void PDForEveryFile(char *pThe_path, void (*pAction_routine)(char*));
 
 // Offset: 5540
 // Size: 39
@@ -180,7 +184,7 @@ void PDSetPalette(br_pixelmap *pThe_palette);
 // EAX: pPalette
 // EDX: pFirst_colour
 // EBX: pCount
-void PDSetPaletteEntries(br_pixelmap *pPalette, int pFirst_colour);
+void PDSetPaletteEntries(br_pixelmap *pPalette, int pFirst_colour, int pCount);
 
 // Offset: 5716
 // Size: 44
@@ -241,7 +245,7 @@ void Usage(char *pProgpath);
 // Size: 722
 // EAX: pArgc
 // EDX: pArgv
-int main(int pArgc, char **pArgv, unsigned int arg);
+int main(int pArgc, char **pArgv);
 
 // Offset: 7696
 // Size: 62
@@ -354,9 +358,10 @@ void CriticalISR(INTPACK pRegs);
 // EAX: pThe_path
 // EDX: pFile_name
 // EBX: pMin_size
-int PDCheckDriveExists2(char *pThe_path, char *pFile_name, tU32 pMin_size, char buf);
+int PDCheckDriveExists2(char *pThe_path, char *pFile_name, tU32 pMin_size);
 
 // Offset: 10184
 // Size: 108
 int PDDoWeLeadAnAustereExistance();
 
+#endif

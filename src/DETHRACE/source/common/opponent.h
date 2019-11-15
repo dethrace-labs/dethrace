@@ -1,5 +1,9 @@
+#ifndef _OPPONENT_H_
+#define _OPPONENT_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 137
 // EAX: pThe_actor
@@ -78,7 +82,7 @@ void CalcRaceRoute(tOpponent_spec *pOpponent_spec);
 // Size: 790
 // EAX: pOpponent_spec
 // EDX: pSections_to_add
-void TopUpRandomRoute(tOpponent_spec *pOpponent_spec);
+void TopUpRandomRoute(tOpponent_spec *pOpponent_spec, int pSections_to_add);
 
 // Offset: 4840
 // Size: 942
@@ -86,7 +90,7 @@ void TopUpRandomRoute(tOpponent_spec *pOpponent_spec);
 // EDX: pPerm_store
 // EBX: pNum_of_perm_store_sections
 // ECX: pTarget_section
-int SearchForSection(tRoute_section *pTemp_store, tRoute_section *pPerm_store, int *pNum_of_perm_store_sections, tS16 pTarget_section, int pDepth, br_scalar pDistance_so_far);
+int SearchForSection(tRoute_section *pTemp_store, tRoute_section *pPerm_store, int *pNum_of_perm_store_sections, tS16 pTarget_section, int pDepth, br_scalar pDistance_so_far, tOpponent_spec *pOpponent_spec);
 
 // Offset: 5784
 // Size: 796
@@ -109,19 +113,19 @@ void ClearOpponentsProjectedRoute(tOpponent_spec *pOpponent_spec);
 // EAX: pOpponent_spec
 // EDX: pSection_no
 // EBX: pDirection
-int AddToOpponentsProjectedRoute(tOpponent_spec *pOpponent_spec, tS16 pSection_no);
+int AddToOpponentsProjectedRoute(tOpponent_spec *pOpponent_spec, tS16 pSection_no, int pDirection);
 
 // Offset: 7320
 // Size: 177
 // EAX: pOpponent_spec
 // EDX: pPlaces
-int ShiftOpponentsProjectedRoute(tOpponent_spec *pOpponent_spec);
+int ShiftOpponentsProjectedRoute(tOpponent_spec *pOpponent_spec, int pPlaces);
 
 // Offset: 7500
 // Size: 134
 // EAX: pOpponent_spec
 // EDX: pMilliseconds
-void StunTheBugger(tOpponent_spec *pOpponent_spec);
+void StunTheBugger(tOpponent_spec *pOpponent_spec, int pMilliseconds);
 
 // Offset: 7636
 // Size: 47
@@ -156,7 +160,7 @@ tS16 FindNearestTrailSection(tOpponent_spec *pOpponent_spec, tCar_spec *pPursuee
 // Size: 111
 // EAX: pOpponent_spec
 // EDX: pSection
-tS16 CalcNextTrailSection(tOpponent_spec *pOpponent_spec);
+tS16 CalcNextTrailSection(tOpponent_spec *pOpponent_spec, int pSection);
 
 // Offset: 9692
 // Size: 2515
@@ -235,7 +239,7 @@ void TeleportOpponentToNearestSafeLocation(tOpponent_spec *pOpponent_spec);
 // Size: 4057
 // EAX: pOpponent_spec
 // EDX: pMust_choose_one
-void ChooseNewObjective(tOpponent_spec *pOpponent_spec);
+void ChooseNewObjective(tOpponent_spec *pOpponent_spec, int pMust_choose_one);
 
 // Offset: 20688
 // Size: 365
@@ -279,7 +283,7 @@ void CalcDistanceFromHome(tOpponent_spec *pOpponent_spec);
 // Size: 767
 // EAX: pOpponent_spec
 // EDX: pMassage_count
-int MassageOpponentPosition(tOpponent_spec *pOpponent_spec);
+int MassageOpponentPosition(tOpponent_spec *pOpponent_spec, int pMassage_count);
 
 // Offset: 23580
 // Size: 821
@@ -362,13 +366,13 @@ int GetCarCount(tVehicle_type pCategory);
 // Size: 238
 // EAX: pCategory
 // EDX: pIndex
-tCar_spec* GetCarSpec(tVehicle_type pCategory);
+tCar_spec* GetCarSpec(tVehicle_type pCategory, int pIndex);
 
 // Offset: 35504
 // Size: 172
 // EAX: pCategory
 // EDX: pIndex
-char* GetDriverName(tVehicle_type pCategory);
+char* GetDriverName(tVehicle_type pCategory, int pIndex);
 
 // Offset: 35676
 // Size: 240
@@ -384,7 +388,7 @@ tCar_spec* GetCarSpecFromGlobalOppoIndex(int pIndex);
 // Size: 95
 // EAX: pOpponent_spec
 // EDX: pSection_no
-int GetOpponentsRealSection(tOpponent_spec *pOpponent_spec);
+int GetOpponentsRealSection(tOpponent_spec *pOpponent_spec, int pSection_no);
 
 // Offset: 36128
 // Size: 106
@@ -432,14 +436,14 @@ br_scalar GetOpponentsSectionWidth(tOpponent_spec *pOpponent_spec, tS16 pSection
 // EAX: pOpponent_spec
 // EDX: pSection
 // EBX: pTowards_finish
-int GetOpponentsSectionMinSpeed(tOpponent_spec *pOpponent_spec, tS16 pSection);
+int GetOpponentsSectionMinSpeed(tOpponent_spec *pOpponent_spec, tS16 pSection, int pTowards_finish);
 
 // Offset: 37836
 // Size: 262
 // EAX: pOpponent_spec
 // EDX: pSection
 // EBX: pTowards_finish
-int GetOpponentsSectionMaxSpeed(tOpponent_spec *pOpponent_spec, tS16 pSection);
+int GetOpponentsSectionMaxSpeed(tOpponent_spec *pOpponent_spec, tS16 pSection, int pTowards_finish);
 
 // Offset: 38100
 // Size: 59
@@ -500,7 +504,7 @@ void DeleteSection(tS16 pSection_to_delete);
 // Size: 824
 // EAX: pNode_to_delete
 // EDX: pAnd_sections
-void DeleteNode(tS16 pNode_to_delete);
+void DeleteNode(tS16 pNode_to_delete, int pAnd_sections);
 
 // Offset: 41920
 // Size: 116
@@ -538,7 +542,7 @@ void CalcNegativeXVector(br_vector3 *pNegative_x_vector, br_vector3 *pStart, br_
 // Size: 162
 // EAX: pModel
 // EDX: pVertex_num
-void MakeVertexAndOffsetIt(br_model *pModel, int pVertex_num, br_scalar pX, br_scalar pY, br_scalar pZ);
+void MakeVertexAndOffsetIt(br_model *pModel, int pVertex_num, br_scalar pX, br_scalar pY, br_scalar pZ, br_vector3 *pOffset);
 
 // Offset: 44864
 // Size: 134
@@ -546,7 +550,7 @@ void MakeVertexAndOffsetIt(br_model *pModel, int pVertex_num, br_scalar pX, br_s
 // EDX: pFace_num
 // EBX: pV0
 // ECX: pV1
-void MakeFaceAndTextureIt(br_model *pModel, int pFace_num, int pV0, int pV1);
+void MakeFaceAndTextureIt(br_model *pModel, int pFace_num, int pV0, int pV1, int pV2, br_material *pMaterial);
 
 // Offset: 45000
 // Size: 942
@@ -554,7 +558,7 @@ void MakeFaceAndTextureIt(br_model *pModel, int pFace_num, int pV0, int pV1);
 // EDX: pFirst_face
 // EBX: pStart
 // ECX: pFinish
-void MakeSection(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3 *pStart, br_vector3 *pFinish, br_scalar pWidth, br_material *pMaterial_centre_lt, br_material *pMaterial_centre_dk, br_material *pMaterial_edges_start_lt, br_material *pMaterial_edges_start_dk, br_material *pMaterial_edges_finish_lt, br_material *pMaterial_edges_finish_dk, div_t i, br_memory_classes offset_v, unsigned char the_material_start_lt, br_uint_16 the_material_start_dk, br_uint_16 the_material_finish_lt, br_vector3 *the_material_finish_dk, br_material *height, br_material *__unk19__);
+void MakeSection(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3 *pStart, br_vector3 *pFinish, br_scalar pWidth, br_material *pMaterial_centre_lt, br_material *pMaterial_centre_dk, br_material *pMaterial_edges_start_lt, br_material *pMaterial_edges_start_dk, br_material *pMaterial_edges_finish_lt, br_material *pMaterial_edges_finish_dk);
 
 // Offset: 45944
 // Size: 1235
@@ -562,7 +566,7 @@ void MakeSection(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3 *p
 // EDX: pFirst_face
 // EBX: pPoint
 // ECX: pMaterial_1
-void MakeCube(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3 *pPoint, br_material *pMaterial_1, br_material *pMaterial_2, br_material *pMaterial_3, unsigned short offset_v, br_memory_classes point, union __unk9__);
+void MakeCube(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3 *pPoint, br_material *pMaterial_1, br_material *pMaterial_2, br_material *pMaterial_3);
 
 // Offset: 47180
 // Size: 88
@@ -575,7 +579,7 @@ void CalcNumberOfFacesAndVerticesForOppoPathModel(br_uint_16 *pFace_index_ptr, b
 // EAX: pModel
 // EDX: pNum_faces
 // EBX: pNum_vertices
-void ReallocModelFacesAndVertices(br_model *pModel, int pNum_faces);
+void ReallocModelFacesAndVertices(br_model *pModel, int pNum_faces, int pNum_vertices);
 
 // Offset: 47704
 // Size: 127
@@ -710,3 +714,4 @@ void DeleteCopStartPoint();
 // Size: 34
 void CycleCopStartPointType();
 
+#endif

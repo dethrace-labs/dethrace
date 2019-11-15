@@ -1,6 +1,5 @@
 #include "brbegin.h"
 
-// Global variables
 br_boolean active;
 char rscid[54];
 

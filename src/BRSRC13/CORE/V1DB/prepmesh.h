@@ -1,5 +1,9 @@
+#ifndef _PREPMESH_H_
+#define _PREPMESH_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 8
 // Size: 246
 // EAX: first
@@ -45,12 +49,12 @@ void PrepareFaceNormals(br_model *model);
 // Offset: 2705
 // Size: 296
 // EAX: model
-void Smoothing(br_model *model, br_scalar crease_limit, prep_vertex **start);
+void Smoothing(br_model *model, br_scalar crease_limit, prep_vertex **start, prep_vertex **end);
 
 // Offset: 3018
 // Size: 500
 // EAX: model
-void SmoothingCreased(br_model *model, br_scalar crease_limit, prep_vertex **start);
+void SmoothingCreased(br_model *model, br_scalar crease_limit, prep_vertex **start, prep_vertex **end);
 
 // Offset: 3529
 // Size: 479
@@ -58,7 +62,7 @@ void SmoothingCreased(br_model *model, br_scalar crease_limit, prep_vertex **sta
 // EDX: v
 // EBX: src
 // ECX: model
-void CopyVertex(v11group *group, int v, prep_vertex *src);
+void CopyVertex(v11group *group, int v, prep_vertex *src, br_model *model);
 
 // Offset: 4017
 // Size: 293
@@ -66,7 +70,7 @@ void CopyVertex(v11group *group, int v, prep_vertex *src);
 // EDX: f
 // EBX: src
 // ECX: model
-void CopyFace(v11group *group, int f, br_face *src);
+void CopyFace(v11group *group, int f, br_face *src, br_model *model);
 
 // Offset: 4324
 // Size: 2516
@@ -95,10 +99,11 @@ void RegenerateVertexNormals(v11model *v11m);
 
 // Offset: 8413
 // Size: 1585
-void BrModelUpdate(br_model *model);
+void BrModelUpdate(br_model *model, br_uint_16 flags);
 
 // Offset: 10011
 // Size: 109
 // EAX: model
 void BrModelClear(br_model *model);
 
+#endif

@@ -1,5 +1,9 @@
+#ifndef _EVENTQ_H_
+#define _EVENTQ_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 14
 // Size: 200
 br_error DOSEventBegin();
@@ -12,3 +16,4 @@ void DOSEventEnd();
 // Size: 407
 br_boolean DOSEventWait(dosio_event *event, br_boolean block);
 
+#endif

@@ -1,22 +1,26 @@
+#ifndef _ACTSUPT_H_
+#define _ACTSUPT_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 12
 // Size: 158
-br_uint_32 BrActorEnum(br_actor *parent, br_actor_enum_cbfn *callback);
+br_uint_32 BrActorEnum(br_actor *parent, br_actor_enum_cbfn *callback, void *arg);
 
 // Offset: 188
 // Size: 321
-br_uint_32 BrActorSearchMany(br_actor *root, char *pattern, br_actor **actors);
+br_uint_32 BrActorSearchMany(br_actor *root, char *pattern, br_actor **actors, int max);
 
 // Offset: 523
 // Size: 103
-br_actor* BrActorSearch(br_actor *root);
+br_actor* BrActorSearch(br_actor *root, char *pattern);
 
 // Offset: 640
 // Size: 117
 // EAX: a
 // EDX: d
-void RenumberActor(br_actor *a);
+void RenumberActor(br_actor *a, int d);
 
 // Offset: 768
 // Size: 230
@@ -62,7 +66,7 @@ br_boolean ActorToRootTyped(br_actor *a, br_actor *world, br_matrix34 *m, br_int
 // Size: 572
 // EAX: mat
 // EDX: field_of_view
-void Matrix4PerspectiveNew(br_matrix4 *mat, br_angle field_of_view, br_scalar aspect, br_scalar hither);
+void Matrix4PerspectiveNew(br_matrix4 *mat, br_angle field_of_view, br_scalar aspect, br_scalar hither, br_scalar yon, br_scalar origin_x, br_scalar origin_y);
 
 // Offset: 3441
 // Size: 944
@@ -96,3 +100,4 @@ void ActorToBounds(br_bounds *dest, br_actor *ap, br_model *model);
 // Size: 310
 br_bounds* BrActorToBounds(br_bounds *b, br_actor *ap);
 
+#endif

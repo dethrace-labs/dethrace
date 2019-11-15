@@ -1,6 +1,5 @@
 #include "racestrt.h"
 
-// Global variables
 int gGrid_number_colour[4];
 br_pixelmap *gDead_car;
 int gFade_away_parts_shop;
@@ -38,18 +37,18 @@ int gOur_starting_position;
 // Size: 1371
 // EAX: pOffset
 void DrawRaceList(int pOffset) {
-  int i;
-  int font_height;
-  int pitch;
-  int y;
-  int left_most;
-  int right_most;
-  int rank_colour;
-  int text_colour;
-  int box_bot;
-  int text_width;
-  int text_x;
-  char rank_str[256];
+    int i;
+    int font_height;
+    int pitch;
+    int y;
+    int left_most;
+    int right_most;
+    int rank_colour;
+    int text_colour;
+    int box_bot;
+    int text_width;
+    int text_x;
+    char rank_str[256];
 }
 
 // Offset: 1372
@@ -57,10 +56,11 @@ void DrawRaceList(int pOffset) {
 // EAX: pFrom
 // EDX: pTo
 // EBX: pTime_to_move
-void MoveRaceList(int pFrom, int pTo, tS32 pTime_to_move, unsigned short start_time) {
-  tS32 the_time;
-  int move_distance;
-  int pitch;
+void MoveRaceList(int pFrom, int pTo, tS32 pTime_to_move) {
+    tS32 start_time;
+    tS32 the_time;
+    int move_distance;
+    int pitch;
 }
 
 // Offset: 1516
@@ -84,9 +84,9 @@ int DownRace(int *pCurrent_choice, int *pCurrent_mode) {
 // EBX: pX_offset
 // ECX: pY_offset
 int ClickOnRace(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_offset) {
-  int x_coord;
-  int y_coord;
-  int race_delta;
+    int x_coord;
+    int y_coord;
+    int race_delta;
 }
 
 // Offset: 2208
@@ -117,12 +117,13 @@ void StartChangeRace() {
 // EAX: pRace_index
 // EDX: pNet_mode
 // EBX: pNet_race_sequence
-int ChangeRace(int *pRace_index, int pNet_mode, tNet_sequence_type pNet_race_sequence, signed char flicker_on) {
-  tFlicette flicker_off[4];
-  tFlicette push[4];
-  tMouse_area mouse_areas[5];
-  tInterface_spec interface_spec;
-  int result;
+int ChangeRace(int *pRace_index, int pNet_mode, tNet_sequence_type pNet_race_sequence) {
+    tFlicette flicker_on[4];
+    tFlicette flicker_off[4];
+    tFlicette push[4];
+    tMouse_area mouse_areas[5];
+    tInterface_spec interface_spec;
+    int result;
 }
 
 // Offset: 2620
@@ -135,9 +136,9 @@ void DoChangeRace() {
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
 void DrawCar(int pCurrent_choice, int pCurrent_mode) {
-  char s[64];
-  int text_x;
-  int text_width;
+    char s[64];
+    int text_x;
+    int text_width;
 }
 
 // Offset: 3424
@@ -189,14 +190,15 @@ int ChangeCarGoAhead(int *pCurrent_choice, int *pCurrent_mode) {
 // EAX: pNet_mode
 // EDX: pCar_index
 // EBX: pNet_game
-int ChangeCar(int pNet_mode, int *pCar_index, tNet_game_details *pNet_game, signed char flicker_on) {
-  tFlicette flicker_off[4];
-  tFlicette push[4];
-  tMouse_area mouse_areas[4];
-  tInterface_spec interface_spec;
-  int i;
-  int result;
-  int power_up_levels[3];
+int ChangeCar(int pNet_mode, int *pCar_index, tNet_game_details *pNet_game) {
+    tFlicette flicker_on[4];
+    tFlicette flicker_off[4];
+    tFlicette push[4];
+    tMouse_area mouse_areas[4];
+    tInterface_spec interface_spec;
+    int i;
+    int result;
+    int power_up_levels[3];
 }
 
 // Offset: 5260
@@ -207,9 +209,9 @@ void DoChangeCar() {
 // Offset: 5308
 // Size: 264
 int PartsShopRecommended() {
-  int i;
-  int current_index;
-  int counter;
+    int i;
+    int current_index;
+    int counter;
 }
 
 // Offset: 5572
@@ -219,7 +221,7 @@ int PartsShopRecommended() {
 // EBX: pPrice
 // ECX: pCost
 void CalcPartPrice(int pCategory, int pIndex, int *pPrice, int *pCost) {
-  int current_value;
+    int current_value;
 }
 
 // Offset: 5752
@@ -227,18 +229,18 @@ void CalcPartPrice(int pCategory, int pIndex, int *pPrice, int *pCost) {
 // EAX: pCategory
 // EDX: pIndex
 int BuyPart(int pCategory, int pIndex) {
-  int price;
-  int cost;
+    int price;
+    int cost;
 }
 
 // Offset: 5900
 // Size: 257
 void DoAutoParts() {
-  int lowest_yet;
-  int lowest_one;
-  int price;
-  int cost;
-  int current_level;
+    int lowest_yet;
+    int lowest_one;
+    int price;
+    int cost;
+    int current_level;
 }
 
 // Offset: 6160
@@ -255,7 +257,7 @@ void ErasePartsText(int pTotal_as_well) {
 // Offset: 6592
 // Size: 788
 void DrawPartsText() {
-  int cost;
+    int cost;
 }
 
 // Offset: 7380
@@ -276,7 +278,7 @@ void CalcPartsIndex() {
 // Offset: 7784
 // Size: 148
 void DoExchangePart() {
-  int cost;
+    int cost;
 }
 
 // Offset: 7932
@@ -284,7 +286,7 @@ void DoExchangePart() {
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
 int PartsShopGoAhead(int *pCurrent_choice, int *pCurrent_mode) {
-  int flic_index;
+    int flic_index;
 }
 
 // Offset: 8448
@@ -358,12 +360,12 @@ void DrawPartsShop(int pCurrent_choice, int pCurrent_mode) {
 // Size: 195
 // EAX: pFade_away
 void DoPartsShop(int pFade_away) {
-  tFlicette flicker_on[7];
-  tFlicette flicker_off[7];
-  tFlicette push[7];
-  tMouse_area mouse_areas[7];
-  tInterface_spec interface_spec;
-  int result;
+    tFlicette flicker_on[7];
+    tFlicette flicker_off[7];
+    tFlicette push[7];
+    tMouse_area mouse_areas[7];
+    tInterface_spec interface_spec;
+    int result;
 }
 
 // Offset: 10084
@@ -378,11 +380,11 @@ int AutoPartsDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
 // Offset: 10152
 // Size: 166
 tSO_result DoAutoPartsShop() {
-  tFlicette flicker_off[3];
-  tFlicette push[3];
-  tMouse_area mouse_areas[3];
-  tInterface_spec interface_spec;
-  int result;
+    tFlicette flicker_off[3];
+    tFlicette push[3];
+    tMouse_area mouse_areas[3];
+    tInterface_spec interface_spec;
+    int result;
 }
 
 // Offset: 10320
@@ -463,11 +465,11 @@ void SelectRaceStart() {
 // Offset: 11808
 // Size: 480
 int SuggestRace() {
-  int least_done;
-  int suggested_so_far;
-  int suggested_race;
-  int new_suggestion;
-  int number_of_visits;
+    int least_done;
+    int suggested_so_far;
+    int suggested_race;
+    int new_suggestion;
+    int number_of_visits;
 }
 
 // Offset: 12288
@@ -475,32 +477,32 @@ int SuggestRace() {
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
 void SelectRaceDraw(int pCurrent_choice, int pCurrent_mode) {
-  tOpponent *the_opponent;
-  tText_chunk *the_chunk;
-  int j;
-  int k;
-  int y_coord;
-  char s[256];
-  char temp_str[256];
-  char *sub_pt;
-  char sub_str[16];
-  tU32 *test;
-  tU32 test2;
+    tOpponent *the_opponent;
+    tText_chunk *the_chunk;
+    int j;
+    int k;
+    int y_coord;
+    char s[256];
+    char temp_str[256];
+    char *sub_pt;
+    char sub_str[16];
+    tU32 *test;
+    tU32 test2;
 }
 
 // Offset: 13784
 // Size: 754
 // EAX: pSecond_time_around
 tSO_result DoSelectRace(int *pSecond_time_around) {
-  tFlicette flicker_on[7];
-  tFlicette flicker_off[7];
-  tFlicette push[7];
-  tMouse_area mouse_areas[7];
-  tInterface_spec interface_spec;
-  int result;
-  int default_choice;
-  int suggested;
-  int old_current_race;
+    tFlicette flicker_on[7];
+    tFlicette flicker_off[7];
+    tFlicette push[7];
+    tMouse_area mouse_areas[7];
+    tInterface_spec interface_spec;
+    int result;
+    int default_choice;
+    int suggested;
+    int old_current_race;
 }
 
 // Offset: 14540
@@ -508,7 +510,7 @@ tSO_result DoSelectRace(int *pSecond_time_around) {
 // EAX: pX
 // EDX: pY
 // EBX: pImage
-void DrawGridCar(int pX, int pY, br_pixelmap *pImage, char __unk3__) {
+void DrawGridCar(int pX, int pY, br_pixelmap *pImage) {
 }
 
 // Offset: 14676
@@ -516,24 +518,24 @@ void DrawGridCar(int pX, int pY, br_pixelmap *pImage, char __unk3__) {
 // EAX: pOffset
 // EDX: pDraw_it
 void DrawGrid(int pOffset, int pDraw_it) {
-  int i;
-  int j;
-  int y;
-  int x;
-  int str_x;
-  int width_job;
-  int done_highest;
-  int str_index;
-  int swap_1_x;
-  int swap_1_y;
-  int swap_2_x;
-  int swap_2_y;
-  br_pixelmap *the_image;
-  br_pixelmap *swap_1_image;
-  br_pixelmap *swap_2_image;
-  char numbers_str[4][100];
-  char total_str[256];
-  tU32 the_time;
+    int i;
+    int j;
+    int y;
+    int x;
+    int str_x;
+    int width_job;
+    int done_highest;
+    int str_index;
+    int swap_1_x;
+    int swap_1_y;
+    int swap_2_x;
+    int swap_2_y;
+    br_pixelmap *the_image;
+    br_pixelmap *swap_1_image;
+    br_pixelmap *swap_2_image;
+    char numbers_str[4][100];
+    char total_str[256];
+    tU32 the_time;
 }
 
 // Offset: 16792
@@ -541,10 +543,11 @@ void DrawGrid(int pOffset, int pDraw_it) {
 // EAX: pFrom
 // EDX: pTo
 // EBX: pTime_to_move
-void MoveGrid(int pFrom, int pTo, tS32 pTime_to_move, unsigned short start_time) {
-  tS32 the_time;
-  int move_distance;
-  int pitch;
+void MoveGrid(int pFrom, int pTo, tS32 pTime_to_move) {
+    tS32 start_time;
+    tS32 the_time;
+    int move_distance;
+    int pitch;
 }
 
 // Offset: 16948
@@ -565,7 +568,7 @@ void GridDraw(int pCurrent_choice, int pCurrent_mode) {
 // EAX: pFirst_index
 // EDX: pSecond_index
 void ActuallySwapOrder(int pFirst_index, int pSecond_index) {
-  tOpp_spec temp_opp;
+    tOpp_spec temp_opp;
 }
 
 // Offset: 17200
@@ -573,20 +576,20 @@ void ActuallySwapOrder(int pFirst_index, int pSecond_index) {
 // EAX: pFirst_index
 // EDX: pSecond_index
 void DoGridTransition(int pFirst_index, int pSecond_index) {
-  tU32 start_time;
-  tU32 the_time;
+    tU32 start_time;
+    tU32 the_time;
 }
 
 // Offset: 17444
 // Size: 895
 void ChallengeStart() {
-  int i;
-  int j;
-  int line_count;
-  int dare_index;
-  FILE *f;
-  tPath_name the_path;
-  char s[256];
+    int i;
+    int j;
+    int line_count;
+    int dare_index;
+    FILE *f;
+    tPath_name the_path;
+    char s[256];
 }
 
 // Offset: 18340
@@ -608,11 +611,11 @@ int ChallengeDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
 // Offset: 18740
 // Size: 172
 void DoChallengeScreen() {
-  tFlicette flicker_off[2];
-  tFlicette push[2];
-  tMouse_area mouse_areas[2];
-  tInterface_spec interface_spec;
-  int result;
+    tFlicette flicker_off[2];
+    tFlicette push[2];
+    tMouse_area mouse_areas[2];
+    tInterface_spec interface_spec;
+    int result;
 }
 
 // Offset: 18912
@@ -650,10 +653,10 @@ int GridMoveRight(int *pCurrent_choice, int *pCurrent_mode) {
 // EBX: pX_offset
 // ECX: pY_offset
 int GridClickCar(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_offset) {
-  int rel_pos;
-  int new_pos;
-  int base_pos;
-  int x_coord;
+    int rel_pos;
+    int new_pos;
+    int base_pos;
+    int x_coord;
 }
 
 // Offset: 19684
@@ -663,8 +666,8 @@ int GridClickCar(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY
 // EBX: pX_offset
 // ECX: pY_offset
 int GridClickNumbers(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_offset) {
-  int new_pos;
-  int i;
+    int new_pos;
+    int i;
 }
 
 // Offset: 19900
@@ -696,7 +699,7 @@ int CheckChallenge(int *pCurrent_choice, int *pCurrent_mode) {
 // Size: 100
 // EAX: pOur_rank
 int FindBestPos(int pOur_rank) {
-  int i;
+    int i;
 }
 
 // Offset: 20220
@@ -714,18 +717,18 @@ void SortOpponents() {
 // Offset: 20564
 // Size: 326
 tSO_result DoGridPosition() {
-  tFlicette flicker_off[3];
-  tFlicette push[3];
-  tMouse_area mouse_areas[5];
-  tInterface_spec interface_spec;
-  int result;
+    tFlicette flicker_off[3];
+    tFlicette push[3];
+    tMouse_area mouse_areas[5];
+    tInterface_spec interface_spec;
+    int result;
 }
 
 // Offset: 20892
 // Size: 185
 void CheckPlayersAreResponding() {
-  tU32 time;
-  tNet_message *message;
+    tU32 time;
+    tNet_message *message;
 }
 
 // Offset: 21080
@@ -747,9 +750,9 @@ void DrawAnItem(int pX, int pY_index, int pFont_index, char *pText) {
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
 void NetSynchStartDraw(int pCurrent_choice, int pCurrent_mode) {
-  int i;
-  int number_ready;
-  char s[256];
+    int i;
+    int number_ready;
+    char s[256];
 }
 
 // Offset: 21972
@@ -779,22 +782,22 @@ int ExitWhenReady(int *pCurrent_choice, int *pCurrent_mode) {
 // Size: 246
 // EAX: pMode
 tSO_result NetSynchRaceStart2(tNet_synch_mode pMode) {
-  tFlicette flicker_on_hf[2];
-  tFlicette flicker_off_hf[2];
-  tFlicette push_hf[2];
-  tMouse_area mouse_areas_hf[2];
-  tInterface_spec interface_spec_hf;
-  tFlicette flicker_on_hs[1];
-  tFlicette flicker_off_hs[1];
-  tFlicette push_hs[1];
-  tMouse_area mouse_areas_hs[1];
-  tInterface_spec interface_spec_hs;
-  tFlicette flicker_on_c[1];
-  tFlicette flicker_off_c[1];
-  tFlicette push_c[1];
-  tMouse_area mouse_areas_c[1];
-  tInterface_spec interface_spec_c;
-  int result;
+    tFlicette flicker_on_hf[2];
+    tFlicette flicker_off_hf[2];
+    tFlicette push_hf[2];
+    tMouse_area mouse_areas_hf[2];
+    tInterface_spec interface_spec_hf;
+    tFlicette flicker_on_hs[1];
+    tFlicette flicker_off_hs[1];
+    tFlicette push_hs[1];
+    tMouse_area mouse_areas_hs[1];
+    tInterface_spec interface_spec_hs;
+    tFlicette flicker_on_c[1];
+    tFlicette flicker_off_c[1];
+    tFlicette push_c[1];
+    tMouse_area mouse_areas_c[1];
+    tInterface_spec interface_spec_c;
+    int result;
 }
 
 // Offset: 22636

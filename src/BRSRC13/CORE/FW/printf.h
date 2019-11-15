@@ -1,5 +1,9 @@
+#ifndef _PRINTF_H_
+#define _PRINTF_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 10
 // Size: 75
 br_int_32 BrSprintf(char *buf, char *fmt, ...);
@@ -16,3 +20,4 @@ int BrLogPrintf(char *fmt, ...);
 // Size: 75
 br_int_32 BrSScanf(char *str, char *fmt, ...);
 
+#endif

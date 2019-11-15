@@ -1,5 +1,9 @@
+#ifndef _NETGAME_H_
+#define _NETGAME_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 2343
 // EAX: pNext_frame_time
@@ -95,7 +99,7 @@ int SortNetHeadDescending(void *pFirst_one, void *pSecond_one);
 // EAX: pName
 // EDX: pFont
 // EBX: pMax_width
-void ClipName(char *pName, tDR_font *pFont, int pMax_width, signed char __unk3__);
+void ClipName(char *pName, tDR_font *pFont, int pMax_width);
 
 // Offset: 9340
 // Size: 2219
@@ -209,7 +213,7 @@ void ReceivedGameplay(tNet_contents *pContents, tNet_message *pMessage, tU32 pRe
 // EDX: pMess
 // EBX: pParam_1
 // ECX: pParam_2
-void SendGameplay(tPlayer_ID pPlayer, tNet_gameplay_mess pMess, int pParam_1, int pParam_2);
+void SendGameplay(tPlayer_ID pPlayer, tNet_gameplay_mess pMess, int pParam_1, int pParam_2, int pParam_3, int pParam_4);
 
 // Offset: 18816
 // Size: 117
@@ -217,7 +221,7 @@ void SendGameplay(tPlayer_ID pPlayer, tNet_gameplay_mess pMess, int pParam_1, in
 // EDX: pParam_1
 // EBX: pParam_2
 // ECX: pParam_3
-void SendGameplayToAllPlayers(tNet_gameplay_mess pMess, int pParam_1, int pParam_2);
+void SendGameplayToAllPlayers(tNet_gameplay_mess pMess, int pParam_1, int pParam_2, int pParam_3, int pParam_4);
 
 // Offset: 18936
 // Size: 126
@@ -225,7 +229,7 @@ void SendGameplayToAllPlayers(tNet_gameplay_mess pMess, int pParam_1, int pParam
 // EDX: pParam_1
 // EBX: pParam_2
 // ECX: pParam_3
-void SendGameplayToHost(tNet_gameplay_mess pMess, int pParam_1, int pParam_2);
+void SendGameplayToHost(tNet_gameplay_mess pMess, int pParam_1, int pParam_2, int pParam_3, int pParam_4);
 
 // Offset: 19064
 // Size: 42
@@ -265,3 +269,4 @@ void GetExpandedMatrix(br_matrix34 *m1, tReduced_matrix *m2);
 // EDX: pCredits
 void NetEarnCredits(tNet_game_player_info *pPlayer, tS32 pCredits);
 
+#endif

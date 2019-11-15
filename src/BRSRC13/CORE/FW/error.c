@@ -1,6 +1,5 @@
 #include "error.h"
 
-// Global variables
 char rscid[47];
 
 // Offset: 15

@@ -1,6 +1,5 @@
 #include "trig.h"
 
-// Global variables
 br_matrix23 mat23tmp1;
 br_matrix23 mat23tmp2;
 br_matrix34 mattmp1;
@@ -60,15 +59,15 @@ br_scalar FastScalarCosAngle(br_angle pBR_angle) {
 // Size: 91
 // EAX: pBR_angle
 br_scalar FastScalarTanAngle(br_angle pBR_angle) {
-  int angle_in_degrees;
+    int angle_in_degrees;
 }
 
 // Offset: 892
 // Size: 201
 float FastFloatArcSin(float pValue) {
-  float low_limit;
-  float high_limit;
-  float mid_point;
+    float low_limit;
+    float high_limit;
+    float mid_point;
 }
 
 // Offset: 1096
@@ -89,29 +88,29 @@ br_scalar FastScalarArcCos(br_scalar pValue) {
 // Offset: 1284
 // Size: 388
 float FastFloatArcTan2(float pY, float pX) {
-  float abs_x;
-  float abs_y;
+    float abs_x;
+    float abs_y;
 }
 
 // Offset: 1672
 // Size: 67
 br_scalar FastScalarArcTan2(br_scalar pY, br_scalar pX) {
-  br_scalar abs_x;
-  br_scalar abs_y;
+    br_scalar abs_x;
+    br_scalar abs_y;
 }
 
 // Offset: 1740
 // Size: 533
 br_angle FastFloatArcTan2Angle(float pY, float pX) {
-  float abs_x;
-  float abs_y;
+    float abs_x;
+    float abs_y;
 }
 
 // Offset: 2276
 // Size: 65
 br_angle FastScalarArcTan2Angle(br_scalar pY, br_scalar pX) {
-  br_scalar abs_x;
-  br_scalar abs_y;
+    br_scalar abs_x;
+    br_scalar abs_y;
 }
 
 // Offset: 2344
@@ -119,8 +118,8 @@ br_angle FastScalarArcTan2Angle(br_scalar pY, br_scalar pX) {
 // EAX: mat
 // EDX: rx
 void DRMatrix34RotateX(br_matrix34 *mat, br_angle rx) {
-  br_scalar s;
-  br_scalar c;
+    br_scalar s;
+    br_scalar c;
 }
 
 // Offset: 2528
@@ -128,8 +127,8 @@ void DRMatrix34RotateX(br_matrix34 *mat, br_angle rx) {
 // EAX: mat
 // EDX: ry
 void DRMatrix34RotateY(br_matrix34 *mat, br_angle ry) {
-  br_scalar s;
-  br_scalar c;
+    br_scalar s;
+    br_scalar c;
 }
 
 // Offset: 2712
@@ -137,8 +136,8 @@ void DRMatrix34RotateY(br_matrix34 *mat, br_angle ry) {
 // EAX: mat
 // EDX: rz
 void DRMatrix34RotateZ(br_matrix34 *mat, br_angle rz) {
-  br_scalar s;
-  br_scalar c;
+    br_scalar s;
+    br_scalar c;
 }
 
 // Offset: 2896
@@ -147,15 +146,15 @@ void DRMatrix34RotateZ(br_matrix34 *mat, br_angle rz) {
 // EDX: r
 // EBX: a
 void DRMatrix34Rotate(br_matrix34 *mat, br_angle r, br_vector3 *a) {
-  br_scalar t;
-  br_scalar s;
-  br_scalar c;
-  br_scalar txy;
-  br_scalar txz;
-  br_scalar tyz;
-  br_scalar sx;
-  br_scalar sy;
-  br_scalar sz;
+    br_scalar t;
+    br_scalar s;
+    br_scalar c;
+    br_scalar txy;
+    br_scalar txz;
+    br_scalar tyz;
+    br_scalar sx;
+    br_scalar sy;
+    br_scalar sz;
 }
 
 // Offset: 3228
@@ -221,8 +220,8 @@ void DRMatrix34PostRotate(br_matrix34 *mat, br_angle r, br_vector3 *axis) {
 // EAX: mat
 // EDX: rz
 void DRMatrix23Rotate(br_matrix23 *mat, br_angle rz) {
-  br_scalar s;
-  br_scalar c;
+    br_scalar s;
+    br_scalar c;
 }
 
 // Offset: 4128

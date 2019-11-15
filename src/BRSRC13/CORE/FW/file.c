@@ -1,12 +1,11 @@
 #include "file.h"
 
-// Global variables
 char rscid[49];
 
 // Offset: 12
 // Size: 86
 void _BrFileFree(void *res, br_uint_8 res_class, br_size_t size) {
-  br_file *file;
+    br_file *file;
 }
 
 // Offset: 115
@@ -17,16 +16,16 @@ br_uint_32 BrFileAttributes() {
 // Offset: 207
 // Size: 267
 void* BrFileOpenRead(char *name, br_size_t n_magics, br_mode_test_cbfn *mode_test, int *mode_result) {
-  void *raw_file;
-  br_file *file;
-  int bin_mode;
+    void *raw_file;
+    br_file *file;
+    int bin_mode;
 }
 
 // Offset: 490
 // Size: 230
 void* BrFileOpenWrite(char *name, int mode) {
-  void *raw_file;
-  br_file *file;
+    void *raw_file;
+    br_file *file;
 }
 
 // Offset: 732
@@ -77,7 +76,7 @@ void BrFileAdvance(long count, void *f) {
 // Offset: 1960
 // Size: 173
 int BrFilePrintf(void *f, char *fmt, ...) {
-  int n;
-  va_list args;
+    int n;
+    va_list args;
 }
 

@@ -1,5 +1,9 @@
+#ifndef _DEPTH_H_
+#define _DEPTH_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 110
 // EAX: pNumber
@@ -29,7 +33,7 @@ void FrobFog();
 // EDX: pSky_texture
 // EBX: pStart
 // ECX: pEnd
-void InstantDepthChange(tDepth_effect_type pType, br_pixelmap *pSky_texture, int pStart);
+void InstantDepthChange(tDepth_effect_type pType, br_pixelmap *pSky_texture, int pStart, int pEnd);
 
 // Offset: 916
 // Size: 90
@@ -58,7 +62,7 @@ br_model* CreateHorizonModel(br_actor *pCamera);
 // EAX: pName
 // EDX: pTable
 // EBX: pPower
-void LoadDepthTable(char *pName, br_pixelmap **pTable, int *pPower, div_t the_path);
+void LoadDepthTable(char *pName, br_pixelmap **pTable, int *pPower);
 
 // Offset: 4120
 // Size: 611
@@ -70,7 +74,7 @@ void InitDepthEffects();
 // EDX: pDepth_buffer
 // EBX: pShade_table
 // ECX: pShade_table_power
-void DoDepthByShadeTable(br_pixelmap *pRender_buffer, br_pixelmap *pDepth_buffer, br_pixelmap *pShade_table, int pShade_table_power);
+void DoDepthByShadeTable(br_pixelmap *pRender_buffer, br_pixelmap *pDepth_buffer, br_pixelmap *pShade_table, int pShade_table_power, int pStart, int pEnd);
 
 // Offset: 5504
 // Size: 1009
@@ -226,3 +230,4 @@ void MungeForwardSky();
 // Size: 60
 void MungeRearviewSky();
 
+#endif

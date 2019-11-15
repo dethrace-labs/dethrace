@@ -1,5 +1,9 @@
+#ifndef _PREPMAP_H_
+#define _PREPMAP_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 12
 // Size: 77
 void BrMapUpdate(br_pixelmap *map, br_uint_16 flags);
@@ -16,3 +20,4 @@ void BrBufferUpdate(br_pixelmap *pm, br_token use, br_uint_16 flags);
 // EAX: pm
 void BrBufferClear(br_pixelmap *pm);
 
+#endif

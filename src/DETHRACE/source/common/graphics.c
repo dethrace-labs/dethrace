@@ -1,6 +1,5 @@
 #include "graphics.h"
 
-// Global variables
 int gArrows[2][4][60];
 int gMap_colours[4];
 br_vector3 gShadow_points[8];
@@ -107,16 +106,15 @@ void ResetLollipopQueue() {
 // Size: 124
 // EAX: pActor
 // EDX: pIndex
-int AddToLollipopQueue(br_actor *pActor) {
-  int pIndex;
+int AddToLollipopQueue(br_actor *pActor, int pIndex) {
 }
 
 // Offset: 256
 // Size: 237
 void RenderLollipops() {
-  int must_relink;
-  br_actor **the_actor;
-  br_actor *old_parent;
+    int must_relink;
+    br_actor **the_actor;
+    br_actor *old_parent;
 }
 
 // Offset: 496
@@ -125,19 +123,16 @@ void RenderLollipops() {
 // EDX: pX1
 // EBX: pY1
 // ECX: pX2
-void DRDrawLine(br_pixelmap *pDestn, int pX1, int pY1) {
-  int pX2;
-  int pY2;
-  int pColour;
-  tU8 *d_ptr;
-  tS32 y_delta;
-  tS32 x_delta;
-  tU32 current_y;
-  tU32 current_x;
-  int row_bytes;
-  int x;
-  int y;
-  int the_diff;
+void DRDrawLine(br_pixelmap *pDestn, int pX1, int pY1, int pX2, int pY2, int pColour) {
+    tU8 *d_ptr;
+    tS32 y_delta;
+    tS32 x_delta;
+    tU32 current_y;
+    tU32 current_x;
+    int row_bytes;
+    int x;
+    int y;
+    int the_diff;
 }
 
 // Offset: 604
@@ -146,9 +141,7 @@ void DRDrawLine(br_pixelmap *pDestn, int pX1, int pY1) {
 // EDX: pX
 // EBX: pY
 // ECX: pY_pitch
-void DrawDigitAt(br_pixelmap *gImage, int pX, int pY) {
-  int pY_pitch;
-  int pValue;
+void DrawDigitAt(br_pixelmap *gImage, int pX, int pY, int pY_pitch, int pValue) {
 }
 
 // Offset: 696
@@ -157,27 +150,23 @@ void DrawDigitAt(br_pixelmap *gImage, int pX, int pY) {
 // EDX: pX
 // EBX: pY
 // ECX: pX_pitch
-void DrawNumberAt(br_pixelmap *gImage, int pX, int pY, int pX_pitch) {
-  int pY_pitch;
-  int pValue;
-  int pDigit_count;
-  int pLeading_zeroes;
-  int i;
-  int the_value;
+void DrawNumberAt(br_pixelmap *gImage, int pX, int pY, int pX_pitch, int pY_pitch, int pValue, int pDigit_count, int pLeading_zeroes) {
+    int i;
+    int the_value;
 }
 
 // Offset: 852
 // Size: 350
 // EAX: pPalette
 void BuildColourTable(br_pixelmap *pPalette) {
-  int i;
-  int j;
-  int nearest_index;
-  int red;
-  int green;
-  int blue;
-  float nearest_distance;
-  float distance;
+    int i;
+    int j;
+    int nearest_index;
+    int red;
+    int green;
+    int blue;
+    float nearest_distance;
+    float distance;
 }
 
 // Offset: 1204
@@ -189,12 +178,11 @@ void ClearConcussion() {
 // Size: 137
 // EAX: pSource
 // EDX: pCount
-tS8* SkipLines(tS8 *pSource) {
-  int pCount;
-  int i;
-  int j;
-  int number_of_chunks;
-  int chunk_length;
+tS8* SkipLines(tS8 *pSource, int pCount) {
+    int i;
+    int j;
+    int number_of_chunks;
+    int chunk_length;
 }
 
 // Offset: 1388
@@ -203,8 +191,8 @@ tS8* SkipLines(tS8 *pSource) {
 // EDX: pSrc
 // EBX: pN
 void CopyWords(char *pDst, char *pSrc, int pN) {
-  tU16 *dst;
-  tU16 *src;
+    tU16 *dst;
+    tU16 *src;
 }
 
 // Offset: 1516
@@ -213,22 +201,18 @@ void CopyWords(char *pDst, char *pSrc, int pN) {
 // EDX: pDest_x
 // EBX: pOffset_x
 // ECX: pDest_y
-void Copy8BitStripImageTo16Bit(br_pixelmap *pDest, br_int_16 pDest_x, br_int_16 pOffset_x, br_int_16 pDest_y, br_int_16 pOffset_y, tS8 *pSource) {
-  br_int_16 pSource_x;
-  br_int_16 pSource_y;
-  br_uint_16 pWidth;
-  br_uint_16 pHeight;
-  int i;
-  int j;
-  int height;
-  int number_of_chunks;
-  int old_x_byte;
-  int x_byte;
-  int off_the_left;
-  int destn_width;
-  int chunk_length;
-  char *destn_ptr;
-  char *destn_ptr2;
+void Copy8BitStripImageTo16Bit(br_pixelmap *pDest, br_int_16 pDest_x, br_int_16 pOffset_x, br_int_16 pDest_y, br_int_16 pOffset_y, tS8 *pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_uint_16 pWidth, br_uint_16 pHeight) {
+    int i;
+    int j;
+    int height;
+    int number_of_chunks;
+    int old_x_byte;
+    int x_byte;
+    int off_the_left;
+    int destn_width;
+    int chunk_length;
+    char *destn_ptr;
+    char *destn_ptr2;
 }
 
 // Offset: 2124
@@ -237,22 +221,18 @@ void Copy8BitStripImageTo16Bit(br_pixelmap *pDest, br_int_16 pDest_x, br_int_16 
 // EDX: pDest_x
 // EBX: pOffset_x
 // ECX: pDest_y
-void CopyStripImage(br_pixelmap *pDest, br_int_16 pDest_x, br_int_16 pOffset_x, br_int_16 pDest_y, br_int_16 pOffset_y, tS8 *pSource) {
-  br_int_16 pSource_x;
-  br_int_16 pSource_y;
-  br_uint_16 pWidth;
-  br_uint_16 pHeight;
-  int i;
-  int j;
-  int height;
-  int number_of_chunks;
-  int old_x_byte;
-  int x_byte;
-  int off_the_left;
-  int destn_width;
-  int chunk_length;
-  char *destn_ptr;
-  char *destn_ptr2;
+void CopyStripImage(br_pixelmap *pDest, br_int_16 pDest_x, br_int_16 pOffset_x, br_int_16 pDest_y, br_int_16 pOffset_y, tS8 *pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_uint_16 pWidth, br_uint_16 pHeight) {
+    int i;
+    int j;
+    int height;
+    int number_of_chunks;
+    int old_x_byte;
+    int x_byte;
+    int off_the_left;
+    int destn_width;
+    int chunk_length;
+    char *destn_ptr;
+    char *destn_ptr2;
 }
 
 // Offset: 2776
@@ -289,24 +269,21 @@ void ScreenLarger() {
 // EAX: pPalette
 // EDX: pFirst_colour
 // EBX: pCount
-void DRSetPaletteEntries(br_pixelmap *pPalette, int pFirst_colour) {
-  int pCount;
+void DRSetPaletteEntries(br_pixelmap *pPalette, int pFirst_colour, int pCount) {
 }
 
 // Offset: 4144
 // Size: 128
 // EAX: pThe_palette
 // EDX: pSet_current_palette
-void DRSetPalette3(br_pixelmap *pThe_palette) {
-  int pSet_current_palette;
+void DRSetPalette3(br_pixelmap *pThe_palette, int pSet_current_palette) {
 }
 
 // Offset: 4272
 // Size: 140
 // EAX: pThe_palette
 // EDX: pSet_current_palette
-void DRSetPalette2(br_pixelmap *pThe_palette) {
-  int pSet_current_palette;
+void DRSetPalette2(br_pixelmap *pThe_palette, int pSet_current_palette) {
 }
 
 // Offset: 4412
@@ -318,14 +295,14 @@ void DRSetPalette(br_pixelmap *pThe_palette) {
 // Offset: 4464
 // Size: 415
 void InitializePalettes() {
-  int j;
+    int j;
 }
 
 // Offset: 4880
 // Size: 66
 // EAX: pPal_name
 void SwitchToPalette(char *pPal_name) {
-  br_pixelmap *the_palette;
+    br_pixelmap *the_palette;
 }
 
 // Offset: 4948
@@ -346,9 +323,9 @@ void InitWobbleStuff() {
 // Offset: 5236
 // Size: 198
 void NewScreenWobble(double pAmplitude_x, double pAmplitude_y, double pPeriod) {
-  int i;
-  int oldest_time;
-  int oldest_index;
+    int i;
+    int oldest_time;
+    int oldest_index;
 }
 
 // Offset: 5436
@@ -367,31 +344,31 @@ void ResetScreenWobble() {
 // Size: 813
 // EAX: pThe_time
 void CalculateWobblitude(tU32 pThe_time) {
-  int i;
-  tU32 time_going;
-  double angle;
-  double mod_angle;
-  double cosine_over_angle;
+    int i;
+    tU32 time_going;
+    double angle;
+    double mod_angle;
+    double cosine_over_angle;
 }
 
 // Offset: 6352
 // Size: 605
 // EAX: pThe_time
 void CalculateConcussion(tU32 pThe_time) {
-  tU32 time_difference;
-  int i;
-  int j;
-  float the_amplitude;
-  float angle;
-  float mod_angle;
-  float cosine_over_angle;
+    tU32 time_difference;
+    int i;
+    int j;
+    float the_amplitude;
+    float angle;
+    float mod_angle;
+    float cosine_over_angle;
 }
 
 // Offset: 6960
 // Size: 171
 void SufferFromConcussion(float pSeriousness) {
-  int i;
-  int j;
+    int i;
+    int j;
 }
 
 // Offset: 7132
@@ -407,7 +384,7 @@ void ProcessNonTrackActors(br_pixelmap *pRender_buffer, br_pixelmap *pDepth_buff
 // Size: 119
 // EAX: pColour
 int OppositeColour(int pColour) {
-  int brightness;
+    int brightness;
 }
 
 // Offset: 7308
@@ -416,30 +393,29 @@ int OppositeColour(int pColour) {
 // EDX: pTime
 // EBX: pTrans
 // ECX: pPos
-void DrawMapBlip(tCar_spec *pCar, tU32 pTime, br_matrix34 *pTrans, br_vector3 *pPos) {
-  int pColour;
-  br_vector3 map_pos;
-  int offset;
-  int *arrow_ptr;
-  int point_count;
-  int colours[2];
-  int x;
-  int y;
-  int colour;
-  int i;
-  int j;
-  int temp;
-  int from_x;
-  int from_y;
-  int to_x;
-  int to_y;
-  int arrow_index;
-  tU32 time_diff;
-  tU32 period;
-  br_matrix34 car_in_map_space;
-  float bearing;
-  float cos_factor;
-  float sin_factor;
+void DrawMapBlip(tCar_spec *pCar, tU32 pTime, br_matrix34 *pTrans, br_vector3 *pPos, int pColour) {
+    br_vector3 map_pos;
+    int offset;
+    int *arrow_ptr;
+    int point_count;
+    int colours[2];
+    int x;
+    int y;
+    int colour;
+    int i;
+    int j;
+    int temp;
+    int from_x;
+    int from_y;
+    int to_x;
+    int to_y;
+    int arrow_index;
+    tU32 time_diff;
+    tU32 period;
+    br_matrix34 car_in_map_space;
+    float bearing;
+    float cos_factor;
+    float sin_factor;
 }
 
 // Offset: 9112
@@ -447,11 +423,10 @@ void DrawMapBlip(tCar_spec *pCar, tU32 pTime, br_matrix34 *pTrans, br_vector3 *p
 // EAX: pTime
 // EDX: pPos
 // EBX: pColour
-void DrawMapSmallBlip(tU32 pTime, br_vector3 *pPos) {
-  int pColour;
-  br_vector3 map_pos;
-  int offset;
-  tU32 time_diff;
+void DrawMapSmallBlip(tU32 pTime, br_vector3 *pPos, int pColour) {
+    br_vector3 map_pos;
+    int offset;
+    tU32 time_diff;
 }
 
 // Offset: 9372
@@ -461,12 +436,12 @@ void DrawMapSmallBlip(tU32 pTime, br_vector3 *pPos) {
 // EBX: p1
 // ECX: p2
 void MungeClipPlane(br_vector3 *pLight, tCar_spec *pCar, br_vector3 *p1, br_vector3 *p2, br_scalar pY_offset) {
-  br_vector3 v1;
-  br_vector3 v2;
-  br_vector3 v3;
-  br_vector3 v4;
-  br_scalar length;
-  br_actor *new_clip;
+    br_vector3 v1;
+    br_vector3 v2;
+    br_vector3 v3;
+    br_vector3 v4;
+    br_scalar length;
+    br_actor *new_clip;
 }
 
 // Offset: 10024
@@ -474,19 +449,17 @@ void MungeClipPlane(br_vector3 *pLight, tCar_spec *pCar, br_vector3 *p1, br_vect
 // EAX: pCar
 // EDX: pLight
 // EBX: pIndex_1
-void TryThisEdge(tCar_spec *pCar, br_vector3 *pLight, int pIndex_1, br_scalar pSign_1, int pIndex_2, br_scalar pSign_2, int pPoint_index_1) {
-  int pPoint_index_2;
-  br_scalar pY_offset;
-  br_scalar dot_1;
-  br_scalar dot_2;
-  br_scalar mult;
+void TryThisEdge(tCar_spec *pCar, br_vector3 *pLight, int pIndex_1, br_scalar pSign_1, int pIndex_2, br_scalar pSign_2, int pPoint_index_1, int pPoint_index_2, br_scalar pY_offset) {
+    br_scalar dot_1;
+    br_scalar dot_2;
+    br_scalar mult;
 }
 
 // Offset: 10204
 // Size: 104
 // EAX: pPos
 br_scalar DistanceFromPlane(br_vector3 *pPos, br_scalar pA, br_scalar pB, br_scalar pC, br_scalar pD) {
-  br_vector3 normal;
+    br_vector3 normal;
 }
 
 // Offset: 10308
@@ -506,58 +479,58 @@ void EnableLights() {
 // EBX: pTrack_spec
 // ECX: pCamera
 void ProcessShadow(tCar_spec *pCar, br_actor *pWorld, tTrack_spec *pTrack_spec, br_actor *pCamera, br_matrix34 *pCamera_to_world_transform, br_scalar pDistance_factor) {
-  int i;
-  int j;
-  int face_count;
-  int force_shadow;
-  int models_used;
-  int point_to_use;
-  int oily_count;
-  int f_num;
-  br_vector3 pos;
-  br_vector3 light_ray_car;
-  br_vector3 temp_v;
-  br_vector3 shadow_points_world[8];
-  br_vector3 poly_centre;
-  br_vector3 car_to_poly;
-  br_vector3 ray;
-  br_vector3 ray_pos;
-  br_vector3 normal;
-  br_vector3 the_normal;
-  br_vector3 pos_cam_space;
-  br_vector3 *v0;
-  br_vector3 *v1;
-  br_vector3 *v2;
-  br_vector4 *clip_normal;
-  br_scalar bounds_x_min;
-  br_scalar bounds_x_max;
-  br_scalar bounds_y_min;
-  br_scalar bounds_y_max;
-  br_scalar bounds_z_min;
-  br_scalar bounds_z_max;
-  br_scalar height;
-  br_scalar oily_size;
-  br_scalar highest_underneath;
-  br_scalar shadow_scaling_factor;
-  br_scalar y_offset;
-  br_scalar most_neg_dotty;
-  br_scalar mr_dotty;
-  br_scalar first_poly_below;
-  br_scalar distance;
-  br_scalar camera_hither_fudge;
-  br_scalar camera_angle_additional_fudge;
-  br_scalar ray_length;
-  tBounds kev_bounds;
-  tFace_ref the_list[100];
-  tFace_ref *face_ref;
-  tFace_ref *list_ptr;
-  br_renderbounds_cbfn *old_call_back;
-  br_camera *camera_ptr;
-  br_actor *oily_actor;
-  br_model *model;
-  br_material *material;
-  br_vertex verts[48];
-  br_face faces[16];
+    int i;
+    int j;
+    int face_count;
+    int force_shadow;
+    int models_used;
+    int point_to_use;
+    int oily_count;
+    int f_num;
+    br_vector3 pos;
+    br_vector3 light_ray_car;
+    br_vector3 temp_v;
+    br_vector3 shadow_points_world[8];
+    br_vector3 poly_centre;
+    br_vector3 car_to_poly;
+    br_vector3 ray;
+    br_vector3 ray_pos;
+    br_vector3 normal;
+    br_vector3 the_normal;
+    br_vector3 pos_cam_space;
+    br_vector3 *v0;
+    br_vector3 *v1;
+    br_vector3 *v2;
+    br_vector4 *clip_normal;
+    br_scalar bounds_x_min;
+    br_scalar bounds_x_max;
+    br_scalar bounds_y_min;
+    br_scalar bounds_y_max;
+    br_scalar bounds_z_min;
+    br_scalar bounds_z_max;
+    br_scalar height;
+    br_scalar oily_size;
+    br_scalar highest_underneath;
+    br_scalar shadow_scaling_factor;
+    br_scalar y_offset;
+    br_scalar most_neg_dotty;
+    br_scalar mr_dotty;
+    br_scalar first_poly_below;
+    br_scalar distance;
+    br_scalar camera_hither_fudge;
+    br_scalar camera_angle_additional_fudge;
+    br_scalar ray_length;
+    tBounds kev_bounds;
+    tFace_ref the_list[100];
+    tFace_ref *face_ref;
+    tFace_ref *list_ptr;
+    br_renderbounds_cbfn *old_call_back;
+    br_camera *camera_ptr;
+    br_actor *oily_actor;
+    br_model *model;
+    br_material *material;
+    br_vertex verts[48];
+    br_face faces[16];
 }
 
 // Offset: 15140
@@ -567,56 +540,57 @@ void ProcessShadow(tCar_spec *pCar, br_actor *pWorld, tTrack_spec *pTrack_spec, 
 // EBX: pCamera
 // ECX: pCamera_to_world_transform
 void RenderShadows(br_actor *pWorld, tTrack_spec *pTrack_spec, br_actor *pCamera, br_matrix34 *pCamera_to_world_transform) {
-  int i;
-  int cat;
-  int car_count;
-  tCar_spec *the_car;
-  br_vector3 camera_to_car;
-  br_scalar distance_factor;
+    int i;
+    int cat;
+    int car_count;
+    tCar_spec *the_car;
+    br_vector3 camera_to_car;
+    br_scalar distance_factor;
 }
 
 // Offset: 15660
 // Size: 247
 // EAX: pIndex
 // EDX: pTime
-void FlashyMapCheckpoint(int pIndex, tU32 pTime, char cp) {
-  tU32 last_flash;
-  int flash_state;
+void FlashyMapCheckpoint(int pIndex, tU32 pTime) {
+    tCheckpoint *cp;
+    tU32 last_flash;
+    int flash_state;
 }
 
 // Offset: 15908
 // Size: 252
 // EAX: pPixelmap
 int ConditionallyFillWithSky(br_pixelmap *pPixelmap) {
-  int bgnd_col;
+    int bgnd_col;
 }
 
 // Offset: 16160
 // Size: 3751
 // EAX: pDepth_mask_on
 void RenderAFrame(int pDepth_mask_on) {
-  int cat;
-  int i;
-  int car_count;
-  int flags;
-  int x_shift;
-  int y_shift;
-  int cockpit_on;
-  int real_origin_x;
-  int real_origin_y;
-  int real_base_x;
-  int real_base_y;
-  int map_timer_x;
-  int map_timer_width;
-  int ped_type;
-  char *old_pixels;
-  br_matrix34 old_camera_matrix;
-  br_matrix34 old_mirror_cam_matrix;
-  tU32 the_time;
-  br_vector3 *car_pos;
-  br_vector3 pos;
-  char the_text[256];
-  tCar_spec *car;
+    int cat;
+    int i;
+    int car_count;
+    int flags;
+    int x_shift;
+    int y_shift;
+    int cockpit_on;
+    int real_origin_x;
+    int real_origin_y;
+    int real_base_x;
+    int real_base_y;
+    int map_timer_x;
+    int map_timer_width;
+    int ped_type;
+    char *old_pixels;
+    br_matrix34 old_camera_matrix;
+    br_matrix34 old_mirror_cam_matrix;
+    tU32 the_time;
+    br_vector3 *car_pos;
+    br_vector3 pos;
+    char the_text[256];
+    tCar_spec *car;
 }
 
 // Offset: 19912
@@ -632,20 +606,20 @@ void RevertPalette() {
 // Offset: 20044
 // Size: 34
 void MungePalette() {
-  tU8 *q;
-  int i;
-  float damage;
-  float throb_start;
-  float throb_end;
-  float throb_amount;
-  float throb_amount_dash;
-  float omega;
-  tU32 period;
-  tU32 the_time;
-  int palette_spammed;
-  float last_omega;
-  tU32 next_repair_time;
-  tU32 last_sound;
+    tU8 *q;
+    int i;
+    float damage;
+    float throb_start;
+    float throb_end;
+    float throb_amount;
+    float throb_amount_dash;
+    float omega;
+    tU32 period;
+    tU32 the_time;
+    int palette_spammed;
+    float last_omega;
+    tU32 next_repair_time;
+    tU32 last_sound;
 }
 
 // Offset: 20080
@@ -657,32 +631,31 @@ void ResetPalette() {
 // Size: 65
 // EAX: pPtr
 // EDX: pDarken_amount
-void Darken(tU8 *pPtr) {
-  unsigned int pDarken_amount;
-  unsigned int value;
+void Darken(tU8 *pPtr, unsigned int pDarken_amount) {
+    unsigned int value;
 }
 
 // Offset: 20200
 // Size: 194
 // EAX: pDegree
 void SetFadedPalette(int pDegree) {
-  int j;
-  br_pixelmap *the_palette;
-  char *the_pixels;
+    int j;
+    br_pixelmap *the_palette;
+    char *the_pixels;
 }
 
 // Offset: 20396
 // Size: 147
 void FadePaletteDown() {
-  int start_time;
-  int the_time;
+    int start_time;
+    int the_time;
 }
 
 // Offset: 20544
 // Size: 116
 void FadePaletteUp() {
-  int start_time;
-  int the_time;
+    int start_time;
+    int the_time;
 }
 
 // Offset: 20660
@@ -699,7 +672,7 @@ void EnsureRenderPalette() {
 // Size: 248
 // EAX: pPixmap_name
 void SplashScreenWith(char *pPixmap_name) {
-  br_pixelmap *the_map;
+    br_pixelmap *the_map;
 }
 
 // Offset: 21060
@@ -709,9 +682,8 @@ void EnsurePaletteUp() {
 
 // Offset: 21108
 // Size: 103
-br_uint_32 AmbientificateMaterial(br_material *pMat) {
-  void *pArg;
-  float a;
+br_uint_32 AmbientificateMaterial(br_material *pMat, void *pArg) {
+    float a;
 }
 
 // Offset: 21212
@@ -730,19 +702,16 @@ void InitAmbience() {
 // EDX: pDest_x
 // EBX: pDest_y
 // ECX: pSource
-void DRPixelmapRectangleMaskedCopy(br_pixelmap *pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap *pSource, br_int_16 pSource_x) {
-  br_int_16 pSource_y;
-  br_int_16 pWidth;
-  br_int_16 pHeight;
-  int y_count;
-  int x_count;
-  int dest_row_wrap;
-  int source_row_wrap;
-  int x_delta;
-  tU8 the_byte;
-  tU8 *source_ptr;
-  tU8 *dest_ptr;
-  tU8 *conv_table;
+void DRPixelmapRectangleMaskedCopy(br_pixelmap *pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap *pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight) {
+    int y_count;
+    int x_count;
+    int dest_row_wrap;
+    int source_row_wrap;
+    int x_delta;
+    tU8 the_byte;
+    tU8 *source_ptr;
+    tU8 *dest_ptr;
+    tU8 *conv_table;
 }
 
 // Offset: 22120
@@ -750,7 +719,7 @@ void DRPixelmapRectangleMaskedCopy(br_pixelmap *pDest, br_int_16 pDest_x, br_int
 // EAX: pDest_x
 // EDX: pDest_y
 // EBX: pSource
-void DRMaskedStamp(br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap *pSource, ldiv_t __unk3__) {
+void DRMaskedStamp(br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap *pSource) {
 }
 
 // Offset: 22208
@@ -759,19 +728,16 @@ void DRMaskedStamp(br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap *pSource, l
 // EDX: pDest_x
 // EBX: pDest_y
 // ECX: pSource
-void DRPixelmapRectangleOnscreenCopy(br_pixelmap *pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap *pSource, br_int_16 pSource_x) {
-  br_int_16 pSource_y;
-  br_int_16 pWidth;
-  br_int_16 pHeight;
-  int y_count;
-  int x_count;
-  int dest_row_wrap;
-  int source_row_wrap;
-  int x_delta;
-  tU8 the_byte;
-  tU8 *source_ptr;
-  tU8 *dest_ptr;
-  tU8 *conv_table;
+void DRPixelmapRectangleOnscreenCopy(br_pixelmap *pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap *pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight) {
+    int y_count;
+    int x_count;
+    int dest_row_wrap;
+    int source_row_wrap;
+    int x_delta;
+    tU8 the_byte;
+    tU8 *source_ptr;
+    tU8 *dest_ptr;
+    tU8 *conv_table;
 }
 
 // Offset: 22540
@@ -780,23 +746,20 @@ void DRPixelmapRectangleOnscreenCopy(br_pixelmap *pDest, br_int_16 pDest_x, br_i
 // EDX: pDest_x
 // EBX: pDest_y
 // ECX: pSource
-void DRPixelmapRectangleShearedCopy(br_pixelmap *pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap *pSource, br_int_16 pSource_x, br_int_16 pSource_y) {
-  br_int_16 pWidth;
-  br_int_16 pHeight;
-  tX1616 pShear;
-  int y_count;
-  int x_count;
-  int dest_row_wrap;
-  int source_row_wrap;
-  int x_delta;
-  int last_shear_x;
-  int current_shear_x;
-  int shear_x_difference;
-  tU8 the_byte;
-  tU8 *source_ptr;
-  tU8 *dest_ptr;
-  tU8 *conv_table;
-  tX1616 current_shear;
+void DRPixelmapRectangleShearedCopy(br_pixelmap *pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap *pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight, tX1616 pShear) {
+    int y_count;
+    int x_count;
+    int dest_row_wrap;
+    int source_row_wrap;
+    int x_delta;
+    int last_shear_x;
+    int current_shear_x;
+    int shear_x_difference;
+    tU8 the_byte;
+    tU8 *source_ptr;
+    tU8 *dest_ptr;
+    tU8 *conv_table;
+    tX1616 current_shear;
 }
 
 // Offset: 23364
@@ -805,21 +768,18 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap *pDest, br_int_16 pDest_x, br_in
 // EDX: pDest_x
 // EBX: pDest_y
 // ECX: pSource
-void DRPixelmapRectangleVScaledCopy(br_pixelmap *pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap *pSource, br_int_16 pSource_x) {
-  br_int_16 pSource_y;
-  br_int_16 pWidth;
-  br_int_16 pHeight;
-  int y_count;
-  int x_count;
-  int dest_row_wrap;
-  int source_row_wrap;
-  int x_delta;
-  tU8 the_byte;
-  tU8 *source_ptr;
-  tU8 *dest_ptr;
-  tU32 source_y;
-  tU32 source_y_delta;
-  tU32 old_source_y;
+void DRPixelmapRectangleVScaledCopy(br_pixelmap *pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap *pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight) {
+    int y_count;
+    int x_count;
+    int dest_row_wrap;
+    int source_row_wrap;
+    int x_delta;
+    tU8 the_byte;
+    tU8 *source_ptr;
+    tU8 *dest_ptr;
+    tU32 source_y;
+    tU32 source_y_delta;
+    tU32 old_source_y;
 }
 
 // Offset: 23708
@@ -833,7 +793,7 @@ void InitTransientBitmaps() {
 // EDX: pHeight
 // EBX: pUser_data
 int AllocateTransientBitmap(int pWidth, int pHeight, int pUser_data) {
-  int bm_index;
+    int bm_index;
 }
 
 // Offset: 23980
@@ -851,8 +811,8 @@ void DeallocateAllTransientBitmaps() {
 // Size: 254
 // EAX: pGraphically_remove_them
 void RemoveTransientBitmaps(int pGraphically_remove_them) {
-  int i;
-  int order_number;
+    int i;
+    int order_number;
 }
 
 // Offset: 24400
@@ -867,56 +827,57 @@ void SaveTransient(int pIndex, int pX_coord, int pY_coord) {
 // Size: 214
 // EAX: pGib
 void DrawCursorGiblet(tCursor_giblet *pGib) {
-  br_pixelmap *the_image;
+    br_pixelmap *the_image;
 }
 
 // Offset: 24808
 // Size: 743
 // EAX: pPeriod
 void ProcessCursorGiblets(int pPeriod) {
-  int i;
-  int kill_the_giblet;
-  tU32 time_now;
-  tCursor_giblet *gib;
+    int i;
+    int kill_the_giblet;
+    tU32 time_now;
+    tCursor_giblet *gib;
 }
 
 // Offset: 25552
 // Size: 578
 // EAX: pX_coord
 // EDX: pY_coord
-int NewCursorGiblet(int pX_coord, int pY_coord, float pX_speed, float pY_speed, tU32 pDrop_time, signed char i) {
-  int the_width;
-  int the_height;
-  int sequence_number;
+int NewCursorGiblet(int pX_coord, int pY_coord, float pX_speed, float pY_speed, tU32 pDrop_time) {
+    int i;
+    int the_width;
+    int the_height;
+    int sequence_number;
 }
 
 // Offset: 26132
 // Size: 1373
 int DoMouseCursor() {
-  int y_coord;
-  int mouse_moved;
-  int new_required;
-  int giblet_index;
-  int cursor_offset;
-  int button_is_down;
-  int giblet_chance;
-  int giblet_count;
-  tU32 this_call_time;
-  tU32 last_cursor_change;
-  tU32 last_call_time;
-  tU32 last_required_change;
-  tS32 period;
-  int delta_x;
-  int required_cursor;
-  int zero_count;
-  int button_was_down;
+    int y_coord;
+    int mouse_moved;
+    int new_required;
+    int giblet_index;
+    int cursor_offset;
+    int button_is_down;
+    int giblet_chance;
+    int giblet_count;
+    tU32 this_call_time;
+    tU32 last_cursor_change;
+    tU32 last_call_time;
+    tU32 last_required_change;
+    tS32 period;
+    int delta_x;
+    int required_cursor;
+    int zero_count;
+    int button_was_down;
 }
 
 // Offset: 27508
 // Size: 186
 int AllocateCursorTransient() {
-  int largest_width;
-  int largest_height;
+    int largest_width;
+    int largest_height;
 }
 
 // Offset: 27696
@@ -933,11 +894,11 @@ void EndMouseCursor() {
 // Size: 568
 // EAX: pFont_ID
 void LoadFont(int pFont_ID) {
-  tPath_name the_path;
-  int i;
-  int number_of_chars;
-  FILE *f;
-  tU32 the_size;
+    tPath_name the_path;
+    int i;
+    int number_of_chars;
+    FILE *f;
+    tU32 the_size;
 }
 
 // Offset: 28464
@@ -957,14 +918,11 @@ void InitDRFonts() {
 // EDX: pLeft
 // EBX: pTop
 // ECX: pTop_clip
-void DrawDropImage(br_pixelmap *pImage, int pLeft, int pTop) {
-  int pTop_clip;
-  int pBottom_clip;
-  int pOffset;
-  int y;
-  int src_y;
-  int src_height;
-  int y_diff;
+void DrawDropImage(br_pixelmap *pImage, int pLeft, int pTop, int pTop_clip, int pBottom_clip, int pOffset) {
+    int y;
+    int src_y;
+    int src_height;
+    int y_diff;
 }
 
 // Offset: 28956
@@ -973,12 +931,10 @@ void DrawDropImage(br_pixelmap *pImage, int pLeft, int pTop) {
 // EDX: pLeft
 // EBX: pTop
 // ECX: pTop_clip
-void DropInImageFromTop(br_pixelmap *pImage, int pLeft, int pTop) {
-  int pTop_clip;
-  int pBottom_clip;
-  tS32 start_time;
-  tS32 the_time;
-  int drop_distance;
+void DropInImageFromTop(br_pixelmap *pImage, int pLeft, int pTop, int pTop_clip, int pBottom_clip) {
+    tS32 start_time;
+    tS32 the_time;
+    int drop_distance;
 }
 
 // Offset: 29120
@@ -987,12 +943,10 @@ void DropInImageFromTop(br_pixelmap *pImage, int pLeft, int pTop) {
 // EDX: pLeft
 // EBX: pTop
 // ECX: pTop_clip
-void DropOutImageThruBottom(br_pixelmap *pImage, int pLeft, int pTop) {
-  int pTop_clip;
-  int pBottom_clip;
-  tS32 start_time;
-  tS32 the_time;
-  int drop_distance;
+void DropOutImageThruBottom(br_pixelmap *pImage, int pLeft, int pTop, int pTop_clip, int pBottom_clip) {
+    tS32 start_time;
+    tS32 the_time;
+    int drop_distance;
 }
 
 // Offset: 29272
@@ -1001,12 +955,10 @@ void DropOutImageThruBottom(br_pixelmap *pImage, int pLeft, int pTop) {
 // EDX: pLeft
 // EBX: pTop
 // ECX: pTop_clip
-void DropInImageFromBottom(br_pixelmap *pImage, int pLeft, int pTop) {
-  int pTop_clip;
-  int pBottom_clip;
-  tS32 start_time;
-  tS32 the_time;
-  int drop_distance;
+void DropInImageFromBottom(br_pixelmap *pImage, int pLeft, int pTop, int pTop_clip, int pBottom_clip) {
+    tS32 start_time;
+    tS32 the_time;
+    int drop_distance;
 }
 
 // Offset: 29424
@@ -1015,12 +967,10 @@ void DropInImageFromBottom(br_pixelmap *pImage, int pLeft, int pTop) {
 // EDX: pLeft
 // EBX: pTop
 // ECX: pTop_clip
-void DropOutImageThruTop(br_pixelmap *pImage, int pLeft, int pTop) {
-  int pTop_clip;
-  int pBottom_clip;
-  tS32 start_time;
-  tS32 the_time;
-  int drop_distance;
+void DropOutImageThruTop(br_pixelmap *pImage, int pLeft, int pTop, int pTop_clip, int pBottom_clip) {
+    tS32 start_time;
+    tS32 the_time;
+    int drop_distance;
 }
 
 // Offset: 29588
@@ -1029,11 +979,9 @@ void DropOutImageThruTop(br_pixelmap *pImage, int pLeft, int pTop) {
 // EDX: pLeft
 // EBX: pTop
 // ECX: pPercentage
-void DrawTellyLine(br_pixelmap *pImage, int pLeft) {
-  int pTop;
-  int pPercentage;
-  int the_width;
-  int the_height;
+void DrawTellyLine(br_pixelmap *pImage, int pLeft, int pTop, int pPercentage) {
+    int the_width;
+    int the_height;
 }
 
 // Offset: 29852
@@ -1042,10 +990,8 @@ void DrawTellyLine(br_pixelmap *pImage, int pLeft) {
 // EDX: pLeft
 // EBX: pTop
 // ECX: pPercentage
-void DrawTellyImage(br_pixelmap *pImage, int pLeft) {
-  int pTop;
-  int pPercentage;
-  int the_height;
+void DrawTellyImage(br_pixelmap *pImage, int pLeft, int pTop, int pPercentage) {
+    int the_height;
 }
 
 // Offset: 30056
@@ -1053,10 +999,9 @@ void DrawTellyImage(br_pixelmap *pImage, int pLeft) {
 // EAX: pImage
 // EDX: pLeft
 // EBX: pTop
-void TellyInImage(br_pixelmap *pImage, int pLeft) {
-  int pTop;
-  tS32 start_time;
-  tS32 the_time;
+void TellyInImage(br_pixelmap *pImage, int pLeft, int pTop) {
+    tS32 start_time;
+    tS32 the_time;
 }
 
 // Offset: 30252
@@ -1064,11 +1009,10 @@ void TellyInImage(br_pixelmap *pImage, int pLeft) {
 // EAX: pImage
 // EDX: pLeft
 // EBX: pTop
-void TellyOutImage(br_pixelmap *pImage, int pLeft) {
-  int pTop;
-  tS32 start_time;
-  tS32 the_time;
-  int drop_distance;
+void TellyOutImage(br_pixelmap *pImage, int pLeft, int pTop) {
+    tS32 start_time;
+    tS32 the_time;
+    int drop_distance;
 }
 
 // Offset: 30472
@@ -1090,14 +1034,13 @@ void ToggleShadow() {
 // Offset: 30816
 // Size: 503
 void InitShadow() {
-  int i;
-  br_vector3 temp_v;
+    int i;
+    br_vector3 temp_v;
 }
 
 // Offset: 31320
 // Size: 140
-br_uint_32 SaveShadeTable(br_pixelmap *pTable) {
-  void *pArg;
+br_uint_32 SaveShadeTable(br_pixelmap *pTable, void *pArg) {
 }
 
 // Offset: 31460
@@ -1131,19 +1074,17 @@ int SwitchToLoresMode() {
 // EDX: pSource
 // EBX: pSource_width
 // ECX: pSource_height
-void DRPixelmapDoubledCopy(br_pixelmap *pDestn, br_pixelmap *pSource, int pSource_width, int pSource_height) {
-  int pX_offset;
-  int pY_offset;
-  tU16 *sptr;
-  tU16 pixels;
-  tU8 *dptr;
-  tU8 *dptr2;
-  tU8 pixel_1;
-  tU8 pixel_2;
-  int i;
-  int j;
-  int dst_row_skip;
-  int src_row_skip;
-  int width_over_2;
+void DRPixelmapDoubledCopy(br_pixelmap *pDestn, br_pixelmap *pSource, int pSource_width, int pSource_height, int pX_offset, int pY_offset) {
+    tU16 *sptr;
+    tU16 pixels;
+    tU8 *dptr;
+    tU8 *dptr2;
+    tU8 pixel_1;
+    tU8 pixel_2;
+    int i;
+    int j;
+    int dst_row_skip;
+    int src_row_skip;
+    int width_over_2;
 }
 

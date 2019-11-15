@@ -1,5 +1,9 @@
+#ifndef _BREXCEPT_H_
+#define _BREXCEPT_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 18
 // Size: 81
 br_exception_handler* _BrExceptionBegin();
@@ -20,3 +24,4 @@ br_exception _BrExceptionValueFetch(br_exception type, void **evp);
 // Size: 41
 void* _BrExceptionResource();
 
+#endif

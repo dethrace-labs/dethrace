@@ -1,5 +1,9 @@
+#ifndef _SYS_CONF_H_
+#define _SYS_CONF_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 26
 // Size: 106
 // EAX: t
@@ -55,3 +59,4 @@ br_error BrSystemConfigSetString(br_token t, char *string);
 // Size: 175
 br_error BrSystemConfigQueryString(br_token t, char *string, int max_size);
 
+#endif

@@ -1,6 +1,5 @@
 #include "stddiag.h"
 
-// Global variables
 br_diaghandler BrStdioDiagHandler;
 br_diaghandler *_BrDefaultDiagHandler;
 char rscid[49];

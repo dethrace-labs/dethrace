@@ -1,5 +1,9 @@
+#ifndef _STDMEM_H_
+#define _STDMEM_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 17
 // Size: 80
 void* BrStdlibAllocate(br_size_t size, br_uint_8 type);
@@ -16,3 +20,4 @@ br_size_t BrStdlibInquire(br_uint_8 type);
 // Size: 40
 br_uint_32 BrStdlibAlign(br_uint_8 type);
 
+#endif

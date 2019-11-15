@@ -1,5 +1,9 @@
+#ifndef _MAINLOOP_H_
+#define _MAINLOOP_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 161
 void ToggleInfo();
@@ -46,3 +50,4 @@ tRace_result MainGameLoop();
 // Size: 61
 tRace_result DoRace();
 
+#endif

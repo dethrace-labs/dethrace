@@ -1,5 +1,9 @@
+#ifndef _FILE_H_
+#define _FILE_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 12
 // Size: 86
 void _BrFileFree(void *res, br_uint_8 res_class, br_size_t size);
@@ -56,3 +60,4 @@ void BrFileAdvance(long count, void *f);
 // Size: 173
 int BrFilePrintf(void *f, char *fmt, ...);
 
+#endif

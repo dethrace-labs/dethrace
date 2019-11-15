@@ -1,6 +1,5 @@
 #include "brbhook.h"
 
-// Global variables
 char rscid[49];
 
 // Offset: 13

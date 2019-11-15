@@ -1,6 +1,5 @@
 #include "globvrbm.h"
 
-// Global variables
 br_material *gMaterial[2];
 int g16bit_palette_valid;
 tException_list gExceptions;

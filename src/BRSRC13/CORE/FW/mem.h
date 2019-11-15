@@ -1,5 +1,9 @@
+#ifndef _MEM_H_
+#define _MEM_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 14
 // Size: 153
 void* BrMemAllocate(br_size_t size, br_uint_8 type);
@@ -24,3 +28,4 @@ void* BrMemCalloc(int nelems, br_size_t size, br_uint_8 type);
 // Size: 120
 char* BrMemStrDup(char *str);
 
+#endif

@@ -1,6 +1,5 @@
 #include "brlists.h"
 
-// Global variables
 char rscid[49];
 
 // Offset: 10
@@ -21,13 +20,13 @@ void BrAddTail(br_list *list, br_node *node) {
 // Offset: 241
 // Size: 77
 br_node* BrRemHead(br_list *list) {
-  br_node *n;
+    br_node *n;
 }
 
 // Offset: 328
 // Size: 77
 br_node* BrRemTail(br_list *list) {
-  br_node *n;
+    br_node *n;
 }
 
 // Offset: 414
@@ -53,7 +52,7 @@ void BrSimpleAddHead(br_simple_list *list, br_simple_node *node) {
 // Offset: 720
 // Size: 65
 br_simple_node* BrSimpleRemHead(br_simple_list *list) {
-  br_simple_node *node;
+    br_simple_node *node;
 }
 
 // Offset: 800

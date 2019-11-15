@@ -1,5 +1,9 @@
+#ifndef _MATH_H_
+#define _MATH_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 13
 // Size: 61
 float BrFloatFloor(float f);
@@ -20,3 +24,4 @@ float BrFloatPow(float a, float b);
 // Size: 70
 float BrFloatAtan2(float x, float y);
 
+#endif

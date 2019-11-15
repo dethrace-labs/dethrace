@@ -1,6 +1,5 @@
 #include "genfile.h"
 
-// Global variables
 br_file_struct_member file_info_FM[2];
 br_file_struct file_info_F;
 br_file_enum_member file_type_FM[10];
@@ -13,9 +12,7 @@ char rscid[50];
 // EDX: id
 // EBX: length
 // ECX: count
-int FopRead_END(br_datafile *df, br_uint_32 id) {
-  br_uint_32 length;
-  br_uint_32 count;
+int FopRead_END(br_datafile *df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
 }
 
 // Offset: 75
@@ -29,6 +26,6 @@ int FopWrite_END(br_datafile *df) {
 // EAX: df
 // EDX: type
 int FopWrite_FILE_INFO(br_datafile *df, br_uint_32 type) {
-  file_info fi;
+    file_info fi;
 }
 

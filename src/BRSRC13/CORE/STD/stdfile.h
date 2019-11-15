@@ -1,3 +1,6 @@
+#ifndef _STDFILE_H_
+#define _STDFILE_H_
+
 #include "dr_types.h"
 #include "br_types.h"
 
@@ -51,3 +54,4 @@ void BrStdioPutLine(char *buf, void *f);
 // Size: 46
 void BrStdioAdvance(br_size_t count, void *f);
 
+#endif

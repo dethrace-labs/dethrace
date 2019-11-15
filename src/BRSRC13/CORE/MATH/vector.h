@@ -1,5 +1,9 @@
+#ifndef _VECTOR_H_
+#define _VECTOR_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 14
 // Size: 108
 void BrVector2Copy(br_vector2 *v1, br_vector2 *v2);
@@ -128,39 +132,40 @@ void BrVector4Copy(br_vector4 *v1, br_vector4 *v2);
 // Size: 130
 // EAX: v1
 // EDX: v2
-br_scalar BrFVector2Dot(br_fvector2 *v1);
+br_scalar BrFVector2Dot(br_fvector2 *v1, br_vector2 *v2);
 
 // Offset: 4718
 // Size: 134
 // EAX: v1
 // EDX: v2
-void BrFVector3Copy(br_fvector3 *v1);
+void BrFVector3Copy(br_fvector3 *v1, br_vector3 *v2);
 
 // Offset: 4868
 // Size: 145
 // EAX: v1
 // EDX: v2
-void BrVector3ScaleF(br_vector3 *v1, br_fvector3 *v2, br_scalar s, short __unk3__);
+void BrVector3ScaleF(br_vector3 *v1, br_fvector3 *v2, br_scalar s);
 
 // Offset: 5027
 // Size: 144
 // EAX: v1
 // EDX: v2
-br_scalar BrFVector3Dot(br_fvector3 *v1);
+br_scalar BrFVector3Dot(br_fvector3 *v1, br_vector3 *v2);
 
 // Offset: 5191
 // Size: 234
 // EAX: v1
 // EDX: v2
-void BrFVector3Normalise(br_fvector3 *v1);
+void BrFVector3Normalise(br_fvector3 *v1, br_vector3 *v2);
 
 // Offset: 5447
 // Size: 190
 // EAX: v1
 // EDX: v2
-void BrFVector3NormaliseLP(br_fvector3 *v1);
+void BrFVector3NormaliseLP(br_fvector3 *v1, br_vector3 *v2);
 
 // Offset: 5656
 // Size: 190
 void BrVector2Normalise(br_vector2 *v1, br_vector2 *v2);
 
+#endif

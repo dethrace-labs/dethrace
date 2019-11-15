@@ -1,3 +1,6 @@
+#ifndef _DIAG_H_
+#define _DIAG_H_
+
 #include "dr_types.h"
 #include "br_types.h"
 // Offset: 10
@@ -20,3 +23,4 @@ void _BrAssert(const char *condition, const char *file, unsigned int line);
 // Size: 95
 void _BrUAssert(const char *condition, const char *file, unsigned int line);
 
+#endif

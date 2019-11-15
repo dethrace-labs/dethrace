@@ -1,6 +1,5 @@
 #include "vector.h"
 
-// Global variables
 char rscid[50];
 
 // Offset: 14
@@ -141,13 +140,13 @@ br_scalar BrVector3LengthSquared(br_vector3 *v1) {
 // Offset: 3795
 // Size: 226
 void BrVector3Normalise(br_vector3 *v1, br_vector3 *v2) {
-  br_scalar scale;
+    br_scalar scale;
 }
 
 // Offset: 4042
 // Size: 191
 void BrVector3NormaliseLP(br_vector3 *v1, br_vector3 *v2) {
-  br_scalar scale;
+    br_scalar scale;
 }
 
 // Offset: 4246
@@ -164,54 +163,49 @@ void BrVector4Copy(br_vector4 *v1, br_vector4 *v2) {
 // Size: 130
 // EAX: v1
 // EDX: v2
-br_scalar BrFVector2Dot(br_fvector2 *v1) {
-  br_vector2 *v2;
+br_scalar BrFVector2Dot(br_fvector2 *v1, br_vector2 *v2) {
 }
 
 // Offset: 4718
 // Size: 134
 // EAX: v1
 // EDX: v2
-void BrFVector3Copy(br_fvector3 *v1) {
-  br_vector3 *v2;
+void BrFVector3Copy(br_fvector3 *v1, br_vector3 *v2) {
 }
 
 // Offset: 4868
 // Size: 145
 // EAX: v1
 // EDX: v2
-void BrVector3ScaleF(br_vector3 *v1, br_fvector3 *v2, br_scalar s, short __unk3__) {
+void BrVector3ScaleF(br_vector3 *v1, br_fvector3 *v2, br_scalar s) {
 }
 
 // Offset: 5027
 // Size: 144
 // EAX: v1
 // EDX: v2
-br_scalar BrFVector3Dot(br_fvector3 *v1) {
-  br_vector3 *v2;
+br_scalar BrFVector3Dot(br_fvector3 *v1, br_vector3 *v2) {
 }
 
 // Offset: 5191
 // Size: 234
 // EAX: v1
 // EDX: v2
-void BrFVector3Normalise(br_fvector3 *v1) {
-  br_vector3 *v2;
-  br_scalar scale;
+void BrFVector3Normalise(br_fvector3 *v1, br_vector3 *v2) {
+    br_scalar scale;
 }
 
 // Offset: 5447
 // Size: 190
 // EAX: v1
 // EDX: v2
-void BrFVector3NormaliseLP(br_fvector3 *v1) {
-  br_vector3 *v2;
-  br_scalar scale;
+void BrFVector3NormaliseLP(br_fvector3 *v1, br_vector3 *v2) {
+    br_scalar scale;
 }
 
 // Offset: 5656
 // Size: 190
 void BrVector2Normalise(br_vector2 *v1, br_vector2 *v2) {
-  br_scalar scale;
+    br_scalar scale;
 }
 

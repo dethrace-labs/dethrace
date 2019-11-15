@@ -1,6 +1,5 @@
 #include "hostcfg.h"
 
-// Global variables
 
 // Offset: 18
 // Size: 40

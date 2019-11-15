@@ -1,10 +1,14 @@
+#ifndef _INPUT_H_
+#define _INPUT_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 996
 // EAX: pKeys
 // EDX: pMark
-void SetJoystickArrays(int *pKeys);
+void SetJoystickArrays(int *pKeys, int pMark);
 
 // Offset: 996
 // Size: 82
@@ -97,7 +101,7 @@ void EndRollingLetters();
 // EDX: pX
 // EBX: pY
 // ECX: rolling_type
-int AddRollingLetter(char pChar, int pX, int pY, tRolling_type rolling_type, int let);
+int AddRollingLetter(char pChar, int pX, int pY, tRolling_type rolling_type);
 
 // Offset: 4012
 // Size: 111
@@ -105,7 +109,7 @@ int AddRollingLetter(char pChar, int pX, int pY, tRolling_type rolling_type, int
 // EDX: pX
 // EBX: pY
 // ECX: rolling_type
-void AddRollingString(char *pStr, int pX, int pY, tRolling_type rolling_type, int i);
+void AddRollingString(char *pStr, int pX, int pY, tRolling_type rolling_type);
 
 // Offset: 4124
 // Size: 85
@@ -113,7 +117,7 @@ void AddRollingString(char *pStr, int pX, int pY, tRolling_type rolling_type, in
 // EDX: pWidth
 // EBX: pX
 // ECX: pY
-void AddRollingNumber(tU32 pNumber, int pWidth);
+void AddRollingNumber(tU32 pNumber, int pWidth, int pX, int pY);
 
 // Offset: 4212
 // Size: 651
@@ -227,3 +231,4 @@ void EdgeTriggerModeOn();
 // Size: 44
 void EdgeTriggerModeOff();
 
+#endif

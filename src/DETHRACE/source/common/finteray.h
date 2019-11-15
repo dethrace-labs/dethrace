@@ -1,5 +1,9 @@
+#ifndef _FINTERAY_H_
+#define _FINTERAY_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 104
 int BadDiv(br_scalar a, br_scalar b);
@@ -39,15 +43,15 @@ int DRSceneRayPick2D(br_actor *world, br_vector3 *pPosition, br_vector3 *pDir, d
 // EDX: material
 // EBX: ray_pos
 // ECX: ray_dir
-int DRModelPick2D(br_model *model, br_material *material, br_vector3 *ray_pos, br_vector3 *ray_dir, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn *callback);
+int DRModelPick2D(br_model *model, br_material *material, br_vector3 *ray_pos, br_vector3 *ray_dir, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn *callback, void *arg);
 
 // Offset: 3604
 // Size: 88
-int FindHighestPolyCallBack(br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3 *pPoint);
+int FindHighestPolyCallBack(br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3 *pPoint, br_vector2 *pMap, void *pArg);
 
 // Offset: 3692
 // Size: 112
-int FindHighestCallBack(br_actor *pActor, br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT_near, br_scalar pT_far);
+int FindHighestCallBack(br_actor *pActor, br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT_near, br_scalar pT_far, void *pArg);
 
 // Offset: 3804
 // Size: 247
@@ -79,7 +83,7 @@ void CheckSingleFace(tFace_ref *pFace, br_vector3 *ray_pos, br_vector3 *ray_dir,
 // EDX: pFace
 // EBX: ray_pos
 // ECX: ray_dir
-void MultiRayCheckSingleFace(int pNum_rays, tFace_ref *pFace, br_vector3 *ray_pos, br_vector3 *ray_dir, br_vector3 *normal, br_scalar *rt, signed char i, double t, enum numerator, br_scalar d, signed char p);
+void MultiRayCheckSingleFace(int pNum_rays, tFace_ref *pFace, br_vector3 *ray_pos, br_vector3 *ray_dir, br_vector3 *normal, br_scalar *rt);
 
 // Offset: 6808
 // Size: 662
@@ -93,14 +97,14 @@ void GetNewBoundingBox(br_bounds *b2, br_bounds *b1, br_matrix34 *m);
 // EAX: bnds
 // EDX: face_list
 // EBX: max_face
-int FindFacesInBox(tBounds *bnds, tFace_ref *face_list);
+int FindFacesInBox(tBounds *bnds, tFace_ref *face_list, int max_face);
 
 // Offset: 8968
 // Size: 945
 // EAX: bnds
 // EDX: face_list
 // EBX: max_face
-int FindFacesInBox2(tBounds *bnds, tFace_ref *face_list);
+int FindFacesInBox2(tBounds *bnds, tFace_ref *face_list, int max_face);
 
 // Offset: 9916
 // Size: 1001
@@ -108,7 +112,7 @@ int FindFacesInBox2(tBounds *bnds, tFace_ref *face_list);
 // EDX: ap
 // EBX: model
 // ECX: material
-int ActorBoxPick(tBounds *bnds, br_actor *ap, br_model *model, br_material *material, tFace_ref *face_list, int max_face);
+int ActorBoxPick(tBounds *bnds, br_actor *ap, br_model *model, br_material *material, tFace_ref *face_list, int max_face, br_matrix34 *pMat);
 
 // Offset: 10920
 // Size: 2803
@@ -116,21 +120,21 @@ int ActorBoxPick(tBounds *bnds, br_actor *ap, br_model *model, br_material *mate
 // EDX: bnds
 // EBX: model
 // ECX: model_material
-int ModelPickBox(br_actor *actor, tBounds *bnds, br_model *model, br_material *model_material, tFace_ref *face_list, int max_face);
+int ModelPickBox(br_actor *actor, tBounds *bnds, br_model *model, br_material *model_material, tFace_ref *face_list, int max_face, br_matrix34 *pMat);
 
 // Offset: 13724
 // Size: 613
 // EAX: p
 // EDX: nv
 // EBX: i
-void ClipToPlaneGE(br_vector3 *p, int *nv, int i);
+void ClipToPlaneGE(br_vector3 *p, int *nv, int i, br_scalar limit);
 
 // Offset: 14340
 // Size: 613
 // EAX: p
 // EDX: nv
 // EBX: i
-void ClipToPlaneLE(br_vector3 *p, int *nv, int i);
+void ClipToPlaneLE(br_vector3 *p, int *nv, int i, br_scalar limit);
 
 // Offset: 14956
 // Size: 165
@@ -219,3 +223,4 @@ void SelectFaceForward();
 // Size: 93
 void SelectFaceDown();
 
+#endif

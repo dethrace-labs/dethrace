@@ -1,6 +1,5 @@
 #include "himage.h"
 
-// Global variables
 
 // Offset: 14
 // Size: 40

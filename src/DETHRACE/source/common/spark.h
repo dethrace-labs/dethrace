@@ -1,5 +1,9 @@
+#ifndef _SPARK_H_
+#define _SPARK_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 119
 void DrawDot(br_scalar z, tU8 *scr_ptr, tU16 *depth_ptr, tU8 *shade_ptr);
@@ -79,7 +83,7 @@ void CreateSparkShower(br_vector3 *pos, br_vector3 *v, br_vector3 *pForce, tCar_
 // EAX: pSpark_num
 // EDX: pos
 // EBX: length
-void AdjustSpark(int pSpark_num, br_vector3 *pos, br_vector3 *length, wchar_t tv, br_memory_classes mat);
+void AdjustSpark(int pSpark_num, br_vector3 *pos, br_vector3 *length);
 
 // Offset: 9596
 // Size: 206
@@ -87,7 +91,7 @@ void AdjustSpark(int pSpark_num, br_vector3 *pos, br_vector3 *length, wchar_t tv
 // EDX: pos
 // EBX: pAge
 // ECX: pMaterial
-void AdjustShrapnel(int pShrapnel_num, br_vector3 *pos, tU16 pAge, br_material *pMaterial, ldiv_t i, br_memory_classes __unk5__);
+void AdjustShrapnel(int pShrapnel_num, br_vector3 *pos, tU16 pAge, br_material *pMaterial);
 
 // Offset: 9804
 // Size: 44
@@ -146,7 +150,7 @@ void DrMatrix34Rotate(br_matrix34 *mat, br_angle r, br_vector3 *a);
 // Size: 245
 // EAX: l
 // EDX: x
-void SmokeLine(int l, int x, br_scalar zbuff, int r_squared, tU8 *scr_ptr, tU16 *depth_ptr, tU8 *shade_ptr, br_scalar r_multiplier, br_scalar z_multiplier, br_scalar shade_offset, void (i)(), br_memory_classes r_multiplier_int, unsigned short z, br_vector3 *__unk14__, br_scalar __unk15__, br_scalar __unk16__);
+void SmokeLine(int l, int x, br_scalar zbuff, int r_squared, tU8 *scr_ptr, tU16 *depth_ptr, tU8 *shade_ptr, br_scalar r_multiplier, br_scalar z_multiplier, br_scalar shade_offset);
 
 // Offset: 13528
 // Size: 2390
@@ -183,7 +187,7 @@ void ReplaySmoke(br_pixelmap *pRender_screen, br_pixelmap *pDepth_buffer, br_act
 // EAX: pCar
 // EDX: wheel
 // EBX: pTime
-void GenerateContinuousSmoke(tCar_spec *pCar, int wheel);
+void GenerateContinuousSmoke(tCar_spec *pCar, int wheel, tU32 pTime);
 
 // Offset: 18572
 // Size: 91
@@ -201,7 +205,7 @@ void RenderSmoke(br_pixelmap *pRender_screen, br_pixelmap *pDepth_buffer, br_act
 // Size: 672
 // EAX: pos
 // EDX: v
-void CreatePuffOfSmoke(br_vector3 *pos, br_vector3 *v, br_scalar strength, br_scalar pDecay_factor, int pType);
+void CreatePuffOfSmoke(br_vector3 *pos, br_vector3 *v, br_scalar strength, br_scalar pDecay_factor, int pType, tCar_spec *pC);
 
 // Offset: 21152
 // Size: 44
@@ -212,7 +216,7 @@ void ResetSmoke();
 // EAX: pIndex
 // EDX: pType
 // EBX: pPos
-void AdjustSmoke(int pIndex, tU8 pType, br_vector3 *pPos, br_scalar pRadius, br_scalar pStrength, int __unk5__, br_memory_classes __unk6__, char __unk8__);
+void AdjustSmoke(int pIndex, tU8 pType, br_vector3 *pPos, br_scalar pRadius, br_scalar pStrength);
 
 // Offset: 21340
 // Size: 34
@@ -224,7 +228,7 @@ void ActorError();
 // EDX: pCar
 // EBX: pVertex
 // ECX: pColour
-void AdjustSmokeColumn(int pIndex, tCar_spec *pCar, int pVertex, int pColour, unsigned int i);
+void AdjustSmokeColumn(int pIndex, tCar_spec *pCar, int pVertex, int pColour);
 
 // Offset: 21632
 // Size: 880
@@ -232,7 +236,7 @@ void AdjustSmokeColumn(int pIndex, tCar_spec *pCar, int pVertex, int pColour, un
 // EDX: pColour
 // EBX: pVertex_index
 // ECX: pLifetime
-void CreateSmokeColumn(tCar_spec *pCar, int pColour, int pVertex_index);
+void CreateSmokeColumn(tCar_spec *pCar, int pColour, int pVertex_index, tU32 pLifetime);
 
 // Offset: 22512
 // Size: 309
@@ -246,7 +250,7 @@ void GenerateItFoxShadeTable();
 // Size: 153
 // EAX: pIndex
 // EDX: pFrame_count
-void AdjustFlame(int pIndex, int pFrame_count, br_scalar pScale_x, br_scalar pScale_y, br_scalar pOffset_x, br_scalar pOffset_z, unsigned short i, br_memory_classes j, union actor);
+void AdjustFlame(int pIndex, int pFrame_count, br_scalar pScale_x, br_scalar pScale_y, br_scalar pOffset_x, br_scalar pOffset_z);
 
 // Offset: 23076
 // Size: 373
@@ -259,14 +263,14 @@ void ReplayFlame(tSmoke_column *col, br_actor *actor);
 // EAX: c
 // EDX: pPos
 // EBX: pTime
-void FlameAnimate(int c, br_vector3 *pPos, tU32 pTime, int col, br_memory_classes actor);
+void FlameAnimate(int c, br_vector3 *pPos, tU32 pTime);
 
 // Offset: 24388
 // Size: 537
 // EAX: i
 // EDX: pTime
 // EBX: pRet_car_pos
-void DoSmokeColumn(int i, tU32 pTime, br_vector3 *pRet_car_pos, signed char c, _complex actor);
+void DoSmokeColumn(int i, tU32 pTime, br_vector3 *pRet_car_pos);
 
 // Offset: 24928
 // Size: 132
@@ -311,7 +315,7 @@ void PipeInstantUnSmudge(tCar_spec *pCar);
 // Size: 1828
 // EAX: pCar
 // EDX: fire_point
-void SmudgeCar(tCar_spec *pCar);
+void SmudgeCar(tCar_spec *pCar, int fire_point);
 
 // Offset: 31904
 // Size: 105
@@ -351,7 +355,7 @@ void StopCarSmokingInstantly(tCar_spec *pCar);
 // EAX: pCar
 // EDX: pDamage_index
 // EBX: pColour
-void ConditionalSmokeColumn(tCar_spec *pCar, int pDamage_index);
+void ConditionalSmokeColumn(tCar_spec *pCar, int pDamage_index, int pColour);
 
 // Offset: 32660
 // Size: 1065
@@ -401,11 +405,11 @@ void DisposeKevStuffCar(tCar_spec *pCar);
 
 // Offset: 38780
 // Size: 829
-void DoTrueColModelThing(br_actor *actor, br_model *pModel, br_material *material, void *render_data);
+void DoTrueColModelThing(br_actor *actor, br_model *pModel, br_material *material, void *render_data, br_uint_8 style, int on_screen);
 
 // Offset: 39612
 // Size: 856
-void DoModelThing(br_actor *actor, br_model *pModel, br_material *material, void *render_data);
+void DoModelThing(br_actor *actor, br_model *pModel, br_material *material, void *render_data, br_uint_8 style, int on_screen);
 
 // Offset: 40468
 // Size: 204
@@ -423,3 +427,4 @@ void MakeCarIt(tCar_spec *pCar);
 // EAX: pCar
 void StopCarBeingIt(tCar_spec *pCar);
 
+#endif

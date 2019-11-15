@@ -1,5 +1,9 @@
+#ifndef _DISPLAYS_H_
+#define _DISPLAYS_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 56
 // EAX: pStr
@@ -35,7 +39,7 @@ int HeadupActive(int pIndex);
 // EDX: pX
 // EBX: pY
 // ECX: pFont
-void DRPixelmapText(br_pixelmap *pPixelmap, int pX, int pY, tDR_font *pFont);
+void DRPixelmapText(br_pixelmap *pPixelmap, int pX, int pY, tDR_font *pFont, char *pText, int pRight_edge);
 
 // Offset: 1032
 // Size: 550
@@ -43,7 +47,7 @@ void DRPixelmapText(br_pixelmap *pPixelmap, int pX, int pY, tDR_font *pFont);
 // EDX: pX
 // EBX: pY
 // ECX: pFont
-void DRPixelmapCleverText2(br_pixelmap *pPixelmap, int pX, int pY, tDR_font *pFont);
+void DRPixelmapCleverText2(br_pixelmap *pPixelmap, int pX, int pY, tDR_font *pFont, signed char *pText, int pRight_edge);
 
 // Offset: 1584
 // Size: 248
@@ -51,11 +55,11 @@ void DRPixelmapCleverText2(br_pixelmap *pPixelmap, int pX, int pY, tDR_font *pFo
 // EDX: pLeft
 // EBX: pTop
 // ECX: pRight
-void DeviouslyDimRectangle(br_pixelmap *pPixelmap, int pLeft, int pTop);
+void DeviouslyDimRectangle(br_pixelmap *pPixelmap, int pLeft, int pTop, int pRight, int pBottom, int pKnock_out_corners);
 
 // Offset: 1832
 // Size: 461
-void DimRectangle(br_pixelmap *pPixelmap, int pLeft, int pTop);
+void DimRectangle(br_pixelmap *pPixelmap, int pLeft, int pTop, int pRight, int pBottom, int pKnock_out_corners);
 
 // Offset: 2296
 // Size: 352
@@ -98,7 +102,7 @@ int FindAHeadupHoleWoofBarkSoundsABitRude(int pSlot_index);
 // Size: 144
 // EAX: pFont
 // EDX: pText
-int DRTextWidth(tDR_font *pFont);
+int DRTextWidth(tDR_font *pFont, char *pText);
 
 // Offset: 5952
 // Size: 206
@@ -112,7 +116,7 @@ int DRTextCleverWidth(tDR_font *pFont, signed char *pText);
 // EDX: pX
 // EBX: pY
 // ECX: pFont
-void DRPixelmapCentredText(br_pixelmap *pPixelmap, int pX, int pY);
+void DRPixelmapCentredText(br_pixelmap *pPixelmap, int pX, int pY, tDR_font *pFont, char *pText);
 
 // Offset: 6260
 // Size: 77
@@ -189,7 +193,7 @@ void DoDamageScreen(tU32 pThe_time);
 
 // Offset: 9664
 // Size: 404
-void PoshDrawLine(float pAngle, br_pixelmap *pDestn, int pX1, int pY1, int pX2, int pY2, int pColour, signed char __unk7__);
+void PoshDrawLine(float pAngle, br_pixelmap *pDestn, int pX1, int pY1, int pX2, int pY2, int pColour);
 
 // Offset: 10068
 // Size: 3133
@@ -232,7 +236,7 @@ void AwardTime(tU32 pTime);
 // EDX: pLeft
 // EBX: pTop
 // ECX: pRight
-void DrawRectangle(br_pixelmap *pPixelmap, int pLeft, int pTop);
+void DrawRectangle(br_pixelmap *pPixelmap, int pLeft, int pTop, int pRight, int pBottom, int pColour);
 
 // Offset: 15208
 // Size: 178
@@ -240,7 +244,7 @@ void DrawRectangle(br_pixelmap *pPixelmap, int pLeft, int pTop);
 // EDX: pLeft
 // EBX: pTop
 // ECX: pRight
-void DrawRRectangle(br_pixelmap *pPixelmap, int pLeft, int pTop);
+void DrawRRectangle(br_pixelmap *pPixelmap, int pLeft, int pTop, int pRight, int pBottom, int pColour);
 
 // Offset: 15388
 // Size: 620
@@ -248,7 +252,7 @@ void DrawRRectangle(br_pixelmap *pPixelmap, int pLeft, int pTop);
 // EDX: pText
 // EBX: pPixelmap
 // ECX: pLeft
-void OoerrIveGotTextInMeBoxMissus(int pFont_index, char *pText, br_pixelmap *pPixelmap, int pLeft, int pTop, int pRight, int pBottom, int pCentred, signed char font);
+void OoerrIveGotTextInMeBoxMissus(int pFont_index, char *pText, br_pixelmap *pPixelmap, int pLeft, int pTop, int pRight, int pBottom, int pCentred);
 
 // Offset: 16008
 // Size: 117
@@ -256,7 +260,7 @@ void OoerrIveGotTextInMeBoxMissus(int pFont_index, char *pText, br_pixelmap *pPi
 // EDX: pX
 // EBX: pY
 // ECX: pColour
-void TransBrPixelmapText(br_pixelmap *pPixelmap, int pX, int pY, br_uint_32 pColour);
+void TransBrPixelmapText(br_pixelmap *pPixelmap, int pX, int pY, br_uint_32 pColour, br_font *pFont, signed char *pText);
 
 // Offset: 16128
 // Size: 250
@@ -264,7 +268,7 @@ void TransBrPixelmapText(br_pixelmap *pPixelmap, int pX, int pY, br_uint_32 pCol
 // EDX: pX
 // EBX: pY
 // ECX: pFont
-void TransDRPixelmapText(br_pixelmap *pPixelmap, int pX, int pY, tDR_font *pFont);
+void TransDRPixelmapText(br_pixelmap *pPixelmap, int pX, int pY, tDR_font *pFont, char *pText, int pRight_edge);
 
 // Offset: 16380
 // Size: 250
@@ -272,5 +276,6 @@ void TransDRPixelmapText(br_pixelmap *pPixelmap, int pX, int pY, tDR_font *pFont
 // EDX: pX
 // EBX: pY
 // ECX: pFont
-void TransDRPixelmapCleverText(br_pixelmap *pPixelmap, int pX, int pY, tDR_font *pFont);
+void TransDRPixelmapCleverText(br_pixelmap *pPixelmap, int pX, int pY, tDR_font *pFont, char *pText, int pRight_edge);
 
+#endif

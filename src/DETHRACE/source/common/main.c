@@ -1,6 +1,5 @@
 #include "main.h"
 
-// Global variables
 
 // Offset: 0
 // Size: 161
@@ -10,10 +9,10 @@ void QuitGame() {
 // Offset: 164
 // Size: 97
 tU32 TrackCount(br_actor *pActor, tU32 *pCount) {
-  unsigned int x;
-  unsigned int z;
-  int ad;
-  float e;
+    unsigned int x;
+    unsigned int z;
+    int ad;
+    float e;
 }
 
 // Offset: 264
@@ -41,6 +40,7 @@ void ServiceGameInRace() {
 // Size: 177
 // EAX: pArgc
 // EDX: pArgv
-void GameMain(int pArgc, char **pArgv, union CD_dir) {
+void GameMain(int pArgc, char **pArgv) {
+    tPath_name CD_dir;
 }
 

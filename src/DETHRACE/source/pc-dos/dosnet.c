@@ -1,6 +1,5 @@
 #include "dosnet.h"
 
-// Global variables
 _IPX_ELEMENT gListen_elements[16];
 char gLocal_ipx_addr_string[32];
 _IPX_ELEMENT gSend_elements[16];
@@ -42,7 +41,7 @@ void ClearupPDNetworkStuff() {
 // EAX: pFunction_name
 // EDX: pMessage
 // EBX: pAlleged_size
-void MATTMessageCheck(char *pFunction_name, tNet_message *pMessage, int pAlleged_size, unsigned short __unk3__) {
+void MATTMessageCheck(char *pFunction_name, tNet_message *pMessage, int pAlleged_size) {
 }
 
 // Offset: 244
@@ -52,18 +51,18 @@ void MATTMessageCheck(char *pFunction_name, tNet_message *pMessage, int pAlleged
 // EBX: pFname
 // ECX: pKeyname
 int GetProfileText(char *pDest, int pDest_len, char *pFname, char *pKeyname) {
-  FILE *fp;
-  char in_buf[256];
-  int i;
-  int j;
-  int len;
+    FILE *fp;
+    char in_buf[256];
+    int i;
+    int j;
+    int len;
 }
 
 // Offset: 728
 // Size: 187
 int GetSocketNumberFromProfileFile() {
-  int sscanf_res;
-  tU32 socknum;
+    int sscanf_res;
+    tU32 socknum;
 }
 
 // Offset: 916
@@ -76,15 +75,15 @@ tU32 EthernetAddressToU32(_IPX_LOCAL_TARGET *pAddr_ipx) {
 // Size: 175
 // EAX: pString
 // EDX: pSock_addr_ipx
-void NetNowIPXLocalTarget2String(char *pString, _IPX_LOCAL_TARGET *pSock_addr_ipx, signed char __unk2__) {
+void NetNowIPXLocalTarget2String(char *pString, _IPX_LOCAL_TARGET *pSock_addr_ipx) {
 }
 
 // Offset: 1196
 // Size: 157
 // EAX: pMessage_str
 int GetMessageTypeFromMessage(char *pMessage_str) {
-  char *real_msg;
-  int msg_type_int;
+    char *real_msg;
+    int msg_type_int;
 }
 
 // Offset: 1356
@@ -98,8 +97,8 @@ int SameEthernetAddress(_IPX_LOCAL_TARGET *pAddr_ipx1, _IPX_LOCAL_TARGET *pAddr_
 // Size: 194
 // EAX: pPlayer_id
 _IPX_LOCAL_TARGET* GetIPXAddrFromPlayerID(tPlayer_ID pPlayer_id) {
-  int i;
-  tU8 *nodenum;
+    int i;
+    tU8 *nodenum;
 }
 
 // Offset: 1648
@@ -111,24 +110,24 @@ void MakeMessageToSend(int pMessage_type) {
 // Offset: 1716
 // Size: 514
 int ReceiveHostResponses() {
-  int i;
-  int already_registered;
+    int i;
+    int already_registered;
 }
 
 // Offset: 2232
 // Size: 229
 int BroadcastMessage() {
-  int errors;
-  char broadcast_addr_string[32];
-  char *real_msg;
+    int errors;
+    char broadcast_addr_string[32];
+    char *real_msg;
 }
 
 // Offset: 2464
 // Size: 174
 // EAX: wSocket
 BOOL hmiIPXCloseSocket(W32 wSocket) {
-  REGS regs;
-  SREGS sregs;
+    REGS regs;
+    SREGS sregs;
 }
 
 // Offset: 2640
@@ -136,10 +135,10 @@ BOOL hmiIPXCloseSocket(W32 wSocket) {
 // EAX: pECB_ptr
 // EDX: pOffset
 void hmiIPXListenForPacket(_IPX_ECB *pECB_ptr, tU32 pOffset) {
-  SREGS sregs;
-  REGS regs;
-  _IPX_HEADER *IPX_header_ptr;
-  _IPX_ECB *sIPXECB;
+    SREGS sregs;
+    REGS regs;
+    _IPX_HEADER *IPX_header_ptr;
+    _IPX_ECB *sIPXECB;
 }
 
 // Offset: 2980
@@ -152,10 +151,10 @@ BOOL hmiIPXPostListen(_IPX_ECB *pECB_ptr, tU32 pOffset) {
 // Offset: 3040
 // Size: 278
 BOOL hmiIPXGetData(PSTR pData, tU32 wDSize) {
-  tU32 packets_checked;
-  tU32 full_packet_ooer_missus;
-  _IPX_ECB *ECB_ptr;
-  tU32 round_robin_jobby;
+    tU32 packets_checked;
+    tU32 full_packet_ooer_missus;
+    _IPX_ECB *ECB_ptr;
+    tU32 round_robin_jobby;
 }
 
 // Offset: 3320
@@ -165,11 +164,11 @@ BOOL hmiIPXGetData(PSTR pData, tU32 wDSize) {
 // EBX: pHeader
 // ECX: wSize
 void hmiIPXSendPacket(_IPX_ECB *sECB, _IPX_ECB **pPacket, PSTR pHeader, W32 wSize) {
-  SREGS sregs;
-  REGS regs;
-  _IPX_HEADER *sIPXHeader;
-  _IPX_ECB *sIPXECB;
-  PSTR pIPXData;
+    SREGS sregs;
+    REGS regs;
+    _IPX_HEADER *sIPXHeader;
+    _IPX_ECB *sIPXECB;
+    PSTR pIPXData;
 }
 
 // Offset: 3744
@@ -179,25 +178,25 @@ void hmiIPXSendPacket(_IPX_ECB *sECB, _IPX_ECB **pPacket, PSTR pHeader, W32 wSiz
 // EBX: pData
 // ECX: wDSize
 BOOL hmiIPXSendDataDirect(PSTR pHeader, W32 wHSize, PSTR pData, W32 wDSize, _NETNOW_NODE_ADDR *sNode) {
-  W32 wIndex;
-  _IPX_ELEMENT *sElement;
-  W32 *pSequence;
+    W32 wIndex;
+    _IPX_ELEMENT *sElement;
+    W32 *pSequence;
 }
 
 // Offset: 4244
 // Size: 183
 // EAX: sInterworkAddr
 void hmiIPXGetInternetworkAddr(_IPX_INTERNET_ADDR *sInterworkAddr) {
-  SREGS sregs;
-  REGS regs;
+    SREGS sregs;
+    REGS regs;
 }
 
 // Offset: 4428
 // Size: 211
 // EAX: sNetworkAddr
 void hmiIPXGetLocalTarget(_IPX_LOCAL_TARGET *sNetworkAddr) {
-  SREGS sregs;
-  REGS regs;
+    SREGS sregs;
+    REGS regs;
 }
 
 // Offset: 4640
@@ -207,55 +206,55 @@ void hmiIPXGetLocalTarget(_IPX_LOCAL_TARGET *sNetworkAddr) {
 // EBX: pSegment
 // ECX: pSelector
 BOOL AllocateRealMem(W32 wSize, PSTR *pPtr, W32 *pSegment, tU16 *pSelector) {
-  REGS regs;
-  SREGS sregs;
-  W32 wAddress;
-  W32 wHandle;
-  W32 wSegment;
-  W32 wLinear;
+    REGS regs;
+    SREGS sregs;
+    W32 wAddress;
+    W32 wHandle;
+    W32 wSegment;
+    W32 wLinear;
 }
 
 // Offset: 4864
 // Size: 165
 // EAX: pSelector
 BOOL FreeRealMem(tU16 pSelector) {
-  REGS regs;
-  SREGS sregs;
-  W32 wAddress;
-  W32 wHandle;
-  W32 wSegment;
-  W32 wLinear;
+    REGS regs;
+    SREGS sregs;
+    W32 wAddress;
+    W32 wHandle;
+    W32 wSegment;
+    W32 wLinear;
 }
 
 // Offset: 5032
 // Size: 210
 BOOL hmiIPXInstalled() {
-  REGS regs;
+    REGS regs;
 }
 
 // Offset: 5244
 // Size: 204
 // EAX: wSocket
 BOOL hmiIPXOpenSocket(W32 wSocket) {
-  SREGS sregs;
-  REGS regs;
+    SREGS sregs;
+    REGS regs;
 }
 
 // Offset: 5448
 // Size: 203
 void GetLargestPacketSizeOoErBetterInsertLinfordChristieJokeHere() {
-  REGS regs;
+    REGS regs;
 }
 
 // Offset: 5652
 // Size: 510
 // EAX: wSocket
 BOOL hmiIPXInitSystem(W32 wSocket) {
-  W32 wNIndex;
-  W32 wIndex;
-  W32 wMIndex;
-  USHORT wSOffset;
-  USHORT wLOffset;
+    W32 wNIndex;
+    W32 wIndex;
+    W32 wMIndex;
+    USHORT wSOffset;
+    USHORT wLOffset;
 }
 
 // Offset: 6164
@@ -266,13 +265,13 @@ void GetIPXToStickItsEarToTheGround() {
 // Offset: 6252
 // Size: 342
 int PDNetInitialise() {
-  char profile_string[32];
-  char key_name[32];
-  int sscanf_res;
-  int i;
-  tU32 netnum;
-  char str[256];
-  int mess_num;
+    char profile_string[32];
+    char key_name[32];
+    int sscanf_res;
+    int i;
+    tU32 netnum;
+    char str[256];
+    int mess_num;
 }
 
 // Offset: 6596
@@ -294,13 +293,12 @@ void PDNetEndJoinList() {
 // Size: 369
 // EAX: pGame
 // EDX: pIndex
-int PDNetGetNextJoinGame(tNet_game_details *pGame) {
-  int pIndex;
-  tU32 next_broadcast_time;
-  int i;
-  int j;
-  int number_of_hosts_has_changed;
-  char str[256];
+int PDNetGetNextJoinGame(tNet_game_details *pGame, int pIndex) {
+    tU32 next_broadcast_time;
+    int i;
+    int j;
+    int number_of_hosts_has_changed;
+    char str[256];
 }
 
 // Offset: 7220
@@ -314,16 +312,14 @@ void PDNetDisposeGameDetails(tNet_game_details *pDetails) {
 // EAX: pDetails
 // EDX: pHost_name
 // EBX: pHost_address
-int PDNetHostGame(tNet_game_details *pDetails, char *pHost_name) {
-  void **pHost_address;
+int PDNetHostGame(tNet_game_details *pDetails, char *pHost_name, void **pHost_address) {
 }
 
 // Offset: 7344
 // Size: 62
 // EAX: pDetails
 // EDX: pPlayer_name
-int PDNetJoinGame(tNet_game_details *pDetails) {
-  char *pPlayer_name;
+int PDNetJoinGame(tNet_game_details *pDetails, char *pPlayer_name) {
 }
 
 // Offset: 7408
@@ -363,8 +359,8 @@ void PDNetObtainSystemUserName(char *pName, int pMax_length) {
 // EDX: pMessage
 // EBX: pPlayer
 int PDNetSendMessageToPlayer(tNet_game_details *pDetails, tNet_message *pMessage, tPlayer_ID pPlayer) {
-  char str[256];
-  _IPX_LOCAL_TARGET *remote_addr_ipx;
+    char str[256];
+    _IPX_LOCAL_TARGET *remote_addr_ipx;
 }
 
 // Offset: 7960
@@ -372,8 +368,8 @@ int PDNetSendMessageToPlayer(tNet_game_details *pDetails, tNet_message *pMessage
 // EAX: pDetails
 // EDX: pMessage
 int PDNetSendMessageToAllPlayers(tNet_game_details *pDetails, tNet_message *pMessage) {
-  char str[256];
-  int i;
+    char str[256];
+    int i;
 }
 
 // Offset: 8236
@@ -381,9 +377,9 @@ int PDNetSendMessageToAllPlayers(tNet_game_details *pDetails, tNet_message *pMes
 // EAX: pDetails
 // EDX: pSender_address
 tNet_message* PDNetGetNextMessage(tNet_game_details *pDetails, void **pSender_address) {
-  char *receive_buffer;
-  char str[256];
-  int msg_type;
+    char *receive_buffer;
+    char str[256];
+    int msg_type;
 }
 
 // Offset: 8656
@@ -404,8 +400,7 @@ void PDNetDisposeMessage(tNet_game_details *pDetails, tNet_message *pMessage) {
 // Size: 62
 // EAX: pPlayer
 // EDX: pSender_address
-void PDNetSetPlayerSystemInfo(tNet_game_player_info *pPlayer) {
-  void *pSender_address;
+void PDNetSetPlayerSystemInfo(tNet_game_player_info *pPlayer, void *pSender_address) {
 }
 
 // Offset: 8860
@@ -419,9 +414,8 @@ void PDNetDisposePlayer(tNet_game_player_info *pPlayer) {
 // EAX: pDetails
 // EDX: pMessage
 // EBX: pAddress
-int PDNetSendMessageToAddress(tNet_game_details *pDetails, tNet_message *pMessage) {
-  void *pAddress;
-  char str[256];
+int PDNetSendMessageToAddress(tNet_game_details *pDetails, tNet_message *pMessage, void *pAddress) {
+    char str[256];
 }
 
 // Offset: 9116

@@ -1,5 +1,9 @@
+#ifndef _FLICPLAY_H_
+#define _FLICPLAY_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 44
 void EnableTranslationText();
@@ -12,7 +16,7 @@ void DisableTranslationText();
 // Size: 54
 // EAX: pSound_ID
 // EDX: pSound_time
-void SetFlicSound(int pSound_ID, tU32 pSound_time, signed char __unk2__);
+void SetFlicSound(int pSound_ID, tU32 pSound_time);
 
 // Offset: 144
 // Size: 45
@@ -83,7 +87,7 @@ void AssertFlicPixelmap(tFlic_descriptor_ptr pFlic_info, br_pixelmap *pDest_pixe
 // EDX: pIndex
 // EBX: pFlic_info
 // ECX: pSize
-int StartFlic(char *pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU32 pSize, tS8 *pData_ptr, br_pixelmap *pDest_pixelmap, int pX_offset, int pY_offset, int pFrame_rate, unsigned char claimed_speed, br_memory_classes magic_number, int the_path, struct total_size);
+int StartFlic(char *pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU32 pSize, tS8 *pData_ptr, br_pixelmap *pDest_pixelmap, int pX_offset, int pY_offset, int pFrame_rate);
 
 // Offset: 1720
 // Size: 96
@@ -170,13 +174,13 @@ void DoMini(tFlic_descriptor *pFlic_info, tU32 chunk_length);
 // Size: 377
 // EAX: pFlic_info
 // EDX: pLast_frame
-void DrawTranslations(tFlic_descriptor *pFlic_info);
+void DrawTranslations(tFlic_descriptor *pFlic_info, int pLast_frame);
 
 // Offset: 5680
 // Size: 783
 // EAX: pFlic_info
 // EDX: pPanel_flic
-int PlayNextFlicFrame2(tFlic_descriptor *pFlic_info);
+int PlayNextFlicFrame2(tFlic_descriptor *pFlic_info, int pPanel_flic);
 
 // Offset: 6464
 // Size: 53
@@ -189,7 +193,7 @@ int PlayNextFlicFrame(tFlic_descriptor *pFlic_info);
 // EDX: pSize
 // EBX: pData_ptr
 // ECX: pDest_pixelmap
-int PlayFlic(int pIndex, tU32 pSize, tS8 *pData_ptr, br_pixelmap *pDest_pixelmap, int pX_offset, int pY_offset, void (*DoPerFrame)(), int pInterruptable, int pFrame_rate, signed char finished_playing, br_memory_classes the_flic, struct new_time);
+int PlayFlic(int pIndex, tU32 pSize, tS8 *pData_ptr, br_pixelmap *pDest_pixelmap, int pX_offset, int pY_offset, void (*DoPerFrame)(), int pInterruptable, int pFrame_rate);
 
 // Offset: 6816
 // Size: 41
@@ -219,7 +223,7 @@ void UnlockFlic(int pIndex);
 // EAX: pName
 // EDX: pData
 // EBX: pData_length
-int LoadFlicData(char *pName, tU8 **pData, tU32 *pData_length, short f, br_memory_classes the_path);
+int LoadFlicData(char *pName, tU8 **pData, tU32 *pData_length);
 
 // Offset: 7824
 // Size: 87
@@ -306,7 +310,7 @@ void ServicePanelFlics(int pCopy_to_buffer);
 // EAX: pIndex
 // EDX: pData
 // EBX: pData_length
-void ChangePanelFlic(int pIndex, tU8 *pData, tU32 pData_length, unsigned char __unk3__, br_memory_classes __unk4__);
+void ChangePanelFlic(int pIndex, tU8 *pData, tU32 pData_length);
 
 // Offset: 10456
 // Size: 55
@@ -329,3 +333,4 @@ void SuspendPendingFlic();
 // Size: 44
 void ResumePendingFlic();
 
+#endif

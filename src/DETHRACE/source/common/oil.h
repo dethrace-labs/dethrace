@@ -1,5 +1,9 @@
+#ifndef _OIL_H_
+#define _OIL_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 811
 void InitOilSpills();
@@ -62,13 +66,13 @@ int GetOilSpillCount();
 // EAX: pIndex
 // EDX: pActor
 // EBX: pSize
-void GetOilSpillDetails(int pIndex, br_actor **pActor, br_scalar *pSize, short __unk3__, br_memory_classes __unk4__);
+void GetOilSpillDetails(int pIndex, br_actor **pActor, br_scalar *pSize);
 
 // Offset: 4384
 // Size: 273
 // EAX: pV
 // EDX: pSpill
-int PointInSpill(br_vector3 *pV);
+int PointInSpill(br_vector3 *pV, int pSpill);
 
 // Offset: 4660
 // Size: 597
@@ -82,10 +86,11 @@ void GetOilFrictionFactors(tCar_spec *pCar, br_scalar *pFl_factor, br_scalar *pF
 // Size: 211
 // EAX: pIndex
 // EDX: pMat
-void AdjustOilSpill(int pIndex, br_matrix34 *pMat, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec *pCar, br_vector3 *pOriginal_pos, br_pixelmap *pPixelmap, char __unk9__, brfile_getchr_cbfn __unk10__, tNet_contents __unk11__, unsigned char __unk12__, br_memory_classes __unk13__, struct __unk15__, tNet_contents *__unk16__);
+void AdjustOilSpill(int pIndex, br_matrix34 *pMat, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec *pCar, br_vector3 *pOriginal_pos, br_pixelmap *pPixelmap);
 
 // Offset: 5472
 // Size: 338
 // EAX: pContents
 void ReceivedOilSpill(tNet_contents *pContents);
 
+#endif

@@ -1,5 +1,9 @@
+#ifndef _BRUCETRK_H_
+#define _BRUCETRK_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 201
 // EAX: pTrack_spec
@@ -11,7 +15,7 @@ void AllocateActorMatrix(tTrack_spec *pTrack_spec, br_actor ****pDst);
 // EAX: pTrack_spec
 // EDX: pVictim
 // EBX: pRemove_act_mod
-void DisposeActorMatrix(tTrack_spec *pTrack_spec, br_actor ****pVictim);
+void DisposeActorMatrix(tTrack_spec *pTrack_spec, br_actor ****pVictim, int pRemove_act_mod);
 
 // Offset: 576
 // Size: 131
@@ -57,7 +61,7 @@ void LollipopizeActor4(br_actor *pActor, br_matrix34 *pRef_to_world, br_actor *p
 
 // Offset: 3744
 // Size: 65
-br_uint_32 LollipopizeChildren(br_actor *pActor);
+br_uint_32 LollipopizeChildren(br_actor *pActor, void *pArg);
 
 // Offset: 3812
 // Size: 1062
@@ -65,7 +69,7 @@ br_uint_32 LollipopizeChildren(br_actor *pActor);
 // EDX: pTrack_spec
 // EBX: pMin_x
 // ECX: pMax_x
-void DrawColumns(int pDraw_blends, tTrack_spec *pTrack_spec, int pMin_x, int pMax_x, int pMin_z, int pMax_z, br_matrix34 *pCamera_to_world, va_list column_x, br_memory_classes column_z);
+void DrawColumns(int pDraw_blends, tTrack_spec *pTrack_spec, int pMin_x, int pMax_x, int pMin_z, int pMax_z, br_matrix34 *pCamera_to_world);
 
 // Offset: 4876
 // Size: 1321
@@ -73,7 +77,7 @@ void DrawColumns(int pDraw_blends, tTrack_spec *pTrack_spec, int pMin_x, int pMa
 // EDX: pTrack_spec
 // EBX: pCamera
 // ECX: pCamera_to_world
-void RenderTrack(br_actor *pWorld, tTrack_spec *pTrack_spec, br_actor *pCamera, br_matrix34 *pCamera_to_world);
+void RenderTrack(br_actor *pWorld, tTrack_spec *pTrack_spec, br_actor *pCamera, br_matrix34 *pCamera_to_world, int pRender_blends);
 
 // Offset: 6200
 // Size: 47
@@ -83,3 +87,4 @@ br_scalar GetYonFactor();
 // Size: 44
 void SetYonFactor(br_scalar pNew);
 
+#endif

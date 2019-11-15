@@ -1,5 +1,9 @@
+#ifndef _GENCLIP_H_
+#define _GENCLIP_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 18
 // Size: 143
 br_clip_result PixelmapPointClip(br_point *out, br_point *in, br_pixelmap *pm);
@@ -20,3 +24,4 @@ br_clip_result PixelmapRectangleClipTwo(br_rectangle *r_out, br_point *p_out, br
 // Size: 418
 br_clip_result PixelmapCopyBitsClip(br_rectangle *r_out, br_point *p_out, br_rectangle *r_in, br_point *p_in, br_pixelmap *pm);
 
+#endif

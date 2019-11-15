@@ -1,12 +1,16 @@
+#ifndef _OPPOPROC_H_
+#define _OPPOPROC_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 724
 // EAX: pCent
 // EDX: pRadius
 // EBX: pEntry_length
 // ECX: pLeft_not_right
-int StraightestArcForCorner2D(br_vector2 *pCent, br_scalar *pRadius, br_scalar *pEntry_length, int *pLeft_not_right, br_vector2 *p1, br_vector2 *p2, br_vector2 *p3, br_scalar pWidth12);
+int StraightestArcForCorner2D(br_vector2 *pCent, br_scalar *pRadius, br_scalar *pEntry_length, int *pLeft_not_right, br_vector2 *p1, br_vector2 *p2, br_vector2 *p3, br_scalar pWidth12, br_scalar pWidth23);
 
 // Offset: 724
 // Size: 47
@@ -42,7 +46,7 @@ int RoughlyColinear(br_vector2 *p1, br_vector2 *p2, br_vector2 *p3);
 // EDX: pFinish
 // EBX: pWidth
 // ECX: section1
-int GetStraight(br_vector2 *pStart, br_vector2 *pFinish, br_scalar *pWidth, int section1, tOpponent_spec *pOpponent_spec);
+int GetStraight(br_vector2 *pStart, br_vector2 *pFinish, br_scalar *pWidth, int section1, tOpponent_spec *pOpponent_spec, tFollow_path_data *data);
 
 // Offset: 1576
 // Size: 5921
@@ -50,10 +54,11 @@ int GetStraight(br_vector2 *pStart, br_vector2 *pFinish, br_scalar *pWidth, int 
 // EDX: pCommand
 // EBX: pPursuit_mode
 // ECX: pIgnore_end
-tFollow_path_result ProcessFollowPath(tOpponent_spec *pOpponent_spec, tProcess_objective_command pCommand, int pPursuit_mode);
+tFollow_path_result ProcessFollowPath(tOpponent_spec *pOpponent_spec, tProcess_objective_command pCommand, int pPursuit_mode, int pIgnore_end, int pNever_struggle);
 
 // Offset: 7500
 // Size: 3018
 // EAX: pOpponent_spec
 tFollow_path_result FollowCheatyPath(tOpponent_spec *pOpponent_spec);
 
+#endif

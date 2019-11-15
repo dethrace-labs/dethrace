@@ -1,5 +1,9 @@
+#ifndef _RESREG_H_
+#define _RESREG_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 14
 // Size: 176
 br_resource_class* BrResClassAdd(br_resource_class *rclass);
@@ -36,3 +40,4 @@ br_uint_32 BrResClassCount(char *pattern);
 // Size: 55
 br_uint_32 BrResClassEnum(char *pattern, br_resclass_enum_cbfn *callback, void *arg);
 
+#endif

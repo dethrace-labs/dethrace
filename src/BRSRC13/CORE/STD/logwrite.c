@@ -1,6 +1,5 @@
 #include "logwrite.h"
 
-// Global variables
 char rscid[50];
 
 // Offset: 11

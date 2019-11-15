@@ -1,5 +1,9 @@
+#ifndef _MATRIX23_H_
+#define _MATRIX23_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 15
 // Size: 156
 void BrMatrix23Copy(br_matrix23 *A, br_matrix23 *B);
@@ -108,3 +112,4 @@ void BrMatrix23PreShearY(br_matrix23 *mat, br_scalar sx);
 // Size: 126
 void BrMatrix23PostShearY(br_matrix23 *mat, br_scalar sx);
 
+#endif

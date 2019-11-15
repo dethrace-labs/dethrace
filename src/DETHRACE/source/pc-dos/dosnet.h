@@ -1,5 +1,9 @@
+#ifndef _DOSNET_H_
+#define _DOSNET_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 201
 void ClearupPDNetworkStuff();
@@ -9,7 +13,7 @@ void ClearupPDNetworkStuff();
 // EAX: pFunction_name
 // EDX: pMessage
 // EBX: pAlleged_size
-void MATTMessageCheck(char *pFunction_name, tNet_message *pMessage, int pAlleged_size, unsigned short __unk3__);
+void MATTMessageCheck(char *pFunction_name, tNet_message *pMessage, int pAlleged_size);
 
 // Offset: 244
 // Size: 484
@@ -32,7 +36,7 @@ tU32 EthernetAddressToU32(_IPX_LOCAL_TARGET *pAddr_ipx);
 // Size: 175
 // EAX: pString
 // EDX: pSock_addr_ipx
-void NetNowIPXLocalTarget2String(char *pString, _IPX_LOCAL_TARGET *pSock_addr_ipx, signed char __unk2__);
+void NetNowIPXLocalTarget2String(char *pString, _IPX_LOCAL_TARGET *pSock_addr_ipx);
 
 // Offset: 1196
 // Size: 157
@@ -165,7 +169,7 @@ void PDNetEndJoinList();
 // Size: 369
 // EAX: pGame
 // EDX: pIndex
-int PDNetGetNextJoinGame(tNet_game_details *pGame);
+int PDNetGetNextJoinGame(tNet_game_details *pGame, int pIndex);
 
 // Offset: 7220
 // Size: 51
@@ -177,13 +181,13 @@ void PDNetDisposeGameDetails(tNet_game_details *pDetails);
 // EAX: pDetails
 // EDX: pHost_name
 // EBX: pHost_address
-int PDNetHostGame(tNet_game_details *pDetails, char *pHost_name);
+int PDNetHostGame(tNet_game_details *pDetails, char *pHost_name, void **pHost_address);
 
 // Offset: 7344
 // Size: 62
 // EAX: pDetails
 // EDX: pPlayer_name
-int PDNetJoinGame(tNet_game_details *pDetails);
+int PDNetJoinGame(tNet_game_details *pDetails, char *pPlayer_name);
 
 // Offset: 7408
 // Size: 51
@@ -246,7 +250,7 @@ void PDNetDisposeMessage(tNet_game_details *pDetails, tNet_message *pMessage);
 // Size: 62
 // EAX: pPlayer
 // EDX: pSender_address
-void PDNetSetPlayerSystemInfo(tNet_game_player_info *pPlayer);
+void PDNetSetPlayerSystemInfo(tNet_game_player_info *pPlayer, void *pSender_address);
 
 // Offset: 8860
 // Size: 51
@@ -258,7 +262,7 @@ void PDNetDisposePlayer(tNet_game_player_info *pPlayer);
 // EAX: pDetails
 // EDX: pMessage
 // EBX: pAddress
-int PDNetSendMessageToAddress(tNet_game_details *pDetails, tNet_message *pMessage);
+int PDNetSendMessageToAddress(tNet_game_details *pDetails, tNet_message *pMessage, void *pAddress);
 
 // Offset: 9116
 // Size: 61
@@ -269,3 +273,4 @@ int PDNetInitClient(tNet_game_details *pDetails);
 // Size: 44
 int PDNetGetHeaderSize();
 
+#endif

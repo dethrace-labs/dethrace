@@ -1,14 +1,13 @@
 #include "dbsetup.h"
 
-// Global variables
 br_resource_class resourceClasses[14];
 br_v1db_state v1db;
 
 // Offset: 12
 // Size: 345
 br_error BrV1dbBegin() {
-  char *devstr;
-  br_size_t s;
+    char *devstr;
+    br_size_t s;
 }
 
 // Offset: 367
@@ -18,58 +17,50 @@ br_error BrV1dbEnd() {
 
 // Offset: 482
 // Size: 89
-br_uint_32 updateTable(br_pixelmap *item) {
-  void *arg;
+br_uint_32 updateTable(br_pixelmap *item, void *arg) {
 }
 
 // Offset: 581
 // Size: 89
-br_uint_32 updateMap(br_pixelmap *item) {
-  void *arg;
+br_uint_32 updateMap(br_pixelmap *item, void *arg) {
 }
 
 // Offset: 685
 // Size: 89
-br_uint_32 updateMaterial(br_material *item) {
-  void *arg;
+br_uint_32 updateMaterial(br_material *item, void *arg) {
 }
 
 // Offset: 786
 // Size: 89
-br_uint_32 updateModel(br_model *item) {
-  void *arg;
+br_uint_32 updateModel(br_model *item, void *arg) {
 }
 
 // Offset: 886
 // Size: 79
-br_uint_32 clearTable(br_pixelmap *item) {
-  void *arg;
+br_uint_32 clearTable(br_pixelmap *item, void *arg) {
 }
 
 // Offset: 974
 // Size: 79
-br_uint_32 clearMap(br_pixelmap *item) {
-  void *arg;
+br_uint_32 clearMap(br_pixelmap *item, void *arg) {
 }
 
 // Offset: 1067
 // Size: 79
-br_uint_32 clearMaterial(br_material *item) {
-  void *arg;
+br_uint_32 clearMaterial(br_material *item, void *arg) {
 }
 
 // Offset: 1157
 // Size: 79
-br_uint_32 clearModel(br_model *item) {
-  void *arg;
+br_uint_32 clearModel(br_model *item, void *arg) {
 }
 
 // Offset: 1256
 // Size: 462
 br_error BrV1dbRendererBegin(br_device_pixelmap *destination, br_renderer *renderer) {
-  br_renderer_facility *renderer_facility;
-  br_error r;
-  br_token_value tv[2];
+    br_renderer_facility *renderer_facility;
+    br_error r;
+    br_token_value tv[2];
 }
 
 // Offset: 1738

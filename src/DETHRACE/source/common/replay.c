@@ -1,6 +1,5 @@
 #include "replay.h"
 
-// Global variables
 int gProgress_line_top[2];
 int gProgress_line_left[2];
 int gProgress_line_right[2];
@@ -48,12 +47,12 @@ void StopSaving() {
 // Size: 1597
 // EAX: pSpecial_zappy_bastard
 void ActualActionReplayHeadups(int pSpecial_zappy_bastard) {
-  tU32 the_time;
-  int x;
-  tU16 played_col1;
-  tU16 played_col2;
-  tU16 to_play_col1;
-  tU16 to_play_col2;
+    tU32 the_time;
+    int x;
+    tU16 played_col1;
+    tU16 played_col2;
+    tU16 to_play_col1;
+    tU16 to_play_col2;
 }
 
 // Offset: 1824
@@ -65,7 +64,7 @@ void DoActionReplayPostSwap() {
 // Size: 109
 // EAX: pSpecial_zappy_bastard
 void DoZappyActionReplayHeadups(int pSpecial_zappy_bastard) {
-  tU32 the_time;
+    tU32 the_time;
 }
 
 // Offset: 1980
@@ -77,12 +76,12 @@ void DoActionReplayHeadups() {
 // Size: 318
 // EAX: pMove_amount
 void MoveReplayBuffer(tS32 pMove_amount) {
-  tU8 *play_ptr;
-  tU8 *old_play_ptr;
-  tU8 *old_play_ptr2;
-  int i;
-  int a;
-  tU32 old_time;
+    tU8 *play_ptr;
+    tU8 *old_play_ptr;
+    tU8 *old_play_ptr2;
+    int i;
+    int a;
+    tU32 old_time;
 }
 
 // Offset: 2344
@@ -110,23 +109,23 @@ void ReverseSound(tS3_effect_tag pEffect_index, tS3_sound_tag pSound_tag) {
 // Offset: 3032
 // Size: 223
 int FindUniqueFile() {
-  FILE *f;
-  tPath_name the_path;
+    FILE *f;
+    tPath_name the_path;
 }
 
 // Offset: 3256
 // Size: 1576
 // EAX: pFrame_period
 void PollActionReplayControls(tU32 pFrame_period) {
-  float old_replay_rate;
-  int old_key_down;
-  int x_coord;
-  int y_coord;
-  int i;
-  tU32 real_time;
-  tU32 last_real_time;
-  int psuedo_mouse_keys[8];
-  tRectangle mouse_areas[2][8];
+    float old_replay_rate;
+    int old_key_down;
+    int x_coord;
+    int y_coord;
+    int i;
+    tU32 real_time;
+    tU32 last_real_time;
+    int psuedo_mouse_keys[8];
+    tRectangle mouse_areas[2][8];
 }
 
 // Offset: 4832
@@ -148,7 +147,7 @@ void DoActionReplay(tU32 pFrame_period) {
 // Offset: 5100
 // Size: 330
 void SynchronizeActionReplay() {
-  tPath_name the_path;
-  tU32 gLast_synch_time;
+    tPath_name the_path;
+    tU32 gLast_synch_time;
 }
 

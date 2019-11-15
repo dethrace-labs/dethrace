@@ -1,5 +1,9 @@
+#ifndef _NEWGAME_H_
+#define _NEWGAME_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 149
 void StartRollingPlayerNamesIn();
@@ -339,14 +343,14 @@ void SetGameTarget(tNet_game_type *pGame_type, tNet_game_options *pGame_options)
 // EAX: pGame_type
 // EDX: pGame_options
 // EBX: pRace_index
-int NetGameChoices(tNet_game_type *pGame_type, tNet_game_options *pGame_options);
+int NetGameChoices(tNet_game_type *pGame_type, tNet_game_options *pGame_options, int *pRace_index);
 
 // Offset: 10932
 // Size: 95
 // EAX: pGame_type
 // EDX: pGame_options
 // EBX: pRace_index
-void ReadNetGameChoices(tNet_game_type *pGame_type, tNet_game_options *pGame_options);
+void ReadNetGameChoices(tNet_game_type *pGame_type, tNet_game_options *pGame_options, int *pRace_index);
 
 // Offset: 11028
 // Size: 56
@@ -383,7 +387,7 @@ void SetNetAvailability(tNet_game_options *pOptions);
 // EDX: pOptions
 // EBX: pCar_index
 // ECX: pIm_the_host_so_fuck_off
-int ChooseNetCar(tNet_game_details *pNet_game, tNet_game_options *pOptions, int *pCar_index);
+int ChooseNetCar(tNet_game_details *pNet_game, tNet_game_options *pOptions, int *pCar_index, int pIm_the_host_so_fuck_off);
 
 // Offset: 12164
 // Size: 115
@@ -397,3 +401,4 @@ void DisposeNetStorageSpace();
 // Size: 793
 int DoMultiPlayerStart();
 
+#endif

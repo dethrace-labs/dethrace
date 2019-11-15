@@ -1,5 +1,9 @@
+#ifndef _WORLD_H_
+#define _WORLD_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 88
 float MapSawToTriangle(float pNumber);
@@ -29,7 +33,7 @@ br_actor* CloneActor(br_actor *pSource_actor);
 // EDX: pMax_pixelmaps
 // EBX: pMax_shade_tables
 // ECX: pMax_materials
-void InitialiseStorageSpace(tBrender_storage *pStorage_space, int pMax_pixelmaps, int pMax_shade_tables);
+void InitialiseStorageSpace(tBrender_storage *pStorage_space, int pMax_pixelmaps, int pMax_shade_tables, int pMax_materials, int pMax_models);
 
 // Offset: 872
 // Size: 107
@@ -70,46 +74,46 @@ tAdd_to_storage_result AddModelToStorage(tBrender_storage *pStorage_space, br_mo
 // EAX: pStorage_space
 // EDX: pF
 // EBX: pCount
-int LoadNPixelmaps(tBrender_storage *pStorage_space, FILE *pF);
+int LoadNPixelmaps(tBrender_storage *pStorage_space, FILE *pF, int pCount);
 
 // Offset: 2864
 // Size: 195
 // EAX: pStorage_space
 // EDX: pName
-br_pixelmap* LoadSinglePixelmap(tBrender_storage *pStorage_space);
+br_pixelmap* LoadSinglePixelmap(tBrender_storage *pStorage_space, char *pName);
 
 // Offset: 3060
 // Size: 195
 // EAX: pStorage_space
 // EDX: pName
-br_material* LoadSingleMaterial(tBrender_storage *pStorage_space);
+br_material* LoadSingleMaterial(tBrender_storage *pStorage_space, char *pName);
 
 // Offset: 3256
 // Size: 394
 // EAX: pStorage_space
 // EDX: pF
 // EBX: pCount
-int LoadNShadeTables(tBrender_storage *pStorage_space, FILE *pF);
+int LoadNShadeTables(tBrender_storage *pStorage_space, FILE *pF, int pCount);
 
 // Offset: 3652
 // Size: 195
 // EAX: pStorage_space
 // EDX: pName
-br_pixelmap* LoadSingleShadeTable(tBrender_storage *pStorage_space);
+br_pixelmap* LoadSingleShadeTable(tBrender_storage *pStorage_space, char *pName);
 
 // Offset: 3848
 // Size: 414
 // EAX: pStorage_space
 // EDX: pF
 // EBX: pCount
-int LoadNMaterials(tBrender_storage *pStorage_space, FILE *pF);
+int LoadNMaterials(tBrender_storage *pStorage_space, FILE *pF, int pCount);
 
 // Offset: 4264
 // Size: 449
 // EAX: pStorage_space
 // EDX: pF
 // EBX: pCount
-int LoadNModels(tBrender_storage *pStorage_space, FILE *pF);
+int LoadNModels(tBrender_storage *pStorage_space, FILE *pF, int pCount);
 
 // Offset: 4716
 // Size: 103
@@ -120,7 +124,7 @@ void DodgyModelUpdate(br_model *pM);
 // Size: 197
 // EAX: pOld
 // EDX: pSuffix
-br_material* SuffixedMaterial(br_material *pOld);
+br_material* SuffixedMaterial(br_material *pOld, char *pSuffix);
 
 // Offset: 5020
 // Size: 656
@@ -163,7 +167,7 @@ void ProcessModelFaceMaterials(br_model *pModel, tPMFMCB pCallback);
 // EAX: pStorage_space
 // EDX: pF
 // EBX: pCount
-int LoadNTrackModels(tBrender_storage *pStorage_space, FILE *pF);
+int LoadNTrackModels(tBrender_storage *pStorage_space, FILE *pF, int pCount);
 
 // Offset: 7192
 // Size: 107
@@ -199,7 +203,7 @@ void LoadSomeTrackModels(tBrender_storage *pStorage_space, FILE *pF);
 // Size: 87
 // EAX: pSlot_number
 // EDX: pPeriod_address
-void AddFunkGrooveBinding(int pSlot_number, float *pPeriod_address, unsigned char __unk2__);
+void AddFunkGrooveBinding(int pSlot_number, float *pPeriod_address);
 
 // Offset: 7820
 // Size: 81
@@ -263,7 +267,7 @@ void Adjust2FloatsForExceptions(float *pVictim1, float *pVictim2, br_pixelmap *p
 // EAX: pF
 // EDX: pOwner
 // EBX: pRef_offset
-void AddFunkotronics(FILE *pF, int pOwner);
+void AddFunkotronics(FILE *pF, int pOwner, int pRef_offset);
 
 // Offset: 13060
 // Size: 118
@@ -280,7 +284,7 @@ tGroovidelic_spec* AddNewGroovidelic();
 // EDX: pOwner
 // EBX: pParent_actor
 // ECX: pRef_offset
-void AddGroovidelics(FILE *pF, int pOwner, br_actor *pParent_actor);
+void AddGroovidelics(FILE *pF, int pOwner, br_actor *pParent_actor, int pRef_offset, int pAllowed_to_be_absent);
 
 // Offset: 16148
 // Size: 161
@@ -297,7 +301,7 @@ void KillFunkotronic(int pOwner);
 // EAX: pActor
 // EDX: pMatrix
 // EBX: pArg
-br_uint_32 DeleteBastards(br_actor *pActor, br_matrix34 *pMatrix);
+br_uint_32 DeleteBastards(br_actor *pActor, br_matrix34 *pMatrix, void *pArg);
 
 // Offset: 16736
 // Size: 110
@@ -308,7 +312,7 @@ void DeleteAnyZeroBastards();
 // EAX: pActor
 // EDX: pMatrix
 // EBX: pArg
-br_uint_32 ApplyTransToModels(br_actor *pActor, br_matrix34 *pMatrix);
+br_uint_32 ApplyTransToModels(br_actor *pActor, br_matrix34 *pMatrix, void *pArg);
 
 // Offset: 17068
 // Size: 120
@@ -321,7 +325,7 @@ int FindSpecVolIndex(br_actor *pActor);
 // EDX: pMat_1
 // EBX: pMat_2
 // ECX: pAxis_0
-void MungeMaterial(br_matrix34 *pMat, br_material *pMat_1, br_material *pMat_2, int pAxis_0);
+void MungeMaterial(br_matrix34 *pMat, br_material *pMat_1, br_material *pMat_2, int pAxis_0, int pAxis_1);
 
 // Offset: 17432
 // Size: 166
@@ -504,7 +508,7 @@ void DisposeTexturingMaterials();
 
 // Offset: 23000
 // Size: 73
-br_uint_32 SetAccessoryRenderingCB(br_actor *pActor);
+br_uint_32 SetAccessoryRenderingCB(br_actor *pActor, void *pFlag);
 
 // Offset: 23076
 // Size: 100
@@ -529,7 +533,7 @@ int GetCarSimplificationLevel();
 // EAX: pF
 // EDX: pSpec
 // EBX: pScreen_name_str
-void ParseSpecialVolume(FILE *pF, tSpecial_volume *pSpec);
+void ParseSpecialVolume(FILE *pF, tSpecial_volume *pSpec, char *pScreen_name_str);
 
 // Offset: 23584
 // Size: 56
@@ -556,11 +560,11 @@ void FreeExceptions();
 // EAX: pFile_name
 // EDX: pTrack_spec
 // EBX: pRace_info
-void LoadTrack(char *pFile_name, tTrack_spec *pTrack_spec, tRace_info *pRace_info, char temp_name, double f);
+void LoadTrack(char *pFile_name, tTrack_spec *pTrack_spec, tRace_info *pRace_info);
 
 // Offset: 31676
 // Size: 82
-br_uint_32 RemoveBounds(br_actor *pActor);
+br_uint_32 RemoveBounds(br_actor *pActor, void *pArg);
 
 // Offset: 31760
 // Size: 52
@@ -578,7 +582,7 @@ void FreeTrack(tTrack_spec *pTrack_spec);
 // EDX: pTrack_spec
 // EBX: pCamera
 // ECX: pCamera_to_world_transform
-void ProcessTrack(br_actor *pWorld, tTrack_spec *pTrack_spec, br_actor *pCamera, br_matrix34 *pCamera_to_world_transform);
+void ProcessTrack(br_actor *pWorld, tTrack_spec *pTrack_spec, br_actor *pCamera, br_matrix34 *pCamera_to_world_transform, int pRender_blends);
 
 // Offset: 32348
 // Size: 71
@@ -612,7 +616,7 @@ int PointOutOfSight(br_vector3 *pPoint, br_scalar pMax_distance);
 // EDX: pTime
 // EBX: pMat
 // ECX: pInterrupt_it
-void PathGrooveBastard(tGroovidelic_spec *pGroove, tU32 pTime, br_matrix34 *pMat);
+void PathGrooveBastard(tGroovidelic_spec *pGroove, tU32 pTime, br_matrix34 *pMat, int pInterrupt_it);
 
 // Offset: 46756
 // Size: 9418
@@ -620,14 +624,14 @@ void PathGrooveBastard(tGroovidelic_spec *pGroove, tU32 pTime, br_matrix34 *pMat
 // EDX: pTime
 // EBX: pMat
 // ECX: pInterrupt_it
-void ObjectGrooveBastard(tGroovidelic_spec *pGroove, tU32 pTime, br_matrix34 *pMat);
+void ObjectGrooveBastard(tGroovidelic_spec *pGroove, tU32 pTime, br_matrix34 *pMat, int pInterrupt_it);
 
 // Offset: 56176
 // Size: 611
 // EAX: pGroove
 // EDX: pTime
 // EBX: pInterrupt_it
-void GrooveThisDelic(tGroovidelic_spec *pGroove, tU32 pTime);
+void GrooveThisDelic(tGroovidelic_spec *pGroove, tU32 pTime, int pInterrupt_it);
 
 // Offset: 56788
 // Size: 191
@@ -644,7 +648,7 @@ void StopGroovidelic(br_actor *pActor);
 // EDX: pMatrix
 // EBX: pPath_interrupt
 // ECX: pObject_interrupt
-void SetGrooveInterrupt(int pGroove_index, br_matrix34 *pMatrix, int pPath_interrupt, int pObject_interrupt, float pPath_resumption, float pObject_resumption, signed char the_groove);
+void SetGrooveInterrupt(int pGroove_index, br_matrix34 *pMatrix, int pPath_interrupt, int pObject_interrupt, float pPath_resumption, float pObject_resumption);
 
 // Offset: 57240
 // Size: 92
@@ -672,11 +676,11 @@ br_scalar DistanceFromFace(br_vector3 *pPos, tFace_ref *pFace);
 
 // Offset: 57864
 // Size: 166
-br_uint_32 CalcHighestID(br_actor *pActor);
+br_uint_32 CalcHighestID(br_actor *pActor, int *pHighest);
 
 // Offset: 58032
 // Size: 182
-br_uint_32 SetID(br_actor *pActor);
+br_uint_32 SetID(br_actor *pActor, void *pArg);
 
 // Offset: 58216
 // Size: 100
@@ -688,15 +692,15 @@ void UniquificateActorsName(br_actor *pUniverse_actor, br_actor *pActor);
 // Size: 107
 // EAX: pActor
 // EDX: pPrefix
-void AccessoryHeadup(br_actor *pActor);
+void AccessoryHeadup(br_actor *pActor, char *pPrefix);
 
 // Offset: 58424
 // Size: 132
-br_uint_32 CalcHighestNonAmID(br_actor *pActor);
+br_uint_32 CalcHighestNonAmID(br_actor *pActor, int *pHighest);
 
 // Offset: 58556
 // Size: 443
-br_uint_32 SetIDAndDupModel(br_actor *pActor);
+br_uint_32 SetIDAndDupModel(br_actor *pActor, void *pArg);
 
 // Offset: 59000
 // Size: 100
@@ -750,7 +754,7 @@ void DropActor9();
 
 // Offset: 60788
 // Size: 273
-br_uint_32 IdentifyAccCB(br_actor *pActor);
+br_uint_32 IdentifyAccCB(br_actor *pActor, void *pArg);
 
 // Offset: 61064
 // Size: 105
@@ -758,11 +762,11 @@ void IdentifyAcc();
 
 // Offset: 61172
 // Size: 108
-br_uint_32 DelGrooveRef(br_actor *pActor);
+br_uint_32 DelGrooveRef(br_actor *pActor, void *pArg);
 
 // Offset: 61280
 // Size: 177
-br_uint_32 DelReferencedModels(br_actor *pActor);
+br_uint_32 DelReferencedModels(br_actor *pActor, void *pArg);
 
 // Offset: 61460
 // Size: 135
@@ -770,7 +774,7 @@ void DeleteAcc();
 
 // Offset: 61596
 // Size: 170
-br_uint_32 OffsetModel(br_actor *pActor);
+br_uint_32 OffsetModel(br_actor *pActor, void *pArg);
 
 // Offset: 61768
 // Size: 54
@@ -975,7 +979,7 @@ br_material* GetExternalMat();
 // EDX: pIndex
 // EBX: pInt_mat
 // ECX: pExt_mat
-void BuildSpecVolModel(tSpecial_volume *pSpec, int pIndex, br_material *pInt_mat);
+void BuildSpecVolModel(tSpecial_volume *pSpec, int pIndex, br_material *pInt_mat, br_material *pExt_mat);
 
 // Offset: 67484
 // Size: 427
@@ -1207,3 +1211,4 @@ void ShowSpecialVolumes();
 // Size: 112
 void HideSpecialVolumes();
 
+#endif

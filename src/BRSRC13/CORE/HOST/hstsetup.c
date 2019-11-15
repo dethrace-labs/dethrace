@@ -1,6 +1,5 @@
 #include "hstsetup.h"
 
-// Global variables
 host_info hostInfo;
 void *functionPointers_BRHOST1[50];
 br_image Image_BRHOST1;
@@ -19,8 +18,7 @@ void HostEnd() {
 
 // Offset: 125
 // Size: 125
-br_error HostInfo(host_info *buffer) {
-  br_size_t buffersize;
-  br_int_32 features;
+br_error HostInfo(host_info *buffer, br_size_t buffersize) {
+    br_int_32 features;
 }
 

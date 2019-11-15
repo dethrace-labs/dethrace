@@ -1,6 +1,5 @@
 #include "depth.h"
 
-// Global variables
 tDepth_effect gDistance_depth_effects[4];
 br_scalar gSky_height;
 br_scalar gSky_x_multiplier;
@@ -37,16 +36,16 @@ br_angle gSky_image_underground;
 // Size: 110
 // EAX: pNumber
 int Log2(int pNumber) {
-  int i;
-  int bits[16];
+    int i;
+    int bits[16];
 }
 
 // Offset: 112
 // Size: 130
 br_scalar CalculateWrappingMultiplier(br_scalar pValue, br_scalar pYon) {
-  br_scalar k;
-  br_scalar trunc_k;
-  int int_k;
+    br_scalar k;
+    br_scalar trunc_k;
+    int int_k;
 }
 
 // Offset: 244
@@ -59,14 +58,14 @@ br_scalar DepthCueingShiftToDistance(int pShift) {
 // Size: 210
 // EAX: pMaterial
 void FogAccordingToGPSCDE(br_material *pMaterial) {
-  int start;
-  int end;
+    int start;
+    int end;
 }
 
 // Offset: 536
 // Size: 206
 void FrobFog() {
-  br_material *mat;
+    br_material *mat;
 }
 
 // Offset: 744
@@ -75,8 +74,7 @@ void FrobFog() {
 // EDX: pSky_texture
 // EBX: pStart
 // ECX: pEnd
-void InstantDepthChange(tDepth_effect_type pType, br_pixelmap *pSky_texture, int pStart) {
-  int pEnd;
+void InstantDepthChange(tDepth_effect_type pType, br_pixelmap *pSky_texture, int pStart, int pEnd) {
 }
 
 // Offset: 916
@@ -90,9 +88,9 @@ br_scalar Tan(br_scalar pAngle) {
 // EDX: pView
 // EBX: pPerfect
 br_scalar EdgeU(br_angle pSky, br_angle pView, br_angle pPerfect) {
-  br_scalar a;
-  br_scalar b;
-  br_scalar c;
+    br_scalar a;
+    br_scalar b;
+    br_scalar c;
 }
 
 // Offset: 1224
@@ -100,34 +98,34 @@ br_scalar EdgeU(br_angle pSky, br_angle pView, br_angle pPerfect) {
 // EAX: pCamera
 // EDX: pModel
 void MungeSkyModel(br_actor *pCamera, br_model *pModel) {
-  br_camera *camera_data;
-  br_scalar horizon_half_height;
-  br_scalar horizon_half_width;
-  br_scalar horizon_half_diag;
-  br_scalar tan_half_fov;
-  br_scalar sky_distance;
-  br_angle half_hori_fov;
-  br_angle half_diag_fov;
-  tU8 nbands;
-  tU8 band;
-  tU8 vertex;
-  tU8 stripe;
-  br_scalar edge_u;
-  br_scalar narrow_u;
-  br_angle min_angle;
-  br_angle angle_range;
-  br_angle angle;
+    br_camera *camera_data;
+    br_scalar horizon_half_height;
+    br_scalar horizon_half_width;
+    br_scalar horizon_half_diag;
+    br_scalar tan_half_fov;
+    br_scalar sky_distance;
+    br_angle half_hori_fov;
+    br_angle half_diag_fov;
+    tU8 nbands;
+    tU8 band;
+    tU8 vertex;
+    tU8 stripe;
+    br_scalar edge_u;
+    br_scalar narrow_u;
+    br_angle min_angle;
+    br_angle angle_range;
+    br_angle angle;
 }
 
 // Offset: 2828
 // Size: 882
 // EAX: pCamera
 br_model* CreateHorizonModel(br_actor *pCamera) {
-  tU8 nbands;
-  tU8 band;
-  tU8 vertex;
-  tU8 stripe;
-  br_model *model;
+    tU8 nbands;
+    tU8 band;
+    tU8 vertex;
+    tU8 stripe;
+    br_model *model;
 }
 
 // Offset: 3712
@@ -135,17 +133,18 @@ br_model* CreateHorizonModel(br_actor *pCamera) {
 // EAX: pName
 // EDX: pTable
 // EBX: pPower
-void LoadDepthTable(char *pName, br_pixelmap **pTable, int *pPower, div_t the_path) {
-  int i;
-  int j;
-  tU8 temp;
+void LoadDepthTable(char *pName, br_pixelmap **pTable, int *pPower) {
+    tPath_name the_path;
+    int i;
+    int j;
+    tU8 temp;
 }
 
 // Offset: 4120
 // Size: 611
 void InitDepthEffects() {
-  int i;
-  int j;
+    int i;
+    int j;
 }
 
 // Offset: 4732
@@ -154,20 +153,18 @@ void InitDepthEffects() {
 // EDX: pDepth_buffer
 // EBX: pShade_table
 // ECX: pShade_table_power
-void DoDepthByShadeTable(br_pixelmap *pRender_buffer, br_pixelmap *pDepth_buffer, br_pixelmap *pShade_table, int pShade_table_power) {
-  int pStart;
-  int pEnd;
-  tU8 *render_ptr;
-  tU8 *shade_table_pixels;
-  tU16 *depth_ptr;
-  tU16 depth_value;
-  tU16 too_near;
-  int depth_shift_amount;
-  int depth_start;
-  int y;
-  int x;
-  int depth_line_skip;
-  int render_line_skip;
+void DoDepthByShadeTable(br_pixelmap *pRender_buffer, br_pixelmap *pDepth_buffer, br_pixelmap *pShade_table, int pShade_table_power, int pStart, int pEnd) {
+    tU8 *render_ptr;
+    tU8 *shade_table_pixels;
+    tU16 *depth_ptr;
+    tU16 depth_value;
+    tU16 too_near;
+    int depth_shift_amount;
+    int depth_start;
+    int y;
+    int x;
+    int depth_line_skip;
+    int render_line_skip;
 }
 
 // Offset: 5504
@@ -177,27 +174,27 @@ void DoDepthByShadeTable(br_pixelmap *pRender_buffer, br_pixelmap *pDepth_buffer
 // EBX: pCamera
 // ECX: pCamera_to_world
 void ExternalSky(br_pixelmap *pRender_buffer, br_pixelmap *pDepth_buffer, br_actor *pCamera, br_matrix34 *pCamera_to_world) {
-  int dst_x;
-  int src_x;
-  int dx;
-  int hori_y;
-  int top_y;
-  int hori_pixels;
-  br_angle yaw;
-  br_angle hori_sky;
-  br_angle pitch;
-  br_angle vert_sky;
-  br_camera *camera;
-  br_scalar tan_half_fov;
-  br_scalar tan_half_hori_fov;
-  br_scalar tan_half_hori_sky;
-  br_scalar hshift;
-  br_scalar tan_pitch;
-  tU8 top_col;
-  tU8 bot_col;
-  int bot_height;
-  int repetitions;
-  br_pixelmap *col_map;
+    int dst_x;
+    int src_x;
+    int dx;
+    int hori_y;
+    int top_y;
+    int hori_pixels;
+    br_angle yaw;
+    br_angle hori_sky;
+    br_angle pitch;
+    br_angle vert_sky;
+    br_camera *camera;
+    br_scalar tan_half_fov;
+    br_scalar tan_half_hori_fov;
+    br_scalar tan_half_hori_sky;
+    br_scalar hshift;
+    br_scalar tan_pitch;
+    tU8 top_col;
+    tU8 bot_col;
+    int bot_height;
+    int repetitions;
+    br_pixelmap *col_map;
 }
 
 // Offset: 6516
@@ -207,8 +204,8 @@ void ExternalSky(br_pixelmap *pRender_buffer, br_pixelmap *pDepth_buffer, br_act
 // EBX: pCamera
 // ECX: pCamera_to_world
 void DoHorizon(br_pixelmap *pRender_buffer, br_pixelmap *pDepth_buffer, br_actor *pCamera, br_matrix34 *pCamera_to_world) {
-  br_angle yaw;
-  br_actor *actor;
+    br_angle yaw;
+    br_actor *actor;
 }
 
 // Offset: 6980
@@ -247,50 +244,50 @@ void DepthEffectSky(br_pixelmap *pRender_buffer, br_pixelmap *pDepth_buffer, br_
 // Size: 627
 // EAX: pCamera
 void DoWobbleCamera(br_actor *pCamera) {
-  float f_time;
-  br_scalar mag00;
-  br_scalar mag01;
-  br_scalar mag02;
-  br_scalar mag10;
-  br_scalar mag11;
-  br_scalar mag12;
-  br_scalar mag20;
-  br_scalar mag21;
-  br_scalar mag22;
-  float period00;
-  float period01;
-  float period02;
-  float period10;
-  float period11;
-  float period12;
-  float period20;
-  float period21;
-  float period22;
+    float f_time;
+    br_scalar mag00;
+    br_scalar mag01;
+    br_scalar mag02;
+    br_scalar mag10;
+    br_scalar mag11;
+    br_scalar mag12;
+    br_scalar mag20;
+    br_scalar mag21;
+    br_scalar mag22;
+    float period00;
+    float period01;
+    float period02;
+    float period10;
+    float period11;
+    float period12;
+    float period20;
+    float period21;
+    float period22;
 }
 
 // Offset: 7948
 // Size: 627
 // EAX: pCamera
 void DoDrugWobbleCamera(br_actor *pCamera) {
-  float f_time;
-  br_scalar mag00;
-  br_scalar mag01;
-  br_scalar mag02;
-  br_scalar mag10;
-  br_scalar mag11;
-  br_scalar mag12;
-  br_scalar mag20;
-  br_scalar mag21;
-  br_scalar mag22;
-  float period00;
-  float period01;
-  float period02;
-  float period10;
-  float period11;
-  float period12;
-  float period20;
-  float period21;
-  float period22;
+    float f_time;
+    br_scalar mag00;
+    br_scalar mag01;
+    br_scalar mag02;
+    br_scalar mag10;
+    br_scalar mag11;
+    br_scalar mag12;
+    br_scalar mag20;
+    br_scalar mag21;
+    br_scalar mag22;
+    float period00;
+    float period01;
+    float period02;
+    float period10;
+    float period11;
+    float period12;
+    float period20;
+    float period21;
+    float period22;
 }
 
 // Offset: 8576
@@ -323,28 +320,28 @@ void MoreDepthFactor2() {
 // Offset: 9156
 // Size: 95
 void AssertYons() {
-  int i;
+    int i;
 }
 
 // Offset: 9252
 // Size: 140
 void IncreaseYon() {
-  int i;
-  char s[256];
+    int i;
+    char s[256];
 }
 
 // Offset: 9392
 // Size: 162
 void DecreaseYon() {
-  int i;
-  char s[256];
+    int i;
+    char s[256];
 }
 
 // Offset: 9556
 // Size: 127
 void SetYon(br_scalar pYon) {
-  int i;
-  br_camera *camera_ptr;
+    int i;
+    br_camera *camera_ptr;
 }
 
 // Offset: 9684
@@ -355,15 +352,15 @@ br_scalar GetYon() {
 // Offset: 9732
 // Size: 162
 void IncreaseAngle() {
-  int i;
-  char s[256];
+    int i;
+    char s[256];
 }
 
 // Offset: 9896
 // Size: 162
 void DecreaseAngle() {
-  int i;
-  char s[256];
+    int i;
+    char s[256];
 }
 
 // Offset: 10060
@@ -406,8 +403,8 @@ void SetDepthCueingOn(int pOn) {
 // Offset: 10864
 // Size: 110
 void ToggleDepthCueingQuietly() {
-  int temp_start;
-  int temp_end;
+    int temp_start;
+    int temp_end;
 }
 
 // Offset: 10976
@@ -418,13 +415,13 @@ void ToggleDepthCueing() {
 // Offset: 11164
 // Size: 74
 void ChangeDepthEffect() {
-  br_scalar x2;
-  br_scalar y1;
-  br_scalar y2;
-  br_scalar z1;
-  br_scalar z2;
-  br_scalar distance;
-  tSpecial_volume *special_volume;
+    br_scalar x2;
+    br_scalar y1;
+    br_scalar y2;
+    br_scalar z1;
+    br_scalar z2;
+    br_scalar distance;
+    tSpecial_volume *special_volume;
 }
 
 // Offset: 11240

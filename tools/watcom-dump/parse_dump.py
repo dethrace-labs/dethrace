@@ -1,7 +1,20 @@
 #!/usr/bin/env python3 -u
+
+#######################################################
+# Parses Watcom "exedump" output into c skeleton coode
+# exedump: https://github.com/jeff-1amstudios/open-watcom-v2/tree/master/bld/exedump
+#
+# Writes c code into "./_generated" directory
+#
+# Usage: parse_dump.py <path to dump file>
+#######################################################
+import sys
 import re
 import os
 import errno
+import shutil
+
+BASE_OUTPUT_DIR = '_generated/'
 
 module_start_regex = '\d+\\) Name:\s+(\S+)'
 LOCAL_HEADER_REGEX = '(\S+):\s+(\S+)'
@@ -26,14 +39,14 @@ ENUM_ITEM_REGEX = '"(\S+)"   value = (\S+)'
 
 SECTION_UNDERLINE = '^(=*)$' # ignore these lines
 
-fp = open('full_dump.txt', 'r')
+fp = open(sys.argv[1], 'r')
 
 STATE_NONE = 0
 STATE_MODULE = 1
 STATE_LOCALS = 2
 STATE_TYPES = 3
 
-INDENT_SPACES = 2
+INDENT_SPACES = 4
 
 modules = []
 scopes = []
@@ -328,12 +341,6 @@ def process_type(current_module, type_name):
 
 def resolve_type_str(module, type_idx, var_name, decl=True):
   global indent
-  # if var_name != None:
-  #   var_name = ' ' + var_name + ' '
-  if type_idx not in module['types']:
-    print('ERROR: type', type_idx, 'not found in', module['name'], 'line', line_number)
-    return '__unk{}__'.format(type_idx)
-
   original_type = module['types'][type_idx]
   t = module['types'][type_idx]
   bounds = ''
@@ -452,16 +459,7 @@ def resolve_function_signature(module, fn):
       if 'value' in arg_type and arg_type['value'] == 'void':
         continue
 
-    if len(fn['local_vars']) <= i:
-      print('WARNING: missing local var for', fn['name'], i)
-      print('context:', args)
-      print('locals:')
-      print(fn['local_vars'])
-      print('args:')
-      print(fn_type['args'])
-      name = '__unk{}__'.format(i)
-    else:
-      name = fn['local_vars'][i]['name']
+    name = fn['local_vars'][i]['name']
     arg_type = resolve_type_str(module, arg, name, False)
     if arg_type == 'void ?no_name?':
       continue
@@ -534,6 +532,7 @@ def get_struct_tag_name(module, t):
 def get_type_declaration(module, t, name):
   global indent
   indirections = ''
+  bounds = ''
   while 'base_type' in t:
     if t['type'] == 'NEAR386 PTR' or t['type'] == 'FAR386 PTR':
       indirections = indirections + '*'
@@ -541,7 +540,7 @@ def get_type_declaration(module, t, name):
       bounds = bounds + '[{}]'.format(t['upper_bound']+1)
     t = module['types'][t['base_type']]
 
-  print ('type decl', t)
+  #print ('type decl', t)
   if t['type'] == 'FIELD_LIST':
     s = 'struct'
     tag_name = get_struct_tag_name(module, t)
@@ -552,7 +551,7 @@ def get_type_declaration(module, t, name):
     for e in reversed(t['fields']):
       s += '\n'
       s += ' ' * (indent * INDENT_SPACES)
-      s += '  ' + resolve_type_str(module, e['type_idx'], e['name']);
+      s += (' ' * INDENT_SPACES) + resolve_type_str(module, e['type_idx'], e['name']);
       if e['type'] == 'BIT_BYTE':
         s += ': ' + str(e['bit_size'])
       s += ';'
@@ -572,7 +571,7 @@ def get_type_declaration(module, t, name):
   elif t['type'] == 'SCALAR' or t['type'] == 'NAME':
     if indirections != '':
       indirections = ' ' + indirections
-    return t['value'] + indirections + ' ' + name + ''
+    return t['value'] + indirections + ' ' + name + bounds
   else:
     return 'WARN: No decl for ' + t['type']
 
@@ -580,10 +579,14 @@ def generate_c_skeleton():
   global dr_types_file
   global br_types_file
 
-  mkdir_p('src/types')
+  try:
+    shutil.rmtree(BASE_OUTPUT_DIR)
+  except:
+    pass
+  mkdir_p(BASE_OUTPUT_DIR + '/types')
 
-  dr_types_file = open('src/types/dr_types.h', 'w')
-  br_types_file = open('src/types/br_types.h', 'w')
+  dr_types_file = open(BASE_OUTPUT_DIR + '/types/dr_types.h', 'w')
+  br_types_file = open(BASE_OUTPUT_DIR + '/types/br_types.h', 'w')
 
   dr_types_file.write("#ifndef DR_TYPES_H\n")
   dr_types_file.write("#define DR_TYPES_H\n\n")
@@ -593,34 +596,43 @@ def generate_c_skeleton():
   br_types_file.write("#define BR_TYPES_H\n\n")
 
   for m in modules:
+    # ignore lib modules
     if 'DETHRACE' not in m['name'] and 'BRSRC13' not in m['name']:
-      #print("ignoring", m['name'])
+      print("ignoring", m['name'])
       continue
     print(m['name'])
     print('-----------------------')
-    #generate_h_file(m)
-    #generate_c_file(m)
+    generate_h_file(m)
+    generate_c_file(m)
     generate_types_header(m)
 
   br_types_file.write("\n#endif")
   dr_types_file.write("\n#endif")
 
 def generate_h_file(module):
-  filename = 'src/' + module['name'][3:].replace('\\', '/').replace('.c', '.h')
+  filename = BASE_OUTPUT_DIR + module['name'][3:].replace('\\', '/').replace('.c', '.h')
 
   dir = os.path.dirname(filename)
+  name = os.path.basename(filename)
+
   mkdir_p(dir)
   h_file = open(filename, 'w')
+
+  def_name = '_' + name.upper().replace('.', '_') + '_'
+  h_file.write('#ifndef ' + def_name + '\n')
+  h_file.write('#define ' + def_name + '\n\n')
+
   h_file.write('#include \"dr_types.h\"\n')
-  h_file.write('#include \"br_types.h\"\n')
+  h_file.write('#include \"br_types.h\"\n\n')
   for fn in module['functions']:
     h_file.write(resolve_function_header(module, fn))
     h_file.write('\n')
     h_file.write(resolve_function_signature(module, fn) + ';')
     h_file.write('\n\n')
+  h_file.write('#endif\n')
 
 def generate_c_file(module):
-  filename = 'src/' + module['name'][3:].replace('\\', '/')
+  filename = BASE_OUTPUT_DIR + module['name'][3:].replace('\\', '/')
 
   c_file = open(filename, 'w')
   c_file.write('#include \"')
@@ -628,7 +640,6 @@ def generate_c_file(module):
   c_file.write('\"\n\n')
 
   # global variables
-  c_file.write('// Global variables\n')
   for gv in module['global_vars']:
     # print('gv:', gv)
     str = resolve_type_str(module, gv['type'], gv['name'])
@@ -650,7 +661,7 @@ def generate_c_file(module):
     #   print fn
     #   print module['types'][fn['type']]
     for v in fn['local_vars'][arg_count:]:
-      c_file.write('  ')
+      c_file.write(' ' * INDENT_SPACES)
       str = resolve_type_str(module, v['type'], v['name'])
       c_file.write(str)
       c_file.write(';\n')
@@ -704,17 +715,17 @@ def generate_types_header(module):
       for e in reversed(t['elements']):
         if not first_elem:
           s += ','
-        s += '\n  {} = {}'.format(e['name'], e['value'])
+        s += '\n{}{} = {}'.format((' ' * INDENT_SPACES), e['name'], e['value'])
         first_elem = False
-      s += '\n}} {};\n\n'.format(type_name)
+      s += '\n}} {};\n'.format(type_name)
       enums[type_name] = s
     elif t['type'] == 'FIELD_LIST':
       type_name = get_struct_name(module, t)
       tag_name = get_struct_tag_name(module, t)
       s = 'typedef struct ' + tag_name + ' ' + type_name + ';\n'
-      typedefs[type_name] = s
+      #typedefs[type_name] = s
 
-      s = get_type_declaration(module, t, type_name) + ';\n'
+      s = 'typedef ' + get_type_declaration(module, t, type_name) + ' ' + type_name + ';\n\n'
       structs[type_name] = s
     elif t['type'] == 'SCALAR' or t['type'] == 'NAME':
       s = 'typedef ' + get_type_declaration(module, t, type_name) + ';\n'
@@ -725,8 +736,9 @@ def generate_types_header(module):
     elif 'NEAR386' in t['type'] or 'FAR386' in t['type']:
       s = 'typedef ' + get_type_declaration(module, t, type_name) + ';\n'
       typedefs[type_name] = s
-      if s == 'typedef ;\n':
-        print ('got empty s')
+    elif 'ARRAY' in t['type']:
+      s = 'typedef ' + get_type_declaration(module, t, type_name) + ';\n'
+      typedefs[type_name] = s
     else:
       print('ignoring type', type_name, t)
 

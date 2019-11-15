@@ -1,5 +1,9 @@
+#ifndef _DATAFILE_H_
+#define _DATAFILE_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 7
 // Size: 209
 // EAX: type
@@ -28,7 +32,7 @@ int DfTopType();
 // EAX: df
 // EDX: ident
 // EBX: data
-int TextReadLine(br_datafile *df, char **ident, char **data, unsigned char cp, int (__unk4__)(br_datafile*, br_uint_32, br_uint_32));
+int TextReadLine(br_datafile *df, char **ident, char **data);
 
 // Offset: 1083
 // Size: 436
@@ -41,40 +45,40 @@ br_uint_16 scalarTypeConvert(br_datafile *df, br_uint_16 t);
 // EAX: df
 // EDX: str
 // EBX: base
-br_uint_32 DfStructWriteBinary(br_datafile *df, br_file_struct *str, void *base, char m);
+br_uint_32 DfStructWriteBinary(br_datafile *df, br_file_struct *str, void *base);
 
 // Offset: 2769
 // Size: 1394
 // EAX: df
 // EDX: str
 // EBX: base
-br_uint_32 DfStructReadBinary(br_datafile *df, br_file_struct *str, void *base, char tmp_string);
+br_uint_32 DfStructReadBinary(br_datafile *df, br_file_struct *str, void *base);
 
 // Offset: 4182
 // Size: 427
 // EAX: df
 // EDX: str
 // EBX: base
-int DfStructSizeBinary(br_datafile *df, br_file_struct *str, void *base, char mp);
+int DfStructSizeBinary(br_datafile *df, br_file_struct *str, void *base);
 
 // Offset: 4624
 // Size: 177
 // EAX: e
 // EDX: str
-int EnumFromString(br_file_enum *e);
+int EnumFromString(br_file_enum *e, char *str);
 
 // Offset: 4814
 // Size: 138
 // EAX: e
 // EDX: num
-char* EnumToString(br_file_enum *e);
+char* EnumToString(br_file_enum *e, int num);
 
 // Offset: 4970
 // Size: 92
 // EAX: df
 // EDX: str
 // EBX: base
-br_uint_32 DfStructWriteText(br_datafile *df, br_file_struct *str, void *base, char __unk3__);
+br_uint_32 DfStructWriteText(br_datafile *df, br_file_struct *str, void *base);
 
 // Offset: 5081
 // Size: 1827
@@ -82,28 +86,28 @@ br_uint_32 DfStructWriteText(br_datafile *df, br_file_struct *str, void *base, c
 // EDX: str
 // EBX: base
 // ECX: indent
-br_uint_32 StructWriteTextSub(br_datafile *df, br_file_struct *str, void *base, int indent, int m);
+br_uint_32 StructWriteTextSub(br_datafile *df, br_file_struct *str, void *base, int indent);
 
 // Offset: 6925
 // Size: 156
 // EAX: df
 // EDX: str
 // EBX: base
-br_uint_32 DfStructReadText(br_datafile *df, br_file_struct *str, void *base, char id);
+br_uint_32 DfStructReadText(br_datafile *df, br_file_struct *str, void *base);
 
 // Offset: 7099
 // Size: 1609
 // EAX: df
 // EDX: str
 // EBX: base
-br_uint_32 StructReadTextSub(br_datafile *df, br_file_struct *str, void *base, char m);
+br_uint_32 StructReadTextSub(br_datafile *df, br_file_struct *str, void *base);
 
 // Offset: 8725
 // Size: 144
 // EAX: df
 // EDX: str
 // EBX: base
-int DfStructSizeText(br_datafile *df, br_file_struct *str, void *base, char m);
+int DfStructSizeText(br_datafile *df, br_file_struct *str, void *base);
 
 // Offset: 8888
 // Size: 109
@@ -111,7 +115,7 @@ int DfStructSizeText(br_datafile *df, br_file_struct *str, void *base, char m);
 // EDX: str
 // EBX: base
 // ECX: n
-br_uint_32 DfStructWriteArray(br_datafile *df, br_file_struct *str, void *base, int n, int cp);
+br_uint_32 DfStructWriteArray(br_datafile *df, br_file_struct *str, void *base, int n);
 
 // Offset: 9015
 // Size: 126
@@ -119,7 +123,7 @@ br_uint_32 DfStructWriteArray(br_datafile *df, br_file_struct *str, void *base, 
 // EDX: str
 // EBX: base
 // ECX: n
-br_uint_32 DfStructReadArray(br_datafile *df, br_file_struct *str, void *base, int n, int cp);
+br_uint_32 DfStructReadArray(br_datafile *df, br_file_struct *str, void *base, int n);
 
 // Offset: 9158
 // Size: 150
@@ -287,7 +291,7 @@ int DfSkipBinary(br_datafile *df, br_uint_32 length);
 // Size: 241
 // EAX: df
 // EDX: table
-int DfChunksInterpret(br_datafile *df, br_chunks_table *table, signed char length);
+int DfChunksInterpret(br_datafile *df, br_chunks_table *table);
 
 // Offset: 13438
 // Size: 59
@@ -313,3 +317,4 @@ void DfClose(br_datafile *df);
 // Size: 94
 int BrWriteModeSet(int mode);
 
+#endif

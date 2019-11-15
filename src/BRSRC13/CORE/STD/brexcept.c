@@ -1,6 +1,5 @@
 #include "brexcept.h"
 
-// Global variables
 void *exceptionValue;
 br_exception_handler *_BrExceptionHandler;
 char rscid[50];
@@ -18,8 +17,8 @@ void _BrExceptionEnd() {
 // Offset: 218
 // Size: 107
 void _BrExceptionThrow(br_int_32 type, void *value) {
-  br_exception_handler h;
-  br_exception_handler *old;
+    br_exception_handler h;
+    br_exception_handler *old;
 }
 
 // Offset: 348

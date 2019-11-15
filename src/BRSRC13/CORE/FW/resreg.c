@@ -1,18 +1,17 @@
 #include "resreg.h"
 
-// Global variables
 char rscid[48];
 
 // Offset: 14
 // Size: 176
 br_resource_class* BrResClassAdd(br_resource_class *rclass) {
-  br_resource_class *r;
+    br_resource_class *r;
 }
 
 // Offset: 207
 // Size: 158
 br_resource_class* BrResClassRemove(br_resource_class *rclass) {
-  br_resource_class *r;
+    br_resource_class *r;
 }
 
 // Offset: 380
@@ -23,20 +22,20 @@ br_resource_class* BrResClassFind(char *pattern) {
 // Offset: 448
 // Size: 55
 br_resclass_find_cbfn* BrResClassFindHook(br_resclass_find_cbfn *hook) {
-  br_resclass_find_cbfn *old;
+    br_resclass_find_cbfn *old;
 }
 
 // Offset: 521
 // Size: 83
 br_uint_32 BrResClassAddMany(br_resource_class **items, int n) {
-  int i;
+    int i;
 }
 
 // Offset: 625
 // Size: 100
 br_uint_32 BrResClassRemoveMany(br_resource_class **items, int n) {
-  int i;
-  int r;
+    int i;
+    int r;
 }
 
 // Offset: 744

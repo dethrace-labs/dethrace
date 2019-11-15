@@ -1,5 +1,9 @@
+#ifndef _ERRORS_H_
+#define _ERRORS_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 207
 void FatalError(int pStr_index, ...);
@@ -25,3 +29,4 @@ void dprintf(char *fmt_string);
 // EAX: pMisc_text_index
 int DoErrorInterface(int pMisc_text_index);
 
+#endif

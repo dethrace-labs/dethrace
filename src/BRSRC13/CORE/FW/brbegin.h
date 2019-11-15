@@ -1,5 +1,9 @@
+#ifndef _BRBEGIN_H_
+#define _BRBEGIN_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 8
 // Size: 88
 br_error BrBegin();
@@ -8,3 +12,4 @@ br_error BrBegin();
 // Size: 126
 br_error BrEnd();
 
+#endif

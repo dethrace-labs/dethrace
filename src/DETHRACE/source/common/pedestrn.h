@@ -1,5 +1,9 @@
+#ifndef _PEDESTRN_H_
+#define _PEDESTRN_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 152
 // EAX: pModel
@@ -34,7 +38,7 @@ br_actor* GetPedestrianActor(int pIndex);
 // Size: 97
 // EAX: pActor
 // EDX: pFlipped
-br_pixelmap* GetPedestrianTexture(br_actor *pActor);
+br_pixelmap* GetPedestrianTexture(br_actor *pActor, int *pFlipped);
 
 // Offset: 660
 // Size: 153
@@ -51,7 +55,7 @@ void SetPedMaterialForRender(br_actor *pActor);
 
 // Offset: 1976
 // Size: 158
-void PedCallBack(br_actor *pActor, br_model *pModel, br_material *pMaterial, void *pRender_data);
+void PedCallBack(br_actor *pActor, br_model *pModel, br_material *pMaterial, void *pRender_data, br_uint_8 pStyle, int pOn_screen);
 
 // Offset: 2136
 // Size: 516
@@ -65,7 +69,7 @@ void MungeModelSize(br_actor *pActor, br_scalar pScaling_factor);
 // Offset: 2928
 // Size: 1468
 // EAX: pPedestrian
-int BurstPedestrian(tPedestrian_data *pPedestrian, float pSplattitudinalitude);
+int BurstPedestrian(tPedestrian_data *pPedestrian, float pSplattitudinalitude, int pAllow_explosion);
 
 // Offset: 4396
 // Size: 137
@@ -77,7 +81,7 @@ void ResetAllPedGibs();
 // EDX: pSize
 // EBX: pGib_index
 // ECX: pPed_index
-void AdjustPedGib(int pIndex, int pSize, int pGib_index, int pPed_index, br_matrix34 *pTrans, unsigned char the_ped_gib);
+void AdjustPedGib(int pIndex, int pSize, int pGib_index, int pPed_index, br_matrix34 *pTrans);
 
 // Offset: 4736
 // Size: 810
@@ -100,13 +104,13 @@ void CalcPedWidthNHeight(tPedestrian_data *pPedestrian, br_pixelmap *pPixelmap, 
 // Offset: 6120
 // Size: 1942
 // EAX: pPedestrian
-int PedestrianNextInstruction(tPedestrian_data *pPedestrian, float pDanger_level);
+int PedestrianNextInstruction(tPedestrian_data *pPedestrian, float pDanger_level, int pPosition_explicitly, int pMove_pc);
 
 // Offset: 8064
 // Size: 464
 // EAX: pPedestrian
 // EDX: pAction_changed
-void MungePedestrianSequence(tPedestrian_data *pPedestrian);
+void MungePedestrianSequence(tPedestrian_data *pPedestrian, int pAction_changed);
 
 // Offset: 8528
 // Size: 166
@@ -138,12 +142,12 @@ void MungePedModel(tPedestrian_data *pPedestrian);
 // EAX: pPedestrian
 // EDX: pAction_index
 // EBX: pRedo_frames_etc
-void ChangeActionTo(tPedestrian_data *pPedestrian, int pAction_index);
+void ChangeActionTo(tPedestrian_data *pPedestrian, int pAction_index, int pRedo_frames_etc);
 
 // Offset: 11892
 // Size: 589
 // EAX: pPedestrian
-int MungePedestrianAction(tPedestrian_data *pPedestrian);
+int MungePedestrianAction(tPedestrian_data *pPedestrian, float pDanger_level);
 
 // Offset: 12484
 // Size: 105
@@ -152,7 +156,7 @@ void MakeFlagWavingBastardWaveHisFlagWhichIsTheProbablyTheLastThingHeWillEverDo(
 // Offset: 12592
 // Size: 2334
 // EAX: pPedestrian
-void MungePedestrianPath(tPedestrian_data *pPedestrian, float pDanger_level);
+void MungePedestrianPath(tPedestrian_data *pPedestrian, float pDanger_level, br_vector3 *pDanger_direction);
 
 // Offset: 14928
 // Size: 764
@@ -181,7 +185,7 @@ int BloodyWheels(tCar_spec *pCar, br_vector3 *pPed_car, br_scalar pSize, br_vect
 // Size: 142
 // EAX: pPedestrian
 // EDX: pCar
-int FancyATossOffMate(tPedestrian_data *pPedestrian, tCollision_info *pCar);
+int FancyATossOffMate(tPedestrian_data *pPedestrian, tCollision_info *pCar, float pImpact_speed);
 
 // Offset: 17232
 // Size: 5870
@@ -192,13 +196,13 @@ void CheckPedestrianDeathScenario(tPedestrian_data *pPedestrian);
 // Size: 769
 // EAX: pPedestrian
 // EDX: pIndex
-void SendPedestrian(tPedestrian_data *pPedestrian);
+void SendPedestrian(tPedestrian_data *pPedestrian, int pIndex);
 
 // Offset: 23876
 // Size: 1162
 // EAX: pPedestrian
 // EDX: pIndex
-void DoPedestrian(tPedestrian_data *pPedestrian);
+void DoPedestrian(tPedestrian_data *pPedestrian, int pIndex);
 
 // Offset: 25040
 // Size: 767
@@ -206,7 +210,7 @@ void DoPedestrian(tPedestrian_data *pPedestrian);
 // EDX: pAction_index
 // EBX: pFrame_index
 // ECX: pHit_points
-void AdjustPedestrian(int pIndex, int pAction_index, int pFrame_index, int pHit_points, int pDone_initial, tU16 pParent, br_actor *pParent_actor, float pSpin_period, br_scalar pJump_magnitude, br_vector3 *pOffset, br_vector3 *pTrans, unsigned short pedestrian, br_memory_classes parent, union __unk14__, br_vertex *__unk15__);
+void AdjustPedestrian(int pIndex, int pAction_index, int pFrame_index, int pHit_points, int pDone_initial, tU16 pParent, br_actor *pParent_actor, float pSpin_period, br_scalar pJump_magnitude, br_vector3 *pOffset, br_vector3 *pTrans);
 
 // Offset: 25808
 // Size: 194
@@ -227,7 +231,7 @@ void GroundPedestrian(tPedestrian_data *pPedestrian);
 // Size: 483
 // EAX: pPedestrian
 // EDX: pAnimate
-void RevivePedestrian(tPedestrian_data *pPedestrian);
+void RevivePedestrian(tPedestrian_data *pPedestrian, int pAnimate);
 
 // Offset: 27056
 // Size: 1078
@@ -246,7 +250,7 @@ int GetPedCount();
 // Size: 260
 // EAX: pIndex
 // EDX: pPos
-int GetPedPosition(int pIndex, br_vector3 *pPos, size_t pedestrian);
+int GetPedPosition(int pIndex, br_vector3 *pPos);
 
 // Offset: 28648
 // Size: 2930
@@ -254,7 +258,7 @@ int GetPedPosition(int pIndex, br_vector3 *pPos, size_t pedestrian);
 // EDX: pInstructions
 // EBX: pInstruc_count
 // ECX: pInit_instruc
-void CreatePedestrian(FILE *pG, tPedestrian_instruction *pInstructions, int pInstruc_count, int pInit_instruc);
+void CreatePedestrian(FILE *pG, tPedestrian_instruction *pInstructions, int pInstruc_count, int pInit_instruc, int pRef_num, int pForce_read);
 
 // Offset: 31580
 // Size: 73
@@ -273,14 +277,14 @@ void ResetPedMaterial();
 // EAX: pF
 // EDX: pSubs_count
 // EBX: pSubs_array
-void LoadInPedestrians(FILE *pF, int pSubs_count);
+void LoadInPedestrians(FILE *pF, int pSubs_count, tPed_subs *pSubs_array);
 
 // Offset: 33608
 // Size: 1313
 // EAX: pInstructions
 // EDX: pInstruc_count
 // EBX: pInit_instruc
-br_actor* BuildPedPaths(tPedestrian_instruction *pInstructions, int pInstruc_count);
+br_actor* BuildPedPaths(tPedestrian_instruction *pInstructions, int pInstruc_count, int pInit_instruc);
 
 // Offset: 34924
 // Size: 1161
@@ -417,7 +421,7 @@ void DropInitPedPointAir();
 
 // Offset: 38452
 // Size: 77
-br_uint_32 KillActorsModel(br_actor *pActor);
+br_uint_32 KillActorsModel(br_actor *pActor, void *pArg);
 
 // Offset: 38532
 // Size: 154
@@ -475,7 +479,7 @@ void RenderProximityRays(br_pixelmap *pRender_screen, br_pixelmap *pDepth_buffer
 // EDX: pCar_ID
 // EBX: pPed_index
 // ECX: pTime
-void AdjustProxRay(int pRay_index, tU16 pCar_ID, tU16 pPed_index, tU32 pTime, unsigned int __unk4__, br_memory_classes __unk5__);
+void AdjustProxRay(int pRay_index, tU16 pCar_ID, tU16 pPed_index, tU32 pTime);
 
 // Offset: 42404
 // Size: 1200
@@ -489,3 +493,4 @@ void ReceivedPedestrian(tNet_contents *pContents, tNet_message *pMessage, tU32 p
 // EAX: pPlayer
 void SendAllPedestrianPositions(tPlayer_ID pPlayer);
 
+#endif

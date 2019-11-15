@@ -1,5 +1,9 @@
+#ifndef _REPLAY_H_
+#define _REPLAY_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 71
 int ReplayIsPaused();
@@ -83,3 +87,4 @@ void DoActionReplay(tU32 pFrame_period);
 // Size: 330
 void SynchronizeActionReplay();
 
+#endif

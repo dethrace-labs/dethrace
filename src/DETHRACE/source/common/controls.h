@@ -1,5 +1,9 @@
+#ifndef _CONTROLS_H_
+#define _CONTROLS_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 53
 void AbortRace();
@@ -268,7 +272,7 @@ void CheckToggles(int pRacing);
 // Size: 444
 // EAX: pCar
 // EDX: pCheck_around
-int CarWorldOffFallenCheckThingy(tCar_spec *pCar);
+int CarWorldOffFallenCheckThingy(tCar_spec *pCar, int pCheck_around);
 
 // Offset: 5768
 // Size: 56
@@ -508,3 +512,4 @@ void InitAbuseomatic();
 // Size: 94
 void DisposeAbuseomatic();
 
+#endif

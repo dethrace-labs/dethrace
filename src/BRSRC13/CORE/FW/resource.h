@@ -1,5 +1,9 @@
+#ifndef _RESOURCE_H_
+#define _RESOURCE_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 10
 // Size: 188
 // EAX: r
@@ -74,13 +78,14 @@ char* BrResStrDup(void *vparent, char *str);
 // EDX: putline
 // EBX: arg
 // ECX: level
-void InternalResourceDump(resource_header *res, br_putline_cbfn *putline, void *arg, int level, enum i);
+void InternalResourceDump(resource_header *res, br_putline_cbfn *putline, void *arg, int level);
 
 // Offset: 3349
 // Size: 57
-void BrResDump(void *vres, br_putline_cbfn *putline, void *arg, signed char res);
+void BrResDump(void *vres, br_putline_cbfn *putline, void *arg);
 
 // Offset: 3427
 // Size: 80
 char* BrResClassIdentifier(br_uint_8 res_class);
 
+#endif

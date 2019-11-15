@@ -1,5 +1,9 @@
+#ifndef _MEMMGMT_H_
+#define _MEMMGMT_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 9
 // Size: 223
 br_error HostLock(br_uint_32 offset, br_uint_16 sel, br_size_t size);
@@ -44,3 +48,4 @@ br_error HostSelectorBaseQuery(br_uint_32 *basep, br_uint_16 sel);
 // Size: 175
 br_error HostSelectorLimitQuery(br_uint_32 *limitp, br_uint_16 sel);
 
+#endif

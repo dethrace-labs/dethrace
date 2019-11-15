@@ -1,5 +1,9 @@
+#ifndef _HIMAGE_H_
+#define _HIMAGE_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 14
 // Size: 40
 void* HostImageLoad(char *name);
@@ -16,3 +20,4 @@ void* HostImageLookupName(void *img, char *name, br_uint_32 hint);
 // Size: 40
 void* HostImageLookupOrdinal(void *img, br_uint_32 ordinal);
 
+#endif

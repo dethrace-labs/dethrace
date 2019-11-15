@@ -1,6 +1,5 @@
 #include "register.h"
 
-// Global variables
 char rscid[50];
 
 // Offset: 14
@@ -13,7 +12,7 @@ void* BrRegistryNew(br_registry *reg) {
 // Size: 126
 // EAX: reg
 void* BrRegistryClear(br_registry *reg) {
-  br_registry_entry *e;
+    br_registry_entry *e;
 }
 
 // Offset: 266
@@ -21,7 +20,7 @@ void* BrRegistryClear(br_registry *reg) {
 // EAX: reg
 // EDX: item
 void* BrRegistryAdd(br_registry *reg, void *item) {
-  br_registry_entry *e;
+    br_registry_entry *e;
 }
 
 // Offset: 443
@@ -30,7 +29,7 @@ void* BrRegistryAdd(br_registry *reg, void *item) {
 // EDX: items
 // EBX: n
 int BrRegistryAddMany(br_registry *reg, void **items, int n) {
-  int i;
+    int i;
 }
 
 // Offset: 608
@@ -38,8 +37,8 @@ int BrRegistryAddMany(br_registry *reg, void **items, int n) {
 // EAX: reg
 // EDX: item
 void* BrRegistryRemove(br_registry *reg, void *item) {
-  br_registry_entry *e;
-  void *r;
+    br_registry_entry *e;
+    void *r;
 }
 
 // Offset: 827
@@ -48,8 +47,8 @@ void* BrRegistryRemove(br_registry *reg, void *item) {
 // EDX: items
 // EBX: n
 int BrRegistryRemoveMany(br_registry *reg, void **items, int n) {
-  int i;
-  int r;
+    int i;
+    int r;
 }
 
 // Offset: 1013
@@ -57,7 +56,7 @@ int BrRegistryRemoveMany(br_registry *reg, void **items, int n) {
 // EAX: reg
 // EDX: pattern
 void* BrRegistryFind(br_registry *reg, char *pattern) {
-  br_registry_entry *e;
+    br_registry_entry *e;
 }
 
 // Offset: 1204
@@ -67,8 +66,8 @@ void* BrRegistryFind(br_registry *reg, char *pattern) {
 // EBX: items
 // ECX: max
 int BrRegistryFindMany(br_registry *reg, char *pattern, void **items, int max) {
-  br_registry_entry *e;
-  int n;
+    br_registry_entry *e;
+    int n;
 }
 
 // Offset: 1360
@@ -76,8 +75,8 @@ int BrRegistryFindMany(br_registry *reg, char *pattern, void **items, int max) {
 // EAX: reg
 // EDX: pattern
 int BrRegistryCount(br_registry *reg, char *pattern) {
-  br_registry_entry *e;
-  int n;
+    br_registry_entry *e;
+    int n;
 }
 
 // Offset: 1538
@@ -86,8 +85,9 @@ int BrRegistryCount(br_registry *reg, char *pattern) {
 // EDX: pattern
 // EBX: callback
 // ECX: arg
-int BrRegistryEnum(br_registry *reg, char *pattern, br_enum_cbfn *callback, void *arg, short e) {
-  int r;
+int BrRegistryEnum(br_registry *reg, char *pattern, br_enum_cbfn *callback, void *arg) {
+    br_registry_entry *e;
+    int r;
 }
 
 // Offset: 1838

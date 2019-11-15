@@ -1,6 +1,5 @@
 #include "globvrpb.h"
 
-// Global variables
 tNet_game_player_info gNet_players[6];
 br_matrix34 gRoot_to_camera;
 tCar_detail_info gCar_details[60];

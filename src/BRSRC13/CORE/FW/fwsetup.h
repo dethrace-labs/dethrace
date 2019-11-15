@@ -1,5 +1,9 @@
+#ifndef _FWSETUP_H_
+#define _FWSETUP_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 10
 // Size: 324
 br_error BrFwBegin();
@@ -20,3 +24,4 @@ br_filesystem* BrFilesystemSet(br_filesystem *newfs);
 // Size: 73
 br_allocator* BrAllocatorSet(br_allocator *newal);
 
+#endif

@@ -1,5 +1,9 @@
+#ifndef _UTILITY_H_
+#define _UTILITY_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 144
 int CheckQuit();
@@ -49,13 +53,13 @@ br_scalar SRandomPosNeg(br_scalar pN);
 // Size: 506
 // EAX: pF
 // EDX: pS
-char* GetALineWithNoPossibleService(FILE *pF);
+char* GetALineWithNoPossibleService(FILE *pF, unsigned char *pS);
 
 // Offset: 1744
 // Size: 60
 // EAX: pF
 // EDX: pS
-char* GetALineAndDontArgue(FILE *pF);
+char* GetALineAndDontArgue(FILE *pF, char *pS);
 
 // Offset: 1804
 // Size: 86
@@ -96,7 +100,7 @@ br_pixelmap* DRPixelmapAllocate(br_uint_8 pType, br_uint_16 pW, br_uint_16 pH, v
 // EDX: pX
 // EBX: pY
 // ECX: pW
-br_pixelmap* DRPixelmapAllocateSub(br_pixelmap *pPm, br_uint_16 pX, br_uint_16 pY);
+br_pixelmap* DRPixelmapAllocateSub(br_pixelmap *pPm, br_uint_16 pX, br_uint_16 pY, br_uint_16 pW, br_uint_16 pH);
 
 // Offset: 2468
 // Size: 195
@@ -112,26 +116,26 @@ br_pixelmap* DRPixelmapMatchSized(br_pixelmap *pSrc, tU8 pMatch_type, tS32 pWidt
 // EDX: pSrc
 // EBX: pSrc_width
 // ECX: pSrc_height
-void CopyDoubled8BitTo16BitRectangle(br_pixelmap *pDst, br_pixelmap *pSrc, int pSrc_width, int pSrc_height, int pDst_x);
+void CopyDoubled8BitTo16BitRectangle(br_pixelmap *pDst, br_pixelmap *pSrc, int pSrc_width, int pSrc_height, int pDst_x, int pDst_y, br_pixelmap *pPalette);
 
 // Offset: 3024
 // Size: 262
 // EAX: pSrc
 // EDX: pWidth
 // EBX: pHeight
-br_pixelmap* Scale8BitPixelmap(br_pixelmap *pSrc, int pWidth);
+br_pixelmap* Scale8BitPixelmap(br_pixelmap *pSrc, int pWidth, int pHeight);
 
 // Offset: 3288
 // Size: 390
 // EAX: pSrc
 // EDX: pN
-br_pixelmap* Tile8BitPixelmap(br_pixelmap *pSrc);
+br_pixelmap* Tile8BitPixelmap(br_pixelmap *pSrc, int pN);
 
 // Offset: 3680
 // Size: 83
 // EAX: pName
 // EDX: pList
-tException_list FindExceptionInList(char *pName, tException_list pList, short __unk2__);
+tException_list FindExceptionInList(char *pName, tException_list pList);
 
 // Offset: 3764
 // Size: 492
@@ -148,7 +152,7 @@ br_pixelmap* DRPixelmapLoad(char *pFile_name);
 // EAX: pFile_name
 // EDX: pPixelmaps
 // EBX: pNum
-br_uint_32 DRPixelmapLoadMany(char *pFile_name, br_pixelmap **pPixelmaps, br_uint_16 pNum, unsigned char the_map);
+br_uint_32 DRPixelmapLoadMany(char *pFile_name, br_pixelmap **pPixelmaps, br_uint_16 pNum);
 
 // Offset: 4540
 // Size: 67
@@ -160,17 +164,17 @@ void WaitFor(tU32 pDelay);
 // EAX: pActor
 // EDX: callback
 // EBX: arg
-br_uint_32 DRActorEnumRecurse(br_actor *pActor, br_actor_enum_cbfn *callback);
+br_uint_32 DRActorEnumRecurse(br_actor *pActor, br_actor_enum_cbfn *callback, void *arg);
 
 // Offset: 4744
 // Size: 77
-br_uint_32 CompareActorID(br_actor *pActor);
+br_uint_32 CompareActorID(br_actor *pActor, void *pArg);
 
 // Offset: 4824
 // Size: 60
 // EAX: pSearch_root
 // EDX: pName
-br_actor* DRActorFindRecurse(br_actor *pSearch_root);
+br_actor* DRActorFindRecurse(br_actor *pSearch_root, char *pName);
 
 // Offset: 4884
 // Size: 156
@@ -178,7 +182,7 @@ br_actor* DRActorFindRecurse(br_actor *pSearch_root);
 // EDX: pMat
 // EBX: pCall_back
 // ECX: pArg
-br_uint_32 DRActorEnumRecurseWithMat(br_actor *pActor, br_material *pMat, br_uint_32 (*pCall_back)(br_actor*, br_material*));
+br_uint_32 DRActorEnumRecurseWithMat(br_actor *pActor, br_material *pMat, br_uint_32 (*pCall_back)(br_actor*, br_material*, void*), void *pArg);
 
 // Offset: 5040
 // Size: 188
@@ -186,7 +190,7 @@ br_uint_32 DRActorEnumRecurseWithMat(br_actor *pActor, br_material *pMat, br_uin
 // EDX: pMatrix
 // EBX: pCall_back
 // ECX: pArg
-br_uint_32 DRActorEnumRecurseWithTrans(br_actor *pActor, br_matrix34 *pMatrix, br_uint_32 (*pCall_back)(br_actor*, br_matrix34*));
+br_uint_32 DRActorEnumRecurseWithTrans(br_actor *pActor, br_matrix34 *pMatrix, br_uint_32 (*pCall_back)(br_actor*, br_matrix34*, void*), void *pArg);
 
 // Offset: 5228
 // Size: 89
@@ -236,7 +240,7 @@ void AddLostTime(tU32 pLost_time);
 // EDX: pStr
 // EBX: pFudge_colon
 // ECX: pForce_colon
-void TimerString(tU32 pTime, char *pStr);
+void TimerString(tU32 pTime, char *pStr, int pFudge_colon, int pForce_colon);
 
 // Offset: 7256
 // Size: 55
@@ -254,7 +258,7 @@ void GetCopyOfMiscString(int pIndex, char *pStr);
 // EAX: pPeriod
 // EDX: pLast_change
 // EBX: pCurrent_state
-int Flash(tU32 pPeriod, tU32 *pLast_change);
+int Flash(tU32 pPeriod, tU32 *pLast_change, int *pCurrent_state);
 
 // Offset: 7488
 // Size: 225
@@ -295,7 +299,7 @@ br_pixelmap* LoadGeneratedShadeTable(int pR, int pG, int pB);
 // EDX: pR
 // EBX: pG
 // ECX: pB
-void SaveGeneratedShadeTable(br_pixelmap *pThe_table, int pR);
+void SaveGeneratedShadeTable(br_pixelmap *pThe_table, int pR, int pG, int pB);
 
 // Offset: 8448
 // Size: 106
@@ -303,7 +307,7 @@ void SaveGeneratedShadeTable(br_pixelmap *pThe_table, int pR);
 // EDX: pPalette
 // EBX: pRed_mix
 // ECX: pGreen_mix
-br_pixelmap* GenerateShadeTable(int pHeight, br_pixelmap *pPalette, int pRed_mix, int pGreen_mix, int pBlue_mix, float pQuarter, float pHalf, float pThree_quarter, ldiv_t __unk8__);
+br_pixelmap* GenerateShadeTable(int pHeight, br_pixelmap *pPalette, int pRed_mix, int pGreen_mix, int pBlue_mix, float pQuarter, float pHalf, float pThree_quarter);
 
 // Offset: 8556
 // Size: 761
@@ -311,7 +315,7 @@ br_pixelmap* GenerateShadeTable(int pHeight, br_pixelmap *pPalette, int pRed_mix
 // EDX: pPalette
 // EBX: pRed_mix
 // ECX: pGreen_mix
-br_pixelmap* GenerateDarkenedShadeTable(int pHeight, br_pixelmap *pPalette, int pRed_mix, int pGreen_mix, int pBlue_mix, float pQuarter, float pHalf, float pThree_quarter, br_scalar pDarken, unsigned int the_table, br_memory_classes the_RGB);
+br_pixelmap* GenerateDarkenedShadeTable(int pHeight, br_pixelmap *pPalette, int pRed_mix, int pGreen_mix, int pBlue_mix, float pQuarter, float pHalf, float pThree_quarter, br_scalar pDarken);
 
 // Offset: 9320
 // Size: 92
@@ -328,7 +332,7 @@ void DRMatrix34TApplyP(br_vector3 *pA, br_vector3 *pB, br_matrix34 *pC);
 // Size: 132
 // EAX: pPal
 // EDX: pEntry
-tU16 PaletteEntry16Bit(br_pixelmap *pPal);
+tU16 PaletteEntry16Bit(br_pixelmap *pPal, int pEntry);
 
 // Offset: 9736
 // Size: 210
@@ -380,7 +384,7 @@ void Copy8BitRectangleTo16BitRhombusWithTransparency(br_pixelmap *pDst, tS16 pDs
 // EDX: dx
 // EBX: dy
 // ECX: src
-void DRPixelmapRectangleCopy(br_pixelmap *dst, br_int_16 dx, br_int_16 dy, br_pixelmap *src, br_int_16 sx);
+void DRPixelmapRectangleCopy(br_pixelmap *dst, br_int_16 dx, br_int_16 dy, br_pixelmap *src, br_int_16 sx, br_int_16 sy, br_uint_16 w, br_uint_16 h);
 
 // Offset: 12308
 // Size: 107
@@ -394,7 +398,7 @@ void DRPixelmapCopy(br_pixelmap *dst, br_pixelmap *src);
 // EDX: x
 // EBX: y
 // ECX: w
-void DRPixelmapRectangleFill(br_pixelmap *dst, br_int_16 x, br_int_16 y);
+void DRPixelmapRectangleFill(br_pixelmap *dst, br_int_16 x, br_int_16 y, br_uint_16 w, br_uint_16 h, br_uint_32 colour);
 
 // Offset: 12500
 // Size: 156
@@ -456,13 +460,13 @@ int DRStricmp(char *p1, char *p2);
 // Size: 559
 // EAX: pArray
 // EDX: pCount
-void GlorifyMaterial(br_material **pArray);
+void GlorifyMaterial(br_material **pArray, int pCount);
 
 // Offset: 15912
 // Size: 178
 // EAX: pArray
 // EDX: pN
-void WhitenVertexRGB(br_model **pArray);
+void WhitenVertexRGB(br_model **pArray, int pN);
 
 // Offset: 16092
 // Size: 239
@@ -488,17 +492,18 @@ int AlreadyBlended(br_material *pMaterial);
 // Size: 148
 // EAX: pMaterial
 // EDX: pPercent
-void BlendifyMaterialTablishly(br_material *pMaterial);
+void BlendifyMaterialTablishly(br_material *pMaterial, int pPercent);
 
 // Offset: 16740
 // Size: 110
 // EAX: pMaterial
 // EDX: pPercent
-void BlendifyMaterialPrimitively(br_material *pMaterial);
+void BlendifyMaterialPrimitively(br_material *pMaterial, int pPercent);
 
 // Offset: 16852
 // Size: 73
 // EAX: pMaterial
 // EDX: pPercent
-void BlendifyMaterial(br_material *pMaterial);
+void BlendifyMaterial(br_material *pMaterial, int pPercent);
 
+#endif

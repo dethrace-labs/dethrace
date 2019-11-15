@@ -1,6 +1,5 @@
 #include "matrix23.h"
 
-// Global variables
 br_matrix23 mattmp1;
 br_matrix23 mattmp2;
 char rscid[52];
@@ -23,8 +22,8 @@ void BrMatrix23Identity(br_matrix23 *mat) {
 // Offset: 654
 // Size: 179
 void BrMatrix23Rotate(br_matrix23 *mat, br_angle rz) {
-  br_scalar s;
-  br_scalar c;
+    br_scalar s;
+    br_scalar c;
 }
 
 // Offset: 853
@@ -50,10 +49,10 @@ void BrMatrix23ShearY(br_matrix23 *mat, br_scalar sx) {
 // Offset: 1389
 // Size: 469
 br_scalar BrMatrix23Inverse(br_matrix23 *B, br_matrix23 *A) {
-  br_scalar det;
-  br_scalar idet;
-  br_scalar pos;
-  br_scalar neg;
+    br_scalar det;
+    br_scalar idet;
+    br_scalar pos;
+    br_scalar neg;
 }
 
 // Offset: 1878

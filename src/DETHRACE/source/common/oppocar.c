@@ -1,6 +1,5 @@
 #include "oppocar.h"
 
-// Global variables
 tFace_ref gFace_list[32];
 void (*ControlCar[6])(tCar_spec*, br_scalar);
 int gMetal_crunch_sound_id[5];
@@ -25,12 +24,12 @@ void MakeCarStationary(tCar_spec *pCar_spec) {
 // EAX: pTime_difference
 // EDX: car
 void MoveThisCar(tU32 pTime_difference, tCar_spec *car) {
-  br_scalar dt;
-  br_scalar ts;
-  br_vector3 r;
-  br_vector3 minus_k;
-  int i;
-  int j;
-  br_angle phi;
+    br_scalar dt;
+    br_scalar ts;
+    br_vector3 r;
+    br_vector3 minus_k;
+    int i;
+    int j;
+    br_angle phi;
 }
 

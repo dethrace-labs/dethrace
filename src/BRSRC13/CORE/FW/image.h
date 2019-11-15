@@ -1,5 +1,9 @@
+#ifndef _IMAGE_H_
+#define _IMAGE_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 11
 // Size: 58
 br_boolean BrImageAdd(br_image *img);
@@ -48,3 +52,4 @@ void BrImageFree(br_image *image);
 // Size: 42
 void _BrImageFree(void *res, br_uint_8 res_class, br_size_t size);
 
+#endif

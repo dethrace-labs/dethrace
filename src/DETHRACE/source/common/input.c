@@ -1,6 +1,5 @@
 #include "input.h"
 
-// Global variables
 tJoy_array gJoy_array;
 tKey_array gKey_array;
 int gKey_poll_counter;
@@ -26,15 +25,14 @@ char gCurrent_typing[110];
 // Size: 996
 // EAX: pKeys
 // EDX: pMark
-void SetJoystickArrays(int *pKeys) {
-  int pMark;
-  int i;
-  tS32 joyX;
-  tS32 joyY;
-  tS32 old_joy1X;
-  tS32 old_joy1Y;
-  tS32 old_joy2X;
-  tS32 old_joy2Y;
+void SetJoystickArrays(int *pKeys, int pMark) {
+    int i;
+    tS32 joyX;
+    tS32 joyY;
+    tS32 old_joy1X;
+    tS32 old_joy1Y;
+    tS32 old_joy2X;
+    tS32 old_joy2Y;
 }
 
 // Offset: 996
@@ -60,36 +58,36 @@ void CheckKeysForMouldiness() {
 // Offset: 1400
 // Size: 82
 int EitherMouseButtonDown() {
-  int but_2;
+    int but_2;
 }
 
 // Offset: 1484
 // Size: 214
 // EAX: pKey_index
 tKey_down_result PDKeyDown2(int pKey_index) {
-  tU32 the_time;
+    tU32 the_time;
 }
 
 // Offset: 1700
 // Size: 130
 // EAX: pKey_index
 int PDKeyDown(int pKey_index) {
-  tKey_down_result result;
+    tKey_down_result result;
 }
 
 // Offset: 1832
 // Size: 117
 // EAX: pKey_index
 int PDKeyDown3(int pKey_index) {
-  int last_key_down_time;
-  int last_key_down;
-  tKey_down_result result;
+    int last_key_down_time;
+    int last_key_down;
+    tKey_down_result result;
 }
 
 // Offset: 1952
 // Size: 208
 int PDAnyKeyDown() {
-  tKey_down_result result;
+    tKey_down_result result;
 }
 
 // Offset: 2160
@@ -100,28 +98,28 @@ int AnyKeyDown() {
 // Offset: 2248
 // Size: 451
 tU32* KevKeyService() {
-  tU32 sum;
-  tU32 code;
-  tU32 code2;
-  int last_key;
-  int last_single_key;
-  tU32 last_time;
-  tU32 return_val[2];
-  tU32 keys;
+    tU32 sum;
+    tU32 code;
+    tU32 code2;
+    int last_key;
+    int last_single_key;
+    tU32 last_time;
+    tU32 return_val[2];
+    tU32 keys;
 }
 
 // Offset: 2700
 // Size: 145
 // EAX: pKey_index
 int OldKeyIsDown(int pKey_index) {
-  int i;
+    int i;
 }
 
 // Offset: 2848
 // Size: 157
 // EAX: pKey_index
 int KeyIsDown(int pKey_index) {
-  int i;
+    int i;
 }
 
 // Offset: 3008
@@ -146,10 +144,10 @@ int CmdKeyDown(int pFKey_ID, int pCmd_key_ID) {
 // EAX: pX_coord
 // EDX: pY_coord
 void GetMousePosition(int *pX_coord, int *pY_coord) {
-  int x_left_margin;
-  int x_right_margin;
-  int y_top_margin;
-  int y_bottom_margin;
+    int x_left_margin;
+    int x_right_margin;
+    int y_top_margin;
+    int y_bottom_margin;
 }
 
 // Offset: 3452
@@ -168,9 +166,10 @@ void EndRollingLetters() {
 // EDX: pX
 // EBX: pY
 // ECX: rolling_type
-int AddRollingLetter(char pChar, int pX, int pY, tRolling_type rolling_type, int let) {
-  int i;
-  int number_of_letters;
+int AddRollingLetter(char pChar, int pX, int pY, tRolling_type rolling_type) {
+    tRolling_letter *let;
+    int i;
+    int number_of_letters;
 }
 
 // Offset: 4012
@@ -179,7 +178,8 @@ int AddRollingLetter(char pChar, int pX, int pY, tRolling_type rolling_type, int
 // EDX: pX
 // EBX: pY
 // ECX: rolling_type
-void AddRollingString(char *pStr, int pX, int pY, tRolling_type rolling_type, int i) {
+void AddRollingString(char *pStr, int pX, int pY, tRolling_type rolling_type) {
+    int i;
 }
 
 // Offset: 4124
@@ -188,30 +188,28 @@ void AddRollingString(char *pStr, int pX, int pY, tRolling_type rolling_type, in
 // EDX: pWidth
 // EBX: pX
 // ECX: pY
-void AddRollingNumber(tU32 pNumber, int pWidth) {
-  int pX;
-  int pY;
-  char the_string[32];
+void AddRollingNumber(tU32 pNumber, int pWidth, int pX, int pY) {
+    char the_string[32];
 }
 
 // Offset: 4212
 // Size: 651
 void RollLettersIn() {
-  tU32 period;
-  tRolling_letter *let;
-  int i;
-  int j;
-  int k;
-  int offset;
-  int which_letter;
-  int font_width;
-  int letter_offset;
-  int font_height;
-  int the_row_bytes;
-  tU8 *char_ptr;
-  tU8 *saved_char_ptr;
-  tU8 *source_ptr;
-  tU8 the_byte;
+    tU32 period;
+    tRolling_letter *let;
+    int i;
+    int j;
+    int k;
+    int offset;
+    int which_letter;
+    int font_width;
+    int letter_offset;
+    int font_height;
+    int the_row_bytes;
+    tU8 *char_ptr;
+    tU8 *saved_char_ptr;
+    tU8 *source_ptr;
+    tU8 the_byte;
 }
 
 // Offset: 4864
@@ -220,12 +218,12 @@ void RollLettersIn() {
 // EDX: pChar_index
 // EBX: pNew_char
 int ChangeCharTo(int pSlot_index, int pChar_index, char pNew_char) {
-  int x_coord;
-  int y_coord;
-  int i;
-  int j;
-  tRolling_letter *let;
-  tRolling_type new_type;
+    int x_coord;
+    int y_coord;
+    int i;
+    int j;
+    tRolling_letter *let;
+    tRolling_type new_type;
 }
 
 // Offset: 5212
@@ -235,14 +233,14 @@ int ChangeCharTo(int pSlot_index, int pChar_index, char pNew_char) {
 // EBX: pNew_str
 // ECX: pOld_str
 void ChangeTextTo(int pXcoord, int pYcoord, char *pNew_str, char *pOld_str) {
-  int x_coord;
-  int i;
-  int len;
-  int len2;
-  int j;
-  tRolling_letter *let;
-  tRolling_type new_type;
-  char new_char;
+    int x_coord;
+    int i;
+    int len;
+    int len2;
+    int j;
+    tRolling_letter *let;
+    tRolling_type new_type;
+    char new_char;
 }
 
 // Offset: 5628
@@ -257,23 +255,23 @@ void SetRollingCursor(int pSlot_index) {
 // EDX: pName_length
 // EBX: pVisible_length
 void BlankSlot(int pIndex, int pName_length, int pVisible_length) {
-  int i;
+    int i;
 }
 
 // Offset: 5784
 // Size: 232
 // EAX: pSlot_index
 void DoRLBackspace(int pSlot_index) {
-  int i;
-  int new_len;
+    int i;
+    int new_len;
 }
 
 // Offset: 6016
 // Size: 190
 // EAX: pSlot_index
 void DoRLDelete(int pSlot_index) {
-  int i;
-  int new_len;
+    int i;
+    int new_len;
 }
 
 // Offset: 6208
@@ -299,15 +297,15 @@ void DoRLCursorRight(int pSlot_index) {
 // EAX: pChar
 // EDX: pSlot_index
 void DoRLTypeLetter(int pChar, int pSlot_index) {
-  int i;
-  int new_len;
+    int i;
+    int new_len;
 }
 
 // Offset: 6848
 // Size: 123
 // EAX: pSlot_index
 void StopTyping(int pSlot_index) {
-  int i;
+    int i;
 }
 
 // Offset: 6972
@@ -315,7 +313,7 @@ void StopTyping(int pSlot_index) {
 // EAX: pSlot_index
 // EDX: pRevert_str
 void RevertTyping(int pSlot_index, char *pRevert_str) {
-  int i;
+    int i;
 }
 
 // Offset: 7096
@@ -352,12 +350,12 @@ void GetTypedName(char *pDestn, int pMax_length) {
 // Size: 212
 // EAX: pSlot_index
 void KillCursor(int pSlot_index) {
-  int x_coord;
-  int y_coord;
-  int i;
-  int j;
-  tRolling_letter *let;
-  tRolling_type new_type;
+    int x_coord;
+    int y_coord;
+    int i;
+    int j;
+    tRolling_letter *let;
+    tRolling_type new_type;
 }
 
 // Offset: 7744

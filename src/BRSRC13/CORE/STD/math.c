@@ -1,6 +1,5 @@
 #include "math.h"
 
-// Global variables
 char rscid[46];
 
 // Offset: 13

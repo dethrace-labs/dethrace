@@ -1,5 +1,9 @@
+#ifndef _ERROR_H_
+#define _ERROR_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 15
 // Size: 55
 br_error BrLastErrorGet(void **valuep);
@@ -8,3 +12,4 @@ br_error BrLastErrorGet(void **valuep);
 // Size: 46
 void BrLastErrorSet(br_error type, void *value);
 
+#endif

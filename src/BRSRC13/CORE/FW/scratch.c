@@ -1,6 +1,5 @@
 #include "scratch.h"
 
-// Global variables
 char scratchString[512];
 char rscid[49];
 

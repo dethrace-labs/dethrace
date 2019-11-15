@@ -1,14 +1,13 @@
 #include "sys_conf.h"
 
-// Global variables
 br_token valid_system_config_tokens[5];
 
 // Offset: 26
 // Size: 106
 // EAX: t
 br_boolean Is_Valid_Sys_Config_Token(br_token t) {
-  br_boolean bOK;
-  int i;
+    br_boolean bOK;
+    int i;
 }
 
 // Offset: 145
@@ -18,10 +17,10 @@ br_boolean Is_Valid_Sys_Config_Token(br_token t) {
 // EBX: t
 // ECX: Entry
 br_boolean LoadIniEntry(char *ini_file, char *section_name, br_token t, char *Entry) {
-  char Temp[255];
-  br_uint_16 size;
-  br_value v;
-  br_error r;
+    char Temp[255];
+    br_uint_16 size;
+    br_value v;
+    br_error r;
 }
 
 // Offset: 289
@@ -38,10 +37,10 @@ br_error LoadIniConfig(char *ini_file, char *section_name) {
 // EBX: t
 // ECX: Entry
 br_boolean LoadRegistryEntry(char *Reg_Path, void *hKey, br_token t, char *Entry) {
-  char Temp[255];
-  br_uint_16 size;
-  br_value v;
-  br_error r;
+    char Temp[255];
+    br_uint_16 size;
+    br_value v;
+    br_error r;
 }
 
 // Offset: 669
@@ -56,36 +55,36 @@ br_error LoadRegistryConfig(char *Reg_Path, void *hKey) {
 // EAX: t
 // EDX: Entry
 br_error BrSetDefaultConfig(br_token t, char *Entry) {
-  char Reg_Path[255];
-  int v0;
-  int v1;
-  int v2;
-  br_value v;
+    char Reg_Path[255];
+    int v0;
+    int v1;
+    int v2;
+    br_value v;
 }
 
 // Offset: 1125
 // Size: 328
 br_error BrSystemConfigBegin() {
-  char temp[255];
-  br_value v;
+    char temp[255];
+    br_value v;
 }
 
 // Offset: 1472
 // Size: 188
 br_error BrSystemConfigLoad(br_token t, char *Param1, void *Param2) {
-  br_error r;
+    br_error r;
 }
 
 // Offset: 1684
 // Size: 158
 br_error BrSystemConfigSetString(br_token t, char *string) {
-  br_value v;
+    br_value v;
 }
 
 // Offset: 1868
 // Size: 175
 br_error BrSystemConfigQueryString(br_token t, char *string, int max_size) {
-  br_error r;
-  br_value v;
+    br_error r;
+    br_value v;
 }
 

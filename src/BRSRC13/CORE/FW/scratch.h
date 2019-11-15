@@ -1,5 +1,9 @@
+#ifndef _SCRATCH_H_
+#define _SCRATCH_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 18
 // Size: 153
 void* BrScratchAllocate(br_size_t size);
@@ -24,3 +28,4 @@ char* BrScratchString();
 // Size: 40
 br_size_t BrScratchStringSize();
 
+#endif

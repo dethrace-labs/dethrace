@@ -1,6 +1,5 @@
 #include "image.h"
 
-// Global variables
 char rscid[50];
 
 // Offset: 11
@@ -16,24 +15,24 @@ br_boolean BrImageRemove(br_image *img) {
 // Offset: 147
 // Size: 201
 br_image* BrImageFind(char *pattern) {
-  char *c;
-  br_image *img;
+    char *c;
+    br_image *img;
 }
 
 // Offset: 362
 // Size: 140
 // EAX: name
 br_image* imageLoadHost(char *name) {
-  br_image *img;
-  void *host_image;
+    br_image *img;
+    void *host_image;
 }
 
 // Offset: 519
 // Size: 454
 br_image* BrImageReference(char *name) {
-  char *suffix;
-  char *scratch;
-  br_image *img;
+    char *suffix;
+    char *scratch;
+    br_image *img;
 }
 
 // Offset: 989
@@ -42,16 +41,16 @@ br_image* BrImageReference(char *name) {
 // EDX: name
 // EBX: hint
 void* imageLookupName(br_image *img, char *name, br_uint_32 hint) {
-  int c;
-  int limit;
-  int base;
+    int c;
+    int limit;
+    int base;
 }
 
 // Offset: 1339
 // Size: 231
 void* BrImageLookupName(br_image *img, char *name, br_uint_32 hint) {
-  char *scratch;
-  void *p;
+    char *scratch;
+    void *p;
 }
 
 // Offset: 1591
@@ -67,7 +66,7 @@ void BrImageDereference(br_image *image) {
 // Offset: 1891
 // Size: 90
 void BrImageFree(br_image *image) {
-  int i;
+    int i;
 }
 
 // Offset: 1994

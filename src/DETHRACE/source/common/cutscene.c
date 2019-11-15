@@ -1,13 +1,12 @@
 #include "cutscene.h"
 
-// Global variables
 tS32 gLast_demo_end_anim;
 
 // Offset: 0
 // Size: 118
 void* radmalloc(unsigned long numbytes) {
-  unsigned char *temp;
-  unsigned char i;
+    unsigned char *temp;
+    unsigned char i;
 }
 
 // Offset: 120
@@ -20,7 +19,7 @@ void radfree(void *ptr) {
 // EAX: pIndex
 // EDX: pWait_end
 // EBX: pSound_ID
-void ShowCutScene(int pIndex, int pWait_end, int pSound_ID, br_scalar pDelay, signed char __unk4__) {
+void ShowCutScene(int pIndex, int pWait_end, int pSound_ID, br_scalar pDelay) {
 }
 
 // Offset: 360
@@ -37,14 +36,14 @@ void DoStainlessLogo() {
 // Size: 844
 // EAX: pSmack_name
 void PlaySmackerFile(char *pSmack_name) {
-  tPath_name the_path;
-  br_colour *br_colours_ptr;
-  tU8 *smack_colours_ptr;
-  Smack *smk;
-  int i;
-  int j;
-  int len;
-  int fuck_off;
+    tPath_name the_path;
+    br_colour *br_colours_ptr;
+    tU8 *smack_colours_ptr;
+    Smack *smk;
+    int i;
+    int j;
+    int len;
+    int fuck_off;
 }
 
 // Offset: 1276
@@ -65,7 +64,7 @@ void DoGoToRaceAnimation() {
 // Offset: 1452
 // Size: 215
 void DoEndRaceAnimation() {
-  int went_up_a_rank;
+    int went_up_a_rank;
 }
 
 // Offset: 1668

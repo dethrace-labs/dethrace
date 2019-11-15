@@ -1,5 +1,9 @@
+#ifndef _MAIN_H_
+#define _MAIN_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 161
 void QuitGame();
@@ -29,5 +33,6 @@ void ServiceGameInRace();
 // Size: 177
 // EAX: pArgc
 // EDX: pArgv
-void GameMain(int pArgc, char **pArgv, union CD_dir);
+void GameMain(int pArgc, char **pArgv);
 
+#endif

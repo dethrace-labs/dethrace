@@ -1,8 +1,12 @@
+#ifndef _RENDER_H_
+#define _RENDER_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 16
 // Size: 1005
-void BrDbModelRender(br_actor *actor, br_model *model, br_material *material, void *render_data, br_uint_8 style);
+void BrDbModelRender(br_actor *actor, br_model *model, br_material *material, void *render_data, br_uint_8 style, int on_screen, int use_custom);
 
 // Offset: 1037
 // Size: 100
@@ -12,14 +16,14 @@ br_uint_32 BrOnScreenCheck(br_bounds3 *bounds);
 // Size: 261
 // EAX: ap
 // EDX: t
-br_uint_16 prependActorTransform(br_actor *ap);
+br_uint_16 prependActorTransform(br_actor *ap, br_uint_16 t);
 
 // Offset: 1434
 // Size: 196
 // EAX: mat
 // EDX: mat_t
 // EBX: t
-br_uint_16 prependMatrix(br_matrix34 *mat, br_uint_16 mat_t);
+br_uint_16 prependMatrix(br_matrix34 *mat, br_uint_16 mat_t, br_uint_16 t);
 
 // Offset: 1642
 // Size: 1009
@@ -27,7 +31,7 @@ br_uint_16 prependMatrix(br_matrix34 *mat, br_uint_16 mat_t);
 // EDX: model
 // EBX: material
 // ECX: render_data
-void actorRender(br_actor *ap, br_model *model, br_material *material, void *render_data);
+void actorRender(br_actor *ap, br_model *model, br_material *material, void *render_data, br_uint_8 style, br_uint_16 t);
 
 // Offset: 2671
 // Size: 522
@@ -35,7 +39,7 @@ void actorRender(br_actor *ap, br_model *model, br_material *material, void *ren
 // EDX: model
 // EBX: material
 // ECX: render_data
-void actorRenderOnScreen(br_actor *ap, br_model *model, br_material *material, void *render_data);
+void actorRenderOnScreen(br_actor *ap, br_model *model, br_material *material, void *render_data, br_uint_8 style, br_uint_16 t);
 
 // Offset: 3210
 // Size: 198
@@ -103,11 +107,11 @@ br_primitive_cbfn* BrZsPrimitiveCallbackSet(br_primitive_cbfn *new_cbfn);
 
 // Offset: 7635
 // Size: 159
-void BrZbModelRender(br_actor *actor, br_model *model, br_material *material, br_uint_8 style);
+void BrZbModelRender(br_actor *actor, br_model *model, br_material *material, br_uint_8 style, int on_screen, int use_custom);
 
 // Offset: 7810
 // Size: 192
-void BrZsModelRender(br_actor *actor, br_model *model, br_material *material, br_order_table *order_table, br_uint_8 style);
+void BrZsModelRender(br_actor *actor, br_model *model, br_material *material, br_order_table *order_table, br_uint_8 style, int on_screen, int use_custom);
 
 // Offset: 8030
 // Size: 111
@@ -117,3 +121,4 @@ br_renderbounds_cbfn* BrZbRenderBoundsCallbackSet(br_renderbounds_cbfn *new_cbfn
 // Size: 111
 br_renderbounds_cbfn* BrZsRenderBoundsCallbackSet(br_renderbounds_cbfn *new_cbfn);
 
+#endif

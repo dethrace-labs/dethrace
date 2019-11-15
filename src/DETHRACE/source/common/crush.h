@@ -1,5 +1,9 @@
+#ifndef _CRUSH_H_
+#define _CRUSH_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 620
 // EAX: pF
@@ -28,7 +32,7 @@ void DisposeCrushData(tCrush_data *pCrush_data);
 // EDX: pModel_index
 // EBX: pModel
 // ECX: pCrush_point_index
-void CrushModelPoint(tCar_spec *pCar, int pModel_index, br_model *pModel, int pCrush_point_index, br_vector3 *pEnergy_vector, br_scalar total_energy);
+void CrushModelPoint(tCar_spec *pCar, int pModel_index, br_model *pModel, int pCrush_point_index, br_vector3 *pEnergy_vector, br_scalar total_energy, tCrush_data *pCrush_data);
 
 // Offset: 3344
 // Size: 527
@@ -36,18 +40,18 @@ void CrushModelPoint(tCar_spec *pCar, int pModel_index, br_model *pModel, int pC
 // EDX: pModel_index
 // EBX: pActor
 // ECX: pImpact_point
-void CrushModel(tCar_spec *pCar, int pModel_index, br_actor *pActor, br_vector3 *pImpact_point, br_vector3 *pEnergy_vector);
+void CrushModel(tCar_spec *pCar, int pModel_index, br_actor *pActor, br_vector3 *pImpact_point, br_vector3 *pEnergy_vector, tCrush_data *pCrush_data);
 
 // Offset: 3872
 // Size: 99
-void JitModelUpdate(br_actor *actor, br_model *model, br_material *material, void *render_data);
+void JitModelUpdate(br_actor *actor, br_model *model, br_material *material, void *render_data, br_uint_8 style, int on_screen);
 
 // Offset: 3972
 // Size: 131
 // EAX: pModel
 // EDX: pCar
 // EBX: crush_only
-void SetModelForUpdate(br_model *pModel, tCar_spec *pCar);
+void SetModelForUpdate(br_model *pModel, tCar_spec *pCar, int crush_only);
 
 // Offset: 4104
 // Size: 380
@@ -55,7 +59,7 @@ void SetModelForUpdate(br_model *pModel, tCar_spec *pCar);
 // EDX: pModel_index
 // EBX: pActor
 // ECX: pCrush_data
-void TotallySpamTheModel(tCar_spec *pCar, int pModel_index, br_actor *pActor, tCrush_data *pCrush_data);
+void TotallySpamTheModel(tCar_spec *pCar, int pModel_index, br_actor *pActor, tCrush_data *pCrush_data, br_scalar pMagnitude);
 
 // Offset: 4484
 // Size: 662
@@ -63,7 +67,7 @@ void TotallySpamTheModel(tCar_spec *pCar, int pModel_index, br_actor *pActor, tC
 // EDX: pModel_index
 // EBX: pActor
 // ECX: pUndamaged_vertices
-br_scalar RepairModel(tCar_spec *pCar, int pModel_index, br_actor *pActor, br_vertex *pUndamaged_vertices, br_scalar pAmount);
+br_scalar RepairModel(tCar_spec *pCar, int pModel_index, br_actor *pActor, br_vertex *pUndamaged_vertices, br_scalar pAmount, br_scalar *pTotal_deflection);
 
 // Offset: 5148
 // Size: 298
@@ -107,7 +111,7 @@ void SetKnackeredFlag(tCar_spec *pCar);
 // EAX: pCar
 // EDX: pUnit_type
 // EBX: pDamage_amount
-void DamageUnit2(tCar_spec *pCar, int pUnit_type);
+void DamageUnit2(tCar_spec *pCar, int pUnit_type, int pDamage_amount);
 
 // Offset: 7104
 // Size: 236
@@ -118,7 +122,7 @@ void RecordLastDamage(tCar_spec *pCar);
 // Size: 249
 // EAX: pCar
 // EDX: pDamage_type
-void DoDamage(tCar_spec *pCar, tDamage_type pDamage_type, float pMagnitude);
+void DoDamage(tCar_spec *pCar, tDamage_type pDamage_type, float pMagnitude, float pNastiness);
 
 // Offset: 7592
 // Size: 650
@@ -143,7 +147,7 @@ void DoPratcamHit(br_vector3 *pHit_vector);
 // EDX: pImpact_point
 // EBX: pEnergy_vector
 // ECX: pWas_hitting_a_car
-void DamageSystems(tCar_spec *pCar, br_vector3 *pImpact_point, br_vector3 *pEnergy_vector);
+void DamageSystems(tCar_spec *pCar, br_vector3 *pImpact_point, br_vector3 *pEnergy_vector, int pWas_hitting_a_car);
 
 // Offset: 10840
 // Size: 210
@@ -182,3 +186,4 @@ void DoWheelDamage(tU32 pFrame_period);
 // EDX: pCar2
 void CrashEarnings(tCar_spec *pCar1, tCar_spec *pCar2);
 
+#endif

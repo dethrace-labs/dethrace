@@ -1,5 +1,9 @@
+#ifndef _RACESUMM_H_
+#define _RACESUMM_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 302
 // EAX: pThe_state
@@ -112,7 +116,7 @@ void ZoomOutTo(int pIndex, int *pCurrent_choice, int *pCurrent_mode);
 
 // Offset: 5672
 // Size: 102
-int WreckPick(br_actor *pActor, br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pNear, br_scalar pFar);
+int WreckPick(br_actor *pActor, br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pNear, br_scalar pFar, void *pArg);
 
 // Offset: 5776
 // Size: 404
@@ -220,5 +224,6 @@ void DoNetRaceSummary();
 // Size: 227
 // EAX: pFirst_summary_done
 // EDX: pRace_result
-tSO_result DoEndRaceSummary(int *pFirst_summary_done, tRace_result pRace_result, union result);
+tSO_result DoEndRaceSummary(int *pFirst_summary_done, tRace_result pRace_result);
 
+#endif

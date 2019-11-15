@@ -1,5 +1,9 @@
+#ifndef _READMSE_H_
+#define _READMSE_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 14
 // Size: 358
 br_error DOSMouseBegin();
@@ -12,3 +16,4 @@ void DOSMouseEnd();
 // Size: 217
 br_error DOSMouseRead(br_int_32 *mouse_x, br_int_32 *mouse_y, br_uint_32 *mouse_buttons);
 
+#endif

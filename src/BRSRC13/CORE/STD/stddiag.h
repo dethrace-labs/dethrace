@@ -1,5 +1,9 @@
+#ifndef _STDDIAG_H_
+#define _STDDIAG_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 15
 // Size: 78
 void BrStdioWarning(char *message);
@@ -8,3 +12,4 @@ void BrStdioWarning(char *message);
 // Size: 93
 void BrStdioFailure(char *message);
 
+#endif

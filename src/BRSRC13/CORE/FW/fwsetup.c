@@ -1,6 +1,5 @@
 #include "fwsetup.h"
 
-// Global variables
 br_image Image_BRCORE1;
 br_framework_state fw;
 void *functionPointers_BRCORE1[185];
@@ -22,18 +21,18 @@ br_error BrFwEnd() {
 // Offset: 466
 // Size: 73
 br_diaghandler* BrDiagHandlerSet(br_diaghandler *newdh) {
-  br_diaghandler *old;
+    br_diaghandler *old;
 }
 
 // Offset: 555
 // Size: 73
 br_filesystem* BrFilesystemSet(br_filesystem *newfs) {
-  br_filesystem *old;
+    br_filesystem *old;
 }
 
 // Offset: 643
 // Size: 73
 br_allocator* BrAllocatorSet(br_allocator *newal) {
-  br_allocator *old;
+    br_allocator *old;
 }
 

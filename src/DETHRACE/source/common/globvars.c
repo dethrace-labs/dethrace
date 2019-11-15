@@ -1,6 +1,5 @@
 #include "globvars.h"
 
-// Global variables
 char gNet_player_name[32];
 br_matrix34 gRearview_camera_to_world;
 tSpecial_volume gDefault_default_water_spec_vol;

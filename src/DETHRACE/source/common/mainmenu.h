@@ -1,5 +1,9 @@
+#ifndef _MAINMENU_H_
+#define _MAINMENU_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 194
 // EAX: pCurrent_choice
@@ -24,13 +28,13 @@ void StartMainMenu();
 // Size: 455
 // EAX: pTime_out
 // EDX: pContinue_allowed
-int DoMainMenuInterface(tU32 pTime_out);
+int DoMainMenuInterface(tU32 pTime_out, int pContinue_allowed);
 
 // Offset: 1068
 // Size: 256
 // EAX: pTime_out
 // EDX: pContinue_allowed
-tMM_result GetMainMenuOption(tU32 pTime_out);
+tMM_result GetMainMenuOption(tU32 pTime_out, int pContinue_allowed);
 
 // Offset: 1324
 // Size: 169
@@ -54,12 +58,13 @@ int DoVerifyQuit(int pReplace_background);
 // EAX: pTime_out
 // EDX: pSave_allowed
 // EBX: pContinue_allowed
-tMM_result DoMainMenu(tU32 pTime_out, int pSave_allowed);
+tMM_result DoMainMenu(tU32 pTime_out, int pSave_allowed, int pContinue_allowed);
 
 // Offset: 2420
 // Size: 304
 // EAX: pTime_out
 // EDX: pSave_allowed
 // EBX: pContinue_allowed
-void DoMainMenuScreen(tU32 pTime_out, int pSave_allowed);
+void DoMainMenuScreen(tU32 pTime_out, int pSave_allowed, int pContinue_allowed);
 
+#endif

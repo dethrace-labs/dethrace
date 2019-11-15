@@ -1,5 +1,9 @@
+#ifndef _HOSTCFG_H_
+#define _HOSTCFG_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 18
 // Size: 40
 char* HostDefaultDevice();
@@ -16,3 +20,4 @@ br_error HostIniQuery(char *ini_file, char *section_name, char *entry, char *Buf
 // Size: 54
 br_error HostRegistryQuery(void *hKey, char *Path, char *entry, char *Buffer, br_uint_16 max, br_uint_16 *size);
 
+#endif

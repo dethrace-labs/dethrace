@@ -1,5 +1,9 @@
+#ifndef _TOKEN_H_
+#define _TOKEN_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 13
 // Size: 112
 void BrTokenBegin();
@@ -36,3 +40,4 @@ br_int_32 BrTokenFindMany(char *pattern, br_token *tokens, br_int_32 max_tokens)
 // ECX: ntypes
 br_token BrTokenFindType(br_token *ptype, char *base, br_token *types, br_int_32 ntypes);
 
+#endif

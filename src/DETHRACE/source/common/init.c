@@ -1,6 +1,5 @@
 #include "init.h"
 
-// Global variables
 int gInitialisation_finished;
 tU32 gAustere_time;
 int gInitial_rank;
@@ -21,15 +20,15 @@ void AllocateSelf() {
 // Offset: 116
 // Size: 514
 void AllocateCamera() {
-  int i;
+    int i;
 }
 
 // Offset: 632
 // Size: 582
 void ReinitialiseForwardCamera() {
-  float the_angle;
-  float d;
-  float w;
+    float the_angle;
+    float d;
+    float w;
 }
 
 // Offset: 1216
@@ -45,7 +44,7 @@ void ReinitialiseRearviewCamera() {
 // Offset: 1608
 // Size: 347
 void ReinitialiseRenderStuff() {
-  int y_diff;
+    int y_diff;
 }
 
 // Offset: 1956
@@ -56,8 +55,8 @@ void InstallFindFailedHooks() {
 // Offset: 1992
 // Size: 158
 void AllocateStandardLamp() {
-  br_actor *lamp;
-  int i;
+    br_actor *lamp;
+    int i;
 }
 
 // Offset: 2152
@@ -83,37 +82,38 @@ void InitLineStuff() {
 // Offset: 3084
 // Size: 896
 void InitSmokeStuff() {
-  tPath_name path;
+    tPath_name path;
 }
 
 // Offset: 3980
 // Size: 1350
 void Init2DStuff() {
-  br_token_value fadealpha[3];
-  tPath_name path;
-  br_scalar prat_u;
-  br_scalar prat_v;
+    br_token_value fadealpha[3];
+    tPath_name path;
+    br_scalar prat_u;
+    br_scalar prat_v;
 }
 
 // Offset: 5332
 // Size: 671
 // EAX: pArgc
 // EDX: pArgv
-void InitialiseApplication(int pArgc, char **pArgv, signed char __unk2__) {
+void InitialiseApplication(int pArgc, char **pArgv) {
 }
 
 // Offset: 6004
 // Size: 64
 // EAX: pArgc
 // EDX: pArgv
-void InitialiseDeathRace(int pArgc, char **pArgv, signed char the_path) {
+void InitialiseDeathRace(int pArgc, char **pArgv) {
+    tPath_name the_path;
 }
 
 // Offset: 6068
 // Size: 427
 // EAX: pStart_race
 void InitGame(int pStart_race) {
-  int i;
+    int i;
 }
 
 // Offset: 6496

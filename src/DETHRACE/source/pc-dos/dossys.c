@@ -1,6 +1,5 @@
 #include "dossys.h"
 
-// Global variables
 int gASCII_table[128];
 tU32 gKeyboard_bits[8];
 int gASCII_shift_table[128];
@@ -33,9 +32,9 @@ tU8 gScan_code[123][2];
 // Offset: 0
 // Size: 291
 void KeyboardHandler() {
-  tU8 scan_code;
-  tU8 up;
-  tU8 extended;
+    tU8 scan_code;
+    tU8 up;
+    tU8 extended;
 }
 
 // Offset: 292
@@ -72,11 +71,10 @@ int KeyDown22(int pKey_index) {
 // Size: 141
 // EAX: pKeys
 // EDX: pMark
-void PDSetKeyArray(int *pKeys) {
-  int pMark;
-  int i;
-  tS32 joyX;
-  tS32 joyY;
+void PDSetKeyArray(int *pKeys, int pMark) {
+    int i;
+    tS32 joyX;
+    tS32 joyY;
 }
 
 // Offset: 2612
@@ -89,7 +87,7 @@ int PDGetASCIIFromKey(int pKey) {
 // Size: 174
 // EAX: pThe_str
 void PDFatalError(char *pThe_str) {
-  int been_here;
+    int been_here;
 }
 
 // Offset: 2864
@@ -101,9 +99,9 @@ void PDNonFatalError(char *pThe_str) {
 // Offset: 2920
 // Size: 190
 void PDInitialiseSystem() {
-  tPath_name the_path;
-  FILE *f;
-  int len;
+    tPath_name the_path;
+    FILE *f;
+    int len;
 }
 
 // Offset: 3112
@@ -125,7 +123,7 @@ void PDRevertPalette() {
 // Size: 90
 // EAX: pArgc
 // EDX: pArgv
-int PDInitScreenVars(int pArgc, char **pArgv, unsigned int __unk2__) {
+int PDInitScreenVars(int pArgc, char **pArgv) {
 }
 
 // Offset: 3300
@@ -154,15 +152,15 @@ void PDAllocateScreenAndBack() {
 // EDX: pSrc
 // EBX: pPalette
 void Copy8BitTo16BitPixelmap(br_pixelmap *pDst, br_pixelmap *pSrc, br_pixelmap *pPalette) {
-  int x;
-  int y;
-  tU8 *src;
-  tU8 value;
-  tU8 red;
-  tU8 green;
-  tU8 blue;
-  tU16 *dst;
-  tU16 *palette_entry;
+    int x;
+    int y;
+    tU8 *src;
+    tU8 value;
+    tU8 red;
+    tU8 green;
+    tU8 blue;
+    tU16 *dst;
+    tU16 *palette_entry;
 }
 
 // Offset: 4132
@@ -172,17 +170,17 @@ void Copy8BitTo16BitPixelmap(br_pixelmap *pDst, br_pixelmap *pSrc, br_pixelmap *
 // EBX: pPalette
 // ECX: pOff
 void Double8BitTo16BitPixelmap(br_pixelmap *pDst, br_pixelmap *pSrc, br_pixelmap *pPalette, tU16 pOff, tU16 pSrc_width, tU16 pSrc_height) {
-  int x;
-  int y;
-  tU8 *src;
-  tU8 value;
-  tU8 red;
-  tU8 green;
-  tU8 blue;
-  tU16 *dst0;
-  tU16 *dst1;
-  tU16 sixteen;
-  tU16 *palette_entry;
+    int x;
+    int y;
+    tU8 *src;
+    tU8 value;
+    tU8 red;
+    tU8 green;
+    tU8 blue;
+    tU16 *dst0;
+    tU16 *dst1;
+    tU16 sixteen;
+    tU16 *palette_entry;
 }
 
 // Offset: 4440
@@ -220,10 +218,7 @@ void PDScreenBufferSwap(int pRendering_area_only) {
 // EDX: dx
 // EBX: dy
 // ECX: src
-void PDPixelmapToScreenRectangleCopy(br_pixelmap *dst, br_int_16 dx, br_int_16 dy, br_pixelmap *src, br_int_16 sx) {
-  br_int_16 sy;
-  br_uint_16 w;
-  br_uint_16 h;
+void PDPixelmapToScreenRectangleCopy(br_pixelmap *dst, br_int_16 dx, br_int_16 dy, br_pixelmap *src, br_int_16 sx, br_int_16 sy, br_uint_16 w, br_uint_16 h) {
 }
 
 // Offset: 5104
@@ -232,10 +227,7 @@ void PDPixelmapToScreenRectangleCopy(br_pixelmap *dst, br_int_16 dx, br_int_16 d
 // EDX: x1
 // EBX: y1
 // ECX: x2
-void PDPixelmapHLineOnScreen(br_pixelmap *dst, br_int_16 x1, br_int_16 y1) {
-  br_int_16 x2;
-  br_int_16 y2;
-  br_uint_32 colour;
+void PDPixelmapHLineOnScreen(br_pixelmap *dst, br_int_16 x1, br_int_16 y1, br_int_16 x2, br_int_16 y2, br_uint_32 colour) {
 }
 
 // Offset: 5172
@@ -244,10 +236,7 @@ void PDPixelmapHLineOnScreen(br_pixelmap *dst, br_int_16 x1, br_int_16 y1) {
 // EDX: x1
 // EBX: y1
 // ECX: x2
-void PDPixelmapVLineOnScreen(br_pixelmap *dst, br_int_16 x1, br_int_16 y1) {
-  br_int_16 x2;
-  br_int_16 y2;
-  br_uint_32 colour;
+void PDPixelmapVLineOnScreen(br_pixelmap *dst, br_int_16 x1, br_int_16 y1, br_int_16 x2, br_int_16 y2, br_uint_32 colour) {
 }
 
 // Offset: 5240
@@ -264,16 +253,17 @@ void PDSetFileVariables() {
 // Size: 98
 // EAX: pThe_path
 void PDBuildAppPath(char *pThe_path) {
-  int pos;
+    int pos;
 }
 
 // Offset: 5404
 // Size: 133
 // EAX: pThe_path
 // EDX: pAction_routine
-void PDForEveryFile(char *pThe_path, void (*pAction_routine)(char*), signed char find_path) {
-  char found_path[256];
-  find_t the_find_buffer;
+void PDForEveryFile(char *pThe_path, void (*pAction_routine)(char*)) {
+    char find_path[256];
+    char found_path[256];
+    find_t the_find_buffer;
 }
 
 // Offset: 5540
@@ -287,10 +277,9 @@ void PDSetPalette(br_pixelmap *pThe_palette) {
 // EAX: pPalette
 // EDX: pFirst_colour
 // EBX: pCount
-void PDSetPaletteEntries(br_pixelmap *pPalette, int pFirst_colour) {
-  int pCount;
-  int i;
-  tU8 *p;
+void PDSetPaletteEntries(br_pixelmap *pPalette, int pFirst_colour, int pCount) {
+    int i;
+    tU8 *p;
 }
 
 // Offset: 5716
@@ -308,9 +297,9 @@ void PDSwitchToLoresMode() {
 // EAX: pButton_1
 // EDX: pButton_2
 void PDMouseButtons(int *pButton_1, int *pButton_2) {
-  br_uint_32 mouse_buttons;
-  br_int_32 mouse_x;
-  br_int_32 mouse_y;
+    br_uint_32 mouse_buttons;
+    br_int_32 mouse_x;
+    br_int_32 mouse_y;
 }
 
 // Offset: 5892
@@ -318,13 +307,13 @@ void PDMouseButtons(int *pButton_1, int *pButton_2) {
 // EAX: pX_coord
 // EDX: pY_coord
 void PDGetMousePosition(int *pX_coord, int *pY_coord) {
-  br_uint_32 mouse_buttons;
-  br_int_32 mouse_x2;
-  br_int_32 mouse_y2;
-  int delta_x;
-  int delta_y;
-  br_int_32 mouse_x;
-  br_int_32 mouse_y;
+    br_uint_32 mouse_buttons;
+    br_int_32 mouse_x2;
+    br_int_32 mouse_y2;
+    int delta_x;
+    int delta_y;
+    br_int_32 mouse_x;
+    br_int_32 mouse_y;
 }
 
 // Offset: 6272
@@ -341,9 +330,9 @@ int PDServiceSystem(tU32 pTime_since_last_call) {
 // Offset: 6352
 // Size: 121
 tU32 LargestBlockAvail() {
-  SREGS sregs;
-  tMem_info mem_info;
-  size_t memmax;
+    SREGS sregs;
+    tMem_info mem_info;
+    size_t memmax;
 }
 
 // Offset: 6476
@@ -351,7 +340,7 @@ tU32 LargestBlockAvail() {
 // EAX: pMaximum_required
 // EDX: pAmount_allocated
 void* PDGrabLargestMammaryWeCanPlayWith(tU32 pMaximum_required, tU32 *pAmount_allocated) {
-  void *result;
+    void *result;
 }
 
 // Offset: 6588
@@ -359,8 +348,8 @@ void* PDGrabLargestMammaryWeCanPlayWith(tU32 pMaximum_required, tU32 *pAmount_al
 // EAX: pBuffer
 // EDX: pBuffer_size
 void PDAllocateActionReplayBuffer(char **pBuffer, tU32 *pBuffer_size) {
-  tU32 lba;
-  tU32 required;
+    tU32 lba;
+    tU32 required;
 }
 
 // Offset: 6788
@@ -373,16 +362,17 @@ void PDDisposeActionReplayBuffer(char *pBuffer) {
 // Size: 146
 // EAX: pProgpath
 void Usage(char *pProgpath) {
-  char basename[9];
+    char basename[9];
 }
 
 // Offset: 6972
 // Size: 722
 // EAX: pArgc
 // EDX: pArgv
-int main(int pArgc, char **pArgv, unsigned int arg) {
-  int i;
-  float f;
+int main(int pArgc, char **pArgv) {
+    int arg;
+    int i;
+    float f;
 }
 
 // Offset: 7696
@@ -393,23 +383,23 @@ int OurGetChar() {
 // Offset: 7760
 // Size: 34
 int PDGetGorePassword() {
-  int len;
-  int chances;
-  char password[17];
+    int len;
+    int chances;
+    char password[17];
 }
 
 // Offset: 7796
 // Size: 73
 // EAX: pGory
 void PDDisplayGoreworthiness(int pGory) {
-  tU32 delay_start;
+    tU32 delay_start;
 }
 
 // Offset: 7872
 // Size: 35
 // EAX: pStr
 void PDEnterDebugger(char *pStr) {
-  unsigned char *save_it;
+    unsigned char *save_it;
 }
 
 // Offset: 7908
@@ -427,9 +417,9 @@ int matherr(exception *err) {
 // Size: 127
 // EAX: limit
 int LoopLimitTooLow(tU32 limit) {
-  clock_t start;
-  tU32 count;
-  tU32 val;
+    clock_t start;
+    tU32 count;
+    tU32 val;
 }
 
 // Offset: 8120
@@ -446,16 +436,16 @@ int InitJoysticks() {
 // Size: 182
 // EAX: pBit
 tU32 ReadJoystickAxis(int pBit) {
-  tU32 val;
-  tU32 count;
+    tU32 val;
+    tU32 count;
 }
 
 // Offset: 8504
 // Size: 406
 void PDReadJoySticks() {
-  tU32 temp1y;
-  tU32 temp2x;
-  tU32 temp2y;
+    tU32 temp1y;
+    tU32 temp2x;
+    tU32 temp2y;
 }
 
 // Offset: 8912
@@ -522,7 +512,7 @@ int PDGetJoy2Button4() {
 // Size: 51
 // EAX: pThe_path
 int PDFileUnlock(char *pThe_path) {
-  unsigned int attr;
+    unsigned int attr;
 }
 
 // Offset: 9876
@@ -535,11 +525,12 @@ void CriticalISR(INTPACK pRegs) {
 // EAX: pThe_path
 // EDX: pFile_name
 // EBX: pMin_size
-int PDCheckDriveExists2(char *pThe_path, char *pFile_name, tU32 pMin_size, char buf) {
-  void (*old_critical_isr)();
-  int stat_failed;
-  char slasher[4];
-  char the_path[256];
+int PDCheckDriveExists2(char *pThe_path, char *pFile_name, tU32 pMin_size) {
+    stat buf;
+    void (*old_critical_isr)();
+    int stat_failed;
+    char slasher[4];
+    char the_path[256];
 }
 
 // Offset: 10184

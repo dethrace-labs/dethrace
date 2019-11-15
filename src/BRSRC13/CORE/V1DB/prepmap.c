@@ -1,6 +1,5 @@
 #include "prepmap.h"
 
-// Global variables
 char rscid[51];
 
 // Offset: 12
@@ -14,7 +13,7 @@ void BrMapUpdate(br_pixelmap *map, br_uint_16 flags) {
 // EDX: use
 // EBX: flags
 void BrBufferUpdate(br_pixelmap *pm, br_token use, br_uint_16 flags) {
-  br_token_value tv[3];
+    br_token_value tv[3];
 }
 
 // Offset: 301

@@ -1,6 +1,5 @@
 #include "preptab.h"
 
-// Global variables
 char rscid[51];
 
 // Offset: 14

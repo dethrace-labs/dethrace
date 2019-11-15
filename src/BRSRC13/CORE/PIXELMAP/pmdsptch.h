@@ -1,5 +1,9 @@
+#ifndef _PMDSPTCH_H_
+#define _PMDSPTCH_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 22
 // Size: 107
 br_pixelmap* BrPixelmapAllocateSub(br_pixelmap *src, br_int_32 x, br_int_32 y, br_int_32 w, br_int_32 h);
@@ -112,19 +116,19 @@ void BrPixelmapDoubleBuffer(br_pixelmap *dst, br_pixelmap *src);
 
 // Offset: 4709
 // Size: 98
-void BrPixelmapText(br_pixelmap *dst, br_int_32 x, br_int_32 y, br_uint_32 colour, br_font *font, char *text, long p);
+void BrPixelmapText(br_pixelmap *dst, br_int_32 x, br_int_32 y, br_uint_32 colour, br_font *font, char *text);
 
 // Offset: 4823
 // Size: 145
-void BrPixelmapTextF(br_pixelmap *dst, br_int_32 x, br_int_32 y, br_uint_32 colour, br_font *font, char *fmt, unsigned short ss, ...);
+void BrPixelmapTextF(br_pixelmap *dst, br_int_32 x, br_int_32 y, br_uint_32 colour, br_font *font, char *fmt, ...);
 
 // Offset: 4988
 // Size: 214
-br_uint_16 BrPixelmapTextWidth(br_pixelmap *dst, br_font *font, char *text, short i);
+br_uint_16 BrPixelmapTextWidth(br_pixelmap *dst, br_font *font, char *text);
 
 // Offset: 5223
 // Size: 51
-br_uint_16 BrPixelmapTextHeight(br_pixelmap *dst, br_font *font, unsigned long __unk2__);
+br_uint_16 BrPixelmapTextHeight(br_pixelmap *dst, br_font *font);
 
 // Offset: 5293
 // Size: 119
@@ -152,7 +156,7 @@ void BrPixelmapPaletteEntrySet(br_pixelmap *pm, br_int_32 index, br_colour colou
 
 // Offset: 5943
 // Size: 96
-void BrPixelmapPaletteEntrySetMany(br_pixelmap *pm, br_int_32 index, br_int_32 ncolours, br_colour *colours, unsigned char clut);
+void BrPixelmapPaletteEntrySetMany(br_pixelmap *pm, br_int_32 index, br_int_32 ncolours, br_colour *colours);
 
 // Offset: 6060
 // Size: 113
@@ -162,3 +166,4 @@ br_pixelmap* BrPixelmapDirectLock(br_pixelmap *src, br_boolean block);
 // Size: 109
 br_pixelmap* BrPixelmapDirectUnlock(br_pixelmap *src);
 
+#endif

@@ -1,5 +1,9 @@
+#ifndef _HSTSETUP_H_
+#define _HSTSETUP_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 10
 // Size: 49
 void HostBegin();
@@ -10,5 +14,6 @@ void HostEnd();
 
 // Offset: 125
 // Size: 125
-br_error HostInfo(host_info *buffer);
+br_error HostInfo(host_info *buffer, br_size_t buffersize);
 
+#endif

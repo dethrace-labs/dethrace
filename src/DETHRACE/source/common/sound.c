@@ -1,6 +1,5 @@
 #include "sound.h"
 
-// Global variables
 tS3_outlet_ptr gIndexed_outlets[6];
 int gRandom_CDA_tunes[7];
 tU32 gLast_sound_service;
@@ -33,19 +32,19 @@ tS3_outlet_ptr gEffects_outlet;
 // Offset: 0
 // Size: 224
 void UsePathFileToDetermineIfFullInstallation() {
-  char line2[80];
-  char line3[80];
-  char path_file[80];
-  FILE *fp;
+    char line2[80];
+    char line3[80];
+    char path_file[80];
+    FILE *fp;
 }
 
 // Offset: 224
 // Size: 976
 void InitSound() {
-  tS3_sound_tag tag;
-  int engine_channel_count;
-  int car_channel_count;
-  int ped_channel_count;
+    tS3_sound_tag tag;
+    int engine_channel_count;
+    int car_channel_count;
+    int ped_channel_count;
 }
 
 // Offset: 1200
@@ -179,25 +178,25 @@ void ToggleSoundEnable() {
 // Offset: 2900
 // Size: 125
 void SoundService() {
-  br_matrix34 mat;
+    br_matrix34 mat;
 }
 
 // Offset: 3028
 // Size: 521
 void InitSoundSources() {
-  int car_count;
-  int i;
-  int toggle;
-  tCar_spec *the_car;
+    int car_count;
+    int i;
+    int toggle;
+    tCar_spec *the_car;
 }
 
 // Offset: 3552
 // Size: 411
 void DisposeSoundSources() {
-  int car_count;
-  int i;
-  int toggle;
-  tCar_spec *the_car;
+    int car_count;
+    int i;
+    int toggle;
+    tCar_spec *the_car;
 }
 
 // Offset: 3964
@@ -207,7 +206,7 @@ void DisposeSoundSources() {
 // EBX: pInitial_position
 // ECX: pInitial_velocity
 tS3_sound_tag DRS3StartSound3D(tS3_outlet_ptr pOutlet, tS3_sound_id pSound, br_vector3 *pInitial_position, br_vector3 *pInitial_velocity, tS3_repeats pRepeats, tS3_volume pVolume, tS3_pitch pPitch, tS3_speed pSpeed) {
-  tS3_sound_tag tag;
+    tS3_sound_tag tag;
 }
 
 // Offset: 4156
@@ -217,7 +216,7 @@ tS3_sound_tag DRS3StartSound3D(tS3_outlet_ptr pOutlet, tS3_sound_id pSound, br_v
 // EBX: pRepeats
 // ECX: pVolume
 tS3_sound_tag DRS3StartSoundFromSource3(tS3_sound_source_ptr pSource, tS3_sound_id pSound, tS3_repeats pRepeats, tS3_volume pVolume, tS3_pitch pPitch, tS3_speed pSpeed) {
-  tS3_sound_tag tag;
+    tS3_sound_tag tag;
 }
 
 // Offset: 4256
@@ -225,20 +224,20 @@ tS3_sound_tag DRS3StartSoundFromSource3(tS3_sound_source_ptr pSource, tS3_sound_
 // EAX: pSource
 // EDX: pSound
 tS3_sound_tag DRS3StartSoundFromSource(tS3_sound_source_ptr pSource, tS3_sound_id pSound) {
-  tS3_sound_tag tag;
+    tS3_sound_tag tag;
 }
 
 // Offset: 4336
 // Size: 1377
 void MungeEngineNoise() {
-  tU32 pitch;
-  int vol;
-  int cat;
-  int car_count;
-  int i;
-  int stop_all;
-  int type_of_engine_noise;
-  tS3_sound_id engine_noise;
+    tU32 pitch;
+    int vol;
+    int cat;
+    int car_count;
+    int i;
+    int stop_all;
+    int type_of_engine_noise;
+    tS3_sound_id engine_noise;
 }
 
 // Offset: 5716
@@ -256,7 +255,7 @@ tS3_outlet_ptr GetOutletFromIndex(int pIndex) {
 // Size: 97
 // EAX: pOutlet
 int GetIndexFromOutlet(tS3_outlet_ptr pOutlet) {
-  int i;
+    int i;
 }
 
 // Offset: 6028

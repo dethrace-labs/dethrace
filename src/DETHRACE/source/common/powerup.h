@@ -1,10 +1,14 @@
+#ifndef _POWERUP_H_
+#define _POWERUP_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 303
 // EAX: pThe_powerup
 // EDX: pTell_net_players
-void LosePowerupX(tPowerup *pThe_powerup);
+void LosePowerupX(tPowerup *pThe_powerup, int pTell_net_players);
 
 // Offset: 304
 // Size: 50
@@ -22,13 +26,13 @@ void LoseAllSimilarPowerups(tPowerup *pThe_powerup);
 // EDX: pIndex
 // EBX: pTell_net_players
 // ECX: pDisplay_headup
-int GotPowerupX(tCar_spec *pCar, int pIndex, int pTell_net_players);
+int GotPowerupX(tCar_spec *pCar, int pIndex, int pTell_net_players, int pDisplay_headup, tU32 pTime_left);
 
 // Offset: 1560
 // Size: 67
 // EAX: pCar
 // EDX: pIndex
-int GotPowerup(tCar_spec *pCar);
+int GotPowerup(tCar_spec *pCar, int pIndex);
 
 // Offset: 1628
 // Size: 811
@@ -107,7 +111,7 @@ int GotCredits(tPowerup *pPowerup, tCar_spec *pCar);
 // Size: 89
 // EAX: pCar
 // EDX: pIndex
-void ImprovePSPowerup(tCar_spec *pCar);
+void ImprovePSPowerup(tCar_spec *pCar, int pIndex);
 
 // Offset: 4388
 // Size: 397
@@ -245,7 +249,7 @@ int TakeDrugs(tPowerup *pPowerup, tCar_spec *pCar);
 // Size: 195
 // EAX: pPixelmap
 // EDX: pOffset
-void PaletteFuckedUpByDrugs(br_pixelmap *pPixelmap);
+void PaletteFuckedUpByDrugs(br_pixelmap *pPixelmap, int pOffset);
 
 // Offset: 6884
 // Size: 72
@@ -501,3 +505,4 @@ void SendCurrentPowerups();
 // EAX: pCar
 void LoseAllLocalPowerups(tCar_spec *pCar);
 
+#endif

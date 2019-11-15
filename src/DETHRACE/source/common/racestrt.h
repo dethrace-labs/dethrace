@@ -1,5 +1,9 @@
+#ifndef _RACESTRT_H_
+#define _RACESTRT_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 1371
 // EAX: pOffset
@@ -10,7 +14,7 @@ void DrawRaceList(int pOffset);
 // EAX: pFrom
 // EDX: pTo
 // EBX: pTime_to_move
-void MoveRaceList(int pFrom, int pTo, tS32 pTime_to_move, unsigned short start_time);
+void MoveRaceList(int pFrom, int pTo, tS32 pTime_to_move);
 
 // Offset: 1516
 // Size: 227
@@ -57,7 +61,7 @@ void StartChangeRace();
 // EAX: pRace_index
 // EDX: pNet_mode
 // EBX: pNet_race_sequence
-int ChangeRace(int *pRace_index, int pNet_mode, tNet_sequence_type pNet_race_sequence, signed char flicker_on);
+int ChangeRace(int *pRace_index, int pNet_mode, tNet_sequence_type pNet_race_sequence);
 
 // Offset: 2620
 // Size: 62
@@ -112,7 +116,7 @@ int ChangeCarGoAhead(int *pCurrent_choice, int *pCurrent_mode);
 // EAX: pNet_mode
 // EDX: pCar_index
 // EBX: pNet_game
-int ChangeCar(int pNet_mode, int *pCar_index, tNet_game_details *pNet_game, signed char flicker_on);
+int ChangeCar(int pNet_mode, int *pCar_index, tNet_game_details *pNet_game);
 
 // Offset: 5260
 // Size: 48
@@ -334,7 +338,7 @@ tSO_result DoSelectRace(int *pSecond_time_around);
 // EAX: pX
 // EDX: pY
 // EBX: pImage
-void DrawGridCar(int pX, int pY, br_pixelmap *pImage, char __unk3__);
+void DrawGridCar(int pX, int pY, br_pixelmap *pImage);
 
 // Offset: 14676
 // Size: 2113
@@ -347,7 +351,7 @@ void DrawGrid(int pOffset, int pDraw_it);
 // EAX: pFrom
 // EDX: pTo
 // EBX: pTime_to_move
-void MoveGrid(int pFrom, int pTo, tS32 pTime_to_move, unsigned short start_time);
+void MoveGrid(int pFrom, int pTo, tS32 pTime_to_move);
 
 // Offset: 16948
 // Size: 57
@@ -526,3 +530,4 @@ tSO_result NetSynchRaceStart2(tNet_synch_mode pMode);
 // Size: 100
 tSO_result NetSynchRaceStart();
 
+#endif

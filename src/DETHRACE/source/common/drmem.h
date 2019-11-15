@@ -1,5 +1,9 @@
+#ifndef _DRMEM_H_
+#define _DRMEM_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 44
 void SetNonFatalAllocationErrors();
@@ -60,3 +64,4 @@ void CreateStainlessClasses();
 // Size: 34
 void CheckMemory();
 
+#endif

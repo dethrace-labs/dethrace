@@ -1,5 +1,9 @@
+#ifndef _DBSETUP_H_
+#define _DBSETUP_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 12
 // Size: 345
 br_error BrV1dbBegin();
@@ -10,35 +14,35 @@ br_error BrV1dbEnd();
 
 // Offset: 482
 // Size: 89
-br_uint_32 updateTable(br_pixelmap *item);
+br_uint_32 updateTable(br_pixelmap *item, void *arg);
 
 // Offset: 581
 // Size: 89
-br_uint_32 updateMap(br_pixelmap *item);
+br_uint_32 updateMap(br_pixelmap *item, void *arg);
 
 // Offset: 685
 // Size: 89
-br_uint_32 updateMaterial(br_material *item);
+br_uint_32 updateMaterial(br_material *item, void *arg);
 
 // Offset: 786
 // Size: 89
-br_uint_32 updateModel(br_model *item);
+br_uint_32 updateModel(br_model *item, void *arg);
 
 // Offset: 886
 // Size: 79
-br_uint_32 clearTable(br_pixelmap *item);
+br_uint_32 clearTable(br_pixelmap *item, void *arg);
 
 // Offset: 974
 // Size: 79
-br_uint_32 clearMap(br_pixelmap *item);
+br_uint_32 clearMap(br_pixelmap *item, void *arg);
 
 // Offset: 1067
 // Size: 79
-br_uint_32 clearMaterial(br_material *item);
+br_uint_32 clearMaterial(br_material *item, void *arg);
 
 // Offset: 1157
 // Size: 79
-br_uint_32 clearModel(br_model *item);
+br_uint_32 clearModel(br_model *item, void *arg);
 
 // Offset: 1256
 // Size: 462
@@ -76,3 +80,4 @@ void BrV1dbBeginWrapper_Float();
 // Size: 40
 void BrV1dbEndWrapper();
 
+#endif

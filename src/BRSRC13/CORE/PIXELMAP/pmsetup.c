@@ -1,6 +1,5 @@
 #include "pmsetup.h"
 
-// Global variables
 br_image Image_BRPMAP1;
 br_resource_class resourceClasses[2];
 void *functionPointers_BRPMAP1[77];

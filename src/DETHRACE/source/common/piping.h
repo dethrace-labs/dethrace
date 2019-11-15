@@ -1,5 +1,9 @@
+#ifndef _PIPING_H_
+#define _PIPING_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 139
 // EAX: v
@@ -41,7 +45,7 @@ tU32 LengthOfSession(tPipe_session *pSession);
 // Size: 196
 // EAX: pThe_type
 // EDX: pMunge_reentrancy
-void StartPipingSession2(tPipe_chunk_type pThe_type);
+void StartPipingSession2(tPipe_chunk_type pThe_type, int pMunge_reentrancy);
 
 // Offset: 2128
 // Size: 50
@@ -62,7 +66,7 @@ void EndPipingSession();
 // EAX: pSubject_index
 // EDX: pData
 // EBX: pData_length
-void AddDataToSession(int pSubject_index, void *pData, tU32 pData_length, char temp_buffer_size);
+void AddDataToSession(int pSubject_index, void *pData, tU32 pData_length);
 
 // Offset: 2784
 // Size: 140
@@ -70,7 +74,7 @@ void AddDataToSession(int pSubject_index, void *pData, tU32 pData_length, char t
 // EDX: pModel_index
 // EBX: pVertex_count
 // ECX: pCoordinates
-void AddModelGeometryToPipingSession(tU16 pCar_ID, int pModel_index, int pVertex_count);
+void AddModelGeometryToPipingSession(tU16 pCar_ID, int pModel_index, int pVertex_count, tChanged_vertex *pCoordinates);
 
 // Offset: 2924
 // Size: 140
@@ -78,7 +82,7 @@ void AddModelGeometryToPipingSession(tU16 pCar_ID, int pModel_index, int pVertex
 // EDX: pModel_index
 // EBX: pVertex_count
 // ECX: pCoordinates
-void AddSmudgeToPipingSession(tU16 pCar_ID, int pModel_index, int pVertex_count);
+void AddSmudgeToPipingSession(tU16 pCar_ID, int pModel_index, int pVertex_count, tSmudged_vertex *pCoordinates);
 
 // Offset: 3064
 // Size: 208
@@ -86,14 +90,14 @@ void AddSmudgeToPipingSession(tU16 pCar_ID, int pModel_index, int pVertex_count)
 // EDX: pTrans
 // EBX: pAction_index
 // ECX: pFrame_index
-void AddPedestrianToPipingSession(int pPedestrian_index, br_matrix34 *pTrans, tU8 pAction_index, tU8 pFrame_index, tS8 pHit_points, int pDone_initial, tU16 pParent_ID, float pSpin_period, br_scalar pJump_magnitude, br_vector3 *pOffset, int data, br_memory_classes data_size, enum __unk13__, int __unk14__, br_vector3 *__unk15__, br_vector3 *__unk16__);
+void AddPedestrianToPipingSession(int pPedestrian_index, br_matrix34 *pTrans, tU8 pAction_index, tU8 pFrame_index, tS8 pHit_points, int pDone_initial, tU16 pParent_ID, float pSpin_period, br_scalar pJump_magnitude, br_vector3 *pOffset);
 
 // Offset: 3272
 // Size: 107
 // EAX: pSpark_index
 // EDX: pPos
 // EBX: pV
-void AddSparkToPipingSession(int pSpark_index, br_vector3 *pPos, br_vector3 *pV, wchar_t data, br_memory_classes __unk4__);
+void AddSparkToPipingSession(int pSpark_index, br_vector3 *pPos, br_vector3 *pV);
 
 // Offset: 3380
 // Size: 118
@@ -101,7 +105,7 @@ void AddSparkToPipingSession(int pSpark_index, br_vector3 *pPos, br_vector3 *pV,
 // EDX: pPos
 // EBX: pAge
 // ECX: pMaterial
-void AddShrapnelToPipingSession(int pShrapnel_index, br_vector3 *pPos, tU16 pAge, br_material *pMaterial, unsigned char data, br_memory_classes data_size);
+void AddShrapnelToPipingSession(int pShrapnel_index, br_vector3 *pPos, tU16 pAge, br_material *pMaterial);
 
 // Offset: 3500
 // Size: 65
@@ -115,20 +119,20 @@ void AddScreenWobbleToPipingSession(int pWobble_x, int pWobble_y);
 // EDX: pMatrix
 // EBX: pPath_interrupt
 // ECX: pObject_interrupt
-void AddGrooveStopToPipingSession(int pGroove_index, br_matrix34 *pMatrix, int pPath_interrupt, int pObject_interrupt, float pPath_resumption, float pObject_resumption, short data);
+void AddGrooveStopToPipingSession(int pGroove_index, br_matrix34 *pMatrix, int pPath_interrupt, int pObject_interrupt, float pPath_resumption, float pObject_resumption);
 
 // Offset: 3668
 // Size: 79
 // EAX: pIndex
 // EDX: pActor
-void AddNonCarToPipingSession(int pIndex, br_actor *pActor, div_t data);
+void AddNonCarToPipingSession(int pIndex, br_actor *pActor);
 
 // Offset: 3748
 // Size: 127
 // EAX: pIndex
 // EDX: pType
 // EBX: pPos
-void AddSmokeToPipingSession(int pIndex, tU8 pType, br_vector3 *pPos, br_scalar pRadius, br_scalar pStrength, int data, br_memory_classes __unk6__, char __unk8__);
+void AddSmokeToPipingSession(int pIndex, tU8 pType, br_vector3 *pPos, br_scalar pRadius, br_scalar pStrength);
 
 // Offset: 3876
 // Size: 87
@@ -136,13 +140,13 @@ void AddSmokeToPipingSession(int pIndex, tU8 pType, br_vector3 *pPos, br_scalar 
 // EDX: pCar
 // EBX: pVertex
 // ECX: pColour
-void AddSmokeColumnToPipingSession(int pIndex, tCar_spec *pCar, int pVertex, int pColour, div_t data);
+void AddSmokeColumnToPipingSession(int pIndex, tCar_spec *pCar, int pVertex, int pColour);
 
 // Offset: 3964
 // Size: 87
 // EAX: pIndex
 // EDX: pFrame_count
-void AddFlameToPipingSession(int pIndex, int pFrame_count, br_scalar pScale_x, br_scalar pScale_y, br_scalar pOffset_x, br_scalar pOffset_z, char data, brfile_getchr_cbfn __unk7__, tCollision_info __unk8__, unsigned char __unk9__);
+void AddFlameToPipingSession(int pIndex, int pFrame_count, br_scalar pScale_x, br_scalar pScale_y, br_scalar pOffset_x, br_scalar pOffset_z);
 
 // Offset: 4052
 // Size: 122
@@ -153,7 +157,7 @@ void AddSplashToPipingSession(tCollision_info *pCar);
 // Size: 134
 // EAX: pIndex
 // EDX: pMat
-void AddOilSpillToPipingSession(int pIndex, br_matrix34 *pMat, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec *pCar, br_vector3 *pOriginal_pos, br_pixelmap *pPixelmap, unsigned char data, br_memory_classes __unk10__, struct __unk12__, tU32 __unk13__, br_memory_classes __unk15__);
+void AddOilSpillToPipingSession(int pIndex, br_matrix34 *pMat, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec *pCar, br_vector3 *pOriginal_pos, br_pixelmap *pPixelmap);
 
 // Offset: 4312
 // Size: 58
@@ -165,7 +169,7 @@ void AddFrameFinishToPipingSession(tU32 pThe_time);
 // EAX: pCar_ID
 // EDX: pCar_mat
 // EBX: pCar_velocity
-void AddCarToPipingSession(int pCar_ID, br_matrix34 *pCar_mat, br_vector3 *pCar_velocity, float pSpeedo_speed, float pLf_sus_position, float pRf_sus_position, float pLr_sus_position, float pRr_sus_position, float pSteering_angle, br_scalar pRevs, int pGear, int pFrame_coll_flag, long data, br_memory_classes __unk13__);
+void AddCarToPipingSession(int pCar_ID, br_matrix34 *pCar_mat, br_vector3 *pCar_velocity, float pSpeedo_speed, float pLf_sus_position, float pRf_sus_position, float pLr_sus_position, float pRr_sus_position, float pSteering_angle, br_scalar pRevs, int pGear, int pFrame_coll_flag);
 
 // Offset: 4732
 // Size: 129
@@ -173,13 +177,13 @@ void AddCarToPipingSession(int pCar_ID, br_matrix34 *pCar_mat, br_vector3 *pCar_
 // EDX: pSound_index
 // EBX: pL_volume
 // ECX: pR_volume
-void AddSoundToPipingSession(tS3_outlet_ptr pOutlet, int pSound_index, tS3_volume pL_volume, tS3_volume pR_volume, tS3_pitch pPitch);
+void AddSoundToPipingSession(tS3_outlet_ptr pOutlet, int pSound_index, tS3_volume pL_volume, tS3_volume pR_volume, tS3_pitch pPitch, br_vector3 *pPos);
 
 // Offset: 4864
 // Size: 94
 // EAX: pCar_ID
 // EDX: pDifferences
-void AddDamageToPipingSession(int pCar_ID, tS8 *pDifferences, unsigned char data);
+void AddDamageToPipingSession(int pCar_ID, tS8 *pDifferences);
 
 // Offset: 4960
 // Size: 53
@@ -192,21 +196,21 @@ void AddSpecialToPipingSession(tSpecial_type pType);
 // EDX: pTrans
 // EBX: pSize
 // ECX: pGib_index
-void AddPedGibToPipingSession(int pIndex, br_matrix34 *pTrans, int pSize, int pGib_index, int pPed_index, int data);
+void AddPedGibToPipingSession(int pIndex, br_matrix34 *pTrans, int pSize, int pGib_index, int pPed_index);
 
 // Offset: 5108
 // Size: 83
-void AddCarIncidentToPipingSession(float pSeverity, tCar_spec *pCar, br_vector3 *pImpact_point, short data, br_memory_classes __unk4__);
+void AddCarIncidentToPipingSession(float pSeverity, tCar_spec *pCar, br_vector3 *pImpact_point);
 
 // Offset: 5192
 // Size: 73
 // EAX: pPed_index
 // EDX: pActor
-void AddPedIncidentToPipingSession(int pPed_index, br_actor *pActor, div_t data);
+void AddPedIncidentToPipingSession(int pPed_index, br_actor *pActor);
 
 // Offset: 5268
 // Size: 69
-void AddWallIncidentToPipingSession(float pSeverity, br_vector3 *pImpact_point, wchar_t data);
+void AddWallIncidentToPipingSession(float pSeverity, br_vector3 *pImpact_point);
 
 // Offset: 5340
 // Size: 83
@@ -214,14 +218,14 @@ void AddWallIncidentToPipingSession(float pSeverity, br_vector3 *pImpact_point, 
 // EDX: pCar
 // EBX: pPed_index
 // ECX: pTime
-void AddProxRayToPipingSession(int pRay_index, tCar_spec *pCar, tU16 pPed_index, tU32 pTime, unsigned short data, br_memory_classes __unk5__);
+void AddProxRayToPipingSession(int pRay_index, tCar_spec *pCar, tU16 pPed_index, tU32 pTime);
 
 // Offset: 5424
 // Size: 74
 // EAX: pSkid_num
 // EDX: pMatrix
 // EBX: pMaterial_index
-void AddSkidAdjustmentToPipingSession(int pSkid_num, br_matrix34 *pMatrix, int pMaterial_index, signed char adjustment);
+void AddSkidAdjustmentToPipingSession(int pSkid_num, br_matrix34 *pMatrix, int pMaterial_index);
 
 // Offset: 5500
 // Size: 75
@@ -229,7 +233,7 @@ void AddSkidAdjustmentToPipingSession(int pSkid_num, br_matrix34 *pMatrix, int p
 // EDX: pModel_index
 // EBX: pVertex_count
 // ECX: pCoordinates
-void PipeSingleModelGeometry(tU16 pCar_ID, int pModel_index, int pVertex_count);
+void PipeSingleModelGeometry(tU16 pCar_ID, int pModel_index, int pVertex_count, tChanged_vertex *pCoordinates);
 
 // Offset: 5576
 // Size: 116
@@ -237,14 +241,14 @@ void PipeSingleModelGeometry(tU16 pCar_ID, int pModel_index, int pVertex_count);
 // EDX: pTrans
 // EBX: pAction_index
 // ECX: pFrame_index
-void PipeSinglePedestrian(int pPedestrian_index, br_matrix34 *pTrans, tU8 pAction_index, tU8 pFrame_index, tS8 pHit_points, int pDone_initial, tU16 pParent_ID, float pSpin_period, br_scalar pJump_magnitude, br_vector3 *pOffset, int __unk10__, br_memory_classes __unk11__, enum __unk13__, int __unk14__, br_vector3 *__unk15__, br_vector3 *__unk16__);
+void PipeSinglePedestrian(int pPedestrian_index, br_matrix34 *pTrans, tU8 pAction_index, tU8 pFrame_index, tS8 pHit_points, int pDone_initial, tU16 pParent_ID, float pSpin_period, br_scalar pJump_magnitude, br_vector3 *pOffset);
 
 // Offset: 5692
 // Size: 141
 // EAX: pCar_ID
 // EDX: pCar_mat
 // EBX: pCar_velocity
-void PipeSingleCar(int pCar_ID, br_matrix34 *pCar_mat, br_vector3 *pCar_velocity, float pSpeedo_speed, float pLf_sus_position, float pRf_sus_position, float pLr_sus_position, float pRr_sus_position, float pSteering_angle, br_scalar pRevs, int pGear, int pFrame_coll_flag, long __unk12__, br_memory_classes __unk13__);
+void PipeSingleCar(int pCar_ID, br_matrix34 *pCar_mat, br_vector3 *pCar_velocity, float pSpeedo_speed, float pLf_sus_position, float pRf_sus_position, float pLr_sus_position, float pRr_sus_position, float pSteering_angle, br_scalar pRevs, int pGear, int pFrame_coll_flag);
 
 // Offset: 5836
 // Size: 102
@@ -252,19 +256,19 @@ void PipeSingleCar(int pCar_ID, br_matrix34 *pCar_mat, br_vector3 *pCar_velocity
 // EDX: pSound_index
 // EBX: pL_volume
 // ECX: pR_volume
-void PipeSingleSound(tS3_outlet_ptr pOutlet, int pSound_index, tS3_volume pL_volume, tS3_volume pR_volume, tS3_pitch pPitch);
+void PipeSingleSound(tS3_outlet_ptr pOutlet, int pSound_index, tS3_volume pL_volume, tS3_volume pR_volume, tS3_pitch pPitch, br_vector3 *pPos);
 
 // Offset: 5940
 // Size: 104
 // EAX: pIndex
 // EDX: pMat
-void PipeSingleOilSpill(int pIndex, br_matrix34 *pMat, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec *pCar, br_vector3 *pOriginal_pos, br_pixelmap *pPixelmap, unsigned char __unk9__, br_memory_classes __unk10__, struct __unk12__, tU32 __unk13__, br_memory_classes __unk15__);
+void PipeSingleOilSpill(int pIndex, br_matrix34 *pMat, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec *pCar, br_vector3 *pOriginal_pos, br_pixelmap *pPixelmap);
 
 // Offset: 6044
 // Size: 64
 // EAX: pCar_ID
 // EDX: pDifferences
-void PipeSingleDamage(int pCar_ID, tS8 *pDifferences, unsigned char __unk2__);
+void PipeSingleDamage(int pCar_ID, tS8 *pDifferences);
 
 // Offset: 6108
 // Size: 60
@@ -277,21 +281,21 @@ void PipeSingleSpecial(tSpecial_type pType);
 // EDX: pTrans
 // EBX: pSize
 // ECX: pGib_index
-void PipeSinglePedGib(int pIndex, br_matrix34 *pTrans, int pSize, int pGib_index, int pPed_index, int __unk5__);
+void PipeSinglePedGib(int pIndex, br_matrix34 *pTrans, int pSize, int pGib_index, int pPed_index);
 
 // Offset: 6248
 // Size: 73
-void PipeSingleCarIncident(float pSeverity, tCar_spec *pCar, br_vector3 *pImpact_point, short __unk3__, br_memory_classes __unk4__);
+void PipeSingleCarIncident(float pSeverity, tCar_spec *pCar, br_vector3 *pImpact_point);
 
 // Offset: 6324
 // Size: 74
 // EAX: pPed_index
 // EDX: pActor
-void PipeSinglePedIncident(int pPed_index, br_actor *pActor, div_t __unk2__);
+void PipeSinglePedIncident(int pPed_index, br_actor *pActor);
 
 // Offset: 6400
 // Size: 69
-void PipeSingleWallIncident(float pSeverity, br_vector3 *pImpact_point, wchar_t __unk2__);
+void PipeSingleWallIncident(float pSeverity, br_vector3 *pImpact_point);
 
 // Offset: 6472
 // Size: 64
@@ -305,7 +309,7 @@ void PipeSingleScreenShake(int pWobble_x, int pWobble_y);
 // EDX: pMatrix
 // EBX: pPath_interrupt
 // ECX: pObject_interrupt
-void PipeSingleGrooveStop(int pGroove_index, br_matrix34 *pMatrix, int pPath_interrupt, int pObject_interrupt, float pPath_resumption, float pObject_resumption, short __unk6__);
+void PipeSingleGrooveStop(int pGroove_index, br_matrix34 *pMatrix, int pPath_interrupt, int pObject_interrupt, float pPath_resumption, float pObject_resumption);
 
 // Offset: 6628
 // Size: 113
@@ -320,7 +324,7 @@ void PipingFrameReset();
 // EAX: pSkid_num
 // EDX: pMatrix
 // EBX: pMaterial_index
-void PipeSingleSkidAdjustment(int pSkid_num, br_matrix34 *pMatrix, int pMaterial_index, signed char __unk3__);
+void PipeSingleSkidAdjustment(int pSkid_num, br_matrix34 *pMatrix, int pMaterial_index);
 
 // Offset: 6900
 // Size: 84
@@ -378,7 +382,7 @@ void ApplyModelGeometry(tPipe_chunk **pChunk);
 // Size: 422
 // EAX: pChunk
 // EDX: pDir
-void DoSmudge(tPipe_chunk **pChunk);
+void DoSmudge(tPipe_chunk **pChunk, int pDir);
 
 // Offset: 9872
 // Size: 63
@@ -639,14 +643,14 @@ tU32 FindPrevFrameTime(tU8 *pPtr);
 // EDX: pType
 // EBX: pDefault_time
 // ECX: pCall_back
-void ScanBuffer(tU8 **pPtr, tPipe_chunk_type pType, tU32 pDefault_time, int (*pCall_back)(tPipe_chunk*, int), int (*pTime_check)(tU32));
+void ScanBuffer(tU8 **pPtr, tPipe_chunk_type pType, tU32 pDefault_time, int (*pCall_back)(tPipe_chunk*, int, tU32), int (*pTime_check)(tU32));
 
 // Offset: 18172
 // Size: 191
 // EAX: pChunk_ptr
 // EDX: pChunk_count
 // EBX: pTime
-int CheckSound(tPipe_chunk *pChunk_ptr, int pChunk_count);
+int CheckSound(tPipe_chunk *pChunk_ptr, int pChunk_count, tU32 pTime);
 
 // Offset: 18364
 // Size: 88
@@ -665,7 +669,7 @@ void ScanAndPlaySoundsToBe(tU8 *pPtr, tU32 pOldest_time, tU32 pYoungest_time);
 // EAX: pChunk_ptr
 // EDX: pChunk_count
 // EBX: pTime
-int CheckCar(tPipe_chunk *pChunk_ptr, int pChunk_count);
+int CheckCar(tPipe_chunk *pChunk_ptr, int pChunk_count, tU32 pTime);
 
 // Offset: 19216
 // Size: 237
@@ -683,7 +687,7 @@ void ScanCarsPositions(tCar_spec *pCar, br_vector3 *pSource_pos, br_scalar pMax_
 // EAX: pChunk_ptr
 // EDX: pChunk_count
 // EBX: pTime
-int CheckIncident(tPipe_chunk *pChunk_ptr, int pChunk_count);
+int CheckIncident(tPipe_chunk *pChunk_ptr, int pChunk_count, tU32 pTime);
 
 // Offset: 20112
 // Size: 595
@@ -697,3 +701,4 @@ int GetNextIncident(tU32 pOffset_time, tIncident_type *pIncident_type, float *pS
 // Size: 87
 tU32 GetARStartTime();
 
+#endif

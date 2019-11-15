@@ -1,5 +1,9 @@
+#ifndef _CUTSCENE_H_
+#define _CUTSCENE_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 118
 void* radmalloc(unsigned long numbytes);
@@ -13,7 +17,7 @@ void radfree(void *ptr);
 // EAX: pIndex
 // EDX: pWait_end
 // EBX: pSound_ID
-void ShowCutScene(int pIndex, int pWait_end, int pSound_ID, br_scalar pDelay, signed char __unk4__);
+void ShowCutScene(int pIndex, int pWait_end, int pSound_ID, br_scalar pDelay);
 
 // Offset: 360
 // Size: 34
@@ -56,3 +60,4 @@ void DoGameCompletedAnimation();
 // Size: 70
 void StartLoadingScreen();
 
+#endif

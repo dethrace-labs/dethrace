@@ -1,5 +1,9 @@
+#ifndef _OPTIONS_H_
+#define _OPTIONS_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 161
 // EAX: pWhich_one
@@ -265,3 +269,4 @@ void DrawDisabledOptions();
 // Size: 146
 void DoOptions();
 
+#endif

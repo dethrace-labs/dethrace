@@ -1,5 +1,9 @@
+#ifndef _RAYCAST_H_
+#define _RAYCAST_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 190
 // EAX: a
@@ -34,7 +38,7 @@ int PickBoundsTestRay(br_bounds *b, br_vector3 *rp, br_vector3 *rd, br_scalar t_
 // EDX: model
 // EBX: material
 // ECX: callback
-int ActorPick2D(br_actor *ap, br_model *model, br_material *material, dr_pick2d_cbfn *callback);
+int ActorPick2D(br_actor *ap, br_model *model, br_material *material, dr_pick2d_cbfn *callback, void *arg);
 
 // Offset: 1756
 // Size: 342
@@ -42,7 +46,7 @@ int ActorPick2D(br_actor *ap, br_model *model, br_material *material, dr_pick2d_
 // EDX: camera
 // EBX: viewport
 // ECX: pick_x
-int DRScenePick2DXY(br_actor *world, br_actor *camera, br_pixelmap *viewport, int pick_x, int pick_y);
+int DRScenePick2DXY(br_actor *world, br_actor *camera, br_pixelmap *viewport, int pick_x, int pick_y, dr_pick2d_cbfn *callback, void *arg);
 
 // Offset: 2100
 // Size: 266
@@ -50,7 +54,7 @@ int DRScenePick2DXY(br_actor *world, br_actor *camera, br_pixelmap *viewport, in
 // EDX: camera
 // EBX: callback
 // ECX: arg
-int DRScenePick2D(br_actor *world, br_actor *camera, dr_pick2d_cbfn *callback);
+int DRScenePick2D(br_actor *world, br_actor *camera, dr_pick2d_cbfn *callback, void *arg);
 
 // Offset: 2368
 // Size: 1777
@@ -58,29 +62,29 @@ int DRScenePick2D(br_actor *world, br_actor *camera, dr_pick2d_cbfn *callback);
 // EDX: material
 // EBX: ray_pos
 // ECX: ray_dir
-int DRModelPick2D(br_model *model, br_material *material, br_vector3 *ray_pos, br_vector3 *ray_dir, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn *callback);
+int DRModelPick2D(br_model *model, br_material *material, br_vector3 *ray_pos, br_vector3 *ray_dir, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn *callback, void *arg);
 
 // Offset: 4148
 // Size: 141
-int FindHighestPolyCallBack(br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3 *pPoint);
+int FindHighestPolyCallBack(br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3 *pPoint, br_vector2 *pMap, void *pArg);
 
 // Offset: 4292
 // Size: 112
-int FindHighestCallBack(br_actor *pActor, br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT_near, br_scalar pT_far);
+int FindHighestCallBack(br_actor *pActor, br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT_near, br_scalar pT_far, void *pArg);
 
 // Offset: 4404
 // Size: 194
 // EAX: pPosition
 // EDX: gWorld
-void FindBestY(br_vector3 *pPosition, br_actor *gWorld, br_scalar pStarting_height, br_scalar *pNearest_y_above, br_scalar *pNearest_y_below, br_model **pNearest_above_model, br_model **pNearest_below_model, int *pNearest_above_face_index);
+void FindBestY(br_vector3 *pPosition, br_actor *gWorld, br_scalar pStarting_height, br_scalar *pNearest_y_above, br_scalar *pNearest_y_below, br_model **pNearest_above_model, br_model **pNearest_below_model, int *pNearest_above_face_index, int *pNearest_below_face_index);
 
 // Offset: 4600
 // Size: 102
-int FindYVerticallyBelowPolyCallBack(br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3 *pPoint);
+int FindYVerticallyBelowPolyCallBack(br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3 *pPoint, br_vector2 *pMap, void *pArg);
 
 // Offset: 4704
 // Size: 112
-int FindYVerticallyBelowCallBack(br_actor *pActor, br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT_near, br_scalar pT_far);
+int FindYVerticallyBelowCallBack(br_actor *pActor, br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT_near, br_scalar pT_far, void *pArg);
 
 // Offset: 4816
 // Size: 558
@@ -92,3 +96,4 @@ br_scalar FindYVerticallyBelow(br_vector3 *pPosition);
 // EAX: pCast_point
 br_scalar FindYVerticallyBelow2(br_vector3 *pCast_point);
 
+#endif

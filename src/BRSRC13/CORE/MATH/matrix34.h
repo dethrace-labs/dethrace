@@ -1,5 +1,9 @@
+#ifndef _MATRIX34_H_
+#define _MATRIX34_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 15
 // Size: 228
 void BrMatrix34Copy(br_matrix34 *A, br_matrix34 *B);
@@ -70,18 +74,18 @@ br_matrix34* BrBoundsToMatrix34(br_matrix34 *mat, br_bounds *bounds);
 
 // Offset: 6124
 // Size: 234
-void BrMatrix34Copy4(br_matrix34 *A, br_matrix4 *B, char __unk2__);
+void BrMatrix34Copy4(br_matrix34 *A, br_matrix4 *B);
 
 // Offset: 6377
 // Size: 298
 // EAX: A
 // EDX: B
 // EBX: C
-void BrMatrix34TApplyFV(br_vector3 *A, br_fvector3 *B, br_matrix34 *C, char __unk3__);
+void BrMatrix34TApplyFV(br_vector3 *A, br_fvector3 *B, br_matrix34 *C);
 
 // Offset: 6691
 // Size: 331
-void BrMatrix34Apply(br_vector3 *A, br_vector4 *B, br_matrix34 *C, short __unk3__);
+void BrMatrix34Apply(br_vector3 *A, br_vector4 *B, br_matrix34 *C);
 
 // Offset: 7039
 // Size: 379
@@ -93,7 +97,7 @@ void BrMatrix34ApplyV(br_vector3 *A, br_vector3 *B, br_matrix34 *C);
 
 // Offset: 7807
 // Size: 408
-void BrMatrix34TApply(br_vector4 *A, br_vector4 *B);
+void BrMatrix34TApply(br_vector4 *A, br_vector4 *B, br_matrix34 *C);
 
 // Offset: 8233
 // Size: 355
@@ -183,3 +187,4 @@ void BrMatrix34PreShearZ(br_matrix34 *mat, br_scalar sx, br_scalar sy);
 // Size: 135
 void BrMatrix34PostShearZ(br_matrix34 *mat, br_scalar sx, br_scalar sy);
 
+#endif

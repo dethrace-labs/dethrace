@@ -1,6 +1,5 @@
 #include "controls.h"
 
-// Global variables
 tCheat gKev_keys[44];
 char *gAbuse_text[10];
 tEdit_func gEdit_funcs[10][18][8];
@@ -28,7 +27,7 @@ void AbortRace() {
 // Offset: 56
 // Size: 271
 void F4Key() {
-  tEdit_mode old_edit_mode;
+    tEdit_mode old_edit_mode;
 }
 
 // Offset: 328
@@ -57,7 +56,7 @@ void ShowSpecialVolumesIfRequ() {
 // Size: 261
 // EAX: pIndex
 void DoEditModeKey(int pIndex) {
-  int modifiers;
+    int modifiers;
 }
 
 // Offset: 820
@@ -233,7 +232,7 @@ void MoveBonnetForward() {
 // Offset: 2736
 // Size: 93
 void SaveBonnet() {
-  tPath_name the_path;
+    tPath_name the_path;
 }
 
 // Offset: 2832
@@ -344,27 +343,26 @@ void CheckHelp() {
 // Offset: 4644
 // Size: 313
 void CheckLoadSave() {
-  int switched_res;
+    int switched_res;
 }
 
 // Offset: 4960
 // Size: 364
 // EAX: pRacing
 void CheckToggles(int pRacing) {
-  int i;
-  int new_state;
+    int i;
+    int new_state;
 }
 
 // Offset: 5324
 // Size: 444
 // EAX: pCar
 // EDX: pCheck_around
-int CarWorldOffFallenCheckThingy(tCar_spec *pCar) {
-  int pCheck_around;
-  br_vector3 car_pos;
-  br_vector3 offset_c;
-  br_vector3 offset_w;
-  int result;
+int CarWorldOffFallenCheckThingy(tCar_spec *pCar, int pCheck_around) {
+    br_vector3 car_pos;
+    br_vector3 offset_c;
+    br_vector3 offset_w;
+    int result;
 }
 
 // Offset: 5768
@@ -376,8 +374,8 @@ int HasCarFallenOffWorld(tCar_spec *pCar) {
 // Offset: 5824
 // Size: 250
 void CheckForBeingOutOfThisWorld() {
-  tU32 sLast_check;
-  int time_step;
+    tU32 sLast_check;
+    int time_step;
 }
 
 // Offset: 6076
@@ -410,54 +408,54 @@ void RecoverCar() {
 // Offset: 7112
 // Size: 765
 void CheckMapRenderMove() {
-  int amount;
-  float old_x;
-  float old_y;
+    int amount;
+    float old_x;
+    float old_y;
 }
 
 // Offset: 7880
 // Size: 300
 // EAX: pCar
 void ExplodeCar(tCar_spec *pCar) {
-  br_vector3 tv;
-  br_vector3 pos;
+    br_vector3 tv;
+    br_vector3 pos;
 }
 
 // Offset: 8180
 // Size: 448
 // EAX: pEndFrameTime
 void CheckRecoveryOfCars(tU32 pEndFrameTime) {
-  int i;
-  int time;
-  char s[256];
+    int i;
+    int time;
+    char s[256];
 }
 
 // Offset: 8628
 // Size: 107
 // EAX: pNumber
 void LoseSomePSPowerups(int pNumber) {
-  int index;
+    int index;
 }
 
 // Offset: 8736
 // Size: 1771
 void CheckOtherRacingKeys() {
-  int j;
-  int new_level;
-  int old_level;
-  char s[256];
-  tU32 cost;
-  br_scalar ts;
-  br_vector3 tv;
-  int flip_up_flag;
-  tCar_spec *car;
-  float bodywork_repair_amount;
-  tU32 total_repair_cost;
-  tS3_sound_tag sound_tag;
-  br_scalar amount;
-  int NeedToExpandBoundingBox;
-  int total_difference;
-  int stopped_repairing;
+    int j;
+    int new_level;
+    int old_level;
+    char s[256];
+    tU32 cost;
+    br_scalar ts;
+    br_vector3 tv;
+    int flip_up_flag;
+    tCar_spec *car;
+    float bodywork_repair_amount;
+    tU32 total_repair_cost;
+    tS3_sound_tag sound_tag;
+    br_scalar amount;
+    int NeedToExpandBoundingBox;
+    int total_difference;
+    int stopped_repairing;
 }
 
 // Offset: 10508
@@ -469,9 +467,9 @@ int CheckRecoverCost() {
 // Size: 279
 // EAX: pCar
 void SortOutRecover(tCar_spec *pCar) {
-  int the_time;
-  int val;
-  int old_time;
+    int the_time;
+    int val;
+    int old_time;
 }
 
 // Offset: 11048
@@ -484,16 +482,16 @@ void SetFlipUpCar(tCar_spec *pCar) {
 // Size: 1385
 // EAX: car
 void FlipUpCar(tCar_spec *car) {
-  br_vector3 tv;
-  br_vector3 dir;
-  int new_pos;
-  int i;
-  int j;
-  int l;
-  int count;
-  br_scalar dist;
-  br_material *material;
-  br_scalar t;
+    br_vector3 tv;
+    br_vector3 dir;
+    int new_pos;
+    int i;
+    int j;
+    int l;
+    int count;
+    br_scalar dist;
+    br_material *material;
+    br_scalar t;
 }
 
 // Offset: 12552
@@ -506,15 +504,15 @@ void GetPowerup(int pNum) {
 // Size: 112
 // EAX: pRacing
 void CheckSystemKeys(int pRacing) {
-  tU32 start_menu_time;
-  int i;
+    tU32 start_menu_time;
+    int i;
 }
 
 // Offset: 12716
 // Size: 395
 void CheckKevKeys() {
-  tU32 *value;
-  char s[128];
+    tU32 *value;
+    char s[128];
 }
 
 // Offset: 13112
@@ -526,27 +524,27 @@ void BrakeInstantly() {
 // Size: 853
 // EAX: pTime_difference
 void PollCarControls(tU32 pTime_difference) {
-  int decay_steering;
-  int decay_speed;
-  float decay_rate;
-  tS32 joyX;
-  tS32 joyY;
-  tCar_controls keys;
-  tJoystick joystick;
-  tCar_spec *c;
+    int decay_steering;
+    int decay_speed;
+    float decay_rate;
+    tS32 joyX;
+    tS32 joyY;
+    tCar_controls keys;
+    tJoystick joystick;
+    tCar_spec *c;
 }
 
 // Offset: 14160
 // Size: 846
 // EAX: pTime_difference
 void PollCameraControls(tU32 pTime_difference) {
-  int flag;
-  int left;
-  int right;
-  int swirl_mode;
-  int up_and_down_mode;
-  int going_up;
-  int last_swirl_mode;
+    int flag;
+    int left;
+    int right;
+    int swirl_mode;
+    int up_and_down_mode;
+    int going_up;
+    int last_swirl_mode;
 }
 
 // Offset: 15008
@@ -593,7 +591,7 @@ void LoseDosh() {
 // Offset: 15688
 // Size: 301
 void ToggleMap() {
-  int was_in_cockpit;
+    int was_in_cockpit;
 }
 
 // Offset: 15992
@@ -640,7 +638,7 @@ void CycleRoadTexturingLevel() {
 // Offset: 16960
 // Size: 246
 void CycleYonFactor() {
-  char factor_str[5];
+    char factor_str[5];
 }
 
 // Offset: 17208
@@ -668,7 +666,7 @@ void CycleSoundDetailLevel() {
 // Offset: 17584
 // Size: 162
 void CycleCarSimplificationLevel() {
-  char *dst;
+    char *dst;
 }
 
 // Offset: 17748
@@ -685,9 +683,9 @@ void ToggleSmoke() {
 // Size: 144
 // EAX: pFont
 void DrawSomeText2(tDR_font *pFont) {
-  int y;
-  int i;
-  char *txt[15];
+    int y;
+    int i;
+    char *txt[15];
 }
 
 // Offset: 18244
@@ -708,30 +706,30 @@ void UserSendMessage() {
 // Offset: 18460
 // Size: 815
 void EnterUserMessage() {
-  int about_to_die;
-  tU32 next_time;
-  char *the_message;
-  char *p;
-  int len;
-  int the_key;
-  int abuse_num;
+    int about_to_die;
+    tU32 next_time;
+    char *the_message;
+    char *p;
+    int len;
+    int the_key;
+    int abuse_num;
 }
 
 // Offset: 19276
 // Size: 435
 void DisplayUserMessage() {
-  char *the_message;
-  int len;
-  tDR_font *font;
+    char *the_message;
+    int len;
+    tDR_font *font;
 }
 
 // Offset: 19712
 // Size: 347
 void InitAbuseomatic() {
-  char s[256];
-  FILE *f;
-  int i;
-  int len;
+    char s[256];
+    FILE *f;
+    int i;
+    int len;
 }
 
 // Offset: 20060

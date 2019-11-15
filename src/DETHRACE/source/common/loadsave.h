@@ -1,5 +1,9 @@
+#ifndef _LOADSAVE_H_
+#define _LOADSAVE_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 647
 // EAX: pIndex
@@ -97,3 +101,4 @@ int SaveGameInterface(int pDefault_choice);
 // EAX: pSave_allowed
 void DoSaveGame(int pSave_allowed);
 
+#endif

@@ -1,5 +1,9 @@
+#ifndef _LOADING_H_
+#define _LOADING_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 67
 // EAX: pF
@@ -70,7 +74,7 @@ void WriteS8L(FILE *pF, tS8 pNumber);
 // Size: 54
 // EAX: pF
 // EDX: pBytes_to_skip
-void SkipBytes(FILE *pF);
+void SkipBytes(FILE *pF, int pBytes_to_skip);
 
 // Offset: 872
 // Size: 70
@@ -106,7 +110,7 @@ tS8 MemReadS8(char **pPtr);
 // Size: 46
 // EAX: pPtr
 // EDX: pBytes_to_skip
-void MemSkipBytes(char **pPtr);
+void MemSkipBytes(char **pPtr, int pBytes_to_skip);
 
 // Offset: 1320
 // Size: 2149
@@ -126,7 +130,7 @@ br_pixelmap* LoadPixelmap(char *pName);
 // EAX: pFile_name
 // EDX: pPixelmaps
 // EBX: pNum
-br_uint_32 LoadPixelmaps(char *pFile_name, br_pixelmap **pPixelmaps, br_uint_16 pNum, unsigned char path);
+br_uint_32 LoadPixelmaps(char *pFile_name, br_pixelmap **pPixelmaps, br_uint_16 pNum);
 
 // Offset: 4044
 // Size: 99
@@ -162,7 +166,7 @@ void DRLoadShadeTable(char *pPath_name);
 // Size: 84
 // EAX: pPixelmap_array
 // EDX: pCount
-void RezeroPixelmaps(br_pixelmap **pPixelmap_array);
+void RezeroPixelmaps(br_pixelmap **pPixelmap_array, int pCount);
 
 // Offset: 4748
 // Size: 97
@@ -194,7 +198,7 @@ void DRLoadLights(char *pPath_name);
 // EAX: pThe_base_path
 // EDX: pThe_dir_name
 // EBX: pLoad_routine
-void LoadInFiles(char *pThe_base_path, char *pThe_dir_name, void (*pLoad_routine)(char*), signed char the_path);
+void LoadInFiles(char *pThe_base_path, char *pThe_dir_name, void (*pLoad_routine)(char*));
 
 // Offset: 5400
 // Size: 208
@@ -247,7 +251,7 @@ void DropOffDyingPeds(tCar_spec *pCar);
 // Size: 1113
 // EAX: pCar_spec
 // EDX: pOwner
-void DisposeCar(tCar_spec *pCar_spec);
+void DisposeCar(tCar_spec *pCar_spec, int pOwner);
 
 // Offset: 9032
 // Size: 626
@@ -259,21 +263,21 @@ void AdjustCarCoordinates(tCar_spec *pCar);
 // EAX: pF
 // EDX: pIndex
 // EBX: pCar_spec
-void LoadSpeedo(FILE *pF, int pIndex);
+void LoadSpeedo(FILE *pF, int pIndex, tCar_spec *pCar_spec);
 
 // Offset: 10592
 // Size: 764
 // EAX: pF
 // EDX: pIndex
 // EBX: pCar_spec
-void LoadTacho(FILE *pF, int pIndex);
+void LoadTacho(FILE *pF, int pIndex, tCar_spec *pCar_spec);
 
 // Offset: 11356
 // Size: 816
 // EAX: pF
 // EDX: pIndex
 // EBX: pCar_spec
-void LoadHeadups(FILE *pF, int pIndex);
+void LoadHeadups(FILE *pF, int pIndex, tCar_spec *pCar_spec);
 
 // Offset: 12172
 // Size: 1819
@@ -292,7 +296,7 @@ void ReadMechanicsData(FILE *pF, tCar_spec *c);
 // EAX: pF
 // EDX: pIndex
 // EBX: pCar_spec
-void LoadGear(FILE *pF, int pIndex);
+void LoadGear(FILE *pF, int pIndex, tCar_spec *pCar_spec);
 
 // Offset: 17664
 // Size: 56
@@ -314,14 +318,14 @@ br_uint_32 LinkModel(br_actor *pActor, tModel_pool *pModel_pool);
 // Size: 198
 // EAX: pModel_array
 // EDX: pModel_count
-void FreeUpBonnetModels(br_model **pModel_array);
+void FreeUpBonnetModels(br_model **pModel_array, int pModel_count);
 
 // Offset: 18800
 // Size: 67
 // EAX: pActor
 // EDX: pModel_array
 // EBX: pModel_count
-void LinkModelsToActor(br_actor *pActor, br_model **pModel_array);
+void LinkModelsToActor(br_actor *pActor, br_model **pModel_array, int pModel_count);
 
 // Offset: 18868
 // Size: 132
@@ -354,7 +358,7 @@ void MungeWindscreen(br_model *pModel);
 // Size: 141
 // EAX: pModel
 // EDX: pOwner
-void SetModelFlags(br_model *pModel);
+void SetModelFlags(br_model *pModel, int pOwner);
 
 // Offset: 20140
 // Size: 8202
@@ -362,7 +366,7 @@ void SetModelFlags(br_model *pModel);
 // EDX: pDriver
 // EBX: pCar_spec
 // ECX: pOwner
-void LoadCar(char *pCar_name, tDriver pDriver, tCar_spec *pCar_spec, int pOwner, char *pDriver_name, tBrender_storage *pStorage_space, signed char f, _complex g);
+void LoadCar(char *pCar_name, tDriver pDriver, tCar_spec *pCar_spec, int pOwner, char *pDriver_name, tBrender_storage *pStorage_space);
 
 // Offset: 28344
 // Size: 186
@@ -386,7 +390,7 @@ void SkipRestOfRace(FILE *pF);
 // EAX: pRace_list
 // EDX: pCount
 // EBX: pRace_type_index
-void LoadRaces(tRace_list_spec *pRace_list, int *pCount);
+void LoadRaces(tRace_list_spec *pRace_list, int *pCount, int pRace_type_index);
 
 // Offset: 29372
 // Size: 88
@@ -402,19 +406,19 @@ void LoadOpponentMugShot(int pIndex);
 // Size: 136
 // EAX: pRace_info
 // EDX: pIndex
-void DisposeOpponentGridIcon(tRace_info *pRace_info);
+void DisposeOpponentGridIcon(tRace_info *pRace_info, int pIndex);
 
 // Offset: 29764
 // Size: 155
 // EAX: pRace_info
 // EDX: pIndex
-void LoadOpponentGridIcon(tRace_info *pRace_info);
+void LoadOpponentGridIcon(tRace_info *pRace_info, int pIndex);
 
 // Offset: 29920
 // Size: 804
 // EAX: pRace_index
 // EDX: pRace_info
-void LoadRaceInfo(int pRace_index, tRace_info *pRace_info, signed char f);
+void LoadRaceInfo(int pRace_index, tRace_info *pRace_info);
 
 // Offset: 30724
 // Size: 351
@@ -462,7 +466,7 @@ void DisposeChromeFont(br_pixelmap *pThe_font);
 // EAX: pF
 // EDX: pString_list
 // EBX: pCount
-int GetALineAndInterpretCommand(FILE *pF, char **pString_list);
+int GetALineAndInterpretCommand(FILE *pF, char **pString_list, int pCount);
 
 // Offset: 33724
 // Size: 101
@@ -499,7 +503,7 @@ void GetThreeFloats(FILE *pF, float *pF1, float *pF2, float *pF3);
 // EAX: pF
 // EDX: pF1
 // EBX: pF2
-void GetPairOfInts(FILE *pF, int *pF1);
+void GetPairOfInts(FILE *pF, int *pF1, int *pF2);
 
 // Offset: 34476
 // Size: 169
@@ -507,7 +511,7 @@ void GetPairOfInts(FILE *pF, int *pF1);
 // EDX: pF1
 // EBX: pF2
 // ECX: pF3
-void GetThreeInts(FILE *pF, int *pF1);
+void GetThreeInts(FILE *pF, int *pF1, int *pF2, int *pF3);
 
 // Offset: 34648
 // Size: 197
@@ -515,7 +519,7 @@ void GetThreeInts(FILE *pF, int *pF1);
 // EDX: pF1
 // EBX: pF2
 // ECX: pF3
-void GetThreeIntsAndAString(FILE *pF, int *pF1, int *pF2);
+void GetThreeIntsAndAString(FILE *pF, int *pF1, int *pF2, int *pF3, char *pS);
 
 // Offset: 34848
 // Size: 208
@@ -523,7 +527,7 @@ void GetThreeIntsAndAString(FILE *pF, int *pF1, int *pF2);
 // EDX: pF1
 // EBX: pF2
 // ECX: pF3
-void GetFourInts(FILE *pF, int *pF1, int *pF2);
+void GetFourInts(FILE *pF, int *pF1, int *pF2, int *pF3, int *pF4);
 
 // Offset: 35056
 // Size: 51
@@ -566,7 +570,7 @@ void GetFiveScalars(FILE *pF, br_scalar *pF1, br_scalar *pF2, br_scalar *pF3, br
 // EAX: pF
 // EDX: pNumber
 // EBX: pScalars
-void GetNScalars(FILE *pF, int pNumber);
+void GetNScalars(FILE *pF, int pNumber, br_scalar *pScalars);
 
 // Offset: 35944
 // Size: 157
@@ -587,7 +591,7 @@ void GetThreeFloatPercents(FILE *pF, float *pF1, float *pF2, float *pF3);
 // Size: 82
 // EAX: pF
 // EDX: pString
-void GetAString(FILE *pF);
+void GetAString(FILE *pF, char *pString);
 
 // Offset: 36396
 // Size: 49
@@ -659,7 +663,7 @@ void ReadNetworkSettings(FILE *pF, tNet_game_options *pOptions);
 // Size: 378
 // EAX: pF
 // EDX: pIndex
-int PrintNetOptions(FILE *pF);
+int PrintNetOptions(FILE *pF, int pIndex);
 
 // Offset: 39512
 // Size: 1398
@@ -673,3 +677,4 @@ int RestoreOptions();
 // Size: 75
 void InitFunkGrooveFlags();
 
+#endif

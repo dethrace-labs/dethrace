@@ -1,6 +1,5 @@
 #include "errors.h"
 
-// Global variables
 char *gError_messages[126];
 int gError_code;
 char *gPalette_copy;
@@ -11,21 +10,21 @@ char *gPixels_copy;
 // Offset: 0
 // Size: 207
 void FatalError(int pStr_index, ...) {
-  char the_str[1024];
-  char *sub_str;
-  char temp_str[1024];
-  char *sub_pt;
-  va_list ap;
+    char the_str[1024];
+    char *sub_str;
+    char temp_str[1024];
+    char *sub_pt;
+    va_list ap;
 }
 
 // Offset: 208
 // Size: 172
 void NonFatalError(int pStr_index, ...) {
-  char the_str[256];
-  char *sub_str;
-  char temp_str[256];
-  char *sub_pt;
-  va_list ap;
+    char the_str[256];
+    char *sub_str;
+    char temp_str[256];
+    char *sub_pt;
+    va_list ap;
 }
 
 // Offset: 380

@@ -1,5 +1,9 @@
+#ifndef _BSWAP_H_
+#define _BSWAP_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 9
 // Size: 81
 br_uint_32 BrSwap32(br_uint_32 l);
@@ -16,3 +20,4 @@ br_float BrSwapFloat(br_float f);
 // Size: 781
 void* BrSwapBlock(void *block, int count, int size);
 
+#endif

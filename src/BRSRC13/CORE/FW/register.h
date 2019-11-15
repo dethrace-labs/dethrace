@@ -1,5 +1,9 @@
+#ifndef _REGISTER_H_
+#define _REGISTER_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 14
 // Size: 96
 // EAX: reg
@@ -62,7 +66,7 @@ int BrRegistryCount(br_registry *reg, char *pattern);
 // EDX: pattern
 // EBX: callback
 // ECX: arg
-int BrRegistryEnum(br_registry *reg, char *pattern, br_enum_cbfn *callback, void *arg, short e);
+int BrRegistryEnum(br_registry *reg, char *pattern, br_enum_cbfn *callback, void *arg);
 
 // Offset: 1838
 // Size: 49
@@ -84,3 +88,4 @@ void* BrRegistryAddStatic(br_registry *reg, br_registry_entry *base, void *item)
 // EDX: item
 void* BrRegistryRemoveStatic(br_registry *reg, void *item);
 
+#endif

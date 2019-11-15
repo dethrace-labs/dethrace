@@ -1,5 +1,9 @@
+#ifndef _TRIG_H_
+#define _TRIG_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 198
 // EAX: pAngle_in_degrees
@@ -170,3 +174,4 @@ void DRMatrix23PreRotate(br_matrix23 *mat, br_angle rz);
 // EDX: rz
 void DRMatrix23PostRotate(br_matrix23 *mat, br_angle rz);
 
+#endif

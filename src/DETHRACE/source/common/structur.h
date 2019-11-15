@@ -1,5 +1,9 @@
+#ifndef _STRUCTUR_H_
+#define _STRUCTUR_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 124
 int NumberOfOpponentsLeft();
@@ -71,7 +75,7 @@ void SelectOpponents(tRace_info *pRace_info);
 // Size: 269
 // EAX: pCurrent_race
 // EDX: pNet_race_sequence
-int PickNetRace(int pCurrent_race, tNet_sequence_type pNet_race_sequence, char i);
+int PickNetRace(int pCurrent_race, tNet_sequence_type pNet_race_sequence);
 
 // Offset: 3400
 // Size: 288
@@ -105,3 +109,4 @@ void GoingToInterfaceFromRace();
 // Size: 81
 void GoingBackToRaceFromInterface();
 
+#endif

@@ -1,6 +1,5 @@
 #include "drfile.h"
 
-// Global variables
 br_filesystem *gOld_file_system;
 br_filesystem gFilesystem;
 
@@ -22,13 +21,13 @@ void DRStdioClose(void *f) {
 // Offset: 168
 // Size: 70
 br_size_t DRStdioRead(void *buf, br_size_t size, unsigned int n, void *f) {
-  br_size_t result;
+    br_size_t result;
 }
 
 // Offset: 240
 // Size: 70
 br_size_t DRStdioWrite(void *buf, br_size_t size, unsigned int n, void *f) {
-  br_size_t result;
+    br_size_t result;
 }
 
 // Offset: 312

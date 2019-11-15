@@ -1,5 +1,9 @@
+#ifndef _GENCOPY_H_
+#define _GENCOPY_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 21
 // Size: 50
 // EAX: dest
@@ -22,3 +26,4 @@ br_error GeneralCopy(br_device_pixelmap *dst, br_device_pixelmap *src);
 // ECX: s
 br_error GeneralRectangleStretchCopy(br_device_pixelmap *dst, br_rectangle *d, br_device_pixelmap *src, br_rectangle *s);
 
+#endif

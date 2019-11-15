@@ -1,5 +1,9 @@
+#ifndef _BRQSORT_H_
+#define _BRQSORT_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 8
 // Size: 560
 void BrQsort(void *basep, unsigned int nelems, unsigned int size, br_qsort_cbfn comp);
@@ -25,3 +29,4 @@ void swap_ints(char *ap, char *bp, unsigned int nints);
 // EBX: nints
 void swap_int_1(char *ap, char *bp, unsigned int nints);
 
+#endif

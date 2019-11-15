@@ -1,6 +1,5 @@
 #include "drmem.h"
 
-// Global variables
 br_resource_class gStainless_classes[118];
 char *gMem_names[247];
 int gNon_fatal_allocation_errors;
@@ -24,8 +23,8 @@ int AllocationErrorsAreFatal() {
 // Offset: 156
 // Size: 34
 void MAMSInitMem() {
-  FILE *f;
-  tPath_name the_path;
+    FILE *f;
+    tPath_name the_path;
 }
 
 // Offset: 192
@@ -38,15 +37,15 @@ void PrintMemoryDump(int pFlags, char *pTitle) {
 // Offset: 232
 // Size: 169
 void* DRStdlibAllocate(br_size_t size, br_uint_8 type) {
-  void *p;
-  int i;
-  char s[256];
+    void *p;
+    int i;
+    char s[256];
 }
 
 // Offset: 404
 // Size: 38
 void DRStdlibFree(void *mem) {
-  int i;
+    int i;
 }
 
 // Offset: 444

@@ -1,6 +1,5 @@
 #include "powerup.h"
 
-// Global variables
 int gPed_harvest_sounds[4];
 tGot_proc gGot_procs[34];
 tLose_proc gLose_procs[34];
@@ -19,10 +18,9 @@ br_vector3 gZero_v;
 // Size: 303
 // EAX: pThe_powerup
 // EDX: pTell_net_players
-void LosePowerupX(tPowerup *pThe_powerup) {
-  int pTell_net_players;
-  int i;
-  tNet_message *the_message;
+void LosePowerupX(tPowerup *pThe_powerup, int pTell_net_players) {
+    int i;
+    tNet_message *the_message;
 }
 
 // Offset: 304
@@ -35,8 +33,8 @@ void LosePowerup(tPowerup *pThe_powerup) {
 // Size: 139
 // EAX: pThe_powerup
 void LoseAllSimilarPowerups(tPowerup *pThe_powerup) {
-  int i;
-  tPowerup *the_powerup;
+    int i;
+    tPowerup *the_powerup;
 }
 
 // Offset: 496
@@ -45,78 +43,75 @@ void LoseAllSimilarPowerups(tPowerup *pThe_powerup) {
 // EDX: pIndex
 // EBX: pTell_net_players
 // ECX: pDisplay_headup
-int GotPowerupX(tCar_spec *pCar, int pIndex, int pTell_net_players) {
-  int pDisplay_headup;
-  tU32 pTime_left;
-  tPowerup *the_powerup;
-  int i;
-  int original_index;
-  int icon_index;
-  int ps_power;
-  char s[256];
-  char *s2;
-  tNet_message *the_message;
+int GotPowerupX(tCar_spec *pCar, int pIndex, int pTell_net_players, int pDisplay_headup, tU32 pTime_left) {
+    tPowerup *the_powerup;
+    int i;
+    int original_index;
+    int icon_index;
+    int ps_power;
+    char s[256];
+    char *s2;
+    tNet_message *the_message;
 }
 
 // Offset: 1560
 // Size: 67
 // EAX: pCar
 // EDX: pIndex
-int GotPowerup(tCar_spec *pCar) {
-  int pIndex;
+int GotPowerup(tCar_spec *pCar, int pIndex) {
 }
 
 // Offset: 1628
 // Size: 811
 void LoadPowerups() {
-  tPath_name the_path;
-  char s[256];
-  int i;
-  int j;
-  int time;
-  int action_index;
-  tPowerup *the_powerup;
+    tPath_name the_path;
+    char s[256];
+    int i;
+    int j;
+    int time;
+    int action_index;
+    tPowerup *the_powerup;
 }
 
 // Offset: 2440
 // Size: 112
 void InitPowerups() {
-  tPowerup *the_powerup;
+    tPowerup *the_powerup;
 }
 
 // Offset: 2552
 // Size: 99
 void CloseDownPowerUps() {
-  tPowerup *the_powerup;
+    tPowerup *the_powerup;
 }
 
 // Offset: 2652
 // Size: 701
 // EAX: pTime
 void DrawPowerups(tU32 pTime) {
-  int i;
-  int y;
-  int timer;
-  tPowerup *the_powerup;
-  char s[8];
-  tHeadup_icon *the_icon;
-  br_pixelmap *fizzle_pix;
+    int i;
+    int y;
+    int timer;
+    tPowerup *the_powerup;
+    char s[8];
+    tHeadup_icon *the_icon;
+    br_pixelmap *fizzle_pix;
 }
 
 // Offset: 3356
 // Size: 176
 // EAX: pFrame_period
 void DoPowerupPeriodics(tU32 pFrame_period) {
-  int i;
-  tPowerup *the_powerup;
-  tU32 the_time;
+    int i;
+    tPowerup *the_powerup;
+    tU32 the_time;
 }
 
 // Offset: 3532
 // Size: 158
 // EAX: pN
 void GotPowerupN(int pN) {
-  int modifiers;
+    int modifiers;
 }
 
 // Offset: 3692
@@ -174,17 +169,16 @@ void GotPowerup9() {
 // EAX: pPowerup
 // EDX: pCar
 int GotCredits(tPowerup *pPowerup, tCar_spec *pCar) {
-  int credits;
-  char s[256];
+    int credits;
+    char s[256];
 }
 
 // Offset: 4296
 // Size: 89
 // EAX: pCar
 // EDX: pIndex
-void ImprovePSPowerup(tCar_spec *pCar) {
-  int pIndex;
-  tNet_message *the_message;
+void ImprovePSPowerup(tCar_spec *pCar, int pIndex) {
+    tNet_message *the_message;
 }
 
 // Offset: 4388
@@ -192,11 +186,11 @@ void ImprovePSPowerup(tCar_spec *pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int GotTimeOrPower(tPowerup *pPowerup, tCar_spec *pCar) {
-  int time;
-  int index;
-  int i;
-  int not_allowed_power;
-  char s[256];
+    int time;
+    int index;
+    int i;
+    int not_allowed_power;
+    char s[256];
 }
 
 // Offset: 4788
@@ -225,7 +219,7 @@ void ResetHades(tPowerup *pPowerup, tCar_spec *pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int SetPedSize(tPowerup *pPowerup, tCar_spec *pCar) {
-  br_scalar old_scale;
+    br_scalar old_scale;
 }
 
 // Offset: 5172
@@ -338,8 +332,8 @@ int SetUnderwater(tPowerup *pPowerup, tCar_spec *pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int TrashBodywork(tPowerup *pPowerup, tCar_spec *pCar) {
-  int i;
-  tCar_spec *c;
+    int i;
+    tCar_spec *c;
 }
 
 // Offset: 6544
@@ -353,9 +347,8 @@ int TakeDrugs(tPowerup *pPowerup, tCar_spec *pCar) {
 // Size: 195
 // EAX: pPixelmap
 // EDX: pOffset
-void PaletteFuckedUpByDrugs(br_pixelmap *pPixelmap) {
-  int pOffset;
-  int i;
+void PaletteFuckedUpByDrugs(br_pixelmap *pPixelmap, int pOffset) {
+    int i;
 }
 
 // Offset: 6884
@@ -370,7 +363,7 @@ void TheEffectsOfDrugs(tPowerup *pPowerup, tU32 pPeriod) {
 // EAX: pPowerup
 // EDX: pCar
 int SetOpponentsSpeed(tPowerup *pPowerup, tCar_spec *pCar) {
-  int i;
+    int i;
 }
 
 // Offset: 7120
@@ -455,7 +448,7 @@ void PukeDrugsBackUp(tPowerup *pPowerup, tCar_spec *pCar) {
 // EAX: pPowerup
 // EDX: pCar
 void ResetOpponentsSpeed(tPowerup *pPowerup, tCar_spec *pCar) {
-  int i;
+    int i;
 }
 
 // Offset: 8200
@@ -568,8 +561,8 @@ void DoBouncey(tPowerup *pPowerup, tU32 pPeriod) {
 // EAX: pPowerup
 // EDX: pCar
 int HitMine(tPowerup *pPowerup, tCar_spec *pCar) {
-  int i;
-  float fudge_multiplier;
+    int i;
+    float fudge_multiplier;
 }
 
 // Offset: 9668
@@ -626,7 +619,7 @@ int SetPedHarvest(tPowerup *pPowerup, tCar_spec *pCar) {
 // EAX: pPowerup
 // EDX: pCar
 void ResetPedHarvest(tPowerup *pPowerup, tCar_spec *pCar) {
-  int i;
+    int i;
 }
 
 // Offset: 10288
@@ -647,25 +640,25 @@ void ResetVesuvianCorpses(tPowerup *pPowerup, tCar_spec *pCar) {
 // Size: 423
 // EAX: pContents
 void ReceivedPowerup(tNet_contents *pContents) {
-  tPowerup *powerup;
-  tCar_spec *car;
+    tPowerup *powerup;
+    tCar_spec *car;
 }
 
 // Offset: 10836
 // Size: 354
 void SendCurrentPowerups() {
-  int cat;
-  int j;
-  int car_count;
-  tCar_spec *car;
-  tNet_contents *the_contents;
-  tPlayer_ID ID;
+    int cat;
+    int j;
+    int car_count;
+    tCar_spec *car;
+    tNet_contents *the_contents;
+    tPlayer_ID ID;
 }
 
 // Offset: 11192
 // Size: 137
 // EAX: pCar
 void LoseAllLocalPowerups(tCar_spec *pCar) {
-  int i;
+    int i;
 }
 

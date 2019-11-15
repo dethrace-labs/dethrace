@@ -1,5 +1,9 @@
+#ifndef _ANGLES_H_
+#define _ANGLES_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 18
 // Size: 998
 br_matrix34* BrEulerToMatrix34(br_matrix34 *mat, br_euler *euler);
@@ -24,3 +28,4 @@ br_quat* BrEulerToQuat(br_quat *q, br_euler *euler);
 // Size: 68
 br_euler* BrQuatToEuler(br_euler *euler, br_quat *q);
 
+#endif

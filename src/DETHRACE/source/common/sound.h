@@ -1,5 +1,9 @@
+#ifndef _SOUND_H_
+#define _SOUND_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 224
 void UsePathFileToDetermineIfFullInstallation();
@@ -185,3 +189,4 @@ void StartMusic();
 // Size: 48
 void StopMusic();
 
+#endif

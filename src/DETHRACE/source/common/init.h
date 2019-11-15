@@ -1,5 +1,9 @@
+#ifndef _INIT_H_
+#define _INIT_H_
+
 #include "dr_types.h"
 #include "br_types.h"
+
 // Offset: 0
 // Size: 115
 void AllocateSelf();
@@ -60,13 +64,13 @@ void Init2DStuff();
 // Size: 671
 // EAX: pArgc
 // EDX: pArgv
-void InitialiseApplication(int pArgc, char **pArgv, signed char __unk2__);
+void InitialiseApplication(int pArgc, char **pArgv);
 
 // Offset: 6004
 // Size: 64
 // EAX: pArgc
 // EDX: pArgv
-void InitialiseDeathRace(int pArgc, char **pArgv, signed char the_path);
+void InitialiseDeathRace(int pArgc, char **pArgv);
 
 // Offset: 6068
 // Size: 427
@@ -107,3 +111,4 @@ int GetScreenSize();
 // EAX: pNew_size
 void SetScreenSize(int pNew_size);
 
+#endif
