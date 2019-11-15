@@ -32,6 +32,6 @@ br_size_t BrStdlibInquire(br_uint_8 type) {
 // Offset: 218
 // Size: 40
 br_uint_32 BrStdlibAlign(br_uint_8 type) {
-    return sizeof(void *)
+    return sizeof(void *);
 }
 

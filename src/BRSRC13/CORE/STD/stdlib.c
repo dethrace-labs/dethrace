@@ -18,19 +18,19 @@ int BrMemCmp(void *s1, void *s2, size_t n) {
 // Offset: 68
 // Size: 50
 void* BrMemCpy(void *s1, void *s2, size_t n) {
-    memcpy(d, s, n);
+    memcpy(s1, s2, n);
 }
 
 // Offset: 127
 // Size: 50
 void* BrMemSet(void *s, int c, size_t n) {
-    memset(d, c, n);
+    memset(s, c, n);
 }
 
 // Offset: 186
 // Size: 47
 char* BrStrCat(char *s1, char *s2) {
-    return strcat(d, s);
+    return strcat(s1, s2);
 }
 
 // Offset: 242
@@ -44,16 +44,16 @@ int BrStrCmp(char *s1, char *s2) {
 int BrStrICmp(char *s1, char *s2) {
     // Windows is stricmp, while posix is strcasecmp
 #ifdef _WIN32
-    return stricmp(s1, s2, n);
+    return stricmp(s1, s2);
 #else
-    return strcasecmp(s1, s2, n);
+    return strcasecmp(s1, s2);
 #endif
 }
 
 // Offset: 355
 // Size: 47
 char* BrStrCpy(char *s1, char *s2) {
-    return strcpy(d, s);
+    return strcpy(s1, s2);
 }
 
 // Offset: 411
@@ -82,13 +82,13 @@ int BrStrNICmp(char *s1, char *s2, size_t n) {
 // Offset: 586
 // Size: 50
 char* BrStrNCpy(char *s1, char *s2, size_t n) {
-    return strncpy(d, s, n);
+    return strncpy(s1, s2, n);
 }
 
 // Offset: 646
 // Size: 49
 char* BrStrRChr(char *s1, char c) {
-    return strrchr(s, c);
+    return strrchr(s1, c);
 }
 
 // Offset: 703
@@ -106,25 +106,25 @@ char* BrGetEnv(char *name) {
 // Offset: 800
 // Size: 58
 float BrStrToF(char *nptr, char **endptr) {
-    return strtof(num, endp);
+    return strtof(nptr, endptr);
 }
 
 // Offset: 867
 // Size: 67
 double BrStrToD(char *nptr, char **endptr) {
-    return strtod(num, endp);
+    return strtod(nptr, endptr);
 }
 
 // Offset: 943
 // Size: 50
 long BrStrToL(char *nptr, char **endptr, int base) {
-    return strtol(num, endp, base);
+    return strtol(nptr, endptr, base);
 }
 
 // Offset: 1003
 // Size: 50
 unsigned long BrStrToUL(char *nptr, char **endptr, int base) {
-    return strtoul(num, endp, base);
+    return strtoul(nptr, endptr, base);
 }
 
 // Offset: 1063
@@ -148,13 +148,13 @@ br_boolean BrIsSpace(int c) {
 // Offset: 1270
 // Size: 59
 br_boolean BrIsPrint(int c) {
-    return isprint(c)
+    return isprint(c);
 }
 
 // Offset: 1340
 // Size: 50
 br_int_32 BrVSprintf(char *buf, char *fmt, va_list args) {
-    return vsprintf(s, f, a);
+    return vsprintf(buf, fmt, args);
 }
 
 // Offset: 1402
@@ -166,7 +166,7 @@ br_int_32 BrVSprintfN(char *buf, br_size_t buf_size, char *fmt, va_list args) {
   
     n = vsprintf(tmp, fmt, args);
   
-    if ( buf_size - 1 < n ) {
+    if (buf_size - 1 < n) {
         n = buf_size - 1;
     }
     
@@ -177,6 +177,6 @@ br_int_32 BrVSprintfN(char *buf, br_size_t buf_size, char *fmt, va_list args) {
 // Offset: 1513
 // Size: 50
 br_int_32 BrVSScanf(char *buf, char *fmt, va_list args) {
-    return vsscanf(s, f, a);
+    return vsscanf(buf, fmt, args);
 }
 

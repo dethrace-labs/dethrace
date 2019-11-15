@@ -94,15 +94,15 @@ br_boolean BrIsPrint(int c);
 
 // Offset: 1340
 // Size: 50
-br_int_32 BrVSprintf(char *buf, char *fmt, char **args);
+br_int_32 BrVSprintf(char *buf, char *fmt, va_list args);
 
 // Offset: 1402
 // Size: 101
-br_int_32 BrVSprintfN(char *buf, br_size_t buf_size, char *fmt, char **args);
+br_int_32 BrVSprintfN(char *buf, br_size_t buf_size, char *fmt, va_list args);
 
 // Offset: 1513
 // Size: 50
-br_int_32 BrVSScanf(char *buf, char *fmt, char **args);
+br_int_32 BrVSScanf(char *buf, char *fmt, va_list args);
 
 #endif
 

@@ -816,7 +816,7 @@ void SetWallTexturingLevel(tWall_texturing_level pLevel) {
 // Size: 82
 // EAX: pLevel
 void ReallySetWallTexturingLevel(tWall_texturing_level pLevel) {
-    tPMFMCB tweaker[3][3];
+    tPMFMCB *tweaker[3][3];
 }
 
 // Offset: 22536

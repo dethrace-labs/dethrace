@@ -2,7 +2,10 @@
 #define DR_TYPES_H
 
 #include "br_types.h"
-
+#include <stdarg.h>
+#include <stdio.h>
+#include <stddef.h>
+/*
 typedef char * va_list[1];
 typedef unsigned short wchar_t;
 typedef unsigned int size_t;
@@ -10,6 +13,7 @@ typedef char * __va_list[1];
 typedef __iobuf FILE;
 typedef long fpos_t;
 typedef void * onexit_t();
+*/
 typedef short SHORT;
 typedef unsigned short USHORT;
 typedef int INT;
@@ -38,22 +42,22 @@ typedef BYTE * HPSTR;
 typedef LONG * HPLONG;
 typedef void * HPVOID;
 typedef unsigned int HANDLE;
-typedef _tagRMI_REGS _RMI_REGS;
-typedef _tagBREGS _HMI_BREGS;
-typedef _tagWREGS _HMI_WREGS;
-typedef _tagDREGS _HMI_DREGS;
-typedef _tagSREGS _HMI_SREGS;
-typedef _tagIPX_HEADER _IPX_HEADER;
-typedef _tagIPX_ECB _IPX_ECB;
-typedef _tagIPX_INTERNET_ADDR _IPX_INTERNET_ADDR;
-typedef _tagIPX_NETWORK_ADDR _IPX_NETWORK_ADDR;
-typedef _tagIPX_LOCAL_TARGET _IPX_LOCAL_TARGET;
-typedef _tagIPX_ELEMENT _IPX_ELEMENT;
-typedef _tag_NETBIOS_NCB _NETBIOS_NCB;
-typedef _tagNETBIOS_ADAPTER_STATUS _NETBIOS_ADAPTER_STATUS;
-typedef _tagNETBIOS_ELEMENT _NETBIOS_ELEMENT;
-typedef _tagNETBIOS_LOCAL_TARGET _NETBIOS_LOCAL_TARGET;
-typedef _tagXFER_BLOCK_HEADER _XFER_BLOCK_HEADER;
+typedef struct _tagRMI_REGS _RMI_REGS;
+typedef struct _tagBREGS _HMI_BREGS;
+typedef struct _tagWREGS _HMI_WREGS;
+typedef struct _tagDREGS _HMI_DREGS;
+typedef struct _tagSREGS _HMI_SREGS;
+typedef struct _tagIPX_HEADER _IPX_HEADER;
+typedef struct _tagIPX_ECB _IPX_ECB;
+typedef struct _tagIPX_INTERNET_ADDR _IPX_INTERNET_ADDR;
+typedef struct _tagIPX_NETWORK_ADDR _IPX_NETWORK_ADDR;
+typedef struct _tagIPX_LOCAL_TARGET _IPX_LOCAL_TARGET;
+typedef struct _tagIPX_ELEMENT _IPX_ELEMENT;
+typedef struct _tag_NETBIOS_NCB _NETBIOS_NCB;
+typedef struct _tagNETBIOS_ADAPTER_STATUS _NETBIOS_ADAPTER_STATUS;
+typedef struct _tagNETBIOS_ELEMENT _NETBIOS_ELEMENT;
+typedef struct _tagNETBIOS_LOCAL_TARGET _NETBIOS_LOCAL_TARGET;
+typedef struct _tagXFER_BLOCK_HEADER _XFER_BLOCK_HEADER;
 typedef unsigned char tU8;
 typedef signed char tS8;
 typedef unsigned short tU16;
@@ -67,9 +71,9 @@ typedef long tX1616;
 typedef tU8 tNet_message_type;
 typedef char * tS3_sound_source_ptr;
 typedef int tS3_sound_tag;
-typedef tCar_spec_struct tCar_spec;
-typedef tPath_node_struct tPath_node;
-typedef tPath_section_struct tPath_section;
+typedef struct tCar_spec_struct tCar_spec;
+typedef struct tPath_node_struct tPath_node;
+typedef struct tPath_section_struct tPath_section;
 typedef tU32 tPlayer_ID;
 typedef int tS3_sound_id;
 typedef int tS3_type;
@@ -81,18 +85,19 @@ typedef long tS3_pitch;
 typedef long tS3_speed;
 typedef char * tS3_outlet_ptr;
 typedef void * tPipe_reset_proc();
+typedef struct tPowerup tPowerup;
 typedef int * tGot_proc(tPowerup*, tCar_spec*);
 typedef void * tLose_proc(tPowerup*, tCar_spec*);
 typedef void * tPeriodic_proc(tPowerup*, tU32);
 typedef char tPath_name[256];
-typedef tFlic_descriptor * tFlic_descriptor_ptr;
-typedef exception_struct * tException_list;
-typedef exception_struct tException_node;
+typedef struct tFlic_descriptor * tFlic_descriptor_ptr;
+typedef struct exception_struct * tException_list;
+typedef struct exception_struct tException_node;
 typedef int tKey_array[123];
 typedef tS32 tJoy_array[8];
 typedef void * tPMFM2CB(br_material*);
-typedef v11face DR_FACE;
-typedef fmt_vertex DR_VERTEX;
+typedef struct v11face DR_FACE;
+typedef struct fmt_vertex DR_VERTEX;
 
 typedef enum tDriver {
     eDriver_non_car_unused_slot = 0,
@@ -474,19 +479,10 @@ typedef enum tSmear_type {
     eSmear_blood = 1,
     eSmear_count = 2
 } tSmear_type;
+typedef struct ot_vertex ot_vertex;
 typedef void zs_order_table_traversal_cbfn(int, ot_vertex*, ot_vertex*, ot_vertex*);
 typedef void tS3_outlet_callback(tS3_outlet_ptr, tS3_sound_tag, tS3_termination_reason);
 typedef void tS3_sample_filter(tS3_effect_tag, tS3_sound_tag);
-typedef struct __iobuf {
-    unsigned char *_ptr;
-    int _cnt;
-    unsigned char *_base;
-    unsigned int _flag;
-    int _handle;
-    unsigned int _bufsize;
-    unsigned char _ungotten;
-    unsigned char _tmpfchar;
-} FILE;
 
 typedef struct div_t {
     int quot;
@@ -867,6 +863,89 @@ typedef struct tNet_message_mechanics_info {
     br_scalar wheel_dam_offset[4];
 } tNet_message_mechanics_info;
 
+typedef struct tDamage_unit {
+    int x_coord;
+    int y_coord;
+    int damage_level;
+    int last_level;
+    int smoke_last_level;
+    int periods[5];
+    br_pixelmap *images;
+} tDamage_unit;
+
+typedef struct tDamage_condition {
+    tAxis_comp axis_comp;
+    tCondition_operator condition_operator;
+    float comparitor;
+} tDamage_condition;
+
+typedef struct tDamage_effect {
+    tDamage_type type;
+    float weakness_factor;
+} tDamage_effect;
+
+typedef struct tDamage_clause {
+    tDamage_condition conditions[2];
+    int effect_count;
+    int condition_count;
+    tDamage_effect effects[4];
+} tDamage_clause;
+
+typedef struct tDamage_program {
+    int clause_count;
+    tDamage_clause *clauses;
+} tDamage_program;
+
+typedef struct tHeadup_slot {
+    int x;
+    int y;
+    int colour;
+    int cockpit_anchored;
+    int dimmed_background;
+    int dim_left;
+    int dim_top;
+    int dim_right;
+    int dim_bottom;
+    tJustification justification;
+} tHeadup_slot;
+
+typedef struct tPart_info {
+    char part_name[14];
+    tU8 *data_ptr;
+    tU32 data_length;
+    int rank_required;
+    int prices[3];
+} tPart_info;
+
+typedef struct tParts_spec {
+    int number_of_parts;
+    tPart_info info[6];
+} tParts_spec;
+
+typedef struct tCar_actor {
+    br_actor *actor;
+    br_scalar min_distance_squared;
+    tCrush_data crush_data;
+    br_vertex *undamaged_vertices;
+} tCar_actor;
+
+typedef struct tJoystick {
+    tS32 left;
+    tS32 right;
+    tS32 acc;
+    tS32 dec;
+} tJoystick;
+
+typedef struct tPursuee_trail {
+    br_vector3 trail_nodes[25];
+    br_vector3 base_heading;
+    tU32 time_of_next_recording;
+    tU32 end_of_deviation;
+    tU8 number_of_nodes;
+    tU8 has_deviated_recently;
+    tU8 nodes_shifted_this_frame;
+} tPursuee_trail;
+
 typedef struct tCar_spec_struct {
     int index;
     int disabled;
@@ -918,7 +997,7 @@ typedef struct tCar_spec_struct {
     tNet_message_mechanics_info message;
     tU32 last_car_car_collision;
     br_scalar dt;
-    tCar_spec_struct *who_last_hit_me;
+    struct tCar_spec_struct *who_last_hit_me;
     char name[32];
     char driver_name[32];
     char grid_icon_names[3][14];
@@ -1106,8 +1185,8 @@ typedef struct tCar_spec_struct {
     float last_col_prop_z;
     tU32 time_last_hit;
     tU32 time_last_victim;
-    tCar_spec_struct *last_hit_by;
-    tCar_spec_struct *last_culprit;
+    struct tCar_spec_struct *last_hit_by;
+    struct tCar_spec_struct *last_culprit;
     int no_of_processes_recording_my_trail;
     tPursuee_trail my_trail;
     unsigned int grudge_raised_recently;
@@ -1119,8 +1198,8 @@ typedef struct tCar_spec_struct {
     tU32 end_trans_damage_effect;
     int false_key_left;
     int false_key_right;
-    tCar_spec_struct *last_person_to_hit_us;
-    tCar_spec_struct *last_person_we_hit;
+    struct tCar_spec_struct *last_person_to_hit_us;
+    struct tCar_spec_struct *last_person_we_hit;
     br_vector3 engine_pos;
     br_model *last_wheel_models[4];
     int last_wheel_faces[4];
@@ -1145,89 +1224,6 @@ typedef struct tCar_spec_struct {
     int power_up_levels[3];
     tS3_sound_tag horn_sound_tag;
 } tCar_spec;
-
-typedef struct tDamage_unit {
-    int x_coord;
-    int y_coord;
-    int damage_level;
-    int last_level;
-    int smoke_last_level;
-    int periods[5];
-    br_pixelmap *images;
-} tDamage_unit;
-
-typedef struct tDamage_condition {
-    tAxis_comp axis_comp;
-    tCondition_operator condition_operator;
-    float comparitor;
-} tDamage_condition;
-
-typedef struct tDamage_effect {
-    tDamage_type type;
-    float weakness_factor;
-} tDamage_effect;
-
-typedef struct tDamage_clause {
-    tDamage_condition conditions[2];
-    int effect_count;
-    int condition_count;
-    tDamage_effect effects[4];
-} tDamage_clause;
-
-typedef struct tDamage_program {
-    int clause_count;
-    tDamage_clause *clauses;
-} tDamage_program;
-
-typedef struct tHeadup_slot {
-    int x;
-    int y;
-    int colour;
-    int cockpit_anchored;
-    int dimmed_background;
-    int dim_left;
-    int dim_top;
-    int dim_right;
-    int dim_bottom;
-    tJustification justification;
-} tHeadup_slot;
-
-typedef struct tPart_info {
-    char part_name[14];
-    tU8 *data_ptr;
-    tU32 data_length;
-    int rank_required;
-    int prices[3];
-} tPart_info;
-
-typedef struct tParts_spec {
-    int number_of_parts;
-    tPart_info info[6];
-} tParts_spec;
-
-typedef struct tCar_actor {
-    br_actor *actor;
-    br_scalar min_distance_squared;
-    tCrush_data crush_data;
-    br_vertex *undamaged_vertices;
-} tCar_actor;
-
-typedef struct tJoystick {
-    tS32 left;
-    tS32 right;
-    tS32 acc;
-    tS32 dec;
-} tJoystick;
-
-typedef struct tPursuee_trail {
-    br_vector3 trail_nodes[25];
-    br_vector3 base_heading;
-    tU32 time_of_next_recording;
-    tU32 end_of_deviation;
-    tU8 number_of_nodes;
-    tU8 has_deviated_recently;
-    tU8 nodes_shifted_this_frame;
-} tPursuee_trail;
 
 typedef struct tOppo_psyche {
     tU8 grudge_against_player;
@@ -1790,9 +1786,9 @@ typedef struct tPowerup {
     int current_value;
     int prat_cam_event;
     tNet_powerup_type net_type;
-    tGot_proc got_proc;
-    tLose_proc lose_proc;
-    tPeriodic_proc periodic_proc;
+    tGot_proc *got_proc;
+    tLose_proc *lose_proc;
+    tPeriodic_proc *periodic_proc;
     float *float_params;
     tCar_spec *car;
     char message[64];
@@ -1911,7 +1907,7 @@ typedef struct tCollision_info {
     tNet_message_mechanics_info message;
     tU32 last_car_car_collision;
     br_scalar dt;
-    tCar_spec_struct *who_last_hit_me;
+    tCar_spec *who_last_hit_me;
 } tCollision_info;
 
 typedef struct tNon_car_spec {
@@ -2429,20 +2425,20 @@ typedef struct fmt_vertex {
     br_vector3 p;
     br_vector2 map;
     br_vector3 n;
-} DR_VERTEX;
+} DR_VERTEX, fmt_vertex;
 
 typedef struct v11face {
     br_uint_16 vertices[3];
     br_uint_16 edges[3];
     br_vector4 eqn;
-} DR_FACE;
+} DR_FACE, v11face;
 
 typedef struct v11group {
     void *stored;
-    v11face *faces;
+    DR_FACE *faces;
     br_colour *face_colours;
     br_uint_16 *face_user;
-    fmt_vertex *vertices;
+    DR_VERTEX *vertices;
     br_colour *vertex_colours;
     br_uint_16 *vertex_user;
     br_uint_16 nfaces;
@@ -2846,30 +2842,29 @@ typedef struct tCheat {
     int num;
 } tCheat;
 
-typedef _tag_sos_evds_struct _SOS_EVDS_STRUCT;
-typedef _tag_sos_vds_struct _SOS_VDS_STRUCT;
-typedef _tag_sos_sample _SOS_SAMPLE;
+typedef struct _tag_sos_evds_struct _SOS_EVDS_STRUCT;
+typedef struct _tag_sos_vds_struct _SOS_VDS_STRUCT;
+typedef struct _tag_sos_sample _SOS_SAMPLE;
 typedef _SOS_SAMPLE * PSOSSAMPLE;
-typedef _tagCAPABILITIES _SOS_CAPABILITIES;
+typedef struct _tagCAPABILITIES _SOS_CAPABILITIES;
 typedef _SOS_CAPABILITIES * PSOSCAPABILITIES;
-typedef _SOS_HARDWARE * PSOSHARDWARE;
-typedef _tag_sos_driver _SOS_DIGI_DRIVER;
+typedef struct _SOS_HARDWARE * PSOSHARDWARE;
+typedef struct _tag_sos_driver _SOS_DIGI_DRIVER;
 typedef _SOS_DIGI_DRIVER * PSOSDIGIDRIVER;
-typedef _SOS_DRV_FILEHEADER * PSOSDRVFILEHEADER;
-typedef _SOS_DRV_DRIVERHEADER * PSOSDRVDRIVERHEADER;
-typedef _tag_sos_system _SOS_SYSTEM;
+typedef struct _SOS_DRV_FILEHEADER * PSOSDRVFILEHEADER;
+typedef struct _SOS_DRV_DRIVERHEADER * PSOSDRVDRIVERHEADER;
+typedef struct _tag_sos_system _SOS_SYSTEM;
 typedef _SOS_SYSTEM * PSOSSYSTEM;
-typedef _tag_sos_det_system _SOS_DET_SYSTEM;
+typedef struct _tag_sos_det_system _SOS_DET_SYSTEM;
 typedef _SOS_DET_SYSTEM * PSOSDETSYSTEM;
-typedef _tag_sos_timer_system _SOS_TIMER_SYSTEM;
+typedef struct _tag_sos_timer_system _SOS_TIMER_SYSTEM;
 typedef _SOS_TIMER_SYSTEM * PSOSTIMERSYSTEM;
-typedef int ptrdiff_t;
-typedef SmackTag Smack;
-typedef SmackSumTag SmackSum;
+typedef struct SmackTag Smack;
+typedef struct SmackSumTag SmackSum;
 typedef void * SmackTimerSetupType();
 typedef unsigned long * SmackTimerReadType();
 typedef void * SmackTimerDoneType();
-typedef _heapinfo _HEAPINFO;
+typedef struct _heapinfo _HEAPINFO;
 typedef struct _tag_sos_evds_struct {
     unsigned int region_size;
     unsigned int offset;
@@ -2911,13 +2906,13 @@ typedef struct _tag_sos_sample {
     DWORD wPanEnd;
     DWORD wPanMode;
     DWORD wTotalBytesProcessed;
-    void (*pfnSampleProcessed)(_tag_sos_sample*);
-    void (*pfnSampleDone)(_tag_sos_sample*);
-    void (*pfnSampleLoop)(_tag_sos_sample*);
+    void (*pfnSampleProcessed)(PSOSSAMPLE*);
+    void (*pfnSampleDone)(PSOSSAMPLE*);
+    void (*pfnSampleLoop)(PSOSSAMPLE*);
     DWORD wSystem[16];
     DWORD wUser[16];
-    _tag_sos_sample *pLink;
-    _tag_sos_sample *pNext;
+    PSOSSAMPLE *pLink;
+    PSOSSAMPLE *pNext;
 } _SOS_SAMPLE;
 
 typedef struct _tagCAPABILITIES {
@@ -3153,14 +3148,14 @@ typedef struct tHeadup {
             char text[250];
             int colour;
             br_font *font;
-        };
+        }a;
         struct {
             char text[250];
             tDR_font *coloured_font;
-        };
+        }b;
         struct {
             br_pixelmap *image;
-        };
+        }c;
         struct {
             br_pixelmap *image;
             int offset;
@@ -3168,7 +3163,7 @@ typedef struct tHeadup {
             int end_offset;
             tFancy_stage fancy_stage;
             tU32 start_time;
-        };
+        }d;
     };
 } tHeadup;
 
@@ -3291,18 +3286,6 @@ typedef br_pixelmap* dev_clone_cbfn(br_device*, br_pixelmap*);
 typedef void dev_free_cbfn(br_device*, br_pixelmap*);
 typedef int dr_modelpick2d_cbfn(br_model*, br_material*, br_vector3*, br_vector3*, br_scalar, int, int, int, br_vector3*, br_vector2*, void*);
 typedef int dr_pick3d_cbfn(br_actor*, br_model*, br_material*, br_matrix34*, br_bounds*, void*);
-typedef struct fw_fn_table {
-    br_surface_fn *light;
-    br_surface_fn *light_material;
-    br_surface_fn *light_vertex;
-    br_surface_fn *light_texture;
-    br_face_surface_fn *face_light;
-    br_light_sub_fn *direct;
-    br_light_sub_fn *point;
-    br_light_sub_fn *point_attn;
-    br_light_sub_fn *spot;
-    br_light_sub_fn *spot_attn;
-} fw_fn_table;
 
 typedef struct tFlic_spec {
     char *file_name;
@@ -3332,13 +3315,14 @@ typedef struct tTranslation_record {
     char *text;
 } tTranslation_record;
 
-
+/* Changed due to conflict with tVehicle_type enum */
 typedef enum tVehicle_category {
-    eVehicle_self = 0,
-    eVehicle_opponent = 1,
-    eVehicle_rozzer = 2,
-    eVehicle_drone = 3
+    eVehiclecat_self = 0,
+    eVehiclecat_opponent = 1,
+    eVehiclecat_rozzer = 2,
+    eVehiclecat_drone = 3
 } tVehicle_category;
+
 typedef struct tTransient_bm {
     br_pixelmap *pixmap;
     int in_use;
@@ -3393,6 +3377,11 @@ typedef enum tS3_sound_type {
     eS3_ST_midi = 1,
     eS3_ST_cda = 2
 } tS3_sound_type;
+
+typedef struct tS3_outlet tS3_outlet;
+typedef struct tS3_descriptor tS3_descriptor;
+typedef struct tS3_channel tS3_channel;
+typedef struct tS3_sound_source tS3_sound_source;
 typedef struct tS3_channel {
     int active;
     int termination_reason;
@@ -4014,13 +4003,13 @@ typedef struct tFunkotronic_spec {
     struct {
         struct {
             float period;
-        };
+        }a;
         struct {
             float period;
             br_scalar x_centre;
             br_scalar y_centre;
             float rock_angle;
-        };
+        }b;
         struct {
             float x_period;
             float y_period;
@@ -4028,17 +4017,17 @@ typedef struct tFunkotronic_spec {
             br_scalar y_centre;
             float x_magnitude;
             float y_magnitude;
-        };
+        }c;
         struct {
             float x_period;
             float y_period;
             float x_magnitude;
             float y_magnitude;
-        };
+        }d;
         struct {
             float x_period;
             float y_period;
-        };
+        }e;
     };
     tMove_mode lighting_animation_type;
     float lighting_animation_period;
@@ -4058,12 +4047,12 @@ typedef struct tFunkotronic_spec {
             int texture_count;
             int current_frame;
             br_pixelmap *textures[8];
-        };
+        }f;
         struct {
             tU8 *flic_data;
             tU32 flic_data_length;
             tFlic_descriptor flic_descriptor;
-        };
+        }g;
     };
     int proximity_count;
     br_vector3 *proximity_array;
@@ -4086,13 +4075,13 @@ typedef struct tGroovidelic_spec {
             float y_delta;
             float z_delta;
             br_vector3 centre;
-        };
+        }a;
         struct {
             float period;
             float radius;
             br_vector3 centre;
             tGroove_axis_mode axis;
-        };
+        }b;
     };
     br_vector3 object_centre;
     br_vector3 object_position;
@@ -4104,13 +4093,13 @@ typedef struct tGroovidelic_spec {
         struct {
             float period;
             tGroove_axis_mode axis;
-        };
+        }c;
         struct {
             float period;
             float max_angle;
             float current_angle;
             tGroove_axis_mode axis;
-        };
+        }d;
         struct {
             float x_period;
             float y_period;
@@ -4118,7 +4107,7 @@ typedef struct tGroovidelic_spec {
             float x_magnitude;
             float y_magnitude;
             float z_magnitude;
-        };
+        }e;
         struct {
             float x_period;
             float y_period;
@@ -4126,7 +4115,7 @@ typedef struct tGroovidelic_spec {
             float x_magnitude;
             float y_magnitude;
             float z_magnitude;
-        };
+        }f;
     };
 } tGroovidelic_spec;
 
@@ -4391,7 +4380,6 @@ typedef struct tRM_info {
 typedef unsigned int ino_t;
 typedef int dev_t;
 typedef long off_t;
-typedef dirent DIR;
 
 typedef enum dosio_event_type {
     DOSIO_EVENT_KEY_DOWN = 0,
@@ -4411,16 +4399,6 @@ typedef enum dosio_event_qual {
     DOSIO_QUAL_CONTROL = 2,
     DOSIO_QUAL_ALT = 4
 } dosio_event_qual;
-typedef struct dirent {
-    char d_dta[21];
-    char d_attr;
-    unsigned short d_time;
-    unsigned short d_date;
-    long d_size;
-    char d_name[13];
-    unsigned short d_ino;
-    char d_first;
-} DIR;
 
 typedef struct dosio_event {
     br_uint_16 type;
@@ -4492,9 +4470,8 @@ typedef struct tMem_info {
     unsigned int reserved[3];
 } tMem_info;
 
-typedef unsigned int jmp_buf[13];
 typedef struct pm_temp_edge {
-    pm_temp_edge *next;
+    struct pm_temp_edge *next;
     br_uint_16 first;
     br_uint_16 last;
     char other;
@@ -4556,7 +4533,7 @@ typedef struct host_regs {
         br_uint_16 cs;
         br_uint_16 sp;
         br_uint_16 ss;
-    };
+    }a;
     struct {
         br_uint_16 di;
         br_uint_16 _pad0;
@@ -4583,7 +4560,7 @@ typedef struct host_regs {
         br_uint_16 cs;
         br_uint_16 sp;
         br_uint_16 ss;
-    };
+    }b;
     struct {
         br_uint_32 _pad0[4];
         br_uint_8 bl;
@@ -4602,7 +4579,7 @@ typedef struct host_regs {
         br_uint_8 ah;
         br_uint_8 _pad7;
         br_uint_8 _pad8;
-    };
+    }c;
 } host_regs;
 
 typedef struct host_info {

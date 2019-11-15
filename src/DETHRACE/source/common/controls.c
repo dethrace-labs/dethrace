@@ -2,7 +2,7 @@
 
 tCheat gKev_keys[44];
 char *gAbuse_text[10];
-tEdit_func gEdit_funcs[10][18][8];
+tEdit_func *gEdit_funcs[10][18][8];
 char *gEdit_mode_names[10];
 tToggle_element gToggle_array[43];
 char gString[84];

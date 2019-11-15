@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 // Global variables
-br_filesystem BrStdioFilesystem == {
+br_filesystem BrStdioFilesystem = {
     "Standard IO",
     BrStdioAttributes,
     BrStdioOpenRead,
@@ -44,7 +44,7 @@ void* BrStdioOpenRead(char *name, br_size_t n_magics, br_mode_test_cbfn *identif
 void* BrStdioOpenWrite(char *name, int mode) {
     FILE *fh;
 
-    if(text == BR_FS_MODE_TEXT) {
+    if(mode == BR_FS_MODE_TEXT) {
         fh = fopen(name, "w");
     } else {
         fh = fopen(name, "wb");  
@@ -80,13 +80,13 @@ void BrStdioPutChar(int c, void *f) {
 // Offset: 1075
 // Size: 53
 br_size_t BrStdioRead(void *buf, br_size_t size, unsigned int n, void *f) {
-    return fread(buf, size, nelems, f);
+    return fread(buf, size, n, f);
 }
 
 // Offset: 1141
 // Size: 53
 br_size_t BrStdioWrite(void *buf, br_size_t size, unsigned int n, void *f) {
-    return fwrite(buf, size, nelems, f);
+    return fwrite(buf, size, n, f);
 }
 
 // Offset: 1209
