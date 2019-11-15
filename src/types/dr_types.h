@@ -4379,7 +4379,8 @@ typedef struct tRM_info {
 
 typedef unsigned int ino_t;
 typedef int dev_t;
-typedef long off_t;
+//typedef long off_t;  // Conflicts with __darwin_off_t on OSX
+typedef long off_t_;
 
 typedef enum dosio_event_type {
     DOSIO_EVENT_KEY_DOWN = 0,
@@ -4423,7 +4424,7 @@ typedef struct _stat {
     unsigned long st_uid;
     short st_gid;
     dev_t st_rdev;
-    off_t st_size;
+    off_t_ st_size;
     time_t st_atime;
     time_t st_mtime;
     time_t st_ctime;
@@ -4444,7 +4445,7 @@ typedef struct stat {
     unsigned long st_uid;
     short st_gid;
     dev_t st_rdev;
-    off_t st_size;
+    off_t_ st_size;
     time_t st_atime;
     time_t st_mtime;
     time_t st_ctime;
