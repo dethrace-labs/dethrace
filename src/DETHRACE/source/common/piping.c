@@ -1,7 +1,7 @@
 #include "piping.h"
 
 tPiped_registration_snapshot gRegistration_snapshots[5];
-tPipe_reset_proc gReset_procs[32];
+tPipe_reset_proc *gReset_procs[32];
 float gWall_severity;
 tPipe_smudge_data *gSmudge_space;
 tU32 gOldest_time;

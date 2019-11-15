@@ -1,4 +1,6 @@
 #include "diag.h"
+#include "fwsetup.h"
+#include "printf.h"
 #include "stdlib.h"
 #include <stdarg.h>
 
@@ -16,11 +18,11 @@ void BrFailure(const char *s, ...) {
     BrStrCpy(_diag_scratch, failure_header);
     BrVSprintf(&_diag_scratch[sizeof(failure_header) - 1], s, args);
 
-    if (fw.diag->failure == NULL) {
+    if (fw.err->error == NULL) {
         BrAbort();
     }
     
-    fw.diag->failure(_diag_scratch);
+    fw.err->error(_diag_scratch);
     va_end(args);
 }
 
@@ -34,11 +36,11 @@ void BrWarning(const char *s, ...) {
     BrStrCpy(_diag_scratch, warning_header);
     BrVSprintf(&_diag_scratch[sizeof(warning_header) - 1], s, args);
 
-    if (fw.diag->warning == NULL) {
+    if (fw.err->message == NULL) {
         BrAbort();
     }
     
-    fw.diag->warning(_diag_scratch);
+    fw.err->message(_diag_scratch);
     va_end(args);
 }
 
@@ -51,33 +53,33 @@ void BrFatal(const char *name, int line, const char *s, ...) {
     va_start(args, s);
     n = BrSprintF(_diag_scratch, "FATAL %s:%d\n", name, line);
     BrVSprintf(&_diag_scratch[n], s, args);
-    if (fw.diag->failure == NULL) {
+    if (fw.err->error == NULL) {
         BrAbort();
     }
     
-    fw.diag->failure(_diag_scratch);
+    fw.err->error(_diag_scratch);
     va_end(args);
 }
 
 // Offset: 406
 // Size: 95
 void _BrAssert(const char *condition, const char *file, unsigned int line) {
-    if (fw.diag->error == NULL) {
+    if (fw.err->error == NULL) {
         BrAbort();
     }
     
     BrSprintf(_diag_scratch, "ASSERTION FAILED %s:%d: \"%s\"\n", file, line, condition);
-    fw.diag->error(_diag_scratch);
+    fw.err->error(_diag_scratch);
 }
 
 // Offset: 512
 // Size: 95
 void _BrUAssert(const char *condition, const char *file, unsigned int line) {
-    if (fw.diag->error == NULL) {
+    if (fw.err->error == NULL) {
         BrAbort();
     }
     
     BrSprintf(_diag_scratch, "ASSERTION FAILED %s:%d: \"%s\"\n", file, line, condition);
-    fw.diag->error(_diag_scratch);
+    fw.err->error(_diag_scratch);
 }
 

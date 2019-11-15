@@ -22,7 +22,7 @@ void OpenDiagnostics();
 
 // Offset: 452
 // Size: 34
-void dprintf(char *fmt_string);
+// void dprintf(char *fmt_string);
 
 // Offset: 488
 // Size: 57

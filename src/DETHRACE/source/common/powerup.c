@@ -1,10 +1,10 @@
 #include "powerup.h"
 
 int gPed_harvest_sounds[4];
-tGot_proc gGot_procs[34];
-tLose_proc gLose_procs[34];
+tGot_proc *gGot_procs[34];
+tLose_proc *gLose_procs[34];
 tHeadup_icon gIcon_list[20];
-tPeriodic_proc gPeriodic_procs[34];
+tPeriodic_proc *gPeriodic_procs[34];
 char *gFizzle_names[3];
 br_pixelmap *gFizzle_in[3];
 int gNumber_of_powerups;

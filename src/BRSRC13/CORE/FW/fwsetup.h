@@ -4,6 +4,8 @@
 #include "dr_types.h"
 #include "br_types.h"
 
+extern br_framework_state fw;
+
 // Offset: 10
 // Size: 324
 br_error BrFwBegin();
