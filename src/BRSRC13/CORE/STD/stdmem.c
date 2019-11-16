@@ -1,5 +1,7 @@
 #include "stdmem.h"
 
+#include <stdlib.h>
+
 // Global variables
 char rscid[48];
 br_allocator BrStdlibAllocator = {"malloc", BrStdlibAllocate, BrStdlibFree, BrStdlibInquire, BrStdlibAlign};

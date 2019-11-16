@@ -484,26 +484,6 @@ typedef void zs_order_table_traversal_cbfn(int, ot_vertex*, ot_vertex*, ot_verte
 typedef void tS3_outlet_callback(tS3_outlet_ptr, tS3_sound_tag, tS3_termination_reason);
 typedef void tS3_sample_filter(tS3_effect_tag, tS3_sound_tag);
 
-typedef struct div_t {
-    int quot;
-    int rem;
-} div_t;
-
-typedef struct ldiv_t {
-    long quot;
-    long rem;
-} ldiv_t;
-
-typedef struct _complex {
-    double x;
-    double y;
-} _complex;
-
-typedef struct complex {
-    double x;
-    double y;
-} complex;
-
 typedef struct exception {
     int type;
     char *name;

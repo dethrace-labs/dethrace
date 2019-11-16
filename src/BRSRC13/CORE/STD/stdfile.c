@@ -1,5 +1,7 @@
 #include "stdfile.h"
+
 #include <stdio.h>
+#include <string.h>
 
 // Global variables
 br_filesystem BrStdioFilesystem = {
@@ -47,7 +49,7 @@ void* BrStdioOpenWrite(char *name, int mode) {
     if(mode == BR_FS_MODE_TEXT) {
         fh = fopen(name, "w");
     } else {
-        fh = fopen(name, "wb");  
+        fh = fopen(name, "wb");
     }
 
     return fh;
@@ -93,7 +95,7 @@ br_size_t BrStdioWrite(void *buf, br_size_t size, unsigned int n, void *f) {
 // Size: 141
 br_size_t BrStdioGetLine(char *buf, br_size_t buf_len, void *f) {
     br_size_t l;
-    
+
     if (fgets(buf, buf_len, f) == NULL) {
         return 0;
     }
