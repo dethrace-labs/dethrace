@@ -1,4 +1,4 @@
-#include "printf.h"
+#include "brprintf.h"
 
 char rscid[48];
 

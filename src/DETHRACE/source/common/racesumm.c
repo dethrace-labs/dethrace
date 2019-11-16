@@ -133,16 +133,6 @@ tSO_result DoEndRaceSummary1() {
     int completed_already;
 }
 
-// Offset: 3184
-// Size: 165
-// EAX: model
-void PrepareBoundingRadius(br_model *model) {
-    float d;
-    float max;
-    int v;
-    br_vertex *vp;
-}
-
 // Offset: 3352
 // Size: 1003
 void BuildWrecks() {

@@ -13,11 +13,6 @@ br_material *gReal_material;
 br_scalar gNearest_T;
 tFace_ref *gPling_face;
 
-// Offset: 0
-// Size: 104
-int BadDiv(br_scalar a, br_scalar b) {
-}
-
 // Offset: 104
 // Size: 73
 // EAX: a
@@ -25,16 +20,6 @@ int BadDiv(br_scalar a, br_scalar b) {
 void DRVector2AccumulateScale(br_vector2 *a, br_vector2 *b, br_scalar s) {
 }
 
-// Offset: 180
-// Size: 552
-// EAX: b
-// EDX: rp
-// EBX: rd
-int PickBoundsTestRay(br_bounds *b, br_vector3 *rp, br_vector3 *rd, br_scalar t_near, br_scalar t_far, br_scalar *new_t_near, br_scalar *new_t_far) {
-    int i;
-    float s;
-    float t;
-}
 
 // Offset: 732
 // Size: 710
@@ -63,46 +48,6 @@ int ActorRayPick2D(br_actor *ap, br_vector3 *pPosition, br_vector3 *pDir, br_mod
 // EBX: pDir
 // ECX: callback
 int DRSceneRayPick2D(br_actor *world, br_vector3 *pPosition, br_vector3 *pDir, dr_pick2d_cbfn *callback) {
-}
-
-// Offset: 1544
-// Size: 2059
-// EAX: model
-// EDX: material
-// EBX: ray_pos
-// ECX: ray_dir
-int DRModelPick2D(br_model *model, br_material *material, br_vector3 *ray_pos, br_vector3 *ray_dir, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn *callback, void *arg) {
-    DR_FACE *fp;
-    int f;
-    int axis_m;
-    int axis_0;
-    int axis_1;
-    br_scalar t;
-    br_scalar n;
-    br_scalar d;
-    br_vector3 p;
-    float u0;
-    float u1;
-    float u2;
-    float v0;
-    float v1;
-    float v2;
-    br_scalar v0i1;
-    br_scalar v0i2;
-    float alpha;
-    float beta;
-    float f_d;
-    float f_n;
-    br_scalar s_alpha;
-    br_scalar s_beta;
-    br_vector2 map;
-    int v;
-    int e;
-    int r;
-    br_material *this_material;
-    br_scalar numerator;
-    float f_numerator;
-    int group;
 }
 
 // Offset: 3604

@@ -403,18 +403,6 @@ void DoNetOptions(tNet_game_options *pGame_options) {
 void SetOptions(tNet_game_type pGame_type, tNet_game_options *pGame_options) {
 }
 
-// Offset: 8752
-// Size: 118
-// EAX: pIndex
-void PlayRadioOn(int pIndex) {
-}
-
-// Offset: 8872
-// Size: 118
-// EAX: pIndex
-void PlayRadioOff(int pIndex) {
-}
-
 // Offset: 8992
 // Size: 44
 void DrawNetChooseInitial() {

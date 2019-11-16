@@ -1,6 +1,6 @@
 #include "diag.h"
 #include "fwsetup.h"
-#include "printf.h"
+#include "brprintf.h"
 #include "brstdlib.h"
 #include <stdarg.h>
 

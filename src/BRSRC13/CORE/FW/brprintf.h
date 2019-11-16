@@ -1,5 +1,5 @@
-#ifndef _PRINTF_H_
-#define _PRINTF_H_
+#ifndef _BRPRINTF_H_
+#define _BRPRINTF_H_
 
 #include "dr_types.h"
 #include "br_types.h"

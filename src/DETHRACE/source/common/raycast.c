@@ -28,12 +28,6 @@ void InitRayCasting() {
 int BadDiv(br_scalar a, br_scalar b) {
 }
 
-// Offset: 516
-// Size: 73
-// EAX: a
-// EDX: b
-void DRVector2AccumulateScale(br_vector2 *a, br_vector2 *b, br_scalar s) {
-}
 
 // Offset: 592
 // Size: 544
@@ -128,17 +122,6 @@ int DRModelPick2D(br_model *model, br_material *material, br_vector3 *ray_pos, b
     br_material *this_material;
     br_scalar numerator;
     double f_numerator;
-}
-
-// Offset: 4148
-// Size: 141
-int FindHighestPolyCallBack(br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3 *pPoint, br_vector2 *pMap, void *pArg) {
-    br_scalar the_y;
-}
-
-// Offset: 4292
-// Size: 112
-int FindHighestCallBack(br_actor *pActor, br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT_near, br_scalar pT_far, void *pArg) {
 }
 
 // Offset: 4404

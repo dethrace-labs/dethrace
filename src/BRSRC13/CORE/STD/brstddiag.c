@@ -1,4 +1,4 @@
-#include "stddiag.h"
+#include "brstddiag.h"
 
 br_diaghandler BrStdioDiagHandler;
 br_diaghandler *_BrDefaultDiagHandler;

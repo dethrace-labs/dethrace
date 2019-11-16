@@ -1,5 +1,5 @@
-#ifndef _STDFILE_H_
-#define _STDFILE_H_
+#ifndef _BRSTDFILE_H_
+#define _BRSTDFILE_H_
 
 #include "dr_types.h"
 #include "br_types.h"

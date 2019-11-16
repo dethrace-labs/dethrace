@@ -77,11 +77,6 @@ int SummCheckGameOver(int *pCurrent_choice, int *pCurrent_mode);
 // Size: 288
 tSO_result DoEndRaceSummary1();
 
-// Offset: 3184
-// Size: 165
-// EAX: model
-void PrepareBoundingRadius(br_model *model);
-
 // Offset: 3352
 // Size: 1003
 void BuildWrecks();
