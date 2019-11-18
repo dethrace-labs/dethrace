@@ -3154,8 +3154,8 @@ typedef struct tQueued_headup {
     char text[256];
 } tQueued_headup;
 
-typedef unsigned long time_t;
-typedef unsigned long clock_t;
+//typedef unsigned long time_t;
+//typedef unsigned long clock_t;
 typedef struct tFlicette {
     int flic_index;
     int x[2];
@@ -4345,11 +4345,6 @@ typedef struct tRM_info {
     unsigned short SS;
 } tRM_info;
 
-typedef unsigned int ino_t;
-typedef int dev_t;
-//typedef long off_t;  // Conflicts with __darwin_off_t on OSX
-typedef long off_t_;
-
 typedef enum dosio_event_type {
     DOSIO_EVENT_KEY_DOWN = 0,
     DOSIO_EVENT_KEY_UP = 1,
@@ -4383,48 +4378,6 @@ typedef struct dosio_event_queue {
     br_uint_16 tail;
     dosio_event slots[1];
 } dosio_event_queue;
-
-typedef struct _stat {
-    dev_t st_dev;
-    ino_t st_ino;
-    unsigned short st_mode;
-    short st_nlink;
-    unsigned long st_uid;
-    short st_gid;
-    dev_t st_rdev;
-    off_t_ st_size;
-    time_t st_atime;
-    time_t st_mtime;
-    time_t st_ctime;
-    time_t st_btime;
-    unsigned long st_attr;
-    unsigned long st_archivedID;
-    unsigned long st_updatedID;
-    unsigned short st_inheritedRightsMask;
-    unsigned char st_originatingNameSpace;
-    unsigned char st_name[13];
-} _stat;
-
-typedef struct stat {
-    dev_t st_dev;
-    ino_t st_ino;
-    unsigned short st_mode;
-    short st_nlink;
-    unsigned long st_uid;
-    short st_gid;
-    dev_t st_rdev;
-    off_t_ st_size;
-    time_t st_atime;
-    time_t st_mtime;
-    time_t st_ctime;
-    time_t st_btime;
-    unsigned long st_attr;
-    unsigned long st_archivedID;
-    unsigned long st_updatedID;
-    unsigned short st_inheritedRightsMask;
-    unsigned char st_originatingNameSpace;
-    unsigned char st_name[13];
-} stat;
 
 typedef struct tMem_info {
     unsigned int largest_block_avail;
