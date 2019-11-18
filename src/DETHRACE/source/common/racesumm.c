@@ -133,16 +133,6 @@ tSO_result DoEndRaceSummary1() {
     int completed_already;
 }
 
-// Offset: 3184
-// Size: 165
-// EAX: model
-void PrepareBoundingRadius(br_model *model) {
-    float d;
-    float max;
-    int v;
-    br_vertex *vp;
-}
-
 // Offset: 3352
 // Size: 1003
 void BuildWrecks() {
@@ -311,22 +301,6 @@ tSO_result DoEndRaceSummary2() {
     tMouse_area mouse_areas[3];
     tInterface_spec interface_spec;
     int result;
-}
-
-// Offset: 11068
-// Size: 92
-// EAX: pX
-// EDX: pY_index
-// EBX: pFont_index
-// ECX: pText
-void DrawAnItem(int pX, int pY_index, int pFont_index, char *pText) {
-}
-
-// Offset: 11160
-// Size: 96
-// EAX: pStr_index
-// EDX: pX
-void DrawColumnHeading(int pStr_index, int pX) {
 }
 
 // Offset: 11256

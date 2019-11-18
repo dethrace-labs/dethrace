@@ -1,7 +1,7 @@
 #include "diag.h"
 #include "fwsetup.h"
-#include "printf.h"
-#include "stdlib.h"
+#include "brprintf.h"
+#include "brstdlib.h"
 #include <stdarg.h>
 
 // Global variables
@@ -21,7 +21,7 @@ void BrFailure(const char *s, ...) {
     if (fw.err->error == NULL) {
         BrAbort();
     }
-    
+
     fw.err->error(_diag_scratch);
     va_end(args);
 }
@@ -39,7 +39,7 @@ void BrWarning(const char *s, ...) {
     if (fw.err->message == NULL) {
         BrAbort();
     }
-    
+
     fw.err->message(_diag_scratch);
     va_end(args);
 }
@@ -51,12 +51,12 @@ void BrFatal(const char *name, int line, const char *s, ...) {
     int n;
 
     va_start(args, s);
-    n = BrSprintF(_diag_scratch, "FATAL %s:%d\n", name, line);
+    n = BrSprintf(_diag_scratch, "FATAL %s:%d\n", name, line);
     BrVSprintf(&_diag_scratch[n], s, args);
     if (fw.err->error == NULL) {
         BrAbort();
     }
-    
+
     fw.err->error(_diag_scratch);
     va_end(args);
 }
@@ -67,7 +67,7 @@ void _BrAssert(const char *condition, const char *file, unsigned int line) {
     if (fw.err->error == NULL) {
         BrAbort();
     }
-    
+
     BrSprintf(_diag_scratch, "ASSERTION FAILED %s:%d: \"%s\"\n", file, line, condition);
     fw.err->error(_diag_scratch);
 }
@@ -78,7 +78,7 @@ void _BrUAssert(const char *condition, const char *file, unsigned int line) {
     if (fw.err->error == NULL) {
         BrAbort();
     }
-    
+
     BrSprintf(_diag_scratch, "ASSERTION FAILED %s:%d: \"%s\"\n", file, line, condition);
     fw.err->error(_diag_scratch);
 }

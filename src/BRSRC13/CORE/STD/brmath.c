@@ -1,4 +1,4 @@
-#include "math.h"
+#include "brmath.h"
 
 char rscid[46];
 

@@ -1,5 +1,9 @@
-#ifndef _STDLIB_H_
-#define _STDLIB_H_
+/*
+ * Renamed from stdlib.h to avoid collisions with c std lib
+*/
+
+#ifndef _BRSTDLIB_H_
+#define _BRSTDLIB_H_
 
 #include "dr_types.h"
 #include "br_types.h"

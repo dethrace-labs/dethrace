@@ -1,5 +1,5 @@
-#ifndef _MATH_H_
-#define _MATH_H_
+#ifndef _BRMATH_H_
+#define _BRMATH_H_
 
 #include "dr_types.h"
 #include "br_types.h"

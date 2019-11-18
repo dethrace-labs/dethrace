@@ -890,20 +890,6 @@ void ToggleMellowOpponents() {
 void RepairOpponentsSystems() {
 }
 
-// Offset: 40304
-// Size: 144
-// EAX: pDest_vertex
-// EDX: pSrc_vertex
-void CopyVertex(br_vertex *pDest_vertex, br_vertex *pSrc_vertex) {
-}
-
-// Offset: 40448
-// Size: 116
-// EAX: pDest_face
-// EDX: pSrc_face
-void CopyFace(br_face *pDest_face, br_face *pSrc_face) {
-}
-
 // Offset: 40564
 // Size: 530
 // EAX: pSection_to_delete

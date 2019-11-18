@@ -77,11 +77,6 @@ int SummCheckGameOver(int *pCurrent_choice, int *pCurrent_mode);
 // Size: 288
 tSO_result DoEndRaceSummary1();
 
-// Offset: 3184
-// Size: 165
-// EAX: model
-void PrepareBoundingRadius(br_model *model);
-
 // Offset: 3352
 // Size: 1003
 void BuildWrecks();
@@ -185,14 +180,6 @@ int DamageScrnDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pE
 // Offset: 10780
 // Size: 286
 tSO_result DoEndRaceSummary2();
-
-// Offset: 11068
-// Size: 92
-// EAX: pX
-// EDX: pY_index
-// EBX: pFont_index
-// ECX: pText
-void DrawAnItem(int pX, int pY_index, int pFont_index, char *pText);
 
 // Offset: 11160
 // Size: 96

@@ -1,5 +1,5 @@
-#ifndef _STDMEM_H_
-#define _STDMEM_H_
+#ifndef _BRSTDMEM_H_
+#define _BRSTDMEM_H_
 
 #include "dr_types.h"
 #include "br_types.h"

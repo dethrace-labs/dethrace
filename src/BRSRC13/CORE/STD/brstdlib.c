@@ -1,9 +1,12 @@
-#include "stdlib.h"
+#include "brstdlib.h"
+
+#include <ctype.h>
 #include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 
 // Global variables
 // DOSPICK has "$Id: stdlib.c 2.4 1996/12/06 21:18:39 sam Exp $" for this. Do we want to implement these?
@@ -163,13 +166,13 @@ br_int_32 BrVSprintfN(char *buf, br_size_t buf_size, char *fmt, va_list args) {
     // Most C libs have vsnprintf these days that can replace this.
     unsigned int n;
     char tmp[512];
-  
+
     n = vsprintf(tmp, fmt, args);
-  
+
     if (buf_size - 1 < n) {
         n = buf_size - 1;
     }
-    
+
     strncpy(buf, tmp, n);
     buf[n] = '\0';
 }

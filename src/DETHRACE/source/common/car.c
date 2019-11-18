@@ -1612,13 +1612,6 @@ int CrashCarsTogetherSinglePass(br_scalar dt, int pPass, tCollison_data *collide
 void BringCarToAGrindingHalt(tCollision_info *car) {
 }
 
-// Offset: 94772
-// Size: 165
-// EAX: b1
-// EDX: b2
-int BoundsOverlapTest(br_bounds *b1, br_bounds *b2) {
-}
-
 // Offset: 94940
 // Size: 99
 // EAX: car1

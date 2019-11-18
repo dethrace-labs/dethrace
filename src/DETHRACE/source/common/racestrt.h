@@ -487,14 +487,6 @@ void CheckPlayersAreResponding();
 // Size: 39
 void NetSynchStartStart();
 
-// Offset: 21120
-// Size: 92
-// EAX: pX
-// EDX: pY_index
-// EBX: pFont_index
-// ECX: pText
-void DrawAnItem(int pX, int pY_index, int pFont_index, char *pText);
-
 // Offset: 21212
 // Size: 759
 // EAX: pCurrent_choice

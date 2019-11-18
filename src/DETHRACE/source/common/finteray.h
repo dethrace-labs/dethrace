@@ -4,22 +4,11 @@
 #include "dr_types.h"
 #include "br_types.h"
 
-// Offset: 0
-// Size: 104
-int BadDiv(br_scalar a, br_scalar b);
-
 // Offset: 104
 // Size: 73
 // EAX: a
 // EDX: b
 void DRVector2AccumulateScale(br_vector2 *a, br_vector2 *b, br_scalar s);
-
-// Offset: 180
-// Size: 552
-// EAX: b
-// EDX: rp
-// EBX: rd
-int PickBoundsTestRay(br_bounds *b, br_vector3 *rp, br_vector3 *rd, br_scalar t_near, br_scalar t_far, br_scalar *new_t_near, br_scalar *new_t_far);
 
 // Offset: 732
 // Size: 710
@@ -36,14 +25,6 @@ int ActorRayPick2D(br_actor *ap, br_vector3 *pPosition, br_vector3 *pDir, br_mod
 // EBX: pDir
 // ECX: callback
 int DRSceneRayPick2D(br_actor *world, br_vector3 *pPosition, br_vector3 *pDir, dr_pick2d_cbfn *callback);
-
-// Offset: 1544
-// Size: 2059
-// EAX: model
-// EDX: material
-// EBX: ray_pos
-// ECX: ray_dir
-int DRModelPick2D(br_model *model, br_material *material, br_vector3 *ray_pos, br_vector3 *ray_dir, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn *callback, void *arg);
 
 // Offset: 3604
 // Size: 88

@@ -1,4 +1,6 @@
-#include "stdmem.h"
+#include "brstdmem.h"
+
+#include <stdlib.h>
 
 // Global variables
 char rscid[48];

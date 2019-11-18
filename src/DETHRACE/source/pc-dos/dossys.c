@@ -1,5 +1,8 @@
 #include "dossys.h"
 
+#include <time.h>
+#include <sys/stat.h>
+
 int gASCII_table[128];
 tU32 gKeyboard_bits[8];
 int gASCII_shift_table[128];
@@ -526,7 +529,7 @@ void CriticalISR(INTPACK pRegs) {
 // EDX: pFile_name
 // EBX: pMin_size
 int PDCheckDriveExists2(char *pThe_path, char *pFile_name, tU32 pMin_size) {
-    stat buf;
+    struct stat buf;
     void (*old_critical_isr)();
     int stat_failed;
     char slasher[4];

@@ -1,5 +1,7 @@
 #include "pedestrn.h"
 
+#include <time.h>
+
 int gPed_gib_counts[4][5];
 int gPed_gib_maxes[4][5];
 tPedestrian_instruction gPed_instrucs[100];
