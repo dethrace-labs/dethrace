@@ -182,25 +182,6 @@ int RadioClick(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_o
 int GraphOptGoAhead(int *pCurrent_choice, int *pCurrent_mode) {
 }
 
-// Offset: 3920
-// Size: 195
-// EAX: pIndex
-// EDX: pColour_value
-void PlotAGraphBox(int pIndex, int pColour_value) {
-}
-
-// Offset: 4116
-// Size: 50
-// EAX: pIndex
-void DrawAGraphBox(int pIndex) {
-}
-
-// Offset: 4168
-// Size: 47
-// EAX: pIndex
-void EraseAGraphBox(int pIndex) {
-}
-
 // Offset: 4216
 // Size: 80
 // EAX: pCurrent_choice
