@@ -6,7 +6,7 @@ char rscid[53];
 // Size: 112
 br_error AddRequestedDrivers() {
     char devstr[256];
-    br_boolean bAlreadyDone;
+    static br_boolean bAlreadyDone;
 }
 
 // Offset: 139

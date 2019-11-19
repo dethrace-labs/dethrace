@@ -19,7 +19,7 @@ br_matrix34* BrModelFitMap(br_model *model, int axis_0, int axis_1, br_matrix34 
     br_vector3 tr;
     br_vector3 sc;
     int i;
-    br_vector3 axis_vectors[6];
+    static br_vector3 axis_vectors[6];
 }
 
 // Offset: 1442

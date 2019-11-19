@@ -374,7 +374,7 @@ int HasCarFallenOffWorld(tCar_spec *pCar) {
 // Offset: 5824
 // Size: 250
 void CheckForBeingOutOfThisWorld() {
-    tU32 sLast_check;
+    static tU32 sLast_check;
     int time_step;
 }
 
@@ -450,12 +450,12 @@ void CheckOtherRacingKeys() {
     int flip_up_flag;
     tCar_spec *car;
     float bodywork_repair_amount;
-    tU32 total_repair_cost;
-    tS3_sound_tag sound_tag;
-    br_scalar amount;
-    int NeedToExpandBoundingBox;
-    int total_difference;
-    int stopped_repairing;
+    static tU32 total_repair_cost;
+    static tS3_sound_tag sound_tag;
+    static br_scalar amount;
+    static int NeedToExpandBoundingBox;
+    static int total_difference;
+    static int stopped_repairing;
 }
 
 // Offset: 10508
@@ -469,7 +469,7 @@ int CheckRecoverCost() {
 void SortOutRecover(tCar_spec *pCar) {
     int the_time;
     int val;
-    int old_time;
+    static int old_time;
 }
 
 // Offset: 11048
@@ -544,7 +544,7 @@ void PollCameraControls(tU32 pTime_difference) {
     int swirl_mode;
     int up_and_down_mode;
     int going_up;
-    int last_swirl_mode;
+    static int last_swirl_mode;
 }
 
 // Offset: 15008
@@ -591,7 +591,7 @@ void LoseDosh() {
 // Offset: 15688
 // Size: 301
 void ToggleMap() {
-    int was_in_cockpit;
+    static int was_in_cockpit;
 }
 
 // Offset: 15992
@@ -706,8 +706,8 @@ void UserSendMessage() {
 // Offset: 18460
 // Size: 815
 void EnterUserMessage() {
-    int about_to_die;
-    tU32 next_time;
+    static int about_to_die;
+    static tU32 next_time;
     char *the_message;
     char *p;
     int len;

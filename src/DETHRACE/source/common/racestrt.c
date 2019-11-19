@@ -118,11 +118,11 @@ void StartChangeRace() {
 // EDX: pNet_mode
 // EBX: pNet_race_sequence
 int ChangeRace(int *pRace_index, int pNet_mode, tNet_sequence_type pNet_race_sequence) {
-    tFlicette flicker_on[4];
-    tFlicette flicker_off[4];
-    tFlicette push[4];
-    tMouse_area mouse_areas[5];
-    tInterface_spec interface_spec;
+    static tFlicette flicker_on[4];
+    static tFlicette flicker_off[4];
+    static tFlicette push[4];
+    static tMouse_area mouse_areas[5];
+    static tInterface_spec interface_spec;
     int result;
 }
 
@@ -191,11 +191,11 @@ int ChangeCarGoAhead(int *pCurrent_choice, int *pCurrent_mode) {
 // EDX: pCar_index
 // EBX: pNet_game
 int ChangeCar(int pNet_mode, int *pCar_index, tNet_game_details *pNet_game) {
-    tFlicette flicker_on[4];
-    tFlicette flicker_off[4];
-    tFlicette push[4];
-    tMouse_area mouse_areas[4];
-    tInterface_spec interface_spec;
+    static tFlicette flicker_on[4];
+    static tFlicette flicker_off[4];
+    static tFlicette push[4];
+    static tMouse_area mouse_areas[4];
+    static tInterface_spec interface_spec;
     int i;
     int result;
     int power_up_levels[3];
@@ -360,11 +360,11 @@ void DrawPartsShop(int pCurrent_choice, int pCurrent_mode) {
 // Size: 195
 // EAX: pFade_away
 void DoPartsShop(int pFade_away) {
-    tFlicette flicker_on[7];
-    tFlicette flicker_off[7];
-    tFlicette push[7];
-    tMouse_area mouse_areas[7];
-    tInterface_spec interface_spec;
+    static tFlicette flicker_on[7];
+    static tFlicette flicker_off[7];
+    static tFlicette push[7];
+    static tMouse_area mouse_areas[7];
+    static tInterface_spec interface_spec;
     int result;
 }
 
@@ -380,10 +380,10 @@ int AutoPartsDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
 // Offset: 10152
 // Size: 166
 tSO_result DoAutoPartsShop() {
-    tFlicette flicker_off[3];
-    tFlicette push[3];
-    tMouse_area mouse_areas[3];
-    tInterface_spec interface_spec;
+    static tFlicette flicker_off[3];
+    static tFlicette push[3];
+    static tMouse_area mouse_areas[3];
+    static tInterface_spec interface_spec;
     int result;
 }
 
@@ -487,18 +487,18 @@ void SelectRaceDraw(int pCurrent_choice, int pCurrent_mode) {
     char *sub_pt;
     char sub_str[16];
     tU32 *test;
-    tU32 test2;
+    static tU32 test2;
 }
 
 // Offset: 13784
 // Size: 754
 // EAX: pSecond_time_around
 tSO_result DoSelectRace(int *pSecond_time_around) {
-    tFlicette flicker_on[7];
-    tFlicette flicker_off[7];
-    tFlicette push[7];
-    tMouse_area mouse_areas[7];
-    tInterface_spec interface_spec;
+    static tFlicette flicker_on[7];
+    static tFlicette flicker_off[7];
+    static tFlicette push[7];
+    static tMouse_area mouse_areas[7];
+    static tInterface_spec interface_spec;
     int result;
     int default_choice;
     int suggested;
@@ -611,10 +611,10 @@ int ChallengeDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
 // Offset: 18740
 // Size: 172
 void DoChallengeScreen() {
-    tFlicette flicker_off[2];
-    tFlicette push[2];
-    tMouse_area mouse_areas[2];
-    tInterface_spec interface_spec;
+    static tFlicette flicker_off[2];
+    static tFlicette push[2];
+    static tMouse_area mouse_areas[2];
+    static tInterface_spec interface_spec;
     int result;
 }
 
@@ -717,10 +717,10 @@ void SortOpponents() {
 // Offset: 20564
 // Size: 326
 tSO_result DoGridPosition() {
-    tFlicette flicker_off[3];
-    tFlicette push[3];
-    tMouse_area mouse_areas[5];
-    tInterface_spec interface_spec;
+    static tFlicette flicker_off[3];
+    static tFlicette push[3];
+    static tMouse_area mouse_areas[5];
+    static tInterface_spec interface_spec;
     int result;
 }
 
@@ -735,7 +735,6 @@ void CheckPlayersAreResponding() {
 // Size: 39
 void NetSynchStartStart() {
 }
-
 
 // Offset: 21212
 // Size: 759
@@ -774,21 +773,21 @@ int ExitWhenReady(int *pCurrent_choice, int *pCurrent_mode) {
 // Size: 246
 // EAX: pMode
 tSO_result NetSynchRaceStart2(tNet_synch_mode pMode) {
-    tFlicette flicker_on_hf[2];
-    tFlicette flicker_off_hf[2];
-    tFlicette push_hf[2];
-    tMouse_area mouse_areas_hf[2];
-    tInterface_spec interface_spec_hf;
-    tFlicette flicker_on_hs[1];
-    tFlicette flicker_off_hs[1];
-    tFlicette push_hs[1];
-    tMouse_area mouse_areas_hs[1];
-    tInterface_spec interface_spec_hs;
-    tFlicette flicker_on_c[1];
-    tFlicette flicker_off_c[1];
-    tFlicette push_c[1];
-    tMouse_area mouse_areas_c[1];
-    tInterface_spec interface_spec_c;
+    static tFlicette flicker_on_hf[2];
+    static tFlicette flicker_off_hf[2];
+    static tFlicette push_hf[2];
+    static tMouse_area mouse_areas_hf[2];
+    static tInterface_spec interface_spec_hf;
+    static tFlicette flicker_on_hs[1];
+    static tFlicette flicker_off_hs[1];
+    static tFlicette push_hs[1];
+    static tMouse_area mouse_areas_hs[1];
+    static tInterface_spec interface_spec_hs;
+    static tFlicette flicker_on_c[1];
+    static tFlicette flicker_off_c[1];
+    static tFlicette push_c[1];
+    static tMouse_area mouse_areas_c[1];
+    static tInterface_spec interface_spec_c;
     int result;
 }
 

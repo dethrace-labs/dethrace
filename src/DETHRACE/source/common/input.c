@@ -29,10 +29,10 @@ void SetJoystickArrays(int *pKeys, int pMark) {
     int i;
     tS32 joyX;
     tS32 joyY;
-    tS32 old_joy1X;
-    tS32 old_joy1Y;
-    tS32 old_joy2X;
-    tS32 old_joy2Y;
+    static tS32 old_joy1X;
+    static tS32 old_joy1Y;
+    static tS32 old_joy2X;
+    static tS32 old_joy2Y;
 }
 
 // Offset: 996
@@ -98,13 +98,13 @@ int AnyKeyDown() {
 // Offset: 2248
 // Size: 451
 tU32* KevKeyService() {
-    tU32 sum;
-    tU32 code;
-    tU32 code2;
-    int last_key;
-    int last_single_key;
-    tU32 last_time;
-    tU32 return_val[2];
+    static tU32 sum;
+    static tU32 code;
+    static tU32 code2;
+    static int last_key;
+    static int last_single_key;
+    static tU32 last_time;
+    static tU32 return_val[2];
     tU32 keys;
 }
 

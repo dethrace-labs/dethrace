@@ -35,16 +35,16 @@ void StartMainMenu() {
 // EAX: pTime_out
 // EDX: pContinue_allowed
 int DoMainMenuInterface(tU32 pTime_out, int pContinue_allowed) {
-    tFlicette flicker_on1[8];
-    tFlicette flicker_off1[8];
-    tFlicette push1[8];
-    tMouse_area mouse_areas1[8];
-    tInterface_spec interface_spec1;
-    tFlicette flicker_on2[5];
-    tFlicette flicker_off2[5];
-    tFlicette push2[5];
-    tMouse_area mouse_areas2[5];
-    tInterface_spec interface_spec2;
+    static tFlicette flicker_on1[8];
+    static tFlicette flicker_off1[8];
+    static tFlicette push1[8];
+    static tMouse_area mouse_areas1[8];
+    static tInterface_spec interface_spec1;
+    static tFlicette flicker_on2[5];
+    static tFlicette flicker_off2[5];
+    static tFlicette push2[5];
+    static tMouse_area mouse_areas2[5];
+    static tInterface_spec interface_spec2;
     int result;
 }
 
@@ -74,11 +74,11 @@ int QuitVerifyDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pE
 // Size: 333
 // EAX: pReplace_background
 int DoVerifyQuit(int pReplace_background) {
-    tFlicette flicker_on[2];
-    tFlicette flicker_off[2];
-    tFlicette push[2];
-    tMouse_area mouse_areas[2];
-    tInterface_spec interface_spec;
+    static tFlicette flicker_on[2];
+    static tFlicette flicker_off[2];
+    static tFlicette push[2];
+    static tMouse_area mouse_areas[2];
+    static tInterface_spec interface_spec;
     int result;
     int switched_res;
     int woz_in_race;

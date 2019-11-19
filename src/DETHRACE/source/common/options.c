@@ -77,10 +77,10 @@ int SoundClick(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_o
 // Offset: 1436
 // Size: 77
 void DoSoundOptions() {
-    tFlicette flicker_off[3];
-    tFlicette push[3];
-    tMouse_area mouse_areas[3];
-    tInterface_spec interface_spec;
+    static tFlicette flicker_off[3];
+    static tFlicette push[3];
+    static tMouse_area mouse_areas[3];
+    static tInterface_spec interface_spec;
     int result;
 }
 
@@ -192,10 +192,10 @@ void DrawGraphBox(int pCurrent_choice, int pCurrent_mode) {
 // Offset: 4296
 // Size: 128
 void DoGraphicsOptions() {
-    tFlicette flicker_off[14];
-    tFlicette push[14];
-    tMouse_area mouse_areas[14];
-    tInterface_spec interface_spec;
+    static tFlicette flicker_off[14];
+    static tFlicette push[14];
+    static tMouse_area mouse_areas[14];
+    static tInterface_spec interface_spec;
 }
 
 // Offset: 4424
@@ -290,7 +290,7 @@ void DrawKeyAssignments(int pCurrent_choice, int pCurrent_mode) {
     int end_box;
     tDR_font *font_n;
     tDR_font *font_k;
-    int on_radios_last_time;
+    static int on_radios_last_time;
 }
 
 // Offset: 8452
@@ -360,10 +360,10 @@ void DrawInitialKMRadios() {
 // Offset: 10796
 // Size: 366
 void DoControlOptions() {
-    tFlicette flicker_off[4];
-    tFlicette push[4];
-    tMouse_area mouse_areas[5];
-    tInterface_spec interface_spec;
+    static tFlicette flicker_off[4];
+    static tFlicette push[4];
+    static tMouse_area mouse_areas[5];
+    static tInterface_spec interface_spec;
     int result;
     int swap_font_1;
     int swap_font_2;
@@ -390,10 +390,10 @@ void DrawDisabledOptions() {
 // Offset: 11448
 // Size: 146
 void DoOptions() {
-    tFlicette flicker_off[4];
-    tFlicette push[4];
-    tMouse_area mouse_areas[4];
-    tInterface_spec interface_spec;
+    static tFlicette flicker_off[4];
+    static tFlicette push[4];
+    static tMouse_area mouse_areas[4];
+    static tInterface_spec interface_spec;
     int result;
 }
 

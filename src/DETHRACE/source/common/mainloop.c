@@ -29,7 +29,7 @@ void ToggleInfo() {
 // Size: 220
 void CalculateFrameRate() {
     tU32 new_time;
-    int last_rates[30];
+    static int last_rates[30];
     int new_rate;
     int i;
 }
@@ -60,7 +60,7 @@ void MungeHeadups() {
     float bearing;
     br_material *nearby;
     tPixelmap_user_data *user;
-    tU32 last_rattle_time;
+    static tU32 last_rattle_time;
 }
 
 // Offset: 3384
@@ -70,7 +70,7 @@ void UpdateFramePeriod(tU32 *pCamera_period) {
     tU32 new_tick_count;
     tU32 new_camera_tick_count;
     int error;
-    int last_AR_mode;
+    static int last_AR_mode;
 }
 
 // Offset: 3972
@@ -82,8 +82,8 @@ tU32 GetLastTickCount() {
 // Size: 192
 void CheckTimer() {
     tS32 time_left;
-    tU32 last_time_in_seconds;
-    tU32 last_demo_time_in_seconds;
+    static tU32 last_time_in_seconds;
+    static tU32 last_demo_time_in_seconds;
 }
 
 // Offset: 4212
