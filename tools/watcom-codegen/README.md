@@ -1,6 +1,6 @@
-# Watcom dump tools
+# Watcom symbol dump codegen tools
 
-### parse_dump.py
+### codegen.py
 
 Takes an [exedump](https://github.com/jeff-1amstudios/open-watcom-v2/tree/master/bld/exedump) output file and generates skeleton "c" project files containing functions, structs, enums and global variables.
 

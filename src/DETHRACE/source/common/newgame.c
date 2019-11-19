@@ -66,21 +66,21 @@ void FrankAnneDraw(int pCurrent_choice, int pCurrent_mode) {
 // Offset: 1032
 // Size: 123
 int FrankieOrAnnie() {
-    tFlicette flicker_off[3];
-    tFlicette push[3];
-    tMouse_area mouse_areas[3];
-    tRectile recopy_areas[2];
-    tInterface_spec interface_spec;
+    static tFlicette flicker_off[3];
+    static tFlicette push[3];
+    static tMouse_area mouse_areas[3];
+    static tRectile recopy_areas[2];
+    static tInterface_spec interface_spec;
     int result;
 }
 
 // Offset: 1156
 // Size: 88
 int SelectSkillLevel() {
-    tFlicette flicker_off[4];
-    tFlicette push[4];
-    tMouse_area mouse_areas[4];
-    tInterface_spec interface_spec;
+    static tFlicette flicker_off[4];
+    static tFlicette push[4];
+    static tMouse_area mouse_areas[4];
+    static tInterface_spec interface_spec;
     int result;
 }
 
@@ -205,12 +205,12 @@ int NewNetGoAhead(int *pCurrent_choice, int *pCurrent_mode) {
 // Size: 287
 // EAX: pGame_to_join
 tJoin_or_host_result JoinOrHostGame(tNet_game_details **pGame_to_join) {
-    tFlicette flicker_on[2];
-    tFlicette flicker_off[2];
-    tFlicette push[2];
-    tMouse_area mouse_areas[3];
-    tRectile recopy_areas[1];
-    tInterface_spec interface_spec;
+    static tFlicette flicker_on[2];
+    static tFlicette flicker_off[2];
+    static tFlicette push[2];
+    static tMouse_area mouse_areas[3];
+    static tRectile recopy_areas[1];
+    static tInterface_spec interface_spec;
     int result;
 }
 
@@ -389,11 +389,11 @@ void DrawNetOptBox(int pCurrent_choice, int pCurrent_mode) {
 // Size: 111
 // EAX: pGame_options
 void DoNetOptions(tNet_game_options *pGame_options) {
-    tFlicette flicker_on[14];
-    tFlicette flicker_off[14];
-    tFlicette push[14];
-    tMouse_area mouse_areas[14];
-    tInterface_spec interface_spec;
+    static tFlicette flicker_on[14];
+    static tFlicette flicker_off[14];
+    static tFlicette push[14];
+    static tMouse_area mouse_areas[14];
+    static tInterface_spec interface_spec;
 }
 
 // Offset: 8560
@@ -464,11 +464,11 @@ void SetGameTarget(tNet_game_type *pGame_type, tNet_game_options *pGame_options)
 // EDX: pGame_options
 // EBX: pRace_index
 int NetGameChoices(tNet_game_type *pGame_type, tNet_game_options *pGame_options, int *pRace_index) {
-    tFlicette flicker_on[11];
-    tFlicette flicker_off[11];
-    tFlicette push[11];
-    tMouse_area mouse_areas[11];
-    tInterface_spec interface_spec;
+    static tFlicette flicker_on[11];
+    static tFlicette flicker_off[11];
+    static tFlicette push[11];
+    static tMouse_area mouse_areas[11];
+    static tInterface_spec interface_spec;
     int result;
 }
 

@@ -85,7 +85,7 @@ br_scalar SkidLen(int pSkid) {
 // EBX: pPos
 // ECX: pMaterial_index
 void SkidSection(tCar_spec *pCar, int pWheel_num, br_vector3 *pPos, int pMaterial_index) {
-    tU16 skid;
+    static tU16 skid;
     br_material *material;
 }
 

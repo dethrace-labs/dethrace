@@ -10,7 +10,7 @@ DEPS := $(OBJS:.o=.d)
 INC_DIRS := $(shell find $(SRC_DIRS) -type d)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
-CFLAGS ?= $(INC_FLAGS) -Wno-return-type -Wno-missing-declarations
+CFLAGS ?= $(INC_FLAGS) -Wno-return-type -Wno-missing-declarations -Werror=implicit-function-declaration
 
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
 	$(CC) $(OBJS) -o $@ $(LDFLAGS)

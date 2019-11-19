@@ -89,8 +89,8 @@ void RampUpRate(float *pRate, tU32 pTime) {
 // EDX: pCurrent_mode
 void DrawSummary(int pCurrent_choice, int pCurrent_mode) {
     tU32 the_time;
-    tU32 last_time;
-    tU32 last_change_time;
+    static tU32 last_time;
+    static tU32 last_change_time;
     int credit_delta;
     float old_temp_increase;
     float rank_delta;
@@ -125,10 +125,10 @@ int SummCheckGameOver(int *pCurrent_choice, int *pCurrent_mode) {
 // Offset: 2896
 // Size: 288
 tSO_result DoEndRaceSummary1() {
-    tFlicette flicker_off[1];
-    tFlicette push[1];
-    tMouse_area mouse_areas[1];
-    tInterface_spec interface_spec;
+    static tFlicette flicker_off[1];
+    static tFlicette push[1];
+    static tMouse_area mouse_areas[1];
+    static tInterface_spec interface_spec;
     int result;
     int completed_already;
 }
@@ -296,10 +296,10 @@ int DamageScrnDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pE
 // Offset: 10780
 // Size: 286
 tSO_result DoEndRaceSummary2() {
-    tFlicette flicker_off[3];
-    tFlicette push[3];
-    tMouse_area mouse_areas[3];
-    tInterface_spec interface_spec;
+    static tFlicette flicker_off[3];
+    static tFlicette push[3];
+    static tMouse_area mouse_areas[3];
+    static tInterface_spec interface_spec;
     int result;
 }
 
@@ -328,10 +328,10 @@ void NetSumDraw(int pCurrent_choice, int pCurrent_mode) {
 // Offset: 12104
 // Size: 188
 void DoNetRaceSummary() {
-    tFlicette flicker_off[1];
-    tFlicette push[1];
-    tMouse_area mouse_areas[1];
-    tInterface_spec interface_spec;
+    static tFlicette flicker_off[1];
+    static tFlicette push[1];
+    static tMouse_area mouse_areas[1];
+    static tInterface_spec interface_spec;
     int i;
     int result;
     tS32 start_time;

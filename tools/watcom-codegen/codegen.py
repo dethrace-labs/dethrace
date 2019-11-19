@@ -6,7 +6,7 @@
 #
 # Writes c code into "./_generated" directory
 #
-# Usage: parse_dump.py <path to dump file>
+# Usage: codegen.py <path to dump file>
 #######################################################
 import sys
 import re
@@ -662,8 +662,9 @@ def generate_c_file(module):
     #   print module['types'][fn['type']]
     for v in fn['local_vars'][arg_count:]:
       c_file.write(' ' * INDENT_SPACES)
-      str = resolve_type_str(module, v['type'], v['name'])
-      c_file.write(str)
+      if 'CONST' in v['addr_type']:
+        c_file.write('static ')
+      c_file.write(resolve_type_str(module, v['type'], v['name']))
       c_file.write(';\n')
     c_file.write('}\n\n')
 

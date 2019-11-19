@@ -297,7 +297,7 @@ int IsCarInTheSea() {
 // EAX: car
 // EDX: pTime
 void RememberSafePosition(tCar_spec *car, tU32 pTime) {
-    tU32 time_count;
+    static tU32 time_count;
     int j;
     br_vector3 r;
     br_scalar ts;
@@ -310,7 +310,7 @@ void ControlOurCar(tU32 pTime_difference) {
     br_scalar ts;
     br_vector3 minus_k;
     tCar_spec *car;
-    int steering_locked;
+    static int steering_locked;
     int i;
     tU32 time;
 }
@@ -333,7 +333,7 @@ void CalcEngineForce(tCar_spec *c, br_scalar dt) {
 void PrepareCars(tU32 pFrame_start_time) {
     tCar_spec *car;
     int i;
-    tU32 last_frame_start;
+    static tU32 last_frame_start;
 }
 
 // Offset: 11668
@@ -363,7 +363,7 @@ void ResetOldmat() {
     tCar_spec *car;
     int i;
     br_matrix34 mat;
-    int normalise_count;
+    static int normalise_count;
 }
 
 // Offset: 13768
@@ -392,7 +392,7 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
     int old_num_cars;
     int step_number;
     int dam_index;
-    int steering_locked;
+    static int steering_locked;
     tCar_spec *car;
     tCollision_info *car_info;
     tNon_car_spec *non_car;
@@ -542,7 +542,7 @@ void RotateCarFirstOrder(tCollision_info *c, br_scalar dt) {
     br_scalar rad;
     br_scalar e1;
     br_scalar e2;
-    br_scalar max_rad;
+    static br_scalar max_rad;
 }
 
 // Offset: 25312
@@ -657,8 +657,8 @@ void CalcForce(tCar_spec *c, br_scalar dt) {
     br_scalar rr_oil_factor;
     br_matrix34 *mat;
     tMaterial_modifiers *mat_list;
-    br_scalar stop_timer;
-    br_scalar slide_dist;
+    static br_scalar stop_timer;
+    static br_scalar slide_dist;
     tDamage_type dam;
     br_scalar v;
     tSpecial_volume *vol;
@@ -736,7 +736,7 @@ int CollCheck(tCollision_info *c, br_scalar dt) {
     int k;
     int material;
     int noise_defeat;
-    int oldk;
+    static int oldk;
     br_scalar min;
     br_scalar max;
     br_vector3 edges[3];
@@ -787,8 +787,8 @@ void AddFrictionCarToCar(tCollision_info *car1, tCollision_info *car2, br_vector
 // Size: 233
 void ScrapeNoise(br_scalar vel, br_vector3 *position, int material) {
     tS3_volume vol;
-    tS3_sound_tag scrape_tag;
-    tS3_volume last_scrape_vol;
+    static tS3_sound_tag scrape_tag;
+    static tS3_volume last_scrape_vol;
     br_vector3 velocity;
     br_vector3 position_in_br;
 }
@@ -803,7 +803,7 @@ void SkidNoise(tCar_spec *pC, int pWheel_num, br_scalar pV, int material) {
     br_vector3 wv;
     br_vector3 wvw;
     br_scalar ts;
-    tS3_volume last_skid_vol[2];
+    static tS3_volume last_skid_vol[2];
     int i;
 }
 
@@ -819,8 +819,8 @@ void StopSkid(tCar_spec *pC) {
 // EDX: position
 // EBX: material
 void CrashNoise(br_vector3 *pForce, br_vector3 *position, int material) {
-    tS3_sound_tag crunch_tag;
-    tS3_volume last_crunch_vol;
+    static tS3_sound_tag crunch_tag;
+    static tS3_volume last_crunch_vol;
     tS3_volume vol;
     br_vector3 velocity;
 }
@@ -871,7 +871,7 @@ void CrushBoundingBox(tCar_spec *c, int crush_only) {
 // Offset: 56728
 // Size: 279
 void AddCollPoint(br_scalar dist, br_vector3 *p, br_vector3 *norm, br_vector3 *r, br_vector3 *n, br_vector3 *dir, int num, tCollision_info *c) {
-    br_scalar d[4];
+    static br_scalar d[4];
     int i;
     int furthest;
 }
@@ -1137,7 +1137,7 @@ void SetAmbientPratCam(tCar_spec *pCar) {
     br_scalar abs_omega_y;
     br_scalar abs_omega_z;
     tU32 the_time;
-    tU32 last_time_on_ground;
+    static tU32 last_time_on_ground;
 }
 
 // Offset: 67700
@@ -1194,8 +1194,8 @@ tCar_spec* GetRaceLeader() {
 // Offset: 71688
 // Size: 555
 void AmIGettingBoredWatchingCameraSpin() {
-    tU32 time_of_death;
-    tU32 headup_timer;
+    static tU32 time_of_death;
+    static tU32 headup_timer;
     tCar_spec *car;
     char s[256];
 }
@@ -1256,7 +1256,7 @@ void CheckDisablePlingMaterials(tCar_spec *pCar) {
 // EAX: c
 // EDX: pTime
 void PositionExternalCamera(tCar_spec *c, tU32 pTime) {
-    int old_camera_mode;
+    static int old_camera_mode;
     br_camera *camera_ptr;
 }
 
@@ -1302,12 +1302,12 @@ int IncidentCam(tCar_spec *c, tU32 pTime) {
     br_vector3 murderer_pos;
     br_scalar ts;
     tCar_spec *car2;
-    tU32 next_incident_time;
-    tIncident_type type;
-    float severity;
-    tIncident_info info;
-    int random;
-    int count;
+    static tU32 next_incident_time;
+    static tIncident_type type;
+    static float severity;
+    static tIncident_info info;
+    static int random;
+    static int count;
     br_scalar temp;
     br_vector3 old_cam_pos;
     int removed;
@@ -1344,7 +1344,7 @@ void PanningExternalCamera(tCar_spec *c, tU32 pTime) {
     br_matrix34 *m1;
     br_vector3 tv;
     br_scalar ts;
-    int inside_camera_zone;
+    static int inside_camera_zone;
 }
 
 // Offset: 78640
@@ -1430,7 +1430,7 @@ void NormalPositionExternalCamera(tCar_spec *c, tU32 pTime) {
 void MoveWithWheels(tCar_spec *c, br_vector3 *vn, int manual_swing) {
     br_angle yaw;
     br_angle theta;
-    int move_with_wheels;
+    static int move_with_wheels;
 }
 
 // Offset: 82916
@@ -1449,9 +1449,9 @@ void SwingCamera(tCar_spec *c, br_matrix34 *m1, br_matrix34 *m2, br_vector3 *vn,
     br_scalar cos_dtheta;
     br_scalar sign;
     int manual_swing;
-    br_angle omega;
-    int elapsed_time;
-    br_vector3 old_vn;
+    static br_angle omega;
+    static int elapsed_time;
+    static br_vector3 old_vn;
 }
 
 // Offset: 84744
@@ -1561,7 +1561,7 @@ void FlyCar(tCar_spec *c, br_scalar dt) {
     br_vector3 step;
     br_matrix34 *mat;
     br_angle theta;
-    br_scalar vel;
+    static br_scalar vel;
     tFace_ref faces[20];
     tBounds bnds;
 }
@@ -1678,11 +1678,11 @@ int CollideTwoCars(tCollision_info *car1, tCollision_info *car2, int pPass) {
     br_vector3 sep;
     br_vector3 tv;
     int add_point;
-    br_vector3 oldr1;
-    br_vector3 oldr2;
-    br_vector3 oldn1;
-    br_vector3 oldn2;
-    int is_old_point_available;
+    static br_vector3 oldr1;
+    static br_vector3 oldr2;
+    static br_vector3 oldn1;
+    static br_vector3 oldn2;
+    static int is_old_point_available;
 }
 
 // Offset: 99720
@@ -1847,7 +1847,7 @@ int TestForNan(float *f) {
 // Offset: 116696
 // Size: 89
 void CheckCameraHither() {
-    int old_hither;
+    static int old_hither;
 }
 
 // Offset: 116788
@@ -1929,7 +1929,7 @@ int DoPullActorFromWorld(br_actor *pActor) {
 // Size: 904
 // EAX: pTime
 void CheckForDeAttachmentOfNonCars(tU32 pTime) {
-    tU32 total_time;
+    static tU32 total_time;
     br_bounds bnds;
     int i;
     int j;

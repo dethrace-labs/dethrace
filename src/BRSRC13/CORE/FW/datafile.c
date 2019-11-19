@@ -450,8 +450,8 @@ void BrNullOther() {
 // Offset: 13512
 // Size: 168
 int DfFileIdentify(br_uint_8 *magics, br_size_t n_magics) {
-    char text_magics[8];
-    char binary_magics[8];
+    static char text_magics[8];
+    static char binary_magics[8];
 }
 
 // Offset: 13687

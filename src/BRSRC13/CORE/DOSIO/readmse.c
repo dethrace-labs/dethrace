@@ -21,7 +21,7 @@ void DOSMouseEnd() {
 br_error DOSMouseRead(br_int_32 *mouse_x, br_int_32 *mouse_y, br_uint_32 *mouse_buttons) {
     br_int_16 mx;
     br_int_16 my;
-    br_int_16 ox;
-    br_int_16 oy;
+    static br_int_16 ox;
+    static br_int_16 oy;
 }
 

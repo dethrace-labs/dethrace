@@ -235,7 +235,7 @@ void BrTokenValueDump(br_token_value *tv, char *prefix, br_putline_cbfn *putline
 br_error BrStringToTokenValue(br_token_value *buffer, br_size_t buffer_size, char *str) {
     br_lexer *l;
     br_error r;
-    br_lexer_keyword keywords[4];
+    static br_lexer_keyword keywords[4];
 }
 
 // Offset: 10672
@@ -247,7 +247,7 @@ br_error parseTokenValue(br_lexer *l, br_token_value *tv, br_size_t size) {
     int len;
     char name[40];
     br_token type;
-    br_token real_types[2];
+    static br_token real_types[2];
     br_error r;
 }
 
