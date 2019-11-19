@@ -415,20 +415,20 @@ void DrawNetChooseInitial() {
 int NetChooseGoAhead(int *pCurrent_choice, int *pCurrent_mode) {
 }
 
-// Offset: 3920
-// Size: 195
+// Offset: 9288
+// Size: 182
 // EAX: pIndex
 // EDX: pColour_value
 void PlotAGraphBox(int pIndex, int pColour_value) {
 }
 
-// Offset: 4116
+// Offset: 9472
 // Size: 50
 // EAX: pIndex
 void DrawAGraphBox(int pIndex) {
 }
 
-// Offset: 4168
+// Offset: 9524
 // Size: 47
 // EAX: pIndex
 void EraseAGraphBox(int pIndex) {
