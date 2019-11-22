@@ -484,6 +484,15 @@ typedef void zs_order_table_traversal_cbfn(int, ot_vertex*, ot_vertex*, ot_verte
 typedef void tS3_outlet_callback(tS3_outlet_ptr, tS3_sound_tag, tS3_termination_reason);
 typedef void tS3_sample_filter(tS3_effect_tag, tS3_sound_tag);
 
+// Make gcc happy
+typedef struct exception_ {
+    int type;
+    char *name;
+    double arg1;
+    double arg2;
+    double retval;
+} exception_;
+
 typedef struct ot_vertex {
     br_scalar screenX;
     br_scalar screenY;

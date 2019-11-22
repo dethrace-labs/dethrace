@@ -416,7 +416,7 @@ void PDEndItAllAndReRunTheBastard() {
 // Offset: 7932
 // Size: 57
 // EAX: err
-int matherr(struct exception *err) {
+int matherr(struct exception_ *err) {
 }
 
 // Offset: 7992
