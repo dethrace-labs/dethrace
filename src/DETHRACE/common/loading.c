@@ -17,7 +17,7 @@ int gCurrent_race_file_index;
 int gGroove_funk_offset;
 int gDemo_armour;
 int gDemo_rank;
-int gDecode_thing;
+int gDecode_thing = '@';
 int gDemo_opponents[5];
 int gDemo_power;
 int gDemo_offensive;

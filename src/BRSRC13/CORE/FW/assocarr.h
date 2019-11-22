@@ -1,7 +1,6 @@
 #ifndef _ASSOCARR_H_
 #define _ASSOCARR_H_
 
-#include "dr_types.h"
 #include "br_types.h"
 
 // Offset: 27

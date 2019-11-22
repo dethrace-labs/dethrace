@@ -1,7 +1,6 @@
 #ifndef _V1DBFILE_H_
 #define _V1DBFILE_H_
 
-#include "dr_types.h"
 #include "br_types.h"
 
 // Offset: 18

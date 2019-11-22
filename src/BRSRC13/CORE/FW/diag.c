@@ -1,7 +1,7 @@
 #include "diag.h"
 #include "fwsetup.h"
 #include "brprintf.h"
-#include "brstdlib.h"
+#include "CORE/STD/brstdlib.h"
 #include <stdarg.h>
 
 // Global variables

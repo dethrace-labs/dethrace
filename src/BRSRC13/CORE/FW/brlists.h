@@ -1,7 +1,6 @@
 #ifndef _BRLISTS_H_
 #define _BRLISTS_H_
 
-#include "dr_types.h"
 #include "br_types.h"
 
 // Offset: 10

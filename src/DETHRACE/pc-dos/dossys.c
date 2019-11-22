@@ -322,6 +322,9 @@ void PDGetMousePosition(int *pX_coord, int *pY_coord) {
 // Offset: 6272
 // Size: 38
 int PDGetTotalTime() {
+    struct timespec spec;
+    clock_gettime(CLOCK_MONOTONIC, &spec);
+    return spec.tv_sec * 1000 + spec.tv_nsec / 1000;
 }
 
 // Offset: 6312
@@ -413,7 +416,7 @@ void PDEndItAllAndReRunTheBastard() {
 // Offset: 7932
 // Size: 57
 // EAX: err
-int matherr(exception *err) {
+int matherr(struct exception *err) {
 }
 
 // Offset: 7992

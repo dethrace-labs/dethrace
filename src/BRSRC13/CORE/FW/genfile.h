@@ -1,7 +1,6 @@
 #ifndef _GENFILE_H_
 #define _GENFILE_H_
 
-#include "dr_types.h"
 #include "br_types.h"
 
 // Offset: 12

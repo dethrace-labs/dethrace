@@ -1,7 +1,6 @@
 #ifndef _PREPMATL_H_
 #define _PREPMATL_H_
 
-#include "dr_types.h"
 #include "br_types.h"
 
 // Offset: 17

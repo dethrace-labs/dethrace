@@ -1,7 +1,6 @@
 #ifndef _GENCOPY_H_
 #define _GENCOPY_H_
 
-#include "dr_types.h"
 #include "br_types.h"
 
 // Offset: 21

@@ -1,8 +1,9 @@
 #ifndef _BRPRINTF_H_
 #define _BRPRINTF_H_
 
-#include "dr_types.h"
 #include "br_types.h"
+
+#include <stdlib.h>
 
 // Offset: 10
 // Size: 75

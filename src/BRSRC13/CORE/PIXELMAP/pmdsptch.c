@@ -1,5 +1,7 @@
 #include "pmdsptch.h"
 
+#include <stdarg.h>
+
 char rscid[65];
 
 // Offset: 22

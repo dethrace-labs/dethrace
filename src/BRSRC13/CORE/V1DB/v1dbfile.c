@@ -1,5 +1,7 @@
 #include "v1dbfile.h"
 
+#include <stdlib.h>
+
 br_chunks_table_entry MaterialLoadEntries[8];
 br_chunks_table MaterialLoadTable;
 br_chunks_table ActorLoadTable;

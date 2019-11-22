@@ -1,7 +1,6 @@
 #ifndef _BRBEGIN_H_
 #define _BRBEGIN_H_
 
-#include "dr_types.h"
 #include "br_types.h"
 
 // Offset: 8

@@ -1,7 +1,6 @@
 #ifndef _DBSETUP_H_
 #define _DBSETUP_H_
 
-#include "dr_types.h"
 #include "br_types.h"
 
 // Offset: 12

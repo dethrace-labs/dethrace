@@ -1,7 +1,6 @@
 #ifndef _OBJECT_H_
 #define _OBJECT_H_
 
-#include "dr_types.h"
 #include "br_types.h"
 
 // Offset: 19

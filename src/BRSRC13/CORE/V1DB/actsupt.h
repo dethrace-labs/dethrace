@@ -1,7 +1,6 @@
 #ifndef _ACTSUPT_H_
 #define _ACTSUPT_H_
 
-#include "dr_types.h"
 #include "br_types.h"
 
 // Offset: 12

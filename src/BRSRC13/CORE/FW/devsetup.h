@@ -1,7 +1,6 @@
 #ifndef _DEVSETUP_H_
 #define _DEVSETUP_H_
 
-#include "dr_types.h"
 #include "br_types.h"
 
 // Offset: 20

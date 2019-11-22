@@ -1,6 +1,8 @@
 #ifndef BR_TYPES_H
 #define BR_TYPES_H
 
+#include <setjmp.h>
+
 typedef long br_int_32;
 typedef unsigned long br_uint_32;
 typedef short br_int_16;
@@ -2324,7 +2326,7 @@ typedef struct br_token_entry {
     br_int_32 base_length;
 } br_token_entry;
 
-typedef unsigned int jmp_buf[13];
+
 typedef struct br_exception_handler br_exception_handler;
 typedef struct br_exception_handler {
     br_exception_handler *prev;
@@ -2337,5 +2339,375 @@ typedef struct br_pixelmap_state {
     br_tv_template *pixelmap_match_template;
 } br_pixelmap_state;
 
+typedef struct pm_type_info {
+    br_uint_16 bits;
+    br_uint_16 file_size;
+    br_uint_16 align;
+    br_uint_16 channels;
+} pm_type_info;
+
+typedef struct match_tokens {
+    br_token use;
+    br_uint_8 pixel_type;
+    br_int_32 pixel_bits;
+    br_int_32 width;
+    br_int_32 height;
+    br_object *renderer;
+} match_tokens;
+
+typedef struct host_info {
+    br_uint_32 size;
+    char identifier[40];
+    br_uint_32 capabilities;
+    br_token processor_family;
+    br_token processor_type;
+} host_info;
+
+typedef struct host_interrupt_hook {
+    br_uint_8 vector;
+    br_boolean active;
+    br_uint_32 old_offset;
+    br_uint_16 old_sel;
+} host_interrupt_hook;
+
+typedef struct host_exception_hook {
+    br_uint_8 exception;
+    br_boolean active;
+    br_uint_32 old_offset;
+    br_uint_16 old_sel;
+    br_uint_8 scratch[256];
+} host_exception_hook;
+
+typedef struct host_regs {
+    struct {
+        br_uint_32 edi;
+        br_uint_32 esi;
+        br_uint_32 ebp;
+        br_uint_32 _res;
+        br_uint_32 ebx;
+        br_uint_32 edx;
+        br_uint_32 ecx;
+        br_uint_32 eax;
+        br_uint_16 flags;
+        br_uint_16 es;
+        br_uint_16 ds;
+        br_uint_16 fs;
+        br_uint_16 gs;
+        br_uint_16 ip;
+        br_uint_16 cs;
+        br_uint_16 sp;
+        br_uint_16 ss;
+    }a;
+    struct {
+        br_uint_16 di;
+        br_uint_16 _pad0;
+        br_uint_16 si;
+        br_uint_16 _pad1;
+        br_uint_16 bp;
+        br_uint_16 _pad2;
+        br_uint_16 _res;
+        br_uint_16 _pad3;
+        br_uint_16 bx;
+        br_uint_16 _pad4;
+        br_uint_16 dx;
+        br_uint_16 _pad5;
+        br_uint_16 cx;
+        br_uint_16 _pad6;
+        br_uint_16 ax;
+        br_uint_16 _pad7;
+        br_uint_16 flags;
+        br_uint_16 es;
+        br_uint_16 ds;
+        br_uint_16 fs;
+        br_uint_16 gs;
+        br_uint_16 ip;
+        br_uint_16 cs;
+        br_uint_16 sp;
+        br_uint_16 ss;
+    }b;
+    struct {
+        br_uint_32 _pad0[4];
+        br_uint_8 bl;
+        br_uint_8 bh;
+        br_uint_8 _pad1;
+        br_uint_8 _pad2;
+        br_uint_8 dl;
+        br_uint_8 dh;
+        br_uint_8 _pad3;
+        br_uint_8 _pad4;
+        br_uint_8 cl;
+        br_uint_8 ch;
+        br_uint_8 _pad5;
+        br_uint_8 _pad6;
+        br_uint_8 al;
+        br_uint_8 ah;
+        br_uint_8 _pad7;
+        br_uint_8 _pad8;
+    }c;
+} host_regs;
+
+typedef struct ldt {
+    unsigned long limit_0: 10;
+    unsigned long base_0: 10;
+    unsigned long base_1: 8;
+    unsigned long type: 4;
+    unsigned long application: 1;
+    unsigned long dpl: 2;
+    unsigned long present: 1;
+    unsigned long limit_1: 4;
+    unsigned long system: 1;
+    unsigned long reserved: 1;
+    unsigned long use32: 1;
+    unsigned long granularity: 1;
+    unsigned long base_2: 8;
+} ldt;
+
+typedef struct msdos_header {
+    br_uint_16 magic;
+    br_uint_16 last_page_bytes;
+    br_uint_16 pages;
+    br_uint_16 n_relocations;
+    br_uint_16 header_size;
+    br_uint_16 minalloc;
+    br_uint_16 maxalloc;
+    br_uint_16 start_ss;
+    br_uint_16 start_sp;
+    br_uint_16 checksum;
+    br_uint_16 start_ip;
+    br_uint_16 start_cs;
+    br_uint_16 reloc_offset;
+    br_uint_16 overlay_number;
+    br_uint_16 _reserved0[4];
+    br_uint_16 oem_id;
+    br_uint_16 oem_info;
+    br_uint_16 _reserved1[10];
+    br_uint_32 new_header_offset;
+} msdos_header;
+
+typedef struct coff_header {
+    br_uint_16 machine;
+    br_uint_16 n_sections;
+    br_uint_32 time_date;
+    br_uint_32 symbols_offset;
+    br_uint_32 n_symbols;
+    br_uint_16 opt_header_size;
+    br_uint_16 flags;
+} coff_header;
+
+typedef struct nt_optional_header {
+    br_uint_16 magic;
+    br_uint_8 l_major;
+    br_uint_8 l_minor;
+    br_uint_32 code_size;
+    br_uint_32 data_size;
+    br_uint_32 bss_size;
+    br_uint_32 entry_point;
+    br_uint_32 code_base;
+    br_uint_32 data_base;
+    br_uint_32 image_base;
+    br_uint_32 section_alignment;
+    br_uint_32 file_alignment;
+    br_uint_16 os_major;
+    br_uint_16 os_minor;
+    br_uint_16 user_major;
+    br_uint_16 user_minor;
+    br_uint_16 subsys_major;
+    br_uint_16 subsys_minor;
+    br_uint_32 _reserved;
+    br_uint_32 image_size;
+    br_uint_32 header_size;
+    br_uint_32 file_checksum;
+    br_uint_16 subsystem;
+    br_uint_16 dll_flags;
+    br_uint_32 stack_reserve_size;
+    br_uint_32 stack_commit_size;
+    br_uint_32 heap_reserve_size;
+    br_uint_32 heap_commit_size;
+    br_uint_32 loader_flags;
+    br_uint_32 n_data_directories;
+    struct {
+        br_uint_32 rva;
+        br_uint_32 size;
+    };
+} nt_optional_header;
+
+typedef struct section_header {
+    br_uint_8 section_name[8];
+    br_uint_32 virtual_size;
+    br_uint_32 rva;
+    br_uint_32 data_size;
+    br_uint_32 data_offset;
+    br_uint_32 relocs_offset;
+    br_uint_32 linenums_offset;
+    br_uint_16 n_relocs;
+    br_uint_16 n_linenums;
+    br_uint_32 flags;
+} section_header;
+
+typedef struct resource_header {
+    br_simple_node node;
+    br_simple_list children;
+    br_uint_8 size_l;
+    br_uint_8 size_m;
+    br_uint_8 size_h;
+    br_uint_8 class;
+    void *magic_ptr;
+    int magic_num;
+} resource_header;
+
+typedef struct host_real_memory {
+    br_uint_32 pm_off;
+    br_uint_16 pm_seg;
+    br_uint_16 _reserved;
+    br_uint_16 rm_off;
+    br_uint_16 rm_seg;
+} host_real_memory;
+
+typedef struct file_info {
+    br_uint_32 type;
+    br_uint_32 version;
+} file_info;
+
+typedef struct object_list {
+    br_simple_list l;
+} object_list;
+
+typedef struct object_list_entry {
+    br_simple_node n;
+    br_object *h;
+} object_list_entry;
+
+typedef struct token_match {
+    br_token_value *original;
+    br_token_value *query;
+    br_int_32 n;
+    void *extra;
+    br_size_t extra_size;
+} token_match;
+
+typedef struct token_type {
+    char *identifier;
+    br_token type;
+    int length;
+} token_type;
+
+typedef struct export_directory {
+    br_uint_32 flags;
+    br_uint_32 timestamp;
+    br_uint_16 major_version;
+    br_uint_16 minor_version;
+    br_uint_32 name;
+    br_uint_32 ordinal_base;
+    br_uint_32 n_entries;
+    br_uint_32 n_names;
+    br_uint_32 export_table;
+    br_uint_32 name_table;
+    br_uint_32 ordinal_table;
+} export_directory;
+
+typedef struct import_directory {
+    br_uint_32 lookup_table;
+    br_uint_32 timestamp;
+    br_uint_32 forwarder;
+    br_uint_32 name;
+    br_uint_32 address_table;
+} import_directory;
+
+typedef struct basereloc_header {
+    br_uint_32 rva;
+    br_uint_32 size;
+} basereloc_header;
+
+typedef struct order_info {
+    br_uint_8 a0;
+    br_uint_8 a1;
+    br_uint_8 a2;
+    br_uint_8 _pad[1];
+} order_info;
+
+typedef struct transform_type {
+    br_uint_32 id;
+    br_file_struct *fs;
+} transform_type;
+
+typedef enum dosio_event_type {
+    DOSIO_EVENT_KEY_DOWN = 0,
+    DOSIO_EVENT_KEY_UP = 1,
+    DOSIO_EVENT_POINTER1_DOWN = 2,
+    DOSIO_EVENT_POINTER1_UP = 3,
+    DOSIO_EVENT_POINTER2_DOWN = 4,
+    DOSIO_EVENT_POINTER2_UP = 5,
+    DOSIO_EVENT_POINTER3_DOWN = 6,
+    DOSIO_EVENT_POINTER3_UP = 7,
+    DOSIO_EVENT_POINTER_MOVE = 8,
+    DOSIO_EVENT_MAX = 9
+} dosio_event_type;
+
+typedef enum dosio_event_qual {
+    DOSIO_QUAL_SHIFT = 1,
+    DOSIO_QUAL_CONTROL = 2,
+    DOSIO_QUAL_ALT = 4
+} dosio_event_qual;
+
+typedef struct dosio_event {
+    br_uint_16 type;
+    br_uint_16 qualifiers;
+    br_uint_32 value_1;
+    br_uint_32 value_2;
+} dosio_event;
+
+typedef struct dosio_event_queue {
+    br_uint_16 total;
+    br_uint_16 count;
+    br_uint_16 head;
+    br_uint_16 tail;
+    dosio_event slots[1];
+} dosio_event_queue;
+
+typedef struct pm_temp_edge {
+    struct pm_temp_edge *next;
+    br_uint_16 first;
+    br_uint_16 last;
+    char other;
+} pm_temp_edge;
+
+typedef struct prep_vertex {
+    br_vector3 n;
+    br_uint_16 v;
+    br_uint_16 f;
+} prep_vertex;
+
+typedef struct fmt_vertex {
+    br_vector3 p;
+    br_vector2 map;
+    br_vector3 n;
+} DR_VERTEX, fmt_vertex;
+
+typedef struct v11face {
+    br_uint_16 vertices[3];
+    br_uint_16 edges[3];
+    br_vector4 eqn;
+} DR_FACE, v11face;
+
+typedef struct v11group {
+    void *stored;
+    DR_FACE *faces;
+    br_colour *face_colours;
+    br_uint_16 *face_user;
+    DR_VERTEX *vertices;
+    br_colour *vertex_colours;
+    br_uint_16 *vertex_user;
+    br_uint_16 nfaces;
+    br_uint_16 nvertices;
+    br_uint_16 nedges;
+} v11group;
+
+typedef struct v11model {
+    br_size_t size;
+    br_uint_32 flags;
+    br_uint_16 ngroups;
+    br_vector3 pivot;
+    v11group *groups;
+} v11model;
 
 #endif

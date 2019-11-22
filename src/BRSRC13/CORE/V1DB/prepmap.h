@@ -1,7 +1,6 @@
 #ifndef _PREPMAP_H_
 #define _PREPMAP_H_
 
-#include "dr_types.h"
 #include "br_types.h"
 
 // Offset: 12

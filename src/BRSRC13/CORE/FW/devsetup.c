@@ -1,5 +1,7 @@
 #include "devsetup.h"
 
+#include <stdarg.h>
+
 br_pixelmap *last_begin_screen;
 char rscid[51];
 

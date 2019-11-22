@@ -1,5 +1,7 @@
 #include "brucetrk.h"
 
+#include "CORE/STD/brstdlib.h"
+
 br_actor *gMr_blendy;
 int gDefault_blend_pc;
 
@@ -9,6 +11,8 @@ int gDefault_blend_pc;
 // EDX: pDst
 void AllocateActorMatrix(tTrack_spec *pTrack_spec, br_actor ****pDst) {
     tU16 z;
+    char *s = "jeff";
+    BrStrLen(s);
 }
 
 // Offset: 204
