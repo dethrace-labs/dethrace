@@ -1,7 +1,6 @@
 #ifndef _BRQSORT_H_
 #define _BRQSORT_H_
 
-#include "dr_types.h"
 #include "br_types.h"
 
 // Offset: 8

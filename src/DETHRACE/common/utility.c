@@ -1,5 +1,13 @@
 #include "utility.h"
 
+#include "loading.h"
+#include "errors.h"
+#include "dossys.h"
+
+#include <string.h>
+#include <stdio.h>
+#include <unistd.h>
+
 tU32 gLong_key[4];
 tU32 gOther_long_key[4];
 char *gMisc_strings[250];
@@ -778,4 +786,3 @@ void BlendifyMaterialPrimitively(br_material *pMaterial, int pPercent) {
 // EDX: pPercent
 void BlendifyMaterial(br_material *pMaterial, int pPercent) {
 }
-

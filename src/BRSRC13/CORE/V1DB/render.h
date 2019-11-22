@@ -1,7 +1,6 @@
 #ifndef _RENDER_H_
 #define _RENDER_H_
 
-#include "dr_types.h"
 #include "br_types.h"
 
 // Offset: 16

@@ -1,5 +1,9 @@
 #include "memmgmt.h"
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
 host_regs regs;
 
 // Offset: 9
@@ -64,6 +68,6 @@ br_error HostSelectorBaseQuery(br_uint_32 *basep, br_uint_16 sel) {
 // Size: 175
 br_error HostSelectorLimitQuery(br_uint_32 *limitp, br_uint_16 sel) {
     br_uint_32 limit;
-    ldt ldt;
+    ldt ldta;
 }
 

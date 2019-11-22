@@ -2,9 +2,7 @@
 
 #include <ctype.h>
 #include <errno.h>
-#include <stdarg.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 
@@ -55,7 +53,7 @@ int BrStrICmp(char *s1, char *s2) {
 
 // Offset: 355
 // Size: 47
-char* BrStrCpy(char *s1, char *s2) {
+char* BrStrCpy(char *s1, const char *s2) {
     return strcpy(s1, s2);
 }
 
@@ -156,13 +154,13 @@ br_boolean BrIsPrint(int c) {
 
 // Offset: 1340
 // Size: 50
-br_int_32 BrVSprintf(char *buf, char *fmt, va_list args) {
+br_int_32 BrVSprintf(char *buf, const char *fmt, va_list args) {
     return vsprintf(buf, fmt, args);
 }
 
 // Offset: 1402
 // Size: 101
-br_int_32 BrVSprintfN(char *buf, br_size_t buf_size, char *fmt, va_list args) {
+br_int_32 BrVSprintfN(char *buf, br_size_t buf_size, const char *fmt, va_list args) {
     // Most C libs have vsnprintf these days that can replace this.
     unsigned int n;
     char tmp[512];
@@ -179,7 +177,7 @@ br_int_32 BrVSprintfN(char *buf, br_size_t buf_size, char *fmt, va_list args) {
 
 // Offset: 1513
 // Size: 50
-br_int_32 BrVSScanf(char *buf, char *fmt, va_list args) {
+br_int_32 BrVSScanf(char *buf, const char *fmt, va_list args) {
     return vsscanf(buf, fmt, args);
 }
 

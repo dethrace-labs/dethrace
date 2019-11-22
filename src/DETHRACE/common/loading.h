@@ -4,6 +4,8 @@
 #include "dr_types.h"
 #include "br_types.h"
 
+extern int gDecode_thing;
+
 // Offset: 0
 // Size: 67
 // EAX: pF

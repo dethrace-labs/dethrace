@@ -1,7 +1,6 @@
 #ifndef _MATRIX4_H_
 #define _MATRIX4_H_
 
-#include "dr_types.h"
 #include "br_types.h"
 
 // Offset: 14

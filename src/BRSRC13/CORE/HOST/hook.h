@@ -1,7 +1,6 @@
 #ifndef _HOOK_H_
 #define _HOOK_H_
 
-#include "dr_types.h"
 #include "br_types.h"
 
 // Offset: 18

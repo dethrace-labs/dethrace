@@ -1,7 +1,7 @@
 #ifndef _RESREG_H_
 #define _RESREG_H_
 
-#include "dr_types.h"
+
 #include "br_types.h"
 
 // Offset: 14

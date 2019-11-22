@@ -1,5 +1,7 @@
 #include "file.h"
 
+#include <stdarg.h>
+
 char rscid[49];
 
 // Offset: 12

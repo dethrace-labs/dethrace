@@ -4,6 +4,11 @@
 #include "dr_types.h"
 #include "br_types.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+
 // Offset: 0
 // Size: 291
 void KeyboardHandler();
@@ -272,7 +277,7 @@ void PDEndItAllAndReRunTheBastard();
 // Offset: 7932
 // Size: 57
 // EAX: err
-int matherr(exception *err);
+int matherr(struct exception_ *err);
 
 // Offset: 7992
 // Size: 127

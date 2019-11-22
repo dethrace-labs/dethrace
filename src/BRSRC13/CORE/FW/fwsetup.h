@@ -1,7 +1,6 @@
 #ifndef _FWSETUP_H_
 #define _FWSETUP_H_
 
-#include "dr_types.h"
 #include "br_types.h"
 
 extern br_framework_state fw;

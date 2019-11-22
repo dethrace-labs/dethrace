@@ -1,5 +1,9 @@
 #include "errors.h"
 
+#include <string.h>
+#include <stdio.h>
+#include <stdarg.h>
+
 char *gError_messages[126];
 int gError_code;
 char *gPalette_copy;
@@ -48,4 +52,3 @@ void OpenDiagnostics() {
 // EAX: pMisc_text_index
 int DoErrorInterface(int pMisc_text_index) {
 }
-

@@ -367,4 +367,3 @@ void EdgeTriggerModeOn() {
 // Size: 44
 void EdgeTriggerModeOff() {
 }
-

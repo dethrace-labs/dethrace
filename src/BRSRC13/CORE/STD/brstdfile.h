@@ -1,7 +1,6 @@
 #ifndef _BRSTDFILE_H_
 #define _BRSTDFILE_H_
 
-#include "dr_types.h"
 #include "br_types.h"
 
 extern br_filesystem *_BrDefaultFilesystem;

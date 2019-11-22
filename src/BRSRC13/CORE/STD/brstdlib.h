@@ -5,8 +5,10 @@
 #ifndef _BRSTDLIB_H_
 #define _BRSTDLIB_H_
 
-#include "dr_types.h"
 #include "br_types.h"
+
+#include <stdarg.h>
+#include <stdlib.h>
 
 // Offset: 9
 // Size: 50
@@ -34,7 +36,7 @@ int BrStrICmp(char *s1, char *s2);
 
 // Offset: 355
 // Size: 47
-char* BrStrCpy(char *s1, char *s2);
+char* BrStrCpy(char *s1, const char *s2);
 
 // Offset: 411
 // Size: 44
@@ -98,15 +100,15 @@ br_boolean BrIsPrint(int c);
 
 // Offset: 1340
 // Size: 50
-br_int_32 BrVSprintf(char *buf, char *fmt, va_list args);
+br_int_32 BrVSprintf(char *buf, const char *fmt, va_list args);
 
 // Offset: 1402
 // Size: 101
-br_int_32 BrVSprintfN(char *buf, br_size_t buf_size, char *fmt, va_list args);
+br_int_32 BrVSprintfN(char *buf, br_size_t buf_size, const char *fmt, va_list args);
 
 // Offset: 1513
 // Size: 50
-br_int_32 BrVSScanf(char *buf, char *fmt, va_list args);
+br_int_32 BrVSScanf(char *buf, const char *fmt, va_list args);
 
 #endif
 

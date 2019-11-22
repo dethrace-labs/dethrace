@@ -1,7 +1,6 @@
 #ifndef _HSTSETUP_H_
 #define _HSTSETUP_H_
 
-#include "dr_types.h"
 #include "br_types.h"
 
 // Offset: 10

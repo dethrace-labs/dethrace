@@ -2,6 +2,8 @@
 
 char rscid[48];
 
+#include <stdarg.h>
+
 // Offset: 10
 // Size: 75
 br_int_32 BrSprintf(char *buf, char *fmt, ...) {

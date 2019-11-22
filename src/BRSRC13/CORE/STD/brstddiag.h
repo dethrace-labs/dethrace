@@ -1,7 +1,6 @@
 #ifndef _STDDIAG_H_
 #define _STDDIAG_H_
 
-#include "dr_types.h"
 #include "br_types.h"
 
 // Offset: 15
