@@ -4,6 +4,8 @@
 #include "dr_types.h"
 #include "br_types.h"
 
+extern int _unittest_controls_lastGetPowerup;
+
 // Offset: 0
 // Size: 53
 void AbortRace();

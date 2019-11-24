@@ -32,6 +32,8 @@ int gReal_back_screen_locked;
 void (*gPrev_keyboard_handler)();
 tU8 gScan_code[123][2];
 
+int _unittest_do_not_exit = 0;
+
 // Offset: 0
 // Size: 291
 void KeyboardHandler() {
@@ -91,6 +93,18 @@ int PDGetASCIIFromKey(int pKey) {
 // EAX: pThe_str
 void PDFatalError(char *pThe_str) {
     int been_here;
+
+    if (been_here) {
+        exit(1);
+    }
+    been_here = 1;
+
+    fprintf(stderr, "FATAL ERROR: %s\n", pThe_str);
+    // wait for keypress
+    // DoSaveGame() -> exit
+    if (_unittest_do_not_exit == 0) {
+       exit(1);
+    }
 }
 
 // Offset: 2864
@@ -371,15 +385,15 @@ void Usage(char *pProgpath) {
     char basename[9];
 }
 
-// Offset: 6972
-// Size: 722
-// EAX: pArgc
-// EDX: pArgv
-int main(int pArgc, char **pArgv) {
-    int arg;
-    int i;
-    float f;
-}
+// // Offset: 6972
+// // Size: 722
+// // EAX: pArgc
+// // EDX: pArgv
+// int main(int pArgc, char **pArgv) {
+//     int arg;
+//     int i;
+//     float f;
+// }
 
 // Offset: 7696
 // Size: 62
