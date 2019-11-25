@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+### November 25, 2019
+- First unit tests added and hooked up to the CI build pipeline
+
 ### November 18, 2019
 - c skeleton compiles for the first time on OSX and Linux!
 
