@@ -5,6 +5,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stddef.h>
+#include <stdint.h>
+
 /*
 typedef char * va_list[1];
 typedef unsigned short wchar_t;
@@ -60,14 +62,14 @@ typedef struct _tagNETBIOS_LOCAL_TARGET _NETBIOS_LOCAL_TARGET;
 typedef struct _tagXFER_BLOCK_HEADER _XFER_BLOCK_HEADER;
 typedef unsigned char tU8;
 typedef signed char tS8;
-typedef unsigned short tU16;
-typedef short tS16;
-typedef unsigned long tU32;
-typedef long tS32;
+typedef uint16_t tU16;
+typedef int16_t tS16;
+typedef uint32_t tU32;
+typedef int32_t tS32;
 typedef float tF32;
 typedef double tF64;
-typedef short tX88;
-typedef long tX1616;
+typedef int16_t tX88;
+typedef int32_t tX1616;
 typedef tU8 tNet_message_type;
 typedef char * tS3_sound_source_ptr;
 typedef int tS3_sound_tag;

@@ -32,12 +32,14 @@ int gReal_back_screen_locked;
 void (*gPrev_keyboard_handler)();
 tU8 gScan_code[123][2];
 
+int _unittest_do_not_exit = 0;
+
 // Offset: 0
 // Size: 291
 void KeyboardHandler() {
     tU8 scan_code;
     tU8 up;
-    tU8 extended;
+    static tU8 extended;
 }
 
 // Offset: 292
@@ -90,7 +92,19 @@ int PDGetASCIIFromKey(int pKey) {
 // Size: 174
 // EAX: pThe_str
 void PDFatalError(char *pThe_str) {
-    int been_here;
+    static int been_here = 0;
+
+    if (been_here) {
+        exit(1);
+    }
+    been_here = 1;
+
+    fprintf(stderr, "FATAL ERROR: %s\n", pThe_str);
+    // wait for keypress
+    // DoSaveGame() -> exit
+    if (_unittest_do_not_exit == 0) {
+       exit(1);
+    }
 }
 
 // Offset: 2864
@@ -315,8 +329,8 @@ void PDGetMousePosition(int *pX_coord, int *pY_coord) {
     br_int_32 mouse_y2;
     int delta_x;
     int delta_y;
-    br_int_32 mouse_x;
-    br_int_32 mouse_y;
+    static br_int_32 mouse_x;
+    static br_int_32 mouse_y;
 }
 
 // Offset: 6272
@@ -371,15 +385,15 @@ void Usage(char *pProgpath) {
     char basename[9];
 }
 
-// Offset: 6972
-// Size: 722
-// EAX: pArgc
-// EDX: pArgv
-int main(int pArgc, char **pArgv) {
-    int arg;
-    int i;
-    float f;
-}
+// // Offset: 6972
+// // Size: 722
+// // EAX: pArgc
+// // EDX: pArgv
+// int main(int pArgc, char **pArgv) {
+//     int arg;
+//     int i;
+//     float f;
+// }
 
 // Offset: 7696
 // Size: 62
@@ -405,7 +419,7 @@ void PDDisplayGoreworthiness(int pGory) {
 // Size: 35
 // EAX: pStr
 void PDEnterDebugger(char *pStr) {
-    unsigned char *save_it;
+    static unsigned char *save_it;
 }
 
 // Offset: 7908

@@ -1,5 +1,7 @@
 #include "input.h"
 
+#include "dossys.h"
+
 tJoy_array gJoy_array;
 tKey_array gKey_array;
 int gKey_poll_counter;
@@ -98,14 +100,61 @@ int AnyKeyDown() {
 // Offset: 2248
 // Size: 451
 tU32* KevKeyService() {
-    static tU32 sum;
-    static tU32 code;
-    static tU32 code2;
-    static int last_key;
-    static int last_single_key;
-    static tU32 last_time;
+    static tU32 sum = 0;
+    static tU32 code = 0;
+    static tU32 code2 = 0;
+    static int last_key = -1;
+    static int last_single_key = -1;
+    static tU32 last_time = 0;
     static tU32 return_val[2];
     tU32 keys;
+
+    keys = gLast_key_down;
+    //printf("key: %d, %lx, %lx\n", sizeof(long), keys, code2);
+    return_val[0] = 0;
+    return_val[1] = 0;
+
+    if (keys < 0x6B) {
+        last_single_key = gLast_key_down;
+    } else {
+        if (keys > 0x6b00) {
+            sum = 0;
+            code = 0;
+            return return_val;
+        }
+        if ((keys & 0xff) != last_single_key && keys >> 8 != last_single_key) {
+            sum = 0;
+            code = 0;
+            return return_val;
+        }
+        if (keys >> 8 != last_single_key) {
+            sum = 0;
+            code = 0;
+            return return_val;
+        }
+        if ((keys & 0xff) == last_single_key) {
+            keys = keys >> 8;
+        }
+        keys = keys & 0xff;
+    }
+
+    if (keys && keys != last_key) {
+        sum += keys;
+        code += keys << 11;
+        code = (code >> 17) + 16 * code;
+        code2 = (code2 >> 29) + keys * keys + 8 * code2;
+        //printf("accumulate: keys=%lx, sum=%lx, code=%lx, code2=%lx\n", keys, sum, code, code2);
+        last_time = PDGetTotalTime();
+    } else if (PDGetTotalTime() > (last_time + 1000)) {
+        return_val[0] = ((code >> 11) + (sum << 21));
+        return_val[1] = code2;
+        //printf("final value: code=%lx, code2=%lx\n", return_val[0], return_val[1]);
+        code = 0;
+        code2 = 0;
+        sum = 0;
+    }
+    last_key = keys;
+    return return_val;
 }
 
 // Offset: 2700

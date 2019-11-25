@@ -1,20 +1,24 @@
-TARGET_EXEC ?= c1
+TARGET_EXEC ?= c1tests
 
 BUILD_DIR ?= ./build
 SRC_DIR ?= .
-BR_SRC_DIR ?= ../BRSRC13
+DR_SRC_DIR ?= ../src/DETHRACE
+BR_SRC_DIR ?= ../src/BRSRC13
 
-SRCS := $(shell find $(SRC_DIR) -name *.c)
+SRCS := $(shell find $(SRC_DIR) -name "*.c")
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 OBJS += $(shell find $(BR_SRC_DIR) -name *.o)
+# include all DR objects except the main method to avoid _main symbol collision
+OBJS += $(shell find $(DR_SRC_DIR) -name *.o | grep -v pc-dos/main.c.o)
+
 DEPS := $(OBJS:.o=.d)
 
-INC_DIRS := $(shell find $(SRC_DIR) -type d) $(BR_SRC_DIR)
+INC_DIRS := $(shell find $(SRC_DIR) -type d) $(BR_SRC_DIR) $(DR_SRC_DIR)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
-CFLAGS ?= $(INC_FLAGS) -Wno-return-type -Wno-missing-declarations -Werror=implicit-function-declaration
+CFLAGS ?= $(INC_FLAGS)
 
-.PHONY: clean build test
+.PHONY: clean build run
 
 build: $(BUILD_DIR)/$(TARGET_EXEC)
 
@@ -27,11 +31,7 @@ $(BUILD_DIR)/%.c.o: %.c
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	$(RM) -r $(BUILD_DIR)
-
-test: build
-	@$(BUILD_DIR)/$(TARGET_EXEC) -test
-
+	@$(RM) -r $(BUILD_DIR)
 
 -include $(DEPS)
 

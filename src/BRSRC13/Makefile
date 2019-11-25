@@ -22,7 +22,7 @@ $(BUILD_DIR)/%.c.o: %.c
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	$(RM) -r $(BUILD_DIR)
+	@$(RM) -r $(BUILD_DIR)
 
 -include $(DEPS)
 

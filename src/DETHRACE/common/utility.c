@@ -8,12 +8,13 @@
 #include <stdio.h>
 #include <unistd.h>
 
-tU32 gLong_key[4];
-tU32 gOther_long_key[4];
+tU32 gLong_key[]        = { 0x5F991B6C, 0x135FCDB9, 0x0E2004CB, 0x0EA11C5E };
+tU32 gOther_long_key[]  = { 0x26D6A867, 0x1B45DDB6, 0x13227E32, 0x3794C215 };
+
 char *gMisc_strings[250];
 int gIn_check_quit;
 tU32 gLost_time;
-int gEncryption_method;
+int gEncryption_method = 1;
 br_pixelmap *g16bit_palette;
 br_pixelmap *gSource_for_16bit_palette;
 
@@ -630,6 +631,14 @@ br_material* DRMaterialClone(br_material *pMaterial) {
 // EAX: s
 void StripCR(char *s) {
     char *pos;
+    pos = s;
+    while (*pos != 0) {
+        if (*pos == '\r' || *pos == '\n') {
+            *pos = 0;
+            break;
+        }
+        pos++;
+    }
 }
 
 // Offset: 13104
@@ -650,6 +659,57 @@ void DecodeLine2(char *pS) {
     int i;
     unsigned char c;
     char *key;
+
+    len = strlen(pS);
+    key = (char*)gLong_key;
+    while ( len > 0 && (pS[len - 1] == 13 || pS[len - 1] == 10))
+    {
+        --len;
+        pS[len] = 0;
+    }
+    seed = len % 16;
+    for ( i = 0; i < len; i++)
+    {
+        c = pS[i];
+        if (i >= 2) {
+            if (pS[i - 1] == '/' && pS[i - 2] == '/') {
+                key = (char*)gOther_long_key;
+            }
+        }
+        if (gEncryption_method == 1)
+        {
+            if ( c == '\t' ) {
+                c = 0x80;
+            }
+            c -= 0x20;
+            if (!(c & 0x80)) {
+                c = (c ^ key[seed]) & 0x7f;
+                c += 0x20;
+            }
+            seed += 7;
+            seed = seed % 16;
+
+            if ( c == 0x80 ) {
+                c = '\t';
+            }
+        }
+        else {
+            if (c == '\t') {
+                c = 0x9f;
+            }
+            c -= 0x20;
+            c = (c ^ key[seed]) & 0x7f;
+            c += 0x20;
+
+            seed += 7;
+            seed = seed % 16;
+
+            if ( c == 0x9f ) {
+                c = '\t';
+            }
+        }
+        pS[i] = c;
+    }
 }
 
 // Offset: 13692
@@ -662,6 +722,46 @@ void EncodeLine2(char *pS) {
     int count;
     unsigned char c;
     char *key;
+
+    len = strlen(pS);
+    count = 0;
+    key = (char*)gLong_key;
+    while ( len > 0 && (pS[len - 1] == 13 || pS[len - 1] == 10))
+    {
+        --len;
+        pS[len] = 0;
+    }
+
+    seed = len % 16;
+
+    for ( i = 0; i < len; ++pS )
+    {
+        if ( count == 2 )
+            key = (char*)gOther_long_key;
+        if ( *pS == '/' )
+        {
+            ++count;
+        }
+        else {
+            count = 0;
+        }
+        if ( *pS == '\t' ) {
+            *pS = 0x80;
+        }
+        c = *pS - 0x20;
+        if (!(c & 0x80)) {
+            c = c ^ (key[seed] & 0x7F);
+            c += 0x20;
+        }
+        seed += 7;
+        seed = seed % 16;
+
+        if ( c == 0x80 ) {
+            c = '\t';
+        }
+        *pS = c;
+        ++i;
+    }
 }
 
 // Offset: 13996
@@ -678,13 +778,123 @@ void EncodeFile(char *pThe_path) {
     int decode;
     int len;
     int count;
+
+    len = strlen(pThe_path);
+    strcpy(new_file, pThe_path);
+    strcat(new_file, "ENC");
+
+    f = fopen(pThe_path, "rt");
+    if (!f) {
+        FatalError(0x6b, new_file);
+    }
+
+    ch = fgetc(f);
+    ungetc(ch, f);
+
+    if (gDecode_thing == '@' && gDecode_thing == (char)ch) {
+        fclose(f);
+        return;
+    }
+
+    d = fopen(new_file, "wb");
+    if (!d) {
+        FatalError(0x6b, new_file);
+    }
+
+    result = &line[1];
+
+    while (!feof(f)) {
+        fgets(result, 256, f);
+
+        if (ch == '@') {
+            decode = 1;
+        } else {
+            decode = 0;
+            s = &result[1];
+            while (line[0] == ' ' || line[0] == '\t') {
+                memmove(result, s, strlen(result));
+            }
+        }
+
+        if (decode == 0) {
+            EncodeLine2(result + decode);
+        } else {
+            DecodeLine2(result + decode);
+        }
+
+        line[0] = '@';
+        fputs(&line[decode*2], d);
+        count = -1;
+        ch = fgetc(f);
+        while (ch == '\r' || ch == '\n') {
+            count++;
+        }
+        if (count >= 2) {
+            fputc(0x0d, d);
+            fputc(0x0a, d);
+        }
+        fputc(0x0d, d);
+        fputc(0x0a, d);
+
+        if (ch != -1) {
+            ungetc(ch, f);
+        }
+    }
+    fclose(f);
+    fclose(d);
+
+    PDFileUnlock(pThe_path);
+    unlink(pThe_path);
+    rename(new_file, pThe_path);
 }
 
 // Offset: 14552
 // Size: 513
 // EAX: pThe_path
-void EncodeFileWrapper(char *pThe_path) {
-    int len;
+void EncodeFileWrapper (char *pThe_path) {
+    int len = strlen(pThe_path);
+
+    if (strcmp(&pThe_path[len - 4], ".TXT") == 0) {
+        return;
+    }
+    if (strcmp(pThe_path, "DKEYMAP0.TXT") == 0) {
+        return;
+    }
+    if (strcmp(pThe_path, "DKEYMAP1.TXT") == 0) {
+        return;
+    }
+    if (strcmp(pThe_path, "DKEYMAP2.TXT") == 0) {
+        return;
+    }
+    if (strcmp(pThe_path, "DKEYMAP3.TXT") == 0) {
+        return;
+    }
+    if (strcmp(pThe_path, "KEYMAP_0.TXT") == 0) {
+        return;
+    }
+    if (strcmp(pThe_path, "KEYMAP_1.TXT") == 0) {
+        return;
+    }
+    if (strcmp(pThe_path, "KEYMAP_2.TXT") == 0) {
+        return;
+    }
+    if (strcmp(pThe_path, "KEYMAP_3.TXT") == 0) {
+        return;
+    }
+    if (strcmp(pThe_path, "OPTIONS.TXT") == 0) {
+        return;
+    }
+    if (strcmp(pThe_path, "KEYNAMES.TXT") == 0) {
+        return;
+    }
+    if (strcmp(pThe_path, "KEYMAP.TXT") == 0) {
+        return;
+    }
+    if (strcmp(pThe_path, "PATHS.TXT") == 0) {
+        return;
+    }
+
+    EncodeFile(pThe_path);
 }
 
 // Offset: 15068
@@ -786,3 +996,4 @@ void BlendifyMaterialPrimitively(br_material *pMaterial, int pPercent) {
 // EDX: pPercent
 void BlendifyMaterial(br_material *pMaterial, int pPercent) {
 }
+

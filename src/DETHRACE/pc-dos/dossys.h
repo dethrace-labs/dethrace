@@ -9,6 +9,8 @@
 #include <string.h>
 #include <math.h>
 
+extern int _unittest_do_not_exit;
+
 // Offset: 0
 // Size: 291
 void KeyboardHandler();
@@ -245,12 +247,6 @@ void PDDisposeActionReplayBuffer(char *pBuffer);
 // Size: 146
 // EAX: pProgpath
 void Usage(char *pProgpath);
-
-// Offset: 6972
-// Size: 722
-// EAX: pArgc
-// EDX: pArgv
-int main(int pArgc, char **pArgv);
 
 // Offset: 7696
 // Size: 62
