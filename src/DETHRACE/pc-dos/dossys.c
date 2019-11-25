@@ -39,7 +39,7 @@ int _unittest_do_not_exit = 0;
 void KeyboardHandler() {
     tU8 scan_code;
     tU8 up;
-    tU8 extended;
+    static tU8 extended;
 }
 
 // Offset: 292
@@ -329,8 +329,8 @@ void PDGetMousePosition(int *pX_coord, int *pY_coord) {
     br_int_32 mouse_y2;
     int delta_x;
     int delta_y;
-    br_int_32 mouse_x;
-    br_int_32 mouse_y;
+    static br_int_32 mouse_x;
+    static br_int_32 mouse_y;
 }
 
 // Offset: 6272
@@ -419,7 +419,7 @@ void PDDisplayGoreworthiness(int pGory) {
 // Size: 35
 // EAX: pStr
 void PDEnterDebugger(char *pStr) {
-    unsigned char *save_it;
+    static unsigned char *save_it;
 }
 
 // Offset: 7908
