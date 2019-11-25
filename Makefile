@@ -7,8 +7,6 @@ build:
 	@$(MAKE) -C src/BRSRC13 build
 	@echo "Building dethrace"
 	@$(MAKE) -C src/DETHRACE build
-	@echo "Building tests"
-	@$(MAKE) -C test build
 
 clean:
 	@$(MAKE) -C src/BRSRC13 clean
@@ -16,7 +14,9 @@ clean:
 	@$(MAKE) -C test clean
 
 test: build
-	@test/build/c1tests
+	@echo "Building tests"
+	@$(MAKE) -C test build
+	test/build/c1tests
 
 run: build
-	src/DETHRACE/build/c1
+	@src/DETHRACE/build/c1

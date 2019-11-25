@@ -92,7 +92,7 @@ int PDGetASCIIFromKey(int pKey) {
 // Size: 174
 // EAX: pThe_str
 void PDFatalError(char *pThe_str) {
-    int been_here;
+    static int been_here = 0;
 
     if (been_here) {
         exit(1);
