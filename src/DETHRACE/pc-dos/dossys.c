@@ -391,7 +391,7 @@ void PDDisposeActionReplayBuffer(char *pBuffer) {
 void Usage(char *pProgpath) {
     char basename[9];
 
-    splitpath(pProgpath, 0, 0, basename, 0);
+    splitpath(pProgpath, NULL, NULL, basename, NULL);
 
     fprintf(stderr,
         "Usage: %s [%s] [%s YonFactor] [%s CarSimplificationLevel] [%s SoundDetailLevel] [%s] [%s] [%s] [%s] [%s] [%s]\nWhere YonFactor is between 0 and 1,\nCarSimplificationLevel is a whole number between 0 and %d,\nand SoundDetailLevel is a whole number.\n",
@@ -403,7 +403,7 @@ void Usage(char *pProgpath) {
         "-robots",
         "-lomem",
         "-nosound",
-        "-spammfitter",
+        "-spamfritter",
         "-nocutscenes",
         "-noreplay",
         CAR_MAX_SIMPLIFICATION_LEVEL);
@@ -420,54 +420,51 @@ int _main(int pArgc, char **pArgv) {
     int i;
     float f;
 
-    if ( pArgc > 1 ) {
-        for (i = 1; i < pArgc; i++ ) {
+    for (i = 1; i < pArgc; i++) {
+        if (strcasecmp(pArgv[i], "-hires") == 0) {
+            gReal_graf_data_index = 1;
+        }
+        else if (strcasecmp(pArgv[i], "-yon") == 0 && i < pArgc - 1) {
+            i++;
+            sscanf(pArgv[i], "%f", &f);
+            if (f >= 0.0 && f <= 1065353216 )
+            {
+                gYon_multiplier = f;
+            }
+        }
+        else if (strcasecmp(pArgv[i], "-simple") == 0 && i < pArgc - 1) {
+            i++;
+            sscanf(pArgv[i], "%d", &arg);
+            if (arg >= 0 && arg < 5) {
+                gCar_simplification_level = arg;
+            }
+        }
+        else if (strcasecmp(pArgv[i], "-sound") == 0 && i < pArgc - 1) {
+            i++;
+            sscanf(pArgv[i], "%d", &arg);
+            gSound_detail_level = arg;
 
-            if ( !stricmp(pArgv[i], "-hires") ) {
-                gReal_graf_data_index = 1;
-            }
-            else if ( !stricmp(pArgv[i], "-yon") && i < pArgc - 1) {
-                i++;
-                sscanf(pArgv[i], "%f", &f);
-                if (f >= 0.0 && f <= 1065353216 )
-                {
-                    gYon_multiplier = f;
-                }
-            }
-            else if ( !stricmp(pArgv[i], "-simple") && i < pArgc - 1) {
-                i++;
-                sscanf(pArgv[i], "%d", &arg);
-                if (arg >= 0 && arg < 5) {
-                    gCar_simplification_level = arg;
-                }
-            }
-            else if ( !stricmp(pArgv[i], "-sound")) {
-                i++;
-                sscanf(pArgv[i], "%d", &arg);
-                gSound_detail_level = arg;
-
-            }
-            else if ( !stricmp(pArgv[i], "-robots") ) {
-                gSausage_override = 1;
-            }
-            else if ( !stricmp(pArgv[i], "-lomem") ) {
-                gAustere_override = 1;
-            }
-            else if ( !stricmp(pArgv[i], "-nosound") ) {
-                gSound_override = 1;
-            }
-            else if ( !stricmp(pArgv[i], "-spammfitter") ) {
-                gExtra_mem = 2000000;
-            }
-            else if ( !stricmp(pArgv[i], "-nocutscenes") ) {
-                gCut_scene_override = 1;
-            }
-            else if ( !stricmp(pArgv[i], "-noreplay") ) {
-                gReplay_override = 1;
-            }
-            else {
-                Usage(pArgv[0]);
-            }
+        }
+        else if (strcasecmp(pArgv[i], "-robots") == 0) {
+            gSausage_override = 1;
+        }
+        else if (strcasecmp(pArgv[i], "-lomem") == 0) {
+            gAustere_override = 1;
+        }
+        else if (strcasecmp(pArgv[i], "-nosound") == 0) {
+            gSound_override = 1;
+        }
+        else if (strcasecmp(pArgv[i], "-spamfritter") == 0) {
+            gExtra_mem = 2000000;
+        }
+        else if (strcasecmp(pArgv[i], "-nocutscenes") == 0) {
+            gCut_scene_override = 1;
+        }
+        else if (strcasecmp(pArgv[i], "-noreplay") == 0) {
+            gReplay_override = 1;
+        }
+        else {
+            Usage(pArgv[0]);
         }
     }
     GameMain(pArgc, pArgv);
