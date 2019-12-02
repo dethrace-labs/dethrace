@@ -4,8 +4,6 @@
 // These functions are used by the game and were originally provided by Watcom C lib.
 // Reimplemented here without Watcom code
 
-int stricmp(const char *a, const char *b);
-
 void splitpath( char *path, char *drive, char *dir, char *fname, char *ext );
 
 #endif

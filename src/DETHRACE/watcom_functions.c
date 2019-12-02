@@ -11,7 +11,7 @@
   #define strcasecmp _stricmp
   #define strncasecmp _strnicmp
 #else
-#include <strings.h>
+  #include <strings.h>
 #endif
 
 void splitpath( char *path, char *drive, char *dir, char *fname, char *ext ) {
