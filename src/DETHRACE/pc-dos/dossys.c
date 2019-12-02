@@ -2,6 +2,13 @@
 
 #include <time.h>
 #include <sys/stat.h>
+#include <string.h>
+
+#include "watcom_functions.h"
+#include "common/globvars.h"
+#include "common/main.h"
+#include "common/car.h"
+#include "common/sound.h"
 
 int gASCII_table[128];
 tU32 gKeyboard_bits[8];
@@ -383,17 +390,86 @@ void PDDisposeActionReplayBuffer(char *pBuffer) {
 // EAX: pProgpath
 void Usage(char *pProgpath) {
     char basename[9];
+
+    splitpath(pProgpath, NULL, NULL, basename, NULL);
+
+    fprintf(stderr,
+        "Usage: %s [%s] [%s YonFactor] [%s CarSimplificationLevel] [%s SoundDetailLevel] [%s] [%s] [%s] [%s] [%s] [%s]\nWhere YonFactor is between 0 and 1,\nCarSimplificationLevel is a whole number between 0 and %d,\nand SoundDetailLevel is a whole number.\n",
+        basename,
+        "-hires",
+        "-yon",
+        "-simple",
+        "-sound",
+        "-robots",
+        "-lomem",
+        "-nosound",
+        "-spamfritter",
+        "-nocutscenes",
+        "-noreplay",
+        CAR_MAX_SIMPLIFICATION_LEVEL);
+    exit(1);
 }
 
-// // Offset: 6972
-// // Size: 722
-// // EAX: pArgc
-// // EDX: pArgv
-// int main(int pArgc, char **pArgv) {
-//     int arg;
-//     int i;
-//     float f;
-// }
+// Offset: 6972
+// Size: 722
+// EAX: pArgc
+// EDX: pArgv
+// Renamed from "main" to "_main" to allow for unit testing
+int _main(int pArgc, char **pArgv) {
+    int arg;
+    int i;
+    float f;
+
+    for (i = 1; i < pArgc; i++) {
+        if (strcasecmp(pArgv[i], "-hires") == 0) {
+            gReal_graf_data_index = 1;
+        }
+        else if (strcasecmp(pArgv[i], "-yon") == 0 && i < pArgc - 1) {
+            i++;
+            sscanf(pArgv[i], "%f", &f);
+            if (f >= 0.0 && f <= 1065353216 )
+            {
+                gYon_multiplier = f;
+            }
+        }
+        else if (strcasecmp(pArgv[i], "-simple") == 0 && i < pArgc - 1) {
+            i++;
+            sscanf(pArgv[i], "%d", &arg);
+            if (arg >= 0 && arg < 5) {
+                gCar_simplification_level = arg;
+            }
+        }
+        else if (strcasecmp(pArgv[i], "-sound") == 0 && i < pArgc - 1) {
+            i++;
+            sscanf(pArgv[i], "%d", &arg);
+            gSound_detail_level = arg;
+
+        }
+        else if (strcasecmp(pArgv[i], "-robots") == 0) {
+            gSausage_override = 1;
+        }
+        else if (strcasecmp(pArgv[i], "-lomem") == 0) {
+            gAustere_override = 1;
+        }
+        else if (strcasecmp(pArgv[i], "-nosound") == 0) {
+            gSound_override = 1;
+        }
+        else if (strcasecmp(pArgv[i], "-spamfritter") == 0) {
+            gExtra_mem = 2000000;
+        }
+        else if (strcasecmp(pArgv[i], "-nocutscenes") == 0) {
+            gCut_scene_override = 1;
+        }
+        else if (strcasecmp(pArgv[i], "-noreplay") == 0) {
+            gReplay_override = 1;
+        }
+        else {
+            Usage(pArgv[0]);
+        }
+    }
+    GameMain(pArgc, pArgv);
+    return 0;
+}
 
 // Offset: 7696
 // Size: 62

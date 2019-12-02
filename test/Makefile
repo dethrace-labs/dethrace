@@ -7,7 +7,7 @@ BR_SRC_DIR ?= ../src/BRSRC13
 
 SRCS := $(shell find $(SRC_DIR) -name "*.c")
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
-OBJS += $(shell find $(BR_SRC_DIR) -name *.o)
+OBJS += $(shell find $(BR_SRC_DIR) -name "*.o")
 # include all DR objects except the main method to avoid _main symbol collision
 OBJS += $(shell find $(DR_SRC_DIR) -name *.o | grep -v pc-dos/main.c.o)
 
