@@ -1,13 +1,10 @@
 #include "pc-dos/dossys.h"
 
-// main method Moved from pc-dos/dossys.c to enable unit testing
+extern int _main(int pArgc, char* pArgv[]);
 
-// Offset: 6972
-// Size: 722
 // EAX: pArgc
 // EDX: pArgv
-int main(int pArgc, char **pArgv) {
-    int arg;
-    int i;
-    float f;
+// Moved from pc-dos/dossys.c to enable unit testing
+int main(int pArgc, char* pArgv[]) {
+    return _main(pArgc, pArgv);
 }

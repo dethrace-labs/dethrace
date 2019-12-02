@@ -3,7 +3,7 @@ TARGET_EXEC ?= c1
 BUILD_DIR ?= ./build
 SRC_DIR ?= .
 
-SRCS := $(shell find $(SRC_DIR) -name *.c)
+SRCS := $(shell find $(SRC_DIR) -name "*.c")
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
 

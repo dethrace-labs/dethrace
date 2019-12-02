@@ -4,6 +4,35 @@
 #include "dr_types.h"
 #include "br_types.h"
 
+extern tS3_outlet_ptr gIndexed_outlets[6];
+extern int gRandom_CDA_tunes[7];
+extern tU32 gLast_sound_service;
+extern int gSong_repeat_count;
+extern int gServicing_sound;
+extern int gCD_fully_installed;
+extern int gCD_is_disabled;
+extern int gCDA_is_playing;
+extern int gSound_sources_inited;
+extern tS3_sound_tag gCDA_tag;
+extern tS3_outlet_ptr gEngine_outlet;
+extern int gRandom_Rockin_MIDI_tunes[3];
+extern int gOld_sound_detail_level;
+extern int gLast_tune;
+extern int gVirgin_pass;
+extern br_vector3 gCamera_left;
+extern int gRandom_MIDI_tunes[3];
+extern br_vector3 gCamera_position;
+extern br_vector3 gOld_camera_position;
+extern br_vector3 gCamera_velocity;
+extern int gSound_detail_level;
+extern tS3_outlet_ptr gDriver_outlet;
+extern tS3_outlet_ptr gPedestrians_outlet;
+extern tS3_outlet_ptr gCar_outlet;
+extern tS3_sound_id gMIDI_id;
+extern int gMusic_available;
+extern tS3_outlet_ptr gMusic_outlet;
+extern tS3_outlet_ptr gEffects_outlet;
+
 // Offset: 0
 // Size: 224
 void UsePathFileToDetermineIfFullInstallation();
