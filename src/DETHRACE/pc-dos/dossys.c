@@ -407,7 +407,7 @@ void Usage(char *pProgpath) {
         "-nocutscenes",
         "-noreplay",
         CAR_MAX_SIMPLIFICATION_LEVEL);
-  exit(1);
+    exit(1);
 }
 
 // Offset: 6972
