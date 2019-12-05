@@ -349,7 +349,7 @@ int DoCrashEarnings(tCar_spec *pCar1, tCar_spec *pCar2) {
     tU32 the_time;
     tU32 time;
     float credits_squared;
-    tU32 last_earn_time;
+    static tU32 last_earn_time;
     char s[256];
     tImpact_location modified_location_1;
     tImpact_location modified_location_2;
@@ -379,7 +379,7 @@ void DoWheelDamage(tU32 pFrame_period) {
     br_scalar old_offset;
     br_vector3 temp_vector;
     br_vector3 wonky_vector;
-    int kev_index[4];
+    static int kev_index[4];
 }
 
 // Offset: 17896

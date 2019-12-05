@@ -1080,8 +1080,7 @@ int GetCDPathFromPathsTxtFile(char *pPath_name) {
     FILE *paths_txt_fp;
     tPath_name paths_txt;
 
-    if ( !got_it_already )
-    {
+    if ( !got_it_already ) {
         sprintf(paths_txt, "%s%s%s", gApplication_path, gDir_separator, "PATHS.TXT");
         paths_txt_fp = fopen(paths_txt, "rt");
         if ( !paths_txt_fp ) {

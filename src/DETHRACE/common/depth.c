@@ -245,24 +245,24 @@ void DepthEffectSky(br_pixelmap *pRender_buffer, br_pixelmap *pDepth_buffer, br_
 // EAX: pCamera
 void DoWobbleCamera(br_actor *pCamera) {
     float f_time;
-    br_scalar mag00;
-    br_scalar mag01;
-    br_scalar mag02;
-    br_scalar mag10;
-    br_scalar mag11;
-    br_scalar mag12;
-    br_scalar mag20;
-    br_scalar mag21;
-    br_scalar mag22;
-    float period00;
-    float period01;
-    float period02;
-    float period10;
-    float period11;
-    float period12;
-    float period20;
-    float period21;
-    float period22;
+    static br_scalar mag00;
+    static br_scalar mag01;
+    static br_scalar mag02;
+    static br_scalar mag10;
+    static br_scalar mag11;
+    static br_scalar mag12;
+    static br_scalar mag20;
+    static br_scalar mag21;
+    static br_scalar mag22;
+    static float period00;
+    static float period01;
+    static float period02;
+    static float period10;
+    static float period11;
+    static float period12;
+    static float period20;
+    static float period21;
+    static float period22;
 }
 
 // Offset: 7948
@@ -270,24 +270,24 @@ void DoWobbleCamera(br_actor *pCamera) {
 // EAX: pCamera
 void DoDrugWobbleCamera(br_actor *pCamera) {
     float f_time;
-    br_scalar mag00;
-    br_scalar mag01;
-    br_scalar mag02;
-    br_scalar mag10;
-    br_scalar mag11;
-    br_scalar mag12;
-    br_scalar mag20;
-    br_scalar mag21;
-    br_scalar mag22;
-    float period00;
-    float period01;
-    float period02;
-    float period10;
-    float period11;
-    float period12;
-    float period20;
-    float period21;
-    float period22;
+    static br_scalar mag00;
+    static br_scalar mag01;
+    static br_scalar mag02;
+    static br_scalar mag10;
+    static br_scalar mag11;
+    static br_scalar mag12;
+    static br_scalar mag20;
+    static br_scalar mag21;
+    static br_scalar mag22;
+    static float period00;
+    static float period01;
+    static float period02;
+    static float period10;
+    static float period11;
+    static float period12;
+    static float period20;
+    static float period21;
+    static float period22;
 }
 
 // Offset: 8576

@@ -49,7 +49,7 @@ void test_loop() {
 
 }
 
-void test_GetALineWithNoPossibleService() {
+void test_utility_GetALineWithNoPossibleService() {
     FILE *file = fopen("/tmp/testfile","wt");
     fprintf(file,"hello world\r\n  space_prefixed\r\n\r\n\ttab_prefixed\r\n$ignored_prefix\r\nlast_line");
     fclose(file);
@@ -81,5 +81,5 @@ void test_utility_suite() {
     RUN_TEST(test_utility_DecodeLine2);
     RUN_TEST(test_utility_EncodeLine2);
     RUN_TEST(test_utility_StripCR);
-    RUN_TEST(test_GetALineWithNoPossibleService);
+    RUN_TEST(test_utility_GetALineWithNoPossibleService);
 }

@@ -57,12 +57,12 @@ void LoadStart() {
 // Size: 415
 // EAX: pSave_allowed
 int DoLoadGame(int pSave_allowed) {
-    tFlicette flicker_on[9];
-    tFlicette flicker_off[9];
-    tFlicette push[9];
-    tMouse_area mouse_areas[9];
-    tRectile recopy_areas[24];
-    tInterface_spec interface_spec;
+    static tFlicette flicker_on[9];
+    static tFlicette flicker_off[9];
+    static tFlicette push[9];
+    static tMouse_area mouse_areas[9];
+    static tRectile recopy_areas[24];
+    static tInterface_spec interface_spec;
     int result;
 }
 
@@ -84,10 +84,10 @@ void SaveTheGame(int pSlot_number) {
 // Offset: 3636
 // Size: 77
 int ConfirmMidGameSave() {
-    tFlicette flicker_off[2];
-    tFlicette push[2];
-    tMouse_area mouse_areas[2];
-    tInterface_spec interface_spec;
+    static tFlicette flicker_off[2];
+    static tFlicette push[2];
+    static tMouse_area mouse_areas[2];
+    static tInterface_spec interface_spec;
 }
 
 // Offset: 3716
@@ -142,12 +142,12 @@ int SaveEscape(int *pCurrent_choice, int *pCurrent_mode) {
 // Size: 92
 // EAX: pDefault_choice
 int SaveGameInterface(int pDefault_choice) {
-    tFlicette flicker_on[9];
-    tFlicette flicker_off[9];
-    tFlicette push[9];
-    tMouse_area mouse_areas[9];
-    tRectile recopy_areas[24];
-    tInterface_spec interface_spec;
+    static tFlicette flicker_on[9];
+    static tFlicette flicker_off[9];
+    static tFlicette push[9];
+    static tMouse_area mouse_areas[9];
+    static tRectile recopy_areas[24];
+    static tInterface_spec interface_spec;
 }
 
 // Offset: 5416

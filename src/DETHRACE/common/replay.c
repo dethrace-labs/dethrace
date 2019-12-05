@@ -123,9 +123,9 @@ void PollActionReplayControls(tU32 pFrame_period) {
     int y_coord;
     int i;
     tU32 real_time;
-    tU32 last_real_time;
-    int psuedo_mouse_keys[8];
-    tRectangle mouse_areas[2][8];
+    static tU32 last_real_time;
+    static int psuedo_mouse_keys[8];
+    static tRectangle mouse_areas[2][8];
 }
 
 // Offset: 4832
@@ -148,6 +148,6 @@ void DoActionReplay(tU32 pFrame_period) {
 // Size: 330
 void SynchronizeActionReplay() {
     tPath_name the_path;
-    tU32 gLast_synch_time;
+    static tU32 gLast_synch_time;
 }
 

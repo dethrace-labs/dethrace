@@ -1,5 +1,7 @@
 #include "init.h"
 
+#include "pc-dos/dossys.h"
+
 int gInitialisation_finished;
 tU32 gAustere_time;
 int gInitial_rank;
@@ -88,7 +90,7 @@ void InitSmokeStuff() {
 // Offset: 3980
 // Size: 1350
 void Init2DStuff() {
-    br_token_value fadealpha[3];
+    static br_token_value fadealpha[3];
     tPath_name path;
     br_scalar prat_u;
     br_scalar prat_v;
@@ -106,7 +108,9 @@ void InitialiseApplication(int pArgc, char **pArgv) {
 // EAX: pArgc
 // EDX: pArgv
 void InitialiseDeathRace(int pArgc, char **pArgv) {
-    tPath_name the_path;
+    PDInitialiseSystem();
+    InitialiseApplication(pArgc, pArgv);
+    //dword_112DF8 = 1;  // never checked by game
 }
 
 // Offset: 6068

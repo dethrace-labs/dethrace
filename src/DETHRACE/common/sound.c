@@ -46,9 +46,6 @@ void UsePathFileToDetermineIfFullInstallation() {
     strcat(path_file, gDir_separator);
     strcat(path_file, "PATHS.TXT");
 
-    printf("file: %s\n", path_file);
-
-    //aRt_6
     if (PDCheckDriveExists(path_file) == 0) {
         fp = fopen(path_file, "rt");
         if (fp != NULL) {

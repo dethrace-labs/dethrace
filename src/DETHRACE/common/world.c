@@ -816,7 +816,7 @@ void SetWallTexturingLevel(tWall_texturing_level pLevel) {
 // Size: 82
 // EAX: pLevel
 void ReallySetWallTexturingLevel(tWall_texturing_level pLevel) {
-    tPMFMCB *tweaker[3][3];
+    static tPMFMCB *tweaker[3][3];
 }
 
 // Offset: 22536
@@ -827,7 +827,7 @@ br_material* DisposeSuffixedMaterials(br_model *pModel, tU16 pFace) {
     size_t max_suffix_len;
     br_material *mat;
     br_material *victim;
-    char *suffixes[3];
+    static char *suffixes[3];
     int s;
     char *id;
 }

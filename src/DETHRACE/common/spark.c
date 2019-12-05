@@ -474,14 +474,14 @@ void CreateSmokeColumn(tCar_spec *pCar, int pColour, int pVertex_index, tU32 pLi
 // Offset: 22512
 // Size: 309
 void GenerateSmokeShades() {
-    int gb;
-    int bb;
-    int rd;
-    int gd;
-    int bd;
-    int rg;
-    int gg;
-    int bg;
+    static int gb;
+    static int bb;
+    static int rd;
+    static int gd;
+    static int bd;
+    static int rg;
+    static int gg;
+    static int bg;
 }
 
 // Offset: 22824
@@ -829,7 +829,7 @@ void MakeCarIt(tCar_spec *pCar) {
     br_actor *actor;
     br_actor *bonny;
     br_pixelmap *shade[6];
-    int shade_num;
+    static int shade_num;
     int i;
 }
 

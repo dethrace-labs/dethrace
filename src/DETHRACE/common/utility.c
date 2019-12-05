@@ -12,6 +12,10 @@
 #include <unistd.h>
 #include <ctype.h>
 
+// Added >>
+#define MIN_SERVICE_INTERVAL 200
+// <<
+
 tU32 gLong_key[]        = { 0x5F991B6C, 0x135FCDB9, 0x0E2004CB, 0x0EA11C5E };
 tU32 gOther_long_key[]  = { 0x26D6A867, 0x1B45DDB6, 0x13227E32, 0x3794C215 };
 
@@ -90,7 +94,7 @@ br_scalar SRandomPosNeg(br_scalar pN) {
 // Size: 506
 // EAX: pF
 // EDX: pS
-char* GetALineWithNoPossibleService(FILE *pF, unsigned char *pS) {
+char* GetALineWithNoPossibleService(FILE *pF, /*unsigned*/ char *pS) {
     // JeffH removed "signed' to avoid compiler warnings..
     /*signed*/ char *result;
     /*signed*/ char s[256];
@@ -543,11 +547,13 @@ br_pixelmap* GenerateDarkenedShadeTable(int pHeight, br_pixelmap *pPalette, int 
 // Size: 92
 void PossibleService() {
     static tU32 last_service = 0;
-    tU32 current_time;  //Added by JeffH
+    // Added >>
+    tU32 current_time;
+    // <<
 
     current_time = PDGetTotalTime();
 
-    if (current_time - last_service > 0xC8 && !gProgram_state.racing) {
+    if (current_time - last_service > MIN_SERVICE_INTERVAL && !gProgram_state.racing) {
         SoundService();
         NetService(gProgram_state.racing);
         last_service = current_time;
@@ -697,7 +703,7 @@ int NormalSideOfPlane(br_vector3 *pPoint, br_vector3 *pNormal, br_scalar pD) {
 br_material* DRMaterialClone(br_material *pMaterial) {
     br_material *the_material;
     char s[256];
-    int name_suffix;
+    static int name_suffix;
 }
 
 // Offset: 13008
@@ -1033,14 +1039,13 @@ void NobbleNonzeroBlacks(br_pixelmap *pPalette) {
 // EAX: pThe_path
 int PDCheckDriveExists(char *pThe_path) {
 
-    // Added: convert dir separator >>
+    // Added: force unix dir separator for now >>
     char *rep = pThe_path;
     while((rep = strchr(rep, '\\')) != NULL) {
         *rep++ = '/';
     }
     // <<
 
-    printf("PDCheckDriveExists %s\n", pThe_path);
     if (access(pThe_path, 0) != -1) {
         return 1;
     }
@@ -1072,9 +1077,9 @@ void BlendifyMaterialTablishly(br_material *pMaterial, int pPercent) {
 // EAX: pMaterial
 // EDX: pPercent
 void BlendifyMaterialPrimitively(br_material *pMaterial, int pPercent) {
-    br_token_value alpha25[3];
-    br_token_value alpha50[3];
-    br_token_value alpha75[3];
+    static br_token_value alpha25[3];
+    static br_token_value alpha50[3];
+    static br_token_value alpha75[3];
 }
 
 // Offset: 16852

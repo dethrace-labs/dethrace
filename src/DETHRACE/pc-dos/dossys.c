@@ -3,6 +3,7 @@
 #include <time.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <stdio.h>
 #include <unistd.h>
 
 #include "watcom_functions.h"
@@ -10,6 +11,7 @@
 #include "common/main.h"
 #include "common/car.h"
 #include "common/sound.h"
+#include "common/utility.h"
 
 int gASCII_table[128];
 tU32 gKeyboard_bits[8];
@@ -67,6 +69,122 @@ void KeyTranslation(tU8 pKey_index, tU8 pScan_code_1, tU8 pScan_code_2) {
 // Offset: 436
 // Size: 1897
 void KeyBegin() {
+  // int v0; // edx@0
+  // int v1; // ST00_4@1
+  // __int16 v2; // dx@1
+
+    // *(_WORD *)gScan_code[11] = 11;
+    // *(_WORD *)gScan_code[13] = 3;
+    // *(_WORD *)gScan_code[14] = 4;
+    // *(_WORD *)gScan_code[12] = 2;
+    // *(_WORD *)gScan_code[15] = 5;
+    // *(_WORD *)gScan_code[17] = 7;
+    // *(_WORD *)gScan_code[18] = 8;
+    // *(_WORD *)gScan_code[16] = 6;
+    // *(_WORD *)gScan_code[19] = 9;
+    // *(_WORD *)gScan_code[21] = 30;
+    // *(_WORD *)gScan_code[22] = 48;
+    // *(_WORD *)gScan_code[20] = 10;
+    // *(_WORD *)gScan_code[23] = 46;
+    // *(_WORD *)gScan_code[25] = 18;
+    // *(_WORD *)gScan_code[26] = 33;
+    // *(_WORD *)gScan_code[24] = 32;
+    // *(_WORD *)gScan_code[27] = 34;
+    // *(_WORD *)gScan_code[29] = 23;
+    // *(_WORD *)gScan_code[30] = 36;
+    // *(_WORD *)gScan_code[28] = 35;
+    // *(_WORD *)gScan_code[31] = 37;
+    // *(_WORD *)gScan_code[33] = 50;
+    // *(_WORD *)gScan_code[34] = 49;
+    // *(_WORD *)gScan_code[32] = 38;
+    // *(_WORD *)gScan_code[35] = 24;
+    // *(_WORD *)gScan_code[37] = 16;
+    // *(_WORD *)gScan_code[38] = 19;
+    // *(_WORD *)gScan_code[36] = 25;
+    // *(_WORD *)gScan_code[39] = 31;
+    // *(_WORD *)gScan_code[41] = 22;
+    // *(_WORD *)gScan_code[42] = 47;
+    // *(_WORD *)gScan_code[40] = 20;
+    // *(_WORD *)gScan_code[43] = 17;
+    // *(_WORD *)gScan_code[44] = 45;
+    // *(_WORD *)gScan_code[45] = 21;
+    // *(_WORD *)gScan_code[46] = 44;
+    // *(_WORD *)gScan_code[47] = 41;
+    // *(_WORD *)gScan_code[48] = 12;
+    // *(_WORD *)gScan_code[49] = 13;
+    // *(_WORD *)gScan_code[50] = 14;
+    // *(_WORD *)gScan_code[51] = 28;
+    // *(_WORD *)gScan_code[52] = 156;
+
+    // *(_WORD *)gScan_code[0] = 13866;
+    // *(_WORD *)gScan_code[1] = -18376;
+    // *(_WORD *)gScan_code[2] = -25315;
+    // *(_WORD *)gScan_code[3] = -25315;
+    // *(_WORD *)gScan_code[4] = 58;
+    // *(_WORD *)gScan_code[55] = 86;
+    // *(_WORD *)gScan_code[54] = 53;
+    // *(_WORD *)gScan_code[56] = 39;
+    // *(_WORD *)gScan_code[59] = 51;
+    // *(_WORD *)gScan_code[53] = 15;
+    // *(_WORD *)gScan_code[58] = 52;
+    // *(_WORD *)gScan_code[60] = 26;
+    // *(_WORD *)gScan_code[63] = 1;
+    // *(_WORD *)gScan_code[57] = 40;
+    // *(_WORD *)gScan_code[62] = 43;
+    // *(_WORD *)gScan_code[64] = 210;
+    // *(_WORD *)gScan_code[67] = 207;
+    // *(_WORD *)gScan_code[61] = 27;
+    // *(_WORD *)gScan_code[66] = 199;
+    // *(_WORD *)gScan_code[68] = 201;
+    // *(_WORD *)gScan_code[71] = 205;
+    // *(_WORD *)gScan_code[65] = 211;
+    // *(_WORD *)gScan_code[70] = 203;
+    // *(_WORD *)gScan_code[72] = 200;
+    // *(_WORD *)gScan_code[69] = 209;
+    // *(_WORD *)gScan_code[74] = 69;
+    // *(_WORD *)gScan_code[73] = 208;
+    // *(_WORD *)gScan_code[75] = 181;
+    // *(_WORD *)gScan_code[76] = 55;
+    // *(_WORD *)gScan_code[78] = 78;
+    // *(_WORD *)gScan_code[77] = 74;
+    // *(_WORD *)gScan_code[80] = 0;
+    // *(_WORD *)gScan_code[79] = 83;
+    // *(_WORD *)gScan_code[82] = 79;
+    // *(_WORD *)gScan_code[84] = 81;
+    // *(_WORD *)gScan_code[81] = 82;
+    // *(_WORD *)gScan_code[83] = 80;
+    // *(_WORD *)gScan_code[86] = 76;
+    // *(_WORD *)gScan_code[88] = 71;
+    // *(_WORD *)gScan_code[85] = 75;
+    // *(_WORD *)gScan_code[87] = 77;
+    // *(_WORD *)gScan_code[90] = 73;
+    // *(_WORD *)gScan_code[92] = 60;
+    // *(_WORD *)gScan_code[89] = 72;
+    // *(_WORD *)gScan_code[91] = 59;
+    // *(_WORD *)gScan_code[94] = 62;
+    // *(_WORD *)gScan_code[96] = 64;
+    // *(_WORD *)gScan_code[93] = 61;
+    // *(_WORD *)gScan_code[95] = 63;
+    // *(_WORD *)gScan_code[98] = 66;
+    // *(_WORD *)gScan_code[100] = 68;
+    // *(_WORD *)gScan_code[97] = 65;
+    // *(_WORD *)gScan_code[99] = 67;
+    // *(_WORD *)gScan_code[102] = 88;
+    // *(_WORD *)gScan_code[104] = 70;
+    // *(_WORD *)gScan_code[101] = 87;
+    // *(_WORD *)gScan_code[103] = 0;
+    // *(_WORD *)gScan_code[105] = 0;
+    // *(_WORD *)gScan_code[106] = 57;
+    // *(_WORD *)gScan_code[5] = 54;
+    // *(_WORD *)gScan_code[6] = 184;
+    // *(_WORD *)gScan_code[7] = 157;
+    // *(_WORD *)gScan_code[8] = 42;
+    // *(_WORD *)gScan_code[9] = 56;
+    // *(_WORD *)gScan_code[10] = 29;
+
+    //gPrev_keyboard_handler = (void (__fastcall *)())dos_getvect(9);
+    //unk_142E6C = v2;
+    //dos_setvect(9, KeyboardHandler);
 }
 
 // Offset: 2336
@@ -127,6 +245,23 @@ void PDInitialiseSystem() {
     tPath_name the_path;
     FILE *f;
     int len;
+
+    KeyBegin();
+    //v4 = DOSMouseBegin();
+    gJoystick_deadzone = 8000;
+    //gUpper_loop_limit = sub_A1940(v4, v5, v3, v6) / 2;
+    PathCat(the_path, gApplication_path, "KEYBOARD.COK");
+    f = fopen(the_path, "rb");
+    if (!f) {
+        PDFatalError("This .exe must have KEYBOARD.COK in the DATA folder.");
+    }
+
+    fseek(f, 0, SEEK_END);
+    len = ftell(f);
+    rewind(f);
+    fread(gASCII_table, len/2, 1, f);
+    fread(gASCII_shift_table, len/2, 1, f);
+    fclose(f);
 }
 
 // Offset: 3112
@@ -272,8 +407,12 @@ void PDInstallErrorHandlers() {
 // Offset: 5264
 // Size: 39
 void PDSetFileVariables() {
+    gDir_separator[0] = '\\';
+
+    // Added >>
     gDir_separator[0] = '/';
-    gDir_separator[1] = '\0';  //added by JeffH
+    gDir_separator[1] = '\0';
+    // <<
 }
 
 // Offset: 5304
@@ -287,12 +426,13 @@ void PDBuildAppPath(char *pThe_path) {
     pThe_path[pos] = '\\';
     pThe_path[pos + 1] = 0;
 
-    pThe_path[pos] = '/'; //added by JeffH
+    // Added >>
+    pThe_path[pos] = '/';
+    // <<
 
     strcpy(gNetwork_profile_fname, pThe_path);
     pos = strlen(gNetwork_profile_fname);
     strcat(gNetwork_profile_fname, "NETWORK.INI");
-    printf("apppath %s\n", gNetwork_profile_fname);
 }
 
 // Offset: 5404

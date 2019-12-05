@@ -373,9 +373,9 @@ tNet_message* NetAllocateMessage(int pSize) {
     void *pointer;
     void *last_message;
     char *test;
-    int rr_min;
-    int rr_mid;
-    int rr_max;
+    static int rr_min;
+    static int rr_mid;
+    static int rr_max;
     tNet_message *message;
     int i;
 }
@@ -595,11 +595,11 @@ void ReceivedWasted(tNet_contents *pContents) {
     tNet_game_player_info *culprit;
     char s[256];
     tCar_spec *car;
-    tS32 last_got_wasted_time;
-    tS32 last_wasted_em_time;
-    tS32 last_wasty_message_time;
-    tNet_game_player_info *last_culprit;
-    tNet_game_player_info *last_victim;
+    static tS32 last_got_wasted_time;
+    static tS32 last_wasted_em_time;
+    static tS32 last_wasty_message_time;
+    static tNet_game_player_info *last_culprit;
+    static tNet_game_player_info *last_victim;
 }
 
 // Offset: 14116
@@ -668,7 +668,7 @@ void CheckForPendingStartRace() {
 // EAX: pIn_race
 void NetService(int pIn_race) {
     tU32 time;
-    tU32 last_status_broadcast;
+    static tU32 last_status_broadcast;
 }
 
 // Offset: 16400
