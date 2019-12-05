@@ -3,6 +3,7 @@
 #include <time.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "watcom_functions.h"
 #include "common/globvars.h"
@@ -271,6 +272,8 @@ void PDInstallErrorHandlers() {
 // Offset: 5264
 // Size: 39
 void PDSetFileVariables() {
+    gDir_separator[0] = '/';
+    gDir_separator[1] = '\0';  //added by JeffH
 }
 
 // Offset: 5304
@@ -278,6 +281,18 @@ void PDSetFileVariables() {
 // EAX: pThe_path
 void PDBuildAppPath(char *pThe_path) {
     int pos;
+
+    getcwd(pThe_path, 256);
+    pos = strlen(pThe_path);
+    pThe_path[pos] = '\\';
+    pThe_path[pos + 1] = 0;
+
+    pThe_path[pos] = '/'; //added by JeffH
+
+    strcpy(gNetwork_profile_fname, pThe_path);
+    pos = strlen(gNetwork_profile_fname);
+    strcat(gNetwork_profile_fname, "NETWORK.INI");
+    printf("apppath %s\n", gNetwork_profile_fname);
 }
 
 // Offset: 5404

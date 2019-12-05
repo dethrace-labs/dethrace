@@ -3,10 +3,14 @@
 #include "loading.h"
 #include "errors.h"
 #include "dossys.h"
+#include "globvars.h"
+#include "sound.h"
+#include "network.h"
 
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <ctype.h>
 
 tU32 gLong_key[]        = { 0x5F991B6C, 0x135FCDB9, 0x0E2004CB, 0x0EA11C5E };
 tU32 gOther_long_key[]  = { 0x26D6A867, 0x1B45DDB6, 0x13227E32, 0x3794C215 };
@@ -87,11 +91,70 @@ br_scalar SRandomPosNeg(br_scalar pN) {
 // EAX: pF
 // EDX: pS
 char* GetALineWithNoPossibleService(FILE *pF, unsigned char *pS) {
-    signed char *result;
-    signed char s[256];
+    // JeffH removed "signed' to avoid compiler warnings..
+    /*signed*/ char *result;
+    /*signed*/ char s[256];
     int ch;
     int len;
     int i;
+
+    do
+    {
+        result = fgets(s, 256, pF);
+        if ( !result ) {
+            break;
+        }
+        if ( s[0] == '@' )
+        {
+            EncodeLine(&s[1]);
+            goto LABEL_5;
+        }
+        while ( 1 )
+        {
+            if ( s[0] != ' ' && s[0] != '\t' ){
+                break;
+            }
+LABEL_5:
+            len = strlen(s);
+            memmove(s, &s[1], len);
+        }
+
+        while (1) {
+            ch = fgetc(pF);
+            if (ch != '\r' && ch != '\n') {
+                break;
+            }
+        }
+        if ( ch != -1 )
+            ungetc(ch, pF);
+    }
+    while (!isalnum(s[0])
+        && s[0] != '-'
+        && s[0] != '.'
+        && s[0] != '!'
+        && s[0] != '&'
+        && s[0] != '('
+        && s[0] != '\''
+        && s[0] != '\"'
+        && s[0] >= 0 );
+
+    if (result) {
+        len = strlen(result);
+        if ( len != 0 && (result[len - 1] == '\r' || result[len - 1] == '\n' )) {
+            result[len - 1] = 0;
+        }
+        if ( len != 1 && (result[len - 2] == '\r' || result[len - 2] == '\n' )) {
+            result[len - 2] = 0;
+        }
+    }
+    strcpy((char*)pS, s);
+    len = strlen(s);
+    for (i = 0; i < len; i++) {
+        if (pS[i] >= 0xE0u) {
+            pS[i] -= 32;
+        }
+    }
+    return result;
 }
 
 // Offset: 1744
@@ -99,6 +162,8 @@ char* GetALineWithNoPossibleService(FILE *pF, unsigned char *pS) {
 // EAX: pF
 // EDX: pS
 char* GetALineAndDontArgue(FILE *pF, char *pS) {
+    PossibleService(pF, pS);
+    return GetALineWithNoPossibleService(pF, pS);
 }
 
 // Offset: 1804
@@ -477,7 +542,16 @@ br_pixelmap* GenerateDarkenedShadeTable(int pHeight, br_pixelmap *pPalette, int 
 // Offset: 9320
 // Size: 92
 void PossibleService() {
-    tU32 last_service;
+    static tU32 last_service = 0;
+    tU32 current_time;  //Added by JeffH
+
+    current_time = PDGetTotalTime();
+
+    if (current_time - last_service > 0xC8 && !gProgram_state.racing) {
+        SoundService();
+        NetService(gProgram_state.racing);
+        last_service = current_time;
+    }
 }
 
 // Offset: 9412
@@ -958,6 +1032,19 @@ void NobbleNonzeroBlacks(br_pixelmap *pPalette) {
 // Size: 55
 // EAX: pThe_path
 int PDCheckDriveExists(char *pThe_path) {
+
+    // Added: convert dir separator >>
+    char *rep = pThe_path;
+    while((rep = strchr(rep, '\\')) != NULL) {
+        *rep++ = '/';
+    }
+    // <<
+
+    printf("PDCheckDriveExists %s\n", pThe_path);
+    if (access(pThe_path, 0) != -1) {
+        return 1;
+    }
+    return 0;
 }
 
 // Offset: 16388

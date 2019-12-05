@@ -1,5 +1,10 @@
 #include "sound.h"
 
+#include <string.h>
+
+#include "globvars.h"
+#include "utility.h"
+
 tS3_outlet_ptr gIndexed_outlets[6];
 int gRandom_CDA_tunes[7];
 tU32 gLast_sound_service;
@@ -36,7 +41,29 @@ void UsePathFileToDetermineIfFullInstallation() {
     char line3[80];
     char path_file[80];
     FILE *fp;
+
+    strcpy(path_file, gApplication_path);
+    strcat(path_file, gDir_separator);
+    strcat(path_file, "PATHS.TXT");
+
+    printf("file: %s\n", path_file);
+
+    //aRt_6
+    if (PDCheckDriveExists(path_file) == 0) {
+        fp = fopen(path_file, "rt");
+        if (fp != NULL) {
+            if (GetALineWithNoPossibleService(fp, line2) &&
+                GetALineWithNoPossibleService(fp, line2) &&
+                GetALineWithNoPossibleService(fp, line3) &&
+                strcmp(line3, "Full") == 0) {
+
+                gCD_fully_installed = 1;
+            }
+            fclose(fp);
+        }
+    }
 }
+
 
 // Offset: 224
 // Size: 976
