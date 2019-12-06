@@ -39,6 +39,7 @@ extern void (*gPrev_keyboard_handler)();
 extern tU8 gScan_code[123][2];
 
 extern int _unittest_do_not_exit;
+extern char *_unittest_last_fatal_error;
 
 // Offset: 0
 // Size: 291

@@ -53,7 +53,7 @@ br_scalar SRandomPosNeg(br_scalar pN);
 // Size: 506
 // EAX: pF
 // EDX: pS
-char* GetALineWithNoPossibleService(FILE *pF, unsigned char *pS);
+char* GetALineWithNoPossibleService(FILE *pF, /*unsigned*/ char *pS);
 
 // Offset: 1744
 // Size: 60

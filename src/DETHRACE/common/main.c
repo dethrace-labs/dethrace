@@ -1,5 +1,15 @@
 #include "main.h"
 
+#include "pc-dos/dossys.h"
+#include "common/globvars.h"
+#include "common/sound.h"
+#include "common/loading.h"
+#include "common/init.h"
+#include "pc-dos/dossys.h"
+#include "common/utility.h"
+#include "common/structur.h"
+#include "common/loadsave.h"
+
 
 // Offset: 0
 // Size: 161
@@ -42,5 +52,22 @@ void ServiceGameInRace() {
 // EDX: pArgv
 void GameMain(int pArgc, char **pArgv) {
     tPath_name CD_dir;
+
+    PDSetFileVariables();
+    PDBuildAppPath(gApplication_path);
+    //v8 = DRLogMessage(v19, v20);
+
+    strcat(gApplication_path, "DATA");
+
+    UsePathFileToDetermineIfFullInstallation();
+
+    if (!gCD_fully_installed && GetCDPathFromPathsTxtFile(CD_dir) && !PDCheckDriveExists(CD_dir)) {
+        PDInitialiseSystem();
+        fprintf(stderr, "Can't find the Carmageddon CD\n");
+        exit(1);
+    }
+    InitialiseDeathRace(pArgc, pArgv);
+    DoProgram();
+    DoSaveGame(1);
 }
 

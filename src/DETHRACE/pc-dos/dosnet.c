@@ -154,7 +154,7 @@ BOOL hmiIPXGetData(PSTR pData, tU32 wDSize) {
     tU32 packets_checked;
     tU32 full_packet_ooer_missus;
     _IPX_ECB *ECB_ptr;
-    tU32 round_robin_jobby;
+    static tU32 round_robin_jobby;
 }
 
 // Offset: 3320
@@ -294,7 +294,7 @@ void PDNetEndJoinList() {
 // EAX: pGame
 // EDX: pIndex
 int PDNetGetNextJoinGame(tNet_game_details *pGame, int pIndex) {
-    tU32 next_broadcast_time;
+    static tU32 next_broadcast_time;
     int i;
     int j;
     int number_of_hosts_has_changed;

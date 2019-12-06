@@ -554,8 +554,8 @@ void RenderShadows(br_actor *pWorld, tTrack_spec *pTrack_spec, br_actor *pCamera
 // EDX: pTime
 void FlashyMapCheckpoint(int pIndex, tU32 pTime) {
     tCheckpoint *cp;
-    tU32 last_flash;
-    int flash_state;
+    static tU32 last_flash;
+    static int flash_state;
 }
 
 // Offset: 15908
@@ -616,10 +616,10 @@ void MungePalette() {
     float omega;
     tU32 period;
     tU32 the_time;
-    int palette_spammed;
-    float last_omega;
-    tU32 next_repair_time;
-    tU32 last_sound;
+    static int palette_spammed;
+    static float last_omega;
+    static tU32 next_repair_time;
+    static tU32 last_sound;
 }
 
 // Offset: 20080
@@ -863,14 +863,14 @@ int DoMouseCursor() {
     int giblet_chance;
     int giblet_count;
     tU32 this_call_time;
-    tU32 last_cursor_change;
-    tU32 last_call_time;
-    tU32 last_required_change;
+    static tU32 last_cursor_change;
+    static tU32 last_call_time;
+    static tU32 last_required_change;
     tS32 period;
-    int delta_x;
-    int required_cursor;
-    int zero_count;
-    int button_was_down;
+    static int delta_x;
+    static int required_cursor;
+    static int zero_count;
+    static int button_was_down;
 }
 
 // Offset: 27508

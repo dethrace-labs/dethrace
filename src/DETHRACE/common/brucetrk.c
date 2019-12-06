@@ -49,7 +49,7 @@ void StripBlendedFaces(br_actor *pActor, br_model *pModel) {
     br_face *face;
     int changed_one;
     char s[256];
-    tU16 nfaces_allocated;
+    static tU16 nfaces_allocated;
 }
 
 // Offset: 1704
@@ -124,17 +124,17 @@ void DrawColumns(int pDraw_blends, tTrack_spec *pTrack_spec, int pMin_x, int pMa
 // EBX: pCamera
 // ECX: pCamera_to_world
 void RenderTrack(br_actor *pWorld, tTrack_spec *pTrack_spec, br_actor *pCamera, br_matrix34 *pCamera_to_world, int pRender_blends) {
-    tU8 column_x;
-    tU8 column_z;
-    tU8 min_x;
-    tU8 max_x;
-    tU8 min_z;
-    tU8 max_z;
-    br_vector3 edge_before;
-    br_vector3 edge_after;
-    br_camera *camera;
-    br_scalar tan_fov_ish;
-    br_actor *result;
+    static tU8 column_x;
+    static tU8 column_z;
+    static tU8 min_x;
+    static tU8 max_x;
+    static tU8 min_z;
+    static tU8 max_z;
+    static br_vector3 edge_before;
+    static br_vector3 edge_after;
+    static br_camera *camera;
+    static br_scalar tan_fov_ish;
+    static br_actor *result;
 }
 
 // Offset: 6200

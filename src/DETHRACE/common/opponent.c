@@ -217,8 +217,8 @@ void TopUpRandomRoute(tOpponent_spec *pOpponent_spec, int pSections_to_add) {
 // EBX: pNum_of_perm_store_sections
 // ECX: pTarget_section
 int SearchForSection(tRoute_section *pTemp_store, tRoute_section *pPerm_store, int *pNum_of_perm_store_sections, tS16 pTarget_section, int pDepth, br_scalar pDistance_so_far, tOpponent_spec *pOpponent_spec) {
-    br_scalar shortest_dist;
-    int routes_found;
+    static br_scalar shortest_dist;
+    static int routes_found;
     char depth_indent[32];
     int direction;
     tPath_node *node_ptr;
@@ -595,9 +595,9 @@ int RematerialiseOpponentOnNearestSection(tOpponent_spec *pOpponent_spec, br_sca
 // Size: 2365
 // EAX: pOpponent_spec
 int RematerialiseOpponent(tOpponent_spec *pOpponent_spec, br_scalar pSpeed) {
-    int count;
-    int total;
-    int highest;
+    static int count;
+    static int total;
+    static int highest;
     int this_total;
     br_matrix34 *mat;
     br_matrix34 original_mat;
@@ -1049,7 +1049,7 @@ void AllocateMatsForOppoPathModel() {
 // Offset: 48088
 // Size: 1093
 void RebuildOppoPathModel() {
-    int nfaces_last_time;
+    static int nfaces_last_time;
     int i;
     int at_least_one;
     br_uint_16 nfaces;

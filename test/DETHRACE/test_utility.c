@@ -31,8 +31,47 @@ void test_utility_StripCR() {
     TEST_ASSERT_EQUAL_STRING("line", buf);
 }
 
+void test_utility_GetALineWithNoPossibleService() {
+    FILE *file = fopen("/tmp/testfile","wt");
+    fprintf(file,"hello world\r\n  space_prefixed\r\n\r\n\ttab_prefixed\r\n$ignored_prefix\r\nlast_line");
+    fclose(file);
+
+    file = fopen("/tmp/testfile","rt");
+    char s[256];
+
+    char *result = GetALineWithNoPossibleService(file, s);
+    TEST_ASSERT_NOT_NULL(result);
+    TEST_ASSERT_EQUAL_STRING("hello world", s);
+
+    result = GetALineWithNoPossibleService(file, s);
+    TEST_ASSERT_NOT_NULL(result);
+    TEST_ASSERT_EQUAL_STRING("space_prefixed", s);
+
+    result = GetALineWithNoPossibleService(file, s);
+    TEST_ASSERT_NOT_NULL(result);
+    TEST_ASSERT_EQUAL_STRING("tab_prefixed", s);
+
+    result = GetALineWithNoPossibleService(file, s);
+    TEST_ASSERT_NOT_NULL(result);
+    TEST_ASSERT_EQUAL_STRING("last_line", s);
+
+    result = GetALineWithNoPossibleService(file, s);
+    TEST_ASSERT_NULL(result);
+}
+
+void test_utility_PathCat() {
+    char buf[256];
+    PathCat(buf, "a", "b");
+    TEST_ASSERT_EQUAL_STRING("a/b", buf);
+
+    PathCat(buf, "a", "");
+    TEST_ASSERT_EQUAL_STRING("a", buf);
+}
+
 void test_utility_suite() {
     RUN_TEST(test_utility_DecodeLine2);
     RUN_TEST(test_utility_EncodeLine2);
     RUN_TEST(test_utility_StripCR);
+    RUN_TEST(test_utility_GetALineWithNoPossibleService);
+    RUN_TEST(test_utility_PathCat);
 }

@@ -135,5 +135,5 @@ int gTyping;
 int gSound_available;
 int gNumber_of_races;
 int gArrow_mode;
-char gDir_separator[3];
+char gDir_separator[3] = "";
 

@@ -1,5 +1,10 @@
 #include "loading.h"
 
+#include <string.h>
+
+#include "globvars.h"
+#include "utility.h"
+
 char *gWheel_actor_names[6];
 int gFunk_groove_flags[30];
 char *gNet_avail_names[4];
@@ -1042,7 +1047,7 @@ FILE* OldDRfopen(char *pFilename, char *pMode) {
     tPath_name CD_dir;
     tPath_name path_file;
     tPath_name source_check;
-    int source_exists;
+    static int source_exists;
     int len;
 }
 
@@ -1070,10 +1075,23 @@ FILE* DRfopen(char *pFilename, char *pMode) {
 // Size: 178
 // EAX: pPath_name
 int GetCDPathFromPathsTxtFile(char *pPath_name) {
-    int got_it_already;
-    tPath_name cd_pathname;
+    static int got_it_already = 0;
+    static tPath_name cd_pathname;
     FILE *paths_txt_fp;
     tPath_name paths_txt;
+
+    if ( !got_it_already ) {
+        sprintf(paths_txt, "%s%s%s", gApplication_path, gDir_separator, "PATHS.TXT");
+        paths_txt_fp = fopen(paths_txt, "rt");
+        if ( !paths_txt_fp ) {
+            return 0;
+        }
+        GetALineAndDontArgue(paths_txt_fp, cd_pathname);
+        fclose(paths_txt_fp);
+        got_it_already = 1;
+    }
+    memcpy(pPath_name, cd_pathname, 256);
+    return 1;
 }
 
 // Offset: 38784
