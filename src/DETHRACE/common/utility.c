@@ -176,6 +176,11 @@ char* GetALineAndDontArgue(FILE *pF, char *pS) {
 // EDX: pStr_1
 // EBX: pStr_2
 void PathCat(char *pDestn_str, char *pStr_1, char *pStr_2) {
+    strcpy(pDestn_str, pStr_1);
+    if (strlen(pStr_2) != 0) {
+        strcat(pDestn_str, gDir_separator);
+        strcat(pDestn_str, pStr_2);
+    }
 }
 
 // Offset: 1892

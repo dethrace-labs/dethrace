@@ -77,9 +77,19 @@ void test_utility_GetALineWithNoPossibleService() {
     TEST_ASSERT_NULL(result);
 }
 
+void test_utility_PathCat() {
+    char buf[256];
+    PathCat(buf, "a", "b");
+    TEST_ASSERT_EQUAL_STRING("a/b", buf);
+
+    PathCat(buf, "a", "");
+    TEST_ASSERT_EQUAL_STRING("a", buf);
+}
+
 void test_utility_suite() {
     RUN_TEST(test_utility_DecodeLine2);
     RUN_TEST(test_utility_EncodeLine2);
     RUN_TEST(test_utility_StripCR);
     RUN_TEST(test_utility_GetALineWithNoPossibleService);
+    RUN_TEST(test_utility_PathCat);
 }

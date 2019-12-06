@@ -19,4 +19,5 @@ test: build
 	test/build/c1tests
 
 run: build
-	@src/DETHRACE/build/c1
+	@echo "Running dethrace"
+	@./run.sh

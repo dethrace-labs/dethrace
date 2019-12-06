@@ -12,6 +12,7 @@
 #include "common/car.h"
 #include "common/sound.h"
 #include "common/utility.h"
+#include "common/loadsave.h"
 
 int gASCII_table[128];
 tU32 gKeyboard_bits[8];
@@ -43,6 +44,7 @@ void (*gPrev_keyboard_handler)();
 tU8 gScan_code[123][2];
 
 int _unittest_do_not_exit = 0;
+char *_unittest_last_fatal_error;
 
 // Offset: 0
 // Size: 291
@@ -221,14 +223,19 @@ void PDFatalError(char *pThe_str) {
     static int been_here = 0;
 
     if (been_here) {
-        exit(1);
+        if (!_unittest_do_not_exit) {
+            exit(1);
+        }
     }
     been_here = 1;
 
+    _unittest_last_fatal_error = pThe_str;
     fprintf(stderr, "FATAL ERROR: %s\n", pThe_str);
+
     // wait for keypress
-    // DoSaveGame() -> exit
-    if (_unittest_do_not_exit == 0) {
+
+    DoSaveGame(1);
+    if (!_unittest_do_not_exit) {
        exit(1);
     }
 }
@@ -247,6 +254,7 @@ void PDInitialiseSystem() {
     int len;
 
     KeyBegin();
+
     //v4 = DOSMouseBegin();
     gJoystick_deadzone = 8000;
     //gUpper_loop_limit = sub_A1940(v4, v5, v3, v6) / 2;
@@ -423,13 +431,8 @@ void PDBuildAppPath(char *pThe_path) {
 
     getcwd(pThe_path, 256);
     pos = strlen(pThe_path);
-    pThe_path[pos] = '\\';
+    pThe_path[pos] = gDir_separator[0];  // original: pThe_path[pos] = '\\';
     pThe_path[pos + 1] = 0;
-
-    // Added >>
-    pThe_path[pos] = '/';
-    // <<
-
     strcpy(gNetwork_profile_fname, pThe_path);
     pos = strlen(gNetwork_profile_fname);
     strcat(gNetwork_profile_fname, "NETWORK.INI");

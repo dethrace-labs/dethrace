@@ -13,6 +13,7 @@ void test_loading_GetCDPathFromPathsTxtFile() {
 
     unlink("/tmp/PATHS.TXT");
 
+    // should return false, path does not exist
     result = GetCDPathFromPathsTxtFile(cd_path);
     TEST_ASSERT_EQUAL_INT(0, result);
 
