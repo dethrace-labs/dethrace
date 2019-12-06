@@ -31,24 +31,6 @@ void test_utility_StripCR() {
     TEST_ASSERT_EQUAL_STRING("line", buf);
 }
 
-void test_loop() {
-    int i = 0;
-    if (i) {
-        printf("got i\n");
-    }
-    if (!i) {
-        printf("got not i\n");
-    }
-    i = 100;
-    if (i) {
-        printf("got i=1\n");
-    }
-    if (!i) {
-        printf("got not i=1\n");
-    }
-
-}
-
 void test_utility_GetALineWithNoPossibleService() {
     FILE *file = fopen("/tmp/testfile","wt");
     fprintf(file,"hello world\r\n  space_prefixed\r\n\r\n\ttab_prefixed\r\n$ignored_prefix\r\nlast_line");
