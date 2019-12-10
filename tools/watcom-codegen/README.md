@@ -1,6 +1,6 @@
 # Watcom symbol dump codegen tools
 
-### codegen.py
+## codegen.py
 
 Takes an [exedump](https://github.com/jeff-1amstudios/open-watcom-v2/tree/master/bld/exedump) output file and generates skeleton "c" project files containing functions, structs, enums and global variables.
 
@@ -41,6 +41,26 @@ void CalcEngineForce(tCar_spec *c, br_scalar dt) {
 }
 ```
 
-### split-dump.sh
+### Usage
+
+1. Concatenate the executable file and the symbol file
+```
+cat carma1.exe dethrace.sym > carma_with_symbols.exe
+```
+
+2. Execute wdump and pipe the output to file
+```
+wdump -Daglmt carma_with_symbols.exe > dump.txt
+```
+
+3. Execute the codegen tool
+```
+codegen.py dump.txt
+```
+
+You now have the C skeleton files in `./_generated`.
+
+
+## split-dump.sh
 Takes a [exedump](https://github.com/jeff-1amstudios/open-watcom-v2/tree/master/bld/exedump) output file and splits it into a single file per module for easier debugging.
 
