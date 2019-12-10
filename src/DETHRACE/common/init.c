@@ -137,7 +137,7 @@ void InitialiseApplication(int pArgc, char **pArgv) {
   LoadGeneralParameters();
   DefaultNetName();
   strcpy(gProgram_state.player_name[0], "MAX DAMAGE"); 
-  strcpy(gProgram_state.player_name[0], "DIE ANNA"); 
+  strcpy(gProgram_state.player_name[1], "DIE ANNA"); 
   
   RestoreOptions();
   LoadKeyMapping();
