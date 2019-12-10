@@ -44,17 +44,17 @@ void CalcEngineForce(tCar_spec *c, br_scalar dt) {
 ### Usage
 
 1. Concatenate the executable file and the symbol file
-```
+```sh
 cat carma1.exe dethrace.sym > carma_with_symbols.exe
 ```
 
 2. Execute wdump and pipe the output to file
-```
+```sh
 wdump -Daglmt carma_with_symbols.exe > dump.txt
 ```
 
 3. Execute the codegen tool
-```
+```sh
 codegen.py dump.txt
 ```
 
