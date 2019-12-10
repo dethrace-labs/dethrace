@@ -145,8 +145,6 @@ void InitialiseApplication(int pArgc, char **pArgv) {
     FatalError(0);
   }
   CalcGrafDataIndex();
-//   v26 = locret_A1004();
-//   v27 = ((int (__fastcall *)(int))locret_A1040)(v26);
   InitializeBRenderEnvironment();
   InitDRFonts();
   InitBRFonts();
@@ -163,6 +161,7 @@ void InitialiseApplication(int pArgc, char **pArgv) {
   InitSound();
   InitHeadups();
   gDefault_track_material = BrMaterialAllocate("gDefault_track_material");
+  //TODO:
   //BYTE2(gDefault_track_material->map_transform.m[2][1]) = -29;
   //BYTE3(gDefault_track_material->map_transform.m[2][1]) = 1;
   BrMaterialAdd(gDefault_track_material);
