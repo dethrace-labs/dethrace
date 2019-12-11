@@ -9,6 +9,7 @@
 #include "common/utility.h"
 #include "common/structur.h"
 #include "common/loadsave.h"
+#include "common/drdebug.h"
 
 
 // Offset: 0
@@ -55,7 +56,7 @@ void GameMain(int pArgc, char **pArgv) {
 
     PDSetFileVariables();
     PDBuildAppPath(gApplication_path);
-    //v8 = DRLogMessage(v19, v20);
+    //DrDebugMessage(*pArgv);
 
     strcat(gApplication_path, "DATA");
 

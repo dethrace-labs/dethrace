@@ -13,11 +13,18 @@
 #include "common/sound.h"
 #include "common/utility.h"
 #include "common/loadsave.h"
+#include "common/drdebug.h"
+
 
 int gASCII_table[128];
 tU32 gKeyboard_bits[8];
 int gASCII_shift_table[128];
-tGraf_spec gGraf_specs[2];
+tGraf_spec gGraf_specs[2] =
+{
+  { 8, 1, 0, 320, 200, 0, 0, "32X20X8", "MCGA,W:320,H:200,B:8", 0, 0, 0, NULL },
+  { 8, 1, 0, 640, 480, 0, 0, "64X48X8", "VESA,W:640,H:480,B:8", 0, 0, 0, NULL }
+};
+
 char gNetwork_profile_fname[256];
 tS32 gJoystick_min1y;
 tS32 gJoystick_min2y;
@@ -292,6 +299,9 @@ void PDRevertPalette() {
 // EAX: pArgc
 // EDX: pArgv
 int PDInitScreenVars(int pArgc, char **pArgv) {
+    gGraf_specs[gGraf_spec_index].phys_width = gGraf_specs[gGraf_spec_index].total_width;
+    gGraf_specs[gGraf_spec_index].phys_height = gGraf_specs[gGraf_spec_index].total_height;
+    return 1;
 }
 
 // Offset: 3300
@@ -518,6 +528,10 @@ tU32 LargestBlockAvail() {
     SREGS sregs;
     tMem_info mem_info;
     size_t memmax;
+
+    // Added >>
+    return 15000000;
+    // <<
 }
 
 // Offset: 6476
@@ -580,7 +594,7 @@ int _main(int pArgc, char **pArgv) {
 
     for (i = 1; i < pArgc; i++) {
         if (strcasecmp(pArgv[i], "-hires") == 0) {
-            gReal_graf_data_index = 1;
+            gGraf_spec_index = 1;
         }
         else if (strcasecmp(pArgv[i], "-yon") == 0 && i < pArgc - 1) {
             i++;
@@ -789,5 +803,16 @@ int PDCheckDriveExists2(char *pThe_path, char *pFile_name, tU32 pMin_size) {
 // Offset: 10184
 // Size: 108
 int PDDoWeLeadAnAustereExistance() {
+   tU32 block;
+
+   block = LargestBlockAvail();
+
+  DrDebugMessage("PDDoWeLeadAnAustereExistance (sic): LargestBlockAvail=%d\n", block);
+  
+  if (gReal_graf_data_index == 0) {
+    return block < 13000000;
+  } 
+ return block < 15000000;
+  
 }
 
