@@ -3,4 +3,6 @@
 
 #include "br_types.h"
 
+extern br_model _BrDefaultModel;
+
 #endif

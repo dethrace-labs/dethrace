@@ -178,22 +178,6 @@ def read_file():
 
         #os.exit(1)
 
-# def process_type_names():
-#   for m in modules:
-#     for type_idx in m['types']:
-#       t = m['types'][type_idx]
-#       if t['type'] == 'NAME':
-
-#         target_type = t['type_idx']
-#         if m['types'][target_type]['type'] != 'NAME':
-#           #print m['types'][target_type]['type'], t['value'], t['name']
-#           m['types'][target_type]['type_name'] = t['value']
-#         else:
-#           pass
-#           #print (t)
-#           #print (m['types'][target_type])
-#           #print ()
-
 def process_global_var():
   glob = {}
   line = read_line()
@@ -305,6 +289,7 @@ def process_type(current_module, type_name):
     # number of fields = 000D   size = 00000034
     match = re.match(FIELD_LIST_REGEX, line)
     nbr_fields = int(match.group(1), 16)
+    struct_size = int(match.group(2), 16)
     fields = []
     for i in range(nbr_fields):
       line = read_line()
@@ -321,7 +306,7 @@ def process_type(current_module, type_name):
         field['bit_size'] = int(match.group(2))
         #print field
       fields.append(field)
-    return { 'size': int(match.group(2), 16), 'fields': fields }
+    return { 'size': struct_size, 'fields': fields }
   elif type_name == 'ENUM_LIST':
     match = re.match(ENUM_LIST_REGEX, line)
     nbr_fields = int(match.group(1), 16)
@@ -547,6 +532,7 @@ def get_type_declaration(module, t, name):
     if tag_name is not None:
       s += ' ' + tag_name
     s += ' {'
+    s += '\t\t// size: ' + str(t['size'])
     first_elem = True
     for e in reversed(t['fields']):
       s += '\n'
@@ -555,6 +541,7 @@ def get_type_declaration(module, t, name):
       if e['type'] == 'BIT_BYTE':
         s += ': ' + str(e['bit_size'])
       s += ';'
+      s += '\t\t// @' + str(e['offset'])
       first_elem = False
     s += '\n' + ' ' * (indent * INDENT_SPACES) + '}'
     return s
@@ -692,23 +679,33 @@ def generate_types_header(module):
     if t['type'] != 'NAME':
       continue
     type_name = t['value']
-    if type_name in generated_type_names:
-      # skip duplicates
-      continue
 
-
-    if type_name == 'br_value_tag':
-      print ('!!br_value_tag', type_name in generated_type_names)
-    if type_name == 'br_value':
-      print ('!!br_value', type_name in generated_type_names)
-
-
+    cache_type_name = type_name 
+    
     # get type that this name references
     t = module['types'][t['type_idx']]
     if t is None:
       continue
 
-    generated_type_names[type_name] = 1
+    if t['type'] == 'FIELD_LIST':
+      if len(t['fields']) == 0:
+        print("skipping", type_name, "it has no fields")
+        continue
+      cache_type_name = '+' + cache_type_name + '|' + str(len(t['fields']))
+      found_prefix = False
+      found = ''
+      for x in generated_type_names:
+        if '+' + type_name + '|' in x:
+          found_prefix=True
+          found = x
+      if found_prefix and cache_type_name not in generated_type_names:
+        print('CACHEFOUND:', found, cache_type_name)
+      
+    if cache_type_name in generated_type_names:
+      # skip duplicates
+      continue
+
+    generated_type_names[cache_type_name] = 1
 
     if t['type'] == 'ENUM_LIST':
       s = '\ntypedef enum {} {{'.format(type_name)
