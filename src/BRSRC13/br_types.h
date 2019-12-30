@@ -1456,7 +1456,7 @@ typedef struct br_list {
 typedef struct br_simple_node br_simple_node;
 typedef struct br_simple_node {
     br_simple_node* next;
-    br_simple_node** prev;
+    br_simple_node* prev;
 } br_simple_node;
 
 typedef struct br_simple_list {
