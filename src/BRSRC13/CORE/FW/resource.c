@@ -33,12 +33,10 @@ void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class) {
     br_int_32 actual_pad;
 
     br_int_32 actual_pad_2;
-
     char* tmp;
 
     malign = BrMemAlign(res_class) - 1;
-    //LOWORD(size_plus_header_plus_3) = (size + 27) & 0xFFFC;
-    printf("BrResAllocate: parent: %p, size: %d, class: %d, class_index: %p\n", vparent, size, res_class, fw.resource_class_index[res_class]);
+    //printf("BrResAllocate: parent: %p, size: %d, class: %d, class_index: %p\n", vparent, size, res_class, fw.resource_class_index[res_class]);
     calign = fw.resource_class_index[res_class]->alignment;
     if (calign <= 0) {
         calign = 4;
@@ -49,8 +47,9 @@ void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class) {
     pad = (~malign & calign) + 3;
     actual_pad = (sizeof(resource_header) + pad) & 0xFFFC;
     actual_pad_2 = (size + sizeof(resource_header) + 3) & 0xFFFC;
-    printf("pad: %d, %d, %d\n", malign, calign, pad);
+
     res = (resource_header*)BrMemAllocate(size + actual_pad, res_class);
+    // TOOD: ?
     // if ((signed int)(((unsigned int)((char*)allocated + res_align_1) & ~res_align_1) - (_DWORD)allocated) > v8)
     //     BrFailure((int)"Memory allocator broke alignment", v14);
     res->class = res_class;
@@ -69,7 +68,7 @@ void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class) {
         parent = (resource_header*)(tmp - sizeof(resource_header));
         BrSimpleAddHead(&parent->children, &res->node);
     }
-    printf("BrResAllocate returning res: %p, pad: %d, result: %p\n", res, pad, ((char*)res) + actual_pad);
+    //printf("BrResAllocate returning res: %p, pad: %d, result: %p\n", res, pad, ((char*)res) + actual_pad);
     return ((char*)res) + actual_pad;
 }
 

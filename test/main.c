@@ -33,8 +33,6 @@ void tearDown(void) {
 
 int main(int pArgc, char** pArgv) {
 
-    debug("hi %d\n", 3);
-
     UNITY_BEGIN();
 
     // BRSRC13

@@ -54,12 +54,9 @@ void BrSimpleNewList(br_simple_list* list) {
 // Offset: 628
 // Size: 76
 void BrSimpleAddHead(br_simple_list* list, br_simple_node* node) {
-    printf("BrSimpleAddHead %p\n", &node);
     node->next = list->head;
-    printf("setting me %p ->prev = %p\n", node, &list->head);
     node->prev = list;
     if (node->next) {
-        printf("setting %p ->prev = %p\n", node->next, node);
         node->next->prev = node;
     }
     list->head = node;

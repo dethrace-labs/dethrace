@@ -10,18 +10,17 @@ void test_brlists_BrSimpleList() {
     br_simple_node* two = calloc(1, sizeof(br_simple_node));
     br_simple_node* three = calloc(1, sizeof(br_simple_node));
 
-    printf("lisr %p, 1 %p, 2 %p, 3 %p\n", list, one, two, three);
-
     BrSimpleNewList(list);
     TEST_ASSERT_NULL(list->head);
 
     BrSimpleAddHead(list, one);
+    // expected 1->null
     TEST_ASSERT_EQUAL_PTR(one, list->head);
     TEST_ASSERT_NULL(one->next);
     TEST_ASSERT_EQUAL_PTR(list, one->prev);
 
     BrSimpleAddHead(list, two);
-    // expected 2->1
+    // expected 2->1->null
     TEST_ASSERT_EQUAL_PTR(two, list->head);
     TEST_ASSERT_EQUAL_PTR(one, two->next);
     TEST_ASSERT_EQUAL_PTR(list, two->prev);
@@ -30,8 +29,7 @@ void test_brlists_BrSimpleList() {
     TEST_ASSERT_NULL(one->next);
 
     BrSimpleAddHead(list, three);
-    // expected 3->2->1
-    //printf("prevs: %p, %p, %p\n", one.prev, two.prev, three.prev);
+    // expected 3->2->1->null
     TEST_ASSERT_EQUAL_PTR(two, one->prev);
 
     TEST_ASSERT_EQUAL_PTR(three, list->head);
@@ -43,6 +41,11 @@ void test_brlists_BrSimpleList() {
 
     TEST_ASSERT_EQUAL_PTR(two, one->prev);
     TEST_ASSERT_NULL(one->next);
+
+    free(list);
+    free(one);
+    free(two);
+    free(three);
 }
 
 void test_brlists_suite() {

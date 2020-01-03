@@ -1456,6 +1456,7 @@ typedef struct br_list {
 typedef struct br_simple_node br_simple_node;
 typedef struct br_simple_node {
     br_simple_node* next;
+    // TODO: We changed this from "** prev" to "*prev". Is this really correct?
     br_simple_node* prev;
 } br_simple_node;
 

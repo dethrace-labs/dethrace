@@ -15,7 +15,6 @@
 #include <stddef.h>
 #include <stdio.h>
 
-br_image Image_BRCORE1;
 br_framework_state fw;
 void* functionPointers_BRCORE1[185];
 char* namePointers_BRCORE1[185];
@@ -48,6 +47,25 @@ br_resource_class fw_resourceClasses[25] = {
 };
 
 br_uint_16 nameOrdinals_BRCORE1[185];
+
+br_image Image_BRCORE1 = {
+    {},
+    "BRCORE1",
+    2,
+    0,
+    1,
+    185,
+    &functionPointers_BRCORE1,
+    185,
+    &namePointers_BRCORE1,
+    nameOrdinals_BRCORE1,
+    0,
+    NULL,
+    0,
+    NULL,
+    NULL
+};
+
 char rscid[53];
 
 #define NBR_DEV_SLOTS 16
@@ -70,7 +88,6 @@ br_error BrFwBegin() {
     fw.open_mode = 0;
     BrRegistryNew(&fw.reg_resource_classes);
 
-    printf("here21\n");
     fw.resource_class_index[BR_MEMORY_REGISTRY] = &fw_resourceClasses[0];
     fw.resource_class_index[BR_MEMORY_ANCHOR] = &fw_resourceClasses[1];
     fw.res = BrResAllocate(0, 0, BR_MEMORY_ANCHOR);

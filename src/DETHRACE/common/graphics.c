@@ -1,16 +1,18 @@
 #include "graphics.h"
 
+#include <math.h>
+
 int gArrows[2][4][60];
 int gMap_colours[4];
 br_vector3 gShadow_points[8];
 tConcussion gConcussion;
 tClip_details gShadow_clip_planes[8];
 br_matrix34 gSheer_mat;
-br_actor *gLollipops[100];
+br_actor* gLollipops[100];
 tWobble_spec gWobble_array[5];
 br_matrix34 gIdentity34;
 tSaved_table gSaved_shade_tables[100];
-int *gCursor_giblet_sequences[4];
+int* gCursor_giblet_sequences[4];
 int gCursor_y_offsets[8];
 int gCursor_x_offsets[8];
 tCursor_giblet gCursor_giblets[45];
@@ -18,11 +20,11 @@ int gCursor_gib_x_offsets[8];
 int gCursor_gib_y_offsets[8];
 tTransient_bm gTransient_bitmaps[50];
 float gCosine_array[64];
-br_pixelmap *gCursors[8];
-br_pixelmap *gCursor_giblet_images[18];
+br_pixelmap* gCursors[8];
+br_pixelmap* gCursor_giblet_images[18];
 br_scalar gShadow_hither_min_move;
-br_pixelmap *gEval_1;
-br_pixelmap *gEval_2;
+br_pixelmap* gEval_1;
+br_pixelmap* gEval_2;
 br_vector3 gShadow_light_z;
 br_vector3 gShadow_light_x;
 int gShadow_dim_amount;
@@ -32,36 +34,36 @@ br_vector3 gShadow_light_ray;
 br_scalar gShadow_hither_z_move;
 int gFancy_shadow;
 tShadow_level gShadow_level;
-br_model *gShadow_model;
-br_actor *gShadow_actor;
+br_model* gShadow_model;
+br_actor* gShadow_actor;
 int gShadow_clip_plane_count;
-br_pixelmap *gPalette_conversion_table;
-br_material *gShadow_material;
+br_pixelmap* gPalette_conversion_table;
+br_material* gShadow_material;
 int gSaved_table_count;
 int gCursor_giblet_sequence3[5];
 int gCursor_giblet_sequence2[5];
-char *gFont_names[21];
+char* gFont_names[21];
 int gCurrent_cursor_index;
 int gCursor_giblet_sequence1[5];
 int gCursor_giblet_sequence0[7];
 int gPalette_index;
 int gCursor_transient_index;
-char *gScratch_pixels;
-br_pixelmap *gScratch_palette;
+char* gScratch_pixels;
+br_pixelmap* gScratch_palette;
 int gPalette_munged;
 int gLast_palette_change;
 int gColourValues[1];
-br_pixelmap *gOrig_render_palette;
+br_pixelmap* gOrig_render_palette;
 int gNext_transient;
-br_pixelmap *gCurrent_palette;
-br_pixelmap *gRender_palette;
-br_pixelmap *gCurrent_splash;
-br_pixelmap *gCurrent_conversion_table;
+br_pixelmap* gCurrent_palette;
+br_pixelmap* gRender_palette;
+br_pixelmap* gCurrent_splash;
+br_pixelmap* gCurrent_conversion_table;
 float gCamera_to_horiz_angle;
 int gColours[9];
-br_pixelmap *gFlic_palette;
+br_pixelmap* gFlic_palette;
 tDR_font gFonts[21];
-char *gCurrent_palette_pixels;
+char* gCurrent_palette_pixels;
 int gAR_fudge_headups;
 float gMap_render_x;
 float gMap_render_y;
@@ -106,15 +108,15 @@ void ResetLollipopQueue() {
 // Size: 124
 // EAX: pActor
 // EDX: pIndex
-int AddToLollipopQueue(br_actor *pActor, int pIndex) {
+int AddToLollipopQueue(br_actor* pActor, int pIndex) {
 }
 
 // Offset: 256
 // Size: 237
 void RenderLollipops() {
     int must_relink;
-    br_actor **the_actor;
-    br_actor *old_parent;
+    br_actor** the_actor;
+    br_actor* old_parent;
 }
 
 // Offset: 496
@@ -123,8 +125,8 @@ void RenderLollipops() {
 // EDX: pX1
 // EBX: pY1
 // ECX: pX2
-void DRDrawLine(br_pixelmap *pDestn, int pX1, int pY1, int pX2, int pY2, int pColour) {
-    tU8 *d_ptr;
+void DRDrawLine(br_pixelmap* pDestn, int pX1, int pY1, int pX2, int pY2, int pColour) {
+    tU8* d_ptr;
     tS32 y_delta;
     tS32 x_delta;
     tU32 current_y;
@@ -141,7 +143,7 @@ void DRDrawLine(br_pixelmap *pDestn, int pX1, int pY1, int pX2, int pY2, int pCo
 // EDX: pX
 // EBX: pY
 // ECX: pY_pitch
-void DrawDigitAt(br_pixelmap *gImage, int pX, int pY, int pY_pitch, int pValue) {
+void DrawDigitAt(br_pixelmap* gImage, int pX, int pY, int pY_pitch, int pValue) {
 }
 
 // Offset: 696
@@ -150,7 +152,7 @@ void DrawDigitAt(br_pixelmap *gImage, int pX, int pY, int pY_pitch, int pValue) 
 // EDX: pX
 // EBX: pY
 // ECX: pX_pitch
-void DrawNumberAt(br_pixelmap *gImage, int pX, int pY, int pX_pitch, int pY_pitch, int pValue, int pDigit_count, int pLeading_zeroes) {
+void DrawNumberAt(br_pixelmap* gImage, int pX, int pY, int pX_pitch, int pY_pitch, int pValue, int pDigit_count, int pLeading_zeroes) {
     int i;
     int the_value;
 }
@@ -158,7 +160,7 @@ void DrawNumberAt(br_pixelmap *gImage, int pX, int pY, int pX_pitch, int pY_pitc
 // Offset: 852
 // Size: 350
 // EAX: pPalette
-void BuildColourTable(br_pixelmap *pPalette) {
+void BuildColourTable(br_pixelmap* pPalette) {
     int i;
     int j;
     int nearest_index;
@@ -178,7 +180,7 @@ void ClearConcussion() {
 // Size: 137
 // EAX: pSource
 // EDX: pCount
-tS8* SkipLines(tS8 *pSource, int pCount) {
+tS8* SkipLines(tS8* pSource, int pCount) {
     int i;
     int j;
     int number_of_chunks;
@@ -190,9 +192,9 @@ tS8* SkipLines(tS8 *pSource, int pCount) {
 // EAX: pDst
 // EDX: pSrc
 // EBX: pN
-void CopyWords(char *pDst, char *pSrc, int pN) {
-    tU16 *dst;
-    tU16 *src;
+void CopyWords(char* pDst, char* pSrc, int pN) {
+    tU16* dst;
+    tU16* src;
 }
 
 // Offset: 1516
@@ -201,7 +203,7 @@ void CopyWords(char *pDst, char *pSrc, int pN) {
 // EDX: pDest_x
 // EBX: pOffset_x
 // ECX: pDest_y
-void Copy8BitStripImageTo16Bit(br_pixelmap *pDest, br_int_16 pDest_x, br_int_16 pOffset_x, br_int_16 pDest_y, br_int_16 pOffset_y, tS8 *pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_uint_16 pWidth, br_uint_16 pHeight) {
+void Copy8BitStripImageTo16Bit(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, br_int_16 pDest_y, br_int_16 pOffset_y, tS8* pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_uint_16 pWidth, br_uint_16 pHeight) {
     int i;
     int j;
     int height;
@@ -211,8 +213,8 @@ void Copy8BitStripImageTo16Bit(br_pixelmap *pDest, br_int_16 pDest_x, br_int_16 
     int off_the_left;
     int destn_width;
     int chunk_length;
-    char *destn_ptr;
-    char *destn_ptr2;
+    char* destn_ptr;
+    char* destn_ptr2;
 }
 
 // Offset: 2124
@@ -221,7 +223,7 @@ void Copy8BitStripImageTo16Bit(br_pixelmap *pDest, br_int_16 pDest_x, br_int_16 
 // EDX: pDest_x
 // EBX: pOffset_x
 // ECX: pDest_y
-void CopyStripImage(br_pixelmap *pDest, br_int_16 pDest_x, br_int_16 pOffset_x, br_int_16 pDest_y, br_int_16 pOffset_y, tS8 *pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_uint_16 pWidth, br_uint_16 pHeight) {
+void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, br_int_16 pDest_y, br_int_16 pOffset_y, tS8* pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_uint_16 pWidth, br_uint_16 pHeight) {
     int i;
     int j;
     int height;
@@ -231,8 +233,8 @@ void CopyStripImage(br_pixelmap *pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
     int off_the_left;
     int destn_width;
     int chunk_length;
-    char *destn_ptr;
-    char *destn_ptr2;
+    char* destn_ptr;
+    char* destn_ptr2;
 }
 
 // Offset: 2776
@@ -269,27 +271,27 @@ void ScreenLarger() {
 // EAX: pPalette
 // EDX: pFirst_colour
 // EBX: pCount
-void DRSetPaletteEntries(br_pixelmap *pPalette, int pFirst_colour, int pCount) {
+void DRSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
 }
 
 // Offset: 4144
 // Size: 128
 // EAX: pThe_palette
 // EDX: pSet_current_palette
-void DRSetPalette3(br_pixelmap *pThe_palette, int pSet_current_palette) {
+void DRSetPalette3(br_pixelmap* pThe_palette, int pSet_current_palette) {
 }
 
 // Offset: 4272
 // Size: 140
 // EAX: pThe_palette
 // EDX: pSet_current_palette
-void DRSetPalette2(br_pixelmap *pThe_palette, int pSet_current_palette) {
+void DRSetPalette2(br_pixelmap* pThe_palette, int pSet_current_palette) {
 }
 
 // Offset: 4412
 // Size: 50
 // EAX: pThe_palette
-void DRSetPalette(br_pixelmap *pThe_palette) {
+void DRSetPalette(br_pixelmap* pThe_palette) {
 }
 
 // Offset: 4464
@@ -301,8 +303,8 @@ void InitializePalettes() {
 // Offset: 4880
 // Size: 66
 // EAX: pPal_name
-void SwitchToPalette(char *pPal_name) {
-    br_pixelmap *the_palette;
+void SwitchToPalette(char* pPal_name) {
+    br_pixelmap* the_palette;
 }
 
 // Offset: 4948
@@ -318,6 +320,15 @@ void ClearWobbles() {
 // Offset: 5128
 // Size: 108
 void InitWobbleStuff() {
+    int i;
+
+    for (i = 0; i < 5; i++) {
+        gWobble_array[i].amplitude_x = 0;
+    }
+
+    for (i = 0; i < 64; i++) {
+        gCosine_array[i] = cosf((double)i * 0.015625f * 3.141592653589793f * 0.5f);
+    }
 }
 
 // Offset: 5236
@@ -377,7 +388,7 @@ void SufferFromConcussion(float pSeriousness) {
 // EDX: pDepth_buffer
 // EBX: pCamera
 // ECX: pCamera_to_world
-void ProcessNonTrackActors(br_pixelmap *pRender_buffer, br_pixelmap *pDepth_buffer, br_actor *pCamera, br_matrix34 *pCamera_to_world, br_matrix34 *pOld_camera_matrix) {
+void ProcessNonTrackActors(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world, br_matrix34* pOld_camera_matrix) {
 }
 
 // Offset: 7188
@@ -393,10 +404,10 @@ int OppositeColour(int pColour) {
 // EDX: pTime
 // EBX: pTrans
 // ECX: pPos
-void DrawMapBlip(tCar_spec *pCar, tU32 pTime, br_matrix34 *pTrans, br_vector3 *pPos, int pColour) {
+void DrawMapBlip(tCar_spec* pCar, tU32 pTime, br_matrix34* pTrans, br_vector3* pPos, int pColour) {
     br_vector3 map_pos;
     int offset;
-    int *arrow_ptr;
+    int* arrow_ptr;
     int point_count;
     int colours[2];
     int x;
@@ -423,7 +434,7 @@ void DrawMapBlip(tCar_spec *pCar, tU32 pTime, br_matrix34 *pTrans, br_vector3 *p
 // EAX: pTime
 // EDX: pPos
 // EBX: pColour
-void DrawMapSmallBlip(tU32 pTime, br_vector3 *pPos, int pColour) {
+void DrawMapSmallBlip(tU32 pTime, br_vector3* pPos, int pColour) {
     br_vector3 map_pos;
     int offset;
     tU32 time_diff;
@@ -435,13 +446,13 @@ void DrawMapSmallBlip(tU32 pTime, br_vector3 *pPos, int pColour) {
 // EDX: pCar
 // EBX: p1
 // ECX: p2
-void MungeClipPlane(br_vector3 *pLight, tCar_spec *pCar, br_vector3 *p1, br_vector3 *p2, br_scalar pY_offset) {
+void MungeClipPlane(br_vector3* pLight, tCar_spec* pCar, br_vector3* p1, br_vector3* p2, br_scalar pY_offset) {
     br_vector3 v1;
     br_vector3 v2;
     br_vector3 v3;
     br_vector3 v4;
     br_scalar length;
-    br_actor *new_clip;
+    br_actor* new_clip;
 }
 
 // Offset: 10024
@@ -449,7 +460,7 @@ void MungeClipPlane(br_vector3 *pLight, tCar_spec *pCar, br_vector3 *p1, br_vect
 // EAX: pCar
 // EDX: pLight
 // EBX: pIndex_1
-void TryThisEdge(tCar_spec *pCar, br_vector3 *pLight, int pIndex_1, br_scalar pSign_1, int pIndex_2, br_scalar pSign_2, int pPoint_index_1, int pPoint_index_2, br_scalar pY_offset) {
+void TryThisEdge(tCar_spec* pCar, br_vector3* pLight, int pIndex_1, br_scalar pSign_1, int pIndex_2, br_scalar pSign_2, int pPoint_index_1, int pPoint_index_2, br_scalar pY_offset) {
     br_scalar dot_1;
     br_scalar dot_2;
     br_scalar mult;
@@ -458,7 +469,7 @@ void TryThisEdge(tCar_spec *pCar, br_vector3 *pLight, int pIndex_1, br_scalar pS
 // Offset: 10204
 // Size: 104
 // EAX: pPos
-br_scalar DistanceFromPlane(br_vector3 *pPos, br_scalar pA, br_scalar pB, br_scalar pC, br_scalar pD) {
+br_scalar DistanceFromPlane(br_vector3* pPos, br_scalar pA, br_scalar pB, br_scalar pC, br_scalar pD) {
     br_vector3 normal;
 }
 
@@ -478,7 +489,7 @@ void EnableLights() {
 // EDX: pWorld
 // EBX: pTrack_spec
 // ECX: pCamera
-void ProcessShadow(tCar_spec *pCar, br_actor *pWorld, tTrack_spec *pTrack_spec, br_actor *pCamera, br_matrix34 *pCamera_to_world_transform, br_scalar pDistance_factor) {
+void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, br_matrix34* pCamera_to_world_transform, br_scalar pDistance_factor) {
     int i;
     int j;
     int face_count;
@@ -498,10 +509,10 @@ void ProcessShadow(tCar_spec *pCar, br_actor *pWorld, tTrack_spec *pTrack_spec, 
     br_vector3 normal;
     br_vector3 the_normal;
     br_vector3 pos_cam_space;
-    br_vector3 *v0;
-    br_vector3 *v1;
-    br_vector3 *v2;
-    br_vector4 *clip_normal;
+    br_vector3* v0;
+    br_vector3* v1;
+    br_vector3* v2;
+    br_vector4* clip_normal;
     br_scalar bounds_x_min;
     br_scalar bounds_x_max;
     br_scalar bounds_y_min;
@@ -522,13 +533,13 @@ void ProcessShadow(tCar_spec *pCar, br_actor *pWorld, tTrack_spec *pTrack_spec, 
     br_scalar ray_length;
     tBounds kev_bounds;
     tFace_ref the_list[100];
-    tFace_ref *face_ref;
-    tFace_ref *list_ptr;
-    br_renderbounds_cbfn *old_call_back;
-    br_camera *camera_ptr;
-    br_actor *oily_actor;
-    br_model *model;
-    br_material *material;
+    tFace_ref* face_ref;
+    tFace_ref* list_ptr;
+    br_renderbounds_cbfn* old_call_back;
+    br_camera* camera_ptr;
+    br_actor* oily_actor;
+    br_model* model;
+    br_material* material;
     br_vertex verts[48];
     br_face faces[16];
 }
@@ -539,11 +550,11 @@ void ProcessShadow(tCar_spec *pCar, br_actor *pWorld, tTrack_spec *pTrack_spec, 
 // EDX: pTrack_spec
 // EBX: pCamera
 // ECX: pCamera_to_world_transform
-void RenderShadows(br_actor *pWorld, tTrack_spec *pTrack_spec, br_actor *pCamera, br_matrix34 *pCamera_to_world_transform) {
+void RenderShadows(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, br_matrix34* pCamera_to_world_transform) {
     int i;
     int cat;
     int car_count;
-    tCar_spec *the_car;
+    tCar_spec* the_car;
     br_vector3 camera_to_car;
     br_scalar distance_factor;
 }
@@ -553,7 +564,7 @@ void RenderShadows(br_actor *pWorld, tTrack_spec *pTrack_spec, br_actor *pCamera
 // EAX: pIndex
 // EDX: pTime
 void FlashyMapCheckpoint(int pIndex, tU32 pTime) {
-    tCheckpoint *cp;
+    tCheckpoint* cp;
     static tU32 last_flash;
     static int flash_state;
 }
@@ -561,7 +572,7 @@ void FlashyMapCheckpoint(int pIndex, tU32 pTime) {
 // Offset: 15908
 // Size: 252
 // EAX: pPixelmap
-int ConditionallyFillWithSky(br_pixelmap *pPixelmap) {
+int ConditionallyFillWithSky(br_pixelmap* pPixelmap) {
     int bgnd_col;
 }
 
@@ -583,14 +594,14 @@ void RenderAFrame(int pDepth_mask_on) {
     int map_timer_x;
     int map_timer_width;
     int ped_type;
-    char *old_pixels;
+    char* old_pixels;
     br_matrix34 old_camera_matrix;
     br_matrix34 old_mirror_cam_matrix;
     tU32 the_time;
-    br_vector3 *car_pos;
+    br_vector3* car_pos;
     br_vector3 pos;
     char the_text[256];
-    tCar_spec *car;
+    tCar_spec* car;
 }
 
 // Offset: 19912
@@ -606,7 +617,7 @@ void RevertPalette() {
 // Offset: 20044
 // Size: 34
 void MungePalette() {
-    tU8 *q;
+    tU8* q;
     int i;
     float damage;
     float throb_start;
@@ -631,7 +642,7 @@ void ResetPalette() {
 // Size: 65
 // EAX: pPtr
 // EDX: pDarken_amount
-void Darken(tU8 *pPtr, unsigned int pDarken_amount) {
+void Darken(tU8* pPtr, unsigned int pDarken_amount) {
     unsigned int value;
 }
 
@@ -640,8 +651,8 @@ void Darken(tU8 *pPtr, unsigned int pDarken_amount) {
 // EAX: pDegree
 void SetFadedPalette(int pDegree) {
     int j;
-    br_pixelmap *the_palette;
-    char *the_pixels;
+    br_pixelmap* the_palette;
+    char* the_pixels;
 }
 
 // Offset: 20396
@@ -671,8 +682,8 @@ void EnsureRenderPalette() {
 // Offset: 20812
 // Size: 248
 // EAX: pPixmap_name
-void SplashScreenWith(char *pPixmap_name) {
-    br_pixelmap *the_map;
+void SplashScreenWith(char* pPixmap_name) {
+    br_pixelmap* the_map;
 }
 
 // Offset: 21060
@@ -682,7 +693,7 @@ void EnsurePaletteUp() {
 
 // Offset: 21108
 // Size: 103
-br_uint_32 AmbientificateMaterial(br_material *pMat, void *pArg) {
+br_uint_32 AmbientificateMaterial(br_material* pMat, void* pArg) {
     float a;
 }
 
@@ -702,16 +713,16 @@ void InitAmbience() {
 // EDX: pDest_x
 // EBX: pDest_y
 // ECX: pSource
-void DRPixelmapRectangleMaskedCopy(br_pixelmap *pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap *pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight) {
+void DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap* pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight) {
     int y_count;
     int x_count;
     int dest_row_wrap;
     int source_row_wrap;
     int x_delta;
     tU8 the_byte;
-    tU8 *source_ptr;
-    tU8 *dest_ptr;
-    tU8 *conv_table;
+    tU8* source_ptr;
+    tU8* dest_ptr;
+    tU8* conv_table;
 }
 
 // Offset: 22120
@@ -719,7 +730,7 @@ void DRPixelmapRectangleMaskedCopy(br_pixelmap *pDest, br_int_16 pDest_x, br_int
 // EAX: pDest_x
 // EDX: pDest_y
 // EBX: pSource
-void DRMaskedStamp(br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap *pSource) {
+void DRMaskedStamp(br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap* pSource) {
 }
 
 // Offset: 22208
@@ -728,16 +739,16 @@ void DRMaskedStamp(br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap *pSource) {
 // EDX: pDest_x
 // EBX: pDest_y
 // ECX: pSource
-void DRPixelmapRectangleOnscreenCopy(br_pixelmap *pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap *pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight) {
+void DRPixelmapRectangleOnscreenCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap* pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight) {
     int y_count;
     int x_count;
     int dest_row_wrap;
     int source_row_wrap;
     int x_delta;
     tU8 the_byte;
-    tU8 *source_ptr;
-    tU8 *dest_ptr;
-    tU8 *conv_table;
+    tU8* source_ptr;
+    tU8* dest_ptr;
+    tU8* conv_table;
 }
 
 // Offset: 22540
@@ -746,7 +757,7 @@ void DRPixelmapRectangleOnscreenCopy(br_pixelmap *pDest, br_int_16 pDest_x, br_i
 // EDX: pDest_x
 // EBX: pDest_y
 // ECX: pSource
-void DRPixelmapRectangleShearedCopy(br_pixelmap *pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap *pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight, tX1616 pShear) {
+void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap* pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight, tX1616 pShear) {
     int y_count;
     int x_count;
     int dest_row_wrap;
@@ -756,9 +767,9 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap *pDest, br_int_16 pDest_x, br_in
     int current_shear_x;
     int shear_x_difference;
     tU8 the_byte;
-    tU8 *source_ptr;
-    tU8 *dest_ptr;
-    tU8 *conv_table;
+    tU8* source_ptr;
+    tU8* dest_ptr;
+    tU8* conv_table;
     tX1616 current_shear;
 }
 
@@ -768,15 +779,15 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap *pDest, br_int_16 pDest_x, br_in
 // EDX: pDest_x
 // EBX: pDest_y
 // ECX: pSource
-void DRPixelmapRectangleVScaledCopy(br_pixelmap *pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap *pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight) {
+void DRPixelmapRectangleVScaledCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap* pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight) {
     int y_count;
     int x_count;
     int dest_row_wrap;
     int source_row_wrap;
     int x_delta;
     tU8 the_byte;
-    tU8 *source_ptr;
-    tU8 *dest_ptr;
+    tU8* source_ptr;
+    tU8* dest_ptr;
     tU32 source_y;
     tU32 source_y_delta;
     tU32 old_source_y;
@@ -826,8 +837,8 @@ void SaveTransient(int pIndex, int pX_coord, int pY_coord) {
 // Offset: 24592
 // Size: 214
 // EAX: pGib
-void DrawCursorGiblet(tCursor_giblet *pGib) {
-    br_pixelmap *the_image;
+void DrawCursorGiblet(tCursor_giblet* pGib) {
+    br_pixelmap* the_image;
 }
 
 // Offset: 24808
@@ -837,7 +848,7 @@ void ProcessCursorGiblets(int pPeriod) {
     int i;
     int kill_the_giblet;
     tU32 time_now;
-    tCursor_giblet *gib;
+    tCursor_giblet* gib;
 }
 
 // Offset: 25552
@@ -897,7 +908,7 @@ void LoadFont(int pFont_ID) {
     tPath_name the_path;
     int i;
     int number_of_chars;
-    FILE *f;
+    FILE* f;
     tU32 the_size;
 }
 
@@ -918,7 +929,7 @@ void InitDRFonts() {
 // EDX: pLeft
 // EBX: pTop
 // ECX: pTop_clip
-void DrawDropImage(br_pixelmap *pImage, int pLeft, int pTop, int pTop_clip, int pBottom_clip, int pOffset) {
+void DrawDropImage(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip, int pBottom_clip, int pOffset) {
     int y;
     int src_y;
     int src_height;
@@ -931,7 +942,7 @@ void DrawDropImage(br_pixelmap *pImage, int pLeft, int pTop, int pTop_clip, int 
 // EDX: pLeft
 // EBX: pTop
 // ECX: pTop_clip
-void DropInImageFromTop(br_pixelmap *pImage, int pLeft, int pTop, int pTop_clip, int pBottom_clip) {
+void DropInImageFromTop(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip, int pBottom_clip) {
     tS32 start_time;
     tS32 the_time;
     int drop_distance;
@@ -943,7 +954,7 @@ void DropInImageFromTop(br_pixelmap *pImage, int pLeft, int pTop, int pTop_clip,
 // EDX: pLeft
 // EBX: pTop
 // ECX: pTop_clip
-void DropOutImageThruBottom(br_pixelmap *pImage, int pLeft, int pTop, int pTop_clip, int pBottom_clip) {
+void DropOutImageThruBottom(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip, int pBottom_clip) {
     tS32 start_time;
     tS32 the_time;
     int drop_distance;
@@ -955,7 +966,7 @@ void DropOutImageThruBottom(br_pixelmap *pImage, int pLeft, int pTop, int pTop_c
 // EDX: pLeft
 // EBX: pTop
 // ECX: pTop_clip
-void DropInImageFromBottom(br_pixelmap *pImage, int pLeft, int pTop, int pTop_clip, int pBottom_clip) {
+void DropInImageFromBottom(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip, int pBottom_clip) {
     tS32 start_time;
     tS32 the_time;
     int drop_distance;
@@ -967,7 +978,7 @@ void DropInImageFromBottom(br_pixelmap *pImage, int pLeft, int pTop, int pTop_cl
 // EDX: pLeft
 // EBX: pTop
 // ECX: pTop_clip
-void DropOutImageThruTop(br_pixelmap *pImage, int pLeft, int pTop, int pTop_clip, int pBottom_clip) {
+void DropOutImageThruTop(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip, int pBottom_clip) {
     tS32 start_time;
     tS32 the_time;
     int drop_distance;
@@ -979,7 +990,7 @@ void DropOutImageThruTop(br_pixelmap *pImage, int pLeft, int pTop, int pTop_clip
 // EDX: pLeft
 // EBX: pTop
 // ECX: pPercentage
-void DrawTellyLine(br_pixelmap *pImage, int pLeft, int pTop, int pPercentage) {
+void DrawTellyLine(br_pixelmap* pImage, int pLeft, int pTop, int pPercentage) {
     int the_width;
     int the_height;
 }
@@ -990,7 +1001,7 @@ void DrawTellyLine(br_pixelmap *pImage, int pLeft, int pTop, int pPercentage) {
 // EDX: pLeft
 // EBX: pTop
 // ECX: pPercentage
-void DrawTellyImage(br_pixelmap *pImage, int pLeft, int pTop, int pPercentage) {
+void DrawTellyImage(br_pixelmap* pImage, int pLeft, int pTop, int pPercentage) {
     int the_height;
 }
 
@@ -999,7 +1010,7 @@ void DrawTellyImage(br_pixelmap *pImage, int pLeft, int pTop, int pPercentage) {
 // EAX: pImage
 // EDX: pLeft
 // EBX: pTop
-void TellyInImage(br_pixelmap *pImage, int pLeft, int pTop) {
+void TellyInImage(br_pixelmap* pImage, int pLeft, int pTop) {
     tS32 start_time;
     tS32 the_time;
 }
@@ -1009,7 +1020,7 @@ void TellyInImage(br_pixelmap *pImage, int pLeft, int pTop) {
 // EAX: pImage
 // EDX: pLeft
 // EBX: pTop
-void TellyOutImage(br_pixelmap *pImage, int pLeft, int pTop) {
+void TellyOutImage(br_pixelmap* pImage, int pLeft, int pTop) {
     tS32 start_time;
     tS32 the_time;
     int drop_distance;
@@ -1040,7 +1051,7 @@ void InitShadow() {
 
 // Offset: 31320
 // Size: 140
-br_uint_32 SaveShadeTable(br_pixelmap *pTable, void *pArg) {
+br_uint_32 SaveShadeTable(br_pixelmap* pTable, void* pArg) {
 }
 
 // Offset: 31460
@@ -1074,11 +1085,11 @@ int SwitchToLoresMode() {
 // EDX: pSource
 // EBX: pSource_width
 // ECX: pSource_height
-void DRPixelmapDoubledCopy(br_pixelmap *pDestn, br_pixelmap *pSource, int pSource_width, int pSource_height, int pX_offset, int pY_offset) {
-    tU16 *sptr;
+void DRPixelmapDoubledCopy(br_pixelmap* pDestn, br_pixelmap* pSource, int pSource_width, int pSource_height, int pX_offset, int pY_offset) {
+    tU16* sptr;
     tU16 pixels;
-    tU8 *dptr;
-    tU8 *dptr2;
+    tU8* dptr;
+    tU8* dptr2;
     tU8 pixel_1;
     tU8 pixel_2;
     int i;
@@ -1087,4 +1098,3 @@ void DRPixelmapDoubledCopy(br_pixelmap *pDestn, br_pixelmap *pSource, int pSourc
     int src_row_skip;
     int width_over_2;
 }
-
