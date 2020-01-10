@@ -15,6 +15,8 @@
 
 #define debug(format_, ...) fprintf(stderr, format_, __VA_ARGS__)
 
+#define debug(format_, ...) fprintf(stderr, format_, __VA_ARGS__)
+
 extern void test_utility_suite();
 extern void test_loading_suite();
 extern void test_controls_suite();

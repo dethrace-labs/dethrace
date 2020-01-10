@@ -8,5 +8,5 @@ set -eu
 #
 
 CODE_DIR=$(pwd)
-cd ${DETHRACE_ROOT_DIR}
+ln -s $CODE_DIR ${DETHRACE_ROOT_DIR}
 ${CODE_DIR}/src/DETHRACE/build/c1
