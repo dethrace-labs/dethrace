@@ -1,7 +1,9 @@
 #include "drmem.h"
+#include "CORE/FW/resreg.h"
+#include "errors.h"
 
 br_resource_class gStainless_classes[118];
-char *gMem_names[247];
+char* gMem_names[247];
 int gNon_fatal_allocation_errors;
 br_allocator gAllocator;
 
@@ -23,7 +25,7 @@ int AllocationErrorsAreFatal() {
 // Offset: 156
 // Size: 34
 void MAMSInitMem() {
-    FILE *f;
+    FILE* f;
     tPath_name the_path;
 }
 
@@ -31,20 +33,20 @@ void MAMSInitMem() {
 // Size: 38
 // EAX: pFlags
 // EDX: pTitle
-void PrintMemoryDump(int pFlags, char *pTitle) {
+void PrintMemoryDump(int pFlags, char* pTitle) {
 }
 
 // Offset: 232
 // Size: 169
 void* DRStdlibAllocate(br_size_t size, br_uint_8 type) {
-    void *p;
+    void* p;
     int i;
     char s[256];
 }
 
 // Offset: 404
 // Size: 38
-void DRStdlibFree(void *mem) {
+void DRStdlibFree(void* mem) {
     int i;
 }
 
@@ -66,22 +68,29 @@ void InstallDRMemCalls() {
 // Offset: 572
 // Size: 59
 // EAX: pPtr
-void MAMSUnlock(void **pPtr) {
+void MAMSUnlock(void** pPtr) {
 }
 
 // Offset: 632
 // Size: 37
 // EAX: pPtr
-void MAMSLock(void **pPtr) {
+void MAMSLock(void** pPtr) {
 }
 
 // Offset: 672
 // Size: 124
 void CreateStainlessClasses() {
+    int i;
+
+    for (i = 0; i < 118; i++) {
+        gStainless_classes[i + 129].res_class = i;
+        if (!BrResClassAdd(&gStainless_classes[i + 129])) {
+            FatalError(94);
+        }
+    }
 }
 
 // Offset: 796
 // Size: 34
 void CheckMemory() {
 }
-

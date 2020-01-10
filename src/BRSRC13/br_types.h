@@ -2,24 +2,25 @@
 #define BR_TYPES_H
 
 #include <setjmp.h>
+#include <stdint.h>
 
-typedef long br_int_32;
-typedef unsigned long br_uint_32;
-typedef short br_int_16;
-typedef unsigned short br_uint_16;
+typedef int32_t br_int_32;
+typedef uint32_t br_uint_32;
+typedef int16_t br_int_16;
+typedef uint16_t br_uint_16;
 typedef signed char br_int_8;
 typedef unsigned char br_uint_8;
-typedef unsigned int br_size_t;
-typedef int br_boolean;
+typedef uint32_t br_size_t;
+typedef int32_t br_boolean;
 typedef float br_float;
 typedef br_uint_32 br_error;
-typedef long br_fixed_ls;
-typedef short br_fixed_lsf;
-typedef unsigned long br_fixed_lu;
-typedef unsigned short br_fixed_luf;
-typedef short br_fixed_ss;
+typedef int32_t br_fixed_ls;
+typedef int16_t br_fixed_lsf;
+typedef uint32_t br_fixed_lu;
+typedef uint16_t br_fixed_luf;
+typedef int16_t br_fixed_ss;
 typedef char br_fixed_ssf;
-typedef unsigned short br_fixed_su;
+typedef uint16_t br_fixed_su;
 typedef unsigned char br_fixed_suf;
 typedef float br_scalar;
 typedef float br_fraction;
@@ -30,7 +31,7 @@ typedef br_fixed_luf br_ufraction_x;
 typedef float br_scalar_f;
 typedef float br_fraction_f;
 typedef float br_ufraction_f;
-typedef unsigned long br_colour;
+typedef uint32_t br_colour;
 typedef struct br_bounds3 br_bounds;
 typedef struct br_bounds2_i br_bounds2i;
 typedef struct br_bounds3_i br_bounds3i;
@@ -683,49 +684,69 @@ typedef struct br_matrix34 br_matrix34;
 typedef int br_pick3d_cbfn(br_actor*, br_model*, br_material*, br_matrix34*, br_bounds*, void*);
 typedef struct br_vector2 br_vector2;
 typedef int br_modelpick2d_cbfn(br_model*, br_material*, br_vector3*, br_vector3*, br_scalar, int, int, int, br_vector3*, br_vector2*, void*);
-typedef struct br_resource_class
-{
-  br_uint_32 reserved;
-  char *identifier;
-  br_uint_8 res_class;
-  br_resourcefree_cbfn *free_cb;
-  br_uint_32 alignment;
+
+typedef enum view_to_screen_type {
+    BR_VTOS_PARALLEL = 0,
+    BR_VTOS_PERSPECTIVE = 1,
+    BR_VTOS_4X4 = 2
+} view_to_screen_type;
+
+typedef void dev_fill_cbfn(br_device*, br_pixelmap*, br_uint_32);
+typedef void dev_rectangle_copy_cbfn(br_device*, br_pixelmap*, br_uint_16, br_uint_16, br_pixelmap*, br_uint_16, br_uint_16, br_uint_16, br_uint_16);
+typedef void dev_rectangle_fill_cbfn(br_device*, br_pixelmap*, br_uint_16, br_uint_16, br_uint_16, br_uint_16, br_uint_32);
+typedef void dev_dirty_rectangle_copy_cbfn(br_device*, br_pixelmap*, br_pixelmap*, br_uint_16, br_uint_16, br_uint_16, br_uint_16);
+typedef void dev_dirty_rectangle_fill_cbfn(br_device*, br_pixelmap*, br_uint_16, br_uint_16, br_uint_16, br_uint_16, br_uint_32);
+typedef void dev_plot_cbfn(br_device*, br_pixelmap*, br_uint_16, br_uint_16, br_uint_32);
+typedef void dev_copy_cbfn(br_device*, br_pixelmap*, br_pixelmap*);
+typedef void dev_line_cbfn(br_device*, br_pixelmap*, br_int_16, br_int_16, br_int_16, br_int_16, br_uint_32);
+typedef void dev_copy_bits_cbfn(br_device*, br_pixelmap*, br_int_16, br_int_16, br_uint_8*, br_uint_16, br_uint_16, br_uint_16, br_uint_16, br_uint_32);
+typedef br_pixelmap* dev_double_buffer_cbfn(br_device*, br_pixelmap*, br_pixelmap*);
+typedef br_pixelmap* dev_match_cbfn(br_device*, br_pixelmap*, br_uint_8);
+typedef br_pixelmap* dev_clone_cbfn(br_device*, br_pixelmap*);
+typedef void dev_free_cbfn(br_device*, br_pixelmap*);
+
+typedef struct br_resource_class { // size: 20
+    br_uint_32 reserved; // @0
+    char* identifier; // @4
+    br_uint_8 res_class; // @8
+    br_resourcefree_cbfn* free_cb; // @12
+    br_uint_32 alignment; // @16
 } br_resource_class;
 
 typedef struct br_filesystem {
-    char *identifier;
-    brfile_attributes_cbfn *attributes;
-    brfile_open_read_cbfn *open_read;
-    brfile_open_write_cbfn *open_write;
-    brfile_close_cbfn *close;
-    brfile_eof_cbfn *eof;
-    brfile_getchr_cbfn *getchr;
-    brfile_putchr_cbfn *putchr;
-    brfile_read_cbfn *read;
-    brfile_write_cbfn *write;
-    brfile_getline_cbfn *getline;
-    brfile_putline_cbfn *putline;
-    brfile_advance_cbfn *advance;
+    char* identifier;
+    brfile_attributes_cbfn* attributes;
+    brfile_open_read_cbfn* open_read;
+    brfile_open_write_cbfn* open_write;
+    brfile_close_cbfn* close;
+    brfile_eof_cbfn* eof;
+    brfile_getchr_cbfn* getchr;
+    brfile_putchr_cbfn* putchr;
+    brfile_read_cbfn* read;
+    brfile_write_cbfn* write;
+    brfile_getline_cbfn* getline;
+    brfile_putline_cbfn* putline;
+    brfile_advance_cbfn* advance;
 } br_filesystem;
 
 typedef struct br_allocator {
-    char *identifier;
-    brmem_allocate_cbfn *allocate;
-    brmem_free_cbfn *free;
-    brmem_inquire_cbfn *inquire;
-    brmem_align_cbfn *align;
+    char* identifier;
+    brmem_allocate_cbfn* allocate;
+    brmem_free_cbfn* free;
+    brmem_inquire_cbfn* inquire;
+    brmem_align_cbfn* align;
 } br_allocator;
 
 typedef struct br_diaghandler {
-    char *identifier;
-    br_diag_warning_cbfn *warning;
-    br_diag_failure_cbfn *failure;
+    char* identifier;
+    br_diag_warning_cbfn* warning;
+    br_diag_failure_cbfn* failure;
 } br_diaghandler;
 
 typedef struct br_errorhandler {
-    char *identifier;
-    br_diag_warning_cbfn *message;
-    br_diag_failure_cbfn *error;
+    char* identifier;
+    br_diag_warning_cbfn* message;
+    br_diag_failure_cbfn* error;
 } br_errorhandler;
 
 typedef struct br_colour_range {
@@ -935,31 +956,31 @@ typedef struct br_transform {
             br_euler e;
             br_scalar _pad[7];
             br_vector3 t;
-        }a;
+        } a;
         struct {
             br_quat q;
             br_scalar _pad[5];
             br_vector3 t;
-        }b;
+        } b;
         struct {
             br_vector3 look;
             br_vector3 up;
             br_scalar _pad[3];
             br_vector3 t;
-        }c;
+        } c;
         struct {
             br_scalar _pad[9];
             br_vector3 t;
-        }d;
+        } d;
     };
 } br_transform;
 
 typedef struct br_pixelmap {
     br_uint_32 _reserved;
-    char *identifier;
-    void *pixels;
+    char* identifier;
+    void* pixels;
     br_uint_32 pixels_qualifier;
-    br_pixelmap *map;
+    br_pixelmap* map;
     br_colour_range src_key;
     br_colour_range dst_key;
     br_uint_32 key;
@@ -974,8 +995,8 @@ typedef struct br_pixelmap {
     br_uint_16 height;
     br_int_16 origin_x;
     br_int_16 origin_y;
-    void *user;
-    void *stored;
+    void* user;
+    void* stored;
 } br_pixelmap;
 
 typedef struct br_point {
@@ -996,9 +1017,9 @@ typedef struct br_font {
     br_uint_16 glyph_y;
     br_int_16 spacing_x;
     br_int_16 spacing_y;
-    br_int_8 *width;
-    br_uint_16 *encoding;
-    br_uint_8 *glyphs;
+    br_int_8* width;
+    br_uint_16* encoding;
+    br_uint_8* glyphs;
 } br_font;
 
 typedef struct br_object {
@@ -1008,7 +1029,7 @@ typedef struct br_token_value br_token_value;
 typedef struct br_value_tag {
     br_uint_32 u32;
     br_boolean b;
-    void *p;
+    void* p;
     br_token t;
     br_int_8 i8;
     br_uint_8 u8;
@@ -1020,28 +1041,28 @@ typedef struct br_value_tag {
     br_scalar s;
     br_angle a;
     br_colour rgb;
-    br_object *o;
-    br_vector2_i *v2_i;
-    br_vector3_i *v3_i;
-    br_vector4_i *v4_i;
-    br_vector2_x *v2_x;
-    br_vector3_x *v3_x;
-    br_vector4_x *v4_x;
-    br_vector2_f *v2_f;
-    br_vector3_f *v3_f;
-    br_vector4_f *v4_f;
-    br_matrix23_x *m23_x;
-    br_matrix34_x *m34_x;
-    br_matrix4_x *m4_x;
-    br_matrix23_f *m23_f;
-    br_matrix34_f *m34_f;
-    br_matrix4_f *m4_f;
-    char *str;
-    char *cstr;
-    br_object **hl;
-    br_token *tl;
-    void **pl;
-    br_token_value *tvl;
+    br_object* o;
+    br_vector2_i* v2_i;
+    br_vector3_i* v3_i;
+    br_vector4_i* v4_i;
+    br_vector2_x* v2_x;
+    br_vector3_x* v3_x;
+    br_vector4_x* v4_x;
+    br_vector2_f* v2_f;
+    br_vector3_f* v3_f;
+    br_vector4_f* v4_f;
+    br_matrix23_x* m23_x;
+    br_matrix34_x* m34_x;
+    br_matrix4_x* m4_x;
+    br_matrix23_f* m23_f;
+    br_matrix34_f* m34_f;
+    br_matrix4_f* m4_f;
+    char* str;
+    char* cstr;
+    br_object** hl;
+    br_token* tl;
+    void** pl;
+    br_token_value* tvl;
 } br_value;
 
 typedef struct br_token_value {
@@ -1051,27 +1072,27 @@ typedef struct br_token_value {
 
 typedef struct br_pool_block br_pool_block;
 typedef struct br_pool_block {
-    br_pool_block *next;
+    br_pool_block* next;
 } br_pool_block;
 
 typedef struct br_pool {
-    br_pool_block *free;
+    br_pool_block* free;
     br_uint_32 block_size;
     br_uint_32 chunk_size;
     int mem_type;
 } br_pool;
 
 typedef struct br_primitive {
-    br_primitive *next;
+    br_primitive* next;
     br_uint_32 type;
-    void *stored;
-    void *v[3];
+    void* stored;
+    void* v[3];
 } br_primitive;
 
 typedef struct br_order_table {
-    br_primitive **table;
+    br_primitive** table;
     br_uint_16 size;
-    br_order_table *next;
+    br_order_table* next;
     br_scalar min_z;
     br_scalar max_z;
     br_scalar sort_z;
@@ -1082,18 +1103,35 @@ typedef struct br_order_table {
 } br_order_table;
 
 typedef struct br_primitive_heap {
-    br_uint_8 *base;
+    br_uint_8* base;
     br_size_t size;
-    br_uint_8 *current;
+    br_uint_8* current;
 } br_primitive_heap;
 
 typedef struct br_associative_array_tag {
-    br_token_value *tv;
+    br_token_value* tv;
     br_uint_16 num_elements;
     br_uint_16 max_elements;
 } br_associative_array;
 
-typedef struct br_device {
+typedef struct br_device { // size: 68
+    br_uint_32 magic; // @0
+    char* identifier; // @4
+    br_font* default_font; // @8
+    br_uint_32 qualifier; // @12
+    dev_fill_cbfn* fill; // @16
+    dev_rectangle_copy_cbfn* rectangle_copy; // @20
+    dev_rectangle_fill_cbfn* rectangle_fill; // @24
+    dev_dirty_rectangle_copy_cbfn* dirty_rectangle_copy; // @28
+    dev_dirty_rectangle_fill_cbfn* dirty_rectangle_fill; // @32
+    dev_plot_cbfn* plot; // @36
+    dev_copy_cbfn* copy; // @40
+    dev_line_cbfn* line; // @44
+    dev_copy_bits_cbfn* copy_bits; // @48
+    dev_double_buffer_cbfn* double_buffer; // @52
+    dev_match_cbfn* match; // @56
+    dev_clone_cbfn* clone; // @60
+    dev_free_cbfn* free; // @64
 } br_device;
 
 typedef struct br_outfcty_desc {
@@ -1126,7 +1164,7 @@ typedef struct br_renderer {
 
 typedef struct br_material {
     br_uint_32 _reserved;
-    char *identifier;
+    char* identifier;
     br_colour colour;
     br_uint_8 opacity;
     br_ufraction ka;
@@ -1137,18 +1175,18 @@ typedef struct br_material {
     br_matrix23 map_transform;
     br_uint_8 index_base;
     br_uint_8 index_range;
-    br_pixelmap *colour_map;
-    br_pixelmap *screendoor;
-    br_pixelmap *index_shade;
-    br_pixelmap *index_blend;
-    br_pixelmap *index_fog;
-    br_token_value *extra_surf;
-    br_token_value *extra_prim;
+    br_pixelmap* colour_map;
+    br_pixelmap* screendoor;
+    br_pixelmap* index_shade;
+    br_pixelmap* index_blend;
+    br_pixelmap* index_fog;
+    br_token_value* extra_surf;
+    br_token_value* extra_prim;
     br_scalar fog_min;
     br_scalar fog_max;
     br_colour fog_colour;
     br_uint_32 flags_ext;
-    br_pixelmap *colour_map_1;
+    br_pixelmap* colour_map_1;
     br_matrix23 map_transform_1;
     br_int_8 mip_modifier;
     br_uint_8 min_mip;
@@ -1157,8 +1195,8 @@ typedef struct br_material {
     br_uint_8 zbuffer_mode;
     br_uint_8 zbuffer_compare;
     br_int_32 subdivide_tolerance;
-    void *user;
-    void *stored;
+    void* user;
+    void* stored;
 } br_material;
 
 typedef struct br_vertex {
@@ -1175,7 +1213,7 @@ typedef struct br_vertex {
 typedef struct br_face {
     br_uint_16 vertices[3];
     br_uint_16 smoothing;
-    br_material *material;
+    br_material* material;
     br_uint_8 index;
     br_uint_8 red;
     br_uint_8 grn;
@@ -1189,12 +1227,12 @@ typedef struct br_face {
 
 typedef struct br_primitive_list br_primitive_list;
 typedef struct br_primitive_list {
-    br_primitive_list *next;
+    br_primitive_list* next;
     br_uint_32 prim_type;
     br_uint_16 nprims;
     br_uint_16 nspares;
-    void *prim;
-    void *spare;
+    void* prim;
+    void* spare;
 } br_primitive_list;
 
 typedef struct br_vertex_single {
@@ -1225,12 +1263,12 @@ typedef struct br_vertex_double {
 
 typedef struct br_point_prim {
     br_uint_16 vertices[1];
-    br_material *material;
+    br_material* material;
 } br_point_prim;
 
 typedef struct br_line {
     br_uint_16 vertices[2];
-    br_material *material;
+    br_material* material;
     br_uint_8 alpha0;
     br_uint_8 red0;
     br_uint_8 grn0;
@@ -1244,7 +1282,7 @@ typedef struct br_line {
 typedef struct br_triangle {
     br_uint_16 vertices[3];
     br_uint_16 smoothing;
-    br_material *material;
+    br_material* material;
     br_uint_8 alpha0;
     br_uint_8 red0;
     br_uint_8 grn0;
@@ -1261,7 +1299,7 @@ typedef struct br_triangle {
 typedef struct br_quad {
     br_uint_16 vertices[4];
     br_uint_16 smoothing;
-    br_material *material;
+    br_material* material;
     br_uint_8 alpha0;
     br_uint_8 red0;
     br_uint_8 grn0;
@@ -1292,50 +1330,50 @@ typedef struct br_strip_face_data {
 
 typedef struct br_tri_strip {
     br_uint_16 nvertices;
-    br_uint_16 *vertices;
-    br_material *material;
-    br_strip_face_data *face_data;
+    br_uint_16* vertices;
+    br_material* material;
+    br_strip_face_data* face_data;
 } br_tri_strip;
 
 typedef struct br_actor {
-    br_actor *next;
-    br_actor **prev;
-    br_actor *children;
-    br_actor *parent;
+    br_actor* next;
+    br_actor** prev;
+    br_actor* children;
+    br_actor* parent;
     br_uint_16 depth;
     br_uint_8 type;
-    char *identifier;
-    br_model *model;
-    br_material *material;
+    char* identifier;
+    br_model* model;
+    br_material* material;
     br_uint_8 render_style;
-    void *render_data;
+    void* render_data;
     br_transform t;
-    void *type_data;
-    void *user;
+    void* type_data;
+    void* user;
 } br_actor;
 
 typedef struct br_model {
     br_uint_32 _reserved;
-    char *identifier;
-    br_vertex *vertices;
-    br_face *faces;
+    char* identifier;
+    br_vertex* vertices;
+    br_face* faces;
     br_uint_16 nvertices;
     br_uint_16 nfaces;
     br_vector3 pivot;
     br_uint_16 flags;
-    br_model_custom_cbfn *custom;
-    void *user;
+    br_model_custom_cbfn* custom;
+    void* user;
     br_angle crease_angle;
     br_scalar radius;
     br_bounds bounds;
-    void *prepared;
-    void *stored;
+    void* prepared;
+    void* stored;
     br_uint_16 nprimitive_lists;
-    br_primitive_list *primitive_list;
+    br_primitive_list* primitive_list;
 } br_model;
 
 typedef struct br_camera {
-    char *identifier;
+    char* identifier;
     br_uint_8 type;
     br_angle field_of_view;
     br_scalar hither_z;
@@ -1344,11 +1382,11 @@ typedef struct br_camera {
     br_scalar width;
     br_scalar height;
     br_scalar distance;
-    void *user;
+    void* user;
 } br_camera;
 
 typedef struct br_light {
-    char *identifier;
+    char* identifier;
     br_uint_8 type;
     br_colour colour;
     br_scalar attenuation_c;
@@ -1356,19 +1394,19 @@ typedef struct br_light {
     br_scalar attenuation_q;
     br_angle cone_outer;
     br_angle cone_inner;
-    void *user;
+    void* user;
 } br_light;
 
 typedef struct br_fmt_results {
-    br_actor **actors;
-    br_model **models;
-    br_light **lights;
-    br_camera **cameras;
-    br_vector4 **clip_planes;
-    br_bounds3 **bounds;
-    br_bounds3 **bounds_correct;
-    br_material **materials;
-    br_pixelmap **pixelmaps;
+    br_actor** actors;
+    br_model** models;
+    br_light** lights;
+    br_camera** cameras;
+    br_vector4** clip_planes;
+    br_bounds3** bounds;
+    br_bounds3** bounds_correct;
+    br_material** materials;
+    br_pixelmap** pixelmaps;
     br_uint_32 nactors;
     br_uint_32 nmodels;
     br_uint_32 nlights;
@@ -1389,7 +1427,7 @@ typedef struct br_3ds_options {
     br_scalar hither;
     br_scalar yon;
     br_scalar scale;
-    br_fmt_report_cbfn *report;
+    br_fmt_report_cbfn* report;
 } br_3ds_options;
 
 typedef struct br_registery br_registry;
@@ -1405,35 +1443,36 @@ typedef void br_table_update_cbfn(br_pixelmap*, br_uint_16);
 typedef void br_map_update_cbfn(br_pixelmap*, br_uint_16);
 typedef struct br_node br_node;
 typedef struct br_node {
-    br_node *next;
-    br_node *prev;
+    br_node* next;
+    br_node* prev;
 } br_node;
 
 typedef struct br_list {
-    br_node *head;
-    br_node *_null;
-    br_node *tail;
+    br_node* head;
+    br_node* _null;
+    br_node* tail;
 } br_list;
 
 typedef struct br_simple_node br_simple_node;
 typedef struct br_simple_node {
-    br_simple_node *next;
-    br_simple_node **prev;
+    br_simple_node* next;
+    // TODO: We changed this from "** prev" to "*prev". Is this really correct?
+    br_simple_node* prev;
 } br_simple_node;
 
 typedef struct br_simple_list {
-    br_simple_node *head;
+    br_simple_node* head;
 } br_simple_list;
 
-typedef struct br_registry_entry {
-    br_node node;
-    char **item;
+typedef struct br_registry_entry { // size: 12
+    br_node node; // @0
+    char** item; // @8
 } br_registry_entry;
 
-typedef struct br_registery {
-    br_list list;
-    int count;
-    br_find_failed_cbfn *find_failed_hook;
+typedef struct br_registery { // size: 20
+    br_list list; // @0
+    int count; // @12
+    br_find_failed_cbfn* find_failed_hook; // @16
 } br_registry;
 
 typedef struct br_active_light {
@@ -1447,7 +1486,7 @@ typedef struct br_active_light {
     br_scalar spot_cosine_inner;
     void (*light_sub_function)(br_vector3*, br_fvector3*, br_active_light*, br_scalar*);
     int type;
-    br_light *light;
+    br_light* light;
 } br_active_light;
 
 typedef struct br_active_clip_plane {
@@ -1455,23 +1494,81 @@ typedef struct br_active_clip_plane {
 } br_active_clip_plane;
 
 typedef struct fw_fn_table {
-    br_surface_fn *light;
-    br_surface_fn *light_material;
-    br_surface_fn *light_vertex;
-    br_surface_fn *light_texture;
-    br_face_surface_fn *face_light;
-    br_light_sub_fn *direct;
-    br_light_sub_fn *point;
-    br_light_sub_fn *point_attn;
-    br_light_sub_fn *spot;
-    br_light_sub_fn *spot_attn;
+    br_surface_fn* light;
+    br_surface_fn* light_material;
+    br_surface_fn* light_vertex;
+    br_surface_fn* light_texture;
+    br_face_surface_fn* face_light;
+    br_light_sub_fn* direct;
+    br_light_sub_fn* point;
+    br_light_sub_fn* point_attn;
+    br_light_sub_fn* spot;
+    br_light_sub_fn* spot_attn;
 } fw_fn_table;
 
-typedef struct br_framework_state {
-    br_surface_fn *surface_fn;
-    br_surface_fn *surface_fn_after_map;
-    br_surface_fn *surface_fn_after_copy;
-    br_face_surface_fn *face_surface_fn;
+typedef struct br_image_section {
+    char* name;
+    void* base;
+    br_size_t mem_offset;
+    br_size_t mem_size;
+    br_uint_32 data_offset;
+    br_uint_32 data_size;
+} br_image_section;
+
+typedef struct br_image br_image;
+typedef struct br_image {
+    br_node node;
+    char* identifier;
+    br_int_32 type;
+    br_int_32 ref_count;
+    br_uint_32 ordinal_base;
+    br_uint_32 n_functions;
+    void** functions;
+    br_uint_32 n_names;
+    char** names;
+    br_uint_16* name_ordinals;
+    br_uint_16 n_imports;
+    br_image** imports;
+    br_uint_16 n_sections;
+    br_image_section* sections;
+    void* type_pointer;
+} br_image;
+
+typedef struct br_open_device {
+    br_device* dev;
+    br_image* image;
+} br_open_device;
+
+typedef struct br_framework_state { // size: 1136
+    br_boolean active; // @0
+    br_registry reg_resource_classes; // @4
+    br_resource_class* resource_class_index[256]; // @24
+    br_list tokens; // @1048
+    br_token next_free_token; // @1060
+    br_filesystem* fsys; // @1064
+    br_allocator* mem; // @1068
+    br_diaghandler* diag; // @1072
+    int open_mode; // @1076
+    void* res; // @1080
+    void* scratch_ptr; // @1084
+    br_size_t scratch_size; // @1088
+    br_size_t scratch_last; // @1092
+    int scratch_inuse; // @1096
+    br_error last_error_type; // @1100
+    void** last_error_value; // @1104
+    br_list images; // @1108
+    br_open_device* dev_slots; // @1120
+    br_int_32 ndev_slots; // @1124
+    br_associative_array* sys_config; // @1128
+    br_boolean bAlreadyLoadedDrivers; // @1132
+} br_framework_state;
+
+// br_framework_state defined by "C:\DETHRACE\source\common\finteray.c" module
+typedef struct br_framework_state_2 {
+    br_surface_fn* surface_fn;
+    br_surface_fn* surface_fn_after_map;
+    br_surface_fn* surface_fn_after_copy;
+    br_face_surface_fn* face_surface_fn;
     br_matrix23 map_transform;
     br_scalar index_base;
     br_scalar index_range;
@@ -1482,12 +1579,12 @@ typedef struct br_framework_state {
     br_matrix34 model_to_environment;
     struct {
         br_matrix34 m;
-        br_actor *a;
+        br_actor* a;
     };
     int vtos_type;
     br_vector3 eye_m;
     br_vector3 eye_m_normalised;
-    br_material *material;
+    br_material* material;
     br_active_light active_lights_model[16];
     br_active_light active_lights_view[16];
     br_uint_16 nactive_lights_model;
@@ -1496,10 +1593,10 @@ typedef struct br_framework_state {
     br_vector3 eye_l;
     br_active_clip_plane active_clip_planes[6];
     br_uint_16 nactive_clip_planes;
-    br_actor *enabled_lights[16];
-    br_actor *enabled_clip_planes[6];
-    br_actor *enabled_environment;
-    br_pixelmap *output;
+    br_actor* enabled_lights[16];
+    br_actor* enabled_clip_planes[6];
+    br_actor* enabled_environment;
+    br_pixelmap* output;
     br_scalar vp_width;
     br_scalar vp_height;
     br_scalar vp_ox;
@@ -1510,30 +1607,30 @@ typedef struct br_framework_state {
     br_registry reg_textures;
     br_registry reg_tables;
     br_registry reg_resource_classes;
-    br_resource_class *resource_class_index[256];
-    br_model_update_cbfn *model_update;
-    br_material_update_cbfn *material_update;
-    br_table_update_cbfn *table_update;
-    br_map_update_cbfn *map_update;
-    br_filesystem *fsys;
-    br_allocator *mem;
-    br_errorhandler *err;
+    br_resource_class* resource_class_index[256];
+    br_model_update_cbfn* model_update;
+    br_material_update_cbfn* material_update;
+    br_table_update_cbfn* table_update;
+    br_map_update_cbfn* map_update;
+    br_filesystem* fsys;
+    br_allocator* mem;
+    br_errorhandler* err;
     int open_mode;
-    void *res;
-    br_model *default_model;
-    br_material *default_material;
+    void* res;
+    br_model* default_model;
+    br_material* default_material;
     fw_fn_table fn_table;
-    void *scratch_ptr;
+    void* scratch_ptr;
     br_size_t scratch_size;
     br_size_t scratch_last;
     int scratch_inuse;
-} br_framework_state;
+} br_framework_state_2;
 
 typedef br_error br_exception;
 typedef void br_resident_fn();
 typedef struct br_tv_template_entry {
     br_token token;
-    char *name;
+    char* name;
     br_int_32 offset;
     br_int_16 flags;
     br_int_16 conv;
@@ -1543,18 +1640,18 @@ typedef struct br_tv_template_entry {
 
 typedef struct br_tv_template {
     int n_entries;
-    br_tv_template_entry *entries;
+    br_tv_template_entry* entries;
     br_int_32 map_base;
     br_int_32 n_map_entries;
-    br_tv_template_entry **map_query_entry;
-    br_tv_template_entry **map_set_entry;
+    br_tv_template_entry** map_query_entry;
+    br_tv_template_entry** map_set_entry;
     br_boolean names_resolved;
-    void *res;
+    void* res;
 } br_tv_template;
 
 typedef struct br_object_container_dispatch br_object_container_dispatch;
 typedef struct br_object_container {
-    br_object_container_dispatch *dispatch;
+    br_object_container_dispatch* dispatch;
 } br_object_container;
 
 typedef struct br_object_container_dispatch {
@@ -1617,6 +1714,11 @@ typedef struct br_device_dispatch {
     br_error (*_count)(br_object_container*, br_int_32*, br_token, char*, br_token_value*);
 } br_device_dispatch;
 
+// br_device. Not sure when this is used
+typedef struct br_device_2 {
+    br_device_dispatch* dispatch;
+} br_device_2;
+
 typedef struct br_object_dispatch {
     void (*__reserved0)(br_object*);
     void (*__reserved1)(br_object*);
@@ -1639,7 +1741,7 @@ typedef struct br_object_dispatch {
 
 typedef struct br_geometry_stored_dispatch br_geometry_stored_dispatch;
 typedef struct br_geometry_stored {
-    br_geometry_stored_dispatch *dispatch;
+    br_geometry_stored_dispatch* dispatch;
 } br_geometry_stored;
 
 typedef struct br_renderer_state_stored_dispatch {
@@ -1663,12 +1765,12 @@ typedef struct br_renderer_state_stored_dispatch {
 } br_renderer_state_stored_dispatch;
 
 typedef struct br_renderer_state_stored {
-    br_renderer_state_stored_dispatch *dispatch;
+    br_renderer_state_stored_dispatch* dispatch;
 } br_renderer_state_stored;
 
 typedef struct br_buffer_stored_dispatch br_buffer_stored_dispatch;
 typedef struct br_buffer_stored {
-    br_buffer_stored_dispatch *dispatch;
+    br_buffer_stored_dispatch* dispatch;
 } br_buffer_stored;
 
 typedef struct br_device_pixelmap_dispatch {
@@ -1851,19 +1953,19 @@ typedef struct br_datafile br_datafile;
 typedef struct br_file_struct_member {
     br_uint_16 type;
     br_uint_32 offset;
-    char *name;
-    void *extra;
+    char* name;
+    void* extra;
 } br_file_struct_member;
 
 typedef struct br_file_struct {
-    char *name;
+    char* name;
     br_uint_32 nmembers;
-    br_file_struct_member *members;
+    br_file_struct_member* members;
     int mem_size;
 } br_file_struct;
 
 typedef struct br_file_primitives {
-    char *identifier;
+    char* identifier;
     int (*skip)(br_datafile*, br_uint_32);
     int (*chunk_write)(br_datafile*, br_uint_32, br_uint_32);
     int (*chunk_read)(br_datafile*, br_uint_32*);
@@ -1889,22 +1991,22 @@ typedef struct br_chunks_table_entry {
 
 typedef struct br_chunks_table {
     int nentries;
-    br_chunks_table_entry *entries;
+    br_chunks_table_entry* entries;
 } br_chunks_table;
 
 typedef struct br_file_enum_member {
     int value;
-    char *name;
+    char* name;
 } br_file_enum_member;
 
 typedef struct br_file_enum {
     br_uint_32 nmembers;
-    br_file_enum_member *members;
+    br_file_enum_member* members;
 } br_file_enum;
 
 typedef struct br_device_clut_dispatch br_device_clut_dispatch;
 typedef struct br_device_clut {
-    br_device_clut_dispatch *dispatch;
+    br_device_clut_dispatch* dispatch;
 } br_device_clut;
 
 typedef struct br_device_clut_dispatch {
@@ -1931,39 +2033,6 @@ typedef struct br_device_clut_dispatch {
     br_error (*_entryQueryMany)(br_device_clut*, br_colour*, br_int_32, br_int_32);
 } br_device_clut_dispatch;
 
-typedef struct br_image_section {
-    char *name;
-    void *base;
-    br_size_t mem_offset;
-    br_size_t mem_size;
-    br_uint_32 data_offset;
-    br_uint_32 data_size;
-} br_image_section;
-
-typedef struct br_image br_image;
-typedef struct br_image {
-    br_node node;
-    char *identifier;
-    br_int_32 type;
-    br_int_32 ref_count;
-    br_uint_32 ordinal_base;
-    br_uint_32 n_functions;
-    void **functions;
-    br_uint_32 n_names;
-    char **names;
-    br_uint_16 *name_ordinals;
-    br_uint_16 n_imports;
-    br_image **imports;
-    br_uint_16 n_sections;
-    br_image_section *sections;
-    void *type_pointer;
-} br_image;
-
-typedef struct br_open_device {
-    br_device *dev;
-    br_image *image;
-} br_open_device;
-
 typedef struct br_geometry_dispatch {
     void (*__reserved0)(br_object*);
     void (*__reserved1)(br_object*);
@@ -1986,7 +2055,7 @@ typedef struct br_geometry_dispatch {
 
 typedef struct br_geometry_lighting_dispatch br_geometry_lighting_dispatch;
 typedef struct br_geometry_lighting {
-    br_geometry_lighting_dispatch *dispatch;
+    br_geometry_lighting_dispatch* dispatch;
 } br_geometry_lighting;
 
 typedef struct br_geometry_lighting_dispatch {
@@ -2015,8 +2084,8 @@ typedef struct br_v1db_enable {
     br_int_32 max;
     br_int_32 count;
     br_int_32 type;
-    char *name;
-    br_actor **enabled;
+    char* name;
+    br_actor** enabled;
 } br_v1db_enable;
 
 typedef struct br_v1db_state {
@@ -2024,19 +2093,19 @@ typedef struct br_v1db_state {
     br_boolean zs_active;
     br_boolean zb_active;
     br_int_32 rendering;
-    br_renderer *renderer;
-    br_renderer *query_renderer;
-    br_geometry *format_model;
-    br_geometry *format_buckets;
-    br_geometry_lighting *format_lighting;
+    br_renderer* renderer;
+    br_renderer* query_renderer;
+    br_geometry* format_model;
+    br_geometry* format_buckets;
+    br_geometry_lighting* format_lighting;
     br_matrix4 model_to_screen;
     br_matrix34 model_to_view;
     br_boolean model_to_screen_valid;
     br_uint_32 ttype;
-    br_actor *render_root;
+    br_actor* render_root;
     struct {
         br_matrix34 m;
-        br_actor *a;
+        br_actor* a;
         br_uint_8 transform_type;
     };
     br_v1db_enable enabled_lights;
@@ -2044,27 +2113,27 @@ typedef struct br_v1db_state {
     br_v1db_enable enabled_horizon_planes;
     br_int_32 max_light;
     br_int_32 max_clip;
-    br_actor *enabled_environment;
+    br_actor* enabled_environment;
     br_registry reg_models;
     br_registry reg_materials;
     br_registry reg_textures;
     br_registry reg_tables;
-    void *res;
-    br_model *default_model;
-    br_material *default_material;
-    void *default_render_data;
-    br_order_table *default_order_table;
-    br_order_table *primary_order_table;
-    br_order_table *order_table_list;
+    void* res;
+    br_model* default_model;
+    br_material* default_material;
+    void* default_render_data;
+    br_order_table* default_order_table;
+    br_order_table* primary_order_table;
+    br_order_table* order_table_list;
     br_primitive_heap heap;
-    br_primitive_cbfn *primitive_call;
-    br_renderbounds_cbfn *bounds_call;
+    br_primitive_cbfn* primitive_call;
+    br_renderbounds_cbfn* bounds_call;
     br_vector2 origin;
     br_scalar vp_ox;
     br_scalar vp_oy;
     br_scalar vp_width;
     br_scalar vp_height;
-    br_pixelmap *colour_buffer;
+    br_pixelmap* colour_buffer;
 } br_v1db_state;
 
 typedef struct br_renderer_facility_dispatch {
@@ -2101,7 +2170,7 @@ typedef struct br_renderer_facility_dispatch {
 
 typedef struct br_output_facility_dispatch br_output_facility_dispatch;
 typedef struct br_output_facility {
-    br_output_facility_dispatch *dispatch;
+    br_output_facility_dispatch* dispatch;
 } br_output_facility;
 
 typedef struct br_output_facility_dispatch {
@@ -2140,7 +2209,7 @@ typedef struct br_output_facility_dispatch {
 
 typedef struct br_primitive_state_dispatch br_primitive_state_dispatch;
 typedef struct br_primitive_state {
-    br_primitive_state_dispatch *dispatch;
+    br_primitive_state_dispatch* dispatch;
 } br_primitive_state;
 
 typedef struct brp_block {
@@ -2220,12 +2289,11 @@ typedef struct br_primitive_library_dispatch {
 } br_primitive_library_dispatch;
 
 typedef struct br_file {
-    void *raw_file;
+    void* raw_file;
     br_boolean writing;
     int mode;
     char name[1];
 } br_file;
-
 
 typedef enum br_lexer_token_id {
     T_EOF = 0,
@@ -2273,12 +2341,12 @@ typedef void br_lexer_getchar_cbfn(br_lexer_source*);
 typedef struct br_lexer br_lexer;
 typedef void br_lexer_error_cbfn(br_lexer*, char*);
 typedef struct br_lexer_source {
-    br_lexer_source *prev;
-    char *name;
+    br_lexer_source* prev;
+    char* name;
     br_int_32 line;
     br_int_32 next;
-    br_lexer_getchar_cbfn *getchar;
-    void *ptr;
+    br_lexer_getchar_cbfn* getchar;
+    void* ptr;
 } br_lexer_source;
 
 typedef struct br_lexer_token {
@@ -2286,57 +2354,56 @@ typedef struct br_lexer_token {
     struct {
         br_int_32 integer;
         float real;
-        char *string;
+        char* string;
     };
 } br_lexer_token;
 
 typedef struct br_lexer_keyword {
-    char *name;
+    char* name;
     br_int_32 id;
 } br_lexer_keyword;
 
 typedef struct br_lexer {
-    br_lexer_source *source;
+    br_lexer_source* source;
     br_lexer_token current;
-    br_lexer_keyword *keywords;
+    br_lexer_keyword* keywords;
     br_int_32 nkeywords;
     char eol_comment;
     void (*advance)(br_lexer*);
-    br_putline_cbfn *putline;
-    void *putline_arg;
-    char *string_buffer;
+    br_putline_cbfn* putline;
+    void* putline_arg;
+    char* string_buffer;
     br_int_32 string_buffer_size;
-    br_lexer_error_cbfn *error;
+    br_lexer_error_cbfn* error;
 } br_lexer;
 
 typedef br_error br_tv_custom_query_cbfn(br_uint_32*, void**, br_size_t*, void*, br_tv_template_entry*);
 typedef br_error br_tv_custom_set_cbfn(void*, br_uint_32*, br_tv_template_entry*);
 typedef br_size_t br_tv_custom_extra_size_cbfn(void*, br_tv_template_entry*);
 typedef struct br_tv_custom {
-    br_tv_custom_query_cbfn *query;
-    br_tv_custom_set_cbfn *set;
-    br_tv_custom_extra_size_cbfn *extra_size;
+    br_tv_custom_query_cbfn* query;
+    br_tv_custom_set_cbfn* set;
+    br_tv_custom_extra_size_cbfn* extra_size;
 } br_tv_custom;
 
-typedef struct br_token_entry {
-    br_node node;
-    char *identifier;
-    br_int_32 type;
-    br_token token;
-    br_int_32 base_length;
+typedef struct br_token_entry { // size: 24
+    br_node node; // @0
+    char* identifier; // @8
+    br_int_32 type; // @12
+    br_token token; // @16
+    br_int_32 base_length; // @20
 } br_token_entry;
-
 
 typedef struct br_exception_handler br_exception_handler;
 typedef struct br_exception_handler {
-    br_exception_handler *prev;
+    br_exception_handler* prev;
     jmp_buf context;
 } br_exception_handler;
 
 typedef struct br_pixelmap_state {
-    void *res;
-    br_tv_template *device_pixelmap_template;
-    br_tv_template *pixelmap_match_template;
+    void* res;
+    br_tv_template* device_pixelmap_template;
+    br_tv_template* pixelmap_match_template;
 } br_pixelmap_state;
 
 typedef struct pm_type_info {
@@ -2352,7 +2419,7 @@ typedef struct match_tokens {
     br_int_32 pixel_bits;
     br_int_32 width;
     br_int_32 height;
-    br_object *renderer;
+    br_object* renderer;
 } match_tokens;
 
 typedef struct host_info {
@@ -2397,7 +2464,7 @@ typedef struct host_regs {
         br_uint_16 cs;
         br_uint_16 sp;
         br_uint_16 ss;
-    }a;
+    } a;
     struct {
         br_uint_16 di;
         br_uint_16 _pad0;
@@ -2424,7 +2491,7 @@ typedef struct host_regs {
         br_uint_16 cs;
         br_uint_16 sp;
         br_uint_16 ss;
-    }b;
+    } b;
     struct {
         br_uint_32 _pad0[4];
         br_uint_8 bl;
@@ -2443,23 +2510,23 @@ typedef struct host_regs {
         br_uint_8 ah;
         br_uint_8 _pad7;
         br_uint_8 _pad8;
-    }c;
+    } c;
 } host_regs;
 
 typedef struct ldt {
-    unsigned long limit_0: 10;
-    unsigned long base_0: 10;
-    unsigned long base_1: 8;
-    unsigned long type: 4;
-    unsigned long application: 1;
-    unsigned long dpl: 2;
-    unsigned long present: 1;
-    unsigned long limit_1: 4;
-    unsigned long system: 1;
-    unsigned long reserved: 1;
-    unsigned long use32: 1;
-    unsigned long granularity: 1;
-    unsigned long base_2: 8;
+    unsigned long limit_0 : 10;
+    unsigned long base_0 : 10;
+    unsigned long base_1 : 8;
+    unsigned long type : 4;
+    unsigned long application : 1;
+    unsigned long dpl : 2;
+    unsigned long present : 1;
+    unsigned long limit_1 : 4;
+    unsigned long system : 1;
+    unsigned long reserved : 1;
+    unsigned long use32 : 1;
+    unsigned long granularity : 1;
+    unsigned long base_2 : 8;
 } ldt;
 
 typedef struct msdos_header {
@@ -2544,16 +2611,18 @@ typedef struct section_header {
     br_uint_32 flags;
 } section_header;
 
-typedef struct resource_header {
-    br_simple_node node;
-    br_simple_list children;
-    br_uint_8 size_l;
-    br_uint_8 size_m;
-    br_uint_8 size_h;
-    br_uint_8 class;
-    void *magic_ptr;
-    int magic_num;
+#pragma pack(push, 1)
+typedef struct resource_header { // size: 24
+    br_simple_node node; // @0
+    br_simple_list children; // @8
+    br_uint_8 size_l; // @12
+    br_uint_8 size_m; // @13
+    br_uint_8 size_h; // @14
+    br_uint_8 class; // @15
+    void* magic_ptr; // @16
+    br_uint_32 magic_num; // @20
 } resource_header;
+#pragma pack(pop)
 
 typedef struct host_real_memory {
     br_uint_32 pm_off;
@@ -2574,19 +2643,19 @@ typedef struct object_list {
 
 typedef struct object_list_entry {
     br_simple_node n;
-    br_object *h;
+    br_object* h;
 } object_list_entry;
 
 typedef struct token_match {
-    br_token_value *original;
-    br_token_value *query;
+    br_token_value* original;
+    br_token_value* query;
     br_int_32 n;
-    void *extra;
+    void* extra;
     br_size_t extra_size;
 } token_match;
 
 typedef struct token_type {
-    char *identifier;
+    char* identifier;
     br_token type;
     int length;
 } token_type;
@@ -2627,7 +2696,7 @@ typedef struct order_info {
 
 typedef struct transform_type {
     br_uint_32 id;
-    br_file_struct *fs;
+    br_file_struct* fs;
 } transform_type;
 
 typedef enum dosio_event_type {
@@ -2665,7 +2734,7 @@ typedef struct dosio_event_queue {
 } dosio_event_queue;
 
 typedef struct pm_temp_edge {
-    struct pm_temp_edge *next;
+    struct pm_temp_edge* next;
     br_uint_16 first;
     br_uint_16 last;
     char other;
@@ -2690,13 +2759,13 @@ typedef struct v11face {
 } DR_FACE, v11face;
 
 typedef struct v11group {
-    void *stored;
-    DR_FACE *faces;
-    br_colour *face_colours;
-    br_uint_16 *face_user;
-    DR_VERTEX *vertices;
-    br_colour *vertex_colours;
-    br_uint_16 *vertex_user;
+    void* stored;
+    DR_FACE* faces;
+    br_colour* face_colours;
+    br_uint_16* face_user;
+    DR_VERTEX* vertices;
+    br_colour* vertex_colours;
+    br_uint_16* vertex_user;
     br_uint_16 nfaces;
     br_uint_16 nvertices;
     br_uint_16 nedges;
@@ -2707,7 +2776,7 @@ typedef struct v11model {
     br_uint_32 flags;
     br_uint_16 ngroups;
     br_vector3 pivot;
-    v11group *groups;
+    v11group* groups;
 } v11model;
 
 #endif

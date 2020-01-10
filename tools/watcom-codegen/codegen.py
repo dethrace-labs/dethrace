@@ -84,6 +84,7 @@ def unread_line():
 
 def read_file():
   state = STATE_NONE
+  current_module = None
 
   while eof == 0:
     line = read_line()
@@ -96,10 +97,8 @@ def read_file():
     match = re.match(module_start_regex, line)
     if match:
 
-      if len(modules) > 0:
-        m = modules[len(modules)-1]
-        # if 'depth.c' in m['name']:
-        #   break
+      if current_module is not None:
+        cleanup_function_args(current_module)
 
       current_module = {
         'name': match.group(1),
@@ -131,7 +130,7 @@ def read_file():
           last_fn = None
 
         elif local_type == 'NEAR_RTN_386' or local_type == 'FAR_RTN_386':
-          fn = process_function()
+          fn = process_function(current_module)
           last_fn = fn
           current_module['functions'].append(fn)
 
@@ -178,22 +177,6 @@ def read_file():
 
         #os.exit(1)
 
-# def process_type_names():
-#   for m in modules:
-#     for type_idx in m['types']:
-#       t = m['types'][type_idx]
-#       if t['type'] == 'NAME':
-
-#         target_type = t['type_idx']
-#         if m['types'][target_type]['type'] != 'NAME':
-#           #print m['types'][target_type]['type'], t['value'], t['name']
-#           m['types'][target_type]['type_name'] = t['value']
-#         else:
-#           pass
-#           #print (t)
-#           #print (m['types'][target_type])
-#           #print ()
-
 def process_global_var():
   glob = {}
   line = read_line()
@@ -203,7 +186,7 @@ def process_global_var():
   glob['type'] = match.group(3)
   return glob
 
-def process_function():
+def process_function(module):
   fn = { 'args': [], 'local_vars': [] }
 
   #start off = 00000000, code size = 000000C9, parent off = 0000
@@ -305,6 +288,7 @@ def process_type(current_module, type_name):
     # number of fields = 000D   size = 00000034
     match = re.match(FIELD_LIST_REGEX, line)
     nbr_fields = int(match.group(1), 16)
+    struct_size = int(match.group(2), 16)
     fields = []
     for i in range(nbr_fields):
       line = read_line()
@@ -321,7 +305,7 @@ def process_type(current_module, type_name):
         field['bit_size'] = int(match.group(2))
         #print field
       fields.append(field)
-    return { 'size': int(match.group(2), 16), 'fields': fields }
+    return { 'size': struct_size, 'fields': fields }
   elif type_name == 'ENUM_LIST':
     match = re.match(ENUM_LIST_REGEX, line)
     nbr_fields = int(match.group(1), 16)
@@ -395,31 +379,6 @@ def resolve_type_str(module, type_idx, var_name, decl=True):
     #print 'resolved to', type_idx, t
     #return resolve_name_for_type(module, type_idx) + ' ' + indirections + '{}' + bounds
 
-
-# def resolve_type(module, type_idx):
-#   result=''
-#   t = module['types'][type_idx]
-#   while 'base_type' in t:
-#     if t['type'] == 'NEAR386 PTR' or t['type'] == 'FAR386 PTR':
-#       result = '*' + result
-#       t = module['types'][t['base_type']]
-#     elif t['type'] == 'WORD_INDEX ARRAY' or t['type'] == 'BYTE_INDEX ARRAY':
-#       inner_type = resolve_type(module, t['base_type'])
-#       return inner_type + '[' + str(t['upper_bound']) + ']'
-
-#   if t['type'] == 'NEAR386 PROC':
-#     return resolve_type(module, t['return_type']) + '(*' + describe_args(module, t, False) + result
-#   if 'value' in t:
-#     return t['value'] + result
-#   else:
-#     t2 = get_child_reference(module, type_idx)
-#     if t2 is not None:
-#       return t2['value'] + result
-
-#     print (t)
-#     return t['type_name'] + result
-
-
 def resolve_function_header(module, fn):
   text = ''
   text += '// Offset: ' + str(fn['offset']) + '\n// Size: ' + str(fn['size'])
@@ -428,7 +387,19 @@ def resolve_function_header(module, fn):
       text += '\n'
     name = fn['local_vars'][i]['name']
     text += '// ' + fn['args'][i] + ': ' + name
+  text += '\n//IDA: ' + resolve_function_ida_signature(module, fn)
   return text
+
+def cleanup_function_args(module):
+  # if theres a single "void" argument for a function, we just remove it
+  for fn in module['functions']:
+    type_idx = fn['type']
+    fn_type = module['types'][type_idx]
+    if len(fn_type['args']) == 1:
+      arg_type = resolve_type_str(module, fn_type['args'][0], '')
+      if arg_type == 'void':
+        fn_type['args'] = []
+
 
 def get_function_arg_count(module, fn):
   type_idx = fn['type']
@@ -456,13 +427,9 @@ def resolve_function_signature(module, fn):
       continue
     else:
       arg_type = module['types'][arg]
-      if 'value' in arg_type and arg_type['value'] == 'void':
-        continue
 
     name = fn['local_vars'][i]['name']
     arg_type = resolve_type_str(module, arg, name, False)
-    if arg_type == 'void ?no_name?':
-      continue
     if len(args) != 0:
       args += ', '
     args += arg_type
@@ -472,13 +439,45 @@ def resolve_function_signature(module, fn):
 
   return return_type + ' ' + fn['name'] + '(' + args + ')'
 
+def resolve_function_ida_signature(module, fn):
+  type_idx = fn['type']
+  fn_type = module['types'][type_idx]
+  return_type = resolve_type_str(module, fn_type['return_type'], "")
+  args = ''
+  for i in range(len(fn_type['args'])):
+    arg = fn_type['args'][i]
+
+    if arg not in module['types']:
+      continue
+    else:
+      arg_type = module['types'][arg]
+
+    name = fn['local_vars'][i]['name']
+    arg_type = resolve_type_str(module, arg, name, False)
+    if len(args) != 0:
+      args += ', '
+    args += arg_type
+    if i < len(fn['args']):
+      args += '@<' + fn['args'][i] + '>'
+
+  if is_function_vararg(module, fn):
+    args += ', ...'
+
+  # void __usercall PathCat(char *pDestn_str@<eax>, char *pStr_1@<edx>, char *pStr_2@<ebx>)
+  # float __usercall GetAFloat@<st0>(FILE *pF@<eax>)
+  return_reg = ''
+  if len(fn['args']) > 0 and 'return_value' in fn:
+    return_reg = '@<' + fn['return_value'] + '>'
+  call_type = '__cdecl'
+  if len(fn['args']) > 0:
+    call_type = '__usercall'
+  return return_type + ' ' + call_type + ' ' + fn['name'] + return_reg + '(' + args + ')'
+
 def describe_args(module, fn_type, resolve_names):
   args = ''
   for i in range(len(fn_type['args'])):
     arg = fn_type['args'][i]
     arg_type = resolve_type_str(module, arg, '')
-    if arg_type == 'void':
-      continue
     if resolve_names:
       name = fn['local_vars'][i]['name']
 
@@ -547,6 +546,7 @@ def get_type_declaration(module, t, name):
     if tag_name is not None:
       s += ' ' + tag_name
     s += ' {'
+    s += '\t\t// size: ' + str(t['size'])
     first_elem = True
     for e in reversed(t['fields']):
       s += '\n'
@@ -555,6 +555,7 @@ def get_type_declaration(module, t, name):
       if e['type'] == 'BIT_BYTE':
         s += ': ' + str(e['bit_size'])
       s += ';'
+      s += '\t\t// @' + str(e['offset'])
       first_elem = False
     s += '\n' + ' ' * (indent * INDENT_SPACES) + '}'
     return s
@@ -656,10 +657,6 @@ def generate_c_file(module):
 
     # skip local variables that were passed in as arguments
     arg_count = get_function_arg_count(module, fn)
-    # if fn['name'] == 'DrawColumns':
-    #   print 'xxxx'
-    #   print fn
-    #   print module['types'][fn['type']]
     for v in fn['local_vars'][arg_count:]:
       c_file.write(' ' * INDENT_SPACES)
       if 'CONST' in v['addr_type']:
@@ -692,23 +689,33 @@ def generate_types_header(module):
     if t['type'] != 'NAME':
       continue
     type_name = t['value']
-    if type_name in generated_type_names:
-      # skip duplicates
-      continue
 
-
-    if type_name == 'br_value_tag':
-      print ('!!br_value_tag', type_name in generated_type_names)
-    if type_name == 'br_value':
-      print ('!!br_value', type_name in generated_type_names)
-
-
+    cache_type_name = type_name 
+    
     # get type that this name references
     t = module['types'][t['type_idx']]
     if t is None:
       continue
 
-    generated_type_names[type_name] = 1
+    if t['type'] == 'FIELD_LIST':
+      if len(t['fields']) == 0:
+        print("skipping", type_name, "it has no fields")
+        continue
+      cache_type_name = '+' + cache_type_name + '|' + str(len(t['fields']))
+      found_prefix = False
+      found = ''
+      for x in generated_type_names:
+        if '+' + type_name + '|' in x:
+          found_prefix=True
+          found = x
+      if found_prefix and cache_type_name not in generated_type_names:
+        print('CACHEFOUND:', found, cache_type_name)
+      
+    if cache_type_name in generated_type_names:
+      # skip duplicates
+      continue
+
+    generated_type_names[cache_type_name] = 1
 
     if t['type'] == 'ENUM_LIST':
       s = '\ntypedef enum {} {{'.format(type_name)
