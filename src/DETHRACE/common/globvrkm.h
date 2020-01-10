@@ -1,7 +1,9 @@
 #ifndef _GLOBVRKM_H_
 #define _GLOBVRKM_H_
 
-#include "dr_types.h"
 #include "br_types.h"
+#include "dr_types.h"
+
+extern float gRecovery_cost[3];
 
 #endif

@@ -1,10 +1,22 @@
 #include "framework/unity.h"
 
-#include <string.h>
 #include "common/utility.h"
+#include <string.h>
+
+void test_utility_EncodeLinex() {
+    char buf[50];
+    // first line of GENERAL.TXT, "@" prefix and line ending stripped
+    char input[] = "\x29\x2a\x9c\x22\x61\x4d\x5e\x5f\x60\x34\x64\x57\x8d\x2b\x82\x7b\x33\x4c";
+    strcpy(buf, input);
+    EncodeLine(buf);
+    //TEST_ASSERT_EQUAL_INT(2, gEncryption_method);
+    char expected[] = "0.01\t\t\t\t\t// Hither";
+    TEST_ASSERT_EQUAL_STRING(expected, buf);
+}
 
 void test_utility_DecodeLine2() {
     char buf[50];
+    gEncryption_method = 1;
     // first line of GENERAL.TXT, "@" prefix and line ending stripped
     char input[] = "\x29\x2a\x9c\x22\x61\x4d\x5e\x5f\x60\x34\x64\x57\x8d\x2b\x82\x7b\x33\x4c";
     strcpy(buf, input);
@@ -32,14 +44,14 @@ void test_utility_StripCR() {
 }
 
 void test_utility_GetALineWithNoPossibleService() {
-    FILE *file = fopen("/tmp/testfile","wt");
-    fprintf(file,"hello world\r\n  space_prefixed\r\n\r\n\ttab_prefixed\r\n$ignored_prefix\r\nlast_line");
+    FILE* file = fopen("/tmp/testfile", "wt");
+    fprintf(file, "hello world\r\n  space_prefixed\r\n\r\n\ttab_prefixed\r\n$ignored_prefix\r\nlast_line");
     fclose(file);
 
-    file = fopen("/tmp/testfile","rt");
+    file = fopen("/tmp/testfile", "rt");
     char s[256];
 
-    char *result = GetALineWithNoPossibleService(file, s);
+    char* result = GetALineWithNoPossibleService(file, s);
     TEST_ASSERT_NOT_NULL(result);
     TEST_ASSERT_EQUAL_STRING("hello world", s);
 
@@ -69,6 +81,7 @@ void test_utility_PathCat() {
 }
 
 void test_utility_suite() {
+    RUN_TEST(test_utility_EncodeLinex);
     RUN_TEST(test_utility_DecodeLine2);
     RUN_TEST(test_utility_EncodeLine2);
     RUN_TEST(test_utility_StripCR);

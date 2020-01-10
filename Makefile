@@ -16,7 +16,8 @@ clean:
 test: build
 	@echo "Building tests"
 	@$(MAKE) -C test build
-	test/build/c1tests
+	@cp -r test/assets/DATA test/build
+	@(cd test/build && ./c1tests)
 
 run: build
 	@echo "Running dethrace"

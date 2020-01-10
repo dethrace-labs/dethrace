@@ -1,20 +1,22 @@
 #ifndef _OPPONENT_H_
 #define _OPPONENT_H_
 
-#include "dr_types.h"
 #include "br_types.h"
+#include "dr_types.h"
+
+extern float gOpponent_nastyness_frigger;
 
 // Offset: 0
 // Size: 137
 // EAX: pThe_actor
 // EDX: pThe_vector
-void PointActorAlongThisBloodyVector(br_actor *pThe_actor, br_vector3 *pThe_vector);
+void PointActorAlongThisBloodyVector(br_actor* pThe_actor, br_vector3* pThe_vector);
 
 // Offset: 140
 // Size: 301
 // EAX: pOpponent_spec
 // EDX: pCommand
-void ProcessCurrentObjective(tOpponent_spec *pOpponent_spec, tProcess_objective_command pCommand);
+void ProcessCurrentObjective(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand);
 
 // Offset: 444
 // Size: 190
@@ -30,13 +32,13 @@ tS16 ReallocExtraPathSections(int pHow_many_then);
 // Size: 186
 // EAX: pFrom
 // EDX: pTo
-int PointVisibleFromHere(br_vector3 *pFrom, br_vector3 *pTo);
+int PointVisibleFromHere(br_vector3* pFrom, br_vector3* pTo);
 
 // Offset: 1012
 // Size: 276
 // EAX: pActor_coords
 // EDX: pDistance
-tS16 FindNearestPathNode(br_vector3 *pActor_coords, br_scalar *pDistance);
+tS16 FindNearestPathNode(br_vector3* pActor_coords, br_scalar* pDistance);
 
 // Offset: 1288
 // Size: 66
@@ -44,7 +46,7 @@ tS16 FindNearestPathNode(br_vector3 *pActor_coords, br_scalar *pDistance);
 // EDX: pPath_direction
 // EBX: pIntersect
 // ECX: pDistance
-tS16 FindNearestPathSection(br_vector3 *pActor_coords, br_vector3 *pPath_direction, br_vector3 *pIntersect, br_scalar *pDistance);
+tS16 FindNearestPathSection(br_vector3* pActor_coords, br_vector3* pPath_direction, br_vector3* pIntersect, br_scalar* pDistance);
 
 // Offset: 1356
 // Size: 1187
@@ -52,37 +54,37 @@ tS16 FindNearestPathSection(br_vector3 *pActor_coords, br_vector3 *pPath_directi
 // EDX: pActor_coords
 // EBX: pPath_direction
 // ECX: pIntersect
-tS16 FindNearestGeneralSection(tCar_spec *pPursuee, br_vector3 *pActor_coords, br_vector3 *pPath_direction, br_vector3 *pIntersect, br_scalar *pDistance);
+tS16 FindNearestGeneralSection(tCar_spec* pPursuee, br_vector3* pActor_coords, br_vector3* pPath_direction, br_vector3* pIntersect, br_scalar* pDistance);
 
 // Offset: 2544
 // Size: 171
 // EAX: pCar_spec
-void DeadStopCar(tCar_spec *pCar_spec);
+void DeadStopCar(tCar_spec* pCar_spec);
 
 // Offset: 2716
 // Size: 69
 // EAX: pOpponent_spec
-void TurnOpponentPhysicsOn(tOpponent_spec *pOpponent_spec);
+void TurnOpponentPhysicsOn(tOpponent_spec* pOpponent_spec);
 
 // Offset: 2788
 // Size: 80
 // EAX: pOpponent_spec
-void TurnOpponentPhysicsOff(tOpponent_spec *pOpponent_spec);
+void TurnOpponentPhysicsOff(tOpponent_spec* pOpponent_spec);
 
 // Offset: 2868
 // Size: 247
-void NewObjective(tOpponent_spec *pOpponent_spec, tOpponent_objective_type pObjective_type, ...);
+void NewObjective(tOpponent_spec* pOpponent_spec, tOpponent_objective_type pObjective_type, ...);
 
 // Offset: 3116
 // Size: 929
 // EAX: pOpponent_spec
-void CalcRaceRoute(tOpponent_spec *pOpponent_spec);
+void CalcRaceRoute(tOpponent_spec* pOpponent_spec);
 
 // Offset: 4048
 // Size: 790
 // EAX: pOpponent_spec
 // EDX: pSections_to_add
-void TopUpRandomRoute(tOpponent_spec *pOpponent_spec, int pSections_to_add);
+void TopUpRandomRoute(tOpponent_spec* pOpponent_spec, int pSections_to_add);
 
 // Offset: 4840
 // Size: 942
@@ -90,63 +92,63 @@ void TopUpRandomRoute(tOpponent_spec *pOpponent_spec, int pSections_to_add);
 // EDX: pPerm_store
 // EBX: pNum_of_perm_store_sections
 // ECX: pTarget_section
-int SearchForSection(tRoute_section *pTemp_store, tRoute_section *pPerm_store, int *pNum_of_perm_store_sections, tS16 pTarget_section, int pDepth, br_scalar pDistance_so_far, tOpponent_spec *pOpponent_spec);
+int SearchForSection(tRoute_section* pTemp_store, tRoute_section* pPerm_store, int* pNum_of_perm_store_sections, tS16 pTarget_section, int pDepth, br_scalar pDistance_so_far, tOpponent_spec* pOpponent_spec);
 
 // Offset: 5784
 // Size: 796
 // EAX: pOpponent_spec
 // EDX: pPlayer
-void CalcGetNearPlayerRoute(tOpponent_spec *pOpponent_spec, tCar_spec *pPlayer);
+void CalcGetNearPlayerRoute(tOpponent_spec* pOpponent_spec, tCar_spec* pPlayer);
 
 // Offset: 6580
 // Size: 575
 // EAX: pOpponent_spec
-void CalcReturnToStartPointRoute(tOpponent_spec *pOpponent_spec);
+void CalcReturnToStartPointRoute(tOpponent_spec* pOpponent_spec);
 
 // Offset: 7156
 // Size: 47
 // EAX: pOpponent_spec
-void ClearOpponentsProjectedRoute(tOpponent_spec *pOpponent_spec);
+void ClearOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec);
 
 // Offset: 7204
 // Size: 114
 // EAX: pOpponent_spec
 // EDX: pSection_no
 // EBX: pDirection
-int AddToOpponentsProjectedRoute(tOpponent_spec *pOpponent_spec, tS16 pSection_no, int pDirection);
+int AddToOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec, tS16 pSection_no, int pDirection);
 
 // Offset: 7320
 // Size: 177
 // EAX: pOpponent_spec
 // EDX: pPlaces
-int ShiftOpponentsProjectedRoute(tOpponent_spec *pOpponent_spec, int pPlaces);
+int ShiftOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec, int pPlaces);
 
 // Offset: 7500
 // Size: 134
 // EAX: pOpponent_spec
 // EDX: pMilliseconds
-void StunTheBugger(tOpponent_spec *pOpponent_spec, int pMilliseconds);
+void StunTheBugger(tOpponent_spec* pOpponent_spec, int pMilliseconds);
 
 // Offset: 7636
 // Size: 47
 // EAX: pOpponent_spec
-void UnStunTheBugger(tOpponent_spec *pOpponent_spec);
+void UnStunTheBugger(tOpponent_spec* pOpponent_spec);
 
 // Offset: 7684
 // Size: 436
 // EAX: pOpponent_spec
 // EDX: pCommand
-void ProcessCompleteRace(tOpponent_spec *pOpponent_spec, tProcess_objective_command pCommand);
+void ProcessCompleteRace(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand);
 
 // Offset: 8120
 // Size: 337
 // EAX: pPursuee
-void StartRecordingTrail(tCar_spec *pPursuee);
+void StartRecordingTrail(tCar_spec* pPursuee);
 
 // Offset: 8460
 // Size: 1039
 // EAX: pPursuee
-void RecordNextTrailNode(tCar_spec *pPursuee);
+void RecordNextTrailNode(tCar_spec* pPursuee);
 
 // Offset: 9500
 // Size: 78
@@ -154,102 +156,102 @@ void RecordNextTrailNode(tCar_spec *pPursuee);
 // EDX: pPursuee
 // EBX: pSection_v
 // ECX: pIntersect
-tS16 FindNearestTrailSection(tOpponent_spec *pOpponent_spec, tCar_spec *pPursuee, br_vector3 *pSection_v, br_vector3 *pIntersect, br_scalar *pDistance);
+tS16 FindNearestTrailSection(tOpponent_spec* pOpponent_spec, tCar_spec* pPursuee, br_vector3* pSection_v, br_vector3* pIntersect, br_scalar* pDistance);
 
 // Offset: 9580
 // Size: 111
 // EAX: pOpponent_spec
 // EDX: pSection
-tS16 CalcNextTrailSection(tOpponent_spec *pOpponent_spec, int pSection);
+tS16 CalcNextTrailSection(tOpponent_spec* pOpponent_spec, int pSection);
 
 // Offset: 9692
 // Size: 2515
 // EAX: pOpponent_spec
 // EDX: pCommand
-void ProcessPursueAndTwat(tOpponent_spec *pOpponent_spec, tProcess_objective_command pCommand);
+void ProcessPursueAndTwat(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand);
 
 // Offset: 12208
 // Size: 638
 // EAX: pOpponent_spec
 // EDX: pCommand
-void ProcessRunAway(tOpponent_spec *pOpponent_spec, tProcess_objective_command pCommand);
+void ProcessRunAway(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand);
 
 // Offset: 12848
 // Size: 126
 // EAX: pOpponent_spec
 // EDX: pCommand
-void ProcessWaitForSomeHaplessSod(tOpponent_spec *pOpponent_spec, tProcess_objective_command pCommand);
+void ProcessWaitForSomeHaplessSod(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand);
 
 // Offset: 12976
 // Size: 629
 // EAX: pOpponent_spec
 // EDX: pCommand
-void ProcessReturnToStart(tOpponent_spec *pOpponent_spec, tProcess_objective_command pCommand);
+void ProcessReturnToStart(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand);
 
 // Offset: 13608
 // Size: 921
 // EAX: pOpponent_spec
 // EDX: pCommand
-void ProcessLevitate(tOpponent_spec *pOpponent_spec, tProcess_objective_command pCommand);
+void ProcessLevitate(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand);
 
 // Offset: 14532
 // Size: 543
 // EAX: pOpponent_spec
 // EDX: pCommand
-void ProcessGetNearPlayer(tOpponent_spec *pOpponent_spec, tProcess_objective_command pCommand);
+void ProcessGetNearPlayer(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand);
 
 // Offset: 15076
 // Size: 230
 // EAX: pOpponent_spec
 // EDX: pCommand
-void ProcessFrozen(tOpponent_spec *pOpponent_spec, tProcess_objective_command pCommand);
+void ProcessFrozen(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand);
 
 // Offset: 15308
 // Size: 355
 // EAX: pOpponent_spec
-int HeadOnWithPlayerPossible(tOpponent_spec *pOpponent_spec);
+int HeadOnWithPlayerPossible(tOpponent_spec* pOpponent_spec);
 
 // Offset: 15664
 // Size: 88
 // EAX: pOpponent_spec
 // EDX: pPursuee
-int AlreadyPursuingCar(tOpponent_spec *pOpponent_spec, tCar_spec *pPursuee);
+int AlreadyPursuingCar(tOpponent_spec* pOpponent_spec, tCar_spec* pPursuee);
 
 // Offset: 15752
 // Size: 97
 // EAX: pOpponent_spec
-int LastTwatteeAPlayer(tOpponent_spec *pOpponent_spec);
+int LastTwatteeAPlayer(tOpponent_spec* pOpponent_spec);
 
 // Offset: 15852
 // Size: 97
 // EAX: pOpponent_spec
-int LastTwatterAPlayer(tOpponent_spec *pOpponent_spec);
+int LastTwatterAPlayer(tOpponent_spec* pOpponent_spec);
 
 // Offset: 15952
 // Size: 130
 // EAX: pOpponent_spec
-void ObjectiveComplete(tOpponent_spec *pOpponent_spec);
+void ObjectiveComplete(tOpponent_spec* pOpponent_spec);
 
 // Offset: 16084
 // Size: 542
 // EAX: pOpponent_spec
-void TeleportOpponentToNearestSafeLocation(tOpponent_spec *pOpponent_spec);
+void TeleportOpponentToNearestSafeLocation(tOpponent_spec* pOpponent_spec);
 
 // Offset: 16628
 // Size: 4057
 // EAX: pOpponent_spec
 // EDX: pMust_choose_one
-void ChooseNewObjective(tOpponent_spec *pOpponent_spec, int pMust_choose_one);
+void ChooseNewObjective(tOpponent_spec* pOpponent_spec, int pMust_choose_one);
 
 // Offset: 20688
 // Size: 365
 // EAX: pOpponent_spec
-void ProcessThisOpponent(tOpponent_spec *pOpponent_spec);
+void ProcessThisOpponent(tOpponent_spec* pOpponent_spec);
 
 // Offset: 21056
 // Size: 256
 // EAX: pPoint
-int IsNetCarActive(br_vector3 *pPoint);
+int IsNetCarActive(br_vector3* pPoint);
 
 // Offset: 21312
 // Size: 692
@@ -262,53 +264,53 @@ void ForceRebuildActiveCarList();
 // Offset: 22064
 // Size: 138
 // EAX: pOpponent_spec
-void StartToCheat(tOpponent_spec *pOpponent_spec);
+void StartToCheat(tOpponent_spec* pOpponent_spec);
 
 // Offset: 22204
 // Size: 138
 // EAX: pOpponent_spec
-void OiStopCheating(tOpponent_spec *pOpponent_spec);
+void OiStopCheating(tOpponent_spec* pOpponent_spec);
 
 // Offset: 22344
 // Size: 326
 // EAX: pOpponent_spec
-int TeleportCopToStart(tOpponent_spec *pOpponent_spec);
+int TeleportCopToStart(tOpponent_spec* pOpponent_spec);
 
 // Offset: 22672
 // Size: 139
 // EAX: pOpponent_spec
-void CalcDistanceFromHome(tOpponent_spec *pOpponent_spec);
+void CalcDistanceFromHome(tOpponent_spec* pOpponent_spec);
 
 // Offset: 22812
 // Size: 767
 // EAX: pOpponent_spec
 // EDX: pMassage_count
-int MassageOpponentPosition(tOpponent_spec *pOpponent_spec, int pMassage_count);
+int MassageOpponentPosition(tOpponent_spec* pOpponent_spec, int pMassage_count);
 
 // Offset: 23580
 // Size: 821
 // EAX: pOpponent_spec
-int RematerialiseOpponentOnThisSection(tOpponent_spec *pOpponent_spec, br_scalar pSpeed, tS16 pSection_no);
+int RematerialiseOpponentOnThisSection(tOpponent_spec* pOpponent_spec, br_scalar pSpeed, tS16 pSection_no);
 
 // Offset: 24404
 // Size: 482
 // EAX: pOpponent_spec
-int RematerialiseOpponentOnNearestSection(tOpponent_spec *pOpponent_spec, br_scalar pSpeed);
+int RematerialiseOpponentOnNearestSection(tOpponent_spec* pOpponent_spec, br_scalar pSpeed);
 
 // Offset: 24888
 // Size: 2365
 // EAX: pOpponent_spec
-int RematerialiseOpponent(tOpponent_spec *pOpponent_spec, br_scalar pSpeed);
+int RematerialiseOpponent(tOpponent_spec* pOpponent_spec, br_scalar pSpeed);
 
 // Offset: 27256
 // Size: 434
 // EAX: pOpponent_spec
-void CalcPlayerConspicuousness(tOpponent_spec *pOpponent_spec);
+void CalcPlayerConspicuousness(tOpponent_spec* pOpponent_spec);
 
 // Offset: 27692
 // Size: 192
 // EAX: pOpponent_spec
-void CalcOpponentConspicuousnessWithAViewToCheatingLikeFuck(tOpponent_spec *pOpponent_spec);
+void CalcOpponentConspicuousnessWithAViewToCheatingLikeFuck(tOpponent_spec* pOpponent_spec);
 
 // Offset: 27884
 // Size: 52
@@ -323,7 +325,7 @@ void LoadCopCars();
 // Offset: 28168
 // Size: 2460
 // EAX: pF
-void LoadInOppoPaths(FILE *pF);
+void LoadInOppoPaths(FILE* pF);
 
 // Offset: 30628
 // Size: 153
@@ -341,7 +343,7 @@ void SetInitialCopPositions();
 // Offset: 31988
 // Size: 2545
 // EAX: pRace_info
-void InitOpponents(tRace_info *pRace_info);
+void InitOpponents(tRace_info* pRace_info);
 
 // Offset: 34536
 // Size: 142
@@ -355,7 +357,7 @@ void WakeUpOpponentsToTheFactThatTheStartHasBeenJumped(int pWhat_the_countdown_w
 // Offset: 34992
 // Size: 91
 // EAX: pCar_spec
-void ReportMurderToPoliceDepartment(tCar_spec *pCar_spec);
+void ReportMurderToPoliceDepartment(tCar_spec* pCar_spec);
 
 // Offset: 35084
 // Size: 178
@@ -377,7 +379,7 @@ char* GetDriverName(tVehicle_type pCategory, int pIndex);
 // Offset: 35676
 // Size: 240
 // EAX: pCar_spec
-tOpponent_spec* GetOpponentSpecFromCarSpec(tCar_spec *pCar_spec);
+tOpponent_spec* GetOpponentSpecFromCarSpec(tCar_spec* pCar_spec);
 
 // Offset: 35916
 // Size: 113
@@ -388,62 +390,62 @@ tCar_spec* GetCarSpecFromGlobalOppoIndex(int pIndex);
 // Size: 95
 // EAX: pOpponent_spec
 // EDX: pSection_no
-int GetOpponentsRealSection(tOpponent_spec *pOpponent_spec, int pSection_no);
+int GetOpponentsRealSection(tOpponent_spec* pOpponent_spec, int pSection_no);
 
 // Offset: 36128
 // Size: 106
 // EAX: pOpponent_spec
-int GetOpponentsFirstSection(tOpponent_spec *pOpponent_spec);
+int GetOpponentsFirstSection(tOpponent_spec* pOpponent_spec);
 
 // Offset: 36236
 // Size: 185
 // EAX: pOpponent_spec
 // EDX: pCurrent_section
-int GetOpponentsNextSection(tOpponent_spec *pOpponent_spec, tS16 pCurrent_section);
+int GetOpponentsNextSection(tOpponent_spec* pOpponent_spec, tS16 pCurrent_section);
 
 // Offset: 36424
 // Size: 239
 // EAX: pOpponent_spec
 // EDX: pSection
-tS16 GetOpponentsSectionStartNode(tOpponent_spec *pOpponent_spec, tS16 pSection);
+tS16 GetOpponentsSectionStartNode(tOpponent_spec* pOpponent_spec, tS16 pSection);
 
 // Offset: 36664
 // Size: 185
 // EAX: pOpponent_spec
 // EDX: pSection
-tS16 GetOpponentsSectionFinishNode(tOpponent_spec *pOpponent_spec, tS16 pSection);
+tS16 GetOpponentsSectionFinishNode(tOpponent_spec* pOpponent_spec, tS16 pSection);
 
 // Offset: 36852
 // Size: 284
 // EAX: pOpponent_spec
 // EDX: pSection
-br_vector3* GetOpponentsSectionStartNodePoint(tOpponent_spec *pOpponent_spec, tS16 pSection);
+br_vector3* GetOpponentsSectionStartNodePoint(tOpponent_spec* pOpponent_spec, tS16 pSection);
 
 // Offset: 37136
 // Size: 266
 // EAX: pOpponent_spec
 // EDX: pSection
-br_vector3* GetOpponentsSectionFinishNodePoint(tOpponent_spec *pOpponent_spec, tS16 pSection);
+br_vector3* GetOpponentsSectionFinishNodePoint(tOpponent_spec* pOpponent_spec, tS16 pSection);
 
 // Offset: 37404
 // Size: 165
 // EAX: pOpponent_spec
 // EDX: pSection
-br_scalar GetOpponentsSectionWidth(tOpponent_spec *pOpponent_spec, tS16 pSection);
+br_scalar GetOpponentsSectionWidth(tOpponent_spec* pOpponent_spec, tS16 pSection);
 
 // Offset: 37572
 // Size: 262
 // EAX: pOpponent_spec
 // EDX: pSection
 // EBX: pTowards_finish
-int GetOpponentsSectionMinSpeed(tOpponent_spec *pOpponent_spec, tS16 pSection, int pTowards_finish);
+int GetOpponentsSectionMinSpeed(tOpponent_spec* pOpponent_spec, tS16 pSection, int pTowards_finish);
 
 // Offset: 37836
 // Size: 262
 // EAX: pOpponent_spec
 // EDX: pSection
 // EBX: pTowards_finish
-int GetOpponentsSectionMaxSpeed(tOpponent_spec *pOpponent_spec, tS16 pSection, int pTowards_finish);
+int GetOpponentsSectionMaxSpeed(tOpponent_spec* pOpponent_spec, tS16 pSection, int pTowards_finish);
 
 // Offset: 38100
 // Size: 59
@@ -453,19 +455,19 @@ void InitOpponentPsyche(int pOpponent_index);
 // Offset: 38160
 // Size: 108
 // EAX: pOpponent_spec
-void ClearTwattageOccurrenceVariables(tOpponent_spec *pOpponent_spec);
+void ClearTwattageOccurrenceVariables(tOpponent_spec* pOpponent_spec);
 
 // Offset: 38268
 // Size: 86
 // EAX: pA_car
 // EDX: pAnother_car
-void TwoCarsHitEachOther(tCar_spec *pA_car, tCar_spec *pAnother_car);
+void TwoCarsHitEachOther(tCar_spec* pA_car, tCar_spec* pAnother_car);
 
 // Offset: 38356
 // Size: 1166
 // EAX: pTwatter
 // EDX: pTwattee
-void RecordOpponentTwattageOccurrence(tCar_spec *pTwatter, tCar_spec *pTwattee);
+void RecordOpponentTwattageOccurrence(tCar_spec* pTwatter, tCar_spec* pTwattee);
 
 // Offset: 39524
 // Size: 67
@@ -503,7 +505,7 @@ void DeleteOrphanNodes();
 // EAX: pInserted_node
 // EDX: pSection_no
 // EBX: pWhere
-void InsertThisNodeInThisSectionHere(tS16 pInserted_node, tS16 pSection_no, br_vector3 *pWhere);
+void InsertThisNodeInThisSectionHere(tS16 pInserted_node, tS16 pSection_no, br_vector3* pWhere);
 
 // Offset: 42752
 // Size: 254
@@ -524,13 +526,13 @@ void RecalcNearestPathSectionWidth(br_scalar pAdjustment);
 // EAX: pNegative_x_vector
 // EDX: pStart
 // EBX: pFinish
-void CalcNegativeXVector(br_vector3 *pNegative_x_vector, br_vector3 *pStart, br_vector3 *pFinish, br_scalar pLength);
+void CalcNegativeXVector(br_vector3* pNegative_x_vector, br_vector3* pStart, br_vector3* pFinish, br_scalar pLength);
 
 // Offset: 44700
 // Size: 162
 // EAX: pModel
 // EDX: pVertex_num
-void MakeVertexAndOffsetIt(br_model *pModel, int pVertex_num, br_scalar pX, br_scalar pY, br_scalar pZ, br_vector3 *pOffset);
+void MakeVertexAndOffsetIt(br_model* pModel, int pVertex_num, br_scalar pX, br_scalar pY, br_scalar pZ, br_vector3* pOffset);
 
 // Offset: 44864
 // Size: 134
@@ -538,7 +540,7 @@ void MakeVertexAndOffsetIt(br_model *pModel, int pVertex_num, br_scalar pX, br_s
 // EDX: pFace_num
 // EBX: pV0
 // ECX: pV1
-void MakeFaceAndTextureIt(br_model *pModel, int pFace_num, int pV0, int pV1, int pV2, br_material *pMaterial);
+void MakeFaceAndTextureIt(br_model* pModel, int pFace_num, int pV0, int pV1, int pV2, br_material* pMaterial);
 
 // Offset: 45000
 // Size: 942
@@ -546,7 +548,7 @@ void MakeFaceAndTextureIt(br_model *pModel, int pFace_num, int pV0, int pV1, int
 // EDX: pFirst_face
 // EBX: pStart
 // ECX: pFinish
-void MakeSection(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3 *pStart, br_vector3 *pFinish, br_scalar pWidth, br_material *pMaterial_centre_lt, br_material *pMaterial_centre_dk, br_material *pMaterial_edges_start_lt, br_material *pMaterial_edges_start_dk, br_material *pMaterial_edges_finish_lt, br_material *pMaterial_edges_finish_dk);
+void MakeSection(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3* pStart, br_vector3* pFinish, br_scalar pWidth, br_material* pMaterial_centre_lt, br_material* pMaterial_centre_dk, br_material* pMaterial_edges_start_lt, br_material* pMaterial_edges_start_dk, br_material* pMaterial_edges_finish_lt, br_material* pMaterial_edges_finish_dk);
 
 // Offset: 45944
 // Size: 1235
@@ -554,20 +556,20 @@ void MakeSection(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3 *p
 // EDX: pFirst_face
 // EBX: pPoint
 // ECX: pMaterial_1
-void MakeCube(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3 *pPoint, br_material *pMaterial_1, br_material *pMaterial_2, br_material *pMaterial_3);
+void MakeCube(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3* pPoint, br_material* pMaterial_1, br_material* pMaterial_2, br_material* pMaterial_3);
 
 // Offset: 47180
 // Size: 88
 // EAX: pFace_index_ptr
 // EDX: pVertex_index_ptr
-void CalcNumberOfFacesAndVerticesForOppoPathModel(br_uint_16 *pFace_index_ptr, br_uint_16 *pVertex_index_ptr);
+void CalcNumberOfFacesAndVerticesForOppoPathModel(br_uint_16* pFace_index_ptr, br_uint_16* pVertex_index_ptr);
 
 // Offset: 47268
 // Size: 433
 // EAX: pModel
 // EDX: pNum_faces
 // EBX: pNum_vertices
-void ReallocModelFacesAndVertices(br_model *pModel, int pNum_faces, int pNum_vertices);
+void ReallocModelFacesAndVertices(br_model* pModel, int pNum_faces, int pNum_vertices);
 
 // Offset: 47704
 // Size: 127

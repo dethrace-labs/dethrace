@@ -1,9 +1,24 @@
 #include "loading.h"
 
+#include <stdio.h>
 #include <string.h>
 
+#include "displays.h"
+#include "errors.h"
 #include "globvars.h"
+#include "globvrkm.h"
+#include "graphics.h"
+#include "init.h"
+#include "newgame.h"
+#include "opponent.h"
+#include "pc-dos/dossys.h"
+#include "pedestrn.h"
+#include "sound.h"
 #include "utility.h"
+#include "world.h"
+
+#define HITHER_MULTIPLIER 2.0f
+#define AMBIENT_MULTIPLIER 0.0099999998f
 
 char* gWheel_actor_names[6];
 int gFunk_groove_flags[30];
@@ -13,7 +28,7 @@ char* gDrivable_car_names[6];
 char* gYour_car_names[2][6];
 char gDef_def_water_screen_name[32];
 tHeadup_info gHeadup_image_info[31];
-int gAllow_open_to_fail;
+int gAllow_open_to_fail = 1;
 br_material* gDestn_screen_mat;
 br_material* gSource_screen_mat;
 char* gRaces_file_names[9];
@@ -182,6 +197,146 @@ void LoadGeneralParameters() {
     int temp;
     char s[256];
     char* str;
+
+    PathCat(the_path, gApplication_path, "ACTORS");
+    PathCat(the_path, the_path, "PROG.ACT");
+    f = fopen(the_path, "rb");
+    if (f) {
+        fgets(s, 255, f);
+        fclose(f);
+        for (i = 0; i < strlen(gDecode_string); i++) {
+            gDecode_string[i] -= 50;
+        }
+
+        // trim trailing CRLF etc
+        while (s[0] != '\0' && s[strlen(s) - 1] < 0x20) {
+            s[strlen(s) - 1] = 0;
+        }
+
+        if (strcmp(s, gDecode_string) == 0) {
+            gDecode_thing = 0;
+            printf("Expecting decrypted text files!\n");
+        }
+
+        for (i = 0; i < strlen(gDecode_string); i++) {
+            gDecode_string[i] -= 50;
+        }
+    }
+    PathCat(the_path, gApplication_path, "GENERAL.TXT");
+    f = DRfopen(the_path, "rt");
+    if (!f) {
+        FatalError(8);
+    }
+    gCamera_hither = GetAFloat(f) * HITHER_MULTIPLIER;
+    gCamera_yon = GetAFloat(f);
+    gCamera_angle = GetAFloat(f);
+    gAmbient_adjustment = GetAFloat(f) * AMBIENT_MULTIPLIER;
+    gDim_amount = GetAnInt(f);
+    gInitial_rank = GetAnInt(f);
+    GetThreeInts(f, &gInitial_credits[0], &gInitial_credits[1], &gInitial_credits[2]);
+    GetThreeInts(f, &gCredits_per_rank[0], &gCredits_per_rank[1], &gCredits_per_rank[2]);
+    gCar_crush_min_fold = GetAFloat(f);
+    gCar_crush_max_fold = GetAFloat(f);
+    gCar_crush_wibble = GetAFloat(f);
+    gCar_crush_limit_deviant = GetAFloat(f);
+    gCar_crush_split_chance = GetAFloat(f);
+    gCar_crush_softness = GetAFloat(f);
+    GetThreeFloats(f, &gRepair_cost[0], &gRepair_cost[1], &gRepair_cost[2]);
+    GetThreeFloats(f, &gRecovery_cost[0], &gRecovery_cost[1], &gRecovery_cost[2]);
+    GetThreeInts(f, &gPed_time_value[0], &gPed_time_value[1], &gPed_time_value[2]);
+    if (gProgram_state.sausage_eater_mode) {
+        for (i = 0; i < 7; i++) {
+            GetALineAndDontArgue(f, s);
+        }
+
+        GetThreeFloats(f, gCar_time_value, &gCar_time_value[1], &gCar_time_value[2]);
+        GetThreeFloats(f, gCar_cred_value, &gCar_cred_value[1], &gCar_cred_value[2]);
+        GetThreeInts(f, gWasted_time, &gWasted_time[1], &gWasted_time[2]);
+        GetThreeInts(f, gWasted_creds, &gWasted_creds[1], &gWasted_creds[2]);
+        GetThreeInts(f, gRoll_over_time, &gRoll_over_time[1], &gRoll_over_time[2]);
+        GetThreeInts(f, gRoll_over_creds, &gRoll_over_creds[1], &gRoll_over_creds[2]);
+        GetThreeInts(f, gCheck_point_cash, &gCheck_point_cash[1], &gCheck_point_cash[2]);
+    } else {
+        GetThreeFloats(f, gCar_time_value, &gCar_time_value[1], &gCar_time_value[2]);
+        GetThreeFloats(f, gCar_cred_value, &gCar_cred_value[1], &gCar_cred_value[2]);
+        GetThreeInts(f, gWasted_time, &gWasted_time[1], &gWasted_time[2]);
+        GetThreeInts(f, gWasted_creds, &gWasted_creds[1], &gWasted_creds[2]);
+        GetThreeInts(f, gRoll_over_time, &gRoll_over_time[1], &gRoll_over_time[2]);
+        GetThreeInts(f, gRoll_over_creds, &gRoll_over_creds[1], &gRoll_over_creds[2]);
+        GetThreeInts(f, gCheck_point_cash, &gCheck_point_cash[1], &gCheck_point_cash[2]);
+        for (i = 0; i < 7; i++) {
+            GetALineAndDontArgue(f, s);
+        }
+    }
+    GetThreeInts(f, gJump_start_fine, &gJump_start_fine[1], &gJump_start_fine[2]);
+    GetThreeInts(f, gPoints_per_second, &gPoints_per_second[1], &gPoints_per_second[2]);
+    GetThreeInts(f, gCunning_stunt_bonus, &gCunning_stunt_bonus[1], &gCunning_stunt_bonus[2]);
+    GetAString(f, gBasic_car_names[0]);
+    GetAString(f, gBasic_car_names[1]);
+    gKnobbled_frame_period = GetAnInt(f);
+    if (gKnobbled_frame_period) {
+        gKnobbled_frame_period = 1000 / gKnobbled_frame_period;
+    }
+    gOpponent_nastyness_frigger = GetAFloat(f);
+    ParseSpecialVolume(f, &gDefault_default_water_spec_vol, gDef_def_water_screen_name);
+    GetALineAndDontArgue(f, s);
+    str = strtok(s, "\t ,/");
+    for (i = 0; i < 5; i++) {
+        sscanf(str, "%d", &gInitial_net_credits[i]);
+        str = strtok(NULL, "\t ,/");
+    }
+
+    gTag_start_time = 1000 * GetAnInt(f);
+    gFox_start_time = 1000 * GetAnInt(f);
+
+    GetALineAndDontArgue(f, s);
+    str = strtok(s, "\t ,/");
+    for (i = 0; i < 7; i++) {
+        sscanf(str, "%f", &gNet_repair_cost[i]);
+        str = strtok(NULL, "\t ,/");
+    }
+    GetALineAndDontArgue(f, s);
+    str = strtok(s, "\t ,/");
+    for (i = 0; i < 7; i++) {
+        sscanf(str, "%f", &gNet_recovery_cost[i]);
+        str = strtok(NULL, "\t ,/");
+    }
+    GetALineAndDontArgue(f, s);
+    str = strtok(s, "\t ,/");
+    for (i = 0; i < 7; i++) {
+        sscanf(str, "%f", &gNet_softness[i]);
+        str = strtok(NULL, "\t ,/");
+    }
+    GetALineAndDontArgue(f, s);
+    str = strtok(s, "\t ,/");
+    for (i = 0; i < 7; i++) {
+        sscanf(str, "%f", &gNet_offensive[i]);
+        str = strtok(NULL, "\t ,/");
+    }
+    GetALineAndDontArgue(f, s);
+    str = strtok(s, "\t ,/");
+    for (i = 0; i < 7; i++) {
+        sscanf(str, "%d", &gNet_target[i]);
+        str = strtok(NULL, "\t ,/");
+    }
+
+    gMin_respawn_time = 1000 * GetAnInt(f);
+    gRespawn_variance = 1000 * GetAnInt(f);
+    gDemo_rank = GetAnInt(f);
+    gDemo_armour = GetAnInt(f);
+    gDemo_power = GetAnInt(f);
+    gDemo_offensive = GetAnInt(f);
+    for (i = 0; i < 5; i++) {
+        gDemo_opponents[i] = GetAnInt(f);
+    }
+
+    gGravity_multiplier = GetAFloat(f);
+    gZombie_factor = GetAFloat(f);
+    gCut_delay_1 = GetAFloat(f);
+    gCut_delay_2 = GetAFloat(f);
+    gCut_delay_3 = GetAFloat(f);
+    gCut_delay_4 = 1.0f;
+    fclose(f);
 }
 
 // Offset: 3472
@@ -822,6 +977,11 @@ int GetAnInt(FILE* pF) {
     char s[256];
     char* str;
     int result;
+
+    GetALineAndDontArgue(pF, s);
+    str = strtok(s, "\t ,/");
+    sscanf(str, "%d", &result);
+    return result;
 }
 
 // Offset: 33828
@@ -831,6 +991,11 @@ float GetAFloat(FILE* pF) {
     char s[256];
     char* str;
     float result;
+
+    GetALineAndDontArgue(pF, s);
+    str = strtok(s, "\t ,/");
+    sscanf(str, "%f", &result);
+    return result;
 }
 
 // Offset: 33932
@@ -850,6 +1015,12 @@ float GetAFloatPercent(FILE* pF) {
 void GetPairOfFloats(FILE* pF, float* pF1, float* pF2) {
     char s[256];
     char* str;
+
+    GetALineAndDontArgue(pF, s);
+    str = strtok(s, "\t ,/");
+    sscanf(str, "%f", pF1);
+    str = strtok(NULL, "\t ,/");
+    sscanf(str, "%f", pF2);
 }
 
 // Offset: 34172
@@ -861,6 +1032,14 @@ void GetPairOfFloats(FILE* pF, float* pF1, float* pF2) {
 void GetThreeFloats(FILE* pF, float* pF1, float* pF2, float* pF3) {
     char s[256];
     char* str;
+
+    GetALineAndDontArgue(pF, s);
+    str = strtok(s, "\t ,/");
+    sscanf(str, "%f", pF1);
+    str = strtok(NULL, "\t ,/");
+    sscanf(str, "%f", pF2);
+    str = strtok(NULL, "\t ,/");
+    sscanf(str, "%f", pF3);
 }
 
 // Offset: 34344
@@ -871,6 +1050,12 @@ void GetThreeFloats(FILE* pF, float* pF1, float* pF2, float* pF3) {
 void GetPairOfInts(FILE* pF, int* pF1, int* pF2) {
     char s[256];
     char* str;
+
+    GetALineAndDontArgue(pF, s);
+    str = strtok(s, "\t ,/");
+    sscanf(str, "%d", pF1);
+    str = strtok(NULL, "\t ,/");
+    sscanf(str, "%d", pF2);
 }
 
 // Offset: 34476
@@ -882,6 +1067,14 @@ void GetPairOfInts(FILE* pF, int* pF1, int* pF2) {
 void GetThreeInts(FILE* pF, int* pF1, int* pF2, int* pF3) {
     char s[256];
     char* str;
+
+    GetALineAndDontArgue(pF, s);
+    str = strtok(s, "\t ,/");
+    sscanf(str, "%d", pF1);
+    str = strtok(NULL, "\t ,/");
+    sscanf(str, "%d", pF2);
+    str = strtok(NULL, "\t ,/");
+    sscanf(str, "%d", pF3);
 }
 
 // Offset: 34648
@@ -904,12 +1097,23 @@ void GetThreeIntsAndAString(FILE* pF, int* pF1, int* pF2, int* pF3, char* pS) {
 void GetFourInts(FILE* pF, int* pF1, int* pF2, int* pF3, int* pF4) {
     char s[256];
     char* str;
+
+    GetALineAndDontArgue(pF, s);
+    str = strtok(s, "\t ,/");
+    sscanf(str, "%d", pF1);
+    str = strtok(NULL, "\t ,/");
+    sscanf(str, "%d", pF2);
+    str = strtok(NULL, "\t ,/");
+    sscanf(str, "%d", pF3);
+    str = strtok(NULL, "\t ,/");
+    sscanf(str, "%d", pF4);
 }
 
 // Offset: 35056
 // Size: 51
 // EAX: pF
 br_scalar GetAScalar(FILE* pF) {
+    return GetAFloat(pF);
 }
 
 // Offset: 35108
@@ -1000,6 +1204,10 @@ void GetThreeFloatPercents(FILE* pF, float* pF1, float* pF2, float* pF3) {
 void GetAString(FILE* pF, char* pString) {
     char s[256];
     char* str;
+
+    GetALineAndDontArgue(pF, s);
+    str = strtok(s, "\t ,/");
+    strcpy(pString, str);
 }
 
 // Offset: 36396
@@ -1048,8 +1256,89 @@ FILE* OldDRfopen(char* pFilename, char* pMode) {
     tPath_name CD_dir;
     tPath_name path_file;
     tPath_name source_check;
-    static int source_exists;
+    static int source_exists = 1;
     int len;
+    int c;
+
+    fp = fopen(pFilename, pMode);
+
+    if (fp) {
+        len = strlen(pFilename) + 1;
+        if (gDecode_thing != 0) {
+            if (strcmp(&pFilename[len - 4], ".TXT") != 0
+                && strcmp(&pFilename[len - 12], "DKEYMAP0.TXT") != 0
+                && strcmp(&pFilename[len - 12], "DKEYMAP1.TXT") != 0
+                && strcmp(&pFilename[len - 12], "DKEYMAP2.TXT") != 0
+                && strcmp(&pFilename[len - 12], "DKEYMAP3.TXT") != 0
+                && strcmp(&pFilename[len - 12], "KEYMAP_0.TXT") != 0
+                && strcmp(&pFilename[len - 12], "KEYMAP_1.TXT") != 0
+                && strcmp(&pFilename[len - 12], "KEYMAP_2.TXT") != 0
+                && strcmp(&pFilename[len - 12], "KEYMAP_3.TXT") != 0
+                && strcmp(&pFilename[len - 11], "OPTIONS.TXT") != 0
+                && strcmp(&pFilename[len - 12], "KEYNAMES.TXT") != 0
+                && strcmp(&pFilename[len - 10], "KEYMAP.TXT") != 0
+                && strcmp(&pFilename[len - 9], "PATHS.TXT") != 0
+                && strcmp(&pFilename[len - 11], "PRATCAM.TXT") != 0) {
+
+                c = fgetc(fp);
+                if (c != gDecode_thing) {
+                    fclose(fp);
+                    return NULL;
+                }
+                ungetc(c, fp);
+                return fp;
+            }
+        }
+    }
+    if (gCD_fully_installed) {
+        return fp;
+    }
+    if (source_exists == 1) {
+        strcpy(path_file, "DATA");
+        strcat(path_file, gDir_separator);
+        strcat(path_file, "PATHS.TXT");
+
+        if (!PDCheckDriveExists(path_file)) {
+            source_exists = 0;
+            return NULL;
+        }
+        test1 = fopen(path_file, "rt");
+        if (!test1) {
+            source_exists = 0;
+            return NULL;
+        }
+
+        GetALineAndDontArgue(test1, source_check);
+        strcat(source_check, gDir_separator);
+        strcat(source_check, "DATA");
+        strcat(source_check, gDir_separator);
+        strcat(source_check, "GENERAL.TXT");
+
+        fclose(test1);
+        if (PDCheckDriveExists(source_check)) {
+            source_exists++;
+        } else {
+            PDFatalError("Carmageddon CD not in drive.");
+            if (gCD_fully_installed) {
+                source_exists = 0;
+            }
+        }
+    }
+    if (!source_exists) {
+        return fp;
+    }
+
+    data_dir = strstr(pFilename, "DATA");
+    if (data_dir != NULL) {
+        if (GetCDPathFromPathsTxtFile(CD_dir)) {
+            strcat(CD_dir, gDir_separator);
+            strcat(CD_dir, data_dir);
+            if (PDCheckDriveExists(CD_dir)) {
+                fp = fopen(CD_dir, pMode);
+            }
+        }
+    }
+    return fp;
 }
 
 // Offset: 38332
@@ -1070,6 +1359,20 @@ FILE* DRfopen(char* pFilename, char* pMode) {
     FILE* result;
     tPath_name CD_dir;
     char msg[336];
+
+    result = OldDRfopen(pFilename, pMode);
+    if (!result && !gAllow_open_to_fail) {
+        if (GetCDPathFromPathsTxtFile(CD_dir) && !PDCheckDriveExists(CD_dir)) {
+            if (gMisc_strings[0]) {
+                PDFatalError(GetMiscString(243));
+            } else {
+                PDFatalError("Could not find the Carmageddon CD");
+            }
+            sprintf(msg, "DRfopen( \"%s\", \"%s\" ) failed", pFilename, pMode);
+            PDFatalError(msg);
+        }
+    }
+    return result;
 }
 
 // Offset: 38604
@@ -1083,6 +1386,7 @@ int GetCDPathFromPathsTxtFile(char* pPath_name) {
 
     if (!got_it_already) {
         sprintf(paths_txt, "%s%s%s", gApplication_path, gDir_separator, "PATHS.TXT");
+        printf("%s\n", paths_txt);
         paths_txt_fp = fopen(paths_txt, "rt");
         if (!paths_txt_fp) {
             return 0;

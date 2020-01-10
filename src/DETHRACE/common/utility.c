@@ -1,30 +1,30 @@
 #include "utility.h"
 
-#include "loading.h"
-#include "errors.h"
 #include "dossys.h"
+#include "errors.h"
 #include "globvars.h"
-#include "sound.h"
+#include "loading.h"
 #include "network.h"
+#include "sound.h"
 
-#include <string.h>
-#include <stdio.h>
-#include <unistd.h>
 #include <ctype.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 
 // Added >>
 #define MIN_SERVICE_INTERVAL 200
 // <<
 
-tU32 gLong_key[]        = { 0x5F991B6C, 0x135FCDB9, 0x0E2004CB, 0x0EA11C5E };
-tU32 gOther_long_key[]  = { 0x26D6A867, 0x1B45DDB6, 0x13227E32, 0x3794C215 };
+tU32 gLong_key[] = { 0x5F991B6C, 0x135FCDB9, 0x0E2004CB, 0x0EA11C5E };
+tU32 gOther_long_key[] = { 0x26D6A867, 0x1B45DDB6, 0x13227E32, 0x3794C215 };
 
-char *gMisc_strings[250];
+char* gMisc_strings[250];
 int gIn_check_quit;
 tU32 gLost_time;
-int gEncryption_method = 1;
-br_pixelmap *g16bit_palette;
-br_pixelmap *gSource_for_16bit_palette;
+int gEncryption_method = 0;
+br_pixelmap* g16bit_palette;
+br_pixelmap* gSource_for_16bit_palette;
 
 // Offset: 0
 // Size: 144
@@ -32,21 +32,90 @@ int CheckQuit() {
     int got_as_far_as_verify;
 }
 
-// Offset: 144
-// Size: 50
-double sqr(double pN) {
-}
-
 // Offset: 196
 // Size: 542
 // EAX: pS
-void EncodeLine(char *pS) {
+void EncodeLine(char* pS) {
     int len;
     int seed;
     int i;
-    char *key;
+    char* key;
     unsigned char c;
-    FILE *test;
+    FILE* test;
+
+    tPath_name test_path;
+    char temp[256];
+
+    len = strlen(pS);
+    key = (char*)gLong_key;
+    if (!gEncryption_method) {
+        strcpy(test_path, gApplication_path);
+        strcat(test_path, gDir_separator);
+        strcat(test_path, "GENERAL.TXT");
+
+        test = fopen(test_path, "rt");
+        if (test) {
+            fgets(temp, 256, test);
+            if (temp[0] != '@') {
+                gEncryption_method = 2;
+            } else {
+                gEncryption_method = 1;
+                EncodeLine(&temp[1]);
+                temp[7] = '\0';
+                if (strcmp(&temp[1], "0.01\t\t") != 0) {
+                    gEncryption_method = 2;
+                }
+            }
+            fclose(test);
+        } else {
+            gEncryption_method = 2;
+        }
+    }
+    while (len > 0 && (pS[len - 1] == '\r' || pS[len - 1] == '\n')) {
+        --len;
+        pS[len] = 0;
+    }
+
+    seed = len % 16;
+    for (i = 0; i < len; i++) {
+        c = pS[i];
+        if (i >= 2) {
+            if (pS[i - 1] == '/' && pS[i - 2] == '/') {
+                key = (char*)gOther_long_key;
+            }
+        }
+        if (gEncryption_method == 1) {
+            if (c == '\t') {
+                c = 0x80;
+            }
+            c -= 0x20;
+            if (!(c & 0x80)) {
+                c = (c ^ key[seed]) & 0x7f;
+                c += 0x20;
+            }
+            seed += 7;
+            seed = seed % 16;
+
+            if (c == 0x80) {
+                c = '\t';
+            }
+        } else {
+            if (c == '\t') {
+                c = 0x9f;
+            }
+            c -= 0x20;
+            c = (c ^ key[seed]) & 0x7f;
+            c += 0x20;
+
+            seed += 7;
+            seed = seed % 16;
+
+            if (c == 0x9f) {
+                c = '\t';
+            }
+        }
+        pS[i] = c;
+    }
 }
 
 // Offset: 740
@@ -94,31 +163,29 @@ br_scalar SRandomPosNeg(br_scalar pN) {
 // Size: 506
 // EAX: pF
 // EDX: pS
-char* GetALineWithNoPossibleService(FILE *pF, /*unsigned*/ char *pS) {
+char* GetALineWithNoPossibleService(FILE* pF, /*unsigned*/ char* pS) {
     // JeffH removed "signed' to avoid compiler warnings..
-    /*signed*/ char *result;
+    /*signed*/ char* result;
     /*signed*/ char s[256];
     int ch;
     int len;
     int i;
 
-    do
-    {
+    do {
         result = fgets(s, 256, pF);
-        if ( !result ) {
+        if (!result) {
             break;
         }
-        if ( s[0] == '@' )
-        {
+
+        if (s[0] == '@') {
             EncodeLine(&s[1]);
             goto LABEL_5;
         }
-        while ( 1 )
-        {
-            if ( s[0] != ' ' && s[0] != '\t' ){
+        while (1) {
+            if (s[0] != ' ' && s[0] != '\t') {
                 break;
             }
-LABEL_5:
+        LABEL_5:
             len = strlen(s);
             memmove(s, &s[1], len);
         }
@@ -129,10 +196,10 @@ LABEL_5:
                 break;
             }
         }
-        if ( ch != -1 )
+        if (ch != -1) {
             ungetc(ch, pF);
-    }
-    while (!isalnum(s[0])
+        }
+    } while (!isalnum(s[0])
         && s[0] != '-'
         && s[0] != '.'
         && s[0] != '!'
@@ -140,14 +207,14 @@ LABEL_5:
         && s[0] != '('
         && s[0] != '\''
         && s[0] != '\"'
-        && s[0] >= 0 );
+        && s[0] >= 0);
 
     if (result) {
         len = strlen(result);
-        if ( len != 0 && (result[len - 1] == '\r' || result[len - 1] == '\n' )) {
+        if (len != 0 && (result[len - 1] == '\r' || result[len - 1] == '\n')) {
             result[len - 1] = 0;
         }
-        if ( len != 1 && (result[len - 2] == '\r' || result[len - 2] == '\n' )) {
+        if (len != 1 && (result[len - 2] == '\r' || result[len - 2] == '\n')) {
             result[len - 2] = 0;
         }
     }
@@ -165,7 +232,7 @@ LABEL_5:
 // Size: 60
 // EAX: pF
 // EDX: pS
-char* GetALineAndDontArgue(FILE *pF, char *pS) {
+char* GetALineAndDontArgue(FILE* pF, char* pS) {
     PossibleService(pF, pS);
     return GetALineWithNoPossibleService(pF, pS);
 }
@@ -175,8 +242,10 @@ char* GetALineAndDontArgue(FILE *pF, char *pS) {
 // EAX: pDestn_str
 // EDX: pStr_1
 // EBX: pStr_2
-void PathCat(char *pDestn_str, char *pStr_1, char *pStr_2) {
-    strcpy(pDestn_str, pStr_1);
+void PathCat(char* pDestn_str, char* pStr_1, char* pStr_2) {
+    if (pDestn_str != pStr_1) { // Added to avoid strcpy overlap checks
+        strcpy(pDestn_str, pStr_1);
+    }
     if (strlen(pStr_2) != 0) {
         strcat(pDestn_str, gDir_separator);
         strcat(pDestn_str, pStr_2);
@@ -196,7 +265,7 @@ float tandeg(float pAngle) {
 // Offset: 2084
 // Size: 80
 // EAX: pF
-tU32 GetFileLength(FILE *pF) {
+tU32 GetFileLength(FILE* pF) {
     tU32 the_size;
 }
 
@@ -212,8 +281,8 @@ int BooleanTo1Or0(int pB) {
 // EDX: pW
 // EBX: pH
 // ECX: pPixels
-br_pixelmap* DRPixelmapAllocate(br_uint_8 pType, br_uint_16 pW, br_uint_16 pH, void *pPixels, int pFlags) {
-    br_pixelmap *the_map;
+br_pixelmap* DRPixelmapAllocate(br_uint_8 pType, br_uint_16 pW, br_uint_16 pH, void* pPixels, int pFlags) {
+    br_pixelmap* the_map;
 }
 
 // Offset: 2348
@@ -222,8 +291,8 @@ br_pixelmap* DRPixelmapAllocate(br_uint_8 pType, br_uint_16 pW, br_uint_16 pH, v
 // EDX: pX
 // EBX: pY
 // ECX: pW
-br_pixelmap* DRPixelmapAllocateSub(br_pixelmap *pPm, br_uint_16 pX, br_uint_16 pY, br_uint_16 pW, br_uint_16 pH) {
-    br_pixelmap *the_map;
+br_pixelmap* DRPixelmapAllocateSub(br_pixelmap* pPm, br_uint_16 pX, br_uint_16 pY, br_uint_16 pW, br_uint_16 pH) {
+    br_pixelmap* the_map;
 }
 
 // Offset: 2468
@@ -232,8 +301,8 @@ br_pixelmap* DRPixelmapAllocateSub(br_pixelmap *pPm, br_uint_16 pX, br_uint_16 p
 // EDX: pMatch_type
 // EBX: pWidth
 // ECX: pHeight
-br_pixelmap* DRPixelmapMatchSized(br_pixelmap *pSrc, tU8 pMatch_type, tS32 pWidth, tS32 pHeight) {
-    br_pixelmap *result;
+br_pixelmap* DRPixelmapMatchSized(br_pixelmap* pSrc, tU8 pMatch_type, tS32 pWidth, tS32 pHeight) {
+    br_pixelmap* result;
 }
 
 // Offset: 2664
@@ -242,13 +311,13 @@ br_pixelmap* DRPixelmapMatchSized(br_pixelmap *pSrc, tU8 pMatch_type, tS32 pWidt
 // EDX: pSrc
 // EBX: pSrc_width
 // ECX: pSrc_height
-void CopyDoubled8BitTo16BitRectangle(br_pixelmap *pDst, br_pixelmap *pSrc, int pSrc_width, int pSrc_height, int pDst_x, int pDst_y, br_pixelmap *pPalette) {
+void CopyDoubled8BitTo16BitRectangle(br_pixelmap* pDst, br_pixelmap* pSrc, int pSrc_width, int pSrc_height, int pDst_x, int pDst_y, br_pixelmap* pPalette) {
     int x;
     int y;
-    tU8 *src_start;
-    tU16 *dst_start0;
-    tU16 *dst_start1;
-    tU16 *palette_entry;
+    tU8* src_start;
+    tU16* dst_start0;
+    tU16* dst_start1;
+    tU16* palette_entry;
 }
 
 // Offset: 3024
@@ -256,42 +325,42 @@ void CopyDoubled8BitTo16BitRectangle(br_pixelmap *pDst, br_pixelmap *pSrc, int p
 // EAX: pSrc
 // EDX: pWidth
 // EBX: pHeight
-br_pixelmap* Scale8BitPixelmap(br_pixelmap *pSrc, int pWidth, int pHeight) {
-    br_pixelmap *result;
+br_pixelmap* Scale8BitPixelmap(br_pixelmap* pSrc, int pWidth, int pHeight) {
+    br_pixelmap* result;
     int x;
     int y;
-    tU8 *src_pixels;
-    tU8 *dst_pixels;
+    tU8* src_pixels;
+    tU8* dst_pixels;
 }
 
 // Offset: 3288
 // Size: 390
 // EAX: pSrc
 // EDX: pN
-br_pixelmap* Tile8BitPixelmap(br_pixelmap *pSrc, int pN) {
-    br_pixelmap *result;
+br_pixelmap* Tile8BitPixelmap(br_pixelmap* pSrc, int pN) {
+    br_pixelmap* result;
     int new_width;
     int new_height;
     int x;
     int y2;
     int y;
-    tU8 *src_pixels;
-    tU8 *dst_pixels;
+    tU8* src_pixels;
+    tU8* dst_pixels;
 }
 
 // Offset: 3680
 // Size: 83
 // EAX: pName
 // EDX: pList
-tException_list FindExceptionInList(char *pName, tException_list pList) {
+tException_list FindExceptionInList(char* pName, tException_list pList) {
 }
 
 // Offset: 3764
 // Size: 492
 // EAX: pSrc
-br_pixelmap* PurifiedPixelmap(br_pixelmap *pSrc) {
-    br_pixelmap *intermediate;
-    br_pixelmap *result;
+br_pixelmap* PurifiedPixelmap(br_pixelmap* pSrc) {
+    br_pixelmap* intermediate;
+    br_pixelmap* result;
     int new_width;
     int new_height;
     tException_list e;
@@ -300,8 +369,8 @@ br_pixelmap* PurifiedPixelmap(br_pixelmap *pSrc) {
 // Offset: 4256
 // Size: 105
 // EAX: pFile_name
-br_pixelmap* DRPixelmapLoad(char *pFile_name) {
-    br_pixelmap *the_map;
+br_pixelmap* DRPixelmapLoad(char* pFile_name) {
+    br_pixelmap* the_map;
 }
 
 // Offset: 4364
@@ -309,8 +378,8 @@ br_pixelmap* DRPixelmapLoad(char *pFile_name) {
 // EAX: pFile_name
 // EDX: pPixelmaps
 // EBX: pNum
-br_uint_32 DRPixelmapLoadMany(char *pFile_name, br_pixelmap **pPixelmaps, br_uint_16 pNum) {
-    br_pixelmap *the_map;
+br_uint_32 DRPixelmapLoadMany(char* pFile_name, br_pixelmap** pPixelmaps, br_uint_16 pNum) {
+    br_pixelmap* the_map;
     int number_loaded;
     int i;
 }
@@ -327,20 +396,20 @@ void WaitFor(tU32 pDelay) {
 // EAX: pActor
 // EDX: callback
 // EBX: arg
-br_uint_32 DRActorEnumRecurse(br_actor *pActor, br_actor_enum_cbfn *callback, void *arg) {
+br_uint_32 DRActorEnumRecurse(br_actor* pActor, br_actor_enum_cbfn* callback, void* arg) {
     br_uint_32 result;
 }
 
 // Offset: 4744
 // Size: 77
-br_uint_32 CompareActorID(br_actor *pActor, void *pArg) {
+br_uint_32 CompareActorID(br_actor* pActor, void* pArg) {
 }
 
 // Offset: 4824
 // Size: 60
 // EAX: pSearch_root
 // EDX: pName
-br_actor* DRActorFindRecurse(br_actor *pSearch_root, char *pName) {
+br_actor* DRActorFindRecurse(br_actor* pSearch_root, char* pName) {
 }
 
 // Offset: 4884
@@ -349,7 +418,7 @@ br_actor* DRActorFindRecurse(br_actor *pSearch_root, char *pName) {
 // EDX: pMat
 // EBX: pCall_back
 // ECX: pArg
-br_uint_32 DRActorEnumRecurseWithMat(br_actor *pActor, br_material *pMat, br_uint_32 (*pCall_back)(br_actor*, br_material*, void*), void *pArg) {
+br_uint_32 DRActorEnumRecurseWithMat(br_actor* pActor, br_material* pMat, br_uint_32 (*pCall_back)(br_actor*, br_material*, void*), void* pArg) {
     br_uint_32 result;
 }
 
@@ -359,7 +428,7 @@ br_uint_32 DRActorEnumRecurseWithMat(br_actor *pActor, br_material *pMat, br_uin
 // EDX: pMatrix
 // EBX: pCall_back
 // ECX: pArg
-br_uint_32 DRActorEnumRecurseWithTrans(br_actor *pActor, br_matrix34 *pMatrix, br_uint_32 (*pCall_back)(br_actor*, br_matrix34*, void*), void *pArg) {
+br_uint_32 DRActorEnumRecurseWithTrans(br_actor* pActor, br_matrix34* pMatrix, br_uint_32 (*pCall_back)(br_actor*, br_matrix34*, void*), void* pArg) {
     br_uint_32 result;
     br_matrix34 combined_transform;
 }
@@ -379,32 +448,32 @@ float fsign(float pNumber) {
 // Size: 210
 // EAX: pPrefix
 // EDX: pExtension
-FILE* OpenUniqueFileB(char *pPrefix, char *pExtension) {
+FILE* OpenUniqueFileB(char* pPrefix, char* pExtension) {
     int index;
-    FILE *f;
+    FILE* f;
     tPath_name the_path;
 }
 
 // Offset: 5632
 // Size: 572
 // EAX: pF
-void PrintScreenFile(FILE *pF) {
+void PrintScreenFile(FILE* pF) {
     int i;
     int j;
     int bit_map_size;
     int offset;
-    tU8 *pixel_ptr;
+    tU8* pixel_ptr;
 }
 
 // Offset: 6204
 // Size: 554
 // EAX: pF
-void PrintScreenFile16(FILE *pF) {
+void PrintScreenFile16(FILE* pF) {
     int i;
     int j;
     int bit_map_size;
     int offset;
-    tU8 *pixel_ptr;
+    tU8* pixel_ptr;
     tU16 pixel;
 }
 
@@ -435,7 +504,7 @@ void AddLostTime(tU32 pLost_time) {
 // EDX: pStr
 // EBX: pFudge_colon
 // ECX: pForce_colon
-void TimerString(tU32 pTime, char *pStr, int pFudge_colon, int pForce_colon) {
+void TimerString(tU32 pTime, char* pStr, int pFudge_colon, int pForce_colon) {
     int seconds;
 }
 
@@ -449,7 +518,7 @@ char* GetMiscString(int pIndex) {
 // Size: 58
 // EAX: pIndex
 // EDX: pStr
-void GetCopyOfMiscString(int pIndex, char *pStr) {
+void GetCopyOfMiscString(int pIndex, char* pStr) {
 }
 
 // Offset: 7372
@@ -457,7 +526,7 @@ void GetCopyOfMiscString(int pIndex, char *pStr) {
 // EAX: pPeriod
 // EDX: pLast_change
 // EBX: pCurrent_state
-int Flash(tU32 pPeriod, tU32 *pLast_change, int *pCurrent_state) {
+int Flash(tU32 pPeriod, tU32* pLast_change, int* pCurrent_state) {
     tU32 the_time;
 }
 
@@ -465,27 +534,27 @@ int Flash(tU32 pPeriod, tU32 *pLast_change, int *pCurrent_state) {
 // Size: 225
 // EAX: pDst
 // EDX: pSrc
-void MaterialCopy(br_material *pDst, br_material *pSrc) {
+void MaterialCopy(br_material* pDst, br_material* pSrc) {
 }
 
 // Offset: 7716
 // Size: 139
 // EAX: pColour_1
 // EDX: pColour_2
-double RGBDifferenceSqr(tRGB_colour *pColour_1, tRGB_colour *pColour_2) {
+double RGBDifferenceSqr(tRGB_colour* pColour_1, tRGB_colour* pColour_2) {
 }
 
 // Offset: 7856
 // Size: 200
 // EAX: pRGB_colour
 // EDX: pPalette
-int FindBestMatch(tRGB_colour *pRGB_colour, br_pixelmap *pPalette) {
+int FindBestMatch(tRGB_colour* pRGB_colour, br_pixelmap* pPalette) {
     int n;
     int near_c;
     double min_d;
     double d;
     tRGB_colour trial_RGB;
-    br_colour *dp;
+    br_colour* dp;
 }
 
 // Offset: 8056
@@ -494,7 +563,7 @@ int FindBestMatch(tRGB_colour *pRGB_colour, br_pixelmap *pPalette) {
 // EDX: pR
 // EBX: pG
 // ECX: pB
-void BuildShadeTablePath(char *pThe_path, int pR, int pG, int pB) {
+void BuildShadeTablePath(char* pThe_path, int pR, int pG, int pB) {
     char s[32];
 }
 
@@ -513,7 +582,7 @@ br_pixelmap* LoadGeneratedShadeTable(int pR, int pG, int pB) {
 // EDX: pR
 // EBX: pG
 // ECX: pB
-void SaveGeneratedShadeTable(br_pixelmap *pThe_table, int pR, int pG, int pB) {
+void SaveGeneratedShadeTable(br_pixelmap* pThe_table, int pR, int pG, int pB) {
     char the_path[256];
 }
 
@@ -523,7 +592,7 @@ void SaveGeneratedShadeTable(br_pixelmap *pThe_table, int pR, int pG, int pB) {
 // EDX: pPalette
 // EBX: pRed_mix
 // ECX: pGreen_mix
-br_pixelmap* GenerateShadeTable(int pHeight, br_pixelmap *pPalette, int pRed_mix, int pGreen_mix, int pBlue_mix, float pQuarter, float pHalf, float pThree_quarter) {
+br_pixelmap* GenerateShadeTable(int pHeight, br_pixelmap* pPalette, int pRed_mix, int pGreen_mix, int pBlue_mix, float pQuarter, float pHalf, float pThree_quarter) {
 }
 
 // Offset: 8556
@@ -532,14 +601,14 @@ br_pixelmap* GenerateShadeTable(int pHeight, br_pixelmap *pPalette, int pRed_mix
 // EDX: pPalette
 // EBX: pRed_mix
 // ECX: pGreen_mix
-br_pixelmap* GenerateDarkenedShadeTable(int pHeight, br_pixelmap *pPalette, int pRed_mix, int pGreen_mix, int pBlue_mix, float pQuarter, float pHalf, float pThree_quarter, br_scalar pDarken) {
-    br_pixelmap *the_table;
+br_pixelmap* GenerateDarkenedShadeTable(int pHeight, br_pixelmap* pPalette, int pRed_mix, int pGreen_mix, int pBlue_mix, float pQuarter, float pHalf, float pThree_quarter, br_scalar pDarken) {
+    br_pixelmap* the_table;
     tRGB_colour the_RGB;
     tRGB_colour new_RGB;
     tRGB_colour ref_col;
-    br_colour *cp;
-    char *tab_ptr;
-    char *shade_ptr;
+    br_colour* cp;
+    char* tab_ptr;
+    char* shade_ptr;
     double f_i;
     double f_total_minus_1;
     double ratio1;
@@ -570,7 +639,7 @@ void PossibleService() {
 // EAX: pA
 // EDX: pB
 // EBX: pC
-void DRMatrix34TApplyP(br_vector3 *pA, br_vector3 *pB, br_matrix34 *pC) {
+void DRMatrix34TApplyP(br_vector3* pA, br_vector3* pB, br_matrix34* pC) {
     br_scalar t1;
     br_scalar t2;
     br_scalar t3;
@@ -580,8 +649,8 @@ void DRMatrix34TApplyP(br_vector3 *pA, br_vector3 *pB, br_matrix34 *pC) {
 // Size: 132
 // EAX: pPal
 // EDX: pEntry
-tU16 PaletteEntry16Bit(br_pixelmap *pPal, int pEntry) {
-    tU32 *src_entry;
+tU16 PaletteEntry16Bit(br_pixelmap* pPal, int pEntry) {
+    tU32* src_entry;
     int red;
     int green;
     int blue;
@@ -590,8 +659,8 @@ tU16 PaletteEntry16Bit(br_pixelmap *pPal, int pEntry) {
 // Offset: 9736
 // Size: 210
 // EAX: pSrc
-br_pixelmap* PaletteOf16Bits(br_pixelmap *pSrc) {
-    tU16 *dst_entry;
+br_pixelmap* PaletteOf16Bits(br_pixelmap* pSrc) {
+    tU16* dst_entry;
     int value;
 }
 
@@ -600,12 +669,12 @@ br_pixelmap* PaletteOf16Bits(br_pixelmap *pSrc) {
 // EAX: pDst
 // EDX: pSrc
 // EBX: pPalette
-void Copy8BitTo16Bit(br_pixelmap *pDst, br_pixelmap *pSrc, br_pixelmap *pPalette) {
+void Copy8BitTo16Bit(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette) {
     int x;
     int y;
-    tU8 *src_start;
-    tU16 *dst_start;
-    tU16 *palette_entry;
+    tU8* src_start;
+    tU16* dst_start;
+    tU16* palette_entry;
 }
 
 // Offset: 10168
@@ -614,12 +683,12 @@ void Copy8BitTo16Bit(br_pixelmap *pDst, br_pixelmap *pSrc, br_pixelmap *pPalette
 // EDX: pDst_x
 // EBX: pDst_y
 // ECX: pSrc
-void Copy8BitTo16BitRectangle(br_pixelmap *pDst, tS16 pDst_x, tS16 pDst_y, br_pixelmap *pSrc, tS16 pSrc_x, tS16 pSrc_y, tS16 pWidth, tS16 pHeight, br_pixelmap *pPalette) {
+void Copy8BitTo16BitRectangle(br_pixelmap* pDst, tS16 pDst_x, tS16 pDst_y, br_pixelmap* pSrc, tS16 pSrc_x, tS16 pSrc_y, tS16 pWidth, tS16 pHeight, br_pixelmap* pPalette) {
     int x;
     int y;
-    tU8 *src_start;
-    tU16 *dst_start;
-    tU16 *palette_entry;
+    tU8* src_start;
+    tU16* dst_start;
+    tU16* palette_entry;
 }
 
 // Offset: 10728
@@ -628,12 +697,12 @@ void Copy8BitTo16BitRectangle(br_pixelmap *pDst, tS16 pDst_x, tS16 pDst_y, br_pi
 // EDX: pDst_x
 // EBX: pDst_y
 // ECX: pSrc
-void Copy8BitTo16BitRectangleWithTransparency(br_pixelmap *pDst, tS16 pDst_x, tS16 pDst_y, br_pixelmap *pSrc, tS16 pSrc_x, tS16 pSrc_y, tS16 pWidth, tS16 pHeight, br_pixelmap *pPalette) {
+void Copy8BitTo16BitRectangleWithTransparency(br_pixelmap* pDst, tS16 pDst_x, tS16 pDst_y, br_pixelmap* pSrc, tS16 pSrc_x, tS16 pSrc_y, tS16 pWidth, tS16 pHeight, br_pixelmap* pPalette) {
     int x;
     int y;
-    tU8 *src_start;
-    tU16 *dst_start;
-    tU16 *palette_entry;
+    tU8* src_start;
+    tU16* dst_start;
+    tU16* palette_entry;
 }
 
 // Offset: 11248
@@ -642,12 +711,12 @@ void Copy8BitTo16BitRectangleWithTransparency(br_pixelmap *pDst, tS16 pDst_x, tS
 // EDX: pDst_x
 // EBX: pDst_y
 // ECX: pSrc
-void Copy8BitToOnscreen16BitRectangleWithTransparency(br_pixelmap *pDst, tS16 pDst_x, tS16 pDst_y, br_pixelmap *pSrc, tS16 pSrc_x, tS16 pSrc_y, tS16 pWidth, tS16 pHeight, br_pixelmap *pPalette) {
+void Copy8BitToOnscreen16BitRectangleWithTransparency(br_pixelmap* pDst, tS16 pDst_x, tS16 pDst_y, br_pixelmap* pSrc, tS16 pSrc_x, tS16 pSrc_y, tS16 pWidth, tS16 pHeight, br_pixelmap* pPalette) {
     int x;
     int y;
-    tU8 *src_start;
-    tU16 *dst_start;
-    tU16 *palette_entry;
+    tU8* src_start;
+    tU16* dst_start;
+    tU16* palette_entry;
 }
 
 // Offset: 11528
@@ -656,12 +725,12 @@ void Copy8BitToOnscreen16BitRectangleWithTransparency(br_pixelmap *pDst, tS16 pD
 // EDX: pDst_x
 // EBX: pDst_y
 // ECX: pSrc
-void Copy8BitRectangleTo16BitRhombusWithTransparency(br_pixelmap *pDst, tS16 pDst_x, tS16 pDst_y, br_pixelmap *pSrc, tS16 pSrc_x, tS16 pSrc_y, tS16 pWidth, tS16 pHeight, tX1616 pShear, br_pixelmap *pPalette) {
+void Copy8BitRectangleTo16BitRhombusWithTransparency(br_pixelmap* pDst, tS16 pDst_x, tS16 pDst_y, br_pixelmap* pSrc, tS16 pSrc_x, tS16 pSrc_y, tS16 pWidth, tS16 pHeight, tX1616 pShear, br_pixelmap* pPalette) {
     int x;
     int y;
-    tU8 *src_start;
-    tU16 *dst_start;
-    tU16 *palette_entry;
+    tU8* src_start;
+    tU16* dst_start;
+    tU16* palette_entry;
     tX1616 total_shear;
     tS16 sheared_x;
     tS16 clipped_src_x;
@@ -674,14 +743,14 @@ void Copy8BitRectangleTo16BitRhombusWithTransparency(br_pixelmap *pDst, tS16 pDs
 // EDX: dx
 // EBX: dy
 // ECX: src
-void DRPixelmapRectangleCopy(br_pixelmap *dst, br_int_16 dx, br_int_16 dy, br_pixelmap *src, br_int_16 sx, br_int_16 sy, br_uint_16 w, br_uint_16 h) {
+void DRPixelmapRectangleCopy(br_pixelmap* dst, br_int_16 dx, br_int_16 dy, br_pixelmap* src, br_int_16 sx, br_int_16 sy, br_uint_16 w, br_uint_16 h) {
 }
 
 // Offset: 12308
 // Size: 107
 // EAX: dst
 // EDX: src
-void DRPixelmapCopy(br_pixelmap *dst, br_pixelmap *src) {
+void DRPixelmapCopy(br_pixelmap* dst, br_pixelmap* src) {
 }
 
 // Offset: 12416
@@ -690,14 +759,14 @@ void DRPixelmapCopy(br_pixelmap *dst, br_pixelmap *src) {
 // EDX: x
 // EBX: y
 // ECX: w
-void DRPixelmapRectangleFill(br_pixelmap *dst, br_int_16 x, br_int_16 y, br_uint_16 w, br_uint_16 h, br_uint_32 colour) {
+void DRPixelmapRectangleFill(br_pixelmap* dst, br_int_16 x, br_int_16 y, br_uint_16 w, br_uint_16 h, br_uint_32 colour) {
 }
 
 // Offset: 12500
 // Size: 156
 // EAX: pPoint
 // EDX: pNormal
-int NormalSideOfPlane(br_vector3 *pPoint, br_vector3 *pNormal, br_scalar pD) {
+int NormalSideOfPlane(br_vector3* pPoint, br_vector3* pNormal, br_scalar pD) {
     br_scalar numer;
     br_scalar denom;
 }
@@ -705,8 +774,8 @@ int NormalSideOfPlane(br_vector3 *pPoint, br_vector3 *pNormal, br_scalar pD) {
 // Offset: 12656
 // Size: 351
 // EAX: pMaterial
-br_material* DRMaterialClone(br_material *pMaterial) {
-    br_material *the_material;
+br_material* DRMaterialClone(br_material* pMaterial) {
+    br_material* the_material;
     char s[256];
     static int name_suffix;
 }
@@ -714,8 +783,8 @@ br_material* DRMaterialClone(br_material *pMaterial) {
 // Offset: 13008
 // Size: 93
 // EAX: s
-void StripCR(char *s) {
-    char *pos;
+void StripCR(char* s) {
+    char* pos;
     pos = s;
     while (*pos != 0) {
         if (*pos == '\r' || *pos == '\n') {
@@ -728,42 +797,39 @@ void StripCR(char *s) {
 
 // Offset: 13104
 // Size: 132
-void SubsStringJob(char *pStr, ...) {
-    char *sub_str;
+void SubsStringJob(char* pStr, ...) {
+    char* sub_str;
     char temp_str[256];
-    char *sub_pt;
+    char* sub_pt;
     va_list ap;
 }
 
 // Offset: 13236
 // Size: 454
 // EAX: pS
-void DecodeLine2(char *pS) {
+void DecodeLine2(char* pS) {
     int len;
     int seed;
     int i;
     unsigned char c;
-    char *key;
+    char* key;
 
     len = strlen(pS);
     key = (char*)gLong_key;
-    while ( len > 0 && (pS[len - 1] == 13 || pS[len - 1] == 10))
-    {
+    while (len > 0 && (pS[len - 1] == 13 || pS[len - 1] == 10)) {
         --len;
         pS[len] = 0;
     }
     seed = len % 16;
-    for ( i = 0; i < len; i++)
-    {
+    for (i = 0; i < len; i++) {
         c = pS[i];
         if (i >= 2) {
             if (pS[i - 1] == '/' && pS[i - 2] == '/') {
                 key = (char*)gOther_long_key;
             }
         }
-        if (gEncryption_method == 1)
-        {
-            if ( c == '\t' ) {
+        if (gEncryption_method == 1) {
+            if (c == '\t') {
                 c = 0x80;
             }
             c -= 0x20;
@@ -774,11 +840,10 @@ void DecodeLine2(char *pS) {
             seed += 7;
             seed = seed % 16;
 
-            if ( c == 0x80 ) {
+            if (c == 0x80) {
                 c = '\t';
             }
-        }
-        else {
+        } else {
             if (c == '\t') {
                 c = 0x9f;
             }
@@ -789,7 +854,7 @@ void DecodeLine2(char *pS) {
             seed += 7;
             seed = seed % 16;
 
-            if ( c == 0x9f ) {
+            if (c == 0x9f) {
                 c = '\t';
             }
         }
@@ -800,37 +865,33 @@ void DecodeLine2(char *pS) {
 // Offset: 13692
 // Size: 304
 // EAX: pS
-void EncodeLine2(char *pS) {
+void EncodeLine2(char* pS) {
     int len;
     int seed;
     int i;
     int count;
     unsigned char c;
-    char *key;
+    char* key;
 
     len = strlen(pS);
     count = 0;
     key = (char*)gLong_key;
-    while ( len > 0 && (pS[len - 1] == 13 || pS[len - 1] == 10))
-    {
+    while (len > 0 && (pS[len - 1] == 13 || pS[len - 1] == 10)) {
         --len;
         pS[len] = 0;
     }
 
     seed = len % 16;
 
-    for ( i = 0; i < len; ++pS )
-    {
-        if ( count == 2 )
+    for (i = 0; i < len; ++pS) {
+        if (count == 2)
             key = (char*)gOther_long_key;
-        if ( *pS == '/' )
-        {
+        if (*pS == '/') {
             ++count;
-        }
-        else {
+        } else {
             count = 0;
         }
-        if ( *pS == '\t' ) {
+        if (*pS == '\t') {
             *pS = 0x80;
         }
         c = *pS - 0x20;
@@ -841,7 +902,7 @@ void EncodeLine2(char *pS) {
         seed += 7;
         seed = seed % 16;
 
-        if ( c == 0x80 ) {
+        if (c == 0x80) {
             c = '\t';
         }
         *pS = c;
@@ -852,13 +913,13 @@ void EncodeLine2(char *pS) {
 // Offset: 13996
 // Size: 553
 // EAX: pThe_path
-void EncodeFile(char *pThe_path) {
-    FILE *f;
-    FILE *d;
+void EncodeFile(char* pThe_path) {
+    FILE* f;
+    FILE* d;
     char line[257];
     char new_file[256];
-    char *s;
-    char *result;
+    char* s;
+    char* result;
     int ch;
     int decode;
     int len;
@@ -908,7 +969,7 @@ void EncodeFile(char *pThe_path) {
         }
 
         line[0] = '@';
-        fputs(&line[decode*2], d);
+        fputs(&line[decode * 2], d);
         count = -1;
         ch = fgetc(f);
         while (ch == '\r' || ch == '\n') {
@@ -936,7 +997,7 @@ void EncodeFile(char *pThe_path) {
 // Offset: 14552
 // Size: 513
 // EAX: pThe_path
-void EncodeFileWrapper (char *pThe_path) {
+void EncodeFileWrapper(char* pThe_path) {
     int len = strlen(pThe_path);
 
     if (strcmp(&pThe_path[len - 4], ".TXT") == 0) {
@@ -985,14 +1046,14 @@ void EncodeFileWrapper (char *pThe_path) {
 // Offset: 15068
 // Size: 72
 // EAX: pThe_path
-void EncodeAllFilesInDirectory(char *pThe_path) {
+void EncodeAllFilesInDirectory(char* pThe_path) {
     char s[256];
 }
 
 // Offset: 15140
 // Size: 89
 // EAX: pF
-void SkipNLines(FILE *pF) {
+void SkipNLines(FILE* pF) {
     int i;
     int count;
     char s[256];
@@ -1002,7 +1063,7 @@ void SkipNLines(FILE *pF) {
 // Size: 118
 // EAX: p1
 // EDX: p2
-int DRStricmp(char *p1, char *p2) {
+int DRStricmp(char* p1, char* p2) {
     int val;
 }
 
@@ -1010,10 +1071,10 @@ int DRStricmp(char *p1, char *p2) {
 // Size: 559
 // EAX: pArray
 // EDX: pCount
-void GlorifyMaterial(br_material **pArray, int pCount) {
+void GlorifyMaterial(br_material** pArray, int pCount) {
     int i;
     int c;
-    br_pixelmap *big_tile;
+    br_pixelmap* big_tile;
     tException_list e;
 }
 
@@ -1021,32 +1082,32 @@ void GlorifyMaterial(br_material **pArray, int pCount) {
 // Size: 178
 // EAX: pArray
 // EDX: pN
-void WhitenVertexRGB(br_model **pArray, int pN) {
+void WhitenVertexRGB(br_model** pArray, int pN) {
     int m;
     int v;
-    br_vertex *vertex;
+    br_vertex* vertex;
 }
 
 // Offset: 16092
 // Size: 239
 // EAX: pPalette
-void NobbleNonzeroBlacks(br_pixelmap *pPalette) {
+void NobbleNonzeroBlacks(br_pixelmap* pPalette) {
     tU32 red;
     tU32 green;
     tU32 blue;
     tU32 value;
-    tU32 *palette_entry;
+    tU32* palette_entry;
     tU32 frobbed;
 }
 
 // Offset: 16332
 // Size: 55
 // EAX: pThe_path
-int PDCheckDriveExists(char *pThe_path) {
+int PDCheckDriveExists(char* pThe_path) {
 
     // Added: force unix dir separator for now >>
-    char *rep = pThe_path;
-    while((rep = strchr(rep, '\\')) != NULL) {
+    char* rep = pThe_path;
+    while ((rep = strchr(rep, '\\')) != NULL) {
         *rep++ = '/';
     }
     // <<
@@ -1060,28 +1121,28 @@ int PDCheckDriveExists(char *pThe_path) {
 // Offset: 16388
 // Size: 102
 // EAX: pPrims
-int OpacityInPrims(br_token_value *pPrims) {
+int OpacityInPrims(br_token_value* pPrims) {
 }
 
 // Offset: 16492
 // Size: 97
 // EAX: pMaterial
-int AlreadyBlended(br_material *pMaterial) {
+int AlreadyBlended(br_material* pMaterial) {
 }
 
 // Offset: 16592
 // Size: 148
 // EAX: pMaterial
 // EDX: pPercent
-void BlendifyMaterialTablishly(br_material *pMaterial, int pPercent) {
-    char *s;
+void BlendifyMaterialTablishly(br_material* pMaterial, int pPercent) {
+    char* s;
 }
 
 // Offset: 16740
 // Size: 110
 // EAX: pMaterial
 // EDX: pPercent
-void BlendifyMaterialPrimitively(br_material *pMaterial, int pPercent) {
+void BlendifyMaterialPrimitively(br_material* pMaterial, int pPercent) {
     static br_token_value alpha25[3];
     static br_token_value alpha50[3];
     static br_token_value alpha75[3];
@@ -1091,6 +1152,5 @@ void BlendifyMaterialPrimitively(br_material *pMaterial, int pPercent) {
 // Size: 73
 // EAX: pMaterial
 // EDX: pPercent
-void BlendifyMaterial(br_material *pMaterial, int pPercent) {
+void BlendifyMaterial(br_material* pMaterial, int pPercent) {
 }
-

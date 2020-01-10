@@ -4,28 +4,47 @@
 #include <unistd.h>
 
 #include "common/globvars.h"
+#include "common/init.h"
 #include "common/loading.h"
-
+#include "common/newgame.h"
 
 void test_loading_GetCDPathFromPathsTxtFile() {
     int result;
     tPath_name cd_path;
 
-    unlink("/tmp/PATHS.TXT");
-
-    // should return false, path does not exist
-    result = GetCDPathFromPathsTxtFile(cd_path);
-    TEST_ASSERT_EQUAL_INT(0, result);
-
-    FILE *file = fopen("/tmp/PATHS.TXT","wt");
-    fprintf(file,"test_cd_path\r\n");
-    fclose(file);
-
     result = GetCDPathFromPathsTxtFile(cd_path);
     TEST_ASSERT_EQUAL_INT(1, result);
-    TEST_ASSERT_EQUAL_STRING("test_cd_path", cd_path);
+    TEST_ASSERT_EQUAL_STRING(".\\DATA\\MINICD", cd_path);
+}
+
+void test_loading_OldDRfopen() {
+    FILE* f;
+
+    f = OldDRfopen("DATA/i-dont-exist", "rt");
+    TEST_ASSERT_NULL(f);
+
+    f = OldDRfopen("DATA/GENERAL.TXT", "rt");
+    TEST_ASSERT_NOT_NULL(f);
+}
+
+void test_loading_LoadGeneralParameters() {
+
+    LoadGeneralParameters();
+    TEST_ASSERT_EQUAL_FLOAT(0.02f, gCamera_hither);
+    TEST_ASSERT_EQUAL_INT(7500, gInitial_credits[0]);
+    TEST_ASSERT_EQUAL_INT(5000, gInitial_credits[1]);
+    TEST_ASSERT_EQUAL_INT(3000, gInitial_credits[2]);
+    TEST_ASSERT_EQUAL_STRING("BLKEAGLE.TXT", gBasic_car_names[0]);
+    TEST_ASSERT_EQUAL_FLOAT(0.2f, gDefault_default_water_spec_vol.gravity_multiplier);
+    TEST_ASSERT_EQUAL_FLOAT(50.0f, gDefault_default_water_spec_vol.viscosity_multiplier);
+
+    TEST_ASSERT_EQUAL_INT(0, gInitial_net_credits[0]);
+    TEST_ASSERT_EQUAL_INT(2000, gInitial_net_credits[1]);
+    TEST_ASSERT_EQUAL_INT(1, gGravity_multiplier);
 }
 
 void test_loading_suite() {
     RUN_TEST(test_loading_GetCDPathFromPathsTxtFile);
+    RUN_TEST(test_loading_OldDRfopen);
+    RUN_TEST(test_loading_LoadGeneralParameters);
 }

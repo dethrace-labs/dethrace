@@ -1,8 +1,31 @@
 #ifndef _NEWGAME_H_
 #define _NEWGAME_H_
 
-#include "dr_types.h"
 #include "br_types.h"
+#include "dr_types.h"
+
+extern char* gBasic_car_names[2];
+extern tNet_game_options gNet_settings[8];
+extern tRadio_bastards gRadio_bastards[11];
+extern tJoinable_game gGames_to_join[6];
+extern tNet_game_options* gOptions;
+extern int gNet_target[7];
+extern int gLast_graph_sel;
+extern tInterface_spec* gThe_interface_spec;
+extern tNet_sequence_type gNet_race_sequence;
+extern tNet_game_type gLast_game_type;
+extern int gCurrent_net_game_count;
+extern tU32 gAnne_flic_data_length;
+extern int gShifted_default_yet;
+extern int gNet_storage_allocated;
+extern tU8* gFrank_flic_data;
+extern char* gNet_name;
+extern tU32 gFrank_flic_data_length;
+extern tU8* gAnne_flic_data;
+extern int gLast_net_choose_box;
+extern int gCurrent_game_selection;
+extern int gRace_index;
+extern int gRadio_selected;
 
 // Offset: 0
 // Size: 149
@@ -22,7 +45,7 @@ void FrankAnneStart2();
 // EDX: pCurrent_choice
 // EBX: pString
 // ECX: pMax_length
-void GetPlayerName(int pStarting_to_type, int pCurrent_choice, char *pString, int *pMax_length);
+void GetPlayerName(int pStarting_to_type, int pCurrent_choice, char* pString, int* pMax_length);
 
 // Offset: 688
 // Size: 203
@@ -54,13 +77,13 @@ int DoOnePlayerStart();
 // Size: 263
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int NewNetGameUp(int *pCurrent_choice, int *pCurrent_mode);
+int NewNetGameUp(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 1832
 // Size: 263
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int NewNetGameDown(int *pCurrent_choice, int *pCurrent_mode);
+int NewNetGameDown(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 2096
 // Size: 70
@@ -73,7 +96,7 @@ void DisposeJoinableGame(int pIndex);
 // EDX: pY_index
 // EBX: pFont_index
 // ECX: pText
-void DrawAnItem(int pX, int pY_index, int pFont_index, char *pText);
+void DrawAnItem(int pX, int pY_index, int pFont_index, char* pText);
 
 // Offset: 2292
 // Size: 119
@@ -99,7 +122,7 @@ void DisposeJoinList(int pExemption);
 // Offset: 4420
 // Size: 227
 // EAX: pGame
-void AddToJoinList(tNet_game_details *pGame);
+void AddToJoinList(tNet_game_details* pGame);
 
 // Offset: 4648
 // Size: 111
@@ -115,7 +138,7 @@ void NewNetStart2();
 // EDX: pCurrent_choice
 // EBX: pString
 // ECX: pMax_length
-void NewNetGetName(int pStarting_to_type, int pCurrent_choice, char *pString, int *pMax_length);
+void NewNetGetName(int pStarting_to_type, int pCurrent_choice, char* pString, int* pMax_length);
 
 // Offset: 4888
 // Size: 72
@@ -129,22 +152,22 @@ int NewNetDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscap
 // Size: 72
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int NewNetGoAhead(int *pCurrent_choice, int *pCurrent_mode);
+int NewNetGoAhead(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 5032
 // Size: 287
 // EAX: pGame_to_join
-tJoin_or_host_result JoinOrHostGame(tNet_game_details **pGame_to_join);
+tJoin_or_host_result JoinOrHostGame(tNet_game_details** pGame_to_join);
 
 // Offset: 5320
 // Size: 223
 // EAX: pGame_options
-void GetNetOptions(tNet_game_options *pGame_options);
+void GetNetOptions(tNet_game_options* pGame_options);
 
 // Offset: 5544
 // Size: 234
 // EAX: pGame_options
-void SetNetOptions(tNet_game_options *pGame_options);
+void SetNetOptions(tNet_game_options* pGame_options);
 
 // Offset: 5780
 // Size: 72
@@ -209,25 +232,25 @@ void NetCheckboxChanged(int pIndex);
 // Size: 153
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int NetOptLeft(int *pCurrent_choice, int *pCurrent_mode);
+int NetOptLeft(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 6992
 // Size: 157
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int NetOptRight(int *pCurrent_choice, int *pCurrent_mode);
+int NetOptRight(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 7152
 // Size: 148
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int NetOptUp(int *pCurrent_choice, int *pCurrent_mode);
+int NetOptUp(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 7300
 // Size: 148
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int NetOptDown(int *pCurrent_choice, int *pCurrent_mode);
+int NetOptDown(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 7448
 // Size: 213
@@ -235,7 +258,7 @@ int NetOptDown(int *pCurrent_choice, int *pCurrent_mode);
 // EDX: pCurrent_mode
 // EBX: pX_offset
 // ECX: pY_offset
-int NetRadioClick(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_offset);
+int NetRadioClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset);
 
 // Offset: 7664
 // Size: 142
@@ -249,7 +272,7 @@ void DefaultNetSettings();
 // Size: 98
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int NetOptGoAhead(int *pCurrent_choice, int *pCurrent_mode);
+int NetOptGoAhead(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 8064
 // Size: 202
@@ -276,13 +299,13 @@ void DrawNetOptBox(int pCurrent_choice, int pCurrent_mode);
 // Offset: 8448
 // Size: 111
 // EAX: pGame_options
-void DoNetOptions(tNet_game_options *pGame_options);
+void DoNetOptions(tNet_game_options* pGame_options);
 
 // Offset: 8560
 // Size: 190
 // EAX: pGame_type
 // EDX: pGame_options
-void SetOptions(tNet_game_type pGame_type, tNet_game_options *pGame_options);
+void SetOptions(tNet_game_type pGame_type, tNet_game_options* pGame_options);
 
 // Offset: 8992
 // Size: 44
@@ -292,7 +315,7 @@ void DrawNetChooseInitial();
 // Size: 250
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int NetChooseGoAhead(int *pCurrent_choice, int *pCurrent_mode);
+int NetChooseGoAhead(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 9288
 // Size: 182
@@ -320,42 +343,42 @@ void DrawNetChoose(int pCurrent_choice, int pCurrent_mode);
 // Size: 61
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int NetChooseLR(int *pCurrent_choice, int *pCurrent_mode);
+int NetChooseLR(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 10356
 // Size: 190
 // EAX: pGame_type
 // EDX: pGame_options
-void SetGameTarget(tNet_game_type *pGame_type, tNet_game_options *pGame_options);
+void SetGameTarget(tNet_game_type* pGame_type, tNet_game_options* pGame_options);
 
 // Offset: 10548
 // Size: 383
 // EAX: pGame_type
 // EDX: pGame_options
 // EBX: pRace_index
-int NetGameChoices(tNet_game_type *pGame_type, tNet_game_options *pGame_options, int *pRace_index);
+int NetGameChoices(tNet_game_type* pGame_type, tNet_game_options* pGame_options, int* pRace_index);
 
 // Offset: 10932
 // Size: 95
 // EAX: pGame_type
 // EDX: pGame_options
 // EBX: pRace_index
-void ReadNetGameChoices(tNet_game_type *pGame_type, tNet_game_options *pGame_options, int *pRace_index);
+void ReadNetGameChoices(tNet_game_type* pGame_type, tNet_game_options* pGame_options, int* pRace_index);
 
 // Offset: 11028
 // Size: 56
 // EAX: pRank
-int ChooseStartRace(int *pRank);
+int ChooseStartRace(int* pRank);
 
 // Offset: 11084
 // Size: 63
 // EAX: pNet_game
-void SetUpOtherNetThings(tNet_game_details *pNet_game);
+void SetUpOtherNetThings(tNet_game_details* pNet_game);
 
 // Offset: 11148
 // Size: 97
 // EAX: pNet_game
-void RequestCarDetails(tNet_game_details *pNet_game);
+void RequestCarDetails(tNet_game_details* pNet_game);
 
 // Offset: 11248
 // Size: 181
@@ -364,12 +387,12 @@ int PickARandomCar();
 // Offset: 11432
 // Size: 54
 // EAX: pNet_game
-void PollCarDetails(tNet_game_details *pNet_game);
+void PollCarDetails(tNet_game_details* pNet_game);
 
 // Offset: 11488
 // Size: 278
 // EAX: pOptions
-void SetNetAvailability(tNet_game_options *pOptions);
+void SetNetAvailability(tNet_game_options* pOptions);
 
 // Offset: 11768
 // Size: 396
@@ -377,7 +400,7 @@ void SetNetAvailability(tNet_game_options *pOptions);
 // EDX: pOptions
 // EBX: pCar_index
 // ECX: pIm_the_host_so_fuck_off
-int ChooseNetCar(tNet_game_details *pNet_game, tNet_game_options *pOptions, int *pCar_index, int pIm_the_host_so_fuck_off);
+int ChooseNetCar(tNet_game_details* pNet_game, tNet_game_options* pOptions, int* pCar_index, int pIm_the_host_so_fuck_off);
 
 // Offset: 12164
 // Size: 115

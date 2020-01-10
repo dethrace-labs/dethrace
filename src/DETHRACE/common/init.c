@@ -2,26 +2,26 @@
 
 #include <time.h>
 
-#include "pc-dos/dossys.h"
-#include "common/globvars.h"
-#include "common/errors.h"
-#include "common/drmem.h"
-#include "common/graphics.h"
+#include "common/depth.h"
+#include "common/displays.h"
 #include "common/drdebug.h"
+#include "common/drmem.h"
+#include "common/errors.h"
+#include "common/flicplay.h"
+#include "common/globvars.h"
+#include "common/grafdata.h"
+#include "common/graphics.h"
 #include "common/loading.h"
 #include "common/netgame.h"
-#include "common/replay.h"
-#include "common/grafdata.h"
-#include "common/flicplay.h"
-#include "common/sound.h"
-#include "common/displays.h"
+#include "common/oil.h"
+#include "common/pedestrn.h"
 #include "common/powerup.h"
 #include "common/raycast.h"
-#include "common/depth.h"
-#include "common/world.h"
-#include "common/oil.h"
+#include "common/replay.h"
 #include "common/skidmark.h"
-#include "common/pedestrn.h"
+#include "common/sound.h"
+#include "common/world.h"
+#include "pc-dos/dossys.h"
 
 #include "brender.h"
 
@@ -35,7 +35,7 @@ int gRender_indent;
 int gCredits_per_rank[3];
 int gInitial_credits[3];
 int gNet_mode_of_last_game;
-br_material *gDefault_track_material;
+br_material* gDefault_track_material;
 
 // Offset: 0
 // Size: 115
@@ -80,7 +80,7 @@ void InstallFindFailedHooks() {
 // Offset: 1992
 // Size: 158
 void AllocateStandardLamp() {
-    br_actor *lamp;
+    br_actor* lamp;
     int i;
 }
 
@@ -123,82 +123,83 @@ void Init2DStuff() {
 // Size: 671
 // EAX: pArgc
 // EDX: pArgv
-void InitialiseApplication(int pArgc, char **pArgv) {
-  gProgram_state.sausage_eater_mode = gSausage_override;
-  DrDebugLog(gSausage_override, *pArgv);
-  if (gAustere_override || PDDoWeLeadAnAustereExistance() != 0) {
-    gAusterity_mode = 1;
-  }
-  
-  srand(time(NULL));
-  BrV1dbBeginWrapper_Float();
-  CreateStainlessClasses();
-  InitWobbleStuff();
-  LoadGeneralParameters();
-  DefaultNetName();
-  strcpy(gProgram_state.player_name[0], "MAX DAMAGE"); 
-  strcpy(gProgram_state.player_name[1], "DIE ANNA"); 
-  
-  RestoreOptions();
-  LoadKeyMapping();
-  if (!PDInitScreenVars(pArgc, pArgv)) {
-    FatalError(0);
-  }
-  CalcGrafDataIndex();
-  InitializeBRenderEnvironment();
-  InitDRFonts();
-  InitBRFonts();
-  LoadMiscStrings();
-  LoadInRegistees();
-  FinishLoadingGeneral();
-  InitializePalettes();
-  AustereWarning();
-  LoadInterfaceStrings();
-  InitializeActionReplay();
-  FlicPaletteAllocate();
-  InitInterfaceLoadState();
-  InitTransientBitmaps();
-  InitSound();
-  InitHeadups();
-  gDefault_track_material = BrMaterialAllocate("gDefault_track_material");
-  //TODO:
-  //BYTE2(gDefault_track_material->map_transform.m[2][1]) = -29;
-  //BYTE3(gDefault_track_material->map_transform.m[2][1]) = 1;
-  BrMaterialAdd(gDefault_track_material);
-  InitShadow();
-  InitFlics();
-  AllocateStandardLamp();
-  InitAmbience();
-  LoadOpponents();
-  LoadPowerups();
-  LoadRaces(gRace_list, &gNumber_of_races, -1);
-  RevertPalette();
-  InitRayCasting();
-  InitDepthEffects();
-  InitialiseStorageSpace(&gOur_car_storage_space, 40, 2, 40, 30);
-  InitialiseStorageSpace(&gTheir_cars_storage_space, 300, 50, 500, 200);
-  InitialiseStorageSpace(&gPedestrians_storage_space, 500, 10, 0, 0);
-  InitialiseStorageSpace(&gTrack_storage_space, 400, 50, 400, 1000);
-  InitOilSpills();
-  if (gAustere_time) {
-      while (PDGetTotalTime() - gAustere_time < 2000) {
-      }
-  }
-  ClearEntireScreen();
-  InitSkids();
-  InitPeds();
-  gProgram_state.cars_available[42] = 0;
-  gCD_is_in_drive = TestForOriginalCarmaCDinDrive();
-  SwitchToLoresMode();
-  DrDebugLog(0, "AFTER APPLICATION INITIALISATION");
+void InitialiseApplication(int pArgc, char** pArgv) {
+    gProgram_state.sausage_eater_mode = gSausage_override;
+    DrDebugLog(gSausage_override, *pArgv);
+    if (gAustere_override || PDDoWeLeadAnAustereExistance() != 0) {
+        gAusterity_mode = 1;
+    }
+
+    srand(time(NULL));
+    BrV1dbBeginWrapper_Float();
+    CreateStainlessClasses();
+    InitWobbleStuff();
+    LoadGeneralParameters();
+    DefaultNetName();
+    strcpy(gProgram_state.player_name[0], "MAX DAMAGE");
+    strcpy(gProgram_state.player_name[1], "DIE ANNA");
+
+    RestoreOptions();
+    LoadKeyMapping();
+    if (!PDInitScreenVars(pArgc, pArgv)) {
+        FatalError(0);
+    }
+    CalcGrafDataIndex();
+    InitializeBRenderEnvironment();
+    InitDRFonts();
+    InitBRFonts();
+    LoadMiscStrings();
+    LoadInRegistees();
+    FinishLoadingGeneral();
+    InitializePalettes();
+    AustereWarning();
+    LoadInterfaceStrings();
+    InitializeActionReplay();
+    FlicPaletteAllocate();
+    InitInterfaceLoadState();
+    InitTransientBitmaps();
+    InitSound();
+    InitHeadups();
+    gDefault_track_material = BrMaterialAllocate("gDefault_track_material");
+    //TODO:
+    //BYTE2(gDefault_track_material->map_transform.m[2][1]) = -29;
+    //BYTE3(gDefault_track_material->map_transform.m[2][1]) = 1;
+    BrMaterialAdd(gDefault_track_material);
+    InitShadow();
+    InitFlics();
+    AllocateStandardLamp();
+    InitAmbience();
+    LoadOpponents();
+    LoadPowerups();
+    LoadRaces(gRace_list, &gNumber_of_races, -1);
+    RevertPalette();
+    InitRayCasting();
+    InitDepthEffects();
+    InitialiseStorageSpace(&gOur_car_storage_space, 40, 2, 40, 30);
+    InitialiseStorageSpace(&gTheir_cars_storage_space, 300, 50, 500, 200);
+    InitialiseStorageSpace(&gPedestrians_storage_space, 500, 10, 0, 0);
+    InitialiseStorageSpace(&gTrack_storage_space, 400, 50, 400, 1000);
+    InitOilSpills();
+    if (gAustere_time) {
+        while (PDGetTotalTime() - gAustere_time < 2000) {
+        }
+    }
+    ClearEntireScreen();
+    InitSkids();
+    InitPeds();
+    gProgram_state.cars_available[42] = 0;
+    gCD_is_in_drive = TestForOriginalCarmaCDinDrive();
+    SwitchToLoresMode();
+    DrDebugLog(0, "AFTER APPLICATION INITIALISATION");
 }
 
 // Offset: 6004
 // Size: 64
 // EAX: pArgc
 // EDX: pArgv
-void InitialiseDeathRace(int pArgc, char **pArgv) {
+void InitialiseDeathRace(int pArgc, char** pArgv) {
     PDInitialiseSystem();
+
     InitialiseApplication(pArgc, pArgv);
     //dword_112DF8 = 1;  // never checked by game
 }
@@ -228,7 +229,7 @@ void DisposeTrack() {
 // Offset: 6788
 // Size: 97
 // EAX: pMaterial
-void CopyMaterialColourFromIndex(br_material *pMaterial) {
+void CopyMaterialColourFromIndex(br_material* pMaterial) {
 }
 
 // Offset: 6888
@@ -251,4 +252,3 @@ int GetScreenSize() {
 // EAX: pNew_size
 void SetScreenSize(int pNew_size) {
 }
-

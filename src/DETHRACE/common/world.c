@@ -1,20 +1,25 @@
 #include "world.h"
 
-br_actor *gActor_array[500];
-float *gGroove_funk_bindings[960];
-br_actor *gDelete_list[500];
-br_actor *gLight_array[50];
-br_model *gAdditional_models[1000];
-br_actor *gSpec_vol_actors[100];
-char *gDepth_effect_names[2];
-char *gFunk_nature_names[4];
-char *gGroove_object_names[4];
-char *gGroove_path_names[2];
-char *gGroove_nature_names[2];
-char *gFunk_anim_names[2];
-char *gFunk_move_names[6];
+#include "brender.h"
+#include "loading.h"
+
+#include <string.h>
+
+br_actor* gActor_array[500];
+float* gGroove_funk_bindings[960];
+br_actor* gDelete_list[500];
+br_actor* gLight_array[50];
+br_model* gAdditional_models[1000];
+br_actor* gSpec_vol_actors[100];
+char* gDepth_effect_names[2];
+char* gFunk_nature_names[4];
+char* gGroove_object_names[4];
+char* gGroove_path_names[2];
+char* gGroove_nature_names[2];
+char* gFunk_anim_names[2];
+char* gFunk_move_names[6];
 tPath_name gAdditional_actor_path;
-char *gTime_mode_names[2];
+char* gTime_mode_names[2];
 tPath_name gAdditional_model_path;
 tU32 gPrevious_groove_times[2];
 int gRace_file_version;
@@ -23,28 +28,28 @@ tWall_texturing_level gWall_texturing_level;
 int gNumber_of_additional_models;
 int gNumber_of_actors;
 float gTemp;
-br_actor *gLast_actor;
-br_actor *gKnown_actor;
-br_actor *gAdditional_actors;
-br_actor *gGroove_by_proxy_actor;
+br_actor* gLast_actor;
+br_actor* gKnown_actor;
+br_actor* gAdditional_actors;
+br_actor* gGroove_by_proxy_actor;
 int gRendering_accessories;
 tScale_mode gCurrent_scale_mode;
 int gNumber_of_lights;
 tRoad_texturing_level gRoad_texturing_level;
 int gDelete_count;
 br_scalar gNearest_distance;
-br_actor *gNearest_actor;
-br_actor *gStandard_lamp;
+br_actor* gNearest_actor;
+br_actor* gStandard_lamp;
 tRotate_mode gCurrent_rotate_mode;
 tCar_texturing_level gCar_texturing_level;
 br_scalar gSight_distance_squared;
-char *gLollipop_names[3];
-char *gAxis_names[3];
+char* gLollipop_names[3];
+char* gAxis_names[3];
 int gGroovidelics_array_size;
-tGroovidelic_spec *gGroovidelics_array;
+tGroovidelic_spec* gGroovidelics_array;
 int gSpec_vol_mode;
-char *gFunk_type_names[5];
-tFunkotronic_spec *gFunkotronics_array;
+char* gFunk_type_names[5];
+tFunkotronic_spec* gFunkotronics_array;
 int gFunkotronics_array_size;
 
 // Offset: 0
@@ -60,24 +65,24 @@ void SetSightDistance(br_scalar pYon) {
 // Offset: 152
 // Size: 121
 // EAX: pThe_name
-br_actor* FindActorInArray(char *pThe_name) {
+br_actor* FindActorInArray(char* pThe_name) {
     int i;
 }
 
 // Offset: 276
 // Size: 121
 // EAX: pThe_name
-br_actor* FindLightInArray(char *pThe_name) {
+br_actor* FindLightInArray(char* pThe_name) {
     int i;
 }
 
 // Offset: 400
 // Size: 223
 // EAX: pSource_actor
-br_actor* CloneActor(br_actor *pSource_actor) {
-    br_actor *new_actor;
-    br_actor *child_actor;
-    br_actor *new_child_actor;
+br_actor* CloneActor(br_actor* pSource_actor) {
+    br_actor* new_actor;
+    br_actor* child_actor;
+    br_actor* new_child_actor;
 }
 
 // Offset: 624
@@ -86,19 +91,19 @@ br_actor* CloneActor(br_actor *pSource_actor) {
 // EDX: pMax_pixelmaps
 // EBX: pMax_shade_tables
 // ECX: pMax_materials
-void InitialiseStorageSpace(tBrender_storage *pStorage_space, int pMax_pixelmaps, int pMax_shade_tables, int pMax_materials, int pMax_models) {
+void InitialiseStorageSpace(tBrender_storage* pStorage_space, int pMax_pixelmaps, int pMax_shade_tables, int pMax_materials, int pMax_models) {
 }
 
 // Offset: 872
 // Size: 107
 // EAX: pStorage_space
-void DisposeStorageSpace(tBrender_storage *pStorage_space) {
+void DisposeStorageSpace(tBrender_storage* pStorage_space) {
 }
 
 // Offset: 980
 // Size: 463
 // EAX: pStorage_space
-void ClearOutStorageSpace(tBrender_storage *pStorage_space) {
+void ClearOutStorageSpace(tBrender_storage* pStorage_space) {
     int i;
 }
 
@@ -106,7 +111,7 @@ void ClearOutStorageSpace(tBrender_storage *pStorage_space) {
 // Size: 232
 // EAX: pStorage_space
 // EDX: pThe_pm
-tAdd_to_storage_result AddPixelmapToStorage(tBrender_storage *pStorage_space, br_pixelmap **pThe_pm) {
+tAdd_to_storage_result AddPixelmapToStorage(tBrender_storage* pStorage_space, br_pixelmap** pThe_pm) {
     int i;
 }
 
@@ -114,7 +119,7 @@ tAdd_to_storage_result AddPixelmapToStorage(tBrender_storage *pStorage_space, br
 // Size: 211
 // EAX: pStorage_space
 // EDX: pThe_st
-tAdd_to_storage_result AddShadeTableToStorage(tBrender_storage *pStorage_space, br_pixelmap *pThe_st) {
+tAdd_to_storage_result AddShadeTableToStorage(tBrender_storage* pStorage_space, br_pixelmap* pThe_st) {
     int i;
 }
 
@@ -122,7 +127,7 @@ tAdd_to_storage_result AddShadeTableToStorage(tBrender_storage *pStorage_space, 
 // Size: 234
 // EAX: pStorage_space
 // EDX: pThe_mat
-tAdd_to_storage_result AddMaterialToStorage(tBrender_storage *pStorage_space, br_material *pThe_mat) {
+tAdd_to_storage_result AddMaterialToStorage(tBrender_storage* pStorage_space, br_material* pThe_mat) {
     int i;
 }
 
@@ -130,7 +135,7 @@ tAdd_to_storage_result AddMaterialToStorage(tBrender_storage *pStorage_space, br
 // Size: 231
 // EAX: pStorage_space
 // EDX: pThe_mod
-tAdd_to_storage_result AddModelToStorage(tBrender_storage *pStorage_space, br_model *pThe_mod) {
+tAdd_to_storage_result AddModelToStorage(tBrender_storage* pStorage_space, br_model* pThe_mod) {
     int i;
 }
 
@@ -139,31 +144,31 @@ tAdd_to_storage_result AddModelToStorage(tBrender_storage *pStorage_space, br_mo
 // EAX: pStorage_space
 // EDX: pF
 // EBX: pCount
-int LoadNPixelmaps(tBrender_storage *pStorage_space, FILE *pF, int pCount) {
+int LoadNPixelmaps(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     tPath_name the_path;
     int i;
     int j;
     int new_ones;
     int total;
     char s[256];
-    char *str;
-    br_pixelmap *temp_array[200];
+    char* str;
+    br_pixelmap* temp_array[200];
 }
 
 // Offset: 2864
 // Size: 195
 // EAX: pStorage_space
 // EDX: pName
-br_pixelmap* LoadSinglePixelmap(tBrender_storage *pStorage_space, char *pName) {
-    br_pixelmap *temp;
+br_pixelmap* LoadSinglePixelmap(tBrender_storage* pStorage_space, char* pName) {
+    br_pixelmap* temp;
 }
 
 // Offset: 3060
 // Size: 195
 // EAX: pStorage_space
 // EDX: pName
-br_material* LoadSingleMaterial(tBrender_storage *pStorage_space, char *pName) {
-    br_material *temp;
+br_material* LoadSingleMaterial(tBrender_storage* pStorage_space, char* pName) {
+    br_material* temp;
 }
 
 // Offset: 3256
@@ -171,23 +176,23 @@ br_material* LoadSingleMaterial(tBrender_storage *pStorage_space, char *pName) {
 // EAX: pStorage_space
 // EDX: pF
 // EBX: pCount
-int LoadNShadeTables(tBrender_storage *pStorage_space, FILE *pF, int pCount) {
+int LoadNShadeTables(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     tPath_name the_path;
     int i;
     int j;
     int new_ones;
     int total;
     char s[256];
-    char *str;
-    br_pixelmap *temp_array[50];
+    char* str;
+    br_pixelmap* temp_array[50];
 }
 
 // Offset: 3652
 // Size: 195
 // EAX: pStorage_space
 // EDX: pName
-br_pixelmap* LoadSingleShadeTable(tBrender_storage *pStorage_space, char *pName) {
-    br_pixelmap *temp;
+br_pixelmap* LoadSingleShadeTable(tBrender_storage* pStorage_space, char* pName) {
+    br_pixelmap* temp;
 }
 
 // Offset: 3848
@@ -195,15 +200,15 @@ br_pixelmap* LoadSingleShadeTable(tBrender_storage *pStorage_space, char *pName)
 // EAX: pStorage_space
 // EDX: pF
 // EBX: pCount
-int LoadNMaterials(tBrender_storage *pStorage_space, FILE *pF, int pCount) {
+int LoadNMaterials(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     tPath_name the_path;
     int i;
     int j;
     int new_ones;
     int total;
     char s[256];
-    char *str;
-    br_material *temp_array[200];
+    char* str;
+    br_material* temp_array[200];
 }
 
 // Offset: 4264
@@ -211,39 +216,39 @@ int LoadNMaterials(tBrender_storage *pStorage_space, FILE *pF, int pCount) {
 // EAX: pStorage_space
 // EDX: pF
 // EBX: pCount
-int LoadNModels(tBrender_storage *pStorage_space, FILE *pF, int pCount) {
+int LoadNModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     tPath_name the_path;
     int i;
     int j;
     int new_ones;
     int total;
     char s[256];
-    char *str;
-    br_model *temp_array[2000];
-    v11model *prepared;
+    char* str;
+    br_model* temp_array[2000];
+    v11model* prepared;
     int group;
 }
 
 // Offset: 4716
 // Size: 103
 // EAX: pM
-void DodgyModelUpdate(br_model *pM) {
+void DodgyModelUpdate(br_model* pM) {
 }
 
 // Offset: 4820
 // Size: 197
 // EAX: pOld
 // EDX: pSuffix
-br_material* SuffixedMaterial(br_material *pOld, char *pSuffix) {
-    br_material *new_mat;
-    char *new_id;
+br_material* SuffixedMaterial(br_material* pOld, char* pSuffix) {
+    br_material* new_mat;
+    char* new_id;
 }
 
 // Offset: 5020
 // Size: 656
 // EAX: pModel
 // EDX: pFace
-int FaceIsRoad(br_model *pModel, tU16 pFace) {
+int FaceIsRoad(br_model* pModel, tU16 pFace) {
     br_vector3 v0;
     br_vector3 v1;
     br_vector3 cross;
@@ -253,47 +258,47 @@ int FaceIsRoad(br_model *pModel, tU16 pFace) {
 // Size: 161
 // EAX: pModel
 // EDX: pFace
-br_material* RoadPerspToUntex(br_model *pModel, tU16 pFace) {
-    br_material *old_mat;
-    br_material *new_mat;
+br_material* RoadPerspToUntex(br_model* pModel, tU16 pFace) {
+    br_material* old_mat;
+    br_material* new_mat;
 }
 
 // Offset: 5840
 // Size: 169
 // EAX: pModel
 // EDX: pFace
-br_material* WallPerspToLinear(br_model *pModel, tU16 pFace) {
-    br_material *old_mat;
-    br_material *new_mat;
+br_material* WallPerspToLinear(br_model* pModel, tU16 pFace) {
+    br_material* old_mat;
+    br_material* new_mat;
 }
 
 // Offset: 6012
 // Size: 188
 // EAX: pModel
 // EDX: pFace
-br_material* WallPerspToUntex(br_model *pModel, tU16 pFace) {
-    br_material *old_mat;
-    br_material *new_mat;
+br_material* WallPerspToUntex(br_model* pModel, tU16 pFace) {
+    br_material* old_mat;
+    br_material* new_mat;
 }
 
 // Offset: 6200
 // Size: 260
 // EAX: pModel
 // EDX: pCallback
-void ProcessModelFaceMaterials2(br_model *pModel, tPMFM2CB pCallback) {
+void ProcessModelFaceMaterials2(br_model* pModel, tPMFM2CB pCallback) {
     tU16 f;
     tU16 group;
-    br_material *old_mat;
+    br_material* old_mat;
 }
 
 // Offset: 6460
 // Size: 173
 // EAX: pModel
 // EDX: pCallback
-void ProcessModelFaceMaterials(br_model *pModel, tPMFMCB pCallback) {
+void ProcessModelFaceMaterials(br_model* pModel, tPMFMCB pCallback) {
     tU16 f;
-    br_material *possible_mat;
-    br_material *new_mat;
+    br_material* possible_mat;
+    br_material* new_mat;
 }
 
 // Offset: 6636
@@ -301,7 +306,7 @@ void ProcessModelFaceMaterials(br_model *pModel, tPMFMCB pCallback) {
 // EAX: pStorage_space
 // EDX: pF
 // EBX: pCount
-int LoadNTrackModels(tBrender_storage *pStorage_space, FILE *pF, int pCount) {
+int LoadNTrackModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     tPath_name the_path;
     int i;
     int j;
@@ -309,91 +314,91 @@ int LoadNTrackModels(tBrender_storage *pStorage_space, FILE *pF, int pCount) {
     int total;
     int group;
     char s[256];
-    char *str;
-    br_model *temp_array[2000];
-    v11model *prepared;
+    char* str;
+    br_model* temp_array[2000];
+    v11model* prepared;
 }
 
 // Offset: 7192
 // Size: 107
 // EAX: pStorage_space
 // EDX: pF
-void LoadSomePixelmaps(tBrender_storage *pStorage_space, FILE *pF) {
+void LoadSomePixelmaps(tBrender_storage* pStorage_space, FILE* pF) {
     tPath_name the_path;
     int i;
     int j;
     int count;
     int new_ones;
     char s[256];
-    char *str;
-    br_pixelmap *temp_array[200];
+    char* str;
+    br_pixelmap* temp_array[200];
 }
 
 // Offset: 7300
 // Size: 107
 // EAX: pStorage_space
 // EDX: pF
-void LoadSomeShadeTables(tBrender_storage *pStorage_space, FILE *pF) {
+void LoadSomeShadeTables(tBrender_storage* pStorage_space, FILE* pF) {
     tPath_name the_path;
     int i;
     int j;
     int count;
     int new_ones;
     char s[256];
-    char *str;
-    br_pixelmap *temp_array[50];
+    char* str;
+    br_pixelmap* temp_array[50];
 }
 
 // Offset: 7408
 // Size: 107
 // EAX: pStorage_space
 // EDX: pF
-void LoadSomeMaterials(tBrender_storage *pStorage_space, FILE *pF) {
+void LoadSomeMaterials(tBrender_storage* pStorage_space, FILE* pF) {
     tPath_name the_path;
     int i;
     int j;
     int count;
     int new_ones;
     char s[256];
-    char *str;
-    br_material *temp_array[200];
+    char* str;
+    br_material* temp_array[200];
 }
 
 // Offset: 7516
 // Size: 107
 // EAX: pStorage_space
 // EDX: pF
-void LoadSomeModels(tBrender_storage *pStorage_space, FILE *pF) {
+void LoadSomeModels(tBrender_storage* pStorage_space, FILE* pF) {
     tPath_name the_path;
     int i;
     int j;
     int count;
     int new_ones;
     char s[256];
-    char *str;
-    br_model *temp_array[2000];
+    char* str;
+    br_model* temp_array[2000];
 }
 
 // Offset: 7624
 // Size: 107
 // EAX: pStorage_space
 // EDX: pF
-void LoadSomeTrackModels(tBrender_storage *pStorage_space, FILE *pF) {
+void LoadSomeTrackModels(tBrender_storage* pStorage_space, FILE* pF) {
     tPath_name the_path;
     int i;
     int j;
     int count;
     int new_ones;
     char s[256];
-    char *str;
-    br_model *temp_array[2000];
+    char* str;
+    br_model* temp_array[2000];
 }
 
 // Offset: 7732
 // Size: 87
 // EAX: pSlot_number
 // EDX: pPeriod_address
-void AddFunkGrooveBinding(int pSlot_number, float *pPeriod_address) {
+void AddFunkGrooveBinding(int pSlot_number, float* pPeriod_address) {
 }
 
 // Offset: 7820
@@ -413,7 +418,7 @@ float ControlBoundFunkGroovePlus(int pSlot_number, float pValue) {
 // EAX: pStart
 // EDX: pEnd
 // EBX: pDelta
-void ShiftBoundGrooveFunks(char *pStart, char *pEnd, int pDelta) {
+void ShiftBoundGrooveFunks(char* pStart, char* pEnd, int pDelta) {
     int i;
 }
 
@@ -428,19 +433,19 @@ tFunkotronic_spec* AddNewFunkotronic() {
 // EAX: pOwner
 void DisposeFunkotronics(int pOwner) {
     int i;
-    tFunkotronic_spec *the_funk;
+    tFunkotronic_spec* the_funk;
 }
 
 // Offset: 8788
 // Size: 76
 // EAX: pV
 // EDX: pThe_funk
-void AddProximityVertex(br_vector3 *pV, tFunkotronic_spec *pThe_funk) {
+void AddProximityVertex(br_vector3* pV, tFunkotronic_spec* pThe_funk) {
 }
 
 // Offset: 8864
 // Size: 65
-void AddProximityVertexXYZ(br_scalar pX, br_scalar pY, br_scalar pZ, tFunkotronic_spec *pThe_funk) {
+void AddProximityVertexXYZ(br_scalar pX, br_scalar pY, br_scalar pZ, tFunkotronic_spec* pThe_funk) {
     br_vector3 v;
 }
 
@@ -449,8 +454,8 @@ void AddProximityVertexXYZ(br_scalar pX, br_scalar pY, br_scalar pZ, tFunkotroni
 // EAX: pActor
 // EDX: pMat
 // EBX: pThe_funk
-br_uint_32 CalcProximities(br_actor *pActor, br_material *pMat, tFunkotronic_spec *pThe_funk) {
-    br_face *the_face;
+br_uint_32 CalcProximities(br_actor* pActor, br_material* pMat, tFunkotronic_spec* pThe_funk) {
+    br_face* the_face;
     int i;
 }
 
@@ -459,8 +464,8 @@ br_uint_32 CalcProximities(br_actor *pActor, br_material *pMat, tFunkotronic_spe
 // EAX: pActor
 // EDX: pMat
 // EBX: pThe_funk
-br_uint_32 AddProximities(br_actor *pActor, br_material *pMat, tFunkotronic_spec *pThe_funk) {
-    br_face *the_face;
+br_uint_32 AddProximities(br_actor* pActor, br_material* pMat, tFunkotronic_spec* pThe_funk) {
+    br_face* the_face;
     int i;
 }
 
@@ -469,7 +474,7 @@ br_uint_32 AddProximities(br_actor *pActor, br_material *pMat, tFunkotronic_spec
 // EAX: pVictim1
 // EDX: pVictim2
 // EBX: pCulprit
-void Adjust2FloatsForExceptions(float *pVictim1, float *pVictim2, br_pixelmap *pCulprit) {
+void Adjust2FloatsForExceptions(float* pVictim1, float* pVictim2, br_pixelmap* pCulprit) {
     tException_list e;
 }
 
@@ -478,13 +483,13 @@ void Adjust2FloatsForExceptions(float *pVictim1, float *pVictim2, br_pixelmap *p
 // EAX: pF
 // EDX: pOwner
 // EBX: pRef_offset
-void AddFunkotronics(FILE *pF, int pOwner, int pRef_offset) {
+void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
     char s[256];
-    char *str;
+    char* str;
     int first_time;
     int i;
     int j;
-    tFunkotronic_spec *the_funk;
+    tFunkotronic_spec* the_funk;
     float speed1;
     float speed2;
     float a_min;
@@ -493,8 +498,8 @@ void AddFunkotronics(FILE *pF, int pOwner, int pRef_offset) {
     float a_max;
     float d_max;
     float s_max;
-    void *the_pixels;
-    br_pixelmap *the_pixelmap;
+    void* the_pixels;
+    br_pixelmap* the_pixelmap;
 }
 
 // Offset: 13060
@@ -502,7 +507,7 @@ void AddFunkotronics(FILE *pF, int pOwner, int pRef_offset) {
 // EAX: pOwner
 void DisposeGroovidelics(int pOwner) {
     int i;
-    tGroovidelic_spec *the_groove;
+    tGroovidelic_spec* the_groove;
 }
 
 // Offset: 13180
@@ -517,13 +522,13 @@ tGroovidelic_spec* AddNewGroovidelic() {
 // EDX: pOwner
 // EBX: pParent_actor
 // ECX: pRef_offset
-void AddGroovidelics(FILE *pF, int pOwner, br_actor *pParent_actor, int pRef_offset, int pAllowed_to_be_absent) {
+void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_offset, int pAllowed_to_be_absent) {
     char s[256];
-    char *str;
+    char* str;
     int first_time;
     int i;
     int j;
-    tGroovidelic_spec *the_groove;
+    tGroovidelic_spec* the_groove;
 }
 
 // Offset: 16148
@@ -531,7 +536,7 @@ void AddGroovidelics(FILE *pF, int pOwner, br_actor *pParent_actor, int pRef_off
 // EAX: pOwner
 void KillGroovadelic(int pOwner) {
     int i;
-    tGroovidelic_spec *the_groove;
+    tGroovidelic_spec* the_groove;
 }
 
 // Offset: 16312
@@ -539,7 +544,7 @@ void KillGroovadelic(int pOwner) {
 // EAX: pOwner
 void KillFunkotronic(int pOwner) {
     int i;
-    tFunkotronic_spec *the_funk;
+    tFunkotronic_spec* the_funk;
 }
 
 // Offset: 16500
@@ -547,7 +552,7 @@ void KillFunkotronic(int pOwner) {
 // EAX: pActor
 // EDX: pMatrix
 // EBX: pArg
-br_uint_32 DeleteBastards(br_actor *pActor, br_matrix34 *pMatrix, void *pArg) {
+br_uint_32 DeleteBastards(br_actor* pActor, br_matrix34* pMatrix, void* pArg) {
     int i;
     int parent_already_doomed;
 }
@@ -562,7 +567,7 @@ void DeleteAnyZeroBastards() {
 // EAX: pActor
 // EDX: pMatrix
 // EBX: pArg
-br_uint_32 ApplyTransToModels(br_actor *pActor, br_matrix34 *pMatrix, void *pArg) {
+br_uint_32 ApplyTransToModels(br_actor* pActor, br_matrix34* pMatrix, void* pArg) {
     int i;
     br_vector3 temp_point;
 }
@@ -570,9 +575,9 @@ br_uint_32 ApplyTransToModels(br_actor *pActor, br_matrix34 *pMatrix, void *pArg
 // Offset: 17068
 // Size: 120
 // EAX: pActor
-int FindSpecVolIndex(br_actor *pActor) {
+int FindSpecVolIndex(br_actor* pActor) {
     int i;
-    tSpecial_volume *v;
+    tSpecial_volume* v;
 }
 
 // Offset: 17188
@@ -581,20 +586,20 @@ int FindSpecVolIndex(br_actor *pActor) {
 // EDX: pMat_1
 // EBX: pMat_2
 // ECX: pAxis_0
-void MungeMaterial(br_matrix34 *pMat, br_material *pMat_1, br_material *pMat_2, int pAxis_0, int pAxis_1) {
+void MungeMaterial(br_matrix34* pMat, br_material* pMat_1, br_material* pMat_2, int pAxis_0, int pAxis_1) {
 }
 
 // Offset: 17432
 // Size: 166
 // EAX: pActor
-void SetSpecVolMatSize(br_actor *pActor) {
-    br_model *model;
+void SetSpecVolMatSize(br_actor* pActor) {
+    br_model* model;
 }
 
 // Offset: 17600
 // Size: 115
 // EAX: pSpec
-void FindInverseAndWorldBox(tSpecial_volume *pSpec) {
+void FindInverseAndWorldBox(tSpecial_volume* pSpec) {
     br_bounds bnds;
 }
 
@@ -602,15 +607,15 @@ void FindInverseAndWorldBox(tSpecial_volume *pSpec) {
 // Size: 109
 void UpdateSpecVol() {
     int index;
-    tSpecial_volume *v;
+    tSpecial_volume* v;
 }
 
 // Offset: 17828
 // Size: 834
 void SaveSpecialVolumes() {
-    FILE *f;
+    FILE* f;
     int i;
-    tSpecial_volume *v;
+    tSpecial_volume* v;
 }
 
 // Offset: 18664
@@ -620,18 +625,18 @@ void SaveAdditionalStuff() {
 
 // Offset: 18804
 // Size: 110
-br_uint_32 ProcessMaterials(br_actor *pActor, tPMFM2CB pCallback) {
+br_uint_32 ProcessMaterials(br_actor* pActor, tPMFM2CB pCallback) {
 }
 
 // Offset: 18916
 // Size: 123
-br_uint_32 ProcessFaceMaterials2(br_actor *pActor, tPMFM2CB pCallback) {
+br_uint_32 ProcessFaceMaterials2(br_actor* pActor, tPMFM2CB pCallback) {
 }
 
 // Offset: 19040
 // Size: 91
 // EAX: pMaterial
-void ChangePerspToSubdivCB(br_material *pMaterial) {
+void ChangePerspToSubdivCB(br_material* pMaterial) {
 }
 
 // Offset: 19132
@@ -642,7 +647,7 @@ void ChangePerspToSubdiv() {
 // Offset: 19188
 // Size: 78
 // EAX: pMaterial
-void ChangeSubdivToPerspCB(br_material *pMaterial) {
+void ChangeSubdivToPerspCB(br_material* pMaterial) {
 }
 
 // Offset: 19268
@@ -652,52 +657,52 @@ void ChangeSubdivToPersp() {
 
 // Offset: 19324
 // Size: 123
-br_uint_32 ProcessFaceMaterials(br_actor *pActor, tPMFMCB pCallback) {
+br_uint_32 ProcessFaceMaterials(br_actor* pActor, tPMFMCB pCallback) {
 }
 
 // Offset: 19448
 // Size: 236
 // EAX: pm
-int DRPixelmapHasZeros(br_pixelmap *pm) {
+int DRPixelmapHasZeros(br_pixelmap* pm) {
     int x;
     int y;
-    char *row_ptr;
-    char *pp;
+    char* row_ptr;
+    char* pp;
 }
 
 // Offset: 19684
 // Size: 125
 // EAX: pStorage
 // EDX: pMap
-int StorageContainsPixelmap(tBrender_storage *pStorage, br_pixelmap *pMap) {
+int StorageContainsPixelmap(tBrender_storage* pStorage, br_pixelmap* pMap) {
     int i;
 }
 
 // Offset: 19812
 // Size: 266
 // EAX: pStorage
-void HideStoredOpaqueTextures(tBrender_storage *pStorage) {
+void HideStoredOpaqueTextures(tBrender_storage* pStorage) {
     int i;
 }
 
 // Offset: 20080
 // Size: 224
 // EAX: pStorage
-void RevealStoredTransparentTextures(tBrender_storage *pStorage) {
+void RevealStoredTransparentTextures(tBrender_storage* pStorage) {
     int i;
 }
 
 // Offset: 20304
 // Size: 236
 // EAX: pStorage
-void HideStoredTextures(tBrender_storage *pStorage) {
+void HideStoredTextures(tBrender_storage* pStorage) {
     int i;
 }
 
 // Offset: 20540
 // Size: 197
 // EAX: pStorage
-void RevealStoredTextures(tBrender_storage *pStorage) {
+void RevealStoredTextures(tBrender_storage* pStorage) {
     int i;
 }
 
@@ -706,7 +711,7 @@ void RevealStoredTextures(tBrender_storage *pStorage) {
 // EAX: pStorage
 // EDX: pNew
 // EBX: pOld
-void SetCarStorageTexturingLevel(tBrender_storage *pStorage, tCar_texturing_level pNew, tCar_texturing_level pOld) {
+void SetCarStorageTexturingLevel(tBrender_storage* pStorage, tCar_texturing_level pNew, tCar_texturing_level pOld) {
 }
 
 // Offset: 20864
@@ -724,7 +729,7 @@ void SetCarTexturingLevel(tCar_texturing_level pLevel) {
 // Size: 138
 // EAX: pIdent
 // EDX: pSuffix
-int HasThisSuffix(char *pIdent, char *pSuffix) {
+int HasThisSuffix(char* pIdent, char* pSuffix) {
     size_t len_ident;
     size_t len_suffix;
 }
@@ -733,55 +738,55 @@ int HasThisSuffix(char *pIdent, char *pSuffix) {
 // Size: 145
 // EAX: pOld_ident
 // EDX: pSuffix
-br_material* UnsuffixedMaterial(char *pOld_ident, char *pSuffix) {
-    br_material *result;
+br_material* UnsuffixedMaterial(char* pOld_ident, char* pSuffix) {
+    br_material* result;
     int unsuffixed_len;
-    char *new_id;
+    char* new_id;
 }
 
 // Offset: 21340
 // Size: 118
 // EAX: pModel
 // EDX: pFace
-br_material* RoadUntexToPersp(br_model *pModel, tU16 pFace) {
-    br_material *old_mat;
-    br_material *new_mat;
+br_material* RoadUntexToPersp(br_model* pModel, tU16 pFace) {
+    br_material* old_mat;
+    br_material* new_mat;
 }
 
 // Offset: 21460
 // Size: 240
 // EAX: pModel
 // EDX: pFace
-br_material* WallLinearToUntex(br_model *pModel, tU16 pFace) {
-    br_material *old_mat;
-    br_material *new_mat;
+br_material* WallLinearToUntex(br_model* pModel, tU16 pFace) {
+    br_material* old_mat;
+    br_material* new_mat;
 }
 
 // Offset: 21700
 // Size: 203
 // EAX: pModel
 // EDX: pFace
-br_material* WallUntexToLinear(br_model *pModel, tU16 pFace) {
-    br_material *old_mat;
-    br_material *new_mat;
+br_material* WallUntexToLinear(br_model* pModel, tU16 pFace) {
+    br_material* old_mat;
+    br_material* new_mat;
 }
 
 // Offset: 21904
 // Size: 153
 // EAX: pModel
 // EDX: pFace
-br_material* WallUntexToPersp(br_model *pModel, tU16 pFace) {
-    br_material *old_mat;
-    br_material *new_mat;
+br_material* WallUntexToPersp(br_model* pModel, tU16 pFace) {
+    br_material* old_mat;
+    br_material* new_mat;
 }
 
 // Offset: 22060
 // Size: 112
 // EAX: pModel
 // EDX: pFace
-br_material* WallLinearToPersp(br_model *pModel, tU16 pFace) {
-    br_material *old_mat;
-    br_material *new_mat;
+br_material* WallLinearToPersp(br_model* pModel, tU16 pFace) {
+    br_material* old_mat;
+    br_material* new_mat;
 }
 
 // Offset: 22172
@@ -816,20 +821,20 @@ void SetWallTexturingLevel(tWall_texturing_level pLevel) {
 // Size: 82
 // EAX: pLevel
 void ReallySetWallTexturingLevel(tWall_texturing_level pLevel) {
-    static tPMFMCB *tweaker[3][3];
+    static tPMFMCB* tweaker[3][3];
 }
 
 // Offset: 22536
 // Size: 297
 // EAX: pModel
 // EDX: pFace
-br_material* DisposeSuffixedMaterials(br_model *pModel, tU16 pFace) {
+br_material* DisposeSuffixedMaterials(br_model* pModel, tU16 pFace) {
     size_t max_suffix_len;
-    br_material *mat;
-    br_material *victim;
-    static char *suffixes[3];
+    br_material* mat;
+    br_material* victim;
+    static char* suffixes[3];
     int s;
-    char *id;
+    char* id;
 }
 
 // Offset: 22836
@@ -839,7 +844,7 @@ void DisposeTexturingMaterials() {
 
 // Offset: 23000
 // Size: 73
-br_uint_32 SetAccessoryRenderingCB(br_actor *pActor, void *pFlag) {
+br_uint_32 SetAccessoryRenderingCB(br_actor* pActor, void* pFlag) {
 }
 
 // Offset: 23076
@@ -870,24 +875,41 @@ int GetCarSimplificationLevel() {
 // EAX: pF
 // EDX: pSpec
 // EBX: pScreen_name_str
-void ParseSpecialVolume(FILE *pF, tSpecial_volume *pSpec, char *pScreen_name_str) {
+void ParseSpecialVolume(FILE* pF, tSpecial_volume* pSpec, char* pScreen_name_str) {
     char s[256];
+    pSpec->gravity_multiplier = GetAScalar(pF);
+    pSpec->viscosity_multiplier = GetAScalar(pF);
+    pSpec->car_damage_per_ms = GetAScalar(pF);
+    pSpec->ped_damage_per_ms = GetAScalar(pF);
+    pSpec->camera_special_effect_index = GetAnInt(pF);
+    pSpec->sky_col = GetAnInt(pF);
+
+    GetAString(pF, s);
+    if (pScreen_name_str) {
+        strcpy(pScreen_name_str, s);
+    } else {
+        pSpec->screen_material = BrMaterialFind(s);
+    }
+    pSpec->entry_noise = GetAnInt(pF);
+    pSpec->exit_noise = GetAnInt(pF);
+    pSpec->engine_noise_index = GetAnInt(pF);
+    pSpec->material_modifier_index = GetAnInt(pF);
 }
 
 // Offset: 23584
 // Size: 56
 // EAX: pDst
 // EDX: pNew
-void AddExceptionToList(tException_list *pDst, tException_list pNew) {
+void AddExceptionToList(tException_list* pDst, tException_list pNew) {
 }
 
 // Offset: 23640
 // Size: 527
 // EAX: pName
-void LoadExceptionsFile(char *pName) {
-    FILE *f;
+void LoadExceptionsFile(char* pName) {
+    FILE* f;
     char line[256];
-    char *tok;
+    char* tok;
     int file_version;
     tException_list e;
     char delimiters[4];
@@ -896,7 +918,7 @@ void LoadExceptionsFile(char *pName) {
 // Offset: 24168
 // Size: 91
 // EAX: pTrack_file_name
-void LoadExceptionsFileForTrack(char *pTrack_file_name) {
+void LoadExceptionsFileForTrack(char* pTrack_file_name) {
     tPath_name exceptions_file_name;
 }
 
@@ -911,11 +933,11 @@ void FreeExceptions() {
 // EAX: pFile_name
 // EDX: pTrack_spec
 // EBX: pRace_info
-void LoadTrack(char *pFile_name, tTrack_spec *pTrack_spec, tRace_info *pRace_info) {
+void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_info) {
     char temp_name[14];
-    FILE *f;
-    FILE *non_car_f;
-    FILE *g;
+    FILE* f;
+    FILE* non_car_f;
+    FILE* g;
     int i;
     int j;
     int k;
@@ -934,41 +956,41 @@ void LoadTrack(char *pFile_name, tTrack_spec *pTrack_spec, tRace_info *pRace_inf
     tPath_name the_path;
     tPath_name general_file_path;
     char s[256];
-    char *str;
+    char* str;
     float temp_float;
-    br_actor *new_root;
+    br_actor* new_root;
     br_vector3 a;
     br_vector3 b;
     tU16 sky_pixels_high;
-    tNon_car_spec *non_car;
-    tSpecial_volume *spec;
+    tNon_car_spec* non_car;
+    tSpecial_volume* spec;
     br_vector3 p[3];
     br_vector3 v1;
     br_vector3 v2;
     br_vector3 temp_v;
     br_bounds temp_bounds;
-    tPed_subs *ped_subs;
-    br_pixelmap *sky;
-    br_material *material;
+    tPed_subs* ped_subs;
+    br_pixelmap* sky;
+    br_material* material;
 }
 
 // Offset: 31676
 // Size: 82
-br_uint_32 RemoveBounds(br_actor *pActor, void *pArg) {
+br_uint_32 RemoveBounds(br_actor* pActor, void* pArg) {
 }
 
 // Offset: 31760
 // Size: 52
 // EAX: pActor
-void RemoveBoundsStructures(br_actor *pActor) {
+void RemoveBoundsStructures(br_actor* pActor) {
 }
 
 // Offset: 31812
 // Size: 439
 // EAX: pTrack_spec
-void FreeTrack(tTrack_spec *pTrack_spec) {
+void FreeTrack(tTrack_spec* pTrack_spec) {
     int i;
-    tNon_car_spec *non_car;
+    tNon_car_spec* non_car;
 }
 
 // Offset: 32252
@@ -977,7 +999,7 @@ void FreeTrack(tTrack_spec *pTrack_spec) {
 // EDX: pTrack_spec
 // EBX: pCamera
 // ECX: pCamera_to_world_transform
-void ProcessTrack(br_actor *pWorld, tTrack_spec *pTrack_spec, br_actor *pCamera, br_matrix34 *pCamera_to_world_transform, int pRender_blends) {
+void ProcessTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, br_matrix34* pCamera_to_world_transform, int pRender_blends) {
 }
 
 // Offset: 32348
@@ -991,17 +1013,17 @@ void FunkThoseTronics() {
     int j;
     int iteration_count;
     int finished;
-    tFunkotronic_spec *the_funk;
-    br_vector3 *the_proximity;
+    tFunkotronic_spec* the_funk;
+    br_vector3* the_proximity;
     tS32 the_time;
     tS32 old_last_time;
     tS32 time_diff;
-    br_matrix23 *mat_matrix;
-    br_material *the_material;
+    br_matrix23* mat_matrix;
+    br_material* the_material;
     float f_the_time;
     float rot_amount;
     float f_time_diff;
-    br_pixelmap *old_colour_map;
+    br_pixelmap* old_colour_map;
 }
 
 // Offset: 41796
@@ -1009,7 +1031,7 @@ void FunkThoseTronics() {
 // EAX: pSubject_actor
 // EDX: ref_to_world
 // EBX: pWhich_axis
-void LollipopizeActor(br_actor *pSubject_actor, br_matrix34 *ref_to_world, tLollipop_mode pWhich_axis) {
+void LollipopizeActor(br_actor* pSubject_actor, br_matrix34* ref_to_world, tLollipop_mode pWhich_axis) {
     br_vector3 ref_to_subject;
     br_vector3 fixed_axis;
     br_vector3 vector_a;
@@ -1022,13 +1044,13 @@ void LollipopizeActor(br_actor *pSubject_actor, br_matrix34 *ref_to_world, tLoll
 // Size: 140
 // EAX: pResult
 // EDX: pActor
-void CalcActorGlobalPos(br_vector3 *pResult, br_actor *pActor) {
+void CalcActorGlobalPos(br_vector3* pResult, br_actor* pActor) {
 }
 
 // Offset: 42740
 // Size: 320
 // EAX: pPoint
-int PointOutOfSight(br_vector3 *pPoint, br_scalar pMax_distance) {
+int PointOutOfSight(br_vector3* pPoint, br_scalar pMax_distance) {
     br_vector3 distance_vector;
 }
 
@@ -1038,7 +1060,7 @@ int PointOutOfSight(br_vector3 *pPoint, br_scalar pMax_distance) {
 // EDX: pTime
 // EBX: pMat
 // ECX: pInterrupt_it
-void PathGrooveBastard(tGroovidelic_spec *pGroove, tU32 pTime, br_matrix34 *pMat, int pInterrupt_it) {
+void PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat, int pInterrupt_it) {
     br_scalar pos;
 }
 
@@ -1048,13 +1070,13 @@ void PathGrooveBastard(tGroovidelic_spec *pGroove, tU32 pTime, br_matrix34 *pMat
 // EDX: pTime
 // EBX: pMat
 // ECX: pInterrupt_it
-void ObjectGrooveBastard(tGroovidelic_spec *pGroove, tU32 pTime, br_matrix34 *pMat, int pInterrupt_it) {
+void ObjectGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat, int pInterrupt_it) {
     int rock_it;
     br_scalar x_size;
     br_scalar y_size;
     br_scalar z_size;
     br_scalar pos;
-    br_bounds *bounds;
+    br_bounds* bounds;
 }
 
 // Offset: 56176
@@ -1062,10 +1084,10 @@ void ObjectGrooveBastard(tGroovidelic_spec *pGroove, tU32 pTime, br_matrix34 *pM
 // EAX: pGroove
 // EDX: pTime
 // EBX: pInterrupt_it
-void GrooveThisDelic(tGroovidelic_spec *pGroove, tU32 pTime, int pInterrupt_it) {
-    br_actor *the_actor;
+void GrooveThisDelic(tGroovidelic_spec* pGroove, tU32 pTime, int pInterrupt_it) {
+    br_actor* the_actor;
     br_vector3 actor_pos;
-    br_matrix34 *the_mat;
+    br_matrix34* the_mat;
     tInterrupt_status old_path_interrupt;
     tInterrupt_status old_object_interrupt;
 }
@@ -1073,16 +1095,16 @@ void GrooveThisDelic(tGroovidelic_spec *pGroove, tU32 pTime, int pInterrupt_it) 
 // Offset: 56788
 // Size: 191
 void GrooveThoseDelics() {
-    tGroovidelic_spec *the_groove;
+    tGroovidelic_spec* the_groove;
     float f_the_time;
 }
 
 // Offset: 56980
 // Size: 137
 // EAX: pActor
-void StopGroovidelic(br_actor *pActor) {
+void StopGroovidelic(br_actor* pActor) {
     int i;
-    tGroovidelic_spec *the_groove;
+    tGroovidelic_spec* the_groove;
 }
 
 // Offset: 57120
@@ -1091,15 +1113,15 @@ void StopGroovidelic(br_actor *pActor) {
 // EDX: pMatrix
 // EBX: pPath_interrupt
 // ECX: pObject_interrupt
-void SetGrooveInterrupt(int pGroove_index, br_matrix34 *pMatrix, int pPath_interrupt, int pObject_interrupt, float pPath_resumption, float pObject_resumption) {
-    tGroovidelic_spec *the_groove;
+void SetGrooveInterrupt(int pGroove_index, br_matrix34* pMatrix, int pPath_interrupt, int pObject_interrupt, float pPath_resumption, float pObject_resumption) {
+    tGroovidelic_spec* the_groove;
 }
 
 // Offset: 57240
 // Size: 92
 void ResetGrooveFlags() {
     int i;
-    tGroovidelic_spec *the_groove;
+    tGroovidelic_spec* the_groove;
 }
 
 // Offset: 57332
@@ -1111,9 +1133,9 @@ tSpecial_volume* GetDefaultSpecialVolumeForWater() {
 // Size: 342
 // EAX: pP
 // EDX: pLast_vol
-tSpecial_volume* FindSpecialVolume(br_vector3 *pP, tSpecial_volume *pLast_vol) {
+tSpecial_volume* FindSpecialVolume(br_vector3* pP, tSpecial_volume* pLast_vol) {
     int i;
-    tSpecial_volume *v;
+    tSpecial_volume* v;
     br_vector3 p;
 }
 
@@ -1126,20 +1148,20 @@ void SaveAdditionalActors() {
 // Size: 89
 // EAX: pPos
 // EDX: pFace
-br_scalar DistanceFromFace(br_vector3 *pPos, tFace_ref *pFace) {
+br_scalar DistanceFromFace(br_vector3* pPos, tFace_ref* pFace) {
     br_vector3 normal;
 }
 
 // Offset: 57864
 // Size: 166
-br_uint_32 CalcHighestID(br_actor *pActor, int *pHighest) {
+br_uint_32 CalcHighestID(br_actor* pActor, int* pHighest) {
     char s[256];
     int number;
 }
 
 // Offset: 58032
 // Size: 182
-br_uint_32 SetID(br_actor *pActor, void *pArg) {
+br_uint_32 SetID(br_actor* pActor, void* pArg) {
     char s[256];
 }
 
@@ -1147,7 +1169,7 @@ br_uint_32 SetID(br_actor *pActor, void *pArg) {
 // Size: 100
 // EAX: pUniverse_actor
 // EDX: pActor
-void UniquificateActorsName(br_actor *pUniverse_actor, br_actor *pActor) {
+void UniquificateActorsName(br_actor* pUniverse_actor, br_actor* pActor) {
     int highest;
 }
 
@@ -1155,31 +1177,31 @@ void UniquificateActorsName(br_actor *pUniverse_actor, br_actor *pActor) {
 // Size: 107
 // EAX: pActor
 // EDX: pPrefix
-void AccessoryHeadup(br_actor *pActor, char *pPrefix) {
+void AccessoryHeadup(br_actor* pActor, char* pPrefix) {
     char s[256];
     int i;
-    br_actor *original_actor;
+    br_actor* original_actor;
 }
 
 // Offset: 58424
 // Size: 132
-br_uint_32 CalcHighestNonAmID(br_actor *pActor, int *pHighest) {
+br_uint_32 CalcHighestNonAmID(br_actor* pActor, int* pHighest) {
     char s[256];
     int number;
 }
 
 // Offset: 58556
 // Size: 443
-br_uint_32 SetIDAndDupModel(br_actor *pActor, void *pArg) {
+br_uint_32 SetIDAndDupModel(br_actor* pActor, void* pArg) {
     char s[256];
     char s2[256];
-    br_model *new_model;
+    br_model* new_model;
 }
 
 // Offset: 59000
 // Size: 100
 // EAX: pActor
-void DuplicateIfNotAmpersand(br_actor *pActor) {
+void DuplicateIfNotAmpersand(br_actor* pActor) {
     int highest;
 }
 
@@ -1187,7 +1209,7 @@ void DuplicateIfNotAmpersand(br_actor *pActor) {
 // Size: 1246
 // EAX: pIndex
 void DropActor(int pIndex) {
-    FILE *f;
+    FILE* f;
     tPath_name the_path;
     char s[256];
     int i;
@@ -1202,8 +1224,8 @@ void DropActor(int pIndex) {
     br_angle phi;
     br_matrix34 mat;
     br_transform new_transform;
-    br_actor *a;
-    br_actor *last_non_ampersand;
+    br_actor* a;
+    br_actor* last_non_ampersand;
 }
 
 // Offset: 60348
@@ -1258,7 +1280,7 @@ void DropActor9() {
 
 // Offset: 60788
 // Size: 273
-br_uint_32 IdentifyAccCB(br_actor *pActor, void *pArg) {
+br_uint_32 IdentifyAccCB(br_actor* pActor, void* pArg) {
     br_scalar distance;
     char s[256];
     br_vector3 v;
@@ -1271,15 +1293,15 @@ void IdentifyAcc() {
 
 // Offset: 61172
 // Size: 108
-br_uint_32 DelGrooveRef(br_actor *pActor, void *pArg) {
-    tGroovidelic_spec *the_groove;
+br_uint_32 DelGrooveRef(br_actor* pActor, void* pArg) {
+    tGroovidelic_spec* the_groove;
     int i;
 }
 
 // Offset: 61280
 // Size: 177
-br_uint_32 DelReferencedModels(br_actor *pActor, void *pArg) {
-    tGroovidelic_spec *the_groove;
+br_uint_32 DelReferencedModels(br_actor* pActor, void* pArg) {
+    tGroovidelic_spec* the_groove;
     int i;
 }
 
@@ -1290,7 +1312,7 @@ void DeleteAcc() {
 
 // Offset: 61596
 // Size: 170
-br_uint_32 OffsetModel(br_actor *pActor, void *pArg) {
+br_uint_32 OffsetModel(br_actor* pActor, void* pArg) {
     int i;
 }
 
@@ -1298,14 +1320,14 @@ br_uint_32 OffsetModel(br_actor *pActor, void *pArg) {
 // Size: 54
 // EAX: pActor
 // EDX: pOffset
-void OffsetActor(br_actor *pActor, br_vector3 *pOffset) {
+void OffsetActor(br_actor* pActor, br_vector3* pOffset) {
 }
 
 // Offset: 61824
 // Size: 286
 // EAX: pActor
 // EDX: pOffset
-void CentreActor(br_actor *pActor, br_vector3 *pOffset) {
+void CentreActor(br_actor* pActor, br_vector3* pOffset) {
 }
 
 // Offset: 62112
@@ -1548,25 +1570,25 @@ br_material* GetExternalMat() {
 // EDX: pIndex
 // EBX: pInt_mat
 // ECX: pExt_mat
-void BuildSpecVolModel(tSpecial_volume *pSpec, int pIndex, br_material *pInt_mat, br_material *pExt_mat) {
+void BuildSpecVolModel(tSpecial_volume* pSpec, int pIndex, br_material* pInt_mat, br_material* pExt_mat) {
     int i;
     int j;
     int temp;
-    tSpecial_volume *v;
-    br_actor *actor;
-    br_model *model;
+    tSpecial_volume* v;
+    br_actor* actor;
+    br_model* model;
 }
 
 // Offset: 67484
 // Size: 427
 // EAX: pIndex
 void DropSpecVol(int pIndex) {
-    FILE *f;
+    FILE* f;
     tPath_name the_path;
     int i;
     int spec_count;
     tSpecial_volume spec;
-    tSpecial_volume *new_specs;
+    tSpecial_volume* new_specs;
     char s[256];
 }
 
@@ -1624,10 +1646,10 @@ void DropSpecVol9() {
 // Size: 344
 void IdentifySpecVol() {
     int min_index;
-    tSpecial_volume *v;
+    tSpecial_volume* v;
     br_scalar min_d;
     br_scalar d;
-    br_vector3 *p;
+    br_vector3* p;
     char s[256];
 }
 
@@ -1635,8 +1657,8 @@ void IdentifySpecVol() {
 // Size: 349
 // EAX: pIndex
 void DelSpecVolumeGraph(int pIndex) {
-    br_actor *actor;
-    br_model *model;
+    br_actor* actor;
+    br_model* model;
 }
 
 // Offset: 69040
@@ -1854,16 +1876,15 @@ void SnapSpecVolToVertical() {
 void ShowSpecialVolumes() {
     int j;
     int temp;
-    tSpecial_volume *v;
-    br_actor *actor;
-    br_model *model;
-    br_material *internal_mat;
-    br_material *external_mat;
+    tSpecial_volume* v;
+    br_actor* actor;
+    br_model* model;
+    br_material* internal_mat;
+    br_material* external_mat;
 }
 
 // Offset: 71100
 // Size: 112
 void HideSpecialVolumes() {
-    tSpecial_volume *v;
+    tSpecial_volume* v;
 }
-

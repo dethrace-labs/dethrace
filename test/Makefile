@@ -16,8 +16,8 @@ DEPS := $(OBJS:.o=.d)
 INC_DIRS := $(shell find $(SRC_DIR) -type d) $(BR_SRC_DIR) $(DR_SRC_DIR)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
-CFLAGS ?= $(INC_FLAGS)
-LDFLAGS ?= -lm
+CFLAGS ?= $(INC_FLAGS) -g
+LDFLAGS ?= -lm -fno-pie
 
 .PHONY: clean build run
 

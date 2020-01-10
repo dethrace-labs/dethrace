@@ -1,8 +1,12 @@
 #ifndef _INIT_H_
 #define _INIT_H_
 
-#include "dr_types.h"
 #include "br_types.h"
+#include "dr_types.h"
+
+extern int gCredits_per_rank[3];
+extern int gInitial_credits[3];
+extern int gInitial_rank;
 
 // Offset: 0
 // Size: 115
@@ -64,13 +68,13 @@ void Init2DStuff();
 // Size: 671
 // EAX: pArgc
 // EDX: pArgv
-void InitialiseApplication(int pArgc, char **pArgv);
+void InitialiseApplication(int pArgc, char** pArgv);
 
 // Offset: 6004
 // Size: 64
 // EAX: pArgc
 // EDX: pArgv
-void InitialiseDeathRace(int pArgc, char **pArgv);
+void InitialiseDeathRace(int pArgc, char** pArgv);
 
 // Offset: 6068
 // Size: 427
@@ -92,7 +96,7 @@ void DisposeTrack();
 // Offset: 6788
 // Size: 97
 // EAX: pMaterial
-void CopyMaterialColourFromIndex(br_material *pMaterial);
+void CopyMaterialColourFromIndex(br_material* pMaterial);
 
 // Offset: 6888
 // Size: 1230
