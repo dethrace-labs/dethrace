@@ -58,15 +58,15 @@ void MungeHeadups() {
     int oppo_count;
     tU32 the_time;
     float bearing;
-    br_material *nearby;
-    tPixelmap_user_data *user;
+    br_material* nearby;
+    tPixelmap_user_data* user;
     static tU32 last_rattle_time;
 }
 
 // Offset: 3384
 // Size: 588
 // EAX: pCamera_period
-void UpdateFramePeriod(tU32 *pCamera_period) {
+void UpdateFramePeriod(tU32* pCamera_period) {
     tU32 new_tick_count;
     tU32 new_camera_tick_count;
     int error;
@@ -107,4 +107,3 @@ tRace_result MainGameLoop() {
 // Size: 61
 tRace_result DoRace() {
 }
-

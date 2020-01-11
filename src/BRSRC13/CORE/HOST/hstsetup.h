@@ -13,6 +13,6 @@ void HostEnd();
 
 // Offset: 125
 // Size: 125
-br_error HostInfo(host_info *buffer, br_size_t buffersize);
+br_error HostInfo(host_info* buffer, br_size_t buffersize);
 
 #endif

@@ -1,8 +1,8 @@
 #ifndef _ERRORS_H_
 #define _ERRORS_H_
 
-#include "dr_types.h"
 #include "br_types.h"
+#include "dr_types.h"
 
 // Offset: 0
 // Size: 207

@@ -1,13 +1,13 @@
 #ifndef _INPUT_H_
 #define _INPUT_H_
 
-#include "dr_types.h"
 #include "br_types.h"
+#include "dr_types.h"
 
 extern tJoy_array gJoy_array;
 extern tKey_array gKey_array;
-extern  int gKey_poll_counter;
-extern tRolling_letter *gRolling_letters;
+extern int gKey_poll_counter;
+extern tRolling_letter* gRolling_letters;
 extern tU32 gLast_poll_keys;
 extern int gCurrent_cursor;
 extern int gCurrent_position;
@@ -29,7 +29,7 @@ extern char gCurrent_typing[110];
 // Size: 996
 // EAX: pKeys
 // EDX: pMark
-void SetJoystickArrays(int *pKeys, int pMark);
+void SetJoystickArrays(int* pKeys, int pMark);
 
 // Offset: 996
 // Size: 82
@@ -106,7 +106,7 @@ int CmdKeyDown(int pFKey_ID, int pCmd_key_ID);
 // Size: 206
 // EAX: pX_coord
 // EDX: pY_coord
-void GetMousePosition(int *pX_coord, int *pY_coord);
+void GetMousePosition(int* pX_coord, int* pY_coord);
 
 // Offset: 3452
 // Size: 125
@@ -130,7 +130,7 @@ int AddRollingLetter(char pChar, int pX, int pY, tRolling_type rolling_type);
 // EDX: pX
 // EBX: pY
 // ECX: rolling_type
-void AddRollingString(char *pStr, int pX, int pY, tRolling_type rolling_type);
+void AddRollingString(char* pStr, int pX, int pY, tRolling_type rolling_type);
 
 // Offset: 4124
 // Size: 85
@@ -157,7 +157,7 @@ int ChangeCharTo(int pSlot_index, int pChar_index, char pNew_char);
 // EDX: pYcoord
 // EBX: pNew_str
 // ECX: pOld_str
-void ChangeTextTo(int pXcoord, int pYcoord, char *pNew_str, char *pOld_str);
+void ChangeTextTo(int pXcoord, int pYcoord, char* pNew_str, char* pOld_str);
 
 // Offset: 5628
 // Size: 61
@@ -211,14 +211,14 @@ void StopTyping(int pSlot_index);
 // Size: 121
 // EAX: pSlot_index
 // EDX: pRevert_str
-void RevertTyping(int pSlot_index, char *pRevert_str);
+void RevertTyping(int pSlot_index, char* pRevert_str);
 
 // Offset: 7096
 // Size: 91
 // EAX: pSlot_index
 // EDX: pText
 // EBX: pVisible_length
-void StartTyping(int pSlot_index, char *pText, int pVisible_length);
+void StartTyping(int pSlot_index, char* pText, int pVisible_length);
 
 // Offset: 7188
 // Size: 176
@@ -237,7 +237,7 @@ void SetSlotXY(int pSlot_index, int pX_coord, int pY_coord);
 // Size: 93
 // EAX: pDestn
 // EDX: pMax_length
-void GetTypedName(char *pDestn, int pMax_length);
+void GetTypedName(char* pDestn, int pMax_length);
 
 // Offset: 7532
 // Size: 212

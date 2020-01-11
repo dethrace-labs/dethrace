@@ -47,9 +47,9 @@ tCheat gKev_keys[44] = {
     { .code = 0x30A19FAB, .code2 = 0x2B0C2782, .action_proc = GetPowerup, .num = 44 },
     { .code = 0x0, .code2 = 0x0, .action_proc = 0x0, .num = 0x0 }
 };
-char *gAbuse_text[10];
-tEdit_func *gEdit_funcs[10][18][8];
-char *gEdit_mode_names[10];
+char* gAbuse_text[10];
+tEdit_func* gEdit_funcs[10][18][8];
+char* gEdit_mode_names[10];
 tToggle_element gToggle_array[43];
 char gString[84];
 int gToo_late;
@@ -64,7 +64,6 @@ int gInstant_handbrake;
 int gAuto_repair;
 tU32 gPalette_fade_time;
 int gEntering_message;
-
 
 int _unittest_controls_lastGetPowerup = 0;
 
@@ -407,7 +406,7 @@ void CheckToggles(int pRacing) {
 // Size: 444
 // EAX: pCar
 // EDX: pCheck_around
-int CarWorldOffFallenCheckThingy(tCar_spec *pCar, int pCheck_around) {
+int CarWorldOffFallenCheckThingy(tCar_spec* pCar, int pCheck_around) {
     br_vector3 car_pos;
     br_vector3 offset_c;
     br_vector3 offset_w;
@@ -417,7 +416,7 @@ int CarWorldOffFallenCheckThingy(tCar_spec *pCar, int pCheck_around) {
 // Offset: 5768
 // Size: 56
 // EAX: pCar
-int HasCarFallenOffWorld(tCar_spec *pCar) {
+int HasCarFallenOffWorld(tCar_spec* pCar) {
 }
 
 // Offset: 5824
@@ -430,13 +429,13 @@ void CheckForBeingOutOfThisWorld() {
 // Offset: 6076
 // Size: 190
 // EAX: pCar
-void CheckHornLocal(tCar_spec *pCar) {
+void CheckHornLocal(tCar_spec* pCar) {
 }
 
 // Offset: 6268
 // Size: 249
 // EAX: pCar
-void CheckHorn3D(tCar_spec *pCar) {
+void CheckHorn3D(tCar_spec* pCar) {
 }
 
 // Offset: 6520
@@ -465,7 +464,7 @@ void CheckMapRenderMove() {
 // Offset: 7880
 // Size: 300
 // EAX: pCar
-void ExplodeCar(tCar_spec *pCar) {
+void ExplodeCar(tCar_spec* pCar) {
     br_vector3 tv;
     br_vector3 pos;
 }
@@ -497,7 +496,7 @@ void CheckOtherRacingKeys() {
     br_scalar ts;
     br_vector3 tv;
     int flip_up_flag;
-    tCar_spec *car;
+    tCar_spec* car;
     float bodywork_repair_amount;
     static tU32 total_repair_cost;
     static tS3_sound_tag sound_tag;
@@ -515,7 +514,7 @@ int CheckRecoverCost() {
 // Offset: 10768
 // Size: 279
 // EAX: pCar
-void SortOutRecover(tCar_spec *pCar) {
+void SortOutRecover(tCar_spec* pCar) {
     int the_time;
     int val;
     static int old_time;
@@ -524,13 +523,13 @@ void SortOutRecover(tCar_spec *pCar) {
 // Offset: 11048
 // Size: 115
 // EAX: pCar
-void SetFlipUpCar(tCar_spec *pCar) {
+void SetFlipUpCar(tCar_spec* pCar) {
 }
 
 // Offset: 11164
 // Size: 1385
 // EAX: car
-void FlipUpCar(tCar_spec *car) {
+void FlipUpCar(tCar_spec* car) {
     br_vector3 tv;
     br_vector3 dir;
     int new_pos;
@@ -539,7 +538,7 @@ void FlipUpCar(tCar_spec *car) {
     int l;
     int count;
     br_scalar dist;
-    br_material *material;
+    br_material* material;
     br_scalar t;
 }
 
@@ -562,7 +561,7 @@ void CheckSystemKeys(int pRacing) {
 // Size: 395
 void CheckKevKeys() {
     int i;
-    tU32 *value;
+    tU32* value;
     char s[128];
 
     value = KevKeyService();
@@ -598,7 +597,7 @@ void PollCarControls(tU32 pTime_difference) {
     tS32 joyY;
     tCar_controls keys;
     tJoystick joystick;
-    tCar_spec *c;
+    tCar_spec* c;
 }
 
 // Offset: 14160
@@ -733,7 +732,7 @@ void CycleSoundDetailLevel() {
 // Offset: 17584
 // Size: 162
 void CycleCarSimplificationLevel() {
-    char *dst;
+    char* dst;
 }
 
 // Offset: 17748
@@ -749,10 +748,10 @@ void ToggleSmoke() {
 // Offset: 18100
 // Size: 144
 // EAX: pFont
-void DrawSomeText2(tDR_font *pFont) {
+void DrawSomeText2(tDR_font* pFont) {
     int y;
     int i;
-    char *txt[15];
+    char* txt[15];
 }
 
 // Offset: 18244
@@ -775,8 +774,8 @@ void UserSendMessage() {
 void EnterUserMessage() {
     static int about_to_die;
     static tU32 next_time;
-    char *the_message;
-    char *p;
+    char* the_message;
+    char* p;
     int len;
     int the_key;
     int abuse_num;
@@ -785,16 +784,16 @@ void EnterUserMessage() {
 // Offset: 19276
 // Size: 435
 void DisplayUserMessage() {
-    char *the_message;
+    char* the_message;
     int len;
-    tDR_font *font;
+    tDR_font* font;
 }
 
 // Offset: 19712
 // Size: 347
 void InitAbuseomatic() {
     char s[256];
-    FILE *f;
+    FILE* f;
     int i;
     int len;
 }
@@ -803,4 +802,3 @@ void InitAbuseomatic() {
 // Size: 94
 void DisposeAbuseomatic() {
 }
-

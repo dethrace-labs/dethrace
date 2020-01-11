@@ -1,8 +1,8 @@
 #ifndef _STRUCTUR_H_
 #define _STRUCTUR_H_
 
-#include "dr_types.h"
 #include "br_types.h"
+#include "dr_types.h"
 
 // Offset: 0
 // Size: 124
@@ -33,7 +33,7 @@ void IncrementLap();
 // EDX: pV1
 // EBX: pV2
 // ECX: pNormal
-int RayHitFace(br_vector3 *pV0, br_vector3 *pV1, br_vector3 *pV2, br_vector3 *pNormal, br_vector3 *pStart, br_vector3 *pDir);
+int RayHitFace(br_vector3* pV0, br_vector3* pV1, br_vector3* pV2, br_vector3* pNormal, br_vector3* pStart, br_vector3* pDir);
 
 // Offset: 1156
 // Size: 241
@@ -64,12 +64,12 @@ void DoProgramDemo();
 // Size: 308
 // EAX: pNastiness
 // EDX: pHad_scum
-int ChooseOpponent(int pNastiness, int *pHad_scum);
+int ChooseOpponent(int pNastiness, int* pHad_scum);
 
 // Offset: 2832
 // Size: 294
 // EAX: pRace_info
-void SelectOpponents(tRace_info *pRace_info);
+void SelectOpponents(tRace_info* pRace_info);
 
 // Offset: 3128
 // Size: 269

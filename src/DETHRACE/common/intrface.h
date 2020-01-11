@@ -1,8 +1,8 @@
 #ifndef _INTRFACE_H_
 #define _INTRFACE_H_
 
-#include "dr_types.h"
 #include "br_types.h"
+#include "dr_types.h"
 
 // Offset: 0
 // Size: 44
@@ -27,13 +27,13 @@ void ResetInterfaceTimeout();
 // EDX: pOld_selection
 // EBX: pNew_selection
 // ECX: pMode
-void ChangeSelection(tInterface_spec *pSpec, int *pOld_selection, int *pNew_selection, int pMode, int pSkip_disabled);
+void ChangeSelection(tInterface_spec* pSpec, int* pOld_selection, int* pNew_selection, int pMode, int pSkip_disabled);
 
 // Offset: 864
 // Size: 292
 // EAX: pSpec
 // EDX: pCopy_areas
-void RecopyAreas(tInterface_spec *pSpec, br_pixelmap **pCopy_areas);
+void RecopyAreas(tInterface_spec* pSpec, br_pixelmap** pCopy_areas);
 
 // Offset: 1156
 // Size: 111
@@ -50,7 +50,7 @@ void EnableChoice(int pChoice);
 // EAX: pSpec
 // EDX: pOptions
 // EBX: pCurrent_choice
-int DoInterfaceScreen(tInterface_spec *pSpec, int pOptions, int pCurrent_choice);
+int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice);
 
 // Offset: 6764
 // Size: 88

@@ -16,14 +16,14 @@ br_angle gOld_yaw;
 // Offset: 0
 // Size: 89
 // EAX: pCar_spec
-void MakeCarStationary(tCar_spec *pCar_spec) {
+void MakeCarStationary(tCar_spec* pCar_spec) {
 }
 
 // Offset: 92
 // Size: 1323
 // EAX: pTime_difference
 // EDX: car
-void MoveThisCar(tU32 pTime_difference, tCar_spec *car) {
+void MoveThisCar(tU32 pTime_difference, tCar_spec* car) {
     br_scalar dt;
     br_scalar ts;
     br_vector3 r;
@@ -32,4 +32,3 @@ void MoveThisCar(tU32 pTime_difference, tCar_spec *car) {
     int j;
     br_angle phi;
 }
-

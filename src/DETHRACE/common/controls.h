@@ -1,8 +1,8 @@
 #ifndef _CONTROLS_H_
 #define _CONTROLS_H_
 
-#include "dr_types.h"
 #include "br_types.h"
+#include "dr_types.h"
 
 extern int _unittest_controls_lastGetPowerup;
 
@@ -274,12 +274,12 @@ void CheckToggles(int pRacing);
 // Size: 444
 // EAX: pCar
 // EDX: pCheck_around
-int CarWorldOffFallenCheckThingy(tCar_spec *pCar, int pCheck_around);
+int CarWorldOffFallenCheckThingy(tCar_spec* pCar, int pCheck_around);
 
 // Offset: 5768
 // Size: 56
 // EAX: pCar
-int HasCarFallenOffWorld(tCar_spec *pCar);
+int HasCarFallenOffWorld(tCar_spec* pCar);
 
 // Offset: 5824
 // Size: 250
@@ -288,12 +288,12 @@ void CheckForBeingOutOfThisWorld();
 // Offset: 6076
 // Size: 190
 // EAX: pCar
-void CheckHornLocal(tCar_spec *pCar);
+void CheckHornLocal(tCar_spec* pCar);
 
 // Offset: 6268
 // Size: 249
 // EAX: pCar
-void CheckHorn3D(tCar_spec *pCar);
+void CheckHorn3D(tCar_spec* pCar);
 
 // Offset: 6520
 // Size: 103
@@ -314,7 +314,7 @@ void CheckMapRenderMove();
 // Offset: 7880
 // Size: 300
 // EAX: pCar
-void ExplodeCar(tCar_spec *pCar);
+void ExplodeCar(tCar_spec* pCar);
 
 // Offset: 8180
 // Size: 448
@@ -337,17 +337,17 @@ int CheckRecoverCost();
 // Offset: 10768
 // Size: 279
 // EAX: pCar
-void SortOutRecover(tCar_spec *pCar);
+void SortOutRecover(tCar_spec* pCar);
 
 // Offset: 11048
 // Size: 115
 // EAX: pCar
-void SetFlipUpCar(tCar_spec *pCar);
+void SetFlipUpCar(tCar_spec* pCar);
 
 // Offset: 11164
 // Size: 1385
 // EAX: car
-void FlipUpCar(tCar_spec *car);
+void FlipUpCar(tCar_spec* car);
 
 // Offset: 12552
 // Size: 50
@@ -484,7 +484,7 @@ void ToggleSmoke();
 // Offset: 18100
 // Size: 144
 // EAX: pFont
-void DrawSomeText2(tDR_font *pFont);
+void DrawSomeText2(tDR_font* pFont);
 
 // Offset: 18244
 // Size: 104

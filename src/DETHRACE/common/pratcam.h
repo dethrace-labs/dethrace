@@ -1,8 +1,8 @@
 #ifndef _PRATCAM_H_
 #define _PRATCAM_H_
 
-#include "dr_types.h"
 #include "br_types.h"
+#include "dr_types.h"
 
 // Offset: 0
 // Size: 45
@@ -23,7 +23,7 @@ void TogglePratcam();
 // Offset: 384
 // Size: 1836
 // EAX: pFolder_name
-void LoadPratcam(char *pFolder_name);
+void LoadPratcam(char* pFolder_name);
 
 // Offset: 2220
 // Size: 495

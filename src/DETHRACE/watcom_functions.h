@@ -4,6 +4,6 @@
 // These functions are used by the game and were originally provided by Watcom C lib.
 // Reimplemented here without Watcom code
 
-void splitpath( char *path, char *drive, char *dir, char *fname, char *ext );
+void splitpath(char* path, char* drive, char* dir, char* fname, char* ext);
 
 #endif

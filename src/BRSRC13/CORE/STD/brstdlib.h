@@ -12,51 +12,51 @@
 
 // Offset: 9
 // Size: 50
-int BrMemCmp(void *s1, void *s2, size_t n);
+int BrMemCmp(void* s1, void* s2, size_t n);
 
 // Offset: 68
 // Size: 50
-void* BrMemCpy(void *s1, void *s2, size_t n);
+void* BrMemCpy(void* s1, void* s2, size_t n);
 
 // Offset: 127
 // Size: 50
-void* BrMemSet(void *s, int c, size_t n);
+void* BrMemSet(void* s, int c, size_t n);
 
 // Offset: 186
 // Size: 47
-char* BrStrCat(char *s1, char *s2);
+char* BrStrCat(char* s1, char* s2);
 
 // Offset: 242
 // Size: 47
-int BrStrCmp(char *s1, char *s2);
+int BrStrCmp(char* s1, char* s2);
 
 // Offset: 299
 // Size: 47
-int BrStrICmp(char *s1, char *s2);
+int BrStrICmp(char* s1, char* s2);
 
 // Offset: 355
 // Size: 47
-char* BrStrCpy(char *s1, const char *s2);
+char* BrStrCpy(char* s1, const char* s2);
 
 // Offset: 411
 // Size: 44
-br_size_t BrStrLen(char *s);
+br_size_t BrStrLen(char* s);
 
 // Offset: 465
 // Size: 50
-int BrStrNCmp(char *s1, char *s2, size_t n);
+int BrStrNCmp(char* s1, char* s2, size_t n);
 
 // Offset: 526
 // Size: 50
-int BrStrNICmp(char *s1, char *s2, size_t n);
+int BrStrNICmp(char* s1, char* s2, size_t n);
 
 // Offset: 586
 // Size: 50
-char* BrStrNCpy(char *s1, char *s2, size_t n);
+char* BrStrNCpy(char* s1, char* s2, size_t n);
 
 // Offset: 646
 // Size: 49
-char* BrStrRChr(char *s1, char c);
+char* BrStrRChr(char* s1, char c);
 
 // Offset: 703
 // Size: 35
@@ -64,23 +64,23 @@ void BrAbort(void);
 
 // Offset: 747
 // Size: 44
-char* BrGetEnv(char *name);
+char* BrGetEnv(char* name);
 
 // Offset: 800
 // Size: 58
-float BrStrToF(char *nptr, char **endptr);
+float BrStrToF(char* nptr, char** endptr);
 
 // Offset: 867
 // Size: 67
-double BrStrToD(char *nptr, char **endptr);
+double BrStrToD(char* nptr, char** endptr);
 
 // Offset: 943
 // Size: 50
-long BrStrToL(char *nptr, char **endptr, int base);
+long BrStrToL(char* nptr, char** endptr, int base);
 
 // Offset: 1003
 // Size: 50
-unsigned long BrStrToUL(char *nptr, char **endptr, int base);
+unsigned long BrStrToUL(char* nptr, char** endptr, int base);
 
 // Offset: 1063
 // Size: 59
@@ -100,15 +100,14 @@ br_boolean BrIsPrint(int c);
 
 // Offset: 1340
 // Size: 50
-br_int_32 BrVSprintf(char *buf, const char *fmt, va_list args);
+br_int_32 BrVSprintf(char* buf, const char* fmt, va_list args);
 
 // Offset: 1402
 // Size: 101
-br_int_32 BrVSprintfN(char *buf, br_size_t buf_size, const char *fmt, va_list args);
+br_int_32 BrVSprintfN(char* buf, br_size_t buf_size, const char* fmt, va_list args);
 
 // Offset: 1513
 // Size: 50
-br_int_32 BrVSScanf(char *buf, const char *fmt, va_list args);
+br_int_32 BrVSScanf(char* buf, const char* fmt, va_list args);
 
 #endif
-

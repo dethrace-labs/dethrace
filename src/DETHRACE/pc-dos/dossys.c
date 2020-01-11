@@ -1,28 +1,26 @@
 #include "dossys.h"
 
-#include <time.h>
-#include <sys/stat.h>
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <time.h>
 #include <unistd.h>
 
-#include "watcom_functions.h"
-#include "common/globvars.h"
-#include "common/main.h"
 #include "common/car.h"
+#include "common/drdebug.h"
+#include "common/globvars.h"
+#include "common/loadsave.h"
+#include "common/main.h"
 #include "common/sound.h"
 #include "common/utility.h"
-#include "common/loadsave.h"
-#include "common/drdebug.h"
-
+#include "watcom_functions.h"
 
 int gASCII_table[128];
 tU32 gKeyboard_bits[8];
 int gASCII_shift_table[128];
-tGraf_spec gGraf_specs[2] =
-{
-  { 8, 1, 0, 320, 200, 0, 0, "32X20X8", "MCGA,W:320,H:200,B:8", 0, 0, 0, NULL },
-  { 8, 1, 0, 640, 480, 0, 0, "64X48X8", "VESA,W:640,H:480,B:8", 0, 0, 0, NULL }
+tGraf_spec gGraf_specs[2] = {
+    { 8, 1, 0, 320, 200, 0, 0, "32X20X8", "MCGA,W:320,H:200,B:8", 0, 0, 0, NULL },
+    { 8, 1, 0, 640, 480, 0, 0, "64X48X8", "VESA,W:640,H:480,B:8", 0, 0, 0, NULL }
 };
 
 char gNetwork_profile_fname[256];
@@ -40,9 +38,9 @@ tS32 gJoystick_range1x;
 int gNo_voodoo;
 int gSwitched_resolution;
 int gReplay_override;
-br_pixelmap *gReal_back_screen;
+br_pixelmap* gReal_back_screen;
 tS32 gJoystick_min1x;
-br_pixelmap *gTemp_screen;
+br_pixelmap* gTemp_screen;
 int gDOSGfx_initialized;
 tU32 gUpper_loop_limit;
 int gExtra_mem;
@@ -51,7 +49,7 @@ void (*gPrev_keyboard_handler)();
 tU8 gScan_code[123][2];
 
 int _unittest_do_not_exit = 0;
-char *_unittest_last_fatal_error;
+char* _unittest_last_fatal_error;
 
 // Offset: 0
 // Size: 291
@@ -78,9 +76,9 @@ void KeyTranslation(tU8 pKey_index, tU8 pScan_code_1, tU8 pScan_code_2) {
 // Offset: 436
 // Size: 1897
 void KeyBegin() {
-  // int v0; // edx@0
-  // int v1; // ST00_4@1
-  // __int16 v2; // dx@1
+    // int v0; // edx@0
+    // int v1; // ST00_4@1
+    // __int16 v2; // dx@1
 
     // *(_WORD *)gScan_code[11] = 11;
     // *(_WORD *)gScan_code[13] = 3;
@@ -211,7 +209,7 @@ int KeyDown22(int pKey_index) {
 // Size: 141
 // EAX: pKeys
 // EDX: pMark
-void PDSetKeyArray(int *pKeys, int pMark) {
+void PDSetKeyArray(int* pKeys, int pMark) {
     int i;
     tS32 joyX;
     tS32 joyY;
@@ -226,7 +224,7 @@ int PDGetASCIIFromKey(int pKey) {
 // Offset: 2688
 // Size: 174
 // EAX: pThe_str
-void PDFatalError(char *pThe_str) {
+void PDFatalError(char* pThe_str) {
     static int been_here = 0;
 
     if (been_here) {
@@ -243,21 +241,21 @@ void PDFatalError(char *pThe_str) {
 
     DoSaveGame(1);
     if (!_unittest_do_not_exit) {
-       exit(1);
+        exit(1);
     }
 }
 
 // Offset: 2864
 // Size: 55
 // EAX: pThe_str
-void PDNonFatalError(char *pThe_str) {
+void PDNonFatalError(char* pThe_str) {
 }
 
 // Offset: 2920
 // Size: 190
 void PDInitialiseSystem() {
     tPath_name the_path;
-    FILE *f;
+    FILE* f;
     int len;
 
     KeyBegin();
@@ -274,8 +272,8 @@ void PDInitialiseSystem() {
     fseek(f, 0, SEEK_END);
     len = ftell(f);
     rewind(f);
-    fread(gASCII_table, len/2, 1, f);
-    fread(gASCII_shift_table, len/2, 1, f);
+    fread(gASCII_table, len / 2, 1, f);
+    fread(gASCII_shift_table, len / 2, 1, f);
     fclose(f);
 }
 
@@ -298,7 +296,7 @@ void PDRevertPalette() {
 // Size: 90
 // EAX: pArgc
 // EDX: pArgv
-int PDInitScreenVars(int pArgc, char **pArgv) {
+int PDInitScreenVars(int pArgc, char** pArgv) {
     gGraf_specs[gGraf_spec_index].phys_width = gGraf_specs[gGraf_spec_index].total_width;
     gGraf_specs[gGraf_spec_index].phys_height = gGraf_specs[gGraf_spec_index].total_height;
     return 1;
@@ -329,16 +327,16 @@ void PDAllocateScreenAndBack() {
 // EAX: pDst
 // EDX: pSrc
 // EBX: pPalette
-void Copy8BitTo16BitPixelmap(br_pixelmap *pDst, br_pixelmap *pSrc, br_pixelmap *pPalette) {
+void Copy8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette) {
     int x;
     int y;
-    tU8 *src;
+    tU8* src;
     tU8 value;
     tU8 red;
     tU8 green;
     tU8 blue;
-    tU16 *dst;
-    tU16 *palette_entry;
+    tU16* dst;
+    tU16* palette_entry;
 }
 
 // Offset: 4132
@@ -347,18 +345,18 @@ void Copy8BitTo16BitPixelmap(br_pixelmap *pDst, br_pixelmap *pSrc, br_pixelmap *
 // EDX: pSrc
 // EBX: pPalette
 // ECX: pOff
-void Double8BitTo16BitPixelmap(br_pixelmap *pDst, br_pixelmap *pSrc, br_pixelmap *pPalette, tU16 pOff, tU16 pSrc_width, tU16 pSrc_height) {
+void Double8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette, tU16 pOff, tU16 pSrc_width, tU16 pSrc_height) {
     int x;
     int y;
-    tU8 *src;
+    tU8* src;
     tU8 value;
     tU8 red;
     tU8 green;
     tU8 blue;
-    tU16 *dst0;
-    tU16 *dst1;
+    tU16* dst0;
+    tU16* dst1;
     tU16 sixteen;
-    tU16 *palette_entry;
+    tU16* palette_entry;
 }
 
 // Offset: 4440
@@ -396,7 +394,7 @@ void PDScreenBufferSwap(int pRendering_area_only) {
 // EDX: dx
 // EBX: dy
 // ECX: src
-void PDPixelmapToScreenRectangleCopy(br_pixelmap *dst, br_int_16 dx, br_int_16 dy, br_pixelmap *src, br_int_16 sx, br_int_16 sy, br_uint_16 w, br_uint_16 h) {
+void PDPixelmapToScreenRectangleCopy(br_pixelmap* dst, br_int_16 dx, br_int_16 dy, br_pixelmap* src, br_int_16 sx, br_int_16 sy, br_uint_16 w, br_uint_16 h) {
 }
 
 // Offset: 5104
@@ -405,7 +403,7 @@ void PDPixelmapToScreenRectangleCopy(br_pixelmap *dst, br_int_16 dx, br_int_16 d
 // EDX: x1
 // EBX: y1
 // ECX: x2
-void PDPixelmapHLineOnScreen(br_pixelmap *dst, br_int_16 x1, br_int_16 y1, br_int_16 x2, br_int_16 y2, br_uint_32 colour) {
+void PDPixelmapHLineOnScreen(br_pixelmap* dst, br_int_16 x1, br_int_16 y1, br_int_16 x2, br_int_16 y2, br_uint_32 colour) {
 }
 
 // Offset: 5172
@@ -414,7 +412,7 @@ void PDPixelmapHLineOnScreen(br_pixelmap *dst, br_int_16 x1, br_int_16 y1, br_in
 // EDX: x1
 // EBX: y1
 // ECX: x2
-void PDPixelmapVLineOnScreen(br_pixelmap *dst, br_int_16 x1, br_int_16 y1, br_int_16 x2, br_int_16 y2, br_uint_32 colour) {
+void PDPixelmapVLineOnScreen(br_pixelmap* dst, br_int_16 x1, br_int_16 y1, br_int_16 x2, br_int_16 y2, br_uint_32 colour) {
 }
 
 // Offset: 5240
@@ -436,12 +434,12 @@ void PDSetFileVariables() {
 // Offset: 5304
 // Size: 98
 // EAX: pThe_path
-void PDBuildAppPath(char *pThe_path) {
+void PDBuildAppPath(char* pThe_path) {
     int pos;
 
     getcwd(pThe_path, 256);
     pos = strlen(pThe_path);
-    pThe_path[pos] = gDir_separator[0];  // original: pThe_path[pos] = '\\';
+    pThe_path[pos] = gDir_separator[0]; // original: pThe_path[pos] = '\\';
     pThe_path[pos + 1] = 0;
     strcpy(gNetwork_profile_fname, pThe_path);
     pos = strlen(gNetwork_profile_fname);
@@ -452,7 +450,7 @@ void PDBuildAppPath(char *pThe_path) {
 // Size: 133
 // EAX: pThe_path
 // EDX: pAction_routine
-void PDForEveryFile(char *pThe_path, void (*pAction_routine)(char*)) {
+void PDForEveryFile(char* pThe_path, void (*pAction_routine)(char*)) {
     char find_path[256];
     char found_path[256];
     find_t the_find_buffer;
@@ -461,7 +459,7 @@ void PDForEveryFile(char *pThe_path, void (*pAction_routine)(char*)) {
 // Offset: 5540
 // Size: 39
 // EAX: pThe_palette
-void PDSetPalette(br_pixelmap *pThe_palette) {
+void PDSetPalette(br_pixelmap* pThe_palette) {
 }
 
 // Offset: 5580
@@ -469,9 +467,9 @@ void PDSetPalette(br_pixelmap *pThe_palette) {
 // EAX: pPalette
 // EDX: pFirst_colour
 // EBX: pCount
-void PDSetPaletteEntries(br_pixelmap *pPalette, int pFirst_colour, int pCount) {
+void PDSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
     int i;
-    tU8 *p;
+    tU8* p;
 }
 
 // Offset: 5716
@@ -488,7 +486,7 @@ void PDSwitchToLoresMode() {
 // Size: 86
 // EAX: pButton_1
 // EDX: pButton_2
-void PDMouseButtons(int *pButton_1, int *pButton_2) {
+void PDMouseButtons(int* pButton_1, int* pButton_2) {
     br_uint_32 mouse_buttons;
     br_int_32 mouse_x;
     br_int_32 mouse_y;
@@ -498,7 +496,7 @@ void PDMouseButtons(int *pButton_1, int *pButton_2) {
 // Size: 380
 // EAX: pX_coord
 // EDX: pY_coord
-void PDGetMousePosition(int *pX_coord, int *pY_coord) {
+void PDGetMousePosition(int* pX_coord, int* pY_coord) {
     br_uint_32 mouse_buttons;
     br_int_32 mouse_x2;
     br_int_32 mouse_y2;
@@ -538,15 +536,15 @@ tU32 LargestBlockAvail() {
 // Size: 111
 // EAX: pMaximum_required
 // EDX: pAmount_allocated
-void* PDGrabLargestMammaryWeCanPlayWith(tU32 pMaximum_required, tU32 *pAmount_allocated) {
-    void *result;
+void* PDGrabLargestMammaryWeCanPlayWith(tU32 pMaximum_required, tU32* pAmount_allocated) {
+    void* result;
 }
 
 // Offset: 6588
 // Size: 200
 // EAX: pBuffer
 // EDX: pBuffer_size
-void PDAllocateActionReplayBuffer(char **pBuffer, tU32 *pBuffer_size) {
+void PDAllocateActionReplayBuffer(char** pBuffer, tU32* pBuffer_size) {
     tU32 lba;
     tU32 required;
 }
@@ -554,13 +552,13 @@ void PDAllocateActionReplayBuffer(char **pBuffer, tU32 *pBuffer_size) {
 // Offset: 6788
 // Size: 35
 // EAX: pBuffer
-void PDDisposeActionReplayBuffer(char *pBuffer) {
+void PDDisposeActionReplayBuffer(char* pBuffer) {
 }
 
 // Offset: 6824
 // Size: 146
 // EAX: pProgpath
-void Usage(char *pProgpath) {
+void Usage(char* pProgpath) {
     char basename[9];
 
     splitpath(pProgpath, NULL, NULL, basename, NULL);
@@ -587,7 +585,7 @@ void Usage(char *pProgpath) {
 // EAX: pArgc
 // EDX: pArgv
 // Renamed from "main" to "_main" to allow for unit testing
-int _main(int pArgc, char **pArgv) {
+int _main(int pArgc, char** pArgv) {
     int arg;
     int i;
     float f;
@@ -595,46 +593,36 @@ int _main(int pArgc, char **pArgv) {
     for (i = 1; i < pArgc; i++) {
         if (strcasecmp(pArgv[i], "-hires") == 0) {
             gGraf_spec_index = 1;
-        }
-        else if (strcasecmp(pArgv[i], "-yon") == 0 && i < pArgc - 1) {
+        } else if (strcasecmp(pArgv[i], "-yon") == 0 && i < pArgc - 1) {
             i++;
             sscanf(pArgv[i], "%f", &f);
             if (f >= 0.0 && f <= 1065353216) {
                 gYon_multiplier = f;
             }
-        }
-        else if (strcasecmp(pArgv[i], "-simple") == 0 && i < pArgc - 1) {
+        } else if (strcasecmp(pArgv[i], "-simple") == 0 && i < pArgc - 1) {
             i++;
             sscanf(pArgv[i], "%d", &arg);
             if (arg >= 0 && arg < 5) {
                 gCar_simplification_level = arg;
             }
-        }
-        else if (strcasecmp(pArgv[i], "-sound") == 0 && i < pArgc - 1) {
+        } else if (strcasecmp(pArgv[i], "-sound") == 0 && i < pArgc - 1) {
             i++;
             sscanf(pArgv[i], "%d", &arg);
             gSound_detail_level = arg;
 
-        }
-        else if (strcasecmp(pArgv[i], "-robots") == 0) {
+        } else if (strcasecmp(pArgv[i], "-robots") == 0) {
             gSausage_override = 1;
-        }
-        else if (strcasecmp(pArgv[i], "-lomem") == 0) {
+        } else if (strcasecmp(pArgv[i], "-lomem") == 0) {
             gAustere_override = 1;
-        }
-        else if (strcasecmp(pArgv[i], "-nosound") == 0) {
+        } else if (strcasecmp(pArgv[i], "-nosound") == 0) {
             gSound_override = 1;
-        }
-        else if (strcasecmp(pArgv[i], "-spamfritter") == 0) {
+        } else if (strcasecmp(pArgv[i], "-spamfritter") == 0) {
             gExtra_mem = 2000000;
-        }
-        else if (strcasecmp(pArgv[i], "-nocutscenes") == 0) {
+        } else if (strcasecmp(pArgv[i], "-nocutscenes") == 0) {
             gCut_scene_override = 1;
-        }
-        else if (strcasecmp(pArgv[i], "-noreplay") == 0) {
+        } else if (strcasecmp(pArgv[i], "-noreplay") == 0) {
             gReplay_override = 1;
-        }
-        else {
+        } else {
             Usage(pArgv[0]);
         }
     }
@@ -665,8 +653,8 @@ void PDDisplayGoreworthiness(int pGory) {
 // Offset: 7872
 // Size: 35
 // EAX: pStr
-void PDEnterDebugger(char *pStr) {
-    static unsigned char *save_it;
+void PDEnterDebugger(char* pStr) {
+    static unsigned char* save_it;
 }
 
 // Offset: 7908
@@ -677,7 +665,7 @@ void PDEndItAllAndReRunTheBastard() {
 // Offset: 7932
 // Size: 57
 // EAX: err
-int matherr(struct exception_ *err) {
+int matherr(struct exception_* err) {
 }
 
 // Offset: 7992
@@ -778,7 +766,7 @@ int PDGetJoy2Button4() {
 // Offset: 9824
 // Size: 51
 // EAX: pThe_path
-int PDFileUnlock(char *pThe_path) {
+int PDFileUnlock(char* pThe_path) {
     unsigned int attr;
 }
 
@@ -792,7 +780,7 @@ void CriticalISR(INTPACK pRegs) {
 // EAX: pThe_path
 // EDX: pFile_name
 // EBX: pMin_size
-int PDCheckDriveExists2(char *pThe_path, char *pFile_name, tU32 pMin_size) {
+int PDCheckDriveExists2(char* pThe_path, char* pFile_name, tU32 pMin_size) {
     struct stat buf;
     void (*old_critical_isr)();
     int stat_failed;
@@ -803,16 +791,14 @@ int PDCheckDriveExists2(char *pThe_path, char *pFile_name, tU32 pMin_size) {
 // Offset: 10184
 // Size: 108
 int PDDoWeLeadAnAustereExistance() {
-   tU32 block;
+    tU32 block;
 
-   block = LargestBlockAvail();
+    block = LargestBlockAvail();
 
-  DrDebugMessage("PDDoWeLeadAnAustereExistance (sic): LargestBlockAvail=%d\n", block);
-  
-  if (gReal_graf_data_index == 0) {
-    return block < 13000000;
-  } 
- return block < 15000000;
-  
+    DrDebugMessage("PDDoWeLeadAnAustereExistance (sic): LargestBlockAvail=%d\n", block);
+
+    if (gReal_graf_data_index == 0) {
+        return block < 13000000;
+    }
+    return block < 15000000;
 }
-

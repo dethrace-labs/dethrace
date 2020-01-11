@@ -1,15 +1,13 @@
 #include "framework/unity.h"
 
+#include "common/input.h"
 #include <string.h>
 #include <unistd.h>
-#include "common/input.h"
-
-
 
 void test_input_KevKeyService() {
     int i;
-    char *input = "iwanttofiddle";
-    tU32 *result;
+    char* input = "iwanttofiddle";
+    tU32* result;
     for (i = 0; i < strlen(input); i++) {
         gLast_key_down = input[i] - 75;
         result = KevKeyService();

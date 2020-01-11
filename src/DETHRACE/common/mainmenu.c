@@ -1,11 +1,11 @@
 #include "mainmenu.h"
 
-char *gPalette_copy;
+char* gPalette_copy;
 int gPixel_buffer_size;
-tInterface_spec *gMain_menu_spec;
+tInterface_spec* gMain_menu_spec;
 int gMouse_was_started;
 int gReplace_background;
-char *gPixels_copy;
+char* gPixels_copy;
 
 // Offset: 0
 // Size: 194
@@ -101,4 +101,3 @@ tMM_result DoMainMenu(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) 
 void DoMainMenuScreen(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) {
     tPlayer_status old_status;
 }
-

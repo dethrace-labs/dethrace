@@ -117,7 +117,7 @@ br_angle FastScalarArcTan2Angle(br_scalar pY, br_scalar pX) {
 // Size: 183
 // EAX: mat
 // EDX: rx
-void DRMatrix34RotateX(br_matrix34 *mat, br_angle rx) {
+void DRMatrix34RotateX(br_matrix34* mat, br_angle rx) {
     br_scalar s;
     br_scalar c;
 }
@@ -126,7 +126,7 @@ void DRMatrix34RotateX(br_matrix34 *mat, br_angle rx) {
 // Size: 183
 // EAX: mat
 // EDX: ry
-void DRMatrix34RotateY(br_matrix34 *mat, br_angle ry) {
+void DRMatrix34RotateY(br_matrix34* mat, br_angle ry) {
     br_scalar s;
     br_scalar c;
 }
@@ -135,7 +135,7 @@ void DRMatrix34RotateY(br_matrix34 *mat, br_angle ry) {
 // Size: 183
 // EAX: mat
 // EDX: rz
-void DRMatrix34RotateZ(br_matrix34 *mat, br_angle rz) {
+void DRMatrix34RotateZ(br_matrix34* mat, br_angle rz) {
     br_scalar s;
     br_scalar c;
 }
@@ -145,7 +145,7 @@ void DRMatrix34RotateZ(br_matrix34 *mat, br_angle rz) {
 // EAX: mat
 // EDX: r
 // EBX: a
-void DRMatrix34Rotate(br_matrix34 *mat, br_angle r, br_vector3 *a) {
+void DRMatrix34Rotate(br_matrix34* mat, br_angle r, br_vector3* a) {
     br_scalar t;
     br_scalar s;
     br_scalar c;
@@ -161,42 +161,42 @@ void DRMatrix34Rotate(br_matrix34 *mat, br_angle r, br_vector3 *a) {
 // Size: 96
 // EAX: mat
 // EDX: rx
-void DRMatrix34PreRotateX(br_matrix34 *mat, br_angle rx) {
+void DRMatrix34PreRotateX(br_matrix34* mat, br_angle rx) {
 }
 
 // Offset: 3324
 // Size: 96
 // EAX: mat
 // EDX: rx
-void DRMatrix34PostRotateX(br_matrix34 *mat, br_angle rx) {
+void DRMatrix34PostRotateX(br_matrix34* mat, br_angle rx) {
 }
 
 // Offset: 3420
 // Size: 96
 // EAX: mat
 // EDX: ry
-void DRMatrix34PreRotateY(br_matrix34 *mat, br_angle ry) {
+void DRMatrix34PreRotateY(br_matrix34* mat, br_angle ry) {
 }
 
 // Offset: 3516
 // Size: 96
 // EAX: mat
 // EDX: ry
-void DRMatrix34PostRotateY(br_matrix34 *mat, br_angle ry) {
+void DRMatrix34PostRotateY(br_matrix34* mat, br_angle ry) {
 }
 
 // Offset: 3612
 // Size: 96
 // EAX: mat
 // EDX: rz
-void DRMatrix34PreRotateZ(br_matrix34 *mat, br_angle rz) {
+void DRMatrix34PreRotateZ(br_matrix34* mat, br_angle rz) {
 }
 
 // Offset: 3708
 // Size: 96
 // EAX: mat
 // EDX: rz
-void DRMatrix34PostRotateZ(br_matrix34 *mat, br_angle rz) {
+void DRMatrix34PostRotateZ(br_matrix34* mat, br_angle rz) {
 }
 
 // Offset: 3804
@@ -204,7 +204,7 @@ void DRMatrix34PostRotateZ(br_matrix34 *mat, br_angle rz) {
 // EAX: mat
 // EDX: r
 // EBX: axis
-void DRMatrix34PreRotate(br_matrix34 *mat, br_angle r, br_vector3 *axis) {
+void DRMatrix34PreRotate(br_matrix34* mat, br_angle r, br_vector3* axis) {
 }
 
 // Offset: 3904
@@ -212,14 +212,14 @@ void DRMatrix34PreRotate(br_matrix34 *mat, br_angle r, br_vector3 *axis) {
 // EAX: mat
 // EDX: r
 // EBX: axis
-void DRMatrix34PostRotate(br_matrix34 *mat, br_angle r, br_vector3 *axis) {
+void DRMatrix34PostRotate(br_matrix34* mat, br_angle r, br_vector3* axis) {
 }
 
 // Offset: 4004
 // Size: 123
 // EAX: mat
 // EDX: rz
-void DRMatrix23Rotate(br_matrix23 *mat, br_angle rz) {
+void DRMatrix23Rotate(br_matrix23* mat, br_angle rz) {
     br_scalar s;
     br_scalar c;
 }
@@ -228,13 +228,12 @@ void DRMatrix23Rotate(br_matrix23 *mat, br_angle rz) {
 // Size: 96
 // EAX: mat
 // EDX: rz
-void DRMatrix23PreRotate(br_matrix23 *mat, br_angle rz) {
+void DRMatrix23PreRotate(br_matrix23* mat, br_angle rz) {
 }
 
 // Offset: 4224
 // Size: 96
 // EAX: mat
 // EDX: rz
-void DRMatrix23PostRotate(br_matrix23 *mat, br_angle rz) {
+void DRMatrix23PostRotate(br_matrix23* mat, br_angle rz) {
 }
-

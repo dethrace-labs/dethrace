@@ -13,7 +13,7 @@ int gMirror_on;
 int NumberOfOpponentsLeft() {
     int car_count;
     int result;
-    tCar_spec *the_car;
+    tCar_spec* the_car;
 }
 
 // Offset: 124
@@ -45,7 +45,7 @@ void IncrementLap() {
 // EDX: pV1
 // EBX: pV2
 // ECX: pNormal
-int RayHitFace(br_vector3 *pV0, br_vector3 *pV1, br_vector3 *pV2, br_vector3 *pNormal, br_vector3 *pStart, br_vector3 *pDir) {
+int RayHitFace(br_vector3* pV0, br_vector3* pV1, br_vector3* pV2, br_vector3* pNormal, br_vector3* pStart, br_vector3* pDir) {
     tFace_ref the_face;
     br_scalar rt;
 }
@@ -59,7 +59,7 @@ void WrongCheckpoint(int pCheckpoint_index) {
 // Offset: 1400
 // Size: 870
 void CheckCheckpoints() {
-    tCar_spec *car;
+    tCar_spec* car;
     br_vector3 orig;
     br_vector3 dir;
     int i;
@@ -67,7 +67,7 @@ void CheckCheckpoints() {
     int cat;
     int car_count;
     int car_index;
-    tNet_game_player_info *net_player;
+    tNet_game_player_info* net_player;
 }
 
 // Offset: 2272
@@ -94,7 +94,7 @@ void DoProgramDemo() {
 // Size: 308
 // EAX: pNastiness
 // EDX: pHad_scum
-int ChooseOpponent(int pNastiness, int *pHad_scum) {
+int ChooseOpponent(int pNastiness, int* pHad_scum) {
     int i;
     int count;
     int temp_array[40];
@@ -103,7 +103,7 @@ int ChooseOpponent(int pNastiness, int *pHad_scum) {
 // Offset: 2832
 // Size: 294
 // EAX: pRace_info
-void SelectOpponents(tRace_info *pRace_info) {
+void SelectOpponents(tRace_info* pRace_info) {
     int i;
     int rank_band;
     int nastiness;
@@ -166,4 +166,3 @@ void GoingToInterfaceFromRace() {
 // Size: 81
 void GoingBackToRaceFromInterface() {
 }
-

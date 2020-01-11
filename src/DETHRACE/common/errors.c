@@ -1,13 +1,13 @@
 #include "errors.h"
 
-#include <string.h>
-#include <stdio.h>
 #include <stdarg.h>
+#include <stdio.h>
+#include <string.h>
 
-#include "utility.h"
 #include "pc-dos/dossys.h"
+#include "utility.h"
 
-char *gError_messages[126] = {
+char* gError_messages[126] = {
     "Unable to support this screen depth setting\nCouldn't allocate off-screen buffer",
     "Couldn't allocate Z-Buffer",
     "Couldn't allocate root actor",
@@ -126,18 +126,18 @@ char *gError_messages[126] = {
     "Random number out of range (%)"
 };
 int gError_code;
-char *gPalette_copy;
+char* gPalette_copy;
 int gPixel_buffer_size;
 int gMouse_was_started;
-char *gPixels_copy;
+char* gPixels_copy;
 
 // Offset: 0
 // Size: 207
 void FatalError(int pStr_index, ...) {
     char the_str[1024];
-    char *sub_str;
+    char* sub_str;
     char temp_str[1024];
-    char *sub_pt;
+    char* sub_pt;
     va_list ap;
     int i = 0;
 
@@ -145,7 +145,7 @@ void FatalError(int pStr_index, ...) {
 
     int read_timer = 0;
     gError_code = 0x20000000 + read_timer;
-    strcpy(the_str, gError_messages[pStr_index-1]);
+    strcpy(the_str, gError_messages[pStr_index - 1]);
     sub_pt = temp_str;
 
     for (i = 0; i < strlen(the_str); i++) {
@@ -168,9 +168,9 @@ void FatalError(int pStr_index, ...) {
 // Size: 172
 void NonFatalError(int pStr_index, ...) {
     char the_str[256];
-    char *sub_str;
+    char* sub_str;
     char temp_str[256];
-    char *sub_pt;
+    char* sub_pt;
     va_list ap;
 }
 
@@ -195,4 +195,3 @@ void OpenDiagnostics() {
 // EAX: pMisc_text_index
 int DoErrorInterface(int pMisc_text_index) {
 }
-

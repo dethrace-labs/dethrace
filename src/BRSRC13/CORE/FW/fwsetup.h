@@ -15,14 +15,14 @@ br_error BrFwEnd();
 
 // Offset: 466
 // Size: 73
-br_diaghandler* BrDiagHandlerSet(br_diaghandler *newdh);
+br_diaghandler* BrDiagHandlerSet(br_diaghandler* newdh);
 
 // Offset: 555
 // Size: 73
-br_filesystem* BrFilesystemSet(br_filesystem *newfs);
+br_filesystem* BrFilesystemSet(br_filesystem* newfs);
 
 // Offset: 643
 // Size: 73
-br_allocator* BrAllocatorSet(br_allocator *newal);
+br_allocator* BrAllocatorSet(br_allocator* newal);
 
 #endif

@@ -1,8 +1,8 @@
 #ifndef _OPTIONS_H_
 #define _OPTIONS_H_
 
-#include "dr_types.h"
 #include "br_types.h"
+#include "dr_types.h"
 
 // Offset: 0
 // Size: 161
@@ -33,13 +33,13 @@ int SoundOptionsDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int 
 // Size: 154
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int SoundOptionsLeft(int *pCurrent_choice, int *pCurrent_mode);
+int SoundOptionsLeft(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 896
 // Size: 154
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int SoundOptionsRight(int *pCurrent_choice, int *pCurrent_mode);
+int SoundOptionsRight(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 1052
 // Size: 384
@@ -47,7 +47,7 @@ int SoundOptionsRight(int *pCurrent_choice, int *pCurrent_mode);
 // EDX: pCurrent_mode
 // EBX: pX_offset
 // ECX: pY_offset
-int SoundClick(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_offset);
+int SoundClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset);
 
 // Offset: 1436
 // Size: 77
@@ -99,25 +99,25 @@ void RadioChanged(int pIndex, int pNew_value);
 // Size: 121
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int GraphOptLeft(int *pCurrent_choice, int *pCurrent_mode);
+int GraphOptLeft(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 3260
 // Size: 125
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int GraphOptRight(int *pCurrent_choice, int *pCurrent_mode);
+int GraphOptRight(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 3388
 // Size: 148
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int GraphOptUp(int *pCurrent_choice, int *pCurrent_mode);
+int GraphOptUp(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 3536
 // Size: 148
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int GraphOptDown(int *pCurrent_choice, int *pCurrent_mode);
+int GraphOptDown(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 3684
 // Size: 175
@@ -125,13 +125,13 @@ int GraphOptDown(int *pCurrent_choice, int *pCurrent_mode);
 // EDX: pCurrent_mode
 // EBX: pX_offset
 // ECX: pY_offset
-int RadioClick(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_offset);
+int RadioClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset);
 
 // Offset: 3860
 // Size: 59
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int GraphOptGoAhead(int *pCurrent_choice, int *pCurrent_mode);
+int GraphOptGoAhead(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 4216
 // Size: 80
@@ -150,7 +150,7 @@ void CalibrateJoysticks();
 // Offset: 5952
 // Size: 118
 // EAX: pStr
-void StripControls(unsigned char *pStr);
+void StripControls(unsigned char* pStr);
 
 // Offset: 6072
 // Size: 215
@@ -170,7 +170,7 @@ void SaveOrigKeyMapping();
 // EDX: pY
 // EBX: pName_x
 // ECX: pKey_x
-void GetKeyCoords(int pIndex, int *pY, int *pName_x, int *pKey_x, int *pEnd_box);
+void GetKeyCoords(int pIndex, int* pY, int* pName_x, int* pKey_x, int* pEnd_box);
 
 // Offset: 6808
 // Size: 182
@@ -195,31 +195,31 @@ void DrawKeyAssignments(int pCurrent_choice, int pCurrent_mode);
 // Size: 252
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int KeyAssignLeft(int *pCurrent_choice, int *pCurrent_mode);
+int KeyAssignLeft(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 8704
 // Size: 252
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int KeyAssignRight(int *pCurrent_choice, int *pCurrent_mode);
+int KeyAssignRight(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 8956
 // Size: 299
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int KeyAssignUp(int *pCurrent_choice, int *pCurrent_mode);
+int KeyAssignUp(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 9256
 // Size: 265
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int KeyAssignDown(int *pCurrent_choice, int *pCurrent_mode);
+int KeyAssignDown(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 9524
 // Size: 1009
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int KeyAssignGoAhead(int *pCurrent_choice, int *pCurrent_mode);
+int KeyAssignGoAhead(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 10536
 // Size: 168
@@ -227,7 +227,7 @@ int KeyAssignGoAhead(int *pCurrent_choice, int *pCurrent_mode);
 // EDX: pCurrent_mode
 // EBX: pX_offset
 // ECX: pY_offset
-int MouseyClickBastard(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_offset);
+int MouseyClickBastard(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset);
 
 // Offset: 10704
 // Size: 90

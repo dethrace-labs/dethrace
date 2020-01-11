@@ -1,24 +1,24 @@
 #include "globvrbm.h"
 
-br_material *gMaterial[2];
+br_material* gMaterial[2];
 int g16bit_palette_valid;
 tException_list gExceptions;
-br_actor *g2d_camera;
+br_actor* g2d_camera;
 int gAlready_copied;
-br_actor *gBlend_actor;
-br_actor *gLine_actor;
-br_model *gBlend_model;
-br_model *gPrat_model;
-char *gExceptions_general_file;
-br_model *gDim_model;
-br_material *gPrat_material;
-br_material *gBlend_material;
-char *gExceptions_file_suffix;
-br_material *gDim_material;
-br_actor *gPrat_actor;
-br_material *gLine_material;
-br_model *gLine_model;
-br_actor *gDim_actor;
+br_actor* gBlend_actor;
+br_actor* gLine_actor;
+br_model* gBlend_model;
+br_model* gPrat_model;
+char* gExceptions_general_file;
+br_model* gDim_model;
+br_material* gPrat_material;
+br_material* gBlend_material;
+char* gExceptions_file_suffix;
+br_material* gDim_material;
+br_actor* gPrat_actor;
+br_material* gLine_material;
+br_model* gLine_model;
+br_actor* gDim_actor;
 int gNo_transients;
 int gSmall_frames_are_slow;
 int gShade_tables_do_not_work;
@@ -33,4 +33,3 @@ int gMax_texture_side;
 int gDevious_2d;
 int gMax_texture_aspect_ratio;
 int gMaterial_fogging;
-

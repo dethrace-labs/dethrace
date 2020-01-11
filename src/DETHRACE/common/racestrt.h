@@ -1,8 +1,8 @@
 #ifndef _RACESTRT_H_
 #define _RACESTRT_H_
 
-#include "dr_types.h"
 #include "br_types.h"
+#include "dr_types.h"
 
 // Offset: 0
 // Size: 1371
@@ -20,13 +20,13 @@ void MoveRaceList(int pFrom, int pTo, tS32 pTime_to_move);
 // Size: 227
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int UpRace(int *pCurrent_choice, int *pCurrent_mode);
+int UpRace(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 1744
 // Size: 232
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int DownRace(int *pCurrent_choice, int *pCurrent_mode);
+int DownRace(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 1976
 // Size: 229
@@ -34,7 +34,7 @@ int DownRace(int *pCurrent_choice, int *pCurrent_mode);
 // EDX: pCurrent_mode
 // EBX: pX_offset
 // ECX: pY_offset
-int ClickOnRace(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_offset);
+int ClickOnRace(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset);
 
 // Offset: 2208
 // Size: 61
@@ -42,7 +42,7 @@ int ClickOnRace(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_
 // EDX: pCurrent_mode
 // EBX: pX_offset
 // ECX: pY_offset
-int UpClickRace(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_offset);
+int UpClickRace(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset);
 
 // Offset: 2272
 // Size: 61
@@ -50,7 +50,7 @@ int UpClickRace(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_
 // EDX: pCurrent_mode
 // EBX: pX_offset
 // ECX: pY_offset
-int DownClickRace(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_offset);
+int DownClickRace(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset);
 
 // Offset: 2336
 // Size: 55
@@ -61,7 +61,7 @@ void StartChangeRace();
 // EAX: pRace_index
 // EDX: pNet_mode
 // EBX: pNet_race_sequence
-int ChangeRace(int *pRace_index, int pNet_mode, tNet_sequence_type pNet_race_sequence);
+int ChangeRace(int* pRace_index, int pNet_mode, tNet_sequence_type pNet_race_sequence);
 
 // Offset: 2620
 // Size: 62
@@ -81,13 +81,13 @@ void SetCarFlic();
 // Size: 287
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int UpCar(int *pCurrent_choice, int *pCurrent_mode);
+int UpCar(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 3812
 // Size: 292
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int DownCar(int *pCurrent_choice, int *pCurrent_mode);
+int DownCar(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 4104
 // Size: 61
@@ -95,7 +95,7 @@ int DownCar(int *pCurrent_choice, int *pCurrent_mode);
 // EDX: pCurrent_mode
 // EBX: pX_offset
 // ECX: pY_offset
-int UpClickCar(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_offset);
+int UpClickCar(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset);
 
 // Offset: 4168
 // Size: 61
@@ -103,20 +103,20 @@ int UpClickCar(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_o
 // EDX: pCurrent_mode
 // EBX: pX_offset
 // ECX: pY_offset
-int DownClickCar(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_offset);
+int DownClickCar(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset);
 
 // Offset: 4232
 // Size: 107
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int ChangeCarGoAhead(int *pCurrent_choice, int *pCurrent_mode);
+int ChangeCarGoAhead(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 4340
 // Size: 918
 // EAX: pNet_mode
 // EDX: pCar_index
 // EBX: pNet_game
-int ChangeCar(int pNet_mode, int *pCar_index, tNet_game_details *pNet_game);
+int ChangeCar(int pNet_mode, int* pCar_index, tNet_game_details* pNet_game);
 
 // Offset: 5260
 // Size: 48
@@ -132,7 +132,7 @@ int PartsShopRecommended();
 // EDX: pIndex
 // EBX: pPrice
 // ECX: pCost
-void CalcPartPrice(int pCategory, int pIndex, int *pPrice, int *pCost);
+void CalcPartPrice(int pCategory, int pIndex, int* pPrice, int* pCost);
 
 // Offset: 5752
 // Size: 145
@@ -177,19 +177,19 @@ void DoExchangePart();
 // Size: 516
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int PartsShopGoAhead(int *pCurrent_choice, int *pCurrent_mode);
+int PartsShopGoAhead(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 8448
 // Size: 367
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int UpPart(int *pCurrent_choice, int *pCurrent_mode);
+int UpPart(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 8816
 // Size: 376
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int DownPart(int *pCurrent_choice, int *pCurrent_mode);
+int DownPart(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 9192
 // Size: 61
@@ -197,7 +197,7 @@ int DownPart(int *pCurrent_choice, int *pCurrent_mode);
 // EDX: pCurrent_mode
 // EBX: pX_offset
 // ECX: pY_offset
-int UpClickPart(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_offset);
+int UpClickPart(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset);
 
 // Offset: 9256
 // Size: 61
@@ -205,19 +205,19 @@ int UpClickPart(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_
 // EDX: pCurrent_mode
 // EBX: pX_offset
 // ECX: pY_offset
-int DownClickPart(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_offset);
+int DownClickPart(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset);
 
 // Offset: 9320
 // Size: 197
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int PartsArrowsOn(int *pCurrent_choice, int *pCurrent_mode);
+int PartsArrowsOn(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 9520
 // Size: 197
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int PartsArrowsOff(int *pCurrent_choice, int *pCurrent_mode);
+int PartsArrowsOff(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 9720
 // Size: 44
@@ -278,25 +278,25 @@ int SelectRaceDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pE
 // Size: 191
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int StartRaceGoAhead(int *pCurrent_choice, int *pCurrent_mode);
+int StartRaceGoAhead(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 10928
 // Size: 99
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int TryToMoveToArrows(int *pCurrent_choice, int *pCurrent_mode);
+int TryToMoveToArrows(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 11028
 // Size: 296
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int UpOpponent(int *pCurrent_choice, int *pCurrent_mode);
+int UpOpponent(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 11324
 // Size: 302
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int DownOpponent(int *pCurrent_choice, int *pCurrent_mode);
+int DownOpponent(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 11628
 // Size: 61
@@ -304,7 +304,7 @@ int DownOpponent(int *pCurrent_choice, int *pCurrent_mode);
 // EDX: pCurrent_mode
 // EBX: pX_offset
 // ECX: pY_offset
-int UpClickOpp(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_offset);
+int UpClickOpp(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset);
 
 // Offset: 11692
 // Size: 61
@@ -312,7 +312,7 @@ int UpClickOpp(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_o
 // EDX: pCurrent_mode
 // EBX: pX_offset
 // ECX: pY_offset
-int DownClickOpp(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_offset);
+int DownClickOpp(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset);
 
 // Offset: 11756
 // Size: 51
@@ -331,14 +331,14 @@ void SelectRaceDraw(int pCurrent_choice, int pCurrent_mode);
 // Offset: 13784
 // Size: 754
 // EAX: pSecond_time_around
-tSO_result DoSelectRace(int *pSecond_time_around);
+tSO_result DoSelectRace(int* pSecond_time_around);
 
 // Offset: 14540
 // Size: 135
 // EAX: pX
 // EDX: pY
 // EBX: pImage
-void DrawGridCar(int pX, int pY, br_pixelmap *pImage);
+void DrawGridCar(int pX, int pY, br_pixelmap* pImage);
 
 // Offset: 14676
 // Size: 2113
@@ -384,7 +384,7 @@ void ChallengeStart();
 // Size: 186
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int CheckNextStage(int *pCurrent_choice, int *pCurrent_mode);
+int CheckNextStage(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 18528
 // Size: 212
@@ -414,13 +414,13 @@ void GridStart();
 // Size: 185
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int GridMoveLeft(int *pCurrent_choice, int *pCurrent_mode);
+int GridMoveLeft(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 19260
 // Size: 166
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int GridMoveRight(int *pCurrent_choice, int *pCurrent_mode);
+int GridMoveRight(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 19428
 // Size: 253
@@ -428,7 +428,7 @@ int GridMoveRight(int *pCurrent_choice, int *pCurrent_mode);
 // EDX: pCurrent_mode
 // EBX: pX_offset
 // ECX: pY_offset
-int GridClickCar(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_offset);
+int GridClickCar(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset);
 
 // Offset: 19684
 // Size: 213
@@ -436,7 +436,7 @@ int GridClickCar(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY
 // EDX: pCurrent_mode
 // EBX: pX_offset
 // ECX: pY_offset
-int GridClickNumbers(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_offset);
+int GridClickNumbers(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset);
 
 // Offset: 19900
 // Size: 61
@@ -444,7 +444,7 @@ int GridClickNumbers(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, in
 // EDX: pCurrent_mode
 // EBX: pX_offset
 // ECX: pY_offset
-int GridClickLeft(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_offset);
+int GridClickLeft(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset);
 
 // Offset: 19964
 // Size: 61
@@ -452,13 +452,13 @@ int GridClickLeft(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int p
 // EDX: pCurrent_mode
 // EBX: pX_offset
 // ECX: pY_offset
-int GridClickRight(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_offset);
+int GridClickRight(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset);
 
 // Offset: 20028
 // Size: 90
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int CheckChallenge(int *pCurrent_choice, int *pCurrent_mode);
+int CheckChallenge(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 20120
 // Size: 100
@@ -469,7 +469,7 @@ int FindBestPos(int pOur_rank);
 // Size: 56
 // EAX: pFirst_one
 // EDX: pSecond_one
-int SortGridFunction(void *pFirst_one, void *pSecond_one);
+int SortGridFunction(void* pFirst_one, void* pSecond_one);
 
 // Offset: 20276
 // Size: 286
@@ -505,13 +505,13 @@ int NetSynchStartDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int
 // Size: 217
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int NetSynchStartGoAhead(int *pCurrent_choice, int *pCurrent_mode);
+int NetSynchStartGoAhead(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 22276
 // Size: 111
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int ExitWhenReady(int *pCurrent_choice, int *pCurrent_mode);
+int ExitWhenReady(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 22388
 // Size: 246

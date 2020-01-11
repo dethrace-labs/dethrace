@@ -1,8 +1,8 @@
 #ifndef _CUTSCENE_H_
 #define _CUTSCENE_H_
 
-#include "dr_types.h"
 #include "br_types.h"
+#include "dr_types.h"
 
 // Offset: 0
 // Size: 118
@@ -10,7 +10,7 @@ void* radmalloc(unsigned long numbytes);
 
 // Offset: 120
 // Size: 59
-void radfree(void *ptr);
+void radfree(void* ptr);
 
 // Offset: 180
 // Size: 179
@@ -30,7 +30,7 @@ void DoStainlessLogo();
 // Offset: 432
 // Size: 844
 // EAX: pSmack_name
-void PlaySmackerFile(char *pSmack_name);
+void PlaySmackerFile(char* pSmack_name);
 
 // Offset: 1276
 // Size: 59

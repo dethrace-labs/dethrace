@@ -40,7 +40,7 @@ void UsePathFileToDetermineIfFullInstallation() {
     char line2[80];
     char line3[80];
     char path_file[80];
-    FILE *fp;
+    FILE* fp;
 
     strcpy(path_file, gApplication_path);
     strcat(path_file, gDir_separator);
@@ -49,10 +49,7 @@ void UsePathFileToDetermineIfFullInstallation() {
     if (PDCheckDriveExists(path_file) == 0) {
         fp = fopen(path_file, "rt");
         if (fp != NULL) {
-            if (GetALineWithNoPossibleService(fp, line2) &&
-                GetALineWithNoPossibleService(fp, line2) &&
-                GetALineWithNoPossibleService(fp, line3) &&
-                strcmp(line3, "Full") == 0) {
+            if (GetALineWithNoPossibleService(fp, line2) && GetALineWithNoPossibleService(fp, line2) && GetALineWithNoPossibleService(fp, line3) && strcmp(line3, "Full") == 0) {
 
                 gCD_fully_installed = 1;
             }
@@ -60,7 +57,6 @@ void UsePathFileToDetermineIfFullInstallation() {
         }
     }
 }
-
 
 // Offset: 224
 // Size: 976
@@ -211,7 +207,7 @@ void InitSoundSources() {
     int car_count;
     int i;
     int toggle;
-    tCar_spec *the_car;
+    tCar_spec* the_car;
 }
 
 // Offset: 3552
@@ -220,7 +216,7 @@ void DisposeSoundSources() {
     int car_count;
     int i;
     int toggle;
-    tCar_spec *the_car;
+    tCar_spec* the_car;
 }
 
 // Offset: 3964
@@ -229,7 +225,7 @@ void DisposeSoundSources() {
 // EDX: pSound
 // EBX: pInitial_position
 // ECX: pInitial_velocity
-tS3_sound_tag DRS3StartSound3D(tS3_outlet_ptr pOutlet, tS3_sound_id pSound, br_vector3 *pInitial_position, br_vector3 *pInitial_velocity, tS3_repeats pRepeats, tS3_volume pVolume, tS3_pitch pPitch, tS3_speed pSpeed) {
+tS3_sound_tag DRS3StartSound3D(tS3_outlet_ptr pOutlet, tS3_sound_id pSound, br_vector3* pInitial_position, br_vector3* pInitial_velocity, tS3_repeats pRepeats, tS3_volume pVolume, tS3_pitch pPitch, tS3_speed pSpeed) {
     tS3_sound_tag tag;
 }
 
@@ -302,4 +298,3 @@ void StartMusic() {
 // Size: 48
 void StopMusic() {
 }
-

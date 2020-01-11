@@ -6,7 +6,7 @@ int gPed_target;
 int gNot_shown_race_type_headup;
 tU32 gLast_it_change;
 tU32 gTime_for_punishment;
-tNet_game_player_info *gLast_lepper;
+tNet_game_player_info* gLast_lepper;
 int gInitialised_grid;
 int gIt_or_fox;
 
@@ -14,9 +14,9 @@ int gIt_or_fox;
 // Size: 2343
 // EAX: pNext_frame_time
 void SendCarData(tU32 pNext_frame_time) {
-    tNet_contents *contents;
-    tCar_spec *car;
-    tCollision_info *ncar;
+    tNet_contents* contents;
+    tCar_spec* car;
+    tCollision_info* ncar;
     int i;
     int j;
     static tU32 last_time;
@@ -27,7 +27,7 @@ void SendCarData(tU32 pNext_frame_time) {
 // Offset: 2344
 // Size: 137
 // EAX: pContents
-void ReceivedRecover(tNet_contents *pContents) {
+void ReceivedRecover(tNet_contents* pContents) {
     int i;
 }
 
@@ -35,23 +35,23 @@ void ReceivedRecover(tNet_contents *pContents) {
 // Size: 117
 // EAX: pCar
 // EDX: pContents
-void CopyMechanics(tCar_spec *pCar, tNet_contents *pContents) {
+void CopyMechanics(tCar_spec* pCar, tNet_contents* pContents) {
     int j;
 }
 
 // Offset: 2604
 // Size: 1378
 // EAX: pContents
-void ReceivedMechanics(tNet_contents *pContents) {
+void ReceivedMechanics(tNet_contents* pContents) {
     int i;
-    tCar_spec *car;
+    tCar_spec* car;
 }
 
 // Offset: 3984
 // Size: 576
 // EAX: pContents
-void ReceivedCopInfo(tNet_contents *pContents) {
-    tCar_spec *c;
+void ReceivedCopInfo(tNet_contents* pContents) {
+    tCar_spec* c;
     int i;
 }
 
@@ -59,36 +59,36 @@ void ReceivedCopInfo(tNet_contents *pContents) {
 // Size: 250
 void SendAllNonCarPositions() {
     int i;
-    br_actor **list;
-    tNon_car_spec *non_car;
-    tNet_contents *contents;
+    br_actor** list;
+    tNon_car_spec* non_car;
+    tNet_contents* contents;
 }
 
 // Offset: 4812
 // Size: 118
 // EAX: pContents
-void ReceivedNonCarPosition(tNet_contents *pContents) {
-    br_actor *actor;
+void ReceivedNonCarPosition(tNet_contents* pContents) {
+    br_actor* actor;
 }
 
 // Offset: 4932
 // Size: 842
 // EAX: pContents
-void ReceivedNonCar(tNet_contents *pContents) {
-    br_actor *actor;
+void ReceivedNonCar(tNet_contents* pContents) {
+    br_actor* actor;
     br_vector3 tv;
     tU8 cx;
     tU8 cz;
-    tTrack_spec *track_spec;
-    tNon_car_spec *ncar;
-    tCollision_info *c;
+    tTrack_spec* track_spec;
+    tNon_car_spec* ncar;
+    tCollision_info* c;
 }
 
 // Offset: 5776
 // Size: 617
 // EAX: pIndex
 void SignalToStartRace2(int pIndex) {
-    tNet_message *the_message;
+    tNet_message* the_message;
     int i;
     int j;
 }
@@ -110,7 +110,7 @@ void SetUpNetCarPositions() {
 // Offset: 7228
 // Size: 93
 // EAX: pCar
-void ReinitialiseCar(tCar_spec *pCar) {
+void ReinitialiseCar(tCar_spec* pCar) {
     int i;
 }
 
@@ -118,20 +118,20 @@ void ReinitialiseCar(tCar_spec *pCar) {
 // Size: 285
 // EAX: pIndex
 void RepositionPlayer(int pIndex) {
-    tNet_message *the_message;
-    tCar_spec *car;
+    tNet_message* the_message;
+    tCar_spec* car;
 }
 
 // Offset: 7612
 // Size: 200
 // EAX: pCar
-void DisableCar(tCar_spec *pCar) {
+void DisableCar(tCar_spec* pCar) {
 }
 
 // Offset: 7812
 // Size: 222
 // EAX: pCar
-void EnableCar(tCar_spec *pCar) {
+void EnableCar(tCar_spec* pCar) {
 }
 
 // Offset: 8036
@@ -148,14 +148,14 @@ void DoNetworkHeadups(int pCredits) {
 // Size: 167
 // EAX: pFirst_one
 // EDX: pSecond_one
-int SortNetHeadAscending(void *pFirst_one, void *pSecond_one) {
+int SortNetHeadAscending(void* pFirst_one, void* pSecond_one) {
 }
 
 // Offset: 9100
 // Size: 167
 // EAX: pFirst_one
 // EDX: pSecond_one
-int SortNetHeadDescending(void *pFirst_one, void *pSecond_one) {
+int SortNetHeadDescending(void* pFirst_one, void* pSecond_one) {
 }
 
 // Offset: 9268
@@ -163,7 +163,7 @@ int SortNetHeadDescending(void *pFirst_one, void *pSecond_one) {
 // EAX: pName
 // EDX: pFont
 // EBX: pMax_width
-void ClipName(char *pName, tDR_font *pFont, int pMax_width) {
+void ClipName(char* pName, tDR_font* pFont, int pMax_width) {
 }
 
 // Offset: 9340
@@ -210,7 +210,7 @@ void EverybodysLost() {
 // Size: 676
 // EAX: pWinner_index
 void DeclareWinner(int pWinner_index) {
-    tNet_message *the_message;
+    tNet_message* the_message;
     int i;
     int j;
     int best_score_index;
@@ -220,7 +220,7 @@ void DeclareWinner(int pWinner_index) {
 // Offset: 12716
 // Size: 476
 // EAX: pPlayer
-void PlayerIsIt(tNet_game_player_info *pPlayer) {
+void PlayerIsIt(tNet_game_player_info* pPlayer) {
     int i;
     char s[256];
 }
@@ -229,14 +229,14 @@ void PlayerIsIt(tNet_game_player_info *pPlayer) {
 // Size: 195
 // EAX: pPlayer_1
 // EDX: pPlayer_2
-int FarEnoughAway(tNet_game_player_info *pPlayer_1, tNet_game_player_info *pPlayer_2) {
+int FarEnoughAway(tNet_game_player_info* pPlayer_1, tNet_game_player_info* pPlayer_2) {
     br_vector3 difference;
 }
 
 // Offset: 13388
 // Size: 144
 // EAX: pPlayer
-void CarInContactWithItOrFox(tNet_game_player_info *pPlayer) {
+void CarInContactWithItOrFox(tNet_game_player_info* pPlayer) {
 }
 
 // Offset: 13532
@@ -265,11 +265,11 @@ void CalcPlayerScores() {
     int lowest_score;
     int player_left;
     int new_choice;
-    tCar_spec *car;
-    tNet_message *message;
+    tCar_spec* car;
+    tNet_message* message;
     tS32 time;
     char s[256];
-    tNet_game_player_info *lowest_score_player;
+    tNet_game_player_info* lowest_score_player;
 }
 
 // Offset: 16380
@@ -286,7 +286,7 @@ void DoNetGameManagement() {
 // Offset: 16620
 // Size: 218
 // EAX: pPlayer
-void InitialisePlayerScore(tNet_game_player_info *pPlayer) {
+void InitialisePlayerScore(tNet_game_player_info* pPlayer) {
 }
 
 // Offset: 16840
@@ -327,7 +327,7 @@ void UseGeneralScore(int pScore) {
 // Offset: 17852
 // Size: 53
 // EAX: pPlayer
-void NetSendEnvironmentChanges(tNet_game_player_info *pPlayer) {
+void NetSendEnvironmentChanges(tNet_game_player_info* pPlayer) {
 }
 
 // Offset: 17908
@@ -340,11 +340,11 @@ void UpdateEnvironments() {
 // EAX: pContents
 // EDX: pMessage
 // EBX: pReceive_time
-void ReceivedGameplay(tNet_contents *pContents, tNet_message *pMessage, tU32 pReceive_time) {
+void ReceivedGameplay(tNet_contents* pContents, tNet_message* pMessage, tU32 pReceive_time) {
     int must_revert_reentrancy;
     int gPixel_buffer_size;
-    char *gPixels_copy;
-    char *gPalette_copy;
+    char* gPixels_copy;
+    char* gPalette_copy;
     static int pause_semaphore;
 }
 
@@ -355,7 +355,7 @@ void ReceivedGameplay(tNet_contents *pContents, tNet_message *pMessage, tU32 pRe
 // EBX: pParam_1
 // ECX: pParam_2
 void SendGameplay(tPlayer_ID pPlayer, tNet_gameplay_mess pMess, int pParam_1, int pParam_2, int pParam_3, int pParam_4) {
-    tNet_message *the_message;
+    tNet_message* the_message;
 }
 
 // Offset: 18816
@@ -365,7 +365,7 @@ void SendGameplay(tPlayer_ID pPlayer, tNet_gameplay_mess pMess, int pParam_1, in
 // EBX: pParam_2
 // ECX: pParam_3
 void SendGameplayToAllPlayers(tNet_gameplay_mess pMess, int pParam_1, int pParam_2, int pParam_3, int pParam_4) {
-    tNet_message *the_message;
+    tNet_message* the_message;
 }
 
 // Offset: 18936
@@ -375,7 +375,7 @@ void SendGameplayToAllPlayers(tNet_gameplay_mess pMess, int pParam_1, int pParam
 // EBX: pParam_2
 // ECX: pParam_3
 void SendGameplayToHost(tNet_gameplay_mess pMess, int pParam_1, int pParam_2, int pParam_3, int pParam_4) {
-    tNet_message *the_message;
+    tNet_message* the_message;
 }
 
 // Offset: 19064
@@ -393,35 +393,34 @@ void DefaultNetName() {
 // EAX: pCar
 // EDX: pCrush_point_index
 // EBX: pEnergy_vector
-void NetSendPointCrush(tCar_spec *pCar, tU16 pCrush_point_index, br_vector3 *pEnergy_vector) {
-    tNet_contents *contents;
+void NetSendPointCrush(tCar_spec* pCar, tU16 pCrush_point_index, br_vector3* pEnergy_vector) {
+    tNet_contents* contents;
 }
 
 // Offset: 19276
 // Size: 290
 // EAX: pContents
-void RecievedCrushPoint(tNet_contents *pContents) {
-    tCar_spec *car;
+void RecievedCrushPoint(tNet_contents* pContents) {
+    tCar_spec* car;
 }
 
 // Offset: 19568
 // Size: 144
 // EAX: m1
 // EDX: m2
-void GetReducedMatrix(tReduced_matrix *m1, br_matrix34 *m2) {
+void GetReducedMatrix(tReduced_matrix* m1, br_matrix34* m2) {
 }
 
 // Offset: 19712
 // Size: 238
 // EAX: m1
 // EDX: m2
-void GetExpandedMatrix(br_matrix34 *m1, tReduced_matrix *m2) {
+void GetExpandedMatrix(br_matrix34* m1, tReduced_matrix* m2) {
 }
 
 // Offset: 19952
 // Size: 38
 // EAX: pPlayer
 // EDX: pCredits
-void NetEarnCredits(tNet_game_player_info *pPlayer, tS32 pCredits) {
+void NetEarnCredits(tNet_game_player_info* pPlayer, tS32 pCredits) {
 }
-

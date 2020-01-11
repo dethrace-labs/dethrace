@@ -176,7 +176,6 @@ char* GetALineWithNoPossibleService(FILE* pF, /*unsigned*/ char* pS) {
         if (!result) {
             break;
         }
-
         if (s[0] == '@') {
             EncodeLine(&s[1]);
             goto LABEL_5;

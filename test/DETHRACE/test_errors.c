@@ -1,9 +1,8 @@
 #include "framework/unity.h"
 
-#include <string.h>
 #include "common/errors.h"
 #include "pc-dos/dossys.h"
-
+#include <string.h>
 
 void test_errors_FatalError() {
     _unittest_do_not_exit = 1;
