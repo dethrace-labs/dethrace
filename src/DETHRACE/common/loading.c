@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "brucetrk.h"
+#include "depth.h"
 #include "displays.h"
 #include "errors.h"
 #include "globvars.h"
@@ -14,6 +16,7 @@
 #include "pc-dos/dossys.h"
 #include "pedestrn.h"
 #include "sound.h"
+#include "spark.h"
 #include "utility.h"
 #include "world.h"
 
@@ -1437,11 +1440,97 @@ int SaveOptions() {
 // Offset: 40912
 // Size: 1643
 int RestoreOptions() {
+    tPath_name the_path;
     FILE* f;
     char line[80];
     char token[80];
     char* s;
     float arg;
+
+    gProgram_state.music_volume = 4;
+    gProgram_state.effects_volume = 4;
+    DefaultNetSettings();
+
+    PathCat(the_path, gApplication_path, "OPTIONS.TXT");
+    f = DRfopen(the_path, "rt");
+    if (!f) {
+        return 0;
+    }
+    while (fgets(line, 80, f)) {
+        if (sscanf(line, "%79s%f", token, &arg) == 2) {
+            if (!strcmp(token, "YonFactor")) {
+                SetYonFactor(arg);
+            } else if (!strcmp(token, "SkyTextureOn")) {
+                SetSkyTextureOn((int)arg);
+            } else if (!strcmp(token, "CarTexturingLevel")) {
+                SetCarTexturingLevel((tCar_texturing_level)arg);
+            } else if (!strcmp(token, "RoadTexturingLevel")) {
+                SetRoadTexturingLevel((tRoad_texturing_level)arg);
+            } else if (!strcmp(token, "WallTexturingLevel")) {
+                SetWallTexturingLevel((tWall_texturing_level)arg);
+            } else if (!strcmp(token, "ShadowLevel")) {
+                SetShadowLevel((tShadow_level)arg);
+            } else if (!strcmp(token, "DepthCueingOn")) {
+                SetDepthCueingOn((int)arg);
+            } else if (!strcmp(token, "Yon")) {
+                SetYon(arg);
+            } else if (!strcmp(token, "CarSimplificationLevel")) {
+                SetCarSimplificationLevel((int)arg);
+            } else if (!strcmp(token, "AccessoryRendering")) {
+                SetAccessoryRendering((int)arg);
+            } else if (!strcmp(token, "SmokeOn")) {
+                SetSmokeOn((int)arg);
+            } else if (!strcmp(token, "SoundDetailLevel")) {
+                SetSoundDetailLevel((int)arg);
+            } else if (!strcmp(token, "ScreenSize")) {
+                SetScreenSize((int)arg);
+            } else if (!strcmp(token, "MapRenderX")) {
+                gMap_render_x = arg;
+            } else if (!strcmp(token, "MapRenderY")) {
+                gMap_render_y = arg;
+            } else if (!strcmp(token, "MapRenderWidth")) {
+                gMap_render_width = arg;
+            } else if (!strcmp(token, "MapRenderHeight")) {
+                gMap_render_height = arg;
+            } else if (!strcmp(token, "PlayerName")) {
+                fgets(&line, 80, f);
+                s = strtok(&line, "\n\r");
+                strcpy(gProgram_state.player_name[(int)arg], s);
+            } else if (!strcmp(token, "EVolume")) {
+                gProgram_state.effects_volume = (int)arg;
+            } else if (!strcmp(token, "MVolume")) {
+                gProgram_state.music_volume = (int)arg;
+            } else if (!strcmp(token, "KeyMapIndex")) {
+                gKey_map_index = (int)arg;
+            } else if (!strcmp(token, "Joystick_min1x")) {
+                gJoystick_min1x = (int)arg;
+            } else if (!strcmp(token, "Joystick_min1y")) {
+                gJoystick_min1y = (int)arg;
+            } else if (!strcmp(token, "Joystick_min2x")) {
+                gJoystick_min2x = (int)arg;
+            } else if (!strcmp(token, "Joystick_min2y")) {
+                gJoystick_min2y = (int)arg;
+            } else if (!strcmp(token, "Joystick_range1x")) {
+                gJoystick_range1x = (int)arg;
+            } else if (!strcmp(token, "Joystick_range1y")) {
+                gJoystick_range1y = (int)arg;
+            } else if (!strcmp(token, "Joystick_range2x")) {
+                gJoystick_range2x = (int)arg;
+            } else if (!strcmp(token, "Joystick_range2y")) {
+                gJoystick_range2y = (int)arg;
+            } else if (!strcmp(token, "NetName")) {
+                fgets_(&line, 80, f);
+                s = strtok(&line, "\n\r");
+                strcpy(gNet_player_name, s);
+            } else if (!strcmp(token, "NETGAMETYPE")) {
+                gLast_game_type = (tNet_game_type)arg;
+            } else if (!strcmp(token, "NETSETTINGS")) {
+                ReadNetworkSettings(f, &gNet_settings[(int)arg]);
+            }
+        }
+    }
+    fclose(f);
+    return 1;
 }
 
 // Offset: 42556

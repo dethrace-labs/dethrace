@@ -1,4 +1,5 @@
 #include "network.h"
+#include "pc-dos/dosnet.h"
 
 tNet_game_player_info gNew_net_players[6];
 tGuaranteed_message gGuarantee_list[150];
@@ -259,6 +260,8 @@ int NetJoinGame(tNet_game_details* pDetails, char* pPlayer_name, int pCar_index)
 // EAX: pName
 // EDX: pMax_length
 void NetObtainSystemUserName(char* pName, int pMax_length) {
+    PDNetObtainSystemUserName(pName, pMax_length);
+    pName[9] = 0;
 }
 
 // Offset: 5668

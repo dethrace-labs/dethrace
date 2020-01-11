@@ -1,5 +1,8 @@
 #include "dosnet.h"
 
+#include "drdebug.h"
+#include <string.h>
+
 _IPX_ELEMENT gListen_elements[16];
 char gLocal_ipx_addr_string[32];
 _IPX_ELEMENT gSend_elements[16];
@@ -351,6 +354,8 @@ tPlayer_ID PDNetExtractPlayerID(tNet_game_details* pDetails) {
 // EAX: pName
 // EDX: pMax_length
 void PDNetObtainSystemUserName(char* pName, int pMax_length) {
+    DrDebugMessage("PDNetObtainSystemUserName()");
+    strcpy(pName, "Ron Turn");
 }
 
 // Offset: 7736

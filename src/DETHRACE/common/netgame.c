@@ -1,4 +1,6 @@
 #include "netgame.h"
+#include "globvars.h"
+#include "network.h"
 
 int gGame_scores[6];
 int gPowerup_cost[4];
@@ -386,6 +388,7 @@ void InitNetGameplayStuff() {
 // Offset: 19108
 // Size: 49
 void DefaultNetName() {
+    NetObtainSystemUserName(gNet_player_name, 32);
 }
 
 // Offset: 19160
