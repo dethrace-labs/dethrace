@@ -1,13 +1,13 @@
 #ifndef _RACESUMM_H_
 #define _RACESUMM_H_
 
-#include "dr_types.h"
 #include "br_types.h"
+#include "dr_types.h"
 
 // Offset: 0
 // Size: 302
 // EAX: pThe_state
-void MungeRankEtc(tProgram_state *pThe_state);
+void MungeRankEtc(tProgram_state* pThe_state);
 
 // Offset: 304
 // Size: 96
@@ -45,7 +45,7 @@ void DrawSummaryItems();
 // Size: 127
 // EAX: pRate
 // EDX: pTime
-void RampUpRate(float *pRate, tU32 pTime);
+void RampUpRate(float* pRate, tU32 pTime);
 
 // Offset: 1604
 // Size: 747
@@ -65,13 +65,13 @@ void SetUpTemps();
 // Size: 78
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int Summ1GoAhead(int *pCurrent_choice, int *pCurrent_mode);
+int Summ1GoAhead(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 2572
 // Size: 324
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int SummCheckGameOver(int *pCurrent_choice, int *pCurrent_mode);
+int SummCheckGameOver(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 2896
 // Size: 288
@@ -88,7 +88,7 @@ void DisposeWrecks();
 // Offset: 4744
 // Size: 185
 // EAX: pMat
-int MatrixIsIdentity(br_matrix34 *pMat);
+int MatrixIsIdentity(br_matrix34* pMat);
 
 // Offset: 4932
 // Size: 403
@@ -100,30 +100,30 @@ void SpinWrecks(tU32 pFrame_period);
 // EAX: pIndex
 // EDX: pCurrent_choice
 // EBX: pCurrent_mode
-void ZoomInTo(int pIndex, int *pCurrent_choice, int *pCurrent_mode);
+void ZoomInTo(int pIndex, int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 5480
 // Size: 189
 // EAX: pIndex
 // EDX: pCurrent_choice
 // EBX: pCurrent_mode
-void ZoomOutTo(int pIndex, int *pCurrent_choice, int *pCurrent_mode);
+void ZoomOutTo(int pIndex, int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 5672
 // Size: 102
-int WreckPick(br_actor *pActor, br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pNear, br_scalar pFar, void *pArg);
+int WreckPick(br_actor* pActor, br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pNear, br_scalar pFar, void* pArg);
 
 // Offset: 5776
 // Size: 404
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int CastSelectionRay(int *pCurrent_choice, int *pCurrent_mode);
+int CastSelectionRay(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 6180
 // Size: 167
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int DamageScrnExit(int *pCurrent_choice, int *pCurrent_mode);
+int DamageScrnExit(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 6348
 // Size: 2481
@@ -135,31 +135,31 @@ void DamageScrnDraw(int pCurrent_choice, int pCurrent_mode);
 // Size: 268
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int DamageScrnLeft(int *pCurrent_choice, int *pCurrent_mode);
+int DamageScrnLeft(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 9100
 // Size: 275
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int DamageScrnRight(int *pCurrent_choice, int *pCurrent_mode);
+int DamageScrnRight(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 9376
 // Size: 428
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int DamageScrnUp(int *pCurrent_choice, int *pCurrent_mode);
+int DamageScrnUp(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 9804
 // Size: 470
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int DamageScrnDown(int *pCurrent_choice, int *pCurrent_mode);
+int DamageScrnDown(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 10276
 // Size: 176
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int DamageScrnGoHead(int *pCurrent_choice, int *pCurrent_mode);
+int DamageScrnGoHead(int* pCurrent_choice, int* pCurrent_mode);
 
 // Offset: 10452
 // Size: 258
@@ -167,7 +167,7 @@ int DamageScrnGoHead(int *pCurrent_choice, int *pCurrent_mode);
 // EDX: pCurrent_mode
 // EBX: pX_offset
 // ECX: pY_offset
-int ClickDamage(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_offset);
+int ClickDamage(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset);
 
 // Offset: 10712
 // Size: 66
@@ -191,7 +191,7 @@ void DrawColumnHeading(int pStr_index, int pX);
 // Size: 74
 // EAX: pFirst_one
 // EDX: pSecond_one
-int SortScores(void *pFirst_one, void *pSecond_one);
+int SortScores(void* pFirst_one, void* pSecond_one);
 
 // Offset: 11332
 // Size: 60
@@ -211,6 +211,6 @@ void DoNetRaceSummary();
 // Size: 227
 // EAX: pFirst_summary_done
 // EDX: pRace_result
-tSO_result DoEndRaceSummary(int *pFirst_summary_done, tRace_result pRace_result);
+tSO_result DoEndRaceSummary(int* pFirst_summary_done, tRace_result pRace_result);
 
 #endif

@@ -1,8 +1,8 @@
 #ifndef _DEPTH_H_
 #define _DEPTH_H_
 
-#include "dr_types.h"
 #include "br_types.h"
+#include "dr_types.h"
 
 // Offset: 0
 // Size: 110
@@ -21,7 +21,7 @@ br_scalar DepthCueingShiftToDistance(int pShift);
 // Offset: 324
 // Size: 210
 // EAX: pMaterial
-void FogAccordingToGPSCDE(br_material *pMaterial);
+void FogAccordingToGPSCDE(br_material* pMaterial);
 
 // Offset: 536
 // Size: 206
@@ -33,7 +33,7 @@ void FrobFog();
 // EDX: pSky_texture
 // EBX: pStart
 // ECX: pEnd
-void InstantDepthChange(tDepth_effect_type pType, br_pixelmap *pSky_texture, int pStart, int pEnd);
+void InstantDepthChange(tDepth_effect_type pType, br_pixelmap* pSky_texture, int pStart, int pEnd);
 
 // Offset: 916
 // Size: 90
@@ -50,19 +50,19 @@ br_scalar EdgeU(br_angle pSky, br_angle pView, br_angle pPerfect);
 // Size: 1602
 // EAX: pCamera
 // EDX: pModel
-void MungeSkyModel(br_actor *pCamera, br_model *pModel);
+void MungeSkyModel(br_actor* pCamera, br_model* pModel);
 
 // Offset: 2828
 // Size: 882
 // EAX: pCamera
-br_model* CreateHorizonModel(br_actor *pCamera);
+br_model* CreateHorizonModel(br_actor* pCamera);
 
 // Offset: 3712
 // Size: 408
 // EAX: pName
 // EDX: pTable
 // EBX: pPower
-void LoadDepthTable(char *pName, br_pixelmap **pTable, int *pPower);
+void LoadDepthTable(char* pName, br_pixelmap** pTable, int* pPower);
 
 // Offset: 4120
 // Size: 611
@@ -74,7 +74,7 @@ void InitDepthEffects();
 // EDX: pDepth_buffer
 // EBX: pShade_table
 // ECX: pShade_table_power
-void DoDepthByShadeTable(br_pixelmap *pRender_buffer, br_pixelmap *pDepth_buffer, br_pixelmap *pShade_table, int pShade_table_power, int pStart, int pEnd);
+void DoDepthByShadeTable(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_pixelmap* pShade_table, int pShade_table_power, int pStart, int pEnd);
 
 // Offset: 5504
 // Size: 1009
@@ -82,7 +82,7 @@ void DoDepthByShadeTable(br_pixelmap *pRender_buffer, br_pixelmap *pDepth_buffer
 // EDX: pDepth_buffer
 // EBX: pCamera
 // ECX: pCamera_to_world
-void ExternalSky(br_pixelmap *pRender_buffer, br_pixelmap *pDepth_buffer, br_actor *pCamera, br_matrix34 *pCamera_to_world);
+void ExternalSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world);
 
 // Offset: 6516
 // Size: 463
@@ -90,19 +90,19 @@ void ExternalSky(br_pixelmap *pRender_buffer, br_pixelmap *pDepth_buffer, br_act
 // EDX: pDepth_buffer
 // EBX: pCamera
 // ECX: pCamera_to_world
-void DoHorizon(br_pixelmap *pRender_buffer, br_pixelmap *pDepth_buffer, br_actor *pCamera, br_matrix34 *pCamera_to_world);
+void DoHorizon(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world);
 
 // Offset: 6980
 // Size: 73
 // EAX: pRender_buffer
 // EDX: pDepth_buffer
-void DoDepthCue(br_pixelmap *pRender_buffer, br_pixelmap *pDepth_buffer);
+void DoDepthCue(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer);
 
 // Offset: 7056
 // Size: 73
 // EAX: pRender_buffer
 // EDX: pDepth_buffer
-void DoFog(br_pixelmap *pRender_buffer, br_pixelmap *pDepth_buffer);
+void DoFog(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer);
 
 // Offset: 7132
 // Size: 91
@@ -110,7 +110,7 @@ void DoFog(br_pixelmap *pRender_buffer, br_pixelmap *pDepth_buffer);
 // EDX: pDepth_buffer
 // EBX: pCamera
 // ECX: pCamera_to_world
-void DepthEffect(br_pixelmap *pRender_buffer, br_pixelmap *pDepth_buffer, br_actor *pCamera, br_matrix34 *pCamera_to_world);
+void DepthEffect(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world);
 
 // Offset: 7224
 // Size: 93
@@ -118,23 +118,23 @@ void DepthEffect(br_pixelmap *pRender_buffer, br_pixelmap *pDepth_buffer, br_act
 // EDX: pDepth_buffer
 // EBX: pCamera
 // ECX: pCamera_to_world
-void DepthEffectSky(br_pixelmap *pRender_buffer, br_pixelmap *pDepth_buffer, br_actor *pCamera, br_matrix34 *pCamera_to_world);
+void DepthEffectSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world);
 
 // Offset: 7320
 // Size: 627
 // EAX: pCamera
-void DoWobbleCamera(br_actor *pCamera);
+void DoWobbleCamera(br_actor* pCamera);
 
 // Offset: 7948
 // Size: 627
 // EAX: pCamera
-void DoDrugWobbleCamera(br_actor *pCamera);
+void DoDrugWobbleCamera(br_actor* pCamera);
 
 // Offset: 8576
 // Size: 116
 // EAX: pCamera
 // EDX: pCamera_to_world
-void DoSpecialCameraEffect(br_actor *pCamera, br_matrix34 *pCamera_to_world);
+void DoSpecialCameraEffect(br_actor* pCamera, br_matrix34* pCamera_to_world);
 
 // Offset: 8692
 // Size: 115

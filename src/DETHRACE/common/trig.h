@@ -1,8 +1,8 @@
 #ifndef _TRIG_H_
 #define _TRIG_H_
 
-#include "dr_types.h"
 #include "br_types.h"
+#include "dr_types.h"
 
 // Offset: 0
 // Size: 198
@@ -85,93 +85,93 @@ br_angle FastScalarArcTan2Angle(br_scalar pY, br_scalar pX);
 // Size: 183
 // EAX: mat
 // EDX: rx
-void DRMatrix34RotateX(br_matrix34 *mat, br_angle rx);
+void DRMatrix34RotateX(br_matrix34* mat, br_angle rx);
 
 // Offset: 2528
 // Size: 183
 // EAX: mat
 // EDX: ry
-void DRMatrix34RotateY(br_matrix34 *mat, br_angle ry);
+void DRMatrix34RotateY(br_matrix34* mat, br_angle ry);
 
 // Offset: 2712
 // Size: 183
 // EAX: mat
 // EDX: rz
-void DRMatrix34RotateZ(br_matrix34 *mat, br_angle rz);
+void DRMatrix34RotateZ(br_matrix34* mat, br_angle rz);
 
 // Offset: 2896
 // Size: 329
 // EAX: mat
 // EDX: r
 // EBX: a
-void DRMatrix34Rotate(br_matrix34 *mat, br_angle r, br_vector3 *a);
+void DRMatrix34Rotate(br_matrix34* mat, br_angle r, br_vector3* a);
 
 // Offset: 3228
 // Size: 96
 // EAX: mat
 // EDX: rx
-void DRMatrix34PreRotateX(br_matrix34 *mat, br_angle rx);
+void DRMatrix34PreRotateX(br_matrix34* mat, br_angle rx);
 
 // Offset: 3324
 // Size: 96
 // EAX: mat
 // EDX: rx
-void DRMatrix34PostRotateX(br_matrix34 *mat, br_angle rx);
+void DRMatrix34PostRotateX(br_matrix34* mat, br_angle rx);
 
 // Offset: 3420
 // Size: 96
 // EAX: mat
 // EDX: ry
-void DRMatrix34PreRotateY(br_matrix34 *mat, br_angle ry);
+void DRMatrix34PreRotateY(br_matrix34* mat, br_angle ry);
 
 // Offset: 3516
 // Size: 96
 // EAX: mat
 // EDX: ry
-void DRMatrix34PostRotateY(br_matrix34 *mat, br_angle ry);
+void DRMatrix34PostRotateY(br_matrix34* mat, br_angle ry);
 
 // Offset: 3612
 // Size: 96
 // EAX: mat
 // EDX: rz
-void DRMatrix34PreRotateZ(br_matrix34 *mat, br_angle rz);
+void DRMatrix34PreRotateZ(br_matrix34* mat, br_angle rz);
 
 // Offset: 3708
 // Size: 96
 // EAX: mat
 // EDX: rz
-void DRMatrix34PostRotateZ(br_matrix34 *mat, br_angle rz);
+void DRMatrix34PostRotateZ(br_matrix34* mat, br_angle rz);
 
 // Offset: 3804
 // Size: 100
 // EAX: mat
 // EDX: r
 // EBX: axis
-void DRMatrix34PreRotate(br_matrix34 *mat, br_angle r, br_vector3 *axis);
+void DRMatrix34PreRotate(br_matrix34* mat, br_angle r, br_vector3* axis);
 
 // Offset: 3904
 // Size: 100
 // EAX: mat
 // EDX: r
 // EBX: axis
-void DRMatrix34PostRotate(br_matrix34 *mat, br_angle r, br_vector3 *axis);
+void DRMatrix34PostRotate(br_matrix34* mat, br_angle r, br_vector3* axis);
 
 // Offset: 4004
 // Size: 123
 // EAX: mat
 // EDX: rz
-void DRMatrix23Rotate(br_matrix23 *mat, br_angle rz);
+void DRMatrix23Rotate(br_matrix23* mat, br_angle rz);
 
 // Offset: 4128
 // Size: 96
 // EAX: mat
 // EDX: rz
-void DRMatrix23PreRotate(br_matrix23 *mat, br_angle rz);
+void DRMatrix23PreRotate(br_matrix23* mat, br_angle rz);
 
 // Offset: 4224
 // Size: 96
 // EAX: mat
 // EDX: rz
-void DRMatrix23PostRotate(br_matrix23 *mat, br_angle rz);
+void DRMatrix23PostRotate(br_matrix23* mat, br_angle rz);
 
 #endif

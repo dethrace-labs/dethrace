@@ -2,12 +2,12 @@
 
 tFlic_descriptor gPrat_flic;
 tS3_sound_tag gWhirr_noise;
-tPrat_sequence *gPratcam_sequences;
-tPrat_flic_spec *gPratcam_flics;
+tPrat_sequence* gPratcam_sequences;
+tPrat_flic_spec* gPratcam_flics;
 int gCurrent_pratcam_chunk;
 int gPending_ambient_prat;
 int gCurrent_pratcam_index;
-br_pixelmap *gPrat_buffer;
+br_pixelmap* gPrat_buffer;
 int gNumber_of_prat_sequences;
 int gNumber_of_prat_flics;
 tU32 gLast_pratcam_frame_time;
@@ -39,9 +39,9 @@ void TogglePratcam() {
 // Offset: 384
 // Size: 1836
 // EAX: pFolder_name
-void LoadPratcam(char *pFolder_name) {
-    FILE *f;
-    FILE *g;
+void LoadPratcam(char* pFolder_name) {
+    FILE* f;
+    FILE* g;
     tPath_name the_path;
     int i;
     int j;
@@ -49,7 +49,7 @@ void LoadPratcam(char *pFolder_name) {
     int l;
     char s[256];
     char folder_path[256];
-    char *str;
+    char* str;
     char num_str[256];
 }
 
@@ -58,7 +58,7 @@ void LoadPratcam(char *pFolder_name) {
 void NextPratcamChunk() {
     int random_number;
     int count;
-    tPrat_alternative *current_alternative;
+    tPrat_alternative* current_alternative;
 }
 
 // Offset: 2716
@@ -128,9 +128,9 @@ void DoPratcam(tU32 pThe_time) {
     int right_hand;
     tU32 time_diff;
     tU32 old_last_time;
-    br_pixelmap *the_image;
-    br_pixelmap *left_image;
-    br_pixelmap *right_image;
+    br_pixelmap* the_image;
+    br_pixelmap* left_image;
+    br_pixelmap* right_image;
 }
 
 // Offset: 5476
@@ -188,4 +188,3 @@ void PratCam8() {
 // Size: 44
 void PratCam9() {
 }
-

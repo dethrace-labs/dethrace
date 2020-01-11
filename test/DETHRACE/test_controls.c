@@ -1,21 +1,20 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "framework/unity.h"
 
-#include "common/utility.h"
-#include "common/loading.h"
+#include "common/controls.h"
 #include "common/errors.h"
 #include "common/input.h"
-#include "common/controls.h"
-
+#include "common/loading.h"
+#include "common/utility.h"
 
 void test_controls_CheckKevKeys() {
     int i;
-    char *input = "spamfritters";
-    tU32 *result;
+    char* input = "spamfritters";
+    tU32* result;
     for (i = 0; i < strlen(input); i++) {
         gLast_key_down = input[i] - 75; // 0x1e;
         result = KevKeyService();

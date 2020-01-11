@@ -1,8 +1,8 @@
 #ifndef _DRMEM_H_
 #define _DRMEM_H_
 
-#include "dr_types.h"
 #include "br_types.h"
+#include "dr_types.h"
 
 // Offset: 0
 // Size: 44
@@ -24,7 +24,7 @@ void MAMSInitMem();
 // Size: 38
 // EAX: pFlags
 // EDX: pTitle
-void PrintMemoryDump(int pFlags, char *pTitle);
+void PrintMemoryDump(int pFlags, char* pTitle);
 
 // Offset: 232
 // Size: 169
@@ -32,7 +32,7 @@ void* DRStdlibAllocate(br_size_t size, br_uint_8 type);
 
 // Offset: 404
 // Size: 38
-void DRStdlibFree(void *mem);
+void DRStdlibFree(void* mem);
 
 // Offset: 444
 // Size: 40
@@ -49,12 +49,12 @@ void InstallDRMemCalls();
 // Offset: 572
 // Size: 59
 // EAX: pPtr
-void MAMSUnlock(void **pPtr);
+void MAMSUnlock(void** pPtr);
 
 // Offset: 632
 // Size: 37
 // EAX: pPtr
-void MAMSLock(void **pPtr);
+void MAMSLock(void** pPtr);
 
 // Offset: 672
 // Size: 124

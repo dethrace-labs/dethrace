@@ -11,4 +11,3 @@ void _BrBeginHook() {
 // Size: 30
 void _BrEndHook() {
 }
-

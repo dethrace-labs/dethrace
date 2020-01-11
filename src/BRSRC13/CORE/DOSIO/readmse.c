@@ -18,10 +18,9 @@ void DOSMouseEnd() {
 
 // Offset: 489
 // Size: 217
-br_error DOSMouseRead(br_int_32 *mouse_x, br_int_32 *mouse_y, br_uint_32 *mouse_buttons) {
+br_error DOSMouseRead(br_int_32* mouse_x, br_int_32* mouse_y, br_uint_32* mouse_buttons) {
     br_int_16 mx;
     br_int_16 my;
     static br_int_16 ox;
     static br_int_16 oy;
 }
-

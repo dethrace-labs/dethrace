@@ -6,11 +6,10 @@
 #include "common/globvars.h"
 #include "pc-dos/dossys.h"
 
-
 void test_dossys_PDInitialiseSystem() {
 
-    FILE *file = fopen("/tmp/KEYBOARD.COK", "wt");
-    fprintf(file,"abcdef");
+    FILE* file = fopen("/tmp/KEYBOARD.COK", "wt");
+    fprintf(file, "abcdef");
     fclose(file);
 
     PDInitialiseSystem();

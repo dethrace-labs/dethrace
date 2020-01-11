@@ -1,7 +1,7 @@
 #include "framework/unity.h"
 
-#include <string.h>
 #include "common/utility.h"
+#include <string.h>
 
 void test_utility_DecodeLine2() {
     char buf[50];
@@ -32,14 +32,14 @@ void test_utility_StripCR() {
 }
 
 void test_utility_GetALineWithNoPossibleService() {
-    FILE *file = fopen("/tmp/testfile","wt");
-    fprintf(file,"hello world\r\n  space_prefixed\r\n\r\n\ttab_prefixed\r\n$ignored_prefix\r\nlast_line");
+    FILE* file = fopen("/tmp/testfile", "wt");
+    fprintf(file, "hello world\r\n  space_prefixed\r\n\r\n\ttab_prefixed\r\n$ignored_prefix\r\nlast_line");
     fclose(file);
 
-    file = fopen("/tmp/testfile","rt");
+    file = fopen("/tmp/testfile", "rt");
     char s[256];
 
-    char *result = GetALineWithNoPossibleService(file, s);
+    char* result = GetALineWithNoPossibleService(file, s);
     TEST_ASSERT_NOT_NULL(result);
     TEST_ASSERT_EQUAL_STRING("hello world", s);
 

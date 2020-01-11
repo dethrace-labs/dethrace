@@ -17,6 +17,6 @@ br_float BrSwapFloat(br_float f);
 
 // Offset: 279
 // Size: 781
-void* BrSwapBlock(void *block, int count, int size);
+void* BrSwapBlock(void* block, int count, int size);
 
 #endif

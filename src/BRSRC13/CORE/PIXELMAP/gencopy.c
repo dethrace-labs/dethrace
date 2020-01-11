@@ -8,14 +8,14 @@ char rscid[49];
 // EDX: p
 // EBX: src
 // ECX: r
-br_error GeneralRectangleCopy(br_device_pixelmap *dest, br_point *p, br_device_pixelmap *src, br_rectangle *r) {
+br_error GeneralRectangleCopy(br_device_pixelmap* dest, br_point* p, br_device_pixelmap* src, br_rectangle* r) {
 }
 
 // Offset: 83
 // Size: 48
 // EAX: dst
 // EDX: src
-br_error GeneralCopy(br_device_pixelmap *dst, br_device_pixelmap *src) {
+br_error GeneralCopy(br_device_pixelmap* dst, br_device_pixelmap* src) {
 }
 
 // Offset: 159
@@ -24,6 +24,5 @@ br_error GeneralCopy(br_device_pixelmap *dst, br_device_pixelmap *src) {
 // EDX: d
 // EBX: src
 // ECX: s
-br_error GeneralRectangleStretchCopy(br_device_pixelmap *dst, br_rectangle *d, br_device_pixelmap *src, br_rectangle *s) {
+br_error GeneralRectangleStretchCopy(br_device_pixelmap* dst, br_rectangle* d, br_device_pixelmap* src, br_rectangle* s) {
 }
-
