@@ -4,4 +4,6 @@
 #include "br_types.h"
 #include "dr_types.h"
 
+extern float gRecovery_cost[3];
+
 #endif

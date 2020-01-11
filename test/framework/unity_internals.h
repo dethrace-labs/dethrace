@@ -732,6 +732,10 @@ extern const char UnityStrErrShorthand[];
 #define UNITY_BEGIN() UnityBegin(__FILE__)
 #endif
 
+#ifndef UNITY_PARSE_OPTS
+#define UNITY_PARSE_OPTS() UnityParseOptions(argc, argv)
+#endif
+
 #ifndef UNITY_END
 #define UNITY_END() UnityEnd()
 #endif
@@ -750,10 +754,8 @@ extern const char UnityStrErrShorthand[];
  * Command Line Argument Support
  *-----------------------------------------------*/
 
-#ifdef UNITY_USE_COMMAND_LINE_ARGS
 int UnityParseOptions(int argc, char** argv);
 int UnityTestMatches(void);
-#endif
 
 /*-------------------------------------------------------
  * Basic Fail and Ignore

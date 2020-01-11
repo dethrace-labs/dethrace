@@ -1,5 +1,10 @@
 #include "world.h"
 
+#include "brender.h"
+#include "loading.h"
+
+#include <string.h>
+
 br_actor* gActor_array[500];
 float* gGroove_funk_bindings[960];
 br_actor* gDelete_list[500];
@@ -872,6 +877,23 @@ int GetCarSimplificationLevel() {
 // EBX: pScreen_name_str
 void ParseSpecialVolume(FILE* pF, tSpecial_volume* pSpec, char* pScreen_name_str) {
     char s[256];
+    pSpec->gravity_multiplier = GetAScalar(pF);
+    pSpec->viscosity_multiplier = GetAScalar(pF);
+    pSpec->car_damage_per_ms = GetAScalar(pF);
+    pSpec->ped_damage_per_ms = GetAScalar(pF);
+    pSpec->camera_special_effect_index = GetAnInt(pF);
+    pSpec->sky_col = GetAnInt(pF);
+
+    GetAString(pF, s);
+    if (pScreen_name_str) {
+        strcpy(pScreen_name_str, s);
+    } else {
+        pSpec->screen_material = BrMaterialFind(s);
+    }
+    pSpec->entry_noise = GetAnInt(pF);
+    pSpec->exit_noise = GetAnInt(pF);
+    pSpec->engine_noise_index = GetAnInt(pF);
+    pSpec->material_modifier_index = GetAnInt(pF);
 }
 
 // Offset: 23584

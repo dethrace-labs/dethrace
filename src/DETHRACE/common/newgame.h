@@ -4,6 +4,29 @@
 #include "br_types.h"
 #include "dr_types.h"
 
+extern char* gBasic_car_names[2];
+extern tNet_game_options gNet_settings[8];
+extern tRadio_bastards gRadio_bastards[11];
+extern tJoinable_game gGames_to_join[6];
+extern tNet_game_options* gOptions;
+extern int gNet_target[7];
+extern int gLast_graph_sel;
+extern tInterface_spec* gThe_interface_spec;
+extern tNet_sequence_type gNet_race_sequence;
+extern tNet_game_type gLast_game_type;
+extern int gCurrent_net_game_count;
+extern tU32 gAnne_flic_data_length;
+extern int gShifted_default_yet;
+extern int gNet_storage_allocated;
+extern tU8* gFrank_flic_data;
+extern char* gNet_name;
+extern tU32 gFrank_flic_data_length;
+extern tU8* gAnne_flic_data;
+extern int gLast_net_choose_box;
+extern int gCurrent_game_selection;
+extern int gRace_index;
+extern int gRadio_selected;
+
 // Offset: 0
 // Size: 149
 void StartRollingPlayerNamesIn();

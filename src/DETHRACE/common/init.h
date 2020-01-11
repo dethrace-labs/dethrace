@@ -4,6 +4,10 @@
 #include "br_types.h"
 #include "dr_types.h"
 
+extern int gCredits_per_rank[3];
+extern int gInitial_credits[3];
+extern int gInitial_rank;
+
 // Offset: 0
 // Size: 115
 void AllocateSelf();

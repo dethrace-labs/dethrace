@@ -1606,6 +1606,8 @@ void UnityMessage(const char* msg, const UNITY_LINE_TYPE line) {
 void UnityDefaultTestRun(UnityTestFunction Func, const char* FuncName, const int FuncLineNum) {
     Unity.CurrentTestName = FuncName;
     Unity.CurrentTestLineNumber = (UNITY_LINE_TYPE)FuncLineNum;
+    if (!UnityTestMatches())
+        return;
     Unity.NumberOfTests++;
     UNITY_CLR_DETAILS();
     UNITY_EXEC_TIME_START();
@@ -1670,7 +1672,7 @@ int UnityEnd(void) {
 /*-----------------------------------------------
  * Command Line Argument Support
  *-----------------------------------------------*/
-#ifdef UNITY_USE_COMMAND_LINE_ARGS
+// #ifdef UNITY_USE_COMMAND_LINE_ARGS
 
 char* UnityOptionIncludeNamed = NULL;
 char* UnityOptionExcludeNamed = NULL;
@@ -1842,5 +1844,5 @@ int UnityTestMatches(void) {
     return retval;
 }
 
-#endif /* UNITY_USE_COMMAND_LINE_ARGS */
+//#endif /* UNITY_USE_COMMAND_LINE_ARGS */
 /*-----------------------------------------------*/

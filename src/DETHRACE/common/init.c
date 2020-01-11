@@ -199,6 +199,7 @@ void InitialiseApplication(int pArgc, char** pArgv) {
 // EDX: pArgv
 void InitialiseDeathRace(int pArgc, char** pArgv) {
     PDInitialiseSystem();
+
     InitialiseApplication(pArgc, pArgv);
     //dword_112DF8 = 1;  // never checked by game
 }

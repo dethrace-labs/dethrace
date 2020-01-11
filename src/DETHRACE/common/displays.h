@@ -4,6 +4,8 @@
 #include "br_types.h"
 #include "dr_types.h"
 
+extern int gDim_amount;
+
 // Offset: 0
 // Size: 56
 // EAX: pStr

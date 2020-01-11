@@ -4,13 +4,12 @@
 #include "br_types.h"
 #include "dr_types.h"
 
+extern char* gMisc_strings[250];
+extern int gEncryption_method;
+
 // Offset: 0
 // Size: 144
 int CheckQuit();
-
-// Offset: 144
-// Size: 50
-double sqr(double pN);
 
 // Offset: 196
 // Size: 542

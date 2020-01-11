@@ -1,0 +1,5 @@
+.\DATA\MINICD
+.
+Full
+English
+..\CARMA

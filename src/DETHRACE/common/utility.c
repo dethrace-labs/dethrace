@@ -22,7 +22,7 @@ tU32 gOther_long_key[] = { 0x26D6A867, 0x1B45DDB6, 0x13227E32, 0x3794C215 };
 char* gMisc_strings[250];
 int gIn_check_quit;
 tU32 gLost_time;
-int gEncryption_method = 1;
+int gEncryption_method = 0;
 br_pixelmap* g16bit_palette;
 br_pixelmap* gSource_for_16bit_palette;
 
@@ -30,11 +30,6 @@ br_pixelmap* gSource_for_16bit_palette;
 // Size: 144
 int CheckQuit() {
     int got_as_far_as_verify;
-}
-
-// Offset: 144
-// Size: 50
-double sqr(double pN) {
 }
 
 // Offset: 196
@@ -47,6 +42,80 @@ void EncodeLine(char* pS) {
     char* key;
     unsigned char c;
     FILE* test;
+
+    tPath_name test_path;
+    char temp[256];
+
+    len = strlen(pS);
+    key = (char*)gLong_key;
+    if (!gEncryption_method) {
+        strcpy(test_path, gApplication_path);
+        strcat(test_path, gDir_separator);
+        strcat(test_path, "GENERAL.TXT");
+
+        test = fopen(test_path, "rt");
+        if (test) {
+            fgets(temp, 256, test);
+            if (temp[0] != '@') {
+                gEncryption_method = 2;
+            } else {
+                gEncryption_method = 1;
+                EncodeLine(&temp[1]);
+                temp[7] = '\0';
+                if (strcmp(&temp[1], "0.01\t\t") != 0) {
+                    gEncryption_method = 2;
+                }
+            }
+            fclose(test);
+        } else {
+            gEncryption_method = 2;
+        }
+    }
+    while (len > 0 && (pS[len - 1] == '\r' || pS[len - 1] == '\n')) {
+        --len;
+        pS[len] = 0;
+    }
+
+    seed = len % 16;
+    for (i = 0; i < len; i++) {
+        c = pS[i];
+        if (i >= 2) {
+            if (pS[i - 1] == '/' && pS[i - 2] == '/') {
+                key = (char*)gOther_long_key;
+            }
+        }
+        if (gEncryption_method == 1) {
+            if (c == '\t') {
+                c = 0x80;
+            }
+            c -= 0x20;
+            if (!(c & 0x80)) {
+                c = (c ^ key[seed]) & 0x7f;
+                c += 0x20;
+            }
+            seed += 7;
+            seed = seed % 16;
+
+            if (c == 0x80) {
+                c = '\t';
+            }
+        } else {
+            if (c == '\t') {
+                c = 0x9f;
+            }
+            c -= 0x20;
+            c = (c ^ key[seed]) & 0x7f;
+            c += 0x20;
+
+            seed += 7;
+            seed = seed % 16;
+
+            if (c == 0x9f) {
+                c = '\t';
+            }
+        }
+        pS[i] = c;
+    }
 }
 
 // Offset: 740
@@ -126,8 +195,9 @@ char* GetALineWithNoPossibleService(FILE* pF, /*unsigned*/ char* pS) {
                 break;
             }
         }
-        if (ch != -1)
+        if (ch != -1) {
             ungetc(ch, pF);
+        }
     } while (!isalnum(s[0])
         && s[0] != '-'
         && s[0] != '.'
@@ -172,7 +242,9 @@ char* GetALineAndDontArgue(FILE* pF, char* pS) {
 // EDX: pStr_1
 // EBX: pStr_2
 void PathCat(char* pDestn_str, char* pStr_1, char* pStr_2) {
-    strcpy(pDestn_str, pStr_1);
+    if (pDestn_str != pStr_1) { // Added to avoid strcpy overlap checks
+        strcpy(pDestn_str, pStr_1);
+    }
     if (strlen(pStr_2) != 0) {
         strcat(pDestn_str, gDir_separator);
         strcat(pDestn_str, pStr_2);

@@ -40,8 +40,6 @@ br_error BrV1dbBegin() {
         return 4103;
     }
 
-    printf("BrV1dbBegin\n");
-
     BrMemSet(&v1db, 0, sizeof(br_v1db_state));
     v1db.active = 1;
     BrRegistryNew(&v1db.reg_models);

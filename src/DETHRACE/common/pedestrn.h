@@ -4,6 +4,10 @@
 #include "br_types.h"
 #include "dr_types.h"
 
+extern int gMin_respawn_time;
+extern int gRespawn_variance;
+extern float gZombie_factor;
+
 // Offset: 0
 // Size: 152
 // EAX: pModel

@@ -4,6 +4,8 @@
 #include "br_types.h"
 #include "dr_types.h"
 
+extern br_scalar gAmbient_adjustment;
+
 // Offset: 0
 // Size: 44
 void TurnOnPaletteConversion();

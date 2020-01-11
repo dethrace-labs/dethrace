@@ -4,6 +4,8 @@
 #include "br_types.h"
 #include "dr_types.h"
 
+extern float gOpponent_nastyness_frigger;
+
 // Offset: 0
 // Size: 137
 // EAX: pThe_actor

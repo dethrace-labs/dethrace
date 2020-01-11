@@ -1,6 +1,8 @@
 #include "newgame.h"
 
-char* gBasic_car_names[2];
+char x[] = "xxxxxxxx.TXT";
+char y[] = "yyyyyyyy.TXT";
+char* gBasic_car_names[2] = { x, y };
 tNet_game_options gNet_settings[8];
 tRadio_bastards gRadio_bastards[11];
 tJoinable_game gGames_to_join[6];
