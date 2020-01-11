@@ -11,10 +11,6 @@ extern int gEncryption_method;
 // Size: 144
 int CheckQuit();
 
-// Offset: 144
-// Size: 50
-double sqr(double pN);
-
 // Offset: 196
 // Size: 542
 // EAX: pS
