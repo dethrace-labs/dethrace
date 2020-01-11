@@ -6,12 +6,11 @@ int gLast_demo;
 // Size: 476
 void DoDemo() {
     tS32 frame_time;
-    FILE *f;
+    FILE* f;
     tPath_name the_path;
     int i;
     int count;
     char s[256];
-    char *str;
+    char* str;
     tS3_sound_tag song_tag;
 }
-

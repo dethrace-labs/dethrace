@@ -9,7 +9,7 @@ void* BrMemAllocate(br_size_t size, br_uint_8 type);
 
 // Offset: 177
 // Size: 106
-void BrMemFree(void *block);
+void BrMemFree(void* block);
 
 // Offset: 296
 // Size: 131
@@ -25,6 +25,6 @@ void* BrMemCalloc(int nelems, br_size_t size, br_uint_8 type);
 
 // Offset: 739
 // Size: 120
-char* BrMemStrDup(char *str);
+char* BrMemStrDup(char* str);
 
 #endif

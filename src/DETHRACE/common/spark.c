@@ -1,17 +1,17 @@
 #include "spark.h"
 
-br_pixelmap *gFlame_map[20];
-tBRender_smoke *gBR_smoke_pointers[30];
+br_pixelmap* gFlame_map[20];
+tBRender_smoke* gBR_smoke_pointers[30];
 tSplash gSplash[32];
-br_material *gSplash_material[20];
+br_material* gSplash_material[20];
 tBRender_smoke gBR_smoke_structs[30];
 tSmoke_column gSmoke_column[25];
 br_matrix4 gCameraToScreen;
 tSpark gSparks[32];
-br_model *gShrapnel_model[2];
-br_pixelmap *gShade_list[16];
+br_model* gShrapnel_model[2];
+br_pixelmap* gShade_list[16];
 int gN_BR_smoke_structs;
-br_pixelmap **gDust_table;
+br_pixelmap** gDust_table;
 tSmoke gSmoke[25];
 tU32 gSplash_flags;
 int gSmoke_num;
@@ -20,34 +20,34 @@ int gColumn_flags;
 tU32 gNext_splash;
 int gOffset;
 int gIt_type;
-br_pixelmap *gBlack_smoke_shade_table;
-br_pixelmap *gGrey_smoke_shade_table;
-br_model *gLollipop_model;
+br_pixelmap* gBlack_smoke_shade_table;
+br_pixelmap* gGrey_smoke_shade_table;
+br_model* gLollipop_model;
 int gNum_splash_types;
 int gNum_dust_tables;
 int gSmoke_on;
 int gSmoke_flags;
-br_model *gSplash_model;
+br_model* gSplash_model;
 int gDust_rotate;
-br_pixelmap *gIt_shade_table;
-br_pixelmap *gDark_smoke_shade_table;
+br_pixelmap* gIt_shade_table;
+br_pixelmap* gDark_smoke_shade_table;
 int gShrapnel_flags;
 int gSpark_flags;
 int gNext_shrapnel;
-br_camera *gSpark_cam;
+br_camera* gSpark_cam;
 int gNext_spark;
-br_material *gBlack_material;
+br_material* gBlack_material;
 tShrapnel gShrapnel[15];
 
 // Offset: 0
 // Size: 119
-void DrawDot(br_scalar z, tU8 *scr_ptr, tU16 *depth_ptr, tU8 *shade_ptr) {
+void DrawDot(br_scalar z, tU8* scr_ptr, tU16* depth_ptr, tU8* shade_ptr) {
 }
 
 // Offset: 120
 // Size: 234
 // EAX: pScreen
-void SetWorldToScreen(br_pixelmap *pScreen) {
+void SetWorldToScreen(br_pixelmap* pScreen) {
     br_matrix4 mat;
     br_matrix4 mat2;
 }
@@ -56,7 +56,7 @@ void SetWorldToScreen(br_pixelmap *pScreen) {
 // Size: 171
 // EAX: pStart
 // EDX: pEnd
-void DrawLine3DThroughBRender(br_vector3 *pStart, br_vector3 *pEnd) {
+void DrawLine3DThroughBRender(br_vector3* pStart, br_vector3* pEnd) {
 }
 
 // Offset: 528
@@ -65,7 +65,7 @@ void DrawLine3DThroughBRender(br_vector3 *pStart, br_vector3 *pEnd) {
 // EDX: end
 // EBX: pScreen
 // ECX: pDepth_buffer
-int DrawLine3D(br_vector3 *start, br_vector3 *end, br_pixelmap *pScreen, br_pixelmap *pDepth_buffer, br_pixelmap *shade_table) {
+int DrawLine3D(br_vector3* start, br_vector3* end, br_pixelmap* pScreen, br_pixelmap* pDepth_buffer, br_pixelmap* shade_table) {
     br_vector3 o;
     br_vector3 p;
     br_vector3 tv;
@@ -80,10 +80,10 @@ int DrawLine3D(br_vector3 *start, br_vector3 *end, br_pixelmap *pScreen, br_pixe
 // EDX: p
 // EBX: pScreen
 // ECX: pDepth_buffer
-int DrawLine2D(br_vector3 *o, br_vector3 *p, br_pixelmap *pScreen, br_pixelmap *pDepth_buffer, br_scalar brightness, br_pixelmap *shade_table) {
-    tU8 *scr_ptr;
-    tU16 *depth_ptr;
-    tU8 *shade_ptr;
+int DrawLine2D(br_vector3* o, br_vector3* p, br_pixelmap* pScreen, br_pixelmap* pDepth_buffer, br_scalar brightness, br_pixelmap* shade_table) {
+    tU8* scr_ptr;
+    tU16* depth_ptr;
+    tU8* shade_ptr;
     int x1;
     int x2;
     int y1;
@@ -115,7 +115,7 @@ void SetLineModelCols(tU8 pCol) {
 // EDX: pDepth_buffer
 // EBX: pCamera
 // ECX: pTime
-void ReplaySparks(br_pixelmap *pRender_screen, br_pixelmap *pDepth_buffer, br_actor *pCamera, tU32 pTime) {
+void ReplaySparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_actor* pCamera, tU32 pTime) {
     int i;
     br_vector3 pos;
     br_vector3 o;
@@ -130,7 +130,7 @@ void ReplaySparks(br_pixelmap *pRender_screen, br_pixelmap *pDepth_buffer, br_ac
 // EDX: pDepth_buffer
 // EBX: pCamera
 // ECX: pCamera_to_world
-void RenderSparks(br_pixelmap *pRender_screen, br_pixelmap *pDepth_buffer, br_actor *pCamera, br_matrix34 *pCamera_to_world, tU32 pTime) {
+void RenderSparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world, tU32 pTime) {
     int i;
     int time;
     br_vector3 tv;
@@ -146,7 +146,7 @@ void RenderSparks(br_pixelmap *pRender_screen, br_pixelmap *pDepth_buffer, br_ac
 // EAX: pCar
 // EDX: pPos
 // EBX: pVel
-void CreateSingleSpark(tCar_spec *pCar, br_vector3 *pPos, br_vector3 *pVel) {
+void CreateSingleSpark(tCar_spec* pCar, br_vector3* pPos, br_vector3* pVel) {
 }
 
 // Offset: 6704
@@ -154,7 +154,7 @@ void CreateSingleSpark(tCar_spec *pCar, br_vector3 *pPos, br_vector3 *pVel) {
 // EAX: pos
 // EDX: v
 // EBX: pForce
-void CreateSparks(br_vector3 *pos, br_vector3 *v, br_vector3 *pForce, br_scalar sparkiness, tCar_spec *pCar) {
+void CreateSparks(br_vector3* pos, br_vector3* v, br_vector3* pForce, br_scalar sparkiness, tCar_spec* pCar) {
     br_vector3 norm;
     br_vector3 normal;
     br_vector3 tv;
@@ -172,12 +172,12 @@ void CreateSparks(br_vector3 *pos, br_vector3 *v, br_vector3 *pForce, br_scalar 
 // EDX: v
 // EBX: pForce
 // ECX: pCar1
-void CreateSparkShower(br_vector3 *pos, br_vector3 *v, br_vector3 *pForce, tCar_spec *pCar1, tCar_spec *pCar2) {
+void CreateSparkShower(br_vector3* pos, br_vector3* v, br_vector3* pForce, tCar_spec* pCar1, tCar_spec* pCar2) {
     br_scalar ts;
     br_scalar ts2;
     int num;
     int i;
-    tCar_spec *c;
+    tCar_spec* c;
     br_vector3 tv;
     br_vector3 tv2;
     br_vector3 normal;
@@ -188,9 +188,9 @@ void CreateSparkShower(br_vector3 *pos, br_vector3 *v, br_vector3 *pForce, tCar_
 // EAX: pSpark_num
 // EDX: pos
 // EBX: length
-void AdjustSpark(int pSpark_num, br_vector3 *pos, br_vector3 *length) {
+void AdjustSpark(int pSpark_num, br_vector3* pos, br_vector3* length) {
     br_vector3 tv;
-    br_matrix34 *mat;
+    br_matrix34* mat;
     int i;
 }
 
@@ -200,7 +200,7 @@ void AdjustSpark(int pSpark_num, br_vector3 *pos, br_vector3 *length) {
 // EDX: pos
 // EBX: pAge
 // ECX: pMaterial
-void AdjustShrapnel(int pShrapnel_num, br_vector3 *pos, tU16 pAge, br_material *pMaterial) {
+void AdjustShrapnel(int pShrapnel_num, br_vector3* pos, tU16 pAge, br_material* pMaterial) {
     int i;
 }
 
@@ -219,13 +219,13 @@ void ResetShrapnel() {
 // EAX: pos
 // EDX: v
 // EBX: pNormal
-void CreateShrapnelShower(br_vector3 *pos, br_vector3 *v, br_vector3 *pNormal, br_scalar pForce, tCar_spec *c1, tCar_spec *c2) {
+void CreateShrapnelShower(br_vector3* pos, br_vector3* v, br_vector3* pNormal, br_scalar pForce, tCar_spec* c1, tCar_spec* c2) {
     br_scalar ts;
     br_scalar ts2;
     br_scalar rnd;
     int num;
     int i;
-    tCar_spec *c;
+    tCar_spec* c;
     br_vector3 tv;
     br_vector3 tv2;
     br_vector3 vel;
@@ -263,7 +263,7 @@ void DisposeShrapnel() {
 // EAX: pTime
 void ReplayShrapnel(tU32 pTime) {
     int i;
-    br_matrix34 *mat;
+    br_matrix34* mat;
 }
 
 // Offset: 12024
@@ -272,7 +272,7 @@ void ReplayShrapnel(tU32 pTime) {
 void MungeShrapnel(tU32 pTime) {
     br_vector3 disp;
     int i;
-    br_matrix34 *mat;
+    br_matrix34* mat;
     br_scalar ts;
 }
 
@@ -281,7 +281,7 @@ void MungeShrapnel(tU32 pTime) {
 // EAX: mat
 // EDX: r
 // EBX: a
-void DrMatrix34Rotate(br_matrix34 *mat, br_angle r, br_vector3 *a) {
+void DrMatrix34Rotate(br_matrix34* mat, br_angle r, br_vector3* a) {
     br_scalar t;
     br_scalar s;
     br_scalar c;
@@ -297,7 +297,7 @@ void DrMatrix34Rotate(br_matrix34 *mat, br_angle r, br_vector3 *a) {
 // Size: 245
 // EAX: l
 // EDX: x
-void SmokeLine(int l, int x, br_scalar zbuff, int r_squared, tU8 *scr_ptr, tU16 *depth_ptr, tU8 *shade_ptr, br_scalar r_multiplier, br_scalar z_multiplier, br_scalar shade_offset) {
+void SmokeLine(int l, int x, br_scalar zbuff, int r_squared, tU8* scr_ptr, tU16* depth_ptr, tU8* shade_ptr, br_scalar r_multiplier, br_scalar z_multiplier, br_scalar shade_offset) {
     int i;
     int r_multiplier_int;
     int shade_offset_int;
@@ -307,12 +307,12 @@ void SmokeLine(int l, int x, br_scalar zbuff, int r_squared, tU8 *scr_ptr, tU16 
 // Offset: 13528
 // Size: 2390
 // EAX: o
-void SmokeCircle(br_vector3 *o, br_scalar r, br_scalar extra_z, br_scalar strength, br_scalar pAspect, br_pixelmap *pRender_screen, br_pixelmap *pDepth_buffer, br_pixelmap *pShade_table) {
-    tU8 *scr_ptr;
-    tU16 *depth_ptr;
-    tU8 *shade_ptr;
-    tU8 *osp;
-    tU16 *odp;
+void SmokeCircle(br_vector3* o, br_scalar r, br_scalar extra_z, br_scalar strength, br_scalar pAspect, br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_pixelmap* pShade_table) {
+    tU8* scr_ptr;
+    tU16* depth_ptr;
+    tU8* shade_ptr;
+    tU8* osp;
+    tU16* odp;
     int ox;
     int oy;
     int i;
@@ -339,15 +339,15 @@ void SmokeCircle(br_vector3 *o, br_scalar r, br_scalar extra_z, br_scalar streng
 
 // Offset: 15920
 // Size: 112
-int CmpSmokeZ(void *p1, void *p2) {
-    tBRender_smoke **a;
-    tBRender_smoke **b;
+int CmpSmokeZ(void* p1, void* p2) {
+    tBRender_smoke** a;
+    tBRender_smoke** b;
 }
 
 // Offset: 16032
 // Size: 506
 void RenderRecordedSmokeCircles() {
-    tBRender_smoke *smoke;
+    tBRender_smoke* smoke;
     tU8 red;
     tU8 grn;
     tU8 blu;
@@ -356,7 +356,7 @@ void RenderRecordedSmokeCircles() {
 // Offset: 16540
 // Size: 266
 // EAX: pCent
-void RecordSmokeCircle(br_vector3 *pCent, br_scalar pR, br_scalar pStrength, br_pixelmap *pShade, br_scalar pAspect) {
+void RecordSmokeCircle(br_vector3* pCent, br_scalar pR, br_scalar pStrength, br_pixelmap* pShade, br_scalar pAspect) {
     tU8 shade_index;
     br_colour shade_rgb;
 }
@@ -364,11 +364,11 @@ void RecordSmokeCircle(br_vector3 *pCent, br_scalar pR, br_scalar pStrength, br_
 // Offset: 16808
 // Size: 506
 // EAX: o
-void SmokeCircle3D(br_vector3 *o, br_scalar r, br_scalar strength, br_scalar pAspect, br_pixelmap *pRender_screen, br_pixelmap *pDepth_buffer, br_pixelmap *pShade_table, br_actor *pCam) {
+void SmokeCircle3D(br_vector3* o, br_scalar r, br_scalar strength, br_scalar pAspect, br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_pixelmap* pShade_table, br_actor* pCam) {
     br_vector3 tv;
     br_vector3 p;
     br_vector4 o2;
-    br_camera *cam;
+    br_camera* cam;
     int scaled_r;
     br_scalar extra_z;
 }
@@ -378,7 +378,7 @@ void SmokeCircle3D(br_vector3 *o, br_scalar r, br_scalar strength, br_scalar pAs
 // EAX: pRender_screen
 // EDX: pDepth_buffer
 // EBX: pCamera
-void ReplaySmoke(br_pixelmap *pRender_screen, br_pixelmap *pDepth_buffer, br_actor *pCamera) {
+void ReplaySmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_actor* pCamera) {
     br_scalar aspect;
     int i;
 }
@@ -388,7 +388,7 @@ void ReplaySmoke(br_pixelmap *pRender_screen, br_pixelmap *pDepth_buffer, br_act
 // EAX: pCar
 // EDX: wheel
 // EBX: pTime
-void GenerateContinuousSmoke(tCar_spec *pCar, int wheel, tU32 pTime) {
+void GenerateContinuousSmoke(tCar_spec* pCar, int wheel, tU32 pTime) {
     br_vector3 pos;
     br_vector3 v;
     br_vector3 vcs;
@@ -411,7 +411,7 @@ void DustRotate() {
 // EDX: pDepth_buffer
 // EBX: pCamera
 // ECX: pCamera_to_world
-void RenderSmoke(br_pixelmap *pRender_screen, br_pixelmap *pDepth_buffer, br_actor *pCamera, br_matrix34 *pCamera_to_world, tU32 pTime) {
+void RenderSmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world, tU32 pTime) {
     int i;
     int j;
     br_vector3 tv;
@@ -425,7 +425,7 @@ void RenderSmoke(br_pixelmap *pRender_screen, br_pixelmap *pDepth_buffer, br_act
 // Size: 672
 // EAX: pos
 // EDX: v
-void CreatePuffOfSmoke(br_vector3 *pos, br_vector3 *v, br_scalar strength, br_scalar pDecay_factor, int pType, tCar_spec *pC) {
+void CreatePuffOfSmoke(br_vector3* pos, br_vector3* v, br_scalar strength, br_scalar pDecay_factor, int pType, tCar_spec* pC) {
     br_vector3 tv;
     int pipe_me;
 }
@@ -440,7 +440,7 @@ void ResetSmoke() {
 // EAX: pIndex
 // EDX: pType
 // EBX: pPos
-void AdjustSmoke(int pIndex, tU8 pType, br_vector3 *pPos, br_scalar pRadius, br_scalar pStrength) {
+void AdjustSmoke(int pIndex, tU8 pType, br_vector3* pPos, br_scalar pRadius, br_scalar pStrength) {
 }
 
 // Offset: 21340
@@ -454,9 +454,9 @@ void ActorError() {
 // EDX: pCar
 // EBX: pVertex
 // ECX: pColour
-void AdjustSmokeColumn(int pIndex, tCar_spec *pCar, int pVertex, int pColour) {
+void AdjustSmokeColumn(int pIndex, tCar_spec* pCar, int pVertex, int pColour) {
     int i;
-    br_actor *actor;
+    br_actor* actor;
 }
 
 // Offset: 21632
@@ -465,10 +465,10 @@ void AdjustSmokeColumn(int pIndex, tCar_spec *pCar, int pVertex, int pColour) {
 // EDX: pColour
 // EBX: pVertex_index
 // ECX: pLifetime
-void CreateSmokeColumn(tCar_spec *pCar, int pColour, int pVertex_index, tU32 pLifetime) {
+void CreateSmokeColumn(tCar_spec* pCar, int pColour, int pVertex_index, tU32 pLifetime) {
     int i;
-    br_actor *actor;
-    tSmoke_column *col;
+    br_actor* actor;
+    tSmoke_column* col;
 }
 
 // Offset: 22512
@@ -496,15 +496,15 @@ void GenerateItFoxShadeTable() {
 void AdjustFlame(int pIndex, int pFrame_count, br_scalar pScale_x, br_scalar pScale_y, br_scalar pOffset_x, br_scalar pOffset_z) {
     int i;
     int j;
-    tSmoke_column *col;
-    br_actor *actor;
+    tSmoke_column* col;
+    br_actor* actor;
 }
 
 // Offset: 23076
 // Size: 373
 // EAX: col
 // EDX: actor
-void ReplayFlame(tSmoke_column *col, br_actor *actor) {
+void ReplayFlame(tSmoke_column* col, br_actor* actor) {
     int i;
 }
 
@@ -513,9 +513,9 @@ void ReplayFlame(tSmoke_column *col, br_actor *actor) {
 // EAX: c
 // EDX: pPos
 // EBX: pTime
-void FlameAnimate(int c, br_vector3 *pPos, tU32 pTime) {
-    tSmoke_column *col;
-    br_actor *actor;
+void FlameAnimate(int c, br_vector3* pPos, tU32 pTime) {
+    tSmoke_column* col;
+    br_actor* actor;
     int i;
 }
 
@@ -524,10 +524,10 @@ void FlameAnimate(int c, br_vector3 *pPos, tU32 pTime) {
 // EAX: i
 // EDX: pTime
 // EBX: pRet_car_pos
-void DoSmokeColumn(int i, tU32 pTime, br_vector3 *pRet_car_pos) {
-    tCar_spec *c;
-    br_actor *actor;
-    br_actor *bonny;
+void DoSmokeColumn(int i, tU32 pTime, br_vector3* pRet_car_pos) {
+    tCar_spec* c;
+    br_actor* actor;
+    br_actor* bonny;
     int group;
 }
 
@@ -545,8 +545,8 @@ void ReplaySmokeColumn(tU32 pTime) {
 void MungeSmokeColumn(tU32 pTime) {
     int i;
     int plane;
-    br_actor *actor;
-    br_actor *bonny;
+    br_actor* actor;
+    br_actor* bonny;
     br_vector3 car_pos;
     br_vector3 pos;
     br_vector3 v;
@@ -555,15 +555,15 @@ void MungeSmokeColumn(tU32 pTime) {
     br_vector3 end;
     br_scalar ts;
     br_scalar decay_factor;
-    tCar_spec *c;
+    tCar_spec* c;
 }
 
 // Offset: 26220
 // Size: 304
 void DisposeFlame() {
     int j;
-    br_actor *actor;
-    br_material *material;
+    br_actor* actor;
+    br_material* material;
 }
 
 // Offset: 26524
@@ -572,21 +572,21 @@ void InitFlame() {
     int j;
     int num;
     char the_path[256];
-    br_actor *actor;
-    br_material *material;
+    br_actor* actor;
+    br_material* material;
 }
 
 // Offset: 27364
 // Size: 1197
 // EAX: pF
-void InitSplash(FILE *pF) {
+void InitSplash(FILE* pF) {
     int i;
     int num_files;
     int num;
-    br_actor *actor;
+    br_actor* actor;
     char the_path[256];
     char s[256];
-    br_pixelmap *splash_maps[20];
+    br_pixelmap* splash_maps[20];
 }
 
 // Offset: 28564
@@ -600,7 +600,7 @@ void DisposeSplash() {
 // EAX: pRender_screen
 // EDX: pDepth_buffer
 // EBX: pCamera
-void DrawTheGlow(br_pixelmap *pRender_screen, br_pixelmap *pDepth_buffer, br_actor *pCamera) {
+void DrawTheGlow(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_actor* pCamera) {
     int i;
     br_scalar strength;
     br_vector3 tv;
@@ -610,11 +610,11 @@ void DrawTheGlow(br_pixelmap *pRender_screen, br_pixelmap *pDepth_buffer, br_act
 // Offset: 29132
 // Size: 944
 // EAX: pCar
-void PipeInstantUnSmudge(tCar_spec *pCar) {
-    br_model *model;
-    br_model *b_model;
-    br_actor *actor;
-    br_actor *bonny;
+void PipeInstantUnSmudge(tCar_spec* pCar) {
+    br_model* model;
+    br_model* b_model;
+    br_actor* actor;
+    br_actor* bonny;
     int j;
     int n;
     int v;
@@ -626,14 +626,14 @@ void PipeInstantUnSmudge(tCar_spec *pCar) {
 // Size: 1828
 // EAX: pCar
 // EDX: fire_point
-void SmudgeCar(tCar_spec *pCar, int fire_point) {
+void SmudgeCar(tCar_spec* pCar, int fire_point) {
     int v;
     int j;
     int real_vertex_number;
-    br_model *model;
-    br_model *b_model;
-    br_actor *actor;
-    br_actor *bonny;
+    br_model* model;
+    br_model* b_model;
+    br_actor* actor;
+    br_actor* bonny;
     br_scalar ts;
     br_vector3 tv;
     br_vector3 bonny_pos;
@@ -674,14 +674,14 @@ int GetSmokeOn() {
 // Offset: 32212
 // Size: 107
 // EAX: pCar
-void StopCarSmoking(tCar_spec *pCar) {
+void StopCarSmoking(tCar_spec* pCar) {
     int i;
 }
 
 // Offset: 32320
 // Size: 91
 // EAX: pCar
-void StopCarSmokingInstantly(tCar_spec *pCar) {
+void StopCarSmokingInstantly(tCar_spec* pCar) {
     int i;
 }
 
@@ -690,7 +690,7 @@ void StopCarSmokingInstantly(tCar_spec *pCar) {
 // EAX: pCar
 // EDX: pDamage_index
 // EBX: pColour
-void ConditionalSmokeColumn(tCar_spec *pCar, int pDamage_index, int pColour) {
+void ConditionalSmokeColumn(tCar_spec* pCar, int pDamage_index, int pColour) {
     int i;
 }
 
@@ -700,9 +700,9 @@ void ConditionalSmokeColumn(tCar_spec *pCar, int pDamage_index, int pColour) {
 // EDX: sp
 // EBX: normal
 // ECX: pTime
-void SingleSplash(tCar_spec *pCar, br_vector3 *sp, br_vector3 *normal, tU32 pTime) {
-    br_matrix34 *mat;
-    br_matrix34 *c_mat;
+void SingleSplash(tCar_spec* pCar, br_vector3* sp, br_vector3* normal, tU32 pTime) {
+    br_matrix34* mat;
+    br_matrix34* c_mat;
     br_vector3 tv;
     br_vector3 vel;
     br_scalar size;
@@ -714,7 +714,7 @@ void SingleSplash(tCar_spec *pCar, br_vector3 *sp, br_vector3 *normal, tU32 pTim
 // Size: 3206
 // EAX: pCar
 // EDX: pTime
-void CreateSplash(tCar_spec *pCar, tU32 pTime) {
+void CreateSplash(tCar_spec* pCar, tU32 pTime) {
     br_vector3 normal_car_space;
     br_vector3 pos2;
     br_vector3 v_plane;
@@ -748,7 +748,7 @@ void MungeSplash(tU32 pTime) {
     br_vector3 tv;
     br_scalar dt;
     br_scalar ts;
-    tCar_spec *car;
+    tCar_spec* car;
     tVehicle_type type;
 }
 
@@ -760,7 +760,7 @@ void RenderSplashes() {
 // Offset: 38060
 // Size: 207
 // EAX: f
-void GetSmokeShadeTables(FILE *f) {
+void GetSmokeShadeTables(FILE* f) {
     int i;
     int red;
     int green;
@@ -779,7 +779,7 @@ void FreeSmokeShadeTables() {
 // Offset: 38388
 // Size: 80
 // EAX: pF
-void LoadInKevStuff(FILE *pF) {
+void LoadInKevStuff(FILE* pF) {
 }
 
 // Offset: 38468
@@ -790,13 +790,13 @@ void DisposeKevStuff() {
 // Offset: 38520
 // Size: 259
 // EAX: pCar
-void DisposeKevStuffCar(tCar_spec *pCar) {
+void DisposeKevStuffCar(tCar_spec* pCar) {
     int i;
 }
 
 // Offset: 38780
 // Size: 829
-void DoTrueColModelThing(br_actor *actor, br_model *pModel, br_material *material, void *render_data, br_uint_8 style, int on_screen) {
+void DoTrueColModelThing(br_actor* actor, br_model* pModel, br_material* material, void* render_data, br_uint_8 style, int on_screen) {
     int group;
     int j;
     int val;
@@ -804,7 +804,7 @@ void DoTrueColModelThing(br_actor *actor, br_model *pModel, br_material *materia
 
 // Offset: 39612
 // Size: 856
-void DoModelThing(br_actor *actor, br_model *pModel, br_material *material, void *render_data, br_uint_8 style, int on_screen) {
+void DoModelThing(br_actor* actor, br_model* pModel, br_material* material, void* render_data, br_uint_8 style, int on_screen) {
     int j;
     int i;
     int group;
@@ -816,19 +816,19 @@ void DoModelThing(br_actor *actor, br_model *pModel, br_material *material, void
 // Size: 204
 // EAX: pActor
 // EDX: pShade
-void SetModelShade(br_actor *pActor, br_pixelmap *pShade) {
+void SetModelShade(br_actor* pActor, br_pixelmap* pShade) {
     int i;
-    br_material *material;
-    br_model *model;
+    br_material* material;
+    br_model* model;
 }
 
 // Offset: 40672
 // Size: 414
 // EAX: pCar
-void MakeCarIt(tCar_spec *pCar) {
-    br_actor *actor;
-    br_actor *bonny;
-    br_pixelmap *shade[6];
+void MakeCarIt(tCar_spec* pCar) {
+    br_actor* actor;
+    br_actor* bonny;
+    br_pixelmap* shade[6];
     static int shade_num;
     int i;
 }
@@ -836,10 +836,9 @@ void MakeCarIt(tCar_spec *pCar) {
 // Offset: 41088
 // Size: 1093
 // EAX: pCar
-void StopCarBeingIt(tCar_spec *pCar) {
+void StopCarBeingIt(tCar_spec* pCar) {
     int i;
     int group;
-    br_actor *actor;
-    br_actor *bonny;
+    br_actor* actor;
+    br_actor* bonny;
 }
-

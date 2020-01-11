@@ -32,4 +32,3 @@ float BrFloatPow(float a, float b) {
 float BrFloatAtan2(float x, float y) {
     return atan2f(x, y);
 }
-

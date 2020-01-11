@@ -1,13 +1,12 @@
 #include "oppoproc.h"
 
-
 // Offset: 0
 // Size: 724
 // EAX: pCent
 // EDX: pRadius
 // EBX: pEntry_length
 // ECX: pLeft_not_right
-int StraightestArcForCorner2D(br_vector2 *pCent, br_scalar *pRadius, br_scalar *pEntry_length, int *pLeft_not_right, br_vector2 *p1, br_vector2 *p2, br_vector2 *p3, br_scalar pWidth12, br_scalar pWidth23) {
+int StraightestArcForCorner2D(br_vector2* pCent, br_scalar* pRadius, br_scalar* pEntry_length, int* pLeft_not_right, br_vector2* p1, br_vector2* p2, br_vector2* p3, br_scalar pWidth12, br_scalar pWidth23) {
     br_vector2 rel1;
     br_vector2 rel3;
     br_vector2 rot1;
@@ -22,13 +21,13 @@ int StraightestArcForCorner2D(br_vector2 *pCent, br_scalar *pRadius, br_scalar *
 // Offset: 724
 // Size: 47
 // EAX: pCar_spec
-br_scalar CornerFudge(tCar_spec *pCar_spec) {
+br_scalar CornerFudge(tCar_spec* pCar_spec) {
 }
 
 // Offset: 772
 // Size: 92
 // EAX: pCar
-br_scalar MaxCurvatureForCarSpeed(tCar_spec *pCar, br_scalar pSpeed) {
+br_scalar MaxCurvatureForCarSpeed(tCar_spec* pCar, br_scalar pSpeed) {
     br_scalar curv;
 }
 
@@ -36,14 +35,14 @@ br_scalar MaxCurvatureForCarSpeed(tCar_spec *pCar, br_scalar pSpeed) {
 // Size: 70
 // EAX: pA
 // EDX: pB
-br_scalar Vector2Cross(br_vector2 *pA, br_vector2 *pB) {
+br_scalar Vector2Cross(br_vector2* pA, br_vector2* pB) {
 }
 
 // Offset: 936
 // Size: 108
 // EAX: pOpponent_spec
-tFollow_path_result EndOfPath(tOpponent_spec *pOpponent_spec) {
-    tCar_spec *car_spec;
+tFollow_path_result EndOfPath(tOpponent_spec* pOpponent_spec) {
+    tCar_spec* car_spec;
 }
 
 // Offset: 1044
@@ -51,7 +50,7 @@ tFollow_path_result EndOfPath(tOpponent_spec *pOpponent_spec) {
 // EAX: p1
 // EDX: p2
 // EBX: p3
-int RoughlyColinear(br_vector2 *p1, br_vector2 *p2, br_vector2 *p3) {
+int RoughlyColinear(br_vector2* p1, br_vector2* p2, br_vector2* p3) {
     br_vector2 rel1;
     br_vector2 rel2;
     br_vector2 sum;
@@ -66,7 +65,7 @@ int RoughlyColinear(br_vector2 *p1, br_vector2 *p2, br_vector2 *p3) {
 // EDX: pFinish
 // EBX: pWidth
 // ECX: section1
-int GetStraight(br_vector2 *pStart, br_vector2 *pFinish, br_scalar *pWidth, int section1, tOpponent_spec *pOpponent_spec, tFollow_path_data *data) {
+int GetStraight(br_vector2* pStart, br_vector2* pFinish, br_scalar* pWidth, int section1, tOpponent_spec* pOpponent_spec, tFollow_path_data* data) {
     int section;
     br_vector2 next;
     br_scalar next_width;
@@ -78,12 +77,12 @@ int GetStraight(br_vector2 *pStart, br_vector2 *pFinish, br_scalar *pWidth, int 
 // EDX: pCommand
 // EBX: pPursuit_mode
 // ECX: pIgnore_end
-tFollow_path_result ProcessFollowPath(tOpponent_spec *pOpponent_spec, tProcess_objective_command pCommand, int pPursuit_mode, int pIgnore_end, int pNever_struggle) {
+tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand, int pPursuit_mode, int pIgnore_end, int pNever_struggle) {
     tS16 real_section_no;
-    tFollow_path_data *data;
+    tFollow_path_data* data;
     br_vector3 wank;
     br_vector3 wank2;
-    br_vector3 *not_our_dir;
+    br_vector3* not_our_dir;
     br_vector3 section_dir;
     br_vector3 section_v;
     br_vector3 start;
@@ -94,7 +93,7 @@ tFollow_path_result ProcessFollowPath(tOpponent_spec *pOpponent_spec, tProcess_o
     br_vector3 a;
     br_vector3 p;
     br_vector3 car_to_end;
-    br_actor *car_master_actor;
+    br_actor* car_master_actor;
     br_scalar stopped_speed;
     br_scalar dist_to_end;
     br_scalar t;
@@ -118,7 +117,7 @@ tFollow_path_result ProcessFollowPath(tOpponent_spec *pOpponent_spec, tProcess_o
     br_scalar dot_a;
     br_scalar dot_d;
     br_scalar further_along;
-    tCar_spec *car_spec;
+    tCar_spec* car_spec;
     int engine_damage;
     int trans_damage;
     int section_no;
@@ -164,15 +163,15 @@ tFollow_path_result ProcessFollowPath(tOpponent_spec *pOpponent_spec, tProcess_o
 // Offset: 7500
 // Size: 3018
 // EAX: pOpponent_spec
-tFollow_path_result FollowCheatyPath(tOpponent_spec *pOpponent_spec) {
-    tFollow_path_data *data;
+tFollow_path_result FollowCheatyPath(tOpponent_spec* pOpponent_spec) {
+    tFollow_path_data* data;
     br_vector3 a;
     br_vector3 p;
     br_vector3 section_v;
     br_vector3 car_to_end;
     br_vector3 car_to_intersect;
-    br_vector3 *start;
-    br_vector3 *finish;
+    br_vector3* start;
+    br_vector3* finish;
     br_scalar t;
     br_scalar frame_period_in_secs;
     br_scalar distance_left;
@@ -182,4 +181,3 @@ tFollow_path_result FollowCheatyPath(tOpponent_spec *pOpponent_spec) {
     br_scalar section_max;
     br_scalar desired_speed_BRU;
 }
-

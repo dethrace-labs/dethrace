@@ -9,7 +9,7 @@ void* BrScratchAllocate(br_size_t size);
 
 // Offset: 185
 // Size: 72
-void BrScratchFree(void *scratch);
+void BrScratchFree(void* scratch);
 
 // Offset: 272
 // Size: 96

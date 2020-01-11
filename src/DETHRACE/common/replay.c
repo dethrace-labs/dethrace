@@ -3,8 +3,8 @@
 int gProgress_line_top[2];
 int gProgress_line_left[2];
 int gProgress_line_right[2];
-br_pixelmap *gReplay_pixies[10];
-char *gReplay_pixie_names[10];
+br_pixelmap* gReplay_pixies[10];
+char* gReplay_pixie_names[10];
 int gKey_down;
 int gNo_cursor;
 int gSingle_frame_mode;
@@ -76,9 +76,9 @@ void DoActionReplayHeadups() {
 // Size: 318
 // EAX: pMove_amount
 void MoveReplayBuffer(tS32 pMove_amount) {
-    tU8 *play_ptr;
-    tU8 *old_play_ptr;
-    tU8 *old_play_ptr2;
+    tU8* play_ptr;
+    tU8* old_play_ptr;
+    tU8* old_play_ptr2;
     int i;
     int a;
     tU32 old_time;
@@ -109,7 +109,7 @@ void ReverseSound(tS3_effect_tag pEffect_index, tS3_sound_tag pSound_tag) {
 // Offset: 3032
 // Size: 223
 int FindUniqueFile() {
-    FILE *f;
+    FILE* f;
     tPath_name the_path;
 }
 
@@ -150,4 +150,3 @@ void SynchronizeActionReplay() {
     tPath_name the_path;
     static tU32 gLast_synch_time;
 }
-

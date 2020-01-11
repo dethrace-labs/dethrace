@@ -5,7 +5,7 @@
 tJoy_array gJoy_array;
 tKey_array gKey_array;
 int gKey_poll_counter;
-tRolling_letter *gRolling_letters;
+tRolling_letter* gRolling_letters;
 tU32 gLast_poll_keys;
 int gCurrent_cursor;
 int gCurrent_position;
@@ -27,7 +27,7 @@ char gCurrent_typing[110];
 // Size: 996
 // EAX: pKeys
 // EDX: pMark
-void SetJoystickArrays(int *pKeys, int pMark) {
+void SetJoystickArrays(int* pKeys, int pMark) {
     int i;
     tS32 joyX;
     tS32 joyY;
@@ -192,7 +192,7 @@ int CmdKeyDown(int pFKey_ID, int pCmd_key_ID) {
 // Size: 206
 // EAX: pX_coord
 // EDX: pY_coord
-void GetMousePosition(int *pX_coord, int *pY_coord) {
+void GetMousePosition(int* pX_coord, int* pY_coord) {
     int x_left_margin;
     int x_right_margin;
     int y_top_margin;
@@ -216,7 +216,7 @@ void EndRollingLetters() {
 // EBX: pY
 // ECX: rolling_type
 int AddRollingLetter(char pChar, int pX, int pY, tRolling_type rolling_type) {
-    tRolling_letter *let;
+    tRolling_letter* let;
     int i;
     int number_of_letters;
 }
@@ -227,7 +227,7 @@ int AddRollingLetter(char pChar, int pX, int pY, tRolling_type rolling_type) {
 // EDX: pX
 // EBX: pY
 // ECX: rolling_type
-void AddRollingString(char *pStr, int pX, int pY, tRolling_type rolling_type) {
+void AddRollingString(char* pStr, int pX, int pY, tRolling_type rolling_type) {
     int i;
 }
 
@@ -245,7 +245,7 @@ void AddRollingNumber(tU32 pNumber, int pWidth, int pX, int pY) {
 // Size: 651
 void RollLettersIn() {
     tU32 period;
-    tRolling_letter *let;
+    tRolling_letter* let;
     int i;
     int j;
     int k;
@@ -255,9 +255,9 @@ void RollLettersIn() {
     int letter_offset;
     int font_height;
     int the_row_bytes;
-    tU8 *char_ptr;
-    tU8 *saved_char_ptr;
-    tU8 *source_ptr;
+    tU8* char_ptr;
+    tU8* saved_char_ptr;
+    tU8* source_ptr;
     tU8 the_byte;
 }
 
@@ -271,7 +271,7 @@ int ChangeCharTo(int pSlot_index, int pChar_index, char pNew_char) {
     int y_coord;
     int i;
     int j;
-    tRolling_letter *let;
+    tRolling_letter* let;
     tRolling_type new_type;
 }
 
@@ -281,13 +281,13 @@ int ChangeCharTo(int pSlot_index, int pChar_index, char pNew_char) {
 // EDX: pYcoord
 // EBX: pNew_str
 // ECX: pOld_str
-void ChangeTextTo(int pXcoord, int pYcoord, char *pNew_str, char *pOld_str) {
+void ChangeTextTo(int pXcoord, int pYcoord, char* pNew_str, char* pOld_str) {
     int x_coord;
     int i;
     int len;
     int len2;
     int j;
-    tRolling_letter *let;
+    tRolling_letter* let;
     tRolling_type new_type;
     char new_char;
 }
@@ -361,7 +361,7 @@ void StopTyping(int pSlot_index) {
 // Size: 121
 // EAX: pSlot_index
 // EDX: pRevert_str
-void RevertTyping(int pSlot_index, char *pRevert_str) {
+void RevertTyping(int pSlot_index, char* pRevert_str) {
     int i;
 }
 
@@ -370,7 +370,7 @@ void RevertTyping(int pSlot_index, char *pRevert_str) {
 // EAX: pSlot_index
 // EDX: pText
 // EBX: pVisible_length
-void StartTyping(int pSlot_index, char *pText, int pVisible_length) {
+void StartTyping(int pSlot_index, char* pText, int pVisible_length) {
 }
 
 // Offset: 7188
@@ -392,7 +392,7 @@ void SetSlotXY(int pSlot_index, int pX_coord, int pY_coord) {
 // Size: 93
 // EAX: pDestn
 // EDX: pMax_length
-void GetTypedName(char *pDestn, int pMax_length) {
+void GetTypedName(char* pDestn, int pMax_length) {
 }
 
 // Offset: 7532
@@ -403,7 +403,7 @@ void KillCursor(int pSlot_index) {
     int y_coord;
     int i;
     int j;
-    tRolling_letter *let;
+    tRolling_letter* let;
     tRolling_type new_type;
 }
 

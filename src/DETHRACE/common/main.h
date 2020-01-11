@@ -1,8 +1,8 @@
 #ifndef _MAIN_H_
 #define _MAIN_H_
 
-#include "dr_types.h"
 #include "br_types.h"
+#include "dr_types.h"
 
 // Offset: 0
 // Size: 161
@@ -10,7 +10,7 @@ void QuitGame();
 
 // Offset: 164
 // Size: 97
-tU32 TrackCount(br_actor *pActor, tU32 *pCount);
+tU32 TrackCount(br_actor* pActor, tU32* pCount);
 
 // Offset: 264
 // Size: 95
@@ -33,6 +33,6 @@ void ServiceGameInRace();
 // Size: 177
 // EAX: pArgc
 // EDX: pArgv
-void GameMain(int pArgc, char **pArgv);
+void GameMain(int pArgc, char** pArgv);
 
 #endif

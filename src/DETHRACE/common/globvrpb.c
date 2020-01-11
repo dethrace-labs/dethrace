@@ -11,14 +11,13 @@ tNet_mode gNet_mode;
 int gNumber_of_net_players;
 int gStart_race_sent;
 int gSynch_race_start;
-tNet_game_details *gCurrent_net_game;
+tNet_game_details* gCurrent_net_game;
 int gReceived_car_details;
 int gWaiting_for_unpause;
-tNet_game_options *gNet_options;
+tNet_game_options* gNet_options;
 br_vector3 gCamera_direction;
 int gNetwork_available;
 int gPedestrian_image;
 int gHighest_pedestrian_value;
 int gNeed_to_send_start_race;
 int gRendering_mirror;
-

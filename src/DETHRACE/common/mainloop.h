@@ -1,8 +1,8 @@
 #ifndef _MAINLOOP_H_
 #define _MAINLOOP_H_
 
-#include "dr_types.h"
 #include "br_types.h"
+#include "dr_types.h"
 
 // Offset: 0
 // Size: 161
@@ -28,7 +28,7 @@ void MungeHeadups();
 // Offset: 3384
 // Size: 588
 // EAX: pCamera_period
-void UpdateFramePeriod(tU32 *pCamera_period);
+void UpdateFramePeriod(tU32* pCamera_period);
 
 // Offset: 3972
 // Size: 45

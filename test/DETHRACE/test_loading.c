@@ -6,7 +6,6 @@
 #include "common/globvars.h"
 #include "common/loading.h"
 
-
 void test_loading_GetCDPathFromPathsTxtFile() {
     int result;
     tPath_name cd_path;
@@ -17,8 +16,8 @@ void test_loading_GetCDPathFromPathsTxtFile() {
     result = GetCDPathFromPathsTxtFile(cd_path);
     TEST_ASSERT_EQUAL_INT(0, result);
 
-    FILE *file = fopen("/tmp/PATHS.TXT","wt");
-    fprintf(file,"test_cd_path\r\n");
+    FILE* file = fopen("/tmp/PATHS.TXT", "wt");
+    fprintf(file, "test_cd_path\r\n");
     fclose(file);
 
     result = GetCDPathFromPathsTxtFile(cd_path);

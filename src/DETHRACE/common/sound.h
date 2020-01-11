@@ -1,8 +1,8 @@
 #ifndef _SOUND_H_
 #define _SOUND_H_
 
-#include "dr_types.h"
 #include "br_types.h"
+#include "dr_types.h"
 
 extern tS3_outlet_ptr gIndexed_outlets[6];
 extern int gRandom_CDA_tunes[7];
@@ -167,7 +167,7 @@ void DisposeSoundSources();
 // EDX: pSound
 // EBX: pInitial_position
 // ECX: pInitial_velocity
-tS3_sound_tag DRS3StartSound3D(tS3_outlet_ptr pOutlet, tS3_sound_id pSound, br_vector3 *pInitial_position, br_vector3 *pInitial_velocity, tS3_repeats pRepeats, tS3_volume pVolume, tS3_pitch pPitch, tS3_speed pSpeed);
+tS3_sound_tag DRS3StartSound3D(tS3_outlet_ptr pOutlet, tS3_sound_id pSound, br_vector3* pInitial_position, br_vector3* pInitial_velocity, tS3_repeats pRepeats, tS3_volume pVolume, tS3_pitch pPitch, tS3_speed pSpeed);
 
 // Offset: 4156
 // Size: 97

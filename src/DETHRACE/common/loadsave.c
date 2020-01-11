@@ -1,6 +1,6 @@
 #include "loadsave.h"
 
-tSave_game *gSaved_games[8];
+tSave_game* gSaved_games[8];
 int gStarted_typing;
 int gSave_allowed;
 
@@ -14,18 +14,18 @@ void CorrectLoadByteOrdering(int pIndex) {
 // Offset: 648
 // Size: 128
 // EAX: pSaved_game
-tU32 CalcLSChecksum(tSave_game *pSaved_game) {
+tU32 CalcLSChecksum(tSave_game* pSaved_game) {
     tU32 checksum;
     tU32 checksum2;
     int i;
-    tU8 *ptr;
+    tU8* ptr;
 }
 
 // Offset: 776
 // Size: 391
 void LoadSavedGames() {
     int i;
-    FILE *f;
+    FILE* f;
     tU32 the_size;
 }
 
@@ -78,7 +78,7 @@ void CorrectSaveByteOrdering(int pIndex) {
 // EAX: pSlot_number
 void SaveTheGame(int pSlot_number) {
     tPath_name the_path;
-    FILE *f;
+    FILE* f;
 }
 
 // Offset: 3636
@@ -93,7 +93,7 @@ int ConfirmMidGameSave() {
 // Offset: 3716
 // Size: 492
 // EAX: pSave_record
-void MakeSavedGame(tSave_game **pSave_record) {
+void MakeSavedGame(tSave_game** pSave_record) {
     int i;
 }
 
@@ -108,7 +108,7 @@ void SaveStart() {
 // EDX: pCurrent_choice
 // EBX: pString
 // ECX: pMax_length
-void GetSaveName(int pStarting_to_type, int pCurrent_choice, char *pString, int *pMax_length) {
+void GetSaveName(int pStarting_to_type, int pCurrent_choice, char* pString, int* pMax_length) {
 }
 
 // Offset: 4400
@@ -124,7 +124,7 @@ int SaveDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped
 // Size: 368
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int SaveGoAhead(int *pCurrent_choice, int *pCurrent_mode) {
+int SaveGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     char s1[256];
     char s2[256];
 }
@@ -133,7 +133,7 @@ int SaveGoAhead(int *pCurrent_choice, int *pCurrent_mode) {
 // Size: 368
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int SaveEscape(int *pCurrent_choice, int *pCurrent_mode) {
+int SaveEscape(int* pCurrent_choice, int* pCurrent_mode) {
     char s1[256];
     char s2[256];
 }
@@ -155,4 +155,3 @@ int SaveGameInterface(int pDefault_choice) {
 // EAX: pSave_allowed
 void DoSaveGame(int pSave_allowed) {
 }
-

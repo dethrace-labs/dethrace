@@ -1,8 +1,8 @@
 #ifndef _FLICPLAY_H_
 #define _FLICPLAY_H_
 
-#include "dr_types.h"
 #include "br_types.h"
+#include "dr_types.h"
 
 // Offset: 0
 // Size: 44
@@ -79,7 +79,7 @@ void FlicPaletteAllocate();
 // Size: 92
 // EAX: pFlic_info
 // EDX: pDest_pixelmap
-void AssertFlicPixelmap(tFlic_descriptor_ptr pFlic_info, br_pixelmap *pDest_pixelmap);
+void AssertFlicPixelmap(tFlic_descriptor_ptr pFlic_info, br_pixelmap* pDest_pixelmap);
 
 // Offset: 928
 // Size: 791
@@ -87,7 +87,7 @@ void AssertFlicPixelmap(tFlic_descriptor_ptr pFlic_info, br_pixelmap *pDest_pixe
 // EDX: pIndex
 // EBX: pFlic_info
 // ECX: pSize
-int StartFlic(char *pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU32 pSize, tS8 *pData_ptr, br_pixelmap *pDest_pixelmap, int pX_offset, int pY_offset, int pFrame_rate);
+int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap, int pX_offset, int pY_offset, int pFrame_rate);
 
 // Offset: 1720
 // Size: 96
@@ -108,84 +108,84 @@ void DoColourMap(tFlic_descriptor_ptr pFlic_info, tU32 chunk_length);
 // Size: 343
 // EAX: pFlic_info
 // EDX: chunk_length
-void DoDifferenceX(tFlic_descriptor *pFlic_info, tU32 chunk_length);
+void DoDifferenceX(tFlic_descriptor* pFlic_info, tU32 chunk_length);
 
 // Offset: 2592
 // Size: 377
 // EAX: pFlic_info
 // EDX: chunk_length
-void DoDifferenceTrans(tFlic_descriptor *pFlic_info, tU32 chunk_length);
+void DoDifferenceTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length);
 
 // Offset: 2972
 // Size: 303
 // EAX: pFlic_info
 // EDX: chunk_length
-void DoColour256(tFlic_descriptor *pFlic_info, tU32 chunk_length);
+void DoColour256(tFlic_descriptor* pFlic_info, tU32 chunk_length);
 
 // Offset: 3276
 // Size: 537
 // EAX: pFlic_info
 // EDX: chunk_length
-void DoDeltaTrans(tFlic_descriptor *pFlic_info, tU32 chunk_length);
+void DoDeltaTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length);
 
 // Offset: 3816
 // Size: 354
 // EAX: pFlic_info
 // EDX: chunk_length
-void DoDeltaX(tFlic_descriptor *pFlic_info, tU32 chunk_length);
+void DoDeltaX(tFlic_descriptor* pFlic_info, tU32 chunk_length);
 
 // Offset: 4172
 // Size: 156
 // EAX: pFlic_info
 // EDX: chunk_length
-void DoBlack(tFlic_descriptor *pFlic_info, tU32 chunk_length);
+void DoBlack(tFlic_descriptor* pFlic_info, tU32 chunk_length);
 
 // Offset: 4328
 // Size: 272
 // EAX: pFlic_info
 // EDX: chunk_length
-void DoRunLengthX(tFlic_descriptor *pFlic_info, tU32 chunk_length);
+void DoRunLengthX(tFlic_descriptor* pFlic_info, tU32 chunk_length);
 
 // Offset: 4600
 // Size: 309
 // EAX: pFlic_info
 // EDX: chunk_length
-void DoRunLengthTrans(tFlic_descriptor *pFlic_info, tU32 chunk_length);
+void DoRunLengthTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length);
 
 // Offset: 4912
 // Size: 160
 // EAX: pFlic_info
 // EDX: chunk_length
-void DoUncompressed(tFlic_descriptor *pFlic_info, tU32 chunk_length);
+void DoUncompressed(tFlic_descriptor* pFlic_info, tU32 chunk_length);
 
 // Offset: 5072
 // Size: 176
 // EAX: pFlic_info
 // EDX: chunk_length
-void DoUncompressedTrans(tFlic_descriptor *pFlic_info, tU32 chunk_length);
+void DoUncompressedTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length);
 
 // Offset: 5248
 // Size: 52
 // EAX: pFlic_info
 // EDX: chunk_length
-void DoMini(tFlic_descriptor *pFlic_info, tU32 chunk_length);
+void DoMini(tFlic_descriptor* pFlic_info, tU32 chunk_length);
 
 // Offset: 5300
 // Size: 377
 // EAX: pFlic_info
 // EDX: pLast_frame
-void DrawTranslations(tFlic_descriptor *pFlic_info, int pLast_frame);
+void DrawTranslations(tFlic_descriptor* pFlic_info, int pLast_frame);
 
 // Offset: 5680
 // Size: 783
 // EAX: pFlic_info
 // EDX: pPanel_flic
-int PlayNextFlicFrame2(tFlic_descriptor *pFlic_info, int pPanel_flic);
+int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic);
 
 // Offset: 6464
 // Size: 53
 // EAX: pFlic_info
-int PlayNextFlicFrame(tFlic_descriptor *pFlic_info);
+int PlayNextFlicFrame(tFlic_descriptor* pFlic_info);
 
 // Offset: 6520
 // Size: 295
@@ -193,7 +193,7 @@ int PlayNextFlicFrame(tFlic_descriptor *pFlic_info);
 // EDX: pSize
 // EBX: pData_ptr
 // ECX: pDest_pixelmap
-int PlayFlic(int pIndex, tU32 pSize, tS8 *pData_ptr, br_pixelmap *pDest_pixelmap, int pX_offset, int pY_offset, void (*DoPerFrame)(), int pInterruptable, int pFrame_rate);
+int PlayFlic(int pIndex, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap, int pX_offset, int pY_offset, void (*DoPerFrame)(), int pInterruptable, int pFrame_rate);
 
 // Offset: 6816
 // Size: 41
@@ -223,7 +223,7 @@ void UnlockFlic(int pIndex);
 // EAX: pName
 // EDX: pData
 // EBX: pData_length
-int LoadFlicData(char *pName, tU8 **pData, tU32 *pData_length);
+int LoadFlicData(char* pName, tU8** pData, tU32* pData_length);
 
 // Offset: 7824
 // Size: 87
@@ -310,7 +310,7 @@ void ServicePanelFlics(int pCopy_to_buffer);
 // EAX: pIndex
 // EDX: pData
 // EBX: pData_length
-void ChangePanelFlic(int pIndex, tU8 *pData, tU32 pData_length);
+void ChangePanelFlic(int pIndex, tU8* pData, tU32 pData_length);
 
 // Offset: 10456
 // Size: 55

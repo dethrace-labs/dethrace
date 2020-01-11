@@ -11,17 +11,17 @@ tPD_net_player_info gLocal_net_player_info;
 char gSend_buffer[512];
 tIPX_netnum gNetworks[16];
 _IPX_LOCAL_TARGET gRemote_addr_ipx;
-tU8 *gSend_packet;
+tU8* gSend_packet;
 W32 gListen_segment;
-tU8 *gSend_packet_ptr;
+tU8* gSend_packet_ptr;
 W32 gSend_segment;
-tU8 *gListen_packet;
-tU8 *gListen_packet_ptr;
+tU8* gListen_packet;
+tU8* gListen_packet_ptr;
 size_t gMsg_header_strlen;
 int gNumber_of_networks;
 int gNumber_of_hosts;
 tU32 gNetwork_init_flags;
-tPD_net_game_info *gJoinable_games;
+tPD_net_game_info* gJoinable_games;
 tRM_info RMI;
 int gMatts_PC;
 _IPX_HEADER gLast_received_IPX_header;
@@ -41,7 +41,7 @@ void ClearupPDNetworkStuff() {
 // EAX: pFunction_name
 // EDX: pMessage
 // EBX: pAlleged_size
-void MATTMessageCheck(char *pFunction_name, tNet_message *pMessage, int pAlleged_size) {
+void MATTMessageCheck(char* pFunction_name, tNet_message* pMessage, int pAlleged_size) {
 }
 
 // Offset: 244
@@ -50,8 +50,8 @@ void MATTMessageCheck(char *pFunction_name, tNet_message *pMessage, int pAlleged
 // EDX: pDest_len
 // EBX: pFname
 // ECX: pKeyname
-int GetProfileText(char *pDest, int pDest_len, char *pFname, char *pKeyname) {
-    FILE *fp;
+int GetProfileText(char* pDest, int pDest_len, char* pFname, char* pKeyname) {
+    FILE* fp;
     char in_buf[256];
     int i;
     int j;
@@ -68,21 +68,21 @@ int GetSocketNumberFromProfileFile() {
 // Offset: 916
 // Size: 104
 // EAX: pAddr_ipx
-tU32 EthernetAddressToU32(_IPX_LOCAL_TARGET *pAddr_ipx) {
+tU32 EthernetAddressToU32(_IPX_LOCAL_TARGET* pAddr_ipx) {
 }
 
 // Offset: 1020
 // Size: 175
 // EAX: pString
 // EDX: pSock_addr_ipx
-void NetNowIPXLocalTarget2String(char *pString, _IPX_LOCAL_TARGET *pSock_addr_ipx) {
+void NetNowIPXLocalTarget2String(char* pString, _IPX_LOCAL_TARGET* pSock_addr_ipx) {
 }
 
 // Offset: 1196
 // Size: 157
 // EAX: pMessage_str
-int GetMessageTypeFromMessage(char *pMessage_str) {
-    char *real_msg;
+int GetMessageTypeFromMessage(char* pMessage_str) {
+    char* real_msg;
     int msg_type_int;
 }
 
@@ -90,7 +90,7 @@ int GetMessageTypeFromMessage(char *pMessage_str) {
 // Size: 95
 // EAX: pAddr_ipx1
 // EDX: pAddr_ipx2
-int SameEthernetAddress(_IPX_LOCAL_TARGET *pAddr_ipx1, _IPX_LOCAL_TARGET *pAddr_ipx2) {
+int SameEthernetAddress(_IPX_LOCAL_TARGET* pAddr_ipx1, _IPX_LOCAL_TARGET* pAddr_ipx2) {
 }
 
 // Offset: 1452
@@ -98,7 +98,7 @@ int SameEthernetAddress(_IPX_LOCAL_TARGET *pAddr_ipx1, _IPX_LOCAL_TARGET *pAddr_
 // EAX: pPlayer_id
 _IPX_LOCAL_TARGET* GetIPXAddrFromPlayerID(tPlayer_ID pPlayer_id) {
     int i;
-    tU8 *nodenum;
+    tU8* nodenum;
 }
 
 // Offset: 1648
@@ -119,7 +119,7 @@ int ReceiveHostResponses() {
 int BroadcastMessage() {
     int errors;
     char broadcast_addr_string[32];
-    char *real_msg;
+    char* real_msg;
 }
 
 // Offset: 2464
@@ -134,18 +134,18 @@ BOOL hmiIPXCloseSocket(W32 wSocket) {
 // Size: 337
 // EAX: pECB_ptr
 // EDX: pOffset
-void hmiIPXListenForPacket(_IPX_ECB *pECB_ptr, tU32 pOffset) {
+void hmiIPXListenForPacket(_IPX_ECB* pECB_ptr, tU32 pOffset) {
     SREGS sregs;
     REGS regs;
-    _IPX_HEADER *IPX_header_ptr;
-    _IPX_ECB *sIPXECB;
+    _IPX_HEADER* IPX_header_ptr;
+    _IPX_ECB* sIPXECB;
 }
 
 // Offset: 2980
 // Size: 59
 // EAX: pECB_ptr
 // EDX: pOffset
-BOOL hmiIPXPostListen(_IPX_ECB *pECB_ptr, tU32 pOffset) {
+BOOL hmiIPXPostListen(_IPX_ECB* pECB_ptr, tU32 pOffset) {
 }
 
 // Offset: 3040
@@ -153,7 +153,7 @@ BOOL hmiIPXPostListen(_IPX_ECB *pECB_ptr, tU32 pOffset) {
 BOOL hmiIPXGetData(PSTR pData, tU32 wDSize) {
     tU32 packets_checked;
     tU32 full_packet_ooer_missus;
-    _IPX_ECB *ECB_ptr;
+    _IPX_ECB* ECB_ptr;
     static tU32 round_robin_jobby;
 }
 
@@ -163,11 +163,11 @@ BOOL hmiIPXGetData(PSTR pData, tU32 wDSize) {
 // EDX: pPacket
 // EBX: pHeader
 // ECX: wSize
-void hmiIPXSendPacket(_IPX_ECB *sECB, _IPX_ECB **pPacket, PSTR pHeader, W32 wSize) {
+void hmiIPXSendPacket(_IPX_ECB* sECB, _IPX_ECB** pPacket, PSTR pHeader, W32 wSize) {
     SREGS sregs;
     REGS regs;
-    _IPX_HEADER *sIPXHeader;
-    _IPX_ECB *sIPXECB;
+    _IPX_HEADER* sIPXHeader;
+    _IPX_ECB* sIPXECB;
     PSTR pIPXData;
 }
 
@@ -177,16 +177,16 @@ void hmiIPXSendPacket(_IPX_ECB *sECB, _IPX_ECB **pPacket, PSTR pHeader, W32 wSiz
 // EDX: wHSize
 // EBX: pData
 // ECX: wDSize
-BOOL hmiIPXSendDataDirect(PSTR pHeader, W32 wHSize, PSTR pData, W32 wDSize, _NETNOW_NODE_ADDR *sNode) {
+BOOL hmiIPXSendDataDirect(PSTR pHeader, W32 wHSize, PSTR pData, W32 wDSize, _NETNOW_NODE_ADDR* sNode) {
     W32 wIndex;
-    _IPX_ELEMENT *sElement;
-    W32 *pSequence;
+    _IPX_ELEMENT* sElement;
+    W32* pSequence;
 }
 
 // Offset: 4244
 // Size: 183
 // EAX: sInterworkAddr
-void hmiIPXGetInternetworkAddr(_IPX_INTERNET_ADDR *sInterworkAddr) {
+void hmiIPXGetInternetworkAddr(_IPX_INTERNET_ADDR* sInterworkAddr) {
     SREGS sregs;
     REGS regs;
 }
@@ -194,7 +194,7 @@ void hmiIPXGetInternetworkAddr(_IPX_INTERNET_ADDR *sInterworkAddr) {
 // Offset: 4428
 // Size: 211
 // EAX: sNetworkAddr
-void hmiIPXGetLocalTarget(_IPX_LOCAL_TARGET *sNetworkAddr) {
+void hmiIPXGetLocalTarget(_IPX_LOCAL_TARGET* sNetworkAddr) {
     SREGS sregs;
     REGS regs;
 }
@@ -205,7 +205,7 @@ void hmiIPXGetLocalTarget(_IPX_LOCAL_TARGET *sNetworkAddr) {
 // EDX: pPtr
 // EBX: pSegment
 // ECX: pSelector
-BOOL AllocateRealMem(W32 wSize, PSTR *pPtr, W32 *pSegment, tU16 *pSelector) {
+BOOL AllocateRealMem(W32 wSize, PSTR* pPtr, W32* pSegment, tU16* pSelector) {
     REGS regs;
     SREGS sregs;
     W32 wAddress;
@@ -293,7 +293,7 @@ void PDNetEndJoinList() {
 // Size: 369
 // EAX: pGame
 // EDX: pIndex
-int PDNetGetNextJoinGame(tNet_game_details *pGame, int pIndex) {
+int PDNetGetNextJoinGame(tNet_game_details* pGame, int pIndex) {
     static tU32 next_broadcast_time;
     int i;
     int j;
@@ -304,7 +304,7 @@ int PDNetGetNextJoinGame(tNet_game_details *pGame, int pIndex) {
 // Offset: 7220
 // Size: 51
 // EAX: pDetails
-void PDNetDisposeGameDetails(tNet_game_details *pDetails) {
+void PDNetDisposeGameDetails(tNet_game_details* pDetails) {
 }
 
 // Offset: 7272
@@ -312,45 +312,45 @@ void PDNetDisposeGameDetails(tNet_game_details *pDetails) {
 // EAX: pDetails
 // EDX: pHost_name
 // EBX: pHost_address
-int PDNetHostGame(tNet_game_details *pDetails, char *pHost_name, void **pHost_address) {
+int PDNetHostGame(tNet_game_details* pDetails, char* pHost_name, void** pHost_address) {
 }
 
 // Offset: 7344
 // Size: 62
 // EAX: pDetails
 // EDX: pPlayer_name
-int PDNetJoinGame(tNet_game_details *pDetails, char *pPlayer_name) {
+int PDNetJoinGame(tNet_game_details* pDetails, char* pPlayer_name) {
 }
 
 // Offset: 7408
 // Size: 51
 // EAX: pDetails
-void PDNetLeaveGame(tNet_game_details *pDetails) {
+void PDNetLeaveGame(tNet_game_details* pDetails) {
 }
 
 // Offset: 7460
 // Size: 51
 // EAX: pDetails
-void PDNetHostFinishGame(tNet_game_details *pDetails) {
+void PDNetHostFinishGame(tNet_game_details* pDetails) {
 }
 
 // Offset: 7512
 // Size: 74
 // EAX: pDetails
-tU32 PDNetExtractGameID(tNet_game_details *pDetails) {
+tU32 PDNetExtractGameID(tNet_game_details* pDetails) {
 }
 
 // Offset: 7588
 // Size: 78
 // EAX: pDetails
-tPlayer_ID PDNetExtractPlayerID(tNet_game_details *pDetails) {
+tPlayer_ID PDNetExtractPlayerID(tNet_game_details* pDetails) {
 }
 
 // Offset: 7668
 // Size: 65
 // EAX: pName
 // EDX: pMax_length
-void PDNetObtainSystemUserName(char *pName, int pMax_length) {
+void PDNetObtainSystemUserName(char* pName, int pMax_length) {
 }
 
 // Offset: 7736
@@ -358,16 +358,16 @@ void PDNetObtainSystemUserName(char *pName, int pMax_length) {
 // EAX: pDetails
 // EDX: pMessage
 // EBX: pPlayer
-int PDNetSendMessageToPlayer(tNet_game_details *pDetails, tNet_message *pMessage, tPlayer_ID pPlayer) {
+int PDNetSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage, tPlayer_ID pPlayer) {
     char str[256];
-    _IPX_LOCAL_TARGET *remote_addr_ipx;
+    _IPX_LOCAL_TARGET* remote_addr_ipx;
 }
 
 // Offset: 7960
 // Size: 274
 // EAX: pDetails
 // EDX: pMessage
-int PDNetSendMessageToAllPlayers(tNet_game_details *pDetails, tNet_message *pMessage) {
+int PDNetSendMessageToAllPlayers(tNet_game_details* pDetails, tNet_message* pMessage) {
     char str[256];
     int i;
 }
@@ -376,8 +376,8 @@ int PDNetSendMessageToAllPlayers(tNet_game_details *pDetails, tNet_message *pMes
 // Size: 420
 // EAX: pDetails
 // EDX: pSender_address
-tNet_message* PDNetGetNextMessage(tNet_game_details *pDetails, void **pSender_address) {
-    char *receive_buffer;
+tNet_message* PDNetGetNextMessage(tNet_game_details* pDetails, void** pSender_address) {
+    char* receive_buffer;
     char str[256];
     int msg_type;
 }
@@ -393,20 +393,20 @@ tNet_message* PDNetAllocateMessage(tU32 pSize, tS32 pSize_decider) {
 // Size: 63
 // EAX: pDetails
 // EDX: pMessage
-void PDNetDisposeMessage(tNet_game_details *pDetails, tNet_message *pMessage) {
+void PDNetDisposeMessage(tNet_game_details* pDetails, tNet_message* pMessage) {
 }
 
 // Offset: 8796
 // Size: 62
 // EAX: pPlayer
 // EDX: pSender_address
-void PDNetSetPlayerSystemInfo(tNet_game_player_info *pPlayer, void *pSender_address) {
+void PDNetSetPlayerSystemInfo(tNet_game_player_info* pPlayer, void* pSender_address) {
 }
 
 // Offset: 8860
 // Size: 51
 // EAX: pPlayer
-void PDNetDisposePlayer(tNet_game_player_info *pPlayer) {
+void PDNetDisposePlayer(tNet_game_player_info* pPlayer) {
 }
 
 // Offset: 8912
@@ -414,18 +414,17 @@ void PDNetDisposePlayer(tNet_game_player_info *pPlayer) {
 // EAX: pDetails
 // EDX: pMessage
 // EBX: pAddress
-int PDNetSendMessageToAddress(tNet_game_details *pDetails, tNet_message *pMessage, void *pAddress) {
+int PDNetSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessage, void* pAddress) {
     char str[256];
 }
 
 // Offset: 9116
 // Size: 61
 // EAX: pDetails
-int PDNetInitClient(tNet_game_details *pDetails) {
+int PDNetInitClient(tNet_game_details* pDetails) {
 }
 
 // Offset: 9180
 // Size: 44
 int PDNetGetHeaderSize() {
 }
-

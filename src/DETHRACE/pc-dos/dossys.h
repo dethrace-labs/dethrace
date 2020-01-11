@@ -1,13 +1,13 @@
 #ifndef _DOSSYS_H_
 #define _DOSSYS_H_
 
-#include "dr_types.h"
 #include "br_types.h"
+#include "dr_types.h"
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 
 extern int gASCII_table[128];
 extern tU32 gKeyboard_bits[8];
@@ -28,9 +28,9 @@ extern tS32 gJoystick_range1x;
 extern int gNo_voodoo;
 extern int gSwitched_resolution;
 extern int gReplay_override;
-extern br_pixelmap *gReal_back_screen;
+extern br_pixelmap* gReal_back_screen;
 extern tS32 gJoystick_min1x;
-extern br_pixelmap *gTemp_screen;
+extern br_pixelmap* gTemp_screen;
 extern int gDOSGfx_initialized;
 extern tU32 gUpper_loop_limit;
 extern int gExtra_mem;
@@ -39,7 +39,7 @@ extern void (*gPrev_keyboard_handler)();
 extern tU8 gScan_code[123][2];
 
 extern int _unittest_do_not_exit;
-extern char *_unittest_last_fatal_error;
+extern char* _unittest_last_fatal_error;
 
 // Offset: 0
 // Size: 291
@@ -74,7 +74,7 @@ int KeyDown22(int pKey_index);
 // Size: 141
 // EAX: pKeys
 // EDX: pMark
-void PDSetKeyArray(int *pKeys, int pMark);
+void PDSetKeyArray(int* pKeys, int pMark);
 
 // Offset: 2612
 // Size: 73
@@ -84,12 +84,12 @@ int PDGetASCIIFromKey(int pKey);
 // Offset: 2688
 // Size: 174
 // EAX: pThe_str
-void PDFatalError(char *pThe_str);
+void PDFatalError(char* pThe_str);
 
 // Offset: 2864
 // Size: 55
 // EAX: pThe_str
-void PDNonFatalError(char *pThe_str);
+void PDNonFatalError(char* pThe_str);
 
 // Offset: 2920
 // Size: 190
@@ -111,7 +111,7 @@ void PDRevertPalette();
 // Size: 90
 // EAX: pArgc
 // EDX: pArgv
-int PDInitScreenVars(int pArgc, char **pArgv);
+int PDInitScreenVars(int pArgc, char** pArgv);
 
 // Offset: 3300
 // Size: 24
@@ -134,7 +134,7 @@ void PDAllocateScreenAndBack();
 // EAX: pDst
 // EDX: pSrc
 // EBX: pPalette
-void Copy8BitTo16BitPixelmap(br_pixelmap *pDst, br_pixelmap *pSrc, br_pixelmap *pPalette);
+void Copy8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette);
 
 // Offset: 4132
 // Size: 307
@@ -142,7 +142,7 @@ void Copy8BitTo16BitPixelmap(br_pixelmap *pDst, br_pixelmap *pSrc, br_pixelmap *
 // EDX: pSrc
 // EBX: pPalette
 // ECX: pOff
-void Double8BitTo16BitPixelmap(br_pixelmap *pDst, br_pixelmap *pSrc, br_pixelmap *pPalette, tU16 pOff, tU16 pSrc_width, tU16 pSrc_height);
+void Double8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette, tU16 pOff, tU16 pSrc_width, tU16 pSrc_height);
 
 // Offset: 4440
 // Size: 35
@@ -174,7 +174,7 @@ void PDScreenBufferSwap(int pRendering_area_only);
 // EDX: dx
 // EBX: dy
 // ECX: src
-void PDPixelmapToScreenRectangleCopy(br_pixelmap *dst, br_int_16 dx, br_int_16 dy, br_pixelmap *src, br_int_16 sx, br_int_16 sy, br_uint_16 w, br_uint_16 h);
+void PDPixelmapToScreenRectangleCopy(br_pixelmap* dst, br_int_16 dx, br_int_16 dy, br_pixelmap* src, br_int_16 sx, br_int_16 sy, br_uint_16 w, br_uint_16 h);
 
 // Offset: 5104
 // Size: 68
@@ -182,7 +182,7 @@ void PDPixelmapToScreenRectangleCopy(br_pixelmap *dst, br_int_16 dx, br_int_16 d
 // EDX: x1
 // EBX: y1
 // ECX: x2
-void PDPixelmapHLineOnScreen(br_pixelmap *dst, br_int_16 x1, br_int_16 y1, br_int_16 x2, br_int_16 y2, br_uint_32 colour);
+void PDPixelmapHLineOnScreen(br_pixelmap* dst, br_int_16 x1, br_int_16 y1, br_int_16 x2, br_int_16 y2, br_uint_32 colour);
 
 // Offset: 5172
 // Size: 68
@@ -190,7 +190,7 @@ void PDPixelmapHLineOnScreen(br_pixelmap *dst, br_int_16 x1, br_int_16 y1, br_in
 // EDX: x1
 // EBX: y1
 // ECX: x2
-void PDPixelmapVLineOnScreen(br_pixelmap *dst, br_int_16 x1, br_int_16 y1, br_int_16 x2, br_int_16 y2, br_uint_32 colour);
+void PDPixelmapVLineOnScreen(br_pixelmap* dst, br_int_16 x1, br_int_16 y1, br_int_16 x2, br_int_16 y2, br_uint_32 colour);
 
 // Offset: 5240
 // Size: 24
@@ -203,25 +203,25 @@ void PDSetFileVariables();
 // Offset: 5304
 // Size: 98
 // EAX: pThe_path
-void PDBuildAppPath(char *pThe_path);
+void PDBuildAppPath(char* pThe_path);
 
 // Offset: 5404
 // Size: 133
 // EAX: pThe_path
 // EDX: pAction_routine
-void PDForEveryFile(char *pThe_path, void (*pAction_routine)(char*));
+void PDForEveryFile(char* pThe_path, void (*pAction_routine)(char*));
 
 // Offset: 5540
 // Size: 39
 // EAX: pThe_palette
-void PDSetPalette(br_pixelmap *pThe_palette);
+void PDSetPalette(br_pixelmap* pThe_palette);
 
 // Offset: 5580
 // Size: 136
 // EAX: pPalette
 // EDX: pFirst_colour
 // EBX: pCount
-void PDSetPaletteEntries(br_pixelmap *pPalette, int pFirst_colour, int pCount);
+void PDSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount);
 
 // Offset: 5716
 // Size: 44
@@ -235,13 +235,13 @@ void PDSwitchToLoresMode();
 // Size: 86
 // EAX: pButton_1
 // EDX: pButton_2
-void PDMouseButtons(int *pButton_1, int *pButton_2);
+void PDMouseButtons(int* pButton_1, int* pButton_2);
 
 // Offset: 5892
 // Size: 380
 // EAX: pX_coord
 // EDX: pY_coord
-void PDGetMousePosition(int *pX_coord, int *pY_coord);
+void PDGetMousePosition(int* pX_coord, int* pY_coord);
 
 // Offset: 6272
 // Size: 38
@@ -260,23 +260,23 @@ tU32 LargestBlockAvail();
 // Size: 111
 // EAX: pMaximum_required
 // EDX: pAmount_allocated
-void* PDGrabLargestMammaryWeCanPlayWith(tU32 pMaximum_required, tU32 *pAmount_allocated);
+void* PDGrabLargestMammaryWeCanPlayWith(tU32 pMaximum_required, tU32* pAmount_allocated);
 
 // Offset: 6588
 // Size: 200
 // EAX: pBuffer
 // EDX: pBuffer_size
-void PDAllocateActionReplayBuffer(char **pBuffer, tU32 *pBuffer_size);
+void PDAllocateActionReplayBuffer(char** pBuffer, tU32* pBuffer_size);
 
 // Offset: 6788
 // Size: 35
 // EAX: pBuffer
-void PDDisposeActionReplayBuffer(char *pBuffer);
+void PDDisposeActionReplayBuffer(char* pBuffer);
 
 // Offset: 6824
 // Size: 146
 // EAX: pProgpath
-void Usage(char *pProgpath);
+void Usage(char* pProgpath);
 
 // Offset: 7696
 // Size: 62
@@ -294,7 +294,7 @@ void PDDisplayGoreworthiness(int pGory);
 // Offset: 7872
 // Size: 35
 // EAX: pStr
-void PDEnterDebugger(char *pStr);
+void PDEnterDebugger(char* pStr);
 
 // Offset: 7908
 // Size: 24
@@ -303,7 +303,7 @@ void PDEndItAllAndReRunTheBastard();
 // Offset: 7932
 // Size: 57
 // EAX: err
-int matherr(struct exception_ *err);
+int matherr(struct exception_* err);
 
 // Offset: 7992
 // Size: 127
@@ -378,7 +378,7 @@ int PDGetJoy2Button4();
 // Offset: 9824
 // Size: 51
 // EAX: pThe_path
-int PDFileUnlock(char *pThe_path);
+int PDFileUnlock(char* pThe_path);
 
 // Offset: 9876
 // Size: 33
@@ -389,7 +389,7 @@ void CriticalISR(INTPACK pRegs);
 // EAX: pThe_path
 // EDX: pFile_name
 // EBX: pMin_size
-int PDCheckDriveExists2(char *pThe_path, char *pFile_name, tU32 pMin_size);
+int PDCheckDriveExists2(char* pThe_path, char* pFile_name, tU32 pMin_size);
 
 // Offset: 10184
 // Size: 108

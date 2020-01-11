@@ -13,6 +13,6 @@ void DOSEventEnd();
 
 // Offset: 302
 // Size: 407
-br_boolean DOSEventWait(dosio_event *event, br_boolean block);
+br_boolean DOSEventWait(dosio_event* event, br_boolean block);
 
 #endif

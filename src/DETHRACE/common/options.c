@@ -4,11 +4,11 @@ int gKey_defns[18];
 tRadio_bastards gRadio_bastards[13];
 int gKey_count;
 int gLast_graph_sel;
-char *gKey_names[125];
+char* gKey_names[125];
 int gPending_entry;
-tInterface_spec *gThe_interface_spec;
+tInterface_spec* gThe_interface_spec;
 int gOrig_key_mapping[67];
-br_pixelmap *gDials_pix;
+br_pixelmap* gDials_pix;
 int gCurrent_key;
 
 // Offset: 0
@@ -46,18 +46,18 @@ int SoundOptionsDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int 
 // Size: 154
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int SoundOptionsLeft(int *pCurrent_choice, int *pCurrent_mode) {
+int SoundOptionsLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int old_value;
-    int *the_value;
+    int* the_value;
 }
 
 // Offset: 896
 // Size: 154
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int SoundOptionsRight(int *pCurrent_choice, int *pCurrent_mode) {
+int SoundOptionsRight(int* pCurrent_choice, int* pCurrent_mode) {
     int old_value;
-    int *the_value;
+    int* the_value;
 }
 
 // Offset: 1052
@@ -66,12 +66,12 @@ int SoundOptionsRight(int *pCurrent_choice, int *pCurrent_mode) {
 // EDX: pCurrent_mode
 // EBX: pX_offset
 // ECX: pY_offset
-int SoundClick(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_offset) {
+int SoundClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     float x_delta;
     float y_delta;
     float angle;
     int old_value;
-    int *the_value;
+    int* the_value;
 }
 
 // Offset: 1436
@@ -139,7 +139,7 @@ void RadioChanged(int pIndex, int pNew_value) {
 // Size: 121
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int GraphOptLeft(int *pCurrent_choice, int *pCurrent_mode) {
+int GraphOptLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int new_value;
 }
 
@@ -147,7 +147,7 @@ int GraphOptLeft(int *pCurrent_choice, int *pCurrent_mode) {
 // Size: 125
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int GraphOptRight(int *pCurrent_choice, int *pCurrent_mode) {
+int GraphOptRight(int* pCurrent_choice, int* pCurrent_mode) {
     int new_value;
 }
 
@@ -155,14 +155,14 @@ int GraphOptRight(int *pCurrent_choice, int *pCurrent_mode) {
 // Size: 148
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int GraphOptUp(int *pCurrent_choice, int *pCurrent_mode) {
+int GraphOptUp(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // Offset: 3536
 // Size: 148
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int GraphOptDown(int *pCurrent_choice, int *pCurrent_mode) {
+int GraphOptDown(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // Offset: 3684
@@ -171,7 +171,7 @@ int GraphOptDown(int *pCurrent_choice, int *pCurrent_mode) {
 // EDX: pCurrent_mode
 // EBX: pX_offset
 // ECX: pY_offset
-int RadioClick(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_offset) {
+int RadioClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     int i;
 }
 
@@ -179,7 +179,7 @@ int RadioClick(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_o
 // Size: 59
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int GraphOptGoAhead(int *pCurrent_choice, int *pCurrent_mode) {
+int GraphOptGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // Offset: 4216
@@ -222,7 +222,7 @@ void CalibrateJoysticks() {
 // Offset: 5952
 // Size: 118
 // EAX: pStr
-void StripControls(unsigned char *pStr) {
+void StripControls(unsigned char* pStr) {
     int i;
     int len;
 }
@@ -230,7 +230,7 @@ void StripControls(unsigned char *pStr) {
 // Offset: 6072
 // Size: 215
 void LoadKeyNames() {
-    FILE *f;
+    FILE* f;
     tPath_name the_path;
     unsigned char s[256];
 }
@@ -251,7 +251,7 @@ void SaveOrigKeyMapping() {
 // EDX: pY
 // EBX: pName_x
 // ECX: pKey_x
-void GetKeyCoords(int pIndex, int *pY, int *pName_x, int *pKey_x, int *pEnd_box) {
+void GetKeyCoords(int pIndex, int* pY, int* pName_x, int* pKey_x, int* pEnd_box) {
     int col;
 }
 
@@ -288,8 +288,8 @@ void DrawKeyAssignments(int pCurrent_choice, int pCurrent_mode) {
     int key_x;
     int new_key;
     int end_box;
-    tDR_font *font_n;
-    tDR_font *font_k;
+    tDR_font* font_n;
+    tDR_font* font_k;
     static int on_radios_last_time;
 }
 
@@ -297,7 +297,7 @@ void DrawKeyAssignments(int pCurrent_choice, int pCurrent_mode) {
 // Size: 252
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int KeyAssignLeft(int *pCurrent_choice, int *pCurrent_mode) {
+int KeyAssignLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int new_index;
 }
 
@@ -305,7 +305,7 @@ int KeyAssignLeft(int *pCurrent_choice, int *pCurrent_mode) {
 // Size: 252
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int KeyAssignRight(int *pCurrent_choice, int *pCurrent_mode) {
+int KeyAssignRight(int* pCurrent_choice, int* pCurrent_mode) {
     int new_index;
 }
 
@@ -313,21 +313,21 @@ int KeyAssignRight(int *pCurrent_choice, int *pCurrent_mode) {
 // Size: 299
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int KeyAssignUp(int *pCurrent_choice, int *pCurrent_mode) {
+int KeyAssignUp(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // Offset: 9256
 // Size: 265
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int KeyAssignDown(int *pCurrent_choice, int *pCurrent_mode) {
+int KeyAssignDown(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // Offset: 9524
 // Size: 1009
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
-int KeyAssignGoAhead(int *pCurrent_choice, int *pCurrent_mode) {
+int KeyAssignGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     int key;
     int i;
     int j;
@@ -337,7 +337,7 @@ int KeyAssignGoAhead(int *pCurrent_choice, int *pCurrent_mode) {
     int name_x;
     int key_x;
     int end_box;
-    tDR_font *font;
+    tDR_font* font;
 }
 
 // Offset: 10536
@@ -346,7 +346,7 @@ int KeyAssignGoAhead(int *pCurrent_choice, int *pCurrent_mode) {
 // EDX: pCurrent_mode
 // EBX: pX_offset
 // ECX: pY_offset
-int MouseyClickBastard(int *pCurrent_choice, int *pCurrent_mode, int pX_offset, int pY_offset) {
+int MouseyClickBastard(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     int i;
     int x_coord;
     int y_coord;
@@ -396,4 +396,3 @@ void DoOptions() {
     static tInterface_spec interface_spec;
     int result;
 }
-
