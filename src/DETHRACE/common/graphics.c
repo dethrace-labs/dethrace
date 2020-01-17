@@ -1030,11 +1030,14 @@ void TellyOutImage(br_pixelmap* pImage, int pLeft, int pTop) {
 // Size: 45
 // EAX: pLevel
 void SetShadowLevel(tShadow_level pLevel) {
+    LOG_TRACE("(%d)", pLevel);
+    gShadow_level = pLevel;
 }
 
 // Offset: 30520
 // Size: 45
 tShadow_level GetShadowLevel() {
+    return gShadow_level;
 }
 
 // Offset: 30568

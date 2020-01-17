@@ -397,6 +397,24 @@ void WaitFor(tU32 pDelay) {
 // EBX: arg
 br_uint_32 DRActorEnumRecurse(br_actor* pActor, br_actor_enum_cbfn* callback, void* arg) {
     br_uint_32 result;
+
+    result = callback(pActor, arg);
+    if (result == 0) {
+        pActor = pActor->children;
+        if (pActor) {
+            while (1) {
+                result = DRActorEnumRecurse(pActor, callback, arg);
+                if (result != 0) {
+                    break;
+                }
+                pActor = pActor->next;
+                if (!pActor) {
+                    return 0;
+                }
+            }
+        }
+    }
+    return result;
 }
 
 // Offset: 4744
@@ -1103,6 +1121,7 @@ void NobbleNonzeroBlacks(br_pixelmap* pPalette) {
 // Size: 55
 // EAX: pThe_path
 int PDCheckDriveExists(char* pThe_path) {
+    LOG_TRACE("(\"%s\")", pThe_path);
 
     // Added: force unix dir separator for now >>
     char* rep = pThe_path;

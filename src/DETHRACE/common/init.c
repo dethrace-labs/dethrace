@@ -251,4 +251,7 @@ int GetScreenSize() {
 // Size: 45
 // EAX: pNew_size
 void SetScreenSize(int pNew_size) {
+    LOG_TRACE("(%d)", pNew_size);
+    //TOOD: which global var is this pointing to?
+    //gScreen_size = pNew_size;
 }

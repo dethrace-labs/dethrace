@@ -108,10 +108,6 @@ void ResetShrapnel();
 // EBX: pNormal
 void CreateShrapnelShower(br_vector3* pos, br_vector3* v, br_vector3* pNormal, br_scalar pForce, tCar_spec* c1, tCar_spec* c2);
 
-// Offset: 10820
-// Size: 57
-br_scalar random();
-
 // Offset: 10880
 // Size: 523
 void InitShrapnel();

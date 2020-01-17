@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "brucetrk.h"
+#include "controls.h"
+#include "depth.h"
 #include "displays.h"
 #include "errors.h"
 #include "globvars.h"
@@ -14,6 +17,7 @@
 #include "pc-dos/dossys.h"
 #include "pedestrn.h"
 #include "sound.h"
+#include "spark.h"
 #include "utility.h"
 #include "world.h"
 
@@ -215,7 +219,6 @@ void LoadGeneralParameters() {
 
         if (strcmp(s, gDecode_string) == 0) {
             gDecode_thing = 0;
-            printf("Expecting decrypted text files!\n");
         }
 
         for (i = 0; i < strlen(gDecode_string); i++) {
@@ -1260,12 +1263,14 @@ FILE* OldDRfopen(char* pFilename, char* pMode) {
     int len;
     int c;
 
+    LOG_TRACE("(\"%s\", \"%s\")", pFilename, pMode);
+
     fp = fopen(pFilename, pMode);
 
     if (fp) {
-        len = strlen(pFilename) + 1;
+        len = strlen(pFilename);
         if (gDecode_thing != 0) {
-            if (strcmp(&pFilename[len - 4], ".TXT") != 0
+            if (strcmp(&pFilename[len - 4], ".TXT") == 0
                 && strcmp(&pFilename[len - 12], "DKEYMAP0.TXT") != 0
                 && strcmp(&pFilename[len - 12], "DKEYMAP1.TXT") != 0
                 && strcmp(&pFilename[len - 12], "DKEYMAP2.TXT") != 0
@@ -1275,14 +1280,14 @@ FILE* OldDRfopen(char* pFilename, char* pMode) {
                 && strcmp(&pFilename[len - 12], "KEYMAP_2.TXT") != 0
                 && strcmp(&pFilename[len - 12], "KEYMAP_3.TXT") != 0
                 && strcmp(&pFilename[len - 11], "OPTIONS.TXT") != 0
-                && strcmp(&pFilename[len - 12], "KEYNAMES.TXT") != 0
+                && strcmp(&pFilename[len - 11], "KEYNAMES.TXT") != 0
                 && strcmp(&pFilename[len - 10], "KEYMAP.TXT") != 0
                 && strcmp(&pFilename[len - 9], "PATHS.TXT") != 0
                 && strcmp(&pFilename[len - 11], "PRATCAM.TXT") != 0) {
-
                 c = fgetc(fp);
                 if (c != gDecode_thing) {
                     fclose(fp);
+                    LOG_WARN("Unexpected encoding character");
                     return NULL;
                 }
                 ungetc(c, fp);
@@ -1293,6 +1298,7 @@ FILE* OldDRfopen(char* pFilename, char* pMode) {
     if (gCD_fully_installed) {
         return fp;
     }
+    // source_exists = 1 means we haven't checked the CD yet
     if (source_exists == 1) {
         strcpy(path_file, "DATA");
         strcat(path_file, gDir_separator);
@@ -1300,11 +1306,13 @@ FILE* OldDRfopen(char* pFilename, char* pMode) {
 
         if (!PDCheckDriveExists(path_file)) {
             source_exists = 0;
+            LOG_WARN("PATHS.TXT not found");
             return NULL;
         }
         test1 = fopen(path_file, "rt");
         if (!test1) {
             source_exists = 0;
+            LOG_WARN("PATHS.TXT couldnt be opened");
             return NULL;
         }
 
@@ -1383,10 +1391,10 @@ int GetCDPathFromPathsTxtFile(char* pPath_name) {
     static tPath_name cd_pathname;
     FILE* paths_txt_fp;
     tPath_name paths_txt;
+    LOG_TRACE("(\"%s\")", pPath_name);
 
     if (!got_it_already) {
         sprintf(paths_txt, "%s%s%s", gApplication_path, gDir_separator, "PATHS.TXT");
-        printf("%s\n", paths_txt);
         paths_txt_fp = fopen(paths_txt, "rt");
         if (!paths_txt_fp) {
             return 0;
@@ -1419,6 +1427,19 @@ int CarmaCDinDriveOrFullGameInstalled() {
 // EAX: pF
 // EDX: pOptions
 void ReadNetworkSettings(FILE* pF, tNet_game_options* pOptions) {
+    LOG_TRACE("(%p, %p)", pF, pOptions);
+
+    pOptions->enable_text_messages = GetAnInt(pF);
+    pOptions->show_players_on_map = GetAnInt(pF);
+    pOptions->show_peds_on_map = GetAnInt(pF);
+    pOptions->show_powerups_on_map = GetAnInt(pF);
+    pOptions->powerup_respawn = GetAnInt(pF);
+    pOptions->open_game = GetAnInt(pF);
+    pOptions->grid_start = GetAnInt(pF);
+    pOptions->race_sequence_type = GetAnInt(pF);
+    pOptions->random_car_choice = GetAnInt(pF);
+    pOptions->car_choice = GetAnInt(pF);
+    pOptions->starting_money_index = GetAnInt(pF);
 }
 
 // Offset: 39132
@@ -1437,11 +1458,99 @@ int SaveOptions() {
 // Offset: 40912
 // Size: 1643
 int RestoreOptions() {
+    tPath_name the_path;
     FILE* f;
     char line[80];
     char token[80];
     char* s;
     float arg;
+    LOG_TRACE("()");
+
+    gProgram_state.music_volume = 4;
+    gProgram_state.effects_volume = 4;
+    DefaultNetSettings();
+
+    PathCat(the_path, gApplication_path, "OPTIONS.TXT");
+    f = DRfopen(the_path, "rt");
+    if (!f) {
+        LOG_WARN("Failed to open OPTIONS.TXT");
+        return 0;
+    }
+    while (fgets(line, 80, f)) {
+        if (sscanf(line, "%79s%f", token, &arg) == 2) {
+            if (!strcmp(token, "YonFactor")) {
+                SetYonFactor(arg);
+            } else if (!strcmp(token, "SkyTextureOn")) {
+                SetSkyTextureOn((int)arg);
+            } else if (!strcmp(token, "CarTexturingLevel")) {
+                SetCarTexturingLevel((tCar_texturing_level)arg);
+            } else if (!strcmp(token, "RoadTexturingLevel")) {
+                SetRoadTexturingLevel((tRoad_texturing_level)arg);
+            } else if (!strcmp(token, "WallTexturingLevel")) {
+                SetWallTexturingLevel((tWall_texturing_level)arg);
+            } else if (!strcmp(token, "ShadowLevel")) {
+                SetShadowLevel((tShadow_level)arg);
+            } else if (!strcmp(token, "DepthCueingOn")) {
+                SetDepthCueingOn((int)arg);
+            } else if (!strcmp(token, "Yon")) {
+                SetYon(arg);
+            } else if (!strcmp(token, "CarSimplificationLevel")) {
+                SetCarSimplificationLevel((int)arg);
+            } else if (!strcmp(token, "AccessoryRendering")) {
+                SetAccessoryRendering((int)arg);
+            } else if (!strcmp(token, "SmokeOn")) {
+                SetSmokeOn((int)arg);
+            } else if (!strcmp(token, "SoundDetailLevel")) {
+                SetSoundDetailLevel((int)arg);
+            } else if (!strcmp(token, "ScreenSize")) {
+                SetScreenSize((int)arg);
+            } else if (!strcmp(token, "MapRenderX")) {
+                gMap_render_x = arg;
+            } else if (!strcmp(token, "MapRenderY")) {
+                gMap_render_y = arg;
+            } else if (!strcmp(token, "MapRenderWidth")) {
+                gMap_render_width = arg;
+            } else if (!strcmp(token, "MapRenderHeight")) {
+                gMap_render_height = arg;
+            } else if (!strcmp(token, "PlayerName")) {
+                fgets(line, 80, f);
+                s = strtok(line, "\n\r");
+                strcpy(gProgram_state.player_name[(int)arg], s);
+            } else if (!strcmp(token, "EVolume")) {
+                gProgram_state.effects_volume = (int)arg;
+            } else if (!strcmp(token, "MVolume")) {
+                gProgram_state.music_volume = (int)arg;
+            } else if (!strcmp(token, "KeyMapIndex")) {
+                gKey_map_index = (int)arg;
+            } else if (!strcmp(token, "Joystick_min1x")) {
+                gJoystick_min1x = (int)arg;
+            } else if (!strcmp(token, "Joystick_min1y")) {
+                gJoystick_min1y = (int)arg;
+            } else if (!strcmp(token, "Joystick_min2x")) {
+                gJoystick_min2x = (int)arg;
+            } else if (!strcmp(token, "Joystick_min2y")) {
+                gJoystick_min2y = (int)arg;
+            } else if (!strcmp(token, "Joystick_range1x")) {
+                gJoystick_range1x = (int)arg;
+            } else if (!strcmp(token, "Joystick_range1y")) {
+                gJoystick_range1y = (int)arg;
+            } else if (!strcmp(token, "Joystick_range2x")) {
+                gJoystick_range2x = (int)arg;
+            } else if (!strcmp(token, "Joystick_range2y")) {
+                gJoystick_range2y = (int)arg;
+            } else if (!strcmp(token, "NetName")) {
+                fgets(line, 80, f);
+                s = strtok(line, "\n\r");
+                strcpy(gNet_player_name, s);
+            } else if (!strcmp(token, "NETGAMETYPE")) {
+                gLast_game_type = (tNet_game_type)arg;
+            } else if (!strcmp(token, "NETSETTINGS")) {
+                ReadNetworkSettings(f, &gNet_settings[(int)arg]);
+            }
+        }
+    }
+    fclose(f);
+    return 1;
 }
 
 // Offset: 42556

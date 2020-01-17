@@ -2,6 +2,7 @@
 #define DR_TYPES_H
 
 #include "br_types.h"
+#include "new/debug.h"
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>

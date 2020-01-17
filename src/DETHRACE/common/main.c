@@ -54,7 +54,7 @@ void GameMain(int pArgc, char** pArgv) {
 
     PDSetFileVariables();
     PDBuildAppPath(gApplication_path);
-    //DrDebugMessage(*pArgv);
+    DrDebugMessage(*pArgv);
 
     strcat(gApplication_path, "DATA");
 

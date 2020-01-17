@@ -382,11 +382,6 @@ def resolve_type_str(module, type_idx, var_name, decl=True):
 def resolve_function_header(module, fn):
   text = ''
   text += '// Offset: ' + str(fn['offset']) + '\n// Size: ' + str(fn['size'])
-  for i in range(len(fn['args'])):
-    if len(text) > 0:
-      text += '\n'
-    name = fn['local_vars'][i]['name']
-    text += '// ' + fn['args'][i] + ': ' + name
   text += '\n//IDA: ' + resolve_function_ida_signature(module, fn)
   return text
 
@@ -657,12 +652,51 @@ def generate_c_file(module):
 
     # skip local variables that were passed in as arguments
     arg_count = get_function_arg_count(module, fn)
+    
     for v in fn['local_vars'][arg_count:]:
       c_file.write(' ' * INDENT_SPACES)
       if 'CONST' in v['addr_type']:
         c_file.write('static ')
       c_file.write(resolve_type_str(module, v['type'], v['name']))
       c_file.write(';\n')
+
+    
+    c_file.write(' ' * INDENT_SPACES)
+    c_file.write('LOG_TRACE("(')
+    do_comma = False
+    for v in fn['local_vars'][:arg_count]:
+      if do_comma:
+        c_file.write(', ')
+      type_str = resolve_type_str(module, v['type'], '')
+      fmt = '%d'
+      if type_str == 'char*':
+        fmt = '\\"%s\\"'
+      elif '*' in type_str:
+        fmt = '%p'
+      elif 'int' in type_str:
+        fmt = '%d'
+      elif 'scalar' in type_str or 'float' in type_str:
+        fmt = '%f'
+      elif 'tU32' in type_str or 'tS32' in type_str or 'tU16' in type_str or 'tS16' in type_str:
+        fmt = '%d'
+      elif 'tU8' in type_str:
+        fmt = '%d'
+      elif 'br_angle' in type_str:
+        fmt = '%d'
+      elif 'size_t' in type_str:
+        fmt = '%d'
+      else:
+        print('Unknown type for format', type_str)
+      c_file.write(fmt)
+      do_comma = True
+    c_file.write(')"')
+
+    for v in fn['local_vars'][:arg_count]:
+      c_file.write(', ')
+      c_file.write(v['name'])
+      do_comma = True
+      
+    c_file.write(');\n')
     c_file.write('}\n\n')
 
 def get_child_reference(module, type_idx):

@@ -1,10 +1,11 @@
 #include "drdebug.h"
+#include <string.h>
 
 // These functions were compiled out of the release executable. Implementation is just a guess
 
-void DrDebugLog(int unk, char* pStr) {
+void DrDebugLog(int level_maybe, char* pStr) {
     // maybe this is actually "errors::dprintf"?
-    printf("%d: %s\n", unk, pStr);
+    printf("%d: %s\n", level_maybe, pStr);
 }
 
 void DrDebugMessage(char* pStr, ...) {
