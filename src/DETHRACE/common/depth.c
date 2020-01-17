@@ -1,5 +1,12 @@
 #include "depth.h"
 
+<<<<<<< HEAD
+=======
+#include "brender.h"
+#include "globvars.h"
+#include "globvrkm.h"
+
+>>>>>>> wip
 tDepth_effect gDistance_depth_effects[4];
 br_scalar gSky_height;
 br_scalar gSky_x_multiplier;
@@ -75,6 +82,20 @@ void FrobFog() {
 // EBX: pStart
 // ECX: pEnd
 void InstantDepthChange(tDepth_effect_type pType, br_pixelmap* pSky_texture, int pStart, int pEnd) {
+    // TODO: not sure if this line is right..
+    if ((int)pType == -1) {
+        pStart = 3;
+        pEnd = 3;
+    }
+    gProgram_state.current_depth_effect.sky_texture = pSky_texture;
+    gHorizon_material->colour_map = pSky_texture;
+    BrMaterialUpdate(gHorizon_material, 0x7FFFu);
+    gProgram_state.current_depth_effect.type = pType;
+    gProgram_state.current_depth_effect.start = pStart;
+    gProgram_state.current_depth_effect.end = pEnd;
+    gProgram_state.default_depth_effect.type = pType;
+    gProgram_state.default_depth_effect.start = pStart;
+    gProgram_state.default_depth_effect.end = pEnd;
 }
 
 // Offset: 916
@@ -342,6 +363,18 @@ void DecreaseYon() {
 void SetYon(br_scalar pYon) {
     int i;
     br_camera* camera_ptr;
+
+    if (pYon < 5.0f) {
+        pYon = 5.0f;
+    }
+
+    for (i = 0; i < 2; i++) {
+        if (gCamera_list[i]) {
+            camera_ptr = (br_camera*)gCamera_list[i]->type_data;
+            camera_ptr->yon_z = pYon;
+        }
+    }
+    gCamera_yon = pYon;
 }
 
 // Offset: 9684
@@ -377,6 +410,24 @@ int GetSkyTextureOn() {
 // Size: 60
 // EAX: pOn
 void SetSkyTextureOn(int pOn) {
+<<<<<<< HEAD
+=======
+    br_pixelmap* tmp;
+    if (pOn != gSky_on) {
+        tmp = gProgram_state.current_depth_effect.sky_texture;
+        gProgram_state.current_depth_effect.sky_texture = gSwap_sky_texture;
+        gProgram_state.default_depth_effect.sky_texture = gSwap_sky_texture;
+        gSwap_sky_texture = tmp;
+
+        if (gHorizon_material) {
+            if (gSwap_sky_texture) {
+                gHorizon_material->colour_map = gSwap_sky_texture;
+                BrMaterialUpdate(gHorizon_material, -1);
+            }
+        }
+    }
+    gSky_on = pOn;
+>>>>>>> wip
 }
 
 // Offset: 10432
@@ -398,6 +449,13 @@ int GetDepthCueingOn() {
 // Size: 71
 // EAX: pOn
 void SetDepthCueingOn(int pOn) {
+    if (pOn != gDepth_cueing_on && gHorizon_material) {
+        InstantDepthChange(gSwap_depth_effect_type, gProgram_state.current_depth_effect.sky_texture, gSwap_depth_effect_start, gSwap_depth_effect_end);
+        gSwap_depth_effect_type = gProgram_state.current_depth_effect.type;
+        gSwap_depth_effect_start = gProgram_state.current_depth_effect.start;
+        gSwap_depth_effect_end = gProgram_state.current_depth_effect.end;
+    }
+    gDepth_cueing_on = pOn;
 }
 
 // Offset: 10864

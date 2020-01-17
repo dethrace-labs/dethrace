@@ -1,6 +1,7 @@
 #include "brucetrk.h"
 
 #include "CORE/STD/brstdlib.h"
+#include "globvrbm.h"
 
 br_actor* gMr_blendy;
 int gDefault_blend_pc;

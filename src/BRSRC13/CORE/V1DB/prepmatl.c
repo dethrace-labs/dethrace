@@ -9,6 +9,9 @@ void BrMaterialUpdate(br_material* mat, br_uint_16 flags) {
     br_token_value* tvp;
     br_token t;
     br_int_32 c;
+
+    //TODO: ?
+
 }
 
 // Offset: 3030

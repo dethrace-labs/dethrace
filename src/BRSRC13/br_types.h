@@ -150,6 +150,15 @@ typedef enum br_clip_result {
     BR_CLIP_ACCEPT = 2
 } br_clip_result;
 
+enum {
+    /*
+    * No direct access to pixels
+    */
+    BR_PMF_NO_ACCESS = 0x01,
+    BR_PMF_LINEAR = 0x02,
+    BR_PMF_ROW_WHOLEPIXELS = 0x04
+} br_pixelmap_flags;
+
 typedef enum br_token {
     BRT_ABGR_1_5_5_5 = 319,
     BRT_ABGR_4_4_4_4 = 335,
@@ -1158,6 +1167,8 @@ typedef struct br_primitive_library {
 
 typedef struct br_geometry {
 } br_geometry;
+
+typedef struct br_renderer_dispatch br_renderer_dispatch;
 
 typedef struct br_renderer {
 } br_renderer;

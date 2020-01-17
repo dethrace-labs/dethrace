@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "brucetrk.h"
+#include "controls.h"
 #include "depth.h"
 #include "displays.h"
 #include "errors.h"
@@ -1268,24 +1269,25 @@ FILE* OldDRfopen(char* pFilename, char* pMode) {
     if (fp) {
         len = strlen(pFilename) + 1;
         if (gDecode_thing != 0) {
-            if (strcmp(&pFilename[len - 4], ".TXT") != 0
-                && strcmp(&pFilename[len - 12], "DKEYMAP0.TXT") != 0
-                && strcmp(&pFilename[len - 12], "DKEYMAP1.TXT") != 0
-                && strcmp(&pFilename[len - 12], "DKEYMAP2.TXT") != 0
-                && strcmp(&pFilename[len - 12], "DKEYMAP3.TXT") != 0
-                && strcmp(&pFilename[len - 12], "KEYMAP_0.TXT") != 0
-                && strcmp(&pFilename[len - 12], "KEYMAP_1.TXT") != 0
-                && strcmp(&pFilename[len - 12], "KEYMAP_2.TXT") != 0
-                && strcmp(&pFilename[len - 12], "KEYMAP_3.TXT") != 0
-                && strcmp(&pFilename[len - 11], "OPTIONS.TXT") != 0
+            if (strcmp(&pFilename[len - 5], ".TXT") != 0
+                && strcmp(&pFilename[len - 13], "DKEYMAP0.TXT") != 0
+                && strcmp(&pFilename[len - 13], "DKEYMAP1.TXT") != 0
+                && strcmp(&pFilename[len - 13], "DKEYMAP2.TXT") != 0
+                && strcmp(&pFilename[len - 13], "DKEYMAP3.TXT") != 0
+                && strcmp(&pFilename[len - 13], "KEYMAP_0.TXT") != 0
+                && strcmp(&pFilename[len - 13], "KEYMAP_1.TXT") != 0
+                && strcmp(&pFilename[len - 13], "KEYMAP_2.TXT") != 0
+                && strcmp(&pFilename[len - 13], "KEYMAP_3.TXT") != 0
+                && strcmp(&pFilename[len - 12], "OPTIONS.TXT") != 0
                 && strcmp(&pFilename[len - 12], "KEYNAMES.TXT") != 0
-                && strcmp(&pFilename[len - 10], "KEYMAP.TXT") != 0
-                && strcmp(&pFilename[len - 9], "PATHS.TXT") != 0
-                && strcmp(&pFilename[len - 11], "PRATCAM.TXT") != 0) {
+                && strcmp(&pFilename[len - 11], "KEYMAP.TXT") != 0
+                && strcmp(&pFilename[len - 10], "PATHS.TXT") != 0
+                && strcmp(&pFilename[len - 12], "PRATCAM.TXT") != 0) {
 
                 c = fgetc(fp);
                 if (c != gDecode_thing) {
                     fclose(fp);
+                    printf("failed to decode %s, %c\n", &pFilename[len - 11], c);
                     return NULL;
                 }
                 ungetc(c, fp);
@@ -1302,11 +1304,13 @@ FILE* OldDRfopen(char* pFilename, char* pMode) {
         strcat(path_file, "PATHS.TXT");
 
         if (!PDCheckDriveExists(path_file)) {
+            printf("exit 1\n");
             source_exists = 0;
             return NULL;
         }
         test1 = fopen(path_file, "rt");
         if (!test1) {
+            printf("exit 2\n");
             source_exists = 0;
             return NULL;
         }
@@ -1452,11 +1456,15 @@ int RestoreOptions() {
     DefaultNetSettings();
 
     PathCat(the_path, gApplication_path, "OPTIONS.TXT");
-    f = DRfopen(the_path, "rt");
+    printf("path: %s\n", the_path);
+    f
+        = DRfopen(the_path, "rt");
     if (!f) {
+        printf("bail...");
         return 0;
     }
     while (fgets(line, 80, f)) {
+        printf("line: %s\n", line);
         if (sscanf(line, "%79s%f", token, &arg) == 2) {
             if (!strcmp(token, "YonFactor")) {
                 SetYonFactor(arg);
@@ -1493,8 +1501,8 @@ int RestoreOptions() {
             } else if (!strcmp(token, "MapRenderHeight")) {
                 gMap_render_height = arg;
             } else if (!strcmp(token, "PlayerName")) {
-                fgets(&line, 80, f);
-                s = strtok(&line, "\n\r");
+                fgets(line, 80, f);
+                s = strtok(line, "\n\r");
                 strcpy(gProgram_state.player_name[(int)arg], s);
             } else if (!strcmp(token, "EVolume")) {
                 gProgram_state.effects_volume = (int)arg;
@@ -1519,8 +1527,8 @@ int RestoreOptions() {
             } else if (!strcmp(token, "Joystick_range2y")) {
                 gJoystick_range2y = (int)arg;
             } else if (!strcmp(token, "NetName")) {
-                fgets_(&line, 80, f);
-                s = strtok(&line, "\n\r");
+                fgets(line, 80, f);
+                s = strtok(line, "\n\r");
                 strcpy(gNet_player_name, s);
             } else if (!strcmp(token, "NETGAMETYPE")) {
                 gLast_game_type = (tNet_game_type)arg;

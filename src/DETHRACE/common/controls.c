@@ -1,6 +1,7 @@
 #include "controls.h"
 
 #include "input.h"
+#include "sound.h"
 
 tCheat gKev_keys[44] = {
     { .code = 0xA11EE75D, .code2 = 0xF805EDDD, .action_proc = SetFlag, .num = 0x0A11EE75D },
@@ -711,6 +712,7 @@ void CycleYonFactor() {
 // Size: 45
 // EAX: pLevel
 void SetSoundDetailLevel(int pLevel) {
+    gSound_detail_level = pLevel;
 }
 
 // Offset: 17256

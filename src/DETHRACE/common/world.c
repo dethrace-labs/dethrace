@@ -1,7 +1,10 @@
 #include "world.h"
 
 #include "brender.h"
+#include "car.h"
+#include "globvars.h"
 #include "loading.h"
+#include "utility.h"
 
 #include <string.h>
 
@@ -11,7 +14,7 @@ br_actor* gDelete_list[500];
 br_actor* gLight_array[50];
 br_model* gAdditional_models[1000];
 br_actor* gSpec_vol_actors[100];
-char* gDepth_effect_names[2];
+char* gDepth_effect_names[2] = { "dark", "fog" };
 char* gFunk_nature_names[4];
 char* gGroove_object_names[4];
 char* gGroove_path_names[2];
@@ -24,7 +27,7 @@ tPath_name gAdditional_model_path;
 tU32 gPrevious_groove_times[2];
 int gRace_file_version;
 br_vector3 gActor_centre;
-tWall_texturing_level gWall_texturing_level;
+tWall_texturing_level gWall_texturing_level = eWTL_full;
 int gNumber_of_additional_models;
 int gNumber_of_actors;
 float gTemp;
@@ -35,13 +38,13 @@ br_actor* gGroove_by_proxy_actor;
 int gRendering_accessories;
 tScale_mode gCurrent_scale_mode;
 int gNumber_of_lights;
-tRoad_texturing_level gRoad_texturing_level;
+tRoad_texturing_level gRoad_texturing_level = eRTL_full;
 int gDelete_count;
 br_scalar gNearest_distance;
 br_actor* gNearest_actor;
 br_actor* gStandard_lamp;
-tRotate_mode gCurrent_rotate_mode;
-tCar_texturing_level gCar_texturing_level;
+tRotate_mode gCurrent_rotate_mode = eRotate_mode_y;
+tCar_texturing_level gCar_texturing_level = eCTL_full;
 br_scalar gSight_distance_squared;
 char* gLollipop_names[3];
 char* gAxis_names[3];
@@ -636,7 +639,7 @@ br_uint_32 ProcessFaceMaterials2(br_actor* pActor, tPMFM2CB pCallback) {
 // Offset: 19040
 // Size: 91
 // EAX: pMaterial
-void ChangePerspToSubdivCB(br_material* pMaterial) {
+br_uint_32 ChangePerspToSubdivCB(br_material* pMaterial) {
 }
 
 // Offset: 19132
@@ -657,17 +660,34 @@ void ChangeSubdivToPersp() {
 
 // Offset: 19324
 // Size: 123
-br_uint_32 ProcessFaceMaterials(br_actor* pActor, tPMFMCB pCallback) {
+void ProcessFaceMaterials(br_actor* pActor, tPMFMCB pCallback) {
 }
 
 // Offset: 19448
 // Size: 236
 // EAX: pm
+
 int DRPixelmapHasZeros(br_pixelmap* pm) {
     int x;
     int y;
     char* row_ptr;
     char* pp;
+    int i;
+
+    if (pm->flags & BR_PMF_NO_ACCESS) {
+        return 1;
+    }
+    row_ptr = (char*)pm->pixels + (pm->row_bytes * pm->base_y) + pm->base_x;
+    for (y = 0; y < pm->height; y++) {
+        pp = row_ptr;
+        for (x = 0; x < pm->width; x++) {
+            if (!pp)
+                return 1;
+            pp++;
+        }
+        row_ptr += pm->row_bytes;
+    }
+    return 0;
 }
 
 // Offset: 19684
@@ -676,6 +696,13 @@ int DRPixelmapHasZeros(br_pixelmap* pm) {
 // EDX: pMap
 int StorageContainsPixelmap(tBrender_storage* pStorage, br_pixelmap* pMap) {
     int i;
+
+    for (i = 0; i < pStorage->pixelmaps_count; i++) {
+        if (pMap == pStorage->pixelmaps[i]) {
+            return 1;
+        }
+    }
+    return 0;
 }
 
 // Offset: 19812
@@ -683,6 +710,17 @@ int StorageContainsPixelmap(tBrender_storage* pStorage, br_pixelmap* pMap) {
 // EAX: pStorage
 void HideStoredOpaqueTextures(tBrender_storage* pStorage) {
     int i;
+
+    for (i = 0; i < pStorage->materials_count; i++) {
+        if (pStorage->materials[i]->colour_map && StorageContainsPixelmap(pStorage, pStorage->materials[i]->colour_map)) {
+            if (!DRPixelmapHasZeros(pStorage->materials[i]->colour_map)) {
+                pStorage->saved_colour_maps[i] = pStorage->materials[i]->colour_map;
+                pStorage->materials[i]->colour_map = NULL;
+                pStorage->materials[i]->flags &= 0xFDu;
+                BrMaterialUpdate(pStorage->materials[i], 0x7FFFu);
+            }
+        }
+    }
 }
 
 // Offset: 20080
@@ -690,6 +728,17 @@ void HideStoredOpaqueTextures(tBrender_storage* pStorage) {
 // EAX: pStorage
 void RevealStoredTransparentTextures(tBrender_storage* pStorage) {
     int i;
+
+    for (i = 0; i < pStorage->materials_count; i++) {
+        if (pStorage->saved_colour_maps[i]) {
+            if (DRPixelmapHasZeros(pStorage->saved_colour_maps[i])) {
+                pStorage->materials[i]->colour_map = pStorage->saved_colour_maps[i];
+                pStorage->saved_colour_maps[i] = NULL;
+                pStorage->materials[i]->flags |= 2u;
+                BrMaterialUpdate(pStorage->materials[i], 0x7FFFu);
+            }
+        }
+    }
 }
 
 // Offset: 20304
@@ -697,6 +746,17 @@ void RevealStoredTransparentTextures(tBrender_storage* pStorage) {
 // EAX: pStorage
 void HideStoredTextures(tBrender_storage* pStorage) {
     int i;
+
+    for (i = 0; i < pStorage->materials_count; i++) {
+        if (pStorage->materials[i]->colour_map) {
+            if (StorageContainsPixelmap(pStorage, pStorage->materials[i]->colour_map)) {
+                pStorage->saved_colour_maps[i] = pStorage->materials[i]->colour_map;
+                pStorage->materials[i]->colour_map = NULL;
+                pStorage->materials[i]->flags &= 0xFDu;
+                BrMaterialUpdate(pStorage->materials[i], 0x7FFFu);
+            }
+        }
+    }
 }
 
 // Offset: 20540
@@ -704,6 +764,15 @@ void HideStoredTextures(tBrender_storage* pStorage) {
 // EAX: pStorage
 void RevealStoredTextures(tBrender_storage* pStorage) {
     int i;
+
+    for (i = 0; i < pStorage->materials_count; i++) {
+        if (pStorage->saved_colour_maps[i]) {
+            pStorage->materials[i]->colour_map = pStorage->saved_colour_maps[i];
+            pStorage->saved_colour_maps[i] = NULL;
+            pStorage->materials[i]->flags |= 2u;
+            BrMaterialUpdate(pStorage->materials[i], 0x7FFFu);
+        }
+    }
 }
 
 // Offset: 20740
@@ -723,6 +792,51 @@ tCar_texturing_level GetCarTexturingLevel() {
 // Size: 139
 // EAX: pLevel
 void SetCarTexturingLevel(tCar_texturing_level pLevel) {
+    if (pLevel != gCar_texturing_level) {
+        if (gOur_car_storage_space.models_count) {
+            if (pLevel == eCTL_none) {
+                HideStoredTextures(&gOur_car_storage_space);
+            } else if (pLevel == eCTL_transparent) {
+                if (gCar_texturing_level) {
+                    if (gCar_texturing_level == 2)
+                        HideStoredOpaqueTextures(&gOur_car_storage_space);
+                } else {
+                    RevealStoredTransparentTextures(&gOur_car_storage_space);
+                }
+            } else if (pLevel == eCTL_full) {
+                RevealStoredTextures(&gOur_car_storage_space);
+            }
+        }
+        if (gTheir_cars_storage_space.models_count) {
+            if (pLevel == eCTL_none) {
+                HideStoredTextures(&gTheir_cars_storage_space);
+            } else if (pLevel == eCTL_transparent) {
+                if (gCar_texturing_level) {
+                    if (gCar_texturing_level == 2)
+                        HideStoredOpaqueTextures(&gTheir_cars_storage_space);
+                } else {
+                    RevealStoredTransparentTextures(&gTheir_cars_storage_space);
+                }
+            } else if (pLevel == eCTL_full) {
+                RevealStoredTextures(&gTheir_cars_storage_space);
+            }
+        }
+        if (gNet_cars_storage_space.models_count) {
+            if (pLevel == eCTL_none) {
+                HideStoredTextures(&gTheir_cars_storage_space);
+            } else if (pLevel == eCTL_transparent) {
+                if (gCar_texturing_level) {
+                    if (gCar_texturing_level == 2)
+                        HideStoredOpaqueTextures(&gTheir_cars_storage_space);
+                } else {
+                    RevealStoredTransparentTextures(&gTheir_cars_storage_space);
+                }
+            } else if (pLevel == eCTL_full) {
+                RevealStoredTextures(&gTheir_cars_storage_space);
+            }
+        }
+    }
+    gCar_texturing_level = pLevel;
 }
 
 // Offset: 21052
@@ -792,12 +906,14 @@ br_material* WallLinearToPersp(br_model* pModel, tU16 pFace) {
 // Offset: 22172
 // Size: 45
 tRoad_texturing_level GetRoadTexturingLevel() {
+    return gRoad_texturing_level;
 }
 
 // Offset: 22220
 // Size: 45
 // EAX: pLevel
 void SetRoadTexturingLevel(tRoad_texturing_level pLevel) {
+    gRoad_texturing_level = pLevel;
 }
 
 // Offset: 22268
@@ -815,6 +931,7 @@ tWall_texturing_level GetWallTexturingLevel() {
 // Size: 45
 // EAX: pLevel
 void SetWallTexturingLevel(tWall_texturing_level pLevel) {
+    gWall_texturing_level = pLevel;
 }
 
 // Offset: 22452
@@ -832,7 +949,7 @@ br_material* DisposeSuffixedMaterials(br_model* pModel, tU16 pFace) {
     size_t max_suffix_len;
     br_material* mat;
     br_material* victim;
-    static char* suffixes[3];
+    static char* suffixes[3] = { ".road", ".pwall", ".lwall" };
     int s;
     char* id;
 }
@@ -845,6 +962,10 @@ void DisposeTexturingMaterials() {
 // Offset: 23000
 // Size: 73
 br_uint_32 SetAccessoryRenderingCB(br_actor* pActor, void* pFlag) {
+    if (pActor->identifier && *pActor->identifier == 38) {
+        pActor->render_style = *(br_uint_8*)pFlag;
+    }
+    return 0;
 }
 
 // Offset: 23076
@@ -852,6 +973,15 @@ br_uint_32 SetAccessoryRenderingCB(br_actor* pActor, void* pFlag) {
 // EAX: pOn
 void SetAccessoryRendering(int pOn) {
     int style;
+    if (gTrack_actor) {
+        if (pOn) {
+            style = 4;
+        } else {
+            style = 1;
+        }
+        DRActorEnumRecurse(gTrack_actor, (br_actor_enum_cbfn*)SetAccessoryRenderingCB, &style);
+    }
+    gRendering_accessories = pOn;
 }
 
 // Offset: 23176
@@ -863,6 +993,7 @@ int GetAccessoryRendering() {
 // Size: 45
 // EAX: pLevel
 void SetCarSimplificationLevel(int pLevel) {
+    gCar_simplification_level = pLevel;
 }
 
 // Offset: 23272

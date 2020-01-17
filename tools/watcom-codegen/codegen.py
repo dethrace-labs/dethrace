@@ -111,8 +111,8 @@ def read_file():
       modules.append(current_module)
       last_fn = None
       last_local_type = ''
-      # if len(modules) == 3:
-      #   break
+      if len(modules) == 3:
+        break
 
     elif line == LOCALS_SECTION_HEADER:
       state = STATE_LOCALS
@@ -382,11 +382,6 @@ def resolve_type_str(module, type_idx, var_name, decl=True):
 def resolve_function_header(module, fn):
   text = ''
   text += '// Offset: ' + str(fn['offset']) + '\n// Size: ' + str(fn['size'])
-  for i in range(len(fn['args'])):
-    if len(text) > 0:
-      text += '\n'
-    name = fn['local_vars'][i]['name']
-    text += '// ' + fn['args'][i] + ': ' + name
   text += '\n//IDA: ' + resolve_function_ida_signature(module, fn)
   return text
 
@@ -657,12 +652,43 @@ def generate_c_file(module):
 
     # skip local variables that were passed in as arguments
     arg_count = get_function_arg_count(module, fn)
+    
     for v in fn['local_vars'][arg_count:]:
       c_file.write(' ' * INDENT_SPACES)
       if 'CONST' in v['addr_type']:
         c_file.write('static ')
       c_file.write(resolve_type_str(module, v['type'], v['name']))
       c_file.write(';\n')
+
+    
+    c_file.write(' ' * INDENT_SPACES)
+    c_file.write('DR_TRACE("%s')
+    do_comma = False
+    for v in fn['local_vars'][:arg_count]:
+      c_file.write(', ')
+      type_str = resolve_type_str(module, v['type'], '')
+      fmt = '%c'
+      if 'int' in type_str:
+        fmt = '%d'
+      elif type_str == 'char*':
+        fmt = '%s'
+      elif 'scalar' in type_str:
+        fmt = '%f'
+      elif '*' in type_str:
+        fmt = '%p'
+      else:
+        print('Unknown type for format', type_str)
+      c_file.write(fmt)
+      do_comma = True
+    c_file.write('", __func__, ')
+    do_comma = False
+    for v in fn['local_vars'][:arg_count]:
+      if do_comma:
+        c_file.write(', ')
+      c_file.write(v['name'])
+      do_comma = True
+      
+    c_file.write(')\n')
     c_file.write('}\n\n')
 
 def get_child_reference(module, type_idx):

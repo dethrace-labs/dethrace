@@ -397,6 +397,22 @@ void WaitFor(tU32 pDelay) {
 // EBX: arg
 br_uint_32 DRActorEnumRecurse(br_actor* pActor, br_actor_enum_cbfn* callback, void* arg) {
     br_uint_32 result;
+
+    result = callback(pActor, arg);
+    if (result == 0) {
+        pActor = pActor->children;
+        if (pActor) {
+            while (1) {
+                result = DRActorEnumRecurse(pActor, callback, arg);
+                if (result != 0)
+                    break;
+                pActor = pActor->next;
+                if (!pActor)
+                    return 0;
+            }
+        }
+    }
+    return result;
 }
 
 // Offset: 4744

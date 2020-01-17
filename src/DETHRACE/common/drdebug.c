@@ -1,4 +1,5 @@
 #include "drdebug.h"
+#include <string.h>
 
 // These functions were compiled out of the release executable. Implementation is just a guess
 

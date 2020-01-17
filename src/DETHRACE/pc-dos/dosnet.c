@@ -354,7 +354,7 @@ tPlayer_ID PDNetExtractPlayerID(tNet_game_details* pDetails) {
 // EAX: pName
 // EDX: pMax_length
 void PDNetObtainSystemUserName(char* pName, int pMax_length) {
-    DrDebugMessage("PDNetObtainSystemUserName()");
+    DrDebugMessage("PDNetObtainSystemUserName()\n");
     strcpy(pName, "Ron Turn");
 }
 

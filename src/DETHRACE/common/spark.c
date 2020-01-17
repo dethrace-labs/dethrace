@@ -25,7 +25,7 @@ br_pixelmap* gGrey_smoke_shade_table;
 br_model* gLollipop_model;
 int gNum_splash_types;
 int gNum_dust_tables;
-int gSmoke_on;
+int gSmoke_on = 1;
 int gSmoke_flags;
 br_model* gSplash_model;
 int gDust_rotate;
@@ -229,11 +229,6 @@ void CreateShrapnelShower(br_vector3* pos, br_vector3* v, br_vector3* pNormal, b
     br_vector3 tv;
     br_vector3 tv2;
     br_vector3 vel;
-}
-
-// Offset: 10820
-// Size: 57
-br_scalar random() {
 }
 
 // Offset: 10880
@@ -652,6 +647,7 @@ void ResetSmokeColumns() {
 // Size: 45
 // EAX: pSmoke_on
 void SetSmokeOn(int pSmoke_on) {
+    gSmoke_on = pSmoke_on;
 }
 
 // Offset: 32060
