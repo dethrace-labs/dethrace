@@ -1,12 +1,9 @@
 #include "depth.h"
 
-<<<<<<< HEAD
-=======
 #include "brender.h"
 #include "globvars.h"
 #include "globvrkm.h"
 
->>>>>>> wip
 tDepth_effect gDistance_depth_effects[4];
 br_scalar gSky_height;
 br_scalar gSky_x_multiplier;
@@ -410,8 +407,6 @@ int GetSkyTextureOn() {
 // Size: 60
 // EAX: pOn
 void SetSkyTextureOn(int pOn) {
-<<<<<<< HEAD
-=======
     br_pixelmap* tmp;
     if (pOn != gSky_on) {
         tmp = gProgram_state.current_depth_effect.sky_texture;
@@ -427,7 +422,6 @@ void SetSkyTextureOn(int pOn) {
         }
     }
     gSky_on = pOn;
->>>>>>> wip
 }
 
 // Offset: 10432

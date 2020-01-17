@@ -1073,6 +1073,7 @@ void GetThreeInts(FILE* pF, int* pF1, int* pF2, int* pF3) {
     char* str;
 
     GetALineAndDontArgue(pF, s);
+    printf("line: %s\n", s);
     str = strtok(s, "\t ,/");
     sscanf(str, "%d", pF1);
     str = strtok(NULL, "\t ,/");
