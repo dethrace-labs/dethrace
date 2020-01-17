@@ -360,7 +360,7 @@ br_uint_32 ProcessFaceMaterials2(br_actor* pActor, tPMFM2CB pCallback);
 // Offset: 19040
 // Size: 91
 // EAX: pMaterial
-br_uint_32 ChangePerspToSubdivCB(br_material* pMaterial);
+void ChangePerspToSubdivCB(br_material* pMaterial);
 
 // Offset: 19132
 // Size: 54
@@ -377,7 +377,7 @@ void ChangeSubdivToPersp();
 
 // Offset: 19324
 // Size: 123
-void ProcessFaceMaterials(br_actor* pActor, tPMFMCB pCallback);
+br_uint_32 ProcessFaceMaterials(br_actor* pActor, tPMFMCB pCallback);
 
 // Offset: 19448
 // Size: 236

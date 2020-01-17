@@ -1171,6 +1171,7 @@ typedef struct br_geometry {
 typedef struct br_renderer_dispatch br_renderer_dispatch;
 
 typedef struct br_renderer {
+    br_renderer_dispatch* dispatch;
 } br_renderer;
 
 typedef struct br_material {

@@ -404,11 +404,13 @@ br_uint_32 DRActorEnumRecurse(br_actor* pActor, br_actor_enum_cbfn* callback, vo
         if (pActor) {
             while (1) {
                 result = DRActorEnumRecurse(pActor, callback, arg);
-                if (result != 0)
+                if (result != 0) {
                     break;
+                }
                 pActor = pActor->next;
-                if (!pActor)
+                if (!pActor) {
                     return 0;
+                }
             }
         }
     }
