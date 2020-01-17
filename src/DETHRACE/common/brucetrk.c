@@ -141,9 +141,11 @@ void RenderTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, 
 // Offset: 6200
 // Size: 47
 br_scalar GetYonFactor() {
+    return gYon_factor;
 }
 
 // Offset: 6248
 // Size: 44
 void SetYonFactor(br_scalar pNew) {
+    gYon_factor = pNew;
 }

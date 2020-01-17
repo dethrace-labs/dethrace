@@ -361,6 +361,8 @@ void SetYon(br_scalar pYon) {
     int i;
     br_camera* camera_ptr;
 
+    LOG_TRACE("(%d)", pYon);
+
     if (pYon < 5.0f) {
         pYon = 5.0f;
     }
@@ -408,6 +410,8 @@ int GetSkyTextureOn() {
 // EAX: pOn
 void SetSkyTextureOn(int pOn) {
     br_pixelmap* tmp;
+    LOG_TRACE("(%d)", pOn);
+
     if (pOn != gSky_on) {
         tmp = gProgram_state.current_depth_effect.sky_texture;
         gProgram_state.current_depth_effect.sky_texture = gSwap_sky_texture;
@@ -443,6 +447,7 @@ int GetDepthCueingOn() {
 // Size: 71
 // EAX: pOn
 void SetDepthCueingOn(int pOn) {
+    LOG_TRACE("(%d)", pOn);
     if (pOn != gDepth_cueing_on && gHorizon_material) {
         InstantDepthChange(gSwap_depth_effect_type, gProgram_state.current_depth_effect.sky_texture, gSwap_depth_effect_start, gSwap_depth_effect_end);
         gSwap_depth_effect_type = gProgram_state.current_depth_effect.type;

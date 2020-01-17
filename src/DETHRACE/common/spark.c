@@ -647,6 +647,7 @@ void ResetSmokeColumns() {
 // Size: 45
 // EAX: pSmoke_on
 void SetSmokeOn(int pSmoke_on) {
+    LOG_TRACE("(%d)", pSmoke_on);
     gSmoke_on = pSmoke_on;
 }
 

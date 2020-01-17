@@ -792,6 +792,8 @@ tCar_texturing_level GetCarTexturingLevel() {
 // Size: 139
 // EAX: pLevel
 void SetCarTexturingLevel(tCar_texturing_level pLevel) {
+    LOG_TRACE("(%d)", pLevel);
+
     if (pLevel != gCar_texturing_level) {
         if (gOur_car_storage_space.models_count) {
             if (pLevel == eCTL_none) {
@@ -913,6 +915,7 @@ tRoad_texturing_level GetRoadTexturingLevel() {
 // Size: 45
 // EAX: pLevel
 void SetRoadTexturingLevel(tRoad_texturing_level pLevel) {
+    LOG_TRACE("(%d)", pLevel);
     gRoad_texturing_level = pLevel;
 }
 
@@ -931,6 +934,7 @@ tWall_texturing_level GetWallTexturingLevel() {
 // Size: 45
 // EAX: pLevel
 void SetWallTexturingLevel(tWall_texturing_level pLevel) {
+    LOG_TRACE("(%d)", pLevel);
     gWall_texturing_level = pLevel;
 }
 
@@ -973,6 +977,9 @@ br_uint_32 SetAccessoryRenderingCB(br_actor* pActor, void* pFlag) {
 // EAX: pOn
 void SetAccessoryRendering(int pOn) {
     int style;
+    
+    LOG_TRACE("(%d)", pOn);
+
     if (gTrack_actor) {
         if (pOn) {
             style = 4;
@@ -993,6 +1000,7 @@ int GetAccessoryRendering() {
 // Size: 45
 // EAX: pLevel
 void SetCarSimplificationLevel(int pLevel) {
+    LOG_TRACE("(%d)", pLevel);
     gCar_simplification_level = pLevel;
 }
 

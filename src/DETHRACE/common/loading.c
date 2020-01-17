@@ -219,7 +219,6 @@ void LoadGeneralParameters() {
 
         if (strcmp(s, gDecode_string) == 0) {
             gDecode_thing = 0;
-            printf("Expecting decrypted text files!\n");
         }
 
         for (i = 0; i < strlen(gDecode_string); i++) {
@@ -1073,7 +1072,6 @@ void GetThreeInts(FILE* pF, int* pF1, int* pF2, int* pF3) {
     char* str;
 
     GetALineAndDontArgue(pF, s);
-    printf("line: %s\n", s);
     str = strtok(s, "\t ,/");
     sscanf(str, "%d", pF1);
     str = strtok(NULL, "\t ,/");
@@ -1265,30 +1263,31 @@ FILE* OldDRfopen(char* pFilename, char* pMode) {
     int len;
     int c;
 
+    LOG_TRACE("(\"%s\", \"%s\")", pFilename, pMode);
+
     fp = fopen(pFilename, pMode);
 
     if (fp) {
-        len = strlen(pFilename) + 1;
+        len = strlen(pFilename);
         if (gDecode_thing != 0) {
-            if (strcmp(&pFilename[len - 5], ".TXT") != 0
-                && strcmp(&pFilename[len - 13], "DKEYMAP0.TXT") != 0
-                && strcmp(&pFilename[len - 13], "DKEYMAP1.TXT") != 0
-                && strcmp(&pFilename[len - 13], "DKEYMAP2.TXT") != 0
-                && strcmp(&pFilename[len - 13], "DKEYMAP3.TXT") != 0
-                && strcmp(&pFilename[len - 13], "KEYMAP_0.TXT") != 0
-                && strcmp(&pFilename[len - 13], "KEYMAP_1.TXT") != 0
-                && strcmp(&pFilename[len - 13], "KEYMAP_2.TXT") != 0
-                && strcmp(&pFilename[len - 13], "KEYMAP_3.TXT") != 0
-                && strcmp(&pFilename[len - 12], "OPTIONS.TXT") != 0
-                && strcmp(&pFilename[len - 12], "KEYNAMES.TXT") != 0
-                && strcmp(&pFilename[len - 11], "KEYMAP.TXT") != 0
-                && strcmp(&pFilename[len - 10], "PATHS.TXT") != 0
-                && strcmp(&pFilename[len - 12], "PRATCAM.TXT") != 0) {
-
+            if (strcmp(&pFilename[len - 4], ".TXT") == 0
+                && strcmp(&pFilename[len - 12], "DKEYMAP0.TXT") != 0
+                && strcmp(&pFilename[len - 12], "DKEYMAP1.TXT") != 0
+                && strcmp(&pFilename[len - 12], "DKEYMAP2.TXT") != 0
+                && strcmp(&pFilename[len - 12], "DKEYMAP3.TXT") != 0
+                && strcmp(&pFilename[len - 12], "KEYMAP_0.TXT") != 0
+                && strcmp(&pFilename[len - 12], "KEYMAP_1.TXT") != 0
+                && strcmp(&pFilename[len - 12], "KEYMAP_2.TXT") != 0
+                && strcmp(&pFilename[len - 12], "KEYMAP_3.TXT") != 0
+                && strcmp(&pFilename[len - 11], "OPTIONS.TXT") != 0
+                && strcmp(&pFilename[len - 11], "KEYNAMES.TXT") != 0
+                && strcmp(&pFilename[len - 10], "KEYMAP.TXT") != 0
+                && strcmp(&pFilename[len - 9], "PATHS.TXT") != 0
+                && strcmp(&pFilename[len - 11], "PRATCAM.TXT") != 0) {
                 c = fgetc(fp);
                 if (c != gDecode_thing) {
                     fclose(fp);
-                    printf("failed to decode %s, %c\n", &pFilename[len - 11], c);
+                    LOG_WARN("Unexpected encoding character");
                     return NULL;
                 }
                 ungetc(c, fp);
@@ -1299,20 +1298,21 @@ FILE* OldDRfopen(char* pFilename, char* pMode) {
     if (gCD_fully_installed) {
         return fp;
     }
+    // source_exists = 1 means we haven't checked the CD yet
     if (source_exists == 1) {
         strcpy(path_file, "DATA");
         strcat(path_file, gDir_separator);
         strcat(path_file, "PATHS.TXT");
 
         if (!PDCheckDriveExists(path_file)) {
-            printf("exit 1\n");
             source_exists = 0;
+            LOG_WARN("PATHS.TXT not found");
             return NULL;
         }
         test1 = fopen(path_file, "rt");
         if (!test1) {
-            printf("exit 2\n");
             source_exists = 0;
+            LOG_WARN("PATHS.TXT couldnt be opened");
             return NULL;
         }
 
@@ -1391,10 +1391,10 @@ int GetCDPathFromPathsTxtFile(char* pPath_name) {
     static tPath_name cd_pathname;
     FILE* paths_txt_fp;
     tPath_name paths_txt;
+    LOG_TRACE("(\"%s\")", pPath_name);
 
     if (!got_it_already) {
         sprintf(paths_txt, "%s%s%s", gApplication_path, gDir_separator, "PATHS.TXT");
-        printf("%s\n", paths_txt);
         paths_txt_fp = fopen(paths_txt, "rt");
         if (!paths_txt_fp) {
             return 0;
@@ -1427,6 +1427,19 @@ int CarmaCDinDriveOrFullGameInstalled() {
 // EAX: pF
 // EDX: pOptions
 void ReadNetworkSettings(FILE* pF, tNet_game_options* pOptions) {
+    LOG_TRACE("(%p, %p)", pF, pOptions);
+
+    pOptions->enable_text_messages = GetAnInt(pF);
+    pOptions->show_players_on_map = GetAnInt(pF);
+    pOptions->show_peds_on_map = GetAnInt(pF);
+    pOptions->show_powerups_on_map = GetAnInt(pF);
+    pOptions->powerup_respawn = GetAnInt(pF);
+    pOptions->open_game = GetAnInt(pF);
+    pOptions->grid_start = GetAnInt(pF);
+    pOptions->race_sequence_type = GetAnInt(pF);
+    pOptions->random_car_choice = GetAnInt(pF);
+    pOptions->car_choice = GetAnInt(pF);
+    pOptions->starting_money_index = GetAnInt(pF);
 }
 
 // Offset: 39132
@@ -1451,21 +1464,19 @@ int RestoreOptions() {
     char token[80];
     char* s;
     float arg;
+    LOG_TRACE("()");
 
     gProgram_state.music_volume = 4;
     gProgram_state.effects_volume = 4;
     DefaultNetSettings();
 
     PathCat(the_path, gApplication_path, "OPTIONS.TXT");
-    printf("path: %s\n", the_path);
-    f
-        = DRfopen(the_path, "rt");
+    f = DRfopen(the_path, "rt");
     if (!f) {
-        printf("bail...");
+        LOG_WARN("Failed to open OPTIONS.TXT");
         return 0;
     }
     while (fgets(line, 80, f)) {
-        printf("line: %s\n", line);
         if (sscanf(line, "%79s%f", token, &arg) == 2) {
             if (!strcmp(token, "YonFactor")) {
                 SetYonFactor(arg);

@@ -1119,6 +1119,7 @@ void NobbleNonzeroBlacks(br_pixelmap* pPalette) {
 // Size: 55
 // EAX: pThe_path
 int PDCheckDriveExists(char* pThe_path) {
+    LOG_TRACE("(\"%s\")", pThe_path);
 
     // Added: force unix dir separator for now >>
     char* rep = pThe_path;

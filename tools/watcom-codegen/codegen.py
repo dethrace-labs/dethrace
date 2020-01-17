@@ -111,8 +111,8 @@ def read_file():
       modules.append(current_module)
       last_fn = None
       last_local_type = ''
-      if len(modules) == 3:
-        break
+      # if len(modules) == 3:
+      #   break
 
     elif line == LOCALS_SECTION_HEADER:
       state = STATE_LOCALS
@@ -662,33 +662,41 @@ def generate_c_file(module):
 
     
     c_file.write(' ' * INDENT_SPACES)
-    c_file.write('DR_TRACE("%s')
-    do_comma = False
-    for v in fn['local_vars'][:arg_count]:
-      c_file.write(', ')
-      type_str = resolve_type_str(module, v['type'], '')
-      fmt = '%c'
-      if 'int' in type_str:
-        fmt = '%d'
-      elif type_str == 'char*':
-        fmt = '%s'
-      elif 'scalar' in type_str:
-        fmt = '%f'
-      elif '*' in type_str:
-        fmt = '%p'
-      else:
-        print('Unknown type for format', type_str)
-      c_file.write(fmt)
-      do_comma = True
-    c_file.write('", __func__, ')
+    c_file.write('LOG_TRACE("(')
     do_comma = False
     for v in fn['local_vars'][:arg_count]:
       if do_comma:
         c_file.write(', ')
+      type_str = resolve_type_str(module, v['type'], '')
+      fmt = '%d'
+      if type_str == 'char*':
+        fmt = '\\"%s\\"'
+      elif '*' in type_str:
+        fmt = '%p'
+      elif 'int' in type_str:
+        fmt = '%d'
+      elif 'scalar' in type_str or 'float' in type_str:
+        fmt = '%f'
+      elif 'tU32' in type_str or 'tS32' in type_str or 'tU16' in type_str or 'tS16' in type_str:
+        fmt = '%d'
+      elif 'tU8' in type_str:
+        fmt = '%d'
+      elif 'br_angle' in type_str:
+        fmt = '%d'
+      elif 'size_t' in type_str:
+        fmt = '%d'
+      else:
+        print('Unknown type for format', type_str)
+      c_file.write(fmt)
+      do_comma = True
+    c_file.write(')"')
+
+    for v in fn['local_vars'][:arg_count]:
+      c_file.write(', ')
       c_file.write(v['name'])
       do_comma = True
       
-    c_file.write(')\n')
+    c_file.write(');\n')
     c_file.write('}\n\n')
 
 def get_child_reference(module, type_idx):

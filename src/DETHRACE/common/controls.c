@@ -712,6 +712,7 @@ void CycleYonFactor() {
 // Size: 45
 // EAX: pLevel
 void SetSoundDetailLevel(int pLevel) {
+    LOG_TRACE("(%d)", pLevel);
     gSound_detail_level = pLevel;
 }
 
