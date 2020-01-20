@@ -5,6 +5,7 @@
 #include "common/depth.h"
 #include "common/displays.h"
 #include "common/drdebug.h"
+#include "common/drfile.h"
 #include "common/drmem.h"
 #include "common/errors.h"
 #include "common/flicplay.h"
@@ -87,6 +88,43 @@ void AllocateStandardLamp() {
 // Offset: 2152
 // Size: 342
 void InitializeBRenderEnvironment() {
+    br_model* arrow_model;
+    LOG_TRACE("()");
+
+    gBr_initialized = 1;
+    InstallDRMemCalls();
+    InstallDRFileCalls();
+    SetBRenderScreenAndBuffers(0, 0, 0, 0);
+    gUniverse_actor = BrActorAllocate(BR_ACTOR_NONE, NULL);
+    if (!gUniverse_actor) {
+        FatalError(3);
+    }
+    gUniverse_actor->identifier = BrResStrDup(gUniverse_actor, "Root");
+    BrEnvironmentSet(gUniverse_actor);
+    gNon_track_actor = BrActorAllocate(BR_ACTOR_NONE, NULL);
+    if (!gNon_track_actor) {
+        FatalError(3);
+    }
+    BrActorAdd(gUniverse_actor, gNon_track_actor);
+    gDont_render_actor = BrActorAllocate(BR_ACTOR_NONE, 0);
+    if (!gDont_render_actor) {
+        FatalError(3);
+    }
+    gDont_render_actor->render_style = BR_RSTYLE_NONE;
+    BrActorAdd(gUniverse_actor, gDont_render_actor);
+    gSelf = BrActorAllocate(BR_ACTOR_NONE, NULL);
+    if (!gSelf) {
+        FatalError(6);
+    }
+    gSelf = BrActorAdd(gNon_track_actor, gSelf);
+    if (!gSelf) {
+        FatalError(6);
+    }
+    AllocateCamera();
+    arrow_model = LoadModel("CPOINT.DAT");
+    BrModelAdd(arrow_model);
+    gArrow_actor = LoadActor("CPOINT.ACT");
+    gArrow_actor->model = arrow_model;
 }
 
 // Offset: 2496
@@ -161,9 +199,8 @@ void InitialiseApplication(int pArgc, char** pArgv) {
     InitSound();
     InitHeadups();
     gDefault_track_material = BrMaterialAllocate("gDefault_track_material");
-    //TODO:
-    //BYTE2(gDefault_track_material->map_transform.m[2][1]) = -29;
-    //BYTE3(gDefault_track_material->map_transform.m[2][1]) = 1;
+    gDefault_track_material->index_base = 227;
+    gDefault_track_material->index_range = 1;
     BrMaterialAdd(gDefault_track_material);
     InitShadow();
     InitFlics();
@@ -187,7 +224,7 @@ void InitialiseApplication(int pArgc, char** pArgv) {
     ClearEntireScreen();
     InitSkids();
     InitPeds();
-    gProgram_state.cars_available[42] = 0;
+    gProgram_state.track_spec.the_actor = NULL;
     gCD_is_in_drive = TestForOriginalCarmaCDinDrive();
     SwitchToLoresMode();
     DrDebugLog(0, "AFTER APPLICATION INITIALISATION");
@@ -252,6 +289,5 @@ int GetScreenSize() {
 // EAX: pNew_size
 void SetScreenSize(int pNew_size) {
     LOG_TRACE("(%d)", pNew_size);
-    //TOOD: which global var is this pointing to?
-    //gScreen_size = pNew_size;
+    gRender_indent = pNew_size;
 }

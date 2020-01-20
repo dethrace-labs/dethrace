@@ -52,7 +52,7 @@ br_error BrV1dbBegin() {
         BrResClassAdd(&v1db_resourceClasses[i]);
     }
 
-    v1db.default_model = (br_model*)BrResAllocate(v1db.res, sizeof(br_model), BR_MEMORY_MODEL);
+    v1db.default_model = BrResAllocate(v1db.res, sizeof(br_model), BR_MEMORY_MODEL);
     memcpy(v1db.default_model, &_BrDefaultModel, sizeof(br_model));
     v1db.default_material = SetupDefaultMaterial();
     v1db.enabled_lights.type = 2;

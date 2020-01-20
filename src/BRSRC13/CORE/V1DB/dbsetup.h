@@ -3,6 +3,8 @@
 
 #include "br_types.h"
 
+extern br_v1db_state v1db;
+
 // Offset: 12
 // Size: 345
 br_error BrV1dbBegin();

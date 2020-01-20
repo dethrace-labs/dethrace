@@ -1,4 +1,5 @@
 #include "enables.h"
+#include "dbsetup.h"
 
 char rscid[51];
 
@@ -52,6 +53,9 @@ void BrHorizonPlaneDisable(br_actor* h) {
 // Size: 55
 br_actor* BrEnvironmentSet(br_actor* a) {
     br_actor* old_a;
+    old_a = v1db.enabled_environment;
+    v1db.enabled_environment = a;
+    return old_a;
 }
 
 // Offset: 1131

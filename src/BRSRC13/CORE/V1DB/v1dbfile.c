@@ -65,7 +65,7 @@ struct {
     br_uint_32 id;
     size_t offset;
     int table;
-};
+} MaterialMaps;
 char rscid[53];
 
 // Offset: 18

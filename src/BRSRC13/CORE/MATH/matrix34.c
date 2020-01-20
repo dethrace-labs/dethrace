@@ -17,6 +17,25 @@ void BrMatrix34Mul(br_matrix34* A, br_matrix34* B, br_matrix34* C) {
 // Offset: 958
 // Size: 177
 void BrMatrix34Identity(br_matrix34* mat) {
+    // { 1, 0, 0},
+    // { 0, 1, 0},
+    // { 0, 0, 1}
+    // ( 0, 0, 0 }
+    mat->m[0][0] = 1.0;
+    mat->m[0][1] = 0;
+    mat->m[0][2] = 0;
+
+    mat->m[1][0] = 0;
+    mat->m[1][1] = 1.0;
+    mat->m[1][2] = 0;
+
+    mat->m[2][0] = 0;
+    mat->m[2][1] = 0;
+    mat->m[2][2] = 1.0;
+
+    mat->m[3][0] = 0;
+    mat->m[3][1] = 0;
+    mat->m[3][2] = 0;
 }
 
 // Offset: 1153

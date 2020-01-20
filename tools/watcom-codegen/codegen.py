@@ -4,9 +4,7 @@
 # Parses Watcom "exedump" output into c skeleton coode
 # exedump: https://github.com/jeff-1amstudios/open-watcom-v2/tree/master/bld/exedump
 #
-# Writes c code into "./_generated" directory
-#
-# Usage: codegen.py <path to dump file>
+# Usage: codegen.py <path to dump file> <path to write generated code>
 #######################################################
 import sys
 import re
@@ -14,7 +12,7 @@ import os
 import errno
 import shutil
 
-BASE_OUTPUT_DIR = '_generated/'
+#BASE_OUTPUT_DIR = '_generated/'
 
 module_start_regex = '\d+\\) Name:\s+(\S+)'
 LOCAL_HEADER_REGEX = '(\S+):\s+(\S+)'
@@ -40,6 +38,7 @@ ENUM_ITEM_REGEX = '"(\S+)"   value = (\S+)'
 SECTION_UNDERLINE = '^(=*)$' # ignore these lines
 
 fp = open(sys.argv[1], 'r')
+BASE_OUTPUT_DIR = sys.argv[2]
 
 STATE_NONE = 0
 STATE_MODULE = 1
@@ -111,7 +110,7 @@ def read_file():
       modules.append(current_module)
       last_fn = None
       last_local_type = ''
-      # if len(modules) == 3:
+      # if len(modules) == 2:
       #   break
 
     elif line == LOCALS_SECTION_HEADER:
@@ -381,7 +380,7 @@ def resolve_type_str(module, type_idx, var_name, decl=True):
 
 def resolve_function_header(module, fn):
   text = ''
-  text += '// Offset: ' + str(fn['offset']) + '\n// Size: ' + str(fn['size'])
+  text += '// Offset: ' + str(fn['offset']) + '\n// Size: ' + hex(fn['size'])
   text += '\n//IDA: ' + resolve_function_ida_signature(module, fn)
   return text
 
@@ -498,11 +497,12 @@ def get_struct_name(module, t):
   for i in module['types']:
     t2 = module['types'][i]
     if 'type_idx' in t2 and t2['type_idx'] == target_id:
+      print ('t2', t2)
       if t2['scope_idx'] == '0':
         return t2['value']
       found_id = t2['id']
       found_name = t2['value']
-      #print ('found1', t2['value'])
+      print ('found1', t2['value'])
   if found_id is None:
     print ('ERROR1: not found', t)
     return None
@@ -537,22 +537,25 @@ def get_type_declaration(module, t, name):
   #print ('type decl', t)
   if t['type'] == 'FIELD_LIST':
     s = 'struct'
+    print('struct', )
     tag_name = get_struct_tag_name(module, t)
     if tag_name is not None:
       s += ' ' + tag_name
     s += ' {'
-    s += '\t\t// size: ' + str(t['size'])
+    s += '\t\t// size: ' + hex(t['size'])
     first_elem = True
     for e in reversed(t['fields']):
       s += '\n'
       s += ' ' * (indent * INDENT_SPACES)
       s += (' ' * INDENT_SPACES) + resolve_type_str(module, e['type_idx'], e['name']);
-      if e['type'] == 'BIT_BYTE':
+      if e['type'] == 'BIT_BYTE' or e['type'] == 'BIT_WORD':
         s += ': ' + str(e['bit_size'])
       s += ';'
-      s += '\t\t// @' + str(e['offset'])
+      s += '\t\t// @' + hex(e['offset'])
       first_elem = False
     s += '\n' + ' ' * (indent * INDENT_SPACES) + '}'
+    if get_struct_name(module, t) is None:
+      s += ' ' + name
     return s
   elif t['type'] == 'NEAR386 PROC':
     return_type = resolve_type_str(module, t['return_type'], '')
@@ -576,7 +579,7 @@ def generate_c_skeleton():
   global br_types_file
 
   try:
-    shutil.rmtree(BASE_OUTPUT_DIR)
+    shutil.rmtree(BASE_OUTPUT_DIR + '/*')
   except:
     pass
   mkdir_p(BASE_OUTPUT_DIR + '/types')

@@ -12,6 +12,7 @@
 #include "globvrkm.h"
 #include "graphics.h"
 #include "init.h"
+#include "input.h"
 #include "newgame.h"
 #include "opponent.h"
 #include "pc-dos/dossys.h"
@@ -485,8 +486,23 @@ void LoadInRegistees() {
 // Offset: 5652
 // Size: 182
 void LoadKeyMapping() {
+    FILE* f;
     tPath_name the_path;
     int i;
+    LOG_TRACE("()");
+
+    PathCat(the_path, gApplication_path, "KEYMAP_X.TXT");
+    the_path[strlen(the_path) - 5] = gKey_map_index + 48;
+    f = DRfopen(the_path, "rt");
+    if (!f) {
+        FatalError(9);
+    }
+
+    for (i = 0; i < 67; i++) {
+        fscanf(f, "%d", &gKey_mapping[i]);
+    }
+
+    fclose(f);
 }
 
 // Offset: 5836

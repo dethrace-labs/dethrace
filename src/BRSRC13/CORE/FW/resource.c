@@ -1,6 +1,7 @@
 #include "resource.h"
 
 #include "brlists.h"
+#include "debug.h"
 #include "fwsetup.h"
 #include "mem.h"
 #include <stdio.h>
@@ -31,6 +32,7 @@ void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class) {
     br_int_32 calign;
     br_int_32 pad;
     br_int_32 actual_pad;
+    LOG_TRACE("(%p, %d, %d)", vparent, size, res_class);
 
     br_int_32 actual_pad_2;
     char* tmp;
@@ -56,6 +58,7 @@ void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class) {
     res->size_l = actual_pad_2 >> 2;
     res->size_m = actual_pad_2 >> 10;
     res->size_h = actual_pad_2 >> 18;
+
     BrSimpleNewList(&res->children);
     res->magic_ptr = res;
     res->magic_num = 0xDEADBEEF;

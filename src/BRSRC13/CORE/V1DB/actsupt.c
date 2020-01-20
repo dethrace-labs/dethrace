@@ -1,4 +1,12 @@
+#include <stdio.h>
+
+#include "CORE/FW/brlists.h"
+#include "CORE/FW/fwsetup.h"
+#include "CORE/FW/resource.h"
+#include "CORE/MATH/matrix34.h"
+#include "CORE/V1DB/dbsetup.h"
 #include "actsupt.h"
+#include "debug.h"
 
 char rscid[53];
 
@@ -59,6 +67,53 @@ br_actor* BrActorAllocate(br_uint_8 type, void* type_data) {
     br_camera* camera;
     br_bounds* bounds;
     br_vector4* clip_plane;
+    LOG_TRACE("(%d, %p)", type, type_data);
+
+    a = BrResAllocate(v1db.res, sizeof(br_actor), BR_MEMORY_ACTOR);
+    BrSimpleNewList((br_simple_list*)a->children);
+    a->type = type;
+    a->depth = 0;
+    a->t.type = 0;
+    BrMatrix34Identity(&a->t.t.mat);
+    if (type_data) {
+        a->type_data = type_data;
+    } else {
+        switch (type) {
+        case BR_ACTOR_LIGHT:
+            light = BrResAllocate(a, sizeof(br_light), BR_MEMORY_LIGHT);
+            a->type_data = light;
+            light->type = BR_LIGHT_DIRECT;
+            light->colour = BR_COLOUR_RGB(255, 255, 255);
+            light->attenuation_c = 1.0f;
+            light->cone_outer = BR_ANGLE_DEG(15);
+            light->cone_inner = BR_ANGLE_DEG(10);
+            break;
+        case BR_ACTOR_CAMERA:
+            camera = (br_camera*)BrResAllocate(a, sizeof(br_camera), BR_MEMORY_CAMERA);
+            a->type_data = camera;
+            camera->type = BR_CAMERA_PERSPECTIVE_FOV;
+            camera->field_of_view = BR_ANGLE_DEG(45.0f);
+            camera->hither_z = 1.0f;
+            camera->yon_z = 10.0f;
+            camera->aspect = 1.0f;
+            break;
+        case BR_ACTOR_BOUNDS:
+        case BR_ACTOR_BOUNDS_CORRECT:
+            bounds = BrResAllocate(a, sizeof(br_bounds), BR_MEMORY_CLIP_PLANE);
+            a->type_data = bounds;
+            break;
+        case BR_ACTOR_CLIP_PLANE:
+            clip_plane = BrResAllocate(a, sizeof(br_vector4), BR_MEMORY_CLIP_PLANE);
+            clip_plane->v[0] = 0;
+            clip_plane->v[1] = 0;
+            clip_plane->v[2] = 1.0;
+            clip_plane->v[3] = 0;
+            a->type_data = clip_plane;
+        default:
+            printf("Warning: Unknown type for BrActorAllocate");
+        }
+    }
+    return a;
 }
 
 // Offset: 1907
