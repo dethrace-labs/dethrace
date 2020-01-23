@@ -1,5 +1,6 @@
 #include "enables.h"
 #include "dbsetup.h"
+#include <stddef.h>
 
 char rscid[51];
 
@@ -129,4 +130,14 @@ void BrSetupHorizons(br_actor* world, br_matrix34* world_to_view, br_int_32 w2vt
 // Size: 136
 // EAX: a
 void BrActorEnableCheck(br_actor* a) {
+    if (v1db.enabled_environment == a) {
+        v1db.enabled_environment = NULL;
+    }
+    if (a->type == BR_ACTOR_LIGHT) {
+        actorDisable(&v1db.enabled_lights, a);
+    } else if (a->type == BR_ACTOR_MAX) {
+        actorDisable(&v1db.enabled_horizon_planes, a);
+    } else if (a->type <= BR_ACTOR_CLIP_PLANE) {
+        actorDisable(&v1db.enabled_clip_planes, a);
+    }
 }

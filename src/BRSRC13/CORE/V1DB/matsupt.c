@@ -1,4 +1,5 @@
 #include "matsupt.h"
+#include <stddef.h>
 
 char rscid[49];
 
@@ -6,6 +7,7 @@ char rscid[49];
 // Size: 138
 br_material* BrMaterialAllocate(char* name) {
     br_material* m;
+    return NULL;
 }
 
 // Offset: 172

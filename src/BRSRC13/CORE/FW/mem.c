@@ -20,6 +20,7 @@ void* BrMemAllocate(br_size_t size, br_uint_8 type) {
 // Offset: 177
 // Size: 106
 void BrMemFree(void* block) {
+    LOG_TRACE("(%p)", block);
     fw.mem->free(block);
 }
 

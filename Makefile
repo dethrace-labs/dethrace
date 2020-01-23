@@ -20,7 +20,7 @@ test: build
 	@echo "Building tests"
 	@$(MAKE) -C test build
 	@cp -r test/assets/DATA test/build
-	@(cd test/build && ./c1tests)
+	@(cd test/build && ./c1tests $$DR_TEST_ARGS)
 
 run: build
 	@echo "Running dethrace"

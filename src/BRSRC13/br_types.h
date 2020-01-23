@@ -1347,21 +1347,21 @@ typedef struct br_tri_strip {
     br_strip_face_data* face_data;
 } br_tri_strip;
 
-typedef struct br_actor {
-    br_actor* next;
-    br_actor* prev;
-    br_actor* children;
-    br_actor* parent;
-    br_uint_16 depth;
-    br_uint_8 type;
-    char* identifier;
-    br_model* model;
-    br_material* material;
-    br_uint_8 render_style;
-    void* render_data;
-    br_transform t;
-    void* type_data;
-    void* user;
+typedef struct br_actor { // size: 0x64
+    br_actor* next; // @0x0
+    br_actor** prev; // @0x4
+    br_actor* children; // @0x8
+    br_actor* parent; // @0xc
+    br_uint_16 depth; // @0x10
+    br_uint_8 type; // @0x12
+    char* identifier; // @0x14
+    br_model* model; // @0x18
+    br_material* material; // @0x1c
+    br_uint_8 render_style; // @0x20
+    void* render_data; // @0x24
+    br_transform t; // @0x28
+    void* type_data; // @0x5c
+    void* user; // @0x60
 } br_actor;
 
 typedef struct br_model {
@@ -1469,7 +1469,7 @@ typedef struct br_simple_node br_simple_node;
 typedef struct br_simple_node {
     br_simple_node* next;
     // TODO: We changed this from "** prev" to "*prev". Is this really correct?
-    br_simple_node* prev;
+    br_simple_node** prev;
 } br_simple_node;
 
 typedef struct br_simple_list {

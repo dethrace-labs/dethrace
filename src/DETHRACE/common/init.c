@@ -120,11 +120,13 @@ void InitializeBRenderEnvironment() {
     if (!gSelf) {
         FatalError(6);
     }
-    AllocateCamera();
-    arrow_model = LoadModel("CPOINT.DAT");
-    BrModelAdd(arrow_model);
-    gArrow_actor = LoadActor("CPOINT.ACT");
-    gArrow_actor->model = arrow_model;
+    // LOG_DEBUG("after4");
+    // AllocateCamera();
+    // LOG_DEBUG("after5");
+    // arrow_model = LoadModel("CPOINT.DAT");
+    // BrModelAdd(arrow_model);
+    // gArrow_actor = LoadActor("CPOINT.ACT");
+    // gArrow_actor->model = arrow_model;
 }
 
 // Offset: 2496
@@ -178,27 +180,35 @@ void InitialiseApplication(int pArgc, char** pArgv) {
     strcpy(gProgram_state.player_name[1], "DIE ANNA");
 
     RestoreOptions();
+
     LoadKeyMapping();
+
     if (!PDInitScreenVars(pArgc, pArgv)) {
         FatalError(0);
     }
     CalcGrafDataIndex();
+
     InitializeBRenderEnvironment();
     InitDRFonts();
     InitBRFonts();
     LoadMiscStrings();
     LoadInRegistees();
     FinishLoadingGeneral();
+
     InitializePalettes();
     AustereWarning();
     LoadInterfaceStrings();
+
     InitializeActionReplay();
     FlicPaletteAllocate();
     InitInterfaceLoadState();
+
     InitTransientBitmaps();
     InitSound();
     InitHeadups();
+
     gDefault_track_material = BrMaterialAllocate("gDefault_track_material");
+    // TODO: once we can allocate materials
     gDefault_track_material->index_base = 227;
     gDefault_track_material->index_range = 1;
     BrMaterialAdd(gDefault_track_material);
@@ -221,6 +231,7 @@ void InitialiseApplication(int pArgc, char** pArgv) {
         while (PDGetTotalTime() - gAustere_time < 2000) {
         }
     }
+
     ClearEntireScreen();
     InitSkids();
     InitPeds();

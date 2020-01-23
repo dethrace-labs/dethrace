@@ -48,6 +48,36 @@ void test_brlists_BrSimpleList() {
     free(three);
 }
 
+void test_brlists_BrSimpleRemove() {
+    br_simple_list list;
+    br_simple_node one;
+    br_simple_node two;
+    br_simple_node three;
+
+    BrSimpleNewList(&list);
+    TEST_ASSERT_NULL(list.head);
+    BrSimpleAddHead(&list, &one);
+    TEST_ASSERT_NOT_NULL(list.head);
+    BrSimpleRemove(&one);
+
+    // removed the only item, so head points to null
+    TEST_ASSERT_NULL(list.head);
+    TEST_ASSERT_NULL(one.next);
+    TEST_ASSERT_NULL(one.prev);
+
+    BrSimpleAddHead(&list, &one);
+    BrSimpleAddHead(&list, &two);
+    BrSimpleAddHead(&list, &three);
+    BrSimpleRemove(&two);
+
+    // we removed the middle element, so we are left with head -> 3 -> 1 and list <- 3 <- 1
+    TEST_ASSERT_EQUAL_PTR(&three, list.head);
+    TEST_ASSERT_EQUAL_PTR(three.next, &one);
+    TEST_ASSERT_EQUAL_PTR(one.prev, &three);
+    TEST_ASSERT_EQUAL_PTR(three.prev, &list);
+}
+
 void test_brlists_suite() {
     RUN_TEST(test_brlists_BrSimpleList);
+    RUN_TEST(test_brlists_BrSimpleRemove);
 }

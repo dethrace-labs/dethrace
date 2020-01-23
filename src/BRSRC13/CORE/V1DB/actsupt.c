@@ -5,6 +5,7 @@
 #include "CORE/FW/resource.h"
 #include "CORE/MATH/matrix34.h"
 #include "CORE/V1DB/dbsetup.h"
+#include "CORE/V1DB/enables.h"
 #include "actsupt.h"
 #include "debug.h"
 
@@ -70,15 +71,19 @@ br_actor* BrActorAllocate(br_uint_8 type, void* type_data) {
     LOG_TRACE("(%d, %p)", type, type_data);
 
     a = BrResAllocate(v1db.res, sizeof(br_actor), BR_MEMORY_ACTOR);
-    BrSimpleNewList((br_simple_list*)a->children);
+    BrSimpleNewList(&a->children);
     a->type = type;
     a->depth = 0;
     a->t.type = 0;
+    a->type_data = NULL;
     BrMatrix34Identity(&a->t.t.mat);
+
     if (type_data) {
         a->type_data = type_data;
     } else {
         switch (type) {
+        case BR_ACTOR_NONE:
+            break;
         case BR_ACTOR_LIGHT:
             light = BrResAllocate(a, sizeof(br_light), BR_MEMORY_LIGHT);
             a->type_data = light;
@@ -110,7 +115,7 @@ br_actor* BrActorAllocate(br_uint_8 type, void* type_data) {
             clip_plane->v[3] = 0;
             a->type_data = clip_plane;
         default:
-            printf("Warning: Unknown type for BrActorAllocate");
+            LOG_WARN("Warning: Unknown type %d for BrActorAllocate", type);
         }
     }
     return a;
@@ -120,11 +125,23 @@ br_actor* BrActorAllocate(br_uint_8 type, void* type_data) {
 // Size: 152
 // EAX: a
 void InternalActorFree(br_actor* a) {
+    while (a->children) {
+        BrSimpleRemove((br_simple_node*)a->children);
+        InternalActorFree(a);
+    }
+    BrActorEnableCheck(a);
+    BrResFree(a);
 }
 
 // Offset: 2071
 // Size: 103
 void BrActorFree(br_actor* a) {
+    while (a->children != NULL) {
+        BrSimpleRemove(a->children);
+        InternalActorFree(a);
+    }
+    BrActorEnableCheck(a);
+    BrResFree(a);
 }
 
 // Offset: 2186
