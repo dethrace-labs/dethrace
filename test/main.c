@@ -23,11 +23,12 @@ extern void test_controls_suite();
 extern void test_input_suite();
 extern void test_errors_suite();
 extern void test_dossys_suite();
-
+extern void test_init_suite();
 extern void test_brlists_suite();
 extern void test_fwsetup_suite();
 extern void test_resource_suite();
 extern void test_actsupt_suite();
+extern void test_genclip_suite();
 
 void setUp(void) {
 }
@@ -62,9 +63,11 @@ int main(int argc, char** argv) {
     test_fwsetup_suite();
     test_resource_suite();
     test_actsupt_suite();
+    test_genclip_suite();
 
     // DETHRACE
     test_utility_suite();
+    test_init_suite();
     test_loading_suite();
     test_controls_suite();
     test_input_suite();

@@ -114,6 +114,7 @@ br_actor* BrActorAllocate(br_uint_8 type, void* type_data) {
             clip_plane->v[2] = 1.0;
             clip_plane->v[3] = 0;
             a->type_data = clip_plane;
+            break;
         default:
             LOG_WARN("Warning: Unknown type %d for BrActorAllocate", type);
         }
@@ -136,7 +137,7 @@ void InternalActorFree(br_actor* a) {
 // Offset: 2071
 // Size: 103
 void BrActorFree(br_actor* a) {
-    while (a->children != NULL) {
+    while (a->children) {
         BrSimpleRemove(a->children);
         InternalActorFree(a);
     }

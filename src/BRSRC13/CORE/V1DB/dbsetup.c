@@ -7,6 +7,7 @@
 #include "CORE/STD/brstdlib.h"
 #include "CORE/V1DB/def_mat.h"
 #include "CORE/V1DB/def_mdl.h"
+#include "debug.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -133,6 +134,7 @@ br_error BrV1dbRendererEnd() {
 // Offset: 2029
 // Size: 94
 void BrZbBegin(br_uint_8 colour_type, br_uint_8 depth_type) {
+    LOG_TRACE("(%d, %d)", colour_type, depth_type);
 }
 
 // Offset: 2133

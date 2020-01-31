@@ -1,5 +1,12 @@
 #include "graphics.h"
 
+#include "brender.h"
+#include "errors.h"
+#include "globvars.h"
+#include "init.h"
+#include "pc-dos/dossys.h"
+#include "utility.h"
+
 #include <math.h>
 
 int gArrows[2][4][60];
@@ -244,6 +251,39 @@ void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
 // EBX: pWidth
 // ECX: pHeight
 void SetBRenderScreenAndBuffers(int pX_offset, int pY_offset, int pWidth, int pHeight) {
+    LOG_TRACE("(%d, %d, %d, %d)", pX_offset, pY_offset, pWidth, pHeight);
+
+    PDInitScreen();
+    if (!pWidth) {
+        pWidth = gBack_screen->width;
+    }
+    if (!pHeight) {
+        pHeight = gBack_screen->height;
+    }
+    gRender_screen = DRPixelmapAllocateSub(gBack_screen, pX_offset, pY_offset, pHeight, pWidth);
+    gWidth = pWidth;
+    gHeight = pHeight;
+    gY_offset = pY_offset;
+    gX_offset = pX_offset;
+    if (gGraf_specs[gGraf_spec_index].doubled) {
+        gScreen->base_x = (gGraf_specs[gGraf_spec_index].phys_width - 2 * gGraf_specs[gGraf_spec_index].total_width) / 2;
+        gScreen->base_y = (gGraf_specs[gGraf_spec_index].phys_height - 2 * gGraf_specs[gGraf_spec_index].total_height) / 2;
+    } else {
+        gScreen->base_x = (gGraf_specs[gGraf_spec_index].phys_width - gGraf_specs[gGraf_spec_index].total_width) / 2;
+        gScreen->base_y = (gGraf_specs[gGraf_spec_index].phys_height - gGraf_specs[gGraf_spec_index].total_height) / 2;
+    }
+
+    gScreen->origin_x = 0;
+    gScreen->origin_y = 0;
+    if (!gBack_screen) {
+        FatalError(1);
+    }
+    gDepth_buffer = BrPixelmapMatch(gBack_screen, BR_PMMATCH_DEPTH_16);
+    if (!gDepth_buffer) {
+        FatalError(2);
+    }
+    BrZbBegin(gRender_screen->type, gDepth_buffer->type);
+    gBrZb_initialized = 1;
 }
 
 // Offset: 3284

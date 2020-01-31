@@ -7,6 +7,7 @@
 extern int gCredits_per_rank[3];
 extern int gInitial_credits[3];
 extern int gInitial_rank;
+extern int gBrZb_initialized;
 
 // Offset: 0
 // Size: 115

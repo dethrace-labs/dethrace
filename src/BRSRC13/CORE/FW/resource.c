@@ -1,6 +1,7 @@
 #include "resource.h"
 
 #include "brlists.h"
+#include "brstdlib.h"
 #include "debug.h"
 #include "fwsetup.h"
 #include "mem.h"
@@ -118,12 +119,11 @@ void BrResFree(void* vres) {
     // go backwards through padding until we hit the end of resource_header
     while (*(char*)vres == 0) {
         vres = (char*)vres - 1;
-        LOG_DEBUG("jump");
     }
     // jump one more step backwards to start of resource_header
     vres = (char*)vres + 1;
     vres = ((resource_header*)vres - 1);
-    //TODO assert magic_num
+    //TODO: assert magic_num
     BrResInternalFree(vres, 1);
 }
 
@@ -195,6 +195,11 @@ br_uint_32 BrResCheck(void* vres, int no_tag) {
 char* BrResStrDup(void* vparent, char* str) {
     int l;
     char* nstr;
+
+    l = BrStrLen(str);
+    nstr = (char*)BrResAllocate(vparent, l + 1, BR_MEMORY_STRING);
+    BrStrCpy(nstr, str);
+    return nstr;
 }
 
 // Offset: 3026

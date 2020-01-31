@@ -10,6 +10,7 @@
 #include "common/errors.h"
 #include "common/flicplay.h"
 #include "common/globvars.h"
+#include "common/globvrkm.h"
 #include "common/grafdata.h"
 #include "common/graphics.h"
 #include "common/loading.h"
@@ -46,7 +47,50 @@ void AllocateSelf() {
 // Offset: 116
 // Size: 514
 void AllocateCamera() {
+    br_camera* camera_ptr;
     int i;
+    LOG_TRACE("()");
+
+    for (i = 0; i < 2; i++) {
+        gCamera_list[i] = BrActorAllocate(BR_ACTOR_CAMERA, NULL);
+        if (!gCamera_list[i]) {
+            FatalError(5);
+        }
+
+        camera_ptr = gCamera_list[i]->type_data;
+        camera_ptr->type = 1;
+        camera_ptr->field_of_view = BR_ANGLE_DEG(gCamera_angle);
+        camera_ptr->hither_z = gCamera_hither;
+        camera_ptr->yon_z = gCamera_yon;
+        camera_ptr->aspect = (double)gWidth / (double)gHeight;
+    }
+
+    gCamera_list[0] = BrActorAdd(gSelf, gCamera_list[0]);
+    if (!gCamera_list[0]) {
+        FatalError(5);
+    }
+    gCamera_list[1] = BrActorAdd(gUniverse_actor, gCamera_list[1]);
+    if (!gCamera_list[1]) {
+        FatalError(5);
+    }
+    gCamera = gCamera_list[0];
+    gRearview_camera = BrActorAllocate(BR_ACTOR_CAMERA, NULL);
+    if (!gRearview_camera) {
+        FatalError(5);
+    }
+
+    gRearview_camera->t.t.mat.m[2][2] = -1.0f;
+    camera_ptr = (br_camera*)gRearview_camera->type_data;
+    camera_ptr->hither_z = gCamera_hither;
+    camera_ptr->type = 1;
+    camera_ptr->yon_z = gCamera_yon;
+    camera_ptr->field_of_view = BR_ANGLE_DEG(gCamera_angle);
+    camera_ptr->aspect = (double)gWidth / (double)gHeight;
+    gRearview_camera = BrActorAdd(gSelf, gRearview_camera);
+    if (!gRearview_camera) {
+        FatalError(5);
+    }
+    SetSightDistance(camera_ptr->yon_z);
 }
 
 // Offset: 632
@@ -120,13 +164,11 @@ void InitializeBRenderEnvironment() {
     if (!gSelf) {
         FatalError(6);
     }
-    // LOG_DEBUG("after4");
-    // AllocateCamera();
-    // LOG_DEBUG("after5");
-    // arrow_model = LoadModel("CPOINT.DAT");
-    // BrModelAdd(arrow_model);
-    // gArrow_actor = LoadActor("CPOINT.ACT");
-    // gArrow_actor->model = arrow_model;
+    AllocateCamera();
+    arrow_model = LoadModel("CPOINT.DAT");
+    BrModelAdd(arrow_model);
+    gArrow_actor = LoadActor("CPOINT.ACT");
+    gArrow_actor->model = arrow_model;
 }
 
 // Offset: 2496
@@ -208,7 +250,6 @@ void InitialiseApplication(int pArgc, char** pArgv) {
     InitHeadups();
 
     gDefault_track_material = BrMaterialAllocate("gDefault_track_material");
-    // TODO: once we can allocate materials
     gDefault_track_material->index_base = 227;
     gDefault_track_material->index_range = 1;
     BrMaterialAdd(gDefault_track_material);
