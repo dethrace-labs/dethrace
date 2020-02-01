@@ -1,6 +1,9 @@
 #include "pmdsptch.h"
 
+#include "debug.h"
+#include "pmmem.h"
 #include <stdarg.h>
+#include <stdlib.h>
 
 char rscid[65];
 
@@ -9,6 +12,14 @@ char rscid[65];
 br_pixelmap* BrPixelmapAllocateSub(br_pixelmap* src, br_int_32 x, br_int_32 y, br_int_32 w, br_int_32 h) {
     br_pixelmap* new;
     br_rectangle r;
+    LOG_TRACE("(%p, %d, %d, %d, %d)", src, x, y, w, h);
+
+    r.h = h;
+    r.w = w;
+    r.x = x;
+    r.y = y;
+    _M_br_device_pixelmap_mem_allocateSub((br_device_pixelmap*)src, (br_device_pixelmap**)&new, &r);
+    return new;
 }
 
 // Offset: 144
@@ -26,6 +37,32 @@ br_pixelmap* BrPixelmapResize(br_pixelmap* src, br_int_32 width, br_int_32 heigh
 br_pixelmap* BrPixelmapMatch(br_pixelmap* src, br_uint_8 match_type) {
     br_pixelmap* new;
     br_token_value tv[3];
+    new = NULL;
+    LOG_TRACE("(%p, %d)", src, match_type);
+
+    CheckDispatch((br_device_pixelmap*)src);
+
+    switch (match_type) {
+    case 0u:
+        tv[1].t = BRT_OFFSCREEN;
+        break;
+    case 1u:
+        tv[2].t = BRT_VECTOR2_INTEGER;
+        tv[1].t = BRT_DEPTH;
+        tv[1].v.u32 = 76;
+        break;
+    default:
+        LOG_PANIC("Case %d not implemented", match_type);
+    }
+
+    //((br_device_pixelmap*)src)->dispatch->_match((br_device_pixelmap*)src, (br_device_pixelmap**)&new, &tv[0]);
+    LOG_DEBUG("new1 %p, %p\n", new, &new);
+    if (_M_br_device_pixelmap_mem_match((br_device_pixelmap*)src, (br_device_pixelmap**)&new, &tv[0]) != 0) {
+        LOG_WARN("_M_br_device_pixelmap_mem_match returned error");
+        return NULL;
+    }
+    LOG_DEBUG("new %p, %d\n", new, new->width);
+    return new;
 }
 
 // Offset: 839

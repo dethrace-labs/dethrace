@@ -1,5 +1,5 @@
 #include "brlists.h"
-
+#include "debug.h"
 #include <stdio.h>
 #include <unistd.h>
 
@@ -48,6 +48,7 @@ br_node* BrRemove(br_node* node) {
 // Offset: 573
 // Size: 39
 void BrSimpleNewList(br_simple_list* list) {
+    LOG_TRACE("(%p)", list);
     list->head = NULL;
 }
 
@@ -76,4 +77,11 @@ void BrSimpleInsert(br_simple_list* list, br_simple_node* here, br_simple_node* 
 // Offset: 891
 // Size: 93
 br_simple_node* BrSimpleRemove(br_simple_node* node) {
+    *node->prev = node->next;
+    if (node->next) {
+        node->next->prev = node->prev;
+    }
+    node->next = NULL;
+    node->prev = NULL;
+    return node;
 }

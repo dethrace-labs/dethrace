@@ -7,6 +7,7 @@
 #include "CORE/STD/brstdlib.h"
 #include "CORE/V1DB/def_mat.h"
 #include "CORE/V1DB/def_mdl.h"
+#include "debug.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -52,7 +53,7 @@ br_error BrV1dbBegin() {
         BrResClassAdd(&v1db_resourceClasses[i]);
     }
 
-    v1db.default_model = (br_model*)BrResAllocate(v1db.res, sizeof(br_model), BR_MEMORY_MODEL);
+    v1db.default_model = BrResAllocate(v1db.res, sizeof(br_model), BR_MEMORY_MODEL);
     memcpy(v1db.default_model, &_BrDefaultModel, sizeof(br_model));
     v1db.default_material = SetupDefaultMaterial();
     v1db.enabled_lights.type = 2;
@@ -133,6 +134,7 @@ br_error BrV1dbRendererEnd() {
 // Offset: 2029
 // Size: 94
 void BrZbBegin(br_uint_8 colour_type, br_uint_8 depth_type) {
+    LOG_TRACE("(%d, %d)", colour_type, depth_type);
 }
 
 // Offset: 2133

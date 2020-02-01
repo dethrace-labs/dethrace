@@ -6,6 +6,7 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "brender.h"
 #include "common/car.h"
 #include "common/drdebug.h"
 #include "common/globvars.h"
@@ -305,6 +306,16 @@ int PDInitScreenVars(int pArgc, char** pArgv) {
 // Offset: 3300
 // Size: 24
 void PDInitScreen() {
+    gScreen = DOSGfxBegin(gGraf_specs[gGraf_spec_index].gfx_init_string);
+    gScreen->origin_x = 0;
+    gDOSGfx_initialized = 1;
+    gScreen->origin_y = 0;
+    gBack_screen = BrPixelmapMatch(gScreen, BR_PMMATCH_OFFSCREEN);
+    gBack_screen->origin_x = 0;
+    gBack_screen->origin_y = 0;
+    gTemp_screen = BrPixelmapMatch(gScreen, BR_PMMATCH_OFFSCREEN);
+    gTemp_screen->origin_x = 0;
+    gTemp_screen->origin_y = 0;
 }
 
 // Offset: 3324

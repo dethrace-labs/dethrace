@@ -1,6 +1,8 @@
 #include "resource.h"
 
 #include "brlists.h"
+#include "brstdlib.h"
+#include "debug.h"
 #include "fwsetup.h"
 #include "mem.h"
 #include <stdio.h>
@@ -31,6 +33,7 @@ void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class) {
     br_int_32 calign;
     br_int_32 pad;
     br_int_32 actual_pad;
+    LOG_TRACE("(%p, %d, %d)", vparent, size, res_class);
 
     br_int_32 actual_pad_2;
     char* tmp;
@@ -49,6 +52,7 @@ void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class) {
     actual_pad_2 = (size + sizeof(resource_header) + 3) & 0xFFFC;
 
     res = (resource_header*)BrMemAllocate(size + actual_pad, res_class);
+    LOG_DEBUG("allocated r %p\n", res);
     // TOOD: ?
     // if ((signed int)(((unsigned int)((char*)allocated + res_align_1) & ~res_align_1) - (_DWORD)allocated) > v8)
     //     BrFailure((int)"Memory allocator broke alignment", v14);
@@ -56,6 +60,7 @@ void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class) {
     res->size_l = actual_pad_2 >> 2;
     res->size_m = actual_pad_2 >> 10;
     res->size_h = actual_pad_2 >> 18;
+
     BrSimpleNewList(&res->children);
     res->magic_ptr = res;
     res->magic_num = 0xDEADBEEF;
@@ -79,11 +84,47 @@ void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class) {
 void BrResInternalFree(resource_header* res, br_boolean callback) {
     int c;
     void* r;
+    LOG_TRACE("(%p, %d)", res, callback);
+
+    c = res->class;
+    if (c != 127) {
+        //v5 = fw.resource_class_index[c]->alignment;
+        //if ((signed int)v5 <= 0)
+        //    v5 = 4;
+        res->class = 127;
+        if (callback && fw.resource_class_index[c]->free_cb) {
+            // TODO: we should return address of the user-facing data, not the resource_header
+            //~(v5 - 1) & (unsigned int)((char*)&res->magic_num + v5 + 3),
+            fw.resource_class_index[c]->free_cb(res, c, (res->size_h << 18) | 4 * res->size_l | (res->size_m << 10));
+        }
+
+        while (res->children.head) {
+            r = BrSimpleRemove(res->children.head);
+            BrResInternalFree((resource_header*)r, 1);
+        }
+        if (res->node.prev) {
+            BrSimpleRemove(&res->node);
+        }
+        res->magic_num = 1;
+        res->magic_ptr = 0;
+        BrMemFree(res);
+    }
 }
 
 // Offset: 1148
 // Size: 79
 void BrResFree(void* vres) {
+    LOG_TRACE("(%p)", vres);
+
+    // go backwards through padding until we hit the end of resource_header
+    while (*(char*)vres == 0) {
+        vres = (char*)vres - 1;
+    }
+    // jump one more step backwards to start of resource_header
+    vres = (char*)vres + 1;
+    vres = ((resource_header*)vres - 1);
+    //TODO: assert magic_num
+    BrResInternalFree(vres, 1);
 }
 
 // Offset: 1247
@@ -154,6 +195,11 @@ br_uint_32 BrResCheck(void* vres, int no_tag) {
 char* BrResStrDup(void* vparent, char* str) {
     int l;
     char* nstr;
+
+    l = BrStrLen(str);
+    nstr = (char*)BrResAllocate(vparent, l + 1, BR_MEMORY_STRING);
+    BrStrCpy(nstr, str);
+    return nstr;
 }
 
 // Offset: 3026

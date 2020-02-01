@@ -2,7 +2,7 @@
 #define DR_TYPES_H
 
 #include "br_types.h"
-#include "new/debug.h"
+#include "debug.h"
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -75,6 +75,7 @@ typedef tU8 tNet_message_type;
 typedef char* tS3_sound_source_ptr;
 typedef int tS3_sound_tag;
 typedef struct tCar_spec_struct tCar_spec;
+typedef struct tCar_spec_struct2 tCar_spec2;
 typedef struct tPath_node_struct tPath_node;
 typedef struct tPath_section_struct tPath_section;
 typedef tU32 tPlayer_ID;
@@ -709,7 +710,7 @@ typedef struct _tagNETBIOS_ADAPTER_STATUS {
         BYTE bName[16];
         BYTE bNameNumber;
         BYTE bNameStatus;
-    };
+    } sNameTable;
 } _NETBIOS_ADAPTER_STATUS;
 
 typedef struct _tagNETBIOS_ELEMENT {
@@ -1676,45 +1677,45 @@ typedef struct tNet_message_crush_point {
     br_vector3 energy_vector;
 } tNet_message_crush_point;
 
-typedef struct tNet_contents {
-    struct {
-        tU8 contents_size;
-        tNet_message_type type;
-    };
-    struct {
-        tNet_message_send_me_details send_details;
-        tNet_message_my_details details;
-        tNet_message_join join;
-        tNet_message_leave leave;
-        tNet_message_host_pissing_off hosticide;
-        tNet_message_new_player_list player_list;
-        tNet_message_race_over race_over;
-        tNet_message_status_report report;
-        tNet_message_start_race start_race;
-        tNet_message_guarantee_reply reply;
-        tNet_message_headup headup;
-        tNet_message_host_query where_we_at;
-        tNet_message_host_reply heres_where_we_at;
-        tNet_message_mechanics_info mech;
-        tNet_message_non_car_info non_car;
-        tNet_message_time_sync time_sync;
-        tNet_message_players_confirm confirm;
-        tNet_message_disable_car disable_car;
-        tNet_message_enable_car enabled_car;
-        tNet_message_powerup powerup;
-        tNet_message_recover recover;
-        tNet_message_scores scores;
-        tNet_message_wasted wasted;
-        tNet_message_pedestrian pedestrian;
-        tNet_message_gameplay gameplay;
-        tNet_message_non_car_position non_car_position;
-        tNet_message_cop_info cop_info;
-        tNet_message_car_details_req car_details_req;
-        tNet_message_car_details car_details;
-        tNet_message_game_scores game_scores;
-        tNet_message_oil_spill oil_spill;
-        tNet_message_crush_point crush;
-    };
+typedef union tNet_contents { // size: 0x160
+    struct { // size: 0x2
+        tU8 contents_size; // @0x0
+        tNet_message_type type; // @0x1
+    } header; // @0x0
+    union { // size: 0x160
+        tNet_message_send_me_details send_details; // @0x0
+        tNet_message_my_details details; // @0x0
+        tNet_message_join join; // @0x0
+        tNet_message_leave leave; // @0x0
+        tNet_message_host_pissing_off hosticide; // @0x0
+        tNet_message_new_player_list player_list; // @0x0
+        tNet_message_race_over race_over; // @0x0
+        tNet_message_status_report report; // @0x0
+        tNet_message_start_race start_race; // @0x0
+        tNet_message_guarantee_reply reply; // @0x0
+        tNet_message_headup headup; // @0x0
+        tNet_message_host_query where_we_at; // @0x0
+        tNet_message_host_reply heres_where_we_at; // @0x0
+        tNet_message_mechanics_info mech; // @0x0
+        tNet_message_non_car_info non_car; // @0x0
+        tNet_message_time_sync time_sync; // @0x0
+        tNet_message_players_confirm confirm; // @0x0
+        tNet_message_disable_car disable_car; // @0x0
+        tNet_message_enable_car enabled_car; // @0x0
+        tNet_message_powerup powerup; // @0x0
+        tNet_message_recover recover; // @0x0
+        tNet_message_scores scores; // @0x0
+        tNet_message_wasted wasted; // @0x0
+        tNet_message_pedestrian pedestrian; // @0x0
+        tNet_message_gameplay gameplay; // @0x0
+        tNet_message_non_car_position non_car_position; // @0x0
+        tNet_message_cop_info cop_info; // @0x0
+        tNet_message_car_details_req car_details_req; // @0x0
+        tNet_message_car_details car_details; // @0x0
+        tNet_message_game_scores game_scores; // @0x0
+        tNet_message_oil_spill oil_spill; // @0x0
+        tNet_message_crush_point crush; // @0x0
+    } data; // @0x0
 } tNet_contents;
 
 typedef struct tNet_message {
@@ -2487,18 +2488,18 @@ typedef struct tReduced_pos {
     tS16 v[3];
 } tReduced_pos;
 
-typedef struct tIncident_info {
-    struct {
-        tCar_spec* car;
-        br_vector3 impact_point;
-    };
-    struct {
-        br_actor* ped_actor;
-        br_actor* murderer_actor;
-    };
-    struct {
-        br_vector3 pos;
-    };
+typedef union tIncident_info { // size: 0x10
+    struct { // size: 0x10
+        tCar_spec* car; // @0x0
+        br_vector3 impact_point; // @0x4
+    } car_info; // @0x0
+    struct { // size: 0x8
+        br_actor* ped_actor; // @0x0
+        br_actor* murderer_actor; // @0x4
+    } ped_info; // @0x0
+    struct { // size: 0xc
+        br_vector3 pos; // @0x0
+    } wall_info; // @0x0
 } tIncident_info;
 
 typedef struct tChanged_vertex {
@@ -2614,21 +2615,21 @@ typedef struct tPipe_ped_gib_data {
     br_matrix34 transform;
 } tPipe_ped_gib_data;
 
-typedef struct tPipe_incident_data {
-    float severity;
-    struct {
-        struct {
-            tU16 car_ID;
-            br_vector3 impact_point;
-        };
-        struct {
-            tU16 ped_index;
-            br_actor* actor;
-        };
-        struct {
-            br_vector3 pos;
-        };
-    };
+typedef struct tPipe_incident_data { // size: 0x14
+    float severity; // @0x0
+    union { // size: 0x10
+        struct { // size: 0x10
+            tU16 car_ID; // @0x0
+            br_vector3 impact_point; // @0x4
+        } car_info; // @0x0
+        struct { // size: 0x8
+            tU16 ped_index; // @0x0
+            br_actor* actor; // @0x4
+        } ped_info; // @0x0
+        struct { // size: 0xc
+            br_vector3 pos; // @0x0
+        } wall_info; // @0x0
+    } info; // @0x4
 } tPipe_incident_data;
 
 typedef struct tPipe_spark_data {
@@ -2707,42 +2708,42 @@ typedef struct tPipe_skid_adjustment {
     int material_index;
 } tPipe_skid_adjustment;
 
-typedef struct tPipe_chunk {
-    tChunk_subject_index subject_index;
-    struct {
-        tPipe_actor_rstyle_data actor_rstyle_data;
-        tPipe_actor_translate_data actor_translate_data;
-        tPipe_actor_transform_data actor_transform_data;
-        tPipe_actor_create_data actor_create_data;
-        tPipe_actor_destroy_data actor_destroy_data;
-        tPipe_actor_relink_data actor_relink_data;
-        tPipe_actor_material_data actor_material_data;
-        tPipe_face_material_data face_material_data;
-        tPipe_material_trans_data material_trans_data;
-        tPipe_material_pixelmap_data material_pixelmap_data;
-        tPipe_model_geometry_data model_geometry_data;
-        tPipe_pedestrian_data pedestrian_data;
-        tPipe_frame_boundary_data frame_boundary_data;
-        tPipe_car_data car_data;
-        tPipe_sound_data sound_data;
-        tPipe_damage_data damage_data;
-        tPipe_special_data special_data;
-        tPipe_ped_gib_data ped_gib_data;
-        tPipe_incident_data incident_data;
-        tPipe_spark_data spark_data;
-        tPipe_shrapnel_data shrapnel_data;
-        tPipe_screen_shake_data screen_shake_data;
-        tPipe_groove_stop_data groove_stop_data;
-        tPipe_non_car_data non_car_data;
-        tPipe_smoke_data smoke_data;
-        tPipe_oil_spill_data oil_data;
-        tPipe_smoke_column_data smoke_column_data;
-        tPipe_flame_data flame_data;
-        tPipe_smudge_data smudge_data;
-        tPipe_splash_data splash_data;
-        tPipe_prox_ray_data prox_ray_data;
-        tPipe_skid_adjustment skid_adjustment;
-    };
+typedef struct tPipe_chunk { // size: 0x58
+    tChunk_subject_index subject_index; // @0x0
+    union { // size: 0x54
+        tPipe_actor_rstyle_data actor_rstyle_data; // @0x0
+        tPipe_actor_translate_data actor_translate_data; // @0x0
+        tPipe_actor_transform_data actor_transform_data; // @0x0
+        tPipe_actor_create_data actor_create_data; // @0x0
+        tPipe_actor_destroy_data actor_destroy_data; // @0x0
+        tPipe_actor_relink_data actor_relink_data; // @0x0
+        tPipe_actor_material_data actor_material_data; // @0x0
+        tPipe_face_material_data face_material_data; // @0x0
+        tPipe_material_trans_data material_trans_data; // @0x0
+        tPipe_material_pixelmap_data material_pixelmap_data; // @0x0
+        tPipe_model_geometry_data model_geometry_data; // @0x0
+        tPipe_pedestrian_data pedestrian_data; // @0x0
+        tPipe_frame_boundary_data frame_boundary_data; // @0x0
+        tPipe_car_data car_data; // @0x0
+        tPipe_sound_data sound_data; // @0x0
+        tPipe_damage_data damage_data; // @0x0
+        tPipe_special_data special_data; // @0x0
+        tPipe_ped_gib_data ped_gib_data; // @0x0
+        tPipe_incident_data incident_data; // @0x0
+        tPipe_spark_data spark_data; // @0x0
+        tPipe_shrapnel_data shrapnel_data; // @0x0
+        tPipe_screen_shake_data screen_shake_data; // @0x0
+        tPipe_groove_stop_data groove_stop_data; // @0x0
+        tPipe_non_car_data non_car_data; // @0x0
+        tPipe_smoke_data smoke_data; // @0x0
+        tPipe_oil_spill_data oil_data; // @0x0
+        tPipe_smoke_column_data smoke_column_data; // @0x0
+        tPipe_flame_data flame_data; // @0x0
+        tPipe_smudge_data smudge_data; // @0x0
+        tPipe_splash_data splash_data; // @0x0
+        tPipe_prox_ray_data prox_ray_data; // @0x0
+        tPipe_skid_adjustment skid_adjustment; // @0x0
+    } chunk_data; // @0x4
 } tPipe_chunk;
 
 typedef struct tPipe_session {
@@ -3075,47 +3076,48 @@ typedef enum tFancy_stage {
     eFancy_stage_readying = 3,
     eFancy_stage_leaving = 4
 } tFancy_stage;
-typedef struct tHeadup {
-    tHeadup_type type;
-    int x;
-    int y;
-    int original_x;
-    int right_edge;
-    int flash_period;
-    int slot_index;
-    int dimmed_background;
-    int dim_left;
-    int dim_top;
-    int dim_right;
-    int dim_bottom;
-    int clever;
-    int cockpit_anchored;
-    int flash_state;
-    tJustification justification;
-    tU32 end_time;
-    tU32 last_flash;
-    struct {
-        struct {
-            char text[250];
-            int colour;
-            br_font* font;
-        } a;
-        struct {
-            char text[250];
-            tDR_font* coloured_font;
-        } b;
-        struct {
-            br_pixelmap* image;
-        } c;
-        struct {
-            br_pixelmap* image;
-            int offset;
-            int shear_amount;
-            int end_offset;
-            tFancy_stage fancy_stage;
-            tU32 start_time;
-        } d;
-    };
+
+typedef struct tHeadup { // size: 0x14c
+    tHeadup_type type; // @0x0
+    int x; // @0x4
+    int y; // @0x8
+    int original_x; // @0xc
+    int right_edge; // @0x10
+    int flash_period; // @0x14
+    int slot_index; // @0x18
+    int dimmed_background; // @0x1c
+    int dim_left; // @0x20
+    int dim_top; // @0x24
+    int dim_right; // @0x28
+    int dim_bottom; // @0x2c
+    int clever; // @0x30
+    int cockpit_anchored; // @0x34
+    int flash_state; // @0x38
+    tJustification justification; // @0x3c
+    tU32 end_time; // @0x40
+    tU32 last_flash; // @0x44
+    union { // size: 0x104
+        struct { // size: 0x104
+            char text[250]; // @0x0
+            int colour; // @0xfc
+            br_font* font; // @0x100
+        } text_info; // @0x0
+        struct { // size: 0x100
+            char text[250]; // @0x0
+            tDR_font* coloured_font; // @0xfc
+        } coloured_text_info; // @0x0
+        struct { // size: 0x4
+            br_pixelmap* image; // @0x0
+        } image_info; // @0x0
+        struct { // size: 0x18
+            br_pixelmap* image; // @0x0
+            int offset; // @0x4
+            int shear_amount; // @0x8
+            int end_offset; // @0xc
+            tFancy_stage fancy_stage; // @0x10
+            tU32 start_time; // @0x14
+        } fancy_info; // @0x0
+    } data; // @0x48
 } tHeadup;
 
 typedef struct tQueued_headup {
@@ -3529,27 +3531,27 @@ typedef struct tPed_choice {
     tU8 marker_ref;
 } tPed_choice;
 
-typedef struct tPedestrian_instruction {
-    tPed_instruc_type type;
-    struct {
-        struct {
-            br_vector3 position;
-            int irreversable;
-        };
-        struct {
-            int number_of_choices;
-            tPed_choice choices[2];
-        };
-        struct {
-            int death_sequence;
-        };
-        struct {
-            int marker_ref;
-        };
-        struct {
-            int action_index;
-        };
-    };
+typedef struct tPedestrian_instruction { // size: 0x14
+    tPed_instruc_type type; // @0x0
+    union { // size: 0x10
+        struct { // size: 0x10
+            br_vector3 position; // @0x0
+            int irreversable; // @0xc
+        } point_data; // @0x0
+        struct { // size: 0xc
+            int number_of_choices; // @0x0
+            tPed_choice choices[2]; // @0x4
+        } choice_data; // @0x0
+        struct { // size: 0x4
+            int death_sequence; // @0x0
+        } death_data; // @0x0
+        struct { // size: 0x4
+            int marker_ref; // @0x0
+        } marker_data; // @0x0
+        struct { // size: 0x4
+            int action_index; // @0x0
+        } action_data; // @0x0
+    } data; // @0x4
 } tPedestrian_instruction;
 
 typedef struct tBearing_sequence {
@@ -3908,129 +3910,130 @@ typedef enum tScale_mode {
     eScale_mode_y = 2,
     eScale_mode_z = 3
 } tScale_mode;
-typedef struct tFunkotronic_spec {
-    int owner;
-    br_material* material;
-    tFunk_trigger_mode mode;
-    tMatrix_mod_type matrix_mod_type;
-    tMove_mode matrix_mode;
-    struct {
-        struct {
-            float period;
-        } a;
-        struct {
-            float period;
-            br_scalar x_centre;
-            br_scalar y_centre;
-            float rock_angle;
-        } b;
-        struct {
-            float x_period;
-            float y_period;
-            br_scalar x_centre;
-            br_scalar y_centre;
-            float x_magnitude;
-            float y_magnitude;
-        } c;
-        struct {
-            float x_period;
-            float y_period;
-            float x_magnitude;
-            float y_magnitude;
-        } d;
-        struct {
-            float x_period;
-            float y_period;
-        } e;
-    };
-    tMove_mode lighting_animation_type;
-    float lighting_animation_period;
-    float ambient_base;
-    float ambient_delta;
-    float direct_base;
-    float direct_delta;
-    float specular_base;
-    float specular_delta;
-    tTexture_animation_type texture_animation_type;
-    tAnimation_time_mode time_mode;
-    float last_frame;
-    struct {
-        struct {
-            tMove_mode mode;
-            float period;
-            int texture_count;
-            int current_frame;
-            br_pixelmap* textures[8];
-        } f;
-        struct {
-            tU8* flic_data;
-            tU32 flic_data_length;
-            tFlic_descriptor flic_descriptor;
-        } g;
-    };
-    int proximity_count;
-    br_vector3* proximity_array;
+
+typedef struct tFunkotronic_spec { // size: 0xd8
+    int owner; // @0x0
+    br_material* material; // @0x4
+    tFunk_trigger_mode mode; // @0x8
+    tMatrix_mod_type matrix_mod_type; // @0xc
+    tMove_mode matrix_mode; // @0x10
+    union { // size: 0x18
+        struct { // size: 0x4
+            float period; // @0x0
+        } spin_info; // @0x0
+        struct { // size: 0x10
+            float period; // @0x0
+            br_scalar x_centre; // @0x4
+            br_scalar y_centre; // @0x8
+            float rock_angle; // @0xc
+        } rock_info; // @0x0
+        struct { // size: 0x18
+            float x_period; // @0x0
+            float y_period; // @0x4
+            br_scalar x_centre; // @0x8
+            br_scalar y_centre; // @0xc
+            float x_magnitude; // @0x10
+            float y_magnitude; // @0x14
+        } throb_info; // @0x0
+        struct { // size: 0x10
+            float x_period; // @0x0
+            float y_period; // @0x4
+            float x_magnitude; // @0x8
+            float y_magnitude; // @0xc
+        } slither_info; // @0x0
+        struct { // size: 0x8
+            float x_period; // @0x0
+            float y_period; // @0x4
+        } roll_info; // @0x0
+    } matrix_mod_data; // @0x14
+    tMove_mode lighting_animation_type; // @0x2c
+    float lighting_animation_period; // @0x30
+    float ambient_base; // @0x34
+    float ambient_delta; // @0x38
+    float direct_base; // @0x3c
+    float direct_delta; // @0x40
+    float specular_base; // @0x44
+    float specular_delta; // @0x48
+    tTexture_animation_type texture_animation_type; // @0x4c
+    tAnimation_time_mode time_mode; // @0x50
+    float last_frame; // @0x54
+    union { // size: 0x78
+        struct { // size: 0x30
+            tMove_mode mode; // @0x0
+            float period; // @0x4
+            int texture_count; // @0x8
+            int current_frame; // @0xc
+            br_pixelmap* textures[8]; // @0x10
+        } frames_info; // @0x0
+        struct { // size: 0x78
+            tU8* flic_data; // @0x0
+            tU32 flic_data_length; // @0x4
+            tFlic_descriptor flic_descriptor; // @0x8
+        } flic_info; // @0x0
+    } texture_animation_data; // @0x58
+    int proximity_count; // @0xd0
+    br_vector3* proximity_array; // @0xd4
 } tFunkotronic_spec;
 
-typedef struct tGroovidelic_spec {
-    int owner;
-    int done_this_frame;
-    br_actor* actor;
-    tLollipop_mode lollipop_mode;
-    tGroove_trigger_mode mode;
-    tGroove_path_mode path_type;
-    tMove_mode path_mode;
-    tInterrupt_status path_interrupt_status;
-    float path_resumption_value;
-    struct {
-        struct {
-            float period;
-            float x_delta;
-            float y_delta;
-            float z_delta;
-            br_vector3 centre;
-        } a;
-        struct {
-            float period;
-            float radius;
-            br_vector3 centre;
-            tGroove_axis_mode axis;
-        } b;
-    };
-    br_vector3 object_centre;
-    br_vector3 object_position;
-    tGroove_object_mode object_type;
-    tMove_mode object_mode;
-    tInterrupt_status object_interrupt_status;
-    float object_resumption_value;
-    struct {
-        struct {
-            float period;
-            tGroove_axis_mode axis;
-        } c;
-        struct {
-            float period;
-            float max_angle;
-            float current_angle;
-            tGroove_axis_mode axis;
-        } d;
-        struct {
-            float x_period;
-            float y_period;
-            float z_period;
-            float x_magnitude;
-            float y_magnitude;
-            float z_magnitude;
-        } e;
-        struct {
-            float x_period;
-            float y_period;
-            float z_period;
-            float x_magnitude;
-            float y_magnitude;
-            float z_magnitude;
-        } f;
-    };
+typedef struct tGroovidelic_spec { // size: 0x80
+    int owner; // @0x0
+    int done_this_frame; // @0x4
+    br_actor* actor; // @0x8
+    tLollipop_mode lollipop_mode; // @0xc
+    tGroove_trigger_mode mode; // @0x10
+    tGroove_path_mode path_type; // @0x14
+    tMove_mode path_mode; // @0x18
+    tInterrupt_status path_interrupt_status; // @0x1c
+    float path_resumption_value; // @0x20
+    union { // size: 0x1c
+        struct { // size: 0x1c
+            float period; // @0x0
+            float x_delta; // @0x4
+            float y_delta; // @0x8
+            float z_delta; // @0xc
+            br_vector3 centre; // @0x10
+        } straight_info; // @0x0
+        struct { // size: 0x18
+            float period; // @0x0
+            float radius; // @0x4
+            br_vector3 centre; // @0x8
+            tGroove_axis_mode axis; // @0x14
+        } circular_info; // @0x0
+    } path_data; // @0x24
+    br_vector3 object_centre; // @0x40
+    br_vector3 object_position; // @0x4c
+    tGroove_object_mode object_type; // @0x58
+    tMove_mode object_mode; // @0x5c
+    tInterrupt_status object_interrupt_status; // @0x60
+    float object_resumption_value; // @0x64
+    union { // size: 0x18
+        struct { // size: 0x8
+            float period; // @0x0
+            tGroove_axis_mode axis; // @0x4
+        } spin_info; // @0x0
+        struct { // size: 0x10
+            float period; // @0x0
+            float max_angle; // @0x4
+            float current_angle; // @0x8
+            tGroove_axis_mode axis; // @0xc
+        } rock_info; // @0x0
+        struct { // size: 0x18
+            float x_period; // @0x0
+            float y_period; // @0x4
+            float z_period; // @0x8
+            float x_magnitude; // @0xc
+            float y_magnitude; // @0x10
+            float z_magnitude; // @0x14
+        } throb_info; // @0x0
+        struct { // size: 0x18
+            float x_period; // @0x0
+            float y_period; // @0x4
+            float z_period; // @0x8
+            float x_magnitude; // @0xc
+            float y_magnitude; // @0x10
+            float z_magnitude; // @0x14
+        } shear_info; // @0x0
+    } object_data; // @0x68
 } tGroovidelic_spec;
 
 typedef struct DWORDREGS {

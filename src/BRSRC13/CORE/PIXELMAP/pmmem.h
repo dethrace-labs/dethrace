@@ -14,7 +14,7 @@ br_device_pixelmap* DevicePixelmapMemAllocate(br_uint_8 type, br_uint_16 w, br_u
 // Offset: 539
 // Size: 54
 // EAX: pm
-void _CheckDispatch(br_device_pixelmap* pm);
+void CheckDispatch(br_device_pixelmap* pm);
 
 // Offset: 631
 // Size: 222

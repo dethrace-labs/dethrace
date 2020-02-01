@@ -10,7 +10,7 @@ struct {
     int type;
     void* value;
     int count;
-};
+} DatafileStack;
 char* ChunkNames[61];
 char rscid[52];
 int DatafileStackTop;
@@ -72,7 +72,7 @@ br_uint_32 DfStructWriteBinary(br_datafile* df, br_file_struct* str, void* base)
     struct {
         unsigned char b[8];
         float f;
-    };
+    } conv;
 }
 
 // Offset: 2769
@@ -91,7 +91,7 @@ br_uint_32 DfStructReadBinary(br_datafile* df, br_file_struct* str, void* base) 
     struct {
         unsigned char b[8];
         float f;
-    };
+    } conv;
 }
 
 // Offset: 4182

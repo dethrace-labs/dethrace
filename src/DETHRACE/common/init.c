@@ -5,10 +5,12 @@
 #include "common/depth.h"
 #include "common/displays.h"
 #include "common/drdebug.h"
+#include "common/drfile.h"
 #include "common/drmem.h"
 #include "common/errors.h"
 #include "common/flicplay.h"
 #include "common/globvars.h"
+#include "common/globvrkm.h"
 #include "common/grafdata.h"
 #include "common/graphics.h"
 #include "common/loading.h"
@@ -45,7 +47,50 @@ void AllocateSelf() {
 // Offset: 116
 // Size: 514
 void AllocateCamera() {
+    br_camera* camera_ptr;
     int i;
+    LOG_TRACE("()");
+
+    for (i = 0; i < 2; i++) {
+        gCamera_list[i] = BrActorAllocate(BR_ACTOR_CAMERA, NULL);
+        if (!gCamera_list[i]) {
+            FatalError(5);
+        }
+
+        camera_ptr = gCamera_list[i]->type_data;
+        camera_ptr->type = 1;
+        camera_ptr->field_of_view = BR_ANGLE_DEG(gCamera_angle);
+        camera_ptr->hither_z = gCamera_hither;
+        camera_ptr->yon_z = gCamera_yon;
+        camera_ptr->aspect = (double)gWidth / (double)gHeight;
+    }
+
+    gCamera_list[0] = BrActorAdd(gSelf, gCamera_list[0]);
+    if (!gCamera_list[0]) {
+        FatalError(5);
+    }
+    gCamera_list[1] = BrActorAdd(gUniverse_actor, gCamera_list[1]);
+    if (!gCamera_list[1]) {
+        FatalError(5);
+    }
+    gCamera = gCamera_list[0];
+    gRearview_camera = BrActorAllocate(BR_ACTOR_CAMERA, NULL);
+    if (!gRearview_camera) {
+        FatalError(5);
+    }
+
+    gRearview_camera->t.t.mat.m[2][2] = -1.0f;
+    camera_ptr = (br_camera*)gRearview_camera->type_data;
+    camera_ptr->hither_z = gCamera_hither;
+    camera_ptr->type = 1;
+    camera_ptr->yon_z = gCamera_yon;
+    camera_ptr->field_of_view = BR_ANGLE_DEG(gCamera_angle);
+    camera_ptr->aspect = (double)gWidth / (double)gHeight;
+    gRearview_camera = BrActorAdd(gSelf, gRearview_camera);
+    if (!gRearview_camera) {
+        FatalError(5);
+    }
+    SetSightDistance(camera_ptr->yon_z);
 }
 
 // Offset: 632
@@ -87,6 +132,43 @@ void AllocateStandardLamp() {
 // Offset: 2152
 // Size: 342
 void InitializeBRenderEnvironment() {
+    br_model* arrow_model;
+    LOG_TRACE("()");
+
+    gBr_initialized = 1;
+    InstallDRMemCalls();
+    InstallDRFileCalls();
+    SetBRenderScreenAndBuffers(0, 0, 0, 0);
+    gUniverse_actor = BrActorAllocate(BR_ACTOR_NONE, NULL);
+    if (!gUniverse_actor) {
+        FatalError(3);
+    }
+    gUniverse_actor->identifier = BrResStrDup(gUniverse_actor, "Root");
+    BrEnvironmentSet(gUniverse_actor);
+    gNon_track_actor = BrActorAllocate(BR_ACTOR_NONE, NULL);
+    if (!gNon_track_actor) {
+        FatalError(3);
+    }
+    BrActorAdd(gUniverse_actor, gNon_track_actor);
+    gDont_render_actor = BrActorAllocate(BR_ACTOR_NONE, 0);
+    if (!gDont_render_actor) {
+        FatalError(3);
+    }
+    gDont_render_actor->render_style = BR_RSTYLE_NONE;
+    BrActorAdd(gUniverse_actor, gDont_render_actor);
+    gSelf = BrActorAllocate(BR_ACTOR_NONE, NULL);
+    if (!gSelf) {
+        FatalError(6);
+    }
+    gSelf = BrActorAdd(gNon_track_actor, gSelf);
+    if (!gSelf) {
+        FatalError(6);
+    }
+    AllocateCamera();
+    arrow_model = LoadModel("CPOINT.DAT");
+    BrModelAdd(arrow_model);
+    gArrow_actor = LoadActor("CPOINT.ACT");
+    gArrow_actor->model = arrow_model;
 }
 
 // Offset: 2496
@@ -140,30 +222,36 @@ void InitialiseApplication(int pArgc, char** pArgv) {
     strcpy(gProgram_state.player_name[1], "DIE ANNA");
 
     RestoreOptions();
+
     LoadKeyMapping();
+
     if (!PDInitScreenVars(pArgc, pArgv)) {
         FatalError(0);
     }
     CalcGrafDataIndex();
+
     InitializeBRenderEnvironment();
     InitDRFonts();
     InitBRFonts();
     LoadMiscStrings();
     LoadInRegistees();
     FinishLoadingGeneral();
+
     InitializePalettes();
     AustereWarning();
     LoadInterfaceStrings();
+
     InitializeActionReplay();
     FlicPaletteAllocate();
     InitInterfaceLoadState();
+
     InitTransientBitmaps();
     InitSound();
     InitHeadups();
+
     gDefault_track_material = BrMaterialAllocate("gDefault_track_material");
-    //TODO:
-    //BYTE2(gDefault_track_material->map_transform.m[2][1]) = -29;
-    //BYTE3(gDefault_track_material->map_transform.m[2][1]) = 1;
+    gDefault_track_material->index_base = 227;
+    gDefault_track_material->index_range = 1;
     BrMaterialAdd(gDefault_track_material);
     InitShadow();
     InitFlics();
@@ -184,10 +272,11 @@ void InitialiseApplication(int pArgc, char** pArgv) {
         while (PDGetTotalTime() - gAustere_time < 2000) {
         }
     }
+
     ClearEntireScreen();
     InitSkids();
     InitPeds();
-    gProgram_state.cars_available[42] = 0;
+    gProgram_state.track_spec.the_actor = NULL;
     gCD_is_in_drive = TestForOriginalCarmaCDinDrive();
     SwitchToLoresMode();
     DrDebugLog(0, "AFTER APPLICATION INITIALISATION");
@@ -252,6 +341,5 @@ int GetScreenSize() {
 // EAX: pNew_size
 void SetScreenSize(int pNew_size) {
     LOG_TRACE("(%d)", pNew_size);
-    //TOOD: which global var is this pointing to?
-    //gScreen_size = pNew_size;
+    gRender_indent = pNew_size;
 }

@@ -1,5 +1,6 @@
 #include "utility.h"
 
+#include "brender.h"
 #include "dossys.h"
 #include "errors.h"
 #include "globvars.h"
@@ -292,6 +293,12 @@ br_pixelmap* DRPixelmapAllocate(br_uint_8 pType, br_uint_16 pW, br_uint_16 pH, v
 // ECX: pW
 br_pixelmap* DRPixelmapAllocateSub(br_pixelmap* pPm, br_uint_16 pX, br_uint_16 pY, br_uint_16 pW, br_uint_16 pH) {
     br_pixelmap* the_map;
+    the_map = BrPixelmapAllocateSub(pPm, pX, pY, pW, pH);
+    if (the_map) {
+        the_map->origin_y = 0;
+        the_map->origin_x = 0;
+    }
+    return the_map;
 }
 
 // Offset: 2468

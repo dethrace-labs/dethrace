@@ -1,4 +1,6 @@
 #include "tokenval.h"
+#include "debug.h"
+#include "resource.h"
 
 char rscid[50];
 
@@ -6,6 +8,13 @@ char rscid[50];
 // Size: 88
 br_tv_template* BrTVTemplateAllocate(void* res, br_tv_template_entry* entries, int n_entries) {
     br_tv_template* t;
+    LOG_TRACE("(%p, %p, %d)", res, entries, n_entries);
+
+    t = BrResAllocate(res, sizeof(br_tv_template), BR_MEMORY_TOKEN_TEMPLATE);
+    t->res = t;
+    t->entries = entries;
+    t->n_entries = n_entries;
+    return t;
 }
 
 // Offset: 126

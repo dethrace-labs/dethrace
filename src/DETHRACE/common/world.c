@@ -63,6 +63,7 @@ float MapSawToTriangle(float pNumber) {
 // Offset: 88
 // Size: 62
 void SetSightDistance(br_scalar pYon) {
+    gSight_distance_squared = pYon * 1.02f * (pYon * 1.02f);
 }
 
 // Offset: 152

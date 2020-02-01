@@ -3,6 +3,8 @@
 
 #include "br_types.h"
 
+extern br_pixelmap_state _pixelmap;
+
 // Offset: 16
 // Size: 130
 void BrPixelmapBegin();

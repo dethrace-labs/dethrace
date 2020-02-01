@@ -12,6 +12,7 @@
 #include "CORE/STD/brstddiag.h"
 #include "CORE/STD/brstdfile.h"
 #include "CORE/STD/brstdmem.h"
+#include "debug.h"
 #include <stddef.h>
 #include <stdio.h>
 
@@ -126,4 +127,12 @@ br_filesystem* BrFilesystemSet(br_filesystem* newfs) {
 // Size: 73
 br_allocator* BrAllocatorSet(br_allocator* newal) {
     br_allocator* old;
+    LOG_TRACE("(%p)", newal);
+
+    if (!newal) {
+        fw.mem = _BrDefaultAllocator;
+    } else {
+        fw.mem = newal;
+    }
+    return fw.mem;
 }

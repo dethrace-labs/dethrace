@@ -11,6 +11,9 @@ void test_resource_BrResAllocate() {
 
     parent = BrResAllocate(NULL, 0, BR_MEMORY_ANCHOR);
     TEST_ASSERT_NOT_NULL(parent);
+
+    // A brender resource consists of a header and a body. The pointer to the body is what is returned to the caller,
+    // so we have to jump the pointer backwards to inspect the header.
     parent_header = (resource_header*)(((char*)parent) - sizeof(resource_header) - 4);
     TEST_ASSERT_EQUAL_UINT32(0xDEADBEEF, parent_header->magic_num);
     TEST_ASSERT_NULL(parent_header->children.head);
@@ -21,9 +24,42 @@ void test_resource_BrResAllocate() {
     child_header = (resource_header*)(((char*)child) - sizeof(resource_header) - 4);
     TEST_ASSERT_EQUAL_PTR(&child_header->node, parent_header->children.head);
     TEST_ASSERT_NULL(parent_header->children.head->next);
-    // ? TEST_ASSERT_NULL(parent_header->children.head->prev);
+}
+
+void test_resource_BrResFree() {
+    void* r;
+    void* child;
+
+    // simple case
+    r = BrResAllocate(NULL, 0, BR_MEMORY_ANCHOR);
+    TEST_ASSERT_NOT_NULL(r);
+    printf("Got res allocated at %p\n", r);
+    BrResFree(r);
+}
+
+void test_resource_BrResFree_Child() {
+    void* r;
+    void* child;
+    resource_header* header;
+
+    r = BrResAllocate(NULL, 0, BR_MEMORY_ANCHOR);
+    TEST_ASSERT_NOT_NULL(r);
+    child = BrResAllocate(r, 0, BR_MEMORY_ANCHOR);
+    TEST_ASSERT_NOT_NULL(child);
+
+    header = (resource_header*)(((char*)child) - sizeof(resource_header) - 4);
+    TEST_ASSERT_EQUAL_INT(0xDEADBEEF, header->magic_num);
+    BrResFree(r);
+    // when the res is free'd, magic_num is set to 1. We make sure the child was free'd when the parent was
+    TEST_ASSERT_EQUAL_INT(1, header->magic_num);
+
+    // And the parent should have the child unlinked from its list of children
+    header = (resource_header*)(((char*)r) - sizeof(resource_header) - 4);
+    TEST_ASSERT_NULL(header->children.head);
 }
 
 void test_resource_suite() {
     RUN_TEST(test_resource_BrResAllocate);
+    RUN_TEST(test_resource_BrResFree);
+    RUN_TEST(test_resource_BrResFree_Child);
 }
