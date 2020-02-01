@@ -36,7 +36,22 @@ void test_actsupt_BrActorAllocateAndFreeChild() {
     BrActorFree(a);
 }
 
+void test_actsupt_BrActorAdd() {
+    br_actor* a;
+    br_actor* b;
+    a = BrActorAllocate(BR_ACTOR_NONE, NULL);
+    b = BrActorAllocate(BR_ACTOR_NONE, NULL);
+    BrActorAdd(a, b);
+    TEST_ASSERT_EQUAL_INT(0, a->depth);
+    TEST_ASSERT_EQUAL_INT(1, b->depth);
+    TEST_ASSERT_EQUAL_PTR(b, a->children);
+    TEST_ASSERT_EQUAL_PTR(a, b->parent);
+    TEST_ASSERT_NULL(a->children->next);
+    TEST_ASSERT_NULL(a->children->children);
+}
+
 void test_actsupt_suite() {
     RUN_TEST(test_actsupt_BrActorAllocateAndFree);
     RUN_TEST(test_actsupt_BrActorAllocateAndFreeChild);
+    RUN_TEST(test_actsupt_BrActorAdd);
 }

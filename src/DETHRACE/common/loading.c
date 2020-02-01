@@ -388,6 +388,7 @@ br_material* LoadMaterial(char* pName) {
 br_model* LoadModel(char* pName) {
     tPath_name the_path;
     br_model* model;
+    LOG_TRACE("(\"%s\")", pName);
 }
 
 // Offset: 4400

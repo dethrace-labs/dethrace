@@ -40,12 +40,37 @@ br_actor* BrActorSearch(br_actor* root, char* pattern) {
 // EDX: d
 void RenumberActor(br_actor* a, int d) {
     br_actor* ac;
+    LOG_TRACE("(%p, %d)", a, d);
+
+    ac = a->children;
+    a->depth = d;
+    while (ac) {
+        d++;
+        RenumberActor(ac, d);
+        ac = ac->next;
+    }
 }
 
 // Offset: 768
 // Size: 230
 br_actor* BrActorAdd(br_actor* parent, br_actor* a) {
     br_actor* ac;
+    br_actor* ac2;
+    LOG_TRACE("(%p, %p)", parent, a);
+
+    BrSimpleAddHead((br_simple_list*)&parent->children, (br_simple_node*)a);
+    a->parent = parent;
+
+    a->depth = parent->depth + 1;
+    for (ac = a->children; ac != NULL; ac = ac->next) {
+        ac->depth = a->depth + 1;
+        ac2 = ac->children;
+        while (ac2 != NULL) {
+            RenumberActor(ac2, a->depth + 2);
+            ac2 = ac2->next;
+        }
+    }
+    return a;
 }
 
 // Offset: 1012
