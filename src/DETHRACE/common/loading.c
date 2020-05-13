@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "brender.h"
 #include "brucetrk.h"
 #include "controls.h"
 #include "depth.h"
@@ -389,6 +390,11 @@ br_model* LoadModel(char* pName) {
     tPath_name the_path;
     br_model* model;
     LOG_TRACE("(\"%s\")", pName);
+
+    PossibleService();
+    PathCat(the_path, gApplication_path, "MODELS");
+    PathCat(the_path, the_path, pName);
+    return BrModelLoad(the_path);
 }
 
 // Offset: 4400

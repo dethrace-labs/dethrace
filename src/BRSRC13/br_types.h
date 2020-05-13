@@ -1386,24 +1386,24 @@ typedef struct br_actor { // size: 0x64
     void* user; // @0x60
 } br_actor;
 
-typedef struct br_model {
-    br_uint_32 _reserved;
-    char* identifier;
-    br_vertex* vertices;
-    br_face* faces;
-    br_uint_16 nvertices;
-    br_uint_16 nfaces;
-    br_vector3 pivot;
-    br_uint_16 flags;
-    br_model_custom_cbfn* custom;
-    void* user;
-    br_angle crease_angle;
-    br_scalar radius;
-    br_bounds bounds;
-    void* prepared;
-    void* stored;
-    br_uint_16 nprimitive_lists;
-    br_primitive_list* primitive_list;
+typedef struct br_model { // size: 0x5c
+    br_uint_32 _reserved; // @0x0
+    char* identifier; // @0x4
+    br_vertex* vertices; // @0x8
+    br_face* faces; // @0xc
+    br_uint_16 nvertices; // @0x10
+    br_uint_16 nfaces; // @0x12
+    br_vector3 pivot; // @0x14
+    br_uint_16 flags; // @0x20
+    br_model_custom_cbfn* custom; // @0x24
+    void* user; // @0x28
+    br_angle crease_angle; // @0x2c
+    br_scalar radius; // @0x30
+    br_bounds bounds; // @0x34
+    void* prepared; // @0x4c
+    void* stored; // @0x50
+    br_uint_16 nprimitive_lists; // @0x54
+    br_primitive_list* primitive_list; // @0x58
 } br_model;
 
 typedef struct br_camera {
@@ -1983,7 +1983,6 @@ typedef struct br_geometry_stored_dispatch {
     br_error (*_renderOnScreen)(br_geometry_stored*, br_renderer*);
 } br_geometry_stored_dispatch;
 
-typedef struct br_datafile br_datafile;
 typedef struct br_file_struct_member {
     br_uint_16 type;
     br_uint_32 offset;
@@ -1997,6 +1996,14 @@ typedef struct br_file_struct {
     br_file_struct_member* members;
     int mem_size;
 } br_file_struct;
+
+typedef struct br_file_primitives br_file_primitives;
+typedef struct br_datafile { // size: 0x10
+    void* h; // @0x0
+    br_file_primitives* prims; // @0x4
+    br_token scalar_type; // @0x8
+    void* res; // @0xc
+} br_datafile;
 
 typedef struct br_file_primitives {
     char* identifier;
@@ -2907,6 +2914,20 @@ enum {
 	 * Opacity + Index
 	 */
     BR_PMT_INDEXA_88
+};
+
+/*
+ * Bits for br_model->flags
+ */
+enum {
+    BR_MODF_DONT_WELD = 0x0001, /* Vertices with same x,y,z cannot be merged	*/
+    BR_MODF_KEEP_ORIGINAL = 0x0002, /* Don't release model->faces/vertices during ModelUpdate() */
+    BR_MODF_GENERATE_TAGS = 0x0004, /* Allocate and fill in the face and vertex tag structures */
+    BR_MODF_QUICK_UPDATE = 0x0010, /* ModelUpdate is fast - but may produce slower models */
+
+    BR_MODF_CUSTOM = 0x0020, /* Invoke custom callback for this model */
+
+    BR_MODF_PREPREPARED = 0x0040 /* Model structure is pre-prepared - update performs no work */
 };
 
 #define BR_COLOUR_RGB(r, g, b) \

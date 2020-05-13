@@ -12,5 +12,5 @@ void debug_printf(const char* fmt, const char* fn, const char* fmt2, ...) {
     vfprintf(stderr, fmt2, ap);
     va_end(ap);
 
-    fputs("\n", stderr);
+    fputs("\033[0m\n", stderr);
 }

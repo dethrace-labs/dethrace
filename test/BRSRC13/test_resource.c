@@ -28,13 +28,22 @@ void test_resource_BrResAllocate() {
 
 void test_resource_BrResFree() {
     void* r;
-    void* child;
+    br_file* child;
+    void* child2;
 
     // simple case
     r = BrResAllocate(NULL, 0, BR_MEMORY_ANCHOR);
     TEST_ASSERT_NOT_NULL(r);
     printf("Got res allocated at %p\n", r);
     BrResFree(r);
+}
+
+void test_resource_BrResFree2() {
+    br_file* child;
+    child = BrResAllocate(NULL, sizeof(br_file), BR_MEMORY_FILE);
+    child->raw_file = 0x1;
+    TEST_ASSERT_NOT_NULL(child);
+    BrResAssert(child);
 }
 
 void test_resource_BrResFree_Child() {
@@ -61,5 +70,6 @@ void test_resource_BrResFree_Child() {
 void test_resource_suite() {
     RUN_TEST(test_resource_BrResAllocate);
     RUN_TEST(test_resource_BrResFree);
+    RUN_TEST(test_resource_BrResFree2);
     RUN_TEST(test_resource_BrResFree_Child);
 }

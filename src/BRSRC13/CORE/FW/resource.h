@@ -27,6 +27,8 @@ void BrResInternalFree(resource_header* res, br_boolean callback);
 // Size: 79
 void BrResFree(void* vres);
 
+void BrResAssert(void* vres);
+
 // Offset: 1247
 // Size: 76
 void BrResFreeNoCallback(void* vres);

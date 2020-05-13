@@ -1,6 +1,7 @@
 #include "diag.h"
 #include "CORE/STD/brstdlib.h"
 #include "brprintf.h"
+#include "debug.h"
 #include "fwsetup.h"
 #include <stdarg.h>
 
@@ -13,6 +14,7 @@ char rscid[49];
 void BrFailure(const char* s, ...) {
     va_list args;
     const char failure_header[10] = "Failure: ";
+    LOG_TRACE("(\"%s\")", s);
 
     va_start(args, s);
     BrStrCpy(_diag_scratch, failure_header);

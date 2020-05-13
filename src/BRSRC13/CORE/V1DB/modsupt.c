@@ -1,4 +1,6 @@
 #include "modsupt.h"
+#include "CORE/FW/resource.h"
+#include "CORE/V1DB/dbsetup.h"
 
 char rscid[50];
 
@@ -31,6 +33,20 @@ void BrModelFree(br_model* m) {
 // Size: 250
 br_model* BrModelAllocate(char* name, int nvertices, int nfaces) {
     br_model* m;
+
+    m = BrResAllocate(v1db.res, sizeof(br_model), BR_MEMORY_MODEL);
+    m->nfaces = nfaces;
+    m->nvertices = nvertices;
+    if (name) {
+        m->identifier = BrResStrDup(m, name);
+    }
+    if (nvertices) {
+        m->vertices = (br_vertex*)BrResAllocate(m, sizeof(br_vertex) * nvertices, BR_MEMORY_VERTICES);
+    }
+    if (nfaces) {
+        m->faces = (br_face*)BrResAllocate(m, sizeof(br_face) * nfaces, BR_MEMORY_FACES);
+    }
+    return m;
 }
 
 // Offset: 1805

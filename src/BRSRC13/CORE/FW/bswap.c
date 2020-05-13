@@ -5,10 +5,11 @@ char rscid[47];
 // Offset: 9
 // Size: 81
 br_uint_32 BrSwap32(br_uint_32 l) {
-    struct {
-        unsigned long l;
-        unsigned char c[4];
-    } u;
+    // union {
+    //     unsigned long l;
+    //     unsigned char c[4];
+    // } u;
+    return ((l << 24) | ((l << 8) & 0x00FF0000) | ((l >> 8) & 0x0000FF00) | (l >> 24));
 }
 
 // Offset: 99

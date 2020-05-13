@@ -52,7 +52,7 @@ void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class) {
     actual_pad_2 = (size + sizeof(resource_header) + 3) & 0xFFFC;
 
     res = (resource_header*)BrMemAllocate(size + actual_pad, res_class);
-    LOG_DEBUG("allocated r %p\n", res);
+
     // TOOD: ?
     // if ((signed int)(((unsigned int)((char*)allocated + res_align_1) & ~res_align_1) - (_DWORD)allocated) > v8)
     //     BrFailure((int)"Memory allocator broke alignment", v14);
@@ -73,7 +73,7 @@ void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class) {
         parent = (resource_header*)(tmp - sizeof(resource_header));
         BrSimpleAddHead(&parent->children, &res->node);
     }
-    //printf("BrResAllocate returning res: %p, pad: %d, result: %p\n", res, pad, ((char*)res) + actual_pad);
+    LOG_DEBUG("res_header %p, body %p, pad %d\n", res, ((char*)res) + actual_pad, actual_pad);
     return ((char*)res) + actual_pad;
 }
 
@@ -85,6 +85,10 @@ void BrResInternalFree(resource_header* res, br_boolean callback) {
     int c;
     void* r;
     LOG_TRACE("(%p, %d)", res, callback);
+
+    if (res->magic_num != 0xDEADBEEF) {
+        LOG_PANIC("Bad resource header")
+    }
 
     c = res->class;
     if (c != 127) {
@@ -117,14 +121,35 @@ void BrResFree(void* vres) {
     LOG_TRACE("(%p)", vres);
 
     // go backwards through padding until we hit the end of resource_header
+    (char*)vres--;
     while (*(char*)vres == 0) {
-        vres = (char*)vres - 1;
+        (char*)vres--;
+    }
+    // jump one more step backwards to start of resource_header
+    (char*)vres++;
+    vres = ((resource_header*)vres - 1);
+
+    if (((resource_header*)vres)->magic_num != 0xDEADBEEF) {
+        LOG_PANIC("Bad resource header at %p", vres);
+    }
+    BrResInternalFree(vres, 1);
+}
+
+void BrResAssert(void* vres) {
+    LOG_TRACE("(%p)", vres);
+
+    (char*)vres--;
+    // go backwards through padding until we hit the end of resource_header
+    while (*(char*)vres == 0) {
+        (char*)vres--;
     }
     // jump one more step backwards to start of resource_header
     vres = (char*)vres + 1;
     vres = ((resource_header*)vres - 1);
-    //TODO: assert magic_num
-    BrResInternalFree(vres, 1);
+
+    if (((resource_header*)vres)->magic_num != 0xDEADBEEF) {
+        LOG_PANIC("Bad resource header at %p. Was %X", vres, ((resource_header*)vres)->magic_num);
+    }
 }
 
 // Offset: 1247
