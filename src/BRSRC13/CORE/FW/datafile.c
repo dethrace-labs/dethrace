@@ -163,6 +163,7 @@ void* DfTop(int type, int* countp) {
     if (countp)
         *countp = DatafileStack[DatafileStackTop - 1].count;
     return DatafileStack[DatafileStackTop - 1].value;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 624
@@ -173,6 +174,7 @@ int DfTopType() {
     } else {
         return 0;
     }
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 710
@@ -675,6 +677,7 @@ br_uint_32 DfCountReadBinary(br_datafile* df) {
     br_uint_32 l;
     BrFileRead(&l, 4, 1, df->h);
     return BrSwap32(l);
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10336
@@ -689,6 +692,7 @@ int DfCountSizeText(br_datafile* df) {
 // EAX: df
 int DfCountSizeBinary(br_datafile* df) {
     return 4;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10464

@@ -1,4 +1,5 @@
 #include "pmfile.h"
+#include "debug.h"
 
 br_chunks_table PixelmapLoadTable;
 br_file_struct br_old_pixelmap_F;
@@ -16,6 +17,7 @@ char rscid[54];
 // EDX: pixelmap
 int FopWrite_PIXELMAP(br_datafile* df, br_pixelmap* pixelmap) {
     br_pixelmap pmap;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 192
@@ -26,6 +28,7 @@ int FopWrite_PIXELMAP(br_datafile* df, br_pixelmap* pixelmap) {
 // ECX: count
 int FopRead_OLD_PIXELMAP(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_pixelmap* pp;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 390
@@ -36,6 +39,7 @@ int FopRead_OLD_PIXELMAP(br_datafile* df, br_uint_32 id, br_uint_32 length, br_u
 // ECX: count
 int FopRead_PIXELMAP(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_pixelmap* pp;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 587
@@ -47,6 +51,7 @@ int FopWrite_PIXELS(br_datafile* df, br_pixelmap* pixelmap) {
     int bytes;
     int block_count;
     char* pixels;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1144
@@ -59,12 +64,14 @@ int FopRead_PIXELS(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32
     int icount;
     br_pixelmap* pp;
     int size;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1305
 // Size: 66
 // EAX: df
 int FopWrite_ADD_MAP(br_datafile* df) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1387
@@ -76,6 +83,7 @@ int FopWrite_ADD_MAP(br_datafile* df) {
 int FopRead_ADD_MAP(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_pixelmap* pp;
     br_pixelmap* map;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1511
@@ -84,6 +92,7 @@ br_uint_32 BrPixelmapLoadMany(char* filename, br_pixelmap** pixelmaps, br_uint_1
     br_datafile* df;
     int count;
     int r;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1687
@@ -91,6 +100,7 @@ br_uint_32 BrPixelmapLoadMany(char* filename, br_pixelmap** pixelmaps, br_uint_1
 // EAX: pp
 // EDX: df
 int WritePixelmap(br_pixelmap* pp, br_datafile* df) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1867
@@ -98,15 +108,18 @@ int WritePixelmap(br_pixelmap* pp, br_datafile* df) {
 br_uint_32 BrPixelmapSaveMany(char* filename, br_pixelmap** pixelmaps, br_uint_16 num) {
     br_datafile* df;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2100
 // Size: 81
 br_pixelmap* BrPixelmapLoad(char* filename) {
     br_pixelmap* ptr;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2196
 // Size: 58
 br_uint_32 BrPixelmapSave(char* filename, br_pixelmap* ptr) {
+    NOT_IMPLEMENTED();
 }

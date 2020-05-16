@@ -17,6 +17,7 @@ br_uint_32 BrActorEnum(br_actor* parent, br_actor_enum_cbfn* callback, void* arg
     br_actor* a;
     br_actor* next;
     br_uint_32 r;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 188
@@ -26,12 +27,14 @@ br_uint_32 BrActorSearchMany(br_actor* root, char* pattern, br_actor** actors, i
     char* sub;
     int n;
     int remaining;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 523
 // Size: 103
 br_actor* BrActorSearch(br_actor* root, char* pattern) {
     br_actor* a;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 640
@@ -77,12 +80,14 @@ br_actor* BrActorAdd(br_actor* parent, br_actor* a) {
 // Size: 177
 br_actor* BrActorRemove(br_actor* a) {
     br_actor* ac;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1203
 // Size: 167
 void BrActorRelink(br_actor* parent, br_actor* a) {
     br_matrix34 mat;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1386
@@ -176,6 +181,7 @@ void BrActorFree(br_actor* a) {
 // EDX: world
 // EBX: m
 br_boolean ActorToRoot(br_actor* a, br_actor* world, br_matrix34* m) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2486
@@ -186,6 +192,7 @@ br_boolean ActorToRoot(br_actor* a, br_actor* world, br_matrix34* m) {
 // ECX: type
 br_boolean ActorToRootTyped(br_actor* a, br_actor* world, br_matrix34* m, br_int_32* type) {
     br_int_32 t;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2847
@@ -194,6 +201,7 @@ br_boolean ActorToRootTyped(br_actor* a, br_actor* world, br_matrix34* m, br_int
 // EDX: field_of_view
 void Matrix4PerspectiveNew(br_matrix4* mat, br_angle field_of_view, br_scalar aspect, br_scalar hither, br_scalar yon, br_scalar origin_x, br_scalar origin_y) {
     br_scalar scale;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3441
@@ -203,6 +211,7 @@ void Matrix4PerspectiveNew(br_matrix4* mat, br_angle field_of_view, br_scalar as
 br_token CameraToScreenMatrix4(br_matrix4* mat, br_actor* camera) {
     br_camera* camera_type;
     br_matrix34 mat34;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4408
@@ -213,12 +222,14 @@ br_uint_16 BrActorToActorMatrix34(br_matrix34* m, br_actor* a, br_actor* b) {
     br_matrix34 matc;
     br_uint_8 at;
     br_uint_8 bt;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5297
 // Size: 178
 void BrActorToScreenMatrix4(br_matrix4* m, br_actor* a, br_actor* camera) {
     br_matrix34 a2c;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5497
@@ -231,6 +242,7 @@ void BrMatrix34ApplyBounds(br_bounds* d, br_bounds* s, br_matrix34* m) {
     int j;
     br_scalar a;
     br_scalar b;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5920
@@ -243,6 +255,7 @@ void ActorToBounds(br_bounds* dest, br_actor* ap, br_model* model) {
     br_bounds new;
     br_matrix34 m2v;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6333
@@ -251,4 +264,5 @@ br_bounds* BrActorToBounds(br_bounds* b, br_actor* ap) {
     br_matrix34 m2v;
     br_model* model;
     br_actor* a;
+    NOT_IMPLEMENTED();
 }

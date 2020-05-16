@@ -16,6 +16,7 @@ char rscid[50];
 // ECX: count
 int FopRead_END(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     return 1;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 75

@@ -1,6 +1,7 @@
 #include "dr_types.h"
 #include "pc-dos/dossys.h"
 #include "stack_trace_handler.h"
+#include <stdlib.h>
 
 extern int _main(int pArgc, char* pArgv[]);
 

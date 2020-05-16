@@ -27,4 +27,5 @@ br_material* BrMaterialAllocate(char* name) {
 // Offset: 172
 // Size: 70
 void BrMaterialFree(br_material* m) {
+    NOT_IMPLEMENTED();
 }

@@ -6,6 +6,7 @@
 #include "init.h"
 #include "pc-dos/dossys.h"
 #include "utility.h"
+#include <stdlib.h>
 
 #include <math.h>
 
@@ -99,16 +100,19 @@ br_scalar gYon_squared;
 // Offset: 0
 // Size: 44
 void TurnOnPaletteConversion() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 44
 // Size: 44
 void TurnOffPaletteConversion() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 88
 // Size: 44
 void ResetLollipopQueue() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 132
@@ -116,6 +120,7 @@ void ResetLollipopQueue() {
 // EAX: pActor
 // EDX: pIndex
 int AddToLollipopQueue(br_actor* pActor, int pIndex) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 256
@@ -124,6 +129,7 @@ void RenderLollipops() {
     int must_relink;
     br_actor** the_actor;
     br_actor* old_parent;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 496
@@ -142,6 +148,7 @@ void DRDrawLine(br_pixelmap* pDestn, int pX1, int pY1, int pX2, int pY2, int pCo
     int x;
     int y;
     int the_diff;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 604
@@ -151,6 +158,7 @@ void DRDrawLine(br_pixelmap* pDestn, int pX1, int pY1, int pX2, int pY2, int pCo
 // EBX: pY
 // ECX: pY_pitch
 void DrawDigitAt(br_pixelmap* gImage, int pX, int pY, int pY_pitch, int pValue) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 696
@@ -162,6 +170,7 @@ void DrawDigitAt(br_pixelmap* gImage, int pX, int pY, int pY_pitch, int pValue) 
 void DrawNumberAt(br_pixelmap* gImage, int pX, int pY, int pX_pitch, int pY_pitch, int pValue, int pDigit_count, int pLeading_zeroes) {
     int i;
     int the_value;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 852
@@ -176,11 +185,13 @@ void BuildColourTable(br_pixelmap* pPalette) {
     int blue;
     float nearest_distance;
     float distance;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1204
 // Size: 44
 void ClearConcussion() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1248
@@ -192,6 +203,7 @@ tS8* SkipLines(tS8* pSource, int pCount) {
     int j;
     int number_of_chunks;
     int chunk_length;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1388
@@ -202,6 +214,7 @@ tS8* SkipLines(tS8* pSource, int pCount) {
 void CopyWords(char* pDst, char* pSrc, int pN) {
     tU16* dst;
     tU16* src;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1516
@@ -222,6 +235,7 @@ void Copy8BitStripImageTo16Bit(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 
     int chunk_length;
     char* destn_ptr;
     char* destn_ptr2;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2124
@@ -242,6 +256,7 @@ void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
     int chunk_length;
     char* destn_ptr;
     char* destn_ptr2;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2776
@@ -289,21 +304,25 @@ void SetBRenderScreenAndBuffers(int pX_offset, int pY_offset, int pWidth, int pH
 // Offset: 3284
 // Size: 172
 void SetIntegerMapRenders() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3456
 // Size: 370
 void AdjustRenderScreenSize() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3828
 // Size: 87
 void ScreenSmaller() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3916
 // Size: 87
 void ScreenLarger() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4004
@@ -312,6 +331,7 @@ void ScreenLarger() {
 // EDX: pFirst_colour
 // EBX: pCount
 void DRSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4144
@@ -319,6 +339,7 @@ void DRSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
 // EAX: pThe_palette
 // EDX: pSet_current_palette
 void DRSetPalette3(br_pixelmap* pThe_palette, int pSet_current_palette) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4272
@@ -326,18 +347,21 @@ void DRSetPalette3(br_pixelmap* pThe_palette, int pSet_current_palette) {
 // EAX: pThe_palette
 // EDX: pSet_current_palette
 void DRSetPalette2(br_pixelmap* pThe_palette, int pSet_current_palette) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4412
 // Size: 50
 // EAX: pThe_palette
 void DRSetPalette(br_pixelmap* pThe_palette) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4464
 // Size: 415
 void InitializePalettes() {
     int j;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4880
@@ -345,16 +369,19 @@ void InitializePalettes() {
 // EAX: pPal_name
 void SwitchToPalette(char* pPal_name) {
     br_pixelmap* the_palette;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4948
 // Size: 104
 void ClearEntireScreen() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5052
 // Size: 75
 void ClearWobbles() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5128
@@ -377,6 +404,7 @@ void NewScreenWobble(double pAmplitude_x, double pAmplitude_y, double pPeriod) {
     int i;
     int oldest_time;
     int oldest_index;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5436
@@ -384,11 +412,13 @@ void NewScreenWobble(double pAmplitude_x, double pAmplitude_y, double pPeriod) {
 // EAX: pWobble_x
 // EDX: pWobble_y
 void SetScreenWobble(int pWobble_x, int pWobble_y) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5492
 // Size: 43
 void ResetScreenWobble() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5536
@@ -400,6 +430,7 @@ void CalculateWobblitude(tU32 pThe_time) {
     double angle;
     double mod_angle;
     double cosine_over_angle;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6352
@@ -413,6 +444,7 @@ void CalculateConcussion(tU32 pThe_time) {
     float angle;
     float mod_angle;
     float cosine_over_angle;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6960
@@ -420,6 +452,7 @@ void CalculateConcussion(tU32 pThe_time) {
 void SufferFromConcussion(float pSeriousness) {
     int i;
     int j;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7132
@@ -429,6 +462,7 @@ void SufferFromConcussion(float pSeriousness) {
 // EBX: pCamera
 // ECX: pCamera_to_world
 void ProcessNonTrackActors(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world, br_matrix34* pOld_camera_matrix) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7188
@@ -436,6 +470,7 @@ void ProcessNonTrackActors(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buff
 // EAX: pColour
 int OppositeColour(int pColour) {
     int brightness;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7308
@@ -467,6 +502,7 @@ void DrawMapBlip(tCar_spec* pCar, tU32 pTime, br_matrix34* pTrans, br_vector3* p
     float bearing;
     float cos_factor;
     float sin_factor;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9112
@@ -478,6 +514,7 @@ void DrawMapSmallBlip(tU32 pTime, br_vector3* pPos, int pColour) {
     br_vector3 map_pos;
     int offset;
     tU32 time_diff;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9372
@@ -493,6 +530,7 @@ void MungeClipPlane(br_vector3* pLight, tCar_spec* pCar, br_vector3* p1, br_vect
     br_vector3 v4;
     br_scalar length;
     br_actor* new_clip;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10024
@@ -504,6 +542,7 @@ void TryThisEdge(tCar_spec* pCar, br_vector3* pLight, int pIndex_1, br_scalar pS
     br_scalar dot_1;
     br_scalar dot_2;
     br_scalar mult;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10204
@@ -511,16 +550,19 @@ void TryThisEdge(tCar_spec* pCar, br_vector3* pLight, int pIndex_1, br_scalar pS
 // EAX: pPos
 br_scalar DistanceFromPlane(br_vector3* pPos, br_scalar pA, br_scalar pB, br_scalar pC, br_scalar pD) {
     br_vector3 normal;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10308
 // Size: 84
 void DisableLights() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10392
 // Size: 84
 void EnableLights() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10476
@@ -582,6 +624,7 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
     br_material* material;
     br_vertex verts[48];
     br_face faces[16];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 15140
@@ -597,6 +640,7 @@ void RenderShadows(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera
     tCar_spec* the_car;
     br_vector3 camera_to_car;
     br_scalar distance_factor;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 15660
@@ -607,6 +651,7 @@ void FlashyMapCheckpoint(int pIndex, tU32 pTime) {
     tCheckpoint* cp;
     static tU32 last_flash;
     static int flash_state;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 15908
@@ -614,6 +659,7 @@ void FlashyMapCheckpoint(int pIndex, tU32 pTime) {
 // EAX: pPixelmap
 int ConditionallyFillWithSky(br_pixelmap* pPixelmap) {
     int bgnd_col;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 16160
@@ -642,16 +688,19 @@ void RenderAFrame(int pDepth_mask_on) {
     br_vector3 pos;
     char the_text[256];
     tCar_spec* car;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 19912
 // Size: 54
 void InitPaletteAnimate() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 19968
 // Size: 76
 void RevertPalette() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 20044
@@ -671,11 +720,13 @@ void MungePalette() {
     static float last_omega;
     static tU32 next_repair_time;
     static tU32 last_sound;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 20080
 // Size: 49
 void ResetPalette() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 20132
@@ -684,6 +735,7 @@ void ResetPalette() {
 // EDX: pDarken_amount
 void Darken(tU8* pPtr, unsigned int pDarken_amount) {
     unsigned int value;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 20200
@@ -693,6 +745,7 @@ void SetFadedPalette(int pDegree) {
     int j;
     br_pixelmap* the_palette;
     char* the_pixels;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 20396
@@ -700,6 +753,7 @@ void SetFadedPalette(int pDegree) {
 void FadePaletteDown() {
     int start_time;
     int the_time;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 20544
@@ -707,16 +761,19 @@ void FadePaletteDown() {
 void FadePaletteUp() {
     int start_time;
     int the_time;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 20660
 // Size: 91
 void KillSplashScreen() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 20752
 // Size: 58
 void EnsureRenderPalette() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 20812
@@ -724,27 +781,32 @@ void EnsureRenderPalette() {
 // EAX: pPixmap_name
 void SplashScreenWith(char* pPixmap_name) {
     br_pixelmap* the_map;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 21060
 // Size: 48
 void EnsurePaletteUp() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 21108
 // Size: 103
 br_uint_32 AmbientificateMaterial(br_material* pMat, void* pArg) {
     float a;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 21212
 // Size: 60
 void ChangeAmbience(br_scalar pDelta) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 21272
 // Size: 57
 void InitAmbience() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 21332
@@ -763,6 +825,7 @@ void DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int
     tU8* source_ptr;
     tU8* dest_ptr;
     tU8* conv_table;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 22120
@@ -771,6 +834,7 @@ void DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int
 // EDX: pDest_y
 // EBX: pSource
 void DRMaskedStamp(br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap* pSource) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 22208
@@ -789,6 +853,7 @@ void DRPixelmapRectangleOnscreenCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_i
     tU8* source_ptr;
     tU8* dest_ptr;
     tU8* conv_table;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 22540
@@ -811,6 +876,7 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
     tU8* dest_ptr;
     tU8* conv_table;
     tX1616 current_shear;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 23364
@@ -831,11 +897,13 @@ void DRPixelmapRectangleVScaledCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
     tU32 source_y;
     tU32 source_y_delta;
     tU32 old_source_y;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 23708
 // Size: 87
 void InitTransientBitmaps() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 23796
@@ -845,17 +913,20 @@ void InitTransientBitmaps() {
 // EBX: pUser_data
 int AllocateTransientBitmap(int pWidth, int pHeight, int pUser_data) {
     int bm_index;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 23980
 // Size: 96
 // EAX: pIndex
 void DeallocateTransientBitmap(int pIndex) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 24076
 // Size: 67
 void DeallocateAllTransientBitmaps() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 24144
@@ -864,6 +935,7 @@ void DeallocateAllTransientBitmaps() {
 void RemoveTransientBitmaps(int pGraphically_remove_them) {
     int i;
     int order_number;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 24400
@@ -872,6 +944,7 @@ void RemoveTransientBitmaps(int pGraphically_remove_them) {
 // EDX: pX_coord
 // EBX: pY_coord
 void SaveTransient(int pIndex, int pX_coord, int pY_coord) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 24592
@@ -879,6 +952,7 @@ void SaveTransient(int pIndex, int pX_coord, int pY_coord) {
 // EAX: pGib
 void DrawCursorGiblet(tCursor_giblet* pGib) {
     br_pixelmap* the_image;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 24808
@@ -889,6 +963,7 @@ void ProcessCursorGiblets(int pPeriod) {
     int kill_the_giblet;
     tU32 time_now;
     tCursor_giblet* gib;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 25552
@@ -900,6 +975,7 @@ int NewCursorGiblet(int pX_coord, int pY_coord, float pX_speed, float pY_speed, 
     int the_width;
     int the_height;
     int sequence_number;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 26132
@@ -922,6 +998,7 @@ int DoMouseCursor() {
     static int required_cursor;
     static int zero_count;
     static int button_was_down;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 27508
@@ -929,16 +1006,19 @@ int DoMouseCursor() {
 int AllocateCursorTransient() {
     int largest_width;
     int largest_height;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 27696
 // Size: 138
 void StartMouseCursor() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 27836
 // Size: 59
 void EndMouseCursor() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 27896
@@ -950,17 +1030,20 @@ void LoadFont(int pFont_ID) {
     int number_of_chars;
     FILE* f;
     tU32 the_size;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 28464
 // Size: 141
 // EAX: pFont_ID
 void DisposeFont(int pFont_ID) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 28608
 // Size: 93
 void InitDRFonts() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 28704
@@ -974,6 +1057,7 @@ void DrawDropImage(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip, int 
     int src_y;
     int src_height;
     int y_diff;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 28956
@@ -986,6 +1070,7 @@ void DropInImageFromTop(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip,
     tS32 start_time;
     tS32 the_time;
     int drop_distance;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 29120
@@ -998,6 +1083,7 @@ void DropOutImageThruBottom(br_pixelmap* pImage, int pLeft, int pTop, int pTop_c
     tS32 start_time;
     tS32 the_time;
     int drop_distance;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 29272
@@ -1010,6 +1096,7 @@ void DropInImageFromBottom(br_pixelmap* pImage, int pLeft, int pTop, int pTop_cl
     tS32 start_time;
     tS32 the_time;
     int drop_distance;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 29424
@@ -1022,6 +1109,7 @@ void DropOutImageThruTop(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip
     tS32 start_time;
     tS32 the_time;
     int drop_distance;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 29588
@@ -1033,6 +1121,7 @@ void DropOutImageThruTop(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip
 void DrawTellyLine(br_pixelmap* pImage, int pLeft, int pTop, int pPercentage) {
     int the_width;
     int the_height;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 29852
@@ -1043,6 +1132,7 @@ void DrawTellyLine(br_pixelmap* pImage, int pLeft, int pTop, int pPercentage) {
 // ECX: pPercentage
 void DrawTellyImage(br_pixelmap* pImage, int pLeft, int pTop, int pPercentage) {
     int the_height;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 30056
@@ -1053,6 +1143,7 @@ void DrawTellyImage(br_pixelmap* pImage, int pLeft, int pTop, int pPercentage) {
 void TellyInImage(br_pixelmap* pImage, int pLeft, int pTop) {
     tS32 start_time;
     tS32 the_time;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 30252
@@ -1064,6 +1155,7 @@ void TellyOutImage(br_pixelmap* pImage, int pLeft, int pTop) {
     tS32 start_time;
     tS32 the_time;
     int drop_distance;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 30472
@@ -1072,17 +1164,20 @@ void TellyOutImage(br_pixelmap* pImage, int pLeft, int pTop) {
 void SetShadowLevel(tShadow_level pLevel) {
     LOG_TRACE("(%d)", pLevel);
     gShadow_level = pLevel;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 30520
 // Size: 45
 tShadow_level GetShadowLevel() {
     return gShadow_level;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 30568
 // Size: 247
 void ToggleShadow() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 30816
@@ -1090,36 +1185,43 @@ void ToggleShadow() {
 void InitShadow() {
     int i;
     br_vector3 temp_v;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 31320
 // Size: 140
 br_uint_32 SaveShadeTable(br_pixelmap* pTable, void* pArg) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 31460
 // Size: 71
 void SaveShadeTables() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 31532
 // Size: 84
 void DisposeSavedShadeTables() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 31616
 // Size: 134
 void ShadowMode() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 31752
 // Size: 114
 int SwitchToRealResolution() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 31868
 // Size: 125
 int SwitchToLoresMode() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 31996
@@ -1140,4 +1242,5 @@ void DRPixelmapDoubledCopy(br_pixelmap* pDestn, br_pixelmap* pSource, int pSourc
     int dst_row_skip;
     int src_row_skip;
     int width_over_2;
+    NOT_IMPLEMENTED();
 }

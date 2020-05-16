@@ -2,6 +2,7 @@
 #include "CORE/FW/resource.h"
 #include "CORE/FW/resreg.h"
 #include "CORE/STD/brstdlib.h"
+#include "debug.h"
 #include "image.h"
 #include <stddef.h>
 #include <stdio.h>
@@ -32,4 +33,5 @@ void BrPixelmapBegin() {
 // Offset: 160
 // Size: 76
 void BrPixelmapEnd() {
+    NOT_IMPLEMENTED();
 }

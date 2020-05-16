@@ -1,4 +1,5 @@
 #include "structur.h"
+#include <stdlib.h>
 
 int gOpponent_mix[10][5];
 int gPratcam_on;
@@ -14,12 +15,14 @@ int NumberOfOpponentsLeft() {
     int car_count;
     int result;
     tCar_spec* the_car;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 124
 // Size: 419
 // EAX: pReason
 void RaceCompleted(tRace_over_reason pReason) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 544
@@ -27,16 +30,19 @@ void RaceCompleted(tRace_over_reason pReason) {
 // EAX: pCheckpoint_index
 // EDX: pDo_sound
 void Checkpoint(int pCheckpoint_index, int pDo_sound) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 624
 // Size: 305
 void IncrementCheckpoint() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 932
 // Size: 70
 void IncrementLap() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1004
@@ -48,12 +54,14 @@ void IncrementLap() {
 int RayHitFace(br_vector3* pV0, br_vector3* pV1, br_vector3* pV2, br_vector3* pNormal, br_vector3* pStart, br_vector3* pDir) {
     tFace_ref the_face;
     br_scalar rt;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1156
 // Size: 241
 // EAX: pCheckpoint_index
 void WrongCheckpoint(int pCheckpoint_index) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1400
@@ -68,26 +76,31 @@ void CheckCheckpoints() {
     int car_count;
     int car_index;
     tNet_game_player_info* net_player;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2272
 // Size: 72
 void TotalRepair() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2344
 // Size: 64
 void DoLogos() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2408
 // Size: 54
 void DoProgOpeningAnimation() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2464
 // Size: 59
 void DoProgramDemo() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2524
@@ -98,6 +111,7 @@ int ChooseOpponent(int pNastiness, int* pHad_scum) {
     int i;
     int count;
     int temp_array[40];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2832
@@ -108,6 +122,7 @@ void SelectOpponents(tRace_info* pRace_info) {
     int rank_band;
     int nastiness;
     int had_scum;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3128
@@ -120,17 +135,20 @@ int PickNetRace(int pCurrent_race, tNet_sequence_type pNet_race_sequence) {
     int races_count;
     int most_seldom_seen;
     int races_to_pick_from[50];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3400
 // Size: 288
 void SwapNetCarsLoad() {
     int switched_res;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3688
 // Size: 165
 void SwapNetCarsDispose() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3856
@@ -140,29 +158,35 @@ void DoGame() {
     int second_select_race;
     int first_summary_done;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5020
 // Size: 242
 void InitialiseProgramState() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5264
 // Size: 171
 void DoProgram() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5436
 // Size: 270
 void JumpTheStart() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5708
 // Size: 81
 void GoingToInterfaceFromRace() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5792
 // Size: 81
 void GoingBackToRaceFromInterface() {
+    NOT_IMPLEMENTED();
 }

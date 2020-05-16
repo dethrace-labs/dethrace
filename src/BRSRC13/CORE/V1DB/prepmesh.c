@@ -1,4 +1,5 @@
 #include "prepmesh.h"
+#include "debug.h"
 
 br_model* compareModel;
 char* pm_edge_scratch;
@@ -13,6 +14,7 @@ char rscid[51];
 // EDX: last
 int addEdge(br_uint_16 first, br_uint_16 last) {
     pm_temp_edge* tep;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 267
@@ -24,6 +26,7 @@ void prepareEdges(v11group* group, br_model* model) {
     br_face* mfp;
     v11face* fp;
     int f;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 743
@@ -32,6 +35,7 @@ void prepareEdges(v11group* group, br_model* model) {
 void BrPrepareEdges(br_model* model) {
     int g;
     v11model* v11m;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 871
@@ -39,6 +43,7 @@ void BrPrepareEdges(br_model* model) {
 int FacesCompare(void* p1, void* p2) {
     br_face* f1;
     br_face* f2;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 987
@@ -49,6 +54,7 @@ int TVCompare_XYZ(void* p1, void* p2) {
     br_vertex* v1;
     br_vertex* v2;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1273
@@ -59,6 +65,7 @@ int TVCompare_MXYZUVN(void* p1, void* p2) {
     br_vertex* v1;
     br_vertex* v2;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1897
@@ -67,11 +74,13 @@ int TVCompare_MVN(void* p1, void* p2) {
     prep_vertex* tv1;
     prep_vertex* tv2;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2304
 // Size: 88
 br_fraction BrScalarToFractionClamp(br_scalar s) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2411
@@ -82,6 +91,7 @@ void PrepareFaceNormals(br_model* model) {
     br_vector4 v4;
     br_face* fp;
     int f;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2705
@@ -90,6 +100,7 @@ void PrepareFaceNormals(br_model* model) {
 void Smoothing(br_model* model, br_scalar crease_limit, prep_vertex** start, prep_vertex** end) {
     prep_vertex** outer;
     prep_vertex** inner;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3018
@@ -99,6 +110,7 @@ void SmoothingCreased(br_model* model, br_scalar crease_limit, prep_vertex** sta
     br_vector3 o_n;
     prep_vertex** outer;
     prep_vertex** inner;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3529
@@ -110,6 +122,7 @@ void SmoothingCreased(br_model* model, br_scalar crease_limit, prep_vertex** sta
 void CopyVertex(v11group* group, int v, prep_vertex* src, br_model* model) {
     br_vertex* srcv;
     br_vector3 n;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4017
@@ -119,6 +132,7 @@ void CopyVertex(v11group* group, int v, prep_vertex* src, br_model* model) {
 // EBX: src
 // ECX: model
 void CopyFace(v11group* group, int f, br_face* src, br_model* model) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4324
@@ -155,6 +169,7 @@ void PrepareGroups(br_model* model) {
     br_uint_16* v11vuser;
     br_face** sorted_faces;
     char* cp;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6862
@@ -165,6 +180,7 @@ void PrepareBoundingRadius(br_model* model) {
     float max;
     int v;
     br_vertex* vp;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7051
@@ -175,6 +191,7 @@ void PrepareBoundingBox(br_model* model) {
     int v;
     br_vertex* vp;
     br_scalar x;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7345
@@ -184,6 +201,7 @@ void RegenerateFaceNormals(v11model* v11m) {
     int g;
     int f;
     v11face* fp;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7637
@@ -196,6 +214,7 @@ void RegenerateVertexNormals(v11model* v11m) {
     v11face* fp;
     fmt_vertex* vp;
     br_vector3* normals;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8413
@@ -209,10 +228,12 @@ void BrModelUpdate(br_model* model, br_uint_16 flags) {
     v11face* ffp;
     br_vertex* vp;
     br_face* fp;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10011
 // Size: 109
 // EAX: model
 void BrModelClear(br_model* model) {
+    NOT_IMPLEMENTED();
 }

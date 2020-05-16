@@ -1,5 +1,6 @@
 #include "network.h"
 #include "pc-dos/dosnet.h"
+#include <stdlib.h>
 
 tNet_game_player_info gNew_net_players[6];
 tGuaranteed_message gGuarantee_list[150];
@@ -41,37 +42,44 @@ int gReceived_game_scores;
 // Offset: 0
 // Size: 429
 int NetInitialise() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 432
 // Size: 103
 int NetShutdown() {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 536
 // Size: 58
 void ShutdownNetIfRequired() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 596
 // Size: 44
 void DisableNetService() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 640
 // Size: 44
 void ReenableNetService() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 684
 // Size: 72
 int PermitNetServiceReentrancy() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 756
 // Size: 44
 void HaltNetServiceReentrancy() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 800
@@ -79,6 +87,7 @@ void HaltNetServiceReentrancy() {
 // EAX: pMessage
 void NetSendHeadupToAllPlayers(char* pMessage) {
     tNet_contents* the_contents;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 876
@@ -86,6 +95,7 @@ void NetSendHeadupToAllPlayers(char* pMessage) {
 // EAX: pMessage
 void NetSendHeadupToEverybody(char* pMessage) {
     tNet_contents* the_contents;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 988
@@ -94,60 +104,71 @@ void NetSendHeadupToEverybody(char* pMessage) {
 // EDX: pPlayer
 void NetSendHeadupToPlayer(char* pMessage, tPlayer_ID pPlayer) {
     tNet_message* message;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1132
 // Size: 94
 void InitialisePlayerStati() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1228
 // Size: 73
 void LeaveTempGame() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1304
 // Size: 63
 void DisposeCurrentJoinPollGame() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1368
 // Size: 277
 void DoNextJoinPoll() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1648
 // Size: 100
 // EAX: pAdd_proc
 void NetStartProducingJoinList(void (*pAdd_proc)(tNet_game_details*)) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1748
 // Size: 59
 void NetEndJoinList() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1808
 // Size: 55
 // EAX: pDetails
 void NetDisposePIDGameInfo(tNet_game_details* pDetails) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1864
 // Size: 51
 // EAX: pDetails
 void NetDisposeGameDetails(tNet_game_details* pDetails) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1916
 // Size: 62
 tNet_game_details* NetAllocatePIDGameDetails() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1980
 // Size: 66
 // EAX: pDetails
 void NetLeaveGameLowLevel(tNet_game_details* pDetails) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2048
@@ -159,6 +180,7 @@ void NetLeaveGame(tNet_game_details* pNet_game) {
     char* s2;
     int i;
     int must_revert_reentrancy;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2432
@@ -166,12 +188,14 @@ void NetLeaveGame(tNet_game_details* pNet_game) {
 // EAX: pPlayer
 // EDX: pSender_address
 void NetSetPlayerSystemInfo(tNet_game_player_info* pPlayer, void* pSender_address) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2484
 // Size: 45
 // EAX: pPlayer
 void NetDisposePlayer(tNet_game_player_info* pPlayer) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2532
@@ -181,6 +205,7 @@ void NetDisposePlayer(tNet_game_player_info* pPlayer) {
 // EBX: pCar_index
 // ECX: pHost
 void FillInThisPlayer(tNet_game_details* pGame, tNet_game_player_info* pPlayer, int pCar_index, int pHost) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2768
@@ -189,6 +214,7 @@ void FillInThisPlayer(tNet_game_details* pGame, tNet_game_player_info* pPlayer, 
 // EDX: pPlayer
 void LoadCarN(int pIndex, tNet_game_player_info* pPlayer) {
     int switched_res;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2976
@@ -197,12 +223,14 @@ void LoadCarN(int pIndex, tNet_game_player_info* pPlayer) {
 void DisposeCarN(int pIndex) {
     int i;
     int j;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3244
 // Size: 154
 // EAX: pIndex
 void PlayerHasLeft(int pIndex) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3400
@@ -217,6 +245,7 @@ void NetPlayersChanged(int pNew_count, tNet_game_player_info* pNew_players) {
     int new_player;
     int player_still_there;
     tPlayer_ID old_fox_it;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4724
@@ -229,12 +258,14 @@ tNet_game_details* NetHostGame(tNet_game_type pGame_type, tNet_game_options* pOp
     tNet_game_details* game;
     void* host_address;
     tNet_game_player_info me;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5112
 // Size: 51
 // EAX: pDetails
 int NetInitClient(tNet_game_details* pDetails) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5164
@@ -242,6 +273,7 @@ int NetInitClient(tNet_game_details* pDetails) {
 // EAX: pDetails
 // EDX: pPlayer_name
 int NetJoinGameLowLevel(tNet_game_details* pDetails, char* pPlayer_name) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5220
@@ -253,6 +285,7 @@ int NetJoinGame(tNet_game_details* pDetails, char* pPlayer_name, int pCar_index)
     int result;
     tNet_message* the_message;
     tU32 start_time;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5612
@@ -262,18 +295,21 @@ int NetJoinGame(tNet_game_details* pDetails, char* pPlayer_name, int pCar_index)
 void NetObtainSystemUserName(char* pName, int pMax_length) {
     PDNetObtainSystemUserName(pName, pMax_length);
     pName[9] = 0;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5668
 // Size: 51
 // EAX: pDetails
 tU32 NetExtractGameID(tNet_game_details* pDetails) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5720
 // Size: 51
 // EAX: pDetails
 tPlayer_ID NetExtractPlayerID(tNet_game_details* pDetails) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5772
@@ -282,6 +318,7 @@ tPlayer_ID NetExtractPlayerID(tNet_game_details* pDetails) {
 // EDX: pMessage
 // EBX: pAddress
 int NetSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessage, void* pAddress) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5892
@@ -291,6 +328,7 @@ int NetSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessage,
 // EBX: pPlayer
 int NetSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage, tPlayer_ID pPlayer) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6064
@@ -298,6 +336,7 @@ int NetSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage, 
 // EAX: pDetails
 // EDX: pMessage
 int NetSendMessageToHost(tNet_game_details* pDetails, tNet_message* pMessage) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6172
@@ -306,6 +345,7 @@ int NetSendMessageToHost(tNet_game_details* pDetails, tNet_message* pMessage) {
 // EDX: pIncoming_message
 // EBX: pReply_message
 int NetReplyToMessage(tNet_game_details* pDetails, tNet_message* pIncoming_message, tNet_message* pReply_message) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6236
@@ -313,6 +353,7 @@ int NetReplyToMessage(tNet_game_details* pDetails, tNet_message* pIncoming_messa
 // EAX: pDetails
 // EDX: pMessage
 int NetSendMessageToAllPlayers(tNet_game_details* pDetails, tNet_message* pMessage) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6324
@@ -321,6 +362,7 @@ int NetSendMessageToAllPlayers(tNet_game_details* pDetails, tNet_message* pMessa
 // EDX: pSize_decider
 tU32 NetGetContentsSize(tNet_message_type pType, tS32 pSize_decider) {
     tU32 the_size;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6968
@@ -328,6 +370,7 @@ tU32 NetGetContentsSize(tNet_message_type pType, tS32 pSize_decider) {
 // EAX: pType
 // EDX: pSize_decider
 tU32 NetGetMessageSize(tNet_message_type pType, tS32 pSize_decider) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7028
@@ -335,6 +378,7 @@ tU32 NetGetMessageSize(tNet_message_type pType, tS32 pSize_decider) {
 // EAX: pContents
 tS32 NetCalcSizeDecider(tNet_contents* pContents) {
     tS32 the_decider;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7140
@@ -344,6 +388,7 @@ tS32 NetCalcSizeDecider(tNet_contents* pContents) {
 tNet_message* NetBuildMessage(tNet_message_type pType, tS32 pSize_decider) {
     tNet_message* the_message;
     tU32 the_size;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7256
@@ -353,6 +398,7 @@ tNet_message* NetBuildMessage(tNet_message_type pType, tS32 pSize_decider) {
 tNet_contents* NetGetToHostContents(tNet_message_type pType, tS32 pSize_decider) {
     tU32 the_size;
     tNet_contents* contents;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7488
@@ -362,11 +408,13 @@ tNet_contents* NetGetToHostContents(tNet_message_type pType, tS32 pSize_decider)
 tNet_contents* NetGetBroadcastContents(tNet_message_type pType, tS32 pSize_decider) {
     tU32 the_size;
     tNet_contents* contents;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7720
 // Size: 114
 void NetSendMessageStacks() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7836
@@ -381,12 +429,14 @@ tNet_message* NetAllocateMessage(int pSize) {
     static int rr_max;
     tNet_message* message;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8472
 // Size: 96
 void NetFreeExcessMemory() {
     void* temp;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8568
@@ -394,6 +444,7 @@ void NetFreeExcessMemory() {
 // EAX: pDetails
 // EDX: pMessage
 int NetDisposeMessage(tNet_game_details* pDetails, tNet_message* pMessage) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8644
@@ -401,6 +452,7 @@ int NetDisposeMessage(tNet_game_details* pDetails, tNet_message* pMessage) {
 // EAX: pDetails
 // EDX: pSender_address
 tNet_message* NetGetNextMessage(tNet_game_details* pDetails, void** pSender_address) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8700
@@ -409,18 +461,21 @@ tNet_message* NetGetNextMessage(tNet_game_details* pDetails, void** pSender_addr
 // EDX: pSender_address
 void ReceivedSendMeDetails(tNet_contents* pContents, void* pSender_address) {
     tNet_message* message;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8804
 // Size: 80
 // EAX: pContents
 void ReceivedDetails(tNet_contents* pContents) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8884
 // Size: 259
 void SendOutPlayerList() {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9144
@@ -433,6 +488,7 @@ void ReceivedJoin(tNet_contents* pContents, void* pSender_address) {
     int slot_index;
     tNet_message* message;
     tNet_game_player_info* new_players;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9744
@@ -443,6 +499,7 @@ void KickPlayerOut(tPlayer_ID pID) {
     int j;
     int new_player_count;
     tNet_game_player_info* new_players;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10108
@@ -450,6 +507,7 @@ void KickPlayerOut(tPlayer_ID pID) {
 // EAX: pContents
 // EDX: pMessage
 void ReceivedLeave(tNet_contents* pContents, tNet_message* pMessage) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10160
@@ -463,24 +521,28 @@ void NetFullScreenMessage(int pStr_index, int pLeave_it_up_there) {
     int restore_screen;
     char* gPixels_copy;
     char* gPalette_copy;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10636
 // Size: 76
 // EAX: pMessage_index
 void HostHasBittenTheDust(int pMessage_index) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10712
 // Size: 47
 // EAX: pContents
 void ReceivedHosticide(tNet_contents* pContents) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10760
 // Size: 75
 void ConfirmReceipt() {
     tNet_message* the_message;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10836
@@ -489,12 +551,14 @@ void ConfirmReceipt() {
 // EDX: pM
 void ReceivedNewPlayerList(tNet_contents* pContents, tNet_message* pM) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11344
 // Size: 89
 // EAX: pContents
 void ReceivedRaceOver(tNet_contents* pContents) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11436
@@ -503,6 +567,7 @@ void ReceivedRaceOver(tNet_contents* pContents) {
 // EDX: pMessage
 void ReceivedStatusReport(tNet_contents* pContents, tNet_message* pMessage) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11688
@@ -511,6 +576,7 @@ void ReceivedStatusReport(tNet_contents* pContents, tNet_message* pMessage) {
 void ReceivedStartRace(tNet_contents* pContents) {
     int i;
     int index;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 12380
@@ -518,12 +584,14 @@ void ReceivedStartRace(tNet_contents* pContents) {
 // EAX: pContents
 void ReceivedGuaranteeReply(tNet_contents* pContents) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 12480
 // Size: 75
 // EAX: pContents
 void ReceivedHeadup(tNet_contents* pContents) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 12556
@@ -532,6 +600,7 @@ void ReceivedHeadup(tNet_contents* pContents) {
 // EDX: pMessage
 void ReceivedHostQuery(tNet_contents* pContents, tNet_message* pMessage) {
     tNet_message* message;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 12688
@@ -539,6 +608,7 @@ void ReceivedHostQuery(tNet_contents* pContents, tNet_message* pMessage) {
 // EAX: pContents
 void ReceivedHostReply(tNet_contents* pContents) {
     tNet_message* message;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 12828
@@ -547,6 +617,7 @@ void ReceivedHostReply(tNet_contents* pContents) {
 // EDX: pSender_address
 void SendGuaranteeReply(tNet_message* pMessage, void* pSender_address) {
     tNet_message* message;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 12920
@@ -554,6 +625,7 @@ void SendGuaranteeReply(tNet_message* pMessage, void* pSender_address) {
 // EAX: pID
 int PlayerIsInList(tPlayer_ID pID) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 13044
@@ -562,6 +634,7 @@ int PlayerIsInList(tPlayer_ID pID) {
 // EDX: pMessage
 // EBX: pReceive_time
 void ReceivedTimeSync(tNet_contents* pContents, tNet_message* pMessage, tU32 pReceive_time) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 13128
@@ -569,18 +642,21 @@ void ReceivedTimeSync(tNet_contents* pContents, tNet_message* pMessage, tU32 pRe
 // EAX: pContents
 void ReceivedConfirm(tNet_contents* pContents) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 13236
 // Size: 37
 // EAX: pContents
 void ReceivedDisableCar(tNet_contents* pContents) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 13276
 // Size: 37
 // EAX: pContents
 void ReceivedEnableCar(tNet_contents* pContents) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 13316
@@ -588,6 +664,7 @@ void ReceivedEnableCar(tNet_contents* pContents) {
 // EAX: pContents
 void ReceivedScores(tNet_contents* pContents) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 13420
@@ -603,6 +680,7 @@ void ReceivedWasted(tNet_contents* pContents) {
     static tS32 last_wasty_message_time;
     static tNet_game_player_info* last_culprit;
     static tNet_game_player_info* last_victim;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 14116
@@ -612,6 +690,7 @@ void ReceivedWasted(tNet_contents* pContents) {
 void ReceivedCarDetailsReq(tNet_contents* pContents, void* pSender_address) {
     tNet_message* message;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 14304
@@ -620,6 +699,7 @@ void ReceivedCarDetailsReq(tNet_contents* pContents, void* pSender_address) {
 void ReceivedCarDetails(tNet_contents* pContents) {
     int i;
     int j;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 14488
@@ -627,6 +707,7 @@ void ReceivedCarDetails(tNet_contents* pContents) {
 // EAX: pContents
 void ReceivedGameScores(tNet_contents* pContents) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 14636
@@ -637,6 +718,7 @@ void ReceivedGameScores(tNet_contents* pContents) {
 void ReceivedMessage(tNet_message* pMessage, void* pSender_address, tU32 pReceive_time) {
     tNet_contents* contents;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 15448
@@ -645,11 +727,13 @@ void NetReceiveAndProcessMessages() {
     void* sender_address;
     tU32 receive_time;
     int old_net_service;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 15628
 // Size: 84
 void BroadcastStatus() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 15712
@@ -659,11 +743,13 @@ void CheckForDisappearees() {
     tU32 the_time;
     char s[256];
     char* s2;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 16068
 // Size: 105
 void CheckForPendingStartRace() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 16176
@@ -672,6 +758,7 @@ void CheckForPendingStartRace() {
 void NetService(int pIn_race) {
     tU32 time;
     static tU32 last_status_broadcast;
+    LOG_WARN("NetService not implemented");
 }
 
 // Offset: 16400
@@ -680,17 +767,20 @@ void NetService(int pIn_race) {
 // EDX: pReason
 void NetFinishRace(tNet_game_details* pDetails, tRace_over_reason pReason) {
     tNet_message* the_message;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 16488
 // Size: 157
 // EAX: pNew_status
 void NetPlayerStatusChanged(tPlayer_status pNew_status) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 16648
 // Size: 56
 tPlayer_status NetGetPlayerStatus() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 16704
@@ -701,6 +791,7 @@ tPlayer_status NetGetPlayerStatus() {
 int NetGuaranteedSendMessageToAllPlayers(tNet_game_details* pDetails, tNet_message* pMessage, int (*pNotifyFail)(tU32, tNet_message*)) {
     int i;
     int err;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 16860
@@ -709,6 +800,7 @@ int NetGuaranteedSendMessageToAllPlayers(tNet_game_details* pDetails, tNet_messa
 // EDX: pMessage
 // EBX: pNotifyFail
 int NetGuaranteedSendMessageToEverybody(tNet_game_details* pDetails, tNet_message* pMessage, int (*pNotifyFail)(tU32, tNet_message*)) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 16996
@@ -717,6 +809,7 @@ int NetGuaranteedSendMessageToEverybody(tNet_game_details* pDetails, tNet_messag
 // EDX: pMessage
 // EBX: pNotifyFail
 int NetGuaranteedSendMessageToHost(tNet_game_details* pDetails, tNet_message* pMessage, int (*pNotifyFail)(tU32, tNet_message*)) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 17060
@@ -727,6 +820,7 @@ int NetGuaranteedSendMessageToHost(tNet_game_details* pDetails, tNet_message* pM
 // ECX: pNotifyFail
 int NetGuaranteedSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage, tPlayer_ID pPlayer, int (*pNotifyFail)(tU32, tNet_message*)) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 17304
@@ -736,6 +830,7 @@ int NetGuaranteedSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* 
 // EBX: pAddress
 // ECX: pNotifyFail
 int NetGuaranteedSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessage, void* pAddress, int (*pNotifyFail)(tU32, tNet_message*)) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 17672
@@ -744,6 +839,7 @@ void ResendGuaranteedMessages() {
     int i;
     int j;
     tU32 time;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 18208
@@ -751,12 +847,14 @@ void ResendGuaranteedMessages() {
 // EAX: pAge
 // EDX: pMessage
 int SampleFailNotifier(tU32 pAge, tNet_message* pMessage) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 18276
 // Size: 77
 void NetWaitForGuaranteeReplies() {
     tU32 start_time;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 18356
@@ -764,6 +862,7 @@ void NetWaitForGuaranteeReplies() {
 // EAX: pPlayer
 tNet_game_player_info* NetPlayerFromID(tPlayer_ID pPlayer) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 18472
@@ -772,6 +871,7 @@ tNet_game_player_info* NetPlayerFromID(tPlayer_ID pPlayer) {
 tCar_spec* NetCarFromPlayerID(tPlayer_ID pPlayer) {
     int i;
     tNet_game_player_info* player;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 18552
@@ -779,6 +879,7 @@ tCar_spec* NetCarFromPlayerID(tPlayer_ID pPlayer) {
 // EAX: pCar
 tNet_game_player_info* NetPlayerFromCar(tCar_spec* pCar) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 18668
@@ -790,16 +891,19 @@ tU32 DoCheckSum(tNet_message* pMessage) {
     tU32 the_sum;
     tU32* p;
     tU8* q;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 18856
 // Size: 37
 // EAX: pMessage
 void GetCheckSum(tNet_message* pMessage) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 18896
 // Size: 37
 // EAX: pMessage
 void CheckCheckSum(tNet_message* pMessage) {
+    NOT_IMPLEMENTED();
 }

@@ -1,4 +1,5 @@
 #include "brstdmem.h"
+#include "debug.h"
 
 #include <stdlib.h>
 

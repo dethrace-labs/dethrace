@@ -1,5 +1,6 @@
 #include "init.h"
 
+#include <stdlib.h>
 #include <time.h>
 
 #include "common/depth.h"
@@ -42,6 +43,7 @@ br_material* gDefault_track_material;
 // Offset: 0
 // Size: 115
 void AllocateSelf() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 116
@@ -99,27 +101,32 @@ void ReinitialiseForwardCamera() {
     float the_angle;
     float d;
     float w;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1216
 // Size: 217
 void AllocateRearviewPixelmap() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1436
 // Size: 169
 void ReinitialiseRearviewCamera() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1608
 // Size: 347
 void ReinitialiseRenderStuff() {
     int y_diff;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1956
 // Size: 34
 void InstallFindFailedHooks() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1992
@@ -127,6 +134,7 @@ void InstallFindFailedHooks() {
 void AllocateStandardLamp() {
     br_actor* lamp;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2152
@@ -174,22 +182,26 @@ void InitializeBRenderEnvironment() {
 // Offset: 2496
 // Size: 79
 void InitBRFonts() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2576
 // Size: 196
 void AustereWarning() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2772
 // Size: 309
 void InitLineStuff() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3084
 // Size: 896
 void InitSmokeStuff() {
     tPath_name path;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3980
@@ -199,6 +211,7 @@ void Init2DStuff() {
     tPath_name path;
     br_scalar prat_u;
     br_scalar prat_v;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5332
@@ -298,42 +311,50 @@ void InitialiseDeathRace(int pArgc, char** pArgv) {
 // EAX: pStart_race
 void InitGame(int pStart_race) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6496
 // Size: 191
 void DisposeGameIfNecessary() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6688
 // Size: 54
 void LoadInTrack() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6744
 // Size: 44
 void DisposeTrack() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6788
 // Size: 97
 // EAX: pMaterial
 void CopyMaterialColourFromIndex(br_material* pMaterial) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6888
 // Size: 1230
 void InitRace() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8120
 // Size: 208
 void DisposeRace() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8328
 // Size: 45
 int GetScreenSize() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8376
@@ -342,4 +363,5 @@ int GetScreenSize() {
 void SetScreenSize(int pNew_size) {
     LOG_TRACE("(%d)", pNew_size);
     gRender_indent = pNew_size;
+    NOT_IMPLEMENTED();
 }

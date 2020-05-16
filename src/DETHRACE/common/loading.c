@@ -1,6 +1,7 @@
 #include "loading.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "brender.h"
@@ -54,6 +55,7 @@ char gDecode_string[14] = { 0x9B, 0x52, 0x93, 0x9F, 0x52, 0x98, 0x9B, 0x96, 0x96
 // EAX: pF
 tU32 ReadU32(FILE* pF) {
     tU32 raw_long;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 68
@@ -61,6 +63,7 @@ tU32 ReadU32(FILE* pF) {
 // EAX: pF
 tU16 ReadU16(FILE* pF) {
     tU16 raw_short;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 136
@@ -68,6 +71,7 @@ tU16 ReadU16(FILE* pF) {
 // EAX: pF
 tU8 ReadU8(FILE* pF) {
     tU8 raw_byte;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 204
@@ -75,6 +79,7 @@ tU8 ReadU8(FILE* pF) {
 // EAX: pF
 tS32 ReadS32(FILE* pF) {
     tS32 raw_long;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 272
@@ -82,6 +87,7 @@ tS32 ReadS32(FILE* pF) {
 // EAX: pF
 tS16 ReadS16(FILE* pF) {
     tS16 raw_short;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 340
@@ -89,6 +95,7 @@ tS16 ReadS16(FILE* pF) {
 // EAX: pF
 tS8 ReadS8(FILE* pF) {
     tS8 raw_byte;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 408
@@ -97,6 +104,7 @@ tS8 ReadS8(FILE* pF) {
 // EDX: pNumber
 void WriteU32L(FILE* pF, tU32 pNumber) {
     tU32 raw_long;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 476
@@ -105,6 +113,7 @@ void WriteU32L(FILE* pF, tU32 pNumber) {
 // EDX: pNumber
 void WriteU16L(FILE* pF, tU16 pNumber) {
     tU16 raw_short;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 544
@@ -113,6 +122,7 @@ void WriteU16L(FILE* pF, tU16 pNumber) {
 // EDX: pNumber
 void WriteU8L(FILE* pF, tU8 pNumber) {
     tU8 raw_byte;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 612
@@ -121,6 +131,7 @@ void WriteU8L(FILE* pF, tU8 pNumber) {
 // EDX: pNumber
 void WriteS32L(FILE* pF, tS32 pNumber) {
     tS32 raw_long;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 680
@@ -129,6 +140,7 @@ void WriteS32L(FILE* pF, tS32 pNumber) {
 // EDX: pNumber
 void WriteS16L(FILE* pF, tS16 pNumber) {
     tS16 raw_short;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 748
@@ -137,6 +149,7 @@ void WriteS16L(FILE* pF, tS16 pNumber) {
 // EDX: pNumber
 void WriteS8L(FILE* pF, tS8 pNumber) {
     tS8 raw_byte;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 816
@@ -144,6 +157,7 @@ void WriteS8L(FILE* pF, tS8 pNumber) {
 // EAX: pF
 // EDX: pBytes_to_skip
 void SkipBytes(FILE* pF, int pBytes_to_skip) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 872
@@ -151,6 +165,7 @@ void SkipBytes(FILE* pF, int pBytes_to_skip) {
 // EAX: pPtr
 tU32 MemReadU32(char** pPtr) {
     tU32 raw_long;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 944
@@ -158,12 +173,14 @@ tU32 MemReadU32(char** pPtr) {
 // EAX: pPtr
 tU16 MemReadU16(char** pPtr) {
     tU16 raw_short;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1016
 // Size: 55
 // EAX: pPtr
 tU8 MemReadU8(char** pPtr) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1072
@@ -171,6 +188,7 @@ tU8 MemReadU8(char** pPtr) {
 // EAX: pPtr
 tS32 MemReadS32(char** pPtr) {
     tS32 raw_long;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1144
@@ -178,6 +196,7 @@ tS32 MemReadS32(char** pPtr) {
 // EAX: pPtr
 tS16 MemReadS16(char** pPtr) {
     tS16 raw_short;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1216
@@ -185,6 +204,7 @@ tS16 MemReadS16(char** pPtr) {
 // EAX: pPtr
 tS8 MemReadS8(char** pPtr) {
     tS8 raw_byte;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1272
@@ -192,6 +212,7 @@ tS8 MemReadS8(char** pPtr) {
 // EAX: pPtr
 // EDX: pBytes_to_skip
 void MemSkipBytes(char** pPtr, int pBytes_to_skip) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1320
@@ -347,6 +368,7 @@ void LoadGeneralParameters() {
 // Offset: 3472
 // Size: 53
 void FinishLoadingGeneral() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3528
@@ -356,6 +378,7 @@ br_pixelmap* LoadPixelmap(char* pName) {
     tPath_name the_path;
     br_pixelmap* pm;
     char* end;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3820
@@ -366,6 +389,7 @@ br_pixelmap* LoadPixelmap(char* pName) {
 br_uint_32 LoadPixelmaps(char* pFile_name, br_pixelmap** pPixelmaps, br_uint_16 pNum) {
     tPath_name path;
     int count;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4044
@@ -373,6 +397,7 @@ br_uint_32 LoadPixelmaps(char* pFile_name, br_pixelmap** pPixelmaps, br_uint_16 
 // EAX: pName
 br_pixelmap* LoadShadeTable(char* pName) {
     tPath_name the_path;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4144
@@ -381,6 +406,7 @@ br_pixelmap* LoadShadeTable(char* pName) {
 br_material* LoadMaterial(char* pName) {
     tPath_name the_path;
     br_material* result;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4276
@@ -402,6 +428,7 @@ br_model* LoadModel(char* pName) {
 // EAX: pName
 br_actor* LoadActor(char* pName) {
     tPath_name the_path;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4504
@@ -410,6 +437,7 @@ br_actor* LoadActor(char* pName) {
 void DRLoadPalette(char* pPath_name) {
     br_pixelmap* palette_array[100];
     int number_of_palettes;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4584
@@ -418,6 +446,7 @@ void DRLoadPalette(char* pPath_name) {
 void DRLoadShadeTable(char* pPath_name) {
     br_pixelmap* table_array[100];
     int number_of_tables;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4664
@@ -425,6 +454,7 @@ void DRLoadShadeTable(char* pPath_name) {
 // EAX: pPixelmap_array
 // EDX: pCount
 void RezeroPixelmaps(br_pixelmap** pPixelmap_array, int pCount) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4748
@@ -433,6 +463,7 @@ void RezeroPixelmaps(br_pixelmap** pPixelmap_array, int pCount) {
 void DRLoadPixelmaps(char* pPath_name) {
     br_pixelmap* pixelmap_array[100];
     int number_of_pixelmaps;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4848
@@ -441,6 +472,7 @@ void DRLoadPixelmaps(char* pPath_name) {
 void DRLoadMaterials(char* pPath_name) {
     br_material* material_array[100];
     int number_of_materials;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4952
@@ -449,6 +481,7 @@ void DRLoadMaterials(char* pPath_name) {
 void DRLoadModels(char* pPath_name) {
     br_model* model_array[100];
     int number_of_models;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5056
@@ -458,6 +491,7 @@ void DRLoadActors(char* pPath_name) {
     br_actor* actor_array[100];
     int number_of_actors;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5192
@@ -467,6 +501,7 @@ void DRLoadLights(char* pPath_name) {
     br_actor* light_array[100];
     int number_of_lights;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5328
@@ -476,6 +511,7 @@ void DRLoadLights(char* pPath_name) {
 // EBX: pLoad_routine
 void LoadInFiles(char* pThe_base_path, char* pThe_dir_name, void (*pLoad_routine)(char*)) {
     tPath_name the_path;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5400
@@ -483,11 +519,13 @@ void LoadInFiles(char* pThe_base_path, char* pThe_dir_name, void (*pLoad_routine
 // EAX: pThe_dir_path
 void LoadInRegisteeDir(char* pThe_dir_path) {
     tPath_name the_path;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5608
 // Size: 44
 void LoadInRegistees() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5652
@@ -518,16 +556,19 @@ void LoadKeyMapping() {
 void LoadInterfaceStuff(int pWithin_race) {
     tPath_name path;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6108
 // Size: 272
 void UnlockInterfaceStuff() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6380
 // Size: 75
 void InitInterfaceLoadState() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6456
@@ -549,6 +590,7 @@ tS8* ConvertPixTo16BitStripMap(br_pixelmap* pBr_map) {
     tU8* new_line;
     tU8 byte;
     tU16* palette_entry;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7084
@@ -568,6 +610,7 @@ tS8* ConvertPixToStripMap(br_pixelmap* pThe_br_map) {
     tU8* temp_strip_image;
     tU8 new_line[800];
     tU8 the_byte;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7664
@@ -577,6 +620,7 @@ tS8* ConvertPixToStripMap(br_pixelmap* pThe_br_map) {
 void KillWindscreen(br_model* pModel, br_material* pMaterial) {
     br_face* face;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7812
@@ -585,6 +629,7 @@ void KillWindscreen(br_model* pModel, br_material* pMaterial) {
 void DropOffDyingPeds(tCar_spec* pCar) {
     br_actor* child;
     br_actor* next;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7916
@@ -594,6 +639,7 @@ void DropOffDyingPeds(tCar_spec* pCar) {
 void DisposeCar(tCar_spec* pCar_spec, int pOwner) {
     int i;
     int j;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9032
@@ -601,6 +647,7 @@ void DisposeCar(tCar_spec* pCar_spec, int pOwner) {
 // EAX: pCar
 void AdjustCarCoordinates(tCar_spec* pCar) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9660
@@ -614,6 +661,7 @@ void LoadSpeedo(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
     char* str;
     char the_char1;
     char the_char2;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10592
@@ -627,6 +675,7 @@ void LoadTacho(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
     char* str;
     char the_char1;
     char the_char2;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11356
@@ -639,6 +688,7 @@ void LoadHeadups(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
     char* str;
     int j;
     int number_of_slots;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 12172
@@ -657,6 +707,7 @@ void ReadNonCarMechanicsData(FILE* pF, tNon_car_spec* non_car) {
     br_scalar ts;
     br_scalar ts1;
     br_scalar snap_angle;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 13992
@@ -679,6 +730,7 @@ void ReadMechanicsData(FILE* pF, tCar_spec* c) {
     br_vector3* actor_offset;
     br_scalar speed;
     br_scalar force;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 17468
@@ -690,12 +742,14 @@ void LoadGear(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
     tPath_name the_path;
     char s[256];
     char* str;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 17664
 // Size: 56
 // EAX: pRef_holder
 void AddRefOffset(int* pRef_holder) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 17720
@@ -712,12 +766,14 @@ void GetDamageProgram(FILE* pF, tCar_spec* pCar_spec, tImpact_location pImpact_l
     char s[256];
     char delim[64];
     char* str;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 18420
 // Size: 178
 br_uint_32 LinkModel(br_actor* pActor, tModel_pool* pModel_pool) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 18600
@@ -726,6 +782,7 @@ br_uint_32 LinkModel(br_actor* pActor, tModel_pool* pModel_pool) {
 // EDX: pModel_count
 void FreeUpBonnetModels(br_model** pModel_array, int pModel_count) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 18800
@@ -735,6 +792,7 @@ void FreeUpBonnetModels(br_model** pModel_array, int pModel_count) {
 // EBX: pModel_count
 void LinkModelsToActor(br_actor* pActor, br_model** pModel_array, int pModel_count) {
     tModel_pool model_pool;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 18868
@@ -745,6 +803,7 @@ void ReadShrapnelMaterials(FILE* pF, tCollision_info* pCar_spec) {
     char s[256];
     char version;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 19000
@@ -753,12 +812,14 @@ void ReadShrapnelMaterials(FILE* pF, tCollision_info* pCar_spec) {
 // EDX: pInput_car
 void CloneCar(tCar_spec** pOutput_car, tCar_spec* pInput_car) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 19200
 // Size: 65
 // EAX: pCar
 void DisposeClonedCar(tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 19268
@@ -772,6 +833,7 @@ int RemoveDoubleSided(br_model* pModel) {
     int i;
     int orig_nfaces;
     int result;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 19792
@@ -780,6 +842,7 @@ int RemoveDoubleSided(br_model* pModel) {
 void MungeWindscreen(br_model* pModel) {
     br_face* face;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 19996
@@ -787,6 +850,7 @@ void MungeWindscreen(br_model* pModel) {
 // EAX: pModel
 // EDX: pOwner
 void SetModelFlags(br_model* pModel, int pOwner) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 20140
@@ -822,24 +886,28 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
     int v_num;
     int group;
     int vertex_total;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 28344
 // Size: 186
 void LoadHeadupImages() {
     tPath_name the_path;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 28532
 // Size: 94
 void DisposeHeadupImages() {
     tPath_name the_path;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 28628
 // Size: 109
 FILE* OpenRaceFile() {
     tPath_name the_path;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 28740
@@ -851,6 +919,7 @@ void SkipRestOfRace(FILE* pF) {
     int text_chunk_count;
     int line_count;
     char s[256];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 28960
@@ -867,18 +936,21 @@ void LoadRaces(tRace_list_spec* pRace_list, int* pCount, int pRace_type_index) {
     int last_race;
     char s[256];
     char* str;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 29372
 // Size: 88
 // EAX: pIndex
 void UnlockOpponentMugshot(int pIndex) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 29460
 // Size: 168
 // EAX: pIndex
 void LoadOpponentMugShot(int pIndex) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 29628
@@ -886,6 +958,7 @@ void LoadOpponentMugShot(int pIndex) {
 // EAX: pRace_info
 // EDX: pIndex
 void DisposeOpponentGridIcon(tRace_info* pRace_info, int pIndex) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 29764
@@ -893,6 +966,7 @@ void DisposeOpponentGridIcon(tRace_info* pRace_info, int pIndex) {
 // EAX: pRace_info
 // EDX: pIndex
 void LoadOpponentGridIcon(tRace_info* pRace_info, int pIndex) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 29920
@@ -913,6 +987,7 @@ void LoadRaceInfo(int pRace_index, tRace_info* pRace_info) {
     char* str;
     float temp_float;
     tText_chunk* the_chunk;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 30724
@@ -923,6 +998,7 @@ void DisposeRaceInfo(tRace_info* pRace_info) {
     int j;
     int k;
     tText_chunk* the_chunk;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 31076
@@ -930,6 +1006,7 @@ void DisposeRaceInfo(tRace_info* pRace_info) {
 // EAX: pRace_info
 void LoadGridIcons(tRace_info* pRace_info) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 31200
@@ -937,6 +1014,7 @@ void LoadGridIcons(tRace_info* pRace_info) {
 // EAX: pRace_info
 void DisposeGridIcons(tRace_info* pRace_info) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 31320
@@ -949,6 +1027,7 @@ void LoadOpponents() {
     char s[256];
     char* str;
     tText_chunk* the_chunk;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 32396
@@ -960,29 +1039,34 @@ br_font* LoadBRFont(char* pName) {
     br_font* the_font;
     tU32 data_size;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 33044
 // Size: 262
 void LoadParts() {
     int j;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 33308
 // Size: 149
 void UnlockParts() {
     int j;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 33460
 // Size: 72
 br_pixelmap* LoadChromeFont() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 33532
 // Size: 49
 // EAX: pThe_font
 void DisposeChromeFont(br_pixelmap* pThe_font) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 33584
@@ -994,6 +1078,7 @@ int GetALineAndInterpretCommand(FILE* pF, char** pString_list, int pCount) {
     int i;
     char s[256];
     char* str;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 33724
@@ -1031,6 +1116,7 @@ float GetAFloatPercent(FILE* pF) {
     char s[256];
     char* str;
     float result;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 34040
@@ -1112,6 +1198,7 @@ void GetThreeInts(FILE* pF, int* pF1, int* pF2, int* pF3) {
 void GetThreeIntsAndAString(FILE* pF, int* pF1, int* pF2, int* pF3, char* pS) {
     char s[256];
     char* str;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 34848
@@ -1140,6 +1227,7 @@ void GetFourInts(FILE* pF, int* pF1, int* pF2, int* pF3, int* pF4) {
 // EAX: pF
 br_scalar GetAScalar(FILE* pF) {
     return GetAFloat(pF);
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 35108
@@ -1148,6 +1236,7 @@ br_scalar GetAScalar(FILE* pF) {
 // EDX: pS1
 // EBX: pS2
 void GetPairOfScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 35180
@@ -1157,6 +1246,7 @@ void GetPairOfScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2) {
 // EBX: pS2
 // ECX: pS3
 void GetThreeScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2, br_scalar* pS3) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 35264
@@ -1172,6 +1262,7 @@ void GetFourScalars(FILE* pF, br_scalar* pF1, br_scalar* pF2, br_scalar* pF3, br
     float f2;
     float f3;
     float f4;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 35504
@@ -1188,6 +1279,7 @@ void GetFiveScalars(FILE* pF, br_scalar* pF1, br_scalar* pF2, br_scalar* pF3, br
     float f3;
     float f4;
     float f5;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 35792
@@ -1200,6 +1292,7 @@ void GetNScalars(FILE* pF, int pNumber, br_scalar* pScalars) {
     char* str;
     float fleurting_point_numero;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 35944
@@ -1210,6 +1303,7 @@ void GetNScalars(FILE* pF, int pNumber, br_scalar* pScalars) {
 void GetPairOfFloatPercents(FILE* pF, float* pF1, float* pF2) {
     char s[256];
     char* str;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 36104
@@ -1221,6 +1315,7 @@ void GetPairOfFloatPercents(FILE* pF, float* pF1, float* pF2) {
 void GetThreeFloatPercents(FILE* pF, float* pF1, float* pF2, float* pF3) {
     char s[256];
     char* str;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 36312
@@ -1239,6 +1334,7 @@ void GetAString(FILE* pF, char* pString) {
 // Offset: 36396
 // Size: 49
 void AboutToLoadFirstCar() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 36448
@@ -1246,6 +1342,7 @@ void AboutToLoadFirstCar() {
 // EAX: pRace_info
 void LoadOpponentsCars(tRace_info* pRace_info) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 36724
@@ -1253,6 +1350,7 @@ void LoadOpponentsCars(tRace_info* pRace_info) {
 // EAX: pRace_info
 void DisposeOpponentsCars(tRace_info* pRace_info) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 36908
@@ -1261,12 +1359,14 @@ void LoadMiscStrings() {
     FILE* f;
     char s[256];
     tPath_name the_path;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 37120
 // Size: 53
 // EAX: pThe_race
 void FillInRaceInfo(tRace_info* pThe_race) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 37176
@@ -1375,11 +1475,13 @@ FILE* OldDRfopen(char* pFilename, char* pMode) {
 // Offset: 38332
 // Size: 44
 void AllowOpenToFail() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 38376
 // Size: 34
 void DoNotAllowOpenToFail() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 38412
@@ -1433,16 +1535,19 @@ int GetCDPathFromPathsTxtFile(char* pPath_name) {
 // Offset: 38784
 // Size: 44
 int TestForOriginalCarmaCDinDrive() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 38828
 // Size: 45
 int OriginalCarmaCDinDrive() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 38876
 // Size: 63
 int CarmaCDinDriveOrFullGameInstalled() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 38940
@@ -1470,12 +1575,14 @@ void ReadNetworkSettings(FILE* pF, tNet_game_options* pOptions) {
 // EAX: pF
 // EDX: pIndex
 int PrintNetOptions(FILE* pF, int pIndex) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 39512
 // Size: 1398
 int SaveOptions() {
     FILE* f;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 40912
@@ -1579,4 +1686,5 @@ int RestoreOptions() {
 // Offset: 42556
 // Size: 75
 void InitFunkGrooveFlags() {
+    NOT_IMPLEMENTED();
 }

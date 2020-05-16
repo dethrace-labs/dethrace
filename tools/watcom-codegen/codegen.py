@@ -349,7 +349,7 @@ def resolve_type_str(module, type_idx, var_name, decl=True):
   if decl == True and t['type'] == 'FIELD_LIST':
     indent += 1
     print ('decl', var_name)
-    s = get_type_declaration(module, t, var_name)
+    s = get_type_declaration(module, t, var_name) + bounds
     indent -= 1
     return s
   if 'value' in t:
@@ -537,7 +537,6 @@ def get_type_declaration(module, t, name):
   #print ('type decl', t)
   if t['type'] == 'FIELD_LIST':
     s = 'struct'
-    print('struct', )
     tag_name = get_struct_tag_name(module, t)
     if tag_name is not None:
       s += ' ' + tag_name

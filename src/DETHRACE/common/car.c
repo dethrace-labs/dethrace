@@ -1,4 +1,5 @@
 #include "car.h"
+#include <stdlib.h>
 
 float gEngine_powerup_factor[6];
 tCar_spec* gLast_car_to_skid[2];
@@ -67,6 +68,7 @@ br_angle gPanning_camera_angle;
 // EBX: pDamage_amount
 void DamageUnit(tCar_spec* pCar, int pUnit_type, int pDamage_amount) {
     tDamage_unit* the_damage;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 92
@@ -75,72 +77,84 @@ void DamageUnit(tCar_spec* pCar, int pUnit_type, int pDamage_amount) {
 // EDX: pUnit_type
 // EBX: pDamage_amount
 void DamageUnitWithSmoke(tCar_spec* pCar, int pUnit_type, int pDamage_amount) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 156
 // Size: 52
 // EAX: pDamage_amount
 void DamageEngine(int pDamage_amount) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 208
 // Size: 55
 // EAX: pDamage_amount
 void DamageTrans(int pDamage_amount) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 264
 // Size: 55
 // EAX: pDamage_amount
 void DamageSteering(int pDamage_amount) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 320
 // Size: 55
 // EAX: pDamage_amount
 void DamageLFWheel(int pDamage_amount) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 376
 // Size: 55
 // EAX: pDamage_amount
 void DamageLFBrake(int pDamage_amount) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 432
 // Size: 55
 // EAX: pDamage_amount
 void DamageLRBrake(int pDamage_amount) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 488
 // Size: 55
 // EAX: pDamage_amount
 void DamageLRWheel(int pDamage_amount) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 544
 // Size: 55
 // EAX: pDamage_amount
 void DamageRFWheel(int pDamage_amount) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 600
 // Size: 55
 // EAX: pDamage_amount
 void DamageRFBrake(int pDamage_amount) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 656
 // Size: 55
 // EAX: pDamage_amount
 void DamageRRBrake(int pDamage_amount) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 712
 // Size: 55
 // EAX: pDamage_amount
 void DamageRRWheel(int pDamage_amount) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 768
@@ -154,6 +168,7 @@ void CalculatePlaneNormal(br_vector3* pP1, br_vector3* pP2, br_vector3* pP3, br_
     br_vector3 p1;
     br_vector3 cross_product;
     br_vector3 temp_vector;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1276
@@ -161,6 +176,7 @@ void CalculatePlaneNormal(br_vector3* pP1, br_vector3* pP2, br_vector3* pP3, br_
 // EAX: pThe_model
 // EDX: pFace_index
 void CalculateGroundNormal(br_model* pThe_model, int pFace_index) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1420
@@ -169,6 +185,7 @@ void ChangeYCoordinate(br_scalar pNew_y, tU32 pTime_taken, br_model* pThe_model,
     br_scalar y_change;
     br_transform new_transform;
     br_vector3 side_window;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1820
@@ -177,6 +194,7 @@ void ChangeYCoordinate(br_scalar pNew_y, tU32 pTime_taken, br_model* pThe_model,
 // EDX: pModel_index
 void SwitchCarActor(tCar_spec* pCar_spec, int pModel_index) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1948
@@ -200,12 +218,14 @@ void InitialiseCar2(tCar_spec* pCar, int pClear_disabled_flag) {
     br_vector3 grid_offset;
     br_matrix34 initial_yaw_matrix;
     br_matrix34 safe_position;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3552
 // Size: 50
 // EAX: pCar
 void InitialiseCar(tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3604
@@ -217,6 +237,7 @@ void InitialiseCarsEtc(tRace_info* pThe_race) {
     int car_count;
     tCar_spec* car;
     br_bounds bnds;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3876
@@ -226,6 +247,7 @@ void GetAverageGridPosition(tRace_info* pThe_race) {
     int i;
     br_scalar total_cars;
     tCar_spec* car;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4108
@@ -253,6 +275,7 @@ void SetInitialPosition(tRace_info* pThe_race, int pCar_index, int pGrid_index) 
     br_vector3 real_pos;
     br_matrix34 initial_yaw_matrix;
     br_bounds bnds;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5176
@@ -260,6 +283,7 @@ void SetInitialPosition(tRace_info* pThe_race, int pCar_index, int pGrid_index) 
 // EAX: pThe_race
 void SetInitialPositions(tRace_info* pThe_race) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5260
@@ -267,6 +291,7 @@ void SetInitialPositions(tRace_info* pThe_race) {
 // EAX: non_car
 void InitialiseNonCar(tNon_car_spec* non_car) {
     tCollision_info* c;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5796
@@ -285,11 +310,13 @@ void GetFacesInBox(tCollision_info* c) {
     br_scalar old_d;
     int i;
     br_bounds current_bounds;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7872
 // Size: 45
 int IsCarInTheSea() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7920
@@ -301,6 +328,7 @@ void RememberSafePosition(tCar_spec* car, tU32 pTime) {
     int j;
     br_vector3 r;
     br_scalar ts;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8492
@@ -313,6 +341,7 @@ void ControlOurCar(tU32 pTime_difference) {
     static int steering_locked;
     int i;
     tU32 time;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9548
@@ -325,6 +354,7 @@ void CalcEngineForce(tCar_spec* c, br_scalar dt) {
     br_scalar brake_temp;
     int sign;
     tS32 temp_for_swap;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11152
@@ -334,6 +364,7 @@ void PrepareCars(tU32 pFrame_start_time) {
     tCar_spec* car;
     int i;
     static tU32 last_frame_start;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11668
@@ -345,6 +376,7 @@ void FinishCars(tU32 pLast_frame_time, tU32 pTime) {
     br_vector3 minus_k;
     int i;
     int wheel;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 13208
@@ -355,6 +387,7 @@ void InterpolateCars(tU32 pLast_frame_time, tU32 pTime) {
     br_scalar dt;
     tCar_spec* car;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 13548
@@ -364,6 +397,7 @@ void ResetOldmat() {
     int i;
     br_matrix34 mat;
     static int normalise_count;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 13768
@@ -371,6 +405,7 @@ void ResetOldmat() {
 void GetNonCars() {
     int i;
     int j;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 13888
@@ -380,6 +415,7 @@ void GetNetPos(tCar_spec* pCar) {
     int j;
     float amount;
     br_scalar total_deflection;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 14892
@@ -398,6 +434,7 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
     tNon_car_spec* non_car;
     tU32 time_step;
     tU32 frame_end_time;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 16192
@@ -406,6 +443,7 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
 void MungeSpecialVolume(tCollision_info* pCar) {
     tSpecial_volume* new_special_volume;
     tCar_spec* car;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 16628
@@ -419,6 +457,7 @@ void ResetCarSpecialVolume(tCollision_info* pCar) {
     char* mat_id;
     tSpecial_volume* new_special_volume;
     br_material* material;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 16828
@@ -439,6 +478,7 @@ void TestAutoSpecialVolume(tCollision_info* pCar) {
     br_scalar highest_p;
     br_scalar val;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 17880
@@ -447,6 +487,7 @@ void TestAutoSpecialVolume(tCollision_info* pCar) {
 void MoveAndCollideCar(tCar_spec* car, br_scalar dt) {
     tCollision_info* car_info;
     int wheel;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 18304
@@ -454,29 +495,34 @@ void MoveAndCollideCar(tCar_spec* car, br_scalar dt) {
 // EAX: non_car
 void MoveAndCollideNonCar(tNon_car_spec* non_car, br_scalar dt) {
     tCollision_info* car_info;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 18576
 // Size: 336
 // EAX: car
 int CollideCarWithWall(tCollision_info* car, br_scalar dt) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 18912
 // Size: 268
 void ToggleControls() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 19180
 // Size: 675
 // EAX: c
 void ControlCar2(tCar_spec* c, br_scalar dt) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 19856
 // Size: 686
 // EAX: c
 void ControlCar3(tCar_spec* c, br_scalar dt) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 20544
@@ -484,18 +530,21 @@ void ControlCar3(tCar_spec* c, br_scalar dt) {
 // EAX: c
 void ControlCar4(tCar_spec* c, br_scalar dt) {
     br_scalar ts;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 21920
 // Size: 1097
 // EAX: c
 void ControlCar5(tCar_spec* c, br_scalar dt) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 23020
 // Size: 530
 // EAX: c
 void ControlCar1(tCar_spec* c, br_scalar dt) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 23552
@@ -504,6 +553,7 @@ void ControlCar1(tCar_spec* c, br_scalar dt) {
 // EDX: m
 void setrotate(br_vector3* wdt, br_matrix34* m) {
     br_euler e;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 23692
@@ -515,6 +565,7 @@ void RotateCar2(tCollision_info* c, br_scalar dt) {
     br_vector3 L;
     br_vector3 L2;
     br_matrix34 m;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 24148
@@ -528,6 +579,7 @@ void RotateCarSecondOrder(tCollision_info* c, br_scalar dt) {
     br_scalar rad;
     br_scalar rad_rate;
     br_matrix34 m;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 24824
@@ -543,6 +595,7 @@ void RotateCarFirstOrder(tCollision_info* c, br_scalar dt) {
     br_scalar e1;
     br_scalar e2;
     static br_scalar max_rad;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 25312
@@ -552,6 +605,7 @@ void SimpleRotate(tCollision_info* c, br_scalar dt) {
     br_vector3 axis;
     br_scalar rad_rate;
     br_scalar rad;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 25532
@@ -561,6 +615,7 @@ void RotateCar(tCollision_info* c, br_scalar dt) {
     br_scalar rad_squared;
     int steps;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 25840
@@ -569,6 +624,7 @@ void RotateCar(tCollision_info* c, br_scalar dt) {
 void SteeringSelfCentre(tCar_spec* c, br_scalar dt, br_vector3* n) {
     br_scalar ts;
     br_scalar ts2;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 26276
@@ -580,6 +636,7 @@ void NonCarCalcForce(tNon_car_spec* nc, br_scalar dt) {
     br_scalar ts;
     br_vector3 tv;
     br_vector3 v;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 27200
@@ -590,6 +647,7 @@ void AddDrag(tCar_spec* c, br_scalar dt) {
     br_scalar ts;
     tSpecial_volume* vol;
     br_vector3 b;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 27604
@@ -604,6 +662,7 @@ void DoBumpiness(tCar_spec* c, br_vector3* wheel_pos, br_vector3* norm, br_scala
     int x;
     int y;
     tMaterial_modifiers* mat_list;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 28024
@@ -662,6 +721,7 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
     tDamage_type dam;
     br_scalar v;
     tSpecial_volume* vol;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 40064
@@ -671,6 +731,7 @@ void DoRevs(tCar_spec* c, br_scalar dt) {
     br_scalar wheel_spin_force;
     br_scalar ts;
     int revs_increase;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 41220
@@ -678,6 +739,7 @@ void DoRevs(tCar_spec* c, br_scalar dt) {
 // EAX: c
 // EDX: tdt
 void ApplyTorque(tCar_spec* c, br_vector3* tdt) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 41348
@@ -685,6 +747,7 @@ void ApplyTorque(tCar_spec* c, br_vector3* tdt) {
 // EAX: c
 void TranslateCar(tCollision_info* c, br_scalar dt) {
     br_vector3 t;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 41468
@@ -745,6 +808,7 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
     br_scalar min_acc;
     br_scalar max_acc;
     br_matrix34 message_mat;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 50500
@@ -759,6 +823,7 @@ br_scalar AddFriction(tCollision_info* c, br_vector3* vel, br_vector3* normal_fo
     br_vector3 ftau;
     br_scalar ts;
     br_scalar point_vel;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 51416
@@ -781,6 +846,7 @@ void AddFrictionCarToCar(tCollision_info* car1, tCollision_info* car2, br_vector
     br_scalar stopping_impulse;
     br_scalar total_friction;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 52596
@@ -791,6 +857,7 @@ void ScrapeNoise(br_scalar vel, br_vector3* position, int material) {
     static tS3_volume last_scrape_vol;
     br_vector3 velocity;
     br_vector3 position_in_br;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 52832
@@ -805,12 +872,14 @@ void SkidNoise(tCar_spec* pC, int pWheel_num, br_scalar pV, int material) {
     br_scalar ts;
     static tS3_volume last_skid_vol[2];
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 53580
 // Size: 77
 // EAX: pC
 void StopSkid(tCar_spec* pC) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 53660
@@ -823,6 +892,7 @@ void CrashNoise(br_vector3* pForce, br_vector3* position, int material) {
     static tS3_volume last_crunch_vol;
     tS3_volume vol;
     br_vector3 velocity;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 53916
@@ -842,6 +912,7 @@ void CrushAndDamageCar(tCar_spec* c, br_vector3* pPosition, br_vector3* pForce_c
     int i;
     br_matrix34 m;
     br_scalar fudge_multiplier;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 55460
@@ -855,6 +926,7 @@ int ExpandBoundingBox(tCar_spec* c) {
     br_vector3 old_pos;
     int l;
     br_matrix34 mat;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 55932
@@ -866,6 +938,7 @@ void CrushBoundingBox(tCar_spec* c, int crush_only) {
     br_vector3 max;
     int i;
     br_actor* actor;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 56728
@@ -874,6 +947,7 @@ void AddCollPoint(br_scalar dist, br_vector3* p, br_vector3* norm, br_vector3* r
     static br_scalar d[4];
     int i;
     int furthest;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 57008
@@ -882,6 +956,7 @@ void AddCollPoint(br_scalar dist, br_vector3* p, br_vector3* norm, br_vector3* r
 // EDX: m
 // EBX: d
 br_scalar SinglePointColl(br_scalar* f, br_matrix4* m, br_scalar* d) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 57096
@@ -892,6 +967,7 @@ br_scalar SinglePointColl(br_scalar* f, br_matrix4* m, br_scalar* d) {
 // ECX: tau
 br_scalar TwoPointColl(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* tau, br_vector3* n) {
     br_scalar ts;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 57456
@@ -899,6 +975,7 @@ br_scalar TwoPointColl(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* ta
 // EAX: mi
 // EDX: mc
 br_scalar DrMatrix4Inverse(br_matrix4* mi, br_matrix4* mc) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 57520
@@ -910,6 +987,7 @@ br_scalar ThreePointColl(br_scalar* f, br_matrix4* m, br_scalar* d) {
     br_matrix4 mc;
     br_matrix4 mi;
     br_scalar ts;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 57692
@@ -922,6 +1000,7 @@ br_scalar ThreePointCollRec(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector
     int i;
     int j;
     br_scalar ts;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 58332
@@ -935,6 +1014,7 @@ br_scalar FourPointColl(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* t
     int j;
     int l;
     br_scalar ts;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 58972
@@ -947,6 +1027,7 @@ void MultiFindFloorInBoxM(int pNum_rays, br_vector3* a, br_vector3* b, br_vector
     br_vector3 aa[4];
     br_vector3 bb;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 59200
@@ -962,6 +1043,7 @@ void MultiFindFloorInBoxBU(int pNum_rays, br_vector3* a, br_vector3* b, br_vecto
     int l;
     br_scalar dist[4];
     tFace_ref* face_ref;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 59540
@@ -974,6 +1056,7 @@ void findfloor(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d) {
     br_material* material;
     br_vector3 aa;
     br_vector3 bb;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 59692
@@ -985,6 +1068,7 @@ void findfloor(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d) {
 int FindFloorInBoxM(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d, tCollision_info* c) {
     br_vector3 aa;
     br_vector3 bb;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 59852
@@ -999,6 +1083,7 @@ int FindFloorInBoxBU(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d
     int j;
     br_scalar dist;
     tFace_ref* face_ref;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 60132
@@ -1014,6 +1099,7 @@ int FindFloorInBoxBU2(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* 
     int j;
     br_scalar dist;
     tFace_ref* face_ref;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 60576
@@ -1025,6 +1111,7 @@ int FindFloorInBoxBU2(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* 
 int FindFloorInBoxM2(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d, tCollision_info* c) {
     br_vector3 aa;
     br_vector3 bb;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 60736
@@ -1045,6 +1132,7 @@ int BoxFaceIntersect(br_bounds* pB, br_matrix34* pM, br_matrix34* pMold, br_vect
     int m;
     tFace_ref* f_ref;
     br_face* face;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 62060
@@ -1066,6 +1154,7 @@ int AddEdgeCollPoints(br_vector3* p1, br_vector3* p2, br_bounds* pB, br_matrix34
     int plane2;
     int plane3;
     int d;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 65652
@@ -1074,6 +1163,7 @@ int AddEdgeCollPoints(br_vector3* p1, br_vector3* p2, br_bounds* pB, br_matrix34
 // EDX: p
 void GetPlaneNormal(br_vector3* n, int p) {
     int d;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 65772
@@ -1089,6 +1179,7 @@ int GetBoundsEdge(br_vector3* pos, br_vector3* edge, br_bounds* pB, int plane1, 
     br_vector3 n;
     br_vector3 p;
     br_vector3 q;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 66308
@@ -1106,21 +1197,25 @@ void oldMoveOurCar(tU32 pTime_difference) {
     int above_face_index;
     br_model* below_model;
     br_model* above_model;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 66912
 // Size: 34
 void ToggleCollisionDetection() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 66948
 // Size: 84
 void CancelPendingCunningStunt() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 67032
 // Size: 61
 float frac(float pN) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 67096
@@ -1138,6 +1233,7 @@ void SetAmbientPratCam(tCar_spec* pCar) {
     br_scalar abs_omega_z;
     tU32 the_time;
     static tU32 last_time_on_ground;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 67700
@@ -1173,6 +1269,7 @@ void MungeCarGraphics(tU32 pFrame_period) {
     br_material* the_material;
     tU32 the_time;
     br_actor* oily_actor;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 71300
@@ -1181,6 +1278,7 @@ void ResetCarScreens() {
     int car_count;
     int i;
     tCar_spec* the_car;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 71480
@@ -1189,6 +1287,7 @@ tCar_spec* GetRaceLeader() {
     int i;
     int score;
     tCar_spec* car;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 71688
@@ -1198,48 +1297,57 @@ void AmIGettingBoredWatchingCameraSpin() {
     static tU32 headup_timer;
     tCar_spec* car;
     char s[256];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 72244
 // Size: 161
 void ViewNetPlayer() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 72408
 // Size: 251
 void ViewOpponent() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 72660
 // Size: 134
 void ToggleCarToCarCollisions() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 72796
 // Size: 34
 void SwapCar() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 72832
 // Size: 178
 void AdjustDownForce() {
     tCar_spec* c;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 73012
 // Size: 134
 void FreezeMechanics() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 73148
 // Size: 134
 void PutOpponentsInNeutral() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 73284
 // Size: 133
 void SetPanningFieldOfView() {
     br_camera* camera_ptr;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 73420
@@ -1249,6 +1357,7 @@ void CheckDisablePlingMaterials(tCar_spec* pCar) {
     br_matrix34* mat;
     br_scalar height;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 73652
@@ -1258,6 +1367,7 @@ void CheckDisablePlingMaterials(tCar_spec* pCar) {
 void PositionExternalCamera(tCar_spec* c, tU32 pTime) {
     static int old_camera_mode;
     br_camera* camera_ptr;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 74000
@@ -1268,6 +1378,7 @@ void CameraBugFix(tCar_spec* c, tU32 pTime) {
     br_matrix34 mat;
     br_matrix34* m2;
     br_vector3 tv;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 74104
@@ -1277,6 +1388,7 @@ int PossibleRemoveNonCarFromWorld(br_actor* pActor) {
     tU8 cx;
     tU8 cz;
     tTrack_spec* track_spec;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 74248
@@ -1286,6 +1398,7 @@ void PutNonCarBackInWorld(br_actor* pActor) {
     tU8 cx;
     tU8 cz;
     tTrack_spec* track_spec;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 74368
@@ -1311,6 +1424,7 @@ int IncidentCam(tCar_spec* c, tU32 pTime) {
     br_scalar temp;
     br_vector3 old_cam_pos;
     int removed;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 77004
@@ -1333,6 +1447,7 @@ int MoveCamToIncident(tCar_spec* c, tIncident_type* type, float* severity, tInci
     br_vector3 tv2;
     br_vector3 perp;
     int test;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 78272
@@ -1345,6 +1460,7 @@ void PanningExternalCamera(tCar_spec* c, tU32 pTime) {
     br_vector3 tv;
     br_scalar ts;
     static int inside_camera_zone;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 78640
@@ -1356,6 +1472,7 @@ int CheckForWall(br_vector3* start, br_vector3* end) {
     br_material* material;
     br_vector3 normal;
     br_scalar d;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 78776
@@ -1379,18 +1496,21 @@ void SetUpPanningCamera(tCar_spec* c) {
     br_vector3 car_centre;
     int left_score;
     int right_score;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 80160
 // Size: 97
 // EAX: i
 void SaveCameraPosition(int i) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 80260
 // Size: 97
 // EAX: i
 void RestoreCameraPosition(int i) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 80360
@@ -1420,6 +1540,7 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
     int manual_swing;
     int manual_zoom;
     br_vector3 old_camera_pos;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 82468
@@ -1431,6 +1552,7 @@ void MoveWithWheels(tCar_spec* c, br_vector3* vn, int manual_swing) {
     br_angle yaw;
     br_angle theta;
     static int move_with_wheels;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 82916
@@ -1452,6 +1574,7 @@ void SwingCamera(tCar_spec* c, br_matrix34* m1, br_matrix34* m2, br_vector3* vn,
     static br_angle omega;
     static int elapsed_time;
     static br_vector3 old_vn;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 84744
@@ -1470,6 +1593,7 @@ void PointCameraAtCar(tCar_spec* c, br_matrix34* m1, br_matrix34* m2) {
     br_camera* camera_ptr;
     br_angle off_centre_angle;
     int swoop;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 85520
@@ -1481,6 +1605,7 @@ void PointCamera(br_vector3* pos, br_matrix34* m2) {
     br_scalar dist;
     br_angle theta;
     br_camera* camera_ptr;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 85988
@@ -1512,6 +1637,7 @@ int CollideCamera2(br_vector3* car_pos, br_vector3* cam_pos, br_vector3* old_cam
     br_scalar sb;
     br_scalar sc;
     tFace_ref face_list[3];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 88400
@@ -1520,6 +1646,7 @@ int CollideCamera2(br_vector3* car_pos, br_vector3* cam_pos, br_vector3* old_cam
 // EDX: p
 int BoundsTest(br_bounds* bnds, br_vector3* p) {
     int j;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 88544
@@ -1537,6 +1664,7 @@ int CollideCameraWithOtherCars(br_vector3* car_pos, br_vector3* cam_pos) {
     br_vector3 p;
     br_vector3 n;
     br_bounds bnds;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 89040
@@ -1545,11 +1673,13 @@ void InitialiseExternalCamera() {
     tCar_spec* c;
     br_vector3 r;
     br_angle yaw;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 89552
 // Size: 44
 void FreezeCamera() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 89596
@@ -1564,6 +1694,7 @@ void FlyCar(tCar_spec* c, br_scalar dt) {
     static br_scalar vel;
     tFace_ref faces[20];
     tBounds bnds;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 91844
@@ -1574,6 +1705,7 @@ void DrVector3RotateY(br_vector3* v, br_angle t) {
     br_scalar c;
     br_scalar s;
     br_scalar ts;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 92004
@@ -1583,6 +1715,7 @@ void CrashCarsTogether(br_scalar dt) {
     int k;
     int i;
     tCollison_data collide_list[32];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 92244
@@ -1604,12 +1737,14 @@ int CrashCarsTogetherSinglePass(br_scalar dt, int pPass, tCollison_data* collide
     tCollision_info* car_3;
     tCollision_info* car_in_middle;
     tCollision_info* car_on_wall;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 94628
 // Size: 142
 // EAX: car
 void BringCarToAGrindingHalt(tCollision_info* car) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 94940
@@ -1617,6 +1752,7 @@ void BringCarToAGrindingHalt(tCollision_info* car) {
 // EAX: car1
 // EDX: car2
 int SimpleCarCarCollisionTest(tCollision_info* car1, tCollision_info* car2) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 95040
@@ -1632,6 +1768,7 @@ int CollideTwoCarsWithWalls(tCollision_info* car1, tCollision_info* car2, br_sca
     int p;
     int im1;
     int im2;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 95920
@@ -1642,6 +1779,7 @@ int CollideTwoCarsRepeatedly(tCollision_info* car1, tCollision_info* car2, br_sc
     int l;
     int collide;
     br_scalar ts;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 96220
@@ -1683,6 +1821,7 @@ int CollideTwoCars(tCollision_info* car1, tCollision_info* car2, int pPass) {
     static br_vector3 oldn1;
     static br_vector3 oldn2;
     static int is_old_point_available;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 99720
@@ -1710,6 +1849,7 @@ int GetEdgeEdgeCollisions(br_bounds* pB1, br_bounds* pB2, br_matrix34* pM21, br_
     int i;
     int j;
     int n;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 103320
@@ -1734,12 +1874,14 @@ int FacePointCarCarCollide(tCollision_info* car1, tCollision_info* car2, br_matr
     br_scalar dist;
     br_bounds* pStat_box;
     br_bounds* pMove_box;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 105240
 // Size: 111
 // EAX: pCar
 void MungeCarsMass(tCollision_info* pCar, br_scalar pFactor) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 105352
@@ -1747,6 +1889,7 @@ void MungeCarsMass(tCollision_info* pCar, br_scalar pFactor) {
 // EAX: pCar_1
 // EDX: pCar_2
 void ModifyCarsMass(tCollision_info* pCar_1, tCollision_info* pCar_2) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 105476
@@ -1754,6 +1897,7 @@ void ModifyCarsMass(tCollision_info* pCar_1, tCollision_info* pCar_2) {
 // EAX: pCar_1
 // EDX: pCar_2
 void ResetCarsMass(tCollision_info* pCar_1, tCollision_info* pCar_2) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 105620
@@ -1800,6 +1944,7 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
     br_scalar fudge_multiplier;
     br_scalar factor;
     int need_to_fudge;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 114564
@@ -1810,6 +1955,7 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
 // ECX: tau
 br_scalar TwoPointCollB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* tau, br_vector3* n) {
     br_scalar ts;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 114984
@@ -1822,6 +1968,7 @@ br_scalar ThreePointCollRecB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vecto
     int i;
     int j;
     br_scalar ts;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 115812
@@ -1835,6 +1982,7 @@ br_scalar FourPointCollB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* 
     int j;
     int l;
     br_scalar ts;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 116604
@@ -1842,12 +1990,14 @@ br_scalar FourPointCollB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* 
 // EAX: f
 int TestForNan(float* f) {
     tU32 i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 116696
 // Size: 89
 void CheckCameraHither() {
     static int old_hither;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 116788
@@ -1859,6 +2009,7 @@ void SetCarSuspGiveAndHeight(tCar_spec* pCar, br_scalar pFront_give_factor, br_s
     br_scalar damping;
     br_scalar ratio;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 117316
@@ -1877,6 +2028,7 @@ int TestForCarInSensiblePlace(tCar_spec* car) {
     br_vector3 sep;
     br_vector3 tv;
     br_vector3 tv2;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 118340
@@ -1907,12 +2059,14 @@ int TestOldMats(tCollision_info* c1, tCollision_info* c2, int newmats) {
     br_bounds* b2;
     br_matrix34 invmat1;
     br_matrix34 mat21;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 118868
 // Size: 69
 // EAX: pActor
 int PullActorFromWorld(br_actor* pActor) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 118940
@@ -1923,6 +2077,7 @@ int DoPullActorFromWorld(br_actor* pActor) {
     int i;
     tCollision_info* c;
     tNon_car_spec* non_car;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 119624
@@ -1942,6 +2097,7 @@ void CheckForDeAttachmentOfNonCars(tU32 pTime) {
     tU8 cz;
     tTrack_spec* track_spec;
     br_matrix34 mat;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 120528
@@ -1952,12 +2108,14 @@ void AdjustNonCar(br_actor* pActor, br_matrix34* pMat) {
     tU8 cx;
     tU8 cz;
     tTrack_spec* track_spec;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 120776
 // Size: 240
 // EAX: c
 void PipeSingleNonCar(tCollision_info* c) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 121016
@@ -1965,9 +2123,11 @@ void PipeSingleNonCar(tCollision_info* c) {
 // EAX: pCar
 // EDX: pFace_refs
 int GetPrecalculatedFacesUnderCar(tCar_spec* pCar, tFace_ref** pFace_refs) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 121188
 // Size: 53
 br_material* SomeNearbyMaterial() {
+    NOT_IMPLEMENTED();
 }

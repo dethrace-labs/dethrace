@@ -1,4 +1,5 @@
 #include "main.h"
+#include <stdlib.h>
 
 #include "common/drdebug.h"
 #include "common/globvars.h"
@@ -13,6 +14,7 @@
 // Offset: 0
 // Size: 161
 void QuitGame() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 164
@@ -22,27 +24,32 @@ tU32 TrackCount(br_actor* pActor, tU32* pCount) {
     unsigned int z;
     int ad;
     float e;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 264
 // Size: 95
 void CheckNumberOfTracks() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 360
 // Size: 173
 // EAX: pRacing
 void ServiceTheGame(int pRacing) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 536
 // Size: 41
 void ServiceGame() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 580
 // Size: 49
 void ServiceGameInRace() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 632

@@ -1,4 +1,5 @@
 #include "loader.h"
+#include "debug.h"
 
 char rscid[49];
 
@@ -20,4 +21,5 @@ br_image* ImageLoad(char* name) {
     int i;
     br_uint_32 offset;
     unsigned int n;
+    NOT_IMPLEMENTED();
 }

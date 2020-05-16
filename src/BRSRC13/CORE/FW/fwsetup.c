@@ -109,18 +109,21 @@ br_error BrFwBegin() {
 // Offset: 342
 // Size: 107
 br_error BrFwEnd() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 466
 // Size: 73
 br_diaghandler* BrDiagHandlerSet(br_diaghandler* newdh) {
     br_diaghandler* old;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 555
 // Size: 73
 br_filesystem* BrFilesystemSet(br_filesystem* newfs) {
     br_filesystem* old;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 643

@@ -2,6 +2,7 @@
 
 #include "CORE/STD/brstdlib.h"
 #include "globvrbm.h"
+#include <stdlib.h>
 
 br_actor* gMr_blendy;
 int gDefault_blend_pc;
@@ -14,6 +15,7 @@ void AllocateActorMatrix(tTrack_spec* pTrack_spec, br_actor**** pDst) {
     tU16 z;
     char* s = "jeff";
     BrStrLen(s);
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 204
@@ -24,12 +26,14 @@ void AllocateActorMatrix(tTrack_spec* pTrack_spec, br_actor**** pDst) {
 void DisposeActorMatrix(tTrack_spec* pTrack_spec, br_actor**** pVictim, int pRemove_act_mod) {
     tU16 z;
     tU16 x;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 576
 // Size: 131
 // EAX: pTrack_spec
 void DisposeColumns(tTrack_spec* pTrack_spec) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 708
@@ -39,6 +43,7 @@ void DisposeColumns(tTrack_spec* pTrack_spec) {
 void XZToColumnXZ(tU8* pColumn_x, tU8* pColumn_z, br_scalar pX, br_scalar pZ, tTrack_spec* pTrack_spec) {
     br_scalar x;
     br_scalar z;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 944
@@ -51,6 +56,7 @@ void StripBlendedFaces(br_actor* pActor, br_model* pModel) {
     int changed_one;
     char s[256];
     static tU16 nfaces_allocated;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1704
@@ -60,6 +66,7 @@ br_uint_32 FindNonCarsCB(br_actor* pActor, tTrack_spec* pTrack_spec) {
     br_scalar r1;
     br_scalar r2;
     br_scalar r3;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2452
@@ -68,12 +75,14 @@ br_uint_32 ProcessModelsCB(br_actor* pActor, tTrack_spec* pTrack_spec) {
     unsigned int x;
     unsigned int z;
     int group;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3036
 // Size: 61
 // EAX: pTrack_spec
 void ProcessModels(tTrack_spec* pTrack_spec) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3100
@@ -87,6 +96,7 @@ void ExtractColumns(tTrack_spec* pTrack_spec) {
     float e;
     br_scalar extra_room;
     br_bounds bounds;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3540
@@ -95,12 +105,14 @@ void ExtractColumns(tTrack_spec* pTrack_spec) {
 // EDX: pRef_to_world
 // EBX: pCamera
 void LollipopizeActor4(br_actor* pActor, br_matrix34* pRef_to_world, br_actor* pCamera) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3744
 // Size: 65
 br_uint_32 LollipopizeChildren(br_actor* pActor, void* pArg) {
     tMatrix_and_actor* maa;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3812
@@ -116,6 +128,7 @@ void DrawColumns(int pDraw_blends, tTrack_spec* pTrack_spec, int pMin_x, int pMa
     tU8 column_z2;
     tMatrix_and_actor maa;
     br_actor* blended_polys;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4876
@@ -136,16 +149,19 @@ void RenderTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, 
     static br_camera* camera;
     static br_scalar tan_fov_ish;
     static br_actor* result;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6200
 // Size: 47
 br_scalar GetYonFactor() {
     return gYon_factor;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6248
 // Size: 44
 void SetYonFactor(br_scalar pNew) {
     gYon_factor = pNew;
+    NOT_IMPLEMENTED();
 }

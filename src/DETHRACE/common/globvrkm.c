@@ -1,4 +1,5 @@
 #include "globvrkm.h"
+#include <stdlib.h>
 
 br_actor* gCamera_list[2];
 tCar_spec* gActive_car_list[25];

@@ -1,4 +1,5 @@
 #include "demo.h"
+#include <stdlib.h>
 
 int gLast_demo;
 
@@ -13,4 +14,5 @@ void DoDemo() {
     char s[256];
     char* str;
     tS3_sound_tag song_tag;
+    NOT_IMPLEMENTED();
 }

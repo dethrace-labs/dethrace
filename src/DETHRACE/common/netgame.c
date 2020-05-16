@@ -1,6 +1,7 @@
 #include "netgame.h"
 #include "globvars.h"
 #include "network.h"
+#include <stdlib.h>
 
 int gGame_scores[6];
 int gPowerup_cost[4];
@@ -24,6 +25,7 @@ void SendCarData(tU32 pNext_frame_time) {
     static tU32 last_time;
     tU32 time;
     int damaged_wheels;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2344
@@ -31,6 +33,7 @@ void SendCarData(tU32 pNext_frame_time) {
 // EAX: pContents
 void ReceivedRecover(tNet_contents* pContents) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2484
@@ -39,6 +42,7 @@ void ReceivedRecover(tNet_contents* pContents) {
 // EDX: pContents
 void CopyMechanics(tCar_spec* pCar, tNet_contents* pContents) {
     int j;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2604
@@ -47,6 +51,7 @@ void CopyMechanics(tCar_spec* pCar, tNet_contents* pContents) {
 void ReceivedMechanics(tNet_contents* pContents) {
     int i;
     tCar_spec* car;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3984
@@ -55,6 +60,7 @@ void ReceivedMechanics(tNet_contents* pContents) {
 void ReceivedCopInfo(tNet_contents* pContents) {
     tCar_spec* c;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4560
@@ -64,6 +70,7 @@ void SendAllNonCarPositions() {
     br_actor** list;
     tNon_car_spec* non_car;
     tNet_contents* contents;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4812
@@ -71,6 +78,7 @@ void SendAllNonCarPositions() {
 // EAX: pContents
 void ReceivedNonCarPosition(tNet_contents* pContents) {
     br_actor* actor;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4932
@@ -84,6 +92,7 @@ void ReceivedNonCar(tNet_contents* pContents) {
     tTrack_spec* track_spec;
     tNon_car_spec* ncar;
     tCollision_info* c;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5776
@@ -93,11 +102,13 @@ void SignalToStartRace2(int pIndex) {
     tNet_message* the_message;
     int i;
     int j;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6396
 // Size: 56
 void SignalToStartRace() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6452
@@ -107,6 +118,7 @@ void SetUpNetCarPositions() {
     int k;
     int grid_index;
     int racer_count;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7228
@@ -114,6 +126,7 @@ void SetUpNetCarPositions() {
 // EAX: pCar
 void ReinitialiseCar(tCar_spec* pCar) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7324
@@ -122,18 +135,21 @@ void ReinitialiseCar(tCar_spec* pCar) {
 void RepositionPlayer(int pIndex) {
     tNet_message* the_message;
     tCar_spec* car;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7612
 // Size: 200
 // EAX: pCar
 void DisableCar(tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7812
 // Size: 222
 // EAX: pCar
 void EnableCar(tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8036
@@ -144,6 +160,7 @@ void DoNetworkHeadups(int pCredits) {
     char s2[256];
     static tU32 last_flash;
     static int flash_state;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8932
@@ -151,6 +168,7 @@ void DoNetworkHeadups(int pCredits) {
 // EAX: pFirst_one
 // EDX: pSecond_one
 int SortNetHeadAscending(void* pFirst_one, void* pSecond_one) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9100
@@ -158,6 +176,7 @@ int SortNetHeadAscending(void* pFirst_one, void* pSecond_one) {
 // EAX: pFirst_one
 // EDX: pSecond_one
 int SortNetHeadDescending(void* pFirst_one, void* pSecond_one) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9268
@@ -166,6 +185,7 @@ int SortNetHeadDescending(void* pFirst_one, void* pSecond_one) {
 // EDX: pFont
 // EBX: pMax_width
 void ClipName(char* pName, tDR_font* pFont, int pMax_width) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9340
@@ -185,27 +205,32 @@ void DoNetScores2(int pOnly_sort_scores) {
     static tU32 last_flash;
     static int flash_state;
     tHeadup_pair headup_pairs[6];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11560
 // Size: 41
 void DoNetScores() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11604
 // Size: 156
 void InitNetHeadups() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11760
 // Size: 146
 void DisposeNetHeadups() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11908
 // Size: 130
 void EverybodysLost() {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 12040
@@ -217,6 +242,7 @@ void DeclareWinner(int pWinner_index) {
     int j;
     int best_score_index;
     char s[256];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 12716
@@ -225,6 +251,7 @@ void DeclareWinner(int pWinner_index) {
 void PlayerIsIt(tNet_game_player_info* pPlayer) {
     int i;
     char s[256];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 13192
@@ -233,12 +260,14 @@ void PlayerIsIt(tNet_game_player_info* pPlayer) {
 // EDX: pPlayer_2
 int FarEnoughAway(tNet_game_player_info* pPlayer_1, tNet_game_player_info* pPlayer_2) {
     br_vector3 difference;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 13388
 // Size: 144
 // EAX: pPlayer
 void CarInContactWithItOrFox(tNet_game_player_info* pPlayer) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 13532
@@ -247,6 +276,7 @@ void CarInContactWithItOrFox(tNet_game_player_info* pPlayer) {
 void SelectRandomItOrFox(int pNot_this_one) {
     int i;
     int new_choice;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 13808
@@ -272,28 +302,33 @@ void CalcPlayerScores() {
     tS32 time;
     char s[256];
     tNet_game_player_info* lowest_score_player;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 16380
 // Size: 183
 void SendPlayerScores() {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 16564
 // Size: 53
 void DoNetGameManagement() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 16620
 // Size: 218
 // EAX: pPlayer
 void InitialisePlayerScore(tNet_game_player_info* pPlayer) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 16840
 // Size: 142
 void InitPlayers() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 16984
@@ -302,21 +337,25 @@ void InitPlayers() {
 void BuyPSPowerup(int pIndex) {
     char s[256];
     char s2[256];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 17328
 // Size: 41
 void BuyArmour() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 17372
 // Size: 188
 void BuyPower() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 17560
 // Size: 44
 void BuyOffense() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 17604
@@ -324,17 +363,20 @@ void BuyOffense() {
 // EAX: pScore
 void UseGeneralScore(int pScore) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 17852
 // Size: 53
 // EAX: pPlayer
 void NetSendEnvironmentChanges(tNet_game_player_info* pPlayer) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 17908
 // Size: 152
 void UpdateEnvironments() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 18060
@@ -348,6 +390,7 @@ void ReceivedGameplay(tNet_contents* pContents, tNet_message* pMessage, tU32 pRe
     char* gPixels_copy;
     char* gPalette_copy;
     static int pause_semaphore;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 18696
@@ -358,6 +401,7 @@ void ReceivedGameplay(tNet_contents* pContents, tNet_message* pMessage, tU32 pRe
 // ECX: pParam_2
 void SendGameplay(tPlayer_ID pPlayer, tNet_gameplay_mess pMess, int pParam_1, int pParam_2, int pParam_3, int pParam_4) {
     tNet_message* the_message;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 18816
@@ -368,6 +412,7 @@ void SendGameplay(tPlayer_ID pPlayer, tNet_gameplay_mess pMess, int pParam_1, in
 // ECX: pParam_3
 void SendGameplayToAllPlayers(tNet_gameplay_mess pMess, int pParam_1, int pParam_2, int pParam_3, int pParam_4) {
     tNet_message* the_message;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 18936
@@ -378,17 +423,20 @@ void SendGameplayToAllPlayers(tNet_gameplay_mess pMess, int pParam_1, int pParam
 // ECX: pParam_3
 void SendGameplayToHost(tNet_gameplay_mess pMess, int pParam_1, int pParam_2, int pParam_3, int pParam_4) {
     tNet_message* the_message;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 19064
 // Size: 42
 void InitNetGameplayStuff() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 19108
 // Size: 49
 void DefaultNetName() {
     NetObtainSystemUserName(gNet_player_name, 32);
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 19160
@@ -398,6 +446,7 @@ void DefaultNetName() {
 // EBX: pEnergy_vector
 void NetSendPointCrush(tCar_spec* pCar, tU16 pCrush_point_index, br_vector3* pEnergy_vector) {
     tNet_contents* contents;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 19276
@@ -405,6 +454,7 @@ void NetSendPointCrush(tCar_spec* pCar, tU16 pCrush_point_index, br_vector3* pEn
 // EAX: pContents
 void RecievedCrushPoint(tNet_contents* pContents) {
     tCar_spec* car;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 19568
@@ -412,6 +462,7 @@ void RecievedCrushPoint(tNet_contents* pContents) {
 // EAX: m1
 // EDX: m2
 void GetReducedMatrix(tReduced_matrix* m1, br_matrix34* m2) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 19712
@@ -419,6 +470,7 @@ void GetReducedMatrix(tReduced_matrix* m1, br_matrix34* m2) {
 // EAX: m1
 // EDX: m2
 void GetExpandedMatrix(br_matrix34* m1, tReduced_matrix* m2) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 19952
@@ -426,4 +478,5 @@ void GetExpandedMatrix(br_matrix34* m1, tReduced_matrix* m2) {
 // EAX: pPlayer
 // EDX: pCredits
 void NetEarnCredits(tNet_game_player_info* pPlayer, tS32 pCredits) {
+    NOT_IMPLEMENTED();
 }

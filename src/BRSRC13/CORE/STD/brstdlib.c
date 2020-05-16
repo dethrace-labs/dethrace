@@ -1,4 +1,5 @@
 #include "brstdlib.h"
+#include "debug.h"
 
 #include <ctype.h>
 #include <errno.h>
@@ -89,72 +90,84 @@ char* BrStrNCpy(char* s1, char* s2, size_t n) {
 // Size: 49
 char* BrStrRChr(char* s1, char c) {
     return strrchr(s1, c);
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 703
 // Size: 35
 void BrAbort(void) {
     abort();
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 747
 // Size: 44
 char* BrGetEnv(char* name) {
     return getenv(name);
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 800
 // Size: 58
 float BrStrToF(char* nptr, char** endptr) {
     return strtof(nptr, endptr);
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 867
 // Size: 67
 double BrStrToD(char* nptr, char** endptr) {
     return strtod(nptr, endptr);
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 943
 // Size: 50
 long BrStrToL(char* nptr, char** endptr, int base) {
     return strtol(nptr, endptr, base);
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1003
 // Size: 50
 unsigned long BrStrToUL(char* nptr, char** endptr, int base) {
     return strtoul(nptr, endptr, base);
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1063
 // Size: 59
 br_boolean BrIsAlpha(int c) {
     return isalpha(c);
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1132
 // Size: 59
 br_boolean BrIsDigit(int c) {
     return isdigit(c);
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1201
 // Size: 59
 br_boolean BrIsSpace(int c) {
     return isspace(c);
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1270
 // Size: 59
 br_boolean BrIsPrint(int c) {
     return isprint(c);
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1340
 // Size: 50
 br_int_32 BrVSprintf(char* buf, const char* fmt, va_list args) {
     return vsprintf(buf, fmt, args);
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1402
@@ -178,4 +191,5 @@ br_int_32 BrVSprintfN(char* buf, br_size_t buf_size, const char* fmt, va_list ar
 // Size: 50
 br_int_32 BrVSScanf(char* buf, const char* fmt, va_list args) {
     return vsscanf(buf, fmt, args);
+    NOT_IMPLEMENTED();
 }

@@ -1,4 +1,5 @@
 #include "mainmenu.h"
+#include <stdlib.h>
 
 char* gPalette_copy;
 int gPixel_buffer_size;
@@ -14,6 +15,7 @@ char* gPixels_copy;
 // EBX: pGo_ahead
 // ECX: pEscaped
 int MainMenuDone1(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 196
@@ -23,11 +25,13 @@ int MainMenuDone1(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
 // EBX: pGo_ahead
 // ECX: pEscaped
 int MainMenuDone2(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 360
 // Size: 251
 void StartMainMenu() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 612
@@ -46,6 +50,7 @@ int DoMainMenuInterface(tU32 pTime_out, int pContinue_allowed) {
     static tMouse_area mouse_areas2[5];
     static tInterface_spec interface_spec2;
     int result;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1068
@@ -54,11 +59,13 @@ int DoMainMenuInterface(tU32 pTime_out, int pContinue_allowed) {
 // EDX: pContinue_allowed
 tMM_result GetMainMenuOption(tU32 pTime_out, int pContinue_allowed) {
     int result;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1324
 // Size: 169
 void QuitVerifyStart() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1496
@@ -68,6 +75,7 @@ void QuitVerifyStart() {
 // EBX: pGo_ahead
 // ECX: pEscaped
 int QuitVerifyDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1716
@@ -82,6 +90,7 @@ int DoVerifyQuit(int pReplace_background) {
     int result;
     int switched_res;
     int woz_in_race;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2052
@@ -91,6 +100,7 @@ int DoVerifyQuit(int pReplace_background) {
 // EBX: pContinue_allowed
 tMM_result DoMainMenu(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) {
     tMM_result the_result;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2420
@@ -100,4 +110,5 @@ tMM_result DoMainMenu(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) 
 // EBX: pContinue_allowed
 void DoMainMenuScreen(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) {
     tPlayer_status old_status;
+    NOT_IMPLEMENTED();
 }

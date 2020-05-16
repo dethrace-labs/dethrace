@@ -12,11 +12,13 @@ char rscid[49];
 // Size: 86
 void _BrFileFree(void* res, br_uint_8 res_class, br_size_t size) {
     br_file* file;
+    fw.fsys->close(res);
 }
 
 // Offset: 115
 // Size: 77
 br_uint_32 BrFileAttributes() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 207
@@ -125,4 +127,5 @@ void BrFileAdvance(long count, void* f) {
 int BrFilePrintf(void* f, char* fmt, ...) {
     int n;
     va_list args;
+    NOT_IMPLEMENTED();
 }

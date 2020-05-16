@@ -56,4 +56,5 @@ void* BrMemCalloc(int nelems, br_size_t size, br_uint_8 type) {
 char* BrMemStrDup(char* str) {
     int l;
     char* nstr;
+    NOT_IMPLEMENTED();
 }

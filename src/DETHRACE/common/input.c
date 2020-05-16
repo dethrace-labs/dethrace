@@ -1,6 +1,7 @@
 #include "input.h"
 
 #include "dossys.h"
+#include <stdlib.h>
 
 tJoy_array gJoy_array;
 tKey_array gKey_array;
@@ -35,32 +36,38 @@ void SetJoystickArrays(int* pKeys, int pMark) {
     static tS32 old_joy1Y;
     static tS32 old_joy2X;
     static tS32 old_joy2Y;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 996
 // Size: 82
 void PollKeys() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1080
 // Size: 127
 void CyclePollKeys() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1208
 // Size: 116
 void ResetPollKeys() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1324
 // Size: 76
 void CheckKeysForMouldiness() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1400
 // Size: 82
 int EitherMouseButtonDown() {
     int but_2;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1484
@@ -68,6 +75,7 @@ int EitherMouseButtonDown() {
 // EAX: pKey_index
 tKey_down_result PDKeyDown2(int pKey_index) {
     tU32 the_time;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1700
@@ -75,6 +83,7 @@ tKey_down_result PDKeyDown2(int pKey_index) {
 // EAX: pKey_index
 int PDKeyDown(int pKey_index) {
     tKey_down_result result;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1832
@@ -84,17 +93,20 @@ int PDKeyDown3(int pKey_index) {
     int last_key_down_time;
     int last_key_down;
     tKey_down_result result;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1952
 // Size: 208
 int PDAnyKeyDown() {
     tKey_down_result result;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2160
 // Size: 88
 int AnyKeyDown() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2248
@@ -162,6 +174,7 @@ tU32* KevKeyService() {
 // EAX: pKey_index
 int OldKeyIsDown(int pKey_index) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2848
@@ -169,16 +182,19 @@ int OldKeyIsDown(int pKey_index) {
 // EAX: pKey_index
 int KeyIsDown(int pKey_index) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3008
 // Size: 64
 void WaitForNoKeys() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3072
 // Size: 67
 void WaitForAKey() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3140
@@ -186,6 +202,7 @@ void WaitForAKey() {
 // EAX: pFKey_ID
 // EDX: pCmd_key_ID
 int CmdKeyDown(int pFKey_ID, int pCmd_key_ID) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3244
@@ -197,16 +214,19 @@ void GetMousePosition(int* pX_coord, int* pY_coord) {
     int x_right_margin;
     int y_top_margin;
     int y_bottom_margin;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3452
 // Size: 125
 void InitRollingLetters() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3580
 // Size: 48
 void EndRollingLetters() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3628
@@ -219,6 +239,7 @@ int AddRollingLetter(char pChar, int pX, int pY, tRolling_type rolling_type) {
     tRolling_letter* let;
     int i;
     int number_of_letters;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4012
@@ -229,6 +250,7 @@ int AddRollingLetter(char pChar, int pX, int pY, tRolling_type rolling_type) {
 // ECX: rolling_type
 void AddRollingString(char* pStr, int pX, int pY, tRolling_type rolling_type) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4124
@@ -239,6 +261,7 @@ void AddRollingString(char* pStr, int pX, int pY, tRolling_type rolling_type) {
 // ECX: pY
 void AddRollingNumber(tU32 pNumber, int pWidth, int pX, int pY) {
     char the_string[32];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4212
@@ -259,6 +282,7 @@ void RollLettersIn() {
     tU8* saved_char_ptr;
     tU8* source_ptr;
     tU8 the_byte;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4864
@@ -273,6 +297,7 @@ int ChangeCharTo(int pSlot_index, int pChar_index, char pNew_char) {
     int j;
     tRolling_letter* let;
     tRolling_type new_type;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5212
@@ -290,12 +315,14 @@ void ChangeTextTo(int pXcoord, int pYcoord, char* pNew_str, char* pOld_str) {
     tRolling_letter* let;
     tRolling_type new_type;
     char new_char;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5628
 // Size: 61
 // EAX: pSlot_index
 void SetRollingCursor(int pSlot_index) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5692
@@ -305,6 +332,7 @@ void SetRollingCursor(int pSlot_index) {
 // EBX: pVisible_length
 void BlankSlot(int pIndex, int pName_length, int pVisible_length) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5784
@@ -313,6 +341,7 @@ void BlankSlot(int pIndex, int pName_length, int pVisible_length) {
 void DoRLBackspace(int pSlot_index) {
     int i;
     int new_len;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6016
@@ -321,24 +350,28 @@ void DoRLBackspace(int pSlot_index) {
 void DoRLDelete(int pSlot_index) {
     int i;
     int new_len;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6208
 // Size: 70
 // EAX: pSlot_index
 void DoRLInsert(int pSlot_index) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6280
 // Size: 137
 // EAX: pSlot_index
 void DoRLCursorLeft(int pSlot_index) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6420
 // Size: 101
 // EAX: pSlot_index
 void DoRLCursorRight(int pSlot_index) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6524
@@ -348,6 +381,7 @@ void DoRLCursorRight(int pSlot_index) {
 void DoRLTypeLetter(int pChar, int pSlot_index) {
     int i;
     int new_len;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6848
@@ -355,6 +389,7 @@ void DoRLTypeLetter(int pChar, int pSlot_index) {
 // EAX: pSlot_index
 void StopTyping(int pSlot_index) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6972
@@ -363,6 +398,7 @@ void StopTyping(int pSlot_index) {
 // EDX: pRevert_str
 void RevertTyping(int pSlot_index, char* pRevert_str) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7096
@@ -371,6 +407,7 @@ void RevertTyping(int pSlot_index, char* pRevert_str) {
 // EDX: pText
 // EBX: pVisible_length
 void StartTyping(int pSlot_index, char* pText, int pVisible_length) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7188
@@ -378,6 +415,7 @@ void StartTyping(int pSlot_index, char* pText, int pVisible_length) {
 // EAX: pSlot_index
 // EDX: pKey
 void TypeKey(int pSlot_index, char pKey) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7364
@@ -386,6 +424,7 @@ void TypeKey(int pSlot_index, char pKey) {
 // EDX: pX_coord
 // EBX: pY_coord
 void SetSlotXY(int pSlot_index, int pX_coord, int pY_coord) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7436
@@ -393,6 +432,7 @@ void SetSlotXY(int pSlot_index, int pX_coord, int pY_coord) {
 // EAX: pDestn
 // EDX: pMax_length
 void GetTypedName(char* pDestn, int pMax_length) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7532
@@ -405,14 +445,17 @@ void KillCursor(int pSlot_index) {
     int j;
     tRolling_letter* let;
     tRolling_type new_type;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7744
 // Size: 44
 void EdgeTriggerModeOn() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7788
 // Size: 44
 void EdgeTriggerModeOff() {
+    NOT_IMPLEMENTED();
 }

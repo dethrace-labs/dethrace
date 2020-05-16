@@ -1,4 +1,5 @@
 #include "powerup.h"
+#include <stdlib.h>
 
 int gPed_harvest_sounds[4];
 tGot_proc* gGot_procs[34];
@@ -21,12 +22,14 @@ br_vector3 gZero_v;
 void LosePowerupX(tPowerup* pThe_powerup, int pTell_net_players) {
     int i;
     tNet_message* the_message;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 304
 // Size: 50
 // EAX: pThe_powerup
 void LosePowerup(tPowerup* pThe_powerup) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 356
@@ -35,6 +38,7 @@ void LosePowerup(tPowerup* pThe_powerup) {
 void LoseAllSimilarPowerups(tPowerup* pThe_powerup) {
     int i;
     tPowerup* the_powerup;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 496
@@ -52,6 +56,7 @@ int GotPowerupX(tCar_spec* pCar, int pIndex, int pTell_net_players, int pDisplay
     char s[256];
     char* s2;
     tNet_message* the_message;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1560
@@ -59,6 +64,7 @@ int GotPowerupX(tCar_spec* pCar, int pIndex, int pTell_net_players, int pDisplay
 // EAX: pCar
 // EDX: pIndex
 int GotPowerup(tCar_spec* pCar, int pIndex) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1628
@@ -71,18 +77,21 @@ void LoadPowerups() {
     int time;
     int action_index;
     tPowerup* the_powerup;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2440
 // Size: 112
 void InitPowerups() {
     tPowerup* the_powerup;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2552
 // Size: 99
 void CloseDownPowerUps() {
     tPowerup* the_powerup;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2652
@@ -96,6 +105,7 @@ void DrawPowerups(tU32 pTime) {
     char s[8];
     tHeadup_icon* the_icon;
     br_pixelmap* fizzle_pix;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3356
@@ -105,6 +115,7 @@ void DoPowerupPeriodics(tU32 pFrame_period) {
     int i;
     tPowerup* the_powerup;
     tU32 the_time;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3532
@@ -112,56 +123,67 @@ void DoPowerupPeriodics(tU32 pFrame_period) {
 // EAX: pN
 void GotPowerupN(int pN) {
     int modifiers;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3692
 // Size: 41
 void GotPowerup0() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3736
 // Size: 44
 void GotPowerup1() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3780
 // Size: 44
 void GotPowerup2() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3824
 // Size: 44
 void GotPowerup3() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3868
 // Size: 44
 void GotPowerup4() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3912
 // Size: 44
 void GotPowerup5() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3956
 // Size: 44
 void GotPowerup6() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4000
 // Size: 44
 void GotPowerup7() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4044
 // Size: 44
 void GotPowerup8() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4088
 // Size: 44
 void GotPowerup9() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4132
@@ -171,6 +193,7 @@ void GotPowerup9() {
 int GotCredits(tPowerup* pPowerup, tCar_spec* pCar) {
     int credits;
     char s[256];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4296
@@ -179,6 +202,7 @@ int GotCredits(tPowerup* pPowerup, tCar_spec* pCar) {
 // EDX: pIndex
 void ImprovePSPowerup(tCar_spec* pCar, int pIndex) {
     tNet_message* the_message;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4388
@@ -191,6 +215,7 @@ int GotTimeOrPower(tPowerup* pPowerup, tCar_spec* pCar) {
     int i;
     int not_allowed_power;
     char s[256];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4788
@@ -198,6 +223,7 @@ int GotTimeOrPower(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int SetPedSpeed(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4868
@@ -205,6 +231,7 @@ int SetPedSpeed(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int SetHades(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4940
@@ -212,6 +239,7 @@ int SetHades(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 void ResetHades(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4984
@@ -220,6 +248,7 @@ void ResetHades(tPowerup* pPowerup, tCar_spec* pCar) {
 // EDX: pCar
 int SetPedSize(tPowerup* pPowerup, tCar_spec* pCar) {
     br_scalar old_scale;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5172
@@ -227,6 +256,7 @@ int SetPedSize(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int SetPedExplode(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5248
@@ -234,6 +264,7 @@ int SetPedExplode(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int SetInvulnerability(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5328
@@ -241,6 +272,7 @@ int SetInvulnerability(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 void ResetInvulnerability(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5380
@@ -248,6 +280,7 @@ void ResetInvulnerability(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int SetFreeRepairs(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5464
@@ -255,6 +288,7 @@ int SetFreeRepairs(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 void ResetFreeRepairs(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5524
@@ -262,6 +296,7 @@ void ResetFreeRepairs(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int SetBlindPedestrians(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5600
@@ -269,6 +304,7 @@ int SetBlindPedestrians(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 void ResetBlindPedestrians(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5648
@@ -276,6 +312,7 @@ void ResetBlindPedestrians(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int FreezeTimer(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5756
@@ -283,6 +320,7 @@ int FreezeTimer(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 void UnfreezeTimer(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5816
@@ -290,6 +328,7 @@ void UnfreezeTimer(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int DoInstantRepair(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5896
@@ -297,6 +336,7 @@ int DoInstantRepair(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 void ResetPedSpeed(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5944
@@ -304,6 +344,7 @@ void ResetPedSpeed(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 void ResetPedSize(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6004
@@ -311,6 +352,7 @@ void ResetPedSize(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 void ResetPedExplode(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6052
@@ -318,6 +360,7 @@ void ResetPedExplode(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int SetEngineFactor(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6208
@@ -325,6 +368,7 @@ int SetEngineFactor(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int SetUnderwater(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6288
@@ -334,6 +378,7 @@ int SetUnderwater(tPowerup* pPowerup, tCar_spec* pCar) {
 int TrashBodywork(tPowerup* pPowerup, tCar_spec* pCar) {
     int i;
     tCar_spec* c;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6544
@@ -341,6 +386,7 @@ int TrashBodywork(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int TakeDrugs(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6688
@@ -349,6 +395,7 @@ int TakeDrugs(tPowerup* pPowerup, tCar_spec* pCar) {
 // EDX: pOffset
 void PaletteFuckedUpByDrugs(br_pixelmap* pPixelmap, int pOffset) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6884
@@ -356,6 +403,7 @@ void PaletteFuckedUpByDrugs(br_pixelmap* pPixelmap, int pOffset) {
 // EAX: pPowerup
 // EDX: pPeriod
 void TheEffectsOfDrugs(tPowerup* pPowerup, tU32 pPeriod) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6956
@@ -364,6 +412,7 @@ void TheEffectsOfDrugs(tPowerup* pPowerup, tU32 pPeriod) {
 // EDX: pCar
 int SetOpponentsSpeed(tPowerup* pPowerup, tCar_spec* pCar) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7120
@@ -371,6 +420,7 @@ int SetOpponentsSpeed(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int SetCopsSpeed(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7200
@@ -378,6 +428,7 @@ int SetCopsSpeed(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int SetGravity(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7280
@@ -385,6 +436,7 @@ int SetGravity(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int SetPinball(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7360
@@ -392,6 +444,7 @@ int SetPinball(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int SetWallclimb(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7440
@@ -399,6 +452,7 @@ int SetWallclimb(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int SetBouncey(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7560
@@ -406,6 +460,7 @@ int SetBouncey(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int SetSuspension(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7680
@@ -413,6 +468,7 @@ int SetSuspension(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int SetTyreGrip(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7764
@@ -420,6 +476,7 @@ int SetTyreGrip(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int SetDamageMultiplier(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7848
@@ -427,6 +484,7 @@ int SetDamageMultiplier(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 void ResetEngineFactor(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7940
@@ -434,6 +492,7 @@ void ResetEngineFactor(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 void ResetUnderwater(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7992
@@ -441,6 +500,7 @@ void ResetUnderwater(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 void PukeDrugsBackUp(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8068
@@ -449,6 +509,7 @@ void PukeDrugsBackUp(tPowerup* pPowerup, tCar_spec* pCar) {
 // EDX: pCar
 void ResetOpponentsSpeed(tPowerup* pPowerup, tCar_spec* pCar) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8200
@@ -456,6 +517,7 @@ void ResetOpponentsSpeed(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 void ResetCopsSpeed(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8248
@@ -463,6 +525,7 @@ void ResetCopsSpeed(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 void ResetGravity(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8300
@@ -470,6 +533,7 @@ void ResetGravity(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 void ResetPinball(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8348
@@ -477,6 +541,7 @@ void ResetPinball(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 void ResetWallclimb(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8400
@@ -484,6 +549,7 @@ void ResetWallclimb(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 void ResetBouncey(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8464
@@ -491,6 +557,7 @@ void ResetBouncey(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 void ResetSuspension(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8532
@@ -498,6 +565,7 @@ void ResetSuspension(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 void ResetDamageMultiplier(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8584
@@ -505,6 +573,7 @@ void ResetDamageMultiplier(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 void ResetTyreGrip(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8636
@@ -512,6 +581,7 @@ void ResetTyreGrip(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int PickAtRandom(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8720
@@ -519,6 +589,7 @@ int PickAtRandom(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int PedestrianRespawn(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8792
@@ -526,6 +597,7 @@ int PedestrianRespawn(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int GotVouchers(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8880
@@ -533,6 +605,7 @@ int GotVouchers(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pPeriod
 void MungeVouchers(tPowerup* pPowerup, tU32 pPeriod) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8932
@@ -540,6 +613,7 @@ void MungeVouchers(tPowerup* pPowerup, tU32 pPeriod) {
 // EAX: pPowerup
 // EDX: pCar
 int SetInstantHandbrake(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9016
@@ -547,6 +621,7 @@ int SetInstantHandbrake(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 void ResetInstantHandbrake(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9076
@@ -554,6 +629,7 @@ void ResetInstantHandbrake(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pPeriod
 void DoBouncey(tPowerup* pPowerup, tU32 pPeriod) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9216
@@ -563,6 +639,7 @@ void DoBouncey(tPowerup* pPowerup, tU32 pPeriod) {
 int HitMine(tPowerup* pPowerup, tCar_spec* pCar) {
     int i;
     float fudge_multiplier;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9668
@@ -570,6 +647,7 @@ int HitMine(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int SetMassMultiplier(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9752
@@ -577,6 +655,7 @@ int SetMassMultiplier(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 void ResetMassMultiplier(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9804
@@ -584,6 +663,7 @@ void ResetMassMultiplier(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int ShowPedestrians(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9888
@@ -591,6 +671,7 @@ int ShowPedestrians(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 void HidePedestrians(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9948
@@ -598,6 +679,7 @@ void HidePedestrians(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int SetProximity(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10040
@@ -605,6 +687,7 @@ int SetProximity(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 void ResetProximity(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10092
@@ -612,6 +695,7 @@ void ResetProximity(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int SetPedHarvest(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10168
@@ -620,6 +704,7 @@ int SetPedHarvest(tPowerup* pPowerup, tCar_spec* pCar) {
 // EDX: pCar
 void ResetPedHarvest(tPowerup* pPowerup, tCar_spec* pCar) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10288
@@ -627,6 +712,7 @@ void ResetPedHarvest(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 int SetVesuvianCorpses(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10364
@@ -634,6 +720,7 @@ int SetVesuvianCorpses(tPowerup* pPowerup, tCar_spec* pCar) {
 // EAX: pPowerup
 // EDX: pCar
 void ResetVesuvianCorpses(tPowerup* pPowerup, tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10412
@@ -642,6 +729,7 @@ void ResetVesuvianCorpses(tPowerup* pPowerup, tCar_spec* pCar) {
 void ReceivedPowerup(tNet_contents* pContents) {
     tPowerup* powerup;
     tCar_spec* car;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10836
@@ -653,6 +741,7 @@ void SendCurrentPowerups() {
     tCar_spec* car;
     tNet_contents* the_contents;
     tPlayer_ID ID;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11192
@@ -660,4 +749,5 @@ void SendCurrentPowerups() {
 // EAX: pCar
 void LoseAllLocalPowerups(tCar_spec* pCar) {
     int i;
+    NOT_IMPLEMENTED();
 }

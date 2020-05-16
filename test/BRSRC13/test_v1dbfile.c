@@ -1,12 +1,13 @@
 #include "framework/unity.h"
 
-#include "CORE/v1db/modsupt.h"
-#include "CORE/v1db/v1dbfile.h"
+#include "CORE/V1DB/modsupt.h"
+#include "CORE/V1DB/v1dbfile.h"
 
 void test_v1dbfile_BrModelLoad() {
     br_model* m;
     m = BrModelLoad("DATA/MODELS/CPOINT.DAT");
     TEST_ASSERT_NOT_NULL(m);
+    TEST_ASSERT_EQUAL_STRING("DIRECT.DAT", m->identifier);
     TEST_ASSERT_NOT_NULL(m->vertices);
     TEST_ASSERT_EQUAL_INT(54, m->nvertices);
     TEST_ASSERT_EQUAL_FLOAT(-0.0950154, m->vertices[0].p.v[0]);

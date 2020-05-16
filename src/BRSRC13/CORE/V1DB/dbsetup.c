@@ -71,46 +71,55 @@ br_error BrV1dbBegin() {
 // Offset: 367
 // Size: 103
 br_error BrV1dbEnd() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 482
 // Size: 89
 br_uint_32 updateTable(br_pixelmap* item, void* arg) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 581
 // Size: 89
 br_uint_32 updateMap(br_pixelmap* item, void* arg) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 685
 // Size: 89
 br_uint_32 updateMaterial(br_material* item, void* arg) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 786
 // Size: 89
 br_uint_32 updateModel(br_model* item, void* arg) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 886
 // Size: 79
 br_uint_32 clearTable(br_pixelmap* item, void* arg) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 974
 // Size: 79
 br_uint_32 clearMap(br_pixelmap* item, void* arg) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1067
 // Size: 79
 br_uint_32 clearMaterial(br_material* item, void* arg) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1157
 // Size: 79
 br_uint_32 clearModel(br_model* item, void* arg) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1256
@@ -119,37 +128,44 @@ br_error BrV1dbRendererBegin(br_device_pixelmap* destination, br_renderer* rende
     br_renderer_facility* renderer_facility;
     br_error r;
     br_token_value tv[2];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1738
 // Size: 41
 br_renderer* BrV1dbRendererQuery() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1797
 // Size: 222
 br_error BrV1dbRendererEnd() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2029
 // Size: 94
 void BrZbBegin(br_uint_8 colour_type, br_uint_8 depth_type) {
     LOG_TRACE("(%d, %d)", colour_type, depth_type);
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2133
 // Size: 141
 void BrZsBegin(br_uint_8 colour_type, void* primitive, br_uint_32 size) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2282
 // Size: 65
 void BrZbEnd() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2355
 // Size: 65
 void BrZsEnd() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2445
@@ -162,4 +178,5 @@ void BrV1dbBeginWrapper_Float() {
 // Offset: 2502
 // Size: 40
 void BrV1dbEndWrapper() {
+    NOT_IMPLEMENTED();
 }

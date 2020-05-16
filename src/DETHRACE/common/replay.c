@@ -1,4 +1,5 @@
 #include "replay.h"
+#include <stdlib.h>
 
 int gProgress_line_top[2];
 int gProgress_line_left[2];
@@ -26,21 +27,25 @@ tAction_replay_camera_type gAction_replay_camera_mode;
 // Offset: 0
 // Size: 71
 int ReplayIsPaused() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 72
 // Size: 47
 float GetReplayRate() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 120
 // Size: 45
 int GetReplayDirection() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 168
 // Size: 54
 void StopSaving() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 224
@@ -53,11 +58,13 @@ void ActualActionReplayHeadups(int pSpecial_zappy_bastard) {
     tU16 played_col2;
     tU16 to_play_col1;
     tU16 to_play_col2;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1824
 // Size: 44
 void DoActionReplayPostSwap() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1868
@@ -65,11 +72,13 @@ void DoActionReplayPostSwap() {
 // EAX: pSpecial_zappy_bastard
 void DoZappyActionReplayHeadups(int pSpecial_zappy_bastard) {
     tU32 the_time;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1980
 // Size: 41
 void DoActionReplayHeadups() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2024
@@ -82,21 +91,25 @@ void MoveReplayBuffer(tS32 pMove_amount) {
     int i;
     int a;
     tU32 old_time;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2344
 // Size: 118
 void MoveToEndOfReplay() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2464
 // Size: 118
 void MoveToStartOfReplay() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2584
 // Size: 395
 void ToggleReplay() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2980
@@ -104,6 +117,7 @@ void ToggleReplay() {
 // EAX: pEffect_index
 // EDX: pSound_tag
 void ReverseSound(tS3_effect_tag pEffect_index, tS3_sound_tag pSound_tag) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3032
@@ -111,6 +125,7 @@ void ReverseSound(tS3_effect_tag pEffect_index, tS3_sound_tag pSound_tag) {
 int FindUniqueFile() {
     FILE* f;
     tPath_name the_path;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3256
@@ -126,22 +141,26 @@ void PollActionReplayControls(tU32 pFrame_period) {
     static tU32 last_real_time;
     static int psuedo_mouse_keys[8];
     static tRectangle mouse_areas[2][8];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4832
 // Size: 94
 void CheckReplayTurnOn() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4928
 // Size: 98
 void InitializeActionReplay() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5028
 // Size: 71
 // EAX: pFrame_period
 void DoActionReplay(tU32 pFrame_period) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5100
@@ -149,4 +168,5 @@ void DoActionReplay(tU32 pFrame_period) {
 void SynchronizeActionReplay() {
     tPath_name the_path;
     static tU32 gLast_synch_time;
+    NOT_IMPLEMENTED();
 }

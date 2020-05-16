@@ -1,5 +1,6 @@
 #include "enables.h"
 #include "dbsetup.h"
+#include "debug.h"
 #include <stddef.h>
 
 char rscid[51];
@@ -10,6 +11,7 @@ char rscid[51];
 // EDX: a
 void actorEnable(br_v1db_enable* e, br_actor* a) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 320
@@ -18,36 +20,43 @@ void actorEnable(br_v1db_enable* e, br_actor* a) {
 // EDX: a
 void actorDisable(br_v1db_enable* e, br_actor* a) {
     int i;
+    LOG_WARN("Not implemented");
 }
 
 // Offset: 525
 // Size: 71
 void BrLightEnable(br_actor* l) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 611
 // Size: 71
 void BrLightDisable(br_actor* l) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 700
 // Size: 71
 void BrClipPlaneEnable(br_actor* c) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 790
 // Size: 71
 void BrClipPlaneDisable(br_actor* c) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 882
 // Size: 71
 void BrHorizonPlaneEnable(br_actor* h) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 975
 // Size: 74
 void BrHorizonPlaneDisable(br_actor* h) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1066
@@ -57,6 +66,7 @@ br_actor* BrEnvironmentSet(br_actor* a) {
     old_a = v1db.enabled_environment;
     v1db.enabled_environment = a;
     return old_a;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1131
@@ -69,6 +79,7 @@ br_boolean setupView(br_matrix34* view_to_this, br_matrix34* this_to_view, br_ma
     br_matrix34 this_to_world;
     br_int_32 root_t;
     br_int_32 t;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1429
@@ -86,6 +97,7 @@ void BrSetupLights(br_actor* world, br_matrix34* world_to_view, br_int_32 w2vt) 
     br_vector3 view_position;
     br_vector3 view_direction;
     br_light* light;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2498
@@ -105,6 +117,7 @@ void BrSetupClipPlanes(br_actor* world, br_matrix34* world_to_view, br_int_32 w2
     br_int_32 clip_part;
     br_token_value tv[3];
     br_vector4 sp;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3052
@@ -116,6 +129,7 @@ void BrSetupEnvironment(br_actor* world, br_matrix34* world_to_view, br_int_32 w
     br_matrix34 view_to_this;
     br_matrix34 this_to_view;
     br_token h;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3361
@@ -124,6 +138,7 @@ void BrSetupEnvironment(br_actor* world, br_matrix34* world_to_view, br_int_32 w
 // EDX: world_to_view
 // EBX: w2vt
 void BrSetupHorizons(br_actor* world, br_matrix34* world_to_view, br_int_32 w2vt) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3419

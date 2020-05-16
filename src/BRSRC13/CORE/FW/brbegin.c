@@ -1,4 +1,5 @@
 #include "brbegin.h"
+#include "debug.h"
 
 #include "CORE/HOST/himage.h"
 #include "CORE/PIXELMAP/pmsetup.h"
@@ -20,9 +21,11 @@ br_error BrBegin() {
         //nullsub_28();
         return 0;
     }
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 102
 // Size: 126
 br_error BrEnd() {
+    NOT_IMPLEMENTED();
 }

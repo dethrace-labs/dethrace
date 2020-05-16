@@ -1,6 +1,7 @@
 #include "modsupt.h"
 #include "CORE/FW/resource.h"
 #include "CORE/V1DB/dbsetup.h"
+#include "debug.h"
 
 char rscid[50];
 
@@ -12,6 +13,7 @@ void BrModelApplyMap(br_model* model, int map_type, br_matrix34* xform) {
     br_vector3 mv;
     br_matrix34 default_xform;
     br_scalar d;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 733
@@ -22,11 +24,13 @@ br_matrix34* BrModelFitMap(br_model* model, int axis_0, int axis_1, br_matrix34*
     br_vector3 sc;
     int i;
     static br_vector3 axis_vectors[6];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1442
 // Size: 73
 void BrModelFree(br_model* m) {
+    BrResFree(m);
 }
 
 // Offset: 1531
@@ -52,9 +56,11 @@ br_model* BrModelAllocate(char* name, int nvertices, int nfaces) {
 // Offset: 1805
 // Size: 40
 br_primitive_list* BrPrimitiveListAllocate(br_uint_32 prim_type, br_uint_16 num_prims) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1869
 // Size: 40
 br_uint_32 BrModelAddPrimitiveList(br_model* model, br_primitive_list* primitive_list) {
+    NOT_IMPLEMENTED();
 }
