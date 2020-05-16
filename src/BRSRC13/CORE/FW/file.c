@@ -12,7 +12,9 @@ char rscid[49];
 // Size: 86
 void _BrFileFree(void* res, br_uint_8 res_class, br_size_t size) {
     br_file* file;
-    fw.fsys->close(res);
+
+    file = (br_file*)res;
+    fw.fsys->close(file->raw_file);
 }
 
 // Offset: 115
