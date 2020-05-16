@@ -92,6 +92,7 @@ void* BrStdioOpenWrite(char* name, int mode) {
 // Offset: 781
 // Size: 38
 void BrStdioClose(void* f) {
+    LOG_TRACE("(%p)", f);
     fclose(f);
 }
 
@@ -106,7 +107,7 @@ int BrStdioEof(void* f) {
 int BrStdioGetChar(void* f) {
     int c;
     c = fgetc(f);
-    LOG_DEBUG("file pos: %d, char: %d", ftell(f) - 1, c);
+    //LOG_DEBUG("file pos: %d, char: %d", ftell(f) - 1, c);
     return c;
 }
 
