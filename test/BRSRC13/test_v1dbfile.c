@@ -22,5 +22,5 @@ void test_v1dbfile_BrModelLoad() {
 }
 
 void test_v1dbfile_suite() {
-    //RUN_TEST(test_v1dbfile_BrModelLoad);
+    RUN_TEST(test_v1dbfile_BrModelLoad);
 }
