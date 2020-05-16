@@ -27,7 +27,7 @@ void BrPixelmapBegin() {
     for (i = 0; i < 2; i++) {
         BrResClassAdd(&pm_resourceClasses[i]);
     }
-    return BrImageAdd(&Image_BRPMAP1);
+    BrImageAdd(&Image_BRPMAP1);
 }
 
 // Offset: 160

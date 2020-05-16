@@ -41,7 +41,7 @@ void test_resource_BrResFree() {
 void test_resource_BrResFree2() {
     br_file* child;
     child = BrResAllocate(NULL, sizeof(br_file), BR_MEMORY_FILE);
-    child->raw_file = 0x1;
+    child->raw_file = (void*)0x1;
     TEST_ASSERT_NOT_NULL(child);
     BrResAssert(child);
 }

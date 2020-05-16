@@ -30,6 +30,7 @@ extern void test_resource_suite();
 extern void test_actsupt_suite();
 extern void test_genclip_suite();
 extern void test_datafile_suite();
+extern void test_v1dbfile_suite();
 
 void setUp(void) {
 }
