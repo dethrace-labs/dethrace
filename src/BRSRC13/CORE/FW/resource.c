@@ -37,11 +37,9 @@ void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class) {
     br_int_32 actual_pad;
     LOG_TRACE("(%p, %d, %d)", vparent, size, res_class);
 
-    br_int_32 actual_pad_2;
     char* tmp;
 
     malign = BrMemAlign(res_class) - 1;
-    //printf("BrResAllocate: parent: %p, size: %d, class: %d, class_index: %p\n", vparent, size, res_class, fw.resource_class_index[res_class]);
     calign = fw.resource_class_index[res_class]->alignment;
     if (calign <= 0) {
         calign = 4;
@@ -51,28 +49,24 @@ void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class) {
 
     pad = (~malign & calign) + 3;
     actual_pad = (sizeof(resource_header) + pad) & 0xFFFC;
-    actual_pad_2 = (size + sizeof(resource_header) + 3) & 0xFFFC;
+
+    // JeffH ignore calculated padding
+    pad = 0;
+    actual_pad = sizeof(resource_header) + pad;
 
     res = (resource_header*)BrMemAllocate(size + actual_pad, res_class);
 
-    // TOOD: ?
-    // if ((signed int)(((unsigned int)((char*)allocated + res_align_1) & ~res_align_1) - (_DWORD)allocated) > v8)
-    //     BrFailure((int)"Memory allocator broke alignment", v14);
     res->class = res_class;
-    res->size_l = actual_pad_2 >> 2;
-    res->size_m = actual_pad_2 >> 10;
-    res->size_h = actual_pad_2 >> 18;
+    res->size_l = size >> 2;
+    res->size_m = size >> 10;
+    res->size_h = size >> 18;
 
     BrSimpleNewList(&res->children);
     res->magic_ptr = res;
     res->magic_num = 0xDEADBEEF;
 
     if (vparent) {
-        tmp = vparent;
-        while (*(tmp - 1) == 0) {
-            tmp--;
-        }
-        parent = (resource_header*)(tmp - sizeof(resource_header));
+        parent = (char*)vparent - sizeof(resource_header);
         BrSimpleAddHead(&parent->children, &res->node);
     }
     LOG_DEBUG("res_header %p, body %p, pad %d", res, ((char*)res) + actual_pad, actual_pad);
@@ -99,9 +93,8 @@ void BrResInternalFree(resource_header* res, br_boolean callback) {
         //    v5 = 4;
         res->class = 127;
         if (callback && fw.resource_class_index[c]->free_cb) {
-            // TODO: we should return address of the user-facing data, not the resource_header
-            //~(v5 - 1) & (unsigned int)((char*)&res->magic_num + v5 + 3),
-            fw.resource_class_index[c]->free_cb(res, c, (res->size_h << 18) | 4 * res->size_l | (res->size_m << 10));
+            // res+1 means we jump over the header to get to the resource data
+            fw.resource_class_index[c]->free_cb(res + 1, c, (res->size_h << 18) | 4 * res->size_l | (res->size_m << 10));
         }
 
         while (res->children.head) {
@@ -112,7 +105,7 @@ void BrResInternalFree(resource_header* res, br_boolean callback) {
             BrSimpleRemove(&res->node);
         }
         res->magic_num = 1;
-        res->magic_ptr = 0;
+        res->magic_ptr = NULL;
         BrMemFree(res);
     }
 }
@@ -122,15 +115,7 @@ void BrResInternalFree(resource_header* res, br_boolean callback) {
 void BrResFree(void* vres) {
     LOG_TRACE("(%p)", vres);
 
-    // go backwards through padding until we hit the end of resource_header
-    (char*)vres--;
-    while (*(char*)vres == 0) {
-        (char*)vres--;
-    }
-    // jump one more step backwards to start of resource_header
-    (char*)vres++;
-    vres = ((resource_header*)vres - 1);
-
+    vres = vres - sizeof(resource_header);
     if (((resource_header*)vres)->magic_num != 0xDEADBEEF) {
         LOG_PANIC("Bad resource header at %p", vres);
     }
@@ -140,14 +125,7 @@ void BrResFree(void* vres) {
 void BrResAssert(void* vres) {
     LOG_TRACE("(%p)", vres);
 
-    (char*)vres--;
-    // go backwards through padding until we hit the end of resource_header
-    while (*(char*)vres == 0) {
-        (char*)vres--;
-    }
-    // jump one more step backwards to start of resource_header
-    vres = (char*)vres + 1;
-    vres = ((resource_header*)vres - 1);
+    vres = vres - sizeof(resource_header);
 
     if (((resource_header*)vres)->magic_num != 0xDEADBEEF) {
         LOG_PANIC("Bad resource header at %p. Was %X", vres, ((resource_header*)vres)->magic_num);

@@ -2332,7 +2332,7 @@ typedef struct br_file {
     void* raw_file;
     br_boolean writing;
     int mode;
-    char name[1];
+    char name[255];
 } br_file;
 
 typedef enum br_lexer_token_id {

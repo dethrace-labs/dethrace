@@ -956,7 +956,7 @@ br_datafile* DfOpen(char* name, int write, br_token scalar_type) {
         else
             df->prims = &_BrFilePrimsReadText;
     }
-    LOG_DEBUG("pushing %p", df->h);
+    LOG_DEBUG("pushing %p", df);
     DfPush(BR_MEMORY_FILE, df, 1);
     return df;
 }
@@ -968,6 +968,8 @@ void DfClose(br_datafile* df) {
     br_datafile* dfp;
     LOG_TRACE("(%p)", df);
 
+    // TODO: this is not quite right according to IDA
+
     while (1) {
         if (DatafileStackTop > 0) {
             if (DatafileStack[DatafileStackTop - 1].type == BR_MEMORY_FILE) {
@@ -977,6 +979,7 @@ void DfClose(br_datafile* df) {
         }
     }
     dfp = DfPop(BR_MEMORY_FILE, NULL);
+    LOG_DEBUG("popped h=%p, raw_file=%p", dfp->h, ((br_file*)dfp->h)->raw_file);
     BrFileClose(dfp->h);
     BrResFree(dfp);
 }

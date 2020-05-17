@@ -14,6 +14,7 @@ void _BrFileFree(void* res, br_uint_8 res_class, br_size_t size) {
     br_file* file;
 
     file = (br_file*)res;
+    LOG_DEBUG("Closing %s", file->name);
     fw.fsys->close(file->raw_file);
 }
 
