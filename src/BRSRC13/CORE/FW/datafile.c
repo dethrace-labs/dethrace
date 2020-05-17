@@ -7,6 +7,7 @@
 #include "debug.h"
 #include "file.h"
 
+#include <stdint.h>
 #include <stdio.h>
 
 br_file_primitives _BrFilePrimsNull = {
@@ -295,7 +296,6 @@ br_uint_32 DfStructReadBinary(br_datafile* df, br_file_struct* str, void* base) 
     int c;
     int n;
     unsigned char* mp;
-    char* tmp;
     br_file_struct_member* sm;
     union {
         unsigned char b[8];
@@ -330,7 +330,6 @@ br_uint_32 DfStructReadBinary(br_datafile* df, br_file_struct* str, void* base) 
         case 14:
             mp[1] = BrFileGetChar(df->h);
             *mp = BrFileGetChar(df->h);
-            LOG_DEBUG("mp=%d, mp[1]=%d", *mp, mp[1]);
             goto LABEL_33;
         case 4:
         case 5:
@@ -339,8 +338,10 @@ br_uint_32 DfStructReadBinary(br_datafile* df, br_file_struct* str, void* base) 
         case 24:
         case 25:
             mp[3] = BrFileGetChar(df->h);
-            LOG_DEBUG("got char %d", mp[3]);
-            goto LABEL_7;
+            mp[2] = BrFileGetChar(df->h);
+            mp[1] = BrFileGetChar(df->h);
+            *mp = BrFileGetChar(df->h);
+            goto LABEL_33;
         case 6:
             LOG_PANIC("Not implemented?");
             conv.b[3] = BrFileGetChar(df->h);
@@ -380,13 +381,9 @@ br_uint_32 DfStructReadBinary(br_datafile* df, br_file_struct* str, void* base) 
                 tmp_string[n] = c;
             }
             tmp_string[n] = 0;
-            tmp = BrResStrDup(df->res ? df->res : fw.res, tmp_string);
-            // TODO: how to make sure this works if sizeof(long) != sizeof(void*)
-            *(long*)mp = tmp;
-
+            *(intptr_t*)mp = BrResStrDup(df->res ? df->res : fw.res, tmp_string);
             goto LABEL_33;
         case 18:
-        LABEL_7:
             mp[2] = BrFileGetChar(df->h);
             mp[1] = BrFileGetChar(df->h);
             *mp = BrFileGetChar(df->h);
@@ -908,10 +905,10 @@ int DfFileIdentify(br_uint_8* magics, br_size_t n_magics) {
     static char text_magics[8] = { '*', 'F', 'I', 'L', 'E', '_', 'I', 'N' };
     static char binary_magics[8] = { '\0', '\0', '\0', '\x12', '\0', '\0', '\0', '\b' };
 
-    if (BrMemCmp(magics, text_magics, 8) == 0) {
+    if (BrMemCmp(magics, text_magics, sizeof(magics)) == 0) {
         return 1;
     }
-    if (BrMemCmp(magics, binary_magics, 8) == 0) {
+    if (BrMemCmp(magics, binary_magics, sizeof(magics)) == 0) {
         return 0;
     }
     LOG_WARN("file does not match magics");
