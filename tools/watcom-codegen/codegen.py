@@ -309,13 +309,13 @@ def process_type(current_module, type_name):
     match = re.match(ENUM_LIST_REGEX, line)
     nbr_fields = int(match.group(1), 16)
     type_idx = int(match.group(2), 16)
-    elements = []
+    elements = {}
     for i in range(nbr_fields):
       element = { ''}
       line = read_line()
       line = read_line()
       match = re.match(ENUM_ITEM_REGEX, line)
-      elements.append({ 'name': match.group(1), 'value': int(match.group(2), 16)})
+      elements[match.group(1)] = int(match.group(2), 16)
     return { 'type_idx': type_idx, 'elements': elements }
   else:
     print('*** UNEXPECTED', type_name, line)
@@ -349,7 +349,7 @@ def resolve_type_str(module, type_idx, var_name, decl=True):
   if decl == True and t['type'] == 'FIELD_LIST':
     indent += 1
     print ('decl', var_name)
-    s = get_type_declaration(module, t, var_name)
+    s = get_type_declaration(module, t, var_name) + bounds
     indent -= 1
     return s
   if 'value' in t:
@@ -537,7 +537,6 @@ def get_type_declaration(module, t, name):
   #print ('type decl', t)
   if t['type'] == 'FIELD_LIST':
     s = 'struct'
-    print('struct', )
     tag_name = get_struct_tag_name(module, t)
     if tag_name is not None:
       s += ' ' + tag_name
@@ -757,10 +756,10 @@ def generate_types_header(module):
     if t['type'] == 'ENUM_LIST':
       s = '\ntypedef enum {} {{'.format(type_name)
       first_elem = True
-      for e in reversed(t['elements']):
+      for k, v in sorted(t['elements'].items(), key=lambda x: x[1]):
         if not first_elem:
           s += ','
-        s += '\n{}{} = {}'.format((' ' * INDENT_SPACES), e['name'], e['value'])
+        s += '\n{}{} = {}'.format((' ' * INDENT_SPACES), k, v)
         first_elem = False
       s += '\n}} {};\n'.format(type_name)
       enums[type_name] = s

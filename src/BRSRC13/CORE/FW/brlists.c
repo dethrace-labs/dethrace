@@ -1,5 +1,6 @@
 #include "brlists.h"
 #include "debug.h"
+#include <assert.h>
 #include <stdio.h>
 #include <unistd.h>
 
@@ -10,39 +11,51 @@ char rscid[49];
 void BrNewList(br_list* list) {
     list->_null = NULL;
     list->tail = (br_node*)list;
-    list->head = list->_null;
+    list->head = &list->_null;
 }
 
 // Offset: 80
 // Size: 68
 void BrAddHead(br_list* list, br_node* node) {
+    assert(node != NULL);
+    assert(list != NULL);
+    assert(list->head != NULL);
+    node->prev = (br_node*)list;
+    node->next = list->head;
+    list->head->prev = node;
+    list->head = node;
 }
 
 // Offset: 158
 // Size: 73
 void BrAddTail(br_list* list, br_node* node) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 241
 // Size: 77
 br_node* BrRemHead(br_list* list) {
     br_node* n;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 328
 // Size: 77
 br_node* BrRemTail(br_list* list) {
     br_node* n;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 414
 // Size: 68
 void BrInsert(br_list* list, br_node* here, br_node* node) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 491
 // Size: 66
 br_node* BrRemove(br_node* node) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 573
@@ -67,11 +80,13 @@ void BrSimpleAddHead(br_simple_list* list, br_simple_node* node) {
 // Size: 65
 br_simple_node* BrSimpleRemHead(br_simple_list* list) {
     br_simple_node* node;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 800
 // Size: 76
 void BrSimpleInsert(br_simple_list* list, br_simple_node* here, br_simple_node* node) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 891

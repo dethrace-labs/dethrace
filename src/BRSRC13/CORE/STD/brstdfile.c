@@ -1,5 +1,7 @@
 #include "brstdfile.h"
 
+#include "CORE/FW/diag.h"
+#include "debug.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -26,6 +28,7 @@ char rscid[52]; // $Id: stdfile.c 2.7 1996/11/20 18:07:52 STEVEW Exp $
 // Size: 40
 br_uint_32 BrStdioAttributes() {
     return BR_FS_ATTR_READABLE | BR_FS_ATTR_WRITEABLE | BR_FS_ATTR_HAS_TEXT | BR_FS_ATTR_HAS_BINARY | BR_FS_ATTR_HAS_ADVANCE;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 74
@@ -38,7 +41,38 @@ void* BrStdioOpenRead(char* name, br_size_t n_magics, br_mode_test_cbfn* identif
     char* cp;
     br_uint_8 magics[16];
     int open_mode;
-    // Needs BrSystemConfigQueryString
+    LOG_TRACE("(\"%s\", %d, %p, %p)", name, n_magics, identify, mode_result);
+
+    fh = fopen(name, "rb");
+    if (!fh) {
+        // skip logic around getting BRENDER_PATH from ini files etc
+        return NULL;
+    }
+
+    if (n_magics) {
+        if (fread(magics, 1u, n_magics, fh) != n_magics) {
+            fclose(fh);
+            return 0;
+        }
+        if (identify) {
+            open_mode = identify(magics, n_magics);
+        }
+        if (mode_result) {
+            *mode_result = open_mode;
+        }
+    }
+
+    fclose(fh);
+    if (open_mode == 0) {
+        fh = fopen(name, "rb");
+    } else if (open_mode == 1) {
+        fh = fopen(name, "rt");
+    } else {
+        BrFailure("BrStdFileOpenRead: invalid open_mode %d", open_mode);
+        return NULL;
+    }
+    LOG_DEBUG("returning pointer %p", fh);
+    return fh;
 }
 
 // Offset: 686
@@ -58,7 +92,8 @@ void* BrStdioOpenWrite(char* name, int mode) {
 // Offset: 781
 // Size: 38
 void BrStdioClose(void* f) {
-    fclose(f);
+    LOG_TRACE("(%p)", f);
+    //fclose(f);
 }
 
 // Offset: 830
@@ -70,7 +105,10 @@ int BrStdioEof(void* f) {
 // Offset: 890
 // Size: 117
 int BrStdioGetChar(void* f) {
-    return fgetc(f);
+    int c;
+    c = fgetc(f);
+    //LOG_DEBUG("file pos: %d, char: %d", ftell(f) - 1, c);
+    return c;
 }
 
 // Offset: 1022
@@ -82,7 +120,11 @@ void BrStdioPutChar(int c, void* f) {
 // Offset: 1075
 // Size: 53
 br_size_t BrStdioRead(void* buf, br_size_t size, unsigned int n, void* f) {
-    return fread(buf, size, n, f);
+    int i;
+    LOG_TRACE("(%p, %d, %d, %p)", buf, size, n, f);
+    LOG_DEBUG("file pos: %d", ftell(f));
+    i = fread(buf, size, n, f);
+    return i;
 }
 
 // Offset: 1141

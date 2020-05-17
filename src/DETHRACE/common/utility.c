@@ -1,4 +1,5 @@
 #include "utility.h"
+#include <stdlib.h>
 
 #include "brender.h"
 #include "dossys.h"
@@ -31,6 +32,7 @@ br_pixelmap* gSource_for_16bit_palette;
 // Size: 144
 int CheckQuit() {
     int got_as_far_as_verify;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 196
@@ -126,38 +128,45 @@ void EncodeLine(char* pS) {
 int IRandomBetween(int pA, int pB) {
     int num;
     char s[32];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 816
 // Size: 79
 // EAX: pC
 int PercentageChance(int pC) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 896
 // Size: 56
 // EAX: pN
 int IRandomPosNeg(int pN) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 952
 // Size: 72
 float FRandomBetween(float pA, float pB) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1024
 // Size: 69
 float FRandomPosNeg(float pN) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1096
 // Size: 67
 br_scalar SRandomBetween(br_scalar pA, br_scalar pB) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1164
 // Size: 69
 br_scalar SRandomPosNeg(br_scalar pN) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1236
@@ -235,6 +244,7 @@ char* GetALineWithNoPossibleService(FILE* pF, /*unsigned*/ char* pS) {
 char* GetALineAndDontArgue(FILE* pF, char* pS) {
     PossibleService(pF, pS);
     return GetALineWithNoPossibleService(pF, pS);
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1804
@@ -255,11 +265,13 @@ void PathCat(char* pDestn_str, char* pStr_1, char* pStr_2) {
 // Offset: 1892
 // Size: 96
 int Chance(float pChance_per_second, int pPeriod) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1988
 // Size: 96
 float tandeg(float pAngle) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2084
@@ -267,12 +279,14 @@ float tandeg(float pAngle) {
 // EAX: pF
 tU32 GetFileLength(FILE* pF) {
     tU32 the_size;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2164
 // Size: 68
 // EAX: pB
 int BooleanTo1Or0(int pB) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2232
@@ -283,6 +297,7 @@ int BooleanTo1Or0(int pB) {
 // ECX: pPixels
 br_pixelmap* DRPixelmapAllocate(br_uint_8 pType, br_uint_16 pW, br_uint_16 pH, void* pPixels, int pFlags) {
     br_pixelmap* the_map;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2348
@@ -299,6 +314,7 @@ br_pixelmap* DRPixelmapAllocateSub(br_pixelmap* pPm, br_uint_16 pX, br_uint_16 p
         the_map->origin_x = 0;
     }
     return the_map;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2468
@@ -309,6 +325,7 @@ br_pixelmap* DRPixelmapAllocateSub(br_pixelmap* pPm, br_uint_16 pX, br_uint_16 p
 // ECX: pHeight
 br_pixelmap* DRPixelmapMatchSized(br_pixelmap* pSrc, tU8 pMatch_type, tS32 pWidth, tS32 pHeight) {
     br_pixelmap* result;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2664
@@ -324,6 +341,7 @@ void CopyDoubled8BitTo16BitRectangle(br_pixelmap* pDst, br_pixelmap* pSrc, int p
     tU16* dst_start0;
     tU16* dst_start1;
     tU16* palette_entry;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3024
@@ -337,6 +355,7 @@ br_pixelmap* Scale8BitPixelmap(br_pixelmap* pSrc, int pWidth, int pHeight) {
     int y;
     tU8* src_pixels;
     tU8* dst_pixels;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3288
@@ -352,6 +371,7 @@ br_pixelmap* Tile8BitPixelmap(br_pixelmap* pSrc, int pN) {
     int y;
     tU8* src_pixels;
     tU8* dst_pixels;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3680
@@ -359,6 +379,7 @@ br_pixelmap* Tile8BitPixelmap(br_pixelmap* pSrc, int pN) {
 // EAX: pName
 // EDX: pList
 tException_list FindExceptionInList(char* pName, tException_list pList) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3764
@@ -370,6 +391,7 @@ br_pixelmap* PurifiedPixelmap(br_pixelmap* pSrc) {
     int new_width;
     int new_height;
     tException_list e;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4256
@@ -377,6 +399,7 @@ br_pixelmap* PurifiedPixelmap(br_pixelmap* pSrc) {
 // EAX: pFile_name
 br_pixelmap* DRPixelmapLoad(char* pFile_name) {
     br_pixelmap* the_map;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4364
@@ -388,6 +411,7 @@ br_uint_32 DRPixelmapLoadMany(char* pFile_name, br_pixelmap** pPixelmaps, br_uin
     br_pixelmap* the_map;
     int number_loaded;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4540
@@ -395,6 +419,7 @@ br_uint_32 DRPixelmapLoadMany(char* pFile_name, br_pixelmap** pPixelmaps, br_uin
 // EAX: pDelay
 void WaitFor(tU32 pDelay) {
     tU32 start_time;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4608
@@ -427,6 +452,7 @@ br_uint_32 DRActorEnumRecurse(br_actor* pActor, br_actor_enum_cbfn* callback, vo
 // Offset: 4744
 // Size: 77
 br_uint_32 CompareActorID(br_actor* pActor, void* pArg) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4824
@@ -434,6 +460,7 @@ br_uint_32 CompareActorID(br_actor* pActor, void* pArg) {
 // EAX: pSearch_root
 // EDX: pName
 br_actor* DRActorFindRecurse(br_actor* pSearch_root, char* pName) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4884
@@ -444,6 +471,7 @@ br_actor* DRActorFindRecurse(br_actor* pSearch_root, char* pName) {
 // ECX: pArg
 br_uint_32 DRActorEnumRecurseWithMat(br_actor* pActor, br_material* pMat, br_uint_32 (*pCall_back)(br_actor*, br_material*, void*), void* pArg) {
     br_uint_32 result;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5040
@@ -455,17 +483,20 @@ br_uint_32 DRActorEnumRecurseWithMat(br_actor* pActor, br_material* pMat, br_uin
 br_uint_32 DRActorEnumRecurseWithTrans(br_actor* pActor, br_matrix34* pMatrix, br_uint_32 (*pCall_back)(br_actor*, br_matrix34*, void*), void* pArg) {
     br_uint_32 result;
     br_matrix34 combined_transform;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5228
 // Size: 89
 // EAX: pNumber
 int sign(int pNumber) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5320
 // Size: 98
 float fsign(float pNumber) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5420
@@ -476,6 +507,7 @@ FILE* OpenUniqueFileB(char* pPrefix, char* pExtension) {
     int index;
     FILE* f;
     tPath_name the_path;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5632
@@ -487,6 +519,7 @@ void PrintScreenFile(FILE* pF) {
     int bit_map_size;
     int offset;
     tU8* pixel_ptr;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6204
@@ -499,27 +532,32 @@ void PrintScreenFile16(FILE* pF) {
     int offset;
     tU8* pixel_ptr;
     tU16 pixel;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6760
 // Size: 95
 void PrintScreen() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6856
 // Size: 89
 tU32 GetTotalTime() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6948
 // Size: 51
 tU32 GetRaceTime() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7000
 // Size: 46
 // EAX: pLost_time
 void AddLostTime(tU32 pLost_time) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7048
@@ -530,12 +568,14 @@ void AddLostTime(tU32 pLost_time) {
 // ECX: pForce_colon
 void TimerString(tU32 pTime, char* pStr, int pFudge_colon, int pForce_colon) {
     int seconds;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7256
 // Size: 55
 // EAX: pIndex
 char* GetMiscString(int pIndex) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7312
@@ -543,6 +583,7 @@ char* GetMiscString(int pIndex) {
 // EAX: pIndex
 // EDX: pStr
 void GetCopyOfMiscString(int pIndex, char* pStr) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7372
@@ -552,6 +593,7 @@ void GetCopyOfMiscString(int pIndex, char* pStr) {
 // EBX: pCurrent_state
 int Flash(tU32 pPeriod, tU32* pLast_change, int* pCurrent_state) {
     tU32 the_time;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7488
@@ -559,6 +601,7 @@ int Flash(tU32 pPeriod, tU32* pLast_change, int* pCurrent_state) {
 // EAX: pDst
 // EDX: pSrc
 void MaterialCopy(br_material* pDst, br_material* pSrc) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7716
@@ -566,6 +609,7 @@ void MaterialCopy(br_material* pDst, br_material* pSrc) {
 // EAX: pColour_1
 // EDX: pColour_2
 double RGBDifferenceSqr(tRGB_colour* pColour_1, tRGB_colour* pColour_2) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7856
@@ -579,6 +623,7 @@ int FindBestMatch(tRGB_colour* pRGB_colour, br_pixelmap* pPalette) {
     double d;
     tRGB_colour trial_RGB;
     br_colour* dp;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8056
@@ -589,6 +634,7 @@ int FindBestMatch(tRGB_colour* pRGB_colour, br_pixelmap* pPalette) {
 // ECX: pB
 void BuildShadeTablePath(char* pThe_path, int pR, int pG, int pB) {
     char s[32];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8288
@@ -598,6 +644,7 @@ void BuildShadeTablePath(char* pThe_path, int pR, int pG, int pB) {
 // EBX: pB
 br_pixelmap* LoadGeneratedShadeTable(int pR, int pG, int pB) {
     char the_path[256];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8368
@@ -608,6 +655,7 @@ br_pixelmap* LoadGeneratedShadeTable(int pR, int pG, int pB) {
 // ECX: pB
 void SaveGeneratedShadeTable(br_pixelmap* pThe_table, int pR, int pG, int pB) {
     char the_path[256];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8448
@@ -617,6 +665,7 @@ void SaveGeneratedShadeTable(br_pixelmap* pThe_table, int pR, int pG, int pB) {
 // EBX: pRed_mix
 // ECX: pGreen_mix
 br_pixelmap* GenerateShadeTable(int pHeight, br_pixelmap* pPalette, int pRed_mix, int pGreen_mix, int pBlue_mix, float pQuarter, float pHalf, float pThree_quarter) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8556
@@ -639,6 +688,7 @@ br_pixelmap* GenerateDarkenedShadeTable(int pHeight, br_pixelmap* pPalette, int 
     double ratio2;
     int i;
     int c;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9320
@@ -667,6 +717,7 @@ void DRMatrix34TApplyP(br_vector3* pA, br_vector3* pB, br_matrix34* pC) {
     br_scalar t1;
     br_scalar t2;
     br_scalar t3;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9604
@@ -678,6 +729,7 @@ tU16 PaletteEntry16Bit(br_pixelmap* pPal, int pEntry) {
     int red;
     int green;
     int blue;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9736
@@ -686,6 +738,7 @@ tU16 PaletteEntry16Bit(br_pixelmap* pPal, int pEntry) {
 br_pixelmap* PaletteOf16Bits(br_pixelmap* pSrc) {
     tU16* dst_entry;
     int value;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9948
@@ -699,6 +752,7 @@ void Copy8BitTo16Bit(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette
     tU8* src_start;
     tU16* dst_start;
     tU16* palette_entry;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10168
@@ -713,6 +767,7 @@ void Copy8BitTo16BitRectangle(br_pixelmap* pDst, tS16 pDst_x, tS16 pDst_y, br_pi
     tU8* src_start;
     tU16* dst_start;
     tU16* palette_entry;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10728
@@ -727,6 +782,7 @@ void Copy8BitTo16BitRectangleWithTransparency(br_pixelmap* pDst, tS16 pDst_x, tS
     tU8* src_start;
     tU16* dst_start;
     tU16* palette_entry;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11248
@@ -741,6 +797,7 @@ void Copy8BitToOnscreen16BitRectangleWithTransparency(br_pixelmap* pDst, tS16 pD
     tU8* src_start;
     tU16* dst_start;
     tU16* palette_entry;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11528
@@ -759,6 +816,7 @@ void Copy8BitRectangleTo16BitRhombusWithTransparency(br_pixelmap* pDst, tS16 pDs
     tS16 sheared_x;
     tS16 clipped_src_x;
     tS16 clipped_width;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 12132
@@ -768,6 +826,7 @@ void Copy8BitRectangleTo16BitRhombusWithTransparency(br_pixelmap* pDst, tS16 pDs
 // EBX: dy
 // ECX: src
 void DRPixelmapRectangleCopy(br_pixelmap* dst, br_int_16 dx, br_int_16 dy, br_pixelmap* src, br_int_16 sx, br_int_16 sy, br_uint_16 w, br_uint_16 h) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 12308
@@ -775,6 +834,7 @@ void DRPixelmapRectangleCopy(br_pixelmap* dst, br_int_16 dx, br_int_16 dy, br_pi
 // EAX: dst
 // EDX: src
 void DRPixelmapCopy(br_pixelmap* dst, br_pixelmap* src) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 12416
@@ -784,6 +844,7 @@ void DRPixelmapCopy(br_pixelmap* dst, br_pixelmap* src) {
 // EBX: y
 // ECX: w
 void DRPixelmapRectangleFill(br_pixelmap* dst, br_int_16 x, br_int_16 y, br_uint_16 w, br_uint_16 h, br_uint_32 colour) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 12500
@@ -793,6 +854,7 @@ void DRPixelmapRectangleFill(br_pixelmap* dst, br_int_16 x, br_int_16 y, br_uint
 int NormalSideOfPlane(br_vector3* pPoint, br_vector3* pNormal, br_scalar pD) {
     br_scalar numer;
     br_scalar denom;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 12656
@@ -802,6 +864,7 @@ br_material* DRMaterialClone(br_material* pMaterial) {
     br_material* the_material;
     char s[256];
     static int name_suffix;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 13008
@@ -826,6 +889,7 @@ void SubsStringJob(char* pStr, ...) {
     char temp_str[256];
     char* sub_pt;
     va_list ap;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 13236
@@ -1072,6 +1136,7 @@ void EncodeFileWrapper(char* pThe_path) {
 // EAX: pThe_path
 void EncodeAllFilesInDirectory(char* pThe_path) {
     char s[256];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 15140
@@ -1081,6 +1146,7 @@ void SkipNLines(FILE* pF) {
     int i;
     int count;
     char s[256];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 15232
@@ -1089,6 +1155,7 @@ void SkipNLines(FILE* pF) {
 // EDX: p2
 int DRStricmp(char* p1, char* p2) {
     int val;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 15352
@@ -1100,6 +1167,7 @@ void GlorifyMaterial(br_material** pArray, int pCount) {
     int c;
     br_pixelmap* big_tile;
     tException_list e;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 15912
@@ -1110,6 +1178,7 @@ void WhitenVertexRGB(br_model** pArray, int pN) {
     int m;
     int v;
     br_vertex* vertex;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 16092
@@ -1122,6 +1191,7 @@ void NobbleNonzeroBlacks(br_pixelmap* pPalette) {
     tU32 value;
     tU32* palette_entry;
     tU32 frobbed;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 16332
@@ -1147,12 +1217,14 @@ int PDCheckDriveExists(char* pThe_path) {
 // Size: 102
 // EAX: pPrims
 int OpacityInPrims(br_token_value* pPrims) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 16492
 // Size: 97
 // EAX: pMaterial
 int AlreadyBlended(br_material* pMaterial) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 16592
@@ -1161,6 +1233,7 @@ int AlreadyBlended(br_material* pMaterial) {
 // EDX: pPercent
 void BlendifyMaterialTablishly(br_material* pMaterial, int pPercent) {
     char* s;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 16740
@@ -1171,6 +1244,7 @@ void BlendifyMaterialPrimitively(br_material* pMaterial, int pPercent) {
     static br_token_value alpha25[3];
     static br_token_value alpha50[3];
     static br_token_value alpha75[3];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 16852
@@ -1178,4 +1252,5 @@ void BlendifyMaterialPrimitively(br_material* pMaterial, int pPercent) {
 // EAX: pMaterial
 // EDX: pPercent
 void BlendifyMaterial(br_material* pMaterial, int pPercent) {
+    NOT_IMPLEMENTED();
 }

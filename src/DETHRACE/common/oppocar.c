@@ -1,4 +1,5 @@
 #include "oppocar.h"
+#include <stdlib.h>
 
 tFace_ref gFace_list[32];
 void (*ControlCar[6])(tCar_spec*, br_scalar);
@@ -17,6 +18,7 @@ br_angle gOld_yaw;
 // Size: 89
 // EAX: pCar_spec
 void MakeCarStationary(tCar_spec* pCar_spec) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 92
@@ -31,4 +33,5 @@ void MoveThisCar(tU32 pTime_difference, tCar_spec* car) {
     int i;
     int j;
     br_angle phi;
+    NOT_IMPLEMENTED();
 }

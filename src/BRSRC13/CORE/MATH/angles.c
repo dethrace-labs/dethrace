@@ -1,4 +1,5 @@
 #include "angles.h"
+#include "debug.h"
 
 char rscid[48];
 order_info OrderAxes[32];
@@ -23,6 +24,7 @@ br_matrix34* BrEulerToMatrix34(br_matrix34* mat, br_euler* euler) {
     int a0;
     int a1;
     int a2;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1034
@@ -32,18 +34,21 @@ br_euler* BrMatrix34ToEuler(br_euler* euler, br_matrix34* mat) {
     int a0;
     int a1;
     int a2;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2264
 // Size: 102
 br_matrix4* BrEulerToMatrix4(br_matrix4* mat, br_euler* euler) {
     br_matrix34 tmp;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2383
 // Size: 99
 br_euler* BrMatrix4ToEuler(br_euler* dest, br_matrix4* mat) {
     br_matrix34 tmp;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2496
@@ -66,10 +71,12 @@ br_quat* BrEulerToQuat(br_quat* q, br_euler* euler) {
     int a0;
     int a1;
     int a2;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3312
 // Size: 68
 br_euler* BrQuatToEuler(br_euler* euler, br_quat* q) {
     br_matrix34 mat;
+    NOT_IMPLEMENTED();
 }

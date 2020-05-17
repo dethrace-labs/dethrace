@@ -1,4 +1,5 @@
 #include "register.h"
+#include "debug.h"
 
 #include "brlists.h"
 #include "fwsetup.h"
@@ -19,6 +20,7 @@ void* BrRegistryNew(br_registry* reg) {
 // EAX: reg
 void* BrRegistryClear(br_registry* reg) {
     br_registry_entry* e;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 266
@@ -42,6 +44,7 @@ void* BrRegistryAdd(br_registry* reg, void* item) {
 // EBX: n
 int BrRegistryAddMany(br_registry* reg, void** items, int n) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 608
@@ -51,6 +54,7 @@ int BrRegistryAddMany(br_registry* reg, void** items, int n) {
 void* BrRegistryRemove(br_registry* reg, void* item) {
     br_registry_entry* e;
     void* r;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 827
@@ -61,6 +65,7 @@ void* BrRegistryRemove(br_registry* reg, void* item) {
 int BrRegistryRemoveMany(br_registry* reg, void** items, int n) {
     int i;
     int r;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1013
@@ -69,6 +74,7 @@ int BrRegistryRemoveMany(br_registry* reg, void** items, int n) {
 // EDX: pattern
 void* BrRegistryFind(br_registry* reg, char* pattern) {
     br_registry_entry* e;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1204
@@ -80,6 +86,7 @@ void* BrRegistryFind(br_registry* reg, char* pattern) {
 int BrRegistryFindMany(br_registry* reg, char* pattern, void** items, int max) {
     br_registry_entry* e;
     int n;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1360
@@ -89,6 +96,7 @@ int BrRegistryFindMany(br_registry* reg, char* pattern, void** items, int max) {
 int BrRegistryCount(br_registry* reg, char* pattern) {
     br_registry_entry* e;
     int n;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1538
@@ -100,6 +108,7 @@ int BrRegistryCount(br_registry* reg, char* pattern) {
 int BrRegistryEnum(br_registry* reg, char* pattern, br_enum_cbfn* callback, void* arg) {
     br_registry_entry* e;
     int r;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1838
@@ -108,6 +117,7 @@ int BrRegistryEnum(br_registry* reg, char* pattern, br_enum_cbfn* callback, void
 // EDX: base
 // EBX: limit
 void* BrRegistryNewStatic(br_registry* reg, br_registry_entry* base, int limit) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1907
@@ -116,6 +126,7 @@ void* BrRegistryNewStatic(br_registry* reg, br_registry_entry* base, int limit) 
 // EDX: base
 // EBX: item
 void* BrRegistryAddStatic(br_registry* reg, br_registry_entry* base, void* item) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1979
@@ -123,4 +134,5 @@ void* BrRegistryAddStatic(br_registry* reg, br_registry_entry* base, void* item)
 // EAX: reg
 // EDX: item
 void* BrRegistryRemoveStatic(br_registry* reg, void* item) {
+    NOT_IMPLEMENTED();
 }

@@ -1,4 +1,5 @@
 #include "oppoproc.h"
+#include <stdlib.h>
 
 // Offset: 0
 // Size: 724
@@ -16,12 +17,14 @@ int StraightestArcForCorner2D(br_vector2* pCent, br_scalar* pRadius, br_scalar* 
     br_scalar c;
     br_scalar numerator;
     br_scalar x;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 724
 // Size: 47
 // EAX: pCar_spec
 br_scalar CornerFudge(tCar_spec* pCar_spec) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 772
@@ -29,6 +32,7 @@ br_scalar CornerFudge(tCar_spec* pCar_spec) {
 // EAX: pCar
 br_scalar MaxCurvatureForCarSpeed(tCar_spec* pCar, br_scalar pSpeed) {
     br_scalar curv;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 864
@@ -36,6 +40,7 @@ br_scalar MaxCurvatureForCarSpeed(tCar_spec* pCar, br_scalar pSpeed) {
 // EAX: pA
 // EDX: pB
 br_scalar Vector2Cross(br_vector2* pA, br_vector2* pB) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 936
@@ -43,6 +48,7 @@ br_scalar Vector2Cross(br_vector2* pA, br_vector2* pB) {
 // EAX: pOpponent_spec
 tFollow_path_result EndOfPath(tOpponent_spec* pOpponent_spec) {
     tCar_spec* car_spec;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1044
@@ -57,6 +63,7 @@ int RoughlyColinear(br_vector2* p1, br_vector2* p2, br_vector2* p3) {
     br_scalar cross;
     br_scalar dot;
     br_scalar wibble;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1280
@@ -69,6 +76,7 @@ int GetStraight(br_vector2* pStart, br_vector2* pFinish, br_scalar* pWidth, int 
     int section;
     br_vector2 next;
     br_scalar next_width;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1576
@@ -158,6 +166,7 @@ tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_o
     int left_not_right;
     int later_straight;
     int next_left_not_right;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7500
@@ -180,4 +189,5 @@ tFollow_path_result FollowCheatyPath(tOpponent_spec* pOpponent_spec) {
     br_scalar section_min;
     br_scalar section_max;
     br_scalar desired_speed_BRU;
+    NOT_IMPLEMENTED();
 }

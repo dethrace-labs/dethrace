@@ -260,16 +260,19 @@ br_allocator gAllocator = { "Death Race", DRStdlibAllocate, DRStdlibFree, DRStdl
 // Offset: 0
 // Size: 44
 void SetNonFatalAllocationErrors() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 44
 // Size: 44
 void ResetNonFatalAllocationErrors() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 88
 // Size: 68
 int AllocationErrorsAreFatal() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 156
@@ -277,6 +280,7 @@ int AllocationErrorsAreFatal() {
 void MAMSInitMem() {
     FILE* f;
     tPath_name the_path;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 192
@@ -284,6 +288,7 @@ void MAMSInitMem() {
 // EAX: pFlags
 // EDX: pTitle
 void PrintMemoryDump(int pFlags, char* pTitle) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 232
@@ -309,36 +314,42 @@ void* DRStdlibAllocate(br_size_t size, br_uint_8 type) {
 void DRStdlibFree(void* mem) {
     int i;
     free(mem);
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 444
 // Size: 40
 br_size_t DRStdlibInquire(br_uint_8 type) {
     return 0;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 484
 // Size: 40
 br_uint_32 Claim4ByteAlignment(br_uint_8 type) {
     return 4;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 524
 // Size: 48
 void InstallDRMemCalls() {
     BrAllocatorSet(&gAllocator);
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 572
 // Size: 59
 // EAX: pPtr
 void MAMSUnlock(void** pPtr) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 632
 // Size: 37
 // EAX: pPtr
 void MAMSLock(void** pPtr) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 672
@@ -357,4 +368,5 @@ void CreateStainlessClasses() {
 // Offset: 796
 // Size: 34
 void CheckMemory() {
+    NOT_IMPLEMENTED();
 }

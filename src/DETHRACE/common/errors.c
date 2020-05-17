@@ -2,6 +2,7 @@
 
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "pc-dos/dossys.h"
@@ -172,16 +173,19 @@ void NonFatalError(int pStr_index, ...) {
     char temp_str[256];
     char* sub_pt;
     va_list ap;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 380
 // Size: 34
 void CloseDiagnostics() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 416
 // Size: 34
 void OpenDiagnostics() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 452
@@ -194,4 +198,5 @@ void OpenDiagnostics() {
 // Size: 57
 // EAX: pMisc_text_index
 int DoErrorInterface(int pMisc_text_index) {
+    NOT_IMPLEMENTED();
 }

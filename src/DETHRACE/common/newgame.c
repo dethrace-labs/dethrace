@@ -1,4 +1,5 @@
 #include "newgame.h"
+#include <stdlib.h>
 
 char x[] = "xxxxxxxx.TXT";
 char y[] = "yyyyyyyy.TXT";
@@ -28,16 +29,19 @@ int gRadio_selected;
 // Offset: 0
 // Size: 149
 void StartRollingPlayerNamesIn() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 152
 // Size: 314
 void FrankAnneStart1() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 468
 // Size: 150
 void FrankAnneStart2() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 620
@@ -47,6 +51,7 @@ void FrankAnneStart2() {
 // EBX: pString
 // ECX: pMax_length
 void GetPlayerName(int pStarting_to_type, int pCurrent_choice, char* pString, int* pMax_length) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 688
@@ -56,6 +61,7 @@ void GetPlayerName(int pStarting_to_type, int pCurrent_choice, char* pString, in
 // EBX: pGo_ahead
 // ECX: pEscaped
 int FrankAnneDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 892
@@ -63,6 +69,7 @@ int FrankAnneDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
 void FrankAnneDraw(int pCurrent_choice, int pCurrent_mode) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1032
@@ -74,6 +81,7 @@ int FrankieOrAnnie() {
     static tRectile recopy_areas[2];
     static tInterface_spec interface_spec;
     int result;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1156
@@ -84,12 +92,14 @@ int SelectSkillLevel() {
     static tMouse_area mouse_areas[4];
     static tInterface_spec interface_spec;
     int result;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1244
 // Size: 323
 int DoOnePlayerStart() {
     tProgram_state saved_state;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1568
@@ -99,6 +109,7 @@ int DoOnePlayerStart() {
 int NewNetGameUp(int* pCurrent_choice, int* pCurrent_mode) {
     int new_sel;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1832
@@ -108,12 +119,14 @@ int NewNetGameUp(int* pCurrent_choice, int* pCurrent_mode) {
 int NewNetGameDown(int* pCurrent_choice, int* pCurrent_mode) {
     int new_sel;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2096
 // Size: 70
 // EAX: pIndex
 void DisposeJoinableGame(int pIndex) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2168
@@ -123,6 +136,7 @@ void DisposeJoinableGame(int pIndex) {
 // EBX: pFont_index
 // ECX: pText
 void DrawAnItem(int pX, int pY_index, int pFont_index, char* pText) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2292
@@ -130,6 +144,7 @@ void DrawAnItem(int pX, int pY_index, int pFont_index, char* pText) {
 // EAX: pStr_index
 // EDX: pX
 void DrawColumnHeading(int pStr_index, int pX) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2412
@@ -145,11 +160,13 @@ void DrawGames(int pCurrent_choice, int pCurrent_mode) {
     char s[256];
     char* s2;
     char* s3;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4236
 // Size: 85
 void InitGamesToJoin() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4324
@@ -157,6 +174,7 @@ void InitGamesToJoin() {
 // EAX: pExemption
 void DisposeJoinList(int pExemption) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4420
@@ -166,16 +184,19 @@ void AddToJoinList(tNet_game_details* pGame) {
     int i;
     int slot_to_use;
     tU32 this_game_ID;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4648
 // Size: 111
 void NewNetStart1() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4760
 // Size: 61
 void NewNetStart2() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4824
@@ -185,6 +206,7 @@ void NewNetStart2() {
 // EBX: pString
 // ECX: pMax_length
 void NewNetGetName(int pStarting_to_type, int pCurrent_choice, char* pString, int* pMax_length) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4888
@@ -194,6 +216,7 @@ void NewNetGetName(int pStarting_to_type, int pCurrent_choice, char* pString, in
 // EBX: pGo_ahead
 // ECX: pEscaped
 int NewNetDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4960
@@ -201,6 +224,7 @@ int NewNetDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscap
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
 int NewNetGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5032
@@ -214,42 +238,49 @@ tJoin_or_host_result JoinOrHostGame(tNet_game_details** pGame_to_join) {
     static tRectile recopy_areas[1];
     static tInterface_spec interface_spec;
     int result;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5320
 // Size: 223
 // EAX: pGame_options
 void GetNetOptions(tNet_game_options* pGame_options) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5544
 // Size: 234
 // EAX: pGame_options
 void SetNetOptions(tNet_game_options* pGame_options) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5780
 // Size: 72
 // EAX: pIndex
 void NetPlayCheckboxOn2(int pIndex) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5852
 // Size: 72
 // EAX: pIndex
 void NetPlayCheckboxOff2(int pIndex) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5924
 // Size: 75
 // EAX: pIndex
 void NetPlayCheckboxOn(int pIndex) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6000
 // Size: 75
 // EAX: pIndex
 void NetPlayCheckboxOff(int pIndex) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6076
@@ -257,6 +288,7 @@ void NetPlayCheckboxOff(int pIndex) {
 // EAX: pIndex
 // EDX: pValue
 void NetPlayRadioOn2(int pIndex, int pValue) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6160
@@ -264,6 +296,7 @@ void NetPlayRadioOn2(int pIndex, int pValue) {
 // EAX: pIndex
 // EDX: pValue
 void NetPlayRadioOff2(int pIndex, int pValue) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6244
@@ -271,6 +304,7 @@ void NetPlayRadioOff2(int pIndex, int pValue) {
 // EAX: pIndex
 // EDX: pValue
 void NetPlayRadioOn(int pIndex, int pValue) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6324
@@ -278,12 +312,14 @@ void NetPlayRadioOn(int pIndex, int pValue) {
 // EAX: pIndex
 // EDX: pValue
 void NetPlayRadioOff(int pIndex, int pValue) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6404
 // Size: 229
 void DrawNOptInitialRadios() {
     int j;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6636
@@ -291,12 +327,14 @@ void DrawNOptInitialRadios() {
 // EAX: pIndex
 // EDX: pNew_value
 void NetRadioChanged(int pIndex, int pNew_value) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6720
 // Size: 116
 // EAX: pIndex
 void NetCheckboxChanged(int pIndex) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6836
@@ -305,6 +343,7 @@ void NetCheckboxChanged(int pIndex) {
 // EDX: pCurrent_mode
 int NetOptLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int new_value;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6992
@@ -313,6 +352,7 @@ int NetOptLeft(int* pCurrent_choice, int* pCurrent_mode) {
 // EDX: pCurrent_mode
 int NetOptRight(int* pCurrent_choice, int* pCurrent_mode) {
     int new_value;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7152
@@ -320,6 +360,7 @@ int NetOptRight(int* pCurrent_choice, int* pCurrent_mode) {
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
 int NetOptUp(int* pCurrent_choice, int* pCurrent_mode) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7300
@@ -327,6 +368,7 @@ int NetOptUp(int* pCurrent_choice, int* pCurrent_mode) {
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
 int NetOptDown(int* pCurrent_choice, int* pCurrent_mode) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7448
@@ -337,6 +379,7 @@ int NetOptDown(int* pCurrent_choice, int* pCurrent_mode) {
 // ECX: pY_offset
 int NetRadioClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7664
@@ -345,6 +388,7 @@ void RevertToDefaults() {
     FILE* f;
     tNet_game_options net_options;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7808
@@ -352,6 +396,7 @@ void RevertToDefaults() {
 void DefaultNetSettings() {
     FILE* f;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7964
@@ -359,6 +404,7 @@ void DefaultNetSettings() {
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
 int NetOptGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8064
@@ -366,18 +412,21 @@ int NetOptGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 // EAX: pIndex
 // EDX: pColour_value
 void NetPlotAGraphBox(int pIndex, int pColour_value) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8268
 // Size: 50
 // EAX: pIndex
 void NetDrawAGraphBox(int pIndex) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8320
 // Size: 47
 // EAX: pIndex
 void NetEraseAGraphBox(int pIndex) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8368
@@ -385,6 +434,7 @@ void NetEraseAGraphBox(int pIndex) {
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
 void DrawNetOptBox(int pCurrent_choice, int pCurrent_mode) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8448
@@ -396,6 +446,7 @@ void DoNetOptions(tNet_game_options* pGame_options) {
     static tFlicette push[14];
     static tMouse_area mouse_areas[14];
     static tInterface_spec interface_spec;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8560
@@ -403,11 +454,13 @@ void DoNetOptions(tNet_game_options* pGame_options) {
 // EAX: pGame_type
 // EDX: pGame_options
 void SetOptions(tNet_game_type pGame_type, tNet_game_options* pGame_options) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8992
 // Size: 44
 void DrawNetChooseInitial() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9036
@@ -415,6 +468,7 @@ void DrawNetChooseInitial() {
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
 int NetChooseGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9288
@@ -422,18 +476,21 @@ int NetChooseGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 // EAX: pIndex
 // EDX: pColour_value
 void PlotAGraphBox(int pIndex, int pColour_value) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9472
 // Size: 50
 // EAX: pIndex
 void DrawAGraphBox(int pIndex) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9524
 // Size: 47
 // EAX: pIndex
 void EraseAGraphBox(int pIndex) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9572
@@ -444,6 +501,7 @@ void DrawNetChoose(int pCurrent_choice, int pCurrent_mode) {
     char s[256];
     tU32* k;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10292
@@ -451,6 +509,7 @@ void DrawNetChoose(int pCurrent_choice, int pCurrent_mode) {
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
 int NetChooseLR(int* pCurrent_choice, int* pCurrent_mode) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10356
@@ -458,6 +517,7 @@ int NetChooseLR(int* pCurrent_choice, int* pCurrent_mode) {
 // EAX: pGame_type
 // EDX: pGame_options
 void SetGameTarget(tNet_game_type* pGame_type, tNet_game_options* pGame_options) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10548
@@ -472,6 +532,7 @@ int NetGameChoices(tNet_game_type* pGame_type, tNet_game_options* pGame_options,
     static tMouse_area mouse_areas[11];
     static tInterface_spec interface_spec;
     int result;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10932
@@ -480,18 +541,21 @@ int NetGameChoices(tNet_game_type* pGame_type, tNet_game_options* pGame_options,
 // EDX: pGame_options
 // EBX: pRace_index
 void ReadNetGameChoices(tNet_game_type* pGame_type, tNet_game_options* pGame_options, int* pRace_index) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11028
 // Size: 56
 // EAX: pRank
 int ChooseStartRace(int* pRank) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11084
 // Size: 63
 // EAX: pNet_game
 void SetUpOtherNetThings(tNet_game_details* pNet_game) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11148
@@ -499,6 +563,7 @@ void SetUpOtherNetThings(tNet_game_details* pNet_game) {
 // EAX: pNet_game
 void RequestCarDetails(tNet_game_details* pNet_game) {
     tNet_message* message;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11248
@@ -506,12 +571,14 @@ void RequestCarDetails(tNet_game_details* pNet_game) {
 int PickARandomCar() {
     int cars[120];
     int array_size;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11432
 // Size: 54
 // EAX: pNet_game
 void PollCarDetails(tNet_game_details* pNet_game) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11488
@@ -519,6 +586,7 @@ void PollCarDetails(tNet_game_details* pNet_game) {
 // EAX: pOptions
 void SetNetAvailability(tNet_game_options* pOptions) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11768
@@ -533,16 +601,19 @@ int ChooseNetCar(tNet_game_details* pNet_game, tNet_game_options* pOptions, int*
     int result;
     int car_index;
     int the_car_index;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 12164
 // Size: 115
 void InitNetStorageSpace() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 12280
 // Size: 63
 void DisposeNetStorageSpace() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 12344
@@ -555,4 +626,5 @@ int DoMultiPlayerStart() {
     tNet_game_options new_game_options;
     int start_rank;
     int car_index;
+    NOT_IMPLEMENTED();
 }

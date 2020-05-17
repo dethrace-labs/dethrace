@@ -1,4 +1,5 @@
 #include "opponent.h"
+#include <stdlib.h>
 
 char gOppo_path_filename[256];
 br_scalar gIn_view_distance;
@@ -71,6 +72,7 @@ tS16 gMobile_section;
 // EDX: pThe_vector
 void PointActorAlongThisBloodyVector(br_actor* pThe_actor, br_vector3* pThe_vector) {
     br_transform trans;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 140
@@ -78,6 +80,7 @@ void PointActorAlongThisBloodyVector(br_actor* pThe_actor, br_vector3* pThe_vect
 // EAX: pOpponent_spec
 // EDX: pCommand
 void ProcessCurrentObjective(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 444
@@ -86,6 +89,7 @@ void ProcessCurrentObjective(tOpponent_spec* pOpponent_spec, tProcess_objective_
 tS16 ReallocExtraPathNodes(int pHow_many_then) {
     tPath_node* new_nodes;
     tS16 first_new_node;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 636
@@ -94,6 +98,7 @@ tS16 ReallocExtraPathNodes(int pHow_many_then) {
 tS16 ReallocExtraPathSections(int pHow_many_then) {
     tPath_section* new_sections;
     tS16 first_new_section;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 824
@@ -106,6 +111,7 @@ int PointVisibleFromHere(br_vector3* pFrom, br_vector3* pTo) {
     br_vector3 norm;
     br_scalar t;
     br_material* material;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1012
@@ -117,6 +123,7 @@ tS16 FindNearestPathNode(br_vector3* pActor_coords, br_scalar* pDistance) {
     tS16 nearest_node;
     br_scalar distance;
     br_vector3 actor_to_node;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1288
@@ -126,6 +133,7 @@ tS16 FindNearestPathNode(br_vector3* pActor_coords, br_scalar* pDistance) {
 // EBX: pIntersect
 // ECX: pDistance
 tS16 FindNearestPathSection(br_vector3* pActor_coords, br_vector3* pPath_direction, br_vector3* pIntersect, br_scalar* pDistance) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1356
@@ -151,30 +159,35 @@ tS16 FindNearestGeneralSection(tCar_spec* pPursuee, br_vector3* pActor_coords, b
     br_vector3* start;
     br_vector3* finish;
     br_vector3* nearest_node_v;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2544
 // Size: 171
 // EAX: pCar_spec
 void DeadStopCar(tCar_spec* pCar_spec) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2716
 // Size: 69
 // EAX: pOpponent_spec
 void TurnOpponentPhysicsOn(tOpponent_spec* pOpponent_spec) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2788
 // Size: 80
 // EAX: pOpponent_spec
 void TurnOpponentPhysicsOff(tOpponent_spec* pOpponent_spec) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2868
 // Size: 247
 void NewObjective(tOpponent_spec* pOpponent_spec, tOpponent_objective_type pObjective_type, ...) {
     va_list marker;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3116
@@ -194,6 +207,7 @@ void CalcRaceRoute(tOpponent_spec* pOpponent_spec) {
     char str[256];
     char work_str[32];
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4048
@@ -208,6 +222,7 @@ void TopUpRandomRoute(tOpponent_spec* pOpponent_spec, int pSections_to_add) {
     int target;
     int num_of_temp_sections;
     int direction;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4840
@@ -226,6 +241,7 @@ int SearchForSection(tRoute_section* pTemp_store, tRoute_section* pPerm_store, i
     tS16 section_no;
     tS16 section_no_index;
     br_scalar distance_so_far;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5784
@@ -248,6 +264,7 @@ void CalcGetNearPlayerRoute(tOpponent_spec* pOpponent_spec, tCar_spec* pPlayer) 
     tRoute_section perm_store[10];
     char work_str[32];
     char str[256];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6580
@@ -265,12 +282,14 @@ void CalcReturnToStartPointRoute(tOpponent_spec* pOpponent_spec) {
     br_scalar distance;
     tRoute_section temp_store[10];
     tRoute_section perm_store[10];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7156
 // Size: 47
 // EAX: pOpponent_spec
 void ClearOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7204
@@ -279,6 +298,7 @@ void ClearOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec) {
 // EDX: pSection_no
 // EBX: pDirection
 int AddToOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec, tS16 pSection_no, int pDirection) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7320
@@ -287,6 +307,7 @@ int AddToOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec, tS16 pSection_n
 // EDX: pPlaces
 int ShiftOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec, int pPlaces) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7500
@@ -294,12 +315,14 @@ int ShiftOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec, int pPlaces) {
 // EAX: pOpponent_spec
 // EDX: pMilliseconds
 void StunTheBugger(tOpponent_spec* pOpponent_spec, int pMilliseconds) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7636
 // Size: 47
 // EAX: pOpponent_spec
 void UnStunTheBugger(tOpponent_spec* pOpponent_spec) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7684
@@ -312,6 +335,7 @@ void ProcessCompleteRace(tOpponent_spec* pOpponent_spec, tProcess_objective_comm
     tComplete_race_data* data;
     int res;
     char str[256];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8120
@@ -319,6 +343,7 @@ void ProcessCompleteRace(tOpponent_spec* pOpponent_spec, tProcess_objective_comm
 // EAX: pPursuee
 void StartRecordingTrail(tCar_spec* pPursuee) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8460
@@ -334,6 +359,7 @@ void RecordNextTrailNode(tCar_spec* pPursuee) {
     br_vector3 car_to_last_point_v;
     br_scalar length;
     int visible;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9500
@@ -343,6 +369,7 @@ void RecordNextTrailNode(tCar_spec* pPursuee) {
 // EBX: pSection_v
 // ECX: pIntersect
 tS16 FindNearestTrailSection(tOpponent_spec* pOpponent_spec, tCar_spec* pPursuee, br_vector3* pSection_v, br_vector3* pIntersect, br_scalar* pDistance) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9580
@@ -352,6 +379,7 @@ tS16 FindNearestTrailSection(tOpponent_spec* pOpponent_spec, tCar_spec* pPursuee
 tS16 CalcNextTrailSection(tOpponent_spec* pOpponent_spec, int pSection) {
     int section_no;
     tPursuee_trail* trail;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9692
@@ -370,6 +398,7 @@ void ProcessPursueAndTwat(tOpponent_spec* pOpponent_spec, tProcess_objective_com
     tFollow_path_result res;
     char str[256];
     tS16 section_no;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 12208
@@ -383,6 +412,7 @@ void ProcessRunAway(tOpponent_spec* pOpponent_spec, tProcess_objective_command p
     br_vector3 intersect;
     br_vector3 direction_v;
     char str[256];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 12848
@@ -390,6 +420,7 @@ void ProcessRunAway(tOpponent_spec* pOpponent_spec, tProcess_objective_command p
 // EAX: pOpponent_spec
 // EDX: pCommand
 void ProcessWaitForSomeHaplessSod(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 12976
@@ -402,6 +433,7 @@ void ProcessReturnToStart(tOpponent_spec* pOpponent_spec, tProcess_objective_com
     br_vector3 cop_to_start;
     br_scalar distance;
     int res;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 13608
@@ -412,6 +444,7 @@ void ProcessLevitate(tOpponent_spec* pOpponent_spec, tProcess_objective_command 
     float t;
     float terminal_time;
     float y;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 14532
@@ -423,6 +456,7 @@ void ProcessGetNearPlayer(tOpponent_spec* pOpponent_spec, tProcess_objective_com
     br_actor* car_actor;
     int res;
     char str[256];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 15076
@@ -430,6 +464,7 @@ void ProcessGetNearPlayer(tOpponent_spec* pOpponent_spec, tProcess_objective_com
 // EAX: pOpponent_spec
 // EDX: pCommand
 void ProcessFrozen(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 15308
@@ -437,6 +472,7 @@ void ProcessFrozen(tOpponent_spec* pOpponent_spec, tProcess_objective_command pC
 // EAX: pOpponent_spec
 int HeadOnWithPlayerPossible(tOpponent_spec* pOpponent_spec) {
     br_vector3 oppo_to_player_norm;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 15664
@@ -444,24 +480,28 @@ int HeadOnWithPlayerPossible(tOpponent_spec* pOpponent_spec) {
 // EAX: pOpponent_spec
 // EDX: pPursuee
 int AlreadyPursuingCar(tOpponent_spec* pOpponent_spec, tCar_spec* pPursuee) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 15752
 // Size: 97
 // EAX: pOpponent_spec
 int LastTwatteeAPlayer(tOpponent_spec* pOpponent_spec) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 15852
 // Size: 97
 // EAX: pOpponent_spec
 int LastTwatterAPlayer(tOpponent_spec* pOpponent_spec) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 15952
 // Size: 130
 // EAX: pOpponent_spec
 void ObjectiveComplete(tOpponent_spec* pOpponent_spec) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 16084
@@ -475,6 +515,7 @@ void TeleportOpponentToNearestSafeLocation(tOpponent_spec* pOpponent_spec) {
     br_vector3 intersect;
     int section_counter;
     int found_safe_place;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 16628
@@ -496,6 +537,7 @@ void ChooseNewObjective(tOpponent_spec* pOpponent_spec, int pMust_choose_one) {
     int pursuit_percentage;
     int percentage;
     int general_grudge_increase;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 20688
@@ -503,6 +545,7 @@ void ChooseNewObjective(tOpponent_spec* pOpponent_spec, int pMust_choose_one) {
 // EAX: pOpponent_spec
 void ProcessThisOpponent(tOpponent_spec* pOpponent_spec) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 21056
@@ -510,29 +553,34 @@ void ProcessThisOpponent(tOpponent_spec* pOpponent_spec) {
 // EAX: pPoint
 int IsNetCarActive(br_vector3* pPoint) {
     br_vector3 tv;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 21312
 // Size: 692
 void RebuildActiveCarList() {
     tCar_spec* car_spec;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 22004
 // Size: 58
 void ForceRebuildActiveCarList() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 22064
 // Size: 138
 // EAX: pOpponent_spec
 void StartToCheat(tOpponent_spec* pOpponent_spec) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 22204
 // Size: 138
 // EAX: pOpponent_spec
 void OiStopCheating(tOpponent_spec* pOpponent_spec) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 22344
@@ -540,6 +588,7 @@ void OiStopCheating(tOpponent_spec* pOpponent_spec) {
 // EAX: pOpponent_spec
 int TeleportCopToStart(tOpponent_spec* pOpponent_spec) {
     br_vector3 wank;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 22672
@@ -547,6 +596,7 @@ int TeleportCopToStart(tOpponent_spec* pOpponent_spec) {
 // EAX: pOpponent_spec
 void CalcDistanceFromHome(tOpponent_spec* pOpponent_spec) {
     br_vector3 wank;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 22812
@@ -559,6 +609,7 @@ int MassageOpponentPosition(tOpponent_spec* pOpponent_spec, int pMassage_count) 
     br_vector3 displacement;
     br_vector3 positive_y_vector;
     br_vector3 direction_v;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 23580
@@ -575,6 +626,7 @@ int RematerialiseOpponentOnThisSection(tOpponent_spec* pOpponent_spec, br_scalar
     br_scalar t;
     br_scalar distance_to_end;
     br_scalar length;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 24404
@@ -589,6 +641,7 @@ int RematerialiseOpponentOnNearestSection(tOpponent_spec* pOpponent_spec, br_sca
     br_scalar distance;
     br_scalar distance_to_end;
     tS16 section_no;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 24888
@@ -614,6 +667,7 @@ int RematerialiseOpponent(tOpponent_spec* pOpponent_spec, br_scalar pSpeed) {
     int massage_count;
     br_angle theta;
     int sensible_place;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 27256
@@ -622,12 +676,14 @@ int RematerialiseOpponent(tOpponent_spec* pOpponent_spec, br_scalar pSpeed) {
 void CalcPlayerConspicuousness(tOpponent_spec* pOpponent_spec) {
     br_vector3 pos_in_cop_space;
     br_matrix34 inverse_transform;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 27692
 // Size: 192
 // EAX: pOpponent_spec
 void CalcOpponentConspicuousnessWithAViewToCheatingLikeFuck(tOpponent_spec* pOpponent_spec) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 27884
@@ -635,11 +691,13 @@ void CalcOpponentConspicuousnessWithAViewToCheatingLikeFuck(tOpponent_spec* pOpp
 // EAX: pChallenger_index
 // EDX: pAccepted
 void ChallengeOccurred(int pChallenger_index, int pAccepted) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 27936
 // Size: 232
 void LoadCopCars() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 28168
@@ -665,11 +723,13 @@ void LoadInOppoPaths(FILE* pF) {
     int j;
     int sections_to_delete;
     int delete_these[1024];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 30628
 // Size: 153
 void DisposeOpponentPaths() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 30784
@@ -678,11 +738,13 @@ void DisposeOpponentPaths() {
 void MungeOpponents(tU32 pFrame_period) {
     int i;
     int un_stun_flag;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 31736
 // Size: 251
 void SetInitialCopPositions() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 31988
@@ -694,11 +756,13 @@ void InitOpponents(tRace_info* pRace_info) {
     int rank_dependent_difficulty;
     int skill_dependent_difficulty;
     br_bounds bounds;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 34536
 // Size: 142
 void DisposeOpponents() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 34680
@@ -706,6 +770,7 @@ void DisposeOpponents() {
 // EAX: pWhat_the_countdown_was
 void WakeUpOpponentsToTheFactThatTheStartHasBeenJumped(int pWhat_the_countdown_was) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 34992
@@ -713,12 +778,14 @@ void WakeUpOpponentsToTheFactThatTheStartHasBeenJumped(int pWhat_the_countdown_w
 // EAX: pCar_spec
 void ReportMurderToPoliceDepartment(tCar_spec* pCar_spec) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 35084
 // Size: 178
 // EAX: pCategory
 int GetCarCount(tVehicle_type pCategory) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 35264
@@ -726,6 +793,7 @@ int GetCarCount(tVehicle_type pCategory) {
 // EAX: pCategory
 // EDX: pIndex
 tCar_spec* GetCarSpec(tVehicle_type pCategory, int pIndex) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 35504
@@ -733,6 +801,7 @@ tCar_spec* GetCarSpec(tVehicle_type pCategory, int pIndex) {
 // EAX: pCategory
 // EDX: pIndex
 char* GetDriverName(tVehicle_type pCategory, int pIndex) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 35676
@@ -740,6 +809,7 @@ char* GetDriverName(tVehicle_type pCategory, int pIndex) {
 // EAX: pCar_spec
 tOpponent_spec* GetOpponentSpecFromCarSpec(tCar_spec* pCar_spec) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 35916
@@ -747,6 +817,7 @@ tOpponent_spec* GetOpponentSpecFromCarSpec(tCar_spec* pCar_spec) {
 // EAX: pIndex
 tCar_spec* GetCarSpecFromGlobalOppoIndex(int pIndex) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 36032
@@ -754,12 +825,14 @@ tCar_spec* GetCarSpecFromGlobalOppoIndex(int pIndex) {
 // EAX: pOpponent_spec
 // EDX: pSection_no
 int GetOpponentsRealSection(tOpponent_spec* pOpponent_spec, int pSection_no) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 36128
 // Size: 106
 // EAX: pOpponent_spec
 int GetOpponentsFirstSection(tOpponent_spec* pOpponent_spec) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 36236
@@ -767,6 +840,7 @@ int GetOpponentsFirstSection(tOpponent_spec* pOpponent_spec) {
 // EAX: pOpponent_spec
 // EDX: pCurrent_section
 int GetOpponentsNextSection(tOpponent_spec* pOpponent_spec, tS16 pCurrent_section) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 36424
@@ -776,6 +850,7 @@ int GetOpponentsNextSection(tOpponent_spec* pOpponent_spec, tS16 pCurrent_sectio
 tS16 GetOpponentsSectionStartNode(tOpponent_spec* pOpponent_spec, tS16 pSection) {
     tS16 section_no;
     int node_index_index;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 36664
@@ -785,6 +860,7 @@ tS16 GetOpponentsSectionStartNode(tOpponent_spec* pOpponent_spec, tS16 pSection)
 tS16 GetOpponentsSectionFinishNode(tOpponent_spec* pOpponent_spec, tS16 pSection) {
     tS16 section_no;
     int node_index_index;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 36852
@@ -795,6 +871,7 @@ br_vector3* GetOpponentsSectionStartNodePoint(tOpponent_spec* pOpponent_spec, tS
     tS16 section_no;
     tS16 node_no;
     int node_index_index;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 37136
@@ -805,6 +882,7 @@ br_vector3* GetOpponentsSectionFinishNodePoint(tOpponent_spec* pOpponent_spec, t
     tS16 section_no;
     tS16 node_no;
     int node_index_index;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 37404
@@ -812,6 +890,7 @@ br_vector3* GetOpponentsSectionFinishNodePoint(tOpponent_spec* pOpponent_spec, t
 // EAX: pOpponent_spec
 // EDX: pSection
 br_scalar GetOpponentsSectionWidth(tOpponent_spec* pOpponent_spec, tS16 pSection) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 37572
@@ -822,6 +901,7 @@ br_scalar GetOpponentsSectionWidth(tOpponent_spec* pOpponent_spec, tS16 pSection
 int GetOpponentsSectionMinSpeed(tOpponent_spec* pOpponent_spec, tS16 pSection, int pTowards_finish) {
     tS16 section_no;
     int direction;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 37836
@@ -832,6 +912,7 @@ int GetOpponentsSectionMinSpeed(tOpponent_spec* pOpponent_spec, tS16 pSection, i
 int GetOpponentsSectionMaxSpeed(tOpponent_spec* pOpponent_spec, tS16 pSection, int pTowards_finish) {
     tS16 section_no;
     int direction;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 38100
@@ -839,12 +920,14 @@ int GetOpponentsSectionMaxSpeed(tOpponent_spec* pOpponent_spec, tS16 pSection, i
 // EAX: pOpponent_index
 void InitOpponentPsyche(int pOpponent_index) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 38160
 // Size: 108
 // EAX: pOpponent_spec
 void ClearTwattageOccurrenceVariables(tOpponent_spec* pOpponent_spec) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 38268
@@ -852,6 +935,7 @@ void ClearTwattageOccurrenceVariables(tOpponent_spec* pOpponent_spec) {
 // EAX: pA_car
 // EDX: pAnother_car
 void TwoCarsHitEachOther(tCar_spec* pA_car, tCar_spec* pAnother_car) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 38356
@@ -868,26 +952,31 @@ void RecordOpponentTwattageOccurrence(tCar_spec* pTwatter, tCar_spec* pTwattee) 
     char str[256];
     tOpponent_spec* twattee_opponent_spec;
     tOpponent_spec* twatter_opponent_spec;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 39524
 // Size: 67
 void ToggleOpponentTest() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 39592
 // Size: 342
 void ToggleOpponentProcessing() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 39936
 // Size: 183
 void ToggleMellowOpponents() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 40120
 // Size: 184
 void RepairOpponentsSystems() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 40564
@@ -899,6 +988,7 @@ void DeleteSection(tS16 pSection_to_delete) {
     tS16 node_no;
     tS16 node_no_index;
     tS16 found_it;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 41096
@@ -910,11 +1000,13 @@ void DeleteNode(tS16 pNode_to_delete, int pAnd_sections) {
     tS16 section_no;
     tS16 section1;
     tS16 section2;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 41920
 // Size: 116
 void DeleteOrphanNodes() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 42036
@@ -928,11 +1020,13 @@ void InsertThisNodeInThisSectionHere(tS16 pInserted_node, tS16 pSection_no, br_v
     tS16 node1;
     tS16 node2;
     tS16 node3;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 42752
 // Size: 254
 void TrackElasticateyPath() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 43008
@@ -950,6 +1044,7 @@ void RecalcNearestPathSectionSpeed(int pMax_not_min, int pAdjustment) {
     char str[128];
     int new_speed;
     int nearest_end;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 44052
@@ -960,6 +1055,7 @@ void RecalcNearestPathSectionWidth(br_scalar pAdjustment) {
     br_vector3 intersect;
     br_scalar distance;
     char str[128];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 44372
@@ -970,6 +1066,7 @@ void RecalcNearestPathSectionWidth(br_scalar pAdjustment) {
 void CalcNegativeXVector(br_vector3* pNegative_x_vector, br_vector3* pStart, br_vector3* pFinish, br_scalar pLength) {
     br_vector3 positive_y_vector;
     br_vector3 path_vector;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 44700
@@ -977,6 +1074,7 @@ void CalcNegativeXVector(br_vector3* pNegative_x_vector, br_vector3* pStart, br_
 // EAX: pModel
 // EDX: pVertex_num
 void MakeVertexAndOffsetIt(br_model* pModel, int pVertex_num, br_scalar pX, br_scalar pY, br_scalar pZ, br_vector3* pOffset) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 44864
@@ -986,6 +1084,7 @@ void MakeVertexAndOffsetIt(br_model* pModel, int pVertex_num, br_scalar pX, br_s
 // EBX: pV0
 // ECX: pV1
 void MakeFaceAndTextureIt(br_model* pModel, int pFace_num, int pV0, int pV1, int pV2, br_material* pMaterial) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 45000
@@ -1003,6 +1102,7 @@ void MakeSection(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3* p
     br_material* the_material_finish_lt;
     br_material* the_material_finish_dk;
     br_scalar height;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 45944
@@ -1014,6 +1114,7 @@ void MakeSection(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3* p
 void MakeCube(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3* pPoint, br_material* pMaterial_1, br_material* pMaterial_2, br_material* pMaterial_3) {
     br_vector3 offset_v;
     br_vector3 point;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 47180
@@ -1021,6 +1122,7 @@ void MakeCube(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3* pPoi
 // EAX: pFace_index_ptr
 // EDX: pVertex_index_ptr
 void CalcNumberOfFacesAndVerticesForOppoPathModel(br_uint_16* pFace_index_ptr, br_uint_16* pVertex_index_ptr) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 47268
@@ -1032,6 +1134,7 @@ void ReallocModelFacesAndVertices(br_model* pModel, int pNum_faces, int pNum_ver
     br_vertex* new_vertices;
     br_face* new_faces;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 47704
@@ -1039,11 +1142,13 @@ void ReallocModelFacesAndVertices(br_model* pModel, int pNum_faces, int pNum_ver
 // EAX: pColour_index
 br_material* CreateSimpleMaterial(int pColour_index) {
     br_material* return_me;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 47832
 // Size: 254
 void AllocateMatsForOppoPathModel() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 48088
@@ -1062,6 +1167,7 @@ void RebuildOppoPathModel() {
     br_material* edge_mat_start_dk;
     br_material* edge_mat_finish_lt;
     br_material* edge_mat_finish_dk;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 49184
@@ -1076,11 +1182,13 @@ int ConsistencyCheck() {
     int failed;
     tU8* nodes_referenced_by_sections_array;
     tU8* sections_referenced_by_nodes_array;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 50504
 // Size: 172
 void ShowOppoPaths() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 50676
@@ -1089,16 +1197,19 @@ void WriteOutOppoPaths() {
     char str[13];
     FILE* f;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 51508
 // Size: 338
 int NewNodeOKHere() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 51848
 // Size: 81
 void ShowHideOppoPaths() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 51932
@@ -1112,6 +1223,7 @@ void DropElasticateyNode() {
     int one_wayness;
     tPath_section_type_enum section_type;
     tPath_section_type_enum original_type;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 53080
@@ -1128,6 +1240,7 @@ void InsertAndElasticate() {
     int one_wayness;
     char str[256];
     tPath_section_type_enum section_type;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 54296
@@ -1140,11 +1253,13 @@ void InsertAndDontElasticate() {
     br_scalar distance;
     int not_perp;
     char str[256];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 54920
 // Size: 300
 void DropDeadEndNode() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 55220
@@ -1152,42 +1267,50 @@ void DropDeadEndNode() {
 void DropNodeOnNodeAndStopElasticating() {
     char str[256];
     br_scalar distance;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 55624
 // Size: 53
 void WidenOppoPathSection() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 55680
 // Size: 53
 void NarrowOppoPathSection() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 55736
 // Size: 55
 void IncreaseSectionMinSpeed() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 55792
 // Size: 55
 void DecreaseSectionMinSpeed() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 55848
 // Size: 58
 void IncreaseSectionMaxSpeed() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 55908
 // Size: 58
 void DecreaseSectionMaxSpeed() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 55968
 // Size: 260
 void PullOppoPoint() {
     br_scalar distance;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 56228
@@ -1195,6 +1318,7 @@ void PullOppoPoint() {
 void ShowNodeInfo() {
     char str[256];
     br_scalar distance;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 56532
@@ -1204,6 +1328,7 @@ void ShowSectionInfo1() {
     br_scalar distance;
     br_vector3 direction_v;
     br_vector3 intersect;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 56896
@@ -1213,6 +1338,7 @@ void ShowSectionInfo2() {
     br_scalar distance;
     br_vector3 direction_v;
     br_vector3 intersect;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 57616
@@ -1221,18 +1347,21 @@ void DeleteOppoPathSection() {
     br_vector3 intersect;
     br_vector3 direction_v;
     tS16 section_no;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 57844
 // Size: 225
 void DeleteOppoPathNodeAndSections() {
     tS16 node_no;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 58072
 // Size: 535
 void DeleteOppoPathNodeAndJoin() {
     tS16 node_no;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 58608
@@ -1243,6 +1372,7 @@ void ReverseSectionDirection() {
     br_vector3 intersect;
     br_vector3 direction_v;
     tS16 section_no;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 59032
@@ -1252,6 +1382,7 @@ void CycleSectionType() {
     br_vector3 direction_v;
     tS16 section_no;
     char str[256];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 59360
@@ -1260,6 +1391,7 @@ void ToggleOneWayNess() {
     br_vector3 intersect;
     br_vector3 direction_v;
     tS16 section_no;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 59684
@@ -1270,11 +1402,13 @@ void CopStartPointInfo() {
     br_scalar closest_distance;
     br_scalar distance;
     br_vector3 car_to_point;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 60036
 // Size: 318
 void DropCopStartPoint() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 60356
@@ -1285,9 +1419,11 @@ void DeleteCopStartPoint() {
     br_scalar closest_distance;
     br_scalar distance;
     br_vector3 car_to_point;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 60860
 // Size: 34
 void CycleCopStartPointType() {
+    NOT_IMPLEMENTED();
 }

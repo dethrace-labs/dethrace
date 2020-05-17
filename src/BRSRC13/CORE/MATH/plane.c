@@ -1,4 +1,5 @@
 #include "plane.h"
+#include "debug.h"
 
 char rscid[49];
 
@@ -18,4 +19,5 @@ br_int_32 BrPlaneEquation(br_vector4* eqn, br_vector3* v0, br_vector3* v1, br_ve
     float nz;
     float d;
     float l;
+    NOT_IMPLEMENTED();
 }

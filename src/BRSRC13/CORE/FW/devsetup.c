@@ -1,4 +1,5 @@
 #include "devsetup.h"
+#include "debug.h"
 
 #include <stdarg.h>
 
@@ -8,12 +9,14 @@ char rscid[51];
 // Offset: 20
 // Size: 45
 br_pixelmap* BrDevLastBeginQuery() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 83
 // Size: 45
 // EAX: pm
 void BrDevLastBeginSet(br_pixelmap* pm) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 142
@@ -23,11 +26,13 @@ br_error BrDevBeginVar(br_pixelmap** ppm, char* setup_string, ...) {
     br_uint_32 i;
     br_uint_32 n;
     br_token_value tv[64];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 367
 // Size: 54
 br_error BrDevBegin(br_pixelmap** ppm, char* setup_string) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 434
@@ -49,27 +54,32 @@ br_error BrDevBeginTV(br_pixelmap** ppm, char* setup_string, br_token_value* set
     int i;
     int n;
     br_error r;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1801
 // Size: 96
 br_pixelmap* BrDevBeginOld(char* setup_string) {
     br_pixelmap* s;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1909
 // Size: 60
 void BrDevEndOld() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1988
 // Size: 57
 void BrDevPaletteSetOld(br_pixelmap* pm) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2069
 // Size: 61
 void BrDevPaletteSetEntryOld(int i, br_colour colour) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2153
@@ -81,6 +91,7 @@ br_error BrRendererFacilityFind(br_renderer_facility** prf, br_device_pixelmap* 
     char object_name[23];
     char image_name[9];
     br_boolean scalar_is_valid;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2631
@@ -92,6 +103,7 @@ br_error BrPrimitiveLibraryFind(br_primitive_library** ppl, br_device_pixelmap* 
     char object_name[25];
     char image_name[9];
     br_boolean scalar_is_valid;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3107
@@ -102,4 +114,5 @@ br_error BrGeometryFormatFind(br_geometry** pgf, br_renderer* renderer, br_rende
     char object_name[21];
     char image_name[9];
     br_boolean scalar_is_valid;
+    NOT_IMPLEMENTED();
 }

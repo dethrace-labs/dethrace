@@ -1,4 +1,5 @@
 #include "gencopy.h"
+#include "debug.h"
 
 char rscid[49];
 
@@ -9,6 +10,7 @@ char rscid[49];
 // EBX: src
 // ECX: r
 br_error GeneralRectangleCopy(br_device_pixelmap* dest, br_point* p, br_device_pixelmap* src, br_rectangle* r) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 83
@@ -16,6 +18,7 @@ br_error GeneralRectangleCopy(br_device_pixelmap* dest, br_point* p, br_device_p
 // EAX: dst
 // EDX: src
 br_error GeneralCopy(br_device_pixelmap* dst, br_device_pixelmap* src) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 159
@@ -25,4 +28,5 @@ br_error GeneralCopy(br_device_pixelmap* dst, br_device_pixelmap* src) {
 // EBX: src
 // ECX: s
 br_error GeneralRectangleStretchCopy(br_device_pixelmap* dst, br_rectangle* d, br_device_pixelmap* src, br_rectangle* s) {
+    NOT_IMPLEMENTED();
 }

@@ -1,4 +1,5 @@
 #include "readmse.h"
+#include "debug.h"
 
 host_real_memory mouseMemory;
 host_regs regs;
@@ -9,11 +10,13 @@ unsigned char mouseHandler[245];
 // Offset: 14
 // Size: 358
 br_error DOSMouseBegin() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 384
 // Size: 92
 void DOSMouseEnd() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 489
@@ -23,4 +26,5 @@ br_error DOSMouseRead(br_int_32* mouse_x, br_int_32* mouse_y, br_uint_32* mouse_
     br_int_16 my;
     static br_int_16 ox;
     static br_int_16 oy;
+    NOT_IMPLEMENTED();
 }

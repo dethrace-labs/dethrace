@@ -1196,41 +1196,41 @@ typedef struct br_renderer {
     br_renderer_dispatch* dispatch;
 } br_renderer;
 
-typedef struct br_material {
-    br_uint_32 _reserved;
-    char* identifier;
-    br_colour colour;
-    br_uint_8 opacity;
-    br_ufraction ka;
-    br_ufraction kd;
-    br_ufraction ks;
-    br_scalar power;
-    br_uint_32 flags;
-    br_matrix23 map_transform;
-    br_uint_8 index_base;
-    br_uint_8 index_range;
-    br_pixelmap* colour_map;
-    br_pixelmap* screendoor;
-    br_pixelmap* index_shade;
-    br_pixelmap* index_blend;
-    br_pixelmap* index_fog;
-    br_token_value* extra_surf;
-    br_token_value* extra_prim;
-    br_scalar fog_min;
-    br_scalar fog_max;
-    br_colour fog_colour;
-    br_uint_32 flags_ext;
-    br_pixelmap* colour_map_1;
-    br_matrix23 map_transform_1;
-    br_int_8 mip_modifier;
-    br_uint_8 min_mip;
-    br_uint_8 max_mip;
-    br_uint_8 alpha_mode;
-    br_uint_8 zbuffer_mode;
-    br_uint_8 zbuffer_compare;
-    br_int_32 subdivide_tolerance;
-    void* user;
-    void* stored;
+typedef struct br_material { // size: 0x9c
+    br_uint_32 _reserved; // @0x0
+    char* identifier; // @0x4
+    br_colour colour; // @0x8
+    br_uint_8 opacity; // @0xc
+    br_ufraction ka; // @0x10
+    br_ufraction kd; // @0x14
+    br_ufraction ks; // @0x18
+    br_scalar power; // @0x1c
+    br_uint_32 flags; // @0x20
+    br_matrix23 map_transform; // @0x24
+    br_uint_8 index_base; // @0x3c
+    br_uint_8 index_range; // @0x3d
+    br_pixelmap* colour_map; // @0x40
+    br_pixelmap* screendoor; // @0x44
+    br_pixelmap* index_shade; // @0x48
+    br_pixelmap* index_blend; // @0x4c
+    br_pixelmap* index_fog; // @0x50
+    br_token_value* extra_surf; // @0x54
+    br_token_value* extra_prim; // @0x58
+    br_scalar fog_min; // @0x5c
+    br_scalar fog_max; // @0x60
+    br_colour fog_colour; // @0x64
+    br_uint_32 flags_ext; // @0x68
+    br_pixelmap* colour_map_1; // @0x6c
+    br_matrix23 map_transform_1; // @0x70
+    br_int_8 mip_modifier; // @0x88
+    br_uint_8 min_mip; // @0x89
+    br_uint_8 max_mip; // @0x8a
+    br_uint_8 alpha_mode; // @0x8b
+    br_uint_8 zbuffer_mode; // @0x8c
+    br_uint_8 zbuffer_compare; // @0x8d
+    br_int_32 subdivide_tolerance; // @0x90
+    void* user; // @0x94
+    void* stored; // @0x98
 } br_material;
 
 typedef struct br_vertex {
@@ -1386,24 +1386,24 @@ typedef struct br_actor { // size: 0x64
     void* user; // @0x60
 } br_actor;
 
-typedef struct br_model {
-    br_uint_32 _reserved;
-    char* identifier;
-    br_vertex* vertices;
-    br_face* faces;
-    br_uint_16 nvertices;
-    br_uint_16 nfaces;
-    br_vector3 pivot;
-    br_uint_16 flags;
-    br_model_custom_cbfn* custom;
-    void* user;
-    br_angle crease_angle;
-    br_scalar radius;
-    br_bounds bounds;
-    void* prepared;
-    void* stored;
-    br_uint_16 nprimitive_lists;
-    br_primitive_list* primitive_list;
+typedef struct br_model { // size: 0x5c
+    br_uint_32 _reserved; // @0x0
+    char* identifier; // @0x4
+    br_vertex* vertices; // @0x8
+    br_face* faces; // @0xc
+    br_uint_16 nvertices; // @0x10
+    br_uint_16 nfaces; // @0x12
+    br_vector3 pivot; // @0x14
+    br_uint_16 flags; // @0x20
+    br_model_custom_cbfn* custom; // @0x24
+    void* user; // @0x28
+    br_angle crease_angle; // @0x2c
+    br_scalar radius; // @0x30
+    br_bounds bounds; // @0x34
+    void* prepared; // @0x4c
+    void* stored; // @0x50
+    br_uint_16 nprimitive_lists; // @0x54
+    br_primitive_list* primitive_list; // @0x58
 } br_model;
 
 typedef struct br_camera {
@@ -1490,7 +1490,6 @@ typedef struct br_list {
 typedef struct br_simple_node br_simple_node;
 typedef struct br_simple_node {
     br_simple_node* next;
-    // TODO: We changed this from "** prev" to "*prev". Is this really correct?
     br_simple_node** prev;
 } br_simple_node;
 
@@ -1614,7 +1613,7 @@ typedef struct br_framework_state2 { // size: 0x14d4
     struct { // size: 0x34
         br_matrix34 m; // @0x0
         br_actor* a; // @0x30
-    } camera_path; // @0x140
+    } camera_path[16]; // @0x140
     int vtos_type; // @0x480
     br_vector3 eye_m; // @0x484
     br_vector3 eye_m_normalised; // @0x490
@@ -1983,7 +1982,6 @@ typedef struct br_geometry_stored_dispatch {
     br_error (*_renderOnScreen)(br_geometry_stored*, br_renderer*);
 } br_geometry_stored_dispatch;
 
-typedef struct br_datafile br_datafile;
 typedef struct br_file_struct_member {
     br_uint_16 type;
     br_uint_32 offset;
@@ -1997,6 +1995,14 @@ typedef struct br_file_struct {
     br_file_struct_member* members;
     int mem_size;
 } br_file_struct;
+
+typedef struct br_file_primitives br_file_primitives;
+typedef struct br_datafile { // size: 0x10
+    void* h; // @0x0
+    br_file_primitives* prims; // @0x4
+    br_token scalar_type; // @0x8
+    void* res; // @0xc
+} br_datafile;
 
 typedef struct br_file_primitives {
     char* identifier;
@@ -2141,7 +2147,7 @@ typedef struct br_v1db_state { // size: 0x504
         br_matrix34 m; // @0x0
         br_actor* a; // @0x30
         br_uint_8 transform_type; // @0x34
-    } camera_path; // @0xa0
+    } camera_path[16]; // @0xa0
     br_v1db_enable enabled_lights; // @0x420
     br_v1db_enable enabled_clip_planes; // @0x434
     br_v1db_enable enabled_horizon_planes; // @0x448
@@ -2326,7 +2332,7 @@ typedef struct br_file {
     void* raw_file;
     br_boolean writing;
     int mode;
-    char name[1];
+    char name[255];
 } br_file;
 
 typedef enum br_lexer_token_id {
@@ -2909,6 +2915,20 @@ enum {
     BR_PMT_INDEXA_88
 };
 
+/*
+ * Bits for br_model->flags
+ */
+enum {
+    BR_MODF_DONT_WELD = 0x0001, /* Vertices with same x,y,z cannot be merged	*/
+    BR_MODF_KEEP_ORIGINAL = 0x0002, /* Don't release model->faces/vertices during ModelUpdate() */
+    BR_MODF_GENERATE_TAGS = 0x0004, /* Allocate and fill in the face and vertex tag structures */
+    BR_MODF_QUICK_UPDATE = 0x0010, /* ModelUpdate is fast - but may produce slower models */
+
+    BR_MODF_CUSTOM = 0x0020, /* Invoke custom callback for this model */
+
+    BR_MODF_PREPREPARED = 0x0040 /* Model structure is pre-prepared - update performs no work */
+};
+
 #define BR_COLOUR_RGB(r, g, b) \
     ((((unsigned int)(r)) << 16) | (((unsigned int)(g)) << 8) | ((unsigned int)(b)))
 
@@ -2917,4 +2937,34 @@ enum {
 
 #define BR_SCALAR(x) ((br_scalar)(x))
 
+/*
+ * Bits for br_material->flags
+ */
+enum {
+    BR_MATF_LIGHT = 0x00000001,
+    BR_MATF_PRELIT = 0x00000002,
+
+    BR_MATF_SMOOTH = 0x00000004,
+
+    BR_MATF_ENVIRONMENT_I = 0x00000008,
+    BR_MATF_ENVIRONMENT_L = 0x00000010,
+    BR_MATF_PERSPECTIVE = 0x00000020,
+    BR_MATF_DECAL = 0x00000040,
+
+    BR_MATF_I_FROM_U = 0x00000080,
+    BR_MATF_I_FROM_V = 0x00000100,
+    BR_MATF_U_FROM_I = 0x00000200,
+    BR_MATF_V_FROM_I = 0x00000400,
+
+    BR_MATF_ALWAYS_VISIBLE = 0x00000800,
+    BR_MATF_TWO_SIDED = 0x00001000,
+
+    BR_MATF_FORCE_Z_0 = 0x00002000,
+
+    BR_MATF_DITHER = 0x00004000
+#if 0
+	BR_MATF_CUSTOM			= 0x00008000
 #endif
+};
+
+#endif /* BR_TYPES_H */

@@ -1,4 +1,5 @@
 #include "intrface.h"
+#include <stdlib.h>
 
 int gDisabled_choices[10];
 int gCurrent_mode;
@@ -11,11 +12,13 @@ int gDisabled_count;
 // Offset: 0
 // Size: 44
 void SetAlwaysTyping() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 44
 // Size: 44
 void ClearAlwaysTyping() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 88
@@ -23,11 +26,13 @@ void ClearAlwaysTyping() {
 // EAX: pChoice
 int ChoiceDisabled(int pChoice) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 192
 // Size: 44
 void ResetInterfaceTimeout() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 236
@@ -38,6 +43,7 @@ void ResetInterfaceTimeout() {
 // ECX: pMode
 void ChangeSelection(tInterface_spec* pSpec, int* pOld_selection, int* pNew_selection, int pMode, int pSkip_disabled) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 864
@@ -46,6 +52,7 @@ void ChangeSelection(tInterface_spec* pSpec, int* pOld_selection, int* pNew_sele
 // EDX: pCopy_areas
 void RecopyAreas(tInterface_spec* pSpec, br_pixelmap** pCopy_areas) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1156
@@ -53,6 +60,7 @@ void RecopyAreas(tInterface_spec* pSpec, br_pixelmap** pCopy_areas) {
 // EAX: pChoice
 void DisableChoice(int pChoice) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1268
@@ -60,6 +68,7 @@ void DisableChoice(int pChoice) {
 // EAX: pChoice
 void EnableChoice(int pChoice) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1408
@@ -98,6 +107,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
     br_pixelmap* old_current_splash;
     void* pixels_copy;
     void* palette_copy;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6764
@@ -106,4 +116,5 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
 // EDX: pNew_mode
 void ChangeSelectionTo(int pNew_choice, int pNew_mode) {
     int last_choice;
+    NOT_IMPLEMENTED();
 }

@@ -1,4 +1,5 @@
 #include "prepmatl.h"
+#include "debug.h"
 
 char rscid[52];
 
@@ -11,11 +12,11 @@ void BrMaterialUpdate(br_material* mat, br_uint_16 flags) {
     br_int_32 c;
 
     //TODO: ?
-
 }
 
 // Offset: 3030
 // Size: 88
 // EAX: mat
 void BrMaterialClear(br_material* mat) {
+    NOT_IMPLEMENTED();
 }

@@ -1,4 +1,5 @@
 #include "crush.h"
+#include <stdlib.h>
 
 float gWobble_spam_y[8];
 float gWobble_spam_z[8];
@@ -18,6 +19,7 @@ int ReadCrushData(FILE* pF, tCrush_data* pCrush_data) {
     int k;
     tCrush_point_spec* the_spec;
     tCrush_neighbour* the_neighbour;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 620
@@ -30,6 +32,7 @@ float SkipCrushData(FILE* pF) {
     int count_2;
     char s[256];
     float softness;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 852
@@ -42,6 +45,7 @@ int WriteCrushData(FILE* pF, tCrush_data* pCrush_data) {
     int k;
     tCrush_point_spec* the_spec;
     tCrush_neighbour* the_neighbour;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1556
@@ -49,6 +53,7 @@ int WriteCrushData(FILE* pF, tCrush_data* pCrush_data) {
 // EAX: pCrush_data
 void DisposeCrushData(tCrush_data* pCrush_data) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1688
@@ -82,6 +87,7 @@ void CrushModelPoint(tCar_spec* pCar, int pModel_index, br_model* pModel, int pC
     float working_split_chance;
     tChanged_vertex pipe_array[600];
     tCar_spec* car;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3344
@@ -102,11 +108,13 @@ void CrushModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, br_vector3*
     br_vertex* vertices;
     br_vertex* the_vertex;
     br_matrix34 inverse_transform;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3872
 // Size: 99
 void JitModelUpdate(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3972
@@ -115,6 +123,7 @@ void JitModelUpdate(br_actor* actor, br_model* model, br_material* material, voi
 // EDX: pCar
 // EBX: crush_only
 void SetModelForUpdate(br_model* pModel, tCar_spec* pCar, int crush_only) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4104
@@ -130,6 +139,7 @@ void TotallySpamTheModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, tC
     int the_index;
     br_vertex* the_vertex;
     br_vertex* vertices;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4484
@@ -147,6 +157,7 @@ br_scalar RepairModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, br_ve
     br_scalar amount;
     br_scalar deviation;
     tChanged_vertex pipe_array[600];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5148
@@ -159,6 +170,7 @@ float RepairCar2(tCar_spec* pCar, tU32 pFrame_period, br_scalar* pTotal_deflecti
     tCar_actor* the_car_actor;
     br_scalar amount;
     br_scalar dummy;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5448
@@ -167,6 +179,7 @@ float RepairCar2(tCar_spec* pCar, tU32 pFrame_period, br_scalar* pTotal_deflecti
 // EDX: pFrame_period
 // EBX: pTotal_deflection
 float RepairCar(tU16 pCar_ID, tU32 pFrame_period, br_scalar* pTotal_deflection) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5568
@@ -180,28 +193,33 @@ void TotallyRepairACar(tCar_spec* pCar) {
     tCar_actor* the_car_actor;
     tChanged_vertex pipe_array[600];
     br_bounds storage_bounds;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6280
 // Size: 53
 void TotallyRepairCar() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6336
 // Size: 111
 void CheckLastCar() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6448
 // Size: 102
 // EAX: pCar
 void KnackerThisCar(tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6552
 // Size: 278
 // EAX: pCar
 void SetKnackeredFlag(tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6832
@@ -212,6 +230,7 @@ void SetKnackeredFlag(tCar_spec* pCar) {
 void DamageUnit2(tCar_spec* pCar, int pUnit_type, int pDamage_amount) {
     tDamage_unit* the_damage;
     int last_level;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7104
@@ -219,6 +238,7 @@ void DamageUnit2(tCar_spec* pCar, int pUnit_type, int pDamage_amount) {
 // EAX: pCar
 void RecordLastDamage(tCar_spec* pCar) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7340
@@ -226,6 +246,7 @@ void RecordLastDamage(tCar_spec* pCar) {
 // EAX: pCar
 // EDX: pDamage_type
 void DoDamage(tCar_spec* pCar, tDamage_type pDamage_type, float pMagnitude, float pNastiness) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7592
@@ -239,12 +260,14 @@ void CheckPiledriverBonus(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3
     br_vector3 norm_child;
     br_vector3 norm_energy;
     br_scalar dp;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8244
 // Size: 152
 // EAX: pCar
 tImpact_location CalcModifiedLocation(tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8396
@@ -253,6 +276,7 @@ tImpact_location CalcModifiedLocation(tCar_spec* pCar) {
 void DoPratcamHit(br_vector3* pHit_vector) {
     int strength_modifier;
     br_scalar strength;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8620
@@ -287,6 +311,7 @@ void DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEner
     tDamage_condition* the_condition;
     tDamage_effect* the_effect;
     tImpact_location modified_location;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10840
@@ -296,6 +321,7 @@ tImpact_location GetDirection(br_vector3* pVelocity) {
     br_scalar mag_x;
     br_scalar mag_y;
     br_scalar mag_z;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11052
@@ -303,6 +329,7 @@ tImpact_location GetDirection(br_vector3* pVelocity) {
 // EAX: pCar
 void SetSmokeLastDamageLevel(tCar_spec* pCar) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11144
@@ -315,12 +342,14 @@ void SortOutSmoke(tCar_spec* pCar) {
     int step;
     int pass;
     int repeat;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11464
 // Size: 103
 // EAX: pCar
 void StealCar(tCar_spec* pCar) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11568
@@ -363,6 +392,7 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
     br_vector3 car_1_offset;
     br_vector3 car_2_offset;
     tNet_message* message;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 16868
@@ -380,6 +410,7 @@ void DoWheelDamage(tU32 pFrame_period) {
     br_vector3 temp_vector;
     br_vector3 wonky_vector;
     static int kev_index[4];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 17896
@@ -387,4 +418,5 @@ void DoWheelDamage(tU32 pFrame_period) {
 // EAX: pCar1
 // EDX: pCar2
 void CrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
+    NOT_IMPLEMENTED();
 }

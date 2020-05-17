@@ -710,7 +710,7 @@ typedef struct _tagNETBIOS_ADAPTER_STATUS {
         BYTE bName[16];
         BYTE bNameNumber;
         BYTE bNameStatus;
-    } sNameTable;
+    } sNameTable[20];
 } _NETBIOS_ADAPTER_STATUS;
 
 typedef struct _tagNETBIOS_ELEMENT {

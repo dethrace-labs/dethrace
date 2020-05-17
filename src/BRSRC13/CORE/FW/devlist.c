@@ -1,4 +1,5 @@
 #include "devlist.h"
+#include "debug.h"
 
 char rscid[53];
 
@@ -7,6 +8,7 @@ char rscid[53];
 br_error AddRequestedDrivers() {
     char devstr[256];
     static br_boolean bAlreadyDone;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 139
@@ -19,6 +21,7 @@ br_error devAdd(br_device** pdev, br_device_begin_fn* dev_begin, char* args, br_
     int i;
     br_device* dev;
     br_open_device* new_slots;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 541
@@ -26,16 +29,19 @@ br_error devAdd(br_device** pdev, br_device_begin_fn* dev_begin, char* args, br_
 br_error BrDevAdd(br_device** pdev, char* image, char* args) {
     br_image* dev_image;
     br_device_begin_fn* dev_begin;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 717
 // Size: 52
 br_error BrDevAddStatic(br_device** pdev, br_device_begin_fn* dev_begin, char* args) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 783
 // Size: 85
 br_error BrDevCheckAdd(br_device** pdev, char* name, char* args) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 883
@@ -46,12 +52,14 @@ br_error BrDevAddConfig(char* config) {
     char* arg;
     char tmp[512];
     int n;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1237
 // Size: 196
 br_error BrDevRemove(br_device* dev) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1443
@@ -59,6 +67,7 @@ br_error BrDevRemove(br_device* dev) {
 br_error BrDevFind(br_device** pdev, char* pattern) {
     int i;
     int c;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1652
@@ -66,6 +75,7 @@ br_error BrDevFind(br_device** pdev, char* pattern) {
 br_error BrDevFindMany(br_device** devices, br_int_32* ndevices, br_int_32 max_devices, char* pattern) {
     int i;
     int c;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1888
@@ -73,12 +83,14 @@ br_error BrDevFindMany(br_device** devices, br_int_32* ndevices, br_int_32 max_d
 br_error BrDevCount(br_int_32* ndevices, char* pattern) {
     int i;
     int c;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2086
 // Size: 164
 br_error BrDevContainedFind(br_object** ph, br_token type, char* pattern, br_token_value* tv) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2273
@@ -88,6 +100,7 @@ br_error BrDevContainedFindMany(br_object** objects, br_int_32 max_objects, br_i
     br_int_32 n;
     br_int_32 total;
     br_error r;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2515
@@ -97,4 +110,5 @@ br_error BrDevContainedCount(br_int_32* pcount, br_token type, char* pattern, br
     br_int_32 n;
     br_int_32 total;
     br_error r;
+    NOT_IMPLEMENTED();
 }

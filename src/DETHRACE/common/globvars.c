@@ -1,4 +1,5 @@
 #include "globvars.h"
+#include <stdlib.h>
 
 char gNet_player_name[32];
 br_matrix34 gRearview_camera_to_world;

@@ -1,4 +1,5 @@
 #include "mainloop.h"
+#include <stdlib.h>
 
 tU32 gOld_camera_time;
 tU32 gActual_last_tick_count;
@@ -23,6 +24,7 @@ int gLast_credit_headup;
 // Offset: 0
 // Size: 161
 void ToggleInfo() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 164
@@ -32,17 +34,20 @@ void CalculateFrameRate() {
     static int last_rates[30];
     int new_rate;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 384
 // Size: 104
 void LoseOldestWastedMassage() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 488
 // Size: 97
 // EAX: pIndex
 void QueueWastedMassage(int pIndex) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 588
@@ -61,6 +66,7 @@ void MungeHeadups() {
     br_material* nearby;
     tPixelmap_user_data* user;
     static tU32 last_rattle_time;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3384
@@ -71,11 +77,13 @@ void UpdateFramePeriod(tU32* pCamera_period) {
     tU32 new_camera_tick_count;
     int error;
     static int last_AR_mode;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3972
 // Size: 45
 tU32 GetLastTickCount() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4020
@@ -84,11 +92,13 @@ void CheckTimer() {
     tS32 time_left;
     static tU32 last_time_in_seconds;
     static tU32 last_demo_time_in_seconds;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4212
 // Size: 319
 int MungeRaceFinished() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4532
@@ -101,9 +111,11 @@ tRace_result MainGameLoop() {
     int tried_to_allocate_AR;
     int i;
     int bonus;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6400
 // Size: 61
 tRace_result DoRace() {
+    NOT_IMPLEMENTED();
 }

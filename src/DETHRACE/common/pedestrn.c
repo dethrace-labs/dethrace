@@ -1,4 +1,5 @@
 #include "pedestrn.h"
+#include <stdlib.h>
 
 #include <time.h>
 
@@ -69,36 +70,42 @@ int gSend_peds;
 // Size: 152
 // EAX: pModel
 void PedModelUpdate(br_model* pModel, br_scalar x0, br_scalar y0, br_scalar x1, br_scalar y1, br_scalar x2, br_scalar y2, br_scalar x3, br_scalar y3) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 152
 // Size: 98
 // EAX: pActor
 int ActorIsPedestrian(br_actor* pActor) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 252
 // Size: 79
 // EAX: pActor
 br_scalar PedHeightFromActor(br_actor* pActor) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 332
 // Size: 52
 // EAX: pActor
 int GetPedestrianValue(br_actor* pActor) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 384
 // Size: 88
 // EAX: pActor
 int PedestrianActorIsPerson(br_actor* pActor) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 472
 // Size: 87
 // EAX: pIndex
 br_actor* GetPedestrianActor(int pIndex) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 560
@@ -106,11 +113,13 @@ br_actor* GetPedestrianActor(int pIndex) {
 // EAX: pActor
 // EDX: pFlipped
 br_pixelmap* GetPedestrianTexture(br_actor* pActor, int* pFlipped) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 660
 // Size: 153
 void TogglePedestrians() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 816
@@ -120,6 +129,7 @@ void InitPedGibs() {
     br_model* the_model;
     br_pixelmap* the_pix;
     br_material* the_material;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1736
@@ -128,17 +138,20 @@ void InitPedGibs() {
 void SetPedMaterialForRender(br_actor* pActor) {
     tPedestrian_data* ped;
     int changed;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1976
 // Size: 158
 void PedCallBack(br_actor* pActor, br_model* pModel, br_material* pMaterial, void* pRender_data, br_uint_8 pStyle, int pOn_screen) {
     tPedestrian_data* ped;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2136
 // Size: 516
 void InitPeds() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2652
@@ -148,6 +161,7 @@ void MungeModelSize(br_actor* pActor, br_scalar pScaling_factor) {
     br_pixelmap* the_pix;
     br_scalar half_width;
     br_scalar half_height;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2928
@@ -167,12 +181,14 @@ int BurstPedestrian(tPedestrian_data* pPedestrian, float pSplattitudinalitude, i
     br_scalar min_speed;
     br_scalar max_speed;
     tU32 the_time;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4396
 // Size: 137
 void ResetAllPedGibs() {
     tPed_gib* the_ped_gib;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4536
@@ -183,6 +199,7 @@ void ResetAllPedGibs() {
 // ECX: pPed_index
 void AdjustPedGib(int pIndex, int pSize, int pGib_index, int pPed_index, br_matrix34* pTrans) {
     tPed_gib* the_ped_gib;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4736
@@ -195,12 +212,14 @@ void MungePedGibs(tU32 pFrame_period) {
     br_scalar s_frame_period;
     tU32 the_time;
     tPedestrian_data* pedestrian;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5548
 // Size: 267
 // EAX: pPedestrian
 void KillPedestrian(tPedestrian_data* pPedestrian) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5816
@@ -212,6 +231,7 @@ void KillPedestrian(tPedestrian_data* pPedestrian) {
 void CalcPedWidthNHeight(tPedestrian_data* pPedestrian, br_pixelmap* pPixelmap, br_scalar* pHeight, br_scalar* pWidth) {
     br_pixelmap* reference_pixel_bastard;
     br_scalar scale_to_use;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6120
@@ -228,6 +248,7 @@ int PedestrianNextInstruction(tPedestrian_data* pPedestrian, float pDanger_level
     int j;
     int choice;
     int the_marker_ref;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8064
@@ -242,12 +263,14 @@ void MungePedestrianSequence(tPedestrian_data* pPedestrian, int pAction_changed)
     br_scalar ped_movement_angle;
     float heading_difference;
     tPedestrian_sequence* sequence_ptr;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8528
 // Size: 166
 // EAX: pPedestrian
 void DetachPedFromCar(tPedestrian_data* pPedestrian) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8696
@@ -255,12 +278,14 @@ void DetachPedFromCar(tPedestrian_data* pPedestrian) {
 // EAX: pPedestrian
 void SetPedPos(tPedestrian_data* pPedestrian) {
     br_vector3 temp_v;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8816
 // Size: 59
 // EAX: pActor
 void DetachPedActorFromCar(br_actor* pActor) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8876
@@ -274,6 +299,7 @@ void MungePedestrianFrames(tPedestrian_data* pPedestrian) {
     int number_of_frames;
     int new_frame;
     tU32 the_time;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10196
@@ -295,6 +321,7 @@ void MungePedModel(tPedestrian_data* pPedestrian) {
     tPed_frame_info* the_frame;
     tCar_spec* murderer;
     br_actor* old_parent;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11484
@@ -306,6 +333,7 @@ void ChangeActionTo(tPedestrian_data* pPedestrian, int pAction_index, int pRedo_
     tPedestrian_action* the_action;
     int the_sound;
     tU32 the_pitch;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11892
@@ -319,11 +347,13 @@ int MungePedestrianAction(tPedestrian_data* pPedestrian, float pDanger_level) {
     int end_index;
     float chance_value;
     float most_dangerous;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 12484
 // Size: 105
 void MakeFlagWavingBastardWaveHisFlagWhichIsTheProbablyTheLastThingHeWillEverDo() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 12592
@@ -342,6 +372,7 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
     br_scalar new_y;
     int damage;
     tU32 the_pitch;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 14928
@@ -359,6 +390,7 @@ float CalcPedestrianDangerLevel(tPedestrian_data* pPedestrian, br_vector3* pDang
     br_scalar heading_difference;
     br_scalar camera_view_angle;
     tCar_spec* car;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 15692
@@ -380,11 +412,13 @@ tPed_hit_position MoveToEdgeOfCar(tPedestrian_data* pPedestrian, tCollision_info
     br_scalar x;
     br_scalar z;
     tPed_hit_position result;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 16664
 // Size: 101
 void CheckLastPed() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 16768
@@ -398,6 +432,7 @@ int BloodyWheels(tCar_spec* pCar, br_vector3* pPed_car, br_scalar pSize, br_vect
     br_scalar ped_m_x;
     br_scalar dist_sqr;
     br_scalar size_sqr;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 17088
@@ -405,6 +440,7 @@ int BloodyWheels(tCar_spec* pCar, br_vector3* pPed_car, br_scalar pSize, br_vect
 // EAX: pPedestrian
 // EDX: pCar
 int FancyATossOffMate(tPedestrian_data* pPedestrian, tCollision_info* pCar, float pImpact_speed) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 17232
@@ -451,6 +487,7 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
     float volume_damage;
     tU32 the_time;
     tPed_hit_position hit_pos;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 23104
@@ -461,6 +498,7 @@ void SendPedestrian(tPedestrian_data* pPedestrian, int pIndex) {
     tNet_contents* the_contents;
     tNet_message* the_message;
     int size_decider;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 23876
@@ -479,6 +517,7 @@ void DoPedestrian(tPedestrian_data* pPedestrian, int pIndex) {
     int start_ins_dir;
     br_vector3 danger_direction;
     br_vector3 old_pos;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 25040
@@ -491,6 +530,7 @@ void AdjustPedestrian(int pIndex, int pAction_index, int pFrame_index, int pHit_
     tPedestrian_data* pedestrian;
     br_actor* parent;
     br_vector3 old_pos;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 25808
@@ -498,12 +538,14 @@ void AdjustPedestrian(int pIndex, int pAction_index, int pFrame_index, int pHit_
 // EAX: pFirst_vertex
 // EDX: pPoint
 void SquirtPathVertex(br_vertex* pFirst_vertex, br_vector3* pPoint) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 26004
 // Size: 92
 void ResetAllPedestrians() {
     tPedestrian_data* the_pedestrian;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 26096
@@ -513,6 +555,7 @@ void GroundPedestrian(tPedestrian_data* pPedestrian) {
     br_scalar new_y;
     br_vector3 cast_point;
     tPedestrian_sequence* sequence;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 26572
@@ -520,6 +563,7 @@ void GroundPedestrian(tPedestrian_data* pPedestrian) {
 // EAX: pPedestrian
 // EDX: pAnimate
 void RevivePedestrian(tPedestrian_data* pPedestrian, int pAnimate) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 27056
@@ -540,17 +584,20 @@ void MungePedestrians(tU32 pFrame_period) {
     br_scalar y_delta;
     br_scalar z_delta;
     tS32 diff;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 28136
 // Size: 201
 void RespawnPedestrians() {
     tPedestrian_data* the_pedestrian;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 28340
 // Size: 45
 int GetPedCount() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 28388
@@ -559,6 +606,7 @@ int GetPedCount() {
 // EDX: pPos
 int GetPedPosition(int pIndex, br_vector3* pPos) {
     tPedestrian_data* pedestrian;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 28648
@@ -593,22 +641,26 @@ void CreatePedestrian(FILE* pG, tPedestrian_instruction* pInstructions, int pIns
     br_scalar maxest_min;
     br_scalar minnest_max;
     br_scalar maxest_max;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 31580
 // Size: 73
 void ResetProxRay() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 31656
 // Size: 34
 void PedMaterialFromHell() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 31692
 // Size: 34
 void ResetPedMaterial() {
     int j;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 31728
@@ -641,6 +693,7 @@ void LoadInPedestrians(FILE* pF, int pSubs_count, tPed_subs* pSubs_array) {
     tPedestrian_instruction* instructions;
     tPedestrian_instruction* the_instruction;
     tPed_choice* the_choice;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 33608
@@ -658,6 +711,7 @@ br_actor* BuildPedPaths(tPedestrian_instruction* pInstructions, int pInstruc_cou
     br_material* the_mat;
     br_model* the_model;
     br_actor* the_actor;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 34924
@@ -678,6 +732,7 @@ void WriteOutPeds() {
     tPed_choice* the_choice;
     FILE* f;
     tPath_name the_path;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 36088
@@ -685,6 +740,7 @@ void WriteOutPeds() {
 void AddPed() {
     FILE* g;
     tPath_name the_path;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 36304
@@ -692,166 +748,199 @@ void AddPed() {
 // EAX: pRef_num
 void NewPed(int pRef_num) {
     char s[255];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 36600
 // Size: 113
 void RemoveCurrentPedPath() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 36716
 // Size: 89
 void ScrubPedestrian() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 36808
 // Size: 134
 void TogglePedDetect() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 36944
 // Size: 41
 void NewPed0() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 36988
 // Size: 44
 void NewPed1() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 37032
 // Size: 44
 void NewPed2() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 37076
 // Size: 44
 void NewPed3() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 37120
 // Size: 44
 void NewPed4() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 37164
 // Size: 44
 void NewPed5() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 37208
 // Size: 44
 void NewPed6() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 37252
 // Size: 44
 void NewPed7() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 37296
 // Size: 44
 void NewPed8() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 37340
 // Size: 44
 void NewPed9() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 37384
 // Size: 44
 void NewPed0B() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 37428
 // Size: 44
 void NewPed1B() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 37472
 // Size: 44
 void NewPed2B() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 37516
 // Size: 44
 void NewPed3B() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 37560
 // Size: 44
 void NewPed4B() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 37604
 // Size: 44
 void NewPed5B() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 37648
 // Size: 44
 void NewPed6B() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 37692
 // Size: 44
 void NewPed7B() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 37736
 // Size: 44
 void NewPed8B() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 37780
 // Size: 44
 void NewPed9B() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 37824
 // Size: 100
 void MungeShowPedPath() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 37924
 // Size: 101
 void DropPedPoint2() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 38028
 // Size: 67
 void DropPedPoint() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 38096
 // Size: 77
 void DropInitPedPoint() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 38176
 // Size: 126
 void DropPedPointAir2() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 38304
 // Size: 67
 void DropPedPointAir() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 38372
 // Size: 77
 void DropInitPedPointAir() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 38452
 // Size: 77
 br_uint_32 KillActorsModel(br_actor* pActor, void* pArg) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 38532
 // Size: 154
 void DisposePedPaths() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 38688
@@ -866,6 +955,7 @@ void GetPedPos(int* pPed_index, int* pPoint_index) {
     br_vector3 last_point;
     br_scalar min_distance;
     br_scalar the_distance;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 39108
@@ -873,24 +963,28 @@ void GetPedPos(int* pPed_index, int* pPoint_index) {
 void ShowPedPos() {
     int min_point;
     char s[255];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 39216
 // Size: 381
 void ShowPedPaths() {
     br_model* the_model;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 39600
 // Size: 104
 void PullPedPoint() {
     int the_point;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 39704
 // Size: 141
 void PullPedPointAir() {
     int the_point;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 39848
@@ -898,11 +992,13 @@ void PullPedPointAir() {
 void DeletePedPath() {
     int the_point;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 39984
 // Size: 89
 void DeletePedPoint() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 40076
@@ -910,6 +1006,7 @@ void DeletePedPoint() {
 void DisposePedestrians() {
     int j;
     tPedestrian_data* the_pedestrian;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 40668
@@ -921,6 +1018,7 @@ void DoPedReport() {
     int j;
     int count;
     int last_ref_num;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 41032
@@ -947,6 +1045,7 @@ void RenderProximityRays(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer
     br_model* car_model;
     br_scalar distance;
     br_scalar t;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 42256
@@ -956,6 +1055,7 @@ void RenderProximityRays(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer
 // EBX: pPed_index
 // ECX: pTime
 void AdjustProxRay(int pRay_index, tU16 pCar_ID, tU16 pPed_index, tU32 pTime) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 42404
@@ -973,6 +1073,7 @@ void ReceivedPedestrian(tNet_contents* pContents, tNet_message* pMessage, tU32 p
     int instruction;
     int dead;
     tPedestrian_sequence* the_sequence;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 43604
@@ -982,4 +1083,5 @@ void SendAllPedestrianPositions(tPlayer_ID pPlayer) {
     int i;
     tPedestrian_data* the_pedestrian;
     tNet_contents* the_contents;
+    NOT_IMPLEMENTED();
 }

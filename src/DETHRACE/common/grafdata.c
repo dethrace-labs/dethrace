@@ -1,4 +1,5 @@
 #include "grafdata.h"
+#include <stdlib.h>
 
 #include "errors.h"
 #include "globvars.h"

@@ -2,6 +2,7 @@
 #include "CORE/FW/resource.h"
 #include "CORE/FW/resreg.h"
 #include "CORE/STD/brstdlib.h"
+#include "debug.h"
 #include "image.h"
 #include <stddef.h>
 #include <stdio.h>
@@ -26,10 +27,11 @@ void BrPixelmapBegin() {
     for (i = 0; i < 2; i++) {
         BrResClassAdd(&pm_resourceClasses[i]);
     }
-    return BrImageAdd(&Image_BRPMAP1);
+    BrImageAdd(&Image_BRPMAP1);
 }
 
 // Offset: 160
 // Size: 76
 void BrPixelmapEnd() {
+    NOT_IMPLEMENTED();
 }

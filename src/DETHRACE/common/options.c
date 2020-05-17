@@ -1,4 +1,5 @@
 #include "options.h"
+#include <stdlib.h>
 
 int gKey_defns[18];
 tRadio_bastards gRadio_bastards[13];
@@ -16,6 +17,7 @@ int gCurrent_key;
 // EAX: pWhich_one
 // EDX: pWhich_stage
 void DrawDial(int pWhich_one, int pWhich_stage) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 164
@@ -26,11 +28,13 @@ void DrawDial(int pWhich_one, int pWhich_stage) {
 void MoveDialFromTo(int pWhich_one, int pOld_stage, int pNew_stage) {
     tS32 time_diff;
     tU32 start_time;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 552
 // Size: 94
 void SoundOptionsStart() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 648
@@ -40,6 +44,7 @@ void SoundOptionsStart() {
 // EBX: pGo_ahead
 // ECX: pEscaped
 int SoundOptionsDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 740
@@ -49,6 +54,7 @@ int SoundOptionsDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int 
 int SoundOptionsLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int old_value;
     int* the_value;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 896
@@ -58,6 +64,7 @@ int SoundOptionsLeft(int* pCurrent_choice, int* pCurrent_mode) {
 int SoundOptionsRight(int* pCurrent_choice, int* pCurrent_mode) {
     int old_value;
     int* the_value;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1052
@@ -72,6 +79,7 @@ int SoundClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_o
     float angle;
     int old_value;
     int* the_value;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1436
@@ -82,17 +90,20 @@ void DoSoundOptions() {
     static tMouse_area mouse_areas[3];
     static tInterface_spec interface_spec;
     int result;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1516
 // Size: 586
 void GetGraphicsOptions() {
     br_scalar br_value;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2104
 // Size: 513
 void SetGraphicsOptions() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2620
@@ -100,6 +111,7 @@ void SetGraphicsOptions() {
 // EAX: pIndex
 // EDX: pValue
 void PlayRadioOn2(int pIndex, int pValue) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2700
@@ -107,6 +119,7 @@ void PlayRadioOn2(int pIndex, int pValue) {
 // EAX: pIndex
 // EDX: pValue
 void PlayRadioOff2(int pIndex, int pValue) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2780
@@ -114,6 +127,7 @@ void PlayRadioOff2(int pIndex, int pValue) {
 // EAX: pIndex
 // EDX: pValue
 void PlayRadioOn(int pIndex, int pValue) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2860
@@ -121,11 +135,13 @@ void PlayRadioOn(int pIndex, int pValue) {
 // EAX: pIndex
 // EDX: pValue
 void PlayRadioOff(int pIndex, int pValue) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2940
 // Size: 109
 void DrawInitialRadios() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3052
@@ -133,6 +149,7 @@ void DrawInitialRadios() {
 // EAX: pIndex
 // EDX: pNew_value
 void RadioChanged(int pIndex, int pNew_value) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3136
@@ -141,6 +158,7 @@ void RadioChanged(int pIndex, int pNew_value) {
 // EDX: pCurrent_mode
 int GraphOptLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int new_value;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3260
@@ -149,6 +167,7 @@ int GraphOptLeft(int* pCurrent_choice, int* pCurrent_mode) {
 // EDX: pCurrent_mode
 int GraphOptRight(int* pCurrent_choice, int* pCurrent_mode) {
     int new_value;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3388
@@ -156,6 +175,7 @@ int GraphOptRight(int* pCurrent_choice, int* pCurrent_mode) {
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
 int GraphOptUp(int* pCurrent_choice, int* pCurrent_mode) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3536
@@ -163,6 +183,7 @@ int GraphOptUp(int* pCurrent_choice, int* pCurrent_mode) {
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
 int GraphOptDown(int* pCurrent_choice, int* pCurrent_mode) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3684
@@ -173,6 +194,7 @@ int GraphOptDown(int* pCurrent_choice, int* pCurrent_mode) {
 // ECX: pY_offset
 int RadioClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3860
@@ -180,6 +202,7 @@ int RadioClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_o
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
 int GraphOptGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4216
@@ -187,6 +210,7 @@ int GraphOptGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
 void DrawGraphBox(int pCurrent_choice, int pCurrent_mode) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4296
@@ -196,6 +220,7 @@ void DoGraphicsOptions() {
     static tFlicette push[14];
     static tMouse_area mouse_areas[14];
     static tInterface_spec interface_spec;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4424
@@ -217,6 +242,7 @@ void CalibrateJoysticks() {
     int saved_2y;
     int max;
     char s[256];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5952
@@ -225,6 +251,7 @@ void CalibrateJoysticks() {
 void StripControls(unsigned char* pStr) {
     int i;
     int len;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6072
@@ -233,16 +260,19 @@ void LoadKeyNames() {
     FILE* f;
     tPath_name the_path;
     unsigned char s[256];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6288
 // Size: 79
 void DisposeKeyNames() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6368
 // Size: 54
 void SaveOrigKeyMapping() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6424
@@ -253,6 +283,7 @@ void SaveOrigKeyMapping() {
 // ECX: pKey_x
 void GetKeyCoords(int pIndex, int* pY, int* pName_x, int* pKey_x, int* pEnd_box) {
     int col;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6808
@@ -260,6 +291,7 @@ void GetKeyCoords(int pIndex, int* pY, int* pName_x, int* pKey_x, int* pEnd_box)
 void SetKeysToDefault() {
     tPath_name the_path;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 6992
@@ -267,12 +299,14 @@ void SetKeysToDefault() {
 void SaveKeyMapping() {
     tPath_name the_path;
     int i;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7212
 // Size: 60
 // EAX: pNew_one
 void ChangeKeyMapIndex(int pNew_one) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 7272
@@ -291,6 +325,7 @@ void DrawKeyAssignments(int pCurrent_choice, int pCurrent_mode) {
     tDR_font* font_n;
     tDR_font* font_k;
     static int on_radios_last_time;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8452
@@ -299,6 +334,7 @@ void DrawKeyAssignments(int pCurrent_choice, int pCurrent_mode) {
 // EDX: pCurrent_mode
 int KeyAssignLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int new_index;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8704
@@ -307,6 +343,7 @@ int KeyAssignLeft(int* pCurrent_choice, int* pCurrent_mode) {
 // EDX: pCurrent_mode
 int KeyAssignRight(int* pCurrent_choice, int* pCurrent_mode) {
     int new_index;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 8956
@@ -314,6 +351,7 @@ int KeyAssignRight(int* pCurrent_choice, int* pCurrent_mode) {
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
 int KeyAssignUp(int* pCurrent_choice, int* pCurrent_mode) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9256
@@ -321,6 +359,7 @@ int KeyAssignUp(int* pCurrent_choice, int* pCurrent_mode) {
 // EAX: pCurrent_choice
 // EDX: pCurrent_mode
 int KeyAssignDown(int* pCurrent_choice, int* pCurrent_mode) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 9524
@@ -338,6 +377,7 @@ int KeyAssignGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     int key_x;
     int end_box;
     tDR_font* font;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10536
@@ -350,11 +390,13 @@ int MouseyClickBastard(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, 
     int i;
     int x_coord;
     int y_coord;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10704
 // Size: 90
 void DrawInitialKMRadios() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 10796
@@ -370,21 +412,25 @@ void DoControlOptions() {
     int swap_font_3;
     int second_time_around;
     int orig_key_map_index;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11164
 // Size: 68
 void LoadSoundOptionsData() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11232
 // Size: 48
 void FreeSoundOptionsData() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11280
 // Size: 165
 void DrawDisabledOptions() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 11448
@@ -395,4 +441,5 @@ void DoOptions() {
     static tMouse_area mouse_areas[4];
     static tInterface_spec interface_spec;
     int result;
+    NOT_IMPLEMENTED();
 }

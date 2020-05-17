@@ -29,6 +29,8 @@ extern void test_fwsetup_suite();
 extern void test_resource_suite();
 extern void test_actsupt_suite();
 extern void test_genclip_suite();
+extern void test_datafile_suite();
+extern void test_v1dbfile_suite();
 
 void setUp(void) {
 }
@@ -64,6 +66,8 @@ int main(int argc, char** argv) {
     test_resource_suite();
     test_actsupt_suite();
     test_genclip_suite();
+    test_datafile_suite();
+    test_v1dbfile_suite();
 
     // DETHRACE
     test_utility_suite();

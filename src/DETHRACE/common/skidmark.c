@@ -1,4 +1,5 @@
 #include "skidmark.h"
+#include <stdlib.h>
 
 char* gMaterial_names[2];
 char* gBoring_material_names[2];
@@ -14,12 +15,14 @@ void StretchMark(tSkid* pMark, br_vector3* pFrom, br_vector3* pTo, br_scalar pTe
     br_vector3* rows;
     br_scalar len;
     br_model* model;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 600
 // Size: 81
 // EAX: pIndex
 br_material* MaterialFromIndex(int pIndex) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 684
@@ -28,6 +31,7 @@ br_material* MaterialFromIndex(int pIndex) {
 // EDX: pMatrix
 // EBX: pMaterial_index
 void AdjustSkid(int pSkid_num, br_matrix34* pMatrix, int pMaterial_index) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 800
@@ -40,6 +44,7 @@ int FarFromLine2D(br_vector3* pPt, br_vector3* pL1, br_vector3* pL2) {
     br_vector2 to_pt;
     br_scalar line_len;
     br_scalar cross;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 984
@@ -50,6 +55,7 @@ int FarFromLine2D(br_vector3* pPt, br_vector3* pL1, br_vector3* pL2) {
 int Reflex2D(br_vector3* pPt, br_vector3* pL1, br_vector3* pL2) {
     br_vector2 line;
     br_vector2 to_pt;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 1124
@@ -59,23 +65,27 @@ void InitSkids() {
     int sl;
     br_model* square;
     char* str;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2012
 // Size: 51
 // EAX: pSkid_num
 void HideSkid(int pSkid_num) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2064
 // Size: 67
 void HideSkids() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2132
 // Size: 136
 // EAX: pSkid
 br_scalar SkidLen(int pSkid) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2268
@@ -87,6 +97,7 @@ br_scalar SkidLen(int pSkid) {
 void SkidSection(tCar_spec* pCar, int pWheel_num, br_vector3* pPos, int pMaterial_index) {
     static tU16 skid;
     br_material* material;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3220
@@ -103,6 +114,7 @@ void SkidMark(tCar_spec* pCar, int pWheel_num) {
     br_scalar dist2;
     int on_ground;
     br_material* material;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4396
@@ -110,14 +122,17 @@ void SkidMark(tCar_spec* pCar, int pWheel_num) {
 // EAX: pCar
 void InitCarSkidStuff(tCar_spec* pCar) {
     int wheel;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4528
 // Size: 121
 void SkidsPerFrame() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4652
 // Size: 76
 void RemoveMaterialsFromSkidmarks() {
+    NOT_IMPLEMENTED();
 }

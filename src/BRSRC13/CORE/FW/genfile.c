@@ -1,4 +1,6 @@
 #include "genfile.h"
+#include "debug.h"
+#include <stdlib.h>
 
 br_file_struct_member file_info_FM[2];
 br_file_struct file_info_F;
@@ -13,12 +15,15 @@ char rscid[50];
 // EBX: length
 // ECX: count
 int FopRead_END(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
+    return 1;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 75
 // Size: 63
 // EAX: df
 int FopWrite_END(br_datafile* df) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 157
@@ -27,4 +32,5 @@ int FopWrite_END(br_datafile* df) {
 // EDX: type
 int FopWrite_FILE_INFO(br_datafile* df, br_uint_32 type) {
     file_info fi;
+    NOT_IMPLEMENTED();
 }

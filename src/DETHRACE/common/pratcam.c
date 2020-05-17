@@ -1,4 +1,5 @@
 #include "pratcam.h"
+#include <stdlib.h>
 
 tFlic_descriptor gPrat_flic;
 tS3_sound_tag gWhirr_noise;
@@ -18,22 +19,26 @@ int gCurrent_pratcam_alternative;
 // Offset: 0
 // Size: 45
 int PratcamGetCurrent() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 48
 // Size: 45
 int PratcamGetAmbient() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 96
 // Size: 45
 int PratcamGetPending() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 144
 // Size: 240
 void TogglePratcam() {
     tU32 time_diff;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 384
@@ -51,6 +56,7 @@ void LoadPratcam(char* pFolder_name) {
     char folder_path[256];
     char* str;
     char num_str[256];
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2220
@@ -59,6 +65,7 @@ void NextPratcamChunk() {
     int random_number;
     int count;
     tPrat_alternative* current_alternative;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2716
@@ -66,6 +73,7 @@ void NextPratcamChunk() {
 // EAX: pSequence_index
 // EDX: pStart_chunk
 void NewPratcamSequence(int pSequence_index, int pStart_chunk) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2800
@@ -73,39 +81,46 @@ void NewPratcamSequence(int pSequence_index, int pStart_chunk) {
 // EAX: pIndex
 // EDX: pStart_chunk
 void ChangeAmbientPratcamNow(int pIndex, int pStart_chunk) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2868
 // Size: 118
 // EAX: pIndex
 void ChangeAmbientPratcam(int pIndex) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 2988
 // Size: 57
 // EAX: pIndex
 void PratcamEventNow(int pIndex) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3048
 // Size: 113
 // EAX: pIndex
 void PratcamEvent(int pIndex) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3164
 // Size: 94
 int HighResPratBufferWidth() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3260
 // Size: 94
 int HighResPratBufferHeight() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3356
 // Size: 419
 void InitPratcam() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 3776
@@ -114,6 +129,7 @@ void DisposePratcam() {
     int j;
     int k;
     int l;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 4224
@@ -131,60 +147,72 @@ void DoPratcam(tU32 pThe_time) {
     br_pixelmap* the_image;
     br_pixelmap* left_image;
     br_pixelmap* right_image;
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5476
 // Size: 96
 // EAX: pIndex
 void TestPratCam(int pIndex) {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5572
 // Size: 41
 void PratCam0() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5616
 // Size: 44
 void PratCam1() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5660
 // Size: 44
 void PratCam2() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5704
 // Size: 44
 void PratCam3() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5748
 // Size: 44
 void PratCam4() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5792
 // Size: 44
 void PratCam5() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5836
 // Size: 44
 void PratCam6() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5880
 // Size: 44
 void PratCam7() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5924
 // Size: 44
 void PratCam8() {
+    NOT_IMPLEMENTED();
 }
 
 // Offset: 5968
 // Size: 44
 void PratCam9() {
+    NOT_IMPLEMENTED();
 }

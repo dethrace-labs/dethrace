@@ -1,4 +1,5 @@
 #include "globvrpb.h"
+#include <stdlib.h>
 
 tNet_game_player_info gNet_players[6];
 br_matrix34 gRoot_to_camera;
