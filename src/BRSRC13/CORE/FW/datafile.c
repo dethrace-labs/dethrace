@@ -956,6 +956,7 @@ br_datafile* DfOpen(char* name, int write, br_token scalar_type) {
         else
             df->prims = &_BrFilePrimsReadText;
     }
+    LOG_DEBUG("pushing %p", df->h);
     DfPush(BR_MEMORY_FILE, df, 1);
     return df;
 }

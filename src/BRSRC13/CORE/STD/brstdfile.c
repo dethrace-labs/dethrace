@@ -71,7 +71,7 @@ void* BrStdioOpenRead(char* name, br_size_t n_magics, br_mode_test_cbfn* identif
         BrFailure("BrStdFileOpenRead: invalid open_mode %d", open_mode);
         return NULL;
     }
-    LOG_DEBUG("returning pointer %p", &(*fh));
+    LOG_DEBUG("returning pointer %p", fh);
     return fh;
 }
 
@@ -93,7 +93,7 @@ void* BrStdioOpenWrite(char* name, int mode) {
 // Size: 38
 void BrStdioClose(void* f) {
     LOG_TRACE("(%p)", f);
-    fclose(f);
+    //fclose(f);
 }
 
 // Offset: 830
