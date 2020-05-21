@@ -2820,6 +2820,21 @@ typedef struct v11model {
 } v11model;
 
 // From BRender SDK v1.2
+
+/*
+ * Type of actor position
+ */
+enum {
+    BR_TRANSFORM_MATRIX34,
+    BR_TRANSFORM_MATRIX34_LP,
+    BR_TRANSFORM_QUAT,
+    BR_TRANSFORM_EULER,
+    BR_TRANSFORM_LOOK_UP,
+    BR_TRANSFORM_TRANSLATION,
+    BR_TRANSFORM_IDENTITY,
+    BR_TRANSFORM_MAX
+};
+
 /*
  * Basic types of actor
  */

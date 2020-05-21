@@ -1,4 +1,6 @@
 #include "regsupt.h"
+#include "CORE/FW/register.h"
+#include "CORE/V1DB/dbsetup.h"
 #include "debug.h"
 
 char rscid[51];
@@ -18,7 +20,8 @@ br_model* BrModelRemove(br_model* model) {
 // Offset: 270
 // Size: 49
 br_model* BrModelFind(char* pattern) {
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(\"%s\")", pattern);
+    return BrRegistryFind(&v1db.reg_models, pattern);
 }
 
 // Offset: 335
@@ -77,7 +80,9 @@ br_material* BrMaterialRemove(br_material* material) {
 // Offset: 1286
 // Size: 49
 br_material* BrMaterialFind(char* pattern) {
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(\"%s\")", pattern);
+
+    return BrRegistryFind(&v1db.reg_materials, pattern);
 }
 
 // Offset: 1354

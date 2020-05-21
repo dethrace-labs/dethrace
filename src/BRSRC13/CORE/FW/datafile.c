@@ -233,7 +233,7 @@ br_uint_16 scalarTypeConvert(br_datafile* df, br_uint_16 t) {
         }
     LABEL_20:
         if (t >= 0xAu
-            && (t <= 0xAu || t >= 0x13u && t <= 0x15u)) {
+            && (t <= 0xAu || (t >= 0x13u && t <= 0x15u))) {
             BrFailure("Incorrect scalar type");
         }
         return t;
@@ -313,7 +313,7 @@ br_uint_32 DfStructReadBinary(br_datafile* df, br_file_struct* str, void* base) 
         //LOWORD(v7) = m
         c = scalarTypeConvert(df, sm->type);
         LOG_DEBUG("got c=%d", c);
-        mp = ((char*)base) + sm->offset;
+        mp = ((unsigned char*)base) + sm->offset;
         if (c > 0x1f) {
             continue;
         }
@@ -381,7 +381,7 @@ br_uint_32 DfStructReadBinary(br_datafile* df, br_file_struct* str, void* base) 
                 tmp_string[n] = c;
             }
             tmp_string[n] = 0;
-            *(intptr_t*)mp = BrResStrDup(df->res ? df->res : fw.res, tmp_string);
+            *(intptr_t*)mp = (intptr_t*)BrResStrDup(df->res ? df->res : fw.res, tmp_string);
             goto LABEL_33;
         case 18:
             mp[2] = BrFileGetChar(df->h);
@@ -815,7 +815,20 @@ int DfNameSizeText(br_datafile* df, char* name) {
 char* DfNameReadBinary(br_datafile* df, char* name) {
     int c;
     int i;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%p, \"%s\")", df, name);
+
+    for (i = 0; i < 255; i++) {
+        c = BrFileGetChar(df->h);
+        if (!c) {
+            break;
+        }
+        if (c == -1) {
+            break;
+        }
+        name[i] = c;
+    }
+    name[i] = '\0';
+    return name;
 }
 
 // Offset: 12796

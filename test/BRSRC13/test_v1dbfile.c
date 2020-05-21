@@ -1,5 +1,6 @@
 #include "framework/unity.h"
 
+#include "CORE/V1DB/actsupt.h"
 #include "CORE/V1DB/modsupt.h"
 #include "CORE/V1DB/v1dbfile.h"
 
@@ -21,6 +22,16 @@ void test_v1dbfile_BrModelLoad() {
     BrModelFree(m);
 }
 
+void test_v1dbfile_BrActorLoad() {
+    br_actor* a;
+    a = BrActorLoad("DATA/ACTORS/CPOINT.ACT");
+    TEST_ASSERT_NOT_NULL(a);
+    TEST_ASSERT_EQUAL_STRING("CPOINT.ACT", a->identifier);
+    TEST_ASSERT_EQUAL_INT(1, a->type);
+    BrActorFree(a);
+}
+
 void test_v1dbfile_suite() {
     RUN_TEST(test_v1dbfile_BrModelLoad);
+    RUN_TEST(test_v1dbfile_BrActorLoad);
 }

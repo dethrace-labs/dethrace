@@ -50,7 +50,8 @@ void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class) {
     pad = (~malign & calign) + 3;
     actual_pad = (sizeof(resource_header) + pad) & 0xFFFC;
 
-    // JeffH ignore calculated padding
+    // JeffH ignore calculated padding for simplicity. We dont care too much about
+    // optimizing data alignment at this point ;)
     pad = 0;
     actual_pad = sizeof(resource_header) + pad;
 
@@ -66,10 +67,9 @@ void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class) {
     res->magic_num = 0xDEADBEEF;
 
     if (vparent) {
-        parent = (char*)vparent - sizeof(resource_header);
+        parent = (resource_header*)((char*)vparent - sizeof(resource_header));
         BrSimpleAddHead(&parent->children, &res->node);
     }
-    LOG_DEBUG("res_header %p, body %p, pad %d", res, ((char*)res) + actual_pad, actual_pad);
     return ((char*)res) + actual_pad;
 }
 
