@@ -67,6 +67,7 @@ void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class) {
     res->magic_num = 0xDEADBEEF;
 
     if (vparent) {
+        // vparent points to a resource body, we track backwards to obtain its resource_header
         parent = (resource_header*)((char*)vparent - sizeof(resource_header));
         BrSimpleAddHead(&parent->children, &res->node);
     }

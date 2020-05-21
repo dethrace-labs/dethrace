@@ -78,21 +78,16 @@ void* BrRegistryFind(br_registry* reg, char* pattern) {
 
     e = (br_registry_entry*)reg->list.head;
     if (e->item) {
-        // e->item[1] actually points to identifer field in br_model / br_material / br_actor etc
+        // as a char**, e->item[1] actually points to `identifier` field in a br_* struct etc
         while (!BrNamePatternMatch(pattern, e->item[1])) {
-            LOG_DEBUG("%p %p", e->node, e->node.next);
             e = (br_registry_entry*)e->node.next;
             if (!e->node.next) {
                 if (reg->find_failed_hook) {
-                    LOG_DEBUG("find failed hook %p", reg->find_failed_hook);
                     return reg->find_failed_hook(pattern);
                 }
                 return NULL;
             }
-            LOG_DEBUG("before item");
-            LOG_DEBUG("item: %p", e->node.next);
         }
-        LOG_DEBUG("breakout");
         return e->item;
     }
     if (reg->find_failed_hook) {

@@ -150,6 +150,12 @@ struct {
     size_t offset;
     int table;
 } MaterialMaps;
+
+// Added by JeffH.
+#define DF_ACTOR 4
+#define DF_MODEL 8
+#define DF_TRANSFORM 16
+
 char rscid[53];
 
 // Offset: 18
@@ -172,7 +178,7 @@ int FopRead_VERTICES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_
     int i;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
 
-    mp = DfTop(8, NULL);
+    mp = DfTop(DF_MODEL, NULL);
     mp->vertices = BrResAllocate(mp, sizeof(br_vertex) * count, BR_MEMORY_VERTICES);
     DfStructReadArray(df, &br_vertex_F, mp->vertices, count);
     for (i = 0; i < count; i++) {
@@ -273,7 +279,7 @@ int FopRead_FACES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 
     br_model* mp;
     int i;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
-    mp = DfTop(8, 0);
+    mp = DfTop(DF_MODEL, 0);
     mp->faces = (br_face*)BrResAllocate(mp, sizeof(br_face) * count, BR_MEMORY_FACES);
     mp->nfaces = count;
     DfStructReadArray(df, &br_face_F, mp->faces, count);
@@ -378,7 +384,7 @@ int FopRead_MODEL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 
     LOG_DEBUG("model id=%s\n", mp->identifier);
 
     mp->flags &= (BR_MODF_DONT_WELD | BR_MODF_KEEP_ORIGINAL | BR_MODF_GENERATE_TAGS | BR_MODF_QUICK_UPDATE);
-    DfPush(8, mp, 1);
+    DfPush(DF_MODEL, mp, 1);
     return 0;
 }
 
@@ -501,7 +507,7 @@ int FopRead_ACTOR(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 
     df->prims->struct_read(df, &br_actor_F, ap);
     df->res = NULL;
     ap->t.type = BR_TRANSFORM_IDENTITY;
-    DfPush(4, ap, 1);
+    DfPush(DF_ACTOR, ap, 1);
     return 0;
 }
 
@@ -524,7 +530,7 @@ int FopRead_ACTOR_MODEL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_ui
     br_actor* a;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
 
-    a = DfTop(4, 0);
+    a = DfTop(DF_ACTOR, 0);
     df->prims->name_read(df, name);
     a->model = BrModelFind(name);
     return 0;
@@ -548,7 +554,7 @@ int FopRead_ACTOR_MATERIAL(br_datafile* df, br_uint_32 id, br_uint_32 length, br
     char name[256];
     br_actor* a;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
-    a = DfTop(4, NULL);
+    a = DfTop(DF_ACTOR, NULL);
     df->prims->name_read(df, name);
     a->material = BrMaterialFind(name);
 }
@@ -571,8 +577,8 @@ int FopRead_ACTOR_TRANSFORM(br_datafile* df, br_uint_32 id, br_uint_32 length, b
     br_transform* tp;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
 
-    tp = DfPop(16, 0);
-    a = DfTop(4, NULL);
+    tp = DfPop(DF_TRANSFORM, NULL);
+    a = DfTop(DF_ACTOR, NULL);
     memcpy(&a->t, tp, sizeof(br_transform));
     BrResFree(tp);
     return 0;
@@ -705,7 +711,7 @@ int FopRead_TRANSFORM(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint
         df->prims->struct_read(df, TransformTypes[t].fs, tp);
     }
     df->res = NULL;
-    DfPush(16, tp, 1);
+    DfPush(DF_TRANSFORM, tp, 1);
     return 0;
 }
 
@@ -805,9 +811,8 @@ br_uint_32 BrModelLoadMany(char* filename, br_model** models, br_uint_16 num) {
         }
         r = DfChunksInterpret(df, &ModelLoadTable);
         LOG_DEBUG("r %d", r);
-        if (DfTopType() == 8) {
-            LOG_DEBUG("poppping model");
-            models[count] = DfPop(8, 0);
+        if (DfTopType() == DF_MODEL) {
+            models[count] = DfPop(DF_MODEL, 0);
             count++;
         }
     } while (r);
@@ -861,8 +866,8 @@ br_uint_32 BrActorLoadMany(char* filename, br_actor** actors, br_uint_16 num) {
         }
         r = DfChunksInterpret(df, &ActorLoadTable);
         LOG_DEBUG("r %d", r);
-        if (DfTopType() == 4) {
-            actors[count] = DfPop(4, NULL);
+        if (DfTopType() == DF_ACTOR) {
+            actors[count] = DfPop(DF_ACTOR, NULL);
             count++;
         }
     } while (r);
