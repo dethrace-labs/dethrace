@@ -380,9 +380,6 @@ int FopRead_MODEL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 
     df->res = mp;
     df->prims->struct_read(df, &br_model_F, mp);
     df->res = NULL;
-
-    LOG_DEBUG("model id=%s\n", mp->identifier);
-
     mp->flags &= (BR_MODF_DONT_WELD | BR_MODF_KEEP_ORIGINAL | BR_MODF_GENERATE_TAGS | BR_MODF_QUICK_UPDATE);
     DfPush(DF_MODEL, mp, 1);
     return 0;
@@ -810,7 +807,6 @@ br_uint_32 BrModelLoadMany(char* filename, br_model** models, br_uint_16 num) {
             break;
         }
         r = DfChunksInterpret(df, &ModelLoadTable);
-        LOG_DEBUG("r %d", r);
         if (DfTopType() == DF_MODEL) {
             models[count] = DfPop(DF_MODEL, 0);
             count++;
@@ -865,7 +861,6 @@ br_uint_32 BrActorLoadMany(char* filename, br_actor** actors, br_uint_16 num) {
             break;
         }
         r = DfChunksInterpret(df, &ActorLoadTable);
-        LOG_DEBUG("r %d", r);
         if (DfTopType() == DF_ACTOR) {
             actors[count] = DfPop(DF_ACTOR, NULL);
             count++;
@@ -924,7 +919,6 @@ br_model* BrModelLoad(char* filename) {
     LOG_TRACE("(\"%s\")", filename);
 
     if (BrModelLoadMany(filename, &ptr, 1u) == 1) {
-        LOG_DEBUG("returning ptr %p", ptr);
         return ptr;
     }
     return NULL;

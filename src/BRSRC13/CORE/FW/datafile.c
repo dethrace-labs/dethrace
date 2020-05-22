@@ -308,11 +308,7 @@ br_uint_32 DfStructReadBinary(br_datafile* df, br_file_struct* str, void* base) 
 
         sm = &str->members[m];
 
-        //v5 = *((_DWORD*)sm + 1);
-        //v6 = basea;
-        //LOWORD(v7) = m
         c = scalarTypeConvert(df, sm->type);
-        LOG_DEBUG("got c=%d", c);
         mp = ((unsigned char*)base) + sm->offset;
         if (c > 0x1f) {
             continue;
