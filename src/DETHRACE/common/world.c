@@ -986,7 +986,6 @@ br_material* WallLinearToPersp(br_model* pModel, tU16 pFace) {
 // Size: 45
 tRoad_texturing_level GetRoadTexturingLevel() {
     return gRoad_texturing_level;
-    NOT_IMPLEMENTED();
 }
 
 // Offset: 22220
@@ -995,7 +994,6 @@ tRoad_texturing_level GetRoadTexturingLevel() {
 void SetRoadTexturingLevel(tRoad_texturing_level pLevel) {
     LOG_TRACE("(%d)", pLevel);
     gRoad_texturing_level = pLevel;
-    NOT_IMPLEMENTED();
 }
 
 // Offset: 22268
@@ -1017,7 +1015,6 @@ tWall_texturing_level GetWallTexturingLevel() {
 void SetWallTexturingLevel(tWall_texturing_level pLevel) {
     LOG_TRACE("(%d)", pLevel);
     gWall_texturing_level = pLevel;
-    NOT_IMPLEMENTED();
 }
 
 // Offset: 22452
@@ -1055,7 +1052,6 @@ br_uint_32 SetAccessoryRenderingCB(br_actor* pActor, void* pFlag) {
         pActor->render_style = *(br_uint_8*)pFlag;
     }
     return 0;
-    NOT_IMPLEMENTED();
 }
 
 // Offset: 23076
@@ -1089,7 +1085,6 @@ int GetAccessoryRendering() {
 void SetCarSimplificationLevel(int pLevel) {
     LOG_TRACE("(%d)", pLevel);
     gCar_simplification_level = pLevel;
-    NOT_IMPLEMENTED();
 }
 
 // Offset: 23272

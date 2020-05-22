@@ -363,5 +363,4 @@ int GetScreenSize() {
 void SetScreenSize(int pNew_size) {
     LOG_TRACE("(%d)", pNew_size);
     gRender_indent = pNew_size;
-    NOT_IMPLEMENTED();
 }

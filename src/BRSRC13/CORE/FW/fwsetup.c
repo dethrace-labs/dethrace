@@ -123,7 +123,13 @@ br_diaghandler* BrDiagHandlerSet(br_diaghandler* newdh) {
 // Size: 73
 br_filesystem* BrFilesystemSet(br_filesystem* newfs) {
     br_filesystem* old;
-    NOT_IMPLEMENTED();
+
+    old = fw.fsys;
+    if (!newfs) {
+        newfs = _BrDefaultFilesystem;
+    }
+    fw.fsys = newfs;
+    return old;
 }
 
 // Offset: 643

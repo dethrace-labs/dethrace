@@ -156,12 +156,10 @@ void RenderTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, 
 // Size: 47
 br_scalar GetYonFactor() {
     return gYon_factor;
-    NOT_IMPLEMENTED();
 }
 
 // Offset: 6248
 // Size: 44
 void SetYonFactor(br_scalar pNew) {
     gYon_factor = pNew;
-    NOT_IMPLEMENTED();
 }

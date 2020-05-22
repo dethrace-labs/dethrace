@@ -268,7 +268,7 @@ void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
 void SetBRenderScreenAndBuffers(int pX_offset, int pY_offset, int pWidth, int pHeight) {
     LOG_TRACE("(%d, %d, %d, %d)", pX_offset, pY_offset, pWidth, pHeight);
 
-    PDInitScreen();
+    PDAllocateScreenAndBack();
     if (!pWidth) {
         pWidth = gBack_screen->width;
     }
@@ -1164,7 +1164,6 @@ void TellyOutImage(br_pixelmap* pImage, int pLeft, int pTop) {
 void SetShadowLevel(tShadow_level pLevel) {
     LOG_TRACE("(%d)", pLevel);
     gShadow_level = pLevel;
-    NOT_IMPLEMENTED();
 }
 
 // Offset: 30520

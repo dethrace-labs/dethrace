@@ -705,7 +705,6 @@ void ResetSmokeColumns() {
 void SetSmokeOn(int pSmoke_on) {
     LOG_TRACE("(%d)", pSmoke_on);
     gSmoke_on = pSmoke_on;
-    NOT_IMPLEMENTED();
 }
 
 // Offset: 32060

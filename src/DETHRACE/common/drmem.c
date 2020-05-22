@@ -314,28 +314,24 @@ void* DRStdlibAllocate(br_size_t size, br_uint_8 type) {
 void DRStdlibFree(void* mem) {
     int i;
     free(mem);
-    NOT_IMPLEMENTED();
 }
 
 // Offset: 444
 // Size: 40
 br_size_t DRStdlibInquire(br_uint_8 type) {
     return 0;
-    NOT_IMPLEMENTED();
 }
 
 // Offset: 484
 // Size: 40
 br_uint_32 Claim4ByteAlignment(br_uint_8 type) {
     return 4;
-    NOT_IMPLEMENTED();
 }
 
 // Offset: 524
 // Size: 48
 void InstallDRMemCalls() {
     BrAllocatorSet(&gAllocator);
-    NOT_IMPLEMENTED();
 }
 
 // Offset: 572

@@ -493,7 +493,6 @@ void SetDepthCueingOn(int pOn) {
         gSwap_depth_effect_end = gProgram_state.current_depth_effect.end;
     }
     gDepth_cueing_on = pOn;
-    NOT_IMPLEMENTED();
 }
 
 // Offset: 10864

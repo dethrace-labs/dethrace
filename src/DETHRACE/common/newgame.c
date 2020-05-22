@@ -396,7 +396,7 @@ void RevertToDefaults() {
 void DefaultNetSettings() {
     FILE* f;
     int i;
-    NOT_IMPLEMENTED();
+    LOG_WARN("Not implemented");
 }
 
 // Offset: 7964

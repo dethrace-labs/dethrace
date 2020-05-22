@@ -396,7 +396,6 @@ tPlayer_ID PDNetExtractPlayerID(tNet_game_details* pDetails) {
 void PDNetObtainSystemUserName(char* pName, int pMax_length) {
     DrDebugMessage("PDNetObtainSystemUserName()\n");
     strcpy(pName, "Ron Turn");
-    NOT_IMPLEMENTED();
 }
 
 // Offset: 7736

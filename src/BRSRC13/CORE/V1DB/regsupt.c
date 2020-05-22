@@ -1,4 +1,7 @@
 #include "regsupt.h"
+#include "CORE/FW/register.h"
+#include "CORE/V1DB/dbsetup.h"
+#include "CORE/V1DB/prepmesh.h"
 #include "debug.h"
 
 char rscid[51];
@@ -6,7 +9,9 @@ char rscid[51];
 // Offset: 11
 // Size: 148
 br_model* BrModelAdd(br_model* model) {
-    NOT_IMPLEMENTED();
+    BrRegistryAdd(&v1db.reg_models, model);
+    BrModelUpdate(model, 0x7FFF);
+    return model;
 }
 
 // Offset: 173
