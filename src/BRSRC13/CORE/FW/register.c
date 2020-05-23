@@ -3,6 +3,7 @@
 
 #include "brlists.h"
 #include "fwsetup.h"
+#include "pattern.h"
 #include "resource.h"
 
 char rscid[50];
@@ -11,7 +12,7 @@ char rscid[50];
 // Size: 96
 // EAX: reg
 void* BrRegistryNew(br_registry* reg) {
-    BrNewList((br_list*)reg);
+    BrNewList(&reg->list);
     reg->count = 0;
 }
 
@@ -31,7 +32,7 @@ void* BrRegistryAdd(br_registry* reg, void* item) {
     br_registry_entry* e;
 
     e = (br_registry_entry*)BrResAllocate(fw.res, sizeof(br_registry_entry), BR_MEMORY_REGISTRY);
-    e->item = (void**)&item;
+    e->item = (char**)item;
     BrAddHead(&reg->list, &e->node);
     reg->count++;
     return item;
@@ -74,7 +75,25 @@ int BrRegistryRemoveMany(br_registry* reg, void** items, int n) {
 // EDX: pattern
 void* BrRegistryFind(br_registry* reg, char* pattern) {
     br_registry_entry* e;
-    NOT_IMPLEMENTED();
+
+    e = (br_registry_entry*)reg->list.head;
+    if (e->item) {
+        // as a char**, e->item[1] actually points to `identifier` field in a br_* struct etc
+        while (!BrNamePatternMatch(pattern, e->item[1])) {
+            e = (br_registry_entry*)e->node.next;
+            if (!e->node.next) {
+                if (reg->find_failed_hook) {
+                    return reg->find_failed_hook(pattern);
+                }
+                return NULL;
+            }
+        }
+        return e->item;
+    }
+    if (reg->find_failed_hook) {
+        return reg->find_failed_hook(pattern);
+    }
+    return NULL;
 }
 
 // Offset: 1204

@@ -3,14 +3,18 @@
 #include "CORE/FW/datafile.h"
 #include "CORE/FW/genfile.h"
 #include "CORE/FW/resource.h"
+#include "CORE/V1DB/actsupt.h"
+#include "CORE/V1DB/dbsetup.h"
 #include "CORE/V1DB/modsupt.h"
+#include "CORE/V1DB/regsupt.h"
 #include "debug.h"
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 
 br_chunks_table_entry MaterialLoadEntries[8];
 br_chunks_table MaterialLoadTable;
-br_chunks_table ActorLoadTable;
+
 br_file_struct br_camera_F;
 br_file_enum camera_type_F;
 
@@ -38,11 +42,27 @@ br_file_enum_member angle_order_FM[24];
 br_file_struct br_transform_matrix34_F;
 br_file_struct_member br_transform_matrix34_FM[4];
 br_file_enum_member render_style_FM[8];
-br_file_enum actor_type_F;
-br_file_struct_member br_actor_FM[3];
-br_file_struct br_actor_F;
+
+br_file_enum_member actor_type_FM[8] = {
+    { 0, "BR_ACTOR_NONE" },
+    { 1, "BR_ACTOR_MODEL" },
+    { 2, "BR_ACTOR_LIGHT" },
+    { 3, "BR_ACTOR_CAMERA" },
+    { 4, "_BR_ACTOR_RESERVED" },
+    { 5, "BR_ACTOR_BOUNDS" },
+    { 6, "BR_ACTOR_BOUNDS_CORRECT" },
+    { 7, "BR_ACTOR_CLIP_PLANE" }
+};
+br_file_enum actor_type_F = { 8u, actor_type_FM };
+
+br_file_struct_member br_actor_FM[3] = {
+    { 13u, offsetof(br_actor, type), "type", NULL /*actor_type_FM */ },
+    { 13u, offsetof(br_actor, render_style), NULL /*render_style_FM*/ },
+    { 17u, offsetof(br_actor, identifier), NULL }
+};
+br_file_struct br_actor_F = { "br_actor", 3u, br_actor_FM, sizeof(br_actor) };
 br_file_enum render_style_F;
-br_file_enum_member actor_type_FM[8];
+
 br_file_struct br_material_old_F;
 br_file_struct_member br_material_FM[17];
 br_file_struct br_material_F;
@@ -55,7 +75,7 @@ br_file_struct_member br_model_FM[2] = {
     { 3u, offsetof(br_model, flags), "flags", NULL },
     { 17u, offsetof(br_model, identifier), "identifier", NULL }
 };
-br_file_struct br_model_F = { "br_model", 2u, br_model_FM, 84 };
+br_file_struct br_model_F = { "br_model", 2u, br_model_FM, sizeof(br_model) };
 
 br_file_struct_member br_old_face_FM[5];
 br_file_struct br_old_face_F;
@@ -69,7 +89,7 @@ br_file_struct_member br_face_FM[5] = {
     { 1u, offsetof(br_face, flags), "flags", NULL }
 };
 
-br_file_struct br_face_F = { "br_face", 5u, br_face_FM, 40 };
+br_file_struct br_face_F = { "br_face", 5u, br_face_FM, sizeof(br_face) };
 br_file_struct_member br_old_vertex_uv_FM[5];
 br_file_struct br_vertex_uv_F;
 br_file_struct br_old_vertex_uv_F;
@@ -79,9 +99,8 @@ br_file_struct_member br_vertex_FM[3] = {
     { 10, offsetof(br_vertex, p) + 4, "p.v[y]", NULL },
     { 10, offsetof(br_vertex, p) + 8, "p.v[z]", NULL }
 };
-br_file_struct br_vertex_F = { "br_vertex", 3, br_vertex_FM, 40 };
+br_file_struct br_vertex_F = { "br_vertex", 3, br_vertex_FM, sizeof(br_vertex) };
 
-br_chunks_table_entry ActorLoadEntries[21];
 br_chunks_table_entry ModelLoadEntries[15] = {
     { 0u, 0u, &FopRead_END },
     { 9u, 0u, &FopRead_OLD_MATERIAL_INDEX },
@@ -101,11 +120,42 @@ br_chunks_table_entry ModelLoadEntries[15] = {
 };
 br_chunks_table ModelLoadTable = { 15, ModelLoadEntries };
 
+br_chunks_table_entry ActorLoadEntries[21] = {
+    { 0u, 0u, &FopRead_END },
+    { 35u, 0u, &FopRead_ACTOR },
+    { 36u, 0u, &FopRead_ACTOR_MODEL },
+    { 37u, 0u, &FopRead_ACTOR_TRANSFORM },
+    { 38u, 0u, &FopRead_ACTOR_MATERIAL },
+    { 39u, 0u, &FopRead_ACTOR_LIGHT },
+    { 40u, 0u, &FopRead_ACTOR_CAMERA },
+    { 41u, 0u, &FopRead_ACTOR_BOUNDS },
+    { 55u, 0u, &FopRead_ACTOR_CLIP_PLANE },
+    { 42u, 0u, &FopRead_ACTOR_ADD_CHILD },
+    { 43u, 0u, &FopRead_TRANSFORM },
+    { 44u, 0u, &FopRead_TRANSFORM },
+    { 45u, 0u, &FopRead_TRANSFORM },
+    { 46u, 0u, &FopRead_TRANSFORM },
+    { 47u, 0u, &FopRead_TRANSFORM },
+    { 48u, 0u, &FopRead_TRANSFORM },
+    { 49u, 0u, &FopRead_TRANSFORM },
+    { 50u, 0u, &FopRead_BOUNDS },
+    { 51u, 0u, &FopRead_LIGHT },
+    { 52u, 0u, &FopRead_CAMERA },
+    { 56u, 0u, &FopRead_PLANE }
+};
+br_chunks_table ActorLoadTable = { 21, ActorLoadEntries };
+
 struct {
     br_uint_32 id;
     size_t offset;
     int table;
 } MaterialMaps;
+
+// Added by JeffH.
+#define DF_ACTOR 4
+#define DF_MODEL 8
+#define DF_TRANSFORM 16
+
 char rscid[53];
 
 // Offset: 18
@@ -128,7 +178,7 @@ int FopRead_VERTICES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_
     int i;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
 
-    mp = DfTop(8, NULL);
+    mp = DfTop(DF_MODEL, NULL);
     mp->vertices = BrResAllocate(mp, sizeof(br_vertex) * count, BR_MEMORY_VERTICES);
     DfStructReadArray(df, &br_vertex_F, mp->vertices, count);
     for (i = 0; i < count; i++) {
@@ -229,7 +279,7 @@ int FopRead_FACES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 
     br_model* mp;
     int i;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
-    mp = DfTop(8, 0);
+    mp = DfTop(DF_MODEL, 0);
     mp->faces = (br_face*)BrResAllocate(mp, sizeof(br_face) * count, BR_MEMORY_FACES);
     mp->nfaces = count;
     DfStructReadArray(df, &br_face_F, mp->faces, count);
@@ -330,11 +380,8 @@ int FopRead_MODEL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 
     df->res = mp;
     df->prims->struct_read(df, &br_model_F, mp);
     df->res = NULL;
-
-    LOG_DEBUG("model id=%s\n", mp->identifier);
-
     mp->flags &= (BR_MODF_DONT_WELD | BR_MODF_KEEP_ORIGINAL | BR_MODF_GENERATE_TAGS | BR_MODF_QUICK_UPDATE);
-    DfPush(8, mp, 1);
+    DfPush(DF_MODEL, mp, 1);
     return 0;
 }
 
@@ -450,7 +497,15 @@ int FopWrite_ACTOR(br_datafile* df, br_actor* ap) {
 // ECX: count
 int FopRead_ACTOR(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_actor* ap;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
+
+    ap = BrActorAllocate(BR_ACTOR_NONE, NULL);
+    df->res = ap;
+    df->prims->struct_read(df, &br_actor_F, ap);
+    df->res = NULL;
+    ap->t.type = BR_TRANSFORM_IDENTITY;
+    DfPush(DF_ACTOR, ap, 1);
+    return 0;
 }
 
 // Offset: 5216
@@ -470,7 +525,12 @@ int FopWrite_ACTOR_MODEL(br_datafile* df, br_model* model) {
 int FopRead_ACTOR_MODEL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     char name[256];
     br_actor* a;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
+
+    a = DfTop(DF_ACTOR, 0);
+    df->prims->name_read(df, name);
+    a->model = BrModelFind(name);
+    return 0;
 }
 
 // Offset: 5505
@@ -490,7 +550,10 @@ int FopWrite_ACTOR_MATERIAL(br_datafile* df, br_material* material) {
 int FopRead_ACTOR_MATERIAL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     char name[256];
     br_actor* a;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
+    a = DfTop(DF_ACTOR, NULL);
+    df->prims->name_read(df, name);
+    a->material = BrMaterialFind(name);
 }
 
 // Offset: 5798
@@ -509,7 +572,13 @@ int FopWrite_ACTOR_TRANSFORM(br_datafile* df) {
 int FopRead_ACTOR_TRANSFORM(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_actor* a;
     br_transform* tp;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
+
+    tp = DfPop(DF_TRANSFORM, NULL);
+    a = DfTop(DF_ACTOR, NULL);
+    memcpy(&a->t, tp, sizeof(br_transform));
+    BrResFree(tp);
+    return 0;
 }
 
 // Offset: 6017
@@ -625,7 +694,22 @@ int FopWrite_TRANSFORM(br_datafile* df, br_transform* t) {
 int FopRead_TRANSFORM(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     int t;
     br_transform* tp;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
+
+    for (t = 0; t < 7; t++) {
+        if (id == TransformTypes[t].id) {
+            break;
+        }
+    }
+    tp = (br_transform*)BrResAllocate(v1db.res, sizeof(br_transform), BR_MEMORY_TRANSFORM);
+    tp->type = t;
+    df->res = tp;
+    if (TransformTypes[t].fs) {
+        df->prims->struct_read(df, TransformTypes[t].fs, tp);
+    }
+    df->res = NULL;
+    DfPush(DF_TRANSFORM, tp, 1);
+    return 0;
 }
 
 // Offset: 7489
@@ -723,10 +807,8 @@ br_uint_32 BrModelLoadMany(char* filename, br_model** models, br_uint_16 num) {
             break;
         }
         r = DfChunksInterpret(df, &ModelLoadTable);
-        LOG_DEBUG("r %d", r);
-        if (DfTopType() == 8) {
-            LOG_DEBUG("poppping model");
-            models[count] = DfPop(8, 0);
+        if (DfTopType() == DF_MODEL) {
+            models[count] = DfPop(DF_MODEL, 0);
             count++;
         }
     } while (r);
@@ -766,7 +848,26 @@ br_uint_32 BrActorLoadMany(char* filename, br_actor** actors, br_uint_16 num) {
     br_datafile* df;
     int count;
     int r;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(\"%s\", %p, %d)", filename, actors, num);
+
+    df = DfOpen(filename, 0, BRT_FLOAT);
+    if (!df) {
+        return 0;
+    }
+
+    count = 0;
+    do {
+        if (count >= num) {
+            break;
+        }
+        r = DfChunksInterpret(df, &ActorLoadTable);
+        if (DfTopType() == DF_ACTOR) {
+            actors[count] = DfPop(DF_ACTOR, NULL);
+            count++;
+        }
+    } while (r);
+    DfClose(df);
+    return count;
 }
 
 // Offset: 9973
@@ -818,11 +919,9 @@ br_model* BrModelLoad(char* filename) {
     LOG_TRACE("(\"%s\")", filename);
 
     if (BrModelLoadMany(filename, &ptr, 1u) == 1) {
-        LOG_DEBUG("returning ptr %p", ptr);
         return ptr;
-    } else {
-        return NULL;
     }
+    return NULL;
 }
 
 // Offset: 11265
@@ -848,7 +947,10 @@ br_uint_32 BrMaterialSave(char* filename, br_material* ptr) {
 // Size: 81
 br_actor* BrActorLoad(char* filename) {
     br_actor* ptr;
-    NOT_IMPLEMENTED();
+    if (BrActorLoadMany(filename, &ptr, 1u) == 1) {
+        return ptr;
+    }
+    return NULL;
 }
 
 // Offset: 11597
