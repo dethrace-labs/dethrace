@@ -428,7 +428,12 @@ br_model* LoadModel(char* pName) {
 // EAX: pName
 br_actor* LoadActor(char* pName) {
     tPath_name the_path;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(\"%s\")", pName);
+
+    PossibleService();
+    PathCat(the_path, gApplication_path, "ACTORS");
+    PathCat(the_path, the_path, pName);
+    return BrActorLoad(the_path);
 }
 
 // Offset: 4504
