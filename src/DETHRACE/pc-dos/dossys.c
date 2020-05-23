@@ -313,23 +313,11 @@ int PDInitScreenVars(int pArgc, char** pArgv) {
     gGraf_specs[gGraf_spec_index].phys_width = gGraf_specs[gGraf_spec_index].total_width;
     gGraf_specs[gGraf_spec_index].phys_height = gGraf_specs[gGraf_spec_index].total_height;
     return 1;
-    NOT_IMPLEMENTED();
 }
 
 // Offset: 3300
 // Size: 24
 void PDInitScreen() {
-    gScreen = DOSGfxBegin(gGraf_specs[gGraf_spec_index].gfx_init_string);
-    gScreen->origin_x = 0;
-    gDOSGfx_initialized = 1;
-    gScreen->origin_y = 0;
-    gBack_screen = BrPixelmapMatch(gScreen, BR_PMMATCH_OFFSCREEN);
-    gBack_screen->origin_x = 0;
-    gBack_screen->origin_y = 0;
-    gTemp_screen = BrPixelmapMatch(gScreen, BR_PMMATCH_OFFSCREEN);
-    gTemp_screen->origin_x = 0;
-    gTemp_screen->origin_y = 0;
-    NOT_IMPLEMENTED();
 }
 
 // Offset: 3324
@@ -347,7 +335,16 @@ void PDUnlockRealBackScreen() {
 // Offset: 3488
 // Size: 431
 void PDAllocateScreenAndBack() {
-    NOT_IMPLEMENTED();
+    gScreen = DOSGfxBegin(gGraf_specs[gGraf_spec_index].gfx_init_string);
+    gScreen->origin_x = 0;
+    gDOSGfx_initialized = 1;
+    gScreen->origin_y = 0;
+    gBack_screen = BrPixelmapMatch(gScreen, BR_PMMATCH_OFFSCREEN);
+    gBack_screen->origin_x = 0;
+    gBack_screen->origin_y = 0;
+    gTemp_screen = BrPixelmapMatch(gScreen, BR_PMMATCH_OFFSCREEN);
+    gTemp_screen->origin_x = 0;
+    gTemp_screen->origin_y = 0;
 }
 
 // Offset: 3920

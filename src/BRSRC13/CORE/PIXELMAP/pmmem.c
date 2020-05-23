@@ -168,7 +168,6 @@ void CheckDispatch(br_device_pixelmap* pm) {
     // if (!pm->dispatch) {
     //     pm->dispatch = &devicePixelmapDispatch;
     // }
-    NOT_IMPLEMENTED();
 }
 
 // Offset: 631

@@ -436,7 +436,6 @@ void InitNetGameplayStuff() {
 // Size: 49
 void DefaultNetName() {
     NetObtainSystemUserName(gNet_player_name, 32);
-    NOT_IMPLEMENTED();
 }
 
 // Offset: 19160
