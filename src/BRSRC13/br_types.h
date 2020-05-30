@@ -2800,10 +2800,10 @@ typedef struct v11face {
 
 typedef struct v11group {
     void* stored;
-    DR_FACE* faces;
+    v11face* faces;
     br_colour* face_colours;
     br_uint_16* face_user;
-    DR_VERTEX* vertices;
+    fmt_vertex* vertices;
     br_colour* vertex_colours;
     br_uint_16* vertex_user;
     br_uint_16 nfaces;
@@ -2931,6 +2931,19 @@ enum {
 };
 
 /*
+ * Flags to BrModelUpdate()
+ */
+enum {
+    BR_MODU_NORMALS = 0x0001,
+    BR_MODU_EDGES = 0x0002,
+    BR_MODU_RADIUS = 0x0004,
+    BR_MODU_GROUPS = 0x0008,
+    BR_MODU_BOUNDING_BOX = 0x0010,
+    BR_MODU_MATERIALS = 0x0020,
+    BR_MODU_ALL = 0x7fff
+};
+
+/*
  * Bits for br_model->flags
  */
 enum {
@@ -2938,10 +2951,11 @@ enum {
     BR_MODF_KEEP_ORIGINAL = 0x0002, /* Don't release model->faces/vertices during ModelUpdate() */
     BR_MODF_GENERATE_TAGS = 0x0004, /* Allocate and fill in the face and vertex tag structures */
     BR_MODF_QUICK_UPDATE = 0x0010, /* ModelUpdate is fast - but may produce slower models */
-
     BR_MODF_CUSTOM = 0x0020, /* Invoke custom callback for this model */
+    BR_MODF_PREPREPARED = 0x0040, /* Model structure is pre-prepared - update performs no work */
 
-    BR_MODF_PREPREPARED = 0x0040 /* Model structure is pre-prepared - update performs no work */
+    BR_MODF_UPDATEABLE = 0x0080, /* Added by JeffH from Errols code */
+    BR_MODF_UNKNOWN = 0x0100 /* Added by JeffH. Referred to in code */
 };
 
 #define BR_COLOUR_RGB(r, g, b) \
