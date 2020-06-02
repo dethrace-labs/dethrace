@@ -2940,6 +2940,7 @@ enum {
     BR_MODU_GROUPS = 0x0008,
     BR_MODU_BOUNDING_BOX = 0x0010,
     BR_MODU_MATERIALS = 0x0020,
+    BR_MODU_UNKNOWN = 0x0100, /* Added by JeffH. Referred to in code */
     BR_MODU_ALL = 0x7fff
 };
 
@@ -2954,8 +2955,7 @@ enum {
     BR_MODF_CUSTOM = 0x0020, /* Invoke custom callback for this model */
     BR_MODF_PREPREPARED = 0x0040, /* Model structure is pre-prepared - update performs no work */
 
-    BR_MODF_UPDATEABLE = 0x0080, /* Added by JeffH from Errols code */
-    BR_MODF_UNKNOWN = 0x0100 /* Added by JeffH. Referred to in code */
+    BR_MODF_UPDATEABLE = 0x0080 /* Added by JeffH from Errols code */
 };
 
 #define BR_COLOUR_RGB(r, g, b) \

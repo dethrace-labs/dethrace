@@ -186,7 +186,10 @@ void PrepareGroups(br_model* model) {
     br_uint_16* v11vuser;
     br_face** sorted_faces;
     char* cp;
-    NOT_IMPLEMENTED();
+
+    LOG_WARN("Ignoring this one for now");
+
+    return;
 }
 
 // Offset: 6862
@@ -217,15 +220,15 @@ void PrepareBoundingBox(br_model* model) {
     br_vertex* vp;
     br_scalar x;
 
-    x = model->vertices[0].p.v[axis];
+    vp = &model->vertices[0];
     for (axis = 0; axis < 3; axis++) {
-        model->bounds.min.v[axis] = x;
-        model->bounds.max.v[axis] = x;
+        model->bounds.min.v[axis] = vp->p.v[axis];
+        model->bounds.max.v[axis] = vp->p.v[axis];
     }
 
     for (v = 1; v < model->nvertices; v++) {
         vp = &model->vertices[v];
-        for (axis = 0; axis < 3;) {
+        for (axis = 0; axis < 3; axis++) {
             x = vp->p.v[axis];
             if (x > model->bounds.max.v[axis]) {
                 model->bounds.max.v[axis] = x;
@@ -277,9 +280,8 @@ void BrModelUpdate(br_model* model, br_uint_16 flags) {
         if (!model->faces || !model->vertices) {
             BrFailure("BrModelUpdate: model has no faces or vertices (%s)", model->identifier ? model->identifier : "<NULL>");
         }
-        if (flags & BR_MODF_UNKNOWN) {
-            LOG_WARN("Tell me when this happens");
-            flags |= 1;
+        if (flags & BR_MODU_UNKNOWN) {
+            flags |= BR_MODU_NORMALS;
         }
         if (model->flags & (BR_MODF_KEEP_ORIGINAL | BR_MODF_GENERATE_TAGS)) {
             model->flags |= BR_MODF_UPDATEABLE;
@@ -317,7 +319,7 @@ void BrModelUpdate(br_model* model, br_uint_16 flags) {
                 }
             }
         } else {
-            LOG_WARN("Do we get here??");
+            LOG_WARN("Do we ever get here??");
             // v11m = (v11model*)model->prepared;
             // if (model->vertices && flags & 0xF) {
             //     for (g = 0; g < v11m->ngroups; g++) {
@@ -393,6 +395,7 @@ void BrModelUpdate(br_model* model, br_uint_16 flags) {
 
         // We arent generating optimized model or storing at this point, so
         // we do not want to free the faces/verts
+
         // if (model->flags >= 0) {
         //     if (model->faces) {
         //         BrResFree(model->faces);
