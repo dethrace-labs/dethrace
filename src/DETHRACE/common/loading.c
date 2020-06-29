@@ -380,9 +380,9 @@ br_pixelmap* LoadPixelmap(char* pName) {
     char* end;
     LOG_TRACE("(\"%s\")", pName);
 
-    end = strrchr(pName, ".");
+    end = strrchr(pName, '.');
     if (!end) {
-        end = pName[strlen(pName)];
+        end = &pName[strlen(pName)];
     }
 
     if ((end - pName) != 4 || memcmp(pName, "none", end - pName) != 0) {

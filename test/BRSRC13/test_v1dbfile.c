@@ -1,5 +1,6 @@
 #include "framework/unity.h"
 
+#include "CORE/PIXELMAP/pmfile.h"
 #include "CORE/V1DB/actsupt.h"
 #include "CORE/V1DB/modsupt.h"
 #include "CORE/V1DB/regsupt.h"
