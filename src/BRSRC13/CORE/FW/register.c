@@ -33,7 +33,7 @@ void* BrRegistryAdd(br_registry* reg, void* item) {
 
     e = (br_registry_entry*)BrResAllocate(fw.res, sizeof(br_registry_entry), BR_MEMORY_REGISTRY);
     e->item = (char**)item;
-    BrAddHead(&reg->list, &e->node);
+    BrAddHead(&reg->list, (br_node*)e);
     reg->count++;
     return item;
 }
@@ -75,9 +75,16 @@ int BrRegistryRemoveMany(br_registry* reg, void** items, int n) {
 // EDX: pattern
 void* BrRegistryFind(br_registry* reg, char* pattern) {
     br_registry_entry* e;
+    br_pixelmap* pm;
+    LOG_TRACE("(%p, \"%s\")", reg, pattern);
 
+    LOG_DEBUG("count %d", reg->count);
     e = (br_registry_entry*)reg->list.head;
+
+    pm = (br_pixelmap*)e->item;
+
     if (e->item) {
+        LOG_DEBUG("got e->item %s", e->item[1]);
         // as a char**, e->item[1] actually points to `identifier` field in a br_* struct etc
         while (!BrNamePatternMatch(pattern, e->item[1])) {
             e = (br_registry_entry*)e->node.next;
@@ -90,9 +97,12 @@ void* BrRegistryFind(br_registry* reg, char* pattern) {
         }
         return e->item;
     }
+    LOG_DEBUG("failed hookxx");
     if (reg->find_failed_hook) {
+        LOG_DEBUG("failed hook");
         return reg->find_failed_hook(pattern);
     }
+    LOG_DEBUG("failed hook none");
     return NULL;
 }
 

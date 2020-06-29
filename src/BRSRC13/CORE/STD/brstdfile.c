@@ -28,7 +28,6 @@ char rscid[52]; // $Id: stdfile.c 2.7 1996/11/20 18:07:52 STEVEW Exp $
 // Size: 40
 br_uint_32 BrStdioAttributes() {
     return BR_FS_ATTR_READABLE | BR_FS_ATTR_WRITEABLE | BR_FS_ATTR_HAS_TEXT | BR_FS_ATTR_HAS_BINARY | BR_FS_ATTR_HAS_ADVANCE;
-    NOT_IMPLEMENTED();
 }
 
 // Offset: 74
@@ -71,7 +70,6 @@ void* BrStdioOpenRead(char* name, br_size_t n_magics, br_mode_test_cbfn* identif
         BrFailure("BrStdFileOpenRead: invalid open_mode %d", open_mode);
         return NULL;
     }
-    LOG_DEBUG("returning pointer %p", fh);
     return fh;
 }
 

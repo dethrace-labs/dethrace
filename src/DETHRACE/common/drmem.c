@@ -353,9 +353,9 @@ void MAMSLock(void** pPtr) {
 void CreateStainlessClasses() {
     int i;
 
-    for (i = 0; i < 118; i++) {
-        gStainless_classes[i + 129].res_class = i;
-        if (!BrResClassAdd(&gStainless_classes[i + 129])) {
+    for (i = 129; i < 246; i++) {
+        gStainless_classes[i - 129].res_class = i;
+        if (!BrResClassAdd(&gStainless_classes[i - 129])) {
             FatalError(94);
         }
     }

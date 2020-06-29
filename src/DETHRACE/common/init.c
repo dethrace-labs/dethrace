@@ -182,7 +182,10 @@ void InitializeBRenderEnvironment() {
 // Offset: 2496
 // Size: 79
 void InitBRFonts() {
-    NOT_IMPLEMENTED();
+    LOG_TRACE("()");
+    gBig_font = LoadBRFont("BIGFONT.FNT");
+    gFont_7 = LoadBRFont("FONT7.FNT");
+    gHeadup_font = LoadBRFont("HEADUP.FNT");
 }
 
 // Offset: 2576
@@ -219,6 +222,7 @@ void Init2DStuff() {
 // EAX: pArgc
 // EDX: pArgv
 void InitialiseApplication(int pArgc, char** pArgv) {
+
     gProgram_state.sausage_eater_mode = gSausage_override;
     DrDebugLog(gSausage_override, *pArgv);
     if (gAustere_override || PDDoWeLeadAnAustereExistance() != 0) {
@@ -228,8 +232,10 @@ void InitialiseApplication(int pArgc, char** pArgv) {
     srand(time(NULL));
     BrV1dbBeginWrapper_Float();
     CreateStainlessClasses();
+
     InitWobbleStuff();
     LoadGeneralParameters();
+
     DefaultNetName();
     strcpy(gProgram_state.player_name[0], "MAX DAMAGE");
     strcpy(gProgram_state.player_name[1], "DIE ANNA");
@@ -244,9 +250,11 @@ void InitialiseApplication(int pArgc, char** pArgv) {
     CalcGrafDataIndex();
 
     InitializeBRenderEnvironment();
+
     InitDRFonts();
     InitBRFonts();
     LoadMiscStrings();
+
     LoadInRegistees();
     FinishLoadingGeneral();
 

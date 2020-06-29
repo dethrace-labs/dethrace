@@ -13,8 +13,6 @@ char rscid[48];
 br_resource_class* BrResClassAdd(br_resource_class* rclass) {
     br_resource_class* r;
 
-    //printf("BrResClassAdd: id: %s, %d = %p\n", rclass->identifier, rclass->res_class, fw.resource_class_index[rclass->res_class]);
-
     r = BrRegistryAdd(&fw.reg_resource_classes, rclass);
     if (!r) {
         return NULL;

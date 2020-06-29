@@ -131,7 +131,7 @@ int gFrame_rate;
 int gNumber_of_racers;
 int gSound_enabled;
 int gInfo_on;
-int gGraf_spec_index;
+int gGraf_spec_index = 0;
 int gTyping;
 int gSound_available;
 int gNumber_of_races;

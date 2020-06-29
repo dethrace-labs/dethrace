@@ -368,7 +368,7 @@ void LoadGeneralParameters() {
 // Offset: 3472
 // Size: 53
 void FinishLoadingGeneral() {
-    NOT_IMPLEMENTED();
+    /*dword_1298C0 = */ BrMaterialFind(gDef_def_water_screen_name);
 }
 
 // Offset: 3528
@@ -376,9 +376,29 @@ void FinishLoadingGeneral() {
 // EAX: pName
 br_pixelmap* LoadPixelmap(char* pName) {
     tPath_name the_path;
-    br_pixelmap* pm;
+    br_pixelmap* pm = NULL;
     char* end;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(\"%s\")", pName);
+
+    end = strrchr(pName, ".");
+    if (!end) {
+        end = pName[strlen(pName)];
+    }
+
+    if ((end - pName) != 4 || memcmp(pName, "none", end - pName) != 0) {
+        PossibleService();
+        PathCat(the_path, gApplication_path, gGraf_specs[gGraf_spec_index].data_dir_name);
+        PathCat(the_path, the_path, "PIXELMAP");
+        PathCat(the_path, the_path, pName);
+        gAllow_open_to_fail = 1;
+        pm = DRPixelmapLoad(the_path);
+        if (!pm) {
+            PathCat(the_path, gApplication_path, "PIXELMAP");
+            PathCat(the_path, the_path, pName);
+            pm = DRPixelmapLoad(the_path);
+        }
+        return pm;
+    }
 }
 
 // Offset: 3820
@@ -442,7 +462,9 @@ br_actor* LoadActor(char* pName) {
 void DRLoadPalette(char* pPath_name) {
     br_pixelmap* palette_array[100];
     int number_of_palettes;
-    NOT_IMPLEMENTED();
+
+    number_of_palettes = DRPixelmapLoadMany(pPath_name, palette_array, 100);
+    BrTableAddMany(palette_array, number_of_palettes);
 }
 
 // Offset: 4584
@@ -451,7 +473,9 @@ void DRLoadPalette(char* pPath_name) {
 void DRLoadShadeTable(char* pPath_name) {
     br_pixelmap* table_array[100];
     int number_of_tables;
-    NOT_IMPLEMENTED();
+
+    number_of_tables = DRPixelmapLoadMany(pPath_name, table_array, 100);
+    BrTableAddMany(table_array, number_of_tables);
 }
 
 // Offset: 4664
@@ -468,7 +492,16 @@ void RezeroPixelmaps(br_pixelmap** pPixelmap_array, int pCount) {
 void DRLoadPixelmaps(char* pPath_name) {
     br_pixelmap* pixelmap_array[100];
     int number_of_pixelmaps;
-    NOT_IMPLEMENTED();
+
+    int i;
+    PossibleService();
+    number_of_pixelmaps = DRPixelmapLoadMany(pPath_name, pixelmap_array, 100);
+
+    for (i = 0; i < number_of_pixelmaps; i++) {
+        pixelmap_array[i]->origin_x = 0;
+        pixelmap_array[i]->origin_y = 0;
+    }
+    BrMapAddMany(pixelmap_array, number_of_pixelmaps);
 }
 
 // Offset: 4848
@@ -477,7 +510,10 @@ void DRLoadPixelmaps(char* pPath_name) {
 void DRLoadMaterials(char* pPath_name) {
     br_material* material_array[100];
     int number_of_materials;
-    NOT_IMPLEMENTED();
+
+    PossibleService();
+    number_of_materials = BrMaterialLoadMany(pPath_name, material_array, 100);
+    BrMaterialAddMany(material_array, number_of_materials);
 }
 
 // Offset: 4952
@@ -524,13 +560,30 @@ void LoadInFiles(char* pThe_base_path, char* pThe_dir_name, void (*pLoad_routine
 // EAX: pThe_dir_path
 void LoadInRegisteeDir(char* pThe_dir_path) {
     tPath_name the_path;
-    NOT_IMPLEMENTED();
+    tPath_name reg_path;
+    LOG_TRACE("(\"%s\")", pThe_dir_path);
+
+    PathCat(reg_path, pThe_dir_path, "REG");
+    PathCat(the_path, reg_path, "PALETTES");
+    PDForEveryFile(the_path, DRLoadPalette);
+    PathCat(the_path, reg_path, "SHADETAB");
+    PDForEveryFile(the_path, DRLoadShadeTable);
+    PathCat(the_path, reg_path, "PIXELMAP");
+    PDForEveryFile(the_path, DRLoadPixelmaps);
+    PathCat(the_path, reg_path, "MATERIAL");
+    PDForEveryFile(the_path, DRLoadMaterials);
+    PathCat(the_path, reg_path, "MODELS");
+    PDForEveryFile(the_path, DRLoadModels);
+    PathCat(the_path, reg_path, "ACTORS");
+    PDForEveryFile(the_path, DRLoadActors);
+    PathCat(the_path, reg_path, "LIGHTS");
+    PDForEveryFile(the_path, DRLoadLights);
 }
 
 // Offset: 5608
 // Size: 44
 void LoadInRegistees() {
-    NOT_IMPLEMENTED();
+    LoadInRegisteeDir(gApplication_path);
 }
 
 // Offset: 5652
@@ -1044,7 +1097,40 @@ br_font* LoadBRFont(char* pName) {
     br_font* the_font;
     tU32 data_size;
     int i;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(\"%s\")", pName);
+
+    PathCat(the_path, gApplication_path, gGraf_specs[gGraf_spec_index].data_dir_name);
+    PathCat(the_path, the_path, "FONTS");
+    PathCat(the_path, the_path, pName);
+    f = DRfopen(the_path, "rb");
+    PossibleService();
+    the_font = BrMemAllocate(sizeof(br_font), 0xA6u);
+
+    // we read 0x18 bytes as that is the size of the struct in 32 bit code.
+    fread(the_font, 0x18, 1u, f);
+    the_font->flags = BrSwap32(the_font->flags);
+    the_font->glyph_x = the_font->glyph_x >> 8 | the_font->glyph_x << 8;
+    the_font->glyph_y = the_font->glyph_y >> 8 | the_font->glyph_y << 8;
+    the_font->spacing_x = the_font->spacing_x >> 8 | the_font->spacing_x << 8;
+    the_font->spacing_y = the_font->spacing_y >> 8 | the_font->spacing_y << 8;
+
+    data_size = sizeof(br_int_8) * 256;
+    the_font->width = BrMemAllocate(data_size, 0xA7u);
+    fread(the_font->width, data_size, 1, f);
+    data_size = sizeof(br_uint_16) * 256;
+    the_font->encoding = BrMemAllocate(data_size, 0xA8u);
+    fread(the_font->encoding, data_size, 1u, f);
+    for (i = 0; i < 256; i++) {
+        the_font->encoding[i] = the_font->encoding[i] >> 8 | the_font->encoding[i] << 8;
+    }
+    PossibleService();
+    fread(&data_size, sizeof(tU32), 1u, f);
+    data_size = BrSwap32(data_size);
+    PossibleService();
+    the_font->glyphs = BrMemAllocate(data_size, 0xA9u);
+    fread(the_font->glyphs, data_size, 1u, f);
+    fclose(f);
+    return the_font;
 }
 
 // Offset: 33044
@@ -1361,10 +1447,26 @@ void DisposeOpponentsCars(tRace_info* pRace_info) {
 // Offset: 36908
 // Size: 211
 void LoadMiscStrings() {
+    int i;
     FILE* f;
     char s[256];
     tPath_name the_path;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("()");
+
+    PathCat(the_path, gApplication_path, "TEXT.TXT");
+    f = DRfopen(the_path, "rt");
+    if (!f) {
+        FatalError(99);
+    }
+    for (i = 0; i < 250; i++) {
+        GetALineAndDontArgue(f, s);
+        gMisc_strings[i] = BrMemAllocate(strlen(s) + 1, 0xABu);
+        strcpy(gMisc_strings[i], s);
+        if (feof(f)) {
+            break;
+        }
+    }
+    fclose(f);
 }
 
 // Offset: 37120
@@ -1509,6 +1611,9 @@ FILE* DRfopen(char* pFilename, char* pMode) {
             sprintf(msg, "DRfopen( \"%s\", \"%s\" ) failed", pFilename, pMode);
             PDFatalError(msg);
         }
+    }
+    if (!result) {
+        LOG_WARN("DRfopen failed");
     }
     return result;
 }

@@ -755,7 +755,27 @@ int DfBlockWriteBinary(br_datafile* df, void* base, int block_size, int block_st
 void* DfBlockReadBinary(br_datafile* df, void* base, int* count, int size, int mtype) {
     int l;
     int s;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%p, %p, %p, %d, %d)", df, base, count, size, mtype);
+
+    BrFileRead(&l, 4, 1, df->h);
+    l = BrSwap32(l);
+    BrFileRead(&s, 4, 1, df->h);
+    s = BrSwap32(s);
+    if (s != size) {
+        BrFailure("block size mismatch");
+    }
+    if (base) {
+        if (l > *count) {
+            LOG_DEBUG("s %d, l %d, count %d", s, l, *count);
+            BrFailure("DfBlockReadBinary: block too long: %d", l);
+        }
+    } else {
+        base = BrResAllocate(df->res ? df->res : fw.res, size * l, mtype);
+    }
+    *count = l;
+    BrFileRead(base, l, size, df->h);
+    BrSwapBlock(base, l, size);
+    return base;
 }
 
 // Offset: 12136
@@ -876,7 +896,7 @@ int DfChunksInterpret(br_datafile* df, br_chunks_table* table) {
 
     while (1) {
         id = df->prims->chunk_read(df, &length);
-        LOG_DEBUG("id %d %d", id, length);
+        LOG_DEBUG("chunk id=%d, len=%d", id, length);
         if (id == -1) {
             break;
         }

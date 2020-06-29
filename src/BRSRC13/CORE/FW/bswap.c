@@ -40,5 +40,26 @@ void* BrSwapBlock(void* block, int count, int size) {
     br_uint_8* cp;
     int i;
     int k;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%p, %d, %d)", block, count, size);
+
+    cp = (br_uint_8*)block;
+    switch (size) {
+    case 1:
+        return block;
+
+    case 4:
+        for (i = 0; i < count; i++) {
+            k = cp[0];
+            cp[0] = cp[3];
+            cp[3] = k;
+            k = cp[1];
+            cp[1] = cp[2];
+            cp[2] = k;
+            cp += 4;
+        }
+        break;
+
+    default:
+        LOG_PANIC("size not implemented");
+    }
 }

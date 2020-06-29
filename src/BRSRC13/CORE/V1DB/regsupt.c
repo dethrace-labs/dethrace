@@ -1,7 +1,10 @@
 #include "regsupt.h"
 #include "CORE/FW/register.h"
 #include "CORE/V1DB/dbsetup.h"
+#include "CORE/V1DB/prepmap.h"
+#include "CORE/V1DB/prepmatl.h"
 #include "CORE/V1DB/prepmesh.h"
+#include "CORE/V1DB/preptab.h"
 
 #include "debug.h"
 
@@ -100,8 +103,16 @@ br_material_find_cbfn* BrMaterialFindHook(br_material_find_cbfn* hook) {
 // Size: 164
 br_uint_32 BrMaterialAddMany(br_material** items, int n) {
     int i;
-    int r;
-    NOT_IMPLEMENTED();
+    int r = 0;
+
+    for (i = 0; i < n; i++) {
+        BrRegistryAdd(&v1db.reg_materials, items[i]);
+        BrMaterialUpdate(items[i], 0x7FFFu);
+        if (items[i]) {
+            r++;
+        }
+    }
+    return r;
 }
 
 // Offset: 1612
@@ -133,7 +144,10 @@ br_uint_32 BrMaterialEnum(char* pattern, br_material_enum_cbfn* callback, void* 
 // Offset: 1994
 // Size: 101
 br_pixelmap* BrMapAdd(br_pixelmap* pixelmap) {
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%p)", pixelmap);
+    BrRegistryAdd(&v1db.reg_textures, pixelmap);
+    BrMapUpdate(pixelmap, 0xFFFu);
+    return pixelmap;
 }
 
 // Offset: 2107
@@ -145,7 +159,8 @@ br_pixelmap* BrMapRemove(br_pixelmap* pixelmap) {
 // Offset: 2205
 // Size: 49
 br_pixelmap* BrMapFind(char* pattern) {
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(\"%s\")", pattern);
+    return BrRegistryFind(&v1db.reg_textures, pattern);
 }
 
 // Offset: 2268
@@ -160,7 +175,15 @@ br_map_find_cbfn* BrMapFindHook(br_map_find_cbfn* hook) {
 br_uint_32 BrMapAddMany(br_pixelmap** items, int n) {
     int i;
     int r;
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < n; i++) {
+        BrRegistryAdd(&v1db.reg_textures, items[i]);
+        BrMapUpdate(items[i], 4095);
+        if (items[i]) {
+            r++;
+        }
+    }
+    return r++;
 }
 
 // Offset: 2547
@@ -204,7 +227,8 @@ br_pixelmap* BrTableRemove(br_pixelmap* pixelmap) {
 // Offset: 3131
 // Size: 49
 br_pixelmap* BrTableFind(char* pattern) {
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(\"%s\")", pattern);
+    return BrRegistryFind(&v1db.reg_tables, pattern);
 }
 
 // Offset: 3196
@@ -219,7 +243,15 @@ br_table_find_cbfn* BrTableFindHook(br_table_find_cbfn* hook) {
 br_uint_32 BrTableAddMany(br_pixelmap** items, int n) {
     int i;
     int r;
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < n; i++) {
+        BrRegistryAdd(&v1db.reg_tables, items[i]);
+        BrTableUpdate(items[i], 0x7FFFu);
+        if (items[i]) {
+            ++r;
+        }
+    }
+    return r;
 }
 
 // Offset: 3479

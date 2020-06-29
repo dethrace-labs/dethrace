@@ -1020,6 +1020,7 @@ typedef struct br_rectangle {
     br_int_32 h;
 } br_rectangle;
 
+#pragma pack(push, 1)
 typedef struct br_font {
     br_uint_32 flags;
     br_uint_16 glyph_x;
@@ -1030,6 +1031,7 @@ typedef struct br_font {
     br_uint_16* encoding;
     br_uint_8* glyphs;
 } br_font;
+#pragma pack(pop)
 
 typedef struct br_object {
 } br_object;

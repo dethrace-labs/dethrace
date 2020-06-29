@@ -3,6 +3,8 @@
 
 #include "br_types.h"
 
+extern pm_type_info pmTypeInfo[30];
+
 // Offset: 26
 // Size: 498
 // EAX: type

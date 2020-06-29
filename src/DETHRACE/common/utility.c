@@ -242,7 +242,7 @@ char* GetALineWithNoPossibleService(FILE* pF, /*unsigned*/ char* pS) {
 // EAX: pF
 // EDX: pS
 char* GetALineAndDontArgue(FILE* pF, char* pS) {
-    PossibleService(pF, pS);
+    PossibleService();
     return GetALineWithNoPossibleService(pF, pS);
     NOT_IMPLEMENTED();
 }
@@ -297,7 +297,12 @@ int BooleanTo1Or0(int pB) {
 // ECX: pPixels
 br_pixelmap* DRPixelmapAllocate(br_uint_8 pType, br_uint_16 pW, br_uint_16 pH, void* pPixels, int pFlags) {
     br_pixelmap* the_map;
-    NOT_IMPLEMENTED();
+    the_map = BrPixelmapAllocate(pType, pW, pH, pPixels, pFlags);
+    if (the_map) {
+        the_map->origin_y = 0;
+        the_map->origin_x = 0;
+    }
+    return the_map;
 }
 
 // Offset: 2348
@@ -399,7 +404,15 @@ br_pixelmap* PurifiedPixelmap(br_pixelmap* pSrc) {
 // EAX: pFile_name
 br_pixelmap* DRPixelmapLoad(char* pFile_name) {
     br_pixelmap* the_map;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(\"%s\")", pFile_name);
+
+    the_map = BrPixelmapLoad(pFile_name);
+    if (the_map) {
+        the_map->origin_x = 0;
+        the_map->origin_y = 0;
+        the_map->row_bytes = (the_map->row_bytes + 3) & 0xFC;
+    }
+    return the_map;
 }
 
 // Offset: 4364
@@ -411,7 +424,16 @@ br_uint_32 DRPixelmapLoadMany(char* pFile_name, br_pixelmap** pPixelmaps, br_uin
     br_pixelmap* the_map;
     int number_loaded;
     int i;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(\"%s\", %p, %d)", pFile_name, pPixelmaps, pNum);
+
+    number_loaded = BrPixelmapLoadMany(pFile_name, pPixelmaps, pNum);
+    for (i = 0; i < number_loaded; i++) {
+        the_map = pPixelmaps[i];
+        the_map->row_bytes = (the_map->row_bytes + 3) & 0xFC;
+        the_map->base_x = 0;
+        the_map->base_y = 0;
+    }
+    return number_loaded;
 }
 
 // Offset: 4540

@@ -103,6 +103,7 @@ br_error BrFwBegin() {
     BrSystemConfigBegin();
     fw.bAlreadyLoadedDrivers = 0;
     BrImageAdd(&Image_BRCORE1);
+
     return 0;
 }
 
