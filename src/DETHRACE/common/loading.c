@@ -1109,6 +1109,8 @@ br_font* LoadBRFont(char* pName) {
     // we read 0x18 bytes as that is the size of the struct in 32 bit code.
     fread(the_font, 0x18, 1u, f);
     the_font->flags = BrSwap32(the_font->flags);
+
+    // swap endianness
     the_font->glyph_x = the_font->glyph_x >> 8 | the_font->glyph_x << 8;
     the_font->glyph_y = the_font->glyph_y >> 8 | the_font->glyph_y << 8;
     the_font->spacing_x = the_font->spacing_x >> 8 | the_font->spacing_x << 8;

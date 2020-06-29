@@ -83,7 +83,6 @@ void* BrRegistryFind(br_registry* reg, char* pattern) {
     pm = (br_pixelmap*)e->item;
 
     if (e->item) {
-        LOG_DEBUG("got e->item %s", e->item[1]);
         // as a char**, e->item[1] actually points to `identifier` field in a br_* struct etc
         while (!BrNamePatternMatch(pattern, e->item[1])) {
             e = (br_registry_entry*)e->node.next;

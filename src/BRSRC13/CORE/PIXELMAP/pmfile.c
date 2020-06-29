@@ -20,6 +20,7 @@ br_file_struct_member br_pixelmap_FM[8] = {
     { 3u, offsetof(br_pixelmap, origin_x), "origin_x", NULL },
     { 3u, offsetof(br_pixelmap, origin_y), "origin_y", NULL },
     { 17u, offsetof(br_pixelmap, identifier), "identifier", NULL },
+    //not sure about this one...
     { 31436u, 7u, &br_pixelmap_FM, (void*)0x44 }
 };
 br_file_struct br_pixelmap_F = { "br_pixelmap", 7u, br_pixelmap_FM, sizeof(br_pixelmap) };
