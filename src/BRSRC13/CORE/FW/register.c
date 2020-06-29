@@ -76,9 +76,8 @@ int BrRegistryRemoveMany(br_registry* reg, void** items, int n) {
 void* BrRegistryFind(br_registry* reg, char* pattern) {
     br_registry_entry* e;
     br_pixelmap* pm;
-    LOG_TRACE("(%p, \"%s\")", reg, pattern);
+    LOG_TRACE8("(%p, \"%s\")", reg, pattern);
 
-    LOG_DEBUG("count %d", reg->count);
     e = (br_registry_entry*)reg->list.head;
 
     pm = (br_pixelmap*)e->item;
@@ -97,12 +96,9 @@ void* BrRegistryFind(br_registry* reg, char* pattern) {
         }
         return e->item;
     }
-    LOG_DEBUG("failed hookxx");
     if (reg->find_failed_hook) {
-        LOG_DEBUG("failed hook");
         return reg->find_failed_hook(pattern);
     }
-    LOG_DEBUG("failed hook none");
     return NULL;
 }
 

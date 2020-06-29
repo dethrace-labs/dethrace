@@ -7,8 +7,18 @@
 #define LOG_LEVEL 3
 
 #define LOG_TRACE(...) debug_printf("[TRACE] %s", __FUNCTION__, __VA_ARGS__)
+
 #define LOG_TRACE10(...)                                       \
     if (LOG_LEVEL >= 10) {                                     \
+        debug_printf("[TRACE] %s", __FUNCTION__, __VA_ARGS__); \
+    }
+#define LOG_TRACE9(...)                                        \
+    if (LOG_LEVEL >= 9) {                                      \
+        debug_printf("[TRACE] %s", __FUNCTION__, __VA_ARGS__); \
+    }
+
+#define LOG_TRACE8(...)                                        \
+    if (LOG_LEVEL >= 8) {                                      \
         debug_printf("[TRACE] %s", __FUNCTION__, __VA_ARGS__); \
     }
 

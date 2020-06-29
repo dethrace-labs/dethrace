@@ -500,7 +500,6 @@ void PDForEveryFile(char* pThe_path, void (*pAction_routine)(char*)) {
             // only files, and only files that dont start with '.'
             if (entry->d_type == DT_REG && entry->d_name[0] != '.') {
                 PathCat(found_path, pThe_path, entry->d_name);
-                LOG_DEBUG(found_path);
                 pAction_routine(found_path);
             }
         }

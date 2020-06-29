@@ -766,7 +766,6 @@ void* DfBlockReadBinary(br_datafile* df, void* base, int* count, int size, int m
     }
     if (base) {
         if (l > *count) {
-            LOG_DEBUG("s %d, l %d, count %d", s, l, *count);
             BrFailure("DfBlockReadBinary: block too long: %d", l);
         }
     } else {

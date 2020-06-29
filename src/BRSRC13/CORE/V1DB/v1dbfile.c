@@ -529,7 +529,6 @@ int FopRead_PIXELMAP_REF(br_datafile* df, br_uint_32 id, br_uint_32 length, br_u
     } else {
         pm = BrMapFind(name);
     }
-    LOG_DEBUG("found pixelmap %p", pm);
     *(intptr_t*)(mp + MaterialMaps[i].offset) = (intptr_t*)pm;
     return 0;
 }

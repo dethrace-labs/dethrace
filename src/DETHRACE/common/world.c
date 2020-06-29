@@ -785,7 +785,7 @@ void HideStoredOpaqueTextures(tBrender_storage* pStorage) {
                 pStorage->saved_colour_maps[i] = pStorage->materials[i]->colour_map;
                 pStorage->materials[i]->colour_map = NULL;
                 pStorage->materials[i]->flags &= 0xFDu;
-                BrMaterialUpdate(pStorage->materials[i], 0x7FFFu);
+                BrMaterialUpdate(pStorage->materials[i], BR_MATU_ALL);
             }
         }
     }
@@ -803,7 +803,7 @@ void RevealStoredTransparentTextures(tBrender_storage* pStorage) {
                 pStorage->materials[i]->colour_map = pStorage->saved_colour_maps[i];
                 pStorage->saved_colour_maps[i] = NULL;
                 pStorage->materials[i]->flags |= 2u;
-                BrMaterialUpdate(pStorage->materials[i], 0x7FFFu);
+                BrMaterialUpdate(pStorage->materials[i], BR_MATU_ALL);
             }
         }
     }
@@ -821,7 +821,7 @@ void HideStoredTextures(tBrender_storage* pStorage) {
                 pStorage->saved_colour_maps[i] = pStorage->materials[i]->colour_map;
                 pStorage->materials[i]->colour_map = NULL;
                 pStorage->materials[i]->flags &= 0xFDu;
-                BrMaterialUpdate(pStorage->materials[i], 0x7FFFu);
+                BrMaterialUpdate(pStorage->materials[i], BR_MATU_ALL);
             }
         }
     }
@@ -837,8 +837,8 @@ void RevealStoredTextures(tBrender_storage* pStorage) {
         if (pStorage->saved_colour_maps[i]) {
             pStorage->materials[i]->colour_map = pStorage->saved_colour_maps[i];
             pStorage->saved_colour_maps[i] = NULL;
-            pStorage->materials[i]->flags |= 2u;
-            BrMaterialUpdate(pStorage->materials[i], 0x7FFFu);
+            pStorage->materials[i]->flags |= BR_MATF_PRELIT;
+            BrMaterialUpdate(pStorage->materials[i], BR_MATU_ALL);
         }
     }
 }

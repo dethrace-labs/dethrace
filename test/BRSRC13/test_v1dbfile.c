@@ -1,6 +1,5 @@
 #include "framework/unity.h"
 
-//#include "CORE/PIXELMAP/pmfile.h"
 #include "CORE/V1DB/actsupt.h"
 #include "CORE/V1DB/modsupt.h"
 #include "CORE/V1DB/regsupt.h"
@@ -55,18 +54,8 @@ void test_v1dbfile_BrMaterialLoad() {
     TEST_ASSERT_EQUAL_PTR(pm, m->colour_map);
 }
 
-void test_v1dbfile_BrPixelmapLoad2() {
-    br_pixelmap* pm;
-    pm = BrPixelmapLoad("DATA/PIXELMAPS/LAVA.PIX");
-    TEST_ASSERT_NOT_NULL(pm);
-    TEST_ASSERT_EQUAL_STRING("LAVA.PIX", pm->identifier);
-    TEST_ASSERT_EQUAL_INT(256, pm->width);
-    TEST_ASSERT_EQUAL_INT(256, pm->height);
-}
-
 void test_v1dbfile_suite() {
     RUN_TEST(test_v1dbfile_BrModelLoad);
     RUN_TEST(test_v1dbfile_BrActorLoad);
     RUN_TEST(test_v1dbfile_BrMaterialLoad);
-    RUN_TEST(test_v1dbfile_BrPixelmapLoad2);
 }

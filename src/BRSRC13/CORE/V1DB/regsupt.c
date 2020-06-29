@@ -14,7 +14,7 @@ char rscid[51];
 // Size: 148
 br_model* BrModelAdd(br_model* model) {
     BrRegistryAdd(&v1db.reg_models, model);
-    BrModelUpdate(model, 0x7FFF);
+    BrModelUpdate(model, BR_MODU_ALL);
     return model;
 }
 
@@ -107,7 +107,7 @@ br_uint_32 BrMaterialAddMany(br_material** items, int n) {
 
     for (i = 0; i < n; i++) {
         BrRegistryAdd(&v1db.reg_materials, items[i]);
-        BrMaterialUpdate(items[i], 0x7FFFu);
+        BrMaterialUpdate(items[i], BR_MATU_ALL);
         if (items[i]) {
             r++;
         }
@@ -246,7 +246,7 @@ br_uint_32 BrTableAddMany(br_pixelmap** items, int n) {
 
     for (i = 0; i < n; i++) {
         BrRegistryAdd(&v1db.reg_tables, items[i]);
-        BrTableUpdate(items[i], 0x7FFFu);
+        BrTableUpdate(items[i], BR_TABU_ALL);
         if (items[i]) {
             ++r;
         }

@@ -232,44 +232,32 @@ void InitialiseApplication(int pArgc, char** pArgv) {
     srand(time(NULL));
     BrV1dbBeginWrapper_Float();
     CreateStainlessClasses();
-
     InitWobbleStuff();
     LoadGeneralParameters();
-
     DefaultNetName();
     strcpy(gProgram_state.player_name[0], "MAX DAMAGE");
     strcpy(gProgram_state.player_name[1], "DIE ANNA");
-
     RestoreOptions();
-
     LoadKeyMapping();
-
     if (!PDInitScreenVars(pArgc, pArgv)) {
         FatalError(0);
     }
     CalcGrafDataIndex();
-
     InitializeBRenderEnvironment();
-
     InitDRFonts();
     InitBRFonts();
     LoadMiscStrings();
-
     LoadInRegistees();
     FinishLoadingGeneral();
-
     InitializePalettes();
     AustereWarning();
     LoadInterfaceStrings();
-
     InitializeActionReplay();
     FlicPaletteAllocate();
     InitInterfaceLoadState();
-
     InitTransientBitmaps();
     InitSound();
     InitHeadups();
-
     gDefault_track_material = BrMaterialAllocate("gDefault_track_material");
     gDefault_track_material->index_base = 227;
     gDefault_track_material->index_range = 1;
@@ -293,7 +281,6 @@ void InitialiseApplication(int pArgc, char** pArgv) {
         while (PDGetTotalTime() - gAustere_time < 2000) {
         }
     }
-
     ClearEntireScreen();
     InitSkids();
     InitPeds();
