@@ -1,7 +1,9 @@
 #include "framework/unity.h"
 
+#include "CORE/PIXELMAP/pmfile.h"
 #include "CORE/V1DB/actsupt.h"
 #include "CORE/V1DB/modsupt.h"
+#include "CORE/V1DB/regsupt.h"
 #include "CORE/V1DB/v1dbfile.h"
 
 void test_v1dbfile_BrModelLoad() {
@@ -31,7 +33,30 @@ void test_v1dbfile_BrActorLoad() {
     BrActorFree(a);
 }
 
+void test_v1dbfile_BrMaterialLoad() {
+    br_material* m;
+    br_pixelmap* pm;
+
+    pm = BrPixelmapLoad("DATA/PIXELMAPS/LAVA.PIX");
+    TEST_ASSERT_NOT_NULL(pm);
+    TEST_ASSERT_EQUAL_STRING("LAVA.PIX", pm->identifier);
+    BrMapAdd(pm);
+
+    m = BrMaterialLoad("DATA/MATERIALS/LAVA.MAT");
+
+    TEST_ASSERT_EQUAL_INT(1, m->map_transform.m[0][0]);
+    TEST_ASSERT_EQUAL_INT(0, m->map_transform.m[0][1]);
+    TEST_ASSERT_EQUAL_INT(0, m->map_transform.m[1][0]);
+    TEST_ASSERT_EQUAL_INT(1, m->map_transform.m[1][1]);
+    TEST_ASSERT_EQUAL_INT(0, m->map_transform.m[2][0]);
+    TEST_ASSERT_EQUAL_INT(0, m->map_transform.m[2][1]);
+
+    TEST_ASSERT_NOT_NULL(m);
+    TEST_ASSERT_EQUAL_PTR(pm, m->colour_map);
+}
+
 void test_v1dbfile_suite() {
     RUN_TEST(test_v1dbfile_BrModelLoad);
     RUN_TEST(test_v1dbfile_BrActorLoad);
+    RUN_TEST(test_v1dbfile_BrMaterialLoad);
 }

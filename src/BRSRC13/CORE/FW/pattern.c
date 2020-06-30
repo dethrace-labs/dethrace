@@ -8,7 +8,7 @@ char rscid[49];
 // Size: 391
 br_boolean BrNamePatternMatch(char* p, char* s) {
     char* cp;
-    LOG_TRACE("(\"%s\", \"%s\")", p, s);
+    LOG_TRACE9("(\"%s\", \"%s\")", p, s);
 
     if (!p) {
         return 1;

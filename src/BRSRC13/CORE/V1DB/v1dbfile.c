@@ -5,6 +5,7 @@
 #include "CORE/FW/resource.h"
 #include "CORE/V1DB/actsupt.h"
 #include "CORE/V1DB/dbsetup.h"
+#include "CORE/V1DB/matsupt.h"
 #include "CORE/V1DB/modsupt.h"
 #include "CORE/V1DB/regsupt.h"
 #include "debug.h"
@@ -12,8 +13,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-br_chunks_table_entry MaterialLoadEntries[8];
-br_chunks_table MaterialLoadTable;
+br_chunks_table_entry MaterialLoadEntries[8] = {
+    { 0u, 0u, &FopRead_END },
+    { 4u, 0u, &FopRead_MATERIAL_OLD },
+    { 28u, 0u, &FopRead_PIXELMAP_REF },
+    { 30u, 0u, &FopRead_PIXELMAP_REF },
+    { 31u, 0u, &FopRead_PIXELMAP_REF },
+    { 32u, 0u, &FopRead_PIXELMAP_REF },
+    { 59u, 0u, &FopRead_PIXELMAP_REF },
+    { 60u, 0u, &FopRead_MATERIAL }
+};
+
+br_chunks_table MaterialLoadTable = { 8, MaterialLoadEntries };
 
 br_file_struct br_camera_F;
 br_file_enum camera_type_F;
@@ -63,14 +74,32 @@ br_file_struct_member br_actor_FM[3] = {
 br_file_struct br_actor_F = { "br_actor", 3u, br_actor_FM, sizeof(br_actor) };
 br_file_enum render_style_F;
 
-br_file_struct br_material_old_F;
 br_file_struct_member br_material_FM[17];
 br_file_struct br_material_F;
-br_file_struct_member br_material_old_FM[13];
-br_file_struct br_pivot_F;
+
+br_file_struct_member br_material_old_FM[13] = {
+    { 18u, offsetof(br_material, colour), "colour", NULL },
+    { 1u, offsetof(br_material, opacity), "opacity", NULL },
+    { 12u, offsetof(br_material, ka), "ka", NULL },
+    { 12u, offsetof(br_material, kd), "kd", NULL },
+    { 12u, offsetof(br_material, ks), "ks", NULL },
+    { 10u, offsetof(br_material, power), "power", NULL },
+    { 3u, offsetof(br_material, flags), "flags", NULL },
+    { 19u, offsetof(br_material, map_transform), "map_transform.m[0]", NULL },
+    { 19u, offsetof(br_material, map_transform) + sizeof(br_scalar) * 2, "map_transform.m[1]", NULL },
+    { 19u, offsetof(br_material, map_transform) + sizeof(br_scalar) * 4, "map_transform.m[2]", NULL },
+    { 1u, offsetof(br_material, index_base), "index_base", NULL },
+    { 1u, offsetof(br_material, index_range), "index_range", NULL },
+    { 17u, offsetof(br_material, identifier), "identifier", NULL }
+};
+br_file_struct br_material_old_F = { "br_material_old", 13, br_material_old_FM, sizeof(br_material) };
+
 br_file_struct_member br_pivot_FM[3];
-br_file_struct br_old_model_1_F;
+br_file_struct br_pivot_F;
+
 br_file_struct_member br_old_model_1_FM[1];
+br_file_struct br_old_model_1_F;
+
 br_file_struct_member br_model_FM[2] = {
     { 3u, offsetof(br_model, flags), "flags", NULL },
     { 17u, offsetof(br_model, identifier), "identifier", NULL }
@@ -79,8 +108,10 @@ br_file_struct br_model_F = { "br_model", 2u, br_model_FM, sizeof(br_model) };
 
 br_file_struct_member br_old_face_FM[5];
 br_file_struct br_old_face_F;
+
 br_file_struct_member br_old_face_1_FM[5];
 br_file_struct br_old_face_1_F;
+
 br_file_struct_member br_face_FM[5] = {
     { 3u, offsetof(br_face, vertices), "vertices[0]", NULL },
     { 3u, offsetof(br_face, vertices) + 2, "vertices[1]", NULL },
@@ -88,12 +119,14 @@ br_file_struct_member br_face_FM[5] = {
     { 3u, offsetof(br_face, smoothing), "smoothing", NULL },
     { 1u, offsetof(br_face, flags), "flags", NULL }
 };
-
 br_file_struct br_face_F = { "br_face", 5u, br_face_FM, sizeof(br_face) };
+
 br_file_struct_member br_old_vertex_uv_FM[5];
-br_file_struct br_vertex_uv_F;
 br_file_struct br_old_vertex_uv_F;
+
 br_file_struct_member br_vertex_uv_FM[2];
+br_file_struct br_vertex_uv_F;
+
 br_file_struct_member br_vertex_FM[3] = {
     { 10, offsetof(br_vertex, p) + 0, "p.v[x]", NULL },
     { 10, offsetof(br_vertex, p) + 4, "p.v[y]", NULL },
@@ -149,9 +182,15 @@ struct {
     br_uint_32 id;
     size_t offset;
     int table;
-} MaterialMaps;
+} MaterialMaps[4] = {
+    { 28u, offsetof(br_material, colour_map), 0 },
+    { 30u, offsetof(br_material, index_blend), 1 },
+    { 31u, offsetof(br_material, index_shade), 1 },
+    { 32u, offsetof(br_material, screendoor), 1 }
+};
 
 // Added by JeffH.
+#define DF_MATERIAL 3
 #define DF_ACTOR 4
 #define DF_MODEL 8
 #define DF_TRANSFORM 16
@@ -436,7 +475,12 @@ int FopRead_PIVOT(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 
 // ECX: count
 int FopRead_MATERIAL_OLD(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_material* mp;
-    NOT_IMPLEMENTED();
+    mp = BrMaterialAllocate(NULL);
+    df->res = mp;
+    df->prims->struct_read(df, &br_material_old_F, mp);
+    df->res = NULL;
+    DfPush(DF_MATERIAL, mp, 1);
+    return 0;
 }
 
 // Offset: 4264
@@ -469,7 +513,24 @@ int FopRead_PIXELMAP_REF(br_datafile* df, br_uint_32 id, br_uint_32 length, br_u
     char name[256];
     char* mp;
     int i;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
+
+    for (i = 0; i < 5; i++) {
+
+        if (id == MaterialMaps[i].id) {
+            break;
+        }
+    }
+
+    mp = DfTop(DF_MATERIAL, NULL);
+    df->prims->name_read(df, name);
+    if (MaterialMaps[i].table) {
+        pm = BrTableFind(name);
+    } else {
+        pm = BrMapFind(name);
+    }
+    *(intptr_t*)(mp + MaterialMaps[i].offset) = (intptr_t*)pm;
+    return 0;
 }
 
 // Offset: 4781
@@ -892,9 +953,25 @@ br_uint_32 BrActorSaveMany(char* filename, br_actor** actors, br_uint_16 num) {
 // Size: 162
 br_uint_32 BrMaterialLoadMany(char* filename, br_material** materials, br_uint_16 num) {
     br_datafile* df;
-    int count;
-    int r;
-    NOT_IMPLEMENTED();
+    int count = 0;
+    int r = 0;
+
+    df = DfOpen(filename, 0, BRT_FLOAT);
+    if (df) {
+        do {
+            if (count >= num) {
+                break;
+            }
+            r = DfChunksInterpret(df, &MaterialLoadTable);
+            if (DfTopType() == DF_MATERIAL) {
+                materials[count] = DfPop(DF_MATERIAL, 0);
+                ++count;
+            }
+            LOG_DEBUG("r=%d", r);
+        } while (r);
+        DfClose(df);
+    }
+    return count;
 }
 
 // Offset: 10740
@@ -934,7 +1011,10 @@ br_uint_32 BrModelSave(char* filename, br_model* ptr) {
 // Size: 81
 br_material* BrMaterialLoad(char* filename) {
     br_material* ptr;
-    NOT_IMPLEMENTED();
+    if (BrMaterialLoadMany(filename, &ptr, 1) == 1) {
+        return ptr;
+    }
+    return NULL;
 }
 
 // Offset: 11434

@@ -15,6 +15,7 @@
 #include "common/sound.h"
 #include "common/utility.h"
 #include "watcom_functions.h"
+#include <dirent.h>
 #include <stdlib.h>
 
 int gASCII_table[128];
@@ -489,15 +490,28 @@ void PDBuildAppPath(char* pThe_path) {
 void PDForEveryFile(char* pThe_path, void (*pAction_routine)(char*)) {
     char find_path[256];
     char found_path[256];
-    find_t the_find_buffer;
-    NOT_IMPLEMENTED();
+    //find_t the_find_buffer;
+    DIR* d;
+    struct dirent* entry;
+
+    d = opendir(pThe_path);
+    if (d) {
+        while ((entry = readdir(d)) != NULL) {
+            // only files, and only files that dont start with '.'
+            if (entry->d_type == DT_REG && entry->d_name[0] != '.') {
+                PathCat(found_path, pThe_path, entry->d_name);
+                pAction_routine(found_path);
+            }
+        }
+        closedir(d);
+    }
 }
 
 // Offset: 5540
 // Size: 39
 // EAX: pThe_palette
 void PDSetPalette(br_pixelmap* pThe_palette) {
-    NOT_IMPLEMENTED();
+    BrDevPaletteSetOld(pThe_palette);
 }
 
 // Offset: 5580

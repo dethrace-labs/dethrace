@@ -11,7 +11,7 @@ char rscid[49];
 void BrNewList(br_list* list) {
     list->_null = NULL;
     list->tail = (br_node*)list;
-    list->head = &list->_null;
+    list->head = (br_node*)&list->_null;
 }
 
 // Offset: 80
@@ -69,9 +69,9 @@ void BrSimpleNewList(br_simple_list* list) {
 // Size: 76
 void BrSimpleAddHead(br_simple_list* list, br_simple_node* node) {
     node->next = list->head;
-    node->prev = list;
+    node->prev = (br_simple_node**)list;
     if (node->next) {
-        node->next->prev = node;
+        node->next->prev = (br_simple_node**)node;
     }
     list->head = node;
 }

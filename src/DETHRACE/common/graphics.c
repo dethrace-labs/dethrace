@@ -4,6 +4,7 @@
 #include "errors.h"
 #include "globvars.h"
 #include "init.h"
+#include "loading.h"
 #include "pc-dos/dossys.h"
 #include "utility.h"
 #include <stdlib.h>
@@ -50,7 +51,30 @@ br_material* gShadow_material;
 int gSaved_table_count;
 int gCursor_giblet_sequence3[5];
 int gCursor_giblet_sequence2[5];
-char* gFont_names[21];
+char* gFont_names[21] = {
+    "TYPEABLE",
+    "ORANGHED",
+    "BLUEHEAD",
+    "GREENHED",
+    "MEDIUMHD",
+    "TIMER",
+    "NEWHITE",
+    "NEWRED",
+    "NEWBIGGR",
+    "GRNDK",
+    "GRNLIT",
+    "GRYDK",
+    "GRYLIT",
+    "BUTTIN",
+    "BUTTOUT",
+    "LITPLAQ",
+    "DRKPLAQ",
+    "BUTTIN1",
+    "BUTTOUT1",
+    "LITPLAQ1",
+    "DRKPLAQ1"
+};
+
 int gCurrent_cursor_index;
 int gCursor_giblet_sequence1[5];
 int gCursor_giblet_sequence0[7];
@@ -58,7 +82,7 @@ int gPalette_index;
 int gCursor_transient_index;
 char* gScratch_pixels;
 br_pixelmap* gScratch_palette;
-int gPalette_munged;
+int gPalette_munged = 0;
 int gLast_palette_change;
 int gColourValues[1];
 br_pixelmap* gOrig_render_palette;
@@ -75,7 +99,7 @@ char* gCurrent_palette_pixels;
 int gAR_fudge_headups;
 float gMap_render_x;
 float gMap_render_y;
-int gFaded_palette;
+int gFaded_palette = 0;
 int gWidth;
 int gMap_render_height_i;
 int gScreen_wobble_x;
@@ -347,7 +371,14 @@ void DRSetPalette3(br_pixelmap* pThe_palette, int pSet_current_palette) {
 // EAX: pThe_palette
 // EDX: pSet_current_palette
 void DRSetPalette2(br_pixelmap* pThe_palette, int pSet_current_palette) {
-    NOT_IMPLEMENTED();
+    ((br_int_32*)pThe_palette->pixels)[0] = 0;
+    if (pSet_current_palette) {
+        memcpy(gCurrent_palette_pixels, pThe_palette->pixels, 0x400u);
+    }
+    if (!gFaded_palette) {
+        PDSetPalette(pThe_palette);
+    }
+    gPalette_munged |= pThe_palette != gRender_palette;
 }
 
 // Offset: 4412
@@ -361,7 +392,25 @@ void DRSetPalette(br_pixelmap* pThe_palette) {
 // Size: 415
 void InitializePalettes() {
     int j;
-    NOT_IMPLEMENTED();
+    gCurrent_palette_pixels = BrMemAllocate(0x400u, 0x96u);
+    gCurrent_palette = DRPixelmapAllocate(BR_PMT_RGBX_888, 1u, 256, gCurrent_palette_pixels, 0);
+    gRender_palette = BrTableFind("DRRENDER.PAL");
+    if (!gRender_palette) {
+        FatalError(10);
+    }
+    gOrig_render_palette = BrPixelmapAllocateSub(gRender_palette, 0, 0, gRender_palette->width, gRender_palette->height);
+    gOrig_render_palette->pixels = BrMemAllocate(0x400u, 0x97u);
+    memcpy(gOrig_render_palette->pixels, gRender_palette->pixels, 0x400u);
+    gFlic_palette = BrTableFind("DRACEFLC.PAL");
+    if (!gFlic_palette) {
+        FatalError(10);
+    }
+    DRSetPalette2(gFlic_palette, 1);
+    gScratch_pixels = BrMemAllocate(0x400u, 0x98u);
+    gScratch_palette = DRPixelmapAllocate(BR_PMT_RGBX_888, 1u, 256, gScratch_pixels, 0);
+    gPalette_conversion_table = BrTableFind("FLC2REND.TAB");
+    gRender_shade_table = BrTableFind("DRRENDER.TAB");
+    gEval_1 = LoadPixelmap("Evalu01.PIX");
 }
 
 // Offset: 4880
@@ -1043,7 +1092,13 @@ void DisposeFont(int pFont_ID) {
 // Offset: 28608
 // Size: 93
 void InitDRFonts() {
-    NOT_IMPLEMENTED();
+    int i;
+    LOG_TRACE("()");
+
+    for (i = 0; i < 21; i++) {
+        gFonts[i].file_read_once = 0;
+        gFonts[i].images = NULL;
+    }
 }
 
 // Offset: 28704

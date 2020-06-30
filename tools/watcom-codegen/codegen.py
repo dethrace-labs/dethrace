@@ -699,6 +699,7 @@ def generate_c_file(module):
       do_comma = True
       
     c_file.write(');\n')
+    c_file.write('NOT_IMPLEMENTED();\n')
     c_file.write('}\n\n')
 
 def get_child_reference(module, type_idx):

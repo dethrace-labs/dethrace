@@ -33,7 +33,7 @@ void* BrRegistryAdd(br_registry* reg, void* item) {
 
     e = (br_registry_entry*)BrResAllocate(fw.res, sizeof(br_registry_entry), BR_MEMORY_REGISTRY);
     e->item = (char**)item;
-    BrAddHead(&reg->list, &e->node);
+    BrAddHead(&reg->list, (br_node*)e);
     reg->count++;
     return item;
 }
@@ -75,8 +75,13 @@ int BrRegistryRemoveMany(br_registry* reg, void** items, int n) {
 // EDX: pattern
 void* BrRegistryFind(br_registry* reg, char* pattern) {
     br_registry_entry* e;
+    br_pixelmap* pm;
+    LOG_TRACE8("(%p, \"%s\")", reg, pattern);
 
     e = (br_registry_entry*)reg->list.head;
+
+    pm = (br_pixelmap*)e->item;
+
     if (e->item) {
         // as a char**, e->item[1] actually points to `identifier` field in a br_* struct etc
         while (!BrNamePatternMatch(pattern, e->item[1])) {

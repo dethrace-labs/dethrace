@@ -10,7 +10,7 @@ char rscid[45];
 // Size: 153
 void* BrMemAllocate(br_size_t size, br_uint_8 type) {
     void* b;
-    LOG_TRACE("(%d, %d)", size, type);
+    LOG_TRACE10("(%d, %d)", size, type);
 
     b = fw.mem->allocate(size, type);
     BrMemSet(b, 0, size);

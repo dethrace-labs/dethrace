@@ -3,6 +3,7 @@
 #include "brlists.h"
 #include "brstdlib.h"
 #include "debug.h"
+#include "file.h"
 #include "fwsetup.h"
 #include "mem.h"
 #include <stdio.h>
@@ -89,9 +90,6 @@ void BrResInternalFree(resource_header* res, br_boolean callback) {
 
     c = res->class;
     if (c != 127) {
-        //v5 = fw.resource_class_index[c]->alignment;
-        //if ((signed int)v5 <= 0)
-        //    v5 = 4;
         res->class = 127;
         if (callback && fw.resource_class_index[c]->free_cb) {
             // res+1 means we jump over the header to get to the resource data

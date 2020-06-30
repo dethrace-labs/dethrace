@@ -101,7 +101,7 @@ br_actor* BrActorAllocate(br_uint_8 type, void* type_data) {
     LOG_TRACE("(%d, %p)", type, type_data);
 
     a = BrResAllocate(v1db.res, sizeof(br_actor), BR_MEMORY_ACTOR);
-    BrSimpleNewList(&a->children);
+    BrSimpleNewList((br_simple_list*)&a->children);
     a->type = type;
     a->depth = 0;
     a->t.type = 0;
@@ -168,7 +168,7 @@ void InternalActorFree(br_actor* a) {
 // Size: 103
 void BrActorFree(br_actor* a) {
     while (a->children) {
-        BrSimpleRemove(a->children);
+        BrSimpleRemove((br_simple_node*)a->children);
         InternalActorFree(a);
     }
     BrActorEnableCheck(a);

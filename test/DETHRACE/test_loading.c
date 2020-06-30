@@ -43,8 +43,20 @@ void test_loading_LoadGeneralParameters() {
     TEST_ASSERT_EQUAL_INT(1, gGravity_multiplier);
 }
 
+void test_loading_brfont() {
+    br_font* font;
+
+    font = LoadBRFont("FONT7.FNT");
+    TEST_ASSERT_NOT_NULL(font);
+    TEST_ASSERT_EQUAL_INT(1, font->flags);
+    TEST_ASSERT_EQUAL_INT(7, font->glyph_y); // font height
+    TEST_ASSERT_EQUAL_INT(0, font->width[0]);
+    TEST_ASSERT_EQUAL_INT(3, font->width[32]);
+}
+
 void test_loading_suite() {
     RUN_TEST(test_loading_GetCDPathFromPathsTxtFile);
     RUN_TEST(test_loading_OldDRfopen);
     RUN_TEST(test_loading_LoadGeneralParameters);
+    RUN_TEST(test_loading_brfont);
 }

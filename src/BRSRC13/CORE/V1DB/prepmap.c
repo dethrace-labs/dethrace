@@ -6,7 +6,7 @@ char rscid[51];
 // Offset: 12
 // Size: 77
 void BrMapUpdate(br_pixelmap* map, br_uint_16 flags) {
-    NOT_IMPLEMENTED();
+    BrBufferUpdate(map, BRT_COLOUR_MAP_O, flags);
 }
 
 // Offset: 104
@@ -16,7 +16,8 @@ void BrMapUpdate(br_pixelmap* map, br_uint_16 flags) {
 // EBX: flags
 void BrBufferUpdate(br_pixelmap* pm, br_token use, br_uint_16 flags) {
     br_token_value tv[3];
-    NOT_IMPLEMENTED();
+
+    // renderer->dispatch->bufferStoredNew ...
 }
 
 // Offset: 301

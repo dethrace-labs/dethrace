@@ -73,7 +73,7 @@ void BrDevEndOld() {
 // Offset: 1988
 // Size: 57
 void BrDevPaletteSetOld(br_pixelmap* pm) {
-    NOT_IMPLEMENTED();
+    LOG_WARN("TODO: capture palette");
 }
 
 // Offset: 2069

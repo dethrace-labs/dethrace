@@ -3,9 +3,11 @@ name: CI
 on: [push]
 
 jobs:
-  build:
+  pipeline:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - name: make
-      run: make all
+    - name: build
+      run: make build
+    - name: test
+      run: make test
