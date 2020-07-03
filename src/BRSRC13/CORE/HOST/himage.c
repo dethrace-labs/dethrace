@@ -1,5 +1,5 @@
 #include "himage.h"
-#include "debug.h"
+#include "harness.h"
 
 // Offset: 14
 // Size: 40

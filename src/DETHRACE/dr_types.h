@@ -2,7 +2,7 @@
 #define DR_TYPES_H
 
 #include "br_types.h"
-#include "debug.h"
+#include "harness.h"
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>

@@ -4,6 +4,15 @@
 
 ![Discord Chat Channel](docs/discord-badge.jpg) [Discord Chat Channel](https://discord.gg/f5StsuP)
 
+## Install dependencies
+
+### SDL2
+
+OSX:
+```sh
+brew install SDL2
+```
+
 ## Run tests
 
 ```sh

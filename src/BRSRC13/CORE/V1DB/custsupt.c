@@ -1,5 +1,5 @@
 #include "custsupt.h"
-#include "debug.h"
+#include "harness.h"
 
 char rscid[52];
 

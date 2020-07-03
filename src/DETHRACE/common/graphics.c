@@ -424,7 +424,13 @@ void SwitchToPalette(char* pPal_name) {
 // Offset: 4948
 // Size: 104
 void ClearEntireScreen() {
-    NOT_IMPLEMENTED();
+    LOG_TRACE("()");
+
+    if (gScreen) {
+        BrPixelmapFill(gScreen, gGraf_specs[gGraf_spec_index].black_value);
+    }
+    BrPixelmapFill(gBack_screen, gGraf_specs[gGraf_spec_index].black_value);
+    PDScreenBufferSwap(0);
 }
 
 // Offset: 5052

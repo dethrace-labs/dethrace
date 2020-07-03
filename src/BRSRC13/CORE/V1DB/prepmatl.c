@@ -1,5 +1,5 @@
 #include "prepmatl.h"
-#include "debug.h"
+#include "harness.h"
 
 char rscid[52];
 

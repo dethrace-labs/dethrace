@@ -23,6 +23,7 @@
 #include "common/replay.h"
 #include "common/skidmark.h"
 #include "common/sound.h"
+#include "common/utility.h"
 #include "common/world.h"
 #include "pc-dos/dossys.h"
 
@@ -191,7 +192,23 @@ void InitBRFonts() {
 // Offset: 2576
 // Size: 196
 void AustereWarning() {
-    NOT_IMPLEMENTED();
+    LOG_TRACE("()");
+
+    ClearEntireScreen();
+    if (gAusterity_mode) {
+        LoadFont(10);
+        TransDRPixelmapText(gBack_screen,
+            (gBack_screen->width - DRTextWidth(&gFonts[10], GetMiscString(193))) / 2,
+            0,
+            &gFonts[10],
+            GetMiscString(193),
+            gBack_screen->width);
+        PDScreenBufferSwap(0);
+        gAustere_time = PDGetTotalTime();
+        DisposeFont(10);
+    } else {
+        gAustere_time = gAusterity_mode;
+    }
 }
 
 // Offset: 2772

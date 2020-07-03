@@ -7,7 +7,7 @@
 #include "CORE/STD/brstdlib.h"
 #include "CORE/V1DB/def_mat.h"
 #include "CORE/V1DB/def_mdl.h"
-#include "debug.h"
+#include "harness.h"
 #include <stdio.h>
 #include <string.h>
 

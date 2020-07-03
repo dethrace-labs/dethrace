@@ -1,5 +1,5 @@
 #include "brbegin.h"
-#include "debug.h"
+#include "harness.h"
 
 #include "CORE/HOST/himage.h"
 #include "CORE/PIXELMAP/pmsetup.h"

@@ -2,7 +2,7 @@
 #include "CORE/FW/diag.h"
 #include "CORE/MATH/plane.h"
 #include "CORE/STD/brmath.h"
-#include "debug.h"
+#include "harness.h"
 
 br_model* compareModel;
 char* pm_edge_scratch;

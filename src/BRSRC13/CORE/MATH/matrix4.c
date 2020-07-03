@@ -1,5 +1,5 @@
 #include "matrix4.h"
-#include "debug.h"
+#include "harness.h"
 
 char rscid[51];
 

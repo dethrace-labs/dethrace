@@ -4,8 +4,8 @@
 #include "CORE/FW/fwsetup.h"
 #include "CORE/FW/resource.h"
 #include "CORE/STD/brstdlib.h"
-#include "debug.h"
 #include "file.h"
+#include "harness.h"
 
 #include <stdint.h>
 #include <stdio.h>

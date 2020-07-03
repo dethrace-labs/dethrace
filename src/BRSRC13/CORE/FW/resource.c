@@ -2,9 +2,9 @@
 
 #include "brlists.h"
 #include "brstdlib.h"
-#include "debug.h"
 #include "file.h"
 #include "fwsetup.h"
+#include "harness.h"
 #include "mem.h"
 #include <stdio.h>
 #include <stdlib.h>

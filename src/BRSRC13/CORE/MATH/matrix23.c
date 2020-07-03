@@ -1,5 +1,5 @@
 #include "matrix23.h"
-#include "debug.h"
+#include "harness.h"
 
 br_matrix23 mattmp1;
 br_matrix23 mattmp2;

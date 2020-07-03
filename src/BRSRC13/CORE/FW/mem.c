@@ -2,7 +2,7 @@
 
 #include "CORE/FW/fwsetup.h"
 #include "CORE/STD/brstdlib.h"
-#include "debug.h"
+#include "harness.h"
 
 char rscid[45];
 

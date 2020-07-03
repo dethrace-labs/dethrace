@@ -1,5 +1,5 @@
 #include "assocarr.h"
-#include "debug.h"
+#include "harness.h"
 
 // Offset: 27
 // Size: 145

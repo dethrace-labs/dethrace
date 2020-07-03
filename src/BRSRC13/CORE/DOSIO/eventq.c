@@ -1,5 +1,5 @@
 #include "eventq.h"
-#include "debug.h"
+#include "harness.h"
 
 char rscid[48];
 int _DOSEventQEnabled;

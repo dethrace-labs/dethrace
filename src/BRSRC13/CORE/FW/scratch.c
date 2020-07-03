@@ -1,5 +1,5 @@
 #include "scratch.h"
-#include "debug.h"
+#include "harness.h"
 
 char scratchString[512];
 char rscid[49];

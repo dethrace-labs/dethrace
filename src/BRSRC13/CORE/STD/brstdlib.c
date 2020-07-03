@@ -1,5 +1,5 @@
 #include "brstdlib.h"
-#include "debug.h"
+#include "harness.h"
 
 #include <ctype.h>
 #include <errno.h>

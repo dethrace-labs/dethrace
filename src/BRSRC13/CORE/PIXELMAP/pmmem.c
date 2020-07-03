@@ -1,6 +1,6 @@
 #include "pmmem.h"
-#include "debug.h"
 #include "genclip.h"
+#include "harness.h"
 #include "pmsetup.h"
 #include "resource.h"
 #include "tokenval.h"

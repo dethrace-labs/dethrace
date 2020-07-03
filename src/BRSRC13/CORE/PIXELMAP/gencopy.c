@@ -1,5 +1,5 @@
 #include "gencopy.h"
-#include "debug.h"
+#include "harness.h"
 
 char rscid[49];
 

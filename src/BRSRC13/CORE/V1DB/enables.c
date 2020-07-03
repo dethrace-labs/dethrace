@@ -1,6 +1,6 @@
 #include "enables.h"
 #include "dbsetup.h"
-#include "debug.h"
+#include "harness.h"
 #include <stddef.h>
 
 char rscid[51];
