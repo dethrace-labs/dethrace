@@ -23,8 +23,7 @@ test: build
 	@(cd test/build && ./c1tests $$DR_TEST_ARGS)
 
 install-deps:
-	apt-get install libsdl2-dev
-
+	sudo apt-get install libsdl2-dev
 
 run: build
 	@echo "Running dethrace"
