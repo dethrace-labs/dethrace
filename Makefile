@@ -1,4 +1,4 @@
-.PHONY: build clean test run
+.PHONY: build clean test install-deps run
 
 all: build test
 
@@ -21,6 +21,10 @@ test: build
 	@$(MAKE) -C test build
 	@cp -r test/assets/DATA test/build
 	@(cd test/build && ./c1tests $$DR_TEST_ARGS)
+
+install-deps:
+	apt-get install libsdl2-dev
+
 
 run: build
 	@echo "Running dethrace"
