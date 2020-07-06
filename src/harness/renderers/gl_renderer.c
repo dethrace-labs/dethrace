@@ -4,9 +4,9 @@
 #ifdef _WIN32
 #include <gl/gl.h>
 #elif defined __unix__
+#define GL_GLEXT_PROTOTYPES 1
 #include <GL/gl.h>
 #elif defined __APPLE__
-#define GL_SILENCE_DEPRECATION
 #include <OpenGL/gl3.h>
 #endif
 #include <SDL2/SDL_opengl.h>
