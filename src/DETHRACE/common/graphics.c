@@ -405,7 +405,7 @@ void InitializePalettes() {
     if (!gFlic_palette) {
         FatalError(10);
     }
-    DRSetPalette2(gFlic_palette, 1);
+    DRSetPalette2(gRender_palette, 1);
     gScratch_pixels = BrMemAllocate(0x400u, 0x98u);
     gScratch_palette = DRPixelmapAllocate(BR_PMT_RGBX_888, 1u, 256, gScratch_pixels, 0);
     gPalette_conversion_table = BrTableFind("FLC2REND.TAB");

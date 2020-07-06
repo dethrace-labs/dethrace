@@ -19,7 +19,6 @@ CFLAGS ?= $(INC_FLAGS) -g -Wno-return-type -Wno-missing-declarations -Werror=imp
 
 SDL_LDFLAGS = `sdl2-config --libs`
 
-
 ifeq ($(OS),Darwin)
 	OPENGL_LDFLAGS = -framework OpenGL
 else

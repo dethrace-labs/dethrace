@@ -73,7 +73,7 @@ void BrDevEndOld() {
 // Offset: 1988
 // Size: 57
 void BrDevPaletteSetOld(br_pixelmap* pm) {
-    Harness_Hook_SetPalette(pm);
+    Harness_Hook_BrDevPaletteSetOld(pm);
 }
 
 // Offset: 2069

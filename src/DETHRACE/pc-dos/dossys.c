@@ -658,8 +658,8 @@ void Usage(char* pProgpath) {
 // Size: 722
 // EAX: pArgc
 // EDX: pArgv
-// Renamed from "main" to "_main" to allow for unit testing
-int _main(int pArgc, char** pArgv) {
+// Renamed from "main" to "original_main" to allow for harness + unit testing
+int original_main(int pArgc, char** pArgv) {
     int arg;
     int i;
     float f;

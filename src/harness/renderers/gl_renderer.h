@@ -6,9 +6,9 @@
 
 extern renderer OpenGLRenderer;
 
-void Harness_GLRenderer_GetWindowFlags();
+int Harness_GLRenderer_GetWindowFlags();
 void Harness_GLRenderer_Init(SDL_Window* window);
 void Harness_GLRenderer_Activate(SDL_Window* window);
-void Harness_GLRenderer_DoubleBuffer(br_pixelmap* dst, br_pixelmap* src, SDL_Window* window);
+void Harness_GLRenderer_DoubleBuffer(uint32_t* dst, SDL_Window* window);
 
 #endif

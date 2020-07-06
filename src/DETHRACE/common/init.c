@@ -195,6 +195,7 @@ void AustereWarning() {
     LOG_TRACE("()");
 
     ClearEntireScreen();
+
     if (gAusterity_mode) {
         LoadFont(10);
         TransDRPixelmapText(gBack_screen,

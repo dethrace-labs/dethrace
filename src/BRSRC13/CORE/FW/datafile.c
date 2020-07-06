@@ -193,7 +193,7 @@ int TextReadLine(br_datafile* df, char** ident, char** data) {
 // EAX: df
 // EDX: t
 br_uint_16 scalarTypeConvert(br_datafile* df, br_uint_16 t) {
-    LOG_TRACE("(%p, %d)", df, t);
+    LOG_TRACE9("(%p, %d)", df, t);
 
     if (df->scalar_type < BRT_FIXED) {
         goto LABEL_20;

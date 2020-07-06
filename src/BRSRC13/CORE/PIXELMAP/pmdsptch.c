@@ -269,7 +269,7 @@ void BrPixelmapLine(br_pixelmap* dst, br_int_32 x1, br_int_32 y1, br_int_32 x2, 
 // Offset: 4629
 // Size: 65
 void BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {
-    Harness_Hook_DoubleBuffer(dst, src);
+    Harness_Hook_BrPixelmapDoubleBuffer(dst, src);
 }
 
 // Offset: 4709
