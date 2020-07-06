@@ -1,5 +1,5 @@
 #include "angles.h"
-#include "debug.h"
+#include "harness.h"
 
 char rscid[48];
 order_info OrderAxes[32];

@@ -2,7 +2,7 @@
 #include "CORE/FW/fwsetup.h"
 #include "CORE/FW/resource.h"
 #include "CORE/STD/brstdlib.h"
-#include "debug.h"
+#include "harness.h"
 #include <stdarg.h>
 #include <stddef.h>
 

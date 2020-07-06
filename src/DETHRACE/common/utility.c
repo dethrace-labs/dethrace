@@ -405,12 +405,17 @@ br_pixelmap* PurifiedPixelmap(br_pixelmap* pSrc) {
 br_pixelmap* DRPixelmapLoad(char* pFile_name) {
     br_pixelmap* the_map;
     LOG_TRACE("(\"%s\")", pFile_name);
+    br_int_8 lobyte;
 
     the_map = BrPixelmapLoad(pFile_name);
     if (the_map) {
         the_map->origin_x = 0;
         the_map->origin_y = 0;
-        the_map->row_bytes = (the_map->row_bytes + 3) & 0xFC;
+
+        lobyte = the_map->row_bytes & 0xff;
+        lobyte += 3;
+        lobyte &= 0xfc;
+        the_map->row_bytes = (the_map->row_bytes & 0xff00) | lobyte;
     }
     return the_map;
 }
@@ -425,11 +430,15 @@ br_uint_32 DRPixelmapLoadMany(char* pFile_name, br_pixelmap** pPixelmaps, br_uin
     int number_loaded;
     int i;
     LOG_TRACE("(\"%s\", %p, %d)", pFile_name, pPixelmaps, pNum);
+    br_uint_8 lobyte;
 
     number_loaded = BrPixelmapLoadMany(pFile_name, pPixelmaps, pNum);
     for (i = 0; i < number_loaded; i++) {
         the_map = pPixelmaps[i];
-        the_map->row_bytes = (the_map->row_bytes + 3) & 0xFC;
+        lobyte = the_map->row_bytes & 0xff;
+        lobyte += 3;
+        lobyte &= 0xfc;
+        the_map->row_bytes = (the_map->row_bytes & 0xff00) | lobyte;
         the_map->base_x = 0;
         the_map->base_y = 0;
     }

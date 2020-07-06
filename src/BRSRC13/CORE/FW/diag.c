@@ -1,8 +1,8 @@
 #include "diag.h"
 #include "CORE/STD/brstdlib.h"
 #include "brprintf.h"
-#include "debug.h"
 #include "fwsetup.h"
+#include "harness.h"
 #include <stdarg.h>
 
 // Global variables

@@ -11,7 +11,8 @@
 #include "CORE/V1DB/dbsetup.h"
 
 #include "common/globvars.h"
-#include "stack_trace_handler.h"
+#include "harness.h"
+#include "renderers/null_renderer.h"
 
 #define debug(format_, ...) fprintf(stderr, format_, __VA_ARGS__)
 
@@ -55,7 +56,7 @@ int main(int argc, char** argv) {
         exit(1);
     }
 
-    set_signal_handler(argv[0]);
+    Harness_Init("tests", &NullRenderer);
 
     setupGlobalVars();
 

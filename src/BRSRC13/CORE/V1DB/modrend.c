@@ -1,5 +1,5 @@
 #include "modrend.h"
-#include "debug.h"
+#include "harness.h"
 
 br_colour bounds_colours[12];
 fmt_vertex bounds_vertices[8];

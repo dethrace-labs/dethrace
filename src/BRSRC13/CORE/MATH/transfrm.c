@@ -1,5 +1,5 @@
 #include "transfrm.h"
-#include "debug.h"
+#include "harness.h"
 
 char rscid[52];
 br_uint_8 _CombineTransforms[7][7];

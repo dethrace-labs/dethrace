@@ -405,7 +405,7 @@ void InitializePalettes() {
     if (!gFlic_palette) {
         FatalError(10);
     }
-    DRSetPalette2(gFlic_palette, 1);
+    DRSetPalette2(gRender_palette, 1);
     gScratch_pixels = BrMemAllocate(0x400u, 0x98u);
     gScratch_palette = DRPixelmapAllocate(BR_PMT_RGBX_888, 1u, 256, gScratch_pixels, 0);
     gPalette_conversion_table = BrTableFind("FLC2REND.TAB");
@@ -424,7 +424,13 @@ void SwitchToPalette(char* pPal_name) {
 // Offset: 4948
 // Size: 104
 void ClearEntireScreen() {
-    NOT_IMPLEMENTED();
+    LOG_TRACE("()");
+
+    if (gScreen) {
+        BrPixelmapFill(gScreen, gGraf_specs[gGraf_spec_index].black_value);
+    }
+    BrPixelmapFill(gBack_screen, gGraf_specs[gGraf_spec_index].black_value);
+    PDScreenBufferSwap(0);
 }
 
 // Offset: 5052

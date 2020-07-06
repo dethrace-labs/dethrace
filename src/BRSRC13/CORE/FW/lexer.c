@@ -1,5 +1,5 @@
 #include "lexer.h"
-#include "debug.h"
+#include "harness.h"
 
 // Offset: 11
 // Size: 30

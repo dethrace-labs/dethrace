@@ -10,6 +10,8 @@
 #include "common/car.h"
 #include "common/drdebug.h"
 #include "common/globvars.h"
+#include "common/grafdata.h"
+#include "common/graphics.h"
 #include "common/loadsave.h"
 #include "common/main.h"
 #include "common/sound.h"
@@ -418,7 +420,17 @@ void CopyBackScreen(int pRendering_area_only) {
 // Size: 92
 // EAX: pRendering_area_only
 void PDScreenBufferSwap(int pRendering_area_only) {
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%d)", pRendering_area_only);
+    if (pRendering_area_only) {
+        BrPixelmapRectangleCopy(gScreen, gY_offset, gX_offset, gRender_screen, 0, 0, gWidth, gHeight);
+    } else {
+        if (gReal_graf_data_index == gGraf_data_index) {
+            BrPixelmapDoubleBuffer(gScreen, gBack_screen);
+        } else {
+            DRPixelmapDoubledCopy(gTemp_screen, gBack_screen, 320, 200, 0, 40);
+            BrPixelmapDoubleBuffer(gScreen, gTemp_screen);
+        }
+    }
 }
 
 // Offset: 5020
@@ -646,8 +658,8 @@ void Usage(char* pProgpath) {
 // Size: 722
 // EAX: pArgc
 // EDX: pArgv
-// Renamed from "main" to "_main" to allow for unit testing
-int _main(int pArgc, char** pArgv) {
+// Renamed from "main" to "original_main" to allow for harness + unit testing
+int original_main(int pArgc, char** pArgv) {
     int arg;
     int i;
     float f;
@@ -688,6 +700,7 @@ int _main(int pArgc, char** pArgv) {
             Usage(pArgv[0]);
         }
     }
+
     GameMain(pArgc, pArgv);
     return 0;
 }

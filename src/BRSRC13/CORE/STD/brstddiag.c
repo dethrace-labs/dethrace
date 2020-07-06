@@ -1,5 +1,5 @@
 #include "brstddiag.h"
-#include "debug.h"
+#include "harness.h"
 
 br_diaghandler BrStdioDiagHandler;
 br_diaghandler* _BrDefaultDiagHandler;

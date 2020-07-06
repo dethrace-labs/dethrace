@@ -1,5 +1,5 @@
 #include "resreg.h"
-#include "debug.h"
+#include "harness.h"
 
 #include "CORE/FW/fwsetup.h"
 #include "CORE/FW/register.h"

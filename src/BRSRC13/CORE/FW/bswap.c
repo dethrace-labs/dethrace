@@ -1,5 +1,5 @@
 #include "bswap.h"
-#include "debug.h"
+#include "harness.h"
 
 char rscid[47];
 

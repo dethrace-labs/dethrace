@@ -1,5 +1,5 @@
 #include "brstdmem.h"
-#include "debug.h"
+#include "harness.h"
 
 #include <stdlib.h>
 

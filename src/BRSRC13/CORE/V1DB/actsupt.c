@@ -7,7 +7,7 @@
 #include "CORE/V1DB/dbsetup.h"
 #include "CORE/V1DB/enables.h"
 #include "actsupt.h"
-#include "debug.h"
+#include "harness.h"
 
 char rscid[53];
 

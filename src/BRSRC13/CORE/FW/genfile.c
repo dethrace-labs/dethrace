@@ -1,5 +1,5 @@
 #include "genfile.h"
-#include "debug.h"
+#include "harness.h"
 #include <stdlib.h>
 
 br_file_struct_member file_info_FM[2];

@@ -1,6 +1,6 @@
 #include "plane.h"
 #include "brmath.h"
-#include "debug.h"
+#include "harness.h"
 #include <math.h>
 
 char rscid[49];

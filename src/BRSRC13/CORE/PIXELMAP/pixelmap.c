@@ -1,5 +1,5 @@
 #include "pixelmap.h"
-#include "debug.h"
+#include "harness.h"
 #include "pmmem.h"
 
 char rscid[50];

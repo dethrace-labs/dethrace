@@ -1,5 +1,5 @@
 #include "hostcfg.h"
-#include "debug.h"
+#include "harness.h"
 
 // Offset: 18
 // Size: 40

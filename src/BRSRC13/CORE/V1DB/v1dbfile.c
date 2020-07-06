@@ -8,7 +8,7 @@
 #include "CORE/V1DB/matsupt.h"
 #include "CORE/V1DB/modsupt.h"
 #include "CORE/V1DB/regsupt.h"
-#include "debug.h"
+#include "harness.h"
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>

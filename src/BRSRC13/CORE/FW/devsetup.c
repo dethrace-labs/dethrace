@@ -1,5 +1,5 @@
 #include "devsetup.h"
-#include "debug.h"
+#include "harness.h"
 
 #include <stdarg.h>
 
@@ -73,7 +73,7 @@ void BrDevEndOld() {
 // Offset: 1988
 // Size: 57
 void BrDevPaletteSetOld(br_pixelmap* pm) {
-    LOG_WARN("TODO: capture palette");
+    Harness_Hook_BrDevPaletteSetOld(pm);
 }
 
 // Offset: 2069

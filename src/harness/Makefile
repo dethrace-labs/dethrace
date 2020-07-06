@@ -1,14 +1,16 @@
 BUILD_DIR ?= ./build
 SRC_DIR ?= .
+BR_SRC_DIR ?= ../BRSRC13
+SDL_CLFAGS = `sdl2-config --cflags`
 
 SRCS := $(shell find $(SRC_DIR) -name "*.c")
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
 
-INC_DIRS := $(shell find $(SRC_DIR) -type d)
+INC_DIRS := $(shell find $(SRC_DIR) -type d) $(BR_SRC_DIR)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
-CFLAGS ?= $(INC_FLAGS) -g -Wno-return-type -Wno-missing-declarations -Werror=implicit-function-declaration
+CFLAGS ?= $(INC_FLAGS) $(SDL_CLFAGS) -g -Wno-return-type -Wno-missing-declarations -Werror=implicit-function-declaration
 
 .PHONY: clean build
 

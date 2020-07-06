@@ -144,7 +144,7 @@ LONG WINAPI windows_exception_handler(EXCEPTION_POINTERS* ExceptionInfo) {
     return EXCEPTION_EXECUTE_HANDLER;
 }
 
-void set_signal_handler(char* program_name) {
+void install_signal_handler(char* program_name) {
     strcpy(_program_name, program_name);
     SetUnhandledExceptionFilter(windows_exception_handler);
 }
@@ -261,7 +261,7 @@ void posix_signal_handler(int sig, siginfo_t* siginfo, void* context) {
 }
 
 static uint8_t alternate_stack[SIGSTKSZ];
-void set_signal_handler(char* program_name) {
+void install_signal_handler(char* program_name) {
 
     strcpy(_program_name, program_name);
 

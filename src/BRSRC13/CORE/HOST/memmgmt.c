@@ -1,5 +1,5 @@
 #include "memmgmt.h"
-#include "debug.h"
+#include "harness.h"
 
 #include <stdio.h>
 #include <stdlib.h>

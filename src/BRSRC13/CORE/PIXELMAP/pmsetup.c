@@ -2,7 +2,7 @@
 #include "CORE/FW/resource.h"
 #include "CORE/FW/resreg.h"
 #include "CORE/STD/brstdlib.h"
-#include "debug.h"
+#include "harness.h"
 #include "image.h"
 #include <stddef.h>
 #include <stdio.h>

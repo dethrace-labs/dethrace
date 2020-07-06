@@ -1,5 +1,5 @@
 #include "object.h"
-#include "debug.h"
+#include "harness.h"
 
 char rscid[48];
 

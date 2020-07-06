@@ -1,5 +1,5 @@
 #include "sys_conf.h"
-#include "debug.h"
+#include "harness.h"
 
 br_token valid_system_config_tokens[5];
 

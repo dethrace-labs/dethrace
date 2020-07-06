@@ -1,5 +1,5 @@
 #include "readmse.h"
-#include "debug.h"
+#include "harness.h"
 
 host_real_memory mouseMemory;
 host_regs regs;

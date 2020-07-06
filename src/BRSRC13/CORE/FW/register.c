@@ -1,5 +1,5 @@
 #include "register.h"
-#include "debug.h"
+#include "harness.h"
 
 #include "brlists.h"
 #include "fwsetup.h"

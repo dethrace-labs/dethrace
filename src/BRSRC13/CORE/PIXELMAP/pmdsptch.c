@@ -1,9 +1,10 @@
 #include "pmdsptch.h"
 
-#include "debug.h"
+#include "harness.h"
 #include "pmmem.h"
 #include <stdarg.h>
 #include <stdlib.h>
+#include <string.h>
 
 char rscid[65];
 
@@ -102,7 +103,17 @@ br_pixelmap* BrPixelmapClone(br_pixelmap* src) {
 // Offset: 2147
 // Size: 57
 void BrPixelmapFill(br_pixelmap* dst, br_uint_32 colour) {
-    NOT_IMPLEMENTED();
+    br_uint_8 linear_wholepixels; //added JeffH
+    LOG_TRACE("(%p, %d)", dst, colour);
+
+    linear_wholepixels = BR_PMF_LINEAR | BR_PMF_ROW_WHOLEPIXELS;
+    if ((dst->flags & linear_wholepixels) == linear_wholepixels) {
+        if (dst->row_bytes > 0) {
+            memset(dst->pixels, colour, dst->row_bytes * dst->height);
+        } else {
+            LOG_PANIC("Not implemented");
+        }
+    }
 }
 
 // Offset: 2224
@@ -152,7 +163,39 @@ br_error DispatchRectangleStretchCopy(br_device_pixelmap* self, br_rectangle* r,
 void BrPixelmapRectangleCopy(br_pixelmap* dst, br_int_32 dx, br_int_32 dy, br_pixelmap* src, br_int_32 sx, br_int_32 sy, br_int_32 w, br_int_32 h) {
     br_rectangle r;
     br_point p;
-    NOT_IMPLEMENTED();
+
+    // Taken from Errol's brender
+
+    br_uint_8* src_pix = (br_uint_8*)src->pixels;
+    br_uint_8* dst_pix = (br_uint_8*)dst->pixels;
+
+    if (src->type != dst->type) {
+        LOG_PANIC("src and dst types don't match! src is %d and dst is %d", src->type, dst->type);
+        return;
+    }
+
+    if (src->type != BR_PMT_INDEX_8) {
+        LOG_PANIC("only 8 bit surfaces supported");
+        return;
+    }
+
+    for (int x = 0; x < w; x++) {
+        if (dx + x < 0 || dx + x >= dst->width) {
+            continue;
+        }
+        if (sx + x >= src->width)
+            continue;
+
+        for (int y = 0; y < h; y++) {
+            if (dy + y < 0 || dy + y >= dst->height) {
+                continue;
+            }
+            if (sy + y >= src->height)
+                continue;
+
+            dst_pix[(y + dy) * dst->row_bytes + (x + dx)] = src_pix[(sy + y) * src->row_bytes + (x + sx)];
+        }
+    }
 }
 
 // Offset: 3297
@@ -226,7 +269,7 @@ void BrPixelmapLine(br_pixelmap* dst, br_int_32 x1, br_int_32 y1, br_int_32 x2, 
 // Offset: 4629
 // Size: 65
 void BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {
-    NOT_IMPLEMENTED();
+    Harness_Hook_BrPixelmapDoubleBuffer(dst, src);
 }
 
 // Offset: 4709

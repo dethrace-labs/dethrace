@@ -1,7 +1,7 @@
 #include "brstdfile.h"
 
 #include "CORE/FW/diag.h"
-#include "debug.h"
+#include "harness.h"
 #include <stdio.h>
 #include <string.h>
 

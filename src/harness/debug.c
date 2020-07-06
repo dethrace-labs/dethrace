@@ -1,4 +1,4 @@
-#include "debug.h"
+#include "harness.h"
 
 #include <stdarg.h>
 #include <stdio.h>

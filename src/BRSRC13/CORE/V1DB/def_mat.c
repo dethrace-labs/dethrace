@@ -1,6 +1,6 @@
 #include "def_mat.h"
 #include "dbsetup.h"
-#include "debug.h"
+#include "harness.h"
 #include "matrix23.h"
 #include "resource.h"
 
