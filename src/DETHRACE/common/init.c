@@ -197,16 +197,16 @@ void AustereWarning() {
     ClearEntireScreen();
 
     if (gAusterity_mode) {
-        LoadFont(10);
+        LoadFont(FONT_GRNLIT);
         TransDRPixelmapText(gBack_screen,
-            (gBack_screen->width - DRTextWidth(&gFonts[10], GetMiscString(193))) / 2,
+            (gBack_screen->width - DRTextWidth(&gFonts[FONT_GRNLIT], GetMiscString(193))) / 2,
             0,
-            &gFonts[10],
+            &gFonts[FONT_GRNLIT],
             GetMiscString(193),
             gBack_screen->width);
         PDScreenBufferSwap(0);
         gAustere_time = PDGetTotalTime();
-        DisposeFont(10);
+        DisposeFont(FONT_GRNLIT);
     } else {
         gAustere_time = gAusterity_mode;
     }

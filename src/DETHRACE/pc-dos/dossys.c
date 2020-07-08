@@ -488,7 +488,7 @@ void PDBuildAppPath(char* pThe_path) {
 
     getcwd(pThe_path, 256);
     pos = strlen(pThe_path);
-    pThe_path[pos] = gDir_separator[0]; // original: pThe_path[pos] = '\\';
+    pThe_path[pos] = '/'; // original: pThe_path[pos] = '\\';
     pThe_path[pos + 1] = 0;
     strcpy(gNetwork_profile_fname, pThe_path);
     pos = strlen(gNetwork_profile_fname);
@@ -581,7 +581,6 @@ int PDGetTotalTime() {
     struct timespec spec;
     clock_gettime(CLOCK_MONOTONIC, &spec);
     return spec.tv_sec * 1000 + spec.tv_nsec / 1000;
-    NOT_IMPLEMENTED();
 }
 
 // Offset: 6312

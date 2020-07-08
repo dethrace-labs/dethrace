@@ -1,4 +1,7 @@
 #include "displays.h"
+#include "common/flicplay.h"
+#include "common/globvars.h"
+#include "common/graphics.h"
 #include <stdlib.h>
 
 br_font* gBR_fonts[4];
@@ -85,7 +88,28 @@ void DRPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFont, cha
     int chr;
     int ch_width;
     unsigned char* ch;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%p, %d, %d, %p, \"%s\", %d)", pPixelmap, pX, pY, pFont, pText, pRight_edge);
+
+    len = strlen(pText);
+    if (pX >= 0 && pPixelmap->width >= pRight_edge && pY >= 0 && pY + pFont->height <= pPixelmap->height) {
+        x = pX;
+        for (i = 0; i < len; i++) {
+            chr = pText[i] - pFont->offset;
+            DRPixelmapRectangleOnscreenCopy(
+                gBack_screen,
+                x,
+                pY,
+                pFont->images,
+                0,
+                pFont->height * chr,
+                pFont->width_table[chr],
+                pFont->height);
+
+            x += pFont->width_table[chr] + pFont->spacing;
+        }
+    } else {
+        NOT_IMPLEMENTED();
+    }
 }
 
 // Offset: 1032
@@ -199,7 +223,17 @@ int DRTextWidth(tDR_font* pFont, char* pText) {
     int len;
     int result;
     char* c;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%p, \"%s\")", pFont, pText);
+
+    c = pText;
+    result = 0;
+    len = strlen(pText);
+
+    for (i = 0; i < len; i++) {
+        result += pFont->width_table[*c - pFont->offset];
+        c++;
+    }
+    return result + pFont->spacing * (len - 1);
 }
 
 // Offset: 5952
@@ -483,7 +517,16 @@ void TransBrPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, br_uint_32 pCol
 // EBX: pY
 // ECX: pFont
 void TransDRPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFont, char* pText, int pRight_edge) {
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%p, %d, %d, %p, \"%s\", %d)", pPixelmap, pX, pY, pFont, pText, pRight_edge);
+
+    if (gAusterity_mode && FlicsPlayedFromDisk() && pFont != gCached_font) {
+        if (gCached_font && gCached_font - gFonts > 13) {
+            DisposeFont(gCached_font - gFonts);
+        }
+        gCached_font = pFont;
+    }
+    LoadFont(pFont - gFonts);
+    DRPixelmapText(pPixelmap, pX, pY - (TranslationMode() ? 2 : 0), pFont, pText, pRight_edge);
 }
 
 // Offset: 16380

@@ -4,13 +4,28 @@
 
 ![Discord Chat Channel](docs/discord-badge.jpg) [Discord Chat Channel](https://discord.gg/f5StsuP)
 
-## Install dependencies
+## Dependencies
 
 ### SDL2
+
+The easiest way to install SDL is via your favorite package manager.
 
 OSX:
 ```sh
 brew install SDL2
+```
+
+Linux:
+```sh
+apt-get install libsdl2-dev
+```
+
+### Root content directory
+
+Dethrace does not ship with any game content. You'll need access to the data from the original game. If you don't have an original CD then you can [buy Carmageddon from GoG.com](https://www.gog.com/game/carmageddon_max_pack). 
+
+```sh
+export DETHRACE_ROOT_DIR=/path/to/carmageddon
 ```
 
 ## Run tests
@@ -21,11 +36,10 @@ make test
 
 ### Run a single test
 ```sh
-DR_TEST_ARGS="-n test_name" make test
+DETHRACE_TEST_ARGS="-n test_name" make test
 ```
 
 ### Run game
 ```sh
-export DETHRACE_ROOT_DIR=/path/to/carmageddon
 make run
 ```

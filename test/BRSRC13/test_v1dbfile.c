@@ -37,13 +37,13 @@ void test_v1dbfile_BrMaterialLoad() {
     br_material* m;
     br_pixelmap* pm;
 
-    pm = BrPixelmapLoad("DATA/PIXELMAPS/LAVA.PIX");
+    pm = BrPixelmapLoad("DATA/REG/PIXELMAP/OILSMEAR.PIX");
     TEST_ASSERT_NOT_NULL(pm);
-    TEST_ASSERT_EQUAL_STRING("LAVA.PIX", pm->identifier);
+    TEST_ASSERT_EQUAL_STRING("oilsmear.pix", pm->identifier);
     BrMapAdd(pm);
 
-    m = BrMaterialLoad("DATA/MATERIALS/LAVA.MAT");
-
+    m = BrMaterialLoad("DATA/REG/MATERIAL/OILSMEAR.MAT");
+    TEST_ASSERT_NOT_NULL(m);
     TEST_ASSERT_EQUAL_INT(1, m->map_transform.m[0][0]);
     TEST_ASSERT_EQUAL_INT(0, m->map_transform.m[0][1]);
     TEST_ASSERT_EQUAL_INT(0, m->map_transform.m[1][0]);
@@ -51,7 +51,6 @@ void test_v1dbfile_BrMaterialLoad() {
     TEST_ASSERT_EQUAL_INT(0, m->map_transform.m[2][0]);
     TEST_ASSERT_EQUAL_INT(0, m->map_transform.m[2][1]);
 
-    TEST_ASSERT_NOT_NULL(m);
     TEST_ASSERT_EQUAL_PTR(pm, m->colour_map);
 }
 

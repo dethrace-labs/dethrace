@@ -34,7 +34,7 @@ void test_loading_LoadGeneralParameters() {
     TEST_ASSERT_EQUAL_INT(7500, gInitial_credits[0]);
     TEST_ASSERT_EQUAL_INT(5000, gInitial_credits[1]);
     TEST_ASSERT_EQUAL_INT(3000, gInitial_credits[2]);
-    TEST_ASSERT_EQUAL_STRING("BLKEAGLE.TXT", gBasic_car_names[0]);
+    TEST_ASSERT_EQUAL_STRING("NEWEAGLE.TXT", gBasic_car_names[0]);
     TEST_ASSERT_EQUAL_FLOAT(0.2f, gDefault_default_water_spec_vol.gravity_multiplier);
     TEST_ASSERT_EQUAL_FLOAT(50.0f, gDefault_default_water_spec_vol.viscosity_multiplier);
 

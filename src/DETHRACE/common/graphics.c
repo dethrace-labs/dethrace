@@ -1,6 +1,7 @@
 #include "graphics.h"
 
 #include "brender.h"
+#include "common/flicplay.h"
 #include "errors.h"
 #include "globvars.h"
 #include "init.h"
@@ -405,7 +406,7 @@ void InitializePalettes() {
     if (!gFlic_palette) {
         FatalError(10);
     }
-    DRSetPalette2(gRender_palette, 1);
+    DRSetPalette2(gFlic_palette, 1);
     gScratch_pixels = BrMemAllocate(0x400u, 0x98u);
     gScratch_palette = DRPixelmapAllocate(BR_PMT_RGBX_888, 1u, 256, gScratch_pixels, 0);
     gPalette_conversion_table = BrTableFind("FLC2REND.TAB");
@@ -908,7 +909,25 @@ void DRPixelmapRectangleOnscreenCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_i
     tU8* source_ptr;
     tU8* dest_ptr;
     tU8* conv_table;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
+
+    source_row_wrap = pSource->row_bytes - pWidth;
+    dest_row_wrap = pDest->row_bytes - pWidth;
+    dest_ptr = pDest->pixels + (pDest->row_bytes * pDest_y + pDest_x);
+    source_ptr = pSource->pixels + (pSource->row_bytes * pSource_y + pSource_x);
+
+    for (y_count = 0; y_count < pHeight; y_count++) {
+        for (x_count = 0; x_count < pWidth; x_count++) {
+            the_byte = *source_ptr;
+            if (the_byte) {
+                *dest_ptr = the_byte;
+            }
+            source_ptr++;
+            dest_ptr++;
+        }
+        source_ptr += source_row_wrap;
+        dest_ptr += dest_row_wrap;
+    }
 }
 
 // Offset: 22540
@@ -1085,14 +1104,56 @@ void LoadFont(int pFont_ID) {
     int number_of_chars;
     FILE* f;
     tU32 the_size;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%d)", pFont_ID);
+
+    if (gFonts[pFont_ID].images) {
+        return;
+    }
+
+    PathCat(the_path, gApplication_path, gGraf_specs[gGraf_spec_index].data_dir_name);
+    PathCat(the_path, the_path, "FONTS");
+    PathCat(the_path, the_path, gFont_names[pFont_ID]);
+    number_of_chars = strlen(the_path);
+    strcat(the_path, ".PIX");
+    gFonts[pFont_ID].images = DRPixelmapLoad(the_path);
+
+    if (!gFonts[pFont_ID].images) {
+        FatalError(20, gFont_names[pFont_ID]);
+    }
+    if (!gFonts[pFont_ID].file_read_once) {
+        strcpy(&the_path[number_of_chars + 1], "TXT");
+
+        f = DRfopen(the_path, "rt");
+        if (!f) {
+            FatalError(21, gFont_names[pFont_ID]);
+        }
+
+        gFonts[pFont_ID].height = GetAnInt(f);
+        gFonts[pFont_ID].width = GetAnInt(f);
+        gFonts[pFont_ID].spacing = GetAnInt(f);
+        gFonts[pFont_ID].offset = GetAnInt(f);
+        gFonts[pFont_ID].num_entries = GetAnInt(f);
+        if (gFonts[pFont_ID].width <= 0) {
+            for (i = 0; i < gFonts[pFont_ID].num_entries; i++) {
+                the_size = GetAnInt(f);
+                gFonts[pFont_ID].width_table[i] = the_size;
+            }
+        }
+        fclose(f);
+        gFonts[pFont_ID].file_read_once = 1;
+    }
 }
 
 // Offset: 28464
 // Size: 141
 // EAX: pFont_ID
 void DisposeFont(int pFont_ID) {
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%d)", pFont_ID);
+    if (gFonts[pFont_ID].images && (!TranslationMode() || gAusterity_mode && FlicsPlayedFromDisk())) {
+        BrPixelmapFree(gFonts[pFont_ID].images);
+        gFonts[pFont_ID].images = NULL;
+        gFonts[pFont_ID].file_read_once = 0;
+    }
 }
 
 // Offset: 28608
