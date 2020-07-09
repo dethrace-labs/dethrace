@@ -24,8 +24,15 @@ apt-get install libsdl2-dev
 
 Dethrace does not ship with any game content. You'll need access to the data from the original game. If you don't have an original CD then you can [buy Carmageddon from GoG.com](https://www.gog.com/game/carmageddon_max_pack). 
 
+Point Dethrace at the Carmageddon install directory:
 ```sh
 export DETHRACE_ROOT_DIR=/path/to/carmageddon
+```
+
+## Build
+
+```sh
+make build
 ```
 
 ## Run tests
@@ -34,12 +41,12 @@ export DETHRACE_ROOT_DIR=/path/to/carmageddon
 make test
 ```
 
-### Run a single test
+To run a single test
 ```sh
 DETHRACE_TEST_ARGS="-n test_name" make test
 ```
 
-### Run game
+## Run game
 ```sh
 make run
 ```
