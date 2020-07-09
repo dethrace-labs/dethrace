@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -35,6 +36,9 @@ extern void test_v1dbfile_suite();
 extern void test_register_suite();
 extern void test_pattern_suite();
 extern void test_pmfile_suite();
+extern void test_graphics_suite();
+
+char* root_dir;
 
 void setUp(void) {
 }
@@ -42,10 +46,23 @@ void setUp(void) {
 void tearDown(void) {
 }
 
-void setupGlobalVars() {
+void setup_global_vars() {
     strcpy(gDir_separator, "/");
-    getcwd(gApplication_path, 256);
-    strcat(gApplication_path, "/DATA");
+
+    root_dir = getenv("DETHRACE_ROOT_DIR");
+    if (root_dir != NULL) {
+        printf("DETHRACE_ROOT_DIR: %s\n", root_dir);
+        chdir(root_dir);
+        strncpy(gApplication_path, root_dir, 256);
+        strcat(gApplication_path, "/DATA");
+    } else {
+        printf("WARN: DETHRACE_ROOT_DIR is not defined. Skipping tests which require it\n");
+        strcpy(gApplication_path, ".");
+    }
+}
+
+int has_data_directory() {
+    return root_dir != NULL;
 }
 
 int main(int argc, char** argv) {
@@ -58,7 +75,7 @@ int main(int argc, char** argv) {
 
     Harness_Init("tests", &NullRenderer);
 
-    setupGlobalVars();
+    setup_global_vars();
 
     BrV1dbBeginWrapper_Float();
 
@@ -85,6 +102,7 @@ int main(int argc, char** argv) {
     test_input_suite();
     test_errors_suite();
     test_dossys_suite();
+    test_graphics_suite();
 
     return UNITY_END();
 }

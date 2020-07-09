@@ -606,7 +606,7 @@ void TimerString(tU32 pTime, char* pStr, int pFudge_colon, int pForce_colon) {
 // Size: 55
 // EAX: pIndex
 char* GetMiscString(int pIndex) {
-    NOT_IMPLEMENTED();
+    return gMisc_strings[pIndex];
 }
 
 // Offset: 7312

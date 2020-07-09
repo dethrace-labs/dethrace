@@ -26,7 +26,7 @@ int gDark_mode;
 int gPending_pending_flic;
 int gTransparency_on;
 int gSound_ID;
-int gPlay_from_disk;
+int gPlay_from_disk = 0;
 int gTranslation_count;
 int gPending_flic;
 tDR_font* gTrans_fonts[15];
@@ -61,7 +61,7 @@ void SetFlicSound(int pSound_ID, tU32 pSound_time) {
 // Offset: 144
 // Size: 45
 int TranslationMode() {
-    NOT_IMPLEMENTED();
+    return 0;
 }
 
 // Offset: 192
@@ -103,7 +103,7 @@ void TurnFlicTransparencyOff() {
 // Offset: 464
 // Size: 44
 void PlayFlicsFromDisk() {
-    NOT_IMPLEMENTED();
+    gPlay_from_disk = 1;
 }
 
 // Offset: 508
@@ -115,7 +115,7 @@ void PlayFlicsFromMemory() {
 // Offset: 552
 // Size: 45
 int FlicsPlayedFromDisk() {
-    NOT_IMPLEMENTED();
+    return gPlay_from_disk;
 }
 
 // Offset: 600

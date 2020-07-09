@@ -200,7 +200,7 @@ br_error _M_br_device_pixelmap_mem_allocateSub(br_device_pixelmap* self, br_devi
 // Offset: 884
 // Size: 42
 void _M_br_device_pixelmap_mem_free(br_device_pixelmap* self) {
-    NOT_IMPLEMENTED();
+    BrResFree(self);
 }
 
 // Offset: 963

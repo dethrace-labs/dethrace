@@ -26,7 +26,8 @@ br_pixelmap* BrPixelmapAllocateSub(br_pixelmap* src, br_int_32 x, br_int_32 y, b
 // Offset: 144
 // Size: 98
 void BrPixelmapFree(br_pixelmap* src) {
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%p)", src);
+    _M_br_device_pixelmap_mem_free((br_device_pixelmap*)src);
 }
 
 // Offset: 259

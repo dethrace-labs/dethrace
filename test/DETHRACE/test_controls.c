@@ -3,7 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "framework/unity.h"
+#include "tests.h"
 
 #include "common/controls.h"
 #include "common/errors.h"

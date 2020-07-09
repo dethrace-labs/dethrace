@@ -1,4 +1,4 @@
-#include "framework/unity.h"
+#include "tests.h"
 
 #include "CORE/PIXELMAP/pmfile.h"
 #include "CORE/V1DB/actsupt.h"
@@ -7,6 +7,8 @@
 #include "CORE/V1DB/v1dbfile.h"
 
 void test_v1dbfile_BrModelLoad() {
+    REQUIRES_DATA_DIRECTORY();
+
     br_model* m;
     m = BrModelLoad("DATA/MODELS/CPOINT.DAT");
     TEST_ASSERT_NOT_NULL(m);
@@ -25,6 +27,8 @@ void test_v1dbfile_BrModelLoad() {
 }
 
 void test_v1dbfile_BrActorLoad() {
+    REQUIRES_DATA_DIRECTORY();
+
     br_actor* a;
     a = BrActorLoad("DATA/ACTORS/CPOINT.ACT");
     TEST_ASSERT_NOT_NULL(a);
@@ -34,16 +38,18 @@ void test_v1dbfile_BrActorLoad() {
 }
 
 void test_v1dbfile_BrMaterialLoad() {
+    REQUIRES_DATA_DIRECTORY();
+
     br_material* m;
     br_pixelmap* pm;
 
-    pm = BrPixelmapLoad("DATA/PIXELMAPS/LAVA.PIX");
+    pm = BrPixelmapLoad("DATA/REG/PIXELMAP/OILSMEAR.PIX");
     TEST_ASSERT_NOT_NULL(pm);
-    TEST_ASSERT_EQUAL_STRING("LAVA.PIX", pm->identifier);
+    TEST_ASSERT_EQUAL_STRING("oilsmear.pix", pm->identifier);
     BrMapAdd(pm);
 
-    m = BrMaterialLoad("DATA/MATERIALS/LAVA.MAT");
-
+    m = BrMaterialLoad("DATA/REG/MATERIAL/OILSMEAR.MAT");
+    TEST_ASSERT_NOT_NULL(m);
     TEST_ASSERT_EQUAL_INT(1, m->map_transform.m[0][0]);
     TEST_ASSERT_EQUAL_INT(0, m->map_transform.m[0][1]);
     TEST_ASSERT_EQUAL_INT(0, m->map_transform.m[1][0]);
@@ -51,7 +57,6 @@ void test_v1dbfile_BrMaterialLoad() {
     TEST_ASSERT_EQUAL_INT(0, m->map_transform.m[2][0]);
     TEST_ASSERT_EQUAL_INT(0, m->map_transform.m[2][1]);
 
-    TEST_ASSERT_NOT_NULL(m);
     TEST_ASSERT_EQUAL_PTR(pm, m->colour_map);
 }
 

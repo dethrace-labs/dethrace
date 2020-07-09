@@ -1,4 +1,4 @@
-#include "framework/unity.h"
+#include "tests.h"
 
 #include <string.h>
 #include <unistd.h>
@@ -9,6 +9,7 @@
 #include "common/newgame.h"
 
 void test_loading_GetCDPathFromPathsTxtFile() {
+    REQUIRES_DATA_DIRECTORY();
     int result;
     tPath_name cd_path;
 
@@ -18,6 +19,7 @@ void test_loading_GetCDPathFromPathsTxtFile() {
 }
 
 void test_loading_OldDRfopen() {
+    REQUIRES_DATA_DIRECTORY();
     FILE* f;
 
     f = OldDRfopen("DATA/i-dont-exist", "rt");
@@ -28,13 +30,14 @@ void test_loading_OldDRfopen() {
 }
 
 void test_loading_LoadGeneralParameters() {
+    REQUIRES_DATA_DIRECTORY();
 
     LoadGeneralParameters();
     TEST_ASSERT_EQUAL_FLOAT(0.02f, gCamera_hither);
     TEST_ASSERT_EQUAL_INT(7500, gInitial_credits[0]);
     TEST_ASSERT_EQUAL_INT(5000, gInitial_credits[1]);
     TEST_ASSERT_EQUAL_INT(3000, gInitial_credits[2]);
-    TEST_ASSERT_EQUAL_STRING("BLKEAGLE.TXT", gBasic_car_names[0]);
+    TEST_ASSERT_EQUAL_STRING("NEWEAGLE.TXT", gBasic_car_names[0]);
     TEST_ASSERT_EQUAL_FLOAT(0.2f, gDefault_default_water_spec_vol.gravity_multiplier);
     TEST_ASSERT_EQUAL_FLOAT(50.0f, gDefault_default_water_spec_vol.viscosity_multiplier);
 
@@ -44,6 +47,7 @@ void test_loading_LoadGeneralParameters() {
 }
 
 void test_loading_brfont() {
+    REQUIRES_DATA_DIRECTORY();
     br_font* font;
 
     font = LoadBRFont("FONT7.FNT");
