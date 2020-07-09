@@ -1,4 +1,4 @@
-#include "framework/unity.h"
+#include "tests.h"
 
 #include "common/input.h"
 #include <string.h>

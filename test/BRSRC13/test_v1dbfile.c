@@ -1,4 +1,4 @@
-#include "framework/unity.h"
+#include "tests.h"
 
 #include "CORE/PIXELMAP/pmfile.h"
 #include "CORE/V1DB/actsupt.h"
@@ -7,6 +7,8 @@
 #include "CORE/V1DB/v1dbfile.h"
 
 void test_v1dbfile_BrModelLoad() {
+    REQUIRES_DATA_DIRECTORY();
+
     br_model* m;
     m = BrModelLoad("DATA/MODELS/CPOINT.DAT");
     TEST_ASSERT_NOT_NULL(m);
@@ -25,6 +27,8 @@ void test_v1dbfile_BrModelLoad() {
 }
 
 void test_v1dbfile_BrActorLoad() {
+    REQUIRES_DATA_DIRECTORY();
+
     br_actor* a;
     a = BrActorLoad("DATA/ACTORS/CPOINT.ACT");
     TEST_ASSERT_NOT_NULL(a);
@@ -34,6 +38,8 @@ void test_v1dbfile_BrActorLoad() {
 }
 
 void test_v1dbfile_BrMaterialLoad() {
+    REQUIRES_DATA_DIRECTORY();
+
     br_material* m;
     br_pixelmap* pm;
 

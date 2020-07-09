@@ -1,4 +1,4 @@
-#include "framework/unity.h"
+#include "tests.h"
 
 #include <string.h>
 #include <unistd.h>

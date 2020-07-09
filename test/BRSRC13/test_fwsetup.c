@@ -1,4 +1,4 @@
-#include "framework/unity.h"
+#include "tests.h"
 
 #include "CORE/FW/fwsetup.h"
 #include <string.h>

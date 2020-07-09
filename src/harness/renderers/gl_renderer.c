@@ -139,5 +139,5 @@ void Harness_GLRenderer_DoubleBuffer(uint32_t* screen_buffer, SDL_Window* window
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     SDL_GL_SwapWindow(window);
-    //SDL_Delay(15000);
+    SDL_Delay(5000);
 }

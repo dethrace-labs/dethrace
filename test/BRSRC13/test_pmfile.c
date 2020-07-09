@@ -1,8 +1,10 @@
-#include "framework/unity.h"
+#include "tests.h"
 
 #include "CORE/PIXELMAP/pmfile.h"
 
 void test_pmfile_BrPixelmapLoad() {
+    REQUIRES_DATA_DIRECTORY();
+
     br_pixelmap* pm;
     pm = BrPixelmapLoad("DATA/PIXELMAP/LOADSCRN.PIX");
     TEST_ASSERT_NOT_NULL(pm);
