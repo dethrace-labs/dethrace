@@ -66,7 +66,8 @@ void InitSound() {
     int engine_channel_count;
     int car_channel_count;
     int ped_channel_count;
-    NOT_IMPLEMENTED();
+
+    LOG_WARN("Not implmented");
 }
 
 // Offset: 1200

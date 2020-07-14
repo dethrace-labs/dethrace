@@ -29,7 +29,7 @@
 
 char* gWheel_actor_names[6];
 int gFunk_groove_flags[30];
-char* gNet_avail_names[4];
+char* gNet_avail_names[4] = { "never", "eagle", "hawk", "all" };
 char* gDamage_names[12];
 char* gDrivable_car_names[6];
 char* gYour_car_names[2][6];
@@ -38,7 +38,17 @@ tHeadup_info gHeadup_image_info[31];
 int gAllow_open_to_fail = 1;
 br_material* gDestn_screen_mat;
 br_material* gSource_screen_mat;
-char* gRaces_file_names[9];
+char* gRaces_file_names[9] = {
+    "RACES.TXT",
+    "NETRACES.TXT",
+    "NETRACES.TXT",
+    "PEDRACES.TXT",
+    "RACES.TXT",
+    "RACES.TXT",
+    "NETRACES.TXT",
+    "NETRACES.TXT",
+    "NETRACES.TXT"
+};
 char* gFloorpan_names[5];
 int gCurrent_race_file_index;
 int gGroove_funk_offset;
@@ -542,7 +552,7 @@ void DRLoadLights(char* pPath_name) {
     br_actor* light_array[100];
     int number_of_lights;
     int i;
-    NOT_IMPLEMENTED();
+    LOG_WARN("skipping");
 }
 
 // Offset: 5328
@@ -626,7 +636,8 @@ void UnlockInterfaceStuff() {
 // Offset: 6380
 // Size: 75
 void InitInterfaceLoadState() {
-    NOT_IMPLEMENTED();
+    LOG_TRACE("()");
+    memset(gCursors, 0, sizeof(gCursors));
 }
 
 // Offset: 6456
@@ -964,8 +975,15 @@ void DisposeHeadupImages() {
 // Offset: 28628
 // Size: 109
 FILE* OpenRaceFile() {
+    FILE* f;
     tPath_name the_path;
-    NOT_IMPLEMENTED();
+
+    PathCat(the_path, gApplication_path, gRaces_file_names[gCurrent_race_file_index]);
+    f = DRfopen(the_path, "rt");
+    if (!f) {
+        FatalError(50);
+    }
+    return f;
 }
 
 // Offset: 28740
@@ -977,7 +995,25 @@ void SkipRestOfRace(FILE* pF) {
     int text_chunk_count;
     int line_count;
     char s[256];
-    NOT_IMPLEMENTED();
+
+    GetALineAndDontArgue(pF, s);
+    GetALineAndDontArgue(pF, s);
+
+    text_chunk_count = GetAnInt(pF);
+    for (j = 0; j < text_chunk_count; j++) {
+
+        PossibleService();
+        GetALineAndDontArgue(pF, s);
+        GetALineAndDontArgue(pF, s);
+        line_count = GetAnInt(pF);
+        while (line_count > 8) {
+            GetALineAndDontArgue(pF, s);
+            line_count--;
+        }
+        for (k = 0; k < line_count; k++) {
+            GetALineAndDontArgue(pF, s);
+        }
+    }
 }
 
 // Offset: 28960
@@ -991,10 +1027,52 @@ void LoadRaces(tRace_list_spec* pRace_list, int* pCount, int pRace_type_index) {
     int j;
     int k;
     int number_of_racers;
-    int last_race;
+    int last_race = 0;
     char s[256];
     char* str;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%p, %p, %d)", pRace_list, pCount, pRace_type_index);
+
+    gCurrent_race_file_index = pRace_type_index + 1;
+    f = OpenRaceFile();
+    number_of_racers = 0;
+    while (!last_race) {
+        GetALineAndDontArgue(f, s);
+        if (strcmp(s, "END") == 0) {
+            last_race = 1;
+        } else {
+            SkipRestOfRace(f);
+            //s = (s + 48);
+            number_of_racers++;
+        }
+    }
+
+    LOG_DEBUG("race count %d", number_of_racers);
+
+    *pCount = number_of_racers;
+    fclose(f);
+    j = 0;
+    for (i = 0; i < number_of_racers; i++) {
+        pRace_list[i].suggested_rank = 99 - j / (number_of_racers - 3);
+        if (i >= 3) {
+            pRace_list[i].rank_required = pRace_list[i - 2].suggested_rank;
+        } else {
+            pRace_list[i].rank_required = 99;
+        }
+        j += 100;
+    }
+
+    pRace_list[number_of_racers - 1].rank_required = 1;
+    if (pRace_list[number_of_racers - 2].rank_required == 1) {
+        --*pCount;
+    }
+
+    for (i = 0; i < number_of_racers; i++) {
+        if (i < *pCount - 3) {
+            pRace_list[i].best_rank = pRace_list[i + 3].suggested_rank;
+        } else {
+            pRace_list[i].best_rank = 1;
+        }
+    }
 }
 
 // Offset: 29372
@@ -1078,6 +1156,7 @@ void DisposeGridIcons(tRace_info* pRace_info) {
 // Offset: 31320
 // Size: 1075
 void LoadOpponents() {
+    FILE* f;
     tPath_name the_path;
     int i;
     int j;
@@ -1085,7 +1164,74 @@ void LoadOpponents() {
     char s[256];
     char* str;
     tText_chunk* the_chunk;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("()");
+
+    PathCat(the_path, gApplication_path, "OPPONENT.TXT");
+    f = DRfopen(the_path, "rt");
+    if (!f) {
+        FatalError(54);
+    }
+    GetALineAndDontArgue(f, s);
+    str = strtok(s, "\t ,/");
+    sscanf(str, "%d", &gNumber_of_racers);
+    gOpponents = BrMemAllocate(sizeof(tOpponent) * gNumber_of_racers, 0xA3u);
+
+    for (i = 0; i < gNumber_of_racers; i++) {
+        PossibleService();
+        GetALineAndDontArgue(f, gOpponents[i].name);
+        if (!strcmp(gOpponents[i].name, "END")) {
+            FatalError(55);
+        }
+
+        GetALineAndDontArgue(f, gOpponents[i].abbrev_name);
+        gOpponents[i].car_number = GetAnInt(f);
+        gOpponents[i].strength_rating = GetAnInt(f);
+        gOpponents[i].network_availability = GetALineAndInterpretCommand(f, gNet_avail_names, 4);
+
+        GetALineAndDontArgue(f, s);
+        str = strtok(s, "\t ,/");
+        strcpy(gOpponents[i].mug_shot_name, str);
+
+        gOpponents[i].mug_shot_image_data = NULL;
+        gOpponents[i].grid_icon_image = NULL;
+        gOpponents[i].stolen_car_image_data = NULL;
+
+        GetALineAndDontArgue(f, s);
+        str = strtok(s, "\t ,/");
+        strcpy(gOpponents[i].car_file_name, str);
+        GetALineAndDontArgue(f, s);
+        str = strtok(s, "\t ,/");
+        strcpy(gOpponents[i].stolen_car_flic_name, str);
+
+        gOpponents[i].text_chunk_count = GetAnInt(f);
+        gOpponents[i].text_chunks = BrMemAllocate(sizeof(tText_chunk) * gOpponents[i].text_chunk_count, 0xA4u);
+
+        for (j = 0; j < gOpponents[i].text_chunk_count; j++) {
+            the_chunk = &gOpponents[i].text_chunks[j];
+            PossibleService();
+            GetPairOfInts(f, &the_chunk->x_coord, &the_chunk->y_coord);
+            GetPairOfInts(f, &the_chunk->frame_cue, &the_chunk->frame_end);
+            the_chunk->line_count = GetAnInt(f);
+            while (the_chunk->line_count > 8) {
+                the_chunk->line_count--;
+                GetALineAndDontArgue(f, s);
+            }
+
+            for (k = 0; k < the_chunk->line_count; k++) {
+                GetALineAndDontArgue(f, s);
+                the_chunk->text[k] = BrMemAllocate(strlen(s) + 1, 0xA5u);
+                strcpy(the_chunk->text[k], s);
+            }
+        }
+
+        gOpponents[i].dead = 0;
+        InitOpponentPsyche(i);
+    }
+    GetALineAndDontArgue(f, s);
+    if (strcmp(s, "END")) {
+        FatalError(55);
+    }
+    return fclose(f);
 }
 
 // Offset: 32396
@@ -1171,7 +1317,19 @@ int GetALineAndInterpretCommand(FILE* pF, char** pString_list, int pCount) {
     int i;
     char s[256];
     char* str;
-    NOT_IMPLEMENTED();
+
+    GetALineAndDontArgue(pF, s);
+
+    str = strtok(s, "\t ,/");
+    if (pCount <= 0) {
+        return -1;
+    }
+    for (i = 0; i < pCount; i++) {
+        if (strcmp(s, pString_list[i]) == 0) {
+            return i;
+        }
+    }
+    return -1;
 }
 
 // Offset: 33724
@@ -1628,7 +1786,7 @@ int GetCDPathFromPathsTxtFile(char* pPath_name) {
     static tPath_name cd_pathname;
     FILE* paths_txt_fp;
     tPath_name paths_txt;
-    LOG_TRACE("(\"%s\")", pPath_name);
+    LOG_TRACE("()");
 
     if (!got_it_already) {
         sprintf(paths_txt, "%s%s%s", gApplication_path, gDir_separator, "PATHS.TXT");

@@ -1,5 +1,6 @@
 #include "graphics.h"
 
+#include "CORE/V1DB/modsupt.h"
 #include "brender.h"
 #include "common/flicplay.h"
 #include "errors.h"
@@ -756,7 +757,8 @@ void InitPaletteAnimate() {
 // Offset: 19968
 // Size: 76
 void RevertPalette() {
-    NOT_IMPLEMENTED();
+    gPalette_munged = 0;
+    gPalette_index = 0;
 }
 
 // Offset: 20044
@@ -850,19 +852,32 @@ void EnsurePaletteUp() {
 // Size: 103
 br_uint_32 AmbientificateMaterial(br_material* pMat, void* pArg) {
     float a;
-    NOT_IMPLEMENTED();
+    LOG_DEBUG("%s", pMat->identifier);
+    a = pMat->ka + *(br_scalar*)pArg;
+    if (a >= 0.0) {
+        if (a > 0.99f) {
+            a = 0.99f;
+        }
+    } else {
+        a = 0.0;
+    }
+    pMat->ka = a;
+    return 0;
 }
 
 // Offset: 21212
 // Size: 60
 void ChangeAmbience(br_scalar pDelta) {
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%f)", pDelta);
+    BrMaterialEnum("*", AmbientificateMaterial, &pDelta);
 }
 
 // Offset: 21272
 // Size: 57
 void InitAmbience() {
-    NOT_IMPLEMENTED();
+    LOG_TRACE("()");
+    gCurrent_ambience = gAmbient_adjustment;
+    return ChangeAmbience(gAmbient_adjustment);
 }
 
 // Offset: 21332
@@ -977,7 +992,12 @@ void DRPixelmapRectangleVScaledCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
 // Offset: 23708
 // Size: 87
 void InitTransientBitmaps() {
-    NOT_IMPLEMENTED();
+    int i;
+    LOG_TRACE("()");
+    for (i = 0; i < 50; i++) {
+        gTransient_bitmaps[i].pixmap = NULL;
+        gTransient_bitmaps[i].in_use = 0;
+    }
 }
 
 // Offset: 23796
@@ -1149,7 +1169,7 @@ void LoadFont(int pFont_ID) {
 // EAX: pFont_ID
 void DisposeFont(int pFont_ID) {
     LOG_TRACE("(%d)", pFont_ID);
-    if (gFonts[pFont_ID].images && (!TranslationMode() || gAusterity_mode && FlicsPlayedFromDisk())) {
+    if (gFonts[pFont_ID].images && (!TranslationMode() || (gAusterity_mode && FlicsPlayedFromDisk()))) {
         BrPixelmapFree(gFonts[pFont_ID].images);
         gFonts[pFont_ID].images = NULL;
         gFonts[pFont_ID].file_read_once = 0;
@@ -1306,7 +1326,33 @@ void ToggleShadow() {
 void InitShadow() {
     int i;
     br_vector3 temp_v;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("()");
+
+    for (i = 0; i < 8; i++) {
+        gShadow_clip_planes[i].clip = BrActorAllocate(BR_ACTOR_CLIP_PLANE, NULL);
+        BrActorAdd(gUniverse_actor, gShadow_clip_planes[i].clip);
+        BrClipPlaneDisable(gShadow_clip_planes[i].clip);
+        BrMatrix34Identity(&gShadow_clip_planes[i].clip->t.t.mat);
+    }
+    gFancy_shadow = 1;
+    gShadow_material = BrMaterialFind("SHADOW.MAT");
+    gShadow_light_ray.v[0] = 0.0;
+    gShadow_light_ray.v[1] = -1.0;
+    gShadow_light_ray.v[2] = 0.0;
+    // dword_1316E4 = 0;
+    // dword_1316BC = 0;
+    // dword_1316C0 = 0;
+    // dword_1316CC = 0;
+    // dword_1316D0 = 0;
+    // dword_1316C8 = 0x3F800000;
+    // dword_1316E0 = 0xBF800000;
+    // dword_1316C4 = 0xBF800000;
+
+    gShadow_model = BrModelAllocate(NULL, 0, 0);
+    gShadow_model->flags = 6;
+    gShadow_actor = BrActorAllocate(BR_ACTOR_MODEL, 0);
+    gShadow_actor->model = gShadow_model;
+    return BrActorAdd(gUniverse_actor, gShadow_actor);
 }
 
 // Offset: 31320

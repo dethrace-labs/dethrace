@@ -1,4 +1,9 @@
 #include "powerup.h"
+#include "brender.h"
+#include "common/errors.h"
+#include "common/globvars.h"
+#include "common/loading.h"
+#include "common/utility.h"
 #include <stdlib.h>
 
 int gPed_harvest_sounds[4];
@@ -6,14 +11,14 @@ tGot_proc* gGot_procs[34];
 tLose_proc* gLose_procs[34];
 tHeadup_icon gIcon_list[20];
 tPeriodic_proc* gPeriodic_procs[34];
-char* gFizzle_names[3];
+char* gFizzle_names[3] = { "CIRCLES.PIX", "SQUARES.PIX", "DIAMONDS.PIX" };
 br_pixelmap* gFizzle_in[3];
 int gNumber_of_powerups;
 tU32* gReal_render_palette;
 int gFizzle_height;
 int gNumber_of_icons;
 tPowerup* gPowerup_array;
-br_vector3 gZero_v;
+br_vector3 gZero_v_powerup; // added _powerup suffix to avoid name collision
 
 // Offset: 0
 // Size: 303
@@ -70,6 +75,7 @@ int GotPowerup(tCar_spec* pCar, int pIndex) {
 // Offset: 1628
 // Size: 811
 void LoadPowerups() {
+    FILE* f;
     tPath_name the_path;
     char s[256];
     int i;
@@ -77,7 +83,67 @@ void LoadPowerups() {
     int time;
     int action_index;
     tPowerup* the_powerup;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("()");
+
+    for (i = 0; i < 3; i++) {
+        gFizzle_in[i] = LoadPixelmap(gFizzle_names[i]);
+    }
+
+    gFizzle_height = gFizzle_in[0]->height / 4;
+    PathCat(the_path, gApplication_path, "POWERUP.TXT");
+    f = DRfopen(the_path, "rt");
+    if (!f) {
+        FatalError(25);
+    }
+    gNumber_of_powerups = GetAnInt(f);
+    gPowerup_array = BrMemAllocate(sizeof(tPowerup) * gNumber_of_powerups, 0xC5u);
+    for (i = 0; i < gNumber_of_powerups; i++) {
+        the_powerup = &gPowerup_array[i];
+
+        GetALineAndDontArgue(f, the_powerup->message);
+        if (strcmp(the_powerup->message, "dummy") == 0) {
+            the_powerup->type = 0;
+        } else {
+            if (strcmp(the_powerup->message, "n/a") == 0) {
+                the_powerup->message[0] = 0;
+            }
+            GetAString(f, s);
+            the_powerup->icon = LoadPixelmap(s);
+            the_powerup->fizzle_type = GetAnInt(f);
+            the_powerup->duration = 1000 * GetAnInt(f);
+            if (the_powerup->duration < 0) {
+                the_powerup->type = ePowerup_instantaneous;
+            } else if (the_powerup->duration == 0) {
+                the_powerup->type = ePowerup_whole_race;
+            } else {
+                the_powerup->type = ePowerup_timed;
+            }
+            action_index = GetAnInt(f);
+            if (action_index >= 0) {
+                the_powerup->got_proc = gGot_procs[action_index];
+                the_powerup->lose_proc = gLose_procs[action_index];
+                the_powerup->periodic_proc = gPeriodic_procs[action_index];
+            } else {
+                the_powerup->lose_proc = NULL;
+                the_powerup->periodic_proc = NULL;
+                the_powerup->got_proc = NULL;
+            }
+            the_powerup->number_of_float_params = GetAnInt(f);
+            the_powerup->float_params = BrMemAllocate(4 * the_powerup->number_of_float_params, 0xC6u);
+            for (j = 0; j < the_powerup->number_of_float_params; j++) {
+                the_powerup->float_params[j] = GetAFloat(f);
+            }
+            the_powerup->number_of_integer_params = GetAnInt(f);
+            the_powerup->integer_params = BrMemAllocate(4 * the_powerup->number_of_integer_params, 0xC7u);
+            for (j = 0; j < the_powerup->number_of_integer_params; j++) {
+                the_powerup->integer_params[j] = GetAnInt(f);
+            }
+            the_powerup->group_inclusion = GetAnInt(f);
+            the_powerup->prat_cam_event = GetAnInt(f);
+            the_powerup->net_type = GetAnInt(f);
+        }
+    }
+    fclose(f);
 }
 
 // Offset: 2440

@@ -132,7 +132,41 @@ int BrRegistryCount(br_registry* reg, char* pattern) {
 int BrRegistryEnum(br_registry* reg, char* pattern, br_enum_cbfn* callback, void* arg) {
     br_registry_entry* e;
     int r;
-    NOT_IMPLEMENTED();
+
+    e = (br_registry_entry*)reg->list.tail;
+    if (!pattern) {
+        if (e->node.prev) {
+            while (1) {
+                r = callback(e->item, arg);
+                if (r) {
+                    break;
+                }
+                e = (br_registry_entry*)e->node.prev;
+                if (!e->node.prev) {
+                    return 0;
+                }
+            }
+            return 0;
+        }
+        return 0;
+    }
+    if (!e->node.prev) {
+        return 0;
+    }
+    while (1) {
+        // as a char**, e->item[1] actually points to `identifier` field in a br_* struct etc
+        if (BrNamePatternMatch(pattern, e->item[1])) {
+            r = callback(e->item, arg);
+            if (r) {
+                break;
+            }
+        }
+        e = (br_registry_entry*)e->node.prev;
+        if (!e->node.prev) {
+            return 0;
+        }
+    }
+    return 0;
 }
 
 // Offset: 1838

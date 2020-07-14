@@ -145,6 +145,9 @@ br_actor* BrActorAllocate(br_uint_8 type, void* type_data) {
             clip_plane->v[3] = 0;
             a->type_data = clip_plane;
             break;
+        case BR_ACTOR_MODEL:
+            // nothing to do
+            break;
         default:
             LOG_WARN("Warning: Unknown type %d for BrActorAllocate", type);
         }

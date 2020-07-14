@@ -1,11 +1,24 @@
 #include "replay.h"
 #include <stdlib.h>
 
+#include "common/loading.h"
+
 int gProgress_line_top[2];
 int gProgress_line_left[2];
 int gProgress_line_right[2];
 br_pixelmap* gReplay_pixies[10];
-char* gReplay_pixie_names[10];
+char* gReplay_pixie_names[10] = {
+    "REPLAY.PIX",
+    "RBUTTONS.PIX",
+    "REWSTART.PIX",
+    "REW.PIX",
+    "REVPLAY.PIX",
+    "PAUSE.PIX",
+    "PLAY.PIX",
+    "FFWD.PIX",
+    "FWDEND.PIX",
+    "CAMERA.PIX"
+};
 int gKey_down;
 int gNo_cursor;
 int gSingle_frame_mode;
@@ -153,7 +166,12 @@ void CheckReplayTurnOn() {
 // Offset: 4928
 // Size: 98
 void InitializeActionReplay() {
-    NOT_IMPLEMENTED();
+    int i;
+    LOG_TRACE("()");
+    for (int i = 0; i < 10; i++) {
+        gReplay_pixies[i] = LoadPixelmap(gReplay_pixie_names[i]);
+    }
+    gAction_replay_camera_mode = eAction_replay_action;
 }
 
 // Offset: 5028

@@ -1,4 +1,5 @@
 #include "displays.h"
+#include "brender.h"
 #include "common/flicplay.h"
 #include "common/globvars.h"
 #include "common/graphics.h"
@@ -43,7 +44,15 @@ void GetTimerString(char* pStr, int pFudge_colon) {
 // Offset: 56
 // Size: 116
 void InitHeadups() {
-    NOT_IMPLEMENTED();
+    int i;
+    LOG_TRACE("()");
+    for (i = 0; i < 15; i++) {
+        gHeadups[i].type = 0;
+    }
+    gBR_fonts[0] = BrFontProp7x9;
+    gBR_fonts[1] = BrFontFixed3x5;
+    gBR_fonts[2] = gFont_7;
+    gBR_fonts[3] = gHeadup_font;
 }
 
 // Offset: 172

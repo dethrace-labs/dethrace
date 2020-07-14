@@ -46,7 +46,7 @@ br_scalar gExploding_ped_scale[3];
 br_vector3 gDanger_direction;
 int gPed_instruc_count;
 int gInit_ped_instruc;
-br_vector3 gZero_v;
+br_vector3 gZero_v_pedestrn; // added _pedestrn to avoid name collision with car.c
 char* gRate_commands[3];
 char* gCollide_commands[1];
 int gCurrent_lollipop_index;

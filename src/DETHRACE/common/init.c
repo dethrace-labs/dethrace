@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "common/controls.h"
 #include "common/depth.h"
 #include "common/displays.h"
 #include "common/drdebug.h"
@@ -135,7 +136,7 @@ void InstallFindFailedHooks() {
 void AllocateStandardLamp() {
     br_actor* lamp;
     int i;
-    NOT_IMPLEMENTED();
+    LOG_WARN("skipping");
 }
 
 // Offset: 2152

@@ -10,6 +10,7 @@
 #include "framework/unity.h"
 
 #include "CORE/V1DB/dbsetup.h"
+#include "common/utility.h"
 
 #include "common/globvars.h"
 #include "harness.h"
@@ -37,10 +38,12 @@ extern void test_register_suite();
 extern void test_pattern_suite();
 extern void test_pmfile_suite();
 extern void test_graphics_suite();
+extern void test_regsupt_suite();
 
 char* root_dir;
 
 void setUp(void) {
+    gEncryption_method = 0;
 }
 
 void tearDown(void) {
@@ -93,6 +96,7 @@ int main(int argc, char** argv) {
     test_pattern_suite();
     test_pmfile_suite();
     test_v1dbfile_suite();
+    test_regsupt_suite();
 
     // DETHRACE
     test_utility_suite();
