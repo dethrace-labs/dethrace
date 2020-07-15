@@ -1,11 +1,5 @@
 #include "dossys.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <time.h>
-#include <unistd.h>
-
 #include "brender.h"
 #include "common/car.h"
 #include "common/drdebug.h"
@@ -18,7 +12,12 @@
 #include "common/utility.h"
 #include "watcom_functions.h"
 #include <dirent.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <unistd.h>
 
 int gASCII_table[128];
 tU32 gKeyboard_bits[8];
@@ -885,7 +884,26 @@ int PDCheckDriveExists2(char* pThe_path, char* pFile_name, tU32 pMin_size) {
     int stat_failed;
     char slasher[4];
     char the_path[256];
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(\"%s\", \"%s\", %d)", pThe_path, pFile_name, pMin_size);
+
+    strcpy(slasher, "?:\\");
+    if (pFile_name) {
+        PathCat(the_path, pThe_path, pFile_name);
+    } else {
+        strcpy(the_path, pThe_path);
+    }
+
+    // JeffH: force unix dir separator >>
+    char* rep = the_path;
+    while ((rep = strchr(rep, '\\')) != NULL) {
+        *rep++ = '/';
+    }
+    // <<
+
+    stat_failed = stat(the_path, &buf);
+    LOG_DEBUG("path: %d, %s, %d", stat_failed, the_path, buf.st_size);
+
+    return !stat_failed && buf.st_size >= pMin_size;
 }
 
 // Offset: 10184

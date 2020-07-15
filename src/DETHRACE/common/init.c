@@ -243,7 +243,7 @@ void Init2DStuff() {
 void InitialiseApplication(int pArgc, char** pArgv) {
 
     gProgram_state.sausage_eater_mode = gSausage_override;
-    DrDebugLog(gSausage_override, *pArgv);
+    DiagnosticsPrint(gSausage_override, *pArgv);
     if (gAustere_override || PDDoWeLeadAnAustereExistance() != 0) {
         gAusterity_mode = 1;
     }
@@ -306,7 +306,7 @@ void InitialiseApplication(int pArgc, char** pArgv) {
     gProgram_state.track_spec.the_actor = NULL;
     gCD_is_in_drive = TestForOriginalCarmaCDinDrive();
     SwitchToLoresMode();
-    DrDebugLog(0, "AFTER APPLICATION INITIALISATION");
+    DiagnosticsPrint(0, "AFTER APPLICATION INITIALISATION");
 }
 
 // Offset: 6004

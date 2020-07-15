@@ -1805,13 +1805,66 @@ int GetCDPathFromPathsTxtFile(char* pPath_name) {
 // Offset: 38784
 // Size: 44
 int TestForOriginalCarmaCDinDrive() {
-    NOT_IMPLEMENTED();
+    LOG_TRACE("()");
+
+    // JeffH the symbol dump didn't include any local variable information.
+    // These names are not necessarily the original names.
+    tPath_name the_path;
+    tPath_name cd_pathname;
+    tPath_name cd_data_pathname;
+    tPath_name cutscene_pathname;
+    FILE* paths_txt_fp;
+    tPath_name paths_txt;
+    int paths_txt_first_char;
+
+    paths_txt[0] = 0;
+    strcat(paths_txt, gApplication_path);
+    strcat(paths_txt, gDir_separator);
+    strcat(paths_txt, "PATHS.TXT");
+
+    if (!PDCheckDriveExists(paths_txt)) {
+        return 0;
+    }
+
+    paths_txt_fp = fopen(paths_txt, "rt");
+    if (!paths_txt_fp) {
+        return 0;
+    }
+    paths_txt_first_char = fgetc(paths_txt_fp);
+    ungetc(paths_txt_first_char, paths_txt_fp);
+    GetALineAndDontArgue(paths_txt_fp, cd_pathname);
+    fclose(paths_txt_fp);
+    strcpy(cd_data_pathname, cd_pathname);
+    strcat(cd_data_pathname, gDir_separator);
+    strcat(cd_data_pathname, "DATA");
+
+    if (DRStricmp(cd_pathname, gApplication_path) == 0) {
+        return 0;
+    }
+
+    strcpy(cutscene_pathname, cd_pathname);
+    strcat(cutscene_pathname, gDir_separator);
+    strcat(cutscene_pathname, "CUTSCENE");
+
+    if (PDCheckDriveExists2(cd_data_pathname, "GENERAL.TXT", 100)
+        && (PDCheckDriveExists2(cd_pathname, "CARMA.EXE", 1000000)
+            || PDCheckDriveExists2(cd_pathname, "CARMAG.EXE", 1000000)
+            || PDCheckDriveExists2(cd_pathname, "MAINPROG.EXE", 1000000)
+            || PDCheckDriveExists2(cd_pathname, "CARMSPLT.EXE", 1000000)
+            || PDCheckDriveExists2(cd_pathname, "CARMGSPL.EXE", 1000000))
+        && PDCheckDriveExists2(cutscene_pathname, "SPLINTRO.SMK", 2000000)) {
+        if (paths_txt_first_char != '@') {
+            EncodeFile(paths_txt);
+        }
+        return 1;
+    }
+    return 0;
 }
 
 // Offset: 38828
 // Size: 45
 int OriginalCarmaCDinDrive() {
-    NOT_IMPLEMENTED();
+    return gCD_is_in_drive;
 }
 
 // Offset: 38876

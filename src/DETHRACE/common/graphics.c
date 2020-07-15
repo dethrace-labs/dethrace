@@ -5,6 +5,7 @@
 #include "common/flicplay.h"
 #include "errors.h"
 #include "globvars.h"
+#include "grafdata.h"
 #include "init.h"
 #include "loading.h"
 #include "pc-dos/dossys.h"
@@ -1388,7 +1389,14 @@ int SwitchToRealResolution() {
 // Offset: 31868
 // Size: 125
 int SwitchToLoresMode() {
-    NOT_IMPLEMENTED();
+    LOG_TRACE("()");
+    if (!gGraf_data_index || gGraf_data_index != gReal_graf_data_index) {
+        return 0;
+    }
+    gGraf_data_index = 0;
+    gGraf_spec_index = 0;
+    gCurrent_graf_data = gGraf_data;
+    return 1;
 }
 
 // Offset: 31996

@@ -3,9 +3,9 @@
 
 // These functions were compiled out of the release executable. Implementation is just a guess
 
-void DrDebugLog(int level_maybe, char* pStr) {
+void DiagnosticsPrint(int level_maybe, char* pStr) {
     // maybe this is actually "errors::dprintf"?
-    printf("%d: %s\n", level_maybe, pStr);
+    LOG_TRACE(" \"%s\"", pStr);
 }
 
 void DrDebugMessage(char* pStr, ...) {

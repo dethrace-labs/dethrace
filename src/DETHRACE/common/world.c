@@ -101,7 +101,20 @@ br_actor* CloneActor(br_actor* pSource_actor) {
 // EBX: pMax_shade_tables
 // ECX: pMax_materials
 void InitialiseStorageSpace(tBrender_storage* pStorage_space, int pMax_pixelmaps, int pMax_shade_tables, int pMax_materials, int pMax_models) {
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%p, %d, %d, %d, %d)", pStorage_space, pMax_pixelmaps, pMax_shade_tables, pMax_materials, pMax_models);
+    pStorage_space->pixelmaps_count = 0;
+    pStorage_space->shade_tables_count = 0;
+    pStorage_space->materials_count = 0;
+    pStorage_space->models_count = 0;
+    pStorage_space->max_pixelmaps = pMax_pixelmaps;
+    pStorage_space->max_shade_tables = pMax_shade_tables;
+    pStorage_space->max_materials = pMax_materials;
+    pStorage_space->max_models = pMax_models;
+    pStorage_space->pixelmaps = BrMemCalloc(pMax_pixelmaps, 4, 0xD7u);
+    pStorage_space->shade_tables = BrMemCalloc(pMax_shade_tables, 4, 0xD8u);
+    pStorage_space->materials = BrMemCalloc(pMax_materials, 4, 0xD9u);
+    pStorage_space->models = BrMemCalloc(pMax_models, 4, 0xDAu);
+    pStorage_space->saved_colour_maps = BrMemCalloc(pMax_materials, 4, 0xDBu);
 }
 
 // Offset: 872

@@ -1186,7 +1186,15 @@ void SkipNLines(FILE* pF) {
 // EDX: p2
 int DRStricmp(char* p1, char* p2) {
     int val;
-    NOT_IMPLEMENTED();
+    while (p1) {
+        val = tolower(*p1) - tolower(*p2);
+        if (val != 0) {
+            return val;
+        }
+        p1++;
+        p2++;
+    }
+    return 0;
 }
 
 // Offset: 15352
@@ -1230,18 +1238,7 @@ void NobbleNonzeroBlacks(br_pixelmap* pPalette) {
 // EAX: pThe_path
 int PDCheckDriveExists(char* pThe_path) {
     LOG_TRACE("(\"%s\")", pThe_path);
-
-    // Added: force unix dir separator for now >>
-    char* rep = pThe_path;
-    while ((rep = strchr(rep, '\\')) != NULL) {
-        *rep++ = '/';
-    }
-    // <<
-
-    if (access(pThe_path, 0) != -1) {
-        return 1;
-    }
-    return 0;
+    return PDCheckDriveExists2(pThe_path, NULL, 0);
 }
 
 // Offset: 16388

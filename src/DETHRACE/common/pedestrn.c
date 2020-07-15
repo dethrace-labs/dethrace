@@ -1,4 +1,5 @@
 #include "pedestrn.h"
+#include "brender.h"
 #include <stdlib.h>
 
 #include <time.h>
@@ -151,7 +152,39 @@ void PedCallBack(br_actor* pActor, br_model* pModel, br_material* pMaterial, voi
 // Offset: 2136
 // Size: 516
 void InitPeds() {
-    NOT_IMPLEMENTED();
+    LOG_TRACE("()");
+    gPed_model = BrModelAllocate(0, 4, 2);
+    gPed_model->faces->vertices[0] = 0;
+    gPed_model->faces->vertices[1] = 2;
+    gPed_model->faces->vertices[2] = 1;
+    gPed_model->faces->material = 0;
+    gPed_model->faces->smoothing = 1;
+    gPed_model->faces[1].vertices[0] = 0;
+    gPed_model->faces[1].vertices[1] = 3;
+    gPed_model->faces[1].vertices[2] = 2;
+    gPed_model->faces[1].material = 0;
+    gPed_model->faces[1].smoothing = 1;
+    gPed_model->vertices->p.v[0] = -0.5;
+    gPed_model->vertices->p.v[1] = 0.0;
+    gPed_model->vertices->p.v[2] = 0.0;
+    gPed_model->vertices->map.v[0] = 0.000099999997;
+    gPed_model->vertices->map.v[1] = 0.99989998;
+    gPed_model->vertices[1].p.v[0] = -0.5;
+    gPed_model->vertices[1].p.v[1] = 1.0;
+    gPed_model->vertices[1].p.v[2] = 0.0;
+    gPed_model->vertices[1].map.v[0] = 0.000099999997;
+    gPed_model->vertices[1].map.v[1] = 0.000099999997;
+    gPed_model->vertices[2].p.v[0] = 0.5;
+    gPed_model->vertices[2].p.v[1] = 1.0;
+    gPed_model->vertices[2].p.v[2] = 0.0;
+    gPed_model->vertices[2].map.v[0] = 0.99989998;
+    gPed_model->vertices[2].map.v[1] = 0.000099999997;
+    gPed_model->vertices[3].p.v[0] = 0.5;
+    gPed_model->vertices[3].p.v[1] = 0.0;
+    gPed_model->vertices[3].p.v[2] = 0.0;
+    gPed_model->vertices[3].map.v[0] = 0.99989998;
+    gPed_model->vertices[3].map.v[1] = 0.99989998;
+    BrModelAdd(gPed_model);
 }
 
 // Offset: 2652
