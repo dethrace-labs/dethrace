@@ -1,4 +1,6 @@
 #include "flicplay.h"
+#include "brender.h"
+#include "common/utility.h"
 #include <stdlib.h>
 
 tFlic_bunch gFlic_bunch[9];
@@ -140,7 +142,9 @@ int GetPanelFlicFrameIndex(int pIndex) {
 // Offset: 744
 // Size: 91
 void FlicPaletteAllocate() {
-    NOT_IMPLEMENTED();
+    LOG_TRACE("()");
+    gPalette_pixels = BrMemAllocate(0x400u, 0x8Fu);
+    gPalette = DRPixelmapAllocate(BR_PMT_RGBX_888, 1, 256, gPalette_pixels, 0);
 }
 
 // Offset: 836
@@ -447,7 +451,11 @@ void ShowFlic(int pIndex) {
 // Offset: 7016
 // Size: 76
 void InitFlics() {
-    NOT_IMPLEMENTED();
+    int i;
+    LOG_TRACE("()");
+    for (i = 0; i < 372; i++) {
+        gMain_flic_list[i].data_ptr = NULL;
+    }
 }
 
 // Offset: 7092
@@ -637,7 +645,8 @@ void LoadInterfaceStrings() {
     int i;
     int j;
     int len;
-    NOT_IMPLEMENTED();
+
+    LOG_WARN("Not implemented");
 }
 
 // Offset: 11948

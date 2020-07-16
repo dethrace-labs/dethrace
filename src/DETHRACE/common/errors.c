@@ -129,7 +129,7 @@ char* gError_messages[126] = {
 int gError_code;
 char* gPalette_copy;
 int gPixel_buffer_size;
-int gMouse_was_started;
+int gMouse_was_started__;
 char* gPixels_copy;
 
 // Offset: 0

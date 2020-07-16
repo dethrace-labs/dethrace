@@ -21,8 +21,26 @@
 #include "CORE/V1DB/regsupt.h"
 #include "CORE/V1DB/v1dbfile.h"
 
+extern struct br_font* BrFontFixed3x5;
+extern struct br_font* BrFontProp4x6;
+extern struct br_font* BrFontProp7x9;
+
 br_pixelmap* BrPixelmapLoad(char* filename);
 br_uint_32 BrPixelmapLoadMany(char* filename, br_pixelmap** pixelmaps, br_uint_16 num);
 void BrDevPaletteSetOld(br_pixelmap* pm);
+void* BrMemAllocate(br_size_t size, br_uint_8 type);
+void* BrMemCalloc(int nelems, br_size_t size, br_uint_8 type);
+br_model* BrModelAllocate(char* name, int nvertices, int nfaces);
+br_pixelmap* BrMapAdd(br_pixelmap* pixelmap);
+br_material* BrMaterialAllocate(char* name);
+
+br_material* BrMaterialAdd(br_material* material);
+void BrMaterialUpdate(br_material* mat, br_uint_16 flags);
+
+void BrMatrix23Identity(br_matrix23* mat);
+
+br_pixelmap* BrTableFind(char* pattern);
+
+void BrFatal(const char* name, int line, const char* s, ...);
 
 #endif

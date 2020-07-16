@@ -4,7 +4,7 @@
 #include "br_types.h"
 #include "dr_types.h"
 
-void DrDebugLog(int unk, char* pStr);
+void DiagnosticsPrint(int unk, char* pStr);
 
 void DrDebugMessage(char* pStr, ...);
 

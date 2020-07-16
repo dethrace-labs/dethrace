@@ -1,6 +1,10 @@
 #include "controls.h"
 
+#include "common/displays.h"
+#include "common/globvars.h"
+#include "common/graphics.h"
 #include "input.h"
+#include "pc-dos/dossys.h"
 #include "sound.h"
 #include <stdlib.h>
 
@@ -866,14 +870,45 @@ void ToggleSmoke() {
 void DrawSomeText2(tDR_font* pFont) {
     int y;
     int i;
-    char* txt[15];
-    NOT_IMPLEMENTED();
+    char* txt[15] = {
+        "Cops    Show all racers on map    Show peds on map",
+        "Random pick-up generation    Pick-up respawn",
+        "Open game    Closed game",
+        "Grid start    Random start",
+        "Random races    Sequential races",
+        "Include opponents' cars in car choices",
+        "Choose cars    manually    randomly    include Big APC",
+        "Starting credits    0    2000    5000    10000    20000",
+        "Driven to Destruction",
+        "Car Crusher",
+        "Carnage Accumulator",
+        "Checkpoint Stampede",
+        "Sudden Death",
+        "Terminal Tag",
+        "Fox 'n' Hounds"
+    };
+
+    ClearEntireScreen();
+    y = 0;
+    for (i = 0; i < 15; i++) {
+        TransDRPixelmapText(gBack_screen, 0, y, pFont, txt[i], 320);
+        y += pFont->height + 1;
+    }
+
+    PDScreenBufferSwap(0);
+    //PrintScreen();
 }
 
 // Offset: 18244
 // Size: 104
 void DrawSomeText() {
-    NOT_IMPLEMENTED();
+    DrawSomeText2(&gFonts[1]);
+    DrawSomeText2(&gFonts[2]);
+    DrawSomeText2(&gFonts[3]);
+    DrawSomeText2(&gFonts[4]);
+    DrawSomeText2(&gFonts[6]);
+    DrawSomeText2(&gFonts[7]);
+    DrawSomeText2(&gFonts[8]);
 }
 
 // Offset: 18348

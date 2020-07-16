@@ -75,7 +75,8 @@ br_uint_32 BrModelEnum(char* pattern, br_model_enum_cbfn* callback, void* arg) {
 // Offset: 981
 // Size: 185
 br_material* BrMaterialAdd(br_material* material) {
-    NOT_IMPLEMENTED();
+    BrRegistryAdd(&v1db.reg_materials, material);
+    BrMaterialUpdate(material, BR_MATU_ALL);
 }
 
 // Offset: 1183
@@ -138,7 +139,8 @@ br_uint_32 BrMaterialCount(char* pattern) {
 // Offset: 1930
 // Size: 55
 br_uint_32 BrMaterialEnum(char* pattern, br_material_enum_cbfn* callback, void* arg) {
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(\"%s\", %p, %p)", pattern, callback, arg);
+    return BrRegistryEnum(&v1db.reg_materials, pattern, callback, arg);
 }
 
 // Offset: 1994

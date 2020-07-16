@@ -44,7 +44,7 @@ void BrClipPlaneEnable(br_actor* c) {
 // Offset: 790
 // Size: 71
 void BrClipPlaneDisable(br_actor* c) {
-    NOT_IMPLEMENTED();
+    actorDisable(&v1db.enabled_clip_planes, c);
 }
 
 // Offset: 882

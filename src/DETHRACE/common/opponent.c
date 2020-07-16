@@ -1,4 +1,5 @@
 #include "opponent.h"
+#include "common/globvars.h"
 #include <stdlib.h>
 
 char gOppo_path_filename[256];
@@ -920,7 +921,7 @@ int GetOpponentsSectionMaxSpeed(tOpponent_spec* pOpponent_spec, tS16 pSection, i
 // EAX: pOpponent_index
 void InitOpponentPsyche(int pOpponent_index) {
     int i;
-    NOT_IMPLEMENTED();
+    gOpponents[pOpponent_index].psyche.grudge_against_player = 0;
 }
 
 // Offset: 38160

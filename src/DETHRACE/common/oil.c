@@ -1,8 +1,11 @@
 #include "oil.h"
+#include "brender.h"
+#include "common/globvars.h"
+#include "common/loading.h"
 #include <stdlib.h>
 
 int gNext_oil_pixie;
-char* gOil_pixie_names[1];
+char* gOil_pixie_names[1] = { "OIL.PIX" };
 br_scalar gZ_buffer_diff;
 br_scalar gMin_z_diff;
 br_pixelmap* gOil_pixies[1];
@@ -11,9 +14,67 @@ tOil_spill_info gOily_spills[15];
 // Offset: 0
 // Size: 811
 void InitOilSpills() {
+    int i;
     br_model* the_model;
     br_material* the_material;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("()");
+
+    gOil_pixies[0] = LoadPixelmap(gOil_pixie_names[0]);
+    BrMapAdd(gOil_pixies[0]);
+    for (i = 0; i < 15; i++) {
+        the_material = BrMaterialAllocate(NULL);
+        BrMaterialAdd(the_material);
+        the_material->ka = 0.99000001;
+        the_material->kd = 0.0;
+        the_material->ks = 0.0;
+        the_material->power = 0.0;
+        the_material->index_base = 0;
+        //LOBYTE(the_material->flags) = v2 | 0x25;
+        the_material->flags |= 0x25;
+        the_material->index_range = 0;
+        the_material->colour_map = 0;
+        BrMatrix23Identity(&the_material->map_transform);
+        the_material->index_shade = BrTableFind("IDENTITY.TAB");
+        BrMaterialUpdate(the_material, BR_MATU_ALL);
+        the_model = BrModelAllocate(NULL, 4, 2);
+        the_model->flags |= BR_MODF_KEEP_ORIGINAL;
+
+        the_model->faces->vertices[0] = 2;
+        the_model->faces->vertices[1] = 1;
+        the_model->faces->vertices[2] = 0;
+        the_model->faces->material = 0;
+        the_model->faces->smoothing = 1;
+        the_model->faces[1].vertices[0] = 3;
+        the_model->faces[1].vertices[1] = 2;
+        the_model->faces[1].vertices[2] = 0;
+        the_model->faces[1].material = 0;
+        the_model->faces[1].smoothing = 1;
+        the_model->vertices->p.v[0] = -1.0;
+        the_model->vertices->p.v[1] = 0.0;
+        the_model->vertices->p.v[2] = -1.0;
+        the_model->vertices->map.v[0] = 0.0;
+        the_model->vertices->map.v[1] = 1.0;
+        the_model->vertices[1].p.v[0] = 1.0;
+        the_model->vertices[1].p.v[1] = 0.0;
+        the_model->vertices[1].p.v[2] = 1.0;
+        the_model->vertices[1].map.v[0] = 0.0;
+        the_model->vertices[1].map.v[1] = 0.0;
+        the_model->vertices[2].p.v[0] = 1.0;
+        the_model->vertices[2].p.v[1] = 0.0;
+        the_model->vertices[2].p.v[2] = -1.0;
+        the_model->vertices[2].map.v[0] = 1.0;
+        the_model->vertices[2].map.v[1] = 0.0;
+        the_model->vertices[3].p.v[0] = -1.0;
+        the_model->vertices[3].p.v[1] = 0.0;
+        the_model->vertices[3].p.v[2] = 1.0;
+        the_model->vertices[3].map.v[0] = 1.0;
+        the_model->vertices[3].map.v[1] = 1.0;
+        gOily_spills[i].actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+        gOily_spills[i].actor->model = the_model;
+        gOily_spills[i].actor->render_style = 1;
+        gOily_spills[i].actor->material = the_material;
+        BrActorAdd(gNon_track_actor, gOily_spills[i].actor);
+    }
 }
 
 // Offset: 812

@@ -4,6 +4,20 @@
 #include "br_types.h"
 #include "dr_types.h"
 
+extern int gPed_harvest_sounds[4];
+extern tGot_proc* gGot_procs[34];
+extern tLose_proc* gLose_procs[34];
+extern tHeadup_icon gIcon_list[20];
+extern tPeriodic_proc* gPeriodic_procs[34];
+extern char* gFizzle_names[3];
+extern br_pixelmap* gFizzle_in[3];
+extern int gNumber_of_powerups;
+extern tU32* gReal_render_palette;
+extern int gFizzle_height;
+extern int gNumber_of_icons;
+extern tPowerup* gPowerup_array;
+extern br_vector3 gZero_v_powerup; // added _powerup suffix to avoid name collision
+
 // Offset: 0
 // Size: 303
 // EAX: pThe_powerup
