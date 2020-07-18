@@ -293,7 +293,7 @@ void MungeEngineNoise() {
 // Offset: 5716
 // Size: 154
 void SetSoundVolumes() {
-    NOT_IMPLEMENTED();
+    LOG_WARN("skipping");
 }
 
 // Offset: 5872
@@ -327,11 +327,9 @@ int DRS3StopCDA() {
 // Offset: 6420
 // Size: 75
 void StartMusic() {
-    NOT_IMPLEMENTED();
 }
 
 // Offset: 6496
 // Size: 48
 void StopMusic() {
-    NOT_IMPLEMENTED();
 }

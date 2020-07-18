@@ -8,7 +8,7 @@ int gThis_net_player_index;
 br_scalar gPedestrian_distance_squared;
 int gPending_race;
 tPlayer_ID gLocal_net_ID;
-tNet_mode gNet_mode;
+tNet_mode gNet_mode = 0;
 int gNumber_of_net_players;
 int gStart_race_sent;
 int gSynch_race_start;

@@ -140,7 +140,7 @@ br_uint_32 BrMaterialCount(char* pattern) {
 // Size: 55
 br_uint_32 BrMaterialEnum(char* pattern, br_material_enum_cbfn* callback, void* arg) {
     LOG_TRACE("(\"%s\", %p, %p)", pattern, callback, arg);
-    return BrRegistryEnum(&v1db.reg_materials, pattern, callback, arg);
+    return BrRegistryEnum(&v1db.reg_materials, pattern, (br_enum_cbfn*)callback, arg);
 }
 
 // Offset: 1994

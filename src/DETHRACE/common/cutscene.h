@@ -4,14 +4,6 @@
 #include "br_types.h"
 #include "dr_types.h"
 
-// Offset: 0
-// Size: 118
-void* radmalloc(unsigned long numbytes);
-
-// Offset: 120
-// Size: 59
-void radfree(void* ptr);
-
 // Offset: 180
 // Size: 179
 // EAX: pIndex

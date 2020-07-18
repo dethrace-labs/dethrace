@@ -6,17 +6,18 @@
 #include "common/controls.h"
 #include "common/depth.h"
 #include "common/displays.h"
-#include "common/drdebug.h"
 #include "common/drfile.h"
 #include "common/drmem.h"
 #include "common/errors.h"
 #include "common/flicplay.h"
 #include "common/globvars.h"
 #include "common/globvrkm.h"
+#include "common/globvrpb.h"
 #include "common/grafdata.h"
 #include "common/graphics.h"
 #include "common/loading.h"
 #include "common/netgame.h"
+#include "common/network.h"
 #include "common/oil.h"
 #include "common/pedestrn.h"
 #include "common/powerup.h"
@@ -30,13 +31,13 @@
 
 #include "brender.h"
 
-int gInitialisation_finished;
+int gInitialisation_finished = 0;
 tU32 gAustere_time;
 int gInitial_rank;
-int gGame_initialized;
-int gBr_initialized;
-int gBrZb_initialized;
-int gRender_indent;
+int gGame_initialized = 0;
+int gBr_initialized = 0;
+int gBrZb_initialized = 0;
+int gRender_indent = 0;
 int gCredits_per_rank[3];
 int gInitial_credits[3];
 int gNet_mode_of_last_game;
@@ -109,7 +110,35 @@ void ReinitialiseForwardCamera() {
 // Offset: 1216
 // Size: 217
 void AllocateRearviewPixelmap() {
-    NOT_IMPLEMENTED();
+    char* rear_screen_pixels;
+    LOG_TRACE("()");
+
+    if (gRearview_screen) {
+        BrMemFree(gRearview_screen->pixels);
+        BrPixelmapFree(gRearview_screen);
+        BrPixelmapFree(gRearview_depth_buffer);
+        gRearview_screen = NULL;
+    }
+    if (gProgram_state.mirror_on) {
+        rear_screen_pixels = BrMemAllocate(
+            (gProgram_state.current_car.mirror_bottom - gProgram_state.current_car.mirror_top + 1)
+                * (gProgram_state.current_car.mirror_right - gProgram_state.current_car.mirror_left + 4)
+                * gGraf_specs[gGraf_spec_index].depth_bytes,
+            0x9Au);
+        if (gScreen->row_bytes < 0) {
+            BrFatal("..\\..\\source\\common\\init.c", 260, "Bruce bug at line %d, file ..\\..\\source\\common\\init.c", 4);
+        }
+        gRearview_screen = DRPixelmapAllocate(
+            gScreen->type,
+            gProgram_state.current_car.mirror_right - gProgram_state.current_car.mirror_left,
+            gProgram_state.current_car.mirror_bottom - gProgram_state.current_car.mirror_top,
+            rear_screen_pixels,
+            0);
+
+        gRearview_screen->origin_x = gRearview_screen->width / 2;
+        gRearview_screen->origin_y = gRearview_screen->height / 2;
+        gRearview_depth_buffer = BrPixelmapMatch(gRearview_screen, BR_PMMATCH_DEPTH_16);
+    }
 }
 
 // Offset: 1436
@@ -243,7 +272,7 @@ void Init2DStuff() {
 void InitialiseApplication(int pArgc, char** pArgv) {
 
     gProgram_state.sausage_eater_mode = gSausage_override;
-    DiagnosticsPrint(gSausage_override, *pArgv);
+    PrintMemoryDump(gSausage_override, *pArgv);
     if (gAustere_override || PDDoWeLeadAnAustereExistance() != 0) {
         gAusterity_mode = 1;
     }
@@ -306,7 +335,7 @@ void InitialiseApplication(int pArgc, char** pArgv) {
     gProgram_state.track_spec.the_actor = NULL;
     gCD_is_in_drive = TestForOriginalCarmaCDinDrive();
     SwitchToLoresMode();
-    DiagnosticsPrint(0, "AFTER APPLICATION INITIALISATION");
+    PrintMemoryDump(0, "AFTER APPLICATION INITIALISATION");
 }
 
 // Offset: 6004
@@ -331,7 +360,25 @@ void InitGame(int pStart_race) {
 // Offset: 6496
 // Size: 191
 void DisposeGameIfNecessary() {
-    NOT_IMPLEMENTED();
+    int i;
+    LOG_TRACE("()");
+
+    if (gNet_mode) {
+        NetLeaveGame(gCurrent_net_game);
+    }
+    if (gGame_initialized) {
+        DisposeHeadupImages();
+        gGame_initialized = 0;
+        if (gNet_mode_of_last_game) {
+            for (i = 0; i < gNumber_of_net_players; i++) {
+                DisposeCar(gNet_players[i].car, gNet_players[i].car_index);
+            }
+            PossibleService();
+            LoadRaces(gRace_list, &gNumber_of_races, -1);
+            DisposeStorageSpace(&gNet_cars_storage_space);
+        }
+    }
+    ShutdownNetIfRequired();
 }
 
 // Offset: 6688

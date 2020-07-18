@@ -1,14 +1,18 @@
-.PHONY: build clean test install-deps run
+.PHONY: build lib clean test install-deps run
 
 all: build test
 
-build:
+build: lib
 	@echo "Building harness"
 	@$(MAKE) -C src/harness build
 	@echo "Building brender"
 	@$(MAKE) -C src/BRSRC13 build
 	@echo "Building dethrace"
 	@$(MAKE) -C src/DETHRACE build
+
+lib:
+	@echo "Building lib"
+	@$(MAKE) -C lib build
 
 clean:
 	@$(MAKE) -C src/harness clean

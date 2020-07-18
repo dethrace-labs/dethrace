@@ -1,6 +1,6 @@
 #include "input.h"
 
-#include "dossys.h"
+#include "pc-dos/dossys.h"
 #include <stdlib.h>
 
 tJoy_array gJoy_array;
@@ -99,14 +99,19 @@ int PDKeyDown3(int pKey_index) {
 // Offset: 1952
 // Size: 208
 int PDAnyKeyDown() {
+    int i;
     tKey_down_result result;
-    NOT_IMPLEMENTED();
 }
 
 // Offset: 2160
 // Size: 88
 int AnyKeyDown() {
-    NOT_IMPLEMENTED();
+    int the_key;
+    the_key = PDAnyKeyDown();
+    if ((the_key != -1 && the_key != 4) || EitherMouseButtonDown() != 0) {
+        return 1;
+    }
+    return 0;
 }
 
 // Offset: 2248

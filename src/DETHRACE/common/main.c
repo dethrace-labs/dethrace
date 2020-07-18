@@ -1,7 +1,7 @@
 #include "main.h"
 #include <stdlib.h>
 
-#include "common/drdebug.h"
+#include "common/errors.h"
 #include "common/globvars.h"
 #include "common/init.h"
 #include "common/loading.h"
@@ -61,7 +61,7 @@ void GameMain(int pArgc, char** pArgv) {
 
     PDSetFileVariables();
     PDBuildAppPath(gApplication_path);
-    DrDebugMessage(*pArgv);
+    dr_dprintf(gApplication_path);
 
     strcat(gApplication_path, "DATA");
 

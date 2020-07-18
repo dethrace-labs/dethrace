@@ -1,4 +1,6 @@
 #include "network.h"
+#include "common/controls.h"
+#include "common/netgame.h"
 #include "pc-dos/dosnet.h"
 #include <stdlib.h>
 
@@ -22,7 +24,7 @@ tU32 gGuarantee_number;
 int gNext_guarantee;
 tU32 gAsk_time;
 int gIn_net_service;
-int gNet_initialised;
+int gNet_initialised = 0;
 int gDont_allow_joiners;
 tU32 gMess_mid_flags;
 tNet_game_details* gCurrent_join_poll_game;
@@ -55,7 +57,15 @@ int NetShutdown() {
 // Offset: 536
 // Size: 58
 void ShutdownNetIfRequired() {
-    NOT_IMPLEMENTED();
+    if (gNet_initialised) {
+        PDNetShutdown();
+        DisposeAbuseomatic();
+        //BrMemFree(dword_1380E8);
+        //BrMemFree(dword_1380E0);
+        //BrMemFree(dword_138100);
+        DisposeNetHeadups();
+        gNet_initialised = 0;
+    }
 }
 
 // Offset: 596
