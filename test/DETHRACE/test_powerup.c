@@ -10,9 +10,9 @@ void test_loading_powerups() {
     REQUIRES_DATA_DIRECTORY();
 
     LoadPowerups();
-    TEST_ASSERT_EQUAL_INT(20, gnumber_of)
+    TEST_ASSERT_EQUAL_INT(46, gNumber_of_powerups);
 }
 
-void test_loading_suite() {
+void test_powerup_suite() {
     RUN_TEST(test_loading_powerups);
 }

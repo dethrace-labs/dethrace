@@ -595,7 +595,7 @@ def generate_c_skeleton():
 
   for m in modules:
     # ignore lib modules
-    if 'DETHRACE' not in m['name'] and 'BRSRC13' not in m['name'] and 'SMACK' not in m['name']:
+    if 'DETHRACE' not in m['name'] and 'BRSRC13' not in m['name']:
       print("ignoring", m['name'])
       continue
     print(m['name'])

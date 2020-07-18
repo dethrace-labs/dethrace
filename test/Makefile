@@ -5,6 +5,7 @@ SRC_DIR ?= .
 DR_SRC_DIR ?= ../src/DETHRACE
 BR_SRC_DIR ?= ../src/BRSRC13
 HARNESS_SRC_DIR ?= ../src/harness
+LIB_BUILD_DIR ?= ../build/lib
 
 OS = $(shell uname -s)
 SRCS := $(shell find $(SRC_DIR) -name "*.c")
@@ -13,6 +14,7 @@ OBJS += $(shell find $(BR_SRC_DIR) -name "*.o")
 OBJS += $(shell find $(HARNESS_SRC_DIR) -name "*.o")
 # include all DR objects except the main method to avoid _main symbol collision
 OBJS += $(shell find $(DR_SRC_DIR) -name *.o | grep -v build/main.c.o)
+OBJS += $(shell find $(LIB_BUILD_DIR) -name "*.o")
 
 DEPS := $(OBJS:.o=.d)
 

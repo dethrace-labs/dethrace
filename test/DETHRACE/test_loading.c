@@ -80,12 +80,6 @@ void test_loading_opponents() {
     TEST_ASSERT_EQUAL_STRING("TOP SPEED: 150MPH", o->text_chunks[0].text[0]);
 }
 
-void test_loading_powerups() {
-    REQUIRES_DATA_DIRECTORY();
-
-    LoadPowerups();
-}
-
 void test_loading_suite() {
     RUN_TEST(test_loading_GetCDPathFromPathsTxtFile);
     RUN_TEST(test_loading_OldDRfopen);

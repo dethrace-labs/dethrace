@@ -110,9 +110,9 @@ void PlaySmackerFile(char* pSmack_name) {
                 }
                 PDScreenBufferSwap(0);
 
-                if (AnyKeyDown() || EitherMouseButtonDown()) {
-                    break;
-                }
+                // if (AnyKeyDown() || EitherMouseButtonDown()) {
+                //     break;
+                // }
 
                 // wait until its time for the next frame
                 nanosleep(&ts, &ts);

@@ -67,7 +67,7 @@ void CheckKeysForMouldiness() {
 // Size: 82
 int EitherMouseButtonDown() {
     int but_2;
-    NOT_IMPLEMENTED();
+    return 0;
 }
 
 // Offset: 1484
@@ -101,6 +101,7 @@ int PDKeyDown3(int pKey_index) {
 int PDAnyKeyDown() {
     int i;
     tKey_down_result result;
+    return 0;
 }
 
 // Offset: 2160
