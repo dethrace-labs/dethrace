@@ -388,7 +388,12 @@ void DRSetPalette2(br_pixelmap* pThe_palette, int pSet_current_palette) {
 // Size: 50
 // EAX: pThe_palette
 void DRSetPalette(br_pixelmap* pThe_palette) {
-    NOT_IMPLEMENTED();
+    ((br_int_32*)pThe_palette->pixels)[0] = 0;
+    memcpy(gCurrent_palette_pixels, pThe_palette->pixels, 0x400u);
+    if (!gFaded_palette) {
+        PDSetPalette(pThe_palette);
+    }
+    gPalette_munged |= pThe_palette != gRender_palette;
 }
 
 // Offset: 4464
@@ -812,7 +817,7 @@ void SetFadedPalette(int pDegree) {
 void FadePaletteDown() {
     int start_time;
     int the_time;
-    NOT_IMPLEMENTED();
+    LOG_WARN("todo");
 }
 
 // Offset: 20544
@@ -820,7 +825,7 @@ void FadePaletteDown() {
 void FadePaletteUp() {
     int start_time;
     int the_time;
-    NOT_IMPLEMENTED();
+    LOG_WARN("todo");
 }
 
 // Offset: 20660
@@ -846,14 +851,13 @@ void SplashScreenWith(char* pPixmap_name) {
 // Offset: 21060
 // Size: 48
 void EnsurePaletteUp() {
-    NOT_IMPLEMENTED();
+    //LOG_WARN("todo");
 }
 
 // Offset: 21108
 // Size: 103
 br_uint_32 AmbientificateMaterial(br_material* pMat, void* pArg) {
     float a;
-    LOG_DEBUG("%s", pMat->identifier);
     a = pMat->ka + *(br_scalar*)pArg;
     if (a >= 0.0) {
         if (a > 0.99f) {

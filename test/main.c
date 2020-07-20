@@ -39,6 +39,7 @@ extern void test_pattern_suite();
 extern void test_pmfile_suite();
 extern void test_graphics_suite();
 extern void test_regsupt_suite();
+extern void test_powerup_suite();
 
 char* root_dir;
 
@@ -107,6 +108,7 @@ int main(int argc, char** argv) {
     test_errors_suite();
     test_dossys_suite();
     test_graphics_suite();
+    test_powerup_suite();
 
     return UNITY_END();
 }

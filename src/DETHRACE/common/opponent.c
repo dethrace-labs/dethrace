@@ -920,7 +920,6 @@ int GetOpponentsSectionMaxSpeed(tOpponent_spec* pOpponent_spec, tS16 pSection, i
 // Size: 59
 // EAX: pOpponent_index
 void InitOpponentPsyche(int pOpponent_index) {
-    int i;
     gOpponents[pOpponent_index].psyche.grudge_against_player = 0;
 }
 

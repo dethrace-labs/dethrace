@@ -3,6 +3,8 @@
 all: build test
 
 build:
+	@echo "Building lib"
+	@$(MAKE) -C lib build
 	@echo "Building harness"
 	@$(MAKE) -C src/harness build
 	@echo "Building brender"
@@ -11,6 +13,7 @@ build:
 	@$(MAKE) -C src/DETHRACE build
 
 clean:
+	@$(MAKE) -C lib clean
 	@$(MAKE) -C src/harness clean
 	@$(MAKE) -C src/BRSRC13 clean
 	@$(MAKE) -C src/DETHRACE clean

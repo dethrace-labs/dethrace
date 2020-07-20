@@ -1809,7 +1809,6 @@ int TestForOriginalCarmaCDinDrive() {
 
     // JeffH the symbol dump didn't include any local variable information.
     // These names are not necessarily the original names.
-    tPath_name the_path;
     tPath_name cd_pathname;
     tPath_name cd_data_pathname;
     tPath_name cutscene_pathname;

@@ -1,6 +1,6 @@
 #include "dosnet.h"
 
-#include "drdebug.h"
+#include "common/errors.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -394,7 +394,7 @@ tPlayer_ID PDNetExtractPlayerID(tNet_game_details* pDetails) {
 // EAX: pName
 // EDX: pMax_length
 void PDNetObtainSystemUserName(char* pName, int pMax_length) {
-    DrDebugMessage("PDNetObtainSystemUserName()\n");
+    dr_dprintf("PDNetObtainSystemUserName()\n");
     strcpy(pName, "Ron Turn");
 }
 

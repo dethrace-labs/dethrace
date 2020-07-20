@@ -758,6 +758,7 @@ void LoseDosh() {
 // Offset: 15688
 // Size: 301
 void ToggleMap() {
+    static int old_indent;
     static int was_in_cockpit;
     NOT_IMPLEMENTED();
 }

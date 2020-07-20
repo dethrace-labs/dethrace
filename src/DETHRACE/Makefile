@@ -4,15 +4,18 @@ BUILD_DIR ?= ./build
 SRC_DIR ?= .
 BR_SRC_DIR ?= ../BRSRC13
 HARNESS_SRC_DIR ?= ../harness
+LIB_SRC_DIR ?= ../../lib
+LIB_BUILD_DIR ?= ../../build/lib
 
 OS = $(shell uname -s)
 SRCS := $(shell find $(SRC_DIR) -name "*.c")
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 OBJS += $(shell find $(BR_SRC_DIR) -name "*.o")
 OBJS += $(shell find $(HARNESS_SRC_DIR) -name "*.o")
+OBJS += $(shell find $(LIB_BUILD_DIR) -name "*.o")
 DEPS := $(OBJS:.o=.d)
 
-INC_DIRS := $(shell find $(SRC_DIR) -type d) $(BR_SRC_DIR) $(HARNESS_SRC_DIR)
+INC_DIRS := $(shell find $(SRC_DIR) -type d) $(BR_SRC_DIR) $(HARNESS_SRC_DIR) $(LIB_SRC_DIR)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 CFLAGS ?= $(INC_FLAGS) -g -Wno-return-type -Wno-missing-declarations -Werror=implicit-function-declaration

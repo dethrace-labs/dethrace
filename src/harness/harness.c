@@ -64,7 +64,7 @@ void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {
         memset(screen_buffer, 0, src->width * src->height * sizeof(uint32_t));
     }
 
-    LOG_DEBUG("%d %d, %d", src->width, src->height, src->row_bytes);
+    //LOG_DEBUG("%d %d, %d", src->width, src->height, src->row_bytes);
 
     // generate 32 bit texture from src + palette
     for (y = 0; y < src->height; y++) {

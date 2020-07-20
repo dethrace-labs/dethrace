@@ -23,6 +23,7 @@
     }
 
 #define LOG_DEBUG(...) debug_printf("\033[0;34m[DEBUG] %s ", __FUNCTION__, __VA_ARGS__)
+#define LOG_INFO(...) debug_printf("\033[0;34m[INFO] %s ", __FUNCTION__, __VA_ARGS__)
 #define LOG_WARN(...) debug_printf("\033[0;33m[WARN] %s ", __FUNCTION__, __VA_ARGS__)
 #define LOG_PANIC(...)                                                \
     debug_printf("\033[0;31m[PANIC] %s ", __FUNCTION__, __VA_ARGS__); \

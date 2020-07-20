@@ -110,8 +110,6 @@ def read_file():
       modules.append(current_module)
       last_fn = None
       last_local_type = ''
-      if 'loading.c' not in current_module['name']:
-        continue
       # if len(modules) == 2:
       #   break
 
@@ -649,7 +647,6 @@ def generate_c_file(module):
 
   # functions
   for fn in module['functions']:
-    print('function', fn)
     c_file.write(resolve_function_header(module, fn))
     c_file.write('\n')
     c_file.write(resolve_function_signature(module, fn))

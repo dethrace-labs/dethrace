@@ -2,7 +2,7 @@
 
 #include "brender.h"
 #include "common/car.h"
-#include "common/drdebug.h"
+#include "common/errors.h"
 #include "common/globvars.h"
 #include "common/grafdata.h"
 #include "common/graphics.h"
@@ -419,7 +419,7 @@ void CopyBackScreen(int pRendering_area_only) {
 // Size: 92
 // EAX: pRendering_area_only
 void PDScreenBufferSwap(int pRendering_area_only) {
-    LOG_TRACE("(%d)", pRendering_area_only);
+    LOG_TRACE10("(%d)", pRendering_area_only);
     if (pRendering_area_only) {
         BrPixelmapRectangleCopy(gScreen, gY_offset, gX_offset, gRender_screen, 0, 0, gWidth, gHeight);
     } else {
@@ -913,7 +913,7 @@ int PDDoWeLeadAnAustereExistance() {
 
     block = LargestBlockAvail();
 
-    DrDebugMessage("PDDoWeLeadAnAustereExistance (sic): LargestBlockAvail=%d\n", block);
+    dr_dprintf("PDDoWeLeadAnAustereExistance (sic): LargestBlockAvail=%d\n", block);
 
     if (gReal_graf_data_index == 0) {
         return block < 13000000;

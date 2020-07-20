@@ -121,7 +121,11 @@ void InitialiseStorageSpace(tBrender_storage* pStorage_space, int pMax_pixelmaps
 // Size: 107
 // EAX: pStorage_space
 void DisposeStorageSpace(tBrender_storage* pStorage_space) {
-    NOT_IMPLEMENTED();
+    BrMemFree(pStorage_space->pixelmaps);
+    BrMemFree(pStorage_space->shade_tables);
+    BrMemFree(pStorage_space->materials);
+    BrMemFree(pStorage_space->models);
+    BrMemFree(pStorage_space->saved_colour_maps);
 }
 
 // Offset: 980

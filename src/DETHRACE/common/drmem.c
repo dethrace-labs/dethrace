@@ -288,7 +288,7 @@ void MAMSInitMem() {
 // EAX: pFlags
 // EDX: pTitle
 void PrintMemoryDump(int pFlags, char* pTitle) {
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%d, \"%s\")", pFlags, pTitle);
 }
 
 // Offset: 232

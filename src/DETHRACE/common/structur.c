@@ -1,13 +1,20 @@
 #include "structur.h"
+#include "common/cutscene.h"
+#include "common/globvars.h"
+#include "common/graphics.h"
+#include "common/init.h"
+#include "common/loadsave.h"
+#include "common/mainmenu.h"
+#include "common/sound.h"
 #include <stdlib.h>
 
 int gOpponent_mix[10][5];
-int gPratcam_on;
+int gPratcam_on = 1;
 tRace_over_reason gRace_over_reason;
-int gCockpit_on;
+int gCockpit_on = 1;
 tU32 gLast_checkpoint_time;
 int gLast_wrong_checkpoint;
-int gMirror_on;
+int gMirror_on = 1;
 
 // Offset: 0
 // Size: 124
@@ -164,13 +171,88 @@ void DoGame() {
 // Offset: 5020
 // Size: 242
 void InitialiseProgramState() {
-    NOT_IMPLEMENTED();
+    gProgram_state.loaded = 0;
+    gProgram_state.last_slot = 0;
+    gProgram_state.frank_or_anniness = eFrankie;
+    gProgram_state.skill_level = 1;
+    gProgram_state.view_type = eVT_Scene;
+    gProgram_state.auto_parts_reply = eAP_auto;
+    gProgram_state.racing = 0;
+    gProgram_state.cut_scene = 0;
+    gProgram_state.saving = 0;
+    gProgram_state.loading = 0;
+    gProgram_state.dont_save_or_load = 0;
+    gProgram_state.dont_load = 0;
+    gProgram_state.mirror_on = gMirror_on;
+    gProgram_state.prog_status = eProg_intro;
+    if (gAusterity_mode) {
+        gProgram_state.prat_cam_on = 0;
+        gPratcam_on = 0;
+    } else {
+        gProgram_state.prat_cam_on = gPratcam_on;
+    }
+    gProgram_state.cockpit_on = gCockpit_on;
+    gProgram_state.car_name[0] = 0;
+    SetSoundVolumes();
+    AllocateRearviewPixelmap();
 }
 
 // Offset: 5264
 // Size: 171
 void DoProgram() {
-    NOT_IMPLEMENTED();
+    InitialiseProgramState();
+    while (1) {
+        switch (gProgram_state.prog_status) {
+        case eProg_intro:
+            DisposeGameIfNecessary();
+            ClearEntireScreen();
+            DoSCILogo();
+            DoOpeningAnimation();
+            DoSCILogo();
+            gProgram_state.prog_status = eProg_opening;
+            continue;
+        case eProg_opening:
+            DisposeGameIfNecessary();
+            gProgram_state.prog_status = eProg_idling;
+            DRS3StopOutletSound(gIndexed_outlets[0]);
+            if (gProgram_state.prog_status == eProg_quit) {
+                return;
+            }
+            continue;
+        case eProg_idling:
+            DisposeGameIfNecessary();
+            if (gGame_to_load >= 0) {
+                DoLoadGame(0);
+                if (gProgram_state.prog_status == eProg_quit) {
+                    return;
+                }
+                continue;
+            }
+            DoMainMenuScreen(30000, 0, 0);
+            if (gProgram_state.prog_status != eProg_quit) {
+                continue;
+            }
+            return;
+        case eProg_demo:
+            DoLogos();
+            gProgram_state.prog_status = eProg_idling;
+            DRS3StopOutletSound(gIndexed_outlets[0]);
+            if (gProgram_state.prog_status == eProg_quit) {
+                return;
+            }
+            continue;
+        case eProg_game_starting:
+            DoGame();
+            if (gProgram_state.prog_status == eProg_quit) {
+                return;
+            }
+            continue;
+        case eProg_game_ongoing:
+        case eProg_quit:
+            // JeffH added to avoid compiler warnings about missing case handling
+            LOG_PANIC("We do not expect to get here");
+        }
+    }
 }
 
 // Offset: 5436

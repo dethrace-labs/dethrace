@@ -190,9 +190,14 @@ void OpenDiagnostics() {
 
 // Offset: 452
 // Size: 34
-//void dprintf(char *fmt_string) {
-//}
-// Conflicts with stdio.h
+// Renamed from dprintf to avoid collisions to stdio
+void dr_dprintf(char* fmt_string, ...) {
+    va_list args;
+    va_start(args, fmt_string);
+    vprintf(fmt_string, args);
+    va_end(args);
+    printf("\n");
+}
 
 // Offset: 488
 // Size: 57
