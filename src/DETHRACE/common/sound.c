@@ -287,7 +287,7 @@ void MungeEngineNoise() {
     int stop_all;
     int type_of_engine_noise;
     tS3_sound_id engine_noise;
-    NOT_IMPLEMENTED();
+    LOG_WARN("skipping");
 }
 
 // Offset: 5716

@@ -1,5 +1,4 @@
 #include "dossys.h"
-
 #include "brender.h"
 #include "common/car.h"
 #include "common/errors.h"
@@ -10,6 +9,7 @@
 #include "common/main.h"
 #include "common/sound.h"
 #include "common/utility.h"
+#include "harness.h"
 #include "watcom_functions.h"
 #include <dirent.h>
 #include <stdio.h>
@@ -52,6 +52,8 @@ int gReal_back_screen_locked;
 void (*gPrev_keyboard_handler)();
 tU8 gScan_code[123][2];
 
+const double NANOSECONDS_TO_MILLISECONDS = 1.0 / 1000000.0;
+
 int _unittest_do_not_exit = 0;
 char* _unittest_last_fatal_error;
 
@@ -68,7 +70,7 @@ void KeyboardHandler() {
 // Size: 71
 // EAX: pScan_code
 int KeyDown(tU8 pScan_code) {
-    NOT_IMPLEMENTED();
+    return Harness_Hook_KeyDown(pScan_code);
 }
 
 // Offset: 364
@@ -83,6 +85,8 @@ void KeyTranslation(tU8 pKey_index, tU8 pScan_code_1, tU8 pScan_code_2) {
 // Offset: 436
 // Size: 1897
 void KeyBegin() {
+
+    Harness_Hook_KeyBegin();
     // int v0; // edx@0
     // int v1; // ST00_4@1
     // __int16 v2; // dx@1
@@ -222,7 +226,17 @@ void PDSetKeyArray(int* pKeys, int pMark) {
     int i;
     tS32 joyX;
     tS32 joyY;
-    NOT_IMPLEMENTED();
+    LOG_TRACE10("(%p, %d)", pKeys, pMark);
+
+    gKeys_pressed = 0;
+    for (i = 0; i < 123; i++) {
+        if (KeyDown(gScan_code[i][0]) || KeyDown(gScan_code[i][1])) {
+            gKeys_pressed = (gKeys_pressed << 8) + i + 1;
+            pKeys[i] = pMark;
+        } else if (pKeys[i] == pMark) {
+            pKeys[i] = 0;
+        }
+    }
 }
 
 // Offset: 2612
@@ -579,7 +593,7 @@ void PDGetMousePosition(int* pX_coord, int* pY_coord) {
 int PDGetTotalTime() {
     struct timespec spec;
     clock_gettime(CLOCK_MONOTONIC, &spec);
-    return spec.tv_sec * 1000 + spec.tv_nsec / 1000;
+    return spec.tv_sec * 1000 + spec.tv_nsec / 1000000;
 }
 
 // Offset: 6312

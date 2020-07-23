@@ -9,8 +9,10 @@
 #include "init.h"
 #include "loading.h"
 #include "pc-dos/dossys.h"
+#include "sound.h"
 #include "utility.h"
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <math.h>
 
@@ -808,24 +810,69 @@ void Darken(tU8* pPtr, unsigned int pDarken_amount) {
 void SetFadedPalette(int pDegree) {
     int j;
     br_pixelmap* the_palette;
-    char* the_pixels;
-    NOT_IMPLEMENTED();
+    unsigned char* the_pixels;
+    LOG_TRACE10("(%d)", pDegree);
+
+    memcpy(gScratch_pixels, gCurrent_palette->pixels, 0x400u);
+    the_pixels = gScratch_pixels;
+    for (j = 0; j < 1024; j += 4) {
+        the_pixels[j] = (pDegree * the_pixels[j]) >> 8;
+        the_pixels[j + 1] = (pDegree * the_pixels[j + 1]) >> 8;
+        the_pixels[j + 2] = (pDegree * the_pixels[j + 2]) >> 8;
+        the_pixels[j + 3] = (pDegree * the_pixels[j + 3]) >> 8;
+    }
+    ((int32_t*)gScratch_palette->pixels)[0] = 0;
+    if (!gFaded_palette) {
+        PDSetPalette(gScratch_palette);
+    }
+    gPalette_munged |= gScratch_palette != gRender_palette;
 }
 
 // Offset: 20396
 // Size: 147
 void FadePaletteDown() {
+    int i;
     int start_time;
     int the_time;
-    LOG_WARN("todo");
+
+    if (!gFaded_palette) {
+        gFaded_palette = 1;
+        MungeEngineNoise();
+        gFaded_palette = 0;
+        start_time = PDGetTotalTime();
+        while (1) {
+            the_time = PDGetTotalTime() - start_time;
+            if (the_time >= 500) {
+                break;
+            }
+            i = 256 - ((the_time * 256) / 500);
+            SetFadedPalette(i);
+        }
+        SetFadedPalette(0);
+        gFaded_palette = 1;
+    }
 }
 
 // Offset: 20544
 // Size: 116
 void FadePaletteUp() {
+    int i;
     int start_time;
     int the_time;
-    LOG_WARN("todo");
+
+    if (gFaded_palette) {
+        gFaded_palette = 0;
+        start_time = PDGetTotalTime();
+        while (1) {
+            the_time = PDGetTotalTime() - start_time;
+            if (the_time >= 500) {
+                break;
+            }
+            i = (the_time * 256) / 500;
+            SetFadedPalette(i);
+        }
+        DRSetPalette2(gCurrent_palette, 1);
+    }
 }
 
 // Offset: 20660
@@ -851,7 +898,9 @@ void SplashScreenWith(char* pPixmap_name) {
 // Offset: 21060
 // Size: 48
 void EnsurePaletteUp() {
-    //LOG_WARN("todo");
+    if (gFaded_palette) {
+        FadePaletteUp();
+    }
 }
 
 // Offset: 21108

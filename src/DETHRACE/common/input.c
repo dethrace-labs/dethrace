@@ -1,5 +1,6 @@
 #include "input.h"
 
+#include "common/globvars.h"
 #include "pc-dos/dossys.h"
 #include <stdlib.h>
 
@@ -7,12 +8,12 @@ tJoy_array gJoy_array;
 tKey_array gKey_array;
 int gKey_poll_counter;
 tRolling_letter* gRolling_letters;
-tU32 gLast_poll_keys;
+tU32 gLast_poll_keys = 0;
 int gCurrent_cursor;
 int gCurrent_position;
 int gInsert_mode;
 int gLetter_x_coords[15];
-int gEdge_trigger_mode;
+int gEdge_trigger_mode = 0;
 int gVisible_length;
 int gLetter_y_coords[15];
 int gThe_key;
@@ -36,25 +37,40 @@ void SetJoystickArrays(int* pKeys, int pMark) {
     static tS32 old_joy1Y;
     static tS32 old_joy2X;
     static tS32 old_joy2Y;
-    NOT_IMPLEMENTED();
 }
 
 // Offset: 996
 // Size: 82
 void PollKeys() {
-    NOT_IMPLEMENTED();
+    gKey_poll_counter++;
+    PDSetKeyArray(gKey_array, gKey_poll_counter);
+    SetJoystickArrays(gKey_array, gKey_poll_counter);
+    gLast_poll_keys = PDGetTotalTime();
 }
 
 // Offset: 1080
 // Size: 127
 void CyclePollKeys() {
-    NOT_IMPLEMENTED();
+    int i;
+    for (i = 0; i < 123; i++) {
+
+        if (gKey_array[i] > gKey_poll_counter) {
+            gKey_array[i] = 0;
+            if (i > 115) {
+                // TOOD: this does _something_, but we cannot figure out what..
+                // eax+1361D4h = -1
+                // gFonts[20].width_table[v1 + 141] = -1;
+            }
+        }
+    }
+    gKey_poll_counter = 0;
 }
 
 // Offset: 1208
 // Size: 116
 void ResetPollKeys() {
-    NOT_IMPLEMENTED();
+    memset(gKey_array, 0, sizeof(gKey_array));
+    memset(gJoy_array, 0, sizeof(gJoy_array));
 }
 
 // Offset: 1324
@@ -75,7 +91,36 @@ int EitherMouseButtonDown() {
 // EAX: pKey_index
 tKey_down_result PDKeyDown2(int pKey_index) {
     tU32 the_time;
-    NOT_IMPLEMENTED();
+    if (/*!s3_timer_started_maybe[0] ||*/ (PDGetTotalTime() - gLast_poll_keys) > 500) {
+        ResetPollKeys();
+        CyclePollKeys();
+        PollKeys();
+    }
+
+    if (!gEdge_trigger_mode) {
+        return gKey_array[pKey_index];
+    }
+    the_time = PDGetTotalTime();
+    if (gKey_array[pKey_index]) {
+        if (pKey_index == gLast_key_down) {
+            if ((the_time - gLast_key_down_time) < 300) {
+                return tKey_down_still;
+            } else {
+                gLast_key_down_time = the_time;
+                return tKey_down_repeat;
+            }
+        } else {
+            gLast_key_down_time = the_time;
+            gLast_key_down = pKey_index;
+            return tKey_down_yes;
+        }
+    } else {
+        if (pKey_index == gLast_key_down) {
+            gLast_key_down_time = gKey_array[pKey_index];
+            gLast_key_down = -1;
+        }
+        return tKey_down_no;
+    }
 }
 
 // Offset: 1700
@@ -101,7 +146,36 @@ int PDKeyDown3(int pKey_index) {
 int PDAnyKeyDown() {
     int i;
     tKey_down_result result;
-    return 0;
+
+    if (/*!s3_timer_started_maybe[0] ||*/ (PDGetTotalTime() - gLast_poll_keys) > 500) {
+        ResetPollKeys();
+        CyclePollKeys();
+        PollKeys();
+    }
+    for (i = 122; i >= 0; i--) {
+        if (gKey_array[i]) {
+            if (!gEdge_trigger_mode) {
+                return i;
+            }
+            result = PDKeyDown2(i);
+            switch (result) {
+            case tKey_down_no:
+            case tKey_down_still:
+                return -1;
+            case tKey_down_yes:
+            case tKey_down_repeat:
+                return i;
+            default:
+                break;
+            }
+        }
+    }
+
+    if (gEdge_trigger_mode) {
+        gLast_key_down = -1;
+        gLast_key_down_time = 0;
+    }
+    return -1;
 }
 
 // Offset: 2160
@@ -127,13 +201,13 @@ tU32* KevKeyService() {
     static tU32 return_val[2];
     tU32 keys;
 
-    keys = gLast_key_down;
+    keys = gKeys_pressed;
     //printf("key: %d, %lx, %lx\n", sizeof(long), keys, code2);
     return_val[0] = 0;
     return_val[1] = 0;
 
     if (keys < 0x6B) {
-        last_single_key = gLast_key_down;
+        last_single_key = gKeys_pressed;
     } else {
         if (keys > 0x6b00) {
             sum = 0;

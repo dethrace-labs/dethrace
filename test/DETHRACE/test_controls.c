@@ -7,6 +7,7 @@
 
 #include "common/controls.h"
 #include "common/errors.h"
+#include "common/globvars.h"
 #include "common/input.h"
 #include "common/loading.h"
 #include "common/utility.h"
@@ -16,13 +17,13 @@ void test_controls_CheckKevKeys() {
     char* input = "spamfritters";
     tU32* result;
     for (i = 0; i < strlen(input); i++) {
-        gLast_key_down = input[i] - 75; // 0x1e;
+        gKeys_pressed = input[i] - 75; // 0x1e;
         result = KevKeyService();
-        gLast_key_down = 0;
+        gKeys_pressed = 0;
         result = KevKeyService();
     }
     sleep(1);
-    gLast_key_down = 0;
+    gKeys_pressed = 0;
 
     CheckKevKeys();
 
