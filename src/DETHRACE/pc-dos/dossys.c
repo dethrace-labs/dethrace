@@ -500,11 +500,8 @@ void PDBuildAppPath(char* pThe_path) {
     int pos;
 
     getcwd(pThe_path, 256);
-    pos = strlen(pThe_path);
-    pThe_path[pos] = '/'; // original: pThe_path[pos] = '\\';
-    pThe_path[pos + 1] = 0;
+    strcat(pThe_path, "/"); // original: pThe_path[pos] = '\\';
     strcpy(gNetwork_profile_fname, pThe_path);
-    pos = strlen(gNetwork_profile_fname);
     strcat(gNetwork_profile_fname, "NETWORK.INI");
 }
 
