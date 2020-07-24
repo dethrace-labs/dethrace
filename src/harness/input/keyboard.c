@@ -144,21 +144,3 @@ void Keyboard_HandleEvent(SDL_KeyboardEvent* key) {
         sdl_key_state[key->keysym.scancode] = 0;
     }
 }
-
-// void Keyboard_SetKeyArray(int* pKeys, int pMark) {
-//     int i;
-//     const uint8_t* state = SDL_GetKeyboardState(NULL);
-
-//     for (int i = 0; i < 123; i++) {
-//         if (keymap[i] <= 0) {
-//             continue;
-//         }
-//         if (state[keymap[i]] > 0) {
-//             printf("key down %d, %d, %d\n", i, keymap[i], gScan_code[i][0]);
-//         }
-//         if (Keyboard_IsKeyDown(106)) {
-//             printf("space is down %d\n", i);
-//         }
-//         //pKeys[i] = keymap[i] > 0 ? state[keymap[i]] : 0;
-//     }
-// }

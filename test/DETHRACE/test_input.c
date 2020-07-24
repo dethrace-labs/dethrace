@@ -15,14 +15,12 @@ void test_input_KevKeyService() {
         gKeys_pressed = 0;
         result = KevKeyService();
     }
-    sleep(1);
+    sleep(2);
     gKeys_pressed = 0;
     result = KevKeyService();
 
     TEST_ASSERT_EQUAL_UINT32(0x33f75455, result[0]);
     TEST_ASSERT_EQUAL_UINT32(0xc10aaaf2, result[1]);
-
-    sleep(2);
 }
 
 void test_input_suite() {

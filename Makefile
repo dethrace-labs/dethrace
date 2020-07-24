@@ -22,7 +22,7 @@ clean:
 test: build
 	@echo "Building tests"
 	@$(MAKE) -C test build
-	@(cd test/build && ./c1tests $$DETHRACE_TEST_ARGS)
+	@(cd test/build && ./c1tests -n $$DETHRACE_TEST_ARGS)
 
 install-deps:
 	sudo apt-get install libsdl2-dev

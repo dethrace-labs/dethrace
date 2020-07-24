@@ -22,11 +22,10 @@ void test_controls_CheckKevKeys() {
         gKeys_pressed = 0;
         result = KevKeyService();
     }
-    sleep(1);
+    sleep(2);
     gKeys_pressed = 0;
 
     CheckKevKeys();
-    sleep(2);
 
     // 'spamfritters' cheat code should enable powerup #8
     TEST_ASSERT_EQUAL_INT(8, _unittest_controls_lastGetPowerup);
