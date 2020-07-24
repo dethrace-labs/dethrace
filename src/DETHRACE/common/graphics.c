@@ -810,16 +810,17 @@ void Darken(tU8* pPtr, unsigned int pDarken_amount) {
 void SetFadedPalette(int pDegree) {
     int j;
     br_pixelmap* the_palette;
-    unsigned char* the_pixels;
+    unsigned char* the_pixels; //JeffH added unsigned
     LOG_TRACE10("(%d)", pDegree);
 
     memcpy(gScratch_pixels, gCurrent_palette->pixels, 0x400u);
-    the_pixels = gScratch_pixels;
+    the_pixels = (unsigned char*)gScratch_pixels;
+
     for (j = 0; j < 1024; j += 4) {
-        the_pixels[j] = (pDegree * the_pixels[j]) >> 8;
-        the_pixels[j + 1] = (pDegree * the_pixels[j + 1]) >> 8;
-        the_pixels[j + 2] = (pDegree * the_pixels[j + 2]) >> 8;
-        the_pixels[j + 3] = (pDegree * the_pixels[j + 3]) >> 8;
+        the_pixels[j] = (pDegree * the_pixels[j]) / 256;
+        the_pixels[j + 1] = (pDegree * the_pixels[j + 1]) / 256;
+        the_pixels[j + 2] = (pDegree * the_pixels[j + 2]) / 256;
+        the_pixels[j + 3] = (pDegree * the_pixels[j + 3]) / 256;
     }
     ((int32_t*)gScratch_palette->pixels)[0] = 0;
     if (!gFaded_palette) {

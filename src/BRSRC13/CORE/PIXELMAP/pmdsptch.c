@@ -64,7 +64,6 @@ br_pixelmap* BrPixelmapMatch(br_pixelmap* src, br_uint_8 match_type) {
         LOG_WARN("_M_br_device_pixelmap_mem_match returned error");
         return NULL;
     }
-    LOG_DEBUG("new %p, %d\n", new, new->width);
     return new;
 }
 

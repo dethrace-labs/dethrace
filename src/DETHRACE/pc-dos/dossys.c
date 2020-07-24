@@ -912,8 +912,6 @@ int PDCheckDriveExists2(char* pThe_path, char* pFile_name, tU32 pMin_size) {
     // <<
 
     stat_failed = stat(the_path, &buf);
-    LOG_DEBUG("path: %d, %s, %d", stat_failed, the_path, buf.st_size);
-
     return !stat_failed && buf.st_size >= pMin_size;
 }
 
