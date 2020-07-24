@@ -7,6 +7,7 @@ extern tU8 gScan_code[123][2];
 
 uint8_t sdl_key_state[123];
 
+// Errol's keymap
 int keymap[123] = {
     SDL_SCANCODE_LSHIFT,
     SDL_SCANCODE_LALT,

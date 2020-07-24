@@ -18,25 +18,6 @@ void Harness_Init(char* name, renderer* renderer) {
     screen_buffer = NULL;
 }
 
-/* Print all information about a key event */
-void PrintKeyInfo(SDL_KeyboardEvent* key) {
-    /* Is it a release or a press? */
-    if (key->type == SDL_KEYUP)
-        printf("Release:- ");
-    else
-        printf("Press:- ");
-
-    /* Print the hardware scancode first */
-    printf("Scancode: 0x%02X", key->keysym.scancode);
-    /* Print the name of the key */
-    printf(", Name: %s", SDL_GetKeyName(key->keysym.sym));
-
-    printf("\n");
-    /* Print modifier info */
-
-    //Keyboard_SetKeyArray(NULL, 0);
-}
-
 void Harness_RunWindowLoop(harness_game_func* game_func, void* arg) {
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
@@ -62,12 +43,9 @@ void Harness_RunWindowLoop(harness_game_func* game_func, void* arg) {
         if (SDL_WaitEvent(&event)) {
             switch (event.type) {
 
-            /* Keyboard event */
-            /* Pass the event data onto PrintKeyInfo() */
             case SDL_KEYDOWN:
             case SDL_KEYUP:
                 Keyboard_HandleEvent(&event.key);
-                //PrintKeyInfo(&event.key);
                 break;
             case SDL_QUIT:
                 keep_pumping = 0;
@@ -128,8 +106,4 @@ void Harness_Hook_KeyBegin() {
 
 int Harness_Hook_KeyDown(unsigned char pScan_code) {
     return Keyboard_IsKeyDown(pScan_code);
-}
-
-void Harness_Hook_PDSetKeyArray(int* pKeys, int pMark) {
-    //Keyboard_Keydown(scan_code);
 }
