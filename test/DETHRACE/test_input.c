@@ -1,7 +1,7 @@
 #include "tests.h"
 
-#include "common/input.h"
 #include "common/globvars.h"
+#include "common/input.h"
 #include <string.h>
 #include <unistd.h>
 
@@ -21,6 +21,8 @@ void test_input_KevKeyService() {
 
     TEST_ASSERT_EQUAL_UINT32(0x33f75455, result[0]);
     TEST_ASSERT_EQUAL_UINT32(0xc10aaaf2, result[1]);
+
+    sleep(2);
 }
 
 void test_input_suite() {
