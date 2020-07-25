@@ -22,4 +22,7 @@ void Harness_Hook_DOSGfxBegin();
 void Harness_Hook_BrDevPaletteSetOld(br_pixelmap* pm);
 void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src);
 
+void Harness_Hook_KeyBegin();
+int Harness_Hook_KeyDown(unsigned char pScan_code);
+
 #endif

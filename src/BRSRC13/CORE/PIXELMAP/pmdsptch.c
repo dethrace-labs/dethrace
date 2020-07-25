@@ -60,12 +60,10 @@ br_pixelmap* BrPixelmapMatch(br_pixelmap* src, br_uint_8 match_type) {
     }
 
     //((br_device_pixelmap*)src)->dispatch->_match((br_device_pixelmap*)src, (br_device_pixelmap**)&new, &tv[0]);
-    LOG_DEBUG("new1 %p, %p\n", new, &new);
     if (_M_br_device_pixelmap_mem_match((br_device_pixelmap*)src, (br_device_pixelmap**)&new, &tv[0]) != 0) {
         LOG_WARN("_M_br_device_pixelmap_mem_match returned error");
         return NULL;
     }
-    LOG_DEBUG("new %p, %d\n", new, new->width);
     return new;
 }
 

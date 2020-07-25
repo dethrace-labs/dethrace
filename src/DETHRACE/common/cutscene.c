@@ -92,7 +92,7 @@ void PlaySmackerFile(char* pSmack_name) {
 
             smk_first(s);
             do {
-                char* pal = smk_get_palette(s);
+                const unsigned char* pal = smk_get_palette(s);
                 for (i = 1; i < 256; i++) {
                     r = pal[(i * 3)];
                     g = pal[(i * 3) + 1];
@@ -102,7 +102,7 @@ void PlaySmackerFile(char* pSmack_name) {
                 DRSetPalette(gCurrent_palette);
                 EnsurePaletteUp();
 
-                char* frame = smk_get_video(s);
+                const unsigned char* frame = smk_get_video(s);
                 for (i = 0; i < h; i++) {
                     for (j = 0; j < w; j++) {
                         dest_pix[(i * gBack_screen->row_bytes) + j] = frame[i * w + j];
@@ -110,9 +110,9 @@ void PlaySmackerFile(char* pSmack_name) {
                 }
                 PDScreenBufferSwap(0);
 
-                // if (AnyKeyDown() || EitherMouseButtonDown()) {
-                //     break;
-                // }
+                if (AnyKeyDown() || EitherMouseButtonDown()) {
+                    break;
+                }
 
                 // wait until its time for the next frame
                 nanosleep(&ts, &ts);

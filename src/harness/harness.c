@@ -1,5 +1,6 @@
 
 #include "harness.h"
+#include "input/keyboard.h"
 #include "stack_trace_handler.h"
 
 SDL_Window* window;
@@ -7,6 +8,9 @@ SDL_Thread* game_thread;
 renderer* current_renderer;
 br_pixelmap* palette;
 uint32_t* screen_buffer;
+
+br_pixelmap* last_dst = NULL;
+br_pixelmap* last_src = NULL;
 
 void Harness_Init(char* name, renderer* renderer) {
     install_signal_handler(name);
@@ -38,6 +42,11 @@ void Harness_RunWindowLoop(harness_game_func* game_func, void* arg) {
     while (keep_pumping) {
         if (SDL_WaitEvent(&event)) {
             switch (event.type) {
+
+            case SDL_KEYDOWN:
+            case SDL_KEYUP:
+                Keyboard_HandleEvent(&event.key);
+                break;
             case SDL_QUIT:
                 keep_pumping = 0;
             }
@@ -50,7 +59,7 @@ void Harness_Hook_DOSGfxBegin() {
     current_renderer->activate(window);
 }
 
-void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {
+void Harness_RenderScreen(br_pixelmap* dst, br_pixelmap* src) {
     uint8_t palette_index = 0;
     int inc = 0;
     uint8_t* data = src->pixels;
@@ -78,6 +87,23 @@ void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {
     }
     current_renderer->doubleBuffer(screen_buffer, window);
 }
+
+void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {
+    last_dst = dst;
+    last_src = src;
+    Harness_RenderScreen(dst, src);
+}
 void Harness_Hook_BrDevPaletteSetOld(br_pixelmap* pm) {
     palette = pm;
+    if (last_dst && last_src) {
+        Harness_RenderScreen(last_dst, last_src);
+    }
+}
+
+void Harness_Hook_KeyBegin() {
+    Keyboard_Init();
+}
+
+int Harness_Hook_KeyDown(unsigned char pScan_code) {
+    return Keyboard_IsKeyDown(pScan_code);
 }

@@ -479,8 +479,9 @@ smk smk_open_file(const char* filename, const unsigned char mode)
 
 	if (!(fp = fopen(filename,"rb")))
 	{
-		fprintf(stderr,"libsmacker::smk_open_file(%s,%u) - ERROR: could not open file (errno: %d)\n",filename,mode,errno);
-		perror ("\tError reported was");
+		// JeffH commented out error messages
+		// fprintf(stderr,"libsmacker::smk_open_file(%s,%u) - ERROR: could not open file (errno: %d)\n",filename,mode,errno);
+		// perror ("\tError reported was");
 		goto error;
 	}
 
