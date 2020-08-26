@@ -8,7 +8,7 @@ token_type tokenTypes[37];
 // Offset: 13
 // Size: 112
 void BrTokenBegin() {
-    LOG_WARN("Not implemented");
+    STUB();
 }
 
 // Offset: 139

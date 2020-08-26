@@ -79,7 +79,7 @@ void BrDevPaletteSetOld(br_pixelmap* pm) {
 // Offset: 2069
 // Size: 61
 void BrDevPaletteSetEntryOld(int i, br_colour colour) {
-    NOT_IMPLEMENTED();
+    Harness_Hook_BrDevPaletteSetEntryOld(i, colour);
 }
 
 // Offset: 2153

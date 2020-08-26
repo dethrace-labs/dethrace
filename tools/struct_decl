@@ -1,0 +1,52 @@
+static tInterface_spec interface_spec1 = {
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        { 0x0FFFFFFFF, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { NULL, NULL },
+        { 0x0FFFFFFFF, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { NULL, NULL },
+        { 0x0FFFFFFFF, 0 },
+        { 0x0FFFFFFFF, 0 },
+        { 0, 0 },
+        { 7, 0 },
+        { NULL, NULL },
+        { 0x0FFFFFFFF, 0 },
+        { 1, 0 },
+        { 0, 0 },
+        { 7, 0 },
+        { NULL, NULL },
+        { 1, 1 },
+        { NULL, NULL },
+        { 1, 1 },
+        { NULL, NULL },
+        NULL,
+        NULL,
+        0u, // time_out
+        &StartMainMenu, // start_proc1
+        NULL, // start_proc2
+        &MainMenuDone1, // done_proc
+        0, // font_needed
+        { 0, 0 }, // typeable
+        NULL, // get_original_string
+        0,
+        0,
+        8, // number_of_button_flics
+        flicker_on1, // flicker_on_flics
+        flicker_off1, // flicker_off_flics
+        push1, // pushed_flics
+        8, // number_of_mouse_areas
+        mouse_areas1, // mouse_areas
+        0, // number_of_recopy_areas
+        NULL // recopy_areas
+    };

@@ -175,7 +175,9 @@ void SkipBytes(FILE* pF, int pBytes_to_skip) {
 // EAX: pPtr
 tU32 MemReadU32(char** pPtr) {
     tU32 raw_long;
-    NOT_IMPLEMENTED();
+    memcpy(&raw_long, *pPtr, 4);
+    *pPtr += sizeof(raw_long);
+    return raw_long;
 }
 
 // Offset: 944
@@ -183,14 +185,16 @@ tU32 MemReadU32(char** pPtr) {
 // EAX: pPtr
 tU16 MemReadU16(char** pPtr) {
     tU16 raw_short;
-    NOT_IMPLEMENTED();
+    memcpy(&raw_short, *pPtr, 2);
+    *pPtr += sizeof(raw_short);
+    return raw_short;
 }
 
 // Offset: 1016
 // Size: 55
 // EAX: pPtr
 tU8 MemReadU8(char** pPtr) {
-    NOT_IMPLEMENTED();
+    return *(*pPtr)++;
 }
 
 // Offset: 1072
@@ -222,7 +226,7 @@ tS8 MemReadS8(char** pPtr) {
 // EAX: pPtr
 // EDX: pBytes_to_skip
 void MemSkipBytes(char** pPtr, int pBytes_to_skip) {
-    NOT_IMPLEMENTED();
+    *pPtr += pBytes_to_skip;
 }
 
 // Offset: 1320
@@ -419,7 +423,19 @@ br_pixelmap* LoadPixelmap(char* pName) {
 br_uint_32 LoadPixelmaps(char* pFile_name, br_pixelmap** pPixelmaps, br_uint_16 pNum) {
     tPath_name path;
     int count;
-    NOT_IMPLEMENTED();
+
+    PathCat(path, gApplication_path, gGraf_specs[gGraf_spec_index].data_dir_name);
+    PathCat(path, path, "PIXELMAP");
+
+    PathCat(path, path, pFile_name);
+    gAllow_open_to_fail = 1;
+    count = DRPixelmapLoadMany(path, pPixelmaps, pNum);
+    if (!count) {
+        PathCat(path, gApplication_path, "PIXELMAP");
+        PathCat(path, path, pFile_name);
+        count = DRPixelmapLoadMany(path, pPixelmaps, pNum);
+    }
+    return count;
 }
 
 // Offset: 4044
@@ -552,7 +568,7 @@ void DRLoadLights(char* pPath_name) {
     br_actor* light_array[100];
     int number_of_lights;
     int i;
-    LOG_WARN("skipping");
+    STUB();
 }
 
 // Offset: 5328
@@ -624,7 +640,30 @@ void LoadKeyMapping() {
 void LoadInterfaceStuff(int pWithin_race) {
     tPath_name path;
     int i;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%d)", pWithin_race);
+
+    if (gProgram_state.sausage_eater_mode) {
+        strcpy(path, "GHANDX.PIX");
+    } else {
+        strcpy(path, "HANDX.PIX");
+    }
+    PossibleService();
+    if (!gCursors[0] && !LoadPixelmaps(path, gCursors, 4)) {
+        FatalError(22);
+    }
+    if (gProgram_state.sausage_eater_mode) {
+        strcpy(path, "GHANDPX.PIX");
+    } else {
+        strcpy(path, "HANDPX.PIX");
+    }
+    PossibleService();
+    if (!gCursors[4] && !LoadPixelmaps(path, &gCursors[4], 4)) {
+        FatalError(22);
+    }
+    PossibleService();
+    if (!gCursor_giblet_images[0] && !LoadPixelmaps("CURSGIBX.PIX", gCursor_giblet_images, 18u)) {
+        FatalError(23);
+    }
 }
 
 // Offset: 6108
@@ -1174,7 +1213,7 @@ void LoadOpponents() {
     GetALineAndDontArgue(f, s);
     str = strtok(s, "\t ,/");
     sscanf(str, "%d", &gNumber_of_racers);
-    gOpponents = BrMemAllocate(sizeof(tOpponent) * gNumber_of_racers, 0xA3u);
+    gOpponents = BrMemAllocate(sizeof(tOpponent) * gNumber_of_racers, kMem_oppo_array);
 
     for (i = 0; i < gNumber_of_racers; i++) {
         PossibleService();
@@ -1204,7 +1243,7 @@ void LoadOpponents() {
         strcpy(gOpponents[i].stolen_car_flic_name, str);
 
         gOpponents[i].text_chunk_count = GetAnInt(f);
-        gOpponents[i].text_chunks = BrMemAllocate(sizeof(tText_chunk) * gOpponents[i].text_chunk_count, 0xA4u);
+        gOpponents[i].text_chunks = BrMemAllocate(sizeof(tText_chunk) * gOpponents[i].text_chunk_count, kMem_oppo_text_chunk);
 
         for (j = 0; j < gOpponents[i].text_chunk_count; j++) {
             the_chunk = &gOpponents[i].text_chunks[j];
@@ -1219,7 +1258,7 @@ void LoadOpponents() {
 
             for (k = 0; k < the_chunk->line_count; k++) {
                 GetALineAndDontArgue(f, s);
-                the_chunk->text[k] = BrMemAllocate(strlen(s) + 1, 0xA5u);
+                the_chunk->text[k] = BrMemAllocate(strlen(s) + 1, kMem_oppo_text_str);
                 strcpy(the_chunk->text[k], s);
             }
         }
@@ -1250,7 +1289,7 @@ br_font* LoadBRFont(char* pName) {
     PathCat(the_path, the_path, pName);
     f = DRfopen(the_path, "rb");
     PossibleService();
-    the_font = BrMemAllocate(sizeof(br_font), 0xA6u);
+    the_font = BrMemAllocate(sizeof(br_font), kMem_br_font);
 
     // we read 0x18 bytes as that is the size of the struct in 32 bit code.
     fread(the_font, 0x18, 1u, f);
@@ -1263,10 +1302,10 @@ br_font* LoadBRFont(char* pName) {
     the_font->spacing_y = the_font->spacing_y >> 8 | the_font->spacing_y << 8;
 
     data_size = sizeof(br_int_8) * 256;
-    the_font->width = BrMemAllocate(data_size, 0xA7u);
+    the_font->width = BrMemAllocate(data_size, kMem_br_font_wid);
     fread(the_font->width, data_size, 1, f);
     data_size = sizeof(br_uint_16) * 256;
-    the_font->encoding = BrMemAllocate(data_size, 0xA8u);
+    the_font->encoding = BrMemAllocate(data_size, kMem_br_font_enc);
     fread(the_font->encoding, data_size, 1u, f);
     for (i = 0; i < 256; i++) {
         the_font->encoding[i] = the_font->encoding[i] >> 8 | the_font->encoding[i] << 8;
@@ -1275,7 +1314,7 @@ br_font* LoadBRFont(char* pName) {
     fread(&data_size, sizeof(tU32), 1u, f);
     data_size = BrSwap32(data_size);
     PossibleService();
-    the_font->glyphs = BrMemAllocate(data_size, 0xA9u);
+    the_font->glyphs = BrMemAllocate(data_size, kMem_br_font_glyphs);
     fread(the_font->glyphs, data_size, 1u, f);
     fclose(f);
     return the_font;
@@ -1620,7 +1659,7 @@ void LoadMiscStrings() {
     }
     for (i = 0; i < 250; i++) {
         GetALineAndDontArgue(f, s);
-        gMisc_strings[i] = BrMemAllocate(strlen(s) + 1, 0xABu);
+        gMisc_strings[i] = BrMemAllocate(strlen(s) + 1, kMem_misc_string);
         strcpy(gMisc_strings[i], s);
         if (feof(f)) {
             break;
@@ -1773,7 +1812,7 @@ FILE* DRfopen(char* pFilename, char* pMode) {
         }
     }
     if (!result) {
-        LOG_WARN("DRfopen failed");
+        LOG_WARN("failed");
     }
     return result;
 }
@@ -1786,7 +1825,7 @@ int GetCDPathFromPathsTxtFile(char* pPath_name) {
     static tPath_name cd_pathname;
     FILE* paths_txt_fp;
     tPath_name paths_txt;
-    LOG_TRACE("()");
+    LOG_TRACE9("()");
 
     if (!got_it_already) {
         sprintf(paths_txt, "%s%s%s", gApplication_path, gDir_separator, "PATHS.TXT");

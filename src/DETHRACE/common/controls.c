@@ -1,11 +1,20 @@
 #include "controls.h"
 
-#include "common/displays.h"
-#include "common/globvars.h"
-#include "common/graphics.h"
+#include "car.h"
+#include "displays.h"
+#include "flicplay.h"
+#include "globvars.h"
+#include "graphics.h"
 #include "input.h"
+#include "loadsave.h"
+#include "mainloop.h"
+#include "netgame.h"
 #include "pc-dos/dossys.h"
+#include "pedestrn.h"
+#include "pratcam.h"
 #include "sound.h"
+#include "structur.h"
+#include "utility.h"
 #include <stdlib.h>
 
 tCheat gKev_keys[44] = {
@@ -56,7 +65,52 @@ tCheat gKev_keys[44] = {
 char* gAbuse_text[10];
 tEdit_func* gEdit_funcs[10][18][8];
 char* gEdit_mode_names[10];
-tToggle_element gToggle_array[43];
+tToggle_element _gToggle_array[] = {
+    { 34, -2, 1, 1, 0, ConcussMe },
+    { 56, -2, 1, 1, 0, ToggleMap },
+    { 35, -2, 1, 1, 0, TogglePratcam },
+    { 59, -2, 1, 1, 0, SetRecovery },
+    { 4, 7, 1, 1, 0, AbortRace },
+    { 45, -2, 1, 1, 0, ToggleMirror },
+    { 50, -2, 1, 1, 0, LookLeft },
+    { 51, -2, 1, 1, 0, LookRight },
+    { 52, -2, 1, 1, 0, DamageTest },
+    { 36, -2, 0, 1, 0, ToggleSoundEnable },
+    { 5, 8, 0, 1, 0, PrintScreen },
+    //{ 9, 7, 1, 1, 0, locret_1EF00 },
+    { 10, 7, 1, 1, 0, ToggleFlying },
+    { 54, -2, 1, 1, 0, TogglePedestrians },
+    { 17, -2, 0, 0, 0, F4Key },
+    { 18, -2, 1, 0, 0, F5Key },
+    { 19, -2, 1, 0, 0, F6Key },
+    { 20, -2, 1, 0, 0, F7Key },
+    { 21, -2, 1, 0, 0, F8Key },
+    { 22, -2, 1, 0, 0, F10Key },
+    { 23, -2, 1, 0, 0, F11Key },
+    { 24, -2, 1, 0, 0, F12Key },
+    { 14, -2, 1, 0, 0, NumberKey0 },
+    { 37, -2, 1, 0, 0, NumberKey1 },
+    { 38, -2, 1, 0, 0, NumberKey2 },
+    { 39, -2, 1, 0, 0, NumberKey3 },
+    { 40, -2, 1, 0, 0, NumberKey4 },
+    { 41, -2, 1, 0, 0, NumberKey5 },
+    { 42, -2, 1, 0, 0, NumberKey6 },
+    { 43, -2, 1, 0, 0, NumberKey7 },
+    { 15, -2, 1, 0, 0, NumberKey8 },
+    { 16, -2, 1, 0, 0, NumberKey9 },
+    { 60, -2, 1, 0, 0, ScreenLarger },
+    { 61, -2, 1, 0, 0, ScreenSmaller },
+    { 62, -2, 1, 0, 0, BuyArmour },
+    { 63, -2, 1, 0, 0, BuyPower },
+    { 64, -2, 1, 0, 0, BuyOffense },
+    { 65, -2, 1, 0, 0, ViewNetPlayer },
+    { 66, -2, 1, 0, 0, UserSendMessage },
+    //{ 25, -2, 1, 1, 0, locret_2CDB4 },
+    { 26, -2, 1, 1, 0, ToggleInfo },
+    { 26, 8, 1, 1, 0, ToggleInfo },
+    { 26, 7, 1, 1, 0, ToggleInfo }
+};
+
 char gString[84];
 int gToo_late;
 int gAllow_car_flying;
@@ -460,8 +514,43 @@ void CheckHelp() {
 // Offset: 4644
 // Size: 313
 void CheckLoadSave() {
+    int save_load_allowed;
     int switched_res;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("()");
+
+    save_load_allowed = !gProgram_state.saving && !gProgram_state.loading && gProgram_state.prog_status == eProg_game_ongoing && !gProgram_state.dont_save_or_load;
+
+    if (CmdKeyDown(KEYMAP_F2, KEYMAP_S)) {
+        if (save_load_allowed) {
+            FadePaletteDown();
+            ClearEntireScreen();
+            if (gProgram_state.racing) {
+                GoingToInterfaceFromRace();
+            }
+            DoSaveGame(gProgram_state.racing == 0);
+            if (gProgram_state.racing) {
+                GoingBackToRaceFromInterface();
+            }
+        }
+        WaitForNoKeys();
+    }
+    if (CmdKeyDown(KEYMAP_F3, KEYMAP_L)) {
+        if (save_load_allowed && !gProgram_state.dont_load) {
+            FadePaletteDown();
+            ClearEntireScreen();
+            if (gProgram_state.racing) {
+                GoingToInterfaceFromRace();
+            }
+            if (DoLoadGame() && !gProgram_state.racing) {
+                gProgram_state.prog_status = eProg_game_starting;
+            }
+            if (gProgram_state.racing) {
+                GoingBackToRaceFromInterface();
+            }
+            PlayFlicsFromMemory();
+        }
+        WaitForNoKeys();
+    }
 }
 
 // Offset: 4960
@@ -470,7 +559,7 @@ void CheckLoadSave() {
 void CheckToggles(int pRacing) {
     int i;
     int new_state;
-    NOT_IMPLEMENTED();
+    STUB();
 }
 
 // Offset: 5324
@@ -635,7 +724,7 @@ void FlipUpCar(tCar_spec* car) {
 // EAX: pNum
 void GetPowerup(int pNum) {
     _unittest_controls_lastGetPowerup = pNum;
-    LOG_WARN("Not implemented");
+    STUB();
 }
 
 // Offset: 12604
@@ -644,7 +733,17 @@ void GetPowerup(int pNum) {
 void CheckSystemKeys(int pRacing) {
     tU32 start_menu_time;
     int i;
-    NOT_IMPLEMENTED();
+
+    start_menu_time = PDGetTotalTime();
+    CheckQuit();
+    if (!gAction_replay_mode) {
+        CheckLoadSave();
+    }
+    AddLostTime(PDGetTotalTime() - start_menu_time);
+    CheckToggles(pRacing);
+    if (pRacing & !gAction_replay_mode) {
+        CheckOtherRacingKeys();
+    }
 }
 
 // Offset: 12716

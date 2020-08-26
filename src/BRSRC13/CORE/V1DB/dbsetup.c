@@ -147,7 +147,7 @@ br_error BrV1dbRendererEnd() {
 // Size: 94
 void BrZbBegin(br_uint_8 colour_type, br_uint_8 depth_type) {
     LOG_TRACE("(%d, %d)", colour_type, depth_type);
-    LOG_WARN("Not implemented");
+    STUB();
 }
 
 // Offset: 2133

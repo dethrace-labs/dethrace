@@ -14,14 +14,12 @@ int keymap[123] = {
     SDL_SCANCODE_LCTRL,
     -1,
     SDL_SCANCODE_CAPSLOCK,
-
     SDL_SCANCODE_RSHIFT,
     SDL_SCANCODE_RALT,
     SDL_SCANCODE_RCTRL,
     SDL_SCANCODE_LSHIFT,
     SDL_SCANCODE_LALT,
     SDL_SCANCODE_LCTRL,
-
     SDL_SCANCODE_0,
     SDL_SCANCODE_1,
     SDL_SCANCODE_2,
@@ -58,7 +56,6 @@ int keymap[123] = {
     SDL_SCANCODE_X,
     SDL_SCANCODE_Y,
     SDL_SCANCODE_Z,
-
     SDL_SCANCODE_GRAVE,
     SDL_SCANCODE_MINUS,
     SDL_SCANCODE_EQUALS,
@@ -140,6 +137,7 @@ void Keyboard_HandleEvent(SDL_KeyboardEvent* key) {
     }
     if (key->type == SDL_KEYDOWN) {
         sdl_key_state[key->keysym.scancode] = 1;
+        LOG_DEBUG("key %d", key->keysym.scancode);
     } else {
         sdl_key_state[key->keysym.scancode] = 0;
     }

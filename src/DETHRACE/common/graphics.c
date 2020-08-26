@@ -360,7 +360,15 @@ void ScreenLarger() {
 // EDX: pFirst_colour
 // EBX: pCount
 void DRSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%p, %d, %d)", pPalette, pFirst_colour, pCount);
+    if (!pFirst_colour) {
+        ((br_int_32*)pPalette->pixels)[0] = 0;
+    }
+    memcpy(gCurrent_palette_pixels + 4 * pFirst_colour, pPalette->pixels + 4 * pFirst_colour, 4 * pCount);
+    if (!gFaded_palette) {
+        //PDSetPaletteEntries(pPalette, pFirst_colour, pCount);
+    }
+    gPalette_munged = 1;
 }
 
 // Offset: 4144
@@ -402,21 +410,21 @@ void DRSetPalette(br_pixelmap* pThe_palette) {
 // Size: 415
 void InitializePalettes() {
     int j;
-    gCurrent_palette_pixels = BrMemAllocate(0x400u, 0x96u);
+    gCurrent_palette_pixels = BrMemAllocate(0x400u, kMem_cur_pal_pixels);
     gCurrent_palette = DRPixelmapAllocate(BR_PMT_RGBX_888, 1u, 256, gCurrent_palette_pixels, 0);
     gRender_palette = BrTableFind("DRRENDER.PAL");
     if (!gRender_palette) {
         FatalError(10);
     }
     gOrig_render_palette = BrPixelmapAllocateSub(gRender_palette, 0, 0, gRender_palette->width, gRender_palette->height);
-    gOrig_render_palette->pixels = BrMemAllocate(0x400u, 0x97u);
+    gOrig_render_palette->pixels = BrMemAllocate(0x400u, kMem_render_pal_pixels);
     memcpy(gOrig_render_palette->pixels, gRender_palette->pixels, 0x400u);
     gFlic_palette = BrTableFind("DRACEFLC.PAL");
     if (!gFlic_palette) {
         FatalError(10);
     }
     DRSetPalette2(gFlic_palette, 1);
-    gScratch_pixels = BrMemAllocate(0x400u, 0x98u);
+    gScratch_pixels = BrMemAllocate(0x400u, kMem_scratch_pal_pixels);
     gScratch_palette = DRPixelmapAllocate(BR_PMT_RGBX_888, 1u, 256, gScratch_pixels, 0);
     gPalette_conversion_table = BrTableFind("FLC2REND.TAB");
     gRender_shade_table = BrTableFind("DRRENDER.TAB");
@@ -879,7 +887,13 @@ void FadePaletteUp() {
 // Offset: 20660
 // Size: 91
 void KillSplashScreen() {
-    NOT_IMPLEMENTED();
+    if (gCurrent_splash) {
+        BrMapRemove(gCurrent_splash);
+        BrPixelmapFree(gCurrent_splash);
+        gCurrent_splash = 0;
+        FadePaletteDown();
+        ClearEntireScreen();
+    }
 }
 
 // Offset: 20752
@@ -1161,7 +1175,7 @@ int AllocateCursorTransient() {
 // Offset: 27696
 // Size: 138
 void StartMouseCursor() {
-    NOT_IMPLEMENTED();
+    LOG_WARN("stub");
 }
 
 // Offset: 27836

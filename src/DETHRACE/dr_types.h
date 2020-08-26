@@ -2,6 +2,7 @@
 #define DR_TYPES_H
 
 #include "br_types.h"
+#include "constants.h"
 #include "harness.h"
 #include <stdarg.h>
 #include <stddef.h>

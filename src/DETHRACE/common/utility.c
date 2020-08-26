@@ -2,10 +2,14 @@
 #include <stdlib.h>
 
 #include "brender.h"
+#include "constants.h"
 #include "dossys.h"
 #include "errors.h"
 #include "globvars.h"
+#include "input.h"
 #include "loading.h"
+#include "loadsave.h"
+#include "mainmenu.h"
 #include "network.h"
 #include "sound.h"
 
@@ -22,7 +26,7 @@ tU32 gLong_key[] = { 0x5F991B6C, 0x135FCDB9, 0x0E2004CB, 0x0EA11C5E };
 tU32 gOther_long_key[] = { 0x26D6A867, 0x1B45DDB6, 0x13227E32, 0x3794C215 };
 
 char* gMisc_strings[250];
-int gIn_check_quit;
+int gIn_check_quit = 0;
 tU32 gLost_time;
 int gEncryption_method = 0;
 br_pixelmap* g16bit_palette;
@@ -31,8 +35,20 @@ br_pixelmap* gSource_for_16bit_palette;
 // Offset: 0
 // Size: 144
 int CheckQuit() {
-    int got_as_far_as_verify;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("()");
+
+    if (!gIn_check_quit && KeyIsDown(KEYMAP_Q) && KeyIsDown(KEYMAP_LCTRL)) {
+        gIn_check_quit = 1;
+        while (AnyKeyDown()) {
+            ;
+        }
+
+        if (DoVerifyQuit(1)) {
+            DoSaveGame(1);
+        }
+        gIn_check_quit = 0;
+    }
+    return 0;
 }
 
 // Offset: 196
@@ -279,7 +295,10 @@ float tandeg(float pAngle) {
 // EAX: pF
 tU32 GetFileLength(FILE* pF) {
     tU32 the_size;
-    NOT_IMPLEMENTED();
+    fseek(pF, 0, SEEK_END);
+    the_size = ftell(pF);
+    rewind(pF);
+    return the_size;
 }
 
 // Offset: 2164
@@ -588,7 +607,7 @@ tU32 GetRaceTime() {
 // Size: 46
 // EAX: pLost_time
 void AddLostTime(tU32 pLost_time) {
-    NOT_IMPLEMENTED();
+    gLost_time += pLost_time;
 }
 
 // Offset: 7048
@@ -1237,7 +1256,7 @@ void NobbleNonzeroBlacks(br_pixelmap* pPalette) {
 // Size: 55
 // EAX: pThe_path
 int PDCheckDriveExists(char* pThe_path) {
-    LOG_TRACE("(\"%s\")", pThe_path);
+    LOG_TRACE9("(\"%s\")", pThe_path);
     return PDCheckDriveExists2(pThe_path, NULL, 0);
 }
 

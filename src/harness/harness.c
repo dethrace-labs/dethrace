@@ -100,6 +100,11 @@ void Harness_Hook_BrDevPaletteSetOld(br_pixelmap* pm) {
     }
 }
 
+void Harness_Hook_BrDevPaletteSetEntryOld(int i, br_colour colour) {
+    uint32_t* colors = palette->pixels;
+    colors[i] = colour;
+}
+
 void Harness_Hook_KeyBegin() {
     Keyboard_Init();
 }

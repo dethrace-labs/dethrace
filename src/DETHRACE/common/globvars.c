@@ -83,7 +83,7 @@ int gInitial_net_credits[5];
 float gCar_cred_value[3];
 int gNo_races_yet;
 int gDefault_engine_noise_index;
-int gGame_to_load;
+int gGame_to_load = -1;
 int gJump_start_fine[3];
 int gSausage_override;
 int gAusterity_mode;

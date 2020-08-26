@@ -6,7 +6,7 @@ char rscid[50];
 // Offset: 11
 // Size: 58
 br_boolean BrImageAdd(br_image* img) {
-    LOG_WARN("Not implemented");
+    STUB();
 }
 
 // Offset: 83

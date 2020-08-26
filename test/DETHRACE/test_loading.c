@@ -80,10 +80,34 @@ void test_loading_opponents() {
     TEST_ASSERT_EQUAL_STRING("TOP SPEED: 150MPH", o->text_chunks[0].text[0]);
 }
 
+void test_loading_memread() {
+    int32_t int_array[] = { 1, 2, 3, 4 };
+    char* data = (char*)int_array;
+    TEST_ASSERT_EQUAL_INT(1, MemReadU32(&data));
+    TEST_ASSERT_EQUAL_INT(2, MemReadU32(&data));
+    MemSkipBytes(&data, sizeof(int32_t));
+    TEST_ASSERT_EQUAL_INT(4, MemReadU32(&data));
+
+    int16_t short_array[] = { 1, 2, 3, 4 };
+    data = (char*)short_array;
+    TEST_ASSERT_EQUAL_INT(1, MemReadU16(&data));
+    TEST_ASSERT_EQUAL_INT(2, MemReadU16(&data));
+    MemSkipBytes(&data, sizeof(int16_t));
+    TEST_ASSERT_EQUAL_INT(4, MemReadU16(&data));
+
+    int8_t char_array[] = { 1, 2, 3, 4 };
+    data = (char*)char_array;
+    TEST_ASSERT_EQUAL_INT(1, MemReadU8(&data));
+    TEST_ASSERT_EQUAL_INT(2, MemReadU8(&data));
+    MemSkipBytes(&data, sizeof(int8_t));
+    TEST_ASSERT_EQUAL_INT(4, MemReadU8(&data));
+}
+
 void test_loading_suite() {
     RUN_TEST(test_loading_GetCDPathFromPathsTxtFile);
     RUN_TEST(test_loading_OldDRfopen);
     RUN_TEST(test_loading_LoadGeneralParameters);
     RUN_TEST(test_loading_brfont);
     RUN_TEST(test_loading_opponents);
+    RUN_TEST(test_loading_memread);
 }

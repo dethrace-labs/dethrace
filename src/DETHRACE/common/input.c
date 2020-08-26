@@ -2,6 +2,7 @@
 
 #include "common/globvars.h"
 #include "pc-dos/dossys.h"
+#include "utility.h"
 #include <stdlib.h>
 
 tJoy_array gJoy_array;
@@ -21,7 +22,7 @@ tU32 gLast_key_down_time;
 int gThe_length;
 tU32 gLast_roll;
 int gLast_key_down;
-int gGo_ahead_keys[3];
+int gGo_ahead_keys[3] = { 51, 52, 106 }; // enter, return, space
 int gKey_mapping[67];
 char gCurrent_typing[110];
 
@@ -262,13 +263,43 @@ int OldKeyIsDown(int pKey_index) {
 // EAX: pKey_index
 int KeyIsDown(int pKey_index) {
     int i;
-    NOT_IMPLEMENTED();
+
+    if (PDGetTotalTime() - gLast_poll_keys > 500) {
+        ResetPollKeys();
+        CyclePollKeys();
+        PollKeys();
+    }
+    if (pKey_index == -2) {
+        return 1;
+    }
+    if (pKey_index != -1) {
+        return gKey_array[gKey_mapping[pKey_index]];
+    }
+
+    for (i = 0; i < 3; i++) {
+        if (gKey_array[gGo_ahead_keys[i]]) {
+            return 1;
+        }
+    }
+
+    return 0;
 }
 
 // Offset: 3008
 // Size: 64
 void WaitForNoKeys() {
-    NOT_IMPLEMENTED();
+    LOG_TRACE("()");
+
+    int key_result = 0; //JeffH added
+
+    while (1) {
+        CheckQuit();
+        key_result = PDAnyKeyDown();
+        if ((key_result == -1 || key_result == 4) && !EitherMouseButtonDown()) {
+            break;
+        }
+    }
+    CheckQuit();
 }
 
 // Offset: 3072
@@ -282,7 +313,7 @@ void WaitForAKey() {
 // EAX: pFKey_ID
 // EDX: pCmd_key_ID
 int CmdKeyDown(int pFKey_ID, int pCmd_key_ID) {
-    NOT_IMPLEMENTED();
+    return KeyIsDown(pFKey_ID) || (KeyIsDown(KEYMAP_LCTRL) && KeyIsDown(pCmd_key_ID));
 }
 
 // Offset: 3244
@@ -531,11 +562,11 @@ void KillCursor(int pSlot_index) {
 // Offset: 7744
 // Size: 44
 void EdgeTriggerModeOn() {
-    NOT_IMPLEMENTED();
+    gEdge_trigger_mode = 1;
 }
 
 // Offset: 7788
 // Size: 44
 void EdgeTriggerModeOff() {
-    NOT_IMPLEMENTED();
+    gEdge_trigger_mode = 0;
 }

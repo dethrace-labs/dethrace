@@ -4,6 +4,8 @@
 #include "br_types.h"
 #include "dr_types.h"
 
+extern tFlic_spec gMain_flic_list[372];
+
 // Offset: 0
 // Size: 44
 void EnableTranslationText();

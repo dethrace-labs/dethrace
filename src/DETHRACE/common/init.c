@@ -124,7 +124,7 @@ void AllocateRearviewPixelmap() {
             (gProgram_state.current_car.mirror_bottom - gProgram_state.current_car.mirror_top + 1)
                 * (gProgram_state.current_car.mirror_right - gProgram_state.current_car.mirror_left + 4)
                 * gGraf_specs[gGraf_spec_index].depth_bytes,
-            0x9Au);
+            kMem_rear_screen_pixels);
         if (gScreen->row_bytes < 0) {
             BrFatal("..\\..\\source\\common\\init.c", 260, "Bruce bug at line %d, file ..\\..\\source\\common\\init.c", 4);
         }
@@ -165,7 +165,7 @@ void InstallFindFailedHooks() {
 void AllocateStandardLamp() {
     br_actor* lamp;
     int i;
-    LOG_WARN("skipping");
+    STUB();
 }
 
 // Offset: 2152

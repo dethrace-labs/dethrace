@@ -1,6 +1,8 @@
 #include "network.h"
 #include "common/controls.h"
 #include "common/netgame.h"
+#include "globvars.h"
+#include "globvrpb.h"
 #include "pc-dos/dosnet.h"
 #include <stdlib.h>
 
@@ -783,7 +785,20 @@ void NetFinishRace(tNet_game_details* pDetails, tRace_over_reason pReason) {
 // Size: 157
 // EAX: pNew_status
 void NetPlayerStatusChanged(tPlayer_status pNew_status) {
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%d)", pNew_status);
+    tNet_message* the_message;
+
+    if (gNet_mode && pNew_status != gNet_players[gThis_net_player_index].player_status) {
+        gNet_players[gThis_net_player_index].player_status = pNew_status;
+        the_message = NetBuildMessage(0xAu, 0);
+        the_message->contents.data.report.status = gNet_players[gThis_net_player_index].player_status;
+        NetSendMessageToAllPlayers(gCurrent_net_game, the_message);
+        if (gProgram_state.current_car.disabled && pNew_status >= ePlayer_status_racing && pNew_status != ePlayer_status_recovering) {
+            EnableCar(&gProgram_state.current_car);
+        } else if (!gProgram_state.current_car.disabled && pNew_status < ePlayer_status_racing) {
+            DisableCar(&gProgram_state.current_car);
+        }
+    }
 }
 
 // Offset: 16648
