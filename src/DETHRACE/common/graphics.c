@@ -366,7 +366,7 @@ void DRSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
     }
     memcpy(gCurrent_palette_pixels + 4 * pFirst_colour, pPalette->pixels + 4 * pFirst_colour, 4 * pCount);
     if (!gFaded_palette) {
-        //PDSetPaletteEntries(pPalette, pFirst_colour, pCount);
+        PDSetPaletteEntries(pPalette, pFirst_colour, pCount);
     }
     gPalette_munged = 1;
 }
@@ -1098,7 +1098,7 @@ void DeallocateAllTransientBitmaps() {
 void RemoveTransientBitmaps(int pGraphically_remove_them) {
     int i;
     int order_number;
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // Offset: 24400
@@ -1161,7 +1161,7 @@ int DoMouseCursor() {
     static int required_cursor;
     static int zero_count;
     static int button_was_down;
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // Offset: 27508

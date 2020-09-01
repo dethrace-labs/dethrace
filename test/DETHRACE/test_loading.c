@@ -88,19 +88,27 @@ void test_loading_memread() {
     MemSkipBytes(&data, sizeof(int32_t));
     TEST_ASSERT_EQUAL_INT(4, MemReadU32(&data));
 
-    int16_t short_array[] = { 1, 2, 3, 4 };
+    int16_t short_array[] = { 1, 2, 3, 4, -5, -6 };
     data = (char*)short_array;
     TEST_ASSERT_EQUAL_INT(1, MemReadU16(&data));
     TEST_ASSERT_EQUAL_INT(2, MemReadU16(&data));
     MemSkipBytes(&data, sizeof(int16_t));
     TEST_ASSERT_EQUAL_INT(4, MemReadU16(&data));
+    TEST_ASSERT_EQUAL_INT(-5, MemReadS16(&data));
+    TEST_ASSERT_EQUAL_INT(-6, MemReadS16(&data));
 
-    int8_t char_array[] = { 1, 2, 3, 4 };
+    int8_t char_array[] = { 1, 2, 3, -4 };
     data = (char*)char_array;
     TEST_ASSERT_EQUAL_INT(1, MemReadU8(&data));
     TEST_ASSERT_EQUAL_INT(2, MemReadU8(&data));
     MemSkipBytes(&data, sizeof(int8_t));
-    TEST_ASSERT_EQUAL_INT(4, MemReadU8(&data));
+    TEST_ASSERT_EQUAL_INT(252, MemReadU8(&data)); // (unsigned)
+
+    data = (char*)char_array;
+    TEST_ASSERT_EQUAL_INT(1, MemReadS8(&data));
+    TEST_ASSERT_EQUAL_INT(2, MemReadS8(&data));
+    MemSkipBytes(&data, sizeof(int8_t));
+    TEST_ASSERT_EQUAL_INT(-4, MemReadS8(&data));
 }
 
 void test_loading_suite() {

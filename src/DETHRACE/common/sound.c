@@ -222,7 +222,7 @@ void ToggleSoundEnable() {
 // Size: 125
 void SoundService() {
     br_matrix34 mat;
-    LOG_WARN("SoundService not implemented");
+    SILENT_STUB();
 }
 
 // Offset: 3028

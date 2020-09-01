@@ -769,7 +769,7 @@ void CheckForPendingStartRace() {
 void NetService(int pIn_race) {
     tU32 time;
     static tU32 last_status_broadcast;
-    LOG_WARN("NetService not implemented");
+    SILENT_STUB();
 }
 
 // Offset: 16400

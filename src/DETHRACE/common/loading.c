@@ -176,7 +176,7 @@ void SkipBytes(FILE* pF, int pBytes_to_skip) {
 tU32 MemReadU32(char** pPtr) {
     tU32 raw_long;
     memcpy(&raw_long, *pPtr, 4);
-    *pPtr += sizeof(raw_long);
+    *pPtr += 4;
     return raw_long;
 }
 
@@ -186,7 +186,7 @@ tU32 MemReadU32(char** pPtr) {
 tU16 MemReadU16(char** pPtr) {
     tU16 raw_short;
     memcpy(&raw_short, *pPtr, 2);
-    *pPtr += sizeof(raw_short);
+    *pPtr += 2;
     return raw_short;
 }
 
@@ -210,7 +210,9 @@ tS32 MemReadS32(char** pPtr) {
 // EAX: pPtr
 tS16 MemReadS16(char** pPtr) {
     tS16 raw_short;
-    NOT_IMPLEMENTED();
+    memcpy(&raw_short, *pPtr, 2);
+    *pPtr += 2;
+    return raw_short;
 }
 
 // Offset: 1216
@@ -218,7 +220,9 @@ tS16 MemReadS16(char** pPtr) {
 // EAX: pPtr
 tS8 MemReadS8(char** pPtr) {
     tS8 raw_byte;
-    NOT_IMPLEMENTED();
+    raw_byte = **pPtr;
+    (*pPtr)++;
+    return raw_byte;
 }
 
 // Offset: 1272

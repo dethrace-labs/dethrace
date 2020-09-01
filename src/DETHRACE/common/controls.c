@@ -516,7 +516,7 @@ void CheckHelp() {
 void CheckLoadSave() {
     int save_load_allowed;
     int switched_res;
-    LOG_TRACE("()");
+    LOG_TRACE8("()");
 
     save_load_allowed = !gProgram_state.saving && !gProgram_state.loading && gProgram_state.prog_status == eProg_game_ongoing && !gProgram_state.dont_save_or_load;
 
@@ -559,7 +559,7 @@ void CheckLoadSave() {
 void CheckToggles(int pRacing) {
     int i;
     int new_state;
-    STUB();
+    SILENT_STUB();
 }
 
 // Offset: 5324

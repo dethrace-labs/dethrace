@@ -129,7 +129,14 @@ tKey_down_result PDKeyDown2(int pKey_index) {
 // EAX: pKey_index
 int PDKeyDown(int pKey_index) {
     tKey_down_result result;
-    NOT_IMPLEMENTED();
+    result = PDKeyDown2(pKey_index);
+    if (!gEdge_trigger_mode || pKey_index <= 10) {
+        return result != 0;
+    }
+    if (result != tKey_down_yes && result != tKey_down_repeat) {
+        return 0;
+    }
+    return 1;
 }
 
 // Offset: 1832

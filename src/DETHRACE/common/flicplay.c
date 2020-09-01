@@ -11,6 +11,7 @@
 #include "sound.h"
 #include "utility.h"
 #include <stdlib.h>
+#include <unistd.h>
 
 int gFlic_bunch8[16];
 int gFlic_bunch4[22];
@@ -636,6 +637,7 @@ int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU3
     if (pDest_pixelmap) {
         pFlic_info->first_pixel = pDest_pixelmap->pixels + pDest_pixelmap->row_bytes * pFlic_info->y_offset + pFlic_info->x_offset;
     }
+    //LOG_DEBUG("first pixel %p %p", pFlic_info->first_pixel, pDest_pixelmap->pixels);
     pFlic_info->the_pixelmap = pDest_pixelmap;
     return 0;
 }
@@ -802,7 +804,45 @@ void DoDeltaTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU32 the_row_bytes;
     tU16* line_pixel_ptr;
     tU16 the_word;
-    NOT_IMPLEMENTED();
+
+    line_count = MemReadU16(&pFlic_info->data);
+    the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
+    pixel_ptr = pFlic_info->first_pixel;
+
+    for (i = 0; i < line_count;) {
+        number_of_packets = MemReadS16(&pFlic_info->data);
+        line_pixel_ptr = (tU16*)pixel_ptr;
+
+        if (number_of_packets < 0) {
+            pixel_ptr = pixel_ptr + the_row_bytes * -number_of_packets;
+        } else {
+            for (j = 0; j < number_of_packets; j++) {
+                skip_count = MemReadU8(&pFlic_info->data);
+                size_count = MemReadS8(&pFlic_info->data);
+                line_pixel_ptr += skip_count / 2;
+                if (size_count < 0) {
+                    the_word = *(tU16*)pFlic_info->data;
+                    pFlic_info->data += 2;
+                    the_byte = the_word & 0xff;
+                    the_byte2 = the_word >> 8 & 0xff;
+
+                    for (k = 0; k < -size_count; k++) {
+                        *line_pixel_ptr = the_word;
+                        line_pixel_ptr++;
+                    }
+                } else {
+                    for (k = 0; k < size_count; k++) {
+                        the_word = *(tU16*)pFlic_info->data;
+                        pFlic_info->data += 2;
+                        *line_pixel_ptr = the_word;
+                        line_pixel_ptr++;
+                    }
+                }
+            }
+            pixel_ptr = pixel_ptr + the_row_bytes;
+            i++;
+        }
+    }
 }
 
 // Offset: 3816
@@ -821,7 +861,42 @@ void DoDeltaX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU32 the_row_bytes;
     tU16* line_pixel_ptr;
     tU16 the_word;
-    NOT_IMPLEMENTED();
+
+    line_count = MemReadU16(&pFlic_info->data);
+    the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
+    pixel_ptr = pFlic_info->first_pixel;
+
+    for (i = 0; i < line_count;) {
+        number_of_packets = MemReadS16(&pFlic_info->data);
+        line_pixel_ptr = (tU16*)pixel_ptr;
+
+        if (number_of_packets < 0) {
+            pixel_ptr = pixel_ptr + the_row_bytes * -number_of_packets;
+        } else {
+            for (j = 0; j < number_of_packets; j++) {
+                skip_count = MemReadU8(&pFlic_info->data);
+                size_count = MemReadS8(&pFlic_info->data);
+                line_pixel_ptr += skip_count / 2;
+                if (size_count < 0) {
+                    the_word = *(tU16*)pFlic_info->data;
+                    pFlic_info->data += 2;
+                    for (k = 0; k < -size_count; k++) {
+                        *line_pixel_ptr = the_word;
+                        line_pixel_ptr++;
+                    }
+                } else {
+                    for (k = 0; k < size_count; k++) {
+                        the_word = *(tU16*)pFlic_info->data;
+                        pFlic_info->data += 2;
+                        *line_pixel_ptr = the_word;
+                        line_pixel_ptr++;
+                    }
+                }
+            }
+            pixel_ptr = pixel_ptr + the_row_bytes;
+            i++;
+        }
+    }
 }
 
 // Offset: 4172
@@ -852,7 +927,31 @@ void DoRunLengthX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU8* line_pixel_ptr;
     tU8 the_byte;
     tU32 the_row_bytes;
-    NOT_IMPLEMENTED();
+
+    the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
+    pixel_ptr = pFlic_info->first_pixel;
+
+    for (i = 0; i < pFlic_info->height; i++) {
+        line_pixel_ptr = pixel_ptr;
+        number_of_packets = MemReadU8(&pFlic_info->data);
+        for (j = 0; j < number_of_packets; j++) {
+            size_count = MemReadS8(&pFlic_info->data);
+            if (size_count >= 0) {
+                the_byte = MemReadU8(&pFlic_info->data);
+                for (k = 0; k < size_count; k++) {
+                    *line_pixel_ptr = the_byte;
+                    line_pixel_ptr++;
+                }
+            } else {
+                for (k = 0; k < -size_count; k++) {
+                    the_byte = MemReadU8(&pFlic_info->data);
+                    *line_pixel_ptr = the_byte;
+                    line_pixel_ptr++;
+                }
+            }
+        }
+        pixel_ptr += the_row_bytes;
+    }
 }
 
 // Offset: 4600
@@ -869,7 +968,35 @@ void DoRunLengthTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU8* line_pixel_ptr;
     tU8 the_byte;
     tU32 the_row_bytes;
-    NOT_IMPLEMENTED();
+
+    the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
+    pixel_ptr = pFlic_info->first_pixel;
+
+    for (i = 0; i < pFlic_info->height; i++) {
+        line_pixel_ptr = pixel_ptr;
+        number_of_packets = MemReadU8(&pFlic_info->data);
+        for (j = 0; j < number_of_packets; j++) {
+            size_count = MemReadS8(&pFlic_info->data);
+            if (size_count >= 0) {
+                the_byte = MemReadU8(&pFlic_info->data);
+                if (the_byte) {
+                    for (k = 0; k < size_count; k++) {
+                        *line_pixel_ptr = the_byte;
+                        line_pixel_ptr++;
+                    }
+                }
+            } else {
+                for (k = 0; k < -size_count; k++) {
+                    the_byte = MemReadU8(&pFlic_info->data);
+                    if (the_byte) {
+                        *line_pixel_ptr = the_byte;
+                        line_pixel_ptr++;
+                    }
+                }
+            }
+        }
+        pixel_ptr += the_row_bytes;
+    }
 }
 
 // Offset: 4912
@@ -945,9 +1072,8 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
     MemSkipBytes(&pFlic_info->data, 8);
     if (magic_bytes == 0xF1FA) {
         for (chunk_counter = 0; chunk_counter < chunk_count; chunk_counter++) {
-            MemReadU32(&pFlic_info->data);
+            chunk_length = MemReadU32(&pFlic_info->data);
             chunk_type = MemReadU16(&pFlic_info->data);
-            LOG_DEBUG("chunk %d", chunk_type);
             switch (chunk_type) {
             case 4u:
                 DoColour256(pFlic_info, chunk_length);
@@ -969,10 +1095,10 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
                     DoDifferenceX(pFlic_info, chunk_length);
                 }
                 break;
-            case 0xDu:
+            case 0xD:
                 DoBlack(pFlic_info, chunk_length);
                 break;
-            case 0xFu:
+            case 0xF:
                 if (gTransparency_on) {
                     DoRunLengthTrans(pFlic_info, chunk_length);
                 } else {
@@ -997,8 +1123,6 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
             if ((uintptr_t)&pFlic_info->data % 2 == 1) {
                 pFlic_info->data++;
             }
-            //pFlic_info->data = ((pFlic_info->data + 1) & 0xfe);
-            LOG_DEBUG("offset %p", pFlic_info->data);
         }
     } else {
         LOG_WARN("not frame header");
@@ -1006,6 +1130,7 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
         pFlic_info->frames_left++;
         pFlic_info->current_frame--;
     }
+    LOG_DEBUG("left %d", pFlic_info->frames_left);
     pFlic_info->current_frame++;
     pFlic_info->frames_left--;
     if (gTrans_enabled && gTranslation_count && !pPanel_flic) {
@@ -1064,7 +1189,6 @@ int PlayFlic(int pIndex, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap
             DRS3StartSound(gIndexed_outlets[0], gSound_ID);
             gSound_time = 0;
         }
-        //LOG_DEBUG("%d, %d", frame_period, the_flic.frame_period);
         if (frame_period >= the_flic.frame_period) {
             finished_playing = PlayNextFlicFrame2(&the_flic, 0);
             DoPerFrame();
@@ -1072,10 +1196,9 @@ int PlayFlic(int pIndex, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap
                 EnsurePaletteUp();
             }
             ServiceGame();
+            last_frame = new_time;
         }
-        last_frame = new_time;
     }
-    LOG_DEBUG("done playing?");
     ServiceGame();
     if (the_flic.f) {
         BrMemFree(pDest_pixelmap);
@@ -1282,7 +1405,44 @@ void ProcessFlicQueue(tU32 pInterval) {
     tFlic_descriptor* doomed_flic;
     tU32 new_time;
     int finished_playing;
-    NOT_IMPLEMENTED();
+
+    the_flic = gFirst_flic;
+    last_flic = NULL;
+    gPalette_fuck_prevention = 1;
+    gTransparency_on = 1;
+    new_time = PDGetTotalTime();
+    while (the_flic) {
+        if (new_time - the_flic->last_frame < the_flic->frame_period) {
+            finished_playing = 0;
+        } else {
+            the_flic->last_frame = new_time;
+            finished_playing = PlayNextFlicFrame2(the_flic, 0);
+        }
+        if (finished_playing) {
+            if (the_flic->f) {
+                BrMemFree(the_flic->data_start);
+                the_flic->data_start = NULL;
+                fclose(the_flic->f);
+                the_flic->f = NULL;
+            }
+            if (the_flic->data) {
+                the_flic->data = NULL;
+            }
+            if (last_flic) {
+                last_flic->next = the_flic->next;
+            } else {
+                gFirst_flic = the_flic->next;
+            }
+            doomed_flic = the_flic;
+            the_flic = the_flic->next;
+            BrMemFree(doomed_flic);
+        } else {
+            last_flic = the_flic;
+            the_flic = the_flic->next;
+        }
+    }
+    gPalette_fuck_prevention = 0;
+    gTransparency_on = 0;
 }
 
 // Offset: 8860
@@ -1299,11 +1459,68 @@ void FlushFlicQueue() {
 // EBX: pY
 // ECX: pMust_finish
 void AddToFlicQueue(int pIndex, int pX, int pY, int pMust_finish) {
-    tFlic_descriptor* the_flic;
-    tFlic_descriptor* new_flic;
-    tFlic_descriptor* last_flic;
-    tFlic_descriptor* doomed_flic;
-    NOT_IMPLEMENTED();
+    tFlic_descriptor* the_flic = NULL;
+    tFlic_descriptor* new_flic = NULL;
+    tFlic_descriptor* last_flic = NULL;
+    tFlic_descriptor* doomed_flic = NULL;
+    LOG_TRACE("(%d, %d, %d, %d)", pIndex, pX, pY, pMust_finish);
+
+    the_flic = gFirst_flic;
+    while (the_flic) {
+        last_flic = the_flic;
+        if (pX == the_flic->x_offset && pY == the_flic->y_offset) {
+            doomed_flic = the_flic;
+            break;
+        }
+        last_flic = the_flic;
+        the_flic = the_flic->next;
+    }
+
+    if (doomed_flic) {
+        if (doomed_flic->f) {
+            BrMemFree(doomed_flic->data_start);
+            doomed_flic->data_start = NULL;
+            fclose(doomed_flic->f);
+            doomed_flic->f = NULL;
+        }
+        if (doomed_flic->data) {
+            doomed_flic->data = NULL;
+        }
+        if (last_flic) {
+            last_flic->next = doomed_flic->next;
+        } else {
+            gFirst_flic = doomed_flic->next;
+        }
+        BrMemFree(doomed_flic);
+    }
+
+    LoadFlic(pIndex);
+    new_flic = BrMemAllocate(sizeof(tFlic_descriptor), kMem_queued_flic);
+    new_flic->next = NULL;
+    the_flic = gFirst_flic;
+    if (gFirst_flic) {
+        while (the_flic->next) {
+            the_flic = the_flic->next;
+        }
+        the_flic->next = new_flic;
+    } else {
+        gFirst_flic = new_flic;
+    }
+    new_flic->last_frame = 0;
+    new_flic->data_start = 0;
+    new_flic->the_index = pIndex;
+    new_flic->must_finish = pMust_finish;
+
+    StartFlic(
+        gMain_flic_list[pIndex].file_name,
+        pIndex,
+        new_flic,
+        gMain_flic_list[pIndex].the_size,
+        gMain_flic_list[pIndex].data_ptr,
+        gBack_screen,
+        pX >= 0 ? pX : gMain_flic_list[pIndex].x_offset,
+        pY >= 0 ? pY : gMain_flic_list[pIndex].y_offset,
+        20);
 }
 
 // Offset: 9424
@@ -1335,7 +1552,77 @@ void ServicePanelFlics(int pCopy_to_buffer) {
     int j;
     int iteration_count;
     int finished;
-    NOT_IMPLEMENTED();
+
+    //v15 = pCopy_to_buffer;
+    if (gPanel_flic_disable) {
+        return;
+    }
+    the_time = PDGetTotalTime();
+    //v17 = v1;
+    gPalette_fuck_prevention = 1;
+    gTransparency_on = 1;
+    //v16 = gPanel_flic[0].file_name;
+    for (i = 0; i < 2; i++) {
+        //v2 = v17;
+        old_last_time[i] = gLast_panel_frame_time[i];
+        if (gPanel_buffer[i] && gPanel_flic[i].data) {
+            if (old_last_time[i]) {
+                time_diff = the_time - old_last_time[i];
+                iteration_count = time_diff / gPanel_flic[i].frame_period;
+            } else {
+                iteration_count = 1;
+            }
+            for (j = 0; j < iteration_count; j++) {
+                // v19 = v5;
+                // v6 = 0;
+                // if (v5 > 0) {
+                //     v22 = 112 * v17;
+                //     pFlic_info = &gPanel_flic[v17];
+                //     v7 = v17;
+                //     pFile_name = v16;
+                //     do {
+                finished = PlayNextFlicFrame2(&gPanel_flic[i], 1);
+                if (finished) {
+                    if (gPanel_flic[i].f) {
+                        BrMemFree(gPanel_flic[i].data_start);
+                        gPanel_flic[i].data_start = NULL;
+                        fclose(gPanel_flic[i].f);
+                        gPanel_flic[i].f = NULL;
+                    }
+                    if (gPanel_flic[i].data) {
+                        gPanel_flic[i].data = 0;
+                    }
+                    StartFlic(
+                        gPanel_flic[i].file_name,
+                        gPanel_flic[i].the_index,
+                        &gPanel_flic[i],
+                        gPanel_flic_data_length[i],
+                        (tS8*)gPanel_flic_data[i],
+                        gPanel_buffer[i],
+                        0,
+                        0,
+                        0);
+                }
+                // v10 = old_last_time[1];
+                // ++v6;
+                gLast_panel_frame_time[i] = the_time;
+                //} while (v6 < v10);
+            }
+            if (pCopy_to_buffer) {
+                BrPixelmapRectangleCopy(
+                    gBack_screen,
+                    gPanel_flic_left[i],
+                    gPanel_flic_top[i],
+                    gPanel_buffer[i],
+                    0,
+                    0,
+                    gPanel_buffer[i]->width,
+                    gPanel_buffer[i]->height);
+            }
+        }
+    }
+    gTransparency_on = 0;
+    gPalette_fuck_prevention = 0;
 }
 
 // Offset: 10248

@@ -127,9 +127,9 @@ int DoMainMenuInterface(tU32 pTime_out, int pContinue_allowed) {
         NULL, // exit_proc
         NULL, // draw_proc
         0u, // time_out
-        &StartMainMenu, // start_proc1
+        StartMainMenu, // start_proc1
         NULL, // start_proc2
-        &MainMenuDone1, // done_proc
+        MainMenuDone1, // done_proc
         0, // font_needed
         { 0, 0 }, // typeable
         NULL, // get_original_string

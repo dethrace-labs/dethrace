@@ -35,7 +35,7 @@ br_pixelmap* gSource_for_16bit_palette;
 // Offset: 0
 // Size: 144
 int CheckQuit() {
-    LOG_TRACE("()");
+    LOG_TRACE8("()");
 
     if (!gIn_check_quit && KeyIsDown(KEYMAP_Q) && KeyIsDown(KEYMAP_LCTRL)) {
         gIn_check_quit = 1;

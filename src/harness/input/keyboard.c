@@ -137,7 +137,7 @@ void Keyboard_HandleEvent(SDL_KeyboardEvent* key) {
     }
     if (key->type == SDL_KEYDOWN) {
         sdl_key_state[key->keysym.scancode] = 1;
-        LOG_DEBUG("key %d", key->keysym.scancode);
+        //LOG_DEBUG("key %d", key->keysym.scancode);
     } else {
         sdl_key_state[key->keysym.scancode] = 0;
     }

@@ -28,7 +28,7 @@ ifeq ($(OS),Darwin)
 else
 	OPENGL_LDFLAGS = -lGL
 endif
-LDFLAGS ?= -lm -fno-pie $(SDL_LDFLAGS) $(OPENGL_LDFLAGS)
+LDFLAGS ?= -lm -g -fno-pie $(SDL_LDFLAGS) $(OPENGL_LDFLAGS)
 
 .PHONY: clean build run
 

@@ -2,12 +2,14 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <limits.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #ifdef _WIN32
 #include <imagehlp.h>
@@ -261,9 +263,26 @@ void posix_signal_handler(int sig, siginfo_t* siginfo, void* context) {
 }
 
 static uint8_t alternate_stack[SIGSTKSZ];
+
+void resolve_full_path(char* path, const char* argv0) {
+    char buf[PATH_MAX];
+    char* pos;
+    if (argv0[0] == '/') { // run with absolute path
+        strcpy(path, argv0);
+    } else { // run with relative path
+        if (NULL == getcwd(path, PATH_MAX)) {
+            perror("getcwd error");
+            return NULL;
+        }
+        strcat(path, "/");
+        strcat(path, argv0);
+    }
+}
+
 void install_signal_handler(char* program_name) {
 
-    strcpy(_program_name, program_name);
+    resolve_full_path(_program_name, program_name);
+    printf("resolved full path: %s\n", _program_name);
 
     /* setup alternate stack */
     {

@@ -18,7 +18,7 @@ DEPS := $(OBJS:.o=.d)
 INC_DIRS := $(shell find $(SRC_DIR) -type d) $(BR_SRC_DIR) $(HARNESS_SRC_DIR) $(LIB_SRC_DIR)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
-CFLAGS ?= $(INC_FLAGS) -g -Wno-return-type -Wno-missing-declarations -Werror=implicit-function-declaration
+CFLAGS ?= $(INC_FLAGS) -g -fno-pie -Wno-return-type -Wno-missing-declarations -Werror=implicit-function-declaration
 
 SDL_LDFLAGS = `sdl2-config --libs`
 
@@ -27,7 +27,7 @@ ifeq ($(OS),Darwin)
 else
 	OPENGL_LDFLAGS = -lGL
 endif
-LDFLAGS ?= -lm -fno-pie $(SDL_LDFLAGS) $(OPENGL_LDFLAGS)
+LDFLAGS ?= -lm -g -fno-pie $(SDL_LDFLAGS) $(OPENGL_LDFLAGS)
 
 .PHONY: clean build test
 

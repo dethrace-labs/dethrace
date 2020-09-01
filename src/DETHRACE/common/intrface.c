@@ -53,7 +53,60 @@ void ResetInterfaceTimeout() {
 // ECX: pMode
 void ChangeSelection(tInterface_spec* pSpec, int* pOld_selection, int* pNew_selection, int pMode, int pSkip_disabled) {
     int i;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%p, %p, %p, %d, %d)", pSpec, *pOld_selection, *pNew_selection, pMode, pSkip_disabled);
+    LOG_DEBUG("on entry: old: %p, new %p", pOld_selection, pNew_selection);
+
+    for (i = 0; i < gDisabled_count; i++) {
+        if (*pNew_selection == gDisabled_choices[i]) {
+            if (pSkip_disabled) {
+                if (*pNew_selection <= *pOld_selection) {
+
+                    do {
+                        (*pNew_selection)--;
+                        if (*pNew_selection < pSpec->move_up_min[pMode]) {
+                            *pNew_selection = pSpec->move_up_max[pMode];
+                        }
+                        if (*pNew_selection > pSpec->move_up_max[pMode]) {
+                            *pNew_selection = pSpec->move_up_min[pMode];
+                        }
+                    } while (*pNew_selection != *pOld_selection && ChoiceDisabled(*pNew_selection));
+                } else {
+                    do {
+                        (*pNew_selection)++;
+                        if (*pNew_selection < pSpec->move_up_min[pMode]) {
+                            *pNew_selection = pSpec->move_up_max[pMode];
+                        }
+                        if (*pNew_selection > pSpec->move_up_max[pMode]) {
+                            *pNew_selection = pSpec->move_up_min[pMode];
+                        }
+                    } while (*pNew_selection != *pOld_selection && ChoiceDisabled(*pNew_selection));
+                }
+            } else {
+                *pNew_selection = *pOld_selection;
+            }
+            break;
+        }
+    }
+
+    if (*pOld_selection != *pNew_selection) {
+        if (*pOld_selection >= 0 && *pOld_selection < pSpec->number_of_button_flics) {
+            if (pSpec->flicker_off_flics[*pOld_selection].flic_index >= 0) {
+                AddToFlicQueue(pSpec->flicker_off_flics[*pOld_selection].flic_index,
+                    pSpec->flicker_off_flics[*pOld_selection].x[gGraf_data_index],
+                    pSpec->flicker_off_flics[*pOld_selection].y[gGraf_data_index], 0);
+            }
+        }
+        if (*pNew_selection >= 0 && *pNew_selection < pSpec->number_of_button_flics) {
+            if (pSpec->flicker_on_flics[*pNew_selection].flic_index >= 0) {
+                AddToFlicQueue(pSpec->flicker_on_flics[*pNew_selection].flic_index,
+                    pSpec->flicker_on_flics[*pNew_selection].x[gGraf_data_index],
+                    pSpec->flicker_on_flics[*pNew_selection].y[gGraf_data_index], 0);
+            }
+        }
+        LOG_DEBUG("new: %p, old %p", pNew_selection, pOld_selection);
+        *pOld_selection = *pNew_selection;
+    }
+    LOG_DEBUG("new: %d, old %d", *pNew_selection, *pOld_selection);
 }
 
 // Offset: 864
@@ -62,7 +115,19 @@ void ChangeSelection(tInterface_spec* pSpec, int* pOld_selection, int* pNew_sele
 // EDX: pCopy_areas
 void RecopyAreas(tInterface_spec* pSpec, br_pixelmap** pCopy_areas) {
     int i;
-    NOT_IMPLEMENTED();
+    LOG_TRACE8("(%p, %p)", pSpec, pCopy_areas);
+
+    for (i = 0; i < pSpec->number_of_recopy_areas; i++) {
+        BrPixelmapRectangleCopy(
+            gBack_screen,
+            pSpec->recopy_areas[i].left[gGraf_data_index],
+            pSpec->recopy_areas[i].top[gGraf_data_index],
+            pCopy_areas[i],
+            0,
+            0,
+            pSpec->recopy_areas[i].right[gGraf_data_index] - pSpec->recopy_areas[i].left[gGraf_data_index],
+            pSpec->recopy_areas[i].bottom[gGraf_data_index] - pSpec->recopy_areas[i].top[gGraf_data_index]);
+    }
 }
 
 // Offset: 1156
@@ -189,7 +254,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
         if (last_choice != gCurrent_choice) {
             ChangeSelection(pSpec, &last_choice, &gCurrent_choice, gCurrent_mode, 1);
         }
-        last_choice_2 = gCurrent_choice;
+        last_choice = gCurrent_choice;
         PollKeys();
         EdgeTriggerModeOff();
         the_key = PDAnyKeyDown();
@@ -285,10 +350,10 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
         if (gTyping_slot >= 0 && pSpec->typeable[gCurrent_mode] && gTyping_slot != gCurrent_choice && !gAlways_typing) {
             gCurrent_choice = gTyping_slot;
         }
-        if (last_choice_2 == gCurrent_choice) {
+        if (last_choice == gCurrent_choice) {
             selection_changed = 0;
         } else {
-            ChangeSelection(pSpec, &last_choice_2, &gCurrent_choice, gCurrent_mode, 1);
+            ChangeSelection(pSpec, &last_choice, &gCurrent_choice, gCurrent_mode, 1);
             selection_changed = 1;
         }
         timed_out = pSpec->time_out && PDGetTotalTime() >= pSpec->time_out + gStart_time;
@@ -320,14 +385,14 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
 
                     if (pSpec->mouse_areas[i].new_choice >= 0 && pSpec->mouse_areas[i].new_choice != gCurrent_choice) {
                         gCurrent_choice = pSpec->mouse_areas[i].new_choice;
-                        ChangeSelection(pSpec, &last_choice_2, &gCurrent_choice, gCurrent_mode, 0);
+                        ChangeSelection(pSpec, &last_choice, &gCurrent_choice, gCurrent_mode, 0);
                     }
                     if (pSpec->mouse_areas[i].new_mode >= 0) {
                         gCurrent_mode = pSpec->mouse_areas[i].new_mode;
                     }
 
                     if (pSpec->mouse_areas[i].new_mode >= 0 || pSpec->mouse_areas[i].new_choice >= 0) {
-                        last_choice_2 = 1;
+                        last_choice = 1;
                     }
                     if (mouse_down) {
                         if (pSpec->mouse_areas[i].mouse_click) {
@@ -405,22 +470,25 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
             }
         }
         ServiceGame();
-        if (last_choice_2 != gCurrent_choice) {
-            ChangeSelection(pSpec, &last_choice_2, &gCurrent_choice, gCurrent_mode, 1);
+        if (last_choice != gCurrent_choice) {
+            ChangeSelection(pSpec, &last_choice, &gCurrent_choice, gCurrent_mode, 1);
         }
         if (entry_status != eProg_idling && gProgram_state.prog_status == eProg_idling) {
             escaped = 1;
         }
-    } while ((!pSpec->exit_proc || !(pSpec->exit_proc)(&gCurrent_choice, &gCurrent_mode)) && !go_ahead && !last_press && !escaped);
+    } while ((!pSpec->exit_proc || !(pSpec->exit_proc)(&gCurrent_choice, &gCurrent_mode)) && !go_ahead && !timed_out && !escaped);
+    LOG_WARN("OUT OF LOOP");
     gTyping = 0;
     if (pSpec->font_needed) {
         EndRollingLetters();
         DisposeFont(0);
     }
-    for (i = 0; i < pSpec->number_of_recopy_areas; i++) {
-        BrPixelmapFree(copy_areas[i]);
+    if (pSpec->number_of_recopy_areas > 0) {
+        for (i = 0; i < pSpec->number_of_recopy_areas; i++) {
+            BrPixelmapFree(copy_areas[i]);
+        }
+        BrMemFree(copy_areas);
     }
-    BrMemFree(copy_areas);
 
     RemoveTransientBitmaps(1);
     FlushFlicQueue();
