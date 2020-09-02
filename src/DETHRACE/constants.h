@@ -122,7 +122,7 @@ typedef enum dr_memory_classes {
     kMem_abuse_text = 243, //  0xf3
     kMem_action_replay_buffer = 244, //  0xf4
     kMem_misc = 245 //  0xf5
-};
+} dr_memory_classes;
 
 typedef enum keycodes {
     KEY_LSHIFT = 0, //  0x0
@@ -232,7 +232,7 @@ typedef enum keycodes {
     KEY_UNDEFINED_4 = 104, //  0x68
     KEY_PAUSE = 105, //  0x69
     KEY_SPACE = 106, //  0x6a
-};
+} keycodes;
 
 typedef enum keymapcodes {
     KEYMAP_Q = 1,
@@ -241,6 +241,6 @@ typedef enum keymapcodes {
     KEYMAP_LCTRL = 7,
     KEYMAP_F2 = 28,
     KEYMAP_F3 = 29,
-};
+} keymapcodes;
 
 #endif
