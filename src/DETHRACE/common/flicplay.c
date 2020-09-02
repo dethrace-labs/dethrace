@@ -587,6 +587,8 @@ int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU3
     } else {
         pFlic_info->f = NULL;
         pFlic_info->data = (char*)pData_ptr;
+        //TOOD: remove this - we added this line because of the padding hack in PlayNextFlicFrame2
+        pFlic_info->data_start = (char*)pData_ptr;
     }
     pFlic_info->bytes_remaining = MemReadU32(&pFlic_info->data);
     magic_number = MemReadU16(&pFlic_info->data);
@@ -756,13 +758,11 @@ void DoColour256(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU8 blue;
 
     palette_pixels = gPalette_pixels;
-    LOG_DEBUG("ptr %p", palette_pixels);
 
     packet_count = MemReadU16(&pFlic_info->data);
     for (i = 0; i < packet_count; i++) {
         skip_count = MemReadU8(&pFlic_info->data);
         change_count = MemReadU8(&pFlic_info->data);
-        LOG_DEBUG("skip %d change %d", skip_count, change_count);
         if (!change_count) {
             change_count = 256;
         }
@@ -804,6 +804,7 @@ void DoDeltaTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU32 the_row_bytes;
     tU16* line_pixel_ptr;
     tU16 the_word;
+    LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
 
     line_count = MemReadU16(&pFlic_info->data);
     the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
@@ -861,6 +862,7 @@ void DoDeltaX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU32 the_row_bytes;
     tU16* line_pixel_ptr;
     tU16 the_word;
+    LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
 
     line_count = MemReadU16(&pFlic_info->data);
     the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
@@ -910,6 +912,7 @@ void DoBlack(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU8* pixel_ptr;
     tU32 the_row_bytes;
     tU32* line_pixel_ptr;
+    LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
     NOT_IMPLEMENTED();
 }
 
@@ -927,6 +930,7 @@ void DoRunLengthX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU8* line_pixel_ptr;
     tU8 the_byte;
     tU32 the_row_bytes;
+    LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
 
     the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
     pixel_ptr = pFlic_info->first_pixel;
@@ -968,6 +972,7 @@ void DoRunLengthTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU8* line_pixel_ptr;
     tU8 the_byte;
     tU32 the_row_bytes;
+    LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
 
     the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
     pixel_ptr = pFlic_info->first_pixel;
@@ -1010,6 +1015,7 @@ void DoUncompressed(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU8* pixel_ptr;
     tU32 the_row_bytes;
     tU32* line_pixel_ptr;
+    LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
     NOT_IMPLEMENTED();
 }
 
@@ -1025,6 +1031,7 @@ void DoUncompressedTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU8* line_pixel_ptr;
     tU8 the_byte;
     tU32 the_row_bytes;
+    LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
     NOT_IMPLEMENTED();
 }
 
@@ -1064,7 +1071,7 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
     int data_knocked_off;
     int read_amount;
 
-    LOG_DEBUG("offset at frame start %p", pFlic_info->data);
+    //LOG_DEBUG("%d (%p), frames left: %d offset: %d", pFlic_info->the_index, pFlic_info, pFlic_info->frames_left, (pFlic_info->data - pFlic_info->data_start) + 4);
     PossibleService();
     frame_length = MemReadU32(&pFlic_info->data);
     magic_bytes = MemReadU16(&pFlic_info->data);
@@ -1120,7 +1127,9 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
                 MemSkipBytes(&pFlic_info->data, chunk_length - 6);
                 break;
             }
-            if ((uintptr_t)&pFlic_info->data % 2 == 1) {
+            //TODO: something like // p &= 0xfffffffffffffffe;
+            int a = (pFlic_info->data - pFlic_info->data_start);
+            if (a % 2 == 1) {
                 pFlic_info->data++;
             }
         }
@@ -1130,7 +1139,6 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
         pFlic_info->frames_left++;
         pFlic_info->current_frame--;
     }
-    LOG_DEBUG("left %d", pFlic_info->frames_left);
     pFlic_info->current_frame++;
     pFlic_info->frames_left--;
     if (gTrans_enabled && gTranslation_count && !pPanel_flic) {
@@ -1467,7 +1475,6 @@ void AddToFlicQueue(int pIndex, int pX, int pY, int pMust_finish) {
 
     the_flic = gFirst_flic;
     while (the_flic) {
-        last_flic = the_flic;
         if (pX == the_flic->x_offset && pY == the_flic->y_offset) {
             doomed_flic = the_flic;
             break;
@@ -1553,17 +1560,13 @@ void ServicePanelFlics(int pCopy_to_buffer) {
     int iteration_count;
     int finished;
 
-    //v15 = pCopy_to_buffer;
     if (gPanel_flic_disable) {
         return;
     }
     the_time = PDGetTotalTime();
-    //v17 = v1;
     gPalette_fuck_prevention = 1;
     gTransparency_on = 1;
-    //v16 = gPanel_flic[0].file_name;
     for (i = 0; i < 2; i++) {
-        //v2 = v17;
         old_last_time[i] = gLast_panel_frame_time[i];
         if (gPanel_buffer[i] && gPanel_flic[i].data) {
             if (old_last_time[i]) {
@@ -1573,14 +1576,6 @@ void ServicePanelFlics(int pCopy_to_buffer) {
                 iteration_count = 1;
             }
             for (j = 0; j < iteration_count; j++) {
-                // v19 = v5;
-                // v6 = 0;
-                // if (v5 > 0) {
-                //     v22 = 112 * v17;
-                //     pFlic_info = &gPanel_flic[v17];
-                //     v7 = v17;
-                //     pFile_name = v16;
-                //     do {
                 finished = PlayNextFlicFrame2(&gPanel_flic[i], 1);
                 if (finished) {
                     if (gPanel_flic[i].f) {
@@ -1603,10 +1598,7 @@ void ServicePanelFlics(int pCopy_to_buffer) {
                         0,
                         0);
                 }
-                // v10 = old_last_time[1];
-                // ++v6;
                 gLast_panel_frame_time[i] = the_time;
-                //} while (v6 < v10);
             }
             if (pCopy_to_buffer) {
                 BrPixelmapRectangleCopy(

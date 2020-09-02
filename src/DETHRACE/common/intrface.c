@@ -356,7 +356,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
             ChangeSelection(pSpec, &last_choice, &gCurrent_choice, gCurrent_mode, 1);
             selection_changed = 1;
         }
-        timed_out = pSpec->time_out && PDGetTotalTime() >= pSpec->time_out + gStart_time;
+        timed_out = pSpec->time_out && (PDGetTotalTime() >= pSpec->time_out + gStart_time);
         RemoveTransientBitmaps(1);
         RecopyAreas(pSpec, copy_areas);
         if (pSpec->font_needed) {
@@ -477,7 +477,8 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
             escaped = 1;
         }
     } while ((!pSpec->exit_proc || !(pSpec->exit_proc)(&gCurrent_choice, &gCurrent_mode)) && !go_ahead && !timed_out && !escaped);
-    LOG_WARN("OUT OF LOOP");
+
+    LOG_WARN("OUT OF LOOP %d %d %d", go_ahead, timed_out, escaped);
     gTyping = 0;
     if (pSpec->font_needed) {
         EndRollingLetters();

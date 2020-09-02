@@ -282,7 +282,6 @@ void resolve_full_path(char* path, const char* argv0) {
 void install_signal_handler(char* program_name) {
 
     resolve_full_path(_program_name, program_name);
-    printf("resolved full path: %s\n", _program_name);
 
     /* setup alternate stack */
     {

@@ -18,6 +18,7 @@ void Harness_Init(char* name, renderer* renderer) {
     screen_buffer = NULL;
 }
 
+
 void Harness_RunWindowLoop(harness_game_func* game_func, void* arg) {
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
