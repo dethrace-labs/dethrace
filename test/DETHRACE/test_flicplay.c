@@ -28,7 +28,7 @@ void test_flicplay_playflic() {
         gMain_flic_list[pIndex].interruptable,
         gMain_flic_list[pIndex].frame_rate);
 
-    TEST_ASSERT_EQUAL_INT(10, nbr_frames_rendered);
+    TEST_ASSERT_EQUAL_INT(3, nbr_frames_rendered);
 }
 
 void test_flicplay_suite() {

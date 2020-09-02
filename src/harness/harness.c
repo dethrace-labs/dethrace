@@ -18,7 +18,6 @@ void Harness_Init(char* name, renderer* renderer) {
     screen_buffer = NULL;
 }
 
-
 void Harness_RunWindowLoop(harness_game_func* game_func, void* arg) {
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
@@ -102,8 +101,10 @@ void Harness_Hook_BrDevPaletteSetOld(br_pixelmap* pm) {
 }
 
 void Harness_Hook_BrDevPaletteSetEntryOld(int i, br_colour colour) {
-    uint32_t* colors = palette->pixels;
-    colors[i] = colour;
+    if (palette != NULL) {
+        uint32_t* colors = palette->pixels;
+        colors[i] = colour;
+    }
 }
 
 void Harness_Hook_KeyBegin() {
