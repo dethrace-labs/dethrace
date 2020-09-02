@@ -4,7 +4,7 @@
 // JeffH: Constant names are not part of the symbol dump, so the names in this file are not original, except as noted.
 
 // Names from `gMem_names`. See also: `CreateStainlessClasses`
-typedef enum dr_memory_classes { // line number - 8 + 129     line number = enum value - 121
+typedef enum dr_memory_classes {
     kMem_intf_pix_copy = 129, //  0x81
     kMem_intf_pal_copy = 130, //  0x82
     kMem_nodes_array = 131, //  0x83

@@ -75,7 +75,7 @@ void InitSound() {
 // EAX: pOutlet
 // EDX: pSound
 tS3_sound_tag DRS3StartSound(tS3_outlet_ptr pOutlet, tS3_sound_id pSound) {
-    LOG_WARN("stub");
+    STUB();
 }
 
 // Offset: 1348
@@ -83,7 +83,7 @@ tS3_sound_tag DRS3StartSound(tS3_outlet_ptr pOutlet, tS3_sound_id pSound) {
 // EAX: pOutlet
 // EDX: pSound
 tS3_sound_tag DRS3StartSoundNoPiping(tS3_outlet_ptr pOutlet, tS3_sound_id pSound) {
-    LOG_WARN("stub");
+    STUB();
 }
 
 // Offset: 1424
@@ -203,7 +203,7 @@ int DRS3OverallVolume(tS3_volume pVolume) {
 // Size: 69
 // EAX: pOutlet
 int DRS3StopOutletSound(tS3_outlet_ptr pOutlet) {
-    LOG_WARN("stub");
+    STUB();
 }
 
 // Offset: 2756

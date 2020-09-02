@@ -19,7 +19,6 @@ void Harness_Init(char* name, renderer* renderer) {
 }
 
 void Harness_RunWindowLoop(harness_game_func* game_func, void* arg) {
-
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
         LOG_PANIC("SDL_Init Error: %s", SDL_GetError());
     }
