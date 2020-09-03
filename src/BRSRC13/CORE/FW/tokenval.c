@@ -184,7 +184,7 @@ br_error BrTokenValueSetMany(void* mem, br_int_32* pcount, br_uint_32* pcombined
     br_int_32 n;
     br_error r;
     br_uint_32 cm;
-    LOG_WARN("Not implemented");
+    STUB();
 }
 
 // Offset: 6409

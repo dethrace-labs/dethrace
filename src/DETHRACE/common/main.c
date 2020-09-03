@@ -1,15 +1,17 @@
 #include "main.h"
 #include <stdlib.h>
 
-#include "common/errors.h"
-#include "common/globvars.h"
-#include "common/init.h"
-#include "common/loading.h"
-#include "common/loadsave.h"
-#include "common/sound.h"
-#include "common/structur.h"
-#include "common/utility.h"
+#include "controls.h"
+#include "errors.h"
+#include "globvars.h"
+#include "init.h"
+#include "input.h"
+#include "loading.h"
+#include "loadsave.h"
 #include "pc-dos/dossys.h"
+#include "sound.h"
+#include "structur.h"
+#include "utility.h"
 
 // Offset: 0
 // Size: 161
@@ -37,13 +39,27 @@ void CheckNumberOfTracks() {
 // Size: 173
 // EAX: pRacing
 void ServiceTheGame(int pRacing) {
-    NOT_IMPLEMENTED();
+    if (!pRacing) {
+        CyclePollKeys();
+    }
+    PollKeys();
+    rand();
+    if (PDServiceSystem(gFrame_period)) {
+        //sub_500B0(v3);
+    }
+    if (!pRacing) {
+        CheckSystemKeys(0);
+    }
+    if (!pRacing && gSound_enabled) {
+        // TODO: sound?
+        // S3Service(gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0, 2);
+    }
 }
 
 // Offset: 536
 // Size: 41
 void ServiceGame() {
-    NOT_IMPLEMENTED();
+    ServiceTheGame(0);
 }
 
 // Offset: 580

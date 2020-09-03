@@ -19,7 +19,6 @@ void Harness_Init(char* name, renderer* renderer) {
 }
 
 void Harness_RunWindowLoop(harness_game_func* game_func, void* arg) {
-
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
         LOG_PANIC("SDL_Init Error: %s", SDL_GetError());
     }
@@ -97,6 +96,13 @@ void Harness_Hook_BrDevPaletteSetOld(br_pixelmap* pm) {
     palette = pm;
     if (last_dst && last_src) {
         Harness_RenderScreen(last_dst, last_src);
+    }
+}
+
+void Harness_Hook_BrDevPaletteSetEntryOld(int i, br_colour colour) {
+    if (palette != NULL) {
+        uint32_t* colors = palette->pixels;
+        colors[i] = colour;
     }
 }
 

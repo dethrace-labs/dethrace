@@ -37,8 +37,7 @@ void LoadStart();
 
 // Offset: 2340
 // Size: 415
-// EAX: pSave_allowed
-int DoLoadGame(int pSave_allowed);
+int DoLoadGame();
 
 // Offset: 2756
 // Size: 647

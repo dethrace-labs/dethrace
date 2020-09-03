@@ -33,6 +33,11 @@
     debug_printf("\033[0;31m[PANIC] %s ", __FUNCTION__, "%s", "not implemented"); \
     exit(1);
 
+#define STUB() \
+    debug_printf("\033[0;31m[WARN] %s ", __FUNCTION__, "%s", "stubbed");
+
+#define SILENT_STUB()
+
 void debug_printf(const char* fmt, const char* fn, const char* fmt2, ...);
 
 #endif

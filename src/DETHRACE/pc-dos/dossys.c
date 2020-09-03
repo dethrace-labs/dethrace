@@ -251,6 +251,7 @@ int PDGetASCIIFromKey(int pKey) {
 // EAX: pThe_str
 void PDFatalError(char* pThe_str) {
     static int been_here = 0;
+    LOG_TRACE("(\"%s\")", pThe_str);
 
     if (been_here) {
         if (!_unittest_do_not_exit) {
@@ -544,7 +545,11 @@ void PDSetPalette(br_pixelmap* pThe_palette) {
 void PDSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
     int i;
     tU8* p;
-    NOT_IMPLEMENTED();
+    p = pPalette->pixels + 4 * pFirst_colour;
+    for (i = pFirst_colour; i < pFirst_colour + pCount; i++) {
+        BrDevPaletteSetEntryOld(i, (p[2] << 16) | (p[1] << 8) | *p);
+        p += 4;
+    }
 }
 
 // Offset: 5716
@@ -597,7 +602,7 @@ int PDGetTotalTime() {
 // Size: 37
 // EAX: pTime_since_last_call
 int PDServiceSystem(tU32 pTime_since_last_call) {
-    NOT_IMPLEMENTED();
+    return 0;
 }
 
 // Offset: 6352
@@ -895,7 +900,7 @@ int PDCheckDriveExists2(char* pThe_path, char* pFile_name, tU32 pMin_size) {
     int stat_failed;
     char slasher[4];
     char the_path[256];
-    LOG_TRACE("(\"%s\", \"%s\", %d)", pThe_path, pFile_name, pMin_size);
+    LOG_TRACE9("(\"%s\", \"%s\", %d)", pThe_path, pFile_name, pMin_size);
 
     strcpy(slasher, "?:\\");
     if (pFile_name) {

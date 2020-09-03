@@ -1,13 +1,365 @@
 #include "flicplay.h"
 #include "brender.h"
-#include "common/utility.h"
+#include "drmem.h"
+#include "errors.h"
+#include "globvars.h"
+#include "graphics.h"
+#include "input.h"
+#include "loading.h"
+#include "main.h"
+#include "pc-dos/dossys.h"
+#include "sound.h"
+#include "utility.h"
 #include <stdlib.h>
+#include <unistd.h>
 
-tFlic_bunch gFlic_bunch[9];
 int gFlic_bunch8[16];
 int gFlic_bunch4[22];
 int gFlic_bunch2[8];
-tFlic_spec gMain_flic_list[372];
+
+tFlic_spec gMain_flic_list[372] = {
+    { "xxxxxxxx.FLI", 1, 0, 0, 0, 0, 25, NULL, 0u },
+    { "DEMSTRT2.FLI", 1, 0, 0, 0, 0, 0, NULL, 0u },
+    { "DEMSTRT1.FLI", 1, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NEWFLIC.FLI", 1, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GOTOFLIC.FLI", 1, 0, 0, 0, 0, 0, NULL, 0u },
+    { "ENDFLIC.FLI", 1, 0, 0, 0, 0, 0, NULL, 0u },
+    { "OVERFLIC.FLI", 1, 0, 0, 0, 0, 0, NULL, 0u },
+    { "DEMO8.FLI", 1, 0, 0, 0, 0, 0, NULL, 0u },
+    { "COMPLETE.FLI", 1, 0, 0, 0, 0, 0, NULL, 0u },
+    { "DEMOEND.FLI", 1, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAINSTIL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAINCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAINAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
+    { "MAINCNFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAINCNGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAINCNIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAINABFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAINABGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAINQTFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAINQTGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAINSVFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAINSVGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAINLDFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAINLDGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAINRCFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAINRCGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAINARFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAINARGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAINOPFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAINOPGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAI2STIL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAI2COME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAI2AWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAINRCGY.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAINARGY.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "SVVYSTIL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "SVVYAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
+    { "BGBUTTFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "BGBUTTGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "SVVYOKIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "CANBUTIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "SAVECOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "SAVEAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
+    { "SMLBUTFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "SMLBUTGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "SMLBUTFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "SMLBUTGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "SAVECAIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NRACCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NRACAWAY.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NCARCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NSUMSTIL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NSUMAWAY.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NOPTCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NOPTAWAY.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NOPTDEIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NOPT00GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NOPT00FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "LOADSTIL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "LOADCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "LOADAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
+    { "LOADHIFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "LOADHIGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NOPT01GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NOPT01FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NOPT02GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NOPT02FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NOPT03GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NEWGCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NEWGAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
+    { "NEWGHLFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NEWGHLGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NEWGDNAV.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NEWGDNGY.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NEWGDNFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NEWGDNGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NEWGDNIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NEWGCAIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NEWNSTIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NEWNSTFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NEWNSTGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "CHCKBXFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "CHCKBXGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "CHCKBXON.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "CHCKBXOF.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "RADBUTFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "RADBUTGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "RADBUTON.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NEWNCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NEWNAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
+    { "NETTCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NETTAWAY.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NETOCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NETOAWAY.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NETNCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NETNAWAY.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "RADBUTOF.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NOPT03FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "SKILCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "SKILAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
+    { "NOPT04GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NOPT04FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NOPT05GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "SKILL1FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "SKILL1GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "SKILLIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "SKILL2FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "SKILL2GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "SKILL3FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "SKILL3GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NCHOCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NCHOAWAY.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NCHOOPIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "ERRRSTIL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NOPT05FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NOPT06GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NOPT06FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NOPT07GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "QUT1STIL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "QUT2STIL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "QUT3STIL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NOPT07FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NOPT08GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "QUITOKIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NOPT08FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NOPT09GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NOPT09FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NOPT10GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "OPTNCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "OPTNAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
+    { "NOPT10FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NOPT11GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "OPTNSNIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "OPTNCNIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "OPTNGRIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "OPTNMSIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NOPT11FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "SNDOCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "SNDOAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "DNEBUTIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "SNDOOLFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "SNDOOLGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRPHCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRPHAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
+    { "NCHO00GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NCHO01GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NCHO02GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NCHO03GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NCHO04GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NCHO05GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NCHO06GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "CNTLCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "CNTLAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
+    { "CNTLDNIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "CNTLCAIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "CNTLDFIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "CNTLMRIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "CNTLDNFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "CNTLDNGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "CNTLSTIL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "OTHRCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "OTHRAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
+    { "NCHO00FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NCHO01FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NCHO02FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NCHO03FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NCHO04FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NCHO05FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NCHO06FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "STRTSTIL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "STRTCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "STRTAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
+    { "CNTL00FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "CNTL00GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "STRTCRIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "STRTPSIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "STRTSRIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "STRTCCIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NTSHSTIL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NTSCSTIL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NTSHSTIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NTSHENIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NTSCLVIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NTSHSTEN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "NTSXSTIL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "VWSC2IN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "VWIN2OPP.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "VWOPP2SC.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "2BUTONFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "2BUTONGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "VWOPUPIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "VWOPDWFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "VWOPDWGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "VWOPDWIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "CHRCCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "CHRCAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "CHCRCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "CHCRAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
+    { "GRPH00GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRPH01GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRPH02GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRPH03GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRPH04GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRPH05GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRPH06GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRPH07GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRPH08GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRPH09GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRPH10GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRPH11GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "PARTCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "PARTAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "PARTARGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "PARTARIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "PARTPFIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "PARTOFIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "PARTEXIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "PARTSPIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "PARTARGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "PARTPFGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "PARTOFGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRPH00FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRPH01FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRPH02FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRPH03FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRPH04FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRPH05FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRPH06FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRPH07FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRPH08FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRPH09FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRPH10FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRPH11FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "PSRMCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "PSRMAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "PSRMDIIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "RADBUTFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "RADBUTGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "RADBUTOF.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "RADBUTON.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRIDSTIL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRIDAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
+    { "GRIDLFFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRIDLFGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRIDLFIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRIDRTFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRIDRTGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "GRIDRTIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "DARECOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "DAREACIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "DARECHIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "SUM1STIL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "SUM1AWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "SUM2STIL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "BGBUT8GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "BGBUT8FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "DNBUT8IN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "BKBUT8IN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "BKBUTOFF.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "BKBUTON.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAI2QTFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAI2QTGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAI2LDFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAI2LDGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAI2N1FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAI2N1GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAI2NNFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAI2NNGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAI2OPFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "MAI2OPGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u }
+};
+
 tU32 gPanel_flic_data_length[2];
 tU32 gLast_panel_frame_time[2];
 tU8* gPanel_flic_data[2];
@@ -19,10 +371,40 @@ int gFlic_bunch6[51];
 int gFlic_bunch7[7];
 int gFlic_bunch5[5];
 int gFlic_bunch3[13];
-int gFlic_bunch0[29];
+int gFlic_bunch0[29] = {
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    35,
+    26,
+    27,
+    36,
+    28,
+    29,
+    130,
+    131,
+    132,
+    42,
+    43,
+    135,
+    45
+};
 int gFlic_bunch1[31];
 tU32 gSound_time;
-int gTrans_enabled;
+int gTrans_enabled = 1;
 int gPanel_flic_disable;
 int gDark_mode;
 int gPending_pending_flic;
@@ -30,7 +412,7 @@ int gTransparency_on;
 int gSound_ID;
 int gPlay_from_disk = 0;
 int gTranslation_count;
-int gPending_flic;
+int gPending_flic = -1;
 tDR_font* gTrans_fonts[15];
 int gPalette_fuck_prevention;
 tTranslation_record* gTranslations;
@@ -39,6 +421,18 @@ void* gPalette_pixels;
 int gPalette_allocate_count;
 tFlic_descriptor* gFirst_flic;
 char gLast_flic_name[14];
+
+tFlic_bunch gFlic_bunch[9] = {
+    { 29, gFlic_bunch0 },
+    { 31, gFlic_bunch1 },
+    { 8, gFlic_bunch2 },
+    { 13, gFlic_bunch3 },
+    { 22, gFlic_bunch4 },
+    { 5, gFlic_bunch5 },
+    { 51, gFlic_bunch6 },
+    { 7, gFlic_bunch7 },
+    { 16, gFlic_bunch8 }
+};
 
 // Offset: 0
 // Size: 44
@@ -111,7 +505,7 @@ void PlayFlicsFromDisk() {
 // Offset: 508
 // Size: 44
 void PlayFlicsFromMemory() {
-    NOT_IMPLEMENTED();
+    gPlay_from_disk = 0;
 }
 
 // Offset: 552
@@ -143,7 +537,7 @@ int GetPanelFlicFrameIndex(int pIndex) {
 // Size: 91
 void FlicPaletteAllocate() {
     LOG_TRACE("()");
-    gPalette_pixels = BrMemAllocate(0x400u, 0x8Fu);
+    gPalette_pixels = BrMemAllocate(0x400u, kMem_flic_pal);
     gPalette = DRPixelmapAllocate(BR_PMT_RGBX_888, 1, 256, gPalette_pixels, 0);
 }
 
@@ -166,7 +560,88 @@ int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU3
     tU16 magic_number;
     tPath_name the_path;
     int total_size;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(\"%s\", %d, %p, %u, %p, %p, %d, %d, %d)", pFile_name, pIndex, pFlic_info, pSize, pData_ptr, pDest_pixelmap, pX_offset, pY_offset, pFrame_rate);
+
+    if (gPlay_from_disk) {
+        PathCat(the_path, gApplication_path, "ANIM");
+        PathCat(the_path, the_path, pFile_name);
+        pFlic_info->f = DRfopen(the_path, "rb");
+
+        if (!pFlic_info->f) {
+            FatalError(13, pFile_name);
+        }
+        total_size = GetFileLength(pFlic_info->f);
+        if (total_size >= 75000) {
+            pFlic_info->bytes_in_buffer = 75000;
+        } else {
+            pFlic_info->bytes_in_buffer = total_size;
+        }
+        if (!pFlic_info->data_start) {
+            pFlic_info->data_start = BrMemAllocate(pFlic_info->bytes_in_buffer, kMem_flic_data);
+        }
+
+        pFlic_info->data = pFlic_info->data_start;
+        strcpy(gLast_flic_name, pFile_name);
+        fread(pFlic_info->data_start, 1u, pFlic_info->bytes_in_buffer, pFlic_info->f);
+        pFlic_info->bytes_still_to_be_read = total_size - pFlic_info->bytes_in_buffer;
+    } else {
+        pFlic_info->f = NULL;
+        pFlic_info->data = (char*)pData_ptr;
+        //TOOD: remove this - we added this line because of the padding hack in PlayNextFlicFrame2
+        pFlic_info->data_start = (char*)pData_ptr;
+    }
+    pFlic_info->bytes_remaining = MemReadU32(&pFlic_info->data);
+    magic_number = MemReadU16(&pFlic_info->data);
+    if (magic_number == 0xAF11) {
+        pFlic_info->new_format = 0;
+    } else if (magic_number == 0xAF12) {
+        pFlic_info->new_format = 1;
+    } else {
+        return -1;
+    }
+
+    pFlic_info->frames_left = MemReadU16(&pFlic_info->data);
+    pFlic_info->current_frame = 0;
+    pFlic_info->width = MemReadU16(&pFlic_info->data);
+    pFlic_info->height = MemReadU16(&pFlic_info->data);
+    if (MemReadU16(&pFlic_info->data) != 8) {
+        FatalError(15, gLast_flic_name);
+    }
+    MemSkipBytes(&pFlic_info->data, 2);
+    claimed_speed = MemReadU16(&pFlic_info->data);
+    MemSkipBytes(&pFlic_info->data, 0x6e);
+    pFlic_info->the_pixelmap = pDest_pixelmap;
+
+    if (pX_offset == -1) {
+        pFlic_info->x_offset = (pDest_pixelmap->width - pFlic_info->width) / 2;
+    } else {
+        pFlic_info->x_offset = pX_offset;
+    }
+    if (pY_offset == -1) {
+        pFlic_info->y_offset = (pDest_pixelmap->height - pFlic_info->height) / 2;
+    } else {
+        pFlic_info->y_offset = pY_offset;
+    }
+
+    if (pFrame_rate) {
+        pFlic_info->frame_period = 1000 / pFrame_rate;
+    } else {
+        if (!claimed_speed) {
+            FatalError(16, gLast_flic_name);
+        }
+        if (pFlic_info->new_format) {
+            pFlic_info->frame_period = claimed_speed;
+        } else {
+            pFlic_info->frame_period = 14 * claimed_speed;
+        }
+    }
+    pFlic_info->the_index = pIndex;
+    if (pDest_pixelmap) {
+        pFlic_info->first_pixel = pDest_pixelmap->pixels + pDest_pixelmap->row_bytes * pFlic_info->y_offset + pFlic_info->x_offset;
+    }
+    //LOG_DEBUG("first pixel %p %p", pFlic_info->first_pixel, pDest_pixelmap->pixels);
+    pFlic_info->the_pixelmap = pDest_pixelmap;
+    return 0;
 }
 
 // Offset: 1720
@@ -192,12 +667,38 @@ void DoColourMap(tFlic_descriptor_ptr pFlic_info, tU32 chunk_length) {
     int packet_count;
     int skip_count;
     int change_count;
-    int current_colour;
+    int current_colour = 0;
     tU8* palette_pixels;
     tU8 red;
     tU8 green;
     tU8 blue;
-    NOT_IMPLEMENTED();
+
+    palette_pixels = gPalette_pixels;
+
+    packet_count = MemReadU16(&pFlic_info->data);
+    for (i = 0; i < packet_count; i++) {
+        skip_count = MemReadU8(&pFlic_info->data);
+        change_count = MemReadU8(&pFlic_info->data);
+        if (!change_count) {
+            change_count = 256;
+        }
+        palette_pixels += skip_count * sizeof(br_int_32);
+        current_colour += skip_count;
+        for (j = 0; j < change_count; j++) {
+            red = MemReadU8(&pFlic_info->data);
+            blue = MemReadU8(&pFlic_info->data);
+            green = MemReadU8(&pFlic_info->data);
+            //argb
+            palette_pixels[0] = green * 4;
+            palette_pixels[1] = blue * 4;
+            palette_pixels[2] = red * 4;
+            palette_pixels[3] = 0;
+            palette_pixels += 4;
+        }
+        if (!gPalette_fuck_prevention) {
+            DRSetPaletteEntries(gPalette, current_colour, change_count);
+        }
+    }
 }
 
 // Offset: 2248
@@ -250,12 +751,39 @@ void DoColour256(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int packet_count;
     int skip_count;
     int change_count;
-    int current_colour;
+    int current_colour = 0;
     tU8* palette_pixels;
     tU8 red;
     tU8 green;
     tU8 blue;
-    NOT_IMPLEMENTED();
+
+    palette_pixels = gPalette_pixels;
+
+    packet_count = MemReadU16(&pFlic_info->data);
+    for (i = 0; i < packet_count; i++) {
+        skip_count = MemReadU8(&pFlic_info->data);
+        change_count = MemReadU8(&pFlic_info->data);
+        if (!change_count) {
+            change_count = 256;
+        }
+        palette_pixels += skip_count * sizeof(br_int_32);
+        current_colour += skip_count;
+        for (j = 0; j < change_count; j++) {
+            red = MemReadU8(&pFlic_info->data);
+            blue = MemReadU8(&pFlic_info->data);
+            green = MemReadU8(&pFlic_info->data);
+            //argb
+            palette_pixels[0] = green;
+            palette_pixels[1] = blue;
+            palette_pixels[2] = red;
+            palette_pixels[3] = 0;
+            palette_pixels += 4;
+            //LOG_DEBUG("color %d", current_colour);
+        }
+        if (!gPalette_fuck_prevention) {
+            DRSetPaletteEntries(gPalette, current_colour, change_count);
+        }
+    }
 }
 
 // Offset: 3276
@@ -276,7 +804,46 @@ void DoDeltaTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU32 the_row_bytes;
     tU16* line_pixel_ptr;
     tU16 the_word;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
+
+    line_count = MemReadU16(&pFlic_info->data);
+    the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
+    pixel_ptr = pFlic_info->first_pixel;
+
+    for (i = 0; i < line_count;) {
+        number_of_packets = MemReadS16(&pFlic_info->data);
+        line_pixel_ptr = (tU16*)pixel_ptr;
+
+        if (number_of_packets < 0) {
+            pixel_ptr = pixel_ptr + the_row_bytes * -number_of_packets;
+        } else {
+            for (j = 0; j < number_of_packets; j++) {
+                skip_count = MemReadU8(&pFlic_info->data);
+                size_count = MemReadS8(&pFlic_info->data);
+                line_pixel_ptr += skip_count / 2;
+                if (size_count < 0) {
+                    the_word = *(tU16*)pFlic_info->data;
+                    pFlic_info->data += 2;
+                    the_byte = the_word & 0xff;
+                    the_byte2 = the_word >> 8 & 0xff;
+
+                    for (k = 0; k < -size_count; k++) {
+                        *line_pixel_ptr = the_word;
+                        line_pixel_ptr++;
+                    }
+                } else {
+                    for (k = 0; k < size_count; k++) {
+                        the_word = *(tU16*)pFlic_info->data;
+                        pFlic_info->data += 2;
+                        *line_pixel_ptr = the_word;
+                        line_pixel_ptr++;
+                    }
+                }
+            }
+            pixel_ptr = pixel_ptr + the_row_bytes;
+            i++;
+        }
+    }
 }
 
 // Offset: 3816
@@ -295,7 +862,43 @@ void DoDeltaX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU32 the_row_bytes;
     tU16* line_pixel_ptr;
     tU16 the_word;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
+
+    line_count = MemReadU16(&pFlic_info->data);
+    the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
+    pixel_ptr = pFlic_info->first_pixel;
+
+    for (i = 0; i < line_count;) {
+        number_of_packets = MemReadS16(&pFlic_info->data);
+        line_pixel_ptr = (tU16*)pixel_ptr;
+
+        if (number_of_packets < 0) {
+            pixel_ptr = pixel_ptr + the_row_bytes * -number_of_packets;
+        } else {
+            for (j = 0; j < number_of_packets; j++) {
+                skip_count = MemReadU8(&pFlic_info->data);
+                size_count = MemReadS8(&pFlic_info->data);
+                line_pixel_ptr += skip_count / 2;
+                if (size_count < 0) {
+                    the_word = *(tU16*)pFlic_info->data;
+                    pFlic_info->data += 2;
+                    for (k = 0; k < -size_count; k++) {
+                        *line_pixel_ptr = the_word;
+                        line_pixel_ptr++;
+                    }
+                } else {
+                    for (k = 0; k < size_count; k++) {
+                        the_word = *(tU16*)pFlic_info->data;
+                        pFlic_info->data += 2;
+                        *line_pixel_ptr = the_word;
+                        line_pixel_ptr++;
+                    }
+                }
+            }
+            pixel_ptr = pixel_ptr + the_row_bytes;
+            i++;
+        }
+    }
 }
 
 // Offset: 4172
@@ -309,6 +912,7 @@ void DoBlack(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU8* pixel_ptr;
     tU32 the_row_bytes;
     tU32* line_pixel_ptr;
+    LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
     NOT_IMPLEMENTED();
 }
 
@@ -326,7 +930,32 @@ void DoRunLengthX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU8* line_pixel_ptr;
     tU8 the_byte;
     tU32 the_row_bytes;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
+
+    the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
+    pixel_ptr = pFlic_info->first_pixel;
+
+    for (i = 0; i < pFlic_info->height; i++) {
+        line_pixel_ptr = pixel_ptr;
+        number_of_packets = MemReadU8(&pFlic_info->data);
+        for (j = 0; j < number_of_packets; j++) {
+            size_count = MemReadS8(&pFlic_info->data);
+            if (size_count >= 0) {
+                the_byte = MemReadU8(&pFlic_info->data);
+                for (k = 0; k < size_count; k++) {
+                    *line_pixel_ptr = the_byte;
+                    line_pixel_ptr++;
+                }
+            } else {
+                for (k = 0; k < -size_count; k++) {
+                    the_byte = MemReadU8(&pFlic_info->data);
+                    *line_pixel_ptr = the_byte;
+                    line_pixel_ptr++;
+                }
+            }
+        }
+        pixel_ptr += the_row_bytes;
+    }
 }
 
 // Offset: 4600
@@ -343,7 +972,36 @@ void DoRunLengthTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU8* line_pixel_ptr;
     tU8 the_byte;
     tU32 the_row_bytes;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
+
+    the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
+    pixel_ptr = pFlic_info->first_pixel;
+
+    for (i = 0; i < pFlic_info->height; i++) {
+        line_pixel_ptr = pixel_ptr;
+        number_of_packets = MemReadU8(&pFlic_info->data);
+        for (j = 0; j < number_of_packets; j++) {
+            size_count = MemReadS8(&pFlic_info->data);
+            if (size_count >= 0) {
+                the_byte = MemReadU8(&pFlic_info->data);
+                if (the_byte) {
+                    for (k = 0; k < size_count; k++) {
+                        *line_pixel_ptr = the_byte;
+                        line_pixel_ptr++;
+                    }
+                }
+            } else {
+                for (k = 0; k < -size_count; k++) {
+                    the_byte = MemReadU8(&pFlic_info->data);
+                    if (the_byte) {
+                        *line_pixel_ptr = the_byte;
+                        line_pixel_ptr++;
+                    }
+                }
+            }
+        }
+        pixel_ptr += the_row_bytes;
+    }
 }
 
 // Offset: 4912
@@ -357,6 +1015,7 @@ void DoUncompressed(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU8* pixel_ptr;
     tU32 the_row_bytes;
     tU32* line_pixel_ptr;
+    LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
     NOT_IMPLEMENTED();
 }
 
@@ -372,6 +1031,7 @@ void DoUncompressedTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU8* line_pixel_ptr;
     tU8 the_byte;
     tU32 the_row_bytes;
+    LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
     NOT_IMPLEMENTED();
 }
 
@@ -410,7 +1070,96 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
     int last_frame;
     int data_knocked_off;
     int read_amount;
-    NOT_IMPLEMENTED();
+
+    //LOG_DEBUG("%d (%p), frames left: %d offset: %d", pFlic_info->the_index, pFlic_info, pFlic_info->frames_left, (pFlic_info->data - pFlic_info->data_start) + 4);
+    PossibleService();
+    frame_length = MemReadU32(&pFlic_info->data);
+    magic_bytes = MemReadU16(&pFlic_info->data);
+    chunk_count = MemReadU16(&pFlic_info->data);
+    MemSkipBytes(&pFlic_info->data, 8);
+    if (magic_bytes == 0xF1FA) {
+        for (chunk_counter = 0; chunk_counter < chunk_count; chunk_counter++) {
+            chunk_length = MemReadU32(&pFlic_info->data);
+            chunk_type = MemReadU16(&pFlic_info->data);
+            switch (chunk_type) {
+            case 4u:
+                DoColour256(pFlic_info, chunk_length);
+                break;
+            case 7u:
+                if (gTransparency_on) {
+                    DoDeltaTrans(pFlic_info, chunk_length);
+                } else {
+                    DoDeltaX(pFlic_info, chunk_length);
+                }
+                break;
+            case 0xBu:
+                DoColourMap(pFlic_info, chunk_length);
+                break;
+            case 0xCu:
+                if (gTransparency_on) {
+                    DoDifferenceTrans(pFlic_info, chunk_length);
+                } else {
+                    DoDifferenceX(pFlic_info, chunk_length);
+                }
+                break;
+            case 0xD:
+                DoBlack(pFlic_info, chunk_length);
+                break;
+            case 0xF:
+                if (gTransparency_on) {
+                    DoRunLengthTrans(pFlic_info, chunk_length);
+                } else {
+                    DoRunLengthX(pFlic_info, chunk_length);
+                }
+                break;
+            case 0x10u:
+                if (gTransparency_on) {
+                    DoUncompressedTrans(pFlic_info, chunk_length);
+                } else {
+                    DoUncompressed(pFlic_info, chunk_length);
+                }
+                break;
+            case 0x12u:
+                MemSkipBytes(&pFlic_info->data, chunk_length - 6);
+                break;
+            default:
+                LOG_WARN("unrecognized chunk type");
+                MemSkipBytes(&pFlic_info->data, chunk_length - 6);
+                break;
+            }
+            //TODO: something like // p &= 0xfffffffffffffffe;
+            int a = (pFlic_info->data - pFlic_info->data_start);
+            if (a % 2 == 1) {
+                pFlic_info->data++;
+            }
+        }
+    } else {
+        LOG_WARN("not frame header");
+        MemSkipBytes(&pFlic_info->data, frame_length - 16);
+        pFlic_info->frames_left++;
+        pFlic_info->current_frame--;
+    }
+    pFlic_info->current_frame++;
+    pFlic_info->frames_left--;
+    if (gTrans_enabled && gTranslation_count && !pPanel_flic) {
+        DrawTranslations(pFlic_info, pFlic_info->frames_left == 0);
+    }
+    if (pFlic_info->f && pFlic_info->bytes_still_to_be_read) {
+        data_knocked_off = pFlic_info->data - pFlic_info->data_start;
+        memcpy(pFlic_info->data_start, pFlic_info->data, pFlic_info->bytes_in_buffer - data_knocked_off);
+        pFlic_info->data = pFlic_info->data_start;
+        read_amount = pFlic_info->bytes_still_to_be_read;
+        pFlic_info->bytes_in_buffer -= data_knocked_off;
+        if (data_knocked_off < read_amount) {
+            read_amount = data_knocked_off;
+        }
+        if (read_amount) {
+            fread(&pFlic_info->data_start[pFlic_info->bytes_in_buffer], 1u, read_amount, pFlic_info->f);
+        }
+        pFlic_info->bytes_still_to_be_read -= read_amount;
+        pFlic_info->bytes_in_buffer = +read_amount;
+    }
+    return pFlic_info->frames_left == 0;
 }
 
 // Offset: 6464
@@ -432,20 +1181,68 @@ int PlayFlic(int pIndex, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap
     tU32 last_frame;
     tU32 new_time;
     tU32 frame_period;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%d, %u, %p, %p, %d, %d, %p, %d, %d)", pIndex, pSize, pData_ptr, pDest_pixelmap, pX_offset, pY_offset, DoPerFrame, pInterruptable, pFrame_rate);
+
+    finished_playing = 0;
+    the_flic.data_start = 0;
+    if (StartFlic(gMain_flic_list[pIndex].file_name, pIndex, &the_flic, pSize, pData_ptr, pDest_pixelmap, pX_offset, pY_offset, pFrame_rate)) {
+        LOG_WARN("startflic returned error");
+        return -1;
+    }
+    while ((!pInterruptable || !AnyKeyDown()) && !finished_playing) {
+        new_time = PDGetTotalTime();
+        frame_period = new_time - last_frame;
+
+        if (gSound_time != 0 && new_time >= gSound_time) {
+            DRS3StartSound(gIndexed_outlets[0], gSound_ID);
+            gSound_time = 0;
+        }
+        if (frame_period >= the_flic.frame_period) {
+            finished_playing = PlayNextFlicFrame2(&the_flic, 0);
+            DoPerFrame();
+            if (gDark_mode == 0) {
+                EnsurePaletteUp();
+            }
+            ServiceGame();
+            last_frame = new_time;
+        }
+    }
+    ServiceGame();
+    if (the_flic.f) {
+        BrMemFree(pDest_pixelmap);
+        pDest_pixelmap = NULL;
+        fclose(the_flic.f);
+        the_flic.f = NULL;
+    }
+    if (pData_ptr) {
+        pData_ptr = 0;
+    }
+    return 0;
 }
 
 // Offset: 6816
 // Size: 41
 void SwapScreen() {
-    NOT_IMPLEMENTED();
+    PDScreenBufferSwap(0);
 }
 
 // Offset: 6860
 // Size: 154
 // EAX: pIndex
 void ShowFlic(int pIndex) {
-    NOT_IMPLEMENTED();
+    do {
+        PlayFlic(
+            pIndex,
+            gMain_flic_list[pIndex].the_size,
+            gMain_flic_list[pIndex].data_ptr,
+            gBack_screen,
+            gMain_flic_list[pIndex].x_offset,
+            gMain_flic_list[pIndex].y_offset,
+            SwapScreen,
+            gMain_flic_list[pIndex].interruptable,
+            gMain_flic_list[pIndex].frame_rate);
+    } while (gMain_flic_list[pIndex].repeat && !AnyKeyDown());
+    gLast_flic_name[0] = 0; // byte_10344C;
 }
 
 // Offset: 7016
@@ -465,7 +1262,41 @@ int LoadFlic(int pIndex) {
     tPath_name the_path;
     FILE* f;
     char* the_buffer;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%d)", pIndex);
+
+    if (pIndex < 0) {
+        return 0;
+    }
+    if (gMain_flic_list[pIndex].data_ptr) {
+        return 1;
+    }
+    if (gPlay_from_disk) {
+        gMain_flic_list[pIndex].data_ptr = NULL;
+        return 1;
+    }
+    PossibleService();
+    PathCat(the_path, gApplication_path, "ANIM");
+    PathCat(the_path, the_path, gMain_flic_list[pIndex].file_name);
+    f = DRfopen(the_path, "rb");
+
+    if (!f) {
+        FatalError(13, gMain_flic_list[pIndex].file_name);
+    }
+
+    gMain_flic_list[pIndex].the_size = GetFileLength(f);
+    gMain_flic_list[pIndex].data_ptr = BrMemAllocate(gMain_flic_list[pIndex].the_size, 0x90u);
+
+    if (gMain_flic_list[pIndex].data_ptr) {
+        fread(gMain_flic_list[pIndex].data_ptr, 1u, gMain_flic_list[pIndex].the_size, f);
+        strcpy(gLast_flic_name, gMain_flic_list[pIndex].file_name);
+        fclose(f);
+        return 1;
+    } else {
+        if (AllocationErrorsAreFatal()) {
+            FatalError(14, gMain_flic_list[pIndex].file_name);
+        }
+        return 0;
+    }
 }
 
 // Offset: 7488
@@ -513,7 +1344,26 @@ void RunFlicAt(int pIndex, int pX, int pY) {
 // Size: 117
 // EAX: pIndex
 void RunFlic(int pIndex) {
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%d)", pIndex);
+
+    if (gPending_flic >= 0) {
+        LoadFlic(gPending_flic);
+        ShowFlic(gPending_flic);
+        UnlockFlic(gPending_flic);
+        gPending_flic = -1;
+    }
+    if (LoadFlic(pIndex)) {
+        if (gMain_flic_list[pIndex].queued) {
+            gPending_flic = pIndex;
+        } else {
+            ShowFlic(pIndex);
+            if (pIndex >= 0) {
+                if (gMain_flic_list[pIndex].data_ptr) {
+                    MAMSUnlock((void**)&gMain_flic_list[pIndex].data_ptr);
+                }
+            }
+        }
+    }
 }
 
 // Offset: 8204
@@ -521,7 +1371,9 @@ void RunFlic(int pIndex) {
 // EAX: pBunch_index
 void PreloadBunchOfFlics(int pBunch_index) {
     int i;
-    NOT_IMPLEMENTED();
+    for (i = 0; i < gFlic_bunch[pBunch_index].count; i++) {
+        LoadFlic(gFlic_bunch[pBunch_index].indexes[i]);
+    }
 }
 
 // Offset: 8312
@@ -543,7 +1395,7 @@ void FlushAllFlics(int pBunch_index) {
 // Offset: 8496
 // Size: 44
 void InitFlicQueue() {
-    NOT_IMPLEMENTED();
+    gFirst_flic = NULL;
 }
 
 // Offset: 8540
@@ -561,7 +1413,44 @@ void ProcessFlicQueue(tU32 pInterval) {
     tFlic_descriptor* doomed_flic;
     tU32 new_time;
     int finished_playing;
-    NOT_IMPLEMENTED();
+
+    the_flic = gFirst_flic;
+    last_flic = NULL;
+    gPalette_fuck_prevention = 1;
+    gTransparency_on = 1;
+    new_time = PDGetTotalTime();
+    while (the_flic) {
+        if (new_time - the_flic->last_frame < the_flic->frame_period) {
+            finished_playing = 0;
+        } else {
+            the_flic->last_frame = new_time;
+            finished_playing = PlayNextFlicFrame2(the_flic, 0);
+        }
+        if (finished_playing) {
+            if (the_flic->f) {
+                BrMemFree(the_flic->data_start);
+                the_flic->data_start = NULL;
+                fclose(the_flic->f);
+                the_flic->f = NULL;
+            }
+            if (the_flic->data) {
+                the_flic->data = NULL;
+            }
+            if (last_flic) {
+                last_flic->next = the_flic->next;
+            } else {
+                gFirst_flic = the_flic->next;
+            }
+            doomed_flic = the_flic;
+            the_flic = the_flic->next;
+            BrMemFree(doomed_flic);
+        } else {
+            last_flic = the_flic;
+            the_flic = the_flic->next;
+        }
+    }
+    gPalette_fuck_prevention = 0;
+    gTransparency_on = 0;
 }
 
 // Offset: 8860
@@ -578,11 +1467,67 @@ void FlushFlicQueue() {
 // EBX: pY
 // ECX: pMust_finish
 void AddToFlicQueue(int pIndex, int pX, int pY, int pMust_finish) {
-    tFlic_descriptor* the_flic;
-    tFlic_descriptor* new_flic;
-    tFlic_descriptor* last_flic;
-    tFlic_descriptor* doomed_flic;
-    NOT_IMPLEMENTED();
+    tFlic_descriptor* the_flic = NULL;
+    tFlic_descriptor* new_flic = NULL;
+    tFlic_descriptor* last_flic = NULL;
+    tFlic_descriptor* doomed_flic = NULL;
+    LOG_TRACE("(%d, %d, %d, %d)", pIndex, pX, pY, pMust_finish);
+
+    the_flic = gFirst_flic;
+    while (the_flic) {
+        if (pX == the_flic->x_offset && pY == the_flic->y_offset) {
+            doomed_flic = the_flic;
+            break;
+        }
+        last_flic = the_flic;
+        the_flic = the_flic->next;
+    }
+
+    if (doomed_flic) {
+        if (doomed_flic->f) {
+            BrMemFree(doomed_flic->data_start);
+            doomed_flic->data_start = NULL;
+            fclose(doomed_flic->f);
+            doomed_flic->f = NULL;
+        }
+        if (doomed_flic->data) {
+            doomed_flic->data = NULL;
+        }
+        if (last_flic) {
+            last_flic->next = doomed_flic->next;
+        } else {
+            gFirst_flic = doomed_flic->next;
+        }
+        BrMemFree(doomed_flic);
+    }
+
+    LoadFlic(pIndex);
+    new_flic = BrMemAllocate(sizeof(tFlic_descriptor), kMem_queued_flic);
+    new_flic->next = NULL;
+    the_flic = gFirst_flic;
+    if (gFirst_flic) {
+        while (the_flic->next) {
+            the_flic = the_flic->next;
+        }
+        the_flic->next = new_flic;
+    } else {
+        gFirst_flic = new_flic;
+    }
+    new_flic->last_frame = 0;
+    new_flic->data_start = 0;
+    new_flic->the_index = pIndex;
+    new_flic->must_finish = pMust_finish;
+
+    StartFlic(
+        gMain_flic_list[pIndex].file_name,
+        pIndex,
+        new_flic,
+        gMain_flic_list[pIndex].the_size,
+        gMain_flic_list[pIndex].data_ptr,
+        gBack_screen,
+        pX >= 0 ? pX : gMain_flic_list[pIndex].x_offset,
+        pY >= 0 ? pY : gMain_flic_list[pIndex].y_offset,
+        20);
 }
 
 // Offset: 9424
@@ -614,7 +1559,62 @@ void ServicePanelFlics(int pCopy_to_buffer) {
     int j;
     int iteration_count;
     int finished;
-    NOT_IMPLEMENTED();
+
+    if (gPanel_flic_disable) {
+        return;
+    }
+    the_time = PDGetTotalTime();
+    gPalette_fuck_prevention = 1;
+    gTransparency_on = 1;
+    for (i = 0; i < 2; i++) {
+        old_last_time[i] = gLast_panel_frame_time[i];
+        if (gPanel_buffer[i] && gPanel_flic[i].data) {
+            if (old_last_time[i]) {
+                time_diff = the_time - old_last_time[i];
+                iteration_count = time_diff / gPanel_flic[i].frame_period;
+            } else {
+                iteration_count = 1;
+            }
+            for (j = 0; j < iteration_count; j++) {
+                finished = PlayNextFlicFrame2(&gPanel_flic[i], 1);
+                if (finished) {
+                    if (gPanel_flic[i].f) {
+                        BrMemFree(gPanel_flic[i].data_start);
+                        gPanel_flic[i].data_start = NULL;
+                        fclose(gPanel_flic[i].f);
+                        gPanel_flic[i].f = NULL;
+                    }
+                    if (gPanel_flic[i].data) {
+                        gPanel_flic[i].data = 0;
+                    }
+                    StartFlic(
+                        gPanel_flic[i].file_name,
+                        gPanel_flic[i].the_index,
+                        &gPanel_flic[i],
+                        gPanel_flic_data_length[i],
+                        (tS8*)gPanel_flic_data[i],
+                        gPanel_buffer[i],
+                        0,
+                        0,
+                        0);
+                }
+                gLast_panel_frame_time[i] = the_time;
+            }
+            if (pCopy_to_buffer) {
+                BrPixelmapRectangleCopy(
+                    gBack_screen,
+                    gPanel_flic_left[i],
+                    gPanel_flic_top[i],
+                    gPanel_buffer[i],
+                    0,
+                    0,
+                    gPanel_buffer[i]->width,
+                    gPanel_buffer[i]->height);
+            }
+        }
+    }
+    gTransparency_on = 0;
+    gPalette_fuck_prevention = 0;
 }
 
 // Offset: 10248
@@ -646,7 +1646,7 @@ void LoadInterfaceStrings() {
     int j;
     int len;
 
-    LOG_WARN("Not implemented");
+    STUB();
 }
 
 // Offset: 11948

@@ -74,7 +74,7 @@ br_error BrSetDefaultConfig(br_token t, char* Entry) {
 br_error BrSystemConfigBegin() {
     char temp[255];
     br_value v;
-    LOG_WARN("Not implemented");
+    STUB();
 }
 
 // Offset: 1472

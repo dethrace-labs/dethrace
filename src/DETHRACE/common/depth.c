@@ -175,7 +175,7 @@ void LoadDepthTable(char* pName, br_pixelmap** pTable, int* pPower) {
 void InitDepthEffects() {
     int i;
     int j;
-    LOG_WARN("skipping");
+    STUB();
 }
 
 // Offset: 4732

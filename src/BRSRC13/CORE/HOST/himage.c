@@ -4,7 +4,7 @@
 // Offset: 14
 // Size: 40
 void* HostImageLoad(char* name) {
-    LOG_WARN("Not implemented");
+    STUB();
 }
 
 // Offset: 70

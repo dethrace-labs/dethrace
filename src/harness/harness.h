@@ -20,6 +20,7 @@ void Harness_RunWindowLoop(harness_game_func* game_func, void* arg);
 // Hooks are called from original game code.
 void Harness_Hook_DOSGfxBegin();
 void Harness_Hook_BrDevPaletteSetOld(br_pixelmap* pm);
+void Harness_Hook_BrDevPaletteSetEntryOld(int i, br_colour colour);
 void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src);
 
 void Harness_Hook_KeyBegin();

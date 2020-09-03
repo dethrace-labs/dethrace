@@ -28,6 +28,7 @@ extern struct br_font* BrFontProp7x9;
 br_pixelmap* BrPixelmapLoad(char* filename);
 br_uint_32 BrPixelmapLoadMany(char* filename, br_pixelmap** pixelmaps, br_uint_16 num);
 void BrDevPaletteSetOld(br_pixelmap* pm);
+void BrDevPaletteSetEntryOld(int i, br_colour colour);
 void* BrMemAllocate(br_size_t size, br_uint_8 type);
 void* BrMemCalloc(int nelems, br_size_t size, br_uint_8 type);
 br_model* BrModelAllocate(char* name, int nvertices, int nfaces);

@@ -250,11 +250,10 @@ char* gMem_names[247] = {
     "kMem_DOS_HMI_file_open",
     "kMem_abuse_text",
     "kMem_action_replay_buffer",
-    "kMem_misc",
-    "Unable to support this screen depth setting"
+    "kMem_misc"
 };
 
-int gNon_fatal_allocation_errors;
+int gNon_fatal_allocation_errors = 0;
 br_allocator gAllocator = { "Death Race", DRStdlibAllocate, DRStdlibFree, DRStdlibInquire, Claim4ByteAlignment };
 
 // Offset: 0
@@ -272,7 +271,7 @@ void ResetNonFatalAllocationErrors() {
 // Offset: 88
 // Size: 68
 int AllocationErrorsAreFatal() {
-    NOT_IMPLEMENTED();
+    return gNon_fatal_allocation_errors == 0;
 }
 
 // Offset: 156
@@ -338,7 +337,8 @@ void InstallDRMemCalls() {
 // Size: 59
 // EAX: pPtr
 void MAMSUnlock(void** pPtr) {
-    NOT_IMPLEMENTED();
+    free(*pPtr);
+    *pPtr = NULL;
 }
 
 // Offset: 632

@@ -20,7 +20,7 @@ void actorEnable(br_v1db_enable* e, br_actor* a) {
 // EDX: a
 void actorDisable(br_v1db_enable* e, br_actor* a) {
     int i;
-    LOG_WARN("Not implemented");
+    STUB();
 }
 
 // Offset: 525

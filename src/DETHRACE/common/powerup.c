@@ -96,7 +96,7 @@ void LoadPowerups() {
         FatalError(25);
     }
     gNumber_of_powerups = GetAnInt(f);
-    gPowerup_array = BrMemAllocate(sizeof(tPowerup) * gNumber_of_powerups, 0xC5u);
+    gPowerup_array = BrMemAllocate(sizeof(tPowerup) * gNumber_of_powerups, kMem_powerup_array);
     for (i = 0; i < gNumber_of_powerups; i++) {
         the_powerup = &gPowerup_array[i];
 
@@ -129,12 +129,12 @@ void LoadPowerups() {
                 the_powerup->got_proc = NULL;
             }
             the_powerup->number_of_float_params = GetAnInt(f);
-            the_powerup->float_params = BrMemAllocate(4 * the_powerup->number_of_float_params, 0xC6u);
+            the_powerup->float_params = BrMemAllocate(4 * the_powerup->number_of_float_params, kMem_powerup_float_parms);
             for (j = 0; j < the_powerup->number_of_float_params; j++) {
                 the_powerup->float_params[j] = GetAFloat(f);
             }
             the_powerup->number_of_integer_params = GetAnInt(f);
-            the_powerup->integer_params = BrMemAllocate(4 * the_powerup->number_of_integer_params, 0xC7u);
+            the_powerup->integer_params = BrMemAllocate(4 * the_powerup->number_of_integer_params, kMem_powerup_int_parms);
             for (j = 0; j < the_powerup->number_of_integer_params; j++) {
                 the_powerup->integer_params[j] = GetAnInt(f);
             }

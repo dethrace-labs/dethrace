@@ -64,7 +64,7 @@ void LoadStart() {
 // Offset: 2340
 // Size: 415
 // EAX: pSave_allowed
-int DoLoadGame(int pSave_allowed) {
+int DoLoadGame() {
     static tFlicette flicker_on[9];
     static tFlicette flicker_off[9];
     static tFlicette push[9];
@@ -173,5 +173,5 @@ int SaveGameInterface(int pDefault_choice) {
 // Size: 181
 // EAX: pSave_allowed
 void DoSaveGame(int pSave_allowed) {
-    LOG_WARN("Not implemented");
+    STUB();
 }
