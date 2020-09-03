@@ -83,9 +83,9 @@ void test_utility_PathCat() {
 }
 
 void test_utility_getMiscString() {
-    LoadMiscStrings();
-    printf("%s\n", GetMiscString(223));
-    printf("%s\n", GetMiscString(75));
+    // LoadMiscStrings();
+    // printf("%s\n", GetMiscString(223));
+    // printf("%s\n", GetMiscString(75));
 }
 
 void test_utility_suite() {

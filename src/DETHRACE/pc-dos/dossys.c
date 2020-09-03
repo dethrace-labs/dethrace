@@ -251,6 +251,7 @@ int PDGetASCIIFromKey(int pKey) {
 // EAX: pThe_str
 void PDFatalError(char* pThe_str) {
     static int been_here = 0;
+    LOG_TRACE("(\"%s\")", pThe_str);
 
     if (been_here) {
         if (!_unittest_do_not_exit) {
