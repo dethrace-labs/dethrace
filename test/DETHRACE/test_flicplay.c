@@ -9,6 +9,7 @@ void frame_render_callback() {
     nbr_frames_rendered++;
 }
 void test_flicplay_playflic() {
+    REQUIRES_DATA_DIRECTORY();
     int pIndex = 31; // main menu swing in
     br_pixelmap* target;
 
