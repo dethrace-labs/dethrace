@@ -25,7 +25,7 @@ GLuint screen_texture;
 GLuint shader_program;
 
 int Harness_GLRenderer_GetWindowFlags() {
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    //SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     return SDL_WINDOW_OPENGL;
 }
 
@@ -54,24 +54,24 @@ void Harness_GLRenderer_Activate(SDL_Window* window) {
 
     SDL_GL_MakeCurrent(window, context);
 
-    const char* vs_source = "#version 330 core\n"
-                            "layout (location = 0) in vec3 aPos;\n"
-                            "layout (location = 1) in vec3 aColor;\n"
-                            "layout (location = 2) in vec2 aTexCoord;\n"
-                            "out vec2 TexCoord;\n"
+    const char* vs_source = "#version 120\n"
+                            "attribute vec3 aPos;\n"
+                            "attribute vec3 aColor;\n"
+                            "attribute vec2 aTexCoord;\n"
+                            "varying vec2 TexCoord;\n"
                             "void main()\n"
                             "{\n"
                             "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
                             "   TexCoord = aTexCoord;\n"
                             "}\0";
-    const char* fs_source = "#version 330 core\n"
-                            "out vec4 FragColor;\n"
-                            "in vec2 TexCoord;\n"
+    const char* fs_source = "#version 120\n"
+                            "varying vec4 FragColor;\n"
+                            "varying vec2 TexCoord;\n"
                             "uniform sampler2D ourTexture;\n"
 
                             "void main()\n"
                             "{\n"
-                            "   FragColor = texture(ourTexture, TexCoord);\n"
+                            "   gl_FragColor = texture2D(ourTexture, TexCoord);\n"
                             "}\n\0";
     vs = glCreateShader(GL_VERTEX_SHADER);
     CompileShader(vs, vs_source);
