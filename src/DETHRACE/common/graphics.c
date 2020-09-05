@@ -1175,7 +1175,7 @@ int AllocateCursorTransient() {
 // Offset: 27696
 // Size: 138
 void StartMouseCursor() {
-    LOG_WARN("stub");
+    STUB();
 }
 
 // Offset: 27836

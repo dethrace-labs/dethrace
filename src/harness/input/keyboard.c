@@ -5,7 +5,7 @@
 
 extern tU8 gScan_code[123][2];
 
-uint8_t sdl_key_state[123];
+uint8_t sdl_key_state[256];
 
 // Errol's keymap
 int keymap[123] = {
@@ -127,6 +127,10 @@ void Keyboard_Init() {
 }
 
 int Keyboard_IsKeyDown(unsigned char scan_code) {
+    if (scan_code > 255) {
+        LOG_WARN("ignoring unexpected scan code %d", scan_code);
+        return 0;
+    }
     return sdl_key_state[scan_code];
 }
 
