@@ -121,7 +121,7 @@ int DatafileStackTop;
 // EDX: value
 // EBX: count
 void DfPush(int type, void* value, int count) {
-    LOG_TRACE("(%d, %p, %d)", type, value, count);
+    LOG_TRACE9("(%d, %p, %d)", type, value, count);
 
     if (DatafileStackTop >= 1024) {
         BrFailure("DatafileStack Overflow");
@@ -137,7 +137,7 @@ void DfPush(int type, void* value, int count) {
 // EAX: type
 // EDX: countp
 void* DfPop(int type, int* countp) {
-    LOG_TRACE("(%d, %p)", type, countp);
+    LOG_TRACE9("(%d, %p)", type, countp);
 
     if (DatafileStackTop <= 0) {
         BrFailure("DatafileStack Underflow");
@@ -302,7 +302,7 @@ br_uint_32 DfStructReadBinary(br_datafile* df, br_file_struct* str, void* base) 
         float f;
     } conv;
 
-    LOG_TRACE("(%p, %p, %p)", df, str, base);
+    LOG_TRACE9("(%p, %p, %p)", df, str, base);
 
     for (m = 0; m < str->nmembers; m++) {
 
@@ -617,7 +617,7 @@ int DfChunkWriteBinary(br_datafile* df, br_uint_32 id, br_uint_32 length) {
 int DfChunkReadBinary(br_datafile* df, br_uint_32* plength) {
     br_uint_32 id;
     br_uint_32 l;
-    LOG_TRACE("(%p, %p)", df, plength);
+    LOG_TRACE9("(%p, %p)", df, plength);
 
     if (BrFileEof(df->h)) {
         return -1;
@@ -877,7 +877,7 @@ int DfSkipText(br_datafile* df, br_uint_32 length) {
 // EAX: df
 // EDX: length
 int DfSkipBinary(br_datafile* df, br_uint_32 length) {
-    LOG_TRACE("(%p, %d)", df, length);
+    LOG_TRACE9("(%p, %d)", df, length);
     BrFileAdvance(length, df->h);
 }
 
@@ -891,7 +891,7 @@ int DfChunksInterpret(br_datafile* df, br_chunks_table* table) {
     br_uint_32 id;
     int r;
     int i;
-    LOG_TRACE("(%p, %p)", df, table);
+    LOG_TRACE9("(%p, %p)", df, table);
 
     while (1) {
         id = df->prims->chunk_read(df, &length);
@@ -953,7 +953,7 @@ br_datafile* DfOpen(char* name, int write, br_token scalar_type) {
     char c;
     br_datafile* df;
     void* h;
-    LOG_TRACE("(\"%s\", %d, %d)", name, write, scalar_type);
+    LOG_TRACE9("(\"%s\", %d, %d)", name, write, scalar_type);
 
     if (write) {
         h = BrFileOpenWrite(name, fw.open_mode);
@@ -981,7 +981,6 @@ br_datafile* DfOpen(char* name, int write, br_token scalar_type) {
         else
             df->prims = &_BrFilePrimsReadText;
     }
-    LOG_DEBUG("pushing %p", df);
     DfPush(BR_MEMORY_FILE, df, 1);
     return df;
 }

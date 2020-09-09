@@ -88,6 +88,12 @@ void test_utility_getMiscString() {
     // printf("%s\n", GetMiscString(75));
 }
 
+void test_utility_IRandomBetween() {
+    IRandomBetween(1, 5);
+    IRandomBetween(0, 5);
+    IRandomBetween(50, 100);
+}
+
 void test_utility_suite() {
     RUN_TEST(test_utility_EncodeLinex);
     RUN_TEST(test_utility_DecodeLine2);
@@ -96,4 +102,5 @@ void test_utility_suite() {
     RUN_TEST(test_utility_GetALineWithNoPossibleService);
     RUN_TEST(test_utility_PathCat);
     RUN_TEST(test_utility_getMiscString);
+    RUN_TEST(test_utility_IRandomBetween);
 }

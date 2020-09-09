@@ -36,7 +36,7 @@ void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class) {
     br_int_32 calign;
     br_int_32 pad;
     br_int_32 actual_pad;
-    LOG_TRACE("(%p, %d, %d)", vparent, size, res_class);
+    LOG_TRACE10("(%p, %d, %d)", vparent, size, res_class);
 
     char* tmp;
 
@@ -82,7 +82,7 @@ void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class) {
 void BrResInternalFree(resource_header* res, br_boolean callback) {
     int c;
     void* r;
-    LOG_TRACE("(%p, %d)", res, callback);
+    LOG_TRACE10("(%p, %d)", res, callback);
 
     if (res->magic_num != 0xDEADBEEF) {
         LOG_PANIC("Bad resource header")
@@ -112,7 +112,7 @@ void BrResInternalFree(resource_header* res, br_boolean callback) {
 // Offset: 1148
 // Size: 79
 void BrResFree(void* vres) {
-    LOG_TRACE("(%p)", vres);
+    LOG_TRACE10("(%p)", vres);
 
     vres = vres - sizeof(resource_header);
     if (((resource_header*)vres)->magic_num != 0xDEADBEEF) {

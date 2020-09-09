@@ -40,7 +40,7 @@ void* BrSwapBlock(void* block, int count, int size) {
     br_uint_8* cp;
     int i;
     int k;
-    LOG_TRACE("(%p, %d, %d)", block, count, size);
+    LOG_TRACE9("(%p, %d, %d)", block, count, size);
 
     cp = (br_uint_8*)block;
     switch (size) {

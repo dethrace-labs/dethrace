@@ -28,4 +28,4 @@ install-deps:
 	sudo apt-get install libsdl2-dev
 
 run: build
-	@src/DETHRACE/build/c1
+	@src/DETHRACE/build/c1 $$DETHRACE_ARGS

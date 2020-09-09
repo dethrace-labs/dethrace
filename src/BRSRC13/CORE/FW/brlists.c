@@ -61,7 +61,7 @@ br_node* BrRemove(br_node* node) {
 // Offset: 573
 // Size: 39
 void BrSimpleNewList(br_simple_list* list) {
-    LOG_TRACE("(%p)", list);
+    LOG_TRACE10("(%p)", list);
     list->head = NULL;
 }
 
