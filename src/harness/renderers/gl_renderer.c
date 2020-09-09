@@ -25,7 +25,9 @@ GLuint screen_texture;
 GLuint shader_program;
 
 int Harness_GLRenderer_GetWindowFlags() {
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE) != 0) {
+        LOG_PANIC("Failed to set SDL_GL_CONTEXT_PROFILE_MASK attribute. %s", SDL_GetError());
+    };
     return SDL_WINDOW_OPENGL;
 }
 
@@ -33,7 +35,7 @@ void Harness_GLRenderer_Init(SDL_Window* window) {
 
     context = SDL_GL_CreateContext(window);
     if (!context) {
-        LOG_PANIC("Failed to create context");
+        LOG_PANIC("Failed to call SDL_GL_CreateContext. %s", SDL_GetError());
     }
 }
 
@@ -52,7 +54,10 @@ void CompileShader(GLuint shader_id, const GLchar* source) {
 void Harness_GLRenderer_Activate(SDL_Window* window) {
     GLuint vs, fs;
 
-    SDL_GL_MakeCurrent(window, context);
+    int result = SDL_GL_MakeCurrent(window, context);
+    if (result != 0) {
+        LOG_PANIC("Failed to call SDL_GL_MakeCurrent. %s", SDL_GetError());
+    }
 
     const char* vs_source = "#version 330 core\n"
                             "layout (location = 0) in vec3 aPos;\n"

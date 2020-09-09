@@ -119,8 +119,7 @@ void BrStdioPutChar(int c, void* f) {
 // Size: 53
 br_size_t BrStdioRead(void* buf, br_size_t size, unsigned int n, void* f) {
     int i;
-    LOG_TRACE("(%p, %d, %d, %p)", buf, size, n, f);
-    LOG_DEBUG("file pos: %d", ftell(f));
+    LOG_TRACE9("(%p, %d, %d, %p)", buf, size, n, f);
     i = fread(buf, size, n, f);
     return i;
 }

@@ -1,9 +1,5 @@
 #!/usr/bin/env python3 -u
 
-# Used to discover the key referenced in `KeyIsDown` calls.
-# Input: keymap index
-# Output: keycode index
-
 import sys
 
 input = sys.argv[1]

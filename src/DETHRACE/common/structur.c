@@ -95,7 +95,11 @@ void TotalRepair() {
 // Offset: 2344
 // Size: 64
 void DoLogos() {
-    NOT_IMPLEMENTED();
+    ClearEntireScreen();
+    DoSCILogo();
+    DoOpeningAnimation();
+    DoSCILogo();
+    gProgram_state.prog_status = eProg_opening;
 }
 
 // Offset: 2408

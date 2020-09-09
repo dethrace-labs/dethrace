@@ -25,7 +25,8 @@ test: build
 	@(cd test/build && ./c1tests $$DETHRACE_TEST_ARGS)
 
 install-deps:
+	sudo apt-get update
 	sudo apt-get install libsdl2-dev
 
 run: build
-	@src/DETHRACE/build/c1
+	@src/DETHRACE/build/c1 $$DETHRACE_ARGS

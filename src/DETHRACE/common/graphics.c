@@ -1181,7 +1181,7 @@ void StartMouseCursor() {
 // Offset: 27836
 // Size: 59
 void EndMouseCursor() {
-    NOT_IMPLEMENTED();
+    STUB();
 }
 
 // Offset: 27896

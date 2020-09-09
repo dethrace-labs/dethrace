@@ -144,7 +144,8 @@ void EncodeLine(char* pS) {
 int IRandomBetween(int pA, int pB) {
     int num;
     char s[32];
-    NOT_IMPLEMENTED();
+    num = (rand() % (pB - pA + 1)) + pA;
+    return num;
 }
 
 // Offset: 816

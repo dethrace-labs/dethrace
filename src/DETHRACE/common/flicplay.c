@@ -14,7 +14,31 @@
 #include <unistd.h>
 
 int gFlic_bunch8[16];
-int gFlic_bunch4[22];
+int gFlic_bunch4[22] = {
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    42,
+    43,
+    88,
+    45,
+    110,
+    111,
+    42,
+    43,
+    45,
+    115,
+    116,
+    117,
+    118,
+    119,
+    120,
+    121
+};
+
 int gFlic_bunch2[8];
 
 tFlic_spec gMain_flic_list[372] = {
@@ -368,7 +392,7 @@ tFlic_descriptor gPanel_flic[2];
 br_pixelmap* gPanel_buffer[2];
 int gPanel_flic_left[2];
 int gFlic_bunch6[51];
-int gFlic_bunch7[7];
+int gFlic_bunch7[7] = { 130, 131, 132, 42, 43, 135, 45 };
 int gFlic_bunch5[5];
 int gFlic_bunch3[13];
 int gFlic_bunch0[29] = {
@@ -517,13 +541,13 @@ int FlicsPlayedFromDisk() {
 // Offset: 600
 // Size: 44
 void TurnOffPanelFlics() {
-    NOT_IMPLEMENTED();
+    gPanel_flic_disable = 1;
 }
 
 // Offset: 644
 // Size: 44
 void TurnOnPanelFlics() {
-    NOT_IMPLEMENTED();
+    gPanel_flic_disable = 0;
 }
 
 // Offset: 688
@@ -804,7 +828,7 @@ void DoDeltaTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU32 the_row_bytes;
     tU16* line_pixel_ptr;
     tU16 the_word;
-    LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
+    LOG_TRACE8("(%p, %d)", pFlic_info, chunk_length);
 
     line_count = MemReadU16(&pFlic_info->data);
     the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
@@ -828,14 +852,18 @@ void DoDeltaTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
                     the_byte2 = the_word >> 8 & 0xff;
 
                     for (k = 0; k < -size_count; k++) {
-                        *line_pixel_ptr = the_word;
+                        if (the_word) {
+                            *line_pixel_ptr = the_word;
+                        }
                         line_pixel_ptr++;
                     }
                 } else {
                     for (k = 0; k < size_count; k++) {
                         the_word = *(tU16*)pFlic_info->data;
                         pFlic_info->data += 2;
-                        *line_pixel_ptr = the_word;
+                        if (the_word) {
+                            *line_pixel_ptr = the_word;
+                        }
                         line_pixel_ptr++;
                     }
                 }
@@ -972,7 +1000,7 @@ void DoRunLengthTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU8* line_pixel_ptr;
     tU8 the_byte;
     tU32 the_row_bytes;
-    LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
+    LOG_TRACE8("(%p, %d)", pFlic_info, chunk_length);
 
     the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
     pixel_ptr = pFlic_info->first_pixel;
@@ -984,19 +1012,20 @@ void DoRunLengthTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
             size_count = MemReadS8(&pFlic_info->data);
             if (size_count >= 0) {
                 the_byte = MemReadU8(&pFlic_info->data);
-                if (the_byte) {
-                    for (k = 0; k < size_count; k++) {
+
+                for (k = 0; k < size_count; k++) {
+                    if (the_byte) {
                         *line_pixel_ptr = the_byte;
-                        line_pixel_ptr++;
                     }
+                    line_pixel_ptr++;
                 }
             } else {
                 for (k = 0; k < -size_count; k++) {
                     the_byte = MemReadU8(&pFlic_info->data);
                     if (the_byte) {
                         *line_pixel_ptr = the_byte;
-                        line_pixel_ptr++;
                     }
+                    line_pixel_ptr++;
                 }
             }
         }
@@ -1303,7 +1332,11 @@ int LoadFlic(int pIndex) {
 // Size: 75
 // EAX: pIndex
 void UnlockFlic(int pIndex) {
-    NOT_IMPLEMENTED();
+    if (pIndex >= 0) {
+        if (gMain_flic_list[pIndex].data_ptr) {
+            MAMSUnlock((void**)&gMain_flic_list[pIndex].data_ptr);
+        }
+    }
 }
 
 // Offset: 7564
@@ -1371,6 +1404,8 @@ void RunFlic(int pIndex) {
 // EAX: pBunch_index
 void PreloadBunchOfFlics(int pBunch_index) {
     int i;
+    LOG_TRACE("(%d)", pBunch_index);
+
     for (i = 0; i < gFlic_bunch[pBunch_index].count; i++) {
         LoadFlic(gFlic_bunch[pBunch_index].indexes[i]);
     }
@@ -1381,7 +1416,13 @@ void PreloadBunchOfFlics(int pBunch_index) {
 // EAX: pBunch_index
 void UnlockBunchOfFlics(int pBunch_index) {
     int i;
-    NOT_IMPLEMENTED();
+    for (i = 0; i < gFlic_bunch[pBunch_index].count; i++) {
+        if (gFlic_bunch[pBunch_index].indexes[i] >= 0) {
+            if (gMain_flic_list[gFlic_bunch[pBunch_index].indexes[i]].data_ptr) {
+                MAMSUnlock((void**)&gMain_flic_list[gFlic_bunch[pBunch_index].indexes[i]].data_ptr);
+            }
+        }
+    }
 }
 
 // Offset: 8420
@@ -1456,8 +1497,47 @@ void ProcessFlicQueue(tU32 pInterval) {
 // Offset: 8860
 // Size: 138
 void FlushFlicQueue() {
+    tFlic_descriptor* the_flic;
     tFlic_descriptor* old_flic;
-    NOT_IMPLEMENTED();
+    LOG_TRACE("()");
+
+    // JeffH: loop through pending flics until we reach the end or we find one that is `must_finish`.
+    // If `must_finish`, we process the queue then check again.
+    // If there are no `must_finish` in the list,
+    while (gFirst_flic) {
+        the_flic = gFirst_flic;
+        while (!the_flic->must_finish) {
+            the_flic = the_flic->next;
+            if (!the_flic) {
+                break;
+            }
+        }
+        if (the_flic) {
+            RemoveTransientBitmaps(1);
+            ProcessFlicQueue(gFrame_period);
+            DoMouseCursor();
+            PDScreenBufferSwap(0);
+        } else {
+            break;
+        }
+    }
+
+    the_flic = gFirst_flic;
+    while (the_flic) {
+        if (the_flic->f) {
+            BrMemFree(the_flic->data_start);
+            the_flic->data_start = NULL;
+            fclose(the_flic->f);
+            the_flic->f = NULL;
+        }
+        if (the_flic->data) {
+            the_flic->data = NULL;
+        }
+        old_flic = the_flic;
+        the_flic = the_flic->next;
+        BrMemFree(old_flic);
+    }
+    gFirst_flic = NULL;
 }
 
 // Offset: 9000

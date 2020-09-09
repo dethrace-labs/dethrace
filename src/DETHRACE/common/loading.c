@@ -673,7 +673,28 @@ void LoadInterfaceStuff(int pWithin_race) {
 // Offset: 6108
 // Size: 272
 void UnlockInterfaceStuff() {
-    NOT_IMPLEMENTED();
+    int i;
+    LOG_TRACE("()");
+    for (i = 0; i < 4; i++) {
+        if (gCursors[i]) {
+            BrPixelmapFree(gCursors[i]);
+            gCursors[i] = NULL;
+        }
+    }
+    PossibleService();
+    for (i = 0; i < 4; i++) {
+        if (gCursors[i + 4]) {
+            BrPixelmapFree(gCursors[i + 4]);
+            gCursors[i + 4] = NULL;
+        }
+    }
+    PossibleService();
+    for (i = 0; i < 18; i++) {
+        if (gCursor_giblet_images[i]) {
+            BrPixelmapFree(gCursor_giblet_images[i]);
+            gCursor_giblet_images[i] = NULL;
+        }
+    }
 }
 
 // Offset: 6380
