@@ -49,12 +49,16 @@ int MainMenuDone2(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
     switch (pCurrent_choice) {
     case 0:
         PreloadBunchOfFlics(4);
+        break;
     case 1:
         PreloadBunchOfFlics(5);
+        break;
     case 2:
         PreloadBunchOfFlics(1);
+        break;
     case 3:
         PreloadBunchOfFlics(3);
+        break;
     case 4:
         PreloadBunchOfFlics(7);
         break;

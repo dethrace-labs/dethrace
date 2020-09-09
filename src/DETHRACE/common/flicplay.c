@@ -14,7 +14,31 @@
 #include <unistd.h>
 
 int gFlic_bunch8[16];
-int gFlic_bunch4[22];
+int gFlic_bunch4[22] = {
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    42,
+    43,
+    88,
+    45,
+    110,
+    111,
+    42,
+    43,
+    45,
+    115,
+    116,
+    117,
+    118,
+    119,
+    120,
+    121
+};
+
 int gFlic_bunch2[8];
 
 tFlic_spec gMain_flic_list[372] = {
@@ -1380,6 +1404,8 @@ void RunFlic(int pIndex) {
 // EAX: pBunch_index
 void PreloadBunchOfFlics(int pBunch_index) {
     int i;
+    LOG_TRACE("(%d)", pBunch_index);
+
     for (i = 0; i < gFlic_bunch[pBunch_index].count; i++) {
         LoadFlic(gFlic_bunch[pBunch_index].indexes[i]);
     }
