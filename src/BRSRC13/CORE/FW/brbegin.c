@@ -8,20 +8,15 @@
 br_boolean active;
 char rscid[54];
 
+// IDA: br_error __cdecl BrBegin()
 br_error BrBegin() {
-    if (active) {
-        return 4103;
-    } else {
-        BrFwBegin();
-        HostImageLoad("unk?");
-        BrPixelmapBegin();
-        active = 1;
-        //nullsub_28();
-        return 0;
-    }
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: br_error __cdecl BrEnd()
 br_error BrEnd() {
+    br_device *dev;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

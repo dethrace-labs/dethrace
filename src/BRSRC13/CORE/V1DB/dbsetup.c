@@ -30,6 +30,7 @@ br_resource_class v1db_resourceClasses[14] = {
 
 br_v1db_state v1db;
 
+// IDA: br_error __cdecl BrV1dbBegin()
 br_error BrV1dbBegin() {
     char* devstr;
     br_size_t s;
@@ -66,79 +67,114 @@ br_error BrV1dbBegin() {
     return 0;
 }
 
+// IDA: br_error __cdecl BrV1dbEnd()
 br_error BrV1dbEnd() {
+    br_device *dev;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: br_uint_32 __cdecl updateTable(br_pixelmap *item, void *arg)
 br_uint_32 updateTable(br_pixelmap* item, void* arg) {
+    LOG_TRACE("(%p, %p)", item, arg);
     NOT_IMPLEMENTED();
 }
 
+// IDA: br_uint_32 __cdecl updateMap(br_pixelmap *item, void *arg)
 br_uint_32 updateMap(br_pixelmap* item, void* arg) {
+    LOG_TRACE("(%p, %p)", item, arg);
     NOT_IMPLEMENTED();
 }
 
+// IDA: br_uint_32 __cdecl updateMaterial(br_material *item, void *arg)
 br_uint_32 updateMaterial(br_material* item, void* arg) {
+    LOG_TRACE("(%p, %p)", item, arg);
     NOT_IMPLEMENTED();
 }
 
+// IDA: br_uint_32 __cdecl updateModel(br_model *item, void *arg)
 br_uint_32 updateModel(br_model* item, void* arg) {
+    LOG_TRACE("(%p, %p)", item, arg);
     NOT_IMPLEMENTED();
 }
 
+// IDA: br_uint_32 __cdecl clearTable(br_pixelmap *item, void *arg)
 br_uint_32 clearTable(br_pixelmap* item, void* arg) {
+    LOG_TRACE("(%p, %p)", item, arg);
     NOT_IMPLEMENTED();
 }
 
+// IDA: br_uint_32 __cdecl clearMap(br_pixelmap *item, void *arg)
 br_uint_32 clearMap(br_pixelmap* item, void* arg) {
+    LOG_TRACE("(%p, %p)", item, arg);
     NOT_IMPLEMENTED();
 }
 
+// IDA: br_uint_32 __cdecl clearMaterial(br_material *item, void *arg)
 br_uint_32 clearMaterial(br_material* item, void* arg) {
+    LOG_TRACE("(%p, %p)", item, arg);
     NOT_IMPLEMENTED();
 }
 
+// IDA: br_uint_32 __cdecl clearModel(br_model *item, void *arg)
 br_uint_32 clearModel(br_model* item, void* arg) {
+    LOG_TRACE("(%p, %p)", item, arg);
     NOT_IMPLEMENTED();
 }
 
+// IDA: br_error __cdecl BrV1dbRendererBegin(br_device_pixelmap *destination, br_renderer *renderer)
 br_error BrV1dbRendererBegin(br_device_pixelmap* destination, br_renderer* renderer) {
-    br_renderer_facility* renderer_facility;
+    br_renderer_facility *renderer_facility;
     br_error r;
     br_token_value tv[2];
+    LOG_TRACE("(%p, %p)", destination, renderer);
     NOT_IMPLEMENTED();
 }
 
+// IDA: br_renderer* __cdecl BrV1dbRendererQuery()
 br_renderer* BrV1dbRendererQuery() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: br_error __cdecl BrV1dbRendererEnd()
 br_error BrV1dbRendererEnd() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl BrZbBegin(br_uint_8 colour_type, br_uint_8 depth_type)
 void BrZbBegin(br_uint_8 colour_type, br_uint_8 depth_type) {
     LOG_TRACE("(%d, %d)", colour_type, depth_type);
     STUB();
 }
 
+// IDA: void __cdecl BrZsBegin(br_uint_8 colour_type, void *primitive, br_uint_32 size)
 void BrZsBegin(br_uint_8 colour_type, void* primitive, br_uint_32 size) {
+    LOG_TRACE("(%d, %p, %d)", colour_type, primitive, size);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl BrZbEnd()
 void BrZbEnd() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl BrZsEnd()
 void BrZsEnd() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl BrV1dbBeginWrapper_Float()
 void BrV1dbBeginWrapper_Float() {
     BrBegin();
     BrV1dbBegin();
 }
 
+// IDA: void __cdecl BrV1dbEndWrapper()
 void BrV1dbEndWrapper() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

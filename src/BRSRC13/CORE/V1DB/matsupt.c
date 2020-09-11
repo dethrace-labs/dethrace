@@ -7,6 +7,7 @@
 
 char rscid[49];
 
+// IDA: br_material* __cdecl BrMaterialAllocate(char *name)
 br_material* BrMaterialAllocate(char* name) {
     br_material* m;
     LOG_TRACE("(\"%s\")", name);
@@ -22,6 +23,8 @@ br_material* BrMaterialAllocate(char* name) {
     return m;
 }
 
+// IDA: void __cdecl BrMaterialFree(br_material *m)
 void BrMaterialFree(br_material* m) {
+    LOG_TRACE("(%p)", m);
     NOT_IMPLEMENTED();
 }

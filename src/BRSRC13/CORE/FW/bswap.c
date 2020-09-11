@@ -3,31 +3,37 @@
 
 char rscid[47];
 
+// IDA: br_uint_32 __cdecl BrSwap32(br_uint_32 l)
 br_uint_32 BrSwap32(br_uint_32 l) {
-    // union {
-    //     unsigned long l;
-    //     unsigned char c[4];
-    // } u;
-    return ((l << 24) | ((l << 8) & 0x00FF0000) | ((l >> 8) & 0x0000FF00) | (l >> 24));
+    struct {		// size: 0x4
+        unsigned long l;		// @0x0
+        unsigned char c[4];		// @0x0
+    } u;
+    LOG_TRACE("(%d)", l);
     NOT_IMPLEMENTED();
 }
 
+// IDA: br_uint_16 __cdecl BrSwap16(br_uint_16 s)
 br_uint_16 BrSwap16(br_uint_16 s) {
-    struct {
-        unsigned short s;
-        unsigned char c[2];
+    struct {		// size: 0x2
+        unsigned short s;		// @0x0
+        unsigned char c[2];		// @0x0
     } u;
+    LOG_TRACE("(%d)", s);
     NOT_IMPLEMENTED();
 }
 
+// IDA: br_float __cdecl BrSwapFloat(br_float f)
 br_float BrSwapFloat(br_float f) {
-    struct {
-        br_float f;
-        unsigned char c[4];
+    struct {		// size: 0x4
+        br_float f;		// @0x0
+        unsigned char c[4];		// @0x0
     } u;
+    LOG_TRACE("(%f)", f);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void* __cdecl BrSwapBlock(void *block, int count, int size)
 void* BrSwapBlock(void* block, int count, int size) {
     br_uint_8* cp;
     int i;

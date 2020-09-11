@@ -126,31 +126,43 @@ int gMap_render_y_i;
 int gMirror_on;
 br_scalar gYon_squared;
 
+// IDA: void __cdecl TurnOnPaletteConversion()
 void TurnOnPaletteConversion() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl TurnOffPaletteConversion()
 void TurnOffPaletteConversion() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl ResetLollipopQueue()
 void ResetLollipopQueue() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __usercall AddToLollipopQueue@<EAX>(br_actor *pActor@<EAX>, int pIndex@<EDX>)
 int AddToLollipopQueue(br_actor* pActor, int pIndex) {
+    LOG_TRACE("(%p, %d)", pActor, pIndex);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl RenderLollipops()
 void RenderLollipops() {
+    int i;
     int must_relink;
-    br_actor** the_actor;
-    br_actor* old_parent;
+    br_actor **the_actor;
+    br_actor *old_parent;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DRDrawLine(br_pixelmap *pDestn@<EAX>, int pX1@<EDX>, int pY1@<EBX>, int pX2@<ECX>, int pY2, int pColour)
 void DRDrawLine(br_pixelmap* pDestn, int pX1, int pY1, int pX2, int pY2, int pColour) {
-    tU8* d_ptr;
+    tU8 *d_ptr;
     tS32 y_delta;
     tS32 x_delta;
     tU32 current_y;
@@ -159,19 +171,25 @@ void DRDrawLine(br_pixelmap* pDestn, int pX1, int pY1, int pX2, int pY2, int pCo
     int x;
     int y;
     int the_diff;
+    LOG_TRACE("(%p, %d, %d, %d, %d, %d)", pDestn, pX1, pY1, pX2, pY2, pColour);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DrawDigitAt(br_pixelmap *gImage@<EAX>, int pX@<EDX>, int pY@<EBX>, int pY_pitch@<ECX>, int pValue)
 void DrawDigitAt(br_pixelmap* gImage, int pX, int pY, int pY_pitch, int pValue) {
+    LOG_TRACE("(%p, %d, %d, %d, %d)", gImage, pX, pY, pY_pitch, pValue);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DrawNumberAt(br_pixelmap *gImage@<EAX>, int pX@<EDX>, int pY@<EBX>, int pX_pitch@<ECX>, int pY_pitch, int pValue, int pDigit_count, int pLeading_zeroes)
 void DrawNumberAt(br_pixelmap* gImage, int pX, int pY, int pX_pitch, int pY_pitch, int pValue, int pDigit_count, int pLeading_zeroes) {
     int i;
     int the_value;
+    LOG_TRACE("(%p, %d, %d, %d, %d, %d, %d, %d)", gImage, pX, pY, pX_pitch, pY_pitch, pValue, pDigit_count, pLeading_zeroes);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall BuildColourTable(br_pixelmap *pPalette@<EAX>)
 void BuildColourTable(br_pixelmap* pPalette) {
     int i;
     int j;
@@ -181,27 +199,35 @@ void BuildColourTable(br_pixelmap* pPalette) {
     int blue;
     float nearest_distance;
     float distance;
+    LOG_TRACE("(%p)", pPalette);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl ClearConcussion()
 void ClearConcussion() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: tS8* __usercall SkipLines@<EAX>(tS8 *pSource@<EAX>, int pCount@<EDX>)
 tS8* SkipLines(tS8* pSource, int pCount) {
     int i;
     int j;
     int number_of_chunks;
     int chunk_length;
+    LOG_TRACE("(%p, %d)", pSource, pCount);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall CopyWords(char *pDst@<EAX>, char *pSrc@<EDX>, int pN@<EBX>)
 void CopyWords(char* pDst, char* pSrc, int pN) {
-    tU16* dst;
-    tU16* src;
+    tU16 *dst;
+    tU16 *src;
+    LOG_TRACE("(\"%s\", \"%s\", %d)", pDst, pSrc, pN);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall Copy8BitStripImageTo16Bit(br_pixelmap *pDest@<EAX>, br_int_16 pDest_x@<EDX>, br_int_16 pOffset_x@<EBX>, br_int_16 pDest_y@<ECX>, br_int_16 pOffset_y, tS8 *pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_uint_16 pWidth, br_uint_16 pHeight)
 void Copy8BitStripImageTo16Bit(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, br_int_16 pDest_y, br_int_16 pOffset_y, tS8* pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_uint_16 pWidth, br_uint_16 pHeight) {
     int i;
     int j;
@@ -212,11 +238,13 @@ void Copy8BitStripImageTo16Bit(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 
     int off_the_left;
     int destn_width;
     int chunk_length;
-    char* destn_ptr;
-    char* destn_ptr2;
+    char *destn_ptr;
+    char *destn_ptr2;
+    LOG_TRACE("(%p, %d, %d, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pOffset_x, pDest_y, pOffset_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall CopyStripImage(br_pixelmap *pDest@<EAX>, br_int_16 pDest_x@<EDX>, br_int_16 pOffset_x@<EBX>, br_int_16 pDest_y@<ECX>, br_int_16 pOffset_y, tS8 *pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_uint_16 pWidth, br_uint_16 pHeight)
 void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, br_int_16 pDest_y, br_int_16 pOffset_y, tS8* pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_uint_16 pWidth, br_uint_16 pHeight) {
     int i;
     int j;
@@ -227,11 +255,13 @@ void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
     int off_the_left;
     int destn_width;
     int chunk_length;
-    char* destn_ptr;
-    char* destn_ptr2;
+    char *destn_ptr;
+    char *destn_ptr2;
+    LOG_TRACE("(%p, %d, %d, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pOffset_x, pDest_y, pOffset_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall SetBRenderScreenAndBuffers(int pX_offset@<EAX>, int pY_offset@<EDX>, int pWidth@<EBX>, int pHeight@<ECX>)
 void SetBRenderScreenAndBuffers(int pX_offset, int pY_offset, int pWidth, int pHeight) {
     LOG_TRACE("(%d, %d, %d, %d)", pX_offset, pY_offset, pWidth, pHeight);
 
@@ -268,22 +298,32 @@ void SetBRenderScreenAndBuffers(int pX_offset, int pY_offset, int pWidth, int pH
     gBrZb_initialized = 1;
 }
 
+// IDA: void __cdecl SetIntegerMapRenders()
 void SetIntegerMapRenders() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl AdjustRenderScreenSize()
 void AdjustRenderScreenSize() {
+    int switched_res;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl ScreenSmaller()
 void ScreenSmaller() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl ScreenLarger()
 void ScreenLarger() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DRSetPaletteEntries(br_pixelmap *pPalette@<EAX>, int pFirst_colour@<EDX>, int pCount@<EBX>)
 void DRSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
     LOG_TRACE("(%p, %d, %d)", pPalette, pFirst_colour, pCount);
     if (!pFirst_colour) {
@@ -296,10 +336,13 @@ void DRSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
     gPalette_munged = 1;
 }
 
+// IDA: void __usercall DRSetPalette3(br_pixelmap *pThe_palette@<EAX>, int pSet_current_palette@<EDX>)
 void DRSetPalette3(br_pixelmap* pThe_palette, int pSet_current_palette) {
+    LOG_TRACE("(%p, %d)", pThe_palette, pSet_current_palette);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DRSetPalette2(br_pixelmap *pThe_palette@<EAX>, int pSet_current_palette@<EDX>)
 void DRSetPalette2(br_pixelmap* pThe_palette, int pSet_current_palette) {
     ((br_int_32*)pThe_palette->pixels)[0] = 0;
     if (pSet_current_palette) {
@@ -311,6 +354,7 @@ void DRSetPalette2(br_pixelmap* pThe_palette, int pSet_current_palette) {
     gPalette_munged |= pThe_palette != gRender_palette;
 }
 
+// IDA: void __usercall DRSetPalette(br_pixelmap *pThe_palette@<EAX>)
 void DRSetPalette(br_pixelmap* pThe_palette) {
     ((br_int_32*)pThe_palette->pixels)[0] = 0;
     memcpy(gCurrent_palette_pixels, pThe_palette->pixels, 0x400u);
@@ -320,6 +364,7 @@ void DRSetPalette(br_pixelmap* pThe_palette) {
     gPalette_munged |= pThe_palette != gRender_palette;
 }
 
+// IDA: void __cdecl InitializePalettes()
 void InitializePalettes() {
     int j;
     gCurrent_palette_pixels = BrMemAllocate(0x400u, kMem_cur_pal_pixels);
@@ -343,11 +388,14 @@ void InitializePalettes() {
     gEval_1 = LoadPixelmap("Evalu01.PIX");
 }
 
+// IDA: void __usercall SwitchToPalette(char *pPal_name@<EAX>)
 void SwitchToPalette(char* pPal_name) {
-    br_pixelmap* the_palette;
+    br_pixelmap *the_palette;
+    LOG_TRACE("(\"%s\")", pPal_name);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl ClearEntireScreen()
 void ClearEntireScreen() {
     LOG_TRACE("()");
 
@@ -358,10 +406,14 @@ void ClearEntireScreen() {
     PDScreenBufferSwap(0);
 }
 
+// IDA: void __cdecl ClearWobbles()
 void ClearWobbles() {
+    int i;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl InitWobbleStuff()
 void InitWobbleStuff() {
     int i;
 
@@ -374,30 +426,39 @@ void InitWobbleStuff() {
     }
 }
 
+// IDA: void __cdecl NewScreenWobble(double pAmplitude_x, double pAmplitude_y, double pPeriod)
 void NewScreenWobble(double pAmplitude_x, double pAmplitude_y, double pPeriod) {
     int i;
     int oldest_time;
     int oldest_index;
+    LOG_TRACE("(%d, %d, %d)", pAmplitude_x, pAmplitude_y, pPeriod);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall SetScreenWobble(int pWobble_x@<EAX>, int pWobble_y@<EDX>)
 void SetScreenWobble(int pWobble_x, int pWobble_y) {
+    LOG_TRACE("(%d, %d)", pWobble_x, pWobble_y);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl ResetScreenWobble()
 void ResetScreenWobble() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall CalculateWobblitude(tU32 pThe_time@<EAX>)
 void CalculateWobblitude(tU32 pThe_time) {
     int i;
     tU32 time_going;
     double angle;
     double mod_angle;
     double cosine_over_angle;
+    LOG_TRACE("(%d)", pThe_time);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall CalculateConcussion(tU32 pThe_time@<EAX>)
 void CalculateConcussion(tU32 pThe_time) {
     tU32 time_difference;
     int i;
@@ -406,28 +467,36 @@ void CalculateConcussion(tU32 pThe_time) {
     float angle;
     float mod_angle;
     float cosine_over_angle;
+    LOG_TRACE("(%d)", pThe_time);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl SufferFromConcussion(float pSeriousness)
 void SufferFromConcussion(float pSeriousness) {
     int i;
     int j;
+    LOG_TRACE("(%f)", pSeriousness);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall ProcessNonTrackActors(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>, br_matrix34 *pOld_camera_matrix)
 void ProcessNonTrackActors(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world, br_matrix34* pOld_camera_matrix) {
+    LOG_TRACE("(%p, %p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world, pOld_camera_matrix);
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __usercall OppositeColour@<EAX>(int pColour@<EAX>)
 int OppositeColour(int pColour) {
     int brightness;
+    LOG_TRACE("(%d)", pColour);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DrawMapBlip(tCar_spec *pCar@<EAX>, tU32 pTime@<EDX>, br_matrix34 *pTrans@<EBX>, br_vector3 *pPos@<ECX>, int pColour)
 void DrawMapBlip(tCar_spec* pCar, tU32 pTime, br_matrix34* pTrans, br_vector3* pPos, int pColour) {
     br_vector3 map_pos;
     int offset;
-    int* arrow_ptr;
+    int *arrow_ptr;
     int point_count;
     int colours[2];
     int x;
@@ -447,46 +516,62 @@ void DrawMapBlip(tCar_spec* pCar, tU32 pTime, br_matrix34* pTrans, br_vector3* p
     float bearing;
     float cos_factor;
     float sin_factor;
+    LOG_TRACE("(%p, %d, %p, %p, %d)", pCar, pTime, pTrans, pPos, pColour);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DrawMapSmallBlip(tU32 pTime@<EAX>, br_vector3 *pPos@<EDX>, int pColour@<EBX>)
 void DrawMapSmallBlip(tU32 pTime, br_vector3* pPos, int pColour) {
     br_vector3 map_pos;
     int offset;
     tU32 time_diff;
+    LOG_TRACE("(%d, %p, %d)", pTime, pPos, pColour);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall MungeClipPlane(br_vector3 *pLight@<EAX>, tCar_spec *pCar@<EDX>, br_vector3 *p1@<EBX>, br_vector3 *p2@<ECX>, br_scalar pY_offset)
 void MungeClipPlane(br_vector3* pLight, tCar_spec* pCar, br_vector3* p1, br_vector3* p2, br_scalar pY_offset) {
     br_vector3 v1;
     br_vector3 v2;
     br_vector3 v3;
     br_vector3 v4;
     br_scalar length;
-    br_actor* new_clip;
+    br_actor *new_clip;
+    LOG_TRACE("(%p, %p, %p, %p, %f)", pLight, pCar, p1, p2, pY_offset);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall TryThisEdge(tCar_spec *pCar@<EAX>, br_vector3 *pLight@<EDX>, int pIndex_1@<EBX>, br_scalar pSign_1, int pIndex_2, br_scalar pSign_2, int pPoint_index_1, int pPoint_index_2, br_scalar pY_offset)
 void TryThisEdge(tCar_spec* pCar, br_vector3* pLight, int pIndex_1, br_scalar pSign_1, int pIndex_2, br_scalar pSign_2, int pPoint_index_1, int pPoint_index_2, br_scalar pY_offset) {
     br_scalar dot_1;
     br_scalar dot_2;
     br_scalar mult;
+    LOG_TRACE("(%p, %p, %d, %f, %d, %f, %d, %d, %f)", pCar, pLight, pIndex_1, pSign_1, pIndex_2, pSign_2, pPoint_index_1, pPoint_index_2, pY_offset);
     NOT_IMPLEMENTED();
 }
 
+// IDA: br_scalar __usercall DistanceFromPlane@<ST0>(br_vector3 *pPos@<EAX>, br_scalar pA, br_scalar pB, br_scalar pC, br_scalar pD)
 br_scalar DistanceFromPlane(br_vector3* pPos, br_scalar pA, br_scalar pB, br_scalar pC, br_scalar pD) {
     br_vector3 normal;
+    LOG_TRACE("(%p, %f, %f, %f, %f)", pPos, pA, pB, pC, pD);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl DisableLights()
 void DisableLights() {
+    int i;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl EnableLights()
 void EnableLights() {
+    int i;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall ProcessShadow(tCar_spec *pCar@<EAX>, br_actor *pWorld@<EDX>, tTrack_spec *pTrack_spec@<EBX>, br_actor *pCamera@<ECX>, br_matrix34 *pCamera_to_world_transform, br_scalar pDistance_factor)
 void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, br_matrix34* pCamera_to_world_transform, br_scalar pDistance_factor) {
     int i;
     int j;
@@ -507,10 +592,10 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
     br_vector3 normal;
     br_vector3 the_normal;
     br_vector3 pos_cam_space;
-    br_vector3* v0;
-    br_vector3* v1;
-    br_vector3* v2;
-    br_vector4* clip_normal;
+    br_vector3 *v0;
+    br_vector3 *v1;
+    br_vector3 *v2;
+    br_vector4 *clip_normal;
     br_scalar bounds_x_min;
     br_scalar bounds_x_max;
     br_scalar bounds_y_min;
@@ -531,40 +616,48 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
     br_scalar ray_length;
     tBounds kev_bounds;
     tFace_ref the_list[100];
-    tFace_ref* face_ref;
-    tFace_ref* list_ptr;
-    br_renderbounds_cbfn* old_call_back;
-    br_camera* camera_ptr;
-    br_actor* oily_actor;
-    br_model* model;
-    br_material* material;
+    tFace_ref *face_ref;
+    tFace_ref *list_ptr;
+    br_renderbounds_cbfn *old_call_back;
+    br_camera *camera_ptr;
+    br_actor *oily_actor;
+    br_model *model;
+    br_material *material;
     br_vertex verts[48];
     br_face faces[16];
+    LOG_TRACE("(%p, %p, %p, %p, %p, %f)", pCar, pWorld, pTrack_spec, pCamera, pCamera_to_world_transform, pDistance_factor);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall RenderShadows(br_actor *pWorld@<EAX>, tTrack_spec *pTrack_spec@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world_transform@<ECX>)
 void RenderShadows(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, br_matrix34* pCamera_to_world_transform) {
     int i;
     int cat;
     int car_count;
-    tCar_spec* the_car;
+    tCar_spec *the_car;
     br_vector3 camera_to_car;
     br_scalar distance_factor;
+    LOG_TRACE("(%p, %p, %p, %p)", pWorld, pTrack_spec, pCamera, pCamera_to_world_transform);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall FlashyMapCheckpoint(int pIndex@<EAX>, tU32 pTime@<EDX>)
 void FlashyMapCheckpoint(int pIndex, tU32 pTime) {
-    tCheckpoint* cp;
+    tCheckpoint *cp;
     static tU32 last_flash;
     static int flash_state;
+    LOG_TRACE("(%d, %d)", pIndex, pTime);
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __usercall ConditionallyFillWithSky@<EAX>(br_pixelmap *pPixelmap@<EAX>)
 int ConditionallyFillWithSky(br_pixelmap* pPixelmap) {
     int bgnd_col;
+    LOG_TRACE("(%p)", pPixelmap);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall RenderAFrame(int pDepth_mask_on@<EAX>)
 void RenderAFrame(int pDepth_mask_on) {
     int cat;
     int i;
@@ -580,28 +673,34 @@ void RenderAFrame(int pDepth_mask_on) {
     int map_timer_x;
     int map_timer_width;
     int ped_type;
-    char* old_pixels;
+    char *old_pixels;
     br_matrix34 old_camera_matrix;
     br_matrix34 old_mirror_cam_matrix;
     tU32 the_time;
-    br_vector3* car_pos;
+    br_vector3 *car_pos;
     br_vector3 pos;
     char the_text[256];
-    tCar_spec* car;
+    tCar_spec *car;
+    LOG_TRACE("(%d)", pDepth_mask_on);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl InitPaletteAnimate()
 void InitPaletteAnimate() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl RevertPalette()
 void RevertPalette() {
     gPalette_munged = 0;
     gPalette_index = 0;
 }
 
+// IDA: void __cdecl MungePalette()
 void MungePalette() {
-    tU8* q;
+    tU8 *p;
+    tU8 *q;
     int i;
     float damage;
     float throb_start;
@@ -615,18 +714,24 @@ void MungePalette() {
     static float last_omega;
     static tU32 next_repair_time;
     static tU32 last_sound;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl ResetPalette()
 void ResetPalette() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall Darken(tU8 *pPtr@<EAX>, unsigned int pDarken_amount@<EDX>)
 void Darken(tU8* pPtr, unsigned int pDarken_amount) {
     unsigned int value;
+    LOG_TRACE("(%p, %d)", pPtr, pDarken_amount);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall SetFadedPalette(int pDegree@<EAX>)
 void SetFadedPalette(int pDegree) {
     int j;
     br_pixelmap* the_palette;
@@ -649,6 +754,7 @@ void SetFadedPalette(int pDegree) {
     gPalette_munged |= gScratch_palette != gRender_palette;
 }
 
+// IDA: void __cdecl FadePaletteDown()
 void FadePaletteDown() {
     int i;
     int start_time;
@@ -672,6 +778,7 @@ void FadePaletteDown() {
     }
 }
 
+// IDA: void __cdecl FadePaletteUp()
 void FadePaletteUp() {
     int i;
     int start_time;
@@ -692,6 +799,7 @@ void FadePaletteUp() {
     }
 }
 
+// IDA: void __cdecl KillSplashScreen()
 void KillSplashScreen() {
     if (gCurrent_splash) {
         BrMapRemove(gCurrent_splash);
@@ -702,21 +810,27 @@ void KillSplashScreen() {
     }
 }
 
+// IDA: void __cdecl EnsureRenderPalette()
 void EnsureRenderPalette() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall SplashScreenWith(char *pPixmap_name@<EAX>)
 void SplashScreenWith(char* pPixmap_name) {
-    br_pixelmap* the_map;
+    br_pixelmap *the_map;
+    LOG_TRACE("(\"%s\")", pPixmap_name);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl EnsurePaletteUp()
 void EnsurePaletteUp() {
     if (gFaded_palette) {
         FadePaletteUp();
     }
 }
 
+// IDA: br_uint_32 __cdecl AmbientificateMaterial(br_material *pMat, void *pArg)
 br_uint_32 AmbientificateMaterial(br_material* pMat, void* pArg) {
     float a;
     a = pMat->ka + *(br_scalar*)pArg;
@@ -731,17 +845,20 @@ br_uint_32 AmbientificateMaterial(br_material* pMat, void* pArg) {
     return 0;
 }
 
+// IDA: void __cdecl ChangeAmbience(br_scalar pDelta)
 void ChangeAmbience(br_scalar pDelta) {
     LOG_TRACE("(%f)", pDelta);
     BrMaterialEnum("*", AmbientificateMaterial, &pDelta);
 }
 
+// IDA: void __cdecl InitAmbience()
 void InitAmbience() {
     LOG_TRACE("()");
     gCurrent_ambience = gAmbient_adjustment;
     return ChangeAmbience(gAmbient_adjustment);
 }
 
+// IDA: void __usercall DRPixelmapRectangleMaskedCopy(br_pixelmap *pDest@<EAX>, br_int_16 pDest_x@<EDX>, br_int_16 pDest_y@<EBX>, br_pixelmap *pSource@<ECX>, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight)
 void DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap* pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight) {
     int y_count;
     int x_count;
@@ -749,16 +866,20 @@ void DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int
     int source_row_wrap;
     int x_delta;
     tU8 the_byte;
-    tU8* source_ptr;
-    tU8* dest_ptr;
-    tU8* conv_table;
+    tU8 *source_ptr;
+    tU8 *dest_ptr;
+    tU8 *conv_table;
+    LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DRMaskedStamp(br_int_16 pDest_x@<EAX>, br_int_16 pDest_y@<EDX>, br_pixelmap *pSource@<EBX>)
 void DRMaskedStamp(br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap* pSource) {
+    LOG_TRACE("(%d, %d, %p)", pDest_x, pDest_y, pSource);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DRPixelmapRectangleOnscreenCopy(br_pixelmap *pDest@<EAX>, br_int_16 pDest_x@<EDX>, br_int_16 pDest_y@<EBX>, br_pixelmap *pSource@<ECX>, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight)
 void DRPixelmapRectangleOnscreenCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap* pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight) {
     int y_count;
     int x_count;
@@ -790,6 +911,7 @@ void DRPixelmapRectangleOnscreenCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_i
     }
 }
 
+// IDA: void __usercall DRPixelmapRectangleShearedCopy(br_pixelmap *pDest@<EAX>, br_int_16 pDest_x@<EDX>, br_int_16 pDest_y@<EBX>, br_pixelmap *pSource@<ECX>, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight, tX1616 pShear)
 void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap* pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight, tX1616 pShear) {
     int y_count;
     int x_count;
@@ -800,13 +922,15 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
     int current_shear_x;
     int shear_x_difference;
     tU8 the_byte;
-    tU8* source_ptr;
-    tU8* dest_ptr;
-    tU8* conv_table;
+    tU8 *source_ptr;
+    tU8 *dest_ptr;
+    tU8 *conv_table;
     tX1616 current_shear;
+    LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d, %d)", pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight, pShear);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DRPixelmapRectangleVScaledCopy(br_pixelmap *pDest@<EAX>, br_int_16 pDest_x@<EDX>, br_int_16 pDest_y@<EBX>, br_pixelmap *pSource@<ECX>, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight)
 void DRPixelmapRectangleVScaledCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap* pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight) {
     int y_count;
     int x_count;
@@ -814,14 +938,16 @@ void DRPixelmapRectangleVScaledCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
     int source_row_wrap;
     int x_delta;
     tU8 the_byte;
-    tU8* source_ptr;
-    tU8* dest_ptr;
+    tU8 *source_ptr;
+    tU8 *dest_ptr;
     tU32 source_y;
     tU32 source_y_delta;
     tU32 old_source_y;
+    LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl InitTransientBitmaps()
 void InitTransientBitmaps() {
     int i;
     LOG_TRACE("()");
@@ -831,50 +957,67 @@ void InitTransientBitmaps() {
     }
 }
 
+// IDA: int __usercall AllocateTransientBitmap@<EAX>(int pWidth@<EAX>, int pHeight@<EDX>, int pUser_data@<EBX>)
 int AllocateTransientBitmap(int pWidth, int pHeight, int pUser_data) {
     int bm_index;
+    LOG_TRACE("(%d, %d, %d)", pWidth, pHeight, pUser_data);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DeallocateTransientBitmap(int pIndex@<EAX>)
 void DeallocateTransientBitmap(int pIndex) {
+    LOG_TRACE("(%d)", pIndex);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl DeallocateAllTransientBitmaps()
 void DeallocateAllTransientBitmaps() {
+    int i;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall RemoveTransientBitmaps(int pGraphically_remove_them@<EAX>)
 void RemoveTransientBitmaps(int pGraphically_remove_them) {
     int i;
     int order_number;
     SILENT_STUB();
 }
 
+// IDA: void __usercall SaveTransient(int pIndex@<EAX>, int pX_coord@<EDX>, int pY_coord@<EBX>)
 void SaveTransient(int pIndex, int pX_coord, int pY_coord) {
+    LOG_TRACE("(%d, %d, %d)", pIndex, pX_coord, pY_coord);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DrawCursorGiblet(tCursor_giblet *pGib@<EAX>)
 void DrawCursorGiblet(tCursor_giblet* pGib) {
-    br_pixelmap* the_image;
+    br_pixelmap *the_image;
+    LOG_TRACE("(%p)", pGib);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall ProcessCursorGiblets(int pPeriod@<EAX>)
 void ProcessCursorGiblets(int pPeriod) {
     int i;
     int kill_the_giblet;
     tU32 time_now;
-    tCursor_giblet* gib;
+    tCursor_giblet *gib;
+    LOG_TRACE("(%d)", pPeriod);
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __usercall NewCursorGiblet@<EAX>(int pX_coord@<EAX>, int pY_coord@<EDX>, float pX_speed, float pY_speed, tU32 pDrop_time)
 int NewCursorGiblet(int pX_coord, int pY_coord, float pX_speed, float pY_speed, tU32 pDrop_time) {
     int i;
     int the_width;
     int the_height;
     int sequence_number;
+    LOG_TRACE("(%d, %d, %f, %f, %d)", pX_coord, pY_coord, pX_speed, pY_speed, pDrop_time);
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __cdecl DoMouseCursor()
 int DoMouseCursor() {
     int y_coord;
     int mouse_moved;
@@ -896,20 +1039,26 @@ int DoMouseCursor() {
     SILENT_STUB();
 }
 
+// IDA: int __cdecl AllocateCursorTransient()
 int AllocateCursorTransient() {
+    int i;
     int largest_width;
     int largest_height;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl StartMouseCursor()
 void StartMouseCursor() {
     STUB();
 }
 
+// IDA: void __cdecl EndMouseCursor()
 void EndMouseCursor() {
     STUB();
 }
 
+// IDA: void __usercall LoadFont(int pFont_ID@<EAX>)
 void LoadFont(int pFont_ID) {
     tPath_name the_path;
     int i;
@@ -956,6 +1105,7 @@ void LoadFont(int pFont_ID) {
     }
 }
 
+// IDA: void __usercall DisposeFont(int pFont_ID@<EAX>)
 void DisposeFont(int pFont_ID) {
     LOG_TRACE("(%d)", pFont_ID);
     if (gFonts[pFont_ID].images && (!TranslationMode() || (gAusterity_mode && FlicsPlayedFromDisk()))) {
@@ -965,6 +1115,7 @@ void DisposeFont(int pFont_ID) {
     }
 }
 
+// IDA: void __cdecl InitDRFonts()
 void InitDRFonts() {
     int i;
     LOG_TRACE("()");
@@ -975,80 +1126,103 @@ void InitDRFonts() {
     }
 }
 
+// IDA: void __usercall DrawDropImage(br_pixelmap *pImage@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pTop_clip@<ECX>, int pBottom_clip, int pOffset)
 void DrawDropImage(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip, int pBottom_clip, int pOffset) {
     int y;
     int src_y;
     int src_height;
     int y_diff;
+    LOG_TRACE("(%p, %d, %d, %d, %d, %d)", pImage, pLeft, pTop, pTop_clip, pBottom_clip, pOffset);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DropInImageFromTop(br_pixelmap *pImage@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pTop_clip@<ECX>, int pBottom_clip)
 void DropInImageFromTop(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip, int pBottom_clip) {
     tS32 start_time;
     tS32 the_time;
     int drop_distance;
+    LOG_TRACE("(%p, %d, %d, %d, %d)", pImage, pLeft, pTop, pTop_clip, pBottom_clip);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DropOutImageThruBottom(br_pixelmap *pImage@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pTop_clip@<ECX>, int pBottom_clip)
 void DropOutImageThruBottom(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip, int pBottom_clip) {
     tS32 start_time;
     tS32 the_time;
     int drop_distance;
+    LOG_TRACE("(%p, %d, %d, %d, %d)", pImage, pLeft, pTop, pTop_clip, pBottom_clip);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DropInImageFromBottom(br_pixelmap *pImage@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pTop_clip@<ECX>, int pBottom_clip)
 void DropInImageFromBottom(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip, int pBottom_clip) {
     tS32 start_time;
     tS32 the_time;
     int drop_distance;
+    LOG_TRACE("(%p, %d, %d, %d, %d)", pImage, pLeft, pTop, pTop_clip, pBottom_clip);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DropOutImageThruTop(br_pixelmap *pImage@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pTop_clip@<ECX>, int pBottom_clip)
 void DropOutImageThruTop(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip, int pBottom_clip) {
     tS32 start_time;
     tS32 the_time;
     int drop_distance;
+    LOG_TRACE("(%p, %d, %d, %d, %d)", pImage, pLeft, pTop, pTop_clip, pBottom_clip);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DrawTellyLine(br_pixelmap *pImage@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pPercentage@<ECX>)
 void DrawTellyLine(br_pixelmap* pImage, int pLeft, int pTop, int pPercentage) {
     int the_width;
     int the_height;
+    LOG_TRACE("(%p, %d, %d, %d)", pImage, pLeft, pTop, pPercentage);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DrawTellyImage(br_pixelmap *pImage@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pPercentage@<ECX>)
 void DrawTellyImage(br_pixelmap* pImage, int pLeft, int pTop, int pPercentage) {
     int the_height;
+    LOG_TRACE("(%p, %d, %d, %d)", pImage, pLeft, pTop, pPercentage);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall TellyInImage(br_pixelmap *pImage@<EAX>, int pLeft@<EDX>, int pTop@<EBX>)
 void TellyInImage(br_pixelmap* pImage, int pLeft, int pTop) {
     tS32 start_time;
     tS32 the_time;
+    LOG_TRACE("(%p, %d, %d)", pImage, pLeft, pTop);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall TellyOutImage(br_pixelmap *pImage@<EAX>, int pLeft@<EDX>, int pTop@<EBX>)
 void TellyOutImage(br_pixelmap* pImage, int pLeft, int pTop) {
     tS32 start_time;
     tS32 the_time;
     int drop_distance;
+    LOG_TRACE("(%p, %d, %d)", pImage, pLeft, pTop);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall SetShadowLevel(tShadow_level pLevel@<EAX>)
 void SetShadowLevel(tShadow_level pLevel) {
     LOG_TRACE("(%d)", pLevel);
     gShadow_level = pLevel;
 }
 
+// IDA: tShadow_level __cdecl GetShadowLevel()
 tShadow_level GetShadowLevel() {
-    return gShadow_level;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl ToggleShadow()
 void ToggleShadow() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl InitShadow()
 void InitShadow() {
     int i;
     br_vector3 temp_v;
@@ -1081,26 +1255,38 @@ void InitShadow() {
     return BrActorAdd(gUniverse_actor, gShadow_actor);
 }
 
+// IDA: br_uint_32 __cdecl SaveShadeTable(br_pixelmap *pTable, void *pArg)
 br_uint_32 SaveShadeTable(br_pixelmap* pTable, void* pArg) {
+    LOG_TRACE("(%p, %p)", pTable, pArg);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl SaveShadeTables()
 void SaveShadeTables() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl DisposeSavedShadeTables()
 void DisposeSavedShadeTables() {
+    int i;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl ShadowMode()
 void ShadowMode() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __cdecl SwitchToRealResolution()
 int SwitchToRealResolution() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __cdecl SwitchToLoresMode()
 int SwitchToLoresMode() {
     LOG_TRACE("()");
     if (!gGraf_data_index || gGraf_data_index != gReal_graf_data_index) {
@@ -1112,11 +1298,12 @@ int SwitchToLoresMode() {
     return 1;
 }
 
+// IDA: void __usercall DRPixelmapDoubledCopy(br_pixelmap *pDestn@<EAX>, br_pixelmap *pSource@<EDX>, int pSource_width@<EBX>, int pSource_height@<ECX>, int pX_offset, int pY_offset)
 void DRPixelmapDoubledCopy(br_pixelmap* pDestn, br_pixelmap* pSource, int pSource_width, int pSource_height, int pX_offset, int pY_offset) {
-    tU16* sptr;
+    tU16 *sptr;
     tU16 pixels;
-    tU8* dptr;
-    tU8* dptr2;
+    tU8 *dptr;
+    tU8 *dptr2;
     tU8 pixel_1;
     tU8 pixel_2;
     int i;
@@ -1124,5 +1311,6 @@ void DRPixelmapDoubledCopy(br_pixelmap* pDestn, br_pixelmap* pSource, int pSourc
     int dst_row_skip;
     int src_row_skip;
     int width_over_2;
+    LOG_TRACE("(%p, %p, %d, %d, %d, %d)", pDestn, pSource, pSource_width, pSource_height, pX_offset, pY_offset);
     NOT_IMPLEMENTED();
 }

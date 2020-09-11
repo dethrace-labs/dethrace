@@ -4,6 +4,7 @@
 
 char rscid[49];
 
+// IDA: br_boolean __cdecl BrNamePatternMatch(char *p, char *s)
 br_boolean BrNamePatternMatch(char* p, char* s) {
     char* cp;
     LOG_TRACE9("(\"%s\", \"%s\")", p, s);

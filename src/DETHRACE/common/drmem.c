@@ -256,28 +256,38 @@ char* gMem_names[247] = {
 int gNon_fatal_allocation_errors = 0;
 br_allocator gAllocator = { "Death Race", DRStdlibAllocate, DRStdlibFree, DRStdlibInquire, Claim4ByteAlignment };
 
+// IDA: void __cdecl SetNonFatalAllocationErrors()
 void SetNonFatalAllocationErrors() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl ResetNonFatalAllocationErrors()
 void ResetNonFatalAllocationErrors() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __cdecl AllocationErrorsAreFatal()
 int AllocationErrorsAreFatal() {
     return gNon_fatal_allocation_errors == 0;
 }
 
+// IDA: void __cdecl MAMSInitMem()
 void MAMSInitMem() {
-    FILE* f;
+    int i;
+    FILE *f;
     tPath_name the_path;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall PrintMemoryDump(int pFlags@<EAX>, char *pTitle@<EDX>)
 void PrintMemoryDump(int pFlags, char* pTitle) {
     LOG_TRACE("(%d, \"%s\")", pFlags, pTitle);
 }
 
+// IDA: void* __cdecl DRStdlibAllocate(br_size_t size, br_uint_8 type)
 void* DRStdlibAllocate(br_size_t size, br_uint_8 type) {
     void* p;
     int i;
@@ -294,32 +304,40 @@ void* DRStdlibAllocate(br_size_t size, br_uint_8 type) {
     return p;
 }
 
+// IDA: void __cdecl DRStdlibFree(void *mem)
 void DRStdlibFree(void* mem) {
     int i;
     free(mem);
 }
 
+// IDA: br_size_t __cdecl DRStdlibInquire(br_uint_8 type)
 br_size_t DRStdlibInquire(br_uint_8 type) {
     return 0;
 }
 
+// IDA: br_uint_32 __cdecl Claim4ByteAlignment(br_uint_8 type)
 br_uint_32 Claim4ByteAlignment(br_uint_8 type) {
     return 4;
 }
 
+// IDA: void __cdecl InstallDRMemCalls()
 void InstallDRMemCalls() {
     BrAllocatorSet(&gAllocator);
 }
 
+// IDA: void __usercall MAMSUnlock(void **pPtr@<EAX>)
 void MAMSUnlock(void** pPtr) {
     free(*pPtr);
     *pPtr = NULL;
 }
 
+// IDA: void __usercall MAMSLock(void **pPtr@<EAX>)
 void MAMSLock(void** pPtr) {
+    LOG_TRACE("(%p)", pPtr);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl CreateStainlessClasses()
 void CreateStainlessClasses() {
     int i;
 
@@ -331,6 +349,8 @@ void CreateStainlessClasses() {
     }
 }
 
+// IDA: void __cdecl CheckMemory()
 void CheckMemory() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

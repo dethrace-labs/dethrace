@@ -458,80 +458,110 @@ tFlic_bunch gFlic_bunch[9] = {
     { 16, gFlic_bunch8 }
 };
 
+// IDA: void __cdecl EnableTranslationText()
 void EnableTranslationText() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl DisableTranslationText()
 void DisableTranslationText() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall SetFlicSound(int pSound_ID@<EAX>, tU32 pSound_time@<EDX>)
 void SetFlicSound(int pSound_ID, tU32 pSound_time) {
+    LOG_TRACE("(%d, %d)", pSound_ID, pSound_time);
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __cdecl TranslationMode()
 int TranslationMode() {
     return 0;
 }
 
+// IDA: void __cdecl DontLetFlicFuckWithPalettes()
 void DontLetFlicFuckWithPalettes() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl LetFlicFuckWithPalettes()
 void LetFlicFuckWithPalettes() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl PlayFlicsInDarkness()
 void PlayFlicsInDarkness() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl ReilluminateFlics()
 void ReilluminateFlics() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl TurnFlicTransparencyOn()
 void TurnFlicTransparencyOn() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl TurnFlicTransparencyOff()
 void TurnFlicTransparencyOff() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl PlayFlicsFromDisk()
 void PlayFlicsFromDisk() {
     gPlay_from_disk = 1;
 }
 
+// IDA: void __cdecl PlayFlicsFromMemory()
 void PlayFlicsFromMemory() {
     gPlay_from_disk = 0;
 }
 
+// IDA: int __cdecl FlicsPlayedFromDisk()
 int FlicsPlayedFromDisk() {
     return gPlay_from_disk;
 }
 
+// IDA: void __cdecl TurnOffPanelFlics()
 void TurnOffPanelFlics() {
     gPanel_flic_disable = 1;
 }
 
+// IDA: void __cdecl TurnOnPanelFlics()
 void TurnOnPanelFlics() {
     gPanel_flic_disable = 0;
 }
 
+// IDA: int __usercall GetPanelFlicFrameIndex@<EAX>(int pIndex@<EAX>)
 int GetPanelFlicFrameIndex(int pIndex) {
+    LOG_TRACE("(%d)", pIndex);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl FlicPaletteAllocate()
 void FlicPaletteAllocate() {
     LOG_TRACE("()");
     gPalette_pixels = BrMemAllocate(0x400u, kMem_flic_pal);
     gPalette = DRPixelmapAllocate(BR_PMT_RGBX_888, 1, 256, gPalette_pixels, 0);
 }
 
+// IDA: void __usercall AssertFlicPixelmap(tFlic_descriptor_ptr pFlic_info@<EAX>, br_pixelmap *pDest_pixelmap@<EDX>)
 void AssertFlicPixelmap(tFlic_descriptor_ptr pFlic_info, br_pixelmap* pDest_pixelmap) {
+    LOG_TRACE("(%d, %p)", pFlic_info, pDest_pixelmap);
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __usercall StartFlic@<EAX>(char *pFile_name@<EAX>, int pIndex@<EDX>, tFlic_descriptor_ptr pFlic_info@<EBX>, tU32 pSize@<ECX>, tS8 *pData_ptr, br_pixelmap *pDest_pixelmap, int pX_offset, int pY_offset, int pFrame_rate)
 int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap, int pX_offset, int pY_offset, int pFrame_rate) {
     tU16 claimed_speed;
     tU16 magic_number;
@@ -621,14 +651,19 @@ int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU3
     return 0;
 }
 
+// IDA: void __cdecl FreeFlicPaletteAllocate()
 void FreeFlicPaletteAllocate() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __usercall EndFlic@<EAX>(tFlic_descriptor_ptr pFlic_info@<EAX>)
 int EndFlic(tFlic_descriptor_ptr pFlic_info) {
+    LOG_TRACE("(%d)", pFlic_info);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DoColourMap(tFlic_descriptor_ptr pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
 void DoColourMap(tFlic_descriptor_ptr pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -669,6 +704,7 @@ void DoColourMap(tFlic_descriptor_ptr pFlic_info, tU32 chunk_length) {
     }
 }
 
+// IDA: void __usercall DoDifferenceX(tFlic_descriptor *pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
 void DoDifferenceX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -678,13 +714,15 @@ void DoDifferenceX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int number_of_packets;
     int skip_count;
     int size_count;
-    tU8* pixel_ptr;
-    tU8* line_pixel_ptr;
+    tU8 *pixel_ptr;
+    tU8 *line_pixel_ptr;
     tU8 the_byte;
     tU32 the_row_bytes;
+    LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DoDifferenceTrans(tFlic_descriptor *pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
 void DoDifferenceTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -694,13 +732,15 @@ void DoDifferenceTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int number_of_packets;
     int skip_count;
     int size_count;
-    tU8* pixel_ptr;
-    tU8* line_pixel_ptr;
+    tU8 *pixel_ptr;
+    tU8 *line_pixel_ptr;
     tU8 the_byte;
     tU32 the_row_bytes;
+    LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DoColour256(tFlic_descriptor *pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
 void DoColour256(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -742,6 +782,7 @@ void DoColour256(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     }
 }
 
+// IDA: void __usercall DoDeltaTrans(tFlic_descriptor *pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
 void DoDeltaTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -802,6 +843,7 @@ void DoDeltaTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     }
 }
 
+// IDA: void __usercall DoDeltaX(tFlic_descriptor *pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
 void DoDeltaX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -853,17 +895,19 @@ void DoDeltaX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     }
 }
 
+// IDA: void __usercall DoBlack(tFlic_descriptor *pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
 void DoBlack(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
     int the_width;
-    tU8* pixel_ptr;
+    tU8 *pixel_ptr;
     tU32 the_row_bytes;
-    tU32* line_pixel_ptr;
+    tU32 *line_pixel_ptr;
     LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DoRunLengthX(tFlic_descriptor *pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
 void DoRunLengthX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -902,6 +946,7 @@ void DoRunLengthX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     }
 }
 
+// IDA: void __usercall DoRunLengthTrans(tFlic_descriptor *pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
 void DoRunLengthTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -945,42 +990,49 @@ void DoRunLengthTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     }
 }
 
+// IDA: void __usercall DoUncompressed(tFlic_descriptor *pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
 void DoUncompressed(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
     int the_width;
-    tU8* pixel_ptr;
+    tU8 *pixel_ptr;
     tU32 the_row_bytes;
-    tU32* line_pixel_ptr;
+    tU32 *line_pixel_ptr;
     LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DoUncompressedTrans(tFlic_descriptor *pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
 void DoUncompressedTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
     int the_width;
-    tU8* pixel_ptr;
-    tU8* line_pixel_ptr;
+    tU8 *pixel_ptr;
+    tU8 *line_pixel_ptr;
     tU8 the_byte;
     tU32 the_row_bytes;
     LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DoMini(tFlic_descriptor *pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
 void DoMini(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
+    LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DrawTranslations(tFlic_descriptor *pFlic_info@<EAX>, int pLast_frame@<EDX>)
 void DrawTranslations(tFlic_descriptor* pFlic_info, int pLast_frame) {
-    tTranslation_record* trans;
+    tTranslation_record *trans;
     int i;
     int x;
     int width;
     int right_edge;
+    LOG_TRACE("(%p, %d)", pFlic_info, pLast_frame);
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __usercall PlayNextFlicFrame2@<EAX>(tFlic_descriptor *pFlic_info@<EAX>, int pPanel_flic@<EDX>)
 int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
     tU32 frame_length;
     tU32 chunk_length;
@@ -1083,10 +1135,13 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
     return pFlic_info->frames_left == 0;
 }
 
+// IDA: int __usercall PlayNextFlicFrame@<EAX>(tFlic_descriptor *pFlic_info@<EAX>)
 int PlayNextFlicFrame(tFlic_descriptor* pFlic_info) {
+    LOG_TRACE("(%p)", pFlic_info);
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __usercall PlayFlic@<EAX>(int pIndex@<EAX>, tU32 pSize@<EDX>, tS8 *pData_ptr@<EBX>, br_pixelmap *pDest_pixelmap@<ECX>, int pX_offset, int pY_offset, void (*DoPerFrame)(), int pInterruptable, int pFrame_rate)
 int PlayFlic(int pIndex, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap, int pX_offset, int pY_offset, void (*DoPerFrame)(), int pInterruptable, int pFrame_rate) {
     int finished_playing;
     tFlic_descriptor the_flic;
@@ -1132,10 +1187,12 @@ int PlayFlic(int pIndex, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap
     return 0;
 }
 
+// IDA: void __cdecl SwapScreen()
 void SwapScreen() {
     PDScreenBufferSwap(0);
 }
 
+// IDA: void __usercall ShowFlic(int pIndex@<EAX>)
 void ShowFlic(int pIndex) {
     do {
         PlayFlic(
@@ -1152,6 +1209,7 @@ void ShowFlic(int pIndex) {
     gLast_flic_name[0] = 0; // byte_10344C;
 }
 
+// IDA: void __cdecl InitFlics()
 void InitFlics() {
     int i;
     LOG_TRACE("()");
@@ -1160,6 +1218,7 @@ void InitFlics() {
     }
 }
 
+// IDA: int __usercall LoadFlic@<EAX>(int pIndex@<EAX>)
 int LoadFlic(int pIndex) {
     tPath_name the_path;
     FILE* f;
@@ -1201,6 +1260,7 @@ int LoadFlic(int pIndex) {
     }
 }
 
+// IDA: void __usercall UnlockFlic(int pIndex@<EAX>)
 void UnlockFlic(int pIndex) {
     if (pIndex >= 0) {
         if (gMain_flic_list[pIndex].data_ptr) {
@@ -1209,24 +1269,33 @@ void UnlockFlic(int pIndex) {
     }
 }
 
+// IDA: int __usercall LoadFlicData@<EAX>(char *pName@<EAX>, tU8 **pData@<EDX>, tU32 *pData_length@<EBX>)
 int LoadFlicData(char* pName, tU8** pData, tU32* pData_length) {
-    FILE* f;
+    FILE *f;
     tPath_name the_path;
+    LOG_TRACE("(\"%s\", %p, %p)", pName, pData, pData_length);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall FreeFlic(int pIndex@<EAX>)
 void FreeFlic(int pIndex) {
+    LOG_TRACE("(%d)", pIndex);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall ForceRunFlic(int pIndex@<EAX>)
 void ForceRunFlic(int pIndex) {
+    LOG_TRACE("(%d)", pIndex);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall RunFlicAt(int pIndex@<EAX>, int pX@<EDX>, int pY@<EBX>)
 void RunFlicAt(int pIndex, int pX, int pY) {
+    LOG_TRACE("(%d, %d, %d)", pIndex, pX, pY);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall RunFlic(int pIndex@<EAX>)
 void RunFlic(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
@@ -1250,6 +1319,7 @@ void RunFlic(int pIndex) {
     }
 }
 
+// IDA: void __usercall PreloadBunchOfFlics(int pBunch_index@<EAX>)
 void PreloadBunchOfFlics(int pBunch_index) {
     int i;
     LOG_TRACE("(%d)", pBunch_index);
@@ -1259,6 +1329,7 @@ void PreloadBunchOfFlics(int pBunch_index) {
     }
 }
 
+// IDA: void __usercall UnlockBunchOfFlics(int pBunch_index@<EAX>)
 void UnlockBunchOfFlics(int pBunch_index) {
     int i;
     for (i = 0; i < gFlic_bunch[pBunch_index].count; i++) {
@@ -1270,19 +1341,26 @@ void UnlockBunchOfFlics(int pBunch_index) {
     }
 }
 
+// IDA: void __usercall FlushAllFlics(int pBunch_index@<EAX>)
 void FlushAllFlics(int pBunch_index) {
     int i;
+    LOG_TRACE("(%d)", pBunch_index);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl InitFlicQueue()
 void InitFlicQueue() {
     gFirst_flic = NULL;
 }
 
+// IDA: int __cdecl FlicQueueFinished()
 int FlicQueueFinished() {
+    tFlic_descriptor *the_flic;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall ProcessFlicQueue(tU32 pInterval@<EAX>)
 void ProcessFlicQueue(tU32 pInterval) {
     tFlic_descriptor* the_flic;
     tFlic_descriptor* last_flic;
@@ -1329,6 +1407,7 @@ void ProcessFlicQueue(tU32 pInterval) {
     gTransparency_on = 0;
 }
 
+// IDA: void __cdecl FlushFlicQueue()
 void FlushFlicQueue() {
     tFlic_descriptor* the_flic;
     tFlic_descriptor* old_flic;
@@ -1373,6 +1452,7 @@ void FlushFlicQueue() {
     gFirst_flic = NULL;
 }
 
+// IDA: void __usercall AddToFlicQueue(int pIndex@<EAX>, int pX@<EDX>, int pY@<EBX>, int pMust_finish@<ECX>)
 void AddToFlicQueue(int pIndex, int pX, int pY, int pMust_finish) {
     tFlic_descriptor* the_flic = NULL;
     tFlic_descriptor* new_flic = NULL;
@@ -1437,15 +1517,20 @@ void AddToFlicQueue(int pIndex, int pX, int pY, int pMust_finish) {
         20);
 }
 
+// IDA: void __usercall InitialiseFlicPanel(int pIndex@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pWidth@<ECX>, int pHeight)
 void InitialiseFlicPanel(int pIndex, int pLeft, int pTop, int pWidth, int pHeight) {
-    void* the_pixels;
+    void *the_pixels;
+    LOG_TRACE("(%d, %d, %d, %d, %d)", pIndex, pLeft, pTop, pWidth, pHeight);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DisposeFlicPanel(int pIndex@<EAX>)
 void DisposeFlicPanel(int pIndex) {
+    LOG_TRACE("(%d)", pIndex);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall ServicePanelFlics(int pCopy_to_buffer@<EAX>)
 void ServicePanelFlics(int pCopy_to_buffer) {
     tU32 time_diff;
     tU32 the_time;
@@ -1512,14 +1597,19 @@ void ServicePanelFlics(int pCopy_to_buffer) {
     gPalette_fuck_prevention = 0;
 }
 
+// IDA: void __usercall ChangePanelFlic(int pIndex@<EAX>, tU8 *pData@<EDX>, tU32 pData_length@<EBX>)
 void ChangePanelFlic(int pIndex, tU8* pData, tU32 pData_length) {
+    LOG_TRACE("(%d, %p, %d)", pIndex, pData, pData_length);
     NOT_IMPLEMENTED();
 }
 
+// IDA: br_pixelmap* __usercall GetPanelPixelmap@<EAX>(int pIndex@<EAX>)
 br_pixelmap* GetPanelPixelmap(int pIndex) {
+    LOG_TRACE("(%d)", pIndex);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl LoadInterfaceStrings()
 void LoadInterfaceStrings() {
     char s[256];
     char s2[256];
@@ -1534,14 +1624,20 @@ void LoadInterfaceStrings() {
     STUB();
 }
 
+// IDA: void __cdecl FlushInterfaceFonts()
 void FlushInterfaceFonts() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl SuspendPendingFlic()
 void SuspendPendingFlic() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl ResumePendingFlic()
 void ResumePendingFlic() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

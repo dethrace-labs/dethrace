@@ -71,6 +71,7 @@ char rscid[53];
 
 #define NBR_DEV_SLOTS 16
 
+// IDA: br_error __cdecl BrFwBegin()
 br_error BrFwBegin() {
     int i;
 
@@ -105,15 +106,20 @@ br_error BrFwBegin() {
     return 0;
 }
 
+// IDA: br_error __cdecl BrFwEnd()
 br_error BrFwEnd() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: br_diaghandler* __cdecl BrDiagHandlerSet(br_diaghandler *newdh)
 br_diaghandler* BrDiagHandlerSet(br_diaghandler* newdh) {
-    br_diaghandler* old;
+    br_diaghandler *old;
+    LOG_TRACE("(%p)", newdh);
     NOT_IMPLEMENTED();
 }
 
+// IDA: br_filesystem* __cdecl BrFilesystemSet(br_filesystem *newfs)
 br_filesystem* BrFilesystemSet(br_filesystem* newfs) {
     br_filesystem* old;
 
@@ -125,6 +131,7 @@ br_filesystem* BrFilesystemSet(br_filesystem* newfs) {
     return old;
 }
 
+// IDA: br_allocator* __cdecl BrAllocatorSet(br_allocator *newal)
 br_allocator* BrAllocatorSet(br_allocator* newal) {
     br_allocator* old;
     LOG_TRACE("(%p)", newal);

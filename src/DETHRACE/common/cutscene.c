@@ -14,17 +14,23 @@
 
 tS32 gLast_demo_end_anim;
 
+// IDA: void __usercall ShowCutScene(int pIndex@<EAX>, int pWait_end@<EDX>, int pSound_ID@<EBX>, br_scalar pDelay)
 void ShowCutScene(int pIndex, int pWait_end, int pSound_ID, br_scalar pDelay) {
+    LOG_TRACE("(%d, %d, %d, %f)", pIndex, pWait_end, pSound_ID, pDelay);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl DoSCILogo()
 void DoSCILogo() {
 }
 
+// IDA: void __cdecl DoStainlessLogo()
 void DoStainlessLogo() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall PlaySmackerFile(char *pSmack_name@<EAX>)
 void PlaySmackerFile(char* pSmack_name) {
     tPath_name the_path;
     br_colour* br_colours_ptr;
@@ -118,6 +124,7 @@ void PlaySmackerFile(char* pSmack_name) {
     }
 }
 
+// IDA: void __cdecl DoOpeningAnimation()
 void DoOpeningAnimation() {
     LOG_TRACE("()");
     PlaySmackerFile("LOGO.SMK");
@@ -125,27 +132,40 @@ void DoOpeningAnimation() {
     return WaitForNoKeys();
 }
 
+// IDA: void __cdecl DoNewGameAnimation()
 void DoNewGameAnimation() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl DoGoToRaceAnimation()
 void DoGoToRaceAnimation() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl DoEndRaceAnimation()
 void DoEndRaceAnimation() {
+    int made_a_profit;
     int went_up_a_rank;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl DoGameOverAnimation()
 void DoGameOverAnimation() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl DoGameCompletedAnimation()
 void DoGameCompletedAnimation() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl StartLoadingScreen()
 void StartLoadingScreen() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

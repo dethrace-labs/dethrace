@@ -132,6 +132,7 @@ int gPixel_buffer_size;
 int gMouse_was_started__;
 char* gPixels_copy;
 
+// IDA: void __cdecl FatalError(int pStr_index, ...)
 void FatalError(int pStr_index, ...) {
     char the_str[1024];
     char* sub_str;
@@ -163,20 +164,26 @@ void FatalError(int pStr_index, ...) {
     PDFatalError(temp_str);
 }
 
+// IDA: void __cdecl NonFatalError(int pStr_index, ...)
 void NonFatalError(int pStr_index, ...) {
     char the_str[256];
-    char* sub_str;
+    char *sub_str;
     char temp_str[256];
-    char* sub_pt;
+    char *sub_pt;
     va_list ap;
+    LOG_TRACE("(%d)", pStr_index);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl CloseDiagnostics()
 void CloseDiagnostics() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl OpenDiagnostics()
 void OpenDiagnostics() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
@@ -189,6 +196,8 @@ void dr_dprintf(char* fmt_string, ...) {
     printf("\n");
 }
 
+// IDA: int __usercall DoErrorInterface@<EAX>(int pMisc_text_index@<EAX>)
 int DoErrorInterface(int pMisc_text_index) {
+    LOG_TRACE("(%d)", pMisc_text_index);
     NOT_IMPLEMENTED();
 }

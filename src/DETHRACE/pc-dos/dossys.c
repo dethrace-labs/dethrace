@@ -57,21 +57,27 @@ const double NANOSECONDS_TO_MILLISECONDS = 1.0 / 1000000.0;
 int _unittest_do_not_exit = 0;
 char* _unittest_last_fatal_error;
 
+// IDA: void __cdecl KeyboardHandler()
 void KeyboardHandler() {
     tU8 scan_code;
     tU8 up;
     static tU8 extended;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __usercall KeyDown@<EAX>(tU8 pScan_code@<EAX>)
 int KeyDown(tU8 pScan_code) {
     return Harness_Hook_KeyDown(pScan_code);
 }
 
+// IDA: void __usercall KeyTranslation(tU8 pKey_index@<EAX>, tU8 pScan_code_1@<EDX>, tU8 pScan_code_2@<EBX>)
 void KeyTranslation(tU8 pKey_index, tU8 pScan_code_1, tU8 pScan_code_2) {
+    LOG_TRACE("(%d, %d, %d)", pKey_index, pScan_code_1, pScan_code_2);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl KeyBegin()
 void KeyBegin() {
 
     Harness_Hook_KeyBegin();
@@ -193,14 +199,19 @@ void KeyBegin() {
     //dos_setvect(9, KeyboardHandler);
 }
 
+// IDA: void __cdecl KeyEnd()
 void KeyEnd() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __usercall KeyDown22@<EAX>(int pKey_index@<EAX>)
 int KeyDown22(int pKey_index) {
+    LOG_TRACE("(%d)", pKey_index);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall PDSetKeyArray(int *pKeys@<EAX>, int pMark@<EDX>)
 void PDSetKeyArray(int* pKeys, int pMark) {
     int i;
     tS32 joyX;
@@ -218,10 +229,13 @@ void PDSetKeyArray(int* pKeys, int pMark) {
     }
 }
 
+// IDA: int __usercall PDGetASCIIFromKey@<EAX>(int pKey@<EAX>)
 int PDGetASCIIFromKey(int pKey) {
+    LOG_TRACE("(%d)", pKey);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall PDFatalError(char *pThe_str@<EAX>)
 void PDFatalError(char* pThe_str) {
     static int been_here = 0;
     LOG_TRACE("(\"%s\")", pThe_str);
@@ -244,10 +258,13 @@ void PDFatalError(char* pThe_str) {
     }
 }
 
+// IDA: void __usercall PDNonFatalError(char *pThe_str@<EAX>)
 void PDNonFatalError(char* pThe_str) {
+    LOG_TRACE("(\"%s\")", pThe_str);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl PDInitialiseSystem()
 void PDInitialiseSystem() {
     tPath_name the_path;
     FILE* f;
@@ -272,35 +289,48 @@ void PDInitialiseSystem() {
     fclose(f);
 }
 
+// IDA: void __cdecl PDShutdownSystem()
 void PDShutdownSystem() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl PDSaveOriginalPalette()
 void PDSaveOriginalPalette() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl PDRevertPalette()
 void PDRevertPalette() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __usercall PDInitScreenVars@<EAX>(int pArgc@<EAX>, char **pArgv@<EDX>)
 int PDInitScreenVars(int pArgc, char** pArgv) {
     gGraf_specs[gGraf_spec_index].phys_width = gGraf_specs[gGraf_spec_index].total_width;
     gGraf_specs[gGraf_spec_index].phys_height = gGraf_specs[gGraf_spec_index].total_height;
     return 1;
 }
 
+// IDA: void __cdecl PDInitScreen()
 void PDInitScreen() {
 }
 
+// IDA: void __cdecl PDLockRealBackScreen()
 void PDLockRealBackScreen() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl PDUnlockRealBackScreen()
 void PDUnlockRealBackScreen() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl PDAllocateScreenAndBack()
 void PDAllocateScreenAndBack() {
     gScreen = DOSGfxBegin(gGraf_specs[gGraf_spec_index].gfx_init_string);
     gScreen->origin_x = 0;
@@ -314,50 +344,63 @@ void PDAllocateScreenAndBack() {
     gTemp_screen->origin_y = 0;
 }
 
+// IDA: void __usercall Copy8BitTo16BitPixelmap(br_pixelmap *pDst@<EAX>, br_pixelmap *pSrc@<EDX>, br_pixelmap *pPalette@<EBX>)
 void Copy8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette) {
     int x;
     int y;
-    tU8* src;
+    tU8 *src;
     tU8 value;
     tU8 red;
     tU8 green;
     tU8 blue;
-    tU16* dst;
-    tU16* palette_entry;
+    tU16 *dst;
+    tU16 *palette_entry;
+    LOG_TRACE("(%p, %p, %p)", pDst, pSrc, pPalette);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall Double8BitTo16BitPixelmap(br_pixelmap *pDst@<EAX>, br_pixelmap *pSrc@<EDX>, br_pixelmap *pPalette@<EBX>, tU16 pOff@<ECX>, tU16 pSrc_width, tU16 pSrc_height)
 void Double8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette, tU16 pOff, tU16 pSrc_width, tU16 pSrc_height) {
     int x;
     int y;
-    tU8* src;
+    tU8 *src;
     tU8 value;
     tU8 red;
     tU8 green;
     tU8 blue;
-    tU16* dst0;
-    tU16* dst1;
+    tU16 *dst0;
+    tU16 *dst1;
     tU16 sixteen;
-    tU16* palette_entry;
+    tU16 *palette_entry;
+    LOG_TRACE("(%p, %p, %p, %d, %d, %d)", pDst, pSrc, pPalette, pOff, pSrc_width, pSrc_height);
     NOT_IMPLEMENTED();
 }
 
+// IDA: br_pixelmap* __cdecl PDInterfacePixelmap()
 br_pixelmap* PDInterfacePixelmap() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl SwapBackScreen()
 void SwapBackScreen() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall ReallyCopyBackScreen(int pRendering_area_only@<EAX>, int pClear_top_and_bottom@<EDX>)
 void ReallyCopyBackScreen(int pRendering_area_only, int pClear_top_and_bottom) {
+    LOG_TRACE("(%d, %d)", pRendering_area_only, pClear_top_and_bottom);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall CopyBackScreen(int pRendering_area_only@<EAX>)
 void CopyBackScreen(int pRendering_area_only) {
+    LOG_TRACE("(%d)", pRendering_area_only);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall PDScreenBufferSwap(int pRendering_area_only@<EAX>)
 void PDScreenBufferSwap(int pRendering_area_only) {
     LOG_TRACE10("(%d)", pRendering_area_only);
     if (pRendering_area_only) {
@@ -372,22 +415,31 @@ void PDScreenBufferSwap(int pRendering_area_only) {
     }
 }
 
+// IDA: void __usercall PDPixelmapToScreenRectangleCopy(br_pixelmap *dst@<EAX>, br_int_16 dx@<EDX>, br_int_16 dy@<EBX>, br_pixelmap *src@<ECX>, br_int_16 sx, br_int_16 sy, br_uint_16 w, br_uint_16 h)
 void PDPixelmapToScreenRectangleCopy(br_pixelmap* dst, br_int_16 dx, br_int_16 dy, br_pixelmap* src, br_int_16 sx, br_int_16 sy, br_uint_16 w, br_uint_16 h) {
+    LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d)", dst, dx, dy, src, sx, sy, w, h);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall PDPixelmapHLineOnScreen(br_pixelmap *dst@<EAX>, br_int_16 x1@<EDX>, br_int_16 y1@<EBX>, br_int_16 x2@<ECX>, br_int_16 y2, br_uint_32 colour)
 void PDPixelmapHLineOnScreen(br_pixelmap* dst, br_int_16 x1, br_int_16 y1, br_int_16 x2, br_int_16 y2, br_uint_32 colour) {
+    LOG_TRACE("(%p, %d, %d, %d, %d, %d)", dst, x1, y1, x2, y2, colour);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall PDPixelmapVLineOnScreen(br_pixelmap *dst@<EAX>, br_int_16 x1@<EDX>, br_int_16 y1@<EBX>, br_int_16 x2@<ECX>, br_int_16 y2, br_uint_32 colour)
 void PDPixelmapVLineOnScreen(br_pixelmap* dst, br_int_16 x1, br_int_16 y1, br_int_16 x2, br_int_16 y2, br_uint_32 colour) {
+    LOG_TRACE("(%p, %d, %d, %d, %d, %d)", dst, x1, y1, x2, y2, colour);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl PDInstallErrorHandlers()
 void PDInstallErrorHandlers() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl PDSetFileVariables()
 void PDSetFileVariables() {
     gDir_separator[0] = '\\';
 
@@ -397,6 +449,7 @@ void PDSetFileVariables() {
     // <<
 }
 
+// IDA: void __usercall PDBuildAppPath(char *pThe_path@<EAX>)
 void PDBuildAppPath(char* pThe_path) {
     int pos;
 
@@ -406,6 +459,7 @@ void PDBuildAppPath(char* pThe_path) {
     strcat(gNetwork_profile_fname, "NETWORK.INI");
 }
 
+// IDA: void __usercall PDForEveryFile(char *pThe_path@<EAX>, void (*pAction_routine)(char*)@<EDX>)
 void PDForEveryFile(char* pThe_path, void (*pAction_routine)(char*)) {
     char find_path[256];
     char found_path[256];
@@ -426,10 +480,12 @@ void PDForEveryFile(char* pThe_path, void (*pAction_routine)(char*)) {
     }
 }
 
+// IDA: void __usercall PDSetPalette(br_pixelmap *pThe_palette@<EAX>)
 void PDSetPalette(br_pixelmap* pThe_palette) {
     BrDevPaletteSetOld(pThe_palette);
 }
 
+// IDA: void __usercall PDSetPaletteEntries(br_pixelmap *pPalette@<EAX>, int pFirst_colour@<EDX>, int pCount@<EBX>)
 void PDSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
     int i;
     tU8* p;
@@ -440,21 +496,28 @@ void PDSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
     }
 }
 
+// IDA: void __cdecl PDSwitchToRealResolution()
 void PDSwitchToRealResolution() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl PDSwitchToLoresMode()
 void PDSwitchToLoresMode() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall PDMouseButtons(int *pButton_1@<EAX>, int *pButton_2@<EDX>)
 void PDMouseButtons(int* pButton_1, int* pButton_2) {
     br_uint_32 mouse_buttons;
     br_int_32 mouse_x;
     br_int_32 mouse_y;
+    LOG_TRACE("(%p, %p)", pButton_1, pButton_2);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall PDGetMousePosition(int *pX_coord@<EAX>, int *pY_coord@<EDX>)
 void PDGetMousePosition(int* pX_coord, int* pY_coord) {
     br_uint_32 mouse_buttons;
     br_int_32 mouse_x2;
@@ -463,19 +526,23 @@ void PDGetMousePosition(int* pX_coord, int* pY_coord) {
     int delta_y;
     static br_int_32 mouse_x;
     static br_int_32 mouse_y;
+    LOG_TRACE("(%p, %p)", pX_coord, pY_coord);
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __cdecl PDGetTotalTime()
 int PDGetTotalTime() {
     struct timespec spec;
     clock_gettime(CLOCK_MONOTONIC, &spec);
     return spec.tv_sec * 1000 + spec.tv_nsec / 1000000;
 }
 
+// IDA: int __usercall PDServiceSystem@<EAX>(tU32 pTime_since_last_call@<EAX>)
 int PDServiceSystem(tU32 pTime_since_last_call) {
     return 0;
 }
 
+// IDA: tU32 __cdecl LargestBlockAvail()
 tU32 LargestBlockAvail() {
     SREGS sregs;
     tMem_info mem_info;
@@ -486,21 +553,28 @@ tU32 LargestBlockAvail() {
     // <<
 }
 
+// IDA: void* __usercall PDGrabLargestMammaryWeCanPlayWith@<EAX>(tU32 pMaximum_required@<EAX>, tU32 *pAmount_allocated@<EDX>)
 void* PDGrabLargestMammaryWeCanPlayWith(tU32 pMaximum_required, tU32* pAmount_allocated) {
-    void* result;
+    void *result;
+    LOG_TRACE("(%d, %p)", pMaximum_required, pAmount_allocated);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall PDAllocateActionReplayBuffer(char **pBuffer@<EAX>, tU32 *pBuffer_size@<EDX>)
 void PDAllocateActionReplayBuffer(char** pBuffer, tU32* pBuffer_size) {
     tU32 lba;
     tU32 required;
+    LOG_TRACE("(%p, %p)", pBuffer, pBuffer_size);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall PDDisposeActionReplayBuffer(char *pBuffer@<EAX>)
 void PDDisposeActionReplayBuffer(char* pBuffer) {
+    LOG_TRACE("(\"%s\")", pBuffer);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall Usage(char *pProgpath@<EAX>)
 void Usage(char* pProgpath) {
     char basename[9];
 
@@ -570,120 +644,179 @@ int original_main(int pArgc, char** pArgv) {
     return 0;
 }
 
+// IDA: int __cdecl OurGetChar()
 int OurGetChar() {
+    int key;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __cdecl PDGetGorePassword()
 int PDGetGorePassword() {
+    int ch;
     int len;
     int chances;
     char password[17];
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall PDDisplayGoreworthiness(int pGory@<EAX>)
 void PDDisplayGoreworthiness(int pGory) {
     tU32 delay_start;
+    LOG_TRACE("(%d)", pGory);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall PDEnterDebugger(char *pStr@<EAX>)
 void PDEnterDebugger(char* pStr) {
-    static unsigned char* save_it;
+    static unsigned char *save_it;
+    LOG_TRACE("(\"%s\")", pStr);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl PDEndItAllAndReRunTheBastard()
 void PDEndItAllAndReRunTheBastard() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __usercall matherr@<EAX>(exception *err@<EAX>)
 int matherr(struct exception_* err) {
+    LOG_TRACE("(%p)", err);
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __usercall LoopLimitTooLow@<EAX>(tU32 limit@<EAX>)
 int LoopLimitTooLow(tU32 limit) {
     clock_t start;
     tU32 count;
     tU32 val;
+    LOG_TRACE("(%d)", limit);
     NOT_IMPLEMENTED();
 }
 
+// IDA: tS32 __cdecl UpperLoopLimit()
 tS32 UpperLoopLimit() {
+    tU32 limit;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __cdecl InitJoysticks()
 int InitJoysticks() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: tU32 __usercall ReadJoystickAxis@<EAX>(int pBit@<EAX>)
 tU32 ReadJoystickAxis(int pBit) {
     tU32 val;
     tU32 count;
+    LOG_TRACE("(%d)", pBit);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl PDReadJoySticks()
 void PDReadJoySticks() {
+    tU32 temp1x;
     tU32 temp1y;
     tU32 temp2x;
     tU32 temp2y;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: tS32 __cdecl PDGetJoy1X()
 tS32 PDGetJoy1X() {
+    tS32 joy;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: tS32 __cdecl PDGetJoy1Y()
 tS32 PDGetJoy1Y() {
+    tS32 joy;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: tS32 __cdecl PDGetJoy2X()
 tS32 PDGetJoy2X() {
+    tS32 joy;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: tS32 __cdecl PDGetJoy2Y()
 tS32 PDGetJoy2Y() {
+    tS32 joy;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __cdecl PDGetJoy1Button1()
 int PDGetJoy1Button1() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __cdecl PDGetJoy1Button2()
 int PDGetJoy1Button2() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __cdecl PDGetJoy1Button3()
 int PDGetJoy1Button3() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __cdecl PDGetJoy1Button4()
 int PDGetJoy1Button4() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __cdecl PDGetJoy2Button1()
 int PDGetJoy2Button1() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __cdecl PDGetJoy2Button2()
 int PDGetJoy2Button2() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __cdecl PDGetJoy2Button3()
 int PDGetJoy2Button3() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __cdecl PDGetJoy2Button4()
 int PDGetJoy2Button4() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __usercall PDFileUnlock@<EAX>(char *pThe_path@<EAX>)
 int PDFileUnlock(char* pThe_path) {
     unsigned int attr;
+    LOG_TRACE("(\"%s\")", pThe_path);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl CriticalISR(INTPACK pRegs)
 void CriticalISR(INTPACK pRegs) {
+    LOG_TRACE("(%d)", pRegs);
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __usercall PDCheckDriveExists2@<EAX>(char *pThe_path@<EAX>, char *pFile_name@<EDX>, tU32 pMin_size@<EBX>)
 int PDCheckDriveExists2(char* pThe_path, char* pFile_name, tU32 pMin_size) {
     struct stat buf;
     void (*old_critical_isr)();
@@ -710,6 +843,7 @@ int PDCheckDriveExists2(char* pThe_path, char* pFile_name, tU32 pMin_size) {
     return !stat_failed && buf.st_size >= pMin_size;
 }
 
+// IDA: int __cdecl PDDoWeLeadAnAustereExistance()
 int PDDoWeLeadAnAustereExistance() {
     tU32 block;
 

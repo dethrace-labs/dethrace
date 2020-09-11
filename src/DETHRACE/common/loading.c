@@ -60,70 +60,97 @@ int gDemo_power;
 int gDemo_offensive;
 char gDecode_string[14] = { 0x9B, 0x52, 0x93, 0x9F, 0x52, 0x98, 0x9B, 0x96, 0x96, 0x9E, 0x9B, 0xA0, 0x99, 0x0 };
 
+// IDA: tU32 __usercall ReadU32@<EAX>(FILE *pF@<EAX>)
 tU32 ReadU32(FILE* pF) {
     tU32 raw_long;
+    LOG_TRACE("(%p)", pF);
     NOT_IMPLEMENTED();
 }
 
+// IDA: tU16 __usercall ReadU16@<AX>(FILE *pF@<EAX>)
 tU16 ReadU16(FILE* pF) {
     tU16 raw_short;
+    LOG_TRACE("(%p)", pF);
     NOT_IMPLEMENTED();
 }
 
+// IDA: tU8 __usercall ReadU8@<AL>(FILE *pF@<EAX>)
 tU8 ReadU8(FILE* pF) {
     tU8 raw_byte;
+    LOG_TRACE("(%p)", pF);
     NOT_IMPLEMENTED();
 }
 
+// IDA: tS32 __usercall ReadS32@<EAX>(FILE *pF@<EAX>)
 tS32 ReadS32(FILE* pF) {
     tS32 raw_long;
+    LOG_TRACE("(%p)", pF);
     NOT_IMPLEMENTED();
 }
 
+// IDA: tS16 __usercall ReadS16@<AX>(FILE *pF@<EAX>)
 tS16 ReadS16(FILE* pF) {
     tS16 raw_short;
+    LOG_TRACE("(%p)", pF);
     NOT_IMPLEMENTED();
 }
 
+// IDA: tS8 __usercall ReadS8@<AL>(FILE *pF@<EAX>)
 tS8 ReadS8(FILE* pF) {
     tS8 raw_byte;
+    LOG_TRACE("(%p)", pF);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall WriteU32L(FILE *pF@<EAX>, tU32 pNumber@<EDX>)
 void WriteU32L(FILE* pF, tU32 pNumber) {
     tU32 raw_long;
+    LOG_TRACE("(%p, %d)", pF, pNumber);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall WriteU16L(FILE *pF@<EAX>, tU16 pNumber@<EDX>)
 void WriteU16L(FILE* pF, tU16 pNumber) {
     tU16 raw_short;
+    LOG_TRACE("(%p, %d)", pF, pNumber);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall WriteU8L(FILE *pF@<EAX>, tU8 pNumber@<EDX>)
 void WriteU8L(FILE* pF, tU8 pNumber) {
     tU8 raw_byte;
+    LOG_TRACE("(%p, %d)", pF, pNumber);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall WriteS32L(FILE *pF@<EAX>, tS32 pNumber@<EDX>)
 void WriteS32L(FILE* pF, tS32 pNumber) {
     tS32 raw_long;
+    LOG_TRACE("(%p, %d)", pF, pNumber);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall WriteS16L(FILE *pF@<EAX>, tS16 pNumber@<EDX>)
 void WriteS16L(FILE* pF, tS16 pNumber) {
     tS16 raw_short;
+    LOG_TRACE("(%p, %d)", pF, pNumber);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall WriteS8L(FILE *pF@<EAX>, tS8 pNumber@<EDX>)
 void WriteS8L(FILE* pF, tS8 pNumber) {
     tS8 raw_byte;
+    LOG_TRACE("(%p, %d)", pF, pNumber);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall SkipBytes(FILE *pF@<EAX>, int pBytes_to_skip@<EDX>)
 void SkipBytes(FILE* pF, int pBytes_to_skip) {
+    LOG_TRACE("(%p, %d)", pF, pBytes_to_skip);
     NOT_IMPLEMENTED();
 }
 
+// IDA: tU32 __usercall MemReadU32@<EAX>(char **pPtr@<EAX>)
 tU32 MemReadU32(char** pPtr) {
     tU32 raw_long;
     memcpy(&raw_long, *pPtr, 4);
@@ -131,6 +158,7 @@ tU32 MemReadU32(char** pPtr) {
     return raw_long;
 }
 
+// IDA: tU16 __usercall MemReadU16@<AX>(char **pPtr@<EAX>)
 tU16 MemReadU16(char** pPtr) {
     tU16 raw_short;
     memcpy(&raw_short, *pPtr, 2);
@@ -138,15 +166,19 @@ tU16 MemReadU16(char** pPtr) {
     return raw_short;
 }
 
+// IDA: tU8 __usercall MemReadU8@<AL>(char **pPtr@<EAX>)
 tU8 MemReadU8(char** pPtr) {
     return *(*pPtr)++;
 }
 
+// IDA: tS32 __usercall MemReadS32@<EAX>(char **pPtr@<EAX>)
 tS32 MemReadS32(char** pPtr) {
     tS32 raw_long;
+    LOG_TRACE("(%p)", pPtr);
     NOT_IMPLEMENTED();
 }
 
+// IDA: tS16 __usercall MemReadS16@<AX>(char **pPtr@<EAX>)
 tS16 MemReadS16(char** pPtr) {
     tS16 raw_short;
     memcpy(&raw_short, *pPtr, 2);
@@ -154,6 +186,7 @@ tS16 MemReadS16(char** pPtr) {
     return raw_short;
 }
 
+// IDA: tS8 __usercall MemReadS8@<AL>(char **pPtr@<EAX>)
 tS8 MemReadS8(char** pPtr) {
     tS8 raw_byte;
     raw_byte = **pPtr;
@@ -161,10 +194,12 @@ tS8 MemReadS8(char** pPtr) {
     return raw_byte;
 }
 
+// IDA: void __usercall MemSkipBytes(char **pPtr@<EAX>, int pBytes_to_skip@<EDX>)
 void MemSkipBytes(char** pPtr, int pBytes_to_skip) {
     *pPtr += pBytes_to_skip;
 }
 
+// IDA: void __cdecl LoadGeneralParameters()
 void LoadGeneralParameters() {
     FILE* f;
     tPath_name the_path;
@@ -313,10 +348,12 @@ void LoadGeneralParameters() {
     fclose(f);
 }
 
+// IDA: void __cdecl FinishLoadingGeneral()
 void FinishLoadingGeneral() {
     /*dword_1298C0 = */ BrMaterialFind(gDef_def_water_screen_name);
 }
 
+// IDA: br_pixelmap* __usercall LoadPixelmap@<EAX>(char *pName@<EAX>)
 br_pixelmap* LoadPixelmap(char* pName) {
     tPath_name the_path;
     br_pixelmap* pm = NULL;
@@ -344,6 +381,7 @@ br_pixelmap* LoadPixelmap(char* pName) {
     }
 }
 
+// IDA: br_uint_32 __usercall LoadPixelmaps@<EAX>(char *pFile_name@<EAX>, br_pixelmap **pPixelmaps@<EDX>, br_uint_16 pNum@<EBX>)
 br_uint_32 LoadPixelmaps(char* pFile_name, br_pixelmap** pPixelmaps, br_uint_16 pNum) {
     tPath_name path;
     int count;
@@ -362,17 +400,22 @@ br_uint_32 LoadPixelmaps(char* pFile_name, br_pixelmap** pPixelmaps, br_uint_16 
     return count;
 }
 
+// IDA: br_pixelmap* __usercall LoadShadeTable@<EAX>(char *pName@<EAX>)
 br_pixelmap* LoadShadeTable(char* pName) {
     tPath_name the_path;
+    LOG_TRACE("(\"%s\")", pName);
     NOT_IMPLEMENTED();
 }
 
+// IDA: br_material* __usercall LoadMaterial@<EAX>(char *pName@<EAX>)
 br_material* LoadMaterial(char* pName) {
     tPath_name the_path;
-    br_material* result;
+    br_material *result;
+    LOG_TRACE("(\"%s\")", pName);
     NOT_IMPLEMENTED();
 }
 
+// IDA: br_model* __usercall LoadModel@<EAX>(char *pName@<EAX>)
 br_model* LoadModel(char* pName) {
     tPath_name the_path;
     br_model* model;
@@ -384,6 +427,7 @@ br_model* LoadModel(char* pName) {
     return BrModelLoad(the_path);
 }
 
+// IDA: br_actor* __usercall LoadActor@<EAX>(char *pName@<EAX>)
 br_actor* LoadActor(char* pName) {
     tPath_name the_path;
     LOG_TRACE("(\"%s\")", pName);
@@ -394,6 +438,7 @@ br_actor* LoadActor(char* pName) {
     return BrActorLoad(the_path);
 }
 
+// IDA: void __usercall DRLoadPalette(char *pPath_name@<EAX>)
 void DRLoadPalette(char* pPath_name) {
     br_pixelmap* palette_array[100];
     int number_of_palettes;
@@ -402,6 +447,7 @@ void DRLoadPalette(char* pPath_name) {
     BrTableAddMany(palette_array, number_of_palettes);
 }
 
+// IDA: void __usercall DRLoadShadeTable(char *pPath_name@<EAX>)
 void DRLoadShadeTable(char* pPath_name) {
     br_pixelmap* table_array[100];
     int number_of_tables;
@@ -410,10 +456,13 @@ void DRLoadShadeTable(char* pPath_name) {
     BrTableAddMany(table_array, number_of_tables);
 }
 
+// IDA: void __usercall RezeroPixelmaps(br_pixelmap **pPixelmap_array@<EAX>, int pCount@<EDX>)
 void RezeroPixelmaps(br_pixelmap** pPixelmap_array, int pCount) {
+    LOG_TRACE("(%p, %d)", pPixelmap_array, pCount);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DRLoadPixelmaps(char *pPath_name@<EAX>)
 void DRLoadPixelmaps(char* pPath_name) {
     br_pixelmap* pixelmap_array[100];
     int number_of_pixelmaps;
@@ -429,6 +478,7 @@ void DRLoadPixelmaps(char* pPath_name) {
     BrMapAddMany(pixelmap_array, number_of_pixelmaps);
 }
 
+// IDA: void __usercall DRLoadMaterials(char *pPath_name@<EAX>)
 void DRLoadMaterials(char* pPath_name) {
     br_material* material_array[100];
     int number_of_materials;
@@ -438,19 +488,24 @@ void DRLoadMaterials(char* pPath_name) {
     BrMaterialAddMany(material_array, number_of_materials);
 }
 
+// IDA: void __usercall DRLoadModels(char *pPath_name@<EAX>)
 void DRLoadModels(char* pPath_name) {
-    br_model* model_array[100];
+    br_model *model_array[100];
     int number_of_models;
+    LOG_TRACE("(\"%s\")", pPath_name);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DRLoadActors(char *pPath_name@<EAX>)
 void DRLoadActors(char* pPath_name) {
-    br_actor* actor_array[100];
+    br_actor *actor_array[100];
     int number_of_actors;
     int i;
+    LOG_TRACE("(\"%s\")", pPath_name);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DRLoadLights(char *pPath_name@<EAX>)
 void DRLoadLights(char* pPath_name) {
     br_actor* light_array[100];
     int number_of_lights;
@@ -458,11 +513,14 @@ void DRLoadLights(char* pPath_name) {
     STUB();
 }
 
+// IDA: void __usercall LoadInFiles(char *pThe_base_path@<EAX>, char *pThe_dir_name@<EDX>, void (*pLoad_routine)(char*)@<EBX>)
 void LoadInFiles(char* pThe_base_path, char* pThe_dir_name, void (*pLoad_routine)(char*)) {
     tPath_name the_path;
+    LOG_TRACE("(\"%s\", \"%s\", %p)", pThe_base_path, pThe_dir_name, pLoad_routine);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall LoadInRegisteeDir(char *pThe_dir_path@<EAX>)
 void LoadInRegisteeDir(char* pThe_dir_path) {
     tPath_name the_path;
     tPath_name reg_path;
@@ -485,10 +543,12 @@ void LoadInRegisteeDir(char* pThe_dir_path) {
     PDForEveryFile(the_path, DRLoadLights);
 }
 
+// IDA: void __cdecl LoadInRegistees()
 void LoadInRegistees() {
     LoadInRegisteeDir(gApplication_path);
 }
 
+// IDA: void __cdecl LoadKeyMapping()
 void LoadKeyMapping() {
     FILE* f;
     tPath_name the_path;
@@ -509,6 +569,7 @@ void LoadKeyMapping() {
     fclose(f);
 }
 
+// IDA: void __usercall LoadInterfaceStuff(int pWithin_race@<EAX>)
 void LoadInterfaceStuff(int pWithin_race) {
     tPath_name path;
     int i;
@@ -538,6 +599,7 @@ void LoadInterfaceStuff(int pWithin_race) {
     }
 }
 
+// IDA: void __cdecl UnlockInterfaceStuff()
 void UnlockInterfaceStuff() {
     int i;
     LOG_TRACE("()");
@@ -563,11 +625,13 @@ void UnlockInterfaceStuff() {
     }
 }
 
+// IDA: void __cdecl InitInterfaceLoadState()
 void InitInterfaceLoadState() {
     LOG_TRACE("()");
     memset(gCursors, 0, sizeof(gCursors));
 }
 
+// IDA: tS8* __usercall ConvertPixTo16BitStripMap@<EAX>(br_pixelmap *pBr_map@<EAX>)
 tS8* ConvertPixTo16BitStripMap(br_pixelmap* pBr_map) {
     int i;
     int j;
@@ -577,16 +641,18 @@ tS8* ConvertPixTo16BitStripMap(br_pixelmap* pBr_map) {
     int counter;
     int chunk_counter;
     int max_line_bytes;
-    tU8* next_byte;
-    tU8* strip_image;
-    tU8* current_strip_pointer;
-    tU8* temp_strip_image;
-    tU8* new_line;
+    tU8 *next_byte;
+    tU8 *strip_image;
+    tU8 *current_strip_pointer;
+    tU8 *temp_strip_image;
+    tU8 *new_line;
     tU8 byte;
-    tU16* palette_entry;
+    tU16 *palette_entry;
+    LOG_TRACE("(%p)", pBr_map);
     NOT_IMPLEMENTED();
 }
 
+// IDA: tS8* __usercall ConvertPixToStripMap@<EAX>(br_pixelmap *pThe_br_map@<EAX>)
 tS8* ConvertPixToStripMap(br_pixelmap* pThe_br_map) {
     int i;
     int j;
@@ -595,79 +661,97 @@ tS8* ConvertPixToStripMap(br_pixelmap* pThe_br_map) {
     int counting_blanks;
     int counter;
     int chunk_counter;
-    tU8* next_byte;
-    tU8* the_strip_image;
-    tU8* current_strip_pointer;
-    tU8* temp_strip_image;
+    tU8 *next_byte;
+    tU8 *the_strip_image;
+    tU8 *current_strip_pointer;
+    tU8 *temp_strip_image;
     tU8 new_line[800];
     tU8 the_byte;
+    LOG_TRACE("(%p)", pThe_br_map);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall KillWindscreen(br_model *pModel@<EAX>, br_material *pMaterial@<EDX>)
 void KillWindscreen(br_model* pModel, br_material* pMaterial) {
-    br_face* face;
+    br_face *face;
     int i;
+    LOG_TRACE("(%p, %p)", pModel, pMaterial);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DropOffDyingPeds(tCar_spec *pCar@<EAX>)
 void DropOffDyingPeds(tCar_spec* pCar) {
-    br_actor* child;
-    br_actor* next;
+    br_actor *child;
+    br_actor *next;
+    LOG_TRACE("(%p)", pCar);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DisposeCar(tCar_spec *pCar_spec@<EAX>, int pOwner@<EDX>)
 void DisposeCar(tCar_spec* pCar_spec, int pOwner) {
     int i;
     int j;
+    LOG_TRACE("(%p, %d)", pCar_spec, pOwner);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall AdjustCarCoordinates(tCar_spec *pCar@<EAX>)
 void AdjustCarCoordinates(tCar_spec* pCar) {
     int i;
+    LOG_TRACE("(%p)", pCar);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall LoadSpeedo(FILE *pF@<EAX>, int pIndex@<EDX>, tCar_spec *pCar_spec@<EBX>)
 void LoadSpeedo(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
     tPath_name the_path;
     char s[256];
-    char* str;
+    char *str;
     char the_char1;
     char the_char2;
+    LOG_TRACE("(%p, %d, %p)", pF, pIndex, pCar_spec);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall LoadTacho(FILE *pF@<EAX>, int pIndex@<EDX>, tCar_spec *pCar_spec@<EBX>)
 void LoadTacho(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
     tPath_name the_path;
     char s[256];
-    char* str;
+    char *str;
     char the_char1;
     char the_char2;
+    LOG_TRACE("(%p, %d, %p)", pF, pIndex, pCar_spec);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall LoadHeadups(FILE *pF@<EAX>, int pIndex@<EDX>, tCar_spec *pCar_spec@<EBX>)
 void LoadHeadups(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
     char s[256];
-    char* str;
+    char *str;
     int j;
     int number_of_slots;
+    LOG_TRACE("(%p, %d, %p)", pF, pIndex, pCar_spec);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall ReadNonCarMechanicsData(FILE *pF@<EAX>, tNon_car_spec *non_car@<EDX>)
 void ReadNonCarMechanicsData(FILE* pF, tNon_car_spec* non_car) {
     int number;
     int i;
     int j;
     char s[256];
-    tCollision_info* c;
+    tCollision_info *c;
     br_scalar wid;
     br_scalar het;
     br_scalar len;
     br_scalar ts;
     br_scalar ts1;
     br_scalar snap_angle;
+    LOG_TRACE("(%p, %p)", pF, non_car);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall ReadMechanicsData(FILE *pF@<EAX>, tCar_spec *c@<EDX>)
 void ReadMechanicsData(FILE* pF, tCar_spec* c) {
     char s[256];
     char version;
@@ -681,91 +765,117 @@ void ReadMechanicsData(FILE* pF, tCar_spec* c) {
     br_scalar wid;
     br_scalar het;
     br_scalar len;
-    br_vector3* actor_offset;
+    br_vector3 *actor_offset;
     br_scalar speed;
     br_scalar force;
+    LOG_TRACE("(%p, %p)", pF, c);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall LoadGear(FILE *pF@<EAX>, int pIndex@<EDX>, tCar_spec *pCar_spec@<EBX>)
 void LoadGear(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
     tPath_name the_path;
     char s[256];
-    char* str;
+    char *str;
+    LOG_TRACE("(%p, %d, %p)", pF, pIndex, pCar_spec);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall AddRefOffset(int *pRef_holder@<EAX>)
 void AddRefOffset(int* pRef_holder) {
+    LOG_TRACE("(%p)", pRef_holder);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall GetDamageProgram(FILE *pF@<EAX>, tCar_spec *pCar_spec@<EDX>, tImpact_location pImpact_location@<EBX>)
 void GetDamageProgram(FILE* pF, tCar_spec* pCar_spec, tImpact_location pImpact_location) {
-    tDamage_clause* the_clause;
+    tDamage_clause *the_clause;
     int i;
     int j;
     int k;
     int count;
     char s[256];
     char delim[64];
-    char* str;
+    char *str;
+    LOG_TRACE("(%p, %p, %d)", pF, pCar_spec, pImpact_location);
     NOT_IMPLEMENTED();
 }
 
+// IDA: br_uint_32 __cdecl LinkModel(br_actor *pActor, tModel_pool *pModel_pool)
 br_uint_32 LinkModel(br_actor* pActor, tModel_pool* pModel_pool) {
     int i;
+    LOG_TRACE("(%p, %p)", pActor, pModel_pool);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall FreeUpBonnetModels(br_model **pModel_array@<EAX>, int pModel_count@<EDX>)
 void FreeUpBonnetModels(br_model** pModel_array, int pModel_count) {
     int i;
+    LOG_TRACE("(%p, %d)", pModel_array, pModel_count);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall LinkModelsToActor(br_actor *pActor@<EAX>, br_model **pModel_array@<EDX>, int pModel_count@<EBX>)
 void LinkModelsToActor(br_actor* pActor, br_model** pModel_array, int pModel_count) {
     tModel_pool model_pool;
+    LOG_TRACE("(%p, %p, %d)", pActor, pModel_array, pModel_count);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall ReadShrapnelMaterials(FILE *pF@<EAX>, tCollision_info *pCar_spec@<EDX>)
 void ReadShrapnelMaterials(FILE* pF, tCollision_info* pCar_spec) {
     char s[256];
     char version;
     int i;
+    LOG_TRACE("(%p, %p)", pF, pCar_spec);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall CloneCar(tCar_spec **pOutput_car@<EAX>, tCar_spec *pInput_car@<EDX>)
 void CloneCar(tCar_spec** pOutput_car, tCar_spec* pInput_car) {
     int i;
+    LOG_TRACE("(%p, %p)", pOutput_car, pInput_car);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DisposeClonedCar(tCar_spec *pCar@<EAX>)
 void DisposeClonedCar(tCar_spec* pCar) {
+    LOG_TRACE("(%p)", pCar);
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __usercall RemoveDoubleSided@<EAX>(br_model *pModel@<EAX>)
 int RemoveDoubleSided(br_model* pModel) {
-    br_face* faces;
-    br_face* face;
+    br_face *faces;
+    br_face *face;
     int temp;
     int num_double_sided_faces;
     int i;
     int orig_nfaces;
     int result;
+    LOG_TRACE("(%p)", pModel);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall MungeWindscreen(br_model *pModel@<EAX>)
 void MungeWindscreen(br_model* pModel) {
-    br_face* face;
+    br_face *face;
     int i;
+    LOG_TRACE("(%p)", pModel);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall SetModelFlags(br_model *pModel@<EAX>, int pOwner@<EDX>)
 void SetModelFlags(br_model* pModel, int pOwner) {
+    LOG_TRACE("(%p, %d)", pModel, pOwner);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall LoadCar(char *pCar_name@<EAX>, tDriver pDriver@<EDX>, tCar_spec *pCar_spec@<EBX>, int pOwner@<ECX>, char *pDriver_name, tBrender_storage *pStorage_space)
 void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner, char* pDriver_name, tBrender_storage* pStorage_space) {
-    FILE* f;
-    FILE* g;
-    FILE* h;
+    FILE *f;
+    FILE *g;
+    FILE *h;
     tPath_name the_path;
     int i;
     int j;
@@ -779,29 +889,37 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
     int temp_index;
     int vertex_array_size;
     char s[256];
-    char* str;
-    br_pixelmap* the_image;
+    char *str;
+    br_pixelmap *the_image;
     float rate;
     float temp_float;
-    br_model* model;
+    br_model *model;
     br_vector3 tv;
     int v;
     int v_num;
     int group;
     int vertex_total;
+    LOG_TRACE("(\"%s\", %d, %p, %d, \"%s\", %p)", pCar_name, pDriver, pCar_spec, pOwner, pDriver_name, pStorage_space);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl LoadHeadupImages()
 void LoadHeadupImages() {
+    int i;
     tPath_name the_path;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl DisposeHeadupImages()
 void DisposeHeadupImages() {
+    int i;
     tPath_name the_path;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: FILE* __cdecl OpenRaceFile()
 FILE* OpenRaceFile() {
     FILE* f;
     tPath_name the_path;
@@ -814,6 +932,7 @@ FILE* OpenRaceFile() {
     return f;
 }
 
+// IDA: void __usercall SkipRestOfRace(FILE *pF@<EAX>)
 void SkipRestOfRace(FILE* pF) {
     int j;
     int k;
@@ -841,6 +960,7 @@ void SkipRestOfRace(FILE* pF) {
     }
 }
 
+// IDA: void __usercall LoadRaces(tRace_list_spec *pRace_list@<EAX>, int *pCount@<EDX>, int pRace_type_index@<EBX>)
 void LoadRaces(tRace_list_spec* pRace_list, int* pCount, int pRace_type_index) {
     FILE* f;
     int i;
@@ -895,24 +1015,33 @@ void LoadRaces(tRace_list_spec* pRace_list, int* pCount, int pRace_type_index) {
     }
 }
 
+// IDA: void __usercall UnlockOpponentMugshot(int pIndex@<EAX>)
 void UnlockOpponentMugshot(int pIndex) {
+    LOG_TRACE("(%d)", pIndex);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall LoadOpponentMugShot(int pIndex@<EAX>)
 void LoadOpponentMugShot(int pIndex) {
+    LOG_TRACE("(%d)", pIndex);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DisposeOpponentGridIcon(tRace_info *pRace_info@<EAX>, int pIndex@<EDX>)
 void DisposeOpponentGridIcon(tRace_info* pRace_info, int pIndex) {
+    LOG_TRACE("(%p, %d)", pRace_info, pIndex);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall LoadOpponentGridIcon(tRace_info *pRace_info@<EAX>, int pIndex@<EDX>)
 void LoadOpponentGridIcon(tRace_info* pRace_info, int pIndex) {
+    LOG_TRACE("(%p, %d)", pRace_info, pIndex);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall LoadRaceInfo(int pRace_index@<EAX>, tRace_info *pRace_info@<EDX>)
 void LoadRaceInfo(int pRace_index, tRace_info* pRace_info) {
-    FILE* f;
+    FILE *f;
     int i;
     int j;
     int k;
@@ -922,30 +1051,38 @@ void LoadRaceInfo(int pRace_index, tRace_info* pRace_info) {
     int old_index;
     int temp_index;
     char s[256];
-    char* str;
+    char *str;
     float temp_float;
-    tText_chunk* the_chunk;
+    tText_chunk *the_chunk;
+    LOG_TRACE("(%d, %p)", pRace_index, pRace_info);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DisposeRaceInfo(tRace_info *pRace_info@<EAX>)
 void DisposeRaceInfo(tRace_info* pRace_info) {
     int i;
     int j;
     int k;
-    tText_chunk* the_chunk;
+    tText_chunk *the_chunk;
+    LOG_TRACE("(%p)", pRace_info);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall LoadGridIcons(tRace_info *pRace_info@<EAX>)
 void LoadGridIcons(tRace_info* pRace_info) {
     int i;
+    LOG_TRACE("(%p)", pRace_info);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DisposeGridIcons(tRace_info *pRace_info@<EAX>)
 void DisposeGridIcons(tRace_info* pRace_info) {
     int i;
+    LOG_TRACE("(%p)", pRace_info);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl LoadOpponents()
 void LoadOpponents() {
     FILE* f;
     tPath_name the_path;
@@ -1025,6 +1162,7 @@ void LoadOpponents() {
     return fclose(f);
 }
 
+// IDA: br_font* __usercall LoadBRFont@<EAX>(char *pName@<EAX>)
 br_font* LoadBRFont(char* pName) {
     FILE* f;
     tPath_name the_path;
@@ -1069,24 +1207,36 @@ br_font* LoadBRFont(char* pName) {
     return the_font;
 }
 
+// IDA: void __cdecl LoadParts()
 void LoadParts() {
+    int i;
     int j;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl UnlockParts()
 void UnlockParts() {
+    int i;
     int j;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: br_pixelmap* __cdecl LoadChromeFont()
 br_pixelmap* LoadChromeFont() {
+    br_pixelmap *result;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DisposeChromeFont(br_pixelmap *pThe_font@<EAX>)
 void DisposeChromeFont(br_pixelmap* pThe_font) {
+    LOG_TRACE("(%p)", pThe_font);
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __usercall GetALineAndInterpretCommand@<EAX>(FILE *pF@<EAX>, char **pString_list@<EDX>, int pCount@<EBX>)
 int GetALineAndInterpretCommand(FILE* pF, char** pString_list, int pCount) {
     int i;
     char s[256];
@@ -1106,6 +1256,7 @@ int GetALineAndInterpretCommand(FILE* pF, char** pString_list, int pCount) {
     return -1;
 }
 
+// IDA: int __usercall GetAnInt@<EAX>(FILE *pF@<EAX>)
 int GetAnInt(FILE* pF) {
     char s[256];
     char* str;
@@ -1117,6 +1268,7 @@ int GetAnInt(FILE* pF) {
     return result;
 }
 
+// IDA: float __usercall GetAFloat@<ST0>(FILE *pF@<EAX>)
 float GetAFloat(FILE* pF) {
     char s[256];
     char* str;
@@ -1128,13 +1280,16 @@ float GetAFloat(FILE* pF) {
     return result;
 }
 
+// IDA: float __usercall GetAFloatPercent@<ST0>(FILE *pF@<EAX>)
 float GetAFloatPercent(FILE* pF) {
     char s[256];
-    char* str;
+    char *str;
     float result;
+    LOG_TRACE("(%p)", pF);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall GetPairOfFloats(FILE *pF@<EAX>, float *pF1@<EDX>, float *pF2@<EBX>)
 void GetPairOfFloats(FILE* pF, float* pF1, float* pF2) {
     char s[256];
     char* str;
@@ -1146,6 +1301,7 @@ void GetPairOfFloats(FILE* pF, float* pF1, float* pF2) {
     sscanf(str, "%f", pF2);
 }
 
+// IDA: void __usercall GetThreeFloats(FILE *pF@<EAX>, float *pF1@<EDX>, float *pF2@<EBX>, float *pF3@<ECX>)
 void GetThreeFloats(FILE* pF, float* pF1, float* pF2, float* pF3) {
     char s[256];
     char* str;
@@ -1159,6 +1315,7 @@ void GetThreeFloats(FILE* pF, float* pF1, float* pF2, float* pF3) {
     sscanf(str, "%f", pF3);
 }
 
+// IDA: void __usercall GetPairOfInts(FILE *pF@<EAX>, int *pF1@<EDX>, int *pF2@<EBX>)
 void GetPairOfInts(FILE* pF, int* pF1, int* pF2) {
     char s[256];
     char* str;
@@ -1170,6 +1327,7 @@ void GetPairOfInts(FILE* pF, int* pF1, int* pF2) {
     sscanf(str, "%d", pF2);
 }
 
+// IDA: void __usercall GetThreeInts(FILE *pF@<EAX>, int *pF1@<EDX>, int *pF2@<EBX>, int *pF3@<ECX>)
 void GetThreeInts(FILE* pF, int* pF1, int* pF2, int* pF3) {
     char s[256];
     char* str;
@@ -1183,12 +1341,15 @@ void GetThreeInts(FILE* pF, int* pF1, int* pF2, int* pF3) {
     sscanf(str, "%d", pF3);
 }
 
+// IDA: void __usercall GetThreeIntsAndAString(FILE *pF@<EAX>, int *pF1@<EDX>, int *pF2@<EBX>, int *pF3@<ECX>, char *pS)
 void GetThreeIntsAndAString(FILE* pF, int* pF1, int* pF2, int* pF3, char* pS) {
     char s[256];
-    char* str;
+    char *str;
+    LOG_TRACE("(%p, %p, %p, %p, \"%s\")", pF, pF1, pF2, pF3, pS);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall GetFourInts(FILE *pF@<EAX>, int *pF1@<EDX>, int *pF2@<EBX>, int *pF3@<ECX>, int *pF4)
 void GetFourInts(FILE* pF, int* pF1, int* pF2, int* pF3, int* pF4) {
     char s[256];
     char* str;
@@ -1204,60 +1365,76 @@ void GetFourInts(FILE* pF, int* pF1, int* pF2, int* pF3, int* pF4) {
     sscanf(str, "%d", pF4);
 }
 
+// IDA: br_scalar __usercall GetAScalar@<ST0>(FILE *pF@<EAX>)
 br_scalar GetAScalar(FILE* pF) {
-    return GetAFloat(pF);
+    LOG_TRACE("(%p)", pF);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall GetPairOfScalars(FILE *pF@<EAX>, br_scalar *pS1@<EDX>, br_scalar *pS2@<EBX>)
 void GetPairOfScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2) {
+    LOG_TRACE("(%p, %p, %p)", pF, pS1, pS2);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall GetThreeScalars(FILE *pF@<EAX>, br_scalar *pS1@<EDX>, br_scalar *pS2@<EBX>, br_scalar *pS3@<ECX>)
 void GetThreeScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2, br_scalar* pS3) {
+    LOG_TRACE("(%p, %p, %p, %p)", pF, pS1, pS2, pS3);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall GetFourScalars(FILE *pF@<EAX>, br_scalar *pF1@<EDX>, br_scalar *pF2@<EBX>, br_scalar *pF3@<ECX>, br_scalar *pF4)
 void GetFourScalars(FILE* pF, br_scalar* pF1, br_scalar* pF2, br_scalar* pF3, br_scalar* pF4) {
     char s[256];
-    char* str;
+    char *str;
     float f1;
     float f2;
     float f3;
     float f4;
+    LOG_TRACE("(%p, %p, %p, %p, %p)", pF, pF1, pF2, pF3, pF4);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall GetFiveScalars(FILE *pF@<EAX>, br_scalar *pF1@<EDX>, br_scalar *pF2@<EBX>, br_scalar *pF3@<ECX>, br_scalar *pF4, br_scalar *pF5)
 void GetFiveScalars(FILE* pF, br_scalar* pF1, br_scalar* pF2, br_scalar* pF3, br_scalar* pF4, br_scalar* pF5) {
     char s[256];
-    char* str;
+    char *str;
     float f1;
     float f2;
     float f3;
     float f4;
     float f5;
+    LOG_TRACE("(%p, %p, %p, %p, %p, %p)", pF, pF1, pF2, pF3, pF4, pF5);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall GetNScalars(FILE *pF@<EAX>, int pNumber@<EDX>, br_scalar *pScalars@<EBX>)
 void GetNScalars(FILE* pF, int pNumber, br_scalar* pScalars) {
     char s[256];
-    char* str;
+    char *str;
     float fleurting_point_numero;
     int i;
+    LOG_TRACE("(%p, %d, %p)", pF, pNumber, pScalars);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall GetPairOfFloatPercents(FILE *pF@<EAX>, float *pF1@<EDX>, float *pF2@<EBX>)
 void GetPairOfFloatPercents(FILE* pF, float* pF1, float* pF2) {
     char s[256];
-    char* str;
+    char *str;
+    LOG_TRACE("(%p, %p, %p)", pF, pF1, pF2);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall GetThreeFloatPercents(FILE *pF@<EAX>, float *pF1@<EDX>, float *pF2@<EBX>, float *pF3@<ECX>)
 void GetThreeFloatPercents(FILE* pF, float* pF1, float* pF2, float* pF3) {
     char s[256];
-    char* str;
+    char *str;
+    LOG_TRACE("(%p, %p, %p, %p)", pF, pF1, pF2, pF3);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall GetAString(FILE *pF@<EAX>, char *pString@<EDX>)
 void GetAString(FILE* pF, char* pString) {
     char s[256];
     char* str;
@@ -1267,20 +1444,27 @@ void GetAString(FILE* pF, char* pString) {
     strcpy(pString, str);
 }
 
+// IDA: void __cdecl AboutToLoadFirstCar()
 void AboutToLoadFirstCar() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall LoadOpponentsCars(tRace_info *pRace_info@<EAX>)
 void LoadOpponentsCars(tRace_info* pRace_info) {
     int i;
+    LOG_TRACE("(%p)", pRace_info);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall DisposeOpponentsCars(tRace_info *pRace_info@<EAX>)
 void DisposeOpponentsCars(tRace_info* pRace_info) {
     int i;
+    LOG_TRACE("(%p)", pRace_info);
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl LoadMiscStrings()
 void LoadMiscStrings() {
     int i;
     FILE* f;
@@ -1304,10 +1488,13 @@ void LoadMiscStrings() {
     fclose(f);
 }
 
+// IDA: void __usercall FillInRaceInfo(tRace_info *pThe_race@<EAX>)
 void FillInRaceInfo(tRace_info* pThe_race) {
+    LOG_TRACE("(%p)", pThe_race);
     NOT_IMPLEMENTED();
 }
 
+// IDA: FILE* __usercall OldDRfopen@<EAX>(char *pFilename@<EAX>, char *pMode@<EDX>)
 FILE* OldDRfopen(char* pFilename, char* pMode) {
     FILE* fp;
     FILE* file_ptr;
@@ -1407,14 +1594,19 @@ FILE* OldDRfopen(char* pFilename, char* pMode) {
     return fp;
 }
 
+// IDA: void __cdecl AllowOpenToFail()
 void AllowOpenToFail() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __cdecl DoNotAllowOpenToFail()
 void DoNotAllowOpenToFail() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: FILE* __usercall DRfopen@<EAX>(char *pFilename@<EAX>, char *pMode@<EDX>)
 FILE* DRfopen(char* pFilename, char* pMode) {
     FILE* result;
     tPath_name CD_dir;
@@ -1438,6 +1630,7 @@ FILE* DRfopen(char* pFilename, char* pMode) {
     return result;
 }
 
+// IDA: int __usercall GetCDPathFromPathsTxtFile@<EAX>(char *pPath_name@<EAX>)
 int GetCDPathFromPathsTxtFile(char* pPath_name) {
     static int got_it_already = 0;
     static tPath_name cd_pathname;
@@ -1459,6 +1652,7 @@ int GetCDPathFromPathsTxtFile(char* pPath_name) {
     return 1;
 }
 
+// IDA: int __cdecl TestForOriginalCarmaCDinDrive()
 int TestForOriginalCarmaCDinDrive() {
     LOG_TRACE("()");
 
@@ -1515,14 +1709,18 @@ int TestForOriginalCarmaCDinDrive() {
     return 0;
 }
 
+// IDA: int __cdecl OriginalCarmaCDinDrive()
 int OriginalCarmaCDinDrive() {
     return gCD_is_in_drive;
 }
 
+// IDA: int __cdecl CarmaCDinDriveOrFullGameInstalled()
 int CarmaCDinDriveOrFullGameInstalled() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: void __usercall ReadNetworkSettings(FILE *pF@<EAX>, tNet_game_options *pOptions@<EDX>)
 void ReadNetworkSettings(FILE* pF, tNet_game_options* pOptions) {
     LOG_TRACE("(%p, %p)", pF, pOptions);
 
@@ -1539,15 +1737,21 @@ void ReadNetworkSettings(FILE* pF, tNet_game_options* pOptions) {
     pOptions->starting_money_index = GetAnInt(pF);
 }
 
+// IDA: int __usercall PrintNetOptions@<EAX>(FILE *pF@<EAX>, int pIndex@<EDX>)
 int PrintNetOptions(FILE* pF, int pIndex) {
+    LOG_TRACE("(%p, %d)", pF, pIndex);
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __cdecl SaveOptions()
 int SaveOptions() {
-    FILE* f;
+    tPath_name the_path;
+    FILE *f;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __cdecl RestoreOptions()
 int RestoreOptions() {
     tPath_name the_path;
     FILE* f;
@@ -1644,6 +1848,9 @@ int RestoreOptions() {
     return 1;
 }
 
+// IDA: void __cdecl InitFunkGrooveFlags()
 void InitFunkGrooveFlags() {
+    int i;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
