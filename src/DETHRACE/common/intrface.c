@@ -19,38 +19,32 @@ tInterface_spec* gSpec;
 int gAlways_typing;
 int gDisabled_count;
 
-// Offset: 0
-// Size: 44
+// IDA: void __cdecl SetAlwaysTyping()
 void SetAlwaysTyping() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 44
-// Size: 44
+// IDA: void __cdecl ClearAlwaysTyping()
 void ClearAlwaysTyping() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 88
-// Size: 103
-// EAX: pChoice
+// IDA: int __usercall ChoiceDisabled@<EAX>(int pChoice@<EAX>)
 int ChoiceDisabled(int pChoice) {
     int i;
+    LOG_TRACE("(%d)", pChoice);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 192
-// Size: 44
+// IDA: void __cdecl ResetInterfaceTimeout()
 void ResetInterfaceTimeout() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 236
-// Size: 627
-// EAX: pSpec
-// EDX: pOld_selection
-// EBX: pNew_selection
-// ECX: pMode
+// IDA: void __usercall ChangeSelection(tInterface_spec *pSpec@<EAX>, int *pOld_selection@<EDX>, int *pNew_selection@<EBX>, int pMode@<ECX>, int pSkip_disabled)
 void ChangeSelection(tInterface_spec* pSpec, int* pOld_selection, int* pNew_selection, int pMode, int pSkip_disabled) {
     int i;
     LOG_TRACE("(%p, %p, %p, %d, %d)", pSpec, *pOld_selection, *pNew_selection, pMode, pSkip_disabled);
@@ -109,10 +103,7 @@ void ChangeSelection(tInterface_spec* pSpec, int* pOld_selection, int* pNew_sele
     LOG_DEBUG("new: %d, old %d", *pNew_selection, *pOld_selection);
 }
 
-// Offset: 864
-// Size: 292
-// EAX: pSpec
-// EDX: pCopy_areas
+// IDA: void __usercall RecopyAreas(tInterface_spec *pSpec@<EAX>, br_pixelmap **pCopy_areas@<EDX>)
 void RecopyAreas(tInterface_spec* pSpec, br_pixelmap** pCopy_areas) {
     int i;
     LOG_TRACE8("(%p, %p)", pSpec, pCopy_areas);
@@ -130,27 +121,21 @@ void RecopyAreas(tInterface_spec* pSpec, br_pixelmap** pCopy_areas) {
     }
 }
 
-// Offset: 1156
-// Size: 111
-// EAX: pChoice
+// IDA: void __usercall DisableChoice(int pChoice@<EAX>)
 void DisableChoice(int pChoice) {
     int i;
+    LOG_TRACE("(%d)", pChoice);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1268
-// Size: 140
-// EAX: pChoice
+// IDA: void __usercall EnableChoice(int pChoice@<EAX>)
 void EnableChoice(int pChoice) {
     int i;
+    LOG_TRACE("(%d)", pChoice);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1408
-// Size: 5354
-// EAX: pSpec
-// EDX: pOptions
-// EBX: pCurrent_choice
+// IDA: int __usercall DoInterfaceScreen@<EAX>(tInterface_spec *pSpec@<EAX>, int pOptions@<EDX>, int pCurrent_choice@<EBX>)
 int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice) {
     tProg_status entry_status; //
     int x_coord; //
@@ -547,11 +532,9 @@ LABEL_230:
     return result;
 }
 
-// Offset: 6764
-// Size: 88
-// EAX: pNew_choice
-// EDX: pNew_mode
+// IDA: void __usercall ChangeSelectionTo(int pNew_choice@<EAX>, int pNew_mode@<EDX>)
 void ChangeSelectionTo(int pNew_choice, int pNew_mode) {
     int last_choice;
+    LOG_TRACE("(%d, %d)", pNew_choice, pNew_mode);
     NOT_IMPLEMENTED();
 }

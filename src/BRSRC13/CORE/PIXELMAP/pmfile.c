@@ -39,35 +39,24 @@ char rscid[54];
 
 #define DF_PIXELMAP 2
 
-// Offset: 18
-// Size: 153
-// EAX: df
-// EDX: pixelmap
+// IDA: int __usercall FopWrite_PIXELMAP@<EAX>(br_datafile *df@<EAX>, br_pixelmap *pixelmap@<EDX>)
 int FopWrite_PIXELMAP(br_datafile* df, br_pixelmap* pixelmap) {
     br_pixelmap pmap;
+    LOG_TRACE("(%p, %p)", df, pixelmap);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 192
-// Size: 181
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
+// IDA: int __usercall FopRead_OLD_PIXELMAP@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_OLD_PIXELMAP(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_pixelmap* pp;
+    LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 390
-// Size: 181
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
+// IDA: int __usercall FopRead_PIXELMAP@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_PIXELMAP(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_pixelmap* pp;
-    LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
+    LOG_TRACE9("(%p, %d, %d, %d)", df, id, length, count);
 
     pp = (br_pixelmap*)DevicePixelmapMemAllocate(3u, 0, 0, 0, 2);
     df->res = pp;
@@ -78,29 +67,22 @@ int FopRead_PIXELMAP(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_
     return 0;
 }
 
-// Offset: 587
-// Size: 542
-// EAX: df
-// EDX: pixelmap
+// IDA: int __usercall FopWrite_PIXELS@<EAX>(br_datafile *df@<EAX>, br_pixelmap *pixelmap@<EDX>)
 int FopWrite_PIXELS(br_datafile* df, br_pixelmap* pixelmap) {
     int size;
     int bytes;
     int block_count;
     char* pixels;
+    LOG_TRACE("(%p, %p)", df, pixelmap);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1144
-// Size: 144
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
+// IDA: int __usercall FopRead_PIXELS@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_PIXELS(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     int icount = 0;
     br_pixelmap* pp;
     int size;
-    LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
+    LOG_TRACE9("(%p, %d, %d, %d)", df, id, length, count);
 
     pp = DfTop(DF_PIXELMAP, NULL);
     size = pmTypeInfo[pp->type].file_size;
@@ -111,27 +93,21 @@ int FopRead_PIXELS(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32
     return 0;
 }
 
-// Offset: 1305
-// Size: 66
-// EAX: df
+// IDA: int __usercall FopWrite_ADD_MAP@<EAX>(br_datafile *df@<EAX>)
 int FopWrite_ADD_MAP(br_datafile* df) {
+    LOG_TRACE("(%p)", df);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1387
-// Size: 105
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
+// IDA: int __usercall FopRead_ADD_MAP@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_ADD_MAP(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_pixelmap* pp;
     br_pixelmap* map;
+    LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1511
-// Size: 162
+// IDA: br_uint_32 __cdecl BrPixelmapLoadMany(char *filename, br_pixelmap **pixelmaps, br_uint_16 num)
 br_uint_32 BrPixelmapLoadMany(char* filename, br_pixelmap** pixelmaps, br_uint_16 num) {
     br_datafile* df;
     int count = 0;
@@ -155,24 +131,21 @@ br_uint_32 BrPixelmapLoadMany(char* filename, br_pixelmap** pixelmaps, br_uint_1
     return count;
 }
 
-// Offset: 1687
-// Size: 161
-// EAX: pp
-// EDX: df
+// IDA: int __usercall WritePixelmap@<EAX>(br_pixelmap *pp@<EAX>, br_datafile *df@<EDX>)
 int WritePixelmap(br_pixelmap* pp, br_datafile* df) {
+    LOG_TRACE("(%p, %p)", pp, df);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1867
-// Size: 218
+// IDA: br_uint_32 __cdecl BrPixelmapSaveMany(char *filename, br_pixelmap **pixelmaps, br_uint_16 num)
 br_uint_32 BrPixelmapSaveMany(char* filename, br_pixelmap** pixelmaps, br_uint_16 num) {
     br_datafile* df;
     int i;
+    LOG_TRACE("(\"%s\", %p, %d)", filename, pixelmaps, num);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2100
-// Size: 81
+// IDA: br_pixelmap* __cdecl BrPixelmapLoad(char *filename)
 br_pixelmap* BrPixelmapLoad(char* filename) {
     br_pixelmap* ptr;
 
@@ -182,8 +155,8 @@ br_pixelmap* BrPixelmapLoad(char* filename) {
     return NULL;
 }
 
-// Offset: 2196
-// Size: 58
+// IDA: br_uint_32 __cdecl BrPixelmapSave(char *filename, br_pixelmap *ptr)
 br_uint_32 BrPixelmapSave(char* filename, br_pixelmap* ptr) {
+    LOG_TRACE("(\"%s\", %p)", filename, ptr);
     NOT_IMPLEMENTED();
 }

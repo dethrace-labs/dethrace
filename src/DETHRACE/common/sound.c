@@ -35,8 +35,7 @@ int gMusic_available;
 tS3_outlet_ptr gMusic_outlet;
 tS3_outlet_ptr gEffects_outlet;
 
-// Offset: 0
-// Size: 224
+// IDA: void __cdecl UsePathFileToDetermineIfFullInstallation()
 void UsePathFileToDetermineIfFullInstallation() {
     char line2[80];
     char line3[80];
@@ -59,8 +58,7 @@ void UsePathFileToDetermineIfFullInstallation() {
     }
 }
 
-// Offset: 224
-// Size: 976
+// IDA: void __cdecl InitSound()
 void InitSound() {
     tS3_sound_tag tag;
     int engine_channel_count;
@@ -70,214 +68,173 @@ void InitSound() {
     LOG_WARN("Not implmented");
 }
 
-// Offset: 1200
-// Size: 145
-// EAX: pOutlet
-// EDX: pSound
+// IDA: tS3_sound_tag __usercall DRS3StartSound@<EAX>(tS3_outlet_ptr pOutlet@<EAX>, tS3_sound_id pSound@<EDX>)
 tS3_sound_tag DRS3StartSound(tS3_outlet_ptr pOutlet, tS3_sound_id pSound) {
     STUB();
 }
 
-// Offset: 1348
-// Size: 73
-// EAX: pOutlet
-// EDX: pSound
+// IDA: tS3_sound_tag __usercall DRS3StartSoundNoPiping@<EAX>(tS3_outlet_ptr pOutlet@<EAX>, tS3_sound_id pSound@<EDX>)
 tS3_sound_tag DRS3StartSoundNoPiping(tS3_outlet_ptr pOutlet, tS3_sound_id pSound) {
     STUB();
 }
 
-// Offset: 1424
-// Size: 206
-// EAX: pOutlet
-// EDX: pSound
-// EBX: pRepeats
-// ECX: pLVolume
+// IDA: tS3_sound_tag __usercall DRS3StartSound2@<EAX>(tS3_outlet_ptr pOutlet@<EAX>, tS3_sound_id pSound@<EDX>, tS3_repeats pRepeats@<EBX>, tS3_volume pLVolume@<ECX>, tS3_volume pRVolume, tS3_pitch pPitch, tS3_speed pSpeed)
 tS3_sound_tag DRS3StartSound2(tS3_outlet_ptr pOutlet, tS3_sound_id pSound, tS3_repeats pRepeats, tS3_volume pLVolume, tS3_volume pRVolume, tS3_pitch pPitch, tS3_speed pSpeed) {
+    LOG_TRACE("(%d, %d, %d, %d, %d, %d, %d)", pOutlet, pSound, pRepeats, pLVolume, pRVolume, pPitch, pSpeed);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1632
-// Size: 73
-// EAX: pSound_tag
-// EDX: pNew_volume
+// IDA: int __usercall DRS3ChangeVolume@<EAX>(tS3_sound_tag pSound_tag@<EAX>, tS3_volume pNew_volume@<EDX>)
 int DRS3ChangeVolume(tS3_sound_tag pSound_tag, tS3_volume pNew_volume) {
+    LOG_TRACE("(%d, %d)", pSound_tag, pNew_volume);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1708
-// Size: 77
-// EAX: pSound_tag
-// EDX: pNew_Lvolume
-// EBX: pNew_Rvolume
+// IDA: int __usercall DRS3ChangeLRVolume@<EAX>(tS3_sound_tag pSound_tag@<EAX>, tS3_volume pNew_Lvolume@<EDX>, tS3_volume pNew_Rvolume@<EBX>)
 int DRS3ChangeLRVolume(tS3_sound_tag pSound_tag, tS3_volume pNew_Lvolume, tS3_volume pNew_Rvolume) {
+    LOG_TRACE("(%d, %d, %d)", pSound_tag, pNew_Lvolume, pNew_Rvolume);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1788
-// Size: 73
-// EAX: pTag
-// EDX: pNew_pitch
+// IDA: int __usercall DRS3ChangePitch@<EAX>(tS3_sound_tag pTag@<EAX>, tS3_pitch pNew_pitch@<EDX>)
 int DRS3ChangePitch(tS3_sound_tag pTag, tS3_pitch pNew_pitch) {
+    LOG_TRACE("(%d, %d)", pTag, pNew_pitch);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1864
-// Size: 73
-// EAX: pTag
-// EDX: pNew_speed
+// IDA: int __usercall DRS3ChangeSpeed@<EAX>(tS3_sound_tag pTag@<EAX>, tS3_pitch pNew_speed@<EDX>)
 int DRS3ChangeSpeed(tS3_sound_tag pTag, tS3_pitch pNew_speed) {
+    LOG_TRACE("(%d, %d)", pTag, pNew_speed);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1940
-// Size: 73
-// EAX: pTag
-// EDX: pNew_pitch
+// IDA: int __usercall DRS3ChangePitchSpeed@<EAX>(tS3_sound_tag pTag@<EAX>, tS3_pitch pNew_pitch@<EDX>)
 int DRS3ChangePitchSpeed(tS3_sound_tag pTag, tS3_pitch pNew_pitch) {
+    LOG_TRACE("(%d, %d)", pTag, pNew_pitch);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2016
-// Size: 69
-// EAX: pSound_tag
+// IDA: int __usercall DRS3StopSound@<EAX>(tS3_sound_tag pSound_tag@<EAX>)
 int DRS3StopSound(tS3_sound_tag pSound_tag) {
+    LOG_TRACE("(%d)", pSound_tag);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2088
-// Size: 69
-// EAX: pThe_sound
+// IDA: int __usercall DRS3LoadSound@<EAX>(tS3_sound_id pThe_sound@<EAX>)
 int DRS3LoadSound(tS3_sound_id pThe_sound) {
+    LOG_TRACE("(%d)", pThe_sound);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2160
-// Size: 69
-// EAX: pThe_sound
+// IDA: int __usercall DRS3ReleaseSound@<EAX>(tS3_sound_id pThe_sound@<EAX>)
 int DRS3ReleaseSound(tS3_sound_id pThe_sound) {
+    LOG_TRACE("(%d)", pThe_sound);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2232
-// Size: 97
+// IDA: void __cdecl DRS3Service()
 void DRS3Service() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2332
-// Size: 69
-// EAX: pOutlet
+// IDA: int __usercall DRS3OutletSoundsPlaying@<EAX>(tS3_outlet_ptr pOutlet@<EAX>)
 int DRS3OutletSoundsPlaying(tS3_outlet_ptr pOutlet) {
+    LOG_TRACE("(%d)", pOutlet);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2404
-// Size: 69
-// EAX: pSound_tag
+// IDA: int __usercall DRS3SoundStillPlaying@<EAX>(tS3_sound_tag pSound_tag@<EAX>)
 int DRS3SoundStillPlaying(tS3_sound_tag pSound_tag) {
+    LOG_TRACE("(%d)", pSound_tag);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2476
-// Size: 58
+// IDA: void __cdecl DRS3ShutDown()
 void DRS3ShutDown() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2536
-// Size: 73
-// EAX: pOutlet
-// EDX: pVolume
+// IDA: int __usercall DRS3SetOutletVolume@<EAX>(tS3_outlet_ptr pOutlet@<EAX>, tS3_volume pVolume@<EDX>)
 int DRS3SetOutletVolume(tS3_outlet_ptr pOutlet, tS3_volume pVolume) {
+    LOG_TRACE("(%d, %d)", pOutlet, pVolume);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2612
-// Size: 69
-// EAX: pVolume
+// IDA: int __usercall DRS3OverallVolume@<EAX>(tS3_volume pVolume@<EAX>)
 int DRS3OverallVolume(tS3_volume pVolume) {
+    LOG_TRACE("(%d)", pVolume);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2684
-// Size: 69
-// EAX: pOutlet
+// IDA: int __usercall DRS3StopOutletSound@<EAX>(tS3_outlet_ptr pOutlet@<EAX>)
 int DRS3StopOutletSound(tS3_outlet_ptr pOutlet) {
     STUB();
 }
 
-// Offset: 2756
-// Size: 63
+// IDA: int __cdecl DRS3StopAllOutletSounds()
 int DRS3StopAllOutletSounds() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2820
-// Size: 80
+// IDA: void __cdecl ToggleSoundEnable()
 void ToggleSoundEnable() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2900
-// Size: 125
+// IDA: void __cdecl SoundService()
 void SoundService() {
     br_matrix34 mat;
     SILENT_STUB();
 }
 
-// Offset: 3028
-// Size: 521
+// IDA: void __cdecl InitSoundSources()
 void InitSoundSources() {
+    int cat;
     int car_count;
     int i;
     int toggle;
     tCar_spec* the_car;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3552
-// Size: 411
+// IDA: void __cdecl DisposeSoundSources()
 void DisposeSoundSources() {
+    int cat;
     int car_count;
     int i;
     int toggle;
     tCar_spec* the_car;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3964
-// Size: 192
-// EAX: pOutlet
-// EDX: pSound
-// EBX: pInitial_position
-// ECX: pInitial_velocity
+// IDA: tS3_sound_tag __usercall DRS3StartSound3D@<EAX>(tS3_outlet_ptr pOutlet@<EAX>, tS3_sound_id pSound@<EDX>, br_vector3 *pInitial_position@<EBX>, br_vector3 *pInitial_velocity@<ECX>, tS3_repeats pRepeats, tS3_volume pVolume, tS3_pitch pPitch, tS3_speed pSpeed)
 tS3_sound_tag DRS3StartSound3D(tS3_outlet_ptr pOutlet, tS3_sound_id pSound, br_vector3* pInitial_position, br_vector3* pInitial_velocity, tS3_repeats pRepeats, tS3_volume pVolume, tS3_pitch pPitch, tS3_speed pSpeed) {
     tS3_sound_tag tag;
+    LOG_TRACE("(%d, %d, %p, %p, %d, %d, %d, %d)", pOutlet, pSound, pInitial_position, pInitial_velocity, pRepeats, pVolume, pPitch, pSpeed);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4156
-// Size: 97
-// EAX: pSource
-// EDX: pSound
-// EBX: pRepeats
-// ECX: pVolume
+// IDA: tS3_sound_tag __usercall DRS3StartSoundFromSource3@<EAX>(tS3_sound_source_ptr pSource@<EAX>, tS3_sound_id pSound@<EDX>, tS3_repeats pRepeats@<EBX>, tS3_volume pVolume@<ECX>, tS3_pitch pPitch, tS3_speed pSpeed)
 tS3_sound_tag DRS3StartSoundFromSource3(tS3_sound_source_ptr pSource, tS3_sound_id pSound, tS3_repeats pRepeats, tS3_volume pVolume, tS3_pitch pPitch, tS3_speed pSpeed) {
     tS3_sound_tag tag;
+    LOG_TRACE("(%d, %d, %d, %d, %d, %d)", pSource, pSound, pRepeats, pVolume, pPitch, pSpeed);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4256
-// Size: 79
-// EAX: pSource
-// EDX: pSound
+// IDA: tS3_sound_tag __usercall DRS3StartSoundFromSource@<EAX>(tS3_sound_source_ptr pSource@<EAX>, tS3_sound_id pSound@<EDX>)
 tS3_sound_tag DRS3StartSoundFromSource(tS3_sound_source_ptr pSource, tS3_sound_id pSound) {
     tS3_sound_tag tag;
+    LOG_TRACE("(%d, %d)", pSource, pSound);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4336
-// Size: 1377
+// IDA: void __cdecl MungeEngineNoise()
 void MungeEngineNoise() {
     tU32 pitch;
     int vol;
@@ -290,46 +247,40 @@ void MungeEngineNoise() {
     STUB();
 }
 
-// Offset: 5716
-// Size: 154
+// IDA: void __cdecl SetSoundVolumes()
 void SetSoundVolumes() {
     STUB();
 }
 
-// Offset: 5872
-// Size: 55
-// EAX: pIndex
+// IDA: tS3_outlet_ptr __usercall GetOutletFromIndex@<EAX>(int pIndex@<EAX>)
 tS3_outlet_ptr GetOutletFromIndex(int pIndex) {
+    LOG_TRACE("(%d)", pIndex);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5928
-// Size: 97
-// EAX: pOutlet
+// IDA: int __usercall GetIndexFromOutlet@<EAX>(tS3_outlet_ptr pOutlet@<EAX>)
 int GetIndexFromOutlet(tS3_outlet_ptr pOutlet) {
     int i;
+    LOG_TRACE("(%d)", pOutlet);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6028
-// Size: 295
-// EAX: pCDA_id
+// IDA: int __usercall DRS3StartCDA@<EAX>(tS3_sound_id pCDA_id@<EAX>)
 int DRS3StartCDA(tS3_sound_id pCDA_id) {
+    LOG_TRACE("(%d)", pCDA_id);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6324
-// Size: 95
+// IDA: int __cdecl DRS3StopCDA()
 int DRS3StopCDA() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6420
-// Size: 75
+// IDA: void __cdecl StartMusic()
 void StartMusic() {
 }
 
-// Offset: 6496
-// Size: 48
+// IDA: void __cdecl StopMusic()
 void StopMusic() {
 }

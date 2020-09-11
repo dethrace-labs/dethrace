@@ -3,8 +3,7 @@
 
 char rscid[52];
 
-// Offset: 17
-// Size: 2997
+// IDA: void __cdecl BrMaterialUpdate(br_material *mat, br_uint_16 flags)
 void BrMaterialUpdate(br_material* mat, br_uint_16 flags) {
     br_token_value tva[32];
     br_token_value* tvp;
@@ -14,9 +13,8 @@ void BrMaterialUpdate(br_material* mat, br_uint_16 flags) {
     //TODO: ?
 }
 
-// Offset: 3030
-// Size: 88
-// EAX: mat
+// IDA: void __usercall BrMaterialClear(br_material *mat@<EAX>)
 void BrMaterialClear(br_material* mat) {
+    LOG_TRACE("(%p)", mat);
     NOT_IMPLEMENTED();
 }

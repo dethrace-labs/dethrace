@@ -32,69 +32,51 @@ int gWreck_zoomed_in;
 int gDone_initial;
 int gTemp_lost;
 
-// Offset: 0
-// Size: 302
-// EAX: pThe_state
+// IDA: void __usercall MungeRankEtc(tProgram_state *pThe_state@<EAX>)
 void MungeRankEtc(tProgram_state* pThe_state) {
     int i;
     int not_done_yet;
+    LOG_TRACE("(%p)", pThe_state);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 304
-// Size: 96
+// IDA: void __cdecl CalcRankIncrease()
 void CalcRankIncrease() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 400
-// Size: 81
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
-// EBX: pGo_ahead
-// ECX: pEscaped
+// IDA: int __usercall RaceSummaryDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
 int RaceSummaryDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
+    LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 484
-// Size: 166
-// EAX: pBox_left
-// EDX: pText_left
-// EBX: pTop
-// ECX: pRight
+// IDA: void __usercall DrawInBox(int pBox_left@<EAX>, int pText_left@<EDX>, int pTop@<EBX>, int pRight@<ECX>, int pBottom, int pColour, int pAmount)
 void DrawInBox(int pBox_left, int pText_left, int pTop, int pRight, int pBottom, int pColour, int pAmount) {
+    LOG_TRACE("(%d, %d, %d, %d, %d, %d, %d)", pBox_left, pText_left, pTop, pRight, pBottom, pColour, pAmount);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 652
-// Size: 220
-// EAX: pLeft_1
-// EDX: pLeft_2
-// EBX: pPitch
-// ECX: pTop
+// IDA: void __usercall DrawChromeNumber(int pLeft_1@<EAX>, int pLeft_2@<EDX>, int pPitch@<EBX>, int pTop@<ECX>, int pAmount)
 void DrawChromeNumber(int pLeft_1, int pLeft_2, int pPitch, int pTop, int pAmount) {
+    LOG_TRACE("(%d, %d, %d, %d, %d)", pLeft_1, pLeft_2, pPitch, pTop, pAmount);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 872
-// Size: 604
+// IDA: void __cdecl DrawSummaryItems()
 void DrawSummaryItems() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1476
-// Size: 127
-// EAX: pRate
-// EDX: pTime
+// IDA: void __usercall RampUpRate(float *pRate@<EAX>, tU32 pTime@<EDX>)
 void RampUpRate(float* pRate, tU32 pTime) {
+    LOG_TRACE("(%p, %d)", pRate, pTime);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1604
-// Size: 747
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
+// IDA: void __usercall DrawSummary(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
 void DrawSummary(int pCurrent_choice, int pCurrent_mode) {
     tU32 the_time;
     static tU32 last_time;
@@ -102,140 +84,125 @@ void DrawSummary(int pCurrent_choice, int pCurrent_mode) {
     int credit_delta;
     float old_temp_increase;
     float rank_delta;
+    LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2352
-// Size: 49
+// IDA: void __cdecl StartSummary()
 void StartSummary() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2404
-// Size: 86
+// IDA: void __cdecl SetUpTemps()
 void SetUpTemps() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2492
-// Size: 78
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
+// IDA: int __usercall Summ1GoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int Summ1GoAhead(int* pCurrent_choice, int* pCurrent_mode) {
+    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2572
-// Size: 324
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
+// IDA: int __usercall SummCheckGameOver@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int SummCheckGameOver(int* pCurrent_choice, int* pCurrent_mode) {
     int i;
     tS3_sound_tag sound_tag;
+    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2896
-// Size: 288
+// IDA: tSO_result __cdecl DoEndRaceSummary1()
 tSO_result DoEndRaceSummary1() {
+    static tFlicette flicker_on[1];
     static tFlicette flicker_off[1];
     static tFlicette push[1];
     static tMouse_area mouse_areas[1];
     static tInterface_spec interface_spec;
     int result;
     int completed_already;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3352
-// Size: 1003
+// IDA: void __cdecl BuildWrecks()
 void BuildWrecks() {
+    int cat;
     int i;
     int position;
     int car_count;
     br_actor* this_car;
     tCar_spec* the_car;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4356
-// Size: 385
+// IDA: void __cdecl DisposeWrecks()
 void DisposeWrecks() {
+    int cat;
     int i;
     int position;
     int car_count;
     br_actor* this_car;
     tCar_spec* the_car;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4744
-// Size: 185
-// EAX: pMat
+// IDA: int __usercall MatrixIsIdentity@<EAX>(br_matrix34 *pMat@<EAX>)
 int MatrixIsIdentity(br_matrix34* pMat) {
+    LOG_TRACE("(%p)", pMat);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4932
-// Size: 403
-// EAX: pFrame_period
+// IDA: void __usercall SpinWrecks(tU32 pFrame_period@<EAX>)
 void SpinWrecks(tU32 pFrame_period) {
     int i;
     br_vector3 translation;
     br_matrix34 old_mat;
+    LOG_TRACE("(%d)", pFrame_period);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5336
-// Size: 143
-// EAX: pIndex
-// EDX: pCurrent_choice
-// EBX: pCurrent_mode
+// IDA: void __usercall ZoomInTo(int pIndex@<EAX>, int *pCurrent_choice@<EDX>, int *pCurrent_mode@<EBX>)
 void ZoomInTo(int pIndex, int* pCurrent_choice, int* pCurrent_mode) {
+    LOG_TRACE("(%d, %p, %p)", pIndex, pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5480
-// Size: 189
-// EAX: pIndex
-// EDX: pCurrent_choice
-// EBX: pCurrent_mode
+// IDA: void __usercall ZoomOutTo(int pIndex@<EAX>, int *pCurrent_choice@<EDX>, int *pCurrent_mode@<EBX>)
 void ZoomOutTo(int pIndex, int* pCurrent_choice, int* pCurrent_mode) {
+    LOG_TRACE("(%d, %p, %p)", pIndex, pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5672
-// Size: 102
+// IDA: int __cdecl WreckPick(br_actor *pActor, br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pNear, br_scalar pFar, void *pArg)
 int WreckPick(br_actor* pActor, br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pNear, br_scalar pFar, void* pArg) {
     int i;
+    LOG_TRACE("(%p, %p, %p, %p, %p, %f, %f, %p)", pActor, pModel, pMaterial, pRay_pos, pRay_dir, pNear, pFar, pArg);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5776
-// Size: 404
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
+// IDA: int __usercall CastSelectionRay@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int CastSelectionRay(int* pCurrent_choice, int* pCurrent_mode) {
     int mouse_x;
     int mouse_y;
     int i;
     int result;
     br_scalar inv_wreck_pick_scale_factor;
+    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6180
-// Size: 167
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
+// IDA: int __usercall DamageScrnExit@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int DamageScrnExit(int* pCurrent_choice, int* pCurrent_mode) {
+    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6348
-// Size: 2481
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
+// IDA: void __usercall DamageScrnDraw(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
 void DamageScrnDraw(int pCurrent_choice, int pCurrent_mode) {
     tU32 the_time;
     br_vector3 camera_movement;
@@ -247,122 +214,102 @@ void DamageScrnDraw(int pCurrent_choice, int pCurrent_mode) {
     float spacing;
     br_actor* sel_actor;
     char* name;
+    LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8832
-// Size: 268
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
+// IDA: int __usercall DamageScrnLeft@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int DamageScrnLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int i;
+    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9100
-// Size: 275
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
+// IDA: int __usercall DamageScrnRight@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int DamageScrnRight(int* pCurrent_choice, int* pCurrent_mode) {
     int i;
+    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9376
-// Size: 428
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
+// IDA: int __usercall DamageScrnUp@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int DamageScrnUp(int* pCurrent_choice, int* pCurrent_mode) {
     int i;
     int difference;
     int new_difference;
     int new_selection;
+    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9804
-// Size: 470
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
+// IDA: int __usercall DamageScrnDown@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int DamageScrnDown(int* pCurrent_choice, int* pCurrent_mode) {
     int i;
     int difference;
     int new_difference;
     int new_selection;
+    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10276
-// Size: 176
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
+// IDA: int __usercall DamageScrnGoHead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int DamageScrnGoHead(int* pCurrent_choice, int* pCurrent_mode) {
+    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10452
-// Size: 258
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
-// EBX: pX_offset
-// ECX: pY_offset
+// IDA: int __usercall ClickDamage@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
 int ClickDamage(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     int mouse_x;
     int mouse_y;
     int old_mouse_x;
     int old_mouse_y;
+    LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10712
-// Size: 66
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
-// EBX: pGo_ahead
-// ECX: pEscaped
+// IDA: int __usercall DamageScrnDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
 int DamageScrnDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
+    LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10780
-// Size: 286
+// IDA: tSO_result __cdecl DoEndRaceSummary2()
 tSO_result DoEndRaceSummary2() {
+    static tFlicette flicker_on[3];
     static tFlicette flicker_off[3];
     static tFlicette push[3];
     static tMouse_area mouse_areas[3];
     static tInterface_spec interface_spec;
     int result;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 11256
-// Size: 74
-// EAX: pFirst_one
-// EDX: pSecond_one
+// IDA: int __usercall SortScores@<EAX>(void *pFirst_one@<EAX>, void *pSecond_one@<EDX>)
 int SortScores(void* pFirst_one, void* pSecond_one) {
+    LOG_TRACE("(%p, %p)", pFirst_one, pSecond_one);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 11332
-// Size: 60
+// IDA: void __cdecl SortGameScores()
 void SortGameScores() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 11392
-// Size: 709
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
+// IDA: void __usercall NetSumDraw(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
 void NetSumDraw(int pCurrent_choice, int pCurrent_mode) {
     int i;
     char s[256];
     tNet_game_player_info* player;
+    LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 12104
-// Size: 188
+// IDA: void __cdecl DoNetRaceSummary()
 void DoNetRaceSummary() {
+    static tFlicette flicker_on[1];
     static tFlicette flicker_off[1];
     static tFlicette push[1];
     static tMouse_area mouse_areas[1];
@@ -370,14 +317,13 @@ void DoNetRaceSummary() {
     int i;
     int result;
     tS32 start_time;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 12292
-// Size: 227
-// EAX: pFirst_summary_done
-// EDX: pRace_result
+// IDA: tSO_result __usercall DoEndRaceSummary@<EAX>(int *pFirst_summary_done@<EAX>, tRace_result pRace_result@<EDX>)
 tSO_result DoEndRaceSummary(int* pFirst_summary_done, tRace_result pRace_result) {
     tSO_result result;
+    LOG_TRACE("(%p, %d)", pFirst_summary_done, pRace_result);
     NOT_IMPLEMENTED();
 }

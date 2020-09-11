@@ -7,21 +7,21 @@ br_image Image_BRHOST1;
 char* namePointers_BRHOST1[50];
 br_uint_16 nameOrdinals_BRHOST1[50];
 
-// Offset: 10
-// Size: 49
+// IDA: void __cdecl HostBegin()
 void HostBegin() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 67
-// Size: 49
+// IDA: void __cdecl HostEnd()
 void HostEnd() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 125
-// Size: 125
+// IDA: br_error __cdecl HostInfo(host_info *buffer, br_size_t buffersize)
 br_error HostInfo(host_info* buffer, br_size_t buffersize) {
     br_int_32 features;
+    LOG_TRACE("(%p, %d)", buffer, buffersize);
     NOT_IMPLEMENTED();
 }

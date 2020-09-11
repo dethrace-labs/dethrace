@@ -1,7 +1,7 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-// JeffH: Constant names are not part of the symbol dump, so the names in this file are not original, except as noted.
+// JeffH: These names are not part of the symbol dump, so the names in this file are not original, except as noted.
 
 // Names from `gMem_names`. See also: `CreateStainlessClasses`
 typedef enum dr_memory_classes {

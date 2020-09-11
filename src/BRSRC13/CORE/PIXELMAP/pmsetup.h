@@ -5,12 +5,8 @@
 
 extern br_pixelmap_state _pixelmap;
 
-// Offset: 16
-// Size: 130
 void BrPixelmapBegin();
 
-// Offset: 160
-// Size: 76
 void BrPixelmapEnd();
 
 #endif

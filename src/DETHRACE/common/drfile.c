@@ -23,8 +23,7 @@ br_filesystem gFilesystem = {
 // Added by JeffH
 #define DR_MEMORY_FILESYSTEM 140
 
-// Offset: 0
-// Size: 64
+// IDA: void* __cdecl DRStdioOpenRead(char *name, br_size_t n_magics, br_mode_test_cbfn *identify, int *mode_result)
 void* DRStdioOpenRead(char* name, br_size_t n_magics, br_mode_test_cbfn* identify, int* mode_result) {
     if (mode_result) {
         *mode_result = 0;
@@ -32,34 +31,29 @@ void* DRStdioOpenRead(char* name, br_size_t n_magics, br_mode_test_cbfn* identif
     return DRfopen(name, "rb");
 }
 
-// Offset: 64
-// Size: 56
+// IDA: void* __cdecl DRStdioOpenWrite(char *name, int mode)
 void* DRStdioOpenWrite(char* name, int mode) {
     return gOld_file_system->open_write(name, mode);
 }
 
-// Offset: 120
-// Size: 46
+// IDA: void __cdecl DRStdioClose(void *f)
 void DRStdioClose(void* f) {
     gOld_file_system->close(f);
 }
 
-// Offset: 168
-// Size: 70
+// IDA: br_size_t __cdecl DRStdioRead(void *buf, br_size_t size, unsigned int n, void *f)
 br_size_t DRStdioRead(void* buf, br_size_t size, unsigned int n, void* f) {
     br_size_t result;
     return gOld_file_system->read(buf, size, n, f);
 }
 
-// Offset: 240
-// Size: 70
+// IDA: br_size_t __cdecl DRStdioWrite(void *buf, br_size_t size, unsigned int n, void *f)
 br_size_t DRStdioWrite(void* buf, br_size_t size, unsigned int n, void* f) {
     br_size_t result;
     return gOld_file_system->write(buf, size, n, f);
 }
 
-// Offset: 312
-// Size: 187
+// IDA: void __cdecl InstallDRFileCalls()
 void InstallDRFileCalls() {
     br_filesystem* temp_system;
     LOG_TRACE("()");

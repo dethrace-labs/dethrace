@@ -3,8 +3,7 @@
 // Global variables
 char rscid[49];
 
-// Offset: 8
-// Size: 560
+// IDA: void __cdecl BrQsort(void *basep, unsigned int nelems, unsigned int size, br_qsort_cbfn *comp)
 void BrQsort(void* basep, unsigned int nelems, unsigned int size, br_qsort_cbfn comp) {
     char* stack[40];
     char** sp;
@@ -107,11 +106,7 @@ void BrQsort(void* basep, unsigned int nelems, unsigned int size, br_qsort_cbfn 
     }
 }
 
-// Offset: 579
-// Size: 81
-// EAX: a
-// EDX: b
-// EBX: nbytes
+// IDA: void __usercall swap_chars(char *a@<EAX>, char *b@<EDX>, unsigned int nbytes@<EBX>)
 void swap_chars(char* a, char* b, unsigned int nbytes) {
     char tmp;
 
@@ -122,11 +117,7 @@ void swap_chars(char* a, char* b, unsigned int nbytes) {
     } while (--nbytes);
 }
 
-// Offset: 670
-// Size: 95
-// EAX: ap
-// EDX: bp
-// EBX: nints
+// IDA: void __usercall swap_ints(char *ap@<EAX>, char *bp@<EDX>, unsigned int nints@<EBX>)
 void swap_ints(char* ap, char* bp, unsigned int nints) {
     int* a = (int*)ap;
     int* b = (int*)bp;
@@ -139,11 +130,7 @@ void swap_ints(char* ap, char* bp, unsigned int nints) {
     } while (--nints);
 }
 
-// Offset: 776
-// Size: 85
-// EAX: ap
-// EDX: bp
-// EBX: nints
+// IDA: void __usercall swap_int_1(char *ap@<EAX>, char *bp@<EDX>, unsigned int nints@<EBX>)
 void swap_int_1(char* ap, char* bp, unsigned int nints) {
     int* a = (int*)ap;
     int* b = (int*)bp;

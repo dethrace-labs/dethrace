@@ -8,9 +8,10 @@
 br_boolean active;
 char rscid[54];
 
-// Offset: 8
-// Size: 88
+// IDA: br_error __cdecl BrBegin()
 br_error BrBegin() {
+    LOG_TRACE("()");
+
     if (active) {
         return 4103;
     } else {
@@ -21,11 +22,11 @@ br_error BrBegin() {
         //nullsub_28();
         return 0;
     }
-    NOT_IMPLEMENTED();
 }
 
-// Offset: 102
-// Size: 126
+// IDA: br_error __cdecl BrEnd()
 br_error BrEnd() {
+    br_device* dev;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

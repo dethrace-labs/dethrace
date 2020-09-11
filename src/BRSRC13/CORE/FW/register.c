@@ -8,26 +8,20 @@
 
 char rscid[50];
 
-// Offset: 14
-// Size: 96
-// EAX: reg
+// IDA: void* __usercall BrRegistryNew@<EAX>(br_registry *reg@<EAX>)
 void* BrRegistryNew(br_registry* reg) {
     BrNewList(&reg->list);
     reg->count = 0;
 }
 
-// Offset: 126
-// Size: 126
-// EAX: reg
+// IDA: void* __usercall BrRegistryClear@<EAX>(br_registry *reg@<EAX>)
 void* BrRegistryClear(br_registry* reg) {
     br_registry_entry* e;
+    LOG_TRACE("(%p)", reg);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 266
-// Size: 159
-// EAX: reg
-// EDX: item
+// IDA: void* __usercall BrRegistryAdd@<EAX>(br_registry *reg@<EAX>, void *item@<EDX>)
 void* BrRegistryAdd(br_registry* reg, void* item) {
     br_registry_entry* e;
 
@@ -38,41 +32,30 @@ void* BrRegistryAdd(br_registry* reg, void* item) {
     return item;
 }
 
-// Offset: 443
-// Size: 148
-// EAX: reg
-// EDX: items
-// EBX: n
+// IDA: int __usercall BrRegistryAddMany@<EAX>(br_registry *reg@<EAX>, void **items@<EDX>, int n@<EBX>)
 int BrRegistryAddMany(br_registry* reg, void** items, int n) {
     int i;
+    LOG_TRACE("(%p, %p, %d)", reg, items, n);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 608
-// Size: 198
-// EAX: reg
-// EDX: item
+// IDA: void* __usercall BrRegistryRemove@<EAX>(br_registry *reg@<EAX>, void *item@<EDX>)
 void* BrRegistryRemove(br_registry* reg, void* item) {
     br_registry_entry* e;
     void* r;
+    LOG_TRACE("(%p, %p)", reg, item);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 827
-// Size: 171
-// EAX: reg
-// EDX: items
-// EBX: n
+// IDA: int __usercall BrRegistryRemoveMany@<EAX>(br_registry *reg@<EAX>, void **items@<EDX>, int n@<EBX>)
 int BrRegistryRemoveMany(br_registry* reg, void** items, int n) {
     int i;
     int r;
+    LOG_TRACE("(%p, %p, %d)", reg, items, n);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1013
-// Size: 172
-// EAX: reg
-// EDX: pattern
+// IDA: void* __usercall BrRegistryFind@<EAX>(br_registry *reg@<EAX>, char *pattern@<EDX>)
 void* BrRegistryFind(br_registry* reg, char* pattern) {
     br_registry_entry* e;
     br_pixelmap* pm;
@@ -101,34 +84,23 @@ void* BrRegistryFind(br_registry* reg, char* pattern) {
     return NULL;
 }
 
-// Offset: 1204
-// Size: 140
-// EAX: reg
-// EDX: pattern
-// EBX: items
-// ECX: max
+// IDA: int __usercall BrRegistryFindMany@<EAX>(br_registry *reg@<EAX>, char *pattern@<EDX>, void **items@<EBX>, int max@<ECX>)
 int BrRegistryFindMany(br_registry* reg, char* pattern, void** items, int max) {
     br_registry_entry* e;
     int n;
+    LOG_TRACE("(%p, \"%s\", %p, %d)", reg, pattern, items, max);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1360
-// Size: 163
-// EAX: reg
-// EDX: pattern
+// IDA: int __usercall BrRegistryCount@<EAX>(br_registry *reg@<EAX>, char *pattern@<EDX>)
 int BrRegistryCount(br_registry* reg, char* pattern) {
     br_registry_entry* e;
     int n;
+    LOG_TRACE("(%p, \"%s\")", reg, pattern);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1538
-// Size: 280
-// EAX: reg
-// EDX: pattern
-// EBX: callback
-// ECX: arg
+// IDA: int __usercall BrRegistryEnum@<EAX>(br_registry *reg@<EAX>, char *pattern@<EDX>, br_enum_cbfn *callback@<EBX>, void *arg@<ECX>)
 int BrRegistryEnum(br_registry* reg, char* pattern, br_enum_cbfn* callback, void* arg) {
     br_registry_entry* e;
     int r;
@@ -169,28 +141,20 @@ int BrRegistryEnum(br_registry* reg, char* pattern, br_enum_cbfn* callback, void
     return 0;
 }
 
-// Offset: 1838
-// Size: 49
-// EAX: reg
-// EDX: base
-// EBX: limit
+// IDA: void* __usercall BrRegistryNewStatic@<EAX>(br_registry *reg@<EAX>, br_registry_entry *base@<EDX>, int limit@<EBX>)
 void* BrRegistryNewStatic(br_registry* reg, br_registry_entry* base, int limit) {
+    LOG_TRACE("(%p, %p, %d)", reg, base, limit);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1907
-// Size: 49
-// EAX: reg
-// EDX: base
-// EBX: item
+// IDA: void* __usercall BrRegistryAddStatic@<EAX>(br_registry *reg@<EAX>, br_registry_entry *base@<EDX>, void *item@<EBX>)
 void* BrRegistryAddStatic(br_registry* reg, br_registry_entry* base, void* item) {
+    LOG_TRACE("(%p, %p, %p)", reg, base, item);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1979
-// Size: 48
-// EAX: reg
-// EDX: item
+// IDA: void* __usercall BrRegistryRemoveStatic@<EAX>(br_registry *reg@<EAX>, void *item@<EDX>)
 void* BrRegistryRemoveStatic(br_registry* reg, void* item) {
+    LOG_TRACE("(%p, %p)", reg, item);
     NOT_IMPLEMENTED();
 }

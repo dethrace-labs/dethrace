@@ -1,5 +1,3 @@
-// This is a temporary solution to avoid userland (dethrace) code from having to understand brender internal paths.
-// Probably should end up just being a bunch of function prototypes.
 
 #ifndef BRENDER_H
 #define BRENDER_H

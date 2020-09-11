@@ -6,8 +6,7 @@
 
 char rscid[52];
 
-// Offset: 21
-// Size: 224
+// IDA: br_material* __cdecl SetupDefaultMaterial()
 br_material* SetupDefaultMaterial() {
     static br_material* default_mat;
 

@@ -3,9 +3,7 @@
 
 char rscid[49];
 
-// Offset: 10
-// Size: 2401
-// EAX: name
+// IDA: br_image* __usercall ImageLoad@<EAX>(char *name@<EAX>)
 br_image* ImageLoad(char* name) {
     void* fh;
     int mode;
@@ -21,5 +19,6 @@ br_image* ImageLoad(char* name) {
     int i;
     br_uint_32 offset;
     unsigned int n;
+    LOG_TRACE("(\"%s\")", name);
     NOT_IMPLEMENTED();
 }

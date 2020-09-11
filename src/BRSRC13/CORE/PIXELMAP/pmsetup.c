@@ -17,8 +17,7 @@ char* namePointers_BRPMAP1[77];
 br_pixelmap_state _pixelmap;
 br_uint_16 nameOrdinals_BRPMAP1[77];
 
-// Offset: 16
-// Size: 130
+// IDA: void __cdecl BrPixelmapBegin()
 void BrPixelmapBegin() {
     int i;
 
@@ -30,8 +29,8 @@ void BrPixelmapBegin() {
     BrImageAdd(&Image_BRPMAP1);
 }
 
-// Offset: 160
-// Size: 76
+// IDA: void __cdecl BrPixelmapEnd()
 void BrPixelmapEnd() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

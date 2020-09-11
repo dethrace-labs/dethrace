@@ -7,8 +7,7 @@
 
 char rscid[49];
 
-// Offset: 19
-// Size: 138
+// IDA: br_material* __cdecl BrMaterialAllocate(char *name)
 br_material* BrMaterialAllocate(char* name) {
     br_material* m;
     LOG_TRACE("(\"%s\")", name);
@@ -24,8 +23,8 @@ br_material* BrMaterialAllocate(char* name) {
     return m;
 }
 
-// Offset: 172
-// Size: 70
+// IDA: void __cdecl BrMaterialFree(br_material *m)
 void BrMaterialFree(br_material* m) {
+    LOG_TRACE("(%p)", m);
     NOT_IMPLEMENTED();
 }

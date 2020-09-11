@@ -1,12 +1,7 @@
 #include "oppoproc.h"
 #include <stdlib.h>
 
-// Offset: 0
-// Size: 724
-// EAX: pCent
-// EDX: pRadius
-// EBX: pEntry_length
-// ECX: pLeft_not_right
+// IDA: int __usercall StraightestArcForCorner2D@<EAX>(br_vector2 *pCent@<EAX>, br_scalar *pRadius@<EDX>, br_scalar *pEntry_length@<EBX>, int *pLeft_not_right@<ECX>, br_vector2 *p1, br_vector2 *p2, br_vector2 *p3, br_scalar pWidth12, br_scalar pWidth23)
 int StraightestArcForCorner2D(br_vector2* pCent, br_scalar* pRadius, br_scalar* pEntry_length, int* pLeft_not_right, br_vector2* p1, br_vector2* p2, br_vector2* p3, br_scalar pWidth12, br_scalar pWidth23) {
     br_vector2 rel1;
     br_vector2 rel3;
@@ -17,45 +12,37 @@ int StraightestArcForCorner2D(br_vector2* pCent, br_scalar* pRadius, br_scalar* 
     br_scalar c;
     br_scalar numerator;
     br_scalar x;
+    LOG_TRACE("(%p, %p, %p, %p, %p, %p, %p, %f, %f)", pCent, pRadius, pEntry_length, pLeft_not_right, p1, p2, p3, pWidth12, pWidth23);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 724
-// Size: 47
-// EAX: pCar_spec
+// IDA: br_scalar __usercall CornerFudge@<ST0>(tCar_spec *pCar_spec@<EAX>)
 br_scalar CornerFudge(tCar_spec* pCar_spec) {
+    LOG_TRACE("(%p)", pCar_spec);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 772
-// Size: 92
-// EAX: pCar
+// IDA: br_scalar __usercall MaxCurvatureForCarSpeed@<ST0>(tCar_spec *pCar@<EAX>, br_scalar pSpeed)
 br_scalar MaxCurvatureForCarSpeed(tCar_spec* pCar, br_scalar pSpeed) {
     br_scalar curv;
+    LOG_TRACE("(%p, %f)", pCar, pSpeed);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 864
-// Size: 70
-// EAX: pA
-// EDX: pB
+// IDA: br_scalar __usercall Vector2Cross@<ST0>(br_vector2 *pA@<EAX>, br_vector2 *pB@<EDX>)
 br_scalar Vector2Cross(br_vector2* pA, br_vector2* pB) {
+    LOG_TRACE("(%p, %p)", pA, pB);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 936
-// Size: 108
-// EAX: pOpponent_spec
+// IDA: tFollow_path_result __usercall EndOfPath@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>)
 tFollow_path_result EndOfPath(tOpponent_spec* pOpponent_spec) {
     tCar_spec* car_spec;
+    LOG_TRACE("(%p)", pOpponent_spec);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1044
-// Size: 235
-// EAX: p1
-// EDX: p2
-// EBX: p3
+// IDA: int __usercall RoughlyColinear@<EAX>(br_vector2 *p1@<EAX>, br_vector2 *p2@<EDX>, br_vector2 *p3@<EBX>)
 int RoughlyColinear(br_vector2* p1, br_vector2* p2, br_vector2* p3) {
     br_vector2 rel1;
     br_vector2 rel2;
@@ -63,28 +50,20 @@ int RoughlyColinear(br_vector2* p1, br_vector2* p2, br_vector2* p3) {
     br_scalar cross;
     br_scalar dot;
     br_scalar wibble;
+    LOG_TRACE("(%p, %p, %p)", p1, p2, p3);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1280
-// Size: 296
-// EAX: pStart
-// EDX: pFinish
-// EBX: pWidth
-// ECX: section1
+// IDA: int __usercall GetStraight@<EAX>(br_vector2 *pStart@<EAX>, br_vector2 *pFinish@<EDX>, br_scalar *pWidth@<EBX>, int section1@<ECX>, tOpponent_spec *pOpponent_spec, tFollow_path_data *data)
 int GetStraight(br_vector2* pStart, br_vector2* pFinish, br_scalar* pWidth, int section1, tOpponent_spec* pOpponent_spec, tFollow_path_data* data) {
     int section;
     br_vector2 next;
     br_scalar next_width;
+    LOG_TRACE("(%p, %p, %p, %d, %p, %p)", pStart, pFinish, pWidth, section1, pOpponent_spec, data);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1576
-// Size: 5921
-// EAX: pOpponent_spec
-// EDX: pCommand
-// EBX: pPursuit_mode
-// ECX: pIgnore_end
+// IDA: tFollow_path_result __usercall ProcessFollowPath@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, tProcess_objective_command pCommand@<EDX>, int pPursuit_mode@<EBX>, int pIgnore_end@<ECX>, int pNever_struggle)
 tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand, int pPursuit_mode, int pIgnore_end, int pNever_struggle) {
     tS16 real_section_no;
     tFollow_path_data* data;
@@ -166,12 +145,11 @@ tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_o
     int left_not_right;
     int later_straight;
     int next_left_not_right;
+    LOG_TRACE("(%p, %d, %d, %d, %d)", pOpponent_spec, pCommand, pPursuit_mode, pIgnore_end, pNever_struggle);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7500
-// Size: 3018
-// EAX: pOpponent_spec
+// IDA: tFollow_path_result __usercall FollowCheatyPath@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>)
 tFollow_path_result FollowCheatyPath(tOpponent_spec* pOpponent_spec) {
     tFollow_path_data* data;
     br_vector3 a;
@@ -189,5 +167,6 @@ tFollow_path_result FollowCheatyPath(tOpponent_spec* pOpponent_spec) {
     br_scalar section_min;
     br_scalar section_max;
     br_scalar desired_speed_BRU;
+    LOG_TRACE("(%p)", pOpponent_spec);
     NOT_IMPLEMENTED();
 }

@@ -1,26 +1,25 @@
 #include "himage.h"
 #include "harness.h"
 
-// Offset: 14
-// Size: 40
+// IDA: void* __cdecl HostImageLoad(char *name)
 void* HostImageLoad(char* name) {
     STUB();
 }
 
-// Offset: 70
-// Size: 30
+// IDA: void __cdecl HostImageUnload(void *image)
 void HostImageUnload(void* image) {
+    LOG_TRACE("(%p)", image);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 120
-// Size: 40
+// IDA: void* __cdecl HostImageLookupName(void *img, char *name, br_uint_32 hint)
 void* HostImageLookupName(void* img, char* name, br_uint_32 hint) {
+    LOG_TRACE("(%p, \"%s\", %d)", img, name, hint);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 183
-// Size: 40
+// IDA: void* __cdecl HostImageLookupOrdinal(void *img, br_uint_32 ordinal)
 void* HostImageLookupOrdinal(void* img, br_uint_32 ordinal) {
+    LOG_TRACE("(%p, %d)", img, ordinal);
     NOT_IMPLEMENTED();
 }

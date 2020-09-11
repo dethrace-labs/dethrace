@@ -37,93 +37,67 @@ br_angle gSky_image_width;
 br_angle gSky_image_height;
 br_angle gSky_image_underground;
 
-// Offset: 0
-// Size: 110
-// EAX: pNumber
+// IDA: int __usercall Log2@<EAX>(int pNumber@<EAX>)
 int Log2(int pNumber) {
     int i;
     int bits[16];
+    LOG_TRACE("(%d)", pNumber);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 112
-// Size: 130
+// IDA: br_scalar __cdecl CalculateWrappingMultiplier(br_scalar pValue, br_scalar pYon)
 br_scalar CalculateWrappingMultiplier(br_scalar pValue, br_scalar pYon) {
     br_scalar k;
     br_scalar trunc_k;
     int int_k;
+    LOG_TRACE("(%f, %f)", pValue, pYon);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 244
-// Size: 78
-// EAX: pShift
+// IDA: br_scalar __usercall DepthCueingShiftToDistance@<ST0>(int pShift@<EAX>)
 br_scalar DepthCueingShiftToDistance(int pShift) {
+    LOG_TRACE("(%d)", pShift);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 324
-// Size: 210
-// EAX: pMaterial
+// IDA: void __usercall FogAccordingToGPSCDE(br_material *pMaterial@<EAX>)
 void FogAccordingToGPSCDE(br_material* pMaterial) {
     int start;
     int end;
+    LOG_TRACE("(%p)", pMaterial);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 536
-// Size: 206
+// IDA: void __cdecl FrobFog()
 void FrobFog() {
+    int i;
     br_material* mat;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 744
-// Size: 170
-// EAX: pType
-// EDX: pSky_texture
-// EBX: pStart
-// ECX: pEnd
+// IDA: void __usercall InstantDepthChange(tDepth_effect_type pType@<EAX>, br_pixelmap *pSky_texture@<EDX>, int pStart@<EBX>, int pEnd@<ECX>)
 void InstantDepthChange(tDepth_effect_type pType, br_pixelmap* pSky_texture, int pStart, int pEnd) {
-    // TODO: not sure if this line is right..
-    if ((int)pType == -1) {
-        pStart = 3;
-        pEnd = 3;
-    }
-    gProgram_state.current_depth_effect.sky_texture = pSky_texture;
-    gHorizon_material->colour_map = pSky_texture;
-    BrMaterialUpdate(gHorizon_material, BR_MATU_ALL);
-    gProgram_state.current_depth_effect.type = pType;
-    gProgram_state.current_depth_effect.start = pStart;
-    gProgram_state.current_depth_effect.end = pEnd;
-    gProgram_state.default_depth_effect.type = pType;
-    gProgram_state.default_depth_effect.start = pStart;
-    gProgram_state.default_depth_effect.end = pEnd;
+    LOG_TRACE("(%d, %p, %d, %d)", pType, pSky_texture, pStart, pEnd);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 916
-// Size: 90
+// IDA: br_scalar __cdecl Tan(br_scalar pAngle)
 br_scalar Tan(br_scalar pAngle) {
+    LOG_TRACE("(%f)", pAngle);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1008
-// Size: 213
-// EAX: pSky
-// EDX: pView
-// EBX: pPerfect
+// IDA: br_scalar __usercall EdgeU@<ST0>(br_angle pSky@<EAX>, br_angle pView@<EDX>, br_angle pPerfect@<EBX>)
 br_scalar EdgeU(br_angle pSky, br_angle pView, br_angle pPerfect) {
     br_scalar a;
     br_scalar b;
     br_scalar c;
+    LOG_TRACE("(%d, %d, %d)", pSky, pView, pPerfect);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1224
-// Size: 1602
-// EAX: pCamera
-// EDX: pModel
+// IDA: void __usercall MungeSkyModel(br_actor *pCamera@<EAX>, br_model *pModel@<EDX>)
 void MungeSkyModel(br_actor* pCamera, br_model* pModel) {
     br_camera* camera_data;
     br_scalar horizon_half_height;
@@ -142,48 +116,39 @@ void MungeSkyModel(br_actor* pCamera, br_model* pModel) {
     br_angle min_angle;
     br_angle angle_range;
     br_angle angle;
+    LOG_TRACE("(%p, %p)", pCamera, pModel);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2828
-// Size: 882
-// EAX: pCamera
+// IDA: br_model* __usercall CreateHorizonModel@<EAX>(br_actor *pCamera@<EAX>)
 br_model* CreateHorizonModel(br_actor* pCamera) {
     tU8 nbands;
     tU8 band;
     tU8 vertex;
     tU8 stripe;
     br_model* model;
+    LOG_TRACE("(%p)", pCamera);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3712
-// Size: 408
-// EAX: pName
-// EDX: pTable
-// EBX: pPower
+// IDA: void __usercall LoadDepthTable(char *pName@<EAX>, br_pixelmap **pTable@<EDX>, int *pPower@<EBX>)
 void LoadDepthTable(char* pName, br_pixelmap** pTable, int* pPower) {
     tPath_name the_path;
     int i;
     int j;
     tU8 temp;
+    LOG_TRACE("(\"%s\", %p, %p)", pName, pTable, pPower);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4120
-// Size: 611
+// IDA: void __cdecl InitDepthEffects()
 void InitDepthEffects() {
     int i;
     int j;
     STUB();
 }
 
-// Offset: 4732
-// Size: 769
-// EAX: pRender_buffer
-// EDX: pDepth_buffer
-// EBX: pShade_table
-// ECX: pShade_table_power
+// IDA: void __usercall DoDepthByShadeTable(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_pixelmap *pShade_table@<EBX>, int pShade_table_power@<ECX>, int pStart, int pEnd)
 void DoDepthByShadeTable(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_pixelmap* pShade_table, int pShade_table_power, int pStart, int pEnd) {
     tU8* render_ptr;
     tU8* shade_table_pixels;
@@ -196,15 +161,11 @@ void DoDepthByShadeTable(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer
     int x;
     int depth_line_skip;
     int render_line_skip;
+    LOG_TRACE("(%p, %p, %p, %d, %d, %d)", pRender_buffer, pDepth_buffer, pShade_table, pShade_table_power, pStart, pEnd);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5504
-// Size: 1009
-// EAX: pRender_buffer
-// EDX: pDepth_buffer
-// EBX: pCamera
-// ECX: pCamera_to_world
+// IDA: void __usercall ExternalSky(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>)
 void ExternalSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world) {
     int dst_x;
     int src_x;
@@ -227,60 +188,43 @@ void ExternalSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_act
     int bot_height;
     int repetitions;
     br_pixelmap* col_map;
+    LOG_TRACE("(%p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6516
-// Size: 463
-// EAX: pRender_buffer
-// EDX: pDepth_buffer
-// EBX: pCamera
-// ECX: pCamera_to_world
+// IDA: void __usercall DoHorizon(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>)
 void DoHorizon(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world) {
     br_angle yaw;
     br_actor* actor;
+    LOG_TRACE("(%p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6980
-// Size: 73
-// EAX: pRender_buffer
-// EDX: pDepth_buffer
+// IDA: void __usercall DoDepthCue(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>)
 void DoDepthCue(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer) {
+    LOG_TRACE("(%p, %p)", pRender_buffer, pDepth_buffer);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7056
-// Size: 73
-// EAX: pRender_buffer
-// EDX: pDepth_buffer
+// IDA: void __usercall DoFog(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>)
 void DoFog(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer) {
+    LOG_TRACE("(%p, %p)", pRender_buffer, pDepth_buffer);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7132
-// Size: 91
-// EAX: pRender_buffer
-// EDX: pDepth_buffer
-// EBX: pCamera
-// ECX: pCamera_to_world
+// IDA: void __usercall DepthEffect(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>)
 void DepthEffect(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world) {
+    LOG_TRACE("(%p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7224
-// Size: 93
-// EAX: pRender_buffer
-// EDX: pDepth_buffer
-// EBX: pCamera
-// ECX: pCamera_to_world
+// IDA: void __usercall DepthEffectSky(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>)
 void DepthEffectSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world) {
+    LOG_TRACE("(%p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7320
-// Size: 627
-// EAX: pCamera
+// IDA: void __usercall DoWobbleCamera(br_actor *pCamera@<EAX>)
 void DoWobbleCamera(br_actor* pCamera) {
     float f_time;
     static br_scalar mag00;
@@ -301,12 +245,11 @@ void DoWobbleCamera(br_actor* pCamera) {
     static float period20;
     static float period21;
     static float period22;
+    LOG_TRACE("(%p)", pCamera);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7948
-// Size: 627
-// EAX: pCamera
+// IDA: void __usercall DoDrugWobbleCamera(br_actor *pCamera@<EAX>)
 void DoDrugWobbleCamera(br_actor* pCamera) {
     float f_time;
     static br_scalar mag00;
@@ -327,66 +270,71 @@ void DoDrugWobbleCamera(br_actor* pCamera) {
     static float period20;
     static float period21;
     static float period22;
+    LOG_TRACE("(%p)", pCamera);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8576
-// Size: 116
-// EAX: pCamera
-// EDX: pCamera_to_world
+// IDA: void __usercall DoSpecialCameraEffect(br_actor *pCamera@<EAX>, br_matrix34 *pCamera_to_world@<EDX>)
 void DoSpecialCameraEffect(br_actor* pCamera, br_matrix34* pCamera_to_world) {
+    LOG_TRACE("(%p, %p)", pCamera, pCamera_to_world);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8692
-// Size: 115
+// IDA: void __cdecl LessDepthFactor()
 void LessDepthFactor() {
+    char s[256];
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8808
-// Size: 115
+// IDA: void __cdecl MoreDepthFactor()
 void MoreDepthFactor() {
+    char s[256];
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8924
-// Size: 115
+// IDA: void __cdecl LessDepthFactor2()
 void LessDepthFactor2() {
+    char s[256];
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9040
-// Size: 115
+// IDA: void __cdecl MoreDepthFactor2()
 void MoreDepthFactor2() {
+    char s[256];
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9156
-// Size: 95
+// IDA: void __cdecl AssertYons()
 void AssertYons() {
+    br_camera* camera_ptr;
     int i;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9252
-// Size: 140
+// IDA: void __cdecl IncreaseYon()
 void IncreaseYon() {
+    br_camera* camera_ptr;
     int i;
     char s[256];
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9392
-// Size: 162
+// IDA: void __cdecl DecreaseYon()
 void DecreaseYon() {
+    br_camera* camera_ptr;
     int i;
     char s[256];
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9556
-// Size: 127
+// IDA: void __cdecl SetYon(br_scalar pYon)
 void SetYon(br_scalar pYon) {
     int i;
     br_camera* camera_ptr;
@@ -406,43 +354,43 @@ void SetYon(br_scalar pYon) {
     gCamera_yon = pYon;
 }
 
-// Offset: 9684
-// Size: 47
+// IDA: br_scalar __cdecl GetYon()
 br_scalar GetYon() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9732
-// Size: 162
+// IDA: void __cdecl IncreaseAngle()
 void IncreaseAngle() {
+    br_camera* camera_ptr;
     int i;
     char s[256];
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9896
-// Size: 162
+// IDA: void __cdecl DecreaseAngle()
 void DecreaseAngle() {
+    br_camera* camera_ptr;
     int i;
     char s[256];
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10060
-// Size: 261
+// IDA: void __cdecl ToggleDepthMode()
 void ToggleDepthMode() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10324
-// Size: 45
+// IDA: int __cdecl GetSkyTextureOn()
 int GetSkyTextureOn() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10372
-// Size: 60
-// EAX: pOn
+// IDA: void __usercall SetSkyTextureOn(int pOn@<EAX>)
 void SetSkyTextureOn(int pOn) {
     br_pixelmap* tmp;
     LOG_TRACE("(%d)", pOn);
@@ -463,27 +411,26 @@ void SetSkyTextureOn(int pOn) {
     gSky_on = pOn;
 }
 
-// Offset: 10432
-// Size: 124
+// IDA: void __cdecl ToggleSkyQuietly()
 void ToggleSkyQuietly() {
+    br_pixelmap* temp;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10556
-// Size: 188
+// IDA: void __cdecl ToggleSky()
 void ToggleSky() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10744
-// Size: 45
+// IDA: int __cdecl GetDepthCueingOn()
 int GetDepthCueingOn() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10792
-// Size: 71
-// EAX: pOn
+// IDA: void __usercall SetDepthCueingOn(int pOn@<EAX>)
 void SetDepthCueingOn(int pOn) {
     LOG_TRACE("(%d)", pOn);
     if (pOn != gDepth_cueing_on && gHorizon_material) {
@@ -495,23 +442,24 @@ void SetDepthCueingOn(int pOn) {
     gDepth_cueing_on = pOn;
 }
 
-// Offset: 10864
-// Size: 110
+// IDA: void __cdecl ToggleDepthCueingQuietly()
 void ToggleDepthCueingQuietly() {
+    tDepth_effect_type temp_type;
     int temp_start;
     int temp_end;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10976
-// Size: 188
+// IDA: void __cdecl ToggleDepthCueing()
 void ToggleDepthCueing() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 11164
-// Size: 74
+// IDA: void __cdecl ChangeDepthEffect()
 void ChangeDepthEffect() {
+    br_scalar x1;
     br_scalar x2;
     br_scalar y1;
     br_scalar y2;
@@ -519,17 +467,18 @@ void ChangeDepthEffect() {
     br_scalar z2;
     br_scalar distance;
     tSpecial_volume* special_volume;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 11240
-// Size: 34
+// IDA: void __cdecl MungeForwardSky()
 void MungeForwardSky() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 11276
-// Size: 60
+// IDA: void __cdecl MungeRearviewSky()
 void MungeRearviewSky() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

@@ -3,119 +3,118 @@
 
 char rscid[48];
 
-// Offset: 32
-// Size: 40
+// IDA: br_error __cdecl _M_br_device_pixelmap_gen_match(br_device_pixelmap *self, br_device_pixelmap **newpm, br_token_value *tv)
 br_error _M_br_device_pixelmap_gen_match(br_device_pixelmap* self, br_device_pixelmap** newpm, br_token_value* tv) {
+    LOG_TRACE("(%p, %p, %p)", self, newpm, tv);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 103
-// Size: 150
+// IDA: br_error __cdecl _M_br_device_pixelmap_gen_copy(br_device_pixelmap *self, br_device_pixelmap *src)
 br_error _M_br_device_pixelmap_gen_copy(br_device_pixelmap* self, br_device_pixelmap* src) {
     br_rectangle r;
     br_point p;
+    LOG_TRACE("(%p, %p)", self, src);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 286
-// Size: 150
+// IDA: br_error __cdecl _M_br_device_pixelmap_gen_copyTo(br_device_pixelmap *self, br_device_pixelmap *src)
 br_error _M_br_device_pixelmap_gen_copyTo(br_device_pixelmap* self, br_device_pixelmap* src) {
     br_rectangle r;
     br_point p;
+    LOG_TRACE("(%p, %p)", self, src);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 471
-// Size: 150
+// IDA: br_error __cdecl _M_br_device_pixelmap_gen_copyFrom(br_device_pixelmap *self, br_device_pixelmap *src)
 br_error _M_br_device_pixelmap_gen_copyFrom(br_device_pixelmap* self, br_device_pixelmap* src) {
     br_rectangle r;
     br_point p;
+    LOG_TRACE("(%p, %p)", self, src);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 652
-// Size: 116
+// IDA: br_error __cdecl _M_br_device_pixelmap_gen_fill(br_device_pixelmap *self, br_uint_32 colour)
 br_error _M_br_device_pixelmap_gen_fill(br_device_pixelmap* self, br_uint_32 colour) {
     br_rectangle r;
+    LOG_TRACE("(%p, %d)", self, colour);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 807
-// Size: 213
+// IDA: br_error __cdecl _M_br_device_pixelmap_gen_doubleBuffer(br_device_pixelmap *self, br_device_pixelmap *src)
 br_error _M_br_device_pixelmap_gen_doubleBuffer(br_device_pixelmap* self, br_device_pixelmap* src) {
     br_rectangle s;
     br_rectangle d;
+    LOG_TRACE("(%p, %p)", self, src);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1056
-// Size: 208
+// IDA: br_error __cdecl _M_br_device_pixelmap_gen_copyDirty(br_device_pixelmap *self, br_device_pixelmap *src, br_rectangle *dirty, br_int_32 num_rects)
 br_error _M_br_device_pixelmap_gen_copyDirty(br_device_pixelmap* self, br_device_pixelmap* src, br_rectangle* dirty, br_int_32 num_rects) {
     int i;
     br_point p;
     br_error e;
+    LOG_TRACE("(%p, %p, %p, %d)", self, src, dirty, num_rects);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1302
-// Size: 208
+// IDA: br_error __cdecl _M_br_device_pixelmap_gen_copyToDirty(br_device_pixelmap *self, br_device_pixelmap *src, br_rectangle *dirty, br_int_32 num_rects)
 br_error _M_br_device_pixelmap_gen_copyToDirty(br_device_pixelmap* self, br_device_pixelmap* src, br_rectangle* dirty, br_int_32 num_rects) {
     int i;
     br_point p;
     br_error e;
+    LOG_TRACE("(%p, %p, %p, %d)", self, src, dirty, num_rects);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1550
-// Size: 208
+// IDA: br_error __cdecl _M_br_device_pixelmap_gen_copyFromDirty(br_device_pixelmap *self, br_device_pixelmap *src, br_rectangle *dirty, br_int_32 num_rects)
 br_error _M_br_device_pixelmap_gen_copyFromDirty(br_device_pixelmap* self, br_device_pixelmap* src, br_rectangle* dirty, br_int_32 num_rects) {
     int i;
     br_point p;
     br_error e;
+    LOG_TRACE("(%p, %p, %p, %d)", self, src, dirty, num_rects);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1794
-// Size: 116
+// IDA: br_error __cdecl _M_br_device_pixelmap_gen_fillDirty(br_device_pixelmap *self, br_uint_32 colour, br_rectangle *dirty, br_int_32 num_rects)
 br_error _M_br_device_pixelmap_gen_fillDirty(br_device_pixelmap* self, br_uint_32 colour, br_rectangle* dirty, br_int_32 num_rects) {
     int i;
     br_error e;
+    LOG_TRACE("(%p, %d, %p, %d)", self, colour, dirty, num_rects);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1954
-// Size: 208
+// IDA: br_error __cdecl _M_br_device_pixelmap_gen_doubleBufferDirty(br_device_pixelmap *self, br_device_pixelmap *src, br_rectangle *dirty, br_int_32 num_rects)
 br_error _M_br_device_pixelmap_gen_doubleBufferDirty(br_device_pixelmap* self, br_device_pixelmap* src, br_rectangle* dirty, br_int_32 num_rects) {
     int i;
     br_point p;
     br_error e;
+    LOG_TRACE("(%p, %p, %p, %d)", self, src, dirty, num_rects);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2198
-// Size: 303
+// IDA: br_error __cdecl _M_br_device_pixelmap_gen_rectangle(br_device_pixelmap *self, br_rectangle *rect, br_uint_32 colour)
 br_error _M_br_device_pixelmap_gen_rectangle(br_device_pixelmap* self, br_rectangle* rect, br_uint_32 colour) {
     br_point tl;
     br_point tr;
     br_point bl;
     br_point br;
     br_error e;
+    LOG_TRACE("(%p, %p, %d)", self, rect, colour);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2538
-// Size: 303
+// IDA: br_error __cdecl _M_br_device_pixelmap_gen_rectangle2(br_device_pixelmap *self, br_rectangle *rect, br_uint_32 colour_tl, br_uint_32 colour_br)
 br_error _M_br_device_pixelmap_gen_rectangle2(br_device_pixelmap* self, br_rectangle* rect, br_uint_32 colour_tl, br_uint_32 colour_br) {
     br_point tl;
     br_point tr;
     br_point bl;
     br_point br;
     br_error e;
+    LOG_TRACE("(%p, %p, %d, %d)", self, rect, colour_tl, colour_br);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2872
-// Size: 3973
+// IDA: br_error __cdecl _M_br_device_pixelmap_gen_line(br_device_pixelmap *self, br_point *s, br_point *e, br_uint_32 colour)
 br_error _M_br_device_pixelmap_gen_line(br_device_pixelmap* self, br_point* s, br_point* e, br_uint_32 colour) {
     int dx;
     int dy;
@@ -137,57 +136,58 @@ br_error _M_br_device_pixelmap_gen_line(br_device_pixelmap* self, br_point* s, b
     br_point as;
     br_point ae;
     br_point p;
+    LOG_TRACE("(%p, %p, %p, %d)", self, s, e, colour);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6876
-// Size: 548
+// IDA: br_error __cdecl _M_br_device_pixelmap_gen_text(br_device_pixelmap *self, br_point *point, br_font *font, char *text, br_uint_32 colour)
 br_error _M_br_device_pixelmap_gen_text(br_device_pixelmap* self, br_point* point, br_font* font, char* text, br_uint_32 colour) {
     br_rectangle r;
     br_point p;
     br_int_32 x;
     br_int_32 y;
     br_int_32 s_stride;
+    LOG_TRACE("(%p, %p, %p, \"%s\", %d)", self, point, font, text, colour);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7461
-// Size: 217
+// IDA: br_error __cdecl _M_br_device_pixelmap_gen_textBounds(br_device_pixelmap *self, br_rectangle *rect, br_font *font, char *text)
 br_error _M_br_device_pixelmap_gen_textBounds(br_device_pixelmap* self, br_rectangle* rect, br_font* font, char* text) {
     int i;
     int j;
+    LOG_TRACE("(%p, %p, %p, \"%s\")", self, rect, font, text);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7713
-// Size: 238
+// IDA: br_error __cdecl _M_br_device_pixelmap_gen_copyBits(br_device_pixelmap *self, br_point *point, br_uint_8 *src, br_uint_16 s_stride, br_rectangle *bit_rect, br_uint_32 colour)
 br_error _M_br_device_pixelmap_gen_copyBits(br_device_pixelmap* self, br_point* point, br_uint_8* src, br_uint_16 s_stride, br_rectangle* bit_rect, br_uint_32 colour) {
     br_int_32 x;
     br_int_32 y;
     br_point p;
+    LOG_TRACE("(%p, %p, %p, %d, %p, %d)", self, point, src, s_stride, bit_rect, colour);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7983
-// Size: 40
+// IDA: br_error __cdecl _M_br_device_pixelmap_gen_flush(br_device_pixelmap *self)
 br_error _M_br_device_pixelmap_gen_flush(br_device_pixelmap* self) {
+    LOG_TRACE("(%p)", self);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8061
-// Size: 40
+// IDA: br_error __cdecl _M_br_device_pixelmap_gen_synchronise(br_device_pixelmap *self, br_token sync_type, br_boolean block)
 br_error _M_br_device_pixelmap_gen_synchronise(br_device_pixelmap* self, br_token sync_type, br_boolean block) {
+    LOG_TRACE("(%p, %d, %d)", self, sync_type, block);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8138
-// Size: 40
+// IDA: br_error __cdecl _M_br_device_pixelmap_gen_directLock(br_device_pixelmap *self, br_boolean block)
 br_error _M_br_device_pixelmap_gen_directLock(br_device_pixelmap* self, br_boolean block) {
+    LOG_TRACE("(%p, %d)", self, block);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8217
-// Size: 40
+// IDA: br_error __cdecl _M_br_device_pixelmap_gen_directUnlock(br_device_pixelmap *self)
 br_error _M_br_device_pixelmap_gen_directUnlock(br_device_pixelmap* self) {
+    LOG_TRACE("(%p)", self);
     NOT_IMPLEMENTED();
 }

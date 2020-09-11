@@ -12,220 +12,181 @@ int gOrig_key_mapping[67];
 br_pixelmap* gDials_pix;
 int gCurrent_key;
 
-// Offset: 0
-// Size: 161
-// EAX: pWhich_one
-// EDX: pWhich_stage
+// IDA: void __usercall DrawDial(int pWhich_one@<EAX>, int pWhich_stage@<EDX>)
 void DrawDial(int pWhich_one, int pWhich_stage) {
+    LOG_TRACE("(%d, %d)", pWhich_one, pWhich_stage);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 164
-// Size: 386
-// EAX: pWhich_one
-// EDX: pOld_stage
-// EBX: pNew_stage
+// IDA: void __usercall MoveDialFromTo(int pWhich_one@<EAX>, int pOld_stage@<EDX>, int pNew_stage@<EBX>)
 void MoveDialFromTo(int pWhich_one, int pOld_stage, int pNew_stage) {
     tS32 time_diff;
     tU32 start_time;
+    LOG_TRACE("(%d, %d, %d)", pWhich_one, pOld_stage, pNew_stage);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 552
-// Size: 94
+// IDA: void __cdecl SoundOptionsStart()
 void SoundOptionsStart() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 648
-// Size: 90
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
-// EBX: pGo_ahead
-// ECX: pEscaped
+// IDA: int __usercall SoundOptionsDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
 int SoundOptionsDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
+    LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 740
-// Size: 154
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
+// IDA: int __usercall SoundOptionsLeft@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int SoundOptionsLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int old_value;
     int* the_value;
+    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 896
-// Size: 154
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
+// IDA: int __usercall SoundOptionsRight@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int SoundOptionsRight(int* pCurrent_choice, int* pCurrent_mode) {
     int old_value;
     int* the_value;
+    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1052
-// Size: 384
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
-// EBX: pX_offset
-// ECX: pY_offset
+// IDA: int __usercall SoundClick@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
 int SoundClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     float x_delta;
     float y_delta;
     float angle;
     int old_value;
     int* the_value;
+    LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1436
-// Size: 77
+// IDA: void __cdecl DoSoundOptions()
 void DoSoundOptions() {
+    static tFlicette flicker_on[3];
     static tFlicette flicker_off[3];
     static tFlicette push[3];
     static tMouse_area mouse_areas[3];
     static tInterface_spec interface_spec;
     int result;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1516
-// Size: 586
+// IDA: void __cdecl GetGraphicsOptions()
 void GetGraphicsOptions() {
+    int value;
     br_scalar br_value;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2104
-// Size: 513
+// IDA: void __cdecl SetGraphicsOptions()
 void SetGraphicsOptions() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2620
-// Size: 80
-// EAX: pIndex
-// EDX: pValue
+// IDA: void __usercall PlayRadioOn2(int pIndex@<EAX>, int pValue@<EDX>)
 void PlayRadioOn2(int pIndex, int pValue) {
+    LOG_TRACE("(%d, %d)", pIndex, pValue);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2700
-// Size: 80
-// EAX: pIndex
-// EDX: pValue
+// IDA: void __usercall PlayRadioOff2(int pIndex@<EAX>, int pValue@<EDX>)
 void PlayRadioOff2(int pIndex, int pValue) {
+    LOG_TRACE("(%d, %d)", pIndex, pValue);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2780
-// Size: 79
-// EAX: pIndex
-// EDX: pValue
+// IDA: void __usercall PlayRadioOn(int pIndex@<EAX>, int pValue@<EDX>)
 void PlayRadioOn(int pIndex, int pValue) {
+    LOG_TRACE("(%d, %d)", pIndex, pValue);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2860
-// Size: 79
-// EAX: pIndex
-// EDX: pValue
+// IDA: void __usercall PlayRadioOff(int pIndex@<EAX>, int pValue@<EDX>)
 void PlayRadioOff(int pIndex, int pValue) {
+    LOG_TRACE("(%d, %d)", pIndex, pValue);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2940
-// Size: 109
+// IDA: void __cdecl DrawInitialRadios()
 void DrawInitialRadios() {
+    int i;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3052
-// Size: 84
-// EAX: pIndex
-// EDX: pNew_value
+// IDA: void __usercall RadioChanged(int pIndex@<EAX>, int pNew_value@<EDX>)
 void RadioChanged(int pIndex, int pNew_value) {
+    LOG_TRACE("(%d, %d)", pIndex, pNew_value);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3136
-// Size: 121
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
+// IDA: int __usercall GraphOptLeft@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int GraphOptLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int new_value;
+    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3260
-// Size: 125
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
+// IDA: int __usercall GraphOptRight@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int GraphOptRight(int* pCurrent_choice, int* pCurrent_mode) {
     int new_value;
+    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3388
-// Size: 148
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
+// IDA: int __usercall GraphOptUp@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int GraphOptUp(int* pCurrent_choice, int* pCurrent_mode) {
+    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3536
-// Size: 148
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
+// IDA: int __usercall GraphOptDown@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int GraphOptDown(int* pCurrent_choice, int* pCurrent_mode) {
+    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3684
-// Size: 175
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
-// EBX: pX_offset
-// ECX: pY_offset
+// IDA: int __usercall RadioClick@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
 int RadioClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     int i;
+    LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3860
-// Size: 59
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
+// IDA: int __usercall GraphOptGoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int GraphOptGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
+    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4216
-// Size: 80
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
+// IDA: void __usercall DrawGraphBox(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
 void DrawGraphBox(int pCurrent_choice, int pCurrent_mode) {
+    LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4296
-// Size: 128
+// IDA: void __cdecl DoGraphicsOptions()
 void DoGraphicsOptions() {
+    static tFlicette flicker_on[14];
     static tFlicette flicker_off[14];
     static tFlicette push[14];
     static tMouse_area mouse_areas[14];
     static tInterface_spec interface_spec;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4424
-// Size: 1526
+// IDA: void __cdecl CalibrateJoysticks()
 void CalibrateJoysticks() {
+    tJoy_calib_stage stage;
     int escaped;
     int joy_value_x;
     int joy_value_y;
@@ -242,77 +203,73 @@ void CalibrateJoysticks() {
     int saved_2y;
     int max;
     char s[256];
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5952
-// Size: 118
-// EAX: pStr
+// IDA: void __usercall StripControls(unsigned char *pStr@<EAX>)
 void StripControls(unsigned char* pStr) {
     int i;
     int len;
+    LOG_TRACE("(%p)", pStr);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6072
-// Size: 215
+// IDA: void __cdecl LoadKeyNames()
 void LoadKeyNames() {
+    int i;
     FILE* f;
     tPath_name the_path;
     unsigned char s[256];
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6288
-// Size: 79
+// IDA: void __cdecl DisposeKeyNames()
 void DisposeKeyNames() {
+    int i;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6368
-// Size: 54
+// IDA: void __cdecl SaveOrigKeyMapping()
 void SaveOrigKeyMapping() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6424
-// Size: 384
-// EAX: pIndex
-// EDX: pY
-// EBX: pName_x
-// ECX: pKey_x
+// IDA: void __usercall GetKeyCoords(int pIndex@<EAX>, int *pY@<EDX>, int *pName_x@<EBX>, int *pKey_x@<ECX>, int *pEnd_box)
 void GetKeyCoords(int pIndex, int* pY, int* pName_x, int* pKey_x, int* pEnd_box) {
     int col;
+    LOG_TRACE("(%d, %p, %p, %p, %p)", pIndex, pY, pName_x, pKey_x, pEnd_box);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6808
-// Size: 182
+// IDA: void __cdecl SetKeysToDefault()
 void SetKeysToDefault() {
+    FILE* f;
     tPath_name the_path;
     int i;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6992
-// Size: 217
+// IDA: void __cdecl SaveKeyMapping()
 void SaveKeyMapping() {
+    FILE* f;
     tPath_name the_path;
     int i;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7212
-// Size: 60
-// EAX: pNew_one
+// IDA: void __usercall ChangeKeyMapIndex(int pNew_one@<EAX>)
 void ChangeKeyMapIndex(int pNew_one) {
+    LOG_TRACE("(%d)", pNew_one);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7272
-// Size: 1178
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
+// IDA: void __usercall DrawKeyAssignments(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
 void DrawKeyAssignments(int pCurrent_choice, int pCurrent_mode) {
     int i;
     int y;
@@ -325,47 +282,37 @@ void DrawKeyAssignments(int pCurrent_choice, int pCurrent_mode) {
     tDR_font* font_n;
     tDR_font* font_k;
     static int on_radios_last_time;
+    LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8452
-// Size: 252
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
+// IDA: int __usercall KeyAssignLeft@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int KeyAssignLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int new_index;
+    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8704
-// Size: 252
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
+// IDA: int __usercall KeyAssignRight@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int KeyAssignRight(int* pCurrent_choice, int* pCurrent_mode) {
     int new_index;
+    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8956
-// Size: 299
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
+// IDA: int __usercall KeyAssignUp@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int KeyAssignUp(int* pCurrent_choice, int* pCurrent_mode) {
+    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9256
-// Size: 265
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
+// IDA: int __usercall KeyAssignDown@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int KeyAssignDown(int* pCurrent_choice, int* pCurrent_mode) {
+    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9524
-// Size: 1009
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
+// IDA: int __usercall KeyAssignGoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int KeyAssignGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     int key;
     int i;
@@ -377,31 +324,29 @@ int KeyAssignGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     int key_x;
     int end_box;
     tDR_font* font;
+    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10536
-// Size: 168
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
-// EBX: pX_offset
-// ECX: pY_offset
+// IDA: int __usercall MouseyClickBastard@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
 int MouseyClickBastard(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     int i;
     int x_coord;
     int y_coord;
+    LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10704
-// Size: 90
+// IDA: void __cdecl DrawInitialKMRadios()
 void DrawInitialKMRadios() {
+    int i;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10796
-// Size: 366
+// IDA: void __cdecl DoControlOptions()
 void DoControlOptions() {
+    static tFlicette flicker_on[4];
     static tFlicette flicker_off[4];
     static tFlicette push[4];
     static tMouse_area mouse_areas[5];
@@ -412,34 +357,37 @@ void DoControlOptions() {
     int swap_font_3;
     int second_time_around;
     int orig_key_map_index;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 11164
-// Size: 68
+// IDA: void __cdecl LoadSoundOptionsData()
 void LoadSoundOptionsData() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 11232
-// Size: 48
+// IDA: void __cdecl FreeSoundOptionsData()
 void FreeSoundOptionsData() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 11280
-// Size: 165
+// IDA: void __cdecl DrawDisabledOptions()
 void DrawDisabledOptions() {
+    br_pixelmap* image;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 11448
-// Size: 146
+// IDA: void __cdecl DoOptions()
 void DoOptions() {
+    static tFlicette flicker_on[4];
     static tFlicette flicker_off[4];
     static tFlicette push[4];
     static tMouse_area mouse_areas[4];
     static tInterface_spec interface_spec;
     int result;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

@@ -14,20 +14,13 @@ br_material* gReal_material;
 br_scalar gNearest_T;
 tFace_ref* gPling_face;
 
-// Offset: 104
-// Size: 73
-// EAX: a
-// EDX: b
+// IDA: void __usercall DRVector2AccumulateScale(br_vector2 *a@<EAX>, br_vector2 *b@<EDX>, br_scalar s)
 void DRVector2AccumulateScale(br_vector2* a, br_vector2* b, br_scalar s) {
+    LOG_TRACE("(%p, %p, %f)", a, b, s);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 732
-// Size: 710
-// EAX: ap
-// EDX: pPosition
-// EBX: pDir
-// ECX: model
+// IDA: int __usercall ActorRayPick2D@<EAX>(br_actor *ap@<EAX>, br_vector3 *pPosition@<EDX>, br_vector3 *pDir@<EBX>, br_model *model@<ECX>, br_material *material, dr_pick2d_cbfn *callback)
 int ActorRayPick2D(br_actor* ap, br_vector3* pPosition, br_vector3* pDir, br_model* model, br_material* material, dr_pick2d_cbfn* callback) {
     br_actor* a;
     br_model* this_model;
@@ -40,60 +33,48 @@ int ActorRayPick2D(br_actor* ap, br_vector3* pPosition, br_vector3* pDir, br_mod
     br_vector3 pos;
     br_vector3 dir;
     void* arg;
+    LOG_TRACE("(%p, %p, %p, %p, %p, %p)", ap, pPosition, pDir, model, material, callback);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1444
-// Size: 97
-// EAX: world
-// EDX: pPosition
-// EBX: pDir
-// ECX: callback
+// IDA: int __usercall DRSceneRayPick2D@<EAX>(br_actor *world@<EAX>, br_vector3 *pPosition@<EDX>, br_vector3 *pDir@<EBX>, dr_pick2d_cbfn *callback@<ECX>)
 int DRSceneRayPick2D(br_actor* world, br_vector3* pPosition, br_vector3* pDir, dr_pick2d_cbfn* callback) {
+    LOG_TRACE("(%p, %p, %p, %p)", world, pPosition, pDir, callback);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3604
-// Size: 88
+// IDA: int __cdecl FindHighestPolyCallBack(br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3 *pPoint, br_vector2 *pMap, void *pArg)
 int FindHighestPolyCallBack(br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3* pPoint, br_vector2* pMap, void* pArg) {
+    LOG_TRACE("(%p, %p, %p, %p, %f, %d, %d, %d, %p, %p, %p)", pModel, pMaterial, pRay_pos, pRay_dir, pT, pF, pE, pV, pPoint, pMap, pArg);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3692
-// Size: 112
+// IDA: int __cdecl FindHighestCallBack(br_actor *pActor, br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT_near, br_scalar pT_far, void *pArg)
 int FindHighestCallBack(br_actor* pActor, br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT_near, br_scalar pT_far, void* pArg) {
+    LOG_TRACE("(%p, %p, %p, %p, %p, %f, %f, %p)", pActor, pModel, pMaterial, pRay_pos, pRay_dir, pT_near, pT_far, pArg);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3804
-// Size: 247
-// EAX: pPosition
-// EDX: pDir
-// EBX: nor
-// ECX: t
+// IDA: void __usercall FindFace(br_vector3 *pPosition@<EAX>, br_vector3 *pDir@<EDX>, br_vector3 *nor@<EBX>, br_scalar *t@<ECX>, br_material **material)
 void FindFace(br_vector3* pPosition, br_vector3* pDir, br_vector3* nor, br_scalar* t, br_material** material) {
     int group;
+    LOG_TRACE("(%p, %p, %p, %p, %p)", pPosition, pDir, nor, t, material);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4052
-// Size: 44
+// IDA: void __cdecl EnablePlingMaterials()
 void EnablePlingMaterials() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4096
-// Size: 44
+// IDA: void __cdecl DisablePlingMaterials()
 void DisablePlingMaterials() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4140
-// Size: 1148
-// EAX: pFace
-// EDX: ray_pos
-// EBX: ray_dir
-// ECX: normal
+// IDA: void __usercall CheckSingleFace(tFace_ref *pFace@<EAX>, br_vector3 *ray_pos@<EDX>, br_vector3 *ray_dir@<EBX>, br_vector3 *normal@<ECX>, br_scalar *rt)
 void CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir, br_vector3* normal, br_scalar* rt) {
     br_scalar t;
     br_scalar numerator;
@@ -117,15 +98,11 @@ void CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir,
     double f_n;
     double f_numerator;
     br_material* this_material;
+    LOG_TRACE("(%p, %p, %p, %p, %p)", pFace, ray_pos, ray_dir, normal, rt);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5288
-// Size: 1519
-// EAX: pNum_rays
-// EDX: pFace
-// EBX: ray_pos
-// ECX: ray_dir
+// IDA: void __usercall MultiRayCheckSingleFace(int pNum_rays@<EAX>, tFace_ref *pFace@<EDX>, br_vector3 *ray_pos@<EBX>, br_vector3 *ray_dir@<ECX>, br_vector3 *normal, br_scalar *rt)
 void MultiRayCheckSingleFace(int pNum_rays, tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir, br_vector3* normal, br_scalar* rt) {
     int i;
     br_scalar t[4];
@@ -150,26 +127,20 @@ void MultiRayCheckSingleFace(int pNum_rays, tFace_ref* pFace, br_vector3* ray_po
     double f_n;
     double f_numerator;
     br_material* this_material;
+    LOG_TRACE("(%d, %p, %p, %p, %p, %p)", pNum_rays, pFace, ray_pos, ray_dir, normal, rt);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6808
-// Size: 662
-// EAX: b2
-// EDX: b1
-// EBX: m
+// IDA: void __usercall GetNewBoundingBox(br_bounds *b2@<EAX>, br_bounds *b1@<EDX>, br_matrix34 *m@<EBX>)
 void GetNewBoundingBox(br_bounds* b2, br_bounds* b1, br_matrix34* m) {
     br_vector3 a;
     br_vector3 c[3];
     int j;
+    LOG_TRACE("(%p, %p, %p)", b2, b1, m);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7472
-// Size: 1493
-// EAX: bnds
-// EDX: face_list
-// EBX: max_face
+// IDA: int __usercall FindFacesInBox@<EAX>(tBounds *bnds@<EAX>, tFace_ref *face_list@<EDX>, int max_face@<EBX>)
 int FindFacesInBox(tBounds* bnds, tFace_ref* face_list, int max_face) {
     br_vector3 a;
     br_vector3 b;
@@ -183,29 +154,22 @@ int FindFacesInBox(tBounds* bnds, tFace_ref* face_list, int max_face) {
     tU8 cz_min;
     tU8 cz_max;
     tTrack_spec* track_spec;
+    LOG_TRACE("(%p, %p, %d)", bnds, face_list, max_face);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8968
-// Size: 945
-// EAX: bnds
-// EDX: face_list
-// EBX: max_face
+// IDA: int __usercall FindFacesInBox2@<EAX>(tBounds *bnds@<EAX>, tFace_ref *face_list@<EDX>, int max_face@<EBX>)
 int FindFacesInBox2(tBounds* bnds, tFace_ref* face_list, int max_face) {
     br_vector3 a;
     br_vector3 b;
     br_vector3 c[3];
     int i;
     int j;
+    LOG_TRACE("(%p, %p, %d)", bnds, face_list, max_face);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9916
-// Size: 1001
-// EAX: bnds
-// EDX: ap
-// EBX: model
-// ECX: material
+// IDA: int __usercall ActorBoxPick@<EAX>(tBounds *bnds@<EAX>, br_actor *ap@<EDX>, br_model *model@<EBX>, br_material *material@<ECX>, tFace_ref *face_list, int max_face, br_matrix34 *pMat)
 int ActorBoxPick(tBounds* bnds, br_actor* ap, br_model* model, br_material* material, tFace_ref* face_list, int max_face, br_matrix34* pMat) {
     br_model* this_model;
     br_material* this_material;
@@ -220,15 +184,11 @@ int ActorBoxPick(tBounds* bnds, br_actor* ap, br_model* model, br_material* mate
     br_matrix34 box_to_actor;
     tBounds new_bounds;
     br_bounds br_bnds;
+    LOG_TRACE("(%p, %p, %p, %p, %p, %d, %p)", bnds, ap, model, material, face_list, max_face, pMat);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10920
-// Size: 2803
-// EAX: actor
-// EDX: bnds
-// EBX: model
-// ECX: model_material
+// IDA: int __usercall ModelPickBox@<EAX>(br_actor *actor@<EAX>, tBounds *bnds@<EDX>, br_model *model@<EBX>, br_material *model_material@<ECX>, tFace_ref *face_list, int max_face, br_matrix34 *pMat)
 int ModelPickBox(br_actor* actor, tBounds* bnds, br_model* model, br_material* model_material, tFace_ref* face_list, int max_face, br_matrix34* pMat) {
     int f;
     int i;
@@ -243,62 +203,47 @@ int ModelPickBox(br_actor* actor, tBounds* bnds, br_model* model, br_material* m
     br_vector3 tv;
     br_scalar t;
     v11model* prepared;
+    LOG_TRACE("(%p, %p, %p, %p, %p, %d, %p)", actor, bnds, model, model_material, face_list, max_face, pMat);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 13724
-// Size: 613
-// EAX: p
-// EDX: nv
-// EBX: i
+// IDA: void __usercall ClipToPlaneGE(br_vector3 *p@<EAX>, int *nv@<EDX>, int i@<EBX>, br_scalar limit)
 void ClipToPlaneGE(br_vector3* p, int* nv, int i, br_scalar limit) {
     int last_vertex;
     int j;
     int vertex;
     int k;
     br_vector3 p2[12];
+    LOG_TRACE("(%p, %p, %d, %f)", p, nv, i, limit);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 14340
-// Size: 613
-// EAX: p
-// EDX: nv
-// EBX: i
+// IDA: void __usercall ClipToPlaneLE(br_vector3 *p@<EAX>, int *nv@<EDX>, int i@<EBX>, br_scalar limit)
 void ClipToPlaneLE(br_vector3* p, int* nv, int i, br_scalar limit) {
     int last_vertex;
     int j;
     int vertex;
     int k;
     br_vector3 p2[12];
+    LOG_TRACE("(%p, %p, %d, %f)", p, nv, i, limit);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 14956
-// Size: 165
-// EAX: b1
-// EDX: b2
+// IDA: int __usercall BoundsOverlapTest@<EAX>(br_bounds *b1@<EAX>, br_bounds *b2@<EDX>)
 int BoundsOverlapTest(br_bounds* b1, br_bounds* b2) {
+    LOG_TRACE("(%p, %p)", b1, b2);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 15124
-// Size: 1164
-// EAX: b1
-// EDX: b2
-// EBX: M
+// IDA: int __usercall BoundsTransformTest@<EAX>(br_bounds *b1@<EAX>, br_bounds *b2@<EDX>, br_matrix34 *M@<EBX>)
 int BoundsTransformTest(br_bounds* b1, br_bounds* b2, br_matrix34* M) {
     br_scalar val;
     br_vector3 o;
+    LOG_TRACE("(%p, %p, %p)", b1, b2, M);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 16288
-// Size: 757
-// EAX: o
-// EDX: p
-// EBX: pB
-// ECX: pHit_point
+// IDA: int __usercall LineBoxColl@<EAX>(br_vector3 *o@<EAX>, br_vector3 *p@<EDX>, br_bounds *pB@<EBX>, br_vector3 *pHit_point@<ECX>)
 int LineBoxColl(br_vector3* o, br_vector3* p, br_bounds* pB, br_vector3* pHit_point) {
     br_vector3 dir;
     int inside;
@@ -307,55 +252,45 @@ int LineBoxColl(br_vector3* o, br_vector3* p, br_bounds* pB, br_vector3* pHit_po
     int which_plane;
     br_scalar max_t[3];
     br_scalar cp[3];
+    LOG_TRACE("(%p, %p, %p, %p)", o, p, pB, pHit_point);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 17048
-// Size: 298
-// EAX: pB
-// EDX: pC
+// IDA: int __usercall SphereBoxIntersection@<EAX>(br_bounds *pB@<EAX>, br_vector3 *pC@<EDX>, br_scalar pR_squared, br_vector3 *pHit_point)
 int SphereBoxIntersection(br_bounds* pB, br_vector3* pC, br_scalar pR_squared, br_vector3* pHit_point) {
     int i;
     br_scalar d;
+    LOG_TRACE("(%p, %p, %f, %p)", pB, pC, pR_squared, pHit_point);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 17348
-// Size: 296
-// EAX: o
-// EDX: p
-// EBX: pB
-// ECX: pHit_point
+// IDA: int __usercall LineBoxCollWithSphere@<EAX>(br_vector3 *o@<EAX>, br_vector3 *p@<EDX>, br_bounds *pB@<EBX>, br_vector3 *pHit_point@<ECX>)
 int LineBoxCollWithSphere(br_vector3* o, br_vector3* p, br_bounds* pB, br_vector3* pHit_point) {
     int i;
     int plane;
+    LOG_TRACE("(%p, %p, %p, %p)", o, p, pB, pHit_point);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 17644
-// Size: 278
-// EAX: v1
-// EDX: v2
+// IDA: int __usercall CompVert@<EAX>(int v1@<EAX>, int v2@<EDX>)
 int CompVert(int v1, int v2) {
     br_vertex* vl;
     br_vector3 tv;
     br_vector2 tv2;
+    LOG_TRACE("(%d, %d)", v1, v2);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 17924
-// Size: 305
-// EAX: pFace
+// IDA: void __usercall SetFacesGroup(int pFace@<EAX>)
 void SetFacesGroup(int pFace) {
     int f;
     int v;
     int i;
+    LOG_TRACE("(%d)", pFace);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 18232
-// Size: 463
-// EAX: pDir
+// IDA: void __usercall SelectFace(br_vector3 *pDir@<EAX>)
 void SelectFace(br_vector3* pDir) {
     tCar_spec* c;
     br_vector3 dir;
@@ -363,26 +298,22 @@ void SelectFace(br_vector3* pDir) {
     br_scalar t;
     br_model* old_model;
     int i;
+    LOG_TRACE("(%p)", pDir);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 18696
-// Size: 448
-// EAX: min
-// EDX: max
+// IDA: void __usercall GetTilingLimits(br_vector2 *min@<EAX>, br_vector2 *max@<EDX>)
 void GetTilingLimits(br_vector2* min, br_vector2* max) {
     int f;
     int i;
     int j;
     br_vertex* verts;
     br_face* faces;
+    LOG_TRACE("(%p, %p)", min, max);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 19144
-// Size: 379
-// EAX: pD
-// EDX: factor
+// IDA: void __usercall Scale(int pD@<EAX>, int factor@<EDX>)
 void Scale(int pD, int factor) {
     br_vector2 min;
     br_vector2 max;
@@ -391,41 +322,44 @@ void Scale(int pD, int factor) {
     br_scalar d;
     br_vertex* verts;
     br_face* faces;
+    LOG_TRACE("(%d, %d)", pD, factor);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 19524
-// Size: 46
+// IDA: void __cdecl ScaleUpX()
 void ScaleUpX() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 19572
-// Size: 46
+// IDA: void __cdecl ScaleDnX()
 void ScaleDnX() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 19620
-// Size: 49
+// IDA: void __cdecl ScaleUpY()
 void ScaleUpY() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 19672
-// Size: 49
+// IDA: void __cdecl ScaleDnY()
 void ScaleDnY() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 19724
-// Size: 93
+// IDA: void __cdecl SelectFaceForward()
 void SelectFaceForward() {
+    br_vector3 dir;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 19820
-// Size: 93
+// IDA: void __cdecl SelectFaceDown()
 void SelectFaceDown() {
+    br_vector3 dir;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

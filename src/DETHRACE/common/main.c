@@ -13,31 +13,30 @@
 #include "structur.h"
 #include "utility.h"
 
-// Offset: 0
-// Size: 161
+// IDA: void __cdecl QuitGame()
 void QuitGame() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 164
-// Size: 97
+// IDA: tU32 __cdecl TrackCount(br_actor *pActor, tU32 *pCount)
 tU32 TrackCount(br_actor* pActor, tU32* pCount) {
     unsigned int x;
     unsigned int z;
     int ad;
     float e;
+    LOG_TRACE("(%p, %p)", pActor, pCount);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 264
-// Size: 95
+// IDA: void __cdecl CheckNumberOfTracks()
 void CheckNumberOfTracks() {
+    tU32 track_count;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 360
-// Size: 173
-// EAX: pRacing
+// IDA: void __usercall ServiceTheGame(int pRacing@<EAX>)
 void ServiceTheGame(int pRacing) {
     if (!pRacing) {
         CyclePollKeys();
@@ -56,22 +55,18 @@ void ServiceTheGame(int pRacing) {
     }
 }
 
-// Offset: 536
-// Size: 41
+// IDA: void __cdecl ServiceGame()
 void ServiceGame() {
     ServiceTheGame(0);
 }
 
-// Offset: 580
-// Size: 49
+// IDA: void __cdecl ServiceGameInRace()
 void ServiceGameInRace() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 632
-// Size: 177
-// EAX: pArgc
-// EDX: pArgv
+// IDA: void __usercall GameMain(int pArgc@<EAX>, char **pArgv@<EDX>)
 void GameMain(int pArgc, char** pArgv) {
     tPath_name CD_dir;
 

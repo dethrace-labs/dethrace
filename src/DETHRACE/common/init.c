@@ -43,14 +43,13 @@ int gInitial_credits[3];
 int gNet_mode_of_last_game;
 br_material* gDefault_track_material;
 
-// Offset: 0
-// Size: 115
+// IDA: void __cdecl AllocateSelf()
 void AllocateSelf() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 116
-// Size: 514
+// IDA: void __cdecl AllocateCamera()
 void AllocateCamera() {
     br_camera* camera_ptr;
     int i;
@@ -98,17 +97,17 @@ void AllocateCamera() {
     SetSightDistance(camera_ptr->yon_z);
 }
 
-// Offset: 632
-// Size: 582
+// IDA: void __cdecl ReinitialiseForwardCamera()
 void ReinitialiseForwardCamera() {
+    br_camera* camera_ptr;
     float the_angle;
     float d;
     float w;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1216
-// Size: 217
+// IDA: void __cdecl AllocateRearviewPixelmap()
 void AllocateRearviewPixelmap() {
     char* rear_screen_pixels;
     LOG_TRACE("()");
@@ -141,35 +140,35 @@ void AllocateRearviewPixelmap() {
     }
 }
 
-// Offset: 1436
-// Size: 169
+// IDA: void __cdecl ReinitialiseRearviewCamera()
 void ReinitialiseRearviewCamera() {
+    br_camera* camera_ptr;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1608
-// Size: 347
+// IDA: void __cdecl ReinitialiseRenderStuff()
 void ReinitialiseRenderStuff() {
+    int x_diff;
     int y_diff;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1956
-// Size: 34
+// IDA: void __cdecl InstallFindFailedHooks()
 void InstallFindFailedHooks() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1992
-// Size: 158
+// IDA: void __cdecl AllocateStandardLamp()
 void AllocateStandardLamp() {
     br_actor* lamp;
     int i;
     STUB();
 }
 
-// Offset: 2152
-// Size: 342
+// IDA: void __cdecl InitializeBRenderEnvironment()
 void InitializeBRenderEnvironment() {
     br_model* arrow_model;
     LOG_TRACE("()");
@@ -210,8 +209,7 @@ void InitializeBRenderEnvironment() {
     gArrow_actor->model = arrow_model;
 }
 
-// Offset: 2496
-// Size: 79
+// IDA: void __cdecl InitBRFonts()
 void InitBRFonts() {
     LOG_TRACE("()");
     gBig_font = LoadBRFont("BIGFONT.FNT");
@@ -219,8 +217,7 @@ void InitBRFonts() {
     gHeadup_font = LoadBRFont("HEADUP.FNT");
 }
 
-// Offset: 2576
-// Size: 196
+// IDA: void __cdecl AustereWarning()
 void AustereWarning() {
     LOG_TRACE("()");
 
@@ -242,33 +239,32 @@ void AustereWarning() {
     }
 }
 
-// Offset: 2772
-// Size: 309
+// IDA: void __cdecl InitLineStuff()
 void InitLineStuff() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3084
-// Size: 896
+// IDA: void __cdecl InitSmokeStuff()
 void InitSmokeStuff() {
+    static br_token_value fadealpha[3];
     tPath_name path;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3980
-// Size: 1350
+// IDA: void __cdecl Init2DStuff()
 void Init2DStuff() {
+    br_camera* camera;
     static br_token_value fadealpha[3];
     tPath_name path;
     br_scalar prat_u;
     br_scalar prat_v;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5332
-// Size: 671
-// EAX: pArgc
-// EDX: pArgv
+// IDA: void __usercall InitialiseApplication(int pArgc@<EAX>, char **pArgv@<EDX>)
 void InitialiseApplication(int pArgc, char** pArgv) {
 
     gProgram_state.sausage_eater_mode = gSausage_override;
@@ -338,10 +334,7 @@ void InitialiseApplication(int pArgc, char** pArgv) {
     PrintMemoryDump(0, "AFTER APPLICATION INITIALISATION");
 }
 
-// Offset: 6004
-// Size: 64
-// EAX: pArgc
-// EDX: pArgv
+// IDA: void __usercall InitialiseDeathRace(int pArgc@<EAX>, char **pArgv@<EDX>)
 void InitialiseDeathRace(int pArgc, char** pArgv) {
     PDInitialiseSystem();
 
@@ -349,16 +342,14 @@ void InitialiseDeathRace(int pArgc, char** pArgv) {
     //dword_112DF8 = 1;  // never checked by game
 }
 
-// Offset: 6068
-// Size: 427
-// EAX: pStart_race
+// IDA: void __usercall InitGame(int pStart_race@<EAX>)
 void InitGame(int pStart_race) {
     int i;
+    LOG_TRACE("(%d)", pStart_race);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6496
-// Size: 191
+// IDA: void __cdecl DisposeGameIfNecessary()
 void DisposeGameIfNecessary() {
     int i;
     LOG_TRACE("()");
@@ -381,46 +372,43 @@ void DisposeGameIfNecessary() {
     ShutdownNetIfRequired();
 }
 
-// Offset: 6688
-// Size: 54
+// IDA: void __cdecl LoadInTrack()
 void LoadInTrack() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6744
-// Size: 44
+// IDA: void __cdecl DisposeTrack()
 void DisposeTrack() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6788
-// Size: 97
-// EAX: pMaterial
+// IDA: void __usercall CopyMaterialColourFromIndex(br_material *pMaterial@<EAX>)
 void CopyMaterialColourFromIndex(br_material* pMaterial) {
+    LOG_TRACE("(%p)", pMaterial);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6888
-// Size: 1230
+// IDA: void __cdecl InitRace()
 void InitRace() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8120
-// Size: 208
+// IDA: void __cdecl DisposeRace()
 void DisposeRace() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8328
-// Size: 45
+// IDA: int __cdecl GetScreenSize()
 int GetScreenSize() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8376
-// Size: 45
-// EAX: pNew_size
+// IDA: void __usercall SetScreenSize(int pNew_size@<EAX>)
 void SetScreenSize(int pNew_size) {
     LOG_TRACE("(%d)", pNew_size);
     gRender_indent = pNew_size;

@@ -11,36 +11,33 @@
 
 char rscid[53];
 
-// Offset: 12
-// Size: 158
+// IDA: br_uint_32 __cdecl BrActorEnum(br_actor *parent, br_actor_enum_cbfn *callback, void *arg)
 br_uint_32 BrActorEnum(br_actor* parent, br_actor_enum_cbfn* callback, void* arg) {
     br_actor* a;
     br_actor* next;
     br_uint_32 r;
+    LOG_TRACE("(%p, %p, %p)", parent, callback, arg);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 188
-// Size: 321
+// IDA: br_uint_32 __cdecl BrActorSearchMany(br_actor *root, char *pattern, br_actor **actors, int max)
 br_uint_32 BrActorSearchMany(br_actor* root, char* pattern, br_actor** actors, int max) {
     br_actor* a;
     char* sub;
     int n;
     int remaining;
+    LOG_TRACE("(%p, \"%s\", %p, %d)", root, pattern, actors, max);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 523
-// Size: 103
+// IDA: br_actor* __cdecl BrActorSearch(br_actor *root, char *pattern)
 br_actor* BrActorSearch(br_actor* root, char* pattern) {
     br_actor* a;
+    LOG_TRACE("(%p, \"%s\")", root, pattern);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 640
-// Size: 117
-// EAX: a
-// EDX: d
+// IDA: void __usercall RenumberActor(br_actor *a@<EAX>, int d@<EDX>)
 void RenumberActor(br_actor* a, int d) {
     br_actor* ac;
     LOG_TRACE("(%p, %d)", a, d);
@@ -54,8 +51,7 @@ void RenumberActor(br_actor* a, int d) {
     }
 }
 
-// Offset: 768
-// Size: 230
+// IDA: br_actor* __cdecl BrActorAdd(br_actor *parent, br_actor *a)
 br_actor* BrActorAdd(br_actor* parent, br_actor* a) {
     br_actor* ac;
     br_actor* ac2;
@@ -76,22 +72,21 @@ br_actor* BrActorAdd(br_actor* parent, br_actor* a) {
     return a;
 }
 
-// Offset: 1012
-// Size: 177
+// IDA: br_actor* __cdecl BrActorRemove(br_actor *a)
 br_actor* BrActorRemove(br_actor* a) {
     br_actor* ac;
+    LOG_TRACE("(%p)", a);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1203
-// Size: 167
+// IDA: void __cdecl BrActorRelink(br_actor *parent, br_actor *a)
 void BrActorRelink(br_actor* parent, br_actor* a) {
     br_matrix34 mat;
+    LOG_TRACE("(%p, %p)", parent, a);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1386
-// Size: 503
+// IDA: br_actor* __cdecl BrActorAllocate(br_uint_8 type, void *type_data)
 br_actor* BrActorAllocate(br_uint_8 type, void* type_data) {
     br_actor* a;
     br_light* light;
@@ -155,9 +150,7 @@ br_actor* BrActorAllocate(br_uint_8 type, void* type_data) {
     return a;
 }
 
-// Offset: 1907
-// Size: 152
-// EAX: a
+// IDA: void __usercall InternalActorFree(br_actor *a@<EAX>)
 void InternalActorFree(br_actor* a) {
     while (a->children) {
         BrSimpleRemove((br_simple_node*)a->children);
@@ -167,8 +160,7 @@ void InternalActorFree(br_actor* a) {
     BrResFree(a);
 }
 
-// Offset: 2071
-// Size: 103
+// IDA: void __cdecl BrActorFree(br_actor *a)
 void BrActorFree(br_actor* a) {
     while (a->children) {
         BrSimpleRemove((br_simple_node*)a->children);
@@ -178,94 +170,77 @@ void BrActorFree(br_actor* a) {
     BrResFree(a);
 }
 
-// Offset: 2186
-// Size: 283
-// EAX: a
-// EDX: world
-// EBX: m
+// IDA: br_boolean __usercall ActorToRoot@<EAX>(br_actor *a@<EAX>, br_actor *world@<EDX>, br_matrix34 *m@<EBX>)
 br_boolean ActorToRoot(br_actor* a, br_actor* world, br_matrix34* m) {
+    LOG_TRACE("(%p, %p, %p)", a, world, m);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2486
-// Size: 339
-// EAX: a
-// EDX: world
-// EBX: m
-// ECX: type
+// IDA: br_boolean __usercall ActorToRootTyped@<EAX>(br_actor *a@<EAX>, br_actor *world@<EDX>, br_matrix34 *m@<EBX>, br_int_32 *type@<ECX>)
 br_boolean ActorToRootTyped(br_actor* a, br_actor* world, br_matrix34* m, br_int_32* type) {
     br_int_32 t;
+    LOG_TRACE("(%p, %p, %p, %p)", a, world, m, type);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2847
-// Size: 572
-// EAX: mat
-// EDX: field_of_view
+// IDA: void __usercall Matrix4PerspectiveNew(br_matrix4 *mat@<EAX>, br_angle field_of_view@<EDX>, br_scalar aspect, br_scalar hither, br_scalar yon, br_scalar origin_x, br_scalar origin_y)
 void Matrix4PerspectiveNew(br_matrix4* mat, br_angle field_of_view, br_scalar aspect, br_scalar hither, br_scalar yon, br_scalar origin_x, br_scalar origin_y) {
     br_scalar scale;
+    LOG_TRACE("(%p, %d, %f, %f, %f, %f, %f)", mat, field_of_view, aspect, hither, yon, origin_x, origin_y);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3441
-// Size: 944
-// EAX: mat
-// EDX: camera
+// IDA: br_token __usercall CameraToScreenMatrix4@<EAX>(br_matrix4 *mat@<EAX>, br_actor *camera@<EDX>)
 br_token CameraToScreenMatrix4(br_matrix4* mat, br_actor* camera) {
     br_camera* camera_type;
     br_matrix34 mat34;
+    LOG_TRACE("(%p, %p)", mat, camera);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4408
-// Size: 866
+// IDA: br_uint_16 __cdecl BrActorToActorMatrix34(br_matrix34 *m, br_actor *a, br_actor *b)
 br_uint_16 BrActorToActorMatrix34(br_matrix34* m, br_actor* a, br_actor* b) {
     br_matrix34 mata;
     br_matrix34 matb;
     br_matrix34 matc;
     br_uint_8 at;
     br_uint_8 bt;
+    LOG_TRACE("(%p, %p, %p)", m, a, b);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5297
-// Size: 178
+// IDA: void __cdecl BrActorToScreenMatrix4(br_matrix4 *m, br_actor *a, br_actor *camera)
 void BrActorToScreenMatrix4(br_matrix4* m, br_actor* a, br_actor* camera) {
     br_matrix34 a2c;
+    LOG_TRACE("(%p, %p, %p)", m, a, camera);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5497
-// Size: 409
-// EAX: d
-// EDX: s
-// EBX: m
+// IDA: void __usercall BrMatrix34ApplyBounds(br_bounds *d@<EAX>, br_bounds *s@<EDX>, br_matrix34 *m@<EBX>)
 void BrMatrix34ApplyBounds(br_bounds* d, br_bounds* s, br_matrix34* m) {
     int i;
     int j;
     br_scalar a;
     br_scalar b;
+    LOG_TRACE("(%p, %p, %p)", d, s, m);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5920
-// Size: 397
-// EAX: dest
-// EDX: ap
-// EBX: model
+// IDA: void __usercall ActorToBounds(br_bounds *dest@<EAX>, br_actor *ap@<EDX>, br_model *model@<EBX>)
 void ActorToBounds(br_bounds* dest, br_actor* ap, br_model* model) {
     br_actor* a;
     br_bounds new;
     br_matrix34 m2v;
     int i;
+    LOG_TRACE("(%p, %p, %p)", dest, ap, model);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6333
-// Size: 310
+// IDA: br_bounds* __cdecl BrActorToBounds(br_bounds *b, br_actor *ap)
 br_bounds* BrActorToBounds(br_bounds* b, br_actor* ap) {
     br_matrix34 m2v;
     br_model* model;
     br_actor* a;
+    LOG_TRACE("(%p, %p)", b, ap);
     NOT_IMPLEMENTED();
 }

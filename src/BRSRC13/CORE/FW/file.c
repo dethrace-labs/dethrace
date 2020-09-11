@@ -8,8 +8,7 @@
 
 char rscid[49];
 
-// Offset: 12
-// Size: 86
+// IDA: void __cdecl _BrFileFree(void *res, br_uint_8 res_class, br_size_t size)
 void _BrFileFree(void* res, br_uint_8 res_class, br_size_t size) {
     br_file* file;
 
@@ -18,14 +17,13 @@ void _BrFileFree(void* res, br_uint_8 res_class, br_size_t size) {
     fw.fsys->close(file->raw_file);
 }
 
-// Offset: 115
-// Size: 77
+// IDA: br_uint_32 __cdecl BrFileAttributes()
 br_uint_32 BrFileAttributes() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 207
-// Size: 267
+// IDA: void* __cdecl BrFileOpenRead(char *name, br_size_t n_magics, br_mode_test_cbfn *mode_test, int *mode_result)
 void* BrFileOpenRead(char* name, br_size_t n_magics, br_mode_test_cbfn* mode_test, int* mode_result) {
     void* raw_file;
     br_file* file;
@@ -52,8 +50,7 @@ void* BrFileOpenRead(char* name, br_size_t n_magics, br_mode_test_cbfn* mode_tes
     return file;
 }
 
-// Offset: 490
-// Size: 230
+// IDA: void* __cdecl BrFileOpenWrite(char *name, int mode)
 void* BrFileOpenWrite(char* name, int mode) {
     void* raw_file;
     br_file* file;
@@ -70,65 +67,56 @@ void* BrFileOpenWrite(char* name, int mode) {
     return file;
 }
 
-// Offset: 732
-// Size: 70
+// IDA: void __cdecl BrFileClose(void *f)
 void BrFileClose(void* f) {
     LOG_TRACE("(%p)", f);
     BrResFree(f);
 }
 
-// Offset: 812
-// Size: 117
+// IDA: int __cdecl BrFileEof(void *f)
 int BrFileEof(void* f) {
     return fw.fsys->eof(((br_file*)f)->raw_file);
 }
 
-// Offset: 943
-// Size: 120
+// IDA: int __cdecl BrFileGetChar(void *f)
 int BrFileGetChar(void* f) {
     return fw.fsys->getchr(((br_file*)f)->raw_file);
 }
 
-// Offset: 1077
-// Size: 118
+// IDA: void __cdecl BrFilePutChar(int c, void *f)
 void BrFilePutChar(int c, void* f) {
     return fw.fsys->putchr(c, ((br_file*)f)->raw_file);
 }
 
-// Offset: 1206
-// Size: 163
+// IDA: int __cdecl BrFileRead(void *buf, int size, int n, void *f)
 int BrFileRead(void* buf, int size, int n, void* f) {
     return fw.fsys->read(buf, size, n, ((br_file*)f)->raw_file);
 }
 
-// Offset: 1381
-// Size: 163
+// IDA: int __cdecl BrFileWrite(void *buf, int size, int n, void *f)
 int BrFileWrite(void* buf, int size, int n, void* f) {
     return fw.fsys->write(buf, size, n, ((br_file*)f)->raw_file);
 }
 
-// Offset: 1558
-// Size: 125
+// IDA: int __cdecl BrFileGetLine(char *buf, br_size_t buf_len, void *f)
 int BrFileGetLine(char* buf, br_size_t buf_len, void* f) {
     return fw.fsys->getline(buf, buf_len, ((br_file*)f)->raw_file);
 }
 
-// Offset: 1697
-// Size: 118
+// IDA: void __cdecl BrFilePutLine(char *buf, void *f)
 void BrFilePutLine(char* buf, void* f) {
     fw.fsys->putline(buf, ((br_file*)f)->raw_file);
 }
 
-// Offset: 1829
-// Size: 118
+// IDA: void __cdecl BrFileAdvance(long count, void *f)
 void BrFileAdvance(long count, void* f) {
     fw.fsys->advance(count, ((br_file*)f)->raw_file);
 }
 
-// Offset: 1960
-// Size: 173
+// IDA: int __cdecl BrFilePrintf(void *f, char *fmt, ...)
 int BrFilePrintf(void* f, char* fmt, ...) {
     int n;
     va_list args;
+    LOG_TRACE("(%p, \"%s\")", f, fmt);
     NOT_IMPLEMENTED();
 }

@@ -256,42 +256,38 @@ char* gMem_names[247] = {
 int gNon_fatal_allocation_errors = 0;
 br_allocator gAllocator = { "Death Race", DRStdlibAllocate, DRStdlibFree, DRStdlibInquire, Claim4ByteAlignment };
 
-// Offset: 0
-// Size: 44
+// IDA: void __cdecl SetNonFatalAllocationErrors()
 void SetNonFatalAllocationErrors() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 44
-// Size: 44
+// IDA: void __cdecl ResetNonFatalAllocationErrors()
 void ResetNonFatalAllocationErrors() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 88
-// Size: 68
+// IDA: int __cdecl AllocationErrorsAreFatal()
 int AllocationErrorsAreFatal() {
     return gNon_fatal_allocation_errors == 0;
 }
 
-// Offset: 156
-// Size: 34
+// IDA: void __cdecl MAMSInitMem()
 void MAMSInitMem() {
+    int i;
     FILE* f;
     tPath_name the_path;
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 192
-// Size: 38
-// EAX: pFlags
-// EDX: pTitle
+// IDA: void __usercall PrintMemoryDump(int pFlags@<EAX>, char *pTitle@<EDX>)
 void PrintMemoryDump(int pFlags, char* pTitle) {
     LOG_TRACE("(%d, \"%s\")", pFlags, pTitle);
 }
 
-// Offset: 232
-// Size: 169
+// IDA: void* __cdecl DRStdlibAllocate(br_size_t size, br_uint_8 type)
 void* DRStdlibAllocate(br_size_t size, br_uint_8 type) {
     void* p;
     int i;
@@ -308,48 +304,40 @@ void* DRStdlibAllocate(br_size_t size, br_uint_8 type) {
     return p;
 }
 
-// Offset: 404
-// Size: 38
+// IDA: void __cdecl DRStdlibFree(void *mem)
 void DRStdlibFree(void* mem) {
     int i;
     free(mem);
 }
 
-// Offset: 444
-// Size: 40
+// IDA: br_size_t __cdecl DRStdlibInquire(br_uint_8 type)
 br_size_t DRStdlibInquire(br_uint_8 type) {
     return 0;
 }
 
-// Offset: 484
-// Size: 40
+// IDA: br_uint_32 __cdecl Claim4ByteAlignment(br_uint_8 type)
 br_uint_32 Claim4ByteAlignment(br_uint_8 type) {
     return 4;
 }
 
-// Offset: 524
-// Size: 48
+// IDA: void __cdecl InstallDRMemCalls()
 void InstallDRMemCalls() {
     BrAllocatorSet(&gAllocator);
 }
 
-// Offset: 572
-// Size: 59
-// EAX: pPtr
+// IDA: void __usercall MAMSUnlock(void **pPtr@<EAX>)
 void MAMSUnlock(void** pPtr) {
     free(*pPtr);
     *pPtr = NULL;
 }
 
-// Offset: 632
-// Size: 37
-// EAX: pPtr
+// IDA: void __usercall MAMSLock(void **pPtr@<EAX>)
 void MAMSLock(void** pPtr) {
+    LOG_TRACE("(%p)", pPtr);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 672
-// Size: 124
+// IDA: void __cdecl CreateStainlessClasses()
 void CreateStainlessClasses() {
     int i;
 
@@ -361,8 +349,8 @@ void CreateStainlessClasses() {
     }
 }
 
-// Offset: 796
-// Size: 34
+// IDA: void __cdecl CheckMemory()
 void CheckMemory() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

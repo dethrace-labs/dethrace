@@ -24,22 +24,13 @@ int gMouse_was_started;
 int gReplace_background;
 char* gPixels_copy;
 
-// Offset: 0
-// Size: 194
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
-// EBX: pGo_ahead
-// ECX: pEscaped
+// IDA: int __usercall MainMenuDone1@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
 int MainMenuDone1(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
+    LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 196
-// Size: 163
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
-// EBX: pGo_ahead
-// ECX: pEscaped
+// IDA: int __usercall MainMenuDone2@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
 int MainMenuDone2(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
 
@@ -66,16 +57,13 @@ int MainMenuDone2(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
     return pCurrent_choice;
 }
 
-// Offset: 360
-// Size: 251
+// IDA: void __cdecl StartMainMenu()
 void StartMainMenu() {
+    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// Offset: 612
-// Size: 455
-// EAX: pTime_out
-// EDX: pContinue_allowed
+// IDA: int __usercall DoMainMenuInterface@<EAX>(tU32 pTime_out@<EAX>, int pContinue_allowed@<EDX>)
 int DoMainMenuInterface(tU32 pTime_out, int pContinue_allowed) {
     static tFlicette flicker_on1[8] = {
         { 14, { 64, 128 }, { 37, 89 } },
@@ -317,10 +305,7 @@ int DoMainMenuInterface(tU32 pTime_out, int pContinue_allowed) {
     return result;
 }
 
-// Offset: 1068
-// Size: 256
-// EAX: pTime_out
-// EDX: pContinue_allowed
+// IDA: tMM_result __usercall GetMainMenuOption@<EAX>(tU32 pTime_out@<EAX>, int pContinue_allowed@<EDX>)
 tMM_result GetMainMenuOption(tU32 pTime_out, int pContinue_allowed) {
     int result;
 
@@ -355,8 +340,7 @@ tMM_result GetMainMenuOption(tU32 pTime_out, int pContinue_allowed) {
     }
 }
 
-// Offset: 1324
-// Size: 169
+// IDA: void __cdecl QuitVerifyStart()
 void QuitVerifyStart() {
     gPixel_buffer_size = gBack_screen->height * gBack_screen->row_bytes;
     gPixels_copy = BrMemAllocate(gPixel_buffer_size, kMem_quit_vfy_pixels);
@@ -366,12 +350,7 @@ void QuitVerifyStart() {
     FadePaletteDown();
 }
 
-// Offset: 1496
-// Size: 220
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
-// EBX: pGo_ahead
-// ECX: pEscaped
+// IDA: int __usercall QuitVerifyDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
 int QuitVerifyDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     FadePaletteDown();
     TurnOnPanelFlics();
@@ -393,9 +372,7 @@ int QuitVerifyDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pE
     return pCurrent_choice == 0;
 }
 
-// Offset: 1716
-// Size: 333
-// EAX: pReplace_background
+// IDA: int __usercall DoVerifyQuit@<EAX>(int pReplace_background@<EAX>)
 int DoVerifyQuit(int pReplace_background) {
     static tFlicette flicker_on[2] = { { 43, { 181, 362 }, { 124, 298 } }, { 43, { 84, 168 }, { 124, 298 } } };
     static tFlicette flicker_off[2] = { { 42, { 181, 362 }, { 124, 298 } }, { 42, { 84, 168 }, { 124, 298 } } };
@@ -504,11 +481,7 @@ int DoVerifyQuit(int pReplace_background) {
     return result;
 }
 
-// Offset: 2052
-// Size: 366
-// EAX: pTime_out
-// EDX: pSave_allowed
-// EBX: pContinue_allowed
+// IDA: tMM_result __usercall DoMainMenu@<EAX>(tU32 pTime_out@<EAX>, int pSave_allowed@<EDX>, int pContinue_allowed@<EBX>)
 tMM_result DoMainMenu(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) {
     tMM_result the_result;
     if (gProgram_state.racing) {
@@ -573,11 +546,7 @@ tMM_result DoMainMenu(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) 
     return the_result;
 }
 
-// Offset: 2420
-// Size: 304
-// EAX: pTime_out
-// EDX: pSave_allowed
-// EBX: pContinue_allowed
+// IDA: void __usercall DoMainMenuScreen(tU32 pTime_out@<EAX>, int pSave_allowed@<EDX>, int pContinue_allowed@<EBX>)
 void DoMainMenuScreen(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) {
     tPlayer_status old_status;
 

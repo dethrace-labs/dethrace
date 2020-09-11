@@ -10,80 +10,51 @@ br_model bounds_model;
 v11group bounds_face_groups[1];
 char rscid[49];
 
-// Offset: 12
-// Size: 226
-// EAX: actor
-// EDX: model
-// EBX: material
-// ECX: render_data
+// IDA: void __usercall renderFaces(br_actor *actor@<EAX>, br_model *model@<EDX>, br_material *material@<EBX>, void *render_data@<ECX>, br_uint_8 style, int on_screen)
 void renderFaces(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen) {
+    LOG_TRACE("(%p, %p, %p, %p, %d, %d)", actor, model, material, render_data, style, on_screen);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 250
-// Size: 143
-// EAX: actor
-// EDX: model
-// EBX: material
-// ECX: render_data
+// IDA: void __usercall renderEdges(br_actor *actor@<EAX>, br_model *model@<EDX>, br_material *material@<EBX>, void *render_data@<ECX>, br_uint_8 style, int on_screen)
 void renderEdges(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen) {
+    LOG_TRACE("(%p, %p, %p, %p, %d, %d)", actor, model, material, render_data, style, on_screen);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 406
-// Size: 143
-// EAX: actor
-// EDX: model
-// EBX: material
-// ECX: render_data
+// IDA: void __usercall renderPoints(br_actor *actor@<EAX>, br_model *model@<EDX>, br_material *material@<EBX>, void *render_data@<ECX>, br_uint_8 style, int on_screen)
 void renderPoints(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen) {
+    LOG_TRACE("(%p, %p, %p, %p, %d, %d)", actor, model, material, render_data, style, on_screen);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 560
-// Size: 42
-// EAX: actor
-// EDX: model
-// EBX: material
-// ECX: render_data
+// IDA: void __usercall nullRender(br_actor *actor@<EAX>, br_model *model@<EDX>, br_material *material@<EBX>, void *render_data@<ECX>, br_uint_8 style, int on_screen)
 void nullRender(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen) {
+    LOG_TRACE("(%p, %p, %p, %p, %d, %d)", actor, model, material, render_data, style, on_screen);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 621
-// Size: 467
-// EAX: b
+// IDA: br_model* __usercall makeMeshFromBounds@<EAX>(br_bounds *b@<EAX>)
 br_model* makeMeshFromBounds(br_bounds* b) {
     int i;
+    LOG_TRACE("(%p)", b);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1112
-// Size: 79
-// EAX: actor
-// EDX: model
-// EBX: material
-// ECX: render_data
+// IDA: void __usercall boundingBoxRenderPoints(br_actor *actor@<EAX>, br_model *model@<EDX>, br_material *material@<EBX>, void *render_data@<ECX>, br_uint_8 style, int on_screen)
 void boundingBoxRenderPoints(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen) {
+    LOG_TRACE("(%p, %p, %p, %p, %d, %d)", actor, model, material, render_data, style, on_screen);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1214
-// Size: 79
-// EAX: actor
-// EDX: model
-// EBX: material
-// ECX: render_data
+// IDA: void __usercall boundingBoxRenderEdges(br_actor *actor@<EAX>, br_model *model@<EDX>, br_material *material@<EBX>, void *render_data@<ECX>, br_uint_8 style, int on_screen)
 void boundingBoxRenderEdges(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen) {
+    LOG_TRACE("(%p, %p, %p, %p, %d, %d)", actor, model, material, render_data, style, on_screen);
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1316
-// Size: 79
-// EAX: actor
-// EDX: model
-// EBX: material
-// ECX: render_data
+// IDA: void __usercall boundingBoxRenderFaces(br_actor *actor@<EAX>, br_model *model@<EDX>, br_material *material@<EBX>, void *render_data@<ECX>, br_uint_8 style, int on_screen)
 void boundingBoxRenderFaces(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen) {
+    LOG_TRACE("(%p, %p, %p, %p, %d, %d)", actor, model, material, render_data, style, on_screen);
     NOT_IMPLEMENTED();
 }
