@@ -16,18 +16,12 @@ tFace_ref* gPling_face;
 
 // Offset: 104
 // Size: 73
-// EAX: a
-// EDX: b
 void DRVector2AccumulateScale(br_vector2* a, br_vector2* b, br_scalar s) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 732
 // Size: 710
-// EAX: ap
-// EDX: pPosition
-// EBX: pDir
-// ECX: model
 int ActorRayPick2D(br_actor* ap, br_vector3* pPosition, br_vector3* pDir, br_model* model, br_material* material, dr_pick2d_cbfn* callback) {
     br_actor* a;
     br_model* this_model;
@@ -45,10 +39,6 @@ int ActorRayPick2D(br_actor* ap, br_vector3* pPosition, br_vector3* pDir, br_mod
 
 // Offset: 1444
 // Size: 97
-// EAX: world
-// EDX: pPosition
-// EBX: pDir
-// ECX: callback
 int DRSceneRayPick2D(br_actor* world, br_vector3* pPosition, br_vector3* pDir, dr_pick2d_cbfn* callback) {
     NOT_IMPLEMENTED();
 }
@@ -67,10 +57,6 @@ int FindHighestCallBack(br_actor* pActor, br_model* pModel, br_material* pMateri
 
 // Offset: 3804
 // Size: 247
-// EAX: pPosition
-// EDX: pDir
-// EBX: nor
-// ECX: t
 void FindFace(br_vector3* pPosition, br_vector3* pDir, br_vector3* nor, br_scalar* t, br_material** material) {
     int group;
     NOT_IMPLEMENTED();
@@ -90,10 +76,6 @@ void DisablePlingMaterials() {
 
 // Offset: 4140
 // Size: 1148
-// EAX: pFace
-// EDX: ray_pos
-// EBX: ray_dir
-// ECX: normal
 void CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir, br_vector3* normal, br_scalar* rt) {
     br_scalar t;
     br_scalar numerator;
@@ -122,10 +104,6 @@ void CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir,
 
 // Offset: 5288
 // Size: 1519
-// EAX: pNum_rays
-// EDX: pFace
-// EBX: ray_pos
-// ECX: ray_dir
 void MultiRayCheckSingleFace(int pNum_rays, tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir, br_vector3* normal, br_scalar* rt) {
     int i;
     br_scalar t[4];
@@ -155,9 +133,6 @@ void MultiRayCheckSingleFace(int pNum_rays, tFace_ref* pFace, br_vector3* ray_po
 
 // Offset: 6808
 // Size: 662
-// EAX: b2
-// EDX: b1
-// EBX: m
 void GetNewBoundingBox(br_bounds* b2, br_bounds* b1, br_matrix34* m) {
     br_vector3 a;
     br_vector3 c[3];
@@ -167,9 +142,6 @@ void GetNewBoundingBox(br_bounds* b2, br_bounds* b1, br_matrix34* m) {
 
 // Offset: 7472
 // Size: 1493
-// EAX: bnds
-// EDX: face_list
-// EBX: max_face
 int FindFacesInBox(tBounds* bnds, tFace_ref* face_list, int max_face) {
     br_vector3 a;
     br_vector3 b;
@@ -188,9 +160,6 @@ int FindFacesInBox(tBounds* bnds, tFace_ref* face_list, int max_face) {
 
 // Offset: 8968
 // Size: 945
-// EAX: bnds
-// EDX: face_list
-// EBX: max_face
 int FindFacesInBox2(tBounds* bnds, tFace_ref* face_list, int max_face) {
     br_vector3 a;
     br_vector3 b;
@@ -202,10 +171,6 @@ int FindFacesInBox2(tBounds* bnds, tFace_ref* face_list, int max_face) {
 
 // Offset: 9916
 // Size: 1001
-// EAX: bnds
-// EDX: ap
-// EBX: model
-// ECX: material
 int ActorBoxPick(tBounds* bnds, br_actor* ap, br_model* model, br_material* material, tFace_ref* face_list, int max_face, br_matrix34* pMat) {
     br_model* this_model;
     br_material* this_material;
@@ -225,10 +190,6 @@ int ActorBoxPick(tBounds* bnds, br_actor* ap, br_model* model, br_material* mate
 
 // Offset: 10920
 // Size: 2803
-// EAX: actor
-// EDX: bnds
-// EBX: model
-// ECX: model_material
 int ModelPickBox(br_actor* actor, tBounds* bnds, br_model* model, br_material* model_material, tFace_ref* face_list, int max_face, br_matrix34* pMat) {
     int f;
     int i;
@@ -248,9 +209,6 @@ int ModelPickBox(br_actor* actor, tBounds* bnds, br_model* model, br_material* m
 
 // Offset: 13724
 // Size: 613
-// EAX: p
-// EDX: nv
-// EBX: i
 void ClipToPlaneGE(br_vector3* p, int* nv, int i, br_scalar limit) {
     int last_vertex;
     int j;
@@ -262,9 +220,6 @@ void ClipToPlaneGE(br_vector3* p, int* nv, int i, br_scalar limit) {
 
 // Offset: 14340
 // Size: 613
-// EAX: p
-// EDX: nv
-// EBX: i
 void ClipToPlaneLE(br_vector3* p, int* nv, int i, br_scalar limit) {
     int last_vertex;
     int j;
@@ -276,17 +231,12 @@ void ClipToPlaneLE(br_vector3* p, int* nv, int i, br_scalar limit) {
 
 // Offset: 14956
 // Size: 165
-// EAX: b1
-// EDX: b2
 int BoundsOverlapTest(br_bounds* b1, br_bounds* b2) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 15124
 // Size: 1164
-// EAX: b1
-// EDX: b2
-// EBX: M
 int BoundsTransformTest(br_bounds* b1, br_bounds* b2, br_matrix34* M) {
     br_scalar val;
     br_vector3 o;
@@ -295,10 +245,6 @@ int BoundsTransformTest(br_bounds* b1, br_bounds* b2, br_matrix34* M) {
 
 // Offset: 16288
 // Size: 757
-// EAX: o
-// EDX: p
-// EBX: pB
-// ECX: pHit_point
 int LineBoxColl(br_vector3* o, br_vector3* p, br_bounds* pB, br_vector3* pHit_point) {
     br_vector3 dir;
     int inside;
@@ -312,8 +258,6 @@ int LineBoxColl(br_vector3* o, br_vector3* p, br_bounds* pB, br_vector3* pHit_po
 
 // Offset: 17048
 // Size: 298
-// EAX: pB
-// EDX: pC
 int SphereBoxIntersection(br_bounds* pB, br_vector3* pC, br_scalar pR_squared, br_vector3* pHit_point) {
     int i;
     br_scalar d;
@@ -322,10 +266,6 @@ int SphereBoxIntersection(br_bounds* pB, br_vector3* pC, br_scalar pR_squared, b
 
 // Offset: 17348
 // Size: 296
-// EAX: o
-// EDX: p
-// EBX: pB
-// ECX: pHit_point
 int LineBoxCollWithSphere(br_vector3* o, br_vector3* p, br_bounds* pB, br_vector3* pHit_point) {
     int i;
     int plane;
@@ -334,8 +274,6 @@ int LineBoxCollWithSphere(br_vector3* o, br_vector3* p, br_bounds* pB, br_vector
 
 // Offset: 17644
 // Size: 278
-// EAX: v1
-// EDX: v2
 int CompVert(int v1, int v2) {
     br_vertex* vl;
     br_vector3 tv;
@@ -345,7 +283,6 @@ int CompVert(int v1, int v2) {
 
 // Offset: 17924
 // Size: 305
-// EAX: pFace
 void SetFacesGroup(int pFace) {
     int f;
     int v;
@@ -355,7 +292,6 @@ void SetFacesGroup(int pFace) {
 
 // Offset: 18232
 // Size: 463
-// EAX: pDir
 void SelectFace(br_vector3* pDir) {
     tCar_spec* c;
     br_vector3 dir;
@@ -368,8 +304,6 @@ void SelectFace(br_vector3* pDir) {
 
 // Offset: 18696
 // Size: 448
-// EAX: min
-// EDX: max
 void GetTilingLimits(br_vector2* min, br_vector2* max) {
     int f;
     int i;
@@ -381,8 +315,6 @@ void GetTilingLimits(br_vector2* min, br_vector2* max) {
 
 // Offset: 19144
 // Size: 379
-// EAX: pD
-// EDX: factor
 void Scale(int pD, int factor) {
     br_vector2 min;
     br_vector2 max;

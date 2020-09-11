@@ -35,8 +35,6 @@ int gCredits_won_headup;
 
 // Offset: 0
 // Size: 56
-// EAX: pStr
-// EDX: pFudge_colon
 void GetTimerString(char* pStr, int pFudge_colon) {
     NOT_IMPLEMENTED();
 }
@@ -57,14 +55,12 @@ void InitHeadups() {
 
 // Offset: 172
 // Size: 54
-// EAX: pIndex
 void ClearHeadup(int pIndex) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 228
 // Size: 110
-// EAX: pSlot_index
 void ClearHeadupSlot(int pSlot_index) {
     int i;
     tHeadup* the_headup;
@@ -79,17 +75,12 @@ void ClearHeadups() {
 
 // Offset: 544
 // Size: 78
-// EAX: pIndex
 int HeadupActive(int pIndex) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 624
 // Size: 406
-// EAX: pPixelmap
-// EDX: pX
-// EBX: pY
-// ECX: pFont
 void DRPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFont, char* pText, int pRight_edge) {
     int i;
     int x;
@@ -123,10 +114,6 @@ void DRPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFont, cha
 
 // Offset: 1032
 // Size: 550
-// EAX: pPixelmap
-// EDX: pX
-// EBX: pY
-// ECX: pFont
 void DRPixelmapCleverText2(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFont, signed char* pText, int pRight_edge) {
     int i;
     int x;
@@ -140,10 +127,6 @@ void DRPixelmapCleverText2(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFo
 
 // Offset: 1584
 // Size: 248
-// EAX: pPixelmap
-// EDX: pLeft
-// EBX: pTop
-// ECX: pRight
 void DeviouslyDimRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int pBottom, int pKnock_out_corners) {
     NOT_IMPLEMENTED();
 }
@@ -175,9 +158,6 @@ void KillOldestQueuedHeadup() {
 
 // Offset: 2716
 // Size: 120
-// EAX: pX_index
-// EDX: pY
-// EBX: pColour
 void DubreyBar(int pX_index, int pY, int pColour) {
     int x;
     NOT_IMPLEMENTED();
@@ -185,10 +165,6 @@ void DubreyBar(int pX_index, int pY, int pColour) {
 
 // Offset: 2836
 // Size: 329
-// EAX: pY
-// EDX: pLevel
-// EBX: pName
-// ECX: pBar_colour
 void DoPSPowerHeadup(int pY, int pLevel, char* pName, int pBar_colour) {
     char s[16];
     int i;
@@ -203,7 +179,6 @@ void DoPSPowerupHeadups() {
 
 // Offset: 3332
 // Size: 2340
-// EAX: pThe_time
 void DoHeadups(tU32 pThe_time) {
     int i;
     int x_offset;
@@ -215,7 +190,6 @@ void DoHeadups(tU32 pThe_time) {
 
 // Offset: 5672
 // Size: 136
-// EAX: pSlot_index
 int FindAHeadupHoleWoofBarkSoundsABitRude(int pSlot_index) {
     int i;
     int empty_one;
@@ -225,8 +199,6 @@ int FindAHeadupHoleWoofBarkSoundsABitRude(int pSlot_index) {
 
 // Offset: 5808
 // Size: 144
-// EAX: pFont
-// EDX: pText
 int DRTextWidth(tDR_font* pFont, char* pText) {
     int i;
     int len;
@@ -247,8 +219,6 @@ int DRTextWidth(tDR_font* pFont, char* pText) {
 
 // Offset: 5952
 // Size: 206
-// EAX: pFont
-// EDX: pText
 int DRTextCleverWidth(tDR_font* pFont, signed char* pText) {
     int i;
     int len;
@@ -259,10 +229,6 @@ int DRTextCleverWidth(tDR_font* pFont, signed char* pText) {
 
 // Offset: 6160
 // Size: 98
-// EAX: pPixelmap
-// EDX: pX
-// EBX: pY
-// ECX: pFont
 void DRPixelmapCentredText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFont, char* pText) {
     int width_over_2;
     NOT_IMPLEMENTED();
@@ -270,14 +236,12 @@ void DRPixelmapCentredText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFo
 
 // Offset: 6260
 // Size: 77
-// EAX: pText
 int IsHeadupTextClever(signed char* pText) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 6340
 // Size: 562
-// EAX: pHeadup
 int MungeHeadupWidth(tHeadup* pHeadup) {
     int width;
     NOT_IMPLEMENTED();
@@ -285,10 +249,6 @@ int MungeHeadupWidth(tHeadup* pHeadup) {
 
 // Offset: 6904
 // Size: 605
-// EAX: pSlot_index
-// EDX: pFlash_rate
-// EBX: pLifetime
-// ECX: pFont_index
 int NewTextHeadupSlot2(int pSlot_index, int pFlash_rate, int pLifetime, int pFont_index, char* pText, int pQueue_it) {
     int index;
     tHeadup* the_headup;
@@ -299,20 +259,12 @@ int NewTextHeadupSlot2(int pSlot_index, int pFlash_rate, int pLifetime, int pFon
 
 // Offset: 7512
 // Size: 71
-// EAX: pSlot_index
-// EDX: pFlash_rate
-// EBX: pLifetime
-// ECX: pFont_index
 int NewTextHeadupSlot(int pSlot_index, int pFlash_rate, int pLifetime, int pFont_index, char* pText) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 7584
 // Size: 496
-// EAX: pSlot_index
-// EDX: pFlash_rate
-// EBX: pLifetime
-// ECX: pImage_index
 int NewImageHeadupSlot(int pSlot_index, int pFlash_rate, int pLifetime, int pImage_index) {
     int index;
     tHeadup* the_headup;
@@ -322,7 +274,6 @@ int NewImageHeadupSlot(int pSlot_index, int pFlash_rate, int pLifetime, int pIma
 
 // Offset: 8080
 // Size: 284
-// EAX: pIndex
 void DoFancyHeadup(int pIndex) {
     tU32 the_time;
     tHeadup* the_headup;
@@ -342,9 +293,6 @@ void AdjustHeadups() {
 
 // Offset: 8772
 // Size: 107
-// EAX: pHeadup_index
-// EDX: pNew_x
-// EBX: pNew_y
 void MoveHeadupTo(int pHeadup_index, int pNew_x, int pNew_y) {
     int delta_x;
     tHeadup* the_headup;
@@ -353,8 +301,6 @@ void MoveHeadupTo(int pHeadup_index, int pNew_x, int pNew_y) {
 
 // Offset: 8880
 // Size: 83
-// EAX: pHeadup_index
-// EDX: pNew_text
 void ChangeHeadupText(int pHeadup_index, char* pNew_text) {
     tHeadup* the_headup;
     NOT_IMPLEMENTED();
@@ -362,8 +308,6 @@ void ChangeHeadupText(int pHeadup_index, char* pNew_text) {
 
 // Offset: 8964
 // Size: 199
-// EAX: pHeadup_index
-// EDX: pNew_image
 void ChangeHeadupImage(int pHeadup_index, int pNew_image) {
     tHeadup* the_headup;
     NOT_IMPLEMENTED();
@@ -371,15 +315,12 @@ void ChangeHeadupImage(int pHeadup_index, int pNew_image) {
 
 // Offset: 9164
 // Size: 69
-// EAX: pHeadup_index
-// EDX: pNew_colour
 void ChangeHeadupColour(int pHeadup_index, int pNew_colour) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 9236
 // Size: 427
-// EAX: pThe_time
 void DoDamageScreen(tU32 pThe_time) {
     int i;
     int y_pitch;
@@ -399,7 +340,6 @@ void PoshDrawLine(float pAngle, br_pixelmap* pDestn, int pX1, int pY1, int pX2, 
 
 // Offset: 10068
 // Size: 3133
-// EAX: pThe_time
 void DoInstruments(tU32 pThe_time) {
     br_pixelmap* speedo_image;
     br_pixelmap* tacho_image;
@@ -416,7 +356,6 @@ void DoInstruments(tU32 pThe_time) {
 
 // Offset: 13204
 // Size: 386
-// EAX: pThe_time
 void DoSteeringWheel(tU32 pThe_time) {
     br_pixelmap* hands_image;
     int hands_index;
@@ -431,8 +370,6 @@ void ChangingView() {
 
 // Offset: 14152
 // Size: 445
-// EAX: pAmount
-// EDX: pPrefix_text
 void EarnCredits2(int pAmount, char* pPrefix_text) {
     char s[256];
     int original_amount;
@@ -442,14 +379,12 @@ void EarnCredits2(int pAmount, char* pPrefix_text) {
 
 // Offset: 14600
 // Size: 50
-// EAX: pAmount
 void EarnCredits(int pAmount) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 14652
 // Size: 103
-// EAX: pAmount
 int SpendCredits(int pAmount) {
     int amount;
     NOT_IMPLEMENTED();
@@ -457,7 +392,6 @@ int SpendCredits(int pAmount) {
 
 // Offset: 14756
 // Size: 279
-// EAX: pTime
 void AwardTime(tU32 pTime) {
     char s[256];
     tU32 original_amount;
@@ -468,30 +402,18 @@ void AwardTime(tU32 pTime) {
 
 // Offset: 15036
 // Size: 170
-// EAX: pPixelmap
-// EDX: pLeft
-// EBX: pTop
-// ECX: pRight
 void DrawRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int pBottom, int pColour) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 15208
 // Size: 178
-// EAX: pPixelmap
-// EDX: pLeft
-// EBX: pTop
-// ECX: pRight
 void DrawRRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int pBottom, int pColour) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 15388
 // Size: 620
-// EAX: pFont_index
-// EDX: pText
-// EBX: pPixelmap
-// ECX: pLeft
 void OoerrIveGotTextInMeBoxMissus(int pFont_index, char* pText, br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int pBottom, int pCentred) {
     tDR_font* font;
     int width;
@@ -509,10 +431,6 @@ void OoerrIveGotTextInMeBoxMissus(int pFont_index, char* pText, br_pixelmap* pPi
 
 // Offset: 16008
 // Size: 117
-// EAX: pPixelmap
-// EDX: pX
-// EBX: pY
-// ECX: pColour
 void TransBrPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, br_uint_32 pColour, br_font* pFont, signed char* pText) {
     int i;
     int len;
@@ -521,10 +439,6 @@ void TransBrPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, br_uint_32 pCol
 
 // Offset: 16128
 // Size: 250
-// EAX: pPixelmap
-// EDX: pX
-// EBX: pY
-// ECX: pFont
 void TransDRPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFont, char* pText, int pRight_edge) {
     LOG_TRACE("(%p, %d, %d, %p, \"%s\", %d)", pPixelmap, pX, pY, pFont, pText, pRight_edge);
 
@@ -540,10 +454,6 @@ void TransDRPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFont
 
 // Offset: 16380
 // Size: 250
-// EAX: pPixelmap
-// EDX: pX
-// EBX: pY
-// ECX: pFont
 void TransDRPixelmapCleverText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFont, char* pText, int pRight_edge) {
     NOT_IMPLEMENTED();
 }

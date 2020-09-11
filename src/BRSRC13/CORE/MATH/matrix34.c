@@ -165,9 +165,6 @@ void BrMatrix34Copy4(br_matrix34* A, br_matrix4* B) {
 
 // Offset: 6377
 // Size: 298
-// EAX: A
-// EDX: B
-// EBX: C
 void BrMatrix34TApplyFV(br_vector3* A, br_fvector3* B, br_matrix34* C) {
     NOT_IMPLEMENTED();
 }

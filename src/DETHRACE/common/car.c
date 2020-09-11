@@ -63,9 +63,6 @@ br_angle gPanning_camera_angle;
 
 // Offset: 0
 // Size: 91
-// EAX: pCar
-// EDX: pUnit_type
-// EBX: pDamage_amount
 void DamageUnit(tCar_spec* pCar, int pUnit_type, int pDamage_amount) {
     tDamage_unit* the_damage;
     NOT_IMPLEMENTED();
@@ -73,96 +70,78 @@ void DamageUnit(tCar_spec* pCar, int pUnit_type, int pDamage_amount) {
 
 // Offset: 92
 // Size: 61
-// EAX: pCar
-// EDX: pUnit_type
-// EBX: pDamage_amount
 void DamageUnitWithSmoke(tCar_spec* pCar, int pUnit_type, int pDamage_amount) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 156
 // Size: 52
-// EAX: pDamage_amount
 void DamageEngine(int pDamage_amount) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 208
 // Size: 55
-// EAX: pDamage_amount
 void DamageTrans(int pDamage_amount) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 264
 // Size: 55
-// EAX: pDamage_amount
 void DamageSteering(int pDamage_amount) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 320
 // Size: 55
-// EAX: pDamage_amount
 void DamageLFWheel(int pDamage_amount) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 376
 // Size: 55
-// EAX: pDamage_amount
 void DamageLFBrake(int pDamage_amount) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 432
 // Size: 55
-// EAX: pDamage_amount
 void DamageLRBrake(int pDamage_amount) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 488
 // Size: 55
-// EAX: pDamage_amount
 void DamageLRWheel(int pDamage_amount) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 544
 // Size: 55
-// EAX: pDamage_amount
 void DamageRFWheel(int pDamage_amount) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 600
 // Size: 55
-// EAX: pDamage_amount
 void DamageRFBrake(int pDamage_amount) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 656
 // Size: 55
-// EAX: pDamage_amount
 void DamageRRBrake(int pDamage_amount) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 712
 // Size: 55
-// EAX: pDamage_amount
 void DamageRRWheel(int pDamage_amount) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 768
 // Size: 508
-// EAX: pP1
-// EDX: pP2
-// EBX: pP3
-// ECX: pNormal
 void CalculatePlaneNormal(br_vector3* pP1, br_vector3* pP2, br_vector3* pP3, br_vector3* pNormal) {
     br_vector3 p0;
     br_vector3 p1;
@@ -173,8 +152,6 @@ void CalculatePlaneNormal(br_vector3* pP1, br_vector3* pP2, br_vector3* pP3, br_
 
 // Offset: 1276
 // Size: 143
-// EAX: pThe_model
-// EDX: pFace_index
 void CalculateGroundNormal(br_model* pThe_model, int pFace_index) {
     NOT_IMPLEMENTED();
 }
@@ -190,8 +167,6 @@ void ChangeYCoordinate(br_scalar pNew_y, tU32 pTime_taken, br_model* pThe_model,
 
 // Offset: 1820
 // Size: 127
-// EAX: pCar_spec
-// EDX: pModel_index
 void SwitchCarActor(tCar_spec* pCar_spec, int pModel_index) {
     int i;
     NOT_IMPLEMENTED();
@@ -199,8 +174,6 @@ void SwitchCarActor(tCar_spec* pCar_spec, int pModel_index) {
 
 // Offset: 1948
 // Size: 1602
-// EAX: pCar
-// EDX: pClear_disabled_flag
 void InitialiseCar2(tCar_spec* pCar, int pClear_disabled_flag) {
     int index;
     int j;
@@ -223,14 +196,12 @@ void InitialiseCar2(tCar_spec* pCar, int pClear_disabled_flag) {
 
 // Offset: 3552
 // Size: 50
-// EAX: pCar
 void InitialiseCar(tCar_spec* pCar) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 3604
 // Size: 270
-// EAX: pThe_race
 void InitialiseCarsEtc(tRace_info* pThe_race) {
     int i;
     int cat;
@@ -242,7 +213,6 @@ void InitialiseCarsEtc(tRace_info* pThe_race) {
 
 // Offset: 3876
 // Size: 231
-// EAX: pThe_race
 void GetAverageGridPosition(tRace_info* pThe_race) {
     int i;
     br_scalar total_cars;
@@ -252,9 +222,6 @@ void GetAverageGridPosition(tRace_info* pThe_race) {
 
 // Offset: 4108
 // Size: 1067
-// EAX: pThe_race
-// EDX: pCar_index
-// EBX: pGrid_index
 void SetInitialPosition(tRace_info* pThe_race, int pCar_index, int pGrid_index) {
     int place_on_grid;
     int i;
@@ -280,7 +247,6 @@ void SetInitialPosition(tRace_info* pThe_race, int pCar_index, int pGrid_index) 
 
 // Offset: 5176
 // Size: 84
-// EAX: pThe_race
 void SetInitialPositions(tRace_info* pThe_race) {
     int i;
     NOT_IMPLEMENTED();
@@ -288,7 +254,6 @@ void SetInitialPositions(tRace_info* pThe_race) {
 
 // Offset: 5260
 // Size: 534
-// EAX: non_car
 void InitialiseNonCar(tNon_car_spec* non_car) {
     tCollision_info* c;
     NOT_IMPLEMENTED();
@@ -296,7 +261,6 @@ void InitialiseNonCar(tNon_car_spec* non_car) {
 
 // Offset: 5796
 // Size: 2073
-// EAX: c
 void GetFacesInBox(tCollision_info* c) {
     tBounds bnds;
     br_bounds new_in_old;
@@ -321,8 +285,6 @@ int IsCarInTheSea() {
 
 // Offset: 7920
 // Size: 570
-// EAX: car
-// EDX: pTime
 void RememberSafePosition(tCar_spec* car, tU32 pTime) {
     static tU32 time_count;
     int j;
@@ -333,7 +295,6 @@ void RememberSafePosition(tCar_spec* car, tU32 pTime) {
 
 // Offset: 8492
 // Size: 1055
-// EAX: pTime_difference
 void ControlOurCar(tU32 pTime_difference) {
     br_scalar ts;
     br_vector3 minus_k;
@@ -346,7 +307,6 @@ void ControlOurCar(tU32 pTime_difference) {
 
 // Offset: 9548
 // Size: 1603
-// EAX: c
 void CalcEngineForce(tCar_spec* c, br_scalar dt) {
     br_scalar torque;
     br_scalar ts;
@@ -359,7 +319,6 @@ void CalcEngineForce(tCar_spec* c, br_scalar dt) {
 
 // Offset: 11152
 // Size: 515
-// EAX: pFrame_start_time
 void PrepareCars(tU32 pFrame_start_time) {
     tCar_spec* car;
     int i;
@@ -369,8 +328,6 @@ void PrepareCars(tU32 pFrame_start_time) {
 
 // Offset: 11668
 // Size: 1539
-// EAX: pLast_frame_time
-// EDX: pTime
 void FinishCars(tU32 pLast_frame_time, tU32 pTime) {
     tCar_spec* car;
     br_vector3 minus_k;
@@ -381,8 +338,6 @@ void FinishCars(tU32 pLast_frame_time, tU32 pTime) {
 
 // Offset: 13208
 // Size: 337
-// EAX: pLast_frame_time
-// EDX: pTime
 void InterpolateCars(tU32 pLast_frame_time, tU32 pTime) {
     br_scalar dt;
     tCar_spec* car;
@@ -410,7 +365,6 @@ void GetNonCars() {
 
 // Offset: 13888
 // Size: 1003
-// EAX: pCar
 void GetNetPos(tCar_spec* pCar) {
     int j;
     float amount;
@@ -420,8 +374,6 @@ void GetNetPos(tCar_spec* pCar) {
 
 // Offset: 14892
 // Size: 1298
-// EAX: last_frame_time
-// EDX: pTime_difference
 void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
     br_vector3 minus_k;
     int i;
@@ -439,7 +391,6 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
 
 // Offset: 16192
 // Size: 436
-// EAX: pCar
 void MungeSpecialVolume(tCollision_info* pCar) {
     tSpecial_volume* new_special_volume;
     tCar_spec* car;
@@ -448,7 +399,6 @@ void MungeSpecialVolume(tCollision_info* pCar) {
 
 // Offset: 16628
 // Size: 199
-// EAX: pCar
 void ResetCarSpecialVolume(tCollision_info* pCar) {
     br_vector3 cast_v;
     br_vector3 norm;
@@ -462,7 +412,6 @@ void ResetCarSpecialVolume(tCollision_info* pCar) {
 
 // Offset: 16828
 // Size: 1052
-// EAX: pCar
 void TestAutoSpecialVolume(tCollision_info* pCar) {
     br_vector3 pos;
     br_scalar car_d;
@@ -483,7 +432,6 @@ void TestAutoSpecialVolume(tCollision_info* pCar) {
 
 // Offset: 17880
 // Size: 421
-// EAX: car
 void MoveAndCollideCar(tCar_spec* car, br_scalar dt) {
     tCollision_info* car_info;
     int wheel;
@@ -492,7 +440,6 @@ void MoveAndCollideCar(tCar_spec* car, br_scalar dt) {
 
 // Offset: 18304
 // Size: 271
-// EAX: non_car
 void MoveAndCollideNonCar(tNon_car_spec* non_car, br_scalar dt) {
     tCollision_info* car_info;
     NOT_IMPLEMENTED();
@@ -500,7 +447,6 @@ void MoveAndCollideNonCar(tNon_car_spec* non_car, br_scalar dt) {
 
 // Offset: 18576
 // Size: 336
-// EAX: car
 int CollideCarWithWall(tCollision_info* car, br_scalar dt) {
     NOT_IMPLEMENTED();
 }
@@ -513,21 +459,18 @@ void ToggleControls() {
 
 // Offset: 19180
 // Size: 675
-// EAX: c
 void ControlCar2(tCar_spec* c, br_scalar dt) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 19856
 // Size: 686
-// EAX: c
 void ControlCar3(tCar_spec* c, br_scalar dt) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 20544
 // Size: 1374
-// EAX: c
 void ControlCar4(tCar_spec* c, br_scalar dt) {
     br_scalar ts;
     NOT_IMPLEMENTED();
@@ -535,22 +478,18 @@ void ControlCar4(tCar_spec* c, br_scalar dt) {
 
 // Offset: 21920
 // Size: 1097
-// EAX: c
 void ControlCar5(tCar_spec* c, br_scalar dt) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 23020
 // Size: 530
-// EAX: c
 void ControlCar1(tCar_spec* c, br_scalar dt) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 23552
 // Size: 138
-// EAX: wdt
-// EDX: m
 void setrotate(br_vector3* wdt, br_matrix34* m) {
     br_euler e;
     NOT_IMPLEMENTED();
@@ -558,7 +497,6 @@ void setrotate(br_vector3* wdt, br_matrix34* m) {
 
 // Offset: 23692
 // Size: 454
-// EAX: c
 void RotateCar2(tCollision_info* c, br_scalar dt) {
     br_vector3 wdt;
     br_vector3 wdt2;
@@ -570,7 +508,6 @@ void RotateCar2(tCollision_info* c, br_scalar dt) {
 
 // Offset: 24148
 // Size: 673
-// EAX: c
 void RotateCarSecondOrder(tCollision_info* c, br_scalar dt) {
     br_vector3 L;
     br_vector3 L2;
@@ -584,7 +521,6 @@ void RotateCarSecondOrder(tCollision_info* c, br_scalar dt) {
 
 // Offset: 24824
 // Size: 486
-// EAX: c
 void RotateCarFirstOrder(tCollision_info* c, br_scalar dt) {
     br_vector3 axis;
     br_vector3 L;
@@ -600,7 +536,6 @@ void RotateCarFirstOrder(tCollision_info* c, br_scalar dt) {
 
 // Offset: 25312
 // Size: 218
-// EAX: c
 void SimpleRotate(tCollision_info* c, br_scalar dt) {
     br_vector3 axis;
     br_scalar rad_rate;
@@ -610,7 +545,6 @@ void SimpleRotate(tCollision_info* c, br_scalar dt) {
 
 // Offset: 25532
 // Size: 305
-// EAX: c
 void RotateCar(tCollision_info* c, br_scalar dt) {
     br_scalar rad_squared;
     int steps;
@@ -620,7 +554,6 @@ void RotateCar(tCollision_info* c, br_scalar dt) {
 
 // Offset: 25840
 // Size: 434
-// EAX: c
 void SteeringSelfCentre(tCar_spec* c, br_scalar dt, br_vector3* n) {
     br_scalar ts;
     br_scalar ts2;
@@ -629,7 +562,6 @@ void SteeringSelfCentre(tCar_spec* c, br_scalar dt, br_vector3* n) {
 
 // Offset: 26276
 // Size: 923
-// EAX: nc
 void NonCarCalcForce(tNon_car_spec* nc, br_scalar dt) {
     tCollision_info* c;
     tSpecial_volume* vol;
@@ -641,7 +573,6 @@ void NonCarCalcForce(tNon_car_spec* nc, br_scalar dt) {
 
 // Offset: 27200
 // Size: 402
-// EAX: c
 void AddDrag(tCar_spec* c, br_scalar dt) {
     br_scalar drag_multiplier;
     br_scalar ts;
@@ -652,10 +583,6 @@ void AddDrag(tCar_spec* c, br_scalar dt) {
 
 // Offset: 27604
 // Size: 419
-// EAX: c
-// EDX: wheel_pos
-// EBX: norm
-// ECX: d
 void DoBumpiness(tCar_spec* c, br_vector3* wheel_pos, br_vector3* norm, br_scalar* d, int n) {
     br_vector3 tv;
     int delta;
@@ -667,7 +594,6 @@ void DoBumpiness(tCar_spec* c, br_vector3* wheel_pos, br_vector3* norm, br_scala
 
 // Offset: 28024
 // Size: 12038
-// EAX: c
 void CalcForce(tCar_spec* c, br_scalar dt) {
     int n;
     int normnum;
@@ -726,7 +652,6 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
 
 // Offset: 40064
 // Size: 1156
-// EAX: c
 void DoRevs(tCar_spec* c, br_scalar dt) {
     br_scalar wheel_spin_force;
     br_scalar ts;
@@ -736,15 +661,12 @@ void DoRevs(tCar_spec* c, br_scalar dt) {
 
 // Offset: 41220
 // Size: 127
-// EAX: c
-// EDX: tdt
 void ApplyTorque(tCar_spec* c, br_vector3* tdt) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 41348
 // Size: 120
-// EAX: c
 void TranslateCar(tCollision_info* c, br_scalar dt) {
     br_vector3 t;
     NOT_IMPLEMENTED();
@@ -752,7 +674,6 @@ void TranslateCar(tCollision_info* c, br_scalar dt) {
 
 // Offset: 41468
 // Size: 9029
-// EAX: c
 int CollCheck(tCollision_info* c, br_scalar dt) {
     br_vector3 a;
     br_vector3 a1;
@@ -813,10 +734,6 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
 
 // Offset: 50500
 // Size: 916
-// EAX: c
-// EDX: vel
-// EBX: normal_force
-// ECX: pos
 br_scalar AddFriction(tCollision_info* c, br_vector3* vel, br_vector3* normal_force, br_vector3* pos, br_scalar total_force, br_vector3* max_friction) {
     br_vector3 norm;
     br_vector3 tv;
@@ -828,10 +745,6 @@ br_scalar AddFriction(tCollision_info* c, br_vector3* vel, br_vector3* normal_fo
 
 // Offset: 51416
 // Size: 1179
-// EAX: car1
-// EDX: car2
-// EBX: vel1
-// ECX: vel2
 void AddFrictionCarToCar(tCollision_info* car1, tCollision_info* car2, br_vector3* vel1, br_vector3* vel2, br_vector3* normal_force1, br_vector3* pos1, br_vector3* pos2, br_scalar total_force, br_vector3* max_friction) {
     br_vector3 v_diff1;
     br_vector3 v_diff2;
@@ -862,8 +775,6 @@ void ScrapeNoise(br_scalar vel, br_vector3* position, int material) {
 
 // Offset: 52832
 // Size: 747
-// EAX: pC
-// EDX: pWheel_num
 void SkidNoise(tCar_spec* pC, int pWheel_num, br_scalar pV, int material) {
     br_vector3 pos;
     br_vector3 world_pos;
@@ -877,16 +788,12 @@ void SkidNoise(tCar_spec* pC, int pWheel_num, br_scalar pV, int material) {
 
 // Offset: 53580
 // Size: 77
-// EAX: pC
 void StopSkid(tCar_spec* pC) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 53660
 // Size: 255
-// EAX: pForce
-// EDX: position
-// EBX: material
 void CrashNoise(br_vector3* pForce, br_vector3* position, int material) {
     static tS3_sound_tag crunch_tag;
     static tS3_volume last_crunch_vol;
@@ -897,10 +804,6 @@ void CrashNoise(br_vector3* pForce, br_vector3* position, int material) {
 
 // Offset: 53916
 // Size: 1541
-// EAX: c
-// EDX: pPosition
-// EBX: pForce_car_space
-// ECX: car2
 void CrushAndDamageCar(tCar_spec* c, br_vector3* pPosition, br_vector3* pForce_car_space, tCar_spec* car2) {
     br_vector3 force;
     br_vector3 force2;
@@ -917,7 +820,6 @@ void CrushAndDamageCar(tCar_spec* c, br_vector3* pPosition, br_vector3* pForce_c
 
 // Offset: 55460
 // Size: 472
-// EAX: c
 int ExpandBoundingBox(tCar_spec* c) {
     br_scalar min_z;
     br_scalar max_z;
@@ -931,8 +833,6 @@ int ExpandBoundingBox(tCar_spec* c) {
 
 // Offset: 55932
 // Size: 795
-// EAX: c
-// EDX: crush_only
 void CrushBoundingBox(tCar_spec* c, int crush_only) {
     br_vector3 min;
     br_vector3 max;
@@ -952,19 +852,12 @@ void AddCollPoint(br_scalar dist, br_vector3* p, br_vector3* norm, br_vector3* r
 
 // Offset: 57008
 // Size: 88
-// EAX: f
-// EDX: m
-// EBX: d
 br_scalar SinglePointColl(br_scalar* f, br_matrix4* m, br_scalar* d) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 57096
 // Size: 359
-// EAX: f
-// EDX: m
-// EBX: d
-// ECX: tau
 br_scalar TwoPointColl(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* tau, br_vector3* n) {
     br_scalar ts;
     NOT_IMPLEMENTED();
@@ -972,17 +865,12 @@ br_scalar TwoPointColl(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* ta
 
 // Offset: 57456
 // Size: 62
-// EAX: mi
-// EDX: mc
 br_scalar DrMatrix4Inverse(br_matrix4* mi, br_matrix4* mc) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 57520
 // Size: 172
-// EAX: f
-// EDX: m
-// EBX: d
 br_scalar ThreePointColl(br_scalar* f, br_matrix4* m, br_scalar* d) {
     br_matrix4 mc;
     br_matrix4 mi;
@@ -992,10 +880,6 @@ br_scalar ThreePointColl(br_scalar* f, br_matrix4* m, br_scalar* d) {
 
 // Offset: 57692
 // Size: 638
-// EAX: f
-// EDX: m
-// EBX: d
-// ECX: tau
 br_scalar ThreePointCollRec(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* tau, br_vector3* n, tCollision_info* c) {
     int i;
     int j;
@@ -1005,10 +889,6 @@ br_scalar ThreePointCollRec(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector
 
 // Offset: 58332
 // Size: 639
-// EAX: f
-// EDX: m
-// EBX: d
-// ECX: tau
 br_scalar FourPointColl(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* tau, br_vector3* n, tCollision_info* c) {
     int i;
     int j;
@@ -1019,10 +899,6 @@ br_scalar FourPointColl(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* t
 
 // Offset: 58972
 // Size: 228
-// EAX: pNum_rays
-// EDX: a
-// EBX: b
-// ECX: nor
 void MultiFindFloorInBoxM(int pNum_rays, br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d, tCar_spec* c, int* mat_ref) {
     br_vector3 aa[4];
     br_vector3 bb;
@@ -1032,10 +908,6 @@ void MultiFindFloorInBoxM(int pNum_rays, br_vector3* a, br_vector3* b, br_vector
 
 // Offset: 59200
 // Size: 338
-// EAX: pNum_rays
-// EDX: a
-// EBX: b
-// ECX: nor
 void MultiFindFloorInBoxBU(int pNum_rays, br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d, tCar_spec* c, int* mat_ref) {
     br_vector3 nor2;
     int i;
@@ -1048,10 +920,6 @@ void MultiFindFloorInBoxBU(int pNum_rays, br_vector3* a, br_vector3* b, br_vecto
 
 // Offset: 59540
 // Size: 149
-// EAX: a
-// EDX: b
-// EBX: nor
-// ECX: d
 void findfloor(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d) {
     br_material* material;
     br_vector3 aa;
@@ -1061,10 +929,6 @@ void findfloor(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d) {
 
 // Offset: 59692
 // Size: 157
-// EAX: a
-// EDX: b
-// EBX: nor
-// ECX: d
 int FindFloorInBoxM(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d, tCollision_info* c) {
     br_vector3 aa;
     br_vector3 bb;
@@ -1073,10 +937,6 @@ int FindFloorInBoxM(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d,
 
 // Offset: 59852
 // Size: 278
-// EAX: a
-// EDX: b
-// EBX: nor
-// ECX: d
 int FindFloorInBoxBU(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d, tCollision_info* c) {
     br_vector3 nor2;
     int i;
@@ -1088,10 +948,6 @@ int FindFloorInBoxBU(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d
 
 // Offset: 60132
 // Size: 443
-// EAX: a
-// EDX: b
-// EBX: nor
-// ECX: d
 int FindFloorInBoxBU2(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d, tCollision_info* c) {
     br_vector3 nor2;
     br_vector3 tv;
@@ -1104,10 +960,6 @@ int FindFloorInBoxBU2(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* 
 
 // Offset: 60576
 // Size: 157
-// EAX: a
-// EDX: b
-// EBX: nor
-// ECX: d
 int FindFloorInBoxM2(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d, tCollision_info* c) {
     br_vector3 aa;
     br_vector3 bb;
@@ -1116,10 +968,6 @@ int FindFloorInBoxM2(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d
 
 // Offset: 60736
 // Size: 1324
-// EAX: pB
-// EDX: pM
-// EBX: pMold
-// ECX: pPoint_list
 int BoxFaceIntersect(br_bounds* pB, br_matrix34* pM, br_matrix34* pMold, br_vector3* pPoint_list, br_vector3* pNorm_list, br_scalar* pDist_list, int pMax_pnts, tCollision_info* c) {
     br_vector3 p[3];
     br_vector3 tv;
@@ -1137,10 +985,6 @@ int BoxFaceIntersect(br_bounds* pB, br_matrix34* pM, br_matrix34* pMold, br_vect
 
 // Offset: 62060
 // Size: 3591
-// EAX: p1
-// EDX: p2
-// EBX: pB
-// ECX: pMold
 int AddEdgeCollPoints(br_vector3* p1, br_vector3* p2, br_bounds* pB, br_matrix34* pMold, br_vector3* pPoint_list, br_vector3* pNorm_list, int n, int pMax_pnts, tCollision_info* c) {
     br_vector3 op1;
     br_vector3 op2;
@@ -1159,8 +1003,6 @@ int AddEdgeCollPoints(br_vector3* p1, br_vector3* p2, br_bounds* pB, br_matrix34
 
 // Offset: 65652
 // Size: 118
-// EAX: n
-// EDX: p
 void GetPlaneNormal(br_vector3* n, int p) {
     int d;
     NOT_IMPLEMENTED();
@@ -1168,10 +1010,6 @@ void GetPlaneNormal(br_vector3* n, int p) {
 
 // Offset: 65772
 // Size: 534
-// EAX: pos
-// EDX: edge
-// EBX: pB
-// ECX: plane1
 int GetBoundsEdge(br_vector3* pos, br_vector3* edge, br_bounds* pB, int plane1, int plane2, br_vector3* a, br_vector3* b, br_vector3* c, int flag) {
     int d1;
     int d2;
@@ -1184,7 +1022,6 @@ int GetBoundsEdge(br_vector3* pos, br_vector3* edge, br_bounds* pB, int plane1, 
 
 // Offset: 66308
 // Size: 603
-// EAX: pTime_difference
 void oldMoveOurCar(tU32 pTime_difference) {
     br_vector3 thrust_vector;
     br_matrix34 direction_matrix;
@@ -1220,7 +1057,6 @@ float frac(float pN) {
 
 // Offset: 67096
 // Size: 601
-// EAX: pCar
 void SetAmbientPratCam(tCar_spec* pCar) {
     br_scalar vcs_x;
     br_scalar vcs_y;
@@ -1238,7 +1074,6 @@ void SetAmbientPratCam(tCar_spec* pCar) {
 
 // Offset: 67700
 // Size: 3599
-// EAX: pFrame_period
 void MungeCarGraphics(tU32 pFrame_period) {
     int i;
     int j;
@@ -1352,7 +1187,6 @@ void SetPanningFieldOfView() {
 
 // Offset: 73420
 // Size: 232
-// EAX: pCar
 void CheckDisablePlingMaterials(tCar_spec* pCar) {
     br_matrix34* mat;
     br_scalar height;
@@ -1362,8 +1196,6 @@ void CheckDisablePlingMaterials(tCar_spec* pCar) {
 
 // Offset: 73652
 // Size: 346
-// EAX: c
-// EDX: pTime
 void PositionExternalCamera(tCar_spec* c, tU32 pTime) {
     static int old_camera_mode;
     br_camera* camera_ptr;
@@ -1372,8 +1204,6 @@ void PositionExternalCamera(tCar_spec* c, tU32 pTime) {
 
 // Offset: 74000
 // Size: 102
-// EAX: c
-// EDX: pTime
 void CameraBugFix(tCar_spec* c, tU32 pTime) {
     br_matrix34 mat;
     br_matrix34* m2;
@@ -1383,7 +1213,6 @@ void CameraBugFix(tCar_spec* c, tU32 pTime) {
 
 // Offset: 74104
 // Size: 141
-// EAX: pActor
 int PossibleRemoveNonCarFromWorld(br_actor* pActor) {
     tU8 cx;
     tU8 cz;
@@ -1393,7 +1222,6 @@ int PossibleRemoveNonCarFromWorld(br_actor* pActor) {
 
 // Offset: 74248
 // Size: 117
-// EAX: pActor
 void PutNonCarBackInWorld(br_actor* pActor) {
     tU8 cx;
     tU8 cz;
@@ -1403,8 +1231,6 @@ void PutNonCarBackInWorld(br_actor* pActor) {
 
 // Offset: 74368
 // Size: 2633
-// EAX: c
-// EDX: pTime
 int IncidentCam(tCar_spec* c, tU32 pTime) {
     br_matrix34* m2;
     br_matrix34 mat;
@@ -1429,10 +1255,6 @@ int IncidentCam(tCar_spec* c, tU32 pTime) {
 
 // Offset: 77004
 // Size: 1267
-// EAX: c
-// EDX: type
-// EBX: severity
-// ECX: info
 int MoveCamToIncident(tCar_spec* c, tIncident_type* type, float* severity, tIncident_info* info, tU32* next_incident_time) {
     tU32 next_incident_time2;
     tU32 t;
@@ -1452,8 +1274,6 @@ int MoveCamToIncident(tCar_spec* c, tIncident_type* type, float* severity, tInci
 
 // Offset: 78272
 // Size: 368
-// EAX: c
-// EDX: pTime
 void PanningExternalCamera(tCar_spec* c, tU32 pTime) {
     br_matrix34* m2;
     br_matrix34* m1;
@@ -1465,8 +1285,6 @@ void PanningExternalCamera(tCar_spec* c, tU32 pTime) {
 
 // Offset: 78640
 // Size: 136
-// EAX: start
-// EDX: end
 int CheckForWall(br_vector3* start, br_vector3* end) {
     br_vector3 dir;
     br_material* material;
@@ -1477,7 +1295,6 @@ int CheckForWall(br_vector3* start, br_vector3* end) {
 
 // Offset: 78776
 // Size: 1383
-// EAX: c
 void SetUpPanningCamera(tCar_spec* c) {
     br_vector3 pos;
     br_vector3 perp;
@@ -1501,22 +1318,18 @@ void SetUpPanningCamera(tCar_spec* c) {
 
 // Offset: 80160
 // Size: 97
-// EAX: i
 void SaveCameraPosition(int i) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 80260
 // Size: 97
-// EAX: i
 void RestoreCameraPosition(int i) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 80360
 // Size: 2107
-// EAX: c
-// EDX: pTime
 void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
     br_matrix34* m2;
     br_matrix34* m1;
@@ -1545,9 +1358,6 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
 
 // Offset: 82468
 // Size: 446
-// EAX: c
-// EDX: vn
-// EBX: manual_swing
 void MoveWithWheels(tCar_spec* c, br_vector3* vn, int manual_swing) {
     br_angle yaw;
     br_angle theta;
@@ -1557,10 +1367,6 @@ void MoveWithWheels(tCar_spec* c, br_vector3* vn, int manual_swing) {
 
 // Offset: 82916
 // Size: 1828
-// EAX: c
-// EDX: m1
-// EBX: m2
-// ECX: vn
 void SwingCamera(tCar_spec* c, br_matrix34* m1, br_matrix34* m2, br_vector3* vn, tU32 pTime) {
     int i;
     br_scalar ts;
@@ -1579,9 +1385,6 @@ void SwingCamera(tCar_spec* c, br_matrix34* m1, br_matrix34* m2, br_vector3* vn,
 
 // Offset: 84744
 // Size: 776
-// EAX: c
-// EDX: m1
-// EBX: m2
 void PointCameraAtCar(tCar_spec* c, br_matrix34* m1, br_matrix34* m2) {
     br_vector3 vn;
     br_vector3 tv;
@@ -1598,8 +1401,6 @@ void PointCameraAtCar(tCar_spec* c, br_matrix34* m1, br_matrix34* m2) {
 
 // Offset: 85520
 // Size: 465
-// EAX: pos
-// EDX: m2
 void PointCamera(br_vector3* pos, br_matrix34* m2) {
     br_vector3 vn;
     br_scalar dist;
@@ -1610,10 +1411,6 @@ void PointCamera(br_vector3* pos, br_matrix34* m2) {
 
 // Offset: 85988
 // Size: 2411
-// EAX: car_pos
-// EDX: cam_pos
-// EBX: old_camera_pos
-// ECX: manual_move
 int CollideCamera2(br_vector3* car_pos, br_vector3* cam_pos, br_vector3* old_camera_pos, int manual_move) {
     int i;
     int k;
@@ -1642,8 +1439,6 @@ int CollideCamera2(br_vector3* car_pos, br_vector3* cam_pos, br_vector3* old_cam
 
 // Offset: 88400
 // Size: 141
-// EAX: bnds
-// EDX: p
 int BoundsTest(br_bounds* bnds, br_vector3* p) {
     int j;
     NOT_IMPLEMENTED();
@@ -1651,8 +1446,6 @@ int BoundsTest(br_bounds* bnds, br_vector3* p) {
 
 // Offset: 88544
 // Size: 494
-// EAX: car_pos
-// EDX: cam_pos
 int CollideCameraWithOtherCars(br_vector3* car_pos, br_vector3* cam_pos) {
     int i;
     int plane;
@@ -1684,7 +1477,6 @@ void FreezeCamera() {
 
 // Offset: 89596
 // Size: 2248
-// EAX: c
 void FlyCar(tCar_spec* c, br_scalar dt) {
     int accflag;
     int turnflag;
@@ -1699,8 +1491,6 @@ void FlyCar(tCar_spec* c, br_scalar dt) {
 
 // Offset: 91844
 // Size: 157
-// EAX: v
-// EDX: t
 void DrVector3RotateY(br_vector3* v, br_angle t) {
     br_scalar c;
     br_scalar s;
@@ -1742,23 +1532,18 @@ int CrashCarsTogetherSinglePass(br_scalar dt, int pPass, tCollison_data* collide
 
 // Offset: 94628
 // Size: 142
-// EAX: car
 void BringCarToAGrindingHalt(tCollision_info* car) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 94940
 // Size: 99
-// EAX: car1
-// EDX: car2
 int SimpleCarCarCollisionTest(tCollision_info* car1, tCollision_info* car2) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 95040
 // Size: 877
-// EAX: car1
-// EDX: car2
 int CollideTwoCarsWithWalls(tCollision_info* car1, tCollision_info* car2, br_scalar dt) {
     br_vector3 mom1;
     br_vector3 mom2;
@@ -1773,8 +1558,6 @@ int CollideTwoCarsWithWalls(tCollision_info* car1, tCollision_info* car2, br_sca
 
 // Offset: 95920
 // Size: 298
-// EAX: car1
-// EDX: car2
 int CollideTwoCarsRepeatedly(tCollision_info* car1, tCollision_info* car2, br_scalar dt) {
     int l;
     int collide;
@@ -1784,9 +1567,6 @@ int CollideTwoCarsRepeatedly(tCollision_info* car1, tCollision_info* car2, br_sc
 
 // Offset: 96220
 // Size: 3499
-// EAX: car1
-// EDX: car2
-// EBX: pPass
 int CollideTwoCars(tCollision_info* car1, tCollision_info* car2, int pPass) {
     int k;
     int old_k;
@@ -1826,10 +1606,6 @@ int CollideTwoCars(tCollision_info* car1, tCollision_info* car2, int pPass) {
 
 // Offset: 99720
 // Size: 3598
-// EAX: pB1
-// EDX: pB2
-// EBX: pM21
-// ECX: pM12
 int GetEdgeEdgeCollisions(br_bounds* pB1, br_bounds* pB2, br_matrix34* pM21, br_matrix34* pM12, br_matrix34* pMo21, br_matrix34* pMo12, br_matrix34* pM1o1, br_vector3* pPoint_list, br_vector3* pNorm_list, int pMax) {
     br_vector3 p1;
     br_vector3 p2;
@@ -1854,10 +1630,6 @@ int GetEdgeEdgeCollisions(br_bounds* pB1, br_bounds* pB2, br_matrix34* pM21, br_
 
 // Offset: 103320
 // Size: 1920
-// EAX: car1
-// EDX: car2
-// EBX: pMms
-// ECX: pMoms
 int FacePointCarCarCollide(tCollision_info* car1, tCollision_info* car2, br_matrix34* pMms, br_matrix34* pMoms, br_matrix34* pMsos, br_vector3* pPoint_list, br_vector3* pNorm_list, int pMax, int order) {
     int k;
     int i;
@@ -1879,33 +1651,24 @@ int FacePointCarCarCollide(tCollision_info* car1, tCollision_info* car2, br_matr
 
 // Offset: 105240
 // Size: 111
-// EAX: pCar
 void MungeCarsMass(tCollision_info* pCar, br_scalar pFactor) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 105352
 // Size: 124
-// EAX: pCar_1
-// EDX: pCar_2
 void ModifyCarsMass(tCollision_info* pCar_1, tCollision_info* pCar_2) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 105476
 // Size: 144
-// EAX: pCar_1
-// EDX: pCar_2
 void ResetCarsMass(tCollision_info* pCar_1, tCollision_info* pCar_2) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 105620
 // Size: 8941
-// EAX: car1
-// EDX: car2
-// EBX: r
-// ECX: n
 int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_vector3* n, int k, int pPass, br_matrix34* mat1_to_mat2) {
     br_matrix34* mat1;
     br_matrix34* mat2;
@@ -1949,10 +1712,6 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
 
 // Offset: 114564
 // Size: 417
-// EAX: f
-// EDX: m
-// EBX: d
-// ECX: tau
 br_scalar TwoPointCollB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* tau, br_vector3* n) {
     br_scalar ts;
     NOT_IMPLEMENTED();
@@ -1960,10 +1719,6 @@ br_scalar TwoPointCollB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* t
 
 // Offset: 114984
 // Size: 827
-// EAX: f
-// EDX: m
-// EBX: d
-// ECX: tau
 br_scalar ThreePointCollRecB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* tau, br_vector3* n) {
     int i;
     int j;
@@ -1973,10 +1728,6 @@ br_scalar ThreePointCollRecB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vecto
 
 // Offset: 115812
 // Size: 789
-// EAX: f
-// EDX: m
-// EBX: d
-// ECX: tau
 br_scalar FourPointCollB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* tau, br_vector3* n) {
     int i;
     int j;
@@ -1987,7 +1738,6 @@ br_scalar FourPointCollB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* 
 
 // Offset: 116604
 // Size: 89
-// EAX: f
 int TestForNan(float* f) {
     tU32 i;
     NOT_IMPLEMENTED();
@@ -2002,7 +1752,6 @@ void CheckCameraHither() {
 
 // Offset: 116788
 // Size: 525
-// EAX: pCar
 void SetCarSuspGiveAndHeight(tCar_spec* pCar, br_scalar pFront_give_factor, br_scalar pRear_give_factor, br_scalar pDamping_factor, br_scalar pExtra_front_height, br_scalar pExtra_rear_height) {
     br_scalar front_give;
     br_scalar rear_give;
@@ -2014,7 +1763,6 @@ void SetCarSuspGiveAndHeight(tCar_spec* pCar, br_scalar pFront_give_factor, br_s
 
 // Offset: 117316
 // Size: 1023
-// EAX: car
 int TestForCarInSensiblePlace(tCar_spec* car) {
     br_bounds bnds;
     br_matrix34 mat;
@@ -2033,9 +1781,6 @@ int TestForCarInSensiblePlace(tCar_spec* car) {
 
 // Offset: 118340
 // Size: 528
-// EAX: c1
-// EDX: c2
-// EBX: newmats
 int TestOldMats(tCollision_info* c1, tCollision_info* c2, int newmats) {
     br_vector3 p1;
     br_vector3 p2;
@@ -2064,14 +1809,12 @@ int TestOldMats(tCollision_info* c1, tCollision_info* c2, int newmats) {
 
 // Offset: 118868
 // Size: 69
-// EAX: pActor
 int PullActorFromWorld(br_actor* pActor) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 118940
 // Size: 681
-// EAX: pActor
 int DoPullActorFromWorld(br_actor* pActor) {
     int num;
     int i;
@@ -2082,7 +1825,6 @@ int DoPullActorFromWorld(br_actor* pActor) {
 
 // Offset: 119624
 // Size: 904
-// EAX: pTime
 void CheckForDeAttachmentOfNonCars(tU32 pTime) {
     static tU32 total_time;
     br_bounds bnds;
@@ -2102,8 +1844,6 @@ void CheckForDeAttachmentOfNonCars(tU32 pTime) {
 
 // Offset: 120528
 // Size: 248
-// EAX: pActor
-// EDX: pMat
 void AdjustNonCar(br_actor* pActor, br_matrix34* pMat) {
     tU8 cx;
     tU8 cz;
@@ -2113,15 +1853,12 @@ void AdjustNonCar(br_actor* pActor, br_matrix34* pMat) {
 
 // Offset: 120776
 // Size: 240
-// EAX: c
 void PipeSingleNonCar(tCollision_info* c) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 121016
 // Size: 169
-// EAX: pCar
-// EDX: pFace_refs
 int GetPrecalculatedFacesUnderCar(tCar_spec* pCar, tFace_ref** pFace_refs) {
     NOT_IMPLEMENTED();
 }

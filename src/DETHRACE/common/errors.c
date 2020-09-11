@@ -201,7 +201,6 @@ void dr_dprintf(char* fmt_string, ...) {
 
 // Offset: 488
 // Size: 57
-// EAX: pMisc_text_index
 int DoErrorInterface(int pMisc_text_index) {
     NOT_IMPLEMENTED();
 }

@@ -13,8 +13,6 @@ char rscid[51];
 
 // Offset: 8
 // Size: 246
-// EAX: first
-// EDX: last
 int addEdge(br_uint_16 first, br_uint_16 last) {
     pm_temp_edge* tep;
     NOT_IMPLEMENTED();
@@ -22,8 +20,6 @@ int addEdge(br_uint_16 first, br_uint_16 last) {
 
 // Offset: 267
 // Size: 461
-// EAX: group
-// EDX: model
 void prepareEdges(v11group* group, br_model* model) {
     br_size_t scratch_size;
     br_face* mfp;
@@ -34,7 +30,6 @@ void prepareEdges(v11group* group, br_model* model) {
 
 // Offset: 743
 // Size: 115
-// EAX: model
 void BrPrepareEdges(br_model* model) {
     int g;
     v11model* v11m;
@@ -94,7 +89,6 @@ br_fraction BrScalarToFractionClamp(br_scalar s) {
 
 // Offset: 2411
 // Size: 284
-// EAX: model
 void PrepareFaceNormals(br_model* model) {
     br_vertex* vertices;
     br_vector4 v4;
@@ -113,7 +107,6 @@ void PrepareFaceNormals(br_model* model) {
 
 // Offset: 2705
 // Size: 296
-// EAX: model
 void Smoothing(br_model* model, br_scalar crease_limit, prep_vertex** start, prep_vertex** end) {
     prep_vertex** outer;
     prep_vertex** inner;
@@ -122,7 +115,6 @@ void Smoothing(br_model* model, br_scalar crease_limit, prep_vertex** start, pre
 
 // Offset: 3018
 // Size: 500
-// EAX: model
 void SmoothingCreased(br_model* model, br_scalar crease_limit, prep_vertex** start, prep_vertex** end) {
     br_vector3 o_n;
     prep_vertex** outer;
@@ -132,10 +124,6 @@ void SmoothingCreased(br_model* model, br_scalar crease_limit, prep_vertex** sta
 
 // Offset: 3529
 // Size: 479
-// EAX: group
-// EDX: v
-// EBX: src
-// ECX: model
 void CopyVertex(v11group* group, int v, prep_vertex* src, br_model* model) {
     br_vertex* srcv;
     br_vector3 n;
@@ -144,17 +132,12 @@ void CopyVertex(v11group* group, int v, prep_vertex* src, br_model* model) {
 
 // Offset: 4017
 // Size: 293
-// EAX: group
-// EDX: f
-// EBX: src
-// ECX: model
 void CopyFace(v11group* group, int f, br_face* src, br_model* model) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 4324
 // Size: 2516
-// EAX: model
 void PrepareGroups(br_model* model) {
     br_qsort_cbfn* vertex_compare_smoothing;
     br_qsort_cbfn* vertex_compare_groups;
@@ -194,7 +177,6 @@ void PrepareGroups(br_model* model) {
 
 // Offset: 6862
 // Size: 170
-// EAX: model
 void PrepareBoundingRadius(br_model* model) {
     float d;
     float max = 0.0f;
@@ -213,7 +195,6 @@ void PrepareBoundingRadius(br_model* model) {
 
 // Offset: 7051
 // Size: 272
-// EAX: model
 void PrepareBoundingBox(br_model* model) {
     int axis;
     int v;
@@ -242,7 +223,6 @@ void PrepareBoundingBox(br_model* model) {
 
 // Offset: 7345
 // Size: 268
-// EAX: v11m
 void RegenerateFaceNormals(v11model* v11m) {
     int g;
     int f;
@@ -252,7 +232,6 @@ void RegenerateFaceNormals(v11model* v11m) {
 
 // Offset: 7637
 // Size: 762
-// EAX: v11m
 void RegenerateVertexNormals(v11model* v11m) {
     int g;
     int v;
@@ -413,7 +392,6 @@ void BrModelUpdate(br_model* model, br_uint_16 flags) {
 
 // Offset: 10011
 // Size: 109
-// EAX: model
 void BrModelClear(br_model* model) {
     NOT_IMPLEMENTED();
 }

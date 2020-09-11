@@ -39,7 +39,6 @@ br_angle gSky_image_underground;
 
 // Offset: 0
 // Size: 110
-// EAX: pNumber
 int Log2(int pNumber) {
     int i;
     int bits[16];
@@ -57,14 +56,12 @@ br_scalar CalculateWrappingMultiplier(br_scalar pValue, br_scalar pYon) {
 
 // Offset: 244
 // Size: 78
-// EAX: pShift
 br_scalar DepthCueingShiftToDistance(int pShift) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 324
 // Size: 210
-// EAX: pMaterial
 void FogAccordingToGPSCDE(br_material* pMaterial) {
     int start;
     int end;
@@ -80,10 +77,6 @@ void FrobFog() {
 
 // Offset: 744
 // Size: 170
-// EAX: pType
-// EDX: pSky_texture
-// EBX: pStart
-// ECX: pEnd
 void InstantDepthChange(tDepth_effect_type pType, br_pixelmap* pSky_texture, int pStart, int pEnd) {
     // TODO: not sure if this line is right..
     if ((int)pType == -1) {
@@ -110,9 +103,6 @@ br_scalar Tan(br_scalar pAngle) {
 
 // Offset: 1008
 // Size: 213
-// EAX: pSky
-// EDX: pView
-// EBX: pPerfect
 br_scalar EdgeU(br_angle pSky, br_angle pView, br_angle pPerfect) {
     br_scalar a;
     br_scalar b;
@@ -122,8 +112,6 @@ br_scalar EdgeU(br_angle pSky, br_angle pView, br_angle pPerfect) {
 
 // Offset: 1224
 // Size: 1602
-// EAX: pCamera
-// EDX: pModel
 void MungeSkyModel(br_actor* pCamera, br_model* pModel) {
     br_camera* camera_data;
     br_scalar horizon_half_height;
@@ -147,7 +135,6 @@ void MungeSkyModel(br_actor* pCamera, br_model* pModel) {
 
 // Offset: 2828
 // Size: 882
-// EAX: pCamera
 br_model* CreateHorizonModel(br_actor* pCamera) {
     tU8 nbands;
     tU8 band;
@@ -159,9 +146,6 @@ br_model* CreateHorizonModel(br_actor* pCamera) {
 
 // Offset: 3712
 // Size: 408
-// EAX: pName
-// EDX: pTable
-// EBX: pPower
 void LoadDepthTable(char* pName, br_pixelmap** pTable, int* pPower) {
     tPath_name the_path;
     int i;
@@ -180,10 +164,6 @@ void InitDepthEffects() {
 
 // Offset: 4732
 // Size: 769
-// EAX: pRender_buffer
-// EDX: pDepth_buffer
-// EBX: pShade_table
-// ECX: pShade_table_power
 void DoDepthByShadeTable(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_pixelmap* pShade_table, int pShade_table_power, int pStart, int pEnd) {
     tU8* render_ptr;
     tU8* shade_table_pixels;
@@ -201,10 +181,6 @@ void DoDepthByShadeTable(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer
 
 // Offset: 5504
 // Size: 1009
-// EAX: pRender_buffer
-// EDX: pDepth_buffer
-// EBX: pCamera
-// ECX: pCamera_to_world
 void ExternalSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world) {
     int dst_x;
     int src_x;
@@ -232,10 +208,6 @@ void ExternalSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_act
 
 // Offset: 6516
 // Size: 463
-// EAX: pRender_buffer
-// EDX: pDepth_buffer
-// EBX: pCamera
-// ECX: pCamera_to_world
 void DoHorizon(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world) {
     br_angle yaw;
     br_actor* actor;
@@ -244,43 +216,30 @@ void DoHorizon(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor
 
 // Offset: 6980
 // Size: 73
-// EAX: pRender_buffer
-// EDX: pDepth_buffer
 void DoDepthCue(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 7056
 // Size: 73
-// EAX: pRender_buffer
-// EDX: pDepth_buffer
 void DoFog(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 7132
 // Size: 91
-// EAX: pRender_buffer
-// EDX: pDepth_buffer
-// EBX: pCamera
-// ECX: pCamera_to_world
 void DepthEffect(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 7224
 // Size: 93
-// EAX: pRender_buffer
-// EDX: pDepth_buffer
-// EBX: pCamera
-// ECX: pCamera_to_world
 void DepthEffectSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 7320
 // Size: 627
-// EAX: pCamera
 void DoWobbleCamera(br_actor* pCamera) {
     float f_time;
     static br_scalar mag00;
@@ -306,7 +265,6 @@ void DoWobbleCamera(br_actor* pCamera) {
 
 // Offset: 7948
 // Size: 627
-// EAX: pCamera
 void DoDrugWobbleCamera(br_actor* pCamera) {
     float f_time;
     static br_scalar mag00;
@@ -332,8 +290,6 @@ void DoDrugWobbleCamera(br_actor* pCamera) {
 
 // Offset: 8576
 // Size: 116
-// EAX: pCamera
-// EDX: pCamera_to_world
 void DoSpecialCameraEffect(br_actor* pCamera, br_matrix34* pCamera_to_world) {
     NOT_IMPLEMENTED();
 }
@@ -442,7 +398,6 @@ int GetSkyTextureOn() {
 
 // Offset: 10372
 // Size: 60
-// EAX: pOn
 void SetSkyTextureOn(int pOn) {
     br_pixelmap* tmp;
     LOG_TRACE("(%d)", pOn);
@@ -483,7 +438,6 @@ int GetDepthCueingOn() {
 
 // Offset: 10792
 // Size: 71
-// EAX: pOn
 void SetDepthCueingOn(int pOn) {
     LOG_TRACE("(%d)", pOn);
     if (pOn != gDepth_cueing_on && gHorizon_material) {

@@ -13,10 +13,6 @@ br_error AddRequestedDrivers() {
 
 // Offset: 139
 // Size: 393
-// EAX: pdev
-// EDX: dev_begin
-// EBX: args
-// ECX: image
 br_error devAdd(br_device** pdev, br_device_begin_fn* dev_begin, char* args, br_image* image) {
     int i;
     br_device* dev;

@@ -26,20 +26,12 @@ char* gPixels_copy;
 
 // Offset: 0
 // Size: 194
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
-// EBX: pGo_ahead
-// ECX: pEscaped
 int MainMenuDone1(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 196
 // Size: 163
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
-// EBX: pGo_ahead
-// ECX: pEscaped
 int MainMenuDone2(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
 
@@ -74,8 +66,6 @@ void StartMainMenu() {
 
 // Offset: 612
 // Size: 455
-// EAX: pTime_out
-// EDX: pContinue_allowed
 int DoMainMenuInterface(tU32 pTime_out, int pContinue_allowed) {
     static tFlicette flicker_on1[8] = {
         { 14, { 64, 128 }, { 37, 89 } },
@@ -319,8 +309,6 @@ int DoMainMenuInterface(tU32 pTime_out, int pContinue_allowed) {
 
 // Offset: 1068
 // Size: 256
-// EAX: pTime_out
-// EDX: pContinue_allowed
 tMM_result GetMainMenuOption(tU32 pTime_out, int pContinue_allowed) {
     int result;
 
@@ -368,10 +356,6 @@ void QuitVerifyStart() {
 
 // Offset: 1496
 // Size: 220
-// EAX: pCurrent_choice
-// EDX: pCurrent_mode
-// EBX: pGo_ahead
-// ECX: pEscaped
 int QuitVerifyDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     FadePaletteDown();
     TurnOnPanelFlics();
@@ -395,7 +379,6 @@ int QuitVerifyDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pE
 
 // Offset: 1716
 // Size: 333
-// EAX: pReplace_background
 int DoVerifyQuit(int pReplace_background) {
     static tFlicette flicker_on[2] = { { 43, { 181, 362 }, { 124, 298 } }, { 43, { 84, 168 }, { 124, 298 } } };
     static tFlicette flicker_off[2] = { { 42, { 181, 362 }, { 124, 298 } }, { 42, { 84, 168 }, { 124, 298 } } };
@@ -506,9 +489,6 @@ int DoVerifyQuit(int pReplace_background) {
 
 // Offset: 2052
 // Size: 366
-// EAX: pTime_out
-// EDX: pSave_allowed
-// EBX: pContinue_allowed
 tMM_result DoMainMenu(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) {
     tMM_result the_result;
     if (gProgram_state.racing) {
@@ -575,9 +555,6 @@ tMM_result DoMainMenu(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) 
 
 // Offset: 2420
 // Size: 304
-// EAX: pTime_out
-// EDX: pSave_allowed
-// EBX: pContinue_allowed
 void DoMainMenuScreen(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) {
     tPlayer_status old_status;
 

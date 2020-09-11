@@ -142,14 +142,12 @@ void F4Key() {
 
 // Offset: 328
 // Size: 87
-// EAX: i
 void SetFlag(int i) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 416
 // Size: 42
-// EAX: i
 void FinishLap(int i) {
     NOT_IMPLEMENTED();
 }
@@ -168,7 +166,6 @@ void ShowSpecialVolumesIfRequ() {
 
 // Offset: 556
 // Size: 261
-// EAX: pIndex
 void DoEditModeKey(int pIndex) {
     int modifiers;
     NOT_IMPLEMENTED();
@@ -555,7 +552,6 @@ void CheckLoadSave() {
 
 // Offset: 4960
 // Size: 364
-// EAX: pRacing
 void CheckToggles(int pRacing) {
     int i;
     int new_state;
@@ -564,8 +560,6 @@ void CheckToggles(int pRacing) {
 
 // Offset: 5324
 // Size: 444
-// EAX: pCar
-// EDX: pCheck_around
 int CarWorldOffFallenCheckThingy(tCar_spec* pCar, int pCheck_around) {
     br_vector3 car_pos;
     br_vector3 offset_c;
@@ -576,7 +570,6 @@ int CarWorldOffFallenCheckThingy(tCar_spec* pCar, int pCheck_around) {
 
 // Offset: 5768
 // Size: 56
-// EAX: pCar
 int HasCarFallenOffWorld(tCar_spec* pCar) {
     NOT_IMPLEMENTED();
 }
@@ -591,14 +584,12 @@ void CheckForBeingOutOfThisWorld() {
 
 // Offset: 6076
 // Size: 190
-// EAX: pCar
 void CheckHornLocal(tCar_spec* pCar) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 6268
 // Size: 249
-// EAX: pCar
 void CheckHorn3D(tCar_spec* pCar) {
     NOT_IMPLEMENTED();
 }
@@ -632,7 +623,6 @@ void CheckMapRenderMove() {
 
 // Offset: 7880
 // Size: 300
-// EAX: pCar
 void ExplodeCar(tCar_spec* pCar) {
     br_vector3 tv;
     br_vector3 pos;
@@ -641,7 +631,6 @@ void ExplodeCar(tCar_spec* pCar) {
 
 // Offset: 8180
 // Size: 448
-// EAX: pEndFrameTime
 void CheckRecoveryOfCars(tU32 pEndFrameTime) {
     int i;
     int time;
@@ -651,7 +640,6 @@ void CheckRecoveryOfCars(tU32 pEndFrameTime) {
 
 // Offset: 8628
 // Size: 107
-// EAX: pNumber
 void LoseSomePSPowerups(int pNumber) {
     int index;
     NOT_IMPLEMENTED();
@@ -687,7 +675,6 @@ int CheckRecoverCost() {
 
 // Offset: 10768
 // Size: 279
-// EAX: pCar
 void SortOutRecover(tCar_spec* pCar) {
     int the_time;
     int val;
@@ -697,14 +684,12 @@ void SortOutRecover(tCar_spec* pCar) {
 
 // Offset: 11048
 // Size: 115
-// EAX: pCar
 void SetFlipUpCar(tCar_spec* pCar) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 11164
 // Size: 1385
-// EAX: car
 void FlipUpCar(tCar_spec* car) {
     br_vector3 tv;
     br_vector3 dir;
@@ -721,7 +706,6 @@ void FlipUpCar(tCar_spec* car) {
 
 // Offset: 12552
 // Size: 50
-// EAX: pNum
 void GetPowerup(int pNum) {
     _unittest_controls_lastGetPowerup = pNum;
     STUB();
@@ -729,7 +713,6 @@ void GetPowerup(int pNum) {
 
 // Offset: 12604
 // Size: 112
-// EAX: pRacing
 void CheckSystemKeys(int pRacing) {
     tU32 start_menu_time;
     int i;
@@ -778,7 +761,6 @@ void BrakeInstantly() {
 
 // Offset: 13304
 // Size: 853
-// EAX: pTime_difference
 void PollCarControls(tU32 pTime_difference) {
     int decay_steering;
     int decay_speed;
@@ -793,7 +775,6 @@ void PollCarControls(tU32 pTime_difference) {
 
 // Offset: 14160
 // Size: 846
-// EAX: pTime_difference
 void PollCameraControls(tU32 pTime_difference) {
     int flag;
     int left;
@@ -807,7 +788,6 @@ void PollCameraControls(tU32 pTime_difference) {
 
 // Offset: 15008
 // Size: 62
-// EAX: i
 void SetFlag2(int i) {
     NOT_IMPLEMENTED();
 }
@@ -882,7 +862,6 @@ int GetRecoverVoucherCount() {
 
 // Offset: 16308
 // Size: 46
-// EAX: pCount
 void AddVouchers(int pCount) {
     NOT_IMPLEMENTED();
 }
@@ -920,7 +899,6 @@ void CycleYonFactor() {
 
 // Offset: 17208
 // Size: 45
-// EAX: pLevel
 void SetSoundDetailLevel(int pLevel) {
     LOG_TRACE("(%d)", pLevel);
     gSound_detail_level = pLevel;
@@ -928,7 +906,6 @@ void SetSoundDetailLevel(int pLevel) {
 
 // Offset: 17256
 // Size: 65
-// EAX: pLevel
 void ReallySetSoundDetailLevel(int pLevel) {
     NOT_IMPLEMENTED();
 }
@@ -966,7 +943,6 @@ void ToggleSmoke() {
 
 // Offset: 18100
 // Size: 144
-// EAX: pFont
 void DrawSomeText2(tDR_font* pFont) {
     int y;
     int i;

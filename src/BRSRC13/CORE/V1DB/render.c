@@ -20,8 +20,6 @@ br_uint_32 BrOnScreenCheck(br_bounds3* bounds) {
 
 // Offset: 1159
 // Size: 261
-// EAX: ap
-// EDX: t
 br_uint_16 prependActorTransform(br_actor* ap, br_uint_16 t) {
     br_matrix34 mt;
     NOT_IMPLEMENTED();
@@ -29,9 +27,6 @@ br_uint_16 prependActorTransform(br_actor* ap, br_uint_16 t) {
 
 // Offset: 1434
 // Size: 196
-// EAX: mat
-// EDX: mat_t
-// EBX: t
 br_uint_16 prependMatrix(br_matrix34* mat, br_uint_16 mat_t, br_uint_16 t) {
     br_matrix34 mt;
     NOT_IMPLEMENTED();
@@ -39,10 +34,6 @@ br_uint_16 prependMatrix(br_matrix34* mat, br_uint_16 mat_t, br_uint_16 t) {
 
 // Offset: 1642
 // Size: 1009
-// EAX: ap
-// EDX: model
-// EBX: material
-// ECX: render_data
 void actorRender(br_actor* ap, br_model* model, br_material* material, void* render_data, br_uint_8 style, br_uint_16 t) {
     br_material* this_material;
     br_model* this_model;
@@ -54,10 +45,6 @@ void actorRender(br_actor* ap, br_model* model, br_material* material, void* ren
 
 // Offset: 2671
 // Size: 522
-// EAX: ap
-// EDX: model
-// EBX: material
-// ECX: render_data
 void actorRenderOnScreen(br_actor* ap, br_model* model, br_material* material, void* render_data, br_uint_8 style, br_uint_16 t) {
     br_material* this_material;
     br_model* this_model;
@@ -68,7 +55,6 @@ void actorRenderOnScreen(br_actor* ap, br_model* model, br_material* material, v
 
 // Offset: 3210
 // Size: 198
-// EAX: world
 void sceneRenderWorld(br_actor* world) {
     br_model* model;
     br_material* material;
@@ -80,7 +66,6 @@ void sceneRenderWorld(br_actor* world) {
 
 // Offset: 3423
 // Size: 522
-// EAX: tree
 void sceneRenderAdd(br_actor* tree) {
     br_material* material;
     br_model* model;
@@ -113,14 +98,12 @@ br_renderbounds_cbfn* BrDbSetRenderBoundsCallback(br_renderbounds_cbfn* new_cbfn
 
 // Offset: 4964
 // Size: 344
-// EAX: buffer
 void SetOrigin(br_pixelmap* buffer) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 5320
 // Size: 233
-// EAX: buffer
 void SetViewport(br_pixelmap* buffer) {
     NOT_IMPLEMENTED();
 }

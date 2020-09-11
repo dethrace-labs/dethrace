@@ -41,8 +41,6 @@ char rscid[54];
 
 // Offset: 18
 // Size: 153
-// EAX: df
-// EDX: pixelmap
 int FopWrite_PIXELMAP(br_datafile* df, br_pixelmap* pixelmap) {
     br_pixelmap pmap;
     NOT_IMPLEMENTED();
@@ -50,10 +48,6 @@ int FopWrite_PIXELMAP(br_datafile* df, br_pixelmap* pixelmap) {
 
 // Offset: 192
 // Size: 181
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_OLD_PIXELMAP(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_pixelmap* pp;
     NOT_IMPLEMENTED();
@@ -61,10 +55,6 @@ int FopRead_OLD_PIXELMAP(br_datafile* df, br_uint_32 id, br_uint_32 length, br_u
 
 // Offset: 390
 // Size: 181
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_PIXELMAP(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_pixelmap* pp;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
@@ -80,8 +70,6 @@ int FopRead_PIXELMAP(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_
 
 // Offset: 587
 // Size: 542
-// EAX: df
-// EDX: pixelmap
 int FopWrite_PIXELS(br_datafile* df, br_pixelmap* pixelmap) {
     int size;
     int bytes;
@@ -92,10 +80,6 @@ int FopWrite_PIXELS(br_datafile* df, br_pixelmap* pixelmap) {
 
 // Offset: 1144
 // Size: 144
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_PIXELS(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     int icount = 0;
     br_pixelmap* pp;
@@ -113,17 +97,12 @@ int FopRead_PIXELS(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32
 
 // Offset: 1305
 // Size: 66
-// EAX: df
 int FopWrite_ADD_MAP(br_datafile* df) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 1387
 // Size: 105
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_ADD_MAP(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_pixelmap* pp;
     br_pixelmap* map;
@@ -157,8 +136,6 @@ br_uint_32 BrPixelmapLoadMany(char* filename, br_pixelmap** pixelmaps, br_uint_1
 
 // Offset: 1687
 // Size: 161
-// EAX: pp
-// EDX: df
 int WritePixelmap(br_pixelmap* pp, br_datafile* df) {
     NOT_IMPLEMENTED();
 }

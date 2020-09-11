@@ -199,19 +199,12 @@ char rscid[53];
 
 // Offset: 18
 // Size: 139
-// EAX: df
-// EDX: vertices
-// EBX: nvertices
 int FopWrite_VERTICES(br_datafile* df, br_vertex* vertices, int nvertices) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 174
 // Size: 126
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_VERTICES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_model* mp;
     int i;
@@ -229,10 +222,6 @@ int FopRead_VERTICES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_
 
 // Offset: 321
 // Size: 144
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_OLD_VERTICES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     void* ptr;
     NOT_IMPLEMENTED();
@@ -240,19 +229,12 @@ int FopRead_OLD_VERTICES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_u
 
 // Offset: 484
 // Size: 139
-// EAX: df
-// EDX: vertices
-// EBX: nvertices
 int FopWrite_VERTEX_UV(br_datafile* df, br_vertex* vertices, int nvertices) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 641
 // Size: 118
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_VERTEX_UV(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_model* mp;
     NOT_IMPLEMENTED();
@@ -260,10 +242,6 @@ int FopRead_VERTEX_UV(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint
 
 // Offset: 783
 // Size: 144
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_OLD_VERTICES_UV(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     void* ptr;
     NOT_IMPLEMENTED();
@@ -271,10 +249,6 @@ int FopRead_OLD_VERTICES_UV(br_datafile* df, br_uint_32 id, br_uint_32 length, b
 
 // Offset: 950
 // Size: 177
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_MATERIAL_INDEX(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     char name[256];
     br_material** mip;
@@ -284,9 +258,6 @@ int FopRead_MATERIAL_INDEX(br_datafile* df, br_uint_32 id, br_uint_32 length, br
 
 // Offset: 1151
 // Size: 208
-// EAX: df
-// EDX: materials
-// EBX: nmaterials
 int FopWrite_MATERIAL_INDEX(br_datafile* df, br_material** materials, int nmaterials) {
     int i;
     int s;
@@ -295,10 +266,6 @@ int FopWrite_MATERIAL_INDEX(br_datafile* df, br_material** materials, int nmater
 
 // Offset: 1386
 // Size: 289
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_OLD_MATERIAL_INDEX(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     char* mblock;
     char* cp;
@@ -310,10 +277,6 @@ int FopRead_OLD_MATERIAL_INDEX(br_datafile* df, br_uint_32 id, br_uint_32 length
 
 // Offset: 1689
 // Size: 207
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_FACES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_model* mp;
     int i;
@@ -337,19 +300,12 @@ int FopRead_FACES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 
 
 // Offset: 1911
 // Size: 139
-// EAX: df
-// EDX: faces
-// EBX: nfaces
 int FopWrite_FACES(br_datafile* df, br_face* faces, int nfaces) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 2070
 // Size: 271
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_OLD_FACES_1(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_model* mp;
     int i;
@@ -358,10 +314,6 @@ int FopRead_OLD_FACES_1(br_datafile* df, br_uint_32 id, br_uint_32 length, br_ui
 
 // Offset: 2359
 // Size: 292
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_OLD_FACES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_face* fp;
     br_material** mip;
@@ -373,10 +325,6 @@ int FopRead_OLD_FACES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint
 
 // Offset: 2674
 // Size: 293
-// EAX: df
-// EDX: faces
-// EBX: nfaces
-// ECX: mindex
 int FopWrite_FACE_MATERIAL(br_datafile* df, br_face* faces, int nfaces, br_material** mindex, int nmaterials) {
     br_uint_16* block;
     br_uint_16* ip;
@@ -388,10 +336,6 @@ int FopWrite_FACE_MATERIAL(br_datafile* df, br_face* faces, int nfaces, br_mater
 
 // Offset: 2989
 // Size: 303
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_FACE_MATERIAL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_material** mindex;
     int nmaterials;
@@ -406,10 +350,6 @@ int FopRead_FACE_MATERIAL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_
 
 // Offset: 3306
 // Size: 132
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_MODEL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_model* mp;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
@@ -426,8 +366,6 @@ int FopRead_MODEL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 
 
 // Offset: 3453
 // Size: 125
-// EAX: df
-// EDX: mp
 int FopWrite_MODEL(br_datafile* df, br_model* mp) {
     br_model temp_model;
     NOT_IMPLEMENTED();
@@ -435,10 +373,6 @@ int FopWrite_MODEL(br_datafile* df, br_model* mp) {
 
 // Offset: 3598
 // Size: 124
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_OLD_MODEL_1(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_model* mp;
     NOT_IMPLEMENTED();
@@ -446,10 +380,6 @@ int FopRead_OLD_MODEL_1(br_datafile* df, br_uint_32 id, br_uint_32 length, br_ui
 
 // Offset: 3740
 // Size: 230
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_OLD_MODEL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_model* mp;
     int i;
@@ -458,10 +388,6 @@ int FopRead_OLD_MODEL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint
 
 // Offset: 3984
 // Size: 122
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_PIVOT(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_model* mp;
     NOT_IMPLEMENTED();
@@ -469,10 +395,6 @@ int FopRead_PIVOT(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 
 
 // Offset: 4127
 // Size: 120
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_MATERIAL_OLD(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_material* mp;
     mp = BrMaterialAllocate(NULL);
@@ -485,10 +407,6 @@ int FopRead_MATERIAL_OLD(br_datafile* df, br_uint_32 id, br_uint_32 length, br_u
 
 // Offset: 4264
 // Size: 120
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_MATERIAL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_material* mp;
     NOT_IMPLEMENTED();
@@ -496,18 +414,12 @@ int FopRead_MATERIAL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_
 
 // Offset: 4402
 // Size: 109
-// EAX: df
-// EDX: mp
 int FopWrite_MATERIAL(br_datafile* df, br_material* mp) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 4532
 // Size: 227
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_PIXELMAP_REF(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_pixelmap* pm;
     char name[256];
@@ -535,27 +447,18 @@ int FopRead_PIXELMAP_REF(br_datafile* df, br_uint_32 id, br_uint_32 length, br_u
 
 // Offset: 4781
 // Size: 144
-// EAX: df
-// EDX: id
-// EBX: pixelmap
 int FopWrite_PIXELMAP_REF(br_datafile* df, int id, br_pixelmap* pixelmap) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 4940
 // Size: 109
-// EAX: df
-// EDX: ap
 int FopWrite_ACTOR(br_datafile* df, br_actor* ap) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 5063
 // Size: 132
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_ACTOR(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_actor* ap;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
@@ -571,18 +474,12 @@ int FopRead_ACTOR(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 
 
 // Offset: 5216
 // Size: 145
-// EAX: df
-// EDX: model
 int FopWrite_ACTOR_MODEL(br_datafile* df, br_model* model) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 5381
 // Size: 100
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_ACTOR_MODEL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     char name[256];
     br_actor* a;
@@ -596,18 +493,12 @@ int FopRead_ACTOR_MODEL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_ui
 
 // Offset: 5505
 // Size: 145
-// EAX: df
-// EDX: material
 int FopWrite_ACTOR_MATERIAL(br_datafile* df, br_material* material) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 5673
 // Size: 100
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_ACTOR_MATERIAL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     char name[256];
     br_actor* a;
@@ -619,17 +510,12 @@ int FopRead_ACTOR_MATERIAL(br_datafile* df, br_uint_32 id, br_uint_32 length, br
 
 // Offset: 5798
 // Size: 66
-// EAX: df
 int FopWrite_ACTOR_TRANSFORM(br_datafile* df) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 5888
 // Size: 108
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_ACTOR_TRANSFORM(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_actor* a;
     br_transform* tp;
@@ -644,17 +530,12 @@ int FopRead_ACTOR_TRANSFORM(br_datafile* df, br_uint_32 id, br_uint_32 length, b
 
 // Offset: 6017
 // Size: 66
-// EAX: df
 int FopWrite_ACTOR_LIGHT(br_datafile* df) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 6103
 // Size: 89
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_ACTOR_LIGHT(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_actor* a;
     br_light* lp;
@@ -663,17 +544,12 @@ int FopRead_ACTOR_LIGHT(br_datafile* df, br_uint_32 id, br_uint_32 length, br_ui
 
 // Offset: 6214
 // Size: 66
-// EAX: df
 int FopWrite_ACTOR_CAMERA(br_datafile* df) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 6301
 // Size: 89
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_ACTOR_CAMERA(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_actor* a;
     br_light* cp;
@@ -682,17 +558,12 @@ int FopRead_ACTOR_CAMERA(br_datafile* df, br_uint_32 id, br_uint_32 length, br_u
 
 // Offset: 6412
 // Size: 66
-// EAX: df
 int FopWrite_ACTOR_BOUNDS(br_datafile* df) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 6499
 // Size: 89
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_ACTOR_BOUNDS(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_actor* a;
     br_bounds* bp;
@@ -701,17 +572,12 @@ int FopRead_ACTOR_BOUNDS(br_datafile* df, br_uint_32 id, br_uint_32 length, br_u
 
 // Offset: 6614
 // Size: 66
-// EAX: df
 int FopWrite_ACTOR_CLIP_PLANE(br_datafile* df) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 6705
 // Size: 89
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_ACTOR_CLIP_PLANE(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_actor* a;
     br_vector4* vp;
@@ -720,17 +586,12 @@ int FopRead_ACTOR_CLIP_PLANE(br_datafile* df, br_uint_32 id, br_uint_32 length, 
 
 // Offset: 6819
 // Size: 66
-// EAX: df
 int FopWrite_ACTOR_ADD_CHILD(br_datafile* df) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 6909
 // Size: 96
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_ACTOR_ADD_CHILD(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_actor* a;
     br_actor* p;
@@ -739,8 +600,6 @@ int FopRead_ACTOR_ADD_CHILD(br_datafile* df, br_uint_32 id, br_uint_32 length, b
 
 // Offset: 7024
 // Size: 197
-// EAX: df
-// EDX: t
 int FopWrite_TRANSFORM(br_datafile* df, br_transform* t) {
     transform_type* tt;
     NOT_IMPLEMENTED();
@@ -748,10 +607,6 @@ int FopWrite_TRANSFORM(br_datafile* df, br_transform* t) {
 
 // Offset: 7239
 // Size: 234
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_TRANSFORM(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     int t;
     br_transform* tp;
@@ -775,18 +630,12 @@ int FopRead_TRANSFORM(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint
 
 // Offset: 7489
 // Size: 109
-// EAX: df
-// EDX: bp
 int FopWrite_BOUNDS(br_datafile* df, br_bounds* bp) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 7613
 // Size: 132
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_BOUNDS(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_bounds3* bp;
     NOT_IMPLEMENTED();
@@ -794,18 +643,12 @@ int FopRead_BOUNDS(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32
 
 // Offset: 7760
 // Size: 109
-// EAX: df
-// EDX: pp
 int FopWrite_PLANE(br_datafile* df, br_vector4* pp) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 7883
 // Size: 132
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_PLANE(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_vector4* pp;
     NOT_IMPLEMENTED();
@@ -813,18 +656,12 @@ int FopRead_PLANE(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 
 
 // Offset: 8030
 // Size: 109
-// EAX: df
-// EDX: lp
 int FopWrite_LIGHT(br_datafile* df, br_light* lp) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 8153
 // Size: 132
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_LIGHT(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_light* lp;
     NOT_IMPLEMENTED();
@@ -832,18 +669,12 @@ int FopRead_LIGHT(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 
 
 // Offset: 8301
 // Size: 109
-// EAX: df
-// EDX: cp
 int FopWrite_CAMERA(br_datafile* df, br_camera* cp) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 8425
 // Size: 132
-// EAX: df
-// EDX: id
-// EBX: length
-// ECX: count
 int FopRead_CAMERA(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_camera* cp;
     NOT_IMPLEMENTED();
@@ -933,8 +764,6 @@ br_uint_32 BrActorLoadMany(char* filename, br_actor** actors, br_uint_16 num) {
 
 // Offset: 9973
 // Size: 400
-// EAX: a
-// EDX: df
 int WriteActor(br_actor* a, br_datafile* df) {
     br_actor* ap;
     br_actor* last_ap;

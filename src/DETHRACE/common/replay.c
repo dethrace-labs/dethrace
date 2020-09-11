@@ -63,7 +63,6 @@ void StopSaving() {
 
 // Offset: 224
 // Size: 1597
-// EAX: pSpecial_zappy_bastard
 void ActualActionReplayHeadups(int pSpecial_zappy_bastard) {
     tU32 the_time;
     int x;
@@ -82,7 +81,6 @@ void DoActionReplayPostSwap() {
 
 // Offset: 1868
 // Size: 109
-// EAX: pSpecial_zappy_bastard
 void DoZappyActionReplayHeadups(int pSpecial_zappy_bastard) {
     tU32 the_time;
     NOT_IMPLEMENTED();
@@ -96,7 +94,6 @@ void DoActionReplayHeadups() {
 
 // Offset: 2024
 // Size: 318
-// EAX: pMove_amount
 void MoveReplayBuffer(tS32 pMove_amount) {
     tU8* play_ptr;
     tU8* old_play_ptr;
@@ -127,8 +124,6 @@ void ToggleReplay() {
 
 // Offset: 2980
 // Size: 49
-// EAX: pEffect_index
-// EDX: pSound_tag
 void ReverseSound(tS3_effect_tag pEffect_index, tS3_sound_tag pSound_tag) {
     NOT_IMPLEMENTED();
 }
@@ -143,7 +138,6 @@ int FindUniqueFile() {
 
 // Offset: 3256
 // Size: 1576
-// EAX: pFrame_period
 void PollActionReplayControls(tU32 pFrame_period) {
     float old_replay_rate;
     int old_key_down;
@@ -176,7 +170,6 @@ void InitializeActionReplay() {
 
 // Offset: 5028
 // Size: 71
-// EAX: pFrame_period
 void DoActionReplay(tU32 pFrame_period) {
     NOT_IMPLEMENTED();
 }

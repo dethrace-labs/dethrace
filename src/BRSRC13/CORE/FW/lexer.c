@@ -72,7 +72,6 @@ br_lexer_source* BrLexerPop(br_lexer* l) {
 
 // Offset: 1128
 // Size: 1264
-// EAX: l
 void lexerAdvance(br_lexer* l) {
     int n;
     br_boolean got_point;
@@ -81,7 +80,6 @@ void lexerAdvance(br_lexer* l) {
 
 // Offset: 2409
 // Size: 529
-// EAX: l
 void lexerAdvanceDump(br_lexer* l) {
     char* tname;
     char* tvalue;

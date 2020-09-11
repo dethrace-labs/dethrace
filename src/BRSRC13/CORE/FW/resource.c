@@ -13,7 +13,6 @@ char rscid[51];
 
 // Offset: 10
 // Size: 188
-// EAX: r
 void* ResToUser(resource_header* r) {
     br_int_32 align;
     NOT_IMPLEMENTED();
@@ -21,7 +20,6 @@ void* ResToUser(resource_header* r) {
 
 // Offset: 208
 // Size: 72
-// EAX: r
 resource_header* UserToRes(void* r) {
     br_uint_8* p;
     NOT_IMPLEMENTED();
@@ -77,8 +75,6 @@ void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class) {
 
 // Offset: 771
 // Size: 367
-// EAX: res
-// EDX: callback
 void BrResInternalFree(resource_header* res, br_boolean callback) {
     int c;
     void* r;
@@ -218,10 +214,6 @@ char* BrResStrDup(void* vparent, char* str) {
 
 // Offset: 3026
 // Size: 313
-// EAX: res
-// EDX: putline
-// EBX: arg
-// ECX: level
 void InternalResourceDump(resource_header* res, br_putline_cbfn* putline, void* arg, int level) {
     int i;
     char* cp;

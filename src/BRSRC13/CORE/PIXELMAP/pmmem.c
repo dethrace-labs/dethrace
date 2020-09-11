@@ -113,10 +113,6 @@ char rscid[53];
 
 // Offset: 26
 // Size: 498
-// EAX: type
-// EDX: w
-// EBX: h
-// ECX: pixels
 br_device_pixelmap* DevicePixelmapMemAllocate(br_uint_8 type, br_uint_16 w, br_uint_16 h, void* pixels, int flags) {
     br_device_pixelmap* pm;
     pm_type_info* tip;
@@ -163,7 +159,6 @@ br_device_pixelmap* DevicePixelmapMemAllocate(br_uint_8 type, br_uint_16 w, br_u
 
 // Offset: 539
 // Size: 54
-// EAX: pm
 void CheckDispatch(br_device_pixelmap* pm) {
     // if (!pm->dispatch) {
     //     pm->dispatch = &devicePixelmapDispatch;

@@ -117,9 +117,6 @@ int DatafileStackTop;
 
 // Offset: 7
 // Size: 209
-// EAX: type
-// EDX: value
-// EBX: count
 void DfPush(int type, void* value, int count) {
     LOG_TRACE9("(%d, %p, %d)", type, value, count);
 
@@ -134,8 +131,6 @@ void DfPush(int type, void* value, int count) {
 
 // Offset: 222
 // Size: 193
-// EAX: type
-// EDX: countp
 void* DfPop(int type, int* countp) {
     LOG_TRACE9("(%d, %p)", type, countp);
 
@@ -154,8 +149,6 @@ void* DfPop(int type, int* countp) {
 
 // Offset: 421
 // Size: 193
-// EAX: type
-// EDX: countp
 void* DfTop(int type, int* countp) {
     if (DatafileStackTop <= 0)
         BrFailure("DatafileStack Underflow");
@@ -180,9 +173,6 @@ int DfTopType() {
 
 // Offset: 710
 // Size: 355
-// EAX: df
-// EDX: ident
-// EBX: data
 int TextReadLine(br_datafile* df, char** ident, char** data) {
     char* cp;
     NOT_IMPLEMENTED();
@@ -190,8 +180,6 @@ int TextReadLine(br_datafile* df, char** ident, char** data) {
 
 // Offset: 1083
 // Size: 436
-// EAX: df
-// EDX: t
 br_uint_16 scalarTypeConvert(br_datafile* df, br_uint_16 t) {
     LOG_TRACE9("(%p, %d)", df, t);
 
@@ -268,9 +256,6 @@ br_uint_16 scalarTypeConvert(br_datafile* df, br_uint_16 t) {
 
 // Offset: 1539
 // Size: 1211
-// EAX: df
-// EDX: str
-// EBX: base
 br_uint_32 DfStructWriteBinary(br_datafile* df, br_file_struct* str, void* base) {
     unsigned int m;
     int i;
@@ -286,9 +271,6 @@ br_uint_32 DfStructWriteBinary(br_datafile* df, br_file_struct* str, void* base)
 
 // Offset: 2769
 // Size: 1394
-// EAX: df
-// EDX: str
-// EBX: base
 br_uint_32 DfStructReadBinary(br_datafile* df, br_file_struct* str, void* base) {
     char tmp_string[256];
     unsigned int m;
@@ -448,9 +430,6 @@ br_uint_32 DfStructReadBinary(br_datafile* df, br_file_struct* str, void* base) 
 
 // Offset: 4182
 // Size: 427
-// EAX: df
-// EDX: str
-// EBX: base
 int DfStructSizeBinary(br_datafile* df, br_file_struct* str, void* base) {
     unsigned char* mp;
     unsigned int m;
@@ -461,8 +440,6 @@ int DfStructSizeBinary(br_datafile* df, br_file_struct* str, void* base) {
 
 // Offset: 4624
 // Size: 177
-// EAX: e
-// EDX: str
 int EnumFromString(br_file_enum* e, char* str) {
     unsigned int m;
     NOT_IMPLEMENTED();
@@ -470,8 +447,6 @@ int EnumFromString(br_file_enum* e, char* str) {
 
 // Offset: 4814
 // Size: 138
-// EAX: e
-// EDX: num
 char* EnumToString(br_file_enum* e, int num) {
     unsigned int m;
     NOT_IMPLEMENTED();
@@ -479,19 +454,12 @@ char* EnumToString(br_file_enum* e, int num) {
 
 // Offset: 4970
 // Size: 92
-// EAX: df
-// EDX: str
-// EBX: base
 br_uint_32 DfStructWriteText(br_datafile* df, br_file_struct* str, void* base) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 5081
 // Size: 1827
-// EAX: df
-// EDX: str
-// EBX: base
-// ECX: indent
 br_uint_32 StructWriteTextSub(br_datafile* df, br_file_struct* str, void* base, int indent) {
     unsigned int m;
     int i;
@@ -504,9 +472,6 @@ br_uint_32 StructWriteTextSub(br_datafile* df, br_file_struct* str, void* base, 
 
 // Offset: 6925
 // Size: 156
-// EAX: df
-// EDX: str
-// EBX: base
 br_uint_32 DfStructReadText(br_datafile* df, br_file_struct* str, void* base) {
     char* id;
     char* data;
@@ -515,9 +480,6 @@ br_uint_32 DfStructReadText(br_datafile* df, br_file_struct* str, void* base) {
 
 // Offset: 7099
 // Size: 1609
-// EAX: df
-// EDX: str
-// EBX: base
 br_uint_32 StructReadTextSub(br_datafile* df, br_file_struct* str, void* base) {
     unsigned int m;
     unsigned int r;
@@ -535,9 +497,6 @@ br_uint_32 StructReadTextSub(br_datafile* df, br_file_struct* str, void* base) {
 
 // Offset: 8725
 // Size: 144
-// EAX: df
-// EDX: str
-// EBX: base
 int DfStructSizeText(br_datafile* df, br_file_struct* str, void* base) {
     unsigned int m;
     br_file_struct_member* sm;
@@ -547,10 +506,6 @@ int DfStructSizeText(br_datafile* df, br_file_struct* str, void* base) {
 
 // Offset: 8888
 // Size: 109
-// EAX: df
-// EDX: str
-// EBX: base
-// ECX: n
 br_uint_32 DfStructWriteArray(br_datafile* df, br_file_struct* str, void* base, int n) {
     char* cp;
     int i;
@@ -559,10 +514,6 @@ br_uint_32 DfStructWriteArray(br_datafile* df, br_file_struct* str, void* base, 
 
 // Offset: 9015
 // Size: 126
-// EAX: df
-// EDX: str
-// EBX: base
-// ECX: n
 br_uint_32 DfStructReadArray(br_datafile* df, br_file_struct* str, void* base, int n) {
     char* cp;
     int i;
@@ -581,17 +532,12 @@ br_uint_32 DfStructReadArray(br_datafile* df, br_file_struct* str, void* base, i
 
 // Offset: 9158
 // Size: 150
-// EAX: df
-// EDX: id
-// EBX: length
 int DfChunkWriteText(br_datafile* df, br_uint_32 id, br_uint_32 length) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 9324
 // Size: 238
-// EAX: df
-// EDX: plength
 int DfChunkReadText(br_datafile* df, br_uint_32* plength) {
     int i;
     char* id;
@@ -602,9 +548,6 @@ int DfChunkReadText(br_datafile* df, br_uint_32* plength) {
 
 // Offset: 9581
 // Size: 121
-// EAX: df
-// EDX: id
-// EBX: length
 int DfChunkWriteBinary(br_datafile* df, br_uint_32 id, br_uint_32 length) {
     br_uint_32 l;
     NOT_IMPLEMENTED();
@@ -612,8 +555,6 @@ int DfChunkWriteBinary(br_datafile* df, br_uint_32 id, br_uint_32 length) {
 
 // Offset: 9720
 // Size: 210
-// EAX: df
-// EDX: plength
 int DfChunkReadBinary(br_datafile* df, br_uint_32* plength) {
     br_uint_32 id;
     br_uint_32 l;
@@ -639,15 +580,12 @@ int DfChunkReadBinary(br_datafile* df, br_uint_32* plength) {
 
 // Offset: 9947
 // Size: 61
-// EAX: df
-// EDX: count
 void DfCountWriteText(br_datafile* df, br_uint_32 count) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 10024
 // Size: 109
-// EAX: df
 br_uint_32 DfCountReadText(br_datafile* df) {
     char* id;
     char* data;
@@ -656,8 +594,6 @@ br_uint_32 DfCountReadText(br_datafile* df) {
 
 // Offset: 10152
 // Size: 74
-// EAX: df
-// EDX: count
 void DfCountWriteBinary(br_datafile* df, br_uint_32 count) {
     br_uint_32 l;
     NOT_IMPLEMENTED();
@@ -665,7 +601,6 @@ void DfCountWriteBinary(br_datafile* df, br_uint_32 count) {
 
 // Offset: 10244
 // Size: 76
-// EAX: df
 br_uint_32 DfCountReadBinary(br_datafile* df) {
     br_uint_32 l;
     BrFileRead(&l, 4, 1, df->h);
@@ -675,14 +610,12 @@ br_uint_32 DfCountReadBinary(br_datafile* df) {
 
 // Offset: 10336
 // Size: 47
-// EAX: df
 int DfCountSizeText(br_datafile* df) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 10401
 // Size: 47
-// EAX: df
 int DfCountSizeBinary(br_datafile* df) {
     return 4;
     NOT_IMPLEMENTED();
@@ -690,10 +623,6 @@ int DfCountSizeBinary(br_datafile* df) {
 
 // Offset: 10464
 // Size: 227
-// EAX: base
-// EDX: block_size
-// EBX: block_stride
-// ECX: block_count
 br_uint_8* BlockWriteSetup(void* base, int block_size, int block_stride, int block_count, int size) {
     int b;
     br_uint_8* block;
@@ -704,10 +633,6 @@ br_uint_8* BlockWriteSetup(void* base, int block_size, int block_stride, int blo
 
 // Offset: 10708
 // Size: 358
-// EAX: df
-// EDX: base
-// EBX: block_size
-// ECX: block_stride
 int DfBlockWriteText(br_datafile* df, void* base, int block_size, int block_stride, int block_count, int size) {
     int i;
     br_uint_8* cp;
@@ -718,10 +643,6 @@ int DfBlockWriteText(br_datafile* df, void* base, int block_size, int block_stri
 
 // Offset: 11082
 // Size: 498
-// EAX: df
-// EDX: base
-// EBX: count
-// ECX: size
 void* DfBlockReadText(br_datafile* df, void* base, int* count, int size, int mtype) {
     char* id;
     char* data;
@@ -734,10 +655,6 @@ void* DfBlockReadText(br_datafile* df, void* base, int* count, int size, int mty
 
 // Offset: 11599
 // Size: 203
-// EAX: df
-// EDX: base
-// EBX: block_size
-// ECX: block_stride
 int DfBlockWriteBinary(br_datafile* df, void* base, int block_size, int block_stride, int block_count, int size) {
     int count;
     br_uint_32 l;
@@ -748,10 +665,6 @@ int DfBlockWriteBinary(br_datafile* df, void* base, int block_size, int block_st
 
 // Offset: 11820
 // Size: 300
-// EAX: df
-// EDX: base
-// EBX: count
-// ECX: size
 void* DfBlockReadBinary(br_datafile* df, void* base, int* count, int size, int mtype) {
     int l;
     int s;
@@ -779,28 +692,18 @@ void* DfBlockReadBinary(br_datafile* df, void* base, int* count, int size, int m
 
 // Offset: 12136
 // Size: 78
-// EAX: df
-// EDX: base
-// EBX: block_size
-// ECX: block_stride
 int DfBlockSizeText(br_datafile* df, void* base, int block_size, int block_stride, int block_count, int size) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 12232
 // Size: 62
-// EAX: df
-// EDX: base
-// EBX: block_size
-// ECX: block_stride
 int DfBlockSizeBinary(br_datafile* df, void* base, int block_size, int block_stride, int block_count, int size) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 12309
 // Size: 157
-// EAX: df
-// EDX: name
 char* DfNameReadText(br_datafile* df, char* name) {
     char* id;
     char* data;
@@ -809,24 +712,18 @@ char* DfNameReadText(br_datafile* df, char* name) {
 
 // Offset: 12482
 // Size: 91
-// EAX: df
-// EDX: name
 int DfNameWriteText(br_datafile* df, char* name) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 12588
 // Size: 48
-// EAX: df
-// EDX: name
 int DfNameSizeText(br_datafile* df, char* name) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 12653
 // Size: 125
-// EAX: df
-// EDX: name
 char* DfNameReadBinary(br_datafile* df, char* name) {
     int c;
     int i;
@@ -848,24 +745,18 @@ char* DfNameReadBinary(br_datafile* df, char* name) {
 
 // Offset: 12796
 // Size: 101
-// EAX: df
-// EDX: name
 int DfNameWriteBinary(br_datafile* df, char* name) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 12914
 // Size: 72
-// EAX: df
-// EDX: name
 int DfNameSizeBinary(br_datafile* df, char* name) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 12997
 // Size: 92
-// EAX: df
-// EDX: length
 int DfSkipText(br_datafile* df, br_uint_32 length) {
     char* id;
     char* data;
@@ -874,8 +765,6 @@ int DfSkipText(br_datafile* df, br_uint_32 length) {
 
 // Offset: 13102
 // Size: 65
-// EAX: df
-// EDX: length
 int DfSkipBinary(br_datafile* df, br_uint_32 length) {
     LOG_TRACE9("(%p, %d)", df, length);
     BrFileAdvance(length, df->h);
@@ -883,8 +772,6 @@ int DfSkipBinary(br_datafile* df, br_uint_32 length) {
 
 // Offset: 13185
 // Size: 241
-// EAX: df
-// EDX: table
 int DfChunksInterpret(br_datafile* df, br_chunks_table* table) {
     br_uint_32 length;
     br_uint_32 count;
@@ -945,9 +832,6 @@ int DfFileIdentify(br_uint_8* magics, br_size_t n_magics) {
 
 // Offset: 13687
 // Size: 278
-// EAX: name
-// EDX: write
-// EBX: scalar_type
 br_datafile* DfOpen(char* name, int write, br_token scalar_type) {
     int mode;
     char c;
@@ -987,7 +871,6 @@ br_datafile* DfOpen(char* name, int write, br_token scalar_type) {
 
 // Offset: 13973
 // Size: 198
-// EAX: df
 void DfClose(br_datafile* df) {
     br_datafile* dfp;
     LOG_TRACE("(%p)", df);

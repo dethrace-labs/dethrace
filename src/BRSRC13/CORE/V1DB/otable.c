@@ -64,7 +64,6 @@ void BrZsOrderTablePrimaryDisable() {
 
 // Offset: 1670
 // Size: 236
-// EAX: order_table
 void InsertOrderTableList(br_order_table* order_table) {
     br_order_table* previous_table;
     br_order_table* current_table;
@@ -73,8 +72,6 @@ void InsertOrderTableList(br_order_table* order_table) {
 
 // Offset: 1926
 // Size: 275
-// EAX: bounds
-// EDX: order_table
 void SetOrderTableBounds(br_bounds* bounds, br_order_table* order_table) {
     br_uint_32 i;
     br_scalar range;
@@ -88,7 +85,6 @@ void SetOrderTableBounds(br_bounds* bounds, br_order_table* order_table) {
 
 // Offset: 2220
 // Size: 175
-// EAX: order_table
 void SetOrderTableRange(br_order_table* order_table) {
     br_scalar range;
     NOT_IMPLEMENTED();

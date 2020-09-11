@@ -39,8 +39,6 @@ br_actor* BrActorSearch(br_actor* root, char* pattern) {
 
 // Offset: 640
 // Size: 117
-// EAX: a
-// EDX: d
 void RenumberActor(br_actor* a, int d) {
     br_actor* ac;
     LOG_TRACE("(%p, %d)", a, d);
@@ -157,7 +155,6 @@ br_actor* BrActorAllocate(br_uint_8 type, void* type_data) {
 
 // Offset: 1907
 // Size: 152
-// EAX: a
 void InternalActorFree(br_actor* a) {
     while (a->children) {
         BrSimpleRemove((br_simple_node*)a->children);
@@ -180,19 +177,12 @@ void BrActorFree(br_actor* a) {
 
 // Offset: 2186
 // Size: 283
-// EAX: a
-// EDX: world
-// EBX: m
 br_boolean ActorToRoot(br_actor* a, br_actor* world, br_matrix34* m) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 2486
 // Size: 339
-// EAX: a
-// EDX: world
-// EBX: m
-// ECX: type
 br_boolean ActorToRootTyped(br_actor* a, br_actor* world, br_matrix34* m, br_int_32* type) {
     br_int_32 t;
     NOT_IMPLEMENTED();
@@ -200,8 +190,6 @@ br_boolean ActorToRootTyped(br_actor* a, br_actor* world, br_matrix34* m, br_int
 
 // Offset: 2847
 // Size: 572
-// EAX: mat
-// EDX: field_of_view
 void Matrix4PerspectiveNew(br_matrix4* mat, br_angle field_of_view, br_scalar aspect, br_scalar hither, br_scalar yon, br_scalar origin_x, br_scalar origin_y) {
     br_scalar scale;
     NOT_IMPLEMENTED();
@@ -209,8 +197,6 @@ void Matrix4PerspectiveNew(br_matrix4* mat, br_angle field_of_view, br_scalar as
 
 // Offset: 3441
 // Size: 944
-// EAX: mat
-// EDX: camera
 br_token CameraToScreenMatrix4(br_matrix4* mat, br_actor* camera) {
     br_camera* camera_type;
     br_matrix34 mat34;
@@ -237,9 +223,6 @@ void BrActorToScreenMatrix4(br_matrix4* m, br_actor* a, br_actor* camera) {
 
 // Offset: 5497
 // Size: 409
-// EAX: d
-// EDX: s
-// EBX: m
 void BrMatrix34ApplyBounds(br_bounds* d, br_bounds* s, br_matrix34* m) {
     int i;
     int j;
@@ -250,9 +233,6 @@ void BrMatrix34ApplyBounds(br_bounds* d, br_bounds* s, br_matrix34* m) {
 
 // Offset: 5920
 // Size: 397
-// EAX: dest
-// EDX: ap
-// EBX: model
 void ActorToBounds(br_bounds* dest, br_actor* ap, br_model* model) {
     br_actor* a;
     br_bounds new;

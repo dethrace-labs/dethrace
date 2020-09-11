@@ -59,10 +59,6 @@ br_int_32 BrTokenFindMany(char* pattern, br_token* tokens, br_int_32 max_tokens)
 
 // Offset: 1297
 // Size: 242
-// EAX: ptype
-// EDX: base
-// EBX: types
-// ECX: ntypes
 br_token BrTokenFindType(br_token* ptype, char* base, br_token* types, br_int_32 ntypes) {
     br_token_entry* te;
     int l;

@@ -267,8 +267,6 @@ void Init2DStuff() {
 
 // Offset: 5332
 // Size: 671
-// EAX: pArgc
-// EDX: pArgv
 void InitialiseApplication(int pArgc, char** pArgv) {
 
     gProgram_state.sausage_eater_mode = gSausage_override;
@@ -340,8 +338,6 @@ void InitialiseApplication(int pArgc, char** pArgv) {
 
 // Offset: 6004
 // Size: 64
-// EAX: pArgc
-// EDX: pArgv
 void InitialiseDeathRace(int pArgc, char** pArgv) {
     PDInitialiseSystem();
 
@@ -351,7 +347,6 @@ void InitialiseDeathRace(int pArgc, char** pArgv) {
 
 // Offset: 6068
 // Size: 427
-// EAX: pStart_race
 void InitGame(int pStart_race) {
     int i;
     NOT_IMPLEMENTED();
@@ -395,7 +390,6 @@ void DisposeTrack() {
 
 // Offset: 6788
 // Size: 97
-// EAX: pMaterial
 void CopyMaterialColourFromIndex(br_material* pMaterial) {
     NOT_IMPLEMENTED();
 }
@@ -420,7 +414,6 @@ int GetScreenSize() {
 
 // Offset: 8376
 // Size: 45
-// EAX: pNew_size
 void SetScreenSize(int pNew_size) {
     LOG_TRACE("(%d)", pNew_size);
     gRender_indent = pNew_size;

@@ -284,8 +284,6 @@ void MAMSInitMem() {
 
 // Offset: 192
 // Size: 38
-// EAX: pFlags
-// EDX: pTitle
 void PrintMemoryDump(int pFlags, char* pTitle) {
     LOG_TRACE("(%d, \"%s\")", pFlags, pTitle);
 }
@@ -335,7 +333,6 @@ void InstallDRMemCalls() {
 
 // Offset: 572
 // Size: 59
-// EAX: pPtr
 void MAMSUnlock(void** pPtr) {
     free(*pPtr);
     *pPtr = NULL;
@@ -343,7 +340,6 @@ void MAMSUnlock(void** pPtr) {
 
 // Offset: 632
 // Size: 37
-// EAX: pPtr
 void MAMSLock(void** pPtr) {
     NOT_IMPLEMENTED();
 }

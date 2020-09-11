@@ -25,7 +25,6 @@ br_image* BrImageFind(char* pattern) {
 
 // Offset: 362
 // Size: 140
-// EAX: name
 br_image* imageLoadHost(char* name) {
     br_image* img;
     void* host_image;
@@ -43,9 +42,6 @@ br_image* BrImageReference(char* name) {
 
 // Offset: 989
 // Size: 332
-// EAX: img
-// EDX: name
-// EBX: hint
 void* imageLookupName(br_image* img, char* name, br_uint_32 hint) {
     int c;
     int limit;

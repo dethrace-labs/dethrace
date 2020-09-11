@@ -14,7 +14,6 @@ br_pixelmap* BrDevLastBeginQuery() {
 
 // Offset: 83
 // Size: 45
-// EAX: pm
 void BrDevLastBeginSet(br_pixelmap* pm) {
     NOT_IMPLEMENTED();
 }

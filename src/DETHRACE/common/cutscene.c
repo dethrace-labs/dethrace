@@ -16,9 +16,6 @@ tS32 gLast_demo_end_anim;
 
 // Offset: 180
 // Size: 179
-// EAX: pIndex
-// EDX: pWait_end
-// EBX: pSound_ID
 void ShowCutScene(int pIndex, int pWait_end, int pSound_ID, br_scalar pDelay) {
     NOT_IMPLEMENTED();
 }
@@ -36,7 +33,6 @@ void DoStainlessLogo() {
 
 // Offset: 432
 // Size: 844
-// EAX: pSmack_name
 void PlaySmackerFile(char* pSmack_name) {
     tPath_name the_path;
     br_colour* br_colours_ptr;

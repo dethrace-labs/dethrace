@@ -45,7 +45,6 @@ void LoseOldestWastedMassage() {
 
 // Offset: 488
 // Size: 97
-// EAX: pIndex
 void QueueWastedMassage(int pIndex) {
     NOT_IMPLEMENTED();
 }
@@ -71,7 +70,6 @@ void MungeHeadups() {
 
 // Offset: 3384
 // Size: 588
-// EAX: pCamera_period
 void UpdateFramePeriod(tU32* pCamera_period) {
     tU32 new_tick_count;
     tU32 new_camera_tick_count;

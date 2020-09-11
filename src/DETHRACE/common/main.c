@@ -37,7 +37,6 @@ void CheckNumberOfTracks() {
 
 // Offset: 360
 // Size: 173
-// EAX: pRacing
 void ServiceTheGame(int pRacing) {
     if (!pRacing) {
         CyclePollKeys();
@@ -70,8 +69,6 @@ void ServiceGameInRace() {
 
 // Offset: 632
 // Size: 177
-// EAX: pArgc
-// EDX: pArgv
 void GameMain(int pArgc, char** pArgv) {
     tPath_name CD_dir;
 

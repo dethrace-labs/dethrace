@@ -43,7 +43,6 @@ void TogglePratcam() {
 
 // Offset: 384
 // Size: 1836
-// EAX: pFolder_name
 void LoadPratcam(char* pFolder_name) {
     FILE* f;
     FILE* g;
@@ -70,37 +69,30 @@ void NextPratcamChunk() {
 
 // Offset: 2716
 // Size: 83
-// EAX: pSequence_index
-// EDX: pStart_chunk
 void NewPratcamSequence(int pSequence_index, int pStart_chunk) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 2800
 // Size: 67
-// EAX: pIndex
-// EDX: pStart_chunk
 void ChangeAmbientPratcamNow(int pIndex, int pStart_chunk) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 2868
 // Size: 118
-// EAX: pIndex
 void ChangeAmbientPratcam(int pIndex) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 2988
 // Size: 57
-// EAX: pIndex
 void PratcamEventNow(int pIndex) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 3048
 // Size: 113
-// EAX: pIndex
 void PratcamEvent(int pIndex) {
     NOT_IMPLEMENTED();
 }
@@ -134,7 +126,6 @@ void DisposePratcam() {
 
 // Offset: 4224
 // Size: 1252
-// EAX: pThe_time
 void DoPratcam(tU32 pThe_time) {
     int i;
     int offset;
@@ -152,7 +143,6 @@ void DoPratcam(tU32 pThe_time) {
 
 // Offset: 5476
 // Size: 96
-// EAX: pIndex
 void TestPratCam(int pIndex) {
     NOT_IMPLEMENTED();
 }

@@ -472,8 +472,6 @@ void DisableTranslationText() {
 
 // Offset: 88
 // Size: 54
-// EAX: pSound_ID
-// EDX: pSound_time
 void SetFlicSound(int pSound_ID, tU32 pSound_time) {
     NOT_IMPLEMENTED();
 }
@@ -552,7 +550,6 @@ void TurnOnPanelFlics() {
 
 // Offset: 688
 // Size: 53
-// EAX: pIndex
 int GetPanelFlicFrameIndex(int pIndex) {
     NOT_IMPLEMENTED();
 }
@@ -567,18 +564,12 @@ void FlicPaletteAllocate() {
 
 // Offset: 836
 // Size: 92
-// EAX: pFlic_info
-// EDX: pDest_pixelmap
 void AssertFlicPixelmap(tFlic_descriptor_ptr pFlic_info, br_pixelmap* pDest_pixelmap) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 928
 // Size: 791
-// EAX: pFile_name
-// EDX: pIndex
-// EBX: pFlic_info
-// ECX: pSize
 int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap, int pX_offset, int pY_offset, int pFrame_rate) {
     tU16 claimed_speed;
     tU16 magic_number;
@@ -676,15 +667,12 @@ void FreeFlicPaletteAllocate() {
 
 // Offset: 1816
 // Size: 118
-// EAX: pFlic_info
 int EndFlic(tFlic_descriptor_ptr pFlic_info) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 1936
 // Size: 312
-// EAX: pFlic_info
-// EDX: chunk_length
 void DoColourMap(tFlic_descriptor_ptr pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -727,8 +715,6 @@ void DoColourMap(tFlic_descriptor_ptr pFlic_info, tU32 chunk_length) {
 
 // Offset: 2248
 // Size: 343
-// EAX: pFlic_info
-// EDX: chunk_length
 void DoDifferenceX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -747,8 +733,6 @@ void DoDifferenceX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
 
 // Offset: 2592
 // Size: 377
-// EAX: pFlic_info
-// EDX: chunk_length
 void DoDifferenceTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -767,8 +751,6 @@ void DoDifferenceTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
 
 // Offset: 2972
 // Size: 303
-// EAX: pFlic_info
-// EDX: chunk_length
 void DoColour256(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -812,8 +794,6 @@ void DoColour256(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
 
 // Offset: 3276
 // Size: 537
-// EAX: pFlic_info
-// EDX: chunk_length
 void DoDeltaTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -876,8 +856,6 @@ void DoDeltaTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
 
 // Offset: 3816
 // Size: 354
-// EAX: pFlic_info
-// EDX: chunk_length
 void DoDeltaX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -931,8 +909,6 @@ void DoDeltaX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
 
 // Offset: 4172
 // Size: 156
-// EAX: pFlic_info
-// EDX: chunk_length
 void DoBlack(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -946,8 +922,6 @@ void DoBlack(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
 
 // Offset: 4328
 // Size: 272
-// EAX: pFlic_info
-// EDX: chunk_length
 void DoRunLengthX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -988,8 +962,6 @@ void DoRunLengthX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
 
 // Offset: 4600
 // Size: 309
-// EAX: pFlic_info
-// EDX: chunk_length
 void DoRunLengthTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -1035,8 +1007,6 @@ void DoRunLengthTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
 
 // Offset: 4912
 // Size: 160
-// EAX: pFlic_info
-// EDX: chunk_length
 void DoUncompressed(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -1050,8 +1020,6 @@ void DoUncompressed(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
 
 // Offset: 5072
 // Size: 176
-// EAX: pFlic_info
-// EDX: chunk_length
 void DoUncompressedTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -1066,16 +1034,12 @@ void DoUncompressedTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
 
 // Offset: 5248
 // Size: 52
-// EAX: pFlic_info
-// EDX: chunk_length
 void DoMini(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 5300
 // Size: 377
-// EAX: pFlic_info
-// EDX: pLast_frame
 void DrawTranslations(tFlic_descriptor* pFlic_info, int pLast_frame) {
     tTranslation_record* trans;
     int i;
@@ -1087,8 +1051,6 @@ void DrawTranslations(tFlic_descriptor* pFlic_info, int pLast_frame) {
 
 // Offset: 5680
 // Size: 783
-// EAX: pFlic_info
-// EDX: pPanel_flic
 int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
     tU32 frame_length;
     tU32 chunk_length;
@@ -1193,17 +1155,12 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
 
 // Offset: 6464
 // Size: 53
-// EAX: pFlic_info
 int PlayNextFlicFrame(tFlic_descriptor* pFlic_info) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 6520
 // Size: 295
-// EAX: pIndex
-// EDX: pSize
-// EBX: pData_ptr
-// ECX: pDest_pixelmap
 int PlayFlic(int pIndex, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap, int pX_offset, int pY_offset, void (*DoPerFrame)(), int pInterruptable, int pFrame_rate) {
     int finished_playing;
     tFlic_descriptor the_flic;
@@ -1257,7 +1214,6 @@ void SwapScreen() {
 
 // Offset: 6860
 // Size: 154
-// EAX: pIndex
 void ShowFlic(int pIndex) {
     do {
         PlayFlic(
@@ -1286,7 +1242,6 @@ void InitFlics() {
 
 // Offset: 7092
 // Size: 395
-// EAX: pIndex
 int LoadFlic(int pIndex) {
     tPath_name the_path;
     FILE* f;
@@ -1330,7 +1285,6 @@ int LoadFlic(int pIndex) {
 
 // Offset: 7488
 // Size: 75
-// EAX: pIndex
 void UnlockFlic(int pIndex) {
     if (pIndex >= 0) {
         if (gMain_flic_list[pIndex].data_ptr) {
@@ -1341,9 +1295,6 @@ void UnlockFlic(int pIndex) {
 
 // Offset: 7564
 // Size: 257
-// EAX: pName
-// EDX: pData
-// EBX: pData_length
 int LoadFlicData(char* pName, tU8** pData, tU32* pData_length) {
     FILE* f;
     tPath_name the_path;
@@ -1352,30 +1303,24 @@ int LoadFlicData(char* pName, tU8** pData, tU32* pData_length) {
 
 // Offset: 7824
 // Size: 87
-// EAX: pIndex
 void FreeFlic(int pIndex) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 7912
 // Size: 61
-// EAX: pIndex
 void ForceRunFlic(int pIndex) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 7976
 // Size: 107
-// EAX: pIndex
-// EDX: pX
-// EBX: pY
 void RunFlicAt(int pIndex, int pX, int pY) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 8084
 // Size: 117
-// EAX: pIndex
 void RunFlic(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
@@ -1401,7 +1346,6 @@ void RunFlic(int pIndex) {
 
 // Offset: 8204
 // Size: 105
-// EAX: pBunch_index
 void PreloadBunchOfFlics(int pBunch_index) {
     int i;
     LOG_TRACE("(%d)", pBunch_index);
@@ -1413,7 +1357,6 @@ void PreloadBunchOfFlics(int pBunch_index) {
 
 // Offset: 8312
 // Size: 105
-// EAX: pBunch_index
 void UnlockBunchOfFlics(int pBunch_index) {
     int i;
     for (i = 0; i < gFlic_bunch[pBunch_index].count; i++) {
@@ -1427,7 +1370,6 @@ void UnlockBunchOfFlics(int pBunch_index) {
 
 // Offset: 8420
 // Size: 73
-// EAX: pBunch_index
 void FlushAllFlics(int pBunch_index) {
     int i;
     NOT_IMPLEMENTED();
@@ -1447,7 +1389,6 @@ int FlicQueueFinished() {
 
 // Offset: 8628
 // Size: 230
-// EAX: pInterval
 void ProcessFlicQueue(tU32 pInterval) {
     tFlic_descriptor* the_flic;
     tFlic_descriptor* last_flic;
@@ -1542,10 +1483,6 @@ void FlushFlicQueue() {
 
 // Offset: 9000
 // Size: 424
-// EAX: pIndex
-// EDX: pX
-// EBX: pY
-// ECX: pMust_finish
 void AddToFlicQueue(int pIndex, int pX, int pY, int pMust_finish) {
     tFlic_descriptor* the_flic = NULL;
     tFlic_descriptor* new_flic = NULL;
@@ -1612,10 +1549,6 @@ void AddToFlicQueue(int pIndex, int pX, int pY, int pMust_finish) {
 
 // Offset: 9424
 // Size: 205
-// EAX: pIndex
-// EDX: pLeft
-// EBX: pTop
-// ECX: pWidth
 void InitialiseFlicPanel(int pIndex, int pLeft, int pTop, int pWidth, int pHeight) {
     void* the_pixels;
     NOT_IMPLEMENTED();
@@ -1623,14 +1556,12 @@ void InitialiseFlicPanel(int pIndex, int pLeft, int pTop, int pWidth, int pHeigh
 
 // Offset: 9632
 // Size: 112
-// EAX: pIndex
 void DisposeFlicPanel(int pIndex) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 9744
 // Size: 502
-// EAX: pCopy_to_buffer
 void ServicePanelFlics(int pCopy_to_buffer) {
     tU32 time_diff;
     tU32 the_time;
@@ -1699,16 +1630,12 @@ void ServicePanelFlics(int pCopy_to_buffer) {
 
 // Offset: 10248
 // Size: 205
-// EAX: pIndex
-// EDX: pData
-// EBX: pData_length
 void ChangePanelFlic(int pIndex, tU8* pData, tU32 pData_length) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 10456
 // Size: 55
-// EAX: pIndex
 br_pixelmap* GetPanelPixelmap(int pIndex) {
     NOT_IMPLEMENTED();
 }

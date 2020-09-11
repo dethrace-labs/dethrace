@@ -5,7 +5,6 @@ br_token valid_system_config_tokens[5];
 
 // Offset: 26
 // Size: 106
-// EAX: t
 br_boolean Is_Valid_Sys_Config_Token(br_token t) {
     br_boolean bOK;
     int i;
@@ -14,10 +13,6 @@ br_boolean Is_Valid_Sys_Config_Token(br_token t) {
 
 // Offset: 145
 // Size: 130
-// EAX: ini_file
-// EDX: section_name
-// EBX: t
-// ECX: Entry
 br_boolean LoadIniEntry(char* ini_file, char* section_name, br_token t, char* Entry) {
     char Temp[255];
     br_uint_16 size;
@@ -28,18 +23,12 @@ br_boolean LoadIniEntry(char* ini_file, char* section_name, br_token t, char* En
 
 // Offset: 289
 // Size: 213
-// EAX: ini_file
-// EDX: section_name
 br_error LoadIniConfig(char* ini_file, char* section_name) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 520
 // Size: 130
-// EAX: Reg_Path
-// EDX: hKey
-// EBX: t
-// ECX: Entry
 br_boolean LoadRegistryEntry(char* Reg_Path, void* hKey, br_token t, char* Entry) {
     char Temp[255];
     br_uint_16 size;
@@ -50,16 +39,12 @@ br_boolean LoadRegistryEntry(char* Reg_Path, void* hKey, br_token t, char* Entry
 
 // Offset: 669
 // Size: 224
-// EAX: Reg_Path
-// EDX: hKey
 br_error LoadRegistryConfig(char* Reg_Path, void* hKey) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 912
 // Size: 193
-// EAX: t
-// EDX: Entry
 br_error BrSetDefaultConfig(br_token t, char* Entry) {
     char Reg_Path[255];
     int v0;

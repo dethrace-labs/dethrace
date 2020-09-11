@@ -16,7 +16,6 @@ void BrMaterialUpdate(br_material* mat, br_uint_16 flags) {
 
 // Offset: 3030
 // Size: 88
-// EAX: mat
 void BrMaterialClear(br_material* mat) {
     NOT_IMPLEMENTED();
 }

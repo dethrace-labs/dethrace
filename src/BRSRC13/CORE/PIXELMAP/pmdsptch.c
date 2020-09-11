@@ -131,28 +131,18 @@ void BrPixelmapRectangle2(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_int_32 
 
 // Offset: 2435
 // Size: 197
-// EAX: self
-// EDX: src
 br_error DispatchCopy(br_device_pixelmap* self, br_device_pixelmap* src) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 2654
 // Size: 238
-// EAX: self
-// EDX: p
-// EBX: src
-// ECX: r
 br_error DispatchRectangleCopy(br_device_pixelmap* self, br_point* p, br_device_pixelmap* src, br_rectangle* r) {
     NOT_IMPLEMENTED();
 }
 
 // Offset: 2921
 // Size: 238
-// EAX: self
-// EDX: r
-// EBX: src
-// ECX: s
 br_error DispatchRectangleStretchCopy(br_device_pixelmap* self, br_rectangle* r, br_device_pixelmap* src, br_rectangle* s) {
     NOT_IMPLEMENTED();
 }
