@@ -147,14 +147,24 @@ void* DfPop(int type, int* countp) {
 
 // IDA: void* __usercall DfTop@<EAX>(int type@<EAX>, int *countp@<EDX>)
 void* DfTop(int type, int* countp) {
-    LOG_TRACE("(%d, %p)", type, countp);
-    NOT_IMPLEMENTED();
+    LOG_TRACE9("(%d, %p)", type, countp);
+    if (DatafileStackTop <= 0)
+        BrFailure("DatafileStack Underflow");
+    if (type != DatafileStack[DatafileStackTop - 1].type)
+        BrFailure("DatafileStack type mismatch, wanted %d, got %d", type, DatafileStack[DatafileStackTop].type);
+    if (countp)
+        *countp = DatafileStack[DatafileStackTop - 1].count;
+    return DatafileStack[DatafileStackTop - 1].value;
 }
 
 // IDA: int __cdecl DfTopType()
 int DfTopType() {
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    LOG_TRACE9("()");
+    if (DatafileStackTop > 0) {
+        return DatafileStack[DatafileStackTop - 1].type;
+    } else {
+        return 0;
+    }
 }
 
 // IDA: int __usercall TextReadLine@<EAX>(br_datafile *df@<EAX>, char **ident@<EDX>, char **data@<EBX>)
@@ -166,8 +176,77 @@ int TextReadLine(br_datafile* df, char** ident, char** data) {
 
 // IDA: br_uint_16 __usercall scalarTypeConvert@<AX>(br_datafile *df@<EAX>, br_uint_16 t@<EDX>)
 br_uint_16 scalarTypeConvert(br_datafile* df, br_uint_16 t) {
-    LOG_TRACE("(%p, %d)", df, t);
-    NOT_IMPLEMENTED();
+    LOG_TRACE9("(%p, %d)", df, t);
+
+    if (df->scalar_type < BRT_FIXED) {
+        goto LABEL_20;
+    }
+
+    if (df->scalar_type > BRT_FIXED) {
+        if (df->scalar_type == BRT_FLOAT) {
+            if (t - 10 <= BRT_FIXED) {
+                switch (t) {
+                case 10:
+                    return 8;
+                case 11:
+                    return 24;
+                case 12:
+                    return 25;
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                    return t;
+                case 19:
+                    return 29;
+                    break;
+                case 20:
+                    return 30;
+                    break;
+                case 21:
+                    return 31;
+                    break;
+                }
+                return t;
+            }
+            NOT_IMPLEMENTED();
+            return t - 10;
+        }
+    LABEL_20:
+        if (t >= 0xAu
+            && (t <= 0xAu || (t >= 0x13u && t <= 0x15u))) {
+            BrFailure("Incorrect scalar type");
+        }
+        return t;
+    }
+    if (t - 10 > BRT_FIXED) {
+        return t;
+    }
+    switch (t) {
+    case 10:
+        return 6;
+    case 11:
+        return 22;
+    case 12:
+        return 23;
+    case 13:
+    case 14:
+    case 15:
+    case 16:
+    case 17:
+    case 18:
+        return t;
+    case 19:
+        return 26;
+    case 20:
+        return 27;
+    case 21:
+        return 28;
+    }
+
+    return t;
 }
 
 // IDA: br_uint_32 __usercall DfStructWriteBinary@<EAX>(br_datafile *df@<EAX>, br_file_struct *str@<EDX>, void *base@<EBX>)
@@ -515,7 +594,8 @@ void DfCountWriteBinary(br_datafile* df, br_uint_32 count) {
 br_uint_32 DfCountReadBinary(br_datafile* df) {
     br_uint_32 l;
     LOG_TRACE("(%p)", df);
-    NOT_IMPLEMENTED();
+    BrFileRead(&l, 4, 1, df->h);
+    return BrSwap32(l);
 }
 
 // IDA: int __usercall DfCountSizeText@<EAX>(br_datafile *df@<EAX>)
@@ -576,7 +656,7 @@ int DfBlockWriteBinary(br_datafile* df, void* base, int block_size, int block_st
 void* DfBlockReadBinary(br_datafile* df, void* base, int* count, int size, int mtype) {
     int l;
     int s;
-    LOG_TRACE("(%p, %p, %p, %d, %d)", df, base, count, size, mtype);
+    LOG_TRACE9("(%p, %p, %p, %d, %d)", df, base, count, size, mtype);
 
     BrFileRead(&l, 4, 1, df->h);
     l = BrSwap32(l);
@@ -687,7 +767,7 @@ int DfChunksInterpret(br_datafile* df, br_chunks_table* table) {
 
     while (1) {
         id = df->prims->chunk_read(df, &length);
-        LOG_DEBUG("chunk id=%d, len=%d", id, length);
+        //LOG_DEBUG("chunk id=%d, len=%d", id, length);
         if (id == -1) {
             break;
         }

@@ -245,8 +245,9 @@ char* GetALineWithNoPossibleService(FILE* pF, /*unsigned*/ char* pS) {
 
 // IDA: char* __usercall GetALineAndDontArgue@<EAX>(FILE *pF@<EAX>, char *pS@<EDX>)
 char* GetALineAndDontArgue(FILE* pF, char* pS) {
-    LOG_TRACE("(%p, \"%s\")", pF, pS);
-    NOT_IMPLEMENTED();
+    //LOG_TRACE10("(%p, \"%s\")", pF, pS);
+    PossibleService();
+    return GetALineWithNoPossibleService(pF, pS);
 }
 
 // IDA: void __usercall PathCat(char *pDestn_str@<EAX>, char *pStr_1@<EDX>, char *pStr_2@<EBX>)
@@ -302,7 +303,12 @@ br_pixelmap* DRPixelmapAllocate(br_uint_8 pType, br_uint_16 pW, br_uint_16 pH, v
 br_pixelmap* DRPixelmapAllocateSub(br_pixelmap* pPm, br_uint_16 pX, br_uint_16 pY, br_uint_16 pW, br_uint_16 pH) {
     br_pixelmap* the_map;
     LOG_TRACE("(%p, %d, %d, %d, %d)", pPm, pX, pY, pW, pH);
-    NOT_IMPLEMENTED();
+    the_map = BrPixelmapAllocateSub(pPm, pX, pY, pW, pH);
+    if (the_map) {
+        the_map->origin_y = 0;
+        the_map->origin_x = 0;
+    }
+    return the_map;
 }
 
 // IDA: br_pixelmap* __usercall DRPixelmapMatchSized@<EAX>(br_pixelmap *pSrc@<EAX>, tU8 pMatch_type@<EDX>, tS32 pWidth@<EBX>, tS32 pHeight@<ECX>)

@@ -420,7 +420,7 @@ int FopRead_PIXELMAP_REF(br_datafile* df, br_uint_32 id, br_uint_32 length, br_u
     char name[256];
     char* mp;
     int i;
-    LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
+    LOG_TRACE9("(%p, %d, %d, %d)", df, id, length, count);
 
     for (i = 0; i < 5; i++) {
 
@@ -455,7 +455,7 @@ int FopWrite_ACTOR(br_datafile* df, br_actor* ap) {
 // IDA: int __usercall FopRead_ACTOR@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_ACTOR(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_actor* ap;
-    LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
+    LOG_TRACE9("(%p, %d, %d, %d)", df, id, length, count);
 
     ap = BrActorAllocate(BR_ACTOR_NONE, NULL);
     df->res = ap;
@@ -468,7 +468,7 @@ int FopRead_ACTOR(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 
 
 // IDA: int __usercall FopWrite_ACTOR_MODEL@<EAX>(br_datafile *df@<EAX>, br_model *model@<EDX>)
 int FopWrite_ACTOR_MODEL(br_datafile* df, br_model* model) {
-    LOG_TRACE("(%p, %p)", df, model);
+    LOG_TRACE9("(%p, %p)", df, model);
     NOT_IMPLEMENTED();
 }
 
@@ -476,7 +476,7 @@ int FopWrite_ACTOR_MODEL(br_datafile* df, br_model* model) {
 int FopRead_ACTOR_MODEL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     char name[256];
     br_actor* a;
-    LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
+    LOG_TRACE9("(%p, %d, %d, %d)", df, id, length, count);
 
     a = DfTop(DF_ACTOR, 0);
     df->prims->name_read(df, name);
@@ -494,7 +494,7 @@ int FopWrite_ACTOR_MATERIAL(br_datafile* df, br_material* material) {
 int FopRead_ACTOR_MATERIAL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     char name[256];
     br_actor* a;
-    LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
+    LOG_TRACE9("(%p, %d, %d, %d)", df, id, length, count);
     a = DfTop(DF_ACTOR, NULL);
     df->prims->name_read(df, name);
     a->material = BrMaterialFind(name);
@@ -510,7 +510,7 @@ int FopWrite_ACTOR_TRANSFORM(br_datafile* df) {
 int FopRead_ACTOR_TRANSFORM(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_actor* a;
     br_transform* tp;
-    LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
+    LOG_TRACE9("(%p, %d, %d, %d)", df, id, length, count);
 
     tp = DfPop(DF_TRANSFORM, NULL);
     a = DfTop(DF_ACTOR, NULL);
@@ -600,7 +600,7 @@ int FopWrite_TRANSFORM(br_datafile* df, br_transform* t) {
 int FopRead_TRANSFORM(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     int t;
     br_transform* tp;
-    LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
+    LOG_TRACE9("(%p, %d, %d, %d)", df, id, length, count);
 
     for (t = 0; t < 7; t++) {
         if (id == TransformTypes[t].id) {
@@ -675,7 +675,7 @@ br_uint_32 BrModelLoadMany(char* filename, br_model** models, br_uint_16 num) {
     int count;
     int r;
     br_datafile* df;
-    LOG_TRACE("(\"%s\", %p, %d)", filename, models, num);
+    LOG_TRACE9("(\"%s\", %p, %d)", filename, models, num);
 
     df = DfOpen(filename, 0, BRT_FLOAT);
     if (!df) {
@@ -728,7 +728,7 @@ br_uint_32 BrActorLoadMany(char* filename, br_actor** actors, br_uint_16 num) {
     br_datafile* df;
     int count;
     int r;
-    LOG_TRACE("(\"%s\", %p, %d)", filename, actors, num);
+    LOG_TRACE9("(\"%s\", %p, %d)", filename, actors, num);
 
     df = DfOpen(filename, 0, BRT_FLOAT);
     if (!df) {

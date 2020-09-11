@@ -11,7 +11,17 @@ char rscid[54];
 // IDA: br_error __cdecl BrBegin()
 br_error BrBegin() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (active) {
+        return 4103;
+    } else {
+        BrFwBegin();
+        HostImageLoad("unk?");
+        BrPixelmapBegin();
+        active = 1;
+        //nullsub_28();
+        return 0;
+    }
 }
 
 // IDA: br_error __cdecl BrEnd()

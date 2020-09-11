@@ -57,7 +57,9 @@ void BrHorizonPlaneDisable(br_actor* h) {
 br_actor* BrEnvironmentSet(br_actor* a) {
     br_actor* old_a;
     LOG_TRACE("(%p)", a);
-    NOT_IMPLEMENTED();
+    old_a = v1db.enabled_environment;
+    v1db.enabled_environment = a;
+    return old_a;
 }
 
 // IDA: br_boolean __usercall setupView@<EAX>(br_matrix34 *view_to_this@<EAX>, br_matrix34 *this_to_view@<EDX>, br_matrix34 *world_to_view@<EBX>, br_int_32 w2vt@<ECX>, br_actor *world, br_actor *a)

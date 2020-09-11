@@ -56,7 +56,7 @@ int FopRead_OLD_PIXELMAP(br_datafile* df, br_uint_32 id, br_uint_32 length, br_u
 // IDA: int __usercall FopRead_PIXELMAP@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_PIXELMAP(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_pixelmap* pp;
-    LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
+    LOG_TRACE9("(%p, %d, %d, %d)", df, id, length, count);
 
     pp = (br_pixelmap*)DevicePixelmapMemAllocate(3u, 0, 0, 0, 2);
     df->res = pp;
@@ -82,7 +82,7 @@ int FopRead_PIXELS(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32
     int icount = 0;
     br_pixelmap* pp;
     int size;
-    LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
+    LOG_TRACE9("(%p, %d, %d, %d)", df, id, length, count);
 
     pp = DfTop(DF_PIXELMAP, NULL);
     size = pmTypeInfo[pp->type].file_size;

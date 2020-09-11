@@ -1368,7 +1368,7 @@ void GetFourInts(FILE* pF, int* pF1, int* pF2, int* pF3, int* pF4) {
 // IDA: br_scalar __usercall GetAScalar@<ST0>(FILE *pF@<EAX>)
 br_scalar GetAScalar(FILE* pF) {
     LOG_TRACE("(%p)", pF);
-    NOT_IMPLEMENTED();
+    return GetAFloat(pF);
 }
 
 // IDA: void __usercall GetPairOfScalars(FILE *pF@<EAX>, br_scalar *pS1@<EDX>, br_scalar *pS2@<EBX>)

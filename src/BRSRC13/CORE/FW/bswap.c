@@ -5,12 +5,12 @@ char rscid[47];
 
 // IDA: br_uint_32 __cdecl BrSwap32(br_uint_32 l)
 br_uint_32 BrSwap32(br_uint_32 l) {
-    struct { // size: 0x4
-        unsigned long l; // @0x0
-        unsigned char c[4]; // @0x0
-    } u;
-    LOG_TRACE("(%d)", l);
-    NOT_IMPLEMENTED();
+    // struct { // size: 0x4
+    //     unsigned long l; // @0x0
+    //     unsigned char c[4]; // @0x0
+    // } u;
+    LOG_TRACE10("(%d)", l);
+    return ((l << 24) | ((l << 8) & 0x00FF0000) | ((l >> 8) & 0x0000FF00) | (l >> 24));
 }
 
 // IDA: br_uint_16 __cdecl BrSwap16(br_uint_16 s)
