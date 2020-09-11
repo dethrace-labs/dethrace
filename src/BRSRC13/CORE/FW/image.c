@@ -16,25 +16,25 @@ br_boolean BrImageRemove(br_image* img) {
 
 // IDA: br_image* __cdecl BrImageFind(char *pattern)
 br_image* BrImageFind(char* pattern) {
-    char *c;
-    br_image *img;
+    char* c;
+    br_image* img;
     LOG_TRACE("(\"%s\")", pattern);
     NOT_IMPLEMENTED();
 }
 
 // IDA: br_image* __usercall imageLoadHost@<EAX>(char *name@<EAX>)
 br_image* imageLoadHost(char* name) {
-    br_image *img;
-    void *host_image;
+    br_image* img;
+    void* host_image;
     LOG_TRACE("(\"%s\")", name);
     NOT_IMPLEMENTED();
 }
 
 // IDA: br_image* __cdecl BrImageReference(char *name)
 br_image* BrImageReference(char* name) {
-    char *suffix;
-    char *scratch;
-    br_image *img;
+    char* suffix;
+    char* scratch;
+    br_image* img;
     LOG_TRACE("(\"%s\")", name);
     NOT_IMPLEMENTED();
 }
@@ -50,8 +50,8 @@ void* imageLookupName(br_image* img, char* name, br_uint_32 hint) {
 
 // IDA: void* __cdecl BrImageLookupName(br_image *img, char *name, br_uint_32 hint)
 void* BrImageLookupName(br_image* img, char* name, br_uint_32 hint) {
-    char *scratch;
-    void *p;
+    char* scratch;
+    void* p;
     LOG_TRACE("(%p, \"%s\", %d)", img, name, hint);
     NOT_IMPLEMENTED();
 }

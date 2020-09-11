@@ -714,8 +714,8 @@ void DoDifferenceX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int number_of_packets;
     int skip_count;
     int size_count;
-    tU8 *pixel_ptr;
-    tU8 *line_pixel_ptr;
+    tU8* pixel_ptr;
+    tU8* line_pixel_ptr;
     tU8 the_byte;
     tU32 the_row_bytes;
     LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
@@ -732,8 +732,8 @@ void DoDifferenceTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int number_of_packets;
     int skip_count;
     int size_count;
-    tU8 *pixel_ptr;
-    tU8 *line_pixel_ptr;
+    tU8* pixel_ptr;
+    tU8* line_pixel_ptr;
     tU8 the_byte;
     tU32 the_row_bytes;
     LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
@@ -900,9 +900,9 @@ void DoBlack(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
     int the_width;
-    tU8 *pixel_ptr;
+    tU8* pixel_ptr;
     tU32 the_row_bytes;
-    tU32 *line_pixel_ptr;
+    tU32* line_pixel_ptr;
     LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
     NOT_IMPLEMENTED();
 }
@@ -995,9 +995,9 @@ void DoUncompressed(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
     int the_width;
-    tU8 *pixel_ptr;
+    tU8* pixel_ptr;
     tU32 the_row_bytes;
-    tU32 *line_pixel_ptr;
+    tU32* line_pixel_ptr;
     LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
     NOT_IMPLEMENTED();
 }
@@ -1007,8 +1007,8 @@ void DoUncompressedTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
     int the_width;
-    tU8 *pixel_ptr;
-    tU8 *line_pixel_ptr;
+    tU8* pixel_ptr;
+    tU8* line_pixel_ptr;
     tU8 the_byte;
     tU32 the_row_bytes;
     LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
@@ -1023,7 +1023,7 @@ void DoMini(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
 
 // IDA: void __usercall DrawTranslations(tFlic_descriptor *pFlic_info@<EAX>, int pLast_frame@<EDX>)
 void DrawTranslations(tFlic_descriptor* pFlic_info, int pLast_frame) {
-    tTranslation_record *trans;
+    tTranslation_record* trans;
     int i;
     int x;
     int width;
@@ -1271,7 +1271,7 @@ void UnlockFlic(int pIndex) {
 
 // IDA: int __usercall LoadFlicData@<EAX>(char *pName@<EAX>, tU8 **pData@<EDX>, tU32 *pData_length@<EBX>)
 int LoadFlicData(char* pName, tU8** pData, tU32* pData_length) {
-    FILE *f;
+    FILE* f;
     tPath_name the_path;
     LOG_TRACE("(\"%s\", %p, %p)", pName, pData, pData_length);
     NOT_IMPLEMENTED();
@@ -1355,7 +1355,7 @@ void InitFlicQueue() {
 
 // IDA: int __cdecl FlicQueueFinished()
 int FlicQueueFinished() {
-    tFlic_descriptor *the_flic;
+    tFlic_descriptor* the_flic;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -1519,7 +1519,7 @@ void AddToFlicQueue(int pIndex, int pX, int pY, int pMust_finish) {
 
 // IDA: void __usercall InitialiseFlicPanel(int pIndex@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pWidth@<ECX>, int pHeight)
 void InitialiseFlicPanel(int pIndex, int pLeft, int pTop, int pWidth, int pHeight) {
-    void *the_pixels;
+    void* the_pixels;
     LOG_TRACE("(%d, %d, %d, %d, %d)", pIndex, pLeft, pTop, pWidth, pHeight);
     NOT_IMPLEMENTED();
 }

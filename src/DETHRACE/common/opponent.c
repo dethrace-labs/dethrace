@@ -82,7 +82,7 @@ void ProcessCurrentObjective(tOpponent_spec* pOpponent_spec, tProcess_objective_
 
 // IDA: tS16 __usercall ReallocExtraPathNodes@<AX>(int pHow_many_then@<EAX>)
 tS16 ReallocExtraPathNodes(int pHow_many_then) {
-    tPath_node *new_nodes;
+    tPath_node* new_nodes;
     tS16 first_new_node;
     LOG_TRACE("(%d)", pHow_many_then);
     NOT_IMPLEMENTED();
@@ -90,7 +90,7 @@ tS16 ReallocExtraPathNodes(int pHow_many_then) {
 
 // IDA: tS16 __usercall ReallocExtraPathSections@<AX>(int pHow_many_then@<EAX>)
 tS16 ReallocExtraPathSections(int pHow_many_then) {
-    tPath_section *new_sections;
+    tPath_section* new_sections;
     tS16 first_new_section;
     LOG_TRACE("(%d)", pHow_many_then);
     NOT_IMPLEMENTED();
@@ -102,7 +102,7 @@ int PointVisibleFromHere(br_vector3* pFrom, br_vector3* pTo) {
     br_vector3 dir;
     br_vector3 norm;
     br_scalar t;
-    br_material *material;
+    br_material* material;
     LOG_TRACE("(%p, %p)", pFrom, pTo);
     NOT_IMPLEMENTED();
 }
@@ -138,9 +138,9 @@ tS16 FindNearestGeneralSection(tCar_spec* pPursuee, br_vector3* pActor_coords, b
     br_vector3 p;
     br_vector3 wank;
     br_vector3 intersect;
-    br_vector3 *start;
-    br_vector3 *finish;
-    br_vector3 *nearest_node_v;
+    br_vector3* start;
+    br_vector3* finish;
+    br_vector3* nearest_node_v;
     LOG_TRACE("(%p, %p, %p, %p, %p)", pPursuee, pActor_coords, pPath_direction, pIntersect, pDistance);
     NOT_IMPLEMENTED();
 }
@@ -208,7 +208,7 @@ int SearchForSection(tRoute_section* pTemp_store, tRoute_section* pPerm_store, i
     static int routes_found;
     char depth_indent[32];
     int direction;
-    tPath_node *node_ptr;
+    tPath_node* node_ptr;
     tS16 node_no;
     tS16 section_no;
     tS16 section_no_index;
@@ -288,9 +288,9 @@ void UnStunTheBugger(tOpponent_spec* pOpponent_spec) {
 
 // IDA: void __usercall ProcessCompleteRace(tOpponent_spec *pOpponent_spec@<EAX>, tProcess_objective_command pCommand@<EDX>)
 void ProcessCompleteRace(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand) {
-    br_vector3 *initial_pos;
-    br_actor *car_actor;
-    tComplete_race_data *data;
+    br_vector3* initial_pos;
+    br_actor* car_actor;
+    tComplete_race_data* data;
     int res;
     char str[256];
     LOG_TRACE("(%p, %d)", pOpponent_spec, pCommand);
@@ -306,7 +306,7 @@ void StartRecordingTrail(tCar_spec* pPursuee) {
 
 // IDA: void __usercall RecordNextTrailNode(tCar_spec *pPursuee@<EAX>)
 void RecordNextTrailNode(tCar_spec* pPursuee) {
-    tPursuee_trail *trail;
+    tPursuee_trail* trail;
     br_vector3 start1;
     br_vector3 finish1;
     br_vector3 start2;
@@ -328,14 +328,14 @@ tS16 FindNearestTrailSection(tOpponent_spec* pOpponent_spec, tCar_spec* pPursuee
 // IDA: tS16 __usercall CalcNextTrailSection@<AX>(tOpponent_spec *pOpponent_spec@<EAX>, int pSection@<EDX>)
 tS16 CalcNextTrailSection(tOpponent_spec* pOpponent_spec, int pSection) {
     int section_no;
-    tPursuee_trail *trail;
+    tPursuee_trail* trail;
     LOG_TRACE("(%p, %d)", pOpponent_spec, pSection);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall ProcessPursueAndTwat(tOpponent_spec *pOpponent_spec@<EAX>, tProcess_objective_command pCommand@<EDX>)
 void ProcessPursueAndTwat(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand) {
-    tPursue_car_data *data;
+    tPursue_car_data* data;
     br_vector3 wank;
     br_vector3 section_v;
     br_vector3 intersect;
@@ -390,8 +390,8 @@ void ProcessLevitate(tOpponent_spec* pOpponent_spec, tProcess_objective_command 
 
 // IDA: void __usercall ProcessGetNearPlayer(tOpponent_spec *pOpponent_spec@<EAX>, tProcess_objective_command pCommand@<EDX>)
 void ProcessGetNearPlayer(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand) {
-    br_vector3 *initial_pos;
-    br_actor *car_actor;
+    br_vector3* initial_pos;
+    br_actor* car_actor;
     int res;
     char str[256];
     LOG_TRACE("(%p, %d)", pOpponent_spec, pCommand);
@@ -485,7 +485,7 @@ int IsNetCarActive(br_vector3* pPoint) {
 // IDA: void __cdecl RebuildActiveCarList()
 void RebuildActiveCarList() {
     int i;
-    tCar_spec *car_spec;
+    tCar_spec* car_spec;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -524,8 +524,8 @@ void CalcDistanceFromHome(tOpponent_spec* pOpponent_spec) {
 
 // IDA: int __usercall MassageOpponentPosition@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, int pMassage_count@<EDX>)
 int MassageOpponentPosition(tOpponent_spec* pOpponent_spec, int pMassage_count) {
-    br_matrix34 *mat;
-    br_vector3 *car_trans;
+    br_matrix34* mat;
+    br_vector3* car_trans;
     br_vector3 displacement;
     br_vector3 positive_y_vector;
     br_vector3 direction_v;
@@ -535,8 +535,8 @@ int MassageOpponentPosition(tOpponent_spec* pOpponent_spec, int pMassage_count) 
 
 // IDA: int __usercall RematerialiseOpponentOnThisSection@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, br_scalar pSpeed, tS16 pSection_no)
 int RematerialiseOpponentOnThisSection(tOpponent_spec* pOpponent_spec, br_scalar pSpeed, tS16 pSection_no) {
-    br_vector3 *start;
-    br_vector3 *finish;
+    br_vector3* start;
+    br_vector3* finish;
     br_vector3 a;
     br_vector3 p;
     br_vector3 section_v;
@@ -554,8 +554,8 @@ int RematerialiseOpponentOnNearestSection(tOpponent_spec* pOpponent_spec, br_sca
     br_vector3 intersect;
     br_vector3 direction_v;
     br_vector3 car_to_end;
-    br_vector3 *start;
-    br_vector3 *finish;
+    br_vector3* start;
+    br_vector3* finish;
     br_scalar distance;
     br_scalar distance_to_end;
     tS16 section_no;
@@ -569,7 +569,7 @@ int RematerialiseOpponent(tOpponent_spec* pOpponent_spec, br_scalar pSpeed) {
     static int total;
     static int highest;
     int this_total;
-    br_matrix34 *mat;
+    br_matrix34* mat;
     br_matrix34 original_mat;
     br_vector3 a;
     br_vector3 b;
@@ -618,7 +618,7 @@ void LoadCopCars() {
 // IDA: void __usercall LoadInOppoPaths(FILE *pF@<EAX>)
 void LoadInOppoPaths(FILE* pF) {
     char s[256];
-    char *res;
+    char* res;
     int data_errors;
     int section_no;
     int node_no;
@@ -628,7 +628,7 @@ void LoadInOppoPaths(FILE* pF) {
     br_scalar z;
     br_scalar scalars[8];
     br_scalar distance;
-    tPath_node *node_ptr;
+    tPath_node* node_ptr;
     br_vector3 section_v;
     br_vector3 positive_y_vector;
     br_vector3 intersect;
@@ -825,8 +825,8 @@ void RecordOpponentTwattageOccurrence(tCar_spec* pTwatter, tCar_spec* pTwattee) 
     int new_grudge_value;
     float damage;
     char str[256];
-    tOpponent_spec *twattee_opponent_spec;
-    tOpponent_spec *twatter_opponent_spec;
+    tOpponent_spec* twattee_opponent_spec;
+    tOpponent_spec* twatter_opponent_spec;
     LOG_TRACE("(%p, %p)", pTwatter, pTwattee);
     NOT_IMPLEMENTED();
 }
@@ -955,10 +955,10 @@ void MakeSection(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3* p
     int i;
     br_vector3 offset_v;
     br_vector3 centre_length_v;
-    br_material *the_material_start_lt;
-    br_material *the_material_start_dk;
-    br_material *the_material_finish_lt;
-    br_material *the_material_finish_dk;
+    br_material* the_material_start_lt;
+    br_material* the_material_start_dk;
+    br_material* the_material_finish_lt;
+    br_material* the_material_finish_dk;
     br_scalar height;
     LOG_TRACE("(%d, %d, %p, %p, %f, %p, %p, %p, %p, %p, %p)", pFirst_vertex, pFirst_face, pStart, pFinish, pWidth, pMaterial_centre_lt, pMaterial_centre_dk, pMaterial_edges_start_lt, pMaterial_edges_start_dk, pMaterial_edges_finish_lt, pMaterial_edges_finish_dk);
     NOT_IMPLEMENTED();
@@ -980,8 +980,8 @@ void CalcNumberOfFacesAndVerticesForOppoPathModel(br_uint_16* pFace_index_ptr, b
 
 // IDA: void __usercall ReallocModelFacesAndVertices(br_model *pModel@<EAX>, int pNum_faces@<EDX>, int pNum_vertices@<EBX>)
 void ReallocModelFacesAndVertices(br_model* pModel, int pNum_faces, int pNum_vertices) {
-    br_vertex *new_vertices;
-    br_face *new_faces;
+    br_vertex* new_vertices;
+    br_face* new_faces;
     int i;
     LOG_TRACE("(%p, %d, %d)", pModel, pNum_faces, pNum_vertices);
     NOT_IMPLEMENTED();
@@ -989,7 +989,7 @@ void ReallocModelFacesAndVertices(br_model* pModel, int pNum_faces, int pNum_ver
 
 // IDA: br_material* __usercall CreateSimpleMaterial@<EAX>(int pColour_index@<EAX>)
 br_material* CreateSimpleMaterial(int pColour_index) {
-    br_material *return_me;
+    br_material* return_me;
     LOG_TRACE("(%d)", pColour_index);
     NOT_IMPLEMENTED();
 }
@@ -1010,12 +1010,12 @@ void RebuildOppoPathModel() {
     br_uint_16 nvertices;
     br_uint_16 first_face;
     br_uint_16 first_vertex;
-    br_material *centre_mat_lt;
-    br_material *centre_mat_dk;
-    br_material *edge_mat_start_lt;
-    br_material *edge_mat_start_dk;
-    br_material *edge_mat_finish_lt;
-    br_material *edge_mat_finish_dk;
+    br_material* centre_mat_lt;
+    br_material* centre_mat_dk;
+    br_material* edge_mat_start_lt;
+    br_material* edge_mat_start_dk;
+    br_material* edge_mat_finish_lt;
+    br_material* edge_mat_finish_dk;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -1030,8 +1030,8 @@ int ConsistencyCheck() {
     tS16 section_no_index1;
     int found_how_many;
     int failed;
-    tU8 *nodes_referenced_by_sections_array;
-    tU8 *sections_referenced_by_nodes_array;
+    tU8* nodes_referenced_by_sections_array;
+    tU8* sections_referenced_by_nodes_array;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -1047,7 +1047,7 @@ void ShowOppoPaths() {
 void WriteOutOppoPaths() {
     char the_path[256];
     char str[13];
-    FILE *f;
+    FILE* f;
     int i;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();

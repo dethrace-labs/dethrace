@@ -12,9 +12,9 @@ tSkid gSkids[100];
 // IDA: void __usercall StretchMark(tSkid *pMark@<EAX>, br_vector3 *pFrom@<EDX>, br_vector3 *pTo@<EBX>, br_scalar pTexture_start)
 void StretchMark(tSkid* pMark, br_vector3* pFrom, br_vector3* pTo, br_scalar pTexture_start) {
     br_vector3 temp;
-    br_vector3 *rows;
+    br_vector3* rows;
     br_scalar len;
-    br_model *model;
+    br_model* model;
     LOG_TRACE("(%p, %p, %p, %f)", pMark, pFrom, pTo, pTexture_start);
     NOT_IMPLEMENTED();
 }
@@ -147,7 +147,7 @@ br_scalar SkidLen(int pSkid) {
 // IDA: void __usercall SkidSection(tCar_spec *pCar@<EAX>, int pWheel_num@<EDX>, br_vector3 *pPos@<EBX>, int pMaterial_index@<ECX>)
 void SkidSection(tCar_spec* pCar, int pWheel_num, br_vector3* pPos, int pMaterial_index) {
     static tU16 skid;
-    br_material *material;
+    br_material* material;
     LOG_TRACE("(%p, %d, %p, %d)", pCar, pWheel_num, pPos, pMaterial_index);
     NOT_IMPLEMENTED();
 }
@@ -162,7 +162,7 @@ void SkidMark(tCar_spec* pCar, int pWheel_num) {
     br_scalar dist;
     br_scalar dist2;
     int on_ground;
-    br_material *material;
+    br_material* material;
     LOG_TRACE("(%p, %d)", pCar, pWheel_num);
     NOT_IMPLEMENTED();
 }

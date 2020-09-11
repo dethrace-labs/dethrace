@@ -60,9 +60,9 @@ int PickBoundsTestRay(br_bounds* b, br_vector3* rp, br_vector3* rd, br_scalar t_
 
 // IDA: int __usercall ActorPick2D@<EAX>(br_actor *ap@<EAX>, br_model *model@<EDX>, br_material *material@<EBX>, dr_pick2d_cbfn *callback@<ECX>, void *arg)
 int ActorPick2D(br_actor* ap, br_model* model, br_material* material, dr_pick2d_cbfn* callback, void* arg) {
-    br_actor *a;
-    br_model *this_model;
-    br_material *this_material;
+    br_actor* a;
+    br_model* this_model;
+    br_material* this_material;
     br_matrix34 m_to_v;
     br_matrix34 v_to_m;
     br_scalar t_near;
@@ -78,7 +78,7 @@ int DRScenePick2DXY(br_actor* world, br_actor* camera, br_pixelmap* viewport, in
     br_scalar scale;
     br_scalar cos_angle;
     br_scalar sin_angle;
-    br_camera *camera_data;
+    br_camera* camera_data;
     br_angle view_over_2;
     LOG_TRACE("(%p, %p, %p, %d, %d, %p, %p)", world, camera, viewport, pick_x, pick_y, callback, arg);
     NOT_IMPLEMENTED();
@@ -88,14 +88,14 @@ int DRScenePick2DXY(br_actor* world, br_actor* camera, br_pixelmap* viewport, in
 int DRScenePick2D(br_actor* world, br_actor* camera, dr_pick2d_cbfn* callback, void* arg) {
     br_matrix34 camera_tfm;
     br_scalar scale;
-    br_camera *camera_data;
+    br_camera* camera_data;
     LOG_TRACE("(%p, %p, %p, %p)", world, camera, callback, arg);
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __usercall DRModelPick2D@<EAX>(br_model *model@<EAX>, br_material *material@<EDX>, br_vector3 *ray_pos@<EBX>, br_vector3 *ray_dir@<ECX>, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn *callback, void *arg)
 int DRModelPick2D(br_model* model, br_material* material, br_vector3* ray_pos, br_vector3* ray_dir, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn* callback, void* arg) {
-    DR_FACE *fp;
+    DR_FACE* fp;
     int f;
     int axis_m;
     int axis_0;
@@ -123,7 +123,7 @@ int DRModelPick2D(br_model* model, br_material* material, br_vector3* ray_pos, b
     int v;
     int e;
     int r;
-    br_material *this_material;
+    br_material* this_material;
     br_scalar numerator;
     double f_numerator;
     LOG_TRACE("(%p, %p, %p, %p, %f, %f, %p, %p)", model, material, ray_pos, ray_dir, t_near, t_far, callback, arg);
@@ -155,7 +155,7 @@ br_scalar FindYVerticallyBelow(br_vector3* pPosition) {
     tU8 cz;
     tU8 x;
     tU8 z;
-    tTrack_spec *track_spec;
+    tTrack_spec* track_spec;
     LOG_TRACE("(%p)", pPosition);
     NOT_IMPLEMENTED();
 }

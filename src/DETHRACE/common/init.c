@@ -99,7 +99,7 @@ void AllocateCamera() {
 
 // IDA: void __cdecl ReinitialiseForwardCamera()
 void ReinitialiseForwardCamera() {
-    br_camera *camera_ptr;
+    br_camera* camera_ptr;
     float the_angle;
     float d;
     float w;
@@ -142,7 +142,7 @@ void AllocateRearviewPixelmap() {
 
 // IDA: void __cdecl ReinitialiseRearviewCamera()
 void ReinitialiseRearviewCamera() {
-    br_camera *camera_ptr;
+    br_camera* camera_ptr;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -255,7 +255,7 @@ void InitSmokeStuff() {
 
 // IDA: void __cdecl Init2DStuff()
 void Init2DStuff() {
-    br_camera *camera;
+    br_camera* camera;
     static br_token_value fadealpha[3];
     tPath_name path;
     br_scalar prat_u;

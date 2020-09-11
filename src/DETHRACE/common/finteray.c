@@ -22,9 +22,9 @@ void DRVector2AccumulateScale(br_vector2* a, br_vector2* b, br_scalar s) {
 
 // IDA: int __usercall ActorRayPick2D@<EAX>(br_actor *ap@<EAX>, br_vector3 *pPosition@<EDX>, br_vector3 *pDir@<EBX>, br_model *model@<ECX>, br_material *material, dr_pick2d_cbfn *callback)
 int ActorRayPick2D(br_actor* ap, br_vector3* pPosition, br_vector3* pDir, br_model* model, br_material* material, dr_pick2d_cbfn* callback) {
-    br_actor *a;
-    br_model *this_model;
-    br_material *this_material;
+    br_actor* a;
+    br_model* this_model;
+    br_material* this_material;
     br_scalar t_near;
     br_scalar t_far;
     int r;
@@ -32,7 +32,7 @@ int ActorRayPick2D(br_actor* ap, br_vector3* pPosition, br_vector3* pDir, br_mod
     br_matrix34 invmat;
     br_vector3 pos;
     br_vector3 dir;
-    void *arg;
+    void* arg;
     LOG_TRACE("(%p, %p, %p, %p, %p, %p)", ap, pPosition, pDir, model, material, callback);
     NOT_IMPLEMENTED();
 }
@@ -97,7 +97,7 @@ void CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir,
     double f_d;
     double f_n;
     double f_numerator;
-    br_material *this_material;
+    br_material* this_material;
     LOG_TRACE("(%p, %p, %p, %p, %p)", pFace, ray_pos, ray_dir, normal, rt);
     NOT_IMPLEMENTED();
 }
@@ -126,7 +126,7 @@ void MultiRayCheckSingleFace(int pNum_rays, tFace_ref* pFace, br_vector3* ray_po
     double f_d;
     double f_n;
     double f_numerator;
-    br_material *this_material;
+    br_material* this_material;
     LOG_TRACE("(%d, %p, %p, %p, %p, %p)", pNum_rays, pFace, ray_pos, ray_dir, normal, rt);
     NOT_IMPLEMENTED();
 }
@@ -153,7 +153,7 @@ int FindFacesInBox(tBounds* bnds, tFace_ref* face_list, int max_face) {
     tU8 cx_max;
     tU8 cz_min;
     tU8 cz_max;
-    tTrack_spec *track_spec;
+    tTrack_spec* track_spec;
     LOG_TRACE("(%p, %p, %d)", bnds, face_list, max_face);
     NOT_IMPLEMENTED();
 }
@@ -171,13 +171,13 @@ int FindFacesInBox2(tBounds* bnds, tFace_ref* face_list, int max_face) {
 
 // IDA: int __usercall ActorBoxPick@<EAX>(tBounds *bnds@<EAX>, br_actor *ap@<EDX>, br_model *model@<EBX>, br_material *material@<ECX>, tFace_ref *face_list, int max_face, br_matrix34 *pMat)
 int ActorBoxPick(tBounds* bnds, br_actor* ap, br_model* model, br_material* material, tFace_ref* face_list, int max_face, br_matrix34* pMat) {
-    br_model *this_model;
-    br_material *this_material;
+    br_model* this_model;
+    br_material* this_material;
     int i;
     int n;
     int test_children;
-    br_actor *a;
-    br_actor *next_a;
+    br_actor* a;
+    br_actor* next_a;
     br_matrix34 mat;
     br_matrix34 mat2;
     br_matrix34 invmat;
@@ -194,7 +194,7 @@ int ModelPickBox(br_actor* actor, tBounds* bnds, br_model* model, br_material* m
     int i;
     int n;
     int group;
-    DR_FACE *fp;
+    DR_FACE* fp;
     int v1;
     int v2;
     int v3;
@@ -202,7 +202,7 @@ int ModelPickBox(br_actor* actor, tBounds* bnds, br_model* model, br_material* m
     br_vector3 a;
     br_vector3 tv;
     br_scalar t;
-    v11model *prepared;
+    v11model* prepared;
     LOG_TRACE("(%p, %p, %p, %p, %p, %d, %p)", actor, bnds, model, model_material, face_list, max_face, pMat);
     NOT_IMPLEMENTED();
 }
@@ -274,7 +274,7 @@ int LineBoxCollWithSphere(br_vector3* o, br_vector3* p, br_bounds* pB, br_vector
 
 // IDA: int __usercall CompVert@<EAX>(int v1@<EAX>, int v2@<EDX>)
 int CompVert(int v1, int v2) {
-    br_vertex *vl;
+    br_vertex* vl;
     br_vector3 tv;
     br_vector2 tv2;
     LOG_TRACE("(%d, %d)", v1, v2);
@@ -292,11 +292,11 @@ void SetFacesGroup(int pFace) {
 
 // IDA: void __usercall SelectFace(br_vector3 *pDir@<EAX>)
 void SelectFace(br_vector3* pDir) {
-    tCar_spec *c;
+    tCar_spec* c;
     br_vector3 dir;
     br_vector3 normal;
     br_scalar t;
-    br_model *old_model;
+    br_model* old_model;
     int i;
     LOG_TRACE("(%p)", pDir);
     NOT_IMPLEMENTED();
@@ -307,8 +307,8 @@ void GetTilingLimits(br_vector2* min, br_vector2* max) {
     int f;
     int i;
     int j;
-    br_vertex *verts;
-    br_face *faces;
+    br_vertex* verts;
+    br_face* faces;
     LOG_TRACE("(%p, %p)", min, max);
     NOT_IMPLEMENTED();
 }
@@ -320,8 +320,8 @@ void Scale(int pD, int factor) {
     int f;
     int v;
     br_scalar d;
-    br_vertex *verts;
-    br_face *faces;
+    br_vertex* verts;
+    br_face* faces;
     LOG_TRACE("(%d, %d)", pD, factor);
     NOT_IMPLEMENTED();
 }

@@ -16,7 +16,7 @@ void* BrRegistryNew(br_registry* reg) {
 
 // IDA: void* __usercall BrRegistryClear@<EAX>(br_registry *reg@<EAX>)
 void* BrRegistryClear(br_registry* reg) {
-    br_registry_entry *e;
+    br_registry_entry* e;
     LOG_TRACE("(%p)", reg);
     NOT_IMPLEMENTED();
 }
@@ -41,8 +41,8 @@ int BrRegistryAddMany(br_registry* reg, void** items, int n) {
 
 // IDA: void* __usercall BrRegistryRemove@<EAX>(br_registry *reg@<EAX>, void *item@<EDX>)
 void* BrRegistryRemove(br_registry* reg, void* item) {
-    br_registry_entry *e;
-    void *r;
+    br_registry_entry* e;
+    void* r;
     LOG_TRACE("(%p, %p)", reg, item);
     NOT_IMPLEMENTED();
 }
@@ -86,7 +86,7 @@ void* BrRegistryFind(br_registry* reg, char* pattern) {
 
 // IDA: int __usercall BrRegistryFindMany@<EAX>(br_registry *reg@<EAX>, char *pattern@<EDX>, void **items@<EBX>, int max@<ECX>)
 int BrRegistryFindMany(br_registry* reg, char* pattern, void** items, int max) {
-    br_registry_entry *e;
+    br_registry_entry* e;
     int n;
     LOG_TRACE("(%p, \"%s\", %p, %d)", reg, pattern, items, max);
     NOT_IMPLEMENTED();
@@ -94,7 +94,7 @@ int BrRegistryFindMany(br_registry* reg, char* pattern, void** items, int max) {
 
 // IDA: int __usercall BrRegistryCount@<EAX>(br_registry *reg@<EAX>, char *pattern@<EDX>)
 int BrRegistryCount(br_registry* reg, char* pattern) {
-    br_registry_entry *e;
+    br_registry_entry* e;
     int n;
     LOG_TRACE("(%p, \"%s\")", reg, pattern);
     NOT_IMPLEMENTED();

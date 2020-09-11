@@ -8,7 +8,7 @@ char rscid[50];
 // IDA: void __cdecl BrModelApplyMap(br_model *model, int map_type, br_matrix34 *xform)
 void BrModelApplyMap(br_model* model, int map_type, br_matrix34* xform) {
     int v;
-    br_vertex *vp;
+    br_vertex* vp;
     br_vector3 mv;
     br_matrix34 default_xform;
     br_scalar d;

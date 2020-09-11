@@ -32,14 +32,14 @@ void BrAddTail(br_list* list, br_node* node) {
 
 // IDA: br_node* __cdecl BrRemHead(br_list *list)
 br_node* BrRemHead(br_list* list) {
-    br_node *n;
+    br_node* n;
     LOG_TRACE("(%p)", list);
     NOT_IMPLEMENTED();
 }
 
 // IDA: br_node* __cdecl BrRemTail(br_list *list)
 br_node* BrRemTail(br_list* list) {
-    br_node *n;
+    br_node* n;
     LOG_TRACE("(%p)", list);
     NOT_IMPLEMENTED();
 }
@@ -74,7 +74,7 @@ void BrSimpleAddHead(br_simple_list* list, br_simple_node* node) {
 
 // IDA: br_simple_node* __cdecl BrSimpleRemHead(br_simple_list *list)
 br_simple_node* BrSimpleRemHead(br_simple_list* list) {
-    br_simple_node *node;
+    br_simple_node* node;
     LOG_TRACE("(%p)", list);
     NOT_IMPLEMENTED();
 }

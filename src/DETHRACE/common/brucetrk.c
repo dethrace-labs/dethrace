@@ -39,7 +39,7 @@ void XZToColumnXZ(tU8* pColumn_x, tU8* pColumn_z, br_scalar pX, br_scalar pZ, tT
 // IDA: void __usercall StripBlendedFaces(br_actor *pActor@<EAX>, br_model *pModel@<EDX>)
 void StripBlendedFaces(br_actor* pActor, br_model* pModel) {
     int i;
-    br_face *face;
+    br_face* face;
     int changed_one;
     char s[256];
     static tU16 nfaces_allocated;
@@ -93,7 +93,7 @@ void LollipopizeActor4(br_actor* pActor, br_matrix34* pRef_to_world, br_actor* p
 
 // IDA: br_uint_32 __cdecl LollipopizeChildren(br_actor *pActor, void *pArg)
 br_uint_32 LollipopizeChildren(br_actor* pActor, void* pArg) {
-    tMatrix_and_actor *maa;
+    tMatrix_and_actor* maa;
     LOG_TRACE("(%p, %p)", pActor, pArg);
     NOT_IMPLEMENTED();
 }
@@ -105,7 +105,7 @@ void DrawColumns(int pDraw_blends, tTrack_spec* pTrack_spec, int pMin_x, int pMa
     tU8 column_x2;
     tU8 column_z2;
     tMatrix_and_actor maa;
-    br_actor *blended_polys;
+    br_actor* blended_polys;
     LOG_TRACE("(%d, %p, %d, %d, %d, %d, %p)", pDraw_blends, pTrack_spec, pMin_x, pMax_x, pMin_z, pMax_z, pCamera_to_world);
     NOT_IMPLEMENTED();
 }
@@ -120,9 +120,9 @@ void RenderTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, 
     static tU8 max_z;
     static br_vector3 edge_before;
     static br_vector3 edge_after;
-    static br_camera *camera;
+    static br_camera* camera;
     static br_scalar tan_fov_ish;
-    static br_actor *result;
+    static br_actor* result;
     LOG_TRACE("(%p, %p, %p, %p, %d)", pWorld, pTrack_spec, pCamera, pCamera_to_world, pRender_blends);
     NOT_IMPLEMENTED();
 }

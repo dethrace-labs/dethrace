@@ -159,7 +159,7 @@ int DfTopType() {
 
 // IDA: int __usercall TextReadLine@<EAX>(br_datafile *df@<EAX>, char **ident@<EDX>, char **data@<EBX>)
 int TextReadLine(br_datafile* df, char** ident, char** data) {
-    char *cp;
+    char* cp;
     LOG_TRACE("(%p, %p, %p)", df, ident, data);
     NOT_IMPLEMENTED();
 }
@@ -175,11 +175,11 @@ br_uint_32 DfStructWriteBinary(br_datafile* df, br_file_struct* str, void* base)
     unsigned int m;
     int i;
     int n;
-    unsigned char *mp;
-    br_file_struct_member *sm;
-    struct {		// size: 0x8
-        unsigned char b[8];		// @0x0
-        float f;		// @0x0
+    unsigned char* mp;
+    br_file_struct_member* sm;
+    struct { // size: 0x8
+        unsigned char b[8]; // @0x0
+        float f; // @0x0
     } conv;
     LOG_TRACE("(%p, %p, %p)", df, str, base);
     NOT_IMPLEMENTED();
@@ -345,9 +345,9 @@ br_uint_32 DfStructReadBinary(br_datafile* df, br_file_struct* str, void* base) 
 
 // IDA: int __usercall DfStructSizeBinary@<EAX>(br_datafile *df@<EAX>, br_file_struct *str@<EDX>, void *base@<EBX>)
 int DfStructSizeBinary(br_datafile* df, br_file_struct* str, void* base) {
-    unsigned char *mp;
+    unsigned char* mp;
     unsigned int m;
-    br_file_struct_member *sm;
+    br_file_struct_member* sm;
     int bytes;
     LOG_TRACE("(%p, %p, %p)", df, str, base);
     NOT_IMPLEMENTED();
@@ -379,16 +379,16 @@ br_uint_32 StructWriteTextSub(br_datafile* df, br_file_struct* str, void* base, 
     int i;
     int w;
     int add_comment;
-    void *mp;
-    br_file_struct_member *sm;
+    void* mp;
+    br_file_struct_member* sm;
     LOG_TRACE("(%p, %p, %p, %d)", df, str, base, indent);
     NOT_IMPLEMENTED();
 }
 
 // IDA: br_uint_32 __usercall DfStructReadText@<EAX>(br_datafile *df@<EAX>, br_file_struct *str@<EDX>, void *base@<EBX>)
 br_uint_32 DfStructReadText(br_datafile* df, br_file_struct* str, void* base) {
-    char *id;
-    char *data;
+    char* id;
+    char* data;
     LOG_TRACE("(%p, %p, %p)", df, str, base);
     NOT_IMPLEMENTED();
 }
@@ -401,11 +401,11 @@ br_uint_32 StructReadTextSub(br_datafile* df, br_file_struct* str, void* base) {
     unsigned int b;
     int i;
     int n;
-    void *mp;
-    br_file_struct_member *sm;
-    char *id;
-    char *data;
-    char *ep;
+    void* mp;
+    br_file_struct_member* sm;
+    char* id;
+    char* data;
+    char* ep;
     LOG_TRACE("(%p, %p, %p)", df, str, base);
     NOT_IMPLEMENTED();
 }
@@ -413,7 +413,7 @@ br_uint_32 StructReadTextSub(br_datafile* df, br_file_struct* str, void* base) {
 // IDA: int __usercall DfStructSizeText@<EAX>(br_datafile *df@<EAX>, br_file_struct *str@<EDX>, void *base@<EBX>)
 int DfStructSizeText(br_datafile* df, br_file_struct* str, void* base) {
     unsigned int m;
-    br_file_struct_member *sm;
+    br_file_struct_member* sm;
     int lines;
     LOG_TRACE("(%p, %p, %p)", df, str, base);
     NOT_IMPLEMENTED();
@@ -421,7 +421,7 @@ int DfStructSizeText(br_datafile* df, br_file_struct* str, void* base) {
 
 // IDA: br_uint_32 __usercall DfStructWriteArray@<EAX>(br_datafile *df@<EAX>, br_file_struct *str@<EDX>, void *base@<EBX>, int n@<ECX>)
 br_uint_32 DfStructWriteArray(br_datafile* df, br_file_struct* str, void* base, int n) {
-    char *cp;
+    char* cp;
     int i;
     LOG_TRACE("(%p, %p, %p, %d)", df, str, base, n);
     NOT_IMPLEMENTED();
@@ -453,8 +453,8 @@ int DfChunkWriteText(br_datafile* df, br_uint_32 id, br_uint_32 length) {
 // IDA: int __usercall DfChunkReadText@<EAX>(br_datafile *df@<EAX>, br_uint_32 *plength@<EDX>)
 int DfChunkReadText(br_datafile* df, br_uint_32* plength) {
     int i;
-    char *id;
-    char *data;
+    char* id;
+    char* data;
     LOG_TRACE("(%p, %p)", df, plength);
     NOT_IMPLEMENTED();
 }
@@ -498,8 +498,8 @@ void DfCountWriteText(br_datafile* df, br_uint_32 count) {
 
 // IDA: br_uint_32 __usercall DfCountReadText@<EAX>(br_datafile *df@<EAX>)
 br_uint_32 DfCountReadText(br_datafile* df) {
-    char *id;
-    char *data;
+    char* id;
+    char* data;
     LOG_TRACE("(%p)", df);
     NOT_IMPLEMENTED();
 }
@@ -533,9 +533,9 @@ int DfCountSizeBinary(br_datafile* df) {
 // IDA: br_uint_8* __usercall BlockWriteSetup@<EAX>(void *base@<EAX>, int block_size@<EDX>, int block_stride@<EBX>, int block_count@<ECX>, int size)
 br_uint_8* BlockWriteSetup(void* base, int block_size, int block_stride, int block_count, int size) {
     int b;
-    br_uint_8 *block;
-    br_uint_8 *sp;
-    br_uint_8 *dp;
+    br_uint_8* block;
+    br_uint_8* sp;
+    br_uint_8* dp;
     LOG_TRACE("(%p, %d, %d, %d, %d)", base, block_size, block_stride, block_count, size);
     NOT_IMPLEMENTED();
 }
@@ -543,8 +543,8 @@ br_uint_8* BlockWriteSetup(void* base, int block_size, int block_stride, int blo
 // IDA: int __usercall DfBlockWriteText@<EAX>(br_datafile *df@<EAX>, void *base@<EDX>, int block_size@<EBX>, int block_stride@<ECX>, int block_count, int size)
 int DfBlockWriteText(br_datafile* df, void* base, int block_size, int block_stride, int block_count, int size) {
     int i;
-    br_uint_8 *cp;
-    br_uint_8 *block;
+    br_uint_8* cp;
+    br_uint_8* block;
     int count;
     LOG_TRACE("(%p, %p, %d, %d, %d, %d)", df, base, block_size, block_stride, block_count, size);
     NOT_IMPLEMENTED();
@@ -552,8 +552,8 @@ int DfBlockWriteText(br_datafile* df, void* base, int block_size, int block_stri
 
 // IDA: void* __usercall DfBlockReadText@<EAX>(br_datafile *df@<EAX>, void *base@<EDX>, int *count@<EBX>, int size@<ECX>, int mtype)
 void* DfBlockReadText(br_datafile* df, void* base, int* count, int size, int mtype) {
-    char *id;
-    char *data;
+    char* id;
+    char* data;
     int l;
     int s;
     int a;
@@ -567,7 +567,7 @@ int DfBlockWriteBinary(br_datafile* df, void* base, int block_size, int block_st
     int count;
     br_uint_32 l;
     br_uint_32 s;
-    void *block;
+    void* block;
     LOG_TRACE("(%p, %p, %d, %d, %d, %d)", df, base, block_size, block_stride, block_count, size);
     NOT_IMPLEMENTED();
 }
@@ -612,8 +612,8 @@ int DfBlockSizeBinary(br_datafile* df, void* base, int block_size, int block_str
 
 // IDA: char* __usercall DfNameReadText@<EAX>(br_datafile *df@<EAX>, char *name@<EDX>)
 char* DfNameReadText(br_datafile* df, char* name) {
-    char *id;
-    char *data;
+    char* id;
+    char* data;
     LOG_TRACE("(%p, \"%s\")", df, name);
     NOT_IMPLEMENTED();
 }
@@ -664,8 +664,8 @@ int DfNameSizeBinary(br_datafile* df, char* name) {
 
 // IDA: int __usercall DfSkipText@<EAX>(br_datafile *df@<EAX>, br_uint_32 length@<EDX>)
 int DfSkipText(br_datafile* df, br_uint_32 length) {
-    char *id;
-    char *data;
+    char* id;
+    char* data;
     LOG_TRACE("(%p, %d)", df, length);
     NOT_IMPLEMENTED();
 }

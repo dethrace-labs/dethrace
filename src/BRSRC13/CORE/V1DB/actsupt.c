@@ -13,8 +13,8 @@ char rscid[53];
 
 // IDA: br_uint_32 __cdecl BrActorEnum(br_actor *parent, br_actor_enum_cbfn *callback, void *arg)
 br_uint_32 BrActorEnum(br_actor* parent, br_actor_enum_cbfn* callback, void* arg) {
-    br_actor *a;
-    br_actor *next;
+    br_actor* a;
+    br_actor* next;
     br_uint_32 r;
     LOG_TRACE("(%p, %p, %p)", parent, callback, arg);
     NOT_IMPLEMENTED();
@@ -22,8 +22,8 @@ br_uint_32 BrActorEnum(br_actor* parent, br_actor_enum_cbfn* callback, void* arg
 
 // IDA: br_uint_32 __cdecl BrActorSearchMany(br_actor *root, char *pattern, br_actor **actors, int max)
 br_uint_32 BrActorSearchMany(br_actor* root, char* pattern, br_actor** actors, int max) {
-    br_actor *a;
-    char *sub;
+    br_actor* a;
+    char* sub;
     int n;
     int remaining;
     LOG_TRACE("(%p, \"%s\", %p, %d)", root, pattern, actors, max);
@@ -32,7 +32,7 @@ br_uint_32 BrActorSearchMany(br_actor* root, char* pattern, br_actor** actors, i
 
 // IDA: br_actor* __cdecl BrActorSearch(br_actor *root, char *pattern)
 br_actor* BrActorSearch(br_actor* root, char* pattern) {
-    br_actor *a;
+    br_actor* a;
     LOG_TRACE("(%p, \"%s\")", root, pattern);
     NOT_IMPLEMENTED();
 }
@@ -74,7 +74,7 @@ br_actor* BrActorAdd(br_actor* parent, br_actor* a) {
 
 // IDA: br_actor* __cdecl BrActorRemove(br_actor *a)
 br_actor* BrActorRemove(br_actor* a) {
-    br_actor *ac;
+    br_actor* ac;
     LOG_TRACE("(%p)", a);
     NOT_IMPLEMENTED();
 }
@@ -192,7 +192,7 @@ void Matrix4PerspectiveNew(br_matrix4* mat, br_angle field_of_view, br_scalar as
 
 // IDA: br_token __usercall CameraToScreenMatrix4@<EAX>(br_matrix4 *mat@<EAX>, br_actor *camera@<EDX>)
 br_token CameraToScreenMatrix4(br_matrix4* mat, br_actor* camera) {
-    br_camera *camera_type;
+    br_camera* camera_type;
     br_matrix34 mat34;
     LOG_TRACE("(%p, %p)", mat, camera);
     NOT_IMPLEMENTED();
@@ -228,7 +228,7 @@ void BrMatrix34ApplyBounds(br_bounds* d, br_bounds* s, br_matrix34* m) {
 
 // IDA: void __usercall ActorToBounds(br_bounds *dest@<EAX>, br_actor *ap@<EDX>, br_model *model@<EBX>)
 void ActorToBounds(br_bounds* dest, br_actor* ap, br_model* model) {
-    br_actor *a;
+    br_actor* a;
     br_bounds new;
     br_matrix34 m2v;
     int i;
@@ -239,8 +239,8 @@ void ActorToBounds(br_bounds* dest, br_actor* ap, br_model* model) {
 // IDA: br_bounds* __cdecl BrActorToBounds(br_bounds *b, br_actor *ap)
 br_bounds* BrActorToBounds(br_bounds* b, br_actor* ap) {
     br_matrix34 m2v;
-    br_model *model;
-    br_actor *a;
+    br_model* model;
+    br_actor* a;
     LOG_TRACE("(%p, %p)", b, ap);
     NOT_IMPLEMENTED();
 }

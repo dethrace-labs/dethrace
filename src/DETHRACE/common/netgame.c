@@ -15,9 +15,9 @@ int gIt_or_fox;
 
 // IDA: void __usercall SendCarData(tU32 pNext_frame_time@<EAX>)
 void SendCarData(tU32 pNext_frame_time) {
-    tNet_contents *contents;
-    tCar_spec *car;
-    tCollision_info *ncar;
+    tNet_contents* contents;
+    tCar_spec* car;
+    tCollision_info* ncar;
     int i;
     int j;
     static tU32 last_time;
@@ -44,14 +44,14 @@ void CopyMechanics(tCar_spec* pCar, tNet_contents* pContents) {
 // IDA: void __usercall ReceivedMechanics(tNet_contents *pContents@<EAX>)
 void ReceivedMechanics(tNet_contents* pContents) {
     int i;
-    tCar_spec *car;
+    tCar_spec* car;
     LOG_TRACE("(%p)", pContents);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall ReceivedCopInfo(tNet_contents *pContents@<EAX>)
 void ReceivedCopInfo(tNet_contents* pContents) {
-    tCar_spec *c;
+    tCar_spec* c;
     int i;
     LOG_TRACE("(%p)", pContents);
     NOT_IMPLEMENTED();
@@ -60,36 +60,36 @@ void ReceivedCopInfo(tNet_contents* pContents) {
 // IDA: void __cdecl SendAllNonCarPositions()
 void SendAllNonCarPositions() {
     int i;
-    br_actor **list;
-    tNon_car_spec *non_car;
-    tNet_contents *contents;
+    br_actor** list;
+    tNon_car_spec* non_car;
+    tNet_contents* contents;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall ReceivedNonCarPosition(tNet_contents *pContents@<EAX>)
 void ReceivedNonCarPosition(tNet_contents* pContents) {
-    br_actor *actor;
+    br_actor* actor;
     LOG_TRACE("(%p)", pContents);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall ReceivedNonCar(tNet_contents *pContents@<EAX>)
 void ReceivedNonCar(tNet_contents* pContents) {
-    br_actor *actor;
+    br_actor* actor;
     br_vector3 tv;
     tU8 cx;
     tU8 cz;
-    tTrack_spec *track_spec;
-    tNon_car_spec *ncar;
-    tCollision_info *c;
+    tTrack_spec* track_spec;
+    tNon_car_spec* ncar;
+    tCollision_info* c;
     LOG_TRACE("(%p)", pContents);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall SignalToStartRace2(int pIndex@<EAX>)
 void SignalToStartRace2(int pIndex) {
-    tNet_message *the_message;
+    tNet_message* the_message;
     int i;
     int j;
     LOG_TRACE("(%d)", pIndex);
@@ -122,8 +122,8 @@ void ReinitialiseCar(tCar_spec* pCar) {
 
 // IDA: void __usercall RepositionPlayer(int pIndex@<EAX>)
 void RepositionPlayer(int pIndex) {
-    tNet_message *the_message;
-    tCar_spec *car;
+    tNet_message* the_message;
+    tCar_spec* car;
     LOG_TRACE("(%d)", pIndex);
     NOT_IMPLEMENTED();
 }
@@ -207,7 +207,7 @@ void DisposeNetHeadups() {
 
 // IDA: void __cdecl EverybodysLost()
 void EverybodysLost() {
-    tNet_message *the_message;
+    tNet_message* the_message;
     int i;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
@@ -215,7 +215,7 @@ void EverybodysLost() {
 
 // IDA: void __usercall DeclareWinner(int pWinner_index@<EAX>)
 void DeclareWinner(int pWinner_index) {
-    tNet_message *the_message;
+    tNet_message* the_message;
     int i;
     int j;
     int best_score_index;
@@ -271,18 +271,18 @@ void CalcPlayerScores() {
     int lowest_score;
     int player_left;
     int new_choice;
-    tCar_spec *car;
-    tNet_message *message;
+    tCar_spec* car;
+    tNet_message* message;
     tS32 time;
     char s[256];
-    tNet_game_player_info *lowest_score_player;
+    tNet_game_player_info* lowest_score_player;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl SendPlayerScores()
 void SendPlayerScores() {
-    tNet_contents *the_contents;
+    tNet_contents* the_contents;
     int i;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
@@ -357,8 +357,8 @@ void UpdateEnvironments() {
 void ReceivedGameplay(tNet_contents* pContents, tNet_message* pMessage, tU32 pReceive_time) {
     int must_revert_reentrancy;
     int gPixel_buffer_size;
-    char *gPixels_copy;
-    char *gPalette_copy;
+    char* gPixels_copy;
+    char* gPalette_copy;
     static int pause_semaphore;
     LOG_TRACE("(%p, %p, %d)", pContents, pMessage, pReceive_time);
     NOT_IMPLEMENTED();
@@ -366,21 +366,21 @@ void ReceivedGameplay(tNet_contents* pContents, tNet_message* pMessage, tU32 pRe
 
 // IDA: void __usercall SendGameplay(tPlayer_ID pPlayer@<EAX>, tNet_gameplay_mess pMess@<EDX>, int pParam_1@<EBX>, int pParam_2@<ECX>, int pParam_3, int pParam_4)
 void SendGameplay(tPlayer_ID pPlayer, tNet_gameplay_mess pMess, int pParam_1, int pParam_2, int pParam_3, int pParam_4) {
-    tNet_message *the_message;
+    tNet_message* the_message;
     LOG_TRACE("(%d, %d, %d, %d, %d, %d)", pPlayer, pMess, pParam_1, pParam_2, pParam_3, pParam_4);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall SendGameplayToAllPlayers(tNet_gameplay_mess pMess@<EAX>, int pParam_1@<EDX>, int pParam_2@<EBX>, int pParam_3@<ECX>, int pParam_4)
 void SendGameplayToAllPlayers(tNet_gameplay_mess pMess, int pParam_1, int pParam_2, int pParam_3, int pParam_4) {
-    tNet_message *the_message;
+    tNet_message* the_message;
     LOG_TRACE("(%d, %d, %d, %d, %d)", pMess, pParam_1, pParam_2, pParam_3, pParam_4);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall SendGameplayToHost(tNet_gameplay_mess pMess@<EAX>, int pParam_1@<EDX>, int pParam_2@<EBX>, int pParam_3@<ECX>, int pParam_4)
 void SendGameplayToHost(tNet_gameplay_mess pMess, int pParam_1, int pParam_2, int pParam_3, int pParam_4) {
-    tNet_message *the_message;
+    tNet_message* the_message;
     LOG_TRACE("(%d, %d, %d, %d, %d)", pMess, pParam_1, pParam_2, pParam_3, pParam_4);
     NOT_IMPLEMENTED();
 }
@@ -398,14 +398,14 @@ void DefaultNetName() {
 
 // IDA: void __usercall NetSendPointCrush(tCar_spec *pCar@<EAX>, tU16 pCrush_point_index@<EDX>, br_vector3 *pEnergy_vector@<EBX>)
 void NetSendPointCrush(tCar_spec* pCar, tU16 pCrush_point_index, br_vector3* pEnergy_vector) {
-    tNet_contents *contents;
+    tNet_contents* contents;
     LOG_TRACE("(%p, %d, %p)", pCar, pCrush_point_index, pEnergy_vector);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall RecievedCrushPoint(tNet_contents *pContents@<EAX>)
 void RecievedCrushPoint(tNet_contents* pContents) {
-    tCar_spec *car;
+    tCar_spec* car;
     LOG_TRACE("(%p)", pContents);
     NOT_IMPLEMENTED();
 }

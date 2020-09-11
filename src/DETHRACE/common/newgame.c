@@ -138,8 +138,8 @@ void DrawGames(int pCurrent_choice, int pCurrent_mode) {
     int x_coord;
     int y_coord;
     char s[256];
-    char *s2;
-    char *s3;
+    char* s2;
+    char* s3;
     LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
@@ -326,7 +326,7 @@ int NetRadioClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int p
 // IDA: void __cdecl RevertToDefaults()
 void RevertToDefaults() {
     tPath_name the_path;
-    FILE *f;
+    FILE* f;
     tNet_game_options net_options;
     int i;
     LOG_TRACE("()");
@@ -420,7 +420,7 @@ void EraseAGraphBox(int pIndex) {
 // IDA: void __usercall DrawNetChoose(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
 void DrawNetChoose(int pCurrent_choice, int pCurrent_mode) {
     char s[256];
-    tU32 *k;
+    tU32* k;
     int i;
     LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
@@ -470,7 +470,7 @@ void SetUpOtherNetThings(tNet_game_details* pNet_game) {
 
 // IDA: void __usercall RequestCarDetails(tNet_game_details *pNet_game@<EAX>)
 void RequestCarDetails(tNet_game_details* pNet_game) {
-    tNet_message *message;
+    tNet_message* message;
     LOG_TRACE("(%p)", pNet_game);
     NOT_IMPLEMENTED();
 }
@@ -524,9 +524,9 @@ void DisposeNetStorageSpace() {
 // IDA: int __cdecl DoMultiPlayerStart()
 int DoMultiPlayerStart() {
     tJoin_or_host_result result;
-    tNet_game_details *game_to_join;
+    tNet_game_details* game_to_join;
     char s[256];
-    char *s2;
+    char* s2;
     tNet_game_type new_game_type;
     tNet_game_options new_game_options;
     int start_rank;

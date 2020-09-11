@@ -66,7 +66,7 @@ br_pixelmap* BrPixelmapMatch(br_pixelmap* src, br_uint_8 match_type) {
 
 // IDA: br_pixelmap* __cdecl BrPixelmapMatchSized(br_pixelmap *src, br_uint_8 match_type, br_int_32 width, br_int_32 height)
 br_pixelmap* BrPixelmapMatchSized(br_pixelmap* src, br_uint_8 match_type, br_int_32 width, br_int_32 height) {
-    br_pixelmap *new;
+    br_pixelmap* new;
     br_token_value tv[5];
     LOG_TRACE("(%p, %d, %d, %d)", src, match_type, width, height);
     NOT_IMPLEMENTED();
@@ -74,7 +74,7 @@ br_pixelmap* BrPixelmapMatchSized(br_pixelmap* src, br_uint_8 match_type, br_int
 
 // IDA: br_pixelmap* __cdecl BrPixelmapMatchTyped(br_pixelmap *src, br_uint_8 match_type, br_uint_8 pixelmap_type)
 br_pixelmap* BrPixelmapMatchTyped(br_pixelmap* src, br_uint_8 match_type, br_uint_8 pixelmap_type) {
-    br_pixelmap *new;
+    br_pixelmap* new;
     br_token_value tv[4];
     LOG_TRACE("(%p, %d, %d)", src, match_type, pixelmap_type);
     NOT_IMPLEMENTED();
@@ -82,7 +82,7 @@ br_pixelmap* BrPixelmapMatchTyped(br_pixelmap* src, br_uint_8 match_type, br_uin
 
 // IDA: br_pixelmap* __cdecl BrPixelmapMatchTypedSized(br_pixelmap *src, br_uint_8 match_type, br_uint_8 pixelmap_type, br_int_32 width, br_int_32 height)
 br_pixelmap* BrPixelmapMatchTypedSized(br_pixelmap* src, br_uint_8 match_type, br_uint_8 pixelmap_type, br_int_32 width, br_int_32 height) {
-    br_pixelmap *new;
+    br_pixelmap* new;
     br_token_value tv[6];
     LOG_TRACE("(%p, %d, %d, %d, %d)", src, match_type, pixelmap_type, width, height);
     NOT_IMPLEMENTED();
@@ -90,7 +90,7 @@ br_pixelmap* BrPixelmapMatchTypedSized(br_pixelmap* src, br_uint_8 match_type, b
 
 // IDA: br_pixelmap* __cdecl BrPixelmapClone(br_pixelmap *src)
 br_pixelmap* BrPixelmapClone(br_pixelmap* src) {
-    br_pixelmap *new;
+    br_pixelmap* new;
     br_token_value tv[2];
     LOG_TRACE("(%p)", src);
     NOT_IMPLEMENTED();
@@ -264,7 +264,7 @@ void BrPixelmapText(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_uint_32 colou
 
 // IDA: void __cdecl BrPixelmapTextF(br_pixelmap *dst, br_int_32 x, br_int_32 y, br_uint_32 colour, br_font *font, char *fmt, ...)
 void BrPixelmapTextF(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_uint_32 colour, br_font* font, char* fmt, ...) {
-    char *ss;
+    char* ss;
     br_point p;
     va_list args;
     LOG_TRACE("(%p, %d, %d, %d, %p, \"%s\")", dst, x, y, colour, font, fmt);
@@ -320,14 +320,14 @@ void BrPixelmapPaletteSet(br_pixelmap* pm, br_pixelmap* pal) {
 
 // IDA: void __cdecl BrPixelmapPaletteEntrySet(br_pixelmap *pm, br_int_32 index, br_colour colour)
 void BrPixelmapPaletteEntrySet(br_pixelmap* pm, br_int_32 index, br_colour colour) {
-    br_device_clut *clut;
+    br_device_clut* clut;
     LOG_TRACE("(%p, %d, %d)", pm, index, colour);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl BrPixelmapPaletteEntrySetMany(br_pixelmap *pm, br_int_32 index, br_int_32 ncolours, br_colour *colours)
 void BrPixelmapPaletteEntrySetMany(br_pixelmap* pm, br_int_32 index, br_int_32 ncolours, br_colour* colours) {
-    br_device_clut *clut;
+    br_device_clut* clut;
     LOG_TRACE("(%p, %d, %d, %p)", pm, index, ncolours, colours);
     NOT_IMPLEMENTED();
 }

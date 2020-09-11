@@ -326,7 +326,7 @@ void EndRollingLetters() {
 
 // IDA: int __usercall AddRollingLetter@<EAX>(char pChar@<EAX>, int pX@<EDX>, int pY@<EBX>, tRolling_type rolling_type@<ECX>)
 int AddRollingLetter(char pChar, int pX, int pY, tRolling_type rolling_type) {
-    tRolling_letter *let;
+    tRolling_letter* let;
     int i;
     int number_of_letters;
     LOG_TRACE("(%d, %d, %d, %d)", pChar, pX, pY, rolling_type);
@@ -351,7 +351,7 @@ void AddRollingNumber(tU32 pNumber, int pWidth, int pX, int pY) {
 void RollLettersIn() {
     tU32 new_time;
     tU32 period;
-    tRolling_letter *let;
+    tRolling_letter* let;
     int i;
     int j;
     int k;
@@ -361,9 +361,9 @@ void RollLettersIn() {
     int letter_offset;
     int font_height;
     int the_row_bytes;
-    tU8 *char_ptr;
-    tU8 *saved_char_ptr;
-    tU8 *source_ptr;
+    tU8* char_ptr;
+    tU8* saved_char_ptr;
+    tU8* source_ptr;
     tU8 the_byte;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
@@ -375,7 +375,7 @@ int ChangeCharTo(int pSlot_index, int pChar_index, char pNew_char) {
     int y_coord;
     int i;
     int j;
-    tRolling_letter *let;
+    tRolling_letter* let;
     tRolling_type new_type;
     LOG_TRACE("(%d, %d, %d)", pSlot_index, pChar_index, pNew_char);
     NOT_IMPLEMENTED();
@@ -388,7 +388,7 @@ void ChangeTextTo(int pXcoord, int pYcoord, char* pNew_str, char* pOld_str) {
     int len;
     int len2;
     int j;
-    tRolling_letter *let;
+    tRolling_letter* let;
     tRolling_type new_type;
     char new_char;
     LOG_TRACE("(%d, %d, \"%s\", \"%s\")", pXcoord, pYcoord, pNew_str, pOld_str);
@@ -494,7 +494,7 @@ void KillCursor(int pSlot_index) {
     int y_coord;
     int i;
     int j;
-    tRolling_letter *let;
+    tRolling_letter* let;
     tRolling_type new_type;
     LOG_TRACE("(%d)", pSlot_index);
     NOT_IMPLEMENTED();

@@ -16,7 +16,7 @@ br_error BrBegin() {
 
 // IDA: br_error __cdecl BrEnd()
 br_error BrEnd() {
-    br_device *dev;
+    br_device* dev;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

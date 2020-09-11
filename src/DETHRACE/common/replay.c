@@ -94,9 +94,9 @@ void DoActionReplayHeadups() {
 
 // IDA: void __usercall MoveReplayBuffer(tS32 pMove_amount@<EAX>)
 void MoveReplayBuffer(tS32 pMove_amount) {
-    tU8 *play_ptr;
-    tU8 *old_play_ptr;
-    tU8 *old_play_ptr2;
+    tU8* play_ptr;
+    tU8* old_play_ptr;
+    tU8* old_play_ptr2;
     int i;
     int a;
     tU32 old_time;
@@ -133,7 +133,7 @@ void ReverseSound(tS3_effect_tag pEffect_index, tS3_sound_tag pSound_tag) {
 // IDA: int __cdecl FindUniqueFile()
 int FindUniqueFile() {
     int index;
-    FILE *f;
+    FILE* f;
     tPath_name the_path;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
@@ -178,7 +178,7 @@ void DoActionReplay(tU32 pFrame_period) {
 
 // IDA: void __cdecl SynchronizeActionReplay()
 void SynchronizeActionReplay() {
-    FILE *f;
+    FILE* f;
     tPath_name the_path;
     static tU32 gLast_synch_time;
     LOG_TRACE("()");

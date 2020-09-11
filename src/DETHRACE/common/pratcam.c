@@ -44,8 +44,8 @@ void TogglePratcam() {
 
 // IDA: void __usercall LoadPratcam(char *pFolder_name@<EAX>)
 void LoadPratcam(char* pFolder_name) {
-    FILE *f;
-    FILE *g;
+    FILE* f;
+    FILE* g;
     tPath_name the_path;
     int i;
     int j;
@@ -53,7 +53,7 @@ void LoadPratcam(char* pFolder_name) {
     int l;
     char s[256];
     char folder_path[256];
-    char *str;
+    char* str;
     char num_str[256];
     LOG_TRACE("(\"%s\")", pFolder_name);
     NOT_IMPLEMENTED();
@@ -64,7 +64,7 @@ void NextPratcamChunk() {
     int i;
     int random_number;
     int count;
-    tPrat_alternative *current_alternative;
+    tPrat_alternative* current_alternative;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -115,7 +115,7 @@ int HighResPratBufferHeight() {
 
 // IDA: void __cdecl InitPratcam()
 void InitPratcam() {
-    void *the_pixels;
+    void* the_pixels;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -140,9 +140,9 @@ void DoPratcam(tU32 pThe_time) {
     int right_hand;
     tU32 time_diff;
     tU32 old_last_time;
-    br_pixelmap *the_image;
-    br_pixelmap *left_image;
-    br_pixelmap *right_image;
+    br_pixelmap* the_image;
+    br_pixelmap* left_image;
+    br_pixelmap* right_image;
     LOG_TRACE("(%d)", pThe_time);
     NOT_IMPLEMENTED();
 }

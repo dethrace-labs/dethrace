@@ -37,18 +37,18 @@ br_error BrDevBegin(br_pixelmap** ppm, char* setup_string) {
 // IDA: br_error __cdecl BrDevBeginTV(br_pixelmap **ppm, char *setup_string, br_token_value *setup_tv)
 br_error BrDevBeginTV(br_pixelmap** ppm, char* setup_string, br_token_value* setup_tv) {
     char str[512];
-    char *args;
-    char *devname;
-    char *devargs;
+    char* args;
+    char* devname;
+    char* devargs;
     char devices_str[512];
-    char *device_name;
-    char *device_args;
-    char *next_device;
+    char* device_name;
+    char* device_args;
+    char* next_device;
     br_token_value args_tv[64];
-    br_token_value *tv;
-    br_output_facility *output_facility;
-    br_device *device;
-    br_pixelmap *screen;
+    br_token_value* tv;
+    br_output_facility* output_facility;
+    br_device* device;
+    br_pixelmap* screen;
     int i;
     int n;
     br_error r;
@@ -58,7 +58,7 @@ br_error BrDevBeginTV(br_pixelmap** ppm, char* setup_string, br_token_value* set
 
 // IDA: br_pixelmap* __cdecl BrDevBeginOld(char *setup_string)
 br_pixelmap* BrDevBeginOld(char* setup_string) {
-    br_pixelmap *s;
+    br_pixelmap* s;
     LOG_TRACE("(\"%s\")", setup_string);
     NOT_IMPLEMENTED();
 }
@@ -81,9 +81,9 @@ void BrDevPaletteSetEntryOld(int i, br_colour colour) {
 
 // IDA: br_error __cdecl BrRendererFacilityFind(br_renderer_facility **prf, br_device_pixelmap *destination, br_token scalar_type)
 br_error BrRendererFacilityFind(br_renderer_facility** prf, br_device_pixelmap* destination, br_token scalar_type) {
-    br_renderer_facility *renderer_facility;
+    br_renderer_facility* renderer_facility;
     br_error r;
-    br_output_facility *ot;
+    br_output_facility* ot;
     char object_name[23];
     char image_name[9];
     br_boolean scalar_is_valid;
@@ -93,9 +93,9 @@ br_error BrRendererFacilityFind(br_renderer_facility** prf, br_device_pixelmap* 
 
 // IDA: br_error __cdecl BrPrimitiveLibraryFind(br_primitive_library **ppl, br_device_pixelmap *destination, br_token scalar_type)
 br_error BrPrimitiveLibraryFind(br_primitive_library** ppl, br_device_pixelmap* destination, br_token scalar_type) {
-    br_primitive_library *primitive_library;
+    br_primitive_library* primitive_library;
     br_error r;
-    br_output_facility *ot;
+    br_output_facility* ot;
     char object_name[25];
     char image_name[9];
     br_boolean scalar_is_valid;
@@ -106,7 +106,7 @@ br_error BrPrimitiveLibraryFind(br_primitive_library** ppl, br_device_pixelmap* 
 // IDA: br_error __cdecl BrGeometryFormatFind(br_geometry **pgf, br_renderer *renderer, br_renderer_facility *renderer_facility, br_token scalar_type, br_token format_type)
 br_error BrGeometryFormatFind(br_geometry** pgf, br_renderer* renderer, br_renderer_facility* renderer_facility, br_token scalar_type, br_token format_type) {
     br_error r;
-    br_geometry *gf;
+    br_geometry* gf;
     char object_name[21];
     char image_name[9];
     br_boolean scalar_is_valid;

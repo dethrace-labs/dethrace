@@ -37,7 +37,7 @@ br_scalar Vector2Cross(br_vector2* pA, br_vector2* pB) {
 
 // IDA: tFollow_path_result __usercall EndOfPath@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>)
 tFollow_path_result EndOfPath(tOpponent_spec* pOpponent_spec) {
-    tCar_spec *car_spec;
+    tCar_spec* car_spec;
     LOG_TRACE("(%p)", pOpponent_spec);
     NOT_IMPLEMENTED();
 }
@@ -66,10 +66,10 @@ int GetStraight(br_vector2* pStart, br_vector2* pFinish, br_scalar* pWidth, int 
 // IDA: tFollow_path_result __usercall ProcessFollowPath@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, tProcess_objective_command pCommand@<EDX>, int pPursuit_mode@<EBX>, int pIgnore_end@<ECX>, int pNever_struggle)
 tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand, int pPursuit_mode, int pIgnore_end, int pNever_struggle) {
     tS16 real_section_no;
-    tFollow_path_data *data;
+    tFollow_path_data* data;
     br_vector3 wank;
     br_vector3 wank2;
-    br_vector3 *not_our_dir;
+    br_vector3* not_our_dir;
     br_vector3 section_dir;
     br_vector3 section_v;
     br_vector3 start;
@@ -80,7 +80,7 @@ tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_o
     br_vector3 a;
     br_vector3 p;
     br_vector3 car_to_end;
-    br_actor *car_master_actor;
+    br_actor* car_master_actor;
     br_scalar stopped_speed;
     br_scalar dist_to_end;
     br_scalar t;
@@ -104,7 +104,7 @@ tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_o
     br_scalar dot_a;
     br_scalar dot_d;
     br_scalar further_along;
-    tCar_spec *car_spec;
+    tCar_spec* car_spec;
     int engine_damage;
     int trans_damage;
     int section_no;
@@ -151,14 +151,14 @@ tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_o
 
 // IDA: tFollow_path_result __usercall FollowCheatyPath@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>)
 tFollow_path_result FollowCheatyPath(tOpponent_spec* pOpponent_spec) {
-    tFollow_path_data *data;
+    tFollow_path_data* data;
     br_vector3 a;
     br_vector3 p;
     br_vector3 section_v;
     br_vector3 car_to_end;
     br_vector3 car_to_intersect;
-    br_vector3 *start;
-    br_vector3 *finish;
+    br_vector3* start;
+    br_vector3* finish;
     br_scalar t;
     br_scalar frame_period_in_secs;
     br_scalar distance_left;

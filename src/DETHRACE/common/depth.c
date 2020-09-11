@@ -71,7 +71,7 @@ void FogAccordingToGPSCDE(br_material* pMaterial) {
 // IDA: void __cdecl FrobFog()
 void FrobFog() {
     int i;
-    br_material *mat;
+    br_material* mat;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -99,7 +99,7 @@ br_scalar EdgeU(br_angle pSky, br_angle pView, br_angle pPerfect) {
 
 // IDA: void __usercall MungeSkyModel(br_actor *pCamera@<EAX>, br_model *pModel@<EDX>)
 void MungeSkyModel(br_actor* pCamera, br_model* pModel) {
-    br_camera *camera_data;
+    br_camera* camera_data;
     br_scalar horizon_half_height;
     br_scalar horizon_half_width;
     br_scalar horizon_half_diag;
@@ -126,7 +126,7 @@ br_model* CreateHorizonModel(br_actor* pCamera) {
     tU8 band;
     tU8 vertex;
     tU8 stripe;
-    br_model *model;
+    br_model* model;
     LOG_TRACE("(%p)", pCamera);
     NOT_IMPLEMENTED();
 }
@@ -150,9 +150,9 @@ void InitDepthEffects() {
 
 // IDA: void __usercall DoDepthByShadeTable(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_pixelmap *pShade_table@<EBX>, int pShade_table_power@<ECX>, int pStart, int pEnd)
 void DoDepthByShadeTable(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_pixelmap* pShade_table, int pShade_table_power, int pStart, int pEnd) {
-    tU8 *render_ptr;
-    tU8 *shade_table_pixels;
-    tU16 *depth_ptr;
+    tU8* render_ptr;
+    tU8* shade_table_pixels;
+    tU16* depth_ptr;
     tU16 depth_value;
     tU16 too_near;
     int depth_shift_amount;
@@ -177,7 +177,7 @@ void ExternalSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_act
     br_angle hori_sky;
     br_angle pitch;
     br_angle vert_sky;
-    br_camera *camera;
+    br_camera* camera;
     br_scalar tan_half_fov;
     br_scalar tan_half_hori_fov;
     br_scalar tan_half_hori_sky;
@@ -187,7 +187,7 @@ void ExternalSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_act
     tU8 bot_col;
     int bot_height;
     int repetitions;
-    br_pixelmap *col_map;
+    br_pixelmap* col_map;
     LOG_TRACE("(%p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world);
     NOT_IMPLEMENTED();
 }
@@ -195,7 +195,7 @@ void ExternalSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_act
 // IDA: void __usercall DoHorizon(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>)
 void DoHorizon(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world) {
     br_angle yaw;
-    br_actor *actor;
+    br_actor* actor;
     LOG_TRACE("(%p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world);
     NOT_IMPLEMENTED();
 }
@@ -310,7 +310,7 @@ void MoreDepthFactor2() {
 
 // IDA: void __cdecl AssertYons()
 void AssertYons() {
-    br_camera *camera_ptr;
+    br_camera* camera_ptr;
     int i;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
@@ -318,7 +318,7 @@ void AssertYons() {
 
 // IDA: void __cdecl IncreaseYon()
 void IncreaseYon() {
-    br_camera *camera_ptr;
+    br_camera* camera_ptr;
     int i;
     char s[256];
     LOG_TRACE("()");
@@ -327,7 +327,7 @@ void IncreaseYon() {
 
 // IDA: void __cdecl DecreaseYon()
 void DecreaseYon() {
-    br_camera *camera_ptr;
+    br_camera* camera_ptr;
     int i;
     char s[256];
     LOG_TRACE("()");
@@ -362,7 +362,7 @@ br_scalar GetYon() {
 
 // IDA: void __cdecl IncreaseAngle()
 void IncreaseAngle() {
-    br_camera *camera_ptr;
+    br_camera* camera_ptr;
     int i;
     char s[256];
     LOG_TRACE("()");
@@ -371,7 +371,7 @@ void IncreaseAngle() {
 
 // IDA: void __cdecl DecreaseAngle()
 void DecreaseAngle() {
-    br_camera *camera_ptr;
+    br_camera* camera_ptr;
     int i;
     char s[256];
     LOG_TRACE("()");
@@ -413,7 +413,7 @@ void SetSkyTextureOn(int pOn) {
 
 // IDA: void __cdecl ToggleSkyQuietly()
 void ToggleSkyQuietly() {
-    br_pixelmap *temp;
+    br_pixelmap* temp;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -466,7 +466,7 @@ void ChangeDepthEffect() {
     br_scalar z1;
     br_scalar z2;
     br_scalar distance;
-    tSpecial_volume *special_volume;
+    tSpecial_volume* special_volume;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

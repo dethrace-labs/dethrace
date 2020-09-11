@@ -440,16 +440,16 @@ int SuggestRace() {
 
 // IDA: void __usercall SelectRaceDraw(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
 void SelectRaceDraw(int pCurrent_choice, int pCurrent_mode) {
-    tOpponent *the_opponent;
-    tText_chunk *the_chunk;
+    tOpponent* the_opponent;
+    tText_chunk* the_chunk;
     int j;
     int k;
     int y_coord;
     char s[256];
     char temp_str[256];
-    char *sub_pt;
+    char* sub_pt;
     char sub_str[16];
-    tU32 *test;
+    tU32* test;
     static tU32 test2;
     LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
@@ -490,9 +490,9 @@ void DrawGrid(int pOffset, int pDraw_it) {
     int swap_1_y;
     int swap_2_x;
     int swap_2_y;
-    br_pixelmap *the_image;
-    br_pixelmap *swap_1_image;
-    br_pixelmap *swap_2_image;
+    br_pixelmap* the_image;
+    br_pixelmap* swap_1_image;
+    br_pixelmap* swap_2_image;
     char numbers_str[4][100];
     char total_str[256];
     tU32 the_time;
@@ -539,12 +539,12 @@ void DoGridTransition(int pFirst_index, int pSecond_index) {
 
 // IDA: void __cdecl ChallengeStart()
 void ChallengeStart() {
-    br_pixelmap *the_map;
+    br_pixelmap* the_map;
     int i;
     int j;
     int line_count;
     int dare_index;
-    FILE *f;
+    FILE* f;
     tPath_name the_path;
     char s[256];
     LOG_TRACE("()");
@@ -671,7 +671,7 @@ tSO_result DoGridPosition() {
 void CheckPlayersAreResponding() {
     int i;
     tU32 time;
-    tNet_message *message;
+    tNet_message* message;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

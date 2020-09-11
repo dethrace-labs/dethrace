@@ -133,8 +133,8 @@ void BuildWrecks() {
     int i;
     int position;
     int car_count;
-    br_actor *this_car;
-    tCar_spec *the_car;
+    br_actor* this_car;
+    tCar_spec* the_car;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -145,8 +145,8 @@ void DisposeWrecks() {
     int i;
     int position;
     int car_count;
-    br_actor *this_car;
-    tCar_spec *the_car;
+    br_actor* this_car;
+    tCar_spec* the_car;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -212,8 +212,8 @@ void DamageScrnDraw(int pCurrent_choice, int pCurrent_mode) {
     int rows;
     int columns;
     float spacing;
-    br_actor *sel_actor;
-    char *name;
+    br_actor* sel_actor;
+    char* name;
     LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
@@ -302,7 +302,7 @@ void SortGameScores() {
 void NetSumDraw(int pCurrent_choice, int pCurrent_mode) {
     int i;
     char s[256];
-    tNet_game_player_info *player;
+    tNet_game_player_info* player;
     LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }

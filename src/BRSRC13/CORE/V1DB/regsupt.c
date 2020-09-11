@@ -31,7 +31,7 @@ br_model* BrModelFind(char* pattern) {
 
 // IDA: br_model_find_cbfn* __cdecl BrModelFindHook(br_model_find_cbfn *hook)
 br_model_find_cbfn* BrModelFindHook(br_model_find_cbfn* hook) {
-    br_model_find_cbfn *old;
+    br_model_find_cbfn* old;
     LOG_TRACE("(%p)", hook);
     NOT_IMPLEMENTED();
 }
@@ -91,7 +91,7 @@ br_material* BrMaterialFind(char* pattern) {
 
 // IDA: br_material_find_cbfn* __cdecl BrMaterialFindHook(br_material_find_cbfn *hook)
 br_material_find_cbfn* BrMaterialFindHook(br_material_find_cbfn* hook) {
-    br_material_find_cbfn *old;
+    br_material_find_cbfn* old;
     LOG_TRACE("(%p)", hook);
     NOT_IMPLEMENTED();
 }
@@ -159,7 +159,7 @@ br_pixelmap* BrMapFind(char* pattern) {
 
 // IDA: br_map_find_cbfn* __cdecl BrMapFindHook(br_map_find_cbfn *hook)
 br_map_find_cbfn* BrMapFindHook(br_map_find_cbfn* hook) {
-    br_map_find_cbfn *old;
+    br_map_find_cbfn* old;
     LOG_TRACE("(%p)", hook);
     NOT_IMPLEMENTED();
 }
@@ -225,7 +225,7 @@ br_pixelmap* BrTableFind(char* pattern) {
 
 // IDA: br_table_find_cbfn* __cdecl BrTableFindHook(br_table_find_cbfn *hook)
 br_table_find_cbfn* BrTableFindHook(br_table_find_cbfn* hook) {
-    br_table_find_cbfn *old;
+    br_table_find_cbfn* old;
     LOG_TRACE("(%p)", hook);
     NOT_IMPLEMENTED();
 }

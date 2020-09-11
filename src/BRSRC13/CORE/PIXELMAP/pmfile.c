@@ -48,7 +48,7 @@ int FopWrite_PIXELMAP(br_datafile* df, br_pixelmap* pixelmap) {
 
 // IDA: int __usercall FopRead_OLD_PIXELMAP@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_OLD_PIXELMAP(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
-    br_pixelmap *pp;
+    br_pixelmap* pp;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
     NOT_IMPLEMENTED();
 }
@@ -72,7 +72,7 @@ int FopWrite_PIXELS(br_datafile* df, br_pixelmap* pixelmap) {
     int size;
     int bytes;
     int block_count;
-    char *pixels;
+    char* pixels;
     LOG_TRACE("(%p, %p)", df, pixelmap);
     NOT_IMPLEMENTED();
 }
@@ -101,8 +101,8 @@ int FopWrite_ADD_MAP(br_datafile* df) {
 
 // IDA: int __usercall FopRead_ADD_MAP@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_ADD_MAP(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
-    br_pixelmap *pp;
-    br_pixelmap *map;
+    br_pixelmap* pp;
+    br_pixelmap* map;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
     NOT_IMPLEMENTED();
 }
@@ -139,7 +139,7 @@ int WritePixelmap(br_pixelmap* pp, br_datafile* df) {
 
 // IDA: br_uint_32 __cdecl BrPixelmapSaveMany(char *filename, br_pixelmap **pixelmaps, br_uint_16 num)
 br_uint_32 BrPixelmapSaveMany(char* filename, br_pixelmap** pixelmaps, br_uint_16 num) {
-    br_datafile *df;
+    br_datafile* df;
     int i;
     LOG_TRACE("(\"%s\", %p, %d)", filename, pixelmaps, num);
     NOT_IMPLEMENTED();

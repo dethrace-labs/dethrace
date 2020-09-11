@@ -3,7 +3,7 @@
 
 // IDA: br_associative_array* __cdecl BrAssociativeArrayAllocate()
 br_associative_array* BrAssociativeArrayAllocate() {
-    br_associative_array *pArray;
+    br_associative_array* pArray;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -17,7 +17,7 @@ br_error Set_Associative_Array_Value(br_associative_array* pArray, int index, br
 // IDA: br_error __usercall BrAssociativeArraySetEntry@<EAX>(br_associative_array *pArray@<EAX>, br_token t@<EDX>, br_value v@<EBX>)
 br_error BrAssociativeArraySetEntry(br_associative_array* pArray, br_token t, br_value v) {
     br_uint_16 i;
-    br_token_value *temp;
+    br_token_value* temp;
     LOG_TRACE("(%p, %d, %d)", pArray, t, v);
     NOT_IMPLEMENTED();
 }

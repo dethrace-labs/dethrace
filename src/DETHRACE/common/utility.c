@@ -300,14 +300,14 @@ br_pixelmap* DRPixelmapAllocate(br_uint_8 pType, br_uint_16 pW, br_uint_16 pH, v
 
 // IDA: br_pixelmap* __usercall DRPixelmapAllocateSub@<EAX>(br_pixelmap *pPm@<EAX>, br_uint_16 pX@<EDX>, br_uint_16 pY@<EBX>, br_uint_16 pW@<ECX>, br_uint_16 pH)
 br_pixelmap* DRPixelmapAllocateSub(br_pixelmap* pPm, br_uint_16 pX, br_uint_16 pY, br_uint_16 pW, br_uint_16 pH) {
-    br_pixelmap *the_map;
+    br_pixelmap* the_map;
     LOG_TRACE("(%p, %d, %d, %d, %d)", pPm, pX, pY, pW, pH);
     NOT_IMPLEMENTED();
 }
 
 // IDA: br_pixelmap* __usercall DRPixelmapMatchSized@<EAX>(br_pixelmap *pSrc@<EAX>, tU8 pMatch_type@<EDX>, tS32 pWidth@<EBX>, tS32 pHeight@<ECX>)
 br_pixelmap* DRPixelmapMatchSized(br_pixelmap* pSrc, tU8 pMatch_type, tS32 pWidth, tS32 pHeight) {
-    br_pixelmap *result;
+    br_pixelmap* result;
     LOG_TRACE("(%p, %d, %d, %d)", pSrc, pMatch_type, pWidth, pHeight);
     NOT_IMPLEMENTED();
 }
@@ -316,35 +316,35 @@ br_pixelmap* DRPixelmapMatchSized(br_pixelmap* pSrc, tU8 pMatch_type, tS32 pWidt
 void CopyDoubled8BitTo16BitRectangle(br_pixelmap* pDst, br_pixelmap* pSrc, int pSrc_width, int pSrc_height, int pDst_x, int pDst_y, br_pixelmap* pPalette) {
     int x;
     int y;
-    tU8 *src_start;
-    tU16 *dst_start0;
-    tU16 *dst_start1;
-    tU16 *palette_entry;
+    tU8* src_start;
+    tU16* dst_start0;
+    tU16* dst_start1;
+    tU16* palette_entry;
     LOG_TRACE("(%p, %p, %d, %d, %d, %d, %p)", pDst, pSrc, pSrc_width, pSrc_height, pDst_x, pDst_y, pPalette);
     NOT_IMPLEMENTED();
 }
 
 // IDA: br_pixelmap* __usercall Scale8BitPixelmap@<EAX>(br_pixelmap *pSrc@<EAX>, int pWidth@<EDX>, int pHeight@<EBX>)
 br_pixelmap* Scale8BitPixelmap(br_pixelmap* pSrc, int pWidth, int pHeight) {
-    br_pixelmap *result;
+    br_pixelmap* result;
     int x;
     int y;
-    tU8 *src_pixels;
-    tU8 *dst_pixels;
+    tU8* src_pixels;
+    tU8* dst_pixels;
     LOG_TRACE("(%p, %d, %d)", pSrc, pWidth, pHeight);
     NOT_IMPLEMENTED();
 }
 
 // IDA: br_pixelmap* __usercall Tile8BitPixelmap@<EAX>(br_pixelmap *pSrc@<EAX>, int pN@<EDX>)
 br_pixelmap* Tile8BitPixelmap(br_pixelmap* pSrc, int pN) {
-    br_pixelmap *result;
+    br_pixelmap* result;
     int new_width;
     int new_height;
     int x;
     int y2;
     int y;
-    tU8 *src_pixels;
-    tU8 *dst_pixels;
+    tU8* src_pixels;
+    tU8* dst_pixels;
     LOG_TRACE("(%p, %d)", pSrc, pN);
     NOT_IMPLEMENTED();
 }
@@ -357,8 +357,8 @@ tException_list FindExceptionInList(char* pName, tException_list pList) {
 
 // IDA: br_pixelmap* __usercall PurifiedPixelmap@<EAX>(br_pixelmap *pSrc@<EAX>)
 br_pixelmap* PurifiedPixelmap(br_pixelmap* pSrc) {
-    br_pixelmap *intermediate;
-    br_pixelmap *result;
+    br_pixelmap* intermediate;
+    br_pixelmap* result;
     int new_width;
     int new_height;
     tException_list e;
@@ -478,7 +478,7 @@ float fsign(float pNumber) {
 // IDA: FILE* __usercall OpenUniqueFileB@<EAX>(char *pPrefix@<EAX>, char *pExtension@<EDX>)
 FILE* OpenUniqueFileB(char* pPrefix, char* pExtension) {
     int index;
-    FILE *f;
+    FILE* f;
     tPath_name the_path;
     LOG_TRACE("(\"%s\", \"%s\")", pPrefix, pExtension);
     NOT_IMPLEMENTED();
@@ -490,7 +490,7 @@ void PrintScreenFile(FILE* pF) {
     int j;
     int bit_map_size;
     int offset;
-    tU8 *pixel_ptr;
+    tU8* pixel_ptr;
     LOG_TRACE("(%p)", pF);
     NOT_IMPLEMENTED();
 }
@@ -501,7 +501,7 @@ void PrintScreenFile16(FILE* pF) {
     int j;
     int bit_map_size;
     int offset;
-    tU8 *pixel_ptr;
+    tU8* pixel_ptr;
     tU16 pixel;
     LOG_TRACE("(%p)", pF);
     NOT_IMPLEMENTED();
@@ -509,7 +509,7 @@ void PrintScreenFile16(FILE* pF) {
 
 // IDA: void __cdecl PrintScreen()
 void PrintScreen() {
-    FILE *f;
+    FILE* f;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -575,7 +575,7 @@ int FindBestMatch(tRGB_colour* pRGB_colour, br_pixelmap* pPalette) {
     double min_d;
     double d;
     tRGB_colour trial_RGB;
-    br_colour *dp;
+    br_colour* dp;
     LOG_TRACE("(%p, %p)", pRGB_colour, pPalette);
     NOT_IMPLEMENTED();
 }
@@ -609,13 +609,13 @@ br_pixelmap* GenerateShadeTable(int pHeight, br_pixelmap* pPalette, int pRed_mix
 
 // IDA: br_pixelmap* __usercall GenerateDarkenedShadeTable@<EAX>(int pHeight@<EAX>, br_pixelmap *pPalette@<EDX>, int pRed_mix@<EBX>, int pGreen_mix@<ECX>, int pBlue_mix, float pQuarter, float pHalf, float pThree_quarter, br_scalar pDarken)
 br_pixelmap* GenerateDarkenedShadeTable(int pHeight, br_pixelmap* pPalette, int pRed_mix, int pGreen_mix, int pBlue_mix, float pQuarter, float pHalf, float pThree_quarter, br_scalar pDarken) {
-    br_pixelmap *the_table;
+    br_pixelmap* the_table;
     tRGB_colour the_RGB;
     tRGB_colour new_RGB;
     tRGB_colour ref_col;
-    br_colour *cp;
-    char *tab_ptr;
-    char *shade_ptr;
+    br_colour* cp;
+    char* tab_ptr;
+    char* shade_ptr;
     double f_i;
     double f_total_minus_1;
     double ratio1;
@@ -653,7 +653,7 @@ void DRMatrix34TApplyP(br_vector3* pA, br_vector3* pB, br_matrix34* pC) {
 
 // IDA: tU16 __usercall PaletteEntry16Bit@<AX>(br_pixelmap *pPal@<EAX>, int pEntry@<EDX>)
 tU16 PaletteEntry16Bit(br_pixelmap* pPal, int pEntry) {
-    tU32 *src_entry;
+    tU32* src_entry;
     int red;
     int green;
     int blue;
@@ -663,7 +663,7 @@ tU16 PaletteEntry16Bit(br_pixelmap* pPal, int pEntry) {
 
 // IDA: br_pixelmap* __usercall PaletteOf16Bits@<EAX>(br_pixelmap *pSrc@<EAX>)
 br_pixelmap* PaletteOf16Bits(br_pixelmap* pSrc) {
-    tU16 *dst_entry;
+    tU16* dst_entry;
     int value;
     LOG_TRACE("(%p)", pSrc);
     NOT_IMPLEMENTED();
@@ -673,9 +673,9 @@ br_pixelmap* PaletteOf16Bits(br_pixelmap* pSrc) {
 void Copy8BitTo16Bit(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette) {
     int x;
     int y;
-    tU8 *src_start;
-    tU16 *dst_start;
-    tU16 *palette_entry;
+    tU8* src_start;
+    tU16* dst_start;
+    tU16* palette_entry;
     LOG_TRACE("(%p, %p, %p)", pDst, pSrc, pPalette);
     NOT_IMPLEMENTED();
 }
@@ -684,9 +684,9 @@ void Copy8BitTo16Bit(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette
 void Copy8BitTo16BitRectangle(br_pixelmap* pDst, tS16 pDst_x, tS16 pDst_y, br_pixelmap* pSrc, tS16 pSrc_x, tS16 pSrc_y, tS16 pWidth, tS16 pHeight, br_pixelmap* pPalette) {
     int x;
     int y;
-    tU8 *src_start;
-    tU16 *dst_start;
-    tU16 *palette_entry;
+    tU8* src_start;
+    tU16* dst_start;
+    tU16* palette_entry;
     LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d, %p)", pDst, pDst_x, pDst_y, pSrc, pSrc_x, pSrc_y, pWidth, pHeight, pPalette);
     NOT_IMPLEMENTED();
 }
@@ -695,9 +695,9 @@ void Copy8BitTo16BitRectangle(br_pixelmap* pDst, tS16 pDst_x, tS16 pDst_y, br_pi
 void Copy8BitTo16BitRectangleWithTransparency(br_pixelmap* pDst, tS16 pDst_x, tS16 pDst_y, br_pixelmap* pSrc, tS16 pSrc_x, tS16 pSrc_y, tS16 pWidth, tS16 pHeight, br_pixelmap* pPalette) {
     int x;
     int y;
-    tU8 *src_start;
-    tU16 *dst_start;
-    tU16 *palette_entry;
+    tU8* src_start;
+    tU16* dst_start;
+    tU16* palette_entry;
     LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d, %p)", pDst, pDst_x, pDst_y, pSrc, pSrc_x, pSrc_y, pWidth, pHeight, pPalette);
     NOT_IMPLEMENTED();
 }
@@ -706,9 +706,9 @@ void Copy8BitTo16BitRectangleWithTransparency(br_pixelmap* pDst, tS16 pDst_x, tS
 void Copy8BitToOnscreen16BitRectangleWithTransparency(br_pixelmap* pDst, tS16 pDst_x, tS16 pDst_y, br_pixelmap* pSrc, tS16 pSrc_x, tS16 pSrc_y, tS16 pWidth, tS16 pHeight, br_pixelmap* pPalette) {
     int x;
     int y;
-    tU8 *src_start;
-    tU16 *dst_start;
-    tU16 *palette_entry;
+    tU8* src_start;
+    tU16* dst_start;
+    tU16* palette_entry;
     LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d, %p)", pDst, pDst_x, pDst_y, pSrc, pSrc_x, pSrc_y, pWidth, pHeight, pPalette);
     NOT_IMPLEMENTED();
 }
@@ -717,9 +717,9 @@ void Copy8BitToOnscreen16BitRectangleWithTransparency(br_pixelmap* pDst, tS16 pD
 void Copy8BitRectangleTo16BitRhombusWithTransparency(br_pixelmap* pDst, tS16 pDst_x, tS16 pDst_y, br_pixelmap* pSrc, tS16 pSrc_x, tS16 pSrc_y, tS16 pWidth, tS16 pHeight, tX1616 pShear, br_pixelmap* pPalette) {
     int x;
     int y;
-    tU8 *src_start;
-    tU16 *dst_start;
-    tU16 *palette_entry;
+    tU8* src_start;
+    tU16* dst_start;
+    tU16* palette_entry;
     tX1616 total_shear;
     tS16 sheared_x;
     tS16 clipped_src_x;
@@ -756,7 +756,7 @@ int NormalSideOfPlane(br_vector3* pPoint, br_vector3* pNormal, br_scalar pD) {
 
 // IDA: br_material* __usercall DRMaterialClone@<EAX>(br_material *pMaterial@<EAX>)
 br_material* DRMaterialClone(br_material* pMaterial) {
-    br_material *the_material;
+    br_material* the_material;
     char s[256];
     static int name_suffix;
     LOG_TRACE("(%p)", pMaterial);
@@ -778,9 +778,9 @@ void StripCR(char* s) {
 
 // IDA: void __cdecl SubsStringJob(char *pStr, ...)
 void SubsStringJob(char* pStr, ...) {
-    char *sub_str;
+    char* sub_str;
     char temp_str[256];
-    char *sub_pt;
+    char* sub_pt;
     va_list ap;
     LOG_TRACE("(\"%s\")", pStr);
     NOT_IMPLEMENTED();
@@ -1051,7 +1051,7 @@ int DRStricmp(char* p1, char* p2) {
 void GlorifyMaterial(br_material** pArray, int pCount) {
     int i;
     int c;
-    br_pixelmap *big_tile;
+    br_pixelmap* big_tile;
     tException_list e;
     LOG_TRACE("(%p, %d)", pArray, pCount);
     NOT_IMPLEMENTED();
@@ -1061,7 +1061,7 @@ void GlorifyMaterial(br_material** pArray, int pCount) {
 void WhitenVertexRGB(br_model** pArray, int pN) {
     int m;
     int v;
-    br_vertex *vertex;
+    br_vertex* vertex;
     LOG_TRACE("(%p, %d)", pArray, pN);
     NOT_IMPLEMENTED();
 }
@@ -1072,7 +1072,7 @@ void NobbleNonzeroBlacks(br_pixelmap* pPalette) {
     tU32 green;
     tU32 blue;
     tU32 value;
-    tU32 *palette_entry;
+    tU32* palette_entry;
     tU32 frobbed;
     LOG_TRACE("(%p)", pPalette);
     NOT_IMPLEMENTED();
@@ -1098,7 +1098,7 @@ int AlreadyBlended(br_material* pMaterial) {
 
 // IDA: void __usercall BlendifyMaterialTablishly(br_material *pMaterial@<EAX>, int pPercent@<EDX>)
 void BlendifyMaterialTablishly(br_material* pMaterial, int pPercent) {
-    char *s;
+    char* s;
     LOG_TRACE("(%p, %d)", pMaterial, pPercent);
     NOT_IMPLEMENTED();
 }

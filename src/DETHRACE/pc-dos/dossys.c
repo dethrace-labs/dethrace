@@ -348,13 +348,13 @@ void PDAllocateScreenAndBack() {
 void Copy8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette) {
     int x;
     int y;
-    tU8 *src;
+    tU8* src;
     tU8 value;
     tU8 red;
     tU8 green;
     tU8 blue;
-    tU16 *dst;
-    tU16 *palette_entry;
+    tU16* dst;
+    tU16* palette_entry;
     LOG_TRACE("(%p, %p, %p)", pDst, pSrc, pPalette);
     NOT_IMPLEMENTED();
 }
@@ -363,15 +363,15 @@ void Copy8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* 
 void Double8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette, tU16 pOff, tU16 pSrc_width, tU16 pSrc_height) {
     int x;
     int y;
-    tU8 *src;
+    tU8* src;
     tU8 value;
     tU8 red;
     tU8 green;
     tU8 blue;
-    tU16 *dst0;
-    tU16 *dst1;
+    tU16* dst0;
+    tU16* dst1;
     tU16 sixteen;
-    tU16 *palette_entry;
+    tU16* palette_entry;
     LOG_TRACE("(%p, %p, %p, %d, %d, %d)", pDst, pSrc, pPalette, pOff, pSrc_width, pSrc_height);
     NOT_IMPLEMENTED();
 }
@@ -555,7 +555,7 @@ tU32 LargestBlockAvail() {
 
 // IDA: void* __usercall PDGrabLargestMammaryWeCanPlayWith@<EAX>(tU32 pMaximum_required@<EAX>, tU32 *pAmount_allocated@<EDX>)
 void* PDGrabLargestMammaryWeCanPlayWith(tU32 pMaximum_required, tU32* pAmount_allocated) {
-    void *result;
+    void* result;
     LOG_TRACE("(%d, %p)", pMaximum_required, pAmount_allocated);
     NOT_IMPLEMENTED();
 }
@@ -670,7 +670,7 @@ void PDDisplayGoreworthiness(int pGory) {
 
 // IDA: void __usercall PDEnterDebugger(char *pStr@<EAX>)
 void PDEnterDebugger(char* pStr) {
-    static unsigned char *save_it;
+    static unsigned char* save_it;
     LOG_TRACE("(\"%s\")", pStr);
     NOT_IMPLEMENTED();
 }

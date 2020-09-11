@@ -14,16 +14,16 @@ br_error AddRequestedDrivers() {
 // IDA: br_error __usercall devAdd@<EAX>(br_device **pdev@<EAX>, br_device_begin_fn *dev_begin@<EDX>, char *args@<EBX>, br_image *image@<ECX>)
 br_error devAdd(br_device** pdev, br_device_begin_fn* dev_begin, char* args, br_image* image) {
     int i;
-    br_device *dev;
-    br_open_device *new_slots;
+    br_device* dev;
+    br_open_device* new_slots;
     LOG_TRACE("(%p, %p, \"%s\", %p)", pdev, dev_begin, args, image);
     NOT_IMPLEMENTED();
 }
 
 // IDA: br_error __cdecl BrDevAdd(br_device **pdev, char *image, char *args)
 br_error BrDevAdd(br_device** pdev, char* image, char* args) {
-    br_image *dev_image;
-    br_device_begin_fn *dev_begin;
+    br_image* dev_image;
+    br_device_begin_fn* dev_begin;
     LOG_TRACE("(%p, \"%s\", \"%s\")", pdev, image, args);
     NOT_IMPLEMENTED();
 }
@@ -42,9 +42,9 @@ br_error BrDevCheckAdd(br_device** pdev, char* name, char* args) {
 
 // IDA: br_error __cdecl BrDevAddConfig(char *config)
 br_error BrDevAddConfig(char* config) {
-    char *end;
-    char *dev;
-    char *arg;
+    char* end;
+    char* dev;
+    char* arg;
     char tmp[512];
     int n;
     LOG_TRACE("(\"%s\")", config);

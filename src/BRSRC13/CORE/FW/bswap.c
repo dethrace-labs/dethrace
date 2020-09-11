@@ -5,9 +5,9 @@ char rscid[47];
 
 // IDA: br_uint_32 __cdecl BrSwap32(br_uint_32 l)
 br_uint_32 BrSwap32(br_uint_32 l) {
-    struct {		// size: 0x4
-        unsigned long l;		// @0x0
-        unsigned char c[4];		// @0x0
+    struct { // size: 0x4
+        unsigned long l; // @0x0
+        unsigned char c[4]; // @0x0
     } u;
     LOG_TRACE("(%d)", l);
     NOT_IMPLEMENTED();
@@ -15,9 +15,9 @@ br_uint_32 BrSwap32(br_uint_32 l) {
 
 // IDA: br_uint_16 __cdecl BrSwap16(br_uint_16 s)
 br_uint_16 BrSwap16(br_uint_16 s) {
-    struct {		// size: 0x2
-        unsigned short s;		// @0x0
-        unsigned char c[2];		// @0x0
+    struct { // size: 0x2
+        unsigned short s; // @0x0
+        unsigned char c[2]; // @0x0
     } u;
     LOG_TRACE("(%d)", s);
     NOT_IMPLEMENTED();
@@ -25,9 +25,9 @@ br_uint_16 BrSwap16(br_uint_16 s) {
 
 // IDA: br_float __cdecl BrSwapFloat(br_float f)
 br_float BrSwapFloat(br_float f) {
-    struct {		// size: 0x4
-        br_float f;		// @0x0
-        unsigned char c[4];		// @0x0
+    struct { // size: 0x4
+        br_float f; // @0x0
+        unsigned char c[4]; // @0x0
     } u;
     LOG_TRACE("(%f)", f);
     NOT_IMPLEMENTED();

@@ -221,7 +221,7 @@ int FopRead_VERTICES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_
 
 // IDA: int __usercall FopRead_OLD_VERTICES@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_OLD_VERTICES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
-    void *ptr;
+    void* ptr;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
     NOT_IMPLEMENTED();
 }
@@ -234,14 +234,14 @@ int FopWrite_VERTEX_UV(br_datafile* df, br_vertex* vertices, int nvertices) {
 
 // IDA: int __usercall FopRead_VERTEX_UV@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_VERTEX_UV(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
-    br_model *mp;
+    br_model* mp;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __usercall FopRead_OLD_VERTICES_UV@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_OLD_VERTICES_UV(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
-    void *ptr;
+    void* ptr;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
     NOT_IMPLEMENTED();
 }
@@ -249,7 +249,7 @@ int FopRead_OLD_VERTICES_UV(br_datafile* df, br_uint_32 id, br_uint_32 length, b
 // IDA: int __usercall FopRead_MATERIAL_INDEX@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_MATERIAL_INDEX(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     char name[256];
-    br_material **mip;
+    br_material** mip;
     br_uint_32 i;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
     NOT_IMPLEMENTED();
@@ -265,11 +265,11 @@ int FopWrite_MATERIAL_INDEX(br_datafile* df, br_material** materials, int nmater
 
 // IDA: int __usercall FopRead_OLD_MATERIAL_INDEX@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_OLD_MATERIAL_INDEX(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
-    char *mblock;
-    char *cp;
+    char* mblock;
+    char* cp;
     int i;
     int num_materials;
-    br_material **mip;
+    br_material** mip;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
     NOT_IMPLEMENTED();
 }
@@ -304,7 +304,7 @@ int FopWrite_FACES(br_datafile* df, br_face* faces, int nfaces) {
 
 // IDA: int __usercall FopRead_OLD_FACES_1@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_OLD_FACES_1(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
-    br_model *mp;
+    br_model* mp;
     int i;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
     NOT_IMPLEMENTED();
@@ -312,20 +312,20 @@ int FopRead_OLD_FACES_1(br_datafile* df, br_uint_32 id, br_uint_32 length, br_ui
 
 // IDA: int __usercall FopRead_OLD_FACES@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_OLD_FACES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
-    br_face *fp;
-    br_material **mip;
+    br_face* fp;
+    br_material** mip;
     int mi_count;
     unsigned int i;
-    void *ptr;
+    void* ptr;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __usercall FopWrite_FACE_MATERIAL@<EAX>(br_datafile *df@<EAX>, br_face *faces@<EDX>, int nfaces@<EBX>, br_material **mindex@<ECX>, int nmaterials)
 int FopWrite_FACE_MATERIAL(br_datafile* df, br_face* faces, int nfaces, br_material** mindex, int nmaterials) {
-    br_uint_16 *block;
-    br_uint_16 *ip;
-    br_face *fp;
+    br_uint_16* block;
+    br_uint_16* ip;
+    br_face* fp;
     int i;
     int j;
     LOG_TRACE("(%p, %p, %d, %p, %d)", df, faces, nfaces, mindex, nmaterials);
@@ -334,12 +334,12 @@ int FopWrite_FACE_MATERIAL(br_datafile* df, br_face* faces, int nfaces, br_mater
 
 // IDA: int __usercall FopRead_FACE_MATERIAL@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_FACE_MATERIAL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
-    br_material **mindex;
+    br_material** mindex;
     int nmaterials;
-    br_model *mp;
-    br_face *fp;
-    br_uint_16 *block;
-    br_uint_16 *ip;
+    br_model* mp;
+    br_face* fp;
+    br_uint_16* block;
+    br_uint_16* ip;
     int block_count;
     int i;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
@@ -370,14 +370,14 @@ int FopWrite_MODEL(br_datafile* df, br_model* mp) {
 
 // IDA: int __usercall FopRead_OLD_MODEL_1@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_OLD_MODEL_1(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
-    br_model *mp;
+    br_model* mp;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __usercall FopRead_OLD_MODEL@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_OLD_MODEL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
-    br_model *mp;
+    br_model* mp;
     int i;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
     NOT_IMPLEMENTED();
@@ -385,7 +385,7 @@ int FopRead_OLD_MODEL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint
 
 // IDA: int __usercall FopRead_PIVOT@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_PIVOT(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
-    br_model *mp;
+    br_model* mp;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
     NOT_IMPLEMENTED();
 }
@@ -403,7 +403,7 @@ int FopRead_MATERIAL_OLD(br_datafile* df, br_uint_32 id, br_uint_32 length, br_u
 
 // IDA: int __usercall FopRead_MATERIAL@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_MATERIAL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
-    br_material *mp;
+    br_material* mp;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
     NOT_IMPLEMENTED();
 }
@@ -527,8 +527,8 @@ int FopWrite_ACTOR_LIGHT(br_datafile* df) {
 
 // IDA: int __usercall FopRead_ACTOR_LIGHT@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_ACTOR_LIGHT(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
-    br_actor *a;
-    br_light *lp;
+    br_actor* a;
+    br_light* lp;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
     NOT_IMPLEMENTED();
 }
@@ -541,8 +541,8 @@ int FopWrite_ACTOR_CAMERA(br_datafile* df) {
 
 // IDA: int __usercall FopRead_ACTOR_CAMERA@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_ACTOR_CAMERA(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
-    br_actor *a;
-    br_light *cp;
+    br_actor* a;
+    br_light* cp;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
     NOT_IMPLEMENTED();
 }
@@ -555,8 +555,8 @@ int FopWrite_ACTOR_BOUNDS(br_datafile* df) {
 
 // IDA: int __usercall FopRead_ACTOR_BOUNDS@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_ACTOR_BOUNDS(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
-    br_actor *a;
-    br_bounds *bp;
+    br_actor* a;
+    br_bounds* bp;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
     NOT_IMPLEMENTED();
 }
@@ -569,8 +569,8 @@ int FopWrite_ACTOR_CLIP_PLANE(br_datafile* df) {
 
 // IDA: int __usercall FopRead_ACTOR_CLIP_PLANE@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_ACTOR_CLIP_PLANE(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
-    br_actor *a;
-    br_vector4 *vp;
+    br_actor* a;
+    br_vector4* vp;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
     NOT_IMPLEMENTED();
 }
@@ -583,15 +583,15 @@ int FopWrite_ACTOR_ADD_CHILD(br_datafile* df) {
 
 // IDA: int __usercall FopRead_ACTOR_ADD_CHILD@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_ACTOR_ADD_CHILD(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
-    br_actor *a;
-    br_actor *p;
+    br_actor* a;
+    br_actor* p;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __usercall FopWrite_TRANSFORM@<EAX>(br_datafile *df@<EAX>, br_transform *t@<EDX>)
 int FopWrite_TRANSFORM(br_datafile* df, br_transform* t) {
-    transform_type *tt;
+    transform_type* tt;
     LOG_TRACE("(%p, %p)", df, t);
     NOT_IMPLEMENTED();
 }
@@ -626,7 +626,7 @@ int FopWrite_BOUNDS(br_datafile* df, br_bounds* bp) {
 
 // IDA: int __usercall FopRead_BOUNDS@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_BOUNDS(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
-    br_bounds3 *bp;
+    br_bounds3* bp;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
     NOT_IMPLEMENTED();
 }
@@ -639,7 +639,7 @@ int FopWrite_PLANE(br_datafile* df, br_vector4* pp) {
 
 // IDA: int __usercall FopRead_PLANE@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_PLANE(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
-    br_vector4 *pp;
+    br_vector4* pp;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
     NOT_IMPLEMENTED();
 }
@@ -652,7 +652,7 @@ int FopWrite_LIGHT(br_datafile* df, br_light* lp) {
 
 // IDA: int __usercall FopRead_LIGHT@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_LIGHT(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
-    br_light *lp;
+    br_light* lp;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
     NOT_IMPLEMENTED();
 }
@@ -665,7 +665,7 @@ int FopWrite_CAMERA(br_datafile* df, br_camera* cp) {
 
 // IDA: int __usercall FopRead_CAMERA@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_CAMERA(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
-    br_camera *cp;
+    br_camera* cp;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
     NOT_IMPLEMENTED();
 }
@@ -705,8 +705,8 @@ int PtrCompare(void* a, void* b) {
 
 // IDA: br_uint_32 __cdecl WriteModel(br_model *mp, br_datafile *df)
 br_uint_32 WriteModel(br_model* mp, br_datafile* df) {
-    br_material **mindex;
-    br_vertex *vp;
+    br_material** mindex;
+    br_vertex* vp;
     int nmaterials;
     int i;
     int has_uv;
@@ -716,7 +716,7 @@ br_uint_32 WriteModel(br_model* mp, br_datafile* df) {
 
 // IDA: br_uint_32 __cdecl BrModelSaveMany(char *filename, br_model **models, br_uint_16 num)
 br_uint_32 BrModelSaveMany(char* filename, br_model** models, br_uint_16 num) {
-    br_datafile *df;
+    br_datafile* df;
     int i;
     int m;
     LOG_TRACE("(\"%s\", %p, %d)", filename, models, num);
@@ -752,15 +752,15 @@ br_uint_32 BrActorLoadMany(char* filename, br_actor** actors, br_uint_16 num) {
 
 // IDA: int __usercall WriteActor@<EAX>(br_actor *a@<EAX>, br_datafile *df@<EDX>)
 int WriteActor(br_actor* a, br_datafile* df) {
-    br_actor *ap;
-    br_actor *last_ap;
+    br_actor* ap;
+    br_actor* last_ap;
     LOG_TRACE("(%p, %p)", a, df);
     NOT_IMPLEMENTED();
 }
 
 // IDA: br_uint_32 __cdecl BrActorSaveMany(char *filename, br_actor **actors, br_uint_16 num)
 br_uint_32 BrActorSaveMany(char* filename, br_actor** actors, br_uint_16 num) {
-    br_datafile *df;
+    br_datafile* df;
     int i;
     LOG_TRACE("(\"%s\", %p, %d)", filename, actors, num);
     NOT_IMPLEMENTED();
@@ -798,7 +798,7 @@ br_uint_32 WriteMaterial(br_material* mp, br_datafile* df) {
 
 // IDA: br_uint_32 __cdecl BrMaterialSaveMany(char *filename, br_material **materials, br_uint_16 num)
 br_uint_32 BrMaterialSaveMany(char* filename, br_material** materials, br_uint_16 num) {
-    br_datafile *df;
+    br_datafile* df;
     int i;
     int count;
     LOG_TRACE("(\"%s\", %p, %d)", filename, materials, num);
@@ -854,21 +854,21 @@ br_uint_32 BrActorSave(char* filename, br_actor* ptr) {
 
 // IDA: br_error __cdecl BrModelFileCount(char *filename, br_uint_16 *num)
 br_error BrModelFileCount(char* filename, br_uint_16* num) {
-    br_datafile *df;
+    br_datafile* df;
     LOG_TRACE("(\"%s\", %p)", filename, num);
     NOT_IMPLEMENTED();
 }
 
 // IDA: br_error __cdecl BrActorFileCount(char *filename, br_uint_16 *num)
 br_error BrActorFileCount(char* filename, br_uint_16* num) {
-    br_datafile *df;
+    br_datafile* df;
     LOG_TRACE("(\"%s\", %p)", filename, num);
     NOT_IMPLEMENTED();
 }
 
 // IDA: br_error __cdecl BrMaterialFileCount(char *filename, br_uint_16 *num)
 br_error BrMaterialFileCount(char* filename, br_uint_16* num) {
-    br_datafile *df;
+    br_datafile* df;
     LOG_TRACE("(\"%s\", %p)", filename, num);
     NOT_IMPLEMENTED();
 }

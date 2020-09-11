@@ -55,7 +55,7 @@ void BrHorizonPlaneDisable(br_actor* h) {
 
 // IDA: br_actor* __cdecl BrEnvironmentSet(br_actor *a)
 br_actor* BrEnvironmentSet(br_actor* a) {
-    br_actor *old_a;
+    br_actor* old_a;
     LOG_TRACE("(%p)", a);
     NOT_IMPLEMENTED();
 }
@@ -76,10 +76,10 @@ void BrSetupLights(br_actor* world, br_matrix34* world_to_view, br_int_32 w2vt) 
     int light_part;
     int i;
     br_token_value tv[16];
-    br_token_value *tvp;
+    br_token_value* tvp;
     br_vector3 view_position;
     br_vector3 view_direction;
-    br_light *light;
+    br_light* light;
     LOG_TRACE("(%p, %p, %d)", world, world_to_view, w2vt);
     NOT_IMPLEMENTED();
 }

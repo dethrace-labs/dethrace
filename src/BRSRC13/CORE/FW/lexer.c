@@ -9,7 +9,7 @@ void lexerError(br_lexer* l, char* string) {
 
 // IDA: br_lexer* __cdecl BrLexerAllocate(br_lexer_keyword *keywords, int nkeywords)
 br_lexer* BrLexerAllocate(br_lexer_keyword* keywords, int nkeywords) {
-    br_lexer *l;
+    br_lexer* l;
     LOG_TRACE("(%p, %d)", keywords, nkeywords);
     NOT_IMPLEMENTED();
 }
@@ -23,7 +23,7 @@ char BrLexerCommentSet(br_lexer* l, char eol_comment) {
 
 // IDA: br_lexer_error_cbfn* __cdecl BrLexerErrorSet(br_lexer *l, br_lexer_error_cbfn *error)
 br_lexer_error_cbfn* BrLexerErrorSet(br_lexer* l, br_lexer_error_cbfn* error) {
-    br_lexer_error_cbfn *old;
+    br_lexer_error_cbfn* old;
     LOG_TRACE("(%p, %p)", l, error);
     NOT_IMPLEMENTED();
 }
@@ -42,8 +42,8 @@ void fileGetchar(br_lexer_source* source) {
 
 // IDA: br_error __cdecl BrLexerPushFile(br_lexer *l, char *file)
 br_error BrLexerPushFile(br_lexer* l, char* file) {
-    br_lexer_source *s;
-    void *f;
+    br_lexer_source* s;
+    void* f;
     int mode;
     LOG_TRACE("(%p, \"%s\")", l, file);
     NOT_IMPLEMENTED();
@@ -51,21 +51,21 @@ br_error BrLexerPushFile(br_lexer* l, char* file) {
 
 // IDA: void __cdecl stringGetchar(br_lexer_source *source)
 void stringGetchar(br_lexer_source* source) {
-    char *cp;
+    char* cp;
     LOG_TRACE("(%p)", source);
     NOT_IMPLEMENTED();
 }
 
 // IDA: br_error __cdecl BrLexerPushString(br_lexer *l, char *string, char *name)
 br_error BrLexerPushString(br_lexer* l, char* string, char* name) {
-    br_lexer_source *s;
+    br_lexer_source* s;
     LOG_TRACE("(%p, \"%s\", \"%s\")", l, string, name);
     NOT_IMPLEMENTED();
 }
 
 // IDA: br_lexer_source* __cdecl BrLexerPop(br_lexer *l)
 br_lexer_source* BrLexerPop(br_lexer* l) {
-    br_lexer_source *s;
+    br_lexer_source* s;
     LOG_TRACE("(%p)", l);
     NOT_IMPLEMENTED();
 }
@@ -80,8 +80,8 @@ void lexerAdvance(br_lexer* l) {
 
 // IDA: void __usercall lexerAdvanceDump(br_lexer *l@<EAX>)
 void lexerAdvanceDump(br_lexer* l) {
-    char *tname;
-    char *tvalue;
+    char* tname;
+    char* tvalue;
     char val[40];
     char tmp[256];
     LOG_TRACE("(%p)", l);

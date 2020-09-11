@@ -84,7 +84,7 @@ void EnablePipedSounds() {
 tU32 LengthOfSession(tPipe_session* pSession) {
     int i;
     tU32 running_total;
-    tPipe_chunk *the_chunk;
+    tPipe_chunk* the_chunk;
     LOG_TRACE("(%p)", pSession);
     NOT_IMPLEMENTED();
 }
@@ -414,14 +414,14 @@ void InitLastDamageArrayEtc() {
     int j;
     int cat;
     int car_count;
-    tCar_spec *car;
+    tCar_spec* car;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl ResetCars()
 void ResetCars() {
-    tCar_spec *car;
+    tCar_spec* car;
     int cat;
     int i;
     int car_count;
@@ -431,7 +431,7 @@ void ResetCars() {
 
 // IDA: void __cdecl PipeCarPositions()
 void PipeCarPositions() {
-    tCar_spec *car;
+    tCar_spec* car;
     int cat;
     int i;
     int j;
@@ -469,7 +469,7 @@ void SetPipePlayPtr(tU8* pPtr) {
 
 // IDA: void __usercall AdvanceChunkPtr(tPipe_chunk **pChunk@<EAX>, tChunk_subject_index pType@<EDX>)
 void AdvanceChunkPtr(tPipe_chunk** pChunk, tChunk_subject_index pType) {
-    tPipe_chunk *old_chunk;
+    tPipe_chunk* old_chunk;
     LOG_TRACE("(%p, %d)", pChunk, pType);
     NOT_IMPLEMENTED();
 }
@@ -477,8 +477,8 @@ void AdvanceChunkPtr(tPipe_chunk** pChunk, tChunk_subject_index pType) {
 // IDA: void __usercall ApplyModelGeometry(tPipe_chunk **pChunk@<EAX>)
 void ApplyModelGeometry(tPipe_chunk** pChunk) {
     int i;
-    br_model *model_ptr;
-    tCar_spec *car;
+    br_model* model_ptr;
+    tCar_spec* car;
     LOG_TRACE("(%p)", pChunk);
     NOT_IMPLEMENTED();
 }
@@ -488,8 +488,8 @@ void DoSmudge(tPipe_chunk** pChunk, int pDir) {
     int i;
     int v;
     tU8 inc;
-    br_model *model_ptr;
-    tCar_spec *car;
+    br_model* model_ptr;
+    tCar_spec* car;
     int group;
     LOG_TRACE("(%p, %d)", pChunk, pDir);
     NOT_IMPLEMENTED();
@@ -558,7 +558,7 @@ void ApplyFlame(tPipe_chunk** pChunk) {
 
 // IDA: void __usercall ApplySplash(tPipe_chunk **pChunk@<EAX>)
 void ApplySplash(tPipe_chunk** pChunk) {
-    tCar_spec *c;
+    tCar_spec* c;
     LOG_TRACE("(%p)", pChunk);
     NOT_IMPLEMENTED();
 }
@@ -584,7 +584,7 @@ void ApplySound(tPipe_chunk** pChunk) {
 
 // IDA: void __usercall ApplyCar(tPipe_chunk **pChunk@<EAX>)
 void ApplyCar(tPipe_chunk** pChunk) {
-    tCar_spec *car;
+    tCar_spec* car;
     br_vector3 com_offset_c;
     br_vector3 com_offset_w;
     LOG_TRACE("(%p)", pChunk);
@@ -593,7 +593,7 @@ void ApplyCar(tPipe_chunk** pChunk) {
 
 // IDA: void __usercall ApplyDamage(tPipe_chunk **pChunk@<EAX>)
 void ApplyDamage(tPipe_chunk** pChunk) {
-    tCar_spec *car;
+    tCar_spec* car;
     int i;
     LOG_TRACE("(%p)", pChunk);
     NOT_IMPLEMENTED();
@@ -627,7 +627,7 @@ void ApplySkidAdjustment(tPipe_chunk** pChunk) {
 int ApplyPipedSession(tU8** pPtr) {
     int i;
     int return_value;
-    tPipe_chunk *chunk_ptr;
+    tPipe_chunk* chunk_ptr;
     tPipe_chunk_type chunk_type;
     LOG_TRACE("(%p)", pPtr);
     NOT_IMPLEMENTED();
@@ -647,11 +647,11 @@ int MoveSessionPointerForwardOne(tU8** pPtr) {
 
 // IDA: tPipe_chunk* __usercall FindPreviousChunk@<EAX>(tU8 *pPtr@<EAX>, tPipe_chunk_type pType@<EDX>, tChunk_subject_index pIndex@<EBX>)
 tPipe_chunk* FindPreviousChunk(tU8* pPtr, tPipe_chunk_type pType, tChunk_subject_index pIndex) {
-    tU8 *ptr;
+    tU8* ptr;
     int i;
     int reached_end;
     int chunk_counter;
-    tPipe_chunk *mr_chunky;
+    tPipe_chunk* mr_chunky;
     tChunk_subject_index masked_index;
     LOG_TRACE("(%p, %d, %d)", pPtr, pType, pIndex);
     NOT_IMPLEMENTED();
@@ -660,8 +660,8 @@ tPipe_chunk* FindPreviousChunk(tU8* pPtr, tPipe_chunk_type pType, tChunk_subject
 // IDA: void __usercall UndoModelGeometry(tPipe_chunk **pChunk@<EAX>)
 void UndoModelGeometry(tPipe_chunk** pChunk) {
     int i;
-    br_model *model_ptr;
-    tCar_spec *car;
+    br_model* model_ptr;
+    tCar_spec* car;
     LOG_TRACE("(%p)", pChunk);
     NOT_IMPLEMENTED();
 }
@@ -669,29 +669,29 @@ void UndoModelGeometry(tPipe_chunk** pChunk) {
 // IDA: void __usercall UndoSmudge(tPipe_chunk **pChunk@<EAX>)
 void UndoSmudge(tPipe_chunk** pChunk) {
     int i;
-    br_model *model_ptr;
-    tCar_spec *car;
+    br_model* model_ptr;
+    tCar_spec* car;
     LOG_TRACE("(%p)", pChunk);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall UndoPedestrian(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
 void UndoPedestrian(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
-    tPipe_chunk *temp_prev_chunk;
+    tPipe_chunk* temp_prev_chunk;
     LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall UndoFrameBoundary(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
 void UndoFrameBoundary(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
-    tPipe_chunk *temp_prev_chunk;
+    tPipe_chunk* temp_prev_chunk;
     LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall UndoCar(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
 void UndoCar(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
-    tPipe_chunk *temp_prev_chunk;
+    tPipe_chunk* temp_prev_chunk;
     LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
     NOT_IMPLEMENTED();
 }
@@ -704,7 +704,7 @@ void UndoSound(tPipe_chunk** pChunk) {
 
 // IDA: void __usercall UndoDamage(tPipe_chunk **pChunk@<EAX>)
 void UndoDamage(tPipe_chunk** pChunk) {
-    tCar_spec *car;
+    tCar_spec* car;
     int i;
     LOG_TRACE("(%p)", pChunk);
     NOT_IMPLEMENTED();
@@ -718,56 +718,56 @@ void UndoSpecial(tPipe_chunk** pChunk) {
 
 // IDA: void __usercall UndoPedGib(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
 void UndoPedGib(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
-    tPipe_chunk *temp_prev_chunk;
+    tPipe_chunk* temp_prev_chunk;
     LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall UndoSpark(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
 void UndoSpark(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
-    tPipe_chunk *temp_prev_chunk;
+    tPipe_chunk* temp_prev_chunk;
     LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall UndoShrapnel(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
 void UndoShrapnel(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
-    tPipe_chunk *temp_prev_chunk;
+    tPipe_chunk* temp_prev_chunk;
     LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall UndoScreenWobble(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
 void UndoScreenWobble(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
-    tPipe_chunk *temp_prev_chunk;
+    tPipe_chunk* temp_prev_chunk;
     LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall UndoGrooveStop(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
 void UndoGrooveStop(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
-    tPipe_chunk *temp_prev_chunk;
+    tPipe_chunk* temp_prev_chunk;
     LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall UndoNonCar(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
 void UndoNonCar(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
-    tPipe_chunk *temp_prev_chunk;
+    tPipe_chunk* temp_prev_chunk;
     LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall UndoSmoke(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
 void UndoSmoke(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
-    tPipe_chunk *temp_prev_chunk;
+    tPipe_chunk* temp_prev_chunk;
     LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall UndoSmokeColumn(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
 void UndoSmokeColumn(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
-    tPipe_chunk *temp_prev_chunk;
+    tPipe_chunk* temp_prev_chunk;
     LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
     NOT_IMPLEMENTED();
 }
@@ -780,14 +780,14 @@ void UndoFlame(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 
 // IDA: void __usercall UndoSplash(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
 void UndoSplash(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
-    tPipe_chunk *temp_prev_chunk;
+    tPipe_chunk* temp_prev_chunk;
     LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall UndoOilSpill(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
 void UndoOilSpill(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
-    tPipe_chunk *temp_prev_chunk;
+    tPipe_chunk* temp_prev_chunk;
     LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
     NOT_IMPLEMENTED();
 }
@@ -806,10 +806,10 @@ void UndoSkidAdjustment(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 
 // IDA: int __usercall UndoPipedSession@<EAX>(tU8 **pPtr@<EAX>)
 int UndoPipedSession(tU8** pPtr) {
-    tPipe_chunk *chunk_ptr;
-    tPipe_chunk *prev_chunk;
-    tU8 *temp_ptr;
-    tU8 *pushed_end_of_session;
+    tPipe_chunk* chunk_ptr;
+    tPipe_chunk* prev_chunk;
+    tU8* temp_ptr;
+    tU8* pushed_end_of_session;
     int i;
     tPipe_chunk_type chunk_type;
     LOG_TRACE("(%p)", pPtr);
@@ -818,14 +818,14 @@ int UndoPipedSession(tU8** pPtr) {
 
 // IDA: tU32 __usercall FindPrevFrameTime@<EAX>(tU8 *pPtr@<EAX>)
 tU32 FindPrevFrameTime(tU8* pPtr) {
-    tU8 *temp_ptr;
+    tU8* temp_ptr;
     LOG_TRACE("(%p)", pPtr);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall ScanBuffer(tU8 **pPtr@<EAX>, tPipe_chunk_type pType@<EDX>, tU32 pDefault_time@<EBX>, int (*pCall_back)(tPipe_chunk*, int, tU32)@<ECX>, int (*pTime_check)(tU32))
 void ScanBuffer(tU8** pPtr, tPipe_chunk_type pType, tU32 pDefault_time, int (*pCall_back)(tPipe_chunk*, int, tU32), int (*pTime_check)(tU32)) {
-    tPipe_chunk *chunk_ptr;
+    tPipe_chunk* chunk_ptr;
     tU32 the_time;
     LOG_TRACE("(%p, %d, %d, %p, %p)", pPtr, pType, pDefault_time, pCall_back, pTime_check);
     NOT_IMPLEMENTED();
@@ -835,7 +835,7 @@ void ScanBuffer(tU8** pPtr, tPipe_chunk_type pType, tU32 pDefault_time, int (*pC
 int CheckSound(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
     int i;
     int sound_length;
-    tPipe_chunk *temp_ptr;
+    tPipe_chunk* temp_ptr;
     LOG_TRACE("(%p, %d, %d)", pChunk_ptr, pChunk_count, pTime);
     NOT_IMPLEMENTED();
 }
@@ -848,7 +848,7 @@ int SoundTimeout(tU32 pTime) {
 
 // IDA: void __usercall ScanAndPlaySoundsToBe(tU8 *pPtr@<EAX>, tU32 pOldest_time@<EDX>, tU32 pYoungest_time@<EBX>)
 void ScanAndPlaySoundsToBe(tU8* pPtr, tU32 pOldest_time, tU32 pYoungest_time) {
-    tU8 *temp_ptr;
+    tU8* temp_ptr;
     LOG_TRACE("(%p, %d, %d)", pPtr, pOldest_time, pYoungest_time);
     NOT_IMPLEMENTED();
 }
@@ -856,11 +856,11 @@ void ScanAndPlaySoundsToBe(tU8* pPtr, tU32 pOldest_time, tU32 pYoungest_time) {
 // IDA: int __usercall CheckCar@<EAX>(tPipe_chunk *pChunk_ptr@<EAX>, int pChunk_count@<EDX>, tU32 pTime@<EBX>)
 int CheckCar(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
     int i;
-    tCar_spec *car;
+    tCar_spec* car;
     br_vector3 com_offset_c;
     br_vector3 com_offset_w;
     br_vector3 difference;
-    tPipe_chunk *temp_ptr;
+    tPipe_chunk* temp_ptr;
     LOG_TRACE("(%p, %d, %d)", pChunk_ptr, pChunk_count, pTime);
     NOT_IMPLEMENTED();
 }
@@ -873,7 +873,7 @@ int CarTimeout(tU32 pTime) {
 
 // IDA: void __usercall ScanCarsPositions(tCar_spec *pCar@<EAX>, br_vector3 *pSource_pos@<EDX>, br_scalar pMax_distance_sqr, tU32 pOffset_time, tU32 pTime_period, br_vector3 *pCar_pos, tU32 *pTime_returned)
 void ScanCarsPositions(tCar_spec* pCar, br_vector3* pSource_pos, br_scalar pMax_distance_sqr, tU32 pOffset_time, tU32 pTime_period, br_vector3* pCar_pos, tU32* pTime_returned) {
-    tU8 *temp_ptr;
+    tU8* temp_ptr;
     LOG_TRACE("(%p, %p, %f, %d, %d, %p, %p)", pCar, pSource_pos, pMax_distance_sqr, pOffset_time, pTime_period, pCar_pos, pTime_returned);
     NOT_IMPLEMENTED();
 }
@@ -886,14 +886,14 @@ int CheckIncident(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
 
 // IDA: int __usercall GetNextIncident@<EAX>(tU32 pOffset_time@<EAX>, tIncident_type *pIncident_type@<EDX>, float *pSeverity@<EBX>, tIncident_info *pInfo@<ECX>, tU32 *pTime_away)
 int GetNextIncident(tU32 pOffset_time, tIncident_type* pIncident_type, float* pSeverity, tIncident_info* pInfo, tU32* pTime_away) {
-    tU8 *temp_ptr;
+    tU8* temp_ptr;
     LOG_TRACE("(%d, %p, %p, %p, %p)", pOffset_time, pIncident_type, pSeverity, pInfo, pTime_away);
     NOT_IMPLEMENTED();
 }
 
 // IDA: tU32 __cdecl GetARStartTime()
 tU32 GetARStartTime() {
-    tU8 *temp_ptr;
+    tU8* temp_ptr;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

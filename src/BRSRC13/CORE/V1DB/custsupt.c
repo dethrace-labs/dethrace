@@ -96,7 +96,7 @@ br_scalar BrZsScreenZToDepth(br_scalar sz, br_camera* camera) {
 
 // IDA: br_scalar __cdecl BrScreenZToCamera(br_actor *camera, br_scalar sz)
 br_scalar BrScreenZToCamera(br_actor* camera, br_scalar sz) {
-    br_camera *data;
+    br_camera* data;
     br_scalar hither;
     br_scalar yon;
     LOG_TRACE("(%p, %f)", camera, sz);
@@ -108,7 +108,7 @@ void BrScreenXYZToCamera(br_vector3* point, br_actor* camera, br_pixelmap* scree
     br_scalar hx;
     br_scalar hy;
     br_scalar vz;
-    br_camera *data;
+    br_camera* data;
     br_angle fov;
     br_scalar scale;
     LOG_TRACE("(%p, %p, %p, %d, %d, %f)", point, camera, screen_buffer, x, y, sz);

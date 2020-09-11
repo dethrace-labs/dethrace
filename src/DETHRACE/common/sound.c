@@ -197,7 +197,7 @@ void InitSoundSources() {
     int car_count;
     int i;
     int toggle;
-    tCar_spec *the_car;
+    tCar_spec* the_car;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -208,7 +208,7 @@ void DisposeSoundSources() {
     int car_count;
     int i;
     int toggle;
-    tCar_spec *the_car;
+    tCar_spec* the_car;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

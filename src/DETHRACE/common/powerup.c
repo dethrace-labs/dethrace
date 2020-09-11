@@ -23,7 +23,7 @@ br_vector3 gZero_v_powerup; // added _powerup suffix to avoid name collision
 // IDA: void __usercall LosePowerupX(tPowerup *pThe_powerup@<EAX>, int pTell_net_players@<EDX>)
 void LosePowerupX(tPowerup* pThe_powerup, int pTell_net_players) {
     int i;
-    tNet_message *the_message;
+    tNet_message* the_message;
     LOG_TRACE("(%p, %d)", pThe_powerup, pTell_net_players);
     NOT_IMPLEMENTED();
 }
@@ -37,21 +37,21 @@ void LosePowerup(tPowerup* pThe_powerup) {
 // IDA: void __usercall LoseAllSimilarPowerups(tPowerup *pThe_powerup@<EAX>)
 void LoseAllSimilarPowerups(tPowerup* pThe_powerup) {
     int i;
-    tPowerup *the_powerup;
+    tPowerup* the_powerup;
     LOG_TRACE("(%p)", pThe_powerup);
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __usercall GotPowerupX@<EAX>(tCar_spec *pCar@<EAX>, int pIndex@<EDX>, int pTell_net_players@<EBX>, int pDisplay_headup@<ECX>, tU32 pTime_left)
 int GotPowerupX(tCar_spec* pCar, int pIndex, int pTell_net_players, int pDisplay_headup, tU32 pTime_left) {
-    tPowerup *the_powerup;
+    tPowerup* the_powerup;
     int i;
     int original_index;
     int icon_index;
     int ps_power;
     char s[256];
-    char *s2;
-    tNet_message *the_message;
+    char* s2;
+    tNet_message* the_message;
     LOG_TRACE("(%p, %d, %d, %d, %d)", pCar, pIndex, pTell_net_players, pDisplay_headup, pTime_left);
     NOT_IMPLEMENTED();
 }
@@ -138,7 +138,7 @@ void LoadPowerups() {
 // IDA: void __cdecl InitPowerups()
 void InitPowerups() {
     int i;
-    tPowerup *the_powerup;
+    tPowerup* the_powerup;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -146,7 +146,7 @@ void InitPowerups() {
 // IDA: void __cdecl CloseDownPowerUps()
 void CloseDownPowerUps() {
     int i;
-    tPowerup *the_powerup;
+    tPowerup* the_powerup;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -156,10 +156,10 @@ void DrawPowerups(tU32 pTime) {
     int i;
     int y;
     int timer;
-    tPowerup *the_powerup;
+    tPowerup* the_powerup;
     char s[8];
-    tHeadup_icon *the_icon;
-    br_pixelmap *fizzle_pix;
+    tHeadup_icon* the_icon;
+    br_pixelmap* fizzle_pix;
     LOG_TRACE("(%d)", pTime);
     NOT_IMPLEMENTED();
 }
@@ -167,7 +167,7 @@ void DrawPowerups(tU32 pTime) {
 // IDA: void __usercall DoPowerupPeriodics(tU32 pFrame_period@<EAX>)
 void DoPowerupPeriodics(tU32 pFrame_period) {
     int i;
-    tPowerup *the_powerup;
+    tPowerup* the_powerup;
     tU32 the_time;
     LOG_TRACE("(%d)", pFrame_period);
     NOT_IMPLEMENTED();
@@ -250,7 +250,7 @@ int GotCredits(tPowerup* pPowerup, tCar_spec* pCar) {
 
 // IDA: void __usercall ImprovePSPowerup(tCar_spec *pCar@<EAX>, int pIndex@<EDX>)
 void ImprovePSPowerup(tCar_spec* pCar, int pIndex) {
-    tNet_message *the_message;
+    tNet_message* the_message;
     LOG_TRACE("(%p, %d)", pCar, pIndex);
     NOT_IMPLEMENTED();
 }
@@ -384,7 +384,7 @@ int SetUnderwater(tPowerup* pPowerup, tCar_spec* pCar) {
 // IDA: int __usercall TrashBodywork@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
 int TrashBodywork(tPowerup* pPowerup, tCar_spec* pCar) {
     int i;
-    tCar_spec *c;
+    tCar_spec* c;
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
     NOT_IMPLEMENTED();
 }
@@ -649,8 +649,8 @@ void ResetVesuvianCorpses(tPowerup* pPowerup, tCar_spec* pCar) {
 
 // IDA: void __usercall ReceivedPowerup(tNet_contents *pContents@<EAX>)
 void ReceivedPowerup(tNet_contents* pContents) {
-    tPowerup *powerup;
-    tCar_spec *car;
+    tPowerup* powerup;
+    tCar_spec* car;
     LOG_TRACE("(%p)", pContents);
     NOT_IMPLEMENTED();
 }
@@ -661,8 +661,8 @@ void SendCurrentPowerups() {
     int cat;
     int j;
     int car_count;
-    tCar_spec *car;
-    tNet_contents *the_contents;
+    tCar_spec* car;
+    tNet_contents* the_contents;
     tPlayer_ID ID;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();

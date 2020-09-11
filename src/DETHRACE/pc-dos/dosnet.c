@@ -49,7 +49,7 @@ void MATTMessageCheck(char* pFunction_name, tNet_message* pMessage, int pAlleged
 
 // IDA: int __usercall GetProfileText@<EAX>(char *pDest@<EAX>, int pDest_len@<EDX>, char *pFname@<EBX>, char *pKeyname@<ECX>)
 int GetProfileText(char* pDest, int pDest_len, char* pFname, char* pKeyname) {
-    FILE *fp;
+    FILE* fp;
     char in_buf[256];
     int i;
     int j;
@@ -81,7 +81,7 @@ void NetNowIPXLocalTarget2String(char* pString, _IPX_LOCAL_TARGET* pSock_addr_ip
 
 // IDA: int __usercall GetMessageTypeFromMessage@<EAX>(char *pMessage_str@<EAX>)
 int GetMessageTypeFromMessage(char* pMessage_str) {
-    char *real_msg;
+    char* real_msg;
     int msg_type_int;
     LOG_TRACE("(\"%s\")", pMessage_str);
     NOT_IMPLEMENTED();
@@ -119,7 +119,7 @@ int BroadcastMessage() {
     int i;
     int errors;
     char broadcast_addr_string[32];
-    char *real_msg;
+    char* real_msg;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -136,8 +136,8 @@ BOOL hmiIPXCloseSocket(W32 wSocket) {
 void hmiIPXListenForPacket(_IPX_ECB* pECB_ptr, tU32 pOffset) {
     SREGS sregs;
     REGS regs;
-    _IPX_HEADER *IPX_header_ptr;
-    _IPX_ECB *sIPXECB;
+    _IPX_HEADER* IPX_header_ptr;
+    _IPX_ECB* sIPXECB;
     LOG_TRACE("(%p, %d)", pECB_ptr, pOffset);
     NOT_IMPLEMENTED();
 }
@@ -152,7 +152,7 @@ BOOL hmiIPXPostListen(_IPX_ECB* pECB_ptr, tU32 pOffset) {
 BOOL hmiIPXGetData(PSTR pData, tU32 wDSize) {
     tU32 packets_checked;
     tU32 full_packet_ooer_missus;
-    _IPX_ECB *ECB_ptr;
+    _IPX_ECB* ECB_ptr;
     static tU32 round_robin_jobby;
     LOG_TRACE("(%d, %d)", pData, wDSize);
     NOT_IMPLEMENTED();
@@ -162,8 +162,8 @@ BOOL hmiIPXGetData(PSTR pData, tU32 wDSize) {
 void hmiIPXSendPacket(_IPX_ECB* sECB, _IPX_ECB** pPacket, PSTR pHeader, W32 wSize) {
     SREGS sregs;
     REGS regs;
-    _IPX_HEADER *sIPXHeader;
-    _IPX_ECB *sIPXECB;
+    _IPX_HEADER* sIPXHeader;
+    _IPX_ECB* sIPXECB;
     PSTR pIPXData;
     LOG_TRACE("(%p, %p, %d, %d)", sECB, pPacket, pHeader, wSize);
     NOT_IMPLEMENTED();
@@ -172,8 +172,8 @@ void hmiIPXSendPacket(_IPX_ECB* sECB, _IPX_ECB** pPacket, PSTR pHeader, W32 wSiz
 // IDA: BOOL __usercall hmiIPXSendDataDirect@<EAX>(PSTR pHeader@<EAX>, W32 wHSize@<EDX>, PSTR pData@<EBX>, W32 wDSize@<ECX>, _NETNOW_NODE_ADDR *sNode)
 BOOL hmiIPXSendDataDirect(PSTR pHeader, W32 wHSize, PSTR pData, W32 wDSize, _NETNOW_NODE_ADDR* sNode) {
     W32 wIndex;
-    _IPX_ELEMENT *sElement;
-    W32 *pSequence;
+    _IPX_ELEMENT* sElement;
+    W32* pSequence;
     LOG_TRACE("(%d, %d, %d, %d, %p)", pHeader, wHSize, pData, wDSize, sNode);
     NOT_IMPLEMENTED();
 }
@@ -354,7 +354,7 @@ void PDNetObtainSystemUserName(char* pName, int pMax_length) {
 // IDA: int __usercall PDNetSendMessageToPlayer@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>, tPlayer_ID pPlayer@<EBX>)
 int PDNetSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage, tPlayer_ID pPlayer) {
     char str[256];
-    _IPX_LOCAL_TARGET *remote_addr_ipx;
+    _IPX_LOCAL_TARGET* remote_addr_ipx;
     LOG_TRACE("(%p, %p, %d)", pDetails, pMessage, pPlayer);
     NOT_IMPLEMENTED();
 }
@@ -369,7 +369,7 @@ int PDNetSendMessageToAllPlayers(tNet_game_details* pDetails, tNet_message* pMes
 
 // IDA: tNet_message* __usercall PDNetGetNextMessage@<EAX>(tNet_game_details *pDetails@<EAX>, void **pSender_address@<EDX>)
 tNet_message* PDNetGetNextMessage(tNet_game_details* pDetails, void** pSender_address) {
-    char *receive_buffer;
+    char* receive_buffer;
     char str[256];
     int msg_type;
     LOG_TRACE("(%p, %p)", pDetails, pSender_address);

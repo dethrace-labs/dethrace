@@ -49,7 +49,7 @@ void* BrMemCalloc(int nelems, br_size_t size, br_uint_8 type) {
 // IDA: char* __cdecl BrMemStrDup(char *str)
 char* BrMemStrDup(char* str) {
     int l;
-    char *nstr;
+    char* nstr;
     LOG_TRACE("(\"%s\")", str);
     NOT_IMPLEMENTED();
 }

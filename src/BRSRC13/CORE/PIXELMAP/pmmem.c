@@ -237,8 +237,8 @@ br_error _M_br_device_pixelmap_mem_validSource(br_device_pixelmap* self, br_obje
 
 // IDA: br_error __cdecl _M_br_device_pixelmap_mem_resize(br_device_pixelmap *self, br_int_32 width, br_int_32 height)
 br_error _M_br_device_pixelmap_mem_resize(br_device_pixelmap* self, br_int_32 width, br_int_32 height) {
-    char *pixels;
-    pm_type_info *tip;
+    char* pixels;
+    pm_type_info* tip;
     br_int_16 old_row_bytes;
     LOG_TRACE("(%p, %d, %d)", self, width, height);
     NOT_IMPLEMENTED();
@@ -457,7 +457,7 @@ br_error _M_br_device_pixelmap_mem_line(br_device_pixelmap* self, br_point* s, b
     int step;
     int reverse;
     int i;
-    char *dest;
+    char* dest;
     int bytes;
     br_point as;
     br_point ae;

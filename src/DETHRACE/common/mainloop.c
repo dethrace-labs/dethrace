@@ -64,8 +64,8 @@ void MungeHeadups() {
     int oppo_count;
     tU32 the_time;
     float bearing;
-    br_material *nearby;
-    tPixelmap_user_data *user;
+    br_material* nearby;
+    tPixelmap_user_data* user;
     static tU32 last_rattle_time;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();

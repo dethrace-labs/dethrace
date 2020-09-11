@@ -410,7 +410,7 @@ br_pixelmap* LoadShadeTable(char* pName) {
 // IDA: br_material* __usercall LoadMaterial@<EAX>(char *pName@<EAX>)
 br_material* LoadMaterial(char* pName) {
     tPath_name the_path;
-    br_material *result;
+    br_material* result;
     LOG_TRACE("(\"%s\")", pName);
     NOT_IMPLEMENTED();
 }
@@ -490,7 +490,7 @@ void DRLoadMaterials(char* pPath_name) {
 
 // IDA: void __usercall DRLoadModels(char *pPath_name@<EAX>)
 void DRLoadModels(char* pPath_name) {
-    br_model *model_array[100];
+    br_model* model_array[100];
     int number_of_models;
     LOG_TRACE("(\"%s\")", pPath_name);
     NOT_IMPLEMENTED();
@@ -498,7 +498,7 @@ void DRLoadModels(char* pPath_name) {
 
 // IDA: void __usercall DRLoadActors(char *pPath_name@<EAX>)
 void DRLoadActors(char* pPath_name) {
-    br_actor *actor_array[100];
+    br_actor* actor_array[100];
     int number_of_actors;
     int i;
     LOG_TRACE("(\"%s\")", pPath_name);
@@ -641,13 +641,13 @@ tS8* ConvertPixTo16BitStripMap(br_pixelmap* pBr_map) {
     int counter;
     int chunk_counter;
     int max_line_bytes;
-    tU8 *next_byte;
-    tU8 *strip_image;
-    tU8 *current_strip_pointer;
-    tU8 *temp_strip_image;
-    tU8 *new_line;
+    tU8* next_byte;
+    tU8* strip_image;
+    tU8* current_strip_pointer;
+    tU8* temp_strip_image;
+    tU8* new_line;
     tU8 byte;
-    tU16 *palette_entry;
+    tU16* palette_entry;
     LOG_TRACE("(%p)", pBr_map);
     NOT_IMPLEMENTED();
 }
@@ -661,10 +661,10 @@ tS8* ConvertPixToStripMap(br_pixelmap* pThe_br_map) {
     int counting_blanks;
     int counter;
     int chunk_counter;
-    tU8 *next_byte;
-    tU8 *the_strip_image;
-    tU8 *current_strip_pointer;
-    tU8 *temp_strip_image;
+    tU8* next_byte;
+    tU8* the_strip_image;
+    tU8* current_strip_pointer;
+    tU8* temp_strip_image;
     tU8 new_line[800];
     tU8 the_byte;
     LOG_TRACE("(%p)", pThe_br_map);
@@ -673,7 +673,7 @@ tS8* ConvertPixToStripMap(br_pixelmap* pThe_br_map) {
 
 // IDA: void __usercall KillWindscreen(br_model *pModel@<EAX>, br_material *pMaterial@<EDX>)
 void KillWindscreen(br_model* pModel, br_material* pMaterial) {
-    br_face *face;
+    br_face* face;
     int i;
     LOG_TRACE("(%p, %p)", pModel, pMaterial);
     NOT_IMPLEMENTED();
@@ -681,8 +681,8 @@ void KillWindscreen(br_model* pModel, br_material* pMaterial) {
 
 // IDA: void __usercall DropOffDyingPeds(tCar_spec *pCar@<EAX>)
 void DropOffDyingPeds(tCar_spec* pCar) {
-    br_actor *child;
-    br_actor *next;
+    br_actor* child;
+    br_actor* next;
     LOG_TRACE("(%p)", pCar);
     NOT_IMPLEMENTED();
 }
@@ -706,7 +706,7 @@ void AdjustCarCoordinates(tCar_spec* pCar) {
 void LoadSpeedo(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
     tPath_name the_path;
     char s[256];
-    char *str;
+    char* str;
     char the_char1;
     char the_char2;
     LOG_TRACE("(%p, %d, %p)", pF, pIndex, pCar_spec);
@@ -717,7 +717,7 @@ void LoadSpeedo(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
 void LoadTacho(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
     tPath_name the_path;
     char s[256];
-    char *str;
+    char* str;
     char the_char1;
     char the_char2;
     LOG_TRACE("(%p, %d, %p)", pF, pIndex, pCar_spec);
@@ -727,7 +727,7 @@ void LoadTacho(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
 // IDA: void __usercall LoadHeadups(FILE *pF@<EAX>, int pIndex@<EDX>, tCar_spec *pCar_spec@<EBX>)
 void LoadHeadups(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
     char s[256];
-    char *str;
+    char* str;
     int j;
     int number_of_slots;
     LOG_TRACE("(%p, %d, %p)", pF, pIndex, pCar_spec);
@@ -740,7 +740,7 @@ void ReadNonCarMechanicsData(FILE* pF, tNon_car_spec* non_car) {
     int i;
     int j;
     char s[256];
-    tCollision_info *c;
+    tCollision_info* c;
     br_scalar wid;
     br_scalar het;
     br_scalar len;
@@ -765,7 +765,7 @@ void ReadMechanicsData(FILE* pF, tCar_spec* c) {
     br_scalar wid;
     br_scalar het;
     br_scalar len;
-    br_vector3 *actor_offset;
+    br_vector3* actor_offset;
     br_scalar speed;
     br_scalar force;
     LOG_TRACE("(%p, %p)", pF, c);
@@ -776,7 +776,7 @@ void ReadMechanicsData(FILE* pF, tCar_spec* c) {
 void LoadGear(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
     tPath_name the_path;
     char s[256];
-    char *str;
+    char* str;
     LOG_TRACE("(%p, %d, %p)", pF, pIndex, pCar_spec);
     NOT_IMPLEMENTED();
 }
@@ -789,14 +789,14 @@ void AddRefOffset(int* pRef_holder) {
 
 // IDA: void __usercall GetDamageProgram(FILE *pF@<EAX>, tCar_spec *pCar_spec@<EDX>, tImpact_location pImpact_location@<EBX>)
 void GetDamageProgram(FILE* pF, tCar_spec* pCar_spec, tImpact_location pImpact_location) {
-    tDamage_clause *the_clause;
+    tDamage_clause* the_clause;
     int i;
     int j;
     int k;
     int count;
     char s[256];
     char delim[64];
-    char *str;
+    char* str;
     LOG_TRACE("(%p, %p, %d)", pF, pCar_spec, pImpact_location);
     NOT_IMPLEMENTED();
 }
@@ -846,8 +846,8 @@ void DisposeClonedCar(tCar_spec* pCar) {
 
 // IDA: int __usercall RemoveDoubleSided@<EAX>(br_model *pModel@<EAX>)
 int RemoveDoubleSided(br_model* pModel) {
-    br_face *faces;
-    br_face *face;
+    br_face* faces;
+    br_face* face;
     int temp;
     int num_double_sided_faces;
     int i;
@@ -859,7 +859,7 @@ int RemoveDoubleSided(br_model* pModel) {
 
 // IDA: void __usercall MungeWindscreen(br_model *pModel@<EAX>)
 void MungeWindscreen(br_model* pModel) {
-    br_face *face;
+    br_face* face;
     int i;
     LOG_TRACE("(%p)", pModel);
     NOT_IMPLEMENTED();
@@ -873,9 +873,9 @@ void SetModelFlags(br_model* pModel, int pOwner) {
 
 // IDA: void __usercall LoadCar(char *pCar_name@<EAX>, tDriver pDriver@<EDX>, tCar_spec *pCar_spec@<EBX>, int pOwner@<ECX>, char *pDriver_name, tBrender_storage *pStorage_space)
 void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner, char* pDriver_name, tBrender_storage* pStorage_space) {
-    FILE *f;
-    FILE *g;
-    FILE *h;
+    FILE* f;
+    FILE* g;
+    FILE* h;
     tPath_name the_path;
     int i;
     int j;
@@ -889,11 +889,11 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
     int temp_index;
     int vertex_array_size;
     char s[256];
-    char *str;
-    br_pixelmap *the_image;
+    char* str;
+    br_pixelmap* the_image;
     float rate;
     float temp_float;
-    br_model *model;
+    br_model* model;
     br_vector3 tv;
     int v;
     int v_num;
@@ -1041,7 +1041,7 @@ void LoadOpponentGridIcon(tRace_info* pRace_info, int pIndex) {
 
 // IDA: void __usercall LoadRaceInfo(int pRace_index@<EAX>, tRace_info *pRace_info@<EDX>)
 void LoadRaceInfo(int pRace_index, tRace_info* pRace_info) {
-    FILE *f;
+    FILE* f;
     int i;
     int j;
     int k;
@@ -1051,9 +1051,9 @@ void LoadRaceInfo(int pRace_index, tRace_info* pRace_info) {
     int old_index;
     int temp_index;
     char s[256];
-    char *str;
+    char* str;
     float temp_float;
-    tText_chunk *the_chunk;
+    tText_chunk* the_chunk;
     LOG_TRACE("(%d, %p)", pRace_index, pRace_info);
     NOT_IMPLEMENTED();
 }
@@ -1063,7 +1063,7 @@ void DisposeRaceInfo(tRace_info* pRace_info) {
     int i;
     int j;
     int k;
-    tText_chunk *the_chunk;
+    tText_chunk* the_chunk;
     LOG_TRACE("(%p)", pRace_info);
     NOT_IMPLEMENTED();
 }
@@ -1225,7 +1225,7 @@ void UnlockParts() {
 
 // IDA: br_pixelmap* __cdecl LoadChromeFont()
 br_pixelmap* LoadChromeFont() {
-    br_pixelmap *result;
+    br_pixelmap* result;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -1283,7 +1283,7 @@ float GetAFloat(FILE* pF) {
 // IDA: float __usercall GetAFloatPercent@<ST0>(FILE *pF@<EAX>)
 float GetAFloatPercent(FILE* pF) {
     char s[256];
-    char *str;
+    char* str;
     float result;
     LOG_TRACE("(%p)", pF);
     NOT_IMPLEMENTED();
@@ -1344,7 +1344,7 @@ void GetThreeInts(FILE* pF, int* pF1, int* pF2, int* pF3) {
 // IDA: void __usercall GetThreeIntsAndAString(FILE *pF@<EAX>, int *pF1@<EDX>, int *pF2@<EBX>, int *pF3@<ECX>, char *pS)
 void GetThreeIntsAndAString(FILE* pF, int* pF1, int* pF2, int* pF3, char* pS) {
     char s[256];
-    char *str;
+    char* str;
     LOG_TRACE("(%p, %p, %p, %p, \"%s\")", pF, pF1, pF2, pF3, pS);
     NOT_IMPLEMENTED();
 }
@@ -1386,7 +1386,7 @@ void GetThreeScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2, br_scalar* pS3) {
 // IDA: void __usercall GetFourScalars(FILE *pF@<EAX>, br_scalar *pF1@<EDX>, br_scalar *pF2@<EBX>, br_scalar *pF3@<ECX>, br_scalar *pF4)
 void GetFourScalars(FILE* pF, br_scalar* pF1, br_scalar* pF2, br_scalar* pF3, br_scalar* pF4) {
     char s[256];
-    char *str;
+    char* str;
     float f1;
     float f2;
     float f3;
@@ -1398,7 +1398,7 @@ void GetFourScalars(FILE* pF, br_scalar* pF1, br_scalar* pF2, br_scalar* pF3, br
 // IDA: void __usercall GetFiveScalars(FILE *pF@<EAX>, br_scalar *pF1@<EDX>, br_scalar *pF2@<EBX>, br_scalar *pF3@<ECX>, br_scalar *pF4, br_scalar *pF5)
 void GetFiveScalars(FILE* pF, br_scalar* pF1, br_scalar* pF2, br_scalar* pF3, br_scalar* pF4, br_scalar* pF5) {
     char s[256];
-    char *str;
+    char* str;
     float f1;
     float f2;
     float f3;
@@ -1411,7 +1411,7 @@ void GetFiveScalars(FILE* pF, br_scalar* pF1, br_scalar* pF2, br_scalar* pF3, br
 // IDA: void __usercall GetNScalars(FILE *pF@<EAX>, int pNumber@<EDX>, br_scalar *pScalars@<EBX>)
 void GetNScalars(FILE* pF, int pNumber, br_scalar* pScalars) {
     char s[256];
-    char *str;
+    char* str;
     float fleurting_point_numero;
     int i;
     LOG_TRACE("(%p, %d, %p)", pF, pNumber, pScalars);
@@ -1421,7 +1421,7 @@ void GetNScalars(FILE* pF, int pNumber, br_scalar* pScalars) {
 // IDA: void __usercall GetPairOfFloatPercents(FILE *pF@<EAX>, float *pF1@<EDX>, float *pF2@<EBX>)
 void GetPairOfFloatPercents(FILE* pF, float* pF1, float* pF2) {
     char s[256];
-    char *str;
+    char* str;
     LOG_TRACE("(%p, %p, %p)", pF, pF1, pF2);
     NOT_IMPLEMENTED();
 }
@@ -1429,7 +1429,7 @@ void GetPairOfFloatPercents(FILE* pF, float* pF1, float* pF2) {
 // IDA: void __usercall GetThreeFloatPercents(FILE *pF@<EAX>, float *pF1@<EDX>, float *pF2@<EBX>, float *pF3@<ECX>)
 void GetThreeFloatPercents(FILE* pF, float* pF1, float* pF2, float* pF3) {
     char s[256];
-    char *str;
+    char* str;
     LOG_TRACE("(%p, %p, %p, %p)", pF, pF1, pF2, pF3);
     NOT_IMPLEMENTED();
 }
@@ -1746,7 +1746,7 @@ int PrintNetOptions(FILE* pF, int pIndex) {
 // IDA: int __cdecl SaveOptions()
 int SaveOptions() {
     tPath_name the_path;
-    FILE *f;
+    FILE* f;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

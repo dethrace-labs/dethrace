@@ -22,7 +22,7 @@ br_resource_class* BrResClassAdd(br_resource_class* rclass) {
 
 // IDA: br_resource_class* __cdecl BrResClassRemove(br_resource_class *rclass)
 br_resource_class* BrResClassRemove(br_resource_class* rclass) {
-    br_resource_class *r;
+    br_resource_class* r;
     LOG_TRACE("(%p)", rclass);
     NOT_IMPLEMENTED();
 }
@@ -35,7 +35,7 @@ br_resource_class* BrResClassFind(char* pattern) {
 
 // IDA: br_resclass_find_cbfn* __cdecl BrResClassFindHook(br_resclass_find_cbfn *hook)
 br_resclass_find_cbfn* BrResClassFindHook(br_resclass_find_cbfn* hook) {
-    br_resclass_find_cbfn *old;
+    br_resclass_find_cbfn* old;
     LOG_TRACE("(%p)", hook);
     NOT_IMPLEMENTED();
 }

@@ -104,14 +104,14 @@ int OKToSpillOil(tOil_spill_info* pOil) {
     br_vector3 ray_pos;
     br_vector3 ray_dir;
     br_vector3 normal;
-    tCar_spec *car;
+    tCar_spec* car;
     int i;
     int face_count;
     int found_one;
     br_angle angle_to_rotate_by;
     tBounds kev_bounds;
     tFace_ref the_list[10];
-    tFace_ref *face_ref;
+    tFace_ref* face_ref;
     LOG_TRACE("(%p)", pOil);
     NOT_IMPLEMENTED();
 }
@@ -154,12 +154,12 @@ void SetInitialOilStuff(tOil_spill_info* pOil, br_model* pModel) {
 void ProcessOilSpills(tU32 pFrame_period) {
     int i;
     tU32 time;
-    br_model *the_model;
+    br_model* the_model;
     br_scalar grow_amount;
     br_scalar initial_size;
     br_scalar this_size;
     br_vector3 v;
-    tNet_message *message;
+    tNet_message* message;
     LOG_TRACE("(%d)", pFrame_period);
     NOT_IMPLEMENTED();
 }
@@ -203,7 +203,7 @@ void ReceivedOilSpill(tNet_contents* pContents) {
     int oldest_one;
     tU32 the_time;
     tU32 oldest_time;
-    tCar_spec *car;
+    tCar_spec* car;
     LOG_TRACE("(%p)", pContents);
     NOT_IMPLEMENTED();
 }

@@ -167,9 +167,9 @@ void FatalError(int pStr_index, ...) {
 // IDA: void __cdecl NonFatalError(int pStr_index, ...)
 void NonFatalError(int pStr_index, ...) {
     char the_str[256];
-    char *sub_str;
+    char* sub_str;
     char temp_str[256];
-    char *sub_pt;
+    char* sub_pt;
     va_list ap;
     LOG_TRACE("(%d)", pStr_index);
     NOT_IMPLEMENTED();

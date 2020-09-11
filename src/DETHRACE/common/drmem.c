@@ -276,7 +276,7 @@ int AllocationErrorsAreFatal() {
 // IDA: void __cdecl MAMSInitMem()
 void MAMSInitMem() {
     int i;
-    FILE *f;
+    FILE* f;
     tPath_name the_path;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();

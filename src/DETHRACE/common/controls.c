@@ -378,7 +378,7 @@ void MoveBonnetForward() {
 
 // IDA: void __cdecl SaveBonnet()
 void SaveBonnet() {
-    br_actor *bonny;
+    br_actor* bonny;
     tPath_name the_path;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
@@ -660,7 +660,7 @@ void CheckOtherRacingKeys() {
     br_scalar ts;
     br_vector3 tv;
     int flip_up_flag;
-    tCar_spec *car;
+    tCar_spec* car;
     float bodywork_repair_amount;
     static tU32 total_repair_cost;
     static tS3_sound_tag sound_tag;
@@ -703,7 +703,7 @@ void FlipUpCar(tCar_spec* car) {
     int l;
     int count;
     br_scalar dist;
-    br_material *material;
+    br_material* material;
     br_scalar t;
     LOG_TRACE("(%p)", car);
     NOT_IMPLEMENTED();
@@ -771,7 +771,7 @@ void PollCarControls(tU32 pTime_difference) {
     tS32 joyY;
     tCar_controls keys;
     tJoystick joystick;
-    tCar_spec *c;
+    tCar_spec* c;
     LOG_TRACE("(%d)", pTime_difference);
     NOT_IMPLEMENTED();
 }
@@ -853,7 +853,7 @@ int HornBlowing() {
 
 // IDA: void __cdecl ToggleArrow()
 void ToggleArrow() {
-    static br_actor *old_actor;
+    static br_actor* old_actor;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -932,8 +932,8 @@ void CycleSoundDetailLevel() {
 
 // IDA: void __cdecl CycleCarSimplificationLevel()
 void CycleCarSimplificationLevel() {
-    char *src;
-    char *dst;
+    char* src;
+    char* dst;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -1013,8 +1013,8 @@ void EnterUserMessage() {
     static int last_key;
     static int about_to_die;
     static tU32 next_time;
-    char *the_message;
-    char *p;
+    char* the_message;
+    char* p;
     int len;
     int the_key;
     int abuse_num;
@@ -1024,9 +1024,9 @@ void EnterUserMessage() {
 
 // IDA: void __cdecl DisplayUserMessage()
 void DisplayUserMessage() {
-    char *the_message;
+    char* the_message;
     int len;
-    tDR_font *font;
+    tDR_font* font;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -1035,7 +1035,7 @@ void DisplayUserMessage() {
 void InitAbuseomatic() {
     char path[256];
     char s[256];
-    FILE *f;
+    FILE* f;
     int i;
     int len;
     LOG_TRACE("()");

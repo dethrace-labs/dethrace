@@ -74,9 +74,9 @@ int DrawLine3D(br_vector3* start, br_vector3* end, br_pixelmap* pScreen, br_pixe
 
 // IDA: int __usercall DrawLine2D@<EAX>(br_vector3 *o@<EAX>, br_vector3 *p@<EDX>, br_pixelmap *pScreen@<EBX>, br_pixelmap *pDepth_buffer@<ECX>, br_scalar brightness, br_pixelmap *shade_table)
 int DrawLine2D(br_vector3* o, br_vector3* p, br_pixelmap* pScreen, br_pixelmap* pDepth_buffer, br_scalar brightness, br_pixelmap* shade_table) {
-    tU8 *scr_ptr;
-    tU16 *depth_ptr;
-    tU8 *shade_ptr;
+    tU8* scr_ptr;
+    tU16* depth_ptr;
+    tU8* shade_ptr;
     int x1;
     int x2;
     int y1;
@@ -157,7 +157,7 @@ void CreateSparkShower(br_vector3* pos, br_vector3* v, br_vector3* pForce, tCar_
     br_scalar ts2;
     int num;
     int i;
-    tCar_spec *c;
+    tCar_spec* c;
     br_vector3 tv;
     br_vector3 tv2;
     br_vector3 normal;
@@ -168,7 +168,7 @@ void CreateSparkShower(br_vector3* pos, br_vector3* v, br_vector3* pForce, tCar_
 // IDA: void __usercall AdjustSpark(int pSpark_num@<EAX>, br_vector3 *pos@<EDX>, br_vector3 *length@<EBX>)
 void AdjustSpark(int pSpark_num, br_vector3* pos, br_vector3* length) {
     br_vector3 tv;
-    br_matrix34 *mat;
+    br_matrix34* mat;
     int i;
     LOG_TRACE("(%d, %p, %p)", pSpark_num, pos, length);
     NOT_IMPLEMENTED();
@@ -201,7 +201,7 @@ void CreateShrapnelShower(br_vector3* pos, br_vector3* v, br_vector3* pNormal, b
     br_scalar rnd;
     int num;
     int i;
-    tCar_spec *c;
+    tCar_spec* c;
     br_vector3 tv;
     br_vector3 tv2;
     br_vector3 vel;
@@ -239,7 +239,7 @@ void DisposeShrapnel() {
 // IDA: void __usercall ReplayShrapnel(tU32 pTime@<EAX>)
 void ReplayShrapnel(tU32 pTime) {
     int i;
-    br_matrix34 *mat;
+    br_matrix34* mat;
     LOG_TRACE("(%d)", pTime);
     NOT_IMPLEMENTED();
 }
@@ -248,7 +248,7 @@ void ReplayShrapnel(tU32 pTime) {
 void MungeShrapnel(tU32 pTime) {
     br_vector3 disp;
     int i;
-    br_matrix34 *mat;
+    br_matrix34* mat;
     br_scalar ts;
     LOG_TRACE("(%d)", pTime);
     NOT_IMPLEMENTED();
@@ -281,11 +281,11 @@ void SmokeLine(int l, int x, br_scalar zbuff, int r_squared, tU8* scr_ptr, tU16*
 
 // IDA: void __usercall SmokeCircle(br_vector3 *o@<EAX>, br_scalar r, br_scalar extra_z, br_scalar strength, br_scalar pAspect, br_pixelmap *pRender_screen, br_pixelmap *pDepth_buffer, br_pixelmap *pShade_table)
 void SmokeCircle(br_vector3* o, br_scalar r, br_scalar extra_z, br_scalar strength, br_scalar pAspect, br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_pixelmap* pShade_table) {
-    tU8 *scr_ptr;
-    tU16 *depth_ptr;
-    tU8 *shade_ptr;
-    tU8 *osp;
-    tU16 *odp;
+    tU8* scr_ptr;
+    tU16* depth_ptr;
+    tU8* shade_ptr;
+    tU8* osp;
+    tU16* odp;
     int ox;
     int oy;
     int i;
@@ -314,8 +314,8 @@ void SmokeCircle(br_vector3* o, br_scalar r, br_scalar extra_z, br_scalar streng
 
 // IDA: int __cdecl CmpSmokeZ(void *p1, void *p2)
 int CmpSmokeZ(void* p1, void* p2) {
-    tBRender_smoke **a;
-    tBRender_smoke **b;
+    tBRender_smoke** a;
+    tBRender_smoke** b;
     LOG_TRACE("(%p, %p)", p1, p2);
     NOT_IMPLEMENTED();
 }
@@ -323,7 +323,7 @@ int CmpSmokeZ(void* p1, void* p2) {
 // IDA: void __cdecl RenderRecordedSmokeCircles()
 void RenderRecordedSmokeCircles() {
     int i;
-    tBRender_smoke *smoke;
+    tBRender_smoke* smoke;
     tU8 red;
     tU8 grn;
     tU8 blu;
@@ -344,7 +344,7 @@ void SmokeCircle3D(br_vector3* o, br_scalar r, br_scalar strength, br_scalar pAs
     br_vector3 tv;
     br_vector3 p;
     br_vector4 o2;
-    br_camera *cam;
+    br_camera* cam;
     int scaled_r;
     br_scalar extra_z;
     LOG_TRACE("(%p, %f, %f, %f, %p, %p, %p, %p)", o, r, strength, pAspect, pRender_screen, pDepth_buffer, pShade_table, pCam);
@@ -422,7 +422,7 @@ void ActorError() {
 // IDA: void __usercall AdjustSmokeColumn(int pIndex@<EAX>, tCar_spec *pCar@<EDX>, int pVertex@<EBX>, int pColour@<ECX>)
 void AdjustSmokeColumn(int pIndex, tCar_spec* pCar, int pVertex, int pColour) {
     int i;
-    br_actor *actor;
+    br_actor* actor;
     LOG_TRACE("(%d, %p, %d, %d)", pIndex, pCar, pVertex, pColour);
     NOT_IMPLEMENTED();
 }
@@ -430,8 +430,8 @@ void AdjustSmokeColumn(int pIndex, tCar_spec* pCar, int pVertex, int pColour) {
 // IDA: void __usercall CreateSmokeColumn(tCar_spec *pCar@<EAX>, int pColour@<EDX>, int pVertex_index@<EBX>, tU32 pLifetime@<ECX>)
 void CreateSmokeColumn(tCar_spec* pCar, int pColour, int pVertex_index, tU32 pLifetime) {
     int i;
-    br_actor *actor;
-    tSmoke_column *col;
+    br_actor* actor;
+    tSmoke_column* col;
     LOG_TRACE("(%p, %d, %d, %d)", pCar, pColour, pVertex_index, pLifetime);
     NOT_IMPLEMENTED();
 }
@@ -461,8 +461,8 @@ void GenerateItFoxShadeTable() {
 void AdjustFlame(int pIndex, int pFrame_count, br_scalar pScale_x, br_scalar pScale_y, br_scalar pOffset_x, br_scalar pOffset_z) {
     int i;
     int j;
-    tSmoke_column *col;
-    br_actor *actor;
+    tSmoke_column* col;
+    br_actor* actor;
     LOG_TRACE("(%d, %d, %f, %f, %f, %f)", pIndex, pFrame_count, pScale_x, pScale_y, pOffset_x, pOffset_z);
     NOT_IMPLEMENTED();
 }
@@ -476,8 +476,8 @@ void ReplayFlame(tSmoke_column* col, br_actor* actor) {
 
 // IDA: void __usercall FlameAnimate(int c@<EAX>, br_vector3 *pPos@<EDX>, tU32 pTime@<EBX>)
 void FlameAnimate(int c, br_vector3* pPos, tU32 pTime) {
-    tSmoke_column *col;
-    br_actor *actor;
+    tSmoke_column* col;
+    br_actor* actor;
     int i;
     LOG_TRACE("(%d, %p, %d)", c, pPos, pTime);
     NOT_IMPLEMENTED();
@@ -485,9 +485,9 @@ void FlameAnimate(int c, br_vector3* pPos, tU32 pTime) {
 
 // IDA: void __usercall DoSmokeColumn(int i@<EAX>, tU32 pTime@<EDX>, br_vector3 *pRet_car_pos@<EBX>)
 void DoSmokeColumn(int i, tU32 pTime, br_vector3* pRet_car_pos) {
-    tCar_spec *c;
-    br_actor *actor;
-    br_actor *bonny;
+    tCar_spec* c;
+    br_actor* actor;
+    br_actor* bonny;
     int group;
     LOG_TRACE("(%d, %d, %p)", i, pTime, pRet_car_pos);
     NOT_IMPLEMENTED();
@@ -505,8 +505,8 @@ void ReplaySmokeColumn(tU32 pTime) {
 void MungeSmokeColumn(tU32 pTime) {
     int i;
     int plane;
-    br_actor *actor;
-    br_actor *bonny;
+    br_actor* actor;
+    br_actor* bonny;
     br_vector3 car_pos;
     br_vector3 pos;
     br_vector3 v;
@@ -515,7 +515,7 @@ void MungeSmokeColumn(tU32 pTime) {
     br_vector3 end;
     br_scalar ts;
     br_scalar decay_factor;
-    tCar_spec *c;
+    tCar_spec* c;
     LOG_TRACE("(%d)", pTime);
     NOT_IMPLEMENTED();
 }
@@ -524,8 +524,8 @@ void MungeSmokeColumn(tU32 pTime) {
 void DisposeFlame() {
     int i;
     int j;
-    br_actor *actor;
-    br_material *material;
+    br_actor* actor;
+    br_material* material;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -536,8 +536,8 @@ void InitFlame() {
     int j;
     int num;
     char the_path[256];
-    br_actor *actor;
-    br_material *material;
+    br_actor* actor;
+    br_material* material;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -547,10 +547,10 @@ void InitSplash(FILE* pF) {
     int i;
     int num_files;
     int num;
-    br_actor *actor;
+    br_actor* actor;
     char the_path[256];
     char s[256];
-    br_pixelmap *splash_maps[20];
+    br_pixelmap* splash_maps[20];
     LOG_TRACE("(%p)", pF);
     NOT_IMPLEMENTED();
 }
@@ -574,10 +574,10 @@ void DrawTheGlow(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
 
 // IDA: void __usercall PipeInstantUnSmudge(tCar_spec *pCar@<EAX>)
 void PipeInstantUnSmudge(tCar_spec* pCar) {
-    br_model *model;
-    br_model *b_model;
-    br_actor *actor;
-    br_actor *bonny;
+    br_model* model;
+    br_model* b_model;
+    br_actor* actor;
+    br_actor* bonny;
     int j;
     int n;
     int v;
@@ -592,10 +592,10 @@ void SmudgeCar(tCar_spec* pCar, int fire_point) {
     int v;
     int j;
     int real_vertex_number;
-    br_model *model;
-    br_model *b_model;
-    br_actor *actor;
-    br_actor *bonny;
+    br_model* model;
+    br_model* b_model;
+    br_actor* actor;
+    br_actor* bonny;
     br_scalar ts;
     br_vector3 tv;
     br_vector3 bonny_pos;
@@ -661,8 +661,8 @@ void ConditionalSmokeColumn(tCar_spec* pCar, int pDamage_index, int pColour) {
 
 // IDA: void __usercall SingleSplash(tCar_spec *pCar@<EAX>, br_vector3 *sp@<EDX>, br_vector3 *normal@<EBX>, tU32 pTime@<ECX>)
 void SingleSplash(tCar_spec* pCar, br_vector3* sp, br_vector3* normal, tU32 pTime) {
-    br_matrix34 *mat;
-    br_matrix34 *c_mat;
+    br_matrix34* mat;
+    br_matrix34* c_mat;
     br_vector3 tv;
     br_vector3 vel;
     br_scalar size;
@@ -707,7 +707,7 @@ void MungeSplash(tU32 pTime) {
     br_vector3 tv;
     br_scalar dt;
     br_scalar ts;
-    tCar_spec *car;
+    tCar_spec* car;
     tVehicle_type type;
     LOG_TRACE("(%d)", pTime);
     NOT_IMPLEMENTED();
@@ -782,17 +782,17 @@ void DoModelThing(br_actor* actor, br_model* pModel, br_material* material, void
 // IDA: void __usercall SetModelShade(br_actor *pActor@<EAX>, br_pixelmap *pShade@<EDX>)
 void SetModelShade(br_actor* pActor, br_pixelmap* pShade) {
     int i;
-    br_material *material;
-    br_model *model;
+    br_material* material;
+    br_model* model;
     LOG_TRACE("(%p, %p)", pActor, pShade);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall MakeCarIt(tCar_spec *pCar@<EAX>)
 void MakeCarIt(tCar_spec* pCar) {
-    br_actor *actor;
-    br_actor *bonny;
-    br_pixelmap *shade[6];
+    br_actor* actor;
+    br_actor* bonny;
+    br_pixelmap* shade[6];
     static int shade_num;
     int i;
     LOG_TRACE("(%p)", pCar);
@@ -803,8 +803,8 @@ void MakeCarIt(tCar_spec* pCar) {
 void StopCarBeingIt(tCar_spec* pCar) {
     int i;
     int group;
-    br_actor *actor;
-    br_actor *bonny;
+    br_actor* actor;
+    br_actor* bonny;
     LOG_TRACE("(%p)", pCar);
     NOT_IMPLEMENTED();
 }

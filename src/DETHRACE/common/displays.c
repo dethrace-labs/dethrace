@@ -61,7 +61,7 @@ void ClearHeadup(int pIndex) {
 // IDA: void __usercall ClearHeadupSlot(int pSlot_index@<EAX>)
 void ClearHeadupSlot(int pSlot_index) {
     int i;
-    tHeadup *the_headup;
+    tHeadup* the_headup;
     LOG_TRACE("(%d)", pSlot_index);
     NOT_IMPLEMENTED();
 }
@@ -86,7 +86,7 @@ void DRPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFont, cha
     int len;
     int chr;
     int ch_width;
-    unsigned char *ch;
+    unsigned char* ch;
     LOG_TRACE("(%p, %d, %d, %p, \"%s\", %d)", pPixelmap, pX, pY, pFont, pText, pRight_edge);
     NOT_IMPLEMENTED();
 }
@@ -98,8 +98,8 @@ void DRPixelmapCleverText2(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFo
     int len;
     int chr;
     int ch_width;
-    unsigned char *ch;
-    tDR_font *new_font;
+    unsigned char* ch;
+    tDR_font* new_font;
     LOG_TRACE("(%p, %d, %d, %p, %p, %d)", pPixelmap, pX, pY, pFont, pText, pRight_edge);
     NOT_IMPLEMENTED();
 }
@@ -112,9 +112,9 @@ void DeviouslyDimRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRig
 
 // IDA: void __cdecl DimRectangle(br_pixelmap *pPixelmap, int pLeft, int pTop, int pRight, int pBottom, int pKnock_out_corners)
 void DimRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int pBottom, int pKnock_out_corners) {
-    tU8 *ptr;
-    tU8 *depth_table_ptr;
-    tU8 *right_ptr;
+    tU8* ptr;
+    tU8* depth_table_ptr;
+    tU8* right_ptr;
     int x;
     int y;
     int line_skip;
@@ -162,7 +162,7 @@ void DoHeadups(tU32 pThe_time) {
     int i;
     int x_offset;
     int y_offset;
-    tHeadup *the_headup;
+    tHeadup* the_headup;
     int time_factor;
     LOG_TRACE("(%d)", pThe_time);
     NOT_IMPLEMENTED();
@@ -172,7 +172,7 @@ void DoHeadups(tU32 pThe_time) {
 int FindAHeadupHoleWoofBarkSoundsABitRude(int pSlot_index) {
     int i;
     int empty_one;
-    tHeadup *the_headup;
+    tHeadup* the_headup;
     LOG_TRACE("(%d)", pSlot_index);
     NOT_IMPLEMENTED();
 }
@@ -201,7 +201,7 @@ int DRTextCleverWidth(tDR_font* pFont, signed char* pText) {
     int i;
     int len;
     int result;
-    unsigned char *c;
+    unsigned char* c;
     LOG_TRACE("(%p, %p)", pFont, pText);
     NOT_IMPLEMENTED();
 }
@@ -229,8 +229,8 @@ int MungeHeadupWidth(tHeadup* pHeadup) {
 // IDA: int __usercall NewTextHeadupSlot2@<EAX>(int pSlot_index@<EAX>, int pFlash_rate@<EDX>, int pLifetime@<EBX>, int pFont_index@<ECX>, char *pText, int pQueue_it)
 int NewTextHeadupSlot2(int pSlot_index, int pFlash_rate, int pLifetime, int pFont_index, char* pText, int pQueue_it) {
     int index;
-    tHeadup *the_headup;
-    tHeadup_slot *headup_slot;
+    tHeadup* the_headup;
+    tHeadup_slot* headup_slot;
     tU32 time;
     LOG_TRACE("(%d, %d, %d, %d, \"%s\", %d)", pSlot_index, pFlash_rate, pLifetime, pFont_index, pText, pQueue_it);
     NOT_IMPLEMENTED();
@@ -245,8 +245,8 @@ int NewTextHeadupSlot(int pSlot_index, int pFlash_rate, int pLifetime, int pFont
 // IDA: int __usercall NewImageHeadupSlot@<EAX>(int pSlot_index@<EAX>, int pFlash_rate@<EDX>, int pLifetime@<EBX>, int pImage_index@<ECX>)
 int NewImageHeadupSlot(int pSlot_index, int pFlash_rate, int pLifetime, int pImage_index) {
     int index;
-    tHeadup *the_headup;
-    tHeadup_slot *headup_slot;
+    tHeadup* the_headup;
+    tHeadup_slot* headup_slot;
     LOG_TRACE("(%d, %d, %d, %d)", pSlot_index, pFlash_rate, pLifetime, pImage_index);
     NOT_IMPLEMENTED();
 }
@@ -254,7 +254,7 @@ int NewImageHeadupSlot(int pSlot_index, int pFlash_rate, int pLifetime, int pIma
 // IDA: void __usercall DoFancyHeadup(int pIndex@<EAX>)
 void DoFancyHeadup(int pIndex) {
     tU32 the_time;
-    tHeadup *the_headup;
+    tHeadup* the_headup;
     int temp_ref;
     LOG_TRACE("(%d)", pIndex);
     NOT_IMPLEMENTED();
@@ -265,7 +265,7 @@ void AdjustHeadups() {
     int i;
     int delta_x;
     int delta_y;
-    tHeadup *the_headup;
+    tHeadup* the_headup;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -273,21 +273,21 @@ void AdjustHeadups() {
 // IDA: void __usercall MoveHeadupTo(int pHeadup_index@<EAX>, int pNew_x@<EDX>, int pNew_y@<EBX>)
 void MoveHeadupTo(int pHeadup_index, int pNew_x, int pNew_y) {
     int delta_x;
-    tHeadup *the_headup;
+    tHeadup* the_headup;
     LOG_TRACE("(%d, %d, %d)", pHeadup_index, pNew_x, pNew_y);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall ChangeHeadupText(int pHeadup_index@<EAX>, char *pNew_text@<EDX>)
 void ChangeHeadupText(int pHeadup_index, char* pNew_text) {
-    tHeadup *the_headup;
+    tHeadup* the_headup;
     LOG_TRACE("(%d, \"%s\")", pHeadup_index, pNew_text);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall ChangeHeadupImage(int pHeadup_index@<EAX>, int pNew_image@<EDX>)
 void ChangeHeadupImage(int pHeadup_index, int pNew_image) {
-    tHeadup *the_headup;
+    tHeadup* the_headup;
     LOG_TRACE("(%d, %d)", pHeadup_index, pNew_image);
     NOT_IMPLEMENTED();
 }
@@ -305,8 +305,8 @@ void DoDamageScreen(tU32 pThe_time) {
     int the_step;
     int the_wobble_x;
     int the_wobble_y;
-    br_pixelmap *the_image;
-    tDamage_unit *the_damage;
+    br_pixelmap* the_image;
+    tDamage_unit* the_damage;
     LOG_TRACE("(%d)", pThe_time);
     NOT_IMPLEMENTED();
 }
@@ -319,8 +319,8 @@ void PoshDrawLine(float pAngle, br_pixelmap* pDestn, int pX1, int pY1, int pX2, 
 
 // IDA: void __usercall DoInstruments(tU32 pThe_time@<EAX>)
 void DoInstruments(tU32 pThe_time) {
-    br_pixelmap *speedo_image;
-    br_pixelmap *tacho_image;
+    br_pixelmap* speedo_image;
+    br_pixelmap* tacho_image;
     int the_wobble_x;
     int the_wobble_y;
     int gear;
@@ -335,7 +335,7 @@ void DoInstruments(tU32 pThe_time) {
 
 // IDA: void __usercall DoSteeringWheel(tU32 pThe_time@<EAX>)
 void DoSteeringWheel(tU32 pThe_time) {
-    br_pixelmap *hands_image;
+    br_pixelmap* hands_image;
     int hands_index;
     LOG_TRACE("(%d)", pThe_time);
     NOT_IMPLEMENTED();
@@ -394,7 +394,7 @@ void DrawRRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int
 
 // IDA: void __usercall OoerrIveGotTextInMeBoxMissus(int pFont_index@<EAX>, char *pText@<EDX>, br_pixelmap *pPixelmap@<EBX>, int pLeft@<ECX>, int pTop, int pRight, int pBottom, int pCentred)
 void OoerrIveGotTextInMeBoxMissus(int pFont_index, char* pText, br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int pBottom, int pCentred) {
-    tDR_font *font;
+    tDR_font* font;
     int width;
     int current_width;
     int i;

@@ -21,7 +21,7 @@ int NumberOfOpponentsLeft() {
     int i;
     int car_count;
     int result;
-    tCar_spec *the_car;
+    tCar_spec* the_car;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -68,7 +68,7 @@ void WrongCheckpoint(int pCheckpoint_index) {
 
 // IDA: void __cdecl CheckCheckpoints()
 void CheckCheckpoints() {
-    tCar_spec *car;
+    tCar_spec* car;
     br_vector3 orig;
     br_vector3 dir;
     int i;
@@ -76,7 +76,7 @@ void CheckCheckpoints() {
     int cat;
     int car_count;
     int car_index;
-    tNet_game_player_info *net_player;
+    tNet_game_player_info* net_player;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

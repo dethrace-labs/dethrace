@@ -41,7 +41,7 @@ br_error _M_br_object_queryAllSize(br_object* self, br_size_t* psize) {
 
 // IDA: void __cdecl _BrObjectFree(void *res, br_uint_8 res_class, br_size_t size)
 void _BrObjectFree(void* res, br_uint_8 res_class, br_size_t size) {
-    br_object *o;
+    br_object* o;
     LOG_TRACE("(%p, %d, %d)", res, res_class, size);
     NOT_IMPLEMENTED();
 }

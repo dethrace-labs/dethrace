@@ -63,7 +63,7 @@ br_angle gPanning_camera_angle;
 
 // IDA: void __usercall DamageUnit(tCar_spec *pCar@<EAX>, int pUnit_type@<EDX>, int pDamage_amount@<EBX>)
 void DamageUnit(tCar_spec* pCar, int pUnit_type, int pDamage_amount) {
-    tDamage_unit *the_damage;
+    tDamage_unit* the_damage;
     LOG_TRACE("(%p, %d, %d)", pCar, pUnit_type, pDamage_amount);
     NOT_IMPLEMENTED();
 }
@@ -178,15 +178,15 @@ void InitialiseCar2(tCar_spec* pCar, int pClear_disabled_flag) {
     int j;
     int cat;
     int car_count;
-    br_actor *car_actor;
+    br_actor* car_actor;
     br_angle initial_yaw;
     br_scalar nearest_y_above;
     br_scalar nearest_y_below;
     br_scalar speed;
     int below_face_index;
     int above_face_index;
-    br_model *below_model;
-    br_model *above_model;
+    br_model* below_model;
+    br_model* above_model;
     br_vector3 grid_offset;
     br_matrix34 initial_yaw_matrix;
     br_matrix34 safe_position;
@@ -205,7 +205,7 @@ void InitialiseCarsEtc(tRace_info* pThe_race) {
     int i;
     int cat;
     int car_count;
-    tCar_spec *car;
+    tCar_spec* car;
     br_bounds bnds;
     LOG_TRACE("(%p)", pThe_race);
     NOT_IMPLEMENTED();
@@ -215,7 +215,7 @@ void InitialiseCarsEtc(tRace_info* pThe_race) {
 void GetAverageGridPosition(tRace_info* pThe_race) {
     int i;
     br_scalar total_cars;
-    tCar_spec *car;
+    tCar_spec* car;
     LOG_TRACE("(%p)", pThe_race);
     NOT_IMPLEMENTED();
 }
@@ -226,16 +226,16 @@ void SetInitialPosition(tRace_info* pThe_race, int pCar_index, int pGrid_index) 
     int i;
     int start_i;
     int j;
-    br_actor *car_actor;
+    br_actor* car_actor;
     br_angle initial_yaw;
     br_scalar nearest_y_above;
     br_scalar nearest_y_below;
     br_scalar speed;
     int below_face_index;
     int above_face_index;
-    br_model *below_model;
-    br_model *above_model;
-    tCar_spec *car;
+    br_model* below_model;
+    br_model* above_model;
+    tCar_spec* car;
     br_vector3 grid_offset;
     br_vector3 dist;
     br_vector3 real_pos;
@@ -254,7 +254,7 @@ void SetInitialPositions(tRace_info* pThe_race) {
 
 // IDA: void __usercall InitialiseNonCar(tNon_car_spec *non_car@<EAX>)
 void InitialiseNonCar(tNon_car_spec* non_car) {
-    tCollision_info *c;
+    tCollision_info* c;
     LOG_TRACE("(%p)", non_car);
     NOT_IMPLEMENTED();
 }
@@ -297,7 +297,7 @@ void RememberSafePosition(tCar_spec* car, tU32 pTime) {
 void ControlOurCar(tU32 pTime_difference) {
     br_scalar ts;
     br_vector3 minus_k;
-    tCar_spec *car;
+    tCar_spec* car;
     static int steering_locked;
     int i;
     tU32 time;
@@ -319,7 +319,7 @@ void CalcEngineForce(tCar_spec* c, br_scalar dt) {
 
 // IDA: void __usercall PrepareCars(tU32 pFrame_start_time@<EAX>)
 void PrepareCars(tU32 pFrame_start_time) {
-    tCar_spec *car;
+    tCar_spec* car;
     int i;
     static tU32 last_frame_start;
     LOG_TRACE("(%d)", pFrame_start_time);
@@ -328,7 +328,7 @@ void PrepareCars(tU32 pFrame_start_time) {
 
 // IDA: void __usercall FinishCars(tU32 pLast_frame_time@<EAX>, tU32 pTime@<EDX>)
 void FinishCars(tU32 pLast_frame_time, tU32 pTime) {
-    tCar_spec *car;
+    tCar_spec* car;
     br_vector3 minus_k;
     int i;
     int wheel;
@@ -339,7 +339,7 @@ void FinishCars(tU32 pLast_frame_time, tU32 pTime) {
 // IDA: void __usercall InterpolateCars(tU32 pLast_frame_time@<EAX>, tU32 pTime@<EDX>)
 void InterpolateCars(tU32 pLast_frame_time, tU32 pTime) {
     br_scalar dt;
-    tCar_spec *car;
+    tCar_spec* car;
     int i;
     LOG_TRACE("(%d, %d)", pLast_frame_time, pTime);
     NOT_IMPLEMENTED();
@@ -347,7 +347,7 @@ void InterpolateCars(tU32 pLast_frame_time, tU32 pTime) {
 
 // IDA: void __cdecl ResetOldmat()
 void ResetOldmat() {
-    tCar_spec *car;
+    tCar_spec* car;
     int i;
     br_matrix34 mat;
     static int normalise_count;
@@ -380,9 +380,9 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
     int step_number;
     int dam_index;
     static int steering_locked;
-    tCar_spec *car;
-    tCollision_info *car_info;
-    tNon_car_spec *non_car;
+    tCar_spec* car;
+    tCollision_info* car_info;
+    tNon_car_spec* non_car;
     tU32 time_step;
     tU32 frame_end_time;
     LOG_TRACE("(%d, %d)", last_frame_time, pTime_difference);
@@ -391,8 +391,8 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
 
 // IDA: void __usercall MungeSpecialVolume(tCollision_info *pCar@<EAX>)
 void MungeSpecialVolume(tCollision_info* pCar) {
-    tSpecial_volume *new_special_volume;
-    tCar_spec *car;
+    tSpecial_volume* new_special_volume;
+    tCar_spec* car;
     LOG_TRACE("(%p)", pCar);
     NOT_IMPLEMENTED();
 }
@@ -403,9 +403,9 @@ void ResetCarSpecialVolume(tCollision_info* pCar) {
     br_vector3 norm;
     br_scalar t;
     int id_len;
-    char *mat_id;
-    tSpecial_volume *new_special_volume;
-    br_material *material;
+    char* mat_id;
+    tSpecial_volume* new_special_volume;
+    br_material* material;
     LOG_TRACE("(%p)", pCar);
     NOT_IMPLEMENTED();
 }
@@ -420,8 +420,8 @@ void TestAutoSpecialVolume(tCollision_info* pCar) {
     br_vector3 tv;
     br_vector3 lp;
     br_vector3 hp;
-    tSpecial_volume *vol;
-    br_matrix34 *mat;
+    tSpecial_volume* vol;
+    br_matrix34* mat;
     br_scalar lowest_p;
     br_scalar highest_p;
     br_scalar val;
@@ -432,7 +432,7 @@ void TestAutoSpecialVolume(tCollision_info* pCar) {
 
 // IDA: void __usercall MoveAndCollideCar(tCar_spec *car@<EAX>, br_scalar dt)
 void MoveAndCollideCar(tCar_spec* car, br_scalar dt) {
-    tCollision_info *car_info;
+    tCollision_info* car_info;
     int wheel;
     LOG_TRACE("(%p, %f)", car, dt);
     NOT_IMPLEMENTED();
@@ -440,7 +440,7 @@ void MoveAndCollideCar(tCar_spec* car, br_scalar dt) {
 
 // IDA: void __usercall MoveAndCollideNonCar(tNon_car_spec *non_car@<EAX>, br_scalar dt)
 void MoveAndCollideNonCar(tNon_car_spec* non_car, br_scalar dt) {
-    tCollision_info *car_info;
+    tCollision_info* car_info;
     LOG_TRACE("(%p, %f)", non_car, dt);
     NOT_IMPLEMENTED();
 }
@@ -562,8 +562,8 @@ void SteeringSelfCentre(tCar_spec* c, br_scalar dt, br_vector3* n) {
 
 // IDA: void __usercall NonCarCalcForce(tNon_car_spec *nc@<EAX>, br_scalar dt)
 void NonCarCalcForce(tNon_car_spec* nc, br_scalar dt) {
-    tCollision_info *c;
-    tSpecial_volume *vol;
+    tCollision_info* c;
+    tSpecial_volume* vol;
     br_scalar ts;
     br_vector3 tv;
     br_vector3 v;
@@ -575,7 +575,7 @@ void NonCarCalcForce(tNon_car_spec* nc, br_scalar dt) {
 void AddDrag(tCar_spec* c, br_scalar dt) {
     br_scalar drag_multiplier;
     br_scalar ts;
-    tSpecial_volume *vol;
+    tSpecial_volume* vol;
     br_vector3 b;
     LOG_TRACE("(%p, %f)", c, dt);
     NOT_IMPLEMENTED();
@@ -587,7 +587,7 @@ void DoBumpiness(tCar_spec* c, br_vector3* wheel_pos, br_vector3* norm, br_scala
     int delta;
     int x;
     int y;
-    tMaterial_modifiers *mat_list;
+    tMaterial_modifiers* mat_list;
     LOG_TRACE("(%p, %p, %p, %p, %d)", c, wheel_pos, norm, d, n);
     NOT_IMPLEMENTED();
 }
@@ -639,13 +639,13 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
     br_scalar fr_oil_factor;
     br_scalar rl_oil_factor;
     br_scalar rr_oil_factor;
-    br_matrix34 *mat;
-    tMaterial_modifiers *mat_list;
+    br_matrix34* mat;
+    tMaterial_modifiers* mat_list;
     static br_scalar stop_timer;
     static br_scalar slide_dist;
     tDamage_type dam;
     br_scalar v;
-    tSpecial_volume *vol;
+    tSpecial_volume* vol;
     LOG_TRACE("(%p, %f)", c, dt);
     NOT_IMPLEMENTED();
 }
@@ -705,14 +705,14 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
     br_scalar ts;
     br_scalar ts2;
     br_scalar v_diff;
-    br_matrix34 *mat;
-    br_matrix34 *oldmat;
+    br_matrix34* mat;
+    br_matrix34* oldmat;
     br_matrix34 mat_to_oldmat;
     br_matrix34 oldmat_to_mat;
     br_matrix34 tm;
     int collision;
     br_bounds bnds;
-    tFace_ref *f_ref;
+    tFace_ref* f_ref;
     int i;
     int j;
     int l;
@@ -836,7 +836,7 @@ void CrushBoundingBox(tCar_spec* c, int crush_only) {
     br_vector3 min;
     br_vector3 max;
     int i;
-    br_actor *actor;
+    br_actor* actor;
     LOG_TRACE("(%p, %d)", c, crush_only);
     NOT_IMPLEMENTED();
 }
@@ -913,14 +913,14 @@ void MultiFindFloorInBoxBU(int pNum_rays, br_vector3* a, br_vector3* b, br_vecto
     int j;
     int l;
     br_scalar dist[4];
-    tFace_ref *face_ref;
+    tFace_ref* face_ref;
     LOG_TRACE("(%d, %p, %p, %p, %p, %p, %p)", pNum_rays, a, b, nor, d, c, mat_ref);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall findfloor(br_vector3 *a@<EAX>, br_vector3 *b@<EDX>, br_vector3 *nor@<EBX>, br_scalar *d@<ECX>)
 void findfloor(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d) {
-    br_material *material;
+    br_material* material;
     br_vector3 aa;
     br_vector3 bb;
     LOG_TRACE("(%p, %p, %p, %p)", a, b, nor, d);
@@ -941,7 +941,7 @@ int FindFloorInBoxBU(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d
     int i;
     int j;
     br_scalar dist;
-    tFace_ref *face_ref;
+    tFace_ref* face_ref;
     LOG_TRACE("(%p, %p, %p, %p, %p)", a, b, nor, d, c);
     NOT_IMPLEMENTED();
 }
@@ -953,7 +953,7 @@ int FindFloorInBoxBU2(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* 
     int i;
     int j;
     br_scalar dist;
-    tFace_ref *face_ref;
+    tFace_ref* face_ref;
     LOG_TRACE("(%p, %p, %p, %p, %p)", a, b, nor, d, c);
     NOT_IMPLEMENTED();
 }
@@ -977,8 +977,8 @@ int BoxFaceIntersect(br_bounds* pB, br_matrix34* pM, br_matrix34* pMold, br_vect
     int n;
     int flag;
     int m;
-    tFace_ref *f_ref;
-    br_face *face;
+    tFace_ref* f_ref;
+    br_face* face;
     LOG_TRACE("(%p, %p, %p, %p, %p, %p, %d, %p)", pB, pM, pMold, pPoint_list, pNorm_list, pDist_list, pMax_pnts, c);
     NOT_IMPLEMENTED();
 }
@@ -1031,8 +1031,8 @@ void oldMoveOurCar(tU32 pTime_difference) {
     br_scalar speed;
     int below_face_index;
     int above_face_index;
-    br_model *below_model;
-    br_model *above_model;
+    br_model* below_model;
+    br_model* above_model;
     LOG_TRACE("(%d)", pTime_difference);
     NOT_IMPLEMENTED();
 }
@@ -1084,7 +1084,7 @@ void MungeCarGraphics(tU32 pFrame_period) {
     int car;
     int cat;
     int new_special_screen;
-    tCar_spec *the_car;
+    tCar_spec* the_car;
     br_scalar distance_from_camera;
     br_scalar car_x;
     br_scalar car_z;
@@ -1099,10 +1099,10 @@ void MungeCarGraphics(tU32 pFrame_period) {
     float sine_angle;
     float raw_revs;
     float rev_reducer;
-    tSpecial_screen *the_special_screen;
-    br_material *the_material;
+    tSpecial_screen* the_special_screen;
+    br_material* the_material;
     tU32 the_time;
-    br_actor *oily_actor;
+    br_actor* oily_actor;
     LOG_TRACE("(%d)", pFrame_period);
     NOT_IMPLEMENTED();
 }
@@ -1112,7 +1112,7 @@ void ResetCarScreens() {
     int cat;
     int car_count;
     int i;
-    tCar_spec *the_car;
+    tCar_spec* the_car;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -1121,7 +1121,7 @@ void ResetCarScreens() {
 tCar_spec* GetRaceLeader() {
     int i;
     int score;
-    tCar_spec *car;
+    tCar_spec* car;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -1130,7 +1130,7 @@ tCar_spec* GetRaceLeader() {
 void AmIGettingBoredWatchingCameraSpin() {
     static tU32 time_of_death;
     static tU32 headup_timer;
-    tCar_spec *car;
+    tCar_spec* car;
     char s[256];
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
@@ -1164,7 +1164,7 @@ void SwapCar() {
 // IDA: void __cdecl AdjustDownForce()
 void AdjustDownForce() {
     char s[100];
-    tCar_spec *c;
+    tCar_spec* c;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -1183,14 +1183,14 @@ void PutOpponentsInNeutral() {
 
 // IDA: void __cdecl SetPanningFieldOfView()
 void SetPanningFieldOfView() {
-    br_camera *camera_ptr;
+    br_camera* camera_ptr;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall CheckDisablePlingMaterials(tCar_spec *pCar@<EAX>)
 void CheckDisablePlingMaterials(tCar_spec* pCar) {
-    br_matrix34 *mat;
+    br_matrix34* mat;
     br_scalar height;
     int i;
     LOG_TRACE("(%p)", pCar);
@@ -1200,7 +1200,7 @@ void CheckDisablePlingMaterials(tCar_spec* pCar) {
 // IDA: void __usercall PositionExternalCamera(tCar_spec *c@<EAX>, tU32 pTime@<EDX>)
 void PositionExternalCamera(tCar_spec* c, tU32 pTime) {
     static int old_camera_mode;
-    br_camera *camera_ptr;
+    br_camera* camera_ptr;
     LOG_TRACE("(%p, %d)", c, pTime);
     NOT_IMPLEMENTED();
 }
@@ -1208,7 +1208,7 @@ void PositionExternalCamera(tCar_spec* c, tU32 pTime) {
 // IDA: void __usercall CameraBugFix(tCar_spec *c@<EAX>, tU32 pTime@<EDX>)
 void CameraBugFix(tCar_spec* c, tU32 pTime) {
     br_matrix34 mat;
-    br_matrix34 *m2;
+    br_matrix34* m2;
     br_vector3 tv;
     LOG_TRACE("(%p, %d)", c, pTime);
     NOT_IMPLEMENTED();
@@ -1218,7 +1218,7 @@ void CameraBugFix(tCar_spec* c, tU32 pTime) {
 int PossibleRemoveNonCarFromWorld(br_actor* pActor) {
     tU8 cx;
     tU8 cz;
-    tTrack_spec *track_spec;
+    tTrack_spec* track_spec;
     LOG_TRACE("(%p)", pActor);
     NOT_IMPLEMENTED();
 }
@@ -1227,14 +1227,14 @@ int PossibleRemoveNonCarFromWorld(br_actor* pActor) {
 void PutNonCarBackInWorld(br_actor* pActor) {
     tU8 cx;
     tU8 cz;
-    tTrack_spec *track_spec;
+    tTrack_spec* track_spec;
     LOG_TRACE("(%p)", pActor);
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __usercall IncidentCam@<EAX>(tCar_spec *c@<EAX>, tU32 pTime@<EDX>)
 int IncidentCam(tCar_spec* c, tU32 pTime) {
-    br_matrix34 *m2;
+    br_matrix34* m2;
     br_matrix34 mat;
     br_vector3 tv;
     br_vector3 tv2;
@@ -1242,7 +1242,7 @@ int IncidentCam(tCar_spec* c, tU32 pTime) {
     br_vector3 vertical;
     br_vector3 murderer_pos;
     br_scalar ts;
-    tCar_spec *car2;
+    tCar_spec* car2;
     static tU32 next_incident_time;
     static tIncident_type type;
     static float severity;
@@ -1277,8 +1277,8 @@ int MoveCamToIncident(tCar_spec* c, tIncident_type* type, float* severity, tInci
 
 // IDA: void __usercall PanningExternalCamera(tCar_spec *c@<EAX>, tU32 pTime@<EDX>)
 void PanningExternalCamera(tCar_spec* c, tU32 pTime) {
-    br_matrix34 *m2;
-    br_matrix34 *m1;
+    br_matrix34* m2;
+    br_matrix34* m1;
     br_vector3 tv;
     br_scalar ts;
     static int inside_camera_zone;
@@ -1289,7 +1289,7 @@ void PanningExternalCamera(tCar_spec* c, tU32 pTime) {
 // IDA: int __usercall CheckForWall@<EAX>(br_vector3 *start@<EAX>, br_vector3 *end@<EDX>)
 int CheckForWall(br_vector3* start, br_vector3* end) {
     br_vector3 dir;
-    br_material *material;
+    br_material* material;
     br_vector3 normal;
     br_scalar d;
     LOG_TRACE("(%p, %p)", start, end);
@@ -1308,8 +1308,8 @@ void SetUpPanningCamera(tCar_spec* c) {
     tU32 t;
     tU32 t2;
     tU32 time_step;
-    br_matrix34 *m2;
-    br_matrix34 *m1;
+    br_matrix34* m2;
+    br_matrix34* m1;
     br_vector3 left;
     br_vector3 right;
     br_vector3 car_centre;
@@ -1333,8 +1333,8 @@ void RestoreCameraPosition(int i) {
 
 // IDA: void __usercall NormalPositionExternalCamera(tCar_spec *c@<EAX>, tU32 pTime@<EDX>)
 void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
-    br_matrix34 *m2;
-    br_matrix34 *m1;
+    br_matrix34* m2;
+    br_matrix34* m1;
     br_scalar time;
     br_scalar ts;
     br_scalar ts2;
@@ -1394,8 +1394,8 @@ void PointCameraAtCar(tCar_spec* c, br_matrix34* m1, br_matrix34* m2) {
     br_scalar dist;
     br_scalar frac;
     br_angle theta;
-    br_vector3 *pos;
-    br_camera *camera_ptr;
+    br_vector3* pos;
+    br_camera* camera_ptr;
     br_angle off_centre_angle;
     int swoop;
     LOG_TRACE("(%p, %p, %p)", c, m1, m2);
@@ -1407,7 +1407,7 @@ void PointCamera(br_vector3* pos, br_matrix34* m2) {
     br_vector3 vn;
     br_scalar dist;
     br_angle theta;
-    br_camera *camera_ptr;
+    br_camera* camera_ptr;
     LOG_TRACE("(%p, %p)", pos, m2);
     NOT_IMPLEMENTED();
 }
@@ -1430,7 +1430,7 @@ int CollideCamera2(br_vector3* car_pos, br_vector3* cam_pos, br_vector3* old_cam
     br_angle theta;
     tBounds bnds;
     br_matrix34 mat;
-    br_material *material;
+    br_material* material;
     br_scalar alpha;
     br_scalar sa;
     br_scalar sb;
@@ -1452,7 +1452,7 @@ int CollideCameraWithOtherCars(br_vector3* car_pos, br_vector3* cam_pos) {
     int i;
     int plane;
     br_scalar ts;
-    tCar_spec *c;
+    tCar_spec* c;
     br_vector3 tv;
     br_vector3 pos_car_space;
     br_vector3 dir;
@@ -1466,7 +1466,7 @@ int CollideCameraWithOtherCars(br_vector3* car_pos, br_vector3* cam_pos) {
 // IDA: void __cdecl InitialiseExternalCamera()
 void InitialiseExternalCamera() {
     br_scalar ts;
-    tCar_spec *c;
+    tCar_spec* c;
     br_vector3 r;
     br_angle yaw;
     LOG_TRACE("()");
@@ -1484,7 +1484,7 @@ void FlyCar(tCar_spec* c, br_scalar dt) {
     int accflag;
     int turnflag;
     br_vector3 step;
-    br_matrix34 *mat;
+    br_matrix34* mat;
     br_angle theta;
     static br_scalar vel;
     tFace_ref faces[20];
@@ -1525,11 +1525,11 @@ int CrashCarsTogetherSinglePass(br_scalar dt, int pPass, tCollison_data* collide
     int ref2;
     int c1im;
     int c2im;
-    tCollision_info *car_1;
-    tCollision_info *car_2;
-    tCollision_info *car_3;
-    tCollision_info *car_in_middle;
-    tCollision_info *car_on_wall;
+    tCollision_info* car_1;
+    tCollision_info* car_2;
+    tCollision_info* car_3;
+    tCollision_info* car_in_middle;
+    tCollision_info* car_on_wall;
     LOG_TRACE("(%f, %d, %p)", dt, pPass, collide_list);
     NOT_IMPLEMENTED();
 }
@@ -1580,10 +1580,10 @@ int CollideTwoCars(tCollision_info* car1, tCollision_info* car2, int pPass) {
     br_bounds new_car1_bnds;
     br_bounds new_car2_bnds;
     br_bounds bnds;
-    br_matrix34 *mat1;
-    br_matrix34 *mat2;
-    br_matrix34 *oldmat1;
-    br_matrix34 *oldmat2;
+    br_matrix34* mat1;
+    br_matrix34* mat2;
+    br_matrix34* oldmat1;
+    br_matrix34* oldmat2;
     br_matrix34 inv_mat1;
     br_matrix34 inv_mat2;
     br_matrix34 inv_oldmat1;
@@ -1647,8 +1647,8 @@ int FacePointCarCarCollide(tCollision_info* car1, tCollision_info* car2, br_matr
     br_vector3 hp;
     br_vector3 centre;
     br_scalar dist;
-    br_bounds *pStat_box;
-    br_bounds *pMove_box;
+    br_bounds* pStat_box;
+    br_bounds* pMove_box;
     LOG_TRACE("(%p, %p, %p, %p, %p, %p, %p, %d, %d)", car1, car2, pMms, pMoms, pMsos, pPoint_list, pNorm_list, pMax, order);
     NOT_IMPLEMENTED();
 }
@@ -1673,10 +1673,10 @@ void ResetCarsMass(tCollision_info* pCar_1, tCollision_info* pCar_2) {
 
 // IDA: int __usercall DoCollide@<EAX>(tCollision_info *car1@<EAX>, tCollision_info *car2@<EDX>, br_vector3 *r@<EBX>, br_vector3 *n@<ECX>, int k, int pPass, br_matrix34 *mat1_to_mat2)
 int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_vector3* n, int k, int pPass, br_matrix34* mat1_to_mat2) {
-    br_matrix34 *mat1;
-    br_matrix34 *mat2;
-    br_matrix34 *oldmat1;
-    br_matrix34 *oldmat2;
+    br_matrix34* mat1;
+    br_matrix34* mat2;
+    br_matrix34* oldmat1;
+    br_matrix34* oldmat2;
     br_matrix4 M;
     br_vector3 tau1[8];
     br_vector3 a;
@@ -1688,7 +1688,7 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
     br_vector3 max_friction;
     br_vector3 tv;
     br_vector3 tv2;
-    br_vector3 *tau2;
+    br_vector3* tau2;
     br_vector3 torque1;
     br_vector3 torque2;
     br_scalar f[4];
@@ -1749,7 +1749,7 @@ int TestForNan(float* f) {
 
 // IDA: void __cdecl CheckCameraHither()
 void CheckCameraHither() {
-    br_camera *cam;
+    br_camera* cam;
     static int old_hither;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
@@ -1770,13 +1770,13 @@ void SetCarSuspGiveAndHeight(tCar_spec* pCar, br_scalar pFront_give_factor, br_s
 int TestForCarInSensiblePlace(tCar_spec* car) {
     br_bounds bnds;
     br_matrix34 mat;
-    br_matrix34 *mat1;
-    br_matrix34 *mat2;
+    br_matrix34* mat1;
+    br_matrix34* mat2;
     int i;
     int j;
     int k;
-    tCollision_info *c2;
-    tCollision_info *car_info;
+    tCollision_info* c2;
+    tCollision_info* car_info;
     br_vector3 sep;
     br_vector3 tv;
     br_vector3 tv2;
@@ -1804,8 +1804,8 @@ int TestOldMats(tCollision_info* c1, tCollision_info* c2, int newmats) {
     int i;
     int j;
     int n;
-    br_bounds *b1;
-    br_bounds *b2;
+    br_bounds* b1;
+    br_bounds* b2;
     br_matrix34 invmat1;
     br_matrix34 mat21;
     LOG_TRACE("(%p, %p, %d)", c1, c2, newmats);
@@ -1822,8 +1822,8 @@ int PullActorFromWorld(br_actor* pActor) {
 int DoPullActorFromWorld(br_actor* pActor) {
     int num;
     int i;
-    tCollision_info *c;
-    tNon_car_spec *non_car;
+    tCollision_info* c;
+    tNon_car_spec* non_car;
     LOG_TRACE("(%p)", pActor);
     NOT_IMPLEMENTED();
 }
@@ -1836,12 +1836,12 @@ void CheckForDeAttachmentOfNonCars(tU32 pTime) {
     int j;
     int last_free_slot;
     int drop;
-    tCollision_info *c;
-    tCollision_info *c2;
-    br_actor *actor;
+    tCollision_info* c;
+    tCollision_info* c2;
+    br_actor* actor;
     tU8 cx;
     tU8 cz;
-    tTrack_spec *track_spec;
+    tTrack_spec* track_spec;
     br_matrix34 mat;
     LOG_TRACE("(%d)", pTime);
     NOT_IMPLEMENTED();
@@ -1851,7 +1851,7 @@ void CheckForDeAttachmentOfNonCars(tU32 pTime) {
 void AdjustNonCar(br_actor* pActor, br_matrix34* pMat) {
     tU8 cx;
     tU8 cz;
-    tTrack_spec *track_spec;
+    tTrack_spec* track_spec;
     LOG_TRACE("(%p, %p)", pActor, pMat);
     NOT_IMPLEMENTED();
 }

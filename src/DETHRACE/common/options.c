@@ -41,7 +41,7 @@ int SoundOptionsDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int 
 // IDA: int __usercall SoundOptionsLeft@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int SoundOptionsLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int old_value;
-    int *the_value;
+    int* the_value;
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
@@ -49,7 +49,7 @@ int SoundOptionsLeft(int* pCurrent_choice, int* pCurrent_mode) {
 // IDA: int __usercall SoundOptionsRight@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int SoundOptionsRight(int* pCurrent_choice, int* pCurrent_mode) {
     int old_value;
-    int *the_value;
+    int* the_value;
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
@@ -60,7 +60,7 @@ int SoundClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_o
     float y_delta;
     float angle;
     int old_value;
-    int *the_value;
+    int* the_value;
     LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
     NOT_IMPLEMENTED();
 }
@@ -218,7 +218,7 @@ void StripControls(unsigned char* pStr) {
 // IDA: void __cdecl LoadKeyNames()
 void LoadKeyNames() {
     int i;
-    FILE *f;
+    FILE* f;
     tPath_name the_path;
     unsigned char s[256];
     LOG_TRACE("()");
@@ -247,7 +247,7 @@ void GetKeyCoords(int pIndex, int* pY, int* pName_x, int* pKey_x, int* pEnd_box)
 
 // IDA: void __cdecl SetKeysToDefault()
 void SetKeysToDefault() {
-    FILE *f;
+    FILE* f;
     tPath_name the_path;
     int i;
     LOG_TRACE("()");
@@ -256,7 +256,7 @@ void SetKeysToDefault() {
 
 // IDA: void __cdecl SaveKeyMapping()
 void SaveKeyMapping() {
-    FILE *f;
+    FILE* f;
     tPath_name the_path;
     int i;
     LOG_TRACE("()");
@@ -279,8 +279,8 @@ void DrawKeyAssignments(int pCurrent_choice, int pCurrent_mode) {
     int key_x;
     int new_key;
     int end_box;
-    tDR_font *font_n;
-    tDR_font *font_k;
+    tDR_font* font_n;
+    tDR_font* font_k;
     static int on_radios_last_time;
     LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
@@ -323,7 +323,7 @@ int KeyAssignGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     int name_x;
     int key_x;
     int end_box;
-    tDR_font *font;
+    tDR_font* font;
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
     NOT_IMPLEMENTED();
 }
@@ -375,7 +375,7 @@ void FreeSoundOptionsData() {
 
 // IDA: void __cdecl DrawDisabledOptions()
 void DrawDisabledOptions() {
-    br_pixelmap *image;
+    br_pixelmap* image;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

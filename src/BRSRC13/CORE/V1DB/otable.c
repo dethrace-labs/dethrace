@@ -5,7 +5,7 @@ char rscid[50];
 
 // IDA: br_order_table* __cdecl BrZsOrderTableAllocate(br_uint_16 size, br_uint_32 flags, br_uint_16 type)
 br_order_table* BrZsOrderTableAllocate(br_uint_16 size, br_uint_32 flags, br_uint_16 type) {
-    br_order_table *order_table;
+    br_order_table* order_table;
     LOG_TRACE("(%d, %d, %d)", size, flags, type);
     NOT_IMPLEMENTED();
 }
@@ -64,8 +64,8 @@ void BrZsOrderTablePrimaryDisable() {
 
 // IDA: void __usercall InsertOrderTableList(br_order_table *order_table@<EAX>)
 void InsertOrderTableList(br_order_table* order_table) {
-    br_order_table *previous_table;
-    br_order_table *current_table;
+    br_order_table* previous_table;
+    br_order_table* current_table;
     LOG_TRACE("(%p)", order_table);
     NOT_IMPLEMENTED();
 }
@@ -77,8 +77,8 @@ void SetOrderTableBounds(br_bounds* bounds, br_order_table* order_table) {
     br_scalar element;
     br_scalar min_z;
     br_scalar max_z;
-    br_vector3 *min;
-    br_vector3 *max;
+    br_vector3* min;
+    br_vector3* max;
     LOG_TRACE("(%p, %p)", bounds, order_table);
     NOT_IMPLEMENTED();
 }
@@ -92,7 +92,7 @@ void SetOrderTableRange(br_order_table* order_table) {
 
 // IDA: void __cdecl RenderOrderTableList()
 void RenderOrderTableList() {
-    br_order_table *order_table;
+    br_order_table* order_table;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -104,9 +104,9 @@ void RenderPrimaryOrderTable() {
     br_scalar bucket_size;
     br_scalar min_z;
     br_scalar max_z;
-    br_primitive *prim;
-    br_primitive **bucket;
-    br_order_table *order_table;
+    br_primitive* prim;
+    br_primitive** bucket;
+    br_order_table* order_table;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

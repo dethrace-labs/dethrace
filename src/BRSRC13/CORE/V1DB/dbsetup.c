@@ -69,7 +69,7 @@ br_error BrV1dbBegin() {
 
 // IDA: br_error __cdecl BrV1dbEnd()
 br_error BrV1dbEnd() {
-    br_device *dev;
+    br_device* dev;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -124,7 +124,7 @@ br_uint_32 clearModel(br_model* item, void* arg) {
 
 // IDA: br_error __cdecl BrV1dbRendererBegin(br_device_pixelmap *destination, br_renderer *renderer)
 br_error BrV1dbRendererBegin(br_device_pixelmap* destination, br_renderer* renderer) {
-    br_renderer_facility *renderer_facility;
+    br_renderer_facility* renderer_facility;
     br_error r;
     br_token_value tv[2];
     LOG_TRACE("(%p, %p)", destination, renderer);

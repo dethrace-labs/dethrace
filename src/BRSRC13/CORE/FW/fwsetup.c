@@ -114,7 +114,7 @@ br_error BrFwEnd() {
 
 // IDA: br_diaghandler* __cdecl BrDiagHandlerSet(br_diaghandler *newdh)
 br_diaghandler* BrDiagHandlerSet(br_diaghandler* newdh) {
-    br_diaghandler *old;
+    br_diaghandler* old;
     LOG_TRACE("(%p)", newdh);
     NOT_IMPLEMENTED();
 }
