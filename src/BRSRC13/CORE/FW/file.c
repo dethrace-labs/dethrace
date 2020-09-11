@@ -8,8 +8,6 @@
 
 char rscid[49];
 
-// Offset: 12
-// Size: 86
 void _BrFileFree(void* res, br_uint_8 res_class, br_size_t size) {
     br_file* file;
 
@@ -18,14 +16,10 @@ void _BrFileFree(void* res, br_uint_8 res_class, br_size_t size) {
     fw.fsys->close(file->raw_file);
 }
 
-// Offset: 115
-// Size: 77
 br_uint_32 BrFileAttributes() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 207
-// Size: 267
 void* BrFileOpenRead(char* name, br_size_t n_magics, br_mode_test_cbfn* mode_test, int* mode_result) {
     void* raw_file;
     br_file* file;
@@ -52,8 +46,6 @@ void* BrFileOpenRead(char* name, br_size_t n_magics, br_mode_test_cbfn* mode_tes
     return file;
 }
 
-// Offset: 490
-// Size: 230
 void* BrFileOpenWrite(char* name, int mode) {
     void* raw_file;
     br_file* file;
@@ -70,63 +62,43 @@ void* BrFileOpenWrite(char* name, int mode) {
     return file;
 }
 
-// Offset: 732
-// Size: 70
 void BrFileClose(void* f) {
     LOG_TRACE("(%p)", f);
     BrResFree(f);
 }
 
-// Offset: 812
-// Size: 117
 int BrFileEof(void* f) {
     return fw.fsys->eof(((br_file*)f)->raw_file);
 }
 
-// Offset: 943
-// Size: 120
 int BrFileGetChar(void* f) {
     return fw.fsys->getchr(((br_file*)f)->raw_file);
 }
 
-// Offset: 1077
-// Size: 118
 void BrFilePutChar(int c, void* f) {
     return fw.fsys->putchr(c, ((br_file*)f)->raw_file);
 }
 
-// Offset: 1206
-// Size: 163
 int BrFileRead(void* buf, int size, int n, void* f) {
     return fw.fsys->read(buf, size, n, ((br_file*)f)->raw_file);
 }
 
-// Offset: 1381
-// Size: 163
 int BrFileWrite(void* buf, int size, int n, void* f) {
     return fw.fsys->write(buf, size, n, ((br_file*)f)->raw_file);
 }
 
-// Offset: 1558
-// Size: 125
 int BrFileGetLine(char* buf, br_size_t buf_len, void* f) {
     return fw.fsys->getline(buf, buf_len, ((br_file*)f)->raw_file);
 }
 
-// Offset: 1697
-// Size: 118
 void BrFilePutLine(char* buf, void* f) {
     fw.fsys->putline(buf, ((br_file*)f)->raw_file);
 }
 
-// Offset: 1829
-// Size: 118
 void BrFileAdvance(long count, void* f) {
     fw.fsys->advance(count, ((br_file*)f)->raw_file);
 }
 
-// Offset: 1960
-// Size: 173
 int BrFilePrintf(void* f, char* fmt, ...) {
     int n;
     va_list args;

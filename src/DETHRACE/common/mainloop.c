@@ -21,14 +21,10 @@ int gQueued_wasted_massages[5];
 tU32 gTime_bonus_start;
 int gLast_credit_headup;
 
-// Offset: 0
-// Size: 161
 void ToggleInfo() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 164
-// Size: 220
 void CalculateFrameRate() {
     tU32 new_time;
     static int last_rates[30];
@@ -37,20 +33,14 @@ void CalculateFrameRate() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 384
-// Size: 104
 void LoseOldestWastedMassage() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 488
-// Size: 97
 void QueueWastedMassage(int pIndex) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 588
-// Size: 2796
 void MungeHeadups() {
     int flash_rate;
     int new_countdown;
@@ -68,8 +58,6 @@ void MungeHeadups() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3384
-// Size: 588
 void UpdateFramePeriod(tU32* pCamera_period) {
     tU32 new_tick_count;
     tU32 new_camera_tick_count;
@@ -78,14 +66,10 @@ void UpdateFramePeriod(tU32* pCamera_period) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3972
-// Size: 45
 tU32 GetLastTickCount() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4020
-// Size: 192
 void CheckTimer() {
     tS32 time_left;
     static tU32 last_time_in_seconds;
@@ -93,14 +77,10 @@ void CheckTimer() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4212
-// Size: 319
 int MungeRaceFinished() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4532
-// Size: 1868
 tRace_result MainGameLoop() {
     tU32 camera_period;
     tU32 start_menu_time;
@@ -112,8 +92,6 @@ tRace_result MainGameLoop() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6400
-// Size: 61
 tRace_result DoRace() {
     NOT_IMPLEMENTED();
 }

@@ -127,389 +127,261 @@ int gEntering_message;
 
 int _unittest_controls_lastGetPowerup = 0;
 
-// Offset: 0
-// Size: 53
 void AbortRace() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 56
-// Size: 271
 void F4Key() {
     tEdit_mode old_edit_mode;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 328
-// Size: 87
 void SetFlag(int i) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 416
-// Size: 42
 void FinishLap(int i) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 460
-// Size: 48
 void EnsureSpecialVolumesHidden() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 508
-// Size: 48
 void ShowSpecialVolumesIfRequ() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 556
-// Size: 261
 void DoEditModeKey(int pIndex) {
     int modifiers;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 820
-// Size: 41
 void F5Key() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 864
-// Size: 44
 void F6Key() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 908
-// Size: 44
 void F7Key() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 952
-// Size: 44
 void F8Key() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 996
-// Size: 44
 void F10Key() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1040
-// Size: 44
 void F11Key() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1084
-// Size: 44
 void F12Key() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1128
-// Size: 44
 void NumberKey0() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1172
-// Size: 44
 void NumberKey1() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1216
-// Size: 44
 void NumberKey2() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1260
-// Size: 44
 void NumberKey3() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1304
-// Size: 44
 void NumberKey4() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1348
-// Size: 44
 void NumberKey5() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1392
-// Size: 44
 void NumberKey6() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1436
-// Size: 44
 void NumberKey7() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1480
-// Size: 44
 void NumberKey8() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1524
-// Size: 44
 void NumberKey9() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1568
-// Size: 175
 void LookLeft() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1744
-// Size: 128
 void LookForward() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1872
-// Size: 175
 void LookRight() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2048
-// Size: 34
 void DamageTest() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2084
-// Size: 44
 void TDamageEngine() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2128
-// Size: 91
 void TDamageDriver() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2220
-// Size: 44
 void TDamageTrans() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2264
-// Size: 44
 void TDamageSteering() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2308
-// Size: 44
 void TDamageLFWheel() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2352
-// Size: 44
 void TDamageLFBrake() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2396
-// Size: 44
 void TDamageLRBrake() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2440
-// Size: 44
 void TDamageLRWheel() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2484
-// Size: 44
 void TDamageRFWheel() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2528
-// Size: 44
 void TDamageRFBrake() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2572
-// Size: 44
 void TDamageRRBrake() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2616
-// Size: 44
 void TDamageRRWheel() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2660
-// Size: 76
 void MoveBonnetForward() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2736
-// Size: 93
 void SaveBonnet() {
     tPath_name the_path;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2832
-// Size: 73
 void MoveBonnetBackward() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2908
-// Size: 76
 void MoveBonnetLeft() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2984
-// Size: 73
 void ShrinkBonnetX() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3060
-// Size: 73
 void SwellBonnetX() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3136
-// Size: 73
 void ShrinkBonnetY() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3212
-// Size: 73
 void SwellBonnetY() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3288
-// Size: 73
 void ShrinkBonnetZ() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3364
-// Size: 73
 void SwellBonnetZ() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3440
-// Size: 73
 void MoveBonnetDown() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3516
-// Size: 73
 void MoveBonnetRight() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3592
-// Size: 76
 void MoveBonnetUp() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3668
-// Size: 67
 void TiltBonnetDownX() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3736
-// Size: 67
 void TiltBonnetUpX() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3804
-// Size: 67
 void TiltBonnetDownY() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3872
-// Size: 67
 void TiltBonnetUpY() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3940
-// Size: 67
 void TiltBonnetDownZ() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4008
-// Size: 67
 void TiltBonnetUpZ() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4076
-// Size: 246
 void ToggleCockpit() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4324
-// Size: 149
 void ToggleMirror() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4476
-// Size: 130
 void ConcussMe() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4608
-// Size: 34
 void CheckHelp() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4644
-// Size: 313
 void CheckLoadSave() {
     int save_load_allowed;
     int switched_res;
@@ -550,16 +422,12 @@ void CheckLoadSave() {
     }
 }
 
-// Offset: 4960
-// Size: 364
 void CheckToggles(int pRacing) {
     int i;
     int new_state;
     SILENT_STUB();
 }
 
-// Offset: 5324
-// Size: 444
 int CarWorldOffFallenCheckThingy(tCar_spec* pCar, int pCheck_around) {
     br_vector3 car_pos;
     br_vector3 offset_c;
@@ -568,52 +436,36 @@ int CarWorldOffFallenCheckThingy(tCar_spec* pCar, int pCheck_around) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5768
-// Size: 56
 int HasCarFallenOffWorld(tCar_spec* pCar) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5824
-// Size: 250
 void CheckForBeingOutOfThisWorld() {
     static tU32 sLast_check;
     int time_step;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6076
-// Size: 190
 void CheckHornLocal(tCar_spec* pCar) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6268
-// Size: 249
 void CheckHorn3D(tCar_spec* pCar) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6520
-// Size: 103
 void CheckHorns() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6624
-// Size: 413
 void SetRecovery() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7040
-// Size: 72
 void RecoverCar() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7112
-// Size: 765
 void CheckMapRenderMove() {
     int amount;
     float old_x;
@@ -621,16 +473,12 @@ void CheckMapRenderMove() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7880
-// Size: 300
 void ExplodeCar(tCar_spec* pCar) {
     br_vector3 tv;
     br_vector3 pos;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8180
-// Size: 448
 void CheckRecoveryOfCars(tU32 pEndFrameTime) {
     int i;
     int time;
@@ -638,15 +486,11 @@ void CheckRecoveryOfCars(tU32 pEndFrameTime) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8628
-// Size: 107
 void LoseSomePSPowerups(int pNumber) {
     int index;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8736
-// Size: 1771
 void CheckOtherRacingKeys() {
     int j;
     int new_level;
@@ -667,14 +511,10 @@ void CheckOtherRacingKeys() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10508
-// Size: 259
 int CheckRecoverCost() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10768
-// Size: 279
 void SortOutRecover(tCar_spec* pCar) {
     int the_time;
     int val;
@@ -682,14 +522,10 @@ void SortOutRecover(tCar_spec* pCar) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 11048
-// Size: 115
 void SetFlipUpCar(tCar_spec* pCar) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 11164
-// Size: 1385
 void FlipUpCar(tCar_spec* car) {
     br_vector3 tv;
     br_vector3 dir;
@@ -704,15 +540,11 @@ void FlipUpCar(tCar_spec* car) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 12552
-// Size: 50
 void GetPowerup(int pNum) {
     _unittest_controls_lastGetPowerup = pNum;
     STUB();
 }
 
-// Offset: 12604
-// Size: 112
 void CheckSystemKeys(int pRacing) {
     tU32 start_menu_time;
     int i;
@@ -729,8 +561,6 @@ void CheckSystemKeys(int pRacing) {
     }
 }
 
-// Offset: 12716
-// Size: 395
 void CheckKevKeys() {
     int i;
     tU32* value;
@@ -753,14 +583,10 @@ void CheckKevKeys() {
     gKev_keys[i].action_proc(gKev_keys[i].num);
 }
 
-// Offset: 13112
-// Size: 190
 void BrakeInstantly() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 13304
-// Size: 853
 void PollCarControls(tU32 pTime_difference) {
     int decay_steering;
     int decay_speed;
@@ -773,8 +599,6 @@ void PollCarControls(tU32 pTime_difference) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 14160
-// Size: 846
 void PollCameraControls(tU32 pTime_difference) {
     int flag;
     int left;
@@ -786,163 +610,111 @@ void PollCameraControls(tU32 pTime_difference) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 15008
-// Size: 62
 void SetFlag2(int i) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 15072
-// Size: 164
 void ToggleFlying() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 15236
-// Size: 136
 void ToggleInvulnerability() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 15372
-// Size: 44
 void MoreTime() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 15416
-// Size: 44
 void MuchMoreTime() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 15460
-// Size: 139
 void ToggleTimerFreeze() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 15600
-// Size: 44
 void EarnDosh() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 15644
-// Size: 44
 void LoseDosh() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 15688
-// Size: 301
 void ToggleMap() {
     static int old_indent;
     static int was_in_cockpit;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 15992
-// Size: 51
 int HornBlowing() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 16044
-// Size: 215
 void ToggleArrow() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 16260
-// Size: 45
 int GetRecoverVoucherCount() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 16308
-// Size: 46
 void AddVouchers(int pCount) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 16356
-// Size: 44
 void ResetRecoveryVouchers() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 16400
-// Size: 194
 void CycleCarTexturingLevel() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 16596
-// Size: 202
 void CycleWallTexturingLevel() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 16800
-// Size: 157
 void CycleRoadTexturingLevel() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 16960
-// Size: 246
 void CycleYonFactor() {
     char factor_str[5];
     NOT_IMPLEMENTED();
 }
 
-// Offset: 17208
-// Size: 45
 void SetSoundDetailLevel(int pLevel) {
     LOG_TRACE("(%d)", pLevel);
     gSound_detail_level = pLevel;
 }
 
-// Offset: 17256
-// Size: 65
 void ReallySetSoundDetailLevel(int pLevel) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 17324
-// Size: 45
 int GetSoundDetailLevel() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 17372
-// Size: 209
 void CycleSoundDetailLevel() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 17584
-// Size: 162
 void CycleCarSimplificationLevel() {
     char* dst;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 17748
-// Size: 194
 void ToggleAccessoryRendering() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 17944
-// Size: 155
 void ToggleSmoke() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 18100
-// Size: 144
 void DrawSomeText2(tDR_font* pFont) {
     int y;
     int i;
@@ -975,8 +747,6 @@ void DrawSomeText2(tDR_font* pFont) {
     //PrintScreen();
 }
 
-// Offset: 18244
-// Size: 104
 void DrawSomeText() {
     DrawSomeText2(&gFonts[1]);
     DrawSomeText2(&gFonts[2]);
@@ -987,20 +757,14 @@ void DrawSomeText() {
     DrawSomeText2(&gFonts[8]);
 }
 
-// Offset: 18348
-// Size: 44
 void SaySorryYouLittleBastard() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 18392
-// Size: 66
 void UserSendMessage() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 18460
-// Size: 815
 void EnterUserMessage() {
     static int about_to_die;
     static tU32 next_time;
@@ -1012,8 +776,6 @@ void EnterUserMessage() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 19276
-// Size: 435
 void DisplayUserMessage() {
     char* the_message;
     int len;
@@ -1021,8 +783,6 @@ void DisplayUserMessage() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 19712
-// Size: 347
 void InitAbuseomatic() {
     char s[256];
     FILE* f;
@@ -1031,8 +791,6 @@ void InitAbuseomatic() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 20060
-// Size: 94
 void DisposeAbuseomatic() {
     NOT_IMPLEMENTED();
 }

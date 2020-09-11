@@ -19,33 +19,23 @@ tInterface_spec* gSpec;
 int gAlways_typing;
 int gDisabled_count;
 
-// Offset: 0
-// Size: 44
 void SetAlwaysTyping() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 44
-// Size: 44
 void ClearAlwaysTyping() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 88
-// Size: 103
 int ChoiceDisabled(int pChoice) {
     int i;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 192
-// Size: 44
 void ResetInterfaceTimeout() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 236
-// Size: 627
 void ChangeSelection(tInterface_spec* pSpec, int* pOld_selection, int* pNew_selection, int pMode, int pSkip_disabled) {
     int i;
     LOG_TRACE("(%p, %p, %p, %d, %d)", pSpec, *pOld_selection, *pNew_selection, pMode, pSkip_disabled);
@@ -104,8 +94,6 @@ void ChangeSelection(tInterface_spec* pSpec, int* pOld_selection, int* pNew_sele
     LOG_DEBUG("new: %d, old %d", *pNew_selection, *pOld_selection);
 }
 
-// Offset: 864
-// Size: 292
 void RecopyAreas(tInterface_spec* pSpec, br_pixelmap** pCopy_areas) {
     int i;
     LOG_TRACE8("(%p, %p)", pSpec, pCopy_areas);
@@ -123,22 +111,16 @@ void RecopyAreas(tInterface_spec* pSpec, br_pixelmap** pCopy_areas) {
     }
 }
 
-// Offset: 1156
-// Size: 111
 void DisableChoice(int pChoice) {
     int i;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1268
-// Size: 140
 void EnableChoice(int pChoice) {
     int i;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1408
-// Size: 5354
 int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice) {
     tProg_status entry_status; //
     int x_coord; //
@@ -535,8 +517,6 @@ LABEL_230:
     return result;
 }
 
-// Offset: 6764
-// Size: 88
 void ChangeSelectionTo(int pNew_choice, int pNew_mode) {
     int last_choice;
     NOT_IMPLEMENTED();

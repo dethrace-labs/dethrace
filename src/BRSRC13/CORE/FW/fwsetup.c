@@ -71,8 +71,6 @@ char rscid[53];
 
 #define NBR_DEV_SLOTS 16
 
-// Offset: 10
-// Size: 324
 br_error BrFwBegin() {
     int i;
 
@@ -107,21 +105,15 @@ br_error BrFwBegin() {
     return 0;
 }
 
-// Offset: 342
-// Size: 107
 br_error BrFwEnd() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 466
-// Size: 73
 br_diaghandler* BrDiagHandlerSet(br_diaghandler* newdh) {
     br_diaghandler* old;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 555
-// Size: 73
 br_filesystem* BrFilesystemSet(br_filesystem* newfs) {
     br_filesystem* old;
 
@@ -133,8 +125,6 @@ br_filesystem* BrFilesystemSet(br_filesystem* newfs) {
     return old;
 }
 
-// Offset: 643
-// Size: 73
 br_allocator* BrAllocatorSet(br_allocator* newal) {
     br_allocator* old;
     LOG_TRACE("(%p)", newal);

@@ -3,8 +3,6 @@
 
 char rscid[48];
 
-// Offset: 10
-// Size: 433
 br_quat* BrQuatMul(br_quat* q, br_quat* l, br_quat* r) {
     br_scalar x1;
     br_scalar x2;
@@ -19,21 +17,15 @@ br_quat* BrQuatMul(br_quat* q, br_quat* l, br_quat* r) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 459
-// Size: 211
 br_quat* BrQuatNormalise(br_quat* q, br_quat* qq) {
     br_scalar s;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 683
-// Size: 147
 br_quat* BrQuatInvert(br_quat* q, br_quat* qq) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 842
-// Size: 612
 br_quat* BrQuatSlerp(br_quat* q, br_quat* l, br_quat* r, br_scalar a, br_int_16 spins) {
     int omega;
     int omega_spin;
@@ -45,8 +37,6 @@ br_quat* BrQuatSlerp(br_quat* q, br_quat* l, br_quat* r, br_scalar a, br_int_16 
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1471
-// Size: 399
 br_matrix34* BrQuatToMatrix34(br_matrix34* mat, br_quat* q) {
     br_scalar xs;
     br_scalar ys;
@@ -63,8 +53,6 @@ br_matrix34* BrQuatToMatrix34(br_matrix34* mat, br_quat* q) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1887
-// Size: 589
 br_quat* BrMatrix34ToQuat(br_quat* q, br_matrix34* mat) {
     br_scalar tr;
     br_scalar s;
@@ -74,15 +62,11 @@ br_quat* BrMatrix34ToQuat(br_quat* q, br_matrix34* mat) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2492
-// Size: 133
 br_matrix4* BrQuatToMatrix4(br_matrix4* mat, br_quat* q) {
     br_matrix34 tmp;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2641
-// Size: 130
 br_quat* BrMatrix4ToQuat(br_quat* q, br_matrix4* mat) {
     br_matrix34 tmp;
     NOT_IMPLEMENTED();

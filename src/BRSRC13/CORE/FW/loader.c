@@ -3,8 +3,6 @@
 
 char rscid[49];
 
-// Offset: 10
-// Size: 2401
 br_image* ImageLoad(char* name) {
     void* fh;
     int mode;

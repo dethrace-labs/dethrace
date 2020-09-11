@@ -37,32 +37,22 @@ int gPlay_direction;
 int gPaused;
 tAction_replay_camera_type gAction_replay_camera_mode;
 
-// Offset: 0
-// Size: 71
 int ReplayIsPaused() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 72
-// Size: 47
 float GetReplayRate() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 120
-// Size: 45
 int GetReplayDirection() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 168
-// Size: 54
 void StopSaving() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 224
-// Size: 1597
 void ActualActionReplayHeadups(int pSpecial_zappy_bastard) {
     tU32 the_time;
     int x;
@@ -73,27 +63,19 @@ void ActualActionReplayHeadups(int pSpecial_zappy_bastard) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1824
-// Size: 44
 void DoActionReplayPostSwap() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1868
-// Size: 109
 void DoZappyActionReplayHeadups(int pSpecial_zappy_bastard) {
     tU32 the_time;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1980
-// Size: 41
 void DoActionReplayHeadups() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2024
-// Size: 318
 void MoveReplayBuffer(tS32 pMove_amount) {
     tU8* play_ptr;
     tU8* old_play_ptr;
@@ -104,40 +86,28 @@ void MoveReplayBuffer(tS32 pMove_amount) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2344
-// Size: 118
 void MoveToEndOfReplay() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2464
-// Size: 118
 void MoveToStartOfReplay() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2584
-// Size: 395
 void ToggleReplay() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2980
-// Size: 49
 void ReverseSound(tS3_effect_tag pEffect_index, tS3_sound_tag pSound_tag) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3032
-// Size: 223
 int FindUniqueFile() {
     FILE* f;
     tPath_name the_path;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3256
-// Size: 1576
 void PollActionReplayControls(tU32 pFrame_period) {
     float old_replay_rate;
     int old_key_down;
@@ -151,14 +121,10 @@ void PollActionReplayControls(tU32 pFrame_period) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4832
-// Size: 94
 void CheckReplayTurnOn() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4928
-// Size: 98
 void InitializeActionReplay() {
     int i;
     LOG_TRACE("()");
@@ -168,14 +134,10 @@ void InitializeActionReplay() {
     gAction_replay_camera_mode = eAction_replay_action;
 }
 
-// Offset: 5028
-// Size: 71
 void DoActionReplay(tU32 pFrame_period) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5100
-// Size: 330
 void SynchronizeActionReplay() {
     tPath_name the_path;
     static tU32 gLast_synch_time;

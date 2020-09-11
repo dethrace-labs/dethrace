@@ -32,52 +32,36 @@ int gWreck_zoomed_in;
 int gDone_initial;
 int gTemp_lost;
 
-// Offset: 0
-// Size: 302
 void MungeRankEtc(tProgram_state* pThe_state) {
     int i;
     int not_done_yet;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 304
-// Size: 96
 void CalcRankIncrease() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 400
-// Size: 81
 int RaceSummaryDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 484
-// Size: 166
 void DrawInBox(int pBox_left, int pText_left, int pTop, int pRight, int pBottom, int pColour, int pAmount) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 652
-// Size: 220
 void DrawChromeNumber(int pLeft_1, int pLeft_2, int pPitch, int pTop, int pAmount) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 872
-// Size: 604
 void DrawSummaryItems() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1476
-// Size: 127
 void RampUpRate(float* pRate, tU32 pTime) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1604
-// Size: 747
 void DrawSummary(int pCurrent_choice, int pCurrent_mode) {
     tU32 the_time;
     static tU32 last_time;
@@ -88,34 +72,24 @@ void DrawSummary(int pCurrent_choice, int pCurrent_mode) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2352
-// Size: 49
 void StartSummary() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2404
-// Size: 86
 void SetUpTemps() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2492
-// Size: 78
 int Summ1GoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2572
-// Size: 324
 int SummCheckGameOver(int* pCurrent_choice, int* pCurrent_mode) {
     int i;
     tS3_sound_tag sound_tag;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2896
-// Size: 288
 tSO_result DoEndRaceSummary1() {
     static tFlicette flicker_off[1];
     static tFlicette push[1];
@@ -126,8 +100,6 @@ tSO_result DoEndRaceSummary1() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3352
-// Size: 1003
 void BuildWrecks() {
     int i;
     int position;
@@ -137,8 +109,6 @@ void BuildWrecks() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4356
-// Size: 385
 void DisposeWrecks() {
     int i;
     int position;
@@ -148,14 +118,10 @@ void DisposeWrecks() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4744
-// Size: 185
 int MatrixIsIdentity(br_matrix34* pMat) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4932
-// Size: 403
 void SpinWrecks(tU32 pFrame_period) {
     int i;
     br_vector3 translation;
@@ -163,27 +129,19 @@ void SpinWrecks(tU32 pFrame_period) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5336
-// Size: 143
 void ZoomInTo(int pIndex, int* pCurrent_choice, int* pCurrent_mode) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5480
-// Size: 189
 void ZoomOutTo(int pIndex, int* pCurrent_choice, int* pCurrent_mode) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5672
-// Size: 102
 int WreckPick(br_actor* pActor, br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pNear, br_scalar pFar, void* pArg) {
     int i;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5776
-// Size: 404
 int CastSelectionRay(int* pCurrent_choice, int* pCurrent_mode) {
     int mouse_x;
     int mouse_y;
@@ -193,14 +151,10 @@ int CastSelectionRay(int* pCurrent_choice, int* pCurrent_mode) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6180
-// Size: 167
 int DamageScrnExit(int* pCurrent_choice, int* pCurrent_mode) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6348
-// Size: 2481
 void DamageScrnDraw(int pCurrent_choice, int pCurrent_mode) {
     tU32 the_time;
     br_vector3 camera_movement;
@@ -215,22 +169,16 @@ void DamageScrnDraw(int pCurrent_choice, int pCurrent_mode) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8832
-// Size: 268
 int DamageScrnLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int i;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9100
-// Size: 275
 int DamageScrnRight(int* pCurrent_choice, int* pCurrent_mode) {
     int i;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9376
-// Size: 428
 int DamageScrnUp(int* pCurrent_choice, int* pCurrent_mode) {
     int i;
     int difference;
@@ -239,8 +187,6 @@ int DamageScrnUp(int* pCurrent_choice, int* pCurrent_mode) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9804
-// Size: 470
 int DamageScrnDown(int* pCurrent_choice, int* pCurrent_mode) {
     int i;
     int difference;
@@ -249,14 +195,10 @@ int DamageScrnDown(int* pCurrent_choice, int* pCurrent_mode) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10276
-// Size: 176
 int DamageScrnGoHead(int* pCurrent_choice, int* pCurrent_mode) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10452
-// Size: 258
 int ClickDamage(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     int mouse_x;
     int mouse_y;
@@ -265,14 +207,10 @@ int ClickDamage(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10712
-// Size: 66
 int DamageScrnDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10780
-// Size: 286
 tSO_result DoEndRaceSummary2() {
     static tFlicette flicker_off[3];
     static tFlicette push[3];
@@ -282,20 +220,14 @@ tSO_result DoEndRaceSummary2() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 11256
-// Size: 74
 int SortScores(void* pFirst_one, void* pSecond_one) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 11332
-// Size: 60
 void SortGameScores() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 11392
-// Size: 709
 void NetSumDraw(int pCurrent_choice, int pCurrent_mode) {
     int i;
     char s[256];
@@ -303,8 +235,6 @@ void NetSumDraw(int pCurrent_choice, int pCurrent_mode) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 12104
-// Size: 188
 void DoNetRaceSummary() {
     static tFlicette flicker_off[1];
     static tFlicette push[1];
@@ -316,8 +246,6 @@ void DoNetRaceSummary() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 12292
-// Size: 227
 tSO_result DoEndRaceSummary(int* pFirst_summary_done, tRace_result pRace_result) {
     tSO_result result;
     NOT_IMPLEMENTED();

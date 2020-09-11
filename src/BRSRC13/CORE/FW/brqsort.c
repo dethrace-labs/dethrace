@@ -3,8 +3,6 @@
 // Global variables
 char rscid[49];
 
-// Offset: 8
-// Size: 560
 void BrQsort(void* basep, unsigned int nelems, unsigned int size, br_qsort_cbfn comp) {
     char* stack[40];
     char** sp;
@@ -107,8 +105,6 @@ void BrQsort(void* basep, unsigned int nelems, unsigned int size, br_qsort_cbfn 
     }
 }
 
-// Offset: 579
-// Size: 81
 void swap_chars(char* a, char* b, unsigned int nbytes) {
     char tmp;
 
@@ -119,8 +115,6 @@ void swap_chars(char* a, char* b, unsigned int nbytes) {
     } while (--nbytes);
 }
 
-// Offset: 670
-// Size: 95
 void swap_ints(char* ap, char* bp, unsigned int nints) {
     int* a = (int*)ap;
     int* b = (int*)bp;
@@ -133,8 +127,6 @@ void swap_ints(char* ap, char* bp, unsigned int nints) {
     } while (--nints);
 }
 
-// Offset: 776
-// Size: 85
 void swap_int_1(char* ap, char* bp, unsigned int nints) {
     int* a = (int*)ap;
     int* b = (int*)bp;

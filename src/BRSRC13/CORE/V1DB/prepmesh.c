@@ -11,15 +11,11 @@ int num_edges;
 pm_temp_edge* pm_edge_table;
 char rscid[51];
 
-// Offset: 8
-// Size: 246
 int addEdge(br_uint_16 first, br_uint_16 last) {
     pm_temp_edge* tep;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 267
-// Size: 461
 void prepareEdges(v11group* group, br_model* model) {
     br_size_t scratch_size;
     br_face* mfp;
@@ -28,24 +24,18 @@ void prepareEdges(v11group* group, br_model* model) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 743
-// Size: 115
 void BrPrepareEdges(br_model* model) {
     int g;
     v11model* v11m;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 871
-// Size: 102
 int FacesCompare(void* p1, void* p2) {
     br_face* f1;
     br_face* f2;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 987
-// Size: 268
 int TVCompare_XYZ(void* p1, void* p2) {
     prep_vertex* tv1;
     prep_vertex* tv2;
@@ -55,8 +45,6 @@ int TVCompare_XYZ(void* p1, void* p2) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1273
-// Size: 610
 int TVCompare_MXYZUVN(void* p1, void* p2) {
     prep_vertex* tv1;
     prep_vertex* tv2;
@@ -66,8 +54,6 @@ int TVCompare_MXYZUVN(void* p1, void* p2) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1897
-// Size: 383
 int TVCompare_MVN(void* p1, void* p2) {
     prep_vertex* tv1;
     prep_vertex* tv2;
@@ -75,8 +61,6 @@ int TVCompare_MVN(void* p1, void* p2) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2304
-// Size: 88
 br_fraction BrScalarToFractionClamp(br_scalar s) {
     if (s >= 1.0f) {
         return 1.0f;
@@ -87,8 +71,6 @@ br_fraction BrScalarToFractionClamp(br_scalar s) {
     return s;
 }
 
-// Offset: 2411
-// Size: 284
 void PrepareFaceNormals(br_model* model) {
     br_vertex* vertices;
     br_vector4 v4;
@@ -105,16 +87,12 @@ void PrepareFaceNormals(br_model* model) {
     }
 }
 
-// Offset: 2705
-// Size: 296
 void Smoothing(br_model* model, br_scalar crease_limit, prep_vertex** start, prep_vertex** end) {
     prep_vertex** outer;
     prep_vertex** inner;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3018
-// Size: 500
 void SmoothingCreased(br_model* model, br_scalar crease_limit, prep_vertex** start, prep_vertex** end) {
     br_vector3 o_n;
     prep_vertex** outer;
@@ -122,22 +100,16 @@ void SmoothingCreased(br_model* model, br_scalar crease_limit, prep_vertex** sta
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3529
-// Size: 479
 void CopyVertex(v11group* group, int v, prep_vertex* src, br_model* model) {
     br_vertex* srcv;
     br_vector3 n;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4017
-// Size: 293
 void CopyFace(v11group* group, int f, br_face* src, br_model* model) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4324
-// Size: 2516
 void PrepareGroups(br_model* model) {
     br_qsort_cbfn* vertex_compare_smoothing;
     br_qsort_cbfn* vertex_compare_groups;
@@ -175,8 +147,6 @@ void PrepareGroups(br_model* model) {
     return;
 }
 
-// Offset: 6862
-// Size: 170
 void PrepareBoundingRadius(br_model* model) {
     float d;
     float max = 0.0f;
@@ -193,8 +163,6 @@ void PrepareBoundingRadius(br_model* model) {
     model->radius = BrFloatSqrt(max);
 }
 
-// Offset: 7051
-// Size: 272
 void PrepareBoundingBox(br_model* model) {
     int axis;
     int v;
@@ -221,8 +189,6 @@ void PrepareBoundingBox(br_model* model) {
     }
 }
 
-// Offset: 7345
-// Size: 268
 void RegenerateFaceNormals(v11model* v11m) {
     int g;
     int f;
@@ -230,8 +196,6 @@ void RegenerateFaceNormals(v11model* v11m) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7637
-// Size: 762
 void RegenerateVertexNormals(v11model* v11m) {
     int g;
     int v;
@@ -242,8 +206,6 @@ void RegenerateVertexNormals(v11model* v11m) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8413
-// Size: 1585
 void BrModelUpdate(br_model* model, br_uint_16 flags) {
     int g;
     int f;
@@ -390,8 +352,6 @@ void BrModelUpdate(br_model* model, br_uint_16 flags) {
     }
 }
 
-// Offset: 10011
-// Size: 109
 void BrModelClear(br_model* model) {
     NOT_IMPLEMENTED();
 }

@@ -14,14 +14,10 @@ br_vector3 gGround_normal;
 int gMetal_scrape_sound_id[3];
 br_angle gOld_yaw;
 
-// Offset: 0
-// Size: 89
 void MakeCarStationary(tCar_spec* pCar_spec) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 92
-// Size: 1323
 void MoveThisCar(tU32 pTime_difference, tCar_spec* car) {
     br_scalar dt;
     br_scalar ts;

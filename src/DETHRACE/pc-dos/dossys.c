@@ -57,8 +57,6 @@ const double NANOSECONDS_TO_MILLISECONDS = 1.0 / 1000000.0;
 int _unittest_do_not_exit = 0;
 char* _unittest_last_fatal_error;
 
-// Offset: 0
-// Size: 291
 void KeyboardHandler() {
     tU8 scan_code;
     tU8 up;
@@ -66,20 +64,14 @@ void KeyboardHandler() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 292
-// Size: 71
 int KeyDown(tU8 pScan_code) {
     return Harness_Hook_KeyDown(pScan_code);
 }
 
-// Offset: 364
-// Size: 71
 void KeyTranslation(tU8 pKey_index, tU8 pScan_code_1, tU8 pScan_code_2) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 436
-// Size: 1897
 void KeyBegin() {
 
     Harness_Hook_KeyBegin();
@@ -201,20 +193,14 @@ void KeyBegin() {
     //dos_setvect(9, KeyboardHandler);
 }
 
-// Offset: 2336
-// Size: 52
 void KeyEnd() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2388
-// Size: 79
 int KeyDown22(int pKey_index) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2468
-// Size: 141
 void PDSetKeyArray(int* pKeys, int pMark) {
     int i;
     tS32 joyX;
@@ -232,14 +218,10 @@ void PDSetKeyArray(int* pKeys, int pMark) {
     }
 }
 
-// Offset: 2612
-// Size: 73
 int PDGetASCIIFromKey(int pKey) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2688
-// Size: 174
 void PDFatalError(char* pThe_str) {
     static int been_here = 0;
     LOG_TRACE("(\"%s\")", pThe_str);
@@ -262,14 +244,10 @@ void PDFatalError(char* pThe_str) {
     }
 }
 
-// Offset: 2864
-// Size: 55
 void PDNonFatalError(char* pThe_str) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2920
-// Size: 190
 void PDInitialiseSystem() {
     tPath_name the_path;
     FILE* f;
@@ -294,51 +272,35 @@ void PDInitialiseSystem() {
     fclose(f);
 }
 
-// Offset: 3112
-// Size: 48
 void PDShutdownSystem() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3160
-// Size: 24
 void PDSaveOriginalPalette() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3184
-// Size: 24
 void PDRevertPalette() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3208
-// Size: 90
 int PDInitScreenVars(int pArgc, char** pArgv) {
     gGraf_specs[gGraf_spec_index].phys_width = gGraf_specs[gGraf_spec_index].total_width;
     gGraf_specs[gGraf_spec_index].phys_height = gGraf_specs[gGraf_spec_index].total_height;
     return 1;
 }
 
-// Offset: 3300
-// Size: 24
 void PDInitScreen() {
 }
 
-// Offset: 3324
-// Size: 113
 void PDLockRealBackScreen() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3440
-// Size: 48
 void PDUnlockRealBackScreen() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3488
-// Size: 431
 void PDAllocateScreenAndBack() {
     gScreen = DOSGfxBegin(gGraf_specs[gGraf_spec_index].gfx_init_string);
     gScreen->origin_x = 0;
@@ -352,8 +314,6 @@ void PDAllocateScreenAndBack() {
     gTemp_screen->origin_y = 0;
 }
 
-// Offset: 3920
-// Size: 209
 void Copy8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette) {
     int x;
     int y;
@@ -367,8 +327,6 @@ void Copy8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* 
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4132
-// Size: 307
 void Double8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette, tU16 pOff, tU16 pSrc_width, tU16 pSrc_height) {
     int x;
     int y;
@@ -384,32 +342,22 @@ void Double8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4440
-// Size: 35
 br_pixelmap* PDInterfacePixelmap() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4476
-// Size: 154
 void SwapBackScreen() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4632
-// Size: 253
 void ReallyCopyBackScreen(int pRendering_area_only, int pClear_top_and_bottom) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4888
-// Size: 40
 void CopyBackScreen(int pRendering_area_only) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4928
-// Size: 92
 void PDScreenBufferSwap(int pRendering_area_only) {
     LOG_TRACE10("(%d)", pRendering_area_only);
     if (pRendering_area_only) {
@@ -424,32 +372,22 @@ void PDScreenBufferSwap(int pRendering_area_only) {
     }
 }
 
-// Offset: 5020
-// Size: 82
 void PDPixelmapToScreenRectangleCopy(br_pixelmap* dst, br_int_16 dx, br_int_16 dy, br_pixelmap* src, br_int_16 sx, br_int_16 sy, br_uint_16 w, br_uint_16 h) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5104
-// Size: 68
 void PDPixelmapHLineOnScreen(br_pixelmap* dst, br_int_16 x1, br_int_16 y1, br_int_16 x2, br_int_16 y2, br_uint_32 colour) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5172
-// Size: 68
 void PDPixelmapVLineOnScreen(br_pixelmap* dst, br_int_16 x1, br_int_16 y1, br_int_16 x2, br_int_16 y2, br_uint_32 colour) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5240
-// Size: 24
 void PDInstallErrorHandlers() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5264
-// Size: 39
 void PDSetFileVariables() {
     gDir_separator[0] = '\\';
 
@@ -459,8 +397,6 @@ void PDSetFileVariables() {
     // <<
 }
 
-// Offset: 5304
-// Size: 98
 void PDBuildAppPath(char* pThe_path) {
     int pos;
 
@@ -470,8 +406,6 @@ void PDBuildAppPath(char* pThe_path) {
     strcat(gNetwork_profile_fname, "NETWORK.INI");
 }
 
-// Offset: 5404
-// Size: 133
 void PDForEveryFile(char* pThe_path, void (*pAction_routine)(char*)) {
     char find_path[256];
     char found_path[256];
@@ -492,14 +426,10 @@ void PDForEveryFile(char* pThe_path, void (*pAction_routine)(char*)) {
     }
 }
 
-// Offset: 5540
-// Size: 39
 void PDSetPalette(br_pixelmap* pThe_palette) {
     BrDevPaletteSetOld(pThe_palette);
 }
 
-// Offset: 5580
-// Size: 136
 void PDSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
     int i;
     tU8* p;
@@ -510,20 +440,14 @@ void PDSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
     }
 }
 
-// Offset: 5716
-// Size: 44
 void PDSwitchToRealResolution() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5760
-// Size: 44
 void PDSwitchToLoresMode() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5804
-// Size: 86
 void PDMouseButtons(int* pButton_1, int* pButton_2) {
     br_uint_32 mouse_buttons;
     br_int_32 mouse_x;
@@ -531,8 +455,6 @@ void PDMouseButtons(int* pButton_1, int* pButton_2) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5892
-// Size: 380
 void PDGetMousePosition(int* pX_coord, int* pY_coord) {
     br_uint_32 mouse_buttons;
     br_int_32 mouse_x2;
@@ -544,22 +466,16 @@ void PDGetMousePosition(int* pX_coord, int* pY_coord) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6272
-// Size: 38
 int PDGetTotalTime() {
     struct timespec spec;
     clock_gettime(CLOCK_MONOTONIC, &spec);
     return spec.tv_sec * 1000 + spec.tv_nsec / 1000000;
 }
 
-// Offset: 6312
-// Size: 37
 int PDServiceSystem(tU32 pTime_since_last_call) {
     return 0;
 }
 
-// Offset: 6352
-// Size: 121
 tU32 LargestBlockAvail() {
     SREGS sregs;
     tMem_info mem_info;
@@ -570,29 +486,21 @@ tU32 LargestBlockAvail() {
     // <<
 }
 
-// Offset: 6476
-// Size: 111
 void* PDGrabLargestMammaryWeCanPlayWith(tU32 pMaximum_required, tU32* pAmount_allocated) {
     void* result;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6588
-// Size: 200
 void PDAllocateActionReplayBuffer(char** pBuffer, tU32* pBuffer_size) {
     tU32 lba;
     tU32 required;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6788
-// Size: 35
 void PDDisposeActionReplayBuffer(char* pBuffer) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6824
-// Size: 146
 void Usage(char* pProgpath) {
     char basename[9];
 
@@ -615,8 +523,6 @@ void Usage(char* pProgpath) {
     exit(1);
 }
 
-// Offset: 6972
-// Size: 722
 // Renamed from "main" to "original_main" to allow for harness + unit testing
 int original_main(int pArgc, char** pArgv) {
     int arg;
@@ -664,14 +570,10 @@ int original_main(int pArgc, char** pArgv) {
     return 0;
 }
 
-// Offset: 7696
-// Size: 62
 int OurGetChar() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7760
-// Size: 34
 int PDGetGorePassword() {
     int len;
     int chances;
@@ -679,34 +581,24 @@ int PDGetGorePassword() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7796
-// Size: 73
 void PDDisplayGoreworthiness(int pGory) {
     tU32 delay_start;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7872
-// Size: 35
 void PDEnterDebugger(char* pStr) {
     static unsigned char* save_it;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7908
-// Size: 24
 void PDEndItAllAndReRunTheBastard() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7932
-// Size: 57
 int matherr(struct exception_* err) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7992
-// Size: 127
 int LoopLimitTooLow(tU32 limit) {
     clock_t start;
     tU32 count;
@@ -714,28 +606,20 @@ int LoopLimitTooLow(tU32 limit) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8120
-// Size: 131
 tS32 UpperLoopLimit() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8252
-// Size: 65
 int InitJoysticks() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8320
-// Size: 182
 tU32 ReadJoystickAxis(int pBit) {
     tU32 val;
     tU32 count;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8504
-// Size: 406
 void PDReadJoySticks() {
     tU32 temp1y;
     tU32 temp2x;
@@ -743,93 +627,63 @@ void PDReadJoySticks() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8912
-// Size: 123
 tS32 PDGetJoy1X() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9036
-// Size: 123
 tS32 PDGetJoy1Y() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9160
-// Size: 123
 tS32 PDGetJoy2X() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9284
-// Size: 123
 tS32 PDGetJoy2Y() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9408
-// Size: 66
 int PDGetJoy1Button1() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9476
-// Size: 66
 int PDGetJoy1Button2() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9544
-// Size: 34
 int PDGetJoy1Button3() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9580
-// Size: 34
 int PDGetJoy1Button4() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9616
-// Size: 66
 int PDGetJoy2Button1() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9684
-// Size: 66
 int PDGetJoy2Button2() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9752
-// Size: 34
 int PDGetJoy2Button3() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9788
-// Size: 34
 int PDGetJoy2Button4() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9824
-// Size: 51
 int PDFileUnlock(char* pThe_path) {
     unsigned int attr;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9876
-// Size: 33
 void CriticalISR(INTPACK pRegs) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9912
-// Size: 269
 int PDCheckDriveExists2(char* pThe_path, char* pFile_name, tU32 pMin_size) {
     struct stat buf;
     void (*old_critical_isr)();
@@ -856,8 +710,6 @@ int PDCheckDriveExists2(char* pThe_path, char* pFile_name, tU32 pMin_size) {
     return !stat_failed && buf.st_size >= pMin_size;
 }
 
-// Offset: 10184
-// Size: 108
 int PDDoWeLeadAnAustereExistance() {
     tU32 block;
 

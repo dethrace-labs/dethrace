@@ -11,8 +11,6 @@ br_scalar gMin_z_diff;
 br_pixelmap* gOil_pixies[1];
 tOil_spill_info gOily_spills[15];
 
-// Offset: 0
-// Size: 811
 void InitOilSpills() {
     int i;
     br_model* the_model;
@@ -77,14 +75,10 @@ void InitOilSpills() {
     }
 }
 
-// Offset: 812
-// Size: 101
 void ResetOilSpills() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 916
-// Size: 335
 void QueueOilSpill(tCar_spec* pCar) {
     int i;
     int oily_index;
@@ -94,8 +88,6 @@ void QueueOilSpill(tCar_spec* pCar) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1252
-// Size: 967
 int OKToSpillOil(tOil_spill_info* pOil) {
     br_scalar temp;
     br_scalar size_with_margin;
@@ -116,14 +108,10 @@ int OKToSpillOil(tOil_spill_info* pOil) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2220
-// Size: 124
 void Vector3Interpolate(br_vector3* pDst, br_vector3* pFrom, br_vector3* pTo, br_scalar pP) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2344
-// Size: 252
 void EnsureGroundDetailVisible(br_vector3* pNew_pos, br_vector3* pGround_normal, br_vector3* pOld_pos) {
     br_scalar factor;
     br_scalar s;
@@ -132,26 +120,18 @@ void EnsureGroundDetailVisible(br_vector3* pNew_pos, br_vector3* pGround_normal,
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2596
-// Size: 64
 void MungeOilsHeightAboveGround(tOil_spill_info* pOil) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2660
-// Size: 53
 void MungeIndexedOilsHeightAboveGround(int pIndex) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2716
-// Size: 193
 void SetInitialOilStuff(tOil_spill_info* pOil, br_model* pModel) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2912
-// Size: 1329
 void ProcessOilSpills(tU32 pFrame_period) {
     int i;
     tU32 time;
@@ -164,40 +144,28 @@ void ProcessOilSpills(tU32 pFrame_period) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4244
-// Size: 44
 int GetOilSpillCount() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4288
-// Size: 93
 void GetOilSpillDetails(int pIndex, br_actor** pActor, br_scalar* pSize) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4384
-// Size: 273
 int PointInSpill(br_vector3* pV, int pSpill) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4660
-// Size: 597
 void GetOilFrictionFactors(tCar_spec* pCar, br_scalar* pFl_factor, br_scalar* pFr_factor, br_scalar* pRl_factor, br_scalar* pRr_factor) {
     int i;
     br_vector3 wheel_world;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5260
-// Size: 211
 void AdjustOilSpill(int pIndex, br_matrix34* pMat, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec* pCar, br_vector3* pOriginal_pos, br_pixelmap* pPixelmap) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5472
-// Size: 338
 void ReceivedOilSpill(tNet_contents* pContents) {
     int i;
     int oily_index;

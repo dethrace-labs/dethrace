@@ -13,14 +13,10 @@
 #include "structur.h"
 #include "utility.h"
 
-// Offset: 0
-// Size: 161
 void QuitGame() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 164
-// Size: 97
 tU32 TrackCount(br_actor* pActor, tU32* pCount) {
     unsigned int x;
     unsigned int z;
@@ -29,14 +25,10 @@ tU32 TrackCount(br_actor* pActor, tU32* pCount) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 264
-// Size: 95
 void CheckNumberOfTracks() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 360
-// Size: 173
 void ServiceTheGame(int pRacing) {
     if (!pRacing) {
         CyclePollKeys();
@@ -55,20 +47,14 @@ void ServiceTheGame(int pRacing) {
     }
 }
 
-// Offset: 536
-// Size: 41
 void ServiceGame() {
     ServiceTheGame(0);
 }
 
-// Offset: 580
-// Size: 49
 void ServiceGameInRace() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 632
-// Size: 177
 void GameMain(int pArgc, char** pArgv) {
     tPath_name CD_dir;
 

@@ -115,8 +115,6 @@ char* ChunkNames[61];
 char rscid[52];
 int DatafileStackTop;
 
-// Offset: 7
-// Size: 209
 void DfPush(int type, void* value, int count) {
     LOG_TRACE9("(%d, %p, %d)", type, value, count);
 
@@ -129,8 +127,6 @@ void DfPush(int type, void* value, int count) {
     DatafileStackTop++;
 }
 
-// Offset: 222
-// Size: 193
 void* DfPop(int type, int* countp) {
     LOG_TRACE9("(%d, %p)", type, countp);
 
@@ -147,8 +143,6 @@ void* DfPop(int type, int* countp) {
     return DatafileStack[DatafileStackTop].value;
 }
 
-// Offset: 421
-// Size: 193
 void* DfTop(int type, int* countp) {
     if (DatafileStackTop <= 0)
         BrFailure("DatafileStack Underflow");
@@ -160,8 +154,6 @@ void* DfTop(int type, int* countp) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 624
-// Size: 73
 int DfTopType() {
     if (DatafileStackTop > 0) {
         return DatafileStack[DatafileStackTop - 1].type;
@@ -171,15 +163,11 @@ int DfTopType() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 710
-// Size: 355
 int TextReadLine(br_datafile* df, char** ident, char** data) {
     char* cp;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1083
-// Size: 436
 br_uint_16 scalarTypeConvert(br_datafile* df, br_uint_16 t) {
     LOG_TRACE9("(%p, %d)", df, t);
 
@@ -254,8 +242,6 @@ br_uint_16 scalarTypeConvert(br_datafile* df, br_uint_16 t) {
     return t;
 }
 
-// Offset: 1539
-// Size: 1211
 br_uint_32 DfStructWriteBinary(br_datafile* df, br_file_struct* str, void* base) {
     unsigned int m;
     int i;
@@ -269,8 +255,6 @@ br_uint_32 DfStructWriteBinary(br_datafile* df, br_file_struct* str, void* base)
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2769
-// Size: 1394
 br_uint_32 DfStructReadBinary(br_datafile* df, br_file_struct* str, void* base) {
     char tmp_string[256];
     unsigned int m;
@@ -428,8 +412,6 @@ br_uint_32 DfStructReadBinary(br_datafile* df, br_file_struct* str, void* base) 
     return 1;
 }
 
-// Offset: 4182
-// Size: 427
 int DfStructSizeBinary(br_datafile* df, br_file_struct* str, void* base) {
     unsigned char* mp;
     unsigned int m;
@@ -438,28 +420,20 @@ int DfStructSizeBinary(br_datafile* df, br_file_struct* str, void* base) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4624
-// Size: 177
 int EnumFromString(br_file_enum* e, char* str) {
     unsigned int m;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4814
-// Size: 138
 char* EnumToString(br_file_enum* e, int num) {
     unsigned int m;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4970
-// Size: 92
 br_uint_32 DfStructWriteText(br_datafile* df, br_file_struct* str, void* base) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5081
-// Size: 1827
 br_uint_32 StructWriteTextSub(br_datafile* df, br_file_struct* str, void* base, int indent) {
     unsigned int m;
     int i;
@@ -470,16 +444,12 @@ br_uint_32 StructWriteTextSub(br_datafile* df, br_file_struct* str, void* base, 
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6925
-// Size: 156
 br_uint_32 DfStructReadText(br_datafile* df, br_file_struct* str, void* base) {
     char* id;
     char* data;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7099
-// Size: 1609
 br_uint_32 StructReadTextSub(br_datafile* df, br_file_struct* str, void* base) {
     unsigned int m;
     unsigned int r;
@@ -495,8 +465,6 @@ br_uint_32 StructReadTextSub(br_datafile* df, br_file_struct* str, void* base) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8725
-// Size: 144
 int DfStructSizeText(br_datafile* df, br_file_struct* str, void* base) {
     unsigned int m;
     br_file_struct_member* sm;
@@ -504,16 +472,12 @@ int DfStructSizeText(br_datafile* df, br_file_struct* str, void* base) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8888
-// Size: 109
 br_uint_32 DfStructWriteArray(br_datafile* df, br_file_struct* str, void* base, int n) {
     char* cp;
     int i;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9015
-// Size: 126
 br_uint_32 DfStructReadArray(br_datafile* df, br_file_struct* str, void* base, int n) {
     char* cp;
     int i;
@@ -530,14 +494,10 @@ br_uint_32 DfStructReadArray(br_datafile* df, br_file_struct* str, void* base, i
     return i;
 }
 
-// Offset: 9158
-// Size: 150
 int DfChunkWriteText(br_datafile* df, br_uint_32 id, br_uint_32 length) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9324
-// Size: 238
 int DfChunkReadText(br_datafile* df, br_uint_32* plength) {
     int i;
     char* id;
@@ -546,15 +506,11 @@ int DfChunkReadText(br_datafile* df, br_uint_32* plength) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9581
-// Size: 121
 int DfChunkWriteBinary(br_datafile* df, br_uint_32 id, br_uint_32 length) {
     br_uint_32 l;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9720
-// Size: 210
 int DfChunkReadBinary(br_datafile* df, br_uint_32* plength) {
     br_uint_32 id;
     br_uint_32 l;
@@ -578,29 +534,21 @@ int DfChunkReadBinary(br_datafile* df, br_uint_32* plength) {
     return id;
 }
 
-// Offset: 9947
-// Size: 61
 void DfCountWriteText(br_datafile* df, br_uint_32 count) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10024
-// Size: 109
 br_uint_32 DfCountReadText(br_datafile* df) {
     char* id;
     char* data;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10152
-// Size: 74
 void DfCountWriteBinary(br_datafile* df, br_uint_32 count) {
     br_uint_32 l;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10244
-// Size: 76
 br_uint_32 DfCountReadBinary(br_datafile* df) {
     br_uint_32 l;
     BrFileRead(&l, 4, 1, df->h);
@@ -608,21 +556,15 @@ br_uint_32 DfCountReadBinary(br_datafile* df) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10336
-// Size: 47
 int DfCountSizeText(br_datafile* df) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10401
-// Size: 47
 int DfCountSizeBinary(br_datafile* df) {
     return 4;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10464
-// Size: 227
 br_uint_8* BlockWriteSetup(void* base, int block_size, int block_stride, int block_count, int size) {
     int b;
     br_uint_8* block;
@@ -631,8 +573,6 @@ br_uint_8* BlockWriteSetup(void* base, int block_size, int block_stride, int blo
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10708
-// Size: 358
 int DfBlockWriteText(br_datafile* df, void* base, int block_size, int block_stride, int block_count, int size) {
     int i;
     br_uint_8* cp;
@@ -641,8 +581,6 @@ int DfBlockWriteText(br_datafile* df, void* base, int block_size, int block_stri
     NOT_IMPLEMENTED();
 }
 
-// Offset: 11082
-// Size: 498
 void* DfBlockReadText(br_datafile* df, void* base, int* count, int size, int mtype) {
     char* id;
     char* data;
@@ -653,8 +591,6 @@ void* DfBlockReadText(br_datafile* df, void* base, int* count, int size, int mty
     NOT_IMPLEMENTED();
 }
 
-// Offset: 11599
-// Size: 203
 int DfBlockWriteBinary(br_datafile* df, void* base, int block_size, int block_stride, int block_count, int size) {
     int count;
     br_uint_32 l;
@@ -663,8 +599,6 @@ int DfBlockWriteBinary(br_datafile* df, void* base, int block_size, int block_st
     NOT_IMPLEMENTED();
 }
 
-// Offset: 11820
-// Size: 300
 void* DfBlockReadBinary(br_datafile* df, void* base, int* count, int size, int mtype) {
     int l;
     int s;
@@ -690,40 +624,28 @@ void* DfBlockReadBinary(br_datafile* df, void* base, int* count, int size, int m
     return base;
 }
 
-// Offset: 12136
-// Size: 78
 int DfBlockSizeText(br_datafile* df, void* base, int block_size, int block_stride, int block_count, int size) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 12232
-// Size: 62
 int DfBlockSizeBinary(br_datafile* df, void* base, int block_size, int block_stride, int block_count, int size) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 12309
-// Size: 157
 char* DfNameReadText(br_datafile* df, char* name) {
     char* id;
     char* data;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 12482
-// Size: 91
 int DfNameWriteText(br_datafile* df, char* name) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 12588
-// Size: 48
 int DfNameSizeText(br_datafile* df, char* name) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 12653
-// Size: 125
 char* DfNameReadBinary(br_datafile* df, char* name) {
     int c;
     int i;
@@ -743,35 +665,25 @@ char* DfNameReadBinary(br_datafile* df, char* name) {
     return name;
 }
 
-// Offset: 12796
-// Size: 101
 int DfNameWriteBinary(br_datafile* df, char* name) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 12914
-// Size: 72
 int DfNameSizeBinary(br_datafile* df, char* name) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 12997
-// Size: 92
 int DfSkipText(br_datafile* df, br_uint_32 length) {
     char* id;
     char* data;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 13102
-// Size: 65
 int DfSkipBinary(br_datafile* df, br_uint_32 length) {
     LOG_TRACE9("(%p, %d)", df, length);
     BrFileAdvance(length, df->h);
 }
 
-// Offset: 13185
-// Size: 241
 int DfChunksInterpret(br_datafile* df, br_chunks_table* table) {
     br_uint_32 length;
     br_uint_32 count;
@@ -808,14 +720,10 @@ int DfChunksInterpret(br_datafile* df, br_chunks_table* table) {
     return 0;
 }
 
-// Offset: 13438
-// Size: 59
 void BrNullOther() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 13512
-// Size: 168
 int DfFileIdentify(br_uint_8* magics, br_size_t n_magics) {
     static char text_magics[8] = { '*', 'F', 'I', 'L', 'E', '_', 'I', 'N' };
     static char binary_magics[8] = { '\0', '\0', '\0', '\x12', '\0', '\0', '\0', '\b' };
@@ -830,8 +738,6 @@ int DfFileIdentify(br_uint_8* magics, br_size_t n_magics) {
     return 2;
 }
 
-// Offset: 13687
-// Size: 278
 br_datafile* DfOpen(char* name, int write, br_token scalar_type) {
     int mode;
     char c;
@@ -869,8 +775,6 @@ br_datafile* DfOpen(char* name, int write, br_token scalar_type) {
     return df;
 }
 
-// Offset: 13973
-// Size: 198
 void DfClose(br_datafile* df) {
     br_datafile* dfp;
     LOG_TRACE("(%p)", df);
@@ -891,8 +795,6 @@ void DfClose(br_datafile* df) {
     BrResFree(dfp);
 }
 
-// Offset: 14186
-// Size: 94
 int BrWriteModeSet(int mode) {
     int old;
     NOT_IMPLEMENTED();

@@ -12,14 +12,10 @@ br_scalar gHighest_y_below;
 br_actor* gY_picking_camera;
 br_scalar gLowest_y_above;
 
-// Offset: 0
-// Size: 190
 int DRActorToRoot(br_actor* a, br_actor* world, br_matrix34* m) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 192
-// Size: 220
 void InitRayCasting() {
     br_camera* camera_ptr;
     LOG_TRACE("()");
@@ -44,14 +40,10 @@ void InitRayCasting() {
     gY_picking_camera = a;
 }
 
-// Offset: 412
-// Size: 104
 int BadDiv(br_scalar a, br_scalar b) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 592
-// Size: 544
 int PickBoundsTestRay(br_bounds* b, br_vector3* rp, br_vector3* rd, br_scalar t_near, br_scalar t_far, br_scalar* new_t_near, br_scalar* new_t_far) {
     int i;
     float s;
@@ -59,8 +51,6 @@ int PickBoundsTestRay(br_bounds* b, br_vector3* rp, br_vector3* rd, br_scalar t_
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1136
-// Size: 619
 int ActorPick2D(br_actor* ap, br_model* model, br_material* material, dr_pick2d_cbfn* callback, void* arg) {
     br_actor* a;
     br_model* this_model;
@@ -73,8 +63,6 @@ int ActorPick2D(br_actor* ap, br_model* model, br_material* material, dr_pick2d_
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1756
-// Size: 342
 int DRScenePick2DXY(br_actor* world, br_actor* camera, br_pixelmap* viewport, int pick_x, int pick_y, dr_pick2d_cbfn* callback, void* arg) {
     br_matrix34 camera_tfm;
     br_scalar scale;
@@ -85,8 +73,6 @@ int DRScenePick2DXY(br_actor* world, br_actor* camera, br_pixelmap* viewport, in
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2100
-// Size: 266
 int DRScenePick2D(br_actor* world, br_actor* camera, dr_pick2d_cbfn* callback, void* arg) {
     br_matrix34 camera_tfm;
     br_scalar scale;
@@ -94,8 +80,6 @@ int DRScenePick2D(br_actor* world, br_actor* camera, dr_pick2d_cbfn* callback, v
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2368
-// Size: 1777
 int DRModelPick2D(br_model* model, br_material* material, br_vector3* ray_pos, br_vector3* ray_dir, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn* callback, void* arg) {
     DR_FACE* fp;
     int f;
@@ -131,27 +115,19 @@ int DRModelPick2D(br_model* model, br_material* material, br_vector3* ray_pos, b
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4404
-// Size: 194
 void FindBestY(br_vector3* pPosition, br_actor* gWorld, br_scalar pStarting_height, br_scalar* pNearest_y_above, br_scalar* pNearest_y_below, br_model** pNearest_above_model, br_model** pNearest_below_model, int* pNearest_above_face_index, int* pNearest_below_face_index) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4600
-// Size: 102
 int FindYVerticallyBelowPolyCallBack(br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3* pPoint, br_vector2* pMap, void* pArg) {
     br_scalar the_y;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4704
-// Size: 112
 int FindYVerticallyBelowCallBack(br_actor* pActor, br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT_near, br_scalar pT_far, void* pArg) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4816
-// Size: 558
 br_scalar FindYVerticallyBelow(br_vector3* pPosition) {
     tU8 cx;
     tU8 cz;
@@ -161,8 +137,6 @@ br_scalar FindYVerticallyBelow(br_vector3* pPosition) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5376
-// Size: 110
 br_scalar FindYVerticallyBelow2(br_vector3* pCast_point) {
     br_scalar result;
     int number_of_attempts;

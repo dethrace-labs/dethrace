@@ -56,34 +56,24 @@ char* gFunk_type_names[5];
 tFunkotronic_spec* gFunkotronics_array;
 int gFunkotronics_array_size;
 
-// Offset: 0
-// Size: 88
 float MapSawToTriangle(float pNumber) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 88
-// Size: 62
 void SetSightDistance(br_scalar pYon) {
     gSight_distance_squared = pYon * 1.02f * (pYon * 1.02f);
 }
 
-// Offset: 152
-// Size: 121
 br_actor* FindActorInArray(char* pThe_name) {
     int i;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 276
-// Size: 121
 br_actor* FindLightInArray(char* pThe_name) {
     int i;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 400
-// Size: 223
 br_actor* CloneActor(br_actor* pSource_actor) {
     br_actor* new_actor;
     br_actor* child_actor;
@@ -91,8 +81,6 @@ br_actor* CloneActor(br_actor* pSource_actor) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 624
-// Size: 247
 void InitialiseStorageSpace(tBrender_storage* pStorage_space, int pMax_pixelmaps, int pMax_shade_tables, int pMax_materials, int pMax_models) {
     LOG_TRACE("(%p, %d, %d, %d, %d)", pStorage_space, pMax_pixelmaps, pMax_shade_tables, pMax_materials, pMax_models);
     pStorage_space->pixelmaps_count = 0;
@@ -110,8 +98,6 @@ void InitialiseStorageSpace(tBrender_storage* pStorage_space, int pMax_pixelmaps
     pStorage_space->saved_colour_maps = BrMemCalloc(pMax_materials, 4, 0xDBu);
 }
 
-// Offset: 872
-// Size: 107
 void DisposeStorageSpace(tBrender_storage* pStorage_space) {
     BrMemFree(pStorage_space->pixelmaps);
     BrMemFree(pStorage_space->shade_tables);
@@ -120,43 +106,31 @@ void DisposeStorageSpace(tBrender_storage* pStorage_space) {
     BrMemFree(pStorage_space->saved_colour_maps);
 }
 
-// Offset: 980
-// Size: 463
 void ClearOutStorageSpace(tBrender_storage* pStorage_space) {
     int i;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1444
-// Size: 232
 tAdd_to_storage_result AddPixelmapToStorage(tBrender_storage* pStorage_space, br_pixelmap** pThe_pm) {
     int i;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1676
-// Size: 211
 tAdd_to_storage_result AddShadeTableToStorage(tBrender_storage* pStorage_space, br_pixelmap* pThe_st) {
     int i;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1888
-// Size: 234
 tAdd_to_storage_result AddMaterialToStorage(tBrender_storage* pStorage_space, br_material* pThe_mat) {
     int i;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2124
-// Size: 231
 tAdd_to_storage_result AddModelToStorage(tBrender_storage* pStorage_space, br_model* pThe_mod) {
     int i;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2356
-// Size: 507
 int LoadNPixelmaps(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     tPath_name the_path;
     int i;
@@ -169,22 +143,16 @@ int LoadNPixelmaps(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2864
-// Size: 195
 br_pixelmap* LoadSinglePixelmap(tBrender_storage* pStorage_space, char* pName) {
     br_pixelmap* temp;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3060
-// Size: 195
 br_material* LoadSingleMaterial(tBrender_storage* pStorage_space, char* pName) {
     br_material* temp;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3256
-// Size: 394
 int LoadNShadeTables(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     tPath_name the_path;
     int i;
@@ -197,15 +165,11 @@ int LoadNShadeTables(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3652
-// Size: 195
 br_pixelmap* LoadSingleShadeTable(tBrender_storage* pStorage_space, char* pName) {
     br_pixelmap* temp;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3848
-// Size: 414
 int LoadNMaterials(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     tPath_name the_path;
     int i;
@@ -218,8 +182,6 @@ int LoadNMaterials(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4264
-// Size: 449
 int LoadNModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     tPath_name the_path;
     int i;
@@ -234,22 +196,16 @@ int LoadNModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4716
-// Size: 103
 void DodgyModelUpdate(br_model* pM) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4820
-// Size: 197
 br_material* SuffixedMaterial(br_material* pOld, char* pSuffix) {
     br_material* new_mat;
     char* new_id;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5020
-// Size: 656
 int FaceIsRoad(br_model* pModel, tU16 pFace) {
     br_vector3 v0;
     br_vector3 v1;
@@ -257,32 +213,24 @@ int FaceIsRoad(br_model* pModel, tU16 pFace) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5676
-// Size: 161
 br_material* RoadPerspToUntex(br_model* pModel, tU16 pFace) {
     br_material* old_mat;
     br_material* new_mat;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5840
-// Size: 169
 br_material* WallPerspToLinear(br_model* pModel, tU16 pFace) {
     br_material* old_mat;
     br_material* new_mat;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6012
-// Size: 188
 br_material* WallPerspToUntex(br_model* pModel, tU16 pFace) {
     br_material* old_mat;
     br_material* new_mat;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6200
-// Size: 260
 void ProcessModelFaceMaterials2(br_model* pModel, tPMFM2CB pCallback) {
     tU16 f;
     tU16 group;
@@ -290,8 +238,6 @@ void ProcessModelFaceMaterials2(br_model* pModel, tPMFM2CB pCallback) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6460
-// Size: 173
 void ProcessModelFaceMaterials(br_model* pModel, tPMFMCB pCallback) {
     tU16 f;
     br_material* possible_mat;
@@ -299,8 +245,6 @@ void ProcessModelFaceMaterials(br_model* pModel, tPMFMCB pCallback) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6636
-// Size: 554
 int LoadNTrackModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     tPath_name the_path;
     int i;
@@ -315,8 +259,6 @@ int LoadNTrackModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7192
-// Size: 107
 void LoadSomePixelmaps(tBrender_storage* pStorage_space, FILE* pF) {
     tPath_name the_path;
     int i;
@@ -329,8 +271,6 @@ void LoadSomePixelmaps(tBrender_storage* pStorage_space, FILE* pF) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7300
-// Size: 107
 void LoadSomeShadeTables(tBrender_storage* pStorage_space, FILE* pF) {
     tPath_name the_path;
     int i;
@@ -343,8 +283,6 @@ void LoadSomeShadeTables(tBrender_storage* pStorage_space, FILE* pF) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7408
-// Size: 107
 void LoadSomeMaterials(tBrender_storage* pStorage_space, FILE* pF) {
     tPath_name the_path;
     int i;
@@ -357,8 +295,6 @@ void LoadSomeMaterials(tBrender_storage* pStorage_space, FILE* pF) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7516
-// Size: 107
 void LoadSomeModels(tBrender_storage* pStorage_space, FILE* pF) {
     tPath_name the_path;
     int i;
@@ -371,8 +307,6 @@ void LoadSomeModels(tBrender_storage* pStorage_space, FILE* pF) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7624
-// Size: 107
 void LoadSomeTrackModels(tBrender_storage* pStorage_space, FILE* pF) {
     tPath_name the_path;
     int i;
@@ -385,84 +319,60 @@ void LoadSomeTrackModels(tBrender_storage* pStorage_space, FILE* pF) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7732
-// Size: 87
 void AddFunkGrooveBinding(int pSlot_number, float* pPeriod_address) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7820
-// Size: 81
 void ControlBoundFunkGroove(int pSlot_number, float pValue) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7904
-// Size: 130
 float ControlBoundFunkGroovePlus(int pSlot_number, float pValue) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8036
-// Size: 124
 void ShiftBoundGrooveFunks(char* pStart, char* pEnd, int pDelta) {
     int i;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8160
-// Size: 361
 tFunkotronic_spec* AddNewFunkotronic() {
     int i;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8524
-// Size: 261
 void DisposeFunkotronics(int pOwner) {
     int i;
     tFunkotronic_spec* the_funk;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8788
-// Size: 76
 void AddProximityVertex(br_vector3* pV, tFunkotronic_spec* pThe_funk) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8864
-// Size: 65
 void AddProximityVertexXYZ(br_scalar pX, br_scalar pY, br_scalar pZ, tFunkotronic_spec* pThe_funk) {
     br_vector3 v;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8932
-// Size: 167
 br_uint_32 CalcProximities(br_actor* pActor, br_material* pMat, tFunkotronic_spec* pThe_funk) {
     br_face* the_face;
     int i;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9100
-// Size: 550
 br_uint_32 AddProximities(br_actor* pActor, br_material* pMat, tFunkotronic_spec* pThe_funk) {
     br_face* the_face;
     int i;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9652
-// Size: 152
 void Adjust2FloatsForExceptions(float* pVictim1, float* pVictim2, br_pixelmap* pCulprit) {
     tException_list e;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9804
-// Size: 3256
 void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
     char s[256];
     char* str;
@@ -483,23 +393,17 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 13060
-// Size: 118
 void DisposeGroovidelics(int pOwner) {
     int i;
     tGroovidelic_spec* the_groove;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 13180
-// Size: 349
 tGroovidelic_spec* AddNewGroovidelic() {
     int i;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 13532
-// Size: 2614
 void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_offset, int pAllowed_to_be_absent) {
     char s[256];
     char* str;
@@ -510,82 +414,60 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
     NOT_IMPLEMENTED();
 }
 
-// Offset: 16148
-// Size: 161
 void KillGroovadelic(int pOwner) {
     int i;
     tGroovidelic_spec* the_groove;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 16312
-// Size: 186
 void KillFunkotronic(int pOwner) {
     int i;
     tFunkotronic_spec* the_funk;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 16500
-// Size: 236
 br_uint_32 DeleteBastards(br_actor* pActor, br_matrix34* pMatrix, void* pArg) {
     int i;
     int parent_already_doomed;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 16736
-// Size: 110
 void DeleteAnyZeroBastards() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 16848
-// Size: 219
 br_uint_32 ApplyTransToModels(br_actor* pActor, br_matrix34* pMatrix, void* pArg) {
     int i;
     br_vector3 temp_point;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 17068
-// Size: 120
 int FindSpecVolIndex(br_actor* pActor) {
     int i;
     tSpecial_volume* v;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 17188
-// Size: 244
 void MungeMaterial(br_matrix34* pMat, br_material* pMat_1, br_material* pMat_2, int pAxis_0, int pAxis_1) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 17432
-// Size: 166
 void SetSpecVolMatSize(br_actor* pActor) {
     br_model* model;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 17600
-// Size: 115
 void FindInverseAndWorldBox(tSpecial_volume* pSpec) {
     br_bounds bnds;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 17716
-// Size: 109
 void UpdateSpecVol() {
     int index;
     tSpecial_volume* v;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 17828
-// Size: 834
 void SaveSpecialVolumes() {
     FILE* f;
     int i;
@@ -593,56 +475,38 @@ void SaveSpecialVolumes() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 18664
-// Size: 137
 void SaveAdditionalStuff() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 18804
-// Size: 110
 br_uint_32 ProcessMaterials(br_actor* pActor, tPMFM2CB pCallback) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 18916
-// Size: 123
 br_uint_32 ProcessFaceMaterials2(br_actor* pActor, tPMFM2CB pCallback) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 19040
-// Size: 91
 void ChangePerspToSubdivCB(br_material* pMaterial) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 19132
-// Size: 54
 void ChangePerspToSubdiv() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 19188
-// Size: 78
 void ChangeSubdivToPerspCB(br_material* pMaterial) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 19268
-// Size: 54
 void ChangeSubdivToPersp() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 19324
-// Size: 123
 br_uint_32 ProcessFaceMaterials(br_actor* pActor, tPMFMCB pCallback) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 19448
-// Size: 236
 
 int DRPixelmapHasZeros(br_pixelmap* pm) {
     int x;
@@ -667,8 +531,6 @@ int DRPixelmapHasZeros(br_pixelmap* pm) {
     return 0;
 }
 
-// Offset: 19684
-// Size: 125
 int StorageContainsPixelmap(tBrender_storage* pStorage, br_pixelmap* pMap) {
     int i;
 
@@ -680,8 +542,6 @@ int StorageContainsPixelmap(tBrender_storage* pStorage, br_pixelmap* pMap) {
     return 0;
 }
 
-// Offset: 19812
-// Size: 266
 void HideStoredOpaqueTextures(tBrender_storage* pStorage) {
     int i;
 
@@ -697,8 +557,6 @@ void HideStoredOpaqueTextures(tBrender_storage* pStorage) {
     }
 }
 
-// Offset: 20080
-// Size: 224
 void RevealStoredTransparentTextures(tBrender_storage* pStorage) {
     int i;
 
@@ -714,8 +572,6 @@ void RevealStoredTransparentTextures(tBrender_storage* pStorage) {
     }
 }
 
-// Offset: 20304
-// Size: 236
 void HideStoredTextures(tBrender_storage* pStorage) {
     int i;
 
@@ -731,8 +587,6 @@ void HideStoredTextures(tBrender_storage* pStorage) {
     }
 }
 
-// Offset: 20540
-// Size: 197
 void RevealStoredTextures(tBrender_storage* pStorage) {
     int i;
 
@@ -746,20 +600,14 @@ void RevealStoredTextures(tBrender_storage* pStorage) {
     }
 }
 
-// Offset: 20740
-// Size: 121
 void SetCarStorageTexturingLevel(tBrender_storage* pStorage, tCar_texturing_level pNew, tCar_texturing_level pOld) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 20864
-// Size: 45
 tCar_texturing_level GetCarTexturingLevel() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 20912
-// Size: 139
 void SetCarTexturingLevel(tCar_texturing_level pLevel) {
     LOG_TRACE("(%d)", pLevel);
 
@@ -810,16 +658,12 @@ void SetCarTexturingLevel(tCar_texturing_level pLevel) {
     gCar_texturing_level = pLevel;
 }
 
-// Offset: 21052
-// Size: 138
 int HasThisSuffix(char* pIdent, char* pSuffix) {
     size_t len_ident;
     size_t len_suffix;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 21192
-// Size: 145
 br_material* UnsuffixedMaterial(char* pOld_ident, char* pSuffix) {
     br_material* result;
     int unsuffixed_len;
@@ -827,87 +671,63 @@ br_material* UnsuffixedMaterial(char* pOld_ident, char* pSuffix) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 21340
-// Size: 118
 br_material* RoadUntexToPersp(br_model* pModel, tU16 pFace) {
     br_material* old_mat;
     br_material* new_mat;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 21460
-// Size: 240
 br_material* WallLinearToUntex(br_model* pModel, tU16 pFace) {
     br_material* old_mat;
     br_material* new_mat;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 21700
-// Size: 203
 br_material* WallUntexToLinear(br_model* pModel, tU16 pFace) {
     br_material* old_mat;
     br_material* new_mat;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 21904
-// Size: 153
 br_material* WallUntexToPersp(br_model* pModel, tU16 pFace) {
     br_material* old_mat;
     br_material* new_mat;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 22060
-// Size: 112
 br_material* WallLinearToPersp(br_model* pModel, tU16 pFace) {
     br_material* old_mat;
     br_material* new_mat;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 22172
-// Size: 45
 tRoad_texturing_level GetRoadTexturingLevel() {
     return gRoad_texturing_level;
 }
 
-// Offset: 22220
-// Size: 45
 void SetRoadTexturingLevel(tRoad_texturing_level pLevel) {
     LOG_TRACE("(%d)", pLevel);
     gRoad_texturing_level = pLevel;
 }
 
-// Offset: 22268
-// Size: 86
 void ReallySetRoadTexturingLevel(tRoad_texturing_level pLevel) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 22356
-// Size: 45
 tWall_texturing_level GetWallTexturingLevel() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 22404
-// Size: 45
 void SetWallTexturingLevel(tWall_texturing_level pLevel) {
     LOG_TRACE("(%d)", pLevel);
     gWall_texturing_level = pLevel;
 }
 
-// Offset: 22452
-// Size: 82
 void ReallySetWallTexturingLevel(tWall_texturing_level pLevel) {
     static tPMFMCB* tweaker[3][3];
     NOT_IMPLEMENTED();
 }
 
-// Offset: 22536
-// Size: 297
 br_material* DisposeSuffixedMaterials(br_model* pModel, tU16 pFace) {
     size_t max_suffix_len;
     br_material* mat;
@@ -918,14 +738,10 @@ br_material* DisposeSuffixedMaterials(br_model* pModel, tU16 pFace) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 22836
-// Size: 161
 void DisposeTexturingMaterials() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 23000
-// Size: 73
 br_uint_32 SetAccessoryRenderingCB(br_actor* pActor, void* pFlag) {
     if (pActor->identifier && *pActor->identifier == 38) {
         pActor->render_style = *(br_uint_8*)pFlag;
@@ -933,8 +749,6 @@ br_uint_32 SetAccessoryRenderingCB(br_actor* pActor, void* pFlag) {
     return 0;
 }
 
-// Offset: 23076
-// Size: 100
 void SetAccessoryRendering(int pOn) {
     int style;
 
@@ -951,27 +765,19 @@ void SetAccessoryRendering(int pOn) {
     gRendering_accessories = pOn;
 }
 
-// Offset: 23176
-// Size: 45
 int GetAccessoryRendering() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 23224
-// Size: 45
 void SetCarSimplificationLevel(int pLevel) {
     LOG_TRACE("(%d)", pLevel);
     gCar_simplification_level = pLevel;
 }
 
-// Offset: 23272
-// Size: 45
 int GetCarSimplificationLevel() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 23320
-// Size: 263
 void ParseSpecialVolume(FILE* pF, tSpecial_volume* pSpec, char* pScreen_name_str) {
     char s[256];
     pSpec->gravity_multiplier = GetAScalar(pF);
@@ -993,14 +799,10 @@ void ParseSpecialVolume(FILE* pF, tSpecial_volume* pSpec, char* pScreen_name_str
     pSpec->material_modifier_index = GetAnInt(pF);
 }
 
-// Offset: 23584
-// Size: 56
 void AddExceptionToList(tException_list* pDst, tException_list pNew) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 23640
-// Size: 527
 void LoadExceptionsFile(char* pName) {
     FILE* f;
     char line[256];
@@ -1011,22 +813,16 @@ void LoadExceptionsFile(char* pName) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 24168
-// Size: 91
 void LoadExceptionsFileForTrack(char* pTrack_file_name) {
     tPath_name exceptions_file_name;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 24260
-// Size: 104
 void FreeExceptions() {
     tException_list next;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 24364
-// Size: 7310
 void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_info) {
     char temp_name[14];
     FILE* f;
@@ -1069,40 +865,28 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     NOT_IMPLEMENTED();
 }
 
-// Offset: 31676
-// Size: 82
 br_uint_32 RemoveBounds(br_actor* pActor, void* pArg) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 31760
-// Size: 52
 void RemoveBoundsStructures(br_actor* pActor) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 31812
-// Size: 439
 void FreeTrack(tTrack_spec* pTrack_spec) {
     int i;
     tNon_car_spec* non_car;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 32252
-// Size: 94
 void ProcessTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, br_matrix34* pCamera_to_world_transform, int pRender_blends) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 32348
-// Size: 71
 br_scalar NormaliseDegreeAngle(br_scalar pAngle) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 32420
-// Size: 9373
 void FunkThoseTronics() {
     int j;
     int iteration_count;
@@ -1121,8 +905,6 @@ void FunkThoseTronics() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 41796
-// Size: 803
 void LollipopizeActor(br_actor* pSubject_actor, br_matrix34* ref_to_world, tLollipop_mode pWhich_axis) {
     br_vector3 ref_to_subject;
     br_vector3 fixed_axis;
@@ -1133,28 +915,20 @@ void LollipopizeActor(br_actor* pSubject_actor, br_matrix34* ref_to_world, tLoll
     NOT_IMPLEMENTED();
 }
 
-// Offset: 42600
-// Size: 140
 void CalcActorGlobalPos(br_vector3* pResult, br_actor* pActor) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 42740
-// Size: 320
 int PointOutOfSight(br_vector3* pPoint, br_scalar pMax_distance) {
     br_vector3 distance_vector;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 43060
-// Size: 3696
 void PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat, int pInterrupt_it) {
     br_scalar pos;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 46756
-// Size: 9418
 void ObjectGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat, int pInterrupt_it) {
     int rock_it;
     br_scalar x_size;
@@ -1165,8 +939,6 @@ void ObjectGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pM
     NOT_IMPLEMENTED();
 }
 
-// Offset: 56176
-// Size: 611
 void GrooveThisDelic(tGroovidelic_spec* pGroove, tU32 pTime, int pInterrupt_it) {
     br_actor* the_actor;
     br_vector3 actor_pos;
@@ -1176,45 +948,33 @@ void GrooveThisDelic(tGroovidelic_spec* pGroove, tU32 pTime, int pInterrupt_it) 
     NOT_IMPLEMENTED();
 }
 
-// Offset: 56788
-// Size: 191
 void GrooveThoseDelics() {
     tGroovidelic_spec* the_groove;
     float f_the_time;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 56980
-// Size: 137
 void StopGroovidelic(br_actor* pActor) {
     int i;
     tGroovidelic_spec* the_groove;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 57120
-// Size: 117
 void SetGrooveInterrupt(int pGroove_index, br_matrix34* pMatrix, int pPath_interrupt, int pObject_interrupt, float pPath_resumption, float pObject_resumption) {
     tGroovidelic_spec* the_groove;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 57240
-// Size: 92
 void ResetGrooveFlags() {
     int i;
     tGroovidelic_spec* the_groove;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 57332
-// Size: 45
 tSpecial_volume* GetDefaultSpecialVolumeForWater() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 57380
-// Size: 342
 tSpecial_volume* FindSpecialVolume(br_vector3* pP, tSpecial_volume* pLast_vol) {
     int i;
     tSpecial_volume* v;
@@ -1222,43 +982,31 @@ tSpecial_volume* FindSpecialVolume(br_vector3* pP, tSpecial_volume* pLast_vol) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 57724
-// Size: 48
 void SaveAdditionalActors() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 57772
-// Size: 89
 br_scalar DistanceFromFace(br_vector3* pPos, tFace_ref* pFace) {
     br_vector3 normal;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 57864
-// Size: 166
 br_uint_32 CalcHighestID(br_actor* pActor, int* pHighest) {
     char s[256];
     int number;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 58032
-// Size: 182
 br_uint_32 SetID(br_actor* pActor, void* pArg) {
     char s[256];
     NOT_IMPLEMENTED();
 }
 
-// Offset: 58216
-// Size: 100
 void UniquificateActorsName(br_actor* pUniverse_actor, br_actor* pActor) {
     int highest;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 58316
-// Size: 107
 void AccessoryHeadup(br_actor* pActor, char* pPrefix) {
     char s[256];
     int i;
@@ -1266,16 +1014,12 @@ void AccessoryHeadup(br_actor* pActor, char* pPrefix) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 58424
-// Size: 132
 br_uint_32 CalcHighestNonAmID(br_actor* pActor, int* pHighest) {
     char s[256];
     int number;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 58556
-// Size: 443
 br_uint_32 SetIDAndDupModel(br_actor* pActor, void* pArg) {
     char s[256];
     char s2[256];
@@ -1283,15 +1027,11 @@ br_uint_32 SetIDAndDupModel(br_actor* pActor, void* pArg) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 59000
-// Size: 100
 void DuplicateIfNotAmpersand(br_actor* pActor) {
     int highest;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 59100
-// Size: 1246
 void DropActor(int pIndex) {
     FILE* f;
     tPath_name the_path;
@@ -1313,68 +1053,46 @@ void DropActor(int pIndex) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 60348
-// Size: 41
 void DropActor0() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 60392
-// Size: 44
 void DropActor1() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 60436
-// Size: 44
 void DropActor2() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 60480
-// Size: 44
 void DropActor3() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 60524
-// Size: 44
 void DropActor4() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 60568
-// Size: 44
 void DropActor5() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 60612
-// Size: 44
 void DropActor6() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 60656
-// Size: 44
 void DropActor7() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 60700
-// Size: 44
 void DropActor8() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 60744
-// Size: 44
 void DropActor9() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 60788
-// Size: 273
 br_uint_32 IdentifyAccCB(br_actor* pActor, void* pArg) {
     br_scalar distance;
     char s[256];
@@ -1382,334 +1100,226 @@ br_uint_32 IdentifyAccCB(br_actor* pActor, void* pArg) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 61064
-// Size: 105
 void IdentifyAcc() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 61172
-// Size: 108
 br_uint_32 DelGrooveRef(br_actor* pActor, void* pArg) {
     tGroovidelic_spec* the_groove;
     int i;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 61280
-// Size: 177
 br_uint_32 DelReferencedModels(br_actor* pActor, void* pArg) {
     tGroovidelic_spec* the_groove;
     int i;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 61460
-// Size: 135
 void DeleteAcc() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 61596
-// Size: 170
 br_uint_32 OffsetModel(br_actor* pActor, void* pArg) {
     int i;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 61768
-// Size: 54
 void OffsetActor(br_actor* pActor, br_vector3* pOffset) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 61824
-// Size: 286
 void CentreActor(br_actor* pActor, br_vector3* pOffset) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 62112
-// Size: 156
 void SnapAccToVertical() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 62268
-// Size: 280
 void RotateAccessory(br_angle pAngle) {
     br_vector3 mr_offset;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 62548
-// Size: 377
 void ScaleAccessory(float pScaling_factor) {
     br_vector3 mr_offset;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 62928
-// Size: 110
 void MoveAccessory(br_scalar pX_shift, br_scalar pY_shift, br_scalar pZ_shift) {
     br_vector3 v;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 63040
-// Size: 44
 void RotateAccL() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 63084
-// Size: 44
 void RotateAccL2() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 63128
-// Size: 44
 void RotateAccL3() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 63172
-// Size: 44
 void RotateAccL4() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 63216
-// Size: 44
 void RotateAccR() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 63260
-// Size: 44
 void RotateAccR2() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 63304
-// Size: 44
 void RotateAccR3() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 63348
-// Size: 44
 void RotateAccR4() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 63392
-// Size: 181
 void CycleAccRotate() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 63576
-// Size: 227
 void CycleAccScale() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 63804
-// Size: 44
 void ScaleAccUp2() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 63848
-// Size: 44
 void ScaleAccUp3() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 63892
-// Size: 44
 void ScaleAccUp4() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 63936
-// Size: 44
 void ScaleAccDown2() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 63980
-// Size: 44
 void ScaleAccDown3() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 64024
-// Size: 44
 void ScaleAccDown4() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 64068
-// Size: 48
 void MoveXAccL() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 64116
-// Size: 48
 void MoveXAccL2() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 64164
-// Size: 48
 void MoveXAccL3() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 64212
-// Size: 48
 void MoveXAccL4() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 64260
-// Size: 48
 void MoveXAccR() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 64308
-// Size: 48
 void MoveXAccR2() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 64356
-// Size: 48
 void MoveXAccR3() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 64404
-// Size: 48
 void MoveXAccR4() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 64452
-// Size: 48
 void MoveYAccL() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 64500
-// Size: 48
 void MoveYAccL2() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 64548
-// Size: 48
 void MoveYAccL3() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 64596
-// Size: 48
 void MoveYAccL4() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 64644
-// Size: 48
 void MoveYAccR() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 64692
-// Size: 48
 void MoveYAccR2() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 64740
-// Size: 48
 void MoveYAccR3() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 64788
-// Size: 48
 void MoveYAccR4() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 64836
-// Size: 48
 void MoveZAccL() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 64884
-// Size: 48
 void MoveZAccL2() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 64932
-// Size: 48
 void MoveZAccL3() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 64980
-// Size: 48
 void MoveZAccL4() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 65028
-// Size: 48
 void MoveZAccR() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 65076
-// Size: 48
 void MoveZAccR2() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 65124
-// Size: 48
 void MoveZAccR3() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 65172
-// Size: 48
 void MoveZAccR4() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 65220
-// Size: 54
 br_material* GetInternalMat() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 65276
-// Size: 54
 br_material* GetExternalMat() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 65332
-// Size: 2149
 void BuildSpecVolModel(tSpecial_volume* pSpec, int pIndex, br_material* pInt_mat, br_material* pExt_mat) {
     int i;
     int j;
@@ -1720,8 +1330,6 @@ void BuildSpecVolModel(tSpecial_volume* pSpec, int pIndex, br_material* pInt_mat
     NOT_IMPLEMENTED();
 }
 
-// Offset: 67484
-// Size: 427
 void DropSpecVol(int pIndex) {
     FILE* f;
     tPath_name the_path;
@@ -1733,68 +1341,46 @@ void DropSpecVol(int pIndex) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 67912
-// Size: 34
 void DropSpecVol0() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 67948
-// Size: 44
 void DropSpecVol1() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 67992
-// Size: 44
 void DropSpecVol2() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 68036
-// Size: 44
 void DropSpecVol3() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 68080
-// Size: 44
 void DropSpecVol4() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 68124
-// Size: 44
 void DropSpecVol5() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 68168
-// Size: 44
 void DropSpecVol6() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 68212
-// Size: 44
 void DropSpecVol7() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 68256
-// Size: 44
 void DropSpecVol8() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 68300
-// Size: 44
 void DropSpecVol9() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 68344
-// Size: 344
 void IdentifySpecVol() {
     int min_index;
     tSpecial_volume* v;
@@ -1805,268 +1391,180 @@ void IdentifySpecVol() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 68688
-// Size: 349
 void DelSpecVolumeGraph(int pIndex) {
     br_actor* actor;
     br_model* model;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 69040
-// Size: 250
 void DeleteSpecVol() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 69292
-// Size: 39
 void RotateSpecVolL() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 69332
-// Size: 39
 void RotateSpecVolL2() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 69372
-// Size: 39
 void RotateSpecVolL3() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 69412
-// Size: 39
 void RotateSpecVolL4() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 69452
-// Size: 39
 void RotateSpecVolR() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 69492
-// Size: 39
 void RotateSpecVolR2() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 69532
-// Size: 39
 void RotateSpecVolR3() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 69572
-// Size: 39
 void RotateSpecVolR4() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 69612
-// Size: 39
 void CycleSpecVolRotate() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 69652
-// Size: 39
 void CycleSpecVolScale() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 69692
-// Size: 39
 void ScaleSpecVolUp2() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 69732
-// Size: 39
 void ScaleSpecVolUp3() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 69772
-// Size: 39
 void ScaleSpecVolUp4() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 69812
-// Size: 39
 void ScaleSpecVolDown2() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 69852
-// Size: 39
 void ScaleSpecVolDown3() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 69892
-// Size: 39
 void ScaleSpecVolDown4() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 69932
-// Size: 39
 void MoveXSpecVolL() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 69972
-// Size: 39
 void MoveXSpecVolL2() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 70012
-// Size: 39
 void MoveXSpecVolL3() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 70052
-// Size: 39
 void MoveXSpecVolL4() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 70092
-// Size: 39
 void MoveXSpecVolR() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 70132
-// Size: 39
 void MoveXSpecVolR2() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 70172
-// Size: 39
 void MoveXSpecVolR3() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 70212
-// Size: 39
 void MoveXSpecVolR4() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 70252
-// Size: 39
 void MoveYSpecVolL() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 70292
-// Size: 39
 void MoveYSpecVolL2() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 70332
-// Size: 39
 void MoveYSpecVolL3() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 70372
-// Size: 39
 void MoveYSpecVolL4() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 70412
-// Size: 39
 void MoveYSpecVolR() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 70452
-// Size: 39
 void MoveYSpecVolR2() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 70492
-// Size: 39
 void MoveYSpecVolR3() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 70532
-// Size: 39
 void MoveYSpecVolR4() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 70572
-// Size: 39
 void MoveZSpecVolL() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 70612
-// Size: 39
 void MoveZSpecVolL2() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 70652
-// Size: 39
 void MoveZSpecVolL3() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 70692
-// Size: 39
 void MoveZSpecVolL4() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 70732
-// Size: 39
 void MoveZSpecVolR() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 70772
-// Size: 39
 void MoveZSpecVolR2() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 70812
-// Size: 39
 void MoveZSpecVolR3() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 70852
-// Size: 39
 void MoveZSpecVolR4() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 70892
-// Size: 39
 void SnapSpecVolToVertical() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 70932
-// Size: 165
 void ShowSpecialVolumes() {
     int j;
     int temp;
@@ -2078,8 +1576,6 @@ void ShowSpecialVolumes() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 71100
-// Size: 112
 void HideSpecialVolumes() {
     tSpecial_volume* v;
     NOT_IMPLEMENTED();

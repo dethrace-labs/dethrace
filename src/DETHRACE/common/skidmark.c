@@ -9,8 +9,6 @@ char* gMaterial_names[2] = { "OILSMEAR.MAT", "GIBSMEAR.MAT" };
 char* gBoring_material_names[2] = { "OILSMEAR.MAT", "ROBSMEAR.MAT" };
 tSkid gSkids[100];
 
-// Offset: 0
-// Size: 600
 void StretchMark(tSkid* pMark, br_vector3* pFrom, br_vector3* pTo, br_scalar pTexture_start) {
     br_vector3 temp;
     br_vector3* rows;
@@ -19,20 +17,14 @@ void StretchMark(tSkid* pMark, br_vector3* pFrom, br_vector3* pTo, br_scalar pTe
     NOT_IMPLEMENTED();
 }
 
-// Offset: 600
-// Size: 81
 br_material* MaterialFromIndex(int pIndex) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 684
-// Size: 116
 void AdjustSkid(int pSkid_num, br_matrix34* pMatrix, int pMaterial_index) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 800
-// Size: 182
 int FarFromLine2D(br_vector3* pPt, br_vector3* pL1, br_vector3* pL2) {
     br_vector2 line;
     br_vector2 to_pt;
@@ -41,16 +33,12 @@ int FarFromLine2D(br_vector3* pPt, br_vector3* pL1, br_vector3* pL2) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 984
-// Size: 137
 int Reflex2D(br_vector3* pPt, br_vector3* pL1, br_vector3* pL2) {
     br_vector2 line;
     br_vector2 to_pt;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1124
-// Size: 885
 void InitSkids() {
     int skid;
     int mat;
@@ -126,34 +114,24 @@ void InitSkids() {
     }
 }
 
-// Offset: 2012
-// Size: 51
 void HideSkid(int pSkid_num) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2064
-// Size: 67
 void HideSkids() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2132
-// Size: 136
 br_scalar SkidLen(int pSkid) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2268
-// Size: 949
 void SkidSection(tCar_spec* pCar, int pWheel_num, br_vector3* pPos, int pMaterial_index) {
     static tU16 skid;
     br_material* material;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3220
-// Size: 1175
 void SkidMark(tCar_spec* pCar, int pWheel_num) {
     br_vector3 pos;
     br_vector3 world_pos;
@@ -167,21 +145,15 @@ void SkidMark(tCar_spec* pCar, int pWheel_num) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4396
-// Size: 130
 void InitCarSkidStuff(tCar_spec* pCar) {
     int wheel;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4528
-// Size: 121
 void SkidsPerFrame() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4652
-// Size: 76
 void RemoveMaterialsFromSkidmarks() {
     NOT_IMPLEMENTED();
 }

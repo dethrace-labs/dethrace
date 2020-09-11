@@ -24,14 +24,10 @@ int gMouse_was_started;
 int gReplace_background;
 char* gPixels_copy;
 
-// Offset: 0
-// Size: 194
 int MainMenuDone1(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 196
-// Size: 163
 int MainMenuDone2(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
 
@@ -58,14 +54,10 @@ int MainMenuDone2(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
     return pCurrent_choice;
 }
 
-// Offset: 360
-// Size: 251
 void StartMainMenu() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 612
-// Size: 455
 int DoMainMenuInterface(tU32 pTime_out, int pContinue_allowed) {
     static tFlicette flicker_on1[8] = {
         { 14, { 64, 128 }, { 37, 89 } },
@@ -307,8 +299,6 @@ int DoMainMenuInterface(tU32 pTime_out, int pContinue_allowed) {
     return result;
 }
 
-// Offset: 1068
-// Size: 256
 tMM_result GetMainMenuOption(tU32 pTime_out, int pContinue_allowed) {
     int result;
 
@@ -343,8 +333,6 @@ tMM_result GetMainMenuOption(tU32 pTime_out, int pContinue_allowed) {
     }
 }
 
-// Offset: 1324
-// Size: 169
 void QuitVerifyStart() {
     gPixel_buffer_size = gBack_screen->height * gBack_screen->row_bytes;
     gPixels_copy = BrMemAllocate(gPixel_buffer_size, kMem_quit_vfy_pixels);
@@ -354,8 +342,6 @@ void QuitVerifyStart() {
     FadePaletteDown();
 }
 
-// Offset: 1496
-// Size: 220
 int QuitVerifyDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     FadePaletteDown();
     TurnOnPanelFlics();
@@ -377,8 +363,6 @@ int QuitVerifyDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pE
     return pCurrent_choice == 0;
 }
 
-// Offset: 1716
-// Size: 333
 int DoVerifyQuit(int pReplace_background) {
     static tFlicette flicker_on[2] = { { 43, { 181, 362 }, { 124, 298 } }, { 43, { 84, 168 }, { 124, 298 } } };
     static tFlicette flicker_off[2] = { { 42, { 181, 362 }, { 124, 298 } }, { 42, { 84, 168 }, { 124, 298 } } };
@@ -487,8 +471,6 @@ int DoVerifyQuit(int pReplace_background) {
     return result;
 }
 
-// Offset: 2052
-// Size: 366
 tMM_result DoMainMenu(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) {
     tMM_result the_result;
     if (gProgram_state.racing) {
@@ -553,8 +535,6 @@ tMM_result DoMainMenu(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) 
     return the_result;
 }
 
-// Offset: 2420
-// Size: 304
 void DoMainMenuScreen(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) {
     tPlayer_status old_status;
 

@@ -35,8 +35,6 @@ int gMusic_available;
 tS3_outlet_ptr gMusic_outlet;
 tS3_outlet_ptr gEffects_outlet;
 
-// Offset: 0
-// Size: 224
 void UsePathFileToDetermineIfFullInstallation() {
     char line2[80];
     char line3[80];
@@ -59,8 +57,6 @@ void UsePathFileToDetermineIfFullInstallation() {
     }
 }
 
-// Offset: 224
-// Size: 976
 void InitSound() {
     tS3_sound_tag tag;
     int engine_channel_count;
@@ -70,135 +66,91 @@ void InitSound() {
     LOG_WARN("Not implmented");
 }
 
-// Offset: 1200
-// Size: 145
 tS3_sound_tag DRS3StartSound(tS3_outlet_ptr pOutlet, tS3_sound_id pSound) {
     STUB();
 }
 
-// Offset: 1348
-// Size: 73
 tS3_sound_tag DRS3StartSoundNoPiping(tS3_outlet_ptr pOutlet, tS3_sound_id pSound) {
     STUB();
 }
 
-// Offset: 1424
-// Size: 206
 tS3_sound_tag DRS3StartSound2(tS3_outlet_ptr pOutlet, tS3_sound_id pSound, tS3_repeats pRepeats, tS3_volume pLVolume, tS3_volume pRVolume, tS3_pitch pPitch, tS3_speed pSpeed) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1632
-// Size: 73
 int DRS3ChangeVolume(tS3_sound_tag pSound_tag, tS3_volume pNew_volume) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1708
-// Size: 77
 int DRS3ChangeLRVolume(tS3_sound_tag pSound_tag, tS3_volume pNew_Lvolume, tS3_volume pNew_Rvolume) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1788
-// Size: 73
 int DRS3ChangePitch(tS3_sound_tag pTag, tS3_pitch pNew_pitch) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1864
-// Size: 73
 int DRS3ChangeSpeed(tS3_sound_tag pTag, tS3_pitch pNew_speed) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1940
-// Size: 73
 int DRS3ChangePitchSpeed(tS3_sound_tag pTag, tS3_pitch pNew_pitch) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2016
-// Size: 69
 int DRS3StopSound(tS3_sound_tag pSound_tag) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2088
-// Size: 69
 int DRS3LoadSound(tS3_sound_id pThe_sound) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2160
-// Size: 69
 int DRS3ReleaseSound(tS3_sound_id pThe_sound) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2232
-// Size: 97
 void DRS3Service() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2332
-// Size: 69
 int DRS3OutletSoundsPlaying(tS3_outlet_ptr pOutlet) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2404
-// Size: 69
 int DRS3SoundStillPlaying(tS3_sound_tag pSound_tag) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2476
-// Size: 58
 void DRS3ShutDown() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2536
-// Size: 73
 int DRS3SetOutletVolume(tS3_outlet_ptr pOutlet, tS3_volume pVolume) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2612
-// Size: 69
 int DRS3OverallVolume(tS3_volume pVolume) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2684
-// Size: 69
 int DRS3StopOutletSound(tS3_outlet_ptr pOutlet) {
     STUB();
 }
 
-// Offset: 2756
-// Size: 63
 int DRS3StopAllOutletSounds() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2820
-// Size: 80
 void ToggleSoundEnable() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2900
-// Size: 125
 void SoundService() {
     br_matrix34 mat;
     SILENT_STUB();
 }
 
-// Offset: 3028
-// Size: 521
 void InitSoundSources() {
     int car_count;
     int i;
@@ -207,8 +159,6 @@ void InitSoundSources() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3552
-// Size: 411
 void DisposeSoundSources() {
     int car_count;
     int i;
@@ -217,29 +167,21 @@ void DisposeSoundSources() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3964
-// Size: 192
 tS3_sound_tag DRS3StartSound3D(tS3_outlet_ptr pOutlet, tS3_sound_id pSound, br_vector3* pInitial_position, br_vector3* pInitial_velocity, tS3_repeats pRepeats, tS3_volume pVolume, tS3_pitch pPitch, tS3_speed pSpeed) {
     tS3_sound_tag tag;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4156
-// Size: 97
 tS3_sound_tag DRS3StartSoundFromSource3(tS3_sound_source_ptr pSource, tS3_sound_id pSound, tS3_repeats pRepeats, tS3_volume pVolume, tS3_pitch pPitch, tS3_speed pSpeed) {
     tS3_sound_tag tag;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4256
-// Size: 79
 tS3_sound_tag DRS3StartSoundFromSource(tS3_sound_source_ptr pSource, tS3_sound_id pSound) {
     tS3_sound_tag tag;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4336
-// Size: 1377
 void MungeEngineNoise() {
     tU32 pitch;
     int vol;
@@ -252,43 +194,29 @@ void MungeEngineNoise() {
     STUB();
 }
 
-// Offset: 5716
-// Size: 154
 void SetSoundVolumes() {
     STUB();
 }
 
-// Offset: 5872
-// Size: 55
 tS3_outlet_ptr GetOutletFromIndex(int pIndex) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5928
-// Size: 97
 int GetIndexFromOutlet(tS3_outlet_ptr pOutlet) {
     int i;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6028
-// Size: 295
 int DRS3StartCDA(tS3_sound_id pCDA_id) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6324
-// Size: 95
 int DRS3StopCDA() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6420
-// Size: 75
 void StartMusic() {
 }
 
-// Offset: 6496
-// Size: 48
 void StopMusic() {
 }

@@ -132,8 +132,6 @@ int gPixel_buffer_size;
 int gMouse_was_started__;
 char* gPixels_copy;
 
-// Offset: 0
-// Size: 207
 void FatalError(int pStr_index, ...) {
     char the_str[1024];
     char* sub_str;
@@ -165,8 +163,6 @@ void FatalError(int pStr_index, ...) {
     PDFatalError(temp_str);
 }
 
-// Offset: 208
-// Size: 172
 void NonFatalError(int pStr_index, ...) {
     char the_str[256];
     char* sub_str;
@@ -176,20 +172,14 @@ void NonFatalError(int pStr_index, ...) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 380
-// Size: 34
 void CloseDiagnostics() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 416
-// Size: 34
 void OpenDiagnostics() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 452
-// Size: 34
 // Renamed from dprintf to avoid collisions to stdio
 void dr_dprintf(char* fmt_string, ...) {
     va_list args;
@@ -199,8 +189,6 @@ void dr_dprintf(char* fmt_string, ...) {
     printf("\n");
 }
 
-// Offset: 488
-// Size: 57
 int DoErrorInterface(int pMisc_text_index) {
     NOT_IMPLEMENTED();
 }

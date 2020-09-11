@@ -16,33 +16,23 @@ int gCurrent_pratcam_precedence;
 int gCurrent_ambient_prat_sequence;
 int gCurrent_pratcam_alternative;
 
-// Offset: 0
-// Size: 45
 int PratcamGetCurrent() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 48
-// Size: 45
 int PratcamGetAmbient() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 96
-// Size: 45
 int PratcamGetPending() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 144
-// Size: 240
 void TogglePratcam() {
     tU32 time_diff;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 384
-// Size: 1836
 void LoadPratcam(char* pFolder_name) {
     FILE* f;
     FILE* g;
@@ -58,8 +48,6 @@ void LoadPratcam(char* pFolder_name) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2220
-// Size: 495
 void NextPratcamChunk() {
     int random_number;
     int count;
@@ -67,56 +55,38 @@ void NextPratcamChunk() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2716
-// Size: 83
 void NewPratcamSequence(int pSequence_index, int pStart_chunk) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2800
-// Size: 67
 void ChangeAmbientPratcamNow(int pIndex, int pStart_chunk) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2868
-// Size: 118
 void ChangeAmbientPratcam(int pIndex) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2988
-// Size: 57
 void PratcamEventNow(int pIndex) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3048
-// Size: 113
 void PratcamEvent(int pIndex) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3164
-// Size: 94
 int HighResPratBufferWidth() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3260
-// Size: 94
 int HighResPratBufferHeight() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3356
-// Size: 419
 void InitPratcam() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3776
-// Size: 447
 void DisposePratcam() {
     int j;
     int k;
@@ -124,8 +94,6 @@ void DisposePratcam() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4224
-// Size: 1252
 void DoPratcam(tU32 pThe_time) {
     int i;
     int offset;
@@ -141,68 +109,46 @@ void DoPratcam(tU32 pThe_time) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5476
-// Size: 96
 void TestPratCam(int pIndex) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5572
-// Size: 41
 void PratCam0() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5616
-// Size: 44
 void PratCam1() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5660
-// Size: 44
 void PratCam2() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5704
-// Size: 44
 void PratCam3() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5748
-// Size: 44
 void PratCam4() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5792
-// Size: 44
 void PratCam5() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5836
-// Size: 44
 void PratCam6() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5880
-// Size: 44
 void PratCam7() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5924
-// Size: 44
 void PratCam8() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5968
-// Size: 44
 void PratCam9() {
     NOT_IMPLEMENTED();
 }

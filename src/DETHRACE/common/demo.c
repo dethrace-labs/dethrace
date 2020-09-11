@@ -3,8 +3,6 @@
 
 int gLast_demo;
 
-// Offset: 0
-// Size: 476
 void DoDemo() {
     tS32 frame_time;
     FILE* f;

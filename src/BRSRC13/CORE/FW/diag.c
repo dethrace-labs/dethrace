@@ -9,8 +9,6 @@
 char _diag_scratch[128];
 char rscid[49];
 
-// Offset: 10
-// Size: 118
 void BrFailure(const char* s, ...) {
     va_list args;
     const char failure_header[10] = "Failure: ";
@@ -28,8 +26,6 @@ void BrFailure(const char* s, ...) {
     va_end(args);
 }
 
-// Offset: 138
-// Size: 118
 void BrWarning(const char* s, ...) {
     va_list args;
     const char warning_header[10] = "Warning: ";
@@ -46,8 +42,6 @@ void BrWarning(const char* s, ...) {
     va_end(args);
 }
 
-// Offset: 264
-// Size: 132
 void BrFatal(const char* name, int line, const char* s, ...) {
     va_list args;
     int n;
@@ -63,8 +57,6 @@ void BrFatal(const char* name, int line, const char* s, ...) {
     va_end(args);
 }
 
-// Offset: 406
-// Size: 95
 void _BrAssert(const char* condition, const char* file, unsigned int line) {
     if (fw.diag->failure == NULL) {
         BrAbort();
@@ -74,8 +66,6 @@ void _BrAssert(const char* condition, const char* file, unsigned int line) {
     fw.diag->failure(_diag_scratch);
 }
 
-// Offset: 512
-// Size: 95
 void _BrUAssert(const char* condition, const char* file, unsigned int line) {
     if (fw.diag->failure == NULL) {
         BrAbort();

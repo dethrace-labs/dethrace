@@ -8,8 +8,6 @@
 br_boolean active;
 char rscid[54];
 
-// Offset: 8
-// Size: 88
 br_error BrBegin() {
     if (active) {
         return 4103;
@@ -24,8 +22,6 @@ br_error BrBegin() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 102
-// Size: 126
 br_error BrEnd() {
     NOT_IMPLEMENTED();
 }

@@ -458,118 +458,80 @@ tFlic_bunch gFlic_bunch[9] = {
     { 16, gFlic_bunch8 }
 };
 
-// Offset: 0
-// Size: 44
 void EnableTranslationText() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 44
-// Size: 44
 void DisableTranslationText() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 88
-// Size: 54
 void SetFlicSound(int pSound_ID, tU32 pSound_time) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 144
-// Size: 45
 int TranslationMode() {
     return 0;
 }
 
-// Offset: 192
-// Size: 44
 void DontLetFlicFuckWithPalettes() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 236
-// Size: 44
 void LetFlicFuckWithPalettes() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 280
-// Size: 44
 void PlayFlicsInDarkness() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 324
-// Size: 49
 void ReilluminateFlics() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 376
-// Size: 44
 void TurnFlicTransparencyOn() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 420
-// Size: 44
 void TurnFlicTransparencyOff() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 464
-// Size: 44
 void PlayFlicsFromDisk() {
     gPlay_from_disk = 1;
 }
 
-// Offset: 508
-// Size: 44
 void PlayFlicsFromMemory() {
     gPlay_from_disk = 0;
 }
 
-// Offset: 552
-// Size: 45
 int FlicsPlayedFromDisk() {
     return gPlay_from_disk;
 }
 
-// Offset: 600
-// Size: 44
 void TurnOffPanelFlics() {
     gPanel_flic_disable = 1;
 }
 
-// Offset: 644
-// Size: 44
 void TurnOnPanelFlics() {
     gPanel_flic_disable = 0;
 }
 
-// Offset: 688
-// Size: 53
 int GetPanelFlicFrameIndex(int pIndex) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 744
-// Size: 91
 void FlicPaletteAllocate() {
     LOG_TRACE("()");
     gPalette_pixels = BrMemAllocate(0x400u, kMem_flic_pal);
     gPalette = DRPixelmapAllocate(BR_PMT_RGBX_888, 1, 256, gPalette_pixels, 0);
 }
 
-// Offset: 836
-// Size: 92
 void AssertFlicPixelmap(tFlic_descriptor_ptr pFlic_info, br_pixelmap* pDest_pixelmap) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 928
-// Size: 791
 int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap, int pX_offset, int pY_offset, int pFrame_rate) {
     tU16 claimed_speed;
     tU16 magic_number;
@@ -659,20 +621,14 @@ int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU3
     return 0;
 }
 
-// Offset: 1720
-// Size: 96
 void FreeFlicPaletteAllocate() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1816
-// Size: 118
 int EndFlic(tFlic_descriptor_ptr pFlic_info) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1936
-// Size: 312
 void DoColourMap(tFlic_descriptor_ptr pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -713,8 +669,6 @@ void DoColourMap(tFlic_descriptor_ptr pFlic_info, tU32 chunk_length) {
     }
 }
 
-// Offset: 2248
-// Size: 343
 void DoDifferenceX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -731,8 +685,6 @@ void DoDifferenceX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2592
-// Size: 377
 void DoDifferenceTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -749,8 +701,6 @@ void DoDifferenceTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2972
-// Size: 303
 void DoColour256(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -792,8 +742,6 @@ void DoColour256(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     }
 }
 
-// Offset: 3276
-// Size: 537
 void DoDeltaTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -854,8 +802,6 @@ void DoDeltaTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     }
 }
 
-// Offset: 3816
-// Size: 354
 void DoDeltaX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -907,8 +853,6 @@ void DoDeltaX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     }
 }
 
-// Offset: 4172
-// Size: 156
 void DoBlack(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -920,8 +864,6 @@ void DoBlack(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 4328
-// Size: 272
 void DoRunLengthX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -960,8 +902,6 @@ void DoRunLengthX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     }
 }
 
-// Offset: 4600
-// Size: 309
 void DoRunLengthTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -1005,8 +945,6 @@ void DoRunLengthTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     }
 }
 
-// Offset: 4912
-// Size: 160
 void DoUncompressed(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -1018,8 +956,6 @@ void DoUncompressed(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5072
-// Size: 176
 void DoUncompressedTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -1032,14 +968,10 @@ void DoUncompressedTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5248
-// Size: 52
 void DoMini(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5300
-// Size: 377
 void DrawTranslations(tFlic_descriptor* pFlic_info, int pLast_frame) {
     tTranslation_record* trans;
     int i;
@@ -1049,8 +981,6 @@ void DrawTranslations(tFlic_descriptor* pFlic_info, int pLast_frame) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5680
-// Size: 783
 int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
     tU32 frame_length;
     tU32 chunk_length;
@@ -1153,14 +1083,10 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
     return pFlic_info->frames_left == 0;
 }
 
-// Offset: 6464
-// Size: 53
 int PlayNextFlicFrame(tFlic_descriptor* pFlic_info) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6520
-// Size: 295
 int PlayFlic(int pIndex, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap, int pX_offset, int pY_offset, void (*DoPerFrame)(), int pInterruptable, int pFrame_rate) {
     int finished_playing;
     tFlic_descriptor the_flic;
@@ -1206,14 +1132,10 @@ int PlayFlic(int pIndex, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap
     return 0;
 }
 
-// Offset: 6816
-// Size: 41
 void SwapScreen() {
     PDScreenBufferSwap(0);
 }
 
-// Offset: 6860
-// Size: 154
 void ShowFlic(int pIndex) {
     do {
         PlayFlic(
@@ -1230,8 +1152,6 @@ void ShowFlic(int pIndex) {
     gLast_flic_name[0] = 0; // byte_10344C;
 }
 
-// Offset: 7016
-// Size: 76
 void InitFlics() {
     int i;
     LOG_TRACE("()");
@@ -1240,8 +1160,6 @@ void InitFlics() {
     }
 }
 
-// Offset: 7092
-// Size: 395
 int LoadFlic(int pIndex) {
     tPath_name the_path;
     FILE* f;
@@ -1283,8 +1201,6 @@ int LoadFlic(int pIndex) {
     }
 }
 
-// Offset: 7488
-// Size: 75
 void UnlockFlic(int pIndex) {
     if (pIndex >= 0) {
         if (gMain_flic_list[pIndex].data_ptr) {
@@ -1293,34 +1209,24 @@ void UnlockFlic(int pIndex) {
     }
 }
 
-// Offset: 7564
-// Size: 257
 int LoadFlicData(char* pName, tU8** pData, tU32* pData_length) {
     FILE* f;
     tPath_name the_path;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7824
-// Size: 87
 void FreeFlic(int pIndex) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7912
-// Size: 61
 void ForceRunFlic(int pIndex) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 7976
-// Size: 107
 void RunFlicAt(int pIndex, int pX, int pY) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8084
-// Size: 117
 void RunFlic(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
@@ -1344,8 +1250,6 @@ void RunFlic(int pIndex) {
     }
 }
 
-// Offset: 8204
-// Size: 105
 void PreloadBunchOfFlics(int pBunch_index) {
     int i;
     LOG_TRACE("(%d)", pBunch_index);
@@ -1355,8 +1259,6 @@ void PreloadBunchOfFlics(int pBunch_index) {
     }
 }
 
-// Offset: 8312
-// Size: 105
 void UnlockBunchOfFlics(int pBunch_index) {
     int i;
     for (i = 0; i < gFlic_bunch[pBunch_index].count; i++) {
@@ -1368,27 +1270,19 @@ void UnlockBunchOfFlics(int pBunch_index) {
     }
 }
 
-// Offset: 8420
-// Size: 73
 void FlushAllFlics(int pBunch_index) {
     int i;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8496
-// Size: 44
 void InitFlicQueue() {
     gFirst_flic = NULL;
 }
 
-// Offset: 8540
-// Size: 87
 int FlicQueueFinished() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8628
-// Size: 230
 void ProcessFlicQueue(tU32 pInterval) {
     tFlic_descriptor* the_flic;
     tFlic_descriptor* last_flic;
@@ -1435,8 +1329,6 @@ void ProcessFlicQueue(tU32 pInterval) {
     gTransparency_on = 0;
 }
 
-// Offset: 8860
-// Size: 138
 void FlushFlicQueue() {
     tFlic_descriptor* the_flic;
     tFlic_descriptor* old_flic;
@@ -1481,8 +1373,6 @@ void FlushFlicQueue() {
     gFirst_flic = NULL;
 }
 
-// Offset: 9000
-// Size: 424
 void AddToFlicQueue(int pIndex, int pX, int pY, int pMust_finish) {
     tFlic_descriptor* the_flic = NULL;
     tFlic_descriptor* new_flic = NULL;
@@ -1547,21 +1437,15 @@ void AddToFlicQueue(int pIndex, int pX, int pY, int pMust_finish) {
         20);
 }
 
-// Offset: 9424
-// Size: 205
 void InitialiseFlicPanel(int pIndex, int pLeft, int pTop, int pWidth, int pHeight) {
     void* the_pixels;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9632
-// Size: 112
 void DisposeFlicPanel(int pIndex) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 9744
-// Size: 502
 void ServicePanelFlics(int pCopy_to_buffer) {
     tU32 time_diff;
     tU32 the_time;
@@ -1628,20 +1512,14 @@ void ServicePanelFlics(int pCopy_to_buffer) {
     gPalette_fuck_prevention = 0;
 }
 
-// Offset: 10248
-// Size: 205
 void ChangePanelFlic(int pIndex, tU8* pData, tU32 pData_length) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10456
-// Size: 55
 br_pixelmap* GetPanelPixelmap(int pIndex) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 10512
-// Size: 1433
 void LoadInterfaceStrings() {
     char s[256];
     char s2[256];
@@ -1656,20 +1534,14 @@ void LoadInterfaceStrings() {
     STUB();
 }
 
-// Offset: 11948
-// Size: 114
 void FlushInterfaceFonts() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 12064
-// Size: 54
 void SuspendPendingFlic() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 12120
-// Size: 44
 void ResumePendingFlic() {
     NOT_IMPLEMENTED();
 }

@@ -7,20 +7,14 @@ br_boolean mouseActive;
 char rscid[49];
 unsigned char mouseHandler[245];
 
-// Offset: 14
-// Size: 358
 br_error DOSMouseBegin() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 384
-// Size: 92
 void DOSMouseEnd() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 489
-// Size: 217
 br_error DOSMouseRead(br_int_32* mouse_x, br_int_32* mouse_y, br_uint_32* mouse_buttons) {
     br_int_16 mx;
     br_int_16 my;

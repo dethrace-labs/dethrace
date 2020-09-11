@@ -39,22 +39,16 @@ char rscid[54];
 
 #define DF_PIXELMAP 2
 
-// Offset: 18
-// Size: 153
 int FopWrite_PIXELMAP(br_datafile* df, br_pixelmap* pixelmap) {
     br_pixelmap pmap;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 192
-// Size: 181
 int FopRead_OLD_PIXELMAP(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_pixelmap* pp;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 390
-// Size: 181
 int FopRead_PIXELMAP(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_pixelmap* pp;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
@@ -68,8 +62,6 @@ int FopRead_PIXELMAP(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_
     return 0;
 }
 
-// Offset: 587
-// Size: 542
 int FopWrite_PIXELS(br_datafile* df, br_pixelmap* pixelmap) {
     int size;
     int bytes;
@@ -78,8 +70,6 @@ int FopWrite_PIXELS(br_datafile* df, br_pixelmap* pixelmap) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1144
-// Size: 144
 int FopRead_PIXELS(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     int icount = 0;
     br_pixelmap* pp;
@@ -95,22 +85,16 @@ int FopRead_PIXELS(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32
     return 0;
 }
 
-// Offset: 1305
-// Size: 66
 int FopWrite_ADD_MAP(br_datafile* df) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1387
-// Size: 105
 int FopRead_ADD_MAP(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_pixelmap* pp;
     br_pixelmap* map;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1511
-// Size: 162
 br_uint_32 BrPixelmapLoadMany(char* filename, br_pixelmap** pixelmaps, br_uint_16 num) {
     br_datafile* df;
     int count = 0;
@@ -134,22 +118,16 @@ br_uint_32 BrPixelmapLoadMany(char* filename, br_pixelmap** pixelmaps, br_uint_1
     return count;
 }
 
-// Offset: 1687
-// Size: 161
 int WritePixelmap(br_pixelmap* pp, br_datafile* df) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1867
-// Size: 218
 br_uint_32 BrPixelmapSaveMany(char* filename, br_pixelmap** pixelmaps, br_uint_16 num) {
     br_datafile* df;
     int i;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2100
-// Size: 81
 br_pixelmap* BrPixelmapLoad(char* filename) {
     br_pixelmap* ptr;
 
@@ -159,8 +137,6 @@ br_pixelmap* BrPixelmapLoad(char* filename) {
     return NULL;
 }
 
-// Offset: 2196
-// Size: 58
 br_uint_32 BrPixelmapSave(char* filename, br_pixelmap* ptr) {
     NOT_IMPLEMENTED();
 }

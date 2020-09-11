@@ -16,8 +16,6 @@ tU32 gLast_checkpoint_time;
 int gLast_wrong_checkpoint;
 int gMirror_on = 1;
 
-// Offset: 0
-// Size: 124
 int NumberOfOpponentsLeft() {
     int car_count;
     int result;
@@ -25,46 +23,32 @@ int NumberOfOpponentsLeft() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 124
-// Size: 419
 void RaceCompleted(tRace_over_reason pReason) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 544
-// Size: 79
 void Checkpoint(int pCheckpoint_index, int pDo_sound) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 624
-// Size: 305
 void IncrementCheckpoint() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 932
-// Size: 70
 void IncrementLap() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1004
-// Size: 152
 int RayHitFace(br_vector3* pV0, br_vector3* pV1, br_vector3* pV2, br_vector3* pNormal, br_vector3* pStart, br_vector3* pDir) {
     tFace_ref the_face;
     br_scalar rt;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1156
-// Size: 241
 void WrongCheckpoint(int pCheckpoint_index) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1400
-// Size: 870
 void CheckCheckpoints() {
     tCar_spec* car;
     br_vector3 orig;
@@ -78,14 +62,10 @@ void CheckCheckpoints() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2272
-// Size: 72
 void TotalRepair() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2344
-// Size: 64
 void DoLogos() {
     ClearEntireScreen();
     DoSCILogo();
@@ -94,20 +74,14 @@ void DoLogos() {
     gProgram_state.prog_status = eProg_opening;
 }
 
-// Offset: 2408
-// Size: 54
 void DoProgOpeningAnimation() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2464
-// Size: 59
 void DoProgramDemo() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2524
-// Size: 308
 int ChooseOpponent(int pNastiness, int* pHad_scum) {
     int i;
     int count;
@@ -115,8 +89,6 @@ int ChooseOpponent(int pNastiness, int* pHad_scum) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 2832
-// Size: 294
 void SelectOpponents(tRace_info* pRace_info) {
     int i;
     int rank_band;
@@ -125,8 +97,6 @@ void SelectOpponents(tRace_info* pRace_info) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3128
-// Size: 269
 int PickNetRace(int pCurrent_race, tNet_sequence_type pNet_race_sequence) {
     int i;
     int new_index;
@@ -136,21 +106,15 @@ int PickNetRace(int pCurrent_race, tNet_sequence_type pNet_race_sequence) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3400
-// Size: 288
 void SwapNetCarsLoad() {
     int switched_res;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3688
-// Size: 165
 void SwapNetCarsDispose() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3856
-// Size: 1161
 void DoGame() {
     tRace_result race_result;
     int second_select_race;
@@ -159,8 +123,6 @@ void DoGame() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5020
-// Size: 242
 void InitialiseProgramState() {
     gProgram_state.loaded = 0;
     gProgram_state.last_slot = 0;
@@ -188,8 +150,6 @@ void InitialiseProgramState() {
     AllocateRearviewPixelmap();
 }
 
-// Offset: 5264
-// Size: 171
 void DoProgram() {
     InitialiseProgramState();
     while (1) {
@@ -246,20 +206,14 @@ void DoProgram() {
     }
 }
 
-// Offset: 5436
-// Size: 270
 void JumpTheStart() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5708
-// Size: 81
 void GoingToInterfaceFromRace() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5792
-// Size: 81
 void GoingBackToRaceFromInterface() {
     NOT_IMPLEMENTED();
 }

@@ -43,14 +43,10 @@ int gInitial_credits[3];
 int gNet_mode_of_last_game;
 br_material* gDefault_track_material;
 
-// Offset: 0
-// Size: 115
 void AllocateSelf() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 116
-// Size: 514
 void AllocateCamera() {
     br_camera* camera_ptr;
     int i;
@@ -98,8 +94,6 @@ void AllocateCamera() {
     SetSightDistance(camera_ptr->yon_z);
 }
 
-// Offset: 632
-// Size: 582
 void ReinitialiseForwardCamera() {
     float the_angle;
     float d;
@@ -107,8 +101,6 @@ void ReinitialiseForwardCamera() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1216
-// Size: 217
 void AllocateRearviewPixelmap() {
     char* rear_screen_pixels;
     LOG_TRACE("()");
@@ -141,35 +133,25 @@ void AllocateRearviewPixelmap() {
     }
 }
 
-// Offset: 1436
-// Size: 169
 void ReinitialiseRearviewCamera() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1608
-// Size: 347
 void ReinitialiseRenderStuff() {
     int y_diff;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1956
-// Size: 34
 void InstallFindFailedHooks() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 1992
-// Size: 158
 void AllocateStandardLamp() {
     br_actor* lamp;
     int i;
     STUB();
 }
 
-// Offset: 2152
-// Size: 342
 void InitializeBRenderEnvironment() {
     br_model* arrow_model;
     LOG_TRACE("()");
@@ -210,8 +192,6 @@ void InitializeBRenderEnvironment() {
     gArrow_actor->model = arrow_model;
 }
 
-// Offset: 2496
-// Size: 79
 void InitBRFonts() {
     LOG_TRACE("()");
     gBig_font = LoadBRFont("BIGFONT.FNT");
@@ -219,8 +199,6 @@ void InitBRFonts() {
     gHeadup_font = LoadBRFont("HEADUP.FNT");
 }
 
-// Offset: 2576
-// Size: 196
 void AustereWarning() {
     LOG_TRACE("()");
 
@@ -242,21 +220,15 @@ void AustereWarning() {
     }
 }
 
-// Offset: 2772
-// Size: 309
 void InitLineStuff() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3084
-// Size: 896
 void InitSmokeStuff() {
     tPath_name path;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 3980
-// Size: 1350
 void Init2DStuff() {
     static br_token_value fadealpha[3];
     tPath_name path;
@@ -265,8 +237,6 @@ void Init2DStuff() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 5332
-// Size: 671
 void InitialiseApplication(int pArgc, char** pArgv) {
 
     gProgram_state.sausage_eater_mode = gSausage_override;
@@ -336,8 +306,6 @@ void InitialiseApplication(int pArgc, char** pArgv) {
     PrintMemoryDump(0, "AFTER APPLICATION INITIALISATION");
 }
 
-// Offset: 6004
-// Size: 64
 void InitialiseDeathRace(int pArgc, char** pArgv) {
     PDInitialiseSystem();
 
@@ -345,15 +313,11 @@ void InitialiseDeathRace(int pArgc, char** pArgv) {
     //dword_112DF8 = 1;  // never checked by game
 }
 
-// Offset: 6068
-// Size: 427
 void InitGame(int pStart_race) {
     int i;
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6496
-// Size: 191
 void DisposeGameIfNecessary() {
     int i;
     LOG_TRACE("()");
@@ -376,44 +340,30 @@ void DisposeGameIfNecessary() {
     ShutdownNetIfRequired();
 }
 
-// Offset: 6688
-// Size: 54
 void LoadInTrack() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6744
-// Size: 44
 void DisposeTrack() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6788
-// Size: 97
 void CopyMaterialColourFromIndex(br_material* pMaterial) {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 6888
-// Size: 1230
 void InitRace() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8120
-// Size: 208
 void DisposeRace() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8328
-// Size: 45
 int GetScreenSize() {
     NOT_IMPLEMENTED();
 }
 
-// Offset: 8376
-// Size: 45
 void SetScreenSize(int pNew_size) {
     LOG_TRACE("(%d)", pNew_size);
     gRender_indent = pNew_size;
