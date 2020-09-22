@@ -8,6 +8,7 @@ SDL_Thread* game_thread;
 renderer* current_renderer;
 br_pixelmap* palette;
 uint32_t* screen_buffer;
+eGame_mode game_mode;
 
 br_pixelmap* last_dst = NULL;
 br_pixelmap* last_src = NULL;
@@ -16,6 +17,11 @@ void Harness_Init(char* name, renderer* renderer) {
     install_signal_handler(name);
     current_renderer = renderer;
     screen_buffer = NULL;
+    game_mode = eGame_mode_Carmageddon;
+}
+
+eGame_mode Harness_GameMode() {
+    return game_mode;
 }
 
 void Harness_RunWindowLoop(harness_game_func* game_func, void* arg) {

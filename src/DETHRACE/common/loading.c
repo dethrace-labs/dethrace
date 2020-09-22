@@ -1656,7 +1656,7 @@ int GetCDPathFromPathsTxtFile(char* pPath_name) {
 int TestForOriginalCarmaCDinDrive() {
     LOG_TRACE("()");
 
-    // JeffH the symbol dump didn't include any local variable information.
+    // JeffH: the symbol dump didn't include any local variable information.
     // These names are not necessarily the original names.
     tPath_name cd_pathname;
     tPath_name cd_data_pathname;
@@ -1690,23 +1690,36 @@ int TestForOriginalCarmaCDinDrive() {
         return 0;
     }
 
-    strcpy(cutscene_pathname, cd_pathname);
+    strcpy(cutscene_pathname, cd_data_pathname);
     strcat(cutscene_pathname, gDir_separator);
     strcat(cutscene_pathname, "CUTSCENE");
+    LOG_DEBUG("cutscene_pathname %s", cutscene_pathname);
 
-    if (PDCheckDriveExists2(cd_data_pathname, "GENERAL.TXT", 100)
-        && (PDCheckDriveExists2(cd_pathname, "CARMA.EXE", 1000000)
-            || PDCheckDriveExists2(cd_pathname, "CARMAG.EXE", 1000000)
-            || PDCheckDriveExists2(cd_pathname, "MAINPROG.EXE", 1000000)
-            || PDCheckDriveExists2(cd_pathname, "CARMSPLT.EXE", 1000000)
-            || PDCheckDriveExists2(cd_pathname, "CARMGSPL.EXE", 1000000))
-        && PDCheckDriveExists2(cutscene_pathname, "SPLINTRO.SMK", 2000000)) {
-        if (paths_txt_first_char != '@') {
-            EncodeFile(paths_txt);
-        }
-        return 1;
+    if (!PDCheckDriveExists2(cd_data_pathname, "GENERAL.TXT", 100)) {
+        return 0;
     }
-    return 0;
+    if (!PDCheckDriveExists2(cd_pathname, "CARMA.EXE", 1000000)
+        && !PDCheckDriveExists2(cd_pathname, "CARMAG.EXE", 1000000)
+        && !PDCheckDriveExists2(cd_pathname, "MAINPROG.EXE", 1000000)
+        && !PDCheckDriveExists2(cd_pathname, "CARMSPLT.EXE", 1000000)
+        && !PDCheckDriveExists2(cd_pathname, "CARMGSPL.EXE", 1000000)) {
+        return 0;
+    }
+
+    if (Harness_GameMode() == eGame_mode_SplatPack) {
+        if (!PDCheckDriveExists2(cutscene_pathname, "SPLINTRO.SMK", 2000000)) {
+            return 0;
+        }
+    } else {
+        if (!PDCheckDriveExists2(cutscene_pathname, "MIX_INTR.SMK", 2000000)) {
+            return 0;
+        }
+    }
+
+    if (paths_txt_first_char != '@') {
+        EncodeFile(paths_txt);
+    }
+    return 1;
 }
 
 // IDA: int __cdecl OriginalCarmaCDinDrive()

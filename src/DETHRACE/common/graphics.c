@@ -813,7 +813,11 @@ void KillSplashScreen() {
 // IDA: void __cdecl EnsureRenderPalette()
 void EnsureRenderPalette() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    if (gPalette_munged) {
+        RevertPalette();
+        DRSetPalette(gRender_palette);
+        gPalette_munged = 0;
+    }
 }
 
 // IDA: void __usercall SplashScreenWith(char *pPixmap_name@<EAX>)
@@ -890,7 +894,7 @@ void DRPixelmapRectangleOnscreenCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_i
     tU8* source_ptr;
     tU8* dest_ptr;
     tU8* conv_table;
-    LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
+    //LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
 
     source_row_wrap = pSource->row_bytes - pWidth;
     dest_row_wrap = pDest->row_bytes - pWidth;
@@ -944,7 +948,33 @@ void DRPixelmapRectangleVScaledCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
     tU32 source_y_delta;
     tU32 old_source_y;
     LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
-    NOT_IMPLEMENTED();
+
+    if (!pHeight) {
+        return;
+    }
+
+    source_row_wrap = pSource->row_bytes - pWidth;
+    dest_row_wrap = pDest->row_bytes - pWidth;
+    dest_ptr = pDest->pixels + (pDest->row_bytes * pDest_y + pDest_x);
+    source_ptr = pSource->pixels + (pSource->row_bytes * pSource_y + pSource_x);
+
+    source_y = 0;
+    source_y_delta = (pSource->height << 16) / pHeight - 0x10000;
+
+    for (y_count = 0; y_count < pHeight; y_count++) {
+        for (x_count = 0; x_count < pWidth; x_count++) {
+            the_byte = *source_ptr;
+            if (the_byte) {
+                *dest_ptr = the_byte;
+            }
+            source_ptr++;
+            dest_ptr++;
+        }
+        old_source_y = source_y;
+        source_y += source_y_delta;
+        source_ptr += (((source_y >> 16) - (old_source_y >> 16)) * pSource->row_bytes) + source_row_wrap;
+        dest_ptr += dest_row_wrap;
+    }
 }
 
 // IDA: void __cdecl InitTransientBitmaps()
@@ -1177,14 +1207,32 @@ void DrawTellyLine(br_pixelmap* pImage, int pLeft, int pTop, int pPercentage) {
     int the_width;
     int the_height;
     LOG_TRACE("(%p, %d, %d, %d)", pImage, pLeft, pTop, pPercentage);
-    NOT_IMPLEMENTED();
+
+    the_width = pImage->width;
+    the_height = pImage->height / 2 + pTop;
+    BrPixelmapLine(gBack_screen, pLeft, the_height, pLeft + the_width, the_height, 0);
+    BrPixelmapLine(gBack_screen, the_width / 2 + pLeft - pPercentage * the_width / 200, the_height, the_width / 2 + pLeft + pPercentage * the_width / 200, the_height, 1);
+    PDScreenBufferSwap(0);
 }
 
 // IDA: void __usercall DrawTellyImage(br_pixelmap *pImage@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pPercentage@<ECX>)
 void DrawTellyImage(br_pixelmap* pImage, int pLeft, int pTop, int pPercentage) {
     int the_height;
     LOG_TRACE("(%p, %d, %d, %d)", pImage, pLeft, pTop, pPercentage);
-    NOT_IMPLEMENTED();
+
+    BrPixelmapRectangleFill(gBack_screen, pLeft, pTop, pImage->width, pImage->height, 0);
+    if (pPercentage != 1000) {
+        DRPixelmapRectangleVScaledCopy(
+            gBack_screen,
+            pLeft,
+            pTop + pImage->height * (100 - pPercentage) / 200,
+            pImage,
+            0,
+            0,
+            pImage->width,
+            pPercentage * pImage->height / 100);
+        PDScreenBufferSwap(0);
+    }
 }
 
 // IDA: void __usercall TellyInImage(br_pixelmap *pImage@<EAX>, int pLeft@<EDX>, int pTop@<EBX>)
@@ -1192,7 +1240,24 @@ void TellyInImage(br_pixelmap* pImage, int pLeft, int pTop) {
     tS32 start_time;
     tS32 the_time;
     LOG_TRACE("(%p, %d, %d)", pImage, pLeft, pTop);
-    NOT_IMPLEMENTED();
+
+    start_time = PDGetTotalTime();
+    while (1) {
+        the_time = PDGetTotalTime();
+        if (the_time - start_time > 100) {
+            break;
+        }
+        DrawTellyLine(pImage, pLeft, pTop, 100 * (the_time - start_time) / 100);
+    }
+    start_time = PDGetTotalTime();
+    while (1) {
+        the_time = PDGetTotalTime();
+        if (the_time - start_time > 100) {
+            break;
+        }
+        DrawTellyImage(pImage, pLeft, pTop, 100 * (the_time - start_time) / 100);
+    }
+    DrawTellyImage(pImage, pLeft, pTop, 100);
 }
 
 // IDA: void __usercall TellyOutImage(br_pixelmap *pImage@<EAX>, int pLeft@<EDX>, int pTop@<EBX>)
@@ -1201,7 +1266,39 @@ void TellyOutImage(br_pixelmap* pImage, int pLeft, int pTop) {
     tS32 the_time;
     int drop_distance;
     LOG_TRACE("(%p, %d, %d)", pImage, pLeft, pTop);
-    NOT_IMPLEMENTED();
+
+    start_time = PDGetTotalTime();
+    while (1) {
+        the_time = PDGetTotalTime();
+        if (the_time - start_time > 100) {
+            break;
+        }
+        DrawTellyImage(pImage, pLeft, pTop, 100 * (100 - the_time + start_time) / 100);
+    }
+    // for (i = PDGetTotalTime();; DrawTellyImage(pImage, pLeft, pTop, 100 * (100 - v5 + i) / 100)) {
+    //     v5 = PDGetTotalTime();
+    //     if (v5 >= v6) {
+    //         break;
+    //     }
+    // }
+    DrawTellyImage(pImage, pLeft, pTop, 1000);
+
+    start_time = PDGetTotalTime();
+    while (1) {
+        the_time = PDGetTotalTime();
+        if (the_time - start_time > 100) {
+            break;
+        }
+        DrawTellyLine(pImage, pLeft, pTop, 100 * (start_time + 100 - the_time) / 100);
+    }
+
+    // for (j = PDGetTotalTime();; DrawTellyLine(pImage, pLeft, pTop, 100 * (j + 100 - v7) / 100)) {
+    //     v7 = PDGetTotalTime();
+    //     if (v7 >= v8) {
+    //         break;
+    //     }
+    // }
+    DrawTellyLine(pImage, pLeft, pTop, 0);
 }
 
 // IDA: void __usercall SetShadowLevel(tShadow_level pLevel@<EAX>)

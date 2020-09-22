@@ -1,9 +1,14 @@
 #include "network.h"
-#include "common/controls.h"
-#include "common/netgame.h"
+#include "brender.h"
+#include "controls.h"
+#include "displays.h"
 #include "globvars.h"
 #include "globvrpb.h"
+#include "graphics.h"
+#include "netgame.h"
 #include "pc-dos/dosnet.h"
+#include "pc-dos/dossys.h"
+#include "utility.h"
 #include <stdlib.h>
 
 tNet_game_player_info gNew_net_players[6];
@@ -456,12 +461,61 @@ void ReceivedLeave(tNet_contents* pContents, tNet_message* pMessage) {
 void NetFullScreenMessage(int pStr_index, int pLeave_it_up_there) {
     tU32 start_time;
     char* s;
-    int gPixel_buffer_size;
+    // JeffH: added underscore suffix to avoid collisions with samed-named globals
+    int gPixel_buffer_size_;
+    char* gPixels_copy_;
+    char* gPalette_copy_;
     int restore_screen;
-    char* gPixels_copy;
-    char* gPalette_copy;
+
     LOG_TRACE("(%d, %d)", pStr_index, pLeave_it_up_there);
-    NOT_IMPLEMENTED();
+
+    if (pLeave_it_up_there || (gProgram_state.racing && !gInterface_within_race_mode)) {
+        restore_screen = 0;
+    } else {
+        gPixel_buffer_size_ = gBack_screen->height * gBack_screen->row_bytes;
+        gPixels_copy_ = BrMemAllocate(gPixel_buffer_size_, 0xB0u);
+        gPalette_copy_ = BrMemAllocate(0x400u, 0xB1u);
+        memcpy(gPixels_copy_, gBack_screen->pixels, gPixel_buffer_size_);
+        memcpy(gPalette_copy_, gCurrent_palette_pixels, 0x400u);
+        restore_screen = 1;
+    }
+    FadePaletteDown();
+    LoadFont(FONT_MEDIUMHD);
+    ClearEntireScreen();
+    if (pStr_index <= 0) {
+        s = "FIXED THAT YOU TWISTED BASTARDS";
+    } else {
+        s = GetMiscString(pStr_index);
+    }
+    OoerrIveGotTextInMeBoxMissus(
+        FONT_MEDIUMHD,
+        s,
+        gBack_screen,
+        0,
+        gGraf_specs[gGraf_spec_index].total_height / 2 - gFonts[4].height,
+        gGraf_specs[gGraf_spec_index].total_width,
+        gGraf_specs[gGraf_spec_index].total_height,
+        1);
+    PDScreenBufferSwap(0);
+    EnsureRenderPalette();
+    EnsurePaletteUp();
+    if (!pLeave_it_up_there) {
+        start_time = PDGetTotalTime();
+        while (PDGetTotalTime() - start_time < 3000) {
+            ;
+        }
+        FadePaletteDown();
+        if (restore_screen) {
+            memcpy(gBack_screen->pixels, gPixels_copy_, gPixel_buffer_size_);
+            memcpy(gCurrent_palette_pixels, gPalette_copy_, 0x400u);
+            BrMemFree(gPixels_copy_);
+            BrMemFree(gPalette_copy_);
+            PDScreenBufferSwap(0);
+            FadePaletteUp();
+        } else {
+            ClearEntireScreen();
+        }
+    }
 }
 
 // IDA: void __usercall HostHasBittenTheDust(int pMessage_index@<EAX>)

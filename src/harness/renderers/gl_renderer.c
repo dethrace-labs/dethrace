@@ -19,7 +19,7 @@ renderer OpenGLRenderer = {
     Harness_GLRenderer_DoubleBuffer,
 };
 
-SDL_GLContext context;
+SDL_GLContext context, context2;
 GLuint VBO, VAO, EBO;
 GLuint screen_texture;
 GLuint shader_program;
@@ -28,6 +28,8 @@ int Harness_GLRenderer_GetWindowFlags() {
     if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE) != 0) {
         LOG_PANIC("Failed to set SDL_GL_CONTEXT_PROFILE_MASK attribute. %s", SDL_GetError());
     };
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
     return SDL_WINDOW_OPENGL;
 }
 
@@ -37,6 +39,10 @@ void Harness_GLRenderer_Init(SDL_Window* window) {
     if (!context) {
         LOG_PANIC("Failed to call SDL_GL_CreateContext. %s", SDL_GetError());
     }
+    // context2 = SDL_GL_CreateContext(window);
+    // if (!context2) {
+    //     LOG_PANIC("Failed to call SDL_GL_CreateContext (2). %s", SDL_GetError());
+    // }
 }
 
 void CompileShader(GLuint shader_id, const GLchar* source) {

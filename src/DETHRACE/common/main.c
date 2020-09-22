@@ -72,7 +72,6 @@ void GameMain(int pArgc, char** pArgv) {
 
     PDSetFileVariables();
     PDBuildAppPath(gApplication_path);
-    dr_dprintf(gApplication_path);
 
     strcat(gApplication_path, "DATA");
 

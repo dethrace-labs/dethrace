@@ -243,4 +243,30 @@ typedef enum keymapcodes {
     KEYMAP_F3 = 29,
 } keymapcodes;
 
+#define FONT_TYPEABLE 0
+#define FONT_ORANGHED 1
+#define FONT_BLUEHEAD 2
+#define FONT_GREENHED 3
+#define FONT_MEDIUMHD 4
+#define FONT_TIMER 5
+#define FONT_NEWHITE 6
+#define FONT_NEWRED 7
+#define FONT_NEWBIGGR 8
+#define FONT_GRNDK 9
+#define FONT_GRNLIT 10
+#define FONT_GRYDK 11
+#define FONT_GRYLIT 12
+#define FONT_BUTTIN 13
+#define FONT_BUTTOUT 14
+#define FONT_LITPLAQ 15
+#define FONT_DRKPLAQ 16
+#define FONT_BUTTIN1 17
+#define FONT_BUTTOUT1 18
+#define FONT_LITPLAQ1 19
+#define FONT_DRKPLAQ1 20
+
+#define ROLLING_LETTER_LOOP_RANDOM 96
+
+#define PLAYER_NAME_MAX_LENGTH 13
+
 #endif

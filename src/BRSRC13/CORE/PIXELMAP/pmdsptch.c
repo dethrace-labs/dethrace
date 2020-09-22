@@ -148,7 +148,7 @@ void BrPixelmapRectangleCopy(br_pixelmap* dst, br_int_32 dx, br_int_32 dy, br_pi
     br_rectangle r;
     br_point p;
 
-    // Taken from Errol's brender
+    // Thanks Errol!
 
     br_uint_8* src_pix = (br_uint_8*)src->pixels;
     br_uint_8* dst_pix = (br_uint_8*)dst->pixels;
@@ -194,7 +194,19 @@ void BrPixelmapRectangleStretchCopy(br_pixelmap* dst, br_int_32 dx, br_int_32 dy
 void BrPixelmapRectangleFill(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_int_32 w, br_int_32 h, br_uint_32 colour) {
     br_rectangle r;
     LOG_TRACE("(%p, %d, %d, %d, %d, %d)", dst, x, y, w, h, colour);
-    NOT_IMPLEMENTED();
+    br_uint_8* dst_pix = (br_uint_8*)dst->pixels;
+
+    for (int i = 0; i < w; i++) {
+        if (x + i < 0 || x + i >= dst->width) {
+            continue;
+        }
+        for (int j = 0; j < h; j++) {
+            if (y + j < 0 || y + j >= dst->height) {
+                continue;
+            }
+            dst_pix[(y + j) * dst->row_bytes + (x + i)] = colour;
+        }
+    }
 }
 
 // IDA: void __cdecl BrPixelmapDirtyRectangleCopy(br_pixelmap *dst, br_pixelmap *src, br_int_32 x, br_int_32 y, br_int_32 w, br_int_32 h)
@@ -222,8 +234,9 @@ void BrPixelmapDirtyRectangleDoubleBuffer(br_pixelmap* dst, br_pixelmap* src, br
 // IDA: void __cdecl BrPixelmapPixelSet(br_pixelmap *dst, br_int_32 x, br_int_32 y, br_uint_32 colour)
 void BrPixelmapPixelSet(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_uint_32 colour) {
     br_point p;
-    LOG_TRACE("(%p, %d, %d, %d)", dst, x, y, colour);
-    NOT_IMPLEMENTED();
+    //LOG_TRACE("(%p, %d, %d, %d)", dst, x, y, colour);
+    br_uint_8* dst_pix = (br_uint_8*)dst->pixels;
+    dst_pix[(y * dst->row_bytes) + x] = (br_uint_8)colour;
 }
 
 // IDA: br_uint_32 __cdecl BrPixelmapPixelGet(br_pixelmap *dst, br_int_32 x, br_int_32 y)
@@ -244,10 +257,46 @@ void BrPixelmapCopy(br_pixelmap* dst, br_pixelmap* src) {
 
 // IDA: void __cdecl BrPixelmapLine(br_pixelmap *dst, br_int_32 x1, br_int_32 y1, br_int_32 x2, br_int_32 y2, br_uint_32 colour)
 void BrPixelmapLine(br_pixelmap* dst, br_int_32 x1, br_int_32 y1, br_int_32 x2, br_int_32 y2, br_uint_32 colour) {
-    br_point s;
-    br_point e;
+    //br_point s;
+    //br_point e;
     LOG_TRACE("(%p, %d, %d, %d, %d, %d)", dst, x1, y1, x2, y2, colour);
-    NOT_IMPLEMENTED();
+
+    // Thanks Errol!
+    br_int_16 dx, dy, inx, iny, e;
+    dx = x2 - x1;
+    dy = y2 - y1;
+    inx = dx > 0 ? 1 : -1;
+    iny = dy > 0 ? 1 : -1;
+    dx = abs(dx);
+    dy = abs(dy);
+    if (dx >= dy) {
+        dy <<= 1;
+        e = dy - dx;
+        dx <<= 1;
+        while (x1 != x2) {
+            BrPixelmapPixelSet(dst, x1, y1, colour);
+            if (e >= 0) {
+                y1 += iny;
+                e -= dx;
+            }
+            e += dy;
+            x1 += inx;
+        }
+    } else {
+        dx <<= 1;
+        e = dx - dy;
+        dy <<= 1;
+        while (y1 != y2) {
+            BrPixelmapPixelSet(dst, x1, y1, colour);
+            if (e >= 0) {
+                x1 += inx;
+                e -= dy;
+            }
+            e += dx;
+            y1 += iny;
+        }
+    }
+    BrPixelmapPixelSet(dst, x1, y1, colour);
 }
 
 // IDA: void __cdecl BrPixelmapDoubleBuffer(br_pixelmap *dst, br_pixelmap *src)

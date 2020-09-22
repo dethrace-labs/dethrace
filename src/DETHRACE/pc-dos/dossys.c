@@ -10,6 +10,7 @@
 #include "common/sound.h"
 #include "common/utility.h"
 #include "harness.h"
+#include "input.h"
 #include "watcom_functions.h"
 #include <dirent.h>
 #include <stdio.h>
@@ -232,7 +233,12 @@ void PDSetKeyArray(int* pKeys, int pMark) {
 // IDA: int __usercall PDGetASCIIFromKey@<EAX>(int pKey@<EAX>)
 int PDGetASCIIFromKey(int pKey) {
     LOG_TRACE("(%d)", pKey);
-    NOT_IMPLEMENTED();
+
+    if (PDKeyDown3(KEY_LSHIFT)) {
+        return gASCII_shift_table[pKey];
+    } else {
+        return gASCII_table[pKey];
+    }
 }
 
 // IDA: void __usercall PDFatalError(char *pThe_str@<EAX>)
@@ -807,7 +813,8 @@ int PDGetJoy2Button4() {
 int PDFileUnlock(char* pThe_path) {
     unsigned int attr;
     LOG_TRACE("(\"%s\")", pThe_path);
-    NOT_IMPLEMENTED();
+    // _dos_setfileattr_(pThe_path, 0);
+    return 0;
 }
 
 // IDA: void __cdecl CriticalISR(INTPACK pRegs)
@@ -823,7 +830,7 @@ int PDCheckDriveExists2(char* pThe_path, char* pFile_name, tU32 pMin_size) {
     int stat_failed;
     char slasher[4];
     char the_path[256];
-    LOG_TRACE9("(\"%s\", \"%s\", %d)", pThe_path, pFile_name, pMin_size);
+    LOG_TRACE("(\"%s\", \"%s\", %d)", pThe_path, pFile_name, pMin_size);
 
     strcpy(slasher, "?:\\");
     if (pFile_name) {
