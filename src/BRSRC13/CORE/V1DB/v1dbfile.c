@@ -212,9 +212,6 @@ int FopRead_VERTICES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_
     mp = DfTop(DF_MODEL, NULL);
     mp->vertices = BrResAllocate(mp, sizeof(br_vertex) * count, BR_MEMORY_VERTICES);
     DfStructReadArray(df, &br_vertex_F, mp->vertices, count);
-    for (i = 0; i < count; i++) {
-        LOG_DEBUG("vert %f, %f, %f", mp->vertices[i].p.v[0], mp->vertices[i].p.v[1], mp->vertices[i].p.v[2]);
-    }
     mp->nvertices = count;
     return 0;
 }
@@ -287,10 +284,6 @@ int FopRead_FACES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 
         if (!mp->faces[i].smoothing) {
             mp->faces[i].smoothing = -1;
         }
-    }
-
-    for (i = 0; i < count; i++) {
-        LOG_DEBUG("face %d, %d, %d %d", mp->faces[i].vertices[0], mp->faces[i].vertices[1], mp->faces[i].vertices[2], mp->faces[i].flags);
     }
 
     return 0;
@@ -783,7 +776,6 @@ br_uint_32 BrMaterialLoadMany(char* filename, br_material** materials, br_uint_1
                 materials[count] = DfPop(DF_MATERIAL, 0);
                 ++count;
             }
-            LOG_DEBUG("r=%d", r);
         } while (r);
         DfClose(df);
     }

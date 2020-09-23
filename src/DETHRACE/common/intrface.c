@@ -97,10 +97,9 @@ void ChangeSelection(tInterface_spec* pSpec, int* pOld_selection, int* pNew_sele
                     pSpec->flicker_on_flics[*pNew_selection].y[gGraf_data_index], 0);
             }
         }
-        LOG_DEBUG("new: %d, old %d, new mode %d", *pNew_selection, *pOld_selection, pMode);
         *pOld_selection = *pNew_selection;
     }
-    LOG_DEBUG("new: %d, old %d", *pNew_selection, *pOld_selection);
+    LOG_DEBUG("new: %d, old %d, new mode %d", *pNew_selection, *pOld_selection, pMode);
 }
 
 // IDA: void __usercall RecopyAreas(tInterface_spec *pSpec@<EAX>, br_pixelmap **pCopy_areas@<EDX>)

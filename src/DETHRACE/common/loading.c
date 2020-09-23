@@ -986,8 +986,6 @@ void LoadRaces(tRace_list_spec* pRace_list, int* pCount, int pRace_type_index) {
         }
     }
 
-    LOG_DEBUG("race count %d", number_of_racers);
-
     *pCount = number_of_racers;
     fclose(f);
     j = 0;
@@ -1693,7 +1691,6 @@ int TestForOriginalCarmaCDinDrive() {
     strcpy(cutscene_pathname, cd_data_pathname);
     strcat(cutscene_pathname, gDir_separator);
     strcat(cutscene_pathname, "CUTSCENE");
-    LOG_DEBUG("cutscene_pathname %s", cutscene_pathname);
 
     if (!PDCheckDriveExists2(cd_data_pathname, "GENERAL.TXT", 100)) {
         return 0;

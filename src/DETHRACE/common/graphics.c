@@ -1275,12 +1275,7 @@ void TellyOutImage(br_pixelmap* pImage, int pLeft, int pTop) {
         }
         DrawTellyImage(pImage, pLeft, pTop, 100 * (100 - the_time + start_time) / 100);
     }
-    // for (i = PDGetTotalTime();; DrawTellyImage(pImage, pLeft, pTop, 100 * (100 - v5 + i) / 100)) {
-    //     v5 = PDGetTotalTime();
-    //     if (v5 >= v6) {
-    //         break;
-    //     }
-    // }
+
     DrawTellyImage(pImage, pLeft, pTop, 1000);
 
     start_time = PDGetTotalTime();
@@ -1292,12 +1287,6 @@ void TellyOutImage(br_pixelmap* pImage, int pLeft, int pTop) {
         DrawTellyLine(pImage, pLeft, pTop, 100 * (start_time + 100 - the_time) / 100);
     }
 
-    // for (j = PDGetTotalTime();; DrawTellyLine(pImage, pLeft, pTop, 100 * (j + 100 - v7) / 100)) {
-    //     v7 = PDGetTotalTime();
-    //     if (v7 >= v8) {
-    //         break;
-    //     }
-    // }
     DrawTellyLine(pImage, pLeft, pTop, 0);
 }
 

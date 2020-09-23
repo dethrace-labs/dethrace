@@ -375,10 +375,7 @@ int AddRollingLetter(char pChar, int pX, int pY, tRolling_type rolling_type) {
         let->number_of_letters = IRandomBetween(3, 9);
     }
 
-    LOG_DEBUG("Added %d with %d letters", i, let->number_of_letters);
-
     let->current_offset = (gCurrent_graf_data->save_slot_letter_height * let->number_of_letters);
-    // v4 != 2 => // if v4 is not 2, then 1-1=0. if v4 is 2, then 0-1 = -1
     for (i = 0; i < let->number_of_letters; i++) {
         if (rolling_type == eRT_numeric) {
             let->letters[i] = pChar;
