@@ -221,14 +221,95 @@ int FrankieOrAnnie() {
 
 // IDA: int __cdecl SelectSkillLevel()
 int SelectSkillLevel() {
-    static tFlicette flicker_on[4];
-    static tFlicette flicker_off[4];
-    static tFlicette push[4];
-    static tMouse_area mouse_areas[4];
-    static tInterface_spec interface_spec;
+    static tFlicette flicker_on[4] = {
+        { 116, { 38, 76 }, { 55, 132 } },
+        { 119, { 36, 72 }, { 83, 199 } },
+        { 121, { 38, 76 }, { 111, 266 } },
+        { 43, { 227, 454 }, { 158, 379 } }
+    };
+
+    static tFlicette flicker_off[4] = {
+        { 115, { 38, 76 }, { 55, 132 } },
+        { 118, { 36, 72 }, { 83, 199 } },
+        { 120, { 38, 76 }, { 111, 266 } },
+        { 42, { 227, 454 }, { 158, 379 } }
+    };
+
+    static tFlicette push[4] = {
+        { 117, { 38, 76 }, { 55, 132 } },
+        { 117, { 36, 72 }, { 83, 199 } },
+        { 117, { 38, 76 }, { 111, 266 } },
+        { 45, { 227, 454 }, { 158, 379 } }
+    };
+    static tMouse_area mouse_areas[4] = {
+        { { 38, 76 }, { 55, 132 }, { 205, 410 }, { 69, 166 }, 0, 0, 0, NULL },
+        { { 36, 72 }, { 83, 199 }, { 205, 410 }, { 98, 235 }, 1, 0, 0, NULL },
+        { { 38, 76 }, { 111, 266 }, { 205, 410 }, { 125, 300 }, 2, 0, 0, NULL },
+        { { 227, 454 }, { 158, 379 }, { 290, 580 }, { 178, 427 }, 3, 0, 0, NULL }
+    };
+
+    static tInterface_spec interface_spec = {
+        0, // initial_imode
+        110, // first_opening_flic
+        0, // second_opening_flic
+        -1, // end_flic_go_ahead
+        111, // end_flic_escaped
+        -1, // end_flic_otherwise
+        0, // flic_bunch_to_load
+        { -1, 0 }, // move_left_new_mode
+        { 0, 0 }, // move_left_delta
+        { 0, 0 }, // move_left_min
+        { 0, 0 }, // move_left_max
+        { NULL, NULL }, // move_left_proc
+        { -1, 0 }, // move_right_new_mode
+        { 0, 0 }, // move_right_delta
+        { 0, 0 }, // move_right_min
+        { 0, 0 }, // move_right_max
+        { NULL, NULL }, // move_right_proc
+        { -1, 0 }, // move_up_new_mode
+        { -1, 0 }, // move_up_delta
+        { 0, 0 }, // move_up_min
+        { 3, 0 }, // move_up_max
+        { NULL, NULL }, // move_up_proc
+        { -1, 0 }, // move_down_new_mode
+        { 1, 0 }, // move_down_delta
+        { 0, 0 }, // move_down_min
+        { 3, 0 }, // move_down_max
+        { NULL, NULL }, // move_down_proc
+        { 1, 1 }, // go_ahead_allowed
+        { NULL, NULL }, // go_ahead_proc
+        { 1, 1 }, // escape_allowed
+        { NULL, NULL }, // escape_proc
+        NULL, // exit_proc
+        NULL, // draw_proc
+        0u, // time_out
+        NULL, // start_proc1
+        NULL, // start_proc2
+        NULL, // done_proc
+        0, // font_needed
+        { 0, 0 }, // typeable
+        NULL, // get_original_string
+        3, // escape_code
+        1, // dont_save_or_load
+        4, // number_of_button_flics
+        flicker_on, // flicker_on_flics
+        flicker_off, // flicker_off_flics
+        push, // pushed_flics
+        4, // number_of_mouse_areas
+        mouse_areas, // mouse_areas
+        0, // number_of_recopy_areas
+        NULL // recopy_areas
+    };
+
     int result;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    result = DoInterfaceScreen(&interface_spec, 0, gProgram_state.skill_level);
+    if (result > 2) {
+        return 0;
+    }
+    gProgram_state.skill_level = result;
+    return 1;
 }
 
 // IDA: int __cdecl DoOnePlayerStart()

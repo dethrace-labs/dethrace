@@ -721,7 +721,10 @@ void MungePalette() {
 // IDA: void __cdecl ResetPalette()
 void ResetPalette() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gPalette_index = 0;
+    gPalette_munged = 0;
+    DRSetPalette2(gRender_palette, 1);
 }
 
 // IDA: void __usercall Darken(tU8 *pPtr@<EAX>, unsigned int pDarken_amount@<EDX>)
@@ -767,10 +770,10 @@ void FadePaletteDown() {
         start_time = PDGetTotalTime();
         while (1) {
             the_time = PDGetTotalTime() - start_time;
-            if (the_time >= 500) {
+            if (the_time >= 5000) {
                 break;
             }
-            i = 256 - ((the_time * 256) / 500);
+            i = 256 - ((the_time * 256) / 5000);
             SetFadedPalette(i);
         }
         SetFadedPalette(0);
@@ -824,7 +827,45 @@ void EnsureRenderPalette() {
 void SplashScreenWith(char* pPixmap_name) {
     br_pixelmap* the_map;
     LOG_TRACE("(\"%s\")", pPixmap_name);
-    NOT_IMPLEMENTED();
+
+    the_map = BrMapFind(pPixmap_name);
+    if (!gCurrent_splash || the_map != gCurrent_splash) {
+        FadePaletteDown();
+        if (gPalette_munged) {
+            ResetPalette();
+            gPalette_munged = 0;
+        }
+        if (gCurrent_splash) {
+            BrMapRemove(gCurrent_splash);
+            BrPixelmapFree(gCurrent_splash);
+            gCurrent_splash = 0;
+            FadePaletteDown();
+            ClearEntireScreen();
+        }
+        gCurrent_splash = the_map;
+        if (!the_map) {
+            the_map = LoadPixelmap(pPixmap_name);
+            gCurrent_splash = the_map;
+            if (the_map) {
+                BrMapAdd(the_map);
+            }
+        }
+        if (gCurrent_splash) {
+            BrPixelmapRectangleCopy(
+                gBack_screen,
+                0,
+                0,
+                gCurrent_splash,
+                0,
+                0,
+                gCurrent_splash->width,
+                gCurrent_splash->height);
+            PDScreenBufferSwap(0);
+            if (gFaded_palette) {
+                FadePaletteUp();
+            }
+        }
+    }
 }
 
 // IDA: void __cdecl EnsurePaletteUp()

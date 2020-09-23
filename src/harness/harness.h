@@ -33,4 +33,6 @@ void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src);
 void Harness_Hook_KeyBegin();
 int Harness_Hook_KeyDown(unsigned char pScan_code);
 
+void Harness_Hook_PDServiceSystem(int pTime_since_last_call);
+
 #endif

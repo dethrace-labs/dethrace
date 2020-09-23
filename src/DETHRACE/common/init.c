@@ -322,7 +322,7 @@ void InitialiseApplication(int pArgc, char** pArgv) {
     InitialiseStorageSpace(&gTrack_storage_space, 400, 50, 400, 1000);
     InitOilSpills();
     if (gAustere_time) {
-        while (PDGetTotalTime() - gAustere_time < 2000) {
+        while (PDGetTotalTime() - gAustere_time < 20000) {
         }
     }
     ClearEntireScreen();

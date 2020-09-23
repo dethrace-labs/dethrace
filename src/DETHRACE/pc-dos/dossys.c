@@ -545,6 +545,7 @@ int PDGetTotalTime() {
 
 // IDA: int __usercall PDServiceSystem@<EAX>(tU32 pTime_since_last_call@<EAX>)
 int PDServiceSystem(tU32 pTime_since_last_call) {
+    Harness_Hook_PDServiceSystem(pTime_since_last_call);
     return 0;
 }
 
