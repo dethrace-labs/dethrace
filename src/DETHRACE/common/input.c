@@ -539,7 +539,7 @@ void ChangeTextTo(int pXcoord, int pYcoord, char* pNew_str, char* pOld_str) {
 // IDA: void __usercall SetRollingCursor(int pSlot_index@<EAX>)
 void SetRollingCursor(int pSlot_index) {
     LOG_TRACE("(%d)", pSlot_index);
-    NOT_IMPLEMENTED();
+    gCurrent_cursor = ChangeCharTo(pSlot_index, gCurrent_position, ROLLING_LETTER_LOOP_RANDOM);
 }
 
 // IDA: void __usercall BlankSlot(int pIndex@<EAX>, int pName_length@<EDX>, int pVisible_length@<EBX>)
@@ -563,7 +563,7 @@ void DoRLBackspace(int pSlot_index) {
         }
         ChangeCharTo(pSlot_index, new_len, ' ');
         new_len = strlen(gCurrent_typing) - 1;
-        for (i = gCurrent_position - 1; i < new_len; i--) {
+        for (i = gCurrent_position - 1; i < new_len; i++) {
             ChangeCharTo(pSlot_index, i, gCurrent_typing[i]);
             gCurrent_typing[i] = gCurrent_typing[i + 1];
         }
@@ -590,7 +590,16 @@ void DoRLInsert(int pSlot_index) {
 // IDA: void __usercall DoRLCursorLeft(int pSlot_index@<EAX>)
 void DoRLCursorLeft(int pSlot_index) {
     LOG_TRACE("(%d)", pSlot_index);
-    NOT_IMPLEMENTED();
+    if (gCurrent_position) {
+        if (strlen(gCurrent_typing) == gCurrent_position) {
+            ChangeCharTo(pSlot_index, strlen(gCurrent_typing), ' ');
+        } else {
+            ChangeCharTo(pSlot_index, gCurrent_position, gCurrent_typing[gCurrent_position]);
+        }
+
+        gCurrent_position--;
+        gCurrent_cursor = ChangeCharTo(pSlot_index, gCurrent_position, ROLLING_LETTER_LOOP_RANDOM);
+    }
 }
 
 // IDA: void __usercall DoRLCursorRight(int pSlot_index@<EAX>)
@@ -649,7 +658,10 @@ void StopTyping(int pSlot_index) {
 void RevertTyping(int pSlot_index, char* pRevert_str) {
     int i;
     LOG_TRACE("(%d, \"%s\")", pSlot_index, pRevert_str);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < gThe_length; i++) {
+        ChangeCharTo(pSlot_index, i, i >= strlen(pRevert_str) ? ' ' : pRevert_str[i]);
+    }
 }
 
 // IDA: void __usercall StartTyping(int pSlot_index@<EAX>, char *pText@<EDX>, int pVisible_length@<EBX>)

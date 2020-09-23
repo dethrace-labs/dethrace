@@ -409,16 +409,14 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
             escaped = 0;
         }
         if (escaped && gTyping_slot >= 0 && !gAlways_typing) {
-            LOG_PANIC("not implemented1");
-            //pSpec->get_original_string(&pVisible_length, gTyping_slot);
+            pSpec->get_original_string(0, gTyping_slot, the_str, &the_max);
             escaped = 0;
-            //RevertTyping(gTyping_slot, &v106);
+            RevertTyping(gTyping_slot, the_str);
             gTyping = 0;
             gTyping_slot = -1;
         }
         if (go_ahead) {
             if (gCurrent_choice >= 0 && gCurrent_choice < pSpec->number_of_button_flics) {
-                //v84 = &pSpec->pushed_flics[gCurrent_choice];
                 if (pSpec->pushed_flics[gCurrent_choice].flic_index >= 0) {
                     AddToFlicQueue(pSpec->pushed_flics[gCurrent_choice].flic_index, pSpec->pushed_flics[gCurrent_choice].x[gGraf_data_index], pSpec->pushed_flics[gCurrent_choice].y[gGraf_data_index], 1);
                 }

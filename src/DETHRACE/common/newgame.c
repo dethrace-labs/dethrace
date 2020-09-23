@@ -91,7 +91,7 @@ void FrankAnneStart2() {
 void GetPlayerName(int pStarting_to_type, int pCurrent_choice, char* pString, int* pMax_length) {
     LOG_TRACE("(%d, %d, \"%s\", %p)", pStarting_to_type, pCurrent_choice, pString, pMax_length);
     strcpy(pString, gProgram_state.player_name[pCurrent_choice]);
-    *pMax_length = 13;
+    *pMax_length = PLAYER_NAME_MAX_LENGTH;
 }
 
 // IDA: int __usercall FrankAnneDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
