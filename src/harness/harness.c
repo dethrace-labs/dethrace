@@ -4,7 +4,6 @@
 #include "stack_trace_handler.h"
 
 SDL_Window* window;
-SDL_Thread* game_thread;
 renderer* current_renderer;
 br_pixelmap* palette;
 uint32_t* screen_buffer;
@@ -18,16 +17,39 @@ void Harness_Init(char* name, renderer* renderer) {
     current_renderer = renderer;
     screen_buffer = NULL;
     game_mode = eGame_mode_Carmageddon;
+
+    if (SDL_Init(SDL_INIT_TIMER) != 0) {
+        LOG_PANIC("SDL_INIT_TIMER error: %s", SDL_GetError());
+    }
+}
+
+void Harness_PumpEvents() {
+    SDL_Event event;
+
+    while (SDL_PollEvent(&event)) {
+        switch (event.type) {
+
+        case SDL_KEYDOWN:
+        case SDL_KEYUP:
+            Keyboard_HandleEvent(&event.key);
+            break;
+
+        case SDL_QUIT:
+            LOG_PANIC("QuitGame");
+            break;
+        }
+    }
 }
 
 eGame_mode Harness_GameMode() {
     return game_mode;
 }
 
-void Harness_RunWindowLoop(harness_game_func* game_func, void* arg) {
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
-        LOG_PANIC("SDL_Init Error: %s", SDL_GetError());
+void Harness_Hook_DOSGfxBegin() {
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+        LOG_PANIC("SDL_INIT_VIDEO error: %s", SDL_GetError());
     }
+
     window = SDL_CreateWindow("Dethrace",
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
@@ -37,31 +59,11 @@ void Harness_RunWindowLoop(harness_game_func* game_func, void* arg) {
     if (!window) {
         LOG_PANIC("Failed to create window");
     }
-
     current_renderer->init(window);
-
-    game_thread = SDL_CreateThread(game_func, "game_thread", arg);
-
-    SDL_Event event;
-    int keep_pumping = 1;
-    while (keep_pumping) {
-        if (SDL_WaitEvent(&event)) {
-            switch (event.type) {
-
-            case SDL_KEYDOWN:
-            case SDL_KEYUP:
-                Keyboard_HandleEvent(&event.key);
-                break;
-            case SDL_QUIT:
-                keep_pumping = 0;
-            }
-        }
-    }
-    LOG_PANIC("leaving loop");
 }
 
-void Harness_Hook_DOSGfxBegin() {
-    current_renderer->activate(window);
+void Harness_Hook_PDServiceSystem(int pTime_since_last_call) {
+    Harness_PumpEvents();
 }
 
 void Harness_RenderScreen(br_pixelmap* dst, br_pixelmap* src) {
@@ -78,8 +80,6 @@ void Harness_RenderScreen(br_pixelmap* dst, br_pixelmap* src) {
         memset(screen_buffer, 0, src->width * src->height * sizeof(uint32_t));
     }
 
-    //LOG_DEBUG("%d %d, %d", src->width, src->height, src->row_bytes);
-
     // generate 32 bit texture from src + palette
     for (y = 0; y < src->height; y++) {
         inc = 0;
@@ -91,6 +91,7 @@ void Harness_RenderScreen(br_pixelmap* dst, br_pixelmap* src) {
         }
     }
     current_renderer->doubleBuffer(screen_buffer, window);
+    Harness_PumpEvents();
 }
 
 void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {

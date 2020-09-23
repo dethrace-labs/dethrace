@@ -15,11 +15,10 @@
 renderer OpenGLRenderer = {
     Harness_GLRenderer_GetWindowFlags,
     Harness_GLRenderer_Init,
-    Harness_GLRenderer_Activate,
     Harness_GLRenderer_DoubleBuffer,
 };
 
-SDL_GLContext context, context2;
+SDL_GLContext context;
 GLuint VBO, VAO, EBO;
 GLuint screen_texture;
 GLuint shader_program;
@@ -31,18 +30,6 @@ int Harness_GLRenderer_GetWindowFlags() {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
     return SDL_WINDOW_OPENGL;
-}
-
-void Harness_GLRenderer_Init(SDL_Window* window) {
-
-    context = SDL_GL_CreateContext(window);
-    if (!context) {
-        LOG_PANIC("Failed to call SDL_GL_CreateContext. %s", SDL_GetError());
-    }
-    context2 = SDL_GL_CreateContext(window);
-    if (!context2) {
-        LOG_PANIC("Failed to call SDL_GL_CreateContext (2). %s", SDL_GetError());
-    }
 }
 
 void CompileShader(GLuint shader_id, const GLchar* source) {
@@ -57,12 +44,12 @@ void CompileShader(GLuint shader_id, const GLchar* source) {
     }
 }
 
-void Harness_GLRenderer_Activate(SDL_Window* window) {
+void Harness_GLRenderer_Init(SDL_Window* window) {
     GLuint vs, fs;
 
-    int result = SDL_GL_MakeCurrent(window, context);
-    if (result != 0) {
-        LOG_PANIC("Failed to call SDL_GL_MakeCurrent. %s", SDL_GetError());
+    context = SDL_GL_CreateContext(window);
+    if (!context) {
+        LOG_PANIC("Failed to call SDL_GL_CreateContext. %s", SDL_GetError());
     }
 
     const char* vs_source = "#version 330 core\n"

@@ -1,13 +1,14 @@
 #include "cutscene.h"
-#include "common/errors.h"
-#include "common/globvars.h"
-#include "common/graphics.h"
-#include "common/input.h"
-#include "common/loading.h"
-#include "common/utility.h"
+#include "errors.h"
+#include "globvars.h"
+#include "globvrpb.h"
+#include "graphics.h"
+#include "input.h"
 #include "libsmacker/smacker.h"
+#include "loading.h"
 #include "pc-dos/dossys.h"
 #include "sound.h"
+#include "utility.h"
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
@@ -141,7 +142,14 @@ void DoNewGameAnimation() {
 // IDA: void __cdecl DoGoToRaceAnimation()
 void DoGoToRaceAnimation() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (!gNet_mode) {
+        if (PercentageChance(50)) {
+            PlaySmackerFile("GARAGE2.SMK");
+        } else {
+            PlaySmackerFile("GARAGE1.SMK");
+        }
+    }
 }
 
 // IDA: void __cdecl DoEndRaceAnimation()
@@ -167,5 +175,7 @@ void DoGameCompletedAnimation() {
 // IDA: void __cdecl StartLoadingScreen()
 void StartLoadingScreen() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    PossibleService();
+    SplashScreenWith("LOADSCRN.PIX");
 }

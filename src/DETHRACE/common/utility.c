@@ -146,7 +146,7 @@ int IRandomBetween(int pA, int pB) {
 // IDA: int __usercall PercentageChance@<EAX>(int pC@<EAX>)
 int PercentageChance(int pC) {
     LOG_TRACE("(%d)", pC);
-    NOT_IMPLEMENTED();
+    return (rand() % 100) < pC;
 }
 
 // IDA: int __usercall IRandomPosNeg@<EAX>(int pN@<EAX>)
