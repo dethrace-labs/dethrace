@@ -18,8 +18,8 @@ void Harness_Init(char* name, renderer* renderer) {
     screen_buffer = NULL;
     game_mode = eGame_mode_Carmageddon;
 
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
-        LOG_PANIC("SDL_Init Error: %s", SDL_GetError());
+    if (SDL_Init(SDL_INIT_TIMER) != 0) {
+        LOG_PANIC("SDL_INIT_TIMER error: %s", SDL_GetError());
     }
 }
 
@@ -46,6 +46,10 @@ eGame_mode Harness_GameMode() {
 }
 
 void Harness_Hook_DOSGfxBegin() {
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+        LOG_PANIC("SDL_INIT_VIDEO error: %s", SDL_GetError());
+    }
+
     window = SDL_CreateWindow("Dethrace",
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
