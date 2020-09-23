@@ -4,7 +4,6 @@
 #include "stack_trace_handler.h"
 
 SDL_Window* window;
-//SDL_Thread* game_thread;
 renderer* current_renderer;
 br_pixelmap* palette;
 uint32_t* screen_buffer;
@@ -22,24 +21,12 @@ void Harness_Init(char* name, renderer* renderer) {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
         LOG_PANIC("SDL_Init Error: %s", SDL_GetError());
     }
-    window = SDL_CreateWindow("Dethrace",
-        SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED,
-        680, 480,
-        current_renderer->get_window_flags());
-
-    if (!window) {
-        LOG_PANIC("Failed to create window");
-    }
-
-    current_renderer->init(window);
 }
 
 void Harness_PumpEvents() {
     SDL_Event event;
 
     while (SDL_PollEvent(&event)) {
-        LOG_DEBUG("pollevents");
         switch (event.type) {
 
         case SDL_KEYDOWN:
@@ -59,7 +46,16 @@ eGame_mode Harness_GameMode() {
 }
 
 void Harness_Hook_DOSGfxBegin() {
-    current_renderer->activate(window);
+    window = SDL_CreateWindow("Dethrace",
+        SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED,
+        680, 480,
+        current_renderer->get_window_flags());
+
+    if (!window) {
+        LOG_PANIC("Failed to create window");
+    }
+    current_renderer->init(window);
 }
 
 void Harness_Hook_PDServiceSystem(int pTime_since_last_call) {

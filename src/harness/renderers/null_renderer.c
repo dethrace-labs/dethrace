@@ -10,6 +10,5 @@ void Harness_NullRenderer_DoubleBuffer(uint32_t* src, SDL_Window* window) {}
 renderer NullRenderer = {
     Harness_NullRenderer_GetWindowFlags,
     Harness_NullRenderer_Init,
-    Harness_NullRenderer_Activate,
     Harness_NullRenderer_DoubleBuffer
 };

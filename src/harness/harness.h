@@ -10,7 +10,6 @@ typedef int harness_game_func(void*);
 typedef struct renderer {
     int (*get_window_flags)();
     void (*init)(SDL_Window* window);
-    void (*activate)(SDL_Window* window);
     void (*doubleBuffer)(uint32_t* src, SDL_Window* window);
 } renderer;
 

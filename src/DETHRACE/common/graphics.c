@@ -770,10 +770,10 @@ void FadePaletteDown() {
         start_time = PDGetTotalTime();
         while (1) {
             the_time = PDGetTotalTime() - start_time;
-            if (the_time >= 5000) {
+            if (the_time >= 500) {
                 break;
             }
-            i = 256 - ((the_time * 256) / 5000);
+            i = 256 - ((the_time * 256) / 500);
             SetFadedPalette(i);
         }
         SetFadedPalette(0);
