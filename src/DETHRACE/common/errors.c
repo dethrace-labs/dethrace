@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "network.h"
 #include "pc-dos/dossys.h"
 #include "utility.h"
 
@@ -199,5 +200,6 @@ void dr_dprintf(char* fmt_string, ...) {
 // IDA: int __usercall DoErrorInterface@<EAX>(int pMisc_text_index@<EAX>)
 int DoErrorInterface(int pMisc_text_index) {
     LOG_TRACE("(%d)", pMisc_text_index);
-    NOT_IMPLEMENTED();
+    NetFullScreenMessage(pMisc_text_index, 0);
+    return 0;
 }

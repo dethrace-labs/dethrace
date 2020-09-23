@@ -14,8 +14,15 @@ typedef struct renderer {
     void (*doubleBuffer)(uint32_t* src, SDL_Window* window);
 } renderer;
 
+typedef enum eGame_mode {
+    eGame_mode_Carmageddon,
+    eGame_mode_SplatPack
+} eGame_mode;
+
 void Harness_Init(char* name, renderer* renderer);
 void Harness_RunWindowLoop(harness_game_func* game_func, void* arg);
+
+eGame_mode Harness_GameMode();
 
 // Hooks are called from original game code.
 void Harness_Hook_DOSGfxBegin();

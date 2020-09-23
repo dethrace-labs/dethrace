@@ -1,4 +1,19 @@
 #include "newgame.h"
+#include "cutscene.h"
+#include "displays.h"
+#include "drmem.h"
+#include "errors.h"
+#include "flicplay.h"
+#include "globvars.h"
+#include "globvrpb.h"
+#include "grafdata.h"
+#include "graphics.h"
+#include "init.h"
+#include "input.h"
+#include "intrface.h"
+#include "loading.h"
+#include "utility.h"
+#include "world.h"
 #include <stdlib.h>
 
 char x[] = "xxxxxxxx.TXT";
@@ -30,50 +45,178 @@ int gRadio_selected;
 void StartRollingPlayerNamesIn() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < 2; i++) {
+        SetSlotXY(i, gCurrent_graf_data->player_name_x[i], gCurrent_graf_data->player_name_y);
+        AddRollingString(gProgram_state.player_name[i], gCurrent_graf_data->player_name_x[i], gCurrent_graf_data->player_name_y, eRT_alpha);
+    }
 }
 
 // IDA: void __cdecl FrankAnneStart1()
 void FrankAnneStart1() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    StartRollingPlayerNamesIn();
+    if (!gFrank_flic_data) {
+        if (!LoadFlicData("FRANK.FLI", &gFrank_flic_data, &gFrank_flic_data_length)) {
+            FatalError(56);
+        }
+    }
+    if (!gAnne_flic_data) {
+        if (!LoadFlicData("ANNIE.FLI", &gAnne_flic_data, &gAnne_flic_data_length)) {
+            FatalError(56);
+        }
+    }
+    InitialiseFlicPanel(0,
+        gCurrent_graf_data->frank_panel_left,
+        gCurrent_graf_data->frank_panel_top,
+        gCurrent_graf_data->frank_panel_right - gCurrent_graf_data->frank_panel_left,
+        gCurrent_graf_data->frank_panel_bottom - gCurrent_graf_data->frank_panel_top);
+    InitialiseFlicPanel(1,
+        gCurrent_graf_data->anne_panel_left,
+        gCurrent_graf_data->anne_panel_top,
+        gCurrent_graf_data->anne_panel_right - gCurrent_graf_data->anne_panel_left,
+        gCurrent_graf_data->anne_panel_bottom - gCurrent_graf_data->anne_panel_top);
 }
 
 // IDA: void __cdecl FrankAnneStart2()
 void FrankAnneStart2() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    ChangePanelFlic(0, gFrank_flic_data, gFrank_flic_data_length);
+    ChangePanelFlic(1, gAnne_flic_data, gAnne_flic_data_length);
+    TellyInImage(GetPanelPixelmap(0), gCurrent_graf_data->frank_panel_left, gCurrent_graf_data->frank_panel_top);
+    TellyInImage(GetPanelPixelmap(1), gCurrent_graf_data->anne_panel_left, gCurrent_graf_data->anne_panel_top);
 }
 
 // IDA: void __usercall GetPlayerName(int pStarting_to_type@<EAX>, int pCurrent_choice@<EDX>, char *pString@<EBX>, int *pMax_length@<ECX>)
 void GetPlayerName(int pStarting_to_type, int pCurrent_choice, char* pString, int* pMax_length) {
     LOG_TRACE("(%d, %d, \"%s\", %p)", pStarting_to_type, pCurrent_choice, pString, pMax_length);
-    NOT_IMPLEMENTED();
+    strcpy(pString, gProgram_state.player_name[pCurrent_choice]);
+    *pMax_length = PLAYER_NAME_MAX_LENGTH;
 }
 
 // IDA: int __usercall FrankAnneDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
 int FrankAnneDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
-    NOT_IMPLEMENTED();
+    RemoveTransientBitmaps(1);
+    TellyOutImage(GetPanelPixelmap(1), gCurrent_graf_data->anne_panel_left, gCurrent_graf_data->anne_panel_top);
+    TellyOutImage(GetPanelPixelmap(0), gCurrent_graf_data->frank_panel_left, gCurrent_graf_data->frank_panel_top);
+    if (gFrank_flic_data) {
+        MAMSUnlock((void**)&gFrank_flic_data);
+    }
+    if (gAnne_flic_data) {
+        MAMSUnlock((void**)&gAnne_flic_data);
+    }
+    gProgram_state.frank_or_anniness = pCurrent_choice;
+    GetTypedName(gProgram_state.player_name[pCurrent_choice], PLAYER_NAME_MAX_LENGTH);
+    return pCurrent_choice;
 }
 
 // IDA: void __usercall FrankAnneDraw(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
 void FrankAnneDraw(int pCurrent_choice, int pCurrent_mode) {
-    LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+    LOG_TRACE9("(%d, %d)", pCurrent_choice, pCurrent_mode);
+    if (gTyping) {
+        if (GetTotalTime() & 0x100) {
+            if (pCurrent_choice < 2) {
+                TransDRPixelmapText(
+                    gBack_screen,
+                    gCurrent_graf_data->enter_name_x[pCurrent_choice],
+                    gCurrent_graf_data->enter_name_y,
+                    &gFonts[FONT_GRNLIT],
+                    GetMiscString(191),
+                    gBack_screen->width);
+            }
+        }
+    }
 }
 
 // IDA: int __cdecl FrankieOrAnnie()
 int FrankieOrAnnie() {
-    static tFlicette flicker_on[3];
-    static tFlicette flicker_off[3];
-    static tFlicette push[3];
-    static tMouse_area mouse_areas[3];
-    static tRectile recopy_areas[2];
-    static tInterface_spec interface_spec;
+    static tFlicette flicker_on[3] = {
+        { 83, { 61, 122 }, { 52, 125 } },
+        { 83, { 184, 398 }, { 52, 125 } },
+        { 43, { 215, 430 }, { 158, 379 } }
+    };
+    static tFlicette flicker_off[3] = {
+        { 82, { 61, 122 }, { 52, 125 } },
+        { 82, { 184, 398 }, { 52, 125 } },
+        { 42, { 215, 430 }, { 158, 379 } }
+    };
+    static tFlicette push[3] = {
+        { 83, { 61, 122 }, { 52, 125 } },
+        { 83, { 184, 398 }, { 52, 125 } },
+        { 45, { 215, 430 }, { 158, 379 } }
+    };
+    static tMouse_area mouse_areas[3] = {
+        { { 55, 110 }, { 52, 125 }, { 161, 322 }, { 154, 370 }, 0, 0, 0, NULL },
+        { { 178, 356 }, { 52, 125 }, { 295, 596 }, { 154, 370 }, 1, 0, 0, NULL },
+        { { 215, 430 }, { 158, 379 }, { 278, 556 }, { 179, 430 }, 2, 1, 1, NULL }
+    };
+    static tRectile recopy_areas[2] = {
+        { { 55, 110 }, { 132, 317 }, { 161, 322 }, { 154, 370 } },
+        { { 178, 356 }, { 132, 317 }, { 295, 590 }, { 154, 370 } }
+    };
+    static tInterface_spec interface_spec = {
+        0, // initial_imode
+        80, // first_opening_flic
+        0, // second_opening_flic
+        81, // end_flic_go_ahead
+        81, // end_flic_escaped
+        81, // end_flic_otherwise
+        0, // flic_bunch_to_load
+        { -1, -1 }, // move_left_new_mode
+        { -1, 0 }, // move_left_delta
+        { 0, 2 }, // move_left_min
+        { 1, 2 }, // move_left_max
+        { NULL, NULL }, // move_left_proc
+        { -1, -1 }, // move_right_new_mode
+        { 1, 0 }, // move_right_delta
+        { 0, 2 }, // move_right_min
+        { 1, 2 }, // move_right_max
+        { NULL, NULL }, // move_right_proc
+        { 1, 0 }, // move_up_new_mode
+        { -2, -1 }, // move_up_delta
+        { 2, 1 }, // move_up_min
+        { 2, 1 }, // move_up_max
+        { NULL, NULL }, // move_up_proc
+        { 1, 0 }, // move_down_new_mode
+        { 2, -1 }, // move_down_delta
+        { 2, 1 }, // move_down_min
+        { 2, 1 }, // move_down_max
+        { NULL, NULL }, // move_down_proc
+        { 1, 1 }, // go_ahead_allowed
+        { NULL, NULL }, // go_ahead_proc
+        { 1, 1 }, // escape_allowed
+        { NULL, NULL }, // escape_proc
+        NULL, // exit_proc
+        FrankAnneDraw, // draw_proc
+        0, // time_out
+        FrankAnneStart1, // start_proc1
+        FrankAnneStart2, // start_proc2
+        FrankAnneDone, // done_proc
+        1, // font_needed
+        { 1, 0 }, // typeable
+        GetPlayerName, // get_original_string
+        2, // escape_code
+        1, // dont_save_or_load
+        3, // number_of_button_flics
+        flicker_on, // flicker_on_flics
+        flicker_off, // flicker_off_flics
+        push, // pushed_flics
+        3, // number_of_mouse_areas
+        mouse_areas, // mouse_areas
+        2, // number_of_recopy_areas
+        recopy_areas // recopy_areas
+    };
+
     int result;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    LoadFont(FONT_GRNLIT);
+    result = DoInterfaceScreen(&interface_spec, 0, gProgram_state.frank_or_anniness);
+    DisposeFlicPanel(1);
+    DisposeFlicPanel(0);
+    DisposeFont(FONT_GRNLIT);
+    return result < 2;
 }
 
 // IDA: int __cdecl SelectSkillLevel()
@@ -93,7 +236,42 @@ int DoOnePlayerStart() {
     int merrily_looping;
     tProgram_state saved_state;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (OriginalCarmaCDinDrive()) {
+        memcpy(&saved_state, &gProgram_state, sizeof(tProgram_state));
+        do {
+            merrily_looping = FrankieOrAnnie();
+            if (!merrily_looping) {
+                memcpy(&gProgram_state, &saved_state, sizeof(tProgram_state));
+                return 0;
+            }
+            if (SelectSkillLevel()) {
+                DoGoToRaceAnimation();
+                StartLoadingScreen();
+                AboutToLoadFirstCar();
+                PrintMemoryDump(0, "JUST BEFORE LOADING YOUR CAR");
+                SwitchToRealResolution();
+                LoadCar(
+                    gBasic_car_names[gProgram_state.frank_or_anniness],
+                    eDriver_local_human,
+                    &gProgram_state.current_car,
+                    gProgram_state.frank_or_anniness,
+                    gProgram_state.player_name[gProgram_state.frank_or_anniness],
+                    &gOur_car_storage_space);
+                SwitchToLoresMode();
+                SetCarStorageTexturingLevel(&gOur_car_storage_space, GetCarTexturingLevel(), eCTL_full);
+                PrintMemoryDump(0, "IMMEDIATELY AFTER LOADING YOUR CAR");
+                gNet_mode = 0;
+                InitGame(0);
+                merrily_looping = 0;
+            }
+        } while (merrily_looping);
+        UnlockBunchOfFlics(4);
+        return 1;
+    } else {
+        DoErrorInterface(223);
+        return 0;
+    }
 }
 
 // IDA: int __usercall NewNetGameUp@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)

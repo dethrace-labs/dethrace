@@ -87,8 +87,27 @@ void DRPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFont, cha
     int chr;
     int ch_width;
     unsigned char* ch;
-    LOG_TRACE("(%p, %d, %d, %p, \"%s\", %d)", pPixelmap, pX, pY, pFont, pText, pRight_edge);
-    NOT_IMPLEMENTED();
+    LOG_TRACE9("(%p, %d, %d, %p, \"%s\", %d)", pPixelmap, pX, pY, pFont, pText, pRight_edge);
+    len = strlen(pText);
+    if (pX >= 0 && pPixelmap->width >= pRight_edge && pY >= 0 && pY + pFont->height <= pPixelmap->height) {
+        x = pX;
+        for (i = 0; i < len; i++) {
+            chr = pText[i] - pFont->offset;
+            DRPixelmapRectangleOnscreenCopy(
+                gBack_screen,
+                x,
+                pY,
+                pFont->images,
+                0,
+                pFont->height * chr,
+                pFont->width_table[chr],
+                pFont->height);
+
+            x += pFont->width_table[chr] + pFont->spacing;
+        }
+    } else {
+        LOG_PANIC("not implemented");
+    }
 }
 
 // IDA: void __usercall DRPixelmapCleverText2(br_pixelmap *pPixelmap@<EAX>, int pX@<EDX>, int pY@<EBX>, tDR_font *pFont@<ECX>, signed char *pText, int pRight_edge)
@@ -406,7 +425,62 @@ void OoerrIveGotTextInMeBoxMissus(int pFont_index, char* pText, br_pixelmap* pPi
     int font_needed_loading;
     char line[256];
     LOG_TRACE("(%d, \"%s\", %p, %d, %d, %d, %d, %d)", pFont_index, pText, pPixelmap, pLeft, pTop, pRight, pBottom, pCentred);
-    NOT_IMPLEMENTED();
+
+    font = &gFonts[pFont_index];
+    current_width = 0;
+    font_needed_loading = font->images == NULL;
+    if (font_needed_loading) {
+        LoadFont(pFont_index);
+    }
+    centre = (pRight + pLeft) / 2;
+    current_y = pTop;
+    width = pRight - pLeft;
+    line_char_index = 0;
+    input_str_index = 0;
+
+    while (pText[input_str_index]) {
+        line[line_char_index] = pText[input_str_index];
+        line[line_char_index + 1] = 0;
+        current_width += font->spacing + font->width_table[pText[input_str_index] - font->offset];
+        if (current_width > width) {
+            for (i = input_str_index; i >= start_line; i--) {
+                if (pText[i] == ' ') {
+                    break;
+                }
+            }
+            if (i == start_line) {
+                i = input_str_index;
+            }
+            line_char_index += i - input_str_index;
+            input_str_index = i;
+            if (pText[input_str_index] == ' ') {
+                input_str_index++;
+            }
+            line[line_char_index] = 0;
+            if (pCentred) {
+                TransDRPixelmapText(gBack_screen, centre - (DRTextWidth(font, line) / 2), current_y, font, line, (DRTextWidth(font, line) / 2) + centre);
+            } else {
+                TransDRPixelmapText(gBack_screen, pLeft, current_y, font, line, pRight);
+            }
+            current_width = 0;
+            current_y += 3 * (font->height - (TranslationMode() ? 2 : 0)) / 2;
+            line_char_index = 0;
+            start_line = input_str_index;
+        } else {
+            line_char_index++;
+            input_str_index++;
+        }
+    }
+    if (line_char_index != 0) {
+        if (pCentred) {
+            TransDRPixelmapText(gBack_screen, centre - (DRTextWidth(font, line) / 2), current_y, font, line, (DRTextWidth(font, line) / 2) + centre);
+        } else {
+            TransDRPixelmapText(gBack_screen, pLeft, current_y, font, line, pRight);
+        }
+    }
+    if (font_needed_loading) {
+        DisposeFont(pFont_index);
+    }
 }
 
 // IDA: void __usercall TransBrPixelmapText(br_pixelmap *pPixelmap@<EAX>, int pX@<EDX>, int pY@<EBX>, br_uint_32 pColour@<ECX>, br_font *pFont, signed char *pText)

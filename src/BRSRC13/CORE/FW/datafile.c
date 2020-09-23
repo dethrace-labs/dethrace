@@ -868,7 +868,6 @@ void DfClose(br_datafile* df) {
         }
     }
     dfp = DfPop(BR_MEMORY_FILE, NULL);
-    LOG_DEBUG("popped h=%p, raw_file=%p", dfp->h, ((br_file*)dfp->h)->raw_file);
     BrFileClose(dfp->h);
     BrResFree(dfp);
 }

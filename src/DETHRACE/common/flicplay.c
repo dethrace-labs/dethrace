@@ -1274,7 +1274,28 @@ int LoadFlicData(char* pName, tU8** pData, tU32* pData_length) {
     FILE* f;
     tPath_name the_path;
     LOG_TRACE("(\"%s\", %p, %p)", pName, pData, pData_length);
-    NOT_IMPLEMENTED();
+
+    if (*pData) {
+        return 1;
+    }
+    if (!gPlay_from_disk) {
+        PossibleService();
+        PathCat(the_path, gApplication_path, "ANIM");
+        PathCat(the_path, the_path, pName);
+        f = DRfopen(the_path, "rb");
+        if (!f) {
+            return 0;
+        }
+        *pData_length = GetFileLength(f);
+        *pData = BrMemAllocate(*pData_length, kMem_flic_data_2);
+        if (!*pData) {
+            fclose(f);
+            return 0;
+        }
+        fread(*pData, 1u, *pData_length, f);
+        fclose(f);
+    }
+    return 1;
 }
 
 // IDA: void __usercall FreeFlic(int pIndex@<EAX>)
@@ -1521,13 +1542,37 @@ void AddToFlicQueue(int pIndex, int pX, int pY, int pMust_finish) {
 void InitialiseFlicPanel(int pIndex, int pLeft, int pTop, int pWidth, int pHeight) {
     void* the_pixels;
     LOG_TRACE("(%d, %d, %d, %d, %d)", pIndex, pLeft, pTop, pWidth, pHeight);
-    NOT_IMPLEMENTED();
+
+    gPanel_flic[pIndex].data = NULL;
+    gPanel_flic_left[pIndex] = pLeft;
+    gPanel_flic_top[pIndex] = pTop;
+    the_pixels = BrMemAllocate(pHeight * ((pWidth + 3) & 0xFC), 0x93u);
+    if (gScreen->row_bytes < 0) {
+        BrFatal(
+            "..\\..\\source\\common\\flicplay.c",
+            2116,
+            "Bruce bug at line %d, file ..\\..\\source\\common\\flicplay.c",
+            68);
+    }
+    gPanel_buffer[pIndex] = DRPixelmapAllocate(gScreen->type, pWidth, pHeight, the_pixels, 0);
 }
 
 // IDA: void __usercall DisposeFlicPanel(int pIndex@<EAX>)
 void DisposeFlicPanel(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+
+    if (gPanel_flic[pIndex].f) {
+        BrMemFree(gPanel_flic[pIndex].data_start);
+        gPanel_flic[pIndex].data_start = NULL;
+        fclose(gPanel_flic[pIndex].f);
+        gPanel_flic[pIndex].f = NULL;
+    }
+    if (gPanel_flic[pIndex].data) {
+        gPanel_flic[pIndex].data = NULL;
+    }
+    BrMemFree(gPanel_buffer[pIndex]->pixels);
+    BrPixelmapFree(gPanel_buffer[pIndex]);
+    gPanel_buffer[pIndex] = NULL;
 }
 
 // IDA: void __usercall ServicePanelFlics(int pCopy_to_buffer@<EAX>)
@@ -1600,13 +1645,37 @@ void ServicePanelFlics(int pCopy_to_buffer) {
 // IDA: void __usercall ChangePanelFlic(int pIndex@<EAX>, tU8 *pData@<EDX>, tU32 pData_length@<EBX>)
 void ChangePanelFlic(int pIndex, tU8* pData, tU32 pData_length) {
     LOG_TRACE("(%d, %p, %d)", pIndex, pData, pData_length);
-    NOT_IMPLEMENTED();
+
+    if (gPanel_flic[pIndex].f) {
+        BrMemFree(gPanel_flic[pIndex].data_start);
+        gPanel_flic[pIndex].data_start = NULL;
+        fclose(gPanel_flic[pIndex].f);
+        gPanel_flic[pIndex].f = NULL;
+    }
+    if (gPanel_flic[pIndex].data) {
+        gPanel_flic[pIndex].data = NULL;
+    }
+    gPanel_flic_data[pIndex] = pData;
+    gPanel_flic_data_length[pIndex] = pData_length;
+    BrPixelmapFill(gPanel_buffer[pIndex], 0);
+    StartFlic(
+        gPanel_flic[pIndex].file_name,
+        pIndex,
+        &gPanel_flic[pIndex],
+        gPanel_flic_data_length[pIndex],
+        (tS8*)gPanel_flic_data[pIndex],
+        gPanel_buffer[pIndex],
+        0,
+        0,
+        0);
+    gLast_panel_frame_time[pIndex] = 0;
+    ServicePanelFlics(0);
 }
 
 // IDA: br_pixelmap* __usercall GetPanelPixelmap@<EAX>(int pIndex@<EAX>)
 br_pixelmap* GetPanelPixelmap(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+    return gPanel_buffer[pIndex];
 }
 
 // IDA: void __cdecl LoadInterfaceStrings()

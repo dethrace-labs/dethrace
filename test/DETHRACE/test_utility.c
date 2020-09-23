@@ -89,9 +89,10 @@ void test_utility_getMiscString() {
 }
 
 void test_utility_IRandomBetween() {
-    IRandomBetween(1, 5);
-    IRandomBetween(0, 5);
-    IRandomBetween(50, 100);
+    tU32 source_y_delta;
+
+    source_y_delta = ((66 << 16) / 67) - 0x10000;
+    printf("delta %x, %x\n", source_y_delta, source_y_delta >> 16);
 }
 
 void test_utility_suite() {

@@ -6,6 +6,7 @@
 #include "dossys.h"
 #include "errors.h"
 #include "globvars.h"
+#include "globvrpb.h"
 #include "input.h"
 #include "loading.h"
 #include "loadsave.h"
@@ -522,8 +523,14 @@ void PrintScreen() {
 
 // IDA: tU32 __cdecl GetTotalTime()
 tU32 GetTotalTime() {
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    LOG_TRACE9("()");
+    if (gAction_replay_mode) {
+        return gLast_replay_frame_time;
+    }
+    if (gNet_mode) {
+        return PDGetTotalTime();
+    }
+    return PDGetTotalTime() - gLost_time;
 }
 
 // IDA: tU32 __cdecl GetRaceTime()

@@ -48,7 +48,7 @@ void ResetInterfaceTimeout() {
 void ChangeSelection(tInterface_spec* pSpec, int* pOld_selection, int* pNew_selection, int pMode, int pSkip_disabled) {
     int i;
     LOG_TRACE("(%p, %p, %p, %d, %d)", pSpec, *pOld_selection, *pNew_selection, pMode, pSkip_disabled);
-    LOG_DEBUG("on entry: old: %p, new %p", pOld_selection, pNew_selection);
+    //    LOG_DEBUG("on entry: old: %p, new %p", pOld_selection, pNew_selection);
 
     for (i = 0; i < gDisabled_count; i++) {
         if (*pNew_selection == gDisabled_choices[i]) {
@@ -97,10 +97,9 @@ void ChangeSelection(tInterface_spec* pSpec, int* pOld_selection, int* pNew_sele
                     pSpec->flicker_on_flics[*pNew_selection].y[gGraf_data_index], 0);
             }
         }
-        LOG_DEBUG("new: %p, old %p", pNew_selection, pOld_selection);
         *pOld_selection = *pNew_selection;
     }
-    LOG_DEBUG("new: %d, old %d", *pNew_selection, *pOld_selection);
+    LOG_DEBUG("new: %d, old %d, new mode %d", *pNew_selection, *pOld_selection, pMode);
 }
 
 // IDA: void __usercall RecopyAreas(tInterface_spec *pSpec@<EAX>, br_pixelmap **pCopy_areas@<EDX>)
@@ -192,7 +191,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
     StartMouseCursor();
     if (pSpec->font_needed) {
         InitRollingLetters();
-        LoadFont(0);
+        LoadFont(FONT_TYPEABLE);
     }
     old_current_splash = gCurrent_splash;
     KillSplashScreen();
@@ -410,16 +409,14 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
             escaped = 0;
         }
         if (escaped && gTyping_slot >= 0 && !gAlways_typing) {
-            LOG_PANIC("not implemented");
-            //pSpec->get_original_string(&pVisible_length, gTyping_slot);
+            pSpec->get_original_string(0, gTyping_slot, the_str, &the_max);
             escaped = 0;
-            //RevertTyping(gTyping_slot, &v106);
+            RevertTyping(gTyping_slot, the_str);
             gTyping = 0;
             gTyping_slot = -1;
         }
         if (go_ahead) {
             if (gCurrent_choice >= 0 && gCurrent_choice < pSpec->number_of_button_flics) {
-                //v84 = &pSpec->pushed_flics[gCurrent_choice];
                 if (pSpec->pushed_flics[gCurrent_choice].flic_index >= 0) {
                     AddToFlicQueue(pSpec->pushed_flics[gCurrent_choice].flic_index, pSpec->pushed_flics[gCurrent_choice].x[gGraf_data_index], pSpec->pushed_flics[gCurrent_choice].y[gGraf_data_index], 1);
                 }
@@ -431,10 +428,9 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
                     RollLettersIn();
                     PDScreenBufferSwap(0);
                 } else {
-                    LOG_PANIC("not implemented");
                     gTyping_slot = gCurrent_choice;
-                    //(pSpec->get_original_string)(&pVisible_length, gCurrent_choice);
-                    //StartTyping(gTyping_slot, &v106, pVisible_length);
+                    pSpec->get_original_string(1, gCurrent_choice, the_str, &the_max);
+                    StartTyping(gTyping_slot, the_str, the_max);
                     go_ahead = 0;
                     gTyping = 1;
                 }
@@ -467,7 +463,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
     gTyping = 0;
     if (pSpec->font_needed) {
         EndRollingLetters();
-        DisposeFont(0);
+        DisposeFont(FONT_TYPEABLE);
     }
     if (pSpec->number_of_recopy_areas > 0) {
         for (i = 0; i < pSpec->number_of_recopy_areas; i++) {

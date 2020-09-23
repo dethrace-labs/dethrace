@@ -2,6 +2,7 @@
 #define DEBUG_H
 
 #include <stdlib.h>
+#include <unistd.h>
 
 #define BLUE
 #define LOG_LEVEL 3
@@ -31,6 +32,7 @@
 
 #define NOT_IMPLEMENTED()                                                         \
     debug_printf("\033[0;31m[PANIC] %s ", __FUNCTION__, "%s", "not implemented"); \
+    sleep(2);                                                                     \
     exit(1);
 
 #define STUB() \
