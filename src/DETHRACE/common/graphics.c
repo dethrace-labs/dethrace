@@ -1410,7 +1410,14 @@ void ShadowMode() {
 // IDA: int __cdecl SwitchToRealResolution()
 int SwitchToRealResolution() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gGraf_data_index == gReal_graf_data_index) {
+        return 0;
+    }
+    gGraf_data_index = gReal_graf_data_index;
+    gGraf_spec_index = gReal_graf_data_index;
+    gCurrent_graf_data = &gGraf_data[gReal_graf_data_index];
+    return 1;
 }
 
 // IDA: int __cdecl SwitchToLoresMode()

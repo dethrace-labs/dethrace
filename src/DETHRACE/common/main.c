@@ -76,7 +76,6 @@ void GameMain(int pArgc, char** pArgv) {
     strcat(gApplication_path, "DATA");
 
     UsePathFileToDetermineIfFullInstallation();
-
     if (!gCD_fully_installed && GetCDPathFromPathsTxtFile(CD_dir) && !PDCheckDriveExists(CD_dir)) {
         PDInitialiseSystem();
         fprintf(stderr, "Can't find the Carmageddon CD\n");
