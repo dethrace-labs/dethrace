@@ -129,7 +129,7 @@ void PlaySmackerFile(char* pSmack_name) {
 void DoOpeningAnimation() {
     LOG_TRACE("()");
     PlaySmackerFile("LOGO.SMK");
-    PlaySmackerFile("MIX_INTR.SMK");
+    PlaySmackerFile(harness_game_mode.intro_smk_file);
     return WaitForNoKeys();
 }
 

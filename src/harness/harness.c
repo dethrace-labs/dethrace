@@ -2,25 +2,44 @@
 #include "harness.h"
 #include "input/keyboard.h"
 #include "stack_trace_handler.h"
+#include "unistd.h"
+#include <sys/stat.h>
 
 SDL_Window* window;
 renderer* current_renderer;
 br_pixelmap* palette;
 uint32_t* screen_buffer;
-eGame_mode game_mode;
 
 br_pixelmap* last_dst = NULL;
 br_pixelmap* last_src = NULL;
+
+// if not 0, enable the original CD check code, otherwise just skip
+int harness_enable_cd_check;
+
+// SplatPack or Carmageddon. This is where we represent the code differences between the two. For example, the intro smack file.
+tHarness_GameMode harness_game_mode;
+
+void Harness_DetectGameMode() {
+    if (access("DATA/CUTSCENE/SPLINTRO.SMK", F_OK) != -1) {
+        harness_game_mode.name = "Splat Pack";
+        harness_game_mode.intro_smk_file = "SPLINTRO.SMK";
+    } else {
+        harness_game_mode.name = "Carmageddon";
+        harness_game_mode.intro_smk_file = "MIX_INTR.SMK";
+    }
+    LOG_INFO("\"%s\"", harness_game_mode.name);
+}
 
 void Harness_Init(char* name, renderer* renderer) {
     install_signal_handler(name);
     current_renderer = renderer;
     screen_buffer = NULL;
-    game_mode = eGame_mode_Carmageddon;
 
     if (SDL_Init(SDL_INIT_TIMER) != 0) {
         LOG_PANIC("SDL_INIT_TIMER error: %s", SDL_GetError());
     }
+
+    Harness_DetectGameMode();
 }
 
 void Harness_PumpEvents() {
@@ -41,8 +60,12 @@ void Harness_PumpEvents() {
     }
 }
 
-eGame_mode Harness_GameMode() {
-    return game_mode;
+int Harness_Hook_HandleCommandLineArg(char* arg) {
+    if (strcasecmp(arg, "-cdcheck") == 0) {
+        harness_enable_cd_check = 1;
+        return 1;
+    }
+    return 0;
 }
 
 void Harness_Hook_DOSGfxBegin() {

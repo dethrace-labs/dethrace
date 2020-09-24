@@ -46,11 +46,10 @@ void UsePathFileToDetermineIfFullInstallation() {
     strcat(path_file, gDir_separator);
     strcat(path_file, "PATHS.TXT");
 
-    if (PDCheckDriveExists(path_file) == 0) {
+    if (PDCheckDriveExists(path_file)) {
         fp = fopen(path_file, "rt");
         if (fp != NULL) {
             if (GetALineWithNoPossibleService(fp, line2) && GetALineWithNoPossibleService(fp, line2) && GetALineWithNoPossibleService(fp, line3) && strcmp(line3, "Full") == 0) {
-
                 gCD_fully_installed = 1;
             }
             fclose(fp);

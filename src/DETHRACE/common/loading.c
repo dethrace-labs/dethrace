@@ -1445,7 +1445,7 @@ void GetAString(FILE* pF, char* pString) {
 // IDA: void __cdecl AboutToLoadFirstCar()
 void AboutToLoadFirstCar() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    memset(gFunk_groove_flags, 0, sizeof(gFunk_groove_flags));
 }
 
 // IDA: void __usercall LoadOpponentsCars(tRace_info *pRace_info@<EAX>)
@@ -1663,6 +1663,11 @@ int TestForOriginalCarmaCDinDrive() {
     tPath_name paths_txt;
     int paths_txt_first_char;
 
+    // JeffH: Added to optionally bypass this check
+    if (!harness_enable_cd_check) {
+        return 1;
+    }
+
     paths_txt[0] = 0;
     strcat(paths_txt, gApplication_path);
     strcat(paths_txt, gDir_separator);
@@ -1703,14 +1708,8 @@ int TestForOriginalCarmaCDinDrive() {
         return 0;
     }
 
-    if (Harness_GameMode() == eGame_mode_SplatPack) {
-        if (!PDCheckDriveExists2(cutscene_pathname, "SPLINTRO.SMK", 2000000)) {
-            return 0;
-        }
-    } else {
-        if (!PDCheckDriveExists2(cutscene_pathname, "MIX_INTR.SMK", 2000000)) {
-            return 0;
-        }
+    if (!PDCheckDriveExists2(cutscene_pathname, harness_game_mode.intro_smk_file, 2000000)) {
+        return 0;
     }
 
     if (paths_txt_first_char != '@') {
