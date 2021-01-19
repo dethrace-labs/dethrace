@@ -12,7 +12,7 @@
 #endif
 #include <SDL2/SDL_opengl.h>
 
-renderer OpenGLRenderer = {
+tRenderer OpenGLRenderer = {
     Harness_GLRenderer_GetWindowFlags,
     Harness_GLRenderer_Init,
     Harness_GLRenderer_DoubleBuffer,

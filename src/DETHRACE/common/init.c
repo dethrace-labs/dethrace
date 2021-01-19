@@ -104,7 +104,8 @@ void ReinitialiseForwardCamera() {
     float d;
     float w;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __cdecl AllocateRearviewPixelmap()
@@ -144,7 +145,7 @@ void AllocateRearviewPixelmap() {
 void ReinitialiseRearviewCamera() {
     br_camera* camera_ptr;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    STUB();
 }
 
 // IDA: void __cdecl ReinitialiseRenderStuff()
@@ -152,7 +153,20 @@ void ReinitialiseRenderStuff() {
     int x_diff;
     int y_diff;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gProgram_state.cockpit_on) {
+        gProgram_state.current_render_left = gProgram_state.current_car.render_left[gProgram_state.cockpit_image_index];
+        gProgram_state.current_render_top = gProgram_state.current_car.render_top[gProgram_state.cockpit_image_index];
+        gProgram_state.current_render_right = gProgram_state.current_car.render_right[gProgram_state.cockpit_image_index];
+        gProgram_state.current_render_bottom = gProgram_state.current_car.render_bottom[gProgram_state.cockpit_image_index];
+    } else {
+        y_diff = (gGraf_specs[gGraf_spec_index].total_height / 18 & 0xFFFFFFFE) * gRender_indent;
+        x_diff = (gGraf_specs[gGraf_spec_index].total_width / 18 & 0xFFFFFFFC) * gRender_indent;
+        gProgram_state.current_render_left = x_diff;
+        gProgram_state.current_render_top = y_diff;
+        gProgram_state.current_render_right = gGraf_specs[gGraf_spec_index].total_width - x_diff;
+        gProgram_state.current_render_bottom = gGraf_specs[gGraf_spec_index].total_height - y_diff;
+    }
 }
 
 // IDA: void __cdecl InstallFindFailedHooks()

@@ -98,7 +98,7 @@ br_pixelmap* BrPixelmapClone(br_pixelmap* src) {
 
 // IDA: void __cdecl BrPixelmapFill(br_pixelmap *dst, br_uint_32 colour)
 void BrPixelmapFill(br_pixelmap* dst, br_uint_32 colour) {
-    br_uint_8 linear_wholepixels; //added JeffH
+    br_uint_8 linear_wholepixels; //added Jeff
     LOG_TRACE("(%p, %d)", dst, colour);
 
     linear_wholepixels = BR_PMF_LINEAR | BR_PMF_ROW_WHOLEPIXELS;

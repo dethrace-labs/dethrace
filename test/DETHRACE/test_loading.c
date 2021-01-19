@@ -3,10 +3,14 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "CORE/PIXELMAP/pixelmap.h"
 #include "common/globvars.h"
+#include "common/graphics.h"
 #include "common/init.h"
 #include "common/loading.h"
 #include "common/newgame.h"
+#include "common/utility.h"
+#include "common/world.h"
 
 void test_loading_GetCDPathFromPathsTxtFile() {
     REQUIRES_DATA_DIRECTORY();
@@ -111,6 +115,43 @@ void test_loading_memread() {
     TEST_ASSERT_EQUAL_INT(-4, MemReadS8(&data));
 }
 
+void test_loading_ConvertPixToStripMap() {
+    REQUIRES_DATA_DIRECTORY();
+    br_pixelmap* pm;
+    tS8* strip_data;
+    br_pixelmap* pm_unstripped;
+    int x;
+    int y;
+    br_uint_8* src_pix;
+    br_uint_8* dst_pix;
+    pm = DRPixelmapLoad("DATA/32x20x8/PIXELMAP/FRANKF.PIX");
+    TEST_ASSERT_NOT_NULL(pm);
+    strip_data = ConvertPixToStripMap(pm);
+    TEST_ASSERT_NOT_NULL(strip_data);
+    pm_unstripped = BrPixelmapAllocate(BR_MEMORY_PIXELS, pm->width, pm->height, NULL, BR_PMAF_NORMAL);
+    CopyStripImage(pm_unstripped, 0, 0, 0, 0, strip_data, 0, 0, pm->width, pm->height);
+    src_pix = (br_uint_8*)pm->pixels;
+    dst_pix = (br_uint_8*)pm_unstripped->pixels;
+    for (y = 0; y < pm->height; y++) {
+        for (x = 0; x < pm->width; x++) {
+            if (src_pix[y * pm->row_bytes + x] != dst_pix[y * pm_unstripped->row_bytes + x]) {
+                printf("Original and unstripped images do not match at (%d %d)\n", x, y);
+                TEST_FAIL();
+            }
+        }
+    }
+}
+
+void test_loading_LoadCar() {
+    tCar_spec car_spec;
+    tBrender_storage storage;
+    InitialiseStorageSpace(&storage, 50, 50, 50, 50);
+    LoadCar("NEWEAGLE.TXT", eDriver_local_human, &car_spec, eFrankie, "playerName", &storage);
+    TEST_ASSERT_TRUE(car_spec.active);
+    TEST_ASSERT_FALSE(car_spec.disabled);
+    TEST_ASSERT_EQUAL_FLOAT(0.06f, car_spec.ride_height);
+}
+
 void test_loading_suite() {
     RUN_TEST(test_loading_GetCDPathFromPathsTxtFile);
     RUN_TEST(test_loading_OldDRfopen);
@@ -118,4 +159,6 @@ void test_loading_suite() {
     RUN_TEST(test_loading_brfont);
     RUN_TEST(test_loading_opponents);
     RUN_TEST(test_loading_memread);
+    RUN_TEST(test_loading_ConvertPixToStripMap);
+    RUN_TEST(test_loading_LoadCar);
 }

@@ -1,7 +1,9 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-// JeffH: These names are not part of the symbol dump, so the names in this file are not original, except as noted.
+#define V11MODEL(model) (((v11model*)model->prepared))
+
+// Jeff: These names are not part of the symbol dump, so the names in this file are not original, except as noted.
 
 // Names from `gMem_names`. See also: `CreateStainlessClasses`
 typedef enum dr_memory_classes {
@@ -268,5 +270,7 @@ typedef enum keymapcodes {
 #define ROLLING_LETTER_LOOP_RANDOM 96
 
 #define PLAYER_NAME_MAX_LENGTH 13
+
+#define DAMAGE_UNIT_PERIODS 5
 
 #endif

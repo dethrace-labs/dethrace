@@ -20,7 +20,7 @@ br_filesystem gFilesystem = {
     NULL
 };
 
-// Added by JeffH
+// Added by Jeff
 #define DR_MEMORY_FILESYSTEM 140
 
 // IDA: void* __cdecl DRStdioOpenRead(char *name, br_size_t n_magics, br_mode_test_cbfn *identify, int *mode_result)

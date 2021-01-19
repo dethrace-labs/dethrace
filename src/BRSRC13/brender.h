@@ -42,4 +42,7 @@ br_pixelmap* BrTableFind(char* pattern);
 
 void BrFatal(const char* name, int line, const char* s, ...);
 
+void BrModelFree(br_model* model);
+void BrModelUpdate(br_model* model, br_uint_16 flags);
+
 #endif

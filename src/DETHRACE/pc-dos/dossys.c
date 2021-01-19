@@ -258,6 +258,8 @@ void PDFatalError(char* pThe_str) {
 
     // wait for keypress
 
+    Harness_Debug_PrintStack();
+
     DoSaveGame(1);
     if (!_unittest_do_not_exit) {
         exit(1);
@@ -845,7 +847,7 @@ int PDCheckDriveExists2(char* pThe_path, char* pFile_name, tU32 pMin_size) {
         strcpy(the_path, pThe_path);
     }
 
-    // JeffH: force unix dir separator >>
+    // Jeff: force unix dir separator >>
     char* rep = the_path;
     while ((rep = strchr(rep, '\\')) != NULL) {
         *rep++ = '/';

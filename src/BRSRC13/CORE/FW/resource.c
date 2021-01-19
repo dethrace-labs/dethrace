@@ -33,12 +33,14 @@ void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class) {
     br_int_32 calign;
     br_int_32 pad;
     br_int_32 actual_pad;
-    LOG_TRACE10("(%p, %d, %d)", vparent, size, res_class);
+    LOG_TRACE9("(%p, %d, %d)", vparent, size, res_class);
 
     char* tmp;
 
     malign = BrMemAlign(res_class) - 1;
+
     calign = fw.resource_class_index[res_class]->alignment;
+
     if (calign <= 0) {
         calign = 4;
     }
@@ -48,11 +50,10 @@ void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class) {
     pad = (~malign & calign) + 3;
     actual_pad = (sizeof(resource_header) + pad) & 0xFFFC;
 
-    // JeffH ignore calculated padding for simplicity. We dont care too much about
+    // Jeff ignore calculated padding for simplicity. We dont care too much about
     // optimizing data alignment at this point ;)
     pad = 0;
     actual_pad = sizeof(resource_header) + pad;
-
     res = (resource_header*)BrMemAllocate(size + actual_pad, res_class);
 
     res->class = res_class;

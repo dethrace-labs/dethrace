@@ -4,7 +4,7 @@
 #include "harness.h"
 #include <SDL2/SDL.h>
 
-extern renderer OpenGLRenderer;
+extern tRenderer OpenGLRenderer;
 
 int Harness_GLRenderer_GetWindowFlags();
 void Harness_GLRenderer_Init(SDL_Window* window);

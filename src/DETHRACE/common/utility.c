@@ -59,27 +59,26 @@ void EncodeLine(char* pS) {
     char* key;
     unsigned char c;
     FILE* test;
-
-    tPath_name test_path;
-    char temp[256];
+    tPath_name the_path;
+    char s[256];
 
     len = strlen(pS);
     key = (char*)gLong_key;
     if (!gEncryption_method) {
-        strcpy(test_path, gApplication_path);
-        strcat(test_path, gDir_separator);
-        strcat(test_path, "GENERAL.TXT");
+        strcpy(the_path, gApplication_path);
+        strcat(the_path, gDir_separator);
+        strcat(the_path, "GENERAL.TXT");
 
-        test = fopen(test_path, "rt");
+        test = fopen(the_path, "rt");
         if (test) {
-            fgets(temp, 256, test);
-            if (temp[0] != '@') {
+            fgets(s, 256, test);
+            if (s[0] != '@') {
                 gEncryption_method = 2;
             } else {
                 gEncryption_method = 1;
-                EncodeLine(&temp[1]);
-                temp[7] = '\0';
-                if (strcmp(&temp[1], "0.01\t\t") != 0) {
+                EncodeLine(&s[1]);
+                s[7] = '\0';
+                if (strcmp(&s[1], "0.01\t\t") != 0) {
                     gEncryption_method = 2;
                 }
             }
@@ -181,7 +180,7 @@ br_scalar SRandomPosNeg(br_scalar pN) {
 
 // IDA: char* __usercall GetALineWithNoPossibleService@<EAX>(FILE *pF@<EAX>, unsigned char *pS@<EDX>)
 char* GetALineWithNoPossibleService(FILE* pF, /*unsigned*/ char* pS) {
-    // JeffH removed "signed' to avoid compiler warnings..
+    // Jeff removed "signed' to avoid compiler warnings..
     /*signed*/ char* result;
     /*signed*/ char s[256];
     int ch;
@@ -241,6 +240,7 @@ char* GetALineWithNoPossibleService(FILE* pF, /*unsigned*/ char* pS) {
             pS[i] -= 32;
         }
     }
+    //LOG_DEBUG("%s", result);
     return result;
 }
 
@@ -421,8 +421,8 @@ void WaitFor(tU32 pDelay) {
 }
 
 // IDA: br_uint_32 __usercall DRActorEnumRecurse@<EAX>(br_actor *pActor@<EAX>, br_actor_enum_cbfn *callback@<EDX>, void *arg@<EBX>)
-br_uint_32 DRActorEnumRecurse(br_actor* pActor, br_actor_enum_cbfn* callback, void* arg) {
-    br_uint_32 result;
+intptr_t DRActorEnumRecurse(br_actor* pActor, br_actor_enum_cbfn* callback, void* arg) {
+    intptr_t result;
 
     result = callback(pActor, arg);
     if (result == 0) {
@@ -444,15 +444,20 @@ br_uint_32 DRActorEnumRecurse(br_actor* pActor, br_actor_enum_cbfn* callback, vo
 }
 
 // IDA: br_uint_32 __cdecl CompareActorID(br_actor *pActor, void *pArg)
-br_uint_32 CompareActorID(br_actor* pActor, void* pArg) {
+intptr_t CompareActorID(br_actor* pActor, void* pArg) {
     LOG_TRACE("(%p, %p)", pActor, pArg);
-    NOT_IMPLEMENTED();
+
+    if (pActor->identifier && !strcmp(pActor->identifier, (const char*)pArg)) {
+        return (intptr_t)pActor;
+    } else {
+        return 0;
+    }
 }
 
 // IDA: br_actor* __usercall DRActorFindRecurse@<EAX>(br_actor *pSearch_root@<EAX>, char *pName@<EDX>)
 br_actor* DRActorFindRecurse(br_actor* pSearch_root, char* pName) {
     LOG_TRACE("(%p, \"%s\")", pSearch_root, pName);
-    NOT_IMPLEMENTED();
+    return (br_actor*)DRActorEnumRecurse(pSearch_root, CompareActorID, pName);
 }
 
 // IDA: br_uint_32 __usercall DRActorEnumRecurseWithMat@<EAX>(br_actor *pActor@<EAX>, br_material *pMat@<EDX>, br_uint_32 (*pCall_back)(br_actor*, br_material*, void*)@<EBX>, void *pArg@<ECX>)
@@ -771,9 +776,28 @@ int NormalSideOfPlane(br_vector3* pPoint, br_vector3* pNormal, br_scalar pD) {
 br_material* DRMaterialClone(br_material* pMaterial) {
     br_material* the_material;
     char s[256];
-    static int name_suffix;
+    static int name_suffix = 0;
     LOG_TRACE("(%p)", pMaterial);
-    NOT_IMPLEMENTED();
+
+    the_material = BrMaterialAllocate(NULL);
+    the_material->flags = pMaterial->flags;
+    the_material->ka = pMaterial->ka;
+    the_material->kd = pMaterial->kd;
+    the_material->ks = pMaterial->ks;
+    the_material->power = pMaterial->power;
+    the_material->colour = pMaterial->colour;
+    the_material->index_base = pMaterial->index_base;
+    the_material->index_range = pMaterial->index_range;
+    the_material->index_shade = pMaterial->index_shade;
+    the_material->index_blend = pMaterial->index_blend;
+    the_material->colour_map = pMaterial->colour_map;
+    memcpy(&the_material->map_transform, &pMaterial->map_transform, sizeof(the_material->map_transform));
+    sprintf(s, "%s(%d)", pMaterial->identifier, name_suffix);
+    name_suffix++;
+    the_material->identifier = (char*)BrResAllocate(the_material, strlen(s) + 1, BR_MEMORY_STRING);
+    strcpy(the_material->identifier, s);
+    BrMaterialAdd(the_material);
+    return the_material;
 }
 
 // IDA: void __usercall StripCR(char *s@<EAX>)
@@ -1043,7 +1067,11 @@ void SkipNLines(FILE* pF) {
     int count;
     char s[256];
     LOG_TRACE("(%p)", pF);
-    NOT_IMPLEMENTED();
+
+    count = GetAnInt(pF);
+    for (i = 0; i < count; i++) {
+        GetALineAndDontArgue(pF, s);
+    }
 }
 
 // IDA: int __usercall DRStricmp@<EAX>(char *p1@<EAX>, char *p2@<EDX>)

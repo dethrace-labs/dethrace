@@ -1,8 +1,10 @@
 #include "v1dbfile.h"
 
 #include "CORE/FW/datafile.h"
+#include "CORE/FW/diag.h"
 #include "CORE/FW/genfile.h"
 #include "CORE/FW/resource.h"
+#include "CORE/FW/scratch.h"
 #include "CORE/V1DB/actsupt.h"
 #include "CORE/V1DB/dbsetup.h"
 #include "CORE/V1DB/matsupt.h"
@@ -39,7 +41,6 @@ br_file_struct br_plane_F;
 br_file_struct_member br_bounds3_FM[2];
 br_file_struct br_bounds3_F;
 br_file_struct_member br_plane_FM[1];
-transform_type TransformTypes[7];
 br_file_struct br_transform_translation_F;
 br_file_struct_member br_transform_translation_FM[1];
 br_file_enum angle_order_F;
@@ -50,8 +51,25 @@ br_file_struct br_transform_euler_F;
 br_file_struct br_transform_quat_F;
 br_file_struct_member br_transform_quat_FM[5];
 br_file_enum_member angle_order_FM[24];
-br_file_struct br_transform_matrix34_F;
-br_file_struct_member br_transform_matrix34_FM[4];
+
+br_file_struct_member br_transform_matrix34_FM[] = {
+    { 20u, offsetof(br_transform, t.mat.m[0]), "t.mat.m[0]", NULL },
+    { 20u, offsetof(br_transform, t.mat.m[1]), "t.mat.m[1]", NULL },
+    { 20u, offsetof(br_transform, t.mat.m[2]), "t.mat.m[2]", NULL },
+    { 20u, offsetof(br_transform, t.mat.m[3]), "t.mat.m[3]", NULL }
+};
+br_file_struct br_transform_matrix34_F = { "br_transform_matrix34", 4u, br_transform_matrix34_FM, sizeof(br_transform) };
+
+transform_type TransformTypes[] = {
+    { 43u, &br_transform_matrix34_F },
+    { 44u, &br_transform_matrix34_F },
+    { 45u, &br_transform_quat_F },
+    { 46u, &br_transform_euler_F },
+    { 47u, &br_transform_look_up_F },
+    { 48u, &br_transform_translation_F },
+    { 49u, NULL }
+};
+
 br_file_enum_member render_style_FM[8];
 
 br_file_enum_member actor_type_FM[8] = {
@@ -114,8 +132,8 @@ br_file_struct br_old_face_1_F;
 
 br_file_struct_member br_face_FM[5] = {
     { 3u, offsetof(br_face, vertices), "vertices[0]", NULL },
-    { 3u, offsetof(br_face, vertices) + 2, "vertices[1]", NULL },
-    { 3u, offsetof(br_face, vertices) + 4, "vertices[2]", NULL },
+    { 3u, offsetof(br_face, vertices[1]), "vertices[1]", NULL },
+    { 3u, offsetof(br_face, vertices[2]), "vertices[2]", NULL },
     { 3u, offsetof(br_face, smoothing), "smoothing", NULL },
     { 1u, offsetof(br_face, flags), "flags", NULL }
 };
@@ -124,17 +142,20 @@ br_file_struct br_face_F = { "br_face", 5u, br_face_FM, sizeof(br_face) };
 br_file_struct_member br_old_vertex_uv_FM[5];
 br_file_struct br_old_vertex_uv_F;
 
-br_file_struct_member br_vertex_uv_FM[2];
-br_file_struct br_vertex_uv_F;
+br_file_struct_member br_vertex_uv_FM[] = {
+    { 10, offsetof(br_vertex, map.v[0]), "map.v[0]", NULL },
+    { 10u, offsetof(br_vertex, map.v[1]), "map.v[1]", NULL }
+};
+br_file_struct br_vertex_uv_F = { "br_vertex_uv", 2, br_vertex_uv_FM, sizeof(br_vertex) };
 
 br_file_struct_member br_vertex_FM[3] = {
-    { 10, offsetof(br_vertex, p) + 0, "p.v[x]", NULL },
-    { 10, offsetof(br_vertex, p) + 4, "p.v[y]", NULL },
-    { 10, offsetof(br_vertex, p) + 8, "p.v[z]", NULL }
+    { 10, offsetof(br_vertex, p.v[0]), "p.v[x]", NULL },
+    { 10, offsetof(br_vertex, p.v[1]), "p.v[y]", NULL },
+    { 10, offsetof(br_vertex, p.v[2]), "p.v[z]", NULL }
 };
 br_file_struct br_vertex_F = { "br_vertex", 3, br_vertex_FM, sizeof(br_vertex) };
 
-br_chunks_table_entry ModelLoadEntries[15] = {
+br_chunks_table_entry ModelLoadEntries[] = {
     { 0u, 0u, &FopRead_END },
     { 9u, 0u, &FopRead_OLD_MATERIAL_INDEX },
     { 10u, 0u, &FopRead_OLD_VERTICES },
@@ -189,9 +210,10 @@ struct {
     { 32u, offsetof(br_material, screendoor), 1 }
 };
 
-// Added by JeffH.
+// Added by Jeff.
 #define DF_MATERIAL 3
 #define DF_ACTOR 4
+#define DF_MATERIAL_INDEX 5
 #define DF_MODEL 8
 #define DF_TRANSFORM 16
 
@@ -207,7 +229,7 @@ int FopWrite_VERTICES(br_datafile* df, br_vertex* vertices, int nvertices) {
 int FopRead_VERTICES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_model* mp;
     int i;
-    LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
+    LOG_TRACE9("(%p, %d, %d, %d)", df, id, length, count);
 
     mp = DfTop(DF_MODEL, NULL);
     mp->vertices = BrResAllocate(mp, sizeof(br_vertex) * count, BR_MEMORY_VERTICES);
@@ -232,8 +254,14 @@ int FopWrite_VERTEX_UV(br_datafile* df, br_vertex* vertices, int nvertices) {
 // IDA: int __usercall FopRead_VERTEX_UV@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
 int FopRead_VERTEX_UV(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_model* mp;
-    LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
-    NOT_IMPLEMENTED();
+    LOG_TRACE9("(%p, %d, %d, %d)", df, id, length, count);
+
+    mp = DfTop(DF_MODEL, NULL);
+    if (count > mp->nvertices) {
+        BrFailure("Vertex UV: too many entries");
+    }
+    DfStructReadArray(df, &br_vertex_uv_F, mp->vertices, count);
+    return 0;
 }
 
 // IDA: int __usercall FopRead_OLD_VERTICES_UV@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
@@ -248,8 +276,16 @@ int FopRead_MATERIAL_INDEX(br_datafile* df, br_uint_32 id, br_uint_32 length, br
     char name[256];
     br_material** mip;
     br_uint_32 i;
-    LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
-    NOT_IMPLEMENTED();
+    LOG_TRACE9("(%p, %d, %d, %d)", df, id, length, count);
+
+    mip = (br_material**)BrResAllocate(v1db.res, sizeof(intptr_t) * (count + 1), BR_MEMORY_MATERIAL_INDEX);
+    mip[0] = NULL;
+    for (i = 1; i < count + 1; i++) {
+        df->prims->name_read(df, name);
+        mip[i] = BrMaterialFind(name);
+    }
+    DfPush(DF_MATERIAL_INDEX, mip, count + 1);
+    return 0;
 }
 
 // IDA: int __usercall FopWrite_MATERIAL_INDEX@<EAX>(br_datafile *df@<EAX>, br_material **materials@<EDX>, int nmaterials@<EBX>)
@@ -275,7 +311,7 @@ int FopRead_OLD_MATERIAL_INDEX(br_datafile* df, br_uint_32 id, br_uint_32 length
 int FopRead_FACES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_model* mp;
     int i;
-    LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
+    LOG_TRACE9("(%p, %d, %d, %d)", df, id, length, count);
     mp = DfTop(DF_MODEL, 0);
     mp->faces = (br_face*)BrResAllocate(mp, sizeof(br_face) * count, BR_MEMORY_FACES);
     mp->nfaces = count;
@@ -335,8 +371,29 @@ int FopRead_FACE_MATERIAL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_
     br_uint_16* ip;
     int block_count;
     int i;
-    LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
-    NOT_IMPLEMENTED();
+    LOG_TRACE9("(%p, %d, %d, %d)", df, id, length, count);
+
+    mindex = DfPop(DF_MATERIAL_INDEX, &nmaterials);
+    mp = DfTop(DF_MODEL, 0);
+
+    block = BrScratchAllocate(length);
+    block_count = mp->nfaces;
+    block = df->prims->block_read(df, block, &block_count, sizeof(br_uint_16), 0);
+
+    if (block_count > mp->nfaces)
+        BrFailure("Face Materials: too many entries");
+
+    fp = mp->faces;
+    ip = block;
+    for (i = 0; i < block_count; i++) {
+        fp->material = (*ip < nmaterials) ? mindex[*ip] : NULL;
+        fp++;
+        ip++;
+    }
+
+    BrScratchFree(block);
+    BrResFree(mindex);
+    return 0;
 }
 
 // IDA: int __usercall FopRead_MODEL@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
@@ -503,7 +560,7 @@ int FopWrite_ACTOR_TRANSFORM(br_datafile* df) {
 int FopRead_ACTOR_TRANSFORM(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_actor* a;
     br_transform* tp;
-    LOG_TRACE9("(%p, %d, %d, %d)", df, id, length, count);
+    LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
 
     tp = DfPop(DF_TRANSFORM, NULL);
     a = DfTop(DF_ACTOR, NULL);
@@ -579,7 +636,12 @@ int FopRead_ACTOR_ADD_CHILD(br_datafile* df, br_uint_32 id, br_uint_32 length, b
     br_actor* a;
     br_actor* p;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
-    NOT_IMPLEMENTED();
+
+    a = DfPop(DF_ACTOR, 0);
+    p = DfTop(DF_ACTOR, 0);
+    BrActorAdd(p, a);
+
+    return 0;
 }
 
 // IDA: int __usercall FopWrite_TRANSFORM@<EAX>(br_datafile *df@<EAX>, br_transform *t@<EDX>)
@@ -595,17 +657,25 @@ int FopRead_TRANSFORM(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint
     br_transform* tp;
     LOG_TRACE9("(%p, %d, %d, %d)", df, id, length, count);
 
-    for (t = 0; t < 7; t++) {
+    for (t = 0; t < COUNT_OF(TransformTypes); t++) {
         if (id == TransformTypes[t].id) {
             break;
         }
+    }
+    if (t == 7) {
+        LOG_PANIC("transform type not found!")
     }
     tp = (br_transform*)BrResAllocate(v1db.res, sizeof(br_transform), BR_MEMORY_TRANSFORM);
     tp->type = t;
     df->res = tp;
     if (TransformTypes[t].fs) {
+        LOG_DEBUG("reading struct for transform type %d", id);
         df->prims->struct_read(df, TransformTypes[t].fs, tp);
     }
+    LOG_DEBUG("%f %f %f", tp->t.mat.m[0][0], tp->t.mat.m[0][1], tp->t.mat.m[0][2]);
+    LOG_DEBUG("%f %f %f", tp->t.mat.m[1][0], tp->t.mat.m[1][1], tp->t.mat.m[1][2]);
+    LOG_DEBUG("%f %f %f", tp->t.mat.m[2][0], tp->t.mat.m[2][1], tp->t.mat.m[2][2]);
+    LOG_DEBUG("%f %f %f", tp->t.mat.m[3][0], tp->t.mat.m[3][1], tp->t.mat.m[3][2]);
     df->res = NULL;
     DfPush(DF_TRANSFORM, tp, 1);
     return 0;
@@ -735,6 +805,7 @@ br_uint_32 BrActorLoadMany(char* filename, br_actor** actors, br_uint_16 num) {
         }
         r = DfChunksInterpret(df, &ActorLoadTable);
         if (DfTopType() == DF_ACTOR) {
+            LOG_DEBUG("adding actor");
             actors[count] = DfPop(DF_ACTOR, NULL);
             count++;
         }
@@ -831,10 +902,13 @@ br_uint_32 BrMaterialSave(char* filename, br_material* ptr) {
 
 // IDA: br_actor* __cdecl BrActorLoad(char *filename)
 br_actor* BrActorLoad(char* filename) {
+    LOG_TRACE("(\"%s\")", filename);
+
     br_actor* ptr;
     if (BrActorLoadMany(filename, &ptr, 1u) == 1) {
         return ptr;
     }
+    LOG_DEBUG("loadmany fail");
     return NULL;
 }
 

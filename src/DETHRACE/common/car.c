@@ -169,7 +169,15 @@ void ChangeYCoordinate(br_scalar pNew_y, tU32 pTime_taken, br_model* pThe_model,
 void SwitchCarActor(tCar_spec* pCar_spec, int pModel_index) {
     int i;
     LOG_TRACE("(%p, %d)", pCar_spec, pModel_index);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < pCar_spec->car_actor_count; i++) {
+        if (i == pModel_index) {
+            pCar_spec->car_model_actors[i].actor->render_style = BR_RSTYLE_FACES;
+        } else {
+            pCar_spec->car_model_actors[i].actor->render_style = BR_RSTYLE_NONE;
+        }
+    }
+    pCar_spec->current_car_actor = pModel_index;
 }
 
 // IDA: void __usercall InitialiseCar2(tCar_spec *pCar@<EAX>, int pClear_disabled_flag@<EDX>)
@@ -1763,7 +1771,48 @@ void SetCarSuspGiveAndHeight(tCar_spec* pCar, br_scalar pFront_give_factor, br_s
     br_scalar ratio;
     int i;
     LOG_TRACE("(%p, %f, %f, %f, %f, %f)", pCar, pFront_give_factor, pRear_give_factor, pDamping_factor, pExtra_front_height, pExtra_rear_height);
-    NOT_IMPLEMENTED();
+
+    front_give = pCar->susp_give[1] * pFront_give_factor * 6.9000001;
+    rear_give = pCar->susp_give[0] * pRear_give_factor * 6.9000001;
+    damping = pCar->damping * pDamping_factor;
+    ratio = fabs((pCar->wpos[0].v[2] - pCar->cmpos.v[2]) / (pCar->wpos[2].v[2] - pCar->cmpos.v[2]));
+    //v8 = ratio;
+    pCar->sk[0] = pCar->M / (ratio + 1.0) * 5.0 / rear_give;
+    LOG_DEBUG("pCar sk[0]=%f", pCar->sk[0]);
+    //v9 = pCar->M / (ratio + 1.0);
+    //sqrt();
+    //sqrt();
+    pCar->sb[0] = pCar->M / (ratio + 1.0) * sqrt(5.0) / sqrt(rear_give);
+    //4.2562828
+    LOG_DEBUG("pCar M=%f, rear_give=%f, ratio=%f, sb[0]=%f", pCar->M, rear_give, ratio, pCar->sb[0]);
+    ratio = 1.0 / ratio;
+    //v11 = v10;
+    pCar->sk[1] = pCar->M / (ratio + 1.0) * 5.0 / front_give;
+    LOG_DEBUG("pCar M=%f, rear_give=%f, ratio=%f, sk[1]=%f", pCar->M, rear_give, ratio, pCar->sk[1]);
+    // v12 = pCar->M / (ratio + 1.0);
+    // sqrt();
+    // sqrt();
+    pCar->sb[1] = pCar->M / (ratio + 1.0) * sqrt(5.0) / sqrt(front_give);
+    LOG_DEBUG("pCar M=%f, rear_give=%f, ratio=%f, sb[1]=%f", pCar->M, rear_give, ratio, pCar->sb[1]);
+    pCar->sb[0] = pCar->sb[0] * damping;
+    pCar->sb[1] = pCar->sb[1] * damping;
+    LOG_DEBUG("pCar M=%f, rear_give=%f, ratio=%f, sb[1]=%f", pCar->M, rear_give, ratio, pCar->sb[1]);
+    pCar->susp_height[0] = pCar->ride_height + rear_give + pExtra_rear_height;
+    LOG_DEBUG("susp_height ride=%f %f", pCar->ride_height, pCar->susp_height[0]);
+    pCar->susp_height[1] = pCar->ride_height + front_give + pExtra_front_height;
+
+    if (rear_give >= front_give) {
+        i = -rear_give;
+    } else {
+        i = -front_give;
+    }
+    if (pExtra_rear_height >= pExtra_front_height) {
+        i -= pExtra_rear_height;
+    } else {
+        i -= pExtra_front_height;
+    }
+    pCar->bounds[0].min.v[1] = i;
+    pCar->bounds[0].min.v[1] = pCar->bounds[0].min.v[1] / 6.9000001;
 }
 
 // IDA: int __usercall TestForCarInSensiblePlace@<EAX>(tCar_spec *car@<EAX>)

@@ -45,6 +45,9 @@ STATE_MODULE = 1
 STATE_LOCALS = 2
 STATE_TYPES = 3
 
+LOCALVAR_SCOPE_FUNCTION = 0
+LOCALVAR_SCOPE_BLOCK = 1
+
 INDENT_SPACES = 4
 
 modules = []
@@ -57,6 +60,8 @@ last_read_offset = 0
 eof = 0
 generated_type_names = {}
 indent = 0
+
+localvar_scope = LOCALVAR_SCOPE_FUNCTION
 
 dr_types_file = {}
 br_types_file = {}
@@ -84,6 +89,8 @@ def unread_line():
 def read_file():
   state = STATE_NONE
   current_module = None
+  # list of blocks each containing a list of vars scoped to that block. Always local to a function.
+  block_scopes = []
 
   while eof == 0:
     line = read_line()
@@ -130,17 +137,20 @@ def read_file():
 
         elif local_type == 'NEAR_RTN_386' or local_type == 'FAR_RTN_386':
           fn = process_function(current_module)
+          fn['block_scopes'] = block_scopes.copy()
           last_fn = fn
           current_module['functions'].append(fn)
+          localvar_scope = LOCALVAR_SCOPE_FUNCTION
+          block_scopes = []
 
         elif local_type == 'LOCAL':
-          if last_fn is not None:
+          if localvar_scope == LOCALVAR_SCOPE_FUNCTION:
             local_var = process_function_var()
             last_fn['local_vars'].append(local_var)
-          else:
-            # TODO: ignore block_386 scoped local variables for now
-            # Maybe indicates asm { ... } usage?
-            local_var = process_function_var()
+          elif localvar_scope == LOCALVAR_SCOPE_BLOCK:
+            block_var = process_function_var()
+            block_scopes[-1].append(block_var)
+            #print('block_scope', block_var)
 
         elif local_type == 'SET_BASE_386':
           last_local_type = local_type
@@ -149,7 +159,8 @@ def read_file():
 
         elif local_type == 'BLOCK_386':
           read_line()
-          last_fn = None
+          localvar_scope = LOCALVAR_SCOPE_BLOCK
+          block_scopes.append([])
 
         else:
           print('Line ', line_number, 'Unknown local type', local_type)
@@ -337,13 +348,9 @@ def resolve_type_str(module, type_idx, var_name, decl=True):
     t = module['types'][t['base_type']]
 
   if t['type'] == 'NEAR386 PROC' or t['type'] == 'FAR386 PROC':
-    print (var_name, 'IS PROC')
     return_type = resolve_type_str(module, t['return_type'], '')
-    #print 'rt', return_type
     a = describe_args(module, t, False)
     print(var_name, 'a', a)
-    # print 'i', indirections
-    # print 'b', bounds
     s = return_type + ' (' + indirections + var_name + bounds + ')(' + a + ')'
     return s
   if decl == True and t['type'] == 'FIELD_LIST':
@@ -497,12 +504,10 @@ def get_struct_name(module, t):
   for i in module['types']:
     t2 = module['types'][i]
     if 'type_idx' in t2 and t2['type_idx'] == target_id:
-      print ('t2', t2)
       if t2['scope_idx'] == '0':
         return t2['value']
       found_id = t2['id']
       found_name = t2['value']
-      print ('found1', t2['value'])
   if found_id is None:
     print ('ERROR1: not found', t)
     return None
@@ -640,8 +645,8 @@ def generate_c_file(module):
   # global variables
   for gv in module['global_vars']:
     # print('gv:', gv)
-    str = resolve_type_str(module, gv['type'], gv['name'])
-    c_file.write(str)
+    s = resolve_type_str(module, gv['type'], gv['name'])
+    c_file.write(s)
     c_file.write(';\n')
   c_file.write('\n')
 
@@ -661,6 +666,17 @@ def generate_c_file(module):
         c_file.write('static ')
       c_file.write(resolve_type_str(module, v['type'], v['name']))
       c_file.write(';\n')
+
+    b_num = 0
+    for b in fn['block_scopes']:
+      for v in b:
+        c_file.write(' ' * INDENT_SPACES)
+        if 'CONST' in v['addr_type']:
+          c_file.write('static ')
+        name = '__block' + str(b_num) + '__' + v['name']
+        c_file.write(resolve_type_str(module, v['type'], name))
+        c_file.write(';\n')
+      b_num = b_num + 1
 
     
     c_file.write(' ' * INDENT_SPACES)
@@ -699,6 +715,7 @@ def generate_c_file(module):
       do_comma = True
       
     c_file.write(');\n')
+    c_file.write(' ' * INDENT_SPACES)
     c_file.write('NOT_IMPLEMENTED();\n')
     c_file.write('}\n\n')
 

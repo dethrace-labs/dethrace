@@ -3,6 +3,6 @@
 
 #include "harness.h"
 
-extern renderer NullRenderer;
+extern tRenderer NullRenderer;
 
 #endif

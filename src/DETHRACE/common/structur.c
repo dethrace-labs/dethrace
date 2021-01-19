@@ -243,7 +243,7 @@ void DoProgram() {
             continue;
         case eProg_game_ongoing:
         case eProg_quit:
-            // JeffH added to avoid compiler warnings about missing case handling
+            // Jeff added to avoid compiler warnings about missing case handling
             LOG_PANIC("We do not expect to get here");
         }
     }
