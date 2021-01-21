@@ -282,7 +282,9 @@ int FopRead_MATERIAL_INDEX(br_datafile* df, br_uint_32 id, br_uint_32 length, br
     mip[0] = NULL;
     for (i = 1; i < count + 1; i++) {
         df->prims->name_read(df, name);
+
         mip[i] = BrMaterialFind(name);
+        LOG_DEBUG("loading material %s %p", name, mip[i]);
     }
     DfPush(DF_MATERIAL_INDEX, mip, count + 1);
     return 0;
@@ -320,6 +322,7 @@ int FopRead_FACES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 
         if (!mp->faces[i].smoothing) {
             mp->faces[i].smoothing = -1;
         }
+        mp->faces[i].index = i;
     }
 
     return 0;

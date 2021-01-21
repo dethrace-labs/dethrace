@@ -3,6 +3,7 @@
 #include "CORE/PIXELMAP/pmfile.h"
 #include "CORE/V1DB/actsupt.h"
 #include "CORE/V1DB/modsupt.h"
+#include "CORE/V1DB/prepmesh.h"
 #include "CORE/V1DB/regsupt.h"
 #include "CORE/V1DB/v1dbfile.h"
 
@@ -60,8 +61,33 @@ void test_v1dbfile_BrMaterialLoad() {
     TEST_ASSERT_EQUAL_PTR(pm, m->colour_map);
 }
 
+void test_v1dbfile_BrModelPrepMesh() {
+    REQUIRES_DATA_DIRECTORY();
+
+    br_model* m;
+    m = BrModelLoad("DATA/MODELS/NEWEAGLE.DAT");
+    TEST_ASSERT_NOT_NULL(m);
+    TEST_ASSERT_NOT_NULL(m->vertices);
+    // TEST_ASSERT_EQUAL_INT(54, m->nvertices);
+    // TEST_ASSERT_EQUAL_INT(44, m->nfaces);
+    TEST_ASSERT_NOT_NULL(m->faces);
+    // TEST_ASSERT_EQUAL_INT(26, m->faces[0].vertices[0]);
+    // TEST_ASSERT_EQUAL_INT(53, m->faces[0].vertices[1]);
+    // TEST_ASSERT_EQUAL_INT(43, m->faces[0].vertices[2]);
+    for (int i = 0; i < m->nfaces; i++) {
+        if (m->faces[i].material != NULL) {
+            printf("id %s\n", m->faces[i].material->identifier);
+        }
+    }
+
+    //BrModelUpdate(m, BR_MODU_ALL);
+
+    TEST_ASSERT_NOT_NULL(m->prepared);
+}
+
 void test_v1dbfile_suite() {
     RUN_TEST(test_v1dbfile_BrModelLoad);
     RUN_TEST(test_v1dbfile_BrActorLoad);
     RUN_TEST(test_v1dbfile_BrMaterialLoad);
+    RUN_TEST(test_v1dbfile_BrModelPrepMesh);
 }

@@ -3001,6 +3001,11 @@ enum {
     BR_MODF_CUSTOM = 0x0020, /* Invoke custom callback for this model */
     BR_MODF_PREPREPARED = 0x0040, /* Model structure is pre-prepared - update performs no work */
 
+    BR_MODF_CREASE = 0x0100, /* Create creases in smoothing along edges if face<->face angle is g.t model->crease */
+    BR_MODF_CUSTOM_NORMALS = 0x0200, /* Uses vertex normals from br_vertex structure */
+    BR_MODF_CUSTOM_BOUNDS = 0x0400, /* Bounding box is already set up				*/
+    //BR_MODF_FACES_ONLY = 0x0800, /* Model will only be used to render faces (not edges or points) */
+
     BR_MODF_UPDATEABLE = 0x0080 /* Added by Jeff from Errols code */
 };
 
@@ -3011,5 +3016,11 @@ enum {
 #define BR_ANGLE_RAD(rad) ((br_angle)((rad)*10430))
 
 #define BR_SCALAR(x) ((br_scalar)(x))
+
+#define BR_COLOUR_RGBA(r, g, b, a) \
+    ((((unsigned int)(a)) << 24) | (((unsigned int)(r)) << 16) | (((unsigned int)(g)) << 8) | ((unsigned int)(b)))
+
+#define BR_LENGTH3(a, b, c) ((br_scalar)sqrt((a) * (a) + (b) * (b) + (c) * (c)))
+#define BR_SCALAR_EPSILON 1.192092896e-7f
 
 #endif /* BR_TYPES_H */

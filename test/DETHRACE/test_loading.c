@@ -149,7 +149,47 @@ void test_loading_LoadCar() {
     LoadCar("NEWEAGLE.TXT", eDriver_local_human, &car_spec, eFrankie, "playerName", &storage);
     TEST_ASSERT_TRUE(car_spec.active);
     TEST_ASSERT_FALSE(car_spec.disabled);
-    TEST_ASSERT_EQUAL_FLOAT(0.06f, car_spec.ride_height);
+    //TEST_ASSERT_EQUAL_FLOAT(0.06f, car_spec.ride_height);
+
+    br_model* model = car_spec.car_model_actors[car_spec.principal_car_actor].actor->model;
+    TEST_ASSERT_EQUAL_STRING("NEWEAGLE.DAT", model->identifier);
+
+    // Test prepared mesh creation
+    TEST_ASSERT_EQUAL_INT(17, V11MODEL(model)->ngroups);
+    int found_test_prep_group = 0;
+    for (int i = 0; i < V11MODEL(model)->ngroups; i++) {
+        if (V11MODEL(model)->groups[i].nfaces == 47) {
+            found_test_prep_group = 1;
+            TEST_ASSERT_EQUAL_INT(99, V11MODEL(model)->groups[i].nvertices);
+            TEST_ASSERT_EQUAL_FLOAT(-0.0844900012, V11MODEL(model)->groups[i].vertices[0].p.v[0]);
+            TEST_ASSERT_EQUAL_FLOAT(0.0440330058, V11MODEL(model)->groups[i].vertices[0].p.v[1]);
+            TEST_ASSERT_EQUAL_FLOAT(0.1230980009, V11MODEL(model)->groups[i].vertices[0].p.v[2]);
+
+            TEST_ASSERT_EQUAL_FLOAT(1.0, V11MODEL(model)->groups[i].vertices[0].map.v[0]);
+            TEST_ASSERT_EQUAL_FLOAT(0.664765000, V11MODEL(model)->groups[i].vertices[0].map.v[1]);
+
+            TEST_ASSERT_EQUAL_FLOAT(-0.0071384655, V11MODEL(model)->groups[i].vertices[0].n.v[0]);
+            TEST_ASSERT_EQUAL_FLOAT(0.9597771764, V11MODEL(model)->groups[i].vertices[0].n.v[1]);
+            TEST_ASSERT_EQUAL_FLOAT(-0.2806721628, V11MODEL(model)->groups[i].vertices[0].n.v[2]);
+            break;
+        }
+    }
+    if (!found_test_prep_group) {
+        TEST_FAIL_MESSAGE("expected prep group not found");
+    }
+
+    // for (int i = 0; i < V11MODEL(model)->ngroups; i++) {
+    //     printf("group %d, nfaces=%d, verts=%d\n", i, V11MODEL(model)->groups[i].nfaces, V11MODEL(model)->groups[i].nvertices);
+    //     for (int j = 0; j < V11MODEL(model)->groups[i].nvertices; j++) {
+    //         printf("(%.10f %.10f %.10f), (%.9f %.9f), (%.10f %.10f %.10f)\n",
+    //             V11MODEL(model)->groups[i].vertices[j].p.v[j], V11MODEL(model)->groups[i].vertices[j].p.v[1], V11MODEL(model)->groups[i].vertices[j].p.v[2],
+    //             V11MODEL(model)->groups[i].vertices[j].map.v[j], V11MODEL(model)->groups[i].vertices[j].map.v[1],
+    //             V11MODEL(model)->groups[i].vertices[j].n.v[j], V11MODEL(model)->groups[i].vertices[j].n.v[1], V11MODEL(model)->groups[i].vertices[j].n.v[2]);
+    //     }
+    // }
+    // for (int j = 0; j < V11MODEL(model)->groups[i].nfaces; j++) {
+    //     printf("(%d %d %d)\n", V11MODEL(model)->groups[i].faces[j].vertices[0], V11MODEL(model)->groups[i].faces[j].vertices[1], V11MODEL(model)->groups[i].faces[j].vertices[2]);
+    // }
 }
 
 void test_loading_suite() {
