@@ -377,7 +377,7 @@ void InitGame(int pStart_race) {
     gNo_races_yet = 1;
     NetPlayerStatusChanged(ePlayer_status_loading);
     gProgram_state.current_race_index = pStart_race;
-    for (i = 0; i < 3; ++i) {
+    for (i = 0; i < COUNT_OF(gProgram_state.current_car.power_up_levels); i++) {
         gProgram_state.current_car.power_up_levels[i] = 0;
     }
     for (i = 0; gNumber_of_races > i; ++i) {
