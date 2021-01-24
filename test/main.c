@@ -85,8 +85,8 @@ void setup_global_vars() {
 
     strcpy(gBasic_car_names[0], "BLKEAGLE.TXT");
 
-    //_unittest_do_not_exit = 1;
-    harness_debug_level = 7;
+    _unittest_do_not_exit = 1;
+    harness_debug_level = 9;
 }
 
 int has_data_directory() {

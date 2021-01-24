@@ -55,16 +55,11 @@ int FacesCompare(void* p1, void* p2) {
     f2 = *(br_face**)p2;
 
     if (f1->material > f2->material) {
-        LOG_DEBUG("face %d, %d => 1", f1->index, f2->index);
         return 1;
     }
     if (f1->material < f2->material) {
-        LOG_DEBUG("face %d, %d => -1", f1->index, f2->index);
         return -1;
     }
-
-    LOG_DEBUG("face %d, %d => 0", f1->index, f2->index);
-
     return 0;
 }
 
@@ -106,7 +101,44 @@ int TVCompare_MXYZUVN(void* p1, void* p2) {
     br_vertex* v2;
     int i;
     LOG_TRACE("(%p, %p)", p1, p2);
-    NOT_IMPLEMENTED();
+
+    tv1 = *(struct prep_vertex**)p1;
+    tv2 = *(struct prep_vertex**)p2;
+
+    assert(compareModel != NULL);
+
+    if (compareModel->faces[tv1->f].material > compareModel->faces[tv2->f].material)
+        return 1;
+    if (compareModel->faces[tv1->f].material < compareModel->faces[tv2->f].material)
+        return -1;
+
+    if (tv1->v != tv2->v) {
+        v1 = compareModel->vertices + tv1->v;
+        v2 = compareModel->vertices + tv2->v;
+
+        for (i = 0; i < 3; i++) {
+            if (v1->p.v[i] > v2->p.v[i])
+                return 1;
+            if (v1->p.v[i] < v2->p.v[i])
+                return -1;
+        }
+
+        for (i = 0; i < 2; i++) {
+            if (v1->map.v[i] > v2->map.v[i])
+                return 1;
+            if (v1->map.v[i] < v2->map.v[i])
+                return -1;
+        }
+    }
+
+    for (i = 0; i < 3; i++) {
+        if (tv1->n.v[i] > tv2->n.v[i])
+            return 1;
+        if (tv1->n.v[i] < tv2->n.v[i])
+            return -1;
+    }
+
+    return 0;
 }
 
 // IDA: int __cdecl TVCompare_MVN(void *p1, void *p2)
@@ -176,7 +208,7 @@ void PrepareFaceNormals(br_model* model) {
 void Smoothing(br_model* model, br_scalar crease_limit, prep_vertex** start, prep_vertex** end) {
     prep_vertex** outer;
     prep_vertex** inner;
-    LOG_TRACE("(%p, %f, %p, %p)", model, crease_limit, start, end);
+    LOG_TRACE9("(%p, %f, %p, %p)", model, crease_limit, start, end);
 
     for (outer = start; outer < end; outer++) {
         for (inner = start; inner < end; inner++) {
@@ -660,7 +692,6 @@ void BrModelUpdate(br_model* model, br_uint_16 flags) {
             model->faces = 0;
         }
     }
-    LOG_DEBUG("done with update");
 }
 
 // IDA: void __usercall BrModelClear(br_model *model@<EAX>)

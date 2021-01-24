@@ -149,10 +149,33 @@ void test_loading_LoadCar() {
     LoadCar("NEWEAGLE.TXT", eDriver_local_human, &car_spec, eFrankie, "playerName", &storage);
     TEST_ASSERT_TRUE(car_spec.active);
     TEST_ASSERT_FALSE(car_spec.disabled);
-    //TEST_ASSERT_EQUAL_FLOAT(0.06f, car_spec.ride_height);
 
     br_model* model = car_spec.car_model_actors[car_spec.principal_car_actor].actor->model;
     TEST_ASSERT_EQUAL_STRING("NEWEAGLE.DAT", model->identifier);
+
+    TEST_ASSERT_EQUAL_FLOAT(1.0, car_spec.M);
+
+    float e_cmpos[] = { 0, 0.345, 0 };
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(e_cmpos, car_spec.cmpos.v, 3);
+    int e_stref[] = { 7, 8, 0, 0, 0, 0 };
+    //TEST_ASSERT_EQUAL_INT_ARRAY(e_stref, car_spec.steering_ref, 6);
+
+    TEST_ASSERT_EQUAL_INT(-1, car_spec.driven_wheels_spin_ref_1);
+    TEST_ASSERT_EQUAL_INT(-1, car_spec.driven_wheels_spin_ref_2);
+    TEST_ASSERT_EQUAL_INT(2, car_spec.driven_wheels_spin_ref_3);
+    TEST_ASSERT_EQUAL_INT(1, car_spec.driven_wheels_spin_ref_4);
+
+    TEST_ASSERT_EQUAL_FLOAT(36.231884, car_spec.sk[0]);
+    TEST_ASSERT_EQUAL_FLOAT(36.231884, car_spec.sk[1]);
+    TEST_ASSERT_EQUAL_FLOAT(4.2562828, car_spec.sb[0]);
+    TEST_ASSERT_EQUAL_FLOAT(4.2562828, car_spec.sb[1]);
+    TEST_ASSERT_EQUAL_FLOAT(0.41400003, car_spec.ride_height);
+
+    TEST_ASSERT_EQUAL_FLOAT(2.1244245, car_spec.mu[0]);
+    TEST_ASSERT_EQUAL_FLOAT(2.2325289, car_spec.mu[1]);
+    TEST_ASSERT_EQUAL_FLOAT(2.3518364, car_spec.mu[2]);
+
+    TEST_ASSERT_NOT_NULL(car_spec.car_model_actors[0].actor->model);
 
     // Test prepared mesh creation
     TEST_ASSERT_EQUAL_INT(17, V11MODEL(model)->ngroups);

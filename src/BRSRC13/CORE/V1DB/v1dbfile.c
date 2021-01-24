@@ -282,9 +282,7 @@ int FopRead_MATERIAL_INDEX(br_datafile* df, br_uint_32 id, br_uint_32 length, br
     mip[0] = NULL;
     for (i = 1; i < count + 1; i++) {
         df->prims->name_read(df, name);
-
         mip[i] = BrMaterialFind(name);
-        LOG_DEBUG("loading material %s %p", name, mip[i]);
     }
     DfPush(DF_MATERIAL_INDEX, mip, count + 1);
     return 0;
@@ -551,6 +549,7 @@ int FopRead_ACTOR_MATERIAL(br_datafile* df, br_uint_32 id, br_uint_32 length, br
     a = DfTop(DF_ACTOR, NULL);
     df->prims->name_read(df, name);
     a->material = BrMaterialFind(name);
+    return 0;
 }
 
 // IDA: int __usercall FopWrite_ACTOR_TRANSFORM@<EAX>(br_datafile *df@<EAX>)
@@ -563,7 +562,7 @@ int FopWrite_ACTOR_TRANSFORM(br_datafile* df) {
 int FopRead_ACTOR_TRANSFORM(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_actor* a;
     br_transform* tp;
-    LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
+    LOG_TRACE9("(%p, %d, %d, %d)", df, id, length, count);
 
     tp = DfPop(DF_TRANSFORM, NULL);
     a = DfTop(DF_ACTOR, NULL);
@@ -672,13 +671,8 @@ int FopRead_TRANSFORM(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint
     tp->type = t;
     df->res = tp;
     if (TransformTypes[t].fs) {
-        LOG_DEBUG("reading struct for transform type %d", id);
         df->prims->struct_read(df, TransformTypes[t].fs, tp);
     }
-    LOG_DEBUG("%f %f %f", tp->t.mat.m[0][0], tp->t.mat.m[0][1], tp->t.mat.m[0][2]);
-    LOG_DEBUG("%f %f %f", tp->t.mat.m[1][0], tp->t.mat.m[1][1], tp->t.mat.m[1][2]);
-    LOG_DEBUG("%f %f %f", tp->t.mat.m[2][0], tp->t.mat.m[2][1], tp->t.mat.m[2][2]);
-    LOG_DEBUG("%f %f %f", tp->t.mat.m[3][0], tp->t.mat.m[3][1], tp->t.mat.m[3][2]);
     df->res = NULL;
     DfPush(DF_TRANSFORM, tp, 1);
     return 0;

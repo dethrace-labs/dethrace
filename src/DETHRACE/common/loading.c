@@ -14,6 +14,7 @@
 #include "errors.h"
 #include "globvars.h"
 #include "globvrkm.h"
+#include "globvrpb.h"
 #include "grafdata.h"
 #include "graphics.h"
 #include "init.h"
@@ -58,7 +59,39 @@ char* gDamage_names[] = {
 char* gDrivable_car_names[6];
 char* gYour_car_names[2][6];
 char gDef_def_water_screen_name[32];
-tHeadup_info gHeadup_image_info[31];
+tHeadup_info gHeadup_image_info[31] = {
+    { "LADY.PIX", eNet_or_otherwise },
+    { "GENT.PIX", eNet_or_otherwise },
+    { "CODGER.PIX", eNet_or_otherwise },
+    { "SPROG.PIX", eNet_or_otherwise },
+    { "GO.PIX", eNet_or_otherwise },
+    { "NUMBER1.PIX", eNet_or_otherwise },
+    { "NUMBER2.PIX", eNet_or_otherwise },
+    { "NUMBER3.PIX", eNet_or_otherwise },
+    { "NUMBER4.PIX", eNet_or_otherwise },
+    { "NUMBER5.PIX", eNet_or_otherwise },
+    { "SPLATTER.PIX", eNet_or_otherwise },
+    { "PILEDRIV.PIX", eNet_or_otherwise },
+    { "EXTRASTY.PIX", eNet_or_otherwise },
+    { "ARTISTIC.PIX", eNet_or_otherwise },
+    { "2XCOMBO.PIX", eNet_or_otherwise },
+    { "3XCOMBO.PIX", eNet_or_otherwise },
+    { "4XCOMBO.PIX", eNet_or_otherwise },
+    { "5XCOMBO.PIX", eNet_or_otherwise },
+    { "BILLIARD.PIX", eNet_or_otherwise },
+    { "POLITE.PIX", eNet_or_otherwise },
+    { "HEADON.PIX", eNet_or_otherwise },
+    { "DESTROY.PIX", eNet_or_otherwise },
+    { "CHECKPNT.PIX", eNet_or_otherwise },
+    { "TIMEUP.PIX", eNot_net },
+    { "RACEOVER.PIX", eNet_or_otherwise },
+    { "UWASTED.PIX", eNet_only },
+    { "MAD.PIX", eNet_only },
+    { "GAMEOVER.PIX", eNet_only },
+    { "UBROKE.PIX", eNet_only },
+    { "ULOST.PIX", eNet_only },
+    { "UWON.PIX", eNet_only }
+};
 int gAllow_open_to_fail = 1;
 br_material* gDestn_screen_mat;
 br_material* gSource_screen_mat;
@@ -1253,12 +1286,12 @@ intptr_t LinkModel(br_actor* pActor, tModel_pool* pModel_pool) {
         for (i = 0; i < pModel_pool->model_count; i++) {
             if (pModel_pool->model_array[i]->identifier
                 && !strcmp(pModel_pool->model_array[i]->identifier, pActor->model->identifier)) {
-                LOG_DEBUG("linking model %s", pModel_pool->model_array[i]->identifier);
                 pActor->model = pModel_pool->model_array[i];
                 return 0;
             }
         }
     }
+    //LOG_WARN("failed to link model %s", pActor->model->identifier);
     return 0;
 }
 
@@ -1806,6 +1839,8 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
         if (!pCar_spec->car_model_actors[i].actor) {
             FatalError(71);
         }
+        LOG_DEBUG("actor %s", pCar_spec->car_model_actors[i].actor->identifier);
+        LOG_DEBUG("actor %s, model %s", pCar_spec->car_model_actors[i].actor->identifier, pCar_spec->car_model_actors[i].actor->model->identifier);
         LinkModelsToActor(
             pCar_spec->car_model_actors[i].actor,
             &pStorage_space->models[old_model_count],
@@ -1937,7 +1972,6 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
     PossibleService();
     for (i = 0; i < COUNT_OF(gWheel_actor_names); ++i) {
         pCar_spec->wheel_actors[i] = DRActorFindRecurse(pCar_spec->car_master_actor, gWheel_actor_names[i]);
-        LOG_DEBUG("wheel actor %p", pCar_spec->wheel_actors[i]);
     }
     PossibleService();
     ReadMechanicsData(f, pCar_spec);
@@ -1979,7 +2013,15 @@ void LoadHeadupImages() {
     int i;
     tPath_name the_path;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < 31; ++i) {
+        PossibleService();
+        if (gHeadup_image_info[i].avail && (gHeadup_image_info[i].avail != eNot_net || gNet_mode) && (gHeadup_image_info[i].avail != eNet_only || !gNet_mode)) {
+            gHeadup_images[i] = NULL;
+        } else {
+            gHeadup_images[i] = LoadPixelmap(gHeadup_image_info[i].name);
+        }
+    }
 }
 
 // IDA: void __cdecl DisposeHeadupImages()

@@ -360,7 +360,41 @@ void InitialiseDeathRace(int pArgc, char** pArgv) {
 void InitGame(int pStart_race) {
     int i;
     LOG_TRACE("(%d)", pStart_race);
-    NOT_IMPLEMENTED();
+
+    gWaiting_for_unpause = 1;
+    gWait_for_it = 1;
+    if (gNet_mode) {
+        gCredit_period = gCredit_period_network[gCurrent_net_game->type];
+    } else {
+        gCredit_period = gCredit_period_single[gProgram_state.skill_level];
+    }
+    SwitchToRealResolution();
+    gGame_to_load = -1;
+    gCurrent_race.number_of_racers = 0;
+    LoadHeadupImages();
+    gGame_initialized = 1;
+    gNet_mode_of_last_game = gNet_mode;
+    gNo_races_yet = 1;
+    NetPlayerStatusChanged(ePlayer_status_loading);
+    gProgram_state.current_race_index = pStart_race;
+    for (i = 0; i < 3; ++i) {
+        gProgram_state.current_car.power_up_levels[i] = 0;
+    }
+    for (i = 0; gNumber_of_races > i; ++i) {
+        gRace_list[i].been_there_done_that = 0;
+    }
+    for (i = 0; gNumber_of_racers > i; ++i) {
+        gOpponents[i].dead = 0;
+    }
+    gProgram_state.rank = gInitial_rank;
+    gProgram_state.credits = gInitial_credits[gProgram_state.skill_level];
+    gProgram_state.credits_per_rank = gCredits_per_rank[gProgram_state.skill_level];
+    gProgram_state.number_of_cars = 1;
+    gProgram_state.cars_available[0] = gProgram_state.frank_or_anniness;
+    gProgram_state.game_completed = 0;
+    gProgram_state.redo_race_index = -1;
+    gWait_for_it = 0;
+    return SwitchToLoresMode();
 }
 
 // IDA: void __cdecl DisposeGameIfNecessary()
