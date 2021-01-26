@@ -41,7 +41,7 @@ void test_loading_LoadGeneralParameters() {
     TEST_ASSERT_EQUAL_INT(7500, gInitial_credits[0]);
     TEST_ASSERT_EQUAL_INT(5000, gInitial_credits[1]);
     TEST_ASSERT_EQUAL_INT(3000, gInitial_credits[2]);
-    TEST_ASSERT_EQUAL_STRING("BLKEAGLE.TXT", gBasic_car_names[0]);
+    TEST_ASSERT_EQUAL_STRING("NEWEAGLE.TXT", gBasic_car_names[0]);
     TEST_ASSERT_EQUAL_FLOAT(0.2f, gDefault_default_water_spec_vol.gravity_multiplier);
     TEST_ASSERT_EQUAL_FLOAT(50.0f, gDefault_default_water_spec_vol.viscosity_multiplier);
 
@@ -69,14 +69,14 @@ void test_loading_opponents() {
     LoadOpponents();
     TEST_ASSERT_EQUAL_INT(40, gNumber_of_racers);
     o = &gOpponents[2];
-    TEST_ASSERT_EQUAL_STRING("Agent Orange", o->name);
-    TEST_ASSERT_EQUAL_STRING("Orange", o->abbrev_name);
-    TEST_ASSERT_EQUAL_INT(12, o->car_number);
+    TEST_ASSERT_EQUAL_STRING("Sinthea", o->name);
+    TEST_ASSERT_EQUAL_STRING("Sinthea", o->abbrev_name);
+    TEST_ASSERT_EQUAL_INT(73, o->car_number);
     TEST_ASSERT_EQUAL_INT(4, o->strength_rating);
     TEST_ASSERT_EQUAL_INT(eNet_avail_never, o->network_availability);
-    TEST_ASSERT_EQUAL_STRING("LEADPUMP.FLI", o->mug_shot_name);
-    TEST_ASSERT_EQUAL_STRING("AGENTO.TXT", o->car_file_name);
-    TEST_ASSERT_EQUAL_STRING("AGENTO.FLI", o->stolen_car_flic_name);
+    TEST_ASSERT_EQUAL_STRING("SINTHMUG.FLI", o->mug_shot_name);
+    TEST_ASSERT_EQUAL_STRING("SLED.TXT", o->car_file_name);
+    TEST_ASSERT_EQUAL_STRING("SLED.FLI", o->stolen_car_flic_name);
     TEST_ASSERT_EQUAL_INT(2, o->text_chunk_count);
     TEST_ASSERT_EQUAL_INT(5, o->text_chunks[0].x_coord);
     TEST_ASSERT_EQUAL_INT(3, o->text_chunks[0].y_coord);
@@ -143,6 +143,7 @@ void test_loading_ConvertPixToStripMap() {
 }
 
 void test_loading_LoadCar() {
+    REQUIRES_DATA_DIRECTORY();
     tCar_spec car_spec;
     tBrender_storage storage;
     InitialiseStorageSpace(&storage, 50, 50, 50, 50);
@@ -157,8 +158,10 @@ void test_loading_LoadCar() {
 
     float e_cmpos[] = { 0, 0.345, 0 };
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(e_cmpos, car_spec.cmpos.v, 3);
-    int e_stref[] = { 7, 8, 0, 0, 0, 0 };
-    //TEST_ASSERT_EQUAL_INT_ARRAY(e_stref, car_spec.steering_ref, 6);
+
+    TEST_ASSERT_EQUAL_INT(2, car_spec.number_of_steerable_wheels);
+    TEST_ASSERT_EQUAL_INT(7, car_spec.steering_ref[0]);
+    TEST_ASSERT_EQUAL_INT(8, car_spec.steering_ref[1]);
 
     TEST_ASSERT_EQUAL_INT(-1, car_spec.driven_wheels_spin_ref_1);
     TEST_ASSERT_EQUAL_INT(-1, car_spec.driven_wheels_spin_ref_2);

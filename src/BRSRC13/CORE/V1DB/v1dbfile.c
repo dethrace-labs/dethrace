@@ -802,7 +802,6 @@ br_uint_32 BrActorLoadMany(char* filename, br_actor** actors, br_uint_16 num) {
         }
         r = DfChunksInterpret(df, &ActorLoadTable);
         if (DfTopType() == DF_ACTOR) {
-            LOG_DEBUG("adding actor");
             actors[count] = DfPop(DF_ACTOR, NULL);
             count++;
         }
