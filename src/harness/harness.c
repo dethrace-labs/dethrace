@@ -6,15 +6,17 @@
 #include <sys/stat.h>
 
 SDL_Window* window;
-renderer* current_renderer;
+tRenderer* current_renderer;
 br_pixelmap* palette;
 uint32_t* screen_buffer;
 
 br_pixelmap* last_dst = NULL;
 br_pixelmap* last_src = NULL;
 
-// if not 0, enable the original CD check code, otherwise just skip
-int harness_enable_cd_check;
+// if true, disable the original CD check code
+int harness_disable_cd_check = 1;
+
+int harness_debug_level = 7;
 
 // SplatPack or Carmageddon. This is where we represent the code differences between the two. For example, the intro smack file.
 tHarness_GameMode harness_game_mode;
@@ -30,7 +32,9 @@ void Harness_DetectGameMode() {
     LOG_INFO("\"%s\"", harness_game_mode.name);
 }
 
-void Harness_Init(char* name, renderer* renderer) {
+void Harness_Init(char* name, tRenderer* renderer) {
+    int result;
+
     install_signal_handler(name);
     current_renderer = renderer;
     screen_buffer = NULL;
@@ -39,7 +43,24 @@ void Harness_Init(char* name, renderer* renderer) {
         LOG_PANIC("SDL_INIT_TIMER error: %s", SDL_GetError());
     }
 
+    char* root_dir = getenv("DETHRACE_ROOT_DIR");
+    if (!root_dir) {
+        LOG_INFO("DETHRACE_ROOT_DIR is not set, assuming '.'");
+    } else {
+        printf("DETHRACE_ROOT_DIR: %s\n", root_dir);
+        result = chdir(root_dir);
+        if (result != 0) {
+            LOG_PANIC("Failed to chdir. Returned %d", result);
+        }
+    }
+
     Harness_DetectGameMode();
+}
+
+void Harness_Debug_PrintStack() {
+#ifndef _WIN32
+    posix_print_stack_trace();
+#endif
 }
 
 void Harness_PumpEvents() {
@@ -62,7 +83,12 @@ void Harness_PumpEvents() {
 
 int Harness_Hook_HandleCommandLineArg(char* arg) {
     if (strcasecmp(arg, "-cdcheck") == 0) {
-        harness_enable_cd_check = 1;
+        harness_disable_cd_check = 0;
+        return 1;
+    } else if (strstr(arg, "-debug=") != NULL) {
+        char* s = strstr(arg, "=");
+        harness_debug_level = atoi(s + 1);
+        LOG_INFO("debug level set to %d", harness_debug_level);
         return 1;
     }
     return 0;

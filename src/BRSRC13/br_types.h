@@ -683,7 +683,7 @@ typedef br_pixelmap* br_map_find_cbfn(char*);
 typedef br_uint_32 br_map_enum_cbfn(br_pixelmap*, void*);
 typedef br_pixelmap* br_table_find_cbfn(char*);
 typedef br_uint_32 br_table_enum_cbfn(br_pixelmap*, void*);
-typedef br_uint_32 br_actor_enum_cbfn(br_actor*, void*);
+typedef intptr_t br_actor_enum_cbfn(br_actor*, void*);
 typedef struct br_vector3 br_vector3;
 typedef int br_pick2d_cbfn(br_actor*, br_model*, br_material*, br_vector3*, br_vector3*, br_scalar, br_scalar, void*);
 typedef struct br_matrix34 br_matrix34;
@@ -2947,10 +2947,8 @@ enum {
     BR_MATF_ALWAYS_VISIBLE = 0x00000800,
     BR_MATF_TWO_SIDED = 0x00001000,
     BR_MATF_FORCE_Z_0 = 0x00002000,
-    BR_MATF_DITHER = 0x00004000
-#if 0
-	BR_MATF_CUSTOM			= 0x00008000
-#endif
+    BR_MATF_DITHER = 0x00004000,
+    BR_MATF_CUSTOM = 0x00008000
 };
 
 /*
@@ -2963,7 +2961,7 @@ enum {
     BR_MODU_GROUPS = 0x0008,
     BR_MODU_BOUNDING_BOX = 0x0010,
     BR_MODU_MATERIALS = 0x0020,
-    BR_MODU_UNKNOWN = 0x0100, /* Added by JeffH. Referred to in code */
+    BR_MODU_UNKNOWN = 0x0100, /* Added by Jeff. Referred to in code */
     BR_MODU_ALL = 0x7fff
 };
 
@@ -3003,7 +3001,12 @@ enum {
     BR_MODF_CUSTOM = 0x0020, /* Invoke custom callback for this model */
     BR_MODF_PREPREPARED = 0x0040, /* Model structure is pre-prepared - update performs no work */
 
-    BR_MODF_UPDATEABLE = 0x0080 /* Added by JeffH from Errols code */
+    BR_MODF_CREASE = 0x0100, /* Create creases in smoothing along edges if face<->face angle is g.t model->crease */
+    BR_MODF_CUSTOM_NORMALS = 0x0200, /* Uses vertex normals from br_vertex structure */
+    BR_MODF_CUSTOM_BOUNDS = 0x0400, /* Bounding box is already set up				*/
+    //BR_MODF_FACES_ONLY = 0x0800, /* Model will only be used to render faces (not edges or points) */
+
+    BR_MODF_UPDATEABLE = 0x0080 /* Added by Jeff from Errols code */
 };
 
 #define BR_COLOUR_RGB(r, g, b) \
@@ -3013,5 +3016,11 @@ enum {
 #define BR_ANGLE_RAD(rad) ((br_angle)((rad)*10430))
 
 #define BR_SCALAR(x) ((br_scalar)(x))
+
+#define BR_COLOUR_RGBA(r, g, b, a) \
+    ((((unsigned int)(a)) << 24) | (((unsigned int)(r)) << 16) | (((unsigned int)(g)) << 8) | ((unsigned int)(b)))
+
+#define BR_LENGTH3(a, b, c) ((br_scalar)sqrt((a) * (a) + (b) * (b) + (c) * (c)))
+#define BR_SCALAR_EPSILON 1.192092896e-7f
 
 #endif /* BR_TYPES_H */

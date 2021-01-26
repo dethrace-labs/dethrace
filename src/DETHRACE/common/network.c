@@ -461,7 +461,7 @@ void ReceivedLeave(tNet_contents* pContents, tNet_message* pMessage) {
 void NetFullScreenMessage(int pStr_index, int pLeave_it_up_there) {
     tU32 start_time;
     char* s;
-    // JeffH: added underscore suffix to avoid collisions with samed-named globals
+    // Jeff: added underscore suffix to avoid collisions with samed-named globals
     int gPixel_buffer_size_;
     char* gPixels_copy_;
     char* gPalette_copy_;

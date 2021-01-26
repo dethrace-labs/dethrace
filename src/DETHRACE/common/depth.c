@@ -313,7 +313,12 @@ void AssertYons() {
     br_camera* camera_ptr;
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    
+    for ( i = 0; i < 2; ++i )
+    {
+        camera_ptr = gCamera_list[i]->type_data;
+        camera_ptr->yon_z = gYon_multiplier * gCamera_yon;
+    }
 }
 
 // IDA: void __cdecl IncreaseYon()

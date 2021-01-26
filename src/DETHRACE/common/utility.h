@@ -61,9 +61,9 @@ br_uint_32 DRPixelmapLoadMany(char* pFile_name, br_pixelmap** pPixelmaps, br_uin
 
 void WaitFor(tU32 pDelay);
 
-br_uint_32 DRActorEnumRecurse(br_actor* pActor, br_actor_enum_cbfn* callback, void* arg);
+intptr_t DRActorEnumRecurse(br_actor* pActor, br_actor_enum_cbfn* callback, void* arg);
 
-br_uint_32 CompareActorID(br_actor* pActor, void* pArg);
+intptr_t CompareActorID(br_actor* pActor, void* pArg);
 
 br_actor* DRActorFindRecurse(br_actor* pSearch_root, char* pName);
 

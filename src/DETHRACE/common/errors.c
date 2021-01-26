@@ -141,6 +141,7 @@ void FatalError(int pStr_index, ...) {
     char* sub_pt;
     va_list ap;
     int i = 0;
+    LOG_TRACE("(%d)", pStr_index);
 
     va_start(ap, pStr_index);
 

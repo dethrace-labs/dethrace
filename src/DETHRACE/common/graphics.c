@@ -258,7 +258,72 @@ void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
     char* destn_ptr;
     char* destn_ptr2;
     LOG_TRACE("(%p, %d, %d, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pOffset_x, pDest_y, pOffset_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
-    NOT_IMPLEMENTED();
+
+    height = *(uint16_t*)pSource;
+    pSource = pSource + 2;
+    if (pDest_y + pOffset_y >= 0) {
+        destn_ptr = (char*)pDest->pixels + pDest->row_bytes * (pDest_y + pOffset_y);
+    } else {
+        LOG_PANIC("path not implemented");
+        // Copy8BitStripImageTo16Bit(
+        //     pSource,
+        //     -pDest_y - pOffset_y,
+        //     v12,
+        //     v13,
+        //     v14,
+        //     (tS8*)height,
+        //     v16,
+        //     v18,
+        //     v20,
+        //     v22);
+        // pSourcea = v10;
+        // destn_ptr = (char*)pDest->pixels;
+        // height = pDest_y + pOffset_y + v11;
+        // pOffset_y = 0;
+        // pDest_y = 0;
+    }
+
+    if (height + pDest_y + pOffset_y > pDest->height) {
+        height = pDest->height - pDest_y - pOffset_y;
+    }
+    off_the_left = pDest_x + pOffset_x;
+    if (off_the_left > 0) {
+        destn_ptr += off_the_left;
+    }
+    for (i = 0; i < height; i++) {
+        destn_ptr2 = destn_ptr;
+        number_of_chunks = *pSource;
+        pSource++;
+        x_byte = off_the_left;
+        for (j = 0; j < number_of_chunks; j++) {
+            chunk_length = *pSource++;
+            if (chunk_length >= 0) {
+                old_x_byte = x_byte;
+                x_byte += chunk_length;
+                if (old_x_byte >= 0) {
+                    destn_ptr2 += chunk_length;
+                } else if (x_byte > 0) {
+                    destn_ptr2 += chunk_length + old_x_byte;
+                }
+            } else {
+                old_x_byte = x_byte;
+                x_byte += -chunk_length;
+                if (old_x_byte >= 0) {
+                    if (pDest->width >= x_byte) {
+                        memcpy(destn_ptr2, pSource, -chunk_length);
+                        destn_ptr2 += -chunk_length;
+                    } else if (old_x_byte < pDest->width) {
+                        memcpy(destn_ptr2, pSource, pDest->width - old_x_byte);
+                    }
+                } else if (x_byte > 0) {
+                    memcpy(destn_ptr2, &pSource[-old_x_byte], -chunk_length + old_x_byte);
+                    destn_ptr2 += -chunk_length + old_x_byte;
+                }
+                pSource += -chunk_length;
+            }
+        }
+        destn_ptr += pDest->row_bytes;
+    }
 }
 
 // IDA: void __usercall SetBRenderScreenAndBuffers(int pX_offset@<EAX>, int pY_offset@<EDX>, int pWidth@<EBX>, int pHeight@<ECX>)
@@ -308,7 +373,33 @@ void SetIntegerMapRenders() {
 void AdjustRenderScreenSize() {
     int switched_res;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    switched_res = SwitchToRealResolution();
+    ReinitialiseRenderStuff();
+    if (gMap_mode) {
+        gRender_screen->base_x = gMap_render_x_i;
+        gRender_screen->base_y = gMap_render_y_i;
+        gRender_screen->width = gMap_render_width_i;
+        gRender_screen->height = gMap_render_height_i;
+    } else {
+        gRender_screen->base_x = gProgram_state.current_render_left;
+        gRender_screen->base_y = gProgram_state.current_render_top;
+        gRender_screen->height = gProgram_state.current_render_bottom - gProgram_state.current_render_top;
+        gRender_screen->width = gProgram_state.current_render_right - gProgram_state.current_render_left;
+    }
+    if (gRender_screen->row_bytes == gRender_screen->width) {
+        gRender_screen->flags |= BR_PMF_ROW_WHOLEPIXELS;
+    } else {
+        //v0 = gRender_screen->flags & 0xFB;
+    }
+    gRender_screen->origin_x = gRender_screen->width / 2;
+    gRender_screen->origin_y = gRender_screen->height / 2;
+    gWidth = gRender_screen->width;
+    gHeight = gRender_screen->height;
+    ReinitialiseForwardCamera();
+    if (switched_res) {
+        SwitchToLoresMode();
+    }
 }
 
 // IDA: void __cdecl ScreenSmaller()
@@ -738,7 +829,7 @@ void Darken(tU8* pPtr, unsigned int pDarken_amount) {
 void SetFadedPalette(int pDegree) {
     int j;
     br_pixelmap* the_palette;
-    unsigned char* the_pixels; //JeffH added unsigned
+    unsigned char* the_pixels; //Jeff added unsigned
     LOG_TRACE10("(%d)", pDegree);
 
     memcpy(gScratch_pixels, gCurrent_palette->pixels, 0x400u);

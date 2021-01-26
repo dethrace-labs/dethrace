@@ -120,7 +120,7 @@ void AddRefOffset(int* pRef_holder);
 
 void GetDamageProgram(FILE* pF, tCar_spec* pCar_spec, tImpact_location pImpact_location);
 
-br_uint_32 LinkModel(br_actor* pActor, tModel_pool* pModel_pool);
+intptr_t LinkModel(br_actor* pActor, tModel_pool* pModel_pool);
 
 void FreeUpBonnetModels(br_model** pModel_array, int pModel_count);
 

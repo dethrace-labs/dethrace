@@ -1434,7 +1434,7 @@ void FlushFlicQueue() {
     tFlic_descriptor* old_flic;
     LOG_TRACE("()");
 
-    // JeffH: loop through pending flics until we reach the end or we find one that is `must_finish`.
+    // Jeff: loop through pending flics until we reach the end or we find one that is `must_finish`.
     // If `must_finish`, we process the queue then check again.
     // If there are no `must_finish` in the list,
     while (gFirst_flic) {

@@ -291,7 +291,7 @@ int KeyIsDown(int pKey_index) {
 void WaitForNoKeys() {
     LOG_TRACE("()");
 
-    int key_result = 0; //JeffH added
+    int key_result = 0; //Jeff added
 
     while (1) {
         CheckQuit();

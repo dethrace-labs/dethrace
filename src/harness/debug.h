@@ -5,21 +5,20 @@
 #include <unistd.h>
 
 #define BLUE
-#define LOG_LEVEL 3
 
 #define LOG_TRACE(...) debug_printf("[TRACE] %s", __FUNCTION__, __VA_ARGS__)
 
 #define LOG_TRACE10(...)                                       \
-    if (LOG_LEVEL >= 10) {                                     \
+    if (harness_debug_level >= 10) {                           \
         debug_printf("[TRACE] %s", __FUNCTION__, __VA_ARGS__); \
     }
 #define LOG_TRACE9(...)                                        \
-    if (LOG_LEVEL >= 9) {                                      \
+    if (harness_debug_level >= 9) {                            \
         debug_printf("[TRACE] %s", __FUNCTION__, __VA_ARGS__); \
     }
 
 #define LOG_TRACE8(...)                                        \
-    if (LOG_LEVEL >= 8) {                                      \
+    if (harness_debug_level >= 8) {                            \
         debug_printf("[TRACE] %s", __FUNCTION__, __VA_ARGS__); \
     }
 
@@ -33,6 +32,10 @@
 #define NOT_IMPLEMENTED()                                                         \
     debug_printf("\033[0;31m[PANIC] %s ", __FUNCTION__, "%s", "not implemented"); \
     sleep(2);                                                                     \
+    exit(1);
+
+#define TELL_ME_IF_WE_PASS_THIS_WAY()                                                    \
+    debug_printf("\033[0;31m[PANIC] %s ", __FUNCTION__, "%s", "code path not expected"); \
     exit(1);
 
 #define STUB() \

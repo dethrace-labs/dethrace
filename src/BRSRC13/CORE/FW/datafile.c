@@ -406,13 +406,13 @@ br_uint_32 DfStructReadBinary(br_datafile* df, br_file_struct* str, void* base) 
             n = 4;
             break;
         }
+
         for (i = 0; i < n; i++) {
             conv.b[3] = BrFileGetChar(df->h);
             conv.b[2] = BrFileGetChar(df->h);
             conv.b[1] = BrFileGetChar(df->h);
             conv.b[0] = BrFileGetChar(df->h);
-            *mp = conv.f;
-            mp += 4;
+            ((br_fvector4_f*)mp)->v[i] = conv.f;
         }
 
     LABEL_33:
@@ -510,7 +510,7 @@ br_uint_32 DfStructWriteArray(br_datafile* df, br_file_struct* str, void* base, 
 br_uint_32 DfStructReadArray(br_datafile* df, br_file_struct* str, void* base, int n) {
     char* cp;
     int i;
-    LOG_TRACE("(%p, %p, %p, %d)", df, str, base, n);
+    LOG_TRACE9("(%p, %p, %p, %d)", df, str, base, n);
 
     cp = (char*)base;
     for (i = 0; i < n; i++) {
@@ -593,7 +593,7 @@ void DfCountWriteBinary(br_datafile* df, br_uint_32 count) {
 // IDA: br_uint_32 __usercall DfCountReadBinary@<EAX>(br_datafile *df@<EAX>)
 br_uint_32 DfCountReadBinary(br_datafile* df) {
     br_uint_32 l;
-    LOG_TRACE("(%p)", df);
+    LOG_TRACE9("(%p)", df);
     BrFileRead(&l, 4, 1, df->h);
     return BrSwap32(l);
 }
@@ -714,7 +714,7 @@ int DfNameSizeText(br_datafile* df, char* name) {
 char* DfNameReadBinary(br_datafile* df, char* name) {
     int c;
     int i;
-    LOG_TRACE("(%p, \"%s\")", df, name);
+    LOG_TRACE9("(%p, \"%s\")", df, name);
 
     for (i = 0; i < 255; i++) {
         c = BrFileGetChar(df->h);

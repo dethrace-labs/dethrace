@@ -3,6 +3,7 @@
 #include "CORE/PIXELMAP/pmfile.h"
 #include "CORE/V1DB/actsupt.h"
 #include "CORE/V1DB/modsupt.h"
+#include "CORE/V1DB/prepmesh.h"
 #include "CORE/V1DB/regsupt.h"
 #include "CORE/V1DB/v1dbfile.h"
 

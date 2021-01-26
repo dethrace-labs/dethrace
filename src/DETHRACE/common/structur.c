@@ -99,7 +99,9 @@ void DoLogos() {
 // IDA: void __cdecl DoProgOpeningAnimation()
 void DoProgOpeningAnimation() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gProgram_state.prog_status = eProg_idling;
+    DRS3StopOutletSound(gIndexed_outlets[0]);
 }
 
 // IDA: void __cdecl DoProgramDemo()
@@ -195,56 +197,32 @@ void InitialiseProgramState() {
 // IDA: void __cdecl DoProgram()
 void DoProgram() {
     InitialiseProgramState();
-    while (1) {
+    while (gProgram_state.prog_status != eProg_quit) {
         switch (gProgram_state.prog_status) {
         case eProg_intro:
             DisposeGameIfNecessary();
-            ClearEntireScreen();
-            DoSCILogo();
-            DoOpeningAnimation();
-            DoSCILogo();
-            gProgram_state.prog_status = eProg_opening;
-            continue;
+            DoLogos();
+            break;
         case eProg_opening:
             DisposeGameIfNecessary();
-            gProgram_state.prog_status = eProg_idling;
-            DRS3StopOutletSound(gIndexed_outlets[0]);
-            if (gProgram_state.prog_status == eProg_quit) {
-                return;
-            }
-            continue;
+            DoProgOpeningAnimation();
+            break;
         case eProg_idling:
             DisposeGameIfNecessary();
-            if (gGame_to_load >= 0) {
-                DoLoadGame(0);
-                if (gProgram_state.prog_status == eProg_quit) {
-                    return;
-                }
-                continue;
+            if (gGame_to_load < 0) {
+                DoMainMenuScreen(30000u, 0, 0);
+            } else {
+                DoLoadGame();
             }
-            DoMainMenuScreen(30000, 0, 0);
-            if (gProgram_state.prog_status != eProg_quit) {
-                continue;
-            }
-            return;
+            break;
         case eProg_demo:
-            DoLogos();
-            gProgram_state.prog_status = eProg_idling;
-            DRS3StopOutletSound(gIndexed_outlets[0]);
-            if (gProgram_state.prog_status == eProg_quit) {
-                return;
-            }
-            continue;
+            DoProgramDemo();
+            break;
         case eProg_game_starting:
             DoGame();
-            if (gProgram_state.prog_status == eProg_quit) {
-                return;
-            }
-            continue;
-        case eProg_game_ongoing:
-        case eProg_quit:
-            // JeffH added to avoid compiler warnings about missing case handling
-            LOG_PANIC("We do not expect to get here");
+            break;
+        default:
+            break;
         }
     }
 }

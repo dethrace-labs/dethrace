@@ -5,7 +5,6 @@
 #include <string.h>
 
 void test_errors_FatalError() {
-    _unittest_do_not_exit = 1;
     FatalError(0x6b, "test_errors", "FATAL");
     TEST_ASSERT_EQUAL_STRING("Can't open 'test_errors'", _unittest_last_fatal_error);
 }

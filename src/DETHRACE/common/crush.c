@@ -1,4 +1,6 @@
 #include "crush.h"
+#include "brender.h"
+#include "loading.h"
 #include <stdlib.h>
 
 float gWobble_spam_y[8];
@@ -17,7 +19,36 @@ int ReadCrushData(FILE* pF, tCrush_data* pCrush_data) {
     tCrush_point_spec* the_spec;
     tCrush_neighbour* the_neighbour;
     LOG_TRACE("(%p, %p)", pF, pCrush_data);
-    NOT_IMPLEMENTED();
+
+    pCrush_data->softness_factor = GetAFloat(pF);
+    GetPairOfFloats(pF, &pCrush_data->min_fold_factor, &pCrush_data->max_fold_factor);
+    pCrush_data->wibble_factor = GetAFloat(pF);
+    pCrush_data->limit_deviant = GetAFloat(pF);
+    pCrush_data->split_chance = GetAFloat(pF);
+    pCrush_data->min_y_fold_down = GetAFloat(pF);
+    pCrush_data->number_of_crush_points = GetAnInt(pF);
+    pCrush_data->crush_points = (tCrush_point_spec*)BrMemAllocate(sizeof(tCrush_point_spec) * pCrush_data->number_of_crush_points, kMem_crush_data);
+
+    the_spec = pCrush_data->crush_points;
+    for (i = 0; i < pCrush_data->number_of_crush_points; i++) {
+        the_spec->vertex_index = GetAnInt(pF);
+        GetThreeFloats(pF, &the_spec->limits_neg.v[0], &the_spec->limits_neg.v[1], &the_spec->limits_neg.v[2]);
+        GetThreeFloats(pF, &the_spec->limits_pos.v[0], &the_spec->limits_pos.v[1], &the_spec->limits_pos.v[2]);
+        GetThreeFloats(pF, &the_spec->softness_neg.v[0], &the_spec->softness_neg.v[1], &the_spec->softness_neg.v[2]);
+        GetThreeFloats(pF, &the_spec->softness_pos.v[0], &the_spec->softness_pos.v[1], &the_spec->softness_pos.v[2]);
+        the_spec->number_of_neighbours = GetAnInt(pF);
+        the_spec->neighbours = BrMemAllocate(sizeof(tCrush_neighbour) * the_spec->number_of_neighbours, kMem_crush_neighbours);
+
+        the_neighbour = the_spec->neighbours;
+        for (j = 0; j < the_spec->number_of_neighbours; j++) {
+            the_neighbour->vertex_index = GetAnInt(pF);
+            the_neighbour->factor = GetAnInt(pF);
+            the_neighbour++;
+        }
+        the_spec++;
+    }
+    LOG_DEBUG("exit");
+    return 0;
 }
 
 // IDA: float __usercall SkipCrushData@<ST0>(FILE *pF@<EAX>)

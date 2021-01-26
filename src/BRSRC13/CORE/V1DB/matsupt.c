@@ -26,5 +26,5 @@ br_material* BrMaterialAllocate(char* name) {
 // IDA: void __cdecl BrMaterialFree(br_material *m)
 void BrMaterialFree(br_material* m) {
     LOG_TRACE("(%p)", m);
-    NOT_IMPLEMENTED();
+    BrResFree(m);
 }
