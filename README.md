@@ -76,6 +76,9 @@ DETHRACE_TEST_ARGS="-n test_name" make test
 make run
 ```
 
+## Changelog
+[From the beginning until release](docs/CHANGELOG.md)
+
 ## Credits
 - CrayzKirk (manually matching up functions and data structures in the executable to the debugging symbols)
 - The developer at Stainless Software who left an old debugging .SYM file on the Splat Pack CD ;)
