@@ -3,7 +3,6 @@
 
 #include "brender.h"
 #include "constants.h"
-#include "dossys.h"
 #include "errors.h"
 #include "globvars.h"
 #include "globvrpb.h"
@@ -12,6 +11,7 @@
 #include "loadsave.h"
 #include "mainmenu.h"
 #include "network.h"
+#include "pd/sys.h"
 #include "sound.h"
 
 #include <ctype.h>
@@ -937,6 +937,7 @@ void EncodeFile(char* pThe_path) {
     int decode;
     int len;
     int count;
+    LOG_TRACE("(\"%s\")", pThe_path);
 
     len = strlen(pThe_path);
     strcpy(new_file, pThe_path);
@@ -1009,45 +1010,49 @@ void EncodeFile(char* pThe_path) {
 
 // IDA: void __usercall EncodeFileWrapper(char *pThe_path@<EAX>)
 void EncodeFileWrapper(char* pThe_path) {
-    int len = strlen(pThe_path);
+    int len;
+    LOG_TRACE("(\"%s\")", pThe_path);
 
-    if (strcmp(&pThe_path[len - 4], ".TXT") == 0) {
+    len = strlen(pThe_path);
+
+    // if file doesn't end in .txt, bail out
+    if (STR_ENDS_WITH(pThe_path, ".TXT") != 0) {
         return;
     }
-    if (strcmp(pThe_path, "DKEYMAP0.TXT") == 0) {
+    if (STR_ENDS_WITH(pThe_path, "DKEYMAP0.TXT") == 0) {
         return;
     }
-    if (strcmp(pThe_path, "DKEYMAP1.TXT") == 0) {
+    if (STR_ENDS_WITH(pThe_path, "DKEYMAP1.TXT") == 0) {
         return;
     }
-    if (strcmp(pThe_path, "DKEYMAP2.TXT") == 0) {
+    if (STR_ENDS_WITH(pThe_path, "DKEYMAP2.TXT") == 0) {
         return;
     }
-    if (strcmp(pThe_path, "DKEYMAP3.TXT") == 0) {
+    if (STR_ENDS_WITH(pThe_path, "DKEYMAP3.TXT") == 0) {
         return;
     }
-    if (strcmp(pThe_path, "KEYMAP_0.TXT") == 0) {
+    if (STR_ENDS_WITH(pThe_path, "KEYMAP_0.TXT") == 0) {
         return;
     }
-    if (strcmp(pThe_path, "KEYMAP_1.TXT") == 0) {
+    if (STR_ENDS_WITH(pThe_path, "KEYMAP_1.TXT") == 0) {
         return;
     }
-    if (strcmp(pThe_path, "KEYMAP_2.TXT") == 0) {
+    if (STR_ENDS_WITH(pThe_path, "KEYMAP_2.TXT") == 0) {
         return;
     }
-    if (strcmp(pThe_path, "KEYMAP_3.TXT") == 0) {
+    if (STR_ENDS_WITH(pThe_path, "KEYMAP_3.TXT") == 0) {
         return;
     }
-    if (strcmp(pThe_path, "OPTIONS.TXT") == 0) {
+    if (STR_ENDS_WITH(pThe_path, "OPTIONS.TXT") == 0) {
         return;
     }
-    if (strcmp(pThe_path, "KEYNAMES.TXT") == 0) {
+    if (STR_ENDS_WITH(pThe_path, "KEYNAMES.TXT") == 0) {
         return;
     }
-    if (strcmp(pThe_path, "KEYMAP.TXT") == 0) {
+    if (STR_ENDS_WITH(pThe_path, "KEYMAP.TXT") == 0) {
         return;
     }
-    if (strcmp(pThe_path, "PATHS.TXT") == 0) {
+    if (STR_ENDS_WITH(pThe_path, "PATHS.TXT") == 0) {
         return;
     }
 
@@ -1058,7 +1063,9 @@ void EncodeFileWrapper(char* pThe_path) {
 void EncodeAllFilesInDirectory(char* pThe_path) {
     char s[256];
     LOG_TRACE("(\"%s\")", pThe_path);
-    NOT_IMPLEMENTED();
+
+    PathCat(s, gApplication_path, pThe_path);
+    PDForEveryFile(s, EncodeFileWrapper);
 }
 
 // IDA: void __usercall SkipNLines(FILE *pF@<EAX>)

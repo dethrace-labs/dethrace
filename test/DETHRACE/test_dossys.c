@@ -4,7 +4,7 @@
 #include <unistd.h>
 
 #include "common/globvars.h"
-#include "pc-dos/dossys.h"
+#include "pd/sys.h"
 
 void test_dossys_suite() {
 }

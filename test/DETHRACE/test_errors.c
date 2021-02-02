@@ -1,7 +1,7 @@
 #include "tests.h"
 
 #include "common/errors.h"
-#include "pc-dos/dossys.h"
+#include "pd/sys.h"
 #include <string.h>
 
 void test_errors_FatalError() {

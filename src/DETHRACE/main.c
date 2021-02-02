@@ -1,5 +1,5 @@
 #include "harness.h"
-#include "pc-dos/dossys.h"
+#include "pd/sys.h"
 #include "renderers/gl_renderer.h"
 #include <stdlib.h>
 #include <unistd.h>

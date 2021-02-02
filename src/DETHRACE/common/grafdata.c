@@ -3,7 +3,7 @@
 
 #include "errors.h"
 #include "globvars.h"
-#include "pc-dos/dossys.h"
+#include "pd/sys.h"
 
 tGraf_data gGraf_data[2] = {
     { 320,

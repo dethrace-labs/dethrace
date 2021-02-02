@@ -7,7 +7,7 @@
 #include "flicplay.h"
 #include "globvars.h"
 #include "loading.h"
-#include "pc-dos/dossys.h"
+#include "pd/sys.h"
 #include "utility.h"
 
 #include <string.h>

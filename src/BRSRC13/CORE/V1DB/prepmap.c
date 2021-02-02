@@ -18,5 +18,6 @@ void BrBufferUpdate(br_pixelmap* pm, br_token use, br_uint_16 flags) {
 // IDA: void __usercall BrBufferClear(br_pixelmap *pm@<EAX>)
 void BrBufferClear(br_pixelmap* pm) {
     LOG_TRACE("(%p)", pm);
-    NOT_IMPLEMENTED();
+
+    SILENT_STUB();
 }

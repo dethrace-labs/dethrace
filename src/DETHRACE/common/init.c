@@ -27,7 +27,7 @@
 #include "common/sound.h"
 #include "common/utility.h"
 #include "common/world.h"
-#include "pc-dos/dossys.h"
+#include "pd/sys.h"
 
 #include "brender.h"
 

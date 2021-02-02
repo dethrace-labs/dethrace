@@ -6,8 +6,8 @@
 #include "globvrpb.h"
 #include "graphics.h"
 #include "netgame.h"
-#include "pc-dos/dosnet.h"
-#include "pc-dos/dossys.h"
+#include "pd/net.h"
+#include "pd/sys.h"
 #include "utility.h"
 #include <stdlib.h>
 

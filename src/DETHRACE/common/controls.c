@@ -9,7 +9,7 @@
 #include "loadsave.h"
 #include "mainloop.h"
 #include "netgame.h"
-#include "pc-dos/dossys.h"
+#include "pd/sys.h"
 #include "pedestrn.h"
 #include "pratcam.h"
 #include "sound.h"

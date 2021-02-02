@@ -11,7 +11,7 @@
 #include "network.h"
 #include "newgame.h"
 #include "options.h"
-#include "pc-dos/dossys.h"
+#include "pd/sys.h"
 #include "sound.h"
 #include "structur.h"
 #include "utility.h"

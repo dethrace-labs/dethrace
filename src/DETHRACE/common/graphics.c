@@ -8,7 +8,7 @@
 #include "grafdata.h"
 #include "init.h"
 #include "loading.h"
-#include "pc-dos/dossys.h"
+#include "pd/sys.h"
 #include "sound.h"
 #include "utility.h"
 #include <stdlib.h>

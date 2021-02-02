@@ -1,4 +1,3 @@
-#include "dossys.h"
 #include "brender.h"
 #include "common/car.h"
 #include "common/errors.h"
@@ -11,6 +10,7 @@
 #include "common/utility.h"
 #include "harness.h"
 #include "input.h"
+#include "pd/sys.h"
 #include "watcom_functions.h"
 #include <dirent.h>
 #include <stdio.h>

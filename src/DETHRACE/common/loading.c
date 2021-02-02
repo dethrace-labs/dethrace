@@ -11,7 +11,9 @@
 #include "crush.h"
 #include "depth.h"
 #include "displays.h"
+#include "drmem.h"
 #include "errors.h"
+#include "flicplay.h"
 #include "globvars.h"
 #include "globvrkm.h"
 #include "globvrpb.h"
@@ -21,7 +23,7 @@
 #include "input.h"
 #include "newgame.h"
 #include "opponent.h"
-#include "pc-dos/dossys.h"
+#include "pd/sys.h"
 #include "pedestrn.h"
 #include "sound.h"
 #include "spark.h"
@@ -2129,13 +2131,26 @@ void LoadRaces(tRace_list_spec* pRace_list, int* pCount, int pRace_type_index) {
 // IDA: void __usercall UnlockOpponentMugshot(int pIndex@<EAX>)
 void UnlockOpponentMugshot(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+
+    if (pIndex >= 0) {
+        if (gOpponents[pIndex].mug_shot_image_data) {
+            MAMSUnlock((void**)&gOpponents[pIndex].mug_shot_image_data);
+        }
+    }
 }
 
 // IDA: void __usercall LoadOpponentMugShot(int pIndex@<EAX>)
 void LoadOpponentMugShot(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+    PossibleService();
+    if (pIndex >= 0 && !gOpponents[pIndex].mug_shot_image_data) {
+        if (!LoadFlicData(
+                gOpponents[pIndex].mug_shot_name,
+                &gOpponents[pIndex].mug_shot_image_data,
+                &gOpponents[pIndex].mug_shot_image_data_length)) {
+            FatalError(56);
+        }
+    }
 }
 
 // IDA: void __usercall DisposeOpponentGridIcon(tRace_info *pRace_info@<EAX>, int pIndex@<EDX>)
@@ -2166,7 +2181,70 @@ void LoadRaceInfo(int pRace_index, tRace_info* pRace_info) {
     float temp_float;
     tText_chunk* the_chunk;
     LOG_TRACE("(%d, %p)", pRace_index, pRace_info);
-    NOT_IMPLEMENTED();
+
+    f = OpenRaceFile();
+    temp_index = pRace_index;
+    while (1) {
+        if (!temp_index) {
+            break;
+        }
+        PossibleService();
+        GetALineAndDontArgue(f, s);
+        SkipRestOfRace(f);
+        temp_index--;
+    }
+    GetALineAndDontArgue(f, pRace_info->name);
+    pRace_info->rank_required = gRace_list[pRace_index].rank_required;
+    pRace_info->best_rank = gRace_list[pRace_index].best_rank;
+    pRace_info->suggested_rank = gRace_list[pRace_index].suggested_rank;
+    GetALineAndDontArgue(f, s);
+    str = strtok(s, "\t ,/");
+    pRace_info->scene_image_data = NULL;
+    pRace_info->map_image_data = NULL;
+    pRace_info->info_image_data = NULL;
+    PossibleService();
+    if (!gNet_mode) {
+        if (!LoadFlicData(str, &pRace_info->scene_image_data, &pRace_info->scene_image_data_length)) {
+            FatalError(51);
+        }
+        str = strtok(0, "\t ,/");
+        if (!LoadFlicData(str, &pRace_info->map_image_data, &pRace_info->map_image_data_length)) {
+            FatalError(52);
+        }
+        str = strtok(0, "\t ,/");
+        if (!LoadFlicData(str, &pRace_info->info_image_data, &pRace_info->info_image_data_length)) {
+            FatalError(53);
+        }
+        for (i = 0; i < pRace_info->number_of_racers; i++) {
+            PossibleService();
+            LoadOpponentMugShot(pRace_info->opponent_list[i].index);
+        }
+    }
+    GetALineAndDontArgue(f, s);
+    str = strtok(s, "\t ,/");
+    strcpy(pRace_info->track_file_name, str);
+    pRace_info->text_chunk_count = GetAnInt(f);
+    pRace_info->text_chunks = BrMemAllocate(sizeof(tText_chunk) * pRace_info->text_chunk_count, kMem_race_text_chunk);
+
+    the_chunk = pRace_info->text_chunks;
+    for (i = 0; i < pRace_info->text_chunk_count; i++) {
+        //while (pRace_info->text_chunk_count > v5) {
+        PossibleService();
+        GetPairOfInts(f, &the_chunk->x_coord, &the_chunk->y_coord);
+        GetPairOfInts(f, &the_chunk->frame_cue, &the_chunk->frame_end);
+        the_chunk->line_count = GetAnInt(f);
+        while (the_chunk->line_count > 8) {
+            --the_chunk->line_count;
+            GetALineAndDontArgue(f, s);
+        }
+        for (k = 0; k < the_chunk->line_count; k++) {
+            GetALineAndDontArgue(f, s);
+            the_chunk->text[k] = BrMemAllocate(strlen(s) + 1, kMem_race_text_str);
+            strcpy(the_chunk->text[k], s);
+        }
+        the_chunk++;
+    }
+    fclose(f);
 }
 
 // IDA: void __usercall DisposeRaceInfo(tRace_info *pRace_info@<EAX>)
@@ -2176,7 +2254,36 @@ void DisposeRaceInfo(tRace_info* pRace_info) {
     int k;
     tText_chunk* the_chunk;
     LOG_TRACE("(%p)", pRace_info);
-    NOT_IMPLEMENTED();
+
+    if (!gNet_mode) {
+        the_chunk = pRace_info->text_chunks;
+        for (i = 0; i < pRace_info->text_chunk_count; i++) {
+            PossibleService();
+            for (j = 0; j < the_chunk->line_count; j++) {
+                if (the_chunk->text[j]) {
+                    BrMemFree(the_chunk->text[j]);
+                }
+            }
+            the_chunk++;
+        }
+        if (pRace_info->text_chunks) {
+            BrMemFree(pRace_info->text_chunks);
+        }
+        if (pRace_info->scene_image_data) {
+            BrMemFree(pRace_info->scene_image_data);
+        }
+        if (pRace_info->map_image_data) {
+            BrMemFree(pRace_info->map_image_data);
+        }
+        PossibleService();
+        if (pRace_info->info_image_data) {
+            BrMemFree(pRace_info->info_image_data);
+        }
+        for (k = 0; k < pRace_info->number_of_racers; k++) {
+            UnlockOpponentMugshot(pRace_info->opponent_list[k].index);
+        }
+        PossibleService();
+    }
 }
 
 // IDA: void __usercall LoadGridIcons(tRace_info *pRace_info@<EAX>)
@@ -2602,7 +2709,8 @@ void LoadMiscStrings() {
 // IDA: void __usercall FillInRaceInfo(tRace_info *pThe_race@<EAX>)
 void FillInRaceInfo(tRace_info* pThe_race) {
     LOG_TRACE("(%p)", pThe_race);
-    NOT_IMPLEMENTED();
+
+    strcpy(gProgram_state.track_file_name, pThe_race->track_file_name);
 }
 
 // IDA: FILE* __usercall OldDRfopen@<EAX>(char *pFilename@<EAX>, char *pMode@<EDX>)

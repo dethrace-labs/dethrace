@@ -18,7 +18,9 @@ void BrAddHead(br_list* list, br_node* node) {
     assert(node != NULL);
     assert(list != NULL);
     assert(list->head != NULL);
-    node->prev = (br_node*)list;
+
+    //node->prev = (br_node*)list;
+    node->prev = (br_node*)&(list->head);
     node->next = list->head;
     list->head->prev = node;
     list->head = node;
@@ -53,7 +55,10 @@ void BrInsert(br_list* list, br_node* here, br_node* node) {
 // IDA: br_node* __cdecl BrRemove(br_node *node)
 br_node* BrRemove(br_node* node) {
     LOG_TRACE("(%p)", node);
-    NOT_IMPLEMENTED();
+
+    node->next->prev = node->prev;
+    node->prev->next = node->next;
+    return node;
 }
 
 // IDA: void __cdecl BrSimpleNewList(br_simple_list *list)

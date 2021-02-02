@@ -7,13 +7,13 @@
 #include "input.h"
 #include "loading.h"
 #include "main.h"
-#include "pc-dos/dossys.h"
+#include "pd/sys.h"
 #include "sound.h"
 #include "utility.h"
 #include <stdlib.h>
 #include <unistd.h>
 
-int gFlic_bunch8[16];
+int gFlic_bunch8[16] = { 290, 291, 292, 293, 294, 295, 296, 297, 42, 43, 154, 301, 42, 43, 304, 305 };
 int gFlic_bunch4[22] = {
     80,
     81,
@@ -39,7 +39,7 @@ int gFlic_bunch4[22] = {
     121
 };
 
-int gFlic_bunch2[8];
+int gFlic_bunch2[8] = { 70, 71, 72, 73, 74, 56, 57, 59 };
 
 tFlic_spec gMain_flic_list[372] = {
     { "xxxxxxxx.FLI", 1, 0, 0, 0, 0, 25, NULL, 0u },
@@ -391,10 +391,62 @@ int gPanel_flic_top[2];
 tFlic_descriptor gPanel_flic[2];
 br_pixelmap* gPanel_buffer[2];
 int gPanel_flic_left[2];
-int gFlic_bunch6[51];
+int gFlic_bunch6[51] = {
+    190,
+    191,
+    192,
+    42,
+    43,
+    195,
+    200,
+    201,
+    210,
+    212,
+    213,
+    220,
+    221,
+    222,
+    220,
+    221,
+    225,
+    230,
+    231,
+    42,
+    43,
+    154,
+    45,
+    220,
+    221,
+    222,
+    220,
+    221,
+    225,
+    250,
+    251,
+    42,
+    43,
+    254,
+    255,
+    256,
+    154,
+    42,
+    43,
+    260,
+    220,
+    221,
+    222,
+    220,
+    221,
+    225,
+    280,
+    281,
+    42,
+    43,
+    284
+};
 int gFlic_bunch7[7] = { 130, 131, 132, 42, 43, 135, 45 };
-int gFlic_bunch5[5];
-int gFlic_bunch3[13];
+int gFlic_bunch5[5] = { 100, 101, 42, 43, 45 };
+int gFlic_bunch3[13] = { 40, 41, 42, 43, 44, 45, 50, 51, 73, 74, 56, 57, 59 };
 int gFlic_bunch0[29] = {
     10,
     11,
@@ -426,7 +478,39 @@ int gFlic_bunch0[29] = {
     135,
     45
 };
-int gFlic_bunch1[31];
+int gFlic_bunch1[31] = {
+    140,
+    141,
+    42,
+    43,
+    144,
+    145,
+    146,
+    147,
+    45,
+    150,
+    151,
+    42,
+    43,
+    154,
+    155,
+    156,
+    160,
+    161,
+    42,
+    43,
+    154,
+    170,
+    171,
+    176,
+    177,
+    172,
+    180,
+    181,
+    42,
+    43,
+    154
+};
 tU32 gSound_time;
 int gTrans_enabled = 1;
 int gPanel_flic_disable;
@@ -545,7 +629,8 @@ void TurnOnPanelFlics() {
 // IDA: int __usercall GetPanelFlicFrameIndex@<EAX>(int pIndex@<EAX>)
 int GetPanelFlicFrameIndex(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+
+    return gPanel_flic[pIndex].current_frame;
 }
 
 // IDA: void __cdecl FlicPaletteAllocate()
@@ -660,7 +745,17 @@ void FreeFlicPaletteAllocate() {
 // IDA: int __usercall EndFlic@<EAX>(tFlic_descriptor_ptr pFlic_info@<EAX>)
 int EndFlic(tFlic_descriptor_ptr pFlic_info) {
     LOG_TRACE("(%d)", pFlic_info);
-    NOT_IMPLEMENTED();
+
+    if (pFlic_info->f) {
+        BrMemFree(pFlic_info->data_start);
+        pFlic_info->data_start = NULL;
+        fclose(pFlic_info->f);
+        pFlic_info->f = NULL;
+    }
+    if (pFlic_info->data) {
+        pFlic_info->data = NULL;
+    }
+    return 0;
 }
 
 // IDA: void __usercall DoColourMap(tFlic_descriptor_ptr pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
@@ -1563,15 +1658,7 @@ void InitialiseFlicPanel(int pIndex, int pLeft, int pTop, int pWidth, int pHeigh
 void DisposeFlicPanel(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
-    if (gPanel_flic[pIndex].f) {
-        BrMemFree(gPanel_flic[pIndex].data_start);
-        gPanel_flic[pIndex].data_start = NULL;
-        fclose(gPanel_flic[pIndex].f);
-        gPanel_flic[pIndex].f = NULL;
-    }
-    if (gPanel_flic[pIndex].data) {
-        gPanel_flic[pIndex].data = NULL;
-    }
+    EndFlic(&gPanel_flic[pIndex]);
     BrMemFree(gPanel_buffer[pIndex]->pixels);
     BrPixelmapFree(gPanel_buffer[pIndex]);
     gPanel_buffer[pIndex] = NULL;

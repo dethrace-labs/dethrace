@@ -7,7 +7,7 @@
 #include "input.h"
 #include "loading.h"
 #include "main.h"
-#include "pc-dos/dossys.h"
+#include "pd/sys.h"
 #include "sound.h"
 #include <stdlib.h>
 

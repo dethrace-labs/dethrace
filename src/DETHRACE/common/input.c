@@ -5,7 +5,7 @@
 #include "globvars.h"
 #include "grafdata.h"
 #include "graphics.h"
-#include "pc-dos/dossys.h"
+#include "pd/sys.h"
 #include "utility.h"
 #include <stdlib.h>
 

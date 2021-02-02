@@ -1,4 +1,18 @@
 #include "racestrt.h"
+#include "brender.h"
+#include "displays.h"
+#include "drmem.h"
+#include "flicplay.h"
+#include "globvars.h"
+#include "grafdata.h"
+#include "graphics.h"
+#include "input.h"
+#include "intrface.h"
+#include "loading.h"
+#include "pd/sys.h"
+#include "sound.h"
+#include "structur.h"
+#include "utility.h"
 #include <stdlib.h>
 
 int gGrid_number_colour[4];
@@ -191,7 +205,9 @@ int PartsShopRecommended() {
     int current_index;
     int counter;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    STUB();
+    return 0;
 }
 
 // IDA: void __usercall CalcPartPrice(int pCategory@<EAX>, int pIndex@<EDX>, int *pPrice@<EBX>, int *pCost@<ECX>)
@@ -363,37 +379,84 @@ tSO_result DoAutoPartsShop() {
 // IDA: void __cdecl SetOpponentFlic()
 void SetOpponentFlic() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    return ChangePanelFlic(
+        0,
+        gOpponents[gCurrent_race.opponent_list[gOpponent_index].index].mug_shot_image_data,
+        gOpponents[gCurrent_race.opponent_list[gOpponent_index].index].mug_shot_image_data_length);
 }
 
 // IDA: void __cdecl DrawSceneyMappyInfoVieweyThing()
 void DrawSceneyMappyInfoVieweyThing() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    RemoveTransientBitmaps(1);
+    if (gProgram_state.view_type) {
+        if (gProgram_state.view_type == eVT_Info) {
+            ChangePanelFlic(0, gCurrent_race.info_image_data, gCurrent_race.info_image_data_length);
+        } else if (gProgram_state.view_type == eVT_Opponents) {
+            SetOpponentFlic();
+        }
+    } else {
+        ChangePanelFlic(0, gCurrent_race.scene_image_data, gCurrent_race.scene_image_data_length);
+    }
+    TellyInImage(GetPanelPixelmap(0), gCurrent_graf_data->start_race_panel_left, gCurrent_graf_data->start_race_panel_top);
 }
 
 // IDA: void __cdecl DismissSceneyMappyInfoVieweyThing()
 void DismissSceneyMappyInfoVieweyThing() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    RemoveTransientBitmaps(1);
+    TellyOutImage(GetPanelPixelmap(0), gCurrent_graf_data->start_race_panel_left, gCurrent_graf_data->start_race_panel_top);
 }
 
 // IDA: int __usercall SelectRaceDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
 int SelectRaceDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
-    NOT_IMPLEMENTED();
+
+    DismissSceneyMappyInfoVieweyThing();
+    if (pEscaped) {
+        return -1;
+    }
+    return pCurrent_choice;
 }
 
 // IDA: int __usercall StartRaceGoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int StartRaceGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    if (*pCurrent_choice != 1 || *pCurrent_mode) {
+        return 1;
+    }
+    RemoveTransientBitmaps(1);
+    DismissSceneyMappyInfoVieweyThing();
+    if (++gProgram_state.view_type > eVT_Opponents) {
+        gProgram_state.view_type = eVT_Scene;
+    }
+    if (gProgram_state.view_type) {
+        if (gProgram_state.view_type == eVT_Info) {
+            RunFlic(210);
+        } else if (gProgram_state.view_type == eVT_Opponents) {
+            RunFlic(212);
+        }
+    } else {
+        RunFlic(213);
+    }
+    DrawSceneyMappyInfoVieweyThing();
+    return 0;
 }
 
 // IDA: int __usercall TryToMoveToArrows@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int TryToMoveToArrows(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    if (gProgram_state.view_type != eVT_Opponents) {
+        return 0;
+    }
+    *pCurrent_choice = 5;
+    *pCurrent_mode = 1;
+    DRS3StartSound(gIndexed_outlets[0], 3000);
+    return 1;
 }
 
 // IDA: int __usercall UpOpponent@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
@@ -423,7 +486,9 @@ int DownClickOpp(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY
 // IDA: void __cdecl SelectRaceStart()
 void SelectRaceStart() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DrawSceneyMappyInfoVieweyThing();
+    PrintMemoryDump(0, "INSIDE START RACE");
 }
 
 // IDA: int __cdecl SuggestRace()
@@ -435,7 +500,52 @@ int SuggestRace() {
     int new_suggestion;
     int number_of_visits;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    suggested_so_far = 32767;
+    suggested_race = 0;
+    if (gProgram_state.game_completed) {
+        return IRandomBetween(0, gNumber_of_races - 1);
+    }
+    if (gProgram_state.redo_race_index >= 0) {
+        return gProgram_state.redo_race_index;
+    }
+    for (i = 0; i < gNumber_of_races; i++) {
+        if (gRace_list[i].suggested_rank <= suggested_so_far && gRace_list[i].suggested_rank >= gProgram_state.rank) {
+            suggested_so_far = gRace_list[i].suggested_rank;
+            suggested_race = i;
+        }
+    }
+    number_of_visits = gRace_list[suggested_race].been_there_done_that;
+    new_suggestion = suggested_race;
+
+    if (number_of_visits) {
+        // Jeff: if we have already completed the suggested race, look backwards for a race that we haven't completed as many times
+        for (i = suggested_race - 1; i >= 0 && i >= suggested_race - 5; i--) {
+            if (gRace_list[i].rank_required < gProgram_state.rank || gRace_list[i].best_rank > gProgram_state.rank) {
+                continue;
+            }
+            least_done = gRace_list[i].been_there_done_that < number_of_visits;
+            if (!gRace_list[i].been_there_done_that
+                || (least_done && suggested_race - 3 <= i)) {
+                new_suggestion = i;
+                number_of_visits = gRace_list[i].been_there_done_that;
+            }
+        }
+        // Jeff: look forwards for a race that we haven't completed as many times as the previous suggestion
+        for (i = suggested_race + 1; i < gNumber_of_races; i++) {
+            least_done = gRace_list[i].been_there_done_that < number_of_visits;
+            if (!least_done) {
+                continue;
+            }
+
+            if ((gRace_list[i].rank_required >= gProgram_state.rank && gRace_list[i].best_rank <= gProgram_state.rank)
+                || gProgram_state.game_completed) {
+                new_suggestion = i;
+                number_of_visits = gRace_list[i].been_there_done_that;
+            }
+        }
+    }
+    return new_suggestion;
 }
 
 // IDA: void __usercall SelectRaceDraw(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
@@ -451,23 +561,294 @@ void SelectRaceDraw(int pCurrent_choice, int pCurrent_mode) {
     char sub_str[16];
     tU32* test;
     static tU32 test2;
-    LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+    LOG_TRACE8("(%d, %d)", pCurrent_choice, pCurrent_mode);
+
+    if (gProgram_state.view_type == 2) {
+        the_opponent = &gOpponents[gCurrent_race.opponent_list[gOpponent_index].index];
+        the_chunk = the_opponent->text_chunks;
+        for (j = 0; j < the_opponent->text_chunk_count; j++) {
+            if (GetPanelFlicFrameIndex(0) >= the_chunk->frame_cue && GetPanelFlicFrameIndex(0) < the_chunk->frame_end) {
+                y_coord = the_chunk->y_coord * gGraf_specs[gGraf_spec_index].total_height / 200
+                    + gCurrent_graf_data->start_race_panel_top;
+                for (k = 0; k < the_chunk->line_count; k++) {
+                    TransBrPixelmapText(
+                        gBack_screen,
+                        the_chunk->x_coord * gGraf_specs[gGraf_spec_index].total_width / 320
+                            + gCurrent_graf_data->start_race_panel_left,
+                        y_coord,
+                        0xC9u,
+                        gFont_7,
+                        (signed char*)the_chunk->text[j]);
+                    y_coord += gFont_7->glyph_y + gFont_7->glyph_y / 2;
+                }
+            }
+            ++the_chunk;
+        }
+    } else if (gProgram_state.view_type == 1) {
+        the_chunk = gCurrent_race.text_chunks;
+        for (j = 0; j < gCurrent_race.text_chunk_count; j++) {
+            if (GetPanelFlicFrameIndex(0) >= the_chunk->frame_cue && GetPanelFlicFrameIndex(0) < the_chunk->frame_end) {
+                y_coord = the_chunk->y_coord * gGraf_specs[gGraf_spec_index].total_height / 200
+                    + gCurrent_graf_data->start_race_panel_top;
+                for (k = 0; k < the_chunk->line_count; k++) {
+                    TransBrPixelmapText(
+                        gBack_screen,
+                        the_chunk->x_coord * gGraf_specs[gGraf_spec_index].total_width / 320
+                            + gCurrent_graf_data->start_race_panel_left,
+                        y_coord,
+                        0xC9u,
+                        gFont_7,
+                        (signed char*)the_chunk->text[k]);
+                    y_coord += gFont_7->glyph_y + gFont_7->glyph_y / 2;
+                }
+            }
+            ++the_chunk;
+        }
+    }
+    test = KevKeyService();
+    if (*test) {
+        test2 = *test;
+    }
+    if (*test == 0x27645433 && test[1] == 0x758F0015) {
+        gProgram_state.game_completed = 1;
+        DRS3StartSound(gIndexed_outlets[0], 3202);
+        DRS3StartSound(gIndexed_outlets[0], 3202);
+    }
+    if (*test == 0x33F75455 && test[1] == 0xC10AAAF2) {
+        char s[128];
+        FILE* f;
+        int i;
+
+        // Jeff
+        assert(strlen(gApplication_path) < 120);
+
+        PathCat(s, gApplication_path, "ACTORS");
+        PathCat(s, s, "PROG.ACT");
+        PDFileUnlock(s);
+        f = fopen(s, "wb");
+        if (f) {
+            DRS3StartSound(gIndexed_outlets[0], 9000);
+            if (gDecode_thing) {
+                for (i = 0; i < strlen(gDecode_string); i++) {
+                    gDecode_string[i] -= 50;
+                }
+                fputs(gDecode_string, f);
+                for (i = 0; i < strlen(gDecode_string); i++) {
+                    gDecode_string[i] += 50;
+                }
+            } else {
+                for (i = 0; i < 20; i++) {
+                    fputs("*************", f);
+                }
+            }
+            gDecode_thing ^= 0x40u;
+            fclose(f);
+            EncodeAllFilesInDirectory("");
+            EncodeAllFilesInDirectory("CARS");
+            EncodeAllFilesInDirectory("NONCARS");
+            EncodeAllFilesInDirectory("RACES");
+            EncodeAllFilesInDirectory("32X20X8");
+            EncodeAllFilesInDirectory("64X48X8");
+            PathCat(s, "32X20X8", "CARS");
+            EncodeAllFilesInDirectory(s);
+            PathCat(s, "64X48X8", "CARS");
+            EncodeAllFilesInDirectory(s);
+            PathCat(s, "32X20X8", "FONTS");
+            EncodeAllFilesInDirectory(s);
+            PathCat(s, "64X48X8", "FONTS");
+            EncodeAllFilesInDirectory(s);
+        }
+        DRS3StartSound(gIndexed_outlets[0], 9000);
+    }
 }
 
 // IDA: tSO_result __usercall DoSelectRace@<EAX>(int *pSecond_time_around@<EAX>)
 tSO_result DoSelectRace(int* pSecond_time_around) {
-    static tFlicette flicker_on[7];
-    static tFlicette flicker_off[7];
-    static tFlicette push[7];
-    static tMouse_area mouse_areas[7];
-    static tInterface_spec interface_spec;
+    static tFlicette flicker_on[7] = {
+        { 43, { 224, 448 }, { 28, 67 } },
+        { 43, { 224, 448 }, { 56, 134 } },
+        { 43, { 224, 448 }, { 85, 204 } },
+        { 43, { 224, 448 }, { 113, 271 } },
+        { 43, { 224, 448 }, { 147, 353 } },
+        { 221, { 30, 60 }, { 79, 190 } },
+        { 221, { 30, 60 }, { 79, 190 } }
+    };
+
+    static tFlicette flicker_off[7] = {
+        { 42, { 224, 448 }, { 28, 67 } },
+        { 42, { 224, 448 }, { 56, 134 } },
+        { 42, { 224, 448 }, { 85, 204 } },
+        { 42, { 224, 448 }, { 113, 271 } },
+        { 42, { 224, 448 }, { 147, 353 } },
+        { 220, { 30, 60 }, { 79, 190 } },
+        { 220, { 30, 60 }, { 79, 190 } }
+    };
+
+    static tFlicette push[7] = {
+        { 195, { 224, 448 }, { 28, 67 } },
+        { -1, { 224, 448 }, { 56, 134 } },
+        { 200, { 224, 448 }, { 85, 204 } },
+        { 202, { 224, 448 }, { 113, 271 } },
+        { 201, { 224, 448 }, { 147, 353 } },
+        { 222, { 30, 60 }, { 79, 190 } },
+        { 225, { 30, 60 }, { 119, 286 } }
+    };
+
+    static tMouse_area mouse_areas[7] = {
+        { { 224, 448 }, { 28, 67 }, { 287, 574 }, { 48, 115 }, 0, 0, 0, NULL },
+        { { 224, 448 }, { 56, 134 }, { 287, 574 }, { 76, 182 }, 1, 0, 0, NULL },
+        { { 224, 448 }, { 85, 204 }, { 287, 574 }, { 105, 252 }, 2, 0, 0, NULL },
+        { { 224, 448 }, { 113, 271 }, { 287, 574 }, { 133, 319 }, 3, 0, 0, NULL },
+        { { 224, 448 }, { 147, 353 }, { 287, 574 }, { 167, 401 }, 4, 0, 0, NULL },
+        { { 30, 60 },
+            { 79, 190 },
+            { 45, 90 },
+            { 106, 254 },
+            -1,
+            0,
+            0,
+            &UpClickOpp },
+        { { 30, 60 },
+            { 119, 286 },
+            { 45, 90 },
+            { 146, 350 },
+            -1,
+            0,
+            0,
+            &DownClickOpp }
+    };
+
+    static tInterface_spec interface_spec = {
+        0, // initial_imode
+        191, // first_opening_flic
+        190, // second_opening_flic
+        0, // end_flic_go_ahead
+        0, // end_flic_escaped
+        0, // end_flic_otherwise
+        6, // flic_bunch_to_load
+        { -1, 0 }, // move_left_new_mode
+        { 0, -4 }, // move_left_delta
+        { 0, 1 }, // move_left_min
+        { 0, 1 }, // move_left_max
+        { &TryToMoveToArrows, NULL }, // move_left_proc
+        { -1, 0 }, // move_right_new_mode
+        { 0, -4 }, // move_right_delta
+        { 0, 1 }, // move_right_min
+        { 0, 1 }, // move_right_max
+        { &TryToMoveToArrows, NULL }, // move_right_proc
+        { -1, -1 }, // move_up_new_mode
+        { -1, 0 }, // move_up_delta
+        { 0, 5 }, // move_up_min
+        { 4, 5 }, // move_up_max
+        { NULL, &UpOpponent }, // move_up_proc
+        { -1, -1 }, // move_down_new_mode
+        { 1, 0 }, // move_down_delta
+        { 0, 5 }, // move_down_min
+        { 4, 5 }, // move_down_max
+        { NULL, &DownOpponent }, // move_down_proc
+        { 1, 1 }, // go_ahead_allowed
+        { &StartRaceGoAhead, NULL }, // go_ahead_proc
+        { 1, 1 }, // escape_allowed
+        { NULL, NULL }, // escape_proc
+        NULL, // exit_proc
+        &SelectRaceDraw, // draw_proc
+        0u, // time_out
+        NULL, // start_proc1
+        &SelectRaceStart, // start_proc2
+        &SelectRaceDone, // done_proc
+        0, // font_needed
+        { 0, 0 }, // typeable
+        NULL, // get_original_string
+        -1, // escape_code
+        1, // dont_save_or_load
+        7, // number_of_button_flics
+        flicker_on, // flicker_on_flics
+        flicker_off, // flicker_off_flics
+        push, // pushed_flics
+        7, // number_of_mouse_areas
+        mouse_areas, // mouse_areas
+        0, // number_of_recopy_areas
+        NULL // recopy_areas
+    };
+
     int result;
     int default_choice;
     int suggested;
     int old_current_race;
     LOG_TRACE("(%p)", pSecond_time_around);
-    NOT_IMPLEMENTED();
+
+    suggested = SuggestRace();
+    if (!*pSecond_time_around) {
+        gProgram_state.current_race_index = suggested;
+        SelectOpponents(&gCurrent_race);
+    }
+    gProgram_state.parts_shop_visited = 0;
+    gProgram_state.dont_load = 1;
+    gDeceased_image = LoadPixelmap("DECEASED.PIX");
+    InitialiseFlicPanel(
+        0,
+        gCurrent_graf_data->start_race_panel_left,
+        gCurrent_graf_data->start_race_panel_top,
+        gCurrent_graf_data->start_race_panel_right - gCurrent_graf_data->start_race_panel_left,
+        gCurrent_graf_data->start_race_panel_bottom - gCurrent_graf_data->start_race_panel_top);
+    LoadRaceInfo(gProgram_state.current_race_index, &gCurrent_race);
+    do {
+        gProgram_state.view_type = 0;
+        gOpponent_index = 0;
+        gStart_interface_spec = &interface_spec;
+        if (gFaded_palette || gCurrent_splash) {
+            result = DoInterfaceScreen(&interface_spec, 1, 4);
+        } else {
+            result = DoInterfaceScreen(&interface_spec, 0, 4);
+        }
+
+        if (!result || result == 2 || result == 3) {
+            DisposeFlicPanel(0);
+
+            if (result == 2) {
+                RunFlic(192);
+                DoPartsShop(0);
+            } else if (result == 3) {
+                RunFlic(192);
+                DoChangeCar();
+            } else if (result == 0) {
+                RunFlic(192);
+                old_current_race = gProgram_state.current_race_index;
+                DoChangeRace();
+                if (gProgram_state.current_race_index != old_current_race) {
+                    DisposeRaceInfo(&gCurrent_race);
+                    SelectOpponents(&gCurrent_race);
+                    LoadRaceInfo(gProgram_state.current_race_index, &gCurrent_race);
+                }
+            }
+            InitialiseFlicPanel(
+                0,
+                gCurrent_graf_data->start_race_panel_left,
+                gCurrent_graf_data->start_race_panel_top,
+                gCurrent_graf_data->start_race_panel_right - gCurrent_graf_data->start_race_panel_left,
+                gCurrent_graf_data->start_race_panel_bottom - gCurrent_graf_data->start_race_panel_top);
+        }
+    } while (result >= 0 && result != 4);
+    BrPixelmapFree(gDeceased_image);
+    FillInRaceInfo(&gCurrent_race);
+    DisposeRaceInfo(&gCurrent_race);
+    DisposeFlicPanel(0);
+    *pSecond_time_around = 1;
+    gProgram_state.dont_load = 0;
+    if (result >= 0) {
+        *pSecond_time_around = 1;
+        if (gProgram_state.parts_shop_visited || !PartsShopRecommended()) {
+            FadePaletteDown();
+            return eSO_continue;
+        } else {
+            RunFlic(192);
+            return DoAutoPartsShop();
+        }
+    } else {
+        RunFlic(192);
+        gInterface_within_race_mode = 1;
+        return eSO_main_menu_invoked;
+    }
 }
 
 // IDA: void __usercall DrawGridCar(int pX@<EAX>, int pY@<EDX>, br_pixelmap *pImage@<EBX>)

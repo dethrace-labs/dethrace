@@ -273,4 +273,6 @@ typedef enum keymapcodes {
 
 #define DAMAGE_UNIT_PERIODS 5
 
+#define STR_ENDS_WITH(haystack, needle) strcmp(haystack + strlen(haystack) - strlen(needle), needle)
+
 #endif

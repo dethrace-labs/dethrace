@@ -150,7 +150,9 @@ br_pixelmap* BrMapAdd(br_pixelmap* pixelmap) {
 // IDA: br_pixelmap* __cdecl BrMapRemove(br_pixelmap *pixelmap)
 br_pixelmap* BrMapRemove(br_pixelmap* pixelmap) {
     LOG_TRACE("(%p)", pixelmap);
-    NOT_IMPLEMENTED();
+
+    BrBufferClear(pixelmap);
+    return BrRegistryRemove(&v1db.reg_textures, pixelmap);
 }
 
 // IDA: br_pixelmap* __cdecl BrMapFind(char *pattern)
