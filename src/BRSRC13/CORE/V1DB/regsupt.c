@@ -20,7 +20,9 @@ br_model* BrModelAdd(br_model* model) {
 // IDA: br_model* __cdecl BrModelRemove(br_model *model)
 br_model* BrModelRemove(br_model* model) {
     LOG_TRACE("(%p)", model);
-    NOT_IMPLEMENTED();
+
+    BrModelClear(model);
+    return BrRegistryRemove(&v1db.reg_models, model);
 }
 
 // IDA: br_model* __cdecl BrModelFind(char *pattern)
@@ -80,7 +82,8 @@ br_material* BrMaterialAdd(br_material* material) {
 // IDA: br_material* __cdecl BrMaterialRemove(br_material *material)
 br_material* BrMaterialRemove(br_material* material) {
     LOG_TRACE("(%p)", material);
-    NOT_IMPLEMENTED();
+
+    return (br_material*)BrRegistryRemove(&v1db.reg_materials, material);
 }
 
 // IDA: br_material* __cdecl BrMaterialFind(char *pattern)

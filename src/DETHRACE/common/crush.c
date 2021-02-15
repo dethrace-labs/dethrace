@@ -1,6 +1,7 @@
 #include "crush.h"
 #include "brender.h"
 #include "loading.h"
+#include "utility.h"
 #include <stdlib.h>
 
 float gWobble_spam_y[8];
@@ -60,7 +61,22 @@ float SkipCrushData(FILE* pF) {
     char s[256];
     float softness;
     LOG_TRACE("(%p)", pF);
-    NOT_IMPLEMENTED();
+
+    softness = GetAFloat(pF);
+    for (i = 0; i < 5; ++i) {
+        GetALineAndDontArgue(pF, s);
+    }
+    count_1 = GetAnInt(pF);
+    for (i = 0; i < count_1; i++) {
+        for (j = 0; j < 5; j++) {
+            GetALineAndDontArgue(pF, s);
+        }
+        count_2 = GetAnInt(pF);
+        for (j = 0; j < 2 * count_2; j++) {
+            GetALineAndDontArgue(pF, s);
+        }
+    }
+    return softness;
 }
 
 // IDA: int __usercall WriteCrushData@<EAX>(FILE *pF@<EAX>, tCrush_data *pCrush_data@<EDX>)

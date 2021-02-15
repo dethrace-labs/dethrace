@@ -873,7 +873,8 @@ void AddVouchers(int pCount) {
 // IDA: void __cdecl ResetRecoveryVouchers()
 void ResetRecoveryVouchers() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gRecovery_voucher_count = 0;
 }
 
 // IDA: void __cdecl CycleCarTexturingLevel()

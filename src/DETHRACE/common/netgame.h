@@ -4,6 +4,16 @@
 #include "br_types.h"
 #include "dr_types.h"
 
+extern int gGame_scores[6];
+extern int gPowerup_cost[4];
+extern int gPed_target;
+extern int gNot_shown_race_type_headup;
+extern tU32 gLast_it_change;
+extern tU32 gTime_for_punishment;
+extern tNet_game_player_info* gLast_lepper;
+extern int gInitialised_grid;
+extern int gIt_or_fox;
+
 void SendCarData(tU32 pNext_frame_time);
 
 void ReceivedRecover(tNet_contents* pContents);

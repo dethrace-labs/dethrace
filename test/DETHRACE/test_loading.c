@@ -47,7 +47,7 @@ void test_loading_LoadGeneralParameters() {
 
     TEST_ASSERT_EQUAL_INT(0, gInitial_net_credits[0]);
     TEST_ASSERT_EQUAL_INT(2000, gInitial_net_credits[1]);
-    TEST_ASSERT_EQUAL_INT(1, gGravity_multiplier);
+    TEST_ASSERT_EQUAL_INT(1, gDefault_gravity);
 }
 
 void test_loading_brfont() {
@@ -218,6 +218,18 @@ void test_loading_LoadCar() {
     // }
 }
 
+void test_loading_LoadOpponentCar() {
+    REQUIRES_DATA_DIRECTORY();
+    tCar_spec car_spec;
+    tBrender_storage storage;
+    InitialiseStorageSpace(&storage, 50, 50, 50, 50);
+    for (int i = 0; i < 10; i++) {
+        LOG_DEBUG("iteration %d", i);
+        LoadCar("NEWEAGLE.TXT", eDriver_oppo, &car_spec, eFrankie, "playerName", &storage);
+        ClearOutStorageSpace(&storage);
+    }
+}
+
 void test_loading_suite() {
     RUN_TEST(test_loading_GetCDPathFromPathsTxtFile);
     RUN_TEST(test_loading_OldDRfopen);
@@ -227,4 +239,5 @@ void test_loading_suite() {
     RUN_TEST(test_loading_memread);
     RUN_TEST(test_loading_ConvertPixToStripMap);
     RUN_TEST(test_loading_LoadCar);
+    RUN_TEST(test_loading_LoadOpponentCar);
 }

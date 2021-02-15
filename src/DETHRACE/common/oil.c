@@ -80,7 +80,7 @@ void InitOilSpills() {
 void ResetOilSpills() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    STUB();
 }
 
 // IDA: void __usercall QueueOilSpill(tCar_spec *pCar@<EAX>)

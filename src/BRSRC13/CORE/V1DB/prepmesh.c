@@ -697,5 +697,6 @@ void BrModelUpdate(br_model* model, br_uint_16 flags) {
 // IDA: void __usercall BrModelClear(br_model *model@<EAX>)
 void BrModelClear(br_model* model) {
     LOG_TRACE("(%p)", model);
-    NOT_IMPLEMENTED();
+
+    // does something with ->stored field, we don't care
 }

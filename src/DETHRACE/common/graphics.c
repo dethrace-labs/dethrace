@@ -42,7 +42,17 @@ br_pixelmap* gEval_2;
 br_vector3 gShadow_light_z;
 br_vector3 gShadow_light_x;
 int gShadow_dim_amount;
-br_colour gRGB_colours[9];
+br_colour gRGB_colours[9] = {
+    0u,
+    16777215u,
+    16711680u,
+    65280u,
+    255u,
+    16776960u,
+    65535u,
+    16711935u,
+    13649666u
+};
 int gNumber_of_lollipops;
 br_vector3 gShadow_light_ray;
 br_scalar gShadow_hither_z_move;
@@ -200,13 +210,33 @@ void BuildColourTable(br_pixelmap* pPalette) {
     float nearest_distance;
     float distance;
     LOG_TRACE("(%p)", pPalette);
-    NOT_IMPLEMENTED();
+
+#define SQR(i) i* i
+
+    for (i = 0; i < 9; ++i) {
+        nearest_distance = 0x48400000;
+        red = (gRGB_colours[i] >> 16) & 0xFF;
+        green = (gRGB_colours[i] >> 8) & 0xFF;
+        blue = gRGB_colours[i] & 0xFF;
+        for (j = 0; j < 256; j++) {
+            distance = SQR((double)(signed int)(*((br_uint_8*)pPalette->pixels + 4 * j + 2) - red));
+            distance += SQR((double)(signed int)(*((br_uint_8*)pPalette->pixels + 4 * j) - blue));
+            distance += SQR((double)(signed int)(*((br_uint_8*)pPalette->pixels + 4 * j + 1) - green));
+            if (distance < nearest_distance) {
+                nearest_index = j;
+                nearest_distance = distance;
+            }
+        }
+        gColours[i] = nearest_index;
+        LOG_DEBUG("color %d %d", i, gColours[i]);
+    }
 }
 
 // IDA: void __cdecl ClearConcussion()
 void ClearConcussion() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gConcussion.concussed = 0;
 }
 
 // IDA: tS8* __usercall SkipLines@<EAX>(tS8 *pSource@<EAX>, int pCount@<EDX>)
@@ -366,7 +396,8 @@ void SetBRenderScreenAndBuffers(int pX_offset, int pY_offset, int pWidth, int pH
 // IDA: void __cdecl SetIntegerMapRenders()
 void SetIntegerMapRenders() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __cdecl AdjustRenderScreenSize()
@@ -500,8 +531,18 @@ void ClearEntireScreen() {
 // IDA: void __cdecl ClearWobbles()
 void ClearWobbles() {
     int i;
+    LOG_TRACE("()");
 
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < COUNT_OF(gWobble_array); ++i) {
+        gWobble_array[i].amplitude_x = 0.0;
+    }
+}
+
+// IDA: void __cdecl InitWobbleStuff()
+void InitWobbleStuff() {
+    int i;
+
+    for (i = 0; i < COUNT_OF(gWobble_array); i++) {
         gWobble_array[i].amplitude_x = 0;
     }
 }
@@ -509,7 +550,7 @@ void ClearWobbles() {
 // IDA: void __cdecl InitWobbleStuff()
 void InitWobbleStuff() {
     int i;
-    
+
     ClearWobbles();
     for (i = 0; i < 64; i++) {
         gCosine_array[i] = cosf(i / 64.0f * 3.141592653589793f / 2.0f);

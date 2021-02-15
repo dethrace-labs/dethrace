@@ -29,6 +29,7 @@
 #include "spark.h"
 #include "utility.h"
 #include "world.h"
+#include <sys/errno.h>
 
 #define HITHER_MULTIPLIER 2.0f
 #define AMBIENT_MULTIPLIER 0.0099999998f
@@ -400,7 +401,7 @@ void LoadGeneralParameters() {
         gDemo_opponents[i] = GetAnInt(f);
     }
 
-    gGravity_multiplier = GetAFloat(f);
+    gDefault_gravity = GetAFloat(f);
     gZombie_factor = GetAFloat(f);
     gCut_delay_1 = GetAFloat(f);
     gCut_delay_2 = GetAFloat(f);
@@ -1038,6 +1039,7 @@ void ReadMechanicsData(FILE* pF, tCar_spec* c) {
     LOG_TRACE("(%p, %p)", pF, c);
 
     GetALineAndDontArgue(pF, s);
+    LOG_DEBUG("s %s", s);
     for (i = strlen(s) - 1; s[i] == ' '; --i) {
         ;
     }
@@ -1301,7 +1303,17 @@ intptr_t LinkModel(br_actor* pActor, tModel_pool* pModel_pool) {
 void FreeUpBonnetModels(br_model** pModel_array, int pModel_count) {
     int i;
     LOG_TRACE("(%p, %d)", pModel_array, pModel_count);
-    NOT_IMPLEMENTED();
+
+    // TODO: this causes a use-after-free somewhere...
+    // for (i = 0; i < pModel_count; i++) {
+    //     if (pModel_array[i]) {
+    //         if (strcmp("Ebonnet.DAT", pModel_array[i]->identifier) == 0 || strcmp("FIN.DAT", pModel_array[i]->identifier) == 0) {
+    //             BrModelRemove(pModel_array[i]);
+    //             BrModelFree(pModel_array[i]);
+    //             pModel_array[i] = NULL;
+    //         }
+    //     }
+    // }
 }
 
 // IDA: void __usercall LinkModelsToActor(br_actor *pActor@<EAX>, br_model **pModel_array@<EDX>, int pModel_count@<EBX>)
@@ -1475,7 +1487,7 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
             if (!gFunk_groove_flags[i]) {
                 pCar_spec->fg_index = i;
                 gFunk_groove_flags[i] = 1;
-                gGroove_funk_offset = 24 * i;
+                gGroove_funk_offset = GROOVE_FUNK_MAX_PER_CAR * i;
                 break;
             }
         }
@@ -1820,14 +1832,14 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
     str = strtok(s, "\t ,/");
     sscanf(str, "%d", &pCar_spec->car_actor_count);
     pCar_spec->principal_car_actor = 0;
-    for (i = 0; pCar_spec->car_actor_count > i; ++i) {
+    for (i = 0; i < pCar_spec->car_actor_count; i++) {
         PossibleService();
         GetALineAndDontArgue(f, s);
         str = strtok(s, "\t ,/");
         sscanf(str, "%f", &temp_float);
         if (temp_float < 0.0 && pDriver != eDriver_local_human) {
             FreeUpBonnetModels(&pStorage_space->models[old_model_count], pStorage_space->models_count - old_model_count);
-            --pCar_spec->car_actor_count;
+            pCar_spec->car_actor_count--;
             break;
         }
         if (temp_float >= 1.0)
@@ -2598,7 +2610,8 @@ void GetPairOfScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2) {
 // IDA: void __usercall GetThreeScalars(FILE *pF@<EAX>, br_scalar *pS1@<EDX>, br_scalar *pS2@<EBX>, br_scalar *pS3@<ECX>)
 void GetThreeScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2, br_scalar* pS3) {
     LOG_TRACE("(%p, %p, %p, %p)", pF, pS1, pS2, pS3);
-    NOT_IMPLEMENTED();
+
+    GetThreeFloats(pF, &pS1, &pS2, &pS3);
 }
 
 // IDA: void __usercall GetFourScalars(FILE *pF@<EAX>, br_scalar *pF1@<EDX>, br_scalar *pF2@<EBX>, br_scalar *pF3@<ECX>, br_scalar *pF4)
@@ -2649,7 +2662,17 @@ void GetThreeFloatPercents(FILE* pF, float* pF1, float* pF2, float* pF3) {
     char s[256];
     char* str;
     LOG_TRACE("(%p, %p, %p, %p)", pF, pF1, pF2, pF3);
-    NOT_IMPLEMENTED();
+
+    GetALineAndDontArgue(pF, s);
+    str = strtok(s, "\t ,/");
+    sscanf(str, "%f", pF1);
+    str = strtok(NULL, "\t ,/");
+    sscanf(str, "%f", pF2);
+    str = strtok(NULL, "\t ,/");
+    sscanf(str, "%f", pF3);
+    *pF1 = *pF1 / 100.0;
+    *pF2 = *pF2 / 100.0;
+    *pF3 = *pF3 / 100.0;
 }
 
 // IDA: void __usercall GetAString(FILE *pF@<EAX>, char *pString@<EDX>)
@@ -2672,7 +2695,22 @@ void AboutToLoadFirstCar() {
 void LoadOpponentsCars(tRace_info* pRace_info) {
     int i;
     LOG_TRACE("(%p)", pRace_info);
-    NOT_IMPLEMENTED();
+
+    gGroove_funk_offset = GROOVE_FUNK_MAX_PER_CAR;
+    for (i = 0; i < pRace_info->number_of_racers; i++) {
+        PossibleService();
+        if (pRace_info->opponent_list[i].index >= 0) {
+            pRace_info->opponent_list[i].car_spec = BrMemAllocate(sizeof(tCar_spec), kMem_oppo_car_spec);
+            LoadCar(
+                gOpponents[pRace_info->opponent_list[i].index].car_file_name,
+                eDriver_oppo,
+                pRace_info->opponent_list[i].car_spec,
+                pRace_info->opponent_list[i].index,
+                gOpponents[pRace_info->opponent_list[i].index].name,
+                &gTheir_cars_storage_space);
+        }
+    }
+    SetCarStorageTexturingLevel(&gTheir_cars_storage_space, GetCarTexturingLevel(), eCTL_full);
 }
 
 // IDA: void __usercall DisposeOpponentsCars(tRace_info *pRace_info@<EAX>)
@@ -2847,7 +2885,7 @@ FILE* DRfopen(char* pFilename, char* pMode) {
         }
     }
     if (!result) {
-        LOG_WARN("failed");
+        LOG_WARN("failed, %d", errno);
     }
     return result;
 }

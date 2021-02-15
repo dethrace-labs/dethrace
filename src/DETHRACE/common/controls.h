@@ -4,6 +4,20 @@
 #include "br_types.h"
 #include "dr_types.h"
 
+extern char gString[84];
+extern int gToo_late;
+extern int gAllow_car_flying;
+extern int gRecover_timer;
+extern tU32 gLast_repair_time;
+extern int gHad_auto_recover;
+extern tEdit_mode gWhich_edit_mode;
+extern int gRepair_last_time;
+extern int gRecovery_voucher_count;
+extern int gInstant_handbrake;
+extern int gAuto_repair;
+extern tU32 gPalette_fade_time;
+extern int gEntering_message;
+
 extern int _unittest_controls_lastGetPowerup;
 
 void AbortRace();

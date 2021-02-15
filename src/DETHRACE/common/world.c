@@ -2,12 +2,20 @@
 #include <stdlib.h>
 
 #include "brender.h"
+#include "brucetrk.h"
 #include "car.h"
+#include "depth.h"
+#include "drmem.h"
 #include "errors.h"
 #include "flicplay.h"
 #include "globvars.h"
+#include "globvrpb.h"
+#include "harness.h"
 #include "loading.h"
+#include "opponent.h"
 #include "pd/sys.h"
+#include "pedestrn.h"
+#include "spark.h"
 #include "utility.h"
 
 #include <string.h>
@@ -124,7 +132,35 @@ void DisposeStorageSpace(tBrender_storage* pStorage_space) {
 void ClearOutStorageSpace(tBrender_storage* pStorage_space) {
     int i;
     LOG_TRACE("(%p)", pStorage_space);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; pStorage_space->pixelmaps_count > i; ++i) {
+        if (pStorage_space->pixelmaps[i]) {
+            BrMapRemove(pStorage_space->pixelmaps[i]);
+            BrPixelmapFree(pStorage_space->pixelmaps[i]);
+        }
+    }
+    pStorage_space->pixelmaps_count = 0;
+    for (i = 0; pStorage_space->shade_tables_count > i; ++i) {
+        if (pStorage_space->shade_tables[i]) {
+            BrTableRemove(pStorage_space->shade_tables[i]);
+            BrPixelmapFree(pStorage_space->shade_tables[i]);
+        }
+    }
+    pStorage_space->shade_tables_count = 0;
+    for (i = 0; pStorage_space->materials_count > i; ++i) {
+        if (pStorage_space->materials[i]) {
+            BrMaterialRemove(pStorage_space->materials[i]);
+            BrMaterialFree(pStorage_space->materials[i]);
+        }
+    }
+    pStorage_space->materials_count = 0;
+    for (i = 0; pStorage_space->models_count > i; ++i) {
+        if (pStorage_space->models[i]) {
+            BrModelRemove(pStorage_space->models[i]);
+            BrModelFree(pStorage_space->models[i]);
+        }
+    }
+    pStorage_space->models_count = 0;
 }
 
 // IDA: tAdd_to_storage_result __usercall AddPixelmapToStorage@<EAX>(tBrender_storage *pStorage_space@<EAX>, br_pixelmap **pThe_pm@<EDX>)
@@ -183,13 +219,15 @@ tAdd_to_storage_result AddModelToStorage(tBrender_storage* pStorage_space, br_mo
         return eStorage_not_enough_room;
     }
     for (i = 0; i < pStorage_space->models_count; i++) {
-        if (pStorage_space->models[i]->identifier
+        if (pStorage_space->models[i]
+            && pStorage_space->models[i]->identifier
             && pThe_mod->identifier
             && !strcmp(pStorage_space->models[i]->identifier, pThe_mod->identifier)) {
             return eStorage_duplicate;
         }
     }
-    pStorage_space->models[pStorage_space->models_count++] = pThe_mod;
+    pStorage_space->models[pStorage_space->models_count] = pThe_mod;
+    pStorage_space->models_count++;
     return eStorage_allocated;
 }
 
@@ -383,6 +421,7 @@ int LoadNModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
                     FatalError(70);
                     break;
                 case eStorage_duplicate:
+                    LOG_DEBUG("going to dupe");
                     BrModelFree(temp_array[j]);
                     break;
                 case eStorage_allocated:
@@ -1774,7 +1813,490 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     br_pixelmap* sky;
     br_material* material;
     LOG_TRACE("(\"%s\", %p, %p)", pFile_name, pTrack_spec, pRace_info);
-    NOT_IMPLEMENTED();
+
+    killed_sky = 0;
+    PathCat(the_path, gApplication_path, "RACES");
+    PathCat(the_path, the_path, pFile_name);
+    f = DRfopen(the_path, "rt");
+    if (!f) {
+        FatalError(50);
+    }
+    GetALineAndDontArgue(f, s);
+    str = strtok(s, "\t ,/");
+    if (strcmp(str, "VERSION") == 0) {
+        str = strtok(NULL, "\t ,/");
+        sscanf(str, "%d", &gRace_file_version);
+        GetALineAndDontArgue(f, s);
+        str = strtok(s, "\t ,/");
+    } else {
+        gRace_file_version = 0;
+    }
+    sscanf(str, "%f", &temp_float);
+    pRace_info->initial_position.v[0] = temp_float;
+    str = strtok(0, "\t ,/");
+    sscanf(str, "%f", &temp_float);
+    pRace_info->initial_position.v[1] = temp_float;
+    str = strtok(0, "\t ,/");
+    sscanf(str, "%f", &temp_float);
+    pRace_info->initial_position.v[2] = temp_float;
+    PossibleService();
+    GetALineAndDontArgue(f, s);
+    str = strtok(s, "\t ,/");
+    sscanf(str, "%f", &temp_float);
+    pRace_info->initial_yaw = temp_float;
+    GetThreeInts(f, pRace_info->initial_timer, &pRace_info->initial_timer[1], &pRace_info->initial_timer[2]);
+    pRace_info->total_laps = GetAnInt(f);
+    GetThreeInts(f, &pRace_info->bonus_score[0][0], &pRace_info->bonus_score[0][1], &pRace_info->bonus_score[0][2]);
+    GetThreeInts(f, &pRace_info->bonus_score[1][0], &pRace_info->bonus_score[1][1], &pRace_info->bonus_score[1][2]);
+    GetThreeInts(f, &pRace_info->bonus_score[2][0], &pRace_info->bonus_score[2][1], &pRace_info->bonus_score[2][2]);
+    if (gRace_file_version > 1) {
+        GetPairOfInts(f, &cp_rect_w[0], &cp_rect_w[1]);
+        GetPairOfInts(f, &cp_rect_h[0], &cp_rect_h[1]);
+    }
+    PossibleService();
+    pRace_info->check_point_count = GetAnInt(f);
+    for (i = 0; i < pRace_info->check_point_count; i++) {
+        PossibleService();
+        if (gProgram_state.sausage_eater_mode) {
+            GetALineAndDontArgue(f, s);
+            GetThreeInts(
+                f,
+                &pRace_info->checkpoints[i].time_value[0],
+                &pRace_info->checkpoints[i].time_value[1],
+                &pRace_info->checkpoints[i].time_value[2]);
+        } else {
+            GetThreeInts(
+                f,
+                &pRace_info->checkpoints[i].time_value[0],
+                &pRace_info->checkpoints[i].time_value[1],
+                &pRace_info->checkpoints[i].time_value[2]);
+            GetALineAndDontArgue(f, s);
+        }
+        pRace_info->checkpoints[i].quad_count = GetAnInt(f);
+        for (j = 0; j < pRace_info->checkpoints[i].quad_count; j++) {
+            for (k = 0; k < 4; ++k) {
+                GetThreeScalars(
+                    f,
+                    &pRace_info->checkpoints[i].vertices[j][k].v[0],
+                    &pRace_info->checkpoints[i].vertices[j][k].v[1],
+                    &pRace_info->checkpoints[i].vertices[j][k].v[2]);
+            }
+            p[0] = pRace_info->checkpoints[i].vertices[j][0];
+            p[1] = pRace_info->checkpoints[i].vertices[j][1];
+            p[2] = pRace_info->checkpoints[i].vertices[j][2];
+            // v77 = p[1].v[0] - p[0].v[0];
+            // v78 = p[1].v[1] - p[0].v[1];
+            // v79 = p[1].v[2] - p[0].v[2];
+            // v74 = p[2].v[0] - p[0].v[0];
+            // v75 = p[2].v[1] - p[0].v[1];
+            // v76 = p[2].v[2] - p[0].v[2];
+            pRace_info->checkpoints[i].normal[j].v[0] = (p[2].v[2] - p[0].v[2]) * (p[1].v[1] - p[0].v[1]) - (p[1].v[2] - p[0].v[2]) * (p[2].v[1] - p[0].v[1]);
+            pRace_info->checkpoints[i].normal[j].v[1] = (p[1].v[2] - p[0].v[2]) * (p[2].v[0] - p[0].v[0]) - (p[2].v[2] - p[0].v[2]) * (p[1].v[0] - p[0].v[0]);
+            pRace_info->checkpoints[i].normal[j].v[2] = (p[2].v[1] - p[0].v[1]) * (p[1].v[0] - p[0].v[0]) - (p[1].v[1] - p[0].v[1]) * (p[2].v[0] - p[0].v[0]);
+        }
+        if (gRace_file_version > 0) {
+            if (gRace_file_version == 1) {
+                GetPairOfInts(f, pRace_info->checkpoints[i].map_left, &pRace_info->checkpoints[i].map_left[1]);
+                GetPairOfInts(f, pRace_info->checkpoints[i].map_top, &pRace_info->checkpoints[i].map_top[1]);
+                GetPairOfInts(f, pRace_info->checkpoints[i].map_right, &pRace_info->checkpoints[i].map_right[1]);
+                GetPairOfInts(f, pRace_info->checkpoints[i].map_bottom, &pRace_info->checkpoints[i].map_bottom[1]);
+            } else {
+                GetPairOfInts(f, pRace_info->checkpoints[i].map_left, &pRace_info->checkpoints[i].map_left[1]);
+                GetPairOfInts(f, pRace_info->checkpoints[i].map_top, &pRace_info->checkpoints[i].map_top[1]);
+                pRace_info->checkpoints[i].map_right[0] = cp_rect_w[0] + pRace_info->checkpoints[i].map_left[0];
+                pRace_info->checkpoints[i].map_right[1] = cp_rect_w[0] + pRace_info->checkpoints[i].map_left[1];
+                pRace_info->checkpoints[i].map_bottom[0] = cp_rect_h[0] + pRace_info->checkpoints[i].map_top[0];
+                pRace_info->checkpoints[i].map_bottom[1] = cp_rect_h[0] + pRace_info->checkpoints[i].map_top[1];
+            }
+        }
+    }
+    if (gRace_file_version <= 3) {
+        LoadSomePixelmaps(&gTrack_storage_space, f);
+    } else if (gAusterity_mode) {
+        SkipNLines(f);
+        LoadSomePixelmaps(&gTrack_storage_space, f);
+    } else {
+        LoadSomePixelmaps(&gTrack_storage_space, f);
+        SkipNLines(f);
+    }
+    LoadSomeShadeTables(&gTrack_storage_space, f);
+    if (gRace_file_version <= 3) {
+        LoadSomeMaterials(&gTrack_storage_space, f);
+    } else if (gAusterity_mode) {
+        SkipNLines(f);
+        LoadSomeMaterials(&gTrack_storage_space, f);
+    } else {
+        LoadSomeMaterials(&gTrack_storage_space, f);
+        SkipNLines(f);
+    }
+    for (i = 0; gTrack_storage_space.materials_count > i; ++i) {
+        PossibleService();
+        if (gTrack_storage_space.materials[i]->flags & 7) {
+            gTrack_storage_space.materials[i]->flags &= 0xFFFFFFF8;
+            if (gTrack_storage_space.materials[i]->flags & 0x1000) {
+                gTrack_storage_space.materials[i]->colour_map_1 = (br_pixelmap*)12345;
+                gTrack_storage_space.materials[i]->flags &= 0xFFFFEFFF;
+            }
+            BrMaterialUpdate(gTrack_storage_space.materials[i], BR_MATU_RENDERING);
+        }
+    }
+    if (gRace_file_version <= 5) {
+        LoadSomeTrackModels(&gTrack_storage_space, f);
+    } else if (gAusterity_mode) {
+        SkipNLines(f);
+        LoadSomeTrackModels(&gTrack_storage_space, f);
+    } else {
+        LoadSomeTrackModels(&gTrack_storage_space, f);
+        SkipNLines(f);
+    }
+    PrintMemoryDump(0, "JUST LOADED IN TEXTURES/MATS/MODELS FOR TRACK");
+    if (gRace_file_version <= 5) {
+        GetALineAndDontArgue(f, s);
+        str = strtok(s, "\t ,/");
+        PathCat(the_path, gApplication_path, "ACTORS");
+        PathCat(the_path, the_path, str);
+    } else if (gAusterity_mode) {
+        GetALineAndDontArgue(f, s);
+        GetALineAndDontArgue(f, s);
+        str = strtok(s, "\t ,/");
+        PathCat(the_path, gApplication_path, "ACTORS");
+        PathCat(the_path, the_path, str);
+    } else {
+        GetALineAndDontArgue(f, s);
+        str = strtok(s, "\t ,/");
+        PathCat(the_path, gApplication_path, "ACTORS");
+        PathCat(the_path, the_path, str);
+        GetALineAndDontArgue(f, s);
+    }
+    pTrack_spec->the_actor = BrActorLoad(the_path);
+    if (gRace_file_version <= 6) {
+        gDefault_blend_pc = 75;
+    } else {
+        GetAString(f, s);
+        if (!sscanf(&s, "%d", &gDefault_blend_pc) || gDefault_blend_pc < 0 || gDefault_blend_pc > 100) {
+            PDFatalError("Wanted a default blend percentage. Didn't get one. Old data file?");
+        }
+    }
+    PossibleService();
+    ExtractColumns(pTrack_spec);
+    for (i = 0; gTrack_storage_space.models_count > i; ++i) {
+        PossibleService();
+        //v80 = 0;
+        if (gTrack_storage_space.models[i] && gTrack_storage_space.models[i]->flags & 0x82) {
+            gTrack_storage_space.models[i]->flags &= 0xFF7Du;
+            for (group = 0; V11MODEL(gTrack_storage_space.models[i])->ngroups > group; ++group) {
+                // TODO: ?
+                // material = gTrack_storage_space.models[i]->faces[V11MODEL(*gTrack_storage_space.models[i])->groups[group].face_user].material;
+                // *gTrack_storage_space.models[i]->prepared->groups[group].face_colours = (br_colour)material;
+                // if (material && !material->index_shade) {
+                //     v9 = BrTableFind("DRRENDER.TAB");
+                //     material->index_shade = v9;
+                //     BrMaterialUpdate(material, 0x7FFFu);
+                // }
+            }
+            DodgyModelUpdate(gTrack_storage_space.models[i]);
+        }
+    }
+    PrintMemoryDump(0, "JUST LOADED IN TRACK ACTOR AND PROCESSED COLUMNS");
+    gTrack_actor = pTrack_spec->the_actor;
+    if (!gRendering_accessories && !gNet_mode) {
+        PossibleService();
+        style = BR_RSTYLE_NONE;
+        DRActorEnumRecurse(gTrack_actor, SetAccessoryRenderingCB, &style);
+    }
+    BrActorAdd(gUniverse_actor, pTrack_spec->the_actor);
+    GetALineAndDontArgue(f, s);
+    str = strtok(s, "\t ,/");
+    str = strtok(str, ".");
+    strcat(str, ".DAT");
+    PathCat(gAdditional_model_path, gApplication_path, "MODELS");
+    PathCat(gAdditional_model_path, gAdditional_model_path, str);
+    gNumber_of_additional_models = 0;
+    PossibleService();
+    str = strtok(s, "\t ,/");
+    str = strtok(str, ".");
+    strcat(str, ".ACT");
+    PathCat(gAdditional_actor_path, gApplication_path, "ACTORS");
+    PathCat(gAdditional_actor_path, gAdditional_actor_path, str);
+    gAdditional_actors = BrActorAllocate(0, 0);
+    BrActorAdd(gUniverse_actor, gAdditional_actors);
+    gLast_actor = 0;
+    SaveAdditionalStuff();
+    GetAString(f, s);
+    sky = BrMapFind(s);
+    if (gAusterity_mode && sky) {
+        for (i = 0; gTrack_storage_space.pixelmaps_count > i; ++i) {
+            if (gTrack_storage_space.pixelmaps[i] == sky) {
+                BrMapRemove(gTrack_storage_space.pixelmaps[i]);
+                BrPixelmapFree(gTrack_storage_space.pixelmaps[i]);
+                gTrack_storage_space.pixelmaps[i] = gTrack_storage_space.pixelmaps[gTrack_storage_space.pixelmaps_count - 1];
+                gTrack_storage_space.pixelmaps_count--;
+                break;
+            }
+        }
+        sky = 0;
+        killed_sky = 1;
+    }
+    gProgram_state.default_depth_effect.sky_texture = sky;
+    if (sky) {
+        sky_pixels_high = gProgram_state.default_depth_effect.sky_texture->height;
+    } else {
+        sky_pixels_high = 100;
+    }
+    PossibleService();
+
+    gSky_image_width = (360.0 / (double)BR_ANGLE_DEG(GetAnInt(f)));
+    gSky_image_height = BR_ANGLE_DEG(GetAScalar(f));
+
+    gSky_image_underground = (uint16_t)gSky_image_height * (sky_pixels_high - GetAnInt(f)) / sky_pixels_high;
+
+    MungeRearviewSky();
+    PossibleService();
+    gProgram_state.default_depth_effect.type = GetALineAndInterpretCommand(f, gDepth_effect_names, 2);
+    GetPairOfInts(f, &gProgram_state.default_depth_effect.start, &gProgram_state.default_depth_effect.end);
+    if (killed_sky && gProgram_state.default_depth_effect.type != eDepth_effect_fog) {
+        gProgram_state.default_depth_effect.type = eDepth_effect_fog;
+        gProgram_state.default_depth_effect.start = 7;
+        gProgram_state.default_depth_effect.end = 0;
+    }
+    InstantDepthChange(
+        gProgram_state.default_depth_effect.type,
+        gProgram_state.default_depth_effect.sky_texture,
+        gProgram_state.default_depth_effect.start,
+        gProgram_state.default_depth_effect.end);
+    gSwap_sky_texture = 0;
+    if (!GetSkyTextureOn()) {
+        ToggleSkyQuietly();
+    }
+    gSwap_depth_effect_type = -1;
+    if (!GetDepthCueingOn()) {
+        ToggleDepthCueingQuietly();
+    }
+    PossibleService();
+    gDefault_engine_noise_index = GetAnInt(f);
+    gDefault_water_spec_vol = &gDefault_default_water_spec_vol;
+    gProgram_state.special_volume_count = GetAnInt(f);
+    if (gProgram_state.special_volume_count) {
+        gProgram_state.special_volumes = BrMemAllocate(sizeof(tSpecial_volume) * gProgram_state.special_volume_count, kMem_special_volume);
+        i = 0;
+        spec = gProgram_state.special_volumes;
+        for (i = 0; i < gProgram_state.special_volume_count; i++) {
+            PossibleService();
+            spec->no_mat = 0;
+            GetALineAndDontArgue(f, s);
+            if (strcmp(s, "NEW IMPROVED!") == 0) {
+                GetThreeScalars(f, &spec->mat.m[0][0], &spec->mat.m[0][1], &spec->mat.m[0][2]);
+                GetThreeScalars(f, &spec->mat.m[1][0], &spec->mat.m[1][1], &spec->mat.m[1][2]);
+                GetThreeScalars(f, &spec->mat.m[2][0], &spec->mat.m[2][1], &spec->mat.m[2][2]);
+                GetThreeScalars(f, &spec->mat.m[3][0], &spec->mat.m[3][1], &spec->mat.m[3][2]);
+                FindInverseAndWorldBox(spec);
+                ParseSpecialVolume(f, spec, 0);
+            } else if (strcmp(s, "DEFAULT WATER") == 0) {
+                spec->bounds.min.v[0] = 0.0;
+                spec->bounds.min.v[1] = 0.0;
+                spec->bounds.min.v[2] = 0.0;
+                spec->bounds.max.v[0] = 0.0;
+                spec->bounds.max.v[1] = 0.0;
+                spec->bounds.max.v[2] = 0.0;
+                ParseSpecialVolume(f, spec, 0);
+                gDefault_water_spec_vol = spec;
+                spec->no_mat = 1;
+            } else {
+                TELL_ME_IF_WE_PASS_THIS_WAY();
+                spec->no_mat = 0;
+                str = strtok(s, "\t ,/");
+                sscanf(str, "%f", &spec->bounds.min.v[0]);
+                str = strtok(0, "\t ,/");
+                sscanf(str, "%f", &spec->bounds.min.v[1]);
+                str = strtok(0, "\t ,/");
+                sscanf(str, "%f", &spec->bounds.min.v[2]);
+                GetThreeScalars(f, &spec->bounds.max.v[0], &spec->bounds.max.v[1], &spec->bounds.max.v[2]);
+                BrMatrix34Identity(&spec->mat);
+                for (k = 0; k < 3; ++k) {
+                    // TODO: ? spec->mat.m[3][k] = (v64[k] + v63[k]) / 2.0;
+                    // spec->mat.m[0][4 * k] = v64[k] - spec->mat.m[3][k];
+                }
+                ParseSpecialVolume(f, spec, 0);
+            }
+            spec++;
+        }
+    }
+    GetAString(f, s);
+    gProgram_state.standard_screen = BrMaterialFind(s);
+    GetAString(f, s);
+    gProgram_state.standard_screen_dark = BrMaterialFind(s);
+    GetAString(f, s);
+    gProgram_state.standard_screen_fog = BrMaterialFind(s);
+    gProgram_state.special_screens_count = GetAnInt(f);
+    if (gProgram_state.special_screens_count) {
+        gProgram_state.special_screens = BrMemAllocate(sizeof(tSpecial_screen) * gProgram_state.special_screens_count, kMem_special_screen);
+        for (i = 0; i < gProgram_state.special_screens_count; i++) {
+            GetFourScalars(
+                f,
+                &gProgram_state.special_screens[i].min_x,
+                &gProgram_state.special_screens[i].min_z,
+                &gProgram_state.special_screens[i].max_x,
+                &gProgram_state.special_screens[i].max_z);
+            GetAString(f, s);
+            material = BrMaterialFind(s);
+            gProgram_state.special_screens[i].material = material;
+        }
+    }
+    PossibleService();
+    GetAString(f, s);
+    pRace_info->map_image = LoadPixelmap(s);
+    PrintMemoryDump(0, "JUST LOADING SKY/SPEC VOLS/SCREENS/MAP");
+    for (i = 0; i < 4; ++i) {
+        GetThreeScalars(
+            f,
+            &pRace_info->map_transformation.m[i][0],
+            &pRace_info->map_transformation.m[i][1],
+            &pRace_info->map_transformation.m[i][2]);
+    }
+    GetALineAndDontArgue(f, s);
+    AddFunkotronics(f, -2, 720);
+    GetALineAndDontArgue(f, s);
+    AddGroovidelics(f, -2, gUniverse_actor, 720, 0);
+    PossibleService();
+    PrintMemoryDump(0, "JUST LOADING IN FUNKS AND GROOVES");
+    ped_subs = 0;
+    count = 0;
+    if (gRace_file_version > 3) {
+        line_count = GetAnInt(f);
+        if (gAusterity_mode) {
+            if (line_count >= 0) {
+                PathCat(the_path, gApplication_path, "PEDSUBS.TXT");
+                g = DRfopen(the_path, "rt");
+                if (!g) {
+                    FatalError(50);
+                }
+                for (i = 0; i < line_count; ++i) {
+                    SkipNLines(g);
+                }
+                count = GetAnInt(g);
+                ped_subs = BrMemAllocate(sizeof(tPed_subs) * count, kMem_misc);
+                for (ped_subs_index = 0; ped_subs_index < count; ped_subs_index++) {
+                    GetPairOfInts(g, &ped_subs[i].orig, &ped_subs[i].subs);
+                }
+                fclose(g);
+            }
+        }
+    }
+    PossibleService();
+    LoadInPedestrians(f, count, ped_subs);
+    if (ped_subs) {
+        BrMemFree(ped_subs);
+    }
+    PrintMemoryDump(0, "JUST LOADED IN PEDS");
+    LoadInOppoPaths(f);
+    PrintMemoryDump(0, "JUST LOADED IN OPPO PATHS");
+    num_materials = GetAnInt(f);
+    for (i = 0; i < num_materials; i++) {
+        PossibleService();
+        pRace_info->material_modifiers[i].car_wall_friction = GetAScalar(f);
+        pRace_info->material_modifiers[i].tyre_road_friction = GetAScalar(f);
+        pRace_info->material_modifiers[i].down_force = GetAScalar(f);
+        pRace_info->material_modifiers[i].bumpiness = GetAScalar(f);
+        pRace_info->material_modifiers[i].tyre_noise_index = GetAnInt(f);
+        pRace_info->material_modifiers[i].crash_noise_index = GetAnInt(f);
+        pRace_info->material_modifiers[i].scrape_noise_index = GetAnInt(f);
+        pRace_info->material_modifiers[i].sparkiness = GetAScalar(f);
+        pRace_info->material_modifiers[i].smoke_type = GetAnInt(f);
+        GetAString(f, s);
+        str = strtok(s, ".");
+
+        if (!strcmp(s, "none") || !strcmp(s, "NONE") || !strcmp(s, "0") || !strcmp(s, "1")) {
+            pRace_info->material_modifiers[i].skid_mark_material = NULL;
+        } else {
+            sl = strlen(str);
+            strcat(str, ".PIX");
+            LoadSinglePixelmap(&gTrack_storage_space, str);
+            str[sl] = 0;
+            strcat(str, ".MAT");
+            material = LoadSingleMaterial(&gTrack_storage_space, str);
+            pRace_info->material_modifiers[i].skid_mark_material = material;
+        }
+    }
+    for (i = num_materials; i < 10; ++i) {
+        pRace_info->material_modifiers[i].car_wall_friction = 1.0;
+        pRace_info->material_modifiers[i].tyre_road_friction = 1.0;
+        pRace_info->material_modifiers[i].down_force = 1.0;
+        pRace_info->material_modifiers[i].bumpiness = 0.0;
+        pRace_info->material_modifiers[i].tyre_noise_index = 0;
+        pRace_info->material_modifiers[i].crash_noise_index = 0;
+        pRace_info->material_modifiers[i].scrape_noise_index = 0;
+        pRace_info->material_modifiers[i].sparkiness = 1.0;
+        pRace_info->material_modifiers[i].smoke_type = 1;
+        pRace_info->material_modifiers[i].skid_mark_material = 0;
+    }
+    i = 10;
+    pRace_info->material_modifiers[i].car_wall_friction = 1.0;
+    pRace_info->material_modifiers[i].tyre_road_friction = 1.0;
+    pRace_info->material_modifiers[i].down_force = 0.0;
+    pRace_info->material_modifiers[i].bumpiness = 0.0;
+    pRace_info->material_modifiers[i].tyre_noise_index = -1;
+    pRace_info->material_modifiers[i].crash_noise_index = 0;
+    pRace_info->material_modifiers[i].scrape_noise_index = 0;
+    pRace_info->material_modifiers[i].sparkiness = 0.0;
+    pRace_info->material_modifiers[i].smoke_type = 1;
+    pRace_info->material_modifiers[i].skid_mark_material = 0;
+    gDefault_water_spec_vol->material_modifier_index = i;
+    num_non_cars = GetAnInt(f);
+    non_car = BrMemCalloc(num_non_cars + 5, sizeof(tNon_car_spec), kMem_non_car_spec);
+    if (!non_car && num_non_cars) {
+        FatalError(50);
+    }
+    gProgram_state.non_cars = non_car;
+    gProgram_state.num_non_car_spaces = num_non_cars + NONCAR_UNUSED_SLOTS;
+    for (i = 0; i < COUNT_OF(gNon_car_spec_list); ++i) {
+        gNon_car_spec_list[i] = 0;
+    }
+    for (i = 0; i < NONCAR_UNUSED_SLOTS; i++) {
+        non_car->collision_info.driver = eDriver_non_car_unused_slot;
+        non_car++;
+    }
+    i = 0;
+    for (i = 0; i < num_non_cars; i++) {
+        PossibleService();
+        GetAString(f, s);
+        PathCat(the_path, gApplication_path, "NONCARS");
+        PathCat(the_path, the_path, s);
+        non_car_f = DRfopen(the_path, "rt");
+        if (!non_car_f) {
+            FatalError(107, the_path);
+        }
+        ReadNonCarMechanicsData(non_car_f, non_car);
+        PossibleService();
+        ReadShrapnelMaterials(non_car_f, &non_car->collision_info);
+        gNon_car_spec_list[non_car->collision_info.index] = i + 1;
+        fclose(non_car_f);
+        non_car++;
+    }
+    GetSmokeShadeTables(f);
+    pRace_info->number_of_net_start_points = GetAnInt(f);
+    for (i = 0; i < pRace_info->number_of_net_start_points; i++) {
+        GetThreeScalars(
+            f,
+            &pRace_info->net_starts[i].pos.v[0],
+            &pRace_info->net_starts[i].pos.v[1],
+            &pRace_info->net_starts[i].pos.v[2]);
+        pRace_info->net_starts[i].yaw = GetAScalar(f);
+    }
+    if (gRace_file_version <= 2) {
+        LoadInKevStuff(NULL);
+    } else {
+        LoadInKevStuff(f);
+    }
+    if (gRace_file_version < 5) {
+        gYon_multiplier = 1.0;
+    } else {
+        gYon_multiplier = GetAScalar(f);
+    }
+    GetAString(f, s);
+    if (strcmp(s, pFile_name) != 0) {
+        FatalError(115, pFile_name);
+    }
+    fclose(f);
 }
 
 // IDA: br_uint_32 __cdecl RemoveBounds(br_actor *pActor, void *pArg)

@@ -3,31 +3,36 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "common/controls.h"
-#include "common/depth.h"
-#include "common/displays.h"
-#include "common/drfile.h"
-#include "common/drmem.h"
-#include "common/errors.h"
-#include "common/flicplay.h"
-#include "common/globvars.h"
-#include "common/globvrkm.h"
-#include "common/globvrpb.h"
-#include "common/grafdata.h"
-#include "common/graphics.h"
-#include "common/loading.h"
-#include "common/netgame.h"
-#include "common/network.h"
-#include "common/oil.h"
-#include "common/pedestrn.h"
-#include "common/powerup.h"
-#include "common/raycast.h"
-#include "common/replay.h"
-#include "common/skidmark.h"
-#include "common/sound.h"
-#include "common/utility.h"
-#include "common/world.h"
+#include "car.h"
+#include "controls.h"
+#include "depth.h"
+#include "displays.h"
+#include "drfile.h"
+#include "drmem.h"
+#include "errors.h"
+#include "flicplay.h"
+#include "globvars.h"
+#include "globvrkm.h"
+#include "globvrpb.h"
+#include "grafdata.h"
+#include "graphics.h"
+#include "loading.h"
+#include "loadsave.h"
+#include "netgame.h"
+#include "network.h"
+#include "oil.h"
+#include "opponent.h"
 #include "pd/sys.h"
+#include "pedestrn.h"
+#include "powerup.h"
+#include "pratcam.h"
+#include "raycast.h"
+#include "replay.h"
+#include "skidmark.h"
+#include "sound.h"
+#include "spark.h"
+#include "utility.h"
+#include "world.h"
 
 #include "brender.h"
 
@@ -423,7 +428,7 @@ void DisposeGameIfNecessary() {
 // IDA: void __cdecl LoadInTrack()
 void LoadInTrack() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    LoadTrack(gProgram_state.track_file_name, &gProgram_state.track_spec, &gCurrent_race);
 }
 
 // IDA: void __cdecl DisposeTrack()
@@ -441,7 +446,120 @@ void CopyMaterialColourFromIndex(br_material* pMaterial) {
 // IDA: void __cdecl InitRace()
 void InitRace() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    SwitchToRealResolution();
+    //TODO: dword_5454C4 = 0;
+    ClearConcussion();
+    ClearWobbles();
+    ClearHeadups();
+    ResetOilSpills();
+    HideSkids();
+    PossibleService();
+    BuildColourTable(gRender_palette);
+    PossibleService();
+    //TODO: dword_55142C = 0;
+    gStart_race_sent = 0;
+    gProgram_state.frame_rate_headup = NewTextHeadupSlot(0, 0, 0, -1, NULL);
+    if (TranslationMode()) {
+        if (gAusterity_mode) {
+            FlushInterfaceFonts();
+        }
+    } else {
+        LoadFont(1);
+        LoadFont(2);
+        LoadFont(3);
+    }
+    LoadFont(4);
+    LoadFont(5);
+    PossibleService();
+    LoadFont(6);
+    LoadFont(7);
+    LoadFont(8);
+    PossibleService();
+    ResetRecoveryVouchers();
+    gMap_mode = 0;
+    gProgram_state.cockpit_image_index = 0;
+    if (gNet_mode) {
+        gNet_cash_headup = NewTextHeadupSlot(13, 0, 0, -6, NULL);
+        gNet_ped_headup = NewTextHeadupSlot(14, 0, 0, -6, NULL);
+    } else {
+        gCredits_won_headup = NewTextHeadupSlot(1, 0, 0, -6, NULL);
+        gPed_kill_count_headup = NewTextHeadupSlot(2, 0, 0, -6, NULL);
+        gCar_kill_count_headup = NewTextHeadupSlot(12, 0, 0, -6, NULL);
+        gTimer_headup = NewTextHeadupSlot(7, 0, 0, -5, NULL);
+        gTime_awarded_headup = NewTextHeadupSlot(11, 0, 0, -2, NULL);
+        gLaps_headup = NewTextHeadupSlot(8, 0, 0, -6, NULL);
+    }
+    PossibleService();
+    gProgram_state.which_view = eView_forward;
+    gProgram_state.new_view = eView_undefined;
+    gProgram_state.pratcam_move_start = 0;
+    gAction_replay_mode = 0;
+    SwitchToRealResolution();
+    InitPratcam();
+    SwitchToLoresMode();
+    gProgram_state.credits_earned = 0;
+    gProgram_state.credits_lost = 0;
+    gProgram_state.peds_killed = 0;
+    gProgram_state.revs = 2000;
+    gProgram_state.current_car.speed = 0.0;
+    gProgram_state.current_car.steering_angle = 0.0;
+    gProgram_state.current_car.lf_sus_position = 0.0;
+    gProgram_state.current_car.rf_sus_position = 0.0;
+    gProgram_state.current_car.lr_sus_position = 0.0;
+    gProgram_state.current_car.rr_sus_position = 0.0;
+    PossibleService();
+    gAuto_repair = 0;
+    SetIntegerMapRenders();
+    AdjustRenderScreenSize();
+    PrintMemoryDump(0, "DIRECTLY BEFORE LOADING IN TRACK");
+    LoadInTrack();
+    if (gYon_multiplier != 1.0) {
+        AdjustRenderScreenSize();
+    }
+    PrintMemoryDump(0, "DIRECTLY AFTER LOADING IN TRACK");
+    LoadCopCars();
+    PrintMemoryDump(0, "AFTER LOADING IN COPS");
+    SaveShadeTables();
+    gArrow_mode = 7;
+    gTimer = 1000 * gCurrent_race.initial_timer[gProgram_state.skill_level];
+    gLap = 1;
+    gTotal_laps = gCurrent_race.total_laps;
+    gCheckpoint = 1;
+    gCheckpoint_count = gCurrent_race.check_point_count;
+    gFreeze_timer = 0;
+    gFree_repairs = 0;
+    if (gNet_mode) {
+        gShow_opponents = gCurrent_net_game->options.show_players_on_map;
+    } else {
+        gShow_opponents = 1;
+    }
+    gOn_drugs = 0;
+    gRace_finished = 0;
+    gOpponent_speed_factor = 1065353216;
+    gCop_speed_factor = 1065353216;
+    gGravity_multiplier = gDefault_gravity;
+    gPinball_factor = 0;
+    gInstant_handbrake = 0;
+    if (gNet_mode) {
+        gShow_peds_on_map = gCurrent_net_game->options.show_peds_on_map;
+    } else {
+        gShow_peds_on_map = 0;
+    }
+    PossibleService();
+    SetCarSuspGiveAndHeight(&gProgram_state.current_car, 1.0, 1.0, 1.0, 0.0, 0.0);
+    InitPowerups();
+    PossibleService();
+    ResetSparks();
+    PossibleService();
+    MakeSavedGame(&gPre_race_saved_game);
+    PossibleService();
+    InitPlayers();
+    if (gNet_mode) {
+        gProgram_state.credits_earned = gInitial_net_credits[gCurrent_net_game->options.starting_money_index];
+    }
+    gInitialised_grid = 0;
+    return SwitchToLoresMode();
 }
 
 // IDA: void __cdecl DisposeRace()

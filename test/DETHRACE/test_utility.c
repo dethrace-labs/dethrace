@@ -83,9 +83,10 @@ void test_utility_PathCat() {
 }
 
 void test_utility_getMiscString() {
-    // LoadMiscStrings();
-    // printf("%s\n", GetMiscString(223));
-    // printf("%s\n", GetMiscString(75));
+    LoadMiscStrings();
+    for (int i = 0; i < 251; i++) {
+        printf("%d: %s\n", i, GetMiscString(i));
+    }
 }
 
 void test_utility_IRandomBetween() {
