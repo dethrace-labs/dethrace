@@ -1030,8 +1030,7 @@ typedef struct br_font {
 } br_font;
 #pragma pack(pop)
 
-typedef struct br_object {
-} br_object;
+typedef struct br_object br_object;
 
 typedef struct br_token_value br_token_value;
 typedef struct br_value_tag {
@@ -1155,8 +1154,7 @@ typedef struct br_outfcty_desc {
     br_boolean fullscreen;
 } br_outfcty_desc;
 
-typedef struct br_renderer_facility {
-} br_renderer_facility;
+typedef struct br_renderer_facility br_renderer_facility;
 
 typedef struct br_device_pixelmap_dispatch br_device_pixelmap_dispatch;
 typedef struct br_device_pixelmap { // size: 0x44
@@ -1183,11 +1181,9 @@ typedef struct br_device_pixelmap { // size: 0x44
     void* pm_stored; // @0x40
 } br_device_pixelmap;
 
-typedef struct br_primitive_library {
-} br_primitive_library;
+typedef struct br_primitive_library br_primitive_library;
 
-typedef struct br_geometry {
-} br_geometry;
+typedef struct br_geometry br_geometry;
 
 typedef struct br_renderer_dispatch br_renderer_dispatch;
 
@@ -1885,8 +1881,7 @@ typedef struct br_buffer_stored_dispatch {
     br_error (*_update)(br_buffer_stored*, br_device_pixelmap*, br_token_value*);
 } br_buffer_stored_dispatch;
 
-typedef struct brp_vertex {
-} brp_vertex;
+typedef struct brp_vertex brp_vertex;
 
 typedef struct br_renderer_dispatch {
     void (*__reserved0)(br_object*);
@@ -2251,8 +2246,7 @@ typedef struct br_primitive_state {
     br_primitive_state_dispatch* dispatch;
 } br_primitive_state;
 
-typedef struct brp_block {
-} brp_block;
+typedef struct brp_block brp_block;
 
 typedef struct br_primitive_state_dispatch {
     void (*__reserved0)(br_object*);

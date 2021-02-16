@@ -2,6 +2,7 @@
 #include "harness.h"
 
 #ifdef _WIN32
+#include <windows.h>
 #include <gl/gl.h>
 #elif defined __unix__
 #define GL_GLEXT_PROTOTYPES 1
@@ -10,7 +11,7 @@
 #define GL_SILENCE_DEPRECATION
 #include <OpenGL/gl3.h>
 #endif
-#include <SDL2/SDL_opengl.h>
+#include <SDL_opengl.h>
 
 tRenderer OpenGLRenderer = {
     Harness_GLRenderer_GetWindowFlags,

@@ -644,7 +644,7 @@ int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU3
     }
     pFlic_info->the_index = pIndex;
     if (pDest_pixelmap) {
-        pFlic_info->first_pixel = pDest_pixelmap->pixels + pDest_pixelmap->row_bytes * pFlic_info->y_offset + pFlic_info->x_offset;
+        pFlic_info->first_pixel = (char*)pDest_pixelmap->pixels + pDest_pixelmap->row_bytes * pFlic_info->y_offset + pFlic_info->x_offset;
     }
     //LOG_DEBUG("first pixel %p %p", pFlic_info->first_pixel, pDest_pixelmap->pixels);
     pFlic_info->the_pixelmap = pDest_pixelmap;
@@ -1156,6 +1156,8 @@ int PlayFlic(int pIndex, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap
         LOG_WARN("startflic returned error");
         return -1;
     }
+
+    last_frame = 0;
     while ((!pInterruptable || !AnyKeyDown()) && !finished_playing) {
         new_time = PDGetTotalTime();
         frame_period = new_time - last_frame;

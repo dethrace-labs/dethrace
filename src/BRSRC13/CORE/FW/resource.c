@@ -108,7 +108,7 @@ void BrResInternalFree(resource_header* res, br_boolean callback) {
 void BrResFree(void* vres) {
     LOG_TRACE10("(%p)", vres);
 
-    vres = vres - sizeof(resource_header);
+    vres = (char*)vres - sizeof(resource_header);
     if (((resource_header*)vres)->magic_num != 0xDEADBEEF) {
         LOG_PANIC("Bad resource header at %p", vres);
     }
@@ -118,7 +118,7 @@ void BrResFree(void* vres) {
 void BrResAssert(void* vres) {
     LOG_TRACE("(%p)", vres);
 
-    vres = vres - sizeof(resource_header);
+    vres = (char*)vres - sizeof(resource_header);
 
     if (((resource_header*)vres)->magic_num != 0xDEADBEEF) {
         LOG_PANIC("Bad resource header at %p. Was %X", vres, ((resource_header*)vres)->magic_num);

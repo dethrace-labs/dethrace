@@ -18,6 +18,9 @@ typedef __iobuf FILE;
 typedef long fpos_t;
 typedef void * onexit_t();
 */
+#ifdef _WIN32
+#include <windows.h>
+#else
 typedef short SHORT;
 typedef unsigned short USHORT;
 typedef int INT;
@@ -25,8 +28,6 @@ typedef int BOOL;
 typedef unsigned int UINT;
 typedef unsigned char BYTE;
 typedef unsigned short WORD;
-typedef unsigned int W32;
-typedef unsigned short W16;
 typedef long LONG;
 typedef unsigned long DWORD;
 typedef BYTE* PBYTE;
@@ -38,7 +39,6 @@ typedef void* PVOID;
 typedef BYTE* LPBYTE;
 typedef BYTE* LPSTR;
 typedef WORD* LPWORD;
-typedef W32* LPW32;
 typedef LONG* LPLONG;
 typedef void* LPVOID;
 typedef BYTE* HPBYTE;
@@ -46,6 +46,10 @@ typedef BYTE* HPSTR;
 typedef LONG* HPLONG;
 typedef void* HPVOID;
 typedef unsigned int HANDLE;
+#endif
+typedef unsigned int W32;
+typedef unsigned short W16;
+typedef W32* LPW32;
 typedef struct _tagRMI_REGS _RMI_REGS;
 typedef struct _tagBREGS _HMI_BREGS;
 typedef struct _tagWREGS _HMI_WREGS;
@@ -3046,11 +3050,13 @@ typedef struct SmackSumTag {
     unsigned long HighestExtraUsed;
 } SmackSum;
 
+#ifndef _WIN32
 typedef struct _heapinfo {
     void* _pentry;
     size_t _size;
     int _useflag;
 } _HEAPINFO;
+#endif
 
 typedef enum tSpec_vol_depth_effect {
     eSpec_dep_acid = 0,
@@ -4262,12 +4268,14 @@ typedef struct find_t {
     char name[13];
 } find_t;
 
+#ifndef _WIN32
 typedef struct _diskfree_t {
     unsigned short total_clusters;
     unsigned short avail_clusters;
     unsigned short sectors_per_cluster;
     unsigned short bytes_per_sector;
 } _diskfree_t;
+#endif
 
 typedef struct tPD_net_game_info {
     _IPX_LOCAL_TARGET addr_ipx;

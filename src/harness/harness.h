@@ -3,7 +3,7 @@
 
 #include "br_types.h"
 #include "debug.h"
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 #define COUNT_OF(array) (sizeof((array)) / sizeof((array)[0]))
 

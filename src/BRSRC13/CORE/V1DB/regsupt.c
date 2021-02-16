@@ -74,6 +74,7 @@ br_uint_32 BrModelEnum(char* pattern, br_model_enum_cbfn* callback, void* arg) {
 br_material* BrMaterialAdd(br_material* material) {
     BrRegistryAdd(&v1db.reg_materials, material);
     BrMaterialUpdate(material, BR_MATU_ALL);
+    return material;
 }
 
 // IDA: br_material* __cdecl BrMaterialRemove(br_material *material)
@@ -99,8 +100,9 @@ br_material_find_cbfn* BrMaterialFindHook(br_material_find_cbfn* hook) {
 // IDA: br_uint_32 __cdecl BrMaterialAddMany(br_material **items, int n)
 br_uint_32 BrMaterialAddMany(br_material** items, int n) {
     int i;
-    int r = 0;
+    int r;
 
+    r = 0;
     for (i = 0; i < n; i++) {
         BrRegistryAdd(&v1db.reg_materials, items[i]);
         BrMaterialUpdate(items[i], BR_MATU_ALL);
@@ -169,6 +171,7 @@ br_uint_32 BrMapAddMany(br_pixelmap** items, int n) {
     int i;
     int r;
 
+    r = 0;
     for (i = 0; i < n; i++) {
         BrRegistryAdd(&v1db.reg_textures, items[i]);
         BrMapUpdate(items[i], 4095);
@@ -233,7 +236,7 @@ br_table_find_cbfn* BrTableFindHook(br_table_find_cbfn* hook) {
 // IDA: br_uint_32 __cdecl BrTableAddMany(br_pixelmap **items, int n)
 br_uint_32 BrTableAddMany(br_pixelmap** items, int n) {
     int i;
-    int r;
+    int r = 0;
 
     for (i = 0; i < n; i++) {
         BrRegistryAdd(&v1db.reg_tables, items[i]);

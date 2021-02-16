@@ -50,7 +50,7 @@ br_resource_class fw_resourceClasses[25] = {
 br_uint_16 nameOrdinals_BRCORE1[185];
 
 br_image Image_BRCORE1 = {
-    {},
+    {0},
     "BRCORE1",
     2,
     0,

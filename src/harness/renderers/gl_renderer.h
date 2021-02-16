@@ -2,7 +2,7 @@
 #define HARNESS_GL_RENDERER
 
 #include "harness.h"
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 extern tRenderer OpenGLRenderer;
 

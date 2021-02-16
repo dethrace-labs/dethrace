@@ -20,6 +20,33 @@
 #include <time.h>
 #include <unistd.h>
 
+#ifdef _WIN32
+#define NS_PER_SEC (1000ULL * 1000ULL * 1000ULL)
+#define CLOCK_MONOTONIC 1
+
+int clock_gettime(int dummy, struct timespec* tv) {
+    static LARGE_INTEGER ticksPerSec;
+    LARGE_INTEGER ticks;
+    double seconds;
+
+    if (!ticksPerSec.QuadPart) {
+        QueryPerformanceFrequency(&ticksPerSec);
+        if (!ticksPerSec.QuadPart) {
+            errno = ENOTSUP;
+            return -1;
+        }
+    }
+
+    QueryPerformanceCounter(&ticks);
+
+    seconds = (double)ticks.QuadPart / (double)ticksPerSec.QuadPart;
+    tv->tv_sec = (time_t)seconds;
+    tv->tv_nsec = (long)((ULONGLONG)(seconds * NS_PER_SEC) % NS_PER_SEC);
+
+    return 0;
+}
+#endif
+
 int gASCII_table[128];
 tU32 gKeyboard_bits[8];
 int gASCII_shift_table[128];
@@ -497,7 +524,7 @@ void PDSetPalette(br_pixelmap* pThe_palette) {
 void PDSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
     int i;
     tU8* p;
-    p = pPalette->pixels + 4 * pFirst_colour;
+    p = (char*)pPalette->pixels + 4 * pFirst_colour;
     for (i = pFirst_colour; i < pFirst_colour + pCount; i++) {
         BrDevPaletteSetEntryOld(i, (p[2] << 16) | (p[1] << 8) | *p);
         p += 4;
