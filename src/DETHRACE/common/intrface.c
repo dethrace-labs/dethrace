@@ -213,6 +213,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
         pSpec->start_proc2();
     }
 
+    copy_areas = NULL;
     if (pSpec->number_of_recopy_areas) {
         copy_areas = BrMemAllocate(sizeof(void*) * pSpec->number_of_recopy_areas, kMem_intf_copy_areas);
         for (i = 0; i < pSpec->number_of_recopy_areas; i++) {
@@ -232,8 +233,9 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
             pSpec->recopy_areas[i].bottom[gGraf_data_index] - pSpec->recopy_areas[i].top[gGraf_data_index]);
     }
 
-    timed_out = -1;
+    timed_out = -1; /* Not sure this is right, timed_out looks like its used as a bool? */
     last_choice = gCurrent_choice;
+    last_press = -1;
     do {
         if (last_choice != gCurrent_choice) {
             ChangeSelection(pSpec, &last_choice, &gCurrent_choice, gCurrent_mode, 1);

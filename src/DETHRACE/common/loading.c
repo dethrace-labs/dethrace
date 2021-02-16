@@ -745,7 +745,7 @@ tS8* ConvertPixToStripMap(br_pixelmap* pThe_br_map) {
     current_strip_pointer = temp_strip_image;
 
     for (i = 0; i < pThe_br_map->height; i++) {
-        next_byte = pThe_br_map->pixels + i * pThe_br_map->row_bytes; //points to start of this line
+        next_byte = (char*)pThe_br_map->pixels + i * pThe_br_map->row_bytes; //points to start of this line
         new_line_length = 2; // leave space at the start of the line to store number of chunks and first chunk length
         j = 0;
         counter = 0;

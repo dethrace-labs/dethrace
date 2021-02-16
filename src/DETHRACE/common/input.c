@@ -461,7 +461,7 @@ void RollLettersIn() {
                 if (which_letter < let->number_of_letters && which_letter >= 0 && letter_offset >= 0 && letter_offset < font_height) {
 
                     //                    LOG_DEBUG("chars %d, %d, %d, %d", let->letters[0], let->letters[1], let->letters[2], let->letters[3]);
-                    source_ptr = gFonts[FONT_TYPEABLE].images->pixels + (font_height * (let->letters[which_letter] - 32) + letter_offset) * the_row_bytes;
+                    source_ptr = (char*)gFonts[FONT_TYPEABLE].images->pixels + (font_height * (let->letters[which_letter] - 32) + letter_offset) * the_row_bytes;
                     for (k = 0; k < font_width; k++) {
                         the_byte = *source_ptr;
                         if (the_byte) {

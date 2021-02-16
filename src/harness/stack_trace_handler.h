@@ -14,6 +14,11 @@
 #ifdef _WIN32
 #include <imagehlp.h>
 #include <windows.h>
+#ifdef _WIN64
+#define Esp Rsp
+#define Eip Rip
+#define Ebp Rbp
+#endif
 #else
 #include <err.h>
 #include <execinfo.h>

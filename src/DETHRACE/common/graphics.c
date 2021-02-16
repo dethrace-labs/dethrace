@@ -420,7 +420,7 @@ void DRSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
     if (!pFirst_colour) {
         ((br_int_32*)pPalette->pixels)[0] = 0;
     }
-    memcpy(gCurrent_palette_pixels + 4 * pFirst_colour, pPalette->pixels + 4 * pFirst_colour, 4 * pCount);
+    memcpy(gCurrent_palette_pixels + 4 * pFirst_colour, (char*)pPalette->pixels + 4 * pFirst_colour, 4 * pCount);
     if (!gFaded_palette) {
         PDSetPaletteEntries(pPalette, pFirst_colour, pCount);
     }
@@ -1029,8 +1029,8 @@ void DRPixelmapRectangleOnscreenCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_i
 
     source_row_wrap = pSource->row_bytes - pWidth;
     dest_row_wrap = pDest->row_bytes - pWidth;
-    dest_ptr = pDest->pixels + (pDest->row_bytes * pDest_y + pDest_x);
-    source_ptr = pSource->pixels + (pSource->row_bytes * pSource_y + pSource_x);
+    dest_ptr = (char*)pDest->pixels + (pDest->row_bytes * pDest_y + pDest_x);
+    source_ptr = (char*)pSource->pixels + (pSource->row_bytes * pSource_y + pSource_x);
 
     for (y_count = 0; y_count < pHeight; y_count++) {
         for (x_count = 0; x_count < pWidth; x_count++) {
@@ -1086,8 +1086,8 @@ void DRPixelmapRectangleVScaledCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
 
     source_row_wrap = pSource->row_bytes - pWidth;
     dest_row_wrap = pDest->row_bytes - pWidth;
-    dest_ptr = pDest->pixels + (pDest->row_bytes * pDest_y + pDest_x);
-    source_ptr = pSource->pixels + (pSource->row_bytes * pSource_y + pSource_x);
+    dest_ptr = (char*)pDest->pixels + (pDest->row_bytes * pDest_y + pDest_x);
+    source_ptr = (char*)pSource->pixels + (pSource->row_bytes * pSource_y + pSource_x);
 
     source_y = 0;
     source_y_delta = (pSource->height << 16) / pHeight - 0x10000;

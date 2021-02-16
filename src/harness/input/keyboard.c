@@ -1,5 +1,5 @@
 #include "dr_types.h"
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 #include "keyboard.h"
 

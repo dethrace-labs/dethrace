@@ -4,6 +4,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#if defined _WIN32 && !defined sleep
+    #define sleep(x) _sleep(x)
+#endif
+
 #define BLUE
 
 #define LOG_TRACE(...) debug_printf("[TRACE] %s", __FUNCTION__, __VA_ARGS__)
