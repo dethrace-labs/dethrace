@@ -81,8 +81,10 @@ void PlaySmackerFile(char* pSmack_name) {
             smk_info_video(s, &w, &h, NULL);
             double fps = 1000000.0 / usf;
             int delay_ms = (1 / fps) * 1000;
+#ifndef _WIN32
             ts.tv_sec = delay_ms / 1000;
             ts.tv_nsec = (delay_ms % 1000) * 1000000;
+#endif
             smk_enable_video(s, 1);
 
             smk_first(s);
@@ -110,7 +112,11 @@ void PlaySmackerFile(char* pSmack_name) {
                 }
 
                 // wait until its time for the next frame
+#ifndef _WIN32
                 nanosleep(&ts, &ts);
+#else
+                Sleep(delay_ms);
+#endif
             } while (smk_next(s) == SMK_MORE);
 
             smk_close(s);

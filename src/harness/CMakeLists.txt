@@ -6,7 +6,7 @@ target_include_directories(harness PRIVATE
     ${CMAKE_SOURCE_DIR}/src/DETHRACE
 )
 
-target_link_libraries(harness PRIVATE miniposix SDL2::SDL2)
+target_link_libraries(harness PRIVATE miniposix SDL2::SDL2 glad)
 
 if(NOT MSVC)
     target_compile_options(harness PRIVATE

@@ -2,7 +2,8 @@
 #include "harness.h"
 #include "input/keyboard.h"
 #include "stack_trace_handler.h"
-#include "unistd.h"
+#include <strings.h>
+#include <unistd.h>
 #include <sys/stat.h>
 
 SDL_Window* window;
@@ -50,7 +51,7 @@ void Harness_Init(char* name, tRenderer* renderer) {
         printf("DETHRACE_ROOT_DIR: %s\n", root_dir);
         result = chdir(root_dir);
         if (result != 0) {
-            LOG_PANIC("Failed to chdir. Returned %d", result);
+            LOG_PANIC("Failed to chdir. Error is %s", strerror(errno));
         }
     }
 
