@@ -1,6 +1,7 @@
 #include "gl_renderer.h"
 #include "harness.h"
 
+/*
 #ifdef _WIN32
 #include <windows.h>
 #include <gl/gl.h>
@@ -11,6 +12,8 @@
 #define GL_SILENCE_DEPRECATION
 #include <OpenGL/gl3.h>
 #endif
+*/
+#include <glad/glad.h>
 #include <SDL_opengl.h>
 
 tRenderer OpenGLRenderer = {
@@ -51,6 +54,12 @@ void Harness_GLRenderer_Init(SDL_Window* window) {
     context = SDL_GL_CreateContext(window);
     if (!context) {
         LOG_PANIC("Failed to call SDL_GL_CreateContext. %s", SDL_GetError());
+    }
+
+    // Load GL extensions using glad
+    if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
+        LOG_PANIC("Failed to initialize the OpenGL context with GLAD.");
+        exit(1);
     }
 
     const char* vs_source = "#version 330 core\n"

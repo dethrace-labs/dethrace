@@ -9,7 +9,7 @@ target_include_directories(dethrace PRIVATE
     ${CMAKE_SOURCE_DIR}/src/BRSRC13
 )
 
-target_link_libraries(dethrace PRIVATE smacker harness brender miniposix SDL2::SDL2)
+target_link_libraries(dethrace PRIVATE smacker harness brender miniposix SDL2::SDL2 glad)
 
 if(NOT MSVC)
     target_compile_options(dethrace PRIVATE
@@ -25,11 +25,13 @@ if(NOT MSVC)
         target_link_libraries(dethrace PRIVATE GL)
     endif()
 else()
-    target_compile_definitions(dethrace PRIVATE -D_CRT_SECURE_NO_WARNINGS)
+    target_compile_definitions(dethrace PRIVATE -D_CRT_SECURE_NO_WARNINGS -DSDL_MAIN_HANDLED)
     target_compile_options(dethrace PRIVATE
         /wd4101
         /wd4996
     )
+    target_link_libraries(dethrace PRIVATE dbghelp)
+    target_link_options(dethrace PRIVATE /subsystem:windows /ENTRY:mainCRTStartup)
 endif()
 
 target_sources(dethrace PRIVATE
