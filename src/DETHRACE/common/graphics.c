@@ -1029,8 +1029,8 @@ void DRPixelmapRectangleOnscreenCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_i
 
     source_row_wrap = pSource->row_bytes - pWidth;
     dest_row_wrap = pDest->row_bytes - pWidth;
-    dest_ptr = (char*)pDest->pixels + (pDest->row_bytes * pDest_y + pDest_x);
-    source_ptr = (char*)pSource->pixels + (pSource->row_bytes * pSource_y + pSource_x);
+    dest_ptr = (tU8*)pDest->pixels + (pDest->row_bytes * pDest_y + pDest_x);
+    source_ptr = (tU8*)pSource->pixels + (pSource->row_bytes * pSource_y + pSource_x);
 
     for (y_count = 0; y_count < pHeight; y_count++) {
         for (x_count = 0; x_count < pWidth; x_count++) {
@@ -1086,8 +1086,8 @@ void DRPixelmapRectangleVScaledCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
 
     source_row_wrap = pSource->row_bytes - pWidth;
     dest_row_wrap = pDest->row_bytes - pWidth;
-    dest_ptr = (char*)pDest->pixels + (pDest->row_bytes * pDest_y + pDest_x);
-    source_ptr = (char*)pSource->pixels + (pSource->row_bytes * pSource_y + pSource_x);
+    dest_ptr = (tU8*)pDest->pixels + (pDest->row_bytes * pDest_y + pDest_x);
+    source_ptr = (tU8*)pSource->pixels + (pSource->row_bytes * pSource_y + pSource_x);
 
     source_y = 0;
     source_y_delta = (pSource->height << 16) / pHeight - 0x10000;

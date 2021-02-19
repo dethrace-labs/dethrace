@@ -644,7 +644,7 @@ int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU3
     }
     pFlic_info->the_index = pIndex;
     if (pDest_pixelmap) {
-        pFlic_info->first_pixel = (char*)pDest_pixelmap->pixels + pDest_pixelmap->row_bytes * pFlic_info->y_offset + pFlic_info->x_offset;
+        pFlic_info->first_pixel = (tU8*)pDest_pixelmap->pixels + pDest_pixelmap->row_bytes * pFlic_info->y_offset + pFlic_info->x_offset;
     }
     //LOG_DEBUG("first pixel %p %p", pFlic_info->first_pixel, pDest_pixelmap->pixels);
     pFlic_info->the_pixelmap = pDest_pixelmap;
