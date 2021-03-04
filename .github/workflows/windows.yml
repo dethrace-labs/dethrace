@@ -1,0 +1,67 @@
+name: windows
+
+on:
+  pull_request:
+  push:
+  release:
+    types: published
+
+jobs:
+  dethrace_win_msvc:
+    runs-on: windows-2019
+    strategy:
+      matrix:
+        platform: [x86, amd64]
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        ref: ${{ github.event.pull_request.head.sha }}
+        
+    - uses: ilammy/msvc-dev-cmd@v1.4.1
+      with:
+        arch: ${{ matrix.platform }}
+        
+    - name: Set Git Info
+      id: gitinfo
+      run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+      
+    - name: Set variables
+      id: vars
+      run: |
+        If ("${{ matrix.platform }}" -eq "x86") {
+          echo "::set-output name=sdl_path::x86"
+          echo "::set-output name=arc_path::i686"
+        } else {
+          echo "::set-output name=sdl_path::x64"
+          echo "::set-output name=arc_path::x86_64"
+        }
+
+    - name: Install Dependencies
+      run: |
+        Invoke-WebRequest -Uri https://www.libsdl.org/release/SDL2-devel-2.0.12-VC.zip -OutFile $Env:TEMP\SDL2-devel.zip
+        Invoke-WebRequest -Uri https://github.com/ninja-build/ninja/releases/download/v1.10.1/ninja-win.zip -OutFile $Env:TEMP\ninja-win.zip
+        Expand-Archive $Env:TEMP\SDL2-devel.zip -DestinationPath $Env:TEMP
+        Expand-Archive $Env:TEMP\ninja-win.zip -DestinationPath $Env:TEMP\ninja
+        echo "$Env:TEMP\ninja" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        ninja --version
+        
+    - name: Configure Deathrace
+      run: |
+        cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSDL2=ON "-DSDL2_ROOT_DIR=$($Env:TEMP)\SDL2-2.0.12" -B build
+
+    - name: Build Deathrace
+      run: |
+        cmake --build build --config RelWithDebInfo
+
+    - name: Create archives
+      shell: bash
+      run: |
+        mkdir artifact
+        7z a artifact/dethrace-win-msvc-${{ steps.vars.outputs.arc_path }}-${{ steps.gitinfo.outputs.sha_short }}.zip ./build/dethrace.exe ./build/dethrace.pdb $TEMP/SDL2-2.0.12/lib/${{ steps.vars.outputs.sdl_path }}/SDL2.dll
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: dethrace-win-msvc-${{ steps.vars.outputs.arc_path }}
+        path: artifact

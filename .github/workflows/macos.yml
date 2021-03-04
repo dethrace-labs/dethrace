@@ -1,0 +1,43 @@
+name: macos
+
+on:
+  pull_request:
+  push:
+  release:
+    types: published
+
+jobs:
+  deathrace-macos:
+    runs-on: macos-10.15
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        ref: ${{ github.event.pull_request.head.sha }}
+    - name: Set Git Info
+      id: gitinfo
+      run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+
+    - name: Install dependencies
+      run: |
+        brew install SDL2
+        
+    - name: Configure Dethrace
+      run: |
+        cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -B build
+        
+    - name: Build Dethrace
+      run: |
+        cmake --build build -- -j 4
+
+    - name: Create archives
+      run: |
+        mkdir artifact
+        7z a artifact/dethrace-macos-${{ matrix.platform }}-x86_64-${{ steps.gitinfo.outputs.sha_short }}.zip ./build/dethrace
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: dethrace-macos-${{ matrix.platform }}-x86_64
+        path: artifact
