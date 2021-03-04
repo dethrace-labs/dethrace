@@ -1,0 +1,63 @@
+name: linux
+
+on:
+  pull_request:
+  push:
+  release:
+    types: published
+
+jobs:
+  dethrace-linux:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        platform: [clang, gcc]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        ref: ${{ github.event.pull_request.head.sha }}
+        
+    - name: Set Git Info
+      id: gitinfo
+      run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+      
+    - name: Set variables
+      id: vars
+      run: |
+        if [ "${{ matrix.platform }}" = "clang" ]
+        then
+          echo "::set-output name=cc::clang"
+          echo "::set-output name=cxx::clang++"
+        else
+          echo "::set-output name=cc::gcc"
+          echo "::set-output name=cxx::g++"
+        fi
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update -qq > /dev/null
+        sudo apt-get install -qq -y libsdl2-dev > /dev/null
+
+    - name: Configure Dethrace
+      env:
+          CC: ${{ steps.vars.outputs.cc }}
+          CXX: ${{ steps.vars.outputs.cxx }}
+      run: |
+        cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -B build
+        
+    - name: Build Dethrace
+      run: |
+        cmake --build build -- -j 4
+
+    - name: Create archives
+      run: |
+        mkdir artifact
+        7z a artifact/dethrace-linux-${{ matrix.platform }}-x86_64-${{ steps.gitinfo.outputs.sha_short }}.zip ./build/dethrace
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: dethrace-linux-${{ matrix.platform }}-x86_64
+        path: artifact
