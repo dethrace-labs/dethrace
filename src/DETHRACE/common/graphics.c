@@ -500,20 +500,19 @@ void ClearEntireScreen() {
 // IDA: void __cdecl ClearWobbles()
 void ClearWobbles() {
     int i;
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < 5; i++) {
+        gWobble_array[i].amplitude_x = 0;
+    }
 }
 
 // IDA: void __cdecl InitWobbleStuff()
 void InitWobbleStuff() {
     int i;
-
-    for (i = 0; i < 5; i++) {
-        gWobble_array[i].amplitude_x = 0;
-    }
-
+    
+    ClearWobbles();
     for (i = 0; i < 64; i++) {
-        gCosine_array[i] = cosf((double)i * 0.015625f * 3.141592653589793f * 0.5f);
+        gCosine_array[i] = cosf(i / 64.0f * 3.141592653589793f / 2.0f);
     }
 }
 
