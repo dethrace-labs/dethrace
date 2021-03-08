@@ -1,6 +1,7 @@
-add_executable(dethrace)
+# Create object files so we can link them into the main binary and into tests without building twice.
+add_library(dethrace_obj OBJECT)
 
-target_include_directories(dethrace PRIVATE
+target_include_directories(dethrace_obj PUBLIC
     .
     common
     pc-dos
@@ -9,32 +10,24 @@ target_include_directories(dethrace PRIVATE
     ${CMAKE_SOURCE_DIR}/src/BRSRC13
 )
 
-target_link_libraries(dethrace PRIVATE smacker harness brender miniposix SDL2::SDL2 glad)
+target_link_libraries(dethrace_obj PUBLIC miniposix SDL2::SDL2 smacker harness brender)
 
 if(NOT MSVC)
-    target_compile_options(dethrace PRIVATE
+    target_compile_options(dethrace_obj PRIVATE
         -g
         -Wno-return-type
         -Wno-missing-declarations
         -Werror=implicit-function-declaration
     )
-
-    if(APPLE)
-        target_link_libraries(dethrace PRIVATE "-framework OpenGL")
-    else()
-        target_link_libraries(dethrace PRIVATE GL)
-    endif()
 else()
-    target_compile_definitions(dethrace PRIVATE -D_CRT_SECURE_NO_WARNINGS -DSDL_MAIN_HANDLED)
-    target_compile_options(dethrace PRIVATE
+    target_compile_definitions(dethrace_obj PRIVATE -D_CRT_SECURE_NO_WARNINGS)
+    target_compile_options(dethrace_obj PRIVATE
         /wd4101
         /wd4996
     )
-    target_link_libraries(dethrace PRIVATE dbghelp)
-    target_link_options(dethrace PRIVATE /subsystem:windows /ENTRY:mainCRTStartup)
 endif()
 
-target_sources(dethrace PRIVATE
+target_sources(dethrace_obj PRIVATE
     common/brucetrk.c
     common/brucetrk.h
     common/car.c
@@ -139,7 +132,6 @@ target_sources(dethrace PRIVATE
     common/world.h
     constants.h
     dr_types.h
-    main.c
     pc-dos/dosnet.c
     pc-dos/dosnet.h
     pc-dos/dossys.c
@@ -147,3 +139,20 @@ target_sources(dethrace PRIVATE
     watcom_functions.c
     watcom_functions.h
 )
+
+# Create our main game binary.
+add_executable(dethrace)
+target_link_libraries(dethrace PRIVATE glad dethrace_obj)
+target_sources(dethrace PRIVATE main.c)
+
+if(NOT MSVC)
+    if(APPLE)
+        target_link_libraries(dethrace PRIVATE "-framework OpenGL")
+    else()
+        target_link_libraries(dethrace PRIVATE GL)
+    endif()
+else()
+    target_link_libraries(dethrace PRIVATE dbghelp)
+    target_link_options(dethrace PRIVATE /subsystem:windows /ENTRY:mainCRTStartup)
+    target_compile_definitions(dethrace PRIVATE -D_CRT_SECURE_NO_WARNINGS -DSDL_MAIN_HANDLED)
+endif()
