@@ -21,7 +21,7 @@ void* ResToUser(resource_header* r) {
 // IDA: resource_header* __usercall UserToRes@<EAX>(void *r@<EAX>)
 resource_header* UserToRes(void* r) {
     br_uint_8* p;
-    LOG_TRACE("(%p)", r);
+    LOG_TRACE9("(%p)", r);
 
     p = r;
     p = p - sizeof(resource_header);
@@ -76,7 +76,7 @@ void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class) {
         parent = UserToRes(vparent);
         BrSimpleAddHead(&parent->children, &res->node);
     }
-    LOG_DEBUG("allocated %p", ((char*)res + actual_pad));
+    //LOG_DEBUG("allocated res=%p, user=%p", res, ((char*)res + actual_pad));
     return ((char*)res) + actual_pad;
 }
 

@@ -7,6 +7,7 @@
 #include "depth.h"
 #include "drmem.h"
 #include "errors.h"
+#include "finteray.h"
 #include "flicplay.h"
 #include "globvars.h"
 #include "globvrpb.h"
@@ -187,7 +188,20 @@ tAdd_to_storage_result AddPixelmapToStorage(tBrender_storage* pStorage_space, br
 tAdd_to_storage_result AddShadeTableToStorage(tBrender_storage* pStorage_space, br_pixelmap* pThe_st) {
     int i;
     LOG_TRACE("(%p, %p)", pStorage_space, pThe_st);
-    NOT_IMPLEMENTED();
+
+    if (pStorage_space->shade_tables_count >= pStorage_space->max_shade_tables) {
+        return eStorage_not_enough_room;
+    }
+
+    for (i = 0; i < pStorage_space->shade_tables_count; i++) {
+        if (pStorage_space->shade_tables[i]->identifier
+            && pThe_st->identifier
+            && !strcmp(pStorage_space->pixelmaps[i]->identifier, pThe_st->identifier)) {
+            return eStorage_duplicate;
+        }
+    }
+    pStorage_space->shade_tables[pStorage_space->shade_tables_count++] = pThe_st;
+    return eStorage_allocated;
 }
 
 // IDA: tAdd_to_storage_result __usercall AddMaterialToStorage@<EAX>(tBrender_storage *pStorage_space@<EAX>, br_material *pThe_mat@<EDX>)
@@ -285,14 +299,54 @@ int LoadNPixelmaps(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
 br_pixelmap* LoadSinglePixelmap(tBrender_storage* pStorage_space, char* pName) {
     br_pixelmap* temp;
     LOG_TRACE("(%p, \"%s\")", pStorage_space, pName);
-    NOT_IMPLEMENTED();
+
+    temp = LoadPixelmap(pName);
+    if (!temp) {
+        return BrMapFind(pName);
+    }
+
+    switch (AddPixelmapToStorage(pStorage_space, temp)) {
+    case eStorage_not_enough_room:
+        FatalError(67);
+        break;
+
+    case eStorage_duplicate:
+        BrPixelmapFree(temp);
+        return BrMapFind(pName);
+
+    case eStorage_allocated:
+        BrMapAdd(temp);
+        return temp;
+    }
+
+    return NULL;
 }
 
 // IDA: br_material* __usercall LoadSingleMaterial@<EAX>(tBrender_storage *pStorage_space@<EAX>, char *pName@<EDX>)
 br_material* LoadSingleMaterial(tBrender_storage* pStorage_space, char* pName) {
     br_material* temp;
     LOG_TRACE("(%p, \"%s\")", pStorage_space, pName);
-    NOT_IMPLEMENTED();
+
+    temp = LoadMaterial(pName);
+    if (!temp) {
+        return BrMaterialFind(pName);
+    }
+
+    switch (AddMaterialToStorage(pStorage_space, temp)) {
+    case eStorage_not_enough_room:
+        FatalError(69);
+        break;
+
+    case eStorage_duplicate:
+        BrMaterialFree(temp);
+        return BrMaterialFind(pName);
+
+    case eStorage_allocated:
+        BrMaterialAdd(temp);
+        return temp;
+    }
+
+    return NULL;
 }
 
 // IDA: int __usercall LoadNShadeTables@<EAX>(tBrender_storage *pStorage_space@<EAX>, FILE *pF@<EDX>, int pCount@<EBX>)
@@ -330,7 +384,7 @@ int LoadNShadeTables(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
                     break;
                 case eStorage_allocated:
                     BrTableAdd(temp_array[j]);
-                    ++new_ones;
+                    new_ones++;
                     break;
                 }
             }
@@ -417,11 +471,9 @@ int LoadNModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
             if (temp_array[j]) {
                 switch (AddModelToStorage(pStorage_space, temp_array[j])) {
                 case eStorage_not_enough_room:
-                    LOG_DEBUG("going to");
                     FatalError(70);
                     break;
                 case eStorage_duplicate:
-                    LOG_DEBUG("going to dupe");
                     BrModelFree(temp_array[j]);
                     break;
                 case eStorage_allocated:
@@ -441,7 +493,15 @@ int LoadNModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
 // IDA: void __usercall DodgyModelUpdate(br_model *pM@<EAX>)
 void DodgyModelUpdate(br_model* pM) {
     LOG_TRACE("(%p)", pM);
-    NOT_IMPLEMENTED();
+
+    LOG_DEBUG("update track model %s %d, %d", pM->identifier, pM->nfaces, pM->nvertices);
+
+    BrResFree(pM->faces);
+    BrResFree(pM->vertices);
+    pM->nfaces = 0;
+    pM->nvertices = 0;
+    pM->faces = NULL;
+    pM->vertices = NULL;
 }
 
 // IDA: br_material* __usercall SuffixedMaterial@<EAX>(br_material *pOld@<EAX>, char *pSuffix@<EDX>)
@@ -516,7 +576,47 @@ int LoadNTrackModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     br_model* temp_array[2000];
     v11model* prepared;
     LOG_TRACE("(%p, %p, %d)", pStorage_space, pF, pCount);
-    NOT_IMPLEMENTED();
+
+    new_ones = 0;
+    for (i = 0; i < pCount; i++) {
+        GetALineAndDontArgue(pF, s);
+        str = strtok(s, "\t ,/");
+        PathCat(the_path, gApplication_path, "MODELS");
+        PathCat(the_path, the_path, str);
+        total = BrModelLoadMany(the_path, temp_array, 2000);
+        if (!total) {
+            FatalError(82, str);
+        }
+        for (j = 0; j < total; j++) {
+            if (temp_array[j]) {
+                LOG_DEBUG("adding track model %s %d, %d", temp_array[j]->identifier, temp_array[j]->nfaces, temp_array[j]->nvertices);
+                switch (AddModelToStorage(pStorage_space, temp_array[j])) {
+                case eStorage_not_enough_room:
+                    FatalError(70);
+                    break;
+                case eStorage_duplicate:
+                    BrModelFree(temp_array[j]);
+                    break;
+                case eStorage_allocated:
+                    temp_array[j]->flags |= BR_MODF_UPDATEABLE;
+                    if (!gRoad_texturing_level) {
+                        ProcessModelFaceMaterials(temp_array[j], (tPMFMCB*)RoadPerspToUntex);
+                    }
+                    if (gWall_texturing_level == 1) {
+                        ProcessModelFaceMaterials(temp_array[j], (tPMFMCB*)WallPerspToLinear);
+                    }
+                    if (!gWall_texturing_level) {
+                        ProcessModelFaceMaterials(temp_array[j], (tPMFMCB*)WallPerspToUntex);
+                    }
+                    //RemoveDoubleSided(temp_array[j]);
+                    BrModelAdd(temp_array[j]);
+                    LOG_DEBUG("added track model %s %d, %d", temp_array[j]->identifier, temp_array[j]->nfaces, temp_array[j]->nvertices);
+                    new_ones++;
+                }
+            }
+        }
+    }
+    return new_ones;
 }
 
 // IDA: void __usercall LoadSomePixelmaps(tBrender_storage *pStorage_space@<EAX>, FILE *pF@<EDX>)
@@ -602,7 +702,11 @@ void LoadSomeTrackModels(tBrender_storage* pStorage_space, FILE* pF) {
     char* str;
     br_model* temp_array[2000];
     LOG_TRACE("(%p, %p)", pStorage_space, pF);
-    NOT_IMPLEMENTED();
+
+    GetALineAndDontArgue(pF, s);
+    str = strtok(s, "\t ,/");
+    sscanf(str, "%d", &count);
+    LoadNTrackModels(pStorage_space, pF, count);
 }
 
 // IDA: void __usercall AddFunkGrooveBinding(int pSlot_number@<EAX>, float *pPeriod_address@<EDX>)
@@ -1014,7 +1118,7 @@ tGroovidelic_spec* AddNewGroovidelic() {
         }
     }
     gGroovidelics_array_size += 16;
-    new_array = (tGroovidelic_spec*)BrMemCalloc(gGroovidelics_array_size, 128, 221);
+    new_array = BrMemCalloc(gGroovidelics_array_size, sizeof(tGroovidelic_spec), kMem_groove_spec);
     if (gGroovidelics_array) {
         memcpy(new_array, gGroovidelics_array, (gGroovidelics_array_size - 16) * sizeof(tGroovidelic_spec));
         ShiftBoundGrooveFunks(
@@ -1312,7 +1416,15 @@ void SetSpecVolMatSize(br_actor* pActor) {
 void FindInverseAndWorldBox(tSpecial_volume* pSpec) {
     br_bounds bnds;
     LOG_TRACE("(%p)", pSpec);
-    NOT_IMPLEMENTED();
+
+    bnds.min.v[0] = -1.0;
+    bnds.min.v[1] = -1.0;
+    bnds.min.v[2] = -1.0;
+    bnds.max.v[0] = 1.0;
+    bnds.max.v[1] = 1.0;
+    bnds.max.v[2] = 1.0;
+    GetNewBoundingBox(&pSpec->bounds, &bnds, &pSpec->mat);
+    BrMatrix34Inverse(&pSpec->inv_mat, &pSpec->mat);
 }
 
 // IDA: void __cdecl UpdateSpecVol()
@@ -1336,7 +1448,7 @@ void SaveSpecialVolumes() {
 // IDA: void __cdecl SaveAdditionalStuff()
 void SaveAdditionalStuff() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    STUB();
 }
 
 // IDA: br_uint_32 __cdecl ProcessMaterials(br_actor *pActor, tPMFM2CB pCallback)
@@ -1949,6 +2061,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
         LoadSomeTrackModels(&gTrack_storage_space, f);
         SkipNLines(f);
     }
+
     PrintMemoryDump(0, "JUST LOADED IN TEXTURES/MATS/MODELS FOR TRACK");
     if (gRace_file_version <= 5) {
         GetALineAndDontArgue(f, s);
@@ -1973,7 +2086,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
         gDefault_blend_pc = 75;
     } else {
         GetAString(f, s);
-        if (!sscanf(&s, "%d", &gDefault_blend_pc) || gDefault_blend_pc < 0 || gDefault_blend_pc > 100) {
+        if (!sscanf(s, "%d", &gDefault_blend_pc) || gDefault_blend_pc < 0 || gDefault_blend_pc > 100) {
             PDFatalError("Wanted a default blend percentage. Didn't get one. Old data file?");
         }
     }
@@ -2002,7 +2115,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     if (!gRendering_accessories && !gNet_mode) {
         PossibleService();
         style = BR_RSTYLE_NONE;
-        DRActorEnumRecurse(gTrack_actor, SetAccessoryRenderingCB, &style);
+        DRActorEnumRecurse(gTrack_actor, (br_actor_enum_cbfn*)SetAccessoryRenderingCB, &style);
     }
     BrActorAdd(gUniverse_actor, pTrack_spec->the_actor);
     GetALineAndDontArgue(f, s);
@@ -2191,6 +2304,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     LoadInOppoPaths(f);
     PrintMemoryDump(0, "JUST LOADED IN OPPO PATHS");
     num_materials = GetAnInt(f);
+    LOG_PANIC("mats: %d", num_materials);
     for (i = 0; i < num_materials; i++) {
         PossibleService();
         pRace_info->material_modifiers[i].car_wall_friction = GetAScalar(f);

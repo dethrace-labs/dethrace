@@ -1,21 +1,60 @@
 #include "pedestrn.h"
 #include "brender.h"
+#include "constants.h"
+#include "errors.h"
+#include "globvars.h"
+#include "graphics.h"
+#include "input.h"
+#include "loading.h"
+#include "pd/sys.h"
+#include "sound.h"
+#include "trig.h"
+#include "utility.h"
+#include "world.h"
 #include <stdlib.h>
-
 #include <time.h>
+
+#define FLAG_WAVING_BASTARD_REF 99
 
 int gPed_gib_counts[4][5];
 int gPed_gib_maxes[4][5];
 tPedestrian_instruction gPed_instrucs[100];
-char* gPed_geb_names[4][5];
-char* gInstruc_commands[10];
+char* gPed_geb_names[4][5] = {
+    { "GBIGGIBS.PIX", "GBIGGIB2.PIX", "GBIGGIB3.PIX", NULL, NULL },
+    { "GELBOW.PIX", "GPELVIS.PIX", "GHEAD.PIX", "GRIBS.PIX", "GBONE.PIX" },
+    { "GHAND.PIX", "GCHUNK02.PIX", "GEYEBALL.PIX", "GCOLON.PIX", "GCHUNK01.PIX" },
+    { "GCHUNK04.PIX",
+        "GSPLAT1.PIX",
+        "GCHUNK03.PIX",
+        "GSPLAT2.PIX",
+        "GSPLATOT.PIX" }
+};
+char* gInstruc_commands[10] = {
+    "point",
+    "xpoint",
+    "bchoice",
+    "fchoice",
+    "dead",
+    "bmarker",
+    "fmarker",
+    "baction",
+    "faction",
+    "reverse"
+};
+
 float gMin_ped_gib_speeds[4];
 tPed_gib gPed_gibs[30];
 float gPed_gib_speeds[4];
-char* gPed_gib_names[4][5];
+char* gPed_gib_names[4][5] = {
+    { "BIGGIBS.PIX", "BIGGIBS2.PIX", "BIGGIBS3.PIX", NULL, NULL },
+    { "ELBOW.PIX", "PELVIS.PIX", "HEAD.PIX", "RIBS.PIX", "BONE.PIX" },
+    { "HAND.PIX", "CHUNK02.PIX", "EYEBALL.PIX", "COLON.PIX", "CHUNK01.PIX" },
+    { "CHUNK04.PIX", "SPLAT1.PIX", "CHUNK03.PIX", "SPLAT2.PIX", "SPLATOUT.PIX" }
+};
 float gPed_gib_distrib[4];
 tPed_gib_materials gPed_gib_materials[4];
-int gPed_size_counts[4];
+int gPed_size_counts[4] = { 3, 5, 5, 5 };
+
 tProximity_ray gProximity_rays[20];
 int gVesuvian_corpses;
 int gPed_colliding;
@@ -48,8 +87,8 @@ br_vector3 gDanger_direction;
 int gPed_instruc_count;
 int gInit_ped_instruc;
 br_vector3 gZero_v_pedestrn; // added _pedestrn to avoid name collision with car.c
-char* gRate_commands[3];
-char* gCollide_commands[1];
+char* gRate_commands[3] = { "fixed", "speed", "variable" };
+char* gCollide_commands[1] = { "collide" };
 int gCurrent_lollipop_index;
 int gDetect_peds;
 int gVesuvians_this_time;
@@ -123,7 +162,74 @@ void InitPedGibs() {
     br_pixelmap* the_pix;
     br_material* the_material;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < COUNT_OF(gPed_gibs); i++) {
+        PossibleService();
+        gPed_gibs[i].size = -1;
+        the_model = BrModelAllocate(0, 4, 2);
+        the_model->flags |= BR_MODF_UPDATEABLE;
+        the_model->faces->vertices[0] = 0;
+        the_model->faces->vertices[1] = 2;
+        the_model->faces->vertices[2] = 1;
+        the_model->faces->material = 0;
+        the_model->faces->smoothing = 1;
+        the_model->faces[1].vertices[0] = 0;
+        the_model->faces[1].vertices[1] = 3;
+        the_model->faces[1].vertices[2] = 2;
+        the_model->faces[1].material = 0;
+        the_model->faces[1].smoothing = 1;
+        the_model->vertices->p.v[0] = -1.0;
+        the_model->vertices->p.v[1] = 0.0;
+        the_model->vertices->p.v[2] = 0.0;
+        the_model->vertices->map.v[0] = 0.0;
+        the_model->vertices->map.v[1] = 1.0;
+        the_model->vertices[1].p.v[0] = -1.0;
+        the_model->vertices[1].p.v[1] = 1.0;
+        the_model->vertices[1].p.v[2] = 0.0;
+        the_model->vertices[1].map.v[0] = 0.0;
+        the_model->vertices[1].map.v[1] = 0.0;
+        the_model->vertices[2].p.v[0] = 1.0;
+        the_model->vertices[2].p.v[1] = 1.0;
+        the_model->vertices[2].p.v[2] = 0.0;
+        the_model->vertices[2].map.v[0] = 1.0;
+        the_model->vertices[2].map.v[1] = 0.0;
+        the_model->vertices[3].p.v[0] = 1.0;
+        the_model->vertices[3].p.v[1] = 0.0;
+        the_model->vertices[3].p.v[2] = 0.0;
+        the_model->vertices[3].map.v[0] = 1.0;
+        the_model->vertices[3].map.v[1] = 1.0;
+        BrModelAdd(the_model);
+        gPed_gibs[i].actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+        gPed_gibs[i].actor->parent = NULL;
+        gPed_gibs[i].actor->model = the_model;
+        gPed_gibs[i].actor->render_style = BR_RSTYLE_NONE;
+    }
+    for (i = 0; i < 4; i++) {
+        for (j = 0; j < gPed_size_counts[i]; j++) {
+            PossibleService();
+            if (gProgram_state.sausage_eater_mode) {
+                the_pix = LoadPixelmap(gPed_geb_names[i][j]);
+            } else {
+                the_pix = LoadPixelmap(gPed_gib_names[i][j]);
+            }
+            BrMapAdd(the_pix);
+            gPed_gib_materials[i].count = gPed_size_counts[i];
+            gPed_gib_materials[i].materials[j] = BrMaterialAllocate(NULL);
+            BrMaterialAdd(gPed_gib_materials[i].materials[j]);
+            the_material = gPedestrian_array[0].actor->material;
+            gPed_gib_materials[i].materials[j]->flags = the_material->flags;
+            gPed_gib_materials[i].materials[j]->ka = the_material->ka;
+            gPed_gib_materials[i].materials[j]->kd = the_material->kd;
+            gPed_gib_materials[i].materials[j]->ks = the_material->ks;
+            gPed_gib_materials[i].materials[j]->power = the_material->power;
+            gPed_gib_materials[i].materials[j]->index_base = the_material->index_base;
+            gPed_gib_materials[i].materials[j]->index_range = the_material->index_range;
+            gPed_gib_materials[i].materials[j]->colour_map = the_pix;
+            gPed_gib_materials[i].materials[j]->map_transform = the_material->map_transform;
+            gPed_gib_materials[i].materials[j]->index_shade = the_material->index_shade;
+            BrMaterialUpdate(gPed_gib_materials[i].materials[j], BR_MATU_ALL);
+        }
+    }
 }
 
 // IDA: void __usercall SetPedMaterialForRender(br_actor *pActor@<EAX>)
@@ -244,7 +350,18 @@ void CalcPedWidthNHeight(tPedestrian_data* pPedestrian, br_pixelmap* pPixelmap, 
     br_pixelmap* reference_pixel_bastard;
     br_scalar scale_to_use;
     LOG_TRACE("(%p, %p, %p, %p)", pPedestrian, pPixelmap, pHeight, pWidth);
-    NOT_IMPLEMENTED();
+
+    reference_pixel_bastard = pPedestrian->sequences->frames[0].pixelmap;
+    if (pPedestrian->ref_number >= 0x64u) {
+        scale_to_use = 1.0;
+    } else {
+        scale_to_use = gPed_scale_factor;
+    }
+    *pHeight = (double)pPixelmap->height
+        / (double)reference_pixel_bastard->height
+        * pPedestrian->height
+        * scale_to_use;
+    *pWidth = (double)pPixelmap->width / (double)pPixelmap->height * *pHeight;
 }
 
 // IDA: int __usercall PedestrianNextInstruction@<EAX>(tPedestrian_data *pPedestrian@<EAX>, float pDanger_level, int pPosition_explicitly, int pMove_pc)
@@ -326,7 +443,63 @@ void MungePedModel(tPedestrian_data* pPedestrian) {
     tCar_spec* murderer;
     br_actor* old_parent;
     LOG_TRACE("(%p)", pPedestrian);
-    NOT_IMPLEMENTED();
+
+    old_parent = NULL;
+    CalcPedWidthNHeight(pPedestrian, pPedestrian->colour_map, &pPedestrian->height2, &pPedestrian->width);
+
+    the_frame = &pPedestrian->sequences[pPedestrian->current_sequence].frames[MAX(pPedestrian->current_frame, 0)];
+    if (pPedestrian->ref_number >= 100 && pPedestrian->current_action == pPedestrian->fatal_car_impact_action) {
+        x_offset = the_frame->offset.v[X] * 2.0;
+        y_offset = the_frame->offset.v[Y];
+        pPedestrian->height2 = pPedestrian->height2 * 2.0;
+        pPedestrian->width = pPedestrian->width * 2.0;
+    } else {
+        x_offset = the_frame->offset.v[X];
+        y_offset = the_frame->offset.v[Y];
+    }
+    pPedestrian->flipped = the_frame->flipped;
+    if (pPedestrian->actor->parent != gDont_render_actor) {
+        old_parent = pPedestrian->actor->parent;
+        BrActorRelink(gDont_render_actor, pPedestrian->actor);
+    }
+    BrMatrix34Scale(&pPedestrian->actor->t.t.mat, pPedestrian->width, pPedestrian->height2, 1.0);
+    if (pPedestrian->spin_period != 0.0 && pPedestrian->actor->model) {
+        height_over2 = pPedestrian->height2 / 2.0;
+        BrMatrix34PostTranslate(&pPedestrian->actor->t.t.mat, 0.0, -height_over2, 0.0);
+        if (pPedestrian->spin_period >= 0.0) {
+            temp_scalar = (double)(GetTotalTime() - pPedestrian->last_action_change) / pPedestrian->spin_period * 360.0;
+        } else {
+            temp_scalar = ((double)(GetTotalTime() - pPedestrian->last_action_change) / pPedestrian->spin_period * 360.0 + 360.0);
+        }
+        DRMatrix34PostRotateZ(&pPedestrian->actor->t.t.mat, BR_ANGLE_DEG(temp_scalar));
+        BrMatrix34PostTranslate(&pPedestrian->actor->t.t.mat, 0.0, height_over2, 0.0);
+    }
+    temp_scalar = FastScalarArcTan2Angle(gCamera_to_world.m[2][0], gCamera_to_world.m[2][2]);
+    DRMatrix34PostRotateY(&pPedestrian->actor->t.t.mat, temp_scalar);
+    if (old_parent
+        && pPedestrian->current_action == pPedestrian->fatal_car_impact_action
+        && !pPedestrian->done_initial
+        && pPedestrian->actor->model) {
+
+        y_offset += FastScalarSin(((double)MAX(pPedestrian->current_frame, 0)
+                        / (double)(pPedestrian->sequences[pPedestrian->current_sequence].looping_frame_start - 1) * 180.0))
+            * pPedestrian->jump_magnitude;
+    }
+    if (old_parent) {
+        BrMatrix34PostTranslate(&pPedestrian->actor->t.t.mat, old_parent->t.t.translate.t.v[0] + x_offset, old_parent->t.t.translate.t.v[1] + y_offset, old_parent->t.t.translate.t.v[2]);
+        BrActorRelink(old_parent, pPedestrian->actor);
+        pPedestrian->actor->t.t.translate.t.v[0] += pPedestrian->offset.v[0];
+        pPedestrian->actor->t.t.translate.t.v[1] += pPedestrian->offset.v[1];
+        pPedestrian->actor->t.t.translate.t.v[2] += pPedestrian->offset.v[2];
+    } else if (pPedestrian->spin_period == 0.0) {
+        BrMatrix34PostTranslate(&pPedestrian->actor->t.t.mat, pPedestrian->pos.v[0] + x_offset - pPedestrian->offset.v[0], pPedestrian->pos.v[1] + y_offset - pPedestrian->offset.v[1], pPedestrian->pos.v[2]);
+        pPedestrian->offset.v[0] = x_offset;
+        pPedestrian->offset.v[1] = y_offset;
+        pPedestrian->offset.v[2] = 0.0;
+    } else {
+        BrMatrix34PostTranslate(&pPedestrian->actor->t.t.mat, pPedestrian->offset.v[0] + x_offset, pPedestrian->offset.v[1] + y_offset, pPedestrian->offset.v[2]);
+    }
+    gCurrent_lollipop_index = AddToLollipopQueue(pPedestrian->actor, gCurrent_lollipop_index);
 }
 
 // IDA: void __usercall ChangeActionTo(tPedestrian_data *pPedestrian@<EAX>, int pAction_index@<EDX>, int pRedo_frames_etc@<EBX>)
@@ -613,14 +786,241 @@ void CreatePedestrian(FILE* pG, tPedestrian_instruction* pInstructions, int pIns
     br_scalar minnest_max;
     br_scalar maxest_max;
     LOG_TRACE("(%p, %p, %d, %d, %d, %d)", pG, pInstructions, pInstruc_count, pInit_instruc, pRef_num, pForce_read);
-    NOT_IMPLEMENTED();
+
+    PossibleService();
+    the_pedestrian = &gPedestrian_array[gPed_count++];
+    the_pedestrian->ref_number = pRef_num;
+    the_pedestrian->magic_number = 1348822049;
+    the_pedestrian->cloned = 0;
+    if (!pForce_read) {
+        for (i = 0; i < gPed_count - 1; i++) {
+            if (gPedestrian_array[i].ref_number == the_pedestrian->ref_number) {
+                memcpy(the_pedestrian, &gPedestrian_array[i], sizeof(tPedestrian_data));
+                the_pedestrian->cloned = 1;
+                break;
+            }
+        }
+    }
+    the_pedestrian->actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+    the_pedestrian->actor->render_style = BR_RSTYLE_NONE;
+    the_pedestrian->actor->type_data = the_pedestrian;
+    BrActorAdd(gDont_render_actor, the_pedestrian->actor);
+    the_pedestrian->actor->model = gPed_model;
+    if (the_pedestrian->cloned) {
+        the_pedestrian->actor->material = gPed_material;
+    LABEL_69:
+        PossibleService();
+        the_pedestrian->number_of_instructions = pInstruc_count;
+        the_pedestrian->first_instruction = pInit_instruc;
+        the_pedestrian->current_instruction = pInit_instruc;
+        the_pedestrian->instruction_list = pInstructions;
+        the_pedestrian->colour_map = the_pedestrian->sequences->frames[0].pixelmap;
+        the_pedestrian->offset.v[0] = 0.0;
+        the_pedestrian->offset.v[1] = 0.0;
+        the_pedestrian->offset.v[2] = 0.0;
+        gInitial_instruction = 0;
+        PedestrianNextInstruction(the_pedestrian, 0.0, 1, 0);
+        the_pedestrian->from_pos = the_pedestrian->actor->t.t.translate.t;
+        MungePedModel(the_pedestrian);
+    } else {
+        rewind(pG);
+        while (1) {
+            GetALineAndDontArgue(pG, s);
+            str = strtok(s, "\t ,/");
+            sscanf(str, "%d", &the_ref);
+            if (the_pedestrian->ref_number != the_ref) {
+                break;
+            }
+        LABEL_13:
+            if (the_pedestrian->ref_number == the_ref) {
+                temp_float1 = GetAFloat(pG);
+                the_pedestrian->height = temp_float1;
+                the_pedestrian->credits_value = GetAnInt(pG);
+                the_pedestrian->hit_points = GetAnInt(pG);
+                the_pedestrian->active = 0;
+                GetALineAndDontArgue(pG, s2);
+                str2 = strtok(s2, "\t ,/");
+                sscanf(str2, "%d", &the_pedestrian->number_of_exploding_sounds);
+                for (j = 0; j < the_pedestrian->number_of_exploding_sounds; j++) {
+                    str2 = strtok(0, "\t ,/");
+                    sscanf(str2, "%d", &the_pedestrian->exploding_sounds[j]);
+                }
+                the_pedestrian->falling_sound = GetAnInt(pG);
+                the_pedestrian->acceleration = GetAFloat(pG);
+                the_pedestrian->image_index = GetAnInt(pG);
+                LoadNShadeTables(&gPedestrians_storage_space, pG, 1);
+                LoadNPixelmaps(&gPedestrians_storage_space, pG, 1);
+                GetALineAndDontArgue(pG, s2);
+                if (!gPed_material) {
+                    str2 = strtok(s2, "\t ,/");
+                    PathCat(the_path, gApplication_path, "MATERIAL");
+                    PathCat(the_path, the_path, s2);
+                    gPed_material = BrMaterialLoad(the_path);
+                    if (!gPed_material) {
+                        FatalError(77, s2);
+                    }
+                    gPed_material->flags &= 0xFFFFEFFF;
+                    gPed_material->flags &= 0xFFFFFFF8;
+                    gPed_material->index_shade = 0;
+                    gPed_material->colour_map = gPedestrians_storage_space.pixelmaps[0];
+                    BrMaterialAdd(gPed_material);
+                }
+                gPed_material->colour_map = *gPedestrians_storage_space.pixelmaps;
+                the_pedestrian->actor->material = gPed_material;
+                the_pedestrian->fatal_car_impact_action = GetAnInt(pG);
+                the_pedestrian->non_fatal_car_impact_action = GetAnInt(pG);
+                the_pedestrian->after_impact_action = GetAnInt(pG);
+                the_pedestrian->fatal_ground_impact_action = GetAnInt(pG);
+                the_pedestrian->non_fatal_ground_impact_action = GetAnInt(pG);
+                the_pedestrian->giblets_action = GetAnInt(pG);
+                the_pedestrian->current_sequence = 0;
+                the_pedestrian->current_frame = 0;
+                the_pedestrian->current_action = 0;
+                the_pedestrian->current_action_mode = -1;
+                the_pedestrian->done_initial = 0;
+                the_pedestrian->current_speed = 0.0;
+                the_pedestrian->instruction_direction = 1;
+                the_pedestrian->spin_period = 0.0;
+                the_pedestrian->falling_speed = 0.0;
+                the_pedestrian->mid_air = 0;
+                the_pedestrian->last_special_volume = 0;
+                the_pedestrian->last_sound = 0;
+                the_pedestrian->giblets_being_sat_upon = 0;
+                the_pedestrian->last_sound_action = -1;
+                the_pedestrian->last_sound_make = 0;
+                the_pedestrian->fate = 0;
+                the_pedestrian->munged = 0;
+                the_pedestrian->collided_last_time = 0;
+                the_pedestrian->reverse_frames = 0;
+                the_pedestrian->respawn_time = 0;
+                the_pedestrian->killers_ID = -1;
+                the_pedestrian->murderer = -1;
+                the_pedestrian->sent_dead_message = 0;
+                minnest_min = 3.4028235e38;
+                maxest_min = -3.4028235e38;
+                minnest_max = 3.4028235e38;
+                maxest_max = -3.4028235e38;
+                the_pedestrian->number_of_actions = GetAnInt(pG);
+                the_pedestrian->action_list = BrMemAllocate(sizeof(tPedestrian_action) * the_pedestrian->number_of_actions, kMem_ped_action_list);
+                the_action = the_pedestrian->action_list;
+                for (i = 0; i < the_pedestrian->number_of_actions; i++) {
+                    PossibleService();
+                    GetPairOfFloats(pG, &the_action->danger_level, &the_action->percentage_chance);
+                    GetPairOfFloats(pG, &the_action->initial_speed, &the_action->looping_speed);
+                    the_action->reaction_time = (tU32)(GetAFloat(pG) * 1000.0);
+                    GetALineAndDontArgue(pG, s2);
+                    str2 = strtok(s2, "\t ,/");
+                    sscanf(str2, "%d", &the_action->number_of_sounds);
+                    for (j = 0; the_action->number_of_sounds > j; ++j) {
+                        str2 = strtok(0, "\t ,/");
+                        sscanf(str2, "%d", &the_action->sounds[j]);
+                    }
+                    the_action->number_of_bearings = GetAnInt(pG);
+                    if (the_action->number_of_bearings > 7) {
+                        FatalError(85);
+                    }
+                    for (j = 0; j < the_action->number_of_bearings; j++) {
+                        GetPairOfFloats(pG, &the_action->sequences[j].max_bearing, &temp_float1);
+                        the_action->sequences[j].sequence_index = (int)temp_float1;
+                    }
+                    the_action++;
+                }
+                the_pedestrian->number_of_sequences = GetAnInt(pG);
+                the_pedestrian->last_frame = 0;
+                the_pedestrian->last_action_change = 0;
+                the_pedestrian->sequences = BrMemAllocate(sizeof(tPedestrian_sequence) * the_pedestrian->number_of_sequences, kMem_ped_sequences);
+                the_sequence = the_pedestrian->sequences;
+                for (i = 0; i < the_pedestrian->number_of_sequences; i++) {
+                    PossibleService();
+                    collide_frame = GetALineAndInterpretCommand(pG, gCollide_commands, 1);
+                    the_sequence->frame_rate_type = GetALineAndInterpretCommand(pG, gRate_commands, 3);
+
+                    if (the_sequence->frame_rate_type == ePed_frame_speed || the_sequence->frame_rate_type == ePed_frame_variable) {
+                        GetPairOfFloats(pG, &the_sequence->frame_rate_factor1, &the_sequence->frame_rate_factor2);
+                    }
+                    the_sequence->number_of_frames = 0;
+                    the_sequence->looping_frame_start = -1;
+                    for (j = 0; j < 2; j++) {
+                        new_frames = GetAnInt(pG);
+                        if (new_frames + the_sequence->number_of_frames > 10) {
+                            FatalError(83);
+                        }
+                        for (k = the_sequence->number_of_frames; k < new_frames + the_sequence->number_of_frames; k++) {
+                            GetAString(pG, s);
+                            the_sequence->frames[k].pixelmap = BrMapFind(s);
+                            if (!the_sequence->frames[k].pixelmap) {
+                                the_sequence->frames[k].pixelmap = LoadPixelmap(s);
+                                if (!the_sequence->frames[k].pixelmap) {
+                                    FatalError(78, s);
+                                }
+                                BrMapAdd(the_sequence->frames[k].pixelmap);
+                            }
+                            GetALineAndDontArgue(pG, s);
+                            str = strtok(s, "\t ,/");
+                            sscanf(str, "%f", &temp_float1);
+                            str = strtok(0, "\t ,/");
+                            sscanf(str, "%f", &temp_float2);
+                            str = strtok(0, "\t ,/");
+                            the_sequence->frames[k].offset.v[0] = temp_float1;
+                            the_sequence->frames[k].offset.v[1] = temp_float2;
+                            the_sequence->frames[k].flipped = !strcmp(str, "flipped");
+                            if (collide_frame) {
+                                CalcPedWidthNHeight(
+                                    the_pedestrian,
+                                    the_sequence->frames[k].pixelmap,
+                                    &height,
+                                    &width_over_2);
+                                if (the_sequence->frames[k].offset.v[0] - width_over_2 < minnest_min) {
+                                    minnest_min = the_sequence->frames[k].offset.v[0] - width_over_2;
+                                }
+                                if (the_sequence->frames[k].offset.v[0] - width_over_2 > maxest_min) {
+                                    maxest_min = the_sequence->frames[k].offset.v[0] - width_over_2;
+                                }
+                                if (the_sequence->frames[k].offset.v[0] + width_over_2 < minnest_max) {
+                                    minnest_max = the_sequence->frames[k].offset.v[0] + width_over_2;
+                                }
+                                if (the_sequence->frames[k].offset.v[0] + width_over_2 > maxest_max) {
+                                    maxest_max = the_sequence->frames[k].offset.v[0] + width_over_2;
+                                }
+                            }
+                        }
+                        the_sequence->number_of_frames += new_frames;
+                        if (the_sequence->looping_frame_start < 0) {
+                            the_sequence->looping_frame_start = the_sequence->number_of_frames;
+                        }
+                    }
+                    the_sequence++;
+                }
+                the_pedestrian->min_x = maxest_min;
+                the_pedestrian->max_x = minnest_max;
+                goto LABEL_69;
+            }
+        }
+        while (1) {
+            PossibleService();
+            GetALineAndDontArgue(pG, s);
+            if (!strcmp(s, "END OF PEDESTRIANS")) {
+                break;
+            }
+            if (!strcmp(s, "NEXT PEDESTRIAN")) {
+                goto LABEL_13;
+            }
+        }
+        BrActorRemove(the_pedestrian->actor);
+        BrActorFree(the_pedestrian->actor);
+        gPed_count--;
+        DRS3StartSound(gIndexed_outlets[0], 3100);
+    }
 }
 
 // IDA: void __cdecl ResetProxRay()
 void ResetProxRay() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < COUNT_OF(gProximity_rays); i++) {
+        gProximity_rays[i].start_time = 0;
+    }
 }
 
 // IDA: void __cdecl PedMaterialFromHell()
@@ -664,7 +1064,172 @@ void LoadInPedestrians(FILE* pF, int pSubs_count, tPed_subs* pSubs_array) {
     tPedestrian_instruction* the_instruction;
     tPed_choice* the_choice;
     LOG_TRACE("(%p, %d, %p)", pF, pSubs_count, pSubs_array);
-    NOT_IMPLEMENTED();
+
+    knock_out = 0;
+    check_for_duplicates = 0;
+    duplicates_found = 0;
+    gTotal_peds = 0;
+    gFlag_waving_bastard = 0;
+    gPedestrians_on = 1;
+    gPed_scale_factor = 1.0;
+    gPed_ref_num = 0;
+    gExploding_pedestrians = 0;
+    gBlind_pedestrians = 0;
+    gPedestrian_speed_factor = 1.0;
+    if (gProgram_state.sausage_eater_mode) {
+        PathCat(the_path, gApplication_path, "BORING.TXT");
+    } else {
+        PathCat(the_path, gApplication_path, "PEDESTRN.TXT");
+    }
+    g = DRfopen(the_path, "rt");
+    if (!g) {
+        FatalError(75);
+    }
+    gPed_count = 0;
+    gLast_ped_splat_time = 0;
+    temp_int = GetAnInt(pF);
+    if (gAusterity_mode) {
+        ped_count = temp_int / 2 + 2;
+    } else {
+        ped_count = temp_int;
+    }
+    gPedestrian_array = BrMemAllocate(sizeof(tPedestrian_data) * (ped_count + (gAusterity_mode == 0 ? 200 : 0)), kMem_ped_array_stain);
+    if (PDKeyDown(KEY_LCTRL) && PDKeyDown(KEY_LSHIFT) && PDKeyDown(KEY_A)) {
+        check_for_duplicates = 1;
+        DRS3StartSound(gIndexed_outlets[0], 3202);
+        DRS3StartSound(gIndexed_outlets[0], 3202);
+    }
+    for (i = 0; i < ped_count; i++) {
+        PossibleService();
+        ref_number = GetAnInt(pF);
+        for (j = 0; pSubs_count > j; ++j) {
+            if (pSubs_array[j].orig == ref_number) {
+                ref_number = pSubs_array[j].subs;
+                break;
+            }
+        }
+        instruc_count = GetAnInt(pF);
+        init_instruc = GetAnInt(pF) - 1;
+        instructions = BrMemAllocate(sizeof(tPedestrian_instruction) * instruc_count, kMem_ped_instructions);
+
+        the_instruction = instructions;
+        for (j = 0; j < instruc_count; j++) {
+            PossibleService();
+            the_instruction->type = GetALineAndInterpretCommand(pF, gInstruc_commands, COUNT_OF(gInstruc_commands));
+            if (the_instruction->type && the_instruction->type != 9) {
+                FatalError(76);
+            }
+            switch (the_instruction->type) {
+            case ePed_instruc_point:
+                GetThreeFloats(pF, &the_instruction->data.point_data.position.v[0], &the_instruction->data.point_data.position.v[1], &the_instruction->data.point_data.position.v[2]);
+                the_instruction->data.point_data.irreversable = 0;
+                break;
+
+            case ePed_instruc_xpoint:
+                GetThreeFloats(pF, &the_instruction->data.point_data.position.v[0], &the_instruction->data.point_data.position.v[1], &the_instruction->data.point_data.position.v[2]);
+                the_instruction->data.point_data.irreversable = 1;
+                break;
+
+            case ePed_instruc_bchoice:
+            case ePed_instruc_fchoice:
+                GetALineAndDontArgue(pF, s);
+                str = strtok(s, "\t ,/");
+                sscanf(str, "%d", &the_instruction->data.choice_data.number_of_choices);
+                if (the_instruction->data.choice_data.number_of_choices > 2) {
+                    FatalError(84);
+                }
+                for (k = 0; k < the_instruction->data.choice_data.number_of_choices; k++) {
+                    str = strtok(NULL, "\t ,/");
+                    sscanf(str, "%f", &temp_float1);
+                    the_instruction->data.choice_data.choices[k].danger_level = (tU16)temp_float1;
+                    str = strtok(NULL, "\t ,/");
+                    sscanf(str, "%f", &temp_float1);
+                    the_instruction->data.choice_data.choices[k].percentage_chance = (tU8)temp_float1;
+                    str = strtok(NULL, "\t ,/");
+                    sscanf(str, "%d", &temp_int);
+                    the_instruction->data.choice_data.choices[k].marker_ref = (tU8)temp_int;
+                }
+                break;
+
+            case ePed_instruc_dead:
+                the_instruction->data.death_data.death_sequence = GetAnInt(pF);
+                break;
+
+            case ePed_instruc_bmarker:
+            case ePed_instruc_fmarker:
+                the_instruction->data.marker_data.marker_ref = GetAnInt(pF);
+                break;
+
+            case ePed_instruc_baction:
+            case ePed_instruc_faction:
+                the_instruction->data.action_data.action_index = GetAnInt(pF);
+                break;
+
+            case ePed_instruc_reverse:
+                break;
+            }
+            the_instruction++;
+        }
+        if (gAusterity_mode) {
+            if (knock_out & 1 && ref_number != FLAG_WAVING_BASTARD_REF) {
+                i--;
+                ped_count--;
+                instruc_count = 0;
+                BrMemFree(instructions);
+            }
+            ++knock_out;
+        }
+        if (check_for_duplicates) {
+            for (j = 0; j < i; j++) {
+                if (gPedestrian_array[j].instruction_list->data.point_data.position.v[0] == instructions->data.point_data.position.v[0]
+                    && gPedestrian_array[j].instruction_list->data.point_data.position.v[1] == instructions->data.point_data.position.v[1]
+                    && gPedestrian_array[j].instruction_list->data.point_data.position.v[2] == instructions->data.point_data.position.v[2]) {
+                    i--;
+                    ped_count--;
+                    instruc_count = 0;
+                    BrMemFree(instructions);
+                    duplicates_found++;
+                }
+            }
+        }
+        if (instruc_count > 0) {
+            if (gAusterity_mode && ref_number >= 100) {
+                // swap MINE for LANDMINE and only one type of powerup ?
+                if (ref_number == 114) {
+                    CreatePedestrian(g, instructions, instruc_count, init_instruc, 146, 0);
+                } else {
+                    CreatePedestrian(g, instructions, instruc_count, init_instruc, 100, 0);
+                }
+            } else {
+                CreatePedestrian(g, instructions, instruc_count, init_instruc, ref_number, 0);
+            }
+            gPedestrian_array[i].ref_number = ref_number;
+            if (ref_number == FLAG_WAVING_BASTARD_REF) {
+                gFlag_waving_bastard = &gPedestrian_array[i];
+            }
+            if (ref_number < 100) {
+                gTotal_peds++;
+            }
+        }
+    }
+    fclose(g);
+    if (duplicates_found) {
+        WriteOutPeds();
+        sprintf(s2,
+            "DUPLICATE PED EXPLOSION!!\n"
+            "%d DOPPELGANGERS FOUND AND DESTROYED.\n"
+            "NEW PED LIST WRITTEN TO PEDPATHS.TXT\n"
+            "\n"
+            "\n"
+            "NOW DON'T DO IT AGAIN!!\n",
+            duplicates_found);
+        PDFatalError(s2);
+    }
+    InitPedGibs();
+    ResetProxRay();
+    gPedestrian_harvest = 0;
+    gVesuvian_corpses = 0;
+    gProx_ray_shade_table = GenerateShadeTable(8, gRender_palette, 215, 255, 233, 0.5, 0.75, 0.89999998);
 }
 
 // IDA: br_actor* __usercall BuildPedPaths@<EAX>(tPedestrian_instruction *pInstructions@<EAX>, int pInstruc_count@<EDX>, int pInit_instruc@<EBX>)

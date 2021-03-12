@@ -637,7 +637,8 @@ void LoadInOppoPaths(FILE* pF) {
     int sections_to_delete;
     int delete_these[1024];
     LOG_TRACE("(%p)", pF);
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __cdecl DisposeOpponentPaths()

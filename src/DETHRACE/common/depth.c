@@ -79,7 +79,22 @@ void FrobFog() {
 // IDA: void __usercall InstantDepthChange(tDepth_effect_type pType@<EAX>, br_pixelmap *pSky_texture@<EDX>, int pStart@<EBX>, int pEnd@<ECX>)
 void InstantDepthChange(tDepth_effect_type pType, br_pixelmap* pSky_texture, int pStart, int pEnd) {
     LOG_TRACE("(%d, %p, %d, %d)", pType, pSky_texture, pStart, pEnd);
-    NOT_IMPLEMENTED();
+
+    if (pType == -1) {
+        pStart = 3;
+        pEnd = 3;
+    }
+    // TODO: needs initdeptheffect implemented.
+
+    // gProgram_state.current_depth_effect.sky_texture = pSky_texture;
+    // gHorizon_material->colour_map = pSky_texture;
+    // BrMaterialUpdate(gHorizon_material, 0x7FFFu);
+    // gProgram_state.current_depth_effect.type = pType;
+    // gProgram_state.current_depth_effect.start = pStart;
+    // gProgram_state.current_depth_effect.end = pEnd;
+    // gProgram_state.default_depth_effect.type = pType;
+    // gProgram_state.default_depth_effect.start = pStart;
+    // gProgram_state.default_depth_effect.end = pEnd;
 }
 
 // IDA: br_scalar __cdecl Tan(br_scalar pAngle)
@@ -313,9 +328,8 @@ void AssertYons() {
     br_camera* camera_ptr;
     int i;
     LOG_TRACE("()");
-    
-    for ( i = 0; i < 2; ++i )
-    {
+
+    for (i = 0; i < 2; ++i) {
         camera_ptr = gCamera_list[i]->type_data;
         camera_ptr->yon_z = gYon_multiplier * gCamera_yon;
     }
@@ -392,7 +406,7 @@ void ToggleDepthMode() {
 // IDA: int __cdecl GetSkyTextureOn()
 int GetSkyTextureOn() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    return gSky_on;
 }
 
 // IDA: void __usercall SetSkyTextureOn(int pOn@<EAX>)
@@ -420,7 +434,17 @@ void SetSkyTextureOn(int pOn) {
 void ToggleSkyQuietly() {
     br_pixelmap* temp;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    temp = gProgram_state.current_depth_effect.sky_texture;
+    gProgram_state.current_depth_effect.sky_texture = gSwap_sky_texture;
+    gSwap_sky_texture = temp;
+    gProgram_state.default_depth_effect.sky_texture = gProgram_state.current_depth_effect.sky_texture;
+    if (gHorizon_material) {
+        if (gProgram_state.current_depth_effect.sky_texture) {
+            gHorizon_material->colour_map = gProgram_state.current_depth_effect.sky_texture;
+            BrMaterialUpdate(gHorizon_material, 0x7FFFu);
+        }
+    }
 }
 
 // IDA: void __cdecl ToggleSky()
@@ -432,7 +456,7 @@ void ToggleSky() {
 // IDA: int __cdecl GetDepthCueingOn()
 int GetDepthCueingOn() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    return gDepth_cueing_on;
 }
 
 // IDA: void __usercall SetDepthCueingOn(int pOn@<EAX>)
@@ -453,7 +477,18 @@ void ToggleDepthCueingQuietly() {
     int temp_start;
     int temp_end;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    temp_type = gProgram_state.current_depth_effect.type;
+    temp_start = gProgram_state.current_depth_effect.start;
+    temp_end = gProgram_state.current_depth_effect.end;
+    InstantDepthChange(
+        gSwap_depth_effect_type,
+        gProgram_state.current_depth_effect.sky_texture,
+        gSwap_depth_effect_start,
+        gSwap_depth_effect_end);
+    gSwap_depth_effect_type = temp_type;
+    gSwap_depth_effect_start = temp_start;
+    gSwap_depth_effect_end = temp_end;
 }
 
 // IDA: void __cdecl ToggleDepthCueing()
@@ -485,5 +520,5 @@ void MungeForwardSky() {
 // IDA: void __cdecl MungeRearviewSky()
 void MungeRearviewSky() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    STUB();
 }

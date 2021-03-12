@@ -38,8 +38,8 @@ br_file_enum light_type_F;
 br_file_enum_member light_type_FM[6];
 br_file_struct_member br_light_FM[8];
 br_file_struct br_plane_F;
-br_file_struct_member br_bounds3_FM[2];
-br_file_struct br_bounds3_F;
+br_file_struct_member br_bounds3_FM[2] = { { 20u, 0u, "min", NULL }, { 20u, 12u, "max", NULL } };
+br_file_struct br_bounds3_F = { "br_bounds3", 2u, br_bounds3_FM, 24 };
 br_file_struct_member br_plane_FM[1];
 br_file_struct br_transform_translation_F;
 br_file_struct_member br_transform_translation_FM[1];
@@ -216,6 +216,7 @@ struct {
 #define DF_MATERIAL_INDEX 5
 #define DF_MODEL 8
 #define DF_TRANSFORM 16
+#define DF_BOUNDS 19
 
 char rscid[53];
 
@@ -610,7 +611,11 @@ int FopRead_ACTOR_BOUNDS(br_datafile* df, br_uint_32 id, br_uint_32 length, br_u
     br_actor* a;
     br_bounds* bp;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
-    NOT_IMPLEMENTED();
+
+    bp = DfPop(DF_BOUNDS, 0);
+    a = DfTop(DF_ACTOR, 0);
+    a->type_data = bp;
+    return 0;
 }
 
 // IDA: int __usercall FopWrite_ACTOR_CLIP_PLANE@<EAX>(br_datafile *df@<EAX>)
@@ -688,7 +693,14 @@ int FopWrite_BOUNDS(br_datafile* df, br_bounds* bp) {
 int FopRead_BOUNDS(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     br_bounds3* bp;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
-    NOT_IMPLEMENTED();
+
+    bp = BrResAllocate(v1db.res, sizeof(br_bounds3), BR_MEMORY_BOUNDS);
+    df->res = bp;
+    df->prims->struct_read(df, &br_bounds3_F, bp);
+    df->res = NULL;
+    DfPush(DF_BOUNDS, bp, 1);
+
+    return 0;
 }
 
 // IDA: int __usercall FopWrite_PLANE@<EAX>(br_datafile *df@<EAX>, br_vector4 *pp@<EDX>)

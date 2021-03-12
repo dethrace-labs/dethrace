@@ -1,4 +1,5 @@
 #include "finteray.h"
+#include "brender.h"
 #include <stdlib.h>
 
 br_matrix34 gPick_model_to_view;
@@ -137,7 +138,29 @@ void GetNewBoundingBox(br_bounds* b2, br_bounds* b1, br_matrix34* m) {
     br_vector3 c[3];
     int j;
     LOG_TRACE("(%p, %p, %p)", b2, b1, m);
-    NOT_IMPLEMENTED();
+
+    BrMatrix34ApplyP(&b2->min, &b1->min, m);
+    b2->max.v[0] = b2->min.v[0];
+    b2->max.v[1] = b2->min.v[1];
+    b2->max.v[2] = b2->min.v[2];
+    a.v[0] = b1->max.v[0] - b1->min.v[0];
+    a.v[1] = b1->max.v[1] - b1->min.v[1];
+    a.v[2] = b1->max.v[2] - b1->min.v[2];
+    for (j = 0; j < 3; j++) {
+        c[j].v[0] = m->m[j][0] * a.v[j];
+        c[j].v[1] = m->m[j][1] * a.v[j];
+        c[j].v[2] = m->m[j][2] * a.v[j];
+    }
+    for (j = 0; j < 3; ++j) {
+        b2->min.v[j] = (double)(c[2].v[j] < 0.0) * c[2].v[j]
+            + (double)(c[1].v[j] < 0.0) * c[1].v[j]
+            + (double)(c[0].v[j] < 0.0) * c[0].v[j]
+            + b2->min.v[j];
+        b2->max.v[j] = (double)(c[0].v[j] > 0.0) * c[0].v[j]
+            + (double)(c[2].v[j] > 0.0) * c[2].v[j]
+            + (double)(c[1].v[j] > 0.0) * c[1].v[j]
+            + b2->max.v[j];
+    }
 }
 
 // IDA: int __usercall FindFacesInBox@<EAX>(tBounds *bnds@<EAX>, tFace_ref *face_list@<EDX>, int max_face@<EBX>)

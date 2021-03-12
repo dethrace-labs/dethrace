@@ -4,6 +4,7 @@
 #include "CORE/FW/fwsetup.h"
 #include "CORE/FW/resource.h"
 #include "CORE/MATH/matrix34.h"
+#include "CORE/MATH/transfrm.h"
 #include "CORE/V1DB/dbsetup.h"
 #include "CORE/V1DB/enables.h"
 #include "actsupt.h"
@@ -17,7 +18,19 @@ br_uint_32 BrActorEnum(br_actor* parent, br_actor_enum_cbfn* callback, void* arg
     br_actor* next;
     br_uint_32 r;
     LOG_TRACE("(%p, %p, %p)", parent, callback, arg);
-    NOT_IMPLEMENTED();
+
+    a = parent->children;
+
+    while (a) {
+        next = a->next;
+
+        if ((r = callback(a, arg)))
+            return r;
+
+        a = next;
+    }
+
+    return 0;
 }
 
 // IDA: br_uint_32 __cdecl BrActorSearchMany(br_actor *root, char *pattern, br_actor **actors, int max)
@@ -217,13 +230,30 @@ void BrActorToScreenMatrix4(br_matrix4* m, br_actor* a, br_actor* camera) {
 }
 
 // IDA: void __usercall BrMatrix34ApplyBounds(br_bounds *d@<EAX>, br_bounds *s@<EDX>, br_matrix34 *m@<EBX>)
-void BrMatrix34ApplyBounds(br_bounds* d, br_bounds* s, br_matrix34* m) {
+void BrMatrix34ApplyBounds(br_bounds* A, br_bounds* B, br_matrix34* C) {
     int i;
     int j;
     br_scalar a;
     br_scalar b;
-    LOG_TRACE("(%p, %p, %p)", d, s, m);
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%p, %p, %p)", A, B, C);
+
+    A->min.v[0] = A->max.v[0] = C->m[3][0];
+    A->min.v[1] = A->max.v[1] = C->m[3][1];
+    A->min.v[2] = A->max.v[2] = C->m[3][2];
+
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
+            a = C->m[j][i] * B->min.v[j];
+            b = C->m[j][i] * B->max.v[j];
+            if (a < b) {
+                A->min.v[i] += a;
+                A->max.v[i] += b;
+            } else {
+                A->min.v[i] += b;
+                A->max.v[i] += a;
+            }
+        }
+    }
 }
 
 // IDA: void __usercall ActorToBounds(br_bounds *dest@<EAX>, br_actor *ap@<EDX>, br_model *model@<EBX>)
@@ -233,7 +263,29 @@ void ActorToBounds(br_bounds* dest, br_actor* ap, br_model* model) {
     br_matrix34 m2v;
     int i;
     LOG_TRACE("(%p, %p, %p)", dest, ap, model);
-    NOT_IMPLEMENTED();
+
+    if (ap->model != NULL)
+        model = ap->model;
+
+    m2v = v1db.model_to_view;
+    BrMatrix34PreTransform(&v1db.model_to_view, &ap->t);
+
+    if (ap->type == BR_ACTOR_MODEL) {
+        BrMatrix34ApplyBounds(&new, &model->bounds, &v1db.model_to_view);
+
+        for (i = 0; i < 3; i++) {
+            if (new.min.v[i] < dest->min.v[i])
+                dest->min.v[i] = new.min.v[i];
+
+            if (new.max.v[i] > dest->max.v[i])
+                dest->max.v[i] = new.max.v[i];
+        }
+    }
+
+    BR_FOR_SIMPLELIST(&ap->children, a)
+    ActorToBounds(dest, a, model);
+
+    v1db.model_to_view = m2v;
 }
 
 // IDA: br_bounds* __cdecl BrActorToBounds(br_bounds *b, br_actor *ap)
@@ -242,5 +294,26 @@ br_bounds* BrActorToBounds(br_bounds* b, br_actor* ap) {
     br_model* model;
     br_actor* a;
     LOG_TRACE("(%p, %p)", b, ap);
-    NOT_IMPLEMENTED();
+
+    m2v = v1db.model_to_view;
+
+    if (ap->model == NULL)
+        model = v1db.default_model;
+    else
+        model = ap->model;
+
+    BrMatrix34Identity(&v1db.model_to_view);
+
+    if (ap->type == BR_ACTOR_MODEL) {
+        *b = model->bounds;
+    } else {
+        b->min.v[0] = b->min.v[1] = b->min.v[2] = BR_SCALAR_MAX;
+        b->max.v[0] = b->max.v[1] = b->max.v[2] = BR_SCALAR_MIN;
+    }
+
+    BR_FOR_SIMPLELIST(&ap->children, a)
+    ActorToBounds(b, a, model);
+
+    v1db.model_to_view = m2v;
+    return b;
 }

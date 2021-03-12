@@ -216,7 +216,10 @@ br_uint_32 BrMapEnum(char* pattern, br_map_enum_cbfn* callback, void* arg) {
 // IDA: br_pixelmap* __cdecl BrTableAdd(br_pixelmap *pixelmap)
 br_pixelmap* BrTableAdd(br_pixelmap* pixelmap) {
     LOG_TRACE("(%p)", pixelmap);
-    NOT_IMPLEMENTED();
+
+    BrRegistryAdd(&v1db.reg_tables, pixelmap);
+    BrTableUpdate(pixelmap, BR_TABU_ALL);
+    return pixelmap;
 }
 
 // IDA: br_pixelmap* __cdecl BrTableRemove(br_pixelmap *pixelmap)

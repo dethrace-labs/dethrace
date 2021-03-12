@@ -474,7 +474,11 @@ br_material* LoadMaterial(char* pName) {
     tPath_name the_path;
     br_material* result;
     LOG_TRACE("(\"%s\")", pName);
-    NOT_IMPLEMENTED();
+
+    PossibleService();
+    PathCat(the_path, gApplication_path, "MATERIAL");
+    PathCat(the_path, the_path, pName);
+    return BrMaterialLoad(the_path);
 }
 
 // IDA: br_model* __usercall LoadModel@<EAX>(char *pName@<EAX>)
@@ -1016,7 +1020,82 @@ void ReadNonCarMechanicsData(FILE* pF, tNon_car_spec* non_car) {
     br_scalar ts1;
     br_scalar snap_angle;
     LOG_TRACE("(%p, %p)", pF, non_car);
-    NOT_IMPLEMENTED();
+
+    non_car->collision_info.driver = 0;
+    number = GetAnInt(pF);
+    non_car->collision_info.index = number;
+    GetThreeFloats(pF, &non_car->free_cmpos.v[0], &non_car->free_cmpos.v[1], &non_car->free_cmpos.v[2]);
+    GetThreeFloats(pF, &non_car->attached_cmpos.v[0], &non_car->attached_cmpos.v[1], &non_car->attached_cmpos.v[2]);
+    GetThreeFloats(pF, &non_car->collision_info.bounds[1].min.v[0], &non_car->collision_info.bounds[1].min.v[1], &non_car->collision_info.bounds[1].min.v[2]);
+    GetThreeFloats(pF, &non_car->collision_info.bounds[1].max.v[0], &non_car->collision_info.bounds[1].max.v[1], &non_car->collision_info.bounds[1].max.v[1]);
+    non_car->collision_info.extra_point_num = GetAnInt(pF);
+    if (non_car->collision_info.extra_point_num > 6) {
+        sprintf(s, "%d", non_car->collision_info.index);
+        FatalError(93, s);
+    }
+    for (i = 0; non_car->collision_info.extra_point_num > i; ++i) {
+        GetThreeFloats(pF, &non_car->collision_info.extra_points[i].v[0], &non_car->collision_info.extra_points[i].v[1], &non_car->collision_info.extra_points[i].v[2]);
+    }
+    GetPairOfFloats(pF, &non_car->free_mass, &non_car->attached_mass);
+    GetThreeFloats(pF, &len, &wid, &het);
+    snap_angle = GetAFloat(pF);
+
+    //cos();
+    non_car->snap_off_cosine = BR_ANGLE_DEG(snap_angle) * 0.00009587379924285257;
+    // expected: snap_angle = 1.0, final = 0.70710677
+
+    non_car->collision_info.break_off_radians_squared = BrDegreeToRadian(snap_angle) * BrDegreeToRadian(snap_angle);
+    // expected: 0.616225
+    LOG_DEBUG("cosine %d, rad %d", non_car->snap_off_cosine, non_car->collision_info.break_off_radians_squared);
+    LOG_PANIC("x");
+    ts = GetAFloat(pF);
+
+    non_car->min_torque_squared = ts * ts;
+    non_car->collision_info.bounds[0].min.v[0] = non_car->collision_info.bounds[1].min.v[0];
+    non_car->collision_info.bounds[0].min.v[1] = non_car->collision_info.bounds[1].min.v[1];
+    non_car->collision_info.bounds[0].min.v[2] = non_car->collision_info.bounds[1].min.v[2];
+    non_car->collision_info.bounds[0].max.v[0] = non_car->collision_info.bounds[1].max.v[0];
+    non_car->collision_info.bounds[0].max.v[1] = non_car->collision_info.bounds[1].max.v[1];
+    non_car->collision_info.bounds[0].max.v[2] = non_car->collision_info.bounds[1].max.v[2];
+    for (i = 0; non_car->collision_info.extra_point_num > i; ++i) {
+        for (j = 0; j < 3; ++j) {
+            if (non_car->collision_info.extra_points[i].v[j] < non_car->collision_info.bounds[0].min.v[j]) {
+                non_car->collision_info.bounds[0].min.v[j] = non_car->collision_info.extra_points[i].v[j];
+            }
+            if (non_car->collision_info.extra_points[i].v[j] > non_car->collision_info.bounds[0].max.v[j]) {
+                non_car->collision_info.bounds[0].max.v[j] = non_car->collision_info.extra_points[i].v[j];
+            }
+        }
+    }
+    non_car->collision_info.bounds[2] = non_car->collision_info.bounds[0];
+    non_car->I_over_M.v[2] = (wid * wid + len * len) / 12.0;
+    non_car->I_over_M.v[1] = (het * het + len * len) / 12.0;
+    non_car->I_over_M.v[0] = (het * het + wid * wid) / 12.0;
+    non_car->free_cmpos.v[0] = non_car->free_cmpos.v[0] * 6.9000001;
+    non_car->free_cmpos.v[1] = non_car->free_cmpos.v[1] * 6.9000001;
+    non_car->free_cmpos.v[2] = non_car->free_cmpos.v[2] * 6.9000001;
+    non_car->attached_cmpos.v[0] = non_car->attached_cmpos.v[0] * 6.9000001;
+    non_car->attached_cmpos.v[1] = non_car->attached_cmpos.v[1] * 6.9000001;
+    non_car->attached_cmpos.v[2] = non_car->attached_cmpos.v[2] * 6.9000001;
+    non_car->I_over_M.v[0] = non_car->I_over_M.v[0] * 47.610001;
+    non_car->I_over_M.v[1] = non_car->I_over_M.v[1] * 47.610001;
+    non_car->I_over_M.v[2] = non_car->I_over_M.v[2] * 47.610001;
+    non_car->collision_info.bounds[1].min.v[0] = non_car->collision_info.bounds[1].min.v[0] * 6.9000001;
+    non_car->collision_info.bounds[1].min.v[1] = non_car->collision_info.bounds[1].min.v[1] * 6.9000001;
+    non_car->collision_info.bounds[1].min.v[2] = non_car->collision_info.bounds[1].min.v[2] * 6.9000001;
+    non_car->collision_info.bounds[1].max.v[0] = non_car->collision_info.bounds[1].max.v[0] * 6.9000001;
+    non_car->collision_info.bounds[1].max.v[1] = non_car->collision_info.bounds[1].max.v[1] * 6.9000001;
+    non_car->collision_info.bounds[1].max.v[2] = non_car->collision_info.bounds[1].max.v[2] * 6.9000001;
+    for (i = 0; non_car->collision_info.extra_point_num > i; ++i) {
+        non_car->collision_info.extra_points[i].v[0] = non_car->collision_info.extra_points[i].v[0] * 6.9000001;
+        non_car->collision_info.extra_points[i].v[1] = non_car->collision_info.extra_points[i].v[1] * 6.9000001;
+        non_car->collision_info.extra_points[i].v[2] = non_car->collision_info.extra_points[i].v[2] * 6.9000001;
+    }
+    non_car->collision_info.max_bounds[0] = non_car->collision_info.bounds[0];
+    non_car->collision_info.max_bounds[1] = non_car->collision_info.bounds[2];
+    for (i = 0; non_car->collision_info.extra_point_num > i; ++i) {
+        non_car->collision_info.original_extra_points_z[i] = non_car->collision_info.extra_points[i].v[2];
+    }
 }
 
 // IDA: void __usercall ReadMechanicsData(FILE *pF@<EAX>, tCar_spec *c@<EDX>)
@@ -1738,8 +1817,7 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
         fclose(h);
         AdjustCarCoordinates(&gProgram_state.current_car);
         AdjustRenderScreenSize();
-        LOG_DEBUG("out");
-        //PossibleService();
+        PossibleService();
         ReinitialiseRearviewCamera();
         GetALineAndDontArgue(f, s);
     } else {
@@ -2240,7 +2318,6 @@ void LoadRaceInfo(int pRace_index, tRace_info* pRace_info) {
 
     the_chunk = pRace_info->text_chunks;
     for (i = 0; i < pRace_info->text_chunk_count; i++) {
-        //while (pRace_info->text_chunk_count > v5) {
         PossibleService();
         GetPairOfInts(f, &the_chunk->x_coord, &the_chunk->y_coord);
         GetPairOfInts(f, &the_chunk->frame_cue, &the_chunk->frame_end);
@@ -2611,7 +2688,7 @@ void GetPairOfScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2) {
 void GetThreeScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2, br_scalar* pS3) {
     LOG_TRACE("(%p, %p, %p, %p)", pF, pS1, pS2, pS3);
 
-    GetThreeFloats(pF, &pS1, &pS2, &pS3);
+    GetThreeFloats(pF, pS1, pS2, pS3);
 }
 
 // IDA: void __usercall GetFourScalars(FILE *pF@<EAX>, br_scalar *pF1@<EDX>, br_scalar *pF2@<EBX>, br_scalar *pF3@<ECX>, br_scalar *pF4)

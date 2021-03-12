@@ -2994,13 +2994,13 @@ enum {
     BR_MODF_QUICK_UPDATE = 0x0010, /* ModelUpdate is fast - but may produce slower models */
     BR_MODF_CUSTOM = 0x0020, /* Invoke custom callback for this model */
     BR_MODF_PREPREPARED = 0x0040, /* Model structure is pre-prepared - update performs no work */
-
+    BR_MODF_UPDATEABLE = 0x0080, /* Added by Jeff from Errols code */
     BR_MODF_CREASE = 0x0100, /* Create creases in smoothing along edges if face<->face angle is g.t model->crease */
     BR_MODF_CUSTOM_NORMALS = 0x0200, /* Uses vertex normals from br_vertex structure */
     BR_MODF_CUSTOM_BOUNDS = 0x0400, /* Bounding box is already set up				*/
     //BR_MODF_FACES_ONLY = 0x0800, /* Model will only be used to render faces (not edges or points) */
 
-    BR_MODF_UPDATEABLE = 0x0080 /* Added by Jeff from Errols code */
+    MODF_USES_DEFAULT = 0x8000
 };
 
 #define BR_COLOUR_RGB(r, g, b) \
@@ -3008,6 +3008,7 @@ enum {
 
 #define BR_ANGLE_DEG(deg) ((br_angle)((deg)*182))
 #define BR_ANGLE_RAD(rad) ((br_angle)((rad)*10430))
+#define BrDegreeToRadian(d) ((br_scalar)((d) * (M_PI / 180.0)))
 
 #define BR_SCALAR(x) ((br_scalar)(x))
 
@@ -3016,5 +3017,19 @@ enum {
 
 #define BR_LENGTH3(a, b, c) ((br_scalar)sqrt((a) * (a) + (b) * (b) + (c) * (c)))
 #define BR_SCALAR_EPSILON 1.192092896e-7f
+#define BR_SCALAR_MAX 3.402823466e+38f
+#define BR_SCALAR_MIN (-3.402823466e+38f)
+
+#define BR_SIMPLEHEAD(l) (void*)(((br_simple_list*)(l))->head)
+#define BR_SIMPLENEXT(n) (void*)(((br_simple_node*)(n))->next)
+#define BR_FOR_SIMPLELIST(list, ptr) for ((ptr) = BR_SIMPLEHEAD(list); (ptr); (ptr) = BR_SIMPLENEXT(ptr))
+
+#define X 0
+#define Y 1
+#define Z 2
+#define W 3
+
+#define U 0
+#define V 1
 
 #endif /* BR_TYPES_H */
