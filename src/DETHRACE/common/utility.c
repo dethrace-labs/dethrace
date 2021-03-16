@@ -156,8 +156,9 @@ int IRandomPosNeg(int pN) {
 
 // IDA: float __cdecl FRandomBetween(float pA, float pB)
 float FRandomBetween(float pA, float pB) {
-    LOG_TRACE("(%f, %f)", pA, pB);
-    NOT_IMPLEMENTED();
+    LOG_TRACE8("(%f, %f)", pA, pB);
+
+    return (double)rand() * (pB - pA) / 32768.0 + pA;
 }
 
 // IDA: float __cdecl FRandomPosNeg(float pN)
@@ -168,8 +169,8 @@ float FRandomPosNeg(float pN) {
 
 // IDA: br_scalar __cdecl SRandomBetween(br_scalar pA, br_scalar pB)
 br_scalar SRandomBetween(br_scalar pA, br_scalar pB) {
-    LOG_TRACE("(%f, %f)", pA, pB);
-    NOT_IMPLEMENTED();
+    LOG_TRACE8("(%f, %f)", pA, pB);
+    return FRandomBetween(pA, pB);
 }
 
 // IDA: br_scalar __cdecl SRandomPosNeg(br_scalar pN)
@@ -622,7 +623,18 @@ void SaveGeneratedShadeTable(br_pixelmap* pThe_table, int pR, int pG, int pB) {
 // IDA: br_pixelmap* __usercall GenerateShadeTable@<EAX>(int pHeight@<EAX>, br_pixelmap *pPalette@<EDX>, int pRed_mix@<EBX>, int pGreen_mix@<ECX>, int pBlue_mix, float pQuarter, float pHalf, float pThree_quarter)
 br_pixelmap* GenerateShadeTable(int pHeight, br_pixelmap* pPalette, int pRed_mix, int pGreen_mix, int pBlue_mix, float pQuarter, float pHalf, float pThree_quarter) {
     LOG_TRACE("(%d, %p, %d, %d, %d, %f, %f, %f)", pHeight, pPalette, pRed_mix, pGreen_mix, pBlue_mix, pQuarter, pHalf, pThree_quarter);
-    NOT_IMPLEMENTED();
+
+    PossibleService();
+    return GenerateDarkenedShadeTable(
+        pHeight,
+        pPalette,
+        pRed_mix,
+        pGreen_mix,
+        pBlue_mix,
+        pQuarter,
+        pHalf,
+        pThree_quarter,
+        1.0);
 }
 
 // IDA: br_pixelmap* __usercall GenerateDarkenedShadeTable@<EAX>(int pHeight@<EAX>, br_pixelmap *pPalette@<EDX>, int pRed_mix@<EBX>, int pGreen_mix@<ECX>, int pBlue_mix, float pQuarter, float pHalf, float pThree_quarter, br_scalar pDarken)
@@ -641,7 +653,9 @@ br_pixelmap* GenerateDarkenedShadeTable(int pHeight, br_pixelmap* pPalette, int 
     int i;
     int c;
     LOG_TRACE("(%d, %p, %d, %d, %d, %f, %f, %f, %f)", pHeight, pPalette, pRed_mix, pGreen_mix, pBlue_mix, pQuarter, pHalf, pThree_quarter, pDarken);
-    NOT_IMPLEMENTED();
+
+    STUB();
+    return NULL;
 }
 
 // IDA: void __cdecl PossibleService()

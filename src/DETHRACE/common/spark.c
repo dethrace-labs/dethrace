@@ -1,4 +1,11 @@
 #include "spark.h"
+#include "brender.h"
+#include "errors.h"
+#include "globvars.h"
+#include "graphics.h"
+#include "loading.h"
+#include "utility.h"
+#include "world.h"
 #include <stdlib.h>
 
 br_pixelmap* gFlame_map[20];
@@ -12,7 +19,7 @@ tSpark gSparks[32];
 br_model* gShrapnel_model[2];
 br_pixelmap* gShade_list[16];
 int gN_BR_smoke_structs;
-br_pixelmap** gDust_table;
+br_pixelmap** gDust_table = &gShade_list[8];
 tSmoke gSmoke[25];
 tU32 gSplash_flags;
 int gSmoke_num;
@@ -184,7 +191,7 @@ void AdjustShrapnel(int pShrapnel_num, br_vector3* pos, tU16 pAge, br_material* 
 // IDA: void __cdecl ResetSparks()
 void ResetSparks() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    STUB();
 }
 
 // IDA: void __cdecl ResetShrapnel()
@@ -214,13 +221,14 @@ void InitShrapnel() {
     int i;
     int j;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __cdecl LoadInShrapnel()
 void LoadInShrapnel() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    STUB();
 }
 
 // IDA: void __usercall KillShrapnel(int i@<EAX>)
@@ -539,7 +547,8 @@ void InitFlame() {
     br_actor* actor;
     br_material* material;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __usercall InitSplash(FILE *pF@<EAX>)
@@ -552,7 +561,70 @@ void InitSplash(FILE* pF) {
     char s[256];
     br_pixelmap* splash_maps[20];
     LOG_TRACE("(%p)", pF);
-    NOT_IMPLEMENTED();
+
+    gSplash_flags = 0;
+    gSplash_model = BrModelAllocate("Splash", 4, 2);
+    if (pF) {
+        num = GetAnInt(pF);
+        gNum_splash_types = 0;
+        for (i = 0; num > i; ++i) {
+            GetAString(pF, s);
+            PathCat(the_path, gApplication_path, "PIXELMAP");
+            PathCat(the_path, the_path, s);
+            num_files = DRPixelmapLoadMany(the_path, &splash_maps[gNum_splash_types], 20 - gNum_splash_types);
+            if (!num_files) {
+                FatalError(79, the_path);
+            }
+            gNum_splash_types += num_files;
+        }
+    } else {
+        PathCat(the_path, gApplication_path, "PIXELMAP");
+        PathCat(the_path, the_path, "SPLSHBLU.PIX");
+        gNum_splash_types = DRPixelmapLoadMany(the_path, splash_maps, 0x14u);
+    }
+    BrMapAddMany(splash_maps, gNum_splash_types);
+    for (i = 0; i < gNum_splash_types; ++i) {
+        gSplash_material[i] = BrMaterialAllocate(0);
+        gSplash_material[i]->flags &= 0xFFFFFFFC;
+        gSplash_material[i]->flags |= 0x820u;
+        gSplash_material[i]->index_blend = LoadSingleShadeTable(&gTrack_storage_space, "BLEND50.TAB");
+        gSplash_material[i]->colour_map = splash_maps[i];
+        BrMaterialAdd(gSplash_material[i]);
+    }
+    gSplash_model->nvertices = 4;
+    BrVector3SetFloat(&gSplash_model->vertices->p, -0.5, 0.0, 0.0);
+    BrVector3SetFloat(&gSplash_model->vertices[1].p, 0.5, 0.0, 0.0);
+    BrVector3SetFloat(&gSplash_model->vertices[2].p, 0.5, 1.0, 0.0);
+    BrVector3SetFloat(&gSplash_model->vertices[3].p, -0.5, 1.0, 0.0);
+    gSplash_model->vertices->map.v[0] = 0.0;
+    gSplash_model->vertices->map.v[1] = 1.0;
+    gSplash_model->vertices[1].map.v[0] = 1.0;
+    gSplash_model->vertices[1].map.v[1] = 1.0;
+    gSplash_model->vertices[2].map.v[0] = 1.0;
+    gSplash_model->vertices[2].map.v[1] = 0.0;
+    gSplash_model->vertices[3].map.v[0] = 0.0;
+    gSplash_model->vertices[3].map.v[1] = 0.0;
+    gSplash_model->nfaces = 2;
+    gSplash_model->faces->vertices[0] = 0;
+    gSplash_model->faces->vertices[1] = 1;
+    gSplash_model->faces->vertices[2] = 2;
+    gSplash_model->faces[1].vertices[0] = 0;
+    gSplash_model->faces[1].vertices[1] = 2;
+    gSplash_model->faces[1].vertices[2] = 3;
+    gSplash_model->faces->smoothing = 1;
+    gSplash_model->faces[1].smoothing = 1;
+    BrModelAdd(gSplash_model);
+    for (i = 0; i < 32; ++i) {
+        gSplash[i].actor = BrActorAllocate(BR_ACTOR_MODEL, 0);
+        actor = gSplash[i].actor;
+        actor->model = gSplash_model;
+        if (gNum_splash_types) {
+            actor->material = gSplash_material[IRandomBetween(0, gNum_splash_types - 1)];
+        } else {
+            actor->material = 0;
+        }
+        gSplash[i].scale_x = SRandomBetween(0.89999998, 1.1) * (float)(2 * IRandomBetween(0, 1) - 1);
+    }
 }
 
 // IDA: void __cdecl DisposeSplash()
@@ -730,7 +802,17 @@ void GetSmokeShadeTables(FILE* f) {
     br_scalar half;
     br_scalar three_quarter;
     LOG_TRACE("(%p)", f);
-    NOT_IMPLEMENTED();
+
+    gNum_dust_tables = GetAnInt(f);
+    if (gNum_dust_tables > 8) {
+        gNum_dust_tables = 8;
+    }
+    for (i = 0; gNum_dust_tables > i; ++i) {
+        PossibleService();
+        GetThreeInts(f, &red, &green, &blue);
+        GetThreeScalars(f, &quarter, &half, &three_quarter);
+        gDust_table[i] = GenerateShadeTable(16, gRender_palette, red, green, blue, quarter, half, three_quarter);
+    }
 }
 
 // IDA: void __cdecl FreeSmokeShadeTables()
@@ -743,7 +825,15 @@ void FreeSmokeShadeTables() {
 // IDA: void __usercall LoadInKevStuff(FILE *pF@<EAX>)
 void LoadInKevStuff(FILE* pF) {
     LOG_TRACE("(%p)", pF);
-    NOT_IMPLEMENTED();
+
+    PossibleService();
+    LoadInShrapnel();
+    PossibleService();
+    InitShrapnel();
+    PossibleService();
+    InitFlame();
+    PossibleService();
+    InitSplash(pF);
 }
 
 // IDA: void __cdecl DisposeKevStuff()

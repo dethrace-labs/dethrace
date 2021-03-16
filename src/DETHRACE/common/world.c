@@ -196,7 +196,7 @@ tAdd_to_storage_result AddShadeTableToStorage(tBrender_storage* pStorage_space, 
     for (i = 0; i < pStorage_space->shade_tables_count; i++) {
         if (pStorage_space->shade_tables[i]->identifier
             && pThe_st->identifier
-            && !strcmp(pStorage_space->pixelmaps[i]->identifier, pThe_st->identifier)) {
+            && !strcmp(pStorage_space->shade_tables[i]->identifier, pThe_st->identifier)) {
             return eStorage_duplicate;
         }
     }
@@ -397,7 +397,27 @@ int LoadNShadeTables(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
 br_pixelmap* LoadSingleShadeTable(tBrender_storage* pStorage_space, char* pName) {
     br_pixelmap* temp;
     LOG_TRACE("(%p, \"%s\")", pStorage_space, pName);
-    NOT_IMPLEMENTED();
+
+    temp = LoadShadeTable(pName);
+    if (!temp) {
+        return BrTableFind(pName);
+    }
+
+    switch (AddShadeTableToStorage(pStorage_space, temp)) {
+    case eStorage_not_enough_room:
+        FatalError(68);
+        break;
+
+    case eStorage_duplicate:
+        BrPixelmapFree(temp);
+        return BrTableFind(pName);
+
+    case eStorage_allocated:
+        BrTableAdd(temp);
+        return temp;
+    }
+
+    return NULL;
 }
 
 // IDA: int __usercall LoadNMaterials@<EAX>(tBrender_storage *pStorage_space@<EAX>, FILE *pF@<EDX>, int pCount@<EBX>)
@@ -2304,7 +2324,6 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     LoadInOppoPaths(f);
     PrintMemoryDump(0, "JUST LOADED IN OPPO PATHS");
     num_materials = GetAnInt(f);
-    LOG_PANIC("mats: %d", num_materials);
     for (i = 0; i < num_materials; i++) {
         PossibleService();
         pRace_info->material_modifiers[i].car_wall_friction = GetAScalar(f);

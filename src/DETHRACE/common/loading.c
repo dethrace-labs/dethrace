@@ -7,6 +7,7 @@
 #include "brender.h"
 #include "brucetrk.h"
 #include "car.h"
+#include "constants.h"
 #include "controls.h"
 #include "crush.h"
 #include "depth.h"
@@ -466,7 +467,10 @@ br_uint_32 LoadPixelmaps(char* pFile_name, br_pixelmap** pPixelmaps, br_uint_16 
 br_pixelmap* LoadShadeTable(char* pName) {
     tPath_name the_path;
     LOG_TRACE("(\"%s\")", pName);
-    NOT_IMPLEMENTED();
+
+    PathCat(the_path, gApplication_path, "SHADETAB");
+    PathCat(the_path, the_path, pName);
+    return BrPixelmapLoad(the_path);
 }
 
 // IDA: br_material* __usercall LoadMaterial@<EAX>(char *pName@<EAX>)
@@ -1040,14 +1044,8 @@ void ReadNonCarMechanicsData(FILE* pF, tNon_car_spec* non_car) {
     GetThreeFloats(pF, &len, &wid, &het);
     snap_angle = GetAFloat(pF);
 
-    //cos();
-    non_car->snap_off_cosine = BR_ANGLE_DEG(snap_angle) * 0.00009587379924285257;
-    // expected: snap_angle = 1.0, final = 0.70710677
-
-    non_car->collision_info.break_off_radians_squared = BrDegreeToRadian(snap_angle) * BrDegreeToRadian(snap_angle);
-    // expected: 0.616225
-    LOG_DEBUG("cosine %d, rad %d", non_car->snap_off_cosine, non_car->collision_info.break_off_radians_squared);
-    LOG_PANIC("x");
+    non_car->snap_off_cosine = cosf(snap_angle * ONEEIGHTTWO * 0.00009587379924285257);
+    non_car->collision_info.break_off_radians_squared = snap_angle * 3.14 / 180.0 * (snap_angle * 3.14 / 180.0);
     ts = GetAFloat(pF);
 
     non_car->min_torque_squared = ts * ts;
@@ -2723,7 +2721,14 @@ void GetNScalars(FILE* pF, int pNumber, br_scalar* pScalars) {
     float fleurting_point_numero;
     int i;
     LOG_TRACE("(%p, %d, %p)", pF, pNumber, pScalars);
-    NOT_IMPLEMENTED();
+
+    GetALineAndDontArgue(pF, s);
+    str = strtok(s, "\t ,/");
+    for (i = 0; i < pNumber; i++) {
+        sscanf(str, "%f", &fleurting_point_numero);
+        pScalars[i] = fleurting_point_numero;
+        str = strtok(NULL, "\t ,/");
+    }
 }
 
 // IDA: void __usercall GetPairOfFloatPercents(FILE *pF@<EAX>, float *pF1@<EDX>, float *pF2@<EBX>)

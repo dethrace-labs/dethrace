@@ -377,7 +377,8 @@ int PedestrianNextInstruction(tPedestrian_data* pPedestrian, float pDanger_level
     int choice;
     int the_marker_ref;
     LOG_TRACE("(%p, %f, %d, %d)", pPedestrian, pDanger_level, pPosition_explicitly, pMove_pc);
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __usercall MungePedestrianSequence(tPedestrian_data *pPedestrian@<EAX>, int pAction_changed@<EDX>)

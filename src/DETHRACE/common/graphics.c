@@ -157,7 +157,19 @@ void ResetLollipopQueue() {
 // IDA: int __usercall AddToLollipopQueue@<EAX>(br_actor *pActor@<EAX>, int pIndex@<EDX>)
 int AddToLollipopQueue(br_actor* pActor, int pIndex) {
     LOG_TRACE("(%p, %d)", pActor, pIndex);
-    NOT_IMPLEMENTED();
+
+    int result; // eax
+
+    if (pIndex >= 0) {
+        gLollipops[pIndex] = pActor;
+        return pIndex;
+    } else if (gNumber_of_lollipops >= 100) {
+        return -1;
+    } else {
+        gLollipops[gNumber_of_lollipops] = pActor;
+        gNumber_of_lollipops++;
+        return gNumber_of_lollipops - 1;
+    }
 }
 
 // IDA: void __cdecl RenderLollipops()
@@ -1522,7 +1534,7 @@ br_uint_32 SaveShadeTable(br_pixelmap* pTable, void* pArg) {
 // IDA: void __cdecl SaveShadeTables()
 void SaveShadeTables() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    STUB();
 }
 
 // IDA: void __cdecl DisposeSavedShadeTables()

@@ -279,4 +279,6 @@ typedef enum keymapcodes {
 #define STR_ENDS_WITH(haystack, needle) strcmp(haystack + strlen(haystack) - strlen(needle), needle)
 #define MAX(a, b) ((a) > (b) ? a : b)
 
+#define ONEEIGHTTWO 182.0444444444444
+
 #endif

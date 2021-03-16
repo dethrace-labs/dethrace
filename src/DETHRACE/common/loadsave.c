@@ -104,7 +104,8 @@ int ConfirmMidGameSave() {
 void MakeSavedGame(tSave_game** pSave_record) {
     int i;
     LOG_TRACE("(%p)", pSave_record);
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __cdecl SaveStart()
