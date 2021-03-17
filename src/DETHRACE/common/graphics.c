@@ -554,17 +554,8 @@ void ClearWobbles() {
 void InitWobbleStuff() {
     int i;
 
-    for (i = 0; i < COUNT_OF(gWobble_array); i++) {
-        gWobble_array[i].amplitude_x = 0;
-    }
-}
-
-// IDA: void __cdecl InitWobbleStuff()
-void InitWobbleStuff() {
-    int i;
-
     ClearWobbles();
-    for (i = 0; i < 64; i++) {
+    for (i = 0; i < COUNT_OF(gCosine_array); i++) {
         gCosine_array[i] = cosf(i / 64.0f * 3.141592653589793f / 2.0f);
     }
 }

@@ -76,7 +76,7 @@ void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class) {
         parent = UserToRes(vparent);
         BrSimpleAddHead(&parent->children, &res->node);
     }
-    //LOG_DEBUG("allocated res=%p, user=%p", res, ((char*)res + actual_pad));
+    //LOG_DEBUG("allocated %p", ((char*)res + actual_pad));
     return ((char*)res) + actual_pad;
 }
 
@@ -114,26 +114,7 @@ void BrResInternalFree(resource_header* res, br_boolean callback) {
 // IDA: void __cdecl BrResFree(void *vres)
 void BrResFree(void* vres) {
     LOG_TRACE10("(%p)", vres);
-<<<<<<< HEAD
-
-    vres = (char*)vres - sizeof(resource_header);
-    if (((resource_header*)vres)->magic_num != 0xDEADBEEF) {
-        LOG_PANIC("Bad resource header at %p", vres);
-    }
-    BrResInternalFree(vres, 1);
-}
-
-void BrResAssert(void* vres) {
-    LOG_TRACE("(%p)", vres);
-
-    vres = (char*)vres - sizeof(resource_header);
-
-    if (((resource_header*)vres)->magic_num != 0xDEADBEEF) {
-        LOG_PANIC("Bad resource header at %p. Was %X", vres, ((resource_header*)vres)->magic_num);
-    }
-=======
     BrResInternalFree(UserToRes(vres), 1);
->>>>>>> before mem hunting
 }
 
 // IDA: void __cdecl BrResFreeNoCallback(void *vres)

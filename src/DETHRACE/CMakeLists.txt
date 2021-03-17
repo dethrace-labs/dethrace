@@ -133,9 +133,9 @@ target_sources(dethrace_obj PRIVATE
     constants.h
     dr_types.h
     pc-dos/dosnet.c
-    pc-dos/dosnet.h
+    pd/net.h
     pc-dos/dossys.c
-    pc-dos/dossys.h
+    pd/sys.h
     watcom_functions.c
     watcom_functions.h
 )
