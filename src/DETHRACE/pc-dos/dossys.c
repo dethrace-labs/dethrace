@@ -651,7 +651,7 @@ int original_main(int pArgc, char** pArgv) {
         } else if (strcasecmp(pArgv[i], "-yon") == 0 && i < pArgc - 1) {
             i++;
             sscanf(pArgv[i], "%f", &f);
-            if (f >= 0.0 && f <= 1065353216) {
+            if (f >= 0.0 && f <= 1.0f) {
                 gYon_multiplier = f;
             }
         } else if (strcasecmp(pArgv[i], "-simple") == 0 && i < pArgc - 1) {

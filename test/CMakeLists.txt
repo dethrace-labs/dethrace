@@ -10,7 +10,7 @@ target_include_directories(dethrace_test PRIVATE
     ${CMAKE_SOURCE_DIR}/src/BRSRC13
     ${CMAKE_SOURCE_DIR}/src/DETHRACE
     ${CMAKE_SOURCE_DIR}/src/DETHRACE/common
-    ${CMAKE_SOURCE_DIR}/src/DETHRACE/pc-dos
+    ${CMAKE_SOURCE_DIR}/src/DETHRACE/pd
 )
 
 if(NOT MSVC)

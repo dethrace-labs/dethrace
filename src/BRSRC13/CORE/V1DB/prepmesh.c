@@ -588,7 +588,6 @@ void BrModelUpdate(br_model* model, br_uint_16 flags) {
                 fp = &model->faces[f];
                 if (!fp->material) {
                     model->flags |= MODF_USES_DEFAULT;
-                    LOG_DEBUG("flags1y: %d", model->flags);
                 }
 
                 for (v = 0; v < 3; v++) {

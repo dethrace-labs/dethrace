@@ -54,7 +54,7 @@ jobs:
     - name: Run unit tests
       run: |
         cd build
-        ctest
+        ctest --verbose
 
     - name: Create archives
       run: |

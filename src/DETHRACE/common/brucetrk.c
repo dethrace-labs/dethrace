@@ -74,8 +74,6 @@ br_uint_32 ProcessModelsCB(br_actor* pActor, tTrack_spec* pTrack_spec) {
     int group;
     LOG_TRACE("(%p, %p)", pActor, pTrack_spec);
 
-    LOG_DEBUG("processing %s, %d", pActor->identifier, pActor->type);
-
     if (sscanf(pActor->identifier, "%u%u", &x, &z) != 2 || pTrack_spec->ncolumns_x <= x || pTrack_spec->ncolumns_z <= z) {
         if (*pActor->identifier != '%'
             || sscanf((const char*)pActor->identifier + 1, "%u%u", &x, &z) != 2
