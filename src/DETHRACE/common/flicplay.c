@@ -1139,13 +1139,12 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
     int data_knocked_off;
     int read_amount;
 
-    LOG_DEBUG("%d (%p), frames left: %d offset: %d", pFlic_info->the_index, pFlic_info, pFlic_info->frames_left, (pFlic_info->data - pFlic_info->data_start) + 4);
+    //LOG_DEBUG("%d (%p), frames left: %d offset: %d", pFlic_info->the_index, pFlic_info, pFlic_info->frames_left, (pFlic_info->data - pFlic_info->data_start) + 4);
     PossibleService();
     frame_length = MemReadU32(&pFlic_info->data);
     magic_bytes = MemReadU16(&pFlic_info->data);
     chunk_count = MemReadU16(&pFlic_info->data);
 
-    LOG_DEBUG("length %d, magic: %d chunks: %d, data %p, data_start %p, %d", frame_length, magic_bytes, chunk_count, pFlic_info->data, pFlic_info->data_start, pFlic_info->f ? 1 : 0);
     MemSkipBytes(&pFlic_info->data, 8);
     if (magic_bytes == 0xF1FA) {
         for (chunk_counter = 0; chunk_counter < chunk_count; chunk_counter++) {

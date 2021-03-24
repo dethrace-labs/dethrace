@@ -514,8 +514,6 @@ int LoadNModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
 void DodgyModelUpdate(br_model* pM) {
     LOG_TRACE("(%p)", pM);
 
-    LOG_DEBUG("update track model %s %d, %d", pM->identifier, pM->nfaces, pM->nvertices);
-
     BrResFree(pM->faces);
     BrResFree(pM->vertices);
     pM->nfaces = 0;

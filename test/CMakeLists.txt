@@ -1,5 +1,5 @@
 add_executable(dethrace_test)
-add_test(NAME teat_dethrace COMMAND dethrace_test)
+add_test(NAME test_dethrace COMMAND dethrace_test)
 
 target_link_libraries(dethrace_test PRIVATE glad dethrace_obj)
 

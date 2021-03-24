@@ -536,8 +536,8 @@ void InitRace() {
     }
     gOn_drugs = 0;
     gRace_finished = 0;
-    gOpponent_speed_factor = 1065353216;
-    gCop_speed_factor = 1065353216;
+    gOpponent_speed_factor = 1.0f;
+    gCop_speed_factor = 1.0f;
     gGravity_multiplier = gDefault_gravity;
     gPinball_factor = 0;
     gInstant_handbrake = 0;
