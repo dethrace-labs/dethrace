@@ -4,6 +4,7 @@
 #include "br_types.h"
 #include "constants.h"
 #include "harness.h"
+#include <assert.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>

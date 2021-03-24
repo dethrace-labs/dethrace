@@ -1,13 +1,12 @@
 name: macos
 
 on:
-  pull_request:
   push:
   release:
     types: published
 
 jobs:
-  deathrace-macos:
+  dethrace-macos:
     runs-on: macos-10.15
 
     steps:
@@ -34,7 +33,7 @@ jobs:
     - name: Run unit tests
       run: |
         cd build
-        ctest
+        ctest --verbose
 
     - name: Create archives
       run: |

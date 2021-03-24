@@ -1,5 +1,11 @@
-#ifndef _DOSSYS_H_
-#define _DOSSYS_H_
+#ifndef _PD_SYS_H_
+#define _PD_SYS_H_
+
+// Jeff:
+// Header files are generated from information in the original symbol dump, but we don't exactly know what this used to look like or be called.
+// Each platform build included a platform-dependant `sys` and `net` files. From the symbol dump and debug/error messages in the binaries,
+// we know of at least `pc-dos/dossys.c`, `pc-dos/dosnet.c`, `Win95sys.c`.
+// Functions contained within these files are prefixed with `PD` - we assume that is short for something like `Platform Dependant`.
 
 #include "br_types.h"
 #include "dr_types.h"
@@ -31,7 +37,7 @@ extern int gReplay_override;
 extern br_pixelmap* gReal_back_screen;
 extern tS32 gJoystick_min1x;
 extern br_pixelmap* gTemp_screen;
-extern int gDOSGfx_initialized;
+//extern int gDOSGfx_initialized;
 extern tU32 gUpper_loop_limit;
 extern int gExtra_mem;
 extern int gReal_back_screen_locked;
@@ -41,17 +47,17 @@ extern tU8 gScan_code[123][2];
 extern int _unittest_do_not_exit;
 extern char* _unittest_last_fatal_error;
 
-void KeyboardHandler();
+// void KeyboardHandler();
 
-int KeyDown(tU8 pScan_code);
+//int KeyDown(tU8 pScan_code);
 
-void KeyTranslation(tU8 pKey_index, tU8 pScan_code_1, tU8 pScan_code_2);
+// void KeyTranslation(tU8 pKey_index, tU8 pScan_code_1, tU8 pScan_code_2);
 
-void KeyBegin();
+//void KeyBegin();
 
-void KeyEnd();
+//void KeyEnd();
 
-int KeyDown22(int pKey_index);
+//int KeyDown22(int pKey_index);
 
 void PDSetKeyArray(int* pKeys, int pMark);
 
@@ -79,17 +85,17 @@ void PDUnlockRealBackScreen();
 
 void PDAllocateScreenAndBack();
 
-void Copy8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette);
+//void Copy8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette);
 
-void Double8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette, tU16 pOff, tU16 pSrc_width, tU16 pSrc_height);
+//void Double8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette, tU16 pOff, tU16 pSrc_width, tU16 pSrc_height);
 
 br_pixelmap* PDInterfacePixelmap();
 
-void SwapBackScreen();
+//void SwapBackScreen();
 
-void ReallyCopyBackScreen(int pRendering_area_only, int pClear_top_and_bottom);
+//void ReallyCopyBackScreen(int pRendering_area_only, int pClear_top_and_bottom);
 
-void CopyBackScreen(int pRendering_area_only);
+//void CopyBackScreen(int pRendering_area_only);
 
 void PDScreenBufferSwap(int pRendering_area_only);
 
@@ -123,7 +129,7 @@ int PDGetTotalTime();
 
 int PDServiceSystem(tU32 pTime_since_last_call);
 
-tU32 LargestBlockAvail();
+//tU32 LargestBlockAvail();
 
 void* PDGrabLargestMammaryWeCanPlayWith(tU32 pMaximum_required, tU32* pAmount_allocated);
 
@@ -131,9 +137,9 @@ void PDAllocateActionReplayBuffer(char** pBuffer, tU32* pBuffer_size);
 
 void PDDisposeActionReplayBuffer(char* pBuffer);
 
-void Usage(char* pProgpath);
+//void Usage(char* pProgpath);
 
-int OurGetChar();
+//int OurGetChar();
 
 int PDGetGorePassword();
 
@@ -143,15 +149,15 @@ void PDEnterDebugger(char* pStr);
 
 void PDEndItAllAndReRunTheBastard();
 
-int matherr(struct exception_* err);
+//int matherr(struct exception_* err);
 
-int LoopLimitTooLow(tU32 limit);
+//int LoopLimitTooLow(tU32 limit);
 
-tS32 UpperLoopLimit();
+//tS32 UpperLoopLimit();
 
-int InitJoysticks();
+//int InitJoysticks();
 
-tU32 ReadJoystickAxis(int pBit);
+//tU32 ReadJoystickAxis(int pBit);
 
 void PDReadJoySticks();
 
@@ -181,7 +187,7 @@ int PDGetJoy2Button4();
 
 int PDFileUnlock(char* pThe_path);
 
-void CriticalISR(INTPACK pRegs);
+// void CriticalISR(INTPACK pRegs);
 
 int PDCheckDriveExists2(char* pThe_path, char* pFile_name, tU32 pMin_size);
 

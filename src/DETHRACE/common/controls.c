@@ -9,7 +9,7 @@
 #include "loadsave.h"
 #include "mainloop.h"
 #include "netgame.h"
-#include "pc-dos/dossys.h"
+#include "pd/sys.h"
 #include "pedestrn.h"
 #include "pratcam.h"
 #include "sound.h"
@@ -77,7 +77,7 @@ tToggle_element _gToggle_array[] = {
     { 52, -2, 1, 1, 0, DamageTest },
     { 36, -2, 0, 1, 0, ToggleSoundEnable },
     { 5, 8, 0, 1, 0, PrintScreen },
-    //{ 9, 7, 1, 1, 0, locret_1EF00 },
+    //{ 9, 7, 1, 1, 0, locret_1EF00 },  //DrawSomeText
     { 10, 7, 1, 1, 0, ToggleFlying },
     { 54, -2, 1, 1, 0, TogglePedestrians },
     { 17, -2, 0, 0, 0, F4Key },
@@ -873,7 +873,8 @@ void AddVouchers(int pCount) {
 // IDA: void __cdecl ResetRecoveryVouchers()
 void ResetRecoveryVouchers() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gRecovery_voucher_count = 0;
 }
 
 // IDA: void __cdecl CycleCarTexturingLevel()

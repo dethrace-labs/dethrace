@@ -268,9 +268,17 @@ typedef enum keymapcodes {
 #define FONT_DRKPLAQ1 20
 
 #define ROLLING_LETTER_LOOP_RANDOM 96
-
 #define PLAYER_NAME_MAX_LENGTH 13
-
 #define DAMAGE_UNIT_PERIODS 5
+
+#define GROOVE_FUNK_MAX_PER_CAR 24
+
+#define NONCAR_UNUSED_SLOTS 5
+
+#define STR_STARTS_WITH(haystack, needle) strncmp(haystack, needle, strlen(needle))
+#define STR_ENDS_WITH(haystack, needle) strcmp(haystack + strlen(haystack) - strlen(needle), needle)
+#define MAX(a, b) ((a) > (b) ? a : b)
+
+#define ONEEIGHTTWO 182.0444444444444
 
 #endif

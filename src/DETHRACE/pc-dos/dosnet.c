@@ -1,4 +1,4 @@
-#include "dosnet.h"
+#include "pd/net.h"
 
 #include "common/errors.h"
 #include <stdlib.h>

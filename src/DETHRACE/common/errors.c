@@ -6,7 +6,7 @@
 #include <string.h>
 
 #include "network.h"
-#include "pc-dos/dossys.h"
+#include "pd/sys.h"
 #include "utility.h"
 
 char* gError_messages[126] = {

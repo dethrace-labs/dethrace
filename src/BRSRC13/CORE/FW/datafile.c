@@ -754,6 +754,7 @@ int DfSkipText(br_datafile* df, br_uint_32 length) {
 int DfSkipBinary(br_datafile* df, br_uint_32 length) {
     LOG_TRACE9("(%p, %d)", df, length);
     BrFileAdvance(length, df->h);
+    return 0;
 }
 
 // IDA: int __usercall DfChunksInterpret@<EAX>(br_datafile *df@<EAX>, br_chunks_table *table@<EDX>)

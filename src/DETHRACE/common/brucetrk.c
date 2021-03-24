@@ -1,7 +1,10 @@
 #include "brucetrk.h"
 
-#include "CORE/STD/brstdlib.h"
+#include "brender.h"
+#include "globvars.h"
 #include "globvrbm.h"
+#include "init.h"
+#include "world.h"
 #include <stdlib.h>
 
 br_actor* gMr_blendy;
@@ -11,7 +14,12 @@ int gDefault_blend_pc;
 void AllocateActorMatrix(tTrack_spec* pTrack_spec, br_actor**** pDst) {
     tU16 z;
     LOG_TRACE("(%p, %p)", pTrack_spec, pDst);
-    NOT_IMPLEMENTED();
+
+    *pDst = BrMemAllocate(sizeof(intptr_t) * pTrack_spec->ncolumns_z, kMem_columns_z);
+    for (z = 0; z < pTrack_spec->ncolumns_z; z++) {
+        (*pDst)[z] = BrMemAllocate(sizeof(intptr_t) * pTrack_spec->ncolumns_x, kMem_columns_x);
+        memset((*pDst)[z], 0, sizeof(intptr_t) * pTrack_spec->ncolumns_x);
+    }
 }
 
 // IDA: void __usercall DisposeActorMatrix(tTrack_spec *pTrack_spec@<EAX>, br_actor ****pVictim@<EDX>, int pRemove_act_mod@<EBX>)
@@ -44,7 +52,7 @@ void StripBlendedFaces(br_actor* pActor, br_model* pModel) {
     char s[256];
     static tU16 nfaces_allocated;
     LOG_TRACE("(%p, %p)", pActor, pModel);
-    NOT_IMPLEMENTED();
+    STUB();
 }
 
 // IDA: br_uint_32 __cdecl FindNonCarsCB(br_actor *pActor, tTrack_spec *pTrack_spec)
@@ -54,7 +62,9 @@ br_uint_32 FindNonCarsCB(br_actor* pActor, tTrack_spec* pTrack_spec) {
     br_scalar r2;
     br_scalar r3;
     LOG_TRACE("(%p, %p)", pActor, pTrack_spec);
-    NOT_IMPLEMENTED();
+
+    STUB();
+    return 0;
 }
 
 // IDA: br_uint_32 __cdecl ProcessModelsCB(br_actor *pActor, tTrack_spec *pTrack_spec)
@@ -63,13 +73,43 @@ br_uint_32 ProcessModelsCB(br_actor* pActor, tTrack_spec* pTrack_spec) {
     unsigned int z;
     int group;
     LOG_TRACE("(%p, %p)", pActor, pTrack_spec);
-    NOT_IMPLEMENTED();
+
+    if (sscanf(pActor->identifier, "%u%u", &x, &z) != 2 || pTrack_spec->ncolumns_x <= x || pTrack_spec->ncolumns_z <= z) {
+        if (*pActor->identifier != '%'
+            || sscanf((const char*)pActor->identifier + 1, "%u%u", &x, &z) != 2
+            || pTrack_spec->ncolumns_x <= x
+            || pTrack_spec->ncolumns_z <= z) {
+            BrActorEnum(pActor, (br_actor_enum_cbfn*)ProcessModelsCB, pTrack_spec);
+        } else {
+            pTrack_spec->lollipops[z][x] = pActor;
+        }
+    } else {
+        pActor->material = gDefault_track_material;
+        pTrack_spec->columns[z][x] = pActor;
+        gMr_blendy = 0;
+        if (pActor->model && !gAusterity_mode) {
+            StripBlendedFaces(pActor, pActor->model);
+        }
+        BrActorEnum(pActor, (br_actor_enum_cbfn*)FindNonCarsCB, pTrack_spec);
+        if (gMr_blendy) {
+            BrActorAdd(pActor, gMr_blendy);
+            BrModelAdd(gMr_blendy->model);
+            for (group = 0; group < V11MODEL(gMr_blendy->model)->ngroups; group++) {
+                V11MODEL(gMr_blendy->model)->groups[group].face_colours[0] = gMr_blendy->model->faces[V11MODEL(gMr_blendy->model)->groups[group].face_user[0]].material->colour;
+            }
+            gMr_blendy->model->flags &= 0xFF7Fu;
+            DodgyModelUpdate(gMr_blendy->model);
+            pTrack_spec->blends[z][x] = gMr_blendy;
+        }
+    }
+    return 0;
 }
 
 // IDA: void __usercall ProcessModels(tTrack_spec *pTrack_spec@<EAX>)
 void ProcessModels(tTrack_spec* pTrack_spec) {
     LOG_TRACE("(%p)", pTrack_spec);
-    NOT_IMPLEMENTED();
+
+    BrActorEnum(pTrack_spec->the_actor, (br_actor_enum_cbfn*)ProcessModelsCB, pTrack_spec);
 }
 
 // IDA: void __usercall ExtractColumns(tTrack_spec *pTrack_spec@<EAX>)
@@ -82,7 +122,48 @@ void ExtractColumns(tTrack_spec* pTrack_spec) {
     br_scalar extra_room;
     br_bounds bounds;
     LOG_TRACE("(%p)", pTrack_spec);
-    NOT_IMPLEMENTED();
+
+    unsplit = 0;
+    switch (sscanf(pTrack_spec->the_actor->identifier, "%u%u%f%d", &x, &z, &extra_room, &ad)) {
+    case 3:
+        BrFailure(
+            "Attempt to extract columns from invalid track\n"
+            "(It might have been produced by an ancient preproc.\n"
+            "This is no longer supported.\n");
+        break;
+
+    case 4:
+        pTrack_spec->ampersand_digits = ad;
+        break;
+
+    default:
+        unsplit = 1;
+        x = 1;
+        z = 1;
+        extra_room = 0.0;
+        pTrack_spec->ampersand_digits = 0;
+    }
+    pTrack_spec->ncolumns_x = x;
+    pTrack_spec->ncolumns_z = z;
+
+    BrActorToBounds(&bounds, pTrack_spec->the_actor);
+    pTrack_spec->column_size_x = (bounds.max.v[0] - bounds.min.v[0] + extra_room * 2.0) / (double)pTrack_spec->ncolumns_x;
+    pTrack_spec->column_size_z = (bounds.max.v[2] - bounds.min.v[2] + extra_room * 2.0) / (double)pTrack_spec->ncolumns_z;
+    pTrack_spec->origin_x = bounds.min.v[0] - extra_room;
+    pTrack_spec->origin_z = bounds.min.v[2] - extra_room;
+    AllocateActorMatrix(pTrack_spec, &pTrack_spec->columns);
+    AllocateActorMatrix(pTrack_spec, &pTrack_spec->lollipops);
+    AllocateActorMatrix(pTrack_spec, &pTrack_spec->blends);
+    if (pTrack_spec->ampersand_digits <= 0) {
+        pTrack_spec->non_car_list = NULL;
+    } else {
+        pTrack_spec->non_car_list = BrMemAllocate(sizeof(intptr_t) * pTrack_spec->ampersand_digits, kMem_non_car_list);
+    }
+    if (unsplit) {
+        **pTrack_spec->columns = pTrack_spec->the_actor;
+    } else {
+        ProcessModels(pTrack_spec);
+    }
 }
 
 // IDA: void __usercall LollipopizeActor4(br_actor *pActor@<EAX>, br_matrix34 *pRef_to_world@<EDX>, br_actor *pCamera@<EBX>)

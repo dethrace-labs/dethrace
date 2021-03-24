@@ -7,6 +7,9 @@
 extern char* gMisc_strings[250];
 extern int gEncryption_method;
 
+// Added by jeff
+typedef br_uint_32 recurse_with_mat_cbfn(br_actor*, br_material*, void*);
+
 int CheckQuit();
 
 void EncodeLine(char* pS);

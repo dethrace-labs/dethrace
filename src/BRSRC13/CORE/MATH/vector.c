@@ -102,7 +102,10 @@ void BrVector3SetInt(br_vector3* v1, int i1, int i2, int i3) {
 // IDA: void __cdecl BrVector3SetFloat(br_vector3 *v1, float f1, float f2, float f3)
 void BrVector3SetFloat(br_vector3* v1, float f1, float f2, float f3) {
     LOG_TRACE("(%p, %f, %f, %f)", v1, f1, f2, f3);
-    NOT_IMPLEMENTED();
+
+    v1->v[0] = f1;
+    v1->v[1] = f2;
+    v1->v[2] = f3;
 }
 
 // IDA: void __cdecl BrVector3Negate(br_vector3 *v1, br_vector3 *v2)

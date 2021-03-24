@@ -12,6 +12,7 @@ char rscid[50];
 void* BrRegistryNew(br_registry* reg) {
     BrNewList(&reg->list);
     reg->count = 0;
+    return reg;
 }
 
 // IDA: void* __usercall BrRegistryClear@<EAX>(br_registry *reg@<EAX>)
@@ -44,7 +45,24 @@ void* BrRegistryRemove(br_registry* reg, void* item) {
     br_registry_entry* e;
     void* r;
     LOG_TRACE("(%p, %p)", reg, item);
-    NOT_IMPLEMENTED();
+
+    e = (br_registry_entry*)reg->list.head;
+    if (e->item) {
+        while (e) {
+            if (e->item == item) {
+                break;
+            }
+            e = (br_registry_entry*)e->node.next;
+        }
+    }
+    if (e) {
+        BrRemove((br_node*)e);
+        r = e->item;
+        BrResFree(e);
+        reg->count--;
+        return r;
+    }
+    return NULL;
 }
 
 // IDA: int __usercall BrRegistryRemoveMany@<EAX>(br_registry *reg@<EAX>, void **items@<EDX>, int n@<EBX>)

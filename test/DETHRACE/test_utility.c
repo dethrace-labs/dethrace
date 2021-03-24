@@ -82,12 +82,6 @@ void test_utility_PathCat() {
     TEST_ASSERT_EQUAL_STRING("a", buf);
 }
 
-void test_utility_getMiscString() {
-    // LoadMiscStrings();
-    // printf("%s\n", GetMiscString(223));
-    // printf("%s\n", GetMiscString(75));
-}
-
 void test_utility_IRandomBetween() {
     tU32 source_y_delta;
 
@@ -102,6 +96,5 @@ void test_utility_suite() {
     RUN_TEST(test_utility_StripCR);
     RUN_TEST(test_utility_GetALineWithNoPossibleService);
     RUN_TEST(test_utility_PathCat);
-    RUN_TEST(test_utility_getMiscString);
     RUN_TEST(test_utility_IRandomBetween);
 }

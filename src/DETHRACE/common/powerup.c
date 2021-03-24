@@ -140,7 +140,7 @@ void InitPowerups() {
     int i;
     tPowerup* the_powerup;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    STUB();
 }
 
 // IDA: void __cdecl CloseDownPowerUps()

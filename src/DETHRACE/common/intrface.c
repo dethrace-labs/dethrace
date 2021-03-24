@@ -7,7 +7,7 @@
 #include "input.h"
 #include "loading.h"
 #include "main.h"
-#include "pc-dos/dossys.h"
+#include "pd/sys.h"
 #include "sound.h"
 #include <stdlib.h>
 
@@ -35,7 +35,13 @@ void ClearAlwaysTyping() {
 int ChoiceDisabled(int pChoice) {
     int i;
     LOG_TRACE("(%d)", pChoice);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < gDisabled_count; ++i) {
+        if (gDisabled_choices[i] == pChoice) {
+            return 1;
+        }
+    }
+    return 0;
 }
 
 // IDA: void __cdecl ResetInterfaceTimeout()
@@ -124,7 +130,14 @@ void RecopyAreas(tInterface_spec* pSpec, br_pixelmap** pCopy_areas) {
 void DisableChoice(int pChoice) {
     int i;
     LOG_TRACE("(%d)", pChoice);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < gDisabled_count; i++) {
+        if (gDisabled_choices[i] == pChoice) {
+            return;
+        }
+    }
+    gDisabled_choices[gDisabled_count] = pChoice;
+    gDisabled_count++;
 }
 
 // IDA: void __usercall EnableChoice(int pChoice@<EAX>)

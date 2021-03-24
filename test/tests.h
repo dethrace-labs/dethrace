@@ -1,6 +1,7 @@
 #ifndef TESTS_H
 #define TESTS_H
 
+#include "debug.h"
 #include "framework/unity.h"
 
 extern int has_data_directory();

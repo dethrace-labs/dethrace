@@ -4,6 +4,39 @@
 #include "br_types.h"
 #include "dr_types.h"
 
+extern int gGrid_number_colour[4];
+extern br_pixelmap* gDead_car;
+extern int gFade_away_parts_shop;
+extern tU32 gDare_start_time;
+extern int gRefund_rate;
+extern int gSwap_grid_2;
+extern int gSwap_grid_1;
+extern int gChange_race_net_mode;
+extern tParts_category gPart_category;
+extern tU32 gNet_synch_start;
+extern tNet_game_details* gChoose_car_net_game;
+extern int gPart_index;
+extern int gChallenger_index;
+extern tGrid_draw gDraw_grid_status;
+extern tNet_sequence_type gNet_race_sequence;
+extern tU32 gLast_host_query;
+extern br_pixelmap* gTaken_image;
+extern int gGrid_number_x_coords[31];
+extern int gGrid_transition_stage;
+extern int gJust_bought_part;
+extern int gGrid_y_adjust;
+extern br_pixelmap* gBullet_image;
+extern br_pixelmap* gDeceased_image;
+extern int gBest_pos_available;
+extern int gChallenger_position;
+extern int gOpponent_index;
+extern int gChallenge_time;
+extern int gOriginal_position;
+extern int gCurrent_race_index;
+extern tInterface_spec* gStart_interface_spec;
+extern int gCurrent_car_index;
+extern int gOur_starting_position;
+
 void DrawRaceList(int pOffset);
 
 void MoveRaceList(int pFrom, int pTo, tS32 pTime_to_move);
@@ -160,7 +193,7 @@ int CheckChallenge(int* pCurrent_choice, int* pCurrent_mode);
 
 int FindBestPos(int pOur_rank);
 
-int SortGridFunction(void* pFirst_one, void* pSecond_one);
+int SortGridFunction(const void* pFirst_one, const void* pSecond_one);
 
 void SortOpponents();
 

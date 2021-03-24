@@ -83,7 +83,7 @@ void* BrStdioOpenWrite(char* name, int mode) {
 
 void BrStdioClose(void* f) {
     LOG_TRACE("(%p)", f);
-    //fclose(f);
+    fclose(f);
 }
 
 int BrStdioEof(void* f) {

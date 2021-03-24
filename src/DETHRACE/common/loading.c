@@ -7,11 +7,14 @@
 #include "brender.h"
 #include "brucetrk.h"
 #include "car.h"
+#include "constants.h"
 #include "controls.h"
 #include "crush.h"
 #include "depth.h"
 #include "displays.h"
+#include "drmem.h"
 #include "errors.h"
+#include "flicplay.h"
 #include "globvars.h"
 #include "globvrkm.h"
 #include "globvrpb.h"
@@ -21,12 +24,14 @@
 #include "input.h"
 #include "newgame.h"
 #include "opponent.h"
-#include "pc-dos/dossys.h"
+#include "pd/sys.h"
 #include "pedestrn.h"
+#include "racestrt.h"
 #include "sound.h"
 #include "spark.h"
 #include "utility.h"
 #include "world.h"
+#include <errno.h>
 
 #define HITHER_MULTIPLIER 2.0f
 #define AMBIENT_MULTIPLIER 0.0099999998f
@@ -398,7 +403,7 @@ void LoadGeneralParameters() {
         gDemo_opponents[i] = GetAnInt(f);
     }
 
-    gGravity_multiplier = GetAFloat(f);
+    gDefault_gravity = GetAFloat(f);
     gZombie_factor = GetAFloat(f);
     gCut_delay_1 = GetAFloat(f);
     gCut_delay_2 = GetAFloat(f);
@@ -463,7 +468,10 @@ br_uint_32 LoadPixelmaps(char* pFile_name, br_pixelmap** pPixelmaps, br_uint_16 
 br_pixelmap* LoadShadeTable(char* pName) {
     tPath_name the_path;
     LOG_TRACE("(\"%s\")", pName);
-    NOT_IMPLEMENTED();
+
+    PathCat(the_path, gApplication_path, "SHADETAB");
+    PathCat(the_path, the_path, pName);
+    return BrPixelmapLoad(the_path);
 }
 
 // IDA: br_material* __usercall LoadMaterial@<EAX>(char *pName@<EAX>)
@@ -471,7 +479,11 @@ br_material* LoadMaterial(char* pName) {
     tPath_name the_path;
     br_material* result;
     LOG_TRACE("(\"%s\")", pName);
-    NOT_IMPLEMENTED();
+
+    PossibleService();
+    PathCat(the_path, gApplication_path, "MATERIAL");
+    PathCat(the_path, the_path, pName);
+    return BrMaterialLoad(the_path);
 }
 
 // IDA: br_model* __usercall LoadModel@<EAX>(char *pName@<EAX>)
@@ -745,7 +757,7 @@ tS8* ConvertPixToStripMap(br_pixelmap* pThe_br_map) {
     current_strip_pointer = temp_strip_image;
 
     for (i = 0; i < pThe_br_map->height; i++) {
-        next_byte = (char*)pThe_br_map->pixels + i * pThe_br_map->row_bytes; //points to start of this line
+        next_byte = (tU8*)pThe_br_map->pixels + i * pThe_br_map->row_bytes; //points to start of this line
         new_line_length = 2; // leave space at the start of the line to store number of chunks and first chunk length
         j = 0;
         counter = 0;
@@ -1013,7 +1025,76 @@ void ReadNonCarMechanicsData(FILE* pF, tNon_car_spec* non_car) {
     br_scalar ts1;
     br_scalar snap_angle;
     LOG_TRACE("(%p, %p)", pF, non_car);
-    NOT_IMPLEMENTED();
+
+    non_car->collision_info.driver = 0;
+    number = GetAnInt(pF);
+    non_car->collision_info.index = number;
+    GetThreeFloats(pF, &non_car->free_cmpos.v[0], &non_car->free_cmpos.v[1], &non_car->free_cmpos.v[2]);
+    GetThreeFloats(pF, &non_car->attached_cmpos.v[0], &non_car->attached_cmpos.v[1], &non_car->attached_cmpos.v[2]);
+    GetThreeFloats(pF, &non_car->collision_info.bounds[1].min.v[0], &non_car->collision_info.bounds[1].min.v[1], &non_car->collision_info.bounds[1].min.v[2]);
+    GetThreeFloats(pF, &non_car->collision_info.bounds[1].max.v[0], &non_car->collision_info.bounds[1].max.v[1], &non_car->collision_info.bounds[1].max.v[1]);
+    non_car->collision_info.extra_point_num = GetAnInt(pF);
+    if (non_car->collision_info.extra_point_num > 6) {
+        sprintf(s, "%d", non_car->collision_info.index);
+        FatalError(93, s);
+    }
+    for (i = 0; non_car->collision_info.extra_point_num > i; ++i) {
+        GetThreeFloats(pF, &non_car->collision_info.extra_points[i].v[0], &non_car->collision_info.extra_points[i].v[1], &non_car->collision_info.extra_points[i].v[2]);
+    }
+    GetPairOfFloats(pF, &non_car->free_mass, &non_car->attached_mass);
+    GetThreeFloats(pF, &len, &wid, &het);
+    snap_angle = GetAFloat(pF);
+
+    non_car->snap_off_cosine = cosf(snap_angle * ONEEIGHTTWO * 0.00009587379924285257);
+    non_car->collision_info.break_off_radians_squared = snap_angle * 3.14 / 180.0 * (snap_angle * 3.14 / 180.0);
+    ts = GetAFloat(pF);
+
+    non_car->min_torque_squared = ts * ts;
+    non_car->collision_info.bounds[0].min.v[0] = non_car->collision_info.bounds[1].min.v[0];
+    non_car->collision_info.bounds[0].min.v[1] = non_car->collision_info.bounds[1].min.v[1];
+    non_car->collision_info.bounds[0].min.v[2] = non_car->collision_info.bounds[1].min.v[2];
+    non_car->collision_info.bounds[0].max.v[0] = non_car->collision_info.bounds[1].max.v[0];
+    non_car->collision_info.bounds[0].max.v[1] = non_car->collision_info.bounds[1].max.v[1];
+    non_car->collision_info.bounds[0].max.v[2] = non_car->collision_info.bounds[1].max.v[2];
+    for (i = 0; non_car->collision_info.extra_point_num > i; ++i) {
+        for (j = 0; j < 3; ++j) {
+            if (non_car->collision_info.extra_points[i].v[j] < non_car->collision_info.bounds[0].min.v[j]) {
+                non_car->collision_info.bounds[0].min.v[j] = non_car->collision_info.extra_points[i].v[j];
+            }
+            if (non_car->collision_info.extra_points[i].v[j] > non_car->collision_info.bounds[0].max.v[j]) {
+                non_car->collision_info.bounds[0].max.v[j] = non_car->collision_info.extra_points[i].v[j];
+            }
+        }
+    }
+    non_car->collision_info.bounds[2] = non_car->collision_info.bounds[0];
+    non_car->I_over_M.v[2] = (wid * wid + len * len) / 12.0;
+    non_car->I_over_M.v[1] = (het * het + len * len) / 12.0;
+    non_car->I_over_M.v[0] = (het * het + wid * wid) / 12.0;
+    non_car->free_cmpos.v[0] = non_car->free_cmpos.v[0] * 6.9000001;
+    non_car->free_cmpos.v[1] = non_car->free_cmpos.v[1] * 6.9000001;
+    non_car->free_cmpos.v[2] = non_car->free_cmpos.v[2] * 6.9000001;
+    non_car->attached_cmpos.v[0] = non_car->attached_cmpos.v[0] * 6.9000001;
+    non_car->attached_cmpos.v[1] = non_car->attached_cmpos.v[1] * 6.9000001;
+    non_car->attached_cmpos.v[2] = non_car->attached_cmpos.v[2] * 6.9000001;
+    non_car->I_over_M.v[0] = non_car->I_over_M.v[0] * 47.610001;
+    non_car->I_over_M.v[1] = non_car->I_over_M.v[1] * 47.610001;
+    non_car->I_over_M.v[2] = non_car->I_over_M.v[2] * 47.610001;
+    non_car->collision_info.bounds[1].min.v[0] = non_car->collision_info.bounds[1].min.v[0] * 6.9000001;
+    non_car->collision_info.bounds[1].min.v[1] = non_car->collision_info.bounds[1].min.v[1] * 6.9000001;
+    non_car->collision_info.bounds[1].min.v[2] = non_car->collision_info.bounds[1].min.v[2] * 6.9000001;
+    non_car->collision_info.bounds[1].max.v[0] = non_car->collision_info.bounds[1].max.v[0] * 6.9000001;
+    non_car->collision_info.bounds[1].max.v[1] = non_car->collision_info.bounds[1].max.v[1] * 6.9000001;
+    non_car->collision_info.bounds[1].max.v[2] = non_car->collision_info.bounds[1].max.v[2] * 6.9000001;
+    for (i = 0; non_car->collision_info.extra_point_num > i; ++i) {
+        non_car->collision_info.extra_points[i].v[0] = non_car->collision_info.extra_points[i].v[0] * 6.9000001;
+        non_car->collision_info.extra_points[i].v[1] = non_car->collision_info.extra_points[i].v[1] * 6.9000001;
+        non_car->collision_info.extra_points[i].v[2] = non_car->collision_info.extra_points[i].v[2] * 6.9000001;
+    }
+    non_car->collision_info.max_bounds[0] = non_car->collision_info.bounds[0];
+    non_car->collision_info.max_bounds[1] = non_car->collision_info.bounds[2];
+    for (i = 0; non_car->collision_info.extra_point_num > i; ++i) {
+        non_car->collision_info.original_extra_points_z[i] = non_car->collision_info.extra_points[i].v[2];
+    }
 }
 
 // IDA: void __usercall ReadMechanicsData(FILE *pF@<EAX>, tCar_spec *c@<EDX>)
@@ -1036,6 +1117,7 @@ void ReadMechanicsData(FILE* pF, tCar_spec* c) {
     LOG_TRACE("(%p, %p)", pF, c);
 
     GetALineAndDontArgue(pF, s);
+    LOG_DEBUG("s %s", s);
     for (i = strlen(s) - 1; s[i] == ' '; --i) {
         ;
     }
@@ -1299,7 +1381,17 @@ intptr_t LinkModel(br_actor* pActor, tModel_pool* pModel_pool) {
 void FreeUpBonnetModels(br_model** pModel_array, int pModel_count) {
     int i;
     LOG_TRACE("(%p, %d)", pModel_array, pModel_count);
-    NOT_IMPLEMENTED();
+
+    // TODO: this causes a use-after-free somewhere...
+    // for (i = 0; i < pModel_count; i++) {
+    //     if (pModel_array[i]) {
+    //         if (strcmp("Ebonnet.DAT", pModel_array[i]->identifier) == 0 || strcmp("FIN.DAT", pModel_array[i]->identifier) == 0) {
+    //             BrModelRemove(pModel_array[i]);
+    //             BrModelFree(pModel_array[i]);
+    //             pModel_array[i] = NULL;
+    //         }
+    //     }
+    // }
 }
 
 // IDA: void __usercall LinkModelsToActor(br_actor *pActor@<EAX>, br_model **pModel_array@<EDX>, int pModel_count@<EBX>)
@@ -1307,7 +1399,7 @@ void LinkModelsToActor(br_actor* pActor, br_model** pModel_array, int pModel_cou
     tModel_pool model_pool;
     LOG_TRACE("(%p, %p, %d)", pActor, pModel_array, pModel_count);
 
-    DRActorEnumRecurse(pActor, LinkModel, &pModel_array);
+    DRActorEnumRecurse(pActor, (br_actor_enum_cbfn*)LinkModel, &pModel_array);
 }
 
 // IDA: void __usercall ReadShrapnelMaterials(FILE *pF@<EAX>, tCollision_info *pCar_spec@<EDX>)
@@ -1473,7 +1565,7 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
             if (!gFunk_groove_flags[i]) {
                 pCar_spec->fg_index = i;
                 gFunk_groove_flags[i] = 1;
-                gGroove_funk_offset = 24 * i;
+                gGroove_funk_offset = GROOVE_FUNK_MAX_PER_CAR * i;
                 break;
             }
         }
@@ -1724,8 +1816,7 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
         fclose(h);
         AdjustCarCoordinates(&gProgram_state.current_car);
         AdjustRenderScreenSize();
-        LOG_DEBUG("out");
-        //PossibleService();
+        PossibleService();
         ReinitialiseRearviewCamera();
         GetALineAndDontArgue(f, s);
     } else {
@@ -1818,14 +1909,14 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
     str = strtok(s, "\t ,/");
     sscanf(str, "%d", &pCar_spec->car_actor_count);
     pCar_spec->principal_car_actor = 0;
-    for (i = 0; pCar_spec->car_actor_count > i; ++i) {
+    for (i = 0; i < pCar_spec->car_actor_count; i++) {
         PossibleService();
         GetALineAndDontArgue(f, s);
         str = strtok(s, "\t ,/");
         sscanf(str, "%f", &temp_float);
         if (temp_float < 0.0 && pDriver != eDriver_local_human) {
             FreeUpBonnetModels(&pStorage_space->models[old_model_count], pStorage_space->models_count - old_model_count);
-            --pCar_spec->car_actor_count;
+            pCar_spec->car_actor_count--;
             break;
         }
         if (temp_float >= 1.0)
@@ -2129,25 +2220,51 @@ void LoadRaces(tRace_list_spec* pRace_list, int* pCount, int pRace_type_index) {
 // IDA: void __usercall UnlockOpponentMugshot(int pIndex@<EAX>)
 void UnlockOpponentMugshot(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+
+    if (pIndex >= 0) {
+        if (gOpponents[pIndex].mug_shot_image_data) {
+            MAMSUnlock((void**)&gOpponents[pIndex].mug_shot_image_data);
+        }
+    }
 }
 
 // IDA: void __usercall LoadOpponentMugShot(int pIndex@<EAX>)
 void LoadOpponentMugShot(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+    PossibleService();
+    if (pIndex >= 0 && !gOpponents[pIndex].mug_shot_image_data) {
+        if (!LoadFlicData(
+                gOpponents[pIndex].mug_shot_name,
+                &gOpponents[pIndex].mug_shot_image_data,
+                &gOpponents[pIndex].mug_shot_image_data_length)) {
+            FatalError(56);
+        }
+    }
 }
 
 // IDA: void __usercall DisposeOpponentGridIcon(tRace_info *pRace_info@<EAX>, int pIndex@<EDX>)
 void DisposeOpponentGridIcon(tRace_info* pRace_info, int pIndex) {
     LOG_TRACE("(%p, %d)", pRace_info, pIndex);
-    NOT_IMPLEMENTED();
+
+    if (pRace_info->opponent_list[pIndex].index >= 0) {
+        if (pRace_info->opponent_list[pIndex].car_spec->grid_icon_image) {
+            BrPixelmapFree(pRace_info->opponent_list[pIndex].car_spec->grid_icon_image);
+            pRace_info->opponent_list[pIndex].car_spec->grid_icon_image = NULL;
+        }
+    }
 }
 
 // IDA: void __usercall LoadOpponentGridIcon(tRace_info *pRace_info@<EAX>, int pIndex@<EDX>)
 void LoadOpponentGridIcon(tRace_info* pRace_info, int pIndex) {
     LOG_TRACE("(%p, %d)", pRace_info, pIndex);
-    NOT_IMPLEMENTED();
+
+    PossibleService();
+    if (pRace_info->opponent_list[pIndex].index >= 0 && !pRace_info->opponent_list[pIndex].car_spec->grid_icon_image) {
+        pRace_info->opponent_list[pIndex].car_spec->grid_icon_image = LoadPixelmap(pRace_info->opponent_list[pIndex].car_spec->grid_icon_names[0]);
+        if (!pRace_info->opponent_list[pIndex].car_spec->grid_icon_image) {
+            FatalError(57);
+        }
+    }
 }
 
 // IDA: void __usercall LoadRaceInfo(int pRace_index@<EAX>, tRace_info *pRace_info@<EDX>)
@@ -2166,7 +2283,69 @@ void LoadRaceInfo(int pRace_index, tRace_info* pRace_info) {
     float temp_float;
     tText_chunk* the_chunk;
     LOG_TRACE("(%d, %p)", pRace_index, pRace_info);
-    NOT_IMPLEMENTED();
+
+    f = OpenRaceFile();
+    temp_index = pRace_index;
+    while (1) {
+        if (!temp_index) {
+            break;
+        }
+        PossibleService();
+        GetALineAndDontArgue(f, s);
+        SkipRestOfRace(f);
+        temp_index--;
+    }
+    GetALineAndDontArgue(f, pRace_info->name);
+    pRace_info->rank_required = gRace_list[pRace_index].rank_required;
+    pRace_info->best_rank = gRace_list[pRace_index].best_rank;
+    pRace_info->suggested_rank = gRace_list[pRace_index].suggested_rank;
+    GetALineAndDontArgue(f, s);
+    str = strtok(s, "\t ,/");
+    pRace_info->scene_image_data = NULL;
+    pRace_info->map_image_data = NULL;
+    pRace_info->info_image_data = NULL;
+    PossibleService();
+    if (!gNet_mode) {
+        if (!LoadFlicData(str, &pRace_info->scene_image_data, &pRace_info->scene_image_data_length)) {
+            FatalError(51);
+        }
+        str = strtok(0, "\t ,/");
+        if (!LoadFlicData(str, &pRace_info->map_image_data, &pRace_info->map_image_data_length)) {
+            FatalError(52);
+        }
+        str = strtok(0, "\t ,/");
+        if (!LoadFlicData(str, &pRace_info->info_image_data, &pRace_info->info_image_data_length)) {
+            FatalError(53);
+        }
+        for (i = 0; i < pRace_info->number_of_racers; i++) {
+            PossibleService();
+            LoadOpponentMugShot(pRace_info->opponent_list[i].index);
+        }
+    }
+    GetALineAndDontArgue(f, s);
+    str = strtok(s, "\t ,/");
+    strcpy(pRace_info->track_file_name, str);
+    pRace_info->text_chunk_count = GetAnInt(f);
+    pRace_info->text_chunks = BrMemAllocate(sizeof(tText_chunk) * pRace_info->text_chunk_count, kMem_race_text_chunk);
+
+    the_chunk = pRace_info->text_chunks;
+    for (i = 0; i < pRace_info->text_chunk_count; i++) {
+        PossibleService();
+        GetPairOfInts(f, &the_chunk->x_coord, &the_chunk->y_coord);
+        GetPairOfInts(f, &the_chunk->frame_cue, &the_chunk->frame_end);
+        the_chunk->line_count = GetAnInt(f);
+        while (the_chunk->line_count > 8) {
+            --the_chunk->line_count;
+            GetALineAndDontArgue(f, s);
+        }
+        for (k = 0; k < the_chunk->line_count; k++) {
+            GetALineAndDontArgue(f, s);
+            the_chunk->text[k] = BrMemAllocate(strlen(s) + 1, kMem_race_text_str);
+            strcpy(the_chunk->text[k], s);
+        }
+        the_chunk++;
+    }
+    fclose(f);
 }
 
 // IDA: void __usercall DisposeRaceInfo(tRace_info *pRace_info@<EAX>)
@@ -2176,21 +2355,61 @@ void DisposeRaceInfo(tRace_info* pRace_info) {
     int k;
     tText_chunk* the_chunk;
     LOG_TRACE("(%p)", pRace_info);
-    NOT_IMPLEMENTED();
+
+    if (!gNet_mode) {
+        the_chunk = pRace_info->text_chunks;
+        for (i = 0; i < pRace_info->text_chunk_count; i++) {
+            PossibleService();
+            for (j = 0; j < the_chunk->line_count; j++) {
+                if (the_chunk->text[j]) {
+                    BrMemFree(the_chunk->text[j]);
+                }
+            }
+            the_chunk++;
+        }
+        if (pRace_info->text_chunks) {
+            BrMemFree(pRace_info->text_chunks);
+        }
+        if (pRace_info->scene_image_data) {
+            BrMemFree(pRace_info->scene_image_data);
+        }
+        if (pRace_info->map_image_data) {
+            BrMemFree(pRace_info->map_image_data);
+        }
+        PossibleService();
+        if (pRace_info->info_image_data) {
+            BrMemFree(pRace_info->info_image_data);
+        }
+        for (k = 0; k < pRace_info->number_of_racers; k++) {
+            UnlockOpponentMugshot(pRace_info->opponent_list[k].index);
+        }
+        PossibleService();
+    }
 }
 
 // IDA: void __usercall LoadGridIcons(tRace_info *pRace_info@<EAX>)
 void LoadGridIcons(tRace_info* pRace_info) {
     int i;
     LOG_TRACE("(%p)", pRace_info);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; pRace_info->number_of_racers > i; ++i) {
+        LoadOpponentGridIcon(pRace_info, i);
+    }
+    gProgram_state.current_car.grid_icon_image = LoadPixelmap(gProgram_state.current_car.grid_icon_names[gProgram_state.frank_or_anniness + 1]);
+    gDead_car = LoadPixelmap("DEADCAR.PIX");
 }
 
 // IDA: void __usercall DisposeGridIcons(tRace_info *pRace_info@<EAX>)
 void DisposeGridIcons(tRace_info* pRace_info) {
     int i;
     LOG_TRACE("(%p)", pRace_info);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; pRace_info->number_of_racers > i; i++) {
+        DisposeOpponentGridIcon(pRace_info, i);
+    }
+    BrPixelmapFree(gProgram_state.current_car.grid_icon_image);
+    gProgram_state.current_car.grid_icon_image = NULL;
+    BrPixelmapFree(gDead_car);
 }
 
 // IDA: void __cdecl LoadOpponents()
@@ -2491,7 +2710,8 @@ void GetPairOfScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2) {
 // IDA: void __usercall GetThreeScalars(FILE *pF@<EAX>, br_scalar *pS1@<EDX>, br_scalar *pS2@<EBX>, br_scalar *pS3@<ECX>)
 void GetThreeScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2, br_scalar* pS3) {
     LOG_TRACE("(%p, %p, %p, %p)", pF, pS1, pS2, pS3);
-    NOT_IMPLEMENTED();
+
+    GetThreeFloats(pF, pS1, pS2, pS3);
 }
 
 // IDA: void __usercall GetFourScalars(FILE *pF@<EAX>, br_scalar *pF1@<EDX>, br_scalar *pF2@<EBX>, br_scalar *pF3@<ECX>, br_scalar *pF4)
@@ -2526,7 +2746,14 @@ void GetNScalars(FILE* pF, int pNumber, br_scalar* pScalars) {
     float fleurting_point_numero;
     int i;
     LOG_TRACE("(%p, %d, %p)", pF, pNumber, pScalars);
-    NOT_IMPLEMENTED();
+
+    GetALineAndDontArgue(pF, s);
+    str = strtok(s, "\t ,/");
+    for (i = 0; i < pNumber; i++) {
+        sscanf(str, "%f", &fleurting_point_numero);
+        pScalars[i] = fleurting_point_numero;
+        str = strtok(NULL, "\t ,/");
+    }
 }
 
 // IDA: void __usercall GetPairOfFloatPercents(FILE *pF@<EAX>, float *pF1@<EDX>, float *pF2@<EBX>)
@@ -2542,7 +2769,17 @@ void GetThreeFloatPercents(FILE* pF, float* pF1, float* pF2, float* pF3) {
     char s[256];
     char* str;
     LOG_TRACE("(%p, %p, %p, %p)", pF, pF1, pF2, pF3);
-    NOT_IMPLEMENTED();
+
+    GetALineAndDontArgue(pF, s);
+    str = strtok(s, "\t ,/");
+    sscanf(str, "%f", pF1);
+    str = strtok(NULL, "\t ,/");
+    sscanf(str, "%f", pF2);
+    str = strtok(NULL, "\t ,/");
+    sscanf(str, "%f", pF3);
+    *pF1 = *pF1 / 100.0;
+    *pF2 = *pF2 / 100.0;
+    *pF3 = *pF3 / 100.0;
 }
 
 // IDA: void __usercall GetAString(FILE *pF@<EAX>, char *pString@<EDX>)
@@ -2565,7 +2802,22 @@ void AboutToLoadFirstCar() {
 void LoadOpponentsCars(tRace_info* pRace_info) {
     int i;
     LOG_TRACE("(%p)", pRace_info);
-    NOT_IMPLEMENTED();
+
+    gGroove_funk_offset = GROOVE_FUNK_MAX_PER_CAR;
+    for (i = 0; i < pRace_info->number_of_racers; i++) {
+        PossibleService();
+        if (pRace_info->opponent_list[i].index >= 0) {
+            pRace_info->opponent_list[i].car_spec = BrMemAllocate(sizeof(tCar_spec), kMem_oppo_car_spec);
+            LoadCar(
+                gOpponents[pRace_info->opponent_list[i].index].car_file_name,
+                eDriver_oppo,
+                pRace_info->opponent_list[i].car_spec,
+                pRace_info->opponent_list[i].index,
+                gOpponents[pRace_info->opponent_list[i].index].name,
+                &gTheir_cars_storage_space);
+        }
+    }
+    SetCarStorageTexturingLevel(&gTheir_cars_storage_space, GetCarTexturingLevel(), eCTL_full);
 }
 
 // IDA: void __usercall DisposeOpponentsCars(tRace_info *pRace_info@<EAX>)
@@ -2602,7 +2854,8 @@ void LoadMiscStrings() {
 // IDA: void __usercall FillInRaceInfo(tRace_info *pThe_race@<EAX>)
 void FillInRaceInfo(tRace_info* pThe_race) {
     LOG_TRACE("(%p)", pThe_race);
-    NOT_IMPLEMENTED();
+
+    strcpy(gProgram_state.track_file_name, pThe_race->track_file_name);
 }
 
 // IDA: FILE* __usercall OldDRfopen@<EAX>(char *pFilename@<EAX>, char *pMode@<EDX>)
@@ -2739,7 +2992,7 @@ FILE* DRfopen(char* pFilename, char* pMode) {
         }
     }
     if (!result) {
-        LOG_WARN("failed");
+        LOG_WARN("failed, %d", errno);
     }
     return result;
 }

@@ -43,7 +43,10 @@ void test_resource_BrResFree2() {
     child = BrResAllocate(NULL, sizeof(br_file), BR_MEMORY_FILE);
     child->raw_file = (void*)0x1;
     TEST_ASSERT_NOT_NULL(child);
-    BrResAssert(child);
+    resource_header* childhdr = (void*)child - sizeof(resource_header);
+    if (childhdr->magic_num != 0xDEADBEEF) {
+        LOG_PANIC("Bad resource header at %p. Was %X", childhdr, ((resource_header*)childhdr)->magic_num);
+    }
 }
 
 void test_resource_BrResFree_Child() {

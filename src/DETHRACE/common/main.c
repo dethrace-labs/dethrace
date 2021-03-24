@@ -8,7 +8,7 @@
 #include "input.h"
 #include "loading.h"
 #include "loadsave.h"
-#include "pc-dos/dossys.h"
+#include "pd/sys.h"
 #include "sound.h"
 #include "structur.h"
 #include "utility.h"

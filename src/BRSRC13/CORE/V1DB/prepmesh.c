@@ -46,10 +46,10 @@ void BrPrepareEdges(br_model* model) {
 }
 
 // IDA: int __cdecl FacesCompare(void *p1, void *p2)
-int FacesCompare(void* p1, void* p2) {
+int FacesCompare(const void* p1, const void* p2) {
     br_face* f1;
     br_face* f2;
-    LOG_TRACE9("(%p, %p)", p1, p2);
+    //LOG_TRACE9("(%p, %p)", p1, p2);
 
     f1 = *(br_face**)p1;
     f2 = *(br_face**)p2;
@@ -64,13 +64,13 @@ int FacesCompare(void* p1, void* p2) {
 }
 
 // IDA: int __cdecl TVCompare_XYZ(void *p1, void *p2)
-int TVCompare_XYZ(void* p1, void* p2) {
+int TVCompare_XYZ(const void* p1, const void* p2) {
     prep_vertex* tv1;
     prep_vertex* tv2;
     br_vertex* v1;
     br_vertex* v2;
     int i;
-    LOG_TRACE9("(%p, %p)", p1, p2);
+    //LOG_TRACE9("(%p, %p)", p1, p2);
 
     tv1 = *(prep_vertex**)p1;
     tv2 = *(prep_vertex**)p2;
@@ -94,13 +94,13 @@ int TVCompare_XYZ(void* p1, void* p2) {
 }
 
 // IDA: int __cdecl TVCompare_MXYZUVN(void *p1, void *p2)
-int TVCompare_MXYZUVN(void* p1, void* p2) {
+int TVCompare_MXYZUVN(const void* p1, const void* p2) {
     prep_vertex* tv1;
     prep_vertex* tv2;
     br_vertex* v1;
     br_vertex* v2;
     int i;
-    LOG_TRACE("(%p, %p)", p1, p2);
+    //LOG_TRACE("(%p, %p)", p1, p2);
 
     tv1 = *(struct prep_vertex**)p1;
     tv2 = *(struct prep_vertex**)p2;
@@ -142,11 +142,11 @@ int TVCompare_MXYZUVN(void* p1, void* p2) {
 }
 
 // IDA: int __cdecl TVCompare_MVN(void *p1, void *p2)
-int TVCompare_MVN(void* p1, void* p2) {
+int TVCompare_MVN(const void* p1, const void* p2) {
     prep_vertex* tv1;
     prep_vertex* tv2;
     int i;
-    LOG_TRACE9("(%p, %p)", p1, p2);
+    //LOG_TRACE9("(%p, %p)", p1, p2);
 
     tv1 = *(prep_vertex**)p1;
     tv2 = *(prep_vertex**)p2;
@@ -213,7 +213,7 @@ void Smoothing(br_model* model, br_scalar crease_limit, prep_vertex** start, pre
     for (outer = start; outer < end; outer++) {
         for (inner = start; inner < end; inner++) {
             if ((inner == outer) || (model->faces[(*outer)->f].smoothing & model->faces[(*inner)->f].smoothing)) {
-                BrVector3Accumulate(&(*outer)->n, &model->faces[(*inner)->f].n);
+                BrVector3Accumulate(&(*outer)->n, (br_vector3*)&model->faces[(*inner)->f].n);
             }
         }
     }
@@ -583,11 +583,11 @@ void BrModelUpdate(br_model* model, br_uint_16 flags) {
             PrepareFaceNormals(model);
             f = 0;
             fp = model->faces;
-            model->flags &= 0x7f;
+            model->flags &= ~MODF_USES_DEFAULT;
             for (f = 0; f < model->nfaces; f++) {
                 fp = &model->faces[f];
                 if (!fp->material) {
-                    model->flags |= BR_MODF_UPDATEABLE;
+                    model->flags |= MODF_USES_DEFAULT;
                 }
 
                 for (v = 0; v < 3; v++) {
@@ -679,7 +679,7 @@ void BrModelUpdate(br_model* model, br_uint_16 flags) {
             // }
         }
 
-        if (model->flags >= 0) {
+        if (!(model->flags & BR_MODF_UPDATEABLE)) {
             if (model->faces) {
                 BrResFree(model->faces);
             }
@@ -697,5 +697,6 @@ void BrModelUpdate(br_model* model, br_uint_16 flags) {
 // IDA: void __usercall BrModelClear(br_model *model@<EAX>)
 void BrModelClear(br_model* model) {
     LOG_TRACE("(%p)", model);
-    NOT_IMPLEMENTED();
+
+    // does something with ->stored field, we don't care
 }

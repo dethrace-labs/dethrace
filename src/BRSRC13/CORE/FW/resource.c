@@ -21,8 +21,14 @@ void* ResToUser(resource_header* r) {
 // IDA: resource_header* __usercall UserToRes@<EAX>(void *r@<EAX>)
 resource_header* UserToRes(void* r) {
     br_uint_8* p;
-    LOG_TRACE("(%p)", r);
-    NOT_IMPLEMENTED();
+    LOG_TRACE9("(%p)", r);
+
+    p = r;
+    p = p - sizeof(resource_header);
+    if (((resource_header*)p)->magic_num != 0xDEADBEEF) {
+        LOG_PANIC("Bad resource header from user at %p. Was %X", r, ((resource_header*)p)->magic_num);
+    }
+    return (resource_header*)p;
 }
 
 // IDA: void* __cdecl BrResAllocate(void *vparent, br_size_t size, br_uint_8 res_class)
@@ -67,9 +73,10 @@ void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class) {
 
     if (vparent) {
         // vparent points to a resource body, we track backwards to obtain its resource_header
-        parent = (resource_header*)((char*)vparent - sizeof(resource_header));
+        parent = UserToRes(vparent);
         BrSimpleAddHead(&parent->children, &res->node);
     }
+    //LOG_DEBUG("allocated %p", ((char*)res + actual_pad));
     return ((char*)res) + actual_pad;
 }
 
@@ -107,22 +114,7 @@ void BrResInternalFree(resource_header* res, br_boolean callback) {
 // IDA: void __cdecl BrResFree(void *vres)
 void BrResFree(void* vres) {
     LOG_TRACE10("(%p)", vres);
-
-    vres = (char*)vres - sizeof(resource_header);
-    if (((resource_header*)vres)->magic_num != 0xDEADBEEF) {
-        LOG_PANIC("Bad resource header at %p", vres);
-    }
-    BrResInternalFree(vres, 1);
-}
-
-void BrResAssert(void* vres) {
-    LOG_TRACE("(%p)", vres);
-
-    vres = (char*)vres - sizeof(resource_header);
-
-    if (((resource_header*)vres)->magic_num != 0xDEADBEEF) {
-        LOG_PANIC("Bad resource header at %p. Was %X", vres, ((resource_header*)vres)->magic_num);
-    }
+    BrResInternalFree(UserToRes(vres), 1);
 }
 
 // IDA: void __cdecl BrResFreeNoCallback(void *vres)
@@ -136,7 +128,15 @@ void* BrResAdd(void* vparent, void* vres) {
     resource_header* res;
     resource_header* parent;
     LOG_TRACE("(%p, %p)", vparent, vres);
-    NOT_IMPLEMENTED();
+
+    res = UserToRes(vres);
+    parent = UserToRes(vparent);
+
+    if (res->node.prev) {
+        BrSimpleRemove((br_simple_node*)res);
+    }
+    BrSimpleAddHead((br_simple_list*)parent, (br_simple_node*)res);
+    return vres;
 }
 
 // IDA: void* __cdecl BrResRemove(void *vres)

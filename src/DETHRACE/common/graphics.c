@@ -8,7 +8,7 @@
 #include "grafdata.h"
 #include "init.h"
 #include "loading.h"
-#include "pc-dos/dossys.h"
+#include "pd/sys.h"
 #include "sound.h"
 #include "utility.h"
 #include <stdlib.h>
@@ -42,7 +42,17 @@ br_pixelmap* gEval_2;
 br_vector3 gShadow_light_z;
 br_vector3 gShadow_light_x;
 int gShadow_dim_amount;
-br_colour gRGB_colours[9];
+br_colour gRGB_colours[9] = {
+    0u,
+    16777215u,
+    16711680u,
+    65280u,
+    255u,
+    16776960u,
+    65535u,
+    16711935u,
+    13649666u
+};
 int gNumber_of_lollipops;
 br_vector3 gShadow_light_ray;
 br_scalar gShadow_hither_z_move;
@@ -147,7 +157,19 @@ void ResetLollipopQueue() {
 // IDA: int __usercall AddToLollipopQueue@<EAX>(br_actor *pActor@<EAX>, int pIndex@<EDX>)
 int AddToLollipopQueue(br_actor* pActor, int pIndex) {
     LOG_TRACE("(%p, %d)", pActor, pIndex);
-    NOT_IMPLEMENTED();
+
+    int result; // eax
+
+    if (pIndex >= 0) {
+        gLollipops[pIndex] = pActor;
+        return pIndex;
+    } else if (gNumber_of_lollipops >= 100) {
+        return -1;
+    } else {
+        gLollipops[gNumber_of_lollipops] = pActor;
+        gNumber_of_lollipops++;
+        return gNumber_of_lollipops - 1;
+    }
 }
 
 // IDA: void __cdecl RenderLollipops()
@@ -200,13 +222,33 @@ void BuildColourTable(br_pixelmap* pPalette) {
     float nearest_distance;
     float distance;
     LOG_TRACE("(%p)", pPalette);
-    NOT_IMPLEMENTED();
+
+#define SQR(i) i* i
+
+    for (i = 0; i < 9; ++i) {
+        nearest_distance = 0x48400000;
+        red = (gRGB_colours[i] >> 16) & 0xFF;
+        green = (gRGB_colours[i] >> 8) & 0xFF;
+        blue = gRGB_colours[i] & 0xFF;
+        for (j = 0; j < 256; j++) {
+            distance = SQR((double)(signed int)(*((br_uint_8*)pPalette->pixels + 4 * j + 2) - red));
+            distance += SQR((double)(signed int)(*((br_uint_8*)pPalette->pixels + 4 * j) - blue));
+            distance += SQR((double)(signed int)(*((br_uint_8*)pPalette->pixels + 4 * j + 1) - green));
+            if (distance < nearest_distance) {
+                nearest_index = j;
+                nearest_distance = distance;
+            }
+        }
+        gColours[i] = nearest_index;
+        LOG_DEBUG("color %d %d", i, gColours[i]);
+    }
 }
 
 // IDA: void __cdecl ClearConcussion()
 void ClearConcussion() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gConcussion.concussed = 0;
 }
 
 // IDA: tS8* __usercall SkipLines@<EAX>(tS8 *pSource@<EAX>, int pCount@<EDX>)
@@ -366,7 +408,8 @@ void SetBRenderScreenAndBuffers(int pX_offset, int pY_offset, int pWidth, int pH
 // IDA: void __cdecl SetIntegerMapRenders()
 void SetIntegerMapRenders() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __cdecl AdjustRenderScreenSize()
@@ -500,18 +543,19 @@ void ClearEntireScreen() {
 // IDA: void __cdecl ClearWobbles()
 void ClearWobbles() {
     int i;
+    LOG_TRACE("()");
 
-    for (i = 0; i < 5; i++) {
-        gWobble_array[i].amplitude_x = 0;
+    for (i = 0; i < COUNT_OF(gWobble_array); ++i) {
+        gWobble_array[i].amplitude_x = 0.0;
     }
 }
 
 // IDA: void __cdecl InitWobbleStuff()
 void InitWobbleStuff() {
     int i;
-    
+
     ClearWobbles();
-    for (i = 0; i < 64; i++) {
+    for (i = 0; i < COUNT_OF(gCosine_array); i++) {
         gCosine_array[i] = cosf(i / 64.0f * 3.141592653589793f / 2.0f);
     }
 }
@@ -1005,7 +1049,60 @@ void DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int
     tU8* dest_ptr;
     tU8* conv_table;
     LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
-    NOT_IMPLEMENTED();
+
+    source_ptr = (tU8*)pSource->pixels + (pSource->row_bytes * pSource_y + pSource_x);
+    dest_ptr = (tU8*)pDest->pixels + (pDest->row_bytes * pDest_y + pDest_x);
+    source_row_wrap = pSource->row_bytes - pWidth;
+    dest_row_wrap = pDest->row_bytes - pWidth;
+
+    if (pDest_y < 0) {
+        pHeight += pDest_y;
+        if (pHeight <= 0) {
+            return;
+        }
+        source_ptr -= pDest_y * pSource->row_bytes;
+        dest_ptr -= pDest_y * pDest->row_bytes;
+        pDest_y = 0;
+    }
+    if (pDest->height > pDest_y) {
+        if (pDest_y + pHeight > pDest->height) {
+            pHeight = pDest->height - pDest_y;
+        }
+        if (pDest_x < 0) {
+            pWidth += pDest_x;
+            if (pWidth <= 0) {
+                return;
+            }
+            source_ptr -= pDest_x;
+            dest_ptr -= pDest_x;
+            source_row_wrap -= pDest_x;
+            dest_row_wrap -= pDest_x;
+            pDest_x = 0;
+        }
+        if (pDest->width > pDest_x) {
+            if (pDest_x + pWidth > pDest->width) {
+                pWidth = pDest->width - pDest_x;
+                source_row_wrap += pDest_x + pWidth - pDest->width;
+                dest_row_wrap += pDest_x + pWidth - pDest->width;
+            }
+            if (gCurrent_conversion_table) {
+                TELL_ME_IF_WE_PASS_THIS_WAY();
+            } else {
+                for (y_count = 0; y_count < pHeight; y_count++) {
+                    for (x_count = 0; x_count < pWidth; x_count++) {
+                        the_byte = *source_ptr;
+                        if (the_byte) {
+                            *dest_ptr = the_byte;
+                        }
+                        source_ptr++;
+                        dest_ptr++;
+                    }
+                    source_ptr += source_row_wrap;
+                    dest_ptr += dest_row_wrap;
+                }
+            }
+        }
+    }
 }
 
 // IDA: void __usercall DRMaskedStamp(br_int_16 pDest_x@<EAX>, br_int_16 pDest_y@<EDX>, br_pixelmap *pSource@<EBX>)
@@ -1481,7 +1578,7 @@ br_uint_32 SaveShadeTable(br_pixelmap* pTable, void* pArg) {
 // IDA: void __cdecl SaveShadeTables()
 void SaveShadeTables() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    STUB();
 }
 
 // IDA: void __cdecl DisposeSavedShadeTables()

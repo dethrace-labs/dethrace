@@ -1,4 +1,3 @@
-#include "dossys.h"
 #include "brender.h"
 #include "common/car.h"
 #include "common/errors.h"
@@ -11,6 +10,7 @@
 #include "common/utility.h"
 #include "harness.h"
 #include "input.h"
+#include "pd/sys.h"
 #include "watcom_functions.h"
 #include <dirent.h>
 #include <stdio.h>
@@ -651,7 +651,7 @@ int original_main(int pArgc, char** pArgv) {
         } else if (strcasecmp(pArgv[i], "-yon") == 0 && i < pArgc - 1) {
             i++;
             sscanf(pArgv[i], "%f", &f);
-            if (f >= 0.0 && f <= 1065353216) {
+            if (f >= 0.0 && f <= 1.0f) {
                 gYon_multiplier = f;
             }
         } else if (strcasecmp(pArgv[i], "-simple") == 0 && i < pArgc - 1) {

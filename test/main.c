@@ -82,6 +82,7 @@ void setup_global_vars() {
 
     gSelf = BrActorAllocate(BR_ACTOR_NONE, NULL);
     gUniverse_actor = BrActorAllocate(BR_ACTOR_NONE, NULL);
+    gNon_track_actor = BrActorAllocate(BR_ACTOR_NONE, NULL);
 
     strcpy(gBasic_car_names[0], "BLKEAGLE.TXT");
 

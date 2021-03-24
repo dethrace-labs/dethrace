@@ -3,6 +3,7 @@
 
 #include "CORE/FW/datafile.h"
 #include "CORE/FW/genfile.h"
+#include "CORE/FW/resource.h"
 #include "CORE/PIXELMAP/pmmem.h"
 
 #include <stddef.h>
@@ -104,7 +105,12 @@ int FopRead_ADD_MAP(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_3
     br_pixelmap* pp;
     br_pixelmap* map;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
-    NOT_IMPLEMENTED();
+
+    map = DfPop(DF_PIXELMAP, 0);
+    pp = DfTop(DF_PIXELMAP, 0);
+    pp->map = map;
+    BrResAdd(pp, map);
+    return 0;
 }
 
 // IDA: br_uint_32 __cdecl BrPixelmapLoadMany(char *filename, br_pixelmap **pixelmaps, br_uint_16 num)

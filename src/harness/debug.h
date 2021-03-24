@@ -48,5 +48,6 @@
 #define SILENT_STUB()
 
 void debug_printf(const char* fmt, const char* fn, const char* fmt2, ...);
+int count_open_fds();
 
 #endif

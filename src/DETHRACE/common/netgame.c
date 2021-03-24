@@ -304,7 +304,8 @@ void InitialisePlayerScore(tNet_game_player_info* pPlayer) {
 void InitPlayers() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __usercall BuyPSPowerup(int pIndex@<EAX>)

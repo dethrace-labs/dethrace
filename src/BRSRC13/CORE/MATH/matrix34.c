@@ -5,16 +5,49 @@ br_matrix34 mattmp1;
 br_matrix34 mattmp2;
 char rscid[52];
 
+#define M(x, y) mat->m[x][y]
+#define A(x, y) A->m[x][y]
+#define B(x, y) B->m[x][y]
+#define C(x, y) C->m[x][y]
+#define BR_MAC3(a, b, c, d, e, f) ((a) * (b) + (c) * (d) + (e) * (f))
+
 // IDA: void __cdecl BrMatrix34Copy(br_matrix34 *A, br_matrix34 *B)
 void BrMatrix34Copy(br_matrix34* A, br_matrix34* B) {
     LOG_TRACE("(%p, %p)", A, B);
-    NOT_IMPLEMENTED();
+
+    A(0, 0) = B(0, 0);
+    A(0, 1) = B(0, 1);
+    A(0, 2) = B(0, 2);
+
+    A(1, 0) = B(1, 0);
+    A(1, 1) = B(1, 1);
+    A(1, 2) = B(1, 2);
+
+    A(2, 0) = B(2, 0);
+    A(2, 1) = B(2, 1);
+    A(2, 2) = B(2, 2);
+
+    A(3, 0) = B(3, 0);
+    A(3, 1) = B(3, 1);
+    A(3, 2) = B(3, 2);
 }
 
 // IDA: void __cdecl BrMatrix34Mul(br_matrix34 *A, br_matrix34 *B, br_matrix34 *C)
 void BrMatrix34Mul(br_matrix34* A, br_matrix34* B, br_matrix34* C) {
     LOG_TRACE("(%p, %p, %p)", A, B, C);
-    NOT_IMPLEMENTED();
+
+    A->m[0][0] = C->m[0][0] * B->m[0][0] + C->m[2][0] * B->m[0][2] + B->m[0][1] * C->m[1][0];
+    A->m[0][1] = B->m[0][0] * C->m[0][1] + B->m[0][2] * C->m[2][1] + B->m[0][1] * C->m[1][1];
+    A->m[0][2] = B->m[0][0] * C->m[0][2] + C->m[1][2] * B->m[0][1] + B->m[0][2] * C->m[2][2];
+    A->m[1][0] = C->m[0][0] * B->m[1][0] + B->m[1][2] * C->m[2][0] + C->m[1][0] * B->m[1][1];
+    A->m[1][1] = B->m[1][2] * C->m[2][1] + C->m[0][1] * B->m[1][0] + C->m[1][1] * B->m[1][1];
+    A->m[1][2] = B->m[1][2] * C->m[2][2] + C->m[1][2] * B->m[1][1] + C->m[0][2] * B->m[1][0];
+    A->m[2][0] = C->m[0][0] * B->m[2][0] + C->m[2][0] * B->m[2][2] + B->m[2][1] * C->m[1][0];
+    A->m[2][1] = C->m[0][1] * B->m[2][0] + C->m[2][1] * B->m[2][2] + B->m[2][1] * C->m[1][1];
+    A->m[2][2] = C->m[1][2] * B->m[2][1] + B->m[2][0] * C->m[0][2] + C->m[2][2] * B->m[2][2];
+    A->m[3][0] = C->m[0][0] * B->m[3][0] + C->m[2][0] * B->m[3][2] + B->m[3][1] * C->m[1][0] + C->m[3][0];
+    A->m[3][1] = B->m[3][0] * C->m[0][1] + B->m[3][1] * C->m[1][1] + B->m[3][2] * C->m[2][1] + C->m[3][1];
+    A->m[3][2] = C->m[1][2] * B->m[3][1] + B->m[3][2] * C->m[2][2] + B->m[3][0] * C->m[0][2] + C->m[3][2];
 }
 
 // IDA: void __cdecl BrMatrix34Identity(br_matrix34 *mat)
@@ -82,13 +115,37 @@ void BrMatrix34Rotate(br_matrix34* mat, br_angle r, br_vector3* a) {
 // IDA: void __cdecl BrMatrix34Translate(br_matrix34 *mat, br_scalar dx, br_scalar dy, br_scalar dz)
 void BrMatrix34Translate(br_matrix34* mat, br_scalar dx, br_scalar dy, br_scalar dz) {
     LOG_TRACE("(%p, %f, %f, %f)", mat, dx, dy, dz);
-    NOT_IMPLEMENTED();
+
+    M(0, 0) = 1;
+    M(0, 1) = 0;
+    M(0, 2) = 0;
+    M(1, 0) = 0;
+    M(1, 1) = 1;
+    M(1, 2) = 0;
+    M(2, 0) = 0;
+    M(2, 1) = 0;
+    M(2, 2) = 1;
+    M(3, 0) = dx;
+    M(3, 1) = dy;
+    M(3, 2) = dz;
 }
 
 // IDA: void __cdecl BrMatrix34Scale(br_matrix34 *mat, br_scalar sx, br_scalar sy, br_scalar sz)
 void BrMatrix34Scale(br_matrix34* mat, br_scalar sx, br_scalar sy, br_scalar sz) {
     LOG_TRACE("(%p, %f, %f, %f)", mat, sx, sy, sz);
-    NOT_IMPLEMENTED();
+
+    M(0, 0) = sx;
+    M(0, 1) = 0;
+    M(0, 2) = 0;
+    M(1, 0) = 0;
+    M(1, 1) = sy;
+    M(1, 2) = 0;
+    M(2, 0) = 0;
+    M(2, 1) = 0;
+    M(2, 2) = sz;
+    M(3, 0) = 0;
+    M(3, 1) = 0;
+    M(3, 2) = 0;
 }
 
 // IDA: void __cdecl BrMatrix34ShearX(br_matrix34 *mat, br_scalar sy, br_scalar sz)
@@ -177,7 +234,10 @@ void BrMatrix34Apply(br_vector3* A, br_vector4* B, br_matrix34* C) {
 // IDA: void __cdecl BrMatrix34ApplyP(br_vector3 *A, br_vector3 *B, br_matrix34 *C)
 void BrMatrix34ApplyP(br_vector3* A, br_vector3* B, br_matrix34* C) {
     LOG_TRACE("(%p, %p, %p)", A, B, C);
-    NOT_IMPLEMENTED();
+
+    A->v[0] = BR_MAC3(B->v[0], C(0, 0), B->v[1], C(1, 0), B->v[2], C(2, 0)) + C(3, 0);
+    A->v[1] = BR_MAC3(B->v[0], C(0, 1), B->v[1], C(1, 1), B->v[2], C(2, 1)) + C(3, 1);
+    A->v[2] = BR_MAC3(B->v[0], C(0, 2), B->v[1], C(1, 2), B->v[2], C(2, 2)) + C(3, 2);
 }
 
 // IDA: void __cdecl BrMatrix34ApplyV(br_vector3 *A, br_vector3 *B, br_matrix34 *C)
@@ -206,8 +266,11 @@ void BrMatrix34TApplyV(br_vector3* A, br_vector3* B, br_matrix34* C) {
 
 // IDA: void __cdecl BrMatrix34Pre(br_matrix34 *mat, br_matrix34 *A)
 void BrMatrix34Pre(br_matrix34* mat, br_matrix34* A) {
+    br_matrix34 mattmp;
     LOG_TRACE("(%p, %p)", mat, A);
-    NOT_IMPLEMENTED();
+
+    BrMatrix34Mul(&mattmp, A, mat);
+    BrMatrix34Copy(mat, &mattmp);
 }
 
 // IDA: void __cdecl BrMatrix34Post(br_matrix34 *mat, br_matrix34 *A)
@@ -273,7 +336,10 @@ void BrMatrix34PreTranslate(br_matrix34* mat, br_scalar x, br_scalar y, br_scala
 // IDA: void __cdecl BrMatrix34PostTranslate(br_matrix34 *mat, br_scalar x, br_scalar y, br_scalar z)
 void BrMatrix34PostTranslate(br_matrix34* mat, br_scalar x, br_scalar y, br_scalar z) {
     LOG_TRACE("(%p, %f, %f, %f)", mat, x, y, z);
-    NOT_IMPLEMENTED();
+
+    BrMatrix34Translate(&mattmp1, x, y, z);
+    BrMatrix34Mul(&mattmp2, mat, &mattmp1);
+    BrMatrix34Copy(mat, &mattmp2);
 }
 
 // IDA: void __cdecl BrMatrix34PreScale(br_matrix34 *mat, br_scalar sx, br_scalar sy, br_scalar sz)

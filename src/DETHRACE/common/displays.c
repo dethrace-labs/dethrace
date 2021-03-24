@@ -70,7 +70,23 @@ void ClearHeadupSlot(int pSlot_index) {
 void ClearHeadups() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < COUNT_OF(gHeadups); ++i) {
+        if (gHeadups[i].type) {
+            ClearHeadup(i);
+        }
+    }
+    gLast_fancy_index = -1;
+    gLast_credit_headup = -1;
+    gLast_time_credit_headup = -1;
+    gLast_earn_time = 0;
+    gLast_fancy_time = 0;
+    gLast_time_earn_time = 0;
+    for (i = 0; i < COUNT_OF(gOld_times); i++) {
+        gOld_times[i] = 0;
+    }
+    gQueued_headup_count = 0;
+    gLast_centre_headup = 0;
 }
 
 // IDA: int __usercall HeadupActive@<EAX>(int pIndex@<EAX>)
@@ -106,7 +122,8 @@ void DRPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFont, cha
             x += pFont->width_table[chr] + pFont->spacing;
         }
     } else {
-        LOG_PANIC("not implemented");
+        TELL_ME_IF_WE_PASS_THIS_WAY();
+        //DRPixelmapRectangleMaskedCopy ...
     }
 }
 
@@ -252,13 +269,16 @@ int NewTextHeadupSlot2(int pSlot_index, int pFlash_rate, int pLifetime, int pFon
     tHeadup_slot* headup_slot;
     tU32 time;
     LOG_TRACE("(%d, %d, %d, %d, \"%s\", %d)", pSlot_index, pFlash_rate, pLifetime, pFont_index, pText, pQueue_it);
-    NOT_IMPLEMENTED();
+
+    STUB();
+    return -1;
 }
 
 // IDA: int __usercall NewTextHeadupSlot@<EAX>(int pSlot_index@<EAX>, int pFlash_rate@<EDX>, int pLifetime@<EBX>, int pFont_index@<ECX>, char *pText)
 int NewTextHeadupSlot(int pSlot_index, int pFlash_rate, int pLifetime, int pFont_index, char* pText) {
     LOG_TRACE("(%d, %d, %d, %d, \"%s\")", pSlot_index, pFlash_rate, pLifetime, pFont_index, pText);
-    NOT_IMPLEMENTED();
+
+    return NewTextHeadupSlot2(pSlot_index, pFlash_rate, pLifetime, pFont_index, pText, 1);
 }
 
 // IDA: int __usercall NewImageHeadupSlot@<EAX>(int pSlot_index@<EAX>, int pFlash_rate@<EDX>, int pLifetime@<EBX>, int pImage_index@<ECX>)
@@ -437,6 +457,7 @@ void OoerrIveGotTextInMeBoxMissus(int pFont_index, char* pText, br_pixelmap* pPi
     width = pRight - pLeft;
     line_char_index = 0;
     input_str_index = 0;
+    start_line = 0;
 
     while (pText[input_str_index]) {
         line[line_char_index] = pText[input_str_index];
@@ -488,7 +509,9 @@ void TransBrPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, br_uint_32 pCol
     int i;
     int len;
     LOG_TRACE("(%p, %d, %d, %d, %p, %p)", pPixelmap, pX, pY, pColour, pFont, pText);
-    NOT_IMPLEMENTED();
+
+    len = (TranslationMode() == 0 ? 0 : 2);
+    BrPixelmapText(pPixelmap, pX, pY - len, pColour, pFont, (char*)pText);
 }
 
 // IDA: void __usercall TransDRPixelmapText(br_pixelmap *pPixelmap@<EAX>, int pX@<EDX>, int pY@<EBX>, tDR_font *pFont@<ECX>, char *pText, int pRight_edge)

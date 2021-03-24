@@ -135,7 +135,8 @@ void HideSkid(int pSkid_num) {
 void HideSkids() {
     int skid;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    
+    STUB();
 }
 
 // IDA: br_scalar __usercall SkidLen@<ST0>(int pSkid@<EAX>)

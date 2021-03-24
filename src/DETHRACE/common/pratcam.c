@@ -117,7 +117,8 @@ int HighResPratBufferHeight() {
 void InitPratcam() {
     void* the_pixels;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __cdecl DisposePratcam()

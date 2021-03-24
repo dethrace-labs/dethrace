@@ -20,7 +20,9 @@ br_model* BrModelAdd(br_model* model) {
 // IDA: br_model* __cdecl BrModelRemove(br_model *model)
 br_model* BrModelRemove(br_model* model) {
     LOG_TRACE("(%p)", model);
-    NOT_IMPLEMENTED();
+
+    BrModelClear(model);
+    return BrRegistryRemove(&v1db.reg_models, model);
 }
 
 // IDA: br_model* __cdecl BrModelFind(char *pattern)
@@ -80,7 +82,8 @@ br_material* BrMaterialAdd(br_material* material) {
 // IDA: br_material* __cdecl BrMaterialRemove(br_material *material)
 br_material* BrMaterialRemove(br_material* material) {
     LOG_TRACE("(%p)", material);
-    NOT_IMPLEMENTED();
+
+    return (br_material*)BrRegistryRemove(&v1db.reg_materials, material);
 }
 
 // IDA: br_material* __cdecl BrMaterialFind(char *pattern)
@@ -150,7 +153,9 @@ br_pixelmap* BrMapAdd(br_pixelmap* pixelmap) {
 // IDA: br_pixelmap* __cdecl BrMapRemove(br_pixelmap *pixelmap)
 br_pixelmap* BrMapRemove(br_pixelmap* pixelmap) {
     LOG_TRACE("(%p)", pixelmap);
-    NOT_IMPLEMENTED();
+
+    BrBufferClear(pixelmap);
+    return BrRegistryRemove(&v1db.reg_textures, pixelmap);
 }
 
 // IDA: br_pixelmap* __cdecl BrMapFind(char *pattern)
@@ -211,7 +216,10 @@ br_uint_32 BrMapEnum(char* pattern, br_map_enum_cbfn* callback, void* arg) {
 // IDA: br_pixelmap* __cdecl BrTableAdd(br_pixelmap *pixelmap)
 br_pixelmap* BrTableAdd(br_pixelmap* pixelmap) {
     LOG_TRACE("(%p)", pixelmap);
-    NOT_IMPLEMENTED();
+
+    BrRegistryAdd(&v1db.reg_tables, pixelmap);
+    BrTableUpdate(pixelmap, BR_TABU_ALL);
+    return pixelmap;
 }
 
 // IDA: br_pixelmap* __cdecl BrTableRemove(br_pixelmap *pixelmap)
