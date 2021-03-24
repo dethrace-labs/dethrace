@@ -4,6 +4,7 @@
 #include "flicplay.h"
 #include "globvars.h"
 #include "globvrpb.h"
+#include "grafdata.h"
 #include "graphics.h"
 #include "intrface.h"
 #include "loading.h"
@@ -27,7 +28,33 @@ char* gPixels_copy;
 // IDA: int __usercall MainMenuDone1@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
 int MainMenuDone1(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
-    NOT_IMPLEMENTED();
+
+    if (pTimed_out) {
+        return -1;
+    }
+    switch (pCurrent_choice) {
+    case 1:
+        PreloadBunchOfFlics(4);
+        break;
+    case 2:
+        PreloadBunchOfFlics(5);
+        break;
+    case 3:
+        PreloadBunchOfFlics(1);
+        break;
+    case 4:
+        PreloadBunchOfFlics(3);
+        break;
+    case 5:
+        PreloadBunchOfFlics(2);
+        break;
+    case 7:
+        PreloadBunchOfFlics(7);
+        break;
+    default:
+        return pCurrent_choice;
+    }
+    return pCurrent_choice;
 }
 
 // IDA: int __usercall MainMenuDone2@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
@@ -60,7 +87,32 @@ int MainMenuDone2(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
 // IDA: void __cdecl StartMainMenu()
 void StartMainMenu() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gFaded_palette) {
+        PlayFlicsInDarkness();
+        RunFlic(10);
+    } else {
+        RunFlic(11);
+    }
+    DontLetFlicFuckWithPalettes();
+    TurnFlicTransparencyOn();
+    if (!gProgram_state.racing) {
+        DisableChoice(1);
+        RunFlicAt(
+            35,
+            gMain_menu_spec->flicker_on_flics[1].x[gGraf_data_index],
+            gMain_menu_spec->flicker_on_flics[1].y[gGraf_data_index]);
+    }
+    if (gInterface_within_race_mode) {
+        DisableChoice(2);
+        RunFlicAt(
+            36,
+            gMain_menu_spec->flicker_on_flics[2].x[gGraf_data_index],
+            gMain_menu_spec->flicker_on_flics[2].y[gGraf_data_index]);
+    }
+    TurnFlicTransparencyOff();
+    LetFlicFuckWithPalettes();
+    ReilluminateFlics();
 }
 
 // IDA: int __usercall DoMainMenuInterface@<EAX>(tU32 pTime_out@<EAX>, int pContinue_allowed@<EDX>)

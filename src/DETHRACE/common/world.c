@@ -1087,18 +1087,10 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
         the_funk->proximity_count = 0;
         the_funk->proximity_array = 0;
         if (the_funk->mode == eFunk_mode_distance) {
-            DRActorEnumRecurseWithMat(
-                gUniverse_actor,
-                0,
-                CalcProximities,
-                the_funk);
+            DRActorEnumRecurseWithMat(gUniverse_actor, 0, (recurse_with_mat_cbfn*)CalcProximities, the_funk);
             the_funk->proximity_array = BrMemAllocate(sizeof(br_vector3) * the_funk->proximity_count, kMem_funk_prox_array);
             the_funk->proximity_count = 0;
-            DRActorEnumRecurseWithMat(
-                gUniverse_actor,
-                0,
-                AddProximities,
-                the_funk);
+            DRActorEnumRecurseWithMat(gUniverse_actor, 0, (recurse_with_mat_cbfn*)AddProximities, the_funk);
             for (i = 0; i < the_funk->proximity_count; i++) {
                 for (j = i + 1; the_funk->proximity_count > j; ++j) {
                     if (the_funk->proximity_array[j].v[0] == the_funk->proximity_array[i].v[0]

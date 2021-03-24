@@ -15,7 +15,7 @@
 #include "utility.h"
 #include <stdlib.h>
 
-int gGrid_number_colour[4];
+int gGrid_number_colour[4] = { 49u, 201u, 1u, 201u };
 br_pixelmap* gDead_car;
 int gFade_away_parts_shop;
 tU32 gDare_start_time;
@@ -854,7 +854,10 @@ tSO_result DoSelectRace(int* pSecond_time_around) {
 // IDA: void __usercall DrawGridCar(int pX@<EAX>, int pY@<EDX>, br_pixelmap *pImage@<EBX>)
 void DrawGridCar(int pX, int pY, br_pixelmap* pImage) {
     LOG_TRACE("(%d, %d, %p)", pX, pY, pImage);
-    NOT_IMPLEMENTED();
+
+    if (gCurrent_graf_data->grid_left_clip <= pX && pX + pImage->width < gCurrent_graf_data->grid_right_clip) {
+        DRPixelmapRectangleMaskedCopy(gBack_screen, pX, pY, pImage, 0, 0, pImage->width, pImage->height);
+    }
 }
 
 // IDA: void __usercall DrawGrid(int pOffset@<EAX>, int pDraw_it@<EDX>)
@@ -878,7 +881,159 @@ void DrawGrid(int pOffset, int pDraw_it) {
     char total_str[256];
     tU32 the_time;
     LOG_TRACE("(%d, %d)", pOffset, pDraw_it);
-    NOT_IMPLEMENTED();
+
+    done_highest = 0;
+    str_index = 0;
+
+    memset(numbers_str, 0, 4 * 100 * sizeof(char));
+    memset(total_str, 0, sizeof(total_str));
+
+    the_time = PDGetTotalTime();
+    BrPixelmapRectangleFill(
+        gBack_screen,
+        gCurrent_graf_data->grid_left_clip,
+        gCurrent_graf_data->grid_top_clip,
+        gCurrent_graf_data->grid_right_clip - gCurrent_graf_data->grid_left_clip,
+        gCurrent_graf_data->grid_bottom_clip - gCurrent_graf_data->grid_top_clip,
+        0);
+    for (i = 0; i < gCurrent_race.number_of_racers; i++) {
+        if (gCurrent_race.opponent_list[i].index == -1) {
+            the_image = gProgram_state.current_car.grid_icon_image;
+        } else {
+            the_image = gCurrent_race.opponent_list[i].car_spec->grid_icon_image;
+        }
+        y = gCurrent_graf_data->grid_top_y
+            + i % 2 * gCurrent_graf_data->grid_y_pitch
+            - the_image->height / 2
+            - gGrid_y_adjust;
+        x = gCurrent_graf_data->grid_left_x
+            + i % 2 * gCurrent_graf_data->grid_x_stagger
+            + i / 2 * gCurrent_graf_data->grid_x_pitch
+            - pOffset;
+        if (i == gSwap_grid_1) {
+            swap_1_x = x;
+            swap_1_y = y;
+            swap_1_image = the_image;
+        } else if (i == gSwap_grid_2) {
+            swap_2_x = x;
+            swap_2_y = y;
+            swap_2_image = the_image;
+        } else if (gCurrent_race.opponent_list[i].index != -1 || the_time % 900 / 300) {
+            DrawGridCar(x, y, the_image);
+        }
+        if (!done_highest && gCurrent_race.opponent_list[i].ranking >= gProgram_state.rank) {
+            done_highest = 1;
+            if (x - gCurrent_graf_data->grid_marker_margin >= gCurrent_graf_data->grid_left_clip
+                && x + the_image->width < gCurrent_graf_data->grid_right_clip) {
+                BrPixelmapLine(
+                    gBack_screen,
+                    x - gCurrent_graf_data->grid_marker_margin,
+                    y - gCurrent_graf_data->grid_marker_margin,
+                    x - gCurrent_graf_data->grid_marker_margin,
+                    y + gCurrent_graf_data->grid_marker_margin + the_image->height,
+                    45);
+                BrPixelmapLine(
+                    gBack_screen,
+                    x - gCurrent_graf_data->grid_marker_margin,
+                    y - gCurrent_graf_data->grid_marker_margin,
+                    x + gCurrent_graf_data->grid_marker_x_len,
+                    y - gCurrent_graf_data->grid_marker_margin,
+                    45);
+                BrPixelmapLine(
+                    gBack_screen,
+                    x - gCurrent_graf_data->grid_marker_margin,
+                    y + gCurrent_graf_data->grid_marker_margin + the_image->height,
+                    x + gCurrent_graf_data->grid_marker_x_len,
+                    y + gCurrent_graf_data->grid_marker_margin + the_image->height,
+                    45);
+            }
+        }
+        if (gCurrent_race.opponent_list[i].index >= 0) {
+            if (gCurrent_race.opponent_list[i].ranking >= gProgram_state.rank) {
+                if (str_index >= 2) {
+                    str_index = 3;
+                } else {
+                    str_index = 1;
+                }
+            }
+        } else {
+            str_index = 2;
+        }
+        if (gCurrent_race.opponent_list[i].index >= 0) {
+            if (gOpponents[gCurrent_race.opponent_list[i].index].car_number <= 0
+                || gOpponents[gCurrent_race.opponent_list[i].index].car_number >= 100) {
+                if (gOpponents[gCurrent_race.opponent_list[i].index].car_number < 0) {
+                    sprintf(&numbers_str[str_index][strlen(numbers_str[str_index])], "%c ", ':');
+                }
+            } else {
+                sprintf(
+                    &numbers_str[str_index][strlen(numbers_str[str_index])],
+                    "%d ",
+                    gOpponents[gCurrent_race.opponent_list[i].index].car_number);
+            }
+        } else {
+            if (gProgram_state.frank_or_anniness) {
+                sprintf(&numbers_str[str_index][strlen(numbers_str[str_index])], "%c ", '<');
+            } else {
+                sprintf(&numbers_str[str_index][strlen(numbers_str[str_index])], "%c ", ';');
+            }
+        }
+    }
+    if (gSwap_grid_1 >= 0) {
+        DrawGridCar(
+            gGrid_transition_stage * (swap_2_x - swap_1_x) / 100 + swap_1_x,
+            gGrid_transition_stage * (swap_2_y - swap_1_y) / 100 + swap_1_y,
+            swap_1_image);
+        DrawGridCar(
+            gGrid_transition_stage * (swap_1_x - swap_2_x) / 100 + swap_2_x,
+            gGrid_transition_stage * (swap_1_y - swap_2_y) / 100 + swap_2_y,
+            swap_2_image);
+    }
+    if (gDraw_grid_status == eGrid_draw_all) {
+        if (strlen(numbers_str[3])) {
+            numbers_str[2][strlen(numbers_str[3]) + 99] = 0;
+        } else {
+            numbers_str[1][strlen(numbers_str[2]) + 99] = 0;
+        }
+        strcpy(total_str, (const char*)numbers_str);
+        for (i = 1; i <= 3; i++) {
+            strcat(total_str, numbers_str[i]);
+        }
+        str_x = (gCurrent_graf_data->grid_numbers_left + gCurrent_graf_data->grid_numbers_right) / 2
+            - (BrPixelmapTextWidth(gBack_screen, gBig_font, total_str) / 2);
+        BrPixelmapRectangleFill(
+            gBack_screen,
+            gCurrent_graf_data->grid_numbers_left,
+            gCurrent_graf_data->grid_numbers_top,
+            gCurrent_graf_data->grid_numbers_right - gCurrent_graf_data->grid_numbers_left,
+            gBig_font->glyph_y,
+            0);
+        gGrid_number_x_coords[0] = str_x - 3 - gCurrent_graf_data->grid_numbers_left;
+        for (i = 0; i < 4; ++i) {
+            if (i != 2 || the_time % 900 / 300) {
+                TransBrPixelmapText(
+                    gBack_screen,
+                    str_x,
+                    gCurrent_graf_data->grid_numbers_top,
+                    gGrid_number_colour[i],
+                    gBig_font,
+                    (signed char*)numbers_str[i]);
+            }
+            str_x += BrPixelmapTextWidth(gBack_screen, gBig_font, numbers_str[i]);
+        }
+        for (i = gCurrent_race.number_of_racers - 1; i > 0; i--) {
+            for (j = strlen(total_str) - 2; j >= 0; j--) {
+                if (total_str[j] == ' ') {
+                    total_str[j + 1] = 0;
+                    break;
+                }
+            }
+            gGrid_number_x_coords[i] = gGrid_number_x_coords[0] + BrPixelmapTextWidth(gBack_screen, gBig_font, total_str);
+        }
+    }
+    if (pDraw_it) {
+        PDScreenBufferSwap(0);
+    }
 }
 
 // IDA: void __usercall MoveGrid(int pFrom@<EAX>, int pTo@<EDX>, tS32 pTime_to_move@<EBX>)
@@ -888,26 +1043,46 @@ void MoveGrid(int pFrom, int pTo, tS32 pTime_to_move) {
     int move_distance;
     int pitch;
     LOG_TRACE("(%d, %d, %d)", pFrom, pTo, pTime_to_move);
-    NOT_IMPLEMENTED();
+
+    pitch = gCurrent_graf_data->grid_x_pitch;
+    start_time = PDGetTotalTime();
+    while (1) {
+        the_time = PDGetTotalTime();
+        if (start_time + pTime_to_move <= the_time) {
+            break;
+        }
+        DrawGrid(pitch * pFrom + pitch * (pTo - pFrom) * (the_time - start_time) / pTime_to_move, 1);
+    }
+    DrawGrid(pitch * pTo, 1);
 }
 
 // IDA: int __usercall CalcGridOffset@<EAX>(int pPosition@<EAX>)
 int CalcGridOffset(int pPosition) {
     LOG_TRACE("(%d)", pPosition);
-    NOT_IMPLEMENTED();
+
+    return pPosition / 2 - 1;
 }
 
 // IDA: void __usercall GridDraw(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
 void GridDraw(int pCurrent_choice, int pCurrent_mode) {
-    LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+    LOG_TRACE8("(%d, %d)", pCurrent_choice, pCurrent_mode);
+
+    if (gDraw_grid_status > eGrid_draw_none) {
+        DrawGrid(gCurrent_graf_data->grid_x_pitch * CalcGridOffset(gOur_starting_position), 0);
+    }
 }
 
 // IDA: void __usercall ActuallySwapOrder(int pFirst_index@<EAX>, int pSecond_index@<EDX>)
 void ActuallySwapOrder(int pFirst_index, int pSecond_index) {
     tOpp_spec temp_opp;
     LOG_TRACE("(%d, %d)", pFirst_index, pSecond_index);
-    NOT_IMPLEMENTED();
+
+    temp_opp = gCurrent_race.opponent_list[pFirst_index];
+    gCurrent_race.opponent_list[pFirst_index] = gCurrent_race.opponent_list[pSecond_index];
+    gCurrent_race.opponent_list[pSecond_index] = temp_opp;
+    gOur_starting_position = pSecond_index;
+
+    //LOG_DEBUG("first %d, second %d", gCurrent_race.opponent_list[pFirst_index].index, gCurrent_race.opponent_list[pSecond_index].index);
 }
 
 // IDA: void __usercall DoGridTransition(int pFirst_index@<EAX>, int pSecond_index@<EDX>)
@@ -915,7 +1090,28 @@ void DoGridTransition(int pFirst_index, int pSecond_index) {
     tU32 start_time;
     tU32 the_time;
     LOG_TRACE("(%d, %d)", pFirst_index, pSecond_index);
-    NOT_IMPLEMENTED();
+
+    if (pFirst_index != pSecond_index) {
+        start_time = PDGetTotalTime();
+        gSwap_grid_1 = pFirst_index;
+        gSwap_grid_2 = pSecond_index;
+        while (1) {
+            the_time = PDGetTotalTime();
+            if (start_time + 150 <= the_time) {
+                break;
+            }
+            RemoveTransientBitmaps(1);
+            gGrid_transition_stage = 100 * (the_time - start_time) / 150;
+            DrawGrid(gCurrent_graf_data->grid_x_pitch * CalcGridOffset(gOur_starting_position), 0);
+            ProcessFlicQueue(gFrame_period);
+            DoMouseCursor();
+            PDScreenBufferSwap(0);
+        }
+        gSwap_grid_1 = -1;
+        gSwap_grid_2 = -1;
+        ActuallySwapOrder(pFirst_index, pSecond_index);
+        MoveGrid(CalcGridOffset(pFirst_index), CalcGridOffset(pSecond_index), 150);
+    }
 }
 
 // IDA: void __cdecl ChallengeStart()
@@ -959,25 +1155,55 @@ void DoChallengeScreen() {
 // IDA: int __usercall GridDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
 int GridDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
-    NOT_IMPLEMENTED();
+
+    if (pTimed_out) {
+        return 0;
+    }
+    if (pEscaped) {
+        return -1;
+    }
+    return pCurrent_choice;
 }
 
 // IDA: void __cdecl GridStart()
 void GridStart() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveGrid(-2, CalcGridOffset(gOur_starting_position), 400);
+    PrintMemoryDump(0, "IN GRID SCREEN");
 }
 
 // IDA: int __usercall GridMoveLeft@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int GridMoveLeft(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    if (gOur_starting_position
+        && gCurrent_race.opponent_list[gOur_starting_position - 1].ranking >= gProgram_state.rank) {
+        AddToFlicQueue(
+            gStart_interface_spec->pushed_flics[1].flic_index,
+            gStart_interface_spec->pushed_flics[1].x[gGraf_data_index],
+            gStart_interface_spec->pushed_flics[1].y[gGraf_data_index],
+            1);
+        DRS3StartSound(gIndexed_outlets[0], 3000);
+        DoGridTransition(gOur_starting_position, gOur_starting_position - 1);
+    }
+    return 0;
 }
 
 // IDA: int __usercall GridMoveRight@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int GridMoveRight(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    if (gOur_starting_position < gCurrent_race.number_of_racers - 1) {
+        AddToFlicQueue(
+            gStart_interface_spec->pushed_flics[2].flic_index,
+            gStart_interface_spec->pushed_flics[2].x[gGraf_data_index],
+            gStart_interface_spec->pushed_flics[2].y[gGraf_data_index],
+            1);
+        DRS3StartSound(gIndexed_outlets[0], 3000);
+        DoGridTransition(gOur_starting_position, gOur_starting_position + 1);
+    }
+    return 0;
 }
 
 // IDA: int __usercall GridClickCar@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
@@ -1012,40 +1238,205 @@ int GridClickRight(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int 
 
 // IDA: int __usercall CheckChallenge@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int CheckChallenge(int* pCurrent_choice, int* pCurrent_mode) {
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+    LOG_TRACE8("(%p, %p)", pCurrent_choice, pCurrent_mode);
+
+    if (!gChallenge_time || PDGetTotalTime() < gChallenge_time) {
+        return 0;
+    }
+    *pCurrent_choice = -2;
+    return 1;
 }
 
 // IDA: int __usercall FindBestPos@<EAX>(int pOur_rank@<EAX>)
 int FindBestPos(int pOur_rank) {
     int i;
     LOG_TRACE("(%d)", pOur_rank);
-    NOT_IMPLEMENTED();
+
+    for (i = gCurrent_race.number_of_racers - 1; i >= 0; i--) {
+        if (gCurrent_race.opponent_list[i].ranking < pOur_rank) {
+            return i + 1;
+        }
+    }
+    return 0;
 }
 
 // IDA: int __usercall SortGridFunction@<EAX>(void *pFirst_one@<EAX>, void *pSecond_one@<EDX>)
-int SortGridFunction(void* pFirst_one, void* pSecond_one) {
+int SortGridFunction(const void* pFirst_one, const void* pSecond_one) {
     LOG_TRACE("(%p, %p)", pFirst_one, pSecond_one);
-    NOT_IMPLEMENTED();
+
+    return ((tOpp_spec*)pFirst_one)->ranking - ((tOpp_spec*)pSecond_one)->ranking;
 }
 
 // IDA: void __cdecl SortOpponents()
 void SortOpponents() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; gCurrent_race.number_of_racers > i; ++i) {
+        if (gCurrent_race.opponent_list[i].index < 0) {
+            return;
+        }
+    }
+    qsort(gCurrent_race.opponent_list, gCurrent_race.number_of_racers, sizeof(tOpp_spec), SortGridFunction);
+    gBest_pos_available = FindBestPos(gProgram_state.rank);
+    gOur_starting_position = gCurrent_race.number_of_racers - 70 * (gCurrent_race.number_of_racers - gBest_pos_available) / 100;
+    for (i = gCurrent_race.number_of_racers; i > gOur_starting_position; i--) {
+        gCurrent_race.opponent_list[i] = gCurrent_race.opponent_list[i - 1];
+        // v0->index = gCurrent_race.checkpoints[9].map_right[4 * j];
+        // v0->ranking = gCurrent_race.checkpoints[9].map_right[4 * j + 1];
+        // v0->net_player_index = gCurrent_race.checkpoints[9].map_bottom[4 * j];
+        // v0->car_spec = (tCar_spec*)gCurrent_race.checkpoints[9].map_bottom[4 * j + 1];
+    }
+    gCurrent_race.opponent_list[gOur_starting_position].index = -1;
+    gCurrent_race.opponent_list[gOur_starting_position].ranking = gProgram_state.rank;
+    gCurrent_race.opponent_list[gOur_starting_position].car_spec = &gProgram_state.current_car;
+    gCurrent_race.number_of_racers++;
 }
 
 // IDA: tSO_result __cdecl DoGridPosition()
 tSO_result DoGridPosition() {
-    static tFlicette flicker_on[3];
-    static tFlicette flicker_off[3];
-    static tFlicette push[3];
-    static tMouse_area mouse_areas[5];
-    static tInterface_spec interface_spec;
+    static tFlicette flicker_on[3] = {
+        { 43, { 240, 480 }, { 158, 379 } },
+        { 293, { 56, 112 }, { 151, 362 } },
+        { 296, { 136, 272 }, { 151, 362 } }
+    };
+
+    static tFlicette flicker_off[3] = {
+        { 42, { 240, 480 }, { 158, 379 } },
+        { 292, { 56, 112 }, { 151, 362 } },
+        { 295, { 136, 272 }, { 151, 362 } }
+    };
+
+    static tFlicette push[3] = {
+        { 154, { 240, 480 }, { 158, 379 } },
+        { 294, { 56, 112 }, { 151, 362 } },
+        { 297, { 136, 272 }, { 151, 362 } }
+    };
+    static tMouse_area mouse_areas[5] = {
+        { { 240, 480 }, { 158, 379 }, { 305, 610 }, { 178, 427 }, 0, 0, 0, NULL },
+        { { 56, 112 },
+            { 151, 362 },
+            { 91, 182 },
+            { 158, 379 },
+            -1,
+            0,
+            0,
+            GridClickLeft },
+        { { 136, 272 },
+            { 151, 362 },
+            { 171, 342 },
+            { 158, 379 },
+            -1,
+            0,
+            0,
+            GridClickRight },
+        { { 52, 104 },
+            { 56, 134 },
+            { 269, 538 },
+            { 141, 338 },
+            -1,
+            0,
+            0,
+            GridClickCar },
+        { { 60, 120 },
+            { 163, 391 },
+            { 235, 470 },
+            { 176, 422 },
+            -1,
+            0,
+            0,
+            GridClickNumbers }
+    };
+
+    static tInterface_spec interface_spec = {
+        0, // initial_imode
+        290, // first_opening_flic
+        0, // second_opening_flic
+        0, // end_flic_go_ahead
+        0, // end_flic_escaped
+        0, // end_flic_otherwise
+        8, // flic_bunch_to_load
+        { -1, 0 }, // move_left_new_mode
+        { 0, 0 }, // move_left_delta
+        { 0, 0 }, // move_left_min
+        { 0, 0 }, // move_left_max
+        { GridMoveLeft, NULL }, // move_left_proc
+        { -1, 0 }, // move_right_new_mode
+        { 0, 0 }, // move_right_delta
+        { 0, 0 }, // move_right_min
+        { 0, 0 }, // move_right_max
+        { GridMoveRight, NULL }, // move_right_proc
+        { -1, 0 }, // move_up_new_mode
+        { 0, 0 }, // move_up_delta
+        { 0, 0 }, // move_up_min
+        { 0, 0 }, // move_up_max
+        { GridMoveLeft, NULL }, // move_up_proc
+        { -1, 0 }, // move_down_new_mode
+        { 0, 0 }, // move_down_delta
+        { 0, 0 }, // move_down_min
+        { 0, 0 }, // move_down_max
+        { GridMoveRight, NULL }, // move_down_proc
+        { 1, 1 }, // go_ahead_allowed
+        { NULL, NULL }, // go_ahead_proc
+        { 1, 1 }, // escape_allowed
+        { NULL, NULL }, // escape_proc
+        CheckChallenge, // exit_proc
+        GridDraw, // draw_proc
+        0u, // time_out
+        NULL, // start_proc1
+        GridStart, // start_proc2
+        GridDone, // done_proc
+        0, // font_needed
+        { 0, 0 }, // typeable
+        NULL, // get_original_string
+        -1, // escape_code
+        1, // dont_save_or_load
+        3, // number_of_button_flics
+        flicker_on, // flicker_on_flics
+        flicker_off, // flicker_off_flics
+        push, // pushed_flics
+        5, // number_of_mouse_areas
+        mouse_areas, // mouse_areas
+        0, // number_of_recopy_areas
+        NULL // recopy_areas
+    };
+
     int result;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gStart_interface_spec = &interface_spec;
+    if (!gAusterity_mode) {
+        LoadGridIcons(&gCurrent_race);
+    }
+    gSwap_grid_1 = -1;
+    gSwap_grid_2 = -1;
+    gDraw_grid_status = eGrid_draw_all;
+    gGrid_y_adjust = 0;
+    SortOpponents();
+    if (!gAusterity_mode) {
+        if (gBest_pos_available > 1
+            && (gOpponents[gCurrent_race.opponent_list[0].index].car_number >= 0
+                || gOpponents[gCurrent_race.opponent_list[1].index].car_number >= 0)
+            && PercentageChance(10)) {
+            gChallenge_time = PDGetTotalTime() + IRandomBetween(1000, 10000);
+        } else {
+            gChallenge_time = 0;
+        }
+        result = DoInterfaceScreen(&interface_spec, 0, 0);
+        if (result >= 0) {
+            FadePaletteDown();
+        } else {
+            RunFlic(291);
+        }
+        if (result == -1) {
+            return eSO_main_menu_invoked;
+        }
+        if (result == -2) {
+            DoChallengeScreen();
+        }
+        DisposeGridIcons(&gCurrent_race);
+    }
+    return eSO_continue;
 }
 
 // IDA: void __cdecl CheckPlayersAreResponding()

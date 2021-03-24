@@ -89,6 +89,8 @@ void BrPixelmapLine(br_pixelmap* dst, br_int_32 x1, br_int_32 y1, br_int_32 x2, 
 void BrPixelmapRectangleFill(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_int_32 w, br_int_32 h, br_uint_32 colour);
 br_pixelmap* BrPixelmapAllocate(br_uint_8 type, br_int_32 w, br_int_32 h, void* pixels, int flags);
 void BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src);
+void BrPixelmapText(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_uint_32 colour, br_font* font, char* text);
+br_uint_16 BrPixelmapTextWidth(br_pixelmap* dst, br_font* font, char* text);
 
 // BrRes
 void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class);

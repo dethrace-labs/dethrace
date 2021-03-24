@@ -18,6 +18,7 @@ tS32 gLast_demo_end_anim;
 // IDA: void __usercall ShowCutScene(int pIndex@<EAX>, int pWait_end@<EDX>, int pSound_ID@<EBX>, br_scalar pDelay)
 void ShowCutScene(int pIndex, int pWait_end, int pSound_ID, br_scalar pDelay) {
     LOG_TRACE("(%d, %d, %d, %f)", pIndex, pWait_end, pSound_ID, pDelay);
+
     NOT_IMPLEMENTED();
 }
 

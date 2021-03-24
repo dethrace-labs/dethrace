@@ -122,7 +122,8 @@ void DRPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFont, cha
             x += pFont->width_table[chr] + pFont->spacing;
         }
     } else {
-        LOG_PANIC("not implemented");
+        TELL_ME_IF_WE_PASS_THIS_WAY();
+        //DRPixelmapRectangleMaskedCopy ...
     }
 }
 
@@ -508,7 +509,8 @@ void TransBrPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, br_uint_32 pCol
     int len;
     LOG_TRACE("(%p, %d, %d, %d, %p, %p)", pPixelmap, pX, pY, pColour, pFont, pText);
 
-    SILENT_STUB();
+    len = (TranslationMode() == 0 ? 0 : 2);
+    BrPixelmapText(pPixelmap, pX, pY - len, pColour, pFont, (char*)pText);
 }
 
 // IDA: void __usercall TransDRPixelmapText(br_pixelmap *pPixelmap@<EAX>, int pX@<EDX>, int pY@<EBX>, tDR_font *pFont@<ECX>, char *pText, int pRight_edge)

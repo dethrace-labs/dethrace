@@ -1049,7 +1049,60 @@ void DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int
     tU8* dest_ptr;
     tU8* conv_table;
     LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
-    NOT_IMPLEMENTED();
+
+    source_ptr = (tU8*)pSource->pixels + (pSource->row_bytes * pSource_y + pSource_x);
+    dest_ptr = (tU8*)pDest->pixels + (pDest->row_bytes * pDest_y + pDest_x);
+    source_row_wrap = pSource->row_bytes - pWidth;
+    dest_row_wrap = pDest->row_bytes - pWidth;
+
+    if (pDest_y < 0) {
+        pHeight += pDest_y;
+        if (pHeight <= 0) {
+            return;
+        }
+        source_ptr -= pDest_y * pSource->row_bytes;
+        dest_ptr -= pDest_y * pDest->row_bytes;
+        pDest_y = 0;
+    }
+    if (pDest->height > pDest_y) {
+        if (pDest_y + pHeight > pDest->height) {
+            pHeight = pDest->height - pDest_y;
+        }
+        if (pDest_x < 0) {
+            pWidth += pDest_x;
+            if (pWidth <= 0) {
+                return;
+            }
+            source_ptr -= pDest_x;
+            dest_ptr -= pDest_x;
+            source_row_wrap -= pDest_x;
+            dest_row_wrap -= pDest_x;
+            pDest_x = 0;
+        }
+        if (pDest->width > pDest_x) {
+            if (pDest_x + pWidth > pDest->width) {
+                pWidth = pDest->width - pDest_x;
+                source_row_wrap += pDest_x + pWidth - pDest->width;
+                dest_row_wrap += pDest_x + pWidth - pDest->width;
+            }
+            if (gCurrent_conversion_table) {
+                TELL_ME_IF_WE_PASS_THIS_WAY();
+            } else {
+                for (y_count = 0; y_count < pHeight; y_count++) {
+                    for (x_count = 0; x_count < pWidth; x_count++) {
+                        the_byte = *source_ptr;
+                        if (the_byte) {
+                            *dest_ptr = the_byte;
+                        }
+                        source_ptr++;
+                        dest_ptr++;
+                    }
+                    source_ptr += source_row_wrap;
+                    dest_ptr += dest_row_wrap;
+                }
+            }
+        }
+    }
 }
 
 // IDA: void __usercall DRMaskedStamp(br_int_16 pDest_x@<EAX>, br_int_16 pDest_y@<EDX>, br_pixelmap *pSource@<EBX>)

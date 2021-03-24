@@ -4,7 +4,7 @@ add_library(dethrace_obj OBJECT)
 target_include_directories(dethrace_obj PUBLIC
     .
     common
-    pc-dos
+    pd
     ${CMAKE_SOURCE_DIR}/lib
     ${CMAKE_SOURCE_DIR}/src/harness
     ${CMAKE_SOURCE_DIR}/src/BRSRC13
@@ -148,6 +148,7 @@ target_sources(dethrace PRIVATE main.c)
 if(NOT MSVC)
     if(APPLE)
         target_link_libraries(dethrace PRIVATE "-framework OpenGL")
+        target_link_options(dethrace PRIVATE -fno-pie)
     else()
         target_link_libraries(dethrace PRIVATE GL)
     endif()

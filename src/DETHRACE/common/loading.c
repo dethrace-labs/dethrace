@@ -26,6 +26,7 @@
 #include "opponent.h"
 #include "pd/sys.h"
 #include "pedestrn.h"
+#include "racestrt.h"
 #include "sound.h"
 #include "spark.h"
 #include "utility.h"
@@ -756,7 +757,7 @@ tS8* ConvertPixToStripMap(br_pixelmap* pThe_br_map) {
     current_strip_pointer = temp_strip_image;
 
     for (i = 0; i < pThe_br_map->height; i++) {
-        next_byte = (char*)pThe_br_map->pixels + i * pThe_br_map->row_bytes; //points to start of this line
+        next_byte = (tU8*)pThe_br_map->pixels + i * pThe_br_map->row_bytes; //points to start of this line
         new_line_length = 2; // leave space at the start of the line to store number of chunks and first chunk length
         j = 0;
         counter = 0;
@@ -1398,7 +1399,7 @@ void LinkModelsToActor(br_actor* pActor, br_model** pModel_array, int pModel_cou
     tModel_pool model_pool;
     LOG_TRACE("(%p, %p, %d)", pActor, pModel_array, pModel_count);
 
-    DRActorEnumRecurse(pActor, LinkModel, &pModel_array);
+    DRActorEnumRecurse(pActor, (br_actor_enum_cbfn*)LinkModel, &pModel_array);
 }
 
 // IDA: void __usercall ReadShrapnelMaterials(FILE *pF@<EAX>, tCollision_info *pCar_spec@<EDX>)
@@ -2244,13 +2245,26 @@ void LoadOpponentMugShot(int pIndex) {
 // IDA: void __usercall DisposeOpponentGridIcon(tRace_info *pRace_info@<EAX>, int pIndex@<EDX>)
 void DisposeOpponentGridIcon(tRace_info* pRace_info, int pIndex) {
     LOG_TRACE("(%p, %d)", pRace_info, pIndex);
-    NOT_IMPLEMENTED();
+
+    if (pRace_info->opponent_list[pIndex].index >= 0) {
+        if (pRace_info->opponent_list[pIndex].car_spec->grid_icon_image) {
+            BrPixelmapFree(pRace_info->opponent_list[pIndex].car_spec->grid_icon_image);
+            pRace_info->opponent_list[pIndex].car_spec->grid_icon_image = NULL;
+        }
+    }
 }
 
 // IDA: void __usercall LoadOpponentGridIcon(tRace_info *pRace_info@<EAX>, int pIndex@<EDX>)
 void LoadOpponentGridIcon(tRace_info* pRace_info, int pIndex) {
     LOG_TRACE("(%p, %d)", pRace_info, pIndex);
-    NOT_IMPLEMENTED();
+
+    PossibleService();
+    if (pRace_info->opponent_list[pIndex].index >= 0 && !pRace_info->opponent_list[pIndex].car_spec->grid_icon_image) {
+        pRace_info->opponent_list[pIndex].car_spec->grid_icon_image = LoadPixelmap(pRace_info->opponent_list[pIndex].car_spec->grid_icon_names[0]);
+        if (!pRace_info->opponent_list[pIndex].car_spec->grid_icon_image) {
+            FatalError(57);
+        }
+    }
 }
 
 // IDA: void __usercall LoadRaceInfo(int pRace_index@<EAX>, tRace_info *pRace_info@<EDX>)
@@ -2377,14 +2391,25 @@ void DisposeRaceInfo(tRace_info* pRace_info) {
 void LoadGridIcons(tRace_info* pRace_info) {
     int i;
     LOG_TRACE("(%p)", pRace_info);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; pRace_info->number_of_racers > i; ++i) {
+        LoadOpponentGridIcon(pRace_info, i);
+    }
+    gProgram_state.current_car.grid_icon_image = LoadPixelmap(gProgram_state.current_car.grid_icon_names[gProgram_state.frank_or_anniness + 1]);
+    gDead_car = LoadPixelmap("DEADCAR.PIX");
 }
 
 // IDA: void __usercall DisposeGridIcons(tRace_info *pRace_info@<EAX>)
 void DisposeGridIcons(tRace_info* pRace_info) {
     int i;
     LOG_TRACE("(%p)", pRace_info);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; pRace_info->number_of_racers > i; i++) {
+        DisposeOpponentGridIcon(pRace_info, i);
+    }
+    BrPixelmapFree(gProgram_state.current_car.grid_icon_image);
+    gProgram_state.current_car.grid_icon_image = NULL;
+    BrPixelmapFree(gDead_car);
 }
 
 // IDA: void __cdecl LoadOpponents()

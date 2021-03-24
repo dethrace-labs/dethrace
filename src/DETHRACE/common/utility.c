@@ -33,6 +33,7 @@ int gEncryption_method = 0;
 br_pixelmap* g16bit_palette;
 br_pixelmap* gSource_for_16bit_palette;
 
+
 // IDA: int __cdecl CheckQuit()
 int CheckQuit() {
     LOG_TRACE8("()");

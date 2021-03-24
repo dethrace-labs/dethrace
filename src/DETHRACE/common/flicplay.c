@@ -567,38 +567,38 @@ int TranslationMode() {
 
 // IDA: void __cdecl DontLetFlicFuckWithPalettes()
 void DontLetFlicFuckWithPalettes() {
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    LOG_TRACE8("()");
+    gPalette_fuck_prevention = 1;
 }
 
 // IDA: void __cdecl LetFlicFuckWithPalettes()
 void LetFlicFuckWithPalettes() {
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    LOG_TRACE8("()");
+    gPalette_fuck_prevention = 0;
 }
 
 // IDA: void __cdecl PlayFlicsInDarkness()
 void PlayFlicsInDarkness() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    gDark_mode = 1;
 }
 
 // IDA: void __cdecl ReilluminateFlics()
 void ReilluminateFlics() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    gDark_mode = 0;
 }
 
 // IDA: void __cdecl TurnFlicTransparencyOn()
 void TurnFlicTransparencyOn() {
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    LOG_TRACE8("()");
+    gTransparency_on = 1;
 }
 
 // IDA: void __cdecl TurnFlicTransparencyOff()
 void TurnFlicTransparencyOff() {
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    LOG_TRACE8("()");
+    gTransparency_on = 0;
 }
 
 // IDA: void __cdecl PlayFlicsFromDisk()
@@ -744,7 +744,7 @@ void FreeFlicPaletteAllocate() {
 
 // IDA: int __usercall EndFlic@<EAX>(tFlic_descriptor_ptr pFlic_info@<EAX>)
 int EndFlic(tFlic_descriptor_ptr pFlic_info) {
-    LOG_TRACE("(%d)", pFlic_info);
+    LOG_TRACE("(%p)", pFlic_info);
 
     if (pFlic_info->f) {
         BrMemFree(pFlic_info->data_start);
@@ -1139,11 +1139,13 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
     int data_knocked_off;
     int read_amount;
 
-    //LOG_DEBUG("%d (%p), frames left: %d offset: %d", pFlic_info->the_index, pFlic_info, pFlic_info->frames_left, (pFlic_info->data - pFlic_info->data_start) + 4);
+    LOG_DEBUG("%d (%p), frames left: %d offset: %d", pFlic_info->the_index, pFlic_info, pFlic_info->frames_left, (pFlic_info->data - pFlic_info->data_start) + 4);
     PossibleService();
     frame_length = MemReadU32(&pFlic_info->data);
     magic_bytes = MemReadU16(&pFlic_info->data);
     chunk_count = MemReadU16(&pFlic_info->data);
+
+    LOG_DEBUG("length %d, magic: %d chunks: %d, data %p, data_start %p, %d", frame_length, magic_bytes, chunk_count, pFlic_info->data, pFlic_info->data_start, pFlic_info->f ? 1 : 0);
     MemSkipBytes(&pFlic_info->data, 8);
     if (magic_bytes == 0xF1FA) {
         for (chunk_counter = 0; chunk_counter < chunk_count; chunk_counter++) {
@@ -1216,16 +1218,18 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
         data_knocked_off = pFlic_info->data - pFlic_info->data_start;
         memcpy(pFlic_info->data_start, pFlic_info->data, pFlic_info->bytes_in_buffer - data_knocked_off);
         pFlic_info->data = pFlic_info->data_start;
-        read_amount = pFlic_info->bytes_still_to_be_read;
         pFlic_info->bytes_in_buffer -= data_knocked_off;
-        if (data_knocked_off < read_amount) {
+
+        if (pFlic_info->bytes_still_to_be_read > data_knocked_off) {
             read_amount = data_knocked_off;
+        } else {
+            read_amount = pFlic_info->bytes_still_to_be_read;
         }
         if (read_amount) {
             fread(&pFlic_info->data_start[pFlic_info->bytes_in_buffer], 1u, read_amount, pFlic_info->f);
         }
+        pFlic_info->bytes_in_buffer += read_amount;
         pFlic_info->bytes_still_to_be_read -= read_amount;
-        pFlic_info->bytes_in_buffer = +read_amount;
     }
     return pFlic_info->frames_left == 0;
 }
@@ -1233,7 +1237,8 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
 // IDA: int __usercall PlayNextFlicFrame@<EAX>(tFlic_descriptor *pFlic_info@<EAX>)
 int PlayNextFlicFrame(tFlic_descriptor* pFlic_info) {
     LOG_TRACE("(%p)", pFlic_info);
-    NOT_IMPLEMENTED();
+
+    return PlayNextFlicFrame2(pFlic_info, 0);
 }
 
 // IDA: int __usercall PlayFlic@<EAX>(int pIndex@<EAX>, tU32 pSize@<EDX>, tS8 *pData_ptr@<EBX>, br_pixelmap *pDest_pixelmap@<ECX>, int pX_offset, int pY_offset, void (*DoPerFrame)(), int pInterruptable, int pFrame_rate)
@@ -1262,7 +1267,7 @@ int PlayFlic(int pIndex, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap
             gSound_time = 0;
         }
         if (frame_period >= the_flic.frame_period) {
-            finished_playing = PlayNextFlicFrame2(&the_flic, 0);
+            finished_playing = PlayNextFlicFrame(&the_flic);
             DoPerFrame();
             if (gDark_mode == 0) {
                 EnsurePaletteUp();
@@ -1272,15 +1277,7 @@ int PlayFlic(int pIndex, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap
         }
     }
     ServiceGame();
-    if (the_flic.f) {
-        BrMemFree(pDest_pixelmap);
-        pDest_pixelmap = NULL;
-        fclose(the_flic.f);
-        the_flic.f = NULL;
-    }
-    if (pData_ptr) {
-        pData_ptr = 0;
-    }
+    EndFlic(&the_flic);
     return 0;
 }
 
@@ -1410,7 +1407,19 @@ void ForceRunFlic(int pIndex) {
 // IDA: void __usercall RunFlicAt(int pIndex@<EAX>, int pX@<EDX>, int pY@<EBX>)
 void RunFlicAt(int pIndex, int pX, int pY) {
     LOG_TRACE("(%d, %d, %d)", pIndex, pX, pY);
-    NOT_IMPLEMENTED();
+
+    LoadFlic(pIndex);
+    PlayFlic(
+        pIndex,
+        gMain_flic_list[pIndex].the_size,
+        gMain_flic_list[pIndex].data_ptr,
+        gBack_screen,
+        pX,
+        pY,
+        SwapScreen,
+        0,
+        0);
+    return UnlockFlic(pIndex);
 }
 
 // IDA: void __usercall RunFlic(int pIndex@<EAX>)
@@ -1475,7 +1484,15 @@ void InitFlicQueue() {
 int FlicQueueFinished() {
     tFlic_descriptor* the_flic;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    the_flic = gFirst_flic;
+    while (the_flic) {
+        if (the_flic->must_finish) {
+            return 0;
+        }
+        the_flic = the_flic->next;
+    }
+    return 1;
 }
 
 // IDA: void __usercall ProcessFlicQueue(tU32 pInterval@<EAX>)
@@ -1485,29 +1502,22 @@ void ProcessFlicQueue(tU32 pInterval) {
     tFlic_descriptor* doomed_flic;
     tU32 new_time;
     int finished_playing;
+    LOG_TRACE8("(%d)", pInterval);
 
+    DontLetFlicFuckWithPalettes();
+    TurnFlicTransparencyOn();
     the_flic = gFirst_flic;
     last_flic = NULL;
-    gPalette_fuck_prevention = 1;
-    gTransparency_on = 1;
     new_time = PDGetTotalTime();
     while (the_flic) {
         if (new_time - the_flic->last_frame < the_flic->frame_period) {
             finished_playing = 0;
         } else {
             the_flic->last_frame = new_time;
-            finished_playing = PlayNextFlicFrame2(the_flic, 0);
+            finished_playing = PlayNextFlicFrame(the_flic);
         }
         if (finished_playing) {
-            if (the_flic->f) {
-                BrMemFree(the_flic->data_start);
-                the_flic->data_start = NULL;
-                fclose(the_flic->f);
-                the_flic->f = NULL;
-            }
-            if (the_flic->data) {
-                the_flic->data = NULL;
-            }
+            EndFlic(the_flic);
             if (last_flic) {
                 last_flic->next = the_flic->next;
             } else {
@@ -1521,8 +1531,8 @@ void ProcessFlicQueue(tU32 pInterval) {
             the_flic = the_flic->next;
         }
     }
-    gPalette_fuck_prevention = 0;
-    gTransparency_on = 0;
+    TurnFlicTransparencyOff();
+    LetFlicFuckWithPalettes();
 }
 
 // IDA: void __cdecl FlushFlicQueue()
@@ -1533,37 +1543,18 @@ void FlushFlicQueue() {
 
     // Jeff: loop through pending flics until we reach the end or we find one that is `must_finish`.
     // If `must_finish`, we process the queue then check again.
-    // If there are no `must_finish` in the list,
-    while (gFirst_flic) {
-        the_flic = gFirst_flic;
-        while (!the_flic->must_finish) {
-            the_flic = the_flic->next;
-            if (!the_flic) {
-                break;
-            }
-        }
-        if (the_flic) {
-            RemoveTransientBitmaps(1);
-            ProcessFlicQueue(gFrame_period);
-            DoMouseCursor();
-            PDScreenBufferSwap(0);
-        } else {
-            break;
-        }
-    }
+    // If there are no `must_finish` in the list, immediately end any remaining flics
 
+    while (!FlicQueueFinished()) {
+        RemoveTransientBitmaps(1);
+        ProcessFlicQueue(gFrame_period);
+        DoMouseCursor();
+        PDScreenBufferSwap(0);
+    }
     the_flic = gFirst_flic;
     while (the_flic) {
-        if (the_flic->f) {
-            BrMemFree(the_flic->data_start);
-            the_flic->data_start = NULL;
-            fclose(the_flic->f);
-            the_flic->f = NULL;
-        }
-        if (the_flic->data) {
-            the_flic->data = NULL;
-        }
         old_flic = the_flic;
+        EndFlic(the_flic);
         the_flic = the_flic->next;
         BrMemFree(old_flic);
     }
@@ -1589,15 +1580,7 @@ void AddToFlicQueue(int pIndex, int pX, int pY, int pMust_finish) {
     }
 
     if (doomed_flic) {
-        if (doomed_flic->f) {
-            BrMemFree(doomed_flic->data_start);
-            doomed_flic->data_start = NULL;
-            fclose(doomed_flic->f);
-            doomed_flic->f = NULL;
-        }
-        if (doomed_flic->data) {
-            doomed_flic->data = NULL;
-        }
+        EndFlic(doomed_flic);
         if (last_flic) {
             last_flic->next = doomed_flic->next;
         } else {
@@ -1643,7 +1626,7 @@ void InitialiseFlicPanel(int pIndex, int pLeft, int pTop, int pWidth, int pHeigh
     gPanel_flic[pIndex].data = NULL;
     gPanel_flic_left[pIndex] = pLeft;
     gPanel_flic_top[pIndex] = pTop;
-    the_pixels = BrMemAllocate(pHeight * ((pWidth + 3) & 0xFC), 0x93u);
+    the_pixels = BrMemAllocate(pHeight * ((pWidth + 3) & 0xFC), kFlic_panel_pixels);
     if (gScreen->row_bytes < 0) {
         BrFatal(
             "..\\..\\source\\common\\flicplay.c",
@@ -1678,8 +1661,9 @@ void ServicePanelFlics(int pCopy_to_buffer) {
         return;
     }
     the_time = PDGetTotalTime();
-    gPalette_fuck_prevention = 1;
-    gTransparency_on = 1;
+    DontLetFlicFuckWithPalettes();
+    TurnFlicTransparencyOn();
+
     for (i = 0; i < 2; i++) {
         old_last_time[i] = gLast_panel_frame_time[i];
         if (gPanel_buffer[i] && gPanel_flic[i].data) {
@@ -1692,15 +1676,7 @@ void ServicePanelFlics(int pCopy_to_buffer) {
             for (j = 0; j < iteration_count; j++) {
                 finished = PlayNextFlicFrame2(&gPanel_flic[i], 1);
                 if (finished) {
-                    if (gPanel_flic[i].f) {
-                        BrMemFree(gPanel_flic[i].data_start);
-                        gPanel_flic[i].data_start = NULL;
-                        fclose(gPanel_flic[i].f);
-                        gPanel_flic[i].f = NULL;
-                    }
-                    if (gPanel_flic[i].data) {
-                        gPanel_flic[i].data = 0;
-                    }
+                    EndFlic(&gPanel_flic[i]);
                     StartFlic(
                         gPanel_flic[i].file_name,
                         gPanel_flic[i].the_index,
@@ -1735,15 +1711,7 @@ void ServicePanelFlics(int pCopy_to_buffer) {
 void ChangePanelFlic(int pIndex, tU8* pData, tU32 pData_length) {
     LOG_TRACE("(%d, %p, %d)", pIndex, pData, pData_length);
 
-    if (gPanel_flic[pIndex].f) {
-        BrMemFree(gPanel_flic[pIndex].data_start);
-        gPanel_flic[pIndex].data_start = NULL;
-        fclose(gPanel_flic[pIndex].f);
-        gPanel_flic[pIndex].f = NULL;
-    }
-    if (gPanel_flic[pIndex].data) {
-        gPanel_flic[pIndex].data = NULL;
-    }
+    EndFlic(&gPanel_flic[pIndex]);
     gPanel_flic_data[pIndex] = pData;
     gPanel_flic_data_length[pIndex] = pData_length;
     BrPixelmapFill(gPanel_buffer[pIndex], 0);

@@ -3032,4 +3032,6 @@ enum {
 #define U 0
 #define V 1
 
+#define BR_FONTF_PROPORTIONAL 1
+
 #endif /* BR_TYPES_H */
