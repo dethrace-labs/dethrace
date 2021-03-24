@@ -31,7 +31,7 @@
 #include "spark.h"
 #include "utility.h"
 #include "world.h"
-#include <sys/errno.h>
+#include <errno.h>
 
 #define HITHER_MULTIPLIER 2.0f
 #define AMBIENT_MULTIPLIER 0.0099999998f

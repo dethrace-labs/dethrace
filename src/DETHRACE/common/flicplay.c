@@ -1418,7 +1418,7 @@ void RunFlicAt(int pIndex, int pX, int pY) {
         SwapScreen,
         0,
         0);
-    return UnlockFlic(pIndex);
+    UnlockFlic(pIndex);
 }
 
 // IDA: void __usercall RunFlic(int pIndex@<EAX>)

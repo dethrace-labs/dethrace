@@ -399,7 +399,7 @@ void InitGame(int pStart_race) {
     gProgram_state.game_completed = 0;
     gProgram_state.redo_race_index = -1;
     gWait_for_it = 0;
-    return SwitchToLoresMode();
+    SwitchToLoresMode();
 }
 
 // IDA: void __cdecl DisposeGameIfNecessary()
@@ -559,7 +559,7 @@ void InitRace() {
         gProgram_state.credits_earned = gInitial_net_credits[gCurrent_net_game->options.starting_money_index];
     }
     gInitialised_grid = 0;
-    return SwitchToLoresMode();
+    SwitchToLoresMode();
 }
 
 // IDA: void __cdecl DisposeRace()

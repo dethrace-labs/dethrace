@@ -337,8 +337,6 @@ void BrPixelmapText(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_uint_32 colou
     } else {
         TELL_ME_IF_WE_PASS_THIS_WAY();
     }
-
-    return 0;
 }
 
 // IDA: void __cdecl BrPixelmapTextF(br_pixelmap *dst, br_int_32 x, br_int_32 y, br_uint_32 colour, br_font *font, char *fmt, ...)

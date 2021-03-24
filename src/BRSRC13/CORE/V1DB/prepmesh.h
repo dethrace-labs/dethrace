@@ -9,13 +9,13 @@ void prepareEdges(v11group* group, br_model* model);
 
 void BrPrepareEdges(br_model* model);
 
-int FacesCompare(void* p1, void* p2);
+int FacesCompare(const void* p1, const void* p2);
 
-int TVCompare_XYZ(void* p1, void* p2);
+int TVCompare_XYZ(const void* p1, const void* p2);
 
-int TVCompare_MXYZUVN(void* p1, void* p2);
+int TVCompare_MXYZUVN(const void* p1, const void* p2);
 
-int TVCompare_MVN(void* p1, void* p2);
+int TVCompare_MVN(const void* p1, const void* p2);
 
 br_fraction BrScalarToFractionClamp(br_scalar s);
 

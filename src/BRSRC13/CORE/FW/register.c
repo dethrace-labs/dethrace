@@ -12,6 +12,7 @@ char rscid[50];
 void* BrRegistryNew(br_registry* reg) {
     BrNewList(&reg->list);
     reg->count = 0;
+    return reg;
 }
 
 // IDA: void* __usercall BrRegistryClear@<EAX>(br_registry *reg@<EAX>)

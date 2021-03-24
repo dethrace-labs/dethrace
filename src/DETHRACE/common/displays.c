@@ -457,6 +457,7 @@ void OoerrIveGotTextInMeBoxMissus(int pFont_index, char* pText, br_pixelmap* pPi
     width = pRight - pLeft;
     line_char_index = 0;
     input_str_index = 0;
+    start_line = 0;
 
     while (pText[input_str_index]) {
         line[line_char_index] = pText[input_str_index];

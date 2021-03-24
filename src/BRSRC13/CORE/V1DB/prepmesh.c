@@ -46,7 +46,7 @@ void BrPrepareEdges(br_model* model) {
 }
 
 // IDA: int __cdecl FacesCompare(void *p1, void *p2)
-int FacesCompare(void* p1, void* p2) {
+int FacesCompare(const void* p1, const void* p2) {
     br_face* f1;
     br_face* f2;
     //LOG_TRACE9("(%p, %p)", p1, p2);
@@ -64,7 +64,7 @@ int FacesCompare(void* p1, void* p2) {
 }
 
 // IDA: int __cdecl TVCompare_XYZ(void *p1, void *p2)
-int TVCompare_XYZ(void* p1, void* p2) {
+int TVCompare_XYZ(const void* p1, const void* p2) {
     prep_vertex* tv1;
     prep_vertex* tv2;
     br_vertex* v1;
@@ -94,7 +94,7 @@ int TVCompare_XYZ(void* p1, void* p2) {
 }
 
 // IDA: int __cdecl TVCompare_MXYZUVN(void *p1, void *p2)
-int TVCompare_MXYZUVN(void* p1, void* p2) {
+int TVCompare_MXYZUVN(const void* p1, const void* p2) {
     prep_vertex* tv1;
     prep_vertex* tv2;
     br_vertex* v1;
@@ -142,7 +142,7 @@ int TVCompare_MXYZUVN(void* p1, void* p2) {
 }
 
 // IDA: int __cdecl TVCompare_MVN(void *p1, void *p2)
-int TVCompare_MVN(void* p1, void* p2) {
+int TVCompare_MVN(const void* p1, const void* p2) {
     prep_vertex* tv1;
     prep_vertex* tv2;
     int i;

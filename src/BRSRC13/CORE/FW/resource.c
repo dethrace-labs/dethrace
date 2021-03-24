@@ -136,6 +136,7 @@ void* BrResAdd(void* vparent, void* vres) {
         BrSimpleRemove((br_simple_node*)res);
     }
     BrSimpleAddHead((br_simple_list*)parent, (br_simple_node*)res);
+    return vres;
 }
 
 // IDA: void* __cdecl BrResRemove(void *vres)

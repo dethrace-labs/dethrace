@@ -657,7 +657,7 @@ typedef void br_diag_failure_cbfn(char*);
 typedef struct br_resource_class br_resource_class;
 typedef br_resource_class* br_resclass_find_cbfn(char*);
 typedef br_uint_32 br_resclass_enum_cbfn(br_resource_class*, void*);
-typedef int br_qsort_cbfn(void*, void*);
+typedef int br_qsort_cbfn(const void*, const void*);
 typedef br_uint_32 br_resenum_cbfn(void*, void*);
 typedef struct br_device br_device;
 typedef br_device* br_device_begin_fn(char*);

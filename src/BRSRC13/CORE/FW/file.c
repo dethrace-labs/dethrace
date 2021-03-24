@@ -84,7 +84,7 @@ int BrFileGetChar(void* f) {
 
 // IDA: void __cdecl BrFilePutChar(int c, void *f)
 void BrFilePutChar(int c, void* f) {
-    return fw.fsys->putchr(c, ((br_file*)f)->raw_file);
+    fw.fsys->putchr(c, ((br_file*)f)->raw_file);
 }
 
 // IDA: int __cdecl BrFileRead(void *buf, int size, int n, void *f)
