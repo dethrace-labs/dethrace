@@ -1,7 +1,6 @@
 name: windows
 
 on:
-  pull_request:
   push:
   release:
     types: published
