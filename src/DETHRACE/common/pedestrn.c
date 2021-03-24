@@ -450,13 +450,13 @@ void MungePedModel(tPedestrian_data* pPedestrian) {
 
     the_frame = &pPedestrian->sequences[pPedestrian->current_sequence].frames[MAX(pPedestrian->current_frame, 0)];
     if (pPedestrian->ref_number >= 100 && pPedestrian->current_action == pPedestrian->fatal_car_impact_action) {
-        x_offset = the_frame->offset.v[X] * 2.0;
-        y_offset = the_frame->offset.v[Y];
+        x_offset = the_frame->offset.v[V_X] * 2.0;
+        y_offset = the_frame->offset.v[V_Y];
         pPedestrian->height2 = pPedestrian->height2 * 2.0;
         pPedestrian->width = pPedestrian->width * 2.0;
     } else {
-        x_offset = the_frame->offset.v[X];
-        y_offset = the_frame->offset.v[Y];
+        x_offset = the_frame->offset.v[V_X];
+        y_offset = the_frame->offset.v[V_Y];
     }
     pPedestrian->flipped = the_frame->flipped;
     if (pPedestrian->actor->parent != gDont_render_actor) {

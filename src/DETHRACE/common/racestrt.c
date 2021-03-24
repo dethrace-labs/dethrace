@@ -430,7 +430,8 @@ int StartRaceGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     }
     RemoveTransientBitmaps(1);
     DismissSceneyMappyInfoVieweyThing();
-    if (++gProgram_state.view_type > eVT_Opponents) {
+    gProgram_state.view_type++;
+    if (gProgram_state.view_type > eVT_Opponents) {
         gProgram_state.view_type = eVT_Scene;
     }
     if (gProgram_state.view_type) {
@@ -610,11 +611,14 @@ void SelectRaceDraw(int pCurrent_choice, int pCurrent_mode) {
         test2 = *test;
     }
     if (*test == 0x27645433 && test[1] == 0x758F0015) {
+        // cheat code: "KEVWOZEAR"
         gProgram_state.game_completed = 1;
         DRS3StartSound(gIndexed_outlets[0], 3202);
         DRS3StartSound(gIndexed_outlets[0], 3202);
     }
     if (*test == 0x33F75455 && test[1] == 0xC10AAAF2) {
+        // cheat code: "IWANTTOFIDDLE"
+
         char s[128];
         FILE* f;
         int i;
@@ -1282,10 +1286,6 @@ void SortOpponents() {
     gOur_starting_position = gCurrent_race.number_of_racers - 70 * (gCurrent_race.number_of_racers - gBest_pos_available) / 100;
     for (i = gCurrent_race.number_of_racers; i > gOur_starting_position; i--) {
         gCurrent_race.opponent_list[i] = gCurrent_race.opponent_list[i - 1];
-        // v0->index = gCurrent_race.checkpoints[9].map_right[4 * j];
-        // v0->ranking = gCurrent_race.checkpoints[9].map_right[4 * j + 1];
-        // v0->net_player_index = gCurrent_race.checkpoints[9].map_bottom[4 * j];
-        // v0->car_spec = (tCar_spec*)gCurrent_race.checkpoints[9].map_bottom[4 * j + 1];
     }
     gCurrent_race.opponent_list[gOur_starting_position].index = -1;
     gCurrent_race.opponent_list[gOur_starting_position].ranking = gProgram_state.rank;

@@ -3024,13 +3024,10 @@ enum {
 #define BR_SIMPLENEXT(n) (void*)(((br_simple_node*)(n))->next)
 #define BR_FOR_SIMPLELIST(list, ptr) for ((ptr) = BR_SIMPLEHEAD(list); (ptr); (ptr) = BR_SIMPLENEXT(ptr))
 
-#define X 0
-#define Y 1
-#define Z 2
-#define W 3
-
-#define U 0
-#define V 1
+#define V_X 0
+#define V_Y 1
+#define V_Z 2
+#define V_W 3
 
 #define BR_FONTF_PROPORTIONAL 1
 

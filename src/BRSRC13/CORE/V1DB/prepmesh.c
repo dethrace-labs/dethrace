@@ -213,7 +213,7 @@ void Smoothing(br_model* model, br_scalar crease_limit, prep_vertex** start, pre
     for (outer = start; outer < end; outer++) {
         for (inner = start; inner < end; inner++) {
             if ((inner == outer) || (model->faces[(*outer)->f].smoothing & model->faces[(*inner)->f].smoothing)) {
-                BrVector3Accumulate(&(*outer)->n, &model->faces[(*inner)->f].n);
+                BrVector3Accumulate(&(*outer)->n, (br_vector3*)&model->faces[(*inner)->f].n);
             }
         }
     }

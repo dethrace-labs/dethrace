@@ -1,9 +1,10 @@
 #ifndef _PD_NET_H_
 #define _PD_NET_H_
 
-// Jeff: Header files aren't created from of the original symbol dump, so we don't exactly know what this used to look like or be called.
-
-// Each platform build included a platform-dependant `sys` and `net` files. For example, `pc-dos/dossys.c`, `pc-dos/dosnet.c`, `winsys.c`.
+// Jeff:
+// Header files are generated from information in the original symbol dump, but we don't exactly know what this used to look like or be called.
+// Each platform build included a platform-dependant `sys` and `net` files. From the symbol dump and debug/error messages in the binaries,
+// we know of at least `pc-dos/dossys.c`, `pc-dos/dosnet.c`, `Win95sys.c`.
 // Functions contained within these files are prefixed with `PD` - we assume that is short for something like `Platform Dependant`.
 
 #include "br_types.h"

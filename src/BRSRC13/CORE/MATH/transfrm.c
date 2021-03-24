@@ -22,26 +22,26 @@ void BrTransformToMatrix34(br_matrix34* mat, br_transform* xform) {
 
         BrQuatToMatrix34(mat, &xform->t.quat.q);
 
-        mat->m[W][X] = xform->t.quat.t.v[X];
-        mat->m[W][Y] = xform->t.quat.t.v[Y];
-        mat->m[W][Z] = xform->t.quat.t.v[Z];
+        mat->m[V_W][V_X] = xform->t.quat.t.v[V_X];
+        mat->m[V_W][V_Y] = xform->t.quat.t.v[V_Y];
+        mat->m[V_W][V_Z] = xform->t.quat.t.v[V_Z];
         break;
 
     case BR_TRANSFORM_EULER:
 
         BrEulerToMatrix34(mat, &xform->t.euler.e);
 
-        mat->m[W][X] = xform->t.euler.t.v[X];
-        mat->m[W][Y] = xform->t.euler.t.v[Y];
-        mat->m[W][Z] = xform->t.euler.t.v[Z];
+        mat->m[V_W][V_X] = xform->t.euler.t.v[V_X];
+        mat->m[V_W][V_Y] = xform->t.euler.t.v[V_Y];
+        mat->m[V_W][V_Z] = xform->t.euler.t.v[V_Z];
 
         break;
 
     case BR_TRANSFORM_TRANSLATION:
         BrMatrix34Translate(mat,
-            xform->t.look_up.t.v[X],
-            xform->t.look_up.t.v[Y],
-            xform->t.look_up.t.v[Z]);
+            xform->t.look_up.t.v[V_X],
+            xform->t.look_up.t.v[V_Y],
+            xform->t.look_up.t.v[V_Z]);
 
         break;
 
@@ -59,19 +59,19 @@ void BrTransformToMatrix34(br_matrix34* mat, br_transform* xform) {
         BrVector3Normalise(&vx, &vx);
         BrVector3Cross(&vy, &vz, &vx);
 
-        mat->m[X][X] = vx.v[X];
-        mat->m[X][Y] = vx.v[Y];
-        mat->m[X][Z] = vx.v[Z];
-        mat->m[Y][X] = vy.v[X];
-        mat->m[Y][Y] = vy.v[Y];
-        mat->m[Y][Z] = vy.v[Z];
-        mat->m[Z][X] = vz.v[X];
-        mat->m[Z][Y] = vz.v[Y];
-        mat->m[Z][Z] = vz.v[Z];
+        mat->m[V_X][V_X] = vx.v[V_X];
+        mat->m[V_X][V_Y] = vx.v[V_Y];
+        mat->m[V_X][V_Z] = vx.v[V_Z];
+        mat->m[V_Y][V_X] = vy.v[V_X];
+        mat->m[V_Y][V_Y] = vy.v[V_Y];
+        mat->m[V_Y][V_Z] = vy.v[V_Z];
+        mat->m[V_Z][V_X] = vz.v[V_X];
+        mat->m[V_Z][V_Y] = vz.v[V_Y];
+        mat->m[V_Z][V_Z] = vz.v[V_Z];
 
-        mat->m[W][X] = xform->t.look_up.t.v[X];
-        mat->m[W][Y] = xform->t.look_up.t.v[Y];
-        mat->m[W][Z] = xform->t.look_up.t.v[Z];
+        mat->m[V_W][V_X] = xform->t.look_up.t.v[V_X];
+        mat->m[V_W][V_Y] = xform->t.look_up.t.v[V_Y];
+        mat->m[V_W][V_Z] = xform->t.look_up.t.v[V_Z];
     } break;
 
     case BR_TRANSFORM_IDENTITY:
