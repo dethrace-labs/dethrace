@@ -45,11 +45,11 @@ jobs:
         echo "$Env:TEMP\ninja" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         ninja --version
         
-    - name: Configure Deathrace
+    - name: Configure
       run: |
         cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSDL2=ON "-DSDL2_ROOT_DIR=$($Env:TEMP)\SDL2-2.0.12" -B build
 
-    - name: Build Deathrace
+    - name: Build
       run: |
         cmake --build build --config RelWithDebInfo
 

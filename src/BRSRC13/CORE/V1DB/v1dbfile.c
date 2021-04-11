@@ -217,6 +217,7 @@ struct {
 #define DF_MODEL 8
 #define DF_TRANSFORM 16
 #define DF_BOUNDS 19
+int gFace_order_key = 0;
 
 char rscid[53];
 
@@ -322,6 +323,7 @@ int FopRead_FACES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 
             mp->faces[i].smoothing = -1;
         }
         mp->faces[i].index = i;
+        mp->faces[i].order_key = gFace_order_key++;
     }
 
     return 0;

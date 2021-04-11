@@ -97,7 +97,13 @@ void BrMatrix34PreTransform(br_matrix34* mat, br_transform* xform) {
 void BrMatrix34PostTransform(br_matrix34* mat, br_transform* xform) {
     br_matrix34 tmp;
     LOG_TRACE("(%p, %p)", mat, xform);
-    NOT_IMPLEMENTED();
+
+    if (xform->type == BR_TRANSFORM_IDENTITY) {
+        return;
+    }
+
+    BrTransformToMatrix34(&tmp, xform);
+    BrMatrix34Post(mat, &tmp);
 }
 
 // IDA: void __cdecl BrMatrix4PreTransform(br_matrix4 *mat, br_transform *xform)

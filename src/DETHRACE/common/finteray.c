@@ -1,5 +1,7 @@
 #include "finteray.h"
 #include "brender.h"
+#include "globvars.h"
+#include "raycast.h"
 #include <stdlib.h>
 
 br_matrix34 gPick_model_to_view;
@@ -18,7 +20,9 @@ tFace_ref* gPling_face;
 // IDA: void __usercall DRVector2AccumulateScale(br_vector2 *a@<EAX>, br_vector2 *b@<EDX>, br_scalar s)
 void DRVector2AccumulateScale(br_vector2* a, br_vector2* b, br_scalar s) {
     LOG_TRACE("(%p, %p, %f)", a, b, s);
-    NOT_IMPLEMENTED();
+
+    a->v[0] = b->v[0] * s + a->v[0];
+    a->v[1] = b->v[1] * s + a->v[1];
 }
 
 // IDA: int __usercall ActorRayPick2D@<EAX>(br_actor *ap@<EAX>, br_vector3 *pPosition@<EDX>, br_vector3 *pDir@<EBX>, br_model *model@<ECX>, br_material *material, dr_pick2d_cbfn *callback)
@@ -47,13 +51,33 @@ int DRSceneRayPick2D(br_actor* world, br_vector3* pPosition, br_vector3* pDir, d
 // IDA: int __cdecl FindHighestPolyCallBack(br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3 *pPoint, br_vector2 *pMap, void *pArg)
 int FindHighestPolyCallBack(br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3* pPoint, br_vector2* pMap, void* pArg) {
     LOG_TRACE("(%p, %p, %p, %p, %f, %d, %d, %d, %p, %p, %p)", pModel, pMaterial, pRay_pos, pRay_dir, pT, pF, pE, pV, pPoint, pMap, pArg);
-    NOT_IMPLEMENTED();
+
+    if (pPoint->v[1] > gCurrent_y) {
+        if (gLowest_y_above > pPoint->v[1]) {
+            gLowest_y_above = pPoint->v[1];
+            gAbove_face_index = pF;
+            gAbove_model = pModel;
+            LOG_DEBUG("mat %s, raypos x %f, y %f, z %f", pMaterial->identifier, pRay_pos->v[0], pRay_pos->v[1], pRay_pos->v[2]);
+            LOG_DEBUG("foundhighabove face %d, x %f, y %f, z %f", pF, pPoint->v[0], pPoint->v[1], pPoint->v[2]);
+        }
+    } else if (pPoint->v[1] > gHighest_y_below) {
+        gHighest_y_below = pPoint->v[1];
+        gBelow_face_index = pF;
+        gBelow_model = pModel;
+        //LOG_DEBUG("foundhighbelow '%s', face %d, y %f", pModel->identifier, pF, pPoint->v[1]);
+    }
+    return 0;
 }
 
 // IDA: int __cdecl FindHighestCallBack(br_actor *pActor, br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT_near, br_scalar pT_far, void *pArg)
 int FindHighestCallBack(br_actor* pActor, br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT_near, br_scalar pT_far, void* pArg) {
     LOG_TRACE("(%p, %p, %p, %p, %p, %f, %f, %p)", pActor, pModel, pMaterial, pRay_pos, pRay_dir, pT_near, pT_far, pArg);
-    NOT_IMPLEMENTED();
+
+    if (gProgram_state.current_car.current_car_actor < 0
+        || gProgram_state.current_car.car_model_actors[gProgram_state.current_car.current_car_actor].actor != pActor) {
+        DRModelPick2D(pModel, pMaterial, pRay_pos, pRay_dir, pT_near, pT_far, FindHighestPolyCallBack, pArg);
+    }
+    return 0;
 }
 
 // IDA: void __usercall FindFace(br_vector3 *pPosition@<EAX>, br_vector3 *pDir@<EDX>, br_vector3 *nor@<EBX>, br_scalar *t@<ECX>, br_material **material)
