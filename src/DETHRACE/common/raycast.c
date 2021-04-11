@@ -137,8 +137,6 @@ int ActorPick2D(br_actor* ap, br_model* model, br_material* material, dr_pick2d_
     br_vector3 dir;
     LOG_TRACE("(%p, %p, %p, %p, %p)", ap, model, material, callback, arg);
 
-    LOG_DEBUG("picking actor %s", ap->identifier);
-
     r = 0;
     if (ap->model) {
         this_model = ap->model;
@@ -169,7 +167,7 @@ int ActorPick2D(br_actor* ap, br_model* model, br_material* material, dr_pick2d_
             dir.v[0] = -v_to_m.m[2][0];
             dir.v[1] = -v_to_m.m[2][1];
             dir.v[2] = -v_to_m.m[2][2];
-            //LOG_DEBUG("model name: '%s', n %f, f %f", this_model->identifier, t_near, t_far); //"6 7"  near=0, far=75.542
+
             r = callback(
                 ap,
                 this_model,
@@ -282,10 +280,7 @@ int DRModelPick2D(br_model* model, br_material* material, br_vector3* ray_pos, b
     double f_numerator;
     LOG_TRACE("(%p, %p, %p, %p, %f, %f, %p, %p)", model, material, ray_pos, ray_dir, t_near, t_far, callback, arg);
 
-    LOG_DEBUG("picking model %s, groups: %d", model->identifier, V11MODEL(model)->ngroups);
-
     for (group = 0; group < V11MODEL(model)->ngroups; group++) {
-        LOG_DEBUG("group %d, nfaces %d", group, V11MODEL(model)->groups[group].nfaces);
         for (f = 0; f < V11MODEL(model)->groups[group].nfaces; f++) {
             fp = &V11MODEL(model)->groups[group].faces[f];
             if (V11MODEL(model)->groups[group].face_colours_material) {
@@ -294,10 +289,8 @@ int DRModelPick2D(br_model* model, br_material* material, br_vector3* ray_pos, b
                 this_material = material;
             }
             d = fp->eqn.v[1] * ray_dir->v[1] + fp->eqn.v[2] * ray_dir->v[2] + fp->eqn.v[0] * ray_dir->v[0];
-            //LOG_DEBUG("outside d %f, eq[1] %f, eq[2] %f, eq[0] %f", d, fp->eqn.v[1], fp->eqn.v[2], fp->eqn.v[0]);
             if (fabs(d) >= 0.00000023841858 && ((this_material->flags & 0x1800) != 0 || d <= 0.0)) // BR_MATF_TWO_SIDED | BR_MATF_ALWAYS_VISIBLE
             {
-                //  LOG_DEBUG("inside g %d, f %d, d %f", group, f, d);
                 numerator = fp->eqn.v[1] * ray_pos->v[1]
                     + fp->eqn.v[2] * ray_pos->v[2]
                     + fp->eqn.v[0] * ray_pos->v[0]
@@ -327,8 +320,6 @@ int DRModelPick2D(br_model* model, br_material* material, br_vector3* ray_pos, b
                             axis_1 = 2;
                         }
 
-                        LOG_DEBUG("t %f, p (%f, %f, %f), axis_m %d, axis_0 %d, axis_1 %d", t, p.v[0], p.v[1], p.v[2], axis_m, axis_0, axis_1);
-
                         v0 = V11MODEL(model)->groups[group].vertices[fp->vertices[0]].p.v[axis_0];
                         u0 = V11MODEL(model)->groups[group].vertices[fp->vertices[0]].p.v[axis_1];
                         v1 = V11MODEL(model)->groups[group].vertices[fp->vertices[1]].p.v[axis_0] - v0;
@@ -336,15 +327,12 @@ int DRModelPick2D(br_model* model, br_material* material, br_vector3* ray_pos, b
                         v2 = V11MODEL(model)->groups[group].vertices[fp->vertices[2]].p.v[axis_0] - v0;
                         u2 = V11MODEL(model)->groups[group].vertices[fp->vertices[2]].p.v[axis_1] - u0;
 
-                        LOG_DEBUG("v0 %f, %f, %f, %f, %f, %f", v0, u0, v1, u1, v2, u2);
-
                         v0i1 = p.v[axis_0] - v0;
                         v0i2 = p.v[axis_1] - u0;
                         if (fabs(v1) > 0.0000002384185791015625) {
                             f_d = v0i2 * v1 - u1 * v0i1;
                             f_n = u2 * v1 - u1 * v2;
                             if (f_d == 0) {
-                                LOG_DEBUG("hitting continue");
                                 continue;
                             }
                             beta = f_d / f_n;
@@ -397,7 +385,6 @@ int DRModelPick2D(br_model* model, br_material* material, br_vector3* ray_pos, b
                                 &map,
                                 arg);
                             if (r) {
-                                LOG_DEBUG("returning %d", r);
                                 return r;
                             }
                         }
@@ -413,7 +400,6 @@ int DRModelPick2D(br_model* model, br_material* material, br_vector3* ray_pos, b
 void FindBestY(br_vector3* pPosition, br_actor* gWorld, br_scalar pStarting_height, br_scalar* pNearest_y_above, br_scalar* pNearest_y_below, br_model** pNearest_above_model, br_model** pNearest_below_model, int* pNearest_above_face_index, int* pNearest_below_face_index) {
     LOG_TRACE("(%p, %p, %f, %p, %p, %p, %p, %p, %p)", pPosition, gWorld, pStarting_height, pNearest_y_above, pNearest_y_below, pNearest_above_model, pNearest_below_model, pNearest_above_face_index, pNearest_below_face_index);
 
-    LOG_DEBUG("position: %f, %f, %f", pPosition->v[0], pPosition->v[1], pPosition->v[2]);
     gLowest_y_above = 30000.0;
     gHighest_y_below = -30000.0;
     gCurrent_y = pPosition->v[1] + 0.000011920929;

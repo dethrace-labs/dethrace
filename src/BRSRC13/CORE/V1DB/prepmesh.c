@@ -465,13 +465,11 @@ void PrepareGroups(br_model* model) {
     for (v = 0, g = 0, count = 0; v < ntemps - 1; v++) {
 
         if (model->faces[sorted_vertices[v]->f].material != model->faces[sorted_vertices[v + 1]->f].material) {
-            LOG_DEBUG("splitting verts at end of group %d %d", count);
             g++;
             v11g[g].vertices = v11v + count + 1;
             v11g[g].vertex_colours = v11vcolours + count + 1;
             v11g[g].vertex_user = v11vuser + count + 1;
             v11g[g].nvertices = 0;
-            //count = 0;
         }
 
         old_count = count;
@@ -497,46 +495,6 @@ void PrepareGroups(br_model* model) {
             v11g[g].faces[f].vertices[2] = temp_verts[v + 2].v - i;
         }
         minus += v11g[g].nfaces * 3;
-    }
-
-    // how to convert an index in the global vertex array to an index in the per-group array?
-    // group collects all faces with same material. Each face could have completely different vertices attached
-
-    if (model->identifier != NULL && strcmp(model->identifier, "6 7") == 0) {
-
-        for (f = 0; f < model->nfaces; f++) {
-            LOG_DEBUG("face %d %s", sorted_faces[f]->order_key, sorted_faces[f]->material->identifier);
-            for (i = 0; i < 3; i++) {
-                int v = sorted_faces[f]->vertices[i];
-                LOG_DEBUG(" %f %f %f", model->vertices[v].p.v[0], model->vertices[v].p.v[1], model->vertices[v].p.v[2]);
-            }
-        }
-        LOG_DEBUG("----");
-        LOG_DEBUG("groups %d", ng);
-        for (g = 0; g < ng; g++) {
-            LOG_DEBUG("group %d, faces %d, nverts %d", g, v11g[g].nfaces, v11g[g].nvertices);
-            for (f = 0; f < v11g[g].nfaces; f++) {
-                LOG_DEBUG("face %d", v11g[g].face_user[f]);
-                LOG_DEBUG(" vx %d %d %d", v11g[g].faces[f].vertices[0], v11g[g].faces[f].vertices[1], v11g[g].faces[f].vertices[2]);
-                if (v11g[g].faces[f].vertices[0] > v11g[g].nvertices || v11g[g].faces[f].vertices[1] > v11g[g].nvertices || v11g[g].faces[f].vertices[2] > v11g[g].nvertices) {
-                    LOG_PANIC("this is a problem!")
-                }
-                LOG_DEBUG(" vx %d %d %d", v11g[g].faces[f].vertices[0], v11g[g].faces[f].vertices[1], v11g[g].faces[f].vertices[2]);
-                for (i = 0; i < 3; i++) {
-                    int vindex = v11g[g].faces[f].vertices[i];
-                    LOG_DEBUG(" v %f %f %f", v11g[g].vertices[vindex].p.v[0], v11g[g].vertices[vindex].p.v[1], v11g[g].vertices[vindex].p.v[2]);
-                }
-                // LOG_DEBUG(" v %f %f %f", v11g[g].vertices[f].p.v[0], v11g[g].vertices[f].p.v[1], v11g[g].vertices[f].p.v[2]);
-                // LOG_DEBUG(" v %f %f %f", v11g[g].vertices[f].p.v[0], v11g[g].vertices[f].p.v[1], v11g[g].vertices[f].p.v[2]);
-                // LOG_DEBUG(" face %d %d %d", v11g[g].faces[f].vertices[0], v11g[g].faces[f].vertices[1], v11g[g].faces[f].vertices[2]);
-            }
-            // LOG_DEBUG("group %d, verts %d", g, v11g[g].nvertices);
-            // for (f = 0; f < v11g[g].nvertices; f++) {
-            //     LOG_DEBUG(" v %f %f %f", v11g[g].vertices[f].p.v[0], v11g[g].vertices[f].p.v[1], v11g[g].vertices[f].p.v[2]);
-            // }
-        }
-
-        //LOG_PANIC("exit");
     }
     BrScratchFree(temp_verts);
 }

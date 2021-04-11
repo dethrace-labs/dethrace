@@ -868,7 +868,8 @@ void MungeOpponents(tU32 pFrame_period) {
 void SetInitialCopPositions() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __usercall InitOpponents(tRace_info *pRace_info@<EAX>)
@@ -879,7 +880,8 @@ void InitOpponents(tRace_info* pRace_info) {
     int skill_dependent_difficulty;
     br_bounds bounds;
     LOG_TRACE("(%p)", pRace_info);
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __cdecl DisposeOpponents()

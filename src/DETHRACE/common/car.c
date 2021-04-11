@@ -1,9 +1,12 @@
 #include "car.h"
 #include "brender.h"
 #include "globvars.h"
+#include "globvrkm.h"
 #include "globvrpb.h"
 #include "netgame.h"
+#include "opponent.h"
 #include "raycast.h"
+#include "utility.h"
 #include <stdlib.h>
 
 float gEngine_powerup_factor[6];
@@ -221,7 +224,33 @@ void InitialiseCarsEtc(tRace_info* pThe_race) {
     tCar_spec* car;
     br_bounds bnds;
     LOG_TRACE("(%p)", pThe_race);
-    NOT_IMPLEMENTED();
+
+    gProgram_state.initial_position = pThe_race->initial_position;
+    gProgram_state.initial_yaw = pThe_race->initial_yaw;
+    BrActorToBounds(&bnds, gProgram_state.track_spec.the_actor);
+    gMin_world_y = bnds.min.v[1];
+    gNum_active_non_cars = 0;
+    for (cat = eVehicle_self; cat <= eVehicle_not_really; ++cat) {
+        if (cat) {
+            car_count = GetCarCount(cat);
+        } else {
+            car_count = 1;
+        }
+        for (i = 0; car_count > i; ++i) {
+            PossibleService();
+            if (cat) {
+                car = GetCarSpec(cat, i);
+            } else {
+                car = &gProgram_state.current_car;
+            }
+            if (cat != eVehicle_not_really) {
+                InitialiseCar(car);
+            }
+        }
+    }
+    gCamera_yaw = 0;
+    InitialiseExternalCamera();
+    gMechanics_time_sync = 0;
 }
 
 // IDA: void __usercall GetAverageGridPosition(tRace_info *pThe_race@<EAX>)
@@ -338,7 +367,6 @@ LABEL_17:
         LOG_DEBUG("found pos 3: %f, x: %f, z: %f", nearest_y_above, car_actor->t.t.translate.t.v[0], car_actor->t.t.translate.t.v[2]);
         car_actor->t.t.translate.t.v[1] = nearest_y_above;
     }
-    LOG_PANIC("exit");
     BrMatrix34PreRotateY(&car_actor->t.t.mat, initial_yaw);
     if (gNet_mode) {
         BrMatrix34Copy(
