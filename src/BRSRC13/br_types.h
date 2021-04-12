@@ -1244,6 +1244,7 @@ typedef struct br_face {
     br_uint_16 vertices[3];
     br_uint_16 smoothing;
     br_material* material;
+    br_uint_8 index;
     br_uint_8 red;
     br_uint_8 grn;
     br_uint_8 blu;
@@ -1252,8 +1253,6 @@ typedef struct br_face {
     br_uint_32 _pad1;
     br_fvector3 n;
     br_scalar d;
-    br_uint_8 index;
-    int order_key; //added by jeff to give us stable ordering for debugging
 } br_face;
 
 typedef struct br_primitive_list br_primitive_list;

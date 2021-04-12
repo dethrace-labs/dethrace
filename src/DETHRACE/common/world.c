@@ -2098,13 +2098,10 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     ExtractColumns(pTrack_spec);
     for (i = 0; gTrack_storage_space.models_count > i; ++i) {
         PossibleService();
-        //v80 = 0;
         if (gTrack_storage_space.models[i] && gTrack_storage_space.models[i]->flags & 0x82) {
             gTrack_storage_space.models[i]->flags &= 0xFF7Du;
             for (group = 0; group < V11MODEL(gTrack_storage_space.models[i])->ngroups; group++) {
-                LOG_DEBUG("overriding face_colors for %s", gTrack_storage_space.models[i]->identifier);
                 int f = V11MODEL(gTrack_storage_space.models[i])->groups[group].face_user[0];
-                LOG_DEBUG("f %d", f);
                 material = gTrack_storage_space.models[i]->faces[f].material;
                 V11MODEL(gTrack_storage_space.models[i])->groups[group].face_colours_material = material;
                 if (material && !material->index_shade) {

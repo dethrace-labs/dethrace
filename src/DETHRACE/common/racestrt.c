@@ -1564,7 +1564,7 @@ tSO_result DoGridPosition() {
         if (gBest_pos_available > 1
             && (gOpponents[gCurrent_race.opponent_list[0].index].car_number >= 0
                 || gOpponents[gCurrent_race.opponent_list[1].index].car_number >= 0)
-            && PercentageChance(100)) {
+            && PercentageChance(10)) {
             gChallenge_time = PDGetTotalTime() + IRandomBetween(1000, 10000);
         } else {
             gChallenge_time = 0;

@@ -213,7 +213,8 @@ void InitialiseCar2(tCar_spec* pCar, int pClear_disabled_flag) {
 // IDA: void __usercall InitialiseCar(tCar_spec *pCar@<EAX>)
 void InitialiseCar(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    InitialiseCar2(pCar, 1)
 }
 
 // IDA: void __usercall InitialiseCarsEtc(tRace_info *pThe_race@<EAX>)

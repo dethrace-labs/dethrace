@@ -54,17 +54,6 @@ int FacesCompare(const void* p1, const void* p2) {
     f1 = *(br_face**)p1;
     f2 = *(br_face**)p2;
 
-    // Added by Jeff to give us stable ordering for debugging
-    // if (f1->material == f2->material) {
-    //     return 0;
-    // }
-    // if (f1->order_key > f2->order_key) {
-    //     return 1;
-    // }
-    // return -1;
-    // //////
-
-    // Original code:
     if (f1->material > f2->material) {
         return 1;
     }
@@ -485,7 +474,6 @@ void PrepareGroups(br_model* model) {
 
     sorted_vertices[v]->v = count;
 
-    int minus = 0;
     for (g = 0; g < ng; g++) {
         for (f = 0; f < v11g[g].nfaces; f++) {
             i = v11g[g].vertices - v11v;
@@ -494,7 +482,6 @@ void PrepareGroups(br_model* model) {
             v11g[g].faces[f].vertices[1] = temp_verts[v + 1].v - i;
             v11g[g].faces[f].vertices[2] = temp_verts[v + 2].v - i;
         }
-        minus += v11g[g].nfaces * 3;
     }
     BrScratchFree(temp_verts);
 }

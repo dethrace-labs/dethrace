@@ -57,14 +57,11 @@ int FindHighestPolyCallBack(br_model* pModel, br_material* pMaterial, br_vector3
             gLowest_y_above = pPoint->v[1];
             gAbove_face_index = pF;
             gAbove_model = pModel;
-            LOG_DEBUG("mat %s, raypos x %f, y %f, z %f", pMaterial->identifier, pRay_pos->v[0], pRay_pos->v[1], pRay_pos->v[2]);
-            LOG_DEBUG("foundhighabove face %d, x %f, y %f, z %f", pF, pPoint->v[0], pPoint->v[1], pPoint->v[2]);
         }
     } else if (pPoint->v[1] > gHighest_y_below) {
         gHighest_y_below = pPoint->v[1];
         gBelow_face_index = pF;
         gBelow_model = pModel;
-        //LOG_DEBUG("foundhighbelow '%s', face %d, y %f", pModel->identifier, pF, pPoint->v[1]);
     }
     return 0;
 }

@@ -63,7 +63,7 @@ void InitRayCasting() {
 int BadDiv(br_scalar a, br_scalar b) {
     //LOG_TRACE("(%f, %f)", a, b);
 
-    return fabs(b) < 1.0 && fabs(a) > fabs(b) * 3.4028235e38;
+    return fabs(b) < 1.0 && fabs(a) > fabs(b) * BR_SCALAR_MAX;
 }
 
 // IDA: int __usercall PickBoundsTestRay@<EAX>(br_bounds *b@<EAX>, br_vector3 *rp@<EDX>, br_vector3 *rd@<EBX>, br_scalar t_near, br_scalar t_far, br_scalar *new_t_near, br_scalar *new_t_far)
@@ -81,38 +81,38 @@ int PickBoundsTestRay(br_bounds* b, br_vector3* rp, br_vector3* rd, br_scalar t_
                 }
             } else {
                 s = (1.0f / rd->v[i]) * (rp->v[i] - b->max.v[i]);
-                if (s >= -3.4028235e38) {
+                if (s >= BR_SCALAR_MIN) {
                     if (s < t_far) {
                         t_far = (1.0f / rd->v[i]) * (rp->v[i] - b->max.v[i]);
                     }
                 } else {
-                    t_far = -3.4028235e38;
+                    t_far = BR_SCALAR_MIN;
                 }
                 t = (1.0f / rd->v[i]) * (rp->v[i] - b->min.v[i]);
-                if (t <= 3.4028235e38) {
+                if (t <= BR_SCALAR_MAX) {
                     if (t > t_near) {
                         t_near = (1.0f / rd->v[i]) * (rp->v[i] - b->min.v[i]);
                     }
                 } else {
-                    t_near = 3.4028235e38;
+                    t_near = BR_SCALAR_MAX;
                 }
             }
         } else {
             s = (1.0f / rd->v[i]) * (rp->v[i] - b->max.v[i]);
-            if (s <= 3.4028235e38) {
+            if (s <= BR_SCALAR_MAX) {
                 if (s > t_near) {
                     t_near = (1.0f / rd->v[i]) * (rp->v[i] - b->max.v[i]);
                 }
             } else {
-                t_near = 3.4028235e38;
+                t_near = BR_SCALAR_MAX;
             }
             t = (1.0f / rd->v[i]) * (rp->v[i] - b->min.v[i]);
-            if (t >= -3.4028235e38) {
+            if (t >= BR_SCALAR_MIN) {
                 if (t < t_far) {
                     t_far = (1.0f / rd->v[i]) * (rp->v[i] - b->min.v[i]);
                 }
             } else {
-                t_far = -3.4028235e38;
+                t_far = BR_SCALAR_MIN;
             }
         }
     }
@@ -161,7 +161,7 @@ int ActorPick2D(br_actor* ap, br_model* model, br_material* material, dr_pick2d_
                 (br_vector3*)v_to_m.m[3],
                 (br_vector3*)v_to_m.m[2],
                 0.0,
-                3.4028235e38,
+                BR_SCALAR_MAX,
                 &t_near,
                 &t_far)) {
             dir.v[0] = -v_to_m.m[2][0];
@@ -193,7 +193,7 @@ int ActorPick2D(br_actor* ap, br_model* model, br_material* material, dr_pick2d_
                 (br_vector3*)v_to_m.m[3],
                 (br_vector3*)v_to_m.m[2],
                 0.0,
-                3.4028235e38,
+                BR_SCALAR_MAX,
                 &t_near,
                 &t_far)) {
             for (a = ap->children; a != NULL; a = a->next) {
