@@ -56,12 +56,18 @@ br_uint_32 BrMaterialEnum(char* pattern, br_material_enum_cbfn* callback, void* 
 void BrMatrix23Identity(br_matrix23* mat);
 
 void BrMatrix34Identity(br_matrix34* mat);
+void BrMatrix34ApplyV(br_vector3* A, br_vector3* B, br_matrix34* C);
 br_scalar BrMatrix34Inverse(br_matrix34* B, br_matrix34* A);
 void BrMatrix34ApplyP(br_vector3* A, br_vector3* B, br_matrix34* C);
 void BrMatrix34Scale(br_matrix34* mat, br_scalar sx, br_scalar sy, br_scalar sz);
 void BrMatrix34PostTranslate(br_matrix34* mat, br_scalar x, br_scalar y, br_scalar z);
 void BrMatrix34Mul(br_matrix34* A, br_matrix34* B, br_matrix34* C);
 void BrMatrix34Copy(br_matrix34* A, br_matrix34* B);
+void BrMatrix34PreRotateY(br_matrix34* mat, br_angle ry);
+void BrMatrix34RotateY(br_matrix34* mat, br_angle ry);
+void BrMatrix34PostScale(br_matrix34* mat, br_scalar sx, br_scalar sy, br_scalar sz);
+void BrMatrix34PreTransform(br_matrix34* mat, br_transform* xform);
+void BrMatrix34PostTransform(br_matrix34* mat, br_transform* xform);
 
 // BrMem
 void BrMemFree(void* block);
@@ -105,6 +111,9 @@ br_pixelmap* BrTableAdd(br_pixelmap* pixelmap);
 br_pixelmap* BrTableFind(char* pattern);
 br_pixelmap* BrTableRemove(br_pixelmap* pixelmap);
 br_uint_32 BrTableAddMany(br_pixelmap** items, int n);
+
+// BrTransform
+void BrTransformToMatrix34(br_matrix34* mat, br_transform* xform);
 
 // BrV1db
 void BrV1dbBeginWrapper_Float();

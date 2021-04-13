@@ -2006,12 +2006,6 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
             p[0] = pRace_info->checkpoints[i].vertices[j][0];
             p[1] = pRace_info->checkpoints[i].vertices[j][1];
             p[2] = pRace_info->checkpoints[i].vertices[j][2];
-            // v77 = p[1].v[0] - p[0].v[0];
-            // v78 = p[1].v[1] - p[0].v[1];
-            // v79 = p[1].v[2] - p[0].v[2];
-            // v74 = p[2].v[0] - p[0].v[0];
-            // v75 = p[2].v[1] - p[0].v[1];
-            // v76 = p[2].v[2] - p[0].v[2];
             pRace_info->checkpoints[i].normal[j].v[0] = (p[2].v[2] - p[0].v[2]) * (p[1].v[1] - p[0].v[1]) - (p[1].v[2] - p[0].v[2]) * (p[2].v[1] - p[0].v[1]);
             pRace_info->checkpoints[i].normal[j].v[1] = (p[1].v[2] - p[0].v[2]) * (p[2].v[0] - p[0].v[0]) - (p[2].v[2] - p[0].v[2]) * (p[1].v[0] - p[0].v[0]);
             pRace_info->checkpoints[i].normal[j].v[2] = (p[2].v[1] - p[0].v[1]) * (p[1].v[0] - p[0].v[0]) - (p[1].v[1] - p[0].v[1]) * (p[2].v[0] - p[0].v[0]);
@@ -2104,18 +2098,16 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     ExtractColumns(pTrack_spec);
     for (i = 0; gTrack_storage_space.models_count > i; ++i) {
         PossibleService();
-        //v80 = 0;
         if (gTrack_storage_space.models[i] && gTrack_storage_space.models[i]->flags & 0x82) {
             gTrack_storage_space.models[i]->flags &= 0xFF7Du;
-            for (group = 0; V11MODEL(gTrack_storage_space.models[i])->ngroups > group; ++group) {
-                // TODO: ?
-                // material = gTrack_storage_space.models[i]->faces[V11MODEL(*gTrack_storage_space.models[i])->groups[group].face_user].material;
-                // *gTrack_storage_space.models[i]->prepared->groups[group].face_colours = (br_colour)material;
-                // if (material && !material->index_shade) {
-                //     v9 = BrTableFind("DRRENDER.TAB");
-                //     material->index_shade = v9;
-                //     BrMaterialUpdate(material, 0x7FFFu);
-                // }
+            for (group = 0; group < V11MODEL(gTrack_storage_space.models[i])->ngroups; group++) {
+                int f = V11MODEL(gTrack_storage_space.models[i])->groups[group].face_user[0];
+                material = gTrack_storage_space.models[i]->faces[f].material;
+                V11MODEL(gTrack_storage_space.models[i])->groups[group].face_colours_material = material;
+                if (material && !material->index_shade) {
+                    material->index_shade = BrTableFind("DRRENDER.TAB");
+                    BrMaterialUpdate(material, 0x7FFFu);
+                }
             }
             DodgyModelUpdate(gTrack_storage_space.models[i]);
         }

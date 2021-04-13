@@ -476,10 +476,11 @@ void PrepareGroups(br_model* model) {
 
     for (g = 0; g < ng; g++) {
         for (f = 0; f < v11g[g].nfaces; f++) {
+            i = v11g[g].vertices - v11v;
             v = v11g[g].face_user[f] * 3;
-            v11g[g].faces[f].vertices[0] = temp_verts[v + 0].v;
-            v11g[g].faces[f].vertices[1] = temp_verts[v + 1].v;
-            v11g[g].faces[f].vertices[2] = temp_verts[v + 2].v;
+            v11g[g].faces[f].vertices[0] = temp_verts[v + 0].v - i;
+            v11g[g].faces[f].vertices[1] = temp_verts[v + 1].v - i;
+            v11g[g].faces[f].vertices[2] = temp_verts[v + 2].v - i;
         }
     }
     BrScratchFree(temp_verts);

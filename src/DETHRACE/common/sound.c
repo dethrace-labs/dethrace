@@ -198,7 +198,8 @@ void InitSoundSources() {
     int toggle;
     tCar_spec* the_car;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __cdecl DisposeSoundSources()

@@ -4,6 +4,16 @@
 #include "br_types.h"
 #include "dr_types.h"
 
+extern br_matrix34 gPick_model_to_view_raycast; //added _raycast suffix to avoid name collision
+extern int gBelow_face_index;
+extern br_scalar gCurrent_y;
+extern int gAbove_face_index;
+extern br_model* gAbove_model;
+extern br_model* gBelow_model;
+extern br_scalar gHighest_y_below;
+extern br_actor* gY_picking_camera;
+extern br_scalar gLowest_y_above;
+
 int DRActorToRoot(br_actor* a, br_actor* world, br_matrix34* m);
 
 void InitRayCasting();

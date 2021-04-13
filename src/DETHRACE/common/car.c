@@ -1,4 +1,12 @@
 #include "car.h"
+#include "brender.h"
+#include "globvars.h"
+#include "globvrkm.h"
+#include "globvrpb.h"
+#include "netgame.h"
+#include "opponent.h"
+#include "raycast.h"
+#include "utility.h"
 #include <stdlib.h>
 
 float gEngine_powerup_factor[6];
@@ -205,7 +213,8 @@ void InitialiseCar2(tCar_spec* pCar, int pClear_disabled_flag) {
 // IDA: void __usercall InitialiseCar(tCar_spec *pCar@<EAX>)
 void InitialiseCar(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    InitialiseCar2(pCar, 1);
 }
 
 // IDA: void __usercall InitialiseCarsEtc(tRace_info *pThe_race@<EAX>)
@@ -216,7 +225,33 @@ void InitialiseCarsEtc(tRace_info* pThe_race) {
     tCar_spec* car;
     br_bounds bnds;
     LOG_TRACE("(%p)", pThe_race);
-    NOT_IMPLEMENTED();
+
+    gProgram_state.initial_position = pThe_race->initial_position;
+    gProgram_state.initial_yaw = pThe_race->initial_yaw;
+    BrActorToBounds(&bnds, gProgram_state.track_spec.the_actor);
+    gMin_world_y = bnds.min.v[1];
+    gNum_active_non_cars = 0;
+    for (cat = eVehicle_self; cat <= eVehicle_not_really; ++cat) {
+        if (cat) {
+            car_count = GetCarCount(cat);
+        } else {
+            car_count = 1;
+        }
+        for (i = 0; car_count > i; ++i) {
+            PossibleService();
+            if (cat) {
+                car = GetCarSpec(cat, i);
+            } else {
+                car = &gProgram_state.current_car;
+            }
+            if (cat != eVehicle_not_really) {
+                InitialiseCar(car);
+            }
+        }
+    }
+    gCamera_yaw = 0;
+    InitialiseExternalCamera();
+    gMechanics_time_sync = 0;
 }
 
 // IDA: void __usercall GetAverageGridPosition(tRace_info *pThe_race@<EAX>)
@@ -250,14 +285,108 @@ void SetInitialPosition(tRace_info* pThe_race, int pCar_index, int pGrid_index) 
     br_matrix34 initial_yaw_matrix;
     br_bounds bnds;
     LOG_TRACE("(%p, %d, %d)", pThe_race, pCar_index, pGrid_index);
-    NOT_IMPLEMENTED();
+
+    car_actor = pThe_race->opponent_list[pCar_index].car_spec->car_master_actor;
+    car = pThe_race->opponent_list[pCar_index].car_spec;
+    BrMatrix34Identity(&car_actor->t.t.mat);
+    place_on_grid = 1;
+    if (gNet_mode && !gCurrent_net_game->options.grid_start && pThe_race->number_of_net_start_points) {
+        TELL_ME_IF_WE_PASS_THIS_WAY();
+        // start_i = IRandomBetween(0, pThe_race->number_of_net_start_points - 1);
+        // i = start_i;
+        // while (1) {
+        //     PossibleService();
+        //     for (j = 0; gNumber_of_net_players > j; ++j) {
+        //         if (j != pCar_index) {
+        //             v19 = pThe_race->opponent_list[j].car_spec->car_master_actor->t.t.translate.t.v[0];
+        //             v20 = pThe_race->opponent_list[j].car_spec->car_master_actor->t.t.translate.t.v[1];
+        //             v21 = pThe_race->opponent_list[j].car_spec->car_master_actor->t.t.translate.t.v[2];
+        //             if (v19 > 500.0) {
+        //                 v19 = v19 - 1000.0f;
+        //                 v20 = v20 - 1000.0f;
+        //                 v21 = v21 - 1000.0f;
+        //             }
+        //             dist.v[0] = v19 - pThe_race->net_starts[start_i].pos.v[0];
+        //             dist.v[1] = v20 - pThe_race->net_starts[start_i].pos.v[1];
+        //             dist.v[2] = v21 - pThe_race->net_starts[start_i].pos.v[2];
+        //             if (dist.v[1] * dist.v[1] + dist.v[2] * dist.v[2] + dist.v[0] * dist.v[0] < 16.0) {
+        //                 break;
+        //             }
+        //         }
+        //     }
+        //     if (gNumber_of_net_players == j) {
+        //         break;
+        //     }
+        //     if (pThe_race->number_of_net_start_points == ++start_i) {
+        //         start_i = 0;
+        //     }
+        //     if (i == start_i) {
+        //         goto LABEL_17;
+        //     }
+        // }
+        // car_actor->t.t.translate.t.v[0] = pThe_race->net_starts[start_i].pos.v[0];
+        // car_actor->t.t.translate.t.v[1] = pThe_race->net_starts[start_i].pos.v[1];
+        // car_actor->t.t.translate.t.v[2] = pThe_race->net_starts[start_i].pos.v[2];
+        // initial_yaw[0] = (__int64)(pThe_race->net_starts[start_i].yaw * 182.0444444444445);
+        // place_on_grid = 0;
+    }
+LABEL_17:
+    if (place_on_grid) {
+        initial_yaw = (pThe_race->initial_yaw * 182.0444444444445);
+        BrMatrix34RotateY(&initial_yaw_matrix, initial_yaw);
+        grid_offset.v[0] = 0.0 - pGrid_index % 2;
+        grid_offset.v[1] = 0.0;
+        grid_offset.v[2] = (double)(pGrid_index / 2) * 2.0 + (double)(pGrid_index % 2) * 0.40000001;
+        LOG_DEBUG("grid offset: %f, %f, %f", grid_offset.v[0], grid_offset.v[1], grid_offset.v[2]);
+        BrMatrix34ApplyV(&car_actor->t.t.translate.t, &grid_offset, &initial_yaw_matrix);
+        car_actor->t.t.translate.t.v[0] += pThe_race->initial_position.v[0];
+        car_actor->t.t.translate.t.v[1] += pThe_race->initial_position.v[1];
+        car_actor->t.t.translate.t.v[2] += pThe_race->initial_position.v[2];
+        LOG_DEBUG("yaw: %f, pos: %f, %f, %f", pThe_race->initial_yaw, pThe_race->initial_position.v[0], pThe_race->initial_position.v[1], pThe_race->initial_position.v[2]);
+    }
+    LOG_DEBUG("grid pos: %d, pos: x=%f, z=%f", pGrid_index, car_actor->t.t.translate.t.v[0], car_actor->t.t.translate.t.v[2]);
+    FindBestY(
+        &car_actor->t.t.translate.t,
+        gTrack_actor,
+        10.0,
+        &nearest_y_above,
+        &nearest_y_below,
+        &above_model,
+        &below_model,
+        &above_face_index,
+        &below_face_index);
+    if (nearest_y_above == 30000.0) {
+        if (nearest_y_below == -30000.0) {
+            LOG_DEBUG("found pos 1: %f", 0);
+            car_actor->t.t.translate.t.v[1] = 0.0;
+        } else {
+            LOG_DEBUG("found pos 2: %f", nearest_y_below);
+            car_actor->t.t.translate.t.v[1] = nearest_y_below;
+        }
+    } else {
+        // 20.345
+        LOG_DEBUG("found pos 3: %f, x: %f, z: %f", nearest_y_above, car_actor->t.t.translate.t.v[0], car_actor->t.t.translate.t.v[2]);
+        car_actor->t.t.translate.t.v[1] = nearest_y_above;
+    }
+    BrMatrix34PreRotateY(&car_actor->t.t.mat, initial_yaw);
+    if (gNet_mode) {
+        BrMatrix34Copy(
+            &gNet_players[pThe_race->opponent_list[pCar_index].net_player_index].initial_position,
+            &car->car_master_actor->t.t.mat);
+    }
+    if (gNet_mode && car->disabled && car_actor->t.t.translate.t.v[0] < 500.0) {
+        DisableCar(car);
+    }
 }
 
 // IDA: void __usercall SetInitialPositions(tRace_info *pThe_race@<EAX>)
 void SetInitialPositions(tRace_info* pThe_race) {
     int i;
     LOG_TRACE("(%p)", pThe_race);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < pThe_race->number_of_racers; i++) {
+        SetInitialPosition(pThe_race, i, i);
+    }
 }
 
 // IDA: void __usercall InitialiseNonCar(tNon_car_spec *non_car@<EAX>)

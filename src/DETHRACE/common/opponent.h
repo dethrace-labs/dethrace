@@ -4,7 +4,70 @@
 #include "br_types.h"
 #include "dr_types.h"
 
+extern char gOppo_path_filename[256];
+extern br_scalar gIn_view_distance;
+extern tU8* gBit_per_node;
+extern int gGrudge_reduction_per_period;
+extern int gSFS_max_cycles;
+extern int gChallenger_index_oppo; // added _oppo suffix to avoid name collision
+extern int gSFS_cycles_this_time;
+extern br_scalar gMinimum_yness_before_knackerisation;
+extern int gWanky_arse_tit_fuck;
+extern br_scalar gHead_on_cos_value;
+extern int gSFS_count;
+extern int gSFS_total_cycles;
+extern tU32 gNext_grudge_reduction;
+extern br_scalar gCop_pursuit_speed_percentage_multiplier;
+extern br_scalar gDefinite_cop_pursuit_speed;
+extern int gAcknowledged_start;
+extern int gMin_bangness;
+extern int gStart_jumped;
+extern int gNum_of_opponents_getting_near;
+extern tU32 gNext_elastication;
+extern int gNumber_of_cops_before_faffage;
+extern int gFirst_frame;
+extern tU32 gAcme_frame_count;
+extern char* gDrone_name;
+extern br_scalar gDefinite_no_cop_pursuit_speed;
+extern tU32 gNext_write_during_elastication;
+extern int gNum_of_opponents_completing_race;
+extern int gNum_of_opponents_pursuing;
+extern int gMax_bangness;
+extern int gActive_car_list_rebuild_required;
+extern char* gCop_name;
+extern br_scalar gFrame_period_for_this_munging_in_secs;
+extern int gBig_bang;
+extern char* gPath_section_type_names[3];
+extern br_material* gMat_lt_blu;
+extern int gFaces_used_in_non_edit_paths;
+extern br_material* gMat_dk_blu;
+extern int gMats_allocated;
+extern int gBIG_APC_index;
+extern br_material* gMat_lt_red;
+extern int gTest_toggle;
+extern int gVertices_used_in_non_edit_paths;
+extern br_material* gMat_lt_turq;
+extern br_material* gMat_lt_grn;
+extern int gAlready_elasticating;
+extern br_material* gMat_dk_red;
+extern int gOppo_paths_shown;
+extern br_material* gMat_dk_turq;
+extern br_material* gMat_lt_gry;
+extern br_material* gMat_md_gry;
+extern br_material* gMat_dk_grn;
+extern int gMellow_opponents;
+extern int gMade_path_filename;
+extern int gProcessing_opponents;
+extern br_material* gMat_dk_gry;
+extern br_material* gMat_dk_yel;
+extern br_material* gMat_lt_yel;
+extern br_material* gMat_md_yel;
+extern br_model* gOppo_path_model;
+extern br_actor* gOppo_path_actor;
+extern tU32 gFrame_period_for_this_munging;
+extern tU32 gTime_stamp_for_this_munging;
 extern float gOpponent_nastyness_frigger;
+extern tS16 gMobile_section;
 
 void PointActorAlongThisBloodyVector(br_actor* pThe_actor, br_vector3* pThe_vector);
 

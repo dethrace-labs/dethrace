@@ -898,10 +898,10 @@ void CreatePedestrian(FILE* pG, tPedestrian_instruction* pInstructions, int pIns
                 the_pedestrian->killers_ID = -1;
                 the_pedestrian->murderer = -1;
                 the_pedestrian->sent_dead_message = 0;
-                minnest_min = 3.4028235e38;
-                maxest_min = -3.4028235e38;
-                minnest_max = 3.4028235e38;
-                maxest_max = -3.4028235e38;
+                minnest_min = BR_SCALAR_MAX;
+                maxest_min = BR_SCALAR_MIN;
+                minnest_max = BR_SCALAR_MAX;
+                maxest_max = BR_SCALAR_MIN;
                 the_pedestrian->number_of_actions = GetAnInt(pG);
                 the_pedestrian->action_list = BrMemAllocate(sizeof(tPedestrian_action) * the_pedestrian->number_of_actions, kMem_ped_action_list);
                 the_action = the_pedestrian->action_list;

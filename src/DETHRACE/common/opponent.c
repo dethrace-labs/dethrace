@@ -13,7 +13,7 @@ br_scalar gIn_view_distance;
 tU8* gBit_per_node;
 int gGrudge_reduction_per_period;
 int gSFS_max_cycles;
-int gChallenger_index;
+int gChallenger_index_oppo; // added _oppo suffix to avoid name collision
 int gSFS_cycles_this_time;
 br_scalar gMinimum_yness_before_knackerisation;
 int gWanky_arse_tit_fuck;
@@ -643,7 +643,9 @@ void CalcOpponentConspicuousnessWithAViewToCheatingLikeFuck(tOpponent_spec* pOpp
 // IDA: void __usercall ChallengeOccurred(int pChallenger_index@<EAX>, int pAccepted@<EDX>)
 void ChallengeOccurred(int pChallenger_index, int pAccepted) {
     LOG_TRACE("(%d, %d)", pChallenger_index, pAccepted);
-    NOT_IMPLEMENTED();
+    if (pAccepted) {
+        gChallenger_index_oppo = pChallenger_index;
+    }
 }
 
 // IDA: void __cdecl LoadCopCars()
@@ -866,7 +868,8 @@ void MungeOpponents(tU32 pFrame_period) {
 void SetInitialCopPositions() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __usercall InitOpponents(tRace_info *pRace_info@<EAX>)
@@ -877,7 +880,8 @@ void InitOpponents(tRace_info* pRace_info) {
     int skill_dependent_difficulty;
     br_bounds bounds;
     LOG_TRACE("(%p)", pRace_info);
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __cdecl DisposeOpponents()

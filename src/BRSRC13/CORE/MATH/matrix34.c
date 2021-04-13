@@ -86,7 +86,22 @@ void BrMatrix34RotateY(br_matrix34* mat, br_angle ry) {
     br_scalar s;
     br_scalar c;
     LOG_TRACE("(%p, %d)", mat, ry);
-    NOT_IMPLEMENTED();
+
+    s = BR_SIN(ry);
+    c = BR_COS(ry);
+
+    M(0, 0) = c;
+    M(0, 1) = 0;
+    M(0, 2) = -s;
+    M(1, 0) = 0;
+    M(1, 1) = 1;
+    M(1, 2) = 0;
+    M(2, 0) = s;
+    M(2, 1) = 0;
+    M(2, 2) = c;
+    M(3, 0) = 0;
+    M(3, 1) = 0;
+    M(3, 2) = 0;
 }
 
 // IDA: void __cdecl BrMatrix34RotateZ(br_matrix34 *mat, br_angle rz)
@@ -177,7 +192,69 @@ br_scalar BrMatrix34Inverse(br_matrix34* B, br_matrix34* A) {
     float BF[4][3];
     int i;
     LOG_TRACE("(%p, %p)", B, A);
-    NOT_IMPLEMENTED();
+
+#define AF(x, y) (AF[x][y])
+#define BF(x, y) (BF[x][y])
+
+#define ACCUMULATE   \
+    if (temp >= 0.0) \
+        pos += temp; \
+    else             \
+        neg += temp;
+#define PRECISION_LIMIT BR_SCALAR(1.0e-15)
+#define ABS(a) (((a) < 0) ? -(a) : (a))
+
+    for (i = 0; i < 4; i++) {
+        AF(i, 0) = A(i, 0);
+        AF(i, 1) = A(i, 1);
+        AF(i, 2) = A(i, 2);
+    }
+
+    pos = neg = 0.0F;
+    temp = AF(0, 0) * AF(1, 1) * AF(2, 2);
+    ACCUMULATE
+    temp = AF(0, 1) * AF(1, 2) * AF(2, 0);
+    ACCUMULATE
+    temp = AF(0, 2) * AF(1, 0) * AF(2, 1);
+    ACCUMULATE
+    temp = -AF(0, 2) * AF(1, 1) * AF(2, 0);
+    ACCUMULATE
+    temp = -AF(0, 1) * AF(1, 0) * AF(2, 2);
+    ACCUMULATE
+    temp = -AF(0, 0) * AF(1, 2) * AF(2, 1);
+    ACCUMULATE
+    det = pos + neg;
+
+    if (ABS(det) <= PRECISION_LIMIT)
+        return 0;
+
+    if ((ABS(det / (pos - neg)) < PRECISION_LIMIT)) {
+        return 0;
+    }
+
+    idet = 1.0F / det;
+
+    BF(0, 0) = (AF(1, 1) * AF(2, 2) - AF(1, 2) * AF(2, 1)) * idet;
+    BF(1, 0) = -(AF(1, 0) * AF(2, 2) - AF(1, 2) * AF(2, 0)) * idet;
+    BF(2, 0) = (AF(1, 0) * AF(2, 1) - AF(1, 1) * AF(2, 0)) * idet;
+    BF(0, 1) = -(AF(0, 1) * AF(2, 2) - AF(0, 2) * AF(2, 1)) * idet;
+    BF(1, 1) = (AF(0, 0) * AF(2, 2) - AF(0, 2) * AF(2, 0)) * idet;
+    BF(2, 1) = -(AF(0, 0) * AF(2, 1) - AF(0, 1) * AF(2, 0)) * idet;
+    BF(0, 2) = (AF(0, 1) * AF(1, 2) - AF(0, 2) * AF(1, 1)) * idet;
+    BF(1, 2) = -(AF(0, 0) * AF(1, 2) - AF(0, 2) * AF(1, 0)) * idet;
+    BF(2, 2) = (AF(0, 0) * AF(1, 1) - AF(0, 1) * AF(1, 0)) * idet;
+
+    BF(3, 0) = -(AF(3, 0) * BF(0, 0) + AF(3, 1) * BF(1, 0) + AF(3, 2) * BF(2, 0));
+    BF(3, 1) = -(AF(3, 0) * BF(0, 1) + AF(3, 1) * BF(1, 1) + AF(3, 2) * BF(2, 1));
+    BF(3, 2) = -(AF(3, 0) * BF(0, 2) + AF(3, 1) * BF(1, 2) + AF(3, 2) * BF(2, 2));
+
+    for (i = 0; i < 4; i++) {
+        B(i, 0) = BF(i, 0);
+        B(i, 1) = BF(i, 1);
+        B(i, 2) = BF(i, 2);
+    }
+
+    return det;
 }
 
 // IDA: void __cdecl BrMatrix34LPInverse(br_matrix34 *A, br_matrix34 *B)
@@ -243,7 +320,10 @@ void BrMatrix34ApplyP(br_vector3* A, br_vector3* B, br_matrix34* C) {
 // IDA: void __cdecl BrMatrix34ApplyV(br_vector3 *A, br_vector3 *B, br_matrix34 *C)
 void BrMatrix34ApplyV(br_vector3* A, br_vector3* B, br_matrix34* C) {
     LOG_TRACE("(%p, %p, %p)", A, B, C);
-    NOT_IMPLEMENTED();
+
+    A->v[0] = BR_MAC3(B->v[0], C(0, 0), B->v[1], C(1, 0), B->v[2], C(2, 0));
+    A->v[1] = BR_MAC3(B->v[0], C(0, 1), B->v[1], C(1, 1), B->v[2], C(2, 1));
+    A->v[2] = BR_MAC3(B->v[0], C(0, 2), B->v[1], C(1, 2), B->v[2], C(2, 2));
 }
 
 // IDA: void __cdecl BrMatrix34TApply(br_vector4 *A, br_vector4 *B, br_matrix34 *C)
@@ -294,7 +374,10 @@ void BrMatrix34PostRotateX(br_matrix34* mat, br_angle rx) {
 // IDA: void __cdecl BrMatrix34PreRotateY(br_matrix34 *mat, br_angle ry)
 void BrMatrix34PreRotateY(br_matrix34* mat, br_angle ry) {
     LOG_TRACE("(%p, %d)", mat, ry);
-    NOT_IMPLEMENTED();
+
+    BrMatrix34RotateY(&mattmp1, ry);
+    BrMatrix34Mul(&mattmp2, &mattmp1, mat);
+    BrMatrix34Copy(mat, &mattmp2);
 }
 
 // IDA: void __cdecl BrMatrix34PostRotateY(br_matrix34 *mat, br_angle ry)
@@ -351,7 +434,10 @@ void BrMatrix34PreScale(br_matrix34* mat, br_scalar sx, br_scalar sy, br_scalar 
 // IDA: void __cdecl BrMatrix34PostScale(br_matrix34 *mat, br_scalar sx, br_scalar sy, br_scalar sz)
 void BrMatrix34PostScale(br_matrix34* mat, br_scalar sx, br_scalar sy, br_scalar sz) {
     LOG_TRACE("(%p, %f, %f, %f)", mat, sx, sy, sz);
-    NOT_IMPLEMENTED();
+
+    BrMatrix34Scale(&mattmp1, sx, sy, sz);
+    BrMatrix34Mul(&mattmp2, mat, &mattmp1);
+    BrMatrix34Copy(mat, &mattmp2);
 }
 
 // IDA: void __cdecl BrMatrix34PreShearX(br_matrix34 *mat, br_scalar sy, br_scalar sz)

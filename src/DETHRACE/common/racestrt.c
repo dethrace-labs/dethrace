@@ -2,6 +2,7 @@
 #include "brender.h"
 #include "displays.h"
 #include "drmem.h"
+#include "errors.h"
 #include "flicplay.h"
 #include "globvars.h"
 #include "grafdata.h"
@@ -9,6 +10,7 @@
 #include "input.h"
 #include "intrface.h"
 #include "loading.h"
+#include "opponent.h"
 #include "pd/sys.h"
 #include "sound.h"
 #include "structur.h"
@@ -1129,31 +1131,176 @@ void ChallengeStart() {
     tPath_name the_path;
     char s[256];
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    InitialiseFlicPanel(
+        0,
+        gCurrent_graf_data->start_race_panel_left,
+        gCurrent_graf_data->start_race_panel_top,
+        gCurrent_graf_data->start_race_panel_right - gCurrent_graf_data->start_race_panel_left,
+        gCurrent_graf_data->start_race_panel_bottom - gCurrent_graf_data->start_race_panel_top);
+    ChangePanelFlic(
+        0,
+        gOpponents[gChallenger_index].mug_shot_image_data,
+        gOpponents[gChallenger_index].mug_shot_image_data_length);
+    if (gScreen->row_bytes < 0) {
+        BrFatal("C:\\Msdev\\Projects\\DethRace\\Racestrt.c", 2610, "Bruce bug at line %d, file C:\\Msdev\\Projects\\DethRace\\Racestrt.c", 50);
+    }
+    the_map = DRPixelmapAllocate(
+        gScreen->type,
+        gCurrent_graf_data->dare_mugshot_width,
+        gCurrent_graf_data->dare_mugshot_height,
+        0,
+        0);
+
+    BrPixelmapRectangleCopy(the_map, 0, 0, GetPanelPixelmap(0), gCurrent_graf_data->dare_mug_left_margin, gCurrent_graf_data->dare_mug_top_margin, gCurrent_graf_data->dare_mugshot_width, gCurrent_graf_data->dare_mugshot_height);
+    DisposeFlicPanel(0);
+    TellyInImage(the_map, gCurrent_graf_data->dare_mugshot_left, gCurrent_graf_data->dare_mugshot_top);
+    BrPixelmapFree(the_map);
+    the_map = DRPixelmapAllocate(gScreen->type, gCurrent_graf_data->dare_text_width, gCurrent_graf_data->dare_mugshot_height, 0, 0);
+    BrPixelmapFill(the_map, 0);
+    TransBrPixelmapText(the_map, 0, 0, 1u, gBig_font, (signed char*)gOpponents[gChallenger_index].abbrev_name);
+    PathCat(the_path, gApplication_path, "DARES.TXT");
+    f = DRfopen(the_path, "rt");
+    if (!f) {
+        FatalError(100);
+    }
+
+    dare_index = IRandomBetween(0, GetAnInt(f) - 1);
+    for (i = 0; i < dare_index; i++) {
+        line_count = GetAnInt(f);
+        for (j = 0; j < line_count; j++) {
+            GetALineAndDontArgue(f, s);
+        }
+    }
+    line_count = GetAnInt(f);
+    for (i = 0; i < line_count; i++) {
+        GetALineAndDontArgue(f, s);
+        TransBrPixelmapText(the_map, 0, 2 * (i + 1) * gBig_font->glyph_y, 0x86u, gBig_font, (signed char*)s);
+    }
+    fclose(f);
+    BrPixelmapLine(the_map, 0, gBig_font->glyph_y + 2, the_map->width, gBig_font->glyph_y + 2, 45);
+    TellyInImage(the_map, gCurrent_graf_data->dare_text_left, gCurrent_graf_data->dare_mugshot_top);
+    BrPixelmapFree(the_map);
+    UnlockOpponentMugshot(gChallenger_index);
+    gDare_start_time = PDGetTotalTime();
 }
 
 // IDA: int __usercall CheckNextStage@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int CheckNextStage(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    if (gDare_start_time && (unsigned int)(PDGetTotalTime() - gDare_start_time) >= 7500) {
+        BrPixelmapRectangleFill(
+            gBack_screen,
+            gCurrent_graf_data->grid_left_clip,
+            gCurrent_graf_data->dare_mugshot_top,
+            gCurrent_graf_data->grid_right_clip - gCurrent_graf_data->grid_left_clip,
+            gCurrent_graf_data->dare_mugshot_height,
+            0);
+        DoGridTransition(gOur_starting_position, gChallenger_position);
+        gDraw_grid_status = eGrid_draw_icons_only;
+        gDare_start_time = 0;
+    }
+    return 0;
 }
 
 // IDA: int __usercall ChallengeDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
 int ChallengeDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
-    NOT_IMPLEMENTED();
+
+    if (!pEscaped || gDare_start_time) {
+        if (!pEscaped && gDare_start_time) {
+            ActuallySwapOrder(gOur_starting_position, gChallenger_position);
+            ChallengeOccurred(gChallenger_index, 1);
+        }
+    } else {
+        DoGridTransition(gOur_starting_position, gOriginal_position);
+        ActuallySwapOrder(gOur_starting_position, gOriginal_position);
+        ChallengeOccurred(gChallenger_index, 0);
+    }
+    ChallengeOccurred(gChallenger_index, pEscaped == 0);
+    if (pTimed_out) {
+        return 0;
+    } else {
+        return pCurrent_choice;
+    }
 }
 
 // IDA: void __cdecl DoChallengeScreen()
 void DoChallengeScreen() {
-    static tFlicette flicker_on[2];
-    static tFlicette flicker_off[2];
-    static tFlicette push[2];
-    static tMouse_area mouse_areas[2];
-    static tInterface_spec interface_spec;
+    static tFlicette flicker_on[2] = { { 43, { 54, 108 }, { 157, 377 } }, { 43, { 218, 436 }, { 157, 377 } } };
+    static tFlicette flicker_off[2] = { { 42, { 54, 108 }, { 157, 377 } }, { 42, { 218, 436 }, { 157, 377 } } };
+    static tFlicette push[2] = { { 304, { 54, 108 }, { 157, 377 } }, { 305, { 218, 436 }, { 157, 377 } } };
+    static tMouse_area mouse_areas[2] = {
+        { { 54, 108 }, { 157, 377 }, { 117, 234 }, { 178, 427 }, 0, 0, 0, NULL },
+        { { 218, 436 }, { 157, 377 }, { 281, 562 }, { 178, 427 }, 1, 0, 0, NULL }
+    };
+    static tInterface_spec interface_spec = {
+        0, // initial_imode
+        301, // first_opening_flic
+        0, // second_opening_flic
+        -1, // end_flic_go_ahead
+        -1, // end_flic_escaped
+        -1, // end_flic_otherwise
+        0, // flic_bunch_to_load
+        { -1, 0 }, // move_left_new_mode
+        { -1, 0 }, // move_left_delta
+        { 0, 0 }, // move_left_min
+        { 1, 0 }, // move_left_max
+        { NULL, NULL }, // move_left_proc
+        { -1, 0 }, // move_right_new_mode
+        { 1, 0 }, // move_right_delta
+        { 0, 0 }, // move_right_min
+        { 1, 0 }, // move_right_max
+        { NULL, NULL }, // move_right_proc
+        { -1, 0 }, // move_up_new_mode
+        { 0, 0 }, // move_up_delta
+        { 0, 0 }, // move_up_min
+        { 0, 0 }, // move_up_max
+        { NULL, NULL }, // move_up_proc
+        { -1, 0 }, // move_down_new_mode
+        { 0, 0 }, // move_down_delta
+        { 0, 0 }, // move_down_min
+        { 0, 0 }, // move_down_max
+        { NULL, NULL }, // move_down_proc
+        { 1, 1 }, // go_ahead_allowed
+        { NULL, NULL }, // go_ahead_proc
+        { 1, 1 }, // escape_allowed
+        { NULL, NULL }, // escape_proc
+        &CheckNextStage, // exit_proc
+        &GridDraw, // draw_proc
+        0u, // time_out
+        NULL, // start_proc1
+        &ChallengeStart, // start_proc2
+        &ChallengeDone, // done_proc
+        0, // font_needed
+        { 0, 0 }, // typeable
+        NULL, // get_original_string
+        1, // escape_code
+        1, // dont_save_or_load
+        2, // number_of_button_flics
+        flicker_on, // flicker_on_flics
+        flicker_off, // flicker_off_flics
+        push, // pushed_flics
+        2, // number_of_mouse_areas
+        mouse_areas, // mouse_areas
+        0, // number_of_recopy_areas
+        NULL // recopy_areas
+    };
+
     int result;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gOriginal_position = gOur_starting_position;
+    gChallenger_position = IRandomBetween(0, 1);
+    if (gOpponents[gCurrent_race.opponent_list[gChallenger_position].index].car_number < 0) {
+        gChallenger_position ^= 1u;
+    }
+    gChallenger_index = gCurrent_race.opponent_list[gChallenger_position].index;
+    LoadOpponentMugShot(gChallenger_index);
+    gDraw_grid_status = eGrid_draw_none;
+    gGrid_y_adjust = gCurrent_graf_data->dare_y_adjust;
+    DoInterfaceScreen(&interface_spec, 0, 0);
 }
 
 // IDA: int __usercall GridDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
