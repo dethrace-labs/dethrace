@@ -14,7 +14,9 @@ echo "$Env:TEMP\ninja" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -App
 
 echo "Temp directory is " $Env:TEMP
 dir $($Env:TEMP)
-dir $($Env:TEMP)\SDL2-2.0.12
+dir "C:\Users\runneradmin\AppData\Local\Temp\SDL2-2.0.12\lib"
+dir "$Env:TEMP)\ninja"
+dir "$Env:TEMP)\SDL2-2.0.12"
 dir $($Env:TEMP)\SDL2-2.0.12\lib
 
 # build
