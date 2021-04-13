@@ -13,8 +13,8 @@ Expand-Archive $Env:TEMP\ninja-win.zip -DestinationPath $Env:TEMP\ninja
 echo "$Env:TEMP\ninja" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
 echo "Temp directory is " $Env:TEMP
-dir $($Env:TEMP)/
-dir $($Env:TEMP)/SDL2-2.0.12/
+dir $($Env:TEMP)
+dir $($Env:TEMP)/SDL2-2.0.12
 dir $($Env:TEMP)/SDL2-2.0.12/lib
 
 # build

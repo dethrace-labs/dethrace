@@ -30,7 +30,7 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: artifacts
-          path: build/linux-amd64.tar.gz
+          path: linux-amd64.tar.gz
 
 
   build-macos:
@@ -52,7 +52,7 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: artifacts
-        path: build/darwin-amd64.tar.gz
+        path: darwin-amd64.tar.gz
 
 
 

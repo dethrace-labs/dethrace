@@ -19,4 +19,4 @@ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -B build
 cmake --build build -- -j 4
 
 # package artifact
-tar -czvf linux-amd64.tar.gz dethrace
+tar -czvf linux-amd64.tar.gz build/dethrace

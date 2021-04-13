@@ -9,4 +9,4 @@ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -B build
 cmake --build build -- -j 4
 
 # package artifact
-tar -czvf darwin-amd64.tar.gz dethrace
+tar -czvf darwin-amd64.tar.gz build/dethrace
