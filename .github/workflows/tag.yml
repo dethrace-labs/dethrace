@@ -7,8 +7,10 @@ on:
 
 jobs:
   create-release:
+    id: create_release
     runs-on: ubuntu-latest
-    needs: [build-linux]
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
       - name: Obtain tag version
         id: get_version
@@ -24,12 +26,17 @@ jobs:
           body: "hello world"
         env:
           GITHUB_TOKEN: ${{ github.token }}
+
+  upload-artifacts:
+    runs-on: ubuntu-latest
+    needs: [create-release, build-linux]
+    steps:
       - name: upload linux artifact
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
           asset_path: ${{ github.workspace }}/dethrace-${{ steps.get_version.version}}-linux-amd64.tar.gz
           asset_name: dethrace-${{ steps.get_version.version}}-linux-amd64.tar.gz
           asset_content_type: application/octet-stream
