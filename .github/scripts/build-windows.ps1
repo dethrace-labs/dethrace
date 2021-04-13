@@ -16,4 +16,4 @@ cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSDL2=ON "-DSDL2_ROOT_DIR=$($E
 cmake --build build --config RelWithDebInfo
 
 # package artifact
-7z a windows-$Env:MATRIX_PLATFORM.zip build\dethrace.exe build/dethrace.pdb $Env:TEMP\SDL2-2.0.12\lib\$sdl_path\SDL2.dll
+7z a windows-$Env:MATRIX_PLATFORM.zip .\build\dethrace.exe .\build\dethrace.pdb $Env:TEMP\SDL2-2.0.12\lib\$sdl_path\SDL2.dll
