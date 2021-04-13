@@ -6,54 +6,48 @@ on:
 jobs:
 
   build-linux:
-    if: always()
-    needs: create-release
     runs-on: ubuntu-18.04
     strategy:
       matrix:
         platform: [gcc]
 
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-        ref: ${{ github.event.pull_request.head.sha }}
-    - name: Obtain tag version
-      id: get_version
-      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
-    - name: Build and test
-      env:
-          CC: ${{ steps.vars.outputs.cc }}
-          CXX: ${{ steps.vars.outputs.cxx }}
-          MATRIX_PLATFORM: ${{ matrix.platform }}
-      run: .github/scripts/build-linux.sh
-    - name: Create artifact
-      if: startsWith(github.ref, 'refs/tags/')
-      run: |
-        tar -czvf ${{ github.workspace }}/dethrace-${{ steps.get_version.VERSION }}-linux-amd64.tar.gz ./build/dethrace
-    - name: upload linux artifact
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      with:
-        upload_url: ${{ needs.create-release.outputs.upload_url }}
-        asset_path: ${{ github.workspace }}/dethrace-${{ steps.get_version.VERSION }}-linux-amd64.tar.gz
-        asset_name: dethrace-${{ steps.get_version.VERSION }}-linux-amd64.tar.gz
-        asset_content_type: application/octet-stream
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Build and test
+        env:
+            CC: ${{ steps.vars.outputs.cc }}
+            CXX: ${{ steps.vars.outputs.cxx }}
+            MATRIX_PLATFORM: ${{ matrix.platform }}
+        run: .github/scripts/build-linux.sh
+      - name: Upload artifact
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: actions/upload-artifact@v1
+        with:
+          name: artifacts
+          path: linux-amd64.tar.gz
 
   create-release:
+    needs: [build-linux]
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
       - name: Obtain tag version
         id: get_version
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
-      - name: release
+      - name: download artifacts
+        uses: actions/download-artifact@v1
+        with:
+          name: artifacts
+      - name: Create release
+        id: create-release
         uses: actions/create-release@v1
-        id: create_release
         with:
           draft: false
           prerelease: true
@@ -62,3 +56,12 @@ jobs:
           body: "hello world"
         env:
           GITHUB_TOKEN: ${{ github.token }}
+      - name: Upload linux-amd64 artifact
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
+          asset_path: ./artifacts/linux-amd64.tar.gz
+          asset_name: dethrace-${{ steps.get_version.VERSION }}-linux-amd64.tar.gz
+          asset_content_type: application/octet-stream

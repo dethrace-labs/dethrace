@@ -1566,7 +1566,7 @@ void InitShadow() {
     gShadow_model->flags = 6;
     gShadow_actor = BrActorAllocate(BR_ACTOR_MODEL, 0);
     gShadow_actor->model = gShadow_model;
-    return BrActorAdd(gUniverse_actor, gShadow_actor);
+    BrActorAdd(gUniverse_actor, gShadow_actor);
 }
 
 // IDA: br_uint_32 __cdecl SaveShadeTable(br_pixelmap *pTable, void *pArg)

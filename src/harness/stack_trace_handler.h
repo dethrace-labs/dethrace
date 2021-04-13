@@ -277,7 +277,7 @@ void resolve_full_path(char* path, const char* argv0) {
     } else { // run with relative path
         if (NULL == getcwd(path, PATH_MAX)) {
             perror("getcwd error");
-            return NULL;
+            return;
         }
         strcat(path, "/");
         strcat(path, argv0);
@@ -287,7 +287,6 @@ void resolve_full_path(char* path, const char* argv0) {
 void install_signal_handler(char* program_name) {
 
     resolve_full_path(_program_name, program_name);
-    printf("fill path %s\n", _program_name);
 
     /* setup alternate stack */
     {
