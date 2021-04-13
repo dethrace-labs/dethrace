@@ -43,15 +43,14 @@ jobs:
         sudo apt-get update -qq > /dev/null
         sudo apt-get install -qq -y libsdl2-dev > /dev/null
 
-    - name: Configure Dethrace
-    - name: Build
+    - name: Configure
       env:
           CC: ${{ steps.vars.outputs.cc }}
           CXX: ${{ steps.vars.outputs.cxx }}
       run: |
         cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -B build
         
-    - name: Build Dethrace
+    - name: Build
       run: |
         cmake --build build -- -j 4
 
