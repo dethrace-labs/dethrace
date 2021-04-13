@@ -1,72 +1,72 @@
-name: linux
+# name: linux
 
-on:
-  push:
-  release:
-    types: published
+# on:
+#   push:
+#   release:
+#     types: published
 
-jobs:
-  build-linux:
-    runs-on: ubuntu-18.04
-    strategy:
-      matrix:
-        platform: [gcc]
+# jobs:
+#   build-linux:
+#     runs-on: ubuntu-18.04
+#     strategy:
+#       matrix:
+#         platform: [gcc]
 
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-        ref: ${{ github.event.pull_request.head.sha }}
+#     steps:
+#     - uses: actions/checkout@v2
+#       with:
+#         fetch-depth: 0
+#         ref: ${{ github.event.pull_request.head.sha }}
         
-    - name: Set Git Info
-      id: gitinfo
-      run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+#     - name: Set Git Info
+#       id: gitinfo
+#       run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
     
-    - name: Obtain tag version
-      id: get_version
-      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+#     - name: Obtain tag version
+#       id: get_version
+#       run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
       
-    - name: Set variables
-      id: vars
-      run: |
-        if [ "${{ matrix.platform }}" = "clang" ]
-        then
-          echo "::set-output name=cc::clang"
-          echo "::set-output name=cxx::clang++"
-        else
-          echo "::set-output name=cc::gcc"
-          echo "::set-output name=cxx::g++"
-        fi
+#     - name: Set variables
+#       id: vars
+#       run: |
+#         if [ "${{ matrix.platform }}" = "clang" ]
+#         then
+#           echo "::set-output name=cc::clang"
+#           echo "::set-output name=cxx::clang++"
+#         else
+#           echo "::set-output name=cc::gcc"
+#           echo "::set-output name=cxx::g++"
+#         fi
 
-    - name: Install dependencies
-      run: |
-        sudo apt-get update -qq > /dev/null
-        sudo apt-get install -qq -y libsdl2-dev > /dev/null
+#     - name: Install dependencies
+#       run: |
+#         sudo apt-get update -qq > /dev/null
+#         sudo apt-get install -qq -y libsdl2-dev > /dev/null
 
-    - name: Configure
-      env:
-          CC: ${{ steps.vars.outputs.cc }}
-          CXX: ${{ steps.vars.outputs.cxx }}
-      run: |
-        cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -B build
+#     - name: Configure
+#       env:
+#           CC: ${{ steps.vars.outputs.cc }}
+#           CXX: ${{ steps.vars.outputs.cxx }}
+#       run: |
+#         cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -B build
         
-    - name: Build
-      run: |
-        cmake --build build -- -j 4
+#     - name: Build
+#       run: |
+#         cmake --build build -- -j 4
 
-    - name: Run unit tests
-      run: |
-        cd build
-        ctest --verbose
+#     - name: Run unit tests
+#       run: |
+#         cd build
+#         ctest --verbose
 
-    - name: Create artifact
-      if: startsWith(github.ref, 'refs/tags/')
-      run: |
-        tar -czvf ${{ github.workspace }}/dethrace-${{ steps.get_version.version}}-linux-amd64.tar.gz ./build/dethrace
+#     - name: Create artifact
+#       if: startsWith(github.ref, 'refs/tags/')
+#       run: |
+#         tar -czvf ${{ github.workspace }}/dethrace-${{ steps.get_version.version}}-linux-amd64.tar.gz ./build/dethrace
 
-    # - name: Upload artifact
-    #   uses: actions/upload-artifact@v2
-    #   if: startsWith(github.ref, 'refs/tags/')
-    #   with:
-    #     name: dethrace-${{ steps.get_version.version}}-linux-amd64.tar.gz
-    #     path: artifacts/dethrace-${{ steps.get_version.version}}-linux-amd64.tar.gz
+#     # - name: Upload artifact
+#     #   uses: actions/upload-artifact@v2
+#     #   if: startsWith(github.ref, 'refs/tags/')
+#     #   with:
+#     #     name: dethrace-${{ steps.get_version.version}}-linux-amd64.tar.gz
+#     #     path: artifacts/dethrace-${{ steps.get_version.version}}-linux-amd64.tar.gz

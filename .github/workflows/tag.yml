@@ -2,11 +2,65 @@ name: release
 
 on:
   push:
-    tags:
-      - 'v*'
 
 jobs:
+
+  build-linux:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        platform: [gcc]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        ref: ${{ github.event.pull_request.head.sha }}
+    
+    - name: Obtain tag version
+      id: get_version
+      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+      
+    - name: Set variables
+      id: vars
+      run: |
+        if [ "${{ matrix.platform }}" = "clang" ]
+        then
+          echo "::set-output name=cc::clang"
+          echo "::set-output name=cxx::clang++"
+        else
+          echo "::set-output name=cc::gcc"
+          echo "::set-output name=cxx::g++"
+        fi
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update -qq > /dev/null
+        sudo apt-get install -qq -y libsdl2-dev > /dev/null
+
+    - name: Configure
+      env:
+          CC: ${{ steps.vars.outputs.cc }}
+          CXX: ${{ steps.vars.outputs.cxx }}
+      run: |
+        cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -B build
+        
+    - name: Build
+      run: |
+        cmake --build build -- -j 4
+
+    - name: Run unit tests
+      run: |
+        cd build
+        ctest --verbose
+
+    - name: Create artifact
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        tar -czvf ${{ github.workspace }}/dethrace-${{ steps.get_version.version}}-linux-amd64.tar.gz ./build/dethrace
+
   create-release:
+    if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
@@ -27,6 +81,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
 
   upload-artifacts:
+    if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     needs: [create-release, build-linux]
     steps:
