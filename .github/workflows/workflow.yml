@@ -27,7 +27,7 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: artifacts
-          path: linux-amd64.tar.gz
+          path: build/linux-amd64.tar.gz
 
   create-release:
     needs: [build-linux]
