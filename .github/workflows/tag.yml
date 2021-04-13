@@ -18,45 +18,19 @@ jobs:
       with:
         fetch-depth: 0
         ref: ${{ github.event.pull_request.head.sha }}
-    
     - name: Obtain tag version
       id: get_version
       run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
-      
-    - name: Set variables
-      id: vars
-      run: |
-        if [ "${{ matrix.platform }}" = "clang" ]
-        then
-          echo "::set-output name=cc::clang"
-          echo "::set-output name=cxx::clang++"
-        else
-          echo "::set-output name=cc::gcc"
-          echo "::set-output name=cxx::g++"
-        fi
-
-    - name: Install dependencies
-      run: |
-        sudo apt-get update -qq > /dev/null
-        sudo apt-get install -qq -y libsdl2-dev > /dev/null
-
-    - name: Configure
+    - name: Build and test
       env:
           CC: ${{ steps.vars.outputs.cc }}
           CXX: ${{ steps.vars.outputs.cxx }}
-      run: |
-        cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -B build
-    - name: Build
-      run: |
-        cmake --build build -- -j 4
-    - name: Run unit tests
-      run: |
-        cd build
-        ctest --verbose
+          MATRIX_PLATFORM: ${{ matrix.platform }}
+      run: .github/scripts/build-linux.sh
     - name: Create artifact
       if: startsWith(github.ref, 'refs/tags/')
       run: |
-        tar -czvf ${{ github.workspace }}/dethrace-${{ steps.get_version.VERSION}}-linux-amd64.tar.gz ./build/dethrace
+        tar -czvf ${{ github.workspace }}/dethrace-${{ steps.get_version.VERSION }}-linux-amd64.tar.gz ./build/dethrace
     - name: upload linux artifact
       if: startsWith(github.ref, 'refs/tags/')
       uses: actions/upload-release-asset@v1
@@ -64,8 +38,8 @@ jobs:
         GITHUB_TOKEN: ${{ github.token }}
       with:
         upload_url: ${{ needs.create-release.outputs.upload_url }}
-        asset_path: ${{ github.workspace }}/dethrace-${{ steps.get_version.VERSION}}-linux-amd64.tar.gz
-        asset_name: dethrace-${{ steps.get_version.VERSION}}-linux-amd64.tar.gz
+        asset_path: ${{ github.workspace }}/dethrace-${{ steps.get_version.VERSION }}-linux-amd64.tar.gz
+        asset_name: dethrace-${{ steps.get_version.VERSION }}-linux-amd64.tar.gz
         asset_content_type: application/octet-stream
 
   create-release:
