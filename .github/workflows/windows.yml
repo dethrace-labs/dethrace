@@ -54,12 +54,14 @@ jobs:
         cmake --build build --config RelWithDebInfo
 
     - name: Create archives
+      if: startsWith(github.ref, 'refs/tags/')
       shell: bash
       run: |
         mkdir artifact
         7z a artifact/dethrace-win-msvc-${{ steps.vars.outputs.arc_path }}-${{ steps.gitinfo.outputs.sha_short }}.zip ./build/dethrace.exe ./build/dethrace.pdb $TEMP/SDL2-2.0.12/lib/${{ steps.vars.outputs.sdl_path }}/SDL2.dll
 
     - name: Upload artifact
+      if: startsWith(github.ref, 'refs/tags/')
       uses: actions/upload-artifact@v2
       with:
         name: dethrace-win-msvc-${{ steps.vars.outputs.arc_path }}
