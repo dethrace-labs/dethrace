@@ -21,7 +21,6 @@ cmake --build build -- -j 4
 # run tests
 cd build
 ctest --verbose
-cd ..
 
 # package artifact
 tar -czvf linux-amd64.tar.gz dethrace
