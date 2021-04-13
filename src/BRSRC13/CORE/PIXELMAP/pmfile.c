@@ -8,10 +8,17 @@
 
 #include <stddef.h>
 
-br_file_struct br_old_pixelmap_F;
 br_file_enum pixelmap_type_F;
 
-br_file_struct_member br_old_pixelmap_FM[7];
+br_file_struct_member br_old_pixelmap_FM[7] = {
+    { 13u, offsetof(br_pixelmap, type), "type", NULL },
+    { 3u, offsetof(br_pixelmap, row_bytes), "row_bytes", NULL },
+    { 3u, offsetof(br_pixelmap, width), "width", NULL },
+    { 3u, offsetof(br_pixelmap, height), "height", NULL },
+    { 3u, offsetof(br_pixelmap, origin_x), "origin_x", NULL },
+    { 3u, offsetof(br_pixelmap, origin_y), "origin_y", NULL },
+    { 17u, offsetof(br_pixelmap, identifier), "identifier", NULL }
+};
 
 br_file_struct_member br_pixelmap_FM[8] = {
     { 13u, offsetof(br_pixelmap, type), "type", NULL },
@@ -20,11 +27,12 @@ br_file_struct_member br_pixelmap_FM[8] = {
     { 3u, offsetof(br_pixelmap, height), "height", NULL },
     { 3u, offsetof(br_pixelmap, origin_x), "origin_x", NULL },
     { 3u, offsetof(br_pixelmap, origin_y), "origin_y", NULL },
+    { 3u, offsetof(br_pixelmap, mip_offset), "mip_offset", NULL },
     { 17u, offsetof(br_pixelmap, identifier), "identifier", NULL },
-    //not sure about this one...
-    { 31436u, 7u, &br_pixelmap_FM, (void*)0x44 }
+
 };
-br_file_struct br_pixelmap_F = { "br_pixelmap", 7u, br_pixelmap_FM, sizeof(br_pixelmap) };
+br_file_struct br_old_pixelmap_F = { "br_old_pixelmap", 7u, br_old_pixelmap_FM, sizeof(br_pixelmap) };
+br_file_struct br_pixelmap_F = { "br_pixelmap", 8u, br_pixelmap_FM, sizeof(br_pixelmap) };
 
 br_file_enum_member pixelmap_type_FM[15];
 br_chunks_table_entry PixelmapLoadEntries[5] = {

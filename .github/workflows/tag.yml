@@ -30,6 +30,6 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: artifacts/dethrace-linux-${{ steps.get_version.version}}-amd64.tar.gz
-          asset_name: dethrace-linux-${{ steps.get_version.version}}-amd64.tar.gz
+          asset_path: ${{ github.workspace }}/dethrace-${{ steps.get_version.version}}-linux-amd64.tar.gz
+          asset_name: dethrace-${{ steps.get_version.version}}-linux-amd64.tar.gz
           asset_content_type: application/octet-stream
