@@ -76,7 +76,7 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: artifacts
-          path: build/windows-${{ matrix.platform }}.zip
+          path: windows-${{ matrix.platform }}.zip
 
 
   create-release:
@@ -101,7 +101,7 @@ jobs:
         with:
           draft: false
           prerelease: true
-          release_name: Dethrace ${{ steps.get_version.outputs.VERSION }}
+          release_name: ${{ steps.get_version.outputs.VERSION }}
           tag_name: ${{ github.ref }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
