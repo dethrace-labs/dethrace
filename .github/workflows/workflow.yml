@@ -103,7 +103,6 @@ jobs:
           prerelease: true
           release_name: Dethrace ${{ steps.get_version.outputs.VERSION }}
           tag_name: ${{ github.ref }}
-          body: "hello world"
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: Upload linux-amd64 artifact
