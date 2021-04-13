@@ -18,6 +18,10 @@ jobs:
       id: gitinfo
       run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
 
+    - name: Obtain tag version
+      id: get_version
+      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+
     - name: Install dependencies
       run: |
         brew install SDL2
@@ -35,13 +39,7 @@ jobs:
         cd build
         ctest --verbose
 
-    - name: Create archives
+    - name: Create artifact
+      if: startsWith(github.ref, 'refs/tags/')
       run: |
-        mkdir artifact
-        7z a artifact/dethrace-macos-${{ matrix.platform }}-x86_64-${{ steps.gitinfo.outputs.sha_short }}.zip ./build/dethrace
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: dethrace-macos-${{ matrix.platform }}-x86_64
-        path: artifact
+        tar -czvf ${{ github.workspace }}/dethrace-${{ steps.get_version.version}}-darwin-amd64.tar.gz ./build/dethrace

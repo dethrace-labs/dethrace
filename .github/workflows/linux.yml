@@ -6,11 +6,11 @@ on:
     types: published
 
 jobs:
-  dethrace-linux:
+  build-linux:
     runs-on: ubuntu-18.04
     strategy:
       matrix:
-        platform: [clang, gcc]
+        platform: [gcc]
 
     steps:
     - uses: actions/checkout@v2
@@ -21,6 +21,10 @@ jobs:
     - name: Set Git Info
       id: gitinfo
       run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+    
+    - name: Obtain tag version
+      id: get_version
+      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
       
     - name: Set variables
       id: vars
@@ -39,14 +43,14 @@ jobs:
         sudo apt-get update -qq > /dev/null
         sudo apt-get install -qq -y libsdl2-dev > /dev/null
 
-    - name: Configure Dethrace
+    - name: Configure
       env:
           CC: ${{ steps.vars.outputs.cc }}
           CXX: ${{ steps.vars.outputs.cxx }}
       run: |
         cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -B build
         
-    - name: Build Dethrace
+    - name: Build
       run: |
         cmake --build build -- -j 4
 
@@ -55,13 +59,14 @@ jobs:
         cd build
         ctest --verbose
 
-    - name: Create archives
+    - name: Create artifact
+      if: startsWith(github.ref, 'refs/tags/')
       run: |
-        mkdir artifact
-        7z a artifact/dethrace-linux-${{ matrix.platform }}-x86_64-${{ steps.gitinfo.outputs.sha_short }}.zip ./build/dethrace
+        tar -czvf ${{ github.workspace }}/dethrace-${{ steps.get_version.version}}-linux-amd64.tar.gz ./build/dethrace
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: dethrace-linux-${{ matrix.platform }}-x86_64
-        path: artifact
+    # - name: Upload artifact
+    #   uses: actions/upload-artifact@v2
+    #   if: startsWith(github.ref, 'refs/tags/')
+    #   with:
+    #     name: dethrace-${{ steps.get_version.version}}-linux-amd64.tar.gz
+    #     path: artifacts/dethrace-${{ steps.get_version.version}}-linux-amd64.tar.gz
