@@ -7,7 +7,6 @@ on:
 
 jobs:
   create-release:
-    id: create_release
     runs-on: ubuntu-latest
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
@@ -36,7 +35,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
-          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
           asset_path: ${{ github.workspace }}/dethrace-${{ steps.get_version.version}}-linux-amd64.tar.gz
           asset_name: dethrace-${{ steps.get_version.version}}-linux-amd64.tar.gz
           asset_content_type: application/octet-stream
