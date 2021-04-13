@@ -15,12 +15,10 @@ echo "$Env:TEMP\ninja" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -App
 echo "Temp directory is " $Env:TEMP
 dir $($Env:TEMP)
 dir "C:\Users\runneradmin\AppData\Local\Temp\SDL2-2.0.12\lib\$sdl_path"
-dir "$Env:TEMP\ninja"
-dir "$Env:TEMP\SDL2-2.0.12"
-dir $($Env:TEMP)\SDL2-2.0.12\lib
+dir "$($Env:TEMP)\SDL2-2.0.12\lib"
 
 # build
 cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSDL2=ON "-DSDL2_ROOT_DIR=$($Env:TEMP)\SDL2-2.0.12" -B build
 cmake --build build --config RelWithDebInfo
 
-7z a windows-$($Env:MATRIX_PLATFORM).zip build/dethrace.exe build/dethrace.pdb $($Env:TEMP)/SDL2-2.0.12/lib/$sdl_path/SDL2.dll
+7z a windows-$Env:MATRIX_PLATFORM.zip build\dethrace.exe build/dethrace.pdb $Env:TEMP\SDL2-2.0.12\lib\$sdl_path\SDL2.dll
