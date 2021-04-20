@@ -1,7 +1,7 @@
 add_library(s3 STATIC)
 
 target_include_directories(s3 PUBLIC
-    ${PROJECT_SOURCE_DIR}/include
+    include
     ${CMAKE_SOURCE_DIR}/src/BRSRC13
     ${CMAKE_SOURCE_DIR}/src/harness
 )
