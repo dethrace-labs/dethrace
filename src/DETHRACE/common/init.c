@@ -332,7 +332,7 @@ void InitialiseApplication(int pArgc, char** pArgv) {
     LoadOpponents();
     LoadPowerups();
     LoadRaces(gRace_list, &gNumber_of_races, -1);
-    RevertPalette();
+    InitPaletteAnimate();
     InitRayCasting();
     InitDepthEffects();
     InitialiseStorageSpace(&gOur_car_storage_space, 40, 2, 40, 30);
@@ -459,7 +459,7 @@ void InitRace() {
     PossibleService();
     //TODO: dword_55142C = 0;
     gStart_race_sent = 0;
-    gProgram_state.frame_rate_headup = NewTextHeadupSlot(0, 0, 0, -1, NULL);
+    gProgram_state.frame_rate_headup = NewTextHeadupSlot(0, 0, 0, -1, "");
     if (TranslationMode()) {
         if (gAusterity_mode) {
             FlushInterfaceFonts();
@@ -480,15 +480,15 @@ void InitRace() {
     gMap_mode = 0;
     gProgram_state.cockpit_image_index = 0;
     if (gNet_mode) {
-        gNet_cash_headup = NewTextHeadupSlot(13, 0, 0, -6, NULL);
-        gNet_ped_headup = NewTextHeadupSlot(14, 0, 0, -6, NULL);
+        gNet_cash_headup = NewTextHeadupSlot(13, 0, 0, -6, "");
+        gNet_ped_headup = NewTextHeadupSlot(14, 0, 0, -6, "");
     } else {
-        gCredits_won_headup = NewTextHeadupSlot(1, 0, 0, -6, NULL);
-        gPed_kill_count_headup = NewTextHeadupSlot(2, 0, 0, -6, NULL);
-        gCar_kill_count_headup = NewTextHeadupSlot(12, 0, 0, -6, NULL);
-        gTimer_headup = NewTextHeadupSlot(7, 0, 0, -5, NULL);
-        gTime_awarded_headup = NewTextHeadupSlot(11, 0, 0, -2, NULL);
-        gLaps_headup = NewTextHeadupSlot(8, 0, 0, -6, NULL);
+        gCredits_won_headup = NewTextHeadupSlot(1, 0, 0, -6, "");
+        gPed_kill_count_headup = NewTextHeadupSlot(2, 0, 0, -6, "");
+        gCar_kill_count_headup = NewTextHeadupSlot(12, 0, 0, -6, "");
+        gTimer_headup = NewTextHeadupSlot(7, 0, 0, -5, "");
+        gTime_awarded_headup = NewTextHeadupSlot(11, 0, 0, -2, "");
+        gLaps_headup = NewTextHeadupSlot(8, 0, 0, -6, "");
     }
     PossibleService();
     gProgram_state.which_view = eView_forward;
@@ -521,7 +521,7 @@ void InitRace() {
     LoadCopCars();
     PrintMemoryDump(0, "AFTER LOADING IN COPS");
     SaveShadeTables();
-    gArrow_mode = 7;
+    gCountdown = 7;
     gTimer = 1000 * gCurrent_race.initial_timer[gProgram_state.skill_level];
     gLap = 1;
     gTotal_laps = gCurrent_race.total_laps;

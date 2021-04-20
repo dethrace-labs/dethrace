@@ -110,20 +110,20 @@ void SetViewport(br_pixelmap* buffer) {
 
 // IDA: void __cdecl BrZbSceneRenderBegin(br_actor *world, br_actor *camera, br_pixelmap *colour_buffer, br_pixelmap *depth_buffer)
 void BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer) {
-    LOG_TRACE("(%p, %p, %p, %p)", world, camera, colour_buffer, depth_buffer);
-    NOT_IMPLEMENTED();
+    //LOG_TRACE("(%p, %p, %p, %p)", world, camera, colour_buffer, depth_buffer);
+    Harness_Hook_BrZbSceneRenderBegin(world, camera, colour_buffer, depth_buffer);
 }
 
 // IDA: void __cdecl BrZbSceneRenderAdd(br_actor *tree)
 void BrZbSceneRenderAdd(br_actor* tree) {
-    LOG_TRACE("(%p)", tree);
-    NOT_IMPLEMENTED();
+    //LOG_TRACE("(%p)", tree);
+    Harness_Hook_BrZbSceneRenderAdd(tree);
 }
 
 // IDA: void __cdecl BrZbSceneRenderEnd()
 void BrZbSceneRenderEnd() {
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    //LOG_TRACE("()");
+    Harness_Hook_BrZbSceneRenderEnd();
 }
 
 // IDA: void __cdecl BrZbSceneRender(br_actor *world, br_actor *camera, br_pixelmap *colour_buffer, br_pixelmap *depth_buffer)

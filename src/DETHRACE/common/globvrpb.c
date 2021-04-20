@@ -22,3 +22,5 @@ int gPedestrian_image;
 int gHighest_pedestrian_value;
 int gNeed_to_send_start_race;
 int gRendering_mirror;
+
+int dword_551424;

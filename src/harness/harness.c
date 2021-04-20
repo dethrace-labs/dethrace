@@ -1,10 +1,11 @@
 
 #include "harness.h"
 #include "input/keyboard.h"
+#include "sound/sound.h"
 #include "stack_trace_handler.h"
 #include <strings.h>
-#include <unistd.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 SDL_Window* window;
 tRenderer* current_renderer;
@@ -18,6 +19,8 @@ br_pixelmap* last_src = NULL;
 int harness_disable_cd_check = 1;
 
 int harness_debug_level = 7;
+
+extern void BrPixelmapFill(br_pixelmap* dst, br_uint_32 colour);
 
 // SplatPack or Carmageddon. This is where we represent the code differences between the two. For example, the intro smack file.
 tHarness_GameMode harness_game_mode;
@@ -163,10 +166,27 @@ void Harness_Hook_BrDevPaletteSetEntryOld(int i, br_colour colour) {
     }
 }
 
+void Harness_Hook_BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer) {
+    BrPixelmapFill(colour_buffer, 0);
+}
+
+void Harness_Hook_BrZbSceneRenderAdd(br_actor* tree) {
+}
+
+void Harness_Hook_BrZbSceneRenderEnd() {
+}
+
 void Harness_Hook_KeyBegin() {
     Keyboard_Init();
 }
 
 int Harness_Hook_KeyDown(unsigned char pScan_code) {
     return Keyboard_IsKeyDown(pScan_code);
+}
+
+void Harness_Hook_S3Service(int unk1, int unk2) {
+    Sound_Service();
+}
+
+void Harness_Hook_S3StopAllOutletSounds() {
 }

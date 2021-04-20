@@ -3,6 +3,7 @@
 #include "crush.h"
 #include "cutscene.h"
 #include "drmem.h"
+#include "flicplay.h"
 #include "globvars.h"
 #include "globvrkm.h"
 #include "globvrpb.h"
@@ -12,6 +13,7 @@
 #include "loadsave.h"
 #include "mainloop.h"
 #include "mainmenu.h"
+#include "netgame.h"
 #include "opponent.h"
 #include "piping.h"
 #include "racestrt.h"
@@ -46,7 +48,16 @@ int NumberOfOpponentsLeft() {
     int result;
     tCar_spec* the_car;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    result = 0;
+    car_count = GetCarCount(eVehicle_opponent);
+    for (i = 0; car_count > i; ++i) {
+        the_car = GetCarSpec(eVehicle_opponent, i);
+        if (!the_car->knackered) {
+            result++;
+        }
+    }
+    return result;
 }
 
 // IDA: void __usercall RaceCompleted(tRace_over_reason pReason@<EAX>)
@@ -101,7 +112,7 @@ void CheckCheckpoints() {
     int car_index;
     tNet_game_player_info* net_player;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __cdecl TotalRepair()
@@ -220,7 +231,7 @@ void DoGame() {
     LOG_TRACE("()");
 
     gAbandon_game = 0;
-    gInterface_within_race_mode = 0;
+    gDisallow_abandon_race = 0;
     gCar_to_view = &gProgram_state.current_car;
     StartLoadingScreen();
     gProgram_state.prog_status = eProg_game_ongoing;
@@ -238,7 +249,7 @@ void DoGame() {
                 if (options_result == eSO_main_menu_invoked) {
                     DoMainMenuScreen(0, 1, 1);
                 }
-                gInterface_within_race_mode = 0;
+                gDisallow_abandon_race = 0;
             } while (options_result == eSO_main_menu_invoked && gProgram_state.prog_status == eProg_game_ongoing && !gAbandon_game);
         }
         if (gProgram_state.prog_status == eProg_game_starting
@@ -438,11 +449,23 @@ void JumpTheStart() {
 // IDA: void __cdecl GoingToInterfaceFromRace()
 void GoingToInterfaceFromRace() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gInterface_within_race_mode = 1;
+    PlayFlicsFromDisk();
+    SwitchToLoresMode();
+    if (gNet_mode == eNet_mode_host) {
+        SendGameplayToAllPlayers(eNet_gameplay_host_paused, 0, 0, 0, 0);
+    }
 }
 
 // IDA: void __cdecl GoingBackToRaceFromInterface()
 void GoingBackToRaceFromInterface() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gInterface_within_race_mode = 0;
+    PlayFlicsFromMemory();
+    SwitchToRealResolution();
+    if (gNet_mode == eNet_mode_host) {
+        SendGameplayToAllPlayers(eNet_gameplay_host_unpaused, 0, 0, 0, 0);
+    }
 }

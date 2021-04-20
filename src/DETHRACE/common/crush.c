@@ -208,7 +208,8 @@ void TotallyRepairACar(tCar_spec* pCar) {
     tChanged_vertex pipe_array[600];
     br_bounds storage_bounds;
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __cdecl TotallyRepairCar()
@@ -401,7 +402,7 @@ void DoWheelDamage(tU32 pFrame_period) {
     br_vector3 wonky_vector;
     static int kev_index[4];
     LOG_TRACE("(%d)", pFrame_period);
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __usercall CrashEarnings(tCar_spec *pCar1@<EAX>, tCar_spec *pCar2@<EDX>)

@@ -1,10 +1,13 @@
 #include "controls.h"
 
 #include "car.h"
+#include "constants.h"
 #include "displays.h"
 #include "flicplay.h"
 #include "globvars.h"
+#include "globvrkm.h"
 #include "graphics.h"
+#include "harness.h"
 #include "input.h"
 #include "loadsave.h"
 #include "mainloop.h"
@@ -65,13 +68,13 @@ tCheat gKev_keys[44] = {
 char* gAbuse_text[10];
 tEdit_func* gEdit_funcs[10][18][8];
 char* gEdit_mode_names[10];
-tToggle_element _gToggle_array[] = {
-    { 34, -2, 1, 1, 0, ConcussMe },
+tToggle_element gToggle_array[] = {
+    { 34, -2, 1, 1, 0, ToggleMirror },
     { 56, -2, 1, 1, 0, ToggleMap },
     { 35, -2, 1, 1, 0, TogglePratcam },
     { 59, -2, 1, 1, 0, SetRecovery },
     { 4, 7, 1, 1, 0, AbortRace },
-    { 45, -2, 1, 1, 0, ToggleMirror },
+    { 45, -2, 1, 1, 0, ToggleCockpit },
     { 50, -2, 1, 1, 0, LookLeft },
     { 51, -2, 1, 1, 0, LookRight },
     { 52, -2, 1, 1, 0, DamageTest },
@@ -156,13 +159,14 @@ void FinishLap(int i) {
 // IDA: void __cdecl EnsureSpecialVolumesHidden()
 void EnsureSpecialVolumesHidden() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __cdecl ShowSpecialVolumesIfRequ()
 void ShowSpecialVolumesIfRequ() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __usercall DoEditModeKey(int pIndex@<EAX>)
@@ -490,7 +494,25 @@ void TiltBonnetUpZ() {
 void ToggleCockpit() {
     br_scalar ts;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if ((&gProgram_state.current_car == gCar_to_view || gProgram_state.cockpit_on) && !gMap_mode) {
+        if (!gAusterity_mode || gProgram_state.cockpit_on) {
+            gProgram_state.cockpit_on = gProgram_state.cockpit_on == 0;
+            if (gProgram_state.cockpit_on) {
+                gCamera = gCamera_list[0];
+            } else {
+                gCamera = gCamera_list[1];
+            }
+            if (!gProgram_state.cockpit_on) {
+                InitialiseExternalCamera();
+                PositionExternalCamera(&gProgram_state.current_car, 1);
+            }
+            AdjustRenderScreenSize();
+            AdjustHeadups();
+        } else {
+            NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(192));
+        }
+    }
 }
 
 // IDA: void __cdecl ToggleMirror()
@@ -556,7 +578,30 @@ void CheckLoadSave() {
 void CheckToggles(int pRacing) {
     int i;
     int new_state;
-    SILENT_STUB();
+
+    for (i = 0; i < COUNT_OF(gToggle_array); i++) {
+        if ((!gToggle_array[i].in_game_only || pRacing)
+            && ((!gTyping && !gEntering_message) || gToggle_array[i].key2 != -2)) {
+            new_state = 0;
+            if (gToggle_array[i].key1 == -2 || KeyIsDown(gToggle_array[i].key1)) {
+                if (gToggle_array[i].key2 == -2 && gToggle_array[i].exact_modifiers) {
+                    if (!PDKeyDown(0) && !PDKeyDown(1) && !PDKeyDown(2) && !PDKeyDown(3)) {
+                        new_state = 1;
+                    }
+                } else {
+                    if (KeyIsDown(gToggle_array[i].key2)) {
+                        new_state = 1;
+                    }
+                }
+            }
+            if (gToggle_array[i].on_last_time != new_state) {
+                gToggle_array[i].on_last_time = new_state;
+                if (new_state) {
+                    gToggle_array[i].action_proc();
+                }
+            }
+        }
+    }
 }
 
 // IDA: int __usercall CarWorldOffFallenCheckThingy@<EAX>(tCar_spec *pCar@<EAX>, int pCheck_around@<EDX>)
@@ -639,7 +684,7 @@ void CheckRecoveryOfCars(tU32 pEndFrameTime) {
     int time;
     char s[256];
     LOG_TRACE("(%d)", pEndFrameTime);
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __usercall LoseSomePSPowerups(int pNumber@<EAX>)
@@ -669,7 +714,8 @@ void CheckOtherRacingKeys() {
     static int total_difference;
     static int stopped_repairing;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    SILENT_STUB();
 }
 
 // IDA: int __cdecl CheckRecoverCost()
@@ -773,7 +819,8 @@ void PollCarControls(tU32 pTime_difference) {
     tJoystick joystick;
     tCar_spec* c;
     LOG_TRACE("(%d)", pTime_difference);
-    NOT_IMPLEMENTED();
+
+    SILENT_STUB();
 }
 
 // IDA: void __usercall PollCameraControls(tU32 pTime_difference@<EAX>)
@@ -786,7 +833,8 @@ void PollCameraControls(tU32 pTime_difference) {
     int going_up;
     static int last_swirl_mode;
     LOG_TRACE("(%d)", pTime_difference);
-    NOT_IMPLEMENTED();
+
+    SILENT_STUB();
 }
 
 // IDA: void __usercall SetFlag2(int i@<EAX>)
@@ -842,7 +890,7 @@ void ToggleMap() {
     static int old_indent;
     static int was_in_cockpit;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: int __cdecl HornBlowing()
@@ -1020,7 +1068,7 @@ void EnterUserMessage() {
     int the_key;
     int abuse_num;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __cdecl DisplayUserMessage()

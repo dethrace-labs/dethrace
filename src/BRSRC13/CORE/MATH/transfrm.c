@@ -6,7 +6,83 @@
 #include "harness.h"
 
 char rscid[52];
-br_uint_8 _CombineTransforms[7][7];
+
+#define M34 BR_TRANSFORM_MATRIX34
+#define MLP BR_TRANSFORM_MATRIX34_LP
+#define QUT BR_TRANSFORM_QUAT
+#define EUL BR_TRANSFORM_EULER
+#define LUP BR_TRANSFORM_LOOK_UP
+#define TRA BR_TRANSFORM_TRANSLATION
+#define IDT BR_TRANSFORM_IDENTITY
+
+br_uint_8 _CombineTransforms[7][7] = {
+
+    /*M34, MLP, QUT, EUL, LUP, TRA, IDT */
+
+    /* M34 */ {
+        M34,
+        M34,
+        M34,
+        M34,
+        M34,
+        M34,
+        M34,
+    },
+    /* MLP */ {
+        M34,
+        MLP,
+        MLP,
+        MLP,
+        MLP,
+        MLP,
+        MLP,
+    },
+    /* QUT */ {
+        M34,
+        MLP,
+        MLP,
+        MLP,
+        MLP,
+        QUT,
+        QUT,
+    },
+    /* EUL */ {
+        M34,
+        MLP,
+        MLP,
+        MLP,
+        MLP,
+        EUL,
+        EUL,
+    },
+    /* LUP */ {
+        M34,
+        MLP,
+        MLP,
+        MLP,
+        MLP,
+        LUP,
+        LUP,
+    },
+    /* TRA */ {
+        M34,
+        MLP,
+        QUT,
+        EUL,
+        LUP,
+        TRA,
+        TRA,
+    },
+    /* IDT */ {
+        M34,
+        MLP,
+        QUT,
+        EUL,
+        LUP,
+        TRA,
+        IDT,
+    },
+};
 
 // IDA: void __cdecl BrTransformToMatrix34(br_matrix34 *mat, br_transform *xform)
 void BrTransformToMatrix34(br_matrix34* mat, br_transform* xform) {

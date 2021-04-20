@@ -373,7 +373,7 @@ tNet_contents* NetGetBroadcastContents(tNet_message_type pType, tS32 pSize_decid
 // IDA: void __cdecl NetSendMessageStacks()
 void NetSendMessageStacks() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: tNet_message* __usercall NetAllocateMessage@<EAX>(int pSize@<EAX>)
@@ -691,7 +691,7 @@ void NetReceiveAndProcessMessages() {
     tU32 receive_time;
     int old_net_service;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __cdecl BroadcastStatus()
@@ -730,13 +730,16 @@ void NetService(int pIn_race) {
 void NetFinishRace(tNet_game_details* pDetails, tRace_over_reason pReason) {
     tNet_message* the_message;
     LOG_TRACE("(%p, %d)", pDetails, pReason);
-    NOT_IMPLEMENTED();
+    STUB();
 }
 
 // IDA: void __usercall NetPlayerStatusChanged(tPlayer_status pNew_status@<EAX>)
 void NetPlayerStatusChanged(tPlayer_status pNew_status) {
     LOG_TRACE("(%d)", pNew_status);
     tNet_message* the_message;
+
+    STUB();
+    return;
 
     if (gNet_mode && pNew_status != gNet_players[gThis_net_player_index].player_status) {
         gNet_players[gThis_net_player_index].player_status = pNew_status;

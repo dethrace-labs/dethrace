@@ -852,7 +852,7 @@ tSO_result DoSelectRace(int* pSecond_time_around) {
         }
     } else {
         RunFlic(192);
-        gInterface_within_race_mode = 1;
+        gDisallow_abandon_race = 1;
         return eSO_main_menu_invoked;
     }
 }

@@ -4,6 +4,8 @@
 #include <string.h>
 
 #include "globvars.h"
+#include "piping.h"
+#include "s3/s3sound.h"
 #include "utility.h"
 
 tS3_outlet_ptr gIndexed_outlets[6];
@@ -69,7 +71,13 @@ void InitSound() {
 
 // IDA: tS3_sound_tag __usercall DRS3StartSound@<EAX>(tS3_outlet_ptr pOutlet@<EAX>, tS3_sound_id pSound@<EDX>)
 tS3_sound_tag DRS3StartSound(tS3_outlet_ptr pOutlet, tS3_sound_id pSound) {
-    STUB();
+    if (!gSound_enabled) {
+        return 0;
+    }
+    if (pSound != 1000 && (pSound < 3000 || pSound > 3007) && (pSound < 5300 || pSound > 5320)) {
+        PipeSingleSound(pOutlet, pSound, 0, 0, -1, 0);
+    }
+    return S3StartSound(pOutlet, pSound);
 }
 
 // IDA: tS3_sound_tag __usercall DRS3StartSoundNoPiping@<EAX>(tS3_outlet_ptr pOutlet@<EAX>, tS3_sound_id pSound@<EDX>)
@@ -175,7 +183,7 @@ int DRS3StopOutletSound(tS3_outlet_ptr pOutlet) {
 // IDA: int __cdecl DRS3StopAllOutletSounds()
 int DRS3StopAllOutletSounds() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    STUB();
 }
 
 // IDA: void __cdecl ToggleSoundEnable()
@@ -244,7 +252,7 @@ void MungeEngineNoise() {
     int stop_all;
     int type_of_engine_noise;
     tS3_sound_id engine_noise;
-    STUB();
+    SILENT_STUB();
 }
 
 // IDA: void __cdecl SetSoundVolumes()

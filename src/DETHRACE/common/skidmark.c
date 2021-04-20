@@ -135,7 +135,7 @@ void HideSkid(int pSkid_num) {
 void HideSkids() {
     int skid;
     LOG_TRACE("()");
-    
+
     STUB();
 }
 
@@ -172,14 +172,14 @@ void SkidMark(tCar_spec* pCar, int pWheel_num) {
 void InitCarSkidStuff(tCar_spec* pCar) {
     int wheel;
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+    STUB();
 }
 
 // IDA: void __cdecl SkidsPerFrame()
 void SkidsPerFrame() {
     int skid;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __cdecl RemoveMaterialsFromSkidmarks()

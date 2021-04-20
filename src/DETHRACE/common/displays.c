@@ -1,8 +1,12 @@
 #include "displays.h"
 #include "brender.h"
-#include "common/flicplay.h"
-#include "common/globvars.h"
-#include "common/graphics.h"
+#include "flicplay.h"
+#include "globvars.h"
+#include "globvrpb.h"
+#include "graphics.h"
+#include "netgame.h"
+#include "pd/sys.h"
+#include "utility.h"
 #include <stdlib.h>
 
 br_font* gBR_fonts[4];
@@ -36,7 +40,8 @@ int gCredits_won_headup;
 // IDA: void __usercall GetTimerString(char *pStr@<EAX>, int pFudge_colon@<EDX>)
 void GetTimerString(char* pStr, int pFudge_colon) {
     LOG_TRACE("(\"%s\", %d)", pStr, pFudge_colon);
-    NOT_IMPLEMENTED();
+
+    TimerString(gTimer, pStr, pFudge_colon, 0);
 }
 
 // IDA: void __cdecl InitHeadups()
@@ -44,7 +49,7 @@ void InitHeadups() {
     int i;
     LOG_TRACE("()");
     for (i = 0; i < 15; i++) {
-        gHeadups[i].type = 0;
+        gHeadups[i].type = eHeadup_unused;
     }
     gBR_fonts[0] = BrFontProp7x9;
     gBR_fonts[1] = BrFontFixed3x5;
@@ -55,7 +60,7 @@ void InitHeadups() {
 // IDA: void __usercall ClearHeadup(int pIndex@<EAX>)
 void ClearHeadup(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+    gHeadups[pIndex].type = eHeadup_unused;
 }
 
 // IDA: void __usercall ClearHeadupSlot(int pSlot_index@<EAX>)
@@ -63,7 +68,15 @@ void ClearHeadupSlot(int pSlot_index) {
     int i;
     tHeadup* the_headup;
     LOG_TRACE("(%d)", pSlot_index);
-    NOT_IMPLEMENTED();
+
+    the_headup = gHeadups;
+    for (i = 0; i < COUNT_OF(gHeadups); i++) {
+        if (the_headup->type && the_headup->slot_index == pSlot_index) {
+            ClearHeadup(i);
+            return;
+        }
+        the_headup++;
+    }
 }
 
 // IDA: void __cdecl ClearHeadups()
@@ -71,7 +84,7 @@ void ClearHeadups() {
     int i;
     LOG_TRACE("()");
 
-    for (i = 0; i < COUNT_OF(gHeadups); ++i) {
+    for (i = 0; i < COUNT_OF(gHeadups); i++) {
         if (gHeadups[i].type) {
             ClearHeadup(i);
         }
@@ -137,7 +150,55 @@ void DRPixelmapCleverText2(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFo
     unsigned char* ch;
     tDR_font* new_font;
     LOG_TRACE("(%p, %d, %d, %p, %p, %d)", pPixelmap, pX, pY, pFont, pText, pRight_edge);
-    NOT_IMPLEMENTED();
+
+    x = pX;
+    len = strlen((char*)pText);
+    ch = (unsigned char*)pText;
+    if (pX >= 0 && pPixelmap->width >= pRight_edge && pY >= 0 && pY + pFont->height <= pPixelmap->height) {
+        for (i = 0; i < len; i++) {
+            if (*ch < 224) {
+                chr = *ch - pFont->offset;
+                ch_width = pFont->width_table[chr];
+                DRPixelmapRectangleOnscreenCopy(
+                    gBack_screen,
+                    x,
+                    pY,
+                    pFont->images,
+                    0,
+                    chr * pFont->height,
+                    ch_width,
+                    pFont->height);
+                x += ch_width + pFont->spacing;
+            } else {
+                new_font = &gFonts[-*ch + 256];
+                pY -= (new_font->height - pFont->height) / 2;
+                pFont = new_font;
+            }
+            ch++;
+        }
+    } else {
+        for (i = 0; i < len; i++) {
+            if (*ch < 224) {
+                chr = *ch - pFont->offset;
+                ch_width = pFont->width_table[chr];
+                DRPixelmapRectangleMaskedCopy(
+                    gBack_screen,
+                    x,
+                    pY,
+                    pFont->images,
+                    0,
+                    chr * pFont->height,
+                    ch_width,
+                    pFont->height);
+                x += ch_width + pFont->spacing;
+            } else {
+                new_font = &gFonts[-*ch + 256];
+                pY -= (new_font->height - pFont->height) / 2;
+                pFont = new_font;
+            }
+            ch++;
+        }
+    }
 }
 
 // IDA: void __usercall DeviouslyDimRectangle(br_pixelmap *pPixelmap@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pRight@<ECX>, int pBottom, int pKnock_out_corners)
@@ -155,15 +216,26 @@ void DimRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int p
     int y;
     int line_skip;
     int width;
-    LOG_TRACE("(%p, %d, %d, %d, %d, %d)", pPixelmap, pLeft, pTop, pRight, pBottom, pKnock_out_corners);
-    NOT_IMPLEMENTED();
+    LOG_TRACE9("(%p, %d, %d, %d, %d, %d)", pPixelmap, pLeft, pTop, pRight, pBottom, pKnock_out_corners);
+    SILENT_STUB();
 }
 
 // IDA: void __cdecl DimAFewBits()
 void DimAFewBits() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    int dim_index; // Added
+    dim_index = gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0;
+    for (i = 0; i < gProgram_state.current_car.dim_count[dim_index]; i++) {
+        DimRectangle(
+            gBack_screen,
+            gProgram_state.current_car.dim_left[dim_index][i],
+            gProgram_state.current_car.dim_top[dim_index][i],
+            gProgram_state.current_car.dim_right[dim_index][i],
+            gProgram_state.current_car.dim_bottom[dim_index][i],
+            1);
+    }
 }
 
 // IDA: void __cdecl KillOldestQueuedHeadup()
@@ -190,7 +262,7 @@ void DoPSPowerHeadup(int pY, int pLevel, char* pName, int pBar_colour) {
 // IDA: void __cdecl DoPSPowerupHeadups()
 void DoPSPowerupHeadups() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __usercall DoHeadups(tU32 pThe_time@<EAX>)
@@ -201,7 +273,253 @@ void DoHeadups(tU32 pThe_time) {
     tHeadup* the_headup;
     int time_factor;
     LOG_TRACE("(%d)", pThe_time);
-    NOT_IMPLEMENTED();
+
+    if (gNet_mode) {
+        DoNetScores();
+    }
+    if (gQueued_headup_count && PDGetTotalTime() - gLast_centre_headup >= 1000) {
+        NewTextHeadupSlot(4, gQueued_headups[0].flash_rate,
+            gQueued_headups[0].lifetime,
+            gQueued_headups[0].font_index,
+            gQueued_headups[0].text);
+        KillOldestQueuedHeadup();
+    }
+
+    the_headup = gHeadups;
+    for (i = 0; i < 15; i++) {
+        the_headup = &gHeadups[i];
+        if (the_headup->type
+            && (gProgram_state.which_view == eView_forward || !the_headup->cockpit_anchored)
+            && (the_headup->type == eHeadup_image
+                || the_headup->type == eHeadup_fancy
+                || (the_headup->type == eHeadup_text && the_headup->data.text_info.text[0])
+                || ((the_headup->type == eHeadup_coloured_text || the_headup->type == eHeadup_box_text)
+                    && the_headup->data.text_info.text[0]))) {
+            if (the_headup->type == eHeadup_fancy || !the_headup->end_time || the_headup->end_time > pThe_time) {
+                if (the_headup->dimmed_background) {
+                    DimRectangle(
+                        gBack_screen,
+                        the_headup->dim_left,
+                        the_headup->dim_top,
+                        the_headup->dim_right,
+                        the_headup->dim_bottom,
+                        1);
+                }
+                if (!the_headup->flash_period
+                    || Flash(the_headup->flash_period, &the_headup->last_flash, &the_headup->flash_state)) {
+                    switch (the_headup->type) {
+                    case eHeadup_text:
+                        if (the_headup->cockpit_anchored) {
+                            y_offset = gScreen_wobble_y;
+                        } else {
+                            y_offset = 0;
+                        }
+                        if (the_headup->cockpit_anchored) {
+                            x_offset = gScreen_wobble_x;
+                        } else {
+                            x_offset = 0;
+                        }
+                        TransBrPixelmapText(
+                            gBack_screen,
+                            x_offset + the_headup->x,
+                            y_offset + the_headup->y,
+                            the_headup->data.text_info.colour,
+                            the_headup->data.text_info.font,
+                            (signed char*)the_headup->data.text_info.text);
+                        break;
+                    case eHeadup_coloured_text:
+                        if (the_headup->clever) {
+                            if (the_headup->cockpit_anchored) {
+                                y_offset = gScreen_wobble_y;
+                            } else {
+                                y_offset = 0;
+                            }
+                            if (the_headup->cockpit_anchored) {
+                                x_offset = gScreen_wobble_x;
+                            } else {
+                                x_offset = 0;
+                            }
+                            TransDRPixelmapCleverText(
+                                gBack_screen,
+                                x_offset + the_headup->x,
+                                y_offset + the_headup->y,
+                                the_headup->data.coloured_text_info.coloured_font,
+                                the_headup->data.text_info.text,
+                                the_headup->right_edge);
+                        } else {
+                            if (the_headup->cockpit_anchored) {
+                                y_offset = gScreen_wobble_y;
+                            } else {
+                                y_offset = 0;
+                            }
+                            if (the_headup->cockpit_anchored) {
+                                x_offset = gScreen_wobble_x;
+                            } else {
+                                x_offset = 0;
+                            }
+                            TransDRPixelmapText(
+                                gBack_screen,
+                                x_offset + the_headup->x,
+                                y_offset + the_headup->y,
+                                the_headup->data.coloured_text_info.coloured_font,
+                                the_headup->data.text_info.text,
+                                the_headup->right_edge);
+                        }
+                        break;
+                    case eHeadup_image:
+                        if (the_headup->cockpit_anchored) {
+                            y_offset = gScreen_wobble_y;
+                        } else {
+                            y_offset = 0;
+                        }
+                        if (the_headup->cockpit_anchored) {
+                            x_offset = gScreen_wobble_x;
+                        } else {
+                            x_offset = 0;
+                        }
+                        DRPixelmapRectangleMaskedCopy(
+                            gBack_screen,
+                            x_offset + the_headup->x,
+                            y_offset + the_headup->y,
+                            the_headup->data.image_info.image,
+                            0,
+                            0,
+                            the_headup->data.image_info.image->width,
+                            the_headup->data.image_info.image->height);
+                        break;
+
+                    case eHeadup_fancy:
+                        switch (the_headup->data.fancy_info.fancy_stage) {
+                        case eFancy_stage_incoming:
+                            the_headup->data.fancy_info.offset -= 500 * gFrame_period / 1000;
+                            if (the_headup->data.fancy_info.offset <= the_headup->data.fancy_info.shear_amount) {
+                                the_headup->data.fancy_info.offset = the_headup->data.fancy_info.shear_amount;
+                                the_headup->data.fancy_info.fancy_stage = eFancy_stage_halting;
+                                the_headup->data.fancy_info.start_time = GetTotalTime();
+                            }
+                            continue;
+                        case eFancy_stage_halting:
+                            time_factor = 1000 * (pThe_time - the_headup->data.fancy_info.start_time) / 100;
+                            if (time_factor > 1000) {
+                                if (time_factor > 1500) {
+                                    time_factor = 1500;
+                                    the_headup->data.fancy_info.fancy_stage = eFancy_stage_waiting;
+                                    the_headup->data.fancy_info.start_time = GetTotalTime();
+                                }
+                                DRPixelmapRectangleShearedCopy(
+                                    gBack_screen,
+                                    the_headup->x - (1500 - time_factor) * the_headup->data.fancy_info.shear_amount / 500,
+                                    the_headup->y,
+                                    the_headup->data.image_info.image,
+                                    0,
+                                    0,
+                                    the_headup->data.image_info.image->width,
+                                    the_headup->data.image_info.image->height,
+                                    (((1500 - time_factor) * the_headup->data.fancy_info.shear_amount / 500) << 16)
+                                        / the_headup->data.image_info.image->height);
+                            } else {
+                                DRPixelmapRectangleShearedCopy(
+                                    gBack_screen,
+                                    the_headup->x - the_headup->data.fancy_info.shear_amount * (time_factor - 500) / 500,
+                                    the_headup->y,
+                                    the_headup->data.image_info.image,
+                                    0,
+                                    0,
+                                    the_headup->data.image_info.image->width,
+                                    the_headup->data.image_info.image->height,
+                                    ((the_headup->data.fancy_info.shear_amount * (time_factor - 500) / 500) << 16)
+                                        / the_headup->data.image_info.image->height);
+                            }
+                            break;
+                        case eFancy_stage_waiting:
+                            if (pThe_time - the_headup->data.fancy_info.start_time > 1000) {
+                                the_headup->data.fancy_info.fancy_stage = eFancy_stage_readying;
+                                the_headup->data.fancy_info.start_time = GetTotalTime();
+                            }
+                            DRPixelmapRectangleMaskedCopy(
+                                gBack_screen,
+                                the_headup->x,
+                                the_headup->y,
+                                the_headup->data.image_info.image,
+                                0,
+                                0,
+                                the_headup->data.image_info.image->width,
+                                the_headup->data.image_info.image->height);
+                            break;
+                        case eFancy_stage_readying:
+                            time_factor = 1000 * (pThe_time - the_headup->data.fancy_info.start_time) / 100;
+                            if (time_factor > 1000) {
+                                time_factor = 1000;
+                                the_headup->data.fancy_info.fancy_stage = eFancy_stage_leaving;
+                                the_headup->data.fancy_info.start_time = GetTotalTime();
+                                the_headup->data.fancy_info.offset = 0;
+                            }
+                            DRPixelmapRectangleShearedCopy(
+                                gBack_screen,
+                                the_headup->x,
+                                the_headup->y,
+                                the_headup->data.image_info.image,
+                                0,
+                                0,
+                                the_headup->data.image_info.image->width,
+                                the_headup->data.image_info.image->height,
+                                -(((time_factor * the_headup->data.fancy_info.shear_amount / 1000) << 16)
+                                    / the_headup->data.image_info.image->height));
+                            break;
+                        case eFancy_stage_leaving:
+                            the_headup->data.fancy_info.offset -= 500 * gFrame_period / 0x3E8;
+                            if (the_headup->data.fancy_info.offset <= the_headup->data.fancy_info.end_offset) {
+                                ClearHeadup(i);
+                                break;
+                            }
+                            DRPixelmapRectangleShearedCopy(
+                                gBack_screen,
+                                the_headup->data.fancy_info.offset + the_headup->x,
+                                the_headup->y,
+                                the_headup->data.image_info.image,
+                                0,
+                                0,
+                                the_headup->data.image_info.image->width,
+                                the_headup->data.image_info.image->height,
+                                -65536);
+                            break;
+                        default:
+                            continue;
+                        }
+                        break;
+
+                    case eHeadup_box_text:
+                        if (the_headup->cockpit_anchored) {
+                            y_offset = gScreen_wobble_y;
+                        } else {
+                            y_offset = 0;
+                        }
+                        if (the_headup->cockpit_anchored) {
+                            x_offset = gScreen_wobble_y;
+                        } else {
+                            x_offset = 0;
+                        }
+                        OoerrIveGotTextInMeBoxMissus(
+                            the_headup->data.coloured_text_info.coloured_font - gFonts,
+                            the_headup->data.coloured_text_info.text,
+                            gBack_screen,
+                            gBack_screen->width / 10,
+                            x_offset + the_headup->y,
+                            9 * gBack_screen->width / 10,
+                            y_offset + the_headup->y + 60,
+                            1);
+                        break;
+                    default:
+                        break;
+                    }
+                }
+            } else {
+            LABEL_22:
+                ClearHeadup(i);
+            }
+        }
+    }
+    DoPSPowerupHeadups();
 }
 
 // IDA: int __usercall FindAHeadupHoleWoofBarkSoundsABitRude@<EAX>(int pSlot_index@<EAX>)
@@ -210,7 +528,20 @@ int FindAHeadupHoleWoofBarkSoundsABitRude(int pSlot_index) {
     int empty_one;
     tHeadup* the_headup;
     LOG_TRACE("(%d)", pSlot_index);
-    NOT_IMPLEMENTED();
+
+    the_headup = gHeadups;
+    empty_one = -1;
+    for (i = 0; i < COUNT_OF(gHeadups); i++) {
+        if (pSlot_index >= 0 && the_headup->slot_index == pSlot_index) {
+            return i;
+        }
+        if (the_headup->type == eHeadup_unused) {
+            empty_one = i;
+            break;
+        }
+        the_headup++;
+    }
+    return empty_one;
 }
 
 // IDA: int __usercall DRTextWidth@<EAX>(tDR_font *pFont@<EAX>, char *pText@<EDX>)
@@ -239,7 +570,26 @@ int DRTextCleverWidth(tDR_font* pFont, signed char* pText) {
     int result;
     unsigned char* c;
     LOG_TRACE("(%p, %p)", pFont, pText);
-    NOT_IMPLEMENTED();
+
+    result = 0;
+    len = strlen((char*)pText) + 1;
+    i = 0;
+    c = (unsigned char*)pText;
+    while (len - 1 > i) {
+        if (*c < 224u) {
+            if (len - 2 > i) {
+                result += pFont->spacing + pFont->width_table[*c - pFont->offset];
+            } else {
+                result += pFont->width_table[*c - pFont->offset];
+            }
+        } else {
+            LOG_DEBUG("font id %d", -*c + 256);
+            pFont = &gFonts[-*c + 256];
+        }
+        ++i;
+        ++c;
+    }
+    return result;
 }
 
 // IDA: void __usercall DRPixelmapCentredText(br_pixelmap *pPixelmap@<EAX>, int pX@<EDX>, int pY@<EBX>, tDR_font *pFont@<ECX>, char *pText)
@@ -252,14 +602,65 @@ void DRPixelmapCentredText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFo
 // IDA: int __usercall IsHeadupTextClever@<EAX>(signed char *pText@<EAX>)
 int IsHeadupTextClever(signed char* pText) {
     LOG_TRACE("(%p)", pText);
-    NOT_IMPLEMENTED();
+
+    while (*pText) {
+        pText++;
+        if (*pText < 0) {
+            return 1;
+        }
+    }
+    return 0;
 }
 
 // IDA: int __usercall MungeHeadupWidth@<EAX>(tHeadup *pHeadup@<EAX>)
 int MungeHeadupWidth(tHeadup* pHeadup) {
     int width;
     LOG_TRACE("(%p)", pHeadup);
-    NOT_IMPLEMENTED();
+
+    width = 0;
+    if (pHeadup->type == eHeadup_box_text) {
+        return 0;
+    }
+    if (pHeadup->type == eHeadup_coloured_text) {
+        pHeadup->clever = IsHeadupTextClever((signed char*)(&pHeadup->data.text_info.text));
+        if (pHeadup->justification) {
+            if (pHeadup->justification == eJust_right) {
+                if (pHeadup->clever) {
+                    width = DRTextCleverWidth(
+                        pHeadup->data.coloured_text_info.coloured_font,
+                        (signed char*)(&pHeadup->data.text_info.text));
+                } else {
+                    width = DRTextWidth(pHeadup->data.coloured_text_info.coloured_font, pHeadup->data.text_info.text);
+                }
+                pHeadup->x = pHeadup->original_x - width;
+            } else if (pHeadup->justification == eJust_centre) {
+                if (pHeadup->clever) {
+                    width = DRTextCleverWidth(
+                        pHeadup->data.coloured_text_info.coloured_font,
+                        (signed char*)(&pHeadup->data.text_info.text));
+                } else {
+                    width = DRTextWidth(pHeadup->data.coloured_text_info.coloured_font, pHeadup->data.text_info.text);
+                }
+                pHeadup->x = pHeadup->original_x - width / 2;
+            }
+        } else {
+            pHeadup->x = pHeadup->original_x;
+        }
+    } else {
+        pHeadup->clever = 0;
+        if (pHeadup->justification) {
+            if (pHeadup->justification == eJust_right) {
+                width = BrPixelmapTextWidth(gBack_screen, pHeadup->data.text_info.font, pHeadup->data.text_info.text);
+                pHeadup->x = pHeadup->original_x - width;
+            } else if (pHeadup->justification == eJust_centre) {
+                width = BrPixelmapTextWidth(gBack_screen, pHeadup->data.text_info.font, pHeadup->data.text_info.text);
+                pHeadup->x = pHeadup->original_x - width / 2;
+            }
+        } else {
+            pHeadup->x = pHeadup->original_x;
+        }
+    }
+    return width;
 }
 
 // IDA: int __usercall NewTextHeadupSlot2@<EAX>(int pSlot_index@<EAX>, int pFlash_rate@<EDX>, int pLifetime@<EBX>, int pFont_index@<ECX>, char *pText, int pQueue_it)
@@ -270,8 +671,66 @@ int NewTextHeadupSlot2(int pSlot_index, int pFlash_rate, int pLifetime, int pFon
     tU32 time;
     LOG_TRACE("(%d, %d, %d, %d, \"%s\", %d)", pSlot_index, pFlash_rate, pLifetime, pFont_index, pText, pQueue_it);
 
-    STUB();
-    return -1;
+    time = PDGetTotalTime();
+    if (pQueue_it && pSlot_index == 4 && (unsigned int)(time - gLast_centre_headup) < 1000) {
+        if (gQueued_headup_count == 4) {
+            KillOldestQueuedHeadup();
+        }
+        gQueued_headups[gQueued_headup_count].flash_rate = pFlash_rate;
+        gQueued_headups[gQueued_headup_count].lifetime = pLifetime;
+        gQueued_headups[gQueued_headup_count].font_index = pFont_index;
+        strcpy(gQueued_headups[gQueued_headup_count].text, pText);
+        gQueued_headup_count++;
+        index = -1;
+    } else {
+        index = FindAHeadupHoleWoofBarkSoundsABitRude(pSlot_index);
+        if (index >= 0) {
+            if (pSlot_index == 4) {
+                gLast_centre_headup = time;
+            }
+            headup_slot = &gProgram_state.current_car.headup_slots[gProgram_state.cockpit_on][pSlot_index];
+            the_headup = &gHeadups[index];
+            the_headup->data.coloured_text_info.coloured_font = &gFonts[-pFont_index];
+            if (pSlot_index == 4) {
+                the_headup->type = eHeadup_box_text;
+            } else {
+                the_headup->type = eHeadup_coloured_text;
+            }
+            if (!pText) {
+                LOG_PANIC("panic");
+            }
+            strcpy(the_headup->data.text_info.text, pText);
+
+            the_headup->slot_index = pSlot_index;
+            the_headup->justification = headup_slot->justification;
+            if (pSlot_index < 0) {
+                the_headup->cockpit_anchored = 0;
+            } else {
+                the_headup->cockpit_anchored = headup_slot->cockpit_anchored;
+            }
+            the_headup->dimmed_background = headup_slot->dimmed_background;
+            the_headup->dim_left = headup_slot->dim_left;
+            the_headup->dim_top = headup_slot->dim_top;
+            the_headup->dim_right = headup_slot->dim_right;
+            the_headup->dim_bottom = headup_slot->dim_bottom;
+            the_headup->original_x = headup_slot->x;
+            the_headup->right_edge = MungeHeadupWidth(the_headup) + the_headup->x;
+            the_headup->y = headup_slot->y;
+            if (pFlash_rate) {
+                the_headup->flash_period = 1000 / pFlash_rate;
+            } else {
+                the_headup->flash_period = 0;
+            }
+            the_headup->last_flash = 0;
+            the_headup->flash_state = 0;
+            if (pLifetime) {
+                the_headup->end_time = GetTotalTime() + pLifetime;
+            } else {
+                the_headup->end_time = 0;
+            }
+        }
+    }
+    return index;
 }
 
 // IDA: int __usercall NewTextHeadupSlot@<EAX>(int pSlot_index@<EAX>, int pFlash_rate@<EDX>, int pLifetime@<EBX>, int pFont_index@<ECX>, char *pText)
@@ -287,7 +746,51 @@ int NewImageHeadupSlot(int pSlot_index, int pFlash_rate, int pLifetime, int pIma
     tHeadup* the_headup;
     tHeadup_slot* headup_slot;
     LOG_TRACE("(%d, %d, %d, %d)", pSlot_index, pFlash_rate, pLifetime, pImage_index);
-    NOT_IMPLEMENTED();
+
+    index = FindAHeadupHoleWoofBarkSoundsABitRude(pSlot_index);
+    if (index >= 0) {
+        headup_slot = &gProgram_state.current_car.headup_slots[gProgram_state.cockpit_on][pSlot_index];
+        the_headup = &gHeadups[index];
+        the_headup->type = eHeadup_image;
+        the_headup->slot_index = pSlot_index;
+        the_headup->justification = headup_slot->justification;
+        if (pSlot_index < 0) {
+            the_headup->cockpit_anchored = 0;
+        } else {
+            the_headup->cockpit_anchored = headup_slot->cockpit_anchored;
+        }
+        the_headup->dimmed_background = headup_slot->dimmed_background;
+        the_headup->dim_left = headup_slot->dim_left;
+        the_headup->dim_top = headup_slot->dim_top;
+        the_headup->dim_right = headup_slot->dim_right;
+        the_headup->dim_bottom = headup_slot->dim_bottom;
+        the_headup->original_x = headup_slot->x;
+
+        if (headup_slot->justification) {
+            if (headup_slot->justification == eJust_right) {
+                the_headup->x = the_headup->original_x - gHeadup_images[pImage_index]->width;
+            } else if (headup_slot->justification == eJust_centre) {
+                the_headup->x = the_headup->original_x - gHeadup_images[pImage_index]->width / 2;
+            }
+        } else {
+            the_headup->x = the_headup->original_x;
+        }
+        the_headup->y = headup_slot->y;
+        if (pFlash_rate) {
+            the_headup->flash_period = 1000 / pFlash_rate;
+        } else {
+            the_headup->flash_period = 0;
+        }
+        the_headup->last_flash = 0;
+        the_headup->flash_state = 0;
+        if (pLifetime) {
+            the_headup->end_time = GetTotalTime() + pLifetime;
+        } else {
+            the_headup->end_time = 0;
+        }
+        the_headup->data.image_info.image = gHeadup_images[pImage_index];
+    }
+    return index;
 }
 
 // IDA: void __usercall DoFancyHeadup(int pIndex@<EAX>)
@@ -306,7 +809,24 @@ void AdjustHeadups() {
     int delta_y;
     tHeadup* the_headup;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    the_headup = gHeadups;
+    for (i = 0; i < COUNT_OF(gHeadups); i++) {
+        if (the_headup->type) {
+            delta_x = gProgram_state.current_car.headup_slots[gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0][the_headup->slot_index].x
+                - gProgram_state.current_car.headup_slots[!gProgram_state.cockpit_on || gProgram_state.cockpit_image_index < 0][the_headup->slot_index].x;
+            delta_y = gProgram_state.current_car.headup_slots[gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0][the_headup->slot_index].y
+                - gProgram_state.current_car.headup_slots[!gProgram_state.cockpit_on || gProgram_state.cockpit_image_index < 0][the_headup->slot_index].y;
+            the_headup->x += delta_x;
+            the_headup->original_x += delta_x;
+            the_headup->y += delta_y;
+            the_headup->dim_left += delta_x;
+            the_headup->dim_top += delta_y;
+            the_headup->dim_right += delta_x;
+            the_headup->dim_bottom += delta_y;
+        }
+        the_headup++;
+    }
 }
 
 // IDA: void __usercall MoveHeadupTo(int pHeadup_index@<EAX>, int pNew_x@<EDX>, int pNew_y@<EBX>)
@@ -321,7 +841,12 @@ void MoveHeadupTo(int pHeadup_index, int pNew_x, int pNew_y) {
 void ChangeHeadupText(int pHeadup_index, char* pNew_text) {
     tHeadup* the_headup;
     LOG_TRACE("(%d, \"%s\")", pHeadup_index, pNew_text);
-    NOT_IMPLEMENTED();
+
+    if (pHeadup_index >= 0) {
+        the_headup = &gHeadups[pHeadup_index];
+        strcpy(the_headup->data.text_info.text, pNew_text);
+        MungeHeadupWidth(the_headup);
+    }
 }
 
 // IDA: void __usercall ChangeHeadupImage(int pHeadup_index@<EAX>, int pNew_image@<EDX>)
@@ -347,7 +872,7 @@ void DoDamageScreen(tU32 pThe_time) {
     br_pixelmap* the_image;
     tDamage_unit* the_damage;
     LOG_TRACE("(%d)", pThe_time);
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __cdecl PoshDrawLine(float pAngle, br_pixelmap *pDestn, int pX1, int pY1, int pX2, int pY2, int pColour)
@@ -369,7 +894,7 @@ void DoInstruments(tU32 pThe_time) {
     double cos_angle;
     double speed_mph;
     LOG_TRACE("(%d)", pThe_time);
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __usercall DoSteeringWheel(tU32 pThe_time@<EAX>)
@@ -377,14 +902,14 @@ void DoSteeringWheel(tU32 pThe_time) {
     br_pixelmap* hands_image;
     int hands_index;
     LOG_TRACE("(%d)", pThe_time);
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __cdecl ChangingView()
 void ChangingView() {
     tU32 the_time;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __usercall EarnCredits2(int pAmount@<EAX>, char *pPrefix_text@<EDX>)
@@ -531,5 +1056,13 @@ void TransDRPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFont
 // IDA: void __usercall TransDRPixelmapCleverText(br_pixelmap *pPixelmap@<EAX>, int pX@<EDX>, int pY@<EBX>, tDR_font *pFont@<ECX>, char *pText, int pRight_edge)
 void TransDRPixelmapCleverText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFont, char* pText, int pRight_edge) {
     LOG_TRACE("(%p, %d, %d, %p, \"%s\", %d)", pPixelmap, pX, pY, pFont, pText, pRight_edge);
-    NOT_IMPLEMENTED();
+
+    if (gAusterity_mode && FlicsPlayedFromDisk() && gCached_font != pFont) {
+        if (gCached_font && gCached_font - gFonts > 13) {
+            DisposeFont(gCached_font - gFonts);
+        }
+        gCached_font = pFont;
+    }
+    LoadFont(pFont - gFonts);
+    DRPixelmapCleverText2(pPixelmap, pX, pY - (TranslationMode() == 0 ? 0 : 2), pFont, (signed char*)pText, pRight_edge);
 }

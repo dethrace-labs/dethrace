@@ -8,6 +8,7 @@
 #include "input.h"
 #include "loading.h"
 #include "loadsave.h"
+#include "network.h"
 #include "pd/sys.h"
 #include "sound.h"
 #include "structur.h"
@@ -38,21 +39,26 @@ void CheckNumberOfTracks() {
 
 // IDA: void __usercall ServiceTheGame(int pRacing@<EAX>)
 void ServiceTheGame(int pRacing) {
+
     if (!pRacing) {
         CyclePollKeys();
     }
     PollKeys();
     rand();
     if (PDServiceSystem(gFrame_period)) {
-        //sub_500B0(v3);
+        QuitGame();
     }
     if (!pRacing) {
         CheckSystemKeys(0);
     }
     if (!pRacing && gSound_enabled) {
-        // TODO: sound?
-        // S3Service(gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0, 2);
+        if (gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0) {
+            Harness_Hook_S3Service(1, 2);
+        } else {
+            Harness_Hook_S3Service(0, 2);
+        }
     }
+    NetService(pRacing);
 }
 
 // IDA: void __cdecl ServiceGame()
@@ -63,7 +69,9 @@ void ServiceGame() {
 // IDA: void __cdecl ServiceGameInRace()
 void ServiceGameInRace() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    ServiceTheGame(1);
+    CheckKevKeys();
 }
 
 // IDA: void __usercall GameMain(int pArgc@<EAX>, char **pArgv@<EDX>)

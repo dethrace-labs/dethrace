@@ -1,5 +1,6 @@
 #include "opponent.h"
 #include "brender.h"
+#include "car.h"
 #include "errors.h"
 #include "globvars.h"
 #include "globvrpb.h"
@@ -531,7 +532,7 @@ void RebuildActiveCarList() {
 // IDA: void __cdecl ForceRebuildActiveCarList()
 void ForceRebuildActiveCarList() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    STUB();
 }
 
 // IDA: void __usercall StartToCheat(tOpponent_spec *pOpponent_spec@<EAX>)
@@ -861,7 +862,7 @@ void MungeOpponents(tU32 pFrame_period) {
     int i;
     int un_stun_flag;
     LOG_TRACE("(%d)", pFrame_period);
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __cdecl SetInitialCopPositions()
@@ -908,13 +909,68 @@ void ReportMurderToPoliceDepartment(tCar_spec* pCar_spec) {
 // IDA: int __usercall GetCarCount@<EAX>(tVehicle_type pCategory@<EAX>)
 int GetCarCount(tVehicle_type pCategory) {
     LOG_TRACE("(%d)", pCategory);
-    NOT_IMPLEMENTED();
+
+    switch (pCategory) {
+
+    case eVehicle_self:
+        return 1;
+
+    case eVehicle_net_player:
+        if (gNet_mode) {
+            return gNumber_of_net_players - 1;
+        } else {
+            return 0;
+        }
+        break;
+    case eVehicle_opponent:
+        return gProgram_state.AI_vehicles.number_of_opponents;
+
+    case eVehicle_rozzer:
+        return gNumber_of_cops_before_faffage;
+
+    case eVehicle_drone:
+        return 0;
+
+    case eVehicle_not_really:
+        return gNum_active_non_cars;
+
+    default:
+        return 0;
+    }
 }
 
 // IDA: tCar_spec* __usercall GetCarSpec@<EAX>(tVehicle_type pCategory@<EAX>, int pIndex@<EDX>)
 tCar_spec* GetCarSpec(tVehicle_type pCategory, int pIndex) {
     LOG_TRACE("(%d, %d)", pCategory, pIndex);
-    NOT_IMPLEMENTED();
+
+    switch (pCategory) {
+
+    case eVehicle_self:
+        return &gProgram_state.current_car;
+
+    case eVehicle_net_player:
+        if (gThis_net_player_index > pIndex) {
+            return gNet_players[pIndex].car;
+        } else {
+            return gNet_players[pIndex + 1].car;
+        }
+
+    case eVehicle_opponent:
+        return gProgram_state.AI_vehicles.opponents[pIndex].car_spec;
+
+    case eVehicle_rozzer:
+        return gProgram_state.AI_vehicles.cops[pIndex].car_spec;
+
+    case eVehicle_drone:
+        PDEnterDebugger("OPPONENT.C: GetCarSpec() can't return drone car_specs");
+        return 0;
+
+    case eVehicle_not_really:
+        return (tCar_spec*)gActive_non_car_list[pIndex];
+
+    default:
+        return 0;
+    }
 }
 
 // IDA: char* __usercall GetDriverName@<EAX>(tVehicle_type pCategory@<EAX>, int pIndex@<EDX>)

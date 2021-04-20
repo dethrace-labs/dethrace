@@ -4,9 +4,56 @@
 #include "br_types.h"
 #include "dr_types.h"
 
-extern int gMin_respawn_time;
-extern int gRespawn_variance;
+extern tProximity_ray gProximity_rays[20];
+extern int gVesuvian_corpses;
+extern int gPed_colliding;
 extern float gZombie_factor;
+extern int gRespawn_variance;
+extern br_scalar gPed_scale_factor;
+extern int gTotal_peds;
+extern int gPedestrian_harvest;
+extern br_actor* gPath_actor;
+extern br_vector3 gPed_pos_camera;
+extern int gMin_respawn_time;
+extern br_material* gPath_mat_calc;
+extern br_actor* gCurrent_ped_path_actor;
+extern float gPedestrian_speed_factor;
+extern int gExploding_pedestrians;
+extern int gBlind_pedestrians;
+extern br_material* gPed_material;
+extern br_material* gPath_mat_normal;
+extern int gPedestrians_on;
+extern br_material* gInit_pos_mat_calc;
+extern int gPed_other;
+extern int gAttracted_pedestrians;
+extern int gPed_count;
+extern int gPed_ref_num;
+extern br_scalar gMax_distance_squared;
+extern br_model* gPed_model;
+extern float gDanger_level;
+extern br_scalar gExploding_ped_scale[3];
+extern br_vector3 gDanger_direction;
+extern int gPed_instruc_count;
+extern int gInit_ped_instruc;
+extern br_vector3 gZero_v_pedestrn; // added _pedestrn to avoid name collision with car.c
+extern char* gRate_commands[3];
+extern char* gCollide_commands[1];
+extern int gCurrent_lollipop_index;
+extern int gDetect_peds;
+extern int gVesuvians_this_time;
+extern int gNumber_of_ped_gibs;
+extern tU32 gLast_ped_message_send;
+extern tPedestrian_data* gFlag_waving_bastard;
+extern int gReally_stupid_ped_bug_enable;
+extern int gNumber_of_pedestrians;
+extern br_pixelmap* gProx_ray_shade_table;
+extern tPedestrian_data* gPedestrian_array;
+extern int gVesuvians_last_time;
+extern tU32 gLast_ped_splat_time;
+extern int gCurrent_ped_multiplier;
+extern int gPed_sound_disable;
+extern tPedestrian_instruction* gInitial_instruction;
+extern int gSend_peds;
 
 void PedModelUpdate(br_model* pModel, br_scalar x0, br_scalar y0, br_scalar x1, br_scalar y1, br_scalar x2, br_scalar y2, br_scalar x3, br_scalar y3);
 

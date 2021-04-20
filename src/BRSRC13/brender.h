@@ -17,6 +17,7 @@ br_actor* BrActorRemove(br_actor* a);
 void BrActorFree(br_actor* a);
 br_uint_32 BrActorEnum(br_actor* parent, br_actor_enum_cbfn* callback, void* arg);
 br_bounds* BrActorToBounds(br_bounds* b, br_actor* ap);
+br_uint_16 BrActorToActorMatrix34(br_matrix34* m, br_actor* a, br_actor* b);
 
 // BrAllocator
 br_allocator* BrAllocatorSet(br_allocator* newal);
@@ -56,6 +57,7 @@ br_uint_32 BrMaterialEnum(char* pattern, br_material_enum_cbfn* callback, void* 
 void BrMatrix23Identity(br_matrix23* mat);
 
 void BrMatrix34Identity(br_matrix34* mat);
+void BrMatrix34Pre(br_matrix34* mat, br_matrix34* A);
 void BrMatrix34ApplyV(br_vector3* A, br_vector3* B, br_matrix34* C);
 br_scalar BrMatrix34Inverse(br_matrix34* B, br_matrix34* A);
 void BrMatrix34ApplyP(br_vector3* A, br_vector3* B, br_matrix34* C);
@@ -127,6 +129,10 @@ void BrFatal(const char* name, int line, const char* s, ...);
 
 // Z-buffer
 void BrZbBegin(br_uint_8 colour_type, br_uint_8 depth_type);
+
+void BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer);
+void BrZbSceneRenderAdd(br_actor* tree);
+void BrZbSceneRenderEnd();
 
 br_pixelmap* DOSGfxBegin(char* setup_string);
 

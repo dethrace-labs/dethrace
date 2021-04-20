@@ -1,11 +1,14 @@
 #include "car.h"
 #include "brender.h"
+#include "controls.h"
+#include "crush.h"
 #include "globvars.h"
 #include "globvrkm.h"
 #include "globvrpb.h"
 #include "netgame.h"
 #include "opponent.h"
 #include "raycast.h"
+#include "skidmark.h"
 #include "utility.h"
 #include <stdlib.h>
 
@@ -52,7 +55,7 @@ br_vector3 gCamera_pos_before_collide;
 br_scalar gGravity;
 br_vector3 gNew_ground_normal;
 br_scalar gDt;
-int gFace_num;
+int gFace_num = 1;
 int gCollision_detection_on;
 int gControl;
 br_vector3 gGround_normal;
@@ -207,7 +210,137 @@ void InitialiseCar2(tCar_spec* pCar, int pClear_disabled_flag) {
     br_matrix34 initial_yaw_matrix;
     br_matrix34 safe_position;
     LOG_TRACE("(%p, %d)", pCar, pClear_disabled_flag);
-    NOT_IMPLEMENTED();
+
+    PossibleService();
+    if (pCar->disabled && pClear_disabled_flag) {
+        EnableCar(pCar);
+    }
+    car_actor = pCar->car_master_actor;
+    InitCarSkidStuff(pCar);
+    if (pCar->current_car_actor >= 0) {
+        pCar->car_model_actors[pCar->current_car_actor].actor->render_style = BR_RSTYLE_NONE;
+    }
+    SwitchCarActor(pCar, pCar->current_car_actor);
+    if (!strcmp(pCar->name, "STELLA.TXT")) {
+        pCar->proxy_ray_distance = 6.0;
+    } else {
+        pCar->proxy_ray_distance = 0.0;
+    }
+    pCar->last_special_volume = 0;
+    pCar->auto_special_volume = 0;
+    pCar->num_smoke_columns = 0;
+    pCar->who_last_hit_me = 0;
+    pCar->screen_material_source = 0;
+    if (pCar->screen_material) {
+        pCar->screen_material->colour_map = 0;
+        pCar->screen_material->index_shade = gRender_shade_table;
+        BrMaterialUpdate(pCar->screen_material, 0x7FFFu);
+    }
+    if (pCar->driver == eDriver_local_human) {
+        ResetRecoveryVouchers();
+    }
+    BrVector3SetFloat(&pCar->v, 0.0, 0.0, 0.0);
+    BrVector3SetFloat(&pCar->omega, 0.0, 0.0, 0.0);
+    pCar->curvature = 0.0;
+    BrMatrix34Copy(&safe_position, &pCar->car_master_actor->t.t.mat);
+    if (safe_position.m[3][0] > 500.0) {
+        safe_position.m[3][0] -= 1000.0f;
+        safe_position.m[3][1] -= 1000.0f;
+        safe_position.m[3][2] -= 1000.0f;
+    }
+    BrMatrix34Copy(&pCar->old_frame_mat, &safe_position);
+    BrMatrix34Copy(&pCar->oldmat, &safe_position);
+    pCar->oldmat.m[3][0] *= 6.9000001;
+    pCar->oldmat.m[3][1] *= 6.9000001;
+    pCar->oldmat.m[3][2] *= 6.9000001;
+    BrMatrix34ApplyP(&pCar->pos, &pCar->cmpos, &pCar->oldmat);
+    pCar->pos.v[0] /= 6.9000001;
+    pCar->pos.v[1] /= 6.9000001;
+    pCar->pos.v[2] /= 6.9000001;
+    for (j = 0; j < COUNT_OF(pCar->oldd); j++) {
+        pCar->oldd[j] = pCar->ride_height;
+    }
+    pCar->gear = 0;
+    pCar->revs = 0.0;
+    pCar->traction_control = 1;
+    pCar->direction.v[0] = -pCar->car_master_actor->t.t.mat.m[2][0];
+    pCar->direction.v[1] = -pCar->car_master_actor->t.t.mat.m[2][1];
+    pCar->direction.v[2] = -pCar->car_master_actor->t.t.mat.m[2][2];
+    for (j = 0; j < COUNT_OF(pCar->last_safe_positions); j++) {
+        BrMatrix34Copy(&pCar->last_safe_positions[j], &safe_position);
+    }
+    pCar->message.type = 0;
+    pCar->message.time = 0;
+    pCar->dt = -1.0;
+    pCar->last_car_car_collision = 1;
+    pCar->time_to_recover = 0;
+    pCar->repair_time = 0;
+
+    switch (pCar->driver) {
+
+    case eDriver_oppo:
+        index = 0;
+        for (j = 0; gCurrent_race.number_of_racers > j; ++j) {
+            if (gCurrent_race.opponent_list[j].car_spec->driver == eDriver_oppo) {
+                if (gCurrent_race.opponent_list[j].car_spec == pCar) {
+                    pCar->car_ID = index + 512;
+                }
+                index++;
+            }
+        }
+        break;
+
+    case eDriver_net_human:
+        index = 0;
+        for (j = 0; gCurrent_race.number_of_racers > j; ++j) {
+            if (gCurrent_race.opponent_list[j].car_spec
+                && gCurrent_race.opponent_list[j].car_spec->driver == eDriver_net_human) {
+                if (gCurrent_race.opponent_list[j].car_spec == pCar) {
+                    pCar->car_ID = index + 256;
+                }
+                index++;
+            }
+        }
+        break;
+
+    case eDriver_local_human:
+        pCar->car_ID = 0;
+        break;
+
+    default:
+        LOG_WARN("Case %d not handled", pCar->driver);
+        break;
+    }
+    PossibleService();
+    pCar->box_face_ref = gFace_num - 2;
+    pCar->doing_nothing_flag = 0;
+    pCar->end_steering_damage_effect = 0;
+    pCar->end_trans_damage_effect = 0;
+    pCar->wheel_dam_offset[0] = 0.0;
+    pCar->wheel_dam_offset[1] = 0.0;
+    pCar->wheel_dam_offset[2] = 0.0;
+    pCar->wheel_dam_offset[3] = 0.0;
+    pCar->shadow_intersection_flags = 0;
+    pCar->underwater_ability = 0;
+    pCar->invulnerable = 0;
+    pCar->wall_climber_mode = 0;
+    pCar->grip_multiplier = 1.0;
+    pCar->damage_multiplier = 1.0;
+    pCar->collision_mass_multiplier = 1.0;
+    pCar->engine_power_multiplier = 1.0;
+    pCar->bounce_rate = 0.0;
+    pCar->bounce_amount = 0.0;
+    pCar->knackered = 0;
+    TotallyRepairACar(pCar);
+    SetCarSuspGiveAndHeight(pCar, 1.0, 1.0, 1.0, 0.0, 0.0);
+    for (j = 0; j < 64; ++j) {
+        pCar->powerups[j] = 0;
+    }
+    if (gNet_mode) {
+        for (j = 0; j < 3; ++j) {
+            pCar->power_up_levels[j] = 0;
+        }
+    }
 }
 
 // IDA: void __usercall InitialiseCar(tCar_spec *pCar@<EAX>)
@@ -260,7 +393,19 @@ void GetAverageGridPosition(tRace_info* pThe_race) {
     br_scalar total_cars;
     tCar_spec* car;
     LOG_TRACE("(%p)", pThe_race);
-    NOT_IMPLEMENTED();
+
+    total_cars = 0.0;
+    BrVector3SetFloat(&gAverage_grid_position, 0.0, 0.0, 0.0);
+    for (i = 0; pThe_race->number_of_racers > i; ++i) {
+        car = pThe_race->opponent_list[i].car_spec;
+        gAverage_grid_position.v[0] = car->pos.v[0] + gAverage_grid_position.v[0];
+        gAverage_grid_position.v[1] = car->pos.v[1] + gAverage_grid_position.v[1];
+        gAverage_grid_position.v[2] = car->pos.v[2] + gAverage_grid_position.v[2];
+        total_cars = total_cars + 1.0;
+    }
+    gAverage_grid_position.v[0] = gAverage_grid_position.v[0] / total_cars;
+    gAverage_grid_position.v[1] = gAverage_grid_position.v[1] / total_cars;
+    gAverage_grid_position.v[2] = gAverage_grid_position.v[2] / total_cars;
 }
 
 // IDA: void __usercall SetInitialPosition(tRace_info *pThe_race@<EAX>, int pCar_index@<EDX>, int pGrid_index@<EBX>)
@@ -439,7 +584,7 @@ void ControlOurCar(tU32 pTime_difference) {
     int i;
     tU32 time;
     LOG_TRACE("(%d)", pTime_difference);
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __usercall CalcEngineForce(tCar_spec *c@<EAX>, br_scalar dt)
@@ -523,7 +668,8 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
     tU32 time_step;
     tU32 frame_end_time;
     LOG_TRACE("(%d, %d)", last_frame_time, pTime_difference);
-    NOT_IMPLEMENTED();
+
+    SILENT_STUB();
 }
 
 // IDA: void __usercall MungeSpecialVolume(tCollision_info *pCar@<EAX>)
@@ -1241,7 +1387,7 @@ void MungeCarGraphics(tU32 pFrame_period) {
     tU32 the_time;
     br_actor* oily_actor;
     LOG_TRACE("(%d)", pFrame_period);
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __cdecl ResetCarScreens()
@@ -1251,7 +1397,7 @@ void ResetCarScreens() {
     int i;
     tCar_spec* the_car;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    STUB();
 }
 
 // IDA: tCar_spec* __cdecl GetRaceLeader()
@@ -1339,7 +1485,8 @@ void PositionExternalCamera(tCar_spec* c, tU32 pTime) {
     static int old_camera_mode;
     br_camera* camera_ptr;
     LOG_TRACE("(%p, %d)", c, pTime);
-    NOT_IMPLEMENTED();
+
+    SILENT_STUB();
 }
 
 // IDA: void __usercall CameraBugFix(tCar_spec *c@<EAX>, tU32 pTime@<EDX>)
@@ -1348,7 +1495,7 @@ void CameraBugFix(tCar_spec* c, tU32 pTime) {
     br_matrix34* m2;
     br_vector3 tv;
     LOG_TRACE("(%p, %d)", c, pTime);
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: int __usercall PossibleRemoveNonCarFromWorld@<EAX>(br_actor *pActor@<EAX>)
@@ -1607,7 +1754,42 @@ void InitialiseExternalCamera() {
     br_vector3 r;
     br_angle yaw;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    c = gCar_to_view;
+    if (!gProgram_state.racing) {
+        c = &gProgram_state.current_car;
+    }
+    gCamera_height = c->pos.v[1];
+    gView_direction.v[0] = c->direction.v[0];
+    gView_direction.v[1] = 0.0;
+    gView_direction.v[2] = c->direction.v[2];
+    ts = sqrt(gView_direction.v[0] * gView_direction.v[0] + gView_direction.v[2] * gView_direction.v[2]);
+    if (ts <= 2.3841858e-7) {
+        gView_direction.v[0] = 1.0;
+        gView_direction.v[1] = 0.0;
+        gView_direction.v[2] = 0.0;
+    } else {
+        gView_direction.v[0] *= (1.0 / ts);
+        gView_direction.v[1] *= (1.0 / ts);
+        gView_direction.v[2] *= (1.0 / ts);
+    }
+    ts = -(gView_direction.v[1] * c->car_master_actor->t.t.mat.m[2][1]
+        + gView_direction.v[0] * c->car_master_actor->t.t.mat.m[2][0]
+        + gView_direction.v[2] * c->car_master_actor->t.t.mat.m[2][2]);
+    gCamera_sign = ts < 0;
+    gCamera_mode = 0;
+    if (ts >= 0.0) {
+        yaw = -gCamera_yaw;
+    } else {
+        yaw = gCamera_yaw;
+    }
+    DrVector3RotateY(&gView_direction, yaw);
+    gMin_camera_car_distance = 0.60000002;
+    gCamera_frozen = 0;
+    gCamera_mode = -2;
+    if (gCountdown && (!gNet_mode || gCurrent_net_game->options.grid_start) && gCountdown > 4) {
+        gCamera_height = gCamera_height + 10.0;
+    }
 }
 
 // IDA: void __cdecl FreezeCamera()
@@ -1636,7 +1818,12 @@ void DrVector3RotateY(br_vector3* v, br_angle t) {
     br_scalar s;
     br_scalar ts;
     LOG_TRACE("(%p, %d)", v, t);
-    NOT_IMPLEMENTED();
+
+    c = cos(BrAngleToRadian(t));
+    s = sin(BrAngleToRadian(t));
+    ts = v->v[0] * c + v->v[2] * s;
+    v->v[2] = v->v[2] * c - v->v[0] * s;
+    v->v[0] = ts;
 }
 
 // IDA: void __cdecl CrashCarsTogether(br_scalar dt)

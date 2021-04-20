@@ -5,7 +5,7 @@
 #include <unistd.h>
 
 #if defined _WIN32 && !defined sleep
-    #define sleep(x) _sleep(x)
+#define sleep(x) _sleep(x)
 #endif
 
 #define BLUE
@@ -45,7 +45,12 @@
 #define STUB() \
     debug_printf("\033[0;31m[WARN] %s ", __FUNCTION__, "%s", "stubbed");
 
-#define SILENT_STUB()
+#define SILENT_STUB()                                                        \
+    static int stub_printed = 0;                                             \
+    if (!stub_printed) {                                                     \
+        debug_printf("\033[0;31m[WARN] %s ", __FUNCTION__, "%s", "stubbed"); \
+        stub_printed = 1;                                                    \
+    }
 
 void debug_printf(const char* fmt, const char* fn, const char* fmt2, ...);
 int count_open_fds();

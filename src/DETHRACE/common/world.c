@@ -2437,7 +2437,7 @@ void FreeTrack(tTrack_spec* pTrack_spec) {
 // IDA: void __usercall ProcessTrack(br_actor *pWorld@<EAX>, tTrack_spec *pTrack_spec@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world_transform@<ECX>, int pRender_blends)
 void ProcessTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, br_matrix34* pCamera_to_world_transform, int pRender_blends) {
     LOG_TRACE("(%p, %p, %p, %p, %d)", pWorld, pTrack_spec, pCamera, pCamera_to_world_transform, pRender_blends);
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: br_scalar __cdecl NormaliseDegreeAngle(br_scalar pAngle)
@@ -2464,7 +2464,7 @@ void FunkThoseTronics() {
     float f_time_diff;
     br_pixelmap* old_colour_map;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __usercall LollipopizeActor(br_actor *pSubject_actor@<EAX>, br_matrix34 *ref_to_world@<EDX>, tLollipop_mode pWhich_axis@<EBX>)
@@ -2528,7 +2528,7 @@ void GrooveThoseDelics() {
     tGroovidelic_spec* the_groove;
     float f_the_time;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __usercall StopGroovidelic(br_actor *pActor@<EAX>)
@@ -2551,7 +2551,12 @@ void ResetGrooveFlags() {
     int i;
     tGroovidelic_spec* the_groove;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    the_groove = gGroovidelics_array;
+    for (i = 0; i < gGroovidelics_array_size; i++) {
+        the_groove->done_this_frame = 0;
+        the_groove++;
+    }
 }
 
 // IDA: tSpecial_volume* __cdecl GetDefaultSpecialVolumeForWater()

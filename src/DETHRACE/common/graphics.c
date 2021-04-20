@@ -1,30 +1,48 @@
 #include "graphics.h"
 
-#include "CORE/V1DB/modsupt.h"
 #include "brender.h"
-#include "common/flicplay.h"
+#include "controls.h"
+#include "depth.h"
+#include "displays.h"
 #include "errors.h"
+#include "flicplay.h"
 #include "globvars.h"
+#include "globvrpb.h"
 #include "grafdata.h"
 #include "init.h"
 #include "loading.h"
+#include "network.h"
+#include "opponent.h"
 #include "pd/sys.h"
+#include "pedestrn.h"
+#include "piping.h"
+#include "powerup.h"
+#include "pratcam.h"
+#include "replay.h"
 #include "sound.h"
+#include "spark.h"
 #include "utility.h"
+#include "world.h"
 #include <stdlib.h>
 #include <unistd.h>
 
 #include <math.h>
 
 int gArrows[2][4][60];
-int gMap_colours[4];
+int gMap_colours[4] = { 4, 0, 52, 132 };
 br_vector3 gShadow_points[8];
 tConcussion gConcussion;
 tClip_details gShadow_clip_planes[8];
 br_matrix34 gSheer_mat;
 br_actor* gLollipops[100];
 tWobble_spec gWobble_array[5];
-br_matrix34 gIdentity34;
+br_matrix34 gIdentity34 = {
+    { { 1.0, 0.0, 0.0 },
+        { 0.0, 1.0, 0.0 },
+        { 0.0, 0.0, 1.0 },
+        { 0.0, 0.0, 0.0 } }
+};
+
 tSaved_table gSaved_shade_tables[100];
 int* gCursor_giblet_sequences[4];
 int gCursor_y_offsets[8];
@@ -133,7 +151,7 @@ br_scalar gAmbient_adjustment;
 int gMap_render_x_i;
 int gX_offset;
 int gMap_render_y_i;
-int gMirror_on;
+int gMirror_on_graphics; // Added graphics suffix to avoid name collision
 br_scalar gYon_squared;
 
 // IDA: void __cdecl TurnOnPaletteConversion()
@@ -151,7 +169,8 @@ void TurnOffPaletteConversion() {
 // IDA: void __cdecl ResetLollipopQueue()
 void ResetLollipopQueue() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gNumber_of_lollipops = 0;
 }
 
 // IDA: int __usercall AddToLollipopQueue@<EAX>(br_actor *pActor@<EAX>, int pIndex@<EDX>)
@@ -179,7 +198,7 @@ void RenderLollipops() {
     br_actor** the_actor;
     br_actor* old_parent;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __usercall DRDrawLine(br_pixelmap *pDestn@<EAX>, int pX1@<EDX>, int pY1@<EBX>, int pX2@<ECX>, int pY2, int pColour)
@@ -379,7 +398,7 @@ void SetBRenderScreenAndBuffers(int pX_offset, int pY_offset, int pWidth, int pH
     if (!pHeight) {
         pHeight = gBack_screen->height;
     }
-    gRender_screen = DRPixelmapAllocateSub(gBack_screen, pX_offset, pY_offset, pHeight, pWidth);
+    gRender_screen = DRPixelmapAllocateSub(gBack_screen, pX_offset, pY_offset, pWidth, pHeight);
     gWidth = pWidth;
     gHeight = pHeight;
     gY_offset = pY_offset;
@@ -433,6 +452,7 @@ void AdjustRenderScreenSize() {
     if (gRender_screen->row_bytes == gRender_screen->width) {
         gRender_screen->flags |= BR_PMF_ROW_WHOLEPIXELS;
     } else {
+        TELL_ME_IF_WE_PASS_THIS_WAY();
         //v0 = gRender_screen->flags & 0xFB;
     }
     gRender_screen->origin_x = gRender_screen->width / 2;
@@ -473,7 +493,16 @@ void DRSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
 // IDA: void __usercall DRSetPalette3(br_pixelmap *pThe_palette@<EAX>, int pSet_current_palette@<EDX>)
 void DRSetPalette3(br_pixelmap* pThe_palette, int pSet_current_palette) {
     LOG_TRACE("(%p, %d)", pThe_palette, pSet_current_palette);
-    NOT_IMPLEMENTED();
+
+    if (pSet_current_palette) {
+        memcpy(gCurrent_palette_pixels, pThe_palette->pixels, 0x400u);
+    }
+    if (!gFaded_palette) {
+        PDSetPalette(pThe_palette);
+    }
+    if (pThe_palette != gRender_palette) {
+        gPalette_munged |= 1u;
+    }
 }
 
 // IDA: void __usercall DRSetPalette2(br_pixelmap *pThe_palette@<EAX>, int pSet_current_palette@<EDX>)
@@ -485,17 +514,14 @@ void DRSetPalette2(br_pixelmap* pThe_palette, int pSet_current_palette) {
     if (!gFaded_palette) {
         PDSetPalette(pThe_palette);
     }
-    gPalette_munged |= pThe_palette != gRender_palette;
+    if (pThe_palette != gRender_palette) {
+        gPalette_munged |= 1u;
+    }
 }
 
 // IDA: void __usercall DRSetPalette(br_pixelmap *pThe_palette@<EAX>)
 void DRSetPalette(br_pixelmap* pThe_palette) {
-    ((br_int_32*)pThe_palette->pixels)[0] = 0;
-    memcpy(gCurrent_palette_pixels, pThe_palette->pixels, 0x400u);
-    if (!gFaded_palette) {
-        PDSetPalette(pThe_palette);
-    }
-    gPalette_munged |= pThe_palette != gRender_palette;
+    DRSetPalette2(pThe_palette, 1);
 }
 
 // IDA: void __cdecl InitializePalettes()
@@ -589,7 +615,10 @@ void CalculateWobblitude(tU32 pThe_time) {
     double mod_angle;
     double cosine_over_angle;
     LOG_TRACE("(%d)", pThe_time);
-    NOT_IMPLEMENTED();
+
+    gScreen_wobble_x = 0;
+    gScreen_wobble_y = 0;
+    SILENT_STUB();
 }
 
 // IDA: void __usercall CalculateConcussion(tU32 pThe_time@<EAX>)
@@ -602,7 +631,9 @@ void CalculateConcussion(tU32 pThe_time) {
     float mod_angle;
     float cosine_over_angle;
     LOG_TRACE("(%d)", pThe_time);
-    NOT_IMPLEMENTED();
+
+    gConcussion.concussed = 0;
+    SILENT_STUB();
 }
 
 // IDA: void __cdecl SufferFromConcussion(float pSeriousness)
@@ -616,7 +647,7 @@ void SufferFromConcussion(float pSeriousness) {
 // IDA: void __usercall ProcessNonTrackActors(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>, br_matrix34 *pOld_camera_matrix)
 void ProcessNonTrackActors(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world, br_matrix34* pOld_camera_matrix) {
     LOG_TRACE("(%p, %p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world, pOld_camera_matrix);
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: int __usercall OppositeColour@<EAX>(int pColour@<EAX>)
@@ -772,7 +803,7 @@ void RenderShadows(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera
     br_vector3 camera_to_car;
     br_scalar distance_factor;
     LOG_TRACE("(%p, %p, %p, %p)", pWorld, pTrack_spec, pCamera, pCamera_to_world_transform);
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __usercall FlashyMapCheckpoint(int pIndex@<EAX>, tU32 pTime@<EDX>)
@@ -781,14 +812,16 @@ void FlashyMapCheckpoint(int pIndex, tU32 pTime) {
     static tU32 last_flash;
     static int flash_state;
     LOG_TRACE("(%d, %d)", pIndex, pTime);
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: int __usercall ConditionallyFillWithSky@<EAX>(br_pixelmap *pPixelmap@<EAX>)
 int ConditionallyFillWithSky(br_pixelmap* pPixelmap) {
     int bgnd_col;
     LOG_TRACE("(%p)", pPixelmap);
-    NOT_IMPLEMENTED();
+
+    SILENT_STUB();
+    return 1;
 }
 
 // IDA: void __usercall RenderAFrame(int pDepth_mask_on@<EAX>)
@@ -816,19 +849,327 @@ void RenderAFrame(int pDepth_mask_on) {
     char the_text[256];
     tCar_spec* car;
     LOG_TRACE("(%d)", pDepth_mask_on);
-    NOT_IMPLEMENTED();
+
+    gRender_screen->pixels = gBack_screen->pixels;
+    the_time = GetTotalTime();
+    old_pixels = gRender_screen->pixels;
+    cockpit_on = gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 && !gMap_mode;
+    gMirror_on_graphics = gProgram_state.mirror_on && cockpit_on && gProgram_state.which_view == eView_forward;
+    if (gMap_mode) {
+        real_origin_x = gBack_screen->origin_x;
+        real_origin_y = gBack_screen->origin_y;
+        real_base_x = gBack_screen->base_x;
+        real_base_y = gBack_screen->base_y;
+        gBack_screen->origin_x = 0;
+        gBack_screen->origin_y = 0;
+        gBack_screen->base_x = 0;
+        gBack_screen->base_y = 0;
+        if (gCurrent_race.map_image) {
+            if (gReal_graf_data_index) {
+                BrPixelmapRectangleFill(gBack_screen, 0, 0, 640, 40, 0);
+                BrPixelmapRectangleFill(gBack_screen, 0, 440, 640, 40, 0);
+                DRPixelmapDoubledCopy(
+                    gBack_screen,
+                    gCurrent_race.map_image,
+                    gCurrent_race.map_image->width,
+                    gCurrent_race.map_image->height,
+                    0,
+                    40);
+            } else {
+                DRPixelmapCopy(gBack_screen, gCurrent_race.map_image);
+            }
+        }
+        DimRectangle(
+            gBack_screen,
+            gMap_render_x_i - gCurrent_graf_data->map_render_x_marg,
+            gMap_render_y_i - gCurrent_graf_data->map_render_y_marg,
+            gMap_render_x_i + gMap_render_width_i + gCurrent_graf_data->map_render_x_marg,
+            gMap_render_y_i + gMap_render_height_i + gCurrent_graf_data->map_render_y_marg,
+            1);
+    }
+    if (!gAction_replay_mode) {
+        CalculateWobblitude(the_time);
+    }
+    if (cockpit_on) {
+        if (-gScreen_wobble_x <= gX_offset) {
+            if (gScreen_wobble_x + gX_offset + gRender_screen->width <= gBack_screen->width) {
+                x_shift = gScreen_wobble_x;
+            } else {
+                x_shift = gBack_screen->width - gRender_screen->width - gX_offset;
+            }
+        } else {
+            x_shift = -gX_offset;
+        }
+        if (-gScreen_wobble_y <= gY_offset) {
+            if (gScreen_wobble_y + gY_offset + gRender_screen->height <= gBack_screen->height) {
+                y_shift = gScreen_wobble_y;
+            } else {
+                y_shift = gBack_screen->height - gRender_screen->height - gY_offset;
+            }
+        } else {
+            y_shift = -gY_offset;
+        }
+    } else {
+        x_shift = 0;
+        y_shift = 0;
+    }
+    old_camera_matrix = gCamera->t.t.mat;
+    if (gMirror_on_graphics) {
+        old_mirror_cam_matrix = gRearview_camera->t.t.mat;
+    }
+    if (cockpit_on) {
+        gIdentity34.m[2][1] = (double)y_shift / (double)gRender_screen->height;
+        gIdentity34.m[2][0] = (double)-x_shift / (double)gRender_screen->width;
+        BrMatrix34Pre(&gCamera->t.t.mat, &gIdentity34);
+        gCamera->t.t.mat.m[3][0] = gCamera->t.t.mat.m[3][0]
+            - (double)gScreen_wobble_x * 1.5 / (double)gRender_screen->width / 6.9000001;
+        gCamera->t.t.mat.m[3][1] = (double)gScreen_wobble_y * 1.5 / (double)gRender_screen->width / 6.9000001
+            + gCamera->t.t.mat.m[3][1];
+    }
+    gRender_screen->pixels = (char*)gRender_screen->pixels + x_shift + y_shift * gRender_screen->row_bytes;
+    CalculateConcussion(the_time);
+    BrPixelmapRectangleFill(gDepth_buffer, 0, 0, gRender_screen->width, gRender_screen->height, 0xFFFFFFFF);
+    if (gRender_indent && !gMap_mode) {
+        BrPixelmapRectangleFill(
+            gBack_screen,
+            0,
+            0,
+            gGraf_specs[gGraf_spec_index].total_width,
+            gProgram_state.current_render_top,
+            0);
+        BrPixelmapRectangleFill(
+            gBack_screen,
+            0,
+            gProgram_state.current_render_bottom,
+            gGraf_specs[gGraf_spec_index].total_width,
+            gGraf_specs[gGraf_spec_index].total_height - gProgram_state.current_render_bottom,
+            0);
+        BrPixelmapRectangleFill(
+            gBack_screen,
+            0,
+            gProgram_state.current_render_top,
+            gProgram_state.current_render_left,
+            gProgram_state.current_render_bottom - gProgram_state.current_render_top,
+            0);
+        BrPixelmapRectangleFill(
+            gBack_screen,
+            gProgram_state.current_render_right,
+            gProgram_state.current_render_top,
+            gGraf_specs[gGraf_spec_index].total_width - gProgram_state.current_render_right,
+            gProgram_state.current_render_bottom - gProgram_state.current_render_top,
+            0);
+    }
+    gRendering_mirror = 0;
+    DoSpecialCameraEffect(gCamera, &gCamera_to_world);
+    if (!ConditionallyFillWithSky(gRender_screen)
+        && !gProgram_state.cockpit_on
+        && !(gAction_replay_camera_mode * gAction_replay_mode)) {
+        ExternalSky(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world);
+    }
+    for (i = 0; i < (gMap_mode == 0 ? 1 : 3); i++) {
+        RenderShadows(gUniverse_actor, &gProgram_state.track_spec, gCamera, &gCamera_to_world);
+        BrZbSceneRenderBegin(gUniverse_actor, gCamera, gRender_screen, gDepth_buffer);
+        ProcessNonTrackActors(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, &old_camera_matrix);
+        ProcessTrack(gUniverse_actor, &gProgram_state.track_spec, gCamera, &gCamera_to_world, 0);
+        RenderLollipops();
+        DepthEffectSky(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world);
+        DepthEffect(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world);
+        if (!gAusterity_mode) {
+            ProcessTrack(gUniverse_actor, &gProgram_state.track_spec, gCamera, &gCamera_to_world, 1);
+        }
+        RenderSplashes();
+        RenderSmoke(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, gFrame_period);
+        RenderSparks(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, gFrame_period);
+        RenderProximityRays(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, gFrame_period);
+        BrZbSceneRenderEnd();
+    }
+    gCamera->t.t.mat = old_camera_matrix;
+    if (gMirror_on_graphics) {
+        LOG_PANIC("mirror is on");
+        BrPixelmapFill(gRearview_depth_buffer, 0xFFFFFFFF);
+        gRendering_mirror = 1;
+        DoSpecialCameraEffect(gRearview_camera, &gRearview_camera_to_world);
+        ConditionallyFillWithSky(gRearview_screen);
+        BrZbSceneRenderBegin(gUniverse_actor, gRearview_camera, gRearview_screen, gRearview_depth_buffer);
+        ProcessNonTrackActors(
+            gRearview_screen,
+            gRearview_depth_buffer,
+            gRearview_camera,
+            &gRearview_camera_to_world,
+            &old_mirror_cam_matrix);
+        ProcessTrack(gUniverse_actor, &gProgram_state.track_spec, gRearview_camera, &gRearview_camera_to_world, 0);
+        RenderLollipops();
+        DepthEffectSky(gRearview_screen, gRearview_depth_buffer, gRearview_camera, &gRearview_camera_to_world);
+        DepthEffect(gRearview_screen, gRearview_depth_buffer, gRearview_camera, &gRearview_camera_to_world);
+        if (!gAusterity_mode) {
+            ProcessTrack(gUniverse_actor, &gProgram_state.track_spec, gRearview_camera, &gRearview_camera_to_world, 1);
+        }
+        RenderSplashes();
+        BrZbSceneRenderEnd();
+        gRearview_camera->t.t.mat = old_mirror_cam_matrix;
+        gRendering_mirror = 0;
+    }
+    if (gMap_mode) {
+        if (gNet_mode == eNet_mode_none) {
+            GetTimerString(the_text, 0);
+            map_timer_width = DRTextWidth(&gFonts[2], the_text);
+            map_timer_x = gCurrent_graf_data->map_timer_text_x - map_timer_width;
+            BrPixelmapRectangleFill(
+                gBack_screen,
+                map_timer_x - gCurrent_graf_data->map_timer_border_x,
+                gCurrent_graf_data->map_timer_text_y - gCurrent_graf_data->map_timer_border_y,
+                map_timer_width + 2 * gCurrent_graf_data->map_timer_border_x,
+                gFonts[2].height + 2 * gCurrent_graf_data->map_timer_border_y,
+                0);
+            TransDRPixelmapText(
+                gBack_screen,
+                map_timer_x,
+                gCurrent_graf_data->map_timer_text_y,
+                &gFonts[2],
+                the_text,
+                gBack_screen->width);
+        }
+        the_time = PDGetTotalTime();
+        if (gNet_mode) {
+            if (gCurrent_net_game->type == eNet_game_type_checkpoint) {
+                flags = gNet_players[gThis_net_player_index].score;
+                for (i = 0; gCurrent_race.check_point_count > i; ++i) {
+                    if ((flags & 1) != 0) {
+                        FlashyMapCheckpoint(i, the_time);
+                    }
+                    flags >>= 1;
+                }
+            } else if (gCurrent_net_game->type == eNet_game_type_sudden_death
+                && gNet_players[gThis_net_player_index].score >= 0) {
+                FlashyMapCheckpoint(
+                    gNet_players[gThis_net_player_index].score % gCurrent_race.check_point_count,
+                    the_time);
+            }
+        } else {
+            FlashyMapCheckpoint(gCheckpoint - 1, the_time);
+        }
+        if (gShow_peds_on_map || (gNet_mode && gCurrent_net_game->options.show_powerups_on_map)) {
+            for (i = 0; GetPedCount() > i; ++i) {
+                ped_type = GetPedPosition(i, &pos);
+                if (ped_type > 0 && gShow_peds_on_map) {
+                    DrawMapSmallBlip(the_time, &pos, 52);
+                } else if (ped_type < 0 && (gNet_mode && gCurrent_net_game->options.show_powerups_on_map)) {
+                    DrawMapSmallBlip(the_time, &pos, 4);
+                }
+            }
+        }
+        if (gShow_opponents) {
+            cat = eVehicle_opponent;
+        } else {
+            cat = eVehicle_self;
+        }
+        while (cat >= eVehicle_self) {
+            if (cat) {
+                car_count = GetCarCount(cat);
+            } else {
+                car_count = 1;
+            }
+            for (i = 0; i < car_count; i++) {
+                if (cat) {
+                    car = GetCarSpec(cat, i);
+                } else {
+                    car = &gProgram_state.current_car;
+                }
+                if (gNet_mode == eNet_mode_none || (!car->knackered && !NetPlayerFromCar(car)->wasted)) {
+                    if (cat) {
+                        car_pos = &GetCarSpec(cat, i)->car_master_actor->t.t.euler.t;
+                    } else {
+                        car_pos = &gSelf->t.t.euler.t;
+                    }
+                    if (gNet_mode) {
+                        DrawMapBlip(
+                            car,
+                            the_time,
+                            &car->car_master_actor->t.t.mat,
+                            car_pos,
+                            car->shrapnel_material[0]->index_range + car->shrapnel_material[0]->index_base - 1);
+                    } else if (car->knackered) {
+                        DrawMapBlip(car, the_time, &car->car_master_actor->t.t.mat, car_pos, 0);
+                    } else {
+                        DrawMapBlip(car, the_time, &car->car_master_actor->t.t.mat, car_pos, gMap_colours[cat]);
+                    }
+                }
+            }
+            cat--;
+        }
+        gBack_screen->origin_x = real_origin_x;
+        gBack_screen->origin_y = real_origin_y;
+        gBack_screen->base_x = real_base_x;
+        gBack_screen->base_y = real_base_y;
+    } else {
+        if (cockpit_on) {
+            CopyStripImage(
+                gBack_screen,
+                -gCurrent_graf_data->cock_margin_x,
+                gScreen_wobble_x,
+                -gCurrent_graf_data->cock_margin_y,
+                gScreen_wobble_y,
+                gProgram_state.current_car.cockpit_images[gProgram_state.cockpit_image_index],
+                0,
+                0,
+                gCurrent_graf_data->total_cock_width,
+                gCurrent_graf_data->total_cock_height);
+            if (gMirror_on_graphics) {
+                BrPixelmapRectangleCopy(
+                    gBack_screen,
+                    gScreen_wobble_x + gProgram_state.current_car.mirror_left,
+                    gScreen_wobble_y + gProgram_state.current_car.mirror_top,
+                    gRearview_screen,
+                    -gRearview_screen->origin_x,
+                    -gRearview_screen->origin_y,
+                    gProgram_state.current_car.mirror_right - gProgram_state.current_car.mirror_left,
+                    gProgram_state.current_car.mirror_bottom - gProgram_state.current_car.mirror_top);
+            }
+        }
+        DimAFewBits();
+        DoDamageScreen(the_time);
+        if (!gAction_replay_mode || gAR_fudge_headups) {
+            DoPratcam(the_time);
+            DoHeadups(the_time);
+        }
+        DoInstruments(the_time);
+        DoSteeringWheel(the_time);
+        if (!gAction_replay_mode || gAR_fudge_headups) {
+            DrawPowerups(the_time);
+        }
+    }
+    if (gNet_mode) {
+        DisplayUserMessage();
+    }
+    if (gAction_replay_mode && !gAR_fudge_headups) {
+        DoActionReplayHeadups();
+    }
+    if (gAction_replay_mode) {
+        SynchronizeActionReplay();
+    } else {
+        PipeFrameFinish();
+    }
+    gRender_screen->pixels = old_pixels;
+    if (!gRecover_timer || GetRaceTime() > gRecover_timer + 500) {
+        PDScreenBufferSwap(0);
+    }
+    if (gAction_replay_mode) {
+        DoActionReplayPostSwap();
+    }
 }
 
 // IDA: void __cdecl InitPaletteAnimate()
 void InitPaletteAnimate() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    //dword_53E78C = 0;
+    //dword_53F930 = 0;
 }
 
 // IDA: void __cdecl RevertPalette()
 void RevertPalette() {
-    gPalette_munged = 0;
-    gPalette_index = 0;
+    memcpy(gRender_palette->pixels, gOrig_render_palette->pixels, 0x400u);
+    DRSetPalette3(gRender_palette, 1);
 }
 
 // IDA: void __cdecl MungePalette()
@@ -856,16 +1197,16 @@ void MungePalette() {
 void ResetPalette() {
     LOG_TRACE("()");
 
-    gPalette_index = 0;
-    gPalette_munged = 0;
-    DRSetPalette2(gRender_palette, 1);
+    InitPaletteAnimate();
+    DRSetPalette(gRender_palette);
 }
 
 // IDA: void __usercall Darken(tU8 *pPtr@<EAX>, unsigned int pDarken_amount@<EDX>)
 void Darken(tU8* pPtr, unsigned int pDarken_amount) {
     unsigned int value;
-    LOG_TRACE("(%p, %d)", pPtr, pDarken_amount);
-    NOT_IMPLEMENTED();
+    //LOG_TRACE("(%p, %d)", pPtr, pDarken_amount);
+
+    *pPtr = (pDarken_amount * *pPtr) / 256;
 }
 
 // IDA: void __usercall SetFadedPalette(int pDegree@<EAX>)
@@ -876,19 +1217,13 @@ void SetFadedPalette(int pDegree) {
     LOG_TRACE10("(%d)", pDegree);
 
     memcpy(gScratch_pixels, gCurrent_palette->pixels, 0x400u);
-    the_pixels = (unsigned char*)gScratch_pixels;
-
-    for (j = 0; j < 1024; j += 4) {
-        the_pixels[j] = (pDegree * the_pixels[j]) / 256;
-        the_pixels[j + 1] = (pDegree * the_pixels[j + 1]) / 256;
-        the_pixels[j + 2] = (pDegree * the_pixels[j + 2]) / 256;
-        the_pixels[j + 3] = (pDegree * the_pixels[j + 3]) / 256;
+    for (j = 0; j < 256; j++) {
+        Darken((tU8*)&gScratch_pixels[4 * j], pDegree);
+        Darken((tU8*)&gScratch_pixels[4 * j + 1], pDegree);
+        Darken((tU8*)&gScratch_pixels[4 * j + 2], pDegree);
+        Darken((tU8*)&gScratch_pixels[4 * j + 3], pDegree);
     }
-    ((int32_t*)gScratch_palette->pixels)[0] = 0;
-    if (!gFaded_palette) {
-        PDSetPalette(gScratch_palette);
-    }
-    gPalette_munged |= gScratch_palette != gRender_palette;
+    DRSetPalette2(gScratch_palette, 0);
 }
 
 // IDA: void __cdecl FadePaletteDown()
@@ -932,7 +1267,7 @@ void FadePaletteUp() {
             i = (the_time * 256) / 500;
             SetFadedPalette(i);
         }
-        DRSetPalette2(gCurrent_palette, 1);
+        DRSetPalette(gCurrent_palette);
     }
 }
 
@@ -951,8 +1286,7 @@ void KillSplashScreen() {
 void EnsureRenderPalette() {
     LOG_TRACE("()");
     if (gPalette_munged) {
-        RevertPalette();
-        DRSetPalette(gRender_palette);
+        ResetPalette();
         gPalette_munged = 0;
     }
 }
@@ -965,16 +1299,10 @@ void SplashScreenWith(char* pPixmap_name) {
     the_map = BrMapFind(pPixmap_name);
     if (!gCurrent_splash || the_map != gCurrent_splash) {
         FadePaletteDown();
-        if (gPalette_munged) {
-            ResetPalette();
-            gPalette_munged = 0;
-        }
+        EnsureRenderPalette();
+
         if (gCurrent_splash) {
-            BrMapRemove(gCurrent_splash);
-            BrPixelmapFree(gCurrent_splash);
-            gCurrent_splash = 0;
-            FadePaletteDown();
-            ClearEntireScreen();
+            KillSplashScreen();
         }
         gCurrent_splash = the_map;
         if (!the_map) {
