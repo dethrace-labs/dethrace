@@ -17,8 +17,6 @@ char rscid[52];
 
 br_uint_8 _CombineTransforms[7][7] = {
 
-    /*M34, MLP, QUT, EUL, LUP, TRA, IDT */
-
     /* M34 */ {
         M34,
         M34,

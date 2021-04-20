@@ -273,9 +273,6 @@ void BrMatrix34LPInverse(br_matrix34* A, br_matrix34* B) {
     A(2, 1) = B(1, 2);
     A(2, 2) = B(2, 2);
 
-    /*
-	 * Calculate -C * inverse(A)
-	 */
     A(3, 0) = -BR_MAC3(B(3, 0), A(0, 0), B(3, 1), A(1, 0), B(3, 2), A(2, 0));
     A(3, 1) = -BR_MAC3(B(3, 0), A(0, 1), B(3, 1), A(1, 1), B(3, 2), A(2, 1));
     A(3, 2) = -BR_MAC3(B(3, 0), A(0, 2), B(3, 1), A(1, 2), B(3, 2), A(2, 2));

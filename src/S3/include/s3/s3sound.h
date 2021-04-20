@@ -3,6 +3,7 @@
 
 #include "s3_types.h"
 
+void S3Service(int inside_cockpit, int unk1);
 tS3_sound_tag S3StartSound(tS3_outlet_ptr pOutlet, tS3_sound_id pSound);
 void S3StopAllOutletSounds();
 

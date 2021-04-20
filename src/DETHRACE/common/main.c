@@ -10,6 +10,7 @@
 #include "loadsave.h"
 #include "network.h"
 #include "pd/sys.h"
+#include "s3/s3sound.h"
 #include "sound.h"
 #include "structur.h"
 #include "utility.h"
@@ -53,9 +54,9 @@ void ServiceTheGame(int pRacing) {
     }
     if (!pRacing && gSound_enabled) {
         if (gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0) {
-            Harness_Hook_S3Service(1, 2);
+            S3Service(1, 2);
         } else {
-            Harness_Hook_S3Service(0, 2);
+            S3Service(0, 2);
         }
     }
     NetService(pRacing);
