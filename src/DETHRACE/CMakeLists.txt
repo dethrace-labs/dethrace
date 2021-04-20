@@ -6,6 +6,7 @@ target_include_directories(dethrace_obj PUBLIC
     common
     pd
     ${CMAKE_SOURCE_DIR}/lib
+    ${CMAKE_SOURCE_DIR}/src/harness
     ${CMAKE_SOURCE_DIR}/src/BRSRC13
     ${CMAKE_SOURCE_DIR}/src/S3/include
 )

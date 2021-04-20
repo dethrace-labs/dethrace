@@ -18,18 +18,18 @@ void debug_printf(const char* fmt, const char* fn, const char* fmt2, ...) {
     fputs("\033[0m\n", stderr);
 }
 
-int count_open_fds() {
-    DIR* dp = opendir("/dev/fd/");
-    struct dirent* de;
-    int count = -3; // '.', '..', dp
+// int count_open_fds() {
+//     DIR* dp = opendir("/dev/fd/");
+//     struct dirent* de;
+//     int count = -3; // '.', '..', dp
 
-    if (dp == NULL)
-        return -1;
+//     if (dp == NULL)
+//         return -1;
 
-    while ((de = readdir(dp)) != NULL)
-        count++;
+//     while ((de = readdir(dp)) != NULL)
+//         count++;
 
-    (void)closedir(dp);
+//     (void)closedir(dp);
 
-    return count;
-}
+//     return count;
+// }
