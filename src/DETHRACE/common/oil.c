@@ -161,7 +161,7 @@ void ProcessOilSpills(tU32 pFrame_period) {
     br_vector3 v;
     tNet_message* message;
     LOG_TRACE("(%d)", pFrame_period);
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: int __cdecl GetOilSpillCount()

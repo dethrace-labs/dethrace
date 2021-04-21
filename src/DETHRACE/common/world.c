@@ -165,6 +165,7 @@ void ClearOutStorageSpace(tBrender_storage* pStorage_space) {
 }
 
 // IDA: tAdd_to_storage_result __usercall AddPixelmapToStorage@<EAX>(tBrender_storage *pStorage_space@<EAX>, br_pixelmap **pThe_pm@<EDX>)
+// This seems like the signature should be `br_pixelmap* pThe_pm`
 tAdd_to_storage_result AddPixelmapToStorage(tBrender_storage* pStorage_space, br_pixelmap** pThe_pm) {
     int i;
     LOG_TRACE("(%p, %p)", pStorage_space, pThe_pm);
@@ -175,8 +176,8 @@ tAdd_to_storage_result AddPixelmapToStorage(tBrender_storage* pStorage_space, br
 
     for (i = 0; i < pStorage_space->pixelmaps_count; i++) {
         if (pStorage_space->pixelmaps[i]->identifier
-            && pThe_pm[1]
-            && !strcmp(pStorage_space->pixelmaps[i]->identifier, (const char*)pThe_pm[1])) {
+            && ((br_pixelmap*)pThe_pm)->identifier
+            && !strcmp(pStorage_space->pixelmaps[i]->identifier, ((br_pixelmap*)pThe_pm)->identifier)) {
             return eStorage_duplicate;
         }
     }
@@ -305,7 +306,7 @@ br_pixelmap* LoadSinglePixelmap(tBrender_storage* pStorage_space, char* pName) {
         return BrMapFind(pName);
     }
 
-    switch (AddPixelmapToStorage(pStorage_space, temp)) {
+    switch (AddPixelmapToStorage(pStorage_space, (br_pixelmap**)temp)) {
     case eStorage_not_enough_room:
         FatalError(67);
         break;
@@ -2437,7 +2438,7 @@ void FreeTrack(tTrack_spec* pTrack_spec) {
 // IDA: void __usercall ProcessTrack(br_actor *pWorld@<EAX>, tTrack_spec *pTrack_spec@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world_transform@<ECX>, int pRender_blends)
 void ProcessTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, br_matrix34* pCamera_to_world_transform, int pRender_blends) {
     LOG_TRACE("(%p, %p, %p, %p, %d)", pWorld, pTrack_spec, pCamera, pCamera_to_world_transform, pRender_blends);
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: br_scalar __cdecl NormaliseDegreeAngle(br_scalar pAngle)
@@ -2464,7 +2465,7 @@ void FunkThoseTronics() {
     float f_time_diff;
     br_pixelmap* old_colour_map;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __usercall LollipopizeActor(br_actor *pSubject_actor@<EAX>, br_matrix34 *ref_to_world@<EDX>, tLollipop_mode pWhich_axis@<EBX>)
@@ -2528,7 +2529,7 @@ void GrooveThoseDelics() {
     tGroovidelic_spec* the_groove;
     float f_the_time;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __usercall StopGroovidelic(br_actor *pActor@<EAX>)
@@ -2551,7 +2552,12 @@ void ResetGrooveFlags() {
     int i;
     tGroovidelic_spec* the_groove;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    the_groove = gGroovidelics_array;
+    for (i = 0; i < gGroovidelics_array_size; i++) {
+        the_groove->done_this_frame = 0;
+        the_groove++;
+    }
 }
 
 // IDA: tSpecial_volume* __cdecl GetDefaultSpecialVolumeForWater()

@@ -1758,7 +1758,8 @@ void FlushInterfaceFonts() {
 // IDA: void __cdecl SuspendPendingFlic()
 void SuspendPendingFlic() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    gPending_pending_flic = gPending_flic;
+    gPending_flic = -1;
 }
 
 // IDA: void __cdecl ResumePendingFlic()

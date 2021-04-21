@@ -260,7 +260,22 @@ br_scalar BrMatrix34Inverse(br_matrix34* B, br_matrix34* A) {
 // IDA: void __cdecl BrMatrix34LPInverse(br_matrix34 *A, br_matrix34 *B)
 void BrMatrix34LPInverse(br_matrix34* A, br_matrix34* B) {
     LOG_TRACE("(%p, %p)", A, B);
-    NOT_IMPLEMENTED();
+
+    A(0, 0) = B(0, 0);
+    A(0, 1) = B(1, 0);
+    A(0, 2) = B(2, 0);
+
+    A(1, 0) = B(0, 1);
+    A(1, 1) = B(1, 1);
+    A(1, 2) = B(2, 1);
+
+    A(2, 0) = B(0, 2);
+    A(2, 1) = B(1, 2);
+    A(2, 2) = B(2, 2);
+
+    A(3, 0) = -BR_MAC3(B(3, 0), A(0, 0), B(3, 1), A(1, 0), B(3, 2), A(2, 0));
+    A(3, 1) = -BR_MAC3(B(3, 0), A(0, 1), B(3, 1), A(1, 1), B(3, 2), A(2, 1));
+    A(3, 2) = -BR_MAC3(B(3, 0), A(0, 2), B(3, 1), A(1, 2), B(3, 2), A(2, 2));
 }
 
 // IDA: void __cdecl BrMatrix34LPNormalise(br_matrix34 *A, br_matrix34 *B)
@@ -355,8 +370,11 @@ void BrMatrix34Pre(br_matrix34* mat, br_matrix34* A) {
 
 // IDA: void __cdecl BrMatrix34Post(br_matrix34 *mat, br_matrix34 *A)
 void BrMatrix34Post(br_matrix34* mat, br_matrix34* A) {
+    br_matrix34 mattmp;
     LOG_TRACE("(%p, %p)", mat, A);
-    NOT_IMPLEMENTED();
+
+    BrMatrix34Mul(&mattmp, mat, A);
+    BrMatrix34Copy(mat, &mattmp);
 }
 
 // IDA: void __cdecl BrMatrix34PreRotateX(br_matrix34 *mat, br_angle rx)

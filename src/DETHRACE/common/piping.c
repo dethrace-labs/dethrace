@@ -1,4 +1,6 @@
 #include "piping.h"
+#include "globvars.h"
+#include "opponent.h"
 #include <stdlib.h>
 
 tPiped_registration_snapshot gRegistration_snapshots[5];
@@ -374,7 +376,7 @@ void PipeSingleGrooveStop(int pGroove_index, br_matrix34* pMatrix, int pPath_int
 // IDA: void __cdecl PipeFrameFinish()
 void PipeFrameFinish() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __cdecl PipingFrameReset()
@@ -399,7 +401,7 @@ void ResetPiping() {
 // IDA: void __cdecl InitialisePiping()
 void InitialisePiping() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __cdecl DisposePiping()
@@ -416,7 +418,27 @@ void InitLastDamageArrayEtc() {
     int car_count;
     tCar_spec* car;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (cat = eVehicle_self; cat <= eVehicle_not_really; cat++) {
+        if (cat == eVehicle_self) {
+            car_count = 1;
+        } else {
+            car_count = GetCarCount(cat);
+        }
+        for (i = 0; i < car_count; i++) {
+            if (cat == eVehicle_self) {
+                car = &gProgram_state.current_car;
+            } else {
+                car = GetCarSpec(cat, i);
+            }
+            if (cat != eVehicle_not_really) {
+                for (j = 0; j < COUNT_OF(car->frame_start_damage); j++) {
+                    car->frame_start_damage[j] = 0;
+                }
+            }
+            car->car_ID = i + (cat * 256);
+        }
+    }
 }
 
 // IDA: void __cdecl ResetCars()
@@ -440,7 +462,8 @@ void PipeCarPositions() {
     int difference_found;
     tS8 damage_deltas[12];
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    SILENT_STUB();
 }
 
 // IDA: void __cdecl ResetPipePlayToEnd()

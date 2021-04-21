@@ -103,7 +103,7 @@ void StartMainMenu() {
             gMain_menu_spec->flicker_on_flics[1].x[gGraf_data_index],
             gMain_menu_spec->flicker_on_flics[1].y[gGraf_data_index]);
     }
-    if (gInterface_within_race_mode) {
+    if (gDisallow_abandon_race) {
         DisableChoice(2);
         RunFlicAt(
             36,

@@ -4,6 +4,7 @@ target_include_directories(harness PRIVATE
     .
     ${CMAKE_SOURCE_DIR}/src/BRSRC13
     ${CMAKE_SOURCE_DIR}/src/DETHRACE
+    ${CMAKE_SOURCE_DIR}/src/S3/include
 )
 
 target_link_libraries(harness PRIVATE miniposix SDL2::SDL2 glad)
@@ -30,5 +31,7 @@ target_sources(harness PRIVATE
     renderers/gl_renderer.h
     renderers/null_renderer.c
     renderers/null_renderer.h
+    sound/sound.c
+    sound/sound.h
     stack_trace_handler.h
 )

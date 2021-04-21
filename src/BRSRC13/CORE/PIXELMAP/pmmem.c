@@ -171,6 +171,7 @@ br_error _M_br_device_pixelmap_mem_allocateSub(br_device_pixelmap* self, br_devi
     if (PixelmapRectangleClip(&out, rect, (br_pixelmap*)self) == BR_CLIP_REJECT) {
         return 4098;
     }
+
     pm = (br_device_pixelmap*)BrResAllocate(_pixelmap.res, sizeof(br_pixelmap), BR_MEMORY_PIXELMAP);
     memcpy(pm, self, sizeof(br_pixelmap));
     pm->pm_base_x += out.x;

@@ -223,7 +223,42 @@ float FastFloatArcTan2(float pY, float pX) {
     float abs_x;
     float abs_y;
     LOG_TRACE("(%f, %f)", pY, pX);
-    NOT_IMPLEMENTED();
+
+    abs_x = fabs(pX);
+    abs_y = fabs(pY);
+    if (pX == 0.0) {
+        if (pY >= 0.0) {
+            if (pY <= 0.0) {
+                return 0.0;
+            } else {
+                return 90.0;
+            }
+        } else {
+            return 270.0;
+        }
+    } else if (pX >= 0.0) {
+        if (pY >= 0.0) {
+            if (abs_y <= (double)abs_x) {
+                return abs_y / abs_x * 45.0;
+            } else {
+                return (2.0 - abs_x / abs_y) * 45.0;
+            }
+        } else if (abs_y <= (double)abs_x) {
+            return (8.0 - abs_y / abs_x) * 45.0;
+        } else {
+            return (abs_x / abs_y + 6.0) * 45.0;
+        }
+    } else if (pY >= 0.0) {
+        if (abs_y <= (double)abs_x) {
+            return (4.0 - abs_y / abs_x) * 45.0;
+        } else {
+            return (abs_x / abs_y + 2.0) * 45.0;
+        }
+    } else if (abs_y <= (double)abs_x) {
+        return (abs_y / abs_x + 4.0) * 45.0;
+    } else {
+        return (6.0 - abs_x / abs_y) * 45.0;
+    }
 }
 
 // IDA: br_scalar __cdecl FastScalarArcTan2(br_scalar pY, br_scalar pX)
@@ -231,7 +266,8 @@ br_scalar FastScalarArcTan2(br_scalar pY, br_scalar pX) {
     br_scalar abs_x;
     br_scalar abs_y;
     LOG_TRACE("(%f, %f)", pY, pX);
-    NOT_IMPLEMENTED();
+
+    return FastFloatArcTan2(pY, pX);
 }
 
 // IDA: br_angle __cdecl FastFloatArcTan2Angle(float pY, float pX)

@@ -107,8 +107,10 @@ void BrPixelmapFill(br_pixelmap* dst, br_uint_32 colour) {
         if (dst->row_bytes > 0) {
             memset(dst->pixels, colour, dst->row_bytes * dst->height);
         } else {
-            LOG_PANIC("Not implemented");
+            TELL_ME_IF_WE_PASS_THIS_WAY();
         }
+    } else {
+        TELL_ME_IF_WE_PASS_THIS_WAY();
     }
 }
 

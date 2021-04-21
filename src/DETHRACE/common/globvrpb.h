@@ -26,4 +26,6 @@ extern int gHighest_pedestrian_value;
 extern int gNeed_to_send_start_race;
 extern int gRendering_mirror;
 
+extern int dword_551424;
+
 #endif

@@ -291,14 +291,8 @@ int KeyIsDown(int pKey_index) {
 void WaitForNoKeys() {
     LOG_TRACE("()");
 
-    int key_result = 0; //Jeff added
-
-    while (1) {
+    while (AnyKeyDown() || EitherMouseButtonDown()) {
         CheckQuit();
-        key_result = PDAnyKeyDown();
-        if ((key_result == -1 || key_result == 4) && !EitherMouseButtonDown()) {
-            break;
-        }
     }
     CheckQuit();
 }

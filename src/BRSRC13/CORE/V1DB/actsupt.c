@@ -219,7 +219,89 @@ br_uint_16 BrActorToActorMatrix34(br_matrix34* m, br_actor* a, br_actor* b) {
     br_uint_8 at;
     br_uint_8 bt;
     LOG_TRACE("(%p, %p, %p)", m, a, b);
-    NOT_IMPLEMENTED();
+
+    if (a == b) {
+        BrMatrix34Identity(m);
+        return BR_TRANSFORM_IDENTITY;
+    }
+
+    if (a->parent == b) {
+        BrTransformToMatrix34(m, &a->t);
+        return a->t.type;
+    }
+
+    if (b->parent == a) {
+        BrTransformToMatrix34(&matb, &b->t);
+
+        if (BrTransformTypeIsLP(b->t.type))
+            BrMatrix34LPInverse(m, &matb);
+        else
+            BrMatrix34Inverse(m, &matb);
+
+        return b->t.type;
+    }
+
+    at = BR_TRANSFORM_IDENTITY;
+    BrMatrix34Identity(&mata);
+
+    bt = BR_TRANSFORM_IDENTITY;
+    BrMatrix34Identity(&matb);
+
+    while (a && b && a != b) {
+
+        if (a->depth > b->depth) {
+
+            if (a->t.type != BR_TRANSFORM_IDENTITY) {
+                BrMatrix34PostTransform(&mata, &a->t);
+                at = BrTransformCombineTypes(at, a->t.type);
+            }
+            a = a->parent;
+
+        } else if (b->depth > a->depth) {
+
+            if (b->t.type != BR_TRANSFORM_IDENTITY) {
+                BrMatrix34PostTransform(&matb, &b->t);
+                bt = BrTransformCombineTypes(bt, b->t.type);
+            }
+            b = b->parent;
+
+        } else {
+
+            if (a->t.type != BR_TRANSFORM_IDENTITY) {
+                BrMatrix34PostTransform(&mata, &a->t);
+                at = BrTransformCombineTypes(at, a->t.type);
+            }
+            if (b->t.type != BR_TRANSFORM_IDENTITY) {
+                BrMatrix34PostTransform(&matb, &b->t);
+                bt = BrTransformCombineTypes(bt, b->t.type);
+            }
+            b = b->parent;
+            a = a->parent;
+        }
+    }
+
+    if (bt == BR_TRANSFORM_IDENTITY) {
+        BrMatrix34Copy(m, &mata);
+        return at;
+    }
+
+    if (at == BR_TRANSFORM_IDENTITY) {
+        if (BrTransformTypeIsLP(bt)) {
+            BrMatrix34LPInverse(m, &matb);
+        } else
+            BrMatrix34Inverse(m, &matb);
+
+        return bt;
+    }
+
+    if (BrTransformTypeIsLP(bt)) {
+        BrMatrix34LPInverse(&matc, &matb);
+    } else
+        BrMatrix34Inverse(&matc, &matb);
+
+    BrMatrix34Mul(m, &mata, &matc);
+
+    return BrTransformCombineTypes(at, bt);
 }
 
 // IDA: void __cdecl BrActorToScreenMatrix4(br_matrix4 *m, br_actor *a, br_actor *camera)

@@ -21,6 +21,7 @@ add_subdirectory(lib/miniposix)
 add_subdirectory(lib/glad)
 
 add_subdirectory(src/harness)
+add_subdirectory(src/S3)
 add_subdirectory(src/BRSRC13)
 add_subdirectory(src/DETHRACE)
 

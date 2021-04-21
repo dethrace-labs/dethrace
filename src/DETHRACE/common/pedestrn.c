@@ -392,7 +392,7 @@ void MungePedestrianSequence(tPedestrian_data* pPedestrian, int pAction_changed)
     float heading_difference;
     tPedestrian_sequence* sequence_ptr;
     LOG_TRACE("(%p, %d)", pPedestrian, pAction_changed);
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __usercall DetachPedFromCar(tPedestrian_data *pPedestrian@<EAX>)
@@ -529,7 +529,12 @@ int MungePedestrianAction(tPedestrian_data* pPedestrian, float pDanger_level) {
 // IDA: void __cdecl MakeFlagWavingBastardWaveHisFlagWhichIsTheProbablyTheLastThingHeWillEverDo()
 void MakeFlagWavingBastardWaveHisFlagWhichIsTheProbablyTheLastThingHeWillEverDo() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gFlag_waving_bastard
+        && gFlag_waving_bastard->current_action != gFlag_waving_bastard->fatal_car_impact_action
+        && gFlag_waving_bastard->current_action != gFlag_waving_bastard->fatal_ground_impact_action) {
+        ChangeActionTo(gFlag_waving_bastard, 7, 1);
+    }
 }
 
 // IDA: void __usercall MungePedestrianPath(tPedestrian_data *pPedestrian@<EAX>, float pDanger_level, br_vector3 *pDanger_direction)
@@ -736,7 +741,7 @@ void MungePedestrians(tU32 pFrame_period) {
     br_scalar z_delta;
     tS32 diff;
     LOG_TRACE("(%d)", pFrame_period);
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __cdecl RespawnPedestrians()
@@ -1582,7 +1587,7 @@ void RenderProximityRays(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer
     br_scalar distance;
     br_scalar t;
     LOG_TRACE("(%p, %p, %p, %p, %d)", pRender_screen, pDepth_buffer, pCamera, pCamera_to_world, pTime);
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __usercall AdjustProxRay(int pRay_index@<EAX>, tU16 pCar_ID@<EDX>, tU16 pPed_index@<EBX>, tU32 pTime@<ECX>)

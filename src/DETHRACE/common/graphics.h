@@ -88,7 +88,7 @@ extern br_scalar gAmbient_adjustment;
 extern int gMap_render_x_i;
 extern int gX_offset;
 extern int gMap_render_y_i;
-extern int gMirror_on;
+extern int gMirror_on_graphics;
 extern br_scalar gYon_squared;
 
 void TurnOnPaletteConversion();

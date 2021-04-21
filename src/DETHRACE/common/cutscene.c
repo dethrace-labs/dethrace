@@ -184,5 +184,9 @@ void StartLoadingScreen() {
     LOG_TRACE("()");
 
     PossibleService();
-    SplashScreenWith("LOADSCRN.PIX");
+    if (gProgram_state.sausage_eater_mode) {
+        SplashScreenWith("LOADSCRN.PIX");
+    } else {
+        SplashScreenWith("LOADSCRN.PIX");
+    }
 }

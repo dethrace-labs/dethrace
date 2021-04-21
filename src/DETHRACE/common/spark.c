@@ -134,7 +134,7 @@ void RenderSparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_ac
     br_vector3 new_pos;
     br_scalar ts;
     LOG_TRACE("(%p, %p, %p, %p, %d)", pRender_screen, pDepth_buffer, pCamera, pCamera_to_world, pTime);
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __usercall CreateSingleSpark(tCar_spec *pCar@<EAX>, br_vector3 *pPos@<EDX>, br_vector3 *pVel@<EBX>)
@@ -259,7 +259,7 @@ void MungeShrapnel(tU32 pTime) {
     br_matrix34* mat;
     br_scalar ts;
     LOG_TRACE("(%d)", pTime);
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __usercall DrMatrix34Rotate(br_matrix34 *mat@<EAX>, br_angle r@<EDX>, br_vector3 *a@<EBX>)
@@ -398,7 +398,7 @@ void RenderSmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
     tU32 seed;
     tU32 not_lonely;
     LOG_TRACE("(%p, %p, %p, %p, %d)", pRender_screen, pDepth_buffer, pCamera, pCamera_to_world, pTime);
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __usercall CreatePuffOfSmoke(br_vector3 *pos@<EAX>, br_vector3 *v@<EDX>, br_scalar strength, br_scalar pDecay_factor, int pType, tCar_spec *pC)
@@ -789,7 +789,7 @@ void MungeSplash(tU32 pTime) {
 void RenderSplashes() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __usercall GetSmokeShadeTables(FILE *f@<EAX>)
@@ -896,5 +896,5 @@ void StopCarBeingIt(tCar_spec* pCar) {
     br_actor* actor;
     br_actor* bonny;
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+    STUB();
 }

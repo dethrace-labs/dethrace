@@ -33,7 +33,6 @@ int gEncryption_method = 0;
 br_pixelmap* g16bit_palette;
 br_pixelmap* gSource_for_16bit_palette;
 
-
 // IDA: int __cdecl CheckQuit()
 int CheckQuit() {
     LOG_TRACE8("()");
@@ -537,13 +536,14 @@ tU32 GetTotalTime() {
     if (gNet_mode) {
         return PDGetTotalTime();
     }
+    LOG_DEBUG("gLost_time %d", gLost_time);
     return PDGetTotalTime() - gLost_time;
 }
 
 // IDA: tU32 __cdecl GetRaceTime()
 tU32 GetRaceTime() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    return GetTotalTime() - gRace_start;
 }
 
 // IDA: void __usercall AddLostTime(tU32 pLost_time@<EAX>)
@@ -555,7 +555,17 @@ void AddLostTime(tU32 pLost_time) {
 void TimerString(tU32 pTime, char* pStr, int pFudge_colon, int pForce_colon) {
     int seconds;
     LOG_TRACE("(%d, \"%s\", %d, %d)", pTime, pStr, pFudge_colon, pForce_colon);
-    NOT_IMPLEMENTED();
+
+    seconds = (pTime + 500) / 1000;
+    if (pForce_colon || seconds > 59) {
+        if (pFudge_colon) {
+            sprintf(pStr, "%d/%02d", seconds / 60, seconds % 60);
+        } else {
+            sprintf(pStr, "%d:%02d", seconds / 60, seconds % 60);
+        }
+    } else {
+        sprintf(pStr, "%d", seconds);
+    }
 }
 
 // IDA: char* __usercall GetMiscString@<EAX>(int pIndex@<EAX>)
@@ -573,7 +583,17 @@ void GetCopyOfMiscString(int pIndex, char* pStr) {
 int Flash(tU32 pPeriod, tU32* pLast_change, int* pCurrent_state) {
     tU32 the_time;
     LOG_TRACE("(%d, %p, %p)", pPeriod, pLast_change, pCurrent_state);
-    NOT_IMPLEMENTED();
+
+    the_time = PDGetTotalTime();
+    if (the_time - *pLast_change > pPeriod) {
+        if (*pCurrent_state) {
+            *pCurrent_state = 0;
+        } else {
+            *pCurrent_state = 1;
+        }
+        *pLast_change = the_time;
+    }
+    return *pCurrent_state;
 }
 
 // IDA: void __usercall MaterialCopy(br_material *pDst@<EAX>, br_material *pSrc@<EDX>)

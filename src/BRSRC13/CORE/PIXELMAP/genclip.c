@@ -42,8 +42,9 @@ br_clip_result PixelmapRectangleClip(br_rectangle* out, br_rectangle* in, br_pix
             }
             if (out->w + out->x > pm->width)
                 out->w = pm->width - out->x;
-            if (out->h + out->y > pm->height)
+            if (out->h + out->y > pm->height) {
                 out->h = pm->height - out->y;
+            }
             return out->w && out->h;
         }
     }

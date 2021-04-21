@@ -4,6 +4,7 @@
 #include "br_types.h"
 #include "constants.h"
 #include "harness.h"
+#include "s3/s3_types.h"
 #include <assert.h>
 #include <stdarg.h>
 #include <stddef.h>
@@ -73,27 +74,15 @@ typedef uint16_t tU16;
 typedef int16_t tS16;
 typedef uint32_t tU32;
 typedef int32_t tS32;
-typedef float tF32;
 typedef double tF64;
 typedef int16_t tX88;
 typedef int32_t tX1616;
 typedef tU8 tNet_message_type;
-typedef char* tS3_sound_source_ptr;
-typedef int tS3_sound_tag;
 typedef struct tCar_spec_struct tCar_spec;
 typedef struct tCar_spec_struct2 tCar_spec2;
 typedef struct tPath_node_struct tPath_node;
 typedef struct tPath_section_struct tPath_section;
 typedef tU32 tPlayer_ID;
-typedef int tS3_sound_id;
-typedef int tS3_type;
-typedef int tS3_repeats;
-typedef int tS3_volume;
-typedef int tS3_effect_tag;
-typedef long tS3_priority;
-typedef long tS3_pitch;
-typedef long tS3_speed;
-typedef char* tS3_outlet_ptr;
 typedef void* tPipe_reset_proc();
 typedef struct tPowerup tPowerup;
 typedef int* tGot_proc(tPowerup*, tCar_spec*);
@@ -215,7 +204,7 @@ typedef enum tParts_category {
 } tParts_category;
 
 typedef enum tRace_over_reason {
-    eRace_not_over_yet = 255,
+    eRace_not_over_yet = -1,
     eRace_over_laps = 0,
     eRace_over_peds = 1,
     eRace_over_opponents = 2,
@@ -301,41 +290,6 @@ typedef enum tCar_detail_ownership {
     eCar_owner_not_allowed = 3
 } tCar_detail_ownership;
 
-typedef enum tS3_error_codes {
-    eS3_error_none = 0,
-    eS3_error_digi_init = 1,
-    eS3_error_midi_init = 2,
-    eS3_error_memory = 3,
-    eS3_error_readfile = 4,
-    eS3_error_soundbank = 5,
-    eS3_error_bad_id = 6,
-    eS3_error_bad_stag = 7,
-    eS3_error_load_sound = 8,
-    eS3_error_start_sound = 9,
-    eS3_error_channel_alloc = 10,
-    eS3_error_not_spatial = 11,
-    eS3_error_function_failed = 12,
-    eS3_error_load_song = 13,
-    eS3_error_song_not_loaded = 14,
-    eS3_error_start_song = 15,
-    eS3_error_start_cda = 16,
-    eS3_error_cda_not_init = 17,
-    eS3_error_already_started_cda = 18,
-    eS3_error_nonexistant_source = 19
-} tS3_error_codes;
-
-typedef enum tS3_termination_reason {
-    eS3_tr_natural = 0,
-    eS3_tr_stopped = 1,
-    eS3_tr_overridden = 2
-} tS3_termination_reason;
-
-typedef enum tS3_filter_type {
-    eS3_filter_none = 0,
-    eS3_filter_reversed = 1,
-    eS3_filter_echo = 2
-} tS3_filter_type;
-
 typedef enum tPowerup_type {
     ePowerup_dummy = 0,
     ePowerup_instantaneous = 1,
@@ -359,7 +313,7 @@ typedef enum tVehicle_type {
 } tVehicle_type;
 
 typedef enum tDepth_effect_type {
-    eDepth_effect_none = 255,
+    eDepth_effect_none = -1,
     eDepth_effect_darkness = 0,
     eDepth_effect_fog = 1
 } tDepth_effect_type;
@@ -478,7 +432,7 @@ typedef enum tAdd_to_storage_result {
 } tAdd_to_storage_result;
 
 typedef enum tLollipop_mode {
-    eLollipop_none = 255,
+    eLollipop_none = -1,
     eLollipop_x_match = 0,
     eLollipop_y_match = 1,
     eLollipop_z_match = 2
@@ -491,8 +445,6 @@ typedef enum tSmear_type {
 } tSmear_type;
 typedef struct ot_vertex ot_vertex;
 typedef void zs_order_table_traversal_cbfn(int, ot_vertex*, ot_vertex*, ot_vertex*);
-typedef void tS3_outlet_callback(tS3_outlet_ptr, tS3_sound_tag, tS3_termination_reason);
-typedef void tS3_sample_filter(tS3_effect_tag, tS3_sound_tag);
 
 // Make gcc happy
 typedef struct exception_ {
@@ -1743,12 +1695,6 @@ typedef struct tCar_detail_info {
     tCar_detail_ownership ownership;
     char name[16];
 } tCar_detail_info;
-
-typedef struct tS3_vector3 {
-    tF32 x;
-    tF32 y;
-    tF32 z;
-} tS3_vector3;
 
 typedef struct tWav_header {
     char quote_RIFF[4];
@@ -3304,115 +3250,6 @@ typedef struct tClip_details {
     br_scalar length;
 } tClip_details;
 
-typedef enum tS3_sound_type {
-    eS3_ST_sample = 0,
-    eS3_ST_midi = 1,
-    eS3_ST_cda = 2
-} tS3_sound_type;
-
-typedef struct tS3_outlet tS3_outlet;
-typedef struct tS3_descriptor tS3_descriptor;
-typedef struct tS3_channel tS3_channel;
-typedef struct tS3_sound_source tS3_sound_source;
-typedef struct tS3_channel {
-    int active;
-    int termination_reason;
-    int needs_service;
-    int repetitions;
-    int rate;
-    int spatial_sound;
-    unsigned int song_handle;
-    tS3_sound_tag tag;
-    tS3_type type;
-    tS3_volume left_volume;
-    tS3_volume right_volume;
-    float volume_multiplier;
-    tS3_vector3 position;
-    tS3_vector3 velocity;
-    tS3_vector3 lastpos;
-    tS3_volume initial_volume;
-    tS3_pitch initial_pitch;
-    float pMax_distance_squared;
-    tS3_outlet* owner_outlet;
-    tS3_descriptor* descriptor;
-    tS3_channel* next;
-    char* type_struct_sample;
-    char* type_struct_midi;
-    char* type_struct_cda;
-    tS3_sound_source* sound_source_ptr;
-} tS3_channel;
-
-typedef struct tS3_outlet {
-    int id;
-    int max_channels;
-    int independent_pitch;
-    tS3_channel* channel_list;
-    tS3_outlet* prev;
-    tS3_outlet* next;
-    tS3_outlet_callback* callback;
-} tS3_outlet;
-
-typedef struct tS3_descriptor {
-    tS3_sound_id id;
-    tS3_type type;
-    tS3_priority priority;
-    tS3_repeats repeats;
-    tS3_volume min_volume;
-    tS3_volume max_volume;
-    tS3_pitch min_pitch;
-    tS3_pitch max_pitch;
-    tS3_speed min_speed;
-    tS3_speed max_speed;
-    tS3_descriptor* prev;
-    tS3_descriptor* next;
-    int flags;
-    int midi_song_handle;
-    int special_fx;
-    int memory_proxy;
-    char* sound_data;
-    char* filename;
-} tS3_descriptor;
-
-typedef struct tS3_sound_source {
-    tS3_channel* channel;
-    int brender_vector;
-    void* position_ptr;
-    void* velocity_ptr;
-    tS3_outlet* bound_outlet;
-    tS3_sound_source* prev;
-    tS3_sound_source* next;
-    int ambient;
-    tS3_repeats ambient_repeats;
-    int time_since_last_played;
-    tS3_sound_id sound_id;
-    float max_distance_sq;
-    int period;
-    tS3_volume volume;
-    tS3_pitch pitch;
-    tS3_speed speed;
-    tS3_sound_tag tag;
-} tS3_sound_source;
-
-typedef struct tS3_sample {
-    int size;
-    int rate;
-    int resolution;
-    int channels;
-    char* dataptr;
-    void* freeptr;
-} tS3_sample;
-
-typedef struct tS3_hardware_info {
-    int device_installed;
-    int timer_installed;
-    int num_channels;
-    int max_resolution;
-    int stereo_flag;
-    int max_sample_rate;
-    int min_sample_rate;
-    int independent_pitch;
-} tS3_hardware_info;
-
 typedef enum tNet_head_avail {
     eNet_or_otherwise = 0,
     eNet_only = 1,
@@ -3525,7 +3362,7 @@ typedef enum tPed_frame_rate_type {
 } tPed_frame_rate_type;
 
 typedef enum tPed_collide_type {
-    ePed_collide_none = 255,
+    ePed_collide_none = -1,
     ePed_collide_on = 0
 } tPed_collide_type;
 
@@ -3842,7 +3679,7 @@ typedef struct tRGB_colour {
 typedef br_material** tPMFMCB(br_model*, tU16);
 
 typedef enum tMatrix_mod_type {
-    eMatrix_mod_none = 255,
+    eMatrix_mod_none = -1,
     eMatrix_mod_spin = 0,
     eMatrix_mod_rock = 1,
     eMatrix_mod_throb = 2,
@@ -3851,13 +3688,13 @@ typedef enum tMatrix_mod_type {
 } tMatrix_mod_type;
 
 typedef enum tTexture_animation_type {
-    eTexture_animation_none = 255,
+    eTexture_animation_none = -1,
     eTexture_animation_frames = 0,
     eTexture_animation_flic = 1
 } tTexture_animation_type;
 
 typedef enum tMove_mode {
-    eMove_none = 255,
+    eMove_none = -1,
     eMove_linear = 0,
     eMove_harmonic = 1,
     eMove_flash = 2,
@@ -3879,13 +3716,13 @@ typedef enum tGroove_trigger_mode {
 } tGroove_trigger_mode;
 
 typedef enum tGroove_path_mode {
-    eGroove_path_none = 255,
+    eGroove_path_none = -1,
     eGroove_path_straight = 0,
     eGroove_path_circular = 1
 } tGroove_path_mode;
 
 typedef enum tGroove_object_mode {
-    eGroove_object_none = 255,
+    eGroove_object_none = -1,
     eGroove_object_spin = 0,
     eGroove_object_rock = 1,
     eGroove_object_throb = 2,

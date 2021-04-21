@@ -161,7 +161,7 @@ void DrawPowerups(tU32 pTime) {
     tHeadup_icon* the_icon;
     br_pixelmap* fizzle_pix;
     LOG_TRACE("(%d)", pTime);
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __usercall DoPowerupPeriodics(tU32 pFrame_period@<EAX>)
@@ -170,7 +170,7 @@ void DoPowerupPeriodics(tU32 pFrame_period) {
     tPowerup* the_powerup;
     tU32 the_time;
     LOG_TRACE("(%d)", pFrame_period);
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __usercall GotPowerupN(int pN@<EAX>)

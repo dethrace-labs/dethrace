@@ -145,7 +145,7 @@ void DoPratcam(tU32 pThe_time) {
     br_pixelmap* left_image;
     br_pixelmap* right_image;
     LOG_TRACE("(%d)", pThe_time);
-    NOT_IMPLEMENTED();
+    SILENT_STUB();
 }
 
 // IDA: void __usercall TestPratCam(int pIndex@<EAX>)
