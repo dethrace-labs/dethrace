@@ -165,6 +165,7 @@ void ClearOutStorageSpace(tBrender_storage* pStorage_space) {
 }
 
 // IDA: tAdd_to_storage_result __usercall AddPixelmapToStorage@<EAX>(tBrender_storage *pStorage_space@<EAX>, br_pixelmap **pThe_pm@<EDX>)
+// This seems like the signature should be `br_pixelmap* pThe_pm`
 tAdd_to_storage_result AddPixelmapToStorage(tBrender_storage* pStorage_space, br_pixelmap** pThe_pm) {
     int i;
     LOG_TRACE("(%p, %p)", pStorage_space, pThe_pm);
@@ -175,8 +176,8 @@ tAdd_to_storage_result AddPixelmapToStorage(tBrender_storage* pStorage_space, br
 
     for (i = 0; i < pStorage_space->pixelmaps_count; i++) {
         if (pStorage_space->pixelmaps[i]->identifier
-            && pThe_pm[1]
-            && !strcmp(pStorage_space->pixelmaps[i]->identifier, (const char*)pThe_pm[1])) {
+            && ((br_pixelmap*)pThe_pm)->identifier
+            && !strcmp(pStorage_space->pixelmaps[i]->identifier, ((br_pixelmap*)pThe_pm)->identifier)) {
             return eStorage_duplicate;
         }
     }
@@ -305,7 +306,7 @@ br_pixelmap* LoadSinglePixelmap(tBrender_storage* pStorage_space, char* pName) {
         return BrMapFind(pName);
     }
 
-    switch (AddPixelmapToStorage(pStorage_space, temp)) {
+    switch (AddPixelmapToStorage(pStorage_space, (br_pixelmap**)temp)) {
     case eStorage_not_enough_room:
         FatalError(67);
         break;

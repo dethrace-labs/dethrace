@@ -1,5 +1,8 @@
 #include "include/s3/s3sound.h"
-#include "harness.h"
+
+// Forward declarations of harneess hook funcs. See `src/harness`
+extern void Harness_Hook_S3Service(int unk1, int unk2);
+extern void Harness_Hook_S3StopAllOutletSounds();
 
 void S3Service(int inside_cockpit, int unk1) {
     Harness_Hook_S3Service(inside_cockpit, unk1);

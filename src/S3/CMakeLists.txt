@@ -2,11 +2,9 @@ add_library(s3 STATIC)
 
 target_include_directories(s3 PUBLIC
     include
-    ${CMAKE_SOURCE_DIR}/src/BRSRC13
-    ${CMAKE_SOURCE_DIR}/src/harness
 )
 
-target_link_libraries(s3 PRIVATE SDL2::SDL2 glad)
+target_link_libraries(s3 PRIVATE)
 
 if(NOT MSVC)
     target_compile_options(s3 PRIVATE
