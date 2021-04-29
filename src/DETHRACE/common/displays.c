@@ -155,7 +155,9 @@ void DRPixelmapCleverText2(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFo
     len = strlen((char*)pText);
     ch = (unsigned char*)pText;
     if (pX >= 0 && pPixelmap->width >= pRight_edge && pY >= 0 && pY + pFont->height <= pPixelmap->height) {
+        LOG_DEBUG("string %s, %d", pText, len);
         for (i = 0; i < len; i++) {
+            //LOG_DEBUG("%c, %d, %u", *ch, (signed char)*ch, *ch);
             if (*ch < 224) {
                 chr = *ch - pFont->offset;
                 ch_width = pFont->width_table[chr];

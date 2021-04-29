@@ -536,7 +536,6 @@ tU32 GetTotalTime() {
     if (gNet_mode) {
         return PDGetTotalTime();
     }
-    LOG_DEBUG("gLost_time %d", gLost_time);
     return PDGetTotalTime() - gLost_time;
 }
 
@@ -681,17 +680,14 @@ br_pixelmap* GenerateDarkenedShadeTable(int pHeight, br_pixelmap* pPalette, int 
 
 // IDA: void __cdecl PossibleService()
 void PossibleService() {
+    tU32 time;
     static tU32 last_service = 0;
-    // Added >>
-    tU32 current_time;
-    // <<
 
-    current_time = PDGetTotalTime();
-
-    if (current_time - last_service > MIN_SERVICE_INTERVAL && !gProgram_state.racing) {
+    time = PDGetTotalTime();
+    if (time - last_service > MIN_SERVICE_INTERVAL && !gProgram_state.racing) {
         SoundService();
         NetService(gProgram_state.racing);
-        last_service = current_time;
+        last_service = time;
     }
 }
 

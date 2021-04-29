@@ -130,17 +130,15 @@ void Harness_RenderScreen(br_pixelmap* dst, br_pixelmap* src) {
 
     if (screen_buffer == NULL) {
         screen_buffer = malloc(src->width * src->height * sizeof(uint32_t));
-        memset(screen_buffer, 0, src->width * src->height * sizeof(uint32_t));
     }
+    memset(screen_buffer, 0, src->width * src->height * sizeof(uint32_t));
 
     // generate 32 bit texture from src + palette
     for (y = 0; y < src->height; y++) {
         inc = 0;
         for (x = 0; x < src->width; x++) {
-
             palette_index = (data[y * src->row_bytes + x]);
-            true_color = colors[palette_index];
-            screen_buffer[y * src->width + x] = true_color;
+            screen_buffer[y * src->width + x] = colors[palette_index];
         }
     }
     current_renderer->doubleBuffer(screen_buffer, window);

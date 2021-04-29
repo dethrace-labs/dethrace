@@ -10,6 +10,8 @@
 typedef struct tRenderer {
     int (*get_window_flags)();
     void (*init)(SDL_Window* window);
+    void (*renderFrameBegin)();
+    void (*renderFrameEnd)();
     void (*doubleBuffer)(uint32_t* src, SDL_Window* window);
 } tRenderer;
 

@@ -202,13 +202,13 @@ void MungeHeadups() {
         DoNetworkHeadups(net_credits);
     } else {
         if (net_credits < 0) {
-            sprintf(the_text, "ø%dú %s", -net_credits, GetMiscString(17));
+            sprintf(the_text, "\xF8%d\xFA %s", -net_credits, GetMiscString(17));
         } else {
-            sprintf(the_text, "ø%dú %s", net_credits, GetMiscString(net_credits < 100000 ? 16 : 47));
+            sprintf(the_text, "\xF8%d\xFA %s", net_credits, GetMiscString(net_credits < 100000 ? 16 : 47));
         }
         ChangeHeadupText(gCredits_won_headup, the_text);
         if (gPedestrians_on) {
-            sprintf(the_text, "ø%dú/%d %s", gProgram_state.peds_killed, gTotal_peds, GetMiscString(18));
+            sprintf(the_text, "\xF8%d\xFA/%d %s", gProgram_state.peds_killed, gTotal_peds, GetMiscString(18));
             ChangeHeadupText(gPed_kill_count_headup, the_text);
         } else {
             ChangeHeadupText(gPed_kill_count_headup, "");
@@ -218,13 +218,13 @@ void MungeHeadups() {
         }
         if (gQueued_wasted_massages_count) {
             if (Flash(150, &gWasted_last_flash, &gWasted_flash_state)) {
-                sprintf(the_text, "ù%s %s", gOpponents[gQueued_wasted_massages[0]].abbrev_name, GetMiscString(46));
+                sprintf(the_text, "\xF9%s %s", gOpponents[gQueued_wasted_massages[0]].abbrev_name, GetMiscString(46));
             } else {
                 sprintf(the_text, " ");
             }
         } else {
             oppo_count = GetCarCount(eVehicle_opponent);
-            sprintf(the_text, "%s ø%dú/%d", GetMiscString(19), oppo_count - NumberOfOpponentsLeft(), oppo_count);
+            sprintf(the_text, "%s \xF8%d\xFA/%d", GetMiscString(19), oppo_count - NumberOfOpponentsLeft(), oppo_count);
         }
         ChangeHeadupText(gCar_kill_count_headup, the_text);
         if (effective_timer > 1199000) {
@@ -232,7 +232,7 @@ void MungeHeadups() {
         }
         TimerString(effective_timer, the_text, 1, 0);
         ChangeHeadupText(gTimer_headup, the_text);
-        sprintf(the_text, "%s ø%dú/%d %s ø%dú/%d", GetMiscString(21), gCheckpoint, gCheckpoint_count, GetMiscString(20), gLap, gTotal_laps);
+        sprintf(the_text, "%s \xF8%d\xFA/%d %s \xF8%d\xFA/%d", GetMiscString(21), gCheckpoint, gCheckpoint_count, GetMiscString(20), gLap, gTotal_laps);
         ChangeHeadupText(gLaps_headup, the_text);
         the_time = GetTotalTime() - gTime_bonus_start;
         switch (gTime_bonus_state) {
