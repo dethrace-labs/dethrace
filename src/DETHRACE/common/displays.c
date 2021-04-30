@@ -516,7 +516,6 @@ void DoHeadups(tU32 pThe_time) {
                     }
                 }
             } else {
-            LABEL_22:
                 ClearHeadup(i);
             }
         }

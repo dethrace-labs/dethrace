@@ -9,9 +9,10 @@ target_link_libraries(s3 PRIVATE)
 if(NOT MSVC)
     target_compile_options(s3 PRIVATE
         -g
-        -Wno-return-type
-        -Wno-missing-declarations
-        -Werror=implicit-function-declaration
+        -Wall
+        -Wextra
+        -Werror
+        -Wno-unused-parameter
     )
 else()
     target_compile_definitions(s3 PRIVATE -D_CRT_SECURE_NO_WARNINGS)

@@ -13,4 +13,5 @@ void S3StopAllOutletSounds() {
 }
 
 tS3_sound_tag S3StartSound(tS3_outlet_ptr pOutlet, tS3_sound_id pSound) {
+    return 0;
 }

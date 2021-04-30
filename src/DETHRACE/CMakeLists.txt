@@ -16,9 +16,13 @@ target_link_libraries(dethrace_obj PUBLIC miniposix SDL2::SDL2 smacker harness b
 if(NOT MSVC)
     target_compile_options(dethrace_obj PRIVATE
         -g
+        -Wall
+        -Wextra
+        -Werror
         -Wno-return-type
-        -Wno-missing-declarations
-        -Werror=implicit-function-declaration
+        -Wno-unused-variable
+        -Wno-unused-parameter
+        -Wno-sign-compare
     )
 else()
     target_compile_definitions(dethrace_obj PRIVATE -D_CRT_SECURE_NO_WARNINGS)

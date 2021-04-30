@@ -12,9 +12,10 @@ target_link_libraries(harness PRIVATE miniposix SDL2::SDL2 glad)
 if(NOT MSVC)
     target_compile_options(harness PRIVATE
         -g
-        -Wno-return-type
-        -Wno-missing-declarations
-        -Werror=implicit-function-declaration
+        -Wall
+        -Wextra
+        -Werror
+        -Wno-unused-parameter
     )
 else()
     target_compile_definitions(harness PRIVATE -D_CRT_SECURE_NO_WARNINGS)

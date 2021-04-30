@@ -124,7 +124,6 @@ void Harness_RenderScreen(br_pixelmap* dst, br_pixelmap* src) {
     int inc = 0;
     uint8_t* data = src->pixels;
     uint32_t* colors = palette->pixels;
-    uint32_t true_color;
     int x;
     int y;
 

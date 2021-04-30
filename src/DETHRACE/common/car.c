@@ -415,7 +415,7 @@ void SetInitialPosition(tRace_info* pThe_race, int pCar_index, int pGrid_index) 
     int start_i;
     int j;
     br_actor* car_actor;
-    br_angle initial_yaw;
+    br_angle initial_yaw = 0;
     br_scalar nearest_y_above;
     br_scalar nearest_y_below;
     br_scalar speed;
@@ -475,7 +475,6 @@ void SetInitialPosition(tRace_info* pThe_race, int pCar_index, int pGrid_index) 
         // initial_yaw[0] = (__int64)(pThe_race->net_starts[start_i].yaw * 182.0444444444445);
         // place_on_grid = 0;
     }
-LABEL_17:
     if (place_on_grid) {
         initial_yaw = (pThe_race->initial_yaw * 182.0444444444445);
         BrMatrix34RotateY(&initial_yaw_matrix, initial_yaw);

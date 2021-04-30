@@ -489,6 +489,7 @@ int DoVerifyQuit(int pReplace_background) {
     int switched_res;
     int woz_in_race;
 
+    woz_in_race = 0;
     if (gAusterity_mode) {
         return 1;
     }
