@@ -9,6 +9,10 @@ extern tRenderer OpenGLRenderer;
 int Harness_GLRenderer_GetWindowFlags();
 void Harness_GLRenderer_Init(SDL_Window* window);
 void Harness_GLRenderer_Activate(SDL_Window* window);
+
+void Harness_GLRenderer_RenderFrameBegin();
+void Harness_GLRenderer_RenderFrameEnd();
+
 void Harness_GLRenderer_DoubleBuffer(uint32_t* dst, SDL_Window* window);
 
 #endif

@@ -4,7 +4,9 @@
 /*
 #ifdef _WIN32
 #include <windows.h>
+
 #include <gl/gl.h>
+
 #elif defined __unix__
 #define GL_GLEXT_PROTOTYPES 1
 #include <GL/gl.h>
@@ -13,13 +15,17 @@
 #include <OpenGL/gl3.h>
 #endif
 */
+
 #include <glad/glad.h>
+
 #include <SDL_opengl.h>
 
 tRenderer OpenGLRenderer = {
     Harness_GLRenderer_GetWindowFlags,
     Harness_GLRenderer_Init,
-    Harness_GLRenderer_DoubleBuffer,
+    Harness_GLRenderer_RenderFrameBegin,
+    Harness_GLRenderer_RenderFrameEnd,
+    Harness_GLRenderer_DoubleBuffer
 };
 
 SDL_GLContext context;
@@ -130,6 +136,12 @@ void Harness_GLRenderer_Init(SDL_Window* window) {
     glGenTextures(1, &screen_texture);
 }
 
+void Harness_GLRenderer_RenderFrameBegin() {
+}
+
+void Harness_GLRenderer_RenderFrameEnd() {
+}
+
 void Harness_GLRenderer_DoubleBuffer(uint32_t* screen_buffer, SDL_Window* window) {
 
     glBindTexture(GL_TEXTURE_2D, screen_texture);
@@ -139,7 +151,7 @@ void Harness_GLRenderer_DoubleBuffer(uint32_t* screen_buffer, SDL_Window* window
     // TODO: remove fixed 320x200
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 320, 200, 0, GL_BGRA, GL_UNSIGNED_BYTE, screen_buffer);
 
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(shader_program);

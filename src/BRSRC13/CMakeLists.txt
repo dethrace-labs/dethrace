@@ -17,9 +17,13 @@ target_link_libraries(brender PRIVATE harness miniposix SDL2::SDL2)
 if(NOT MSVC)
     target_compile_options(brender PRIVATE
         -g
+        -Wall
+        -Wextra
+        -Werror
         -Wno-return-type
-        -Wno-missing-declarations
-        -Werror=implicit-function-declaration
+        -Wno-unused-variable
+        -Wno-unused-parameter
+        -Wno-sign-compare
     )
     
     target_link_libraries(brender PUBLIC m)

@@ -270,8 +270,6 @@ void posix_signal_handler(int sig, siginfo_t* siginfo, void* context) {
 static uint8_t alternate_stack[SIGSTKSZ];
 
 void resolve_full_path(char* path, const char* argv0) {
-    char buf[PATH_MAX];
-    char* pos;
     if (argv0[0] == '/') { // run with absolute path
         strcpy(path, argv0);
     } else { // run with relative path
