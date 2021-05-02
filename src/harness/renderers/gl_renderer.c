@@ -79,7 +79,7 @@ void Harness_GLRenderer_Init(SDL_Window* window) {
                             "   TexCoord = aTexCoord;\n"
                             "}\0";
     const char* fs_source = "#version 330 core\n"
-                            "layout(location = 0) out vec4 FragColor;\n"
+                            "out vec4 FragColor;\n"
                             "in vec2 TexCoord;\n"
                             "uniform sampler2D ourTexture;\n"
 

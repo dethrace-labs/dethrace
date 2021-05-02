@@ -130,7 +130,6 @@ void Harness_RenderScreen(br_pixelmap* dst, br_pixelmap* src) {
     if (screen_buffer == NULL) {
         screen_buffer = malloc(src->width * src->height * sizeof(uint32_t));
     }
-    memset(screen_buffer, 0, src->width * src->height * sizeof(uint32_t));
 
     // generate 32 bit texture from src + palette
     for (y = 0; y < src->height; y++) {
