@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 br_matrix34 gPick_model_to_view;
-int gPling_materials;
+int gPling_materials = 1;
 int gTemp_group;
 br_model* gNearest_model;
 int gNfaces;

@@ -582,7 +582,6 @@ int DRTextCleverWidth(tDR_font* pFont, signed char* pText) {
                 result += pFont->width_table[*c - pFont->offset];
             }
         } else {
-            LOG_DEBUG("font id %d", -*c + 256);
             pFont = &gFonts[-*c + 256];
         }
         ++i;

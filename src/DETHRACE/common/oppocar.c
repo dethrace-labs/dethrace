@@ -12,7 +12,7 @@ int gCollision_detection_on;
 int gControl;
 br_vector3 gGround_normal;
 int gMetal_scrape_sound_id[3];
-br_angle gOld_yaw;
+br_angle gOld_yaw_oppo; // Added _oppo suffix
 
 // IDA: void __usercall MakeCarStationary(tCar_spec *pCar_spec@<EAX>)
 void MakeCarStationary(tCar_spec* pCar_spec) {

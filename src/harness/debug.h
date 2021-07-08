@@ -8,6 +8,10 @@
 #define sleep(x) _sleep(x)
 #endif
 
+void debug_printf(const char* fmt, const char* fn, const char* fmt2, ...);
+void debug_print_vector3(const char* fmt, const char* fn, char* msg, br_vector3* v);
+void debug_print_matrix34(const char* fmt, const char* fn, char* name, br_matrix34* m);
+
 #define BLUE
 
 #define LOG_TRACE(...) debug_printf("[TRACE] %s", __FUNCTION__, __VA_ARGS__)
@@ -27,6 +31,8 @@
     }
 
 #define LOG_DEBUG(...) debug_printf("\033[0;34m[DEBUG] %s ", __FUNCTION__, __VA_ARGS__)
+#define LOG_VEC(msg, v) debug_print_vector3("\033[0;34m[DEBUG] %s ", __FUNCTION__, msg, v)
+#define LOG_MATRIX(msg, m) debug_print_matrix34("\033[0;34m[DEBUG] %s ", __FUNCTION__, msg, m)
 #define LOG_INFO(...) debug_printf("\033[0;34m[INFO] %s ", __FUNCTION__, __VA_ARGS__)
 #define LOG_WARN(...) debug_printf("\033[0;33m[WARN] %s ", __FUNCTION__, __VA_ARGS__)
 #define LOG_PANIC(...)                                                \
@@ -52,7 +58,6 @@
         stub_printed = 1;                                                    \
     }
 
-void debug_printf(const char* fmt, const char* fn, const char* fmt2, ...);
 //int count_open_fds();
 
 #endif

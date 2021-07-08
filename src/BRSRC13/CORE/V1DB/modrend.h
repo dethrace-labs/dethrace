@@ -3,6 +3,14 @@
 
 #include "br_types.h"
 
+extern void (*RenderStyleCalls[])(
+    br_actor* actor,
+    br_model* model,
+    br_material* material,
+    void* render_data,
+    br_uint_8 style,
+    int on_screen);
+
 void renderFaces(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen);
 
 void renderEdges(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen);

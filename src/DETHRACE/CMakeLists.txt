@@ -11,7 +11,7 @@ target_include_directories(dethrace_obj PUBLIC
     ${CMAKE_SOURCE_DIR}/src/S3/include
 )
 
-target_link_libraries(dethrace_obj PUBLIC miniposix SDL2::SDL2 smacker harness brender s3)
+target_link_libraries(dethrace_obj PUBLIC miniposix SDL2::SDL2 smacker harness brender s3 cglm)
 
 if(NOT MSVC)
     target_compile_options(dethrace_obj PRIVATE

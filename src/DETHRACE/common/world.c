@@ -757,8 +757,8 @@ void ShiftBoundGrooveFunks(char* pStart, char* pEnd, int pDelta) {
     LOG_TRACE("(\"%s\", \"%s\", %d)", pStart, pEnd, pDelta);
 
     for (i = 0; i < COUNT_OF(gGroove_funk_bindings); i++) {
-        if ((signed int)gGroove_funk_bindings[i] >= (signed int)pStart
-            && (signed int)gGroove_funk_bindings[i] < (signed int)pEnd) {
+        if ((intptr_t)gGroove_funk_bindings[i] >= (intptr_t)pStart
+            && (intptr_t)gGroove_funk_bindings[i] < (intptr_t)pEnd) {
             gGroove_funk_bindings[i] = (float*)((char*)gGroove_funk_bindings[i] + (pDelta & 0xFFFFFFFC));
         }
     }

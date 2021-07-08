@@ -1,6 +1,8 @@
 #include "dbsetup.h"
 
 #include "CORE/FW/brbegin.h"
+#include "CORE/FW/devsetup.h"
+#include "CORE/FW/diag.h"
 #include "CORE/FW/register.h"
 #include "CORE/FW/resource.h"
 #include "CORE/FW/resreg.h"
@@ -128,7 +130,9 @@ br_error BrV1dbRendererBegin(br_device_pixelmap* destination, br_renderer* rende
     br_error r;
     br_token_value tv[2];
     LOG_TRACE("(%p, %p)", destination, renderer);
-    NOT_IMPLEMENTED();
+
+    Harness_Hook_BrV1dbRendererBegin(&v1db);
+    return 0;
 }
 
 // IDA: br_renderer* __cdecl BrV1dbRendererQuery()
@@ -146,7 +150,13 @@ br_error BrV1dbRendererEnd() {
 // IDA: void __cdecl BrZbBegin(br_uint_8 colour_type, br_uint_8 depth_type)
 void BrZbBegin(br_uint_8 colour_type, br_uint_8 depth_type) {
     LOG_TRACE("(%d, %d)", colour_type, depth_type);
-    STUB();
+
+    if (!v1db.zs_active && !v1db.zb_active) {
+        if (BrV1dbRendererBegin((br_device_pixelmap*)BrDevLastBeginQuery(), NULL) != 0) {
+            BrFailure("Failed to load renderer\n");
+        }
+    }
+    v1db.zb_active = 1;
 }
 
 // IDA: void __cdecl BrZsBegin(br_uint_8 colour_type, void *primitive, br_uint_32 size)

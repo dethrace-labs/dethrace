@@ -156,6 +156,12 @@ void BrPixelmapRectangleCopy(br_pixelmap* dst, br_int_32 dx, br_int_32 dy, br_pi
     br_uint_8* src_pix = (br_uint_8*)src->pixels;
     br_uint_8* dst_pix = (br_uint_8*)dst->pixels;
 
+    dx += dst->origin_x;
+    dy += dst->origin_y;
+
+    sx += src->origin_x;
+    sy += src->origin_y;
+
     if (src->type != dst->type) {
         LOG_PANIC("src and dst types don't match! src is %d and dst is %d", src->type, dst->type);
         return;
@@ -199,6 +205,8 @@ void BrPixelmapRectangleFill(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_int_
     LOG_TRACE("(%p, %d, %d, %d, %d, %d)", dst, x, y, w, h, colour);
     br_uint_8* dst_pix = (br_uint_8*)dst->pixels;
 
+    x += dst->origin_x;
+    y += dst->origin_y;
     for (int i = 0; i < w; i++) {
         if (x + i < 0 || x + i >= dst->width) {
             continue;
@@ -366,7 +374,7 @@ br_uint_16 BrPixelmapTextWidth(br_pixelmap* dst, br_font* font, char* text) {
 
     if (font->flags & BR_FONTF_PROPORTIONAL) {
         for (i = 0, w = 0, j = BrStrLen(text); i < j; i++, text++)
-            w += font->width[*text] + 1;
+            w += font->width[(int)*text] + 1;
         w -= 1;
         return w;
     } else

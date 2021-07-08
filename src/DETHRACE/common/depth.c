@@ -1,8 +1,11 @@
 #include "depth.h"
 
 #include "brender.h"
+#include "errors.h"
 #include "globvars.h"
 #include "globvrkm.h"
+#include "spark.h"
+#include "utility.h"
 #include <stdlib.h>
 
 tDepth_effect gDistance_depth_effects[4];
@@ -84,23 +87,23 @@ void InstantDepthChange(tDepth_effect_type pType, br_pixelmap* pSky_texture, int
         pStart = 3;
         pEnd = 3;
     }
-    // TODO: needs initdeptheffect implemented.
 
-    // gProgram_state.current_depth_effect.sky_texture = pSky_texture;
-    // gHorizon_material->colour_map = pSky_texture;
-    // BrMaterialUpdate(gHorizon_material, 0x7FFFu);
-    // gProgram_state.current_depth_effect.type = pType;
-    // gProgram_state.current_depth_effect.start = pStart;
-    // gProgram_state.current_depth_effect.end = pEnd;
-    // gProgram_state.default_depth_effect.type = pType;
-    // gProgram_state.default_depth_effect.start = pStart;
-    // gProgram_state.default_depth_effect.end = pEnd;
+    gProgram_state.current_depth_effect.sky_texture = pSky_texture;
+    gHorizon_material->colour_map = pSky_texture;
+    BrMaterialUpdate(gHorizon_material, 0x7FFFu);
+    gProgram_state.current_depth_effect.type = pType;
+    gProgram_state.current_depth_effect.start = pStart;
+    gProgram_state.current_depth_effect.end = pEnd;
+    gProgram_state.default_depth_effect.type = pType;
+    gProgram_state.default_depth_effect.start = pStart;
+    gProgram_state.default_depth_effect.end = pEnd;
 }
 
 // IDA: br_scalar __cdecl Tan(br_scalar pAngle)
 br_scalar Tan(br_scalar pAngle) {
     LOG_TRACE("(%f)", pAngle);
-    NOT_IMPLEMENTED();
+    pAngle = sin(pAngle * 0.00009587379924285257);
+    return pAngle / cos(pAngle);
 }
 
 // IDA: br_scalar __usercall EdgeU@<ST0>(br_angle pSky@<EAX>, br_angle pView@<EDX>, br_angle pPerfect@<EBX>)
@@ -143,7 +146,8 @@ br_model* CreateHorizonModel(br_actor* pCamera) {
     tU8 stripe;
     br_model* model;
     LOG_TRACE("(%p)", pCamera);
-    NOT_IMPLEMENTED();
+    STUB();
+    return NULL;
 }
 
 // IDA: void __usercall LoadDepthTable(char *pName@<EAX>, br_pixelmap **pTable@<EDX>, int *pPower@<EBX>)
@@ -153,14 +157,52 @@ void LoadDepthTable(char* pName, br_pixelmap** pTable, int* pPower) {
     int j;
     tU8 temp;
     LOG_TRACE("(\"%s\", %p, %p)", pName, pTable, pPower);
-    NOT_IMPLEMENTED();
+    STUB();
+    return NULL;
 }
 
 // IDA: void __cdecl InitDepthEffects()
 void InitDepthEffects() {
+    tPath_name the_path;
     int i;
     int j;
-    STUB();
+
+    LoadDepthTable("DEPTHCUE.TAB", &gDepth_shade_table, &gDepth_shade_table_power);
+    LoadDepthTable("FOG.TAB", &gFog_shade_table, &gFog_shade_table_power);
+    LoadDepthTable("ACIDFOG.TAB", &gAcid_shade_table, &gAcid_shade_table_power);
+    LoadDepthTable("BLUEGIT.TAB", &gWater_shade_table, &gWater_shade_table_power);
+    GenerateSmokeShades();
+    PathCat(the_path, gApplication_path, "MATERIAL");
+    PathCat(the_path, the_path, "HORIZON.MAT");
+    gHorizon_material = BrMaterialLoad(the_path);
+    if (!gHorizon_material) {
+        FatalError(89);
+    }
+    gHorizon_material->index_blend = BrPixelmapAllocate(3u, 256, 256, 0, 0);
+    BrTableAdd(gHorizon_material->index_blend);
+    for (i = 0; i < 256; i++) {
+        for (j = 0; j < 256; j++) {
+            *((tU8*)gHorizon_material->index_blend->pixels + 256 * i + j) = j;
+        }
+    }
+    gHorizon_material->flags |= 0x20u;
+    BrMaterialAdd(gHorizon_material);
+    gForward_sky_model = CreateHorizonModel(gCamera);
+    gRearview_sky_model = CreateHorizonModel(gRearview_camera);
+    LOG_WARN("InitDepthEffects not fully implemented. This will break cockpit views");
+    // BrModelAdd(gForward_sky_model);
+    // BrModelAdd(gRearview_sky_model);
+    // gForward_sky_actor = BrActorAllocate(BR_ACTOR_MODEL, 0);
+    // gForward_sky_actor->model = gForward_sky_model;
+    // gForward_sky_actor->material = gHorizon_material;
+    // gForward_sky_actor->render_style = 1;
+    // BrActorAdd(gUniverse_actor, gForward_sky_actor);
+    // gRearview_sky_actor = BrActorAllocate(BR_ACTOR_MODEL, 0);
+    // gRearview_sky_actor->model = gRearview_sky_model;
+    // gRearview_sky_actor->material = gHorizon_material;
+    // gRearview_sky_actor->render_style = 1;
+    // BrActorAdd(gUniverse_actor, gRearview_sky_actor);
+    gLast_camera_special_volume = 0;
 }
 
 // IDA: void __usercall DoDepthByShadeTable(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_pixelmap *pShade_table@<EBX>, int pShade_table_power@<ECX>, int pStart, int pEnd)
@@ -204,7 +246,81 @@ void ExternalSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_act
     int repetitions;
     br_pixelmap* col_map;
     LOG_TRACE("(%p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world);
-    NOT_IMPLEMENTED();
+
+    dx = 0;
+    col_map = gHorizon_material->colour_map;
+    camera = (br_camera*)pCamera->type_data;
+    LOG_DEBUG("camera fov %d", camera->field_of_view);
+    tan_half_fov = Tan(camera->field_of_view / 2);
+    tan_half_hori_fov = tan_half_fov * camera->aspect;
+    tan_pitch = 0;
+    // LOG_DEBUG("tan_half_fov %f, tan_half_hori_fov %f, tan_pitch %f", tan_half_fov, tan_half_hori_fov, tan_pitch);
+
+    // LOG_DEBUG("pCamera->m[2][0] %f, pCamera->m[2][2] %f", pCamera->t.t.mat.m[2][0], pCamera->t.t.mat.m[2][2]);
+    // LOG_DEBUG("pCamera_to_world->m[2][0] %f, pCamera_to_world->m[2][2] %f", pCamera_to_world->m[2][0], pCamera_to_world->m[2][2]);
+
+    pitch = BrRadianToAngle(atan2(pCamera_to_world->m[2][0], pCamera_to_world->m[2][2]));
+    yaw = BrRadianToAngle(atan2(col_map->width * tan_half_hori_fov / (double)pRender_buffer->width, 1));
+    tan_pitch = -((double)pitch
+        * 0.0000152587890625
+        / ((double)(uint16_t)(65520
+               / (int)(1.0
+                       / ((double)(uint16_t)(2 * yaw) * 0.0000152587890625)
+                   + 0.5))
+            * 0.0000152587890625));
+
+    //LOG_DEBUG("tan_half_fov %f, tan_half_hori_fov %f, tan_pitch %f", tan_half_fov, tan_half_hori_fov, tan_pitch);
+    //LOG_DEBUG("rep1 %d", (int)((double)col_map->width * tan_pitch));
+    for (repetitions = (int)((double)col_map->width * tan_pitch); repetitions < 0; repetitions += col_map->width) {
+        ;
+    }
+    //LOG_DEBUG("rep2 %d", repetitions);
+    while (col_map->width < repetitions) {
+        repetitions -= col_map->width;
+    }
+    //LOG_DEBUG("rep3 %d", repetitions);
+
+    top_y = -(pCamera_to_world->m[2][1] / sqrt(pCamera_to_world->m[2][1]) / tan_half_fov * (double)pRender_buffer->height / 2.0)
+        - (col_map->height - gSky_image_underground * col_map->height / gSky_image_height);
+    //LOG_DEBUG("gSky_image_underground %d, gSky_image_height %d", gSky_image_underground, gSky_image_height);
+    LOG_DEBUG("top_y %d, r_o_x %d, repetitions %d", top_y, pRender_buffer->origin_x, repetitions);
+    while (pRender_buffer->width > dx) {
+        hori_pixels = col_map->width - repetitions;
+        if (hori_pixels >= pRender_buffer->width - dx) {
+            hori_pixels = pRender_buffer->width - dx;
+        }
+        DRPixelmapRectangleCopy(
+            pRender_buffer,
+            dx - pRender_buffer->origin_x,
+            top_y,
+            col_map,
+            repetitions - col_map->origin_x,
+            -col_map->origin_y,
+            hori_pixels,
+            col_map->height);
+        repetitions = 0;
+        dx += hori_pixels;
+    }
+    if (top_y + pRender_buffer->origin_y > 0) {
+        DRPixelmapRectangleFill(
+            pRender_buffer,
+            -pRender_buffer->origin_x,
+            -pRender_buffer->origin_y,
+            pRender_buffer->width,
+            top_y + pRender_buffer->origin_y,
+            1);
+    }
+    LOG_DEBUG("render buffer width %d", pRender_buffer->width);
+    bot_height = pRender_buffer->height - pRender_buffer->origin_y - top_y - col_map->height;
+    if (bot_height > 0) {
+        DRPixelmapRectangleFill(
+            pRender_buffer,
+            -pRender_buffer->origin_x,
+            top_y + col_map->height,
+            pRender_buffer->width,
+            bot_height,
+            *((tU8*)col_map->pixels + col_map->row_bytes * (col_map->height - 1) + 3));
+    }
 }
 
 // IDA: void __usercall DoHorizon(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>)

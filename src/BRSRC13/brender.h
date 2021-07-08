@@ -70,6 +70,7 @@ void BrMatrix34RotateY(br_matrix34* mat, br_angle ry);
 void BrMatrix34PostScale(br_matrix34* mat, br_scalar sx, br_scalar sy, br_scalar sz);
 void BrMatrix34PreTransform(br_matrix34* mat, br_transform* xform);
 void BrMatrix34PostTransform(br_matrix34* mat, br_transform* xform);
+void BrMatrix34PreRotateX(br_matrix34* mat, br_angle rx);
 
 // BrMem
 void BrMemFree(void* block);

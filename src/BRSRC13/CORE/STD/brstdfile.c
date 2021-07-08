@@ -35,7 +35,7 @@ void* BrStdioOpenRead(char* name, br_size_t n_magics, br_mode_test_cbfn* identif
     char try_name[512];
     char* cp;
     br_uint_8 magics[16];
-    int open_mode;
+    int open_mode = 0;
     LOG_TRACE("(\"%s\", %d, %p, %p)", name, n_magics, identify, mode_result);
 
     fh = fopen(name, "rb");

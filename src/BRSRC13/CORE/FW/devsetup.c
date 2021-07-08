@@ -9,7 +9,9 @@ char rscid[51];
 // IDA: br_pixelmap* __cdecl BrDevLastBeginQuery()
 br_pixelmap* BrDevLastBeginQuery() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    STUB();
+    return NULL;
 }
 
 // IDA: void __usercall BrDevLastBeginSet(br_pixelmap *pm@<EAX>)

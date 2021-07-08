@@ -7,7 +7,7 @@ target_include_directories(harness PRIVATE
     ${CMAKE_SOURCE_DIR}/src/S3/include
 )
 
-target_link_libraries(harness PRIVATE miniposix SDL2::SDL2 glad)
+target_link_libraries(harness PRIVATE miniposix SDL2::SDL2 glad cglm_headers)
 
 if(NOT MSVC)
     target_compile_options(harness PRIVATE
@@ -30,6 +30,10 @@ target_sources(harness PRIVATE
     input/keyboard.h
     renderers/gl_renderer.c
     renderers/gl_renderer.h
+    renderers/gl_renderer_shaders.c
+    renderers/gl_renderer_shaders.h
+    rendering/renderer_state.c
+    rendering/renderer_state.h
     renderers/null_renderer.c
     renderers/null_renderer.h
     sound/sound.c

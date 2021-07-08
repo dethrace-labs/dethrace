@@ -456,7 +456,7 @@ void GenerateSmokeShades() {
     static int gg;
     static int bg;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    STUB();
 }
 
 // IDA: void __cdecl GenerateItFoxShadeTable()

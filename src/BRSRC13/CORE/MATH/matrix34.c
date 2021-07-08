@@ -78,7 +78,22 @@ void BrMatrix34RotateX(br_matrix34* mat, br_angle rx) {
     br_scalar s;
     br_scalar c;
     LOG_TRACE("(%p, %d)", mat, rx);
-    NOT_IMPLEMENTED();
+
+    s = BR_SIN(rx);
+    c = BR_COS(rx);
+
+    M(0, 0) = 1;
+    M(0, 1) = 0;
+    M(0, 2) = 0;
+    M(1, 0) = 0;
+    M(1, 1) = c;
+    M(1, 2) = s;
+    M(2, 0) = 0;
+    M(2, 1) = -s;
+    M(2, 2) = c;
+    M(3, 0) = 0;
+    M(3, 1) = 0;
+    M(3, 2) = 0;
 }
 
 // IDA: void __cdecl BrMatrix34RotateY(br_matrix34 *mat, br_angle ry)
@@ -380,7 +395,10 @@ void BrMatrix34Post(br_matrix34* mat, br_matrix34* A) {
 // IDA: void __cdecl BrMatrix34PreRotateX(br_matrix34 *mat, br_angle rx)
 void BrMatrix34PreRotateX(br_matrix34* mat, br_angle rx) {
     LOG_TRACE("(%p, %d)", mat, rx);
-    NOT_IMPLEMENTED();
+
+    BrMatrix34RotateX(&mattmp1, rx);
+    BrMatrix34Mul(&mattmp2, &mattmp1, mat);
+    BrMatrix34Copy(mat, &mattmp2);
 }
 
 // IDA: void __cdecl BrMatrix34PostRotateX(br_matrix34 *mat, br_angle rx)

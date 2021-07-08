@@ -1,6 +1,7 @@
 
 #include "harness.h"
 #include "input/keyboard.h"
+#include "rendering/renderer_state.h"
 #include "sound/sound.h"
 #include "stack_trace_handler.h"
 #include <strings.h>
@@ -11,6 +12,7 @@ SDL_Window* window;
 tRenderer* current_renderer;
 br_pixelmap* palette;
 uint32_t* screen_buffer;
+harness_br_renderer* renderer_state;
 
 br_pixelmap* last_dst = NULL;
 br_pixelmap* last_src = NULL;
@@ -19,6 +21,8 @@ br_pixelmap* last_src = NULL;
 int harness_disable_cd_check = 1;
 
 int harness_debug_level = 7;
+
+int back_screen_is_transparent = 0;
 
 extern void BrPixelmapFill(br_pixelmap* dst, br_uint_32 colour);
 
@@ -139,19 +143,23 @@ void Harness_RenderScreen(br_pixelmap* dst, br_pixelmap* src) {
             screen_buffer[y * src->width + x] = colors[palette_index];
         }
     }
-    current_renderer->doubleBuffer(screen_buffer, window);
+    current_renderer->renderScreenBuffer(screen_buffer, back_screen_is_transparent);
     Harness_PumpEvents();
+
+    last_dst = dst;
+    last_src = src;
 }
 
 void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {
-    last_dst = dst;
-    last_src = src;
     Harness_RenderScreen(dst, src);
+    current_renderer->swap(window);
+    back_screen_is_transparent = 0;
 }
 void Harness_Hook_BrDevPaletteSetOld(br_pixelmap* pm) {
     palette = pm;
-    if (last_dst && last_src) {
+    if (last_src) {
         Harness_RenderScreen(last_dst, last_src);
+        current_renderer->swap(window);
     }
 }
 
@@ -162,8 +170,22 @@ void Harness_Hook_BrDevPaletteSetEntryOld(int i, br_colour colour) {
     }
 }
 
+void Harness_Hook_BrV1dbRendererBegin(br_v1db_state* v1db) {
+    renderer_state = NewRendererState();
+    v1db->renderer = (br_renderer*)renderer_state;
+}
+
+void Harness_Hook_renderFaces(v11model* model, br_material* material, br_token type) {
+}
+
 void Harness_Hook_BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer) {
+    // splat current back_screen to framebuffer
+    Harness_RenderScreen(NULL, colour_buffer);
+    // clear to transparent ready for the game to render foreground bits
     BrPixelmapFill(colour_buffer, 0);
+    back_screen_is_transparent = 1;
+
+    current_renderer->renderFrameBegin();
 }
 
 void Harness_Hook_BrZbSceneRenderAdd(br_actor* tree) {

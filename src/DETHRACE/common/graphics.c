@@ -448,6 +448,7 @@ void AdjustRenderScreenSize() {
         gRender_screen->base_y = gProgram_state.current_render_top;
         gRender_screen->height = gProgram_state.current_render_bottom - gProgram_state.current_render_top;
         gRender_screen->width = gProgram_state.current_render_right - gProgram_state.current_render_left;
+        LOG_DEBUG("renderscreen is %d x %d", gRender_screen->width, gRender_screen->height);
     }
     if (gRender_screen->row_bytes == gRender_screen->width) {
         gRender_screen->flags |= BR_PMF_ROW_WHOLEPIXELS;
@@ -647,7 +648,8 @@ void SufferFromConcussion(float pSeriousness) {
 // IDA: void __usercall ProcessNonTrackActors(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>, br_matrix34 *pOld_camera_matrix)
 void ProcessNonTrackActors(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world, br_matrix34* pOld_camera_matrix) {
     LOG_TRACE("(%p, %p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world, pOld_camera_matrix);
-    SILENT_STUB();
+
+    BrZbSceneRenderAdd(gNon_track_actor);
 }
 
 // IDA: int __usercall OppositeColour@<EAX>(int pColour@<EAX>)
@@ -821,7 +823,7 @@ int ConditionallyFillWithSky(br_pixelmap* pPixelmap) {
     LOG_TRACE("(%p)", pPixelmap);
 
     SILENT_STUB();
-    return 1;
+    return 0;
 }
 
 // IDA: void __usercall RenderAFrame(int pDepth_mask_on@<EAX>)

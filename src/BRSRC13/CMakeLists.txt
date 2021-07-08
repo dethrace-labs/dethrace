@@ -24,6 +24,7 @@ if(NOT MSVC)
         -Wno-unused-variable
         -Wno-unused-parameter
         -Wno-sign-compare
+        -Wno-int-conversion  #todo!
     )
     
     target_link_libraries(brender PUBLIC m)

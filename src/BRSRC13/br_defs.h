@@ -6,12 +6,19 @@
 #define BrAngleToRadian(a) ((br_scalar)((a) * (PI / 32768.0))) // a * 0.00009587379924285257
 #define BrRadianToAngle(r) ((br_angle)(long)((r) * (32768.0 / PI))) // r * 10430.378350470453
 
+#define BR_VECTOR3(a, b, c) \
+    { a, b, c }
+
+#define BR_VECTOR4(a, b, c, d) \
+    { a, b, c, d }
+
 #define BR_COLOUR_RGB(r, g, b) \
     ((((unsigned int)(r)) << 16) | (((unsigned int)(g)) << 8) | ((unsigned int)(b)))
 
 #define BR_ANGLE_DEG(deg) ((br_angle)((deg)*182))
 #define BR_ANGLE_RAD(rad) ((br_angle)((rad)*10430))
 #define BrDegreeToRadian(d) ((br_scalar)((d) * (PI / 180.0)))
+#define BrDegreeToAngle(d) ((br_angle)(long)((d) * (32768.0 / 180.0))) // "d * 182.044444444"
 
 #define BR_SCALAR(x) ((br_scalar)(x))
 
