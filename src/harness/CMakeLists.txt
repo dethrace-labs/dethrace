@@ -22,8 +22,9 @@ else()
 endif()
 
 target_sources(harness PRIVATE
-    debug.c
-    debug.h
+    harness_hooks.h
+    harness_trace.c
+    harness_trace.h
     harness.c
     harness.h
     input/keyboard.c

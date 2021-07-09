@@ -1,6 +1,6 @@
 #include "gl_renderer.h"
 #include "gl_renderer_shaders.h"
-#include "harness.h"
+#include "harness_trace.h"
 
 /*
 #ifdef _WIN32
@@ -29,6 +29,7 @@ void Harness_GLRenderer_RenderFrameBegin();
 void Harness_GLRenderer_RenderFrameEnd();
 void Harness_GLRenderer_RenderScreenBuffer(uint32_t* screen_buffer, int transparent);
 void Harness_GLRenderer_Swap(SDL_Window* window);
+void Harness_GLRenderer_RenderCube(float x, float y, float z);
 
 tRenderer OpenGLRenderer = {
     Harness_GLRenderer_GetWindowFlags,
@@ -36,7 +37,8 @@ tRenderer OpenGLRenderer = {
     Harness_GLRenderer_RenderFrameBegin,
     Harness_GLRenderer_RenderFrameEnd,
     Harness_GLRenderer_RenderScreenBuffer,
-    Harness_GLRenderer_Swap
+    Harness_GLRenderer_Swap,
+    Harness_GLRenderer_RenderCube
 };
 
 SDL_GLContext context;
@@ -293,29 +295,7 @@ void Harness_GLRenderer_Init(SDL_Window* window) {
     glDepthFunc(GL_LESS);
 }
 
-float ang = 0;
 void Harness_GLRenderer_RenderFrameBegin() {
-
-    // Enable depth test
-    glEnable(GL_DEPTH_TEST);
-    glUseProgram(shader_program_3d);
-
-    mat4 MVP, model, view, proj;
-    glm_perspective(glm_rad(45), 4.0f / 3.0f, 0.1f, 100.f, proj);
-    glm_lookat((vec3){ -70, 25, -60 }, (vec3){ -67, 20, -52 }, (vec3){ 0, 1, 0 }, view);
-
-    glm_mat4_identity(model);
-    //glm_rotate_y(model, ang, model);
-    ang += 0.01f;
-    glm_translate(model, (vec3){ -67.514, 20.345, -52.174 });
-    glm_mat4_mulN((mat4*[]){ &proj, &view, &model }, 3, MVP);
-    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
-
-    glBindVertexArray(cube_vao);
-
-    // Draw the triangle !
-    glDrawArrays(GL_TRIANGLES, 0, 12 * 3); // 12*3 indices starting at 0 -> 12 triangles
-    glBindVertexArray(0);
 }
 
 void Harness_GLRenderer_RenderFrameEnd() {
@@ -350,4 +330,29 @@ void Harness_GLRenderer_Swap(SDL_Window* window) {
     SDL_GL_SwapWindow(window);
     // glClearColor(0.0f, 0.5f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+float ang = 0;
+void Harness_GLRenderer_RenderCube(float x, float y, float z) {
+
+    // Enable depth test
+    glEnable(GL_DEPTH_TEST);
+    glUseProgram(shader_program_3d);
+
+    mat4 MVP, model, view, proj;
+    glm_perspective(glm_rad(45), 4.0f / 3.0f, 0.1f, 100.f, proj);
+    glm_lookat((vec3){ -70, 25, -60 }, (vec3){ x, y, z }, (vec3){ 0, 1, 0 }, view);
+
+    glm_mat4_identity(model);
+    //glm_rotate_y(model, ang, model);
+    ang += 0.01f;
+    glm_translate(model, (vec3){ x, y, z });
+    glm_mat4_mulN((mat4*[]){ &proj, &view, &model }, 3, MVP);
+    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+
+    glBindVertexArray(cube_vao);
+
+    // Draw the triangle !
+    glDrawArrays(GL_TRIANGLES, 0, 12 * 3); // 12*3 indices starting at 0 -> 12 triangles
+    glBindVertexArray(0);
 }

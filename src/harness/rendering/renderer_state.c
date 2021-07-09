@@ -1,5 +1,5 @@
 #include "renderer_state.h"
-#include "../debug.h"
+#include "harness_trace.h"
 #include <stddef.h>
 
 extern void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class);

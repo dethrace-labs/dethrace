@@ -1,5 +1,7 @@
 
 #include "harness.h"
+#include "harness_hooks.h"
+#include "harness_trace.h"
 #include "input/keyboard.h"
 #include "rendering/renderer_state.h"
 #include "sound/sound.h"
@@ -176,6 +178,10 @@ void Harness_Hook_BrV1dbRendererBegin(br_v1db_state* v1db) {
 }
 
 void Harness_Hook_renderFaces(v11model* model, br_material* material, br_token type) {
+    current_renderer->renderCube(
+        renderer_state->state.matrix.model_to_view.m[3][0],
+        renderer_state->state.matrix.model_to_view.m[3][1],
+        renderer_state->state.matrix.model_to_view.m[3][2]);
 }
 
 void Harness_Hook_BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer) {

@@ -1,6 +1,5 @@
-#include "harness.h"
+#include "harness_trace.h"
 
-#include "br_types.h"
 #include <dirent.h>
 #include <stdarg.h>
 #include <stddef.h>

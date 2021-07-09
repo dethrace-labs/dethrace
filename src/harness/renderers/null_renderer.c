@@ -20,5 +20,6 @@ tRenderer NullRenderer = {
     Harness_NullRenderer_RenderFrameBegin,
     Harness_NullRenderer_RenderFrameEnd,
     Harness_NullRenderer_RenderScreenBuffer,
-    Harness_NullRenderer_Swap
+    Harness_NullRenderer_Swap,
+    NULL
 };

@@ -1,7 +1,6 @@
-#include "dr_types.h"
-#include <SDL.h>
-
 #include "keyboard.h"
+#include "dr_types.h"
+#include "harness_trace.h"
 
 extern tU8 gScan_code[123][2];
 
