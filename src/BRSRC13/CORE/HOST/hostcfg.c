@@ -1,5 +1,5 @@
 #include "hostcfg.h"
-#include "harness.h"
+#include "harness_trace.h"
 
 // IDA: char* __cdecl HostDefaultDevice()
 char* HostDefaultDevice() {

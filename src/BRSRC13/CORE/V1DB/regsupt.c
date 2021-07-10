@@ -6,7 +6,7 @@
 #include "CORE/V1DB/prepmesh.h"
 #include "CORE/V1DB/preptab.h"
 
-#include "harness.h"
+#include "harness_trace.h"
 
 char rscid[51];
 

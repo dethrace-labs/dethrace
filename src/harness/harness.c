@@ -22,8 +22,6 @@ br_pixelmap* last_src = NULL;
 // if true, disable the original CD check code
 int harness_disable_cd_check = 1;
 
-int harness_debug_level = 7;
-
 int back_screen_is_transparent = 0;
 
 extern void BrPixelmapFill(br_pixelmap* dst, br_uint_32 colour);
@@ -177,11 +175,17 @@ void Harness_Hook_BrV1dbRendererBegin(br_v1db_state* v1db) {
     v1db->renderer = (br_renderer*)renderer_state;
 }
 
-void Harness_Hook_renderFaces(v11model* model, br_material* material, br_token type) {
-    current_renderer->renderCube(
-        renderer_state->state.matrix.model_to_view.m[3][0],
-        renderer_state->state.matrix.model_to_view.m[3][1],
-        renderer_state->state.matrix.model_to_view.m[3][2]);
+int col = 128;
+
+void Harness_Hook_renderFaces(br_model* model, br_material* material, br_token type) {
+    LOG_DEBUG("rendering model %s at %f, %f, %f", model->identifier, renderer_state->state.matrix.model_to_view.m[3][0], renderer_state->state.matrix.model_to_view.m[3][1], renderer_state->state.matrix.model_to_view.m[3][2]);
+    current_renderer->renderModel(model, renderer_state->state.matrix.model_to_view);
+    // current_renderer->renderCube(
+    //     col / 255.0f,
+    //     renderer_state->state.matrix.model_to_view.m[3][0],
+    //     renderer_state->state.matrix.model_to_view.m[3][1],
+    //     renderer_state->state.matrix.model_to_view.m[3][2]);
+    // col = (col + 20) % 255;
 }
 
 void Harness_Hook_BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer) {
@@ -192,6 +196,7 @@ void Harness_Hook_BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pix
     back_screen_is_transparent = 1;
 
     current_renderer->renderFrameBegin();
+    col = 0;
 }
 
 void Harness_Hook_BrZbSceneRenderAdd(br_actor* tree) {

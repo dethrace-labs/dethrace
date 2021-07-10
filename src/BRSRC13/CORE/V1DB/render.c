@@ -1,9 +1,11 @@
 #include "render.h"
 #include "dbsetup.h"
-#include "harness.h"
+#include "harness_hooks.h"
+#include "harness_trace.h"
 #include "matrix34.h"
 #include "modrend.h"
 #include "transfrm.h"
+#include <string.h>
 
 char rscid[55];
 
@@ -17,11 +19,11 @@ void BrDbModelRender(br_actor* actor, br_model* model, br_material* material, vo
     br_token_value tv[5];
     LOG_TRACE("(%p, %p, %p, %p, %d, %d, %d)", actor, model, material, render_data, style, on_screen, use_custom);
 
-    if (strcmp(model->identifier, "NEWEAGLE.DAT") == 0) {
-        LOG_DEBUG("rendering eagle!");
-    } else {
-        return;
-    }
+    // if (strcmp(model->identifier, "NEWEAGLE.DAT") == 0) {
+    //     LOG_DEBUG("rendering eagle!");
+    // } else {
+    //     return;
+    // }
 
     /*
 	 * Mark local copy of model_to_screen as invalid

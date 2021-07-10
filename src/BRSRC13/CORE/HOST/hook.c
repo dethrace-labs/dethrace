@@ -1,5 +1,5 @@
 #include "hook.h"
-#include "harness.h"
+#include "harness_trace.h"
 
 // IDA: br_error __cdecl HostInterruptHook(host_interrupt_hook *h, br_uint_8 vector, br_uint_32 off, br_uint_16 sel)
 br_error HostInterruptHook(host_interrupt_hook* h, br_uint_8 vector, br_uint_32 off, br_uint_16 sel) {

@@ -1,5 +1,5 @@
 #include "brexcept.h"
-#include "harness.h"
+#include "harness_trace.h"
 
 void* exceptionValue;
 br_exception_handler* _BrExceptionHandler;

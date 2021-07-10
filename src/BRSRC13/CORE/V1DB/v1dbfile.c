@@ -10,7 +10,7 @@
 #include "CORE/V1DB/matsupt.h"
 #include "CORE/V1DB/modsupt.h"
 #include "CORE/V1DB/regsupt.h"
-#include "harness.h"
+#include "harness_trace.h"
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -664,7 +664,7 @@ int FopRead_TRANSFORM(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint
     br_transform* tp;
     LOG_TRACE9("(%p, %d, %d, %d)", df, id, length, count);
 
-    for (t = 0; t < COUNT_OF(TransformTypes); t++) {
+    for (t = 0; t < BR_ASIZE(TransformTypes); t++) {
         if (id == TransformTypes[t].id) {
             break;
         }

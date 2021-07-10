@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <sys/types.h>
 
+int harness_debug_level = 7;
+
 void debug_printf(const char* fmt, const char* fn, const char* fmt2, ...) {
     va_list ap;
 

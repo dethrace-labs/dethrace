@@ -49,4 +49,6 @@
 #define BR_ATAN2(a, b) BrRadianToAngle(atan2((a), (b)))
 #define BR_ATAN2FAST(a, b) BrRadianToAngle(atan2((a), (b)))
 
+#define BR_ASIZE(a) (sizeof(a) / sizeof((a)[0]))
+
 #endif /* BR_DEFS_H */

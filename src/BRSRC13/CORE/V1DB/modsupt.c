@@ -1,7 +1,7 @@
 #include "modsupt.h"
 #include "CORE/FW/resource.h"
 #include "CORE/V1DB/dbsetup.h"
-#include "harness.h"
+#include "harness_trace.h"
 
 char rscid[50];
 

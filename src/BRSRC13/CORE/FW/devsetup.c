@@ -1,5 +1,6 @@
 #include "devsetup.h"
-#include "harness.h"
+#include "harness_hooks.h"
+#include "harness_trace.h"
 
 #include <stdarg.h>
 

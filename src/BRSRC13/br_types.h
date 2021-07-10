@@ -1400,6 +1400,7 @@ typedef struct br_model { // size: 0x5c
     void* stored; // @0x50
     br_uint_16 nprimitive_lists; // @0x54
     br_primitive_list* primitive_list; // @0x58
+    void* harness_user_data;
 } br_model;
 
 typedef struct br_camera {

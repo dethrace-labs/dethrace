@@ -1,5 +1,5 @@
 #include "pmfile.h"
-#include "harness.h"
+#include "harness_trace.h"
 
 #include "CORE/FW/datafile.h"
 #include "CORE/FW/genfile.h"

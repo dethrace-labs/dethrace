@@ -4,7 +4,7 @@
 #include "brstdlib.h"
 #include "file.h"
 #include "fwsetup.h"
-#include "harness.h"
+#include "harness_trace.h"
 #include "mem.h"
 #include <stdio.h>
 #include <stdlib.h>

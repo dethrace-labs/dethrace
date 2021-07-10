@@ -2,9 +2,8 @@
 #define HARNESS_H
 
 #include "br_types.h"
+#include "harness_trace.h"
 #include <SDL.h>
-
-#define COUNT_OF(array) (sizeof((array)) / sizeof((array)[0]))
 
 typedef struct tRenderer {
     int (*get_window_flags)();
@@ -13,7 +12,8 @@ typedef struct tRenderer {
     void (*renderFrameEnd)();
     void (*renderScreenBuffer)(uint32_t* src, int transparent);
     void (*swap)(SDL_Window* window);
-    void (*renderCube)(float x, float y, float z);
+    void (*renderModel)(br_model* model, br_matrix34 model_matrix);
+    void (*renderCube)(float color, float x, float y, float z);
 } tRenderer;
 
 typedef struct tHarness_GameMode {
@@ -23,7 +23,6 @@ typedef struct tHarness_GameMode {
 
 extern tHarness_GameMode harness_game_mode;
 extern int harness_disable_cd_check;
-extern int harness_debug_level;
 
 void Harness_Init(char* name, tRenderer* renderer);
 

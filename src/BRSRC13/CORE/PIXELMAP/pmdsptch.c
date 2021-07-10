@@ -1,7 +1,8 @@
 #include "pmdsptch.h"
 
 #include "brstdlib.h"
-#include "harness.h"
+#include "harness_hooks.h"
+#include "harness_trace.h"
 #include "pmmem.h"
 #include <stdarg.h>
 #include <stdlib.h>

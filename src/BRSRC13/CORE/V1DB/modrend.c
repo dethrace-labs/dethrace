@@ -1,6 +1,7 @@
 #include "modrend.h"
 #include "dbsetup.h"
-#include "harness.h"
+#include "harness_hooks.h"
+#include "harness_trace.h"
 
 br_colour bounds_colours[12];
 fmt_vertex bounds_vertices[8];
@@ -32,7 +33,7 @@ char rscid[49];
 void renderFaces(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen) {
     LOG_TRACE("(%p, %p, %p, %p, %d, %d)", actor, model, material, render_data, style, on_screen);
 
-    Harness_Hook_renderFaces(model->prepared, material, BRT_TRIANGLE);
+    Harness_Hook_renderFaces(model, material, BRT_TRIANGLE);
 }
 
 // IDA: void __usercall renderEdges(br_actor *actor@<EAX>, br_model *model@<EDX>, br_material *material@<EBX>, void *render_data@<ECX>, br_uint_8 style, int on_screen)

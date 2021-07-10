@@ -1,5 +1,5 @@
 #include "tokenval.h"
-#include "harness.h"
+#include "harness_trace.h"
 #include "resource.h"
 
 char rscid[50];

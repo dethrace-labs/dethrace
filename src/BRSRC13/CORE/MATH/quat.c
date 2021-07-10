@@ -1,5 +1,5 @@
 #include "quat.h"
-#include "harness.h"
+#include "harness_trace.h"
 
 char rscid[48];
 

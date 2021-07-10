@@ -1,5 +1,5 @@
 #include "brstddiag.h"
-#include "harness.h"
+#include "harness_trace.h"
 
 br_diaghandler BrStdioDiagHandler;
 br_diaghandler* _BrDefaultDiagHandler = NULL;

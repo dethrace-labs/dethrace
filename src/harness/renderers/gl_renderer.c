@@ -29,7 +29,8 @@ void Harness_GLRenderer_RenderFrameBegin();
 void Harness_GLRenderer_RenderFrameEnd();
 void Harness_GLRenderer_RenderScreenBuffer(uint32_t* screen_buffer, int transparent);
 void Harness_GLRenderer_Swap(SDL_Window* window);
-void Harness_GLRenderer_RenderCube(float x, float y, float z);
+void Harness_GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix);
+void Harness_GLRenderer_RenderCube(float col, float x, float y, float z);
 
 tRenderer OpenGLRenderer = {
     Harness_GLRenderer_GetWindowFlags,
@@ -38,8 +39,13 @@ tRenderer OpenGLRenderer = {
     Harness_GLRenderer_RenderFrameEnd,
     Harness_GLRenderer_RenderScreenBuffer,
     Harness_GLRenderer_Swap,
+    Harness_GLRenderer_RenderModel,
     Harness_GLRenderer_RenderCube
 };
+
+typedef struct tModel_context {
+    GLuint vao_id, ebo_id;
+} tModel_context;
 
 SDL_GLContext context;
 GLuint VBO, VAO, EBO;
@@ -50,9 +56,8 @@ GLuint shader_program_3d;
 
 GLuint cube_vao;
 GLuint cube_vertexbuffer;
-GLuint cube_colorbuffer;
 
-GLuint MatrixID;
+GLuint MatrixID, ColorID;
 
 static const GLfloat g_vertex_buffer_data[] = {
     -1.0f, -1.0f, -1.0f, // triangle 1 : begin
@@ -91,45 +96,6 @@ static const GLfloat g_vertex_buffer_data[] = {
     1.0f, 1.0f, 1.0f,
     -1.0f, 1.0f, 1.0f,
     1.0f, -1.0f, 1.0f
-};
-// One color for each vertex. They were generated randomly.
-static const GLfloat g_color_buffer_data[] = {
-    0.583f, 0.771f, 0.014f,
-    0.609f, 0.115f, 0.436f,
-    0.327f, 0.483f, 0.844f,
-    0.822f, 0.569f, 0.201f,
-    0.435f, 0.602f, 0.223f,
-    0.310f, 0.747f, 0.185f,
-    0.597f, 0.770f, 0.761f,
-    0.559f, 0.436f, 0.730f,
-    0.359f, 0.583f, 0.152f,
-    0.483f, 0.596f, 0.789f,
-    0.559f, 0.861f, 0.639f,
-    0.195f, 0.548f, 0.859f,
-    0.014f, 0.184f, 0.576f,
-    0.771f, 0.328f, 0.970f,
-    0.406f, 0.615f, 0.116f,
-    0.676f, 0.977f, 0.133f,
-    0.971f, 0.572f, 0.833f,
-    0.140f, 0.616f, 0.489f,
-    0.997f, 0.513f, 0.064f,
-    0.945f, 0.719f, 0.592f,
-    0.543f, 0.021f, 0.978f,
-    0.279f, 0.317f, 0.505f,
-    0.167f, 0.620f, 0.077f,
-    0.347f, 0.857f, 0.137f,
-    0.055f, 0.953f, 0.042f,
-    0.714f, 0.505f, 0.345f,
-    0.783f, 0.290f, 0.734f,
-    0.722f, 0.645f, 0.174f,
-    0.302f, 0.455f, 0.848f,
-    0.225f, 0.587f, 0.040f,
-    0.517f, 0.713f, 0.338f,
-    0.053f, 0.959f, 0.120f,
-    0.393f, 0.621f, 0.362f,
-    0.673f, 0.211f, 0.457f,
-    0.820f, 0.883f, 0.371f,
-    0.982f, 0.099f, 0.879f
 };
 
 int Harness_GLRenderer_GetWindowFlags() {
@@ -270,23 +236,6 @@ void Harness_GLRenderer_Init(SDL_Window* window) {
     );
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
-    glGenBuffers(1, &cube_colorbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, cube_colorbuffer);
-    // 2nd attribute buffer : colors
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(
-        1, // attribute. No particular reason for 1, but must match the layout in the shader.
-        3, // size
-        GL_FLOAT, // type
-        GL_FALSE, // normalized?
-        0, // stride
-        (void*)0 // array buffer offset
-    );
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
-
-    MatrixID = glGetUniformLocation(shader_program_3d, "MVP");
-    LOG_DEBUG("found matrixid %d", MatrixID);
-
     glBindVertexArray(0);
 
     glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
@@ -306,6 +255,7 @@ void Harness_GLRenderer_RenderScreenBuffer(uint32_t* screen_buffer, int transpar
     //return;
 
     glDisable(GL_DEPTH_TEST);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     // TODO: remove fixed 320x200
     glBindTexture(GL_TEXTURE_2D, screen_texture);
@@ -326,33 +276,215 @@ void Harness_GLRenderer_RenderScreenBuffer(uint32_t* screen_buffer, int transpar
     glBindVertexArray(0);
 }
 
+float ang = 0;
+
+vec3 cam_pos = { -60, 22, -62 };
+vec3 lookat = { -67.514061, 20.485441, -52.174110 };
+vec3 cam_front = { 0, 0, -1 };
+vec3 cam_up = { 0, -1, 0 };
+float cam_speed = 0.1f;
+
+float lastX = 400, lastY = 300;
+int firstMouse = 1;
+float yaw = 0, pitch = 0;
 void Harness_GLRenderer_Swap(SDL_Window* window) {
     SDL_GL_SwapWindow(window);
     // glClearColor(0.0f, 0.5f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    ang += 0.01f;
+
+    const Uint8* state = SDL_GetKeyboardState(NULL);
+    if (state[SDL_SCANCODE_UP]) {
+        vec3 s;
+        glm_vec3_scale(cam_front, cam_speed, s);
+        glm_vec3_add(cam_pos, s, cam_pos);
+    }
+    if (state[SDL_SCANCODE_DOWN]) {
+        vec3 s;
+        glm_vec3_scale(cam_front, -cam_speed, s);
+        glm_vec3_add(cam_pos, s, cam_pos);
+    }
+    if (state[SDL_SCANCODE_LEFT]) {
+        vec3 cr;
+        glm_cross(cam_front, cam_up, cr);
+        glm_normalize(cr);
+        glm_vec3_scale(cr, cam_speed, cr);
+        glm_vec3_add(cam_pos, cr, cam_pos);
+    }
+    if (state[SDL_SCANCODE_RIGHT]) {
+        vec3 cr;
+        glm_cross(cam_front, cam_up, cr);
+        glm_normalize(cr);
+        glm_vec3_scale(cr, -cam_speed, cr);
+        glm_vec3_add(cam_pos, cr, cam_pos);
+    }
+
+    int xpos, ypos;
+    SDL_GetMouseState(&xpos, &ypos);
+
+    if (firstMouse) {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos;
+    lastX = xpos;
+    lastY = ypos;
+
+    float sensitivity = 0.2f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    yaw += xoffset;
+    pitch += yoffset;
+
+    if (pitch > 89.0f)
+        pitch = 89.0f;
+    if (pitch < -89.0f)
+        pitch = -89.0f;
+
+    vec3 direction;
+    direction[0] = cos(glm_rad(yaw)) * cos(glm_rad(pitch));
+    direction[1] = sin(glm_rad(pitch));
+    direction[2] = sin(glm_rad(yaw)) * cos(glm_rad(pitch));
+    glm_normalize_to(direction, cam_front);
 }
 
-float ang = 0;
-void Harness_GLRenderer_RenderCube(float x, float y, float z) {
+void Harness_GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
+    tModel_context* ctx;
+    ctx = model->harness_user_data;
 
-    // Enable depth test
+    if (ctx == NULL) {
+        ctx = malloc(sizeof(tModel_context));
+
+        GLuint vbo_id;
+
+        LOG_DEBUG("prepping model %d %d", model->nvertices, model->nfaces);
+
+        glGenVertexArrays(1, &ctx->vao_id);
+        glGenBuffers(1, &vbo_id);
+        glGenBuffers(1, &ctx->ebo_id);
+
+        glBindVertexArray(ctx->vao_id);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
+
+        int stride = 6;
+        float* verts = malloc(sizeof(float) * stride * model->nvertices);
+        for (int i = 0; i < model->nvertices; i++) {
+            verts[i * stride] = model->vertices[i].p.v[0];
+            verts[i * stride + 1] = model->vertices[i].p.v[1];
+            verts[i * stride + 2] = model->vertices[i].p.v[2];
+            verts[i * stride + 3] = model->vertices[i].n.v[0];
+            verts[i * stride + 4] = model->vertices[i].n.v[1];
+            verts[i * stride + 5] = model->vertices[i].n.v[2];
+            //LOG_DEBUG("vert: %d: %f, %f, %f", i, model->vertices[i].p.v[0], model->vertices[i].p.v[1], model->vertices[i].p.v[2]);
+        }
+
+        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * stride * model->nvertices, verts, GL_STATIC_DRAW);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx->ebo_id);
+        unsigned int* ind = malloc(sizeof(int) * 3 * model->nfaces);
+        for (int i = 0; i < model->nfaces; i++) {
+            ind[i * 3] = model->faces[i].vertices[0];
+            ind[i * 3 + 1] = model->faces[i].vertices[1];
+            ind[i * 3 + 2] = model->faces[i].vertices[2];
+            LOG_DEBUG("face: %d: %d, %d, %d", i, model->faces[i].vertices[0], model->faces[i].vertices[1], model->faces[i].vertices[2]);
+            //LOG_DEBUG("face: [%d, %d, %d]", ind[i * 3], ind[i * 3 + 1], ind[i * 3 + 2]);
+        }
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * 3 * model->nfaces, ind, GL_STATIC_DRAW);
+        glBindVertexArray(0);
+
+        model->harness_user_data = ctx;
+
+        cam_pos[0] = model_matrix.m[3][0];
+        cam_pos[1] = model_matrix.m[3][1];
+        cam_pos[2] = model_matrix.m[3][2];
+    }
+
     glEnable(GL_DEPTH_TEST);
     glUseProgram(shader_program_3d);
 
-    mat4 MVP, model, view, proj;
-    glm_perspective(glm_rad(45), 4.0f / 3.0f, 0.1f, 100.f, proj);
-    glm_lookat((vec3){ -70, 25, -60 }, (vec3){ x, y, z }, (vec3){ 0, 1, 0 }, view);
+    mat4 MVP, model_m, view, proj;
+    glm_perspective(glm_rad(45), 4.0f / 3.0f, 0.1f, 10000.f, proj);
+    vec3 look2;
+    glm_vec3_add(cam_pos, cam_front, look2);
+    glm_lookat(cam_pos, look2, (vec3){ 0, 1, 0 }, view);
 
-    glm_mat4_identity(model);
-    //glm_rotate_y(model, ang, model);
-    ang += 0.01f;
-    glm_translate(model, (vec3){ x, y, z });
-    glm_mat4_mulN((mat4*[]){ &proj, &view, &model }, 3, MVP);
-    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+    glm_mat4_identity(model_m);
 
-    glBindVertexArray(cube_vao);
+    GLfloat m[16] = {
+        model_matrix.m[0][0], model_matrix.m[0][1], model_matrix.m[0][2], 0,
+        model_matrix.m[1][0], model_matrix.m[1][1], model_matrix.m[1][2], 0,
+        model_matrix.m[2][0], model_matrix.m[2][1], model_matrix.m[2][2], 0,
+        model_matrix.m[3][0], model_matrix.m[3][1], model_matrix.m[3][2], 1
+    };
 
-    // Draw the triangle !
-    glDrawArrays(GL_TRIANGLES, 0, 12 * 3); // 12*3 indices starting at 0 -> 12 triangles
+    memcpy(model_m, m, sizeof(m));
+    //glm_mat4_transpose(model_m);
+    //glm_translate(model_m, (vec3){ model_matrix.m[3][0], model_matrix.m[3][1], model_matrix.m[3][2] });
+    //glm_rotate_y(model_m, ang, model_m);
+    // float sc = 1.0f;
+    // glm_scale(model_m, &sc);
+
+    glm_mat4_mulN((mat4*[]){ &proj, &view, &model_m }, 3, MVP);
+
+    GLuint model_u = glGetUniformLocation(shader_program_3d, "model");
+    GLuint view_u = glGetUniformLocation(shader_program_3d, "view");
+    GLuint projection_u = glGetUniformLocation(shader_program_3d, "projection");
+
+    glUniformMatrix4fv(model_u, 1, GL_FALSE, &model_m[0][0]);
+    glUniformMatrix4fv(view_u, 1, GL_FALSE, &view[0][0]);
+    glUniformMatrix4fv(projection_u, 1, GL_FALSE, &proj[0][0]);
+
+    GLuint lightpos_u = glGetUniformLocation(shader_program_3d, "lightPos");
+    GLuint lightcolor_u = glGetUniformLocation(shader_program_3d, "lightColor");
+    GLuint objectcolor_u = glGetUniformLocation(shader_program_3d, "objectColor");
+
+    LOG_DEBUG("uniforms %d %d %d, %d", lightpos_u, lightcolor_u, objectcolor_u, glGetError());
+
+    glUniform3f(lightpos_u, 1.2f, 1.0f, 2.0f);
+    glUniform3f(lightcolor_u, 1.0f, 1.0f, 1.0f);
+    glUniform3f(objectcolor_u, 1.0f, 0.5f, 0.31f);
+
+    ctx = model->harness_user_data;
+    glBindVertexArray(ctx->vao_id);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx->ebo_id);
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glDrawElements(GL_TRIANGLES, model->nfaces * 3, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+void Harness_GLRenderer_RenderCube(float col, float x, float y, float z) {
+
+    // // Enable depth test
+    // glEnable(GL_DEPTH_TEST);
+    // glUseProgram(shader_program_3d);
+
+    // mat4 MVP, model, view, proj;
+    // glm_perspective(glm_rad(45), 4.0f / 3.0f, 0.1f, 10000.f, proj);
+    // glm_lookat((vec3){ -80, 25, -60 }, (vec3){ -67.514061, 20.485441, -52.174110 }, (vec3){ 0, 1, 0 }, view);
+
+    // glm_mat4_identity(model);
+    // //glm_rotate_y(model, ang, model);
+    // ang += 0.01f;
+    // glm_translate(model, (vec3){ x, y, z });
+    // glm_mat4_mulN((mat4*[]){ &proj, &view, &model }, 3, MVP);
+    // glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+
+    // //const float c[3] = { 1, 1, 1 };
+
+    // glUniform3f(ColorID, col, col, col);
+
+    // glBindVertexArray(cube_vao);
+
+    // // Draw the triangle !
+    // glDrawArrays(GL_TRIANGLES, 0, 12 * 3); // 12*3 indices starting at 0 -> 12 triangles
+    // glBindVertexArray(0);
 }

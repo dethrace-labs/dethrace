@@ -8,7 +8,7 @@
 #include "CORE/STD/brmath.h"
 #include "CORE/STD/brstdlib.h"
 #include "angles.h"
-#include "harness.h"
+#include "harness_trace.h"
 #include <assert.h>
 
 br_model* compareModel;

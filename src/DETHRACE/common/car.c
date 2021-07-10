@@ -1404,6 +1404,8 @@ void MungeCarGraphics(tU32 pFrame_period) {
     } else {
         SwitchCarActor(&gProgram_state.current_car, gProgram_state.current_car.car_actor_count - 2);
     }
+
+    STUB();
 }
 
 // IDA: void __cdecl ResetCarScreens()
