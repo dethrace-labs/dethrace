@@ -2438,7 +2438,13 @@ void FreeTrack(tTrack_spec* pTrack_spec) {
 // IDA: void __usercall ProcessTrack(br_actor *pWorld@<EAX>, tTrack_spec *pTrack_spec@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world_transform@<ECX>, int pRender_blends)
 void ProcessTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, br_matrix34* pCamera_to_world_transform, int pRender_blends) {
     LOG_TRACE("(%p, %p, %p, %p, %d)", pWorld, pTrack_spec, pCamera, pCamera_to_world_transform, pRender_blends);
-    SILENT_STUB();
+
+    RenderTrack(pWorld, pTrack_spec, pCamera, pCamera_to_world_transform, pRender_blends);
+    if (gAdditional_actors) {
+        if (!pRender_blends) {
+            BrZbSceneRenderAdd(gAdditional_actors);
+        }
+    }
 }
 
 // IDA: br_scalar __cdecl NormaliseDegreeAngle(br_scalar pAngle)

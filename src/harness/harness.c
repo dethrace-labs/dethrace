@@ -117,6 +117,9 @@ void Harness_Hook_DOSGfxBegin() {
         LOG_PANIC("Failed to create window");
     }
     current_renderer->init(window);
+
+    //SDL_SetWindowGrab(window, SDL_TRUE);
+    SDL_SetRelativeMouseMode(SDL_TRUE);
 }
 
 void Harness_Hook_PDServiceSystem(int pTime_since_last_call) {
@@ -178,14 +181,8 @@ void Harness_Hook_BrV1dbRendererBegin(br_v1db_state* v1db) {
 int col = 128;
 
 void Harness_Hook_renderFaces(br_model* model, br_material* material, br_token type) {
-    LOG_DEBUG("rendering model %s at %f, %f, %f", model->identifier, renderer_state->state.matrix.model_to_view.m[3][0], renderer_state->state.matrix.model_to_view.m[3][1], renderer_state->state.matrix.model_to_view.m[3][2]);
+    //LOG_DEBUG("rendering model %s at %f, %f, %f", model->identifier, renderer_state->state.matrix.model_to_view.m[3][0], renderer_state->state.matrix.model_to_view.m[3][1], renderer_state->state.matrix.model_to_view.m[3][2]);
     current_renderer->renderModel(model, renderer_state->state.matrix.model_to_view);
-    // current_renderer->renderCube(
-    //     col / 255.0f,
-    //     renderer_state->state.matrix.model_to_view.m[3][0],
-    //     renderer_state->state.matrix.model_to_view.m[3][1],
-    //     renderer_state->state.matrix.model_to_view.m[3][2]);
-    // col = (col + 20) % 255;
 }
 
 void Harness_Hook_BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer) {

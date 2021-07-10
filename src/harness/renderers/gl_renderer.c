@@ -45,6 +45,7 @@ tRenderer OpenGLRenderer = {
 
 typedef struct tModel_context {
     GLuint vao_id, ebo_id;
+    int ngroups, nfaces;
 } tModel_context;
 
 SDL_GLContext context;
@@ -97,6 +98,18 @@ static const GLfloat g_vertex_buffer_data[] = {
     -1.0f, 1.0f, 1.0f,
     1.0f, -1.0f, 1.0f
 };
+
+float ang = 0;
+
+vec3 cam_pos = { 0, 0, 0 };
+vec3 lookat = { -67.514061, 20.485441, -52.174110 };
+vec3 cam_front = { 0, 0, -1 };
+vec3 cam_up = { 0, -1, 0 };
+float cam_speed = 1.0f;
+
+float lastX = 400, lastY = 300;
+int firstMouse = 1;
+float yaw = 0, pitch = 0;
 
 int Harness_GLRenderer_GetWindowFlags() {
     if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE) != 0) {
@@ -245,6 +258,28 @@ void Harness_GLRenderer_Init(SDL_Window* window) {
 }
 
 void Harness_GLRenderer_RenderFrameBegin() {
+
+    glEnable(GL_DEPTH_TEST);
+    glUseProgram(shader_program_3d);
+
+    GLuint lightpos_u = glGetUniformLocation(shader_program_3d, "lightPos");
+    GLuint lightcolor_u = glGetUniformLocation(shader_program_3d, "lightColor");
+    GLuint objectcolor_u = glGetUniformLocation(shader_program_3d, "objectColor");
+
+    glUniform3f(lightpos_u, -0.2f, 1.0f, -0.3f);
+    glUniform3f(lightcolor_u, 1.0f, 1.0f, 1.0f);
+    glUniform3f(objectcolor_u, 1.0f, 1.0f, 1.0f);
+
+    GLuint view_u = glGetUniformLocation(shader_program_3d, "view");
+    GLuint projection_u = glGetUniformLocation(shader_program_3d, "projection");
+    mat4 view, proj;
+    glm_perspective(glm_rad(45), 4.0f / 3.0f, 0.1f, 10000.f, proj);
+    vec3 look2;
+    glm_vec3_add(cam_pos, cam_front, look2);
+    glm_lookat(cam_pos, look2, (vec3){ 0, 1, 0 }, view);
+
+    glUniformMatrix4fv(projection_u, 1, GL_FALSE, &proj[0][0]);
+    glUniformMatrix4fv(view_u, 1, GL_FALSE, &view[0][0]);
 }
 
 void Harness_GLRenderer_RenderFrameEnd() {
@@ -276,17 +311,6 @@ void Harness_GLRenderer_RenderScreenBuffer(uint32_t* screen_buffer, int transpar
     glBindVertexArray(0);
 }
 
-float ang = 0;
-
-vec3 cam_pos = { -60, 22, -62 };
-vec3 lookat = { -67.514061, 20.485441, -52.174110 };
-vec3 cam_front = { 0, 0, -1 };
-vec3 cam_up = { 0, -1, 0 };
-float cam_speed = 0.1f;
-
-float lastX = 400, lastY = 300;
-int firstMouse = 1;
-float yaw = 0, pitch = 0;
 void Harness_GLRenderer_Swap(SDL_Window* window) {
     SDL_GL_SwapWindow(window);
     // glClearColor(0.0f, 0.5f, 0.0f, 1.0f);
@@ -333,7 +357,7 @@ void Harness_GLRenderer_Swap(SDL_Window* window) {
     lastX = xpos;
     lastY = ypos;
 
-    float sensitivity = 0.2f;
+    float sensitivity = 0.7f;
     xoffset *= sensitivity;
     yoffset *= sensitivity;
 
@@ -355,16 +379,23 @@ void Harness_GLRenderer_Swap(SDL_Window* window) {
 void Harness_GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
     tModel_context* ctx;
     ctx = model->harness_user_data;
+    v11model* v11 = model->prepared;
+
+    if (v11 == NULL) {
+        LOG_WARN("No model prepared for %s", model->identifier);
+        return;
+    }
 
     if (ctx == NULL) {
         ctx = malloc(sizeof(tModel_context));
 
         GLuint vbo_id;
-        v11model* v11 = model->prepared;
-        int total_verts, total_faces;
+
+        int total_verts = 0, total_faces = 0;
         for (int i = 0; i < v11->ngroups; i++) {
-            total_faces += v11->groups[i].nfaces;
+            //LOG_DEBUG("group %d: %d, %d", i, v11->groups[i].nvertices, v11->groups[i].nfaces);
             total_verts += v11->groups[i].nvertices;
+            total_faces += v11->groups[i].nfaces;
         }
 
         LOG_DEBUG("prepping model %d %d, %d %d", model->nvertices, model->nfaces, total_verts, total_faces);
@@ -378,20 +409,22 @@ void Harness_GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
 
         int stride = 6;
         float* verts = malloc(sizeof(float) * stride * total_verts);
+        int index = 0;
         for (int g = 0; g < v11->ngroups; g++) {
-            for (int i = 0; i < v11->groups[i].nvertices; i++) {
-                fmt_vertex* v = &v11->groups[i].vertices[i];
-                verts[i * stride] = v->p.v[0];
-                verts[i * stride + 1] = v->p.v[1];
-                verts[i * stride + 2] = v->p.v[2];
-                verts[i * stride + 3] = v->n.v[0];
-                verts[i * stride + 4] = v->n.v[1];
-                verts[i * stride + 5] = v->n.v[2];
+            for (int i = 0; i < v11->groups[g].nvertices; i++) {
+                fmt_vertex* v = &v11->groups[g].vertices[i];
+                verts[index++] = v->p.v[0];
+                verts[index++] = v->p.v[1];
+                verts[index++] = v->p.v[2];
+                verts[index++] = v->n.v[0];
+                verts[index++] = v->n.v[1];
+                verts[index++] = v->n.v[2];
                 //LOG_DEBUG("vert: %d: %f, %f, %f", i, model->vertices[i].p.v[0], model->vertices[i].p.v[1], model->vertices[i].p.v[2]);
             }
         }
+        LOG_DEBUG("create 1 %d", index);
 
-        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * stride * model->nvertices, verts, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * stride * total_verts, verts, GL_STATIC_DRAW);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)0);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)(3 * sizeof(float)));
@@ -399,36 +432,38 @@ void Harness_GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx->ebo_id);
         unsigned int* ind = malloc(sizeof(int) * 3 * total_faces);
+        int face_offset = 0;
+        index = 0;
         for (int g = 0; g < v11->ngroups; g++) {
-            for (int i = 0; i < v11->groups[i].nfaces; i++) {
-                v11face* f = &v11->groups[i].faces[i];
-                ind[i * 3] = f->vertices[0];
-                ind[i * 3 + 1] = f->vertices[1];
-                ind[i * 3 + 2] = f->vertices[2];
+            for (int i = 0; i < v11->groups[g].nfaces; i++) {
+                v11face* f = &v11->groups[g].faces[i];
+                ind[index++] = f->vertices[0] + face_offset;
+                ind[index++] = f->vertices[1] + face_offset;
+                ind[index++] = f->vertices[2] + face_offset;
                 //LOG_DEBUG("face: %d: %d, %d, %d", i, model->faces[i].vertices[0], model->faces[i].vertices[1], model->faces[i].vertices[2]);
                 //LOG_DEBUG("face: [%d, %d, %d]", ind[i * 3], ind[i * 3 + 1], ind[i * 3 + 2]);
             }
+            face_offset += v11->groups[g].nvertices;
         }
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * 3 * model->nfaces, ind, GL_STATIC_DRAW);
+        LOG_DEBUG("create 2 %d", index);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * 3 * total_faces, ind, GL_STATIC_DRAW);
         glBindVertexArray(0);
 
+        free(verts);
+        free(ind);
+
+        ctx->nfaces = total_faces;
         model->harness_user_data = ctx;
 
-        cam_pos[0] = model_matrix.m[3][0];
-        cam_pos[1] = model_matrix.m[3][1];
-        cam_pos[2] = model_matrix.m[3][2];
+        if (cam_pos[0] == 0) {
+            cam_pos[0] = model_matrix.m[3][0];
+            cam_pos[1] = model_matrix.m[3][1];
+            cam_pos[2] = model_matrix.m[3][2];
+        }
     }
 
     glEnable(GL_DEPTH_TEST);
     glUseProgram(shader_program_3d);
-
-    mat4 MVP, model_m, view, proj;
-    glm_perspective(glm_rad(45), 4.0f / 3.0f, 0.1f, 10000.f, proj);
-    vec3 look2;
-    glm_vec3_add(cam_pos, cam_front, look2);
-    glm_lookat(cam_pos, look2, (vec3){ 0, 1, 0 }, view);
-
-    glm_mat4_identity(model_m);
 
     GLfloat m[16] = {
         model_matrix.m[0][0], model_matrix.m[0][1], model_matrix.m[0][2], 0,
@@ -437,38 +472,23 @@ void Harness_GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
         model_matrix.m[3][0], model_matrix.m[3][1], model_matrix.m[3][2], 1
     };
 
-    memcpy(model_m, m, sizeof(m));
-    //glm_mat4_transpose(model_m);
-    //glm_translate(model_m, (vec3){ model_matrix.m[3][0], model_matrix.m[3][1], model_matrix.m[3][2] });
-    //glm_rotate_y(model_m, ang, model_m);
-    // float sc = 1.0f;
-    // glm_scale(model_m, &sc);
-
-    glm_mat4_mulN((mat4*[]){ &proj, &view, &model_m }, 3, MVP);
-
     GLuint model_u = glGetUniformLocation(shader_program_3d, "model");
-    GLuint view_u = glGetUniformLocation(shader_program_3d, "view");
-    GLuint projection_u = glGetUniformLocation(shader_program_3d, "projection");
-
-    glUniformMatrix4fv(model_u, 1, GL_FALSE, &model_m[0][0]);
-    glUniformMatrix4fv(view_u, 1, GL_FALSE, &view[0][0]);
-    glUniformMatrix4fv(projection_u, 1, GL_FALSE, &proj[0][0]);
-
-    GLuint lightpos_u = glGetUniformLocation(shader_program_3d, "lightPos");
-    GLuint lightcolor_u = glGetUniformLocation(shader_program_3d, "lightColor");
-    GLuint objectcolor_u = glGetUniformLocation(shader_program_3d, "objectColor");
-
-    LOG_DEBUG("uniforms %d %d %d, %d", lightpos_u, lightcolor_u, objectcolor_u, glGetError());
-
-    glUniform3f(lightpos_u, 1.2f, 1.0f, 2.0f);
-    glUniform3f(lightcolor_u, 1.0f, 1.0f, 1.0f);
-    glUniform3f(objectcolor_u, 1.0f, 0.5f, 0.31f);
+    glUniformMatrix4fv(model_u, 1, GL_FALSE, m);
 
     ctx = model->harness_user_data;
     glBindVertexArray(ctx->vao_id);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx->ebo_id);
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    glDrawElements(GL_TRIANGLES, model->nfaces * 3, GL_UNSIGNED_INT, 0);
+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_CCW);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    int element_index = 0;
+    for (int g = 0; g < v11->ngroups; g++) {
+        glDrawElements(GL_TRIANGLES, v11->groups[g].nfaces * 3, GL_UNSIGNED_INT, (void*)(element_index * sizeof(int)));
+        element_index += v11->groups[g].nfaces * 3;
+    }
+
     glBindVertexArray(0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }

@@ -205,7 +205,8 @@ void RenderTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, 
     static br_scalar tan_fov_ish;
     static br_actor* result;
     LOG_TRACE("(%p, %p, %p, %p, %d)", pWorld, pTrack_spec, pCamera, pCamera_to_world, pRender_blends);
-    NOT_IMPLEMENTED();
+
+    BrZbSceneRenderAdd(pWorld);
 }
 
 // IDA: br_scalar __cdecl GetYonFactor()
