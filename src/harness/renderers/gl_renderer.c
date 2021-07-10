@@ -360,8 +360,14 @@ void Harness_GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
         ctx = malloc(sizeof(tModel_context));
 
         GLuint vbo_id;
+        v11model* v11 = model->prepared;
+        int total_verts, total_faces;
+        for (int i = 0; i < v11->ngroups; i++) {
+            total_faces += v11->groups[i].nfaces;
+            total_verts += v11->groups[i].nvertices;
+        }
 
-        LOG_DEBUG("prepping model %d %d", model->nvertices, model->nfaces);
+        LOG_DEBUG("prepping model %d %d, %d %d", model->nvertices, model->nfaces, total_verts, total_faces);
 
         glGenVertexArrays(1, &ctx->vao_id);
         glGenBuffers(1, &vbo_id);
@@ -371,15 +377,18 @@ void Harness_GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
         glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
 
         int stride = 6;
-        float* verts = malloc(sizeof(float) * stride * model->nvertices);
-        for (int i = 0; i < model->nvertices; i++) {
-            verts[i * stride] = model->vertices[i].p.v[0];
-            verts[i * stride + 1] = model->vertices[i].p.v[1];
-            verts[i * stride + 2] = model->vertices[i].p.v[2];
-            verts[i * stride + 3] = model->vertices[i].n.v[0];
-            verts[i * stride + 4] = model->vertices[i].n.v[1];
-            verts[i * stride + 5] = model->vertices[i].n.v[2];
-            //LOG_DEBUG("vert: %d: %f, %f, %f", i, model->vertices[i].p.v[0], model->vertices[i].p.v[1], model->vertices[i].p.v[2]);
+        float* verts = malloc(sizeof(float) * stride * total_verts);
+        for (int g = 0; g < v11->ngroups; g++) {
+            for (int i = 0; i < v11->groups[i].nvertices; i++) {
+                fmt_vertex* v = &v11->groups[i].vertices[i];
+                verts[i * stride] = v->p.v[0];
+                verts[i * stride + 1] = v->p.v[1];
+                verts[i * stride + 2] = v->p.v[2];
+                verts[i * stride + 3] = v->n.v[0];
+                verts[i * stride + 4] = v->n.v[1];
+                verts[i * stride + 5] = v->n.v[2];
+                //LOG_DEBUG("vert: %d: %f, %f, %f", i, model->vertices[i].p.v[0], model->vertices[i].p.v[1], model->vertices[i].p.v[2]);
+            }
         }
 
         glBufferData(GL_ARRAY_BUFFER, sizeof(float) * stride * model->nvertices, verts, GL_STATIC_DRAW);
@@ -389,13 +398,16 @@ void Harness_GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
         glEnableVertexAttribArray(1);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx->ebo_id);
-        unsigned int* ind = malloc(sizeof(int) * 3 * model->nfaces);
-        for (int i = 0; i < model->nfaces; i++) {
-            ind[i * 3] = model->faces[i].vertices[0];
-            ind[i * 3 + 1] = model->faces[i].vertices[1];
-            ind[i * 3 + 2] = model->faces[i].vertices[2];
-            LOG_DEBUG("face: %d: %d, %d, %d", i, model->faces[i].vertices[0], model->faces[i].vertices[1], model->faces[i].vertices[2]);
-            //LOG_DEBUG("face: [%d, %d, %d]", ind[i * 3], ind[i * 3 + 1], ind[i * 3 + 2]);
+        unsigned int* ind = malloc(sizeof(int) * 3 * total_faces);
+        for (int g = 0; g < v11->ngroups; g++) {
+            for (int i = 0; i < v11->groups[i].nfaces; i++) {
+                v11face* f = &v11->groups[i].faces[i];
+                ind[i * 3] = f->vertices[0];
+                ind[i * 3 + 1] = f->vertices[1];
+                ind[i * 3 + 2] = f->vertices[2];
+                //LOG_DEBUG("face: %d: %d, %d, %d", i, model->faces[i].vertices[0], model->faces[i].vertices[1], model->faces[i].vertices[2]);
+                //LOG_DEBUG("face: [%d, %d, %d]", ind[i * 3], ind[i * 3 + 1], ind[i * 3 + 2]);
+            }
         }
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * 3 * model->nfaces, ind, GL_STATIC_DRAW);
         glBindVertexArray(0);
