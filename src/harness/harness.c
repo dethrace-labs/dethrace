@@ -192,7 +192,7 @@ void Harness_Hook_BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pix
     BrPixelmapFill(colour_buffer, 0);
     back_screen_is_transparent = 1;
 
-    current_renderer->renderFrameBegin();
+    current_renderer->renderFrameBegin(camera);
     col = 0;
 }
 

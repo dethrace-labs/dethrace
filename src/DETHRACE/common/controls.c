@@ -216,7 +216,8 @@ void F11Key() {
 // IDA: void __cdecl F12Key()
 void F12Key() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __cdecl NumberKey0()

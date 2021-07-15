@@ -250,7 +250,7 @@ void ExternalSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_act
     dx = 0;
     col_map = gHorizon_material->colour_map;
     camera = (br_camera*)pCamera->type_data;
-    LOG_DEBUG("camera fov %d", camera->field_of_view);
+    //LOG_DEBUG("camera fov %d", camera->field_of_view);
     tan_half_fov = Tan(camera->field_of_view / 2);
     tan_half_hori_fov = tan_half_fov * camera->aspect;
     tan_pitch = 0;
@@ -283,7 +283,7 @@ void ExternalSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_act
     top_y = -(pCamera_to_world->m[2][1] / sqrt(pCamera_to_world->m[2][1]) / tan_half_fov * (double)pRender_buffer->height / 2.0)
         - (col_map->height - gSky_image_underground * col_map->height / gSky_image_height);
     //LOG_DEBUG("gSky_image_underground %d, gSky_image_height %d", gSky_image_underground, gSky_image_height);
-    LOG_DEBUG("top_y %d, r_o_x %d, repetitions %d", top_y, pRender_buffer->origin_x, repetitions);
+    //LOG_DEBUG("top_y %d, r_o_x %d, repetitions %d", top_y, pRender_buffer->origin_x, repetitions);
     while (pRender_buffer->width > dx) {
         hori_pixels = col_map->width - repetitions;
         if (hori_pixels >= pRender_buffer->width - dx) {
@@ -310,7 +310,6 @@ void ExternalSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_act
             top_y + pRender_buffer->origin_y,
             1);
     }
-    LOG_DEBUG("render buffer width %d", pRender_buffer->width);
     bot_height = pRender_buffer->height - pRender_buffer->origin_y - top_y - col_map->height;
     if (bot_height > 0) {
         DRPixelmapRectangleFill(

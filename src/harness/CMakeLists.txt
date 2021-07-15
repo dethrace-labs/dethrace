@@ -22,6 +22,8 @@ else()
 endif()
 
 target_sources(harness PRIVATE
+    cameras/debug_camera.c
+    cameras/debug_camera.h
     harness_hooks.h
     harness_trace.c
     harness_trace.h

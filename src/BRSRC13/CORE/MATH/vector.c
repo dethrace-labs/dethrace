@@ -133,7 +133,9 @@ void BrVector3Accumulate(br_vector3* v1, br_vector3* v2) {
 // IDA: void __cdecl BrVector3Sub(br_vector3 *v1, br_vector3 *v2, br_vector3 *v3)
 void BrVector3Sub(br_vector3* v1, br_vector3* v2, br_vector3* v3) {
     LOG_TRACE("(%p, %p, %p)", v1, v2, v3);
-    NOT_IMPLEMENTED();
+    v1->v[0] = v2->v[0] - v3->v[0];
+    v1->v[1] = v2->v[1] - v3->v[1];
+    v1->v[2] = v2->v[2] - v3->v[2];
 }
 
 // IDA: void __cdecl BrVector3Scale(br_vector3 *v1, br_vector3 *v2, br_scalar s)
@@ -157,7 +159,10 @@ br_scalar BrVector3Dot(br_vector3* v1, br_vector3* v2) {
 // IDA: void __cdecl BrVector3Cross(br_vector3 *v1, br_vector3 *v2, br_vector3 *v3)
 void BrVector3Cross(br_vector3* v1, br_vector3* v2, br_vector3* v3) {
     LOG_TRACE("(%p, %p, %p)", v1, v2, v3);
-    NOT_IMPLEMENTED();
+
+    v1->v[0] = v2->v[1] * v3->v[2] - v2->v[2] * v3->v[1];
+    v1->v[1] = v2->v[2] * v3->v[0] - v2->v[0] * v3->v[2];
+    v1->v[2] = v2->v[0] * v3->v[1] - v2->v[1] * v3->v[0];
 }
 
 // IDA: br_scalar __cdecl BrVector3Length(br_vector3 *v1)

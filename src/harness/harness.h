@@ -8,13 +8,20 @@
 typedef struct tRenderer {
     int (*get_window_flags)();
     void (*init)(SDL_Window* window);
-    void (*renderFrameBegin)();
+    void (*renderFrameBegin)(br_actor* camera);
     void (*renderFrameEnd)();
     void (*renderScreenBuffer)(uint32_t* src, int transparent);
     void (*swap)(SDL_Window* window);
     void (*renderModel)(br_model* model, br_matrix34 model_matrix);
     void (*renderCube)(float color, float x, float y, float z);
 } tRenderer;
+
+typedef struct tCamera {
+    void (*update)();
+    float* (*getProjection)();
+    float* (*getView)();
+    void (*setPosition)();
+} tCamera;
 
 typedef struct tHarness_GameMode {
     char* name;
