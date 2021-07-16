@@ -17,7 +17,6 @@ if(NOT MSVC)
     target_compile_options(dethrace_obj PRIVATE
         -g
         -Wall
-        -Wextra
         -Werror
         -Wno-return-type
         -Wno-unused-variable
