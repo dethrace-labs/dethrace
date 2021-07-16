@@ -119,23 +119,18 @@ void actorRender(br_actor* ap, br_model* model, br_material* material, void* ren
             break;
 
         case BR_ACTOR_BOUNDS_CORRECT:
-
             switch (BrOnScreenCheck(ap->type_data)) {
-
             case BRT_ACCEPT:
-
                 BR_FOR_SIMPLELIST(&ap->children, a)
                 actorRenderOnScreen(a, this_model, this_material, this_render_data, style, t);
-
+                return;
             case BRT_REJECT:
-
                 return;
             }
         }
 
         BR_FOR_SIMPLELIST(&ap->children, a)
         actorRender(a, this_model, this_material, this_render_data, style, t);
-
         return;
     }
 
@@ -160,11 +155,10 @@ void actorRender(br_actor* ap, br_model* model, br_material* material, void* ren
 
     case BR_ACTOR_BOUNDS_CORRECT:
         switch (BrOnScreenCheck(ap->type_data)) {
-
         case BRT_ACCEPT:
             BR_FOR_SIMPLELIST(&ap->children, a)
             actorRenderOnScreen(a, this_model, this_material, this_render_data, style, t);
-
+            return;
         case BRT_REJECT:
             RendererStatePop(v1db.renderer, BR_STATE_MATRIX);
             return;
