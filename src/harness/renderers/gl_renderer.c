@@ -248,7 +248,7 @@ void build_model(br_model* model) {
     }
 
     // override normals
-    br_vector3 v3 = { 0, 0, 0 };
+    br_vector3 v3 = { { 0, 0, 0 } };
     for (int g = 0; g < v11->ngroups; g++) {
         for (int i = 0; i < v11->groups[g].nvertices; i++) {
             v11->groups[g].vertices[i].n = v3;

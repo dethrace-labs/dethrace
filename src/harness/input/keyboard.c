@@ -126,10 +126,6 @@ void Keyboard_Init() {
 }
 
 int Keyboard_IsKeyDown(unsigned char scan_code) {
-    if (scan_code > 255) {
-        LOG_WARN("ignoring unexpected scan code %d", scan_code);
-        return 0;
-    }
     return sdl_key_state[scan_code];
 }
 

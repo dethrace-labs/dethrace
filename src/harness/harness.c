@@ -128,7 +128,6 @@ void Harness_Hook_PDServiceSystem(int pTime_since_last_call) {
 
 void Harness_RenderScreen(br_pixelmap* dst, br_pixelmap* src) {
     uint8_t palette_index = 0;
-    int inc = 0;
     uint8_t* data = src->pixels;
     uint32_t* colors = palette->pixels;
     int x;
@@ -140,7 +139,6 @@ void Harness_RenderScreen(br_pixelmap* dst, br_pixelmap* src) {
 
     // generate 32 bit texture from src + palette
     for (y = 0; y < src->height; y++) {
-        inc = 0;
         for (x = 0; x < src->width; x++) {
             palette_index = (data[y * src->row_bytes + x]);
             screen_buffer[y * src->width + x] = colors[palette_index];
