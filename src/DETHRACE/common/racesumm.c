@@ -128,7 +128,7 @@ tSO_result DoEndRaceSummary1() {
 }
 
 //IDA: void __usercall PrepareBoundingRadius(br_model *model@<EAX>)
-void PrepareBoundingRadius_0(br_model* model) {
+void PrepareBoundingRadius_racesumm(br_model* model) {
     float d;
     float max;
     int v;

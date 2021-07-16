@@ -1127,13 +1127,13 @@ void RepairOpponentsSystems() {
 }
 
 //IDA: void __usercall CopyVertex(br_vertex *pDest_vertex@<EAX>, br_vertex *pSrc_vertex@<EDX>)
-void CopyVertex_0(br_vertex* pDest_vertex, br_vertex* pSrc_vertex) {
+void CopyVertex_opponent(br_vertex* pDest_vertex, br_vertex* pSrc_vertex) {
     LOG_TRACE("(%p, %p)", pDest_vertex, pSrc_vertex);
     NOT_IMPLEMENTED();
 }
 
 //IDA: void __usercall CopyFace(br_face *pDest_face@<EAX>, br_face *pSrc_face@<EDX>)
-void CopyFace_0(br_face* pDest_face, br_face* pSrc_face) {
+void CopyFace_opponent(br_face* pDest_face, br_face* pSrc_face) {
     LOG_TRACE("(%p, %p)", pDest_face, pSrc_face);
     NOT_IMPLEMENTED();
 }

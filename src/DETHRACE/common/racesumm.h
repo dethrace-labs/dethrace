@@ -30,7 +30,7 @@ int SummCheckGameOver(int* pCurrent_choice, int* pCurrent_mode);
 
 tSO_result DoEndRaceSummary1();
 
-void PrepareBoundingRadius_0(br_model* model);
+void PrepareBoundingRadius_racesumm(br_model* model);
 
 void BuildWrecks();
 

@@ -127,9 +127,9 @@ void DrawNetOptBox(int pCurrent_choice, int pCurrent_mode);
 
 void DoNetOptions(tNet_game_options* pGame_options);
 
-void PlayRadioOn_0(int pIndex);
+void PlayRadioOn_newgame(int pIndex);
 
-void PlayRadioOff_0(int pIndex);
+void PlayRadioOff_newgame(int pIndex);
 
 void SetOptions(tNet_game_type pGame_type, tNet_game_options* pGame_options);
 

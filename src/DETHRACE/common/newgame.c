@@ -641,13 +641,13 @@ void DoNetOptions(tNet_game_options* pGame_options) {
 }
 
 //IDA: void __usercall PlayRadioOn(int pIndex@<EAX>)
-void PlayRadioOn_0(int pIndex) {
+void PlayRadioOn_newgame(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
     NOT_IMPLEMENTED();
 }
 
 //IDA: void __usercall PlayRadioOff(int pIndex@<EAX>)
-void PlayRadioOff_0(int pIndex) {
+void PlayRadioOff_newgame(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
     NOT_IMPLEMENTED();
 }
