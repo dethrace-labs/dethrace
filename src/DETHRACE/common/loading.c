@@ -764,6 +764,7 @@ tS8* ConvertPixToStripMap(br_pixelmap* pThe_br_map) {
         total = 0;
         counting_blanks = *next_byte == 0;
         chunk_counter = 0;
+        the_byte = 0; // Added to keep compiler happy
         while (1) {
             while (counter <= 126) {
                 if (j == pThe_br_map->width) {
@@ -2490,7 +2491,7 @@ void LoadOpponents() {
     if (strcmp(s, "END")) {
         FatalError(55);
     }
-    return fclose(f);
+    fclose(f);
 }
 
 // IDA: br_font* __usercall LoadBRFont@<EAX>(char *pName@<EAX>)
@@ -2580,7 +2581,7 @@ int GetALineAndInterpretCommand(FILE* pF, char** pString_list, int pCount) {
         return -1;
     }
     for (i = 0; i < pCount; i++) {
-        if (strcmp(s, pString_list[i]) == 0) {
+        if (strcmp(str, pString_list[i]) == 0) {
             return i;
         }
     }
