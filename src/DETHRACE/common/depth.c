@@ -158,7 +158,6 @@ void LoadDepthTable(char* pName, br_pixelmap** pTable, int* pPower) {
     tU8 temp;
     LOG_TRACE("(\"%s\", %p, %p)", pName, pTable, pPower);
     STUB();
-    return NULL;
 }
 
 // IDA: void __cdecl InitDepthEffects()

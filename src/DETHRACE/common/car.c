@@ -247,7 +247,7 @@ void InitialiseCar2(tCar_spec* pCar, int pClear_disabled_flag) {
     BrVector3SetFloat(&pCar->v, 0.0, 0.0, 0.0);
     BrVector3SetFloat(&pCar->omega, 0.0, 0.0, 0.0);
     pCar->curvature = 0.0;
-    BrMatrix34Copy(&safe_position, &pCar->car_master_actor->t.t.mat);
+    BrMatrix34Copy(&safe_position, &car_actor->t.t.mat);
     if (safe_position.m[3][0] > 500.0) {
         safe_position.m[3][0] -= 1000.0f;
         safe_position.m[3][1] -= 1000.0f;
@@ -268,9 +268,9 @@ void InitialiseCar2(tCar_spec* pCar, int pClear_disabled_flag) {
     pCar->gear = 0;
     pCar->revs = 0.0;
     pCar->traction_control = 1;
-    pCar->direction.v[0] = -pCar->car_master_actor->t.t.mat.m[2][0];
-    pCar->direction.v[1] = -pCar->car_master_actor->t.t.mat.m[2][1];
-    pCar->direction.v[2] = -pCar->car_master_actor->t.t.mat.m[2][2];
+    pCar->direction.v[0] = -car_actor->t.t.mat.m[2][0];
+    pCar->direction.v[1] = -car_actor->t.t.mat.m[2][1];
+    pCar->direction.v[2] = -car_actor->t.t.mat.m[2][2];
     for (j = 0; j < COUNT_OF(pCar->last_safe_positions); j++) {
         BrMatrix34Copy(&pCar->last_safe_positions[j], &safe_position);
     }
