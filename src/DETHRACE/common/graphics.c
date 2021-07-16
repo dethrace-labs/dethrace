@@ -834,10 +834,10 @@ void RenderAFrame(int pDepth_mask_on) {
     int x_shift;
     int y_shift;
     int cockpit_on;
-    int real_origin_x;
-    int real_origin_y;
-    int real_base_x;
-    int real_base_y;
+    int real_origin_x = 0;
+    int real_origin_y = 0;
+    int real_base_x = 0;
+    int real_base_y = 0;
     int map_timer_x;
     int map_timer_width;
     int ped_type;
