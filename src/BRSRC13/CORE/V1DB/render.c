@@ -33,8 +33,9 @@ void BrDbModelRender(br_actor* actor, br_model* model, br_material* material, vo
     }
 
     if (model->prepared == NULL && model->stored == NULL) {
-        TELL_ME_IF_WE_PASS_THIS_WAY();
-        // TODO:    BrFailure("Tried to render un-prepared model %s", model->identifier ? model->identifier : "<NULL>");
+        // TELL_ME_IF_WE_PASS_THIS_WAY();
+        // TODO: gShadow_model is not created yet. Will trip into this
+        // LOG_WARN("Tried to render un-prepared model %s", model->identifier ? model->identifier : "<NULL>");
     }
 
     RenderStyleCalls[style](actor, model, material, render_data, style, on_screen);
