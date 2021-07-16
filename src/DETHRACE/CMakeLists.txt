@@ -13,7 +13,18 @@ target_include_directories(dethrace_obj PUBLIC
 
 target_link_libraries(dethrace_obj PUBLIC miniposix SDL2::SDL2 smacker harness brender s3 cglm)
 
-if(NOT MSVC)
+if (CMAKE_C_COMPILER_ID MATCHES "Clang")
+    target_compile_options(dethrace_obj PRIVATE
+        -g
+        -Wall
+        -Werror
+        -Wno-return-type
+        -Wno-unused-variable
+        -Wno-unused-parameter
+        -Wno-sign-compare
+        -Wno-unused-result
+    )
+elseif (CMAKE_C_COMPILER_ID STREQUAL "GNU")
     target_compile_options(dethrace_obj PRIVATE
         -g
         -Wall
