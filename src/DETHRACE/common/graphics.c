@@ -965,7 +965,7 @@ void RenderAFrame(int pDepth_mask_on) {
     DoSpecialCameraEffect(gCamera, &gCamera_to_world);
     if (!ConditionallyFillWithSky(gRender_screen)
         && !gProgram_state.cockpit_on
-        && !(gAction_replay_camera_mode * gAction_replay_mode)) {
+        && !(gAction_replay_camera_mode && gAction_replay_mode)) {
         ExternalSky(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world);
     }
     for (i = 0; i < (gMap_mode == 0 ? 1 : 3); i++) {
