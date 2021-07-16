@@ -23,6 +23,7 @@ if(NOT MSVC)
         -Wno-unused-parameter
         -Wno-sign-compare
         -Wno-unused-result
+        -Wno-unused-but-set-variable  # (SelectRaceDraw::test2)
     )
 else()
     target_compile_definitions(dethrace_obj PRIVATE -D_CRT_SECURE_NO_WARNINGS)
