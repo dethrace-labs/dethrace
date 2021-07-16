@@ -23,9 +23,9 @@ if(NOT MSVC)
         -Wno-return-type
         -Wno-unused-variable
         -Wno-unused-parameter
-        -Wno-error-sign-compare
-        -Wno-error-int-conversion  #todo!
-        -Wno-error-strict-aliasing
+        -Wno-sign-compare
+        -Wno-int-conversion  #todo!
+        -Wno-strict-aliasing
     )
     
     target_link_libraries(brender PUBLIC m)
