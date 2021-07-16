@@ -1,5 +1,5 @@
 #include "lexer.h"
-#include "harness.h"
+#include "harness_trace.h"
 
 // IDA: void __cdecl lexerError(br_lexer *l, char *string)
 void lexerError(br_lexer* l, char* string) {

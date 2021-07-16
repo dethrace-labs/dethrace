@@ -1,5 +1,5 @@
 #include "token.h"
-#include "harness.h"
+#include "harness_trace.h"
 
 br_token_entry predefinedTokens[457];
 char rscid[48];

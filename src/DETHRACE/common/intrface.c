@@ -165,7 +165,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
     int the_key; //
     int the_max;
     int mouse_down; //
-    int new_mouse_down; //
+    int new_mouse_down = 0; //
     int last_mouse_down;
     int defeat_mode_change; //
     int selection_changed; //

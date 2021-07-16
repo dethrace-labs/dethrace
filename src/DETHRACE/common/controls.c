@@ -1,5 +1,6 @@
 #include "controls.h"
 
+#include "brender.h"
 #include "car.h"
 #include "constants.h"
 #include "displays.h"
@@ -80,7 +81,7 @@ tToggle_element gToggle_array[] = {
     { 52, -2, 1, 1, 0, DamageTest },
     { 36, -2, 0, 1, 0, ToggleSoundEnable },
     { 5, 8, 0, 1, 0, PrintScreen },
-    //{ 9, 7, 1, 1, 0, locret_1EF00 },  //DrawSomeText
+    { 9, 7, 1, 1, 0, DrawSomeText }, // commented out in original executable
     { 10, 7, 1, 1, 0, ToggleFlying },
     { 54, -2, 1, 1, 0, TogglePedestrians },
     { 17, -2, 0, 0, 0, F4Key },
@@ -108,7 +109,7 @@ tToggle_element gToggle_array[] = {
     { 64, -2, 1, 0, 0, BuyOffense },
     { 65, -2, 1, 0, 0, ViewNetPlayer },
     { 66, -2, 1, 0, 0, UserSendMessage },
-    //{ 25, -2, 1, 1, 0, locret_2CDB4 },
+    { 25, -2, 1, 1, 0, ToggleArrow }, // commented out in original executable
     { 26, -2, 1, 1, 0, ToggleInfo },
     { 26, 8, 1, 1, 0, ToggleInfo },
     { 26, 7, 1, 1, 0, ToggleInfo }
@@ -215,7 +216,8 @@ void F11Key() {
 // IDA: void __cdecl F12Key()
 void F12Key() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __cdecl NumberKey0()
@@ -903,7 +905,25 @@ int HornBlowing() {
 void ToggleArrow() {
     static br_actor* old_actor;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gArrow_mode) {
+        gProgram_state.current_car.car_model_actors[gProgram_state.current_car.principal_car_actor].actor = old_actor;
+        BrActorRemove(gArrow_actor);
+        BrActorAdd(gProgram_state.current_car.car_master_actor, old_actor);
+        gArrow_mode = 0;
+        if (gInfo_on) {
+            ToggleInfo();
+        }
+    } else {
+        old_actor = gProgram_state.current_car.car_model_actors[gProgram_state.current_car.principal_car_actor].actor;
+        BrActorRemove(old_actor);
+        BrActorAdd(gProgram_state.current_car.car_master_actor, gArrow_actor);
+        gProgram_state.current_car.car_model_actors[gProgram_state.current_car.principal_car_actor].actor = gArrow_actor;
+        gArrow_mode = 1;
+        if (!gInfo_on) {
+            ToggleInfo();
+        }
+    }
 }
 
 // IDA: int __cdecl GetRecoverVoucherCount()

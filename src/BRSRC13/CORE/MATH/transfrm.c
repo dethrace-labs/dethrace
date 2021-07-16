@@ -3,7 +3,7 @@
 #include "CORE/MATH/matrix34.h"
 #include "CORE/MATH/quat.h"
 #include "CORE/MATH/vector.h"
-#include "harness.h"
+#include "harness_trace.h"
 
 char rscid[52];
 

@@ -1126,6 +1126,18 @@ void RepairOpponentsSystems() {
     NOT_IMPLEMENTED();
 }
 
+//IDA: void __usercall CopyVertex(br_vertex *pDest_vertex@<EAX>, br_vertex *pSrc_vertex@<EDX>)
+void CopyVertex_opponent(br_vertex* pDest_vertex, br_vertex* pSrc_vertex) {
+    LOG_TRACE("(%p, %p)", pDest_vertex, pSrc_vertex);
+    NOT_IMPLEMENTED();
+}
+
+//IDA: void __usercall CopyFace(br_face *pDest_face@<EAX>, br_face *pSrc_face@<EDX>)
+void CopyFace_opponent(br_face* pDest_face, br_face* pSrc_face) {
+    LOG_TRACE("(%p, %p)", pDest_face, pSrc_face);
+    NOT_IMPLEMENTED();
+}
+
 // IDA: void __usercall DeleteSection(tS16 pSection_to_delete@<EAX>)
 void DeleteSection(tS16 pSection_to_delete) {
     tS16 section_no;
@@ -1298,8 +1310,8 @@ int ConsistencyCheck() {
     tS16 section_no_index1;
     int found_how_many;
     int failed;
-    tU8* nodes_referenced_by_sections_array;
-    tU8* sections_referenced_by_nodes_array;
+    tU8* nodes_referenced_by_sections_array = NULL;
+    tU8* sections_referenced_by_nodes_array = NULL;
     LOG_TRACE("()");
 
     failed = 0;

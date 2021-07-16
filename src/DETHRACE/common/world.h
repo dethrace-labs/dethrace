@@ -186,7 +186,7 @@ br_material* DisposeSuffixedMaterials(br_model* pModel, tU16 pFace);
 
 void DisposeTexturingMaterials();
 
-br_uint_32 SetAccessoryRenderingCB(br_actor* pActor, void* pFlag);
+/*br_uint_32*/ intptr_t SetAccessoryRenderingCB(br_actor* pActor, void* pFlag);
 
 void SetAccessoryRendering(int pOn);
 

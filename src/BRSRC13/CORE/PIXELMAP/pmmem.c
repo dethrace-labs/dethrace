@@ -1,6 +1,6 @@
 #include "pmmem.h"
 #include "genclip.h"
-#include "harness.h"
+#include "harness_trace.h"
 #include "pmsetup.h"
 #include "resource.h"
 #include "tokenval.h"

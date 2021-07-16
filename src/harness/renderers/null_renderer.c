@@ -5,7 +5,8 @@ int Harness_NullRenderer_GetWindowFlags() {
 }
 void Harness_NullRenderer_Init(SDL_Window* window) {}
 void Harness_NullRenderer_Activate(SDL_Window* window) {}
-void Harness_NullRenderer_DoubleBuffer(uint32_t* src, SDL_Window* window) {}
+void Harness_NullRenderer_RenderScreenBuffer(uint32_t* src, int transparent) {}
+void Harness_NullRenderer_Swap(SDL_Window* window) {}
 
 void Harness_NullRenderer_RenderFrameBegin() {
 }
@@ -18,5 +19,8 @@ tRenderer NullRenderer = {
     Harness_NullRenderer_Init,
     Harness_NullRenderer_RenderFrameBegin,
     Harness_NullRenderer_RenderFrameEnd,
-    Harness_NullRenderer_DoubleBuffer
+    Harness_NullRenderer_RenderScreenBuffer,
+    Harness_NullRenderer_Swap,
+    NULL,
+    NULL
 };

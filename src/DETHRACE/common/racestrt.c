@@ -876,13 +876,13 @@ void DrawGrid(int pOffset, int pDraw_it) {
     int width_job;
     int done_highest;
     int str_index;
-    int swap_1_x;
-    int swap_1_y;
-    int swap_2_x;
-    int swap_2_y;
-    br_pixelmap* the_image;
-    br_pixelmap* swap_1_image;
-    br_pixelmap* swap_2_image;
+    int swap_1_x = 0;
+    int swap_1_y = 0;
+    int swap_2_x = 0;
+    int swap_2_y = 0;
+    br_pixelmap* the_image = NULL;
+    br_pixelmap* swap_1_image = NULL;
+    br_pixelmap* swap_2_image = NULL;
     char numbers_str[4][100];
     char total_str[256];
     tU32 the_time;
@@ -1598,6 +1598,12 @@ void CheckPlayersAreResponding() {
 // IDA: void __cdecl NetSynchStartStart()
 void NetSynchStartStart() {
     LOG_TRACE("()");
+    NOT_IMPLEMENTED();
+}
+
+//IDA: void __usercall DrawAnItem(int pX@<EAX>, int pY_index@<EDX>, int pFont_index@<EBX>, char *pText@<ECX>)
+void DrawAnItem_racestrt(int pX, int pY_index, int pFont_index, char* pText) {
+    LOG_TRACE("(%d, %d, %d, \"%s\")", pX, pY_index, pFont_index, pText);
     NOT_IMPLEMENTED();
 }
 

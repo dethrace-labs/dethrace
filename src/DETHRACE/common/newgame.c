@@ -640,6 +640,18 @@ void DoNetOptions(tNet_game_options* pGame_options) {
     NOT_IMPLEMENTED();
 }
 
+//IDA: void __usercall PlayRadioOn(int pIndex@<EAX>)
+void PlayRadioOn_newgame(int pIndex) {
+    LOG_TRACE("(%d)", pIndex);
+    NOT_IMPLEMENTED();
+}
+
+//IDA: void __usercall PlayRadioOff(int pIndex@<EAX>)
+void PlayRadioOff_newgame(int pIndex) {
+    LOG_TRACE("(%d)", pIndex);
+    NOT_IMPLEMENTED();
+}
+
 // IDA: void __usercall SetOptions(tNet_game_type pGame_type@<EAX>, tNet_game_options *pGame_options@<EDX>)
 void SetOptions(tNet_game_type pGame_type, tNet_game_options* pGame_options) {
     LOG_TRACE("(%d, %p)", pGame_type, pGame_options);

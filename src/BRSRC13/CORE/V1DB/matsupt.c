@@ -1,6 +1,6 @@
 #include "matsupt.h"
 #include "dbsetup.h"
-#include "harness.h"
+#include "harness_trace.h"
 #include "resource.h"
 #include <stddef.h>
 #include <string.h>

@@ -1,6 +1,6 @@
 #include "preptab.h"
 
-#include "harness.h"
+#include "harness_trace.h"
 #include "prepmap.h"
 
 char rscid[51];

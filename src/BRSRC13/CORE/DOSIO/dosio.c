@@ -1,5 +1,6 @@
 #include "dosio.h"
-#include "harness.h"
+#include "harness_hooks.h"
+#include "harness_trace.h"
 #include "pixelmap.h"
 #include <stddef.h>
 

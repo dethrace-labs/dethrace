@@ -18,12 +18,13 @@ if(NOT MSVC)
     target_compile_options(brender PRIVATE
         -g
         -Wall
-        -Wextra
         -Werror
         -Wno-return-type
         -Wno-unused-variable
         -Wno-unused-parameter
         -Wno-sign-compare
+        -Wno-int-conversion  #todo!
+        -Wno-strict-aliasing
     )
     
     target_link_libraries(brender PUBLIC m)

@@ -1,8 +1,8 @@
 #ifndef TESTS_H
 #define TESTS_H
 
-#include "debug.h"
 #include "framework/unity.h"
+#include "harness_trace.h"
 
 extern int has_data_directory();
 

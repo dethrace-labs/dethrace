@@ -1,5 +1,5 @@
 #include "objectc.h"
-#include "harness.h"
+#include "harness_trace.h"
 
 char rscid[49];
 

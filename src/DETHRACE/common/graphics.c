@@ -234,7 +234,7 @@ void DrawNumberAt(br_pixelmap* gImage, int pX, int pY, int pX_pitch, int pY_pitc
 void BuildColourTable(br_pixelmap* pPalette) {
     int i;
     int j;
-    int nearest_index;
+    int nearest_index = 0;
     int red;
     int green;
     int blue;
@@ -259,7 +259,6 @@ void BuildColourTable(br_pixelmap* pPalette) {
             }
         }
         gColours[i] = nearest_index;
-        LOG_DEBUG("color %d %d", i, gColours[i]);
     }
 }
 
@@ -448,6 +447,7 @@ void AdjustRenderScreenSize() {
         gRender_screen->base_y = gProgram_state.current_render_top;
         gRender_screen->height = gProgram_state.current_render_bottom - gProgram_state.current_render_top;
         gRender_screen->width = gProgram_state.current_render_right - gProgram_state.current_render_left;
+        LOG_DEBUG("renderscreen is %d x %d", gRender_screen->width, gRender_screen->height);
     }
     if (gRender_screen->row_bytes == gRender_screen->width) {
         gRender_screen->flags |= BR_PMF_ROW_WHOLEPIXELS;
@@ -647,7 +647,8 @@ void SufferFromConcussion(float pSeriousness) {
 // IDA: void __usercall ProcessNonTrackActors(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>, br_matrix34 *pOld_camera_matrix)
 void ProcessNonTrackActors(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world, br_matrix34* pOld_camera_matrix) {
     LOG_TRACE("(%p, %p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world, pOld_camera_matrix);
-    SILENT_STUB();
+
+    BrZbSceneRenderAdd(gNon_track_actor);
 }
 
 // IDA: int __usercall OppositeColour@<EAX>(int pColour@<EAX>)
@@ -821,7 +822,7 @@ int ConditionallyFillWithSky(br_pixelmap* pPixelmap) {
     LOG_TRACE("(%p)", pPixelmap);
 
     SILENT_STUB();
-    return 1;
+    return 0;
 }
 
 // IDA: void __usercall RenderAFrame(int pDepth_mask_on@<EAX>)
@@ -833,10 +834,10 @@ void RenderAFrame(int pDepth_mask_on) {
     int x_shift;
     int y_shift;
     int cockpit_on;
-    int real_origin_x;
-    int real_origin_y;
-    int real_base_x;
-    int real_base_y;
+    int real_origin_x = 0;
+    int real_origin_y = 0;
+    int real_base_x = 0;
+    int real_base_y = 0;
     int map_timer_x;
     int map_timer_width;
     int ped_type;
@@ -963,7 +964,7 @@ void RenderAFrame(int pDepth_mask_on) {
     DoSpecialCameraEffect(gCamera, &gCamera_to_world);
     if (!ConditionallyFillWithSky(gRender_screen)
         && !gProgram_state.cockpit_on
-        && !(gAction_replay_camera_mode * gAction_replay_mode)) {
+        && !(gAction_replay_camera_mode && gAction_replay_mode)) {
         ExternalSky(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world);
     }
     for (i = 0; i < (gMap_mode == 0 ? 1 : 3); i++) {
@@ -1891,7 +1892,7 @@ void InitShadow() {
     // dword_1316C4 = 0xBF800000;
 
     gShadow_model = BrModelAllocate(NULL, 0, 0);
-    gShadow_model->flags = 6;
+    gShadow_model->flags = BR_MODF_GENERATE_TAGS | BR_MODF_KEEP_ORIGINAL;
     gShadow_actor = BrActorAllocate(BR_ACTOR_MODEL, 0);
     gShadow_actor->model = gShadow_model;
     BrActorAdd(gUniverse_actor, gShadow_actor);

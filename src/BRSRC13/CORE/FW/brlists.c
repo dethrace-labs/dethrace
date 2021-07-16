@@ -1,5 +1,5 @@
 #include "brlists.h"
-#include "harness.h"
+#include "harness_trace.h"
 #include <assert.h>
 #include <stdio.h>
 #include <unistd.h>

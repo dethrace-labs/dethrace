@@ -10,7 +10,7 @@
 #include "CORE/V1DB/matsupt.h"
 #include "CORE/V1DB/modsupt.h"
 #include "CORE/V1DB/regsupt.h"
-#include "harness.h"
+#include "harness_trace.h"
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -86,8 +86,8 @@ br_file_enum actor_type_F = { 8u, actor_type_FM };
 
 br_file_struct_member br_actor_FM[3] = {
     { 13u, offsetof(br_actor, type), "type", NULL /*actor_type_FM */ },
-    { 13u, offsetof(br_actor, render_style), NULL /*render_style_FM*/ },
-    { 17u, offsetof(br_actor, identifier), NULL }
+    { 13u, offsetof(br_actor, render_style), "render_style", NULL /*render_style_FM*/ },
+    { 17u, offsetof(br_actor, identifier), "identifier", NULL }
 };
 br_file_struct br_actor_F = { "br_actor", 3u, br_actor_FM, sizeof(br_actor) };
 br_file_enum render_style_F;
@@ -664,7 +664,7 @@ int FopRead_TRANSFORM(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint
     br_transform* tp;
     LOG_TRACE9("(%p, %d, %d, %d)", df, id, length, count);
 
-    for (t = 0; t < COUNT_OF(TransformTypes); t++) {
+    for (t = 0; t < BR_ASIZE(TransformTypes); t++) {
         if (id == TransformTypes[t].id) {
             break;
         }

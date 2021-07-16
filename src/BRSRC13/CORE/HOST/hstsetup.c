@@ -1,5 +1,5 @@
 #include "hstsetup.h"
-#include "harness.h"
+#include "harness_trace.h"
 
 host_info hostInfo;
 void* functionPointers_BRHOST1[50];

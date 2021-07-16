@@ -151,9 +151,9 @@ void MungeHeadups() {
                 "%d.%d (%.3f, %.3f, %.3f) %.0f, %.0f, MILES=%.2f",
                 gFrame_rate / 10,
                 gFrame_rate % 10,
-                gSelf->t.t.mat.m[3][0],
-                gSelf->t.t.mat.m[3][1],
-                gSelf->t.t.mat.m[3][2],
+                gSelf->t.t.translate.t.v[0],
+                gSelf->t.t.translate.t.v[1],
+                gSelf->t.t.translate.t.v[2],
                 gCamera_to_horiz_angle,
                 bearing,
                 gMr_odo);

@@ -1,6 +1,6 @@
 #include "enables.h"
 #include "dbsetup.h"
-#include "harness.h"
+#include "harness_trace.h"
 #include <stddef.h>
 
 char rscid[51];

@@ -31,6 +31,7 @@
 #include "skidmark.h"
 #include "sound.h"
 #include "spark.h"
+#include "trig.h"
 #include "utility.h"
 #include "world.h"
 
@@ -51,7 +52,15 @@ br_material* gDefault_track_material;
 // IDA: void __cdecl AllocateSelf()
 void AllocateSelf() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gSelf = BrActorAllocate(BR_ACTOR_NONE, NULL);
+    if (!gSelf) {
+        FatalError(6);
+    }
+    gSelf = BrActorAdd(gNon_track_actor, gSelf);
+    if (!gSelf) {
+        FatalError(6);
+    }
 }
 
 // IDA: void __cdecl AllocateCamera()
@@ -110,7 +119,46 @@ void ReinitialiseForwardCamera() {
     float w;
     LOG_TRACE("()");
 
-    STUB();
+    camera_ptr = (br_camera*)gCamera->type_data;
+    if (gProgram_state.cockpit_on) {
+        the_angle = gCamera_angle / 2.0;
+        LOG_DEBUG("the_angle %f, height %d, tandeg %f", the_angle, gRender_screen->height, tandeg(the_angle));
+
+        d = atan(
+                tandeg(the_angle)
+                * (double)gRender_screen->height
+                / (double)(gProgram_state.current_car.render_bottom[0] - gProgram_state.current_car.render_top[0]))
+            * 114.5915590261646;
+        camera_ptr->field_of_view = BrDegreeToAngle(d);
+        LOG_DEBUG("%d, %f", camera_ptr->field_of_view, d);
+        BrMatrix34Identity(&gCamera->t.t.mat);
+        gCamera->t.t.mat.m[3][0] = gProgram_state.current_car.driver_x_offset;
+        gCamera->t.t.mat.m[3][1] = gProgram_state.current_car.driver_y_offset;
+        gCamera->t.t.mat.m[3][2] = gProgram_state.current_car.driver_z_offset;
+        w = (float)(gRender_screen->base_y
+            + (gRender_screen->height / 2)
+            - (gProgram_state.current_car.render_bottom[0] + gProgram_state.current_car.render_top[0]) / 2);
+
+        gCamera->t.t.mat.m[2][1] = tandeg(d / 2.0) * w * 2.0 / (float)gRender_screen->height;
+        LOG_DEBUG("w %f, gCamera->t.t.mat.m[2][1] %f", w, gCamera->t.t.mat.m[2][1]);
+        camera_ptr->aspect = (double)gWidth / (double)gHeight;
+        camera_ptr->yon_z = gYon_multiplier * gCamera_yon;
+        LOG_DEBUG("ascpect %f, yon %f", camera_ptr->aspect, camera_ptr->yon_z);
+        if (gProgram_state.which_view == eView_left) {
+            DRMatrix34PostRotateY(
+                &gCamera->t.t.mat,
+                BrDegreeToAngle(gProgram_state.current_car.head_left_angle));
+        } else if (gProgram_state.which_view == eView_right) {
+            DRMatrix34PostRotateY(
+                &gCamera->t.t.mat,
+                BrDegreeToAngle(gProgram_state.current_car.head_right_angle));
+        }
+        gCamera->t.t.mat.m[3][0] = gProgram_state.current_car.driver_x_offset;
+        gCamera->t.t.mat.m[3][1] = gProgram_state.current_car.driver_y_offset;
+        gCamera->t.t.mat.m[3][2] = gProgram_state.current_car.driver_z_offset;
+        SetSightDistance(camera_ptr->yon_z);
+    }
+    AssertYons();
 }
 
 // IDA: void __cdecl AllocateRearviewPixelmap()
@@ -164,13 +212,15 @@ void ReinitialiseRenderStuff() {
         gProgram_state.current_render_top = gProgram_state.current_car.render_top[gProgram_state.cockpit_image_index];
         gProgram_state.current_render_right = gProgram_state.current_car.render_right[gProgram_state.cockpit_image_index];
         gProgram_state.current_render_bottom = gProgram_state.current_car.render_bottom[gProgram_state.cockpit_image_index];
+        LOG_DEBUG("renderbottom %d", gProgram_state.current_render_bottom);
+
     } else {
-        y_diff = (gGraf_specs[gGraf_spec_index].total_height / 18 & 0xFFFFFFFE) * gRender_indent;
-        x_diff = (gGraf_specs[gGraf_spec_index].total_width / 18 & 0xFFFFFFFC) * gRender_indent;
-        gProgram_state.current_render_left = x_diff;
-        gProgram_state.current_render_top = y_diff;
-        gProgram_state.current_render_right = gGraf_specs[gGraf_spec_index].total_width - x_diff;
-        gProgram_state.current_render_bottom = gGraf_specs[gGraf_spec_index].total_height - y_diff;
+        gProgram_state.current_render_top = (gGraf_specs[gGraf_spec_index].total_height / 18 & 0xFFFFFFFE) * gRender_indent;
+        gProgram_state.current_render_left = (gGraf_specs[gGraf_spec_index].total_width / 18 & 0xFFFFFFFC) * gRender_indent;
+        x_diff = gGraf_specs[gGraf_spec_index].total_width - gProgram_state.current_render_left;
+        y_diff = gGraf_specs[gGraf_spec_index].total_height - gProgram_state.current_render_top;
+        gProgram_state.current_render_right = x_diff;
+        gProgram_state.current_render_bottom = y_diff;
     }
 }
 
@@ -213,14 +263,7 @@ void InitializeBRenderEnvironment() {
     }
     gDont_render_actor->render_style = BR_RSTYLE_NONE;
     BrActorAdd(gUniverse_actor, gDont_render_actor);
-    gSelf = BrActorAllocate(BR_ACTOR_NONE, NULL);
-    if (!gSelf) {
-        FatalError(6);
-    }
-    gSelf = BrActorAdd(gNon_track_actor, gSelf);
-    if (!gSelf) {
-        FatalError(6);
-    }
+    AllocateSelf();
     AllocateCamera();
     arrow_model = LoadModel("CPOINT.DAT");
     BrModelAdd(arrow_model);

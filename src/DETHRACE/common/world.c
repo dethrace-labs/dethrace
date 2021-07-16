@@ -757,8 +757,8 @@ void ShiftBoundGrooveFunks(char* pStart, char* pEnd, int pDelta) {
     LOG_TRACE("(\"%s\", \"%s\", %d)", pStart, pEnd, pDelta);
 
     for (i = 0; i < COUNT_OF(gGroove_funk_bindings); i++) {
-        if ((signed int)gGroove_funk_bindings[i] >= (signed int)pStart
-            && (signed int)gGroove_funk_bindings[i] < (signed int)pEnd) {
+        if ((intptr_t)gGroove_funk_bindings[i] >= (intptr_t)pStart
+            && (intptr_t)gGroove_funk_bindings[i] < (intptr_t)pEnd) {
             gGroove_funk_bindings[i] = (float*)((char*)gGroove_funk_bindings[i] + (pDelta & 0xFFFFFFFC));
         }
     }
@@ -1798,7 +1798,7 @@ void DisposeTexturingMaterials() {
 }
 
 // IDA: br_uint_32 __cdecl SetAccessoryRenderingCB(br_actor *pActor, void *pFlag)
-br_uint_32 SetAccessoryRenderingCB(br_actor* pActor, void* pFlag) {
+intptr_t SetAccessoryRenderingCB(br_actor* pActor, void* pFlag) {
     if (pActor->identifier && *pActor->identifier == '&') {
         pActor->render_style = *(br_uint_8*)pFlag;
     }
@@ -2438,7 +2438,13 @@ void FreeTrack(tTrack_spec* pTrack_spec) {
 // IDA: void __usercall ProcessTrack(br_actor *pWorld@<EAX>, tTrack_spec *pTrack_spec@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world_transform@<ECX>, int pRender_blends)
 void ProcessTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, br_matrix34* pCamera_to_world_transform, int pRender_blends) {
     LOG_TRACE("(%p, %p, %p, %p, %d)", pWorld, pTrack_spec, pCamera, pCamera_to_world_transform, pRender_blends);
-    SILENT_STUB();
+
+    RenderTrack(pWorld, pTrack_spec, pCamera, pCamera_to_world_transform, pRender_blends);
+    if (gAdditional_actors) {
+        if (!pRender_blends) {
+            BrZbSceneRenderAdd(gAdditional_actors);
+        }
+    }
 }
 
 // IDA: br_scalar __cdecl NormaliseDegreeAngle(br_scalar pAngle)

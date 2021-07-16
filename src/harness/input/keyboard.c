@@ -1,7 +1,6 @@
-#include "dr_types.h"
-#include <SDL.h>
-
 #include "keyboard.h"
+#include "dr_types.h"
+#include "harness_trace.h"
 
 extern tU8 gScan_code[123][2];
 
@@ -127,10 +126,6 @@ void Keyboard_Init() {
 }
 
 int Keyboard_IsKeyDown(unsigned char scan_code) {
-    if (scan_code > 255) {
-        LOG_WARN("ignoring unexpected scan code %d", scan_code);
-        return 0;
-    }
     return sdl_key_state[scan_code];
 }
 

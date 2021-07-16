@@ -56,7 +56,7 @@ void StripBlendedFaces(br_actor* pActor, br_model* pModel) {
 }
 
 // IDA: br_uint_32 __cdecl FindNonCarsCB(br_actor *pActor, tTrack_spec *pTrack_spec)
-br_uint_32 FindNonCarsCB(br_actor* pActor, tTrack_spec* pTrack_spec) {
+intptr_t FindNonCarsCB(br_actor* pActor, tTrack_spec* pTrack_spec) {
     int i;
     br_scalar r1;
     br_scalar r2;
@@ -68,7 +68,7 @@ br_uint_32 FindNonCarsCB(br_actor* pActor, tTrack_spec* pTrack_spec) {
 }
 
 // IDA: br_uint_32 __cdecl ProcessModelsCB(br_actor *pActor, tTrack_spec *pTrack_spec)
-br_uint_32 ProcessModelsCB(br_actor* pActor, tTrack_spec* pTrack_spec) {
+intptr_t ProcessModelsCB(br_actor* pActor, tTrack_spec* pTrack_spec) {
     unsigned int x;
     unsigned int z;
     int group;
@@ -205,7 +205,8 @@ void RenderTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, 
     static br_scalar tan_fov_ish;
     static br_actor* result;
     LOG_TRACE("(%p, %p, %p, %p, %d)", pWorld, pTrack_spec, pCamera, pCamera_to_world, pRender_blends);
-    NOT_IMPLEMENTED();
+
+    BrZbSceneRenderAdd(pWorld);
 }
 
 // IDA: br_scalar __cdecl GetYonFactor()

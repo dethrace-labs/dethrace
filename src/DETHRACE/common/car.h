@@ -334,6 +334,8 @@ int CrashCarsTogetherSinglePass(br_scalar dt, int pPass, tCollison_data* collide
 
 void BringCarToAGrindingHalt(tCollision_info* car);
 
+int BoundsOverlapTest_car(br_bounds* b1, br_bounds* b2);
+
 int SimpleCarCarCollisionTest(tCollision_info* car1, tCollision_info* car2);
 
 int CollideTwoCarsWithWalls(tCollision_info* car1, tCollision_info* car2, br_scalar dt);

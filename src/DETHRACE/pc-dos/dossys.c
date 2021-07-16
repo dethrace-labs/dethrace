@@ -9,6 +9,7 @@
 #include "common/sound.h"
 #include "common/utility.h"
 #include "harness.h"
+#include "harness_hooks.h"
 #include "input.h"
 #include "pd/sys.h"
 #include "watcom_functions.h"

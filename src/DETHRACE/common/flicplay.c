@@ -910,16 +910,25 @@ void DoDeltaTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
                 size_count = MemReadS8(&pFlic_info->data);
                 line_pixel_ptr += skip_count / 2;
                 if (size_count < 0) {
-                    the_word = *(tU16*)pFlic_info->data;
-                    pFlic_info->data += 2;
-                    the_byte = the_word & 0xff;
-                    the_byte2 = the_word >> 8 & 0xff;
+                    the_byte = *pFlic_info->data++;
+                    the_byte2 = *pFlic_info->data++;
 
-                    for (k = 0; k < -size_count; k++) {
-                        if (the_word) {
-                            *line_pixel_ptr = the_word;
+                    if (the_byte && the_byte2) {
+                        the_word = *((tU16*)pFlic_info->data - 1);
+                        for (k = 0; k < -size_count; k++) {
+                            *line_pixel_ptr++ = the_word;
                         }
-                        line_pixel_ptr++;
+                    } else {
+                        for (k = 0; k < -size_count; k++) {
+                            if (the_byte) {
+                                *(tU8*)line_pixel_ptr = the_byte;
+                            }
+                            line_pixel_ptr = (tU16*)((tU8*)line_pixel_ptr + 1);
+                            if (the_byte2) {
+                                *(tU8*)line_pixel_ptr = the_byte2;
+                            }
+                            line_pixel_ptr = (tU16*)((tU8*)line_pixel_ptr + 1);
+                        }
                     }
                 } else {
                     for (k = 0; k < size_count; k++) {

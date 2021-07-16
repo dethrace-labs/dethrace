@@ -2,7 +2,7 @@
 #include "CORE/FW/fwsetup.h"
 #include "CORE/FW/resource.h"
 #include "CORE/STD/brstdlib.h"
-#include "harness.h"
+#include "harness_trace.h"
 #include <stdarg.h>
 #include <stddef.h>
 

@@ -99,38 +99,39 @@ void LoadPowerups() {
             GetAString(f, s);
             the_powerup->icon = LoadPixelmap(s);
             the_powerup->fizzle_type = GetAnInt(f);
-            the_powerup->duration = 1000 * GetAnInt(f);
-            if (the_powerup->duration < 0) {
-                the_powerup->type = ePowerup_instantaneous;
-            } else if (the_powerup->duration == 0) {
+            time = 1000 * GetAnInt(f);
+            the_powerup->duration = time;
+            if (time > 0) {
+                the_powerup->type = ePowerup_timed;
+            } else if (time == 0) {
                 the_powerup->type = ePowerup_whole_race;
             } else {
-                the_powerup->type = ePowerup_timed;
+                the_powerup->type = ePowerup_instantaneous;
             }
-            action_index = GetAnInt(f);
-            if (action_index >= 0) {
-                the_powerup->got_proc = gGot_procs[action_index];
-                the_powerup->lose_proc = gLose_procs[action_index];
-                the_powerup->periodic_proc = gPeriodic_procs[action_index];
-            } else {
-                the_powerup->lose_proc = NULL;
-                the_powerup->periodic_proc = NULL;
-                the_powerup->got_proc = NULL;
-            }
-            the_powerup->number_of_float_params = GetAnInt(f);
-            the_powerup->float_params = BrMemAllocate(4 * the_powerup->number_of_float_params, kMem_powerup_float_parms);
-            for (j = 0; j < the_powerup->number_of_float_params; j++) {
-                the_powerup->float_params[j] = GetAFloat(f);
-            }
-            the_powerup->number_of_integer_params = GetAnInt(f);
-            the_powerup->integer_params = BrMemAllocate(4 * the_powerup->number_of_integer_params, kMem_powerup_int_parms);
-            for (j = 0; j < the_powerup->number_of_integer_params; j++) {
-                the_powerup->integer_params[j] = GetAnInt(f);
-            }
-            the_powerup->group_inclusion = GetAnInt(f);
-            the_powerup->prat_cam_event = GetAnInt(f);
-            the_powerup->net_type = GetAnInt(f);
         }
+        action_index = GetAnInt(f);
+        if (action_index >= 0) {
+            the_powerup->got_proc = gGot_procs[action_index];
+            the_powerup->lose_proc = gLose_procs[action_index];
+            the_powerup->periodic_proc = gPeriodic_procs[action_index];
+        } else {
+            the_powerup->lose_proc = NULL;
+            the_powerup->periodic_proc = NULL;
+            the_powerup->got_proc = NULL;
+        }
+        the_powerup->number_of_float_params = GetAnInt(f);
+        the_powerup->float_params = BrMemAllocate(4 * the_powerup->number_of_float_params, kMem_powerup_float_parms);
+        for (j = 0; j < the_powerup->number_of_float_params; j++) {
+            the_powerup->float_params[j] = GetAFloat(f);
+        }
+        the_powerup->number_of_integer_params = GetAnInt(f);
+        the_powerup->integer_params = BrMemAllocate(4 * the_powerup->number_of_integer_params, kMem_powerup_int_parms);
+        for (j = 0; j < the_powerup->number_of_integer_params; j++) {
+            the_powerup->integer_params[j] = GetAnInt(f);
+        }
+        the_powerup->group_inclusion = GetAnInt(f);
+        the_powerup->prat_cam_event = GetAnInt(f);
+        the_powerup->net_type = GetAnInt(f);
     }
     fclose(f);
 }

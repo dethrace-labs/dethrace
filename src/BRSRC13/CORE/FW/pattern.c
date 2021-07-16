@@ -1,5 +1,5 @@
 #include "pattern.h"
-#include "harness.h"
+#include "harness_trace.h"
 #include <ctype.h>
 
 char rscid[49];

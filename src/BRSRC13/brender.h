@@ -70,6 +70,7 @@ void BrMatrix34RotateY(br_matrix34* mat, br_angle ry);
 void BrMatrix34PostScale(br_matrix34* mat, br_scalar sx, br_scalar sy, br_scalar sz);
 void BrMatrix34PreTransform(br_matrix34* mat, br_transform* xform);
 void BrMatrix34PostTransform(br_matrix34* mat, br_transform* xform);
+void BrMatrix34PreRotateX(br_matrix34* mat, br_angle rx);
 
 // BrMem
 void BrMemFree(void* block);
@@ -120,8 +121,12 @@ void BrTransformToMatrix34(br_matrix34* mat, br_transform* xform);
 // BrV1db
 void BrV1dbBeginWrapper_Float();
 
-// BrVector
+// BrVector3
+void BrVector3Cross(br_vector3* v1, br_vector3* v2, br_vector3* v3);
 void BrVector3SetFloat(br_vector3* v1, float f1, float f2, float f3);
+void BrVector3Sub(br_vector3* v1, br_vector3* v2, br_vector3* v3);
+void BrVector3Accumulate(br_vector3* v1, br_vector3* v2);
+void BrVector3Normalise(br_vector3* v1, br_vector3* v2);
 
 // Logging
 void BrFailure(const char* s, ...);

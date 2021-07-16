@@ -764,6 +764,7 @@ tS8* ConvertPixToStripMap(br_pixelmap* pThe_br_map) {
         total = 0;
         counting_blanks = *next_byte == 0;
         chunk_counter = 0;
+        the_byte = 0; // Added to keep compiler happy
         while (1) {
             while (counter <= 126) {
                 if (j == pThe_br_map->width) {
@@ -1383,15 +1384,15 @@ void FreeUpBonnetModels(br_model** pModel_array, int pModel_count) {
     LOG_TRACE("(%p, %d)", pModel_array, pModel_count);
 
     // TODO: this causes a use-after-free somewhere...
-    // for (i = 0; i < pModel_count; i++) {
-    //     if (pModel_array[i]) {
-    //         if (strcmp("Ebonnet.DAT", pModel_array[i]->identifier) == 0 || strcmp("FIN.DAT", pModel_array[i]->identifier) == 0) {
-    //             BrModelRemove(pModel_array[i]);
-    //             BrModelFree(pModel_array[i]);
-    //             pModel_array[i] = NULL;
-    //         }
-    //     }
-    // }
+    for (i = 0; i < pModel_count; i++) {
+        if (pModel_array[i]) {
+            if (strcmp("Ebonnet.DAT", pModel_array[i]->identifier) == 0 || strcmp("FIN.DAT", pModel_array[i]->identifier) == 0) {
+                BrModelRemove(pModel_array[i]);
+                BrModelFree(pModel_array[i]);
+                pModel_array[i] = NULL;
+            }
+        }
+    }
 }
 
 // IDA: void __usercall LinkModelsToActor(br_actor *pActor@<EAX>, br_model **pModel_array@<EDX>, int pModel_count@<EBX>)
@@ -1930,8 +1931,7 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
         if (!pCar_spec->car_model_actors[i].actor) {
             FatalError(71);
         }
-        LOG_DEBUG("actor %s", pCar_spec->car_model_actors[i].actor->identifier);
-        LOG_DEBUG("actor %s, model %s", pCar_spec->car_model_actors[i].actor->identifier, pCar_spec->car_model_actors[i].actor->model->identifier);
+        //LOG_DEBUG("actor %s, model %s", pCar_spec->car_model_actors[i].actor->identifier, pCar_spec->car_model_actors[i].actor->model->identifier);
         LinkModelsToActor(
             pCar_spec->car_model_actors[i].actor,
             &pStorage_space->models[old_model_count],
@@ -1941,13 +1941,15 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
             SetModelFlags(pStorage_space->models[j], pOwner);
         }
         BrActorAdd(pCar_spec->car_master_actor, pCar_spec->car_model_actors[i].actor);
-        if (pCar_spec->car_model_actors[i].min_distance_squared == 0.0)
+        if (pCar_spec->car_model_actors[i].min_distance_squared == 0.0) {
             pCar_spec->principal_car_actor = i;
+        }
     }
-    if (pDriver != eDriver_local_human && pCar_spec->car_model_actors[pCar_spec->car_actor_count - 1].min_distance_squared < 0.0)
+    if (pDriver != eDriver_local_human && pCar_spec->car_model_actors[pCar_spec->car_actor_count - 1].min_distance_squared < 0.0) {
         SwitchCarActor(pCar_spec, pCar_spec->car_actor_count - 2);
-    else
+    } else {
         SwitchCarActor(pCar_spec, pCar_spec->car_actor_count - 1);
+    }
     GetAString(f, s);
     pCar_spec->screen_material = BrMaterialFind(s);
     if (pCar_spec->screen_material) {
@@ -2489,7 +2491,7 @@ void LoadOpponents() {
     if (strcmp(s, "END")) {
         FatalError(55);
     }
-    return fclose(f);
+    fclose(f);
 }
 
 // IDA: br_font* __usercall LoadBRFont@<EAX>(char *pName@<EAX>)
@@ -2579,7 +2581,7 @@ int GetALineAndInterpretCommand(FILE* pF, char** pString_list, int pCount) {
         return -1;
     }
     for (i = 0; i < pCount; i++) {
-        if (strcmp(s, pString_list[i]) == 0) {
+        if (strcmp(str, pString_list[i]) == 0) {
             return i;
         }
     }

@@ -1,5 +1,5 @@
 #include "register.h"
-#include "harness.h"
+#include "harness_trace.h"
 
 #include "brlists.h"
 #include "fwsetup.h"
@@ -76,13 +76,9 @@ int BrRegistryRemoveMany(br_registry* reg, void** items, int n) {
 // IDA: void* __usercall BrRegistryFind@<EAX>(br_registry *reg@<EAX>, char *pattern@<EDX>)
 void* BrRegistryFind(br_registry* reg, char* pattern) {
     br_registry_entry* e;
-    br_pixelmap* pm;
     LOG_TRACE8("(%p, \"%s\")", reg, pattern);
 
     e = (br_registry_entry*)reg->list.head;
-
-    pm = (br_pixelmap*)e->item;
-
     if (e->item) {
         // as a char**, e->item[1] actually points to `identifier` field in a br_* struct etc
         while (!BrNamePatternMatch(pattern, e->item[1])) {

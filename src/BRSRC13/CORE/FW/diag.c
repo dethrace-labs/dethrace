@@ -2,7 +2,7 @@
 #include "CORE/STD/brstdlib.h"
 #include "brprintf.h"
 #include "fwsetup.h"
-#include "harness.h"
+#include "harness_trace.h"
 #include <stdarg.h>
 
 // Global variables

@@ -272,7 +272,8 @@ int Chance(float pChance_per_second, int pPeriod) {
 // IDA: float __cdecl tandeg(float pAngle)
 float tandeg(float pAngle) {
     LOG_TRACE("(%f)", pAngle);
-    NOT_IMPLEMENTED();
+    pAngle = sin(pAngle * 3.141592653589793 / 180.0);
+    return pAngle / cos(pAngle);
 }
 
 // IDA: tU32 __usercall GetFileLength@<EAX>(FILE *pF@<EAX>)
@@ -780,7 +781,7 @@ void Copy8BitRectangleTo16BitRhombusWithTransparency(br_pixelmap* pDst, tS16 pDs
 // IDA: void __usercall DRPixelmapRectangleCopy(br_pixelmap *dst@<EAX>, br_int_16 dx@<EDX>, br_int_16 dy@<EBX>, br_pixelmap *src@<ECX>, br_int_16 sx, br_int_16 sy, br_uint_16 w, br_uint_16 h)
 void DRPixelmapRectangleCopy(br_pixelmap* dst, br_int_16 dx, br_int_16 dy, br_pixelmap* src, br_int_16 sx, br_int_16 sy, br_uint_16 w, br_uint_16 h) {
     LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d)", dst, dx, dy, src, sx, sy, w, h);
-    NOT_IMPLEMENTED();
+    BrPixelmapRectangleCopy(dst, dx, dy, src, sx, sy, w, h);
 }
 
 // IDA: void __usercall DRPixelmapCopy(br_pixelmap *dst@<EAX>, br_pixelmap *src@<EDX>)
@@ -792,7 +793,7 @@ void DRPixelmapCopy(br_pixelmap* dst, br_pixelmap* src) {
 // IDA: void __usercall DRPixelmapRectangleFill(br_pixelmap *dst@<EAX>, br_int_16 x@<EDX>, br_int_16 y@<EBX>, br_uint_16 w@<ECX>, br_uint_16 h, br_uint_32 colour)
 void DRPixelmapRectangleFill(br_pixelmap* dst, br_int_16 x, br_int_16 y, br_uint_16 w, br_uint_16 h, br_uint_32 colour) {
     LOG_TRACE("(%p, %d, %d, %d, %d, %d)", dst, x, y, w, h, colour);
-    NOT_IMPLEMENTED();
+    BrPixelmapRectangleFill(dst, x, y, w, h, colour);
 }
 
 // IDA: int __usercall NormalSideOfPlane@<EAX>(br_vector3 *pPoint@<EAX>, br_vector3 *pNormal@<EDX>, br_scalar pD)
