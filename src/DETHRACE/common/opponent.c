@@ -1310,8 +1310,8 @@ int ConsistencyCheck() {
     tS16 section_no_index1;
     int found_how_many;
     int failed;
-    tU8* nodes_referenced_by_sections_array;
-    tU8* sections_referenced_by_nodes_array;
+    tU8* nodes_referenced_by_sections_array = NULL;
+    tU8* sections_referenced_by_nodes_array = NULL;
     LOG_TRACE("()");
 
     failed = 0;
