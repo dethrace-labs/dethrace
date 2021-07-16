@@ -1798,7 +1798,7 @@ void DisposeTexturingMaterials() {
 }
 
 // IDA: br_uint_32 __cdecl SetAccessoryRenderingCB(br_actor *pActor, void *pFlag)
-br_uint_32 SetAccessoryRenderingCB(br_actor* pActor, void* pFlag) {
+intptr_t SetAccessoryRenderingCB(br_actor* pActor, void* pFlag) {
     if (pActor->identifier && *pActor->identifier == '&') {
         pActor->render_style = *(br_uint_8*)pFlag;
     }

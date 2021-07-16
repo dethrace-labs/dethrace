@@ -17,9 +17,9 @@ void XZToColumnXZ(tU8* pColumn_x, tU8* pColumn_z, br_scalar pX, br_scalar pZ, tT
 
 void StripBlendedFaces(br_actor* pActor, br_model* pModel);
 
-br_uint_32 FindNonCarsCB(br_actor* pActor, tTrack_spec* pTrack_spec);
+/*br_uint_32*/ intptr_t FindNonCarsCB(br_actor* pActor, tTrack_spec* pTrack_spec);
 
-br_uint_32 ProcessModelsCB(br_actor* pActor, tTrack_spec* pTrack_spec);
+/*br_uint_32*/ intptr_t ProcessModelsCB(br_actor* pActor, tTrack_spec* pTrack_spec);
 
 void ProcessModels(tTrack_spec* pTrack_spec);
 

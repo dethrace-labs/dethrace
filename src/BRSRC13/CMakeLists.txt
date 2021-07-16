@@ -26,7 +26,7 @@ if(NOT MSVC)
         -Wno-sign-compare
         -Wno-int-conversion  #todo!
         -Wno-strict-aliasing
-        -Wno-cast-function-type  # (DfNameSizeText pointer)
+        -Wno-bad-function-cast  # (DfNameSizeText pointer)
     )
     
     target_link_libraries(brender PUBLIC m)
