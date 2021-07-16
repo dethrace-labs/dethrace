@@ -21,8 +21,8 @@ if (CMAKE_C_COMPILER_ID MATCHES "Clang")
         -Wno-return-type
         -Wno-unused-variable
         -Wno-unused-parameter
-        -Wno-sign-compare
         -Wno-unused-result
+        -Wno-error=sign-compare
     )
 elseif (CMAKE_C_COMPILER_ID STREQUAL "GNU")
     target_compile_options(dethrace_obj PRIVATE
@@ -32,9 +32,10 @@ elseif (CMAKE_C_COMPILER_ID STREQUAL "GNU")
         -Wno-return-type
         -Wno-unused-variable
         -Wno-unused-parameter
-        -Wno-sign-compare
         -Wno-unused-result
-        -Wno-unused-but-set-variable  # (SelectRaceDraw::test2)
+        -Wno-error=sign-compare
+        -Wno-error=format-overflow
+        -Wno-error=unused-but-set-variable  # (SelectRaceDraw::test2)
     )
 else()
     target_compile_definitions(dethrace_obj PRIVATE -D_CRT_SECURE_NO_WARNINGS)
