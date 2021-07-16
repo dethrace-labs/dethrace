@@ -181,7 +181,6 @@ void Harness_Hook_BrV1dbRendererBegin(br_v1db_state* v1db) {
 int col = 128;
 
 void Harness_Hook_renderFaces(br_model* model, br_material* material, br_token type) {
-    //LOG_DEBUG("rendering model %s at %f, %f, %f", model->identifier, renderer_state->state.matrix.model_to_view.m[3][0], renderer_state->state.matrix.model_to_view.m[3][1], renderer_state->state.matrix.model_to_view.m[3][2]);
     current_renderer->renderModel(model, renderer_state->state.matrix.model_to_view);
 }
 

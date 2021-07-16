@@ -30,6 +30,8 @@ int SummCheckGameOver(int* pCurrent_choice, int* pCurrent_mode);
 
 tSO_result DoEndRaceSummary1();
 
+void PrepareBoundingRadius_0(br_model* model);
+
 void BuildWrecks();
 
 void DisposeWrecks();
@@ -66,7 +68,9 @@ int DamageScrnDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pE
 
 tSO_result DoEndRaceSummary2();
 
-void DrawColumnHeading(int pStr_index, int pX);
+void DrawAnItem_racesumm(int pX, int pY_index, int pFont_index, char* pText);
+
+void DrawColumnHeading_racesumm(int pStr_index, int pX);
 
 int SortScores(void* pFirst_one, void* pSecond_one);
 

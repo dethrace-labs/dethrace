@@ -2136,6 +2136,12 @@ void BringCarToAGrindingHalt(tCollision_info* car) {
     NOT_IMPLEMENTED();
 }
 
+// IDA: int __usercall BoundsOverlapTest@<EAX>(br_bounds *b1@<EAX>, br_bounds *b2@<EDX>)
+int BoundsOverlapTest_car(br_bounds* b1, br_bounds* b2) {
+    LOG_TRACE("(%p, %p)", b1, b2);
+    NOT_IMPLEMENTED();
+}
+
 // IDA: int __usercall SimpleCarCarCollisionTest@<EAX>(tCollision_info *car1@<EAX>, tCollision_info *car2@<EDX>)
 int SimpleCarCarCollisionTest(tCollision_info* car1, tCollision_info* car2) {
     LOG_TRACE("(%p, %p)", car1, car2);

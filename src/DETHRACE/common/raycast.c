@@ -1,6 +1,6 @@
 #include "raycast.h"
 #include "brender.h"
-#include "finteray.h"
+#include "globvars.h"
 #include <stdlib.h>
 
 br_matrix34 gPick_model_to_view_raycast; //added _raycast suffix to avoid name collision
@@ -15,6 +15,8 @@ br_scalar gLowest_y_above;
 
 br_model* model_unk1;
 br_material* material_unk1;
+
+// Note: THIS is the _0 in Mac 3dfx build
 
 // IDA: int __usercall DRActorToRoot@<EAX>(br_actor *a@<EAX>, br_actor *world@<EDX>, br_matrix34 *m@<EBX>)
 int DRActorToRoot(br_actor* a, br_actor* world, br_matrix34* m) {
@@ -60,14 +62,24 @@ void InitRayCasting() {
 }
 
 // IDA: int __cdecl BadDiv(br_scalar a, br_scalar b)
-int BadDiv(br_scalar a, br_scalar b) {
+int BadDiv_raycast(br_scalar a, br_scalar b) {
     //LOG_TRACE("(%f, %f)", a, b);
 
     return fabs(b) < 1.0 && fabs(a) > fabs(b) * BR_SCALAR_MAX;
 }
 
+// Offset: 516
+// Size: 0x49
+//IDA: void __usercall DRVector2AccumulateScale(br_vector2 *a@<EAX>, br_vector2 *b@<EDX>, br_scalar s)
+void DRVector2AccumulateScale_raycast(br_vector2* a, br_vector2* b, br_scalar s) {
+    LOG_TRACE("(%p, %p, %f)", a, b, s);
+
+    a->v[0] = b->v[0] * s + a->v[0];
+    a->v[1] = b->v[1] * s + a->v[1];
+}
+
 // IDA: int __usercall PickBoundsTestRay@<EAX>(br_bounds *b@<EAX>, br_vector3 *rp@<EDX>, br_vector3 *rd@<EBX>, br_scalar t_near, br_scalar t_far, br_scalar *new_t_near, br_scalar *new_t_far)
-int PickBoundsTestRay(br_bounds* b, br_vector3* rp, br_vector3* rd, br_scalar t_near, br_scalar t_far, br_scalar* new_t_near, br_scalar* new_t_far) {
+int PickBoundsTestRay_raycast(br_bounds* b, br_vector3* rp, br_vector3* rd, br_scalar t_near, br_scalar t_far, br_scalar* new_t_near, br_scalar* new_t_far) {
     int i;
     float s;
     float t;
@@ -156,7 +168,7 @@ int ActorPick2D(br_actor* ap, br_model* model, br_material* material, dr_pick2d_
     BrMatrix34PreTransform(&gPick_model_to_view_raycast, &ap->t);
     if (ap->type == BR_ACTOR_MODEL) {
         BrMatrix34Inverse(&v_to_m, &gPick_model_to_view_raycast);
-        if (PickBoundsTestRay(
+        if (PickBoundsTestRay_raycast(
                 &this_model->bounds,
                 (br_vector3*)v_to_m.m[3],
                 (br_vector3*)v_to_m.m[2],
@@ -188,7 +200,7 @@ int ActorPick2D(br_actor* ap, br_model* model, br_material* material, dr_pick2d_
         }
     } else if (ap->type == BR_ACTOR_BOUNDS || ap->type == BR_ACTOR_BOUNDS_CORRECT) {
         BrMatrix34Inverse(&v_to_m, &gPick_model_to_view_raycast);
-        if (PickBoundsTestRay(
+        if (PickBoundsTestRay_raycast(
                 (br_bounds*)ap->type_data,
                 (br_vector3*)v_to_m.m[3],
                 (br_vector3*)v_to_m.m[2],
@@ -246,7 +258,7 @@ int DRScenePick2D(br_actor* world, br_actor* camera, dr_pick2d_cbfn* callback, v
 }
 
 // IDA: int __usercall DRModelPick2D@<EAX>(br_model *model@<EAX>, br_material *material@<EDX>, br_vector3 *ray_pos@<EBX>, br_vector3 *ray_dir@<ECX>, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn *callback, void *arg)
-int DRModelPick2D(br_model* model, br_material* material, br_vector3* ray_pos, br_vector3* ray_dir, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn* callback, void* arg) {
+int DRModelPick2D_raycast(br_model* model, br_material* material, br_vector3* ray_pos, br_vector3* ray_dir, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn* callback, void* arg) {
     DR_FACE* fp;
     int f;
     int axis_m;
@@ -295,7 +307,7 @@ int DRModelPick2D(br_model* model, br_material* material, br_vector3* ray_pos, b
                     + fp->eqn.v[2] * ray_pos->v[2]
                     + fp->eqn.v[0] * ray_pos->v[0]
                     - fp->eqn.v[3];
-                if (!BadDiv(numerator, d)) {
+                if (!BadDiv_raycast(numerator, d)) {
                     t = -(numerator / d);
                     if (t >= (t_near - 0.001) && t <= (t_far + 0.001)) {
                         p.v[0] = ray_dir->v[0] * t;
@@ -347,11 +359,11 @@ int DRModelPick2D(br_model* model, br_material* material, br_vector3* ray_pos, b
                             s_beta = beta;
                             map.v[0] = V11MODEL(model)->groups[group].vertices[fp->vertices[1]].map.v[0] * s_alpha;
                             map.v[1] = V11MODEL(model)->groups[group].vertices[fp->vertices[1]].map.v[1] * s_alpha;
-                            DRVector2AccumulateScale(
+                            DRVector2AccumulateScale_raycast(
                                 &map,
                                 &V11MODEL(model)->groups[group].vertices[fp->vertices[2]].map,
                                 s_beta);
-                            DRVector2AccumulateScale(
+                            DRVector2AccumulateScale_raycast(
                                 &map,
                                 &V11MODEL(model)->groups[group].vertices[fp->vertices[0]].map,
                                 1.0 - (s_alpha + s_beta));
@@ -396,6 +408,36 @@ int DRModelPick2D(br_model* model, br_material* material, br_vector3* ray_pos, b
     return 0;
 }
 
+//IDA: int __cdecl FindHighestPolyCallBack(br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3 *pPoint, br_vector2 *pMap, void *pArg)
+int FindHighestPolyCallBack_raycast(br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3* pPoint, br_vector2* pMap, void* pArg) {
+    br_scalar the_y;
+    LOG_TRACE("(%p, %p, %p, %p, %f, %d, %d, %d, %p, %p, %p)", pModel, pMaterial, pRay_pos, pRay_dir, pT, pF, pE, pV, pPoint, pMap, pArg);
+
+    if (pPoint->v[1] > gCurrent_y) {
+        if (gLowest_y_above > pPoint->v[1]) {
+            gLowest_y_above = pPoint->v[1];
+            gAbove_face_index = pF;
+            gAbove_model = pModel;
+        }
+    } else if (pPoint->v[1] > gHighest_y_below) {
+        gHighest_y_below = pPoint->v[1];
+        gBelow_face_index = pF;
+        gBelow_model = pModel;
+    }
+    return 0;
+}
+
+//IDA: int __cdecl FindHighestCallBack(br_actor *pActor, br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT_near, br_scalar pT_far, void *pArg)
+int FindHighestCallBack_raycast(br_actor* pActor, br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT_near, br_scalar pT_far, void* pArg) {
+    LOG_TRACE("(%p, %p, %p, %p, %p, %f, %f, %p)", pActor, pModel, pMaterial, pRay_pos, pRay_dir, pT_near, pT_far, pArg);
+
+    if (gProgram_state.current_car.current_car_actor < 0
+        || gProgram_state.current_car.car_model_actors[gProgram_state.current_car.current_car_actor].actor != pActor) {
+        DRModelPick2D_raycast(pModel, pMaterial, pRay_pos, pRay_dir, pT_near, pT_far, FindHighestPolyCallBack_raycast, pArg);
+    }
+    return 0;
+}
+
 // IDA: void __usercall FindBestY(br_vector3 *pPosition@<EAX>, br_actor *gWorld@<EDX>, br_scalar pStarting_height, br_scalar *pNearest_y_above, br_scalar *pNearest_y_below, br_model **pNearest_above_model, br_model **pNearest_below_model, int *pNearest_above_face_index, int *pNearest_below_face_index)
 void FindBestY(br_vector3* pPosition, br_actor* gWorld, br_scalar pStarting_height, br_scalar* pNearest_y_above, br_scalar* pNearest_y_below, br_model** pNearest_above_model, br_model** pNearest_below_model, int* pNearest_above_face_index, int* pNearest_below_face_index) {
     LOG_TRACE("(%p, %p, %f, %p, %p, %p, %p, %p, %p)", pPosition, gWorld, pStarting_height, pNearest_y_above, pNearest_y_below, pNearest_above_model, pNearest_below_model, pNearest_above_face_index, pNearest_below_face_index);
@@ -405,7 +447,7 @@ void FindBestY(br_vector3* pPosition, br_actor* gWorld, br_scalar pStarting_heig
     gCurrent_y = pPosition->v[1] + 0.000011920929;
     gY_picking_camera->t.t.euler.t = *pPosition;
     gY_picking_camera->t.t.mat.m[3][1] = gY_picking_camera->t.t.mat.m[3][1] + pStarting_height;
-    DRScenePick2D(gWorld, gY_picking_camera, FindHighestCallBack, 0);
+    DRScenePick2D(gWorld, gY_picking_camera, FindHighestCallBack_raycast, 0);
     *pNearest_y_above = gLowest_y_above;
     *pNearest_y_below = gHighest_y_below;
     *pNearest_above_model = gAbove_model;

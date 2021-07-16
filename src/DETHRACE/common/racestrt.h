@@ -203,6 +203,8 @@ void CheckPlayersAreResponding();
 
 void NetSynchStartStart();
 
+void DrawAnItem_racestrt(int pX, int pY_index, int pFont_index, char* pText);
+
 void NetSynchStartDraw(int pCurrent_choice, int pCurrent_mode);
 
 int NetSynchStartDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out);

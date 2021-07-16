@@ -32,7 +32,10 @@ char rscid[49];
 // IDA: void __usercall renderFaces(br_actor *actor@<EAX>, br_model *model@<EDX>, br_material *material@<EBX>, void *render_data@<ECX>, br_uint_8 style, int on_screen)
 void renderFaces(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen) {
     LOG_TRACE("(%p, %p, %p, %p, %d, %d)", actor, model, material, render_data, style, on_screen);
-
+    LOG_DEBUG("rendering faces for actor %s, type %d", actor->identifier, actor->type);
+    if (actor->parent) {
+        LOG_DEBUG("rendering faces for actor parent %p, %s, type %d", actor->parent, actor->parent->identifier, actor->parent->type);
+    }
     Harness_Hook_renderFaces(model, material, BRT_TRIANGLE);
 }
 

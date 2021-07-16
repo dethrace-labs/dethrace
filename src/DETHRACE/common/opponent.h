@@ -245,6 +245,10 @@ void ToggleMellowOpponents();
 
 void RepairOpponentsSystems();
 
+void CopyVertex_0(br_vertex* pDest_vertex, br_vertex* pSrc_vertex);
+
+void CopyFace_0(br_face* pDest_face, br_face* pSrc_face);
+
 void DeleteSection(tS16 pSection_to_delete);
 
 void DeleteNode(tS16 pNode_to_delete, int pAnd_sections);

@@ -31,10 +31,9 @@ tRenderer OpenGLRenderer = {
     Harness_GLRenderer_RenderCube
 };
 
-typedef struct tModel_context {
+typedef struct tStored_model_context {
     GLuint vao_id, ebo_id;
-    int ngroups, nfaces;
-} tModel_context;
+} tStored_model_context;
 
 SDL_GLContext context;
 GLuint screen_buffer_vao, screen_buffer_ebo;
@@ -236,110 +235,111 @@ void Harness_GLRenderer_Swap(SDL_Window* window) {
 }
 
 void build_model(br_model* model) {
+    tStored_model_context* ctx;
+    v11model* v11;
+
+    v11 = model->prepared;
+    ctx = malloc(sizeof(tStored_model_context));
+
+    int total_verts = 0, total_faces = 0;
+    for (int i = 0; i < v11->ngroups; i++) {
+        total_verts += v11->groups[i].nvertices;
+        total_faces += v11->groups[i].nfaces;
+    }
+
+    // override normals
+    br_vector3 v3 = { 0, 0, 0 };
+    for (int g = 0; g < v11->ngroups; g++) {
+        for (int i = 0; i < v11->groups[g].nvertices; i++) {
+            v11->groups[g].vertices[i].n = v3;
+        }
+    }
+    br_vector3 v0v1, v2v1, normal;
+    for (int g = 0; g < v11->ngroups; g++) {
+        v11group* group = &v11->groups[g];
+        for (int i = 0; i < group->nfaces; i++) {
+            v11face* f = &group->faces[i];
+            fmt_vertex* v0 = &group->vertices[f->vertices[0]];
+            fmt_vertex* v1 = &group->vertices[f->vertices[1]];
+            fmt_vertex* v2 = &group->vertices[f->vertices[2]];
+            BrVector3Sub(&v0v1, &v0->p, &v1->p);
+            BrVector3Sub(&v2v1, &v2->p, &v1->p);
+            BrVector3Cross(&normal, &v0v1, &v2v1);
+            BrVector3Accumulate(&v0->n, &normal);
+            BrVector3Accumulate(&v1->n, &normal);
+            BrVector3Accumulate(&v2->n, &normal);
+        }
+    }
+    for (int g = 0; g < v11->ngroups; g++) {
+        for (int i = 0; i < v11->groups[g].nvertices; i++) {
+            BrVector3Normalise(&v11->groups[g].vertices[i].n, &v11->groups[g].vertices[i].n);
+        }
+    }
+
+    int stride = 6;
+    float* verts = malloc(sizeof(float) * stride * total_verts);
+    unsigned int* indices = malloc(sizeof(int) * 3 * total_faces);
+
+    int v_index = 0;
+    int i_index = 0;
+    int face_offset = 0;
+    for (int g = 0; g < v11->ngroups; g++) {
+        for (int i = 0; i < v11->groups[g].nvertices; i++) {
+            fmt_vertex* v = &v11->groups[g].vertices[i];
+            verts[v_index++] = v->p.v[0];
+            verts[v_index++] = v->p.v[1];
+            verts[v_index++] = v->p.v[2];
+            verts[v_index++] = v->n.v[0];
+            verts[v_index++] = v->n.v[1];
+            verts[v_index++] = v->n.v[2];
+        }
+        for (int i = 0; i < v11->groups[g].nfaces; i++) {
+            v11face* f = &v11->groups[g].faces[i];
+            indices[i_index++] = f->vertices[0] + face_offset;
+            indices[i_index++] = f->vertices[1] + face_offset;
+            indices[i_index++] = f->vertices[2] + face_offset;
+        }
+        face_offset += v11->groups[g].nvertices;
+    }
+
+    glGenVertexArrays(1, &ctx->vao_id);
+    GLuint vbo_id;
+    glGenBuffers(1, &vbo_id);
+    glGenBuffers(1, &ctx->ebo_id);
+
+    // Vertices { position, normal }
+    glBindVertexArray(ctx->vao_id);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * stride * total_verts, verts, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    // Indices
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx->ebo_id);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * 3 * total_faces, indices, GL_STATIC_DRAW);
+    glBindVertexArray(0);
+
+    free(verts);
+    free(indices);
+
+    model->stored = ctx;
 }
 
 void Harness_GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
-    tModel_context* ctx;
-    ctx = model->harness_user_data;
+    tStored_model_context* ctx;
+    ctx = model->stored;
     v11model* v11 = model->prepared;
 
     if (v11 == NULL) {
-        LOG_WARN("No model prepared for %s", model->identifier);
+        //LOG_WARN("No model prepared for %s", model->identifier);
         return;
     }
 
     if (ctx == NULL) {
         build_model(model);
-        ctx = malloc(sizeof(tModel_context));
-
-        int total_verts = 0, total_faces = 0;
-        for (int i = 0; i < v11->ngroups; i++) {
-            total_verts += v11->groups[i].nvertices;
-            total_faces += v11->groups[i].nfaces;
-        }
-
-        LOG_DEBUG("prepping model %d %d, %d %d", model->nvertices, model->nfaces, total_verts, total_faces);
-
-        // override normals
-        br_vector3 v3 = { 0, 0, 0 };
-        for (int g = 0; g < v11->ngroups; g++) {
-            for (int i = 0; i < v11->groups[g].nvertices; i++) {
-                v11->groups[g].vertices[i].n = v3;
-            }
-        }
-        br_vector3 v0v1, v2v1, normal;
-        for (int g = 0; g < v11->ngroups; g++) {
-            v11group* group = &v11->groups[g];
-            for (int i = 0; i < group->nfaces; i++) {
-                v11face* f = &group->faces[i];
-                fmt_vertex* v0 = &group->vertices[f->vertices[0]];
-                fmt_vertex* v1 = &group->vertices[f->vertices[1]];
-                fmt_vertex* v2 = &group->vertices[f->vertices[2]];
-                BrVector3Sub(&v0v1, &v0->p, &v1->p);
-                BrVector3Sub(&v2v1, &v2->p, &v1->p);
-                BrVector3Cross(&normal, &v0v1, &v2v1);
-                BrVector3Accumulate(&v0->n, &normal);
-                BrVector3Accumulate(&v1->n, &normal);
-                BrVector3Accumulate(&v2->n, &normal);
-            }
-        }
-        for (int g = 0; g < v11->ngroups; g++) {
-            for (int i = 0; i < v11->groups[g].nvertices; i++) {
-                BrVector3Normalise(&v11->groups[g].vertices[i].n, &v11->groups[g].vertices[i].n);
-            }
-        }
-
-        int stride = 6;
-        float* verts = malloc(sizeof(float) * stride * total_verts);
-        unsigned int* indices = malloc(sizeof(int) * 3 * total_faces);
-
-        int v_index = 0;
-        int i_index = 0;
-        int face_offset = 0;
-        for (int g = 0; g < v11->ngroups; g++) {
-            for (int i = 0; i < v11->groups[g].nvertices; i++) {
-                fmt_vertex* v = &v11->groups[g].vertices[i];
-                verts[v_index++] = v->p.v[0];
-                verts[v_index++] = v->p.v[1];
-                verts[v_index++] = v->p.v[2];
-                verts[v_index++] = v->n.v[0];
-                verts[v_index++] = v->n.v[1];
-                verts[v_index++] = v->n.v[2];
-            }
-            for (int i = 0; i < v11->groups[g].nfaces; i++) {
-                v11face* f = &v11->groups[g].faces[i];
-                indices[i_index++] = f->vertices[0] + face_offset;
-                indices[i_index++] = f->vertices[1] + face_offset;
-                indices[i_index++] = f->vertices[2] + face_offset;
-            }
-            face_offset += v11->groups[g].nvertices;
-        }
-
-        glGenVertexArrays(1, &ctx->vao_id);
-        GLuint vbo_id;
-        glGenBuffers(1, &vbo_id);
-        glGenBuffers(1, &ctx->ebo_id);
-
-        // Vertices { position, normal }
-        glBindVertexArray(ctx->vao_id);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * stride * total_verts, verts, GL_STATIC_DRAW);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)(3 * sizeof(float)));
-        glEnableVertexAttribArray(1);
-
-        // Indices
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx->ebo_id);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * 3 * total_faces, indices, GL_STATIC_DRAW);
-        glBindVertexArray(0);
-
-        free(verts);
-        free(indices);
-
-        ctx->nfaces = total_faces;
-        model->harness_user_data = ctx;
-
+        ctx = model->stored;
         DebugCamera_SetPosition(model_matrix.m[3][0], model_matrix.m[3][1], model_matrix.m[3][2]);
     }
 
@@ -356,7 +356,6 @@ void Harness_GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
     GLuint model_u = glGetUniformLocation(shader_program_3d, "model");
     glUniformMatrix4fv(model_u, 1, GL_FALSE, m);
 
-    ctx = model->harness_user_data;
     glBindVertexArray(ctx->vao_id);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx->ebo_id);
 

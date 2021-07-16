@@ -25,25 +25,16 @@ void BrDbModelRender(br_actor* actor, br_model* model, br_material* material, vo
     //     return;
     // }
 
-    /*
-	 * Mark local copy of model_to_screen as invalid
-	 */
     v1db.model_to_screen_valid = 0;
-
-    /*
-	 * If model has custom callback, keep following it until
-	 * a model is reached
-	 */
     if (use_custom && (model->flags & BR_MODF_CUSTOM)) {
-        /*
-		 * XXX Fetch current transforms from renderer
-		 */
+        TELL_ME_IF_WE_PASS_THIS_WAY();
         model->custom(actor, model, material, render_data, style, on_screen);
         return;
     }
 
     if (model->prepared == NULL && model->stored == NULL) {
-        // TODO:    BR_ERROR1("Tried to render un-prepared model %s", model->identifier ? model->identifier : "<NULL>");
+        TELL_ME_IF_WE_PASS_THIS_WAY();
+        // TODO:    BrFailure("Tried to render un-prepared model %s", model->identifier ? model->identifier : "<NULL>");
     }
 
     RenderStyleCalls[style](actor, model, material, render_data, style, on_screen);
@@ -97,15 +88,9 @@ void actorRender(br_actor* ap, br_model* model, br_material* material, void* ren
     br_token s;
     LOG_TRACE("(%p, %p, %p, %p, %d, %d)", ap, model, material, render_data, style, t);
 
-    /*
-	 * Ignore actors with no children that are not models, and actors with renderstyle = NONE
-	 */
     if (ap->children == NULL && ap->type != BR_ACTOR_MODEL)
         return;
 
-    /*
-	 * See if this actor overrides default material, model, render_data or style
-	 */
     if (ap->render_style != BR_RSTYLE_DEFAULT)
         style = ap->render_style;
 
@@ -116,19 +101,11 @@ void actorRender(br_actor* ap, br_model* model, br_material* material, void* ren
     this_model = ap->model ? ap->model : model;
     this_render_data = ap->render_data ? ap->render_data : render_data;
 
-    /*
-	 * Catch special case of identity transforms
-	 */
     if (ap->t.type == BR_TRANSFORM_IDENTITY) {
-        /**
-		 ** Actor has no transform
-		 **/
+
         switch (ap->type) {
 
         case BR_ACTOR_MODEL:
-            /*
-			 * This is a model -  see if model's bounding box is on screen
-			 */
 
             if ((s = BrOnScreenCheck(&this_model->bounds)) != BRT_REJECT) {
                 BrDbModelRender(ap, this_model, this_material, this_render_data, style, s, 1);
@@ -136,50 +113,32 @@ void actorRender(br_actor* ap, br_model* model, br_material* material, void* ren
             break;
 
         case BR_ACTOR_BOUNDS:
-            /*
-			 * A bounding box - truncate whole tree if rejected
-			 */
+
             if (BrOnScreenCheck(ap->type_data) == BRT_REJECT)
-                /* DONT PROCESS CHILDREN */
                 return;
             break;
 
         case BR_ACTOR_BOUNDS_CORRECT:
-            /*
-			 * A garuanteed bounding box - test to see if it is on screen
-			 */
+
             switch (BrOnScreenCheck(ap->type_data)) {
 
             case BRT_ACCEPT:
-                /*
-				 * Bounding box is completely on screen - process children with special loop
-				 */
+
                 BR_FOR_SIMPLELIST(&ap->children, a)
                 actorRenderOnScreen(a, this_model, this_material, this_render_data, style, t);
-                /* FALL THROUGH */
 
             case BRT_REJECT:
-                /* DONT PROCESS CHILDREN */
+
                 return;
             }
         }
 
-        /*
-		 * Recurse for children
-		 */
         BR_FOR_SIMPLELIST(&ap->children, a)
         actorRender(a, this_model, this_material, this_render_data, style, t);
 
         return;
     }
 
-    /**
-	 ** Actor has a transform
-	 **/
-
-    /*
-	 * Save the current transforms
-	 */
     RendererStatePush(v1db.renderer, BR_STATE_MATRIX);
 
     t = prependActorTransform(ap, t);
@@ -187,18 +146,12 @@ void actorRender(br_actor* ap, br_model* model, br_material* material, void* ren
     switch (ap->type) {
 
     case BR_ACTOR_MODEL:
-        /*
-		 * This is a model -  see if model's bounding box is on screen
-		 */
         if ((s = BrOnScreenCheck(&this_model->bounds)) != BRT_REJECT) {
             BrDbModelRender(ap, this_model, this_material, this_render_data, style, s, 1);
         }
         break;
 
     case BR_ACTOR_BOUNDS:
-        /*
-		 * A bounding box - truncate whole tree if rejected
-		 */
         if (BrOnScreenCheck(ap->type_data) == BRT_REJECT) {
             RendererStatePop(v1db.renderer, BR_STATE_MATRIX);
             return;
@@ -206,37 +159,20 @@ void actorRender(br_actor* ap, br_model* model, br_material* material, void* ren
         break;
 
     case BR_ACTOR_BOUNDS_CORRECT:
-        /*
-		 * A garuanteed bounding box - test to see if it is on screen
-		 */
         switch (BrOnScreenCheck(ap->type_data)) {
 
         case BRT_ACCEPT:
-            /*
-			 * Bounding box is completely on screen - process children with special loop
-			 */
             BR_FOR_SIMPLELIST(&ap->children, a)
             actorRenderOnScreen(a, this_model, this_material, this_render_data, style, t);
-            /* FALL THROUGH */
 
         case BRT_REJECT:
-            /*
-			 * Don't process children
-			 */
             RendererStatePop(v1db.renderer, BR_STATE_MATRIX);
             return;
         }
     }
 
-    /*
-	 * Recurse for children
-	 */
     BR_FOR_SIMPLELIST(&ap->children, a)
     actorRender(a, this_model, this_material, this_render_data, style, t);
-
-    /*
-	 * Restore transforms
-	 */
     RendererStatePop(v1db.renderer, BR_STATE_MATRIX);
 }
 
@@ -278,9 +214,6 @@ void sceneRenderAdd(br_actor* tree) {
     style = BR_RSTYLE_DEFAULT;
 
     if (tree->parent == NULL) {
-        /*
-		 * Simple case for when added tree is unconnected
-		 */
         actorRender(tree,
             v1db.default_model,
             v1db.default_material,
@@ -292,13 +225,7 @@ void sceneRenderAdd(br_actor* tree) {
     t = BR_TRANSFORM_IDENTITY;
     BrMatrix34Identity(&m);
 
-    /*
-	 * Walk back to current rendering root
-	 */
     for (a = tree->parent; a; a = a->parent) {
-        /*
-		 * Closest material, model and render_data
-		 */
         if (material == NULL && a->material)
             material = a->material;
 
@@ -307,24 +234,12 @@ void sceneRenderAdd(br_actor* tree) {
 
         if (render_data == NULL && a->render_data)
             render_data = a->render_data;
-        /*
-		 * Furthest style
-		 */
         if (a->render_style != BR_RSTYLE_DEFAULT)
             style = a->render_style;
 
-        /*
-		 * Quit if we have go the the root that is
-		 * being used for the current rendering pass
-		 * (before accumulating transform s.t. we do not
-		 * include root's transform
-		 */
         if (a == v1db.render_root)
             break;
 
-        /*
-		 * Accumulate transform 
-		 */
         if (a->t.type != BR_TRANSFORM_IDENTITY) {
             BrMatrix34PostTransform(&m, &a->t);
             t = BrTransformCombineTypes(t, a->t.type);
@@ -343,13 +258,10 @@ void sceneRenderAdd(br_actor* tree) {
     if (t == BR_TRANSFORM_IDENTITY) {
         actorRender(tree, model, material, render_data, style, (br_uint_16)v1db.ttype);
     } else {
-        // RendererStatePush(v1db.renderer, BR_STATE_MATRIX);
-
+        RendererStatePush(v1db.renderer, BR_STATE_MATRIX);
         t = prependMatrix(&m, (unsigned short)t, (unsigned short)v1db.ttype);
-
         actorRender(tree, model, material, render_data, style, (br_uint_16)t);
-
-        // RendererStatePop(v1db.renderer, BR_STATE_MATRIX);
+        RendererStatePop(v1db.renderer, BR_STATE_MATRIX);
     }
 }
 

@@ -1601,6 +1601,12 @@ void NetSynchStartStart() {
     NOT_IMPLEMENTED();
 }
 
+//IDA: void __usercall DrawAnItem(int pX@<EAX>, int pY_index@<EDX>, int pFont_index@<EBX>, char *pText@<ECX>)
+void DrawAnItem_racestrt(int pX, int pY_index, int pFont_index, char* pText) {
+    LOG_TRACE("(%d, %d, %d, \"%s\")", pX, pY_index, pFont_index, pText);
+    NOT_IMPLEMENTED();
+}
+
 // IDA: void __usercall NetSynchStartDraw(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
 void NetSynchStartDraw(int pCurrent_choice, int pCurrent_mode) {
     int i;

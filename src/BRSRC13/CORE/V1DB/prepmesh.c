@@ -563,8 +563,11 @@ void BrModelUpdate(br_model* model, br_uint_16 flags) {
     br_face* fp;
     LOG_TRACE("(%p, %d)", model, flags);
 
+    LOG_DEBUG("flags %d", model->flags);
     if (!(model->flags & BR_MODF_PREPREPARED)) {
+        LOG_DEBUG("inside confi");
         if (!model->faces || !model->vertices) {
+            LOG_DEBUG("exit 2");
             BrFailure("BrModelUpdate: model has no faces or vertices (%s)", model->identifier ? model->identifier : "<NULL>");
         }
         if (flags & BR_MODU_UNKNOWN) {
@@ -579,6 +582,7 @@ void BrModelUpdate(br_model* model, br_uint_16 flags) {
         }
         if (!model->prepared || flags & 0xFFD0) {
             if (!model->faces || !model->vertices) {
+                LOG_DEBUG("exit 1");
                 return;
             }
             PrepareFaceNormals(model);
@@ -600,13 +604,17 @@ void BrModelUpdate(br_model* model, br_uint_16 flags) {
 
             PrepareGroups(model);
             v11m = (v11model*)model->prepared;
+
             if (v11m) {
+                LOG_DEBUG("has prepared model");
                 for (g = 0; g < v11m->ngroups; g++) {
                     //prepareEdges(&v11m->groups[g], model);
                 }
+            } else {
+                LOG_DEBUG("has prepared model FALSE");
             }
         } else {
-            LOG_WARN("Do we ever get here??");
+            TELL_ME_IF_WE_PASS_THIS_WAY();
             // v11m = (v11model*)model->prepared;
             // if (model->vertices && flags & 0xF) {
             //     for (g = 0; g < v11m->ngroups; g++) {

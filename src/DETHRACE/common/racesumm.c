@@ -127,6 +127,16 @@ tSO_result DoEndRaceSummary1() {
     NOT_IMPLEMENTED();
 }
 
+//IDA: void __usercall PrepareBoundingRadius(br_model *model@<EAX>)
+void PrepareBoundingRadius_0(br_model* model) {
+    float d;
+    float max;
+    int v;
+    br_vertex* vp;
+    LOG_TRACE("(%p)", model);
+    NOT_IMPLEMENTED();
+}
+
 // IDA: void __cdecl BuildWrecks()
 void BuildWrecks() {
     int cat;
@@ -284,6 +294,17 @@ tSO_result DoEndRaceSummary2() {
     int result;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
+}
+
+//IDA: void __usercall DrawAnItem(int pX@<EAX>, int pY_index@<EDX>, int pFont_index@<EBX>, char *pText@<ECX>)
+void DrawAnItem_racesumm(int pX, int pY_index, int pFont_index, char* pText) {
+    LOG_TRACE("(%d, %d, %d, \"%s\")", pX, pY_index, pFont_index, pText);
+    NOT_IMPLEMENTED();
+}
+
+//IDA: void __usercall DrawColumnHeading(int pStr_index@<EAX>, int pX@<EDX>)
+void DrawColumnHeading_racesumm(int pStr_index, int pX) {
+    LOG_TRACE("(%d, %d)", pStr_index, pX);
 }
 
 // IDA: int __usercall SortScores@<EAX>(void *pFirst_one@<EAX>, void *pSecond_one@<EDX>)

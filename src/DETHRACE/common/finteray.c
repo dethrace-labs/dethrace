@@ -1,7 +1,6 @@
 #include "finteray.h"
 #include "brender.h"
 #include "globvars.h"
-#include "raycast.h"
 #include <stdlib.h>
 
 br_matrix34 gPick_model_to_view;
@@ -17,12 +16,29 @@ br_material* gReal_material;
 br_scalar gNearest_T;
 tFace_ref* gPling_face;
 
+// IDA: int __cdecl BadDiv(br_scalar a, br_scalar b)
+int BadDiv_finteray(br_scalar a, br_scalar b) {
+    //LOG_TRACE("(%f, %f)", a, b);
+
+    return fabs(b) < 1.0 && fabs(a) > fabs(b) * BR_SCALAR_MAX;
+}
+
 // IDA: void __usercall DRVector2AccumulateScale(br_vector2 *a@<EAX>, br_vector2 *b@<EDX>, br_scalar s)
-void DRVector2AccumulateScale(br_vector2* a, br_vector2* b, br_scalar s) {
+void DRVector2AccumulateScale_finteray(br_vector2* a, br_vector2* b, br_scalar s) {
     LOG_TRACE("(%p, %p, %f)", a, b, s);
 
     a->v[0] = b->v[0] * s + a->v[0];
     a->v[1] = b->v[1] * s + a->v[1];
+}
+
+// Offset: 180
+// Size: 0x228
+//IDA: int __usercall PickBoundsTestRay@<EAX>(br_bounds *b@<EAX>, br_vector3 *rp@<EDX>, br_vector3 *rd@<EBX>, br_scalar t_near, br_scalar t_far, br_scalar *new_t_near, br_scalar *new_t_far)
+int PickBoundsTestRay_finteray(br_bounds* b, br_vector3* rp, br_vector3* rd, br_scalar t_near, br_scalar t_far, br_scalar* new_t_near, br_scalar* new_t_far) {
+    int i;
+    float s;
+    float t;
+    LOG_TRACE("(%p, %p, %p, %f, %f, %p, %p)", b, rp, rd, t_near, t_far, new_t_near, new_t_far);
 }
 
 // IDA: int __usercall ActorRayPick2D@<EAX>(br_actor *ap@<EAX>, br_vector3 *pPosition@<EDX>, br_vector3 *pDir@<EBX>, br_model *model@<ECX>, br_material *material, dr_pick2d_cbfn *callback)
@@ -48,31 +64,65 @@ int DRSceneRayPick2D(br_actor* world, br_vector3* pPosition, br_vector3* pDir, d
     NOT_IMPLEMENTED();
 }
 
+// Offset: 1544
+// Size: 0x80b
+//IDA: int __usercall DRModelPick2D@<EAX>(br_model *model@<EAX>, br_material *material@<EDX>, br_vector3 *ray_pos@<EBX>, br_vector3 *ray_dir@<ECX>, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn *callback, void *arg)
+int DRModelPick2D_finteray(br_model* model, br_material* material, br_vector3* ray_pos, br_vector3* ray_dir, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn* callback, void* arg) {
+    DR_FACE* fp;
+    int f;
+    int axis_m;
+    int axis_0;
+    int axis_1;
+    br_scalar t;
+    br_scalar n;
+    br_scalar d;
+    br_vector3 p;
+    float u0;
+    float u1;
+    float u2;
+    float v0;
+    float v1;
+    float v2;
+    br_scalar v0i1;
+    br_scalar v0i2;
+    float alpha;
+    float beta;
+    float f_d;
+    float f_n;
+    br_scalar s_alpha;
+    br_scalar s_beta;
+    br_vector2 map;
+    int v;
+    int e;
+    int r;
+    br_material* this_material;
+    br_scalar numerator;
+    float f_numerator;
+    int group;
+    LOG_TRACE("(%p, %p, %p, %p, %f, %f, %p, %p)", model, material, ray_pos, ray_dir, t_near, t_far, callback, arg);
+    NOT_IMPLEMENTED();
+}
+
 // IDA: int __cdecl FindHighestPolyCallBack(br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3 *pPoint, br_vector2 *pMap, void *pArg)
-int FindHighestPolyCallBack(br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3* pPoint, br_vector2* pMap, void* pArg) {
+int FindHighestPolyCallBack_finteray(br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3* pPoint, br_vector2* pMap, void* pArg) {
     LOG_TRACE("(%p, %p, %p, %p, %f, %d, %d, %d, %p, %p, %p)", pModel, pMaterial, pRay_pos, pRay_dir, pT, pF, pE, pV, pPoint, pMap, pArg);
 
-    if (pPoint->v[1] > gCurrent_y) {
-        if (gLowest_y_above > pPoint->v[1]) {
-            gLowest_y_above = pPoint->v[1];
-            gAbove_face_index = pF;
-            gAbove_model = pModel;
-        }
-    } else if (pPoint->v[1] > gHighest_y_below) {
-        gHighest_y_below = pPoint->v[1];
-        gBelow_face_index = pF;
-        gBelow_model = pModel;
+    if (pT < (double)gNearest_T) {
+        gNearest_T = pT;
+        gNearest_model = pModel;
+        gNearest_face = pF;
+        gNearest_face_group = gTemp_group;
     }
     return 0;
 }
 
 // IDA: int __cdecl FindHighestCallBack(br_actor *pActor, br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT_near, br_scalar pT_far, void *pArg)
-int FindHighestCallBack(br_actor* pActor, br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT_near, br_scalar pT_far, void* pArg) {
+int FindHighestCallBack_finteray(br_actor* pActor, br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT_near, br_scalar pT_far, void* pArg) {
     LOG_TRACE("(%p, %p, %p, %p, %p, %f, %f, %p)", pActor, pModel, pMaterial, pRay_pos, pRay_dir, pT_near, pT_far, pArg);
 
     if (gProgram_state.current_car.current_car_actor < 0
         || gProgram_state.current_car.car_model_actors[gProgram_state.current_car.current_car_actor].actor != pActor) {
-        DRModelPick2D(pModel, pMaterial, pRay_pos, pRay_dir, pT_near, pT_far, FindHighestPolyCallBack, pArg);
+        DRModelPick2D_finteray(pModel, pMaterial, pRay_pos, pRay_dir, pT_near, pT_far, FindHighestPolyCallBack_finteray, pArg);
     }
     return 0;
 }
@@ -274,7 +324,7 @@ void ClipToPlaneLE(br_vector3* p, int* nv, int i, br_scalar limit) {
 }
 
 // IDA: int __usercall BoundsOverlapTest@<EAX>(br_bounds *b1@<EAX>, br_bounds *b2@<EDX>)
-int BoundsOverlapTest(br_bounds* b1, br_bounds* b2) {
+int BoundsOverlapTest_finteray(br_bounds* b1, br_bounds* b2) {
     LOG_TRACE("(%p, %p)", b1, b2);
     NOT_IMPLEMENTED();
 }

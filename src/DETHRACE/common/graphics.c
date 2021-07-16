@@ -1893,7 +1893,7 @@ void InitShadow() {
     // dword_1316C4 = 0xBF800000;
 
     gShadow_model = BrModelAllocate(NULL, 0, 0);
-    gShadow_model->flags = 6;
+    gShadow_model->flags = BR_MODF_GENERATE_TAGS | BR_MODF_KEEP_ORIGINAL;
     gShadow_actor = BrActorAllocate(BR_ACTOR_MODEL, 0);
     gShadow_actor->model = gShadow_model;
     BrActorAdd(gUniverse_actor, gShadow_actor);
