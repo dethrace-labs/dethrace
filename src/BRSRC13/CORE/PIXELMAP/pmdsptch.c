@@ -333,7 +333,7 @@ void BrPixelmapText(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_uint_32 colou
             br_uint_16 src_offset = font->encoding[(br_uint_8)text[i]];
 
             for (int fy = 0; fy < font->glyph_y; fy++) {
-                br_uint_8 b;
+                br_uint_8 b = 0;
 
                 for (int fx = 0; fx < pw; fx++) {
                     if (fx % 8 == 0) {
