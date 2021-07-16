@@ -234,7 +234,7 @@ void DrawNumberAt(br_pixelmap* gImage, int pX, int pY, int pX_pitch, int pY_pitc
 void BuildColourTable(br_pixelmap* pPalette) {
     int i;
     int j;
-    int nearest_index;
+    int nearest_index = 0;
     int red;
     int green;
     int blue;
@@ -259,7 +259,6 @@ void BuildColourTable(br_pixelmap* pPalette) {
             }
         }
         gColours[i] = nearest_index;
-        LOG_DEBUG("color %d %d", i, gColours[i]);
     }
 }
 
