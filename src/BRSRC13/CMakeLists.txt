@@ -18,7 +18,6 @@ if(NOT MSVC)
     target_compile_options(brender PRIVATE
         -g
         -Wall
-        -Wextra
         -Werror
         -Wno-return-type
         -Wno-unused-variable
@@ -26,7 +25,6 @@ if(NOT MSVC)
         -Wno-sign-compare
         -Wno-int-conversion  #todo!
         -Wno-strict-aliasing
-        -Wno-bad-function-cast  # (DfNameSizeText pointer)
     )
     
     target_link_libraries(brender PUBLIC m)
