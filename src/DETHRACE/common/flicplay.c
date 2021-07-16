@@ -912,8 +912,8 @@ void DoDeltaTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
                 if (size_count < 0) {
                     the_word = *(tU16*)pFlic_info->data;
                     pFlic_info->data += 2;
-                    the_byte = the_word & 0xff;
-                    the_byte2 = the_word >> 8 & 0xff;
+                    //the_byte = the_word & 0xff;
+                    //the_byte2 = the_word >> 8 & 0xff;
 
                     for (k = 0; k < -size_count; k++) {
                         if (the_word) {
