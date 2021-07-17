@@ -454,7 +454,7 @@ void FindBestY(br_vector3* pPosition, br_actor* gWorld, br_scalar pStarting_heig
     *pNearest_below_model = gBelow_model;
     *pNearest_above_face_index = gAbove_face_index;
     *pNearest_below_face_index = gBelow_face_index;
-    LOG_DEBUG("FindBestY %f %f '%s' '%s' %d %d", gLowest_y_above, gHighest_y_below, gAbove_model->identifier, gBelow_model->identifier, gAbove_face_index, gBelow_face_index);
+    //LOG_DEBUG("FindBestY %f %f '%s' '%s' %d %d", gLowest_y_above, gHighest_y_below, gAbove_model->identifier, gBelow_model->identifier, gAbove_face_index, gBelow_face_index);
 }
 
 // IDA: int __cdecl FindYVerticallyBelowPolyCallBack(br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3 *pPoint, br_vector2 *pMap, void *pArg)

@@ -643,7 +643,13 @@ void FlicPaletteAllocate() {
 // IDA: void __usercall AssertFlicPixelmap(tFlic_descriptor_ptr pFlic_info@<EAX>, br_pixelmap *pDest_pixelmap@<EDX>)
 void AssertFlicPixelmap(tFlic_descriptor_ptr pFlic_info, br_pixelmap* pDest_pixelmap) {
     LOG_TRACE("(%d, %p)", pFlic_info, pDest_pixelmap);
-    NOT_IMPLEMENTED();
+
+    if (pDest_pixelmap) {
+        pFlic_info->first_pixel = (tU8*)pDest_pixelmap->pixels
+            + pFlic_info->x_offset
+            + pFlic_info->y_offset * pDest_pixelmap->row_bytes;
+    }
+    pFlic_info->the_pixelmap = pDest_pixelmap;
 }
 
 // IDA: int __usercall StartFlic@<EAX>(char *pFile_name@<EAX>, int pIndex@<EDX>, tFlic_descriptor_ptr pFlic_info@<EBX>, tU32 pSize@<ECX>, tS8 *pData_ptr, br_pixelmap *pDest_pixelmap, int pX_offset, int pY_offset, int pFrame_rate)
