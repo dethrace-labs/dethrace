@@ -463,10 +463,24 @@ br_actor* DRActorFindRecurse(br_actor* pSearch_root, char* pName) {
 }
 
 // IDA: br_uint_32 __usercall DRActorEnumRecurseWithMat@<EAX>(br_actor *pActor@<EAX>, br_material *pMat@<EDX>, br_uint_32 (*pCall_back)(br_actor*, br_material*, void*)@<EBX>, void *pArg@<ECX>)
-br_uint_32 DRActorEnumRecurseWithMat(br_actor* pActor, br_material* pMat, br_uint_32 (*pCall_back)(br_actor*, br_material*, void*), void* pArg) {
+br_uint_32 DRActorEnumRecurseWithMat(br_actor* pActor, br_material* pMat, recurse_with_mat_cbfn* pCall_back, void* pArg) {
     br_uint_32 result;
     LOG_TRACE("(%p, %p, %p, %p)", pActor, pMat, pCall_back, pArg);
-    NOT_IMPLEMENTED();
+
+    if (pActor->material) {
+        pMat = pActor->material;
+    }
+    result = pCall_back(pActor, pMat, pArg);
+    if (result) {
+        return result;
+    }
+    for (pActor = pActor->children; pActor != NULL; pActor = pActor->next) {
+        result = DRActorEnumRecurseWithMat(pActor, pMat, pCall_back, pArg);
+        if (result) {
+            return result;
+        }
+    }
+    return 0;
 }
 
 // IDA: br_uint_32 __usercall DRActorEnumRecurseWithTrans@<EAX>(br_actor *pActor@<EAX>, br_matrix34 *pMatrix@<EDX>, br_uint_32 (*pCall_back)(br_actor*, br_matrix34*, void*)@<EBX>, void *pArg@<ECX>)

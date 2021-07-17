@@ -804,14 +804,20 @@ void DisposeFunkotronics(int pOwner) {
 // IDA: void __usercall AddProximityVertex(br_vector3 *pV@<EAX>, tFunkotronic_spec *pThe_funk@<EDX>)
 void AddProximityVertex(br_vector3* pV, tFunkotronic_spec* pThe_funk) {
     LOG_TRACE("(%p, %p)", pV, pThe_funk);
-    NOT_IMPLEMENTED();
+
+    pThe_funk->proximity_array[pThe_funk->proximity_count] = *pV;
+    pThe_funk->proximity_count++;
 }
 
 // IDA: void __cdecl AddProximityVertexXYZ(br_scalar pX, br_scalar pY, br_scalar pZ, tFunkotronic_spec *pThe_funk)
 void AddProximityVertexXYZ(br_scalar pX, br_scalar pY, br_scalar pZ, tFunkotronic_spec* pThe_funk) {
     br_vector3 v;
     LOG_TRACE("(%f, %f, %f, %p)", pX, pY, pZ, pThe_funk);
-    NOT_IMPLEMENTED();
+
+    v.v[0] = pX;
+    v.v[1] = pY;
+    v.v[2] = pZ;
+    AddProximityVertex(&v, pThe_funk);
 }
 
 // IDA: br_uint_32 __usercall CalcProximities@<EAX>(br_actor *pActor@<EAX>, br_material *pMat@<EDX>, tFunkotronic_spec *pThe_funk@<EBX>)
@@ -819,7 +825,21 @@ br_uint_32 CalcProximities(br_actor* pActor, br_material* pMat, tFunkotronic_spe
     br_face* the_face;
     int i;
     LOG_TRACE("(%p, %p, %p)", pActor, pMat, pThe_funk);
-    NOT_IMPLEMENTED();
+
+    if (pActor->model) {
+        if (pThe_funk->material == pMat) {
+            pThe_funk->proximity_count += 8;
+        } else {
+            the_face = pActor->model->faces;
+            for (i = 0; i < pActor->model->nfaces; i++) {
+                if (pThe_funk->material == the_face->material) {
+                    pThe_funk->proximity_count += 3;
+                }
+                the_face++;
+            }
+        }
+    }
+    return 0;
 }
 
 // IDA: br_uint_32 __usercall AddProximities@<EAX>(br_actor *pActor@<EAX>, br_material *pMat@<EDX>, tFunkotronic_spec *pThe_funk@<EBX>)
@@ -827,7 +847,62 @@ br_uint_32 AddProximities(br_actor* pActor, br_material* pMat, tFunkotronic_spec
     br_face* the_face;
     int i;
     LOG_TRACE("(%p, %p, %p)", pActor, pMat, pThe_funk);
-    NOT_IMPLEMENTED();
+
+    if (pActor->model) {
+        if (pThe_funk->material == pMat) {
+            AddProximityVertexXYZ(
+                pActor->model->bounds.min.v[0],
+                pActor->model->bounds.min.v[1],
+                pActor->model->bounds.min.v[2],
+                pThe_funk);
+            AddProximityVertexXYZ(
+                pActor->model->bounds.min.v[0],
+                pActor->model->bounds.min.v[1],
+                pActor->model->bounds.max.v[2],
+                pThe_funk);
+            AddProximityVertexXYZ(
+                pActor->model->bounds.min.v[0],
+                pActor->model->bounds.max.v[1],
+                pActor->model->bounds.min.v[2],
+                pThe_funk);
+            AddProximityVertexXYZ(
+                pActor->model->bounds.min.v[0],
+                pActor->model->bounds.max.v[1],
+                pActor->model->bounds.max.v[2],
+                pThe_funk);
+            AddProximityVertexXYZ(
+                pActor->model->bounds.max.v[0],
+                pActor->model->bounds.min.v[1],
+                pActor->model->bounds.min.v[2],
+                pThe_funk);
+            AddProximityVertexXYZ(
+                pActor->model->bounds.max.v[0],
+                pActor->model->bounds.min.v[1],
+                pActor->model->bounds.max.v[2],
+                pThe_funk);
+            AddProximityVertexXYZ(
+                pActor->model->bounds.max.v[0],
+                pActor->model->bounds.max.v[1],
+                pActor->model->bounds.min.v[2],
+                pThe_funk);
+            AddProximityVertexXYZ(
+                pActor->model->bounds.max.v[0],
+                pActor->model->bounds.max.v[1],
+                pActor->model->bounds.max.v[2],
+                pThe_funk);
+        } else {
+            the_face = pActor->model->faces;
+            for (i = 0; i < pActor->model->nfaces; i++) {
+                if (pThe_funk->material == the_face->material) {
+                    AddProximityVertex(&pActor->model->vertices[the_face->vertices[0]].p, pThe_funk);
+                    AddProximityVertex(&pActor->model->vertices[the_face->vertices[1]].p, pThe_funk);
+                    AddProximityVertex(&pActor->model->vertices[the_face->vertices[2]].p, pThe_funk);
+                }
+                the_face++;
+            }
+        }
+    }
+    return 0;
 }
 
 // IDA: void __usercall Adjust2FloatsForExceptions(float *pVictim1@<EAX>, float *pVictim2@<EDX>, br_pixelmap *pCulprit@<EBX>)
@@ -1605,27 +1680,21 @@ void RevealStoredTextures(tBrender_storage* pStorage) {
 // IDA: void __usercall SetCarStorageTexturingLevel(tBrender_storage *pStorage@<EAX>, tCar_texturing_level pNew@<EDX>, tCar_texturing_level pOld@<EBX>)
 void SetCarStorageTexturingLevel(tBrender_storage* pStorage, tCar_texturing_level pNew, tCar_texturing_level pOld) {
     LOG_TRACE("(%p, %d, %d)", pStorage, pNew, pOld);
-    switch (pNew) {
-    case eCTL_none:
-        HideStoredTextures(pStorage);
-        break;
 
-    case eCTL_transparent:
-        if (pOld) {
-            if (pOld == 2) {
-                HideStoredOpaqueTextures(pStorage);
+    if (pNew) {
+        if (pNew == eCTL_transparent) {
+            if (pOld) {
+                if (pOld == eCTL_full) {
+                    HideStoredOpaqueTextures(pStorage);
+                }
+            } else {
+                RevealStoredTransparentTextures(pStorage);
             }
-        } else {
-            RevealStoredTransparentTextures(pStorage);
+        } else if (pNew == eCTL_full) {
+            RevealStoredTextures(pStorage);
         }
-        break;
-
-    case eCTL_full:
-        RevealStoredTextures(pStorage);
-        break;
-
-    default:
-        LOG_PANIC("not handled");
+    } else {
+        HideStoredTextures(pStorage);
     }
 }
 

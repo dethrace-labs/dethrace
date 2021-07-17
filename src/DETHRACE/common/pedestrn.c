@@ -510,7 +510,7 @@ void ChangeActionTo(tPedestrian_data* pPedestrian, int pAction_index, int pRedo_
     int the_sound;
     tU32 the_pitch;
     LOG_TRACE("(%p, %d, %d)", pPedestrian, pAction_index, pRedo_frames_etc);
-    NOT_IMPLEMENTED();
+    STUB();
 }
 
 // IDA: int __usercall MungePedestrianAction@<EAX>(tPedestrian_data *pPedestrian@<EAX>, float pDanger_level)
