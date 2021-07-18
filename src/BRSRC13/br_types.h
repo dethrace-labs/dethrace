@@ -2796,7 +2796,6 @@ typedef struct v11group {
     void* stored;
     v11face* faces;
     br_colour* face_colours;
-    br_material* face_colours_material; // Jeff added to avoid 64 bit issues trying to pack br_material* into br_colour
     br_uint_16* face_user;
     fmt_vertex* vertices;
     br_colour* vertex_colours;
@@ -2804,6 +2803,8 @@ typedef struct v11group {
     br_uint_16 nfaces;
     br_uint_16 nvertices;
     br_uint_16 nedges;
+
+    br_material* face_colours_material; // Added to avoid 64 bit issues trying to pack br_material* into br_colour. eek ;)
 } v11group;
 
 typedef struct v11model {

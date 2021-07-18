@@ -33,6 +33,7 @@
 #define BR_SIMPLEHEAD(l) (void*)(((br_simple_list*)(l))->head)
 #define BR_SIMPLENEXT(n) (void*)(((br_simple_node*)(n))->next)
 #define BR_FOR_SIMPLELIST(list, ptr) for ((ptr) = BR_SIMPLEHEAD(list); (ptr); (ptr) = BR_SIMPLENEXT(ptr))
+#define BR_SIMPLEREMOVE(n) ((void*)BrSimpleRemove((br_simple_node*)(n)))
 
 #define V_X 0
 #define V_Y 1

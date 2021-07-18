@@ -372,7 +372,10 @@ void BrMatrix34TApplyP(br_vector3* A, br_vector3* B, br_matrix34* C) {
 // IDA: void __cdecl BrMatrix34TApplyV(br_vector3 *A, br_vector3 *B, br_matrix34 *C)
 void BrMatrix34TApplyV(br_vector3* A, br_vector3* B, br_matrix34* C) {
     LOG_TRACE("(%p, %p, %p)", A, B, C);
-    NOT_IMPLEMENTED();
+
+    A->v[0] = BR_MAC3(B->v[0], C(0, 0), B->v[1], C(0, 1), B->v[2], C(0, 2));
+    A->v[1] = BR_MAC3(B->v[0], C(1, 0), B->v[1], C(1, 1), B->v[2], C(1, 2));
+    A->v[2] = BR_MAC3(B->v[0], C(2, 0), B->v[1], C(2, 1), B->v[2], C(2, 2));
 }
 
 // IDA: void __cdecl BrMatrix34Pre(br_matrix34 *mat, br_matrix34 *A)

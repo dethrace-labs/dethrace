@@ -60,6 +60,7 @@ void BrMatrix34Identity(br_matrix34* mat);
 void BrMatrix34Pre(br_matrix34* mat, br_matrix34* A);
 void BrMatrix34ApplyV(br_vector3* A, br_vector3* B, br_matrix34* C);
 br_scalar BrMatrix34Inverse(br_matrix34* B, br_matrix34* A);
+void BrMatrix34LPInverse(br_matrix34* A, br_matrix34* B);
 void BrMatrix34ApplyP(br_vector3* A, br_vector3* B, br_matrix34* C);
 void BrMatrix34Scale(br_matrix34* mat, br_scalar sx, br_scalar sy, br_scalar sz);
 void BrMatrix34PostTranslate(br_matrix34* mat, br_scalar x, br_scalar y, br_scalar z);
@@ -71,6 +72,7 @@ void BrMatrix34PostScale(br_matrix34* mat, br_scalar sx, br_scalar sy, br_scalar
 void BrMatrix34PreTransform(br_matrix34* mat, br_transform* xform);
 void BrMatrix34PostTransform(br_matrix34* mat, br_transform* xform);
 void BrMatrix34PreRotateX(br_matrix34* mat, br_angle rx);
+void BrMatrix34TApplyV(br_vector3* A, br_vector3* B, br_matrix34* C);
 
 // BrMem
 void BrMemFree(void* block);

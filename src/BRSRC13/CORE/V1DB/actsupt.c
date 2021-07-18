@@ -89,7 +89,20 @@ br_actor* BrActorAdd(br_actor* parent, br_actor* a) {
 br_actor* BrActorRemove(br_actor* a) {
     br_actor* ac;
     LOG_TRACE("(%p)", a);
-    NOT_IMPLEMENTED();
+
+    br_actor* ac2; //Added ?
+
+    BrSimpleRemove((br_simple_node*)a);
+    a->parent = NULL;
+    a->depth = 0;
+
+    for (ac2 = a->children; ac2; ac2 = ac2->next) {
+        ac2->depth = 1;
+        for (ac = ac2->children; ac; ac = ac->next) {
+            RenumberActor(ac, 2);
+        }
+    }
+    return a;
 }
 
 // IDA: void __cdecl BrActorRelink(br_actor *parent, br_actor *a)

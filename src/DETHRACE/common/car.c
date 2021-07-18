@@ -1988,8 +1988,196 @@ int CollideCamera2(br_vector3* car_pos, br_vector3* cam_pos, br_vector3* old_cam
     tFace_ref face_list[3];
     LOG_TRACE("(%p, %p, %p, %d)", car_pos, cam_pos, old_camera_pos, manual_move);
 
-    SILENT_STUB();
-    return 0;
+    hither = ((br_camera*)gCamera->type_data)->hither_z * 3.0;
+    gCamera_has_collided = 0;
+    for (i = 0; i < 1; i++) {
+        tv.v[0] = cam_pos->v[0] - car_pos->v[0];
+        tv.v[1] = cam_pos->v[1] - car_pos->v[1];
+        tv.v[2] = cam_pos->v[2] - car_pos->v[2];
+        dist = sqrt(tv.v[1] * tv.v[1] + tv.v[2] * tv.v[2] + tv.v[0] * tv.v[0]);
+        tv.v[0] = tv.v[0] * 1.2;
+        tv.v[1] = tv.v[1] * 1.2;
+        tv.v[2] = tv.v[2] * 1.2;
+        FindFace(car_pos, &tv, &a, &ts, &material);
+        if (ts <= 1.0) {
+            gCamera_has_collided = 1;
+            if (a.v[1] * tv.v[1] + a.v[2] * tv.v[2] + a.v[0] * tv.v[0] > 0.0) {
+                a.v[0] = -a.v[0];
+                a.v[1] = -a.v[1];
+                a.v[2] = -a.v[2];
+            }
+            if (gCamera_mode == 1 && !manual_move) {
+                tv2.v[0] = car_pos->v[0] - old_camera_pos->v[0];
+                tv2.v[1] = car_pos->v[1] - old_camera_pos->v[1];
+                tv2.v[2] = car_pos->v[2] - old_camera_pos->v[2];
+                FindFace(old_camera_pos, &tv2, &b, &ts2, &material);
+                if (ts2 > 1.0) {
+                    *cam_pos = *old_camera_pos;
+                    return i;
+                }
+            }
+            tv.v[0] = tv.v[0] * ts;
+            tv.v[1] = tv.v[1] * ts;
+            tv.v[2] = tv.v[2] * ts;
+            tv2.v[0] = a.v[0] * hither;
+            tv2.v[1] = a.v[1] * hither;
+            tv2.v[2] = a.v[2] * hither;
+            tv.v[0] = tv2.v[0] + tv.v[0];
+            tv.v[1] = tv2.v[1] + tv.v[1];
+            tv.v[2] = tv2.v[2] + tv.v[2];
+            dist = sqrt(tv.v[1] * tv.v[1] + tv.v[2] * tv.v[2] + tv.v[0] * tv.v[0]);
+            cam_pos->v[0] = car_pos->v[0] + tv.v[0];
+            cam_pos->v[1] = car_pos->v[1] + tv.v[1];
+            cam_pos->v[2] = car_pos->v[2] + tv.v[2];
+            if (gMin_camera_car_distance > dist && !i && a.v[1] > -0.7) {
+                tv2.v[0] = -a.v[1] * a.v[0];
+                tv2.v[1] = -a.v[1] * a.v[1];
+                tv2.v[2] = -a.v[1] * a.v[2];
+                tv2.v[1] = tv2.v[1] + 1.0;
+                if (gProgram_state.current_car.car_master_actor->t.t.mat.m[1][1] < 0.0) {
+                    tv2.v[0] = -tv2.v[0];
+                    tv2.v[1] = -tv2.v[1];
+                    tv2.v[2] = -tv2.v[2];
+                }
+                d = tv2.v[1] * tv2.v[1] + tv2.v[2] * tv2.v[2] + tv2.v[0] * tv2.v[0];
+                l = tv2.v[1] * tv.v[1] + tv2.v[2] * tv.v[2] + tv2.v[0] * tv.v[0];
+                alpha = tv.v[1] * tv.v[1]
+                    + tv.v[2] * tv.v[2]
+                    + tv.v[0] * tv.v[0]
+                    - gMin_camera_car_distance * gMin_camera_car_distance;
+                ts2 = l * l - alpha * d * 4.0;
+                if (alpha >= 0 && d != 0.0) {
+                    sa = (sqrt(ts2) - l) / (d * 2.0);
+                    tv2.v[0] = tv2.v[0] * sa;
+                    tv2.v[1] = tv2.v[1] * sa;
+                    tv2.v[2] = tv2.v[2] * sa;
+                    FindFace(cam_pos, &tv2, &a, &ts, &material);
+                    if (ts < 1.0) {
+                        tv2.v[0] = tv2.v[0] * ts;
+                        tv2.v[1] = tv2.v[1] * ts;
+                        tv2.v[2] = tv2.v[2] * ts;
+                    }
+                    b.v[0] = tv.v[0];
+                    b.v[1] = 0.0;
+                    b.v[2] = tv.v[2];
+                    dist = sqrt(0.0 * 0.0 + tv.v[2] * tv.v[2] + tv.v[0] * tv.v[0]);
+                    if (alpha <= 2.3841858e-7) {
+                        b.v[0] = 1.0;
+                        b.v[1] = 0.0;
+                        b.v[2] = 0.0;
+                    } else {
+                        alpha = 1.0 / dist;
+                        b.v[0] = b.v[0] * alpha;
+                        b.v[1] = b.v[1] * alpha;
+                        b.v[2] = b.v[2] * alpha;
+                    }
+                    tv.v[0] = tv2.v[0] + tv.v[0];
+                    tv.v[1] = tv2.v[1] + tv.v[1];
+                    tv.v[2] = tv2.v[2] + tv.v[2];
+                    ts2 = tv.v[1] * b.v[1] + tv.v[2] * b.v[2] + b.v[0] * tv.v[0];
+                    if (ts2 < 0.029999999 && !gAction_replay_mode) {
+                        dist = sqrt(tv2.v[1] * tv2.v[1] + tv2.v[2] * tv2.v[2] + tv2.v[0] * tv2.v[0]);
+                        if (dist <= 2.3841858e-7) {
+                            tv2.v[0] = 1.0;
+                            tv2.v[1] = 0.0;
+                            tv2.v[2] = 0.0;
+                        } else {
+                            alpha = 1.0 / dist;
+                            tv2.v[0] = tv2.v[0] * alpha;
+                            tv2.v[1] = tv2.v[1] * alpha;
+                            tv2.v[2] = tv2.v[2] * alpha;
+                        }
+                        if (tv2.v[2] * b.v[2] + tv2.v[0] * b.v[0] + tv2.v[1] * b.v[1] < -0.029999999)
+                            alpha = tv2.v[1] * b.v[1] + tv2.v[2] * b.v[2] + b.v[0] * tv2.v[0];
+                        alpha = (0.029999999 - ts2) / alpha;
+                        tv2.v[0] = tv2.v[0] * alpha;
+                        tv2.v[1] = tv2.v[1] * alpha;
+                        tv2.v[2] = tv2.v[2] * alpha;
+                        tv.v[0] = tv2.v[0] + tv.v[0];
+                        tv.v[1] = tv2.v[1] + tv.v[1];
+                        tv.v[2] = tv2.v[2] + tv.v[2];
+                    }
+                }
+            }
+            cam_pos->v[0] = car_pos->v[0] + tv.v[0];
+            cam_pos->v[1] = car_pos->v[1] + tv.v[1];
+            cam_pos->v[2] = car_pos->v[2] + tv.v[2];
+        }
+
+        bnds.mat = &mat;
+        BrMatrix34Identity(&mat);
+        tv2.v[0] = hither;
+        tv2.v[1] = hither;
+        tv2.v[2] = hither;
+        bnds.original_bounds.min.v[0] = cam_pos->v[0] - hither;
+        bnds.original_bounds.min.v[1] = cam_pos->v[1] - hither;
+        bnds.original_bounds.min.v[2] = cam_pos->v[2] - hither;
+        bnds.original_bounds.max.v[0] = cam_pos->v[0] + hither;
+        bnds.original_bounds.max.v[1] = cam_pos->v[1] + hither;
+        bnds.original_bounds.max.v[2] = cam_pos->v[2] + hither;
+        k = FindFacesInBox(&bnds, face_list, 3);
+        if (k > 0) {
+            tv2.v[0] = cam_pos->v[0] - face_list[0].v[0].v[0];
+            tv2.v[1] = cam_pos->v[1] - face_list[0].v[0].v[1];
+            tv2.v[2] = cam_pos->v[2] - face_list[0].v[0].v[2];
+            sa = face_list[0].normal.v[2] * tv2.v[2]
+                + face_list[0].normal.v[1] * tv2.v[1]
+                + face_list[0].normal.v[0] * tv2.v[0];
+            //ts2 = sa;
+            if (sa < hither && sa >= 0.0) {
+                tv2.v[0] = (hither - sa) * face_list[0].normal.v[0];
+                tv2.v[1] = (hither - sa) * face_list[0].normal.v[1];
+                tv2.v[2] = (hither - sa) * face_list[0].normal.v[2];
+                cam_pos->v[0] = cam_pos->v[0] + tv2.v[0];
+                cam_pos->v[1] = cam_pos->v[1] + tv2.v[1];
+                cam_pos->v[2] = cam_pos->v[2] + tv2.v[2];
+            }
+            if (k > 1) {
+                sb = face_list[1].normal.v[2] * face_list[0].normal.v[2]
+                    + face_list[1].normal.v[1] * face_list[0].normal.v[1]
+                    + face_list[1].normal.v[0] * face_list[0].normal.v[0];
+                if (sb > 0.94999999 && k > 2) {
+                    face_list[1].normal.v[0] = face_list[2].normal.v[0];
+                    face_list[1].normal.v[1] = face_list[2].normal.v[1];
+                    face_list[1].normal.v[2] = face_list[2].normal.v[2];
+                    face_list[1].v[0].v[0] = face_list[2].v[0].v[0];
+                    face_list[1].v[0].v[1] = face_list[2].v[0].v[1];
+                    face_list[1].v[0].v[2] = face_list[2].v[0].v[2];
+                    sb = face_list[2].normal.v[2] * face_list[0].normal.v[2]
+                        + face_list[2].normal.v[1] * face_list[0].normal.v[1]
+                        + face_list[2].normal.v[0] * face_list[0].normal.v[0];
+                    k = 2;
+                }
+                if (sb <= 0.94999999) {
+                    tv2.v[0] = cam_pos->v[0] - face_list[1].v[0].v[0];
+                    tv2.v[1] = cam_pos->v[1] - face_list[1].v[0].v[1];
+                    tv2.v[2] = cam_pos->v[2] - face_list[1].v[0].v[2];
+                    sc = face_list[1].normal.v[2] * tv2.v[2]
+                        + face_list[1].normal.v[1] * tv2.v[1]
+                        + face_list[1].normal.v[0] * tv2.v[0];
+                    if (sc < hither && sc >= 0.0) {
+                        sc = face_list[1].normal.v[2] * face_list[0].normal.v[2]
+                            + face_list[1].normal.v[1] * face_list[0].normal.v[1]
+                            + face_list[1].normal.v[0] * face_list[0].normal.v[0];
+                        b.v[0] = face_list[0].normal.v[0] * sc;
+                        b.v[1] = face_list[0].normal.v[1] * sc;
+                        b.v[2] = face_list[0].normal.v[2] * sc;
+                        face_list[1].normal.v[0] = face_list[1].normal.v[0] - b.v[0];
+                        face_list[1].normal.v[1] = face_list[1].normal.v[1] - b.v[1];
+                        face_list[1].normal.v[2] = face_list[1].normal.v[2] - b.v[2];
+                        tv2.v[0] = (hither - ts2) * face_list[1].normal.v[0];
+                        tv2.v[1] = (hither - ts2) * face_list[1].normal.v[1];
+                        tv2.v[2] = (hither - ts2) * face_list[1].normal.v[2];
+                        cam_pos->v[0] = cam_pos->v[0] + tv2.v[0];
+                        cam_pos->v[1] = cam_pos->v[1] + tv2.v[1];
+                        cam_pos->v[2] = cam_pos->v[2] + tv2.v[2];
+                    }
+                }
+            }
+        }
+        i += k;
+    }
+    return i;
 }
 
 // IDA: int __usercall BoundsTest@<EAX>(br_bounds *bnds@<EAX>, br_vector3 *p@<EDX>)
@@ -2449,7 +2637,11 @@ int TestOldMats(tCollision_info* c1, tCollision_info* c2, int newmats) {
 // IDA: int __usercall PullActorFromWorld@<EAX>(br_actor *pActor@<EAX>)
 int PullActorFromWorld(br_actor* pActor) {
     LOG_TRACE("(%p)", pActor);
-    NOT_IMPLEMENTED();
+
+    if (gDoing_physics) {
+        return DoPullActorFromWorld(pActor);
+    }
+    return 0;
 }
 
 // IDA: int __usercall DoPullActorFromWorld@<EAX>(br_actor *pActor@<EAX>)
@@ -2459,7 +2651,9 @@ int DoPullActorFromWorld(br_actor* pActor) {
     tCollision_info* c;
     tNon_car_spec* non_car;
     LOG_TRACE("(%p)", pActor);
-    NOT_IMPLEMENTED();
+
+    STUB();
+    return 0;
 }
 
 // IDA: void __usercall CheckForDeAttachmentOfNonCars(tU32 pTime@<EAX>)
