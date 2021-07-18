@@ -134,7 +134,7 @@ int ActorRayPick2D(br_actor* ap, br_vector3* pPosition, br_vector3* pDir, br_mod
         pPosition = &pos;
         pDir = &dir;
     }
-    if (ap->type == 1) {
+    if (ap->type == BR_ACTOR_MODEL) {
         if (PickBoundsTestRay_finteray(&this_model->bounds, pPosition, pDir, t_near, t_far, &t_near, &t_far)) {
             t_near = 0.0;
             if (gNearest_T >= 1.0) {
@@ -636,7 +636,7 @@ int ActorBoxPick(tBounds* bnds, br_actor* ap, br_model* model, br_material* mate
         }
         bnds = &new_bounds;
     }
-    if (ap->type == 1) {
+    if (ap->type == BR_ACTOR_MODEL) {
         if (BoundsOverlapTest_finteray(&bnds->real_bounds, &this_model->bounds)) {
             n = ModelPickBox(ap, bnds, this_model, this_material, &face_list[i], max_face, pMat);
             if (pMat && max_face != n) {
@@ -828,7 +828,7 @@ void ClipToPlaneGE(br_vector3* p, int* nv, int i, br_scalar limit) {
     last_vertex = *nv - 1;
     j = 0;
     for (vertex = 0; *nv > vertex; ++vertex) {
-        if (p[last_vertex].v[i] > limit != p[vertex].v[i] > limit) {
+        if ((p[last_vertex].v[i] > limit) != (p[vertex].v[i] > limit)) {
             for (k = 0; k < 3; ++k) {
                 if (i != k) {
                     p2[j].v[k] = (p[vertex].v[k] - p[last_vertex].v[k])
@@ -867,7 +867,7 @@ void ClipToPlaneLE(br_vector3* p, int* nv, int i, br_scalar limit) {
     last_vertex = *nv - 1;
     j = 0;
     for (vertex = 0; *nv > vertex; ++vertex) {
-        if (p[vertex].v[i] > (double)limit != p[last_vertex].v[i] > (double)limit) {
+        if ((p[vertex].v[i] > limit) != (p[last_vertex].v[i] > limit)) {
             for (k = 0; k < 3; ++k) {
                 if (k != i) {
                     p2[j].v[k] = (p[vertex].v[k] - p[last_vertex].v[k])
