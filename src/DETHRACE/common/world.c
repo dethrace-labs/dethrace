@@ -2612,7 +2612,8 @@ void StopGroovidelic(br_actor* pActor) {
     int i;
     tGroovidelic_spec* the_groove;
     LOG_TRACE("(%p)", pActor);
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __usercall SetGrooveInterrupt(int pGroove_index@<EAX>, br_matrix34 *pMatrix@<EDX>, int pPath_interrupt@<EBX>, int pObject_interrupt@<ECX>, float pPath_resumption, float pObject_resumption)

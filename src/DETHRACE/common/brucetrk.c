@@ -41,7 +41,23 @@ void XZToColumnXZ(tU8* pColumn_x, tU8* pColumn_z, br_scalar pX, br_scalar pZ, tT
     br_scalar x;
     br_scalar z;
     LOG_TRACE("(%p, %p, %f, %f, %p)", pColumn_x, pColumn_z, pX, pZ, pTrack_spec);
-    NOT_IMPLEMENTED();
+
+    x = (pX - pTrack_spec->origin_x) / pTrack_spec->column_size_x;
+    z = (pZ - pTrack_spec->origin_z) / pTrack_spec->column_size_z;
+    if (x < 0.0) {
+        x = 0.0;
+    }
+    if (pTrack_spec->ncolumns_x <= x) {
+        x = pTrack_spec->ncolumns_x - 1.0;
+    }
+    if (z < 0.0) {
+        z = 0.0;
+    }
+    if (pTrack_spec->ncolumns_z <= z) {
+        z = pTrack_spec->ncolumns_z - 1.0;
+    }
+    *pColumn_x = x;
+    *pColumn_z = z;
 }
 
 // IDA: void __usercall StripBlendedFaces(br_actor *pActor@<EAX>, br_model *pModel@<EDX>)

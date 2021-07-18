@@ -16,8 +16,6 @@ br_scalar gLowest_y_above;
 br_model* model_unk1;
 br_material* material_unk1;
 
-// Note: THIS is the _0 in Mac 3dfx build
-
 // IDA: int __usercall DRActorToRoot@<EAX>(br_actor *a@<EAX>, br_actor *world@<EDX>, br_matrix34 *m@<EBX>)
 int DRActorToRoot(br_actor* a, br_actor* world, br_matrix34* m) {
     LOG_TRACE("(%p, %p, %p)", a, world, m);
@@ -292,6 +290,8 @@ int DRModelPick2D_raycast(br_model* model, br_material* material, br_vector3* ra
     double f_numerator;
     LOG_TRACE("(%p, %p, %p, %p, %f, %f, %p, %p)", model, material, ray_pos, ray_dir, t_near, t_far, callback, arg);
 
+    t_near -= 0.001;
+    t_far += 0.001;
     for (group = 0; group < V11MODEL(model)->ngroups; group++) {
         for (f = 0; f < V11MODEL(model)->groups[group].nfaces; f++) {
             fp = &V11MODEL(model)->groups[group].faces[f];
@@ -309,7 +309,7 @@ int DRModelPick2D_raycast(br_model* model, br_material* material, br_vector3* ra
                     - fp->eqn.v[3];
                 if (!BadDiv_raycast(numerator, d)) {
                     t = -(numerator / d);
-                    if (t >= (t_near - 0.001) && t <= (t_far + 0.001)) {
+                    if (t >= t_near && t <= t_far) {
                         p.v[0] = ray_dir->v[0] * t;
                         p.v[1] = ray_dir->v[1] * t;
                         p.v[2] = ray_dir->v[2] * t;
@@ -384,18 +384,7 @@ int DRModelPick2D_raycast(br_model* model, br_material* material, br_vector3* ra
                                     v = 2;
                                 }
                             }
-                            r = callback(
-                                model,
-                                this_material,
-                                ray_pos,
-                                ray_dir,
-                                t,
-                                f,
-                                e,
-                                v,
-                                &p,
-                                &map,
-                                arg);
+                            r = callback(model, this_material, ray_pos, ray_dir, t, f, e, v, &p, &map, arg);
                             if (r) {
                                 return r;
                             }
