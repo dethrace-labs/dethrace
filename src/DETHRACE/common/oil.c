@@ -18,8 +18,11 @@ void InitOilSpills() {
     br_material* the_material;
     LOG_TRACE("()");
 
-    gOil_pixies[0] = LoadPixelmap(gOil_pixie_names[0]);
-    BrMapAdd(gOil_pixies[0]);
+    for (i = 0; i < 1; i++) {
+        gOil_pixies[i] = LoadPixelmap(gOil_pixie_names[i]);
+        BrMapAdd(gOil_pixies[i]);
+    }
+
     for (i = 0; i < 15; i++) {
         the_material = BrMaterialAllocate(NULL);
         BrMaterialAdd(the_material);
@@ -28,8 +31,9 @@ void InitOilSpills() {
         the_material->ks = 0.0;
         the_material->power = 0.0;
         the_material->index_base = 0;
-        //LOBYTE(the_material->flags) = v2 | 0x25;
-        the_material->flags |= 0x25;
+        the_material->flags |= 1u;
+        the_material->flags |= 0x20u;
+        the_material->flags |= 4u;
         the_material->index_range = 0;
         the_material->colour_map = 0;
         BrMatrix23Identity(&the_material->map_transform);
@@ -166,14 +170,20 @@ void ProcessOilSpills(tU32 pFrame_period) {
 
 // IDA: int __cdecl GetOilSpillCount()
 int GetOilSpillCount() {
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    //LOG_TRACE("()");
+    return 15;
 }
 
 // IDA: void __usercall GetOilSpillDetails(int pIndex@<EAX>, br_actor **pActor@<EDX>, br_scalar *pSize@<EBX>)
 void GetOilSpillDetails(int pIndex, br_actor** pActor, br_scalar* pSize) {
     LOG_TRACE("(%d, %p, %p)", pIndex, pActor, pSize);
-    NOT_IMPLEMENTED();
+
+    if (gOily_spills[pIndex].car) {
+        *pActor = gOily_spills[pIndex].actor;
+        *pSize = gOily_spills[pIndex].full_size;
+    } else {
+        *pActor = 0;
+    }
 }
 
 // IDA: int __usercall PointInSpill@<EAX>(br_vector3 *pV@<EAX>, int pSpill@<EDX>)

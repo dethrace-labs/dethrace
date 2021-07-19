@@ -2,16 +2,22 @@
 #include "brender.h"
 #include "controls.h"
 #include "crush.h"
+#include "displays.h"
 #include "finteray.h"
 #include "globvars.h"
 #include "globvrkm.h"
 #include "globvrpb.h"
+#include "graphics.h"
 #include "netgame.h"
+#include "oil.h"
 #include "opponent.h"
+#include "pd/sys.h"
 #include "raycast.h"
 #include "replay.h"
 #include "skidmark.h"
+#include "trig.h"
 #include "utility.h"
+#include "world.h"
 #include <stdlib.h>
 
 float gEngine_powerup_factor[6];
@@ -375,7 +381,7 @@ void InitialiseCarsEtc(tRace_info* pThe_race) {
         } else {
             car_count = 1;
         }
-        for (i = 0; car_count > i; ++i) {
+        for (i = 0; car_count > i; i++) {
             PossibleService();
             if (cat) {
                 car = GetCarSpec(cat, i);
@@ -401,7 +407,7 @@ void GetAverageGridPosition(tRace_info* pThe_race) {
 
     total_cars = 0.0;
     BrVector3SetFloat(&gAverage_grid_position, 0.0, 0.0, 0.0);
-    for (i = 0; pThe_race->number_of_racers > i; ++i) {
+    for (i = 0; pThe_race->number_of_racers > i; i++) {
         car = pThe_race->opponent_list[i].car_spec;
         gAverage_grid_position.v[0] = car->pos.v[0] + gAverage_grid_position.v[0];
         gAverage_grid_position.v[1] = car->pos.v[1] + gAverage_grid_position.v[1];
@@ -1405,7 +1411,238 @@ void MungeCarGraphics(tU32 pFrame_period) {
         SwitchCarActor(&gProgram_state.current_car, gProgram_state.current_car.car_actor_count - 2);
     }
 
-    STUB();
+    the_time = PDGetTotalTime();
+    for (cat = eVehicle_self; cat <= eVehicle_rozzer; cat++) {
+        if (cat) {
+            car_count = GetCarCount(cat);
+        } else {
+            car_count = 1;
+        }
+        for (car = 0; car_count > car; car++) {
+            if (cat) {
+                the_car = GetCarSpec(cat, car);
+            } else {
+                the_car = &gProgram_state.current_car;
+            }
+            the_car->car_master_actor->render_style = (the_car->driver != eDriver_local_human) && PointOutOfSight(&the_car->pos, gYon_squared);
+        }
+    }
+    for (car = 0; gNum_active_cars > car; car++) {
+        the_car = gActive_car_list[car];
+        if (the_car->car_master_actor->render_style != BR_RSTYLE_NONE) {
+            the_car->shadow_intersection_flags = 0;
+            oily_count = GetOilSpillCount();
+            for (i = 0; i < oily_count; i++) {
+                GetOilSpillDetails(i, &oily_actor, &oily_size);
+                if (oily_actor) {
+                    car_radius = the_car->bounds[1].max.v[2] / 6.9000001 * 1.5;
+                    if (oily_actor->t.t.mat.m[3][0] - oily_size < the_car->car_master_actor->t.t.mat.m[3][0] + car_radius
+                        && oily_actor->t.t.mat.m[3][0] + oily_size > the_car->car_master_actor->t.t.mat.m[3][0] - car_radius
+                        && oily_actor->t.t.mat.m[3][2] - oily_size < the_car->car_master_actor->t.t.mat.m[3][2] + car_radius
+                        && oily_actor->t.t.mat.m[3][2] + oily_size > the_car->car_master_actor->t.t.mat.m[3][2] - car_radius) {
+                        the_car->shadow_intersection_flags |= 1 << i;
+                    }
+                }
+            }
+            if (the_car->driver < eDriver_net_human && (!gAction_replay_mode || !ReplayIsPaused())) {
+                if (gCountdown) {
+                    sine_angle = FRandomBetween(0.40000001, 1.6) * ((double)GetTotalTime() / ((double)gCountdown * 100.0));
+                    sine_angle = frac(sine_angle) * 360.0;
+                    sine_angle = FastScalarSin(sine_angle);
+                    raw_revs = (double)the_car->red_line * fabs(sine_angle);
+                    rev_reducer = (11.0 - (double)gCountdown) / 10.0;
+                    the_car->revs = rev_reducer * raw_revs;
+                } else {
+                    the_car->revs = (the_car->speedo_speed / 0.003
+                                        - (double)(int)(the_car->speedo_speed / 0.003))
+                            * (double)(the_car->red_line - 800)
+                        + 800.0;
+                }
+            }
+            for (i = 0; i < the_car->number_of_steerable_wheels; i++) {
+                ControlBoundFunkGroove(the_car->steering_ref[i], the_car->steering_angle);
+            }
+            for (i = 0; i < 4; i++) {
+                ControlBoundFunkGroove(the_car->rf_sus_ref[i], the_car->rf_sus_position);
+                if ((i & 1) != 0) {
+                    ControlBoundFunkGroove(the_car->lf_sus_ref[i], -the_car->lf_sus_position);
+                } else {
+                    ControlBoundFunkGroove(the_car->lf_sus_ref[i], the_car->lf_sus_position);
+                }
+            }
+            for (i = 0; i < 2; i++) {
+                ControlBoundFunkGroove(the_car->rr_sus_ref[i], the_car->rr_sus_position);
+                if ((i & 1) != 0) {
+                    ControlBoundFunkGroove(the_car->lr_sus_ref[i], -the_car->lr_sus_position);
+                } else {
+                    ControlBoundFunkGroove(the_car->lr_sus_ref[i], the_car->lr_sus_position);
+                }
+            }
+            if (!gAction_replay_mode || !ReplayIsPaused()) {
+                wheel_speed = -(the_car->speedo_speed / the_car->non_driven_wheels_circum * (double)gFrame_period);
+                ControlBoundFunkGroovePlus(the_car->non_driven_wheels_spin_ref_1, wheel_speed);
+                ControlBoundFunkGroovePlus(the_car->non_driven_wheels_spin_ref_2, wheel_speed);
+                ControlBoundFunkGroovePlus(the_car->non_driven_wheels_spin_ref_3, wheel_speed);
+                ControlBoundFunkGroovePlus(the_car->non_driven_wheels_spin_ref_4, wheel_speed);
+                if (the_car->driver >= eDriver_net_human) {
+                    if (the_car->gear) {
+                        wheel_speed = -(the_car->revs
+                            * the_car->speed_revs_ratio
+                            / 6900.0
+                            * (double)the_car->gear
+                            / the_car->driven_wheels_circum
+                            * (double)gFrame_period);
+                    } else if (the_car->keys.brake) {
+                        wheel_speed = 0.0;
+                    } else {
+                        wheel_speed = -(the_car->speedo_speed / the_car->driven_wheels_circum * (double)gFrame_period);
+                    }
+                }
+                ControlBoundFunkGroovePlus(the_car->driven_wheels_spin_ref_1, wheel_speed);
+                ControlBoundFunkGroovePlus(the_car->driven_wheels_spin_ref_2, wheel_speed);
+                ControlBoundFunkGroovePlus(the_car->driven_wheels_spin_ref_3, wheel_speed);
+                ControlBoundFunkGroovePlus(the_car->driven_wheels_spin_ref_4, wheel_speed);
+            }
+            if (gAction_replay_mode) {
+                MungeSpecialVolume((tCollision_info*)the_car);
+            } else if (the_car->driver == eDriver_local_human) {
+                abs_omega_x = (fabs(the_car->I.v[0]) + 3.3) / 2.0 * fabs(the_car->omega.v[0]);
+                abs_omega_y = (fabs(the_car->I.v[1]) + 3.57) / 2.0 * fabs(the_car->omega.v[1]);
+                abs_omega_z = (fabs(the_car->I.v[2]) + 0.44) / 2.0 * fabs(the_car->omega.v[2]);
+                spinning_wildly = abs_omega_x > 26.4 || abs_omega_y > 49.98 || abs_omega_z > 3.52;
+                if (spinning_wildly && the_time - gLast_cunning_stunt > 10000) {
+                    if (gWild_start
+                        && (!the_car->last_special_volume || the_car->last_special_volume->gravity_multiplier == 1.0)) {
+                        if (the_time - gWild_start >= 500) {
+                            DoFancyHeadup(9);
+                            EarnCredits(gCunning_stunt_bonus[gProgram_state.skill_level]);
+                            gLast_cunning_stunt = the_time;
+                            gOn_me_wheels_start = 0;
+                            gQuite_wild_end = 0;
+                            gQuite_wild_start = 0;
+                            gWoz_upside_down_at_all = 0;
+                        }
+                    } else {
+                        gWild_start = the_time;
+                    }
+                } else {
+                    gWild_start = 0;
+                    spinning_mildly = abs_omega_x > 1.65 || abs_omega_z > 0.22;
+                    if (the_car->number_of_wheels_on_ground <= 3) {
+                        gOn_me_wheels_start = 0;
+                        if (the_car->number_of_wheels_on_ground || !spinning_mildly) {
+                            gQuite_wild_end = the_time;
+                        } else {
+                            if (!gQuite_wild_start) {
+                                gQuite_wild_start = the_time;
+                            }
+                            if (the_car->car_master_actor->t.t.mat.m[1][1] < -0.80000001) {
+                                gWoz_upside_down_at_all = the_time;
+                            }
+                        }
+                    } else {
+                        if (!gQuite_wild_end) {
+                            gQuite_wild_end = the_time;
+                        }
+                        if (gQuite_wild_start
+                            && the_time - gLast_cunning_stunt > 10000
+                            && gQuite_wild_end - gQuite_wild_start >= 2000
+                            && gWoz_upside_down_at_all >= gQuite_wild_start
+                            && gWoz_upside_down_at_all <= gQuite_wild_end
+                            && (gOn_me_wheels_start || the_time - gQuite_wild_end < 300)) {
+                            if (gOn_me_wheels_start) {
+                                if (the_time - gOn_me_wheels_start > 500
+                                    && (!the_car->last_special_volume
+                                        || the_car->last_special_volume->gravity_multiplier == 1.0)) {
+                                    DoFancyHeadup(9);
+                                    EarnCredits(gCunning_stunt_bonus[gProgram_state.skill_level]);
+                                    gLast_cunning_stunt = PDGetTotalTime();
+                                    gQuite_wild_end = 0;
+                                    gQuite_wild_start = 0;
+                                    gOn_me_wheels_start = 0;
+                                    gWoz_upside_down_at_all = 0;
+                                }
+                            } else {
+                                gOn_me_wheels_start = the_time;
+                            }
+                        } else {
+                            gQuite_wild_end = 0;
+                            gQuite_wild_start = 0;
+                            gOn_me_wheels_start = 0;
+                            gWoz_upside_down_at_all = 0;
+                        }
+                    }
+                }
+            }
+            if (the_car->driver != eDriver_local_human && the_car->car_model_variable) {
+                distance_from_camera = (the_car->car_master_actor->t.t.mat.m[3][0] - gCamera_to_world.m[3][0])
+                        * (the_car->car_master_actor->t.t.mat.m[3][0] - gCamera_to_world.m[3][0])
+                    + (the_car->car_master_actor->t.t.mat.m[3][2] - gCamera_to_world.m[3][2])
+                        * (the_car->car_master_actor->t.t.mat.m[3][2] - gCamera_to_world.m[3][2])
+                    + (the_car->car_master_actor->t.t.mat.m[3][1] - gCamera_to_world.m[3][1])
+                        * (the_car->car_master_actor->t.t.mat.m[3][1] - gCamera_to_world.m[3][1]);
+
+                distance_from_camera = distance_from_camera / gCar_simplification_factor[gGraf_spec_index][gCar_simplification_level];
+                if (gNet_mode && gNet_players[gIt_or_fox].car == the_car) {
+                    distance_from_camera = 0.0;
+                }
+                for (i = 0; the_car->car_actor_count > i; i++) {
+                    if (the_car->car_model_actors[i].min_distance_squared <= distance_from_camera) {
+                        SwitchCarActor(the_car, i);
+                        break;
+                    }
+                }
+            }
+            if (the_car->screen_material) {
+                the_material = NULL;
+                if (the_car->last_special_volume && the_car->last_special_volume->screen_material) {
+                    if (gAction_replay_mode && the_car->last_special_volume == gDefault_water_spec_vol) {
+                        if (gProgram_state.current_depth_effect.type == eDepth_effect_fog) {
+                            the_material = gProgram_state.standard_screen_fog;
+                        } else if (gProgram_state.current_depth_effect.sky_texture) {
+                            the_material = gProgram_state.standard_screen;
+                        } else {
+                            the_material = gProgram_state.standard_screen_dark;
+                        }
+                    } else {
+                        the_material = the_car->last_special_volume->screen_material;
+                    }
+                } else if (gProgram_state.current_depth_effect.type == eDepth_effect_fog) {
+                    the_material = gProgram_state.standard_screen_fog;
+                } else if (gProgram_state.current_depth_effect.sky_texture) {
+                    the_material = gProgram_state.standard_screen;
+                } else {
+                    the_material = gProgram_state.standard_screen_dark;
+                }
+                update_mat = 0;
+                if (the_material && the_car->screen_material_source != the_material) {
+                    the_car->screen_material->flags = the_material->flags;
+                    the_car->screen_material->ka = the_material->ka;
+                    the_car->screen_material->kd = the_material->kd;
+                    the_car->screen_material->ks = the_material->ks;
+                    the_car->screen_material->power = the_material->power;
+                    the_car->screen_material->index_base = the_material->index_base;
+                    the_car->screen_material->index_range = the_material->index_range;
+                    the_car->screen_material->colour_map = the_material->colour_map;
+
+                    the_car->screen_material->map_transform = the_material->map_transform;
+                    the_car->screen_material->index_shade = gRender_shade_table;
+                    the_car->screen_material_source = the_material;
+                    update_mat = 1;
+                }
+                if (the_car->screen_material->colour_map) {
+                    the_car->screen_material->map_transform.m[2][0] = fmod(the_car->car_master_actor->t.t.mat.m[3][0], 1.0);
+                    the_car->screen_material->map_transform.m[2][1] = fmod(the_car->car_master_actor->t.t.mat.m[3][2], 1.0);
+                    if (!update_mat) {
+                        BrMaterialUpdate(the_car->screen_material, 1u);
+                    }
+                }
+                if (update_mat) {
+                    BrMaterialUpdate(the_car->screen_material, 0x7FFFu);
+                }
+            }
+        }
+    }
 }
 
 // IDA: void __cdecl ResetCarScreens()

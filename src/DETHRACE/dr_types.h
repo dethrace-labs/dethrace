@@ -775,7 +775,7 @@ typedef struct tCar_controls {
     unsigned int right : 1;
     unsigned int acc : 1;
     unsigned int dec : 1;
-    unsigned int brake : 1;
+    unsigned int brake : 1; //0x100000
     unsigned int up : 1;
     unsigned int down : 1;
     unsigned int holdw : 1;

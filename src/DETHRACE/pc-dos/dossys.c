@@ -82,8 +82,6 @@ int gReal_back_screen_locked;
 void (*gPrev_keyboard_handler)();
 tU8 gScan_code[123][2];
 
-const double NANOSECONDS_TO_MILLISECONDS = 1.0 / 1000000.0;
-
 int _unittest_do_not_exit = 0;
 char* _unittest_last_fatal_error;
 
