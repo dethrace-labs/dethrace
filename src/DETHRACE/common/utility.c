@@ -539,7 +539,7 @@ void PrintScreenFile16(FILE* pF) {
 void PrintScreen() {
     FILE* f;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    STUB();
 }
 
 // IDA: tU32 __cdecl GetTotalTime()

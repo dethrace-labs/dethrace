@@ -243,6 +243,8 @@ typedef enum keymapcodes {
     KEYMAP_LCTRL = 7,
     KEYMAP_F2 = 28,
     KEYMAP_F3 = 29,
+    KEYMAP_LEFT = 46,
+    KEYMAP_RIGHT = 46,
 } keymapcodes;
 
 #define FONT_TYPEABLE 0

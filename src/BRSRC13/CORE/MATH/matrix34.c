@@ -1,5 +1,6 @@
 #include "matrix34.h"
 #include "harness_trace.h"
+#include "vector.h"
 #include <math.h>
 
 br_matrix34 mattmp1;
@@ -297,7 +298,15 @@ void BrMatrix34LPInverse(br_matrix34* A, br_matrix34* B) {
 // IDA: void __cdecl BrMatrix34LPNormalise(br_matrix34 *A, br_matrix34 *B)
 void BrMatrix34LPNormalise(br_matrix34* A, br_matrix34* B) {
     LOG_TRACE("(%p, %p)", A, B);
-    NOT_IMPLEMENTED();
+
+    BrVector3Normalise((br_vector3*)A->m[2], (br_vector3*)B->m[2]);
+    BrVector3Cross((br_vector3*)A->m[0], (br_vector3*)B->m[1], (br_vector3*)A->m[2]);
+    BrVector3Normalise((br_vector3*)A->m[0], (br_vector3*)A->m[0]);
+    BrVector3Cross((br_vector3*)A->m[1], (br_vector3*)A->m[2], (br_vector3*)A->m[0]);
+
+    A(3, 0) = B(3, 0);
+    A(3, 1) = B(3, 1);
+    A(3, 2) = B(3, 2);
 }
 
 // IDA: void __cdecl BrMatrix34RollingBall(br_matrix34 *mat, int dx, int dy, int radius)
@@ -441,7 +450,10 @@ void BrMatrix34PostRotateZ(br_matrix34* mat, br_angle rz) {
 // IDA: void __cdecl BrMatrix34PreRotate(br_matrix34 *mat, br_angle r, br_vector3 *axis)
 void BrMatrix34PreRotate(br_matrix34* mat, br_angle r, br_vector3* axis) {
     LOG_TRACE("(%p, %d, %p)", mat, r, axis);
-    NOT_IMPLEMENTED();
+
+    BrMatrix34Rotate(&mattmp1, r, axis);
+    BrMatrix34Mul(&mattmp2, &mattmp1, mat);
+    BrMatrix34Copy(mat, &mattmp2);
 }
 
 // IDA: void __cdecl BrMatrix34PostRotate(br_matrix34 *mat, br_angle r, br_vector3 *axis)

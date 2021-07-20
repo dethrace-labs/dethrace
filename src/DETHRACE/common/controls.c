@@ -19,6 +19,7 @@
 #include "sound.h"
 #include "structur.h"
 #include "utility.h"
+#include "world.h"
 #include <stdlib.h>
 
 tCheat gKev_keys[44] = {
@@ -167,7 +168,9 @@ void EnsureSpecialVolumesHidden() {
 void ShowSpecialVolumesIfRequ() {
     LOG_TRACE("()");
 
-    STUB();
+    if (gWhich_edit_mode == eEdit_mode_spec_vol) {
+        ShowSpecialVolumes();
+    }
 }
 
 // IDA: void __usercall DoEditModeKey(int pIndex@<EAX>)
@@ -822,7 +825,92 @@ void PollCarControls(tU32 pTime_difference) {
     tCar_spec* c;
     LOG_TRACE("(%d)", pTime_difference);
 
-    SILENT_STUB();
+    c = &gProgram_state.current_car;
+
+    memset(&keys, 0, sizeof(tCar_controls));
+    joystick.left = -1;
+    joystick.right = -1;
+    joystick.acc = -1;
+    joystick.dec = -1;
+    if (gEntering_message) {
+        memset(&c->keys, 0, sizeof(tCar_controls));
+        c->joystick.left = -1;
+        c->joystick.right = -1;
+        c->joystick.acc = -1;
+        c->joystick.dec = -1;
+    } else {
+        if (gKey_mapping[46] >= 115 || gKey_mapping[47] >= 115) {
+            joystick.left = gJoy_array[gKey_mapping[46] - 115];
+            joystick.right = gJoy_array[gKey_mapping[47] - 115];
+            if (joystick.left < 0 && joystick.right < 0) {
+                joystick.left = 0;
+            }
+        } else {
+            if (KeyIsDown(46)) {
+                keys.left = 1;
+            }
+            if (KeyIsDown(47)) {
+                keys.right = 1;
+            }
+        }
+        if (KeyIsDown(12)) {
+            keys.holdw = 1;
+        }
+        if (KeyIsDown(53) || gRace_finished) {
+            if (!gInstant_handbrake || gRace_finished) {
+                keys.brake = 1;
+            } else {
+                BrakeInstantly();
+            }
+        }
+        if (gKey_mapping[48] < 115) {
+            if (KeyIsDown(48) && !gRace_finished && !c->knackered && !gWait_for_it) {
+                keys.acc = 1;
+            }
+        } else {
+            joystick.acc = gJoy_array[gKey_mapping[48] - 115];
+            if (joystick.acc > 0xFFFF) {
+                joystick.acc = 0xFFFF;
+            }
+        }
+        if (gKey_mapping[49] < 115) {
+            if (KeyIsDown(49) && !gRace_finished && !c->knackered && !gWait_for_it) {
+                keys.dec = 1;
+            }
+        } else {
+            joystick.dec = gJoy_array[gKey_mapping[49] - 115];
+            if (joystick.dec > 0xFFFF) {
+                joystick.dec = 0xFFFF;
+            }
+        }
+        if (KeyIsDown(55) && c->gear >= 0) {
+            keys.change_down = 1;
+            c->just_changed_gear = 1;
+            if (keys.acc || joystick.acc > 32000) {
+                c->traction_control = 0;
+            } else if (c->gear > 1 && !c->keys.change_down) {
+                --c->gear;
+            }
+            if (gCountdown && !c->keys.change_down) {
+                JumpTheStart();
+            }
+        }
+        if (gCar_flying) {
+            if (KeyIsDown(13)) {
+                keys.up = 1;
+            }
+            if (KeyIsDown(11)) {
+                keys.down = 1;
+            }
+        }
+        if (KeyIsDown(58)) {
+            if (!gEntering_message) {
+                keys.horn = 1;
+            }
+        }
+        c->keys = keys;
+        c->joystick = joystick;
+    }
 }
 
 // IDA: void __usercall PollCameraControls(tU32 pTime_difference@<EAX>)
@@ -1051,7 +1139,7 @@ void DrawSomeText2(tDR_font* pFont) {
     }
 
     PDScreenBufferSwap(0);
-    //PrintScreen();
+    PrintScreen();
 }
 
 // IDA: void __cdecl DrawSomeText()
