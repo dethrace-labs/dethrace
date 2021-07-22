@@ -771,18 +771,18 @@ typedef struct tReduced_matrix {
 typedef struct tCar_controls {
     int joystick_acc : 8;
     int joystick_dec : 8;
-    unsigned int left : 1; // 0x10000
-    unsigned int right : 1; // 0x20000
-    unsigned int acc : 1; // 0x40000
-    unsigned int dec : 1; // 0x80000
-    unsigned int brake : 1; //0x100000  (handbrake?)
-    unsigned int up : 1; // 0x200000
-    unsigned int down : 1; // 0x400000
-    unsigned int holdw : 1; // 0x800000
-    unsigned int backwards : 1; // 0x1000000
-    unsigned int change_up : 1; // 0x2000000
-    unsigned int change_down : 1; // 0x4000000
-    unsigned int horn : 1; // 0x8000000
+    unsigned int left : 1; // 0x10000   bit 17
+    unsigned int right : 1; // 0x20000   bit 18
+    unsigned int acc : 1; // 0x40000   bit 19
+    unsigned int dec : 1; // 0x80000   bit 20
+    unsigned int brake : 1; //0x100000   bit 21
+    unsigned int up : 1; // 0x200000   bit 22
+    unsigned int down : 1; // 0x400000   bit 23
+    unsigned int holdw : 1; // 0x800000   bit 24
+    unsigned int backwards : 1; // 0x1000000   bit 25
+    unsigned int change_up : 1; // 0x2000000   bit 26
+    unsigned int change_down : 1; // 0x4000000   bit 27
+    unsigned int horn : 1; // 0x8000000   bit 28
 } tCar_controls;
 
 typedef struct tNet_message_mechanics_info {

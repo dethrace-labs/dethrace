@@ -3,6 +3,7 @@
 #include "car.h"
 #include "errors.h"
 #include "globvars.h"
+#include "globvrkm.h"
 #include "globvrpb.h"
 #include "loading.h"
 #include "pd/sys.h"
@@ -528,13 +529,64 @@ void RebuildActiveCarList() {
     int i;
     tCar_spec* car_spec;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gActive_car_list_rebuild_required) {
+        gActive_car_list_rebuild_required = 0;
+        gNum_active_cars = 0;
+
+        if (!gProgram_state.current_car.disabled || gAction_replay_mode) {
+            gActive_car_list[gNum_active_cars++] = &gProgram_state.current_car;
+            gProgram_state.current_car.active = 1;
+        }
+
+        if (gNet_mode == eNet_mode_host) {
+            for (i = 0; i < GetCarCount(eVehicle_net_player); i++) {
+                car_spec = GetCarSpec(eVehicle_net_player, i);
+                if (car_spec->disabled) {
+                    car_spec->active = 0;
+                } else {
+                    gActive_car_list[gNum_active_cars++] = car_spec;
+                    car_spec->active = 1;
+                }
+            }
+        } else if (gNet_mode == eNet_mode_client) {
+            for (i = 0; i < GetCarCount(eVehicle_net_player); i++) {
+                car_spec = GetCarSpec(eVehicle_net_player, i);
+                if (car_spec->disabled || !IsNetCarActive(&car_spec->car_master_actor->t.t.translate.t)) {
+                    car_spec->active = 0;
+                } else {
+                    gActive_car_list[gNum_active_cars++] = car_spec;
+                    car_spec->active = 1;
+                }
+            }
+        }
+        for (i = 0; i < gProgram_state.AI_vehicles.number_of_opponents; i++) {
+            car_spec = GetCarSpec(eVehicle_opponent, i);
+            if (gProgram_state.AI_vehicles.opponents[i].physics_me || gAction_replay_mode) {
+                gActive_car_list[gNum_active_cars++] = car_spec;
+                car_spec->active = 1;
+            } else {
+                car_spec->active = 0;
+            }
+        }
+        for (i = 0; gNumber_of_cops_before_faffage > i; ++i) {
+            car_spec = GetCarSpec(eVehicle_rozzer, i);
+            if (gProgram_state.AI_vehicles.cops[i].physics_me || gAction_replay_mode) {
+                gActive_car_list[gNum_active_cars++] = car_spec;
+                car_spec->active = 1;
+            }
+        }
+    }
 }
 
 // IDA: void __cdecl ForceRebuildActiveCarList()
 void ForceRebuildActiveCarList() {
     LOG_TRACE("()");
-    STUB();
+
+    gActive_car_list_rebuild_required = 1;
+    if (gProgram_state.racing) {
+        RebuildActiveCarList();
+    }
 }
 
 // IDA: void __usercall StartToCheat(tOpponent_spec *pOpponent_spec@<EAX>)

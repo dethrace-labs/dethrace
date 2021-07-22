@@ -78,7 +78,7 @@ void ResetPollKeys() {
 
 // IDA: void __cdecl CheckKeysForMouldiness()
 void CheckKeysForMouldiness() {
-    LOG_TRACE("()");
+    LOG_TRACE9("()");
 
     if ((PDGetTotalTime() - gLast_poll_keys) > 500) {
         ResetPollKeys();

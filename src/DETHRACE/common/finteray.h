@@ -4,6 +4,8 @@
 #include "br_types.h"
 #include "dr_types.h"
 
+extern tFace_ref* gPling_face;
+
 int BadDiv_finteray(br_scalar a, br_scalar b);
 
 void DRVector2AccumulateScale_finteray(br_vector2* a, br_vector2* b, br_scalar s);

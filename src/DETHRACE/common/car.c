@@ -12,16 +12,18 @@
 #include "oil.h"
 #include "opponent.h"
 #include "pd/sys.h"
+#include "piping.h"
 #include "raycast.h"
 #include "replay.h"
 #include "skidmark.h"
+#include "spark.h"
 #include "trig.h"
 #include "utility.h"
 #include "world.h"
 #include <math.h>
 #include <stdlib.h>
 
-float gEngine_powerup_factor[6];
+float gEngine_powerup_factor[6] = { 1.3, 1.9, 2.5, 3.2, 4.0, 10.0 };
 tCar_spec* gLast_car_to_skid[2];
 tS3_sound_tag gSkid_tag[2];
 tSave_camera gSave_camera[2];
@@ -574,13 +576,121 @@ void GetFacesInBox(tCollision_info* c) {
     int i;
     br_bounds current_bounds;
     LOG_TRACE("(%p)", c);
-    NOT_IMPLEMENTED();
+
+    BrMatrix34Copy(&mat, &c->car_master_actor->t.t.mat);
+    BrMatrix34Copy(&mat2, &c->oldmat);
+    mat.m[3][0] = mat.m[3][0] / 6.9;
+    mat.m[3][1] = mat.m[3][1] / 6.9;
+    mat.m[3][2] = mat.m[3][2] / 6.9;
+    mat2.m[3][0] = mat2.m[3][0] / 6.9;
+    mat2.m[3][1] = mat2.m[3][1] / 6.9;
+    mat2.m[3][2] = mat2.m[3][2] / 6.9;
+    BrMatrix34LPInverse(&mat3, &mat);
+    BrMatrix34Mul(&mat4, &mat2, &mat3);
+    GetNewBoundingBox(&bnds.original_bounds, c->bounds, &mat4);
+    for (i = 0; i < 3; ++i) {
+        if (bnds.original_bounds.min.v[i] > c->bounds[0].min.v[i]) {
+            bnds.original_bounds.min.v[i] = c->bounds[0].min.v[i];
+        }
+        if (bnds.original_bounds.max.v[i] < c->bounds[0].max.v[i]) {
+            bnds.original_bounds.max.v[i] = c->bounds[0].max.v[i];
+        }
+        bnds.original_bounds.min.v[i] = bnds.original_bounds.min.v[i] - 0.0020000001;
+        bnds.original_bounds.max.v[i] = bnds.original_bounds.max.v[i] + 0.0020000001;
+    }
+    GetNewBoundingBox(&c->bounds_world_space, &bnds.original_bounds, &mat);
+    c->bounds_ws_type = eBounds_ws;
+    if ((c->box_face_ref != gFace_num && (c->box_face_ref != gFace_num - 1 || c->box_face_start <= gFace_count))
+        || (BrMatrix34Mul(&mat5, &mat, &c->last_box_inv_mat),
+            GetNewBoundingBox(&new_in_old, &bnds.original_bounds, &mat5),
+            c->last_box.max.v[0] <= new_in_old.max.v[0])
+        || c->last_box.max.v[1] <= new_in_old.max.v[1]
+        || c->last_box.max.v[2] <= new_in_old.max.v[2]
+        || c->last_box.min.v[0] >= new_in_old.min.v[0]
+        || c->last_box.min.v[1] >= new_in_old.min.v[1]
+        || c->last_box.min.v[2] >= new_in_old.min.v[2]) {
+        BrMatrix34Mul(&mat5, &mat4, &mat4);
+        BrMatrix34Mul(&mat6, &mat5, &mat4);
+        BrMatrix34LPInverse(&mat5, &mat6);
+        GetNewBoundingBox(&predicted_bounds, c->bounds, &mat5);
+        for (i = 0; i < 3; ++i) {
+            if (bnds.original_bounds.min.v[i] > predicted_bounds.min.v[i]) {
+                bnds.original_bounds.min.v[i] = predicted_bounds.min.v[i];
+            }
+            if (bnds.original_bounds.max.v[i] < predicted_bounds.max.v[i]) {
+                bnds.original_bounds.max.v[i] = predicted_bounds.max.v[i];
+            }
+            bnds.original_bounds.min.v[i] = bnds.original_bounds.min.v[i] - 0.02;
+            bnds.original_bounds.max.v[i] = bnds.original_bounds.max.v[i] + 0.02;
+        }
+        c->last_box = bnds.original_bounds;
+        BrMatrix34Copy(&c->last_box_inv_mat, &mat3);
+        bnds.mat = &mat;
+        c->box_face_start = gFace_count;
+        gPling_face = NULL;
+        gFace_count += FindFacesInBox(&bnds, &gFace_list[gFace_count], 150 - gFace_count);
+        if (gFace_count >= 150) {
+            c->box_face_start = 0;
+            gFace_count = FindFacesInBox(&bnds, gFace_list, 150);
+            ++gFace_num;
+        }
+        old_d = c->water_d;
+        if (c->driver == eDriver_local_human
+            && c->water_d != 10000.0
+            && gDouble_pling_water
+            && c->bounds_world_space.max.v[2] * c->water_normal.v[2] + c->bounds_world_space.max.v[1] * c->water_normal.v[1] + c->water_normal.v[0] * c->bounds_world_space.max.v[0] - c->water_d <= 0.0) {
+            gInTheSea = 1;
+            FreezeCamera();
+        }
+        if (gPling_face && fabs(gPling_face->normal.v[1]) > 0.89999998) {
+            c->water_normal.v[0] = gPling_face->normal.v[0];
+            c->water_normal.v[1] = gPling_face->normal.v[1];
+            c->water_normal.v[2] = gPling_face->normal.v[2];
+            if (c->water_normal.v[1] < 0.0) {
+                c->water_normal.v[0] = -c->water_normal.v[0];
+                c->water_normal.v[1] = -c->water_normal.v[1];
+                c->water_normal.v[2] = -c->water_normal.v[2];
+            }
+            c->water_d = gPling_face->v[0].v[1] * c->water_normal.v[1] + gPling_face->v[0].v[2] * c->water_normal.v[2] + gPling_face->v[0].v[0] * c->water_normal.v[0];
+            if (c->driver == eDriver_local_human) {
+                if (gPling_face->material->identifier[1] == '!') {
+                    if (c->bounds_world_space.min.v[1] * c->water_normal.v[1] + c->bounds_world_space.min.v[2] * c->water_normal.v[2] + c->water_normal.v[0] * c->bounds_world_space.min.v[0] - c->water_d < 0.0) {
+                        GetNewBoundingBox(&current_bounds, &c->bounds[1], &c->car_master_actor->t.t.mat);
+                        if ((c->water_normal.v[1] * current_bounds.min.v[1] + c->water_normal.v[2] * current_bounds.min.v[2] + c->water_normal.v[0] * current_bounds.min.v[0]) / 6.9 - c->water_d < 0.0) {
+                            gInTheSea = 1;
+                            FreezeCamera();
+                        }
+                    }
+                    gDouble_pling_water = 1;
+                } else {
+                    gDouble_pling_water = 0;
+                }
+            }
+        } else {
+            c->water_d = 10000.0;
+            if (c->driver == eDriver_local_human) {
+                if (gInTheSea == 1) {
+                    gInTheSea = 2;
+                } else {
+                    gInTheSea = 0;
+                }
+            }
+        }
+        if (c->water_d != old_d) {
+            StartPipingSession(ePipe_chunk_splash);
+            AddSplashToPipingSession(c);
+            EndPipingSession();
+        }
+        c->box_face_end = gFace_count;
+        c->box_face_ref = gFace_num;
+    }
 }
 
 // IDA: int __cdecl IsCarInTheSea()
 int IsCarInTheSea() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    return gInTheSea;
 }
 
 // IDA: void __usercall RememberSafePosition(tCar_spec *car@<EAX>, tU32 pTime@<EDX>)
@@ -683,7 +793,76 @@ void CalcEngineForce(tCar_spec* c, br_scalar dt) {
     int sign;
     tS32 temp_for_swap;
     LOG_TRACE("(%p, %f)", c, dt);
-    NOT_IMPLEMENTED();
+
+    c->acc_force = 0.0;
+    if (c->revs == 0.0) {
+        c->gear = 0;
+    }
+    sign = c->gear < 0 || (!c->gear && c->velocity_car_space.v[2] > 0.5);
+    if (c->keys.backwards != sign) {
+        c->keys.backwards = !c->keys.backwards;
+
+        temp_for_swap = c->keys.acc;
+        c->keys.acc = c->keys.dec;
+        c->keys.dec = temp_for_swap;
+
+        temp_for_swap = c->joystick.acc;
+        c->joystick.acc = c->joystick.dec;
+        c->joystick.dec = temp_for_swap;
+    }
+    if (!c->gear && !c->keys.acc && c->joystick.acc <= 0 && (c->keys.dec || c->joystick.dec > 0) && !c->keys.backwards && fabs(c->velocity_car_space.v[2]) < 1.0) {
+        c->keys.backwards = 1;
+        // c->keys = (tCar_controls)(*(_DWORD*)&c->keys & 0xFFFBFFFF | (((*(_DWORD*)&c->keys >> 19) & 1) << 18));
+        // *(_DWORD*)&c->keys &= 0xFFF7FFFF;
+        c->keys.acc = c->keys.dec;
+        c->keys.dec = 0;
+        temp_for_swap = c->joystick.acc;
+        c->joystick.acc = c->joystick.dec;
+        c->joystick.dec = temp_for_swap;
+    }
+    c->torque = -(c->revs * c->revs / 100000000.0) - 0.2;
+    if (c->keys.acc || c->joystick.acc >= 0) {
+        if (fabs(c->curvature) > c->maxcurve / 2.0 && c->gear < 2 && c->gear && c->traction_control) {
+            ts = 0.69999999;
+        } else if (c->joystick.acc < 0) {
+            ts = 1.2;
+        } else {
+            ts = c->joystick.acc / 54613.0;
+        }
+        torque = c->engine_power_multiplier * ts * gEngine_powerup_factor[c->power_up_levels[1]];
+        if (c->damage_units[0].damage_level > 10) {
+            torque = (1.0 - (double)(c->damage_units[0].damage_level - 10) / 100.0) * torque;
+        }
+        c->torque = c->torque + torque;
+    } else {
+        c->traction_control = 1;
+    }
+    if (!c->keys.dec && (!c->keys.acc || c->gear) && c->joystick.dec <= 0 && (c->joystick.acc <= 0 || c->gear)) {
+        c->brake_force = 0.0;
+    } else {
+        if (c->joystick.dec > 0) {
+            c->brake_force = (double)(c->joystick.dec / 0x10000) * c->brake_increase + c->initial_brake;
+        }
+        if (c->brake_force == 0.0) {
+            c->brake_force = c->initial_brake;
+        } else {
+            c->brake_force = c->brake_increase * dt + c->brake_force;
+            if (c->initial_brake + c->brake_increase < c->brake_force) {
+                c->brake_force = c->initial_brake + c->brake_increase;
+            }
+        }
+    }
+    if (c->gear) {
+        c->acc_force = c->force_torque_ratio * c->torque / (double)c->gear;
+        if (c->brake_force == 0.0) {
+            if (c->revs - 1.0 > c->target_revs || c->revs + 1.0 < c->target_revs) {
+                ts2 = c->torque * dt / 0.0002 + c->revs - c->target_revs;
+                c->acc_force = ts2 / ((1.0 / (c->speed_revs_ratio * c->M) / (double)c->gear + 1.0 / (c->force_torque_ratio * 0.0002) * (double)c->gear) * dt) + c->acc_force;
+            }
+        } else {
+            c->revs = c->target_revs;
+        }
+    }
 }
 
 // IDA: void __usercall PrepareCars(tU32 pFrame_start_time@<EAX>)
@@ -735,9 +914,89 @@ void FinishCars(tU32 pLast_frame_time, tU32 pTime) {
     br_vector3 minus_k;
     int i;
     int wheel;
+    br_scalar scale;
     LOG_TRACE("(%d, %d)", pLast_frame_time, pTime);
 
-    STUB();
+    for (i = 0; gNum_cars_and_non_cars > i; ++i) {
+        car = gActive_car_list[i];
+        if (fabs(car->omega.v[0]) > 10000.0
+            || fabs(car->omega.v[1]) > 10000.0
+            || fabs(car->omega.v[2]) > 10000.0) {
+            BrVector3SetFloat(&car->omega, 0.0, 0.0, 0.0);
+            BrVector3SetFloat(&car->v, 0.0, 0.0, 0.0);
+        }
+        car->velocity_car_space.v[0] = car->velocity_car_space.v[0] / 6900.0;
+        car->velocity_car_space.v[1] = car->velocity_car_space.v[1] / 6900.0;
+        car->velocity_car_space.v[2] = car->velocity_car_space.v[2] / 6900.0;
+        car->car_master_actor->t.t.mat.m[3][0] = car->car_master_actor->t.t.mat.m[3][0] / 6.9000001;
+        car->car_master_actor->t.t.mat.m[3][1] = car->car_master_actor->t.t.mat.m[3][1] / 6.9000001;
+        car->car_master_actor->t.t.mat.m[3][2] = car->car_master_actor->t.t.mat.m[3][2] / 6.9000001;
+
+        car->speed = sqrt(car->v.v[2] * car->v.v[2] + car->v.v[0] * car->v.v[0]) / 6900.0;
+        minus_k.v[0] = -car->car_master_actor->t.t.mat.m[2][0];
+        minus_k.v[1] = -car->car_master_actor->t.t.mat.m[2][1];
+        minus_k.v[2] = -car->car_master_actor->t.t.mat.m[2][2];
+        if (car->speed <= 0.000099999997) {
+            if (car->direction.v[1] * minus_k.v[1] + car->direction.v[2] * minus_k.v[2] + car->direction.v[0] * minus_k.v[0] < 0.0) {
+                BrVector3SetFloat(&minus_k, 0.0, 0.0, 1.0);
+            } else {
+                BrVector3SetFloat(&minus_k, 0.0, 0.0, -1.0);
+            }
+            BrMatrix34ApplyV(&car->direction, &minus_k, &car->car_master_actor->t.t.mat);
+        } else if (gLast_mechanics_time > pLast_frame_time && gCar_to_view == car) {
+            car->old_v.v[0] = car->old_v.v[0] - car->v.v[0];
+            car->old_v.v[1] = car->old_v.v[1] - car->v.v[1];
+            car->old_v.v[2] = car->old_v.v[2] - car->v.v[2];
+            car->old_v.v[0] = (gLast_mechanics_time - pLast_frame_time) / 40.0 * car->old_v.v[0];
+            car->old_v.v[1] = (gLast_mechanics_time - pLast_frame_time) / 40.0 * car->old_v.v[1];
+            car->old_v.v[2] = (gLast_mechanics_time - pLast_frame_time) / 40.0 * car->old_v.v[2];
+            car->old_v.v[0] = car->old_v.v[0] + car->v.v[0];
+            car->old_v.v[1] = car->old_v.v[1] + car->v.v[1];
+            car->old_v.v[2] = car->old_v.v[2] + car->v.v[2];
+            scale = sqrt(
+                car->old_v.v[1] * car->old_v.v[1]
+                + car->old_v.v[2] * car->old_v.v[2]
+                + car->old_v.v[0] * car->old_v.v[0]);
+            if (scale <= 2.3841858e-7) {
+                car->direction.v[0] = 1.0;
+                car->direction.v[1] = 0.0;
+                car->direction.v[2] = 0.0;
+            } else {
+                scale = 1.0 / scale;
+                car->direction.v[0] = car->old_v.v[0] * scale;
+                car->direction.v[1] = car->old_v.v[1] * scale;
+                car->direction.v[2] = car->old_v.v[2] * scale;
+            }
+        } else {
+            scale = sqrt(car->v.v[2] * car->v.v[2] + car->v.v[1] * car->v.v[1] + car->v.v[0] * car->v.v[0]);
+            if (scale <= 2.3841858e-7) {
+                car->direction.v[0] = 1.0;
+                car->direction.v[1] = 0.0;
+                car->direction.v[2] = 0.0;
+            } else {
+                scale = 1.0 / scale;
+                car->direction.v[0] = car->v.v[0] * scale;
+                car->direction.v[1] = car->v.v[1] * scale;
+                car->direction.v[2] = car->v.v[2] * scale;
+            }
+        }
+        if (car->driver > eDriver_non_car) {
+            car->speedo_speed = (car->v.v[2] * minus_k.v[2] + car->v.v[1] * minus_k.v[1] + car->v.v[0] * minus_k.v[0])
+                / 6900.0;
+            car->steering_angle = atan((car->wpos[0].v[2] - car->wpos[2].v[2]) * car->curvature) * 57.29577951308232;
+            car->lr_sus_position = (car->ride_height - car->oldd[0]) / 6.9;
+            car->rr_sus_position = (car->ride_height - car->oldd[1]) / 6.9;
+            car->lf_sus_position = (car->ride_height - car->oldd[2]) / 6.9;
+            car->rf_sus_position = (car->ride_height - car->oldd[3]) / 6.9;
+            for (wheel = 0; wheel < 4; ++wheel) {
+                if (*(float*)((char*)car->susp_height + 2 * (wheel & 0xFFFFFFFE)) > (double)car->oldd[wheel]
+                    && gCurrent_race.material_modifiers[car->material_index[wheel]].smoke_type >= 2
+                    && !car->doing_nothing_flag) {
+                    GenerateContinuousSmoke(car, wheel, pTime);
+                }
+            }
+        }
+    }
 }
 
 // IDA: void __usercall InterpolateCars(tU32 pLast_frame_time@<EAX>, tU32 pTime@<EDX>)
@@ -925,7 +1184,8 @@ void MungeSpecialVolume(tCollision_info* pCar) {
     tSpecial_volume* new_special_volume;
     tCar_spec* car;
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    SILENT_STUB();
 }
 
 // IDA: void __usercall ResetCarSpecialVolume(tCollision_info *pCar@<EAX>)
@@ -966,7 +1226,35 @@ void MoveAndCollideCar(tCar_spec* car, br_scalar dt) {
     tCollision_info* car_info;
     int wheel;
     LOG_TRACE("(%p, %f)", car, dt);
-    NOT_IMPLEMENTED();
+
+    if (car->dt >= 0.0) {
+        dt = car->dt;
+    }
+    if (dt != 0.0 && (!gCar_flying || &gProgram_state.current_car != car)) {
+        car_info = (tCollision_info*)car;
+        car->new_skidding = 0;
+        if (car->water_d != 10000.0) {
+            TestAutoSpecialVolume(car_info);
+        }
+        MungeSpecialVolume(car_info);
+        if (car->driver < eDriver_net_human) {
+            CalcForce(car, dt);
+        } else {
+            CalcEngineForce(car, dt);
+            CalcForce(car, dt);
+            DoRevs(car, dt);
+        }
+        RotateCar(car_info, dt);
+        TranslateCar(car_info, dt);
+        CollideCarWithWall(car_info, dt);
+        BrMatrix34ApplyP(&car->pos, &car->cmpos, &car->car_master_actor->t.t.mat);
+        car->pos.v[0] = car->pos.v[0] / 6.9000001;
+        car->pos.v[1] = car->pos.v[1] / 6.9000001;
+        car->pos.v[2] = car->pos.v[2] / 6.9000001;
+        for (wheel = 0; wheel < 4; wheel++) {
+            SkidMark(car, wheel);
+        }
+    }
 }
 
 // IDA: void __usercall MoveAndCollideNonCar(tNon_car_spec *non_car@<EAX>, br_scalar dt)
@@ -979,7 +1267,9 @@ void MoveAndCollideNonCar(tNon_car_spec* non_car, br_scalar dt) {
 // IDA: int __usercall CollideCarWithWall@<EAX>(tCollision_info *car@<EAX>, br_scalar dt)
 int CollideCarWithWall(tCollision_info* car, br_scalar dt) {
     LOG_TRACE("(%p, %f)", car, dt);
-    NOT_IMPLEMENTED();
+
+    STUB();
+    return 0;
 }
 
 // IDA: void __cdecl ToggleControls()
@@ -1160,9 +1450,27 @@ void RotateCarFirstOrder(tCollision_info* c, br_scalar dt) {
     br_scalar rad;
     br_scalar e1;
     br_scalar e2;
-    static br_scalar max_rad;
+    static br_scalar max_rad = 0.0001;
     LOG_TRACE("(%p, %f)", c, dt);
-    NOT_IMPLEMENTED();
+
+    rad = sqrt(c->omega.v[1] * c->omega.v[1] + c->omega.v[2] * c->omega.v[2] + c->omega.v[0] * c->omega.v[0]);
+    rad_rate = rad * dt;
+    if (rad_rate >= max_rad) {
+        axis.v[0] = c->omega.v[0] / rad;
+        axis.v[1] = c->omega.v[1] / rad;
+        axis.v[2] = c->omega.v[2] / rad;
+        L.v[0] = c->I.v[0] * c->omega.v[0];
+        L.v[1] = c->I.v[1] * c->omega.v[1];
+        L.v[2] = c->I.v[2] * c->omega.v[2];
+        BrMatrix34Rotate(&m, BrRadianToAngle(rad_rate), &axis);
+        BrMatrix34TApplyV(&L2, &L, &m);
+        BrMatrix34PreTranslate(&m, -c->cmpos.v[0], -c->cmpos.v[1], -c->cmpos.v[2]);
+        BrMatrix34PostTranslate(&m, c->cmpos.v[0], c->cmpos.v[1], c->cmpos.v[2]);
+        BrMatrix34Pre(&c->car_master_actor->t.t.mat, &m);
+        c->omega.v[0] = L2.v[0] / c->I.v[0];
+        c->omega.v[1] = L2.v[1] / c->I.v[1];
+        c->omega.v[2] = L2.v[2] / c->I.v[2];
+    }
 }
 
 // IDA: void __usercall SimpleRotate(tCollision_info *c@<EAX>, br_scalar dt)
@@ -1188,7 +1496,20 @@ void RotateCar(tCollision_info* c, br_scalar dt) {
     int steps;
     int i;
     LOG_TRACE("(%p, %f)", c, dt);
-    NOT_IMPLEMENTED();
+
+    rad_squared = (c->omega.v[1] * c->omega.v[1] + c->omega.v[2] * c->omega.v[2] + c->omega.v[0] * c->omega.v[0]) * dt;
+    c->oldomega = c->omega;
+    if (rad_squared >= 0.0000001) {
+        if (rad_squared <= 0.0080000004) {
+            RotateCarFirstOrder(c, dt);
+        } else {
+            steps = sqrt(rad_squared / 0.032000002) + 1;
+            dt = dt / (double)steps;
+            for (i = 0; i < steps && i < 20; ++i) {
+                RotateCarSecondOrder(c, dt);
+            }
+        }
+    }
 }
 
 // IDA: void __usercall SteeringSelfCentre(tCar_spec *c@<EAX>, br_scalar dt, br_vector3 *n)
@@ -1196,7 +1517,26 @@ void SteeringSelfCentre(tCar_spec* c, br_scalar dt, br_vector3* n) {
     br_scalar ts;
     br_scalar ts2;
     LOG_TRACE("(%p, %f, %p)", c, dt, n);
-    NOT_IMPLEMENTED();
+
+    if (c->curvature > (double)c->maxcurve) {
+        c->curvature = c->maxcurve;
+    }
+    if (-c->maxcurve > c->curvature) {
+        c->curvature = -c->maxcurve;
+    }
+    if (!c->keys.left && c->joystick.left <= 0 && !c->keys.right && c->joystick.right <= 0 && !c->keys.holdw) {
+        if (c->susp_height[1] > c->oldd[2] || c->susp_height[1] > c->oldd[3]) {
+            ts = -((c->omega.v[2] * n->v[2] + c->omega.v[1] * n->v[1] + c->omega.v[0] * n->v[0]) * (dt / (c->wpos[0].v[2] - c->wpos[2].v[2])));
+            ts2 = -(c->curvature * dt);
+            if (fabs(ts) < fabs(ts2) || (ts * ts2 < 0.0)) {
+                ts = ts2;
+            }
+            c->curvature = c->curvature + ts;
+            if (c->curvature * ts > 0.0) {
+                c->curvature = 0.0;
+            }
+        }
+    }
 }
 
 // IDA: void __usercall NonCarCalcForce(tNon_car_spec *nc@<EAX>, br_scalar dt)
@@ -1301,7 +1641,62 @@ void DoRevs(tCar_spec* c, br_scalar dt) {
     br_scalar ts;
     int revs_increase;
     LOG_TRACE("(%p, %f)", c, dt);
-    NOT_IMPLEMENTED();
+
+    ts = -(c->car_master_actor->t.t.mat.m[2][2] * c->v.v[2]
+        + c->car_master_actor->t.t.mat.m[2][1] * c->v.v[1]
+        + c->car_master_actor->t.t.mat.m[2][0] * c->v.v[0]);
+    if (c->gear) {
+        c->target_revs = ts / c->speed_revs_ratio / (double)c->gear;
+    } else {
+        c->target_revs = 0.0;
+    }
+    if (c->target_revs < 0.0) {
+        c->target_revs = 0.0;
+        c->gear = 0;
+    }
+    if (!c->number_of_wheels_on_ground || (c->wheel_slip & 2) != -1 || !c->gear) {
+        if (c->number_of_wheels_on_ground) {
+            wheel_spin_force = c->force_torque_ratio * c->torque - (double)c->gear * c->acc_force;
+        } else {
+            wheel_spin_force = c->force_torque_ratio * c->torque;
+        }
+        if (c->gear) {
+            if (c->gear < 2 && (c->keys.dec || c->joystick.dec > 0) && fabs(ts) < 1.0 && c->revs > 1000.0) {
+                c->gear = -c->gear;
+            }
+        } else {
+            if (c->revs > 1000.0 && !c->keys.brake && (c->keys.acc || c->joystick.acc > 0) && !gCountdown) {
+                if (c->keys.backwards) {
+                    c->gear = -1;
+                } else {
+                    c->gear = 1;
+                }
+            }
+            wheel_spin_force = c->force_torque_ratio * c->torque;
+        }
+        c->revs = wheel_spin_force / c->force_torque_ratio * dt / 0.0002 + c->revs;
+        if (c->traction_control && wheel_spin_force > 0.0 && c->revs > (double)c->target_revs && c->gear && c->target_revs > 1000.0) {
+            c->revs = c->target_revs;
+        }
+        if (c->revs <= 0.0) {
+            c->revs = 0.0;
+        }
+    }
+    if ((c->wheel_slip & 2) == 0 && c->target_revs > 6000.0 && c->revs > 6000.0 && c->gear < c->max_gear && c->gear > 0 && !c->just_changed_gear) {
+        ++c->gear;
+    }
+    if (c->gear > 1 && c->target_revs < 3000.0 && !c->just_changed_gear) {
+        c->gear--;
+    }
+    if (c->revs < 200.0 && c->target_revs < 200.0 && c->gear <= 1 && !c->keys.acc && c->joystick.acc <= 0 && !c->just_changed_gear) {
+        c->gear = 0;
+    }
+    if (c->just_changed_gear && c->revs < 6000.0 && c->revs > 200.0 && (c->gear < 2 || c->revs >= 3000.0)) {
+        c->just_changed_gear = 0;
+    }
+    if (c->revs >= 6000.0 && (c->keys.acc || c->joystick.acc > 0)) {
+        c->just_changed_gear = 0;
+    }
 }
 
 // IDA: void __usercall ApplyTorque(tCar_spec *c@<EAX>, br_vector3 *tdt@<EDX>)
@@ -1786,19 +2181,21 @@ void MungeCarGraphics(tU32 pFrame_period) {
             the_car->car_master_actor->render_style = (the_car->driver != eDriver_local_human) && PointOutOfSight(&the_car->pos, gYon_squared);
         }
     }
-    for (car = 0; gNum_active_cars > car; car++) {
+    for (car = 0; car < gNum_active_cars; car++) {
         the_car = gActive_car_list[car];
         if (the_car->car_master_actor->render_style != BR_RSTYLE_NONE) {
+            car_x = the_car->car_master_actor->t.t.mat.m[3][0];
+            car_z = the_car->car_master_actor->t.t.mat.m[3][2];
             the_car->shadow_intersection_flags = 0;
             oily_count = GetOilSpillCount();
             for (i = 0; i < oily_count; i++) {
                 GetOilSpillDetails(i, &oily_actor, &oily_size);
                 if (oily_actor) {
                     car_radius = the_car->bounds[1].max.v[2] / 6.9000001 * 1.5;
-                    if (oily_actor->t.t.mat.m[3][0] - oily_size < the_car->car_master_actor->t.t.mat.m[3][0] + car_radius
-                        && oily_actor->t.t.mat.m[3][0] + oily_size > the_car->car_master_actor->t.t.mat.m[3][0] - car_radius
-                        && oily_actor->t.t.mat.m[3][2] - oily_size < the_car->car_master_actor->t.t.mat.m[3][2] + car_radius
-                        && oily_actor->t.t.mat.m[3][2] + oily_size > the_car->car_master_actor->t.t.mat.m[3][2] - car_radius) {
+                    if (oily_actor->t.t.mat.m[3][0] - oily_size < car_x + car_radius
+                        && oily_actor->t.t.mat.m[3][0] + oily_size > car_x - car_radius
+                        && oily_actor->t.t.mat.m[3][2] - oily_size < car_z + car_radius
+                        && oily_actor->t.t.mat.m[3][2] + oily_size > car_z - car_radius) {
                         the_car->shadow_intersection_flags |= 1 << i;
                     }
                 }
@@ -1865,6 +2262,7 @@ void MungeCarGraphics(tU32 pFrame_period) {
             if (gAction_replay_mode) {
                 MungeSpecialVolume((tCollision_info*)the_car);
             } else if (the_car->driver == eDriver_local_human) {
+                LOG_DEBUG("curve %f", the_car->curvature);
                 abs_omega_x = (fabs(the_car->I.v[0]) + 3.3) / 2.0 * fabs(the_car->omega.v[0]);
                 abs_omega_y = (fabs(the_car->I.v[1]) + 3.57) / 2.0 * fabs(the_car->omega.v[1]);
                 abs_omega_z = (fabs(the_car->I.v[2]) + 0.44) / 2.0 * fabs(the_car->omega.v[2]);
@@ -1934,10 +2332,10 @@ void MungeCarGraphics(tU32 pFrame_period) {
                 }
             }
             if (the_car->driver != eDriver_local_human && the_car->car_model_variable) {
-                distance_from_camera = (the_car->car_master_actor->t.t.mat.m[3][0] - gCamera_to_world.m[3][0])
-                        * (the_car->car_master_actor->t.t.mat.m[3][0] - gCamera_to_world.m[3][0])
-                    + (the_car->car_master_actor->t.t.mat.m[3][2] - gCamera_to_world.m[3][2])
-                        * (the_car->car_master_actor->t.t.mat.m[3][2] - gCamera_to_world.m[3][2])
+                distance_from_camera = (car_x - gCamera_to_world.m[3][0])
+                        * (car_x - gCamera_to_world.m[3][0])
+                    + (car_z - gCamera_to_world.m[3][2])
+                        * (car_z - gCamera_to_world.m[3][2])
                     + (the_car->car_master_actor->t.t.mat.m[3][1] - gCamera_to_world.m[3][1])
                         * (the_car->car_master_actor->t.t.mat.m[3][1] - gCamera_to_world.m[3][1]);
 
@@ -1990,8 +2388,8 @@ void MungeCarGraphics(tU32 pFrame_period) {
                     update_mat = 1;
                 }
                 if (the_car->screen_material->colour_map) {
-                    the_car->screen_material->map_transform.m[2][0] = fmod(the_car->car_master_actor->t.t.mat.m[3][0], 1.0);
-                    the_car->screen_material->map_transform.m[2][1] = fmod(the_car->car_master_actor->t.t.mat.m[3][2], 1.0);
+                    the_car->screen_material->map_transform.m[2][0] = fmod(car_x, 1.0);
+                    the_car->screen_material->map_transform.m[2][1] = fmod(car_z, 1.0);
                     if (!update_mat) {
                         BrMaterialUpdate(the_car->screen_material, 1u);
                     }
