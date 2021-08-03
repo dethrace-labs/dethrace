@@ -284,4 +284,6 @@ typedef enum keymapcodes {
 
 #define ONEEIGHTTWO 182.0444444444444
 
+#define PHYSICS_STEP_TIME 40
+
 #endif

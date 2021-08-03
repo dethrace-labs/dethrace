@@ -851,6 +851,11 @@ void RenderAFrame(int pDepth_mask_on) {
     tCar_spec* car;
     LOG_TRACE("(%d)", pDepth_mask_on);
 
+    static int frame_counter;
+
+    frame_counter++;
+    //LOG_DEBUG("%d", frame_counter);
+
     gRender_screen->pixels = gBack_screen->pixels;
     the_time = GetTotalTime();
     old_pixels = gRender_screen->pixels;
