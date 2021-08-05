@@ -282,8 +282,12 @@ typedef enum keymapcodes {
 #define MAX(a, b) ((a) > (b) ? a : b)
 #define COUNT_OF(array) (sizeof((array)) / sizeof((array)[0]))
 
+#define DEG_TO_RAD(degrees) ((degrees)*3.141592653589793 / 180.0)
+
 #define ONEEIGHTTWO 182.0444444444444
 
 #define PHYSICS_STEP_TIME 40
+
+#define DR_PI 3.141592653589793
 
 #endif

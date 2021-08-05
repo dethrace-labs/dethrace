@@ -213,13 +213,15 @@ void DRDrawLine(br_pixelmap* pDestn, int pX1, int pY1, int pX2, int pY2, int pCo
     int y;
     int the_diff;
     LOG_TRACE("(%p, %d, %d, %d, %d, %d)", pDestn, pX1, pY1, pX2, pY2, pColour);
-    NOT_IMPLEMENTED();
+
+    BrPixelmapLine(pDestn, pX1, pY1, pX2, pY2, pColour);
 }
 
 // IDA: void __usercall DrawDigitAt(br_pixelmap *gImage@<EAX>, int pX@<EDX>, int pY@<EBX>, int pY_pitch@<ECX>, int pValue)
 void DrawDigitAt(br_pixelmap* gImage, int pX, int pY, int pY_pitch, int pValue) {
     LOG_TRACE("(%p, %d, %d, %d, %d)", gImage, pX, pY, pY_pitch, pValue);
-    NOT_IMPLEMENTED();
+
+    DRPixelmapRectangleMaskedCopy(gBack_screen, pX, pY, gImage, 0, pY_pitch * pValue, gImage->width, pY_pitch);
 }
 
 // IDA: void __usercall DrawNumberAt(br_pixelmap *gImage@<EAX>, int pX@<EDX>, int pY@<EBX>, int pX_pitch@<ECX>, int pY_pitch, int pValue, int pDigit_count, int pLeading_zeroes)
@@ -227,7 +229,14 @@ void DrawNumberAt(br_pixelmap* gImage, int pX, int pY, int pX_pitch, int pY_pitc
     int i;
     int the_value;
     LOG_TRACE("(%p, %d, %d, %d, %d, %d, %d, %d)", gImage, pX, pY, pX_pitch, pY_pitch, pValue, pDigit_count, pLeading_zeroes);
-    NOT_IMPLEMENTED();
+
+    for (i = pDigit_count - 1; i >= 0; i--) {
+        the_value = pValue % 10;
+        pValue /= 10;
+        if (pValue || pLeading_zeroes || pDigit_count - 1 == i) {
+            DrawDigitAt(gImage, pX + pX_pitch * i, pY, pY_pitch, the_value);
+        }
+    }
 }
 
 // IDA: void __usercall BuildColourTable(br_pixelmap *pPalette@<EAX>)

@@ -272,7 +272,7 @@ int Chance(float pChance_per_second, int pPeriod) {
 // IDA: float __cdecl tandeg(float pAngle)
 float tandeg(float pAngle) {
     LOG_TRACE("(%f)", pAngle);
-    pAngle = sin(pAngle * 3.141592653589793 / 180.0);
+    pAngle = sin(DEG_TO_RAD(pAngle));
     return pAngle / cos(pAngle);
 }
 

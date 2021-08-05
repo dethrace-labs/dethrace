@@ -850,14 +850,19 @@ void CalcEngineForce(tCar_spec* c, br_scalar dt) {
     }
     if (c->gear) {
         c->acc_force = c->force_torque_ratio * c->torque / (double)c->gear;
+        float f1 = c->acc_force;
+        float f2 = 0;
         if (c->brake_force == 0.0) {
             if (c->revs - 1.0 > c->target_revs || c->revs + 1.0 < c->target_revs) {
                 ts2 = c->torque * dt / 0.0002 + c->revs - c->target_revs;
                 c->acc_force = ts2 / ((1.0 / (c->speed_revs_ratio * c->M) / (double)c->gear + 1.0 / (c->force_torque_ratio * 0.0002) * (double)c->gear) * dt) + c->acc_force;
+                f2 = c->acc_force;
             }
         } else {
             c->revs = c->target_revs;
         }
+
+        LOG_DEBUG("force 1 %f, 2 %f, final %f", f1, f2, c->acc_force);
     }
 }
 
@@ -1434,7 +1439,36 @@ void RotateCarSecondOrder(tCollision_info* c, br_scalar dt) {
     br_scalar rad_rate;
     br_matrix34 m;
     LOG_TRACE("(%p, %f)", c, dt);
-    NOT_IMPLEMENTED();
+
+    rad = sqrt(c->omega.v[1] * c->omega.v[1] + c->omega.v[2] * c->omega.v[2] + c->omega.v[0] * c->omega.v[0]);
+    rad_rate = rad * dt;
+    omega.v[0] = c->omega.v[0] / rad;
+    omega.v[1] = c->omega.v[1] / rad;
+    omega.v[2] = c->omega.v[2] / rad;
+    L.v[0] = c->I.v[0] * c->omega.v[0];
+    L.v[1] = c->I.v[1] * c->omega.v[1];
+    L.v[2] = c->I.v[2] * c->omega.v[2];
+    BrMatrix34Rotate(&m, BrRadianToAngle(rad_rate) >> 1, &omega);
+    BrMatrix34TApplyV(&L2, &L, &m);
+    axis.v[0] = L2.v[0] / c->I.v[0];
+    axis.v[1] = L2.v[1] / c->I.v[1];
+    axis.v[2] = L2.v[2] / c->I.v[2];
+    rad = sqrt(axis.v[1] * axis.v[1] + axis.v[2] * axis.v[2] + axis.v[0] * axis.v[0]);
+    rad_rate = rad * dt;
+    omega.v[0] = axis.v[0] / rad;
+    omega.v[1] = axis.v[1] / rad;
+    omega.v[2] = axis.v[2] / rad;
+    BrMatrix34Rotate(&m, BrRadianToAngle(rad_rate), &omega);
+    omega.v[2] = -c->cmpos.v[2];
+    omega.v[1] = -c->cmpos.v[1];
+    omega.v[0] = -c->cmpos.v[0];
+    BrMatrix34PreTranslate(&m, omega.v[0], omega.v[1], omega.v[2]);
+    BrMatrix34PostTranslate(&m, c->cmpos.v[0], c->cmpos.v[1], c->cmpos.v[2]);
+    BrMatrix34Pre(&c->car_master_actor->t.t.mat, &m);
+    BrMatrix34TApplyV(&L2, &L, &m);
+    c->omega.v[0] = L2.v[0] / c->I.v[0];
+    c->omega.v[1] = L2.v[1] / c->I.v[1];
+    c->omega.v[2] = L2.v[2] / c->I.v[2];
 }
 
 // IDA: void __usercall RotateCarFirstOrder(tCollision_info *c@<EAX>, br_scalar dt)
@@ -1557,7 +1591,30 @@ void AddDrag(tCar_spec* c, br_scalar dt) {
     tSpecial_volume* vol;
     br_vector3 b;
     LOG_TRACE("(%p, %f)", c, dt);
-    NOT_IMPLEMENTED();
+
+    vol = c->last_special_volume;
+    drag_multiplier = -(dt * 0.00050000002);
+    if (vol) {
+        if (c->underwater_ability) {
+            drag_multiplier = vol->viscosity_multiplier * drag_multiplier * 0.6;
+        } else {
+            drag_multiplier = vol->viscosity_multiplier * drag_multiplier;
+        }
+        drag_multiplier = c->water_depth_factor * drag_multiplier;
+    }
+    ts = sqrt(c->v.v[1] * c->v.v[1] + c->v.v[2] * c->v.v[2] + c->v.v[0] * c->v.v[0]) * drag_multiplier / c->M;
+    b.v[0] = c->v.v[0] * ts;
+    b.v[1] = c->v.v[1] * ts;
+    b.v[2] = c->v.v[2] * ts;
+    c->v.v[0] = c->v.v[0] + b.v[0];
+    c->v.v[1] = c->v.v[1] + b.v[1];
+    c->v.v[2] = c->v.v[2] + b.v[2];
+    ts = sqrt(c->omega.v[1] * c->omega.v[1] + c->omega.v[2] * c->omega.v[2] + c->omega.v[0] * c->omega.v[0])
+        * drag_multiplier;
+    b.v[0] = c->omega.v[0] * ts;
+    b.v[1] = c->omega.v[1] * ts;
+    b.v[2] = c->omega.v[2] * ts;
+    ApplyTorque(c, &b);
 }
 
 // IDA: void __usercall DoBumpiness(tCar_spec *c@<EAX>, br_vector3 *wheel_pos@<EDX>, br_vector3 *norm@<EBX>, br_scalar *d@<ECX>, int n)
@@ -2370,7 +2427,10 @@ void DoRevs(tCar_spec* c, br_scalar dt) {
 // IDA: void __usercall ApplyTorque(tCar_spec *c@<EAX>, br_vector3 *tdt@<EDX>)
 void ApplyTorque(tCar_spec* c, br_vector3* tdt) {
     LOG_TRACE("(%p, %p)", c, tdt);
-    NOT_IMPLEMENTED();
+
+    c->omega.v[0] = tdt->v[0] / c->I.v[0] + c->omega.v[0];
+    c->omega.v[1] = tdt->v[1] / c->I.v[1] + c->omega.v[1];
+    c->omega.v[2] = tdt->v[2] / c->I.v[2] + c->omega.v[2];
 }
 
 // IDA: void __usercall TranslateCar(tCollision_info *c@<EAX>, br_scalar dt)
@@ -2497,7 +2557,8 @@ void SkidNoise(tCar_spec* pC, int pWheel_num, br_scalar pV, int material) {
     static tS3_volume last_skid_vol[2];
     int i;
     LOG_TRACE("(%p, %d, %f, %d)", pC, pWheel_num, pV, material);
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __usercall StopSkid(tCar_spec *pC@<EAX>)
@@ -2640,7 +2701,23 @@ void MultiFindFloorInBoxBU(int pNum_rays, br_vector3* a, br_vector3* b, br_vecto
     br_scalar dist[4];
     tFace_ref* face_ref;
     LOG_TRACE("(%d, %p, %p, %p, %p, %p, %p)", pNum_rays, a, b, nor, d, c, mat_ref);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < c->box_face_end; i++) {
+        face_ref = &gFace_list[i];
+        if (!gEliminate_faces || (face_ref->flags & 0x80) == 0) {
+            MultiRayCheckSingleFace(pNum_rays, face_ref, a, b, &nor2, dist);
+            for (j = 0; j < pNum_rays; ++j) {
+                if (d[j] > dist[j]) {
+                    d[j] = dist[j];
+                    nor[j] = nor2;
+                    l = *gFace_list[i].material->identifier - 47;
+                    if (l >= 0 && l < 11) {
+                        mat_ref[j] = l;
+                    }
+                }
+            }
+        }
+    }
 }
 
 // IDA: void __usercall findfloor(br_vector3 *a@<EAX>, br_vector3 *b@<EDX>, br_vector3 *nor@<EBX>, br_scalar *d@<ECX>)

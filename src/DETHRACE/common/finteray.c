@@ -446,7 +446,102 @@ void MultiRayCheckSingleFace(int pNum_rays, tFace_ref* pFace, br_vector3* ray_po
     double f_numerator;
     br_material* this_material;
     LOG_TRACE("(%d, %p, %p, %p, %p, %p)", pNum_rays, pFace, ray_pos, ray_dir, normal, rt);
-    NOT_IMPLEMENTED();
+
+    this_material = pFace->material;
+    d = ray_dir->v[2] * pFace->normal.v[2] + ray_dir->v[1] * pFace->normal.v[1] + ray_dir->v[0] * pFace->normal.v[0];
+    for (i = 0; i < pNum_rays; ++i) {
+        rt[i] = 100.0;
+    }
+    if ((!this_material || (this_material->flags & 0x1800) != 0 || d <= 0.0)
+        && (!this_material || !this_material->identifier || *this_material->identifier != '!' || !gPling_materials)
+        && fabs(d) >= 0.00000023841858) {
+        for (i = 0;; ++i) {
+            if (i >= pNum_rays) {
+                axis_m = fabs(pFace->normal.v[0]) < fabs(pFace->normal.v[1]);
+                if (fabs(pFace->normal.v[2]) > fabs(pFace->normal.v[axis_m])) {
+                    axis_m = 2;
+                }
+                if (axis_m) {
+                    axis_0 = 0;
+                    if (axis_m == 1) {
+                        axis_1 = 2;
+                    } else {
+                        axis_1 = 1;
+                    }
+                } else {
+                    axis_0 = 1;
+                    axis_1 = 2;
+                }
+                v0i1 = pFace->v[0].v[axis_0];
+                v0i2 = pFace->v[0].v[axis_1];
+                u1 = pFace->v[1].v[axis_0] - v0i1;
+                v1 = pFace->v[1].v[axis_1] - v0i2;
+                u2 = pFace->v[2].v[axis_0] - v0i1;
+                v2 = pFace->v[2].v[axis_1] - v0i2;
+                i = 0;
+                while (1) {
+                    if (i >= pNum_rays) {
+                        return;
+                    }
+                    if (t[i] != 100.0) {
+                        u0[i] = p[i].v[axis_0] - v0i1;
+                        v0[i] = p[i].v[axis_1] - v0i2;
+                        if (fabs(u1) <= 0.0000002384185791015625) {
+                            alpha = u0[i] / u2;
+                            beta = v0[i] - alpha * v2;
+                            f_d = beta / v1;
+                            goto LABEL_43;
+                        }
+                        f_numerator = v0[i] * u1 - u0[i] * v1;
+                        f_n = v2 * u1 - v1 * u2;
+                        if (f_n != 0) {
+                            alpha = f_numerator / f_n;
+                            beta = u0[i] - alpha * u2;
+                            f_d = beta / u1;
+                        LABEL_43:
+                            if (f_d >= -0.0001 && alpha >= -0.0001 && alpha + f_d <= 1.0001) {
+                                rt[i] = t[i];
+                                *normal = pFace->normal;
+                                if (d > 0.0) {
+                                    normal->v[0] = -pFace->normal.v[0];
+                                    normal->v[1] = -pFace->normal.v[1];
+                                    normal->v[2] = -pFace->normal.v[2];
+                                }
+                            }
+                        }
+                    }
+                    ++i;
+                    continue;
+                }
+            }
+            tv.v[0] = ray_pos[i].v[0] - pFace->v[0].v[0];
+            tv.v[1] = ray_pos[i].v[1] - pFace->v[0].v[1];
+            tv.v[2] = ray_pos[i].v[2] - pFace->v[0].v[2];
+            numerator = pFace->normal.v[2] * tv.v[2] + pFace->normal.v[1] * tv.v[1] + pFace->normal.v[0] * tv.v[0];
+            if (BadDiv_finteray(numerator, d)) {
+                return;
+            }
+            if (d > 0.0) {
+                if (-numerator < -0.001 || -numerator > d + 0.003) {
+                    t[i] = 100.0;
+                    continue;
+                }
+            } else if (numerator < -0.001 || 0.003 - d < numerator) {
+                t[i] = 100.0;
+                continue;
+            }
+            t[i] = -(numerator / d);
+            if (t[i] > 1.0) {
+                t[i] = 1.0;
+            }
+            p[i].v[0] = t[i] * ray_dir->v[0];
+            p[i].v[1] = t[i] * ray_dir->v[1];
+            p[i].v[2] = t[i] * ray_dir->v[2];
+            p[i].v[0] = ray_pos[i].v[0] + p[i].v[0];
+            p[i].v[1] = ray_pos[i].v[1] + p[i].v[1];
+            p[i].v[2] = ray_pos[i].v[2] + p[i].v[2];
+        }
+    }
 }
 
 // IDA: void __usercall GetNewBoundingBox(br_bounds *b2@<EAX>, br_bounds *b1@<EDX>, br_matrix34 *m@<EBX>)

@@ -19,19 +19,25 @@ int gCurrent_pratcam_alternative;
 // IDA: int __cdecl PratcamGetCurrent()
 int PratcamGetCurrent() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    SILENT_STUB();
+    return 0;
 }
 
 // IDA: int __cdecl PratcamGetAmbient()
 int PratcamGetAmbient() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    SILENT_STUB();
+    return 0;
 }
 
 // IDA: int __cdecl PratcamGetPending()
 int PratcamGetPending() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    SILENT_STUB();
+    return 0;
 }
 
 // IDA: void __cdecl TogglePratcam()

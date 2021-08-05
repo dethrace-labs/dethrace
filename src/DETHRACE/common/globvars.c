@@ -130,7 +130,7 @@ int gCountdown;
 int gFrame_rate;
 int gNumber_of_racers;
 int gSound_enabled;
-int gInfo_on = 0;
+int gInfo_on = 1;
 int gGraf_spec_index = 0;
 int gTyping;
 int gSound_available;
