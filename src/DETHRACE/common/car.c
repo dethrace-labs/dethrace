@@ -78,7 +78,7 @@ br_scalar gGravity;
 br_vector3 gNew_ground_normal;
 br_scalar gDt;
 int gFace_num = 1;
-int gCollision_detection_on;
+int gCollision_detection_on = 1;
 int gControl = 3;
 br_vector3 gGround_normal;
 char gNon_car_spec_list[100];
@@ -733,6 +733,7 @@ void ControlOurCar(tU32 pTime_difference) {
     }
     time = GetTotalTime();
     if (car->damage_units[eDamage_steering].damage_level > 40) {
+        LOG_PANIC("this is not expected");
         if (car->end_steering_damage_effect) {
             if (car->end_steering_damage_effect > time || car->damage_units[eDamage_steering].damage_level == 99) {
                 car->keys.left = car->false_key_left;
@@ -757,6 +758,7 @@ void ControlOurCar(tU32 pTime_difference) {
         }
     }
     if (car->damage_units[eDamage_transmission].damage_level > 40) {
+        LOG_PANIC("this is not expected");
         if (car->end_trans_damage_effect) {
             if (car->end_trans_damage_effect > time || car->damage_units[eDamage_transmission].damage_level == 99) {
                 car->gear = 0;
@@ -794,11 +796,13 @@ void CalcEngineForce(tCar_spec* c, br_scalar dt) {
 
     c->acc_force = 0.0;
     if (c->revs == 0.0) {
+        //LOG_DEBUG("changedown1");
         c->gear = 0;
     }
     sign = c->gear < 0 || (!c->gear && c->velocity_car_space.v[2] > 0.5);
     if (c->keys.backwards != sign) {
         c->keys.backwards = !c->keys.backwards;
+        //LOG_PANIC("not expected");
 
         temp_for_swap = c->keys.acc;
         c->keys.acc = c->keys.dec;
@@ -807,6 +811,7 @@ void CalcEngineForce(tCar_spec* c, br_scalar dt) {
         temp_for_swap = c->joystick.acc;
         c->joystick.acc = c->joystick.dec;
         c->joystick.dec = temp_for_swap;
+        LOG_DEBUG("SWAP ACC-DEC 1");
     }
     if (!c->gear && !c->keys.acc && c->joystick.acc <= 0 && (c->keys.dec || c->joystick.dec > 0) && !c->keys.backwards && fabs(c->velocity_car_space.v[2]) < 1.0) {
         c->keys.backwards = 1;
@@ -815,6 +820,7 @@ void CalcEngineForce(tCar_spec* c, br_scalar dt) {
         temp_for_swap = c->joystick.acc;
         c->joystick.acc = c->joystick.dec;
         c->joystick.dec = temp_for_swap;
+        LOG_DEBUG("SWAP ACC-DEC 2");
     }
     c->torque = -(c->revs * c->revs / 100000000.0) - 0.2;
     if (c->keys.acc || c->joystick.acc >= 0) {
@@ -824,7 +830,9 @@ void CalcEngineForce(tCar_spec* c, br_scalar dt) {
             ts = 1.2;
         } else {
             ts = c->joystick.acc / 54613.0;
+            LOG_PANIC("ooo");
         }
+
         torque = c->engine_power_multiplier * ts * gEngine_powerup_factor[c->power_up_levels[1]];
         if (c->damage_units[0].damage_level > 10) {
             torque = (1.0 - (double)(c->damage_units[0].damage_level - 10) / 100.0) * torque;
@@ -847,23 +855,32 @@ void CalcEngineForce(tCar_spec* c, br_scalar dt) {
                 c->brake_force = c->initial_brake + c->brake_increase;
             }
         }
+        if (c->brake_force) {
+            LOG_DEBUG("braking %f", c->brake_force);
+        }
     }
+    float f1 = c->acc_force;
+    float f2 = 0, f3 = 0;
     if (c->gear) {
         c->acc_force = c->force_torque_ratio * c->torque / (double)c->gear;
-        float f1 = c->acc_force;
-        float f2 = 0;
+        //printf("force_torque_ratio %f, torque %f, dt %f, revs %f, target %f\n", c->force_torque_ratio, c->torque, dt, c->revs, c->target_revs);
+        f2 = c->acc_force;
         if (c->brake_force == 0.0) {
             if (c->revs - 1.0 > c->target_revs || c->revs + 1.0 < c->target_revs) {
                 ts2 = c->torque * dt / 0.0002 + c->revs - c->target_revs;
+                //LOG_DEBUG("revs_diff %f", c->revs - c->target_revs);
                 c->acc_force = ts2 / ((1.0 / (c->speed_revs_ratio * c->M) / (double)c->gear + 1.0 / (c->force_torque_ratio * 0.0002) * (double)c->gear) * dt) + c->acc_force;
-                f2 = c->acc_force;
+                f3 = c->acc_force;
+                //LOG_DEBUG("updating force from %f to %f, delta %f", f2, c->acc_force, ts2 / ((1.0 / (c->speed_revs_ratio * c->M) / (double)c->gear + 1.0 / (c->force_torque_ratio * 0.0002) * (double)c->gear) * dt));
             }
         } else {
             c->revs = c->target_revs;
+            LOG_DEBUG("revs = target_revs");
         }
-
-        LOG_DEBUG("force 1 %f, 2 %f, final %f", f1, f2, c->acc_force);
+    } else {
+        //LOG_DEBUG("not in gear");
     }
+    //LOG_DEBUG("force 1 %f, 2 %f, 3 %f, %f", f1, f2, f3, c->target_revs);
 }
 
 // IDA: void __usercall PrepareCars(tU32 pFrame_start_time@<EAX>)
@@ -1175,6 +1192,7 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
         gDoing_physics = 0;
         CheckForDeAttachmentOfNonCars(pTime_difference);
     } else {
+        //LOG_DEBUG("skipped physics");
         PrepareCars(last_frame_time);
         InterpolateCars(time_step, pTime_difference);
         FinishCars(time_step, pTime_difference);
@@ -1220,7 +1238,8 @@ void TestAutoSpecialVolume(tCollision_info* pCar) {
     br_scalar val;
     int i;
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    SILENT_STUB();
 }
 
 // IDA: void __usercall MoveAndCollideCar(tCar_spec *car@<EAX>, br_scalar dt)
@@ -1270,8 +1289,32 @@ void MoveAndCollideNonCar(tNon_car_spec* non_car, br_scalar dt) {
 int CollideCarWithWall(tCollision_info* car, br_scalar dt) {
     LOG_TRACE("(%p, %f)", car, dt);
 
-    STUB();
-    return 0;
+    GetFacesInBox(car);
+    if (gCollision_detection_on) {
+        car->collision_flag = 0;
+        while (CollCheck(car, dt)) {
+            car->collision_flag++;
+            if (car->collision_flag - 1 > 20) {
+                car->collision_flag = 1;
+                car->v.v[0] = 0.0;
+                car->v.v[1] = 0.0;
+                car->v.v[2] = 0.0;
+                car->omega.v[0] = 0.0;
+                car->omega.v[1] = 0.0;
+                car->omega.v[2] = 0.0;
+                break;
+            }
+            RotateCar(car, dt);
+            TranslateCar(car, dt);
+            GetFacesInBox(car);
+        }
+        if (car->collision_flag) {
+            CrashEarnings((tCar_spec*)car, 0);
+        }
+        BrMatrix34TApplyV(&car->velocity_car_space, &car->v, &car->oldmat);
+        car->frame_collision_flag += car->collision_flag;
+    }
+    return car->collision_flag;
 }
 
 // IDA: void __cdecl ToggleControls()
@@ -1609,8 +1652,7 @@ void AddDrag(tCar_spec* c, br_scalar dt) {
     c->v.v[0] = c->v.v[0] + b.v[0];
     c->v.v[1] = c->v.v[1] + b.v[1];
     c->v.v[2] = c->v.v[2] + b.v[2];
-    ts = sqrt(c->omega.v[1] * c->omega.v[1] + c->omega.v[2] * c->omega.v[2] + c->omega.v[0] * c->omega.v[0])
-        * drag_multiplier;
+    ts = sqrt(c->omega.v[1] * c->omega.v[1] + c->omega.v[2] * c->omega.v[2] + c->omega.v[0] * c->omega.v[0]) * drag_multiplier;
     b.v[0] = c->omega.v[0] * ts;
     b.v[1] = c->omega.v[1] * ts;
     b.v[2] = c->omega.v[2] * ts;
@@ -1625,7 +1667,8 @@ void DoBumpiness(tCar_spec* c, br_vector3* wheel_pos, br_vector3* norm, br_scala
     int y;
     tMaterial_modifiers* mat_list;
     LOG_TRACE("(%p, %p, %p, %p, %d)", c, wheel_pos, norm, d, n);
-    NOT_IMPLEMENTED();
+
+    SILENT_STUB();
 }
 
 // IDA: void __usercall CalcForce(tCar_spec *c@<EAX>, br_scalar dt)
@@ -1820,7 +1863,8 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
         SteeringSelfCentre(c, dt, &c->road_normal);
     }
     if (normnum) {
-        ts = 1.0 / sqrt(1.0);
+        ts = 1.0 / sqrt(1.0); // came out of decompiler like this?
+        ts = 1.0 / sqrt(c->road_normal.v[0] * c->road_normal.v[0] + c->road_normal.v[1] * c->road_normal.v[1] + c->road_normal.v[2] * c->road_normal.v[2]);
         c->road_normal.v[0] = c->road_normal.v[0] * ts;
         c->road_normal.v[1] = c->road_normal.v[1] * ts;
         c->road_normal.v[2] = c->road_normal.v[2] * ts;
@@ -1878,8 +1922,13 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
             ts = -1.0;
         }
         ts3 = sqrt(vplane.v[2] * vplane.v[2] + vplane.v[1] * vplane.v[1] + vplane.v[0] * vplane.v[0]);
+        printf("vplane0 %f, v1 %f, v2 %f\n", vplane.v[0], vplane.v[1], vplane.v[2]);
         deltaomega = ts3 * c->curvature * ts;
+        printf("deltaomega 1 %f\n", deltaomega);
+        printf("road normal %f %f %f\n", c->road_normal.v[0], c->road_normal.v[1], c->road_normal.v[2]);
+        printf("omega %f %f %f\n", c->omega.v[0], c->omega.v[1], c->omega.v[2]);
         deltaomega = deltaomega - (c->omega.v[1] * c->road_normal.v[1] + c->road_normal.v[2] * c->omega.v[2] + c->road_normal.v[0] * c->omega.v[0]);
+        printf("deltaomega 2 %f\n", deltaomega);
         v103.v[0] = c->road_normal.v[1];
         v103.v[1] = -c->road_normal.v[0];
         v103.v[2] = 0.0;
@@ -1894,10 +1943,13 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
             v103.v[1] = v103.v[1] * scale;
             v103.v[2] = v103.v[2] * scale;
         }
+
         friction_number = c->I.v[1] / dt * deltaomega;
         ts = friction_number / (c->wpos[2].v[2] - c->wpos[0].v[2]);
         v108 = ts;
+        //printf("v109-ts %f\n", ts);
         v109 = -ts;
+        //v109 = -0.00001;
         rightplane.v[0] = 0.0;
         rightplane.v[1] = c->road_normal.v[2];
         rightplane.v[2] = -c->road_normal.v[1];
@@ -1913,6 +1965,7 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
             rightplane.v[2] = rightplane.v[2] * scale;
         }
         v99 = c->acc_force;
+        //printf("v99 1 %f\n", v99);
         friction_number = rightplane.v[1] * vplane.v[1] + rightplane.v[2] * vplane.v[2] + vplane.v[0] * rightplane.v[0];
         v87 = v103.v[2] * vplane.v[2] + v103.v[1] * vplane.v[1] + v103.v[0] * vplane.v[0];
         ts2 = fabs(v87);
@@ -1957,13 +2010,23 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
             v106 = -v106;
         }
         v129 = v129 - (ts2 + v106);
+        // if (c->acc_force > 0) {
+        //     printf("\nts2 %f, acc %f, revs %f\n", ts2, c->acc_force, c->revs);
+        // }
         v99 = v99 - ts2;
+        //printf("v99 2 %f\n", v99);
         if (c->keys.brake && c->damage_units[eDamage_lr_brake].damage_level < 60 && c->damage_units[eDamage_rr_brake].damage_level < 60) {
             v99 = v99 - v129;
             c->gear = 0;
         }
         v99 = v99 / c->friction_elipticity;
+        //printf("v99 3 %f\n", v99);
+        // if (v99 > 1) {
+        //     printf("v99 %f, v109 %f speed %f\n", v99, v109, c->speedo_speed * 6.9000001 / 1600.0 * 3600000.0);
+        // }
         v135 = sqrt(v99 * v99 + v109 * v109) / 2.0;
+        printf("v135=%f, v99=%f, v109=%f\n", v135, v99, v109);
+
         GetOilFrictionFactors(c, &fl_oil_factor, &fr_oil_factor, &rl_oil_factor, &rr_oil_factor);
         if (c->driver <= eDriver_non_car) {
             v116 = 1.0;
@@ -1996,30 +2059,48 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
         maxfl = sqrt(force[0]) * friction_number * (rl_oil_factor * v116) * mat_list[c->material_index[0]].tyre_road_friction;
         maxfr = sqrt(force[1]) * friction_number * (rr_oil_factor * v116) * mat_list[c->material_index[1]].tyre_road_friction;
         c->max_force_rear = maxfr + maxfl;
+        // if (v135 > 1) {
+        //     printf("max force rear %f, v135 %f, limit %d\n", c->max_force_rear, v135, v135 * 2.0 > c->max_force_rear);
+        // }
+        printf("outside of check. rpm %f, target %f\n", c->revs, c->target_revs);
         if (rl_oil_factor == 1.0 && rr_oil_factor == 1.0 && c->traction_control && v135 * 2.0 > c->max_force_rear && c->acc_force > 0.0
             && (c->driver < eDriver_net_human || (c->target_revs > 1000.0 && c->gear > 0))) {
+            printf(">>> inside check v99=%f, v135=%f\n", v99, v135);
             ts2 = v99;
             if (v99 * v99 <= v135 * v135 * 4.0) {
-                v87 = sqrt(v135 * v135 * 4.0 - ts2 * ts2);
+                v87 = sqrt(v135 * v135 * 4.0 - v99 * v99);
             } else {
                 v87 = 0.0;
             }
+            printf("v87=%f\n", v87);
             if (c->max_force_rear <= v87) {
+                printf("affecting torque ***** \n");
                 c->torque = -(c->revs * c->revs / 100000000.0) - 0.1;
             } else {
+                float v177 = sqrt(c->max_force_rear * c->max_force_rear - v87 * v87);
                 ts3 = ts2 < 0.0 ? -1.0 : 1.0;
-                ts4 = (ts2 - ts3 * sqrt(ts3)) * 1.01;
+                // ts4 = (ts2 - ts3 * sqrt(ts3)) * 1.01;
+                // if (fabs(ts2) > fabs(ts4)) {
+                //     v87 = ts4;
+                //     ts2 = v87;
+                // }
+
+                ts4 = (ts2 - ts3 * v177) * 1.01;
                 if (fabs(ts2) > fabs(ts4)) {
-                    v87 = ts4;
-                    ts2 = v87;
+                    ts2 = ts4;
                 }
             }
             v99 = v99 - ts2;
             v135 = sqrt(v99 * v99 + v109 * v109) / 2.0;
+
+            // v99 = 8.8f;
+            // v135 = 4.4f;
+            printf("final values v99=%f v135=%f ts2=%f\n", v99, v135, ts2);
         } else if (c->driver >= eDriver_net_human && c->gear > 0 && c->revs > c->target_revs && !c->traction_control) {
             if (!c->keys.change_down) {
                 c->traction_control = 1;
             }
+            LOG_DEBUG("revs > target_revs");
             friction_number = 1.0 - (c->revs - c->target_revs) / (double)(400 * c->gear);
             if (friction_number < 0.40000001) {
                 friction_number = 0.40000001;
@@ -2350,7 +2431,9 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
     }
     AddDrag(c, dt);
     if (c->driver >= eDriver_net_human) {
+        //float old = c->acc_force;
         c->acc_force = -(v136.v[2] * force[0]) - v136.v[2] * force[1];
+        //LOG_DEBUG("old %f new %f", old, c->acc_force);
     }
 }
 
@@ -2364,6 +2447,8 @@ void DoRevs(tCar_spec* c, br_scalar dt) {
     ts = -(c->car_master_actor->t.t.mat.m[2][2] * c->v.v[2]
         + c->car_master_actor->t.t.mat.m[2][1] * c->v.v[1]
         + c->car_master_actor->t.t.mat.m[2][0] * c->v.v[0]);
+
+    //LOG_DEBUG("ts %f, acc %f", ts, c->acc_force);
     if (c->gear) {
         c->target_revs = ts / c->speed_revs_ratio / (double)c->gear;
     } else {
@@ -2372,29 +2457,37 @@ void DoRevs(tCar_spec* c, br_scalar dt) {
     if (c->target_revs < 0.0) {
         c->target_revs = 0.0;
         c->gear = 0;
+        LOG_DEBUG("changedown2");
     }
     if (!c->number_of_wheels_on_ground || (c->wheel_slip & 2) != -1 || !c->gear) {
         if (c->number_of_wheels_on_ground) {
+            //LOG_DEBUG("spin1");
             wheel_spin_force = c->force_torque_ratio * c->torque - (double)c->gear * c->acc_force;
         } else {
             wheel_spin_force = c->force_torque_ratio * c->torque;
+            LOG_DEBUG("spin2");
         }
         if (c->gear) {
             if (c->gear < 2 && (c->keys.dec || c->joystick.dec > 0) && fabs(ts) < 1.0 && c->revs > 1000.0) {
+                LOG_DEBUG("something 2");
                 c->gear = -c->gear;
             }
         } else {
             if (c->revs > 1000.0 && !c->keys.brake && (c->keys.acc || c->joystick.acc > 0) && !gCountdown) {
                 if (c->keys.backwards) {
+                    LOG_DEBUG("change_down3");
                     c->gear = -1;
                 } else {
+                    LOG_DEBUG("change_up2");
                     c->gear = 1;
                 }
             }
             wheel_spin_force = c->force_torque_ratio * c->torque;
         }
+        //LOG_DEBUG("setting revs %f. torque %f", wheel_spin_force, c->torque);
         c->revs = wheel_spin_force / c->force_torque_ratio * dt / 0.0002 + c->revs;
-        if (c->traction_control && wheel_spin_force > 0.0 && c->revs > (double)c->target_revs && c->gear && c->target_revs > 1000.0) {
+        if (c->traction_control && wheel_spin_force > 0.0 && c->revs > c->target_revs && c->gear && c->target_revs > 1000.0) {
+            LOG_DEBUG("revs = target_revs");
             c->revs = c->target_revs;
         }
         if (c->revs <= 0.0) {
@@ -2402,7 +2495,8 @@ void DoRevs(tCar_spec* c, br_scalar dt) {
         }
     }
     if ((c->wheel_slip & 2) == 0 && c->target_revs > 6000.0 && c->revs > 6000.0 && c->gear < c->max_gear && c->gear > 0 && !c->just_changed_gear) {
-        ++c->gear;
+        c->gear++;
+        LOG_DEBUG("gear_up");
     }
     if (c->gear > 1 && c->target_revs < 3000.0 && !c->just_changed_gear) {
         c->gear--;
@@ -2417,11 +2511,13 @@ void DoRevs(tCar_spec* c, br_scalar dt) {
         c->just_changed_gear = 0;
     }
 
-    if (c->driver == eDriver_local_human) {
-        char s[256];
-        sprintf(s, "gear %d, speed %f, rpm: %f", c->gear, c->speed, c->revs);
-        ChangeHeadupText(gProgram_state.frame_rate_headup, s);
-    }
+    //LOG_DEBUG("target_revs %f, %f, ac %d", c->target_revs, c->revs, c->keys.acc);
+
+    // if (c->driver == eDriver_local_human) {
+    //     char s[256];
+    //     sprintf(s, "gear %d, speed %f, rpm: %f", c->gear, c->speed, c->revs);
+    //     ChangeHeadupText(gProgram_state.frame_rate_headup, s);
+    // }
 }
 
 // IDA: void __usercall ApplyTorque(tCar_spec *c@<EAX>, br_vector3 *tdt@<EDX>)
@@ -2503,7 +2599,9 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
     br_scalar max_acc;
     br_matrix34 message_mat;
     LOG_TRACE("(%p, %f)", c, dt);
-    NOT_IMPLEMENTED();
+
+    SILENT_STUB();
+    return 0;
 }
 
 // IDA: br_scalar __usercall AddFriction@<ST0>(tCollision_info *c@<EAX>, br_vector3 *vel@<EDX>, br_vector3 *normal_force@<EBX>, br_vector3 *pos@<ECX>, br_scalar total_force, br_vector3 *max_friction)
@@ -2726,7 +2824,14 @@ void findfloor(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d) {
     br_vector3 aa;
     br_vector3 bb;
     LOG_TRACE("(%p, %p, %p, %p)", a, b, nor, d);
-    NOT_IMPLEMENTED();
+
+    aa.v[0] = a->v[0] / 6.9000001;
+    aa.v[1] = a->v[1] / 6.9000001;
+    aa.v[2] = a->v[2] / 6.9000001;
+    bb.v[0] = b->v[0] / 6.9000001;
+    bb.v[1] = b->v[1] / 6.9000001;
+    bb.v[2] = b->v[2] / 6.9000001;
+    FindFace(&aa, &bb, nor, d, &material);
 }
 
 // IDA: int __usercall FindFloorInBoxM@<EAX>(br_vector3 *a@<EAX>, br_vector3 *b@<EDX>, br_vector3 *nor@<EBX>, br_scalar *d@<ECX>, tCollision_info *c)
@@ -4003,7 +4108,8 @@ void InitialiseExternalCamera() {
 // IDA: void __cdecl FreezeCamera()
 void FreezeCamera() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gCamera_frozen = 1;
 }
 
 // IDA: void __usercall FlyCar(tCar_spec *c@<EAX>, br_scalar dt)

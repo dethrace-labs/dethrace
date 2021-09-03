@@ -489,6 +489,8 @@ tRace_result MainGameLoop() {
     ForceRebuildActiveCarList();
     PrintMemoryDump(0, "ABOUT TO ENTER MAINLOOP");
 
+    double last_time = GetTotalTime() / 1000.0;
+
     do {
         frame_start_time = GetTotalTime();
         CyclePollKeys();
@@ -605,6 +607,15 @@ tRace_result MainGameLoop() {
             gProgram_state.prog_status = eProg_idling;
             gAbandon_game = 0;
         }
+
+        double secs = GetTotalTime() / 1000.0;
+        //LOG_DEBUG("timediff %f", secs - (last_time + (1.0 / 30.0)));
+        while (secs < last_time + (1.0 / 30.0)) {
+            //LOG_DEBUG("skipping time...");
+            secs = GetTotalTime() / 1000.0;
+        }
+        last_time += 1.0 / 30.0;
+
     } while (gProgram_state.prog_status == eProg_game_ongoing
         && !MungeRaceFinished()
         && !gAbandon_game

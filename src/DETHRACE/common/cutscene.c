@@ -29,7 +29,6 @@ void DoSCILogo() {
 // IDA: void __cdecl DoStainlessLogo()
 void DoStainlessLogo() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall PlaySmackerFile(char *pSmack_name@<EAX>)

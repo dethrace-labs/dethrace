@@ -379,7 +379,8 @@ void GenerateContinuousSmoke(tCar_spec* pCar, int wheel, tU32 pTime) {
     br_scalar beta;
     int colour;
     LOG_TRACE("(%p, %d, %d)", pCar, wheel, pTime);
-    NOT_IMPLEMENTED();
+
+    SILENT_STUB();
 }
 
 // IDA: void __cdecl DustRotate()

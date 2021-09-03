@@ -876,6 +876,7 @@ void PollCarControls(tU32 pTime_difference) {
         if (gKey_mapping[49] < 115) {
             if (KeyIsDown(49) && !gRace_finished && !c->knackered && !gWait_for_it) {
                 keys.dec = 1;
+                LOG_DEBUG("braking");
             }
         } else {
             joystick.dec = gJoy_array[gKey_mapping[49] - 115];

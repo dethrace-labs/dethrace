@@ -2,6 +2,7 @@
 #include "car.h"
 #include "crush.h"
 #include "cutscene.h"
+#include "displays.h"
 #include "drmem.h"
 #include "flicplay.h"
 #include "globvars.h"
@@ -126,7 +127,7 @@ void DoLogos() {
     ClearEntireScreen();
     DoSCILogo();
     DoOpeningAnimation();
-    DoSCILogo();
+    DoStainlessLogo();
     gProgram_state.prog_status = eProg_opening;
 }
 
@@ -141,7 +142,10 @@ void DoProgOpeningAnimation() {
 // IDA: void __cdecl DoProgramDemo()
 void DoProgramDemo() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoLogos();
+    gProgram_state.prog_status = eProg_idling;
+    DRS3StopOutletSound(gIndexed_outlets[0]);
 }
 
 // IDA: int __usercall ChooseOpponent@<EAX>(int pNastiness@<EAX>, int *pHad_scum@<EDX>)
@@ -443,7 +447,17 @@ void DoProgram() {
 void JumpTheStart() {
     char s[256];
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gNet_mode == eNet_mode_none
+        || gProgram_state.credits_earned - gProgram_state.credits_lost >= gJump_start_fine[gProgram_state.skill_level]) {
+        WakeUpOpponentsToTheFactThatTheStartHasBeenJumped(gCountdown);
+        gCountdown = 0;
+        DRS3StopOutletSound(gIndexed_outlets[4]);
+        DRS3StartSound(gIndexed_outlets[4], 8016);
+        SpendCredits(gJump_start_fine[gProgram_state.skill_level]);
+        sprintf(s, "%s %d %s", GetMiscString(gProgram_state.frank_or_anniness == eFrankie ? 44 : 49), gJump_start_fine[gProgram_state.skill_level], GetMiscString(45));
+        NewTextHeadupSlot(4, 0, 1000, -4, s);
+    }
 }
 
 // IDA: void __cdecl GoingToInterfaceFromRace()
