@@ -811,7 +811,6 @@ void CalcEngineForce(tCar_spec* c, br_scalar dt) {
         temp_for_swap = c->joystick.acc;
         c->joystick.acc = c->joystick.dec;
         c->joystick.dec = temp_for_swap;
-        LOG_DEBUG("SWAP ACC-DEC 1");
     }
     if (!c->gear && !c->keys.acc && c->joystick.acc <= 0 && (c->keys.dec || c->joystick.dec > 0) && !c->keys.backwards && fabs(c->velocity_car_space.v[2]) < 1.0) {
         c->keys.backwards = 1;
@@ -820,7 +819,6 @@ void CalcEngineForce(tCar_spec* c, br_scalar dt) {
         temp_for_swap = c->joystick.acc;
         c->joystick.acc = c->joystick.dec;
         c->joystick.dec = temp_for_swap;
-        LOG_DEBUG("SWAP ACC-DEC 2");
     }
     c->torque = -(c->revs * c->revs / 100000000.0) - 0.2;
     if (c->keys.acc || c->joystick.acc >= 0) {
@@ -855,9 +853,9 @@ void CalcEngineForce(tCar_spec* c, br_scalar dt) {
                 c->brake_force = c->initial_brake + c->brake_increase;
             }
         }
-        if (c->brake_force) {
-            LOG_DEBUG("braking %f", c->brake_force);
-        }
+        // if (c->brake_force) {
+        //     LOG_DEBUG("braking %f", c->brake_force);
+        // }
     }
     float f1 = c->acc_force;
     float f2 = 0, f3 = 0;
@@ -1636,7 +1634,7 @@ void AddDrag(tCar_spec* c, br_scalar dt) {
     LOG_TRACE("(%p, %f)", c, dt);
 
     vol = c->last_special_volume;
-    drag_multiplier = -(dt * 0.00050000002);
+    drag_multiplier = -(dt * TIME_CONV_THING);
     if (vol) {
         if (c->underwater_ability) {
             drag_multiplier = vol->viscosity_multiplier * drag_multiplier * 0.6;
@@ -1922,13 +1920,8 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
             ts = -1.0;
         }
         ts3 = sqrt(vplane.v[2] * vplane.v[2] + vplane.v[1] * vplane.v[1] + vplane.v[0] * vplane.v[0]);
-        printf("vplane0 %f, v1 %f, v2 %f\n", vplane.v[0], vplane.v[1], vplane.v[2]);
         deltaomega = ts3 * c->curvature * ts;
-        printf("deltaomega 1 %f\n", deltaomega);
-        printf("road normal %f %f %f\n", c->road_normal.v[0], c->road_normal.v[1], c->road_normal.v[2]);
-        printf("omega %f %f %f\n", c->omega.v[0], c->omega.v[1], c->omega.v[2]);
         deltaomega = deltaomega - (c->omega.v[1] * c->road_normal.v[1] + c->road_normal.v[2] * c->omega.v[2] + c->road_normal.v[0] * c->omega.v[0]);
-        printf("deltaomega 2 %f\n", deltaomega);
         v103.v[0] = c->road_normal.v[1];
         v103.v[1] = -c->road_normal.v[0];
         v103.v[2] = 0.0;
@@ -1947,9 +1940,7 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
         friction_number = c->I.v[1] / dt * deltaomega;
         ts = friction_number / (c->wpos[2].v[2] - c->wpos[0].v[2]);
         v108 = ts;
-        //printf("v109-ts %f\n", ts);
         v109 = -ts;
-        //v109 = -0.00001;
         rightplane.v[0] = 0.0;
         rightplane.v[1] = c->road_normal.v[2];
         rightplane.v[2] = -c->road_normal.v[1];
@@ -1965,7 +1956,6 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
             rightplane.v[2] = rightplane.v[2] * scale;
         }
         v99 = c->acc_force;
-        //printf("v99 1 %f\n", v99);
         friction_number = rightplane.v[1] * vplane.v[1] + rightplane.v[2] * vplane.v[2] + vplane.v[0] * rightplane.v[0];
         v87 = v103.v[2] * vplane.v[2] + v103.v[1] * vplane.v[1] + v103.v[0] * vplane.v[0];
         ts2 = fabs(v87);
@@ -2010,22 +2000,13 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
             v106 = -v106;
         }
         v129 = v129 - (ts2 + v106);
-        // if (c->acc_force > 0) {
-        //     printf("\nts2 %f, acc %f, revs %f\n", ts2, c->acc_force, c->revs);
-        // }
         v99 = v99 - ts2;
-        //printf("v99 2 %f\n", v99);
         if (c->keys.brake && c->damage_units[eDamage_lr_brake].damage_level < 60 && c->damage_units[eDamage_rr_brake].damage_level < 60) {
             v99 = v99 - v129;
             c->gear = 0;
         }
         v99 = v99 / c->friction_elipticity;
-        //printf("v99 3 %f\n", v99);
-        // if (v99 > 1) {
-        //     printf("v99 %f, v109 %f speed %f\n", v99, v109, c->speedo_speed * 6.9000001 / 1600.0 * 3600000.0);
-        // }
         v135 = sqrt(v99 * v99 + v109 * v109) / 2.0;
-        printf("v135=%f, v99=%f, v109=%f\n", v135, v99, v109);
 
         GetOilFrictionFactors(c, &fl_oil_factor, &fr_oil_factor, &rl_oil_factor, &rr_oil_factor);
         if (c->driver <= eDriver_non_car) {
@@ -2059,20 +2040,16 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
         maxfl = sqrt(force[0]) * friction_number * (rl_oil_factor * v116) * mat_list[c->material_index[0]].tyre_road_friction;
         maxfr = sqrt(force[1]) * friction_number * (rr_oil_factor * v116) * mat_list[c->material_index[1]].tyre_road_friction;
         c->max_force_rear = maxfr + maxfl;
-        // if (v135 > 1) {
-        //     printf("max force rear %f, v135 %f, limit %d\n", c->max_force_rear, v135, v135 * 2.0 > c->max_force_rear);
-        // }
-        printf("outside of check. rpm %f, target %f\n", c->revs, c->target_revs);
+        // printf("outside of check. rpm %f, target %f\n", c->revs, c->target_revs);
         if (rl_oil_factor == 1.0 && rr_oil_factor == 1.0 && c->traction_control && v135 * 2.0 > c->max_force_rear && c->acc_force > 0.0
             && (c->driver < eDriver_net_human || (c->target_revs > 1000.0 && c->gear > 0))) {
-            printf(">>> inside check v99=%f, v135=%f\n", v99, v135);
+            // printf(">>> inside check v99=%f, v135=%f\n", v99, v135);
             ts2 = v99;
             if (v99 * v99 <= v135 * v135 * 4.0) {
                 v87 = sqrt(v135 * v135 * 4.0 - v99 * v99);
             } else {
                 v87 = 0.0;
             }
-            printf("v87=%f\n", v87);
             if (c->max_force_rear <= v87) {
                 printf("affecting torque ***** \n");
                 c->torque = -(c->revs * c->revs / 100000000.0) - 0.1;
@@ -2485,7 +2462,9 @@ void DoRevs(tCar_spec* c, br_scalar dt) {
             wheel_spin_force = c->force_torque_ratio * c->torque;
         }
         //LOG_DEBUG("setting revs %f. torque %f", wheel_spin_force, c->torque);
+        //printf("revs 0 %f, torque %f acc_force %f\n", c->revs, c->torque, c->acc_force);
         c->revs = wheel_spin_force / c->force_torque_ratio * dt / 0.0002 + c->revs;
+        //printf("revs 1 %f\n", c->revs);
         if (c->traction_control && wheel_spin_force > 0.0 && c->revs > c->target_revs && c->gear && c->target_revs > 1000.0) {
             LOG_DEBUG("revs = target_revs");
             c->revs = c->target_revs;
@@ -3734,12 +3713,120 @@ void SwingCamera(tCar_spec* c, br_matrix34* m1, br_matrix34* m2, br_vector3* vn,
     br_scalar cos_dtheta;
     br_scalar sign;
     int manual_swing;
-    static br_angle omega;
+    static br_angle omega = 0;
     static int elapsed_time = -1;
     static br_vector3 old_vn;
     LOG_TRACE("(%p, %p, %p, %p, %d)", c, m1, m2, vn, pTime);
 
-    SILENT_STUB();
+    manual_swing = gOld_yaw != gCamera_yaw;
+    if (elapsed_time > 500) {
+        elapsed_time = -1;
+    }
+    if (elapsed_time >= 0) {
+        elapsed_time += pTime;
+    }
+    sign = -(m1->m[2][0] * vn->v[0] + m1->m[2][1] * vn->v[1] + m1->m[2][2] * vn->v[2]);
+    ts = vn->v[1] * old_vn.v[1] + vn->v[2] * old_vn.v[2] + vn->v[0] * old_vn.v[0];
+
+    old_vn = *vn;
+    if (sign < 0.0 == gCamera_sign) {
+        elapsed_time = -1;
+    } else if (ts <= 0.0 || elapsed_time >= 0) {
+        if (elapsed_time < 0) {
+            elapsed_time = 0;
+        }
+        if (elapsed_time < 500 && sign <= 0.0) {
+            vn->v[0] = -vn->v[0];
+            vn->v[1] = -vn->v[1];
+            vn->v[2] = -vn->v[2];
+        } else {
+            elapsed_time = 500;
+            if (sign <= 0.0) {
+                ts = 0.0005999999999999999;
+            } else {
+                ts = 0.0001;
+            }
+            if (fabs(c->speedo_speed) <= ts || gCar_flying) {
+                vn->v[0] = -vn->v[0];
+                vn->v[1] = -vn->v[1];
+                vn->v[2] = -vn->v[2];
+            } else {
+                gCamera_sign = gCamera_sign == 0;
+                omega = BrDegreeToAngle(pTime * 0.03);
+                if (gCamera_yaw <= 32760) {
+                    yaw = gCamera_yaw;
+                } else {
+                    yaw = gCamera_yaw - 32760;
+                }
+                if ((uint16_t)(gCamera_yaw + 16380) <= 32760) {
+                    if (yaw > 8190 && yaw < 24570) {
+                        gCamera_yaw = 32760 - gCamera_yaw;
+                    }
+                } else {
+                    gCamera_yaw = 32760 - gCamera_yaw;
+                }
+            }
+        }
+    } else {
+        gCamera_sign = gCamera_sign == 0;
+        if (gCamera_yaw <= 32760) {
+            yaw = gCamera_yaw;
+        } else {
+            yaw = gCamera_yaw - 32760;
+        }
+        if (yaw > 8190 && yaw < 24570) {
+            gCamera_yaw = -gCamera_yaw;
+        }
+    }
+    if (gCamera_sign) {
+        yaw = -gCamera_yaw;
+    } else {
+        yaw = gCamera_yaw;
+    }
+    if (!gCar_flying) {
+        LOG_DEBUG("yaw %d, time %d", yaw, elapsed_time);
+        DrVector3RotateY(vn, yaw);
+    }
+    sin_dtheta = 0.0;
+    br_scalar v16 = vn->v[0] * gView_direction.v[2] - vn->v[2] * gView_direction.v[0];
+    br_scalar v17 = vn->v[0] * gView_direction.v[0] + vn->v[2] * gView_direction.v[2];
+    LOG_DEBUG("v16 %f, v17 %f", v16, v17);
+
+    br_angle v8 = BrRadianToAngle(sqrt(c->omega.v[2] * c->omega.v[2] + c->omega.v[0] * c->omega.v[0] + c->omega.v[1] * c->omega.v[1]) * pTime / 1000.0);
+    sin_dtheta = sin(BrAngleToRadian(v8)) + 0.1;
+
+    if (omega || gCamera_reset || (c->speed < 0.000099999997 && !manual_swing) || gCamera_mode == -1 || (v17 > 0.0 && !manual_swing && fabs(v16) > sin_dtheta)) {
+        if (!gCar_flying) {
+            theta = BrRadianToAngle(asin(sin_dtheta));
+            if (omega < theta) {
+                omega = theta;
+            }
+            if (!omega) {
+                omega = BrDegreeToAngle(pTime * 0.03); // (__int64)((double)(int)pTime * 0.03 * 182.0444444444445);
+            }
+            cos_dtheta = cos(BrAngleToRadian(omega));
+            if (cos_dtheta <= v17) {
+                omega = 0;
+                gCamera_mode = 0;
+            } else {
+                ts = BrAngleToRadian(omega);
+                if (v16 <= 0.0) {
+                    vn->v[0] = cos(ts) * gView_direction.v[0] - sin(ts) * gView_direction.v[2];
+                    vn->v[2] = sin(ts) * gView_direction.v[0] + cos(ts) * gView_direction.v[2];
+                } else {
+                    vn->v[0] = sin(ts) * gView_direction.v[2] + cos(ts) * gView_direction.v[0];
+                    vn->v[2] = cos(ts) * gView_direction.v[2] - sin(ts) * gView_direction.v[0];
+                }
+                omega += BrDegreeToAngle(pTime * 0.03);
+                if (BrDegreeToAngle(pTime * 0.1) < omega) {
+                    omega = BrDegreeToAngle(pTime * 0.1);
+                }
+                if (omega < theta) {
+                    omega = theta;
+                }
+            }
+        }
+    }
 }
 
 // IDA: void __usercall PointCameraAtCar(tCar_spec *c@<EAX>, br_matrix34 *m1@<EDX>, br_matrix34 *m2@<EBX>)

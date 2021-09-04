@@ -16,6 +16,7 @@
 #include "pd/sys.h"
 #include "pedestrn.h"
 #include "pratcam.h"
+#include "replay.h"
 #include "sound.h"
 #include "structur.h"
 #include "utility.h"
@@ -876,7 +877,6 @@ void PollCarControls(tU32 pTime_difference) {
         if (gKey_mapping[49] < 115) {
             if (KeyIsDown(49) && !gRace_finished && !c->knackered && !gWait_for_it) {
                 keys.dec = 1;
-                LOG_DEBUG("braking");
             }
         } else {
             joystick.dec = gJoy_array[gKey_mapping[49] - 115];
@@ -922,10 +922,68 @@ void PollCameraControls(tU32 pTime_difference) {
     int swirl_mode;
     int up_and_down_mode;
     int going_up;
-    static int last_swirl_mode;
+    static int last_swirl_mode = 0;
     LOG_TRACE("(%d)", pTime_difference);
 
-    SILENT_STUB();
+    flag = 0;
+    swirl_mode = gRace_finished && !gAction_replay_mode && (&gProgram_state.current_car == gCar_to_view || gCar_to_view->knackered);
+    up_and_down_mode = swirl_mode && !gCamera_has_collided;
+    going_up = gCamera_zoom > 1.0;
+    if (last_swirl_mode != swirl_mode) {
+        if (swirl_mode) {
+            SaveCameraPosition(0);
+        } else {
+            RestoreCameraPosition(0);
+        }
+        last_swirl_mode = swirl_mode;
+    }
+    if (!gMap_mode && !gProgram_state.cockpit_on && (!gAction_replay_mode || gAction_replay_camera_mode <= eAction_replay_standard)) {
+        if (KeyIsDown(31) || (up_and_down_mode && !going_up)) {
+            gCamera_zoom = (double)pTime_difference * TIME_CONV_THING / (double)(2 * swirl_mode + 1) + gCamera_zoom;
+            if (gCamera_zoom > 2.0) {
+                gCamera_zoom = 2.0;
+            }
+            if (up_and_down_mode && gCamera_zoom > 1.0) {
+                gCamera_zoom = 1.0;
+            }
+        }
+        if (KeyIsDown(30) || (up_and_down_mode && going_up)) {
+            gCamera_zoom = gCamera_zoom - (double)pTime_difference * TIME_CONV_THING / (double)(2 * swirl_mode + 1);
+            if (gCamera_zoom < 0.1) {
+                gCamera_zoom = 0.1;
+                if (up_and_down_mode) {
+                    if (gCamera_zoom < 1.0) {
+                        gCamera_zoom = 1.0;
+                    }
+                }
+            }
+        }
+        if (swirl_mode && gProgram_state.current_car.speedo_speed < 0.001449275362318841) {
+            left = 1;
+            right = 0;
+        } else {
+            left = KeyIsDown(32);
+            right = KeyIsDown(33);
+        }
+
+        if ((gCamera_sign ? left : right)) {
+            if (!gCamera_reset) {
+                gCamera_yaw += BrDegreeToAngle(pTime_difference * 0.050000001);
+            }
+            flag = 1;
+        }
+        if ((gCamera_sign ? right : left)) {
+            if (!gCamera_reset) {
+                gCamera_yaw -= BrDegreeToAngle(pTime_difference * 0.050000001);
+            }
+            if (flag) {
+                gCamera_yaw = 0;
+                gCamera_reset = 1;
+            }
+        } else if (!flag) {
+            gCamera_reset = 0;
+        }
+    }
 }
 
 // IDA: void __usercall SetFlag2(int i@<EAX>)
