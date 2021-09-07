@@ -44,9 +44,28 @@ export DETHRACE_ROOT_DIR=/path/to/carmageddon
 
 ## Build
 
+Dethrace uses [cmake](https://cmake.org/) for generating build files.
+
+To generate the build files (generally only required once):
 ```sh
-make build
+mkdir build
+cd build
+cmake ..
 ```
+
+Build:
+```sh
+make && ./dethrace
+```
+
+### Run
+
+After building, `build/dethrace` is created
+
+```sh
+./dethrace [args]
+```
+
 
 ## Run tests
 

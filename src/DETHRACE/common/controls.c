@@ -7,12 +7,14 @@
 #include "flicplay.h"
 #include "globvars.h"
 #include "globvrkm.h"
+#include "globvrpb.h"
 #include "graphics.h"
 #include "harness.h"
 #include "input.h"
 #include "loadsave.h"
 #include "mainloop.h"
 #include "netgame.h"
+#include "network.h"
 #include "pd/sys.h"
 #include "pedestrn.h"
 #include "pratcam.h"
@@ -62,10 +64,10 @@ tCheat gKev_keys[44] = {
     { .code = 0x2BA3F603, .code2 = 0x29F2425C, .action_proc = GetPowerup, .num = 38 },
     { .code = 0x416EFF61, .code2 = 0x2667DF4B, .action_proc = GetPowerup, .num = 39 },
     { .code = 0x2554125C, .code2 = 0x393CA35D, .action_proc = GetPowerup, .num = 41 },
-    { .code = 0x3FFF84D5, .code2 = 0x84A42DF4, .action_proc = GetPowerup, .num = 41 },
-    { .code = 0x37E83018, .code2 = 0xB609AEE6, .action_proc = GetPowerup, .num = 42 },
-    { .code = 0x2DB03B19, .code2 = 0x924A84B7, .action_proc = GetPowerup, .num = 43 },
-    { .code = 0x30A19FAB, .code2 = 0x2B0C2782, .action_proc = GetPowerup, .num = 44 },
+    { .code = 0x3FFF84D5, .code2 = 0x84A42DF4, .action_proc = GetPowerup, .num = 42 },
+    { .code = 0x37E83018, .code2 = 0xB609AEE6, .action_proc = GetPowerup, .num = 43 },
+    { .code = 0x2DB03B19, .code2 = 0x924A84B7, .action_proc = GetPowerup, .num = 44 },
+    { .code = 0x30A19FAB, .code2 = 0x2B0C2782, .action_proc = GetPowerup, .num = 45 },
     { .code = 0x0, .code2 = 0x0, .action_proc = 0x0, .num = 0x0 }
 };
 char* gAbuse_text[10];
@@ -801,10 +803,24 @@ void CheckKevKeys() {
         }
     }
 
-    if (gKev_keys[i].action_proc == 0) {
-        return;
+    if (gKev_keys[i].action_proc) {
+        if (gNet_mode) {
+            if (gKev_keys[i].num == 0xA11EE75D) {
+                strcpy(s, gNet_players[gThis_net_player_index].player_name);
+                strcat(s, " ");
+                strcat(s, GetMiscString(225));
+                NetSendHeadupToEverybody(s);
+                gKev_keys[i].action_proc(gKev_keys[i].num);
+            } else {
+                strcpy(s, gNet_players[gThis_net_player_index].player_name);
+                strcat(s, " ");
+                strcat(s, GetMiscString(224));
+                NetSendHeadupToAllPlayers(s);
+            }
+        } else {
+            gKev_keys[i].action_proc(gKev_keys[i].num);
+        }
     }
-    gKev_keys[i].action_proc(gKev_keys[i].num);
 }
 
 // IDA: void __cdecl BrakeInstantly()

@@ -3784,13 +3784,11 @@ void SwingCamera(tCar_spec* c, br_matrix34* m1, br_matrix34* m2, br_vector3* vn,
         yaw = gCamera_yaw;
     }
     if (!gCar_flying) {
-        LOG_DEBUG("yaw %d, time %d", yaw, elapsed_time);
         DrVector3RotateY(vn, yaw);
     }
     sin_dtheta = 0.0;
     br_scalar v16 = vn->v[0] * gView_direction.v[2] - vn->v[2] * gView_direction.v[0];
     br_scalar v17 = vn->v[0] * gView_direction.v[0] + vn->v[2] * gView_direction.v[2];
-    LOG_DEBUG("v16 %f, v17 %f", v16, v17);
 
     br_angle v8 = BrRadianToAngle(sqrt(c->omega.v[2] * c->omega.v[2] + c->omega.v[0] * c->omega.v[0] + c->omega.v[1] * c->omega.v[1]) * pTime / 1000.0);
     sin_dtheta = sin(BrAngleToRadian(v8)) + 0.1;
