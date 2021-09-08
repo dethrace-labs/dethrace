@@ -5,6 +5,7 @@
 # exedump: https://github.com/jeff-1amstudios/open-watcom-v2/tree/master/bld/exedump
 #
 # Usage: codegen.py <path to dump file> <path to write generated code>
+# Note: for some hacky reason <path to write generated code> must end with a slash
 #######################################################
 import sys
 import re
@@ -193,6 +194,7 @@ def process_global_var():
   match = re.match(GLOBAL_VAR_REGEX, line)
   glob['name'] = match.group(1)
   glob['addr'] = match.group(2)
+  glob['addr_decimal'] = int(glob['addr'].split(':')[1], 16)
   glob['type'] = match.group(3)
   return glob
 
@@ -627,6 +629,15 @@ def generate_h_file(module):
 
   h_file.write('#include \"dr_types.h\"\n')
   h_file.write('#include \"br_types.h\"\n\n')
+
+  # global variables
+  for gv in sorted(module['global_vars'], key=lambda x: x['addr_decimal']):
+    # print('gv:', gv)
+    s = resolve_type_str(module, gv['type'], gv['name'])
+    h_file.write('extern ' + s)
+    h_file.write(';\n')
+  h_file.write('\n')
+
   for fn in module['functions']:
     h_file.write(resolve_function_header(module, fn))
     h_file.write('\n')
@@ -643,7 +654,7 @@ def generate_c_file(module):
   c_file.write('\"\n\n')
 
   # global variables
-  for gv in module['global_vars']:
+  for gv in sorted(module['global_vars'], key=lambda x: x['addr_decimal']):
     # print('gv:', gv)
     s = resolve_type_str(module, gv['type'], gv['name'])
     c_file.write(s)

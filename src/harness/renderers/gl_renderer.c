@@ -369,6 +369,13 @@ void Harness_GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
         element_index += v11->groups[g].nfaces * 3;
     }
 
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINES);
+    // element_index = 0;
+    // for (int g = 0; g < v11->ngroups; g++) {
+    //     glDrawElements(GL_TRIANGLES, v11->groups[g].nfaces * 3, GL_UNSIGNED_INT, (void*)(element_index * sizeof(int)));
+    //     element_index += v11->groups[g].nfaces * 3;
+    // }
+
     glBindVertexArray(0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }

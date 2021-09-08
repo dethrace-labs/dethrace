@@ -40,8 +40,9 @@ tAction_replay_camera_type gAction_replay_camera_mode;
 
 // IDA: int __cdecl ReplayIsPaused()
 int ReplayIsPaused() {
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    LOG_TRACE8("()");
+
+    return gReplay_rate == 0.0;
 }
 
 // IDA: float __cdecl GetReplayRate()

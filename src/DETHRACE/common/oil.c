@@ -1,7 +1,8 @@
 #include "oil.h"
 #include "brender.h"
-#include "common/globvars.h"
-#include "common/loading.h"
+#include "globvars.h"
+#include "loading.h"
+#include "utility.h"
 #include <stdlib.h>
 
 int gNext_oil_pixie;
@@ -18,8 +19,11 @@ void InitOilSpills() {
     br_material* the_material;
     LOG_TRACE("()");
 
-    gOil_pixies[0] = LoadPixelmap(gOil_pixie_names[0]);
-    BrMapAdd(gOil_pixies[0]);
+    for (i = 0; i < 1; i++) {
+        gOil_pixies[i] = LoadPixelmap(gOil_pixie_names[i]);
+        BrMapAdd(gOil_pixies[i]);
+    }
+
     for (i = 0; i < 15; i++) {
         the_material = BrMaterialAllocate(NULL);
         BrMaterialAdd(the_material);
@@ -28,8 +32,9 @@ void InitOilSpills() {
         the_material->ks = 0.0;
         the_material->power = 0.0;
         the_material->index_base = 0;
-        //LOBYTE(the_material->flags) = v2 | 0x25;
-        the_material->flags |= 0x25;
+        the_material->flags |= 1u;
+        the_material->flags |= 0x20u;
+        the_material->flags |= 4u;
         the_material->index_range = 0;
         the_material->colour_map = 0;
         BrMatrix23Identity(&the_material->map_transform);
@@ -166,20 +171,29 @@ void ProcessOilSpills(tU32 pFrame_period) {
 
 // IDA: int __cdecl GetOilSpillCount()
 int GetOilSpillCount() {
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    //LOG_TRACE("()");
+    return 15;
 }
 
 // IDA: void __usercall GetOilSpillDetails(int pIndex@<EAX>, br_actor **pActor@<EDX>, br_scalar *pSize@<EBX>)
 void GetOilSpillDetails(int pIndex, br_actor** pActor, br_scalar* pSize) {
     LOG_TRACE("(%d, %p, %p)", pIndex, pActor, pSize);
-    NOT_IMPLEMENTED();
+
+    if (gOily_spills[pIndex].car) {
+        *pActor = gOily_spills[pIndex].actor;
+        *pSize = gOily_spills[pIndex].full_size;
+    } else {
+        *pActor = 0;
+    }
 }
 
 // IDA: int __usercall PointInSpill@<EAX>(br_vector3 *pV@<EAX>, int pSpill@<EDX>)
 int PointInSpill(br_vector3* pV, int pSpill) {
     LOG_TRACE("(%p, %d)", pV, pSpill);
-    NOT_IMPLEMENTED();
+
+    return gOily_spills[pSpill].current_size * gOily_spills[pSpill].current_size * 0.80000001 > (pV->v[0] / 6.9000001 - gOily_spills[pSpill].actor->t.t.mat.m[3][0]) * (pV->v[0] / 6.9000001 - gOily_spills[pSpill].actor->t.t.mat.m[3][0])
+        && gOily_spills[pSpill].current_size * gOily_spills[pSpill].current_size * 0.80000001 > (pV->v[2] / 6.9000001 - gOily_spills[pSpill].actor->t.t.mat.m[3][2]) * (pV->v[2] / 6.9000001 - gOily_spills[pSpill].actor->t.t.mat.m[3][2])
+        && fabs(pV->v[1] / 6.9000001 - gOily_spills[pSpill].actor->t.t.mat.m[3][1]) < 0.1;
 }
 
 // IDA: void __usercall GetOilFrictionFactors(tCar_spec *pCar@<EAX>, br_scalar *pFl_factor@<EDX>, br_scalar *pFr_factor@<EBX>, br_scalar *pRl_factor@<ECX>, br_scalar *pRr_factor)
@@ -187,7 +201,47 @@ void GetOilFrictionFactors(tCar_spec* pCar, br_scalar* pFl_factor, br_scalar* pF
     int i;
     br_vector3 wheel_world;
     LOG_TRACE("(%p, %p, %p, %p, %p)", pCar, pFl_factor, pFr_factor, pRl_factor, pRr_factor);
-    NOT_IMPLEMENTED();
+
+    *pFl_factor = 1.0;
+    *pFr_factor = 1.0;
+    *pRl_factor = 1.0;
+    *pRr_factor = 1.0;
+    if (pCar->driver > eDriver_non_car) {
+        if (pCar->shadow_intersection_flags) {
+            for (i = 0; i < 15; i++) {
+                if (((1 << i) & pCar->shadow_intersection_flags) != 0 && gOily_spills[i].car) {
+                    BrMatrix34ApplyP(&wheel_world, &pCar->wpos[2], &pCar->car_master_actor->t.t.mat);
+                    if (PointInSpill(&wheel_world, i)) {
+                        pCar->oil_remaining[2] = SRandomBetween(1.5, 2.5);
+                    }
+                    BrMatrix34ApplyP(&wheel_world, &pCar->wpos[3], &pCar->car_master_actor->t.t.mat);
+                    if (PointInSpill(&wheel_world, i)) {
+                        pCar->oil_remaining[3] = SRandomBetween(1.5, 2.5);
+                    }
+                    BrMatrix34ApplyP(&wheel_world, &pCar->wpos[0], &pCar->car_master_actor->t.t.mat);
+                    if (PointInSpill(&wheel_world, i)) {
+                        pCar->oil_remaining[0] = SRandomBetween(1.5, 2.5);
+                    }
+                    BrMatrix34ApplyP(&wheel_world, &pCar->wpos[1], &pCar->car_master_actor->t.t.mat);
+                    if (PointInSpill(&wheel_world, i)) {
+                        pCar->oil_remaining[1] = SRandomBetween(1.5, 2.5);
+                    }
+                }
+            }
+        }
+        if (pCar->oil_remaining[2] != 0.0) {
+            *pFl_factor = SRandomBetween(0.0099999998, 0.15000001);
+        }
+        if (pCar->oil_remaining[3] != 0.0) {
+            *pFr_factor = SRandomBetween(0.0099999998, 0.15000001);
+        }
+        if (pCar->oil_remaining[0] != 0.0) {
+            *pRl_factor = SRandomBetween(0.0099999998, 0.15000001);
+        }
+        if (pCar->oil_remaining[1] != 0.0) {
+            *pRr_factor = SRandomBetween(0.0099999998, 0.15000001);
+        }
+    }
 }
 
 // IDA: void __usercall AdjustOilSpill(int pIndex@<EAX>, br_matrix34 *pMat@<EDX>, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec *pCar, br_vector3 *pOriginal_pos, br_pixelmap *pPixelmap)

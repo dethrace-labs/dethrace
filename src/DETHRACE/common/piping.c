@@ -100,7 +100,8 @@ void StartPipingSession2(tPipe_chunk_type pThe_type, int pMunge_reentrancy) {
 // IDA: void __usercall StartPipingSession(tPipe_chunk_type pThe_type@<EAX>)
 void StartPipingSession(tPipe_chunk_type pThe_type) {
     LOG_TRACE("(%d)", pThe_type);
-    NOT_IMPLEMENTED();
+
+    SILENT_STUB();
 }
 
 // IDA: void __usercall EndPipingSession2(int pMunge_reentrancy@<EAX>)
@@ -113,7 +114,8 @@ void EndPipingSession2(int pMunge_reentrancy) {
 // IDA: void __cdecl EndPipingSession()
 void EndPipingSession() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    SILENT_STUB();
 }
 
 // IDA: void __usercall AddDataToSession(int pSubject_index@<EAX>, void *pData@<EDX>, tU32 pData_length@<EBX>)
@@ -207,7 +209,8 @@ void AddFlameToPipingSession(int pIndex, int pFrame_count, br_scalar pScale_x, b
 void AddSplashToPipingSession(tCollision_info* pCar) {
     tPipe_splash_data data;
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    SILENT_STUB();
 }
 
 // IDA: void __usercall AddOilSpillToPipingSession(int pIndex@<EAX>, br_matrix34 *pMat@<EDX>, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec *pCar, br_vector3 *pOriginal_pos, br_pixelmap *pPixelmap)

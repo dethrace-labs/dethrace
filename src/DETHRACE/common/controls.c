@@ -7,18 +7,22 @@
 #include "flicplay.h"
 #include "globvars.h"
 #include "globvrkm.h"
+#include "globvrpb.h"
 #include "graphics.h"
 #include "harness.h"
 #include "input.h"
 #include "loadsave.h"
 #include "mainloop.h"
 #include "netgame.h"
+#include "network.h"
 #include "pd/sys.h"
 #include "pedestrn.h"
 #include "pratcam.h"
+#include "replay.h"
 #include "sound.h"
 #include "structur.h"
 #include "utility.h"
+#include "world.h"
 #include <stdlib.h>
 
 tCheat gKev_keys[44] = {
@@ -60,10 +64,10 @@ tCheat gKev_keys[44] = {
     { .code = 0x2BA3F603, .code2 = 0x29F2425C, .action_proc = GetPowerup, .num = 38 },
     { .code = 0x416EFF61, .code2 = 0x2667DF4B, .action_proc = GetPowerup, .num = 39 },
     { .code = 0x2554125C, .code2 = 0x393CA35D, .action_proc = GetPowerup, .num = 41 },
-    { .code = 0x3FFF84D5, .code2 = 0x84A42DF4, .action_proc = GetPowerup, .num = 41 },
-    { .code = 0x37E83018, .code2 = 0xB609AEE6, .action_proc = GetPowerup, .num = 42 },
-    { .code = 0x2DB03B19, .code2 = 0x924A84B7, .action_proc = GetPowerup, .num = 43 },
-    { .code = 0x30A19FAB, .code2 = 0x2B0C2782, .action_proc = GetPowerup, .num = 44 },
+    { .code = 0x3FFF84D5, .code2 = 0x84A42DF4, .action_proc = GetPowerup, .num = 42 },
+    { .code = 0x37E83018, .code2 = 0xB609AEE6, .action_proc = GetPowerup, .num = 43 },
+    { .code = 0x2DB03B19, .code2 = 0x924A84B7, .action_proc = GetPowerup, .num = 44 },
+    { .code = 0x30A19FAB, .code2 = 0x2B0C2782, .action_proc = GetPowerup, .num = 45 },
     { .code = 0x0, .code2 = 0x0, .action_proc = 0x0, .num = 0x0 }
 };
 char* gAbuse_text[10];
@@ -167,7 +171,9 @@ void EnsureSpecialVolumesHidden() {
 void ShowSpecialVolumesIfRequ() {
     LOG_TRACE("()");
 
-    STUB();
+    if (gWhich_edit_mode == eEdit_mode_spec_vol) {
+        ShowSpecialVolumes();
+    }
 }
 
 // IDA: void __usercall DoEditModeKey(int pIndex@<EAX>)
@@ -797,10 +803,24 @@ void CheckKevKeys() {
         }
     }
 
-    if (gKev_keys[i].action_proc == 0) {
-        return;
+    if (gKev_keys[i].action_proc) {
+        if (gNet_mode) {
+            if (gKev_keys[i].num == 0xA11EE75D) {
+                strcpy(s, gNet_players[gThis_net_player_index].player_name);
+                strcat(s, " ");
+                strcat(s, GetMiscString(225));
+                NetSendHeadupToEverybody(s);
+                gKev_keys[i].action_proc(gKev_keys[i].num);
+            } else {
+                strcpy(s, gNet_players[gThis_net_player_index].player_name);
+                strcat(s, " ");
+                strcat(s, GetMiscString(224));
+                NetSendHeadupToAllPlayers(s);
+            }
+        } else {
+            gKev_keys[i].action_proc(gKev_keys[i].num);
+        }
     }
-    gKev_keys[i].action_proc(gKev_keys[i].num);
 }
 
 // IDA: void __cdecl BrakeInstantly()
@@ -822,7 +842,92 @@ void PollCarControls(tU32 pTime_difference) {
     tCar_spec* c;
     LOG_TRACE("(%d)", pTime_difference);
 
-    SILENT_STUB();
+    c = &gProgram_state.current_car;
+
+    memset(&keys, 0, sizeof(tCar_controls));
+    joystick.left = -1;
+    joystick.right = -1;
+    joystick.acc = -1;
+    joystick.dec = -1;
+    if (gEntering_message) {
+        memset(&c->keys, 0, sizeof(tCar_controls));
+        c->joystick.left = -1;
+        c->joystick.right = -1;
+        c->joystick.acc = -1;
+        c->joystick.dec = -1;
+    } else {
+        if (gKey_mapping[46] >= 115 || gKey_mapping[47] >= 115) {
+            joystick.left = gJoy_array[gKey_mapping[46] - 115];
+            joystick.right = gJoy_array[gKey_mapping[47] - 115];
+            if (joystick.left < 0 && joystick.right < 0) {
+                joystick.left = 0;
+            }
+        } else {
+            if (KeyIsDown(46)) {
+                keys.left = 1;
+            }
+            if (KeyIsDown(47)) {
+                keys.right = 1;
+            }
+        }
+        if (KeyIsDown(12)) {
+            keys.holdw = 1;
+        }
+        if (KeyIsDown(53) || gRace_finished) {
+            if (!gInstant_handbrake || gRace_finished) {
+                keys.brake = 1;
+            } else {
+                BrakeInstantly();
+            }
+        }
+        if (gKey_mapping[48] < 115) {
+            if (KeyIsDown(48) && !gRace_finished && !c->knackered && !gWait_for_it) {
+                keys.acc = 1;
+            }
+        } else {
+            joystick.acc = gJoy_array[gKey_mapping[48] - 115];
+            if (joystick.acc > 0xFFFF) {
+                joystick.acc = 0xFFFF;
+            }
+        }
+        if (gKey_mapping[49] < 115) {
+            if (KeyIsDown(49) && !gRace_finished && !c->knackered && !gWait_for_it) {
+                keys.dec = 1;
+            }
+        } else {
+            joystick.dec = gJoy_array[gKey_mapping[49] - 115];
+            if (joystick.dec > 0xFFFF) {
+                joystick.dec = 0xFFFF;
+            }
+        }
+        if (KeyIsDown(55) && c->gear >= 0) {
+            keys.change_down = 1;
+            c->just_changed_gear = 1;
+            if (keys.acc || joystick.acc > 32000) {
+                c->traction_control = 0;
+            } else if (c->gear > 1 && !c->keys.change_down) {
+                --c->gear;
+            }
+            if (gCountdown && !c->keys.change_down) {
+                JumpTheStart();
+            }
+        }
+        if (gCar_flying) {
+            if (KeyIsDown(13)) {
+                keys.up = 1;
+            }
+            if (KeyIsDown(11)) {
+                keys.down = 1;
+            }
+        }
+        if (KeyIsDown(58)) {
+            if (!gEntering_message) {
+                keys.horn = 1;
+            }
+        }
+        c->keys = keys;
+        c->joystick = joystick;
+    }
 }
 
 // IDA: void __usercall PollCameraControls(tU32 pTime_difference@<EAX>)
@@ -833,10 +938,68 @@ void PollCameraControls(tU32 pTime_difference) {
     int swirl_mode;
     int up_and_down_mode;
     int going_up;
-    static int last_swirl_mode;
+    static int last_swirl_mode = 0;
     LOG_TRACE("(%d)", pTime_difference);
 
-    SILENT_STUB();
+    flag = 0;
+    swirl_mode = gRace_finished && !gAction_replay_mode && (&gProgram_state.current_car == gCar_to_view || gCar_to_view->knackered);
+    up_and_down_mode = swirl_mode && !gCamera_has_collided;
+    going_up = gCamera_zoom > 1.0;
+    if (last_swirl_mode != swirl_mode) {
+        if (swirl_mode) {
+            SaveCameraPosition(0);
+        } else {
+            RestoreCameraPosition(0);
+        }
+        last_swirl_mode = swirl_mode;
+    }
+    if (!gMap_mode && !gProgram_state.cockpit_on && (!gAction_replay_mode || gAction_replay_camera_mode <= eAction_replay_standard)) {
+        if (KeyIsDown(31) || (up_and_down_mode && !going_up)) {
+            gCamera_zoom = (double)pTime_difference * TIME_CONV_THING / (double)(2 * swirl_mode + 1) + gCamera_zoom;
+            if (gCamera_zoom > 2.0) {
+                gCamera_zoom = 2.0;
+            }
+            if (up_and_down_mode && gCamera_zoom > 1.0) {
+                gCamera_zoom = 1.0;
+            }
+        }
+        if (KeyIsDown(30) || (up_and_down_mode && going_up)) {
+            gCamera_zoom = gCamera_zoom - (double)pTime_difference * TIME_CONV_THING / (double)(2 * swirl_mode + 1);
+            if (gCamera_zoom < 0.1) {
+                gCamera_zoom = 0.1;
+                if (up_and_down_mode) {
+                    if (gCamera_zoom < 1.0) {
+                        gCamera_zoom = 1.0;
+                    }
+                }
+            }
+        }
+        if (swirl_mode && gProgram_state.current_car.speedo_speed < 0.001449275362318841) {
+            left = 1;
+            right = 0;
+        } else {
+            left = KeyIsDown(32);
+            right = KeyIsDown(33);
+        }
+
+        if ((gCamera_sign ? left : right)) {
+            if (!gCamera_reset) {
+                gCamera_yaw += BrDegreeToAngle(pTime_difference * 0.050000001);
+            }
+            flag = 1;
+        }
+        if ((gCamera_sign ? right : left)) {
+            if (!gCamera_reset) {
+                gCamera_yaw -= BrDegreeToAngle(pTime_difference * 0.050000001);
+            }
+            if (flag) {
+                gCamera_yaw = 0;
+                gCamera_reset = 1;
+            }
+        } else if (!flag) {
+            gCamera_reset = 0;
+        }
+    }
 }
 
 // IDA: void __usercall SetFlag2(int i@<EAX>)
@@ -1051,7 +1214,7 @@ void DrawSomeText2(tDR_font* pFont) {
     }
 
     PDScreenBufferSwap(0);
-    //PrintScreen();
+    PrintScreen();
 }
 
 // IDA: void __cdecl DrawSomeText()

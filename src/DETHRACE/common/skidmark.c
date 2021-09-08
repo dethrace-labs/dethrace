@@ -165,7 +165,8 @@ void SkidMark(tCar_spec* pCar, int pWheel_num) {
     int on_ground;
     br_material* material;
     LOG_TRACE("(%p, %d)", pCar, pWheel_num);
-    NOT_IMPLEMENTED();
+
+    SILENT_STUB();
 }
 
 // IDA: void __usercall InitCarSkidStuff(tCar_spec *pCar@<EAX>)

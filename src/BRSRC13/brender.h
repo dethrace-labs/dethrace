@@ -73,6 +73,10 @@ void BrMatrix34PreTransform(br_matrix34* mat, br_transform* xform);
 void BrMatrix34PostTransform(br_matrix34* mat, br_transform* xform);
 void BrMatrix34PreRotateX(br_matrix34* mat, br_angle rx);
 void BrMatrix34TApplyV(br_vector3* A, br_vector3* B, br_matrix34* C);
+void BrMatrix34LPNormalise(br_matrix34* A, br_matrix34* B);
+void BrMatrix34PreRotate(br_matrix34* mat, br_angle r, br_vector3* axis);
+void BrMatrix34Rotate(br_matrix34* mat, br_angle r, br_vector3* a);
+void BrMatrix34PreTranslate(br_matrix34* mat, br_scalar x, br_scalar y, br_scalar z);
 
 // BrMem
 void BrMemFree(void* block);

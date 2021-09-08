@@ -735,6 +735,7 @@ void AddFunkGrooveBinding(int pSlot_number, float* pPeriod_address) {
     if (pSlot_number < 0 || pSlot_number >= COUNT_OF(gGroove_funk_bindings)) {
         FatalError(72);
     }
+
     gGroove_funk_bindings[pSlot_number] = pPeriod_address;
     *pPeriod_address = 0.0;
 }
@@ -742,13 +743,27 @@ void AddFunkGrooveBinding(int pSlot_number, float* pPeriod_address) {
 // IDA: void __usercall ControlBoundFunkGroove(int pSlot_number@<EAX>, float pValue)
 void ControlBoundFunkGroove(int pSlot_number, float pValue) {
     LOG_TRACE("(%d, %f)", pSlot_number, pValue);
-    NOT_IMPLEMENTED();
+
+    if (pSlot_number >= 0) {
+        if (pSlot_number >= 960) {
+            FatalError(73);
+        }
+        *gGroove_funk_bindings[pSlot_number] = pValue;
+    }
 }
 
 // IDA: float __usercall ControlBoundFunkGroovePlus@<ST0>(int pSlot_number@<EAX>, float pValue)
 float ControlBoundFunkGroovePlus(int pSlot_number, float pValue) {
     LOG_TRACE("(%d, %f)", pSlot_number, pValue);
-    NOT_IMPLEMENTED();
+
+    if (pSlot_number < 0) {
+        return 0.0;
+    }
+    if (pSlot_number >= 960) {
+        FatalError(73);
+    }
+    *gGroove_funk_bindings[pSlot_number] = fmod(*gGroove_funk_bindings[pSlot_number] + pValue, 1.0);
+    return *gGroove_funk_bindings[pSlot_number];
 }
 
 // IDA: void __usercall ShiftBoundGrooveFunks(char *pStart@<EAX>, char *pEnd@<EDX>, int pDelta@<EBX>)
@@ -757,9 +772,8 @@ void ShiftBoundGrooveFunks(char* pStart, char* pEnd, int pDelta) {
     LOG_TRACE("(\"%s\", \"%s\", %d)", pStart, pEnd, pDelta);
 
     for (i = 0; i < COUNT_OF(gGroove_funk_bindings); i++) {
-        if ((intptr_t)gGroove_funk_bindings[i] >= (intptr_t)pStart
-            && (intptr_t)gGroove_funk_bindings[i] < (intptr_t)pEnd) {
-            gGroove_funk_bindings[i] = (float*)((char*)gGroove_funk_bindings[i] + (pDelta & 0xFFFFFFFC));
+        if ((char*)gGroove_funk_bindings[i] >= (char*)pStart && (char*)gGroove_funk_bindings[i] < (char*)pEnd) {
+            gGroove_funk_bindings[i] = (float*)((char*)gGroove_funk_bindings[i] + pDelta); // original code is (pDelta & 0xFFFFFFFC) but this caused problems;
         }
     }
 }

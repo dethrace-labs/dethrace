@@ -248,7 +248,8 @@ void DamageUnit2(tCar_spec* pCar, int pUnit_type, int pDamage_amount) {
 void RecordLastDamage(tCar_spec* pCar) {
     int i;
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __usercall DoDamage(tCar_spec *pCar@<EAX>, tDamage_type pDamage_type@<EDX>, float pMagnitude, float pNastiness)
@@ -326,7 +327,8 @@ tImpact_location GetDirection(br_vector3* pVelocity) {
 void SetSmokeLastDamageLevel(tCar_spec* pCar) {
     int i;
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __usercall SortOutSmoke(tCar_spec *pCar@<EAX>)

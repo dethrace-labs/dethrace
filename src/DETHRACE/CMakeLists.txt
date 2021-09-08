@@ -35,7 +35,7 @@ elseif (CMAKE_C_COMPILER_ID STREQUAL "GNU")
         -Wno-unused-result
         -Wno-error=sign-compare
         -Wno-error=format-overflow
-        -Wno-error=unused-but-set-variable  # (SelectRaceDraw::test2)
+        -Wno-error=unused-but-set-variable  # (SelectRaceDraw::test2), etc
     )
 else()
     target_compile_definitions(dethrace_obj PRIVATE -D_CRT_SECURE_NO_WARNINGS)

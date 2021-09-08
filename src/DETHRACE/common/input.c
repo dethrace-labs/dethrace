@@ -55,13 +55,10 @@ void PollKeys() {
 void CyclePollKeys() {
     int i;
     for (i = 0; i < 123; i++) {
-
         if (gKey_array[i] > gKey_poll_counter) {
             gKey_array[i] = 0;
             if (i > 115) {
-                // TOOD: this does _something_, but we cannot figure out what..
-                // eax+1361D4h = -1
-                // gFonts[20].width_table[v1 + 141] = -1;
+                gJoy_array[i - 115] = -1; // yes this is a little weird I know...
             }
         }
     }
@@ -70,14 +67,24 @@ void CyclePollKeys() {
 
 // IDA: void __cdecl ResetPollKeys()
 void ResetPollKeys() {
-    memset(gKey_array, 0, sizeof(gKey_array));
-    memset(gJoy_array, 0, sizeof(gJoy_array));
+    int i;
+    for (i = 0; i < 123; i++) {
+        gKey_array[i] = 0;
+    }
+    for (i = 0; i < 8; i++) {
+        gJoy_array[i] = -1;
+    }
 }
 
 // IDA: void __cdecl CheckKeysForMouldiness()
 void CheckKeysForMouldiness() {
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    LOG_TRACE9("()");
+
+    if ((PDGetTotalTime() - gLast_poll_keys) > 500) {
+        ResetPollKeys();
+        CyclePollKeys();
+        PollKeys();
+    }
 }
 
 // IDA: int __cdecl EitherMouseButtonDown()
@@ -89,20 +96,15 @@ int EitherMouseButtonDown() {
 // IDA: tKey_down_result __usercall PDKeyDown2@<EAX>(int pKey_index@<EAX>)
 tKey_down_result PDKeyDown2(int pKey_index) {
     tU32 the_time;
-    if (/*!s3_timer_started_maybe[0] ||*/ (PDGetTotalTime() - gLast_poll_keys) > 500) {
-        ResetPollKeys();
-        CyclePollKeys();
-        PollKeys();
-    }
 
+    CheckKeysForMouldiness();
     if (!gEdge_trigger_mode) {
         return gKey_array[pKey_index];
     }
     the_time = PDGetTotalTime();
-
     if (gKey_array[pKey_index]) {
-        if (pKey_index == gLast_key_down) {
-            if ((the_time - gLast_key_down_time) < 300) {
+        if (gLast_key_down == pKey_index) {
+            if (the_time - gLast_key_down_time < 300) {
                 return tKey_down_still;
             } else {
                 gLast_key_down_time = the_time;
@@ -113,13 +115,12 @@ tKey_down_result PDKeyDown2(int pKey_index) {
             gLast_key_down = pKey_index;
             return tKey_down_yes;
         }
-    } else {
-        if (pKey_index == gLast_key_down) {
-            gLast_key_down_time = 0;
-            gLast_key_down = -1;
-        }
-        return tKey_down_no;
     }
+    if (gLast_key_down == pKey_index) {
+        gLast_key_down_time = 0;
+        gLast_key_down = -1;
+    }
+    return tKey_down_no;
 }
 
 // IDA: int __usercall PDKeyDown@<EAX>(int pKey_index@<EAX>)
@@ -155,12 +156,8 @@ int PDAnyKeyDown() {
     int i;
     tKey_down_result result;
 
-    if (/*!s3_timer_started_maybe[0] ||*/ (PDGetTotalTime() - gLast_poll_keys) > 500) {
-        ResetPollKeys();
-        CyclePollKeys();
-        PollKeys();
-    }
-    for (i = 122; i >= 0; i--) {
+    CheckKeysForMouldiness();
+    for (i = 122; i >= 0; --i) {
         if (gKey_array[i]) {
             if (!gEdge_trigger_mode) {
                 return i;
@@ -170,18 +167,17 @@ int PDAnyKeyDown() {
             case tKey_down_no:
             case tKey_down_still:
                 return -1;
+                break;
             case tKey_down_yes:
             case tKey_down_repeat:
                 return i;
-            default:
                 break;
             }
         }
     }
-
     if (gEdge_trigger_mode) {
-        gLast_key_down = -1;
         gLast_key_down_time = 0;
+        gLast_key_down = -1;
     }
     return -1;
 }
@@ -266,24 +262,19 @@ int OldKeyIsDown(int pKey_index) {
 int KeyIsDown(int pKey_index) {
     int i;
 
-    if (PDGetTotalTime() - gLast_poll_keys > 500) {
-        ResetPollKeys();
-        CyclePollKeys();
-        PollKeys();
-    }
+    CheckKeysForMouldiness();
+
     if (pKey_index == -2) {
         return 1;
     }
     if (pKey_index != -1) {
         return gKey_array[gKey_mapping[pKey_index]];
     }
-
     for (i = 0; i < 3; i++) {
         if (gKey_array[gGo_ahead_keys[i]]) {
             return 1;
         }
     }
-
     return 0;
 }
 

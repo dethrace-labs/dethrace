@@ -1,5 +1,6 @@
 #include "netgame.h"
 #include "globvars.h"
+#include "globvrpb.h"
 #include "network.h"
 #include <stdlib.h>
 
@@ -24,7 +25,10 @@ void SendCarData(tU32 pNext_frame_time) {
     tU32 time;
     int damaged_wheels;
     LOG_TRACE("(%d)", pNext_frame_time);
-    NOT_IMPLEMENTED();
+
+    if (gNet_mode) {
+        TELL_ME_IF_WE_PASS_THIS_WAY();
+    }
 }
 
 // IDA: void __usercall ReceivedRecover(tNet_contents *pContents@<EAX>)

@@ -27,7 +27,7 @@ void ExtractColumns(tTrack_spec* pTrack_spec);
 
 void LollipopizeActor4(br_actor* pActor, br_matrix34* pRef_to_world, br_actor* pCamera);
 
-br_uint_32 LollipopizeChildren(br_actor* pActor, void* pArg);
+/*br_uint_32*/ intptr_t LollipopizeChildren(br_actor* pActor, void* pArg);
 
 void DrawColumns(int pDraw_blends, tTrack_spec* pTrack_spec, int pMin_x, int pMax_x, int pMin_z, int pMax_z, br_matrix34* pCamera_to_world);
 

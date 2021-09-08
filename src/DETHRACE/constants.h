@@ -243,6 +243,8 @@ typedef enum keymapcodes {
     KEYMAP_LCTRL = 7,
     KEYMAP_F2 = 28,
     KEYMAP_F3 = 29,
+    KEYMAP_LEFT = 46,
+    KEYMAP_RIGHT = 46,
 } keymapcodes;
 
 #define FONT_TYPEABLE 0
@@ -280,6 +282,14 @@ typedef enum keymapcodes {
 #define MAX(a, b) ((a) > (b) ? a : b)
 #define COUNT_OF(array) (sizeof((array)) / sizeof((array)[0]))
 
+#define DEG_TO_RAD(degrees) ((degrees)*3.141592653589793 / 180.0)
+
 #define ONEEIGHTTWO 182.0444444444444
+
+#define PHYSICS_STEP_TIME 40.0
+
+#define DR_PI 3.141592653589793
+
+#define TIME_CONV_THING 0.00050000002
 
 #endif
