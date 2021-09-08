@@ -1,0 +1,72 @@
+// SCRATCH
+
+// gRender_screen = DRPixelmapAllocateSub(gBack_screen, pX_offset, pY_offset, pWidth, pHeight);
+render background(sky) to gRender_screen(back screen)
+        render 3d scene
+    render foreground to gBack_screen(cockpit, headups etc)
+        swap buffers
+
+    render background(sky) to gRender_screen(back screen)
+    - harness_renderscreen
+    render 3d scene
+    - clear back screen to black
+    - do opengl rendering
+
+    render foreground to gBack_screen(cockpit, headups etc)
+    - ignore any black pixels
+
+    swap buffers
+
+    0053A250
+    - 0x53A43C gKey_array
+
+    005505F4 dword_5505F4 //joy?
+    005507C0
+    - 005507e0 gJoy_array
+    005507E0
+    - 005508EC gKey_mapping
+
+    005505F4 offset in cyclepollkeys to gJoy_array
+    - diff is 115 ints
+
+        0x550428
+
+        / DOS
+
+        00136444 gKey_array
+        001363A0 gJoy_array
+
+        0x1361D4 offset in cyclepollkeys to gJoy_array
+    - diff is 115 ints
+
+        [DEBUG] ShiftBoundGrooveFunks bound funk 0 : 0x0
+            [DEBUG] ShiftBoundGrooveFunks bound funk 1 : 0x1008c897c
+                [DEBUG] ShiftBoundGrooveFunks bound funk 2 : 0x1008c8a04
+                    [DEBUG] ShiftBoundGrooveFunks bound funk 3 : 0x1008c8828
+                        [DEBUG] ShiftBoundGrooveFunks bound funk 4 : 0x1008c88b0
+                            [DEBUG] ShiftBoundGrooveFunks bound funk 5 : 0x1008c8938
+                                [DEBUG] ShiftBoundGrooveFunks bound funk 6 : 0x1008c89c0
+                                    [DEBUG] ShiftBoundGrooveFunks bound funk 7 : 0x1008c886c
+                                        [DEBUG] ShiftBoundGrooveFunks bound funk 8 : 0x1008c88f4
+                                            [DEBUG] ShiftBoundGrooveFunks bound funk 9 : 0x1008c8a8c
+                                                [DEBUG] ShiftBoundGrooveFunks bound funk 10 : 0x1008c8b14
+
+                                                    [DEBUG] ShiftBoundGrooveFunks bound funk 0 : 0x0
+                                                        [DEBUG] ShiftBoundGrooveFunks bound funk 1 : 0x10389837c
+                                                            [DEBUG] ShiftBoundGrooveFunks bound funk 2 : 0x103898404
+                                                                [DEBUG] ShiftBoundGrooveFunks bound funk 3 : 0x103898228
+                                                                    [DEBUG] ShiftBoundGrooveFunks bound funk 4 : 0x1038982b0
+                                                                        [DEBUG] ShiftBoundGrooveFunks bound funk 5 : 0x103898338
+                                                                            [DEBUG] ShiftBoundGrooveFunks bound funk 6 : 0x1038983c0
+                                                                                [DEBUG] ShiftBoundGrooveFunks bound funk 7 : 0x10389826c
+                                                                                    [DEBUG] ShiftBoundGrooveFunks bound funk 8 : 0x1038982f4
+                                                                                        [DEBUG] ShiftBoundGrooveFunks bound funk 9 : 0x10389848c
+                                                                                            [DEBUG] ShiftBoundGrooveFunks bound funk 10 : 0x103898514
+
+    sometimes selfcentre is called multiple times per frame
+    applyphysicstocars always is within time_step
+
+    acc_force is not dropping down fast enough
+
+    ts2 8.015344638012678e-11,
+    acc 5.92524658203125e2, revs 1.16219453125e4 v160 2.962623291015625e2, v118 1.703537831632129e-11, speed 0.0 max_force_rear 7.437321662902832, v135 1.481311645507812e2, limit 1 ts2 3.074372708797455e-1, acc 4.121511840820312e2, revs 7.6736416015625e3 v160 2.05921875e2, v118 3.127531499558245e-6, speed 0.0 max_force_rear 7.437321662902832, v135 1.029609375e2, limit 1 ts2 3.450555503368378e-1, acc 2.825576171875e2, revs 5.08019775390625e3 v160 1.411062774658203e2, v118 3.965127234550891e-6, speed 2.803576358087277 max_force_rear 8.247367858886719, v135 7.055313873291016e1, limit 1 ts2 3.663769066333771e-1, acc 1.920951385498047e2, revs 3.416863525390625e3 v160 9.58643798828125e1, v118 4.987010015611304e-6, speed 4.356438601662044 max_force_rear 8.737387657165527, v135 4.793218994140625e1, limit 1 ts2 3.764173984527588e-1, acc 1.30189453125e2, revs 2.38487939453125e3 v160 6.490651702880859e1, v118 3.554842805897351e-6, speed 5.955295815963242 max_force_rear 9.003288269042969, v135 3.24532585144043e1, limit 1 ts2 3.783531486988068e-1, acc 8.838812255859375e1, revs 1.777574462890625e3 v160 4.40048828125e1, v118 - 5.434078630059958e-4, speed 5.955295815963242 max_force_rear 9.125821113586426, v135 2.200244140625e1, limit 1 ts2 3.753950297832489e-1, acc 6.089559936523438e1, revs 1.454000854492188e3 v160 3.026010131835938e1, v118 - 1.982751418836415e-4, speed 9.13116980073459 max_force_rear 9.149258613586426, v135 1.513005065917969e1, limit 1 ts2 3.73871237039566e-1, acc 4.246442031860352e1, revs 1.315802001953125e3 v160 2.104527473449707e1, v118 1.181649276986718e-4, speed 9.13116980073459 max_force_rear 9.113421440124512, v135 1.052263736724854e1, limit 1 ts2 3.743874132633209e-1, acc 3.010890197753906e1, revs 1.3012431640625e3 v160 1.48672571182251e1, v118 - 4.263391747372225e-5, speed 1.228963766974154e1 max_force_rear 9.094904899597168, v135 7.433628559112549, limit 1 ts2 3.726563155651093e-1, acc 2.178503227233887e1, revs 1.369130737304688e3 v160 1.07061882019043e1, v118 - 1.312031417910475e-5, speed 1.228963766974154e1 max_force_rear 9.101181030273438, v135 5.353094100952148, limit 1 ts2 3.762767016887665e-1, acc 1.618281555175781e1, revs 1.492148193359375e3 v160 7.903269290924072, v118 - 1.101096768252319e-5, speed 1.548429768039707e1 max_force_rear 9.08011531829834, v135 3.951634645462036, limit 0

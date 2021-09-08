@@ -735,10 +735,9 @@ void AddFunkGrooveBinding(int pSlot_number, float* pPeriod_address) {
     if (pSlot_number < 0 || pSlot_number >= COUNT_OF(gGroove_funk_bindings)) {
         FatalError(72);
     }
-    *pPeriod_address = pSlot_number;
 
     gGroove_funk_bindings[pSlot_number] = pPeriod_address;
-    //*pPeriod_address = 0.0;
+    *pPeriod_address = 0.0;
 }
 
 // IDA: void __usercall ControlBoundFunkGroove(int pSlot_number@<EAX>, float pValue)
@@ -772,22 +771,10 @@ void ShiftBoundGrooveFunks(char* pStart, char* pEnd, int pDelta) {
     int i;
     LOG_TRACE("(\"%s\", \"%s\", %d)", pStart, pEnd, pDelta);
 
-    for (i = 0; i < 20; i++) {
-        if (gGroove_funk_bindings[i]) {
-            LOG_DEBUG("bound funk %d: %p, %f", i, gGroove_funk_bindings[i], gGroove_funk_bindings[i] == NULL ? 0 : *gGroove_funk_bindings[i]);
-        }
-    }
-
     for (i = 0; i < COUNT_OF(gGroove_funk_bindings); i++) {
-        if ((char*)gGroove_funk_bindings[i] >= (char*)pStart
-            && (char*)gGroove_funk_bindings[i] < (char*)pEnd) {
-            gGroove_funk_bindings[i] = (float*)((char*)gGroove_funk_bindings[i] + pDelta); // (pDelta & 0xFFFFFFFC));
-            LOG_DEBUG("moving slot %d to %p", i, gGroove_funk_bindings[i]);
+        if ((char*)gGroove_funk_bindings[i] >= (char*)pStart && (char*)gGroove_funk_bindings[i] < (char*)pEnd) {
+            gGroove_funk_bindings[i] = (float*)((char*)gGroove_funk_bindings[i] + pDelta); // original code is (pDelta & 0xFFFFFFFC) but this caused problems;
         }
-    }
-
-    for (i = 0; i < 20; i++) {
-        LOG_DEBUG("bound funk %d: %p, %f", i, gGroove_funk_bindings[i], gGroove_funk_bindings[i] == NULL ? 0 : *gGroove_funk_bindings[i]);
     }
 }
 
@@ -806,7 +793,6 @@ tFunkotronic_spec* AddNewFunkotronic() {
     gFunkotronics_array_size += 16;
     new_array = BrMemCalloc(gFunkotronics_array_size, sizeof(tFunkotronic_spec), kMem_funk_spec);
     if (gFunkotronics_array) {
-        LOG_DEBUG("old array is %p, new_array is %p, size %d", gFunkotronics_array, new_array, gFunkotronics_array_size);
         memcpy(new_array, gFunkotronics_array, sizeof(tFunkotronic_spec) * (gFunkotronics_array_size - 16));
         ShiftBoundGrooveFunks(
             (char*)gFunkotronics_array,
@@ -1234,7 +1220,6 @@ tGroovidelic_spec* AddNewGroovidelic() {
     gGroovidelics_array_size += 16;
     new_array = BrMemCalloc(gGroovidelics_array_size, sizeof(tGroovidelic_spec), kMem_groove_spec);
     if (gGroovidelics_array) {
-        LOG_DEBUG("old array is %p, new_array is %p, size %d", gGroovidelics_array, new_array, gGroovidelics_array_size);
         memcpy(new_array, gGroovidelics_array, (gGroovidelics_array_size - 16) * sizeof(tGroovidelic_spec));
         ShiftBoundGrooveFunks(
             (char*)gGroovidelics_array,
@@ -1361,7 +1346,6 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
                 the_groove->path_data.straight_info.period = x_0 == 0.0f ? 0.0f : 1000.0 / x_0;
             } else {
                 i = GetAnInt(pF);
-                LOG_DEBUG("straight");
                 AddFunkGrooveBinding(i + pRef_offset, &the_groove->path_data.straight_info.period);
             }
             GetThreeFloats(
@@ -1382,7 +1366,6 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
                 the_groove->object_data.spin_info.period = x_0 == 0.0f ? 0.0f : 1000.0 / x_0;
             } else {
                 d_0 = GetAnInt(pF);
-                LOG_DEBUG("spin");
                 AddFunkGrooveBinding(d_0 + pRef_offset, &the_groove->object_data.spin_info.period);
             }
             GetThreeFloats(pF,
@@ -1397,9 +1380,7 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
                 the_groove->object_data.rock_info.period = x_0 == 0.0f ? 0.0f : 1000.0 / x_0;
             } else {
                 d_0 = GetAnInt(pF);
-                LOG_DEBUG("rock %f", the_groove->object_data.rock_info.period);
                 AddFunkGrooveBinding(d_0 + pRef_offset, &the_groove->object_data.rock_info.period);
-                LOG_DEBUG("rock2 %f", the_groove->object_data.rock_info.period);
             }
             GetThreeFloats(pF,
                 &the_groove->object_centre.v[0],
@@ -1416,7 +1397,6 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
                 the_groove->object_data.throb_info.z_period = x_2 == 0.0f ? 0.0f : 1000.0 / x_2;
             } else {
                 GetThreeInts(pF, &d_0, &d_1, &d_2);
-                LOG_DEBUG("throb");
                 if (d_0 >= 0) {
                     AddFunkGrooveBinding(d_0 + pRef_offset, &the_groove->object_data.throb_info.x_period);
                 }
@@ -1445,7 +1425,6 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
                 the_groove->object_data.shear_info.z_period = x_2 == 0.0f ? 0.0f : 1000.0 / x_2;
             } else {
                 GetThreeInts(pF, &d_0, &d_1, &d_2);
-                LOG_DEBUG("shear");
                 if (d_0 >= 0) {
                     AddFunkGrooveBinding(d_0 + pRef_offset, &the_groove->object_data.shear_info.x_period);
                 }

@@ -768,7 +768,7 @@ void ControlOurCar(tU32 pTime_difference) {
             }
         } else {
             ts = pTime_difference * (car->damage_units[eDamage_transmission].damage_level - 40);
-            if (PercentageChance(ts) * 0.006) {
+            if (PercentageChance(ts) * 0.006 != 0) {
                 ts = 10 * (5 * car->damage_units[eDamage_transmission].damage_level - 200);
                 car->end_trans_damage_effect = FRandomBetween(0.0, ts) + time;
             }
@@ -853,30 +853,20 @@ void CalcEngineForce(tCar_spec* c, br_scalar dt) {
                 c->brake_force = c->initial_brake + c->brake_increase;
             }
         }
-        // if (c->brake_force) {
-        //     LOG_DEBUG("braking %f", c->brake_force);
-        // }
     }
-    float f1 = c->acc_force;
-    float f2 = 0, f3 = 0;
     if (c->gear) {
         c->acc_force = c->force_torque_ratio * c->torque / (double)c->gear;
         //printf("force_torque_ratio %f, torque %f, dt %f, revs %f, target %f\n", c->force_torque_ratio, c->torque, dt, c->revs, c->target_revs);
-        f2 = c->acc_force;
         if (c->brake_force == 0.0) {
             if (c->revs - 1.0 > c->target_revs || c->revs + 1.0 < c->target_revs) {
                 ts2 = c->torque * dt / 0.0002 + c->revs - c->target_revs;
                 //LOG_DEBUG("revs_diff %f", c->revs - c->target_revs);
                 c->acc_force = ts2 / ((1.0 / (c->speed_revs_ratio * c->M) / (double)c->gear + 1.0 / (c->force_torque_ratio * 0.0002) * (double)c->gear) * dt) + c->acc_force;
-                f3 = c->acc_force;
                 //LOG_DEBUG("updating force from %f to %f, delta %f", f2, c->acc_force, ts2 / ((1.0 / (c->speed_revs_ratio * c->M) / (double)c->gear + 1.0 / (c->force_torque_ratio * 0.0002) * (double)c->gear) * dt));
             }
         } else {
             c->revs = c->target_revs;
-            LOG_DEBUG("revs = target_revs");
         }
-    } else {
-        //LOG_DEBUG("not in gear");
     }
     //LOG_DEBUG("force 1 %f, 2 %f, 3 %f, %f", f1, f2, f3, c->target_revs);
 }
@@ -997,8 +987,7 @@ void FinishCars(tU32 pLast_frame_time, tU32 pTime) {
             }
         }
         if (car->driver > eDriver_non_car) {
-            car->speedo_speed = (car->v.v[2] * minus_k.v[2] + car->v.v[1] * minus_k.v[1] + car->v.v[0] * minus_k.v[0])
-                / 6900.0;
+            car->speedo_speed = (car->v.v[2] * minus_k.v[2] + car->v.v[1] * minus_k.v[1] + car->v.v[0] * minus_k.v[0]) / 6900.0;
             car->steering_angle = atan((car->wpos[0].v[2] - car->wpos[2].v[2]) * car->curvature) * 57.29577951308232;
             car->lr_sus_position = (car->ride_height - car->oldd[0]) / 6.9;
             car->rr_sus_position = (car->ride_height - car->oldd[1]) / 6.9;
@@ -1759,6 +1748,10 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
     float v135; // [esp+1DCh] [ebp-10h]
     br_vector3 v136; // [esp+1E0h] [ebp-Ch]
 
+    v136.v[0] = 0;
+    v136.v[1] = 0;
+    v136.v[2] = 0;
+
     normnum = 0;
     f.v[0] = 0.0;
     f.v[1] = 0.0;
@@ -1861,7 +1854,7 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
         SteeringSelfCentre(c, dt, &c->road_normal);
     }
     if (normnum) {
-        ts = 1.0 / sqrt(1.0); // came out of decompiler like this?
+        // ts = 1.0 / sqrt(1.0); <- looked like this in the windows build definitely wrong
         ts = 1.0 / sqrt(c->road_normal.v[0] * c->road_normal.v[0] + c->road_normal.v[1] * c->road_normal.v[1] + c->road_normal.v[2] * c->road_normal.v[2]);
         c->road_normal.v[0] = c->road_normal.v[0] * ts;
         c->road_normal.v[1] = c->road_normal.v[1] * ts;
@@ -2408,7 +2401,6 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
     }
     AddDrag(c, dt);
     if (c->driver >= eDriver_net_human) {
-        //float old = c->acc_force;
         c->acc_force = -(v136.v[2] * force[0]) - v136.v[2] * force[1];
         //LOG_DEBUG("old %f new %f", old, c->acc_force);
     }
@@ -3729,7 +3721,7 @@ void SwingCamera(tCar_spec* c, br_matrix34* m1, br_matrix34* m2, br_vector3* vn,
     ts = vn->v[1] * old_vn.v[1] + vn->v[2] * old_vn.v[2] + vn->v[0] * old_vn.v[0];
 
     old_vn = *vn;
-    if (sign < 0.0 == gCamera_sign) {
+    if ((sign < 0.0) == gCamera_sign) {
         elapsed_time = -1;
     } else if (ts <= 0.0 || elapsed_time >= 0) {
         if (elapsed_time < 0) {

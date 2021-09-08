@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+
+
+### July 17 2021
+- 3d rendering somewhat implemented. Flat shaded, no textures, but camera, cars and track are visible in the right place!
+
+### April 21 2021
+- Actual game main loop running! Rendering, phyiscs, sound etc commented out, so all we can see is a black screen with the 2d rendering.
+
+### March 24 2021
+- Menu screens up to and including race and car selection implemented
+- Fixed OpenGL crashes by moving back to single thread
+
 ### September 3 2020
 - Cutscenes displayed on startup.
 - Main menu renders and responds to key up and down events. Hitting "enter" on any option causes a crash

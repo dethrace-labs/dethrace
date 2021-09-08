@@ -801,7 +801,7 @@ void DoFancyHeadup(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
     STUB();
-    return; //
+    return; // some bits are not implemented below
 
     the_time = GetTotalTime();
     if (!gMap_mode && (gLast_fancy_index < 0 || the_time - gLast_fancy_time > 2000 || gLast_fancy_index <= pIndex)) {

@@ -90,11 +90,6 @@ To run a single test
 DETHRACE_TEST_ARGS="-n test_name" make test
 ```
 
-## Run game
-```sh
-make run
-```
-
 ## Changelog
 [From the beginning until release](docs/CHANGELOG.md)
 

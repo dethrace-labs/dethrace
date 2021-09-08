@@ -608,6 +608,7 @@ tRace_result MainGameLoop() {
             gAbandon_game = 0;
         }
 
+        // Added to lock framerate to 30fps. Seems to help physics be less twitchy...
         double secs = GetTotalTime() / 1000.0;
         //LOG_DEBUG("timediff %f", secs - (last_time + (1.0 / 30.0)));
         while (secs < last_time + (1.0 / 30.0)) {
