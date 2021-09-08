@@ -48,7 +48,7 @@ int gRace_bonus_headup;
 int gWasted_flash_state;
 int gLast_time_headup;
 int gNasty_kludgey_cockpit_variable;
-tInfo_mode gInfo_mode = 1;
+tInfo_mode gInfo_mode;
 int gTime_bonus_headup;
 int gQueued_wasted_massages[5];
 tU32 gTime_bonus_start;
