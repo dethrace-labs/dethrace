@@ -440,7 +440,7 @@ def resolve_function_signature(module, fn):
   if is_function_vararg(module, fn):
     args += ', ...'
 
-  return return_type + ' ' + fn['name'] + '(' + args + ')'
+  return return_type + ' ' + get_function_name(module, fn['name']) + '(' + args + ')'
 
 def resolve_function_ida_signature(module, fn):
   type_idx = fn['type']
@@ -579,6 +579,32 @@ def get_type_declaration(module, t, name):
     return t['value'] + indirections + ' ' + name + bounds
   else:
     return 'WARN: No decl for ' + t['type']
+  
+
+def get_function_name(module, name):
+  # if the function name exists in another module, we add a unique scope
+  for m in modules:
+    if m != module:
+      for gv in m['functions']:
+        if gv['name'] == name:
+          return generate_scoped_name(module, name)
+
+  return name
+
+def get_global_var_name(module, name):
+  # if the global var exists in another module, we add a unique scope
+  for m in modules:
+    if m != module:
+      for gv in m['global_vars']:
+        if gv['name'] == name:
+          return generate_scoped_name(module, name)
+  return name
+
+def generate_scoped_name(module, name):
+  last_slash = module['name'].rindex("\\")+1
+  clean_module_name = module['name'][last_slash:-2]
+  return name + "__" + clean_module_name
+  
 
 def generate_c_skeleton():
   global dr_types_file
@@ -602,7 +628,7 @@ def generate_c_skeleton():
 
   for m in modules:
     # ignore lib modules
-    if 'DETHRACE' not in m['name'] and 'BRSRC13' not in m['name']:
+    if '\\' not in m['name']:
       print("ignoring", m['name'])
       continue
     print(m['name'])
@@ -632,17 +658,26 @@ def generate_h_file(module):
 
   # global variables
   for gv in sorted(module['global_vars'], key=lambda x: x['addr_decimal']):
-    # print('gv:', gv)
-    s = resolve_type_str(module, gv['type'], gv['name'])
+    # ignore this specific field
+    if gv['name'] == 'rscid':
+      continue
+    name = get_global_var_name(module, gv['name'])
+    s = resolve_type_str(module, gv['type'], name)
     h_file.write('extern ' + s)
-    h_file.write(';\n')
+    h_file.write(';')
+    if '__' in name:
+      h_file.write(' // suffix added to avoid duplicate symbol')
+    h_file.write('\n')
   h_file.write('\n')
 
   for fn in module['functions']:
     h_file.write(resolve_function_header(module, fn))
     h_file.write('\n')
-    h_file.write(resolve_function_signature(module, fn) + ';')
-    h_file.write('\n\n')
+    sig = resolve_function_signature(module, fn)
+    if '__' in sig:
+      h_file.write('// Suffix added to avoid duplicate symbol\n')
+    h_file.write(sig)
+    h_file.write(';\n\n')
   h_file.write('#endif\n')
 
 def generate_c_file(module):
@@ -655,17 +690,27 @@ def generate_c_file(module):
 
   # global variables
   for gv in sorted(module['global_vars'], key=lambda x: x['addr_decimal']):
-    # print('gv:', gv)
-    s = resolve_type_str(module, gv['type'], gv['name'])
+    
+    # ignore this specific field
+    if gv['name'] == 'rscid':
+      continue
+    name = get_global_var_name(module, gv['name'])
+    s = resolve_type_str(module, gv['type'], name)
     c_file.write(s)
-    c_file.write(';\n')
+    c_file.write(';')
+    if '__' in name:
+      c_file.write(' // suffix added to avoid duplicate symbol')
+    c_file.write('\n')
   c_file.write('\n')
 
   # functions
   for fn in module['functions']:
     c_file.write(resolve_function_header(module, fn))
     c_file.write('\n')
-    c_file.write(resolve_function_signature(module, fn))
+    sig = resolve_function_signature(module, fn)
+    if '__' in sig:
+      c_file.write('// Suffix added to avoid duplicate symbol\n')  
+    c_file.write(sig)
     c_file.write(' {\n')
 
     # skip local variables that were passed in as arguments
