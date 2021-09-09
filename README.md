@@ -1,6 +1,6 @@
 # Dethrace  
 
-![CI](https://github.com/jeff-1amstudios/dethrace/workflows/CI/badge.svg)
+[![Workflow](https://github.com/jeff-1amstudios/dethrace/actions/workflows/workflow.yml/badge.svg)](https://github.com/jeff-1amstudios/dethrace/actions/workflows/workflow.yml)
 
 ![Discord Chat Channel](docs/discord-badge.jpg) [Discord Chat Channel](https://discord.gg/f5StsuP)
 
@@ -53,9 +53,9 @@ cd build
 cmake ..
 ```
 
-Build:
+On cmake has generated the build files for your platform, run the build. For example:
 ```sh
-make && ./dethrace
+make
 ```
 
 ### Run
