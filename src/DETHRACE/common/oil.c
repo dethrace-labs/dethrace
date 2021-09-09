@@ -5,8 +5,8 @@
 #include "utility.h"
 #include <stdlib.h>
 
-int gNext_oil_pixie;
 char* gOil_pixie_names[1] = { "OIL.PIX" };
+int gNext_oil_pixie;
 br_scalar gZ_buffer_diff;
 br_scalar gMin_z_diff;
 br_pixelmap* gOil_pixies[1];

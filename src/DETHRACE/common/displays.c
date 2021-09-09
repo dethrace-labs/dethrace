@@ -11,6 +11,10 @@
 #include "utility.h"
 #include <stdlib.h>
 
+int gLast_fancy_index;
+int gLast_credit_headup__displays; // suffix added to avoid duplicate symbol
+int gLast_time_credit_headup;
+tDR_font* gCached_font;
 br_font* gBR_fonts[4];
 tQueued_headup gQueued_headups[4];
 int gOld_times[10];
@@ -22,10 +26,6 @@ int gQueued_headup_count;
 tU32 gLast_earn_time;
 tU32 gLast_time_credit_amount;
 int gLast_credit_amount;
-tDR_font* gCached_font;
-int gLast_time_credit_headup;
-int gLast_fancy_index;
-int gLast_credit_headup;
 tHeadup gHeadups[15];
 int gLaps_headup;
 int gCar_kill_count_headup;

@@ -128,10 +128,10 @@ char* gError_messages[126] = {
     "Random number out of range (%)"
 };
 int gError_code;
-char* gPalette_copy;
-int gPixel_buffer_size;
-int gMouse_was_started__;
-char* gPixels_copy;
+char* gPalette_copy__errors; // suffix added to avoid duplicate symbol
+int gPixel_buffer_size__errors; // suffix added to avoid duplicate symbol
+int gMouse_was_started__errors; // suffix added to avoid duplicate symbol
+char* gPixels_copy__errors; // suffix added to avoid duplicate symbol
 
 // IDA: void __cdecl FatalError(int pStr_index, ...)
 void FatalError(int pStr_index, ...) {

@@ -37,13 +37,13 @@
 
 #include "brender.h"
 
-int gInitialisation_finished = 0;
+int gGame_initialized;
+int gBr_initialized;
+int gBrZb_initialized;
+int gInitialisation_finished;
+int gRender_indent;
 tU32 gAustere_time;
 int gInitial_rank;
-int gGame_initialized = 0;
-int gBr_initialized = 0;
-int gBrZb_initialized = 0;
-int gRender_indent = 0;
 int gCredits_per_rank[3];
 int gInitial_credits[3];
 int gNet_mode_of_last_game;

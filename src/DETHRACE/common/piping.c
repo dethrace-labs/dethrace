@@ -3,15 +3,17 @@
 #include "opponent.h"
 #include <stdlib.h>
 
-tPiped_registration_snapshot gRegistration_snapshots[5];
-tPipe_reset_proc* gReset_procs[32];
+tU8* gPipe_buffer_start;
+int gDisable_sound;
+int gDisable_advance;
+int gMax_rewind_chunks;
 float gWall_severity;
+tPipe_reset_proc* gReset_procs[32];
+tPiped_registration_snapshot gRegistration_snapshots[5];
 tPipe_smudge_data* gSmudge_space;
 tU32 gOldest_time;
 int gCurrent_snapshot_registration_index;
 tPipe_chunk* gMr_chunky;
-int gMax_rewind_chunks;
-int gDisable_sound;
 tCar_spec* gCar_ptr;
 br_vector3 gZero_vector;
 tPipe_chunk_type gReentrancy_array[5];
@@ -20,7 +22,6 @@ tPipe_model_geometry_data* gModel_geometry_space;
 tU32 gEnd_time;
 tU32 gTrigger_time;
 int gReentrancy_count;
-int gDisable_advance;
 br_vector3 gCar_pos;
 br_vector3 gReference_pos;
 br_scalar gMax_distance;
@@ -37,7 +38,6 @@ tU8* gPipe_buffer_oldest;
 tU32 gPipe_buffer_size;
 tU8* gLocal_buffer;
 tU32 gLocal_buffer_size;
-tU8* gPipe_buffer_start;
 
 // IDA: void __usercall GetReducedPos(br_vector3 *v@<EAX>, tReduced_pos *p@<EDX>)
 void GetReducedPos(br_vector3* v, tReduced_pos* p) {

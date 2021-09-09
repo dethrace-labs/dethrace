@@ -5,8 +5,8 @@
 #include "common/loading.h"
 #include <stdlib.h>
 
-char* gMaterial_names[2] = { "OILSMEAR.MAT", "GIBSMEAR.MAT" };
 char* gBoring_material_names[2] = { "OILSMEAR.MAT", "ROBSMEAR.MAT" };
+char* gMaterial_names[2] = { "OILSMEAR.MAT", "GIBSMEAR.MAT" };
 tSkid gSkids[100];
 
 // IDA: void __usercall StretchMark(tSkid *pMark@<EAX>, br_vector3 *pFrom@<EDX>, br_vector3 *pTo@<EBX>, br_scalar pTexture_start)

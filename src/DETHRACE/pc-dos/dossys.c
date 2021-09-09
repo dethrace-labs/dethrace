@@ -49,14 +49,16 @@ int clock_gettime(int dummy, struct timespec* tv) {
 }
 #endif
 
-int gASCII_table[128];
-tU32 gKeyboard_bits[8];
-int gASCII_shift_table[128];
+int gDOSGfx_initialized;
+int gExtra_mem;
+int gReplay_override;
 tGraf_spec gGraf_specs[2] = {
     { 8, 1, 0, 320, 200, 0, 0, "32X20X8", "MCGA,W:320,H:200,B:8", 0, 0, 0, NULL },
     { 8, 1, 0, 640, 480, 0, 0, "64X48X8", "VESA,W:640,H:480,B:8", 0, 0, 0, NULL }
 };
-
+int gASCII_table[128];
+tU32 gKeyboard_bits[8];
+int gASCII_shift_table[128];
 char gNetwork_profile_fname[256];
 tS32 gJoystick_min1y;
 tS32 gJoystick_min2y;
@@ -71,13 +73,10 @@ tS32 gJoystick_range1y;
 tS32 gJoystick_range1x;
 int gNo_voodoo;
 int gSwitched_resolution;
-int gReplay_override;
 br_pixelmap* gReal_back_screen;
 tS32 gJoystick_min1x;
 br_pixelmap* gTemp_screen;
-int gDOSGfx_initialized;
 tU32 gUpper_loop_limit;
-int gExtra_mem;
 int gReal_back_screen_locked;
 void (*gPrev_keyboard_handler)();
 tU8 gScan_code[123][2];

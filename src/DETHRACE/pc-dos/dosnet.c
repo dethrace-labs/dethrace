@@ -4,6 +4,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+tU32 gNetwork_init_flags;
+tPD_net_game_info* gJoinable_games;
+int gMatts_PC;
+tU16 gSocket_number_pd_format;
 _IPX_ELEMENT gListen_elements[16];
 char gLocal_ipx_addr_string[32];
 _IPX_ELEMENT gSend_elements[16];
@@ -24,13 +28,9 @@ tU8* gListen_packet_ptr;
 size_t gMsg_header_strlen;
 int gNumber_of_networks;
 int gNumber_of_hosts;
-tU32 gNetwork_init_flags;
-tPD_net_game_info* gJoinable_games;
 tRM_info RMI;
-int gMatts_PC;
 _IPX_HEADER gLast_received_IPX_header;
 tU16 gSocket_number_network_order;
-tU16 gSocket_number_pd_format;
 USHORT gECB_offset;
 tU16 gListen_selector;
 tU16 gSend_selector;

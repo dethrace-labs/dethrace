@@ -9,6 +9,9 @@
 #include <stdlib.h>
 
 tDepth_effect gDistance_depth_effects[4];
+int gSky_on;
+int gDepth_cueing_on;
+tDepth_effect_type gSwap_depth_effect_type;
 br_scalar gSky_height;
 br_scalar gSky_x_multiplier;
 br_scalar gSky_width;
@@ -17,8 +20,6 @@ tU32 gLast_depth_change;
 br_scalar gOld_yon;
 br_pixelmap* gWater_shade_table;
 br_material* gHorizon_material;
-int gDepth_cueing_on;
-int gSky_on;
 br_model* gRearview_sky_model;
 int gFog_shade_table_power;
 br_actor* gRearview_sky_actor;
@@ -31,7 +32,6 @@ br_pixelmap* gFog_shade_table;
 int gSwap_depth_effect_start;
 br_pixelmap* gDepth_shade_table;
 tSpecial_volume* gLast_camera_special_volume;
-tDepth_effect_type gSwap_depth_effect_type;
 br_pixelmap* gAcid_shade_table;
 int gSwap_depth_effect_end;
 br_pixelmap* gSwap_sky_texture;

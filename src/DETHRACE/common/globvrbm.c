@@ -1,6 +1,7 @@
 #include "globvrbm.h"
 #include <stdlib.h>
 
+br_scalar gYon_factor;
 br_material* gMaterial[2];
 int g16bit_palette_valid;
 tException_list gExceptions;
@@ -29,7 +30,6 @@ int gPerspective_is_fast;
 int gUse_mip_maps;
 int gBlitting_is_slow;
 int gTextures_need_powers_of_2;
-br_scalar gYon_factor;
 int gMax_texture_side;
 int gDevious_2d;
 int gMax_texture_aspect_ratio;

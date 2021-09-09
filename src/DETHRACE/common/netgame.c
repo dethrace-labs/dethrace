@@ -4,8 +4,8 @@
 #include "network.h"
 #include <stdlib.h>
 
-int gGame_scores[6];
 int gPowerup_cost[4];
+int gGame_scores[6];
 int gPed_target;
 int gNot_shown_race_type_headup;
 tU32 gLast_it_change;

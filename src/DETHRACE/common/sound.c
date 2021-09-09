@@ -8,34 +8,34 @@
 #include "s3/s3sound.h"
 #include "utility.h"
 
-tS3_outlet_ptr gIndexed_outlets[6];
-int gRandom_CDA_tunes[7];
-tU32 gLast_sound_service;
-int gSong_repeat_count;
-int gServicing_sound;
-int gCD_fully_installed;
-int gCD_is_disabled;
-int gCDA_is_playing;
-int gSound_sources_inited;
-tS3_sound_tag gCDA_tag;
-tS3_outlet_ptr gEngine_outlet;
-int gRandom_Rockin_MIDI_tunes[3];
+int gSound_detail_level;
+int gVirgin_pass;
 int gOld_sound_detail_level;
 int gLast_tune;
-int gVirgin_pass;
-br_vector3 gCamera_left;
 int gRandom_MIDI_tunes[3];
+int gRandom_Rockin_MIDI_tunes[3];
+int gRandom_CDA_tunes[7];
+int gCDA_is_playing;
+int gServicing_sound;
+int gSong_repeat_count;
+int gSound_sources_inited;
+int gMusic_available;
+tS3_sound_tag gCDA_tag;
+int gCD_fully_installed;
+tS3_outlet_ptr gEffects_outlet;
+tS3_outlet_ptr gCar_outlet;
+tS3_outlet_ptr gEngine_outlet;
+tS3_outlet_ptr gDriver_outlet;
+tS3_outlet_ptr gPedestrians_outlet;
+tS3_outlet_ptr gMusic_outlet;
+tS3_sound_id gMIDI_id;
+tS3_outlet_ptr gIndexed_outlets[6];
+tU32 gLast_sound_service;
+int gCD_is_disabled;
+br_vector3 gCamera_left;
 br_vector3 gCamera_position;
 br_vector3 gOld_camera_position;
 br_vector3 gCamera_velocity;
-int gSound_detail_level;
-tS3_outlet_ptr gDriver_outlet;
-tS3_outlet_ptr gPedestrians_outlet;
-tS3_outlet_ptr gCar_outlet;
-tS3_sound_id gMIDI_id;
-int gMusic_available;
-tS3_outlet_ptr gMusic_outlet;
-tS3_outlet_ptr gEffects_outlet;
 
 // IDA: void __cdecl UsePathFileToDetermineIfFullInstallation()
 void UsePathFileToDetermineIfFullInstallation() {

@@ -2,11 +2,6 @@
 #include "brender.h"
 #include <stdlib.h>
 
-br_matrix23 mat23tmp1;
-br_matrix23 mat23tmp2;
-br_matrix34 mattmp1;
-br_matrix34 mattmp2;
-br_fixed_ls gFixed_sine_table[91];
 float gFloat_sine_table[91] = {
     0.0,
     0.017452,
@@ -100,6 +95,11 @@ float gFloat_sine_table[91] = {
     0.99984801,
     1.0
 };
+br_fixed_ls gFixed_sine_table[91];
+br_matrix23 mat23tmp1;
+br_matrix23 mat23tmp2;
+br_matrix34 mattmp1__trig; // suffix added to avoid duplicate symbol
+br_matrix34 mattmp2__trig; // suffix added to avoid duplicate symbol
 
 // IDA: float __usercall FastFloatSin@<ST0>(int pAngle_in_degrees@<EAX>)
 float FastFloatSin(int pAngle_in_degrees) {
@@ -411,9 +411,9 @@ void DRMatrix34PreRotateY(br_matrix34* mat, br_angle ry) {
 void DRMatrix34PostRotateY(br_matrix34* mat, br_angle ry) {
     LOG_TRACE("(%p, %d)", mat, ry);
 
-    DRMatrix34RotateY(&mattmp2, ry);
-    BrMatrix34Mul(&mattmp1, mat, &mattmp2);
-    BrMatrix34Copy(mat, &mattmp1);
+    DRMatrix34RotateY(&mattmp2__trig, ry);
+    BrMatrix34Mul(&mattmp1__trig, mat, &mattmp2__trig);
+    BrMatrix34Copy(mat, &mattmp1__trig);
 }
 
 // IDA: void __usercall DRMatrix34PreRotateZ(br_matrix34 *mat@<EAX>, br_angle rz@<EDX>)
@@ -426,9 +426,9 @@ void DRMatrix34PreRotateZ(br_matrix34* mat, br_angle rz) {
 void DRMatrix34PostRotateZ(br_matrix34* mat, br_angle rz) {
     LOG_TRACE("(%p, %d)", mat, rz);
 
-    DRMatrix34RotateZ(&mattmp2, rz);
-    BrMatrix34Mul(&mattmp1, mat, &mattmp2);
-    BrMatrix34Copy(mat, &mattmp1);
+    DRMatrix34RotateZ(&mattmp2__trig, rz);
+    BrMatrix34Mul(&mattmp1__trig, mat, &mattmp2__trig);
+    BrMatrix34Copy(mat, &mattmp1__trig);
 }
 
 // IDA: void __usercall DRMatrix34PreRotate(br_matrix34 *mat@<EAX>, br_angle r@<EDX>, br_vector3 *axis@<EBX>)

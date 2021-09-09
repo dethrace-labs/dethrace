@@ -6,16 +6,16 @@
 #include "world.h"
 #include <stdlib.h>
 
-br_matrix34 gPick_model_to_view;
 int gPling_materials = 1;
+br_material* gSub_material;
+br_material* gReal_material;
+int gNfaces;
+br_matrix34 gPick_model_to_view__finteray; // suffix added to avoid duplicate symbol
 int gTemp_group;
 br_model* gNearest_model;
-int gNfaces;
 br_model* gSelected_model;
 int gNearest_face_group;
-br_material* gSub_material;
 int gNearest_face;
-br_material* gReal_material;
 br_scalar gNearest_T;
 tFace_ref* gPling_face;
 
@@ -174,7 +174,7 @@ int ActorRayPick2D(br_actor* ap, br_vector3* pPosition, br_vector3* pDir, br_mod
 int DRSceneRayPick2D(br_actor* world, br_vector3* pPosition, br_vector3* pDir, dr_pick2d_cbfn* callback) {
     LOG_TRACE("(%p, %p, %p, %p)", world, pPosition, pDir, callback);
 
-    BrMatrix34Inverse(&gPick_model_to_view, &world->t.t.mat);
+    BrMatrix34Inverse(&gPick_model_to_view__finteray, &world->t.t.mat);
     return ActorRayPick2D(world, pPosition, pDir, NULL, NULL, callback);
 }
 

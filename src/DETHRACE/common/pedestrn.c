@@ -16,19 +16,15 @@
 
 #define FLAG_WAVING_BASTARD_REF 99
 
-int gPed_gib_counts[4][5];
-int gPed_gib_maxes[4][5];
-tPedestrian_instruction gPed_instrucs[100];
-char* gPed_geb_names[4][5] = {
-    { "GBIGGIBS.PIX", "GBIGGIB2.PIX", "GBIGGIB3.PIX", NULL, NULL },
-    { "GELBOW.PIX", "GPELVIS.PIX", "GHEAD.PIX", "GRIBS.PIX", "GBONE.PIX" },
-    { "GHAND.PIX", "GCHUNK02.PIX", "GEYEBALL.PIX", "GCOLON.PIX", "GCHUNK01.PIX" },
-    { "GCHUNK04.PIX",
-        "GSPLAT1.PIX",
-        "GCHUNK03.PIX",
-        "GSPLAT2.PIX",
-        "GSPLATOT.PIX" }
-};
+int gDetect_peds;
+int gReally_stupid_ped_bug_enable;
+int gPed_sound_disable;
+int gVesuvians_last_time;
+int gSend_peds;
+tU32 gLast_ped_message_send;
+tPedestrian_instruction* gInitial_instruction;
+char* gRate_commands[3] = { "fixed", "speed", "variable" };
+char* gCollide_commands[1] = { "collide" };
 char* gInstruc_commands[10] = {
     "point",
     "xpoint",
@@ -41,70 +37,68 @@ char* gInstruc_commands[10] = {
     "faction",
     "reverse"
 };
-
 float gMin_ped_gib_speeds[4];
-tPed_gib gPed_gibs[30];
+float gPed_gib_distrib[4];
 float gPed_gib_speeds[4];
+int gPed_size_counts[4] = { 3, 5, 5, 5 };
 char* gPed_gib_names[4][5] = {
     { "BIGGIBS.PIX", "BIGGIBS2.PIX", "BIGGIBS3.PIX", NULL, NULL },
     { "ELBOW.PIX", "PELVIS.PIX", "HEAD.PIX", "RIBS.PIX", "BONE.PIX" },
     { "HAND.PIX", "CHUNK02.PIX", "EYEBALL.PIX", "COLON.PIX", "CHUNK01.PIX" },
     { "CHUNK04.PIX", "SPLAT1.PIX", "CHUNK03.PIX", "SPLAT2.PIX", "SPLATOUT.PIX" }
 };
-float gPed_gib_distrib[4];
-tPed_gib_materials gPed_gib_materials[4];
-int gPed_size_counts[4] = { 3, 5, 5, 5 };
-
-tProximity_ray gProximity_rays[20];
+char* gPed_geb_names[4][5] = {
+    { "GBIGGIBS.PIX", "GBIGGIB2.PIX", "GBIGGIB3.PIX", NULL, NULL },
+    { "GELBOW.PIX", "GPELVIS.PIX", "GHEAD.PIX", "GRIBS.PIX", "GBONE.PIX" },
+    { "GHAND.PIX", "GCHUNK02.PIX", "GEYEBALL.PIX", "GCOLON.PIX", "GCHUNK01.PIX" },
+    { "GCHUNK04.PIX", "GSPLAT1.PIX", "GCHUNK03.PIX", "GSPLAT2.PIX", "GSPLATOT.PIX" }
+};
+int gPed_gib_maxes[4][5];
+br_scalar gExploding_ped_scale[3];
+br_vector3 gZero_v__pedestrn; // suffix added to avoid duplicate symbol
+int gPed_instruc_count;
+int gPed_count;
+br_actor* gPath_actor;
+br_actor* gCurrent_ped_path_actor;
+int gPedestrians_on;
 int gVesuvian_corpses;
+br_material* gPed_material;
+int gPed_gib_counts[4][5];
+tPedestrian_instruction gPed_instrucs[100];
+tPed_gib gPed_gibs[30];
+tPed_gib_materials gPed_gib_materials[4];
+tProximity_ray gProximity_rays[20];
 int gPed_colliding;
 float gZombie_factor;
 int gRespawn_variance;
 br_scalar gPed_scale_factor;
 int gTotal_peds;
 int gPedestrian_harvest;
-br_actor* gPath_actor;
 br_vector3 gPed_pos_camera;
 int gMin_respawn_time;
 br_material* gPath_mat_calc;
-br_actor* gCurrent_ped_path_actor;
 float gPedestrian_speed_factor;
 int gExploding_pedestrians;
 int gBlind_pedestrians;
-br_material* gPed_material;
 br_material* gPath_mat_normal;
-int gPedestrians_on;
 br_material* gInit_pos_mat_calc;
 int gPed_other;
 int gAttracted_pedestrians;
-int gPed_count;
 int gPed_ref_num;
 br_scalar gMax_distance_squared;
 br_model* gPed_model;
 float gDanger_level;
-br_scalar gExploding_ped_scale[3];
 br_vector3 gDanger_direction;
-int gPed_instruc_count;
 int gInit_ped_instruc;
-br_vector3 gZero_v_pedestrn; // added _pedestrn to avoid name collision with car.c
-char* gRate_commands[3] = { "fixed", "speed", "variable" };
-char* gCollide_commands[1] = { "collide" };
 int gCurrent_lollipop_index;
-int gDetect_peds;
 int gVesuvians_this_time;
 int gNumber_of_ped_gibs;
-tU32 gLast_ped_message_send;
 tPedestrian_data* gFlag_waving_bastard;
-int gReally_stupid_ped_bug_enable;
 int gNumber_of_pedestrians;
 br_pixelmap* gProx_ray_shade_table;
 tPedestrian_data* gPedestrian_array;
-int gVesuvians_last_time;
 tU32 gLast_ped_splat_time;
 int gCurrent_ped_multiplier;
-int gPed_sound_disable;
-tPedestrian_instruction* gInitial_instruction;
-int gSend_peds;
 
 // IDA: void __usercall PedModelUpdate(br_model *pModel@<EAX>, br_scalar x0, br_scalar y0, br_scalar x1, br_scalar y1, br_scalar x2, br_scalar y2, br_scalar x3, br_scalar y3)
 void PedModelUpdate(br_model* pModel, br_scalar x0, br_scalar y0, br_scalar x1, br_scalar y1, br_scalar x2, br_scalar y2, br_scalar x3, br_scalar y3) {

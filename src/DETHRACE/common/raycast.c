@@ -3,7 +3,7 @@
 #include "globvars.h"
 #include <stdlib.h>
 
-br_matrix34 gPick_model_to_view_raycast; //added _raycast suffix to avoid name collision
+br_matrix34 gPick_model_to_view__raycast; // suffix added to avoid duplicate symbol
 int gBelow_face_index;
 br_scalar gCurrent_y;
 int gAbove_face_index;
@@ -13,6 +13,7 @@ br_scalar gHighest_y_below;
 br_actor* gY_picking_camera;
 br_scalar gLowest_y_above;
 
+//Added, probably can be replaced with NULL
 br_model* model_unk1;
 br_material* material_unk1;
 

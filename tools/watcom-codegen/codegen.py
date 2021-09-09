@@ -695,11 +695,12 @@ def generate_c_file(module):
     if gv['name'] == 'rscid':
       continue
     name = get_global_var_name(module, gv['name'])
+    if '__' in name:
+      c_file.write(' // Suffix added to avoid duplicate symbol\n')
     s = resolve_type_str(module, gv['type'], name)
     c_file.write(s)
     c_file.write(';')
-    if '__' in name:
-      c_file.write(' // suffix added to avoid duplicate symbol')
+    
     c_file.write('\n')
   c_file.write('\n')
 

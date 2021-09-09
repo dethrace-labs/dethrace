@@ -18,6 +18,8 @@
 #include <stdlib.h>
 
 int gGrid_number_colour[4] = { 49u, 201u, 1u, 201u };
+int gJust_bought_part;
+tU32 gLast_host_query;
 br_pixelmap* gDead_car;
 int gFade_away_parts_shop;
 tU32 gDare_start_time;
@@ -29,14 +31,12 @@ tParts_category gPart_category;
 tU32 gNet_synch_start;
 tNet_game_details* gChoose_car_net_game;
 int gPart_index;
-int gChallenger_index;
+int gChallenger_index__racestrt; // suffix added to avoid duplicate symbol
 tGrid_draw gDraw_grid_status;
-tNet_sequence_type gNet_race_sequence;
-tU32 gLast_host_query;
+tNet_sequence_type gNet_race_sequence__racestrt; // suffix added to avoid duplicate symbol
 br_pixelmap* gTaken_image;
 int gGrid_number_x_coords[31];
 int gGrid_transition_stage;
-int gJust_bought_part;
 int gGrid_y_adjust;
 br_pixelmap* gBullet_image;
 br_pixelmap* gDeceased_image;

@@ -2,12 +2,12 @@
 #include <stdlib.h>
 
 int gKey_defns[18];
-tRadio_bastards gRadio_bastards[13];
+tRadio_bastards gRadio_bastards__options[13]; // suffix added to avoid duplicate symbol
 int gKey_count;
-int gLast_graph_sel;
+int gLast_graph_sel__options; // suffix added to avoid duplicate symbol
 char* gKey_names[125];
 int gPending_entry;
-tInterface_spec* gThe_interface_spec;
+tInterface_spec* gThe_interface_spec__options; // suffix added to avoid duplicate symbol
 int gOrig_key_mapping[67];
 br_pixelmap* gDials_pix;
 int gCurrent_key;

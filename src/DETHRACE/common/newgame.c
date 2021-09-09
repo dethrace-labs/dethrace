@@ -16,26 +16,26 @@
 #include "world.h"
 #include <stdlib.h>
 
-char x[] = "xxxxxxxx.TXT";
-char y[] = "yyyyyyyy.TXT";
-char* gBasic_car_names[2] = { x, y };
+tU8* gFrank_flic_data;
+tU8* gAnne_flic_data;
+int gNet_storage_allocated;
+tRadio_bastards gRadio_bastards__newgame[11]; // suffix added to avoid duplicate symbol
+char _name1[] = "xxxxxxxx.TXT"; // keep compiler happy
+char _name2[] = "yyyyyyyy.TXT"; // keep compiler happy
+char* gBasic_car_names[2] = { _name1, _name2 };
 tNet_game_options gNet_settings[8];
-tRadio_bastards gRadio_bastards[11];
 tJoinable_game gGames_to_join[6];
 tNet_game_options* gOptions;
 int gNet_target[7];
-int gLast_graph_sel;
-tInterface_spec* gThe_interface_spec;
-tNet_sequence_type gNet_race_sequence;
+int gLast_graph_sel__newgame; // suffix added to avoid duplicate symbol
+tInterface_spec* gThe_interface_spec__newgame; // suffix added to avoid duplicate symbol
+tNet_sequence_type gNet_race_sequence__newgame; // suffix added to avoid duplicate symbol
 tNet_game_type gLast_game_type;
 int gCurrent_net_game_count;
 tU32 gAnne_flic_data_length;
 int gShifted_default_yet;
-int gNet_storage_allocated;
-tU8* gFrank_flic_data;
 char* gNet_name;
 tU32 gFrank_flic_data_length;
-tU8* gAnne_flic_data;
 int gLast_net_choose_box;
 int gCurrent_game_selection;
 int gRace_index;

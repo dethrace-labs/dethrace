@@ -11,33 +11,34 @@
 #include "utility.h"
 #include <stdlib.h>
 
+tU32 gMess_max_flags;
+tU32 gMess_mid_flags;
+tU32 gMess_min_flags;
+tU32 gGuarantee_number;
+int gNet_service_disable;
+int gIn_net_service;
+int gPlayer_list_batch_number;
+int gOnly_receive_guarantee_replies;
+void* gMessage_to_free;
+tNet_message* gBroadcast_stack;
+tNet_message* gTo_host_stack;
+tU32 gLast_flush_message;
+int gRace_only_flags[33];
+int gJoin_list_mode;
 tNet_game_player_info gNew_net_players[6];
 tGuaranteed_message gGuarantee_list[150];
-int gRace_only_flags[33];
-tU32 gLast_flush_message;
-void* gMessage_to_free;
 tMid_message* gMid_messages;
 tU32 gLast_player_list_received;
 tMin_message* gMin_messages;
 void (*gAdd_proc)(tNet_game_details*);
-int gNet_service_disable;
-tNet_message* gTo_host_stack;
-tNet_message* gBroadcast_stack;
 int gReceiving_batch_number;
-tU32 gMess_max_flags;
 int gReceiving_new_players;
 tMax_message* gMax_messages;
-tU32 gGuarantee_number;
 int gNext_guarantee;
 tU32 gAsk_time;
-int gIn_net_service;
-int gNet_initialised = 0;
+int gNet_initialised;
 int gDont_allow_joiners;
-tU32 gMess_mid_flags;
 tNet_game_details* gCurrent_join_poll_game;
-int gOnly_receive_guarantee_replies;
-tU32 gMess_min_flags;
-int gPlayer_list_batch_number;
 int gMessage_header_size;
 int gJoin_poll_index;
 int gJoin_request_denied;
@@ -45,7 +46,6 @@ int gHost_died;
 int gCar_was_taken;
 int gBastard_has_answered;
 int gTime_for_next_one;
-int gJoin_list_mode;
 int gReceived_game_scores;
 
 // IDA: int __cdecl NetInitialise()

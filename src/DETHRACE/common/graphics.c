@@ -28,62 +28,18 @@
 
 #include <math.h>
 
-int gArrows[2][4][60];
-int gMap_colours[4] = { 4, 0, 52, 132 };
-br_vector3 gShadow_points[8];
-tConcussion gConcussion;
-tClip_details gShadow_clip_planes[8];
-br_matrix34 gSheer_mat;
-br_actor* gLollipops[100];
-tWobble_spec gWobble_array[5];
-br_matrix34 gIdentity34 = {
-    { { 1.0, 0.0, 0.0 },
-        { 0.0, 1.0, 0.0 },
-        { 0.0, 0.0, 1.0 },
-        { 0.0, 0.0, 0.0 } }
-};
-
-tSaved_table gSaved_shade_tables[100];
-int* gCursor_giblet_sequences[4];
-int gCursor_y_offsets[8];
+int gPalette_munged;
+int gColourValues[1];
+int gNext_transient;
 int gCursor_x_offsets[8];
-tCursor_giblet gCursor_giblets[45];
+int gCursor_y_offsets[8];
 int gCursor_gib_x_offsets[8];
 int gCursor_gib_y_offsets[8];
-tTransient_bm gTransient_bitmaps[50];
-float gCosine_array[64];
-br_pixelmap* gCursors[8];
-br_pixelmap* gCursor_giblet_images[18];
-br_scalar gShadow_hither_min_move;
-br_pixelmap* gEval_1;
-br_pixelmap* gEval_2;
-br_vector3 gShadow_light_z;
-br_vector3 gShadow_light_x;
-int gShadow_dim_amount;
-br_colour gRGB_colours[9] = {
-    0u,
-    16777215u,
-    16711680u,
-    65280u,
-    255u,
-    16776960u,
-    65535u,
-    16711935u,
-    13649666u
-};
-int gNumber_of_lollipops;
-br_vector3 gShadow_light_ray;
-br_scalar gShadow_hither_z_move;
-int gFancy_shadow;
-tShadow_level gShadow_level;
-br_model* gShadow_model;
-br_actor* gShadow_actor;
-int gShadow_clip_plane_count;
-br_pixelmap* gPalette_conversion_table;
-br_material* gShadow_material;
-int gSaved_table_count;
-int gCursor_giblet_sequence3[5];
+int gCursor_giblet_sequence0[7];
+int gCursor_giblet_sequence1[5];
 int gCursor_giblet_sequence2[5];
+int gCursor_giblet_sequence3[5];
+int* gCursor_giblet_sequences[4];
 char* gFont_names[21] = {
     "TYPEABLE",
     "ORANGHED",
@@ -107,42 +63,84 @@ char* gFont_names[21] = {
     "LITPLAQ1",
     "DRKPLAQ1"
 };
-
+br_colour gRGB_colours[9] = {
+    0u,
+    16777215u,
+    16711680u,
+    65280u,
+    255u,
+    16776960u,
+    65535u,
+    16711935u,
+    13649666u
+};
+br_matrix34 gSheer_mat;
+br_matrix34 gIdentity34 = {
+    { { 1.0, 0.0, 0.0 },
+        { 0.0, 1.0, 0.0 },
+        { 0.0, 0.0, 1.0 },
+        { 0.0, 0.0, 0.0 } }
+};
+tShadow_level gShadow_level;
+br_scalar gShadow_hither_z_move;
+br_scalar gShadow_hither_min_move;
+int gArrows[2][4][60];
+float gMap_render_x;
+float gMap_render_y;
+float gMap_render_width;
+float gMap_render_height;
+int gMouse_started;
+int gFaded_palette;
+int gAR_fudge_headups;
+br_pixelmap* gCurrent_splash;
+br_pixelmap* gCurrent_conversion_table;
+int gMap_colours[4] = { 4, 0, 52, 132 };
+br_vector3 gShadow_points[8];
+tConcussion gConcussion;
+tClip_details gShadow_clip_planes[8];
+br_actor* gLollipops[100];
+tWobble_spec gWobble_array[5];
+tSaved_table gSaved_shade_tables[100];
+tCursor_giblet gCursor_giblets[45];
+tTransient_bm gTransient_bitmaps[50];
+float gCosine_array[64];
+br_pixelmap* gCursors[8];
+br_pixelmap* gCursor_giblet_images[18];
+br_pixelmap* gEval_1;
+br_pixelmap* gEval_2;
+br_vector3 gShadow_light_z;
+br_vector3 gShadow_light_x;
+int gShadow_dim_amount;
+int gNumber_of_lollipops;
+br_vector3 gShadow_light_ray;
+int gFancy_shadow;
+br_model* gShadow_model;
+br_actor* gShadow_actor;
+int gShadow_clip_plane_count;
+br_pixelmap* gPalette_conversion_table;
+br_material* gShadow_material;
+int gSaved_table_count;
 int gCurrent_cursor_index;
-int gCursor_giblet_sequence1[5];
-int gCursor_giblet_sequence0[7];
 int gPalette_index;
 int gCursor_transient_index;
 char* gScratch_pixels;
 br_pixelmap* gScratch_palette;
-int gPalette_munged = 0;
 int gLast_palette_change;
-int gColourValues[1];
 br_pixelmap* gOrig_render_palette;
-int gNext_transient;
 br_pixelmap* gCurrent_palette;
 br_pixelmap* gRender_palette;
-br_pixelmap* gCurrent_splash;
-br_pixelmap* gCurrent_conversion_table;
 float gCamera_to_horiz_angle;
 int gColours[9];
 br_pixelmap* gFlic_palette;
 tDR_font gFonts[21];
 char* gCurrent_palette_pixels;
-int gAR_fudge_headups;
-float gMap_render_x;
-float gMap_render_y;
-int gFaded_palette = 0;
 int gWidth;
 int gMap_render_height_i;
 int gScreen_wobble_x;
 int gScreen_wobble_y;
 br_scalar gCurrent_ambience;
 int gY_offset;
-float gMap_render_width;
-float gMap_render_height;
 int gMap_render_width_i;
-int gMouse_started;
 int gMouse_in_use;
 int gHeight;
 int gMouse_last_y_coord;
@@ -151,7 +149,7 @@ br_scalar gAmbient_adjustment;
 int gMap_render_x_i;
 int gX_offset;
 int gMap_render_y_i;
-int gMirror_on_graphics; // Added graphics suffix to avoid name collision
+int gMirror_on__graphics; // suffix added to avoid duplicate symbol
 br_scalar gYon_squared;
 
 // IDA: void __cdecl TurnOnPaletteConversion()

@@ -34,25 +34,25 @@
 #include "world.h"
 #include <stdlib.h>
 
-tU32 gOld_camera_time;
+int gNasty_kludgey_cockpit_variable;
+tInfo_mode gInfo_mode;
+tU32 gLast_tick_count;
 tU32 gActual_last_tick_count;
+tU32 gAverage_frame_period;
+tU32 gOld_camera_time;
 tU32 gLast_wasted_massage_start;
 float gMr_odo;
 tU32 gWasted_last_flash;
-tU32 gLast_tick_count;
-tU32 gAverage_frame_period;
 tTime_bonus_state gTime_bonus_state;
 int gQueued_wasted_massages_count;
 int gTime_bonus;
 int gRace_bonus_headup;
 int gWasted_flash_state;
 int gLast_time_headup;
-int gNasty_kludgey_cockpit_variable;
-tInfo_mode gInfo_mode;
 int gTime_bonus_headup;
 int gQueued_wasted_massages[5];
 tU32 gTime_bonus_start;
-int gLast_credit_headup;
+int gLast_credit_headup__mainloop; // suffix added to avoid duplicate symbol
 
 // IDA: void __cdecl ToggleInfo()
 void ToggleInfo() {

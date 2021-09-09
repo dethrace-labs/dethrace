@@ -9,16 +9,17 @@
 #include "utility.h"
 #include <stdlib.h>
 
+int gEdge_trigger_mode;
+tU32 gLast_poll_keys;
+int gInsert_mode;
+int gGo_ahead_keys[3] = { 51, 52, 106 }; // enter, return, space
 tJoy_array gJoy_array;
 tKey_array gKey_array;
 int gKey_poll_counter;
 tRolling_letter* gRolling_letters;
-tU32 gLast_poll_keys = 0;
 int gCurrent_cursor;
 int gCurrent_position;
-int gInsert_mode;
 int gLetter_x_coords[15];
-int gEdge_trigger_mode = 0;
 int gVisible_length;
 int gLetter_y_coords[15];
 int gThe_key;
@@ -26,7 +27,6 @@ tU32 gLast_key_down_time;
 int gThe_length;
 tU32 gLast_roll;
 int gLast_key_down;
-int gGo_ahead_keys[3] = { 51, 52, 106 }; // enter, return, space
 int gKey_mapping[67];
 char gCurrent_typing[110];
 

@@ -6,9 +6,9 @@
 
 float gWobble_spam_y[8];
 float gWobble_spam_z[8];
-int gSteal_ranks[5];
-tU8 gSmoke_damage_step[12];
 br_scalar gWheel_circ_to_width;
+tU8 gSmoke_damage_step[12];
+int gSteal_ranks[5];
 
 // IDA: int __usercall ReadCrushData@<EAX>(FILE *pF@<EAX>, tCrush_data *pCrush_data@<EDX>)
 int ReadCrushData(FILE* pF, tCrush_data* pCrush_data) {
