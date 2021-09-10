@@ -18,5 +18,8 @@ sudo apt-get install -qq -y libsdl2-dev > /dev/null
 cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -B build
 cmake --build build -- -j 4
 
+# test
+CTEST_OUTPUT_ON_FAILURE=1 make test
+
 # package artifact
 tar -czvf linux-amd64.tar.gz build/dethrace

@@ -12,6 +12,8 @@
 #include "common/loading.h"
 #include "common/utility.h"
 
+extern int _unittest_controls_lastGetPowerup;
+
 void test_controls_CheckKevKeys() {
     int i;
     char* input = "spamfritters";
