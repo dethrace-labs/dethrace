@@ -19,7 +19,7 @@ int gSound_override;
 int gKey_map_index;
 int gInterface_within_race_mode;
 int gCut_scene_override;
-int gGame_to_load = 1;
+int gGame_to_load = -1;
 int gCD_is_in_drive;
 br_pixelmap* gRearview_screen;
 br_scalar gCut_delay_1;
