@@ -18,7 +18,7 @@ int gPalette_fuck_prevention;
 int gDark_mode;
 int gTransparency_on;
 int gPanel_flic_disable;
-int gPending_flic;
+int gPending_flic = -1;
 int gPlay_from_disk;
 int gTrans_enabled = 1;
 br_pixelmap* gPanel_buffer[2];
