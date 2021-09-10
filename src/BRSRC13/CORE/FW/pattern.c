@@ -2,7 +2,6 @@
 #include "harness_trace.h"
 #include <ctype.h>
 
-
 // IDA: br_boolean __cdecl BrNamePatternMatch(char *p, char *s)
 br_boolean BrNamePatternMatch(char* p, char* s) {
     char* cp;

@@ -4,8 +4,6 @@
 #include "br_types.h"
 #include "dr_types.h"
 
-
-
 int StraightestArcForCorner2D(br_vector2* pCent, br_scalar* pRadius, br_scalar* pEntry_length, int* pLeft_not_right, br_vector2* p1, br_vector2* p2, br_vector2* p3, br_scalar pWidth12, br_scalar pWidth23);
 
 br_scalar CornerFudge(tCar_spec* pCar_spec);

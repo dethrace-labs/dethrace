@@ -4,7 +4,7 @@
 #include "br_types.h"
 #include "dr_types.h"
 
-extern tSave_game *gSaved_games[8];
+extern tSave_game* gSaved_games[8];
 extern int gStarted_typing;
 extern int gSave_allowed;
 

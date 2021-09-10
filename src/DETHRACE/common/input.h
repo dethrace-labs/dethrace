@@ -11,7 +11,7 @@ extern int gGo_ahead_keys[3];
 extern tJoy_array gJoy_array;
 extern tKey_array gKey_array;
 extern int gKey_poll_counter;
-extern tRolling_letter *gRolling_letters;
+extern tRolling_letter* gRolling_letters;
 extern int gCurrent_cursor;
 extern int gCurrent_position;
 extern int gLetter_x_coords[15];

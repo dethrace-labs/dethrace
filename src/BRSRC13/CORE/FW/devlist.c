@@ -1,7 +1,6 @@
 #include "devlist.h"
 #include "harness_trace.h"
 
-
 // IDA: br_error __cdecl AddRequestedDrivers()
 br_error AddRequestedDrivers() {
     char devstr[256];

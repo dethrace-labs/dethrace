@@ -4,8 +4,6 @@
 #include "br_types.h"
 #include "dr_types.h"
 
-
-
 void QuitGame();
 
 tU32 TrackCount(br_actor* pActor, tU32* pCount);

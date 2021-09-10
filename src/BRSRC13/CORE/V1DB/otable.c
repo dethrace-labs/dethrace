@@ -1,7 +1,6 @@
 #include "otable.h"
 #include "harness_trace.h"
 
-
 // IDA: br_order_table* __cdecl BrZsOrderTableAllocate(br_uint_16 size, br_uint_32 flags, br_uint_16 type)
 br_order_table* BrZsOrderTableAllocate(br_uint_16 size, br_uint_32 flags, br_uint_16 type) {
     br_order_table* order_table;

@@ -5,7 +5,7 @@
 #include "dr_types.h"
 
 extern br_filesystem gFilesystem;
-extern br_filesystem *gOld_file_system;
+extern br_filesystem* gOld_file_system;
 
 void* DRStdioOpenRead(char* name, br_size_t n_magics, br_mode_test_cbfn* identify, int* mode_result);
 

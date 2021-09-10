@@ -6,7 +6,6 @@
 #include "pattern.h"
 #include "resource.h"
 
-
 // IDA: void* __usercall BrRegistryNew@<EAX>(br_registry *reg@<EAX>)
 void* BrRegistryNew(br_registry* reg) {
     BrNewList(&reg->list);

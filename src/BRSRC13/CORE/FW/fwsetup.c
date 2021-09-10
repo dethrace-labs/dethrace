@@ -67,7 +67,6 @@ br_image Image_BRCORE1 = {
     NULL
 };
 
-
 #define NBR_DEV_SLOTS 16
 
 // IDA: br_error __cdecl BrFwBegin()

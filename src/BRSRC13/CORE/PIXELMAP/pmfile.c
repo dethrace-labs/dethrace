@@ -43,7 +43,6 @@ br_chunks_table_entry PixelmapLoadEntries[5] = {
 };
 br_chunks_table PixelmapLoadTable = { 4, PixelmapLoadEntries };
 
-
 #define DF_PIXELMAP 2
 
 // IDA: int __usercall FopWrite_PIXELMAP@<EAX>(br_datafile *df@<EAX>, br_pixelmap *pixelmap@<EDX>)

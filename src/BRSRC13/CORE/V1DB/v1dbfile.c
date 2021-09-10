@@ -218,7 +218,6 @@ struct {
 #define DF_TRANSFORM 16
 #define DF_BOUNDS 19
 
-
 // IDA: int __usercall FopWrite_VERTICES@<EAX>(br_datafile *df@<EAX>, br_vertex *vertices@<EDX>, int nvertices@<EBX>)
 int FopWrite_VERTICES(br_datafile* df, br_vertex* vertices, int nvertices) {
     LOG_TRACE("(%p, %p, %d)", df, vertices, nvertices);

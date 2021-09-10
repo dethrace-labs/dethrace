@@ -4,7 +4,6 @@
 #include "CORE/STD/brstdlib.h"
 #include "harness_trace.h"
 
-
 // IDA: void* __cdecl BrMemAllocate(br_size_t size, br_uint_8 type)
 void* BrMemAllocate(br_size_t size, br_uint_8 type) {
     void* b;

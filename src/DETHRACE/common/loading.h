@@ -5,20 +5,20 @@
 #include "dr_types.h"
 
 extern tHeadup_info gHeadup_image_info[31];
-extern char *gYour_car_names[2][6];
-extern char *gDrivable_car_names[6];
-extern char *gDamage_names[12];
-extern char *gWheel_actor_names[6];
-extern char *gRaces_file_names[9];
-extern char *gNet_avail_names[4];
-extern char *gFloorpan_names[5];
+extern char* gYour_car_names[2][6];
+extern char* gDrivable_car_names[6];
+extern char* gDamage_names[12];
+extern char* gWheel_actor_names[6];
+extern char* gRaces_file_names[9];
+extern char* gNet_avail_names[4];
+extern char* gFloorpan_names[5];
 extern int gAllow_open_to_fail;
 extern int gDecode_thing;
 extern char gDecode_string[14];
 extern int gFunk_groove_flags[30];
 extern char gDef_def_water_screen_name[32];
-extern br_material *gDestn_screen_mat;
-extern br_material *gSource_screen_mat;
+extern br_material* gDestn_screen_mat;
+extern br_material* gSource_screen_mat;
 extern int gCurrent_race_file_index;
 extern int gGroove_funk_offset;
 extern int gDemo_armour;

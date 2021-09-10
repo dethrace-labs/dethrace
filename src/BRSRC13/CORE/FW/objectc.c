@@ -1,7 +1,6 @@
 #include "objectc.h"
 #include "harness_trace.h"
 
-
 // IDA: void* __cdecl BrObjectListAllocate(void *res)
 void* BrObjectListAllocate(void* res) {
     object_list* hl;

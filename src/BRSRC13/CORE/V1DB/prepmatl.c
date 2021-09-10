@@ -1,7 +1,6 @@
 #include "prepmatl.h"
 #include "harness_trace.h"
 
-
 // IDA: void __cdecl BrMaterialUpdate(br_material *mat, br_uint_16 flags)
 void BrMaterialUpdate(br_material* mat, br_uint_16 flags) {
     br_token_value tva[32];

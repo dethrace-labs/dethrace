@@ -27,7 +27,7 @@ extern tU32 gQuite_wild_end;
 extern tU32 gOn_me_wheels_start;
 extern int gWoz_upside_down_at_all;
 extern tS3_sound_tag gSkid_tag[2];
-extern tCar_spec *gLast_car_to_skid[2];
+extern tCar_spec* gLast_car_to_skid[2];
 extern int gEliminate_faces;
 extern br_vector3 gZero_v__car; // suffix added to avoid duplicate symbol
 extern tU32 gSwitch_time;
@@ -48,12 +48,12 @@ extern int gCar_simplification_level;
 extern int gNum_active_non_cars;
 extern int gCamera_has_collided;
 extern tFace_ref gFace_list__car[150]; // suffix added to avoid duplicate symbol
-extern tNon_car_spec *gActive_non_car_list[50];
+extern tNon_car_spec* gActive_non_car_list[50];
 extern int gOver_shoot;
 extern br_scalar gMin_world_y;
 extern br_scalar gAccel;
 extern br_vector3 gAverage_grid_position;
-extern br_actor *gPed_actor;
+extern br_actor* gPed_actor;
 extern int gCollision_count;
 extern int gCamera_frozen;
 extern int gMaterial_index;

@@ -4,14 +4,14 @@
 #include "br_types.h"
 #include "dr_types.h"
 
-extern char *gReplay_pixie_names[10];
+extern char* gReplay_pixie_names[10];
 extern int gSingle_frame_mode;
 extern tU32 gCam_change_time;
 extern int gSave_file;
 extern int gProgress_line_left[2];
 extern int gProgress_line_right[2];
 extern int gProgress_line_top[2];
-extern br_pixelmap *gReplay_pixies[10];
+extern br_pixelmap* gReplay_pixies[10];
 extern int gKey_down;
 extern int gNo_cursor;
 extern int gSave_frame_number;

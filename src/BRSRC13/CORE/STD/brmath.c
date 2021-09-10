@@ -2,7 +2,6 @@
 #include "harness_trace.h"
 #include <math.h>
 
-
 float BrFloatFloor(float f) {
     return floorf(f);
 }

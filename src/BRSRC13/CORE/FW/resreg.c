@@ -6,7 +6,6 @@
 #include <stddef.h>
 #include <stdio.h>
 
-
 // IDA: br_resource_class* __cdecl BrResClassAdd(br_resource_class *rclass)
 br_resource_class* BrResClassAdd(br_resource_class* rclass) {
     br_resource_class* r;

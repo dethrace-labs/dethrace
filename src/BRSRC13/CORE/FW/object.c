@@ -1,7 +1,6 @@
 #include "object.h"
 #include "harness_trace.h"
 
-
 // IDA: br_error __cdecl _M_br_object_query(br_object *self, br_uint_32 *pvalue, br_token t)
 br_error _M_br_object_query(br_object* self, br_uint_32* pvalue, br_token t) {
     LOG_TRACE("(%p, %p, %d)", self, pvalue, t);

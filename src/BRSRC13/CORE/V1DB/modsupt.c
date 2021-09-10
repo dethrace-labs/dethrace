@@ -3,7 +3,6 @@
 #include "CORE/V1DB/dbsetup.h"
 #include "harness_trace.h"
 
-
 // IDA: void __cdecl BrModelApplyMap(br_model *model, int map_type, br_matrix34 *xform)
 void BrModelApplyMap(br_model* model, int map_type, br_matrix34* xform) {
     int v;

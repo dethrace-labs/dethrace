@@ -8,7 +8,7 @@ extern int gDisabled_choices[10];
 extern int gCurrent_mode;
 extern tU32 gStart_time;
 extern int gCurrent_choice;
-extern tInterface_spec *gSpec;
+extern tInterface_spec* gSpec;
 extern int gAlways_typing;
 extern int gDisabled_count;
 

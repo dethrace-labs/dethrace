@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 // IDA: void* __usercall ResToUser@<EAX>(resource_header *r@<EAX>)
 void* ResToUser(resource_header* r) {
     br_int_32 align;

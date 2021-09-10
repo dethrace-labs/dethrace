@@ -6,7 +6,7 @@
 
 extern br_allocator gAllocator;
 extern int gNon_fatal_allocation_errors;
-extern char *gMem_names[247];
+extern char* gMem_names[247];
 extern br_resource_class gStainless_classes[118];
 
 void SetNonFatalAllocationErrors();

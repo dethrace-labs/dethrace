@@ -4,7 +4,7 @@
 #include "br_types.h"
 #include "dr_types.h"
 
-extern tCar_spec *gViewable_car_list[50];
+extern tCar_spec* gViewable_car_list[50];
 extern int gNum_viewable_cars;
 
 #endif
