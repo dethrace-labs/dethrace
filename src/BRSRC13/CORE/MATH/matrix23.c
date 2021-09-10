@@ -1,8 +1,8 @@
 #include "matrix23.h"
 #include "harness_trace.h"
 
-br_matrix23 mattmp1;
-br_matrix23 mattmp2;
+br_matrix23 mattmp1_23;
+br_matrix23 mattmp2_23;
 
 // IDA: void __cdecl BrMatrix23Copy(br_matrix23 *A, br_matrix23 *B)
 void BrMatrix23Copy(br_matrix23* A, br_matrix23* B) {
