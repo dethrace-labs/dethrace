@@ -4,7 +4,11 @@
 #include "br_types.h"
 #include "dr_types.h"
 
-extern br_font* gBR_fonts[4];
+extern int gLast_fancy_index;
+extern int gLast_credit_headup__displays; // suffix added to avoid duplicate symbol
+extern int gLast_time_credit_headup;
+extern tDR_font *gCached_font;
+extern br_font *gBR_fonts[4];
 extern tQueued_headup gQueued_headups[4];
 extern int gOld_times[10];
 extern int gLast_fancy_headup;
@@ -15,10 +19,6 @@ extern int gQueued_headup_count;
 extern tU32 gLast_earn_time;
 extern tU32 gLast_time_credit_amount;
 extern int gLast_credit_amount;
-extern tDR_font* gCached_font;
-extern int gLast_time_credit_headup;
-extern int gLast_fancy_index;
-extern int gLast_credit_headup;
 extern tHeadup gHeadups[15];
 extern int gLaps_headup;
 extern int gCar_kill_count_headup;
@@ -26,7 +26,7 @@ extern int gTimer_headup;
 extern int gTime_awarded_headup;
 extern int gPed_kill_count_headup;
 extern int gDim_amount;
-extern br_pixelmap* gHeadup_images[31];
+extern br_pixelmap *gHeadup_images[31];
 extern int gNet_cash_headup;
 extern int gNet_ped_headup;
 extern int gCredits_lost_headup;

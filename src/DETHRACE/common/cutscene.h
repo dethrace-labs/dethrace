@@ -4,6 +4,8 @@
 #include "br_types.h"
 #include "dr_types.h"
 
+extern tS32 gLast_demo_end_anim;
+
 void ShowCutScene(int pIndex, int pWait_end, int pSound_ID, br_scalar pDelay);
 
 void DoSCILogo();

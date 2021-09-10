@@ -4,7 +4,7 @@
 #include "br_types.h"
 #include "dr_types.h"
 
-extern br_matrix34 gPick_model_to_view_raycast; //added _raycast suffix to avoid name collision
+extern br_matrix34 gPick_model_to_view__raycast; // suffix added to avoid duplicate symbol
 extern int gBelow_face_index;
 extern br_scalar gCurrent_y;
 extern int gAbove_face_index;
@@ -18,11 +18,14 @@ int DRActorToRoot(br_actor* a, br_actor* world, br_matrix34* m);
 
 void InitRayCasting();
 
-int BadDiv_raycast(br_scalar a, br_scalar b);
+// Suffix added to avoid duplicate symbol
+int BadDiv__raycast(br_scalar a, br_scalar b);
 
-void DRVector2AccumulateScale_raycast(br_vector2* a, br_vector2* b, br_scalar s);
+// Suffix added to avoid duplicate symbol
+void DRVector2AccumulateScale__raycast(br_vector2* a, br_vector2* b, br_scalar s);
 
-int PickBoundsTestRay_raycast(br_bounds* b, br_vector3* rp, br_vector3* rd, br_scalar t_near, br_scalar t_far, br_scalar* new_t_near, br_scalar* new_t_far);
+// Suffix added to avoid duplicate symbol
+int PickBoundsTestRay__raycast(br_bounds* b, br_vector3* rp, br_vector3* rd, br_scalar t_near, br_scalar t_far, br_scalar* new_t_near, br_scalar* new_t_far);
 
 int ActorPick2D(br_actor* ap, br_model* model, br_material* material, dr_pick2d_cbfn* callback, void* arg);
 
@@ -32,9 +35,11 @@ int DRScenePick2D(br_actor* world, br_actor* camera, dr_pick2d_cbfn* callback, v
 
 int DRModelPick2D_raycast(br_model* model, br_material* material, br_vector3* ray_pos, br_vector3* ray_dir, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn* callback, void* arg);
 
-int FindHighestPolyCallBack_raycast(br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3* pPoint, br_vector2* pMap, void* pArg);
+// Suffix added to avoid duplicate symbol
+int FindHighestPolyCallBack__raycast(br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3* pPoint, br_vector2* pMap, void* pArg);
 
-int FindHighestCallBack_raycast(br_actor* pActor, br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT_near, br_scalar pT_far, void* pArg);
+// Suffix added to avoid duplicate symbol
+int FindHighestCallBack__raycast(br_actor* pActor, br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT_near, br_scalar pT_far, void* pArg);
 
 void FindBestY(br_vector3* pPosition, br_actor* gWorld, br_scalar pStarting_height, br_scalar* pNearest_y_above, br_scalar* pNearest_y_below, br_model** pNearest_above_model, br_model** pNearest_below_model, int* pNearest_above_face_index, int* pNearest_below_face_index);
 

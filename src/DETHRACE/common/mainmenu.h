@@ -4,6 +4,13 @@
 #include "br_types.h"
 #include "dr_types.h"
 
+extern char *gPalette_copy__mainmenu; // suffix added to avoid duplicate symbol
+extern int gPixel_buffer_size__mainmenu; // suffix added to avoid duplicate symbol
+extern tInterface_spec *gMain_menu_spec;
+extern int gMouse_was_started__mainmenu; // suffix added to avoid duplicate symbol
+extern int gReplace_background;
+extern char *gPixels_copy__mainmenu; // suffix added to avoid duplicate symbol
+
 int MainMenuDone1(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out);
 
 int MainMenuDone2(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out);

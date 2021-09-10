@@ -1,36 +1,35 @@
 #ifndef _NETWORK_H_
 #define _NETWORK_H_
 
-#include "br_types.h"
 #include "dr_types.h"
-
+extern tU32 gMess_max_flags;
+extern tU32 gMess_mid_flags;
+extern tU32 gMess_min_flags;
+extern tU32 gGuarantee_number;
+extern int gNet_service_disable;
+extern int gIn_net_service;
+extern int gPlayer_list_batch_number;
+extern int gOnly_receive_guarantee_replies;
+extern void* gMessage_to_free;
+extern tNet_message* gBroadcast_stack;
+extern tNet_message* gTo_host_stack;
+extern tU32 gLast_flush_message;
+extern int gRace_only_flags[33];
+extern int gJoin_list_mode;
 extern tNet_game_player_info gNew_net_players[6];
 extern tGuaranteed_message gGuarantee_list[150];
-extern int gRace_only_flags[33];
-extern tU32 gLast_flush_message;
-extern void* gMessage_to_free;
 extern tMid_message* gMid_messages;
 extern tU32 gLast_player_list_received;
 extern tMin_message* gMin_messages;
 extern void (*gAdd_proc)(tNet_game_details*);
-extern int gNet_service_disable;
-extern tNet_message* gTo_host_stack;
-extern tNet_message* gBroadcast_stack;
 extern int gReceiving_batch_number;
-extern tU32 gMess_max_flags;
 extern int gReceiving_new_players;
 extern tMax_message* gMax_messages;
-extern tU32 gGuarantee_number;
 extern int gNext_guarantee;
 extern tU32 gAsk_time;
-extern int gIn_net_service;
 extern int gNet_initialised;
 extern int gDont_allow_joiners;
-extern tU32 gMess_mid_flags;
 extern tNet_game_details* gCurrent_join_poll_game;
-extern int gOnly_receive_guarantee_replies;
-extern tU32 gMess_min_flags;
-extern int gPlayer_list_batch_number;
 extern int gMessage_header_size;
 extern int gJoin_poll_index;
 extern int gJoin_request_denied;
@@ -38,7 +37,6 @@ extern int gHost_died;
 extern int gCar_was_taken;
 extern int gBastard_has_answered;
 extern int gTime_for_next_one;
-extern int gJoin_list_mode;
 extern int gReceived_game_scores;
 
 int NetInitialise();

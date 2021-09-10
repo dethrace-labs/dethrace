@@ -4,7 +4,7 @@
 #include "br_types.h"
 #include "dr_types.h"
 
-extern br_actor* gMr_blendy;
+extern br_actor *gMr_blendy;
 extern int gDefault_blend_pc;
 
 void AllocateActorMatrix(tTrack_spec* pTrack_spec, br_actor**** pDst);

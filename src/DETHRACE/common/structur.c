@@ -396,7 +396,7 @@ void InitialiseProgramState() {
     gProgram_state.loading = 0;
     gProgram_state.dont_save_or_load = 0;
     gProgram_state.dont_load = 0;
-    gProgram_state.mirror_on = gMirror_on;
+    gProgram_state.mirror_on = gMirror_on__structur;
     gProgram_state.prog_status = eProg_intro;
     if (gAusterity_mode) {
         gProgram_state.prat_cam_on = 0;

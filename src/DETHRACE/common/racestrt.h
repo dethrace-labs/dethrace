@@ -5,6 +5,8 @@
 #include "dr_types.h"
 
 extern int gGrid_number_colour[4];
+extern int gJust_bought_part;
+extern tU32 gLast_host_query;
 extern br_pixelmap* gDead_car;
 extern int gFade_away_parts_shop;
 extern tU32 gDare_start_time;
@@ -16,14 +18,12 @@ extern tParts_category gPart_category;
 extern tU32 gNet_synch_start;
 extern tNet_game_details* gChoose_car_net_game;
 extern int gPart_index;
-extern int gChallenger_index;
+extern int gChallenger_index__racestrt; // suffix added to avoid duplicate symbol
 extern tGrid_draw gDraw_grid_status;
-extern tNet_sequence_type gNet_race_sequence;
-extern tU32 gLast_host_query;
+extern tNet_sequence_type gNet_race_sequence__racestrt; // suffix added to avoid duplicate symbol
 extern br_pixelmap* gTaken_image;
 extern int gGrid_number_x_coords[31];
 extern int gGrid_transition_stage;
-extern int gJust_bought_part;
 extern int gGrid_y_adjust;
 extern br_pixelmap* gBullet_image;
 extern br_pixelmap* gDeceased_image;
@@ -203,7 +203,8 @@ void CheckPlayersAreResponding();
 
 void NetSynchStartStart();
 
-void DrawAnItem_racestrt(int pX, int pY_index, int pFont_index, char* pText);
+// Suffix added to avoid duplicate symbol
+void DrawAnItem__racestrt(int pX, int pY_index, int pFont_index, char* pText);
 
 void NetSynchStartDraw(int pCurrent_choice, int pCurrent_mode);
 

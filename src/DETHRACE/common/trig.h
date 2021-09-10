@@ -4,6 +4,13 @@
 #include "br_types.h"
 #include "dr_types.h"
 
+extern float gFloat_sine_table[91];
+extern br_fixed_ls gFixed_sine_table[91];
+extern br_matrix23 mat23tmp1;
+extern br_matrix23 mat23tmp2;
+extern br_matrix34 mattmp1__trig; // suffix added to avoid duplicate symbol
+extern br_matrix34 mattmp2__trig; // suffix added to avoid duplicate symbol
+
 float FastFloatSin(int pAngle_in_degrees);
 
 float FastFloatCos(int pAngle_in_degrees);

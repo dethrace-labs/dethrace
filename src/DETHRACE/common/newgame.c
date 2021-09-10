@@ -378,13 +378,13 @@ void DisposeJoinableGame(int pIndex) {
 }
 
 // IDA: void __usercall DrawAnItem(int pX@<EAX>, int pY_index@<EDX>, int pFont_index@<EBX>, char *pText@<ECX>)
-void DrawAnItem(int pX, int pY_index, int pFont_index, char* pText) {
+void DrawAnItem__newgame(int pX, int pY_index, int pFont_index, char* pText) {
     LOG_TRACE("(%d, %d, %d, \"%s\")", pX, pY_index, pFont_index, pText);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall DrawColumnHeading(int pStr_index@<EAX>, int pX@<EDX>)
-void DrawColumnHeading(int pStr_index, int pX) {
+void DrawColumnHeading__newgame(int pStr_index, int pX) {
     LOG_TRACE("(%d, %d)", pStr_index, pX);
     NOT_IMPLEMENTED();
 }
@@ -641,13 +641,15 @@ void DoNetOptions(tNet_game_options* pGame_options) {
 }
 
 //IDA: void __usercall PlayRadioOn(int pIndex@<EAX>)
-void PlayRadioOn_newgame(int pIndex) {
+// Suffix added to avoid duplicate symbol
+void PlayRadioOn__newgame(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
     NOT_IMPLEMENTED();
 }
 
 //IDA: void __usercall PlayRadioOff(int pIndex@<EAX>)
-void PlayRadioOff_newgame(int pIndex) {
+// Suffix added to avoid duplicate symbol
+void PlayRadioOff__newgame(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
     NOT_IMPLEMENTED();
 }
@@ -671,19 +673,22 @@ int NetChooseGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: void __usercall PlotAGraphBox(int pIndex@<EAX>, int pColour_value@<EDX>)
-void PlotAGraphBox(int pIndex, int pColour_value) {
+// Suffix added to avoid duplicate symbol
+void PlotAGraphBox__newgame(int pIndex, int pColour_value) {
     LOG_TRACE("(%d, %d)", pIndex, pColour_value);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall DrawAGraphBox(int pIndex@<EAX>)
-void DrawAGraphBox(int pIndex) {
+// Suffix added to avoid duplicate symbol
+void DrawAGraphBox__newgame(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall EraseAGraphBox(int pIndex@<EAX>)
-void EraseAGraphBox(int pIndex) {
+// Suffix added to avoid duplicate symbol
+void EraseAGraphBox__newgame(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
     NOT_IMPLEMENTED();
 }

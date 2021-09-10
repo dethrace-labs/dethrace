@@ -867,7 +867,7 @@ void RenderAFrame(int pDepth_mask_on) {
     the_time = GetTotalTime();
     old_pixels = gRender_screen->pixels;
     cockpit_on = gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 && !gMap_mode;
-    gMirror_on_graphics = gProgram_state.mirror_on && cockpit_on && gProgram_state.which_view == eView_forward;
+    gMirror_on__graphics = gProgram_state.mirror_on && cockpit_on && gProgram_state.which_view == eView_forward;
     if (gMap_mode) {
         real_origin_x = gBack_screen->origin_x;
         real_origin_y = gBack_screen->origin_y;
@@ -927,7 +927,7 @@ void RenderAFrame(int pDepth_mask_on) {
         y_shift = 0;
     }
     old_camera_matrix = gCamera->t.t.mat;
-    if (gMirror_on_graphics) {
+    if (gMirror_on__graphics) {
         old_mirror_cam_matrix = gRearview_camera->t.t.mat;
     }
     if (cockpit_on) {
@@ -997,7 +997,7 @@ void RenderAFrame(int pDepth_mask_on) {
         BrZbSceneRenderEnd();
     }
     gCamera->t.t.mat = old_camera_matrix;
-    if (gMirror_on_graphics) {
+    if (gMirror_on__graphics) {
         LOG_PANIC("mirror is on");
         BrPixelmapFill(gRearview_depth_buffer, 0xFFFFFFFF);
         gRendering_mirror = 1;
@@ -1127,7 +1127,7 @@ void RenderAFrame(int pDepth_mask_on) {
                 0,
                 gCurrent_graf_data->total_cock_width,
                 gCurrent_graf_data->total_cock_height);
-            if (gMirror_on_graphics) {
+            if (gMirror_on__graphics) {
                 BrPixelmapRectangleCopy(
                     gBack_screen,
                     gScreen_wobble_x + gProgram_state.current_car.mirror_left,

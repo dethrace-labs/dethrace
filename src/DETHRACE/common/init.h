@@ -4,17 +4,17 @@
 #include "br_types.h"
 #include "dr_types.h"
 
-extern int gInitialisation_finished;
-extern tU32 gAustere_time;
-extern int gInitial_rank;
 extern int gGame_initialized;
 extern int gBr_initialized;
 extern int gBrZb_initialized;
+extern int gInitialisation_finished;
 extern int gRender_indent;
+extern tU32 gAustere_time;
+extern int gInitial_rank;
 extern int gCredits_per_rank[3];
 extern int gInitial_credits[3];
 extern int gNet_mode_of_last_game;
-extern br_material* gDefault_track_material;
+extern br_material *gDefault_track_material;
 
 void AllocateSelf();
 

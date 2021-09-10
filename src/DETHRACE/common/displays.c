@@ -92,7 +92,7 @@ void ClearHeadups() {
         }
     }
     gLast_fancy_index = -1;
-    gLast_credit_headup = -1;
+    gLast_credit_headup__displays = -1;
     gLast_time_credit_headup = -1;
     gLast_earn_time = 0;
     gLast_fancy_time = 0;

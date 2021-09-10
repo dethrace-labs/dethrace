@@ -4,16 +4,17 @@
 #include "br_types.h"
 #include "dr_types.h"
 
+extern int gEdge_trigger_mode;
+extern tU32 gLast_poll_keys;
+extern int gInsert_mode;
+extern int gGo_ahead_keys[3];
 extern tJoy_array gJoy_array;
 extern tKey_array gKey_array;
 extern int gKey_poll_counter;
-extern tRolling_letter* gRolling_letters;
-extern tU32 gLast_poll_keys;
+extern tRolling_letter *gRolling_letters;
 extern int gCurrent_cursor;
 extern int gCurrent_position;
-extern int gInsert_mode;
 extern int gLetter_x_coords[15];
-extern int gEdge_trigger_mode;
 extern int gVisible_length;
 extern int gLetter_y_coords[15];
 extern int gThe_key;
@@ -21,7 +22,6 @@ extern tU32 gLast_key_down_time;
 extern int gThe_length;
 extern tU32 gLast_roll;
 extern int gLast_key_down;
-extern int gGo_ahead_keys[3];
 extern int gKey_mapping[67];
 extern char gCurrent_typing[110];
 

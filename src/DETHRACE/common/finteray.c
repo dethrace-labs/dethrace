@@ -20,24 +20,25 @@ br_scalar gNearest_T;
 tFace_ref* gPling_face;
 
 // IDA: int __cdecl BadDiv(br_scalar a, br_scalar b)
-int BadDiv_finteray(br_scalar a, br_scalar b) {
+// Suffix added to avoid duplicate symbol
+int BadDiv__finteray(br_scalar a, br_scalar b) {
     //LOG_TRACE("(%f, %f)", a, b);
 
     return fabs(b) < 1.0 && fabs(a) > fabs(b) * BR_SCALAR_MAX;
 }
 
 // IDA: void __usercall DRVector2AccumulateScale(br_vector2 *a@<EAX>, br_vector2 *b@<EDX>, br_scalar s)
-void DRVector2AccumulateScale_finteray(br_vector2* a, br_vector2* b, br_scalar s) {
+// Suffix added to avoid duplicate symbol
+void DRVector2AccumulateScale__finteray(br_vector2* a, br_vector2* b, br_scalar s) {
     LOG_TRACE("(%p, %p, %f)", a, b, s);
 
     a->v[0] = b->v[0] * s + a->v[0];
     a->v[1] = b->v[1] * s + a->v[1];
 }
 
-// Offset: 180
-// Size: 0x228
 //IDA: int __usercall PickBoundsTestRay@<EAX>(br_bounds *b@<EAX>, br_vector3 *rp@<EDX>, br_vector3 *rd@<EBX>, br_scalar t_near, br_scalar t_far, br_scalar *new_t_near, br_scalar *new_t_far)
-int PickBoundsTestRay_finteray(br_bounds* b, br_vector3* rp, br_vector3* rd, br_scalar t_near, br_scalar t_far, br_scalar* new_t_near, br_scalar* new_t_far) {
+// Suffix added to avoid duplicate symbol
+int PickBoundsTestRay__finteray(br_bounds* b, br_vector3* rp, br_vector3* rd, br_scalar t_near, br_scalar t_far, br_scalar* new_t_near, br_scalar* new_t_far) {
     int i;
     float s;
     float t;
@@ -135,7 +136,7 @@ int ActorRayPick2D(br_actor* ap, br_vector3* pPosition, br_vector3* pDir, br_mod
         pDir = &dir;
     }
     if (ap->type == BR_ACTOR_MODEL) {
-        if (PickBoundsTestRay_finteray(&this_model->bounds, pPosition, pDir, t_near, t_far, &t_near, &t_far)) {
+        if (PickBoundsTestRay__finteray(&this_model->bounds, pPosition, pDir, t_near, t_far, &t_near, &t_far)) {
             t_near = 0.0;
             if (gNearest_T >= 1.0) {
                 t_far = 1.0;
@@ -151,7 +152,7 @@ int ActorRayPick2D(br_actor* ap, br_vector3* pPosition, br_vector3* pDir, br_mod
             return r;
         }
     } else if (ap->type >= BR_ACTOR_BOUNDS && ap->type <= BR_ACTOR_BOUNDS_CORRECT) {
-        if (PickBoundsTestRay_finteray((br_bounds*)ap->type_data, pPosition, pDir, t_near, t_far, &t_near, &t_far)) {
+        if (PickBoundsTestRay__finteray((br_bounds*)ap->type_data, pPosition, pDir, t_near, t_far, &t_near, &t_far)) {
             for (a = ap->children; a; a = a->next) {
                 r = ActorRayPick2D(a, pPosition, pDir, this_model, this_material, callback);
                 if (r) {
@@ -178,10 +179,9 @@ int DRSceneRayPick2D(br_actor* world, br_vector3* pPosition, br_vector3* pDir, d
     return ActorRayPick2D(world, pPosition, pDir, NULL, NULL, callback);
 }
 
-// Offset: 1544
-// Size: 0x80b
 //IDA: int __usercall DRModelPick2D@<EAX>(br_model *model@<EAX>, br_material *material@<EDX>, br_vector3 *ray_pos@<EBX>, br_vector3 *ray_dir@<ECX>, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn *callback, void *arg)
-int DRModelPick2D_finteray(br_model* model, br_material* material, br_vector3* ray_pos, br_vector3* ray_dir, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn* callback, void* arg) {
+// Suffix added to avoid duplicate symbol
+int DRModelPick2D__finteray(br_model* model, br_material* material, br_vector3* ray_pos, br_vector3* ray_dir, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn* callback, void* arg) {
     DR_FACE* fp;
     int f;
     int axis_m;
@@ -232,7 +232,7 @@ int DRModelPick2D_finteray(br_model* model, br_material* material, br_vector3* r
                     + fp->eqn.v[2] * ray_pos->v[2]
                     + fp->eqn.v[0] * ray_pos->v[0]
                     - fp->eqn.v[3];
-                if (!BadDiv_finteray(numerator, d)) {
+                if (!BadDiv__finteray(numerator, d)) {
                     t = -(numerator / d);
                     if (t >= t_near && t <= t_far) {
                         p.v[0] = ray_dir->v[0] * t;
@@ -300,11 +300,11 @@ int DRModelPick2D_finteray(br_model* model, br_material* material, br_vector3* r
                             s_beta = beta;
                             map.v[0] = V11MODEL(model)->groups[group].vertices[fp->vertices[1]].map.v[0] * s_alpha;
                             map.v[1] = V11MODEL(model)->groups[group].vertices[fp->vertices[1]].map.v[1] * s_alpha;
-                            DRVector2AccumulateScale_finteray(
+                            DRVector2AccumulateScale__finteray(
                                 &map,
                                 &V11MODEL(model)->groups[group].vertices[fp->vertices[2]].map,
                                 s_beta);
-                            DRVector2AccumulateScale_finteray(
+                            DRVector2AccumulateScale__finteray(
                                 &map,
                                 &V11MODEL(model)->groups[group].vertices[fp->vertices[0]].map,
                                 1.0 - (s_alpha + s_beta));
@@ -340,7 +340,8 @@ int DRModelPick2D_finteray(br_model* model, br_material* material, br_vector3* r
 }
 
 // IDA: int __cdecl FindHighestPolyCallBack(br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3 *pPoint, br_vector2 *pMap, void *pArg)
-int FindHighestPolyCallBack_finteray(br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3* pPoint, br_vector2* pMap, void* pArg) {
+// Suffix added to avoid duplicate symbol
+int FindHighestPolyCallBack__finteray(br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3* pPoint, br_vector2* pMap, void* pArg) {
     LOG_TRACE("(%p, %p, %p, %p, %f, %d, %d, %d, %p, %p, %p)", pModel, pMaterial, pRay_pos, pRay_dir, pT, pF, pE, pV, pPoint, pMap, pArg);
 
     if (pT < (double)gNearest_T) {
@@ -353,12 +354,13 @@ int FindHighestPolyCallBack_finteray(br_model* pModel, br_material* pMaterial, b
 }
 
 // IDA: int __cdecl FindHighestCallBack(br_actor *pActor, br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT_near, br_scalar pT_far, void *pArg)
-int FindHighestCallBack_finteray(br_actor* pActor, br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT_near, br_scalar pT_far, void* pArg) {
+// Suffix added to avoid duplicate symbol
+int FindHighestCallBack__finteray(br_actor* pActor, br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT_near, br_scalar pT_far, void* pArg) {
     LOG_TRACE("(%p, %p, %p, %p, %p, %f, %f, %p)", pActor, pModel, pMaterial, pRay_pos, pRay_dir, pT_near, pT_far, pArg);
 
     if (gProgram_state.current_car.current_car_actor < 0
         || gProgram_state.current_car.car_model_actors[gProgram_state.current_car.current_car_actor].actor != pActor) {
-        DRModelPick2D_finteray(pModel, pMaterial, pRay_pos, pRay_dir, pT_near, pT_far, FindHighestPolyCallBack_finteray, pArg);
+        DRModelPick2D__finteray(pModel, pMaterial, pRay_pos, pRay_dir, pT_near, pT_far, FindHighestPolyCallBack__finteray, pArg);
     }
     return 0;
 }
@@ -369,7 +371,7 @@ void FindFace(br_vector3* pPosition, br_vector3* pDir, br_vector3* nor, br_scala
     LOG_TRACE("(%p, %p, %p, %p, %p)", pPosition, pDir, nor, t, material);
 
     gNearest_T = 100.0;
-    DRSceneRayPick2D(gTrack_actor, pPosition, pDir, FindHighestCallBack_finteray);
+    DRSceneRayPick2D(gTrack_actor, pPosition, pDir, FindHighestCallBack__finteray);
     *t = gNearest_T;
     if (*t < 100.0) {
         group = gNearest_face_group;
@@ -518,7 +520,7 @@ void MultiRayCheckSingleFace(int pNum_rays, tFace_ref* pFace, br_vector3* ray_po
             tv.v[1] = ray_pos[i].v[1] - pFace->v[0].v[1];
             tv.v[2] = ray_pos[i].v[2] - pFace->v[0].v[2];
             numerator = pFace->normal.v[2] * tv.v[2] + pFace->normal.v[1] * tv.v[1] + pFace->normal.v[0] * tv.v[0];
-            if (BadDiv_finteray(numerator, d)) {
+            if (BadDiv__finteray(numerator, d)) {
                 return;
             }
             if (d > 0.0) {
@@ -716,13 +718,13 @@ int ActorBoxPick(tBounds* bnds, br_actor* ap, br_model* model, br_material* mate
         new_bounds.radius = bnds->radius;
         GetNewBoundingBox(&new_bounds.real_bounds, &new_bounds.original_bounds, new_bounds.mat);
         if (ap->identifier[1] >= '0' && ap->identifier[1] <= '9') {
-            if (!BoundsOverlapTest_finteray(&new_bounds.real_bounds, &this_model->bounds)) {
+            if (!BoundsOverlapTest__finteray(&new_bounds.real_bounds, &this_model->bounds)) {
                 return max_face;
             }
             BrMatrix34LPInverse(&invmat, bnds->mat);
             BrMatrix34Mul(&box_to_actor, &ap->t.t.mat, &invmat);
             GetNewBoundingBox(&br_bnds, &ap->model->bounds, &box_to_actor);
-            if (!BoundsOverlapTest_finteray(&br_bnds, &bnds->original_bounds)) {
+            if (!BoundsOverlapTest__finteray(&br_bnds, &bnds->original_bounds)) {
                 return max_face;
             }
             if (PullActorFromWorld(ap)) {
@@ -732,7 +734,7 @@ int ActorBoxPick(tBounds* bnds, br_actor* ap, br_model* model, br_material* mate
         bnds = &new_bounds;
     }
     if (ap->type == BR_ACTOR_MODEL) {
-        if (BoundsOverlapTest_finteray(&bnds->real_bounds, &this_model->bounds)) {
+        if (BoundsOverlapTest__finteray(&bnds->real_bounds, &this_model->bounds)) {
             n = ModelPickBox(ap, bnds, this_model, this_material, &face_list[i], max_face, pMat);
             if (pMat && max_face != n) {
                 StopGroovidelic(ap);
@@ -741,7 +743,7 @@ int ActorBoxPick(tBounds* bnds, br_actor* ap, br_model* model, br_material* mate
             max_face = n;
         }
     } else if (ap->type >= 5u && ap->type <= 6u) {
-        test_children = BoundsOverlapTest_finteray(&bnds->real_bounds, (br_bounds*)ap->type_data);
+        test_children = BoundsOverlapTest__finteray(&bnds->real_bounds, (br_bounds*)ap->type_data);
     }
     if (test_children) {
         for (a = ap->children; a; a = next_a) {
@@ -990,7 +992,8 @@ void ClipToPlaneLE(br_vector3* p, int* nv, int i, br_scalar limit) {
 }
 
 // IDA: int __usercall BoundsOverlapTest@<EAX>(br_bounds *b1@<EAX>, br_bounds *b2@<EDX>)
-int BoundsOverlapTest_finteray(br_bounds* b1, br_bounds* b2) {
+// Suffix added to avoid duplicate symbol
+int BoundsOverlapTest__finteray(br_bounds* b1, br_bounds* b2) {
     LOG_TRACE("(%p, %p)", b1, b2);
 
     return b1->min.v[0] <= b2->max.v[0]

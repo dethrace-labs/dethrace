@@ -4,6 +4,21 @@
 #include "br_types.h"
 #include "dr_types.h"
 
+extern tS3_sound_tag gWhirr_noise;
+extern tFlic_descriptor gPrat_flic;
+extern tPrat_sequence *gPratcam_sequences;
+extern tPrat_flic_spec *gPratcam_flics;
+extern int gCurrent_pratcam_chunk;
+extern int gPending_ambient_prat;
+extern int gCurrent_pratcam_index;
+extern br_pixelmap *gPrat_buffer;
+extern int gNumber_of_prat_sequences;
+extern int gNumber_of_prat_flics;
+extern tU32 gLast_pratcam_frame_time;
+extern int gCurrent_pratcam_precedence;
+extern int gCurrent_ambient_prat_sequence;
+extern int gCurrent_pratcam_alternative;
+
 int PratcamGetCurrent();
 
 int PratcamGetAmbient();

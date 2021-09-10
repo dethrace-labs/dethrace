@@ -4,23 +4,40 @@
 #include "br_types.h"
 #include "dr_types.h"
 
+extern int gPling_materials;
+extern br_material* gSub_material;
+extern br_material* gReal_material;
+extern int gNfaces;
+extern br_matrix34 gPick_model_to_view__finteray; // suffix added to avoid duplicate symbol
+extern int gTemp_group;
+extern br_model* gNearest_model;
+extern br_model* gSelected_model;
+extern int gNearest_face_group;
+extern int gNearest_face;
+extern br_scalar gNearest_T;
 extern tFace_ref* gPling_face;
 
-int BadDiv_finteray(br_scalar a, br_scalar b);
+// Suffix added to avoid duplicate symbol
+int BadDiv__finteray(br_scalar a, br_scalar b);
 
-void DRVector2AccumulateScale_finteray(br_vector2* a, br_vector2* b, br_scalar s);
+// Suffix added to avoid duplicate symbol
+void DRVector2AccumulateScale__finteray(br_vector2* a, br_vector2* b, br_scalar s);
 
-int PickBoundsTestRay_finteray(br_bounds* b, br_vector3* rp, br_vector3* rd, br_scalar t_near, br_scalar t_far, br_scalar* new_t_near, br_scalar* new_t_far);
+// Suffix added to avoid duplicate symbol
+int PickBoundsTestRay__finteray(br_bounds* b, br_vector3* rp, br_vector3* rd, br_scalar t_near, br_scalar t_far, br_scalar* new_t_near, br_scalar* new_t_far);
 
 int ActorRayPick2D(br_actor* ap, br_vector3* pPosition, br_vector3* pDir, br_model* model, br_material* material, dr_pick2d_cbfn* callback);
 
 int DRSceneRayPick2D(br_actor* world, br_vector3* pPosition, br_vector3* pDir, dr_pick2d_cbfn* callback);
 
-int DRModelPick2D_finteray(br_model* model, br_material* material, br_vector3* ray_pos, br_vector3* ray_dir, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn* callback, void* arg);
+// Suffix added to avoid duplicate symbol
+int DRModelPick2D__finteray(br_model* model, br_material* material, br_vector3* ray_pos, br_vector3* ray_dir, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn* callback, void* arg);
 
-int FindHighestPolyCallBack_finteray(br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3* pPoint, br_vector2* pMap, void* pArg);
+// Suffix added to avoid duplicate symbol
+int FindHighestPolyCallBack__finteray(br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3* pPoint, br_vector2* pMap, void* pArg);
 
-int FindHighestCallBack_finteray(br_actor* pActor, br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT_near, br_scalar pT_far, void* pArg);
+// Suffix added to avoid duplicate symbol
+int FindHighestCallBack__finteray(br_actor* pActor, br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT_near, br_scalar pT_far, void* pArg);
 
 void FindFace(br_vector3* pPosition, br_vector3* pDir, br_vector3* nor, br_scalar* t, br_material** material);
 
@@ -46,7 +63,8 @@ void ClipToPlaneGE(br_vector3* p, int* nv, int i, br_scalar limit);
 
 void ClipToPlaneLE(br_vector3* p, int* nv, int i, br_scalar limit);
 
-int BoundsOverlapTest_finteray(br_bounds* b1, br_bounds* b2);
+// Suffix added to avoid duplicate symbol
+int BoundsOverlapTest__finteray(br_bounds* b1, br_bounds* b2);
 
 int BoundsTransformTest(br_bounds* b1, br_bounds* b2, br_matrix34* M);
 
