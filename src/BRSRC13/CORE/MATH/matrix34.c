@@ -5,7 +5,6 @@
 
 br_matrix34 mattmp1;
 br_matrix34 mattmp2;
-char rscid[52];
 
 #define M(x, y) mat->m[x][y]
 #define A(x, y) A->m[x][y]

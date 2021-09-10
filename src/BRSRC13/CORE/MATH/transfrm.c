@@ -5,7 +5,6 @@
 #include "CORE/MATH/vector.h"
 #include "harness_trace.h"
 
-char rscid[52];
 
 #define M34 BR_TRANSFORM_MATRIX34
 #define MLP BR_TRANSFORM_MATRIX34_LP

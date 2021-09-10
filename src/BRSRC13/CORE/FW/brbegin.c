@@ -6,7 +6,6 @@
 #include "fwsetup.h"
 
 br_boolean active;
-char rscid[54];
 
 // IDA: br_error __cdecl BrBegin()
 br_error BrBegin() {

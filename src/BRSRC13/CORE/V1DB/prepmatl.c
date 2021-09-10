@@ -1,7 +1,6 @@
 #include "prepmatl.h"
 #include "harness_trace.h"
 
-char rscid[52];
 
 // IDA: void __cdecl BrMaterialUpdate(br_material *mat, br_uint_16 flags)
 void BrMaterialUpdate(br_material* mat, br_uint_16 flags) {

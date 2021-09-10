@@ -16,7 +16,6 @@ char* pm_edge_scratch;
 pm_temp_edge** pm_edge_hash;
 int num_edges;
 pm_temp_edge* pm_edge_table;
-char rscid[51];
 
 #define PREP_ALIGN(f) (f)
 

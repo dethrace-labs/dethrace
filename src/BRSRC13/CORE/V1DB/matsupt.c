@@ -5,7 +5,6 @@
 #include <stddef.h>
 #include <string.h>
 
-char rscid[49];
 
 // IDA: br_material* __cdecl BrMaterialAllocate(char *name)
 br_material* BrMaterialAllocate(char* name) {

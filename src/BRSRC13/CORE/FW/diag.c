@@ -7,7 +7,6 @@
 
 // Global variables
 char _diag_scratch[128];
-char rscid[49];
 
 // IDA: void __cdecl BrFailure(char *s, ...)
 void BrFailure(const char* s, ...) {

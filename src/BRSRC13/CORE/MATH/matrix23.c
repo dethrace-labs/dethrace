@@ -3,7 +3,6 @@
 
 br_matrix23 mattmp1;
 br_matrix23 mattmp2;
-char rscid[52];
 
 // IDA: void __cdecl BrMatrix23Copy(br_matrix23 *A, br_matrix23 *B)
 void BrMatrix23Copy(br_matrix23* A, br_matrix23* B) {

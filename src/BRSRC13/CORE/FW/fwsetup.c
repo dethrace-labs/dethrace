@@ -67,7 +67,6 @@ br_image Image_BRCORE1 = {
     NULL
 };
 
-char rscid[53];
 
 #define NBR_DEV_SLOTS 16
 

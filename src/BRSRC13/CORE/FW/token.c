@@ -2,7 +2,6 @@
 #include "harness_trace.h"
 
 br_token_entry predefinedTokens[457];
-char rscid[48];
 token_type tokenTypes[37];
 
 // IDA: void __cdecl BrTokenBegin()

@@ -43,7 +43,6 @@ br_chunks_table_entry PixelmapLoadEntries[5] = {
 };
 br_chunks_table PixelmapLoadTable = { 4, PixelmapLoadEntries };
 
-char rscid[54];
 
 #define DF_PIXELMAP 2
 

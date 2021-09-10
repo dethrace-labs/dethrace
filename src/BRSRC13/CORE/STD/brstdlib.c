@@ -8,7 +8,6 @@
 
 // Global variables
 // DOSPICK has "$Id: stdlib.c 2.4 1996/12/06 21:18:39 sam Exp $" for this. Do we want to implement these?
-char rscid[48];
 
 int BrMemCmp(void* s1, void* s2, size_t n) {
     return memcmp(s1, s2, n);

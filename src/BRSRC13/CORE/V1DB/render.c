@@ -7,7 +7,6 @@
 #include "transfrm.h"
 #include <string.h>
 
-char rscid[55];
 
 #define RendererModelMul(self, a1) self->dispatch->_modelMulF(self, a1);
 #define RendererStatePush(self, a1) self->dispatch->_statePush(self, a1);

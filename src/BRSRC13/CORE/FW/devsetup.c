@@ -5,7 +5,6 @@
 #include <stdarg.h>
 
 br_pixelmap* last_begin_screen;
-char rscid[51];
 
 // IDA: br_pixelmap* __cdecl BrDevLastBeginQuery()
 br_pixelmap* BrDevLastBeginQuery() {

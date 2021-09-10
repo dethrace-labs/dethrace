@@ -2,7 +2,6 @@
 #include <stdlib.h>
 
 // Global variables
-char rscid[49];
 
 // IDA: void __cdecl BrQsort(void *basep, unsigned int nelems, unsigned int size, br_qsort_cbfn *comp)
 void BrQsort(void* basep, unsigned int nelems, unsigned int size, br_qsort_cbfn comp) {

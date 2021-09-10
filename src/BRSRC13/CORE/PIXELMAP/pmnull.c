@@ -1,7 +1,6 @@
 #include "pmnull.h"
 #include "harness_trace.h"
 
-char rscid[51];
 
 // IDA: br_error __cdecl _M_br_device_pixelmap_null_resize(br_device_pixelmap *self, br_int_32 width, br_int_32 height)
 br_error _M_br_device_pixelmap_null_resize(br_device_pixelmap* self, br_int_32 width, br_int_32 height) {

@@ -3,7 +3,6 @@
 #include "harness_trace.h"
 #include <stddef.h>
 
-char rscid[51];
 
 // IDA: void __usercall actorEnable(br_v1db_enable *e@<EAX>, br_actor *a@<EDX>)
 void actorEnable(br_v1db_enable* e, br_actor* a) {

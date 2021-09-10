@@ -8,7 +8,6 @@
 
 #include "harness_trace.h"
 
-char rscid[51];
 
 // IDA: br_model* __cdecl BrModelAdd(br_model *model)
 br_model* BrModelAdd(br_model* model) {

@@ -1,7 +1,6 @@
 #include "matrix4.h"
 #include "harness_trace.h"
 
-char rscid[51];
 
 // IDA: void __cdecl BrMatrix4Copy(br_matrix4 *A, br_matrix4 *B)
 void BrMatrix4Copy(br_matrix4* A, br_matrix4* B) {

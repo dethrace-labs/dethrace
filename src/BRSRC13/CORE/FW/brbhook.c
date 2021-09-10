@@ -1,7 +1,6 @@
 #include "brbhook.h"
 #include "harness_trace.h"
 
-char rscid[49];
 
 // IDA: void __cdecl _BrBeginHook()
 void _BrBeginHook() {

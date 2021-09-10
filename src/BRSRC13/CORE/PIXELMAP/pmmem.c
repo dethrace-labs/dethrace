@@ -109,7 +109,6 @@ pm_type_info pmTypeInfo[30] = {
     { 0u, 0u, 0u, 0u }
 };
 
-char rscid[53];
 
 // IDA: br_device_pixelmap* __usercall DevicePixelmapMemAllocate@<EAX>(br_uint_8 type@<EAX>, br_uint_16 w@<EDX>, br_uint_16 h@<EBX>, void *pixels@<ECX>, int flags)
 br_device_pixelmap* DevicePixelmapMemAllocate(br_uint_8 type, br_uint_16 w, br_uint_16 h, void* pixels, int flags) {

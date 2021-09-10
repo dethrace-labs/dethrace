@@ -22,7 +22,6 @@ br_filesystem BrStdioFilesystem = {
     BrStdioAdvance
 };
 br_filesystem* _BrDefaultFilesystem = &BrStdioFilesystem;
-char rscid[52]; // $Id: stdfile.c 2.7 1996/11/20 18:07:52 STEVEW Exp $
 
 br_uint_32 BrStdioAttributes() {
     return BR_FS_ATTR_READABLE | BR_FS_ATTR_WRITEABLE | BR_FS_ATTR_HAS_TEXT | BR_FS_ATTR_HAS_BINARY | BR_FS_ATTR_HAS_ADVANCE;

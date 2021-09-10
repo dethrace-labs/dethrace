@@ -4,7 +4,6 @@
 host_real_memory mouseMemory;
 host_regs regs;
 br_boolean mouseActive;
-char rscid[49];
 unsigned char mouseHandler[245];
 
 // IDA: br_error __cdecl DOSMouseBegin()

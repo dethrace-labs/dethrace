@@ -1,7 +1,6 @@
 #include "brprintf.h"
 #include "harness_trace.h"
 
-char rscid[48];
 
 #include <stdarg.h>
 

@@ -2,7 +2,6 @@
 #include "harness_trace.h"
 #include <math.h>
 
-char rscid[50];
 
 // IDA: void __cdecl BrVector2Copy(br_vector2 *v1, br_vector2 *v2)
 void BrVector2Copy(br_vector2* v1, br_vector2* v2) {
