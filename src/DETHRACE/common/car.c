@@ -2431,7 +2431,7 @@ void DoRevs(tCar_spec* c, br_scalar dt) {
         c->gear = 0;
         LOG_DEBUG("changedown2");
     }
-    if (!c->number_of_wheels_on_ground || (c->wheel_slip & 2) != -1 || !c->gear) {
+    if (!c->number_of_wheels_on_ground || ((c->wheel_slip & 2) + 1) != 0 || !c->gear) {
         if (c->number_of_wheels_on_ground) {
             //LOG_DEBUG("spin1");
             wheel_spin_force = c->force_torque_ratio * c->torque - (double)c->gear * c->acc_force;
