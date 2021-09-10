@@ -5,7 +5,6 @@
 #include "resource.h"
 
 char scratchString[512];
-char rscid[49];
 
 // IDA: void* __cdecl BrScratchAllocate(br_size_t size)
 void* BrScratchAllocate(br_size_t size) {

@@ -3,7 +3,6 @@
 #include "loading.h"
 #include <stdlib.h>
 
-br_filesystem* gOld_file_system;
 br_filesystem gFilesystem = {
     "Carmageddon",
     NULL,
@@ -19,6 +18,7 @@ br_filesystem gFilesystem = {
     NULL,
     NULL
 };
+br_filesystem* gOld_file_system;
 
 // Added by Jeff
 #define DR_MEMORY_FILESYSTEM 140

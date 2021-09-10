@@ -12,6 +12,7 @@ int StraightestArcForCorner2D(br_vector2* pCent, br_scalar* pRadius, br_scalar* 
     br_scalar c;
     br_scalar numerator;
     br_scalar x;
+    br_scalar __block0___scale;
     LOG_TRACE("(%p, %p, %p, %p, %p, %p, %p, %f, %f)", pCent, pRadius, pEntry_length, pLeft_not_right, p1, p2, p3, pWidth12, pWidth23);
     NOT_IMPLEMENTED();
 }

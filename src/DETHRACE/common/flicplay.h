@@ -4,7 +4,42 @@
 #include "br_types.h"
 #include "dr_types.h"
 
+extern int gPalette_allocate_count;
+extern int gPalette_fuck_prevention;
+extern int gDark_mode;
+extern int gTransparency_on;
+extern int gPanel_flic_disable;
+extern int gPending_flic;
+extern int gPlay_from_disk;
+extern int gTrans_enabled;
+extern br_pixelmap* gPanel_buffer[2];
+extern tU32 gSound_time;
 extern tFlic_spec gMain_flic_list[372];
+extern int gFlic_bunch0[29];
+extern int gFlic_bunch1[31];
+extern int gFlic_bunch2[8];
+extern int gFlic_bunch3[13];
+extern int gFlic_bunch4[22];
+extern int gFlic_bunch5[5];
+extern int gFlic_bunch6[51];
+extern int gFlic_bunch7[7];
+extern int gFlic_bunch8[16];
+extern tFlic_bunch gFlic_bunch[9];
+extern char gLast_flic_name[14];
+extern tU32 gPanel_flic_data_length[2];
+extern tU32 gLast_panel_frame_time[2];
+extern tU8* gPanel_flic_data[2];
+extern int gPanel_flic_top[2];
+extern tFlic_descriptor gPanel_flic[2];
+extern int gPanel_flic_left[2];
+extern int gPending_pending_flic;
+extern int gSound_ID;
+extern int gTranslation_count;
+extern tDR_font* gTrans_fonts[15];
+extern tTranslation_record* gTranslations;
+extern br_pixelmap* gPalette;
+extern void* gPalette_pixels;
+extern tFlic_descriptor* gFirst_flic;
 
 void EnableTranslationText();
 

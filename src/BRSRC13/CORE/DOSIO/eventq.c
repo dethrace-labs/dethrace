@@ -1,7 +1,6 @@
 #include "eventq.h"
 #include "harness_trace.h"
 
-char rscid[48];
 int _DOSEventQEnabled;
 host_real_memory _DOSEventMemory;
 

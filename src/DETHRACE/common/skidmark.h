@@ -4,6 +4,10 @@
 #include "br_types.h"
 #include "dr_types.h"
 
+extern char* gBoring_material_names[2];
+extern char* gMaterial_names[2];
+extern tSkid gSkids[100];
+
 void StretchMark(tSkid* pMark, br_vector3* pFrom, br_vector3* pTo, br_scalar pTexture_start);
 
 br_material* MaterialFromIndex(int pIndex);

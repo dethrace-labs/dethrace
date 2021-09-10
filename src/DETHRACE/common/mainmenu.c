@@ -18,12 +18,12 @@
 #include "utility.h"
 #include <stdlib.h>
 
-char* gPalette_copy;
-int gPixel_buffer_size;
+char* gPalette_copy__mainmenu; // suffix added to avoid duplicate symbol
+int gPixel_buffer_size__mainmenu; // suffix added to avoid duplicate symbol
 tInterface_spec* gMain_menu_spec;
-int gMouse_was_started;
+int gMouse_was_started__mainmenu; // suffix added to avoid duplicate symbol
 int gReplace_background;
-char* gPixels_copy;
+char* gPixels_copy__mainmenu; // suffix added to avoid duplicate symbol
 
 // IDA: int __usercall MainMenuDone1@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
 int MainMenuDone1(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
@@ -394,11 +394,11 @@ tMM_result GetMainMenuOption(tU32 pTime_out, int pContinue_allowed) {
 
 // IDA: void __cdecl QuitVerifyStart()
 void QuitVerifyStart() {
-    gPixel_buffer_size = gBack_screen->height * gBack_screen->row_bytes;
-    gPixels_copy = BrMemAllocate(gPixel_buffer_size, kMem_quit_vfy_pixels);
-    gPalette_copy = BrMemAllocate(0x400u, kMem_quit_vfy_pal);
-    memcpy(gPixels_copy, gBack_screen->pixels, gPixel_buffer_size);
-    memcpy(gPalette_copy, gCurrent_palette_pixels, 0x400u);
+    gPixel_buffer_size__mainmenu = gBack_screen->height * gBack_screen->row_bytes;
+    gPixels_copy__mainmenu = BrMemAllocate(gPixel_buffer_size__mainmenu, kMem_quit_vfy_pixels);
+    gPalette_copy__mainmenu = BrMemAllocate(0x400u, kMem_quit_vfy_pal);
+    memcpy(gPixels_copy__mainmenu, gBack_screen->pixels, gPixel_buffer_size__mainmenu);
+    memcpy(gPalette_copy__mainmenu, gCurrent_palette_pixels, 0x400u);
     FadePaletteDown();
 }
 
@@ -406,21 +406,21 @@ void QuitVerifyStart() {
 int QuitVerifyDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     FadePaletteDown();
     TurnOnPanelFlics();
-    if (gMouse_was_started) {
+    if (gMouse_was_started__mainmenu) {
         RemoveTransientBitmaps(1);
     }
     if (gReplace_background) {
         if (pCurrent_choice) {
-            memcpy(gBack_screen->pixels, gPixels_copy, gPixel_buffer_size);
-            memcpy(gCurrent_palette_pixels, gPalette_copy, 0x400u);
+            memcpy(gBack_screen->pixels, gPixels_copy__mainmenu, gPixel_buffer_size__mainmenu);
+            memcpy(gCurrent_palette_pixels, gPalette_copy__mainmenu, 0x400u);
         } else {
             ClearEntireScreen();
         }
         PDScreenBufferSwap(0);
         FadePaletteUp();
     }
-    BrMemFree(gPixels_copy);
-    BrMemFree(gPalette_copy);
+    BrMemFree(gPixels_copy__mainmenu);
+    BrMemFree(gPalette_copy__mainmenu);
     return pCurrent_choice == 0;
 }
 
@@ -512,7 +512,7 @@ int DoVerifyQuit(int pReplace_background) {
         interface_spec.first_opening_flic = 132;
         break;
     }
-    gMouse_was_started = gMouse_started;
+    gMouse_was_started__mainmenu = gMouse_started;
     if (gMouse_started) {
         RemoveTransientBitmaps(1);
         EndMouseCursor();
@@ -523,7 +523,7 @@ int DoVerifyQuit(int pReplace_background) {
     DRS3StopOutletSound(gIndexed_outlets[0]);
     LoadInterfaceStuff(woz_in_race);
     result = DoInterfaceScreen(&interface_spec, 0, 0);
-    if (gMouse_was_started) {
+    if (gMouse_was_started__mainmenu) {
         LoadInterfaceStuff(woz_in_race);
         StartMouseCursor();
     }

@@ -18,6 +18,8 @@
 #include <stdlib.h>
 
 int gGrid_number_colour[4] = { 49u, 201u, 1u, 201u };
+int gJust_bought_part;
+tU32 gLast_host_query;
 br_pixelmap* gDead_car;
 int gFade_away_parts_shop;
 tU32 gDare_start_time;
@@ -29,14 +31,12 @@ tParts_category gPart_category;
 tU32 gNet_synch_start;
 tNet_game_details* gChoose_car_net_game;
 int gPart_index;
-int gChallenger_index;
+int gChallenger_index__racestrt; // suffix added to avoid duplicate symbol
 tGrid_draw gDraw_grid_status;
-tNet_sequence_type gNet_race_sequence;
-tU32 gLast_host_query;
+tNet_sequence_type gNet_race_sequence__racestrt; // suffix added to avoid duplicate symbol
 br_pixelmap* gTaken_image;
 int gGrid_number_x_coords[31];
 int gGrid_transition_stage;
-int gJust_bought_part;
 int gGrid_y_adjust;
 br_pixelmap* gBullet_image;
 br_pixelmap* gDeceased_image;
@@ -1140,8 +1140,8 @@ void ChallengeStart() {
         gCurrent_graf_data->start_race_panel_bottom - gCurrent_graf_data->start_race_panel_top);
     ChangePanelFlic(
         0,
-        gOpponents[gChallenger_index].mug_shot_image_data,
-        gOpponents[gChallenger_index].mug_shot_image_data_length);
+        gOpponents[gChallenger_index__racestrt].mug_shot_image_data,
+        gOpponents[gChallenger_index__racestrt].mug_shot_image_data_length);
     if (gScreen->row_bytes < 0) {
         BrFatal("C:\\Msdev\\Projects\\DethRace\\Racestrt.c", 2610, "Bruce bug at line %d, file C:\\Msdev\\Projects\\DethRace\\Racestrt.c", 50);
     }
@@ -1158,7 +1158,7 @@ void ChallengeStart() {
     BrPixelmapFree(the_map);
     the_map = DRPixelmapAllocate(gScreen->type, gCurrent_graf_data->dare_text_width, gCurrent_graf_data->dare_mugshot_height, 0, 0);
     BrPixelmapFill(the_map, 0);
-    TransBrPixelmapText(the_map, 0, 0, 1u, gBig_font, (signed char*)gOpponents[gChallenger_index].abbrev_name);
+    TransBrPixelmapText(the_map, 0, 0, 1u, gBig_font, (signed char*)gOpponents[gChallenger_index__racestrt].abbrev_name);
     PathCat(the_path, gApplication_path, "DARES.TXT");
     f = DRfopen(the_path, "rt");
     if (!f) {
@@ -1181,7 +1181,7 @@ void ChallengeStart() {
     BrPixelmapLine(the_map, 0, gBig_font->glyph_y + 2, the_map->width, gBig_font->glyph_y + 2, 45);
     TellyInImage(the_map, gCurrent_graf_data->dare_text_left, gCurrent_graf_data->dare_mugshot_top);
     BrPixelmapFree(the_map);
-    UnlockOpponentMugshot(gChallenger_index);
+    UnlockOpponentMugshot(gChallenger_index__racestrt);
     gDare_start_time = PDGetTotalTime();
 }
 
@@ -1211,14 +1211,14 @@ int ChallengeDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
     if (!pEscaped || gDare_start_time) {
         if (!pEscaped && gDare_start_time) {
             ActuallySwapOrder(gOur_starting_position, gChallenger_position);
-            ChallengeOccurred(gChallenger_index, 1);
+            ChallengeOccurred(gChallenger_index__racestrt, 1);
         }
     } else {
         DoGridTransition(gOur_starting_position, gOriginal_position);
         ActuallySwapOrder(gOur_starting_position, gOriginal_position);
-        ChallengeOccurred(gChallenger_index, 0);
+        ChallengeOccurred(gChallenger_index__racestrt, 0);
     }
-    ChallengeOccurred(gChallenger_index, pEscaped == 0);
+    ChallengeOccurred(gChallenger_index__racestrt, pEscaped == 0);
     if (pTimed_out) {
         return 0;
     } else {
@@ -1296,8 +1296,8 @@ void DoChallengeScreen() {
     if (gOpponents[gCurrent_race.opponent_list[gChallenger_position].index].car_number < 0) {
         gChallenger_position ^= 1u;
     }
-    gChallenger_index = gCurrent_race.opponent_list[gChallenger_position].index;
-    LoadOpponentMugShot(gChallenger_index);
+    gChallenger_index__racestrt = gCurrent_race.opponent_list[gChallenger_position].index;
+    LoadOpponentMugShot(gChallenger_index__racestrt);
     gDraw_grid_status = eGrid_draw_none;
     gGrid_y_adjust = gCurrent_graf_data->dare_y_adjust;
     DoInterfaceScreen(&interface_spec, 0, 0);
@@ -1602,7 +1602,8 @@ void NetSynchStartStart() {
 }
 
 //IDA: void __usercall DrawAnItem(int pX@<EAX>, int pY_index@<EDX>, int pFont_index@<EBX>, char *pText@<ECX>)
-void DrawAnItem_racestrt(int pX, int pY_index, int pFont_index, char* pText) {
+// Suffix added to avoid duplicate symbol
+void DrawAnItem__racestrt(int pX, int pY_index, int pFont_index, char* pText) {
     LOG_TRACE("(%d, %d, %d, \"%s\")", pX, pY_index, pFont_index, pText);
     NOT_IMPLEMENTED();
 }

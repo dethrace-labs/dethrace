@@ -27,7 +27,6 @@ void (*RenderStyleCalls[])(
 v11model bounds_prepared;
 br_model bounds_model;
 v11group bounds_face_groups[1];
-char rscid[49];
 
 // IDA: void __usercall renderFaces(br_actor *actor@<EAX>, br_model *model@<EDX>, br_material *material@<EBX>, void *render_data@<ECX>, br_uint_8 style, int on_screen)
 void renderFaces(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen) {

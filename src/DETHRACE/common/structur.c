@@ -23,6 +23,10 @@
 #include "utility.h"
 #include <stdlib.h>
 
+int gLast_wrong_checkpoint;
+int gMirror_on__structur = 1; // suffix added to avoid duplicate symbol
+int gPratcam_on = 1;
+int gCockpit_on = 1;
 int gOpponent_mix[10][5] = {
     { 3, 4, 4, 5, 5 },
     { 2, 3, 4, 5, 5 },
@@ -35,12 +39,8 @@ int gOpponent_mix[10][5] = {
     { 1, 1, 2, 3, 3 },
     { 1, 1, 2, 2, 3 }
 };
-int gPratcam_on = 1;
-tRace_over_reason gRace_over_reason;
-int gCockpit_on = 1;
 tU32 gLast_checkpoint_time;
-int gLast_wrong_checkpoint;
-int gMirror_on = 1;
+tRace_over_reason gRace_over_reason;
 
 // IDA: int __cdecl NumberOfOpponentsLeft()
 int NumberOfOpponentsLeft() {
@@ -396,7 +396,7 @@ void InitialiseProgramState() {
     gProgram_state.loading = 0;
     gProgram_state.dont_save_or_load = 0;
     gProgram_state.dont_load = 0;
-    gProgram_state.mirror_on = gMirror_on;
+    gProgram_state.mirror_on = gMirror_on__structur;
     gProgram_state.prog_status = eProg_intro;
     if (gAusterity_mode) {
         gProgram_state.prat_cam_on = 0;

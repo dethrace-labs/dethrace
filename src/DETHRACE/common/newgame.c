@@ -16,26 +16,26 @@
 #include "world.h"
 #include <stdlib.h>
 
-char x[] = "xxxxxxxx.TXT";
-char y[] = "yyyyyyyy.TXT";
-char* gBasic_car_names[2] = { x, y };
+tU8* gFrank_flic_data;
+tU8* gAnne_flic_data;
+int gNet_storage_allocated;
+tRadio_bastards gRadio_bastards__newgame[11]; // suffix added to avoid duplicate symbol
+char _name1[] = "xxxxxxxx.TXT"; // keep compiler happy
+char _name2[] = "yyyyyyyy.TXT"; // keep compiler happy
+char* gBasic_car_names[2] = { _name1, _name2 };
 tNet_game_options gNet_settings[8];
-tRadio_bastards gRadio_bastards[11];
 tJoinable_game gGames_to_join[6];
 tNet_game_options* gOptions;
 int gNet_target[7];
-int gLast_graph_sel;
-tInterface_spec* gThe_interface_spec;
-tNet_sequence_type gNet_race_sequence;
+int gLast_graph_sel__newgame; // suffix added to avoid duplicate symbol
+tInterface_spec* gThe_interface_spec__newgame; // suffix added to avoid duplicate symbol
+tNet_sequence_type gNet_race_sequence__newgame; // suffix added to avoid duplicate symbol
 tNet_game_type gLast_game_type;
 int gCurrent_net_game_count;
 tU32 gAnne_flic_data_length;
 int gShifted_default_yet;
-int gNet_storage_allocated;
-tU8* gFrank_flic_data;
 char* gNet_name;
 tU32 gFrank_flic_data_length;
-tU8* gAnne_flic_data;
 int gLast_net_choose_box;
 int gCurrent_game_selection;
 int gRace_index;
@@ -378,13 +378,13 @@ void DisposeJoinableGame(int pIndex) {
 }
 
 // IDA: void __usercall DrawAnItem(int pX@<EAX>, int pY_index@<EDX>, int pFont_index@<EBX>, char *pText@<ECX>)
-void DrawAnItem(int pX, int pY_index, int pFont_index, char* pText) {
+void DrawAnItem__newgame(int pX, int pY_index, int pFont_index, char* pText) {
     LOG_TRACE("(%d, %d, %d, \"%s\")", pX, pY_index, pFont_index, pText);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall DrawColumnHeading(int pStr_index@<EAX>, int pX@<EDX>)
-void DrawColumnHeading(int pStr_index, int pX) {
+void DrawColumnHeading__newgame(int pStr_index, int pX) {
     LOG_TRACE("(%d, %d)", pStr_index, pX);
     NOT_IMPLEMENTED();
 }
@@ -641,13 +641,15 @@ void DoNetOptions(tNet_game_options* pGame_options) {
 }
 
 //IDA: void __usercall PlayRadioOn(int pIndex@<EAX>)
-void PlayRadioOn_newgame(int pIndex) {
+// Suffix added to avoid duplicate symbol
+void PlayRadioOn__newgame(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
     NOT_IMPLEMENTED();
 }
 
 //IDA: void __usercall PlayRadioOff(int pIndex@<EAX>)
-void PlayRadioOff_newgame(int pIndex) {
+// Suffix added to avoid duplicate symbol
+void PlayRadioOff__newgame(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
     NOT_IMPLEMENTED();
 }
@@ -671,19 +673,22 @@ int NetChooseGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: void __usercall PlotAGraphBox(int pIndex@<EAX>, int pColour_value@<EDX>)
-void PlotAGraphBox(int pIndex, int pColour_value) {
+// Suffix added to avoid duplicate symbol
+void PlotAGraphBox__newgame(int pIndex, int pColour_value) {
     LOG_TRACE("(%d, %d)", pIndex, pColour_value);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall DrawAGraphBox(int pIndex@<EAX>)
-void DrawAGraphBox(int pIndex) {
+// Suffix added to avoid duplicate symbol
+void DrawAGraphBox__newgame(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall EraseAGraphBox(int pIndex@<EAX>)
-void EraseAGraphBox(int pIndex) {
+// Suffix added to avoid duplicate symbol
+void EraseAGraphBox__newgame(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
     NOT_IMPLEMENTED();
 }

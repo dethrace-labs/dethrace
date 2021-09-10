@@ -1,8 +1,6 @@
 #include "brprintf.h"
 #include "harness_trace.h"
 
-char rscid[48];
-
 #include <stdarg.h>
 
 br_int_32 BrSprintf(char* buf, char* fmt, ...) {

@@ -112,7 +112,6 @@ struct {
     int count;
 } DatafileStack[1024];
 char* ChunkNames[61];
-char rscid[52];
 int DatafileStackTop;
 
 // IDA: void __usercall DfPush(int type@<EAX>, void *value@<EDX>, int count@<EBX>)

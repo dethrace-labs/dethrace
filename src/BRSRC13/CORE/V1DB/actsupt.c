@@ -10,8 +10,6 @@
 #include "actsupt.h"
 #include "harness_trace.h"
 
-char rscid[53];
-
 // IDA: br_uint_32 __cdecl BrActorEnum(br_actor *parent, br_actor_enum_cbfn *callback, void *arg)
 br_uint_32 BrActorEnum(br_actor* parent, br_actor_enum_cbfn* callback, void* arg) {
     br_actor* a;

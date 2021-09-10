@@ -128,7 +128,8 @@ tSO_result DoEndRaceSummary1() {
 }
 
 //IDA: void __usercall PrepareBoundingRadius(br_model *model@<EAX>)
-void PrepareBoundingRadius_racesumm(br_model* model) {
+// Suffix added to avoid duplicate symbol
+void PrepareBoundingRadius__racesumm(br_model* model) {
     float d;
     float max;
     int v;
@@ -297,13 +298,15 @@ tSO_result DoEndRaceSummary2() {
 }
 
 //IDA: void __usercall DrawAnItem(int pX@<EAX>, int pY_index@<EDX>, int pFont_index@<EBX>, char *pText@<ECX>)
-void DrawAnItem_racesumm(int pX, int pY_index, int pFont_index, char* pText) {
+// Suffix added to avoid duplicate symbol
+void DrawAnItem__racesumm(int pX, int pY_index, int pFont_index, char* pText) {
     LOG_TRACE("(%d, %d, %d, \"%s\")", pX, pY_index, pFont_index, pText);
     NOT_IMPLEMENTED();
 }
 
 //IDA: void __usercall DrawColumnHeading(int pStr_index@<EAX>, int pX@<EDX>)
-void DrawColumnHeading_racesumm(int pStr_index, int pX) {
+// Suffix added to avoid duplicate symbol
+void DrawColumnHeading__racesumm(int pStr_index, int pX) {
     LOG_TRACE("(%d, %d)", pStr_index, pX);
 }
 

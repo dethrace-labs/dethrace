@@ -6,65 +6,65 @@
 
 #define CAR_MAX_SIMPLIFICATION_LEVEL 4
 
-extern float gEngine_powerup_factor[6];
-extern tCar_spec* gLast_car_to_skid[2];
+extern int gDoing_physics;
+extern br_scalar gDt;
+extern int gCollision_detection_on__car; // suffix added to avoid duplicate symbol
+extern br_vector3 gGround_normal__car; // suffix added to avoid duplicate symbol
+extern void (*ControlCar__car[6])(tCar_spec*, br_scalar); // suffix added to avoid duplicate symbol
+extern int gControl__car; // suffix added to avoid duplicate symbol
+extern int gFace_num__car; // suffix added to avoid duplicate symbol
+extern br_angle gOld_yaw__car; // suffix added to avoid duplicate symbol
+extern br_angle gOld_zoom;
+extern br_vector3 gCamera_pos_before_collide;
+extern int gMetal_crunch_sound_id__car[5]; // suffix added to avoid duplicate symbol
+extern int gMetal_scrape_sound_id__car[3]; // suffix added to avoid duplicate symbol
+extern int gCar_car_collisions;
+extern int gFreeze_mechanics;
+extern tU32 gLast_cunning_stunt;
+extern tU32 gWild_start;
+extern tU32 gQuite_wild_start;
+extern tU32 gQuite_wild_end;
+extern tU32 gOn_me_wheels_start;
+extern int gWoz_upside_down_at_all;
 extern tS3_sound_tag gSkid_tag[2];
+extern tCar_spec* gLast_car_to_skid[2];
+extern int gEliminate_faces;
+extern br_vector3 gZero_v__car; // suffix added to avoid duplicate symbol
+extern tU32 gSwitch_time;
 extern tSave_camera gSave_camera[2];
-extern tFace_ref gFace_list[150];
-extern void (*ControlCar[6])(tCar_spec*, br_scalar);
-extern tNon_car_spec* gActive_non_car_list[50];
-extern float gCar_simplification_factor[2][CAR_MAX_SIMPLIFICATION_LEVEL + 1];
+extern tU32 gLast_mechanics_time;
+extern int gOpponent_viewing_mode;
+extern int gNet_player_to_view_index;
+extern int gDouble_pling_water;
+extern int gStop_opponents_moving;
 extern float gDefensive_powerup_factor[6];
 extern float gOffensive_powerup_factor[6];
-extern int gNet_player_to_view_index;
+extern float gEngine_powerup_factor[6];
+extern br_angle gPanning_camera_angle;
+extern br_scalar gPanning_camera_height;
+extern int gFace_count;
+extern float gCar_simplification_factor[2][5];
+extern int gCar_simplification_level;
+extern int gNum_active_non_cars;
+extern int gCamera_has_collided;
+extern tFace_ref gFace_list__car[150]; // suffix added to avoid duplicate symbol
+extern tNon_car_spec* gActive_non_car_list[50];
 extern int gOver_shoot;
-extern int gDouble_pling_water;
-extern int gOpponent_viewing_mode;
 extern br_scalar gMin_world_y;
-extern int gMetal_crunch_sound_id[5];
-extern int gFreeze_mechanics;
-extern int gWoz_upside_down_at_all;
-extern tU32 gQuite_wild_end;
-extern tU32 gLast_mechanics_time;
-extern tU32 gOn_me_wheels_start;
-extern int gCar_car_collisions;
 extern br_scalar gAccel;
 extern br_vector3 gAverage_grid_position;
 extern br_actor* gPed_actor;
-extern tU32 gWild_start;
-extern tU32 gLast_cunning_stunt;
 extern int gCollision_count;
-extern tU32 gQuite_wild_start;
 extern int gCamera_frozen;
-extern tU32 gSwitch_time;
 extern int gMaterial_index;
-extern int gEliminate_faces;
 extern int gInTheSea;
-extern int gMetal_scrape_sound_id[3];
-extern br_vector3 gZero_v;
 extern int gCamera_mode;
-extern int gDoing_physics;
-extern br_scalar gOur_yaw;
-extern br_vector3 gCamera_pos_before_collide;
-extern br_scalar gGravity;
-extern br_vector3 gNew_ground_normal;
-extern br_scalar gDt;
-extern int gFace_num;
-extern int gCollision_detection_on;
-extern int gControl;
-extern br_vector3 gGround_normal;
+extern br_scalar gOur_yaw__car; // suffix added to avoid duplicate symbol
+extern br_scalar gGravity__car; // suffix added to avoid duplicate symbol
+extern br_vector3 gNew_ground_normal__car; // suffix added to avoid duplicate symbol
 extern char gNon_car_spec_list[100];
-extern int gCamera_has_collided;
-extern int gCar_simplification_level;
-extern int gNum_active_non_cars;
-extern br_scalar gPanning_camera_height;
-extern int gStop_opponents_moving;
 extern tU32 gMechanics_time_sync;
 extern int gNum_cars_and_non_cars;
-extern int gFace_count;
-extern br_angle gOld_yaw;
-extern br_angle gOld_zoom;
-extern br_angle gPanning_camera_angle;
 
 void DamageUnit(tCar_spec* pCar, int pUnit_type, int pDamage_amount);
 

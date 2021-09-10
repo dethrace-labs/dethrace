@@ -4,10 +4,15 @@
 #include "br_types.h"
 #include "dr_types.h"
 
-extern char* gMisc_strings[250];
+extern int gIn_check_quit;
+extern tU32 gLost_time;
+extern tU32 gLong_key[4];
+extern tU32 gOther_long_key[4];
 extern int gEncryption_method;
+extern char* gMisc_strings[250];
+extern br_pixelmap* g16bit_palette;
+extern br_pixelmap* gSource_for_16bit_palette;
 
-// Added by jeff
 typedef br_uint_32 recurse_with_mat_cbfn(br_actor*, br_material*, void*);
 
 int CheckQuit();

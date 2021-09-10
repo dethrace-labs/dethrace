@@ -4,13 +4,13 @@
 #include "br_types.h"
 #include "dr_types.h"
 
-extern int gOpponent_mix[10][5];
-extern int gPratcam_on;
-extern tRace_over_reason gRace_over_reason;
-extern int gCockpit_on;
-extern tU32 gLast_checkpoint_time;
 extern int gLast_wrong_checkpoint;
-extern int gMirror_on;
+extern int gMirror_on__structur; // suffix added to avoid duplicate symbol
+extern int gPratcam_on;
+extern int gCockpit_on;
+extern int gOpponent_mix[10][5];
+extern tU32 gLast_checkpoint_time;
+extern tRace_over_reason gRace_over_reason;
 
 int NumberOfOpponentsLeft();
 

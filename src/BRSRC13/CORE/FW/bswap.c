@@ -1,8 +1,6 @@
 #include "bswap.h"
 #include "harness_trace.h"
 
-char rscid[47];
-
 // IDA: br_uint_32 __cdecl BrSwap32(br_uint_32 l)
 br_uint_32 BrSwap32(br_uint_32 l) {
     // struct { // size: 0x4

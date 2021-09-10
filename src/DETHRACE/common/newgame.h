@@ -4,24 +4,24 @@
 #include "br_types.h"
 #include "dr_types.h"
 
+extern tU8* gFrank_flic_data;
+extern tU8* gAnne_flic_data;
+extern int gNet_storage_allocated;
+extern tRadio_bastards gRadio_bastards__newgame[11]; // suffix added to avoid duplicate symbol
 extern char* gBasic_car_names[2];
 extern tNet_game_options gNet_settings[8];
-extern tRadio_bastards gRadio_bastards[11];
 extern tJoinable_game gGames_to_join[6];
 extern tNet_game_options* gOptions;
 extern int gNet_target[7];
-extern int gLast_graph_sel;
-extern tInterface_spec* gThe_interface_spec;
-extern tNet_sequence_type gNet_race_sequence;
+extern int gLast_graph_sel__newgame; // suffix added to avoid duplicate symbol
+extern tInterface_spec* gThe_interface_spec__newgame; // suffix added to avoid duplicate symbol
+extern tNet_sequence_type gNet_race_sequence__newgame; // suffix added to avoid duplicate symbol
 extern tNet_game_type gLast_game_type;
 extern int gCurrent_net_game_count;
 extern tU32 gAnne_flic_data_length;
 extern int gShifted_default_yet;
-extern int gNet_storage_allocated;
-extern tU8* gFrank_flic_data;
 extern char* gNet_name;
 extern tU32 gFrank_flic_data_length;
-extern tU8* gAnne_flic_data;
 extern int gLast_net_choose_box;
 extern int gCurrent_game_selection;
 extern int gRace_index;
@@ -51,9 +51,9 @@ int NewNetGameDown(int* pCurrent_choice, int* pCurrent_mode);
 
 void DisposeJoinableGame(int pIndex);
 
-void DrawAnItem(int pX, int pY_index, int pFont_index, char* pText);
+void DrawAnItem__newgame(int pX, int pY_index, int pFont_index, char* pText);
 
-void DrawColumnHeading(int pStr_index, int pX);
+void DrawColumnHeading__newgame(int pStr_index, int pX);
 
 void DrawGames(int pCurrent_choice, int pCurrent_mode);
 
@@ -127,9 +127,11 @@ void DrawNetOptBox(int pCurrent_choice, int pCurrent_mode);
 
 void DoNetOptions(tNet_game_options* pGame_options);
 
-void PlayRadioOn_newgame(int pIndex);
+// Suffix added to avoid duplicate symbol
+void PlayRadioOn__newgame(int pIndex);
 
-void PlayRadioOff_newgame(int pIndex);
+// Suffix added to avoid duplicate symbol
+void PlayRadioOff__newgame(int pIndex);
 
 void SetOptions(tNet_game_type pGame_type, tNet_game_options* pGame_options);
 
@@ -137,11 +139,14 @@ void DrawNetChooseInitial();
 
 int NetChooseGoAhead(int* pCurrent_choice, int* pCurrent_mode);
 
-void PlotAGraphBox(int pIndex, int pColour_value);
+// Suffix added to avoid duplicate symbol
+void PlotAGraphBox__newgame(int pIndex, int pColour_value);
 
-void DrawAGraphBox(int pIndex);
+// Suffix added to avoid duplicate symbol
+void DrawAGraphBox__newgame(int pIndex);
 
-void EraseAGraphBox(int pIndex);
+// Suffix added to avoid duplicate symbol
+void EraseAGraphBox__newgame(int pIndex);
 
 void DrawNetChoose(int pCurrent_choice, int pCurrent_mode);
 

@@ -24,11 +24,13 @@
 #include <math.h>
 #include <stdlib.h>
 
-float gEngine_powerup_factor[6] = { 1.3, 1.9, 2.5, 3.2, 4.0, 10.0 };
-tCar_spec* gLast_car_to_skid[2];
-tS3_sound_tag gSkid_tag[2];
-tSave_camera gSave_camera[2];
-tFace_ref gFace_list[150];
+int gDoing_physics;
+br_scalar gDt;
+// suffix added to avoid duplicate symbol
+int gCollision_detection_on__car = 1;
+// suffix added to avoid duplicate symbol
+br_vector3 gGround_normal__car;
+// suffix added to avoid duplicate symbol
 void (*ControlCar[6])(tCar_spec*, br_scalar) = {
     &ControlCar1,
     &ControlCar2,
@@ -37,62 +39,63 @@ void (*ControlCar[6])(tCar_spec*, br_scalar) = {
     &ControlCar5,
     NULL
 };
-tNon_car_spec* gActive_non_car_list[50];
+int gControl__car = 3; // suffix added to avoid duplicate symbol
+int gFace_num__car = 1; // suffix added to avoid duplicate symbol
+br_angle gOld_yaw__car; // suffix added to avoid duplicate symbol
+br_angle gOld_zoom;
+br_vector3 gCamera_pos_before_collide;
+int gMetal_crunch_sound_id__car[5]; // suffix added to avoid duplicate symbol
+int gMetal_scrape_sound_id__car[3]; // suffix added to avoid duplicate symbol
+int gCar_car_collisions;
+int gFreeze_mechanics;
+tU32 gLast_cunning_stunt;
+tU32 gWild_start;
+tU32 gQuite_wild_start;
+tU32 gQuite_wild_end;
+tU32 gOn_me_wheels_start;
+int gWoz_upside_down_at_all;
+tS3_sound_tag gSkid_tag[2];
+tCar_spec* gLast_car_to_skid[2];
+int gEliminate_faces;
+br_vector3 gZero_v__car; // suffix added to avoid duplicate symbol
+tU32 gSwitch_time;
+tSave_camera gSave_camera[2];
+tU32 gLast_mechanics_time;
+int gOpponent_viewing_mode;
+int gNet_player_to_view_index;
+int gDouble_pling_water;
+int gStop_opponents_moving;
+float gDefensive_powerup_factor[6];
+float gOffensive_powerup_factor[6];
+float gEngine_powerup_factor[6] = { 1.3, 1.9, 2.5, 3.2, 4.0, 10.0 };
+br_angle gPanning_camera_angle;
+br_scalar gPanning_camera_height;
+int gFace_count;
 float gCar_simplification_factor[2][5] = {
     { 10.0, 3.0, 1.5, 0.75, 0.0 },
     { 10.0, 5.0, 2.5, 1.5, 0.0 }
 };
-float gDefensive_powerup_factor[6];
-float gOffensive_powerup_factor[6];
-int gNet_player_to_view_index;
+int gCar_simplification_level;
+int gNum_active_non_cars;
+int gCamera_has_collided;
+tFace_ref gFace_list__car[150]; // suffix added to avoid duplicate symbol
+tNon_car_spec* gActive_non_car_list[50];
 int gOver_shoot;
-int gDouble_pling_water;
-int gOpponent_viewing_mode;
 br_scalar gMin_world_y;
-int gMetal_crunch_sound_id[5];
-int gFreeze_mechanics;
-int gWoz_upside_down_at_all;
-tU32 gQuite_wild_end;
-tU32 gLast_mechanics_time;
-tU32 gOn_me_wheels_start;
-int gCar_car_collisions;
 br_scalar gAccel;
 br_vector3 gAverage_grid_position;
 br_actor* gPed_actor;
-tU32 gWild_start;
-tU32 gLast_cunning_stunt;
 int gCollision_count;
-tU32 gQuite_wild_start;
 int gCamera_frozen;
-tU32 gSwitch_time;
 int gMaterial_index;
-int gEliminate_faces;
 int gInTheSea;
-int gMetal_scrape_sound_id[3];
-br_vector3 gZero_v;
 int gCamera_mode;
-int gDoing_physics;
-br_scalar gOur_yaw;
-br_vector3 gCamera_pos_before_collide;
-br_scalar gGravity;
-br_vector3 gNew_ground_normal;
-br_scalar gDt;
-int gFace_num = 1;
-int gCollision_detection_on = 1;
-int gControl = 3;
-br_vector3 gGround_normal;
+br_scalar gOur_yaw__car; // suffix added to avoid duplicate symbol
+br_scalar gGravity__car; // suffix added to avoid duplicate symbol
+br_vector3 gNew_ground_normal__car; // suffix added to avoid duplicate symbol
 char gNon_car_spec_list[100];
-int gCamera_has_collided;
-int gCar_simplification_level;
-int gNum_active_non_cars;
-br_scalar gPanning_camera_height;
-int gStop_opponents_moving;
 tU32 gMechanics_time_sync;
 int gNum_cars_and_non_cars;
-int gFace_count;
-br_angle gOld_yaw;
-br_angle gOld_zoom;
-br_angle gPanning_camera_angle;
 
 // IDA: void __usercall DamageUnit(tCar_spec *pCar@<EAX>, int pUnit_type@<EDX>, int pDamage_amount@<EBX>)
 void DamageUnit(tCar_spec* pCar, int pUnit_type, int pDamage_amount) {
@@ -334,7 +337,7 @@ void InitialiseCar2(tCar_spec* pCar, int pClear_disabled_flag) {
         break;
     }
     PossibleService();
-    pCar->box_face_ref = gFace_num - 2;
+    pCar->box_face_ref = gFace_num__car - 2;
     pCar->doing_nothing_flag = 0;
     pCar->end_steering_damage_effect = 0;
     pCar->end_trans_damage_effect = 0;
@@ -601,7 +604,7 @@ void GetFacesInBox(tCollision_info* c) {
     }
     GetNewBoundingBox(&c->bounds_world_space, &bnds.original_bounds, &mat);
     c->bounds_ws_type = eBounds_ws;
-    if ((c->box_face_ref != gFace_num && (c->box_face_ref != gFace_num - 1 || c->box_face_start <= gFace_count))
+    if ((c->box_face_ref != gFace_num__car && (c->box_face_ref != gFace_num__car - 1 || c->box_face_start <= gFace_count))
         || (BrMatrix34Mul(&mat5, &mat, &c->last_box_inv_mat),
             GetNewBoundingBox(&new_in_old, &bnds.original_bounds, &mat5),
             c->last_box.max.v[0] <= new_in_old.max.v[0])
@@ -629,11 +632,11 @@ void GetFacesInBox(tCollision_info* c) {
         bnds.mat = &mat;
         c->box_face_start = gFace_count;
         gPling_face = NULL;
-        gFace_count += FindFacesInBox(&bnds, &gFace_list[gFace_count], 150 - gFace_count);
+        gFace_count += FindFacesInBox(&bnds, &gFace_list__car[gFace_count], 150 - gFace_count);
         if (gFace_count >= 150) {
             c->box_face_start = 0;
-            gFace_count = FindFacesInBox(&bnds, gFace_list, 150);
-            ++gFace_num;
+            gFace_count = FindFacesInBox(&bnds, gFace_list__car, 150);
+            ++gFace_num__car;
         }
         old_d = c->water_d;
         if (c->driver == eDriver_local_human
@@ -683,7 +686,7 @@ void GetFacesInBox(tCollision_info* c) {
             EndPipingSession();
         }
         c->box_face_end = gFace_count;
-        c->box_face_ref = gFace_num;
+        c->box_face_ref = gFace_num__car;
     }
 }
 
@@ -775,7 +778,7 @@ void ControlOurCar(tU32 pTime_difference) {
         }
     }
     ts = (double)pTime_difference / 1000.0;
-    ControlCar[gControl](car, ts);
+    ControlCar[gControl__car](car, ts);
     RememberSafePosition(car, pTime_difference);
     if (gCamera_reset) {
         BrVector3SetFloat(&minus_k, 0.0, 0.0, -1.0);
@@ -1137,8 +1140,8 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
                 }
                 if (!car->disabled
                     && (!car->doing_nothing_flag || (car->driver >= eDriver_net_human && (!gRecover_timer || car->driver != eDriver_local_human)))) {
-                    if (car->box_face_ref != gFace_num
-                        && (car->box_face_ref != gFace_num - 1 || car->box_face_start <= gFace_count)) {
+                    if (car->box_face_ref != gFace_num__car
+                        && (car->box_face_ref != gFace_num__car - 1 || car->box_face_start <= gFace_count)) {
                         car_info = (tCollision_info*)car;
                         GetFacesInBox(car_info);
                     }
@@ -1155,8 +1158,8 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
                         non_car->collision_info.dt = (double)(gLast_mechanics_time + PHYSICS_STEP_TIME - non_car->collision_info.message.time) / 1000.0;
                         GetNetPos((tCar_spec*)non_car);
                     }
-                    if (non_car->collision_info.box_face_ref != gFace_num
-                        && (non_car->collision_info.box_face_ref != gFace_num - 1
+                    if (non_car->collision_info.box_face_ref != gFace_num__car
+                        && (non_car->collision_info.box_face_ref != gFace_num__car - 1
                             || non_car->collision_info.box_face_start <= gFace_count)) {
                         GetFacesInBox(&non_car->collision_info);
                     }
@@ -1277,7 +1280,7 @@ int CollideCarWithWall(tCollision_info* car, br_scalar dt) {
     LOG_TRACE("(%p, %f)", car, dt);
 
     GetFacesInBox(car);
-    if (gCollision_detection_on) {
+    if (gCollision_detection_on__car) {
         car->collision_flag = 0;
         while (CollCheck(car, dt)) {
             car->collision_flag++;
@@ -1308,10 +1311,10 @@ int CollideCarWithWall(tCollision_info* car, br_scalar dt) {
 void ToggleControls() {
     LOG_TRACE("()");
 
-    if (!ControlCar[++gControl]) {
-        gControl = 0;
+    if (!ControlCar[++gControl__car]) {
+        gControl__car = 0;
     }
-    switch (gControl) {
+    switch (gControl__car) {
     case 0:
         NewTextHeadupSlot(4, 0, 500, -1, "Original Controls");
         break;
@@ -2428,7 +2431,7 @@ void DoRevs(tCar_spec* c, br_scalar dt) {
         c->gear = 0;
         LOG_DEBUG("changedown2");
     }
-    if (!c->number_of_wheels_on_ground || (c->wheel_slip & 2) != -1 || !c->gear) {
+    if (!c->number_of_wheels_on_ground || ((c->wheel_slip & 2) + 1) != 0 || !c->gear) {
         if (c->number_of_wheels_on_ground) {
             //LOG_DEBUG("spin1");
             wheel_spin_force = c->force_torque_ratio * c->torque - (double)c->gear * c->acc_force;
@@ -2772,14 +2775,14 @@ void MultiFindFloorInBoxBU(int pNum_rays, br_vector3* a, br_vector3* b, br_vecto
     LOG_TRACE("(%d, %p, %p, %p, %p, %p, %p)", pNum_rays, a, b, nor, d, c, mat_ref);
 
     for (i = 0; i < c->box_face_end; i++) {
-        face_ref = &gFace_list[i];
+        face_ref = &gFace_list__car[i];
         if (!gEliminate_faces || (face_ref->flags & 0x80) == 0) {
             MultiRayCheckSingleFace(pNum_rays, face_ref, a, b, &nor2, dist);
             for (j = 0; j < pNum_rays; ++j) {
                 if (d[j] > dist[j]) {
                     d[j] = dist[j];
                     nor[j] = nor2;
-                    l = *gFace_list[i].material->identifier - 47;
+                    l = *gFace_list__car[i].material->identifier - 47;
                     if (l >= 0 && l < 11) {
                         mat_ref[j] = l;
                     }
@@ -3522,7 +3525,7 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
     m1 = &gCamera->t.t.mat;
     m2 = &c->car_master_actor->t.t.mat;
     swoop = gCountdown && c->pos.v[1] + 0.001 < gCamera_height;
-    manual_swing = gOld_yaw != gCamera_yaw || swoop;
+    manual_swing = gOld_yaw__car != gCamera_yaw || swoop;
     manual_zoom = (double)gOld_zoom != gCamera_zoom;
     old_camera_pos = *(br_vector3*)&m1->m[3][0];
     if (!gProgram_state.cockpit_on) {
@@ -3580,8 +3583,8 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
             a.v[2] = c->pos.v[2] - old_camera_pos.v[2];
             a.v[1] = 0.0;
             if (manual_swing) {
-                DrVector3RotateY(&a, (gCamera_sign == 0 ? 1 : -1) * (gCamera_yaw - gOld_yaw));
-                gCamera_yaw = gOld_yaw;
+                DrVector3RotateY(&a, (gCamera_sign == 0 ? 1 : -1) * (gCamera_yaw - gOld_yaw__car));
+                gCamera_yaw = gOld_yaw__car;
             }
             scale = sqrt(a.v[1] * a.v[1] + a.v[2] * a.v[2] + a.v[0] * a.v[0]);
             if (scale <= 2.3841858e-7) {
@@ -3655,7 +3658,7 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
         }
         PointCameraAtCar(c, m2, m1);
     }
-    gOld_yaw = gCamera_yaw;
+    gOld_yaw__car = gCamera_yaw;
     gOld_zoom = (br_angle)gCamera_zoom;
 }
 
@@ -3710,7 +3713,7 @@ void SwingCamera(tCar_spec* c, br_matrix34* m1, br_matrix34* m2, br_vector3* vn,
     static br_vector3 old_vn;
     LOG_TRACE("(%p, %p, %p, %p, %d)", c, m1, m2, vn, pTime);
 
-    manual_swing = gOld_yaw != gCamera_yaw;
+    manual_swing = gOld_yaw__car != gCamera_yaw;
     if (elapsed_time > 500) {
         elapsed_time = -1;
     }

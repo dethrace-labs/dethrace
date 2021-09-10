@@ -3,7 +3,6 @@
 
 void* exceptionValue;
 br_exception_handler* _BrExceptionHandler;
-char rscid[50];
 
 // IDA: br_exception_handler* __cdecl _BrExceptionBegin()
 br_exception_handler* _BrExceptionBegin() {

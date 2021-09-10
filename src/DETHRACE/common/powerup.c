@@ -6,19 +6,19 @@
 #include "common/utility.h"
 #include <stdlib.h>
 
-int gPed_harvest_sounds[4];
 tGot_proc* gGot_procs[34];
 tLose_proc* gLose_procs[34];
-tHeadup_icon gIcon_list[20];
 tPeriodic_proc* gPeriodic_procs[34];
+tU32* gReal_render_palette;
 char* gFizzle_names[3] = { "CIRCLES.PIX", "SQUARES.PIX", "DIAMONDS.PIX" };
+br_vector3 gZero_v__powerup; // suffix added to avoid duplicate symbol
+int gPed_harvest_sounds[4];
+tHeadup_icon gIcon_list[20];
 br_pixelmap* gFizzle_in[3];
 int gNumber_of_powerups;
-tU32* gReal_render_palette;
 int gFizzle_height;
 int gNumber_of_icons;
 tPowerup* gPowerup_array;
-br_vector3 gZero_v_powerup; // added _powerup suffix to avoid name collision
 
 // IDA: void __usercall LosePowerupX(tPowerup *pThe_powerup@<EAX>, int pTell_net_players@<EDX>)
 void LosePowerupX(tPowerup* pThe_powerup, int pTell_net_players) {

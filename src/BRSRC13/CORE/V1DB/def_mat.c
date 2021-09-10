@@ -4,8 +4,6 @@
 #include "matrix23.h"
 #include "resource.h"
 
-char rscid[52];
-
 // IDA: br_material* __cdecl SetupDefaultMaterial()
 br_material* SetupDefaultMaterial() {
     static br_material* default_mat;

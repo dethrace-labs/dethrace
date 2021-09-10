@@ -6,8 +6,6 @@
 #include <stdarg.h>
 #include <stddef.h>
 
-char rscid[49];
-
 // IDA: void __cdecl _BrFileFree(void *res, br_uint_8 res_class, br_size_t size)
 void _BrFileFree(void* res, br_uint_8 res_class, br_size_t size) {
     br_file* file;

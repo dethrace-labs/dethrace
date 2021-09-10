@@ -9,8 +9,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-char rscid[51];
-
 // IDA: void* __usercall ResToUser@<EAX>(resource_header *r@<EAX>)
 void* ResToUser(resource_header* r) {
     br_int_32 align;

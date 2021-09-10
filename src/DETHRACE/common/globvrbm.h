@@ -4,6 +4,7 @@
 #include "br_types.h"
 #include "dr_types.h"
 
+extern br_scalar gYon_factor;
 extern br_material* gMaterial[2];
 extern int g16bit_palette_valid;
 extern tException_list gExceptions;
@@ -32,7 +33,6 @@ extern int gPerspective_is_fast;
 extern int gUse_mip_maps;
 extern int gBlitting_is_slow;
 extern int gTextures_need_powers_of_2;
-extern br_scalar gYon_factor;
 extern int gMax_texture_side;
 extern int gDevious_2d;
 extern int gMax_texture_aspect_ratio;

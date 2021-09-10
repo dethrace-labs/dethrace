@@ -1,8 +1,6 @@
 #include "custsupt.h"
 #include "harness_trace.h"
 
-char rscid[52];
-
 // IDA: void __cdecl BrModelToScreenQuery(br_matrix4 *dest)
 void BrModelToScreenQuery(br_matrix4* dest) {
     br_uint_32 dummy;

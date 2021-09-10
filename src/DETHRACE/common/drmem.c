@@ -3,7 +3,8 @@
 #include "errors.h"
 #include <stdlib.h>
 
-br_resource_class gStainless_classes[118];
+br_allocator gAllocator = { "Death Race", DRStdlibAllocate, DRStdlibFree, DRStdlibInquire, Claim4ByteAlignment };
+int gNon_fatal_allocation_errors = 0;
 char* gMem_names[247] = {
     NULL,
     "BR_MEMORY_SCRATCH",
@@ -252,9 +253,7 @@ char* gMem_names[247] = {
     "kMem_action_replay_buffer",
     "kMem_misc"
 };
-
-int gNon_fatal_allocation_errors = 0;
-br_allocator gAllocator = { "Death Race", DRStdlibAllocate, DRStdlibFree, DRStdlibInquire, Claim4ByteAlignment };
+br_resource_class gStainless_classes[118];
 
 // IDA: void __cdecl SetNonFatalAllocationErrors()
 void SetNonFatalAllocationErrors() {

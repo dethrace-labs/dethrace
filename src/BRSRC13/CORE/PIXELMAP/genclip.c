@@ -1,8 +1,6 @@
 #include "genclip.h"
 #include "harness_trace.h"
 
-char rscid[49];
-
 // IDA: br_clip_result __cdecl PixelmapPointClip(br_point *out, br_point *in, br_pixelmap *pm)
 br_clip_result PixelmapPointClip(br_point* out, br_point* in, br_pixelmap* pm) {
     LOG_TRACE("(%p, %p, %p)", out, in, pm);

@@ -2,8 +2,6 @@
 #include "harness_trace.h"
 #include <math.h>
 
-char rscid[46];
-
 float BrFloatFloor(float f) {
     return floorf(f);
 }

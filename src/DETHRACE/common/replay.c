@@ -4,10 +4,6 @@
 #include "graphics.h"
 #include "loading.h"
 
-int gProgress_line_top[2];
-int gProgress_line_left[2];
-int gProgress_line_right[2];
-br_pixelmap* gReplay_pixies[10];
 char* gReplay_pixie_names[10] = {
     "REPLAY.PIX",
     "RBUTTONS.PIX",
@@ -20,19 +16,23 @@ char* gReplay_pixie_names[10] = {
     "FWDEND.PIX",
     "CAMERA.PIX"
 };
+int gSingle_frame_mode;
+tU32 gCam_change_time;
+int gSave_file;
+int gProgress_line_left[2];
+int gProgress_line_right[2];
+int gProgress_line_top[2];
+br_pixelmap* gReplay_pixies[10];
 int gKey_down;
 int gNo_cursor;
-int gSingle_frame_mode;
 int gSave_frame_number;
 int gCam_change_button_down;
 tU32 gAction_replay_start_time;
 tU32 gLast_replay_zappy_screen;
 tS32 gStopped_time;
-tU32 gCam_change_time;
 float gPending_replay_rate;
 tU32 gAction_replay_end_time;
 float gReplay_rate;
-int gSave_file;
 int gSave_bunch_ID;
 int gPlay_direction;
 int gPaused;

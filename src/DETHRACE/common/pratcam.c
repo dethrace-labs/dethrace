@@ -1,8 +1,8 @@
 #include "pratcam.h"
 #include <stdlib.h>
 
-tFlic_descriptor gPrat_flic;
 tS3_sound_tag gWhirr_noise;
+tFlic_descriptor gPrat_flic;
 tPrat_sequence* gPratcam_sequences;
 tPrat_flic_spec* gPratcam_flics;
 int gCurrent_pratcam_chunk;

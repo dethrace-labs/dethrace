@@ -4,6 +4,13 @@
 #include "br_types.h"
 #include "dr_types.h"
 
+extern char* gOil_pixie_names[1];
+extern int gNext_oil_pixie;
+extern br_scalar gZ_buffer_diff;
+extern br_scalar gMin_z_diff;
+extern br_pixelmap* gOil_pixies[1];
+extern tOil_spill_info gOily_spills[15];
+
 void InitOilSpills();
 
 void ResetOilSpills();

@@ -1,8 +1,6 @@
 #include "error.h"
 #include "harness_trace.h"
 
-char rscid[47];
-
 // IDA: br_error __cdecl BrLastErrorGet(void **valuep)
 br_error BrLastErrorGet(void** valuep) {
     LOG_TRACE("(%p)", valuep);

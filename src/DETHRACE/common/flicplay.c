@@ -13,34 +13,16 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-int gFlic_bunch8[16] = { 290, 291, 292, 293, 294, 295, 296, 297, 42, 43, 154, 301, 42, 43, 304, 305 };
-int gFlic_bunch4[22] = {
-    80,
-    81,
-    82,
-    83,
-    84,
-    85,
-    42,
-    43,
-    88,
-    45,
-    110,
-    111,
-    42,
-    43,
-    45,
-    115,
-    116,
-    117,
-    118,
-    119,
-    120,
-    121
-};
-
-int gFlic_bunch2[8] = { 70, 71, 72, 73, 74, 56, 57, 59 };
-
+int gPalette_allocate_count;
+int gPalette_fuck_prevention;
+int gDark_mode;
+int gTransparency_on;
+int gPanel_flic_disable;
+int gPending_flic = -1;
+int gPlay_from_disk;
+int gTrans_enabled = 1;
+br_pixelmap* gPanel_buffer[2];
+tU32 gSound_time;
 tFlic_spec gMain_flic_list[372] = {
     { "xxxxxxxx.FLI", 1, 0, 0, 0, 0, 25, NULL, 0u },
     { "DEMSTRT2.FLI", 1, 0, 0, 0, 0, 0, NULL, 0u },
@@ -383,70 +365,6 @@ tFlic_spec gMain_flic_list[372] = {
     { "MAI2OPFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "MAI2OPGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u }
 };
-
-tU32 gPanel_flic_data_length[2];
-tU32 gLast_panel_frame_time[2];
-tU8* gPanel_flic_data[2];
-int gPanel_flic_top[2];
-tFlic_descriptor gPanel_flic[2];
-br_pixelmap* gPanel_buffer[2];
-int gPanel_flic_left[2];
-int gFlic_bunch6[51] = {
-    190,
-    191,
-    192,
-    42,
-    43,
-    195,
-    200,
-    201,
-    210,
-    212,
-    213,
-    220,
-    221,
-    222,
-    220,
-    221,
-    225,
-    230,
-    231,
-    42,
-    43,
-    154,
-    45,
-    220,
-    221,
-    222,
-    220,
-    221,
-    225,
-    250,
-    251,
-    42,
-    43,
-    254,
-    255,
-    256,
-    154,
-    42,
-    43,
-    260,
-    220,
-    221,
-    222,
-    220,
-    221,
-    225,
-    280,
-    281,
-    42,
-    43,
-    284
-};
-int gFlic_bunch7[7] = { 130, 131, 132, 42, 43, 135, 45 };
-int gFlic_bunch5[5] = { 100, 101, 42, 43, 45 };
-int gFlic_bunch3[13] = { 40, 41, 42, 43, 44, 45, 50, 51, 73, 74, 56, 57, 59 };
 int gFlic_bunch0[29] = {
     10,
     11,
@@ -511,25 +429,88 @@ int gFlic_bunch1[31] = {
     43,
     154
 };
-tU32 gSound_time;
-int gTrans_enabled = 1;
-int gPanel_flic_disable;
-int gDark_mode;
-int gPending_pending_flic;
-int gTransparency_on;
-int gSound_ID;
-int gPlay_from_disk = 0;
-int gTranslation_count;
-int gPending_flic = -1;
-tDR_font* gTrans_fonts[15];
-int gPalette_fuck_prevention;
-tTranslation_record* gTranslations;
-br_pixelmap* gPalette;
-void* gPalette_pixels;
-int gPalette_allocate_count;
-tFlic_descriptor* gFirst_flic;
-char gLast_flic_name[14];
-
+int gFlic_bunch2[8] = { 70, 71, 72, 73, 74, 56, 57, 59 };
+int gFlic_bunch3[13] = { 40, 41, 42, 43, 44, 45, 50, 51, 73, 74, 56, 57, 59 };
+int gFlic_bunch4[22] = {
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    42,
+    43,
+    88,
+    45,
+    110,
+    111,
+    42,
+    43,
+    45,
+    115,
+    116,
+    117,
+    118,
+    119,
+    120,
+    121
+};
+int gFlic_bunch5[5] = { 100, 101, 42, 43, 45 };
+int gFlic_bunch6[51] = {
+    190,
+    191,
+    192,
+    42,
+    43,
+    195,
+    200,
+    201,
+    210,
+    212,
+    213,
+    220,
+    221,
+    222,
+    220,
+    221,
+    225,
+    230,
+    231,
+    42,
+    43,
+    154,
+    45,
+    220,
+    221,
+    222,
+    220,
+    221,
+    225,
+    250,
+    251,
+    42,
+    43,
+    254,
+    255,
+    256,
+    154,
+    42,
+    43,
+    260,
+    220,
+    221,
+    222,
+    220,
+    221,
+    225,
+    280,
+    281,
+    42,
+    43,
+    284
+};
+int gFlic_bunch7[7] = { 130, 131, 132, 42, 43, 135, 45 };
+int gFlic_bunch8[16] = { 290, 291, 292, 293, 294, 295, 296, 297, 42, 43, 154, 301, 42, 43, 304, 305 };
 tFlic_bunch gFlic_bunch[9] = {
     { 29, gFlic_bunch0 },
     { 31, gFlic_bunch1 },
@@ -541,6 +522,21 @@ tFlic_bunch gFlic_bunch[9] = {
     { 7, gFlic_bunch7 },
     { 16, gFlic_bunch8 }
 };
+char gLast_flic_name[14];
+tU32 gPanel_flic_data_length[2];
+tU32 gLast_panel_frame_time[2];
+tU8* gPanel_flic_data[2];
+int gPanel_flic_top[2];
+tFlic_descriptor gPanel_flic[2];
+int gPanel_flic_left[2];
+int gPending_pending_flic = -1;
+int gSound_ID;
+int gTranslation_count;
+tDR_font* gTrans_fonts[15];
+tTranslation_record* gTranslations;
+br_pixelmap* gPalette;
+void* gPalette_pixels;
+tFlic_descriptor* gFirst_flic;
 
 // IDA: void __cdecl EnableTranslationText()
 void EnableTranslationText() {

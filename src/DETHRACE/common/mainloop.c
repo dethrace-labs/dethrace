@@ -34,25 +34,25 @@
 #include "world.h"
 #include <stdlib.h>
 
-tU32 gOld_camera_time;
+int gNasty_kludgey_cockpit_variable;
+tInfo_mode gInfo_mode;
+tU32 gLast_tick_count;
 tU32 gActual_last_tick_count;
+tU32 gAverage_frame_period;
+tU32 gOld_camera_time;
 tU32 gLast_wasted_massage_start;
 float gMr_odo;
 tU32 gWasted_last_flash;
-tU32 gLast_tick_count;
-tU32 gAverage_frame_period;
 tTime_bonus_state gTime_bonus_state;
 int gQueued_wasted_massages_count;
 int gTime_bonus;
 int gRace_bonus_headup;
 int gWasted_flash_state;
 int gLast_time_headup;
-int gNasty_kludgey_cockpit_variable;
-tInfo_mode gInfo_mode;
 int gTime_bonus_headup;
 int gQueued_wasted_massages[5];
 tU32 gTime_bonus_start;
-int gLast_credit_headup;
+int gLast_credit_headup__mainloop; // suffix added to avoid duplicate symbol
 
 // IDA: void __cdecl ToggleInfo()
 void ToggleInfo() {
@@ -163,19 +163,19 @@ void MungeHeadups() {
         ChangeHeadupText(gProgram_state.frame_rate_headup, "");
     }
     net_credits = gProgram_state.credits_earned - gProgram_state.credits_lost;
-    if (fabs((double)(gProgram_state.credits_earned - gProgram_state.credits_lost) - (double)gLast_credit_headup) / (double)gFrame_period > 1.2) {
-        if (net_credits - gLast_credit_headup <= 0) {
-            net_credits = (double)gLast_credit_headup
-                - ((double)(gLast_credit_headup - net_credits) + 1000.0)
+    if (fabs((double)(gProgram_state.credits_earned - gProgram_state.credits_lost) - (double)gLast_credit_headup__mainloop) / (double)gFrame_period > 1.2) {
+        if (net_credits - gLast_credit_headup__mainloop <= 0) {
+            net_credits = (double)gLast_credit_headup__mainloop
+                - ((double)(gLast_credit_headup__mainloop - net_credits) + 1000.0)
                     * (double)gFrame_period
                     * 1.2
                     / 1000.0;
         } else {
-            net_credits = (net_credits - gLast_credit_headup) + 1000.0 * (double)gFrame_period * 1.2 / 1000.0
-                + (double)gLast_credit_headup;
+            net_credits = (net_credits - gLast_credit_headup__mainloop) + 1000.0 * (double)gFrame_period * 1.2 / 1000.0
+                + (double)gLast_credit_headup__mainloop;
         }
     }
-    gLast_credit_headup = net_credits;
+    gLast_credit_headup__mainloop = net_credits;
     if (gCountdown) {
         new_countdown = 7.5 - (double)GetRaceTime() / 1000.0;
         if (new_countdown < 0) {
@@ -461,7 +461,7 @@ tRace_result MainGameLoop() {
     gOld_camera_time = 0;
     ClearEntireScreen();
     ResetPalette();
-    gLast_credit_headup = 0;
+    gLast_credit_headup__mainloop = 0;
     gLast_time_headup = gTimer;
     gRace_bonus_headup = -1;
     gTime_bonus_headup = -1;
@@ -661,7 +661,7 @@ tRace_result MainGameLoop() {
         gProgram_state.redo_race_index = gProgram_state.current_race_index;
     }
     gAbandon_game = 0;
-    dword_551424 = 0;
+    gSynch_race_start = 0;
     gInitialised_grid = 0;
     gHost_abandon_game = 0;
     S3StopAllOutletSounds();

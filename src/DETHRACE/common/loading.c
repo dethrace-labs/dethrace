@@ -37,33 +37,6 @@
 #define AMBIENT_MULTIPLIER 0.0099999998f
 #define NBR_FUNK_GROVE_FLAGS 30
 
-char* gWheel_actor_names[] = {
-    "FLWHEEL.ACT",
-    "FRWHEEL.ACT",
-    "RLWHEEL.ACT",
-    "RRWHEEL.ACT",
-    "IFLWHEEL.ACT",
-    "IFRWHEEL.ACT"
-};
-int gFunk_groove_flags[30];
-char* gNet_avail_names[] = { "never", "eagle", "hawk", "all" };
-char* gDamage_names[] = {
-    "engine",
-    "transmission",
-    "driver",
-    "steering",
-    "lf_brake",
-    "rf_brake",
-    "lr_brake",
-    "rr_brake",
-    "lf_wheel",
-    "rf_wheel",
-    "lr_wheel",
-    "rr_wheel"
-};
-char* gDrivable_car_names[6];
-char* gYour_car_names[2][6];
-char gDef_def_water_screen_name[32];
 tHeadup_info gHeadup_image_info[31] = {
     { "LADY.PIX", eNet_or_otherwise },
     { "GENT.PIX", eNet_or_otherwise },
@@ -97,9 +70,30 @@ tHeadup_info gHeadup_image_info[31] = {
     { "ULOST.PIX", eNet_only },
     { "UWON.PIX", eNet_only }
 };
-int gAllow_open_to_fail = 1;
-br_material* gDestn_screen_mat;
-br_material* gSource_screen_mat;
+char* gYour_car_names[2][6];
+char* gDrivable_car_names[6];
+char* gDamage_names[] = {
+    "engine",
+    "transmission",
+    "driver",
+    "steering",
+    "lf_brake",
+    "rf_brake",
+    "lr_brake",
+    "rr_brake",
+    "lf_wheel",
+    "rf_wheel",
+    "lr_wheel",
+    "rr_wheel"
+};
+char* gWheel_actor_names[] = {
+    "FLWHEEL.ACT",
+    "FRWHEEL.ACT",
+    "RLWHEEL.ACT",
+    "RRWHEEL.ACT",
+    "IFLWHEEL.ACT",
+    "IFRWHEEL.ACT"
+};
 char* gRaces_file_names[] = {
     "RACES.TXT",
     "NETRACES.TXT",
@@ -111,16 +105,22 @@ char* gRaces_file_names[] = {
     "NETRACES.TXT",
     "NETRACES.TXT"
 };
+char* gNet_avail_names[] = { "never", "eagle", "hawk", "all" };
 char* gFloorpan_names[] = { "GBUNDER.MAT", "BGLUNDER.MAT", "GRIMBOT.MAT", "DDBASE.MAT", "HFUNDER.MAT" };
+int gAllow_open_to_fail = 1;
+int gDecode_thing = '@';
+char gDecode_string[] = { 0x9B, 0x52, 0x93, 0x9F, 0x52, 0x98, 0x9B, 0x96, 0x96, 0x9E, 0x9B, 0xA0, 0x99, 0x0 };
+int gFunk_groove_flags[30];
+char gDef_def_water_screen_name[32];
+br_material* gDestn_screen_mat;
+br_material* gSource_screen_mat;
 int gCurrent_race_file_index;
 int gGroove_funk_offset;
 int gDemo_armour;
 int gDemo_rank;
-int gDecode_thing = '@';
 int gDemo_opponents[5];
 int gDemo_power;
 int gDemo_offensive;
-char gDecode_string[] = { 0x9B, 0x52, 0x93, 0x9F, 0x52, 0x98, 0x9B, 0x96, 0x96, 0x9E, 0x9B, 0xA0, 0x99, 0x0 };
 
 #define DOUBLESIDED_FLAG_COLOR_MAP (br_pixelmap*)12345
 

@@ -2,12 +2,12 @@
 #include <stdlib.h>
 
 int gKey_defns[18];
-tRadio_bastards gRadio_bastards[13];
+tRadio_bastards gRadio_bastards__options[13]; // suffix added to avoid duplicate symbol
 int gKey_count;
-int gLast_graph_sel;
+int gLast_graph_sel__options; // suffix added to avoid duplicate symbol
 char* gKey_names[125];
 int gPending_entry;
-tInterface_spec* gThe_interface_spec;
+tInterface_spec* gThe_interface_spec__options; // suffix added to avoid duplicate symbol
 int gOrig_key_mapping[67];
 br_pixelmap* gDials_pix;
 int gCurrent_key;
@@ -104,13 +104,13 @@ void PlayRadioOff2(int pIndex, int pValue) {
 }
 
 // IDA: void __usercall PlayRadioOn(int pIndex@<EAX>, int pValue@<EDX>)
-void PlayRadioOn(int pIndex, int pValue) {
+void PlayRadioOn__options(int pIndex, int pValue) {
     LOG_TRACE("(%d, %d)", pIndex, pValue);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall PlayRadioOff(int pIndex@<EAX>, int pValue@<EDX>)
-void PlayRadioOff(int pIndex, int pValue) {
+void PlayRadioOff__options(int pIndex, int pValue) {
     LOG_TRACE("(%d, %d)", pIndex, pValue);
     NOT_IMPLEMENTED();
 }
@@ -164,6 +164,27 @@ int RadioClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_o
 // IDA: int __usercall GraphOptGoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int GraphOptGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
+    NOT_IMPLEMENTED();
+}
+
+//IDA: void __usercall PlotAGraphBox(int pIndex@<EAX>, int pColour_value@<EDX>)
+// Suffix added to avoid duplicate symbol
+void PlotAGraphBox__options(int pIndex, int pColour_value) {
+    LOG_TRACE("(%d, %d)", pIndex, pColour_value);
+    NOT_IMPLEMENTED();
+}
+
+//IDA: void __usercall DrawAGraphBox(int pIndex@<EAX>)
+// Suffix added to avoid duplicate symbol
+void DrawAGraphBox__options(int pIndex) {
+    LOG_TRACE("(%d)", pIndex);
+    NOT_IMPLEMENTED();
+}
+
+//IDA: void __usercall EraseAGraphBox(int pIndex@<EAX>)
+// Suffix added to avoid duplicate symbol
+void EraseAGraphBox__options(int pIndex) {
+    LOG_TRACE("(%d)", pIndex);
     NOT_IMPLEMENTED();
 }
 

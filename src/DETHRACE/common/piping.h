@@ -4,6 +4,42 @@
 #include "br_types.h"
 #include "dr_types.h"
 
+extern tU8* gPipe_buffer_start;
+extern int gDisable_sound;
+extern int gDisable_advance;
+extern int gMax_rewind_chunks;
+extern float gWall_severity;
+extern tPipe_reset_proc* gReset_procs[32];
+extern tPiped_registration_snapshot gRegistration_snapshots[5];
+extern tPipe_smudge_data* gSmudge_space;
+extern tU32 gOldest_time;
+extern int gCurrent_snapshot_registration_index;
+extern tPipe_chunk* gMr_chunky;
+extern tCar_spec* gCar_ptr;
+extern br_vector3 gZero_vector;
+extern tPipe_chunk_type gReentrancy_array[5];
+extern tU32 gLast_time;
+extern tPipe_model_geometry_data* gModel_geometry_space;
+extern tU32 gEnd_time;
+extern tU32 gTrigger_time;
+extern int gReentrancy_count;
+extern br_vector3 gCar_pos;
+extern br_vector3 gReference_pos;
+extern br_scalar gMax_distance;
+extern tU32 gLoop_abort_time;
+extern br_vector3 gWall_impact_point;
+extern tU8* gPipe_buffer_working_end;
+extern tU32 gYoungest_time;
+extern tU8* gPipe_buffer_phys_end;
+extern tU8* gLocal_buffer_record_ptr;
+extern tU8* gPipe_play_ptr;
+extern tU8* gEnd_of_session;
+extern tU8* gPipe_record_ptr;
+extern tU8* gPipe_buffer_oldest;
+extern tU32 gPipe_buffer_size;
+extern tU8* gLocal_buffer;
+extern tU32 gLocal_buffer_size;
+
 void GetReducedPos(br_vector3* v, tReduced_pos* p);
 
 void SaveReducedPos(tReduced_pos* p, br_vector3* v);

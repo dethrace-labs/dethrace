@@ -1,7 +1,6 @@
 #include "angles.h"
 #include "harness_trace.h"
 
-char rscid[48];
 order_info OrderAxes[32];
 
 // IDA: br_matrix34* __cdecl BrEulerToMatrix34(br_matrix34 *mat, br_euler *euler)

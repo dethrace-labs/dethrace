@@ -4,8 +4,6 @@
 #include <stdio.h>
 #include <unistd.h>
 
-char rscid[49];
-
 // IDA: void __cdecl BrNewList(br_list *list)
 void BrNewList(br_list* list) {
     list->_null = NULL;

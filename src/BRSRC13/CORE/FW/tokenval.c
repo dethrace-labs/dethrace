@@ -2,8 +2,6 @@
 #include "harness_trace.h"
 #include "resource.h"
 
-char rscid[50];
-
 // IDA: br_tv_template* __cdecl BrTVTemplateAllocate(void *res, br_tv_template_entry *entries, int n_entries)
 br_tv_template* BrTVTemplateAllocate(void* res, br_tv_template_entry* entries, int n_entries) {
     br_tv_template* t;

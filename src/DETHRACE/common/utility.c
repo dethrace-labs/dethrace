@@ -23,13 +23,12 @@
 #define MIN_SERVICE_INTERVAL 200
 // <<
 
+int gIn_check_quit;
+tU32 gLost_time;
 tU32 gLong_key[] = { 0x5F991B6C, 0x135FCDB9, 0x0E2004CB, 0x0EA11C5E };
 tU32 gOther_long_key[] = { 0x26D6A867, 0x1B45DDB6, 0x13227E32, 0x3794C215 };
-
+int gEncryption_method;
 char* gMisc_strings[250];
-int gIn_check_quit = 0;
-tU32 gLost_time;
-int gEncryption_method = 0;
 br_pixelmap* g16bit_palette;
 br_pixelmap* gSource_for_16bit_palette;
 

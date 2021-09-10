@@ -4,8 +4,8 @@
 #include "br_types.h"
 #include "dr_types.h"
 
-extern int gGame_scores[6];
 extern int gPowerup_cost[4];
+extern int gGame_scores[6];
 extern int gPed_target;
 extern int gNot_shown_race_type_headup;
 extern tU32 gLast_it_change;
