@@ -331,8 +331,8 @@ void DRMatrix34RotateX(br_matrix34* mat, br_angle rx) {
     s = FastScalarSinAngle(rx);
     c = FastScalarCosAngle(rx);
     mat->m[0][0] = 1.0;
-    mat->m[0][1] = 1.0;
-    mat->m[0][2] = 1.0;
+    mat->m[0][1] = 0.0;
+    mat->m[0][2] = 0.0;
     mat->m[1][0] = 0.0;
     mat->m[1][1] = c;
     mat->m[1][2] = s;
