@@ -12,4 +12,5 @@ Does a `return` at the top of the function in the retail game. Appears to have b
 ### SetFlag2 / ToggleFlying
 TBA
 
-
+### DoDemo
+Reads `DEMOFILE.TXT` which lists a number of `.CNT` files. Each `.CNT` file appears to contain a number of full-screen background images which are displayed as a slideshow. Sound ID `10000` is played during the slideshow.

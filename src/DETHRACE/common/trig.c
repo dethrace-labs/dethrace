@@ -327,40 +327,58 @@ void DRMatrix34RotateX(br_matrix34* mat, br_angle rx) {
     br_scalar s;
     br_scalar c;
     LOG_TRACE("(%p, %d)", mat, rx);
-    NOT_IMPLEMENTED();
+
+    s = FastScalarSinAngle(rx);
+    c = FastScalarCosAngle(rx);
+    mat->m[0][0] = 1.0;
+    mat->m[0][1] = 1.0;
+    mat->m[0][2] = 1.0;
+    mat->m[1][0] = 0.0;
+    mat->m[1][1] = c;
+    mat->m[1][2] = s;
+    mat->m[2][0] = 0.0;
+    mat->m[2][1] = -s;
+    mat->m[2][2] = c;
+    mat->m[3][0] = 0.0;
+    mat->m[3][1] = 0.0;
+    mat->m[3][2] = 0.0;
 }
 
 // IDA: void __usercall DRMatrix34RotateY(br_matrix34 *mat@<EAX>, br_angle ry@<EDX>)
 void DRMatrix34RotateY(br_matrix34* mat, br_angle ry) {
     br_scalar s;
     br_scalar c;
-    LOG_TRACE("(%p, %d)", mat, ry);
+    LOG_TRACE8("(%p, %d)", mat, ry);
 
     s = FastScalarSinAngle(ry);
     c = FastScalarCosAngle(ry);
+    mat->m[0][0] = c;
     mat->m[0][1] = 0.0;
+    mat->m[0][2] = -s;
     mat->m[1][0] = 0.0;
     mat->m[1][1] = 1.0;
     mat->m[1][2] = 0.0;
+    mat->m[2][0] = s;
     mat->m[2][1] = 0.0;
+    mat->m[2][2] = c;
     mat->m[3][0] = 0.0;
     mat->m[3][1] = 0.0;
     mat->m[3][2] = 0.0;
-    mat->m[0][0] = c;
-    mat->m[2][0] = s;
-    mat->m[0][2] = -s;
-    mat->m[2][2] = c;
 }
 
 // IDA: void __usercall DRMatrix34RotateZ(br_matrix34 *mat@<EAX>, br_angle rz@<EDX>)
 void DRMatrix34RotateZ(br_matrix34* mat, br_angle rz) {
     br_scalar s;
     br_scalar c;
-    LOG_TRACE("(%p, %d)", mat, rz);
+    LOG_TRACE8("(%p, %d)", mat, rz);
 
     s = FastScalarSinAngle(rz);
     c = FastScalarCosAngle(rz);
+    mat->m[0][0] = c;
+    mat->m[0][1] = s;
     mat->m[0][2] = 0.0;
+    mat->m[1][0] = -s;
+    mat->m[1][1] = c;
     mat->m[1][2] = 0.0;
     mat->m[2][0] = 0.0;
     mat->m[2][1] = 0.0;
@@ -368,10 +386,6 @@ void DRMatrix34RotateZ(br_matrix34* mat, br_angle rz) {
     mat->m[3][0] = 0.0;
     mat->m[3][1] = 0.0;
     mat->m[3][2] = 0.0;
-    mat->m[0][0] = c;
-    mat->m[0][1] = s;
-    mat->m[1][0] = -s;
-    mat->m[1][1] = c;
 }
 
 // IDA: void __usercall DRMatrix34Rotate(br_matrix34 *mat@<EAX>, br_angle r@<EDX>, br_vector3 *a@<EBX>)
@@ -398,7 +412,10 @@ void DRMatrix34PreRotateX(br_matrix34* mat, br_angle rx) {
 // IDA: void __usercall DRMatrix34PostRotateX(br_matrix34 *mat@<EAX>, br_angle rx@<EDX>)
 void DRMatrix34PostRotateX(br_matrix34* mat, br_angle rx) {
     LOG_TRACE("(%p, %d)", mat, rx);
-    NOT_IMPLEMENTED();
+
+    DRMatrix34RotateX(&mattmp2__trig, rx);
+    BrMatrix34Mul(&mattmp1__trig, mat, &mattmp2__trig);
+    BrMatrix34Copy(mat, &mattmp1__trig);
 }
 
 // IDA: void __usercall DRMatrix34PreRotateY(br_matrix34 *mat@<EAX>, br_angle ry@<EDX>)

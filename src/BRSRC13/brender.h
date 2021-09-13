@@ -77,6 +77,9 @@ void BrMatrix34LPNormalise(br_matrix34* A, br_matrix34* B);
 void BrMatrix34PreRotate(br_matrix34* mat, br_angle r, br_vector3* axis);
 void BrMatrix34Rotate(br_matrix34* mat, br_angle r, br_vector3* a);
 void BrMatrix34PreTranslate(br_matrix34* mat, br_scalar x, br_scalar y, br_scalar z);
+void BrMatrix34PostShearX(br_matrix34* mat, br_scalar sy, br_scalar sz);
+void BrMatrix34PostShearY(br_matrix34* mat, br_scalar sx, br_scalar sz);
+void BrMatrix34PostShearZ(br_matrix34* mat, br_scalar sx, br_scalar sy);
 
 // BrMem
 void BrMemFree(void* block);
