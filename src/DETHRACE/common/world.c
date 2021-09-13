@@ -2868,9 +2868,14 @@ void ObjectGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pM
     br_scalar x_size;
     br_scalar y_size;
     br_scalar z_size;
-    br_scalar pos = 0;
+    br_scalar pos;
     br_bounds* bounds;
     LOG_TRACE("(%p, %d, %p, %d)", pGroove, pTime, pMat, pInterrupt_it);
+
+    x_size = 0;
+    y_size = 0;
+    z_size = 0;
+    pos = 0;
 
     switch (pGroove->object_type) {
     case eGroove_object_spin:
@@ -2934,7 +2939,7 @@ void ObjectGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pM
                 }
             }
             DRMatrix34PostRotateZ(pMat, BrDegreeToAngle(pos));
-        } else if (pGroove->object_data.spin_info.axis == eAxis_x) {
+        } else if (pGroove->object_data.spin_info.axis == eGroove_axis_x) {
             if (pGroove->object_mode == eMove_continuous) {
                 if (pGroove->object_data.spin_info.period != 0.0) {
                     pos = fmod(pTime, pGroove->object_data.spin_info.period) / pGroove->object_data.spin_info.period * 360.0;
@@ -3030,9 +3035,6 @@ void ObjectGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pM
         }
         break;
     case eGroove_object_throb:
-        x_size = 0;
-        y_size = 0;
-        z_size = 0;
         if (pGroove->object_mode == eMove_continuous) {
             if (pGroove->object_data.throb_info.z_period != 0.0) {
                 z_size = fmod(pTime, pGroove->object_data.throb_info.z_period) / pGroove->object_data.throb_info.z_period * pGroove->object_data.throb_info.z_magnitude;
