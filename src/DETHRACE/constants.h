@@ -292,4 +292,6 @@ typedef enum keymapcodes {
 
 #define TIME_CONV_THING 0.00050000002
 
+#define OPPONENT_COUNT 0
+
 #endif

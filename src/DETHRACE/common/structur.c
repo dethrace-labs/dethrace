@@ -182,7 +182,7 @@ void SelectOpponents(tRace_info* pRace_info) {
 
     had_scum = 0;
     if (!gNet_mode) {
-        pRace_info->number_of_racers = 5;
+        pRace_info->number_of_racers = OPPONENT_COUNT;
         for (i = 0; i < gNumber_of_racers; ++i) {
             gOpponents[i].picked = 0;
         }
@@ -191,7 +191,7 @@ void SelectOpponents(tRace_info* pRace_info) {
         } else {
             rank_band = gRace_list[gProgram_state.current_race_index].suggested_rank / 10;
         }
-        for (i = 0; i < 5; i++) {
+        for (i = 0; i < OPPONENT_COUNT; i++) {
             nastiness = gOpponent_mix[rank_band][i];
             pRace_info->opponent_list[i].index = ChooseOpponent(nastiness, &had_scum);
             pRace_info->opponent_list[i].ranking = IRandomBetween(gProgram_state.rank - 10, gProgram_state.rank + 10);

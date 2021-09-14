@@ -665,6 +665,8 @@ def generate_h_file(module):
     s = resolve_type_str(module, gv['type'], name)
     h_file.write('extern ' + s)
     h_file.write(';')
+
+    h_file.write(' // addr: ' + gv['addr'][5:])
     if '__' in name:
       h_file.write(' // suffix added to avoid duplicate symbol')
     h_file.write('\n')

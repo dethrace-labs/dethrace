@@ -206,19 +206,55 @@ void BrMatrix34Scale(br_matrix34* mat, br_scalar sx, br_scalar sy, br_scalar sz)
 // IDA: void __cdecl BrMatrix34ShearX(br_matrix34 *mat, br_scalar sy, br_scalar sz)
 void BrMatrix34ShearX(br_matrix34* mat, br_scalar sy, br_scalar sz) {
     LOG_TRACE("(%p, %f, %f)", mat, sy, sz);
-    NOT_IMPLEMENTED();
+
+    M(0, 0) = 1;
+    M(0, 1) = sy;
+    M(0, 2) = sz;
+    M(1, 0) = 0;
+    M(1, 1) = 1;
+    M(1, 2) = 0;
+    M(2, 0) = 0;
+    M(2, 1) = 0;
+    M(2, 2) = 1;
+    M(3, 0) = 0;
+    M(3, 1) = 0;
+    M(3, 2) = 0;
 }
 
 // IDA: void __cdecl BrMatrix34ShearY(br_matrix34 *mat, br_scalar sx, br_scalar sz)
 void BrMatrix34ShearY(br_matrix34* mat, br_scalar sx, br_scalar sz) {
     LOG_TRACE("(%p, %f, %f)", mat, sx, sz);
-    NOT_IMPLEMENTED();
+
+    M(0, 0) = 1;
+    M(0, 1) = 0;
+    M(0, 2) = 0;
+    M(1, 0) = sx;
+    M(1, 1) = 1;
+    M(1, 2) = sz;
+    M(2, 0) = 0;
+    M(2, 1) = 0;
+    M(2, 2) = 1;
+    M(3, 0) = 0;
+    M(3, 1) = 0;
+    M(3, 2) = 0;
 }
 
 // IDA: void __cdecl BrMatrix34ShearZ(br_matrix34 *mat, br_scalar sx, br_scalar sy)
 void BrMatrix34ShearZ(br_matrix34* mat, br_scalar sx, br_scalar sy) {
     LOG_TRACE("(%p, %f, %f)", mat, sx, sy);
-    NOT_IMPLEMENTED();
+
+    M(0, 0) = 1;
+    M(0, 1) = 0;
+    M(0, 2) = 0;
+    M(1, 0) = 0;
+    M(1, 1) = 1;
+    M(1, 2) = 0;
+    M(2, 0) = sx;
+    M(2, 1) = sy;
+    M(2, 2) = 1;
+    M(3, 0) = 0;
+    M(3, 1) = 0;
+    M(3, 2) = 0;
 }
 
 // IDA: br_scalar __cdecl BrMatrix34Inverse(br_matrix34 *B, br_matrix34 *A)
@@ -527,7 +563,10 @@ void BrMatrix34PreShearX(br_matrix34* mat, br_scalar sy, br_scalar sz) {
 // IDA: void __cdecl BrMatrix34PostShearX(br_matrix34 *mat, br_scalar sy, br_scalar sz)
 void BrMatrix34PostShearX(br_matrix34* mat, br_scalar sy, br_scalar sz) {
     LOG_TRACE("(%p, %f, %f)", mat, sy, sz);
-    NOT_IMPLEMENTED();
+
+    BrMatrix34ShearX(&mattmp1, sy, sz);
+    BrMatrix34Mul(&mattmp2, mat, &mattmp1);
+    BrMatrix34Copy(mat, &mattmp2);
 }
 
 // IDA: void __cdecl BrMatrix34PreShearY(br_matrix34 *mat, br_scalar sx, br_scalar sz)
@@ -539,7 +578,10 @@ void BrMatrix34PreShearY(br_matrix34* mat, br_scalar sx, br_scalar sz) {
 // IDA: void __cdecl BrMatrix34PostShearY(br_matrix34 *mat, br_scalar sx, br_scalar sz)
 void BrMatrix34PostShearY(br_matrix34* mat, br_scalar sx, br_scalar sz) {
     LOG_TRACE("(%p, %f, %f)", mat, sx, sz);
-    NOT_IMPLEMENTED();
+
+    BrMatrix34ShearY(&mattmp1, sx, sz);
+    BrMatrix34Mul(&mattmp2, mat, &mattmp1);
+    BrMatrix34Copy(mat, &mattmp2);
 }
 
 // IDA: void __cdecl BrMatrix34PreShearZ(br_matrix34 *mat, br_scalar sx, br_scalar sy)
@@ -551,5 +593,8 @@ void BrMatrix34PreShearZ(br_matrix34* mat, br_scalar sx, br_scalar sy) {
 // IDA: void __cdecl BrMatrix34PostShearZ(br_matrix34 *mat, br_scalar sx, br_scalar sy)
 void BrMatrix34PostShearZ(br_matrix34* mat, br_scalar sx, br_scalar sy) {
     LOG_TRACE("(%p, %f, %f)", mat, sx, sy);
-    NOT_IMPLEMENTED();
+
+    BrMatrix34ShearZ(&mattmp1, sx, sy);
+    BrMatrix34Mul(&mattmp2, mat, &mattmp1);
+    BrMatrix34Copy(mat, &mattmp2);
 }
