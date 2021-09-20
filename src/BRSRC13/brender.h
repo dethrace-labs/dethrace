@@ -53,7 +53,7 @@ void BrMaterialFree(br_material* m);
 br_uint_32 BrMaterialAddMany(br_material** items, int n);
 br_uint_32 BrMaterialEnum(char* pattern, br_material_enum_cbfn* callback, void* arg);
 
-// BrMatrix
+// BrMatrix34
 void BrMatrix23Identity(br_matrix23* mat);
 
 void BrMatrix34Identity(br_matrix34* mat);
@@ -80,6 +80,11 @@ void BrMatrix34PreTranslate(br_matrix34* mat, br_scalar x, br_scalar y, br_scala
 void BrMatrix34PostShearX(br_matrix34* mat, br_scalar sy, br_scalar sz);
 void BrMatrix34PostShearY(br_matrix34* mat, br_scalar sx, br_scalar sz);
 void BrMatrix34PostShearZ(br_matrix34* mat, br_scalar sx, br_scalar sy);
+
+// BrMatrix4
+void BrMatrix4Copy(br_matrix4* A, br_matrix4* B);
+br_scalar BrMatrix4Inverse(br_matrix4* A, br_matrix4* B);
+void BrMatrix4TApply(br_vector4* A, br_vector4* B, br_matrix4* C);
 
 // BrMem
 void BrMemFree(void* block);

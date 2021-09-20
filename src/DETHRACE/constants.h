@@ -294,4 +294,10 @@ typedef enum keymapcodes {
 
 #define OPPONENT_COUNT 0
 
+#define WORLD_SCALE 6.9000001
+
+#define DOUBLESIDED_FLAG_COLOR_MAP (br_pixelmap*)12345
+
+#define SLOBYTE(x) (*((signed char*)&(x)))
+
 #endif

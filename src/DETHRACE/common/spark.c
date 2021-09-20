@@ -155,7 +155,7 @@ void CreateSparks(br_vector3* pos, br_vector3* v, br_vector3* pForce, br_scalar 
     int num;
     int i;
     LOG_TRACE("(%p, %p, %p, %f, %p)", pos, v, pForce, sparkiness, pCar);
-    NOT_IMPLEMENTED();
+    STUB();
 }
 
 // IDA: void __usercall CreateSparkShower(br_vector3 *pos@<EAX>, br_vector3 *v@<EDX>, br_vector3 *pForce@<EBX>, tCar_spec *pCar1@<ECX>, tCar_spec *pCar2)
