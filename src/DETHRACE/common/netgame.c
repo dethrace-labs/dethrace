@@ -151,7 +151,7 @@ void DoNetworkHeadups(int pCredits) {
     static tU32 last_flash;
     static int flash_state;
     LOG_TRACE("(%d)", pCredits);
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: int __usercall SortNetHeadAscending@<EAX>(void *pFirst_one@<EAX>, void *pSecond_one@<EDX>)
@@ -295,7 +295,7 @@ void SendPlayerScores() {
 // IDA: void __cdecl DoNetGameManagement()
 void DoNetGameManagement() {
     LOG_TRACE("()");
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall InitialisePlayerScore(tNet_game_player_info *pPlayer@<EAX>)
@@ -381,7 +381,7 @@ void SendGameplayToAllPlayers(tNet_gameplay_mess pMess, int pParam_1, int pParam
     tNet_message* the_message;
     LOG_TRACE("(%d, %d, %d, %d, %d)", pMess, pParam_1, pParam_2, pParam_3, pParam_4);
 
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall SendGameplayToHost(tNet_gameplay_mess pMess@<EAX>, int pParam_1@<EDX>, int pParam_2@<EBX>, int pParam_3@<ECX>, int pParam_4)

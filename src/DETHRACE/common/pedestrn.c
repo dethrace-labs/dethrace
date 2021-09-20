@@ -386,7 +386,7 @@ void MungePedestrianSequence(tPedestrian_data* pPedestrian, int pAction_changed)
     float heading_difference;
     tPedestrian_sequence* sequence_ptr;
     LOG_TRACE("(%p, %d)", pPedestrian, pAction_changed);
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall DetachPedFromCar(tPedestrian_data *pPedestrian@<EAX>)
@@ -735,7 +735,7 @@ void MungePedestrians(tU32 pFrame_period) {
     br_scalar z_delta;
     tS32 diff;
     LOG_TRACE("(%d)", pFrame_period);
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __cdecl RespawnPedestrians()
@@ -1581,7 +1581,7 @@ void RenderProximityRays(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer
     br_scalar distance;
     br_scalar t;
     LOG_TRACE("(%p, %p, %p, %p, %d)", pRender_screen, pDepth_buffer, pCamera, pCamera_to_world, pTime);
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall AdjustProxRay(int pRay_index@<EAX>, tU16 pCar_ID@<EDX>, tU16 pPed_index@<EBX>, tU32 pTime@<ECX>)

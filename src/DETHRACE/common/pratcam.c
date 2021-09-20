@@ -20,7 +20,7 @@ int gCurrent_pratcam_alternative;
 int PratcamGetCurrent() {
     LOG_TRACE("()");
 
-    SILENT_STUB();
+    STUB_ONCE();
     return 0;
 }
 
@@ -28,7 +28,7 @@ int PratcamGetCurrent() {
 int PratcamGetAmbient() {
     LOG_TRACE("()");
 
-    SILENT_STUB();
+    STUB_ONCE();
     return 0;
 }
 
@@ -36,7 +36,7 @@ int PratcamGetAmbient() {
 int PratcamGetPending() {
     LOG_TRACE("()");
 
-    SILENT_STUB();
+    STUB_ONCE();
     return 0;
 }
 
@@ -151,7 +151,7 @@ void DoPratcam(tU32 pThe_time) {
     br_pixelmap* left_image;
     br_pixelmap* right_image;
     LOG_TRACE("(%d)", pThe_time);
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall TestPratCam(int pIndex@<EAX>)

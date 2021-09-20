@@ -54,12 +54,10 @@ void debug_print_matrix34(const char* fmt, const char* fn, char* name, br_matrix
     debug_printf("\033[0;31m[PANIC] %s ", __FUNCTION__, "%s", "code path not expected"); \
     exit(1);
 
-#define STUB()                                                               \
-    if (harness_debug_level >= 5) {                                          \
-        debug_printf("\033[0;31m[WARN] %s ", __FUNCTION__, "%s", "stubbed"); \
-    }
+#define STUB() \
+    debug_printf("\033[0;31m[WARN] %s ", __FUNCTION__, "%s", "stubbed");
 
-#define SILENT_STUB()                                                        \
+#define STUB_ONCE()                                                          \
     static int stub_printed = 0;                                             \
     if (!stub_printed) {                                                     \
         debug_printf("\033[0;31m[WARN] %s ", __FUNCTION__, "%s", "stubbed"); \

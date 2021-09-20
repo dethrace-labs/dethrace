@@ -195,7 +195,7 @@ void ToggleSoundEnable() {
 // IDA: void __cdecl SoundService()
 void SoundService() {
     br_matrix34 mat;
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __cdecl InitSoundSources()
@@ -252,7 +252,7 @@ void MungeEngineNoise() {
     int stop_all;
     int type_of_engine_noise;
     tS3_sound_id engine_noise;
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __cdecl SetSoundVolumes()

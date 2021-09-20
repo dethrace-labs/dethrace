@@ -707,7 +707,7 @@ void RememberSafePosition(tCar_spec* car, tU32 pTime) {
     br_scalar ts;
     LOG_TRACE("(%p, %d)", car, pTime);
 
-    STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall ControlOurCar(tU32 pTime_difference@<EAX>)
@@ -1197,7 +1197,7 @@ void MungeSpecialVolume(tCollision_info* pCar) {
     tCar_spec* car;
     LOG_TRACE("(%p)", pCar);
 
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall ResetCarSpecialVolume(tCollision_info *pCar@<EAX>)
@@ -1231,7 +1231,7 @@ void TestAutoSpecialVolume(tCollision_info* pCar) {
     int i;
     LOG_TRACE("(%p)", pCar);
 
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall MoveAndCollideCar(tCar_spec *car@<EAX>, br_scalar dt)
@@ -1660,7 +1660,7 @@ void DoBumpiness(tCar_spec* c, br_vector3* wheel_pos, br_vector3* norm, br_scala
     tMaterial_modifiers* mat_list;
     LOG_TRACE("(%p, %p, %p, %p, %d)", c, wheel_pos, norm, d, n);
 
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall CalcForce(tCar_spec *c@<EAX>, br_scalar dt)
@@ -2431,39 +2431,30 @@ void DoRevs(tCar_spec* c, br_scalar dt) {
     if (c->target_revs < 0.0) {
         c->target_revs = 0.0;
         c->gear = 0;
-        LOG_DEBUG("changedown2");
     }
     if (!c->number_of_wheels_on_ground || ((c->wheel_slip & 2) + 1) != 0 || !c->gear) {
         if (c->number_of_wheels_on_ground) {
-            //LOG_DEBUG("spin1");
             wheel_spin_force = c->force_torque_ratio * c->torque - (double)c->gear * c->acc_force;
         } else {
             wheel_spin_force = c->force_torque_ratio * c->torque;
-            LOG_DEBUG("spin2");
         }
         if (c->gear) {
             if (c->gear < 2 && (c->keys.dec || c->joystick.dec > 0) && fabs(ts) < 1.0 && c->revs > 1000.0) {
-                LOG_DEBUG("something 2");
                 c->gear = -c->gear;
             }
         } else {
             if (c->revs > 1000.0 && !c->keys.brake && (c->keys.acc || c->joystick.acc > 0) && !gCountdown) {
                 if (c->keys.backwards) {
-                    LOG_DEBUG("change_down3");
                     c->gear = -1;
                 } else {
-                    LOG_DEBUG("change_up2");
                     c->gear = 1;
                 }
             }
             wheel_spin_force = c->force_torque_ratio * c->torque;
         }
-        //LOG_DEBUG("setting revs %f. torque %f", wheel_spin_force, c->torque);
-        //printf("revs 0 %f, torque %f acc_force %f\n", c->revs, c->torque, c->acc_force);
         c->revs = wheel_spin_force / c->force_torque_ratio * dt / 0.0002 + c->revs;
-        //printf("revs 1 %f\n", c->revs);
+
         if (c->traction_control && wheel_spin_force > 0.0 && c->revs > c->target_revs && c->gear && c->target_revs > 1000.0) {
-            LOG_DEBUG("revs = target_revs");
             c->revs = c->target_revs;
         }
         if (c->revs <= 0.0) {
@@ -2472,7 +2463,6 @@ void DoRevs(tCar_spec* c, br_scalar dt) {
     }
     if ((c->wheel_slip & 2) == 0 && c->target_revs > 6000.0 && c->revs > 6000.0 && c->gear < c->max_gear && c->gear > 0 && !c->just_changed_gear) {
         c->gear++;
-        LOG_DEBUG("gear_up");
     }
     if (c->gear > 1 && c->target_revs < 3000.0 && !c->just_changed_gear) {
         c->gear--;
@@ -2486,14 +2476,6 @@ void DoRevs(tCar_spec* c, br_scalar dt) {
     if (c->revs >= 6000.0 && (c->keys.acc || c->joystick.acc > 0)) {
         c->just_changed_gear = 0;
     }
-
-    //LOG_DEBUG("target_revs %f, %f, ac %d", c->target_revs, c->revs, c->keys.acc);
-
-    // if (c->driver == eDriver_local_human) {
-    //     char s[256];
-    //     sprintf(s, "gear %d, speed %f, rpm: %f", c->gear, c->speed, c->revs);
-    //     ChangeHeadupText(gProgram_state.frame_rate_headup, s);
-    // }
 }
 
 // IDA: void __usercall ApplyTorque(tCar_spec *c@<EAX>, br_vector3 *tdt@<EDX>)
@@ -3059,7 +3041,62 @@ br_scalar AddFriction(tCollision_info* c, br_vector3* vel, br_vector3* normal_fo
     br_scalar ts;
     br_scalar point_vel;
     LOG_TRACE("(%p, %p, %p, %p, %f, %p)", c, vel, normal_force, pos, total_force, max_friction);
-    //NOT_IMPLEMENTED();
+
+    ts = (normal_force->v[1] * vel->v[1] + normal_force->v[2] * vel->v[2] + normal_force->v[0] * vel->v[0])
+        / (normal_force->v[1] * normal_force->v[1]
+            + normal_force->v[2] * normal_force->v[2]
+            + normal_force->v[0] * normal_force->v[0]);
+    tv.v[0] = normal_force->v[0] * ts;
+    tv.v[1] = normal_force->v[1] * ts;
+    tv.v[2] = normal_force->v[2] * ts;
+    vel->v[0] = vel->v[0] - tv.v[0];
+    vel->v[1] = vel->v[1] - tv.v[1];
+    vel->v[2] = vel->v[2] - tv.v[2];
+    point_vel = total_force * 0.34999999 * gCurrent_race.material_modifiers[gMaterial_index].car_wall_friction;
+    ts = sqrt(vel->v[1] * vel->v[1] + vel->v[2] * vel->v[2] + vel->v[0] * vel->v[0]);
+    if (ts < 0.000099999997) {
+        max_friction->v[0] = 0.0;
+        max_friction->v[1] = 0.0;
+        max_friction->v[2] = 0.0;
+        return 0.0;
+    }
+    ts = 1.0 / -ts;
+    max_friction->v[0] = vel->v[0] * ts;
+    max_friction->v[1] = vel->v[1] * ts;
+    max_friction->v[2] = vel->v[2] * ts;
+    ftau.v[0] = pos->v[1] * max_friction->v[2] - pos->v[2] * max_friction->v[1];
+    ftau.v[1] = pos->v[2] * max_friction->v[0] - pos->v[0] * max_friction->v[2];
+    ftau.v[2] = pos->v[0] * max_friction->v[1] - pos->v[1] * max_friction->v[0];
+    ftau.v[0] = c->M * ftau.v[0];
+    ftau.v[1] = c->M * ftau.v[1];
+    ftau.v[2] = c->M * ftau.v[2];
+    ftau.v[0] = ftau.v[0] / c->I.v[0];
+    ftau.v[1] = ftau.v[1] / c->I.v[1];
+    ftau.v[2] = ftau.v[2] / c->I.v[2];
+    ts = 1.0 / c->M;
+    norm.v[0] = pos->v[2] * ftau.v[1] - pos->v[1] * ftau.v[2];
+    norm.v[1] = pos->v[0] * ftau.v[2] - pos->v[2] * ftau.v[0];
+    norm.v[2] = pos->v[1] * ftau.v[0] - pos->v[0] * ftau.v[1];
+    ts = max_friction->v[0] * norm.v[0] + max_friction->v[1] * norm.v[1] + max_friction->v[2] * norm.v[2] + ts;
+    if (fabs(ts) <= 0.000099999997) {
+        ts = 0.0;
+    } else {
+        ts = -((max_friction->v[1] * vel->v[1] + max_friction->v[2] * vel->v[2] + max_friction->v[0] * vel->v[0]) / ts);
+    }
+    if (ts > point_vel) {
+        ts = point_vel;
+    }
+    max_friction->v[0] = max_friction->v[0] * ts;
+    max_friction->v[1] = max_friction->v[1] * ts;
+    max_friction->v[2] = max_friction->v[2] * ts;
+    tv.v[0] = pos->v[1] * max_friction->v[2] - pos->v[2] * max_friction->v[1];
+    tv.v[1] = pos->v[2] * max_friction->v[0] - pos->v[0] * max_friction->v[2];
+    tv.v[2] = pos->v[0] * max_friction->v[1] - pos->v[1] * max_friction->v[0];
+    tv.v[0] = c->M * tv.v[0];
+    tv.v[1] = c->M * tv.v[1];
+    tv.v[2] = c->M * tv.v[2];
+    ApplyTorque((tCar_spec*)c, &tv);
+    return point_vel;
 }
 
 // IDA: void __usercall AddFrictionCarToCar(tCollision_info *car1@<EAX>, tCollision_info *car2@<EDX>, br_vector3 *vel1@<EBX>, br_vector3 *vel2@<ECX>, br_vector3 *normal_force1, br_vector3 *pos1, br_vector3 *pos2, br_scalar total_force, br_vector3 *max_friction)
@@ -3103,14 +3140,14 @@ void SkidNoise(tCar_spec* pC, int pWheel_num, br_scalar pV, int material) {
     int i;
     LOG_TRACE("(%p, %d, %f, %d)", pC, pWheel_num, pV, material);
 
-    STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall StopSkid(tCar_spec *pC@<EAX>)
 void StopSkid(tCar_spec* pC) {
     LOG_TRACE("(%p)", pC);
 
-    STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall CrashNoise(br_vector3 *pForce@<EAX>, br_vector3 *position@<EDX>, int material@<EBX>)
@@ -3309,7 +3346,41 @@ br_scalar FourPointColl(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* t
     int l;
     br_scalar ts;
     LOG_TRACE("(%p, %p, %p, %p, %p, %p)", f, m, d, tau, n, c);
-    NOT_IMPLEMENTED();
+
+    ts = ThreePointColl(f, m, d);
+    if (*f < 0.0 || f[1] < 0.0 || f[2] < 0.0 || ts < 0.000001) {
+        if (ts >= 0.000001) {
+            if (*f >= 0.0) {
+                if (f[1] >= 0.0) {
+                    j = 2;
+                } else {
+                    j = 1;
+                }
+            } else {
+                j = 0;
+            }
+        } else {
+            j = 3;
+        }
+        for (i = j; i < 3; ++i) {
+            for (l = 0; l < 4; ++l) {
+                m->m[i][l] = m->m[i + 1][l];
+            }
+            d[i] = d[i + 1];
+            tau[i] = tau[i + 1];
+            n[i] = n[i + 1];
+            d[i] = d[i + 1];
+        }
+        for (i = j; i < 3; ++i) {
+            for (l = 0; l < 3; ++l) {
+                m->m[l][i] = m->m[l][i + 1];
+            }
+        }
+        return ThreePointCollRec(f, m, d, tau, n, c);
+    } else {
+        c->infinite_mass = 256;
+        return ts;
+    }
 }
 
 // IDA: void __usercall MultiFindFloorInBoxM(int pNum_rays@<EAX>, br_vector3 *a@<EDX>, br_vector3 *b@<EBX>, br_vector3 *nor@<ECX>, br_scalar *d, tCar_spec *c, int *mat_ref)
@@ -3932,7 +4003,7 @@ void SetAmbientPratCam(tCar_spec* pCar) {
     static tU32 last_time_on_ground;
     LOG_TRACE("(%p)", pCar);
 
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall MungeCarGraphics(tU32 pFrame_period@<EAX>)
@@ -4243,7 +4314,7 @@ void AmIGettingBoredWatchingCameraSpin() {
     char s[256];
     LOG_TRACE("()");
 
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __cdecl ViewNetPlayer()
@@ -4304,7 +4375,7 @@ void CheckDisablePlingMaterials(tCar_spec* pCar) {
     br_scalar height;
     int i;
     LOG_TRACE("(%p)", pCar);
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall PositionExternalCamera(tCar_spec *c@<EAX>, tU32 pTime@<EDX>)
@@ -4356,7 +4427,7 @@ void CameraBugFix(tCar_spec* c, tU32 pTime) {
     br_matrix34* m2;
     br_vector3 tv;
     LOG_TRACE("(%p, %d)", c, pTime);
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: int __usercall PossibleRemoveNonCarFromWorld@<EAX>(br_actor *pActor@<EAX>)
@@ -5115,7 +5186,7 @@ int CollideCameraWithOtherCars(br_vector3* car_pos, br_vector3* cam_pos) {
     br_bounds bnds;
     LOG_TRACE("(%p, %p)", car_pos, cam_pos);
 
-    SILENT_STUB();
+    STUB_ONCE();
     return 0;
 }
 
@@ -5209,7 +5280,7 @@ void CrashCarsTogether(br_scalar dt) {
     tCollison_data collide_list[32];
     LOG_TRACE("(%f)", dt);
 
-    STUB();
+    STUB_ONCE();
 }
 
 // IDA: int __cdecl CrashCarsTogetherSinglePass(br_scalar dt, int pPass, tCollison_data *collide_list)
@@ -5589,7 +5660,7 @@ void CheckForDeAttachmentOfNonCars(tU32 pTime) {
     br_matrix34 mat;
     LOG_TRACE("(%d)", pTime);
 
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall AdjustNonCar(br_actor *pActor@<EAX>, br_matrix34 *pMat@<EDX>)

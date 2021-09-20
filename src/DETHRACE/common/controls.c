@@ -163,7 +163,7 @@ void FinishLap(int i) {
 // IDA: void __cdecl EnsureSpecialVolumesHidden()
 void EnsureSpecialVolumesHidden() {
     LOG_TRACE("()");
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __cdecl ShowSpecialVolumesIfRequ()
@@ -691,7 +691,7 @@ void CheckRecoveryOfCars(tU32 pEndFrameTime) {
     int time;
     char s[256];
     LOG_TRACE("(%d)", pEndFrameTime);
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall LoseSomePSPowerups(int pNumber@<EAX>)
@@ -722,7 +722,7 @@ void CheckOtherRacingKeys() {
     static int stopped_repairing;
     LOG_TRACE("()");
 
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: int __cdecl CheckRecoverCost()
@@ -1054,7 +1054,7 @@ void ToggleMap() {
     static int old_indent;
     static int was_in_cockpit;
     LOG_TRACE("()");
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: int __cdecl HornBlowing()
@@ -1250,7 +1250,7 @@ void EnterUserMessage() {
     int the_key;
     int abuse_num;
     LOG_TRACE("()");
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __cdecl DisplayUserMessage()

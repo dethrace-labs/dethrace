@@ -219,7 +219,7 @@ void DimRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int p
     int line_skip;
     int width;
     LOG_TRACE9("(%p, %d, %d, %d, %d, %d)", pPixelmap, pLeft, pTop, pRight, pBottom, pKnock_out_corners);
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __cdecl DimAFewBits()
@@ -264,7 +264,7 @@ void DoPSPowerHeadup(int pY, int pLevel, char* pName, int pBar_colour) {
 // IDA: void __cdecl DoPSPowerupHeadups()
 void DoPSPowerupHeadups() {
     LOG_TRACE("()");
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall DoHeadups(tU32 pThe_time@<EAX>)
@@ -890,7 +890,7 @@ void DoDamageScreen(tU32 pThe_time) {
     br_pixelmap* the_image;
     tDamage_unit* the_damage;
     LOG_TRACE("(%d)", pThe_time);
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __cdecl PoshDrawLine(float pAngle, br_pixelmap *pDestn, int pX1, int pY1, int pX2, int pY2, int pColour)
@@ -1147,14 +1147,14 @@ void DoSteeringWheel(tU32 pThe_time) {
     br_pixelmap* hands_image;
     int hands_index;
     LOG_TRACE("(%d)", pThe_time);
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __cdecl ChangingView()
 void ChangingView() {
     tU32 the_time;
     LOG_TRACE("()");
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall EarnCredits2(int pAmount@<EAX>, char *pPrefix_text@<EDX>)

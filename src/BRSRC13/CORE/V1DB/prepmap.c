@@ -17,5 +17,5 @@ void BrBufferUpdate(br_pixelmap* pm, br_token use, br_uint_16 flags) {
 void BrBufferClear(br_pixelmap* pm) {
     LOG_TRACE("(%p)", pm);
 
-    SILENT_STUB();
+    STUB_ONCE();
 }

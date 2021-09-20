@@ -166,7 +166,7 @@ void SkidMark(tCar_spec* pCar, int pWheel_num) {
     br_material* material;
     LOG_TRACE("(%p, %d)", pCar, pWheel_num);
 
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall InitCarSkidStuff(tCar_spec *pCar@<EAX>)
@@ -180,7 +180,7 @@ void InitCarSkidStuff(tCar_spec* pCar) {
 void SkidsPerFrame() {
     int skid;
     LOG_TRACE("()");
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __cdecl RemoveMaterialsFromSkidmarks()
