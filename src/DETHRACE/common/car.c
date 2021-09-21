@@ -3470,6 +3470,7 @@ int FindFloorInBoxBU(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d
     tFace_ref* face_ref;
     LOG_TRACE("(%p, %p, %p, %p, %p)", a, b, nor, d, c);
 
+    j = 0; // added to keep compiler happy
     *d = 2.0;
     for (i = c->box_face_start; i < c->box_face_end; i++) {
         face_ref = &gFace_list__car[i];
@@ -3503,6 +3504,7 @@ int FindFloorInBoxBU2(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* 
     tFace_ref* face_ref;
     LOG_TRACE("(%p, %p, %p, %p, %p)", a, b, nor, d, c);
 
+    j = 0; // added to keep compiler happy
     *d = 2.0;
     for (i = c->box_face_start; i < c->box_face_end; i++) {
         face_ref = &gFace_list__car[i];
@@ -3818,7 +3820,7 @@ int AddEdgeCollPoints(br_vector3* p1, br_vector3* p2, br_bounds* pB, br_matrix34
                             pNorm_list[n + 1].v[2] = pNorm_list[n + 1].v[2] * scale;
                         }
                         d = (plane1 - 1) & 3;
-                        if (pNorm_list[n + 1].v[d] < 0.0 == (plane1 & 4) >> 2) {
+                        if ((pNorm_list[n + 1].v[d] < 0.0) == (plane1 & 4) >> 2) {
                             pNorm_list[n + 1].v[0] = -pNorm_list[n + 1].v[0];
                             pNorm_list[n + 1].v[1] = -pNorm_list[n + 1].v[1];
                             pNorm_list[n + 1].v[2] = -pNorm_list[n + 1].v[2];
@@ -3862,7 +3864,7 @@ int AddEdgeCollPoints(br_vector3* p1, br_vector3* p2, br_bounds* pB, br_matrix34
                         pNorm_list[n + 1].v[2] = pNorm_list[n + 1].v[2] * scale;
                     }
                     d = (plane2 - 1) & 3;
-                    if (pNorm_list[n + 1].v[d] < 0.0 == (plane2 & 4) >> 2) {
+                    if ((pNorm_list[n + 1].v[d] < 0.0) == (plane2 & 4) >> 2) {
                         pNorm_list[n + 1].v[0] = -pNorm_list[n + 1].v[0];
                         pNorm_list[n + 1].v[1] = -pNorm_list[n + 1].v[1];
                         pNorm_list[n + 1].v[2] = -pNorm_list[n + 1].v[2];
