@@ -1375,7 +1375,7 @@ void ChangeAmbience(br_scalar pDelta) {
 void InitAmbience() {
     LOG_TRACE("()");
     gCurrent_ambience = gAmbient_adjustment;
-    return ChangeAmbience(gAmbient_adjustment);
+    ChangeAmbience(gAmbient_adjustment);
 }
 
 // IDA: void __usercall DRPixelmapRectangleMaskedCopy(br_pixelmap *pDest@<EAX>, br_int_16 pDest_x@<EDX>, br_int_16 pDest_y@<EBX>, br_pixelmap *pSource@<ECX>, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight)
@@ -1636,6 +1636,7 @@ int DoMouseCursor() {
     static int zero_count;
     static int button_was_down;
     STUB_ONCE();
+    return 0;
 }
 
 // IDA: int __cdecl AllocateCursorTransient()

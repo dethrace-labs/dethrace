@@ -381,10 +381,7 @@ tSO_result DoAutoPartsShop() {
 // IDA: void __cdecl SetOpponentFlic()
 void SetOpponentFlic() {
     LOG_TRACE("()");
-    return ChangePanelFlic(
-        0,
-        gOpponents[gCurrent_race.opponent_list[gOpponent_index].index].mug_shot_image_data,
-        gOpponents[gCurrent_race.opponent_list[gOpponent_index].index].mug_shot_image_data_length);
+    ChangePanelFlic(0, gOpponents[gCurrent_race.opponent_list[gOpponent_index].index].mug_shot_image_data, gOpponents[gCurrent_race.opponent_list[gOpponent_index].index].mug_shot_image_data_length);
 }
 
 // IDA: void __cdecl DrawSceneyMappyInfoVieweyThing()
