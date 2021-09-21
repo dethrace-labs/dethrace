@@ -17,11 +17,23 @@ if (CMAKE_C_COMPILER_ID MATCHES "Clang")
     target_compile_options(dethrace_obj PRIVATE
         -g
         -Wall
+        -Wno-return-type
+        -Wno-unused-variable
+        -Wno-unused-parameter
+        -Wno-unused-result
+        -Wno-error=sign-compare
     )
 elseif (CMAKE_C_COMPILER_ID STREQUAL "GNU")
     target_compile_options(dethrace_obj PRIVATE
         -g
         -Wall
+        -Wno-return-type
+        -Wno-unused-variable
+        -Wno-unused-parameter
+        -Wno-unused-result
+        -Wno-error=sign-compare
+        -Wno-error=format-overflow
+        -Wno-error=unused-but-set-variable  # (SelectRaceDraw::test2), etc
     )
 else()
     target_compile_definitions(dethrace_obj PRIVATE -D_CRT_SECURE_NO_WARNINGS)
