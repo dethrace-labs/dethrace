@@ -122,8 +122,6 @@ int gDemo_opponents[5];
 int gDemo_power;
 int gDemo_offensive;
 
-#define DOUBLESIDED_FLAG_COLOR_MAP (br_pixelmap*)12345
-
 // IDA: tU32 __usercall ReadU32@<EAX>(FILE *pF@<EAX>)
 tU32 ReadU32(FILE* pF) {
     tU32 raw_long;

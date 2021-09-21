@@ -17,7 +17,6 @@ if (CMAKE_C_COMPILER_ID MATCHES "Clang")
     target_compile_options(dethrace_obj PRIVATE
         -g
         -Wall
-        -Werror
         -Wno-return-type
         -Wno-unused-variable
         -Wno-unused-parameter
@@ -28,7 +27,6 @@ elseif (CMAKE_C_COMPILER_ID STREQUAL "GNU")
     target_compile_options(dethrace_obj PRIVATE
         -g
         -Wall
-        -Werror
         -Wno-return-type
         -Wno-unused-variable
         -Wno-unused-parameter

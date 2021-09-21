@@ -344,13 +344,13 @@ void DoFog(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer) {
 // IDA: void __usercall DepthEffect(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>)
 void DepthEffect(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world) {
     LOG_TRACE("(%p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world);
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall DepthEffectSky(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>)
 void DepthEffectSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world) {
     LOG_TRACE("(%p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world);
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall DoWobbleCamera(br_actor *pCamera@<EAX>)
@@ -406,7 +406,7 @@ void DoDrugWobbleCamera(br_actor* pCamera) {
 // IDA: void __usercall DoSpecialCameraEffect(br_actor *pCamera@<EAX>, br_matrix34 *pCamera_to_world@<EDX>)
 void DoSpecialCameraEffect(br_actor* pCamera, br_matrix34* pCamera_to_world) {
     LOG_TRACE("(%p, %p)", pCamera, pCamera_to_world);
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __cdecl LessDepthFactor()
@@ -622,7 +622,7 @@ void ChangeDepthEffect() {
     br_scalar distance;
     tSpecial_volume* special_volume;
     LOG_TRACE("()");
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __cdecl MungeForwardSky()

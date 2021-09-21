@@ -91,7 +91,7 @@ void DoZappyActionReplayHeadups(int pSpecial_zappy_bastard) {
 // IDA: void __cdecl DoActionReplayHeadups()
 void DoActionReplayHeadups() {
     LOG_TRACE("()");
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall MoveReplayBuffer(tS32 pMove_amount@<EAX>)
@@ -123,7 +123,7 @@ void MoveToStartOfReplay() {
 // IDA: void __cdecl ToggleReplay()
 void ToggleReplay() {
     LOG_TRACE("()");
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall ReverseSound(tS3_effect_tag pEffect_index@<EAX>, tS3_sound_tag pSound_tag@<EDX>)
@@ -153,13 +153,13 @@ void PollActionReplayControls(tU32 pFrame_period) {
     static int psuedo_mouse_keys[8];
     static tRectangle mouse_areas[2][8];
     LOG_TRACE("(%d)", pFrame_period);
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __cdecl CheckReplayTurnOn()
 void CheckReplayTurnOn() {
     LOG_TRACE("()");
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __cdecl InitializeActionReplay()

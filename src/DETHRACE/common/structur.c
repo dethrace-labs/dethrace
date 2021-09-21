@@ -113,7 +113,7 @@ void CheckCheckpoints() {
     int car_index;
     tNet_game_player_info* net_player;
     LOG_TRACE("()");
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __cdecl TotalRepair()

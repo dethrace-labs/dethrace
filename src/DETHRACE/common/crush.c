@@ -249,7 +249,7 @@ void RecordLastDamage(tCar_spec* pCar) {
     int i;
     LOG_TRACE("(%p)", pCar);
 
-    STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall DoDamage(tCar_spec *pCar@<EAX>, tDamage_type pDamage_type@<EDX>, float pMagnitude, float pNastiness)
@@ -328,7 +328,7 @@ void SetSmokeLastDamageLevel(tCar_spec* pCar) {
     int i;
     LOG_TRACE("(%p)", pCar);
 
-    STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall SortOutSmoke(tCar_spec *pCar@<EAX>)
@@ -404,11 +404,11 @@ void DoWheelDamage(tU32 pFrame_period) {
     br_vector3 wonky_vector;
     static int kev_index[4];
     LOG_TRACE("(%d)", pFrame_period);
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall CrashEarnings(tCar_spec *pCar1@<EAX>, tCar_spec *pCar2@<EDX>)
 void CrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
     LOG_TRACE("(%p, %p)", pCar1, pCar2);
-    NOT_IMPLEMENTED();
+    STUB();
 }

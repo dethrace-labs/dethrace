@@ -101,7 +101,7 @@ void StartPipingSession2(tPipe_chunk_type pThe_type, int pMunge_reentrancy) {
 void StartPipingSession(tPipe_chunk_type pThe_type) {
     LOG_TRACE("(%d)", pThe_type);
 
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall EndPipingSession2(int pMunge_reentrancy@<EAX>)
@@ -115,7 +115,7 @@ void EndPipingSession2(int pMunge_reentrancy) {
 void EndPipingSession() {
     LOG_TRACE("()");
 
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall AddDataToSession(int pSubject_index@<EAX>, void *pData@<EDX>, tU32 pData_length@<EBX>)
@@ -210,7 +210,7 @@ void AddSplashToPipingSession(tCollision_info* pCar) {
     tPipe_splash_data data;
     LOG_TRACE("(%p)", pCar);
 
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall AddOilSpillToPipingSession(int pIndex@<EAX>, br_matrix34 *pMat@<EDX>, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec *pCar, br_vector3 *pOriginal_pos, br_pixelmap *pPixelmap)
@@ -379,7 +379,7 @@ void PipeSingleGrooveStop(int pGroove_index, br_matrix34* pMatrix, int pPath_int
 // IDA: void __cdecl PipeFrameFinish()
 void PipeFrameFinish() {
     LOG_TRACE("()");
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __cdecl PipingFrameReset()
@@ -404,7 +404,7 @@ void ResetPiping() {
 // IDA: void __cdecl InitialisePiping()
 void InitialisePiping() {
     LOG_TRACE("()");
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __cdecl DisposePiping()
@@ -466,7 +466,7 @@ void PipeCarPositions() {
     tS8 damage_deltas[12];
     LOG_TRACE("()");
 
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __cdecl ResetPipePlayToEnd()

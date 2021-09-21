@@ -196,7 +196,7 @@ void RenderLollipops() {
     br_actor** the_actor;
     br_actor* old_parent;
     LOG_TRACE("()");
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall DRDrawLine(br_pixelmap *pDestn@<EAX>, int pX1@<EDX>, int pY1@<EBX>, int pX2@<ECX>, int pY2, int pColour)
@@ -625,7 +625,7 @@ void CalculateWobblitude(tU32 pThe_time) {
 
     gScreen_wobble_x = 0;
     gScreen_wobble_y = 0;
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall CalculateConcussion(tU32 pThe_time@<EAX>)
@@ -640,7 +640,7 @@ void CalculateConcussion(tU32 pThe_time) {
     LOG_TRACE("(%d)", pThe_time);
 
     gConcussion.concussed = 0;
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __cdecl SufferFromConcussion(float pSeriousness)
@@ -811,7 +811,7 @@ void RenderShadows(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera
     br_vector3 camera_to_car;
     br_scalar distance_factor;
     LOG_TRACE("(%p, %p, %p, %p)", pWorld, pTrack_spec, pCamera, pCamera_to_world_transform);
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall FlashyMapCheckpoint(int pIndex@<EAX>, tU32 pTime@<EDX>)
@@ -820,7 +820,7 @@ void FlashyMapCheckpoint(int pIndex, tU32 pTime) {
     static tU32 last_flash;
     static int flash_state;
     LOG_TRACE("(%d, %d)", pIndex, pTime);
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: int __usercall ConditionallyFillWithSky@<EAX>(br_pixelmap *pPixelmap@<EAX>)
@@ -828,7 +828,7 @@ int ConditionallyFillWithSky(br_pixelmap* pPixelmap) {
     int bgnd_col;
     LOG_TRACE("(%p)", pPixelmap);
 
-    SILENT_STUB();
+    STUB_ONCE();
     return 0;
 }
 
@@ -1375,7 +1375,7 @@ void ChangeAmbience(br_scalar pDelta) {
 void InitAmbience() {
     LOG_TRACE("()");
     gCurrent_ambience = gAmbient_adjustment;
-    return ChangeAmbience(gAmbient_adjustment);
+    ChangeAmbience(gAmbient_adjustment);
 }
 
 // IDA: void __usercall DRPixelmapRectangleMaskedCopy(br_pixelmap *pDest@<EAX>, br_int_16 pDest_x@<EDX>, br_int_16 pDest_y@<EBX>, br_pixelmap *pSource@<ECX>, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight)
@@ -1580,7 +1580,7 @@ void DeallocateAllTransientBitmaps() {
 void RemoveTransientBitmaps(int pGraphically_remove_them) {
     int i;
     int order_number;
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall SaveTransient(int pIndex@<EAX>, int pX_coord@<EDX>, int pY_coord@<EBX>)
@@ -1635,7 +1635,8 @@ int DoMouseCursor() {
     static int required_cursor;
     static int zero_count;
     static int button_was_down;
-    SILENT_STUB();
+    STUB_ONCE();
+    return 0;
 }
 
 // IDA: int __cdecl AllocateCursorTransient()

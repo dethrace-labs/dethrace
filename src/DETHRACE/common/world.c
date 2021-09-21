@@ -2563,7 +2563,7 @@ void FunkThoseTronics() {
     float f_time_diff;
     br_pixelmap* old_colour_map;
     LOG_TRACE("()");
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall LollipopizeActor(br_actor *pSubject_actor@<EAX>, br_matrix34 *ref_to_world@<EDX>, tLollipop_mode pWhich_axis@<EBX>)

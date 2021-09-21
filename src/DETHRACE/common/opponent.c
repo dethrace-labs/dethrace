@@ -916,7 +916,7 @@ void MungeOpponents(tU32 pFrame_period) {
     int i;
     int un_stun_flag;
     LOG_TRACE("(%d)", pFrame_period);
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __cdecl SetInitialCopPositions()

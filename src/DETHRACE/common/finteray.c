@@ -419,7 +419,80 @@ void CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir,
     double f_numerator;
     br_material* this_material;
     LOG_TRACE("(%p, %p, %p, %p, %p)", pFace, ray_pos, ray_dir, normal, rt);
-    NOT_IMPLEMENTED();
+
+    this_material = pFace->material;
+    *rt = 100.0;
+    d = pFace->normal.v[1] * ray_dir->v[1] + ray_dir->v[2] * pFace->normal.v[2] + ray_dir->v[0] * pFace->normal.v[0];
+    if ((!this_material || (this_material->flags & 0x1800) != 0 || d <= 0.0)
+        && (!this_material || !this_material->identifier || *this_material->identifier != '!' || !gPling_materials)
+        && fabs(d) >= 0.00000023841858) {
+        p.v[0] = ray_pos->v[0] - pFace->v[0].v[0];
+        p.v[1] = ray_pos->v[1] - pFace->v[0].v[1];
+        p.v[2] = ray_pos->v[2] - pFace->v[0].v[2];
+        numerator = pFace->normal.v[1] * p.v[1] + pFace->normal.v[2] * p.v[2] + pFace->normal.v[0] * p.v[0];
+        if (!BadDiv__finteray(numerator, d)) {
+            if (d > 0.0) {
+                if (-numerator < -0.001 || -numerator > d + 0.003) {
+                    return;
+                }
+            } else if (numerator < -0.001 || 0.003 - d < numerator) {
+                return;
+            }
+            t = -(numerator / d);
+            if (t > 1.0) {
+                t = 1.0;
+            }
+            tv.v[0] = ray_dir->v[0] * t;
+            tv.v[1] = ray_dir->v[1] * t;
+            tv.v[2] = ray_dir->v[2] * t;
+            tv.v[0] = ray_pos->v[0] + tv.v[0];
+            tv.v[1] = ray_pos->v[1] + tv.v[1];
+            tv.v[2] = ray_pos->v[2] + tv.v[2];
+            axis_m = fabs(pFace->normal.v[0]) < fabs(pFace->normal.v[1]);
+            if (fabs(pFace->normal.v[2]) > fabs(pFace->normal.v[axis_m])) {
+                axis_m = 2;
+            }
+            if (axis_m) {
+                axis_0 = 0;
+                if (axis_m == 1) {
+                    axis_1 = 2;
+                } else {
+                    axis_1 = 1;
+                }
+            } else {
+                axis_0 = 1;
+                axis_1 = 2;
+            }
+            v0i1 = pFace->v[0].v[axis_0];
+            v0i2 = pFace->v[0].v[axis_1];
+            u0 = pFace->v[1].v[axis_0] - v0i1;
+            u1 = pFace->v[1].v[axis_1] - v0i2;
+            v0 = pFace->v[2].v[axis_0] - v0i1;
+            v1 = pFace->v[2].v[axis_1] - v0i2;
+            u2 = tv.v[axis_0] - v0i1;
+            v2 = tv.v[axis_1] - v0i2;
+            if (fabs(u0) > 0.0000002384185791015625) {
+                f_d = v1 * u0 - u1 * v0;
+                if (f_d == 0) {
+                    return;
+                }
+                alpha = (v2 * u0 - u1 * u2) / f_d;
+                beta = (u2 - alpha * v0) / u0;
+            } else {
+                alpha = u2 / v0;
+                beta = (v2 - alpha * v1) / u1;
+            }
+            if (beta >= -0.0001 && alpha >= -0.0001 && alpha + beta <= 1.0001) {
+                *rt = t;
+                *normal = pFace->normal;
+                if (d > 0.0) {
+                    normal->v[0] = -normal->v[0];
+                    normal->v[1] = -normal->v[1];
+                    normal->v[2] = -normal->v[2];
+                }
+            }
+        }
+    }
 }
 
 // IDA: void __usercall MultiRayCheckSingleFace(int pNum_rays@<EAX>, tFace_ref *pFace@<EDX>, br_vector3 *ray_pos@<EBX>, br_vector3 *ray_dir@<ECX>, br_vector3 *normal, br_scalar *rt)
@@ -1071,7 +1144,59 @@ int LineBoxColl(br_vector3* o, br_vector3* p, br_bounds* pB, br_vector3* pHit_po
     br_scalar max_t[3];
     br_scalar cp[3];
     LOG_TRACE("(%p, %p, %p, %p)", o, p, pB, pHit_point);
-    NOT_IMPLEMENTED();
+
+    inside = 1;
+    dir.v[0] = p->v[0] - o->v[0];
+    dir.v[1] = p->v[1] - o->v[1];
+    dir.v[2] = p->v[2] - o->v[2];
+    for (i = 0; i < 3; ++i) {
+        if (pB->min.v[i] <= o->v[i]) {
+            if (pB->max.v[i] >= o->v[i]) {
+                quad[i] = 2;
+            } else {
+                quad[i] = 0;
+                max_t[i] = pB->max.v[i];
+                inside = 0;
+            }
+        } else {
+            quad[i] = 1;
+            max_t[i] = pB->min.v[i];
+            inside = 0;
+        }
+    }
+    if (inside) {
+        *pHit_point = *o;
+        return 8;
+    } else {
+        for (i = 0; i < 3; ++i) {
+            if (quad[i] == 2 || dir.v[i] == 0.0) {
+                cp[i] = -1.0;
+            } else {
+                cp[i] = (max_t[i] - o->v[i]) / dir.v[i];
+            }
+        }
+        which_plane = 0;
+        for (i = 1; i < 3; ++i) {
+            if (cp[which_plane] < cp[i]) {
+                which_plane = i;
+            }
+        }
+        if (cp[which_plane] >= 0.0 && cp[which_plane] <= 1.0) {
+            for (i = 0; i < 3; ++i) {
+                if (which_plane == i) {
+                    pHit_point->v[i] = max_t[i];
+                } else {
+                    pHit_point->v[i] = dir.v[i] * cp[which_plane] + o->v[i];
+                    if (pHit_point->v[i] < pB->min.v[i] || pB->max.v[i] < pHit_point->v[i]) {
+                        return 0;
+                    }
+                }
+            }
+            return which_plane + 4 * quad[which_plane] + 1;
+        } else {
+            return 0;
+        }
+    }
 }
 
 // IDA: int __usercall SphereBoxIntersection@<EAX>(br_bounds *pB@<EAX>, br_vector3 *pC@<EDX>, br_scalar pR_squared, br_vector3 *pHit_point)

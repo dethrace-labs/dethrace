@@ -83,6 +83,7 @@ tS3_sound_tag DRS3StartSound(tS3_outlet_ptr pOutlet, tS3_sound_id pSound) {
 // IDA: tS3_sound_tag __usercall DRS3StartSoundNoPiping@<EAX>(tS3_outlet_ptr pOutlet@<EAX>, tS3_sound_id pSound@<EDX>)
 tS3_sound_tag DRS3StartSoundNoPiping(tS3_outlet_ptr pOutlet, tS3_sound_id pSound) {
     STUB();
+    return 0;
 }
 
 // IDA: tS3_sound_tag __usercall DRS3StartSound2@<EAX>(tS3_outlet_ptr pOutlet@<EAX>, tS3_sound_id pSound@<EDX>, tS3_repeats pRepeats@<EBX>, tS3_volume pLVolume@<ECX>, tS3_volume pRVolume, tS3_pitch pPitch, tS3_speed pSpeed)
@@ -178,12 +179,14 @@ int DRS3OverallVolume(tS3_volume pVolume) {
 // IDA: int __usercall DRS3StopOutletSound@<EAX>(tS3_outlet_ptr pOutlet@<EAX>)
 int DRS3StopOutletSound(tS3_outlet_ptr pOutlet) {
     STUB();
+    return 0;
 }
 
 // IDA: int __cdecl DRS3StopAllOutletSounds()
 int DRS3StopAllOutletSounds() {
     LOG_TRACE("()");
     STUB();
+    return 0;
 }
 
 // IDA: void __cdecl ToggleSoundEnable()
@@ -195,7 +198,7 @@ void ToggleSoundEnable() {
 // IDA: void __cdecl SoundService()
 void SoundService() {
     br_matrix34 mat;
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __cdecl InitSoundSources()
@@ -252,7 +255,7 @@ void MungeEngineNoise() {
     int stop_all;
     int type_of_engine_noise;
     tS3_sound_id engine_noise;
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __cdecl SetSoundVolumes()

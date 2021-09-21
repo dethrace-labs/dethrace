@@ -373,7 +373,7 @@ tNet_contents* NetGetBroadcastContents(tNet_message_type pType, tS32 pSize_decid
 // IDA: void __cdecl NetSendMessageStacks()
 void NetSendMessageStacks() {
     LOG_TRACE("()");
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: tNet_message* __usercall NetAllocateMessage@<EAX>(int pSize@<EAX>)
@@ -691,7 +691,7 @@ void NetReceiveAndProcessMessages() {
     tU32 receive_time;
     int old_net_service;
     LOG_TRACE("()");
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __cdecl BroadcastStatus()
@@ -723,7 +723,7 @@ void CheckForPendingStartRace() {
 void NetService(int pIn_race) {
     tU32 time;
     static tU32 last_status_broadcast;
-    SILENT_STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall NetFinishRace(tNet_game_details *pDetails@<EAX>, tRace_over_reason pReason@<EDX>)
