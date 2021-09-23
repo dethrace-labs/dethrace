@@ -2993,17 +2993,22 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
                 && norm.v[1] > min
                 && norm.v[1] < max) {
                 if (c->driver <= eDriver_non_car || fabs(normal_force.v[2]) <= total_force * 0.89999998) {
-                    c->v.v[0] = 0.0;
-                    c->v.v[1] = 0.0;
-                    c->v.v[2] = 0.0;
-                    memset(&norm, 0, sizeof(norm));
-                    memset(&normal_force, 0, sizeof(normal_force));
-                    c->omega.v[0] = 0.0;
-                    c->omega.v[1] = 0.0;
-                    c->omega.v[2] = 0.0;
-                    c->oldomega.v[0] = 0.0;
-                    c->oldomega.v[1] = 0.0;
-                    c->oldomega.v[2] = 0.0;
+                    // c->v.v[0] = 0.0;
+                    // c->v.v[1] = 0.0;
+                    // c->v.v[2] = 0.0;
+                    BrVector3Set(&c->v, 0, 0, 0);
+                    BrVector3Set(&norm, 0, 0, 0);
+                    BrVector3Set(&normal_force, 0, 0, 0);
+                    // memset(&norm, 0, sizeof(norm));
+                    // memset(&normal_force, 0, sizeof(normal_force));
+                    // c->omega.v[0] = 0.0;
+                    // c->omega.v[1] = 0.0;
+                    // c->omega.v[2] = 0.0;
+                    // c->oldomega.v[0] = 0.0;
+                    // c->oldomega.v[1] = 0.0;
+                    // c->oldomega.v[2] = 0.0;
+                    BrVector3Set(&c->omega, 0, 0, 0);
+                    BrVector3Set(&c->oldomega, 0, 0, 0);
                     if (c->driver <= eDriver_non_car || car_spec->max_force_rear == 0.0) {
                         if (c->driver <= eDriver_non_car) {
                             PipeSingleNonCar(c);
@@ -3015,29 +3020,33 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
                     bb.v[0] = mat->m[1][2] * tv2.v[1] - mat->m[1][1] * tv2.v[2];
                     bb.v[1] = mat->m[1][0] * tv2.v[2] - mat->m[1][2] * tv2.v[0];
                     bb.v[2] = mat->m[1][1] * tv2.v[0] - mat->m[1][0] * tv2.v[1];
-                    if (mat->m[0][1] * bb.v[1] + mat->m[0][2] * bb.v[2] + mat->m[0][0] * bb.v[0] <= 0.0) {
+                    if (BrVector3Dot(&bb, (br_vector3*)&mat->m[0][1]) /*mat->m[0][1] * bb.v[1] + mat->m[0][2] * bb.v[2] + mat->m[0][0] * bb.v[0] */ <= 0.0) {
                         c->omega.v[0] = -0.5;
                     } else {
                         c->omega.v[0] = 0.5;
                     }
                 }
             }
-            c->v.v[0] = c->v.v[0] + norm.v[0];
-            c->v.v[1] = c->v.v[1] + norm.v[1];
-            c->v.v[2] = c->v.v[2] + norm.v[2];
+            // c->v.v[0] = c->v.v[0] + norm.v[0];
+            // c->v.v[1] = c->v.v[1] + norm.v[1];
+            // c->v.v[2] = c->v.v[2] + norm.v[2];
+            BrVector3Accumulate(&c->v, &norm);
             if (c->driver >= eDriver_net_human) {
-                normal_force.v[0] = gDefensive_powerup_factor[car_spec->power_up_levels[0]] * normal_force.v[0];
-                normal_force.v[1] = gDefensive_powerup_factor[car_spec->power_up_levels[0]] * normal_force.v[1];
-                normal_force.v[2] = gDefensive_powerup_factor[car_spec->power_up_levels[0]] * normal_force.v[2];
+                // normal_force.v[0] = gDefensive_powerup_factor[car_spec->power_up_levels[0]] * normal_force.v[0];
+                // normal_force.v[1] = gDefensive_powerup_factor[car_spec->power_up_levels[0]] * normal_force.v[1];
+                // normal_force.v[2] = gDefensive_powerup_factor[car_spec->power_up_levels[0]] * normal_force.v[2];
+                BrVector3Scale(&normal_force, &normal_force, gDefensive_powerup_factor[car_spec->power_up_levels[0]]);
             }
             if (c->driver < eDriver_net_human) {
-                normal_force.v[0] = normal_force.v[0] * 0.0099999998;
-                normal_force.v[1] = normal_force.v[1] * 0.0099999998;
-                normal_force.v[2] = normal_force.v[2] * 0.0099999998;
+                // normal_force.v[0] = normal_force.v[0] * 0.0099999998;
+                // normal_force.v[1] = normal_force.v[1] * 0.0099999998;
+                // normal_force.v[2] = normal_force.v[2] * 0.0099999998;
+                BrVector3Scale(&normal_force, &normal_force, 0.0099999998);
             } else {
-                normal_force.v[0] = normal_force.v[0] * 0.75;
-                normal_force.v[1] = normal_force.v[1] * 0.75;
-                normal_force.v[2] = normal_force.v[2] * 0.75;
+                // normal_force.v[0] = normal_force.v[0] * 0.75;
+                // normal_force.v[1] = normal_force.v[1] * 0.75;
+                // normal_force.v[2] = normal_force.v[2] * 0.75;
+                BrVector3Scale(&normal_force, &normal_force, 0.75);
             }
             v_diff = (car_spec->pre_car_col_velocity.v[1] - c->v.v[1]) * gDefensive_powerup_factor[car_spec->power_up_levels[0]];
             if (car_spec->invulnerable
@@ -3053,12 +3062,7 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
                 }
                 for (i = 0; i < ((tCar_spec*)c)->car_actor_count; i++) {
                     ts2 = (v_diff + 20.0) * -0.01;
-                    TotallySpamTheModel(
-                        car_spec,
-                        i,
-                        car_spec->car_model_actors[i].actor,
-                        &car_spec->car_model_actors[i].crush_data,
-                        ts2);
+                    TotallySpamTheModel(car_spec, i, car_spec->car_model_actors[i].actor, &car_spec->car_model_actors[i].crush_data, ts2);
                 }
                 for (i = 0; i < 12; i++) {
                     DamageUnit(car_spec, i, IRandomPosNeg(5) + (v_diff + 20.0) * -1.5);
@@ -3068,9 +3072,10 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
                 CrashNoise(&norm, &pos, gMaterial_index);
                 ScrapeNoise(batwick_length, &pos, gMaterial_index);
             }
-            tv.v[0] = tv.v[0] / 6.9000001;
-            tv.v[1] = tv.v[1] / 6.9000001;
-            tv.v[2] = tv.v[2] / 6.9000001;
+            // tv.v[0] = tv.v[0] / 6.9000001;
+            // tv.v[1] = tv.v[1] / 6.9000001;
+            // tv.v[2] = tv.v[2] / 6.9000001;
+            BrVector3InvScale(&tv, &tv, WORLD_SCALE);
             BrMatrix34ApplyV(&bb, &tv, &c->car_master_actor->t.t.mat);
             BrMatrix34ApplyV(&norm, &p_vel, &c->car_master_actor->t.t.mat);
             CreateSparks(&pos, &bb, &norm, gCurrent_race.material_modifiers[gMaterial_index].sparkiness, car_spec);
