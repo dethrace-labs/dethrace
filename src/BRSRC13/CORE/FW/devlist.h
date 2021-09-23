@@ -1,7 +1,7 @@
 #ifndef _DEVLIST_H_
 #define _DEVLIST_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 br_error AddRequestedDrivers();
 

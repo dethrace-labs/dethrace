@@ -1,7 +1,7 @@
 #ifndef _MODREND_H_
 #define _MODREND_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 extern void (*RenderStyleCalls[])(
     br_actor* actor,

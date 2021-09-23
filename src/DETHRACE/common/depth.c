@@ -1,6 +1,6 @@
 #include "depth.h"
 
-#include "brender.h"
+#include "brender/brender.h"
 #include "errors.h"
 #include "globvars.h"
 #include "globvrkm.h"

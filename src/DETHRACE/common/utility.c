@@ -1,7 +1,7 @@
 #include "utility.h"
 #include <stdlib.h>
 
-#include "brender.h"
+#include "brender/brender.h"
 #include "constants.h"
 #include "errors.h"
 #include "globvars.h"

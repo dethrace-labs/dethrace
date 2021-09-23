@@ -1,7 +1,7 @@
 #ifndef _INPUT_H_
 #define _INPUT_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern int gEdge_trigger_mode;

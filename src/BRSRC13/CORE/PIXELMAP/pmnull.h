@@ -1,7 +1,7 @@
 #ifndef _PMNULL_H_
 #define _PMNULL_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 br_error _M_br_device_pixelmap_null_resize(br_device_pixelmap* self, br_int_32 width, br_int_32 height);
 

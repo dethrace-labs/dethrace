@@ -1,7 +1,7 @@
 #ifndef _IMAGE_H_
 #define _IMAGE_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 br_boolean BrImageAdd(br_image* img);
 

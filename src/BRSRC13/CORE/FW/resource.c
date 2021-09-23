@@ -1,11 +1,11 @@
 #include "resource.h"
 
-#include "brlists.h"
-#include "brstdlib.h"
-#include "file.h"
-#include "fwsetup.h"
+#include "CORE/FW/brlists.h"
+#include "CORE/FW/file.h"
+#include "CORE/FW/fwsetup.h"
+#include "CORE/FW/mem.h"
+#include "CORE/STD/brstdlib.h"
 #include "harness_trace.h"
-#include "mem.h"
 #include <stdio.h>
 #include <stdlib.h>
 

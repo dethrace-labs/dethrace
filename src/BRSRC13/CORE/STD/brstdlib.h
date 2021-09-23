@@ -5,7 +5,7 @@
 #ifndef _BRSTDLIB_H_
 #define _BRSTDLIB_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 #include <stdarg.h>
 #include <stdlib.h>

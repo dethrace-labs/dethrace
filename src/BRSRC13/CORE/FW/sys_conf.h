@@ -1,7 +1,7 @@
 #ifndef _SYS_CONF_H_
 #define _SYS_CONF_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 br_boolean Is_Valid_Sys_Config_Token(br_token t);
 

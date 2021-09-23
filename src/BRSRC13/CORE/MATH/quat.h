@@ -1,7 +1,7 @@
 #ifndef _QUAT_H_
 #define _QUAT_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 br_quat* BrQuatMul(br_quat* q, br_quat* l, br_quat* r);
 

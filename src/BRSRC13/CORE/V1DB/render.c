@@ -1,10 +1,10 @@
 #include "render.h"
-#include "dbsetup.h"
+#include "CORE/MATH/matrix34.h"
+#include "CORE/MATH/transfrm.h"
+#include "CORE/V1DB/dbsetup.h"
+#include "CORE/V1DB/modrend.h"
 #include "harness_hooks.h"
 #include "harness_trace.h"
-#include "matrix34.h"
-#include "modrend.h"
-#include "transfrm.h"
 #include <string.h>
 
 #define RendererModelMul(self, a1) self->dispatch->_modelMulF(self, a1);

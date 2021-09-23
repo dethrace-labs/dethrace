@@ -1,7 +1,7 @@
 #ifndef HARNESS_HOOKS_H
 #define HARNESS_HOOKS_H
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 // Hooks are called from original game code.
 int Harness_Hook_HandleCommandLineArg(char* arg);

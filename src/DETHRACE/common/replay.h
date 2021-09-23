@@ -1,7 +1,7 @@
 #ifndef _REPLAY_H_
 #define _REPLAY_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern char* gReplay_pixie_names[10];

@@ -1,7 +1,7 @@
 #ifndef _ANGLES_H_
 #define _ANGLES_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 #include <math.h>
 
 br_matrix34* BrEulerToMatrix34(br_matrix34* mat, br_euler* euler);

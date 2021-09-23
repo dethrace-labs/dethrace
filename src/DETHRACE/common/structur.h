@@ -1,7 +1,7 @@
 #ifndef _STRUCTUR_H_
 #define _STRUCTUR_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern int gLast_wrong_checkpoint;

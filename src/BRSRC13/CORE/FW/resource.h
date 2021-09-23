@@ -1,7 +1,7 @@
 #ifndef _RESOURCE_H_
 #define _RESOURCE_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 void* ResToUser(resource_header* r);
 

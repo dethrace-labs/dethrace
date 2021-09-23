@@ -1,5 +1,5 @@
 #include "racestrt.h"
-#include "brender.h"
+#include "brender/brender.h"
 #include "displays.h"
 #include "drmem.h"
 #include "errors.h"

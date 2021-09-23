@@ -1,7 +1,7 @@
 #ifndef _NETGAME_H_
 #define _NETGAME_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern int gPowerup_cost[4];

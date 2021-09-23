@@ -1,7 +1,7 @@
 #ifndef _DBSETUP_H_
 #define _DBSETUP_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 extern br_v1db_state v1db;
 

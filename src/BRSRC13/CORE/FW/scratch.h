@@ -1,7 +1,7 @@
 #ifndef _SCRATCH_H_
 #define _SCRATCH_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 void* BrScratchAllocate(br_size_t size);
 

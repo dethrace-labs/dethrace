@@ -7,7 +7,7 @@
 // we know of at least `pc-dos/dossys.c`, `pc-dos/dosnet.c`, `Win95sys.c`.
 // Functions contained within these files are prefixed with `PD` - we assume that is short for something like `Platform Dependant`.
 
-#include "br_types.h"
+#include "brender/br_types.h"
 #include "dr_types.h"
 
 #include <math.h>

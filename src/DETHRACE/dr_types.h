@@ -1,7 +1,7 @@
 #ifndef DR_TYPES_H
 #define DR_TYPES_H
 
-#include "br_types.h"
+#include "brender/br_types.h"
 #include "constants.h"
 #include "harness.h"
 #include "s3/s3_types.h"

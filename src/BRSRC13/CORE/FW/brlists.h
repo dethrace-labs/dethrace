@@ -1,7 +1,7 @@
 #ifndef _BRLISTS_H_
 #define _BRLISTS_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 void BrNewList(br_list* list);
 

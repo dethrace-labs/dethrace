@@ -1,7 +1,7 @@
 #ifndef _BRSTDFILE_H_
 #define _BRSTDFILE_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 extern br_filesystem* _BrDefaultFilesystem;
 

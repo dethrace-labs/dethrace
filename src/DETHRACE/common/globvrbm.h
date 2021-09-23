@@ -1,7 +1,7 @@
 #ifndef _GLOBVRBM_H_
 #define _GLOBVRBM_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern br_scalar gYon_factor;

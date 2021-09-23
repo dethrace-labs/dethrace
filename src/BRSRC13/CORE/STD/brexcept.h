@@ -1,7 +1,7 @@
 #ifndef _BREXCEPT_H_
 #define _BREXCEPT_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 br_exception_handler* _BrExceptionBegin();
 

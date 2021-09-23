@@ -1,7 +1,7 @@
 #ifndef HARNESS_H
 #define HARNESS_H
 
-#include "br_types.h"
+#include "brender/br_types.h"
 #include "harness_trace.h"
 #include <SDL.h>
 

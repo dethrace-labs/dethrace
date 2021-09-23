@@ -1,7 +1,7 @@
 #ifndef _TOKEN_H_
 #define _TOKEN_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 void BrTokenBegin();
 

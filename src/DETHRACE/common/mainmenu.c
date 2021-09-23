@@ -1,5 +1,5 @@
 #include "mainmenu.h"
-#include "brender.h"
+#include "brender/brender.h"
 #include "controls.h"
 #include "flicplay.h"
 #include "globvars.h"

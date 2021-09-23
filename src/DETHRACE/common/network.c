@@ -1,5 +1,5 @@
 #include "network.h"
-#include "brender.h"
+#include "brender/brender.h"
 #include "controls.h"
 #include "displays.h"
 #include "globvars.h"

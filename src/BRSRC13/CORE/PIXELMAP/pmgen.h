@@ -1,7 +1,7 @@
 #ifndef _PMGEN_H_
 #define _PMGEN_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 br_error _M_br_device_pixelmap_gen_match(br_device_pixelmap* self, br_device_pixelmap** newpm, br_token_value* tv);
 

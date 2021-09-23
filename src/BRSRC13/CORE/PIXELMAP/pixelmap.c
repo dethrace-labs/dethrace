@@ -1,4 +1,4 @@
-#include "pixelmap.h"
+#include "CORE/PIXELMAP/pixelmap.h"
 #include "harness_trace.h"
 #include "pmmem.h"
 

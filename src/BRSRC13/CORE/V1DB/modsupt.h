@@ -1,7 +1,7 @@
 #ifndef _MODSUPT_H_
 #define _MODSUPT_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 void BrModelApplyMap(br_model* model, int map_type, br_matrix34* xform);
 

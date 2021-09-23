@@ -1,7 +1,7 @@
 #ifndef _MEM_H_
 #define _MEM_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 void* BrMemAllocate(br_size_t size, br_uint_8 type);
 

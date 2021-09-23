@@ -1,7 +1,7 @@
 #ifndef _ENABLES_H_
 #define _ENABLES_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 void actorEnable(br_v1db_enable* e, br_actor* a);
 

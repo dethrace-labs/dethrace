@@ -1,7 +1,7 @@
 #ifndef HARNESS_BRENDER_RENDERER_DISPATCH
 #define HARNESS_BRENDER_RENDERER_DISPATCH
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 #define MAX_STATE_STACK 32
 

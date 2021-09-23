@@ -1,5 +1,5 @@
 #include "raycast.h"
-#include "brender.h"
+#include "brender/brender.h"
 #include "globvars.h"
 #include <stdlib.h>
 

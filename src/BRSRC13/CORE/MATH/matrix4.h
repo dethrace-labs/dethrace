@@ -1,7 +1,7 @@
 #ifndef _MATRIX4_H_
 #define _MATRIX4_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 void BrMatrix4Copy(br_matrix4* A, br_matrix4* B);
 

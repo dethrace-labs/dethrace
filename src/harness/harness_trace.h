@@ -1,7 +1,7 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
-#include "br_types.h"
+#include "brender/br_types.h"
 #include <stdlib.h>
 #include <unistd.h>
 

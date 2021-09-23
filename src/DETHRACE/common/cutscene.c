@@ -4,9 +4,9 @@
 #include "globvrpb.h"
 #include "graphics.h"
 #include "input.h"
-#include "libsmacker/smacker.h"
 #include "loading.h"
 #include "pd/sys.h"
+#include "smacker.h"
 #include "sound.h"
 #include "utility.h"
 #include <stdlib.h>

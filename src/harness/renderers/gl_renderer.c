@@ -1,5 +1,5 @@
 #include "gl_renderer.h"
-#include "brender.h"
+#include "brender/brender.h"
 #include "cameras/debug_camera.h"
 #include "gl_renderer_shaders.h"
 #include "harness_trace.h"

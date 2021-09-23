@@ -1,7 +1,7 @@
 #ifndef _HOSTCFG_H_
 #define _HOSTCFG_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 char* HostDefaultDevice();
 

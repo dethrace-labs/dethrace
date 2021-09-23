@@ -1,5 +1,5 @@
 #include "powerup.h"
-#include "brender.h"
+#include "brender/brender.h"
 #include "common/errors.h"
 #include "common/globvars.h"
 #include "common/loading.h"

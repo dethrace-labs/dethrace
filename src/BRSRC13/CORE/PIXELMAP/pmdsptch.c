@@ -1,9 +1,9 @@
 #include "pmdsptch.h"
 
-#include "brstdlib.h"
+#include "CORE/PIXELMAP/pmmem.h"
+#include "CORE/STD/brstdlib.h"
 #include "harness_hooks.h"
 #include "harness_trace.h"
-#include "pmmem.h"
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>

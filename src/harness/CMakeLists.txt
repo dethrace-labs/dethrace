@@ -1,13 +1,12 @@
-add_library(harness OBJECT)
+add_library(harness STATIC)
 
+target_include_directories(harness PUBLIC .)
 target_include_directories(harness PRIVATE
     .
-    ${CMAKE_SOURCE_DIR}/src/BRSRC13
     ${CMAKE_SOURCE_DIR}/src/DETHRACE
-    ${CMAKE_SOURCE_DIR}/src/S3/include
 )
 
-target_link_libraries(harness PRIVATE miniposix SDL2::SDL2 glad cglm_headers)
+target_link_libraries(harness PRIVATE miniposix brender SDL2::SDL2 glad s3 cglm_headers)
 
 if(NOT MSVC)
     target_compile_options(harness PRIVATE

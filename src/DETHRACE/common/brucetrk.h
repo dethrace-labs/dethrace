@@ -1,7 +1,7 @@
 #ifndef _BRUCETRK_H_
 #define _BRUCETRK_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern br_actor* gMr_blendy;

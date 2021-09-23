@@ -1,6 +1,6 @@
 #include "brucetrk.h"
 
-#include "brender.h"
+#include "brender/brender.h"
 #include "globvars.h"
 #include "globvrbm.h"
 #include "init.h"

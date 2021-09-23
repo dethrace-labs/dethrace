@@ -1,6 +1,6 @@
 #include "input.h"
 
-#include "brender.h"
+#include "brender/brender.h"
 #include "errors.h"
 #include "globvars.h"
 #include "grafdata.h"

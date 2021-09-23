@@ -1,7 +1,7 @@
 #ifndef _PMFILE_H_
 #define _PMFILE_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 int FopWrite_PIXELMAP(br_datafile* df, br_pixelmap* pixelmap);
 

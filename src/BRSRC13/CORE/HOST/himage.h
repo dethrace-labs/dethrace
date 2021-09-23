@@ -1,7 +1,7 @@
 #ifndef _HIMAGE_H_
 #define _HIMAGE_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 void* HostImageLoad(char* name);
 

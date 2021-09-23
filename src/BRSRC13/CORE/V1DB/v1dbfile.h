@@ -1,7 +1,7 @@
 #ifndef _V1DBFILE_H_
 #define _V1DBFILE_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 int FopWrite_VERTICES(br_datafile* df, br_vertex* vertices, int nvertices);
 

@@ -1,7 +1,7 @@
 #ifndef _ACTSUPT_H_
 #define _ACTSUPT_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 br_uint_32 BrActorEnum(br_actor* parent, br_actor_enum_cbfn* callback, void* arg);
 

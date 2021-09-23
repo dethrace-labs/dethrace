@@ -1,7 +1,7 @@
 #ifndef _GRAFDATA_H_
 #define _GRAFDATA_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern tGraf_data gGraf_data[2];

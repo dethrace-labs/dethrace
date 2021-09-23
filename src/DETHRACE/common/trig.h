@@ -1,7 +1,7 @@
 #ifndef _TRIG_H_
 #define _TRIG_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern float gFloat_sine_table[91];

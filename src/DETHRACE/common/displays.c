@@ -1,5 +1,5 @@
 #include "displays.h"
-#include "brender.h"
+#include "brender/brender.h"
 #include "constants.h"
 #include "flicplay.h"
 #include "globvars.h"

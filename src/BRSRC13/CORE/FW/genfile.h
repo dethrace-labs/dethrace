@@ -1,7 +1,7 @@
 #ifndef _GENFILE_H_
 #define _GENFILE_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 int FopRead_END(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count);
 

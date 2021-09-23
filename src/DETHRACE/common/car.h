@@ -1,7 +1,7 @@
 #ifndef _CAR_H_
 #define _CAR_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 #include "dr_types.h"
 
 #define CAR_MAX_SIMPLIFICATION_LEVEL 4

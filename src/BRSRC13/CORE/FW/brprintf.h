@@ -1,7 +1,7 @@
 #ifndef _BRPRINTF_H_
 #define _BRPRINTF_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 #include <stdlib.h>
 

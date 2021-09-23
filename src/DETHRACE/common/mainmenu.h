@@ -1,7 +1,7 @@
 #ifndef _MAINMENU_H_
 #define _MAINMENU_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern char* gPalette_copy__mainmenu; // suffix added to avoid duplicate symbol

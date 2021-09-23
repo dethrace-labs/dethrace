@@ -1,7 +1,7 @@
 #ifndef _RESREG_H_
 #define _RESREG_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 br_resource_class* BrResClassAdd(br_resource_class* rclass);
 

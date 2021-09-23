@@ -1,7 +1,7 @@
 #ifndef _MEMMGMT_H_
 #define _MEMMGMT_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 br_error HostLock(br_uint_32 offset, br_uint_16 sel, br_size_t size);
 
