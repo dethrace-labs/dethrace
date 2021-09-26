@@ -7,6 +7,13 @@
 #define BrVector3LengthSquared(v1) BR_SQR3((v1)->v[0], (v1)->v[1], (v1)->v[2])
 #define BrVector3Dot(v1, v2) BR_MAC3((v1)->v[0], (v2)->v[0], (v1)->v[1], (v2)->v[1], (v1)->v[2], (v2)->v[2])
 
+#define BrVector3Negate(v1, v2)   \
+    do {                          \
+        (v1)->v[0] = -(v2)->v[0]; \
+        (v1)->v[1] = -(v2)->v[1]; \
+        (v1)->v[2] = -(v2)->v[2]; \
+    } while (0)
+
 #define BrVector3Set(v1, s1, s2, s3) \
     do {                             \
         (v1)->v[0] = (s1);           \
@@ -72,6 +79,13 @@
             (v1)->v[1] = 0.0;                                    \
             (v1)->v[2] = 0.0;                                    \
         }                                                        \
+    } while (0)
+
+#define BrVector3NormaliseQuick(v1, v2)                                  \
+    do {                                                                 \
+        br_scalar _scale;                                                \
+        _scale = 1.0 / (BR_LENGTH3((v2)->v[0], (v2)->v[1], (v2)->v[2])); \
+        BrVector3Scale(v1, v2, _scale);                                  \
     } while (0)
 
 #endif

@@ -936,9 +936,7 @@ void FinishCars(tU32 pLast_frame_time, tU32 pTime) {
             BrVector3SetFloat(&car->omega, 0.0, 0.0, 0.0);
             BrVector3SetFloat(&car->v, 0.0, 0.0, 0.0);
         }
-        car->velocity_car_space.v[0] = car->velocity_car_space.v[0] / 6900.0;
-        car->velocity_car_space.v[1] = car->velocity_car_space.v[1] / 6900.0;
-        car->velocity_car_space.v[2] = car->velocity_car_space.v[2] / 6900.0;
+        BrVector3InvScale(&car->velocity_car_space, &car->velocity_car_space, 6900.0);
         car->car_master_actor->t.t.mat.m[3][0] = car->car_master_actor->t.t.mat.m[3][0] / 6.9000001;
         car->car_master_actor->t.t.mat.m[3][1] = car->car_master_actor->t.t.mat.m[3][1] / 6.9000001;
         car->car_master_actor->t.t.mat.m[3][2] = car->car_master_actor->t.t.mat.m[3][2] / 6.9000001;
@@ -955,44 +953,12 @@ void FinishCars(tU32 pLast_frame_time, tU32 pTime) {
             }
             BrMatrix34ApplyV(&car->direction, &minus_k, &car->car_master_actor->t.t.mat);
         } else if (gLast_mechanics_time > pLast_frame_time && gCar_to_view == car) {
-            car->old_v.v[0] = car->old_v.v[0] - car->v.v[0];
-            car->old_v.v[1] = car->old_v.v[1] - car->v.v[1];
-            car->old_v.v[2] = car->old_v.v[2] - car->v.v[2];
-            car->old_v.v[0] = (gLast_mechanics_time - pLast_frame_time) / (float)PHYSICS_STEP_TIME * car->old_v.v[0];
-            car->old_v.v[1] = (gLast_mechanics_time - pLast_frame_time) / (float)PHYSICS_STEP_TIME * car->old_v.v[1];
-            car->old_v.v[2] = (gLast_mechanics_time - pLast_frame_time) / (float)PHYSICS_STEP_TIME * car->old_v.v[2];
-            car->old_v.v[0] = car->old_v.v[0] + car->v.v[0];
-            car->old_v.v[1] = car->old_v.v[1] + car->v.v[1];
-            car->old_v.v[2] = car->old_v.v[2] + car->v.v[2];
+            BrVector3Sub(&car->old_v, &car->old_v, &car->v);
+            BrVector3Scale(&car->old_v, &car->old_v, (gLast_mechanics_time - pLast_frame_time) / (float)PHYSICS_STEP_TIME);
+            BrVector3Accumulate(&car->old_v, &car->v);
             BrVector3Normalise(&car->direction, &car->old_v);
-            // scale
-            //     = sqrt(
-            //         car->old_v.v[1] * car->old_v.v[1]
-            //         + car->old_v.v[2] * car->old_v.v[2]
-            //         + car->old_v.v[0] * car->old_v.v[0]);
-            // if (scale <= 2.3841858e-7) {
-            //     car->direction.v[0] = 1.0;
-            //     car->direction.v[1] = 0.0;
-            //     car->direction.v[2] = 0.0;
-            // } else {
-            //     scale = 1.0 / scale;
-            //     car->direction.v[0] = car->old_v.v[0] * scale;
-            //     car->direction.v[1] = car->old_v.v[1] * scale;
-            //     car->direction.v[2] = car->old_v.v[2] * scale;
-            // }
         } else {
             BrVector3Normalise(&car->direction, &car->v);
-            // scale = sqrt(car->v.v[2] * car->v.v[2] + car->v.v[1] * car->v.v[1] + car->v.v[0] * car->v.v[0]);
-            // if (scale <= 2.3841858e-7) {
-            //     car->direction.v[0] = 1.0;
-            //     car->direction.v[1] = 0.0;
-            //     car->direction.v[2] = 0.0;
-            // } else {
-            //     scale = 1.0 / scale;
-            //     car->direction.v[0] = car->v.v[0] * scale;
-            //     car->direction.v[1] = car->v.v[1] * scale;
-            //     car->direction.v[2] = car->v.v[2] * scale;
-            // }
         }
         if (car->driver > eDriver_non_car) {
             car->speedo_speed = (car->v.v[2] * minus_k.v[2] + car->v.v[1] * minus_k.v[1] + car->v.v[0] * minus_k.v[0]) / 6900.0;
@@ -1030,9 +996,7 @@ void InterpolateCars(tU32 pLast_frame_time, tU32 pTime) {
         SimpleRotate((tCollision_info*)car, -dt);
         TranslateCar((tCollision_info*)car, -dt);
         BrMatrix34ApplyP(&car->pos, &car->cmpos, &car->car_master_actor->t.t.mat);
-        car->pos.v[0] = car->pos.v[0] / 6.9000001;
-        car->pos.v[1] = car->pos.v[1] / 6.9000001;
-        car->pos.v[2] = car->pos.v[2] / 6.9000001;
+        BrVector3InvScale(&car->pos, &car->pos, WORLD_SCALE);
     }
 }
 
@@ -1756,17 +1720,10 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
     float v135; // [esp+1DCh] [ebp-10h]
     br_vector3 v136; // [esp+1E0h] [ebp-Ch]
 
-    v136.v[0] = 0;
-    v136.v[1] = 0;
-    v136.v[2] = 0;
-
+    BrVector3Set(&v136, 0, 0, 0);
     normnum = 0;
-    f.v[0] = 0.0;
-    f.v[1] = 0.0;
-    f.v[2] = 0.0;
-    B.v[0] = 0.0;
-    B.v[1] = 0.0;
-    B.v[2] = 0.0;
+    BrVector3Set(&f, 0, 0, 0);
+    BrVector3Set(&B, 0, 0, 0);
     mat = &c->car_master_actor->t.t.mat;
     mat_list = gCurrent_race.material_modifiers;
     vol = c->last_special_volume;
@@ -1778,9 +1735,7 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
     c->material_index[2] = 0;
     c->material_index[3] = 0;
     wheelratio = (c->wpos[2].v[2] - c->cmpos.v[2]) / (c->wpos[0].v[2] - c->cmpos.v[2]);
-    c->road_normal.v[0] = 0.0;
-    c->road_normal.v[1] = 0.0;
-    c->road_normal.v[2] = 0.0;
+    BrVector3Set(&c->road_normal, 0, 0, 0);
     for (i = 0; i < 4; ++i) {
         BrMatrix34ApplyP(&wheel_pos[i], &c->wpos[i], mat);
     }
@@ -1800,9 +1755,7 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
             force[i] = 0.0;
             d[i] = c->susp_height[i / 2];
         } else {
-            c->road_normal.v[0] = norm[i].v[0] + c->road_normal.v[0];
-            c->road_normal.v[1] = norm[i].v[1] + c->road_normal.v[1];
-            c->road_normal.v[2] = norm[i].v[2] + c->road_normal.v[2];
+            BrVector3Accumulate(&c->road_normal, &norm[i]);
             normnum++;
             d[i] = d[i] - c->wheel_dam_offset[i ^ 2] * 6.9;
             force[i] = (c->susp_height[i / 2] - d[i]) * c->sk[1 / 2];
@@ -1837,36 +1790,21 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
         B.v[1] = B.v[1] - mat->m[1][1] * friction_number;
         B.v[2] = B.v[2] - mat->m[2][1] * friction_number;
     } else {
-        scale = sqrt(
-            c->road_normal.v[1] * c->road_normal.v[1]
-            + c->road_normal.v[2] * c->road_normal.v[2]
-            + c->road_normal.v[0] * c->road_normal.v[0]);
-        if (scale <= 2.3841858e-7) {
-            v107.v[0] = 1.0;
-            v107.v[1] = 0.0;
-            v107.v[2] = 0.0;
-        } else {
-            scale = 1.0 / scale;
-            v107.v[0] = c->road_normal.v[0] * scale;
-            v107.v[1] = c->road_normal.v[1] * scale;
-            v107.v[2] = c->road_normal.v[2] * scale;
-        }
-        v107.v[0] = -(c->M * 10.0) * v107.v[0];
-        v107.v[1] = -(c->M * 10.0) * v107.v[1];
-        v107.v[2] = -(c->M * 10.0) * v107.v[2];
-        B.v[0] = B.v[0] + v107.v[0];
-        B.v[1] = B.v[1] + v107.v[1];
-        B.v[2] = B.v[2] + v107.v[2];
+        BrVector3Normalise(&v107, &c->road_normal);
+        BrVector3Scale(&v107, &v107, -(c->M * 10.0));
+        BrVector3Accumulate(&B, &v107);
     }
     if (c->driver >= eDriver_net_human) {
         SteeringSelfCentre(c, dt, &c->road_normal);
     }
     if (normnum) {
         // ts = 1.0 / sqrt(1.0); <- looked like this in the windows build definitely wrong
-        ts = 1.0 / sqrt(c->road_normal.v[0] * c->road_normal.v[0] + c->road_normal.v[1] * c->road_normal.v[1] + c->road_normal.v[2] * c->road_normal.v[2]);
-        c->road_normal.v[0] = c->road_normal.v[0] * ts;
-        c->road_normal.v[1] = c->road_normal.v[1] * ts;
-        c->road_normal.v[2] = c->road_normal.v[2] * ts;
+        // ts = 1.0 / sqrt(c->road_normal.v[0] * c->road_normal.v[0] + c->road_normal.v[1] * c->road_normal.v[1] + c->road_normal.v[2] * c->road_normal.v[2]);
+        // c->road_normal.v[0] = c->road_normal.v[0] * ts;
+        // c->road_normal.v[1] = c->road_normal.v[1] * ts;
+        // c->road_normal.v[2] = c->road_normal.v[2] * ts;
+        BrVector3NormaliseQuick(&c->road_normal, &c->road_normal);
+
         friction_number = c->road_normal.v[1] * mat->m[1][1] + c->road_normal.v[2] * mat->m[2][1] + c->road_normal.v[0] * mat->m[0][1];
         if (c->driver > eDriver_non_car && c->wall_climber_mode) {
             friction_number = 1.0;
@@ -1884,9 +1822,7 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
                 a.v[0] = mat->m[3][0] + a.v[0];
                 a.v[1] = mat->m[3][1] + a.v[1];
                 a.v[2] = mat->m[3][2] + a.v[2];
-                b.v[0] = (c->wpos[0].v[2] - c->wpos[2].v[2]) * b.v[0];
-                b.v[1] = (c->wpos[0].v[2] - c->wpos[2].v[2]) * b.v[1];
-                b.v[2] = (c->wpos[0].v[2] - c->wpos[2].v[2]) * b.v[2];
+                BrVector3Scale(&b, &b, (c->wpos[0].v[2] - c->wpos[2].v[2]));
                 findfloor(&a, &b, norm, &ts2);
                 if (ts2 > 1.0) {
                     c->down_force_flag = 1;
@@ -1900,65 +1836,30 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
             }
             B.v[1] = B.v[1] - friction_number;
         }
-        vplane.v[0] = (c->velocity_car_space.v[1] * c->road_normal.v[1]
-                          + c->road_normal.v[2] * c->velocity_car_space.v[2]
-                          + c->road_normal.v[0] * c->velocity_car_space.v[0])
-            * c->road_normal.v[0];
-        vplane.v[1] = (c->velocity_car_space.v[1] * c->road_normal.v[1]
-                          + c->road_normal.v[2] * c->velocity_car_space.v[2]
-                          + c->road_normal.v[0] * c->velocity_car_space.v[0])
-            * c->road_normal.v[1];
-        vplane.v[2] = (c->velocity_car_space.v[1] * c->road_normal.v[1]
-                          + c->road_normal.v[2] * c->velocity_car_space.v[2]
-                          + c->road_normal.v[0] * c->velocity_car_space.v[0])
-            * c->road_normal.v[2];
-        vplane.v[0] = c->velocity_car_space.v[0] - vplane.v[0];
-        vplane.v[1] = c->velocity_car_space.v[1] - vplane.v[1];
-        vplane.v[2] = c->velocity_car_space.v[2] - vplane.v[2];
+        vplane.v[0] = BrVector3Dot(&c->velocity_car_space, &c->road_normal) * c->road_normal.v[0];
+        vplane.v[1] = BrVector3Dot(&c->velocity_car_space, &c->road_normal) * c->road_normal.v[1];
+        vplane.v[2] = BrVector3Dot(&c->velocity_car_space, &c->road_normal) * c->road_normal.v[2];
+        BrVector3Sub(&vplane, &c->velocity_car_space, &vplane);
         if (vplane.v[2] < 0.0) {
             ts = 1.0;
         } else {
             ts = -1.0;
         }
-        ts3 = sqrt(vplane.v[2] * vplane.v[2] + vplane.v[1] * vplane.v[1] + vplane.v[0] * vplane.v[0]);
+        ts3 = BrVector3Length(&vplane);
         deltaomega = ts3 * c->curvature * ts;
-        deltaomega = deltaomega - (c->omega.v[1] * c->road_normal.v[1] + c->road_normal.v[2] * c->omega.v[2] + c->road_normal.v[0] * c->omega.v[0]);
-        v103.v[0] = c->road_normal.v[1];
-        v103.v[1] = -c->road_normal.v[0];
-        v103.v[2] = 0.0;
-        scale = sqrt(0.0 * 0.0 + v103.v[1] * v103.v[1] + v103.v[0] * v103.v[0]);
-        if (scale <= 2.3841858e-7) {
-            v103.v[0] = 1.0;
-            v103.v[1] = 0.0;
-            v103.v[2] = 0.0;
-        } else {
-            scale = 1.0 / scale;
-            v103.v[0] = v103.v[0] * scale;
-            v103.v[1] = v103.v[1] * scale;
-            v103.v[2] = v103.v[2] * scale;
-        }
+        deltaomega = deltaomega - BrVector3Dot(&c->omega, &c->road_normal);
+        BrVector3Set(&v103, c->road_normal.v[1], -c->road_normal.v[0], 0);
+        BrVector3Normalise(&v103, &v103);
 
         friction_number = c->I.v[1] / dt * deltaomega;
         ts = friction_number / (c->wpos[2].v[2] - c->wpos[0].v[2]);
         v108 = ts;
         v109 = -ts;
-        rightplane.v[0] = 0.0;
-        rightplane.v[1] = c->road_normal.v[2];
-        rightplane.v[2] = -c->road_normal.v[1];
-        scale = sqrt(rightplane.v[1] * rightplane.v[1] + rightplane.v[2] * rightplane.v[2] + 0.0 * 0.0);
-        if (scale <= 2.3841858e-7) {
-            rightplane.v[0] = 1.0;
-            rightplane.v[1] = 0.0;
-            rightplane.v[2] = 0.0;
-        } else {
-            scale = 1.0 / scale;
-            rightplane.v[0] = rightplane.v[0] * scale;
-            rightplane.v[1] = rightplane.v[1] * scale;
-            rightplane.v[2] = rightplane.v[2] * scale;
-        }
+        BrVector3Set(&rightplane, 0, c->road_normal.v[2], -c->road_normal.v[1]);
+        BrVector3Normalise(&rightplane, &rightplane);
         v99 = c->acc_force;
-        friction_number = rightplane.v[1] * vplane.v[1] + rightplane.v[2] * vplane.v[2] + vplane.v[0] * rightplane.v[0];
-        v87 = v103.v[2] * vplane.v[2] + v103.v[1] * vplane.v[1] + v103.v[0] * vplane.v[0];
+        friction_number = BrVector3Dot(&rightplane, &vplane);
+        v87 = BrVector3Dot(&v103, &vplane);
         ts2 = fabs(v87);
         friction_number = (c->wpos[0].v[2] - c->cmpos.v[2]) * friction_number * fabs(c->curvature);
         if (c->curvature <= 0.0) {
@@ -1967,15 +1868,15 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
             friction_number = v87 + friction_number;
         }
         friction_number = -(c->M / dt * friction_number);
-        friction_number = friction_number - (B.v[1] * v103.v[1] + B.v[2] * v103.v[2] + B.v[0] * v103.v[0]);
+        friction_number = friction_number - BrVector3Dot(&B, &v103);
 
         friction_number = friction_number / (1.0 - wheelratio);
         v108 = friction_number + v108;
         v109 = -wheelratio * friction_number + v109;
         friction_number = (c->wpos[0].v[2] - c->wpos[2].v[2]) * v108;
         v98 = friction_number * c->curvature;
-        friction_number = (c->velocity_car_space.v[1] * rightplane.v[1] + rightplane.v[2] * c->velocity_car_space.v[2] + c->velocity_car_space.v[0] * rightplane.v[0]) * c->M / dt;
-        v129 = rightplane.v[1] * B.v[1] + rightplane.v[2] * B.v[2] + B.v[0] * rightplane.v[0] + friction_number;
+        friction_number = BrVector3Dot(&c->velocity_car_space, &rightplane) * c->M / dt;
+        v129 = BrVector3Dot(&rightplane, &B) + friction_number;
         v128 = c->mu[0] * c->brake_force / (c->mu[1] / c->friction_elipticity + c->mu[0]);
         v125 = c->brake_force - v128;
         v105 = (c->damage_units[7].damage_level + c->damage_units[6].damage_level) / 2;
@@ -2015,15 +1916,9 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
         } else {
             v116 = c->grip_multiplier;
         }
-        v102.v[0] = c->wpos[0].v[0] - c->cmpos.v[0];
-        v102.v[1] = c->wpos[0].v[1] - c->cmpos.v[1];
-        v102.v[2] = c->wpos[0].v[2] - c->cmpos.v[2];
-        a.v[0] = c->omega.v[1] * v102.v[2] - c->omega.v[2] * v102.v[1];
-        a.v[1] = c->omega.v[2] * v102.v[0] - v102.v[2] * c->omega.v[0];
-        a.v[2] = v102.v[1] * c->omega.v[0] - c->omega.v[1] * v102.v[0];
-        a.v[0] = c->velocity_car_space.v[0] + a.v[0];
-        a.v[1] = c->velocity_car_space.v[1] + a.v[1];
-        a.v[2] = c->velocity_car_space.v[2] + a.v[2];
+        BrVector3Sub(&v102, &c->wpos[0], &c->cmpos);
+        BrVector3Cross(&a, &c->omega, &v102);
+        BrVector3Accumulate(&a, &c->velocity_car_space);
         if (c->driver >= eDriver_net_human
             && (((c->keys.left || c->joystick.left > 0x8000) && c->curvature > 0.0 && deltaomega > 0.1 && a.v[0] > 0.0)
                 || ((c->keys.right || c->joystick.right > 0x8000) && c->curvature < 0.0 && deltaomega < 0.1 && a.v[0] < 0.0))
@@ -2071,8 +1966,6 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
             v99 = v99 - ts2;
             v135 = sqrt(v99 * v99 + v109 * v109) / 2.0;
 
-            // v99 = 8.8f;
-            // v135 = 4.4f;
             printf("final values v99=%f v135=%f ts2=%f\n", v99, v135, ts2);
         } else if (c->driver >= eDriver_net_human && c->gear > 0 && c->revs > c->target_revs && !c->traction_control) {
             if (!c->keys.change_down) {
@@ -2091,9 +1984,9 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
             v109 = v87 * v109;
             v99 = c->friction_elipticity * v87 * v99;
             friction_number = -((c->wpos[2].v[2] - c->cmpos.v[2]) * v108 * ((c->wpos[2].v[2] - c->cmpos.v[2]) * v108) / c->I.v[1] + (v98 * v98 + v108 * v108) / c->M);
-            ts2 = (v103.v[2] * vplane.v[2] + v103.v[1] * vplane.v[1] + v103.v[0] * vplane.v[0] + v109 / c->M) * v108;
-            ts2 = (rightplane.v[1] * vplane.v[1] + rightplane.v[2] * vplane.v[2] + vplane.v[0] * rightplane.v[0]) * v98 + ts2;
-            ts2 = (c->omega.v[1] * c->road_normal.v[1] + c->road_normal.v[2] * c->omega.v[2] + c->road_normal.v[0] * c->omega.v[0]) * (c->wpos[2].v[2] - c->cmpos.v[2]) * v108 + ts2;
+            ts2 = (BrVector3Dot(&v103, &vplane) + v109 / c->M) * v108;
+            ts2 = BrVector3Dot(&rightplane, &vplane) * v98 + ts2;
+            ts2 = BrVector3Dot(&c->omega, &c->road_normal) /*(c->omega.v[1] * c->road_normal.v[1] + c->road_normal.v[2] * c->omega.v[2] + c->road_normal.v[0] * c->omega.v[0])*/ * (c->wpos[2].v[2] - c->cmpos.v[2]) * v108 + ts2;
             ts2 = (c->wpos[0].v[2] - c->cmpos.v[2]) * (c->wpos[2].v[2] - c->cmpos.v[2]) * v109 / c->I.v[1] * v108 + ts2;
             if (fabs(friction_number) > 0.1) {
                 friction_number = ts2 / (friction_number * dt);
@@ -2190,12 +2083,7 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
         default:
             break;
         }
-        if (c->wheel_slip
-            && c->curvature * c->turn_speed > 0.0
-            && fabs(v109) > 0.0099999998
-            && c->curvature * v109 < 0.0
-            && !c->keys.brake
-            && !c->keys.change_down) {
+        if (c->wheel_slip && c->curvature * c->turn_speed > 0.0 && fabs(v109) > 0.0099999998 && c->curvature * v109 < 0.0 && !c->keys.brake && !c->keys.change_down) {
             c->turn_speed = 0.0;
         }
         v135 = sqrt(v108 * v108 + v98 * v98) / 2.0;
@@ -2277,92 +2165,45 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
             }
             break;
         }
-        v136.v[0] = rightplane.v[0] * v99;
-        v136.v[1] = rightplane.v[1] * v99;
-        v136.v[2] = rightplane.v[2] * v99;
-        a.v[0] = v103.v[0] * v109;
-        a.v[1] = v103.v[1] * v109;
-        a.v[2] = v103.v[2] * v109;
-        v136.v[0] = a.v[0] + v136.v[0];
-        v136.v[1] = v136.v[1] + a.v[1];
-        v136.v[2] = v136.v[2] + a.v[2];
-        v123.v[0] = rightplane.v[0] * v98;
-        v123.v[1] = rightplane.v[1] * v98;
-        v123.v[2] = rightplane.v[2] * v98;
-        a.v[0] = v103.v[0] * v108;
-        a.v[1] = v103.v[1] * v108;
-        a.v[2] = v103.v[2] * v108;
-        v123.v[0] = v123.v[0] + a.v[0];
-        v123.v[1] = v123.v[1] + a.v[1];
-        v123.v[2] = v123.v[2] + a.v[2];
+        BrVector3Scale(&v136, &rightplane, v99);
+        BrVector3Scale(&a, &v103, v109);
+        BrVector3Accumulate(&v136, &a);
+        BrVector3Scale(&v123, &rightplane, v98);
+        BrVector3Scale(&a, &v103, v108);
+        BrVector3Accumulate(&v123, &a);
+
         rightplane = c->wpos[0];
         rightplane.v[1] = rightplane.v[1] - c->oldd[0];
-        rightplane.v[0] = rightplane.v[0] - c->cmpos.v[0];
-        rightplane.v[1] = rightplane.v[1] - c->cmpos.v[1];
-        rightplane.v[2] = rightplane.v[2] - c->cmpos.v[2];
-        b.v[0] = v136.v[0] * force[0];
-        b.v[1] = v136.v[1] * force[0];
-        b.v[2] = v136.v[2] * force[0];
-        B.v[0] = B.v[0] + b.v[0];
-        B.v[1] = B.v[1] + b.v[1];
-        B.v[2] = B.v[2] + b.v[2];
-        a.v[0] = rightplane.v[1] * b.v[2] - b.v[1] * rightplane.v[2];
-        a.v[1] = rightplane.v[2] * b.v[0] - b.v[2] * rightplane.v[0];
-        a.v[2] = b.v[1] * rightplane.v[0] - rightplane.v[1] * b.v[0];
-        f.v[0] = f.v[0] + a.v[0];
-        f.v[1] = f.v[1] + a.v[1];
-        f.v[2] = f.v[2] + a.v[2];
+        BrVector3Sub(&rightplane, &rightplane, &c->cmpos);
+        BrVector3Scale(&b, &v136, force[0]);
+        BrVector3Accumulate(&B, &b);
+        BrVector3Cross(&a, &rightplane, &b);
+        BrVector3Accumulate(&f, &a);
+
         rightplane = c->wpos[1];
         rightplane.v[1] = rightplane.v[1] - c->oldd[1];
-        rightplane.v[0] = rightplane.v[0] - c->cmpos.v[0];
-        rightplane.v[1] = rightplane.v[1] - c->cmpos.v[1];
-        rightplane.v[2] = rightplane.v[2] - c->cmpos.v[2];
-        b.v[0] = force[1] * v136.v[0];
-        b.v[1] = force[1] * v136.v[1];
-        b.v[2] = force[1] * v136.v[2];
-        B.v[0] = B.v[0] + b.v[0];
-        B.v[1] = B.v[1] + b.v[1];
-        B.v[2] = B.v[2] + b.v[2];
-        a.v[0] = rightplane.v[1] * b.v[2] - b.v[1] * rightplane.v[2];
-        a.v[1] = rightplane.v[2] * b.v[0] - b.v[2] * rightplane.v[0];
-        a.v[2] = b.v[1] * rightplane.v[0] - rightplane.v[1] * b.v[0];
-        f.v[0] = f.v[0] + a.v[0];
-        f.v[1] = f.v[1] + a.v[1];
-        f.v[2] = f.v[2] + a.v[2];
+        BrVector3Sub(&rightplane, &rightplane, &c->cmpos);
+        BrVector3Scale(&b, &v136, force[1]);
+        BrVector3Accumulate(&B, &b);
+        BrVector3Cross(&a, &rightplane, &b);
+        BrVector3Accumulate(&f, &a);
+
         rightplane = c->wpos[2];
         rightplane.v[1] = rightplane.v[1] - c->oldd[2];
-        rightplane.v[0] = rightplane.v[0] - c->cmpos.v[0];
-        rightplane.v[1] = rightplane.v[1] - c->cmpos.v[1];
-        rightplane.v[2] = rightplane.v[2] - c->cmpos.v[2];
-        b.v[0] = force[2] * v123.v[0];
-        b.v[1] = force[2] * v123.v[1];
-        b.v[2] = force[2] * v123.v[2];
-        B.v[0] = B.v[0] + b.v[0];
-        B.v[1] = B.v[1] + b.v[1];
-        B.v[2] = B.v[2] + b.v[2];
-        a.v[0] = rightplane.v[1] * b.v[2] - b.v[1] * rightplane.v[2];
-        a.v[1] = rightplane.v[2] * b.v[0] - b.v[2] * rightplane.v[0];
-        a.v[2] = b.v[1] * rightplane.v[0] - rightplane.v[1] * b.v[0];
-        f.v[0] = f.v[0] + a.v[0];
-        f.v[1] = f.v[1] + a.v[1];
-        f.v[2] = f.v[2] + a.v[2];
+        BrVector3Sub(&rightplane, &rightplane, &c->cmpos);
+        BrVector3Scale(&b, &v123, force[2]);
+        BrVector3Accumulate(&B, &b);
+        BrVector3Cross(&a, &rightplane, &b);
+        BrVector3Accumulate(&f, &a);
+
         rightplane = c->wpos[3];
         rightplane.v[1] = rightplane.v[1] - c->oldd[3];
-        rightplane.v[0] = rightplane.v[0] - c->cmpos.v[0];
-        rightplane.v[1] = rightplane.v[1] - c->cmpos.v[1];
-        rightplane.v[2] = rightplane.v[2] - c->cmpos.v[2];
-        b.v[0] = v123.v[0] * force[3];
-        b.v[1] = v123.v[1] * force[3];
-        b.v[2] = v123.v[2] * force[3];
-        B.v[0] = B.v[0] + b.v[0];
-        B.v[1] = B.v[1] + b.v[1];
-        B.v[2] = B.v[2] + b.v[2];
-        a.v[0] = rightplane.v[1] * b.v[2] - b.v[1] * rightplane.v[2];
-        a.v[1] = rightplane.v[2] * b.v[0] - b.v[2] * rightplane.v[0];
-        a.v[2] = b.v[1] * rightplane.v[0] - rightplane.v[1] * b.v[0];
-        f.v[0] = f.v[0] + a.v[0];
-        f.v[1] = f.v[1] + a.v[1];
-        f.v[2] = f.v[2] + a.v[2];
+        BrVector3Sub(&rightplane, &rightplane, &c->cmpos);
+        BrVector3Scale(&b, &v123, force[3]);
+        BrVector3Accumulate(&B, &b);
+        BrVector3Cross(&a, &rightplane, &b);
+        BrVector3Accumulate(&f, &a);
+
     } else {
         c->max_force_front = 0.0;
         c->max_force_rear = 0.0;
@@ -2370,27 +2211,21 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
     }
     c->number_of_wheels_on_ground = normnum;
     BrMatrix34ApplyV(&b, &B, mat);
-    rightplane.v[0] = f.v[0] * dt;
-    rightplane.v[1] = f.v[1] * dt;
-    rightplane.v[2] = f.v[2] * dt;
+    BrVector3Scale(&rightplane, &f, dt);
     ApplyTorque(c, &rightplane);
-    rightplane.v[0] = dt / c->M * b.v[0];
-    rightplane.v[1] = dt / c->M * b.v[1];
-    rightplane.v[2] = dt / c->M * b.v[2];
-    c->v.v[0] = c->v.v[0] + rightplane.v[0];
-    c->v.v[1] = c->v.v[1] + rightplane.v[1];
-    c->v.v[2] = c->v.v[2] + rightplane.v[2];
+    BrVector3Scale(&rightplane, &b, dt / c->M);
+    BrVector3Accumulate(&c->v, &rightplane);
     if (c->speed < 0.000099999997
         && ((!c->keys.acc && c->joystick.acc <= 0) || !c->gear)
         && !c->keys.dec
         && c->joystick.dec <= 0
         && c->bounce_rate == 0.0
-        && sqrt(c->omega.v[1] * c->omega.v[1] + c->omega.v[2] * c->omega.v[2] + c->omega.v[0] * c->omega.v[0]) < 0.05) {
+        && BrVector3Length(&c->omega) < 0.05) {
         if (vol) {
             v73 = c->driver > eDriver_non_car && c->underwater_ability ? 1.0 - (1.0 - vol->gravity_multiplier) * 0.6 : vol->gravity_multiplier;
-            friction_number = sqrt(b.v[2] * b.v[2] + b.v[1] * b.v[1] + b.v[0] * b.v[0]) / v73 / gGravity_multiplier;
+            friction_number = BrVector3Length(&b) / v73 / gGravity_multiplier;
         } else {
-            friction_number = sqrt(b.v[2] * b.v[2] + b.v[1] * b.v[1] + b.v[0] * b.v[0]);
+            friction_number = BrVector3Length(&b);
         }
         if (c->M > friction_number || (c->keys.brake && normnum >= 3)) {
             if (stop_timer == 100.0) {
