@@ -2761,7 +2761,14 @@ void GetPairOfFloatPercents(FILE* pF, float* pF1, float* pF2) {
     char s[256];
     char* str;
     LOG_TRACE("(%p, %p, %p)", pF, pF1, pF2);
-    NOT_IMPLEMENTED();
+
+    GetALineAndDontArgue(pF, s);
+    str = strtok(s, "\t ,/");
+    sscanf(str, "%f", pF1);
+    str = strtok(NULL, "\t ,/");
+    sscanf(str, "%f", pF2);
+    *pF1 = *pF1 / 100.0;
+    *pF2 = *pF2 / 100.0;
 }
 
 // IDA: void __usercall GetThreeFloatPercents(FILE *pF@<EAX>, float *pF1@<EDX>, float *pF2@<EBX>, float *pF3@<ECX>)
@@ -2877,33 +2884,41 @@ FILE* OldDRfopen(char* pFilename, char* pMode) {
     fp = fopen(pFilename, pMode);
 
     if (fp) {
-        len = strlen(pFilename);
-        if (gDecode_thing != 0) {
-            if (strcmp(&pFilename[len - 4], ".TXT") == 0
-                && strcmp(&pFilename[len - 12], "DKEYMAP0.TXT") != 0
-                && strcmp(&pFilename[len - 12], "DKEYMAP1.TXT") != 0
-                && strcmp(&pFilename[len - 12], "DKEYMAP2.TXT") != 0
-                && strcmp(&pFilename[len - 12], "DKEYMAP3.TXT") != 0
-                && strcmp(&pFilename[len - 12], "KEYMAP_0.TXT") != 0
-                && strcmp(&pFilename[len - 12], "KEYMAP_1.TXT") != 0
-                && strcmp(&pFilename[len - 12], "KEYMAP_2.TXT") != 0
-                && strcmp(&pFilename[len - 12], "KEYMAP_3.TXT") != 0
-                && strcmp(&pFilename[len - 11], "OPTIONS.TXT") != 0
-                && strcmp(&pFilename[len - 11], "KEYNAMES.TXT") != 0
-                && strcmp(&pFilename[len - 10], "KEYMAP.TXT") != 0
-                && strcmp(&pFilename[len - 9], "PATHS.TXT") != 0
-                && strcmp(&pFilename[len - 11], "PRATCAM.TXT") != 0) {
-                ch = fgetc(fp);
-                if (ch != gDecode_thing) {
-                    fclose(fp);
-                    LOG_WARN("Unexpected encoding character");
-                    return NULL;
+
+        // gDecode_thing checks are not present in the demo. If the text file starts with
+        // a '@' character, it will be decoded, otherwise used as-is. No checks on PROG.ACT etc.
+        if (harness_game_info.mode == eGame_carmageddon_demo) {
+            return fp;
+        } else {
+            len = strlen(pFilename);
+            if (gDecode_thing != 0) {
+                if (strcmp(&pFilename[len - 4], ".TXT") == 0
+                    && strcmp(&pFilename[len - 12], "DKEYMAP0.TXT") != 0
+                    && strcmp(&pFilename[len - 12], "DKEYMAP1.TXT") != 0
+                    && strcmp(&pFilename[len - 12], "DKEYMAP2.TXT") != 0
+                    && strcmp(&pFilename[len - 12], "DKEYMAP3.TXT") != 0
+                    && strcmp(&pFilename[len - 12], "KEYMAP_0.TXT") != 0
+                    && strcmp(&pFilename[len - 12], "KEYMAP_1.TXT") != 0
+                    && strcmp(&pFilename[len - 12], "KEYMAP_2.TXT") != 0
+                    && strcmp(&pFilename[len - 12], "KEYMAP_3.TXT") != 0
+                    && strcmp(&pFilename[len - 11], "OPTIONS.TXT") != 0
+                    && strcmp(&pFilename[len - 11], "KEYNAMES.TXT") != 0
+                    && strcmp(&pFilename[len - 10], "KEYMAP.TXT") != 0
+                    && strcmp(&pFilename[len - 9], "PATHS.TXT") != 0
+                    && strcmp(&pFilename[len - 11], "PRATCAM.TXT") != 0) {
+                    ch = fgetc(fp);
+                    if (ch != gDecode_thing) {
+                        fclose(fp);
+                        LOG_WARN("Unexpected encoding character");
+                        return NULL;
+                    }
+                    ungetc(ch, fp);
+                    return fp;
                 }
-                ungetc(ch, fp);
-                return fp;
             }
         }
     }
+
     if (gCD_fully_installed) {
         return fp;
     }
@@ -3077,7 +3092,8 @@ int TestForOriginalCarmaCDinDrive() {
         return 0;
     }
 
-    if (!PDCheckDriveExists2(cutscene_pathname, harness_game_mode.intro_smk_file, 2000000)) {
+    // changed from static file reference to handle all game modes
+    if (!PDCheckDriveExists2(cutscene_pathname, harness_game_info.intro_smk_file, 2000000)) {
         return 0;
     }
 

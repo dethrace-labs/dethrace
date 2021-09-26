@@ -50,6 +50,39 @@ int CheckQuit() {
     return 0;
 }
 
+// Added to handle demo-specific text file decryption behavior
+void EncodeLine_DEMO(char* pS) {
+    int len;
+    int seed;
+    int i;
+    char* key;
+    unsigned char c;
+    FILE* test;
+    tPath_name the_path;
+    const tU32 gLong_key_DEMO[] = { 0x763A5058, 0x6585B6CB, 0x75BCD15, 0x3ADE68B1 };
+
+    len = strlen(pS);
+    key = (char*)gLong_key_DEMO;
+
+    while (len > 0 && (pS[len - 1] == '\r' || pS[len - 1] == '\n')) {
+        len--;
+        pS[len] = 0;
+    }
+    seed = len % 16;
+    for (i = 0; i < len; i++) {
+        c = pS[i];
+        if (c == '\t') {
+            c = 0x9F;
+        }
+        c = ((key[seed] ^ (c - 32)) & 0x7F) + 32;
+        seed = (seed + 7) % 16;
+        if (c == 0x9F) {
+            c = '\t';
+        }
+        pS[i] = c;
+    }
+}
+
 // IDA: void __usercall EncodeLine(char *pS@<EAX>)
 void EncodeLine(char* pS) {
     int len;
@@ -60,6 +93,12 @@ void EncodeLine(char* pS) {
     FILE* test;
     tPath_name the_path;
     char s[256];
+
+    // Added to handle demo-specific text file decryption behavior
+    if (harness_game_info.mode == eGame_carmageddon_demo) {
+        EncodeLine_DEMO(pS);
+        return;
+    }
 
     len = strlen(pS);
     key = (char*)gLong_key;

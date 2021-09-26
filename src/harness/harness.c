@@ -27,17 +27,21 @@ int back_screen_is_transparent = 0;
 extern void BrPixelmapFill(br_pixelmap* dst, br_uint_32 colour);
 
 // SplatPack or Carmageddon. This is where we represent the code differences between the two. For example, the intro smack file.
-tHarness_GameMode harness_game_mode;
+tHarness_game_info harness_game_info;
 
 void Harness_DetectGameMode() {
-    if (access("DATA/CUTSCENE/SPLINTRO.SMK", F_OK) != -1) {
-        harness_game_mode.name = "Splat Pack";
-        harness_game_mode.intro_smk_file = "SPLINTRO.SMK";
+
+    if (access("DATA/RACES/CITY01.TXT", F_OK) == -1 && access("DATA/RACES/CITYA1.TXT", F_OK) == -1) {
+        harness_game_info.intro_smk_file = "";
+        harness_game_info.mode = eGame_carmageddon_demo;
+        LOG_INFO("\"%s\"", "Carmageddon demo");
+    } else if (access("DATA/CUTSCENE/SPLINTRO.SMK", F_OK) != -1) {
+        harness_game_info.intro_smk_file = "SPLINTRO.SMK";
+        LOG_INFO("\"%s\"", "Splat Pack");
     } else {
-        harness_game_mode.name = "Carmageddon";
-        harness_game_mode.intro_smk_file = "MIX_INTR.SMK";
+        harness_game_info.intro_smk_file = "MIX_INTR.SMK";
+        LOG_INFO("\"%s\"", "Carmageddon");
     }
-    LOG_INFO("\"%s\"", harness_game_mode.name);
 }
 
 void Harness_Init(char* name, tRenderer* renderer) {

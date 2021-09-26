@@ -309,18 +309,21 @@ void PDInitialiseSystem() {
     //v4 = DOSMouseBegin();
     gJoystick_deadzone = 8000;
     //gUpper_loop_limit = sub_A1940(v4, v5, v3, v6) / 2;
-    PathCat(the_path, gApplication_path, "KEYBOARD.COK");
-    f = fopen(the_path, "rb");
-    if (!f) {
-        PDFatalError("This .exe must have KEYBOARD.COK in the DATA folder.");
-    }
 
-    fseek(f, 0, SEEK_END);
-    len = ftell(f);
-    rewind(f);
-    fread(gASCII_table, len / 2, 1, f);
-    fread(gASCII_shift_table, len / 2, 1, f);
-    fclose(f);
+    if (harness_game_info.mode != eGame_carmageddon_demo) {
+        PathCat(the_path, gApplication_path, "KEYBOARD.COK");
+        f = fopen(the_path, "rb");
+        if (!f) {
+            PDFatalError("This .exe must have KEYBOARD.COK in the DATA folder.");
+        }
+
+        fseek(f, 0, SEEK_END);
+        len = ftell(f);
+        rewind(f);
+        fread(gASCII_table, len / 2, 1, f);
+        fread(gASCII_shift_table, len / 2, 1, f);
+        fclose(f);
+    }
 }
 
 // IDA: void __cdecl PDShutdownSystem()

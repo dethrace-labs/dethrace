@@ -135,7 +135,8 @@ void PlaySmackerFile(char* pSmack_name) {
 void DoOpeningAnimation() {
     LOG_TRACE("()");
     PlaySmackerFile("LOGO.SMK");
-    PlaySmackerFile(harness_game_mode.intro_smk_file);
+    // changed from static file reference to handle all game modes
+    PlaySmackerFile(harness_game_info.intro_smk_file);
     return WaitForNoKeys();
 }
 
