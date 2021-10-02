@@ -1,0 +1,23 @@
+#ifndef SDL_GL_PLATFORM_H
+#define SDL_GL_PLATFORM_H
+
+#include "harness.h"
+#include "sdl/common.h"
+#include "sdl/gl_renderer.h"
+
+// extern tPlatform sdl_gl_platform;
+
+tPlatform sdl_gl_platform = {
+    SDLPlatform_Init,
+    GLRenderer_CreateWindow,
+    SDLPlatform_PollEvents,
+    SDLPlatform_GetKeyMap,
+    SDLPlatform_IsKeyDown,
+    GLRenderer_BeginFrame,
+    GLRenderer_EndFrame,
+    GLRenderer_RenderFullScreenQuad,
+    GLRenderer_RenderModel,
+    GLRenderer_Swap
+};
+
+#endif

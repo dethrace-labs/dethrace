@@ -1,6 +1,6 @@
 #include "enables.h"
 #include "dbsetup.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 #include <stddef.h>
 
 // IDA: void __usercall actorEnable(br_v1db_enable *e@<EAX>, br_actor *a@<EDX>)

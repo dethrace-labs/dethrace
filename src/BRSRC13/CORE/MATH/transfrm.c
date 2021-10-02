@@ -3,7 +3,7 @@
 #include "CORE/MATH/matrix34.h"
 #include "CORE/MATH/quat.h"
 #include "CORE/MATH/vector.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 
 #define M34 BR_TRANSFORM_MATRIX34
 #define MLP BR_TRANSFORM_MATRIX34_LP

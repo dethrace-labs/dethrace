@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "harness/trace.h"
 #include "network.h"
 #include "pd/sys.h"
 #include "utility.h"

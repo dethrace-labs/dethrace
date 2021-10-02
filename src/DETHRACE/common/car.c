@@ -10,6 +10,7 @@
 #include "globvrkm.h"
 #include "globvrpb.h"
 #include "graphics.h"
+#include "harness/trace.h"
 #include "netgame.h"
 #include "oil.h"
 #include "opponent.h"

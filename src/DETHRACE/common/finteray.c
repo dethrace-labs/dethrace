@@ -3,7 +3,9 @@
 #include "brucetrk.h"
 #include "car.h"
 #include "globvars.h"
+#include "harness/trace.h"
 #include "world.h"
+#include <math.h>
 #include <stdlib.h>
 
 int gPling_materials = 1;

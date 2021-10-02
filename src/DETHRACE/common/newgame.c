@@ -8,6 +8,7 @@
 #include "globvrpb.h"
 #include "grafdata.h"
 #include "graphics.h"
+#include "harness/trace.h"
 #include "init.h"
 #include "input.h"
 #include "intrface.h"
@@ -15,6 +16,7 @@
 #include "utility.h"
 #include "world.h"
 #include <stdlib.h>
+#include <string.h>
 
 tU8* gFrank_flic_data;
 tU8* gAnne_flic_data;

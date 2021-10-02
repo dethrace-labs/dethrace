@@ -1,4 +1,5 @@
 #include "replay.h"
+#include "harness/trace.h"
 #include <stdlib.h>
 
 #include "graphics.h"

@@ -1,5 +1,5 @@
 #include "logwrite.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 
 // IDA: int __cdecl BrLogWrite(void *buffer, br_size_t s, br_size_t n)
 int BrLogWrite(void* buffer, br_size_t s, br_size_t n) {

@@ -1,17 +1,18 @@
 #include "brender/brender.h"
-#include "common/car.h"
-#include "common/errors.h"
-#include "common/globvars.h"
-#include "common/grafdata.h"
-#include "common/graphics.h"
-#include "common/loadsave.h"
-#include "common/main.h"
-#include "common/sound.h"
-#include "common/utility.h"
-#include "harness.h"
-#include "harness_hooks.h"
+#include "car.h"
+#include "errors.h"
+#include "globvars.h"
+#include "grafdata.h"
+#include "graphics.h"
+#include "harness/config.h"
+#include "harness/hooks.h"
+#include "harness/trace.h"
 #include "input.h"
+#include "loadsave.h"
+#include "main.h"
 #include "pd/sys.h"
+#include "sound.h"
+#include "utility.h"
 #include "watcom_functions.h"
 #include <dirent.h>
 #include <stdio.h>
@@ -107,7 +108,6 @@ void KeyTranslation(tU8 pKey_index, tU8 pScan_code_1, tU8 pScan_code_2) {
 // IDA: void __cdecl KeyBegin()
 void KeyBegin() {
 
-    Harness_Hook_KeyBegin();
     // int v0; // edx@0
     // int v1; // ST00_4@1
     // __int16 v2; // dx@1
@@ -245,6 +245,8 @@ void PDSetKeyArray(int* pKeys, int pMark) {
     tS32 joyY;
     LOG_TRACE10("(%p, %d)", pKeys, pMark);
 
+    PlatformHooks_PollEvents();
+
     gKeys_pressed = 0;
     for (i = 0; i < 123; i++) {
         if (KeyDown(gScan_code[i][0]) || KeyDown(gScan_code[i][1])) {
@@ -310,6 +312,7 @@ void PDInitialiseSystem() {
     gJoystick_deadzone = 8000;
     //gUpper_loop_limit = sub_A1940(v4, v5, v3, v6) / 2;
 
+    // Demo does not ship with KEYBOARD.COK file
     if (harness_game_info.mode != eGame_carmageddon_demo) {
         PathCat(the_path, gApplication_path, "KEYBOARD.COK");
         f = fopen(the_path, "rb");
@@ -576,7 +579,7 @@ int PDGetTotalTime() {
 
 // IDA: int __usercall PDServiceSystem@<EAX>(tU32 pTime_since_last_call@<EAX>)
 int PDServiceSystem(tU32 pTime_since_last_call) {
-    Harness_Hook_PDServiceSystem(pTime_since_last_call);
+    PlatformHooks_PollEvents();
     return 0;
 }
 

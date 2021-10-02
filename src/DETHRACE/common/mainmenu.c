@@ -6,6 +6,7 @@
 #include "globvrpb.h"
 #include "grafdata.h"
 #include "graphics.h"
+#include "harness/trace.h"
 #include "intrface.h"
 #include "loading.h"
 #include "loadsave.h"

@@ -1,7 +1,7 @@
 #include "scratch.h"
 #include "diag.h"
 #include "fwsetup.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 #include "resource.h"
 
 char scratchString[512];

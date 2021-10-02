@@ -6,6 +6,8 @@
 #include "errors.h"
 #include "globvars.h"
 #include "globvrpb.h"
+#include "harness/config.h"
+#include "harness/trace.h"
 #include "input.h"
 #include "loading.h"
 #include "loadsave.h"
@@ -94,7 +96,7 @@ void EncodeLine(char* pS) {
     tPath_name the_path;
     char s[256];
 
-    // Added to handle demo-specific text file decryption behavior
+    // Demo has its own decryption key + behavior
     if (harness_game_info.mode == eGame_carmageddon_demo) {
         EncodeLine_DEMO(pS);
         return;

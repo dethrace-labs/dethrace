@@ -1,5 +1,5 @@
 #include "assocarr.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 
 // IDA: br_associative_array* __cdecl BrAssociativeArrayAllocate()
 br_associative_array* BrAssociativeArrayAllocate() {

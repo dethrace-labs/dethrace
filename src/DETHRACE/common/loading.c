@@ -20,6 +20,8 @@
 #include "globvrpb.h"
 #include "grafdata.h"
 #include "graphics.h"
+#include "harness/config.h"
+#include "harness/trace.h"
 #include "init.h"
 #include "input.h"
 #include "newgame.h"
@@ -1364,7 +1366,13 @@ intptr_t LinkModel(br_actor* pActor, tModel_pool* pModel_pool) {
     LOG_TRACE("(%p, %p)", pActor, pModel_pool);
 
     if (pActor->model && pActor->model->identifier) {
+        LOG_DEBUG("%s, %d", pActor->model->identifier, pModel_pool->model_count);
         for (i = 0; i < pModel_pool->model_count; i++) {
+            LOG_DEBUG("%d", i);
+            LOG_DEBUG("%p", pModel_pool->model_array[i]->identifier);
+            if (pModel_pool->model_array[i]->identifier) {
+                LOG_DEBUG("%s", pModel_pool->model_array[i]->identifier);
+            }
             if (pModel_pool->model_array[i]->identifier
                 && !strcmp(pModel_pool->model_array[i]->identifier, pActor->model->identifier)) {
                 pActor->model = pModel_pool->model_array[i];
@@ -1398,7 +1406,9 @@ void LinkModelsToActor(br_actor* pActor, br_model** pModel_array, int pModel_cou
     tModel_pool model_pool;
     LOG_TRACE("(%p, %p, %d)", pActor, pModel_array, pModel_count);
 
-    DRActorEnumRecurse(pActor, (br_actor_enum_cbfn*)LinkModel, &pModel_array);
+    model_pool.model_array = pModel_array;
+    model_pool.model_count = pModel_count;
+    DRActorEnumRecurse(pActor, (br_actor_enum_cbfn*)LinkModel, &model_pool);
 }
 
 // IDA: void __usercall ReadShrapnelMaterials(FILE *pF@<EAX>, tCollision_info *pCar_spec@<EDX>)
@@ -2885,8 +2895,8 @@ FILE* OldDRfopen(char* pFilename, char* pMode) {
 
     if (fp) {
 
-        // gDecode_thing checks are not present in the demo. If the text file starts with
-        // a '@' character, it will be decoded, otherwise used as-is. No checks on PROG.ACT etc.
+        // Demo does not check gDecode_thing ("i am fiddling" in PROG.ACT)
+        // If the text file starts with a '@' character, it will be decoded, otherwise used as-is.
         if (harness_game_info.mode == eGame_carmageddon_demo) {
             return fp;
         } else {
@@ -2909,7 +2919,6 @@ FILE* OldDRfopen(char* pFilename, char* pMode) {
                     ch = fgetc(fp);
                     if (ch != gDecode_thing) {
                         fclose(fp);
-                        LOG_WARN("Unexpected encoding character");
                         return NULL;
                     }
                     ungetc(ch, fp);

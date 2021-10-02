@@ -1,5 +1,5 @@
 #include "error.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 
 // IDA: br_error __cdecl BrLastErrorGet(void **valuep)
 br_error BrLastErrorGet(void** valuep) {

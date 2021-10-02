@@ -2,7 +2,7 @@
 #include "brender/brender.h"
 #include "cameras/debug_camera.h"
 #include "gl_renderer_shaders.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 
 #include <cglm/cglm.h>
 #include <glad/glad.h>
@@ -10,46 +10,17 @@
 // this needs to be included after glad.h
 #include <SDL_opengl.h>
 
-int Harness_GLRenderer_GetWindowFlags();
-void Harness_GLRenderer_Init(SDL_Window* window);
-void Harness_GLRenderer_Activate(SDL_Window* window);
-void Harness_GLRenderer_RenderFrameBegin(br_actor* camera);
-void Harness_GLRenderer_RenderFrameEnd();
-void Harness_GLRenderer_RenderScreenBuffer(uint32_t* screen_buffer, int transparent);
-void Harness_GLRenderer_Swap(SDL_Window* window);
-void Harness_GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix);
-void Harness_GLRenderer_RenderCube(float col, float x, float y, float z);
-
-tRenderer OpenGLRenderer = {
-    Harness_GLRenderer_GetWindowFlags,
-    Harness_GLRenderer_Init,
-    Harness_GLRenderer_RenderFrameBegin,
-    Harness_GLRenderer_RenderFrameEnd,
-    Harness_GLRenderer_RenderScreenBuffer,
-    Harness_GLRenderer_Swap,
-    Harness_GLRenderer_RenderModel,
-    Harness_GLRenderer_RenderCube
-};
-
 typedef struct tStored_model_context {
     GLuint vao_id, ebo_id;
 } tStored_model_context;
 
+SDL_Window* window;
 SDL_GLContext context;
 GLuint screen_buffer_vao, screen_buffer_ebo;
 GLuint screen_texture;
 GLuint shader_program_2d;
 GLuint shader_program_2d_trans;
 GLuint shader_program_3d;
-
-int Harness_GLRenderer_GetWindowFlags() {
-    if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE) != 0) {
-        LOG_PANIC("Failed to set SDL_GL_CONTEXT_PROFILE_MASK attribute. %s", SDL_GetError());
-    };
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-    return SDL_WINDOW_OPENGL;
-}
 
 void CompileShader(GLuint shader_id, const GLchar* source) {
     int success;
@@ -99,7 +70,28 @@ void LoadShaders() {
     glDeleteShader(fs);
 }
 
-void Harness_GLRenderer_Init(SDL_Window* window) {
+void GLRenderer_CreateWindow(char* title, int width, int height) {
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+        LOG_PANIC("SDL_INIT_VIDEO error: %s", SDL_GetError());
+    }
+
+    if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE) != 0) {
+        LOG_PANIC("Failed to set SDL_GL_CONTEXT_PROFILE_MASK attribute. %s", SDL_GetError());
+    };
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+
+    window = SDL_CreateWindow(title,
+        SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED,
+        width, height,
+        SDL_WINDOW_OPENGL);
+
+    if (!window) {
+        LOG_PANIC("Failed to create window");
+    }
+    SDL_SetRelativeMouseMode(SDL_TRUE);
+
     context = SDL_GL_CreateContext(window);
     if (!context) {
         LOG_PANIC("Failed to call SDL_GL_CreateContext. %s", SDL_GetError());
@@ -161,10 +153,14 @@ void Harness_GLRenderer_Init(SDL_Window* window) {
     glDepthFunc(GL_LESS);
 }
 
-void Harness_GLRenderer_RenderFrameBegin(br_actor* camera) {
+void GLRenderer_BeginFrame(br_actor* camera, br_pixelmap* colour_buffer) {
+
+    glViewport(colour_buffer->base_x * 2, colour_buffer->base_y * 2, colour_buffer->width * 2, colour_buffer->height * 2);
 
     glEnable(GL_DEPTH_TEST);
     glUseProgram(shader_program_3d);
+
+    //glViewport(0, 0, 320, 200);
 
     GLuint lightpos_u = glGetUniformLocation(shader_program_3d, "lightPos");
     GLuint lightcolor_u = glGetUniformLocation(shader_program_3d, "lightColor");
@@ -203,10 +199,11 @@ void Harness_GLRenderer_RenderFrameBegin(br_actor* camera) {
     DebugCamera_Update();
 }
 
-void Harness_GLRenderer_RenderFrameEnd() {
+void GLRenderer_EndFrame() {
+    glViewport(0, 0, 640, 480);
 }
 
-void Harness_GLRenderer_RenderScreenBuffer(uint32_t* screen_buffer, int transparent) {
+void GLRenderer_RenderFullScreenQuad(uint32_t* screen_buffer, int transparent) {
 
     glDisable(GL_DEPTH_TEST);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -228,7 +225,7 @@ void Harness_GLRenderer_RenderScreenBuffer(uint32_t* screen_buffer, int transpar
     glBindVertexArray(0);
 }
 
-void Harness_GLRenderer_Swap(SDL_Window* window) {
+void GLRenderer_Swap() {
     SDL_GL_SwapWindow(window);
     // glClearColor(0.0f, 0.5f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -327,7 +324,7 @@ void build_model(br_model* model) {
     model->stored = ctx;
 }
 
-void Harness_GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
+void GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
     tStored_model_context* ctx;
     ctx = model->stored;
     v11model* v11 = model->prepared;
@@ -340,7 +337,7 @@ void Harness_GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
     if (ctx == NULL) {
         build_model(model);
         ctx = model->stored;
-        DebugCamera_SetPosition(model_matrix.m[3][0], model_matrix.m[3][1], model_matrix.m[3][2]);
+        //DebugCamera_SetPosition(model_matrix.m[3][0], model_matrix.m[3][1], model_matrix.m[3][2]);
     }
 
     glEnable(GL_DEPTH_TEST);
@@ -378,6 +375,9 @@ void Harness_GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
 
     glBindVertexArray(0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+void Harness_GLRenderer_SetViewport(int x, int y, int width, int height) {
 }
 
 void Harness_GLRenderer_RenderCube(float col, float x, float y, float z) {

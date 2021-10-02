@@ -3,6 +3,7 @@
 #include "errors.h"
 #include "globvars.h"
 #include "graphics.h"
+#include "harness/trace.h"
 #include "loading.h"
 #include "utility.h"
 #include "world.h"

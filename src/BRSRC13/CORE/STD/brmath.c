@@ -1,5 +1,5 @@
 #include "brmath.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 #include <math.h>
 
 float BrFloatFloor(float f) {

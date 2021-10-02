@@ -1,4 +1,5 @@
 #include "racesumm.h"
+#include "harness/trace.h"
 #include <stdlib.h>
 
 int gPlayer_lookup[6];

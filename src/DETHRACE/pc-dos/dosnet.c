@@ -1,6 +1,7 @@
 #include "pd/net.h"
 
-#include "common/errors.h"
+#include "errors.h"
+#include "harness/trace.h"
 #include <stdlib.h>
 #include <string.h>
 

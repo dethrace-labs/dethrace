@@ -1,17 +1,16 @@
 
 #include "harness.h"
-#include "harness_hooks.h"
-#include "harness_trace.h"
-#include "input/keyboard.h"
+#include "include/harness/config.h"
+#include "platforms/sdl_gl.h"
 #include "rendering/renderer_state.h"
 #include "sound/sound.h"
 #include "stack_trace_handler.h"
+
 #include <strings.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
-SDL_Window* window;
-tRenderer* current_renderer;
+tPlatform* platform;
 br_pixelmap* palette;
 uint32_t* screen_buffer;
 harness_br_renderer* renderer_state;
@@ -25,6 +24,7 @@ int harness_disable_cd_check = 1;
 int back_screen_is_transparent = 0;
 
 extern void BrPixelmapFill(br_pixelmap* dst, br_uint_32 colour);
+extern uint8_t gScan_code[123][2];
 
 // SplatPack or Carmageddon. This is where we represent the code differences between the two. For example, the intro smack file.
 tHarness_game_info harness_game_info;
@@ -44,15 +44,26 @@ void Harness_DetectGameMode() {
     }
 }
 
-void Harness_Init(char* name, tRenderer* renderer) {
+void Harness_Init(char* name, char* platform_name) {
     int result;
 
-    install_signal_handler(name);
-    current_renderer = renderer;
+    if (strcmp(platform_name, "sdl_gl") == 0) {
+        platform = &sdl_gl_platform;
+    } else if (strcmp(platform_name, "null") == 0) {
+        platform = NULL;
+    } else {
+        LOG_PANIC("Unknown platform name %s", platform_name);
+    }
+
     screen_buffer = NULL;
 
-    if (SDL_Init(SDL_INIT_TIMER) != 0) {
-        LOG_PANIC("SDL_INIT_TIMER error: %s", SDL_GetError());
+    install_signal_handler(name);
+    platform->Init();
+
+    int* keymap = platform->GetKeyMap();
+    for (int i = 0; i < 123; i++) {
+        gScan_code[i][0] = keymap[i];
+        //gScan_code[i][1] = keymap[i];
     }
 
     char* root_dir = getenv("DETHRACE_ROOT_DIR");
@@ -76,21 +87,7 @@ void Harness_Debug_PrintStack() {
 }
 
 void Harness_PumpEvents() {
-    SDL_Event event;
-
-    while (SDL_PollEvent(&event)) {
-        switch (event.type) {
-
-        case SDL_KEYDOWN:
-        case SDL_KEYUP:
-            Keyboard_HandleEvent(&event.key);
-            break;
-
-        case SDL_QUIT:
-            LOG_PANIC("QuitGame");
-            break;
-        }
-    }
+    platform->PollEvents();
 }
 
 int Harness_Hook_HandleCommandLineArg(char* arg) {
@@ -107,27 +104,7 @@ int Harness_Hook_HandleCommandLineArg(char* arg) {
 }
 
 void Harness_Hook_DOSGfxBegin() {
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        LOG_PANIC("SDL_INIT_VIDEO error: %s", SDL_GetError());
-    }
-
-    window = SDL_CreateWindow("Dethrace",
-        SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED,
-        680, 480,
-        current_renderer->get_window_flags());
-
-    if (!window) {
-        LOG_PANIC("Failed to create window");
-    }
-    current_renderer->init(window);
-
-    //SDL_SetWindowGrab(window, SDL_TRUE);
-    SDL_SetRelativeMouseMode(SDL_TRUE);
-}
-
-void Harness_Hook_PDServiceSystem(int pTime_since_last_call) {
-    Harness_PumpEvents();
+    platform->CreateWindow("Dethrace", 640, 480);
 }
 
 void Harness_RenderScreen(br_pixelmap* dst, br_pixelmap* src) {
@@ -148,7 +125,8 @@ void Harness_RenderScreen(br_pixelmap* dst, br_pixelmap* src) {
             screen_buffer[y * src->width + x] = colors[palette_index];
         }
     }
-    current_renderer->renderScreenBuffer(screen_buffer, back_screen_is_transparent);
+
+    platform->RenderFullScreenQuad(screen_buffer, back_screen_is_transparent);
     Harness_PumpEvents();
 
     last_dst = dst;
@@ -157,14 +135,14 @@ void Harness_RenderScreen(br_pixelmap* dst, br_pixelmap* src) {
 
 void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {
     Harness_RenderScreen(dst, src);
-    current_renderer->swap(window);
+    platform->Swap();
     back_screen_is_transparent = 0;
 }
 void Harness_Hook_BrDevPaletteSetOld(br_pixelmap* pm) {
     palette = pm;
     if (last_src) {
         Harness_RenderScreen(last_dst, last_src);
-        current_renderer->swap(window);
+        platform->Swap();
     }
 }
 
@@ -183,7 +161,7 @@ void Harness_Hook_BrV1dbRendererBegin(br_v1db_state* v1db) {
 int col = 128;
 
 void Harness_Hook_renderFaces(br_model* model, br_material* material, br_token type) {
-    current_renderer->renderModel(model, renderer_state->state.matrix.model_to_view);
+    platform->RenderModel(model, renderer_state->state.matrix.model_to_view);
 }
 
 void Harness_Hook_BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer) {
@@ -193,7 +171,8 @@ void Harness_Hook_BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pix
     BrPixelmapFill(colour_buffer, 0);
     back_screen_is_transparent = 1;
 
-    current_renderer->renderFrameBegin(camera);
+    //current_renderer->setViewport(colour_buffer->base_x * 2, colour_buffer->base_y * 2, colour_buffer->width * 2, colour_buffer->height * 2);
+    platform->BeginFrame(camera, colour_buffer);
     col = 0;
 }
 
@@ -201,14 +180,15 @@ void Harness_Hook_BrZbSceneRenderAdd(br_actor* tree) {
 }
 
 void Harness_Hook_BrZbSceneRenderEnd() {
-}
-
-void Harness_Hook_KeyBegin() {
-    Keyboard_Init();
+    platform->EndFrame();
 }
 
 int Harness_Hook_KeyDown(unsigned char pScan_code) {
-    return Keyboard_IsKeyDown(pScan_code);
+    return platform->IsKeyDown(pScan_code);
+}
+
+void PlatformHooks_PollEvents() {
+    Harness_PumpEvents();
 }
 
 void Harness_Hook_S3Service(int unk1, int unk2) {

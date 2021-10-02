@@ -14,13 +14,17 @@ void Harness_NullRenderer_RenderFrameBegin() {
 void Harness_NullRenderer_RenderFrameEnd() {
 }
 
-tRenderer NullRenderer = {
-    Harness_NullRenderer_GetWindowFlags,
-    Harness_NullRenderer_Init,
-    Harness_NullRenderer_RenderFrameBegin,
-    Harness_NullRenderer_RenderFrameEnd,
-    Harness_NullRenderer_RenderScreenBuffer,
-    Harness_NullRenderer_Swap,
-    NULL,
-    NULL
-};
+void Harness_NullRenderer_SetViewport(int x, int y, int width, int height) {
+}
+
+// tRenderer NullRenderer = {
+//     Harness_NullRenderer_GetWindowFlags,
+//     Harness_NullRenderer_Init,
+//     Harness_NullRenderer_SetViewport,
+//     Harness_NullRenderer_RenderFrameBegin,
+//     Harness_NullRenderer_RenderFrameEnd,
+//     Harness_NullRenderer_RenderScreenBuffer,
+//     Harness_NullRenderer_Swap,
+//     NULL,
+//     NULL
+// };

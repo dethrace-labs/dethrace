@@ -3,8 +3,8 @@
 #include "CORE/MATH/transfrm.h"
 #include "CORE/V1DB/dbsetup.h"
 #include "CORE/V1DB/modrend.h"
-#include "harness_hooks.h"
-#include "harness_trace.h"
+#include "harness/hooks.h"
+#include "harness/trace.h"
 #include <string.h>
 
 #define RendererModelMul(self, a1) self->dispatch->_modelMulF(self, a1);

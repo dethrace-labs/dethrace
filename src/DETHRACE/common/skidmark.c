@@ -1,9 +1,11 @@
 #include "skidmark.h"
 #include "brender/brender.h"
-#include "common/globvars.h"
-#include "common/globvrbm.h"
-#include "common/loading.h"
+#include "globvars.h"
+#include "globvrbm.h"
+#include "harness/trace.h"
+#include "loading.h"
 #include <stdlib.h>
+#include <string.h>
 
 char* gBoring_material_names[2] = { "OILSMEAR.MAT", "ROBSMEAR.MAT" };
 char* gMaterial_names[2] = { "OILSMEAR.MAT", "GIBSMEAR.MAT" };

@@ -102,7 +102,7 @@ int main(int argc, char** argv) {
         exit(1);
     }
 
-    Harness_Init(argv[0], &NullRenderer);
+    Harness_Init(argv[0], "null");
 
     setup_global_vars();
 

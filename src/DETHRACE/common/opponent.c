@@ -5,6 +5,7 @@
 #include "globvars.h"
 #include "globvrkm.h"
 #include "globvrpb.h"
+#include "harness/trace.h"
 #include "loading.h"
 #include "pd/sys.h"
 #include "utility.h"

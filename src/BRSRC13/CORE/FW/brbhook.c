@@ -1,5 +1,5 @@
 #include "brbhook.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 
 // IDA: void __cdecl _BrBeginHook()
 void _BrBeginHook() {

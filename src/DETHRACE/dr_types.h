@@ -3,7 +3,6 @@
 
 #include "brender/br_types.h"
 #include "constants.h"
-#include "harness.h"
 #include "s3/s3_types.h"
 #include <assert.h>
 #include <stdarg.h>

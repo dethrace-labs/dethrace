@@ -33,7 +33,6 @@ else()
 endif()
 
 target_sources(brender PRIVATE
-    harness_hooks.h
     include/brender/brender.h
     include/brender/br_types.h
     include/brender/br_defs.h

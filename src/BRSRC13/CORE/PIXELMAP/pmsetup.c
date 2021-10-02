@@ -3,7 +3,7 @@
 #include "CORE/FW/resource.h"
 #include "CORE/FW/resreg.h"
 #include "CORE/STD/brstdlib.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 #include <stddef.h>
 #include <stdio.h>
 

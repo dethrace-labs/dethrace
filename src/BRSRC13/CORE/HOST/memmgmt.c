@@ -1,5 +1,5 @@
 #include "memmgmt.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 
 #include <stdio.h>
 #include <stdlib.h>

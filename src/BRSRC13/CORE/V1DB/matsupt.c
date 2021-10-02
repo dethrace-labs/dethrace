@@ -1,7 +1,7 @@
 #include "matsupt.h"
 #include "CORE/FW/resource.h"
 #include "CORE/V1DB/dbsetup.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 #include <stddef.h>
 #include <string.h>
 

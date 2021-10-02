@@ -3,7 +3,7 @@
 #include "CORE/FW/tokenval.h"
 #include "CORE/PIXELMAP/genclip.h"
 #include "CORE/PIXELMAP/pmsetup.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>

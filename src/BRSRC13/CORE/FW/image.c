@@ -1,5 +1,5 @@
 #include "image.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 
 // IDA: br_boolean __cdecl BrImageAdd(br_image *img)
 br_boolean BrImageAdd(br_image* img) {

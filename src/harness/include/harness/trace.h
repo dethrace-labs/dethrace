@@ -1,5 +1,5 @@
-#ifndef DEBUG_H
-#define DEBUG_H
+#ifndef HARNESS_TRACE_H
+#define HARNESS_TRACE_H
 
 #include "brender/br_types.h"
 #include <stdlib.h>
@@ -10,6 +10,8 @@
 #endif
 
 extern int harness_debug_level;
+
+void Harness_Debug_PrintStack();
 
 void debug_printf(const char* fmt, const char* fn, const char* fmt2, ...);
 void debug_print_vector3(const char* fmt, const char* fn, char* msg, br_vector3* v);
@@ -47,7 +49,6 @@ void debug_print_matrix34(const char* fmt, const char* fn, char* name, br_matrix
 
 #define NOT_IMPLEMENTED()                                                         \
     debug_printf("\033[0;31m[PANIC] %s ", __FUNCTION__, "%s", "not implemented"); \
-    sleep(2);                                                                     \
     exit(1);
 
 #define TELL_ME_IF_WE_PASS_THIS_WAY()                                                    \

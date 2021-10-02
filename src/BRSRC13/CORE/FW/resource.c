@@ -5,7 +5,7 @@
 #include "CORE/FW/fwsetup.h"
 #include "CORE/FW/mem.h"
 #include "CORE/STD/brstdlib.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 #include <stdio.h>
 #include <stdlib.h>
 

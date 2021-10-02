@@ -1,5 +1,5 @@
 #include "loader.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 
 // IDA: br_image* __usercall ImageLoad@<EAX>(char *name@<EAX>)
 br_image* ImageLoad(char* name) {

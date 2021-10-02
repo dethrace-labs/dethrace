@@ -6,7 +6,7 @@
 #include "CORE/V1DB/prepmesh.h"
 #include "CORE/V1DB/preptab.h"
 
-#include "harness_trace.h"
+#include "harness/trace.h"
 
 // IDA: br_model* __cdecl BrModelAdd(br_model *model)
 br_model* BrModelAdd(br_model* model) {

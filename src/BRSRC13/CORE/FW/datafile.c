@@ -5,7 +5,7 @@
 #include "CORE/FW/resource.h"
 #include "CORE/STD/brstdlib.h"
 #include "file.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 
 #include <stdint.h>
 #include <stdio.h>

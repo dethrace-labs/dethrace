@@ -4,6 +4,7 @@
 #include "globvars.h"
 #include "grafdata.h"
 #include "graphics.h"
+#include "harness/trace.h"
 #include "input.h"
 #include "loading.h"
 #include "main.h"

@@ -1,5 +1,5 @@
 #include "brprintf.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 
 #include <stdarg.h>
 

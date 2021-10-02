@@ -1,5 +1,5 @@
 #include "angles.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 
 order_info OrderAxes[32];
 

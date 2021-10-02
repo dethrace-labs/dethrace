@@ -4,8 +4,10 @@
 #include "errors.h"
 #include "globvars.h"
 #include "globvrkm.h"
+#include "harness/trace.h"
 #include "spark.h"
 #include "utility.h"
+#include <math.h>
 #include <stdlib.h>
 
 tDepth_effect gDistance_depth_effects[4];

@@ -1,8 +1,10 @@
 #include "oil.h"
 #include "brender/brender.h"
 #include "globvars.h"
+#include "harness/trace.h"
 #include "loading.h"
 #include "utility.h"
+#include <math.h>
 #include <stdlib.h>
 
 char* gOil_pixie_names[1] = { "OIL.PIX" };

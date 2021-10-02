@@ -1,4 +1,5 @@
 #include "loadsave.h"
+#include "harness/trace.h"
 #include <stdlib.h>
 
 tSave_game* gSaved_games[8];

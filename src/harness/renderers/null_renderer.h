@@ -3,6 +3,6 @@
 
 #include "harness.h"
 
-extern tRenderer NullRenderer;
+extern tPlatform NullPlatform;
 
 #endif

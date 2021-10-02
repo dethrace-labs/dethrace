@@ -1,5 +1,5 @@
 #include "prepmatl.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 
 // IDA: void __cdecl BrMaterialUpdate(br_material *mat, br_uint_16 flags)
 void BrMaterialUpdate(br_material* mat, br_uint_16 flags) {

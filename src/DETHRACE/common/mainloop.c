@@ -11,6 +11,7 @@
 #include "globvrkm.h"
 #include "globvrpb.h"
 #include "graphics.h"
+#include "harness/trace.h"
 #include "input.h"
 #include "main.h"
 #include "mainmenu.h"

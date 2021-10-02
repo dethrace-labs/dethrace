@@ -1,7 +1,7 @@
 #include "modrend.h"
 #include "dbsetup.h"
-#include "harness_hooks.h"
-#include "harness_trace.h"
+#include "harness/hooks.h"
+#include "harness/trace.h"
 
 br_colour bounds_colours[12];
 fmt_vertex bounds_vertices[8];

@@ -4,6 +4,7 @@
 #include "controls.h"
 #include "errors.h"
 #include "globvars.h"
+#include "harness/trace.h"
 #include "init.h"
 #include "input.h"
 #include "loading.h"

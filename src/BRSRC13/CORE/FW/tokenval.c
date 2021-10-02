@@ -1,5 +1,5 @@
 #include "tokenval.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 #include "resource.h"
 
 // IDA: br_tv_template* __cdecl BrTVTemplateAllocate(void *res, br_tv_template_entry *entries, int n_entries)

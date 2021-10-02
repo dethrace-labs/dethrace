@@ -4,6 +4,7 @@
 #include "errors.h"
 #include "globvars.h"
 #include "graphics.h"
+#include "harness/trace.h"
 #include "input.h"
 #include "loading.h"
 #include "pd/sys.h"

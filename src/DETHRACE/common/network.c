@@ -5,6 +5,7 @@
 #include "globvars.h"
 #include "globvrpb.h"
 #include "graphics.h"
+#include "harness/trace.h"
 #include "netgame.h"
 #include "pd/net.h"
 #include "pd/sys.h"

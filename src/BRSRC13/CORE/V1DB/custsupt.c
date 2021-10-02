@@ -1,5 +1,5 @@
 #include "custsupt.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 
 // IDA: void __cdecl BrModelToScreenQuery(br_matrix4 *dest)
 void BrModelToScreenQuery(br_matrix4* dest) {

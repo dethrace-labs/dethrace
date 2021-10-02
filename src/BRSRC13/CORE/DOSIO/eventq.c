@@ -1,5 +1,5 @@
 #include "eventq.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 
 int _DOSEventQEnabled;
 host_real_memory _DOSEventMemory;
