@@ -33,7 +33,6 @@ tHarness_game_info harness_game_info;
 int Harness_ProcessCommandLine(int* argc, char* argv[]);
 
 void Harness_DetectGameMode() {
-
     if (access("DATA/RACES/CITY01.TXT", F_OK) == -1 && access("DATA/RACES/CITYA1.TXT", F_OK) == -1) {
         harness_game_info.intro_smk_file = "";
         harness_game_info.mode = eGame_carmageddon_demo;
@@ -73,7 +72,9 @@ void Harness_Init(int* argc, char* argv[]) {
             LOG_PANIC("Failed to chdir. Error is %s", strerror(errno));
         }
     }
-    Harness_DetectGameMode();
+    if (harness_game_info.mode == eGame_none) {
+        Harness_DetectGameMode();
+    }
 }
 
 void Harness_Debug_PrintStack() {

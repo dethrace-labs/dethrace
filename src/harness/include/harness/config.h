@@ -2,6 +2,7 @@
 #define HARNESS_CONFIG_H
 
 typedef enum tHarness_game_type {
+    eGame_none,
     eGame_carmageddon,
     eGame_splatpack,
     eGame_carmageddon_demo

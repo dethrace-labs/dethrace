@@ -20,7 +20,7 @@
 #include "common/globvars.h"
 #include "common/grafdata.h"
 #include "harness.h"
-#include "renderers/null_renderer.h"
+#include "harness/config.h"
 
 #define debug(format_, ...) fprintf(stderr, format_, __VA_ARGS__)
 
@@ -89,6 +89,7 @@ void setup_global_vars() {
 
     _unittest_do_not_exit = 1;
     harness_debug_level = 7;
+    harness_game_info.mode = eGame_carmageddon;
 }
 
 int has_data_directory() {
