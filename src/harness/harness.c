@@ -131,7 +131,7 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
 }
 
 void Harness_Hook_DOSGfxBegin() {
-    platform->CreateWindow("Dethrace", 640, 400);
+    platform->NewWindow("Dethrace", 640, 400);
 }
 
 void Harness_RenderScreen(br_pixelmap* dst, br_pixelmap* src) {

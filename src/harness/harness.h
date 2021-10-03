@@ -6,7 +6,7 @@
 
 typedef struct tPlatform {
     void (*Init)();
-    void (*CreateWindow)(char* title, int width, int height);
+    void (*NewWindow)(char* title, int width, int height);
     void (*PollEvents)();
     int* (*GetKeyMap)();
     int (*IsKeyDown)(unsigned char pScan_code);
