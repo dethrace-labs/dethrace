@@ -1,5 +1,5 @@
 #include "pattern.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 #include <ctype.h>
 
 // IDA: br_boolean __cdecl BrNamePatternMatch(char *p, char *s)

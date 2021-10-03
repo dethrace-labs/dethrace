@@ -1,7 +1,7 @@
 #ifndef _DRMEM_H_
 #define _DRMEM_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern br_allocator gAllocator;

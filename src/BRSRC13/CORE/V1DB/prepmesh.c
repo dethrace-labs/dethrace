@@ -3,12 +3,12 @@
 #include "CORE/FW/diag.h"
 #include "CORE/FW/resource.h"
 #include "CORE/FW/scratch.h"
+#include "CORE/MATH/angles.h"
 #include "CORE/MATH/plane.h"
 #include "CORE/MATH/vector.h"
 #include "CORE/STD/brmath.h"
 #include "CORE/STD/brstdlib.h"
-#include "angles.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 #include <assert.h>
 
 br_model* compareModel;

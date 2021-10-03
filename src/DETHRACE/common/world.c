@@ -1,7 +1,7 @@
 #include "world.h"
 #include <stdlib.h>
 
-#include "brender.h"
+#include "brender/brender.h"
 #include "brucetrk.h"
 #include "car.h"
 #include "depth.h"
@@ -12,7 +12,7 @@
 #include "globvars.h"
 #include "globvrpb.h"
 #include "graphics.h"
-#include "harness.h"
+#include "harness/trace.h"
 #include "loading.h"
 #include "opponent.h"
 #include "pd/sys.h"

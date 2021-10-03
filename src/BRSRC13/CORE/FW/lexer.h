@@ -1,7 +1,7 @@
 #ifndef _LEXER_H_
 #define _LEXER_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 void lexerError(br_lexer* l, char* string);
 

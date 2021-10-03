@@ -9,6 +9,7 @@
 #include "globvrkm.h"
 #include "globvrpb.h"
 #include "graphics.h"
+#include "harness/trace.h"
 #include "init.h"
 #include "loading.h"
 #include "loadsave.h"

@@ -1,4 +1,5 @@
 #include "pratcam.h"
+#include "harness/trace.h"
 #include <stdlib.h>
 
 tS3_sound_tag gWhirr_noise;

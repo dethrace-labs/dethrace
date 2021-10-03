@@ -1,7 +1,7 @@
 #ifndef _MATRIX23_H_
 #define _MATRIX23_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 void BrMatrix23Copy(br_matrix23* A, br_matrix23* B);
 

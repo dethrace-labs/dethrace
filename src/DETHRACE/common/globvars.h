@@ -1,7 +1,7 @@
 #ifndef _GLOBVARS_H_
 #define _GLOBVARS_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern int gTyping;

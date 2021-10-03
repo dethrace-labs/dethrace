@@ -1,7 +1,7 @@
 #ifndef _TRANSFRM_H_
 #define _TRANSFRM_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 extern br_uint_8 _CombineTransforms[7][7];
 #define BrTransformCombineTypes(a, b) (_CombineTransforms[(a)][(b)])

@@ -1,7 +1,7 @@
 #ifndef _OPTIONS_H_
 #define _OPTIONS_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern int gKey_defns[18];

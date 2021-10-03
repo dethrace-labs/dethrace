@@ -1,11 +1,14 @@
 #include "brucetrk.h"
 
-#include "brender.h"
+#include "brender/brender.h"
 #include "globvars.h"
 #include "globvrbm.h"
+#include "harness/trace.h"
 #include "init.h"
 #include "world.h"
+#include <math.h>
 #include <stdlib.h>
+#include <string.h>
 
 br_actor* gMr_blendy;
 int gDefault_blend_pc;

@@ -1,7 +1,7 @@
 #ifndef _LOADSAVE_H_
 #define _LOADSAVE_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern tSave_game* gSaved_games[8];

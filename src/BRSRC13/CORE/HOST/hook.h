@@ -1,7 +1,7 @@
 #ifndef _HOOK_H_
 #define _HOOK_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 br_error HostInterruptHook(host_interrupt_hook* h, br_uint_8 vector, br_uint_32 off, br_uint_16 sel);
 

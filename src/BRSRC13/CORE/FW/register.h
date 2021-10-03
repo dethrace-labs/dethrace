@@ -1,7 +1,7 @@
 #ifndef _REGISTER_H_
 #define _REGISTER_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 void* BrRegistryNew(br_registry* reg);
 

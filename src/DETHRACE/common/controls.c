@@ -1,6 +1,6 @@
 #include "controls.h"
 
-#include "brender.h"
+#include "brender/brender.h"
 #include "car.h"
 #include "constants.h"
 #include "displays.h"
@@ -9,7 +9,7 @@
 #include "globvrkm.h"
 #include "globvrpb.h"
 #include "graphics.h"
-#include "harness.h"
+#include "harness/trace.h"
 #include "input.h"
 #include "loadsave.h"
 #include "mainloop.h"
@@ -58,8 +58,8 @@ tToggle_element gToggle_array[] = {
     { 43, -2, 1, 0, 0, NumberKey7 },
     { 15, -2, 1, 0, 0, NumberKey8 },
     { 16, -2, 1, 0, 0, NumberKey9 },
-    { 60, -2, 1, 0, 0, ScreenLarger },
-    { 61, -2, 1, 0, 0, ScreenSmaller },
+    { 60, -2, 1, 0, 0, ScreenSmaller },
+    { 61, -2, 1, 0, 0, ScreenLarger },
     { 62, -2, 1, 0, 0, BuyArmour },
     { 63, -2, 1, 0, 0, BuyPower },
     { 64, -2, 1, 0, 0, BuyOffense },

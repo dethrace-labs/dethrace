@@ -1,7 +1,7 @@
 #ifndef _PMDSPTCH_H_
 #define _PMDSPTCH_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 br_pixelmap* BrPixelmapAllocateSub(br_pixelmap* src, br_int_32 x, br_int_32 y, br_int_32 w, br_int_32 h);
 

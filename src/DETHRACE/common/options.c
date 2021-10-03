@@ -1,4 +1,5 @@
 #include "options.h"
+#include "harness/trace.h"
 #include <stdlib.h>
 
 int gKey_defns[18];

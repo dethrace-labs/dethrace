@@ -1,5 +1,5 @@
 #include "matrix34.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 #include "vector.h"
 #include <math.h>
 

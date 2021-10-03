@@ -1,4 +1,5 @@
 #include "demo.h"
+#include "harness/trace.h"
 #include <stdlib.h>
 
 int gLast_demo;

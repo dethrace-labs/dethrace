@@ -1,7 +1,7 @@
 #ifndef _DIAG_H_
 #define _DIAG_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 void BrFailure(const char* s, ...);
 
 void BrWarning(const char* s, ...);

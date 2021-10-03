@@ -1,5 +1,5 @@
 #include "quat.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 
 // IDA: br_quat* __cdecl BrQuatMul(br_quat *q, br_quat *l, br_quat *r)
 br_quat* BrQuatMul(br_quat* q, br_quat* l, br_quat* r) {

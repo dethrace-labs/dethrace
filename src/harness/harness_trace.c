@@ -1,4 +1,4 @@
-#include "harness_trace.h"
+#include "harness/trace.h"
 
 #include <dirent.h>
 #include <stdarg.h>

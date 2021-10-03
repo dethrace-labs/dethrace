@@ -1,10 +1,5 @@
-#include "keyboard.h"
-#include "dr_types.h"
-#include "harness_trace.h"
-
-extern tU8 gScan_code[123][2];
-
-uint8_t sdl_key_state[256];
+#include "common.h"
+#include <SDL.h>
 
 // Errol's keymap
 int keymap[123] = {
@@ -117,27 +112,46 @@ int keymap[123] = {
     SDL_SCANCODE_SPACE
 };
 
-void Keyboard_Init() {
-    int i;
-    for (i = 0; i < 123; i++) {
-        gScan_code[i][0] = keymap[i];
-        //gScan_code[i][1] = keymap[i];
+uint8_t sdl_key_state[256];
+
+void SDLPlatform_Init() {
+    if (SDL_Init(SDL_INIT_TIMER) != 0) {
+        LOG_PANIC("SDL_INIT_TIMER error: %s", SDL_GetError());
     }
 }
 
-int Keyboard_IsKeyDown(unsigned char scan_code) {
+void SDLPlatform_PollEvents() {
+    SDL_Event event;
+
+    while (SDL_PollEvent(&event)) {
+        switch (event.type) {
+
+        case SDL_KEYDOWN:
+        case SDL_KEYUP:
+            if (event.key.keysym.scancode < 0 || event.key.keysym.scancode > 122) {
+                LOG_WARN("unexpected scan code %d", event.key.keysym.scancode);
+                return;
+            }
+            if (event.key.type == SDL_KEYDOWN) {
+                sdl_key_state[event.key.keysym.scancode] = 1;
+                //LOG_DEBUG("key %d", key->keysym.scancode);
+            } else {
+                sdl_key_state[event.key.keysym.scancode] = 0;
+            }
+
+            break;
+
+        case SDL_QUIT:
+            LOG_PANIC("QuitGame");
+            break;
+        }
+    }
+}
+
+int* SDLPlatform_GetKeyMap() {
+    return (int*)keymap;
+}
+
+int SDLPlatform_IsKeyDown(unsigned char scan_code) {
     return sdl_key_state[scan_code];
-}
-
-void Keyboard_HandleEvent(SDL_KeyboardEvent* key) {
-    if (key->keysym.scancode < 0 || key->keysym.scancode > 122) {
-        LOG_WARN("unexpected scan code %d", key->keysym.scancode);
-        return;
-    }
-    if (key->type == SDL_KEYDOWN) {
-        sdl_key_state[key->keysym.scancode] = 1;
-        //LOG_DEBUG("key %d", key->keysym.scancode);
-    } else {
-        sdl_key_state[key->keysym.scancode] = 0;
-    }
 }

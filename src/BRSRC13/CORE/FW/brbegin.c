@@ -1,5 +1,5 @@
 #include "brbegin.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 
 #include "CORE/HOST/himage.h"
 #include "CORE/PIXELMAP/pmsetup.h"

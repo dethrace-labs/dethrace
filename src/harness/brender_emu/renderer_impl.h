@@ -1,7 +1,7 @@
 #ifndef HARNESS_BRENDER_RENDERER_DISPATCH
 #define HARNESS_BRENDER_RENDERER_DISPATCH
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 #define MAX_STATE_STACK 32
 
@@ -38,6 +38,6 @@ typedef struct harness_br_renderer {
 
 } harness_br_renderer;
 
-harness_br_renderer* NewRendererState();
+harness_br_renderer* NewHarnessBrRenderer();
 
 #endif

@@ -1,9 +1,9 @@
 #include "pmdsptch.h"
 
-#include "brstdlib.h"
-#include "harness_hooks.h"
-#include "harness_trace.h"
-#include "pmmem.h"
+#include "CORE/PIXELMAP/pmmem.h"
+#include "CORE/STD/brstdlib.h"
+#include "harness/hooks.h"
+#include "harness/trace.h"
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
@@ -98,18 +98,18 @@ br_pixelmap* BrPixelmapClone(br_pixelmap* src) {
 
 // IDA: void __cdecl BrPixelmapFill(br_pixelmap *dst, br_uint_32 colour)
 void BrPixelmapFill(br_pixelmap* dst, br_uint_32 colour) {
-    br_uint_8 linear_wholepixels; //added Jeff
     LOG_TRACE("(%p, %d)", dst, colour);
+    br_uint_32 y;
+    char* d;
 
-    linear_wholepixels = BR_PMF_LINEAR | BR_PMF_ROW_WHOLEPIXELS;
-    if ((dst->flags & linear_wholepixels) == linear_wholepixels) {
-        if (dst->row_bytes > 0) {
-            memset(dst->pixels, colour, dst->row_bytes * dst->height);
-        } else {
-            TELL_ME_IF_WE_PASS_THIS_WAY();
-        }
+    if ((dst->flags & (BR_PMF_LINEAR | BR_PMF_ROW_WHOLEPIXELS)) == (BR_PMF_LINEAR | BR_PMF_ROW_WHOLEPIXELS)) {
+        memset(dst->pixels, colour, dst->row_bytes * dst->height);
     } else {
-        TELL_ME_IF_WE_PASS_THIS_WAY();
+        d = dst->pixels;
+        for (y = 0; y < dst->height; y++) {
+            memset(d, colour, dst->row_bytes);
+            d += dst->row_bytes;
+        }
     }
 }
 

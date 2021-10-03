@@ -1,5 +1,5 @@
 #include "matrix4.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 #include <math.h>
 
 #define A(x, y) A->m[x][y]

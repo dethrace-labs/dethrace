@@ -1,7 +1,7 @@
 #ifndef _PIPING_H_
 #define _PIPING_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern tU8* gPipe_buffer_start;

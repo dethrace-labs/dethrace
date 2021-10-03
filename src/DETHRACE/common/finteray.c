@@ -1,9 +1,11 @@
 #include "finteray.h"
-#include "brender.h"
+#include "brender/brender.h"
 #include "brucetrk.h"
 #include "car.h"
 #include "globvars.h"
+#include "harness/trace.h"
 #include "world.h"
+#include <math.h>
 #include <stdlib.h>
 
 int gPling_materials = 1;
@@ -426,9 +428,7 @@ void CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir,
     if ((!this_material || (this_material->flags & 0x1800) != 0 || d <= 0.0)
         && (!this_material || !this_material->identifier || *this_material->identifier != '!' || !gPling_materials)
         && fabs(d) >= 0.00000023841858) {
-        p.v[0] = ray_pos->v[0] - pFace->v[0].v[0];
-        p.v[1] = ray_pos->v[1] - pFace->v[0].v[1];
-        p.v[2] = ray_pos->v[2] - pFace->v[0].v[2];
+        BrVector3Sub(&p, ray_pos, &pFace->v[0]);
         numerator = pFace->normal.v[1] * p.v[1] + pFace->normal.v[2] * p.v[2] + pFace->normal.v[0] * p.v[0];
         if (!BadDiv__finteray(numerator, d)) {
             if (d > 0.0) {
@@ -950,9 +950,7 @@ int ModelPickBox(br_actor* actor, tBounds* bnds, br_model* model, br_material* m
                                                 face_list->flags |= (v2 > v1) + 2 * (v3 > v2) + 4 * (v3 < v1);
                                             }
                                             if (pMat) {
-                                                face_list->d = face_list->v[0].v[2] * face_list->normal.v[2]
-                                                    + face_list->v[0].v[1] * face_list->normal.v[1]
-                                                    + face_list->v[0].v[0] * face_list->normal.v[0];
+                                                face_list->d = BrVector3LengthSquared(&face_list->v[0]);
                                             } else {
                                                 face_list->d = fp->eqn.v[3];
                                             }

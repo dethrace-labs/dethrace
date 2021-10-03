@@ -1,7 +1,7 @@
 #ifndef _BRQSORT_H_
 #define _BRQSORT_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 void BrQsort(void* basep, unsigned int nelems, unsigned int size, br_qsort_cbfn comp);
 

@@ -1,7 +1,7 @@
 #ifndef _GENCLIP_H_
 #define _GENCLIP_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 br_clip_result PixelmapPointClip(br_point* out, br_point* in, br_pixelmap* pm);
 

@@ -1,4 +1,5 @@
 #include "oppocar.h"
+#include "harness/trace.h"
 #include <stdlib.h>
 
 int gCollision_detection_on__oppocar; // suffix added to avoid duplicate symbol

@@ -1,7 +1,7 @@
 #ifndef _OBJECT_H_
 #define _OBJECT_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 br_error _M_br_object_query(br_object* self, br_uint_32* pvalue, br_token t);
 

@@ -1,8 +1,8 @@
 #include "def_mat.h"
+#include "CORE/FW/resource.h"
+#include "CORE/MATH/matrix23.h"
 #include "dbsetup.h"
-#include "harness_trace.h"
-#include "matrix23.h"
-#include "resource.h"
+#include "harness/trace.h"
 
 // IDA: br_material* __cdecl SetupDefaultMaterial()
 br_material* SetupDefaultMaterial() {

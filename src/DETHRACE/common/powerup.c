@@ -1,10 +1,12 @@
 #include "powerup.h"
-#include "brender.h"
-#include "common/errors.h"
-#include "common/globvars.h"
-#include "common/loading.h"
-#include "common/utility.h"
+#include "brender/brender.h"
+#include "errors.h"
+#include "globvars.h"
+#include "harness/trace.h"
+#include "loading.h"
+#include "utility.h"
 #include <stdlib.h>
+#include <string.h>
 
 tGot_proc* gGot_procs[34];
 tLose_proc* gLose_procs[34];

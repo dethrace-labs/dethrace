@@ -3,10 +3,12 @@
 #include "globvars.h"
 #include "globvrpb.h"
 #include "graphics.h"
+#include "harness/config.h"
+#include "harness/trace.h"
 #include "input.h"
-#include "libsmacker/smacker.h"
 #include "loading.h"
 #include "pd/sys.h"
+#include "smacker.h"
 #include "sound.h"
 #include "utility.h"
 #include <stdlib.h>
@@ -135,7 +137,8 @@ void PlaySmackerFile(char* pSmack_name) {
 void DoOpeningAnimation() {
     LOG_TRACE("()");
     PlaySmackerFile("LOGO.SMK");
-    PlaySmackerFile(harness_game_mode.intro_smk_file);
+    // changed from static file reference to handle all game modes
+    PlaySmackerFile(harness_game_info.intro_smk_file);
     return WaitForNoKeys();
 }
 

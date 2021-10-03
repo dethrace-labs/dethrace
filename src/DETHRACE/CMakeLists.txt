@@ -1,14 +1,11 @@
 # Create object files so we can link them into the main binary and into tests without building twice.
 add_library(dethrace_obj OBJECT)
 
-target_include_directories(dethrace_obj PUBLIC
-    .
-    common
-    pd
-    ${CMAKE_SOURCE_DIR}/lib
-    ${CMAKE_SOURCE_DIR}/src/harness
-    ${CMAKE_SOURCE_DIR}/src/BRSRC13
-    ${CMAKE_SOURCE_DIR}/src/S3/include
+target_include_directories(dethrace_obj
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        common
+        pd
 )
 
 target_link_libraries(dethrace_obj PUBLIC miniposix SDL2::SDL2 smacker harness brender s3 cglm)

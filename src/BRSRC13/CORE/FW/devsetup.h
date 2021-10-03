@@ -1,7 +1,7 @@
 #ifndef _DEVSETUP_H_
 #define _DEVSETUP_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 br_pixelmap* BrDevLastBeginQuery();
 

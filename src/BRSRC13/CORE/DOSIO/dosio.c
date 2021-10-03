@@ -1,7 +1,7 @@
 #include "dosio.h"
-#include "harness_hooks.h"
-#include "harness_trace.h"
-#include "pixelmap.h"
+#include "CORE/PIXELMAP/pixelmap.h"
+#include "harness/hooks.h"
+#include "harness/trace.h"
 #include <stddef.h>
 
 br_pixelmap* DOSGfxBegin(char* setup_string) {

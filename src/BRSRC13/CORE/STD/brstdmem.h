@@ -1,7 +1,7 @@
 #ifndef _BRSTDMEM_H_
 #define _BRSTDMEM_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 extern br_allocator BrStdlibAllocator;
 extern br_allocator* _BrDefaultAllocator;

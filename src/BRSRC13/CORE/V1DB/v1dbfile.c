@@ -10,7 +10,7 @@
 #include "CORE/V1DB/matsupt.h"
 #include "CORE/V1DB/modsupt.h"
 #include "CORE/V1DB/regsupt.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>

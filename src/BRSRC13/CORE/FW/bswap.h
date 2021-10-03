@@ -1,7 +1,7 @@
 #ifndef _BSWAP_H_
 #define _BSWAP_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 br_uint_32 BrSwap32(br_uint_32 l);
 

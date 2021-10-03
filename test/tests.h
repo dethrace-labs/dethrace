@@ -2,7 +2,7 @@
 #define TESTS_H
 
 #include "framework/unity.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 
 extern int has_data_directory();
 

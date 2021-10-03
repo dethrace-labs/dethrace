@@ -1,9 +1,9 @@
 #include "pmsetup.h"
+#include "CORE/FW/image.h"
 #include "CORE/FW/resource.h"
 #include "CORE/FW/resreg.h"
 #include "CORE/STD/brstdlib.h"
-#include "harness_trace.h"
-#include "image.h"
+#include "harness/trace.h"
 #include <stddef.h>
 #include <stdio.h>
 

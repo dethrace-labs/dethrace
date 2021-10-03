@@ -1,5 +1,5 @@
 #include "himage.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 
 // IDA: void* __cdecl HostImageLoad(char *name)
 void* HostImageLoad(char* name) {

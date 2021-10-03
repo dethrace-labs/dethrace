@@ -1,7 +1,7 @@
 #ifndef _OPPONENT_H_
 #define _OPPONENT_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern br_actor* gOppo_path_actor;

@@ -12,7 +12,7 @@
 #include "CORE/STD/brstddiag.h"
 #include "CORE/STD/brstdfile.h"
 #include "CORE/STD/brstdmem.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 #include <stddef.h>
 #include <stdio.h>
 

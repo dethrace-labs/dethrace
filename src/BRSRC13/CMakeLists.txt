@@ -1,18 +1,14 @@
 add_library(brender STATIC)
 
-target_include_directories(brender PUBLIC
-    .
-    CORE/DOSIO
-    CORE/FW
-    CORE/HOST
-    CORE/MATH
-    CORE/PIXELMAP
-    CORE/STD
-    CORE/V1DB
-    ${CMAKE_SOURCE_DIR}/src/harness
+target_include_directories(brender 
+    PRIVATE 
+        .
+        include
+    PUBLIC
+        include
 )
 
-target_link_libraries(brender PRIVATE harness miniposix SDL2::SDL2)
+target_link_libraries(brender PRIVATE harness miniposix)
 
 if(NOT MSVC)
     target_compile_options(brender PRIVATE
@@ -37,8 +33,10 @@ else()
 endif()
 
 target_sources(brender PRIVATE
-    brender.h
-    br_types.h
+    include/brender/brender.h
+    include/brender/br_types.h
+    include/brender/br_defs.h
+    include/brender/br_inline_funcs.h
     CORE/DOSIO/dosio.c
     CORE/DOSIO/dosio.h
     CORE/DOSIO/eventq.c

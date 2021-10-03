@@ -1,9 +1,9 @@
 #include "pmmem.h"
-#include "genclip.h"
-#include "harness_trace.h"
-#include "pmsetup.h"
-#include "resource.h"
-#include "tokenval.h"
+#include "CORE/FW/resource.h"
+#include "CORE/FW/tokenval.h"
+#include "CORE/PIXELMAP/genclip.h"
+#include "CORE/PIXELMAP/pmsetup.h"
+#include "harness/trace.h"
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>

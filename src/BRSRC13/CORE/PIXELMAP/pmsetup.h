@@ -1,7 +1,7 @@
 #ifndef _PMSETUP_H_
 #define _PMSETUP_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 extern br_pixelmap_state _pixelmap;
 

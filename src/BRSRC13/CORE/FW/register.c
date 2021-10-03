@@ -1,5 +1,5 @@
 #include "register.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 
 #include "brlists.h"
 #include "fwsetup.h"

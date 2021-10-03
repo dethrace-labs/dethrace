@@ -1,7 +1,7 @@
 #ifndef _FWSETUP_H_
 #define _FWSETUP_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 extern br_framework_state fw;
 

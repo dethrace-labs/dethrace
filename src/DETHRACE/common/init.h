@@ -1,7 +1,7 @@
 #ifndef _INIT_H_
 #define _INIT_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern int gGame_initialized;

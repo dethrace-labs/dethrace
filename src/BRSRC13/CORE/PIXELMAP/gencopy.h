@@ -1,7 +1,7 @@
 #ifndef _GENCOPY_H_
 #define _GENCOPY_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 br_error GeneralRectangleCopy(br_device_pixelmap* dest, br_point* p, br_device_pixelmap* src, br_rectangle* r);
 

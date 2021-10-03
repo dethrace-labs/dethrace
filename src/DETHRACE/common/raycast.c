@@ -1,6 +1,8 @@
 #include "raycast.h"
-#include "brender.h"
+#include "brender/brender.h"
 #include "globvars.h"
+#include "harness/trace.h"
+#include <math.h>
 #include <stdlib.h>
 
 br_matrix34 gPick_model_to_view__raycast; // suffix added to avoid duplicate symbol

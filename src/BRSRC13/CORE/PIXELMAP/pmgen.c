@@ -1,5 +1,5 @@
 #include "pmgen.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 
 // IDA: br_error __cdecl _M_br_device_pixelmap_gen_match(br_device_pixelmap *self, br_device_pixelmap **newpm, br_token_value *tv)
 br_error _M_br_device_pixelmap_gen_match(br_device_pixelmap* self, br_device_pixelmap** newpm, br_token_value* tv) {

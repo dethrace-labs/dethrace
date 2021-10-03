@@ -1,7 +1,7 @@
 #ifndef _RENDER_H_
 #define _RENDER_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 void BrDbModelRender(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen, int use_custom);
 

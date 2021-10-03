@@ -1,7 +1,7 @@
 #ifndef _NEWGAME_H_
 #define _NEWGAME_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern tU8* gFrank_flic_data;

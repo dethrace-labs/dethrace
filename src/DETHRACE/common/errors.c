@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "harness/trace.h"
 #include "network.h"
 #include "pd/sys.h"
 #include "utility.h"
@@ -192,6 +193,7 @@ void OpenDiagnostics() {
 // Renamed from dprintf to avoid collisions to stdio
 void dr_dprintf(char* fmt_string, ...) {
     va_list args;
+    printf("dprintf: ");
     va_start(args, fmt_string);
     vprintf(fmt_string, args);
     va_end(args);

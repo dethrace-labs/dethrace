@@ -1,7 +1,7 @@
 #ifndef _PRATCAM_H_
 #define _PRATCAM_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern tS3_sound_tag gWhirr_noise;

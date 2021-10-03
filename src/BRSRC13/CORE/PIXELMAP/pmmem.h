@@ -1,7 +1,7 @@
 #ifndef _PMMEM_H_
 #define _PMMEM_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 extern pm_type_info pmTypeInfo[30];
 

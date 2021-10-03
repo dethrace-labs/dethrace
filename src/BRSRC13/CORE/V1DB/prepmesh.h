@@ -1,7 +1,7 @@
 #ifndef _PREPMESH_H_
 #define _PREPMESH_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 int addEdge(br_uint_16 first, br_uint_16 last);
 

@@ -1,5 +1,6 @@
 #include "piping.h"
 #include "globvars.h"
+#include "harness/trace.h"
 #include "opponent.h"
 #include <stdlib.h>
 

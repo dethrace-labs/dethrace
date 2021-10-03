@@ -1,7 +1,7 @@
 #ifndef _OPPOCAR_H_
 #define _OPPOCAR_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern int gCollision_detection_on__oppocar; // suffix added to avoid duplicate symbol

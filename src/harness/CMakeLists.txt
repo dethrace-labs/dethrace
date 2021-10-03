@@ -1,13 +1,15 @@
-add_library(harness OBJECT)
+add_library(harness STATIC)
 
-target_include_directories(harness PRIVATE
-    .
-    ${CMAKE_SOURCE_DIR}/src/BRSRC13
-    ${CMAKE_SOURCE_DIR}/src/DETHRACE
-    ${CMAKE_SOURCE_DIR}/src/S3/include
+target_include_directories(harness 
+    PRIVATE
+        .
+        ${CMAKE_SOURCE_DIR}
+        ${CMAKE_SOURCE_DIR}/src/DETHRACE
+    PUBLIC
+        include
 )
 
-target_link_libraries(harness PRIVATE miniposix SDL2::SDL2 glad cglm_headers)
+target_link_libraries(harness PRIVATE miniposix brender SDL2::SDL2 glad s3 cglm_headers)
 
 if(NOT MSVC)
     target_compile_options(harness PRIVATE
@@ -22,24 +24,26 @@ else()
 endif()
 
 target_sources(harness PRIVATE
+    include/harness/hooks.h
+    include/harness/trace.h
+    include/harness/config.h
+
     cameras/debug_camera.c
     cameras/debug_camera.h
-    harness_hooks.h
     harness_trace.c
-    harness_trace.h
     harness.c
     harness.h
-    input/keyboard.c
-    input/keyboard.h
-    renderers/gl_renderer.c
-    renderers/gl_renderer.h
-    renderers/gl_renderer_shaders.c
-    renderers/gl_renderer_shaders.h
-    rendering/renderer_state.c
-    rendering/renderer_state.h
-    renderers/null_renderer.c
-    renderers/null_renderer.h
+    sdl/gl_renderer.c
+    sdl/gl_renderer.h
+    sdl/gl_renderer_shaders.c
+    sdl/gl_renderer_shaders.h
+    brender_emu/renderer_impl.c
+    brender_emu/renderer_impl.h
     sound/sound.c
     sound/sound.h
+    sdl/common.c
+    sdl/common.h
+    platforms/sdl_gl.h
+    platforms/null.h
     stack_trace_handler.h
 )

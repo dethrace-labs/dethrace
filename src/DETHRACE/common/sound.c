@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "globvars.h"
+#include "harness/trace.h"
 #include "piping.h"
 #include "s3/s3sound.h"
 #include "utility.h"

@@ -1,6 +1,6 @@
 #include "graphics.h"
 
-#include "brender.h"
+#include "brender/brender.h"
 #include "controls.h"
 #include "depth.h"
 #include "displays.h"
@@ -9,6 +9,7 @@
 #include "globvars.h"
 #include "globvrpb.h"
 #include "grafdata.h"
+#include "harness/trace.h"
 #include "init.h"
 #include "loading.h"
 #include "network.h"
@@ -283,7 +284,17 @@ tS8* SkipLines(tS8* pSource, int pCount) {
     int number_of_chunks;
     int chunk_length;
     LOG_TRACE("(%p, %d)", pSource, pCount);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < pCount; ++i) {
+        number_of_chunks = *pSource++;
+        for (j = 0; j < number_of_chunks; j++) {
+            chunk_length = *pSource++;
+            if (chunk_length < 0) {
+                pSource -= chunk_length;
+            }
+        }
+    }
+    return pSource;
 }
 
 // IDA: void __usercall CopyWords(char *pDst@<EAX>, char *pSrc@<EDX>, int pN@<EBX>)
@@ -324,30 +335,20 @@ void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
     int chunk_length;
     char* destn_ptr;
     char* destn_ptr2;
-    LOG_TRACE("(%p, %d, %d, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pOffset_x, pDest_y, pOffset_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
+    LOG_TRACE8("(%p, %d, %d, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pOffset_x, pDest_y, pOffset_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
 
     height = *(uint16_t*)pSource;
     pSource = pSource + 2;
     if (pDest_y + pOffset_y >= 0) {
         destn_ptr = (char*)pDest->pixels + pDest->row_bytes * (pDest_y + pOffset_y);
     } else {
-        LOG_PANIC("path not implemented");
-        // Copy8BitStripImageTo16Bit(
-        //     pSource,
-        //     -pDest_y - pOffset_y,
-        //     v12,
-        //     v13,
-        //     v14,
-        //     (tS8*)height,
-        //     v16,
-        //     v18,
-        //     v20,
-        //     v22);
-        // pSourcea = v10;
-        // destn_ptr = (char*)pDest->pixels;
-        // height = pDest_y + pOffset_y + v11;
-        // pOffset_y = 0;
-        // pDest_y = 0;
+        LOG_DEBUG("%d, %d", pDest_y, pOffset_y);
+
+        pSource = SkipLines(pSource, -pDest_y - pOffset_y);
+        destn_ptr = (char*)pDest->pixels;
+        height += pDest_y + pOffset_y;
+        pOffset_y = 0;
+        pDest_y = 0;
     }
 
     if (height + pDest_y + pOffset_y > pDest->height) {
@@ -454,13 +455,13 @@ void AdjustRenderScreenSize() {
         gRender_screen->base_y = gProgram_state.current_render_top;
         gRender_screen->height = gProgram_state.current_render_bottom - gProgram_state.current_render_top;
         gRender_screen->width = gProgram_state.current_render_right - gProgram_state.current_render_left;
-        LOG_DEBUG("renderscreen is %d x %d", gRender_screen->width, gRender_screen->height);
+        LOG_DEBUG("renderscreen is %d %d, %d x %d", gRender_screen->base_x, gRender_screen->base_y, gRender_screen->width, gRender_screen->height);
     }
     if (gRender_screen->row_bytes == gRender_screen->width) {
         gRender_screen->flags |= BR_PMF_ROW_WHOLEPIXELS;
     } else {
-        TELL_ME_IF_WE_PASS_THIS_WAY();
-        //v0 = gRender_screen->flags & 0xFB;
+        gRender_screen->flags &= ~BR_PMF_ROW_WHOLEPIXELS;
+        //TELL_ME_IF_WE_PASS_THIS_WAY();
     }
     gRender_screen->origin_x = gRender_screen->width / 2;
     gRender_screen->origin_y = gRender_screen->height / 2;
@@ -475,13 +476,33 @@ void AdjustRenderScreenSize() {
 // IDA: void __cdecl ScreenSmaller()
 void ScreenSmaller() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (!gMap_mode) {
+        if (gProgram_state.cockpit_on) {
+            ToggleCockpit();
+        }
+        gRender_indent++;
+        if (gRender_indent > 8) {
+            gRender_indent = 8;
+        }
+        AdjustRenderScreenSize();
+    }
 }
 
 // IDA: void __cdecl ScreenLarger()
 void ScreenLarger() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (!gMap_mode) {
+        if (gProgram_state.cockpit_on) {
+            ToggleCockpit();
+        }
+        gRender_indent--;
+        if (gRender_indent < 0) {
+            gRender_indent = 0;
+        }
+        AdjustRenderScreenSize();
+    }
 }
 
 // IDA: void __usercall DRSetPaletteEntries(br_pixelmap *pPalette@<EAX>, int pFirst_colour@<EDX>, int pCount@<EBX>)
@@ -998,7 +1019,7 @@ void RenderAFrame(int pDepth_mask_on) {
     }
     gCamera->t.t.mat = old_camera_matrix;
     if (gMirror_on__graphics) {
-        LOG_PANIC("mirror is on");
+        //LOG_PANIC("mirror is on");
         BrPixelmapFill(gRearview_depth_buffer, 0xFFFFFFFF);
         gRendering_mirror = 1;
         DoSpecialCameraEffect(gRearview_camera, &gRearview_camera_to_world);

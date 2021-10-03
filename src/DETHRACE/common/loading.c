@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "brender.h"
+#include "brender/brender.h"
 #include "brucetrk.h"
 #include "car.h"
 #include "constants.h"
@@ -20,6 +20,8 @@
 #include "globvrpb.h"
 #include "grafdata.h"
 #include "graphics.h"
+#include "harness/config.h"
+#include "harness/trace.h"
 #include "init.h"
 #include "input.h"
 #include "newgame.h"
@@ -1049,12 +1051,8 @@ void ReadNonCarMechanicsData(FILE* pF, tNon_car_spec* non_car) {
     ts = GetAFloat(pF);
 
     non_car->min_torque_squared = ts * ts;
-    non_car->collision_info.bounds[0].min.v[0] = non_car->collision_info.bounds[1].min.v[0];
-    non_car->collision_info.bounds[0].min.v[1] = non_car->collision_info.bounds[1].min.v[1];
-    non_car->collision_info.bounds[0].min.v[2] = non_car->collision_info.bounds[1].min.v[2];
-    non_car->collision_info.bounds[0].max.v[0] = non_car->collision_info.bounds[1].max.v[0];
-    non_car->collision_info.bounds[0].max.v[1] = non_car->collision_info.bounds[1].max.v[1];
-    non_car->collision_info.bounds[0].max.v[2] = non_car->collision_info.bounds[1].max.v[2];
+    non_car->collision_info.bounds[0].min = non_car->collision_info.bounds[1].min;
+    non_car->collision_info.bounds[0].max = non_car->collision_info.bounds[1].max;
     for (i = 0; non_car->collision_info.extra_point_num > i; ++i) {
         for (j = 0; j < 3; ++j) {
             if (non_car->collision_info.extra_points[i].v[j] < non_car->collision_info.bounds[0].min.v[j]) {
@@ -1069,25 +1067,14 @@ void ReadNonCarMechanicsData(FILE* pF, tNon_car_spec* non_car) {
     non_car->I_over_M.v[2] = (wid * wid + len * len) / 12.0;
     non_car->I_over_M.v[1] = (het * het + len * len) / 12.0;
     non_car->I_over_M.v[0] = (het * het + wid * wid) / 12.0;
-    non_car->free_cmpos.v[0] = non_car->free_cmpos.v[0] * 6.9000001;
-    non_car->free_cmpos.v[1] = non_car->free_cmpos.v[1] * 6.9000001;
-    non_car->free_cmpos.v[2] = non_car->free_cmpos.v[2] * 6.9000001;
-    non_car->attached_cmpos.v[0] = non_car->attached_cmpos.v[0] * 6.9000001;
-    non_car->attached_cmpos.v[1] = non_car->attached_cmpos.v[1] * 6.9000001;
-    non_car->attached_cmpos.v[2] = non_car->attached_cmpos.v[2] * 6.9000001;
-    non_car->I_over_M.v[0] = non_car->I_over_M.v[0] * 47.610001;
-    non_car->I_over_M.v[1] = non_car->I_over_M.v[1] * 47.610001;
-    non_car->I_over_M.v[2] = non_car->I_over_M.v[2] * 47.610001;
-    non_car->collision_info.bounds[1].min.v[0] = non_car->collision_info.bounds[1].min.v[0] * 6.9000001;
-    non_car->collision_info.bounds[1].min.v[1] = non_car->collision_info.bounds[1].min.v[1] * 6.9000001;
-    non_car->collision_info.bounds[1].min.v[2] = non_car->collision_info.bounds[1].min.v[2] * 6.9000001;
-    non_car->collision_info.bounds[1].max.v[0] = non_car->collision_info.bounds[1].max.v[0] * 6.9000001;
-    non_car->collision_info.bounds[1].max.v[1] = non_car->collision_info.bounds[1].max.v[1] * 6.9000001;
-    non_car->collision_info.bounds[1].max.v[2] = non_car->collision_info.bounds[1].max.v[2] * 6.9000001;
+    BrVector3Scale(&non_car->free_cmpos, &non_car->free_cmpos, WORLD_SCALE);
+    BrVector3Scale(&non_car->attached_cmpos, &non_car->attached_cmpos, WORLD_SCALE);
+    BrVector3Scale(&non_car->I_over_M, &non_car->I_over_M, 47.610001);
+    BrVector3Scale(&non_car->collision_info.bounds[1].min, &non_car->collision_info.bounds[1].min, WORLD_SCALE);
+    BrVector3Scale(&non_car->collision_info.bounds[1].max, &non_car->collision_info.bounds[1].max, WORLD_SCALE);
+
     for (i = 0; non_car->collision_info.extra_point_num > i; ++i) {
-        non_car->collision_info.extra_points[i].v[0] = non_car->collision_info.extra_points[i].v[0] * 6.9000001;
-        non_car->collision_info.extra_points[i].v[1] = non_car->collision_info.extra_points[i].v[1] * 6.9000001;
-        non_car->collision_info.extra_points[i].v[2] = non_car->collision_info.extra_points[i].v[2] * 6.9000001;
+        BrVector3Scale(&non_car->collision_info.extra_points[i], &non_car->collision_info.extra_points[i], WORLD_SCALE);
     }
     non_car->collision_info.max_bounds[0] = non_car->collision_info.bounds[0];
     non_car->collision_info.max_bounds[1] = non_car->collision_info.bounds[2];
@@ -1364,7 +1351,13 @@ intptr_t LinkModel(br_actor* pActor, tModel_pool* pModel_pool) {
     LOG_TRACE("(%p, %p)", pActor, pModel_pool);
 
     if (pActor->model && pActor->model->identifier) {
+        LOG_DEBUG("%s, %d", pActor->model->identifier, pModel_pool->model_count);
         for (i = 0; i < pModel_pool->model_count; i++) {
+            LOG_DEBUG("%d", i);
+            LOG_DEBUG("%p", pModel_pool->model_array[i]->identifier);
+            if (pModel_pool->model_array[i]->identifier) {
+                LOG_DEBUG("%s", pModel_pool->model_array[i]->identifier);
+            }
             if (pModel_pool->model_array[i]->identifier
                 && !strcmp(pModel_pool->model_array[i]->identifier, pActor->model->identifier)) {
                 pActor->model = pModel_pool->model_array[i];
@@ -1398,7 +1391,9 @@ void LinkModelsToActor(br_actor* pActor, br_model** pModel_array, int pModel_cou
     tModel_pool model_pool;
     LOG_TRACE("(%p, %p, %d)", pActor, pModel_array, pModel_count);
 
-    DRActorEnumRecurse(pActor, (br_actor_enum_cbfn*)LinkModel, &pModel_array);
+    model_pool.model_array = pModel_array;
+    model_pool.model_count = pModel_count;
+    DRActorEnumRecurse(pActor, (br_actor_enum_cbfn*)LinkModel, &model_pool);
 }
 
 // IDA: void __usercall ReadShrapnelMaterials(FILE *pF@<EAX>, tCollision_info *pCar_spec@<EDX>)
@@ -2761,7 +2756,14 @@ void GetPairOfFloatPercents(FILE* pF, float* pF1, float* pF2) {
     char s[256];
     char* str;
     LOG_TRACE("(%p, %p, %p)", pF, pF1, pF2);
-    NOT_IMPLEMENTED();
+
+    GetALineAndDontArgue(pF, s);
+    str = strtok(s, "\t ,/");
+    sscanf(str, "%f", pF1);
+    str = strtok(NULL, "\t ,/");
+    sscanf(str, "%f", pF2);
+    *pF1 = *pF1 / 100.0;
+    *pF2 = *pF2 / 100.0;
 }
 
 // IDA: void __usercall GetThreeFloatPercents(FILE *pF@<EAX>, float *pF1@<EDX>, float *pF2@<EBX>, float *pF3@<ECX>)
@@ -2877,33 +2879,40 @@ FILE* OldDRfopen(char* pFilename, char* pMode) {
     fp = fopen(pFilename, pMode);
 
     if (fp) {
-        len = strlen(pFilename);
-        if (gDecode_thing != 0) {
-            if (strcmp(&pFilename[len - 4], ".TXT") == 0
-                && strcmp(&pFilename[len - 12], "DKEYMAP0.TXT") != 0
-                && strcmp(&pFilename[len - 12], "DKEYMAP1.TXT") != 0
-                && strcmp(&pFilename[len - 12], "DKEYMAP2.TXT") != 0
-                && strcmp(&pFilename[len - 12], "DKEYMAP3.TXT") != 0
-                && strcmp(&pFilename[len - 12], "KEYMAP_0.TXT") != 0
-                && strcmp(&pFilename[len - 12], "KEYMAP_1.TXT") != 0
-                && strcmp(&pFilename[len - 12], "KEYMAP_2.TXT") != 0
-                && strcmp(&pFilename[len - 12], "KEYMAP_3.TXT") != 0
-                && strcmp(&pFilename[len - 11], "OPTIONS.TXT") != 0
-                && strcmp(&pFilename[len - 11], "KEYNAMES.TXT") != 0
-                && strcmp(&pFilename[len - 10], "KEYMAP.TXT") != 0
-                && strcmp(&pFilename[len - 9], "PATHS.TXT") != 0
-                && strcmp(&pFilename[len - 11], "PRATCAM.TXT") != 0) {
-                ch = fgetc(fp);
-                if (ch != gDecode_thing) {
-                    fclose(fp);
-                    LOG_WARN("Unexpected encoding character");
-                    return NULL;
+
+        // Demo does not check gDecode_thing ("i am fiddling" in PROG.ACT)
+        // If the text file starts with a '@' character, it will be decoded, otherwise used as-is.
+        if (harness_game_info.mode == eGame_carmageddon_demo) {
+            return fp;
+        } else {
+            len = strlen(pFilename);
+            if (gDecode_thing != 0) {
+                if (strcmp(&pFilename[len - 4], ".TXT") == 0
+                    && strcmp(&pFilename[len - 12], "DKEYMAP0.TXT") != 0
+                    && strcmp(&pFilename[len - 12], "DKEYMAP1.TXT") != 0
+                    && strcmp(&pFilename[len - 12], "DKEYMAP2.TXT") != 0
+                    && strcmp(&pFilename[len - 12], "DKEYMAP3.TXT") != 0
+                    && strcmp(&pFilename[len - 12], "KEYMAP_0.TXT") != 0
+                    && strcmp(&pFilename[len - 12], "KEYMAP_1.TXT") != 0
+                    && strcmp(&pFilename[len - 12], "KEYMAP_2.TXT") != 0
+                    && strcmp(&pFilename[len - 12], "KEYMAP_3.TXT") != 0
+                    && strcmp(&pFilename[len - 11], "OPTIONS.TXT") != 0
+                    && strcmp(&pFilename[len - 11], "KEYNAMES.TXT") != 0
+                    && strcmp(&pFilename[len - 10], "KEYMAP.TXT") != 0
+                    && strcmp(&pFilename[len - 9], "PATHS.TXT") != 0
+                    && strcmp(&pFilename[len - 11], "PRATCAM.TXT") != 0) {
+                    ch = fgetc(fp);
+                    if (ch != gDecode_thing) {
+                        fclose(fp);
+                        return NULL;
+                    }
+                    ungetc(ch, fp);
+                    return fp;
                 }
-                ungetc(ch, fp);
-                return fp;
             }
         }
     }
+
     if (gCD_fully_installed) {
         return fp;
     }
@@ -3077,7 +3086,8 @@ int TestForOriginalCarmaCDinDrive() {
         return 0;
     }
 
-    if (!PDCheckDriveExists2(cutscene_pathname, harness_game_mode.intro_smk_file, 2000000)) {
+    // changed from static file reference to handle all game modes
+    if (!PDCheckDriveExists2(cutscene_pathname, harness_game_info.intro_smk_file, 2000000)) {
         return 0;
     }
 

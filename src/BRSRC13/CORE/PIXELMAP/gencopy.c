@@ -1,5 +1,5 @@
 #include "gencopy.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 
 // IDA: br_error __usercall GeneralRectangleCopy@<EAX>(br_device_pixelmap *dest@<EAX>, br_point *p@<EDX>, br_device_pixelmap *src@<EBX>, br_rectangle *r@<ECX>)
 br_error GeneralRectangleCopy(br_device_pixelmap* dest, br_point* p, br_device_pixelmap* src, br_rectangle* r) {

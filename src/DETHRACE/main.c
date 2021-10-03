@@ -1,6 +1,5 @@
-#include "harness.h"
+#include "harness/hooks.h"
 #include "pd/sys.h"
-#include "renderers/gl_renderer.h"
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -25,7 +24,7 @@ int main(int argc, char* argv[]) {
     }
 #endif
 
-    Harness_Init(argv[0], &OpenGLRenderer);
+    Harness_Init(&argc, argv);
 
     return original_main(argc, argv);
 }

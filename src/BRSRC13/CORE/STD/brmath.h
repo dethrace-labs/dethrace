@@ -1,7 +1,7 @@
 #ifndef _BRMATH_H_
 #define _BRMATH_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 float BrFloatFloor(float f);
 

@@ -1,7 +1,7 @@
 #ifndef _POWERUP_H_
 #define _POWERUP_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern tGot_proc* gGot_procs[34];

@@ -1,7 +1,7 @@
 #ifndef _VECTOR_H_
 #define _VECTOR_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 void BrVector2Copy(br_vector2* v1, br_vector2* v2);
 

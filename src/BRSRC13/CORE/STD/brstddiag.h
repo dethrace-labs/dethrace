@@ -1,7 +1,7 @@
 #ifndef _STDDIAG_H_
 #define _STDDIAG_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 extern br_diaghandler BrStdioDiagHandler;
 extern br_diaghandler* _BrDefaultDiagHandler;

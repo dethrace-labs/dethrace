@@ -1,6 +1,7 @@
 #include "netgame.h"
 #include "globvars.h"
 #include "globvrpb.h"
+#include "harness/trace.h"
 #include "network.h"
 #include <stdlib.h>
 

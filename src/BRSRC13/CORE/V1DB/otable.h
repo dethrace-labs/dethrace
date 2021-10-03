@@ -1,7 +1,7 @@
 #ifndef _OTABLE_H_
 #define _OTABLE_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 br_order_table* BrZsOrderTableAllocate(br_uint_16 size, br_uint_32 flags, br_uint_16 type);
 

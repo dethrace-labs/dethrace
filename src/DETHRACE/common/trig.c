@@ -1,5 +1,7 @@
 #include "trig.h"
-#include "brender.h"
+#include "brender/brender.h"
+#include "harness/trace.h"
+#include <math.h>
 #include <stdlib.h>
 
 float gFloat_sine_table[91] = {

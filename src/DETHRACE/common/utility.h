@@ -1,7 +1,7 @@
 #ifndef _UTILITY_H_
 #define _UTILITY_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern int gIn_check_quit;

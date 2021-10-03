@@ -2,7 +2,7 @@
 
 #include "CORE/FW/fwsetup.h"
 #include "CORE/STD/brstdlib.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 
 // IDA: void* __cdecl BrMemAllocate(br_size_t size, br_uint_8 type)
 void* BrMemAllocate(br_size_t size, br_uint_8 type) {

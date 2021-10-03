@@ -1,5 +1,5 @@
 #include "bswap.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 
 // IDA: br_uint_32 __cdecl BrSwap32(br_uint_32 l)
 br_uint_32 BrSwap32(br_uint_32 l) {

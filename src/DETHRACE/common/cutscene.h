@@ -1,7 +1,9 @@
 #ifndef _CUTSCENE_H_
 #define _CUTSCENE_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
+#include "brender/brender.h"
+
 #include "dr_types.h"
 
 extern tS32 gLast_demo_end_anim;

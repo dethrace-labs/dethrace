@@ -1,7 +1,7 @@
 #ifndef _GLOBVRPB_H_
 #define _GLOBVRPB_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern tNet_mode gNet_mode;

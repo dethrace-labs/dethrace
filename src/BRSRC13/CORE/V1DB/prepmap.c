@@ -1,5 +1,5 @@
 #include "prepmap.h"
-#include "harness_trace.h"
+#include "harness/trace.h"
 
 // IDA: void __cdecl BrMapUpdate(br_pixelmap *map, br_uint_16 flags)
 void BrMapUpdate(br_pixelmap* map, br_uint_16 flags) {

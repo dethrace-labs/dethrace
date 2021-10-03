@@ -9,8 +9,8 @@
 #include "CORE/STD/brstdlib.h"
 #include "CORE/V1DB/def_mat.h"
 #include "CORE/V1DB/def_mdl.h"
-#include "harness_hooks.h"
-#include "harness_trace.h"
+#include "harness/hooks.h"
+#include "harness/trace.h"
 #include <stdio.h>
 #include <string.h>
 

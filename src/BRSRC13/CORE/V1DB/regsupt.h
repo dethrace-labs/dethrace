@@ -1,7 +1,7 @@
 #ifndef _REGSUPT_H_
 #define _REGSUPT_H_
 
-#include "br_types.h"
+#include "brender/br_types.h"
 
 br_model* BrModelAdd(br_model* model);
 

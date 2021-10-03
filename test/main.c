@@ -1,3 +1,4 @@
+#include "harness/hooks.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,7 +20,7 @@
 #include "common/globvars.h"
 #include "common/grafdata.h"
 #include "harness.h"
-#include "renderers/null_renderer.h"
+#include "harness/config.h"
 
 #define debug(format_, ...) fprintf(stderr, format_, __VA_ARGS__)
 
@@ -88,6 +89,13 @@ void setup_global_vars() {
 
     _unittest_do_not_exit = 1;
     harness_debug_level = 7;
+    harness_game_info.mode = eGame_carmageddon;
+
+    int fake_argc = 2;
+    char* fake_argv[2];
+    fake_argv[0] = "test";
+    fake_argv[1] = "-platform=null";
+    Harness_Init(&fake_argc, fake_argv);
 }
 
 int has_data_directory() {
@@ -101,8 +109,6 @@ int main(int argc, char** argv) {
     if (UnityParseOptions(argc, argv) != 0) {
         exit(1);
     }
-
-    Harness_Init(argv[0], &NullRenderer);
 
     setup_global_vars();
 
