@@ -1051,12 +1051,8 @@ void ReadNonCarMechanicsData(FILE* pF, tNon_car_spec* non_car) {
     ts = GetAFloat(pF);
 
     non_car->min_torque_squared = ts * ts;
-    non_car->collision_info.bounds[0].min.v[0] = non_car->collision_info.bounds[1].min.v[0];
-    non_car->collision_info.bounds[0].min.v[1] = non_car->collision_info.bounds[1].min.v[1];
-    non_car->collision_info.bounds[0].min.v[2] = non_car->collision_info.bounds[1].min.v[2];
-    non_car->collision_info.bounds[0].max.v[0] = non_car->collision_info.bounds[1].max.v[0];
-    non_car->collision_info.bounds[0].max.v[1] = non_car->collision_info.bounds[1].max.v[1];
-    non_car->collision_info.bounds[0].max.v[2] = non_car->collision_info.bounds[1].max.v[2];
+    non_car->collision_info.bounds[0].min = non_car->collision_info.bounds[1].min;
+    non_car->collision_info.bounds[0].max = non_car->collision_info.bounds[1].max;
     for (i = 0; non_car->collision_info.extra_point_num > i; ++i) {
         for (j = 0; j < 3; ++j) {
             if (non_car->collision_info.extra_points[i].v[j] < non_car->collision_info.bounds[0].min.v[j]) {
@@ -1071,25 +1067,14 @@ void ReadNonCarMechanicsData(FILE* pF, tNon_car_spec* non_car) {
     non_car->I_over_M.v[2] = (wid * wid + len * len) / 12.0;
     non_car->I_over_M.v[1] = (het * het + len * len) / 12.0;
     non_car->I_over_M.v[0] = (het * het + wid * wid) / 12.0;
-    non_car->free_cmpos.v[0] = non_car->free_cmpos.v[0] * 6.9000001;
-    non_car->free_cmpos.v[1] = non_car->free_cmpos.v[1] * 6.9000001;
-    non_car->free_cmpos.v[2] = non_car->free_cmpos.v[2] * 6.9000001;
-    non_car->attached_cmpos.v[0] = non_car->attached_cmpos.v[0] * 6.9000001;
-    non_car->attached_cmpos.v[1] = non_car->attached_cmpos.v[1] * 6.9000001;
-    non_car->attached_cmpos.v[2] = non_car->attached_cmpos.v[2] * 6.9000001;
-    non_car->I_over_M.v[0] = non_car->I_over_M.v[0] * 47.610001;
-    non_car->I_over_M.v[1] = non_car->I_over_M.v[1] * 47.610001;
-    non_car->I_over_M.v[2] = non_car->I_over_M.v[2] * 47.610001;
-    non_car->collision_info.bounds[1].min.v[0] = non_car->collision_info.bounds[1].min.v[0] * 6.9000001;
-    non_car->collision_info.bounds[1].min.v[1] = non_car->collision_info.bounds[1].min.v[1] * 6.9000001;
-    non_car->collision_info.bounds[1].min.v[2] = non_car->collision_info.bounds[1].min.v[2] * 6.9000001;
-    non_car->collision_info.bounds[1].max.v[0] = non_car->collision_info.bounds[1].max.v[0] * 6.9000001;
-    non_car->collision_info.bounds[1].max.v[1] = non_car->collision_info.bounds[1].max.v[1] * 6.9000001;
-    non_car->collision_info.bounds[1].max.v[2] = non_car->collision_info.bounds[1].max.v[2] * 6.9000001;
+    BrVector3Scale(&non_car->free_cmpos, &non_car->free_cmpos, WORLD_SCALE);
+    BrVector3Scale(&non_car->attached_cmpos, &non_car->attached_cmpos, WORLD_SCALE);
+    BrVector3Scale(&non_car->I_over_M, &non_car->I_over_M, 47.610001);
+    BrVector3Scale(&non_car->collision_info.bounds[1].min, &non_car->collision_info.bounds[1].min, WORLD_SCALE);
+    BrVector3Scale(&non_car->collision_info.bounds[1].max, &non_car->collision_info.bounds[1].max, WORLD_SCALE);
+
     for (i = 0; non_car->collision_info.extra_point_num > i; ++i) {
-        non_car->collision_info.extra_points[i].v[0] = non_car->collision_info.extra_points[i].v[0] * 6.9000001;
-        non_car->collision_info.extra_points[i].v[1] = non_car->collision_info.extra_points[i].v[1] * 6.9000001;
-        non_car->collision_info.extra_points[i].v[2] = non_car->collision_info.extra_points[i].v[2] * 6.9000001;
+        BrVector3Scale(&non_car->collision_info.extra_points[i], &non_car->collision_info.extra_points[i], WORLD_SCALE);
     }
     non_car->collision_info.max_bounds[0] = non_car->collision_info.bounds[0];
     non_car->collision_info.max_bounds[1] = non_car->collision_info.bounds[2];

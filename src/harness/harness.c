@@ -213,8 +213,11 @@ int Harness_Hook_KeyDown(unsigned char pScan_code) {
     return platform->IsKeyDown(pScan_code);
 }
 
-void PlatformHooks_PollEvents() {
-    Harness_PumpEvents();
+void Harness_Hook_PDServiceSystem() {
+    platform->PollEvents();
+}
+void Harness_Hook_PDSetKeyArray() {
+    platform->PollEvents();
 }
 
 void Harness_Hook_S3Service(int unk1, int unk2) {

@@ -8,9 +8,8 @@
 // Dethrace hooks
 void Harness_Init(int* argc, char* argv[]);
 int Harness_Hook_KeyDown(unsigned char pScan_code);
-
-// Poll windows message events (glfwPollEvents, SDL_PollEvents etc).
-void PlatformHooks_PollEvents();
+void Harness_Hook_PDServiceSystem();
+void Harness_Hook_PDSetKeyArray();
 
 // BRender hooks
 void Harness_Hook_DOSGfxBegin();

@@ -245,7 +245,7 @@ void PDSetKeyArray(int* pKeys, int pMark) {
     tS32 joyY;
     LOG_TRACE10("(%p, %d)", pKeys, pMark);
 
-    PlatformHooks_PollEvents();
+    Harness_Hook_PDSetKeyArray();
 
     gKeys_pressed = 0;
     for (i = 0; i < 123; i++) {
@@ -579,7 +579,7 @@ int PDGetTotalTime() {
 
 // IDA: int __usercall PDServiceSystem@<EAX>(tU32 pTime_since_last_call@<EAX>)
 int PDServiceSystem(tU32 pTime_since_last_call) {
-    PlatformHooks_PollEvents();
+    Harness_Hook_PDServiceSystem();
     return 0;
 }
 
