@@ -5,8 +5,6 @@
 #include "sdl/common.h"
 #include "sdl/gl_renderer.h"
 
-// extern tPlatform sdl_gl_platform;
-
 tPlatform sdl_gl_platform = {
     SDLPlatform_Init,
     GLRenderer_CreateWindow,

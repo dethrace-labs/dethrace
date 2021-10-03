@@ -1,8 +1,9 @@
 
 #include "harness.h"
+#include "brender_emu/renderer_impl.h"
 #include "include/harness/config.h"
+#include "platforms/null.h"
 #include "platforms/sdl_gl.h"
-#include "rendering/renderer_state.h"
 #include "sound/sound.h"
 #include "stack_trace_handler.h"
 
@@ -29,6 +30,8 @@ extern uint8_t gScan_code[123][2];
 // SplatPack or Carmageddon. This is where we represent the code differences between the two. For example, the intro smack file.
 tHarness_game_info harness_game_info;
 
+int Harness_ProcessCommandLine(int* argc, char* argv[]);
+
 void Harness_DetectGameMode() {
 
     if (access("DATA/RACES/CITY01.TXT", F_OK) == -1 && access("DATA/RACES/CITYA1.TXT", F_OK) == -1) {
@@ -44,26 +47,20 @@ void Harness_DetectGameMode() {
     }
 }
 
-void Harness_Init(char* name, char* platform_name) {
+void Harness_Init(int* argc, char* argv[]) {
     int result;
 
-    if (strcmp(platform_name, "sdl_gl") == 0) {
-        platform = &sdl_gl_platform;
-    } else if (strcmp(platform_name, "null") == 0) {
-        platform = NULL;
-    } else {
-        LOG_PANIC("Unknown platform name %s", platform_name);
-    }
+    Harness_ProcessCommandLine(argc, argv);
 
-    screen_buffer = NULL;
-
-    install_signal_handler(name);
+    install_signal_handler(argv[0]);
     platform->Init();
 
     int* keymap = platform->GetKeyMap();
-    for (int i = 0; i < 123; i++) {
-        gScan_code[i][0] = keymap[i];
-        //gScan_code[i][1] = keymap[i];
+    if (keymap != NULL) {
+        for (int i = 0; i < 123; i++) {
+            gScan_code[i][0] = keymap[i];
+            //gScan_code[i][1] = keymap[i];
+        }
     }
 
     char* root_dir = getenv("DETHRACE_ROOT_DIR");
@@ -76,7 +73,6 @@ void Harness_Init(char* name, char* platform_name) {
             LOG_PANIC("Failed to chdir. Error is %s", strerror(errno));
         }
     }
-
     Harness_DetectGameMode();
 }
 
@@ -90,21 +86,51 @@ void Harness_PumpEvents() {
     platform->PollEvents();
 }
 
-int Harness_Hook_HandleCommandLineArg(char* arg) {
-    if (strcasecmp(arg, "-cdcheck") == 0) {
-        harness_disable_cd_check = 0;
-        return 1;
-    } else if (strstr(arg, "-debug=") != NULL) {
-        char* s = strstr(arg, "=");
-        harness_debug_level = atoi(s + 1);
-        LOG_INFO("debug level set to %d", harness_debug_level);
-        return 1;
+int Harness_ProcessCommandLine(int* argc, char* argv[]) {
+    char* platform_name = NULL;
+
+    for (int i = 1; i < *argc; i++) {
+        int handled = 0;
+
+        if (strcasecmp(argv[i], "-cdcheck") == 0) {
+            harness_disable_cd_check = 0;
+            handled = 1;
+        } else if (strstr(argv[i], "-debug") != NULL) {
+            char* s = strstr(argv[i], "=");
+            harness_debug_level = atoi(s + 1);
+            LOG_INFO("debug level set to %d", harness_debug_level);
+            handled = 1;
+        } else if (strstr(argv[i], "-platform") != NULL) {
+            platform_name = strstr(argv[i], "=") + 1;
+            LOG_INFO("Platform set to: %s", platform_name);
+            handled = 1;
+        }
+
+        if (handled) {
+            // shift args downwards
+            for (int j = i; j < *argc - 1; j++) {
+                argv[j] = argv[j + 1];
+            }
+            (*argc)--;
+        }
+    }
+
+    if (platform_name == NULL) {
+        platform_name = "sdl_gl";
+    }
+
+    if (strcmp(platform_name, "sdl_gl") == 0) {
+        platform = &sdl_gl_platform;
+    } else if (strcmp(platform_name, "null") == 0) {
+        platform = &null_platform;
+    } else {
+        LOG_PANIC("Invalid platform: %s", platform_name);
     }
     return 0;
 }
 
 void Harness_Hook_DOSGfxBegin() {
-    platform->CreateWindow("Dethrace", 640, 480);
+    platform->CreateWindow("Dethrace", 640, 400);
 }
 
 void Harness_RenderScreen(br_pixelmap* dst, br_pixelmap* src) {
@@ -154,7 +180,7 @@ void Harness_Hook_BrDevPaletteSetEntryOld(int i, br_colour colour) {
 }
 
 void Harness_Hook_BrV1dbRendererBegin(br_v1db_state* v1db) {
-    renderer_state = NewRendererState();
+    renderer_state = NewHarnessBrRenderer();
     v1db->renderer = (br_renderer*)renderer_state;
 }
 

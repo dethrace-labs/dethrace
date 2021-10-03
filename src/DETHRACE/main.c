@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
     }
 #endif
 
-    Harness_Init(argv[0], "sdl_gl");
+    Harness_Init(&argc, argv);
 
     return original_main(argc, argv);
 }

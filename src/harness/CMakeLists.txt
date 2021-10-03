@@ -37,14 +37,13 @@ target_sources(harness PRIVATE
     sdl/gl_renderer.h
     sdl/gl_renderer_shaders.c
     sdl/gl_renderer_shaders.h
-    rendering/renderer_state.c
-    rendering/renderer_state.h
-    renderers/null_renderer.c
-    renderers/null_renderer.h
+    brender_emu/renderer_impl.c
+    brender_emu/renderer_impl.h
     sound/sound.c
     sound/sound.h
     sdl/common.c
     sdl/common.h
     platforms/sdl_gl.h
+    platforms/null.h
     stack_trace_handler.h
 )

@@ -6,8 +6,7 @@
 // Hooks are called from original game code.
 
 // Dethrace hooks
-void Harness_Init(char* name, char* platform_name);
-int Harness_Hook_HandleCommandLineArg(char* arg);
+void Harness_Init(int* argc, char* argv[]);
 int Harness_Hook_KeyDown(unsigned char pScan_code);
 
 // Poll windows message events (glfwPollEvents, SDL_PollEvents etc).

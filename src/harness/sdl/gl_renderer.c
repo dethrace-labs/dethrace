@@ -22,6 +22,8 @@ GLuint shader_program_2d;
 GLuint shader_program_2d_trans;
 GLuint shader_program_3d;
 
+int window_width, window_height;
+
 void CompileShader(GLuint shader_id, const GLchar* source) {
     int success;
     char log[512];
@@ -71,6 +73,9 @@ void LoadShaders() {
 }
 
 void GLRenderer_CreateWindow(char* title, int width, int height) {
+    window_width = width;
+    window_height = height;
+
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         LOG_PANIC("SDL_INIT_VIDEO error: %s", SDL_GetError());
     }
@@ -160,8 +165,6 @@ void GLRenderer_BeginFrame(br_actor* camera, br_pixelmap* colour_buffer) {
     glEnable(GL_DEPTH_TEST);
     glUseProgram(shader_program_3d);
 
-    //glViewport(0, 0, 320, 200);
-
     GLuint lightpos_u = glGetUniformLocation(shader_program_3d, "lightPos");
     GLuint lightcolor_u = glGetUniformLocation(shader_program_3d, "lightColor");
     GLuint objectcolor_u = glGetUniformLocation(shader_program_3d, "objectColor");
@@ -200,7 +203,7 @@ void GLRenderer_BeginFrame(br_actor* camera, br_pixelmap* colour_buffer) {
 }
 
 void GLRenderer_EndFrame() {
-    glViewport(0, 0, 640, 480);
+    glViewport(0, 0, window_width, window_height);
 }
 
 void GLRenderer_RenderFullScreenQuad(uint32_t* screen_buffer, int transparent) {

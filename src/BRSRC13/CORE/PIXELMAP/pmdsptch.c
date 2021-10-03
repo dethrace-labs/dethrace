@@ -103,11 +103,7 @@ void BrPixelmapFill(br_pixelmap* dst, br_uint_32 colour) {
     char* d;
 
     if ((dst->flags & (BR_PMF_LINEAR | BR_PMF_ROW_WHOLEPIXELS)) == (BR_PMF_LINEAR | BR_PMF_ROW_WHOLEPIXELS)) {
-        if (dst->row_bytes > 0) {
-            memset(dst->pixels, colour, dst->row_bytes * dst->height);
-        } else {
-            TELL_ME_IF_WE_PASS_THIS_WAY();
-        }
+        memset(dst->pixels, colour, dst->row_bytes * dst->height);
     } else {
         d = dst->pixels;
         for (y = 0; y < dst->height; y++) {

@@ -3,7 +3,6 @@
 
 #include "brender/br_types.h"
 #include "harness/trace.h"
-#include <SDL.h>
 
 typedef struct tPlatform {
     void (*Init)();
@@ -25,7 +24,5 @@ typedef struct tCamera {
     float* (*getView)();
     void (*setPosition)();
 } tCamera;
-
-void Harness_Init(char* name, char* platform_name);
 
 #endif

@@ -1,6 +1,8 @@
-#include "renderer_state.h"
-#include "harness/trace.h"
+#include "renderer_impl.h"
+#include "include/harness/trace.h"
 #include <stddef.h>
+
+// Provides a harness-specific implementation of the Brender br_renderer* interface
 
 extern void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class);
 extern void BrMatrix34Mul(br_matrix34* A, br_matrix34* B, br_matrix34* C);
@@ -77,7 +79,7 @@ br_error stateDefault(struct br_renderer* r, br_uint_32 mask) {
     return StateCopy(&self->state, self->default_state, mask, self);
 }
 
-harness_br_renderer* NewRendererState() {
+harness_br_renderer* NewHarnessBrRenderer() {
 
     harness_br_renderer* self;
 

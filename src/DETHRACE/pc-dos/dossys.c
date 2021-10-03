@@ -645,11 +645,6 @@ int original_main(int pArgc, char** pArgv) {
     float f;
 
     for (i = 1; i < pArgc; i++) {
-
-        if (Harness_Hook_HandleCommandLineArg(pArgv[i])) {
-            continue;
-        }
-
         if (strcasecmp(pArgv[i], "-hires") == 0) {
             gGraf_spec_index = 1;
         } else if (strcasecmp(pArgv[i], "-yon") == 0 && i < pArgc - 1) {

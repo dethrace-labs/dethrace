@@ -1,3 +1,4 @@
+#include "harness/hooks.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -102,7 +103,12 @@ int main(int argc, char** argv) {
         exit(1);
     }
 
-    Harness_Init(argv[0], "null");
+    int fake_argc = 2;
+    char* fake_argv[2];
+    fake_argv[0] = "test";
+    fake_argv[1] = "-platform=null";
+
+    Harness_Init(&fake_argc, fake_argv);
 
     setup_global_vars();
 
