@@ -952,9 +952,7 @@ int ModelPickBox(br_actor* actor, tBounds* bnds, br_model* model, br_material* m
                                                 face_list->flags |= (v2 > v1) + 2 * (v3 > v2) + 4 * (v3 < v1);
                                             }
                                             if (pMat) {
-                                                face_list->d = face_list->v[0].v[2] * face_list->normal.v[2]
-                                                    + face_list->v[0].v[1] * face_list->normal.v[1]
-                                                    + face_list->v[0].v[0] * face_list->normal.v[0];
+                                                face_list->d = BrVector3LengthSquared(&face_list->v[0]);
                                             } else {
                                                 face_list->d = fp->eqn.v[3];
                                             }
