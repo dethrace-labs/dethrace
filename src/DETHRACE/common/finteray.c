@@ -428,7 +428,7 @@ void CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir,
     if ((!this_material || (this_material->flags & 0x1800) != 0 || d <= 0.0)
         && (!this_material || !this_material->identifier || *this_material->identifier != '!' || !gPling_materials)
         && fabs(d) >= 0.00000023841858) {
-        BrVector3Sub(&p, &ray_pos, &pFace->v[0]);
+        BrVector3Sub(&p, ray_pos, &pFace->v[0]);
         numerator = pFace->normal.v[1] * p.v[1] + pFace->normal.v[2] * p.v[2] + pFace->normal.v[0] * p.v[0];
         if (!BadDiv__finteray(numerator, d)) {
             if (d > 0.0) {
