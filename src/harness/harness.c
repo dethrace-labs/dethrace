@@ -225,7 +225,7 @@ void Harness_Hook_PDSetKeyArray() {
 }
 
 void Harness_Hook_BrMaterialUpdate(br_material* mat, br_uint_16 flags) {
-    LOG_DEBUG("buffermat %s", mat->identifier);
+    //LOG_DEBUG("buffermat %s", mat->identifier);
     platform->BufferMaterial(mat);
 }
 

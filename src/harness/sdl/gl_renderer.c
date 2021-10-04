@@ -344,8 +344,6 @@ void GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
     ctx = model->stored;
     v11model* v11 = model->prepared;
 
-    LOG_DEBUG("model prepared for %s", model->identifier);
-
     if (v11 == NULL) {
         //LOG_WARN("No model prepared for %s", model->identifier);
         return;
