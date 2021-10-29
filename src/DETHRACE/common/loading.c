@@ -404,17 +404,17 @@ void LoadGeneralParameters() {
     }
 
     gDefault_gravity = GetAFloat(f);
-    gZombie_factor = GetAFloat(f);
     gCut_delay_1 = GetAFloat(f);
     gCut_delay_2 = GetAFloat(f);
     gCut_delay_3 = GetAFloat(f);
-    gCut_delay_4 = 1.0f;
+    gCut_delay_4 = GetAFloat(f);
+    gZombie_factor= 1.0f;
     fclose(f);
 }
 
 // IDA: void __cdecl FinishLoadingGeneral()
 void FinishLoadingGeneral() {
-    /*dword_1298C0 = */ BrMaterialFind(gDef_def_water_screen_name);
+    gDefault_default_water_spec_vol.screen_material = BrMaterialFind(gDef_def_water_screen_name);
 }
 
 // IDA: br_pixelmap* __usercall LoadPixelmap@<EAX>(char *pName@<EAX>)
@@ -2188,14 +2188,23 @@ void LoadRaces(tRace_list_spec* pRace_list, int* pCount, int pRace_type_index) {
     *pCount = number_of_racers;
     fclose(f);
     j = 0;
+    if (harness_game_info.mode == eGame_carmageddon_demo) {
+        j = 99;
+    }
     for (i = 0; i < number_of_racers; i++) {
-        pRace_list[i].suggested_rank = 99 - j / (number_of_racers - 3);
-        if (i >= 3) {
-            pRace_list[i].rank_required = pRace_list[i - 2].suggested_rank;
+        if (harness_game_info.mode == eGame_carmageddon_demo) {
+            pRace_list[i].suggested_rank = gDemo_rank;
+            pRace_list[i].rank_required = j;
+            j -= 3;
         } else {
-            pRace_list[i].rank_required = 99;
+            pRace_list[i].suggested_rank = 99 - j / (number_of_racers - 3);
+            if (i >= 3) {
+                pRace_list[i].rank_required = pRace_list[i - 2].suggested_rank;
+            } else {
+                pRace_list[i].rank_required = 99;
+            }
+            j += 100;
         }
-        j += 100;
     }
 
     pRace_list[number_of_racers - 1].rank_required = 1;
@@ -3087,7 +3096,7 @@ int TestForOriginalCarmaCDinDrive() {
     }
 
     // changed from static file reference to handle all game modes
-    if (!PDCheckDriveExists2(cutscene_pathname, harness_game_info.intro_smk_file, 2000000)) {
+    if (!PDCheckDriveExists2(cutscene_pathname, harness_game_info.defines.INTRO_SMK_FILE, 2000000)) {
         return 0;
     }
 

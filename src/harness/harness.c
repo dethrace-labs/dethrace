@@ -34,14 +34,19 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]);
 
 void Harness_DetectGameMode() {
     if (access("DATA/RACES/CITY01.TXT", F_OK) == -1 && access("DATA/RACES/CITYA1.TXT", F_OK) == -1) {
-        harness_game_info.intro_smk_file = "";
+        harness_game_info.defines.INTRO_SMK_FILE = "";
+        harness_game_info.defines.GERMAN_LOADSCRN = "COWLESS.PIX";
         harness_game_info.mode = eGame_carmageddon_demo;
         LOG_INFO("\"%s\"", "Carmageddon demo");
     } else if (access("DATA/CUTSCENE/SPLINTRO.SMK", F_OK) != -1) {
-        harness_game_info.intro_smk_file = "SPLINTRO.SMK";
+        harness_game_info.defines.INTRO_SMK_FILE = "SPLINTRO.SMK";
+        harness_game_info.defines.GERMAN_LOADSCRN = "LOADSCRN.PIX";
+        harness_game_info.mode = eGame_splatpack;
         LOG_INFO("\"%s\"", "Splat Pack");
     } else {
-        harness_game_info.intro_smk_file = "MIX_INTR.SMK";
+        harness_game_info.defines.INTRO_SMK_FILE = "MIX_INTR.SMK";
+        harness_game_info.defines.GERMAN_LOADSCRN = "LOADSCRN.PIX";
+        harness_game_info.mode = eGame_carmageddon;
         LOG_INFO("\"%s\"", "Carmageddon");
     }
 }

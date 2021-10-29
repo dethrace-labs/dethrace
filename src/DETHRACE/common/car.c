@@ -1006,7 +1006,7 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
     int step_number;
     int dam_index;
     static int steering_locked;
-    tCar_spec* car;
+    tCar_spec* car = NULL;
     tCollision_info* car_info;
     tNon_car_spec* non_car;
     tU32 time_step;
@@ -1108,6 +1108,13 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
         PrepareCars(last_frame_time);
         InterpolateCars(time_step, pTime_difference);
         FinishCars(time_step, pTime_difference);
+    }
+
+    if (car == NULL) {
+
+    } else {
+
+        LOG_DEBUG("ran %d steps, speed %f", step_number, car->speed);
     }
 }
 
@@ -1317,6 +1324,9 @@ void ControlCar4(tCar_spec* c, br_scalar dt) {
         c->turn_speed = 0.0;
     }
     c->curvature = c->curvature + c->turn_speed;
+    if (c->turn_speed != 0) {
+        LOG_DEBUG("curve %f, turn_speed %f", c->curvature, c->turn_speed);
+    }
     if (c->joystick.left <= 0) {
         if (c->joystick.right >= 0) {
             ts = (double)c->joystick.right * (double)c->joystick.right / 4294967300.0;
@@ -1852,6 +1862,8 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
 
         maxfl = sqrt(force[0]) * friction_number * (rl_oil_factor * v116) * mat_list[c->material_index[0]].tyre_road_friction;
         maxfr = sqrt(force[1]) * friction_number * (rr_oil_factor * v116) * mat_list[c->material_index[1]].tyre_road_friction;
+        maxfl *= 2;
+        maxfr *= 2;
         c->max_force_rear = maxfr + maxfl;
         // printf("outside of check. rpm %f, target %f\n", c->revs, c->target_revs);
         if (rl_oil_factor == 1.0 && rr_oil_factor == 1.0 && c->traction_control && v135 * 2.0 > c->max_force_rear && c->acc_force > 0.0
