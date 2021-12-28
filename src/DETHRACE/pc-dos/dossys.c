@@ -510,8 +510,12 @@ void PDForEveryFile(char* pThe_path, void (*pAction_routine)(char*)) {
     d = opendir(pThe_path);
     if (d) {
         while ((entry = readdir(d)) != NULL) {
-            // only files, and only files that dont start with '.'
+            // only files, and only files that don't start with '.'
+#ifdef _WIN32
+            if ((GetFileAttributesA(pThe_path) & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY) {
+#else
             if (entry->d_type == DT_REG && entry->d_name[0] != '.') {
+#endif
                 PathCat(found_path, pThe_path, entry->d_name);
                 pAction_routine(found_path);
             }
