@@ -90,6 +90,7 @@ void test_utility_IRandomBetween() {
 }
 
 void test_utility_suite() {
+    UnitySetTestFile(__FILE__);
     RUN_TEST(test_utility_EncodeLinex);
     RUN_TEST(test_utility_DecodeLine2);
     RUN_TEST(test_utility_EncodeLine2);

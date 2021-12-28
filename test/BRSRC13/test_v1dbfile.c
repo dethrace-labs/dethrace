@@ -62,6 +62,7 @@ void test_v1dbfile_BrMaterialLoad() {
 }
 
 void test_v1dbfile_suite() {
+    UnitySetTestFile(__FILE__);
     RUN_TEST(test_v1dbfile_BrModelLoad);
     RUN_TEST(test_v1dbfile_BrActorLoad);
     RUN_TEST(test_v1dbfile_BrMaterialLoad);

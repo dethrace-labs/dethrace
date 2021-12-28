@@ -8,5 +8,6 @@ void test_fwsetup_BrFwBegin() {
 }
 
 void test_fwsetup_suite() {
+    UnitySetTestFile(__FILE__);
     RUN_TEST(test_fwsetup_BrFwBegin);
 }

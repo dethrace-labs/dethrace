@@ -71,6 +71,7 @@ void test_resource_BrResFree_Child() {
 }
 
 void test_resource_suite() {
+    UnitySetTestFile(__FILE__);
     RUN_TEST(test_resource_BrResAllocate);
     RUN_TEST(test_resource_BrResFree);
     RUN_TEST(test_resource_BrResFree2);

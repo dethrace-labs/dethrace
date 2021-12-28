@@ -34,5 +34,6 @@ void test_controls_CheckKevKeys() {
 }
 
 void test_controls_suite() {
+    UnitySetTestFile(__FILE__);
     RUN_TEST(test_controls_CheckKevKeys);
 }

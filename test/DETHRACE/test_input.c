@@ -24,5 +24,6 @@ void test_input_KevKeyService() {
 }
 
 void test_input_suite() {
+    UnitySetTestFile(__FILE__);
     RUN_TEST(test_input_KevKeyService);
 }

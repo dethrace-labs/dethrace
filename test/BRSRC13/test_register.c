@@ -63,6 +63,7 @@ void test_register_BrRegistryRemove() {
 }
 
 void test_register_suite() {
+    UnitySetTestFile(__FILE__);
     RUN_TEST(test_register_BrRegistryFind);
     RUN_TEST(test_register_BrRegistryRemove);
 }

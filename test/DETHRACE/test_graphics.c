@@ -12,5 +12,6 @@ void test_graphics_loadfont() {
 }
 
 void test_graphics_suite() {
+    UnitySetTestFile(__FILE__);
     RUN_TEST(test_graphics_loadfont);
 }

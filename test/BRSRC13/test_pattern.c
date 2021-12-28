@@ -35,6 +35,7 @@ void test_pattern_BrNamePatternMatch_QuestionMark() {
 }
 
 void test_pattern_suite() {
+    UnitySetTestFile(__FILE__);
     RUN_TEST(test_pattern_BrNamePatternMatch);
     RUN_TEST(test_pattern_BrNamePatternMatch_Star);
     RUN_TEST(test_pattern_BrNamePatternMatch_QuestionMark);

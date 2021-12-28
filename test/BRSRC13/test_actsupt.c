@@ -51,6 +51,7 @@ void test_actsupt_BrActorAdd() {
 }
 
 void test_actsupt_suite() {
+    UnitySetTestFile(__FILE__);
     RUN_TEST(test_actsupt_BrActorAllocateAndFree);
     RUN_TEST(test_actsupt_BrActorAllocateAndFreeChild);
     RUN_TEST(test_actsupt_BrActorAdd);
