@@ -17,7 +17,6 @@ endif()
 
 if(NOT MSVC)
     target_compile_options(harness PRIVATE
-        -g
         -Wall
         -Wextra
         -Werror
