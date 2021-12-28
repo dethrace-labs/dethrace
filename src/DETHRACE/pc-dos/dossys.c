@@ -722,12 +722,6 @@ void PDEndItAllAndReRunTheBastard() {
     NOT_IMPLEMENTED();
 }
 
-// IDA: int __usercall matherr@<EAX>(exception *err@<EAX>)
-int matherr(struct exception_* err) {
-    LOG_TRACE("(%p)", err);
-    NOT_IMPLEMENTED();
-}
-
 // IDA: int __usercall LoopLimitTooLow@<EAX>(tU32 limit@<EAX>)
 int LoopLimitTooLow(tU32 limit) {
     clock_t start;
