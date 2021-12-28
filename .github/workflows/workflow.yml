@@ -68,7 +68,7 @@ jobs:
           arch: ${{ matrix.platform }}
       - name: Build
         run: |
-          .github/scripts/build-windows.ps1
+          .github/scripts/build-msvc.ps1
         env:
           MATRIX_PLATFORM: ${{ matrix.platform }}
       - name: Upload artifact
