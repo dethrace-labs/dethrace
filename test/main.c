@@ -47,6 +47,7 @@ extern void test_pattern_suite();
 extern void test_pmfile_suite();
 extern void test_graphics_suite();
 extern void test_regsupt_suite();
+extern void test_matrix4_suite();
 extern void test_powerup_suite();
 extern void test_flicplay_suite();
 
@@ -127,6 +128,8 @@ int main(int argc, char** argv) {
     test_pmfile_suite();
     test_v1dbfile_suite();
     test_regsupt_suite();
+
+    test_matrix4_suite();
 
     // DETHRACE
     test_utility_suite();
