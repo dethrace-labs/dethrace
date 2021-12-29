@@ -15,6 +15,7 @@
 #include "utility.h"
 #include "watcom_functions.h"
 #include <dirent.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
