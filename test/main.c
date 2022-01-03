@@ -49,6 +49,7 @@ extern void test_graphics_suite();
 extern void test_regsupt_suite();
 extern void test_matrix4_suite();
 extern void test_matrix23_suite();
+extern void test_matrix34_suite();
 extern void test_powerup_suite();
 extern void test_flicplay_suite();
 
@@ -132,6 +133,7 @@ int main(int argc, char** argv) {
 
     test_matrix4_suite();
     test_matrix23_suite();
+    test_matrix34_suite();
 
     // DETHRACE
     test_utility_suite();
