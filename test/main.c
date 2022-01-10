@@ -45,11 +45,9 @@ extern void test_v1dbfile_suite();
 extern void test_register_suite();
 extern void test_pattern_suite();
 extern void test_pmfile_suite();
+extern void test_quat_suite();
 extern void test_graphics_suite();
 extern void test_regsupt_suite();
-extern void test_matrix4_suite();
-extern void test_matrix23_suite();
-extern void test_matrix34_suite();
 extern void test_powerup_suite();
 extern void test_flicplay_suite();
 
@@ -128,12 +126,9 @@ int main(int argc, char** argv) {
 
     test_pattern_suite();
     test_pmfile_suite();
+    test_quat_suite();
     test_v1dbfile_suite();
     test_regsupt_suite();
-
-    test_matrix4_suite();
-    test_matrix23_suite();
-    test_matrix34_suite();
 
     // DETHRACE
     test_utility_suite();
