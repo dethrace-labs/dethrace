@@ -425,7 +425,7 @@ void CheckTimer() {
         }
 
         if (harness_game_info.mode == eGame_carmageddon_demo) {
-            time_left = 240000 - GetTotalTime();
+            time_left = 240000 - GetRaceTime();
             time_in_seconds = (time_left + 500) / 1000;
             if (time_in_seconds != last_demo_time_in_seconds && time_in_seconds <= 10)
                 DRS3StartSound(gIndexed_outlets[4], 1001);
