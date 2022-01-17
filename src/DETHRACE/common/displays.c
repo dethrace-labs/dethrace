@@ -801,9 +801,6 @@ void DoFancyHeadup(int pIndex) {
     int temp_ref;
     LOG_TRACE("(%d)", pIndex);
 
-    STUB();
-    return; // some bits are not implemented below
-
     the_time = GetTotalTime();
     if (!gMap_mode && (gLast_fancy_index < 0 || the_time - gLast_fancy_time > 2000 || gLast_fancy_index <= pIndex)) {
         temp_ref = NewImageHeadupSlot(6, 0, 2000, pIndex + 10);

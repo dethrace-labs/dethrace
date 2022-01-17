@@ -185,9 +185,9 @@ void StartLoadingScreen() {
     LOG_TRACE("()");
 
     PossibleService();
-    if (gProgram_state.sausage_eater_mode) {
-        SplashScreenWith(harness_game_info.defines.GERMAN_LOADSCRN);
-    } else {
-        SplashScreenWith("LOADSCRN.PIX");
-    }
+    //if (gProgram_state.sausage_eater_mode) {
+    SplashScreenWith(harness_game_info.defines.GERMAN_LOADSCRN);
+    //} else {
+    //    SplashScreenWith("LOADSCRN.PIX");
+    //}
 }

@@ -99,6 +99,8 @@ void GLRenderer_CreateWindow(char* title, int width, int height) {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 
+    SDL_GL_SetSwapInterval(1);
+
     window = SDL_CreateWindow(title,
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
@@ -121,7 +123,7 @@ void GLRenderer_CreateWindow(char* title, int width, int height) {
         exit(1);
     }
 
-    LoadShaders();
+        LoadShaders();
 
     float vertices[] = {
         // positions          // colors           // texture coords

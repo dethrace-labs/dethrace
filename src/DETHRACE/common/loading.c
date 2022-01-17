@@ -408,7 +408,7 @@ void LoadGeneralParameters() {
     gCut_delay_2 = GetAFloat(f);
     gCut_delay_3 = GetAFloat(f);
     gCut_delay_4 = GetAFloat(f);
-    gZombie_factor= 1.0f;
+    gZombie_factor = 1.0f;
     fclose(f);
 }
 
@@ -1184,15 +1184,13 @@ void ReadMechanicsData(FILE* pF, tCar_spec* c) {
     c->mu[0] *= sqrt((c->wpos[2].v[2] - c->cmpos.v[2]) / (c->wpos[2].v[2] - c->wpos[0].v[2]) * (c->M * 5.0));
     c->mu[1] *= sqrt((c->wpos[0].v[2] - c->cmpos.v[2]) / (c->wpos[0].v[2] - c->wpos[2].v[2]) * (c->M * 5.0));
     c->mu[2] *= sqrt((c->wpos[2].v[2] - c->cmpos.v[2]) / (c->wpos[2].v[2] - c->wpos[0].v[2]) * (c->M * 5.0));
+
+    LOG_DEBUG("%f %f %f", c->mu[0], c->mu[1], c->mu[2]);
     for (i = 0; i < 4; ++i) {
         c->wpos[i].v[1] = c->ride_height;
     }
-    c->bounds[0].min.v[0] = c->bounds[1].min.v[0];
-    c->bounds[0].min.v[1] = c->bounds[1].min.v[1];
-    c->bounds[0].min.v[2] = c->bounds[1].min.v[2];
-    c->bounds[0].max.v[0] = c->bounds[1].max.v[0];
-    c->bounds[0].max.v[1] = c->bounds[1].max.v[1];
-    c->bounds[0].max.v[2] = c->bounds[1].max.v[2];
+    c->bounds[0].min = c->bounds[1].min;
+    c->bounds[0].max = c->bounds[1].max;
     for (i = 0; c->extra_point_num > i; ++i) {
         for (j = 0; j < 3; ++j) {
             if (c->extra_points[i].v[j] < c->bounds[0].min.v[j]) {
@@ -1204,9 +1202,10 @@ void ReadMechanicsData(FILE* pF, tCar_spec* c) {
         }
     }
     memcpy(&c->bounds[2], &c->bounds[0], sizeof(br_bounds));
-    c->I.v[2] = het * het + wid * wid * c->M / 12.0;
-    c->I.v[1] = wid * wid + len * len * c->M / 12.0;
-    c->I.v[0] = het * het + len * len * c->M / 12.0;
+    c->I.v[2] = (het * het + wid * wid) * c->M / 12.0;
+    c->I.v[1] = (wid * wid + len * len) * c->M / 12.0;
+    c->I.v[0] = (het * het + len * len) * c->M / 12.0;
+
     for (i = 0; i < 4; ++i) {
         c->wpos[i].v[0] = c->wpos[i].v[0] * 6.9;
         c->wpos[i].v[1] = c->wpos[i].v[1] * 6.9;
@@ -1218,6 +1217,7 @@ void ReadMechanicsData(FILE* pF, tCar_spec* c) {
     c->I.v[0] = c->I.v[0] * 47.610001;
     c->I.v[1] = c->I.v[1] * 47.610001;
     c->I.v[2] = c->I.v[2] * 47.610001;
+
     c->bounds[1].min.v[0] = c->bounds[1].min.v[0] * 6.9000001;
     c->bounds[1].min.v[1] = c->bounds[1].min.v[1] * 6.9000001;
     c->bounds[1].min.v[2] = c->bounds[1].min.v[2] * 6.9000001;
@@ -1241,7 +1241,7 @@ void ReadMechanicsData(FILE* pF, tCar_spec* c) {
     for (i = 0; i < 2; ++i) {
         c->susp_height[i] = c->susp_height[i] * 6.9;
         c->sk[i] = c->sk[i] / 6.9;
-        c->sb[i] = c->sb[i] / sqrt(6.9);
+        c->sb[i] = c->sb[i] / sqrt(c->sb[i]);
     }
     GetAString(pF, s);
     SetCarSuspGiveAndHeight(c, 1.0, 1.0, 1.0, 0.0, 0.0);

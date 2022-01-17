@@ -1521,7 +1521,78 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
     tU8* conv_table;
     tX1616 current_shear;
     LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d, %d)", pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight, pShear);
-    NOT_IMPLEMENTED();
+
+    current_shear = 0;
+    last_shear_x = 0;
+    source_ptr = (tU8*)pSource->pixels + pSource_x + pSource_y * pSource->row_bytes;
+    dest_ptr = (tU8*)pDest->pixels + pDest_x + pDest_y * pDest->row_bytes;
+    source_row_wrap = pSource->row_bytes - pWidth;
+    dest_row_wrap = pDest->row_bytes - pWidth;
+    if (pDest_y < 0) {
+        pHeight += pDest_y;
+        if (pHeight <= 0) {
+            return;
+        }
+        source_ptr -= pDest_y * pSource->row_bytes;
+        dest_ptr -= pDest_y * pDest->row_bytes;
+        pDest_y = 0;
+    }
+    if (pDest->height > pDest_y) {
+        if (pDest_y + pHeight > pDest->height) {
+            pHeight = pDest->height - pDest_y;
+        }
+        if (pDest_x < 0) {
+            pWidth += pDest_x;
+            if (pWidth <= 0) {
+                return;
+            }
+            source_ptr -= pDest_x;
+            dest_ptr -= pDest_x;
+            source_row_wrap -= pDest_x;
+            dest_row_wrap -= pDest_x;
+            pDest_x = 0;
+        }
+        if (pDest->width > pDest_x) {
+            if (pDest_x + pWidth > pDest->width) {
+                shear_x_difference = pDest_x + pWidth - pDest->width;
+                pWidth = pDest->width - pDest_x;
+                source_row_wrap += shear_x_difference;
+                dest_row_wrap += shear_x_difference;
+            }
+            for (y_count = 0; pHeight > y_count; ++y_count) {
+                for (x_count = 0; pWidth > x_count; ++x_count) {
+                    the_byte = *source_ptr++;
+                    if (the_byte) {
+                        *dest_ptr = the_byte;
+                    }
+                    ++dest_ptr;
+                }
+                current_shear_x = (current_shear >> 16) - last_shear_x;
+                dest_ptr += dest_row_wrap + current_shear_x;
+                last_shear_x = current_shear >> 16;
+                source_ptr += source_row_wrap;
+                current_shear += pShear;
+                pDest_x += current_shear_x;
+                if (pDest_x < 0) {
+                    pWidth += pDest_x;
+                    source_ptr -= pDest_x;
+                    dest_ptr -= pDest_x;
+                    source_row_wrap -= pDest_x;
+                    dest_row_wrap -= pDest_x;
+                    pDest_x = 0;
+                }
+                if (pDest->width <= pDest_x) {
+                    break;
+                }
+                if (pDest_x + pWidth > pDest->width) {
+                    shear_x_difference = pDest_x + pWidth - pDest->width;
+                    pWidth = pDest->width - pDest_x;
+                    source_row_wrap += shear_x_difference;
+                    dest_row_wrap += shear_x_difference;
+                }
+            }
+        }
+    }
 }
 
 // IDA: void __usercall DRPixelmapRectangleVScaledCopy(br_pixelmap *pDest@<EAX>, br_int_16 pDest_x@<EDX>, br_int_16 pDest_y@<EBX>, br_pixelmap *pSource@<ECX>, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight)

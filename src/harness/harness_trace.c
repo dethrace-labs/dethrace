@@ -35,6 +35,15 @@ void debug_print_matrix34(const char* fmt, const char* fn, char* msg, br_matrix3
     puts("\033[0m");
 }
 
+void debug_print_matrix4(const char* fmt, const char* fn, char* msg, br_matrix4* m) {
+    printf(fmt, fn);
+    printf("matrix34 \"%s\"\n", msg);
+    for (int i = 0; i < 4; i++) {
+        printf("  %f, %f, %f, %f\n", m->m[i][0], m->m[i][1], m->m[i][2], m->m[i][3]);
+    }
+    puts("\033[0m");
+}
+
 // int count_open_fds() {
 //     DIR* dp = opendir("/dev/fd/");
 //     struct dirent* de;

@@ -389,6 +389,8 @@ void UpdateFramePeriod(tU32* pCamera_period) {
     } else {
         *pCamera_period = 10;
     }
+
+    usleep(40 * 1000);
 }
 
 // IDA: tU32 __cdecl GetLastTickCount()
@@ -623,13 +625,14 @@ tRace_result MainGameLoop() {
         }
 
         // Added to lock framerate to 30fps. Seems to help physics be less twitchy...
-        //double secs = GetTotalTime() / 1000.0;
-        // LOG_DEBUG("timediff %f", secs - (last_time + (1.0 / 30.0)));
-        // while (secs < last_time + (1.0 / 30.0)) {
+        double secs = GetTotalTime();
+        //LOG_DEBUG("timediff %f", secs - (last_time + (1.0 / 30.0)));
+        // while (secs < last_time + (1.0 / 30.0) * 1000) {
         //     //LOG_DEBUG("skipping time...");
-        //     secs = GetTotalTime() / 1000.0;
+        //     secs = GetTotalTime();
         // }
-        // last_time += 1.0 / 30.0;
+        //usleep(50 * 1000);
+        //last_time += (1.0 / 30.0) * 1000;
 
     } while (gProgram_state.prog_status == eProg_game_ongoing
         && !MungeRaceFinished()

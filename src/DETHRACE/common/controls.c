@@ -37,7 +37,7 @@ tToggle_element gToggle_array[] = {
     { 52, -2, 1, 1, 0, DamageTest },
     { 36, -2, 0, 1, 0, ToggleSoundEnable },
     { 5, 8, 0, 1, 0, PrintScreen },
-    { 9, 7, 1, 1, 0, DrawSomeText }, // commented out in original executable
+    { 9, 7, 1, 1, 0, DrawSomeText }, // commented out in original executable  // ctrl+f5
     { 10, 7, 1, 1, 0, ToggleFlying },
     { 54, -2, 1, 1, 0, TogglePedestrians },
     { 17, -2, 0, 0, 0, F4Key },
