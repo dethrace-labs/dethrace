@@ -31,8 +31,6 @@ GLuint shader_program_2d;
 GLuint shader_program_2d_trans;
 GLuint shader_program_3d;
 
-GLuint shader3d_texture_location;
-
 int window_width, window_height;
 
 void CompileShader(GLuint shader_id, const GLchar* source) {
@@ -81,8 +79,6 @@ void LoadShaders() {
 
     glDeleteShader(vs);
     glDeleteShader(fs);
-
-    //shader3d_texture_location = glGetUniformLocation(shader_program_3d, "texture");
 }
 
 void GLRenderer_CreateWindow(char* title, int width, int height) {

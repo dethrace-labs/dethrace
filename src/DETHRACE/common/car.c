@@ -29,7 +29,6 @@
 #include <math.h>
 #include <stdlib.h>
 
-///--------------------
 int gDoing_physics;
 br_scalar gDt;
 // suffix added to avoid duplicate symbol
@@ -677,7 +676,6 @@ void ControlOurCar(tU32 pTime_difference) {
     LOG_TRACE("(%d)", pTime_difference);
 
     car = &gProgram_state.current_car;
-
     if (gCar_flying) {
         if (gNet_mode) {
             gCar_flying = 0;
@@ -839,12 +837,12 @@ void PrepareCars(tU32 pFrame_start_time) {
     last_frame_start = pFrame_start_time;
     for (i = 0; i < gNum_cars_and_non_cars; i++) {
         car = gActive_car_list[i];
-        car->car_master_actor->t.t.mat.m[3][0] = car->car_master_actor->t.t.mat.m[3][0] * 6.9000001;
-        car->car_master_actor->t.t.mat.m[3][1] = car->car_master_actor->t.t.mat.m[3][1] * 6.9000001;
-        car->car_master_actor->t.t.mat.m[3][2] = car->car_master_actor->t.t.mat.m[3][2] * 6.9000001;
-        car->velocity_car_space.v[0] = car->velocity_car_space.v[0] * 6900.0;
-        car->velocity_car_space.v[1] = car->velocity_car_space.v[1] * 6900.0;
-        car->velocity_car_space.v[2] = car->velocity_car_space.v[2] * 6900.0;
+        car->car_master_actor->t.t.mat.m[3][0] = car->car_master_actor->t.t.mat.m[3][0] * WORLD_SCALE;
+        car->car_master_actor->t.t.mat.m[3][1] = car->car_master_actor->t.t.mat.m[3][1] * WORLD_SCALE;
+        car->car_master_actor->t.t.mat.m[3][2] = car->car_master_actor->t.t.mat.m[3][2] * WORLD_SCALE;
+        car->velocity_car_space.v[0] = car->velocity_car_space.v[0] * WORLD_SCALE * 1000.0f;
+        car->velocity_car_space.v[1] = car->velocity_car_space.v[1] * WORLD_SCALE * 1000.0f;
+        car->velocity_car_space.v[2] = car->velocity_car_space.v[2] * WORLD_SCALE * 1000.0f;
         car->frame_collision_flag = gOver_shoot && car->collision_flag;
         if (car->driver > eDriver_non_car) {
             RecordLastDamage(car);
@@ -881,7 +879,7 @@ void FinishCars(tU32 pLast_frame_time, tU32 pTime) {
     br_scalar scale;
     LOG_TRACE("(%d, %d)", pLast_frame_time, pTime);
 
-    for (i = 0; gNum_cars_and_non_cars > i; ++i) {
+    for (i = 0; i < gNum_cars_and_non_cars; i++) {
         car = gActive_car_list[i];
         if (fabs(car->omega.v[0]) > 10000.0
             || fabs(car->omega.v[1]) > 10000.0
@@ -889,12 +887,12 @@ void FinishCars(tU32 pLast_frame_time, tU32 pTime) {
             BrVector3SetFloat(&car->omega, 0.0, 0.0, 0.0);
             BrVector3SetFloat(&car->v, 0.0, 0.0, 0.0);
         }
-        BrVector3InvScale(&car->velocity_car_space, &car->velocity_car_space, 6900.0);
-        car->car_master_actor->t.t.mat.m[3][0] = car->car_master_actor->t.t.mat.m[3][0] / 6.9000001;
-        car->car_master_actor->t.t.mat.m[3][1] = car->car_master_actor->t.t.mat.m[3][1] / 6.9000001;
-        car->car_master_actor->t.t.mat.m[3][2] = car->car_master_actor->t.t.mat.m[3][2] / 6.9000001;
+        BrVector3InvScale(&car->velocity_car_space, &car->velocity_car_space, WORLD_SCALE * 1000.0f);
+        car->car_master_actor->t.t.mat.m[3][0] = car->car_master_actor->t.t.mat.m[3][0] / WORLD_SCALE;
+        car->car_master_actor->t.t.mat.m[3][1] = car->car_master_actor->t.t.mat.m[3][1] / WORLD_SCALE;
+        car->car_master_actor->t.t.mat.m[3][2] = car->car_master_actor->t.t.mat.m[3][2] / WORLD_SCALE;
 
-        car->speed = sqrt(car->v.v[2] * car->v.v[2] + car->v.v[0] * car->v.v[0]) / 6900.0;
+        car->speed = BR_LENGTH2(car->v.v[0], car->v.v[2]) / (WORLD_SCALE * 1000.0f);
         minus_k.v[0] = -car->car_master_actor->t.t.mat.m[2][0];
         minus_k.v[1] = -car->car_master_actor->t.t.mat.m[2][1];
         minus_k.v[2] = -car->car_master_actor->t.t.mat.m[2][2];
@@ -914,14 +912,14 @@ void FinishCars(tU32 pLast_frame_time, tU32 pTime) {
             BrVector3Normalise(&car->direction, &car->v);
         }
         if (car->driver > eDriver_non_car) {
-            car->speedo_speed = BrVector3Dot(&minus_k, &car->v) / 6900.0f;
+            car->speedo_speed = BrVector3Dot(&minus_k, &car->v) / (WORLD_SCALE * 1000.0f);
 
             car->steering_angle = d180_OVER_PI * atan((car->wpos[0].v[2] - car->wpos[2].v[2]) * car->curvature);
 
-            car->lr_sus_position = (car->ride_height - car->oldd[0]) / 6.9;
-            car->rr_sus_position = (car->ride_height - car->oldd[1]) / 6.9;
-            car->lf_sus_position = (car->ride_height - car->oldd[2]) / 6.9;
-            car->rf_sus_position = (car->ride_height - car->oldd[3]) / 6.9;
+            car->lr_sus_position = (car->ride_height - car->oldd[0]) / WORLD_SCALE;
+            car->rr_sus_position = (car->ride_height - car->oldd[1]) / WORLD_SCALE;
+            car->lf_sus_position = (car->ride_height - car->oldd[2]) / WORLD_SCALE;
+            car->rf_sus_position = (car->ride_height - car->oldd[3]) / WORLD_SCALE;
             for (wheel = 0; wheel < 4; wheel++) {
                 if (car->oldd[wheel] < car->susp_height[wheel >> 1] && gCurrent_race.material_modifiers[car->material_index[wheel]].smoke_type >= 2
                     && !car->doing_nothing_flag)
@@ -936,6 +934,7 @@ void InterpolateCars(tU32 pLast_frame_time, tU32 pTime) {
     br_scalar dt;
     tCar_spec* car;
     int i;
+    LOG_TRACE("(%d, %d)", pLast_frame_time, pTime);
 
     dt = ((int)(gLast_mechanics_time - pLast_frame_time)) / 1000.0;
     if (dt > 0.04 || dt < 0)
@@ -1014,7 +1013,6 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
     LOG_TRACE("(%d, %d)", last_frame_time, pTime_difference);
 
     step_number = 0;
-
     frame_end_time = last_frame_time + pTime_difference;
     if (gFreeze_mechanics) {
         return;
@@ -1202,9 +1200,6 @@ void MoveAndCollideNonCar(tNon_car_spec* non_car, br_scalar dt) {
 int CollideCarWithWall(tCollision_info* car, br_scalar dt) {
     LOG_TRACE("(%p, %f)", car, dt);
 
-    // GetFacesInBox(car);
-    // BrMatrix34TApplyV(&car->velocity_car_space, &car->v, &car->oldmat);
-    // return 0;
     GetFacesInBox(car);
     if (gCollision_detection_on__car) {
         car->collision_flag = 0;

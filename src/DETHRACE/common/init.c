@@ -576,7 +576,7 @@ void InitRace() {
     gTotal_laps = gCurrent_race.total_laps;
     gCheckpoint = 1;
     gCheckpoint_count = gCurrent_race.check_point_count;
-    gFreeze_timer = 1; // changed
+    gFreeze_timer = 0;
     gFree_repairs = 0;
     if (gNet_mode) {
         gShow_opponents = gCurrent_net_game->options.show_players_on_map;
