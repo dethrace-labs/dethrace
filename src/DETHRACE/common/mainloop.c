@@ -11,6 +11,7 @@
 #include "globvrkm.h"
 #include "globvrpb.h"
 #include "graphics.h"
+#include "harness/config.h"
 #include "harness/trace.h"
 #include "input.h"
 #include "main.h"
@@ -388,6 +389,9 @@ void UpdateFramePeriod(tU32* pCamera_period) {
     } else {
         *pCamera_period = 10;
     }
+
+    // todo: FPS limiter
+    //usleep(40 * 1000);
 }
 
 // IDA: tU32 __cdecl GetLastTickCount()
@@ -418,6 +422,18 @@ void CheckTimer() {
         } else {
             gTimer = 0;
             RaceCompleted(eRace_over_out_of_time);
+        }
+
+        if (harness_game_info.mode == eGame_carmageddon_demo) {
+            time_left = 240000 - GetTotalTime();
+            time_in_seconds = (time_left + 500) / 1000;
+            if (time_in_seconds != last_demo_time_in_seconds && time_in_seconds <= 10)
+                DRS3StartSound(gIndexed_outlets[4], 1001);
+            last_demo_time_in_seconds = time_in_seconds;
+            if (time_left <= 0) {
+                gTimer = 0;
+                RaceCompleted(eRace_over_demo);
+            }
         }
     }
 }
@@ -610,13 +626,14 @@ tRace_result MainGameLoop() {
         }
 
         // Added to lock framerate to 30fps. Seems to help physics be less twitchy...
-        double secs = GetTotalTime() / 1000.0;
+        double secs = GetTotalTime();
         //LOG_DEBUG("timediff %f", secs - (last_time + (1.0 / 30.0)));
-        while (secs < last_time + (1.0 / 30.0)) {
-            //LOG_DEBUG("skipping time...");
-            secs = GetTotalTime() / 1000.0;
-        }
-        last_time += 1.0 / 30.0;
+        // while (secs < last_time + (1.0 / 30.0) * 1000) {
+        //     //LOG_DEBUG("skipping time...");
+        //     secs = GetTotalTime();
+        // }
+        //usleep(50 * 1000);
+        //last_time += (1.0 / 30.0) * 1000;
 
     } while (gProgram_state.prog_status == eProg_game_ongoing
         && !MungeRaceFinished()

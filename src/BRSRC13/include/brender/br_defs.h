@@ -30,6 +30,7 @@
 #define BR_COLOUR_RGBA(r, g, b, a) \
     ((((unsigned int)(a)) << 24) | (((unsigned int)(r)) << 16) | (((unsigned int)(g)) << 8) | ((unsigned int)(b)))
 
+#define BR_LENGTH2(a, b) ((br_scalar)sqrt((a) * (a) + (b) * (b)))
 #define BR_LENGTH3(a, b, c) ((br_scalar)sqrt((a) * (a) + (b) * (b) + (c) * (c)))
 #define BR_SCALAR_EPSILON 1.192092896e-7f
 #define BR_SCALAR_MAX 3.402823466e+38f

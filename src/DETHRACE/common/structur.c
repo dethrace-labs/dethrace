@@ -9,6 +9,7 @@
 #include "globvrkm.h"
 #include "globvrpb.h"
 #include "graphics.h"
+#include "harness/config.h"
 #include "harness/trace.h"
 #include "init.h"
 #include "loading.h"
@@ -181,8 +182,17 @@ void SelectOpponents(tRace_info* pRace_info) {
     int had_scum;
     LOG_TRACE("(%p)", pRace_info);
 
+    if (harness_game_info.mode == eGame_carmageddon_demo) {
+        pRace_info->number_of_racers = OPPONENT_COUNT;
+        for (i = 0; i < OPPONENT_COUNT; i++) {
+            pRace_info->opponent_list[i].index = gDemo_opponents[i];
+            pRace_info->opponent_list[i].ranking = IRandomBetween(gProgram_state.rank - 10, gProgram_state.rank + 10);
+        }
+        return;
+    }
+
     had_scum = 0;
-    if (!gNet_mode) {
+    if (gNet_mode == eNet_mode_none) {
         pRace_info->number_of_racers = OPPONENT_COUNT;
         for (i = 0; i < gNumber_of_racers; ++i) {
             gOpponents[i].picked = 0;

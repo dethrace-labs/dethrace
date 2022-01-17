@@ -1,4 +1,5 @@
 #include "prepmatl.h"
+#include "harness/hooks.h"
 #include "harness/trace.h"
 
 // IDA: void __cdecl BrMaterialUpdate(br_material *mat, br_uint_16 flags)
@@ -9,6 +10,8 @@ void BrMaterialUpdate(br_material* mat, br_uint_16 flags) {
     br_int_32 c;
 
     //TODO: ?
+
+    Harness_Hook_BrMaterialUpdate(mat, flags);
 }
 
 // IDA: void __usercall BrMaterialClear(br_material *mat@<EAX>)

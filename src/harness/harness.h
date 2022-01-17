@@ -15,6 +15,8 @@ typedef struct tPlatform {
     void (*RenderFullScreenQuad)(uint32_t* src, int transparent);
     void (*RenderModel)(br_model* model, br_matrix34 model_matrix);
     void (*Swap)();
+    void (*BufferTexture)(br_pixelmap* pm);
+    void (*BufferMaterial)(br_material* mat);
 
 } tPlatform;
 
@@ -24,5 +26,7 @@ typedef struct tCamera {
     float* (*getView)();
     void (*setPosition)();
 } tCamera;
+
+void Harness_ConvertPalettedPixelmapTo32Bit(uint32_t** dst, br_pixelmap* src);
 
 #endif

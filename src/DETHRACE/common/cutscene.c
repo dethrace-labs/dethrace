@@ -137,8 +137,7 @@ void PlaySmackerFile(char* pSmack_name) {
 void DoOpeningAnimation() {
     LOG_TRACE("()");
     PlaySmackerFile("LOGO.SMK");
-    // changed from static file reference to handle all game modes
-    PlaySmackerFile(harness_game_info.intro_smk_file);
+    PlaySmackerFile(harness_game_info.defines.INTRO_SMK_FILE);
     return WaitForNoKeys();
 }
 
@@ -187,7 +186,7 @@ void StartLoadingScreen() {
 
     PossibleService();
     if (gProgram_state.sausage_eater_mode) {
-        SplashScreenWith("LOADSCRN.PIX");
+        SplashScreenWith(harness_game_info.defines.GERMAN_LOADSCRN);
     } else {
         SplashScreenWith("LOADSCRN.PIX");
     }
