@@ -286,6 +286,8 @@ typedef enum keymapcodes {
 
 #define ONEEIGHTTWO 182.0444444444444
 
+#define d180_OVER_PI 57.29577951308232 // (180 / PI)
+
 #define PHYSICS_STEP_TIME 40.0
 
 #define DR_PI 3.141592653589793

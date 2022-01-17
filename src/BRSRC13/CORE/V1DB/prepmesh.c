@@ -436,7 +436,6 @@ void PrepareGroups(br_model* model) {
             v11g[g].face_colours = v11fcolours + f + 1;
             v11g[g].face_user = v11fuser + f + 1;
             v11g[g].stored = sorted_faces[f + 1]->material ? sorted_faces[f + 1]->material->stored : NULL;
-            LOG_DEBUG("switching material %p", v11g[g].stored);
             v11g[g].nfaces = 0;
         }
     }

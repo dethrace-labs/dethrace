@@ -390,7 +390,8 @@ void UpdateFramePeriod(tU32* pCamera_period) {
         *pCamera_period = 10;
     }
 
-    usleep(40 * 1000);
+    // todo: FPS limiter
+    //usleep(40 * 1000);
 }
 
 // IDA: tU32 __cdecl GetLastTickCount()

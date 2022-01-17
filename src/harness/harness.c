@@ -236,7 +236,6 @@ void Harness_Hook_BrMaterialUpdate(br_material* mat, br_uint_16 flags) {
 
 void Harness_Hook_BrBufferUpdate(br_pixelmap* pm, br_token use, br_uint_16 flags) {
     if (use == BRT_COLOUR_MAP_O) {
-        LOG_DEBUG("bufferpix %s", pm->identifier);
         platform->BufferTexture(pm);
     }
 }

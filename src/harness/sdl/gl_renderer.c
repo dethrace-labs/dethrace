@@ -123,7 +123,7 @@ void GLRenderer_CreateWindow(char* title, int width, int height) {
         exit(1);
     }
 
-        LoadShaders();
+    LoadShaders();
 
     float vertices[] = {
         // positions          // colors           // texture coords
@@ -404,7 +404,6 @@ void GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
 
 void GLRenderer_BufferMaterial(br_material* mat) {
     if (!mat->stored) {
-        LOG_DEBUG("trying to buffer mat");
         if (mat->colour_map) {
             GLRenderer_BufferTexture(mat->colour_map);
             if (mat->colour_map->stored) {
@@ -418,7 +417,6 @@ void GLRenderer_BufferMaterial(br_material* mat) {
 
 void GLRenderer_BufferTexture(br_pixelmap* pm) {
     if (!pm->stored) {
-        LOG_DEBUG("trying to buffer pix");
         uint32_t* full_color_texture = NULL;
         Harness_ConvertPalettedPixelmapTo32Bit(&full_color_texture, pm);
         if (full_color_texture == NULL) {

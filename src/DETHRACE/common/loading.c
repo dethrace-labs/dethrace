@@ -1351,13 +1351,7 @@ intptr_t LinkModel(br_actor* pActor, tModel_pool* pModel_pool) {
     LOG_TRACE("(%p, %p)", pActor, pModel_pool);
 
     if (pActor->model && pActor->model->identifier) {
-        LOG_DEBUG("%s, %d", pActor->model->identifier, pModel_pool->model_count);
         for (i = 0; i < pModel_pool->model_count; i++) {
-            LOG_DEBUG("%d", i);
-            LOG_DEBUG("%p", pModel_pool->model_array[i]->identifier);
-            if (pModel_pool->model_array[i]->identifier) {
-                LOG_DEBUG("%s", pModel_pool->model_array[i]->identifier);
-            }
             if (pModel_pool->model_array[i]->identifier
                 && !strcmp(pModel_pool->model_array[i]->identifier, pActor->model->identifier)) {
                 pActor->model = pModel_pool->model_array[i];
