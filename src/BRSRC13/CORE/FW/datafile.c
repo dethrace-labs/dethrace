@@ -404,6 +404,7 @@ br_uint_32 DfStructReadBinary(br_datafile* df, br_file_struct* str, void* base) 
         case 31:
             n = 4;
             break;
+        default: n = 0;
         }
 
         for (i = 0; i < n; i++) {
