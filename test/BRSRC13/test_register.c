@@ -66,7 +66,6 @@ static void test_register_BrRegistryAdd_BrRegistryRemove() {
     TEST_ASSERT_EQUAL_PTR(&item2, result);
     TEST_ASSERT_EQUAL_INT(0, reg.count);
 
-    // Cannot execute BrRegistryRemove on an empty br_registry
     result = BrRegistryRemove(&reg, &item2);
     TEST_ASSERT_NULL(result);
     TEST_ASSERT_EQUAL_INT(0, reg.count);
