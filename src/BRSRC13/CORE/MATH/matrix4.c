@@ -1,6 +1,7 @@
 #include "matrix4.h"
 #include "harness/trace.h"
 #include <math.h>
+#include <string.h>
 
 #define A(x, y) A->m[x][y]
 #define B(x, y) B->m[x][y]
@@ -36,19 +37,67 @@ void BrMatrix4Copy(br_matrix4* A, br_matrix4* B) {
 // IDA: void __cdecl BrMatrix4Mul(br_matrix4 *A, br_matrix4 *B, br_matrix4 *C)
 void BrMatrix4Mul(br_matrix4* A, br_matrix4* B, br_matrix4* C) {
     LOG_TRACE("(%p, %p, %p)", A, B, C);
-    NOT_IMPLEMENTED();
+
+    A(0, 0) = BR_MAC4(B(0, 0), C(0, 0), B(0, 1), C(1, 0), B(0, 2), C(2, 0), B(0, 3), C(3, 0));
+    A(0, 1) = BR_MAC4(B(0, 0), C(0, 1), B(0, 1), C(1, 1), B(0, 2), C(2, 1), B(0, 3), C(3, 1));
+    A(0, 2) = BR_MAC4(B(0, 0), C(0, 2), B(0, 1), C(1, 2), B(0, 2), C(2, 2), B(0, 3), C(3, 2));
+    A(0, 3) = BR_MAC4(B(0, 0), C(0, 3), B(0, 1), C(1, 3), B(0, 2), C(2, 3), B(0, 3), C(3, 3));
+    A(1, 0) = BR_MAC4(B(1, 0), C(0, 0), B(1, 1), C(1, 0), B(1, 2), C(2, 0), B(1, 3), C(3, 0));
+    A(1, 1) = BR_MAC4(B(1, 0), C(0, 1), B(1, 1), C(1, 1), B(1, 2), C(2, 1), B(1, 3), C(3, 1));
+    A(1, 2) = BR_MAC4(B(1, 0), C(0, 2), B(1, 1), C(1, 2), B(1, 2), C(2, 2), B(1, 3), C(3, 2));
+    A(1, 3) = BR_MAC4(B(1, 0), C(0, 3), B(1, 1), C(1, 3), B(1, 2), C(2, 3), B(1, 3), C(3, 3));
+    A(2, 0) = BR_MAC4(B(2, 0), C(0, 0), B(2, 1), C(1, 0), B(2, 2), C(2, 0), B(2, 3), C(3, 0));
+    A(2, 1) = BR_MAC4(B(2, 0), C(0, 1), B(2, 1), C(1, 1), B(2, 2), C(2, 1), B(2, 3), C(3, 1));
+    A(2, 2) = BR_MAC4(B(2, 0), C(0, 2), B(2, 1), C(1, 2), B(2, 2), C(2, 2), B(2, 3), C(3, 2));
+    A(2, 3) = BR_MAC4(B(2, 0), C(0, 3), B(2, 1), C(1, 3), B(2, 2), C(2, 3), B(2, 3), C(3, 3));
+    A(3, 0) = BR_MAC4(B(3, 0), C(0, 0), B(3, 1), C(1, 0), B(3, 2), C(2, 0), B(3, 3), C(3, 0));
+    A(3, 1) = BR_MAC4(B(3, 0), C(0, 1), B(3, 1), C(1, 1), B(3, 2), C(2, 1), B(3, 3), C(3, 1));
+    A(3, 2) = BR_MAC4(B(3, 0), C(0, 2), B(3, 1), C(1, 2), B(3, 2), C(2, 2), B(3, 3), C(3, 2));
+    A(3, 3) = BR_MAC4(B(3, 0), C(0, 3), B(3, 1), C(1, 3), B(3, 2), C(2, 3), B(3, 3), C(3, 3));
 }
 
 // IDA: void __cdecl BrMatrix4Identity(br_matrix4 *mat)
 void BrMatrix4Identity(br_matrix4* mat) {
     LOG_TRACE("(%p)", mat);
-    NOT_IMPLEMENTED();
+
+    M(0, 0) = BR_SCALAR(1.f);
+    M(0, 1) = BR_SCALAR(0.f);
+    M(0, 2) = BR_SCALAR(0.f);
+    M(0, 3) = BR_SCALAR(0.f);
+    M(1, 0) = BR_SCALAR(0.f);
+    M(1, 1) = BR_SCALAR(1.f);
+    M(1, 2) = BR_SCALAR(0.f);
+    M(1, 3) = BR_SCALAR(0.f);
+    M(2, 0) = BR_SCALAR(0.f);
+    M(2, 1) = BR_SCALAR(0.f);
+    M(2, 2) = BR_SCALAR(1.f);
+    M(2, 3) = BR_SCALAR(0.f);
+    M(3, 0) = BR_SCALAR(0.f);
+    M(3, 1) = BR_SCALAR(0.f);
+    M(3, 2) = BR_SCALAR(0.f);
+    M(3, 3) = BR_SCALAR(1.f);
 }
 
 // IDA: void __cdecl BrMatrix4Scale(br_matrix4 *mat, br_scalar sx, br_scalar sy, br_scalar sz)
 void BrMatrix4Scale(br_matrix4* mat, br_scalar sx, br_scalar sy, br_scalar sz) {
     LOG_TRACE("(%p, %f, %f, %f)", mat, sx, sy, sz);
-    NOT_IMPLEMENTED();
+
+    M(0, 0) = sx;
+    M(1, 1) = sy;
+    M(2, 2) = sz;
+    M(0, 1) = BR_SCALAR(0.f);
+    M(0, 2) = BR_SCALAR(0.f);
+    M(0, 3) = BR_SCALAR(0.f);
+    M(1, 0) = BR_SCALAR(0.f);
+    M(1, 2) = BR_SCALAR(0.f);
+    M(1, 3) = BR_SCALAR(0.f);
+    M(2, 0) = BR_SCALAR(0.f);
+    M(2, 1) = BR_SCALAR(0.f);
+    M(2, 3) = BR_SCALAR(0.f);
+    M(3, 0) = BR_SCALAR(0.f);
+    M(3, 1) = BR_SCALAR(0.f);
+    M(3, 2) = BR_SCALAR(0.f);
+    M(3, 3) = BR_SCALAR(1.f);
 }
 
 // IDA: br_scalar __cdecl BrMatrix4Inverse(br_matrix4 *A, br_matrix4 *B)
@@ -197,25 +246,56 @@ void BrMatrix4Adjoint(br_matrix4* A, br_matrix4* B) {
 void BrMatrix4Perspective(br_matrix4* mat, br_angle field_of_view, br_scalar aspect, br_scalar hither, br_scalar yon) {
     br_scalar scale;
     LOG_TRACE("(%p, %d, %f, %f, %f)", mat, field_of_view, aspect, hither, yon);
-    NOT_IMPLEMENTED();
+
+    scale = BR_COS(field_of_view / 2) / BR_SIN(field_of_view / 2);
+
+    M(0, 0) = scale / aspect;
+    M(1, 1) = scale;
+    M(2, 2) = (yon + hither) / (yon - hither);
+    M(3, 2) = BR_SCALAR(-2.f) * ((yon * hither) / (yon - hither));
+
+    M(0, 1) = BR_SCALAR(0.f);
+    M(0, 2) = BR_SCALAR(0.f);
+    M(0, 3) = BR_SCALAR(0.f);
+    M(1, 0) = BR_SCALAR(0.f);
+    M(1, 2) = BR_SCALAR(0.f);
+    M(1, 3) = BR_SCALAR(0.f);
+    M(2, 0) = BR_SCALAR(0.f);
+    M(2, 1) = BR_SCALAR(0.f);
+    M(2, 3) = BR_SCALAR(-1.f);
+    M(3, 0) = BR_SCALAR(0.f);
+    M(3, 1) = BR_SCALAR(0.f);
+    M(3, 3) = BR_SCALAR(0.f);
 }
 
 // IDA: void __cdecl BrMatrix4Apply(br_vector4 *A, br_vector4 *B, br_matrix4 *C)
 void BrMatrix4Apply(br_vector4* A, br_vector4* B, br_matrix4* C) {
     LOG_TRACE("(%p, %p, %p)", A, B, C);
-    NOT_IMPLEMENTED();
+
+    A->v[0] = BR_MAC4(B->v[0], C(0, 0), B->v[1], C(1, 0), B->v[2], C(2, 0), B->v[3], C(3, 0));
+    A->v[1] = BR_MAC4(B->v[0], C(0, 1), B->v[1], C(1, 1), B->v[2], C(2, 1), B->v[3], C(3, 1));
+    A->v[2] = BR_MAC4(B->v[0], C(0, 2), B->v[1], C(1, 2), B->v[2], C(2, 2), B->v[3], C(3, 2));
+    A->v[3] = BR_MAC4(B->v[0], C(0, 3), B->v[1], C(1, 3), B->v[2], C(2, 3), B->v[3], C(3, 3));
 }
 
 // IDA: void __cdecl BrMatrix4ApplyP(br_vector4 *A, br_vector3 *B, br_matrix4 *C)
 void BrMatrix4ApplyP(br_vector4* A, br_vector3* B, br_matrix4* C) {
     LOG_TRACE("(%p, %p, %p)", A, B, C);
-    NOT_IMPLEMENTED();
+
+    A->v[0] = BR_MAC3(B->v[0], C(0, 0), B->v[1], C(1, 0), B->v[2], C(2, 0)) + C(3, 0);
+    A->v[1] = BR_MAC3(B->v[0], C(0, 1), B->v[1], C(1, 1), B->v[2], C(2, 1)) + C(3, 1);
+    A->v[2] = BR_MAC3(B->v[0], C(0, 2), B->v[1], C(1, 2), B->v[2], C(2, 2)) + C(3, 2);
+    A->v[3] = BR_MAC3(B->v[0], C(0, 3), B->v[1], C(1, 3), B->v[2], C(2, 3)) + C(3, 3);
 }
 
 // IDA: void __cdecl BrMatrix4ApplyV(br_vector4 *A, br_vector3 *B, br_matrix4 *C)
 void BrMatrix4ApplyV(br_vector4* A, br_vector3* B, br_matrix4* C) {
     LOG_TRACE("(%p, %p, %p)", A, B, C);
-    NOT_IMPLEMENTED();
+
+    A->v[0] = BR_MAC3(B->v[0], C(0, 0), B->v[1], C(1, 0), B->v[2], C(2, 0));
+    A->v[1] = BR_MAC3(B->v[0], C(0, 1), B->v[1], C(1, 1), B->v[2], C(2, 1));
+    A->v[2] = BR_MAC3(B->v[0], C(0, 2), B->v[1], C(1, 2), B->v[2], C(2, 2));
+    A->v[3] = BR_MAC3(B->v[0], C(0, 3), B->v[1], C(1, 3), B->v[2], C(2, 3));
 }
 
 // IDA: void __cdecl BrMatrix4TApply(br_vector4 *A, br_vector4 *B, br_matrix4 *C)
@@ -231,36 +311,94 @@ void BrMatrix4TApply(br_vector4* A, br_vector4* B, br_matrix4* C) {
 // IDA: void __cdecl BrMatrix4TApplyP(br_vector4 *A, br_vector3 *B, br_matrix4 *C)
 void BrMatrix4TApplyP(br_vector4* A, br_vector3* B, br_matrix4* C) {
     LOG_TRACE("(%p, %p, %p)", A, B, C);
-    NOT_IMPLEMENTED();
+
+    A->v[0] = BR_MAC3(B->v[0], C(0, 0), B->v[1], C(0, 1), B->v[2], C(0, 2)) + C(0, 3);
+    A->v[1] = BR_MAC3(B->v[0], C(1, 0), B->v[1], C(1, 1), B->v[2], C(1, 2)) + C(1, 3);
+    A->v[2] = BR_MAC3(B->v[0], C(2, 0), B->v[1], C(2, 1), B->v[2], C(2, 2)) + C(2, 3);
+    A->v[3] = BR_MAC3(B->v[0], C(3, 0), B->v[1], C(3, 1), B->v[2], C(3, 2)) + C(3, 3);
 }
 
 // IDA: void __cdecl BrMatrix4TApplyV(br_vector4 *A, br_vector3 *B, br_matrix4 *C)
 void BrMatrix4TApplyV(br_vector4* A, br_vector3* B, br_matrix4* C) {
     LOG_TRACE("(%p, %p, %p)", A, B, C);
-    NOT_IMPLEMENTED();
+
+    A->v[0] = BR_MAC3(B->v[0], C(0, 0), B->v[1], C(0, 1), B->v[2], C(0, 2));
+    A->v[1] = BR_MAC3(B->v[0], C(1, 0), B->v[1], C(1, 1), B->v[2], C(1, 2));
+    A->v[2] = BR_MAC3(B->v[0], C(2, 0), B->v[1], C(2, 1), B->v[2], C(2, 2));
+    A->v[3] = BR_MAC3(B->v[0], C(3, 0), B->v[1], C(3, 1), B->v[2], C(3, 2));
 }
 
 // IDA: void __cdecl BrMatrix4Copy34(br_matrix4 *A, br_matrix34 *B)
 void BrMatrix4Copy34(br_matrix4* A, br_matrix34* B) {
     LOG_TRACE("(%p, %p)", A, B);
-    NOT_IMPLEMENTED();
+
+    A(0, 0) = B(0, 0);
+    A(0, 1) = B(0, 1);
+    A(0, 2) = B(0, 2);
+    A(0, 3) = BR_SCALAR(0.f);
+    A(1, 0) = B(1, 0);
+    A(1, 1) = B(1, 1);
+    A(1, 2) = B(1, 2);
+    A(1, 3) = BR_SCALAR(0.f);
+    A(2, 0) = B(2, 0);
+    A(2, 1) = B(2, 1);
+    A(2, 2) = B(2, 2);
+    A(2, 3) = BR_SCALAR(0.f);
+    A(3, 0) = B(3, 0);
+    A(3, 1) = B(3, 1);
+    A(3, 2) = B(3, 2);
+    A(3, 3) = BR_SCALAR(1.f);
 }
 
 // IDA: void __cdecl BrMatrix4Mul34(br_matrix4 *A, br_matrix34 *B, br_matrix4 *C)
 void BrMatrix4Mul34(br_matrix4* A, br_matrix34* B, br_matrix4* C) {
     LOG_TRACE("(%p, %p, %p)", A, B, C);
-    NOT_IMPLEMENTED();
+
+    A(0, 0) = BR_MAC3(B(0, 0), C(0, 0), B(0, 1), C(1, 0), B(0, 2), C(2, 0));
+    A(0, 1) = BR_MAC3(B(0, 0), C(0, 1), B(0, 1), C(1, 1), B(0, 2), C(2, 1));
+    A(0, 2) = BR_MAC3(B(0, 0), C(0, 2), B(0, 1), C(1, 2), B(0, 2), C(2, 2));
+    A(0, 3) = BR_MAC3(B(0, 0), C(0, 3), B(0, 1), C(1, 3), B(0, 2), C(2, 3));
+    A(1, 0) = BR_MAC3(B(1, 0), C(0, 0), B(1, 1), C(1, 0), B(1, 2), C(2, 0));
+    A(1, 1) = BR_MAC3(B(1, 0), C(0, 1), B(1, 1), C(1, 1), B(1, 2), C(2, 1));
+    A(1, 2) = BR_MAC3(B(1, 0), C(0, 2), B(1, 1), C(1, 2), B(1, 2), C(2, 2));
+    A(1, 3) = BR_MAC3(B(1, 0), C(0, 3), B(1, 1), C(1, 3), B(1, 2), C(2, 3));
+    A(2, 0) = BR_MAC3(B(2, 0), C(0, 0), B(2, 1), C(1, 0), B(2, 2), C(2, 0));
+    A(2, 1) = BR_MAC3(B(2, 0), C(0, 1), B(2, 1), C(1, 1), B(2, 2), C(2, 1));
+    A(2, 2) = BR_MAC3(B(2, 0), C(0, 2), B(2, 1), C(1, 2), B(2, 2), C(2, 2));
+    A(2, 3) = BR_MAC3(B(2, 0), C(0, 3), B(2, 1), C(1, 3), B(2, 2), C(2, 3));
+    A(3, 0) = BR_MAC3(B(3, 0), C(0, 0), B(3, 1), C(1, 0), B(3, 2), C(2, 0)) + C(3, 0);
+    A(3, 1) = BR_MAC3(B(3, 0), C(0, 1), B(3, 1), C(1, 1), B(3, 2), C(2, 1)) + C(3, 1);
+    A(3, 2) = BR_MAC3(B(3, 0), C(0, 2), B(3, 1), C(1, 2), B(3, 2), C(2, 2)) + C(3, 2);
+    A(3, 3) = BR_MAC3(B(3, 0), C(0, 3), B(3, 1), C(1, 3), B(3, 2), C(2, 3)) + C(3, 3);
 }
 
 // IDA: void __cdecl BrMatrix4Pre34(br_matrix4 *A, br_matrix34 *B)
 void BrMatrix4Pre34(br_matrix4* A, br_matrix34* B) {
     br_matrix4 C;
     LOG_TRACE("(%p, %p)", A, B);
-    NOT_IMPLEMENTED();
+
+    memcpy(&C, A, sizeof(*A));
+    BrMatrix4Mul34(A, B, &C);
 }
 
 // IDA: void __cdecl BrMatrix4ShearZ(br_matrix4 *mat, br_scalar sx, br_scalar sy)
 void BrMatrix4ShearZ(br_matrix4* mat, br_scalar sx, br_scalar sy) {
     LOG_TRACE("(%p, %f, %f)", mat, sx, sy);
-    NOT_IMPLEMENTED();
+
+    M(0, 0) = BR_SCALAR(1.f);
+    M(0, 1) = BR_SCALAR(0.f);
+    M(0, 2) = BR_SCALAR(0.f);
+    M(0, 3) = BR_SCALAR(0.f);
+    M(1, 0) = BR_SCALAR(0.f);
+    M(1, 1) = BR_SCALAR(1.f);
+    M(1, 2) = BR_SCALAR(0.f);
+    M(1, 3) = BR_SCALAR(0.f);
+    M(2, 0) = sx;
+    M(2, 1) = sy;
+    M(2, 2) = BR_SCALAR(1.f);
+    M(2, 3) = BR_SCALAR(0.f);
+    M(3, 0) = BR_SCALAR(0.f);
+    M(3, 1) = BR_SCALAR(0.f);
+    M(3, 2) = BR_SCALAR(0.f);
+    M(3, 3) = BR_SCALAR(1.f);
 }
