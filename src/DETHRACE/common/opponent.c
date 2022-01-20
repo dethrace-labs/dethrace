@@ -944,7 +944,8 @@ void InitOpponents(tRace_info* pRace_info) {
 void DisposeOpponents() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __usercall WakeUpOpponentsToTheFactThatTheStartHasBeenJumped(int pWhat_the_countdown_was@<EAX>)

@@ -280,13 +280,13 @@ void InitialiseCar2(tCar_spec* pCar, int pClear_disabled_flag) {
     }
     BrMatrix34Copy(&pCar->old_frame_mat, &safe_position);
     BrMatrix34Copy(&pCar->oldmat, &safe_position);
-    pCar->oldmat.m[3][0] *= 6.9000001;
-    pCar->oldmat.m[3][1] *= 6.9000001;
-    pCar->oldmat.m[3][2] *= 6.9000001;
+    pCar->oldmat.m[3][0] *= WORLD_SCALE;
+    pCar->oldmat.m[3][1] *= WORLD_SCALE;
+    pCar->oldmat.m[3][2] *= WORLD_SCALE;
     BrMatrix34ApplyP(&pCar->pos, &pCar->cmpos, &pCar->oldmat);
-    pCar->pos.v[0] /= 6.9000001;
-    pCar->pos.v[1] /= 6.9000001;
-    pCar->pos.v[2] /= 6.9000001;
+    pCar->pos.v[0] /= WORLD_SCALE;
+    pCar->pos.v[1] /= WORLD_SCALE;
+    pCar->pos.v[2] /= WORLD_SCALE;
     for (j = 0; j < COUNT_OF(pCar->oldd); j++) {
         pCar->oldd[j] = pCar->ride_height;
     }
@@ -662,7 +662,41 @@ void RememberSafePosition(tCar_spec* car, tU32 pTime) {
     br_scalar ts;
     LOG_TRACE("(%p, %d)", car, pTime);
 
-    STUB_ONCE();
+    if (car->disabled) {
+        return;
+    }
+    time_count += pTime;
+    if (time_count < 5000) {
+        return;
+    }
+    time_count = 4000;
+    for (j = 0; j < 4; j++) {
+        if (car->susp_height[j >> 1] <= car->oldd[j]) {
+            return;
+        }
+    }
+    if ((!car->last_special_volume || car->last_special_volume->gravity_multiplier == 1.0)
+        && gCurrent_race.material_modifiers[car->material_index[0]].tyre_road_friction >= 0.1
+        && gCurrent_race.material_modifiers[car->material_index[1]].tyre_road_friction >= 0.1
+        && gCurrent_race.material_modifiers[car->material_index[2]].tyre_road_friction >= 0.1
+        && gCurrent_race.material_modifiers[car->material_index[3]].tyre_road_friction >= 0.1
+        && car->car_master_actor->t.t.mat.m[1][1] >= 0.80000001) {
+
+        for (j = 0; j < 5; j++) {
+            r.v[0] = car->car_master_actor->t.t.mat.m[3][0] - car->last_safe_positions[j].m[3][0];
+            r.v[1] = car->car_master_actor->t.t.mat.m[3][1] - car->last_safe_positions[j].m[3][1];
+            r.v[2] = car->car_master_actor->t.t.mat.m[3][2] - car->last_safe_positions[j].m[3][2];
+
+            if (BrVector3LengthSquared(&r) < 8.4015961) {
+                return;
+            }
+        }
+        for (j = 3; j > 0; j--) {
+            BrMatrix34Copy(&car->last_safe_positions[j], &car->last_safe_positions[j - 1]);
+        }
+        BrMatrix34Copy(&car->last_safe_positions[0], &car->car_master_actor->t.t.mat);
+        time_count = 0;
+    }
 }
 
 // IDA: void __usercall ControlOurCar(tU32 pTime_difference@<EAX>)
@@ -680,14 +714,14 @@ void ControlOurCar(tU32 pTime_difference) {
         if (gNet_mode) {
             gCar_flying = 0;
         } else {
-            car->car_master_actor->t.t.mat.m[3][0] = car->car_master_actor->t.t.mat.m[3][0] * 6.9000001;
-            car->car_master_actor->t.t.mat.m[3][1] = car->car_master_actor->t.t.mat.m[3][1] * 6.9000001;
-            car->car_master_actor->t.t.mat.m[3][2] = car->car_master_actor->t.t.mat.m[3][2] * 6.9000001;
+            car->car_master_actor->t.t.mat.m[3][0] = car->car_master_actor->t.t.mat.m[3][0] * WORLD_SCALE;
+            car->car_master_actor->t.t.mat.m[3][1] = car->car_master_actor->t.t.mat.m[3][1] * WORLD_SCALE;
+            car->car_master_actor->t.t.mat.m[3][2] = car->car_master_actor->t.t.mat.m[3][2] * WORLD_SCALE;
             ts = (double)pTime_difference / 1000.0;
             FlyCar(car, ts);
-            car->car_master_actor->t.t.mat.m[3][0] = car->car_master_actor->t.t.mat.m[3][0] / 6.9000001;
-            car->car_master_actor->t.t.mat.m[3][1] = car->car_master_actor->t.t.mat.m[3][1] / 6.9000001;
-            car->car_master_actor->t.t.mat.m[3][2] = car->car_master_actor->t.t.mat.m[3][2] / 6.9000001;
+            car->car_master_actor->t.t.mat.m[3][0] = car->car_master_actor->t.t.mat.m[3][0] / WORLD_SCALE;
+            car->car_master_actor->t.t.mat.m[3][1] = car->car_master_actor->t.t.mat.m[3][1] / WORLD_SCALE;
+            car->car_master_actor->t.t.mat.m[3][2] = car->car_master_actor->t.t.mat.m[3][2] / WORLD_SCALE;
         }
         return;
     }
@@ -1066,7 +1100,7 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
                 }
             }
             if (!car->disabled
-                && (!car->doing_nothing_flag || (car->driver >= eDriver_net_human && (!gRecover_timer || car->driver != eDriver_local_human)))) {
+                && (!car->doing_nothing_flag || (car->driver >= eDriver_net_human && (!gPalette_fade_time || car->driver != eDriver_local_human)))) {
                 if (car->box_face_ref != gFace_num__car
                     && (car->box_face_ref != gFace_num__car - 1 || car->box_face_start <= gFace_count)) {
                     car_info = (tCollision_info*)car;
@@ -1180,9 +1214,9 @@ void MoveAndCollideCar(tCar_spec* car, br_scalar dt) {
         TranslateCar(car_info, dt);
         CollideCarWithWall(car_info, dt);
         BrMatrix34ApplyP(&car->pos, &car->cmpos, &car->car_master_actor->t.t.mat);
-        car->pos.v[0] = car->pos.v[0] / 6.9000001;
-        car->pos.v[1] = car->pos.v[1] / 6.9000001;
-        car->pos.v[2] = car->pos.v[2] / 6.9000001;
+        car->pos.v[0] = car->pos.v[0] / WORLD_SCALE;
+        car->pos.v[1] = car->pos.v[1] / WORLD_SCALE;
+        car->pos.v[2] = car->pos.v[2] / WORLD_SCALE;
         for (wheel = 0; wheel < 4; wheel++) {
             SkidMark(car, wheel);
         }
@@ -2318,7 +2352,6 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
     // v35 = 0;
     // v36 = 0x3F800000;
     // v48 = 0x3F800347;
-
     car_spec = (tCar_spec*)c;
     mat = &c->car_master_actor->t.t.mat;
     oldmat = &c->oldmat;
@@ -2349,7 +2382,6 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
     a1.v[0] = mat->m[3][0] / WORLD_SCALE;
     a1.v[1] = mat->m[3][1] / WORLD_SCALE;
     a1.v[2] = mat->m[3][2] / WORLD_SCALE;
-
     BrMatrix34ApplyV(&aa, &bnds.min, mat);
     BrVector3Accumulate(&aa, &a1);
     for (j = 0; j < 3; ++j) {
@@ -2357,9 +2389,7 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
         edges[j].v[1] = (bnds.max.v[j] - bnds.min.v[j]) * mat->m[j][1];
         edges[j].v[2] = (bnds.max.v[j] - bnds.min.v[j]) * mat->m[j][2];
     }
-
     i = 0;
-
     f_ref = &gFace_list__car[c->box_face_start];
     while (c->box_face_end - c->box_face_start > i && i < 50) {
         BrVector3Sub(&bb, &aa, &f_ref->v[0]);
@@ -2489,7 +2519,6 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
                     M.m[i][j] = BrVector3Dot(&n[i], &normal_force);
                 }
             }
-
             switch (k) {
             case 1:
                 ts = SinglePointColl(f, &M, d);
@@ -3015,14 +3044,14 @@ void MultiFindFloorInBoxM(int pNum_rays, br_vector3* a, br_vector3* b, br_vector
     LOG_TRACE("(%d, %p, %p, %p, %p, %p, %p)", pNum_rays, a, b, nor, d, c, mat_ref);
 
     for (i = 0; i < pNum_rays; i++) {
-        aa[i].v[0] = a[i].v[0] / 6.9000001;
-        aa[i].v[1] = a[i].v[1] / 6.9000001;
-        aa[i].v[2] = a[i].v[2] / 6.9000001;
+        aa[i].v[0] = a[i].v[0] / WORLD_SCALE;
+        aa[i].v[1] = a[i].v[1] / WORLD_SCALE;
+        aa[i].v[2] = a[i].v[2] / WORLD_SCALE;
         d[i] = 2.0;
     }
-    bb.v[0] = b->v[0] / 6.9000001;
-    bb.v[1] = b->v[1] / 6.9000001;
-    bb.v[2] = b->v[2] / 6.9000001;
+    bb.v[0] = b->v[0] / WORLD_SCALE;
+    bb.v[1] = b->v[1] / WORLD_SCALE;
+    bb.v[2] = b->v[2] / WORLD_SCALE;
     MultiFindFloorInBoxBU(pNum_rays, aa, &bb, nor, d, c, mat_ref);
 }
 
@@ -3061,12 +3090,12 @@ void findfloor(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d) {
     br_vector3 bb;
     LOG_TRACE("(%p, %p, %p, %p)", a, b, nor, d);
 
-    aa.v[0] = a->v[0] / 6.9000001;
-    aa.v[1] = a->v[1] / 6.9000001;
-    aa.v[2] = a->v[2] / 6.9000001;
-    bb.v[0] = b->v[0] / 6.9000001;
-    bb.v[1] = b->v[1] / 6.9000001;
-    bb.v[2] = b->v[2] / 6.9000001;
+    aa.v[0] = a->v[0] / WORLD_SCALE;
+    aa.v[1] = a->v[1] / WORLD_SCALE;
+    aa.v[2] = a->v[2] / WORLD_SCALE;
+    bb.v[0] = b->v[0] / WORLD_SCALE;
+    bb.v[1] = b->v[1] / WORLD_SCALE;
+    bb.v[2] = b->v[2] / WORLD_SCALE;
     FindFace(&aa, &bb, nor, d, &material);
 }
 
@@ -3076,12 +3105,12 @@ int FindFloorInBoxM(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d,
     br_vector3 bb;
     LOG_TRACE("(%p, %p, %p, %p, %p)", a, b, nor, d, c);
 
-    aa.v[0] = a->v[0] / 6.9000001;
-    aa.v[1] = a->v[1] / 6.9000001;
-    aa.v[2] = a->v[2] / 6.9000001;
-    bb.v[0] = b->v[0] / 6.9000001;
-    bb.v[1] = b->v[1] / 6.9000001;
-    bb.v[2] = b->v[2] / 6.9000001;
+    aa.v[0] = a->v[0] / WORLD_SCALE;
+    aa.v[1] = a->v[1] / WORLD_SCALE;
+    aa.v[2] = a->v[2] / WORLD_SCALE;
+    bb.v[0] = b->v[0] / WORLD_SCALE;
+    bb.v[1] = b->v[1] / WORLD_SCALE;
+    bb.v[2] = b->v[2] / WORLD_SCALE;
     return FindFloorInBoxBU(&aa, &bb, nor, d, c);
 }
 
@@ -3170,12 +3199,12 @@ int FindFloorInBoxM2(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d
     br_vector3 bb;
     LOG_TRACE("(%p, %p, %p, %p, %p)", a, b, nor, d, c);
 
-    aa.v[0] = a->v[0] / 6.9000001;
-    aa.v[1] = a->v[1] / 6.9000001;
-    aa.v[2] = a->v[2] / 6.9000001;
-    bb.v[0] = b->v[0] / 6.9000001;
-    bb.v[1] = b->v[1] / 6.9000001;
-    bb.v[2] = b->v[2] / 6.9000001;
+    aa.v[0] = a->v[0] / WORLD_SCALE;
+    aa.v[1] = a->v[1] / WORLD_SCALE;
+    aa.v[2] = a->v[2] / WORLD_SCALE;
+    bb.v[0] = b->v[0] / WORLD_SCALE;
+    bb.v[1] = b->v[1] / WORLD_SCALE;
+    bb.v[2] = b->v[2] / WORLD_SCALE;
     return FindFloorInBoxBU2(&aa, &bb, nor, d, c);
 }
 
@@ -3241,9 +3270,9 @@ int BoxFaceIntersect(br_bounds* pB, br_matrix34* pM, br_matrix34* pMold, br_vect
                     }
                 }
                 while (n > j) {
-                    pPoint_list[j].v[0] = pPoint_list[j].v[0] * 6.9000001;
-                    pPoint_list[j].v[1] = pPoint_list[j].v[1] * 6.9000001;
-                    pPoint_list[j].v[2] = pPoint_list[j].v[2] * 6.9000001;
+                    pPoint_list[j].v[0] = pPoint_list[j].v[0] * WORLD_SCALE;
+                    pPoint_list[j].v[1] = pPoint_list[j].v[1] * WORLD_SCALE;
+                    pPoint_list[j].v[2] = pPoint_list[j].v[2] * WORLD_SCALE;
                     pPoint_list[j].v[0] = pPoint_list[j].v[0] - c->cmpos.v[0];
                     pPoint_list[j].v[1] = pPoint_list[j].v[1] - c->cmpos.v[1];
                     pPoint_list[j].v[2] = pPoint_list[j].v[2] - c->cmpos.v[2];
@@ -3276,9 +3305,9 @@ int BoxFaceIntersect(br_bounds* pB, br_matrix34* pM, br_matrix34* pMold, br_vect
         pPoint_list[m].v[2] = pPoint_list[n - 1].v[2];
         n = m + 1;
     }
-    pMold->m[3][0] = pMold->m[3][0] * 6.9000001;
-    pMold->m[3][1] = pMold->m[3][1] * 6.9000001;
-    pMold->m[3][2] = pMold->m[3][2] * 6.9000001;
+    pMold->m[3][0] = pMold->m[3][0] * WORLD_SCALE;
+    pMold->m[3][1] = pMold->m[3][1] * WORLD_SCALE;
+    pMold->m[3][2] = pMold->m[3][2] * WORLD_SCALE;
     return n;
 }
 
@@ -3605,7 +3634,12 @@ void ToggleCollisionDetection() {
 // IDA: void __cdecl CancelPendingCunningStunt()
 void CancelPendingCunningStunt() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gQuite_wild_end = 0;
+    gQuite_wild_start = 0;
+    gOn_me_wheels_start = 0;
+    gWoz_upside_down_at_all = 0;
+    gWild_start = 0;
 }
 
 // IDA: float __cdecl frac(float pN)
@@ -3703,7 +3737,7 @@ void MungeCarGraphics(tU32 pFrame_period) {
             for (i = 0; i < oily_count; i++) {
                 GetOilSpillDetails(i, &oily_actor, &oily_size);
                 if (oily_actor) {
-                    car_radius = the_car->bounds[1].max.v[2] / 6.9000001 * 1.5;
+                    car_radius = the_car->bounds[1].max.v[2] / WORLD_SCALE * 1.5;
                     if (oily_actor->t.t.mat.m[3][0] - oily_size < car_x + car_radius
                         && oily_actor->t.t.mat.m[3][0] + oily_size > car_x - car_radius
                         && oily_actor->t.t.mat.m[3][2] - oily_size < car_z + car_radius
@@ -4164,7 +4198,12 @@ void SetUpPanningCamera(tCar_spec* c) {
 // IDA: void __usercall SaveCameraPosition(int i@<EAX>)
 void SaveCameraPosition(int i) {
     LOG_TRACE("(%d)", i);
-    NOT_IMPLEMENTED();
+
+    if (gSave_camera[i].saved != 1) {
+        gSave_camera[i].zoom = gCamera_zoom;
+        gSave_camera[i].yaw = gCamera_yaw;
+        gSave_camera[i].saved = 1;
+    }
 }
 
 // IDA: void __usercall RestoreCameraPosition(int i@<EAX>)
@@ -5171,8 +5210,8 @@ void SetCarSuspGiveAndHeight(tCar_spec* pCar, br_scalar pFront_give_factor, br_s
     int i;
     LOG_TRACE("(%p, %f, %f, %f, %f, %f)", pCar, pFront_give_factor, pRear_give_factor, pDamping_factor, pExtra_front_height, pExtra_rear_height);
 
-    front_give = pCar->susp_give[1] * pFront_give_factor * 6.9000001;
-    rear_give = pCar->susp_give[0] * pRear_give_factor * 6.9000001;
+    front_give = pCar->susp_give[1] * pFront_give_factor * WORLD_SCALE;
+    rear_give = pCar->susp_give[0] * pRear_give_factor * WORLD_SCALE;
     damping = pCar->damping * pDamping_factor;
     ratio = fabs((pCar->wpos[0].v[2] - pCar->cmpos.v[2]) / (pCar->wpos[2].v[2] - pCar->cmpos.v[2]));
     pCar->sk[0] = pCar->M / (ratio + 1.0) * 5.0 / rear_give;
@@ -5196,7 +5235,7 @@ void SetCarSuspGiveAndHeight(tCar_spec* pCar, br_scalar pFront_give_factor, br_s
         i -= pExtra_front_height;
     }
     pCar->bounds[0].min.v[1] = i;
-    pCar->bounds[0].min.v[1] = pCar->bounds[0].min.v[1] / 6.9000001;
+    pCar->bounds[0].min.v[1] = pCar->bounds[0].min.v[1] / WORLD_SCALE;
 }
 
 // IDA: int __usercall TestForCarInSensiblePlace@<EAX>(tCar_spec *car@<EAX>)
@@ -5214,7 +5253,70 @@ int TestForCarInSensiblePlace(tCar_spec* car) {
     br_vector3 tv;
     br_vector3 tv2;
     LOG_TRACE("(%p)", car);
-    NOT_IMPLEMENTED();
+
+    car_info = (tCollision_info*)car;
+    if (!gProgram_state.racing) {
+        return 1;
+    }
+    mat1 = &car_info->car_master_actor->t.t.mat;
+    if (!gDoing_physics) {
+        mat1->m[3][0] = mat1->m[3][0] * WORLD_SCALE;
+        mat1->m[3][1] = mat1->m[3][1] * WORLD_SCALE;
+        mat1->m[3][2] = mat1->m[3][2] * WORLD_SCALE;
+    }
+    GetFacesInBox(car_info);
+    BrMatrix34ApplyP(&car_info->pos, &car_info->cmpos, &car_info->car_master_actor->t.t.mat);
+    car_info->pos.v[0] = car_info->pos.v[0] / WORLD_SCALE;
+    car_info->pos.v[1] = car_info->pos.v[1] / WORLD_SCALE;
+    car_info->pos.v[2] = car_info->pos.v[2] / WORLD_SCALE;
+    k = CollCheck(car_info, -2.0);
+    if (!k) {
+        if (gNum_active_non_cars + gNum_active_cars != gNum_cars_and_non_cars) {
+            GetNonCars();
+        }
+        for (i = 0; i < gNum_cars_and_non_cars; i++) {
+            c2 = (tCollision_info*)gActive_car_list[i];
+            if (car_info != c2) {
+                mat2 = &c2->car_master_actor->t.t.mat;
+                mat2->m[3][0] = mat2->m[3][0] * WORLD_SCALE;
+                mat2->m[3][1] = mat2->m[3][1] * WORLD_SCALE;
+                mat2->m[3][2] = mat2->m[3][2] * WORLD_SCALE;
+                sep.v[0] = mat1->m[3][0] - mat2->m[3][0];
+                sep.v[1] = mat1->m[3][1] - mat2->m[3][1];
+                sep.v[2] = mat1->m[3][2] - mat2->m[3][2];
+                if (BrVector3LengthSquared(&sep) <= 100.0) {
+                    k += TestOldMats(car_info, c2, 0);
+                    k += TestOldMats(c2, car_info, 0);
+                }
+                if (k) {
+                    BrMatrix34ApplyP(&tv, &car_info->cmpos, mat1);
+                    BrMatrix34ApplyP(&tv2, &c2->cmpos, mat2);
+                    tv.v[0] = tv2.v[0] - tv.v[0];
+                    tv.v[1] = tv2.v[1] - tv.v[1];
+                    tv.v[2] = tv2.v[2] - tv.v[2];
+                    BrMatrix34TApplyV(&car_info->old_point, &tv, &car_info->car_master_actor->t.t.mat);
+                    BrVector3Normalise(&car_info->old_norm, &car_info->old_point);
+                    BrVector3Negate(&car_info->old_norm, &car_info->old_norm);
+                }
+                mat2->m[3][0] = mat2->m[3][0] / WORLD_SCALE;
+                mat2->m[3][1] = mat2->m[3][1] / WORLD_SCALE;
+                mat2->m[3][2] = mat2->m[3][2] / WORLD_SCALE;
+                if (k) {
+                    break;
+                }
+            }
+        }
+    }
+    if (!gDoing_physics) {
+        mat1->m[3][0] = mat1->m[3][0] / WORLD_SCALE;
+        mat1->m[3][1] = mat1->m[3][1] / WORLD_SCALE;
+        mat1->m[3][2] = mat1->m[3][2] / WORLD_SCALE;
+    }
+    if (k) {
+        return 0;
+    } else {
+        return -1;
+    }
 }
 
 // IDA: int __usercall TestOldMats@<EAX>(tCollision_info *c1@<EAX>, tCollision_info *c2@<EDX>, int newmats@<EBX>)

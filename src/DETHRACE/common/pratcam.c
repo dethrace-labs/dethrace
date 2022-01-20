@@ -91,7 +91,8 @@ void ChangeAmbientPratcamNow(int pIndex, int pStart_chunk) {
 // IDA: void __usercall ChangeAmbientPratcam(int pIndex@<EAX>)
 void ChangeAmbientPratcam(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __usercall PratcamEventNow(int pIndex@<EAX>)
@@ -135,7 +136,8 @@ void DisposePratcam() {
     int k;
     int l;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __usercall DoPratcam(tU32 pThe_time@<EAX>)

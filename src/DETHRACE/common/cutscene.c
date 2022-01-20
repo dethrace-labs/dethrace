@@ -165,7 +165,24 @@ void DoEndRaceAnimation() {
     int made_a_profit;
     int went_up_a_rank;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    made_a_profit = gProgram_state.credits_earned > gProgram_state.credits_lost;
+    went_up_a_rank = gProgram_state.credits_earned > gProgram_state.credits_per_rank;
+
+    FadePaletteDown();
+
+    if (gAusterity_mode || gNet_mode) {
+        return;
+    }
+    if (gProgram_state.credits + gProgram_state.credits_earned - gProgram_state.credits_lost >= 0) {
+        if (!made_a_profit && !went_up_a_rank) {
+            PlaySmackerFile("UNSUCSES.SMK");
+        } else if (!made_a_profit || !went_up_a_rank) {
+            PlaySmackerFile("MUNDANE.SMK");
+        } else {
+            PlaySmackerFile("SUCCESS.SMK");
+        }
+    }
 }
 
 // IDA: void __cdecl DoGameOverAnimation()

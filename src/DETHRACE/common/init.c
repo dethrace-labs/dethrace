@@ -26,6 +26,7 @@
 #include "opponent.h"
 #include "pd/sys.h"
 #include "pedestrn.h"
+#include "piping.h"
 #include "powerup.h"
 #include "pratcam.h"
 #include "raycast.h"
@@ -614,7 +615,33 @@ void InitRace() {
 // IDA: void __cdecl DisposeRace()
 void DisposeRace() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    PossibleService();
+    DisposePiping();
+    PossibleService();
+    CloseDownPowerUps();
+    PossibleService();
+    if (!TranslationMode()) {
+        DisposeFont(1);
+        DisposeFont(2);
+        DisposeFont(3);
+    }
+    PossibleService();
+    DisposeFont(6);
+    DisposeFont(7);
+    DisposeFont(8);
+    DisposeFont(4);
+    DisposeFont(5);
+    PossibleService();
+    DisposeSavedShadeTables();
+    PossibleService();
+    DisposeSoundSources();
+    PossibleService();
+    DisposeOpponents();
+    PossibleService();
+    DisposePedestrians();
+    PossibleService();
+    DisposePratcam();
+    PossibleService();
 }
 
 // IDA: int __cdecl GetScreenSize()

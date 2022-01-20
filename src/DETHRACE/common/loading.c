@@ -1103,7 +1103,6 @@ void ReadMechanicsData(FILE* pF, tCar_spec* c) {
     LOG_TRACE("(%p, %p)", pF, c);
 
     GetALineAndDontArgue(pF, s);
-    LOG_DEBUG("s %s", s);
     for (i = strlen(s) - 1; s[i] == ' '; --i) {
         ;
     }
@@ -1185,7 +1184,6 @@ void ReadMechanicsData(FILE* pF, tCar_spec* c) {
     c->mu[1] *= sqrt((c->wpos[0].v[2] - c->cmpos.v[2]) / (c->wpos[0].v[2] - c->wpos[2].v[2]) * (c->M * 5.0));
     c->mu[2] *= sqrt((c->wpos[2].v[2] - c->cmpos.v[2]) / (c->wpos[2].v[2] - c->wpos[0].v[2]) * (c->M * 5.0));
 
-    LOG_DEBUG("%f %f %f", c->mu[0], c->mu[1], c->mu[2]);
     for (i = 0; i < 4; ++i) {
         c->wpos[i].v[1] = c->ride_height;
     }
@@ -2096,6 +2094,7 @@ void LoadHeadupImages() {
 
     for (i = 0; i < 31; ++i) {
         PossibleService();
+
         if (gHeadup_image_info[i].avail && (gHeadup_image_info[i].avail != eNot_net || gNet_mode) && (gHeadup_image_info[i].avail != eNet_only || !gNet_mode)) {
             gHeadup_images[i] = NULL;
         } else {

@@ -126,7 +126,12 @@ int DRS3ChangePitchSpeed(tS3_sound_tag pTag, tS3_pitch pNew_pitch) {
 // IDA: int __usercall DRS3StopSound@<EAX>(tS3_sound_tag pSound_tag@<EAX>)
 int DRS3StopSound(tS3_sound_tag pSound_tag) {
     LOG_TRACE("(%d)", pSound_tag);
-    NOT_IMPLEMENTED();
+
+    if (gSound_enabled) {
+        return S3StopSound(pSound_tag);
+    } else {
+        return 0;
+    }
 }
 
 // IDA: int __usercall DRS3LoadSound@<EAX>(tS3_sound_id pThe_sound@<EAX>)
@@ -222,7 +227,8 @@ void DisposeSoundSources() {
     int toggle;
     tCar_spec* the_car;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: tS3_sound_tag __usercall DRS3StartSound3D@<EAX>(tS3_outlet_ptr pOutlet@<EAX>, tS3_sound_id pSound@<EDX>, br_vector3 *pInitial_position@<EBX>, br_vector3 *pInitial_velocity@<ECX>, tS3_repeats pRepeats, tS3_volume pVolume, tS3_pitch pPitch, tS3_speed pSpeed)

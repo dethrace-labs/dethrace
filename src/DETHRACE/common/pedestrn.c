@@ -1546,7 +1546,8 @@ void DisposePedestrians() {
     int j;
     tPedestrian_data* the_pedestrian;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __cdecl DoPedReport()

@@ -582,7 +582,7 @@ tRace_result MainGameLoop() {
         CheckReplayTurnOn();
         if (!gRecover_car
             && gProgram_state.prog_status == eProg_game_ongoing
-            && !gRecover_timer
+            && !gPalette_fade_time
             && (gNet_mode == eNet_mode_none
                 || !gAction_replay_mode
                 || gProgram_state.current_car.car_master_actor->t.t.mat.m[3][0] < 500.0)) {

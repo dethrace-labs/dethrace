@@ -1184,7 +1184,7 @@ void RenderAFrame(int pDepth_mask_on) {
         PipeFrameFinish();
     }
     gRender_screen->pixels = old_pixels;
-    if (!gRecover_timer || GetRaceTime() > gRecover_timer + 500) {
+    if (!gPalette_fade_time || GetRaceTime() > gPalette_fade_time + 500) {
         PDScreenBufferSwap(0);
     }
     if (gAction_replay_mode) {
@@ -2019,7 +2019,8 @@ void SaveShadeTables() {
 void DisposeSavedShadeTables() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __cdecl ShadowMode()
