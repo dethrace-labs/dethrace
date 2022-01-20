@@ -1,4 +1,5 @@
 #include "file.h"
+#include "scratch.h"
 #include "CORE/FW/fwsetup.h"
 #include "CORE/FW/resource.h"
 #include "CORE/STD/brstdlib.h"
@@ -114,6 +115,10 @@ void BrFileAdvance(long count, void* f) {
 int BrFilePrintf(void* f, char* fmt, ...) {
     int n;
     va_list args;
-    LOG_TRACE("(%p, \"%s\")", f, fmt);
-    NOT_IMPLEMENTED();
+    LOG_TRACE9("(%p, \"%s\")", f, fmt);
+
+    va_start(args, fmt);
+    n = BrVSprintf(BrScratchString(), fmt, args);
+    va_end(args);
+    return BrFileWrite(BrScratchString(), 1, n, f);
 }
