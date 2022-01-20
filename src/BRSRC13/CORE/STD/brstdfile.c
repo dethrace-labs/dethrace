@@ -102,6 +102,7 @@ void BrStdioPutChar(int c, void* f) {
 
 br_size_t BrStdioRead(void* buf, br_size_t size, unsigned int n, void* f) {
     int i;
+
     LOG_TRACE9("(%p, %d, %d, %p)", buf, size, n, f);
     i = fread(buf, size, n, f);
     return i;
@@ -114,6 +115,7 @@ br_size_t BrStdioWrite(void* buf, br_size_t size, unsigned int n, void* f) {
 br_size_t BrStdioGetLine(char* buf, br_size_t buf_len, void* f) {
     br_size_t l;
 
+    LOG_TRACE9("(%p, %d, %p)", buf, buf_len, f);
     if (fgets(buf, buf_len, f) == NULL) {
         return 0;
     }
