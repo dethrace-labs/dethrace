@@ -352,6 +352,7 @@ static void test_brlists_BrSimpleRemove() {
 }
 
 void test_brlists_suite() {
+    UnitySetTestFile(__FILE__);
     RUN_TEST(test_brlists_BrNewList);
     RUN_TEST(test_brlists_BrAddHead);
     RUN_TEST(test_brlists_BrAddTail);

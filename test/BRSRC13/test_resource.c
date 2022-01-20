@@ -43,7 +43,7 @@ void test_resource_BrResFree2() {
     child = BrResAllocate(NULL, sizeof(br_file), BR_MEMORY_FILE);
     child->raw_file = (void*)0x1;
     TEST_ASSERT_NOT_NULL(child);
-    resource_header* childhdr = (void*)child - sizeof(resource_header);
+    resource_header* childhdr = (char*)child - sizeof(resource_header);
     if (childhdr->magic_num != 0xDEADBEEF) {
         LOG_PANIC("Bad resource header at %p. Was %X", childhdr, ((resource_header*)childhdr)->magic_num);
     }
@@ -62,15 +62,19 @@ void test_resource_BrResFree_Child() {
     header = (resource_header*)(((char*)child) - sizeof(resource_header));
     TEST_ASSERT_EQUAL_INT(0xDEADBEEF, header->magic_num);
     BrResFree(r);
+
+#ifndef _DEBUG
     // when the res is free'd, magic_num is set to 1. We make sure the child was free'd when the parent was
     TEST_ASSERT_EQUAL_INT(1, header->magic_num);
 
     // And the parent should have the child unlinked from its list of children
     header = (resource_header*)(((char*)r) - sizeof(resource_header));
     TEST_ASSERT_NULL(header->children.head);
+#endif
 }
 
 void test_resource_suite() {
+    UnitySetTestFile(__FILE__);
     RUN_TEST(test_resource_BrResAllocate);
     RUN_TEST(test_resource_BrResFree);
     RUN_TEST(test_resource_BrResFree2);

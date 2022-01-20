@@ -45,12 +45,23 @@ void test_utility_StripCR() {
     TEST_ASSERT_EQUAL_STRING("line", buf);
 }
 
+static void get_system_temp_folder(char *buffer, size_t bufferSize) {
+#ifdef _WIN32
+    GetTempPathA(bufferSize, buffer);
+#else
+    strcpy(buffer, "/tmp/");
+#endif
+}
+
 void test_utility_GetALineWithNoPossibleService() {
-    FILE* file = fopen("/tmp/testfile", "wt");
+    char tmpPath[256];
+    get_system_temp_folder(tmpPath, sizeof(tmpPath));
+    strcat(tmpPath, "testfile");
+    FILE* file = fopen(tmpPath, "wt");
     fprintf(file, "hello world\r\n  space_prefixed\r\n\r\n\ttab_prefixed\r\n$ignored_prefix\r\nlast_line");
     fclose(file);
 
-    file = fopen("/tmp/testfile", "rt");
+    file = fopen(tmpPath, "rt");
     char s[256];
 
     char* result = GetALineWithNoPossibleService(file, s);
@@ -71,6 +82,8 @@ void test_utility_GetALineWithNoPossibleService() {
 
     result = GetALineWithNoPossibleService(file, s);
     TEST_ASSERT_NULL(result);
+
+    fclose(file);
 }
 
 void test_utility_PathCat() {
@@ -90,6 +103,7 @@ void test_utility_IRandomBetween() {
 }
 
 void test_utility_suite() {
+    UnitySetTestFile(__FILE__);
     RUN_TEST(test_utility_EncodeLinex);
     RUN_TEST(test_utility_DecodeLine2);
     RUN_TEST(test_utility_EncodeLine2);

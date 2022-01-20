@@ -103,6 +103,14 @@ int has_data_directory() {
     return root_dir != NULL;
 }
 
+void sleep_s(int sec) {
+#ifdef _WIN32
+    Sleep(1000 * sec);
+#else
+    sleep(sec);
+#endif
+}
+
 int main(int argc, char** argv) {
 
     UNITY_BEGIN();

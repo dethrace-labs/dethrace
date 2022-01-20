@@ -24,7 +24,7 @@ void test_controls_CheckKevKeys() {
         gKeys_pressed = 0;
         result = KevKeyService();
     }
-    sleep(2);
+    sleep_s(2);
     gKeys_pressed = 0;
 
     CheckKevKeys();
@@ -34,5 +34,6 @@ void test_controls_CheckKevKeys() {
 }
 
 void test_controls_suite() {
+    UnitySetTestFile(__FILE__);
     RUN_TEST(test_controls_CheckKevKeys);
 }

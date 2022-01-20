@@ -231,6 +231,7 @@ char* GetALineWithNoPossibleService(FILE* pF, /*unsigned*/ char* pS) {
     do {
         result = fgets(s, 256, pF);
         if (!result) {
+            s[0] = '\0';
             break;
         }
         if (s[0] == '@') {
@@ -274,7 +275,7 @@ char* GetALineWithNoPossibleService(FILE* pF, /*unsigned*/ char* pS) {
             result[len - 2] = 0;
         }
     }
-    strcpy((char*)pS, s);
+    strcpy(pS, s);
     len = strlen(s);
     for (i = 0; i < len; i++) {
         if (pS[i] >= 0xE0u) {

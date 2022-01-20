@@ -34,5 +34,6 @@ void test_regsupt_BrMaterialEnum() {
 }
 
 void test_regsupt_suite() {
+    UnitySetTestFile(__FILE__);
     RUN_TEST(test_regsupt_BrMaterialEnum);
 }

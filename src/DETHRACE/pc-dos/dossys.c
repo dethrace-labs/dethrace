@@ -15,6 +15,7 @@
 #include "utility.h"
 #include "watcom_functions.h"
 #include <dirent.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -510,8 +511,12 @@ void PDForEveryFile(char* pThe_path, void (*pAction_routine)(char*)) {
     d = opendir(pThe_path);
     if (d) {
         while ((entry = readdir(d)) != NULL) {
-            // only files, and only files that dont start with '.'
+            // only files, and only files that don't start with '.'
+#ifdef _WIN32
+            if ((GetFileAttributesA(pThe_path) & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY) {
+#else
             if (entry->d_type == DT_REG && entry->d_name[0] != '.') {
+#endif
                 PathCat(found_path, pThe_path, entry->d_name);
                 pAction_routine(found_path);
             }
@@ -719,12 +724,6 @@ void PDEnterDebugger(char* pStr) {
 // IDA: void __cdecl PDEndItAllAndReRunTheBastard()
 void PDEndItAllAndReRunTheBastard() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
-}
-
-// IDA: int __usercall matherr@<EAX>(exception *err@<EAX>)
-int matherr(struct exception_* err) {
-    LOG_TRACE("(%p)", err);
     NOT_IMPLEMENTED();
 }
 

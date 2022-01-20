@@ -13,5 +13,6 @@ void test_datafile_ReadBinary() {
 }
 
 void test_datafile_suite() {
+    UnitySetTestFile(__FILE__);
     RUN_TEST(test_datafile_ReadBinary);
 }

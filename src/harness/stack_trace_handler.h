@@ -12,8 +12,8 @@
 #include <unistd.h>
 
 #ifdef _WIN32
-#include <imagehlp.h>
 #include <windows.h>
+#include <imagehlp.h>
 #ifdef _WIN64
 #define Esp Rsp
 #define Eip Rip

@@ -15,7 +15,7 @@ void test_input_KevKeyService() {
         gKeys_pressed = 0;
         result = KevKeyService();
     }
-    sleep(2);
+    sleep_s(2);
     gKeys_pressed = 0;
     result = KevKeyService();
 
@@ -24,5 +24,6 @@ void test_input_KevKeyService() {
 }
 
 void test_input_suite() {
+    UnitySetTestFile(__FILE__);
     RUN_TEST(test_input_KevKeyService);
 }

@@ -14,5 +14,6 @@ void test_loading_powerups() {
 }
 
 void test_powerup_suite() {
+    UnitySetTestFile(__FILE__);
     RUN_TEST(test_loading_powerups);
 }

@@ -11,9 +11,12 @@ target_include_directories(harness
 
 target_link_libraries(harness PRIVATE miniposix brender SDL2::SDL2 glad s3 cglm_headers)
 
+if(WIN32)
+    target_link_libraries(harness PRIVATE dbghelp)
+endif()
+
 if(NOT MSVC)
     target_compile_options(harness PRIVATE
-        -g
         -Wall
         -Wextra
         -Werror

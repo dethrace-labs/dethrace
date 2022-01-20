@@ -33,5 +33,6 @@ void test_flicplay_playflic() {
 }
 
 void test_flicplay_suite() {
+    UnitySetTestFile(__FILE__);
     RUN_TEST(test_flicplay_playflic);
 }

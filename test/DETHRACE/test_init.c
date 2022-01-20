@@ -9,5 +9,6 @@ void test_init_AllocateCamera() {
 }
 
 void test_init_suite() {
+    UnitySetTestFile(__FILE__);
     RUN_TEST(test_init_AllocateCamera);
 }

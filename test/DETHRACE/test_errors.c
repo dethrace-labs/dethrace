@@ -10,5 +10,6 @@ void test_errors_FatalError() {
 }
 
 void test_errors_suite() {
+    UnitySetTestFile(__FILE__);
     RUN_TEST(test_errors_FatalError);
 }

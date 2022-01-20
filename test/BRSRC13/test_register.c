@@ -489,6 +489,7 @@ static void test_register_BrRegistryEnum() {
 }
 
 void test_register_suite() {
+    UnitySetTestFile(__FILE__);
     RUN_TEST(test_register_BrRegistryNew);
     RUN_TEST(test_register_BrRegistryAdd_BrRegistryRemove);
     RUN_TEST(test_register_offsets);

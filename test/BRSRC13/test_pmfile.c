@@ -15,5 +15,6 @@ void test_pmfile_BrPixelmapLoad() {
 }
 
 void test_pmfile_suite() {
+    UnitySetTestFile(__FILE__);
     RUN_TEST(test_pmfile_BrPixelmapLoad);
 }

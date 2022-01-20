@@ -231,6 +231,7 @@ void test_loading_LoadOpponentCar() {
 }
 
 void test_loading_suite() {
+    UnitySetTestFile(__FILE__);
     RUN_TEST(test_loading_GetCDPathFromPathsTxtFile);
     RUN_TEST(test_loading_OldDRfopen);
     RUN_TEST(test_loading_LoadGeneralParameters);

@@ -68,15 +68,65 @@ jobs:
           arch: ${{ matrix.platform }}
       - name: Build
         run: |
-          .github/scripts/build-windows.ps1
+          .github/scripts/build-msvc.ps1
         env:
           MATRIX_PLATFORM: ${{ matrix.platform }}
+      - name: Test
+        run: |
+          cd build
+          ctest --verbose -C RelWithDebInfo
       - name: Upload artifact
         if: startsWith(github.ref, 'refs/tags/')
         uses: actions/upload-artifact@v1
         with:
           name: artifacts
           path: windows-${{ matrix.platform }}.zip
+
+  build-mingw:
+    runs-on: 'ubuntu-latest'
+    strategy:
+      matrix:
+        platform: [x86, amd64]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Build
+        run: |
+          .github/scripts/build-mingw.sh
+        env:
+          MATRIX_PLATFORM: ${{ matrix.platform }}
+
+  build-mingw-msys2:
+    runs-on: 'windows-latest'
+    strategy:
+      matrix:
+        include:
+          - platform: x86
+            msystem: mingw32
+          - platform: amd64
+            msystem: mingw64
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: ${{ matrix.msystem }}
+      - name: Build
+        run: |
+          .github/scripts/build-mingw.sh
+        env:
+          MATRIX_PLATFORM: ${{ matrix.platform }}
+      - name: Test
+        run: |
+          cd build
+          ctest --verbose
 
 
   create-release:

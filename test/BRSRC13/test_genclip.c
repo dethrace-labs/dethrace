@@ -40,5 +40,6 @@ void test_genclip_PixelmapRectangleClip() {
 }
 
 void test_genclip_suite() {
+    UnitySetTestFile(__FILE__);
     RUN_TEST(test_genclip_PixelmapRectangleClip);
 }
