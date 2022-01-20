@@ -34,6 +34,7 @@ target_sources(dethrace_test PRIVATE
     BRSRC13/test_actsupt.c
     BRSRC13/test_brlists.c
     BRSRC13/test_datafile.c
+    BRSRC13/test_fixed.c
     BRSRC13/test_fwsetup.c
     BRSRC13/test_genclip.c
     BRSRC13/test_pattern.c

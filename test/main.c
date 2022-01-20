@@ -45,6 +45,7 @@ extern void test_v1dbfile_suite();
 extern void test_register_suite();
 extern void test_pattern_suite();
 extern void test_pmfile_suite();
+extern void test_fixed_suite();
 extern void test_quat_suite();
 extern void test_graphics_suite();
 extern void test_regsupt_suite();
@@ -134,6 +135,7 @@ int main(int argc, char** argv) {
 
     test_pattern_suite();
     test_pmfile_suite();
+    test_fixed_suite();
     test_quat_suite();
     test_v1dbfile_suite();
     test_regsupt_suite();
