@@ -44,6 +44,7 @@ target_sources(dethrace_test PRIVATE
     BRSRC13/test_regsupt.c
     BRSRC13/test_resource.c
     BRSRC13/test_resreg.c
+    BRSRC13/test_scratch.c
     BRSRC13/test_v1dbfile.c
     DETHRACE/test_controls.c
     DETHRACE/test_dossys.c
