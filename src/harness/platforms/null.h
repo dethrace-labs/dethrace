@@ -10,6 +10,8 @@ void Null_EndFrame() {}
 void Null_RenderFullScreenQuad(uint32_t* src, int transparent) {}
 void Null_RenderModel(br_model* model, br_matrix34 model_matrix) {}
 void Null_Swap() {}
+void Null_BufferTexture(br_pixelmap* pm) {}
+void Null_BufferMaterial(br_material* mat) {}
 
 tPlatform null_platform = {
     Null_Init,
@@ -21,5 +23,7 @@ tPlatform null_platform = {
     Null_EndFrame,
     Null_RenderFullScreenQuad,
     Null_RenderModel,
-    Null_Swap
+    Null_Swap,
+    Null_BufferTexture,
+    Null_BufferMaterial
 };

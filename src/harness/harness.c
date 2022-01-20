@@ -34,14 +34,19 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]);
 
 void Harness_DetectGameMode() {
     if (access("DATA/RACES/CITY01.TXT", F_OK) == -1 && access("DATA/RACES/CITYA1.TXT", F_OK) == -1) {
-        harness_game_info.intro_smk_file = "";
+        harness_game_info.defines.INTRO_SMK_FILE = "";
+        harness_game_info.defines.GERMAN_LOADSCRN = "COWLESS.PIX";
         harness_game_info.mode = eGame_carmageddon_demo;
         LOG_INFO("\"%s\"", "Carmageddon demo");
     } else if (access("DATA/CUTSCENE/SPLINTRO.SMK", F_OK) != -1) {
-        harness_game_info.intro_smk_file = "SPLINTRO.SMK";
+        harness_game_info.defines.INTRO_SMK_FILE = "SPLINTRO.SMK";
+        harness_game_info.defines.GERMAN_LOADSCRN = "LOADSCRN.PIX";
+        harness_game_info.mode = eGame_splatpack;
         LOG_INFO("\"%s\"", "Splat Pack");
     } else {
-        harness_game_info.intro_smk_file = "MIX_INTR.SMK";
+        harness_game_info.defines.INTRO_SMK_FILE = "MIX_INTR.SMK";
+        harness_game_info.defines.GERMAN_LOADSCRN = "LOADSCRN.PIX";
+        harness_game_info.mode = eGame_carmageddon;
         LOG_INFO("\"%s\"", "Carmageddon");
     }
 }
@@ -81,10 +86,6 @@ void Harness_Debug_PrintStack() {
 #ifndef _WIN32
     posix_print_stack_trace();
 #endif
-}
-
-void Harness_PumpEvents() {
-    platform->PollEvents();
 }
 
 int Harness_ProcessCommandLine(int* argc, char* argv[]) {
@@ -134,27 +135,34 @@ void Harness_Hook_DOSGfxBegin() {
     platform->NewWindow("Dethrace", 640, 400);
 }
 
-void Harness_RenderScreen(br_pixelmap* dst, br_pixelmap* src) {
+void Harness_ConvertPalettedPixelmapTo32Bit(uint32_t** dst, br_pixelmap* src) {
     uint8_t palette_index = 0;
     uint8_t* data = src->pixels;
-    uint32_t* colors = palette->pixels;
+    uint32_t* colors;
     int x;
     int y;
 
-    if (screen_buffer == NULL) {
-        screen_buffer = malloc(src->width * src->height * sizeof(uint32_t));
+    if (!palette) {
+        return;
+    }
+    colors = palette->pixels;
+    if (*dst == NULL) {
+        *dst = malloc(src->width * src->height * sizeof(uint32_t));
     }
 
     // generate 32 bit texture from src + palette
     for (y = 0; y < src->height; y++) {
         for (x = 0; x < src->width; x++) {
             palette_index = (data[y * src->row_bytes + x]);
-            screen_buffer[y * src->width + x] = colors[palette_index];
+            (*dst)[y * src->width + x] = colors[palette_index];
         }
     }
+}
 
+void Harness_RenderScreen(br_pixelmap* dst, br_pixelmap* src) {
+    Harness_ConvertPalettedPixelmapTo32Bit(&screen_buffer, src);
     platform->RenderFullScreenQuad(screen_buffer, back_screen_is_transparent);
-    Harness_PumpEvents();
+    platform->PollEvents();
 
     last_dst = dst;
     last_src = src;
@@ -219,6 +227,17 @@ void Harness_Hook_PDServiceSystem() {
 }
 void Harness_Hook_PDSetKeyArray() {
     platform->PollEvents();
+}
+
+void Harness_Hook_BrMaterialUpdate(br_material* mat, br_uint_16 flags) {
+    //LOG_DEBUG("buffermat %s", mat->identifier);
+    platform->BufferMaterial(mat);
+}
+
+void Harness_Hook_BrBufferUpdate(br_pixelmap* pm, br_token use, br_uint_16 flags) {
+    if (use == BRT_COLOUR_MAP_O) {
+        platform->BufferTexture(pm);
+    }
 }
 
 void Harness_Hook_S3Service(int unk1, int unk2) {

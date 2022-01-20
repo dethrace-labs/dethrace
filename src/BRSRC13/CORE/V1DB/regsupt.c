@@ -177,7 +177,7 @@ br_uint_32 BrMapAddMany(br_pixelmap** items, int n) {
     r = 0;
     for (i = 0; i < n; i++) {
         BrRegistryAdd(&v1db.reg_textures, items[i]);
-        BrMapUpdate(items[i], 4095);
+        BrMapUpdate(items[i], 0xFFF);
         if (items[i]) {
             r++;
         }

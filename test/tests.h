@@ -11,4 +11,12 @@ extern void sleep_s(int sec);
     if (!has_data_directory())    \
         TEST_IGNORE();
 
+#define TEST_ASSERT_FLOAT_ARRAY_WITHIN(delta, expected, actual, num_elements) {     \
+    float *priv_expected = (float*)(expected);                                      \
+    float *priv_actual = (float*)(actual);                                          \
+    for(int it = (num_elements); it != 0; --it, ++priv_expected, ++priv_actual) {   \
+        TEST_ASSERT_FLOAT_WITHIN((delta), *priv_expected, *priv_actual);            \
+    }                                                                               \
+}
+
 #endif

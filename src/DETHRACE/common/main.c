@@ -93,5 +93,5 @@ void GameMain(int pArgc, char** pArgv) {
     }
     InitialiseDeathRace(pArgc, pArgv);
     DoProgram();
-    DoSaveGame(1);
+    QuitGame();
 }

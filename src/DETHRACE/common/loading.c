@@ -404,17 +404,17 @@ void LoadGeneralParameters() {
     }
 
     gDefault_gravity = GetAFloat(f);
-    gZombie_factor = GetAFloat(f);
     gCut_delay_1 = GetAFloat(f);
     gCut_delay_2 = GetAFloat(f);
     gCut_delay_3 = GetAFloat(f);
-    gCut_delay_4 = 1.0f;
+    gCut_delay_4 = GetAFloat(f);
+    gZombie_factor = 1.0f;
     fclose(f);
 }
 
 // IDA: void __cdecl FinishLoadingGeneral()
 void FinishLoadingGeneral() {
-    /*dword_1298C0 = */ BrMaterialFind(gDef_def_water_screen_name);
+    gDefault_default_water_spec_vol.screen_material = BrMaterialFind(gDef_def_water_screen_name);
 }
 
 // IDA: br_pixelmap* __usercall LoadPixelmap@<EAX>(char *pName@<EAX>)
@@ -1184,15 +1184,13 @@ void ReadMechanicsData(FILE* pF, tCar_spec* c) {
     c->mu[0] *= sqrt((c->wpos[2].v[2] - c->cmpos.v[2]) / (c->wpos[2].v[2] - c->wpos[0].v[2]) * (c->M * 5.0));
     c->mu[1] *= sqrt((c->wpos[0].v[2] - c->cmpos.v[2]) / (c->wpos[0].v[2] - c->wpos[2].v[2]) * (c->M * 5.0));
     c->mu[2] *= sqrt((c->wpos[2].v[2] - c->cmpos.v[2]) / (c->wpos[2].v[2] - c->wpos[0].v[2]) * (c->M * 5.0));
+
+    LOG_DEBUG("%f %f %f", c->mu[0], c->mu[1], c->mu[2]);
     for (i = 0; i < 4; ++i) {
         c->wpos[i].v[1] = c->ride_height;
     }
-    c->bounds[0].min.v[0] = c->bounds[1].min.v[0];
-    c->bounds[0].min.v[1] = c->bounds[1].min.v[1];
-    c->bounds[0].min.v[2] = c->bounds[1].min.v[2];
-    c->bounds[0].max.v[0] = c->bounds[1].max.v[0];
-    c->bounds[0].max.v[1] = c->bounds[1].max.v[1];
-    c->bounds[0].max.v[2] = c->bounds[1].max.v[2];
+    c->bounds[0].min = c->bounds[1].min;
+    c->bounds[0].max = c->bounds[1].max;
     for (i = 0; c->extra_point_num > i; ++i) {
         for (j = 0; j < 3; ++j) {
             if (c->extra_points[i].v[j] < c->bounds[0].min.v[j]) {
@@ -1204,9 +1202,10 @@ void ReadMechanicsData(FILE* pF, tCar_spec* c) {
         }
     }
     memcpy(&c->bounds[2], &c->bounds[0], sizeof(br_bounds));
-    c->I.v[2] = het * het + wid * wid * c->M / 12.0;
-    c->I.v[1] = wid * wid + len * len * c->M / 12.0;
-    c->I.v[0] = het * het + len * len * c->M / 12.0;
+    c->I.v[2] = (het * het + wid * wid) * c->M / 12.0;
+    c->I.v[1] = (wid * wid + len * len) * c->M / 12.0;
+    c->I.v[0] = (het * het + len * len) * c->M / 12.0;
+
     for (i = 0; i < 4; ++i) {
         c->wpos[i].v[0] = c->wpos[i].v[0] * 6.9;
         c->wpos[i].v[1] = c->wpos[i].v[1] * 6.9;
@@ -1218,6 +1217,7 @@ void ReadMechanicsData(FILE* pF, tCar_spec* c) {
     c->I.v[0] = c->I.v[0] * 47.610001;
     c->I.v[1] = c->I.v[1] * 47.610001;
     c->I.v[2] = c->I.v[2] * 47.610001;
+
     c->bounds[1].min.v[0] = c->bounds[1].min.v[0] * 6.9000001;
     c->bounds[1].min.v[1] = c->bounds[1].min.v[1] * 6.9000001;
     c->bounds[1].min.v[2] = c->bounds[1].min.v[2] * 6.9000001;
@@ -1241,7 +1241,7 @@ void ReadMechanicsData(FILE* pF, tCar_spec* c) {
     for (i = 0; i < 2; ++i) {
         c->susp_height[i] = c->susp_height[i] * 6.9;
         c->sk[i] = c->sk[i] / 6.9;
-        c->sb[i] = c->sb[i] / sqrt(6.9);
+        c->sb[i] = c->sb[i] / sqrt(c->sb[i]);
     }
     GetAString(pF, s);
     SetCarSuspGiveAndHeight(c, 1.0, 1.0, 1.0, 0.0, 0.0);
@@ -1351,13 +1351,7 @@ intptr_t LinkModel(br_actor* pActor, tModel_pool* pModel_pool) {
     LOG_TRACE("(%p, %p)", pActor, pModel_pool);
 
     if (pActor->model && pActor->model->identifier) {
-        LOG_DEBUG("%s, %d", pActor->model->identifier, pModel_pool->model_count);
         for (i = 0; i < pModel_pool->model_count; i++) {
-            LOG_DEBUG("%d", i);
-            LOG_DEBUG("%p", pModel_pool->model_array[i]->identifier);
-            if (pModel_pool->model_array[i]->identifier) {
-                LOG_DEBUG("%s", pModel_pool->model_array[i]->identifier);
-            }
             if (pModel_pool->model_array[i]->identifier
                 && !strcmp(pModel_pool->model_array[i]->identifier, pActor->model->identifier)) {
                 pActor->model = pModel_pool->model_array[i];
@@ -2188,14 +2182,23 @@ void LoadRaces(tRace_list_spec* pRace_list, int* pCount, int pRace_type_index) {
     *pCount = number_of_racers;
     fclose(f);
     j = 0;
+    if (harness_game_info.mode == eGame_carmageddon_demo) {
+        j = 99;
+    }
     for (i = 0; i < number_of_racers; i++) {
-        pRace_list[i].suggested_rank = 99 - j / (number_of_racers - 3);
-        if (i >= 3) {
-            pRace_list[i].rank_required = pRace_list[i - 2].suggested_rank;
+        if (harness_game_info.mode == eGame_carmageddon_demo) {
+            pRace_list[i].suggested_rank = gDemo_rank;
+            pRace_list[i].rank_required = j;
+            j -= 3;
         } else {
-            pRace_list[i].rank_required = 99;
+            pRace_list[i].suggested_rank = 99 - j / (number_of_racers - 3);
+            if (i >= 3) {
+                pRace_list[i].rank_required = pRace_list[i - 2].suggested_rank;
+            } else {
+                pRace_list[i].rank_required = 99;
+            }
+            j += 100;
         }
-        j += 100;
     }
 
     pRace_list[number_of_racers - 1].rank_required = 1;
@@ -3087,7 +3090,7 @@ int TestForOriginalCarmaCDinDrive() {
     }
 
     // changed from static file reference to handle all game modes
-    if (!PDCheckDriveExists2(cutscene_pathname, harness_game_info.intro_smk_file, 2000000)) {
+    if (!PDCheckDriveExists2(cutscene_pathname, harness_game_info.defines.INTRO_SMK_FILE, 2000000)) {
         return 0;
     }
 

@@ -1,4 +1,5 @@
 #include "prepmap.h"
+#include "harness/hooks.h"
 #include "harness/trace.h"
 
 // IDA: void __cdecl BrMapUpdate(br_pixelmap *map, br_uint_16 flags)
@@ -9,6 +10,8 @@ void BrMapUpdate(br_pixelmap* map, br_uint_16 flags) {
 // IDA: void __usercall BrBufferUpdate(br_pixelmap *pm@<EAX>, br_token use@<EDX>, br_uint_16 flags@<EBX>)
 void BrBufferUpdate(br_pixelmap* pm, br_token use, br_uint_16 flags) {
     br_token_value tv[3];
+
+    Harness_Hook_BrBufferUpdate(pm, use, flags);
 
     // renderer->dispatch->bufferStoredNew ...
 }

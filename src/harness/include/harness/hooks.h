@@ -21,6 +21,8 @@ void Harness_Hook_BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pix
 void Harness_Hook_BrZbSceneRenderAdd(br_actor* tree);
 void Harness_Hook_renderFaces(br_model* model, br_material* material, br_token type);
 void Harness_Hook_BrZbSceneRenderEnd();
+void Harness_Hook_BrBufferUpdate(br_pixelmap* pm, br_token use, br_uint_16 flags);
+void Harness_Hook_BrMaterialUpdate(br_material* mat, br_uint_16 flags);
 
 // Sound hooks
 void Harness_Hook_S3Service(int unk1, int unk2);

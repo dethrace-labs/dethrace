@@ -49,7 +49,6 @@ int ReadCrushData(FILE* pF, tCrush_data* pCrush_data) {
         }
         the_spec++;
     }
-    LOG_DEBUG("exit");
     return 0;
 }
 

@@ -2,6 +2,7 @@
 #include "brender/brender.h"
 #include "cameras/debug_camera.h"
 #include "gl_renderer_shaders.h"
+#include "harness.h"
 #include "harness/trace.h"
 
 #include <cglm/cglm.h>
@@ -13,6 +14,14 @@
 typedef struct tStored_model_context {
     GLuint vao_id, ebo_id;
 } tStored_model_context;
+
+typedef struct tStored_pixelmap {
+    GLuint id;
+} tStored_pixelmap;
+
+typedef struct tStored_material {
+    tStored_pixelmap* texture;
+} tStored_material;
 
 SDL_Window* window;
 SDL_GLContext context;
@@ -85,6 +94,8 @@ void GLRenderer_CreateWindow(char* title, int width, int height) {
     };
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+
+    SDL_GL_SetSwapInterval(1);
 
     window = SDL_CreateWindow(title,
         SDL_WINDOWPOS_CENTERED,
@@ -276,8 +287,7 @@ void build_model(br_model* model) {
         }
     }
 
-    int stride = 6;
-    float* verts = malloc(sizeof(float) * stride * total_verts);
+    fmt_vertex* verts = malloc(sizeof(fmt_vertex) * total_verts);
     unsigned int* indices = malloc(sizeof(int) * 3 * total_faces);
 
     int v_index = 0;
@@ -286,12 +296,10 @@ void build_model(br_model* model) {
     for (int g = 0; g < v11->ngroups; g++) {
         for (int i = 0; i < v11->groups[g].nvertices; i++) {
             fmt_vertex* v = &v11->groups[g].vertices[i];
-            verts[v_index++] = v->p.v[0];
-            verts[v_index++] = v->p.v[1];
-            verts[v_index++] = v->p.v[2];
-            verts[v_index++] = v->n.v[0];
-            verts[v_index++] = v->n.v[1];
-            verts[v_index++] = v->n.v[2];
+            verts[v_index].p = v->p;
+            verts[v_index].n = v->n;
+            verts[v_index].map = v->map;
+            v_index++;
         }
         for (int i = 0; i < v11->groups[g].nfaces; i++) {
             v11face* f = &v11->groups[g].faces[i];
@@ -307,14 +315,16 @@ void build_model(br_model* model) {
     glGenBuffers(1, &vbo_id);
     glGenBuffers(1, &ctx->ebo_id);
 
-    // Vertices { position, normal }
+    // Vertices }
     glBindVertexArray(ctx->vao_id);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * stride * total_verts, verts, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)0);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(fmt_vertex) * total_verts, verts, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(fmt_vertex), (void*)offsetof(fmt_vertex, p));
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(fmt_vertex), (void*)offsetof(fmt_vertex, n));
     glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(fmt_vertex), (void*)offsetof(fmt_vertex, map));
+    glEnableVertexAttribArray(2);
 
     // Indices
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx->ebo_id);
@@ -364,7 +374,15 @@ void GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     int element_index = 0;
+
     for (int g = 0; g < v11->ngroups; g++) {
+        tStored_material* mat = (tStored_material*)v11->groups[g].stored;
+        if (mat && mat->texture) {
+            glBindTexture(GL_TEXTURE_2D, mat->texture->id);
+        } else {
+            glBindTexture(GL_TEXTURE_2D, 0);
+        }
+
         glDrawElements(GL_TRIANGLES, v11->groups[g].nfaces * 3, GL_UNSIGNED_INT, (void*)(element_index * sizeof(int)));
         element_index += v11->groups[g].nfaces * 3;
     }
@@ -380,7 +398,35 @@ void GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void Harness_GLRenderer_SetViewport(int x, int y, int width, int height) {
+void GLRenderer_BufferMaterial(br_material* mat) {
+    if (!mat->stored) {
+        if (mat->colour_map) {
+            GLRenderer_BufferTexture(mat->colour_map);
+            if (mat->colour_map->stored) {
+                tStored_material* stored = malloc(sizeof(tStored_material));
+                stored->texture = mat->colour_map->stored;
+                mat->stored = stored;
+            }
+        }
+    }
+}
+
+void GLRenderer_BufferTexture(br_pixelmap* pm) {
+    if (!pm->stored) {
+        uint32_t* full_color_texture = NULL;
+        Harness_ConvertPalettedPixelmapTo32Bit(&full_color_texture, pm);
+        if (full_color_texture == NULL) {
+            return;
+        }
+        tStored_pixelmap* stored = malloc(sizeof(tStored_pixelmap));
+        glGenTextures(1, &stored->id);
+        glBindTexture(GL_TEXTURE_2D, stored->id);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, pm->width, pm->height, 0, GL_BGRA, GL_UNSIGNED_BYTE, full_color_texture);
+        free(full_color_texture);
+        pm->stored = stored;
+    }
 }
 
 void Harness_GLRenderer_RenderCube(float col, float x, float y, float z) {

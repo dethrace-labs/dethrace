@@ -16,6 +16,7 @@
 #include "globvrpb.h"
 #include "grafdata.h"
 #include "graphics.h"
+#include "harness/config.h"
 #include "harness/trace.h"
 #include "loading.h"
 #include "loadsave.h"
@@ -424,8 +425,14 @@ void InitGame(int pStart_race) {
     gNo_races_yet = 1;
     NetPlayerStatusChanged(ePlayer_status_loading);
     gProgram_state.current_race_index = pStart_race;
-    for (i = 0; i < COUNT_OF(gProgram_state.current_car.power_up_levels); i++) {
-        gProgram_state.current_car.power_up_levels[i] = 0;
+    if (harness_game_info.mode == eGame_carmageddon_demo) {
+        gProgram_state.current_car.power_up_levels[0] = gDemo_armour;
+        gProgram_state.current_car.power_up_levels[1] = gDemo_power;
+        gProgram_state.current_car.power_up_levels[2] = gDemo_offensive;
+    } else {
+        for (i = 0; i < COUNT_OF(gProgram_state.current_car.power_up_levels); i++) {
+            gProgram_state.current_car.power_up_levels[i] = 0;
+        }
     }
     for (i = 0; gNumber_of_races > i; ++i) {
         gRace_list[i].been_there_done_that = 0;
