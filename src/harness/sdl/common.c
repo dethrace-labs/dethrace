@@ -128,7 +128,7 @@ void SDLPlatform_PollEvents() {
 
         case SDL_KEYDOWN:
         case SDL_KEYUP:
-            if (event.key.keysym.scancode < 0 || event.key.keysym.scancode > 122) {
+            if (event.key.keysym.scancode > 122) {
                 LOG_WARN("unexpected scan code %d", event.key.keysym.scancode);
                 return;
             }
