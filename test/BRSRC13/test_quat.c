@@ -357,6 +357,7 @@ static void test_quat_BrMatrix4ToQuat() {
 }
 
 void test_quat_suite() {
+    UnitySetTestFile(__FILE__);
     RUN_TEST(test_quat_BrQuatMul);
     RUN_TEST(test_quat_BrQuatNormalise);
     RUN_TEST(test_quat_BrQuatInvert);

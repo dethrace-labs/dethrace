@@ -47,6 +47,9 @@ extern void test_scratch_suite();
 extern void test_pattern_suite();
 extern void test_pmfile_suite();
 extern void test_fixed_suite();
+extern void test_matrix23_suite();
+extern void test_matrix34_suite();
+extern void test_matrix4_suite();
 extern void test_quat_suite();
 extern void test_graphics_suite();
 extern void test_regsupt_suite();
@@ -126,6 +129,11 @@ int main(int argc, char** argv) {
     printf("Completed setup\n");
 
     // BRSRC13
+    test_matrix23_suite();
+    test_matrix34_suite();
+    test_matrix4_suite();
+    test_quat_suite();
+
     test_brlists_suite();
     test_fwsetup_suite();
     test_resource_suite();
@@ -137,7 +145,6 @@ int main(int argc, char** argv) {
     test_pattern_suite();
     test_pmfile_suite();
     test_fixed_suite();
-    test_quat_suite();
     test_v1dbfile_suite();
     test_regsupt_suite();
     test_scratch_suite();

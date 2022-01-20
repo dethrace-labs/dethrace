@@ -401,6 +401,7 @@ void test_matrix23_BrMatrix23PostShearY() {
 }
 
 void test_matrix23_suite() {
+    UnitySetTestFile(__FILE__);
     RUN_TEST(test_matrix23_BrMatrix23Copy);
     RUN_TEST(test_matrix23_BrMatrix23Identity);
     RUN_TEST(test_matrix23_BrMatrix23Rotate);
