@@ -1,13 +1,40 @@
 #include "brstddiag.h"
+#include "CORE/FW/brbegin.h"
+
 #include "harness/trace.h"
 
-br_diaghandler BrStdioDiagHandler;
-br_diaghandler* _BrDefaultDiagHandler = NULL;
+#include <stdio.h>
+
+br_diaghandler BrStdioDiagHandler = {
+    "Stdio DiagHandler",
+    BrStdioWarning,
+    BrStdioFailure,
+};
+
+br_diaghandler* _BrDefaultDiagHandler = &BrStdioDiagHandler;
 
 void BrStdioWarning(char* message) {
-    NOT_IMPLEMENTED();
+    fflush(stdout);
+    fputs(message, stderr);
+    fputc('\n', stderr);
+    fflush(stderr);
 }
 
 void BrStdioFailure(char* message) {
-    NOT_IMPLEMENTED();
+    LOG_TRACE("(%s)", message);
+
+#if 0
+    // FIXME: 'real' implementation ends BRender
+    BrEnd();
+#endif
+    fflush(stdout);
+    fputs(message, stderr);
+    fputc('\n', stderr);
+    fflush(stderr);
+#if 0
+    // FIXME: 'real' implementation unconditionally exits.
+    exit(10);
+#else
+    abort();
+#endif
 }
