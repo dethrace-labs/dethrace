@@ -39,7 +39,7 @@ typedef struct br_bounds2_i br_bounds2i;
 typedef struct br_bounds3_i br_bounds3i;
 typedef struct br_bounds4_i br_bounds4i;
 typedef br_fixed_luf br_angle;
-typedef struct br_value_tag br_value;
+typedef union br_value_tag br_value;
 typedef struct br_associative_array_tag br_associative_array;
 typedef struct br_tri_strip br_tri_fan;
 typedef struct br_tri_strip br_quad_strip;
@@ -1039,7 +1039,7 @@ typedef struct br_object {
 } br_object;
 
 typedef struct br_token_value br_token_value;
-typedef struct br_value_tag {
+typedef union br_value_tag {
     br_uint_32 u32;
     br_boolean b;
     void* p;
@@ -2331,7 +2331,7 @@ typedef struct br_file {
     void* raw_file;
     br_boolean writing;
     int mode;
-    char name[255];
+    char name[4];
 } br_file;
 
 typedef enum br_lexer_token_id {
@@ -2390,7 +2390,7 @@ typedef struct br_lexer_source {
 
 typedef struct br_lexer_token {
     br_lexer_token_id id;
-    struct {
+    union {
         br_int_32 integer;
         float real;
         char* string;
