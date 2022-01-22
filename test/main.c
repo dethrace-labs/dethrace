@@ -51,6 +51,7 @@ extern void test_token_suite();
 extern void test_pattern_suite();
 extern void test_pmfile_suite();
 extern void test_fixed_suite();
+extern void test_lexer_suite();
 extern void test_matrix23_suite();
 extern void test_matrix34_suite();
 extern void test_matrix4_suite();
@@ -266,6 +267,7 @@ int main(int argc, char** argv) {
     test_actsupt_suite();
     test_genclip_suite();
     test_datafile_suite();
+    test_lexer_suite();
 
     test_pmfile_suite();
     test_v1dbfile_suite();
