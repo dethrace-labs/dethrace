@@ -46,6 +46,7 @@ extern void test_datafile_suite();
 extern void test_v1dbfile_suite();
 extern void test_register_suite();
 extern void test_scratch_suite();
+extern void test_token_suite();
 extern void test_pattern_suite();
 extern void test_pmfile_suite();
 extern void test_fixed_suite();
@@ -258,6 +259,7 @@ int main(int argc, char** argv) {
 
     test_fwsetup_suite();
     test_scratch_suite();
+    test_token_suite();
     test_resource_suite();
     test_actsupt_suite();
     test_genclip_suite();
