@@ -3,6 +3,7 @@
 
 #include "br_defs.h"
 #include <setjmp.h>
+#include <stddef.h>
 #include <stdint.h>
 
 typedef int32_t br_int_32;
@@ -11,7 +12,7 @@ typedef int16_t br_int_16;
 typedef uint16_t br_uint_16;
 typedef signed char br_int_8;
 typedef unsigned char br_uint_8;
-typedef uint32_t br_size_t;
+typedef size_t br_size_t;
 typedef int32_t br_boolean;
 typedef float br_float;
 typedef br_uint_32 br_error;
