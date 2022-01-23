@@ -12,7 +12,7 @@ typedef struct tPlatform {
     int (*IsKeyDown)(unsigned char pScan_code);
     void (*BeginFrame)(br_actor* camera, br_pixelmap* colour_buffer);
     void (*EndFrame)();
-    void (*RenderFullScreenQuad)(uint32_t* src, int transparent);
+    void (*RenderFullScreenQuad)(uint32_t* src, int width, int height);
     void (*RenderModel)(br_model* model, br_matrix34 model_matrix);
     void (*Swap)();
     void (*BufferTexture)(br_pixelmap* pm);
@@ -27,6 +27,6 @@ typedef struct tCamera {
     void (*setPosition)();
 } tCamera;
 
-void Harness_ConvertPalettedPixelmapTo32Bit(uint32_t** dst, br_pixelmap* src);
+void Harness_ConvertPalettedPixelmapTo32Bit(uint32_t** dst, br_pixelmap* src, int vflip);
 
 #endif

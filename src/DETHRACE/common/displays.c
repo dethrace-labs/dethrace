@@ -1177,6 +1177,8 @@ int SpendCredits(int pAmount) {
     int amount;
     LOG_TRACE("(%d)", pAmount);
 
+    LOG_DEBUG("spending");
+
     gProgram_state.credits_lost += pAmount;
     if (gNet_mode == eNet_mode_none) {
         return 0;

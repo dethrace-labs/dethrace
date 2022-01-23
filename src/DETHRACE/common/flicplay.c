@@ -584,6 +584,7 @@ void PlayFlicsInDarkness() {
 void ReilluminateFlics() {
     LOG_TRACE("()");
     gDark_mode = 0;
+    FadePaletteUp();
 }
 
 // IDA: void __cdecl TurnFlicTransparencyOn()

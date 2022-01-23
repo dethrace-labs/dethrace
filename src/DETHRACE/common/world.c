@@ -2524,7 +2524,8 @@ void FreeTrack(tTrack_spec* pTrack_spec) {
     int i;
     tNon_car_spec* non_car;
     LOG_TRACE("(%p)", pTrack_spec);
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __usercall ProcessTrack(br_actor *pWorld@<EAX>, tTrack_spec *pTrack_spec@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world_transform@<ECX>, int pRender_blends)

@@ -2828,7 +2828,17 @@ void LoadOpponentsCars(tRace_info* pRace_info) {
 void DisposeOpponentsCars(tRace_info* pRace_info) {
     int i;
     LOG_TRACE("(%p)", pRace_info);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < pRace_info->number_of_racers; i++) {
+        PossibleService();
+        if (pRace_info->opponent_list[i].index >= 0) {
+            if (pRace_info->opponent_list[i].car_spec) {
+                DisposeCar(pRace_info->opponent_list[i].car_spec, pRace_info->opponent_list[i].index);
+                BrMemFree(pRace_info->opponent_list[i].car_spec);
+            }
+        }
+    }
+    ClearOutStorageSpace(&gTheir_cars_storage_space);
 }
 
 // IDA: void __cdecl LoadMiscStrings()

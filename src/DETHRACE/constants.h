@@ -237,6 +237,7 @@ typedef enum keycodes {
 } keycodes;
 
 typedef enum keymapcodes {
+    KEYMAP_ESCAPE = 0,
     KEYMAP_Q = 1,
     KEYMAP_S = 2,
     KEYMAP_L = 3,

@@ -484,7 +484,8 @@ void LoadInTrack() {
 // IDA: void __cdecl DisposeTrack()
 void DisposeTrack() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    FreeTrack(&gProgram_state.track_spec);
 }
 
 // IDA: void __usercall CopyMaterialColourFromIndex(br_material *pMaterial@<EAX>)

@@ -538,44 +538,43 @@ int DoVerifyQuit(int pReplace_background) {
 // IDA: tMM_result __usercall DoMainMenu@<EAX>(tU32 pTime_out@<EAX>, int pSave_allowed@<EDX>, int pContinue_allowed@<EBX>)
 tMM_result DoMainMenu(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) {
     tMM_result the_result;
+    LOG_TRACE("(%d, %d, %d)", pTime_out, pSave_allowed, pContinue_allowed);
+
     if (gProgram_state.racing) {
-        FadePaletteDown(pTime_out);
+        FadePaletteDown();
     }
     the_result = GetMainMenuOption(pTime_out, pContinue_allowed);
     switch (the_result) {
     case eMM_end_game:
-        if (!gNet_mode) {
-            break;
+        if (gNet_mode) {
+            gProgram_state.prog_status = eProg_idling;
         }
-        gProgram_state.prog_status = eProg_idling;
         break;
     case eMM_1_start:
         if (pContinue_allowed || gAusterity_mode) {
             PlayFlicsFromMemory();
         }
         if (!DoOnePlayerStart()) {
-            the_result = 0;
+            the_result = eMM_none;
         }
-        if (!pContinue_allowed && !gAusterity_mode) {
-            break;
+        if (pContinue_allowed || gAusterity_mode) {
+            PlayFlicsFromDisk();
         }
-        PlayFlicsFromDisk();
         break;
     case eMM_n_start:
-        if (DoMultiPlayerStart()) {
-            break;
+        if (!DoMultiPlayerStart()) {
+            LoadRaces(gRace_list, &gNumber_of_races, -1);
+            the_result = eMM_none;
         }
-        LoadRaces(gRace_list, &gNumber_of_races, -1);
-        the_result = 0;
         break;
     case eMM_loaded:
-        if (!DoLoadGame(the_result)) {
-            the_result = 0;
+        if (!DoLoadGame()) {
+            the_result = eMM_none;
         }
         break;
     case eMM_save:
         DoSaveGame(pSave_allowed);
-        the_result = 0;
+        the_result = eMM_none;
         break;
     case eMM_options:
         LoadSoundOptionsData();
@@ -583,10 +582,9 @@ tMM_result DoMainMenu(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) 
         FreeSoundOptionsData();
         break;
     case eMM_quit:
-        if (DoVerifyQuit(0)) {
-            break;
+        if (!DoVerifyQuit(0)) {
+            the_result = eMM_none;
         }
-        the_result = 0;
         break;
     case eMM_recover:
         SetRecovery();
@@ -595,7 +593,7 @@ tMM_result DoMainMenu(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) 
         gAbandon_game = 1;
         break;
     default:
-        break;
+        return the_result;
     }
     return the_result;
 }
@@ -603,6 +601,7 @@ tMM_result DoMainMenu(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) 
 // IDA: void __usercall DoMainMenuScreen(tU32 pTime_out@<EAX>, int pSave_allowed@<EDX>, int pContinue_allowed@<EBX>)
 void DoMainMenuScreen(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) {
     tPlayer_status old_status;
+    LOG_TRACE("(%d, %d, %d)", pTime_out, pSave_allowed, pContinue_allowed);
 
     if (pContinue_allowed || gAusterity_mode) {
         PlayFlicsFromDisk();

@@ -22,10 +22,9 @@ br_pixelmap* last_src = NULL;
 // if true, disable the original CD check code
 int harness_disable_cd_check = 1;
 
-int back_screen_is_transparent = 0;
-
 extern void BrPixelmapFill(br_pixelmap* dst, br_uint_32 colour);
 extern uint8_t gScan_code[123][2];
+extern int gFaded_palette;
 
 // SplatPack or Carmageddon. This is where we represent the code differences between the two. For example, the intro smack file.
 tHarness_game_info harness_game_info;
@@ -135,12 +134,13 @@ void Harness_Hook_DOSGfxBegin() {
     platform->NewWindow("Dethrace", 640, 400);
 }
 
-void Harness_ConvertPalettedPixelmapTo32Bit(uint32_t** dst, br_pixelmap* src) {
+void Harness_ConvertPalettedPixelmapTo32Bit(uint32_t** dst, br_pixelmap* src, int vflip) {
     uint8_t palette_index = 0;
     uint8_t* data = src->pixels;
     uint32_t* colors;
     int x;
     int y;
+    int dest_y;
 
     if (!palette) {
         return;
@@ -151,34 +151,44 @@ void Harness_ConvertPalettedPixelmapTo32Bit(uint32_t** dst, br_pixelmap* src) {
     }
 
     // generate 32 bit texture from src + palette
-    for (y = 0; y < src->height; y++) {
-        for (x = 0; x < src->width; x++) {
-            palette_index = (data[y * src->row_bytes + x]);
-            (*dst)[y * src->width + x] = colors[palette_index];
+    if (vflip) {
+        dest_y = src->height - 1;
+        for (y = 0; y < src->height; y++) {
+            for (x = 0; x < src->width; x++) {
+                palette_index = (data[y * src->row_bytes + x]);
+                (*dst)[dest_y * src->width + x] = colors[palette_index];
+            }
+            dest_y--;
+        }
+    } else {
+        for (y = 0; y < src->height; y++) {
+            for (x = 0; x < src->width; x++) {
+                palette_index = (data[y * src->row_bytes + x]);
+                (*dst)[y * src->width + x] = colors[palette_index];
+            }
         }
     }
 }
 
+// Render 2d back buffer
 void Harness_RenderScreen(br_pixelmap* dst, br_pixelmap* src) {
-    Harness_ConvertPalettedPixelmapTo32Bit(&screen_buffer, src);
-    platform->RenderFullScreenQuad(screen_buffer, back_screen_is_transparent);
+    Harness_ConvertPalettedPixelmapTo32Bit(&screen_buffer, src, 1);
+    platform->RenderFullScreenQuad(screen_buffer, 320, 200);
     platform->PollEvents();
 
     last_dst = dst;
     last_src = src;
 }
 
-void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {
-    Harness_RenderScreen(dst, src);
-    platform->Swap();
-    back_screen_is_transparent = 0;
-}
 void Harness_Hook_BrDevPaletteSetOld(br_pixelmap* pm) {
+    //if (!gFaded_palette) {
+    printf("setting palette, rendering last screen....\n");
     palette = pm;
     if (last_src) {
         Harness_RenderScreen(last_dst, last_src);
         platform->Swap();
     }
+    //}
 }
 
 void Harness_Hook_BrDevPaletteSetEntryOld(int i, br_colour colour) {
@@ -193,29 +203,33 @@ void Harness_Hook_BrV1dbRendererBegin(br_v1db_state* v1db) {
     v1db->renderer = (br_renderer*)renderer_state;
 }
 
-int col = 128;
-
-void Harness_Hook_renderFaces(br_model* model, br_material* material, br_token type) {
-    platform->RenderModel(model, renderer_state->state.matrix.model_to_view);
-}
-
+// Begin 3d scene
 void Harness_Hook_BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer) {
-    // splat current back_screen to framebuffer
+    // 1. splat current 2d screen contents to framebuffer
     Harness_RenderScreen(NULL, colour_buffer);
-    // clear to transparent ready for the game to render foreground bits
+    // clear to transparent ready for the game to render foreground bits via a call to BrPixelmapDoubleBuffer
     BrPixelmapFill(colour_buffer, 0);
-    back_screen_is_transparent = 1;
 
-    //current_renderer->setViewport(colour_buffer->base_x * 2, colour_buffer->base_y * 2, colour_buffer->width * 2, colour_buffer->height * 2);
     platform->BeginFrame(camera, colour_buffer);
-    col = 0;
 }
 
 void Harness_Hook_BrZbSceneRenderAdd(br_actor* tree) {
 }
 
+void Harness_Hook_renderFaces(br_model* model, br_material* material, br_token type) {
+    platform->RenderModel(model, renderer_state->state.matrix.model_to_view);
+}
+
 void Harness_Hook_BrZbSceneRenderEnd() {
     platform->EndFrame();
+}
+
+// Called by game to swap buffers
+void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {
+    // Splat current 2d screen contents to framebuffer
+    Harness_RenderScreen(dst, src);
+    // Render 3d scene
+    platform->Swap();
 }
 
 int Harness_Hook_KeyDown(unsigned char pScan_code) {
@@ -245,4 +259,7 @@ void Harness_Hook_S3Service(int unk1, int unk2) {
 }
 
 void Harness_Hook_S3StopAllOutletSounds() {
+}
+
+void Harness_Hook_SetFadedPalette(int pDegree) {
 }

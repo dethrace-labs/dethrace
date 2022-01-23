@@ -30,6 +30,8 @@ GLuint screen_texture;
 GLuint shader_program_2d;
 GLuint shader_program_2d_trans;
 GLuint shader_program_3d;
+GLuint framebuffer_id, framebuffer_texture;
+unsigned int rbo;
 
 int window_width, window_height;
 
@@ -123,10 +125,10 @@ void GLRenderer_CreateWindow(char* title, int width, int height) {
 
     float vertices[] = {
         // positions          // colors           // texture coords
-        1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right
-        1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
-        -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
-        -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f // top left
+        1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, // top right
+        1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // bottom right
+        -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, // bottom left
+        -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f // top left
     };
     unsigned int indices[] = {
         0, 1, 3, // first triangle
@@ -163,10 +165,34 @@ void GLRenderer_CreateWindow(char* title, int width, int height) {
 
     glGenTextures(1, &screen_texture);
 
-    glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
     // Accept fragment if it closer to the camera than the former one
     glDepthFunc(GL_LESS);
+
+    glGenFramebuffers(1, &framebuffer_id);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
+
+    glGenTextures(1, &framebuffer_texture);
+    glBindTexture(GL_TEXTURE_2D, framebuffer_texture);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer_texture, 0);
+
+    glGenRenderbuffers(1, &rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        LOG_PANIC("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void GLRenderer_BeginFrame(br_actor* camera, br_pixelmap* colour_buffer) {
@@ -211,13 +237,28 @@ void GLRenderer_BeginFrame(br_actor* camera, br_pixelmap* colour_buffer) {
     glUniformMatrix4fv(projection_u, 1, GL_FALSE, proj);
 
     DebugCamera_Update();
+
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void GLRenderer_EndFrame() {
     glViewport(0, 0, window_width, window_height);
+    glDisable(GL_DEPTH_TEST);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    glBindTexture(GL_TEXTURE_2D, framebuffer_texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glUseProgram(shader_program_2d_trans);
+
+    glBindVertexArray(screen_buffer_vao);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, screen_buffer_ebo);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
 }
 
-void GLRenderer_RenderFullScreenQuad(uint32_t* screen_buffer, int transparent) {
+void GLRenderer_RenderFullScreenQuad(uint32_t* screen_buffer, int width, int height) {
 
     glDisable(GL_DEPTH_TEST);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -226,13 +267,10 @@ void GLRenderer_RenderFullScreenQuad(uint32_t* screen_buffer, int transparent) {
     glBindTexture(GL_TEXTURE_2D, screen_texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 320, 200, 0, GL_BGRA, GL_UNSIGNED_BYTE, screen_buffer);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, screen_buffer);
 
-    if (transparent) {
-        glUseProgram(shader_program_2d_trans);
-    } else {
-        glUseProgram(shader_program_2d);
-    }
+    glUseProgram(shader_program_2d_trans);
+
     glBindVertexArray(screen_buffer_vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, screen_buffer_ebo);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -241,7 +279,6 @@ void GLRenderer_RenderFullScreenQuad(uint32_t* screen_buffer, int transparent) {
 
 void GLRenderer_Swap() {
     SDL_GL_SwapWindow(window);
-    // glClearColor(0.0f, 0.5f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
@@ -414,7 +451,7 @@ void GLRenderer_BufferMaterial(br_material* mat) {
 void GLRenderer_BufferTexture(br_pixelmap* pm) {
     if (!pm->stored) {
         uint32_t* full_color_texture = NULL;
-        Harness_ConvertPalettedPixelmapTo32Bit(&full_color_texture, pm);
+        Harness_ConvertPalettedPixelmapTo32Bit(&full_color_texture, pm, 0);
         if (full_color_texture == NULL) {
             return;
         }

@@ -586,11 +586,12 @@ tRace_result MainGameLoop() {
             && (gNet_mode == eNet_mode_none
                 || !gAction_replay_mode
                 || gProgram_state.current_car.car_master_actor->t.t.mat.m[3][0] < 500.0)) {
+
             EnsureRenderPalette();
             EnsurePaletteUp();
         }
         DoNetGameManagement();
-        if (KeyIsDown(0) && !gEntering_message) {
+        if (KeyIsDown(KEYMAP_ESCAPE) && !gEntering_message) {
             WaitForNoKeys();
             if (gAction_replay_mode) {
                 ToggleReplay();
