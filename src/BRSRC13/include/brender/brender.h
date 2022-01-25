@@ -11,6 +11,7 @@ extern struct br_font* BrFontProp7x9;
 
 // BrActor
 br_actor* BrActorLoad(char* filename);
+br_uint_32 BrActorLoadMany(char* filename, br_actor** actors, br_uint_16 num);
 br_actor* BrActorAllocate(br_uint_8 type, void* type_data);
 br_actor* BrActorAdd(br_actor* parent, br_actor* a);
 void BrActorRelink(br_actor* parent, br_actor* a);
@@ -96,6 +97,7 @@ void* BrMemCalloc(int nelems, br_size_t size, br_uint_8 type);
 // BrModel
 br_model* BrModelAllocate(char* name, int nvertices, int nfaces);
 br_model* BrModelAdd(br_model* model);
+br_uint_32 BrModelAddMany(br_model** items, int n);
 br_model* BrModelRemove(br_model* model);
 br_model* BrModelLoad(char* filename);
 void BrModelFree(br_model* model);
