@@ -113,6 +113,8 @@ target_sources(brender PRIVATE
     CORE/HOST/memmgmt.h
     CORE/MATH/angles.c
     CORE/MATH/angles.h
+    CORE/MATH/fixed.c
+    CORE/MATH/fixed.h
     CORE/MATH/matrix23.c
     CORE/MATH/matrix23.h
     CORE/MATH/matrix34.c

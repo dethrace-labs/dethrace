@@ -1,3 +1,4 @@
+#include "tests.h"
 #include "harness/hooks.h"
 #include <assert.h>
 #include <stdio.h>
@@ -43,8 +44,13 @@ extern void test_genclip_suite();
 extern void test_datafile_suite();
 extern void test_v1dbfile_suite();
 extern void test_register_suite();
+extern void test_scratch_suite();
 extern void test_pattern_suite();
 extern void test_pmfile_suite();
+extern void test_fixed_suite();
+extern void test_matrix23_suite();
+extern void test_matrix34_suite();
+extern void test_matrix4_suite();
 extern void test_quat_suite();
 extern void test_graphics_suite();
 extern void test_regsupt_suite();
@@ -58,6 +64,24 @@ void setUp(void) {
 }
 
 void tearDown(void) {
+}
+
+static const char *temp_folder;
+static char temp_folder_buffer[PATH_MAX+1];
+
+static void setup_temp_folder() {
+#ifdef _WIN32
+    DWORD res;
+    char tmpBuffer[PATH_MAX+1];
+    res = GetTempPathA(sizeof(tmpBuffer), tmpBuffer);
+    if (res == 0) {
+        abort();
+    }
+    sprintf(temp_folder_buffer, "%s\\dethrace_test_%d", tmpBuffer, GetCurrentProcessId());
+#else
+    sprintf(temp_folder_buffer, "/tmp/dethrace_test_%d", getpid());
+#endif
+    temp_folder = temp_folder_buffer;
 }
 
 void setup_global_vars() {
@@ -88,6 +112,9 @@ void setup_global_vars() {
 
     strcpy(gBasic_car_names[0], "BLKEAGLE.TXT");
 
+    setup_temp_folder();
+    printf("INFO: temp folder is \"%s\"\n", temp_folder);
+
     _unittest_do_not_exit = 1;
     harness_debug_level = 7;
     harness_game_info.mode = eGame_carmageddon;
@@ -111,6 +138,49 @@ void sleep_s(int sec) {
 #endif
 }
 
+void create_temp_file(char buffer[PATH_MAX+1], const char *prefix) {
+#ifdef _WIN32
+    DWORD attributes;
+    UINT res;
+    BOOL success;
+
+    attributes = GetFileAttributesA(temp_folder);
+    if ((attributes == INVALID_FILE_ATTRIBUTES) || ((attributes & FILE_ATTRIBUTE_DIRECTORY) == 0)) {
+        LOG_TRACE("Temporary folder does not exist => creating");
+        success = CreateDirectoryA(temp_folder, NULL);
+        if (success == 0) {
+            abort();
+        }
+    }
+    res = GetTempFileNameA(temp_folder, prefix, 0, buffer);
+    if (res == 0) {
+        abort();
+    }
+    strcat(buffer, prefix);
+#else
+    int fdres;
+    struct stat sb;
+    int res;
+
+    stat(temp_folder, &sb);
+    if (!S_ISDIR(sb.st_mode)) {
+        res = mkdir(temp_folder, 0770);
+        if (res == -1) {
+            abort();
+        }
+    }
+    strcpy(buffer, temp_folder);
+    strcat(buffer, "/");
+    strcat(buffer, prefix);
+    strcat(buffer, "XXXXXX");
+    fdres = mkstemp(buffer);
+    if (fdres == -1) {
+        abort();
+    }
+    close(fdres);
+#endif
+}
+
 int main(int argc, char** argv) {
 
     UNITY_BEGIN();
@@ -124,6 +194,11 @@ int main(int argc, char** argv) {
     printf("Completed setup\n");
 
     // BRSRC13
+    test_matrix23_suite();
+    test_matrix34_suite();
+    test_matrix4_suite();
+    test_quat_suite();
+
     test_brlists_suite();
     test_fwsetup_suite();
     test_resource_suite();
@@ -134,9 +209,10 @@ int main(int argc, char** argv) {
 
     test_pattern_suite();
     test_pmfile_suite();
-    test_quat_suite();
+    test_fixed_suite();
     test_v1dbfile_suite();
     test_regsupt_suite();
+    test_scratch_suite();
 
     // DETHRACE
     test_utility_suite();

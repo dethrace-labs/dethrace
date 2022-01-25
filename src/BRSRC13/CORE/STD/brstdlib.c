@@ -124,6 +124,7 @@ br_int_32 BrVSprintfN(char* buf, br_size_t buf_size, const char* fmt, va_list ar
 
     strncpy(buf, tmp, n);
     buf[n] = '\0';
+    return n;
 }
 
 br_int_32 BrVSScanf(char* buf, const char* fmt, va_list args) {

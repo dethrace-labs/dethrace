@@ -321,6 +321,7 @@ void test_matrix4_BrMatrix4ShearZ() {
 }
 
 void test_matrix4_suite() {
+    UnitySetTestFile(__FILE__);
     RUN_TEST(test_matrix4_BrMatrix4Copy);
     RUN_TEST(test_matrix4_BrMatrix4Mul);
     RUN_TEST(test_matrix4_BrMatrix4Identity);

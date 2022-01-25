@@ -4,22 +4,22 @@
 #include "harness/trace.h"
 #include "resource.h"
 
-char scratchString[512];
+char scratchString[512] = "SCRATCH";
 
 // IDA: void* __cdecl BrScratchAllocate(br_size_t size)
 void* BrScratchAllocate(br_size_t size) {
     LOG_TRACE("(%d)", size);
 
-    if (fw.scratch_inuse)
+    if (fw.scratch_inuse != 0) {
         BrFailure("Scratchpad not available");
+    }
 
     fw.scratch_last = size;
 
     if (size > fw.scratch_size) {
-
-        if (fw.scratch_ptr)
+        if (fw.scratch_ptr != NULL) {
             BrResFree(fw.scratch_ptr);
-
+        }
         fw.scratch_ptr = BrResAllocate(fw.res, size, BR_MEMORY_SCRATCH);
         fw.scratch_size = size;
     }
@@ -30,29 +30,41 @@ void* BrScratchAllocate(br_size_t size) {
 // IDA: void __cdecl BrScratchFree(void *scratch)
 void BrScratchFree(void* scratch) {
     LOG_TRACE("(%p)", scratch);
+
     fw.scratch_inuse = 0;
 }
 
 // IDA: void __cdecl BrScratchFlush()
 void BrScratchFlush() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (fw.scratch_inuse != 0) {
+        BrFailure("Scratchpad cannot be flushed while in use");
+    }
+    if (fw.scratch_ptr != NULL) {
+        BrResFree(fw.scratch_ptr);
+    }
+    fw.scratch_ptr = NULL;
+    fw.scratch_size = 0;
 }
 
 // IDA: br_size_t __cdecl BrScratchInquire()
 br_size_t BrScratchInquire() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    return fw.scratch_size;
 }
 
 // IDA: char* __cdecl BrScratchString()
 char* BrScratchString() {
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    LOG_TRACE9("()");
+
+    return scratchString;
 }
 
 // IDA: br_size_t __cdecl BrScratchStringSize()
 br_size_t BrScratchStringSize() {
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    LOG_TRACE9("()");
+
+    return sizeof(scratchString);
 }

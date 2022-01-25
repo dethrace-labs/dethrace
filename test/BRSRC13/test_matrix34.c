@@ -547,6 +547,7 @@ static void test_matrix34_BrMatrix34PostRotateZ() {
 }
 
 void test_matrix34_suite() {
+    UnitySetTestFile(__FILE__);
     RUN_TEST(test_matrix34_BrMatrix34Copy);
     RUN_TEST(test_matrix34_BrMatrix34Mul);
     RUN_TEST(test_matrix34_BrMatrix34Identity);
