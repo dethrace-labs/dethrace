@@ -19,15 +19,23 @@ harness_br_renderer* renderer_state;
 br_pixelmap* last_dst = NULL;
 br_pixelmap* last_src = NULL;
 
-// if true, disable the original CD check code
-int harness_disable_cd_check = 1;
+// value between 0 and 1 - 0 is no fade, 1 is full black
+float palette_fade_to_black_alpha = 0;
+
+int rendered_scenes_this_frame = 0;
+int rendered_scenes_last_frame = 0;
+
+unsigned int last_frame_time = 0;
 
 extern void BrPixelmapFill(br_pixelmap* dst, br_uint_32 colour);
+extern unsigned int GetTotalTime();
 extern uint8_t gScan_code[123][2];
 extern int gFaded_palette;
 
 // SplatPack or Carmageddon. This is where we represent the code differences between the two. For example, the intro smack file.
 tHarness_game_info harness_game_info;
+
+tHarness_game_config harness_game_config;
 
 int Harness_ProcessCommandLine(int* argc, char* argv[]);
 
@@ -52,6 +60,13 @@ void Harness_DetectGameMode() {
 
 void Harness_Init(int* argc, char* argv[]) {
     int result;
+
+    // disable the original CD check code
+    harness_game_config.disable_cd_check = 1;
+    // original physics time step. Lower values seem to work better at 30+ fps
+    harness_game_config.physics_step_time = 40;
+    // limit to 60 fps by default
+    harness_game_config.fps = 60;
 
     Harness_ProcessCommandLine(argc, argv);
 
@@ -93,17 +108,27 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
     for (int i = 1; i < *argc; i++) {
         int handled = 0;
 
-        if (strcasecmp(argv[i], "-cdcheck") == 0) {
-            harness_disable_cd_check = 0;
+        if (strcasecmp(argv[i], "--cdcheck") == 0) {
+            harness_game_config.disable_cd_check = 0;
             handled = 1;
-        } else if (strstr(argv[i], "-debug") != NULL) {
-            char* s = strstr(argv[i], "=");
+        } else if (strstr(argv[i], "--debug ") != NULL) {
+            char* s = strstr(argv[i], " ");
             harness_debug_level = atoi(s + 1);
             LOG_INFO("debug level set to %d", harness_debug_level);
             handled = 1;
-        } else if (strstr(argv[i], "-platform") != NULL) {
-            platform_name = strstr(argv[i], "=") + 1;
+        } else if (strstr(argv[i], "--platform ") != NULL) {
+            platform_name = strstr(argv[i], " ") + 1;
             LOG_INFO("Platform set to: %s", platform_name);
+            handled = 1;
+        } else if (strstr(argv[i], "--physics-step-time ") != NULL) {
+            char* s = strstr(argv[i], " ");
+            harness_game_config.physics_step_time = atof(s + 1);
+            LOG_INFO("Physics step time set to %f", harness_game_config.physics_step_time);
+            handled = 1;
+        } else if (strstr(argv[i], "--fps ") != NULL) {
+            char* s = strstr(argv[i], " ");
+            harness_game_config.fps = atoi(s + 1);
+            LOG_INFO("FPS limiter set to %f", harness_game_config.fps);
             handled = 1;
         }
 
@@ -174,21 +199,13 @@ void Harness_ConvertPalettedPixelmapTo32Bit(uint32_t** dst, br_pixelmap* src, in
 void Harness_RenderScreen(br_pixelmap* dst, br_pixelmap* src) {
     Harness_ConvertPalettedPixelmapTo32Bit(&screen_buffer, src, 1);
     platform->RenderFullScreenQuad(screen_buffer, 320, 200);
-    platform->PollEvents();
 
     last_dst = dst;
     last_src = src;
 }
 
 void Harness_Hook_BrDevPaletteSetOld(br_pixelmap* pm) {
-    //if (!gFaded_palette) {
-    printf("setting palette, rendering last screen....\n");
     palette = pm;
-    if (last_src) {
-        Harness_RenderScreen(last_dst, last_src);
-        platform->Swap();
-    }
-    //}
 }
 
 void Harness_Hook_BrDevPaletteSetEntryOld(int i, br_colour colour) {
@@ -205,12 +222,16 @@ void Harness_Hook_BrV1dbRendererBegin(br_v1db_state* v1db) {
 
 // Begin 3d scene
 void Harness_Hook_BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer) {
-    // 1. splat current 2d screen contents to framebuffer
-    Harness_RenderScreen(NULL, colour_buffer);
-    // clear to transparent ready for the game to render foreground bits via a call to BrPixelmapDoubleBuffer
+    rendered_scenes_this_frame++;
+
+    // if this is the first 3d scene this frame, draw the current colour_buffer (2d screen) contents to framebuffer
+    if (rendered_scenes_this_frame == 0) {
+        Harness_RenderScreen(NULL, colour_buffer);
+    }
+    // clear to transparent ready for the game to render foreground elements which we will capture later in `Harness_Hook_BrPixelmapDoubleBuffer`
     BrPixelmapFill(colour_buffer, 0);
 
-    platform->BeginFrame(camera, colour_buffer);
+    platform->BeginScene(camera, colour_buffer);
 }
 
 void Harness_Hook_BrZbSceneRenderAdd(br_actor* tree) {
@@ -221,15 +242,54 @@ void Harness_Hook_renderFaces(br_model* model, br_material* material, br_token t
 }
 
 void Harness_Hook_BrZbSceneRenderEnd() {
-    platform->EndFrame();
+    platform->EndScene();
 }
 
-// Called by game to swap buffers
+void Harness_Hook_MainGameLoop() {
+    if (last_frame_time) {
+        unsigned int frame_time = GetTotalTime() - last_frame_time;
+
+        if (frame_time < 100) {
+
+            int sleep_time = (1000 / harness_game_config.fps) - frame_time;
+            if (sleep_time > 0) {
+                struct timespec ts;
+                ts.tv_sec = sleep_time / 1000;
+                ts.tv_nsec = (sleep_time % 1000) * 1000000;
+                printf("sleeping for %d ms\n", sleep_time);
+                nanosleep(&ts, &ts);
+            }
+        }
+    }
+
+    last_frame_time = GetTotalTime();
+}
+
+// Called by game to swap buffers at end of frame rendering
 void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {
-    // Splat current 2d screen contents to framebuffer
+
+    // should we switch to fb 0 here ?
+
+    // draw the current colour_buffer (2d screen) contents
     Harness_RenderScreen(dst, src);
-    // Render 3d scene
+
+    // draw the current 3d frame buffer
+    if (rendered_scenes_this_frame) {
+        platform->RenderFrameBuffer();
+    }
+
+    // if the game has faded the palette, we should respect that.
+    // fixes screen flash during race start or recovery
+    if (palette_fade_to_black_alpha != 0) {
+        platform->RenderColorBlend(0, 0, 0, palette_fade_to_black_alpha);
+    }
+
     platform->Swap();
+    platform->PollEvents();
+
+    // reset 3d render count
+    rendered_scenes_last_frame = rendered_scenes_this_frame;
+    rendered_scenes_this_frame = 0;
 }
 
 int Harness_Hook_KeyDown(unsigned char pScan_code) {
@@ -262,4 +322,15 @@ void Harness_Hook_S3StopAllOutletSounds() {
 }
 
 void Harness_Hook_SetFadedPalette(int pDegree) {
+
+    // pDegree is 0-255 where 0 is full black and 255 is full original color.
+    // we convert this to an alpha blend value
+    palette_fade_to_black_alpha = (256 - pDegree) / 256.f;
+
+    if (rendered_scenes_last_frame > 0) {
+        platform->RenderFrameBuffer();
+    }
+    Harness_RenderScreen(last_dst, last_src);
+    platform->RenderColorBlend(0, 0, 0, palette_fade_to_black_alpha);
+    platform->Swap();
 }

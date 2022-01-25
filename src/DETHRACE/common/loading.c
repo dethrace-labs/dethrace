@@ -3054,7 +3054,7 @@ int TestForOriginalCarmaCDinDrive() {
     int paths_txt_first_char;
 
     // Jeff: Added to optionally bypass this check
-    if (harness_disable_cd_check) {
+    if (harness_game_config.disable_cd_check) {
         return 1;
     }
 

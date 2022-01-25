@@ -11,12 +11,20 @@ typedef enum tHarness_game_type {
 typedef struct tHarness_game_info {
     tHarness_game_type mode;
     struct {
-        char* INTRO_SMK_FILE; // different between carmageddon and splatpack
-        char* GERMAN_LOADSCRN; // different between demo and full game
+        // different between carmageddon and splatpack
+        char* INTRO_SMK_FILE;
+        // different between demo and full game
+        char* GERMAN_LOADSCRN;
     } defines;
 } tHarness_game_info;
 
+typedef struct tHarness_game_config {
+    int disable_cd_check;
+    float physics_step_time;
+    float fps;
+} tHarness_game_config;
+
 extern tHarness_game_info harness_game_info;
-extern int harness_disable_cd_check;
+extern tHarness_game_config harness_game_config;
 
 #endif

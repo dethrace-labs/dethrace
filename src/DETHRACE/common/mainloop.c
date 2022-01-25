@@ -12,6 +12,7 @@
 #include "globvrpb.h"
 #include "graphics.h"
 #include "harness/config.h"
+#include "harness/hooks.h"
 #include "harness/trace.h"
 #include "input.h"
 #include "main.h"
@@ -389,9 +390,6 @@ void UpdateFramePeriod(tU32* pCamera_period) {
     } else {
         *pCamera_period = 10;
     }
-
-    // todo: FPS limiter
-    //usleep(40 * 1000);
 }
 
 // IDA: tU32 __cdecl GetLastTickCount()
@@ -505,8 +503,6 @@ tRace_result MainGameLoop() {
     GetAverageGridPosition(&gCurrent_race);
     ForceRebuildActiveCarList();
     PrintMemoryDump(0, "ABOUT TO ENTER MAINLOOP");
-
-    double last_time = GetTotalTime() / 1000.0;
 
     do {
         frame_start_time = GetTotalTime();
@@ -626,15 +622,7 @@ tRace_result MainGameLoop() {
             gAbandon_game = 0;
         }
 
-        // Added to lock framerate to 30fps. Seems to help physics be less twitchy...
-        double secs = GetTotalTime();
-        //LOG_DEBUG("timediff %f", secs - (last_time + (1.0 / 30.0)));
-        // while (secs < last_time + (1.0 / 30.0) * 1000) {
-        //     //LOG_DEBUG("skipping time...");
-        //     secs = GetTotalTime();
-        // }
-        //usleep(50 * 1000);
-        //last_time += (1.0 / 30.0) * 1000;
+        Harness_Hook_MainGameLoop();
 
     } while (gProgram_state.prog_status == eProg_game_ongoing
         && !MungeRaceFinished()

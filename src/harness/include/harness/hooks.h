@@ -11,6 +11,7 @@ int Harness_Hook_KeyDown(unsigned char pScan_code);
 void Harness_Hook_PDServiceSystem();
 void Harness_Hook_PDSetKeyArray();
 void Harness_Hook_SetFadedPalette(int pDegree);
+void Harness_Hook_MainGameLoop(); // limit FPS
 
 // BRender hooks
 void Harness_Hook_DOSGfxBegin();

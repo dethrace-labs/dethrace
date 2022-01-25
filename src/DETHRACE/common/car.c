@@ -12,6 +12,7 @@
 #include "globvrkm.h"
 #include "globvrpb.h"
 #include "graphics.h"
+#include "harness/config.h"
 #include "harness/trace.h"
 #include "netgame.h"
 #include "oil.h"
@@ -939,7 +940,7 @@ void FinishCars(tU32 pLast_frame_time, tU32 pTime) {
             BrMatrix34ApplyV(&car->direction, &minus_k, &car->car_master_actor->t.t.mat);
         } else if (gLast_mechanics_time > pLast_frame_time && gCar_to_view == car) {
             BrVector3Sub(&car->old_v, &car->old_v, &car->v);
-            BrVector3Scale(&car->old_v, &car->old_v, (gLast_mechanics_time - pLast_frame_time) / (float)PHYSICS_STEP_TIME);
+            BrVector3Scale(&car->old_v, &car->old_v, (gLast_mechanics_time - pLast_frame_time) / harness_game_config.physics_step_time);
             BrVector3Accumulate(&car->old_v, &car->v);
             BrVector3Normalise(&car->direction, &car->old_v);
         } else {
@@ -1055,7 +1056,7 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
         ForceRebuildActiveCarList();
     }
     if (gLast_mechanics_time < last_frame_time) {
-        gLast_mechanics_time = PHYSICS_STEP_TIME * (last_frame_time / PHYSICS_STEP_TIME);
+        gLast_mechanics_time = harness_game_config.physics_step_time * (last_frame_time / harness_game_config.physics_step_time);
     }
     GetNonCars();
     if (frame_end_time <= gLast_mechanics_time) {
@@ -1067,7 +1068,7 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
 
     gDoing_physics = 1;
     PrepareCars(last_frame_time);
-    gDt = PHYSICS_STEP_TIME / 1000.0; // 0.039999999;
+    gDt = harness_game_config.physics_step_time / 1000.0; // 0.039999999;
     gMechanics_time_sync = pTime_difference - (gLast_mechanics_time - last_frame_time);
     while (gLast_mechanics_time < frame_end_time && step_number < 5) {
         step_number++;
@@ -1081,8 +1082,8 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
         for (i = 0; gNum_active_cars > i; ++i) {
             car = gActive_car_list[i];
             car->dt = -1.0;
-            if (car->message.type == 15 && car->message.time >= gLast_mechanics_time && gLast_mechanics_time + PHYSICS_STEP_TIME >= car->message.time) {
-                car->dt = (double)(gLast_mechanics_time + PHYSICS_STEP_TIME - car->message.time) / 1000.0;
+            if (car->message.type == 15 && car->message.time >= gLast_mechanics_time && gLast_mechanics_time + harness_game_config.physics_step_time >= car->message.time) {
+                car->dt = (double)(gLast_mechanics_time + harness_game_config.physics_step_time - car->message.time) / 1000.0;
                 if (gDt - 0.0001 <= car->dt) {
                     GetNetPos(car);
                 } else if (gNet_mode == eNet_mode_host) {
@@ -1115,8 +1116,8 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
             non_car = gActive_non_car_list[i];
             if (!non_car->collision_info.doing_nothing_flag) {
                 non_car->collision_info.dt = -1.0;
-                if (non_car->collision_info.message.type == 16 && non_car->collision_info.message.time >= gLast_mechanics_time && gLast_mechanics_time + PHYSICS_STEP_TIME >= non_car->collision_info.message.time) {
-                    non_car->collision_info.dt = (double)(gLast_mechanics_time + PHYSICS_STEP_TIME - non_car->collision_info.message.time) / 1000.0;
+                if (non_car->collision_info.message.type == 16 && non_car->collision_info.message.time >= gLast_mechanics_time && gLast_mechanics_time + harness_game_config.physics_step_time >= non_car->collision_info.message.time) {
+                    non_car->collision_info.dt = (double)(gLast_mechanics_time + harness_game_config.physics_step_time - non_car->collision_info.message.time) / 1000.0;
                     GetNetPos((tCar_spec*)non_car);
                 }
                 if (non_car->collision_info.box_face_ref != gFace_num__car
@@ -1133,8 +1134,8 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
             old_num_cars = gNum_cars_and_non_cars;
             CrashCarsTogether(gDt);
         } while (old_num_cars < gNum_cars_and_non_cars);
-        gMechanics_time_sync -= PHYSICS_STEP_TIME;
-        gLast_mechanics_time += PHYSICS_STEP_TIME;
+        gMechanics_time_sync -= harness_game_config.physics_step_time;
+        gLast_mechanics_time += harness_game_config.physics_step_time;
     }
     gMechanics_time_sync = 1;
     SendCarData(gLast_mechanics_time);

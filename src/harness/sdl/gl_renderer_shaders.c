@@ -34,6 +34,16 @@ const char* fs_2d_trans = "#version 330 core\n"
                           "   }\n"
                           "}\n\0";
 
+const char* fs_postprocess = "#version 330 core\n"
+                             "in vec2 TexCoord;\n"
+                             "uniform vec4 color;\n"
+                             "layout (location = 0) out vec4 FragColor;\n"
+
+                             "void main()\n"
+                             "{\n"
+                             "   FragColor = color;\n"
+                             "}\n\0";
+
 // const char* vs_3d = "#version 330 core\n"
 //                     "layout (location = 0) in vec3 aPos;\n"
 //                     "layout (location = 1) in vec3 aNormal;\n"

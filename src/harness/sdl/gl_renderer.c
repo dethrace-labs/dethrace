@@ -29,8 +29,9 @@ GLuint screen_buffer_vao, screen_buffer_ebo;
 GLuint screen_texture;
 GLuint shader_program_2d;
 GLuint shader_program_2d_trans;
+GLuint shader_program_2d_pp;
 GLuint shader_program_3d;
-GLuint framebuffer_id, framebuffer_texture;
+GLuint framebuffer_id, framebuffer_texture = 0;
 unsigned int rbo;
 
 int window_width, window_height;
@@ -59,16 +60,25 @@ void LoadShaders() {
     glAttachShader(shader_program_2d, vs);
     glAttachShader(shader_program_2d, fs);
     glLinkProgram(shader_program_2d);
-
     glDeleteShader(fs);
+
     fs = glCreateShader(GL_FRAGMENT_SHADER);
     CompileShader(fs, fs_2d_trans);
     shader_program_2d_trans = glCreateProgram();
     glAttachShader(shader_program_2d_trans, vs);
     glAttachShader(shader_program_2d_trans, fs);
     glLinkProgram(shader_program_2d_trans);
-    glDeleteShader(vs);
     glDeleteShader(fs);
+
+    fs = glCreateShader(GL_FRAGMENT_SHADER);
+    CompileShader(fs, fs_postprocess);
+    shader_program_2d_pp = glCreateProgram();
+    glAttachShader(shader_program_2d_pp, vs);
+    glAttachShader(shader_program_2d_pp, fs);
+    glLinkProgram(shader_program_2d_pp);
+    glDeleteShader(fs);
+
+    glDeleteShader(vs);
 
     vs = glCreateShader(GL_VERTEX_SHADER);
     fs = glCreateShader(GL_FRAGMENT_SHADER);
@@ -166,6 +176,7 @@ void GLRenderer_CreateWindow(char* title, int width, int height) {
     glGenTextures(1, &screen_texture);
 
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Accept fragment if it closer to the camera than the former one
     glDepthFunc(GL_LESS);
@@ -173,6 +184,8 @@ void GLRenderer_CreateWindow(char* title, int width, int height) {
     glGenFramebuffers(1, &framebuffer_id);
 
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
+    glClearColor(0, 0, 0, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glGenTextures(1, &framebuffer_texture);
     glBindTexture(GL_TEXTURE_2D, framebuffer_texture);
@@ -195,7 +208,7 @@ void GLRenderer_CreateWindow(char* title, int width, int height) {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void GLRenderer_BeginFrame(br_actor* camera, br_pixelmap* colour_buffer) {
+void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer) {
 
     glViewport(colour_buffer->base_x * 2, colour_buffer->base_y * 2, colour_buffer->width * 2, colour_buffer->height * 2);
 
@@ -242,11 +255,16 @@ void GLRenderer_BeginFrame(br_actor* camera, br_pixelmap* colour_buffer) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void GLRenderer_EndFrame() {
+void GLRenderer_EndScene() {
+}
+
+void GLRenderer_RenderFramebuffer() {
+
     glViewport(0, 0, window_width, window_height);
     glDisable(GL_DEPTH_TEST);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    glDisable(GL_DEPTH_TEST);
     glBindTexture(GL_TEXTURE_2D, framebuffer_texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -263,13 +281,26 @@ void GLRenderer_RenderFullScreenQuad(uint32_t* screen_buffer, int width, int hei
     glDisable(GL_DEPTH_TEST);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-    // TODO: remove fixed 320x200
     glBindTexture(GL_TEXTURE_2D, screen_texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, screen_buffer);
 
     glUseProgram(shader_program_2d_trans);
+
+    glBindVertexArray(screen_buffer_vao);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, screen_buffer_ebo);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+}
+
+// GLRenderer_RenderColorBlend renders a fullscreen quad with the desired color
+void GLRenderer_RenderColorBlend(float r, float g, float b, float a) {
+    glDisable(GL_DEPTH_TEST);
+
+    glUseProgram(shader_program_2d_pp);
+    GLuint model_u = glGetUniformLocation(shader_program_2d_pp, "color");
+    glUniform4f(model_u, r, g, b, a);
 
     glBindVertexArray(screen_buffer_vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, screen_buffer_ebo);

@@ -8,7 +8,9 @@ int Null_IsKeyDown(unsigned char pScan_code) { return 0; }
 void Null_BeginFrame(br_actor* camera, br_pixelmap* colour_buffer) {}
 void Null_EndFrame() {}
 void Null_RenderFullScreenQuad(uint32_t* src, int width, int height) {}
+void Null_RenderColorBlend(float r, float g, float b, float a) {}
 void Null_RenderModel(br_model* model, br_matrix34 model_matrix) {}
+void Null_RenderFrameBuffer() {}
 void Null_Swap() {}
 void Null_BufferTexture(br_pixelmap* pm) {}
 void Null_BufferMaterial(br_material* mat) {}
@@ -22,7 +24,9 @@ tPlatform null_platform = {
     Null_BeginFrame,
     Null_EndFrame,
     Null_RenderFullScreenQuad,
+    Null_RenderColorBlend,
     Null_RenderModel,
+    Null_RenderFrameBuffer,
     Null_Swap,
     Null_BufferTexture,
     Null_BufferMaterial
