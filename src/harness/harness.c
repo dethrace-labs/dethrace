@@ -30,11 +30,11 @@ unsigned int last_frame_time = 0;
 extern void BrPixelmapFill(br_pixelmap* dst, br_uint_32 colour);
 extern unsigned int GetTotalTime();
 extern uint8_t gScan_code[123][2];
-extern int gFaded_palette;
 
 // SplatPack or Carmageddon. This is where we represent the code differences between the two. For example, the intro smack file.
 tHarness_game_info harness_game_info;
 
+// Configuration options
 tHarness_game_config harness_game_config;
 
 int Harness_ProcessCommandLine(int* argc, char* argv[]);
@@ -65,8 +65,8 @@ void Harness_Init(int* argc, char* argv[]) {
     harness_game_config.disable_cd_check = 1;
     // original physics time step. Lower values seem to work better at 30+ fps
     harness_game_config.physics_step_time = 40;
-    // limit to 60 fps by default
-    harness_game_config.fps = 60;
+    // do not limit fps by default
+    harness_game_config.fps = 0;
 
     Harness_ProcessCommandLine(argc, argv);
 
@@ -246,17 +246,20 @@ void Harness_Hook_BrZbSceneRenderEnd() {
 }
 
 void Harness_Hook_MainGameLoop() {
+    if (harness_game_config.fps == 0) {
+        return;
+    }
+
     if (last_frame_time) {
         unsigned int frame_time = GetTotalTime() - last_frame_time;
 
         if (frame_time < 100) {
 
             int sleep_time = (1000 / harness_game_config.fps) - frame_time;
-            if (sleep_time > 0) {
+            if (sleep_time > 5) {
                 struct timespec ts;
                 ts.tv_sec = sleep_time / 1000;
                 ts.tv_nsec = (sleep_time % 1000) * 1000000;
-                printf("sleeping for %d ms\n", sleep_time);
                 nanosleep(&ts, &ts);
             }
         }

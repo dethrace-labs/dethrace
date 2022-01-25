@@ -2092,9 +2092,8 @@ void LoadHeadupImages() {
     tPath_name the_path;
     LOG_TRACE("()");
 
-    for (i = 0; i < 31; ++i) {
+    for (i = 0; i < COUNT_OF(gHeadup_image_info); i++) {
         PossibleService();
-
         if (gHeadup_image_info[i].avail && (gHeadup_image_info[i].avail != eNot_net || gNet_mode) && (gHeadup_image_info[i].avail != eNet_only || !gNet_mode)) {
             gHeadup_images[i] = NULL;
         } else {

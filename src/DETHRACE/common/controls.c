@@ -133,7 +133,7 @@ tU32 gPalette_fade_time; // was gRecover_timer
 char* gAbuse_text[10];
 char gString[84];
 int gToo_late;
-int gRecover_timer; // was
+int gRecover_timer;
 int gRecovery_voucher_count;
 int gInstant_handbrake;
 int gAuto_repair;
