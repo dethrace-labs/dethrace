@@ -3,6 +3,7 @@
 
 #include "brender/br_types.h"
 
+
 int FopWrite_VERTICES(br_datafile* df, br_vertex* vertices, int nvertices);
 
 int FopRead_VERTICES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count);

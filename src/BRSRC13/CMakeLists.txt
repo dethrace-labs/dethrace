@@ -170,6 +170,7 @@ target_sources(brender PRIVATE
     CORE/STD/logwrite.h
     CORE/V1DB/actsupt.c
     CORE/V1DB/actsupt.h
+    CORE/V1DB/chunkids.h
     CORE/V1DB/custsupt.c
     CORE/V1DB/custsupt.h
     CORE/V1DB/dbsetup.c
@@ -202,6 +203,7 @@ target_sources(brender PRIVATE
     CORE/V1DB/regsupt.h
     CORE/V1DB/render.c
     CORE/V1DB/render.h
+    CORE/V1DB/stackids.h
     CORE/V1DB/v1dbfile.c
     CORE/V1DB/v1dbfile.h
 )
