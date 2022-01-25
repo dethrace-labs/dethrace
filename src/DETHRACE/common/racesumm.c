@@ -350,5 +350,7 @@ void DoNetRaceSummary() {
 tSO_result DoEndRaceSummary(int* pFirst_summary_done, tRace_result pRace_result) {
     tSO_result result;
     LOG_TRACE("(%p, %d)", pFirst_summary_done, pRace_result);
-    NOT_IMPLEMENTED();
+
+    STUB();
+    return eSO_main_menu_invoked;
 }

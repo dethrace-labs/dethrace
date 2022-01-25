@@ -1,5 +1,6 @@
 #include "crush.h"
 #include "brender/brender.h"
+#include "globvars.h"
 #include "harness/trace.h"
 #include "loading.h"
 #include "utility.h"
@@ -215,7 +216,10 @@ void TotallyRepairACar(tCar_spec* pCar) {
 // IDA: void __cdecl TotallyRepairCar()
 void TotallyRepairCar() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (!gArrow_mode) {
+        TotallyRepairACar(&gProgram_state.current_car);
+    }
 }
 
 // IDA: void __cdecl CheckLastCar()

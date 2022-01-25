@@ -1103,7 +1103,6 @@ void ReadMechanicsData(FILE* pF, tCar_spec* c) {
     LOG_TRACE("(%p, %p)", pF, c);
 
     GetALineAndDontArgue(pF, s);
-    LOG_DEBUG("s %s", s);
     for (i = strlen(s) - 1; s[i] == ' '; --i) {
         ;
     }
@@ -1185,7 +1184,6 @@ void ReadMechanicsData(FILE* pF, tCar_spec* c) {
     c->mu[1] *= sqrt((c->wpos[0].v[2] - c->cmpos.v[2]) / (c->wpos[0].v[2] - c->wpos[2].v[2]) * (c->M * 5.0));
     c->mu[2] *= sqrt((c->wpos[2].v[2] - c->cmpos.v[2]) / (c->wpos[2].v[2] - c->wpos[0].v[2]) * (c->M * 5.0));
 
-    LOG_DEBUG("%f %f %f", c->mu[0], c->mu[1], c->mu[2]);
     for (i = 0; i < 4; ++i) {
         c->wpos[i].v[1] = c->ride_height;
     }
@@ -2094,7 +2092,7 @@ void LoadHeadupImages() {
     tPath_name the_path;
     LOG_TRACE("()");
 
-    for (i = 0; i < 31; ++i) {
+    for (i = 0; i < COUNT_OF(gHeadup_image_info); i++) {
         PossibleService();
         if (gHeadup_image_info[i].avail && (gHeadup_image_info[i].avail != eNot_net || gNet_mode) && (gHeadup_image_info[i].avail != eNet_only || !gNet_mode)) {
             gHeadup_images[i] = NULL;
@@ -2829,7 +2827,17 @@ void LoadOpponentsCars(tRace_info* pRace_info) {
 void DisposeOpponentsCars(tRace_info* pRace_info) {
     int i;
     LOG_TRACE("(%p)", pRace_info);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < pRace_info->number_of_racers; i++) {
+        PossibleService();
+        if (pRace_info->opponent_list[i].index >= 0) {
+            if (pRace_info->opponent_list[i].car_spec) {
+                DisposeCar(pRace_info->opponent_list[i].car_spec, pRace_info->opponent_list[i].index);
+                BrMemFree(pRace_info->opponent_list[i].car_spec);
+            }
+        }
+    }
+    ClearOutStorageSpace(&gTheir_cars_storage_space);
 }
 
 // IDA: void __cdecl LoadMiscStrings()
@@ -3045,7 +3053,7 @@ int TestForOriginalCarmaCDinDrive() {
     int paths_txt_first_char;
 
     // Jeff: Added to optionally bypass this check
-    if (harness_disable_cd_check) {
+    if (harness_game_config.disable_cd_check) {
         return 1;
     }
 

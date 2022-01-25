@@ -3,7 +3,9 @@
 #include "brender/brender.h"
 #include "car.h"
 #include "constants.h"
+#include "crush.h"
 #include "displays.h"
+#include "finteray.h"
 #include "flicplay.h"
 #include "globvars.h"
 #include "globvrkm.h"
@@ -15,11 +17,15 @@
 #include "mainloop.h"
 #include "netgame.h"
 #include "network.h"
+#include "opponent.h"
 #include "pd/sys.h"
 #include "pedestrn.h"
+#include "piping.h"
 #include "pratcam.h"
 #include "replay.h"
+#include "s3/s3sound.h"
 #include "sound.h"
+#include "spark.h"
 #include "structur.h"
 #include "utility.h"
 #include "world.h"
@@ -73,7 +79,7 @@ tToggle_element gToggle_array[] = {
 int gRepair_last_time;
 int gHad_auto_recover;
 tU32 gLast_repair_time;
-tEdit_mode gWhich_edit_mode;
+tEdit_mode gWhich_edit_mode = eEdit_mode_options;
 char* gEdit_mode_names[10];
 tEdit_func* gEdit_funcs[10][18][8];
 tCheat gKev_keys[44] = {
@@ -123,7 +129,7 @@ tCheat gKev_keys[44] = {
 };
 int gAllow_car_flying;
 int gEntering_message;
-tU32 gPalette_fade_time;
+tU32 gPalette_fade_time; // was gRecover_timer
 char* gAbuse_text[10];
 char gString[84];
 int gToo_late;
@@ -618,13 +624,16 @@ int CarWorldOffFallenCheckThingy(tCar_spec* pCar, int pCheck_around) {
     br_vector3 offset_w;
     int result;
     LOG_TRACE("(%p, %d)", pCar, pCheck_around);
-    NOT_IMPLEMENTED();
+
+    STUB_ONCE();
+    return 0;
 }
 
 // IDA: int __usercall HasCarFallenOffWorld@<EAX>(tCar_spec *pCar@<EAX>)
 int HasCarFallenOffWorld(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    return CarWorldOffFallenCheckThingy(pCar, 1);
 }
 
 // IDA: void __cdecl CheckForBeingOutOfThisWorld()
@@ -633,38 +642,124 @@ void CheckForBeingOutOfThisWorld() {
     static tU32 sLast_check;
     int time_step;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    the_time = PDGetTotalTime();
+
+    if (!gRecover_timer || ((gProgram_state.current_car.frame_collision_flag || gProgram_state.current_car.number_of_wheels_on_ground) && !IsCarInTheSea())) {
+        gRecover_timer = 0;
+        if ((the_time - sLast_check) > 200) {
+            sLast_check = the_time;
+            if (HasCarFallenOffWorld(&gProgram_state.current_car)) {
+                gRecover_timer = 3000;
+            }
+        }
+        if (IsCarInTheSea()) {
+            if (!gRecover_timer) {
+                gRecover_timer = 3000;
+            }
+        }
+        return;
+    }
+    gRecover_timer -= gFrame_period;
+    if (gRecover_timer <= 0 || IsCarInTheSea() == 2) {
+        gRecover_timer = 0;
+        RecoverCar();
+        gHad_auto_recover = 1;
+    }
 }
 
 // IDA: void __usercall CheckHornLocal(tCar_spec *pCar@<EAX>)
 void CheckHornLocal(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    STUB_ONCE();
 }
 
 // IDA: void __usercall CheckHorn3D(tCar_spec *pCar@<EAX>)
 void CheckHorn3D(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    STUB_ONCE();
 }
 
 // IDA: void __cdecl CheckHorns()
 void CheckHorns() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gNet_mode) {
+        for (i = 0; i < gNumber_of_net_players; ++i) {
+            CheckHorn3D(gNet_players[i].car);
+        }
+    } else {
+        CheckHornLocal(&gProgram_state.current_car);
+    }
 }
 
 // IDA: void __cdecl SetRecovery()
 void SetRecovery() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gRace_finished
+        || gProgram_state.current_car.knackered
+        || gWait_for_it
+        || gHad_auto_recover
+        || gPalette_fade_time) {
+        return;
+    }
+
+    if (gNet_mode == eNet_mode_none) {
+        gRecover_car = 1;
+        gRecover_timer = 0;
+        return;
+    }
+    if (gProgram_state.current_car.time_to_recover) {
+        if (GetRaceTime() + 600 >= gProgram_state.current_car.time_to_recover) {
+            NewTextHeadupSlot2(4, 0, 2000, -4, GetMiscString(242), 1);
+            gToo_late = 1;
+        } else {
+            gProgram_state.current_car.time_to_recover = 0;
+            NewTextHeadupSlot2(4, 0, 2000, -4, GetMiscString(125), 0);
+        }
+        return;
+    }
+    if (!CheckRecoverCost()) {
+        return;
+    }
+    if (gCurrent_net_game->type == eNet_game_type_foxy) {
+        if (gThis_net_player_index == gIt_or_fox) {
+            gProgram_state.current_car.time_to_recover = GetRaceTime() + 5000;
+            gRecover_timer = 0;
+            gToo_late = 0;
+            return;
+        }
+    } else {
+        if (gCurrent_net_game->type != eNet_game_type_tag) {
+            gProgram_state.current_car.time_to_recover = GetRaceTime() + 3000;
+            gRecover_timer = 0;
+            gToo_late = 0;
+            return;
+        }
+        if (gThis_net_player_index != gIt_or_fox) {
+            gProgram_state.current_car.time_to_recover = GetRaceTime() + 5000;
+            gRecover_timer = 0;
+            gToo_late = 0;
+            return;
+        }
+    }
+    gProgram_state.current_car.time_to_recover = GetRaceTime() + 1000;
+    gRecover_timer = 0;
+    gToo_late = 0;
 }
 
 // IDA: void __cdecl RecoverCar()
 void RecoverCar() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gNet_mode == eNet_mode_none || !gPalette_fade_time) {
+        gRecover_car = 1;
+    }
+    gProgram_state.current_car.time_to_recover = 0;
 }
 
 // IDA: void __cdecl CheckMapRenderMove()
@@ -674,7 +769,8 @@ void CheckMapRenderMove() {
     float old_x;
     float old_y;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    STUB_ONCE();
 }
 
 // IDA: void __usercall ExplodeCar(tCar_spec *pCar@<EAX>)
@@ -691,14 +787,47 @@ void CheckRecoveryOfCars(tU32 pEndFrameTime) {
     int time;
     char s[256];
     LOG_TRACE("(%d)", pEndFrameTime);
-    STUB_ONCE();
+
+    if (gProgram_state.current_car.time_to_recover) {
+        if (gProgram_state.current_car.knackered) {
+            gProgram_state.current_car.time_to_recover = 0;
+        } else {
+            time = (gProgram_state.current_car.time_to_recover - pEndFrameTime + 1000) / 1000;
+            sprintf(s, "%s %d %s", GetMiscString(97), time, time > 1 ? GetMiscString(99) : GetMiscString(98));
+            if (!gToo_late) {
+                NewTextHeadupSlot2(4, 0, 2000, -4, s, 0);
+            }
+            if (gProgram_state.current_car.time_to_recover <= pEndFrameTime) {
+                RecoverCar();
+            }
+        }
+    }
+    if (gNet_mode) {
+        for (i = 0; i < gNumber_of_net_players; i++) {
+            if (gThis_net_player_index != i && gNet_players[i].car->time_to_recover && gNet_players[i].car->time_to_recover <= pEndFrameTime) {
+                gNet_players[i].player_status = ePlayer_status_recovering;
+                gNet_players[i].car->message.type = 32;
+                gNet_players[i].car->message.time = pEndFrameTime;
+                ExplodeCar(gNet_players[i].car);
+                gNet_players[i].car->time_to_recover = 0;
+            }
+        }
+    }
 }
 
 // IDA: void __usercall LoseSomePSPowerups(int pNumber@<EAX>)
 void LoseSomePSPowerups(int pNumber) {
     int index;
     LOG_TRACE("(%d)", pNumber);
-    NOT_IMPLEMENTED();
+
+    if (gNet_mode && pNumber > 0) {
+        while (pNumber--) {
+            index = IRandomBetween(0, 2);
+            if (gProgram_state.current_car.power_up_levels[index]) {
+                gProgram_state.current_car.power_up_levels[index]--;
+            }
+        }
+    }
 }
 
 // IDA: void __cdecl CheckOtherRacingKeys()
@@ -722,13 +851,158 @@ void CheckOtherRacingKeys() {
     static int stopped_repairing;
     LOG_TRACE("()");
 
-    STUB_ONCE();
+    car = GetCarSpec(eVehicle_self, 0);
+    CheckMapRenderMove();
+    CheckHorns();
+    CheckForBeingOutOfThisWorld();
+    if (gPalette_fade_time) {
+        SortOutRecover(car);
+    } else if (gNet_mode && NetGetPlayerStatus() == ePlayer_status_recovering) {
+        NetPlayerStatusChanged(ePlayer_status_racing);
+    }
+    if ((!gAuto_repair && !KeyIsDown(44))
+        || gRace_finished
+        || gProgram_state.current_car.knackered
+        || gWait_for_it
+        || gEntering_message) {
+        gRepair_last_time = 0;
+        stopped_repairing = 0;
+        total_repair_cost = 0;
+        total_difference = 0;
+        if (sound_tag) {
+            for (i = 0; i < 10 && S3SoundStillPlaying(sound_tag); ++i) {
+                DRS3StopSound(sound_tag);
+            }
+            sound_tag = 0;
+        }
+    } else {
+        if (!gAuto_repair && !gRepair_last_time && GetTotalTime() - gLast_repair_time < 1200) {
+            gAuto_repair = 1;
+        }
+        gLast_repair_time = GetTotalTime();
+        gRepair_last_time = 1;
+        if (!NeedToExpandBoundingBox) {
+            if (gFree_repairs
+                || gNet_mode == eNet_mode_none
+                || gProgram_state.credits_earned - gProgram_state.credits_lost >= 1) {
+                bodywork_repair_amount = RepairCar(gProgram_state.current_car.car_ID, gFrame_period, &amount);
+                NeedToExpandBoundingBox = bodywork_repair_amount > 0;
+                cost = 0;
+                for (j = 0; j < COUNT_OF(gProgram_state.current_car.damage_units); j++) {
+                    old_level = gProgram_state.current_car.damage_units[j].damage_level;
+                    if (amount == 0.0) {
+                        new_level = 0;
+                    } else {
+                        new_level = ((double)gProgram_state.current_car.damage_units[j].damage_level
+                            - floor(bodywork_repair_amount / amount * (double)gProgram_state.current_car.damage_units[j].damage_level));
+                    }
+                    if (new_level >= 0) {
+                        if (new_level < 100) {
+                            gProgram_state.current_car.damage_units[j].damage_level = new_level;
+                        } else {
+                            gProgram_state.current_car.damage_units[j].damage_level = 99;
+                        }
+                    } else {
+                        gProgram_state.current_car.damage_units[j].damage_level = 0;
+                    }
+                    gProgram_state.current_car.damage_units[j].smoke_last_level = gProgram_state.current_car.damage_units[j].damage_level;
+                    if (gNet_mode) {
+                        ts = gNet_repair_cost[gCurrent_net_game->type];
+                    } else {
+                        ts = gRepair_cost[gProgram_state.skill_level];
+                    }
+                    cost = (old_level - gProgram_state.current_car.damage_units[j].damage_level) * ts + cost;
+                    total_difference += old_level - new_level;
+                }
+                if (!gFree_repairs) {
+                    LoseSomePSPowerups(total_difference / 100);
+                }
+                total_difference %= 100;
+                cost = 10 * (cost / 10);
+                if (((!total_repair_cost && cost) || bodywork_repair_amount != 0.0) && !sound_tag) {
+                    sound_tag = DRS3StartSound(gIndexed_outlets[1], 5200);
+                }
+                if (gProgram_state.current_car.num_smoke_columns) {
+                    StopCarSmoking(&gProgram_state.current_car);
+                }
+                if (!cost && bodywork_repair_amount == 0.0) {
+                    gAuto_repair = 0;
+                }
+                if (!gFree_repairs) {
+                    cost += SpendCredits(cost);
+                }
+                total_repair_cost += cost;
+                if (total_repair_cost) {
+                    if (gFree_repairs) {
+                        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(4));
+                    } else {
+                        sprintf(s, "%s %d", GetMiscString(5), total_repair_cost);
+                        NewTextHeadupSlot(4, 0, 1000, -4, s);
+                    }
+                }
+            } else {
+                if (!stopped_repairing) {
+                    NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(95));
+                }
+                gAuto_repair = 0;
+                stopped_repairing = 1;
+            }
+        }
+    }
+    if (NeedToExpandBoundingBox) {
+        NeedToExpandBoundingBox = ExpandBoundingBox(&gProgram_state.current_car) == 0;
+    }
+    if (!gRecover_car || gProgram_state.current_car.knackered) {
+        gHad_auto_recover = 0;
+    } else if (CheckRecoverCost()) {
+        gRecover_timer = 0;
+        SetFlipUpCar(car);
+        if (gNet_mode) {
+            NewTextHeadupSlot(4, 0, 1500, -4, " ");
+        }
+        if (gRecovery_voucher_count) {
+            gRecovery_voucher_count--;
+            sprintf(s, "%s", GetMiscString(48));
+            NewTextHeadupSlot(4, 0, 1500, -4, s);
+        } else {
+            if (gNet_mode) {
+                cost = gNet_recovery_cost[gCurrent_net_game->type];
+            } else {
+                cost = gRecovery_cost[gProgram_state.skill_level];
+            }
+            SpendCredits(cost);
+            if (gNet_mode) {
+                cost = gNet_recovery_cost[gCurrent_net_game->type];
+            } else {
+                cost = gRecovery_cost[gProgram_state.skill_level];
+            }
+            sprintf(s, "%s %d", GetMiscString(7), cost);
+            NewTextHeadupSlot(4, 0, 1500, -4, s);
+            LoseSomePSPowerups(2);
+        }
+        CancelPendingCunningStunt();
+        PipeSingleSpecial(ePipe_special_fade);
+    }
+    gRecover_car = 0;
 }
 
 // IDA: int __cdecl CheckRecoverCost()
 int CheckRecoverCost() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gProgram_state.current_car.knackered
+        || gNet_mode == eNet_mode_none
+        || (gProgram_state.credits_earned - gProgram_state.credits_lost) >= gNet_recovery_cost[gCurrent_net_game->type]
+        || gRecovery_voucher_count) {
+        return 1;
+    }
+    gProgram_state.credits_earned = 0;
+    gProgram_state.credits_lost = 0;
+    NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(96));
+    DoFancyHeadup(18);
+    KnackerThisCar(&gProgram_state.current_car);
+    SendGameplayToHost(eNet_gameplay_suicide, 0, 0, 0, 0);
+    return 0;
 }
 
 // IDA: void __usercall SortOutRecover(tCar_spec *pCar@<EAX>)
@@ -743,7 +1017,14 @@ void SortOutRecover(tCar_spec* pCar) {
 // IDA: void __usercall SetFlipUpCar(tCar_spec *pCar@<EAX>)
 void SetFlipUpCar(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    if (gNet_mode && pCar->driver == eDriver_local_human) {
+        DisableCar(pCar);
+        gPalette_fade_time = GetRaceTime();
+        NetPlayerStatusChanged(ePlayer_status_recovering);
+    } else {
+        FlipUpCar(pCar);
+    }
 }
 
 // IDA: void __usercall FlipUpCar(tCar_spec *car@<EAX>)
@@ -759,7 +1040,97 @@ void FlipUpCar(tCar_spec* car) {
     br_material* material;
     br_scalar t;
     LOG_TRACE("(%p)", car);
-    NOT_IMPLEMENTED();
+
+    count = 0;
+    if (car->driver == eDriver_local_human && gNet_mode == eNet_mode_none) {
+        FadePaletteDown();
+        while (KeyIsDown(44)) {
+            ;
+        }
+    }
+    car->doing_nothing_flag = 0;
+    EnableCar(car);
+    new_pos = 1;
+    for (i = 0; i < 4; ++i) {
+        if (car->susp_height[i >> 1] <= car->oldd[i]) {
+            new_pos = 0;
+        }
+    }
+    do {
+        tv.v[0] = car->car_master_actor->t.t.mat.m[3][0] - car->last_safe_positions[0].m[3][0];
+        tv.v[1] = car->car_master_actor->t.t.mat.m[3][1] - car->last_safe_positions[0].m[3][1];
+        tv.v[2] = car->car_master_actor->t.t.mat.m[3][2] - car->last_safe_positions[0].m[3][2];
+        if (BrVector3LengthSquared(&tv) > 8.3015966) {
+            new_pos = 0;
+        }
+        BrMatrix34Copy(&car->car_master_actor->t.t.mat, &car->last_safe_positions[new_pos]);
+        BrMatrix34Copy(&car->oldmat, &car->last_safe_positions[new_pos]);
+        BrMatrix34Copy(&car->old_frame_mat, &car->oldmat);
+        car->oldmat.m[3][0] = car->oldmat.m[3][0] * WORLD_SCALE;
+        car->oldmat.m[3][1] = car->oldmat.m[3][1] * WORLD_SCALE;
+        car->oldmat.m[3][2] = car->oldmat.m[3][2] * WORLD_SCALE;
+        dir.v[0] = 0.0;
+        dir.v[1] = 0.28985506;
+        dir.v[2] = 0.0;
+        FindFace(&car->car_master_actor->t.t.euler.t, &dir, &tv, &t, &material);
+        if (t > 1.0) {
+            car->car_master_actor->t.t.mat.m[3][0] += dir.v[0];
+            car->car_master_actor->t.t.mat.m[3][1] += dir.v[1];
+            car->car_master_actor->t.t.mat.m[3][2] += dir.v[2];
+            car->oldmat.m[3][0] = car->car_master_actor->t.t.mat.m[3][0] * WORLD_SCALE;
+            car->oldmat.m[3][1] = car->car_master_actor->t.t.mat.m[3][1] * WORLD_SCALE;
+            car->oldmat.m[3][2] = car->car_master_actor->t.t.mat.m[3][2] * WORLD_SCALE;
+            car->old_frame_mat.m[3][0] = car->car_master_actor->t.t.mat.m[3][0];
+            car->old_frame_mat.m[3][1] = car->car_master_actor->t.t.mat.m[3][1];
+            car->old_frame_mat.m[3][2] = car->car_master_actor->t.t.mat.m[3][2];
+        }
+        tv.v[0] = 0.0;
+        tv.v[1] = 0.0;
+        tv.v[2] = -0.001;
+        BrMatrix34ApplyV(&car->v, &tv, &car->car_master_actor->t.t.mat);
+        car->omega.v[0] = 0.0;
+        car->omega.v[1] = 0.0;
+        car->omega.v[2] = 0.0;
+        car->direction.v[0] = -car->oldmat.m[2][0];
+        car->direction.v[1] = -car->oldmat.m[2][1];
+        car->direction.v[2] = -car->oldmat.m[2][2];
+        for (i = 0; i <= new_pos; i++) {
+            for (j = 0; j < 4; j++) {
+                BrMatrix34Copy(&car->last_safe_positions[j], &car->last_safe_positions[j + 1]);
+            }
+        }
+        for (l = 0; l < 10; l++) {
+            BrVector3Scale(&car->old_norm, &car->old_norm, 0.072463766);
+            BrMatrix34ApplyV(&tv, &car->old_norm, &car->car_master_actor->t.t.mat);
+            car->car_master_actor->t.t.mat.m[3][0] = car->car_master_actor->t.t.mat.m[3][0] + tv.v[0];
+            car->car_master_actor->t.t.mat.m[3][1] = car->car_master_actor->t.t.mat.m[3][1] + tv.v[1];
+            car->car_master_actor->t.t.mat.m[3][2] = car->car_master_actor->t.t.mat.m[3][2] + tv.v[2];
+            car->oldmat.m[3][0] = car->car_master_actor->t.t.mat.m[3][0] * WORLD_SCALE;
+            car->oldmat.m[3][1] = car->car_master_actor->t.t.mat.m[3][1] * WORLD_SCALE;
+            car->oldmat.m[3][2] = car->car_master_actor->t.t.mat.m[3][2] * WORLD_SCALE;
+            car->old_frame_mat.m[3][0] = car->car_master_actor->t.t.mat.m[3][0];
+            car->old_frame_mat.m[3][1] = car->car_master_actor->t.t.mat.m[3][1];
+            car->old_frame_mat.m[3][2] = car->car_master_actor->t.t.mat.m[3][2];
+            if (TestForCarInSensiblePlace(car)) {
+                break;
+            }
+        }
+        count++;
+    } while (l == 10 && count < 3);
+    car->oldmat.m[3][0] = car->car_master_actor->t.t.mat.m[3][0] * WORLD_SCALE;
+    car->oldmat.m[3][1] = car->car_master_actor->t.t.mat.m[3][1] * WORLD_SCALE;
+    car->oldmat.m[3][2] = car->car_master_actor->t.t.mat.m[3][2] * WORLD_SCALE;
+    car->curvature = 0.0;
+    for (j = 0; j < 4; ++j) {
+        car->oldd[j] = car->ride_height;
+    }
+    car->revs = 0.0;
+    car->gear = 0;
+    car->auto_special_volume = 0;
+    if (car->driver == eDriver_local_human) {
+        InitialiseExternalCamera();
+        PositionExternalCamera(car, 100u);
+    }
 }
 
 // IDA: void __usercall GetPowerup(int pNum@<EAX>)
@@ -1067,6 +1438,8 @@ int HornBlowing() {
 void ToggleArrow() {
     static br_actor* old_actor;
     LOG_TRACE("()");
+
+    return;
 
     if (gArrow_mode) {
         gProgram_state.current_car.car_model_actors[gProgram_state.current_car.principal_car_actor].actor = old_actor;

@@ -135,6 +135,8 @@ br_device_pixelmap* DevicePixelmapMemAllocate(br_uint_8 type, br_uint_16 w, br_u
     //pm->pm_row_bytes = (v11 - (__CFSHL__(v11 >> 31, 3) + 8 * (v11 >> 31))) >> 3;
     // TODO: calculate this differently
     pm->pm_row_bytes = w;
+    pm->pm_row_bytes = tip->bits * tip->align * ((w + tip->align - 1) / tip->align) / 8;
+
     if ((8 * pm->pm_row_bytes % tip->bits) == 0) {
         pm->pm_flags |= BR_PMF_ROW_WHOLEPIXELS;
     }

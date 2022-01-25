@@ -338,7 +338,8 @@ void PipeSingleDamage(int pCar_ID, tS8* pDifferences) {
 // IDA: void __usercall PipeSingleSpecial(tSpecial_type pType@<EAX>)
 void PipeSingleSpecial(tSpecial_type pType) {
     LOG_TRACE("(%d)", pType);
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __usercall PipeSinglePedGib(int pIndex@<EAX>, br_matrix34 *pTrans@<EDX>, int pSize@<EBX>, int pGib_index@<ECX>, int pPed_index)
@@ -411,7 +412,8 @@ void InitialisePiping() {
 // IDA: void __cdecl DisposePiping()
 void DisposePiping() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __cdecl InitLastDamageArrayEtc()

@@ -1,5 +1,6 @@
 #include "structur.h"
 #include "car.h"
+#include "controls.h"
 #include "crush.h"
 #include "cutscene.h"
 #include "displays.h"
@@ -17,8 +18,10 @@
 #include "mainloop.h"
 #include "mainmenu.h"
 #include "netgame.h"
+#include "network.h"
 #include "opponent.h"
 #include "piping.h"
+#include "pratcam.h"
 #include "racestrt.h"
 #include "racesumm.h"
 #include "sound.h"
@@ -66,7 +69,60 @@ int NumberOfOpponentsLeft() {
 // IDA: void __usercall RaceCompleted(tRace_over_reason pReason@<EAX>)
 void RaceCompleted(tRace_over_reason pReason) {
     LOG_TRACE("(%d)", pReason);
-    NOT_IMPLEMENTED();
+
+    if (!gRace_finished) {
+        if (gNet_mode == eNet_mode_host && pReason < eRace_over_network_victory) {
+            NetFinishRace(gCurrent_net_game, pReason);
+        }
+        if (pReason == eRace_over_out_of_time || pReason == eRace_over_demo) {
+            ChangeAmbientPratcam(35);
+        } else if (pReason < eRace_over_abandoned) {
+            ChangeAmbientPratcam(34);
+        }
+        gRace_over_reason = pReason;
+        if (gMap_mode) {
+            ToggleMap();
+        }
+        switch (gRace_over_reason) {
+        case eRace_over_laps:
+        case eRace_over_peds:
+        case eRace_over_opponents:
+            ChangeAmbientPratcam(34);
+            DoFancyHeadup(14);
+            DRS3StartSound(gIndexed_outlets[4], 8011);
+            break;
+        case eRace_over_abandoned:
+            if (gNet_mode == eNet_mode_client) {
+                gHost_abandon_game = 1;
+                NetFullScreenMessage(87, 0);
+            }
+            break;
+        case eRace_over_out_of_time:
+            ChangeAmbientPratcam(35);
+            DoFancyHeadup(13);
+            DRS3StartSound(gIndexed_outlets[4], 8010);
+            break;
+        case eRace_over_demo:
+            ChangeAmbientPratcam(35);
+            DoFancyHeadup(21);
+            break;
+        case eRace_over_network_victory:
+            ChangeAmbientPratcam(34);
+            DoFancyHeadup(20);
+            break;
+        case eRace_over_network_loss:
+            ChangeAmbientPratcam(36);
+            DoFancyHeadup(17);
+            break;
+        default:
+            break;
+        }
+        if (gNet_mode) {
+            gRace_finished = 8000;
+        } else {
+            gRace_finished = 4000;
+        }
+    }
 }
 
 // IDA: void __usercall Checkpoint(int pCheckpoint_index@<EAX>, int pDo_sound@<EDX>)

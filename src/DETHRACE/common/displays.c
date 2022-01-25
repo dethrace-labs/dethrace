@@ -1176,7 +1176,19 @@ void EarnCredits(int pAmount) {
 int SpendCredits(int pAmount) {
     int amount;
     LOG_TRACE("(%d)", pAmount);
-    NOT_IMPLEMENTED();
+
+    LOG_DEBUG("spending");
+
+    gProgram_state.credits_lost += pAmount;
+    if (gNet_mode == eNet_mode_none) {
+        return 0;
+    }
+    amount = gProgram_state.credits_earned - gProgram_state.credits_lost;
+    if (gProgram_state.credits_earned - gProgram_state.credits_lost >= 0) {
+        return 0;
+    }
+    gProgram_state.credits_lost = gProgram_state.credits_earned;
+    return amount;
 }
 
 // IDA: void __usercall AwardTime(tU32 pTime@<EAX>)

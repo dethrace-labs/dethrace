@@ -237,6 +237,7 @@ typedef enum keycodes {
 } keycodes;
 
 typedef enum keymapcodes {
+    KEYMAP_ESCAPE = 0,
     KEYMAP_Q = 1,
     KEYMAP_S = 2,
     KEYMAP_L = 3,
@@ -287,8 +288,6 @@ typedef enum keymapcodes {
 #define ONEEIGHTTWO 182.0444444444444
 
 #define d180_OVER_PI 57.29577951308232 // (180 / PI)
-
-#define PHYSICS_STEP_TIME 40.0
 
 #define DR_PI 3.141592653589793
 

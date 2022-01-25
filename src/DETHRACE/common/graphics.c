@@ -9,6 +9,7 @@
 #include "globvars.h"
 #include "globvrpb.h"
 #include "grafdata.h"
+#include "harness/hooks.h"
 #include "harness/trace.h"
 #include "init.h"
 #include "loading.h"
@@ -882,7 +883,6 @@ void RenderAFrame(int pDepth_mask_on) {
     static int frame_counter;
 
     frame_counter++;
-    //LOG_DEBUG("%d", frame_counter);
 
     gRender_screen->pixels = gBack_screen->pixels;
     the_time = GetTotalTime();
@@ -1184,7 +1184,7 @@ void RenderAFrame(int pDepth_mask_on) {
         PipeFrameFinish();
     }
     gRender_screen->pixels = old_pixels;
-    if (!gRecover_timer || GetRaceTime() > gRecover_timer + 500) {
+    if (!gPalette_fade_time || GetRaceTime() > gPalette_fade_time + 500) {
         PDScreenBufferSwap(0);
     }
     if (gAction_replay_mode) {
@@ -1238,7 +1238,7 @@ void ResetPalette() {
 // IDA: void __usercall Darken(tU8 *pPtr@<EAX>, unsigned int pDarken_amount@<EDX>)
 void Darken(tU8* pPtr, unsigned int pDarken_amount) {
     unsigned int value;
-    //LOG_TRACE("(%p, %d)", pPtr, pDarken_amount);
+    LOG_TRACE10("(%p, %d)", pPtr, pDarken_amount);
 
     *pPtr = (pDarken_amount * *pPtr) / 256;
 }
@@ -1247,8 +1247,10 @@ void Darken(tU8* pPtr, unsigned int pDarken_amount) {
 void SetFadedPalette(int pDegree) {
     int j;
     br_pixelmap* the_palette;
-    unsigned char* the_pixels; //Jeff added unsigned
+    char* the_pixels;
     LOG_TRACE10("(%d)", pDegree);
+
+    Harness_Hook_SetFadedPalette(pDegree);
 
     memcpy(gScratch_pixels, gCurrent_palette->pixels, 0x400u);
     for (j = 0; j < 256; j++) {
@@ -1265,6 +1267,7 @@ void FadePaletteDown() {
     int i;
     int start_time;
     int the_time;
+    LOG_TRACE("()");
 
     if (!gFaded_palette) {
         gFaded_palette = 1;
@@ -1289,6 +1292,7 @@ void FadePaletteUp() {
     int i;
     int start_time;
     int the_time;
+    LOG_TRACE("()");
 
     if (gFaded_palette) {
         gFaded_palette = 0;
@@ -2019,7 +2023,8 @@ void SaveShadeTables() {
 void DisposeSavedShadeTables() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __cdecl ShadowMode()
