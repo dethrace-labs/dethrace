@@ -257,10 +257,7 @@ void Harness_Hook_MainGameLoop() {
 
             int sleep_time = (1000 / harness_game_config.fps) - frame_time;
             if (sleep_time > 5) {
-                struct timespec ts;
-                ts.tv_sec = sleep_time / 1000;
-                ts.tv_nsec = (sleep_time % 1000) * 1000000;
-                nanosleep(&ts, &ts);
+                SDL_Delay(sleep_time);
             }
         }
     }
