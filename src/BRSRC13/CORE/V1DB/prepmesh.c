@@ -220,8 +220,18 @@ void SmoothingCreased(br_model* model, br_scalar crease_limit, prep_vertex** sta
     br_vector3 o_n;
     prep_vertex** outer;
     prep_vertex** inner;
-    LOG_TRACE("(%p, %f, %p, %p)", model, crease_limit, start, end);
-    NOT_IMPLEMENTED();
+    LOG_TRACE9("(%p, %f, %p, %p)", model, crease_limit, start, end);
+
+    for (outer = start; outer < end; outer++) {
+        o_n.v[0] = model->faces[(*outer)->f].n.v[0];
+        o_n.v[1] = model->faces[(*outer)->f].n.v[1];
+        o_n.v[2] = model->faces[(*outer)->f].n.v[2];
+        for (inner = start; inner < end; inner++) {
+            if ((inner == outer) || ((model->faces[(*outer)->f].smoothing & model->faces[(*inner)->f].smoothing) && (BrVector3Dot((br_vector3*)&model->faces[(*inner)->f].n, &o_n) > crease_limit))) {
+                BrVector3Accumulate(&(*outer)->n, (br_vector3*)&model->faces[(*inner)->f].n);
+            }
+        }
+    }
 }
 
 // IDA: void __usercall CopyVertex(v11group *group@<EAX>, int v@<EDX>, prep_vertex *src@<EBX>, br_model *model@<ECX>)
@@ -231,7 +241,6 @@ void CopyVertex(v11group* group, int v, prep_vertex* src, br_model* model) {
     LOG_TRACE9("(%p, %d, %p, %p)", group, v, src, model);
 
     srcv = model->vertices + src->v;
-    br_vector3 temp;
 
     group->vertices[v].p.v[0] = srcv->p.v[0] - model->pivot.v[0];
     group->vertices[v].p.v[1] = srcv->p.v[1] - model->pivot.v[1];
@@ -532,7 +541,16 @@ void RegenerateFaceNormals(v11model* v11m) {
     int f;
     v11face* fp;
     LOG_TRACE("(%p)", v11m);
-    NOT_IMPLEMENTED();
+
+    for (g = 0; g < v11m->ngroups; g++) {
+        for (f = 0; f < v11m->groups[g].nfaces; f++) {
+            fp = &v11m->groups[g].faces[f];
+            BrPlaneEquation(&fp->eqn,
+                &v11m->groups->vertices[fp->vertices[0]].p,
+                &v11m->groups->vertices[fp->vertices[1]].p,
+                &v11m->groups->vertices[fp->vertices[2]].p);
+        }
+    }
 }
 
 // IDA: void __usercall RegenerateVertexNormals(v11model *v11m@<EAX>)
@@ -544,7 +562,30 @@ void RegenerateVertexNormals(v11model* v11m) {
     fmt_vertex* vp;
     br_vector3* normals;
     LOG_TRACE("(%p)", v11m);
-    NOT_IMPLEMENTED();
+
+    for (g = 0; g < v11m->ngroups; g++) {
+        normals = BrScratchAllocate(v11m->groups[g].nvertices * sizeof(br_vector3));
+        BrMemSet(normals, 0, v11m->groups[g].nvertices * sizeof(br_vector3));
+        for (f = 0; f < v11m->groups[g].nfaces; f++) {
+            fp = &v11m->groups[g].faces[f];
+            normals[fp->vertices[0]].v[0] += fp->eqn.v[0];
+            normals[fp->vertices[0]].v[1] += fp->eqn.v[1];
+            normals[fp->vertices[0]].v[2] += fp->eqn.v[2];
+            normals[fp->vertices[1]].v[0] += fp->eqn.v[0];
+            normals[fp->vertices[1]].v[1] += fp->eqn.v[1];
+            normals[fp->vertices[1]].v[2] += fp->eqn.v[2];
+            normals[fp->vertices[2]].v[0] += fp->eqn.v[0];
+            normals[fp->vertices[2]].v[1] += fp->eqn.v[1];
+            normals[fp->vertices[2]].v[2] += fp->eqn.v[2];
+        }
+        for (v = 0; v < v11m->groups[g].nvertices; v++) {
+            vp = &v11m->groups[g].vertices[v];
+            // FIXME: use inlined variant? BR_VECTOR3_NORMALISE (unsure about exact naming)
+            BrVector3Normalise(&vp->n, &normals[v]);
+        }
+
+        BrScratchFree(normals);
+    }
 }
 
 // IDA: void __cdecl BrModelUpdate(br_model *model, br_uint_16 flags)
@@ -698,11 +739,12 @@ void BrModelUpdate(br_model* model, br_uint_16 flags) {
 void BrModelClear(br_model* model) {
     LOG_TRACE("(%p)", model);
 
-    if (model->prepared) {
+    // remove prepared mesh
+    if (model->prepared != NULL) {
         BrResFree(model->prepared);
         model->prepared = NULL;
     }
-    if (model->stored) {
+    if (model->stored != NULL) {
         ((br_object*)model->stored)->dispatch->_free((br_object*)model->stored);
         model->stored = NULL;
     }
