@@ -111,22 +111,22 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
         if (strcasecmp(argv[i], "--cdcheck") == 0) {
             harness_game_config.disable_cd_check = 0;
             handled = 1;
-        } else if (strstr(argv[i], "--debug ") != NULL) {
-            char* s = strstr(argv[i], " ");
+        } else if (strstr(argv[i], "--debug=") != NULL) {
+            char* s = strstr(argv[i], "=");
             harness_debug_level = atoi(s + 1);
             LOG_INFO("debug level set to %d", harness_debug_level);
             handled = 1;
-        } else if (strstr(argv[i], "--platform ") != NULL) {
-            platform_name = strstr(argv[i], " ") + 1;
+        } else if (strstr(argv[i], "--platform=") != NULL) {
+            platform_name = strstr(argv[i], "=") + 1;
             LOG_INFO("Platform set to: %s", platform_name);
             handled = 1;
-        } else if (strstr(argv[i], "--physics-step-time ") != NULL) {
-            char* s = strstr(argv[i], " ");
+        } else if (strstr(argv[i], "--physics-step-time=") != NULL) {
+            char* s = strstr(argv[i], "=");
             harness_game_config.physics_step_time = atof(s + 1);
             LOG_INFO("Physics step time set to %f", harness_game_config.physics_step_time);
             handled = 1;
-        } else if (strstr(argv[i], "--fps ") != NULL) {
-            char* s = strstr(argv[i], " ");
+        } else if (strstr(argv[i], "--fps=") != NULL) {
+            char* s = strstr(argv[i], "=");
             harness_game_config.fps = atoi(s + 1);
             LOG_INFO("FPS limiter set to %f", harness_game_config.fps);
             handled = 1;
