@@ -42,6 +42,7 @@ target_sources(dethrace_test PRIVATE
     BRSRC13/test_pmfile.c
     BRSRC13/test_quat.c
     BRSRC13/test_lexer.c
+    BRSRC13/test_logwrite.c
     BRSRC13/test_matrix23.c
     BRSRC13/test_matrix34.c
     BRSRC13/test_matrix4

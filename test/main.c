@@ -52,6 +52,7 @@ extern void test_pattern_suite();
 extern void test_pmfile_suite();
 extern void test_fixed_suite();
 extern void test_lexer_suite();
+extern void test_logwrite_suite();
 extern void test_matrix23_suite();
 extern void test_matrix34_suite();
 extern void test_matrix4_suite();
@@ -254,6 +255,7 @@ int main(int argc, char** argv) {
     test_vector_suite();
     test_quat_suite();
     test_fixed_suite();
+    test_logwrite_suite();
 
     test_assocarr_suite();
     test_brlists_suite();
