@@ -127,7 +127,6 @@ br_resource_class* BrResClassAdd(br_resource_class* rclass);
 void BrResFree(void* vres);
 char* BrResStrDup(void* vparent, char* str);
 
-br_uint_32 BrSwap32(br_uint_32 l);
 
 // BrTable
 br_pixelmap* BrTableAdd(br_pixelmap* pixelmap);
@@ -141,7 +140,7 @@ br_uint_32 BrTableEnum(char* pattern, br_table_enum_cbfn* callback, void* arg);
 void BrTransformToMatrix34(br_matrix34* mat, br_transform* xform);
 
 // BrV1db
-void BrV1dbBeginWrapper_Float();
+void BrV1dbBeginWrapper_Float(void);
 
 // BrVector3
 // void BrVector3Cross(br_vector3* v1, br_vector3* v2, br_vector3* v3);
@@ -159,8 +158,12 @@ void BrZbBegin(br_uint_8 colour_type, br_uint_8 depth_type);
 
 void BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer);
 void BrZbSceneRenderAdd(br_actor* tree);
-void BrZbSceneRenderEnd();
+void BrZbSceneRenderEnd(void);
 
 br_pixelmap* DOSGfxBegin(char* setup_string);
+
+// Various
+int BrWriteModeSet(int mode);
+br_uint_32 BrSwap32(br_uint_32 l);
 
 #endif
