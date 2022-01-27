@@ -2653,7 +2653,7 @@ static const br_uint_32 chunk_length_ref = 0x100;
 static const uint8_t binary_chunk_data[] = { BINARY_MAGICS, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x01, 0x00, };
 static const char *text_chunk_data =
     TEXT_MAGICS HOST_NL
-    "*PIXELMAP         256" HOST_NL;
+    "*PIXELMAP_OLD     256" HOST_NL;
 static void test_datafile_binary_chunk() {
     br_datafile* df_w;
     br_datafile* df_r;

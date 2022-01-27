@@ -1,5 +1,7 @@
 add_library(brender STATIC)
 
+option(BRENDER_FIX_BUGS "Fix BRender bugs" ON)
+
 target_include_directories(brender 
     PRIVATE 
         .
@@ -30,6 +32,9 @@ else()
         /wd4101
         /wd4996
     )
+endif()
+if(BRENDER_FIX_BUGS)
+    target_compile_definitions(brender PRIVATE BRENDER_FIX_BUGS)
 endif()
 
 target_sources(brender PRIVATE

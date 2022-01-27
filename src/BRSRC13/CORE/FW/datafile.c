@@ -145,11 +145,19 @@ struct {
     int count;
 } DatafileStack[1024];
 
+#ifdef BRENDER_FIX_BUGS
+char* ChunkNames[62] = {
+#else
 char* ChunkNames[61] = {
+#endif
     "END",
     "IMAGE_PLANE",
     "RLE_IMAGE_PLANE",
+#ifdef BRENDER_FIX_BUGS
+    "PIXELMAP_OLD",
+#else
     "PIXELMAP",
+#endif
     "MATERIAL_OLD",
     "ADD_MATERIAL",
     "OLD_ACTOR",
@@ -206,7 +214,12 @@ char* ChunkNames[61] = {
     "SATURN_FACES",
     "SATURN_MODEL",
     "INDEX_FOG_REF",
+#ifdef BRENDER_FIX_BUGS
+    "MATERIAL",
+    "PIXELMAP",
+#else
     "MATERIAL_OLD",
+#endif
 };
 
 int DatafileStackTop;
@@ -266,7 +279,7 @@ int DfTopType() {
 // IDA: int __usercall TextReadLine@<EAX>(br_datafile *df@<EAX>, char **ident@<EDX>, char **data@<EBX>)
 int TextReadLine(br_datafile* df, char** ident, char** data) {
     char* cp;
-    LOG_TRACE("(%p, %p, %p)", df, ident, data);
+    LOG_TRACE9("(%p, %p, %p)", df, ident, data);
 
     while (1) {
         cp = BrScratchString();
@@ -690,7 +703,7 @@ int DfStructSizeBinary(br_datafile* df, br_file_struct* str, void* base) {
 // IDA: int __usercall EnumFromString@<EAX>(br_file_enum *e@<EAX>, char *str@<EDX>)
 int EnumFromString(br_file_enum* e, char* str) {
     unsigned int m;
-    LOG_TRACE("(%p, \"%s\")", e, str);
+    LOG_TRACE9("(%p, \"%s\")", e, str);
 
     if (e == NULL) {
         BrFailure("Unknown enum string: %s", str);
@@ -706,7 +719,7 @@ int EnumFromString(br_file_enum* e, char* str) {
 // IDA: char* __usercall EnumToString@<EAX>(br_file_enum *e@<EAX>, int num@<EDX>)
 char* EnumToString(br_file_enum* e, int num) {
     unsigned int m;
-    LOG_TRACE("(%p, %d)", e, num);
+    LOG_TRACE9("(%p, %d)", e, num);
 
     if (e == NULL) {
         goto fail;
@@ -860,7 +873,7 @@ br_uint_32 StructWriteTextSub(br_datafile* df, br_file_struct* str, void* base, 
 br_uint_32 DfStructReadText(br_datafile* df, br_file_struct* str, void* base) {
     char* id;
     char* data;
-    LOG_TRACE("(%p, %p, %p)", df, str, base);
+    LOG_TRACE9("(%p, %p, %p)", df, str, base);
 
     TextReadLine(df, &id, &data);
     if (BrStrCmp(id, "struct") != 0) {
@@ -886,7 +899,7 @@ br_uint_32 StructReadTextSub(br_datafile* df, br_file_struct* str, void* base) {
     char* id;
     char* data;
     char* ep;
-    LOG_TRACE("(%p, %p, %p)", df, str, base);
+    LOG_TRACE9("(%p, %p, %p)", df, str, base);
 
     for (m = 0; m < str->nmembers; m++) {
         sm = &str->members[m];
@@ -1096,7 +1109,7 @@ int DfChunkReadText(br_datafile* df, br_uint_32* plength) {
     int i;
     char* id;
     char* data;
-    LOG_TRACE("(%p, %p)", df, plength);
+    LOG_TRACE9("(%p, %p)", df, plength);
 
     if (TextReadLine(df, &id, &data) == 0) {
         return -1;
@@ -1252,7 +1265,7 @@ int DfBlockWriteText(br_datafile* df, void* base, int block_size, int block_stri
             BrFilePutChar('\n', df->h);
         }
     }
-    if ((i & 0x1f) != 0x1f) {
+    if ((i & 0x1f) != 0x0) {
         BrFilePutChar('\n', df->h);
     }
     if (block != base) {
@@ -1269,7 +1282,7 @@ void* DfBlockReadText(br_datafile* df, void* base, int* count, int size, int mty
     int s;
     int a;
     char b[3];
-    LOG_TRACE("(%p, %p, %p, %d, %d)", df, base, count, size, mtype);
+    LOG_TRACE9("(%p, %p, %p, %d, %d)", df, base, count, size, mtype);
 
     TextReadLine(df, &id, &data);
     if (BrStrCmp(id, "block") != 0) {
@@ -1463,6 +1476,7 @@ int DfSkipText(br_datafile* df, br_uint_32 length) {
 
     while ((BrFileEof(df->h) == 0) && (length != 0)) {
         TextReadLine(df, &data, &id);
+        length--;
     }
     return 0;
 }
