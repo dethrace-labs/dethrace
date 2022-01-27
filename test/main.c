@@ -31,6 +31,7 @@
 extern int _unittest_do_not_exit;
 
 extern void test_assocarr_suite();
+extern void test_brprintf_suite();
 extern void test_utility_suite();
 extern void test_loading_suite();
 extern void test_controls_suite();
@@ -256,6 +257,7 @@ int main(int argc, char** argv) {
     test_quat_suite();
     test_fixed_suite();
     test_logwrite_suite();
+    test_brprintf_suite();
 
     test_assocarr_suite();
     test_brlists_suite();
