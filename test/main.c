@@ -32,6 +32,7 @@ extern int _unittest_do_not_exit;
 
 extern void test_assocarr_suite();
 extern void test_brprintf_suite();
+extern void test_bswap_suite();
 extern void test_utility_suite();
 extern void test_loading_suite();
 extern void test_controls_suite();
@@ -250,6 +251,7 @@ int main(int argc, char** argv) {
     printf("Completed setup\n");
 
     // BRSRC13
+    test_bswap_suite();
     test_matrix23_suite();
     test_matrix34_suite();
     test_matrix4_suite();
