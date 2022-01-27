@@ -1,6 +1,7 @@
 #include "tests.h"
 #include "harness/hooks.h"
 #include <assert.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -162,10 +163,11 @@ void create_temp_file(char buffer[PATH_MAX+1], const char *prefix) {
     struct stat sb;
     int res;
 
-    stat(temp_folder, &sb);
-    if (!S_ISDIR(sb.st_mode)) {
+    res = stat(temp_folder, &sb);
+    if (res == -1 || !S_ISDIR(sb.st_mode)) {
         res = mkdir(temp_folder, 0770);
         if (res == -1) {
+            fprintf(stderr, "mmkdir(\"%s\") failed: %s\n", temp_folder, strerror(errno));
             abort();
         }
     }
@@ -175,6 +177,7 @@ void create_temp_file(char buffer[PATH_MAX+1], const char *prefix) {
     strcat(buffer, "XXXXXX");
     fdres = mkstemp(buffer);
     if (fdres == -1) {
+        fprintf(stderr, "mkstemp(\"%s\") failed: %s\n", buffer, strerror(errno));
         abort();
     }
     close(fdres);
@@ -198,21 +201,22 @@ int main(int argc, char** argv) {
     test_matrix34_suite();
     test_matrix4_suite();
     test_quat_suite();
+    test_fixed_suite();
 
     test_brlists_suite();
+    test_pattern_suite();
+    test_register_suite();
+
     test_fwsetup_suite();
+    test_scratch_suite();
     test_resource_suite();
     test_actsupt_suite();
     test_genclip_suite();
-    test_register_suite();
     test_datafile_suite();
 
-    test_pattern_suite();
     test_pmfile_suite();
-    test_fixed_suite();
     test_v1dbfile_suite();
     test_regsupt_suite();
-    test_scratch_suite();
 
     // DETHRACE
     test_utility_suite();
