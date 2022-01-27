@@ -34,32 +34,33 @@ void* BrStdioOpenRead(char* name, br_size_t n_magics, br_mode_test_cbfn* identif
     char try_name[512];
     char* cp;
     br_uint_8 magics[16];
-    int open_mode = 0;
+    int open_mode;
     LOG_TRACE("(\"%s\", %d, %p, %p)", name, n_magics, identify, mode_result);
 
+    open_mode = BR_FS_MODE_BINARY;
     fh = fopen(name, "rb");
-    if (!fh) {
+    if (fh == NULL) {
         // skip logic around getting BRENDER_PATH from ini files etc
         return NULL;
     }
 
-    if (n_magics) {
+    if (n_magics != 0) {
         if (fread(magics, 1u, n_magics, fh) != n_magics) {
             fclose(fh);
             return 0;
         }
-        if (identify) {
+        if (identify != NULL) {
             open_mode = identify(magics, n_magics);
         }
-        if (mode_result) {
+        if (mode_result != NULL) {
             *mode_result = open_mode;
         }
     }
 
     fclose(fh);
-    if (open_mode == 0) {
+    if (open_mode == BR_FS_MODE_BINARY) {
         fh = fopen(name, "rb");
-    } else if (open_mode == 1) {
+    } else if (open_mode == BR_FS_MODE_TEXT) {
         fh = fopen(name, "rt");
     } else {
         BrFailure("BrStdFileOpenRead: invalid open_mode %d", open_mode);
@@ -82,6 +83,7 @@ void* BrStdioOpenWrite(char* name, int mode) {
 
 void BrStdioClose(void* f) {
     LOG_TRACE("(%p)", f);
+    
     fclose(f);
 }
 
