@@ -9,6 +9,9 @@
 #endif
 #define HOST_NL "\n"
 
+void TEST_ASSERT_EQUAL_FILE_CONTENTS_BINARY(const uint8_t *expected, char *filename, int len);
+void TEST_ASSERT_EQUAL_FILE_TEXT(const char *expected, char *filename);
+
 extern int has_data_directory();
 extern void sleep_s(int sec);
 void create_temp_file(char buffer[PATH_MAX+1], const char *prefix);

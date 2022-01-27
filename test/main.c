@@ -85,7 +85,51 @@ static void setup_temp_folder() {
     temp_folder = temp_folder_buffer;
 }
 
-void setup_global_vars() {
+void TEST_ASSERT_EQUAL_FILE_CONTENTS_BINARY(const uint8_t *expected, char *filename, int len) {
+    FILE *f;
+    long filesize;
+    int res;
+    f = fopen(filename, "rb");
+    TEST_ASSERT_NOT_NULL(f);
+    res = fseek(f, 0, SEEK_END);
+    TEST_ASSERT_NOT_EQUAL(-1, res);
+    filesize = ftell(f);
+    TEST_ASSERT_NOT_EQUAL(-1, filesize);
+    TEST_ASSERT_EQUAL(len, filesize);
+    fseek(f, 0, SEEK_SET);
+    uint8_t* tmpBuffer = (uint8_t*)malloc(filesize);
+    res = fread(tmpBuffer, filesize, 1, f);
+    TEST_ASSERT_EQUAL_INT(1, res);
+    fclose(f);
+    TEST_ASSERT_EQUAL_MEMORY(expected, tmpBuffer, len);
+    free(tmpBuffer);
+}
+
+void TEST_ASSERT_EQUAL_FILE_TEXT(const char *expected, char *filename) {
+    FILE *f;
+    long filesize;
+    int res;
+
+    int len = strlen(expected);
+    f = fopen(filename, "r");
+    TEST_ASSERT_NOT_NULL(f);
+    res = fseek(f, 0, SEEK_END);
+    TEST_ASSERT_NOT_EQUAL(-1, res);
+    filesize = ftell(f);
+    TEST_ASSERT_NOT_EQUAL(-1, filesize);
+    fseek(f, 0, SEEK_SET);
+    char* tmpBuffer = (char*)malloc(filesize+1);
+    res = fread(tmpBuffer, 1, filesize, f);
+    TEST_ASSERT_EQUAL_INT(filesize, res);
+    tmpBuffer[filesize] = '\0';
+    fclose(f);
+    TEST_ASSERT_EQUAL_STRING(expected, tmpBuffer);
+    TEST_ASSERT_EQUAL(len, filesize);
+    TEST_ASSERT_EQUAL_INT(filesize, strlen(tmpBuffer));
+    free(tmpBuffer);
+}
+
+void setup_global_vars(int argc, char *argv[]) {
     strcpy(gDir_separator, "/");
 
     root_dir = getenv("DETHRACE_ROOT_DIR");
@@ -122,7 +166,7 @@ void setup_global_vars() {
 
     int fake_argc = 2;
     char* fake_argv[2];
-    fake_argv[0] = "test";
+    fake_argv[0] = argv[0];
     fake_argv[1] = "-platform=null";
     Harness_Init(&fake_argc, fake_argv);
 }
@@ -192,7 +236,7 @@ int main(int argc, char** argv) {
         exit(1);
     }
 
-    setup_global_vars();
+    setup_global_vars(argc, argv);
 
     printf("Completed setup\n");
 
