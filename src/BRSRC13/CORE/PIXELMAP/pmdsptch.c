@@ -435,11 +435,28 @@ void BrPixelmapPaletteEntrySetMany(br_pixelmap* pm, br_int_32 index, br_int_32 n
 // IDA: br_pixelmap* __cdecl BrPixelmapDirectLock(br_pixelmap *src, br_boolean block)
 br_pixelmap* BrPixelmapDirectLock(br_pixelmap* src, br_boolean block) {
     LOG_TRACE("(%p, %d)", src, block);
-    NOT_IMPLEMENTED();
+
+#if 0
+    // FIXME: use pixelmap dispatch table
+    CheckDispatch(src);
+    return ((br_device_pixelmap*)(src))->dispatch->_directLock(src) == 0 ? src : NULL;
+#else
+    STUB();
+    return src;
+#endif
 }
 
 // IDA: br_pixelmap* __cdecl BrPixelmapDirectUnlock(br_pixelmap *src)
 br_pixelmap* BrPixelmapDirectUnlock(br_pixelmap* src) {
     LOG_TRACE("(%p)", src);
-    NOT_IMPLEMENTED();
+
+    STUB();
+#if 0
+    // FIXME: use pixelmap dispatch table
+    CheckDispatch(src);
+    return ((br_device_pixelmap*)(src))->dispatch->_directUnlock(src) == 0 ? src : NULL;
+#else
+    STUB();
+    return src;
+#endif
 }
