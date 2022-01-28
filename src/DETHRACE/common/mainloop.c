@@ -406,6 +406,10 @@ void CheckTimer() {
     static tU32 last_demo_time_in_seconds = 0;
     LOG_TRACE("()");
 
+    if (harness_game_config.freeze_timer) {
+        return;
+    }
+
     if (!gFreeze_timer && !gCountdown && !gRace_finished) {
         if (gFrame_period < gTimer) {
             if (gNet_mode == eNet_mode_none) {

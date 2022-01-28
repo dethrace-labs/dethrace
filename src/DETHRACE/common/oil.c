@@ -126,7 +126,10 @@ int OKToSpillOil(tOil_spill_info* pOil) {
 // IDA: void __usercall Vector3Interpolate(br_vector3 *pDst@<EAX>, br_vector3 *pFrom@<EDX>, br_vector3 *pTo@<EBX>, br_scalar pP)
 void Vector3Interpolate(br_vector3* pDst, br_vector3* pFrom, br_vector3* pTo, br_scalar pP) {
     LOG_TRACE("(%p, %p, %p, %f)", pDst, pFrom, pTo, pP);
-    NOT_IMPLEMENTED();
+
+    pDst->v[0] = (pTo->v[0] - pFrom->v[0]) * pP + pFrom->v[0];
+    pDst->v[1] = (pTo->v[1] - pFrom->v[1]) * pP + pFrom->v[1];
+    pDst->v[2] = (pTo->v[2] - pFrom->v[2]) * pP + pFrom->v[2];
 }
 
 // IDA: void __usercall EnsureGroundDetailVisible(br_vector3 *pNew_pos@<EAX>, br_vector3 *pGround_normal@<EDX>, br_vector3 *pOld_pos@<EBX>)
@@ -136,7 +139,23 @@ void EnsureGroundDetailVisible(br_vector3* pNew_pos, br_vector3* pGround_normal,
     br_scalar dist;
     br_vector3 to_camera;
     LOG_TRACE("(%p, %p, %p)", pNew_pos, pGround_normal, pOld_pos);
-    NOT_IMPLEMENTED();
+
+    to_camera.v[0] = gCamera_to_world.m[3][0] - pOld_pos->v[0];
+    to_camera.v[1] = gCamera_to_world.m[3][1] - pOld_pos->v[1];
+    to_camera.v[2] = gCamera_to_world.m[3][2] - pOld_pos->v[2];
+    dist = BrVector3Length(&to_camera);
+    if (dist > BR_SCALAR_EPSILON) {
+        factor = BrVector3Dot(pGround_normal, &to_camera) / dist;
+        if (fabs(factor) <= 0.0099999998) {
+            s = 0.0099999998;
+        } else {
+            s = 0.0099999998 / factor;
+            if (s > 0.1) {
+                s = 0.1;
+            }
+        }
+        Vector3Interpolate(pNew_pos, pOld_pos, (br_vector3*)gCamera_to_world.m[3], s);
+    }
 }
 
 // IDA: void __usercall MungeOilsHeightAboveGround(tOil_spill_info *pOil@<EAX>)

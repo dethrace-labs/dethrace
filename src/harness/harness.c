@@ -27,6 +27,7 @@ int rendered_scenes_last_frame = 0;
 
 unsigned int last_frame_time = 0;
 
+// Provided by game
 extern void BrPixelmapFill(br_pixelmap* dst, br_uint_32 colour);
 extern unsigned int GetTotalTime();
 extern uint8_t gScan_code[123][2];
@@ -67,6 +68,8 @@ void Harness_Init(int* argc, char* argv[]) {
     harness_game_config.physics_step_time = 40;
     // do not limit fps by default
     harness_game_config.fps = 0;
+    // do not freeze timer
+    harness_game_config.freeze_timer = 0;
 
     Harness_ProcessCommandLine(argc, argv);
 
@@ -129,6 +132,10 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
             char* s = strstr(argv[i], "=");
             harness_game_config.fps = atoi(s + 1);
             LOG_INFO("FPS limiter set to %f", harness_game_config.fps);
+            handled = 1;
+        } else if (strcasecmp(argv[i], "--freeze-timer") == 0) {
+            LOG_INFO("Timer frozen");
+            harness_game_config.freeze_timer = 1;
             handled = 1;
         }
 

@@ -120,6 +120,8 @@ void GLRenderer_CreateWindow(char* title, int width, int height) {
     }
     SDL_SetRelativeMouseMode(SDL_TRUE);
 
+    //SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+
     context = SDL_GL_CreateContext(window);
     if (!context) {
         LOG_PANIC("Failed to call SDL_GL_CreateContext. %s", SDL_GetError());
@@ -401,7 +403,6 @@ void build_model(br_model* model) {
 
     free(verts);
     free(indices);
-
     model->stored = ctx;
 }
 
@@ -431,6 +432,8 @@ void GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
         model_matrix.m[3][0], model_matrix.m[3][1], model_matrix.m[3][2], 1
     };
 
+    GLuint tex_u = glGetUniformLocation(shader_program_3d, "textureSample");
+
     GLuint model_u = glGetUniformLocation(shader_program_3d, "model");
     glUniformMatrix4fv(model_u, 1, GL_FALSE, m);
 
@@ -447,8 +450,10 @@ void GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
         tStored_material* mat = (tStored_material*)v11->groups[g].stored;
         if (mat && mat->texture) {
             glBindTexture(GL_TEXTURE_2D, mat->texture->id);
+            glUniform1i(tex_u, 1);
         } else {
             glBindTexture(GL_TEXTURE_2D, 0);
+            glUniform1i(tex_u, 0);
         }
 
         glDrawElements(GL_TRIANGLES, v11->groups[g].nfaces * 3, GL_UNSIGNED_INT, (void*)(element_index * sizeof(int)));
@@ -468,6 +473,8 @@ void GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
 
 void GLRenderer_BufferMaterial(br_material* mat) {
     if (!mat->stored) {
+        if (!mat->colour_map) {
+        }
         if (mat->colour_map) {
             GLRenderer_BufferTexture(mat->colour_map);
             if (mat->colour_map->stored) {
