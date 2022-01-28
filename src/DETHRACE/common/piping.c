@@ -394,7 +394,7 @@ void PipingFrameReset() {
 // IDA: void __usercall PipeSingleSkidAdjustment(int pSkid_num@<EAX>, br_matrix34 *pMatrix@<EDX>, int pMaterial_index@<EBX>)
 void PipeSingleSkidAdjustment(int pSkid_num, br_matrix34* pMatrix, int pMaterial_index) {
     LOG_TRACE("(%d, %p, %d)", pSkid_num, pMatrix, pMaterial_index);
-    NOT_IMPLEMENTED();
+    STUB_ONCE();
 }
 
 // IDA: void __cdecl ResetPiping()

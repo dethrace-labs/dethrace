@@ -952,7 +952,8 @@ void DisposeOpponents() {
 void WakeUpOpponentsToTheFactThatTheStartHasBeenJumped(int pWhat_the_countdown_was) {
     int i;
     LOG_TRACE("(%d)", pWhat_the_countdown_was);
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __usercall ReportMurderToPoliceDepartment(tCar_spec *pCar_spec@<EAX>)

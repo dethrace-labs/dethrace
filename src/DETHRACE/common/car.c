@@ -3981,7 +3981,24 @@ void AmIGettingBoredWatchingCameraSpin() {
 // IDA: void __cdecl ViewNetPlayer()
 void ViewNetPlayer() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gOpponent_viewing_mode) {
+        if (gProgram_state.cockpit_on) {
+            ToggleCockpit();
+        }
+        gNet_player_to_view_index++;
+        if (gNumber_of_net_players <= gNet_player_to_view_index) {
+            gNet_player_to_view_index = -1;
+        }
+        if (gNet_player_to_view_index < 0) {
+            gCar_to_view = GetRaceLeader();
+        } else {
+            gCar_to_view = gNet_players[gNet_player_to_view_index].car;
+        }
+        gCamera_yaw = 0;
+        InitialiseExternalCamera();
+        PositionExternalCamera(gCar_to_view, 200u);
+    }
 }
 
 // IDA: void __cdecl ViewOpponent()
