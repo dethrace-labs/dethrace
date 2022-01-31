@@ -55,6 +55,7 @@ extern void test_matrix4_suite();
 extern void test_quat_suite();
 extern void test_graphics_suite();
 extern void test_regsupt_suite();
+extern void test_vector_suite();
 extern void test_powerup_suite();
 extern void test_flicplay_suite();
 
@@ -244,6 +245,7 @@ int main(int argc, char** argv) {
     test_matrix23_suite();
     test_matrix34_suite();
     test_matrix4_suite();
+    test_vector_suite();
     test_quat_suite();
     test_fixed_suite();
 
