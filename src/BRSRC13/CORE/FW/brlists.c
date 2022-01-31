@@ -87,12 +87,14 @@ br_node* BrRemove(br_node* node) {
 // IDA: void __cdecl BrSimpleNewList(br_simple_list *list)
 void BrSimpleNewList(br_simple_list* list) {
     LOG_TRACE10("(%p)", list);
+
     list->head = NULL;
 }
 
 // IDA: void __cdecl BrSimpleAddHead(br_simple_list *list, br_simple_node *node)
 void BrSimpleAddHead(br_simple_list* list, br_simple_node* node) {
     LOG_TRACE10("(%p, %p)", list, node);
+
     node->next = list->head;
     node->prev = (br_simple_node**)&list->head;
     if (list->head != NULL) {
