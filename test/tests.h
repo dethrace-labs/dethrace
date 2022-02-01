@@ -7,7 +7,12 @@
 #ifndef PATH_MAX
 #define PATH_MAX 300
 #endif
+
+#ifdef _WIN32
+#define HOST_NL "\r\n"
+#else
 #define HOST_NL "\n"
+#endif
 
 void TEST_ASSERT_EQUAL_FILE_CONTENTS_BINARY(const uint8_t *expected, char *filename, int len);
 void TEST_ASSERT_EQUAL_FILE_TEXT(const char *expected, char *filename);

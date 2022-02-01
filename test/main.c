@@ -108,24 +108,27 @@ void TEST_ASSERT_EQUAL_FILE_CONTENTS_BINARY(const uint8_t *expected, char *filen
 
 void TEST_ASSERT_EQUAL_FILE_TEXT(const char *expected, char *filename) {
     FILE *f;
+    char *tmpBuffer;
     long filesize;
     int res;
+    int len;
 
-    int len = strlen(expected);
-    f = fopen(filename, "r");
+    len = strlen(expected);
+    f = fopen(filename, "rb");
     TEST_ASSERT_NOT_NULL(f);
     res = fseek(f, 0, SEEK_END);
     TEST_ASSERT_NOT_EQUAL(-1, res);
     filesize = ftell(f);
     TEST_ASSERT_NOT_EQUAL(-1, filesize);
     fseek(f, 0, SEEK_SET);
-    char* tmpBuffer = (char*)malloc(filesize+1);
+    tmpBuffer = (char*)malloc(filesize+1);
+    TEST_ASSERT_NOT_NULL(tmpBuffer);
     res = fread(tmpBuffer, 1, filesize, f);
-    TEST_ASSERT_EQUAL_INT(filesize, res);
     tmpBuffer[filesize] = '\0';
     fclose(f);
     TEST_ASSERT_EQUAL_STRING(expected, tmpBuffer);
-    TEST_ASSERT_EQUAL(len, filesize);
+    TEST_ASSERT_EQUAL_INT(filesize, res);
+    TEST_ASSERT_EQUAL_INT(len, filesize);
     TEST_ASSERT_EQUAL_INT(filesize, strlen(tmpBuffer));
     free(tmpBuffer);
 }
