@@ -2,7 +2,7 @@
 
 [![Workflow](https://github.com/jeff-1amstudios/dethrace/actions/workflows/workflow.yml/badge.svg)](https://github.com/jeff-1amstudios/dethrace/actions/workflows/workflow.yml)
 
-![Discord Chat Channel](docs/discord-badge.jpg) [Discord Chat Channel](https://discord.gg/f5StsuP)
+![Discord Carmageddon server](docs/discord-badge.jpg) Want to chat? We are in the `#dethrace` channel on the  [Discord Carmageddon server](https://discord.gg/f5StsuP).
 
 Dethrace is an attempt to learn how the 1997 driving/mayhem game [Carmageddon](https://en.wikipedia.org/wiki/Carmageddon) works behind the scenes and run it on modern systems.
 
