@@ -33,11 +33,11 @@ br_file_struct_member br_vertex_uv_FM[] = {
 br_file_struct br_vertex_uv_F = { "br_vertex_uv", BR_ASIZE(br_vertex_uv_FM), br_vertex_uv_FM, sizeof(br_vertex) };
 
 br_file_struct_member br_old_vertex_uv_FM[5] = {
-    { DF_TYPE_BR_SCALAR, offsetof(br_vertex, p) + 0 * sizeof(br_scalar), "p.v[X]", NULL },
-    { DF_TYPE_BR_SCALAR, offsetof(br_vertex, p) + 1 * sizeof(br_scalar), "p.v[Y]", NULL },
-    { DF_TYPE_BR_SCALAR, offsetof(br_vertex, p) + 2 * sizeof(br_scalar), "p.v[Z]", NULL },
-    { DF_TYPE_BR_SCALAR, offsetof(br_vertex, map) + 0 * sizeof(br_scalar), "map.v[0]", NULL },
-    { DF_TYPE_BR_SCALAR, offsetof(br_vertex, map) + 1 * sizeof(br_scalar), "map.v[1]", NULL },
+    { DF_TYPE_BR_SCALAR, offsetof(br_vertex, p.v[0]), "p.v[X]", NULL },
+    { DF_TYPE_BR_SCALAR, offsetof(br_vertex, p.v[1]), "p.v[Y]", NULL },
+    { DF_TYPE_BR_SCALAR, offsetof(br_vertex, p.v[2]), "p.v[Z]", NULL },
+    { DF_TYPE_BR_SCALAR, offsetof(br_vertex, map.v[0]), "map.v[0]", NULL },
+    { DF_TYPE_BR_SCALAR, offsetof(br_vertex, map.v[1]), "map.v[1]", NULL },
 };
 br_file_struct br_old_vertex_uv_F = { "br_old_vertex_uv", BR_ASIZE(br_old_vertex_uv_FM), br_old_vertex_uv_FM, sizeof(br_vertex) };
 
@@ -51,18 +51,18 @@ br_file_struct_member br_face_FM[5] = {
 br_file_struct br_face_F = { "br_face", BR_ASIZE(br_face_FM), br_face_FM, sizeof(br_face) };
 
 br_file_struct_member br_old_face_1_FM[5] = {
-    { DF_TYPE_BR_UINT_16, offsetof(br_face, vertices) + 0 * sizeof(br_uint_16), "vertices[0]", NULL },
-    { DF_TYPE_BR_UINT_16, offsetof(br_face, vertices) + 1 * sizeof(br_uint_16), "vertices[1]", NULL },
-    { DF_TYPE_BR_UINT_16, offsetof(br_face, vertices) + 2 * sizeof(br_uint_16), "vertices[2]", NULL },
+    { DF_TYPE_BR_UINT_16, offsetof(br_face, vertices[0]), "vertices[0]", NULL },
+    { DF_TYPE_BR_UINT_16, offsetof(br_face, vertices[1]), "vertices[1]", NULL },
+    { DF_TYPE_BR_UINT_16, offsetof(br_face, vertices[2]), "vertices[2]", NULL },
     { DF_TYPE_BR_UINT_8, offsetof(br_face, smoothing), "smoothing", NULL },
     { DF_TYPE_BR_UINT_8, offsetof(br_face, flags), "flags", NULL },
 };
 br_file_struct br_old_face_1_F = { "br_old_face_1", BR_ASIZE(br_old_face_1_FM), br_old_face_1_FM, sizeof(br_face) };
 
 br_file_struct_member br_old_face_FM[5] = {
-    { DF_TYPE_BR_UINT_16, offsetof(br_face, vertices) + 0 * sizeof(br_uint_16), "vertices[0]", NULL },
-    { DF_TYPE_BR_UINT_16, offsetof(br_face, vertices) + 1 * sizeof(br_uint_16), "vertices[1]", NULL },
-    { DF_TYPE_BR_UINT_16, offsetof(br_face, vertices) + 2 * sizeof(br_uint_16), "vertices[2]", NULL },
+    { DF_TYPE_BR_UINT_16, offsetof(br_face, vertices[0]), "vertices[0]", NULL },
+    { DF_TYPE_BR_UINT_16, offsetof(br_face, vertices[1]), "vertices[1]", NULL },
+    { DF_TYPE_BR_UINT_16, offsetof(br_face, vertices[2]), "vertices[2]", NULL },
     { DF_TYPE_BR_UINT_16, offsetof(br_face, material), "material", NULL },
     { DF_TYPE_BR_UINT_16, offsetof(br_face, smoothing), "smoothing", NULL }, // DF_TYPE_BR_UINT_32 in EXE
 };
@@ -80,9 +80,9 @@ br_file_struct_member br_old_model_1_FM[1] = {
 br_file_struct br_old_model_1_F = { "br_old_model_1", 1, br_old_model_1_FM, sizeof(br_model) };
 
 br_file_struct_member br_pivot_FM[3] = {
-    { DF_TYPE_BR_SCALAR, offsetof(br_model, pivot) + 0 * sizeof(br_scalar), "pivot.v[X]", NULL },
-    { DF_TYPE_BR_SCALAR, offsetof(br_model, pivot) + 1 * sizeof(br_scalar), "pivot.v[Y]", NULL },
-    { DF_TYPE_BR_SCALAR, offsetof(br_model, pivot) + 2 * sizeof(br_scalar), "pivot.v[Z]", NULL },
+    { DF_TYPE_BR_SCALAR, offsetof(br_model, pivot.v[0]), "pivot.v[X]", NULL },
+    { DF_TYPE_BR_SCALAR, offsetof(br_model, pivot.v[1]), "pivot.v[Y]", NULL },
+    { DF_TYPE_BR_SCALAR, offsetof(br_model, pivot.v[2]), "pivot.v[Z]", NULL },
 };
 br_file_struct br_pivot_F = { "br_pivot", 3, br_pivot_FM, sizeof(br_model) };
 
@@ -94,9 +94,9 @@ br_file_struct_member br_material_old_FM[13] = {
     { DF_TYPE_BR_UFRACTION, offsetof(br_material, ks), "ks", NULL },
     { DF_TYPE_BR_SCALAR, offsetof(br_material, power), "power", NULL },
     { DF_TYPE_BR_UINT_16, offsetof(br_material, flags), "flags", NULL },
-    { DF_TYPE_BR_VECTOR2, offsetof(br_material, map_transform) + 0 *sizeof(br_vector2), "map_transform.m[0]", NULL },
-    { DF_TYPE_BR_VECTOR2, offsetof(br_material, map_transform) + 1 *sizeof(br_vector2), "map_transform.m[1]", NULL },
-    { DF_TYPE_BR_VECTOR2, offsetof(br_material, map_transform) + 2 *sizeof(br_vector2), "map_transform.m[2]", NULL },
+    { DF_TYPE_BR_VECTOR2, offsetof(br_material, map_transform.m[0]), "map_transform.m[0]", NULL },
+    { DF_TYPE_BR_VECTOR2, offsetof(br_material, map_transform.m[1]), "map_transform.m[1]", NULL },
+    { DF_TYPE_BR_VECTOR2, offsetof(br_material, map_transform.m[2]), "map_transform.m[2]", NULL },
     { DF_TYPE_BR_UINT_8, offsetof(br_material, index_base), "index_base", NULL },
     { DF_TYPE_BR_UINT_8, offsetof(br_material, index_range), "index_range", NULL },
     { DF_TYPE_ASCIZ, offsetof(br_material, identifier), "identifier", NULL }
@@ -111,9 +111,9 @@ br_file_struct_member br_material_FM[17] = {
     { DF_TYPE_BR_UFRACTION, offsetof(br_material, ks), "ks", NULL },
     { DF_TYPE_BR_SCALAR, offsetof(br_material, power), "power", NULL },
     { DF_TYPE_BR_UINT_32, offsetof(br_material, flags), "flags", NULL },
-    { DF_TYPE_BR_VECTOR2, offsetof(br_material, map_transform) + 0 * sizeof(br_vector2), "map_transform.m[0]", NULL },
-    { DF_TYPE_BR_VECTOR2, offsetof(br_material, map_transform) + 1 * sizeof(br_vector2), "map_transform.m[1]", NULL },
-    { DF_TYPE_BR_VECTOR2, offsetof(br_material, map_transform) + 2 * sizeof(br_vector2), "map_transform.m[2]", NULL },
+    { DF_TYPE_BR_VECTOR2, offsetof(br_material, map_transform.m[0]), "map_transform.m[0]", NULL },
+    { DF_TYPE_BR_VECTOR2, offsetof(br_material, map_transform.m[1]), "map_transform.m[1]", NULL },
+    { DF_TYPE_BR_VECTOR2, offsetof(br_material, map_transform.m[2]), "map_transform.m[2]", NULL },
     { DF_TYPE_BR_UINT_8, offsetof(br_material, index_base), "index_base", NULL },
     { DF_TYPE_BR_UINT_8, offsetof(br_material, index_range), "index_range", NULL },
     { DF_TYPE_BR_SCALAR, offsetof(br_material, fog_min), "fog_min", NULL },
