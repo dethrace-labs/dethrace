@@ -1,21 +1,36 @@
 # Dethrace  
 
-[![Workflow](https://github.com/jeff-1amstudios/dethrace/actions/workflows/workflow.yml/badge.svg)](https://github.com/jeff-1amstudios/dethrace/actions/workflows/workflow.yml)
+[![Workflow](https://github.com/jeff-1amstudios/dethrace/actions/workflows/workflow.yml/badge.svg)](https://github.com/jeff-1amstudios/dethrace/actions/workflows/workflow.yml) 
 
-![Discord Carmageddon server](docs/discord-badge.jpg) Want to chat? We are in the `#dethrace` channel on the  [Discord Carmageddon server](https://discord.gg/f5StsuP).
+[![Discord Carmageddon server](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/f5StsuP) Want to chat? We are in the `#dethrace` channel on the Carmageddon discord server.
 
-Dethrace is an attempt to learn how the 1997 driving/mayhem game [Carmageddon](https://en.wikipedia.org/wiki/Carmageddon) works behind the scenes and run it on modern systems.
+Dethrace is an attempt to learn how the 1997 driving/mayhem game [Carmageddon](https://en.wikipedia.org/wiki/Carmageddon) works behind the scenes and rebuild it to run natively on modern systems.
 
-## Introduction
-In 2014, Watcom debugging symbols for an earlier internal build [were discovered](http://1amstudios.com/2014/12/02/carma1-symbols-dumped) on the [Carmageddon Splat Pack](http://carmageddon.wikia.com/wiki/Carmageddon_Splat_Pack) expansion CD release. The symbols unfortunately did not match any known released executable, meaning they were interesting but not immediately usable to reverse engineer the game.
+## Background
+Watcom debug symbols for an earlier internal build [were discovered](http://1amstudios.com/2014/12/02/carma1-symbols-dumped) named `DETHRSC.SYM` on the [Carmageddon Splat Pack](http://carmageddon.wikia.com/wiki/Carmageddon_Splat_Pack) expansion CD release. The symbols unfortunately did not match any known released executable, meaning they were interesting but not immediately usable to reverse engineer the game.
 
 This is what it looked like from the Watcom debugger - the names of all the methods were present but the code location they were pointing to was junk:
 
 ![watcom-debugger](http://1amstudios.com/img/watcom-debugger.jpg)
 
-_CrayzKirk_ from the Carmageddon community then picked it up and did the painstaking work of manually matching up functions and data structures in the DOS executable to the debugging symbols.
+_CrayzKirk_ from the Carmageddon community picked it up and did a lot of painstaking work manually matching up many functions and data structures in the DOS executable to the debugging symbols.
 
-After months of work, we are slowly replacing the original assembly code with equivalent C code.
+We are slowly replacing the original assembly code with equivalent C code, function by function.
+
+### Is "dethrace" a typo?
+No, well, I don't think so at least. The original files according to the symbol dump were stored in `c:\DETHRACE`, and the symbol file is called `DETHSRC.SYM`. Maybe they removed the "a" to be compatible with [8.3 filenames](https://en.wikipedia.org/wiki/8.3_filename)?
+
+## Game content
+
+Dethrace does not ship with any game content. You'll need access to the data from the original game. If you don't have an original CD then you can [buy Carmageddon from GoG.com](https://www.gog.com/game/carmageddon_max_pack).
+
+`dethrace` also supports the various freeware demos:
+- [Original Carmageddon demo](https://rr2000.cwaboard.co.uk/R4/PC/carmdemo.zip)
+- [Splat Pack demo](https://rr2000.cwaboard.co.uk/R4/PC/splatdem.zip)
+- [Splat Pack Xmas demo](https://rr2000.cwaboard.co.uk/R4/PC/Splatpack_christmas_demo.zip)
+
+Lots of other fun things are available from the [Road Reaction site](https://rr2000.cwaboard.co.uk/pc-files#c1)
+
 
 ## Dependencies
 
@@ -33,9 +48,7 @@ Linux:
 apt-get install libsdl2-dev
 ```
 
-### Root content directory
-
-Dethrace does not ship with any game content. You'll need access to the data from the original game. If you don't have an original CD then you can [buy Carmageddon from GoG.com](https://www.gog.com/game/carmageddon_max_pack). 
+ 
 
 Point Dethrace at the Carmageddon install directory:
 ```sh
