@@ -1,10 +1,17 @@
 # Dethrace  
 
-[![Workflow](https://github.com/jeff-1amstudios/dethrace/actions/workflows/workflow.yml/badge.svg)](https://github.com/jeff-1amstudios/dethrace/actions/workflows/workflow.yml) 
+[![Workflow](https://github.com/jeff-1amstudios/dethrace/actions/workflows/workflow.yml/badge.svg)](https://github.com/jeff-1amstudios/dethrace/actions/workflows/workflow.yml)
+[![Twitter](https://badgen.net/badge/icon/twitter?icon=twitter&label)](https://twitter.com/dethrace_labs)
+[![Discord Carmageddon server](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/f5StsuP)
 
-[![Discord Carmageddon server](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/f5StsuP) Want to chat? We are in the `#dethrace` channel on the Carmageddon discord server.
+ Want to chat? We are in the `#dethrace` channel on the Carmageddon discord server.
 
 Dethrace is an attempt to learn how the 1997 driving/mayhem game [Carmageddon](https://en.wikipedia.org/wiki/Carmageddon) works behind the scenes and rebuild it to run natively on modern systems.
+
+## Progress
+33% of functions implemented. _Updated Feb 6 2022._
+
+![Screen Shot 2022-01-28 at 1 03 35 PM](https://user-images.githubusercontent.com/78985374/152665901-ce835fb6-fd53-44de-bcd3-eba7ac931755.png)
 
 ## Background
 Watcom debug symbols for an earlier internal build [were discovered](http://1amstudios.com/2014/12/02/carma1-symbols-dumped) named `DETHRSC.SYM` on the [Carmageddon Splat Pack](http://carmageddon.wikia.com/wiki/Carmageddon_Splat_Pack) expansion CD release. The symbols unfortunately did not match any known released executable, meaning they were interesting but not immediately usable to reverse engineer the game.
