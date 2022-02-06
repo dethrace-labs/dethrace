@@ -1,5 +1,7 @@
 add_library(brender STATIC)
 
+option(BRENDER_FIX_BUGS "Fix BRender bugs" ON)
+
 target_include_directories(brender 
     PRIVATE 
         .
@@ -30,6 +32,9 @@ else()
         /wd4101
         /wd4996
     )
+endif()
+if(BRENDER_FIX_BUGS)
+    target_compile_definitions(brender PRIVATE BRENDER_FIX_BUGS)
 endif()
 
 target_sources(brender PRIVATE
@@ -165,6 +170,7 @@ target_sources(brender PRIVATE
     CORE/STD/logwrite.h
     CORE/V1DB/actsupt.c
     CORE/V1DB/actsupt.h
+    CORE/V1DB/chunkids.h
     CORE/V1DB/custsupt.c
     CORE/V1DB/custsupt.h
     CORE/V1DB/dbsetup.c
@@ -197,6 +203,7 @@ target_sources(brender PRIVATE
     CORE/V1DB/regsupt.h
     CORE/V1DB/render.c
     CORE/V1DB/render.h
+    CORE/V1DB/stackids.h
     CORE/V1DB/v1dbfile.c
     CORE/V1DB/v1dbfile.h
 )

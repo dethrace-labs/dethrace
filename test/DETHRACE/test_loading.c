@@ -124,7 +124,8 @@ void test_loading_ConvertPixToStripMap() {
     int y;
     br_uint_8* src_pix;
     br_uint_8* dst_pix;
-    pm = DRPixelmapLoad("DATA/32x20x8/PIXELMAP/FRANKF.PIX");
+
+    pm = DRPixelmapLoad("DATA/32X20X8/PIXELMAP/FRANKF.PIX");
     TEST_ASSERT_NOT_NULL(pm);
     strip_data = ConvertPixToStripMap(pm);
     TEST_ASSERT_NOT_NULL(strip_data);

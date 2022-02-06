@@ -1,6 +1,7 @@
 #include "tests.h"
 #include "harness/hooks.h"
 #include <assert.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -54,6 +55,7 @@ extern void test_matrix4_suite();
 extern void test_quat_suite();
 extern void test_graphics_suite();
 extern void test_regsupt_suite();
+extern void test_vector_suite();
 extern void test_powerup_suite();
 extern void test_flicplay_suite();
 
@@ -84,7 +86,54 @@ static void setup_temp_folder() {
     temp_folder = temp_folder_buffer;
 }
 
-void setup_global_vars() {
+void TEST_ASSERT_EQUAL_FILE_CONTENTS_BINARY(const uint8_t *expected, char *filename, int len) {
+    FILE *f;
+    long filesize;
+    int res;
+    f = fopen(filename, "rb");
+    TEST_ASSERT_NOT_NULL(f);
+    res = fseek(f, 0, SEEK_END);
+    TEST_ASSERT_NOT_EQUAL(-1, res);
+    filesize = ftell(f);
+    TEST_ASSERT_NOT_EQUAL(-1, filesize);
+    TEST_ASSERT_EQUAL(len, filesize);
+    fseek(f, 0, SEEK_SET);
+    uint8_t* tmpBuffer = (uint8_t*)malloc(filesize);
+    res = fread(tmpBuffer, filesize, 1, f);
+    TEST_ASSERT_EQUAL_INT(1, res);
+    fclose(f);
+    TEST_ASSERT_EQUAL_MEMORY(expected, tmpBuffer, len);
+    free(tmpBuffer);
+}
+
+void TEST_ASSERT_EQUAL_FILE_TEXT(const char *expected, char *filename) {
+    FILE *f;
+    char *tmpBuffer;
+    long filesize;
+    int res;
+    int len;
+
+    len = strlen(expected);
+    f = fopen(filename, "rb");
+    TEST_ASSERT_NOT_NULL(f);
+    res = fseek(f, 0, SEEK_END);
+    TEST_ASSERT_NOT_EQUAL(-1, res);
+    filesize = ftell(f);
+    TEST_ASSERT_NOT_EQUAL(-1, filesize);
+    fseek(f, 0, SEEK_SET);
+    tmpBuffer = (char*)malloc(filesize+1);
+    TEST_ASSERT_NOT_NULL(tmpBuffer);
+    res = fread(tmpBuffer, 1, filesize, f);
+    tmpBuffer[filesize] = '\0';
+    fclose(f);
+    TEST_ASSERT_EQUAL_STRING(expected, tmpBuffer);
+    TEST_ASSERT_EQUAL_INT(filesize, res);
+    TEST_ASSERT_EQUAL_INT(len, filesize);
+    TEST_ASSERT_EQUAL_INT(filesize, strlen(tmpBuffer));
+    free(tmpBuffer);
+}
+
+void setup_global_vars(int argc, char *argv[]) {
     strcpy(gDir_separator, "/");
 
     root_dir = getenv("DETHRACE_ROOT_DIR");
@@ -121,7 +170,7 @@ void setup_global_vars() {
 
     int fake_argc = 2;
     char* fake_argv[2];
-    fake_argv[0] = "test";
+    fake_argv[0] = argv[0];
     fake_argv[1] = "-platform=null";
     Harness_Init(&fake_argc, fake_argv);
 }
@@ -162,10 +211,11 @@ void create_temp_file(char buffer[PATH_MAX+1], const char *prefix) {
     struct stat sb;
     int res;
 
-    stat(temp_folder, &sb);
-    if (!S_ISDIR(sb.st_mode)) {
+    res = stat(temp_folder, &sb);
+    if (res == -1 || !S_ISDIR(sb.st_mode)) {
         res = mkdir(temp_folder, 0770);
         if (res == -1) {
+            fprintf(stderr, "mmkdir(\"%s\") failed: %s\n", temp_folder, strerror(errno));
             abort();
         }
     }
@@ -175,6 +225,7 @@ void create_temp_file(char buffer[PATH_MAX+1], const char *prefix) {
     strcat(buffer, "XXXXXX");
     fdres = mkstemp(buffer);
     if (fdres == -1) {
+        fprintf(stderr, "mkstemp(\"%s\") failed: %s\n", buffer, strerror(errno));
         abort();
     }
     close(fdres);
@@ -189,7 +240,7 @@ int main(int argc, char** argv) {
         exit(1);
     }
 
-    setup_global_vars();
+    setup_global_vars(argc, argv);
 
     printf("Completed setup\n");
 
@@ -197,22 +248,24 @@ int main(int argc, char** argv) {
     test_matrix23_suite();
     test_matrix34_suite();
     test_matrix4_suite();
+    test_vector_suite();
     test_quat_suite();
+    test_fixed_suite();
 
     test_brlists_suite();
+    test_pattern_suite();
+    test_register_suite();
+
     test_fwsetup_suite();
+    test_scratch_suite();
     test_resource_suite();
     test_actsupt_suite();
     test_genclip_suite();
-    test_register_suite();
     test_datafile_suite();
 
-    test_pattern_suite();
     test_pmfile_suite();
-    test_fixed_suite();
     test_v1dbfile_suite();
     test_regsupt_suite();
-    test_scratch_suite();
 
     // DETHRACE
     test_utility_suite();

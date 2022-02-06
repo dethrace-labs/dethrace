@@ -2,35 +2,43 @@
 #include "CORE/V1DB/regsupt.h"
 #include "tests.h"
 
-int nbr_callbacks;
+struct callback_data {
+    int nb;
+};
 
 br_uint_32 callback(br_material* mat, void* arg) {
-    nbr_callbacks++;
+    ((struct callback_data*)arg)->nb++;
     return 0;
 }
 
 void test_regsupt_BrMaterialEnum() {
+    int nb_initial;
     int result;
+    struct callback_data callback_data;
     br_material *m, *m2;
 
-    m = BrMaterialAllocate("mat1");
-    m2 = BrMaterialAllocate("mat2");
+    callback_data.nb = 0;
+    BrMaterialEnum(NULL, callback, &callback_data);
+    nb_initial = callback_data.nb;
+
+    m = BrMaterialAllocate("regsupt_BrMaterialEnum_mat1");
+    m2 = BrMaterialAllocate("regsupt_BrMaterialEnum_mat2");
     TEST_ASSERT_NOT_NULL(m);
     TEST_ASSERT_NOT_NULL(m2);
     BrMaterialAdd(m);
     BrMaterialAdd(m2);
 
-    nbr_callbacks = 0;
-    result = BrMaterialEnum("*", callback, NULL);
-    TEST_ASSERT_EQUAL_INT(2, nbr_callbacks);
+    callback_data.nb = 0;
+    result = BrMaterialEnum("regsupt_BrMaterialEnum_*", callback, &callback_data);
+    TEST_ASSERT_EQUAL_INT(2, callback_data.nb);
 
-    nbr_callbacks = 0;
-    result = BrMaterialEnum(NULL, callback, NULL);
-    TEST_ASSERT_EQUAL_INT(2, nbr_callbacks);
+    callback_data.nb = 0;
+    result = BrMaterialEnum(NULL, callback, &callback_data);
+    TEST_ASSERT_EQUAL_INT(2, callback_data.nb - nb_initial);
 
-    nbr_callbacks = 0;
-    result = BrMaterialEnum("mat1", callback, NULL);
-    TEST_ASSERT_EQUAL_INT(1, nbr_callbacks);
+    callback_data.nb = 0;
+    result = BrMaterialEnum("regsupt_BrMaterialEnum_mat1", callback, &callback_data);
+    TEST_ASSERT_EQUAL_INT(1, callback_data.nb);
 }
 
 void test_regsupt_suite() {

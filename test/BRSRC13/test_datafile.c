@@ -12,49 +12,6 @@
 char *text_magics  = TEXT_MAGICS;
 uint8_t binary_magics[] = {BINARY_MAGICS};
 
-static void TEST_ASSERT_EQUAL_FILE_CONTENTS_BINARY(const uint8_t *expected, char *filename, int len) {
-    FILE *f;
-    long filesize;
-    int res;
-    f = fopen(filename, "rb");
-    TEST_ASSERT_NOT_NULL(f);
-    res = fseek(f, 0, SEEK_END);
-    TEST_ASSERT_NOT_EQUAL(-1, res);
-    filesize = ftell(f);
-    TEST_ASSERT_NOT_EQUAL(-1, filesize);
-    TEST_ASSERT_EQUAL(len, filesize);
-    fseek(f, 0, SEEK_SET);
-    uint8_t* tmpBuffer = (uint8_t*)malloc(filesize);
-    res = fread(tmpBuffer, filesize, 1, f);
-    TEST_ASSERT_EQUAL_INT(1, res);
-    fclose(f);
-    TEST_ASSERT_EQUAL_MEMORY(expected, tmpBuffer, len);
-    free(tmpBuffer);
-}
-
-static void TEST_ASSERT_EQUAL_FILE_TEXT(const char *expected, char *filename) {
-    FILE *f;
-    long filesize;
-    int res;
-
-    int len = strlen(expected);
-    f = fopen(filename, "r");
-    TEST_ASSERT_NOT_NULL(f);
-    res = fseek(f, 0, SEEK_END);
-    TEST_ASSERT_NOT_EQUAL(-1, res);
-    filesize = ftell(f);
-    TEST_ASSERT_NOT_EQUAL(-1, filesize);
-    fseek(f, 0, SEEK_SET);
-    char* tmpBuffer = (char*)malloc(filesize+1);
-    res = fread(tmpBuffer, 1, filesize, f);
-    TEST_ASSERT_EQUAL_INT(filesize, res);
-    tmpBuffer[filesize] = '\0';
-    fclose(f);
-    TEST_ASSERT_EQUAL_STRING(expected, tmpBuffer);
-    TEST_ASSERT_EQUAL(len, filesize);
-    TEST_ASSERT_EQUAL_INT(filesize, strlen(tmpBuffer));
-    free(tmpBuffer);
-}
 
 static void test_datafile_stack() {
     int dummy1;
@@ -149,6 +106,7 @@ static void test_datafile_binary_br_int_8() {
 
     create_temp_file(tmpfilename, "br_int_8_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -179,6 +137,7 @@ static void test_datafile_text_br_int_8() {
     char tmpfilename[PATH_MAX+1];
     struct_br_int_8 read_struct;
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     create_temp_file(tmpfilename, "br_int_8_text");
 
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
@@ -243,6 +202,7 @@ static void test_datafile_binary_br_uint_8() {
 
     create_temp_file(tmpfilename, "br_uint_8_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -275,6 +235,7 @@ static void test_datafile_text_br_uint_8() {
 
     create_temp_file(tmpfilename, "br_uint_8_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -337,6 +298,7 @@ static void test_datafile_binary_br_int_16() {
 
     create_temp_file(tmpfilename, "br_int_16_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -369,6 +331,7 @@ static void test_datafile_text_br_int_16() {
 
     create_temp_file(tmpfilename, "br_int_16_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -431,6 +394,7 @@ static void test_datafile_binary_br_uint_16() {
 
     create_temp_file(tmpfilename, "br_uint_16_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -463,6 +427,7 @@ static void test_datafile_text_br_uint_16() {
 
     create_temp_file(tmpfilename, "br_uint_16_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -525,6 +490,7 @@ static void test_datafile_binary_br_int_32() {
 
     create_temp_file(tmpfilename, "br_int_32_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -557,6 +523,7 @@ static void test_datafile_text_br_int_32() {
 
     create_temp_file(tmpfilename, "br_int_32_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -619,6 +586,7 @@ static void test_datafile_binary_br_uint_32() {
 
     create_temp_file(tmpfilename, "br_uint_32_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -651,6 +619,7 @@ static void test_datafile_text_br_uint_32() {
 
     create_temp_file(tmpfilename, "br_uint_32_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -713,6 +682,7 @@ static void test_datafile_binary_br_fixed() {
 
     create_temp_file(tmpfilename, "br_fixed_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -748,6 +718,7 @@ static void test_datafile_text_br_fixed() {
 
     create_temp_file(tmpfilename, "br_fixed_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -810,6 +781,7 @@ static void test_datafile_binary_br_angle() {
 
     create_temp_file(tmpfilename, "br_angle_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -842,6 +814,7 @@ static void test_datafile_text_br_angle() {
 
     create_temp_file(tmpfilename, "br_angle_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -904,6 +877,7 @@ static void test_datafile_binary_float() {
 
     create_temp_file(tmpfilename, "float_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -936,6 +910,7 @@ static void test_datafile_text_float() {
 
     create_temp_file(tmpfilename, "float_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -998,6 +973,7 @@ static void test_datafile_binary_double() {
 
     create_temp_file(tmpfilename, "double_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -1030,6 +1006,7 @@ static void test_datafile_text_double() {
 
     create_temp_file(tmpfilename, "double_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -1110,6 +1087,7 @@ static void test_datafile_binary_enum_8() {
 
     create_temp_file(tmpfilename, "enum_8_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -1142,6 +1120,7 @@ static void test_datafile_text_enum_8() {
 
     create_temp_file(tmpfilename, "enum_8_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -1222,6 +1201,7 @@ static void test_datafile_binary_enum_16() {
 
     create_temp_file(tmpfilename, "enum_16_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -1254,6 +1234,7 @@ static void test_datafile_text_enum_16() {
 
     create_temp_file(tmpfilename, "enum_16_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -1334,6 +1315,7 @@ static void test_datafile_binary_enum_32() {
 
     create_temp_file(tmpfilename, "enum_32_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -1366,6 +1348,7 @@ static void test_datafile_text_enum_32() {
 
     create_temp_file(tmpfilename, "enum_32_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -1436,6 +1419,7 @@ static void test_datafile_binary_asciz() {
 
     create_temp_file(tmpfilename, "asciz_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -1472,6 +1456,7 @@ static void test_datafile_text_asciz() {
 
     create_temp_file(tmpfilename, "asciz_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -1537,6 +1522,7 @@ static void test_datafile_binary_br_colour() {
 
     create_temp_file(tmpfilename, "br_colour_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -1569,6 +1555,7 @@ static void test_datafile_text_br_colour() {
 
     create_temp_file(tmpfilename, "br_colour_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -1631,6 +1618,7 @@ static void test_datafile_binary_br_fraction_x() {
 
     create_temp_file(tmpfilename, "br_fraction_x_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -1666,6 +1654,7 @@ static void test_datafile_text_br_fraction_x() {
 
     create_temp_file(tmpfilename, "br_fraction_x_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -1728,6 +1717,7 @@ static void test_datafile_binary_br_ufraction_x() {
 
     create_temp_file(tmpfilename, "br_ufraction_x_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -1763,6 +1753,7 @@ static void test_datafile_text_br_ufraction_x() {
 
     create_temp_file(tmpfilename, "br_ufraction_x_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -1825,6 +1816,7 @@ static void test_datafile_binary_br_fraction_f() {
 
     create_temp_file(tmpfilename, "br_fraction_f_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -1857,6 +1849,7 @@ static void test_datafile_text_br_fraction_f() {
 
     create_temp_file(tmpfilename, "br_fraction_f_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -1919,6 +1912,7 @@ static void test_datafile_binary_br_ufraction_f() {
 
     create_temp_file(tmpfilename, "br_ufraction_f_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -1951,6 +1945,7 @@ static void test_datafile_text_br_ufraction_f() {
 
     create_temp_file(tmpfilename, "br_ufraction_f_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -2013,6 +2008,7 @@ static void test_datafile_binary_br_vector2_x() {
 
     create_temp_file(tmpfilename, "br_vector2_x_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -2045,6 +2041,7 @@ static void test_datafile_text_br_vector2_x() {
 
     create_temp_file(tmpfilename, "br_vector2_x_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -2111,6 +2108,7 @@ static void test_datafile_binary_br_vector3_x() {
 
     create_temp_file(tmpfilename, "br_vector3_x_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -2143,6 +2141,7 @@ static void test_datafile_text_br_vector3_x() {
 
     create_temp_file(tmpfilename, "br_vector3_x_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -2209,6 +2208,7 @@ static void test_datafile_binary_br_vector4_x() {
 
     create_temp_file(tmpfilename, "br_vector4_x_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -2241,6 +2241,7 @@ static void test_datafile_text_br_vector4_x() {
 
     create_temp_file(tmpfilename, "br_vector4_x_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -2307,6 +2308,7 @@ static void test_datafile_binary_br_vector2_f() {
 
     create_temp_file(tmpfilename, "br_vector2_f_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -2339,6 +2341,7 @@ static void test_datafile_text_br_vector2_f() {
 
     create_temp_file(tmpfilename, "br_vector2_f_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -2405,6 +2408,7 @@ static void test_datafile_binary_br_vector3_f() {
 
     create_temp_file(tmpfilename, "br_vector3_f_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -2439,6 +2443,7 @@ static void test_datafile_text_br_vector3_f() {
 
     create_temp_file(tmpfilename, "br_vector3_f_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -2505,6 +2510,7 @@ static void test_datafile_binary_br_vector4_f() {
 
     create_temp_file(tmpfilename, "br_vector4_f_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -2537,6 +2543,7 @@ static void test_datafile_text_br_vector4_f() {
 
     create_temp_file(tmpfilename, "br_vector4_f_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -2630,6 +2637,7 @@ static void test_datafile_binary_substruct() {
 
     create_temp_file(tmpfilename, "struct_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -2664,6 +2672,7 @@ static void test_datafile_text_substruct() {
 
     create_temp_file(tmpfilename, "struct_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -2696,7 +2705,7 @@ static const br_uint_32 chunk_length_ref = 0x100;
 static const uint8_t binary_chunk_data[] = { BINARY_MAGICS, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x01, 0x00, };
 static const char *text_chunk_data =
     TEXT_MAGICS HOST_NL
-    "*PIXELMAP         256" HOST_NL;
+    "*PIXELMAP_OLD     256" HOST_NL;
 static void test_datafile_binary_chunk() {
     br_datafile* df_w;
     br_datafile* df_r;
@@ -2706,6 +2715,7 @@ static void test_datafile_binary_chunk() {
 
     create_temp_file(tmpfilename, "chunk_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -2740,6 +2750,7 @@ static void test_datafile_text_chunk() {
 
     create_temp_file(tmpfilename, "chunk_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -2781,6 +2792,7 @@ static void test_datafile_binary_chunk_unknown() {
 
     create_temp_file(tmpfilename, "chunk_unknown_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -2815,6 +2827,7 @@ static void test_datafile_text_chunk_unknown() {
 
     create_temp_file(tmpfilename, "chunk_unknown_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_NOT_NULL(df_w);
@@ -2854,6 +2867,7 @@ static void test_datafile_binary_count() {
 
     create_temp_file(tmpfilename, "count_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_EQUAL_INT(4, DfCountSizeBinary(df_w));
@@ -2887,6 +2901,7 @@ static void test_datafile_text_count() {
 
     create_temp_file(tmpfilename, "count_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_EQUAL_INT(1, DfCountSizeText(df_w));
@@ -2926,6 +2941,7 @@ static void test_datafile_binary_name() {
 
     create_temp_file(tmpfilename, "name_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_EQUAL_INT(strlen(name_ref) + 1, DfNameSizeBinary(df_w, name_ref));
@@ -2960,6 +2976,7 @@ static void test_datafile_text_name() {
 
     create_temp_file(tmpfilename, "name_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_EQUAL_INT(1, DfNameSizeText(df_w, name_ref));
@@ -3028,6 +3045,7 @@ static void test_datafile_binary_block_continguous() {
 
     create_temp_file(tmpfilename, "block_continguous_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_EQUAL_INT(120, DfBlockSizeBinary(df_w, block_continguous_ref, block_continguous_block_size_ref, block_continguous_block_stride_ref, block_continguous_block_count_ref, block_continguous_size_ref));
@@ -3066,6 +3084,7 @@ static void test_datafile_text_block_continguous() {
 
     create_temp_file(tmpfilename, "block_continguous_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_EQUAL_INT(6, DfBlockSizeText(df_w, block_continguous_ref, block_continguous_block_size_ref, block_continguous_block_stride_ref, block_continguous_block_count_ref, block_continguous_size_ref));
@@ -3134,6 +3153,7 @@ static void test_datafile_binary_block_striped() {
 
     create_temp_file(tmpfilename, "block_striped_binary");
 
+    BrWriteModeSet(BR_FS_MODE_BINARY);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_EQUAL_INT(56, DfBlockSizeBinary(df_w, block_striped_input_ref, block_striped_block_size_ref, block_striped_block_stride_ref, block_striped_block_count_ref, block_striped_size_ref));
@@ -3172,6 +3192,7 @@ static void test_datafile_text_block_striped() {
 
     create_temp_file(tmpfilename, "block_striped_text");
 
+    BrWriteModeSet(BR_FS_MODE_TEXT);
     df_w = DfOpen(tmpfilename, 1, BRT_FLOAT);
 
     TEST_ASSERT_EQUAL_INT(4, DfBlockSizeText(df_w, block_striped_input_ref, block_striped_block_size_ref, block_striped_block_stride_ref, block_striped_block_count_ref, block_striped_size_ref));
