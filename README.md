@@ -9,7 +9,9 @@
 Dethrace is an attempt to learn how the 1997 driving/mayhem game [Carmageddon](https://en.wikipedia.org/wiki/Carmageddon) works behind the scenes and rebuild it to run natively on modern systems.
 
 ## Progress
-33% of functions implemented. _Updated Feb 6 2022._
+Follow us on Twitter to get notified of updates!
+
+33% of functions implemented _as of Feb 6 2022._
 
 ![Screen Shot 2022-01-28 at 1 03 35 PM](https://user-images.githubusercontent.com/78985374/152665901-ce835fb6-fd53-44de-bcd3-eba7ac931755.png)
 
