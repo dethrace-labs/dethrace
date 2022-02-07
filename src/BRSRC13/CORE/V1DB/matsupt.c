@@ -12,7 +12,7 @@ br_material* BrMaterialAllocate(char* name) {
 
     m = BrResAllocate(v1db.res, sizeof(br_material), BR_MEMORY_MATERIAL);
     memcpy(m, v1db.default_material, sizeof(br_material));
-    m->map_transform_1.m[0][0] = 0;
+    m->stored = NULL;
     if (name) {
         m->identifier = BrResStrDup(m, name);
     } else {
