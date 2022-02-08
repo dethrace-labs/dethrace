@@ -2634,7 +2634,7 @@ typedef struct nt_optional_header {
     struct {
         br_uint_32 rva;
         br_uint_32 size;
-    };
+    } directories[16];
 } nt_optional_header;
 
 typedef struct section_header {
