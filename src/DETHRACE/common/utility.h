@@ -17,6 +17,8 @@ typedef br_uint_32 recurse_with_mat_cbfn(br_actor*, br_material*, void*);
 
 int CheckQuit();
 
+double sqr(double pN);
+
 void EncodeLine(char* pS);
 
 int IRandomBetween(int pA, int pB);

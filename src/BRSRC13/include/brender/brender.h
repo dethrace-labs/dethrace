@@ -24,6 +24,7 @@ br_uint_16 BrActorToActorMatrix34(br_matrix34* m, br_actor* a, br_actor* b);
 br_allocator* BrAllocatorSet(br_allocator* newal);
 
 // BrClip
+void BrClipPlaneEnable(br_actor* c);
 void BrClipPlaneDisable(br_actor* c);
 
 // BrDev
@@ -129,6 +130,7 @@ br_pixelmap* BrTableAdd(br_pixelmap* pixelmap);
 br_pixelmap* BrTableFind(char* pattern);
 br_pixelmap* BrTableRemove(br_pixelmap* pixelmap);
 br_uint_32 BrTableAddMany(br_pixelmap** items, int n);
+void BrTableUpdate(br_pixelmap* table, br_uint_16 flags);
 
 // BrTransform
 void BrTransformToMatrix34(br_matrix34* mat, br_transform* xform);

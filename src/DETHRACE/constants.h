@@ -297,6 +297,8 @@ typedef enum keymapcodes {
 
 #define WORLD_SCALE 6.9
 
+#define SHADOW_MAX_RENDER_DISTANCE 36.0
+
 #define DOUBLESIDED_FLAG_COLOR_MAP (br_pixelmap*)12345
 
 #define SLOBYTE(x) (*((signed char*)&(x)))

@@ -1031,7 +1031,10 @@ typedef struct br_font {
 } br_font;
 #pragma pack(pop)
 
-typedef struct br_object br_object;
+typedef struct br_object_dispatch br_object_dispatch;
+typedef struct br_object {
+    br_object_dispatch* dispatch;
+} br_object;
 
 typedef struct br_token_value br_token_value;
 typedef struct br_value_tag {

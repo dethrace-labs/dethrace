@@ -701,5 +701,12 @@ void BrModelUpdate(br_model* model, br_uint_16 flags) {
 void BrModelClear(br_model* model) {
     LOG_TRACE("(%p)", model);
 
-    // does something with ->stored field, we don't care
+    if (model->prepared) {
+        BrResFree(model->prepared);
+        model->prepared = 0;
+    }
+    if (model->stored) {
+        ((br_object*)model->stored)->dispatch->_free((br_object*)model->stored);
+        model->stored = NULL;
+    }
 }

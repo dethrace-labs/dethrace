@@ -31,7 +31,8 @@ void BrLightDisable(br_actor* l) {
 // IDA: void __cdecl BrClipPlaneEnable(br_actor *c)
 void BrClipPlaneEnable(br_actor* c) {
     LOG_TRACE("(%p)", c);
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __cdecl BrClipPlaneDisable(br_actor *c)

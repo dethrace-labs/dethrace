@@ -40,6 +40,8 @@ target_sources(harness PRIVATE
     sdl/gl_renderer.h
     sdl/gl_renderer_shaders.c
     sdl/gl_renderer_shaders.h
+    sdl/gl_brender_stored_context.c
+    sdl/gl_brender_stored_context.h
     brender_emu/renderer_impl.c
     brender_emu/renderer_impl.h
     sound/sound.c

@@ -1,6 +1,7 @@
 #include "gl_renderer.h"
 #include "brender/brender.h"
 #include "cameras/debug_camera.h"
+#include "gl_brender_stored_context.h"
 #include "gl_renderer_shaders.h"
 #include "harness.h"
 #include "harness/trace.h"
@@ -11,17 +12,17 @@
 // this needs to be included after glad.h
 #include <SDL_opengl.h>
 
-typedef struct tStored_model_context {
-    GLuint vao_id, ebo_id;
-} tStored_model_context;
+// typedef struct tStored_model_context {
+//     GLuint vao_id, ebo_id;
+// } tStored_model_context;
 
-typedef struct tStored_pixelmap {
-    GLuint id;
-} tStored_pixelmap;
+// typedef struct tStored_pixelmap {
+//     GLuint id;
+// } tStored_pixelmap;
 
-typedef struct tStored_material {
-    tStored_pixelmap* texture;
-} tStored_material;
+// typedef struct tStored_material {
+//     tStored_pixelmap* texture;
+// } tStored_material;
 
 SDL_Window* window;
 SDL_GLContext context;
@@ -120,7 +121,7 @@ void GLRenderer_CreateWindow(char* title, int width, int height) {
     }
     SDL_SetRelativeMouseMode(SDL_TRUE);
 
-    //SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+    //SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 
     context = SDL_GL_CreateContext(window);
     if (!context) {
@@ -254,7 +255,7 @@ void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer) {
     DebugCamera_Update();
 
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void GLRenderer_EndScene() {
@@ -276,6 +277,11 @@ void GLRenderer_RenderFramebuffer() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, screen_buffer_ebo);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+
+    // this wasn't here before...
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void GLRenderer_RenderFullScreenQuad(uint32_t* screen_buffer, int width, int height) {
@@ -320,7 +326,7 @@ void build_model(br_model* model) {
     v11model* v11;
 
     v11 = model->prepared;
-    ctx = malloc(sizeof(tStored_model_context));
+    ctx = NewStoredModelContext();
 
     int total_verts = 0, total_faces = 0;
     for (int i = 0; i < v11->ngroups; i++) {
