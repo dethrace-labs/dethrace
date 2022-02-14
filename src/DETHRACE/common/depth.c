@@ -1,6 +1,7 @@
 #include "depth.h"
 
 #include "brender/brender.h"
+#include "displays.h"
 #include "errors.h"
 #include "globvars.h"
 #include "globvrkm.h"
@@ -453,28 +454,52 @@ void DoSpecialCameraEffect(br_actor* pCamera, br_matrix34* pCamera_to_world) {
 void LessDepthFactor() {
     char s[256];
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gProgram_state.current_depth_effect.start > 3) {
+        gProgram_state.current_depth_effect.start--;
+    }
+    sprintf(s, "Depth start reduced to %d", gProgram_state.current_depth_effect.start);
+    NewTextHeadupSlot(4, 0, 500, -1, s);
+    gProgram_state.default_depth_effect.start = gProgram_state.current_depth_effect.start;
 }
 
 // IDA: void __cdecl MoreDepthFactor()
 void MoreDepthFactor() {
     char s[256];
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gProgram_state.current_depth_effect.start < 14) {
+        gProgram_state.current_depth_effect.start++;
+    }
+    sprintf(s, "Depth start increased to %d", gProgram_state.current_depth_effect.start);
+    NewTextHeadupSlot(4, 0, 500, -1, s);
+    gProgram_state.default_depth_effect.start = gProgram_state.current_depth_effect.start;
 }
 
 // IDA: void __cdecl LessDepthFactor2()
 void LessDepthFactor2() {
     char s[256];
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gProgram_state.current_depth_effect.end < 14) {
+        gProgram_state.current_depth_effect.end++;
+    }
+    sprintf(s, "Depth end reduced to %d", gProgram_state.current_depth_effect.end);
+    NewTextHeadupSlot(4, 0, 500, -1, s);
+    gProgram_state.default_depth_effect.end = gProgram_state.current_depth_effect.end;
 }
 
 // IDA: void __cdecl MoreDepthFactor2()
 void MoreDepthFactor2() {
     char s[256];
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gProgram_state.current_depth_effect.end > 0) {
+        gProgram_state.current_depth_effect.end--;
+    }
+    sprintf(s, "Depth end increased to %d", gProgram_state.current_depth_effect.end);
+    NewTextHeadupSlot(4, 0, 500, -1, s);
+    gProgram_state.default_depth_effect.end = gProgram_state.current_depth_effect.end;
 }
 
 // IDA: void __cdecl AssertYons()
@@ -483,7 +508,7 @@ void AssertYons() {
     int i;
     LOG_TRACE("()");
 
-    for (i = 0; i < 2; ++i) {
+    for (i = 0; i < COUNT_OF(gCamera_list); ++i) {
         camera_ptr = gCamera_list[i]->type_data;
         camera_ptr->yon_z = gYon_multiplier * gCamera_yon;
     }
@@ -495,7 +520,13 @@ void IncreaseYon() {
     int i;
     char s[256];
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gCamera_yon = gCamera_yon + 5.f;
+    AssertYons();
+    camera_ptr = gCamera_list[1]->type_data;
+    i = (int)camera_ptr->yon_z;
+    sprintf(s, GetMiscString(114), i);
+    NewTextHeadupSlot(4, 0, 2000, -4, s);
 }
 
 // IDA: void __cdecl DecreaseYon()
@@ -504,23 +535,31 @@ void DecreaseYon() {
     int i;
     char s[256];
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gCamera_yon = gCamera_yon - 5.f;
+    if (gCamera_yon < 5.f) {
+        gCamera_yon = 5.f;
+    }
+    AssertYons();
+    camera_ptr = gCamera_list[1]->type_data;
+    i = (int)camera_ptr->yon_z;
+    sprintf(s, GetMiscString(115), i);
+    NewTextHeadupSlot(4, 0, 2000, -4, s);
 }
 
 // IDA: void __cdecl SetYon(br_scalar pYon)
 void SetYon(br_scalar pYon) {
     int i;
     br_camera* camera_ptr;
-
     LOG_TRACE("(%d)", pYon);
 
     if (pYon < 5.0f) {
         pYon = 5.0f;
     }
 
-    for (i = 0; i < 2; i++) {
+    for (i = 0; i < COUNT_OF(gCamera_list); i++) {
         if (gCamera_list[i]) {
-            camera_ptr = (br_camera*)gCamera_list[i]->type_data;
+            camera_ptr = gCamera_list[i]->type_data;
             camera_ptr->yon_z = pYon;
         }
     }
@@ -530,7 +569,8 @@ void SetYon(br_scalar pYon) {
 // IDA: br_scalar __cdecl GetYon()
 br_scalar GetYon() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    return gCamera_yon;
 }
 
 // IDA: void __cdecl IncreaseAngle()
@@ -539,7 +579,20 @@ void IncreaseAngle() {
     int i;
     char s[256];
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < COUNT_OF(gCamera_list); i++) {
+        camera_ptr = gCamera_list[i]->type_data;
+        camera_ptr->field_of_view += 0x1c7;  // 2.4993896484375 degrees
+        if (camera_ptr->field_of_view > 0x78e3) {  // 169.9969482421875 degrees
+            camera_ptr->field_of_view = 0x78e3;
+        }
+#ifdef DETHRACE_FIX_BUGS
+        sprintf(s, "Camera angle increased to %f", BrAngleToDegrees(camera_ptr->field_of_view));
+#else
+        sprintf(s, "Camera angle increased to %d", gProgram_state.current_depth_effect.end);
+#endif
+        NewTextHeadupSlot(4, 0, 500, -1, s);
+    }
 }
 
 // IDA: void __cdecl DecreaseAngle()
@@ -548,18 +601,48 @@ void DecreaseAngle() {
     int i;
     char s[256];
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < COUNT_OF(gCamera_list); i++) {
+        camera_ptr = gCamera_list[i]->type_data;
+        camera_ptr->field_of_view -= 0x1c7;  // 2.4993896484375 degrees
+        if (camera_ptr->field_of_view < 0x71c) {  // 9.99755859375 degrees
+            camera_ptr->field_of_view = 0x71c;
+        }
+#ifdef DETHRACE_FIX_BUGS
+        sprintf(s, "Camera angle decreased to %f", BrAngleToDegrees(camera_ptr->field_of_view));
+#else
+        sprintf(s, "Camera angle decreased to %d", gProgram_state.current_depth_effect.end);
+#endif
+        NewTextHeadupSlot(4, 0, 500, -1, s);
+    }
 }
 
 // IDA: void __cdecl ToggleDepthMode()
 void ToggleDepthMode() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    switch (gProgram_state.current_depth_effect.type) {
+    case eDepth_effect_none:
+        InstantDepthChange(eDepth_effect_darkness, gProgram_state.current_depth_effect.sky_texture, 8, 0);
+        NewTextHeadupSlot(4, 0, 500, -1, "Darkness mode");
+        break;
+    case eDepth_effect_darkness:
+        InstantDepthChange(eDepth_effect_none, gProgram_state.current_depth_effect.sky_texture, 0, 0);
+        InstantDepthChange(eDepth_effect_fog, gProgram_state.current_depth_effect.sky_texture, 10, 0);
+        NewTextHeadupSlot(4, 0, 500, -1, "Fog mode");
+        break;
+    case eDepth_effect_fog:
+        InstantDepthChange(eDepth_effect_none, gProgram_state.current_depth_effect.sky_texture, 0, 0);
+        NewTextHeadupSlot(4, 0, 500, -1, "Depth effects disabled");
+        break;
+    }
+    gProgram_state.default_depth_effect.type = gProgram_state.current_depth_effect.type;
 }
 
 // IDA: int __cdecl GetSkyTextureOn()
 int GetSkyTextureOn() {
     LOG_TRACE("()");
+
     return gSky_on;
 }
 
