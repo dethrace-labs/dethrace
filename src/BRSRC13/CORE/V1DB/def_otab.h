@@ -3,4 +3,6 @@
 
 #include "brender/br_types.h"
 
+extern br_order_table _BrDefaultOrderTable;
+
 #endif
