@@ -6,6 +6,7 @@
 #include "errors.h"
 #include "globvars.h"
 #include "globvrpb.h"
+#include "graphics.h"
 #include "harness/config.h"
 #include "harness/trace.h"
 #include "input.h"
@@ -533,13 +534,28 @@ br_uint_32 DRActorEnumRecurseWithTrans(br_actor* pActor, br_matrix34* pMatrix, b
 // IDA: int __usercall sign@<EAX>(int pNumber@<EAX>)
 int sign(int pNumber) {
     LOG_TRACE("(%d)", pNumber);
-    NOT_IMPLEMENTED();
+
+    if (pNumber < 1) {
+        if (pNumber < 0) {
+            return -1;
+        } else {
+            return 0;
+        }
+    } else {
+        return 1;
+    }
 }
 
 // IDA: float __cdecl fsign(float pNumber)
 float fsign(float pNumber) {
     LOG_TRACE("(%f)", pNumber);
-    NOT_IMPLEMENTED();
+    if (pNumber > 0.f) {
+        return 1;
+    } else if (pNumber < 0.f) {
+        return -1.f;
+    } else {
+        return 0.f;
+    }
 }
 
 // IDA: FILE* __usercall OpenUniqueFileB@<EAX>(char *pPrefix@<EAX>, char *pExtension@<EDX>)
@@ -548,7 +564,17 @@ FILE* OpenUniqueFileB(char* pPrefix, char* pExtension) {
     FILE* f;
     tPath_name the_path;
     LOG_TRACE("(\"%s\", \"%s\")", pPrefix, pExtension);
-    NOT_IMPLEMENTED();
+
+    for (index = 0; index < 10000; index++) {
+        PathCat(the_path, gApplication_path, pPrefix);
+        sprintf(the_path + strlen(the_path), "%04d.%s", index, pExtension);
+        f = DRfopen(the_path, "rt");
+        if (f == NULL) {
+            return DRfopen(the_path, "wb");
+        }
+        fclose(f);
+    }
+    return NULL;
 }
 
 // IDA: void __usercall PrintScreenFile(FILE *pF@<EAX>)
@@ -559,7 +585,65 @@ void PrintScreenFile(FILE* pF) {
     int offset;
     tU8* pixel_ptr;
     LOG_TRACE("(%p)", pF);
-    NOT_IMPLEMENTED();
+
+    bit_map_size = gBack_screen->height * gBack_screen->row_bytes;
+
+    // 1. BMP Header
+    //    1. 'BM' Signature
+    WriteU8L(pF, 'B');
+    WriteU8L(pF, 'M');
+    //    2. File size in bytes (header = 0xe bytes; infoHeader = 0x28 bytes; colorTable = 0x400 bytes; pixelData = xxx)
+    WriteU32L(pF, bit_map_size + 0x436);
+    //    3. unused
+    WriteU16L(pF, 0);
+    //    4. unused
+    WriteU16L(pF, 0);
+    //    5. pixelData offset (from beginning of file)
+    WriteU32L(pF, 0x436);
+
+    // 2. Info Header
+    //    1. InfoHeader Size
+    WriteU32L(pF, 0x28);
+    //    2. Width of bitmap in pixels
+    WriteU32L(pF, gBack_screen->row_bytes);
+    //    3. Height of bitmap in pixels
+    WriteU32L(pF, gBack_screen->height);
+    //    4. Number of planes
+    WriteU16L(pF, 1);
+    //    5. Bits per pixels / palletization (8 -> 8bit palletized ==> #colors = 256)
+    WriteU16L(pF, 8);
+    //    6. Compression (0 = BI_RGB -> no compression)
+    WriteU32L(pF, 0);
+    //    7. Image Size (0 --> no compression)
+    WriteU32L(pF, 0);
+    //    8. Horizontal Pixels Per Meter
+    WriteU32L(pF, 0);
+    //    9. Vertical Pixels Per Meter
+    WriteU32L(pF, 0);
+    //    10. # Actually used colors
+    WriteU32L(pF, 0);
+    //    11. Number of important colors
+    WriteU32L(pF, 256);
+
+    // 3. Color table (=palette)
+    for (i = 0; i < 256; i++) {
+        // red, green, blue, unused
+        WriteU8L(pF, ((tU8*)gCurrent_palette->pixels)[4 * i]);
+        WriteU8L(pF, ((tU8*)gCurrent_palette->pixels)[4 * i + 1]);
+        WriteU8L(pF, ((tU8*)gCurrent_palette->pixels)[4 * i + 2]);
+        WriteU8L(pF, 0);
+    }
+
+    // 4. Pixel Data (=LUT)
+    offset = bit_map_size - gBack_screen->row_bytes;
+    for (i = 0; i < gBack_screen->height; i++) {
+        for (j = 0; j < gBack_screen->row_bytes; j++) {
+            WriteU8L(pF, ((tU8*)gBack_screen->pixels)[offset]);
+            offset++;
+        }
+        offset -= 2 * gBack_screen->row_bytes;
+    }
+    WriteU16L(pF, 0);;
 }
 
 // IDA: void __usercall PrintScreenFile16(FILE *pF@<EAX>)
@@ -578,12 +662,18 @@ void PrintScreenFile16(FILE* pF) {
 void PrintScreen() {
     FILE* f;
     LOG_TRACE("()");
-    STUB();
+
+    f = OpenUniqueFileB("DUMP", "BMP");
+    if (f != NULL) {
+        PrintScreenFile(f);
+        fclose(f);
+    }
 }
 
 // IDA: tU32 __cdecl GetTotalTime()
 tU32 GetTotalTime() {
     LOG_TRACE9("()");
+
     if (gAction_replay_mode) {
         return gLast_replay_frame_time;
     }
@@ -596,6 +686,7 @@ tU32 GetTotalTime() {
 // IDA: tU32 __cdecl GetRaceTime()
 tU32 GetRaceTime() {
     LOG_TRACE("()");
+
     return GetTotalTime() - gRace_start;
 }
 
