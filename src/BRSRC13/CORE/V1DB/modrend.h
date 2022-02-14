@@ -3,13 +3,10 @@
 
 #include "brender/br_types.h"
 
-extern void (*RenderStyleCalls[])(
-    br_actor* actor,
-    br_model* model,
-    br_material* material,
-    void* render_data,
-    br_uint_8 style,
-    int on_screen);
+typedef void (*render_style_cbfn)(br_actor* actor, br_model* model, br_material* material,
+    void* render_data, br_uint_8 style, int on_screen);
+
+extern render_style_cbfn RenderStyleCalls[8];
 
 void renderFaces(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen);
 
