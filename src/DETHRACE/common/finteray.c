@@ -178,6 +178,7 @@ int DRSceneRayPick2D(br_actor* world, br_vector3* pPosition, br_vector3* pDir, d
     LOG_TRACE("(%p, %p, %p, %p)", world, pPosition, pDir, callback);
 
     BrMatrix34Inverse(&gPick_model_to_view__finteray, &world->t.t.mat);
+    LOG_WARN_ONCE("Missing material and model pointers to ActorRayPick2D");
     return ActorRayPick2D(world, pPosition, pDir, NULL, NULL, callback);
 }
 
@@ -387,13 +388,15 @@ void FindFace(br_vector3* pPosition, br_vector3* pDir, br_vector3* nor, br_scala
 // IDA: void __cdecl EnablePlingMaterials()
 void EnablePlingMaterials() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    
+    gPling_materials = 1;
 }
 
 // IDA: void __cdecl DisablePlingMaterials()
 void DisablePlingMaterials() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gPling_materials = 0;
 }
 
 // IDA: void __usercall CheckSingleFace(tFace_ref *pFace@<EAX>, br_vector3 *ray_pos@<EDX>, br_vector3 *ray_dir@<EBX>, br_vector3 *normal@<ECX>, br_scalar *rt)
