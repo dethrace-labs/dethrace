@@ -51,12 +51,20 @@ int clock_gettime(int dummy, struct timespec* tv) {
 }
 #endif
 
+#ifdef __DOS__
+#define GFX_INIT_STRING_32X20X8 "MCGA,W:320,H:200,B:8"
+#define GFX_INIT_STRING_64X48X8 "VESA,W:640,H:480,B:8"
+#else
+#define GFX_INIT_STRING_32X20X8 "320x200 init string"
+#define GFX_INIT_STRING_64X48X8 "640x480 init string"
+#endif
+
 int gDOSGfx_initialized;
 int gExtra_mem;
 int gReplay_override;
 tGraf_spec gGraf_specs[2] = {
-    { 8, 1, 0, 320, 200, 0, 0, "32X20X8", "MCGA,W:320,H:200,B:8", 0, 0, 0, NULL },
-    { 8, 1, 0, 640, 480, 0, 0, "64X48X8", "VESA,W:640,H:480,B:8", 0, 0, 0, NULL }
+    { 8, 1, 0, 320, 200, 0, 0, "32X20X8", GFX_INIT_STRING_32X20X8, 320, 320, 200, NULL },
+    { 8, 1, 0, 640, 480, 0, 0, "64X48X8", GFX_INIT_STRING_64X48X8, 640, 640, 480, NULL }
 };
 int gASCII_table[128];
 tU32 gKeyboard_bits[8];
