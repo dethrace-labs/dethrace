@@ -257,7 +257,20 @@ tU32* KevKeyService() {
 int OldKeyIsDown(int pKey_index) {
     int i;
     LOG_TRACE("(%d)", pKey_index);
-    NOT_IMPLEMENTED();
+
+    switch (pKey_index) {
+        case -2:
+            return 1;
+        case -1:
+            for (i = 0; i < COUNT_OF(gGo_ahead_keys); i++) {
+                if (PDKeyDown(gGo_ahead_keys[i]) != 0) {
+                    return 1;
+                }
+            }
+            return 0;
+        default:
+            return PDKeyDown(gKey_mapping[pKey_index]);
+    }
 }
 
 // IDA: int __usercall KeyIsDown@<EAX>(int pKey_index@<EAX>)
@@ -293,7 +306,18 @@ void WaitForNoKeys() {
 // IDA: void __cdecl WaitForAKey()
 void WaitForAKey() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    while (1) {
+        CheckQuit();
+        if (AnyKeyDown() != 0) {
+            break;
+        }
+        if (EitherMouseButtonDown() != 0) {
+            break;
+        }
+    }
+    CheckQuit();
+    WaitForNoKeys();
 }
 
 // IDA: int __usercall CmdKeyDown@<EAX>(int pFKey_ID@<EAX>, int pCmd_key_ID@<EDX>)
@@ -308,7 +332,18 @@ void GetMousePosition(int* pX_coord, int* pY_coord) {
     int y_top_margin;
     int y_bottom_margin;
     LOG_TRACE("(%p, %p)", pX_coord, pY_coord);
-    NOT_IMPLEMENTED();
+
+    PDMouseButtons(pX_coord, pY_coord);
+    if (*pX_coord < 0) {
+        *pX_coord = 0;
+    } else if (gGraf_specs[gGraf_spec_index].total_width < *pX_coord) {
+        *pX_coord = gGraf_specs[gGraf_spec_index].total_width;
+    }
+    if (*pY_coord < 0) {
+        *pY_coord = 0;
+    } else if (gGraf_specs[gGraf_spec_index].total_height < *pY_coord) {
+        *pY_coord = gGraf_specs[gGraf_spec_index].total_height;
+    }
 }
 
 // IDA: void __cdecl InitRollingLetters()
@@ -327,6 +362,7 @@ void InitRollingLetters() {
 // IDA: void __cdecl EndRollingLetters()
 void EndRollingLetters() {
     LOG_TRACE("()");
+
     BrMemFree(gRolling_letters);
 }
 
@@ -392,7 +428,9 @@ void AddRollingString(char* pStr, int pX, int pY, tRolling_type rolling_type) {
 void AddRollingNumber(tU32 pNumber, int pWidth, int pX, int pY) {
     char the_string[32];
     LOG_TRACE("(%d, %d, %d, %d)", pNumber, pWidth, pX, pY);
-    NOT_IMPLEMENTED();
+
+    sprintf(the_string, "%0.*d", pWidth, pNumber);
+    AddRollingString(the_string, pX, pY, eRT_numeric);
 }
 
 // IDA: void __cdecl RollLettersIn()
@@ -520,12 +558,47 @@ void ChangeTextTo(int pXcoord, int pYcoord, char* pNew_str, char* pOld_str) {
     tRolling_type new_type;
     char new_char;
     LOG_TRACE("(%d, %d, \"%s\", \"%s\")", pXcoord, pYcoord, pNew_str, pOld_str);
-    NOT_IMPLEMENTED();
+
+    len = strlen(pOld_str);
+    len2 = strlen(pNew_str);
+
+    for (i = 0; i < len; i++) {
+        if (i < len2) {
+            new_char = pNew_str[i];
+        } else {
+            new_char = ' ';
+        }
+        if (new_char == ROLLING_LETTER_LOOP_RANDOM) {
+            new_type = eRT_looping_random;
+        } else if (new_char >= '0' && new_char <= '9') {
+            new_type = eRT_numeric;
+        } else {
+            new_type = eRT_alpha;
+        }
+        x_coord = gCurrent_graf_data->rolling_letter_x_pitch * i + pXcoord;
+        for (j = 0, let = gRolling_letters; j < NBR_ROLLING_LETTERS; j++, let++) {
+            if (let->number_of_letters >= 0 && let->x_coord == x_coord && let->y_coord == pYcoord) {
+                if (new_char != ROLLING_LETTER_LOOP_RANDOM) {
+                    let->letters[0] = new_char;
+                }
+                if (new_char == ' ') {
+                    let->letters[0] = ' ';
+                }
+                let->current_offset = let->number_of_letters * gCurrent_graf_data->save_slot_letter_height;
+                let->rolling_type = new_type;
+            }
+        }
+    }
+    for (i = len; i < len2; i++) {
+        // new_type should be calculated here.
+        AddRollingLetter(pNew_str[i], gCurrent_graf_data->rolling_letter_x_pitch * i + pXcoord, pYcoord, new_type);
+    }
 }
 
 // IDA: void __usercall SetRollingCursor(int pSlot_index@<EAX>)
 void SetRollingCursor(int pSlot_index) {
     LOG_TRACE("(%d)", pSlot_index);
+
     gCurrent_cursor = ChangeCharTo(pSlot_index, gCurrent_position, ROLLING_LETTER_LOOP_RANDOM);
 }
 
@@ -533,7 +606,11 @@ void SetRollingCursor(int pSlot_index) {
 void BlankSlot(int pIndex, int pName_length, int pVisible_length) {
     int i;
     LOG_TRACE("(%d, %d, %d)", pIndex, pName_length, pVisible_length);
-    NOT_IMPLEMENTED();
+
+    gVisible_length = pVisible_length;
+    for (i = 0; i < pName_length; i++) {
+        ChangeCharTo(pIndex, i, ' ');
+    }
 }
 
 // IDA: void __usercall DoRLBackspace(int pSlot_index@<EAX>)
@@ -556,7 +633,7 @@ void DoRLBackspace(int pSlot_index) {
         }
         gCurrent_typing[new_len] = 0;
         gCurrent_position = gCurrent_position - 1;
-        gCurrent_cursor = ChangeCharTo(pSlot_index, gCurrent_position, ROLLING_LETTER_LOOP_RANDOM);
+        SetRollingCursor(pSlot_index);
     }
 }
 
@@ -565,13 +642,24 @@ void DoRLDelete(int pSlot_index) {
     int i;
     int new_len;
     LOG_TRACE("(%d)", pSlot_index);
-    NOT_IMPLEMENTED();
+
+    if (gCurrent_position <= ((int)strlen(gCurrent_typing) - 1)) {
+        new_len = strlen(gCurrent_typing) - 1;
+        ChangeCharTo(pSlot_index, new_len, ' ');
+        for (i = gCurrent_position; i < new_len; i++) {
+            gCurrent_typing[i] = gCurrent_typing[i + 1];
+            ChangeCharTo(pSlot_index, i, gCurrent_typing[i]);
+        }
+        gCurrent_typing[new_len] = '\0';
+        SetRollingCursor(pSlot_index);
+    }
 }
 
 // IDA: void __usercall DoRLInsert(int pSlot_index@<EAX>)
 void DoRLInsert(int pSlot_index) {
     LOG_TRACE("(%d)", pSlot_index);
-    NOT_IMPLEMENTED();
+
+    gInsert_mode = !gInsert_mode;
 }
 
 // IDA: void __usercall DoRLCursorLeft(int pSlot_index@<EAX>)
@@ -585,14 +673,19 @@ void DoRLCursorLeft(int pSlot_index) {
         }
 
         gCurrent_position--;
-        gCurrent_cursor = ChangeCharTo(pSlot_index, gCurrent_position, ROLLING_LETTER_LOOP_RANDOM);
+        SetRollingCursor(pSlot_index);
     }
 }
 
 // IDA: void __usercall DoRLCursorRight(int pSlot_index@<EAX>)
 void DoRLCursorRight(int pSlot_index) {
     LOG_TRACE("(%d)", pSlot_index);
-    NOT_IMPLEMENTED();
+
+    if (gCurrent_position < strlen(gCurrent_typing)) {
+        ChangeCharTo(pSlot_index, gCurrent_position, gCurrent_typing[gCurrent_position]);
+        gCurrent_position++;
+        SetRollingCursor(pSlot_index);
+    }
 }
 
 // IDA: void __usercall DoRLTypeLetter(int pChar@<EAX>, int pSlot_index@<EDX>)
@@ -630,7 +723,7 @@ void DoRLTypeLetter(int pChar, int pSlot_index) {
         gCurrent_typing[gCurrent_position] = pChar;
         ChangeCharTo(pSlot_index, gCurrent_position, pChar);
         gCurrent_position++;
-        gCurrent_cursor = ChangeCharTo(pSlot_index, gCurrent_position, ROLLING_LETTER_LOOP_RANDOM);
+        SetRollingCursor(pSlot_index);
     }
 }
 
@@ -638,7 +731,14 @@ void DoRLTypeLetter(int pChar, int pSlot_index) {
 void StopTyping(int pSlot_index) {
     int i;
     LOG_TRACE("(%d)", pSlot_index);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < gThe_length; i++) {
+        if (i < (strlen(gCurrent_typing) - 1)) {
+            ChangeCharTo(pSlot_index, i, gCurrent_typing[i]);
+        } else {
+            ChangeCharTo(pSlot_index, i, ' ');
+        }
+    }
 }
 
 // IDA: void __usercall RevertTyping(int pSlot_index@<EAX>, char *pRevert_str@<EDX>)
@@ -654,6 +754,7 @@ void RevertTyping(int pSlot_index, char* pRevert_str) {
 // IDA: void __usercall StartTyping(int pSlot_index@<EAX>, char *pText@<EDX>, int pVisible_length@<EBX>)
 void StartTyping(int pSlot_index, char* pText, int pVisible_length) {
     LOG_TRACE("(%d, \"%s\", %d)", pSlot_index, pText, pVisible_length);
+
     gThe_length = pVisible_length;
     strcpy(gCurrent_typing, pText);
     gVisible_length = pVisible_length;
@@ -665,36 +766,27 @@ void StartTyping(int pSlot_index, char* pText, int pVisible_length) {
 void TypeKey(int pSlot_index, char pKey) {
     LOG_TRACE("(%d, %d)", pSlot_index, pKey);
 
-    //if (pKey < 0x40u) {
-    //if (pKey >= 0x2Fu) {
-    if (pKey == KEY_GRAVE) {
-        return;
-    }
-    if (pKey == KEY_BACKSPACE) {
+    switch (pKey) {
+    case KEY_GRAVE:
+        break;
+    case KEY_BACKSPACE:
         DoRLBackspace(pSlot_index);
-        return;
-    }
-    //}
-    if (pKey == KEY_INSERT) {
-        gInsert_mode = !gInsert_mode;
-        return;
-    }
-    if (pKey == KEY_DELETE) {
+        break;
+    case KEY_INSERT:
+        DoRLInsert(pSlot_index);
+        break;
+    case KEY_DELETE:
         DoRLDelete(pSlot_index);
-        return;
-    }
-    if (pKey == KEY_LEFT) {
+        break;
+    case KEY_LEFT:
         DoRLCursorLeft(pSlot_index);
-        return;
-    }
-    if (pKey != KEY_RIGHT) {
+        break;
+    case KEY_RIGHT:
+        DoRLCursorRight(pSlot_index);
+        break;
+    default:	
         DoRLTypeLetter(PDGetASCIIFromKey(pKey), pSlot_index);
-        return;
-    }
-    if (strlen(gCurrent_typing) > gCurrent_position) {
-        ChangeCharTo(pSlot_index, gCurrent_position, gCurrent_typing[gCurrent_position]);
-        ++gCurrent_position;
-        SetRollingCursor(pSlot_index);
+        break;
     }
 }
 
@@ -709,6 +801,7 @@ void SetSlotXY(int pSlot_index, int pX_coord, int pY_coord) {
 // IDA: void __usercall GetTypedName(char *pDestn@<EAX>, int pMax_length@<EDX>)
 void GetTypedName(char* pDestn, int pMax_length) {
     LOG_TRACE("(\"%s\", %d)", pDestn, pMax_length);
+
     if (strlen(gCurrent_typing) <= pMax_length) {
         strcpy(pDestn, gCurrent_typing);
     } else {
