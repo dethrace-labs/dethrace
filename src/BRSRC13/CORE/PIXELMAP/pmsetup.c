@@ -23,7 +23,7 @@ void BrPixelmapBegin() {
 
     BrMemSet(&_pixelmap, 0, sizeof(br_pixelmap_state));
     _pixelmap.res = BrResAllocate(NULL, 0, BR_MEMORY_ANCHOR);
-    for (i = 0; i < 2; i++) {
+    for (i = 0; i < BR_ASIZE(pm_resourceClasses); i++) {
         BrResClassAdd(&pm_resourceClasses[i]);
     }
     BrImageAdd(&Image_BRPMAP1);
