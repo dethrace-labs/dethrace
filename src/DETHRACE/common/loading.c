@@ -128,133 +128,169 @@ int gDemo_offensive;
 tU32 ReadU32(FILE* pF) {
     tU32 raw_long;
     LOG_TRACE("(%p)", pF);
-    NOT_IMPLEMENTED();
+
+    fread(&raw_long, sizeof(raw_long), 1, pF);
+    return raw_long;
 }
 
 // IDA: tU16 __usercall ReadU16@<AX>(FILE *pF@<EAX>)
 tU16 ReadU16(FILE* pF) {
     tU16 raw_short;
     LOG_TRACE("(%p)", pF);
-    NOT_IMPLEMENTED();
+
+    fread(&raw_short, sizeof(raw_short), 1, pF);
+    return raw_short;
 }
 
 // IDA: tU8 __usercall ReadU8@<AL>(FILE *pF@<EAX>)
 tU8 ReadU8(FILE* pF) {
     tU8 raw_byte;
     LOG_TRACE("(%p)", pF);
-    NOT_IMPLEMENTED();
+
+    fread(&raw_byte, sizeof(raw_byte), 1, pF);
+    return raw_byte;
 }
 
 // IDA: tS32 __usercall ReadS32@<EAX>(FILE *pF@<EAX>)
 tS32 ReadS32(FILE* pF) {
     tS32 raw_long;
     LOG_TRACE("(%p)", pF);
-    NOT_IMPLEMENTED();
+
+    fread(&raw_long, sizeof(raw_long), 1, pF);
+    return raw_long;
 }
 
 // IDA: tS16 __usercall ReadS16@<AX>(FILE *pF@<EAX>)
 tS16 ReadS16(FILE* pF) {
     tS16 raw_short;
     LOG_TRACE("(%p)", pF);
-    NOT_IMPLEMENTED();
+
+    fread(&raw_short, sizeof(raw_short), 1, pF);
+    return raw_short;
 }
 
 // IDA: tS8 __usercall ReadS8@<AL>(FILE *pF@<EAX>)
 tS8 ReadS8(FILE* pF) {
     tS8 raw_byte;
     LOG_TRACE("(%p)", pF);
-    NOT_IMPLEMENTED();
+
+    fread(&raw_byte, sizeof(raw_byte), 1, pF);
+    return raw_byte;
 }
 
 // IDA: void __usercall WriteU32L(FILE *pF@<EAX>, tU32 pNumber@<EDX>)
 void WriteU32L(FILE* pF, tU32 pNumber) {
     tU32 raw_long;
     LOG_TRACE("(%p, %d)", pF, pNumber);
-    NOT_IMPLEMENTED();
+
+    raw_long = pNumber;
+    fwrite(&raw_long, sizeof(raw_long), 1, pF);
 }
 
 // IDA: void __usercall WriteU16L(FILE *pF@<EAX>, tU16 pNumber@<EDX>)
 void WriteU16L(FILE* pF, tU16 pNumber) {
     tU16 raw_short;
     LOG_TRACE("(%p, %d)", pF, pNumber);
-    NOT_IMPLEMENTED();
+
+    raw_short = pNumber;
+    fwrite(&raw_short, sizeof(raw_short), 1, pF);
 }
 
 // IDA: void __usercall WriteU8L(FILE *pF@<EAX>, tU8 pNumber@<EDX>)
 void WriteU8L(FILE* pF, tU8 pNumber) {
     tU8 raw_byte;
     LOG_TRACE("(%p, %d)", pF, pNumber);
-    NOT_IMPLEMENTED();
+
+    raw_byte = pNumber;
+    fwrite(&raw_byte, sizeof(raw_byte), 1, pF);
 }
 
 // IDA: void __usercall WriteS32L(FILE *pF@<EAX>, tS32 pNumber@<EDX>)
 void WriteS32L(FILE* pF, tS32 pNumber) {
     tS32 raw_long;
     LOG_TRACE("(%p, %d)", pF, pNumber);
-    NOT_IMPLEMENTED();
+
+    raw_long = pNumber;
+    fwrite(&raw_long, sizeof(raw_long), 1, pF);
 }
 
 // IDA: void __usercall WriteS16L(FILE *pF@<EAX>, tS16 pNumber@<EDX>)
 void WriteS16L(FILE* pF, tS16 pNumber) {
     tS16 raw_short;
     LOG_TRACE("(%p, %d)", pF, pNumber);
-    NOT_IMPLEMENTED();
+
+    raw_short = pNumber;
+    fwrite(&raw_short, sizeof(raw_short), 1, pF);
 }
 
 // IDA: void __usercall WriteS8L(FILE *pF@<EAX>, tS8 pNumber@<EDX>)
 void WriteS8L(FILE* pF, tS8 pNumber) {
     tS8 raw_byte;
     LOG_TRACE("(%p, %d)", pF, pNumber);
-    NOT_IMPLEMENTED();
+
+    raw_byte = pNumber;
+    fwrite(&raw_byte, sizeof(raw_byte), 1, pF);
 }
 
 // IDA: void __usercall SkipBytes(FILE *pF@<EAX>, int pBytes_to_skip@<EDX>)
 void SkipBytes(FILE* pF, int pBytes_to_skip) {
     LOG_TRACE("(%p, %d)", pF, pBytes_to_skip);
-    NOT_IMPLEMENTED();
+
+    fseek(pF, pBytes_to_skip, 1);
 }
 
 // IDA: tU32 __usercall MemReadU32@<EAX>(char **pPtr@<EAX>)
 tU32 MemReadU32(char** pPtr) {
     tU32 raw_long;
-    memcpy(&raw_long, *pPtr, 4);
-    *pPtr += 4;
+
+    memcpy(&raw_long, *pPtr, sizeof(raw_long));
+    *pPtr += sizeof(raw_long);
     return raw_long;
 }
 
 // IDA: tU16 __usercall MemReadU16@<AX>(char **pPtr@<EAX>)
 tU16 MemReadU16(char** pPtr) {
     tU16 raw_short;
-    memcpy(&raw_short, *pPtr, 2);
-    *pPtr += 2;
+
+    memcpy(&raw_short, *pPtr, sizeof(raw_short));
+    *pPtr += sizeof(raw_short);
     return raw_short;
 }
 
 // IDA: tU8 __usercall MemReadU8@<AL>(char **pPtr@<EAX>)
 tU8 MemReadU8(char** pPtr) {
-    return *(*pPtr)++;
+    tU8 raw_byte;
+
+    memcpy(&raw_byte, *pPtr, sizeof(raw_byte));
+    *pPtr += sizeof(raw_byte);
+    return raw_byte;
 }
 
 // IDA: tS32 __usercall MemReadS32@<EAX>(char **pPtr@<EAX>)
 tS32 MemReadS32(char** pPtr) {
     tS32 raw_long;
     LOG_TRACE("(%p)", pPtr);
-    NOT_IMPLEMENTED();
+
+    memcpy(&raw_long, *pPtr, sizeof(raw_long));
+    *pPtr += sizeof(raw_long);
+    return raw_long;
 }
 
 // IDA: tS16 __usercall MemReadS16@<AX>(char **pPtr@<EAX>)
 tS16 MemReadS16(char** pPtr) {
     tS16 raw_short;
-    memcpy(&raw_short, *pPtr, 2);
-    *pPtr += 2;
+
+    memcpy(&raw_short, *pPtr, sizeof(raw_short));
+    *pPtr += sizeof(raw_short);
     return raw_short;
 }
 
 // IDA: tS8 __usercall MemReadS8@<AL>(char **pPtr@<EAX>)
 tS8 MemReadS8(char** pPtr) {
     tS8 raw_byte;
-    raw_byte = **pPtr;
-    (*pPtr)++;
+
+    memcpy(&raw_byte, *pPtr, sizeof(raw_byte));
+    *pPtr += sizeof(raw_byte);
     return raw_byte;
 }
 
@@ -275,8 +311,8 @@ void LoadGeneralParameters() {
     PathCat(the_path, gApplication_path, "ACTORS");
     PathCat(the_path, the_path, "PROG.ACT");
     f = fopen(the_path, "rb");
-    if (f) {
-        fgets(s, 255, f);
+    if (f != NULL) {
+        fgets(s, sizeof(s) - 1, f);
         fclose(f);
         for (i = 0; i < strlen(gDecode_string); i++) {
             gDecode_string[i] -= 50;
@@ -297,7 +333,7 @@ void LoadGeneralParameters() {
     }
     PathCat(the_path, gApplication_path, "GENERAL.TXT");
     f = DRfopen(the_path, "rt");
-    if (!f) {
+    if (f == NULL) {
         FatalError(8);
     }
     gCamera_hither = GetAFloat(f) * HITHER_MULTIPLIER;
@@ -434,7 +470,7 @@ br_pixelmap* LoadPixelmap(char* pName) {
         PathCat(the_path, gApplication_path, gGraf_specs[gGraf_spec_index].data_dir_name);
         PathCat(the_path, the_path, "PIXELMAP");
         PathCat(the_path, the_path, pName);
-        gAllow_open_to_fail = 1;
+        AllowOpenToFail();
         pm = DRPixelmapLoad(the_path);
         if (!pm) {
             PathCat(the_path, gApplication_path, "PIXELMAP");
@@ -530,7 +566,12 @@ void DRLoadShadeTable(char* pPath_name) {
 // IDA: void __usercall RezeroPixelmaps(br_pixelmap **pPixelmap_array@<EAX>, int pCount@<EDX>)
 void RezeroPixelmaps(br_pixelmap** pPixelmap_array, int pCount) {
     LOG_TRACE("(%p, %d)", pPixelmap_array, pCount);
-    NOT_IMPLEMENTED();
+
+    while (pCount != 0) {
+        pCount--;
+        pPixelmap_array[pCount]->origin_x = 0;
+        pPixelmap_array[pCount]->origin_y = 0;
+    }
 }
 
 // IDA: void __usercall DRLoadPixelmaps(char *pPath_name@<EAX>)
@@ -542,10 +583,7 @@ void DRLoadPixelmaps(char* pPath_name) {
     PossibleService();
     number_of_pixelmaps = DRPixelmapLoadMany(pPath_name, pixelmap_array, 100);
 
-    for (i = 0; i < number_of_pixelmaps; i++) {
-        pixelmap_array[i]->origin_x = 0;
-        pixelmap_array[i]->origin_y = 0;
-    }
+    RezeroPixelmaps(pixelmap_array, number_of_pixelmaps);
     BrMapAddMany(pixelmap_array, number_of_pixelmaps);
 }
 
@@ -564,7 +602,10 @@ void DRLoadModels(char* pPath_name) {
     br_model* model_array[100];
     int number_of_models;
     LOG_TRACE("(\"%s\")", pPath_name);
-    NOT_IMPLEMENTED();
+
+    PossibleService();
+    number_of_models = BrModelLoadMany(pPath_name, model_array, COUNT_OF(model_array));
+    BrModelAddMany(model_array, number_of_models);
 }
 
 // IDA: void __usercall DRLoadActors(char *pPath_name@<EAX>)
@@ -573,7 +614,13 @@ void DRLoadActors(char* pPath_name) {
     int number_of_actors;
     int i;
     LOG_TRACE("(\"%s\")", pPath_name);
-    NOT_IMPLEMENTED();
+
+    PossibleService();
+    number_of_actors = BrActorLoadMany(pPath_name, actor_array, COUNT_OF(actor_array));
+    for (i = 0; i < number_of_actors; i++) {
+        gActor_array[gNumber_of_actors] = actor_array[i];
+        gNumber_of_actors++;
+    }
 }
 
 // IDA: void __usercall DRLoadLights(char *pPath_name@<EAX>)
@@ -581,14 +628,22 @@ void DRLoadLights(char* pPath_name) {
     br_actor* light_array[100];
     int number_of_lights;
     int i;
-    STUB();
+
+    PossibleService();
+    number_of_lights = BrActorLoadMany(pPath_name, light_array, COUNT_OF(light_array));
+    for (i = 0; i < number_of_lights; i++) {
+        gLight_array[gNumber_of_lights] = light_array[i];
+        gNumber_of_lights++;
+    }
 }
 
 // IDA: void __usercall LoadInFiles(char *pThe_base_path@<EAX>, char *pThe_dir_name@<EDX>, void (*pLoad_routine)(char*)@<EBX>)
 void LoadInFiles(char* pThe_base_path, char* pThe_dir_name, void (*pLoad_routine)(char*)) {
     tPath_name the_path;
     LOG_TRACE("(\"%s\", \"%s\", %p)", pThe_base_path, pThe_dir_name, pLoad_routine);
-    NOT_IMPLEMENTED();
+
+    PathCat(the_path, pThe_base_path, pThe_dir_name);
+    PDForEveryFile(the_path, pLoad_routine);
 }
 
 // IDA: void __usercall LoadInRegisteeDir(char *pThe_dir_path@<EAX>)
@@ -598,20 +653,13 @@ void LoadInRegisteeDir(char* pThe_dir_path) {
     LOG_TRACE("(\"%s\")", pThe_dir_path);
 
     PathCat(reg_path, pThe_dir_path, "REG");
-    PathCat(the_path, reg_path, "PALETTES");
-    PDForEveryFile(the_path, DRLoadPalette);
-    PathCat(the_path, reg_path, "SHADETAB");
-    PDForEveryFile(the_path, DRLoadShadeTable);
-    PathCat(the_path, reg_path, "PIXELMAP");
-    PDForEveryFile(the_path, DRLoadPixelmaps);
-    PathCat(the_path, reg_path, "MATERIAL");
-    PDForEveryFile(the_path, DRLoadMaterials);
-    PathCat(the_path, reg_path, "MODELS");
-    PDForEveryFile(the_path, DRLoadModels);
-    PathCat(the_path, reg_path, "ACTORS");
-    PDForEveryFile(the_path, DRLoadActors);
-    PathCat(the_path, reg_path, "LIGHTS");
-    PDForEveryFile(the_path, DRLoadLights);
+    LoadInFiles(reg_path, "PALETTES", DRLoadPalette);
+    LoadInFiles(reg_path, "SHADETAB", DRLoadShadeTable);
+    LoadInFiles(reg_path, "PIXELMAP", DRLoadPixelmaps);
+    LoadInFiles(reg_path, "MATERIAL", DRLoadMaterials);
+    LoadInFiles(reg_path, "MODELS", DRLoadModels);
+    LoadInFiles(reg_path, "ACTORS", DRLoadActors);
+    LoadInFiles(reg_path, "LIGHTS", DRLoadLights);
 }
 
 // IDA: void __cdecl LoadInRegistees()
@@ -699,6 +747,7 @@ void UnlockInterfaceStuff() {
 // IDA: void __cdecl InitInterfaceLoadState()
 void InitInterfaceLoadState() {
     LOG_TRACE("()");
+
     memset(gCursors, 0, sizeof(gCursors));
 }
 
@@ -812,7 +861,17 @@ void KillWindscreen(br_model* pModel, br_material* pMaterial) {
     br_face* face;
     int i;
     LOG_TRACE("(%p, %p)", pModel, pMaterial);
-    NOT_IMPLEMENTED();
+
+    if (pModel == NULL || pModel->nfaces == 0) {
+        return;
+    }
+    for (i = 0; i < pModel->nfaces; i++) {
+        face = &pModel->faces[i];
+        if (face->material == pMaterial) {
+            face->material = NULL;
+        }
+    }
+    BrModelUpdate(pModel, BR_MODU_ALL);
 }
 
 // IDA: void __usercall DropOffDyingPeds(tCar_spec *pCar@<EAX>)
@@ -820,7 +879,19 @@ void DropOffDyingPeds(tCar_spec* pCar) {
     br_actor* child;
     br_actor* next;
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    if (pCar->current_car_actor < 0) {
+        return;
+    }
+
+    child = pCar->car_master_actor->children;
+    while (child != NULL) {
+        next = child->next;
+        if (ActorIsPedestrian(child)) {
+            DetachPedActorFromCar(child);
+        }
+        child = next;
+    }
 }
 
 // IDA: void __usercall DisposeCar(tCar_spec *pCar_spec@<EAX>, int pOwner@<EDX>)
@@ -1412,7 +1483,9 @@ void CloneCar(tCar_spec** pOutput_car, tCar_spec* pInput_car) {
 // IDA: void __usercall DisposeClonedCar(tCar_spec *pCar@<EAX>)
 void DisposeClonedCar(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    BrActorRemove(pCar->car_master_actor);
+    BrActorFree(pCar->car_master_actor);
 }
 
 // IDA: int __usercall RemoveDoubleSided@<EAX>(br_model *pModel@<EAX>)
@@ -1479,7 +1552,7 @@ void MungeWindscreen(br_model* pModel) {
             }
             face++;
         }
-        BrModelUpdate(pModel, 0x7FFFu);
+        BrModelUpdate(pModel, BR_MODU_ALL);
     }
 }
 
@@ -2107,7 +2180,12 @@ void DisposeHeadupImages() {
     int i;
     tPath_name the_path;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < COUNT_OF(gHeadup_images); i++) {
+        if (gHeadup_images[i] != NULL) {
+            BrPixelmapFree(gHeadup_images[i]);
+        }
+    }
 }
 
 // IDA: FILE* __cdecl OpenRaceFile()
@@ -2798,7 +2876,9 @@ void GetAString(FILE* pF, char* pString) {
 // IDA: void __cdecl AboutToLoadFirstCar()
 void AboutToLoadFirstCar() {
     LOG_TRACE("()");
-    memset(gFunk_groove_flags, 0, sizeof(gFunk_groove_flags));
+
+    InitFunkGrooveFlags();
+    gGroove_funk_offset = 0;
 }
 
 // IDA: void __usercall LoadOpponentsCars(tRace_info *pRace_info@<EAX>)
@@ -3250,5 +3330,9 @@ int RestoreOptions() {
 void InitFunkGrooveFlags() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    // Starting from 1
+    for (i = 1; i < COUNT_OF(gFunk_groove_flags); i++) {
+        gFunk_groove_flags[i] = 0;
+    }
 }
