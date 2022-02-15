@@ -92,14 +92,26 @@ void SetSightDistance(br_scalar pYon) {
 br_actor* FindActorInArray(char* pThe_name) {
     int i;
     LOG_TRACE("(\"%s\")", pThe_name);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < gNumber_of_actors; i++) {
+        if (strcmp(gActor_array[i]->identifier, pThe_name) == 0) {
+            return gActor_array[i];
+        }
+    }
+    return NULL;
 }
 
 // IDA: br_actor* __usercall FindLightInArray@<EAX>(char *pThe_name@<EAX>)
 br_actor* FindLightInArray(char* pThe_name) {
     int i;
     LOG_TRACE("(\"%s\")", pThe_name);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < gNumber_of_lights; i++) {
+        if (strcmp(gLight_array[i]->identifier, pThe_name) == 0) {
+            return gLight_array[i];
+        }
+    }
+    return NULL;
 }
 
 // IDA: br_actor* __usercall CloneActor@<EAX>(br_actor *pSource_actor@<EAX>)
@@ -108,12 +120,28 @@ br_actor* CloneActor(br_actor* pSource_actor) {
     br_actor* child_actor;
     br_actor* new_child_actor;
     LOG_TRACE("(%p)", pSource_actor);
-    NOT_IMPLEMENTED();
+
+    new_actor = BrActorAllocate(pSource_actor->type, pSource_actor->type_data);
+    new_actor->model = pSource_actor->model;
+    new_actor->material = pSource_actor->material;
+    if (pSource_actor->identifier != NULL) {
+        if (new_actor->identifier != NULL) {
+            BrResFree(new_actor->identifier);
+        }
+        new_actor->identifier = BrResStrDup(new_actor, pSource_actor->identifier);
+    }
+    new_actor->t = pSource_actor->t;
+    for (child_actor = pSource_actor->children; child_actor != NULL; child_actor = child_actor->next) {
+        new_child_actor = CloneActor(child_actor);
+        BrActorAdd(new_actor, new_child_actor);
+    }
+    return new_actor;
 }
 
 // IDA: void __usercall InitialiseStorageSpace(tBrender_storage *pStorage_space@<EAX>, int pMax_pixelmaps@<EDX>, int pMax_shade_tables@<EBX>, int pMax_materials@<ECX>, int pMax_models)
 void InitialiseStorageSpace(tBrender_storage* pStorage_space, int pMax_pixelmaps, int pMax_shade_tables, int pMax_materials, int pMax_models) {
     LOG_TRACE("(%p, %d, %d, %d, %d)", pStorage_space, pMax_pixelmaps, pMax_shade_tables, pMax_materials, pMax_models);
+
     pStorage_space->pixelmaps_count = 0;
     pStorage_space->shade_tables_count = 0;
     pStorage_space->materials_count = 0;
@@ -2228,7 +2256,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     PathCat(gAdditional_actor_path, gAdditional_actor_path, str);
     gAdditional_actors = BrActorAllocate(0, 0);
     BrActorAdd(gUniverse_actor, gAdditional_actors);
-    gLast_actor = 0;
+    gLast_actor = NULL;
     SaveAdditionalStuff();
     GetAString(f, s);
     sky = BrMapFind(s);
@@ -2260,6 +2288,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
 
     MungeRearviewSky();
     PossibleService();
+
     gProgram_state.default_depth_effect.type = GetALineAndInterpretCommand(f, gDepth_effect_names, 2);
     GetPairOfInts(f, &gProgram_state.default_depth_effect.start, &gProgram_state.default_depth_effect.end);
     if (killed_sky && gProgram_state.default_depth_effect.type != eDepth_effect_fog) {
