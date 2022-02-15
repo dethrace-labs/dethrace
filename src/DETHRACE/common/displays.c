@@ -6,6 +6,7 @@
 #include "globvrkm.h"
 #include "globvrpb.h"
 #include "graphics.h"
+#include "grafdata.h"
 #include "harness/trace.h"
 #include "netgame.h"
 #include "pd/sys.h"
@@ -251,7 +252,9 @@ void KillOldestQueuedHeadup() {
 void DubreyBar(int pX_index, int pY, int pColour) {
     int x;
     LOG_TRACE("(%d, %d, %d)", pX_index, pY, pColour);
-    NOT_IMPLEMENTED();
+
+    x = gCurrent_graf_data->ps_bar_left - gCurrent_graf_data->ps_x_pitch * pX_index;
+    BrPixelmapLine(gBack_screen, x, pY, x, gCurrent_graf_data->ps_bar_height + pY, pColour);
 }
 
 // IDA: void __usercall DoPSPowerHeadup(int pY@<EAX>, int pLevel@<EDX>, char *pName@<EBX>, int pBar_colour@<ECX>)
@@ -259,13 +262,25 @@ void DoPSPowerHeadup(int pY, int pLevel, char* pName, int pBar_colour) {
     char s[16];
     int i;
     LOG_TRACE("(%d, %d, \"%s\", %d)", pY, pLevel, pName, pBar_colour);
-    NOT_IMPLEMENTED();
+
+    DimRectangle(gBack_screen, gCurrent_graf_data->ps_dim_left, pY, gCurrent_graf_data->ps_dim_right, gCurrent_graf_data->ps_dim_height + pY, 1);
+    TransDRPixelmapText(gBack_screen, gCurrent_graf_data->ps_name_left, gCurrent_graf_data->ps_name_top_border + pY, gFonts + 6, pName, gBack_screen->width);
+
+    for (i = (6 - gCurrent_graf_data->ps_bars_per_level) * gCurrent_graf_data->ps_bars_per_level + 1; i > (gCurrent_graf_data->ps_bars_per_level * pLevel + 1); i--) {
+        DubreyBar(i, pY + gCurrent_graf_data->ps_bar_top_border, 0);
+    }
+    for (i = gCurrent_graf_data->ps_bars_per_level * pLevel + 1; i >= 0; i--) {
+        DubreyBar(i, pY + gCurrent_graf_data->ps_bar_top_border, pBar_colour);
+    }
 }
 
 // IDA: void __cdecl DoPSPowerupHeadups()
 void DoPSPowerupHeadups() {
     LOG_TRACE("()");
-    STUB_ONCE();
+
+    DoPSPowerHeadup(gCurrent_graf_data->armour_headup_y[gProgram_state.cockpit_on], gProgram_state.current_car.power_up_levels[0], "A", 45);
+    DoPSPowerHeadup(gCurrent_graf_data->power_headup_y[gProgram_state.cockpit_on], gProgram_state.current_car.power_up_levels[1], "P", 99);
+    DoPSPowerHeadup(gCurrent_graf_data->offense_headup_y[gProgram_state.cockpit_on], gProgram_state.current_car.power_up_levels[2], "O", 4);
 }
 
 // IDA: void __usercall DoHeadups(tU32 pThe_time@<EAX>)
