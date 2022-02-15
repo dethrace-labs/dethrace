@@ -16,6 +16,7 @@
 #include "network.h"
 #include "pd/sys.h"
 #include "sound.h"
+#include "world.h"
 
 #include <ctype.h>
 #include <stdio.h>
@@ -28,8 +29,8 @@
 
 int gIn_check_quit;
 tU32 gLost_time;
-tU32 gLong_key[] = { 0x5F991B6C, 0x135FCDB9, 0x0E2004CB, 0x0EA11C5E };
-tU32 gOther_long_key[] = { 0x26D6A867, 0x1B45DDB6, 0x13227E32, 0x3794C215 };
+tU32 gLong_key[4] = { 0x5F991B6C, 0x135FCDB9, 0x0E2004CB, 0x0EA11C5E };
+tU32 gOther_long_key[4] = { 0x26D6A867, 0x1B45DDB6, 0x13227E32, 0x3794C215 };
 int gEncryption_method;
 char* gMisc_strings[250];
 br_pixelmap* g16bit_palette;
@@ -528,7 +529,22 @@ br_uint_32 DRActorEnumRecurseWithTrans(br_actor* pActor, br_matrix34* pMatrix, b
     br_uint_32 result;
     br_matrix34 combined_transform;
     LOG_TRACE("(%p, %p, %p, %p)", pActor, pMatrix, pCall_back, pArg);
-    NOT_IMPLEMENTED();
+
+    if (pMatrix == NULL) {
+        BrMatrix34Copy(&combined_transform, &pActor->t.t.mat);
+    } else {
+        BrMatrix34Mul(&combined_transform, pMatrix, &pActor->t.t.mat);
+    }
+    result = pCall_back(pActor, &combined_transform, pArg);
+    if (result == 0) {
+        for (pActor = pActor->children; pActor != NULL; pActor = pActor->next) {
+            result = DRActorEnumRecurseWithTrans(pActor, &combined_transform, pCall_back, pArg);
+            if (result != 0) {
+                return result;
+            }
+        }
+    }
+    return 0;
 }
 
 // IDA: int __usercall sign@<EAX>(int pNumber@<EAX>)
@@ -720,7 +736,8 @@ char* GetMiscString(int pIndex) {
 // IDA: void __usercall GetCopyOfMiscString(int pIndex@<EAX>, char *pStr@<EDX>)
 void GetCopyOfMiscString(int pIndex, char* pStr) {
     LOG_TRACE("(%d, \"%s\")", pIndex, pStr);
-    NOT_IMPLEMENTED();
+
+    strcpy(pStr, GetMiscString(pIndex));
 }
 
 // IDA: int __usercall Flash@<EAX>(tU32 pPeriod@<EAX>, tU32 *pLast_change@<EDX>, int *pCurrent_state@<EBX>)
@@ -743,13 +760,28 @@ int Flash(tU32 pPeriod, tU32* pLast_change, int* pCurrent_state) {
 // IDA: void __usercall MaterialCopy(br_material *pDst@<EAX>, br_material *pSrc@<EDX>)
 void MaterialCopy(br_material* pDst, br_material* pSrc) {
     LOG_TRACE("(%p, %p)", pDst, pSrc);
-    NOT_IMPLEMENTED();
+
+    pDst->flags = pSrc->flags;
+    pDst->ka = pSrc->ka;
+    pDst->kd = pSrc->kd;
+    pDst->ks = pSrc->ks;
+    pDst->power = pSrc->power;
+    pDst->colour = pSrc->colour;
+    pDst->index_base = pSrc->index_base;
+    pDst->index_range = pSrc->index_range;
+    pDst->index_shade = pSrc->index_shade;
+    pDst->colour_map = pSrc->colour_map;
+    pDst->map_transform = pSrc->map_transform;
+    pDst->identifier = pSrc->identifier;
 }
 
 // IDA: double __usercall RGBDifferenceSqr@<ST0>(tRGB_colour *pColour_1@<EAX>, tRGB_colour *pColour_2@<EDX>)
 double RGBDifferenceSqr(tRGB_colour* pColour_1, tRGB_colour* pColour_2) {
     LOG_TRACE("(%p, %p)", pColour_1, pColour_2);
-    NOT_IMPLEMENTED();
+
+    return ((pColour_1->red - pColour_2->red) * (pColour_1->red - pColour_2->red))
+        + ((pColour_1->green - pColour_2->green) * (pColour_1->green - pColour_2->green))
+        + ((pColour_1->blue - pColour_2->blue) * (pColour_1->blue - pColour_2->blue));
 }
 
 // IDA: int __usercall FindBestMatch@<EAX>(tRGB_colour *pRGB_colour@<EAX>, br_pixelmap *pPalette@<EDX>)
@@ -761,28 +793,57 @@ int FindBestMatch(tRGB_colour* pRGB_colour, br_pixelmap* pPalette) {
     tRGB_colour trial_RGB;
     br_colour* dp;
     LOG_TRACE("(%p, %p)", pRGB_colour, pPalette);
-    NOT_IMPLEMENTED();
+
+    near_c = 127;
+    min_d = 1.79769e+308;  // max double
+    dp = pPalette->pixels;
+    for (n = 0; n < 256; n++) {
+        trial_RGB.red = (dp[n] >> 16) & 0xff;
+        trial_RGB.green = (dp[n] >> 8) & 0xff;
+        trial_RGB.blue = (dp[n] >> 0) & 0xff;
+        d = RGBDifferenceSqr(pRGB_colour, &trial_RGB);
+        if (d < min_d) {
+            min_d = d;
+            near_c = n;
+        }
+    }
+    return near_c;
 }
 
 // IDA: void __usercall BuildShadeTablePath(char *pThe_path@<EAX>, int pR@<EDX>, int pG@<EBX>, int pB@<ECX>)
 void BuildShadeTablePath(char* pThe_path, int pR, int pG, int pB) {
     char s[32];
     LOG_TRACE("(\"%s\", %d, %d, %d)", pThe_path, pR, pG, pB);
-    NOT_IMPLEMENTED();
+
+    s[0] = 's';
+    s[1] = 't';
+    s[2] = 'A' + ((pR & 0xf0) >> 4);
+    s[3] = 'A' + ((pR & 0x0f) >> 0);
+    s[4] = 'A' + ((pG & 0xf0) >> 4);
+    s[5] = 'A' + ((pG & 0x0f) >> 0);
+    s[6] = 'A' + ((pB & 0xf0) >> 4);
+    s[7] = 'A' + ((pB & 0x0f) >> 0);
+    s[8] = '\0';
+    PathCat(pThe_path, gApplication_path, "SHADETAB");
+    PathCat(pThe_path, pThe_path, s);
 }
 
 // IDA: br_pixelmap* __usercall LoadGeneratedShadeTable@<EAX>(int pR@<EAX>, int pG@<EDX>, int pB@<EBX>)
 br_pixelmap* LoadGeneratedShadeTable(int pR, int pG, int pB) {
     char the_path[256];
     LOG_TRACE("(%d, %d, %d)", pR, pG, pB);
-    NOT_IMPLEMENTED();
+
+    BuildShadeTablePath(the_path, pR, pG, pB);
+    return BrPixelmapLoad(the_path);
 }
 
 // IDA: void __usercall SaveGeneratedShadeTable(br_pixelmap *pThe_table@<EAX>, int pR@<EDX>, int pG@<EBX>, int pB@<ECX>)
 void SaveGeneratedShadeTable(br_pixelmap* pThe_table, int pR, int pG, int pB) {
     char the_path[256];
     LOG_TRACE("(%p, %d, %d, %d)", pThe_table, pR, pG, pB);
-    NOT_IMPLEMENTED();
+
+    BuildShadeTablePath(the_path, pR, pG, pB);
+    BrPixelmapSave(the_path, pThe_table);
 }
 
 // IDA: br_pixelmap* __usercall GenerateShadeTable@<EAX>(int pHeight@<EAX>, br_pixelmap *pPalette@<EDX>, int pRed_mix@<EBX>, int pGreen_mix@<ECX>, int pBlue_mix, float pQuarter, float pHalf, float pThree_quarter)
@@ -819,8 +880,55 @@ br_pixelmap* GenerateDarkenedShadeTable(int pHeight, br_pixelmap* pPalette, int 
     int c;
     LOG_TRACE("(%d, %p, %d, %d, %d, %f, %f, %f, %f)", pHeight, pPalette, pRed_mix, pGreen_mix, pBlue_mix, pQuarter, pHalf, pThree_quarter, pDarken);
 
-    STUB();
-    return NULL;
+    the_table = LoadGeneratedShadeTable(pRed_mix, pGreen_mix, pBlue_mix);
+    if (the_table == NULL) {
+        the_table = BrPixelmapAllocate(BR_PMT_INDEX_8, 256, pHeight, NULL, 0);
+        if (the_table == NULL) {
+            FatalError(109);
+        }
+        cp = pPalette->pixels;
+
+        ref_col.red = pRed_mix;
+        ref_col.green = pGreen_mix;
+        ref_col.blue = pBlue_mix;
+
+        for (c = 0, tab_ptr = the_table->pixels; c < 256; c++, tab_ptr++) {
+            the_RGB.red   = ((cp[i] >> 16) & 0xff) * pDarken;
+            the_RGB.green = ((cp[i] >>  8) & 0xff) * pDarken;
+            the_RGB.blue  = ((cp[i] >>  0) & 0xff) * pDarken;
+
+            if (pHeight == 1) {
+                f_total_minus_1 = 1.;
+            } else {
+                f_total_minus_1 = pHeight - 1;
+            }
+            shade_ptr = tab_ptr;
+            for (i = 0, shade_ptr = tab_ptr; i < pHeight; i++, shade_ptr += 0x100) {
+                f_i = i;
+                ratio1 = f_i / f_total_minus_1;
+                if (ratio1 < .5) {
+                    if (ratio1 < .25) {
+                        ratio2 = pQuarter * ratio1 * 4.;
+                    } else {
+                        ratio2 = (ratio1 - .25) * (pHalf - pQuarter) * 4. + pQuarter;
+                    }
+                } else {
+                    if (ratio1 < 0.75) {
+                        ratio2 = (ratio1 - .5) * (pThree_quarter - pHalf) * 4. + pHalf;
+                    } else {
+                        ratio2 = 1. - (1. - pThree_quarter) * (1. - ratio1) * 4.;
+                    }
+                }
+                new_RGB.red   = ref_col.red   * ratio2 + the_RGB.red   * (1. - ratio2);
+                new_RGB.green = ref_col.green * ratio2 + the_RGB.green * (1. - ratio2);
+                new_RGB.blue  = ref_col.blue  * ratio2 + the_RGB.blue  * (1. - ratio2);
+                *shade_ptr = FindBestMatch(&new_RGB, pPalette);
+            }
+        }
+        SaveGeneratedShadeTable(the_table, pRed_mix, pGreen_mix, pBlue_mix);
+    }
+    BrTableAdd(the_table);
+    return the_table;
 }
 
 // IDA: void __cdecl PossibleService()
@@ -846,8 +954,8 @@ void DRMatrix34TApplyP(br_vector3* pA, br_vector3* pB, br_matrix34* pC) {
     t1 = pB->v[0] - pC->m[3][0];
     t2 = pB->v[1] - pC->m[3][1];
     t3 = pB->v[2] - pC->m[3][2];
-    pA->v[0] = pC->m[0][2] * t3 + pC->m[0][1] * t2 + pC->m[0][0] * t1;
-    pA->v[1] = pC->m[1][0] * t1 + pC->m[1][2] * t3 + pC->m[1][1] * t2;
+    pA->v[0] = pC->m[0][0] * t1 + pC->m[0][1] * t2 + pC->m[0][2] * t3;
+    pA->v[1] = pC->m[1][0] * t1 + pC->m[1][1] * t2 + pC->m[1][2] * t3;
     pA->v[2] = pC->m[2][0] * t1 + pC->m[2][1] * t2 + pC->m[2][2] * t3;
 }
 
@@ -931,6 +1039,7 @@ void Copy8BitRectangleTo16BitRhombusWithTransparency(br_pixelmap* pDst, tS16 pDs
 // IDA: void __usercall DRPixelmapRectangleCopy(br_pixelmap *dst@<EAX>, br_int_16 dx@<EDX>, br_int_16 dy@<EBX>, br_pixelmap *src@<ECX>, br_int_16 sx, br_int_16 sy, br_uint_16 w, br_uint_16 h)
 void DRPixelmapRectangleCopy(br_pixelmap* dst, br_int_16 dx, br_int_16 dy, br_pixelmap* src, br_int_16 sx, br_int_16 sy, br_uint_16 w, br_uint_16 h) {
     LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d)", dst, dx, dy, src, sx, sy, w, h);
+
     BrPixelmapRectangleCopy(dst, dx, dy, src, sx, sy, w, h);
 }
 
@@ -943,6 +1052,7 @@ void DRPixelmapCopy(br_pixelmap* dst, br_pixelmap* src) {
 // IDA: void __usercall DRPixelmapRectangleFill(br_pixelmap *dst@<EAX>, br_int_16 x@<EDX>, br_int_16 y@<EBX>, br_uint_16 w@<ECX>, br_uint_16 h, br_uint_32 colour)
 void DRPixelmapRectangleFill(br_pixelmap* dst, br_int_16 x, br_int_16 y, br_uint_16 w, br_uint_16 h, br_uint_32 colour) {
     LOG_TRACE("(%p, %d, %d, %d, %d, %d)", dst, x, y, w, h, colour);
+
     BrPixelmapRectangleFill(dst, x, y, w, h, colour);
 }
 
@@ -976,7 +1086,7 @@ br_material* DRMaterialClone(br_material* pMaterial) {
     memcpy(&the_material->map_transform, &pMaterial->map_transform, sizeof(the_material->map_transform));
     sprintf(s, "%s(%d)", pMaterial->identifier, name_suffix);
     name_suffix++;
-    the_material->identifier = (char*)BrResAllocate(the_material, strlen(s) + 1, BR_MEMORY_STRING);
+    the_material->identifier = BrResAllocate(the_material, strlen(s) + 1, BR_MEMORY_STRING);
     strcpy(the_material->identifier, s);
     BrMaterialAdd(the_material);
     return the_material;
@@ -1330,20 +1440,68 @@ int AlreadyBlended(br_material* pMaterial) {
 void BlendifyMaterialTablishly(br_material* pMaterial, int pPercent) {
     char* s;
     LOG_TRACE("(%p, %d)", pMaterial, pPercent);
-    NOT_IMPLEMENTED();
+
+    switch (pPercent) {
+        case 25:
+            s = "BLEND75.TAB";
+            break;
+        case 50:
+            s = "BLEND50.TAB";
+            break;
+        case 75:
+            s = "BLEND25.TAB";
+            break;
+        default:
+            PDFatalError("Invalid alpha");
+            break;
+    }
+    pMaterial->index_blend = BrTableFind(s);
+    if (pMaterial->index_blend == NULL) {
+        pMaterial->index_blend = LoadSingleShadeTable(&gTrack_storage_space, s);
+    }
 }
 
 // IDA: void __usercall BlendifyMaterialPrimitively(br_material *pMaterial@<EAX>, int pPercent@<EDX>)
 void BlendifyMaterialPrimitively(br_material* pMaterial, int pPercent) {
-    static br_token_value alpha25[3];
-    static br_token_value alpha50[3];
-    static br_token_value alpha75[3];
+    static br_token_value alpha25[3] = {
+        { BRT_BLEND_B, { .b = 1 } },
+        { BRT_OPACITY_X, { .x = 0x400000 }},
+        { 0 },
+    };
+    static br_token_value alpha50[3] = {
+        { BRT_BLEND_B, { .b = 1 } },
+        { BRT_OPACITY_X, { .x = 0x800000 }},
+        { 0 },
+    };
+    static br_token_value alpha75[3] = {
+        { BRT_BLEND_B, { .b = 1 } },
+        { BRT_OPACITY_X, { .x = 0xc00000 }},
+        { 0 },
+    };
     LOG_TRACE("(%p, %d)", pMaterial, pPercent);
-    NOT_IMPLEMENTED();
+
+    switch (pPercent) {
+    case 25:
+        pMaterial->extra_prim = alpha25;
+        break;
+    case 50:
+        pMaterial->extra_prim = alpha50;
+        break;
+    case 75:
+        pMaterial->extra_prim = alpha75;
+        break;
+    default:
+        PDFatalError("Invalid alpha");
+    }
 }
 
 // IDA: void __usercall BlendifyMaterial(br_material *pMaterial@<EAX>, int pPercent@<EDX>)
 void BlendifyMaterial(br_material* pMaterial, int pPercent) {
     LOG_TRACE("(%p, %d)", pMaterial, pPercent);
-    NOT_IMPLEMENTED();
+
+    if (gScreen->type == BR_PMT_INDEX_8) {
+        BlendifyMaterialTablishly(pMaterial, pPercent);
+    } else {
+        BlendifyMaterialPrimitively(pMaterial, pPercent);
+    }
 }
