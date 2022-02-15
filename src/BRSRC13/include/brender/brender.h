@@ -105,6 +105,8 @@ br_uint_32 BrModelLoadMany(char* filename, br_model** models, br_uint_16 num);
 // BrPixelmap
 br_pixelmap* BrPixelmapLoad(char* filename);
 br_uint_32 BrPixelmapLoadMany(char* filename, br_pixelmap** pixelmaps, br_uint_16 num);
+br_uint_32 BrPixelmapSave(char* filename, br_pixelmap* ptr);
+br_uint_32 BrPixelmapSaveMany(char* filename, br_pixelmap** pixelmaps, br_uint_16 num);
 void BrPixelmapFree(br_pixelmap* src);
 br_pixelmap* BrPixelmapMatch(br_pixelmap* src, br_uint_8 match_type);
 br_pixelmap* BrPixelmapAllocateSub(br_pixelmap* src, br_int_32 x, br_int_32 y, br_int_32 w, br_int_32 h);
