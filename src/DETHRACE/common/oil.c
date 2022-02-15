@@ -87,7 +87,12 @@ void InitOilSpills() {
 void ResetOilSpills() {
     int i;
     LOG_TRACE("()");
-    STUB();
+
+    for (i = 0; i < COUNT_OF(gOily_spills); i++) {
+        gOily_spills[i].actor->render_style = BR_RSTYLE_NONE;
+        gOily_spills[i].car = NULL;
+        gOily_spills[i].stop_time = 0;
+    }
 }
 
 // IDA: void __usercall QueueOilSpill(tCar_spec *pCar@<EAX>)
