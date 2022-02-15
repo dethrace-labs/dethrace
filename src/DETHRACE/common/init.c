@@ -478,6 +478,7 @@ void DisposeGameIfNecessary() {
 // IDA: void __cdecl LoadInTrack()
 void LoadInTrack() {
     LOG_TRACE("()");
+
     LoadTrack(gProgram_state.track_file_name, &gProgram_state.track_spec, &gCurrent_race);
 }
 
@@ -608,6 +609,7 @@ void InitRace() {
     InitPlayers();
     if (gNet_mode) {
         gProgram_state.credits_earned = gInitial_net_credits[gCurrent_net_game->options.starting_money_index];
+        InitNetGameplayStuff();
     }
     gInitialised_grid = 0;
     SwitchToLoresMode();
@@ -616,6 +618,7 @@ void InitRace() {
 // IDA: void __cdecl DisposeRace()
 void DisposeRace() {
     LOG_TRACE("()");
+    
     PossibleService();
     DisposePiping();
     PossibleService();
