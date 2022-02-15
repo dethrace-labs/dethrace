@@ -310,7 +310,7 @@ void DoGame() {
     if (gNet_mode_of_last_game == gNet_mode) {
         PrintMemoryDump(0, "BEFORE START RACE SCREEN");
         SelectOpponents(&gCurrent_race);
-        if (gNet_mode) {
+        if (gNet_mode != eNet_mode_none) {
             LoadRaceInfo(gProgram_state.current_race_index, &gCurrent_race);
             FillInRaceInfo(&gCurrent_race);
             DisposeRaceInfo(&gCurrent_race);
@@ -333,8 +333,9 @@ void DoGame() {
             }
         } else {
             PrintMemoryDump(0, "AFTER START RACE SCREEN");
+            DoNewGameAnimation();
             StartLoadingScreen();
-            if (gNet_mode) {
+            if (gNet_mode != eNet_mode_none) {
                 if (gCurrent_net_game->options.random_car_choice
                     && (gCurrent_net_game->options.car_choice == eNet_car_all || gCurrent_net_game->options.car_choice == eNet_car_both)
                     && !gNo_races_yet) {
