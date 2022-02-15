@@ -18,10 +18,10 @@ void AllocateActorMatrix(tTrack_spec* pTrack_spec, br_actor**** pDst) {
     tU16 z;
     LOG_TRACE("(%p, %p)", pTrack_spec, pDst);
 
-    *pDst = BrMemAllocate(sizeof(intptr_t) * pTrack_spec->ncolumns_z, kMem_columns_z);
+    *pDst = BrMemAllocate(sizeof(br_actor***) * pTrack_spec->ncolumns_z, kMem_columns_z);
     for (z = 0; z < pTrack_spec->ncolumns_z; z++) {
-        (*pDst)[z] = BrMemAllocate(sizeof(intptr_t) * pTrack_spec->ncolumns_x, kMem_columns_x);
-        memset((*pDst)[z], 0, sizeof(intptr_t) * pTrack_spec->ncolumns_x);
+        (*pDst)[z] = BrMemAllocate(sizeof(br_actor**) * pTrack_spec->ncolumns_x, kMem_columns_x);
+        memset((*pDst)[z], 0, sizeof(br_actor**) * pTrack_spec->ncolumns_x);
     }
 }
 
@@ -30,13 +30,34 @@ void DisposeActorMatrix(tTrack_spec* pTrack_spec, br_actor**** pVictim, int pRem
     tU16 z;
     tU16 x;
     LOG_TRACE("(%p, %p, %d)", pTrack_spec, pVictim, pRemove_act_mod);
-    NOT_IMPLEMENTED();
+    if (*pVictim != NULL) {
+        for (z = 0; z != pTrack_spec->ncolumns_z; z++) {
+            if (pRemove_act_mod != 0) {
+                for (x = 0; x !=pTrack_spec->ncolumns_x; x++) {
+                    if ((*pVictim)[z][x] != NULL && (*pVictim)[z][z]->model != NULL) {
+                        BrModelRemove((*pVictim)[z][x]->model);
+                        BrModelFree((*pVictim)[z][x]->model);
+                    }
+                }
+            }
+            BrMemFree((*pVictim)[z]);
+        }
+        BrMemFree(*pVictim);
+    }
 }
 
 // IDA: void __usercall DisposeColumns(tTrack_spec *pTrack_spec@<EAX>)
 void DisposeColumns(tTrack_spec* pTrack_spec) {
     LOG_TRACE("(%p)", pTrack_spec);
-    NOT_IMPLEMENTED();
+
+    DisposeActorMatrix(pTrack_spec, &pTrack_spec->columns, 0);
+    DisposeActorMatrix(pTrack_spec, &pTrack_spec->lollipops, 0);
+    if (gAusterity_mode == 0) {
+        DisposeActorMatrix(pTrack_spec, &pTrack_spec->blends, 1);
+    }
+    if (pTrack_spec->non_car_list != NULL && (0 < pTrack_spec->ampersand_digits)) {
+        BrMemFree(pTrack_spec->non_car_list);
+    }
 }
 
 // IDA: void __usercall XZToColumnXZ(tU8 *pColumn_x@<EAX>, tU8 *pColumn_z@<EDX>, br_scalar pX, br_scalar pZ, tTrack_spec *pTrack_spec)
