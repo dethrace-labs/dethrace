@@ -1,6 +1,7 @@
 #include "pedestrn.h"
 #include "brender/brender.h"
 #include "constants.h"
+#include "displays.h"
 #include "errors.h"
 #include "globvars.h"
 #include "graphics.h"
@@ -146,7 +147,14 @@ br_pixelmap* GetPedestrianTexture(br_actor* pActor, int* pFlipped) {
 // IDA: void __cdecl TogglePedestrians()
 void TogglePedestrians() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    if (gProgram_state.sausage_eater_mode == 0) {
+        gPedestrians_on = !gPedestrians_on;
+        if (gPedestrians_on != 0) {
+            NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(24));
+        } else {
+            NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(25));
+        }
+    }
 }
 
 // IDA: void __cdecl InitPedGibs()
@@ -750,14 +758,31 @@ void RespawnPedestrians() {
 // IDA: int __cdecl GetPedCount()
 int GetPedCount() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    return gPed_count;
 }
 
 // IDA: int __usercall GetPedPosition@<EAX>(int pIndex@<EAX>, br_vector3 *pPos@<EDX>)
 int GetPedPosition(int pIndex, br_vector3* pPos) {
     tPedestrian_data* pedestrian;
     LOG_TRACE("(%d, %p)", pIndex, pPos);
-    NOT_IMPLEMENTED();
+
+    pedestrian = &gPedestrian_array[pIndex];
+    if (pedestrian->ref_number < 100) {
+        if (pedestrian->hit_points == -100 || pedestrian->current_action == pedestrian->fatal_car_impact_action
+                || pedestrian->current_action == pedestrian->fatal_ground_impact_action 
+                || pedestrian->current_action == pedestrian->giblets_action) {
+            return 0;
+        } else {
+            *pPos = pedestrian->pos;
+            return 1;
+        }
+    } else if (pedestrian->hit_points == -100) {
+        return 0;
+    } else {
+        *pPos = pedestrian->pos;
+        return 1;
+    }
 }
 
 // IDA: void __usercall CreatePedestrian(FILE *pG@<EAX>, tPedestrian_instruction *pInstructions@<EDX>, int pInstruc_count@<EBX>, int pInit_instruc@<ECX>, int pRef_num, int pForce_read)
