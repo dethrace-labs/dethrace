@@ -351,5 +351,4 @@ void CreateStainlessClasses() {
 
 // IDA: void __cdecl CheckMemory()
 void CheckMemory() {
-    LOG_TRACE("()");
 }
