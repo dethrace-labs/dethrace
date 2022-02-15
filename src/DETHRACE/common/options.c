@@ -1,4 +1,13 @@
 #include "options.h"
+#include "drmem.h"
+#include "errors.h"
+#include "flicplay.h"
+#include "globvars.h"
+#include "grafdata.h"
+#include "graphics.h"
+#include "intrface.h"
+#include "loading.h"
+#include <brender/brender.h>
 #include "harness/trace.h"
 #include <stdlib.h>
 
@@ -386,30 +395,106 @@ void DoControlOptions() {
 // IDA: void __cdecl LoadSoundOptionsData()
 void LoadSoundOptionsData() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gDials_pix = LoadPixelmap("DIALSTCK.PIX");
+    if (gDials_pix == NULL) {
+        FatalError(42);
+    }
 }
 
 // IDA: void __cdecl FreeSoundOptionsData()
 void FreeSoundOptionsData() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    BrPixelmapFree(gDials_pix);
 }
 
 // IDA: void __cdecl DrawDisabledOptions()
 void DrawDisabledOptions() {
     br_pixelmap* image;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    PrintMemoryDump(0, "INSIDE OPTIONS");
+
+    // Disable sound options menu
+    image = LoadPixelmap("NOSNDOPT.PIX");
+    DisableChoice(0);
+    if (image != NULL) {
+        DRPixelmapRectangleMaskedCopy(gBack_screen, gCurrent_graf_data->sound_opt_disable_x,
+                gCurrent_graf_data->sound_opt_disable_y, image, 0, 0, image->width, image->height);
+        BrPixelmapFree(image);
+    }
+
+    // Disable graphics options menu when in-game
+    if (gProgram_state.track_spec.the_actor != NULL) {
+        image = LoadPixelmap("NODETOPT.PIX");
+        DisableChoice(1);
+        if (image != NULL) {
+            DRPixelmapRectangleMaskedCopy(gBack_screen, gCurrent_graf_data->graph_opt_disable_x,
+                    gCurrent_graf_data->graph_opt_disable_y, image, 0, 0, image->width, image->height);
+            BrPixelmapFree(image);
+        }
+    }
 }
 
 // IDA: void __cdecl DoOptions()
 void DoOptions() {
-    static tFlicette flicker_on[4];
-    static tFlicette flicker_off[4];
-    static tFlicette push[4];
-    static tMouse_area mouse_areas[4];
-    static tInterface_spec interface_spec;
+    static tFlicette flicker_on[4] = {
+        { 43, { 57, 114 }, {  41,  98 } },
+        { 43, { 57, 114 }, {  78, 187 } },
+        { 43, { 57, 114 }, { 114, 274 } },
+        { 43, { 57, 114 }, { 154, 370 } }
+    };
+    static tFlicette flicker_off[4] = {
+        { 42, { 57, 114} , {  41,  98 } },
+        { 42, { 57, 114} , {  78, 187 } },
+        { 42, { 57, 114} , { 114, 274 } },
+        { 42, { 57, 114} , { 154, 370 } },
+    };
+    static tFlicette push[4] = {
+        { 144, { 57, 114 }, { 41,  98 } },
+        { 146, { 57, 114 }, { 78, 187 } },
+        { 145, { 57, 114 }, {114, 274 } },
+        {  45, { 57, 114 }, {154, 370 } },
+    };
+    static tMouse_area mouse_areas[4] = {
+        { { 57, 114 }, {  41,  98 }, { 123, 246 }, {  62, 149 }, 0, 0, 0, NULL }, 
+        { { 57, 114 }, {  78, 187 }, { 123, 246 }, {  99, 238 }, 1, 0, 0, NULL },
+        { { 57, 114 }, { 114, 274 }, { 123, 246 }, { 135, 324 }, 2, 0, 0, NULL },
+        { { 57, 114 }, { 154, 370 }, { 123, 246 }, { 175, 420 }, 3, 0, 0, NULL },
+    };
+    static tInterface_spec interface_spec = {
+        0, 140, 0, 141, 141, 141, 1,
+        { -1, 0 }, {  0, 0 }, { 0, 0 }, { 0, 0 },{ NULL, NULL },
+        { -1, 0 }, {  0, 0 }, { 0, 0 }, { 0, 0 },{ NULL, NULL },
+        { -1, 0 }, { -1, 0 }, { 0, 0 }, { 3, 0 },{ NULL, NULL },
+        { -1, 0 }, {  1, 0 }, { 0, 0 }, { 3, 0 },{ NULL, NULL },
+        {  1, 1 }, { NULL, NULL},
+        {  1, 1 }, { NULL, NULL},
+        NULL, NULL, 0,
+        NULL, DrawDisabledOptions, NULL, 0, { 0, 0 },
+        NULL, 3, 1,
+        COUNT_OF(flicker_on), flicker_on, flicker_off, push,
+        COUNT_OF(mouse_areas), mouse_areas,
+        0, NULL,
+    };
     int result;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    PrintMemoryDump(0, "BEFORE ENTERING OPTIONS");
+    PreloadBunchOfFlics(1);
+    result = DoInterfaceScreen(&interface_spec, 0, gProgram_state.track_spec.the_actor ? 2 : 1);
+    switch (result) {
+    case 0:
+        DoSoundOptions();
+        break;
+    case 1:
+        DoGraphicsOptions();
+        break;
+    case 2:
+        DoControlOptions();
+        break;
+    }
+    UnlockBunchOfFlics(1);
+    PrintMemoryDump(0, "AFTER ENTERING OPTIONS");
 }
