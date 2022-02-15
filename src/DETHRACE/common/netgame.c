@@ -410,7 +410,6 @@ void SendGameplayToHost(tNet_gameplay_mess pMess, int pParam_1, int pParam_2, in
 // IDA: void __cdecl InitNetGameplayStuff()
 void InitNetGameplayStuff() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl DefaultNetName()
