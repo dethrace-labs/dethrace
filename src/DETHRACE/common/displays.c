@@ -597,7 +597,9 @@ int DRTextCleverWidth(tDR_font* pFont, signed char* pText) {
 void DRPixelmapCentredText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFont, char* pText) {
     int width_over_2;
     LOG_TRACE("(%p, %d, %d, %p, \"%s\")", pPixelmap, pX, pY, pFont, pText);
-    NOT_IMPLEMENTED();
+
+    width_over_2 = DRTextWidth(pFont, pText) / 2;
+    TransDRPixelmapText(pPixelmap, pX - width_over_2, pY, pFont, pText, width_over_2 + pX);
 }
 
 // IDA: int __usercall IsHeadupTextClever@<EAX>(signed char *pText@<EAX>)
@@ -1259,7 +1261,7 @@ void OoerrIveGotTextInMeBoxMissus(int pFont_index, char* pText, br_pixelmap* pPi
             }
             line[line_char_index] = 0;
             if (pCentred) {
-                TransDRPixelmapText(gBack_screen, centre - (DRTextWidth(font, line) / 2), current_y, font, line, (DRTextWidth(font, line) / 2) + centre);
+                DRPixelmapCentredText(gBack_screen, centre, current_y, font, line);
             } else {
                 TransDRPixelmapText(gBack_screen, pLeft, current_y, font, line, pRight);
             }
