@@ -84,6 +84,7 @@ void GameMain(int pArgc, char** pArgv) {
 
     PDSetFileVariables();
     PDBuildAppPath(gApplication_path);
+    OpenDiagnostics();
 
     strcat(gApplication_path, "DATA");
 

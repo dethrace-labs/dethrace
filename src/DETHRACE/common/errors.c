@@ -181,13 +181,11 @@ void NonFatalError(int pStr_index, ...) {
 // IDA: void __cdecl CloseDiagnostics()
 void CloseDiagnostics() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl OpenDiagnostics()
 void OpenDiagnostics() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
 }
 
 // Renamed from dprintf to avoid collisions to stdio
