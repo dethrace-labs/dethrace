@@ -332,7 +332,9 @@ void SetSmokeLastDamageLevel(tCar_spec* pCar) {
     int i;
     LOG_TRACE("(%p)", pCar);
 
-    STUB_ONCE();
+    for (i = 0; i < BR_ASIZE(pCar->damage_units); i++) {
+        pCar->damage_units[i].smoke_last_level = pCar->damage_units[i].damage_level;
+    }
 }
 
 // IDA: void __usercall SortOutSmoke(tCar_spec *pCar@<EAX>)
@@ -350,7 +352,11 @@ void SortOutSmoke(tCar_spec* pCar) {
 // IDA: void __usercall StealCar(tCar_spec *pCar@<EAX>)
 void StealCar(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    pCar->has_been_stolen = 1;
+    gProgram_state.cars_available[gProgram_state.number_of_cars] = pCar->index;
+    gProgram_state.number_of_cars++;
+    gOpponents[pCar->index].dead = 1;
 }
 
 // IDA: int __usercall DoCrashEarnings@<EAX>(tCar_spec *pCar1@<EAX>, tCar_spec *pCar2@<EDX>)
