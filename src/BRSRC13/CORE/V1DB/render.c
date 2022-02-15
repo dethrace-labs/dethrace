@@ -292,6 +292,8 @@ void SetViewport(br_pixelmap* buffer) {
 // IDA: void __cdecl BrZbSceneRenderBegin(br_actor *world, br_actor *camera, br_pixelmap *colour_buffer, br_pixelmap *depth_buffer)
 void BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer) {
     //LOG_TRACE("(%p, %p, %p, %p)", world, camera, colour_buffer, depth_buffer);
+
+    //BrDbSceneRenderBegin(world, camera);
     Harness_Hook_BrZbSceneRenderBegin(world, camera, colour_buffer, depth_buffer);
 }
 

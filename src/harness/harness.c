@@ -31,6 +31,7 @@ unsigned int last_frame_time = 0;
 extern void BrPixelmapFill(br_pixelmap* dst, br_uint_32 colour);
 extern unsigned int GetTotalTime();
 extern uint8_t gScan_code[123][2];
+extern br_v1db_state v1db;
 
 // SplatPack or Carmageddon. This is where we represent the code differences between the two. For example, the intro smack file.
 tHarness_game_info harness_game_info;
@@ -188,7 +189,11 @@ void Harness_ConvertPalettedPixelmapTo32Bit(uint32_t** dst, br_pixelmap* src, in
         for (y = 0; y < src->height; y++) {
             for (x = 0; x < src->width; x++) {
                 palette_index = (data[y * src->row_bytes + x]);
-                (*dst)[dest_y * src->width + x] = colors[palette_index];
+                if (palette_index != 0) {
+                    (*dst)[dest_y * src->width + x] = (colors[palette_index] & 0x00ffffff) | 0xff000000; // set alpha to 1;
+                } else {
+                    (*dst)[dest_y * src->width + x] = 0;
+                }
             }
             dest_y--;
         }
@@ -196,7 +201,11 @@ void Harness_ConvertPalettedPixelmapTo32Bit(uint32_t** dst, br_pixelmap* src, in
         for (y = 0; y < src->height; y++) {
             for (x = 0; x < src->width; x++) {
                 palette_index = (data[y * src->row_bytes + x]);
-                (*dst)[y * src->width + x] = colors[palette_index];
+                if (palette_index != 0) {
+                    (*dst)[y * src->width + x] = (colors[palette_index] & 0x00ffffff) | 0xff000000; // set alpha to 1;
+                } else {
+                    (*dst)[y * src->width + x] = 0;
+                }
             }
         }
     }

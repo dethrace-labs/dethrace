@@ -4,10 +4,9 @@
 
 void _free(br_object* o) {
     tStored_model_context* ctx = (tStored_model_context*)o;
-    LOG_DEBUG("free called!");
-
     glDeleteVertexArrays(1, &ctx->vao_id);
     glDeleteBuffers(1, &ctx->ebo_id);
+    free(o);
 }
 
 br_object_dispatch dispatch_funcs = {

@@ -12,18 +12,6 @@
 // this needs to be included after glad.h
 #include <SDL_opengl.h>
 
-// typedef struct tStored_model_context {
-//     GLuint vao_id, ebo_id;
-// } tStored_model_context;
-
-// typedef struct tStored_pixelmap {
-//     GLuint id;
-// } tStored_pixelmap;
-
-// typedef struct tStored_material {
-//     tStored_pixelmap* texture;
-// } tStored_material;
-
 SDL_Window* window;
 SDL_GLContext context;
 GLuint screen_buffer_vao, screen_buffer_ebo;
@@ -121,7 +109,7 @@ void GLRenderer_CreateWindow(char* title, int width, int height) {
     }
     SDL_SetRelativeMouseMode(SDL_TRUE);
 
-    //SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+    //SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
     context = SDL_GL_CreateContext(window);
     if (!context) {
@@ -211,6 +199,8 @@ void GLRenderer_CreateWindow(char* title, int width, int height) {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+extern br_v1db_state v1db;
+
 void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer) {
 
     glViewport(colour_buffer->base_x * 2, colour_buffer->base_y * 2, colour_buffer->width * 2, colour_buffer->height * 2);
@@ -229,6 +219,28 @@ void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer) {
 
     GLuint view_u = glGetUniformLocation(shader_program_3d, "view");
     GLuint projection_u = glGetUniformLocation(shader_program_3d, "projection");
+
+    printf("planes %d\n", v1db.enabled_clip_planes.max);
+    for (int i = 0; i < v1db.enabled_clip_planes.max; i++) {
+        char name[32];
+
+        sprintf(name, "clip_plane_enabled[%d]", i);
+        GLuint clip_enable = glGetUniformLocation(shader_program_3d, name);
+
+        printf("plane %d\n", i);
+        if (!v1db.enabled_clip_planes.enabled || !v1db.enabled_clip_planes.enabled[i]) {
+            glUniform1i(clip_enable, 0);
+            continue;
+        }
+        printf("enabled\n");
+
+        sprintf(name, "clip_plane[%d]", i);
+        GLuint clip = glGetUniformLocation(shader_program_3d, name);
+
+        glUniform1i(clip_enable, 1);
+        br_vector4* v4 = v1db.enabled_clip_planes.enabled[i]->type_data;
+        glUniform4f(clip, v4->v[0], v4->v[1], v4->v[2], v4->v[3]);
+    }
 
     if (gDebugCamera_active) {
         float m2[4][4];
@@ -292,7 +304,7 @@ void GLRenderer_RenderFullScreenQuad(uint32_t* screen_buffer, int width, int hei
     glBindTexture(GL_TEXTURE_2D, screen_texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, screen_buffer);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, screen_buffer);
 
     glUseProgram(shader_program_2d_trans);
 
