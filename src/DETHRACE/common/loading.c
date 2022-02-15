@@ -2313,6 +2313,7 @@ void LoadOpponentMugShot(int pIndex) {
                 &gOpponents[pIndex].mug_shot_image_data_length)) {
             FatalError(56);
         }
+        MAMSLock((void**)&gOpponents[pIndex].mug_shot_image_data);
     }
 }
 
