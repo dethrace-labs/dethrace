@@ -4227,7 +4227,12 @@ void SaveCameraPosition(int i) {
 // IDA: void __usercall RestoreCameraPosition(int i@<EAX>)
 void RestoreCameraPosition(int i) {
     LOG_TRACE("(%d)", i);
-    NOT_IMPLEMENTED();
+
+    if (gSave_camera[i].saved != 0) {
+        gCamera_zoom = gSave_camera[i].zoom;
+        gCamera_yaw = gSave_camera[i].yaw;
+        gSave_camera[i].saved = 0;
+    }
 }
 
 // IDA: void __usercall NormalPositionExternalCamera(tCar_spec *c@<EAX>, tU32 pTime@<EDX>)
