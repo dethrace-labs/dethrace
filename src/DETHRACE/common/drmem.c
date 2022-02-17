@@ -260,13 +260,15 @@ br_resource_class gStainless_classes[118];
 // IDA: void __cdecl SetNonFatalAllocationErrors()
 void SetNonFatalAllocationErrors() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gNon_fatal_allocation_errors = 1;
 }
 
 // IDA: void __cdecl ResetNonFatalAllocationErrors()
 void ResetNonFatalAllocationErrors() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gNon_fatal_allocation_errors = 0;
 }
 
 // IDA: int __cdecl AllocationErrorsAreFatal()
@@ -280,7 +282,8 @@ void MAMSInitMem() {
     FILE* f;
     tPath_name the_path;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    LOG_WARN("nop in Windows (doing something for DOS?)");
 }
 
 // IDA: void __usercall PrintMemoryDump(int pFlags@<EAX>, char *pTitle@<EDX>)
