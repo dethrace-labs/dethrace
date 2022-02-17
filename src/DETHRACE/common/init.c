@@ -331,6 +331,7 @@ void Init2DStuff() {
 void InitialiseApplication(int pArgc, char** pArgv) {
 
     gProgram_state.sausage_eater_mode = gSausage_override;
+    MAMSInitMem();
     PrintMemoryDump(gSausage_override, *pArgv);
     if (gAustere_override || PDDoWeLeadAnAustereExistance() != 0) {
         gAusterity_mode = 1;
