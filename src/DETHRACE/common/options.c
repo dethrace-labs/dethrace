@@ -1,4 +1,9 @@
 #include "options.h"
+#include "dr_types.h"
+#include "brucetrk.h"
+#include "controls.h"
+#include "depth.h"
+#include "displays.h"
 #include "drmem.h"
 #include "errors.h"
 #include "flicplay.h"
@@ -7,12 +12,29 @@
 #include "graphics.h"
 #include "intrface.h"
 #include "loading.h"
+#include "sound.h"
+#include "spark.h"
+#include "world.h"
 #include <brender/brender.h>
 #include "harness/trace.h"
 #include <stdlib.h>
 
 int gKey_defns[18];
-tRadio_bastards gRadio_bastards__options[13]; // suffix added to avoid duplicate symbol
+tRadio_bastards gRadio_bastards__options[13] = { // suffix added to avoid duplicate symbol
+    { 4,  36, 0, {132, 175, 221, 253, 0 } }, 
+    { 3,  45, 0, {132, 157, 217,   0, 0 } }, 
+    { 3,  54, 0, {132, 183, 236,   0, 0 } }, 
+    { 3,  67, 0, {132, 194, 234,   0, 0 } }, 
+    { 3,  76, 0, {132, 194, 234,   0, 0 } }, 
+    { 4,  89, 0, {132, 176, 204, 246, 0 } }, 
+    { 4,  98, 0, {132, 176, 204, 246, 0 } }, 
+    { 2, 111, 0, {132, 158,   0,   0, 0 } }, 
+    { 2, 120, 0, {132, 158,   0,   0, 0 } },
+    { 2, 129, 0, {132, 158,   0,   0, 0 } }, 
+    { 2, 138, 0, {132, 158,   0,   0, 0 } }, 
+    { 3, 150, 0, {132, 164, 207,   0, 0 } },
+    { 4, 153, 0, {177, 199, 220, 242, 0 } },
+};
 int gKey_count;
 int gLast_graph_sel__options; // suffix added to avoid duplicate symbol
 char* gKey_names[125];
@@ -92,76 +114,317 @@ void GetGraphicsOptions() {
     int value;
     br_scalar br_value;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    value = GetCarSimplificationLevel();
+    if (value > 1) {
+        value--;
+    }
+    gRadio_bastards__options[0].current_value = value;
+
+    switch (GetCarTexturingLevel()) {
+    case eCTL_none:
+        value = 2;
+        break;
+    case eCTL_transparent:
+        value = 1;
+        break;
+    case eCTL_full:
+        value = 0;
+        break;
+    case eCTL_count:
+        TELL_ME_IF_WE_PASS_THIS_WAY();
+        break;
+    }
+    gRadio_bastards__options[1].current_value = value;
+
+    switch (GetShadowLevel()) {
+    case eShadow_none:
+        value = 2;
+        break;
+    case eShadow_us_only:
+        value = 1;
+        break;
+    default:
+        value = 0;
+        break;
+    }
+    gRadio_bastards__options[2].current_value = value;
+
+    switch (GetWallTexturingLevel()) {
+    case eWTL_none:
+        value = 2;
+        break;
+    case eWTL_linear:
+        value = 1;
+        break;
+    case eWTL_full:
+        value = 0;
+        break;
+    case eWTL_count:
+        TELL_ME_IF_WE_PASS_THIS_WAY();
+        break;
+    }
+    gRadio_bastards__options[3].current_value = value;
+
+    switch (GetRoadTexturingLevel()) {
+    case eRTL_none:
+        value = 2;
+        break;
+    case eRTL_full:
+        value = 0;
+        break;
+    case eRTL_count:
+        TELL_ME_IF_WE_PASS_THIS_WAY();
+        break;
+    }
+    gRadio_bastards__options[4].current_value = value;
+
+    value = (int)((35.f - GetYon()) / 5.f);
+    gRadio_bastards__options[5].current_value = value;
+
+    br_value = GetYonFactor();
+    if (br_value < .5f) {
+        if (br_value < .25f) {
+            value = 3;
+        } else {
+            value = 2;
+        }
+    } else {
+        if (br_value < 1.f) {
+            value = 1;
+        } else {
+            value = 0;
+        }
+    }
+    gRadio_bastards__options[6].current_value = value;
+
+    value = !GetSkyTextureOn();
+    gRadio_bastards__options[7].current_value = value;
+
+    value = !GetDepthCueingOn();
+    gRadio_bastards__options[8].current_value = value;
+
+    value = !GetAccessoryRendering();
+    gRadio_bastards__options[9].current_value = value;
+
+    value = !GetSmokeOn();
+    gRadio_bastards__options[10].current_value = value;
+
+    value = 2 - GetSoundDetailLevel();
+    gRadio_bastards__options[11].current_value = value;
 }
 
 // IDA: void __cdecl SetGraphicsOptions()
 void SetGraphicsOptions() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gRadio_bastards__options[0].current_value < 2) {
+        SetCarSimplificationLevel(gRadio_bastards__options[0].current_value);
+    } else {
+        SetCarSimplificationLevel(gRadio_bastards__options[0].current_value + 1);
+    }
+
+    switch (gRadio_bastards__options[1].current_value) {
+    case 0:
+        SetCarTexturingLevel(eCTL_full);
+        break;
+    case 1:
+        SetCarTexturingLevel(eCTL_transparent);
+        break;
+    case 2:
+        SetCarTexturingLevel(eCTL_none);
+        break;
+    }
+
+    switch (gRadio_bastards__options[2].current_value) {
+    case 0:
+        SetShadowLevel(eShadow_everyone);
+        break;
+    case 1:
+        SetShadowLevel(eShadow_us_only);
+        break;
+    case 2:
+        SetShadowLevel(eShadow_none);
+        break;
+    }
+
+    switch (gRadio_bastards__options[3].current_value) {
+    case 0:
+        SetWallTexturingLevel(eWTL_full);
+        break;
+    case 1:
+        SetWallTexturingLevel(eWTL_linear);
+        break;
+    case 2:
+        SetWallTexturingLevel(eWTL_none);
+        break;
+    }
+
+    switch (gRadio_bastards__options[4].current_value) {
+    case 0:
+        SetRoadTexturingLevel(eRTL_full);
+        break;
+    case 2:
+        SetRoadTexturingLevel(eRTL_none);
+        break;
+    }
+
+    SetYon(35.f - gRadio_bastards__options[5].current_value * 5.f);
+
+    switch (gRadio_bastards__options[6].current_value) {
+    case 0:
+        SetYonFactor(1.f);
+        break;
+    case 1:
+        SetYonFactor(.5f);
+        break;
+    case 2:
+        SetYonFactor(.25f);
+        break;
+    case 3:
+        SetYonFactor(.125f);
+        break;
+    }
+
+    SetSkyTextureOn(1 - gRadio_bastards__options[7].current_value);
+    SetDepthCueingOn(1 - gRadio_bastards__options[8].current_value);
+    SetAccessoryRendering(1 - gRadio_bastards__options[9].current_value);
+    SetSmokeOn(1 - gRadio_bastards__options[10].current_value);
+    SetSoundDetailLevel(2 - gRadio_bastards__options[11].current_value);
+    SaveOptions();
 }
 
 // IDA: void __usercall PlayRadioOn2(int pIndex@<EAX>, int pValue@<EDX>)
 void PlayRadioOn2(int pIndex, int pValue) {
     LOG_TRACE("(%d, %d)", pIndex, pValue);
-    NOT_IMPLEMENTED();
+
+    RunFlicAt(288,
+            gRadio_bastards__options[pIndex].left[pValue],
+            gRadio_bastards__options[pIndex].top);
 }
 
 // IDA: void __usercall PlayRadioOff2(int pIndex@<EAX>, int pValue@<EDX>)
 void PlayRadioOff2(int pIndex, int pValue) {
     LOG_TRACE("(%d, %d)", pIndex, pValue);
-    NOT_IMPLEMENTED();
+
+    RunFlicAt(287,
+            gRadio_bastards__options[pIndex].left[pValue],
+            gRadio_bastards__options[pIndex].top);
 }
 
 // IDA: void __usercall PlayRadioOn(int pIndex@<EAX>, int pValue@<EDX>)
 void PlayRadioOn__options(int pIndex, int pValue) {
     LOG_TRACE("(%d, %d)", pIndex, pValue);
-    NOT_IMPLEMENTED();
+
+    RemoveTransientBitmaps(1);
+    DontLetFlicFuckWithPalettes();
+    TurnFlicTransparencyOn();
+    PlayRadioOn2(pIndex, pValue);
+    TurnFlicTransparencyOff();
+    LetFlicFuckWithPalettes();
 }
 
 // IDA: void __usercall PlayRadioOff(int pIndex@<EAX>, int pValue@<EDX>)
 void PlayRadioOff__options(int pIndex, int pValue) {
     LOG_TRACE("(%d, %d)", pIndex, pValue);
-    NOT_IMPLEMENTED();
+
+    RemoveTransientBitmaps(1);
+    DontLetFlicFuckWithPalettes();
+    TurnFlicTransparencyOn();
+    PlayRadioOff2(pIndex, pValue);
+    TurnFlicTransparencyOff();
+    LetFlicFuckWithPalettes();
 }
 
 // IDA: void __cdecl DrawInitialRadios()
 void DrawInitialRadios() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    RemoveTransientBitmaps(1);
+    DontLetFlicFuckWithPalettes();
+    TurnFlicTransparencyOn();
+    // FIXME: count of radio buttons does not agree with windows version
+    for (i = 0; i < COUNT_OF(gRadio_bastards__options) - 1; i++) {
+        PlayRadioOn2(i, gRadio_bastards__options[i].current_value);
+    }
+    TurnFlicTransparencyOff();
+    LetFlicFuckWithPalettes();
 }
 
 // IDA: void __usercall RadioChanged(int pIndex@<EAX>, int pNew_value@<EDX>)
 void RadioChanged(int pIndex, int pNew_value) {
     LOG_TRACE("(%d, %d)", pIndex, pNew_value);
-    NOT_IMPLEMENTED();
+
+    PlayRadioOff__options(pIndex, gRadio_bastards__options[pIndex].current_value);
+    PlayRadioOn__options(pIndex, pNew_value);
+    gRadio_bastards__options[pIndex].current_value = pNew_value;
 }
 
 // IDA: int __usercall GraphOptLeft@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int GraphOptLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int new_value;
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    DRS3StartSound(gIndexed_outlets[0], 3000);
+    new_value = gRadio_bastards__options[*pCurrent_choice - 2].current_value - 1;
+    if (new_value < 0) {
+        new_value = gRadio_bastards__options[*pCurrent_choice - 2].count - 1;
+    }
+    RadioChanged(*pCurrent_choice - 2, new_value);
+    return 1;
 }
 
 // IDA: int __usercall GraphOptRight@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int GraphOptRight(int* pCurrent_choice, int* pCurrent_mode) {
     int new_value;
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    DRS3StartSound(gIndexed_outlets[0], 3000);
+    new_value = gRadio_bastards__options[*pCurrent_choice + -2].current_value + 1;
+    if (new_value == gRadio_bastards__options[*pCurrent_choice - 2].count) {
+        new_value = 0;
+    }
+    RadioChanged(*pCurrent_choice - 2, new_value);
+    return 1;
 }
 
 // IDA: int __usercall GraphOptUp@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int GraphOptUp(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    if (*pCurrent_mode == 0) {
+        *pCurrent_mode = 1;
+        *pCurrent_choice = 13;
+        DRS3StartSound(gIndexed_outlets[0], 3000);
+        return 1;
+    } else if (*pCurrent_choice == 1) {
+        *pCurrent_mode = 0;
+        *pCurrent_choice = 0;
+        DRS3StartSound(gIndexed_outlets[0], 3000);
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 // IDA: int __usercall GraphOptDown@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int GraphOptDown(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    if (*pCurrent_mode == 0) {
+        *pCurrent_mode = 1;
+        *pCurrent_choice = 2;
+        DRS3StartSound(gIndexed_outlets[0], 3000);
+        return 1;
+    } else if (*pCurrent_choice == 14) {
+        *pCurrent_mode = 0;
+        *pCurrent_choice = 0;
+        DRS3StartSound(gIndexed_outlets[0], 3000);
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 // IDA: int __usercall RadioClick@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
@@ -174,45 +437,146 @@ int RadioClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_o
 // IDA: int __usercall GraphOptGoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int GraphOptGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    GraphOptRight(pCurrent_choice, pCurrent_mode);
+    return 0;
 }
 
 //IDA: void __usercall PlotAGraphBox(int pIndex@<EAX>, int pColour_value@<EDX>)
 // Suffix added to avoid duplicate symbol
 void PlotAGraphBox__options(int pIndex, int pColour_value) {
     LOG_TRACE("(%d, %d)", pIndex, pColour_value);
-    NOT_IMPLEMENTED();
+
+    if (pIndex < 0) {
+        return;
+    }
+    DrawRRectangle(gBack_screen,
+            gThe_interface_spec__options->mouse_areas[2].left[gGraf_data_index] - 6,
+            gRadio_bastards__options[pIndex].top - 3,
+            gThe_interface_spec__options->mouse_areas[2].right[gGraf_data_index] + 3,
+            gRadio_bastards__options[pIndex].top + gFonts[12].height + (TranslationMode() ? 2 : 0), pColour_value);
 }
 
 //IDA: void __usercall DrawAGraphBox(int pIndex@<EAX>)
 // Suffix added to avoid duplicate symbol
 void DrawAGraphBox__options(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+
+    PlotAGraphBox__options(pIndex, 45);
 }
 
 //IDA: void __usercall EraseAGraphBox(int pIndex@<EAX>)
 // Suffix added to avoid duplicate symbol
 void EraseAGraphBox__options(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+
+    PlotAGraphBox__options(pIndex, 0);
 }
 
 // IDA: void __usercall DrawGraphBox(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
 void DrawGraphBox(int pCurrent_choice, int pCurrent_mode) {
     LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    if (pCurrent_choice != gPending_entry) {
+        EraseAGraphBox__options(gPending_entry - 2);
+        DrawAGraphBox__options(pCurrent_choice - 2);
+        gPending_entry = pCurrent_choice;
+    }
 }
 
 // IDA: void __cdecl DoGraphicsOptions()
 void DoGraphicsOptions() {
-    static tFlicette flicker_on[14];
-    static tFlicette flicker_off[14];
-    static tFlicette push[14];
-    static tMouse_area mouse_areas[14];
-    static tInterface_spec interface_spec;
+    static tFlicette flicker_on[14] = {
+        {  43, {  45,  90 }, { 166, 398 } },
+        {  43, { 220, 440 }, { 166, 398 } },
+        { 238, {  49,  98 }, {  36,  86 } },
+        { 239, {  49,  98 }, {  45, 108 } }, 
+        { 240, {  49,  98 }, {  54, 130 } }, 
+        { 241, {  49,  98 }, {  67, 161 } }, 
+        { 242, {  49,  98 }, {  76, 182 } }, 
+        { 243, {  49,  98 }, {  89, 214 } }, 
+        { 244, {  49,  98 }, {  98, 235 } }, 
+        { 245, {  49,  98 }, { 111, 266 } }, 
+        { 246, {  49,  98 }, { 120, 288 } }, 
+        { 247, {  49,  98 }, { 129, 310 } }, 
+        { 248, {  49,  98 }, { 138, 331 } }, 
+        { 249, {  49,  98 }, { 150, 360 } },
+    };
+    static tFlicette flicker_off[14] = {
+        { 42,  {  45,  90 }, { 166, 398 } }, 
+        { 42,  { 220, 440 }, { 166, 398 } }, 
+        { 265, {  49,  98 }, {  36,  86 } }, 
+        { 266, {  49,  98 }, {  45, 108 } }, 
+        { 267, {  49,  98 }, {  54, 130 } }, 
+        { 268, {  49,  98 }, {  67, 161 } }, 
+        { 269, {  49,  98 }, {  76, 182 } }, 
+        { 270, {  49,  98 }, {  89, 214 } }, 
+        { 271, {  49,  98 }, {  98, 235 } },
+        { 272, {  49,  98 }, { 111, 266 } },
+        { 273, {  49,  98 }, { 120, 288 } },
+        { 274, {  49,  98 }, { 129, 310 } },
+        { 275, {  49,  98 }, { 138, 331 } },
+        { 276, {  49,  98 }, { 150, 360 } },
+    };
+    static tFlicette push[14] = {
+        { 154, {  45,  90 }, { 166, 398 } }, 
+        {  45, { 220, 440 }, { 166, 398 } }, 
+        {  45, { 210, 440 }, { 170, 408 } },
+        {  45, { 210, 440 }, { 170, 408 } },
+        {  45, { 210, 440 }, { 170, 408 } },
+        {  45, { 210, 440 }, { 170, 408 } },
+        {  45, { 210, 440 }, { 170, 408 } },
+        {  45, { 210, 440 }, { 170, 408 } }, 
+        {  45, { 210, 440 }, { 170, 408 } },
+        {  45, { 210, 440 }, { 170, 408 } },
+        {  45, { 210, 440 }, { 170, 408 } }, 
+        {  45, { 210, 440 }, { 170, 408 } },
+        {  45, { 210, 440 }, { 170, 408 } }, 
+        {  45, { 210, 440 }, { 170, 408 } },
+    };
+    static tMouse_area mouse_areas[14] = {
+        { {  45,  90 }, { 165, 396 }, { 104, 214 }, { 185, 444 },  0, 0, 0, NULL },
+        { { 220, 440 }, { 165, 396 }, { 276, 552 }, { 185, 444 },  1, 0, 0, NULL },
+        { {  49,  98 }, {  35,  84 }, { 284, 568 }, {  43, 103 },  2, 1, 0, RadioClick },
+        { {  49,  98 }, {  44, 106 }, { 284, 568 }, {  52, 125 },  3, 1, 0, RadioClick },
+        { {  49,  98 }, {  53, 127 }, { 284, 568 }, {  61, 146 },  4, 1, 0, RadioClick },
+        { {  49,  98 }, {  66, 158 }, { 284, 568 }, {  74, 178 },  5, 1, 0, RadioClick },
+        { {  49,  98 }, {  75, 180 }, { 284, 568 }, {  83, 199 },  6, 1, 0, RadioClick },
+        { {  49,  98 }, {  88, 192 }, { 284, 568 }, {  96, 230 },  7, 1, 0, RadioClick },
+        { {  49,  98 }, {  97, 233 }, { 284, 568 }, { 105, 252 },  8, 1, 0, RadioClick },
+        { {  49,  98 }, { 110, 264 }, { 284, 568 }, { 118, 283 },  9, 1, 0, RadioClick },
+        { {  49,  98 }, { 119, 286 }, { 284, 568 }, { 127, 305 }, 10, 1, 0, RadioClick },
+        { {  49,  98 }, { 128, 307 }, { 284, 322 }, { 136, 326 }, 11, 1, 0, RadioClick },
+        { {  49,  98 }, { 137, 329 }, { 284, 322 }, { 145, 348 }, 12, 1, 0, RadioClick },
+        { {  49,  98 }, { 149, 358 }, { 284, 322 }, { 157, 377 }, 13, 1, 0, RadioClick },
+    };
+    static tInterface_spec interface_spec = {
+        0, 160, 0, 0, 0, 0, 1,
+        { -1,  0 }, { -1,  0 }, { 0, 2 }, { 1,  2 }, { NULL,         GraphOptLeft  },
+        { -1,  0 }, {  1,  0 }, { 0, 2 }, { 1, 13 }, { NULL,         GraphOptRight },
+        { -1, -1 }, {  0, -1 }, { 0, 1 }, { 0, 13 }, { GraphOptUp,   GraphOptUp    },
+        { -1, -1 }, {  1,  1 }, { 0, 2 }, { 0, 14 }, { GraphOptDown, GraphOptDown  },
+        { 1, 1 }, { NULL, GraphOptGoAhead }, { 1, 1 }, { NULL, NULL },
+        NULL, DrawGraphBox, 0, NULL, DrawInitialRadios, NULL, 0, { 0, 0 },
+        NULL, 1, 1, 
+        COUNT_OF(flicker_on), flicker_on, flicker_off, push,
+        COUNT_OF(mouse_areas), mouse_areas, 0, NULL,
+    };
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gThe_interface_spec__options = &interface_spec;
+    gPending_entry = -1;
+    LoadFont(12);
+    GetGraphicsOptions();
+    if (DoInterfaceScreen(&interface_spec, 0, 0) == 0) {
+        SetGraphicsOptions();
+    }
+    if (gProgram_state.racing) {
+        FadePaletteDown();
+    } else {
+        RunFlic(161);
+    }
+    DisposeFont(12);
 }
 
 // IDA: void __cdecl CalibrateJoysticks()
