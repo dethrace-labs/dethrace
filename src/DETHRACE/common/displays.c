@@ -1,6 +1,7 @@
 #include "displays.h"
 #include "brender/brender.h"
 #include "constants.h"
+#include "depth.h"
 #include "flicplay.h"
 #include "globvars.h"
 #include "globvars.h"
@@ -225,7 +226,35 @@ void DimRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int p
     int line_skip;
     int width;
     LOG_TRACE9("(%p, %d, %d, %d, %d, %d)", pPixelmap, pLeft, pTop, pRight, pBottom, pKnock_out_corners);
-    STUB_ONCE();
+
+    ptr = (tU8*)pPixelmap->pixels + pLeft + pPixelmap->row_bytes * pTop;
+    line_skip = pPixelmap->row_bytes - pRight + pLeft;
+    depth_table_ptr = gDepth_shade_table->pixels;
+    x = gDepth_shade_table->row_bytes * gDim_amount;
+    width = pRight - pLeft;
+
+    if (pKnock_out_corners) {
+        ptr++;
+        for (right_ptr = ptr + width - 2; ptr < right_ptr; ptr++) {
+            *ptr = depth_table_ptr[*ptr + x];
+        }
+        ptr += line_skip + 1;
+        for (y = pTop + 1; y < (pBottom - 1); y++, ptr += line_skip) {
+            for (right_ptr = ptr + width; ptr < right_ptr; ptr++) {
+                *ptr = depth_table_ptr[*ptr + x];
+            }
+        }
+        ptr++;
+        for (right_ptr = ptr + width - 2; ptr < right_ptr; ptr++) {
+            *ptr = depth_table_ptr[*ptr + x];
+        }
+    } else {
+        for (y = pTop; y < pBottom; y++) {
+            for (right_ptr = ptr + width; ptr < right_ptr; ptr += line_skip) {
+                *ptr = depth_table_ptr[*ptr + x];
+            }
+        }
+    }
 }
 
 // IDA: void __cdecl DimAFewBits()
