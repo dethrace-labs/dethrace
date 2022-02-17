@@ -65,7 +65,7 @@ int Log2(int pNumber) {
     bits[13] = 0x2000;
     bits[14] = 0x4000;
     bits[15] = 0x8000;
-    for (i = 15; i >= 0; --i) {
+    for (i = COUNT_OF(bits) - 1; i >= 0; --i) {
         if ((bits[i] & pNumber) != 0) {
             return i;
         }
@@ -183,22 +183,24 @@ void LoadDepthTable(char* pName, br_pixelmap** pTable, int* pPower) {
     tU8 temp;
     LOG_TRACE("(\"%s\", %p, %p)", pName, pTable, pPower);
 
-#define pTABLE_PIXELS ((tU8*)(*pTable)->pixels)
+#define PTABLE_PIXEL_AT(X, Y) ((tU8*)((*pTable)->pixels))[(X) + (Y) * (*pTable)->row_bytes]
 
     PathCat(the_path, gApplication_path, "SHADETAB");
     PathCat(the_path, the_path, pName);
     *pTable = DRPixelmapLoad(the_path);
-    if (!*pTable) {
+    if (*pTable == NULL) {
         FatalError(87);
     }
     *pPower = Log2((*pTable)->height);
     for (i = 0; i < (*pTable)->width; i++) {
-        for (j = 0; j < (*pTable)->height / 2; j++) {
-            temp = pTABLE_PIXELS[j * (*pTable)->row_bytes + i];
-            pTABLE_PIXELS[j * (*pTable)->row_bytes + i] = pTABLE_PIXELS[(*pTable)->row_bytes * ((*pTable)->height - j - 1) + i];
-            pTABLE_PIXELS[(*pTable)->row_bytes * ((*pTable)->height - j - 1) + i] = temp;
+        for (j = 0; j < (*pTable)->height; j++) {
+            temp = PTABLE_PIXEL_AT(i, j);
+            PTABLE_PIXEL_AT(i, j) = PTABLE_PIXEL_AT(i, ((*pTable)->height - j - 1));
+            PTABLE_PIXEL_AT(i, ((*pTable)->height - j - 1)) = temp;
         }
     }
+
+#undef PTABLE_PIXEL_AT
 }
 
 // IDA: void __cdecl InitDepthEffects()
@@ -218,14 +220,14 @@ void InitDepthEffects() {
     if (!gHorizon_material) {
         FatalError(89);
     }
-    gHorizon_material->index_blend = BrPixelmapAllocate(3u, 256, 256, 0, 0);
+    gHorizon_material->index_blend = BrPixelmapAllocate(BR_PMT_INDEX_8, 256, 256, NULL, 0);
     BrTableAdd(gHorizon_material->index_blend);
     for (i = 0; i < 256; i++) {
         for (j = 0; j < 256; j++) {
             *((tU8*)gHorizon_material->index_blend->pixels + 256 * i + j) = j;
         }
     }
-    gHorizon_material->flags |= 0x20u;
+    gHorizon_material->flags |= BR_MATF_PERSPECTIVE;
     BrMaterialAdd(gHorizon_material);
     gForward_sky_model = CreateHorizonModel(gCamera);
     gRearview_sky_model = CreateHorizonModel(gRearview_camera);
@@ -235,12 +237,12 @@ void InitDepthEffects() {
     // gForward_sky_actor = BrActorAllocate(BR_ACTOR_MODEL, 0);
     // gForward_sky_actor->model = gForward_sky_model;
     // gForward_sky_actor->material = gHorizon_material;
-    // gForward_sky_actor->render_style = 1;
+    // gForward_sky_actor->render_style = BR_RSTYLE_NONE;
     // BrActorAdd(gUniverse_actor, gForward_sky_actor);
     // gRearview_sky_actor = BrActorAllocate(BR_ACTOR_MODEL, 0);
     // gRearview_sky_actor->model = gRearview_sky_model;
     // gRearview_sky_actor->material = gHorizon_material;
-    // gRearview_sky_actor->render_style = 1;
+    // gRearview_sky_actor->render_style = BR_RSTYLE_NONE;
     // BrActorAdd(gUniverse_actor, gRearview_sky_actor);
     gLast_camera_special_volume = 0;
 }
