@@ -1219,13 +1219,21 @@ void AwardTime(tU32 pTime) {
 // IDA: void __usercall DrawRectangle(br_pixelmap *pPixelmap@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pRight@<ECX>, int pBottom, int pColour)
 void DrawRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int pBottom, int pColour) {
     LOG_TRACE("(%p, %d, %d, %d, %d, %d)", pPixelmap, pLeft, pTop, pRight, pBottom, pColour);
-    NOT_IMPLEMENTED();
+
+    BrPixelmapLine(pPixelmap, pLeft,  pTop,    pRight, pTop,    pColour);
+    BrPixelmapLine(pPixelmap, pLeft,  pBottom, pRight, pBottom, pColour);
+    BrPixelmapLine(pPixelmap, pLeft,  pTop,    pLeft,  pBottom, pColour);
+    BrPixelmapLine(pPixelmap, pRight, pTop,    pRight, pBottom, pColour);
 }
 
 // IDA: void __usercall DrawRRectangle(br_pixelmap *pPixelmap@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pRight@<ECX>, int pBottom, int pColour)
 void DrawRRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int pBottom, int pColour) {
     LOG_TRACE("(%p, %d, %d, %d, %d, %d)", pPixelmap, pLeft, pTop, pRight, pBottom, pColour);
-    NOT_IMPLEMENTED();
+
+    BrPixelmapLine(pPixelmap, pLeft + 1, pTop,     pRight - 1, pTop,        pColour);
+    BrPixelmapLine(pPixelmap, pLeft + 1, pBottom,  pRight - 1, pBottom,     pColour);
+    BrPixelmapLine(pPixelmap, pLeft,     pTop + 1, pLeft,      pBottom - 1, pColour);
+    BrPixelmapLine(pPixelmap, pRight,    pTop + 1, pRight,     pBottom - 1, pColour);
 }
 
 // IDA: void __usercall OoerrIveGotTextInMeBoxMissus(int pFont_index@<EAX>, char *pText@<EDX>, br_pixelmap *pPixelmap@<EBX>, int pLeft@<ECX>, int pTop, int pRight, int pBottom, int pCentred)
