@@ -542,24 +542,28 @@ tFlic_descriptor* gFirst_flic;
 // IDA: void __cdecl EnableTranslationText()
 void EnableTranslationText() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gTrans_enabled = 1;
 }
 
 // IDA: void __cdecl DisableTranslationText()
 void DisableTranslationText() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gTrans_enabled = 0;
 }
 
 // IDA: void __usercall SetFlicSound(int pSound_ID@<EAX>, tU32 pSound_time@<EDX>)
 void SetFlicSound(int pSound_ID, tU32 pSound_time) {
     LOG_TRACE("(%d, %d)", pSound_ID, pSound_time);
-    NOT_IMPLEMENTED();
+
+    gSound_time = pSound_time;
+    gSound_ID = pSound_ID;
 }
 
 // IDA: int __cdecl TranslationMode()
 int TranslationMode() {
-    return 0;
+    return gTranslation_count;
 }
 
 // IDA: void __cdecl DontLetFlicFuckWithPalettes()
