@@ -76,16 +76,16 @@ print("=======================================")
 completed_funcs = 0
 total_funcs = 0
 for f in sorted(files, key=lambda x: x['percent'], reverse=True):
-    print('{0:45} {1:5}%\t{2} / {3}'.format(f['name'], f['percent'], f['completed'], f['total']))
+    print('{0:45} {1:5}%\t{2:>4} / {3:>4}'.format(f['name'], f['percent'], f['completed'], f['total']))
 
     total_funcs = total_funcs + f['total']
     completed_funcs = completed_funcs + f['completed']
 
 
-print('{0:45} {1:5}\t{2}'.format('name', 'percent', 'complete / total'))
+print('{0:45} {1:5}\t{2:>4}'.format('name', 'percent', 'complete / total'))
 print("=======================================")
 percent_completed = round((completed_funcs / total_funcs) * 100)
-print('{0:45} {1:5}%\t{2} / {3}'.format('total', percent_completed, completed_funcs, total_funcs))
+print('{0:45} {1:5}%\t{2:>4} / {3:>4}'.format('total', percent_completed, completed_funcs, total_funcs))
 
 print()
 print('Overall progress:')
