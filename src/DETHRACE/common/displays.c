@@ -3,6 +3,7 @@
 #include "constants.h"
 #include "flicplay.h"
 #include "globvars.h"
+#include "globvars.h"
 #include "globvrkm.h"
 #include "globvrpb.h"
 #include "graphics.h"
@@ -52,6 +53,7 @@ void GetTimerString(char* pStr, int pFudge_colon) {
 void InitHeadups() {
     int i;
     LOG_TRACE("()");
+
     for (i = 0; i < 15; i++) {
         gHeadups[i].type = eHeadup_unused;
     }
@@ -64,6 +66,7 @@ void InitHeadups() {
 // IDA: void __usercall ClearHeadup(int pIndex@<EAX>)
 void ClearHeadup(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
+
     gHeadups[pIndex].type = eHeadup_unused;
 }
 
@@ -109,7 +112,8 @@ void ClearHeadups() {
 // IDA: int __usercall HeadupActive@<EAX>(int pIndex@<EAX>)
 int HeadupActive(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+
+    return gHeadups[pIndex].type != eHeadup_unused;
 }
 
 // IDA: void __usercall DRPixelmapText(br_pixelmap *pPixelmap@<EAX>, int pX@<EDX>, int pY@<EBX>, tDR_font *pFont@<ECX>, char *pText, int pRight_edge)
@@ -1213,7 +1217,24 @@ void AwardTime(tU32 pTime) {
     tU32 the_time;
     int i;
     LOG_TRACE("(%d)", pTime);
-    NOT_IMPLEMENTED();
+
+    if (gRace_finished || gFreeze_timer || gNet_mode == eNet_mode_none || pTime == 0) {
+        return;
+    }
+    original_amount = pTime;
+    the_time = GetTotalTime();
+    for (i = COUNT_OF(gOld_times) - 1; i > 0; i--) {
+        gOld_times[i] = gOld_times[i - 1];
+    }
+    gOld_times[0] = pTime;
+    if (gLast_time_credit_headup >= 0 && (the_time - gLast_time_earn_time) < 2000) {
+        pTime += gLast_time_credit_headup;
+    }
+    gLast_time_credit_headup = pTime;
+    gTimer += original_amount * 1000;
+    TimerString(1000 * pTime, s, 0, 0);
+    gLast_time_credit_headup = NewTextHeadupSlot(11, 0, 2000, -2, s);
+    gLast_time_earn_time = the_time;
 }
 
 // IDA: void __usercall DrawRectangle(br_pixelmap *pPixelmap@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pRight@<ECX>, int pBottom, int pColour)
