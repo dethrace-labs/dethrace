@@ -2295,6 +2295,7 @@ void TellyOutImage(br_pixelmap* pImage, int pLeft, int pTop) {
 // IDA: void __usercall SetShadowLevel(tShadow_level pLevel@<EAX>)
 void SetShadowLevel(tShadow_level pLevel) {
     LOG_TRACE("(%d)", pLevel);
+    
     gShadow_level = pLevel;
 }
 

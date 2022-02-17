@@ -1883,12 +1883,14 @@ void ReallySetRoadTexturingLevel(tRoad_texturing_level pLevel) {
 // IDA: tWall_texturing_level __cdecl GetWallTexturingLevel()
 tWall_texturing_level GetWallTexturingLevel() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    return gWall_texturing_level;
 }
 
 // IDA: void __usercall SetWallTexturingLevel(tWall_texturing_level pLevel@<EAX>)
 void SetWallTexturingLevel(tWall_texturing_level pLevel) {
     LOG_TRACE("(%d)", pLevel);
+
     gWall_texturing_level = pLevel;
 }
 
@@ -1945,19 +1947,22 @@ void SetAccessoryRendering(int pOn) {
 // IDA: int __cdecl GetAccessoryRendering()
 int GetAccessoryRendering() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    return gRendering_accessories;
 }
 
 // IDA: void __usercall SetCarSimplificationLevel(int pLevel@<EAX>)
 void SetCarSimplificationLevel(int pLevel) {
     LOG_TRACE("(%d)", pLevel);
+
     gCar_simplification_level = pLevel;
 }
 
 // IDA: int __cdecl GetCarSimplificationLevel()
 int GetCarSimplificationLevel() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    return gCar_simplification_level;
 }
 
 // IDA: void __usercall ParseSpecialVolume(FILE *pF@<EAX>, tSpecial_volume *pSpec@<EDX>, char *pScreen_name_str@<EBX>)
