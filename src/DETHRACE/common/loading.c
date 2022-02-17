@@ -3219,7 +3219,20 @@ void ReadNetworkSettings(FILE* pF, tNet_game_options* pOptions) {
 // IDA: int __usercall PrintNetOptions@<EAX>(FILE *pF@<EAX>, int pIndex@<EDX>)
 int PrintNetOptions(FILE* pF, int pIndex) {
     LOG_TRACE("(%p, %d)", pF, pIndex);
-    NOT_IMPLEMENTED();
+
+    fprintf(pF, "NETSETTINGS %d\n", pIndex);
+    fprintf(pF, "%d // Allow the sending of Abuse-o-Matic(tm) text messages\n", gNet_settings[pIndex].enable_text_messages);
+    fprintf(pF, "%d // Show cars on map\n", gNet_settings[pIndex].show_players_on_map);
+    fprintf(pF, "%d // Show peds on map\n", gNet_settings[pIndex].show_peds_on_map);
+    fprintf(pF, "%d // Show pickups on map\n", gNet_settings[pIndex].show_powerups_on_map);
+    fprintf(pF, "%d // Pickup respawn\n", gNet_settings[pIndex].powerup_respawn);
+    fprintf(pF, "%d // Open game\n", gNet_settings[pIndex].open_game);
+    fprintf(pF, "%d // Grid start\n", gNet_settings[pIndex].grid_start);
+    fprintf(pF, "%d // Race order\n", gNet_settings[pIndex].race_sequence_type);
+    fprintf(pF, "%d // Random car selection\n", gNet_settings[pIndex].random_car_choice);
+    fprintf(pF, "%d // Car choice mode\n", gNet_settings[pIndex].car_choice);
+    fprintf(pF, "%d // Starting credits index\n\n", gNet_settings[pIndex].starting_money_index);
+    return 0;
 }
 
 // IDA: int __cdecl SaveOptions()
@@ -3227,7 +3240,57 @@ int SaveOptions() {
     tPath_name the_path;
     FILE* f;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    PathCat(the_path, gApplication_path, "OPTIONS.TXT");
+    PDFileUnlock(the_path);
+    f = DRfopen(the_path, "wt");
+    gMap_render_x = 6.f;
+    gMap_render_y = 6.f;
+    gMap_render_width = 64.f;
+    gMap_render_height = 40.f;
+    if (f == NULL) {
+        return 0;
+    }
+
+#define BAIL_IF_NEGATIVE(VAL) if ((VAL) < 0) { LOG_WARN( #VAL " FAILED\n"); return 0; }
+
+    BAIL_IF_NEGATIVE(fprintf(f, "YonFactor %f\n", GetYonFactor()));
+    BAIL_IF_NEGATIVE(fprintf(f, "SkyTextureOn %d\n", GetSkyTextureOn()));
+    BAIL_IF_NEGATIVE(fprintf(f, "CarTexturingLevel %d\n", GetCarTexturingLevel()));
+    BAIL_IF_NEGATIVE(fprintf(f, "RoadTexturingLevel %d\n", GetRoadTexturingLevel()));
+    BAIL_IF_NEGATIVE(fprintf(f, "WallTexturingLevel %d\n", GetWallTexturingLevel()));
+    BAIL_IF_NEGATIVE(fprintf(f, "ShadowLevel %d\n", GetShadowLevel()));
+    BAIL_IF_NEGATIVE(fprintf(f, "DepthCueingOn %d\n", GetDepthCueingOn()));
+    BAIL_IF_NEGATIVE(fprintf(f, "Yon %f\n", GetYon()));
+    BAIL_IF_NEGATIVE(fprintf(f, "CarSimplificationLevel %d\n", GetCarSimplificationLevel()));
+    BAIL_IF_NEGATIVE(fprintf(f, "AccessoryRendering %d\n", GetAccessoryRendering()));
+    BAIL_IF_NEGATIVE(fprintf(f, "SmokeOn %d\n", GetSmokeOn()));
+    BAIL_IF_NEGATIVE(fprintf(f, "SoundDetailLevel %d\n", GetSoundDetailLevel()));
+    BAIL_IF_NEGATIVE(fprintf(f, "ScreenSize %d\n", GetScreenSize()));
+    BAIL_IF_NEGATIVE(fprintf(f, "MapRenderX %f\n", gMap_render_x));
+    BAIL_IF_NEGATIVE(fprintf(f, "MapRenderY %f\n", gMap_render_y));
+    BAIL_IF_NEGATIVE(fprintf(f, "MapRenderWidth %f\n", gMap_render_width));
+    BAIL_IF_NEGATIVE(fprintf(f, "MapRenderHeight %f\n", gMap_render_height));
+    BAIL_IF_NEGATIVE(fprintf(f, "PlayerName 0\n%s\n", (gProgram_state.player_name[0][0] == '\0') ? "MAX DAMAGE" : gProgram_state.player_name[0]));
+    BAIL_IF_NEGATIVE(fprintf(f, "PlayerName 1\n%s\n", (gProgram_state.player_name[1][0] == '\0') ? "DIE ANNA" : gProgram_state.player_name[1]));
+    BAIL_IF_NEGATIVE(fprintf(f, "NetName 0\n%s\n", (gNet_player_name[0] == '\0') ? "RON TURN" : gNet_player_name));
+    BAIL_IF_NEGATIVE(fprintf(f, "EVolume %d\n", gProgram_state.effects_volume));
+    BAIL_IF_NEGATIVE(fprintf(f, "MVolume %d\n", gProgram_state.music_volume));
+    BAIL_IF_NEGATIVE(fprintf(f, "KeyMapIndex %d\n", gKey_map_index));
+
+    BAIL_IF_NEGATIVE(fprintf(f, "NETGAMETYPE %d\n", gLast_game_type));
+    BAIL_IF_NEGATIVE(PrintNetOptions(f, 0));
+    BAIL_IF_NEGATIVE(PrintNetOptions(f, 1));
+    BAIL_IF_NEGATIVE(PrintNetOptions(f, 2));
+    BAIL_IF_NEGATIVE(PrintNetOptions(f, 3));
+    BAIL_IF_NEGATIVE(PrintNetOptions(f, 4));
+    BAIL_IF_NEGATIVE(PrintNetOptions(f, 5));
+    BAIL_IF_NEGATIVE(PrintNetOptions(f, 6));
+    BAIL_IF_NEGATIVE(PrintNetOptions(f, 7));
+    
+    fclose(f);
+
+    return 1;
 }
 
 // IDA: int __cdecl RestoreOptions()
