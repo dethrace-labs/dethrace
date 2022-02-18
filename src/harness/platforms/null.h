@@ -7,8 +7,8 @@ int* Null_GetKeyMap() { return NULL; }
 int Null_IsKeyDown(unsigned char pScan_code) { return 0; }
 void Null_BeginFrame(br_actor* camera, br_pixelmap* colour_buffer) {}
 void Null_EndFrame() {}
-void Null_RenderFullScreenQuad(uint32_t* src, int width, int height) {}
-void Null_RenderColorBlend(float r, float g, float b, float a) {}
+void Null_SetPalette(uint8_t* palette) {}
+void Null_RenderFullScreenQuad(uint8_t* src, int width, int height) {}
 void Null_RenderModel(br_model* model, br_matrix34 model_matrix) {}
 void Null_RenderFrameBuffer() {}
 void Null_Swap() {}
@@ -23,8 +23,8 @@ tPlatform null_platform = {
     Null_IsKeyDown,
     Null_BeginFrame,
     Null_EndFrame,
+    Null_SetPalette,
     Null_RenderFullScreenQuad,
-    Null_RenderColorBlend,
     Null_RenderModel,
     Null_RenderFrameBuffer,
     Null_Swap,

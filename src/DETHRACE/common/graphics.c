@@ -471,7 +471,7 @@ void AdjustRenderScreenSize() {
         gRender_screen->flags |= BR_PMF_ROW_WHOLEPIXELS;
     } else {
         gRender_screen->flags &= ~BR_PMF_ROW_WHOLEPIXELS;
-        //TELL_ME_IF_WE_PASS_THIS_WAY();
+        // TELL_ME_IF_WE_PASS_THIS_WAY();
     }
     gRender_screen->origin_x = gRender_screen->width / 2;
     gRender_screen->origin_y = gRender_screen->height / 2;
@@ -1038,7 +1038,7 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
                     CheckSingleFace(list_ptr, &ray_pos, &ray, &normal, &distance);
                     if (distance < 1.0 && ray_length * distance < highest_underneath) {
                         highest_underneath = ray_length * distance;
-                        //v22 = normal;
+                        // v22 = normal;
                     }
                 }
                 if (f_num >= 16) {
@@ -1365,7 +1365,7 @@ void RenderAFrame(int pDepth_mask_on) {
     }
     gCamera->t.t.mat = old_camera_matrix;
     if (gMirror_on__graphics) {
-        //LOG_PANIC("mirror is on");
+        // LOG_PANIC("mirror is on");
         BrPixelmapFill(gRearview_depth_buffer, 0xFFFFFFFF);
         gRendering_mirror = 1;
         DoSpecialCameraEffect(gRearview_camera, &gRearview_camera_to_world);
@@ -1542,8 +1542,8 @@ void RenderAFrame(int pDepth_mask_on) {
 void InitPaletteAnimate() {
     LOG_TRACE("()");
 
-    //dword_53E78C = 0;
-    //dword_53F930 = 0;
+    // dword_53E78C = 0;
+    // dword_53F930 = 0;
 }
 
 // IDA: void __cdecl RevertPalette()
@@ -1595,8 +1595,6 @@ void SetFadedPalette(int pDegree) {
     br_pixelmap* the_palette;
     char* the_pixels;
     LOG_TRACE10("(%d)", pDegree);
-
-    Harness_Hook_SetFadedPalette(pDegree);
 
     memcpy(gScratch_pixels, gCurrent_palette->pixels, 0x400u);
     for (j = 0; j < 256; j++) {
@@ -1834,7 +1832,7 @@ void DRPixelmapRectangleOnscreenCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_i
     tU8* source_ptr;
     tU8* dest_ptr;
     tU8* conv_table;
-    //LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
+    // LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
 
     source_row_wrap = pSource->row_bytes - pWidth;
     dest_row_wrap = pDest->row_bytes - pWidth;
@@ -2332,7 +2330,7 @@ void InitShadow() {
         BrClipPlaneDisable(gShadow_clip_planes[i].clip);
         BrMatrix34Identity(&gShadow_clip_planes[i].clip->t.t.mat);
     }
-    gFancy_shadow = 0; //jeff changed
+    gFancy_shadow = 0; // jeff changed
     gShadow_material = BrMaterialFind("SHADOW.MAT");
     gShadow_light_ray.v[0] = 0.0;
     gShadow_light_ray.v[1] = -1.0;

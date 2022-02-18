@@ -15,71 +15,120 @@
 SDL_Window* window;
 SDL_GLContext context;
 GLuint screen_buffer_vao, screen_buffer_ebo;
-GLuint screen_texture;
+GLuint screen_texture, palette_texture;
+
 GLuint shader_program_2d;
-GLuint shader_program_2d_trans;
 GLuint shader_program_2d_pp;
 GLuint shader_program_3d;
 GLuint framebuffer_id, framebuffer_texture = 0;
 unsigned int rbo;
+uint8_t gl_palette[4 * 256]; // RGBA
 
 int window_width, window_height;
 
-void CompileShader(GLuint shader_id, const GLchar* source) {
+struct {
+    GLuint textureSample;
+    GLuint pixels, palette;
+    GLuint model, view, projection;
+    GLuint clip_plane_count;
+    GLuint clip_planes[6];
+} uniforms_3d;
+
+struct {
+    GLuint pixels, palette;
+} uniforms_2d;
+
+GLuint CreateShaderFromFile(const char* filename, const char* fallback, GLenum type) {
     int success;
-    char log[512];
-    glShaderSource(shader_id, 1, &source, NULL);
-    glCompileShader(shader_id);
-    glGetShaderiv(shader_id, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(shader_id, 512, NULL, log);
-        LOG_PANIC("shader %d failed. %s", shader_id, log);
+
+    GLuint res = glCreateShader(type);
+
+    FILE* f = fopen(filename, "r");
+    if (f) {
+        fseek(f, 0, SEEK_END);
+        long fsize = ftell(f);
+        fseek(f, 0, SEEK_SET);
+        char* file_bytes = malloc(fsize + 1);
+        fread(file_bytes, fsize, 1, f);
+        fclose(f);
+        file_bytes[fsize] = 0;
+        const GLchar* sources[] = { file_bytes };
+        glShaderSource(res, 1, sources, NULL);
+    } else {
+        const GLchar* sources[] = { fallback };
+        glShaderSource(res, 1, sources, NULL);
     }
+
+    glCompileShader(res);
+    glGetShaderiv(res, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        char log_buffer[1024];
+        glGetShaderInfoLog(res, 1024, NULL, log_buffer);
+        LOG_PANIC("shader %s failed to compile: %s", filename, log_buffer);
+    }
+    return res;
+}
+
+GLuint CreateShaderProgram(const char* vertex_file, const char* fragment_file, const char* vertex_fallback, const char* fragment_fallback) {
+    GLuint program = glCreateProgram();
+    GLuint v_shader, f_shader;
+
+    v_shader = CreateShaderFromFile(vertex_file, vertex_fallback, GL_VERTEX_SHADER);
+    if (!v_shader)
+        return 0;
+    glAttachShader(program, v_shader);
+
+    f_shader = CreateShaderFromFile(fragment_file, fragment_fallback, GL_FRAGMENT_SHADER);
+    if (!f_shader)
+        return 0;
+    glAttachShader(program, f_shader);
+
+    glLinkProgram(program);
+
+    glDeleteShader(v_shader);
+    glDeleteShader(f_shader);
+
+    GLint link_ok = GL_FALSE;
+    glGetProgramiv(program, GL_LINK_STATUS, &link_ok);
+    if (!link_ok) {
+        char log_buffer[1024];
+        glGetShaderInfoLog(program, 1024, NULL, log_buffer);
+        LOG_PANIC("shader program %s:%s failed to link: %s", vertex_file, fragment_file, log_buffer);
+    }
+    return program;
 }
 
 void LoadShaders() {
-    GLuint vs, fs;
+    shader_program_2d = CreateShaderProgram("vertex_shader_2d.glsl", "fragment_shader_2d.glsl", vs_2d, fs_2d);
+    glUseProgram(shader_program_2d);
+    uniforms_2d.pixels = glGetUniformLocation(shader_program_2d, "pixels");
+    uniforms_2d.palette = glGetUniformLocation(shader_program_2d, "palette");
 
-    vs = glCreateShader(GL_VERTEX_SHADER);
-    CompileShader(vs, vs_2d);
-    fs = glCreateShader(GL_FRAGMENT_SHADER);
-    CompileShader(fs, fs_2d);
+    // bind the uniform samplers to texture units:
+    glUniform1i(uniforms_2d.pixels, 0);
+    glUniform1i(uniforms_2d.palette, 1);
 
-    shader_program_2d = glCreateProgram();
-    glAttachShader(shader_program_2d, vs);
-    glAttachShader(shader_program_2d, fs);
-    glLinkProgram(shader_program_2d);
-    glDeleteShader(fs);
+    shader_program_2d_pp = CreateShaderProgram("vertex_shader_postprocess.glsl", "fragment_shader_postprocess.glsl", vs_2d, fs_postprocess);
 
-    fs = glCreateShader(GL_FRAGMENT_SHADER);
-    CompileShader(fs, fs_2d_trans);
-    shader_program_2d_trans = glCreateProgram();
-    glAttachShader(shader_program_2d_trans, vs);
-    glAttachShader(shader_program_2d_trans, fs);
-    glLinkProgram(shader_program_2d_trans);
-    glDeleteShader(fs);
+    shader_program_3d = CreateShaderProgram("vertex_shader_3d.glsl", "fragment_shader_3d.glsl", vs_3d, fs_3d);
+    glUseProgram(shader_program_3d);
+    uniforms_3d.clip_plane_count = glGetUniformLocation(shader_program_3d, "clip_plane_count");
+    for (int i = 0; i < 6; i++) {
+        char name[32];
+        sprintf(name, "clip_planes[%d]", i);
+        uniforms_3d.clip_planes[i] = glGetUniformLocation(shader_program_3d, name);
+        LOG_DEBUG("%d", uniforms_3d.clip_planes[i]);
+    }
+    uniforms_3d.model = glGetUniformLocation(shader_program_3d, "model");
+    uniforms_3d.palette = glGetUniformLocation(shader_program_3d, "palette");
+    uniforms_3d.pixels = glGetUniformLocation(shader_program_3d, "pixels");
+    uniforms_3d.projection = glGetUniformLocation(shader_program_3d, "projection");
+    uniforms_3d.textureSample = glGetUniformLocation(shader_program_3d, "textureSample");
+    uniforms_3d.view = glGetUniformLocation(shader_program_3d, "view");
 
-    fs = glCreateShader(GL_FRAGMENT_SHADER);
-    CompileShader(fs, fs_postprocess);
-    shader_program_2d_pp = glCreateProgram();
-    glAttachShader(shader_program_2d_pp, vs);
-    glAttachShader(shader_program_2d_pp, fs);
-    glLinkProgram(shader_program_2d_pp);
-    glDeleteShader(fs);
-
-    glDeleteShader(vs);
-
-    vs = glCreateShader(GL_VERTEX_SHADER);
-    fs = glCreateShader(GL_FRAGMENT_SHADER);
-    CompileShader(fs, fs_3d);
-    CompileShader(vs, vs_3d);
-    shader_program_3d = glCreateProgram();
-    glAttachShader(shader_program_3d, vs);
-    glAttachShader(shader_program_3d, fs);
-    glLinkProgram(shader_program_3d);
-
-    glDeleteShader(vs);
-    glDeleteShader(fs);
+    // bind the uniform samplers to texture units:
+    glUniform1i(uniforms_2d.pixels, 0);
+    glUniform1i(uniforms_2d.palette, 1);
 }
 
 void GLRenderer_CreateWindow(char* title, int width, int height) {
@@ -109,7 +158,7 @@ void GLRenderer_CreateWindow(char* title, int width, int height) {
     }
     SDL_SetRelativeMouseMode(SDL_TRUE);
 
-    //SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+    // SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
     context = SDL_GL_CreateContext(window);
     if (!context) {
@@ -165,6 +214,7 @@ void GLRenderer_CreateWindow(char* title, int width, int height) {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glGenTextures(1, &screen_texture);
+    glGenTextures(1, &palette_texture);
 
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -181,10 +231,9 @@ void GLRenderer_CreateWindow(char* title, int width, int height) {
     glGenTextures(1, &framebuffer_texture);
     glBindTexture(GL_TEXTURE_2D, framebuffer_texture);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8UI, width, height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer_texture, 0);
 
@@ -199,6 +248,30 @@ void GLRenderer_CreateWindow(char* title, int width, int height) {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void GLRenderer_SetPalette(uint8_t* rgba_colors) {
+    for (int i = 0; i < 256; i++) {
+
+        gl_palette[i * 4] = rgba_colors[i * 4 + 2];
+        gl_palette[i * 4 + 1] = rgba_colors[i * 4 + 1];
+        gl_palette[i * 4 + 2] = rgba_colors[i * 4];
+        // palette index 0 is transparent, so set alpha to 0
+        if (i == 0) {
+            gl_palette[i * 4 + 3] = 0;
+        } else {
+            gl_palette[i * 4 + 3] = 0xff;
+        }
+    }
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, palette_texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 256, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, gl_palette);
+
+    // reset active texture back to default
+    glActiveTexture(GL_TEXTURE0);
+}
+
 extern br_v1db_state v1db;
 
 void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer) {
@@ -208,39 +281,17 @@ void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer) {
     glEnable(GL_DEPTH_TEST);
     glUseProgram(shader_program_3d);
 
-    GLuint lightpos_u = glGetUniformLocation(shader_program_3d, "lightPos");
-    GLuint lightcolor_u = glGetUniformLocation(shader_program_3d, "lightColor");
-    GLuint objectcolor_u = glGetUniformLocation(shader_program_3d, "objectColor");
-
-    glUniform3f(lightpos_u, -0.0f, -1.0f, -0.3f);
-    //glUniform3f(lightcolor_u, 0.97f, 0.84f, 0.11f);
-    glUniform3f(lightcolor_u, 1, 1, 1);
-    glUniform3f(objectcolor_u, 1.0f, 1.0f, 1.0f);
-
-    GLuint view_u = glGetUniformLocation(shader_program_3d, "view");
-    GLuint projection_u = glGetUniformLocation(shader_program_3d, "projection");
-
-    printf("planes %d\n", v1db.enabled_clip_planes.max);
+    int enabled_clip_planes = 0;
     for (int i = 0; i < v1db.enabled_clip_planes.max; i++) {
-        char name[32];
-
-        sprintf(name, "clip_plane_enabled[%d]", i);
-        GLuint clip_enable = glGetUniformLocation(shader_program_3d, name);
-
-        printf("plane %d\n", i);
         if (!v1db.enabled_clip_planes.enabled || !v1db.enabled_clip_planes.enabled[i]) {
-            glUniform1i(clip_enable, 0);
             continue;
         }
-        printf("enabled\n");
-
-        sprintf(name, "clip_plane[%d]", i);
-        GLuint clip = glGetUniformLocation(shader_program_3d, name);
-
-        glUniform1i(clip_enable, 1);
         br_vector4* v4 = v1db.enabled_clip_planes.enabled[i]->type_data;
-        glUniform4f(clip, v4->v[0], v4->v[1], v4->v[2], v4->v[3]);
+        glUniform4f(uniforms_3d.clip_planes[enabled_clip_planes], v4->v[0], v4->v[1], v4->v[2], v4->v[3]);
+        enabled_clip_planes++;
     }
+
+    glUniform1i(uniforms_3d.clip_plane_count, enabled_clip_planes);
 
     if (gDebugCamera_active) {
         float m2[4][4];
@@ -249,7 +300,7 @@ void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer) {
         // LOG_DEBUG("%f, %f, %f, %f", m2[1][0], m2[1][1], m2[1][2], m2[1][3]);
         // LOG_DEBUG("%f, %f, %f, %f", m2[2][0], m2[2][1], m2[2][2], m2[2][3]);
         // LOG_DEBUG("%f, %f, %f, %f", m2[3][0], m2[3][1], m2[3][2], m2[3][3]);
-        glUniformMatrix4fv(view_u, 1, GL_FALSE, (float*)&m2[0]);
+        glUniformMatrix4fv(uniforms_3d.view, 1, GL_FALSE, (float*)&m2[0]);
     } else {
         mat4 cam_matrix = {
             { camera->t.t.mat.m[0][0], camera->t.t.mat.m[0][1], camera->t.t.mat.m[0][2], 0 },
@@ -259,15 +310,15 @@ void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer) {
         };
         mat4 cam_matrix_inv;
         glm_mat4_inv(cam_matrix, cam_matrix_inv);
-        glUniformMatrix4fv(view_u, 1, GL_FALSE, &cam_matrix_inv[0][0]);
+        glUniformMatrix4fv(uniforms_3d.view, 1, GL_FALSE, &cam_matrix_inv[0][0]);
     }
     float* proj = DebugCamera_Projection();
-    glUniformMatrix4fv(projection_u, 1, GL_FALSE, proj);
+    glUniformMatrix4fv(uniforms_3d.projection, 1, GL_FALSE, proj);
 
     DebugCamera_Update();
 
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void GLRenderer_EndScene() {
@@ -283,7 +334,7 @@ void GLRenderer_RenderFramebuffer() {
     glBindTexture(GL_TEXTURE_2D, framebuffer_texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glUseProgram(shader_program_2d_trans);
+    glUseProgram(shader_program_2d_pp);
 
     glBindVertexArray(screen_buffer_vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, screen_buffer_ebo);
@@ -296,32 +347,34 @@ void GLRenderer_RenderFramebuffer() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void GLRenderer_RenderFullScreenQuad(uint32_t* screen_buffer, int width, int height) {
+void GLRenderer_RenderFullScreenQuad(uint8_t* screen_buffer, int width, int height) {
 
     glDisable(GL_DEPTH_TEST);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+    GLenum e = glGetError();
+    if (e != 0) {
+        LOG_DEBUG("error %d", e);
+    }
+
+    // e = glGetError();
+    // LOG_DEBUG("error1x %d, text %d", e, screen_texture);
+
+    glUseProgram(shader_program_2d);
     glBindTexture(GL_TEXTURE_2D, screen_texture);
+    // e = glGetError();
+    // LOG_DEBUG("error2 %d, text %d", e, screen_texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, screen_buffer);
 
-    glUseProgram(shader_program_2d_trans);
+    // e = glGetError();
+    // LOG_DEBUG("error3 %d", e);
 
-    glBindVertexArray(screen_buffer_vao);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, screen_buffer_ebo);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
-}
-
-// GLRenderer_RenderColorBlend renders a fullscreen quad with the desired color
-void GLRenderer_RenderColorBlend(float r, float g, float b, float a) {
-    glDisable(GL_DEPTH_TEST);
-
-    glUseProgram(shader_program_2d_pp);
-    GLuint model_u = glGetUniformLocation(shader_program_2d_pp, "color");
-    glUniform4f(model_u, r, g, b, a);
-
+    //    memset(screen_buffer, 0x30, 320 * 200);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8UI, width, height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, screen_buffer);
+    // glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_R8, GL_UNSIGNED_BYTE, screen_buffer);
+    e = glGetError();
+    LOG_DEBUG("error4 %d", e);
     glBindVertexArray(screen_buffer_vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, screen_buffer_ebo);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -430,14 +483,14 @@ void GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
     v11model* v11 = model->prepared;
 
     if (v11 == NULL) {
-        //LOG_WARN("No model prepared for %s", model->identifier);
+        // LOG_WARN("No model prepared for %s", model->identifier);
         return;
     }
 
     if (ctx == NULL) {
         build_model(model);
         ctx = model->stored;
-        //DebugCamera_SetPosition(model_matrix.m[3][0], model_matrix.m[3][1], model_matrix.m[3][2]);
+        // DebugCamera_SetPosition(model_matrix.m[3][0], model_matrix.m[3][1], model_matrix.m[3][2]);
     }
 
     glEnable(GL_DEPTH_TEST);
@@ -450,10 +503,7 @@ void GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
         model_matrix.m[3][0], model_matrix.m[3][1], model_matrix.m[3][2], 1
     };
 
-    GLuint tex_u = glGetUniformLocation(shader_program_3d, "textureSample");
-
-    GLuint model_u = glGetUniformLocation(shader_program_3d, "model");
-    glUniformMatrix4fv(model_u, 1, GL_FALSE, m);
+    glUniformMatrix4fv(uniforms_3d.model, 1, GL_FALSE, m);
 
     glBindVertexArray(ctx->vao_id);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx->ebo_id);
@@ -468,10 +518,10 @@ void GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
         tStored_material* mat = (tStored_material*)v11->groups[g].stored;
         if (mat && mat->texture) {
             glBindTexture(GL_TEXTURE_2D, mat->texture->id);
-            glUniform1i(tex_u, 1);
+            glUniform1i(uniforms_3d.textureSample, 1);
         } else {
             glBindTexture(GL_TEXTURE_2D, 0);
-            glUniform1i(tex_u, 0);
+            glUniform1i(uniforms_3d.textureSample, 0);
         }
 
         glDrawElements(GL_TRIANGLES, v11->groups[g].nfaces * 3, GL_UNSIGNED_INT, (void*)(element_index * sizeof(int)));
@@ -506,18 +556,22 @@ void GLRenderer_BufferMaterial(br_material* mat) {
 
 void GLRenderer_BufferTexture(br_pixelmap* pm) {
     if (!pm->stored) {
-        uint32_t* full_color_texture = NULL;
-        Harness_ConvertPalettedPixelmapTo32Bit(&full_color_texture, pm, 0);
-        if (full_color_texture == NULL) {
-            return;
+        // sometimes the pixelmap has row_bytes > width. OpenGL expects linear pixels, so flatten it out
+        uint8_t* linear_pixels = malloc(sizeof(uint8_t) * pm->width * pm->height);
+        uint8_t* original_pixels = pm->pixels;
+        for (int y = 0; y < pm->height; y++) {
+            for (int x = 0; x < pm->width; x++) {
+                linear_pixels[y * pm->width + x] = original_pixels[y * pm->row_bytes + x];
+            }
         }
+
         tStored_pixelmap* stored = malloc(sizeof(tStored_pixelmap));
         glGenTextures(1, &stored->id);
         glBindTexture(GL_TEXTURE_2D, stored->id);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, pm->width, pm->height, 0, GL_BGRA, GL_UNSIGNED_BYTE, full_color_texture);
-        free(full_color_texture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_R8UI, pm->width, pm->height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, linear_pixels);
+        free(linear_pixels);
         pm->stored = stored;
     }
 }

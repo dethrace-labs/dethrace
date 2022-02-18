@@ -20,7 +20,7 @@ br_pixelmap* last_dst = NULL;
 br_pixelmap* last_src = NULL;
 
 // value between 0 and 1 - 0 is no fade, 1 is full black
-float palette_fade_to_black_alpha = 0;
+// float palette_fade_to_black_alpha = 0;
 
 int rendered_scenes_this_frame = 0;
 int rendered_scenes_last_frame = 0;
@@ -81,7 +81,7 @@ void Harness_Init(int* argc, char* argv[]) {
     if (keymap != NULL) {
         for (int i = 0; i < 123; i++) {
             gScan_code[i][0] = keymap[i];
-            //gScan_code[i][1] = keymap[i];
+            // gScan_code[i][1] = keymap[i];
         }
     }
 
@@ -213,15 +213,24 @@ void Harness_ConvertPalettedPixelmapTo32Bit(uint32_t** dst, br_pixelmap* src, in
 
 // Render 2d back buffer
 void Harness_RenderScreen(br_pixelmap* dst, br_pixelmap* src) {
-    Harness_ConvertPalettedPixelmapTo32Bit(&screen_buffer, src, 1);
-    platform->RenderFullScreenQuad(screen_buffer, 320, 200);
+    // Harness_ConvertPalettedPixelmapTo32Bit(&screen_buffer, src, 1);
+    platform->RenderFullScreenQuad((uint8_t*)src->pixels, 320, 200);
 
     last_dst = dst;
     last_src = src;
 }
 
 void Harness_Hook_BrDevPaletteSetOld(br_pixelmap* pm) {
+    platform->SetPalette((uint8_t*)pm->pixels);
     palette = pm;
+
+    if (last_dst) {
+        if (rendered_scenes_this_frame) {
+            platform->RenderFrameBuffer();
+        }
+        Harness_RenderScreen(last_dst, last_src);
+        platform->Swap();
+    }
 }
 
 void Harness_Hook_BrDevPaletteSetEntryOld(int i, br_colour colour) {
@@ -296,9 +305,9 @@ void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {
 
     // if the game has faded the palette, we should respect that.
     // fixes screen flash during race start or recovery
-    if (palette_fade_to_black_alpha != 0) {
-        platform->RenderColorBlend(0, 0, 0, palette_fade_to_black_alpha);
-    }
+    // if (palette_fade_to_black_alpha != 0) {
+    //     platform->RenderColorBlend(0, 0, 0, palette_fade_to_black_alpha);
+    // }
 
     platform->Swap();
     platform->PollEvents();
@@ -320,7 +329,7 @@ void Harness_Hook_PDSetKeyArray() {
 }
 
 void Harness_Hook_BrMaterialUpdate(br_material* mat, br_uint_16 flags) {
-    //LOG_DEBUG("buffermat %s", mat->identifier);
+    // LOG_DEBUG("buffermat %s", mat->identifier);
     platform->BufferMaterial(mat);
 }
 
@@ -337,16 +346,16 @@ void Harness_Hook_S3Service(int unk1, int unk2) {
 void Harness_Hook_S3StopAllOutletSounds() {
 }
 
-void Harness_Hook_SetFadedPalette(int pDegree) {
+// void Harness_Hook_SetFadedPalette(int pDegree) {
 
-    // pDegree is 0-255 where 0 is full black and 255 is full original color.
-    // we convert this to an alpha blend value
-    palette_fade_to_black_alpha = (256 - pDegree) / 256.f;
+//     // pDegree is 0-255 where 0 is full black and 255 is full original color.
+//     // we convert this to an alpha blend value
+//     palette_fade_to_black_alpha = (256 - pDegree) / 256.f;
 
-    if (rendered_scenes_last_frame > 0) {
-        platform->RenderFrameBuffer();
-    }
-    Harness_RenderScreen(last_dst, last_src);
-    platform->RenderColorBlend(0, 0, 0, palette_fade_to_black_alpha);
-    platform->Swap();
-}
+//     if (rendered_scenes_last_frame > 0) {
+//         platform->RenderFrameBuffer();
+//     }
+//     Harness_RenderScreen(last_dst, last_src);
+//     platform->RenderColorBlend(0, 0, 0, palette_fade_to_black_alpha);
+//     platform->Swap();
+// }

@@ -12,8 +12,8 @@ typedef struct tPlatform {
     int (*IsKeyDown)(unsigned char pScan_code);
     void (*BeginScene)(br_actor* camera, br_pixelmap* colour_buffer);
     void (*EndScene)();
-    void (*RenderFullScreenQuad)(uint32_t* src, int width, int height);
-    void (*RenderColorBlend)(float r, float g, float b, float a);
+    void (*SetPalette)(uint8_t* palette);
+    void (*RenderFullScreenQuad)(uint8_t* src, int width, int height);
     void (*RenderModel)(br_model* model, br_matrix34 model_matrix);
     void (*RenderFrameBuffer)();
     void (*Swap)();
