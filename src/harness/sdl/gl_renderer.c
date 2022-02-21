@@ -17,6 +17,8 @@ SDL_GLContext context;
 GLuint screen_buffer_vao, screen_buffer_ebo;
 GLuint screen_texture, palette_texture;
 
+int render_width, render_height;
+
 GLuint shader_program_2d;
 GLuint shader_program_2d_pp;
 GLuint shader_program_3d;
@@ -144,48 +146,7 @@ void LoadShaders() {
     glUniform1i(uniforms_3d.shade_table, 2);
 }
 
-void GLRenderer_CreateWindow(char* title, int width, int height, int render_width, int render_height) {
-    window_width = width;
-    window_height = height;
-
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        LOG_PANIC("SDL_INIT_VIDEO error: %s", SDL_GetError());
-    }
-
-    if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE) != 0) {
-        LOG_PANIC("Failed to set SDL_GL_CONTEXT_PROFILE_MASK attribute. %s", SDL_GetError());
-    };
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-
-    SDL_GL_SetSwapInterval(1);
-
-    window = SDL_CreateWindow(title,
-        SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED,
-        width, height,
-        SDL_WINDOW_OPENGL);
-
-    if (!window) {
-        LOG_PANIC("Failed to create window");
-    }
-    SDL_SetRelativeMouseMode(SDL_TRUE);
-
-    // SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
-
-    context = SDL_GL_CreateContext(window);
-    if (!context) {
-        LOG_PANIC("Failed to call SDL_GL_CreateContext. %s", SDL_GetError());
-    }
-
-    // Load GL extensions using glad
-    if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
-        LOG_PANIC("Failed to initialize the OpenGL context with GLAD.");
-        exit(1);
-    }
-
-    LoadShaders();
-
+void SetupFullScreenRectGeometry() {
     float vertices[] = {
         // positions          // colors           // texture coords
         1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right
@@ -222,49 +183,89 @@ void GLRenderer_CreateWindow(char* title, int width, int height, int render_widt
     glEnableVertexAttribArray(2);
 
     glBindVertexArray(0);
+}
 
-    CHECK_GL_ERROR("after bind fb01");
+void InitializeOpenGLContext() {
+    context = SDL_GL_CreateContext(window);
+    if (!context) {
+        LOG_PANIC("Failed to call SDL_GL_CreateContext. %s", SDL_GetError());
+    }
 
+    // Load GL extensions using glad
+    if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
+        LOG_PANIC("Failed to initialize the OpenGL context with GLAD.");
+        exit(1);
+    }
+
+    LoadShaders();
+    SetupFullScreenRectGeometry();
+
+    // opengl config
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDepthFunc(GL_LESS);
+    glEnable(GL_CULL_FACE);
+    glClearColor(0, 0, 0, 1.0f);
 
+    // textures
     glGenTextures(1, &screen_texture);
     glGenTextures(1, &palette_texture);
 
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // Accept fragment if it closer to the camera than the former one
-    glDepthFunc(GL_LESS);
-
-    glEnable(GL_CULL_FACE);
-
+    // setup framebuffer
     glGenFramebuffers(1, &framebuffer_id);
-
-    CHECK_GL_ERROR("after bind fb02");
-
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
 
-    glClearColor(0, 0, 0, 1.0f);
     glGenTextures(1, &framebuffer_texture);
     glBindTexture(GL_TEXTURE_2D, framebuffer_texture);
-
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R8UI, render_width, render_height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, NULL);
-
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer_texture, 0);
 
     glGenRenderbuffers(1, &rbo);
     glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, window_width, window_height);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        LOG_PANIC("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
+        LOG_PANIC("Framebuffer is not complete!");
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    CHECK_GL_ERROR("initializeOpenGLContext");
+}
+
+void GLRenderer_CreateWindow(char* title, int width, int height, int pRender_width, int pRender_height) {
+    window_width = width;
+    window_height = height;
+    render_width = pRender_width;
+    render_height = pRender_height;
+
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+        LOG_PANIC("SDL_INIT_VIDEO error: %s", SDL_GetError());
+    }
+
+    if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE) != 0) {
+        LOG_PANIC("Failed to set SDL_GL_CONTEXT_PROFILE_MASK attribute. %s", SDL_GetError());
+    };
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+
+    SDL_GL_SetSwapInterval(1);
+
+    window = SDL_CreateWindow(title,
+        SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED,
+        width, height,
+        SDL_WINDOW_OPENGL);
+
+    if (!window) {
+        LOG_PANIC("Failed to create window");
+    }
+    SDL_SetRelativeMouseMode(SDL_TRUE);
+
+    // SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+
+    InitializeOpenGLContext();
 
     CHECK_GL_ERROR("after bind fb0");
 }
@@ -292,7 +293,7 @@ void GLRenderer_SetPalette(uint8_t* rgba_colors) {
     // reset active texture back to default
     glActiveTexture(GL_TEXTURE0);
 
-    CHECK_GL_ERROR("after pal");
+    CHECK_GL_ERROR("GLRenderer_SetPalette");
 }
 
 br_pixelmap* last_shade_table = NULL;
@@ -368,20 +369,23 @@ void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer) {
 }
 
 void GLRenderer_EndScene() {
-    static uint8_t pixels[320 * 200];
+    static uint8_t* pixels = NULL;
     // switch back to default fb
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     glBindTexture(GL_TEXTURE_2D, framebuffer_texture);
     glGetTexImage(GL_TEXTURE_2D, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, pixels);
 
+    if (!pixels) {
+        pixels = malloc(sizeof(uint8_t) * render_width * render_height);
+    }
     // flip texture to match the orientation of `gBack_screen`
-    int dest_y = 200;
+    int dest_y = render_height;
     uint8_t* pm_pixels = last_colour_buffer->pixels;
-    for (int y = 0; y < 200; y++) {
+    for (int y = 0; y < render_height; y++) {
         dest_y--;
-        for (int x = 0; x < 320; x++) {
-            pm_pixels[dest_y * 320 + x] = pixels[y * 320 + x];
+        for (int x = 0; x < render_width; x++) {
+            pm_pixels[dest_y * render_width + x] = pixels[y * render_width + x];
         }
     }
 }
