@@ -34,3 +34,17 @@ tStored_model_context* NewStoredModelContext() {
     ctx->dispatch = &dispatch_funcs;
     return ctx;
 }
+
+tStored_material* NewStoredMaterial() {
+    tStored_material* ctx = malloc(sizeof(tStored_material));
+    ctx->index_base = -1;
+    ctx->texture = NULL;
+    ctx->identifier[0] = '\0';
+    return ctx;
+}
+
+tStored_pixelmap* NewStoredPixelmap() {
+    tStored_pixelmap* ctx = malloc(sizeof(tStored_pixelmap));
+    ctx->id = 0;
+    return ctx;
+}

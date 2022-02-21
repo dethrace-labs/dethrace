@@ -131,6 +131,7 @@ br_pixelmap* BrTableFind(char* pattern);
 br_pixelmap* BrTableRemove(br_pixelmap* pixelmap);
 br_uint_32 BrTableAddMany(br_pixelmap** items, int n);
 void BrTableUpdate(br_pixelmap* table, br_uint_16 flags);
+br_uint_32 BrTableEnum(char* pattern, br_table_enum_cbfn* callback, void* arg);
 
 // BrTransform
 void BrTransformToMatrix34(br_matrix34* mat, br_transform* xform);
@@ -139,11 +140,11 @@ void BrTransformToMatrix34(br_matrix34* mat, br_transform* xform);
 void BrV1dbBeginWrapper_Float();
 
 // BrVector3
-//void BrVector3Cross(br_vector3* v1, br_vector3* v2, br_vector3* v3);
+// void BrVector3Cross(br_vector3* v1, br_vector3* v2, br_vector3* v3);
 void BrVector3SetFloat(br_vector3* v1, float f1, float f2, float f3);
-//void BrVector3Sub(br_vector3* v1, br_vector3* v2, br_vector3* v3);
-//void BrVector3Accumulate(br_vector3* v1, br_vector3* v2);
-//void BrVector3Normalise(br_vector3* v1, br_vector3* v2);
+// void BrVector3Sub(br_vector3* v1, br_vector3* v2, br_vector3* v3);
+// void BrVector3Accumulate(br_vector3* v1, br_vector3* v2);
+// void BrVector3Normalise(br_vector3* v1, br_vector3* v2);
 
 // Logging
 void BrFailure(const char* s, ...);

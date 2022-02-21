@@ -16,7 +16,6 @@ tPlatform sdl_gl_platform = {
     GLRenderer_SetPalette,
     GLRenderer_RenderFullScreenQuad,
     GLRenderer_RenderModel,
-    GLRenderer_RenderFramebuffer,
     GLRenderer_Swap,
     GLRenderer_BufferTexture,
     GLRenderer_BufferMaterial

@@ -1,7 +1,7 @@
 #include "harness.h"
 
 void Null_Init() {}
-void Null_CreateWindow(char* title, int width, int height) {}
+void Null_CreateWindow(char* title, int width, int height, int render_width, int render_height) {}
 void Null_PollEvents() {}
 int* Null_GetKeyMap() { return NULL; }
 int Null_IsKeyDown(unsigned char pScan_code) { return 0; }
@@ -26,7 +26,6 @@ tPlatform null_platform = {
     Null_SetPalette,
     Null_RenderFullScreenQuad,
     Null_RenderModel,
-    Null_RenderFrameBuffer,
     Null_Swap,
     Null_BufferTexture,
     Null_BufferMaterial

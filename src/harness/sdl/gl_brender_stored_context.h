@@ -14,9 +14,17 @@ typedef struct tStored_pixelmap {
 } tStored_pixelmap;
 
 typedef struct tStored_material {
-    tStored_pixelmap* texture;
+    int index_base;
+    br_uint_32 flags;
+    br_pixelmap* shade_table;
+    br_pixelmap* texture;
+    char identifier[200];
 } tStored_material;
 
 tStored_model_context* NewStoredModelContext();
+
+tStored_material* NewStoredMaterial();
+
+tStored_pixelmap* NewStoredPixelmap();
 
 #endif

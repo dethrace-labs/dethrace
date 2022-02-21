@@ -578,7 +578,7 @@ void InitializePalettes() {
     if (!gFlic_palette) {
         FatalError(10);
     }
-    DRSetPalette2(gFlic_palette, 1);
+    DRSetPalette(gFlic_palette);
     gScratch_pixels = BrMemAllocate(0x400u, kMem_scratch_pal_pixels);
     gScratch_palette = DRPixelmapAllocate(BR_PMT_RGBX_888, 1u, 256, gScratch_pixels, 0);
     gPalette_conversion_table = BrTableFind("FLC2REND.TAB");
@@ -1059,7 +1059,8 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
             gShadow_dim_amount = ((2.2 - highest_underneath) * 5.0 / 2.2 + 2.5);
             for (i = 0; i < gSaved_table_count; i++) {
                 gSaved_shade_tables[i].original->height = 1;
-                gSaved_shade_tables[i].original->pixels = (char*)gDepth_shade_table->pixels + gShadow_dim_amount * gDepth_shade_table->row_bytes;
+                gSaved_shade_tables[i].original->pixels = (tU8*)gDepth_shade_table->pixels + gShadow_dim_amount * gDepth_shade_table->row_bytes;
+
                 BrTableUpdate(gSaved_shade_tables[i].original, BR_TABU_ALL);
             }
         }
@@ -2309,13 +2310,34 @@ void SetShadowLevel(tShadow_level pLevel) {
 // IDA: tShadow_level __cdecl GetShadowLevel()
 tShadow_level GetShadowLevel() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    return gShadow_level;
 }
 
 // IDA: void __cdecl ToggleShadow()
 void ToggleShadow() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gShadow_level++;
+    if (gShadow_level == eShadow_everyone) {
+        gShadow_level = eShadow_none;
+    }
+    switch (gShadow_level) {
+    case eShadow_none:
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(104));
+        break;
+    case eShadow_us_only:
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(105));
+        break;
+    case eShadow_us_and_opponents:
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(106));
+        break;
+    case eShadow_everyone:
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(107));
+        break;
+    default:
+        return;
+    }
 }
 
 // IDA: void __cdecl InitShadow()
@@ -2330,7 +2352,7 @@ void InitShadow() {
         BrClipPlaneDisable(gShadow_clip_planes[i].clip);
         BrMatrix34Identity(&gShadow_clip_planes[i].clip->t.t.mat);
     }
-    gFancy_shadow = 0; // jeff changed
+    gFancy_shadow = 1;
     gShadow_material = BrMaterialFind("SHADOW.MAT");
     gShadow_light_ray.v[0] = 0.0;
     gShadow_light_ray.v[1] = -1.0;
@@ -2352,13 +2374,24 @@ void InitShadow() {
 // IDA: br_uint_32 __cdecl SaveShadeTable(br_pixelmap *pTable, void *pArg)
 br_uint_32 SaveShadeTable(br_pixelmap* pTable, void* pArg) {
     LOG_TRACE("(%p, %p)", pTable, pArg);
-    NOT_IMPLEMENTED();
+
+    if (gSaved_table_count == 100) {
+        return 1;
+    }
+    gSaved_shade_tables[gSaved_table_count].original = pTable;
+    gSaved_shade_tables[gSaved_table_count].copy = (br_pixelmap*)BrMemAllocate(sizeof(br_pixelmap), kMem_shade_table_copy);
+    memcpy(gSaved_shade_tables[gSaved_table_count].copy, pTable, sizeof(br_pixelmap));
+    gSaved_table_count++;
+    return 0;
 }
 
 // IDA: void __cdecl SaveShadeTables()
 void SaveShadeTables() {
     LOG_TRACE("()");
-    STUB();
+
+    PossibleService();
+    gSaved_table_count = 0;
+    return BrTableEnum("*", SaveShadeTable, 0);
 }
 
 // IDA: void __cdecl DisposeSavedShadeTables()
@@ -2372,7 +2405,13 @@ void DisposeSavedShadeTables() {
 // IDA: void __cdecl ShadowMode()
 void ShadowMode() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gFancy_shadow = !gFancy_shadow;
+    if (gFancy_shadow) {
+        return NewTextHeadupSlot(4, 0, 2000, -4, "Translucent shadow");
+    } else {
+        return NewTextHeadupSlot(4, 0, 2000, -4, "Solid shadow");
+    }
 }
 
 // IDA: int __cdecl SwitchToRealResolution()

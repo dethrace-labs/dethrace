@@ -6,7 +6,7 @@
 
 typedef struct tPlatform {
     void (*Init)();
-    void (*NewWindow)(char* title, int width, int height);
+    void (*NewWindow)(char* title, int width, int height, int render_width, int render_height);
     void (*PollEvents)();
     int* (*GetKeyMap)();
     int (*IsKeyDown)(unsigned char pScan_code);
@@ -15,7 +15,6 @@ typedef struct tPlatform {
     void (*SetPalette)(uint8_t* palette);
     void (*RenderFullScreenQuad)(uint8_t* src, int width, int height);
     void (*RenderModel)(br_model* model, br_matrix34 model_matrix);
-    void (*RenderFrameBuffer)();
     void (*Swap)();
     void (*BufferTexture)(br_pixelmap* pm);
     void (*BufferMaterial)(br_material* mat);
