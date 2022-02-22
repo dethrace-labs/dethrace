@@ -17,16 +17,18 @@ SDL_GLContext context;
 GLuint screen_buffer_vao, screen_buffer_ebo;
 GLuint screen_texture, palette_texture;
 
-int render_width, render_height;
-
 GLuint shader_program_2d;
 GLuint shader_program_2d_pp;
 GLuint shader_program_3d;
 GLuint framebuffer_id, framebuffer_texture = 0;
 unsigned int rbo;
 uint8_t gl_palette[4 * 256]; // RGBA
+uint8_t* screen_buffer_flip_pixels;
 
-int window_width, window_height;
+int window_width, window_height, render_width, render_height;
+
+br_pixelmap* last_colour_buffer;
+br_pixelmap* last_shade_table = NULL;
 
 struct {
     GLuint pixels, shade_table;
@@ -186,6 +188,7 @@ void SetupFullScreenRectGeometry() {
 }
 
 void InitializeOpenGLContext() {
+
     context = SDL_GL_CreateContext(window);
     if (!context) {
         LOG_PANIC("Failed to call SDL_GL_CreateContext. %s", SDL_GetError());
@@ -197,6 +200,12 @@ void InitializeOpenGLContext() {
         exit(1);
     }
 
+    int maxTextureImageUnits;
+    glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxTextureImageUnits);
+    if (maxTextureImageUnits < 3) {
+        LOG_PANIC("GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS is %d. Need at least 3", maxTextureImageUnits);
+    }
+
     LoadShaders();
     SetupFullScreenRectGeometry();
 
@@ -206,16 +215,17 @@ void InitializeOpenGLContext() {
     glDepthFunc(GL_LESS);
     glEnable(GL_CULL_FACE);
     glClearColor(0, 0, 0, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     // textures
     glGenTextures(1, &screen_texture);
     glGenTextures(1, &palette_texture);
+    glGenTextures(1, &framebuffer_texture);
 
     // setup framebuffer
     glGenFramebuffers(1, &framebuffer_id);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
 
-    glGenTextures(1, &framebuffer_texture);
     glBindTexture(GL_TEXTURE_2D, framebuffer_texture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R8UI, render_width, render_height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -224,13 +234,14 @@ void InitializeOpenGLContext() {
 
     glGenRenderbuffers(1, &rbo);
     glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, window_width, window_height);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, render_width, render_height);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         LOG_PANIC("Framebuffer is not complete!");
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     CHECK_GL_ERROR("initializeOpenGLContext");
 }
 
@@ -267,7 +278,7 @@ void GLRenderer_CreateWindow(char* title, int width, int height, int pRender_wid
 
     InitializeOpenGLContext();
 
-    CHECK_GL_ERROR("after bind fb0");
+    screen_buffer_flip_pixels = malloc(sizeof(uint8_t) * render_width * render_height);
 }
 
 void GLRenderer_SetPalette(uint8_t* rgba_colors) {
@@ -296,7 +307,6 @@ void GLRenderer_SetPalette(uint8_t* rgba_colors) {
     CHECK_GL_ERROR("GLRenderer_SetPalette");
 }
 
-br_pixelmap* last_shade_table = NULL;
 void GLRenderer_SetShadeTable(br_pixelmap* table) {
 
     if (last_shade_table == table) {
@@ -319,7 +329,6 @@ void GLRenderer_SetShadeTable(br_pixelmap* table) {
 
 extern br_v1db_state v1db;
 
-br_pixelmap* last_colour_buffer;
 void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer) {
     last_colour_buffer = colour_buffer;
     glViewport(colour_buffer->base_x, colour_buffer->base_y, colour_buffer->width, colour_buffer->height);
@@ -342,11 +351,7 @@ void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer) {
     if (gDebugCamera_active) {
         float m2[4][4];
         memcpy(m2, DebugCamera_View(), sizeof(float) * 16);
-        // LOG_DEBUG("%f, %f, %f, %f", m2[0][0], m2[0][1], m2[0][2], m2[0][3]);
-        // LOG_DEBUG("%f, %f, %f, %f", m2[1][0], m2[1][1], m2[1][2], m2[1][3]);
-        // LOG_DEBUG("%f, %f, %f, %f", m2[2][0], m2[2][1], m2[2][2], m2[2][3]);
-        // LOG_DEBUG("%f, %f, %f, %f", m2[3][0], m2[3][1], m2[3][2], m2[3][3]);
-        glUniformMatrix4fv(uniforms_3d.view, 1, GL_FALSE, (float*)&m2[0]);
+        glUniformMatrix4fv(uniforms_3d.view, 1, GL_FALSE, (GLfloat*)m2);
     } else {
         mat4 cam_matrix = {
             { camera->t.t.mat.m[0][0], camera->t.t.mat.m[0][1], camera->t.t.mat.m[0][2], 0 },
@@ -369,23 +374,21 @@ void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer) {
 }
 
 void GLRenderer_EndScene() {
-    static uint8_t* pixels = NULL;
-    // switch back to default fb
+
+    //  switch back to default fb
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    // pull framebuffer into cpu memory to emulate BRender behavior
     glBindTexture(GL_TEXTURE_2D, framebuffer_texture);
-    glGetTexImage(GL_TEXTURE_2D, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, pixels);
+    glGetTexImage(GL_TEXTURE_2D, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, screen_buffer_flip_pixels);
 
-    if (!pixels) {
-        pixels = malloc(sizeof(uint8_t) * render_width * render_height);
-    }
-    // flip texture to match the orientation of `gBack_screen`
+    // flip texture to match the expected orientation
     int dest_y = render_height;
     uint8_t* pm_pixels = last_colour_buffer->pixels;
     for (int y = 0; y < render_height; y++) {
         dest_y--;
         for (int x = 0; x < render_width; x++) {
-            pm_pixels[dest_y * render_width + x] = pixels[y * render_width + x];
+            pm_pixels[dest_y * render_width + x] = screen_buffer_flip_pixels[y * render_width + x];
         }
     }
 }

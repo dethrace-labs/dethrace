@@ -163,6 +163,8 @@ int gMap_render_y_i;
 int gMirror_on__graphics; // suffix added to avoid duplicate symbol
 br_scalar gYon_squared;
 
+#define SHADOW_D_IGNORE_FLAG 10000.0
+
 // IDA: void __cdecl TurnOnPaletteConversion()
 void TurnOnPaletteConversion() {
     LOG_TRACE("()");
@@ -926,7 +928,7 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
         kev_bounds.original_bounds.max.v[0] = -1000.0;
         kev_bounds.original_bounds.max.v[1] = -1000.0;
         kev_bounds.original_bounds.max.v[2] = -1000.0;
-        for (i = 0; i < 8; i++) {
+        for (i = 0; i < COUNT_OF(shadow_points_world); i++) {
             BrMatrix34ApplyP(&shadow_points_world[i], &gShadow_points[i], &pCar->car_master_actor->t.t.mat);
             if (shadow_points_world[i].v[0] >= kev_bounds.original_bounds.min.v[0]) {
                 if (shadow_points_world[i].v[0] > kev_bounds.original_bounds.max.v[0]) {
@@ -971,9 +973,9 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
             v2 = &list_ptr->v[2];
             if (list_ptr->normal.v[1] >= -0.1 || (list_ptr->material && (list_ptr->material->flags & 0x1000) != 0)) {
                 if (list_ptr->normal.v[1] < 0.0 || list_ptr->material && ((list_ptr->material->identifier && *list_ptr->material->identifier == '!') || list_ptr->material->index_blend)) {
-                    list_ptr->d = 10000.0;
+                    list_ptr->d = SHADOW_D_IGNORE_FLAG;
                 } else if ((list_ptr->v[0].v[1] > pCar->pos.v[1] || v1->v[1] > pCar->pos.v[1] || v2->v[1] > pCar->pos.v[1]) && list_ptr->normal.v[1] < 0.1) {
-                    list_ptr->d = 10000.0;
+                    list_ptr->d = SHADOW_D_IGNORE_FLAG;
                 }
             } else {
                 poly_centre.v[0] = v1->v[0] + list_ptr->v[0].v[0];
@@ -995,54 +997,43 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
                         first_poly_below = poly_centre.v[1];
                     }
                 }
-                list_ptr->d = 10000.0;
+                list_ptr->d = SHADOW_D_IGNORE_FLAG;
             }
             list_ptr++;
         }
         list_ptr = face_ref;
         for (i = 0; i < face_count; i++) {
-            if (list_ptr->d == 10000.0) {
-                continue;
-            }
-            if (list_ptr->v[0].v[1] >= first_poly_below || list_ptr->v[1].v[1] >= first_poly_below || list_ptr->v[2].v[1] >= first_poly_below) {
-                if (gFancy_shadow) {
-                    faces[f_num].material = list_ptr->material;
-                    if (list_ptr->material && list_ptr->material->colour_map && (list_ptr->material->flags & BR_MATF_LIGHT) == 0) {
-                        list_ptr->material->flags |= BR_MATF_SMOOTH | BR_MATF_LIGHT;
-                        BrMaterialUpdate(list_ptr->material, BR_MATU_RENDERING);
+            if (list_ptr->d != 10000.0) {
+                if (list_ptr->v[0].v[1] >= first_poly_below || list_ptr->v[1].v[1] >= first_poly_below || list_ptr->v[2].v[1] >= first_poly_below) {
+                    if (gFancy_shadow) {
+                        faces[f_num].material = list_ptr->material;
+                        if (list_ptr->material && list_ptr->material->colour_map && (list_ptr->material->flags & BR_MATF_LIGHT) == 0) {
+                            list_ptr->material->flags |= BR_MATF_SMOOTH | BR_MATF_LIGHT;
+                            BrMaterialUpdate(list_ptr->material, BR_MATU_RENDERING);
+                        }
+                    } else {
+                        faces[f_num].material = gShadow_material;
                     }
-                } else {
-                    faces[f_num].material = gShadow_material;
-                }
 
-                verts[3 * f_num].p.v[0] = list_ptr->v[0].v[0];
-                verts[3 * f_num].p.v[1] = list_ptr->v[0].v[1];
-                verts[3 * f_num].p.v[2] = list_ptr->v[0].v[2];
-                verts[3 * f_num + 1].p.v[0] = list_ptr->v[1].v[0];
-                verts[3 * f_num + 1].p.v[1] = list_ptr->v[1].v[1];
-                verts[3 * f_num + 1].p.v[2] = list_ptr->v[1].v[2];
-                verts[3 * f_num + 2].p.v[0] = list_ptr->v[2].v[0];
-                verts[3 * f_num + 2].p.v[1] = list_ptr->v[2].v[1];
-                verts[3 * f_num + 2].p.v[2] = list_ptr->v[2].v[2];
-                verts[3 * f_num].map.v[0] = list_ptr->map[0]->v[0];
-                verts[3 * f_num].map.v[1] = list_ptr->map[0]->v[1];
-                verts[3 * f_num + 1].map.v[0] = list_ptr->map[1]->v[0];
-                verts[3 * f_num + 1].map.v[1] = list_ptr->map[1]->v[1];
-                verts[3 * f_num + 2].map.v[0] = list_ptr->map[2]->v[0];
-                verts[3 * f_num + 2].map.v[1] = list_ptr->map[2]->v[1];
-                faces[f_num].vertices[0] = 3 * f_num;
-                faces[f_num].vertices[1] = 3 * f_num + 1;
-                faces[f_num].vertices[2] = 3 * f_num + 2;
-                f_num++;
-                if (highest_underneath > 0.0) {
-                    CheckSingleFace(list_ptr, &ray_pos, &ray, &normal, &distance);
-                    if (distance < 1.0 && ray_length * distance < highest_underneath) {
-                        highest_underneath = ray_length * distance;
-                        // v22 = normal;
+                    verts[3 * f_num].p = list_ptr->v[0];
+                    verts[3 * f_num].map = *list_ptr->map[0];
+                    verts[3 * f_num + 1].p = list_ptr->v[1];
+                    verts[3 * f_num + 1].map = *list_ptr->map[1];
+                    verts[3 * f_num + 2].p = list_ptr->v[2];
+                    verts[3 * f_num + 2].map = *list_ptr->map[2];
+                    faces[f_num].vertices[0] = 3 * f_num;
+                    faces[f_num].vertices[1] = 3 * f_num + 1;
+                    faces[f_num].vertices[2] = 3 * f_num + 2;
+                    f_num++;
+                    if (highest_underneath > 0.0) {
+                        CheckSingleFace(list_ptr, &ray_pos, &ray, &normal, &distance);
+                        if (distance < 1.0 && ray_length * distance < highest_underneath) {
+                            highest_underneath = ray_length * distance;
+                        }
                     }
-                }
-                if (f_num >= 16) {
-                    break;
+                    if (f_num >= LEN(faces)) {
+                        break;
+                    }
                 }
             }
             list_ptr++;
