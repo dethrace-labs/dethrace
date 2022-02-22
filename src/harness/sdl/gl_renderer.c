@@ -18,7 +18,6 @@ GLuint screen_buffer_vao, screen_buffer_ebo;
 GLuint screen_texture, palette_texture;
 
 GLuint shader_program_2d;
-GLuint shader_program_2d_pp;
 GLuint shader_program_3d;
 GLuint framebuffer_id, framebuffer_texture = 0;
 unsigned int rbo;
@@ -117,15 +116,6 @@ void LoadShaders() {
     glUniform1i(uniforms_2d.pixels, 0);
     glUniform1i(uniforms_2d.palette, 1);
 
-    shader_program_2d_pp = CreateShaderProgram("vertex_shader_postprocess.glsl", "fragment_shader_postprocess.glsl", vs_2d, fs_postprocess);
-    glUseProgram(shader_program_2d_pp);
-    uniforms_2dpp.pixels = glGetUniformLocation(shader_program_2d_pp, "pixels");
-    uniforms_2dpp.palette = glGetUniformLocation(shader_program_2d_pp, "palette");
-
-    // bind the uniform samplers to texture units:
-    glUniform1i(uniforms_2dpp.pixels, 0);
-    glUniform1i(uniforms_2dpp.palette, 1);
-
     shader_program_3d = CreateShaderProgram("vertex_shader_3d.glsl", "fragment_shader_3d.glsl", vs_3d, fs_3d);
     glUseProgram(shader_program_3d);
     uniforms_3d.clip_plane_count = glGetUniformLocation(shader_program_3d, "clip_plane_count");
@@ -133,7 +123,6 @@ void LoadShaders() {
         char name[32];
         sprintf(name, "clip_planes[%d]", i);
         uniforms_3d.clip_planes[i] = glGetUniformLocation(shader_program_3d, name);
-        LOG_DEBUG("%d", uniforms_3d.clip_planes[i]);
     }
     uniforms_3d.model = glGetUniformLocation(shader_program_3d, "model");
     uniforms_3d.pixels = glGetUniformLocation(shader_program_3d, "pixels");
@@ -323,8 +312,6 @@ void GLRenderer_SetShadeTable(br_pixelmap* table) {
     glActiveTexture(GL_TEXTURE0);
 
     last_shade_table = table;
-
-    CHECK_GL_ERROR("after shadetable");
 }
 
 extern br_v1db_state v1db;
@@ -369,8 +356,6 @@ void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer) {
     DebugCamera_Update();
 
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
-    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    CHECK_GL_ERROR("bs10");
 }
 
 void GLRenderer_EndScene() {
@@ -399,30 +384,28 @@ void GLRenderer_RenderFullScreenQuad(uint8_t* screen_buffer, int width, int heig
     glDisable(GL_DEPTH_TEST);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-    CHECK_GL_ERROR("fsq1");
-
     glUseProgram(shader_program_2d);
     glBindTexture(GL_TEXTURE_2D, screen_texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R8UI, width, height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, screen_buffer);
-    // glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_R8, GL_UNSIGNED_BYTE, screen_buffer);
-    CHECK_GL_ERROR("fsq2");
     glBindVertexArray(screen_buffer_vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, screen_buffer_ebo);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
-    CHECK_GL_ERROR("fsq3");
+    CHECK_GL_ERROR("GLRenderer_RenderFullScreenQuad");
 }
 
 void GLRenderer_Swap() {
     SDL_GL_SwapWindow(window);
+    // clear our virtual framebuffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
+    // clear real framebuffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    CHECK_GL_ERROR("after swap");
+    CHECK_GL_ERROR("GLRenderer_Swap");
 }
 
 void build_model(br_model* model) {
@@ -539,8 +522,6 @@ void GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
     glEnable(GL_DEPTH_TEST);
     glUseProgram(shader_program_3d);
 
-    CHECK_GL_ERROR("rm2");
-
     GLfloat m[16] = {
         model_matrix.m[0][0], model_matrix.m[0][1], model_matrix.m[0][2], 0,
         model_matrix.m[1][0], model_matrix.m[1][1], model_matrix.m[1][2], 0,
@@ -549,20 +530,11 @@ void GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
     };
 
     glUniformMatrix4fv(uniforms_3d.model, 1, GL_FALSE, m);
-    CHECK_GL_ERROR("rm3");
     glBindVertexArray(ctx->vao_id);
-    CHECK_GL_ERROR("rm3.1");
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx->ebo_id);
-    CHECK_GL_ERROR("rm3.2");
-
-    CHECK_GL_ERROR("rm3.2x");
-    // glCullFace(GL_FRONT);
-    CHECK_GL_ERROR("rm3.3");
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     int element_index = 0;
-
-    CHECK_GL_ERROR("rm3.5");
 
     v11group* group;
     for (int g = 0; g < v11->ngroups; g++) {
@@ -574,7 +546,7 @@ void GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
                 GLRenderer_SetShadeTable(material->shade_table);
             }
             if ((material->flags & BR_MATF_LIGHT) && material->shade_table) {
-                // LOG_DEBUG("light! %s", material->identifier);
+                // TODO: light value shouldn't always be 0? Works for shadows, not sure about other things.
                 glUniform1i(uniforms_3d.light_value, 0);
             } else {
                 glUniform1i(uniforms_3d.light_value, -1);
@@ -584,9 +556,7 @@ void GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
                 tStored_pixelmap* stored_px = material->texture->stored;
                 if (stored_px) {
                     glBindTexture(GL_TEXTURE_2D, stored_px->id);
-                    CHECK_GL_ERROR("rm3.6");
                     glUniform1i(uniforms_3d.palette_index_override, -1);
-                    CHECK_GL_ERROR("rm3.7");
                 }
             }
         } else {
@@ -595,18 +565,14 @@ void GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
             glUniform1i(uniforms_3d.light_value, -1);
         }
 
-        CHECK_GL_ERROR("rm4");
-
         glDrawElements(GL_TRIANGLES, group->nfaces * 3, GL_UNSIGNED_INT, (void*)(element_index * sizeof(int)));
         element_index += group->nfaces * 3;
     }
 
-    CHECK_GL_ERROR("rm5");
-
     glBindVertexArray(0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    CHECK_GL_ERROR("after render model");
+    CHECK_GL_ERROR("GLRenderer_RenderModel");
 }
 
 void GLRenderer_BufferMaterial(br_material* mat) {
@@ -621,23 +587,6 @@ void GLRenderer_BufferMaterial(br_material* mat) {
     stored->texture = mat->colour_map;
     stored->flags = mat->flags;
     stored->shade_table = mat->index_shade;
-
-    // if (!mat->stored) {
-    //     if (mat->colour_map) {
-    //         tStored_material* stored = NewStoredMaterial();
-    //         mat->stored = stored;
-    //         GLRenderer_BufferTexture(mat->colour_map);
-    //         if (mat->colour_map->stored) {
-    //             stored->texture = mat->colour_map->stored;
-    //         } else {
-    //             LOG_PANIC("texture not buffered %s", mat->colour_map->identifier);
-    //         }
-    //     }
-    // } else {
-    //     tStored_material* stored = mat->stored;
-    //     GLRenderer_BufferTexture(mat->colour_map);
-    //     stored->texture = mat->colour_map->stored;
-    // }
 }
 
 void GLRenderer_BufferTexture(br_pixelmap* pm) {
@@ -658,15 +607,13 @@ void GLRenderer_BufferTexture(br_pixelmap* pm) {
         }
     }
 
-    // LOG_DEBUG("buffering %s, %dx%d, id=%d", pm->identifier, pm->width, pm->height, stored->id);
-
     glBindTexture(GL_TEXTURE_2D, stored->id);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R8UI, pm->width, pm->height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, linear_pixels);
     free(linear_pixels);
 
-    CHECK_GL_ERROR("after buffer tex");
+    CHECK_GL_ERROR("GLRenderer_BufferTexture");
 }
 
 void Harness_GLRenderer_RenderCube(float col, float x, float y, float z) {

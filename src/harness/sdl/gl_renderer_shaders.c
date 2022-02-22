@@ -23,23 +23,6 @@ const char* fs_2d = "#version 330 core\n"
                     "  FragColor = texel;\n"
                     "}\n\0";
 
-const char* fs_postprocess = "#version 330 core\n"
-                             "in vec2 TexCoord;\n"
-                             "uniform sampler2D palette;\n"
-                             "uniform usampler2D pixels;\n"
-                             "out vec4 FragColor;\n"
-
-                             "void main()\n"
-                             "{\n"
-                             "   uint palette_index = texture(pixels, TexCoord.xy).x;\n"
-                             "   vec4 texel = texelFetch(palette, ivec2(palette_index, 0), 0);\n"
-                             "  if (palette_index > 0u) {\n"
-                             "   FragColor = vec4(1,1,1,1);\n"
-                             "}\n"
-
-                             "   //FragColor = texture(pixels, TexCoord);\n"
-                             "}\n\0";
-
 const char* vs_3d = "#version 330 core\n"
                     "layout (location = 0) in vec3 aPos;\n"
                     "layout (location = 1) in vec3 aNormal;\n"
