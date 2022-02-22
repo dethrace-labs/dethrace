@@ -34,7 +34,6 @@ resource_header* UserToRes(void* r) {
     while (*p == 0) {
         p--;
     }
-    fflush(stdout);
     if (((resource_header*)(p - (sizeof(resource_header) - 1)))->magic_num != 0xdeadbeef) {
         LOG_PANIC("Bad resource header from user at %p. Was %X", r, ((resource_header*)p)->magic_num);
     }
