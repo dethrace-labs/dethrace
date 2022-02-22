@@ -3287,7 +3287,9 @@ int SaveOptions() {
     BAIL_IF_NEGATIVE(PrintNetOptions(f, 5));
     BAIL_IF_NEGATIVE(PrintNetOptions(f, 6));
     BAIL_IF_NEGATIVE(PrintNetOptions(f, 7));
-    
+
+#undef BAIL_IF_NEGATIVE
+
     fclose(f);
 
     return 1;
