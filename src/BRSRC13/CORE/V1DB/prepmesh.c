@@ -48,7 +48,7 @@ void BrPrepareEdges(br_model* model) {
 int FacesCompare(const void* p1, const void* p2) {
     br_face* f1;
     br_face* f2;
-    //LOG_TRACE9("(%p, %p)", p1, p2);
+    // LOG_TRACE9("(%p, %p)", p1, p2);
 
     f1 = *(br_face**)p1;
     f2 = *(br_face**)p2;
@@ -69,7 +69,7 @@ int TVCompare_XYZ(const void* p1, const void* p2) {
     br_vertex* v1;
     br_vertex* v2;
     int i;
-    //LOG_TRACE9("(%p, %p)", p1, p2);
+    // LOG_TRACE9("(%p, %p)", p1, p2);
 
     tv1 = *(prep_vertex**)p1;
     tv2 = *(prep_vertex**)p2;
@@ -99,7 +99,7 @@ int TVCompare_MXYZUVN(const void* p1, const void* p2) {
     br_vertex* v1;
     br_vertex* v2;
     int i;
-    //LOG_TRACE("(%p, %p)", p1, p2);
+    // LOG_TRACE("(%p, %p)", p1, p2);
 
     tv1 = *(struct prep_vertex**)p1;
     tv2 = *(struct prep_vertex**)p2;
@@ -145,7 +145,7 @@ int TVCompare_MVN(const void* p1, const void* p2) {
     prep_vertex* tv1;
     prep_vertex* tv2;
     int i;
-    //LOG_TRACE9("(%p, %p)", p1, p2);
+    // LOG_TRACE9("(%p, %p)", p1, p2);
 
     tv1 = *(prep_vertex**)p1;
     tv2 = *(prep_vertex**)p2;
@@ -163,9 +163,6 @@ int TVCompare_MVN(const void* p1, const void* p2) {
     if (tv1->v < tv2->v)
         return -1;
 
-    /*
-	 * Compare Normal
-	 */
     for (i = 0; i < 3; i++) {
         if (tv1->n.v[i] > tv2->n.v[i])
             return 1;
@@ -602,7 +599,7 @@ void BrModelUpdate(br_model* model, br_uint_16 flags) {
 
             if (v11m) {
                 for (g = 0; g < v11m->ngroups; g++) {
-                    //prepareEdges(&v11m->groups[g], model);
+                    // prepareEdges(&v11m->groups[g], model);
                 }
             } else {
                 LOG_DEBUG("has prepared model FALSE");
@@ -701,5 +698,12 @@ void BrModelUpdate(br_model* model, br_uint_16 flags) {
 void BrModelClear(br_model* model) {
     LOG_TRACE("(%p)", model);
 
-    // does something with ->stored field, we don't care
+    if (model->prepared) {
+        BrResFree(model->prepared);
+        model->prepared = NULL;
+    }
+    if (model->stored) {
+        ((br_object*)model->stored)->dispatch->_free((br_object*)model->stored);
+        model->stored = NULL;
+    }
 }

@@ -2,7 +2,7 @@
 
 # Print stats of overall project progress
 
-# Usage: find src/ -name "*.c" | xargs ./progress.py
+# Usage: find src/ -name "*.c" | xargs ./tools/progress.py
 
 import sys
 import os
@@ -81,9 +81,15 @@ for f in sorted(files, key=lambda x: x['percent'], reverse=True):
     total_funcs = total_funcs + f['total']
     completed_funcs = completed_funcs + f['completed']
 
+
+print('{0:45} {1:5}\t{2}'.format('name', 'percent', 'complete / total'))
 print("=======================================")
 percent_completed = round((completed_funcs / total_funcs) * 100)
 print('{0:45} {1:5}%\t{2} / {3}'.format('total', percent_completed, completed_funcs, total_funcs))
+
+print()
+print('Overall progress:')
+print('{0}% of all functions implemented. ({1} completed / {2} total)'.format(percent_completed, completed_funcs, total_funcs))
 
         
 

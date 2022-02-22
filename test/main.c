@@ -1,5 +1,5 @@
-#include "tests.h"
 #include "harness/hooks.h"
+#include "tests.h"
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h>
@@ -68,13 +68,13 @@ void setUp(void) {
 void tearDown(void) {
 }
 
-static const char *temp_folder;
-static char temp_folder_buffer[PATH_MAX+1];
+static const char* temp_folder;
+static char temp_folder_buffer[PATH_MAX + 1];
 
 static void setup_temp_folder() {
 #ifdef _WIN32
     DWORD res;
-    char tmpBuffer[PATH_MAX+1];
+    char tmpBuffer[PATH_MAX + 1];
     res = GetTempPathA(sizeof(tmpBuffer), tmpBuffer);
     if (res == 0) {
         abort();
@@ -86,8 +86,8 @@ static void setup_temp_folder() {
     temp_folder = temp_folder_buffer;
 }
 
-void TEST_ASSERT_EQUAL_FILE_CONTENTS_BINARY(const uint8_t *expected, char *filename, int len) {
-    FILE *f;
+void TEST_ASSERT_EQUAL_FILE_CONTENTS_BINARY(const uint8_t* expected, char* filename, int len) {
+    FILE* f;
     long filesize;
     int res;
     f = fopen(filename, "rb");
@@ -106,9 +106,9 @@ void TEST_ASSERT_EQUAL_FILE_CONTENTS_BINARY(const uint8_t *expected, char *filen
     free(tmpBuffer);
 }
 
-void TEST_ASSERT_EQUAL_FILE_TEXT(const char *expected, char *filename) {
-    FILE *f;
-    char *tmpBuffer;
+void TEST_ASSERT_EQUAL_FILE_TEXT(const char* expected, char* filename) {
+    FILE* f;
+    char* tmpBuffer;
     long filesize;
     int res;
     int len;
@@ -121,7 +121,7 @@ void TEST_ASSERT_EQUAL_FILE_TEXT(const char *expected, char *filename) {
     filesize = ftell(f);
     TEST_ASSERT_NOT_EQUAL(-1, filesize);
     fseek(f, 0, SEEK_SET);
-    tmpBuffer = (char*)malloc(filesize+1);
+    tmpBuffer = (char*)malloc(filesize + 1);
     TEST_ASSERT_NOT_NULL(tmpBuffer);
     res = fread(tmpBuffer, 1, filesize, f);
     tmpBuffer[filesize] = '\0';
@@ -133,7 +133,7 @@ void TEST_ASSERT_EQUAL_FILE_TEXT(const char *expected, char *filename) {
     free(tmpBuffer);
 }
 
-void setup_global_vars(int argc, char *argv[]) {
+void setup_global_vars(int argc, char* argv[]) {
     strcpy(gDir_separator, "/");
 
     root_dir = getenv("DETHRACE_ROOT_DIR");
@@ -171,7 +171,7 @@ void setup_global_vars(int argc, char *argv[]) {
     int fake_argc = 2;
     char* fake_argv[2];
     fake_argv[0] = argv[0];
-    fake_argv[1] = "-platform=null";
+    fake_argv[1] = "--platform=null";
     Harness_Init(&fake_argc, fake_argv);
 }
 
@@ -187,7 +187,7 @@ void sleep_s(int sec) {
 #endif
 }
 
-void create_temp_file(char buffer[PATH_MAX+1], const char *prefix) {
+void create_temp_file(char buffer[PATH_MAX + 1], const char* prefix) {
 #ifdef _WIN32
     DWORD attributes;
     UINT res;

@@ -282,6 +282,7 @@ typedef enum keymapcodes {
 #define STR_ENDS_WITH(haystack, needle) strcmp(haystack + strlen(haystack) - strlen(needle), needle)
 #define MAX(a, b) ((a) > (b) ? a : b)
 #define COUNT_OF(array) (sizeof((array)) / sizeof((array)[0]))
+#define LEN(array) (sizeof((array)) / sizeof((array)[0]))
 
 #define DEG_TO_RAD(degrees) ((degrees)*3.141592653589793 / 180.0)
 
@@ -296,6 +297,8 @@ typedef enum keymapcodes {
 #define OPPONENT_COUNT 0
 
 #define WORLD_SCALE 6.9
+
+#define SHADOW_MAX_RENDER_DISTANCE 36.0
 
 #define DOUBLESIDED_FLAG_COLOR_MAP (br_pixelmap*)12345
 

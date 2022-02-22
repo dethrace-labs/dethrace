@@ -13,10 +13,9 @@ tPlatform sdl_gl_platform = {
     SDLPlatform_IsKeyDown,
     GLRenderer_BeginScene,
     GLRenderer_EndScene,
+    GLRenderer_SetPalette,
     GLRenderer_RenderFullScreenQuad,
-    GLRenderer_RenderColorBlend,
     GLRenderer_RenderModel,
-    GLRenderer_RenderFramebuffer,
     GLRenderer_Swap,
     GLRenderer_BufferTexture,
     GLRenderer_BufferMaterial

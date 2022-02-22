@@ -757,7 +757,7 @@ tS8* ConvertPixToStripMap(br_pixelmap* pThe_br_map) {
     current_strip_pointer = temp_strip_image;
 
     for (i = 0; i < pThe_br_map->height; i++) {
-        next_byte = (tU8*)pThe_br_map->pixels + i * pThe_br_map->row_bytes; //points to start of this line
+        next_byte = (tU8*)pThe_br_map->pixels + i * pThe_br_map->row_bytes; // points to start of this line
         new_line_length = 2; // leave space at the start of the line to store number of chunks and first chunk length
         j = 0;
         counter = 0;
@@ -1357,7 +1357,7 @@ intptr_t LinkModel(br_actor* pActor, tModel_pool* pModel_pool) {
             }
         }
     }
-    //LOG_WARN("failed to link model %s", pActor->model->identifier);
+    // LOG_WARN("failed to link model %s", pActor->model->identifier);
     return 0;
 }
 
@@ -1916,7 +1916,7 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
         if (!pCar_spec->car_model_actors[i].actor) {
             FatalError(71);
         }
-        //LOG_DEBUG("actor %s, model %s", pCar_spec->car_model_actors[i].actor->identifier, pCar_spec->car_model_actors[i].actor->model->identifier);
+        // LOG_DEBUG("actor %s, model %s", pCar_spec->car_model_actors[i].actor->identifier, pCar_spec->car_model_actors[i].actor->model->identifier);
         LinkModelsToActor(
             pCar_spec->car_model_actors[i].actor,
             &pStorage_space->models[old_model_count],
@@ -2172,7 +2172,7 @@ void LoadRaces(tRace_list_spec* pRace_list, int* pCount, int pRace_type_index) {
             last_race = 1;
         } else {
             SkipRestOfRace(f);
-            //s = (s + 48);
+            // s = (s + 48);
             number_of_racers++;
         }
     }
@@ -3000,7 +3000,6 @@ FILE* DRfopen(char* pFilename, char* pMode) {
     result = OldDRfopen(pFilename, pMode);
 
     if (!result && !gAllow_open_to_fail) {
-        LOG_DEBUG("allow to fail %d", gAllow_open_to_fail);
         if (GetCDPathFromPathsTxtFile(CD_dir) && !PDCheckDriveExists(CD_dir)) {
             if (gMisc_strings[0]) {
                 PDFatalError(GetMiscString(243));
@@ -3012,7 +3011,7 @@ FILE* DRfopen(char* pFilename, char* pMode) {
         }
     }
     if (!result) {
-        LOG_WARN("failed, %d", errno);
+        LOG_WARN("failed for %d", errno);
     }
     return result;
 }

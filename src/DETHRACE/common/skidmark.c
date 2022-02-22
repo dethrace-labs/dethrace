@@ -23,8 +23,6 @@ void StretchMark(tSkid* pMark, br_vector3* pFrom, br_vector3* pTo, br_scalar pTe
     br_model* model;
     LOG_TRACE("(%p, %p, %p, %f)", pMark, pFrom, pTo, pTexture_start);
 
-    //LOG_DEBUG("(%p, %p, %p, %f)", pMark, pFrom, pTo, pTexture_start);
-
     rows = (br_vector3*)&pMark->actor->t.t.mat;
     BrVector3Sub(&temp, pTo, pFrom);
     len = BrVector3Length(&temp);
@@ -135,7 +133,7 @@ void InitSkids() {
         }
     }
 
-    for (skid = 0; skid < 100; skid++) {
+    for (skid = 0; skid < LEN(gSkids); skid++) {
         gSkids[skid].actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
         BrActorAdd(gNon_track_actor, gSkids[skid].actor);
         gSkids[skid].actor->t.t.mat.m[1][1] = 0.0099999998;
@@ -187,7 +185,7 @@ void HideSkids() {
     int skid;
     LOG_TRACE("()");
 
-    for (skid = 0; skid < 100; skid++) {
+    for (skid = 0; skid < LEN(gSkids); skid++) {
         HideSkid(skid);
     }
 }
@@ -216,7 +214,7 @@ void SkidSection(tCar_spec* pCar, int pWheel_num, br_vector3* pPos, int pMateria
     }
 
     material = MaterialFromIndex(pMaterial_index);
-    if (pCar->old_skid[pWheel_num] >= 100
+    if (pCar->old_skid[pWheel_num] >= COUNT_OF(gSkids)
         || gSkids[pCar->old_skid[pWheel_num]].actor->material != material
         || SkidLen(pCar->old_skid[pWheel_num]) > 0.5
         || FarFromLine2D(pPos, &pCar->skid_line_start[pWheel_num], &pCar->skid_line_end[pWheel_num])
@@ -233,7 +231,7 @@ void SkidSection(tCar_spec* pCar, int pWheel_num, br_vector3* pPos, int pMateria
         StretchMark(&gSkids[skid], &pCar->prev_skid_pos[pWheel_num], pPos, pCar->total_length[pWheel_num]);
         PipeSingleSkidAdjustment(skid, &gSkids[skid].actor->t.t.mat, pMaterial_index);
         pCar->old_skid[pWheel_num] = skid;
-        skid = (skid + 1) % 100;
+        skid = (skid + 1) % LEN(gSkids);
     } else {
         StretchMark(&gSkids[pCar->old_skid[pWheel_num]], &pCar->skid_line_start[pWheel_num], pPos, pCar->total_length[pWheel_num]);
         PipeSingleSkidAdjustment(pCar->old_skid[pWheel_num], &gSkids[pCar->old_skid[pWheel_num]].actor->t.t.mat, pMaterial_index);
@@ -339,7 +337,7 @@ void SkidsPerFrame() {
     int skid;
     LOG_TRACE("()");
 
-    for (skid = 0; skid < COUNT_OF(gSkids); skid++) {
+    for (skid = 0; skid < LEN(gSkids); skid++) {
         if (gSkids[skid].actor->render_style != BR_RSTYLE_NONE) {
             EnsureGroundDetailVisible(&gSkids[skid].actor->t.t.translate.t, &gSkids[skid].normal, &gSkids[skid].pos);
         }

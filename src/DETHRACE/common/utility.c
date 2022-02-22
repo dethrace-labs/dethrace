@@ -52,6 +52,11 @@ int CheckQuit() {
     return 0;
 }
 
+//IDA: double __cdecl sqr(double pN)
+double sqr(double pN) {
+    return pN * pN;
+}
+
 // Added to handle demo-specific text file decryption behavior
 void EncodeLine_DEMO(char* pS) {
     int len;
@@ -746,7 +751,13 @@ void DRMatrix34TApplyP(br_vector3* pA, br_vector3* pB, br_matrix34* pC) {
     br_scalar t2;
     br_scalar t3;
     LOG_TRACE("(%p, %p, %p)", pA, pB, pC);
-    NOT_IMPLEMENTED();
+
+    t1 = pB->v[0] - pC->m[3][0];
+    t2 = pB->v[1] - pC->m[3][1];
+    t3 = pB->v[2] - pC->m[3][2];
+    pA->v[0] = pC->m[0][2] * t3 + pC->m[0][1] * t2 + pC->m[0][0] * t1;
+    pA->v[1] = pC->m[1][0] * t1 + pC->m[1][2] * t3 + pC->m[1][1] * t2;
+    pA->v[2] = pC->m[2][0] * t1 + pC->m[2][1] * t2 + pC->m[2][2] * t3;
 }
 
 // IDA: tU16 __usercall PaletteEntry16Bit@<AX>(br_pixelmap *pPal@<EAX>, int pEntry@<EDX>)

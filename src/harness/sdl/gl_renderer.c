@@ -1,6 +1,7 @@
 #include "gl_renderer.h"
 #include "brender/brender.h"
 #include "cameras/debug_camera.h"
+#include "gl_brender_stored_context.h"
 #include "gl_renderer_shaders.h"
 #include "harness.h"
 #include "harness/trace.h"
@@ -11,136 +12,138 @@
 // this needs to be included after glad.h
 #include <SDL_opengl.h>
 
-typedef struct tStored_model_context {
-    GLuint vao_id, ebo_id;
-} tStored_model_context;
-
-typedef struct tStored_pixelmap {
-    GLuint id;
-} tStored_pixelmap;
-
-typedef struct tStored_material {
-    tStored_pixelmap* texture;
-} tStored_material;
-
 SDL_Window* window;
 SDL_GLContext context;
 GLuint screen_buffer_vao, screen_buffer_ebo;
-GLuint screen_texture;
+GLuint screen_texture, palette_texture;
+
 GLuint shader_program_2d;
-GLuint shader_program_2d_trans;
-GLuint shader_program_2d_pp;
 GLuint shader_program_3d;
 GLuint framebuffer_id, framebuffer_texture = 0;
 unsigned int rbo;
+uint8_t gl_palette[4 * 256]; // RGBA
+uint8_t* screen_buffer_flip_pixels;
 
-int window_width, window_height;
+int window_width, window_height, render_width, render_height;
 
-void CompileShader(GLuint shader_id, const GLchar* source) {
+br_pixelmap* last_colour_buffer;
+br_pixelmap* last_shade_table = NULL;
+
+struct {
+    GLuint pixels, shade_table;
+    GLuint model, view, projection;
+    GLuint palette_index_override;
+    GLuint clip_plane_count;
+    GLuint clip_planes[6];
+    GLuint light_value;
+} uniforms_3d;
+
+struct {
+    GLuint pixels, palette;
+} uniforms_2d;
+
+struct {
+    GLuint pixels, palette;
+} uniforms_2dpp;
+
+GLuint CreateShaderFromFile(const char* filename, const char* fallback, GLenum type) {
     int success;
-    char log[512];
-    glShaderSource(shader_id, 1, &source, NULL);
-    glCompileShader(shader_id);
-    glGetShaderiv(shader_id, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(shader_id, 512, NULL, log);
-        LOG_PANIC("shader %d failed. %s", shader_id, log);
+
+    GLuint res = glCreateShader(type);
+
+    FILE* f = fopen(filename, "r");
+    if (f) {
+        fseek(f, 0, SEEK_END);
+        long fsize = ftell(f);
+        fseek(f, 0, SEEK_SET);
+        char* file_bytes = malloc(fsize + 1);
+        fsize = fread(file_bytes, fsize, 1, f);
+        fclose(f);
+        file_bytes[fsize] = 0;
+        const GLchar* sources[] = { file_bytes };
+        glShaderSource(res, 1, sources, NULL);
+    } else {
+        const GLchar* sources[] = { fallback };
+        glShaderSource(res, 1, sources, NULL);
     }
+
+    glCompileShader(res);
+    glGetShaderiv(res, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        char log_buffer[1024];
+        glGetShaderInfoLog(res, 1024, NULL, log_buffer);
+        LOG_PANIC("shader %s failed to compile: %s", filename, log_buffer);
+    }
+    return res;
+}
+
+GLuint CreateShaderProgram(const char* vertex_file, const char* fragment_file, const char* vertex_fallback, const char* fragment_fallback) {
+    GLuint program = glCreateProgram();
+    GLuint v_shader, f_shader;
+
+    v_shader = CreateShaderFromFile(vertex_file, vertex_fallback, GL_VERTEX_SHADER);
+    if (!v_shader)
+        return 0;
+    glAttachShader(program, v_shader);
+
+    f_shader = CreateShaderFromFile(fragment_file, fragment_fallback, GL_FRAGMENT_SHADER);
+    if (!f_shader)
+        return 0;
+    glAttachShader(program, f_shader);
+
+    glLinkProgram(program);
+
+    glDeleteShader(v_shader);
+    glDeleteShader(f_shader);
+
+    GLint link_ok = GL_FALSE;
+    glGetProgramiv(program, GL_LINK_STATUS, &link_ok);
+    if (!link_ok) {
+        char log_buffer[1024];
+        glGetShaderInfoLog(program, 1024, NULL, log_buffer);
+        LOG_PANIC("shader program %s:%s failed to link: %s", vertex_file, fragment_file, log_buffer);
+    }
+    return program;
 }
 
 void LoadShaders() {
-    GLuint vs, fs;
+    shader_program_2d = CreateShaderProgram("vertex_shader_2d.glsl", "fragment_shader_2d.glsl", vs_2d, fs_2d);
+    glUseProgram(shader_program_2d);
+    uniforms_2d.pixels = glGetUniformLocation(shader_program_2d, "pixels");
+    uniforms_2d.palette = glGetUniformLocation(shader_program_2d, "palette");
 
-    vs = glCreateShader(GL_VERTEX_SHADER);
-    CompileShader(vs, vs_2d);
-    fs = glCreateShader(GL_FRAGMENT_SHADER);
-    CompileShader(fs, fs_2d);
+    // bind the uniform samplers to texture units:
+    glUniform1i(uniforms_2d.pixels, 0);
+    glUniform1i(uniforms_2d.palette, 1);
 
-    shader_program_2d = glCreateProgram();
-    glAttachShader(shader_program_2d, vs);
-    glAttachShader(shader_program_2d, fs);
-    glLinkProgram(shader_program_2d);
-    glDeleteShader(fs);
+    shader_program_3d = CreateShaderProgram("vertex_shader_3d.glsl", "fragment_shader_3d.glsl", vs_3d, fs_3d);
+    glUseProgram(shader_program_3d);
+    uniforms_3d.clip_plane_count = glGetUniformLocation(shader_program_3d, "clip_plane_count");
+    for (int i = 0; i < 6; i++) {
+        char name[32];
+        sprintf(name, "clip_planes[%d]", i);
+        uniforms_3d.clip_planes[i] = glGetUniformLocation(shader_program_3d, name);
+    }
+    uniforms_3d.model = glGetUniformLocation(shader_program_3d, "model");
+    uniforms_3d.pixels = glGetUniformLocation(shader_program_3d, "pixels");
+    uniforms_3d.shade_table = glGetUniformLocation(shader_program_3d, "shade_table");
+    uniforms_3d.projection = glGetUniformLocation(shader_program_3d, "projection");
+    uniforms_3d.palette_index_override = glGetUniformLocation(shader_program_3d, "palette_index_override");
+    uniforms_3d.view = glGetUniformLocation(shader_program_3d, "view");
+    uniforms_3d.light_value = glGetUniformLocation(shader_program_3d, "light_value");
 
-    fs = glCreateShader(GL_FRAGMENT_SHADER);
-    CompileShader(fs, fs_2d_trans);
-    shader_program_2d_trans = glCreateProgram();
-    glAttachShader(shader_program_2d_trans, vs);
-    glAttachShader(shader_program_2d_trans, fs);
-    glLinkProgram(shader_program_2d_trans);
-    glDeleteShader(fs);
-
-    fs = glCreateShader(GL_FRAGMENT_SHADER);
-    CompileShader(fs, fs_postprocess);
-    shader_program_2d_pp = glCreateProgram();
-    glAttachShader(shader_program_2d_pp, vs);
-    glAttachShader(shader_program_2d_pp, fs);
-    glLinkProgram(shader_program_2d_pp);
-    glDeleteShader(fs);
-
-    glDeleteShader(vs);
-
-    vs = glCreateShader(GL_VERTEX_SHADER);
-    fs = glCreateShader(GL_FRAGMENT_SHADER);
-    CompileShader(fs, fs_3d);
-    CompileShader(vs, vs_3d);
-    shader_program_3d = glCreateProgram();
-    glAttachShader(shader_program_3d, vs);
-    glAttachShader(shader_program_3d, fs);
-    glLinkProgram(shader_program_3d);
-
-    glDeleteShader(vs);
-    glDeleteShader(fs);
+    // bind the uniform samplers to texture units. palette=1, shadetable=2
+    glUniform1i(uniforms_3d.pixels, 0);
+    glUniform1i(uniforms_3d.shade_table, 2);
 }
 
-void GLRenderer_CreateWindow(char* title, int width, int height) {
-    window_width = width;
-    window_height = height;
-
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        LOG_PANIC("SDL_INIT_VIDEO error: %s", SDL_GetError());
-    }
-
-    if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE) != 0) {
-        LOG_PANIC("Failed to set SDL_GL_CONTEXT_PROFILE_MASK attribute. %s", SDL_GetError());
-    };
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-
-    SDL_GL_SetSwapInterval(1);
-
-    window = SDL_CreateWindow(title,
-        SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED,
-        width, height,
-        SDL_WINDOW_OPENGL);
-
-    if (!window) {
-        LOG_PANIC("Failed to create window");
-    }
-    SDL_SetRelativeMouseMode(SDL_TRUE);
-
-    //SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
-
-    context = SDL_GL_CreateContext(window);
-    if (!context) {
-        LOG_PANIC("Failed to call SDL_GL_CreateContext. %s", SDL_GetError());
-    }
-
-    // Load GL extensions using glad
-    if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
-        LOG_PANIC("Failed to initialize the OpenGL context with GLAD.");
-        exit(1);
-    }
-
-    LoadShaders();
-
+void SetupFullScreenRectGeometry() {
     float vertices[] = {
         // positions          // colors           // texture coords
-        1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, // top right
-        1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // bottom right
-        -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, // bottom left
-        -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f // top left
+        1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right
+        1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
+        -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
+        -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f // top left
     };
     unsigned int indices[] = {
         0, 1, 3, // first triangle
@@ -171,72 +174,171 @@ void GLRenderer_CreateWindow(char* title, int width, int height) {
     glEnableVertexAttribArray(2);
 
     glBindVertexArray(0);
+}
 
+void InitializeOpenGLContext() {
+
+    context = SDL_GL_CreateContext(window);
+    if (!context) {
+        LOG_PANIC("Failed to call SDL_GL_CreateContext. %s", SDL_GetError());
+    }
+
+    // Load GL extensions using glad
+    if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
+        LOG_PANIC("Failed to initialize the OpenGL context with GLAD.");
+        exit(1);
+    }
+
+    int maxTextureImageUnits;
+    glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxTextureImageUnits);
+    if (maxTextureImageUnits < 3) {
+        LOG_PANIC("GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS is %d. Need at least 3", maxTextureImageUnits);
+    }
+
+    LoadShaders();
+    SetupFullScreenRectGeometry();
+
+    // opengl config
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    glGenTextures(1, &screen_texture);
-
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // Accept fragment if it closer to the camera than the former one
     glDepthFunc(GL_LESS);
-
-    glGenFramebuffers(1, &framebuffer_id);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
+    glEnable(GL_CULL_FACE);
     glClearColor(0, 0, 0, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
 
+    // textures
+    glGenTextures(1, &screen_texture);
+    glGenTextures(1, &palette_texture);
     glGenTextures(1, &framebuffer_texture);
+
+    // setup framebuffer
+    glGenFramebuffers(1, &framebuffer_id);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
+
     glBindTexture(GL_TEXTURE_2D, framebuffer_texture);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8UI, render_width, render_height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer_texture, 0);
 
     glGenRenderbuffers(1, &rbo);
     glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, render_width, render_height);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        LOG_PANIC("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
+        LOG_PANIC("Framebuffer is not complete!");
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    CHECK_GL_ERROR("initializeOpenGLContext");
 }
 
-void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer) {
+void GLRenderer_CreateWindow(char* title, int width, int height, int pRender_width, int pRender_height) {
+    window_width = width;
+    window_height = height;
+    render_width = pRender_width;
+    render_height = pRender_height;
 
-    glViewport(colour_buffer->base_x * 2, colour_buffer->base_y * 2, colour_buffer->width * 2, colour_buffer->height * 2);
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+        LOG_PANIC("SDL_INIT_VIDEO error: %s", SDL_GetError());
+    }
+
+    if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE) != 0) {
+        LOG_PANIC("Failed to set SDL_GL_CONTEXT_PROFILE_MASK attribute. %s", SDL_GetError());
+    };
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+
+    SDL_GL_SetSwapInterval(1);
+
+    window = SDL_CreateWindow(title,
+        SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED,
+        width, height,
+        SDL_WINDOW_OPENGL);
+
+    if (!window) {
+        LOG_PANIC("Failed to create window");
+    }
+    SDL_SetRelativeMouseMode(SDL_TRUE);
+
+    // SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+
+    InitializeOpenGLContext();
+
+    screen_buffer_flip_pixels = malloc(sizeof(uint8_t) * render_width * render_height);
+}
+
+void GLRenderer_SetPalette(uint8_t* rgba_colors) {
+    for (int i = 0; i < 256; i++) {
+
+        gl_palette[i * 4] = rgba_colors[i * 4 + 2];
+        gl_palette[i * 4 + 1] = rgba_colors[i * 4 + 1];
+        gl_palette[i * 4 + 2] = rgba_colors[i * 4];
+        // palette index 0 is transparent, so set alpha to 0
+        if (i == 0) {
+            gl_palette[i * 4 + 3] = 0;
+        } else {
+            gl_palette[i * 4 + 3] = 0xff;
+        }
+    }
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, palette_texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 256, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, gl_palette);
+
+    // reset active texture back to default
+    glActiveTexture(GL_TEXTURE0);
+
+    CHECK_GL_ERROR("GLRenderer_SetPalette");
+}
+
+void GLRenderer_SetShadeTable(br_pixelmap* table) {
+
+    if (last_shade_table == table) {
+        return;
+    }
+
+    glActiveTexture(GL_TEXTURE2);
+    tStored_pixelmap* stored = table->stored;
+    glBindTexture(GL_TEXTURE_2D, stored->id);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    // reset active texture back to default
+    glActiveTexture(GL_TEXTURE0);
+
+    last_shade_table = table;
+}
+
+extern br_v1db_state v1db;
+
+void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer) {
+    last_colour_buffer = colour_buffer;
+    glViewport(colour_buffer->base_x, colour_buffer->base_y, colour_buffer->width, colour_buffer->height);
 
     glEnable(GL_DEPTH_TEST);
     glUseProgram(shader_program_3d);
 
-    GLuint lightpos_u = glGetUniformLocation(shader_program_3d, "lightPos");
-    GLuint lightcolor_u = glGetUniformLocation(shader_program_3d, "lightColor");
-    GLuint objectcolor_u = glGetUniformLocation(shader_program_3d, "objectColor");
+    int enabled_clip_planes = 0;
+    for (int i = 0; i < v1db.enabled_clip_planes.max; i++) {
+        if (!v1db.enabled_clip_planes.enabled || !v1db.enabled_clip_planes.enabled[i]) {
+            continue;
+        }
+        br_vector4* v4 = v1db.enabled_clip_planes.enabled[i]->type_data;
+        glUniform4f(uniforms_3d.clip_planes[enabled_clip_planes], v4->v[0], v4->v[1], v4->v[2], v4->v[3]);
+        enabled_clip_planes++;
+    }
 
-    glUniform3f(lightpos_u, -0.0f, -1.0f, -0.3f);
-    //glUniform3f(lightcolor_u, 0.97f, 0.84f, 0.11f);
-    glUniform3f(lightcolor_u, 1, 1, 1);
-    glUniform3f(objectcolor_u, 1.0f, 1.0f, 1.0f);
-
-    GLuint view_u = glGetUniformLocation(shader_program_3d, "view");
-    GLuint projection_u = glGetUniformLocation(shader_program_3d, "projection");
+    glUniform1i(uniforms_3d.clip_plane_count, enabled_clip_planes);
 
     if (gDebugCamera_active) {
         float m2[4][4];
         memcpy(m2, DebugCamera_View(), sizeof(float) * 16);
-        // LOG_DEBUG("%f, %f, %f, %f", m2[0][0], m2[0][1], m2[0][2], m2[0][3]);
-        // LOG_DEBUG("%f, %f, %f, %f", m2[1][0], m2[1][1], m2[1][2], m2[1][3]);
-        // LOG_DEBUG("%f, %f, %f, %f", m2[2][0], m2[2][1], m2[2][2], m2[2][3]);
-        // LOG_DEBUG("%f, %f, %f, %f", m2[3][0], m2[3][1], m2[3][2], m2[3][3]);
-        glUniformMatrix4fv(view_u, 1, GL_FALSE, (float*)&m2[0]);
+        glUniformMatrix4fv(uniforms_3d.view, 1, GL_FALSE, (GLfloat*)m2);
     } else {
         mat4 cam_matrix = {
             { camera->t.t.mat.m[0][0], camera->t.t.mat.m[0][1], camera->t.t.mat.m[0][2], 0 },
@@ -246,73 +348,64 @@ void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer) {
         };
         mat4 cam_matrix_inv;
         glm_mat4_inv(cam_matrix, cam_matrix_inv);
-        glUniformMatrix4fv(view_u, 1, GL_FALSE, &cam_matrix_inv[0][0]);
+        glUniformMatrix4fv(uniforms_3d.view, 1, GL_FALSE, &cam_matrix_inv[0][0]);
     }
     float* proj = DebugCamera_Projection();
-    glUniformMatrix4fv(projection_u, 1, GL_FALSE, proj);
+    glUniformMatrix4fv(uniforms_3d.projection, 1, GL_FALSE, proj);
 
     DebugCamera_Update();
 
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void GLRenderer_EndScene() {
-}
 
-void GLRenderer_RenderFramebuffer() {
-
-    glViewport(0, 0, window_width, window_height);
-    glDisable(GL_DEPTH_TEST);
+    //  switch back to default fb
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    glDisable(GL_DEPTH_TEST);
+    // pull framebuffer into cpu memory to emulate BRender behavior
     glBindTexture(GL_TEXTURE_2D, framebuffer_texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glUseProgram(shader_program_2d_trans);
+    glGetTexImage(GL_TEXTURE_2D, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, screen_buffer_flip_pixels);
 
-    glBindVertexArray(screen_buffer_vao);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, screen_buffer_ebo);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
+    // flip texture to match the expected orientation
+    int dest_y = render_height;
+    uint8_t* pm_pixels = last_colour_buffer->pixels;
+    for (int y = 0; y < render_height; y++) {
+        dest_y--;
+        for (int x = 0; x < render_width; x++) {
+            pm_pixels[dest_y * render_width + x] = screen_buffer_flip_pixels[y * render_width + x];
+        }
+    }
 }
 
-void GLRenderer_RenderFullScreenQuad(uint32_t* screen_buffer, int width, int height) {
-
+void GLRenderer_RenderFullScreenQuad(uint8_t* screen_buffer, int width, int height) {
+    glViewport(0, 0, window_width, window_height);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDisable(GL_DEPTH_TEST);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+    glUseProgram(shader_program_2d);
     glBindTexture(GL_TEXTURE_2D, screen_texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, screen_buffer);
 
-    glUseProgram(shader_program_2d_trans);
-
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8UI, width, height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, screen_buffer);
     glBindVertexArray(screen_buffer_vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, screen_buffer_ebo);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
-}
-
-// GLRenderer_RenderColorBlend renders a fullscreen quad with the desired color
-void GLRenderer_RenderColorBlend(float r, float g, float b, float a) {
-    glDisable(GL_DEPTH_TEST);
-
-    glUseProgram(shader_program_2d_pp);
-    GLuint model_u = glGetUniformLocation(shader_program_2d_pp, "color");
-    glUniform4f(model_u, r, g, b, a);
-
-    glBindVertexArray(screen_buffer_vao);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, screen_buffer_ebo);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
+    CHECK_GL_ERROR("GLRenderer_RenderFullScreenQuad");
 }
 
 void GLRenderer_Swap() {
     SDL_GL_SwapWindow(window);
+    // clear our virtual framebuffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
+    // clear real framebuffer
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    CHECK_GL_ERROR("GLRenderer_Swap");
 }
 
 void build_model(br_model* model) {
@@ -320,7 +413,7 @@ void build_model(br_model* model) {
     v11model* v11;
 
     v11 = model->prepared;
-    ctx = malloc(sizeof(tStored_model_context));
+    ctx = NewStoredModelContext();
 
     int total_verts = 0, total_faces = 0;
     for (int i = 0; i < v11->ngroups; i++) {
@@ -404,6 +497,8 @@ void build_model(br_model* model) {
     free(verts);
     free(indices);
     model->stored = ctx;
+
+    CHECK_GL_ERROR("after build model");
 }
 
 void GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
@@ -411,16 +506,18 @@ void GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
     ctx = model->stored;
     v11model* v11 = model->prepared;
 
+    // LOG_DEBUG("model rendering %s", model->identifier);
     if (v11 == NULL) {
-        //LOG_WARN("No model prepared for %s", model->identifier);
+        // LOG_WARN("No model prepared for %s", model->identifier);
         return;
     }
 
     if (ctx == NULL) {
         build_model(model);
         ctx = model->stored;
-        //DebugCamera_SetPosition(model_matrix.m[3][0], model_matrix.m[3][1], model_matrix.m[3][2]);
+        // DebugCamera_SetPosition(model_matrix.m[3][0], model_matrix.m[3][1], model_matrix.m[3][2]);
     }
+    CHECK_GL_ERROR("rm1");
 
     glEnable(GL_DEPTH_TEST);
     glUseProgram(shader_program_3d);
@@ -432,76 +529,91 @@ void GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
         model_matrix.m[3][0], model_matrix.m[3][1], model_matrix.m[3][2], 1
     };
 
-    GLuint tex_u = glGetUniformLocation(shader_program_3d, "textureSample");
-
-    GLuint model_u = glGetUniformLocation(shader_program_3d, "model");
-    glUniformMatrix4fv(model_u, 1, GL_FALSE, m);
-
+    glUniformMatrix4fv(uniforms_3d.model, 1, GL_FALSE, m);
     glBindVertexArray(ctx->vao_id);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx->ebo_id);
-
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_CCW);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     int element_index = 0;
 
+    v11group* group;
     for (int g = 0; g < v11->ngroups; g++) {
-        tStored_material* mat = (tStored_material*)v11->groups[g].stored;
-        if (mat && mat->texture) {
-            glBindTexture(GL_TEXTURE_2D, mat->texture->id);
-            glUniform1i(tex_u, 1);
+        group = &v11->groups[g];
+        tStored_material* material = group->stored;
+        if (material) {
+            glUniform1i(uniforms_3d.palette_index_override, material->index_base);
+            if (material->shade_table) {
+                GLRenderer_SetShadeTable(material->shade_table);
+            }
+            if ((material->flags & BR_MATF_LIGHT) && material->shade_table) {
+                // TODO: light value shouldn't always be 0? Works for shadows, not sure about other things.
+                glUniform1i(uniforms_3d.light_value, 0);
+            } else {
+                glUniform1i(uniforms_3d.light_value, -1);
+            }
+
+            if (material->texture) {
+                tStored_pixelmap* stored_px = material->texture->stored;
+                if (stored_px) {
+                    glBindTexture(GL_TEXTURE_2D, stored_px->id);
+                    glUniform1i(uniforms_3d.palette_index_override, -1);
+                }
+            }
         } else {
-            glBindTexture(GL_TEXTURE_2D, 0);
-            glUniform1i(tex_u, 0);
+            // LOG_WARN("no material");
+            glUniform1i(uniforms_3d.palette_index_override, 0);
+            glUniform1i(uniforms_3d.light_value, -1);
         }
 
-        glDrawElements(GL_TRIANGLES, v11->groups[g].nfaces * 3, GL_UNSIGNED_INT, (void*)(element_index * sizeof(int)));
-        element_index += v11->groups[g].nfaces * 3;
+        glDrawElements(GL_TRIANGLES, group->nfaces * 3, GL_UNSIGNED_INT, (void*)(element_index * sizeof(int)));
+        element_index += group->nfaces * 3;
     }
-
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINES);
-    // element_index = 0;
-    // for (int g = 0; g < v11->ngroups; g++) {
-    //     glDrawElements(GL_TRIANGLES, v11->groups[g].nfaces * 3, GL_UNSIGNED_INT, (void*)(element_index * sizeof(int)));
-    //     element_index += v11->groups[g].nfaces * 3;
-    // }
 
     glBindVertexArray(0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    CHECK_GL_ERROR("GLRenderer_RenderModel");
 }
 
 void GLRenderer_BufferMaterial(br_material* mat) {
-    if (!mat->stored) {
-        if (!mat->colour_map) {
-        }
-        if (mat->colour_map) {
-            GLRenderer_BufferTexture(mat->colour_map);
-            if (mat->colour_map->stored) {
-                tStored_material* stored = malloc(sizeof(tStored_material));
-                stored->texture = mat->colour_map->stored;
-                mat->stored = stored;
-            }
+    tStored_material* stored = mat->stored;
+    if (!stored) {
+        stored = NewStoredMaterial();
+        mat->stored = stored;
+        if (mat->identifier) {
+            strcpy(stored->identifier, mat->identifier);
         }
     }
+    stored->texture = mat->colour_map;
+    stored->flags = mat->flags;
+    stored->shade_table = mat->index_shade;
 }
 
 void GLRenderer_BufferTexture(br_pixelmap* pm) {
-    if (!pm->stored) {
-        uint32_t* full_color_texture = NULL;
-        Harness_ConvertPalettedPixelmapTo32Bit(&full_color_texture, pm, 0);
-        if (full_color_texture == NULL) {
-            return;
-        }
-        tStored_pixelmap* stored = malloc(sizeof(tStored_pixelmap));
+    tStored_pixelmap* stored = pm->stored;
+    if (pm->stored) {
+    } else {
+        stored = NewStoredPixelmap();
         glGenTextures(1, &stored->id);
-        glBindTexture(GL_TEXTURE_2D, stored->id);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, pm->width, pm->height, 0, GL_BGRA, GL_UNSIGNED_BYTE, full_color_texture);
-        free(full_color_texture);
         pm->stored = stored;
     }
+
+    // sometimes the pixelmap has row_bytes > width. OpenGL expects linear pixels, so flatten it out
+    uint8_t* linear_pixels = malloc(sizeof(uint8_t) * pm->width * pm->height);
+    uint8_t* original_pixels = pm->pixels;
+    for (int y = 0; y < pm->height; y++) {
+        for (int x = 0; x < pm->width; x++) {
+            linear_pixels[y * pm->width + x] = original_pixels[y * pm->row_bytes + x];
+        }
+    }
+
+    glBindTexture(GL_TEXTURE_2D, stored->id);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8UI, pm->width, pm->height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, linear_pixels);
+    free(linear_pixels);
+
+    CHECK_GL_ERROR("GLRenderer_BufferTexture");
 }
 
 void Harness_GLRenderer_RenderCube(float col, float x, float y, float z) {

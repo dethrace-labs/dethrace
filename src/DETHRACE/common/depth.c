@@ -47,7 +47,29 @@ int Log2(int pNumber) {
     int i;
     int bits[16];
     LOG_TRACE("(%d)", pNumber);
-    NOT_IMPLEMENTED();
+
+    bits[0] = 1;
+    bits[1] = 2;
+    bits[2] = 4;
+    bits[3] = 8;
+    bits[4] = 16;
+    bits[5] = 32;
+    bits[6] = 64;
+    bits[7] = 128;
+    bits[8] = 256;
+    bits[9] = 512;
+    bits[10] = 1024;
+    bits[11] = 2048;
+    bits[12] = 4096;
+    bits[13] = 0x2000;
+    bits[14] = 0x4000;
+    bits[15] = 0x8000;
+    for (i = 15; i >= 0; --i) {
+        if ((bits[i] & pNumber) != 0) {
+            return i;
+        }
+    }
+    return 0;
 }
 
 // IDA: br_scalar __cdecl CalculateWrappingMultiplier(br_scalar pValue, br_scalar pYon)
@@ -159,7 +181,23 @@ void LoadDepthTable(char* pName, br_pixelmap** pTable, int* pPower) {
     int j;
     tU8 temp;
     LOG_TRACE("(\"%s\", %p, %p)", pName, pTable, pPower);
-    STUB();
+
+#define pTABLE_PIXELS ((tU8*)(*pTable)->pixels)
+
+    PathCat(the_path, gApplication_path, "SHADETAB");
+    PathCat(the_path, the_path, pName);
+    *pTable = DRPixelmapLoad(the_path);
+    if (!*pTable) {
+        FatalError(87);
+    }
+    *pPower = Log2((*pTable)->height);
+    for (i = 0; i < (*pTable)->width; i++) {
+        for (j = 0; j < (*pTable)->height / 2; j++) {
+            temp = pTABLE_PIXELS[j * (*pTable)->row_bytes + i];
+            pTABLE_PIXELS[j * (*pTable)->row_bytes + i] = pTABLE_PIXELS[(*pTable)->row_bytes * ((*pTable)->height - j - 1) + i];
+            pTABLE_PIXELS[(*pTable)->row_bytes * ((*pTable)->height - j - 1) + i] = temp;
+        }
+    }
 }
 
 // IDA: void __cdecl InitDepthEffects()
@@ -251,7 +289,7 @@ void ExternalSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_act
     dx = 0;
     col_map = gHorizon_material->colour_map;
     camera = (br_camera*)pCamera->type_data;
-    //LOG_DEBUG("camera fov %d", camera->field_of_view);
+    // LOG_DEBUG("camera fov %d", camera->field_of_view);
     tan_half_fov = Tan(camera->field_of_view / 2);
     tan_half_hori_fov = tan_half_fov * camera->aspect;
     tan_pitch = 0;
@@ -270,21 +308,21 @@ void ExternalSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_act
                    + 0.5))
             * 0.0000152587890625));
 
-    //LOG_DEBUG("tan_half_fov %f, tan_half_hori_fov %f, tan_pitch %f", tan_half_fov, tan_half_hori_fov, tan_pitch);
-    //LOG_DEBUG("rep1 %d", (int)((double)col_map->width * tan_pitch));
+    // LOG_DEBUG("tan_half_fov %f, tan_half_hori_fov %f, tan_pitch %f", tan_half_fov, tan_half_hori_fov, tan_pitch);
+    // LOG_DEBUG("rep1 %d", (int)((double)col_map->width * tan_pitch));
     for (repetitions = (int)((double)col_map->width * tan_pitch); repetitions < 0; repetitions += col_map->width) {
         ;
     }
-    //LOG_DEBUG("rep2 %d", repetitions);
+    // LOG_DEBUG("rep2 %d", repetitions);
     while (col_map->width < repetitions) {
         repetitions -= col_map->width;
     }
-    //LOG_DEBUG("rep3 %d", repetitions);
+    // LOG_DEBUG("rep3 %d", repetitions);
 
     top_y = -(pCamera_to_world->m[2][1] / sqrt(pCamera_to_world->m[2][1]) / tan_half_fov * (double)pRender_buffer->height / 2.0)
         - (col_map->height - gSky_image_underground * col_map->height / gSky_image_height);
-    //LOG_DEBUG("gSky_image_underground %d, gSky_image_height %d", gSky_image_underground, gSky_image_height);
-    //LOG_DEBUG("top_y %d, r_o_x %d, repetitions %d", top_y, pRender_buffer->origin_x, repetitions);
+    // LOG_DEBUG("gSky_image_underground %d, gSky_image_height %d", gSky_image_underground, gSky_image_height);
+    // LOG_DEBUG("top_y %d, r_o_x %d, repetitions %d", top_y, pRender_buffer->origin_x, repetitions);
     while (pRender_buffer->width > dx) {
         hori_pixels = col_map->width - repetitions;
         if (hori_pixels >= pRender_buffer->width - dx) {

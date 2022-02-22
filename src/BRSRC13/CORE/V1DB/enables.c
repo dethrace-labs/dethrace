@@ -1,4 +1,6 @@
 #include "enables.h"
+#include "CORE/FW/diag.h"
+#include "CORE/FW/resource.h"
 #include "dbsetup.h"
 #include "harness/trace.h"
 #include <stddef.h>
@@ -7,13 +9,43 @@
 void actorEnable(br_v1db_enable* e, br_actor* a) {
     int i;
     LOG_TRACE("(%p, %p)", e, a);
-    NOT_IMPLEMENTED();
+
+    if (!e->enabled) {
+        e->enabled = BrResAllocate(v1db.res, e->max * sizeof(*e->enabled), BR_MEMORY_ENABLED_ACTORS);
+    }
+
+    for (i = 0; i < e->max; i++) {
+        if (e->enabled[i] == a) {
+            return;
+        }
+    }
+
+    for (i = 0; i < e->max; i++) {
+        if (!e->enabled[i]) {
+            e->enabled[i] = a;
+            e->count++;
+            return;
+        }
+    }
+
+    BrFailure("too many enabled %ss", e->name);
 }
 
 // IDA: void __usercall actorDisable(br_v1db_enable *e@<EAX>, br_actor *a@<EDX>)
 void actorDisable(br_v1db_enable* e, br_actor* a) {
     int i;
-    STUB();
+
+    if (!e->enabled) {
+        return;
+    }
+
+    for (i = 0; i < e->max; i++) {
+        if (e->enabled[i] == a) {
+            e->enabled[i] = NULL;
+            e->count--;
+            return;
+        }
+    }
 }
 
 // IDA: void __cdecl BrLightEnable(br_actor *l)
@@ -31,7 +63,8 @@ void BrLightDisable(br_actor* l) {
 // IDA: void __cdecl BrClipPlaneEnable(br_actor *c)
 void BrClipPlaneEnable(br_actor* c) {
     LOG_TRACE("(%p)", c);
-    NOT_IMPLEMENTED();
+
+    actorEnable(&v1db.enabled_clip_planes, c);
 }
 
 // IDA: void __cdecl BrClipPlaneDisable(br_actor *c)
