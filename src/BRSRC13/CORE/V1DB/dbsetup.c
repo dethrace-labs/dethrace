@@ -65,13 +65,13 @@ br_error BrV1dbBegin() {
     memcpy(v1db.default_model, &_BrDefaultModel, sizeof(br_model));
     v1db.default_material = SetupDefaultMaterial();
     v1db.enabled_lights.max = 16;
-    v1db.enabled_lights.type = 2;
+    v1db.enabled_lights.type = BR_ACTOR_LIGHT;
     v1db.enabled_lights.name = "light";
     v1db.enabled_clip_planes.max = 6;
-    v1db.enabled_clip_planes.type = 7;
+    v1db.enabled_clip_planes.type = BR_ACTOR_CLIP_PLANE;
     v1db.enabled_clip_planes.name = "clip plane";
     v1db.enabled_horizon_planes.max = 6;
-    v1db.enabled_horizon_planes.type = 8;
+    v1db.enabled_horizon_planes.type = BR_ACTOR_HORIZONTAL_PLANE;
     v1db.enabled_horizon_planes.name = "horizon plane";
     return 0;
 }
