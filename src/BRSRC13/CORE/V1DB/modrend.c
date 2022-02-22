@@ -122,7 +122,7 @@ br_model* makeMeshFromBounds(br_bounds* b) {
     bounds_vertices[7].p.v[1] = b->max.v[1];
     bounds_vertices[7].p.v[2] = b->max.v[2];
 
-    // 2. Modify d in the face equation (a*x+b*y+c*y+c=0)
+    // 2. Modify d in the face equation (a*x+b*y+c*y+d=0)
     for (i = 0; i < BR_ASIZE(bounds_faces)/4; i++) {
         bounds_faces[2*i+0].eqn.v[3] = b->min.v[i];
         bounds_faces[2*i+1].eqn.v[3] = b->min.v[i];
