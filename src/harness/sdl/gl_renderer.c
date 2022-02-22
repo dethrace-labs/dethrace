@@ -57,7 +57,7 @@ GLuint CreateShaderFromFile(const char* filename, const char* fallback, GLenum t
         long fsize = ftell(f);
         fseek(f, 0, SEEK_SET);
         char* file_bytes = malloc(fsize + 1);
-        fread(file_bytes, fsize, 1, f);
+        fsize = fread(file_bytes, fsize, 1, f);
         fclose(f);
         file_bytes[fsize] = 0;
         const GLchar* sources[] = { file_bytes };
