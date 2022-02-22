@@ -193,7 +193,7 @@ void LoadDepthTable(char* pName, br_pixelmap** pTable, int* pPower) {
     }
     *pPower = Log2((*pTable)->height);
     for (i = 0; i < (*pTable)->width; i++) {
-        for (j = 0; j < (*pTable)->height; j++) {
+        for (j = 0; j < (*pTable)->height / 2; j++) {
             temp = PTABLE_PIXEL_AT(i, j);
             PTABLE_PIXEL_AT(i, j) = PTABLE_PIXEL_AT(i, ((*pTable)->height - j - 1));
             PTABLE_PIXEL_AT(i, ((*pTable)->height - j - 1)) = temp;
