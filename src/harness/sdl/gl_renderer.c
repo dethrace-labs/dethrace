@@ -561,7 +561,7 @@ void GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
             }
         } else {
             // LOG_WARN("no material");
-            glUniform1i(uniforms_3d.palette_index_override, 10);
+            glUniform1i(uniforms_3d.palette_index_override, 0);
             glUniform1i(uniforms_3d.light_value, -1);
         }
 
