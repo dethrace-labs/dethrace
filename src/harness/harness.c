@@ -161,53 +161,8 @@ void Harness_Hook_DOSGfxBegin() {
     platform->NewWindow("Dethrace", 640, 400, 320, 200);
 }
 
-void Harness_ConvertPalettedPixelmapTo32Bit(uint32_t** dst, br_pixelmap* src, int vflip) {
-    uint8_t palette_index = 0;
-    uint8_t* data = src->pixels;
-    uint32_t* colors;
-    int x;
-    int y;
-    int dest_y;
-
-    if (!palette) {
-        return;
-    }
-    colors = palette->pixels;
-    if (*dst == NULL) {
-        *dst = malloc(src->width * src->height * sizeof(uint32_t));
-    }
-
-    // generate 32 bit texture from src + palette
-    if (vflip) {
-        dest_y = src->height - 1;
-        for (y = 0; y < src->height; y++) {
-            for (x = 0; x < src->width; x++) {
-                palette_index = (data[y * src->row_bytes + x]);
-                if (palette_index != 0) {
-                    (*dst)[dest_y * src->width + x] = (colors[palette_index] & 0x00ffffff) | 0xff000000; // set alpha to 1;
-                } else {
-                    (*dst)[dest_y * src->width + x] = 0;
-                }
-            }
-            dest_y--;
-        }
-    } else {
-        for (y = 0; y < src->height; y++) {
-            for (x = 0; x < src->width; x++) {
-                palette_index = (data[y * src->row_bytes + x]);
-                if (palette_index != 0) {
-                    (*dst)[y * src->width + x] = (colors[palette_index] & 0x00ffffff) | 0xff000000; // set alpha to 1;
-                } else {
-                    (*dst)[y * src->width + x] = 0;
-                }
-            }
-        }
-    }
-}
-
 // Render 2d back buffer
 void Harness_RenderScreen(br_pixelmap* dst, br_pixelmap* src) {
-    // Harness_ConvertPalettedPixelmapTo32Bit(&screen_buffer, src, 1);
     platform->RenderFullScreenQuad((uint8_t*)src->pixels, 320, 200);
 
     last_dst = dst;

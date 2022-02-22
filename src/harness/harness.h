@@ -28,6 +28,4 @@ typedef struct tCamera {
     void (*setPosition)();
 } tCamera;
 
-void Harness_ConvertPalettedPixelmapTo32Bit(uint32_t** dst, br_pixelmap* src, int vflip);
-
 #endif
