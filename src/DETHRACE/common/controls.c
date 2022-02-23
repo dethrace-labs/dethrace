@@ -21,6 +21,7 @@
 #include "pd/sys.h"
 #include "pedestrn.h"
 #include "piping.h"
+#include "powerup.h"
 #include "pratcam.h"
 #include "replay.h"
 #include "s3/s3sound.h"
@@ -163,7 +164,8 @@ void SetFlag(int i) {
 // IDA: void __usercall FinishLap(int i@<EAX>)
 void FinishLap(int i) {
     LOG_TRACE("(%d)", i);
-    NOT_IMPLEMENTED();
+
+    IncrementLap();
 }
 
 // IDA: void __cdecl EnsureSpecialVolumesHidden()
@@ -191,104 +193,120 @@ void DoEditModeKey(int pIndex) {
 // IDA: void __cdecl F5Key()
 void F5Key() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(0);
 }
 
 // IDA: void __cdecl F6Key()
 void F6Key() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(1);
 }
 
 // IDA: void __cdecl F7Key()
 void F7Key() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(2);
 }
 
 // IDA: void __cdecl F8Key()
 void F8Key() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(3);
 }
 
 // IDA: void __cdecl F10Key()
 void F10Key() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(4);
 }
 
 // IDA: void __cdecl F11Key()
 void F11Key() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(5);
 }
 
 // IDA: void __cdecl F12Key()
 void F12Key() {
     LOG_TRACE("()");
 
-    STUB();
+    DoEditModeKey(6);
 }
 
 // IDA: void __cdecl NumberKey0()
 void NumberKey0() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(7);
 }
 
 // IDA: void __cdecl NumberKey1()
 void NumberKey1() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(8);
 }
 
 // IDA: void __cdecl NumberKey2()
 void NumberKey2() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(9);
 }
 
 // IDA: void __cdecl NumberKey3()
 void NumberKey3() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(10);
 }
 
 // IDA: void __cdecl NumberKey4()
 void NumberKey4() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(11);
 }
 
 // IDA: void __cdecl NumberKey5()
 void NumberKey5() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(12);
 }
 
 // IDA: void __cdecl NumberKey6()
 void NumberKey6() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(13);
 }
 
 // IDA: void __cdecl NumberKey7()
 void NumberKey7() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(14);
 }
 
 // IDA: void __cdecl NumberKey8()
 void NumberKey8() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(15);
 }
 
 // IDA: void __cdecl NumberKey9()
 void NumberKey9() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(16);
 }
 
 // IDA: void __cdecl LookLeft()
@@ -1135,8 +1153,12 @@ void FlipUpCar(tCar_spec* car) {
 
 // IDA: void __usercall GetPowerup(int pNum@<EAX>)
 void GetPowerup(int pNum) {
+    LOG_TRACE("()");
+
+    // FIXME: remove unittest variables from dethrace
     _unittest_controls_lastGetPowerup = pNum;
-    STUB();
+
+    GotPowerup(&gProgram_state.current_car, pNum);
 }
 
 // IDA: void __usercall CheckSystemKeys(int pRacing@<EAX>)
@@ -1657,5 +1679,10 @@ void InitAbuseomatic() {
 void DisposeAbuseomatic() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < COUNT_OF(gAbuse_text); i++) {
+        if (gAbuse_text[i] != NULL) {
+            BrMemFree(gAbuse_text[i]);
+        }
+    }
 }
