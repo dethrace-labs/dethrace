@@ -144,7 +144,6 @@ void DoOpeningAnimation() {
 // IDA: void __cdecl DoNewGameAnimation()
 void DoNewGameAnimation() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl DoGoToRaceAnimation()
@@ -188,13 +187,19 @@ void DoEndRaceAnimation() {
 // IDA: void __cdecl DoGameOverAnimation()
 void DoGameOverAnimation() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    StopMusic();
+    PlaySmackerFile("CRASH.SMK");
+    StartMusic();
 }
 
 // IDA: void __cdecl DoGameCompletedAnimation()
 void DoGameCompletedAnimation() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    StopMusic();
+    PlaySmackerFile("TOPRANK.SMK");
+    StartMusic();
 }
 
 // IDA: void __cdecl StartLoadingScreen()

@@ -1,11 +1,14 @@
 #include "displays.h"
 #include "brender/brender.h"
 #include "constants.h"
+#include "depth.h"
 #include "flicplay.h"
+#include "globvars.h"
 #include "globvars.h"
 #include "globvrkm.h"
 #include "globvrpb.h"
 #include "graphics.h"
+#include "grafdata.h"
 #include "harness/trace.h"
 #include "netgame.h"
 #include "pd/sys.h"
@@ -51,6 +54,7 @@ void GetTimerString(char* pStr, int pFudge_colon) {
 void InitHeadups() {
     int i;
     LOG_TRACE("()");
+
     for (i = 0; i < 15; i++) {
         gHeadups[i].type = eHeadup_unused;
     }
@@ -63,6 +67,7 @@ void InitHeadups() {
 // IDA: void __usercall ClearHeadup(int pIndex@<EAX>)
 void ClearHeadup(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
+
     gHeadups[pIndex].type = eHeadup_unused;
 }
 
@@ -108,7 +113,8 @@ void ClearHeadups() {
 // IDA: int __usercall HeadupActive@<EAX>(int pIndex@<EAX>)
 int HeadupActive(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+
+    return gHeadups[pIndex].type != eHeadup_unused;
 }
 
 // IDA: void __usercall DRPixelmapText(br_pixelmap *pPixelmap@<EAX>, int pX@<EDX>, int pY@<EBX>, tDR_font *pFont@<ECX>, char *pText, int pRight_edge)
@@ -220,7 +226,35 @@ void DimRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int p
     int line_skip;
     int width;
     LOG_TRACE9("(%p, %d, %d, %d, %d, %d)", pPixelmap, pLeft, pTop, pRight, pBottom, pKnock_out_corners);
-    STUB_ONCE();
+
+    ptr = (tU8*)pPixelmap->pixels + pLeft + pPixelmap->row_bytes * pTop;
+    line_skip = pPixelmap->row_bytes - pRight + pLeft;
+    depth_table_ptr = gDepth_shade_table->pixels;
+    x = gDepth_shade_table->row_bytes * gDim_amount;
+    width = pRight - pLeft;
+
+    if (pKnock_out_corners) {
+        ptr++;
+        for (right_ptr = ptr + width - 2; ptr < right_ptr; ptr++) {
+            *ptr = depth_table_ptr[*ptr + x];
+        }
+        ptr += line_skip + 1;
+        for (y = pTop + 1; y < (pBottom - 1); y++, ptr += line_skip) {
+            for (right_ptr = ptr + width; ptr < right_ptr; ptr++) {
+                *ptr = depth_table_ptr[*ptr + x];
+            }
+        }
+        ptr++;
+        for (right_ptr = ptr + width - 2; ptr < right_ptr; ptr++) {
+            *ptr = depth_table_ptr[*ptr + x];
+        }
+    } else {
+        for (y = pTop; y < pBottom; y++) {
+            for (right_ptr = ptr + width; ptr < right_ptr; ptr += line_skip) {
+                *ptr = depth_table_ptr[*ptr + x];
+            }
+        }
+    }
 }
 
 // IDA: void __cdecl DimAFewBits()
@@ -244,14 +278,18 @@ void DimAFewBits() {
 // IDA: void __cdecl KillOldestQueuedHeadup()
 void KillOldestQueuedHeadup() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gQueued_headup_count--;
+    memmove(&gQueued_headups[0], &gQueued_headups[1], gQueued_headup_count * sizeof(tQueued_headup));
 }
 
 // IDA: void __usercall DubreyBar(int pX_index@<EAX>, int pY@<EDX>, int pColour@<EBX>)
 void DubreyBar(int pX_index, int pY, int pColour) {
     int x;
     LOG_TRACE("(%d, %d, %d)", pX_index, pY, pColour);
-    NOT_IMPLEMENTED();
+
+    x = gCurrent_graf_data->ps_bar_left - gCurrent_graf_data->ps_x_pitch * pX_index;
+    BrPixelmapLine(gBack_screen, x, pY, x, gCurrent_graf_data->ps_bar_height + pY, pColour);
 }
 
 // IDA: void __usercall DoPSPowerHeadup(int pY@<EAX>, int pLevel@<EDX>, char *pName@<EBX>, int pBar_colour@<ECX>)
@@ -259,13 +297,25 @@ void DoPSPowerHeadup(int pY, int pLevel, char* pName, int pBar_colour) {
     char s[16];
     int i;
     LOG_TRACE("(%d, %d, \"%s\", %d)", pY, pLevel, pName, pBar_colour);
-    NOT_IMPLEMENTED();
+
+    DimRectangle(gBack_screen, gCurrent_graf_data->ps_dim_left, pY, gCurrent_graf_data->ps_dim_right, gCurrent_graf_data->ps_dim_height + pY, 1);
+    TransDRPixelmapText(gBack_screen, gCurrent_graf_data->ps_name_left, gCurrent_graf_data->ps_name_top_border + pY, gFonts + 6, pName, gBack_screen->width);
+
+    for (i = (6 - gCurrent_graf_data->ps_bars_per_level) * gCurrent_graf_data->ps_bars_per_level + 1; i > (gCurrent_graf_data->ps_bars_per_level * pLevel + 1); i--) {
+        DubreyBar(i, pY + gCurrent_graf_data->ps_bar_top_border, 0);
+    }
+    for (i = gCurrent_graf_data->ps_bars_per_level * pLevel + 1; i >= 0; i--) {
+        DubreyBar(i, pY + gCurrent_graf_data->ps_bar_top_border, pBar_colour);
+    }
 }
 
 // IDA: void __cdecl DoPSPowerupHeadups()
 void DoPSPowerupHeadups() {
     LOG_TRACE("()");
-    STUB_ONCE();
+
+    DoPSPowerHeadup(gCurrent_graf_data->armour_headup_y[gProgram_state.cockpit_on], gProgram_state.current_car.power_up_levels[0], "A", 45);
+    DoPSPowerHeadup(gCurrent_graf_data->power_headup_y[gProgram_state.cockpit_on], gProgram_state.current_car.power_up_levels[1], "P", 99);
+    DoPSPowerHeadup(gCurrent_graf_data->offense_headup_y[gProgram_state.cockpit_on], gProgram_state.current_car.power_up_levels[2], "O", 4);
 }
 
 // IDA: void __usercall DoHeadups(tU32 pThe_time@<EAX>)
@@ -597,7 +647,9 @@ int DRTextCleverWidth(tDR_font* pFont, signed char* pText) {
 void DRPixelmapCentredText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFont, char* pText) {
     int width_over_2;
     LOG_TRACE("(%p, %d, %d, %p, \"%s\")", pPixelmap, pX, pY, pFont, pText);
-    NOT_IMPLEMENTED();
+
+    width_over_2 = DRTextWidth(pFont, pText) / 2;
+    TransDRPixelmapText(pPixelmap, pX - width_over_2, pY, pFont, pText, width_over_2 + pX);
 }
 
 // IDA: int __usercall IsHeadupTextClever@<EAX>(signed char *pText@<EAX>)
@@ -1196,19 +1248,44 @@ void AwardTime(tU32 pTime) {
     tU32 the_time;
     int i;
     LOG_TRACE("(%d)", pTime);
-    NOT_IMPLEMENTED();
+
+    if (gRace_finished || gFreeze_timer || gNet_mode == eNet_mode_none || pTime == 0) {
+        return;
+    }
+    original_amount = pTime;
+    the_time = GetTotalTime();
+    for (i = COUNT_OF(gOld_times) - 1; i > 0; i--) {
+        gOld_times[i] = gOld_times[i - 1];
+    }
+    gOld_times[0] = pTime;
+    if (gLast_time_credit_headup >= 0 && (the_time - gLast_time_earn_time) < 2000) {
+        pTime += gLast_time_credit_headup;
+    }
+    gLast_time_credit_headup = pTime;
+    gTimer += original_amount * 1000;
+    TimerString(1000 * pTime, s, 0, 0);
+    gLast_time_credit_headup = NewTextHeadupSlot(11, 0, 2000, -2, s);
+    gLast_time_earn_time = the_time;
 }
 
 // IDA: void __usercall DrawRectangle(br_pixelmap *pPixelmap@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pRight@<ECX>, int pBottom, int pColour)
 void DrawRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int pBottom, int pColour) {
     LOG_TRACE("(%p, %d, %d, %d, %d, %d)", pPixelmap, pLeft, pTop, pRight, pBottom, pColour);
-    NOT_IMPLEMENTED();
+
+    BrPixelmapLine(pPixelmap, pLeft,  pTop,    pRight, pTop,    pColour);
+    BrPixelmapLine(pPixelmap, pLeft,  pBottom, pRight, pBottom, pColour);
+    BrPixelmapLine(pPixelmap, pLeft,  pTop,    pLeft,  pBottom, pColour);
+    BrPixelmapLine(pPixelmap, pRight, pTop,    pRight, pBottom, pColour);
 }
 
 // IDA: void __usercall DrawRRectangle(br_pixelmap *pPixelmap@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pRight@<ECX>, int pBottom, int pColour)
 void DrawRRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int pBottom, int pColour) {
     LOG_TRACE("(%p, %d, %d, %d, %d, %d)", pPixelmap, pLeft, pTop, pRight, pBottom, pColour);
-    NOT_IMPLEMENTED();
+
+    BrPixelmapLine(pPixelmap, pLeft + 1, pTop,     pRight - 1, pTop,        pColour);
+    BrPixelmapLine(pPixelmap, pLeft + 1, pBottom,  pRight - 1, pBottom,     pColour);
+    BrPixelmapLine(pPixelmap, pLeft,     pTop + 1, pLeft,      pBottom - 1, pColour);
+    BrPixelmapLine(pPixelmap, pRight,    pTop + 1, pRight,     pBottom - 1, pColour);
 }
 
 // IDA: void __usercall OoerrIveGotTextInMeBoxMissus(int pFont_index@<EAX>, char *pText@<EDX>, br_pixelmap *pPixelmap@<EBX>, int pLeft@<ECX>, int pTop, int pRight, int pBottom, int pCentred)
@@ -1259,7 +1336,7 @@ void OoerrIveGotTextInMeBoxMissus(int pFont_index, char* pText, br_pixelmap* pPi
             }
             line[line_char_index] = 0;
             if (pCentred) {
-                TransDRPixelmapText(gBack_screen, centre - (DRTextWidth(font, line) / 2), current_y, font, line, (DRTextWidth(font, line) / 2) + centre);
+                DRPixelmapCentredText(gBack_screen, centre, current_y, font, line);
             } else {
                 TransDRPixelmapText(gBack_screen, pLeft, current_y, font, line, pRight);
             }

@@ -7,7 +7,7 @@
 br_allocator gAllocator = { "Death Race", DRStdlibAllocate, DRStdlibFree, DRStdlibInquire, Claim4ByteAlignment };
 int gNon_fatal_allocation_errors = 0;
 char* gMem_names[247] = {
-    NULL,
+    "",
     "BR_MEMORY_SCRATCH",
     "BR_MEMORY_PIXELMAP",
     "BR_MEMORY_PIXELS",
@@ -53,89 +53,89 @@ char* gMem_names[247] = {
     "BR_MEMORY_ORDER_TABLE",
     "BR_MEMORY_TOKEN_VALUE",
     "BR_MEMORY_TOKEN_TEMPLATE",
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
     "kMem_intf_pix_copy",
     "kMem_intf_pal_copy",
     "kMem_nodes_array",
@@ -252,20 +252,23 @@ char* gMem_names[247] = {
     "kMem_DOS_HMI_file_open",
     "kMem_abuse_text",
     "kMem_action_replay_buffer",
-    "kMem_misc"
+    "kMem_misc",
+    NULL,
 };
 br_resource_class gStainless_classes[118];
 
 // IDA: void __cdecl SetNonFatalAllocationErrors()
 void SetNonFatalAllocationErrors() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gNon_fatal_allocation_errors = 1;
 }
 
 // IDA: void __cdecl ResetNonFatalAllocationErrors()
 void ResetNonFatalAllocationErrors() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gNon_fatal_allocation_errors = 0;
 }
 
 // IDA: int __cdecl AllocationErrorsAreFatal()
@@ -279,7 +282,8 @@ void MAMSInitMem() {
     FILE* f;
     tPath_name the_path;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    LOG_WARN("nop in Windows (doing something for DOS?)");
 }
 
 // IDA: void __usercall PrintMemoryDump(int pFlags@<EAX>, char *pTitle@<EDX>)
@@ -327,14 +331,13 @@ void InstallDRMemCalls() {
 
 // IDA: void __usercall MAMSUnlock(void **pPtr@<EAX>)
 void MAMSUnlock(void** pPtr) {
-    free(*pPtr);
+    DRStdlibFree(*pPtr);
     *pPtr = NULL;
 }
 
 // IDA: void __usercall MAMSLock(void **pPtr@<EAX>)
 void MAMSLock(void** pPtr) {
     LOG_TRACE("(%p)", pPtr);
-    NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl CreateStainlessClasses()
@@ -351,6 +354,4 @@ void CreateStainlessClasses() {
 
 // IDA: void __cdecl CheckMemory()
 void CheckMemory() {
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
 }

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "controls.h"
+#include "drmem.h"
 #include "errors.h"
 #include "globvars.h"
 #include "harness/trace.h"
@@ -42,6 +43,7 @@ void CheckNumberOfTracks() {
 // IDA: void __usercall ServiceTheGame(int pRacing@<EAX>)
 void ServiceTheGame(int pRacing) {
 
+    CheckMemory();
     if (!pRacing) {
         CyclePollKeys();
     }
@@ -82,6 +84,7 @@ void GameMain(int pArgc, char** pArgv) {
 
     PDSetFileVariables();
     PDBuildAppPath(gApplication_path);
+    OpenDiagnostics();
 
     strcat(gApplication_path, "DATA");
 

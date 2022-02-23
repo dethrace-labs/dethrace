@@ -79,6 +79,7 @@ void ActualActionReplayHeadups(int pSpecial_zappy_bastard) {
 // IDA: void __cdecl DoActionReplayPostSwap()
 void DoActionReplayPostSwap() {
     LOG_TRACE("()");
+
     RemoveTransientBitmaps(1);
 }
 
@@ -167,6 +168,7 @@ void CheckReplayTurnOn() {
 void InitializeActionReplay() {
     int i;
     LOG_TRACE("()");
+
     for (int i = 0; i < 10; i++) {
         gReplay_pixies[i] = LoadPixelmap(gReplay_pixie_names[i]);
     }

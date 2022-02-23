@@ -691,6 +691,7 @@ void ResetSmokeColumns() {
 // IDA: void __usercall SetSmokeOn(int pSmoke_on@<EAX>)
 void SetSmokeOn(int pSmoke_on) {
     LOG_TRACE("(%d)", pSmoke_on);
+    
     gSmoke_on = pSmoke_on;
 }
 
@@ -703,13 +704,16 @@ void ReallySetSmokeOn(int pSmoke_on) {
 // IDA: void __usercall SetSmoke(int pSmoke_on@<EAX>)
 void SetSmoke(int pSmoke_on) {
     LOG_TRACE("(%d)", pSmoke_on);
-    NOT_IMPLEMENTED();
+
+    ReallySetSmokeOn(pSmoke_on);
+    SetSmokeOn(pSmoke_on);
 }
 
 // IDA: int __cdecl GetSmokeOn()
 int GetSmokeOn() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    return gSmoke_on;
 }
 
 // IDA: void __usercall StopCarSmoking(tCar_spec *pCar@<EAX>)

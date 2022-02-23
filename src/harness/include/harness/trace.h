@@ -49,6 +49,13 @@ void debug_print_matrix4(const char* fmt, const char* fn, char* name, br_matrix4
     debug_printf("\033[0;31m[PANIC] %s ", __FUNCTION__, __VA_ARGS__); \
     exit(1);
 
+#define LOG_WARN_ONCE(...)                                                   \
+    static int warn_printed = 0;                                             \
+    if (!warn_printed) {                                                     \
+        debug_printf("\033[0;33m[WARN] %s ", __FUNCTION__, __VA_ARGS__);     \
+        warn_printed = 1;                                                    \
+    }
+
 #define NOT_IMPLEMENTED()                                                         \
     debug_printf("\033[0;31m[PANIC] %s ", __FUNCTION__, "%s", "not implemented"); \
     exit(1);

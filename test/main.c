@@ -30,6 +30,9 @@
 
 extern int _unittest_do_not_exit;
 
+extern void test_assocarr_suite();
+extern void test_brprintf_suite();
+extern void test_bswap_suite();
 extern void test_utility_suite();
 extern void test_loading_suite();
 extern void test_controls_suite();
@@ -46,9 +49,12 @@ extern void test_datafile_suite();
 extern void test_v1dbfile_suite();
 extern void test_register_suite();
 extern void test_scratch_suite();
+extern void test_token_suite();
 extern void test_pattern_suite();
 extern void test_pmfile_suite();
 extern void test_fixed_suite();
+extern void test_lexer_suite();
+extern void test_logwrite_suite();
 extern void test_matrix23_suite();
 extern void test_matrix34_suite();
 extern void test_matrix4_suite();
@@ -245,23 +251,29 @@ int main(int argc, char** argv) {
     printf("Completed setup\n");
 
     // BRSRC13
+    test_bswap_suite();
     test_matrix23_suite();
     test_matrix34_suite();
     test_matrix4_suite();
     test_vector_suite();
     test_quat_suite();
     test_fixed_suite();
+    test_logwrite_suite();
+    test_brprintf_suite();
 
+    test_assocarr_suite();
     test_brlists_suite();
     test_pattern_suite();
     test_register_suite();
 
     test_fwsetup_suite();
     test_scratch_suite();
+    test_token_suite();
     test_resource_suite();
     test_actsupt_suite();
     test_genclip_suite();
     test_datafile_suite();
+    test_lexer_suite();
 
     test_pmfile_suite();
     test_v1dbfile_suite();

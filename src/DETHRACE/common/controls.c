@@ -1512,19 +1512,26 @@ void CycleYonFactor() {
 // IDA: void __usercall SetSoundDetailLevel(int pLevel@<EAX>)
 void SetSoundDetailLevel(int pLevel) {
     LOG_TRACE("(%d)", pLevel);
+    
     gSound_detail_level = pLevel;
 }
 
 // IDA: void __usercall ReallySetSoundDetailLevel(int pLevel@<EAX>)
 void ReallySetSoundDetailLevel(int pLevel) {
     LOG_TRACE("(%d)", pLevel);
-    NOT_IMPLEMENTED();
+
+    DRS3StopAllOutletSounds();
+    DisposeSoundSources();
+    gSound_detail_level = pLevel;
+    InitSound();
+    InitSoundSources();
 }
 
 // IDA: int __cdecl GetSoundDetailLevel()
 int GetSoundDetailLevel() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    return gSound_detail_level;
 }
 
 // IDA: void __cdecl CycleSoundDetailLevel()

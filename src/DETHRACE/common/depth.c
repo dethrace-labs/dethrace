@@ -1,6 +1,7 @@
 #include "depth.h"
 
 #include "brender/brender.h"
+#include "displays.h"
 #include "errors.h"
 #include "globvars.h"
 #include "globvrkm.h"
@@ -64,7 +65,7 @@ int Log2(int pNumber) {
     bits[13] = 0x2000;
     bits[14] = 0x4000;
     bits[15] = 0x8000;
-    for (i = 15; i >= 0; --i) {
+    for (i = COUNT_OF(bits) - 1; i >= 0; --i) {
         if ((bits[i] & pNumber) != 0) {
             return i;
         }
@@ -182,22 +183,24 @@ void LoadDepthTable(char* pName, br_pixelmap** pTable, int* pPower) {
     tU8 temp;
     LOG_TRACE("(\"%s\", %p, %p)", pName, pTable, pPower);
 
-#define pTABLE_PIXELS ((tU8*)(*pTable)->pixels)
+#define PTABLE_PIXEL_AT(X, Y) ((tU8*)((*pTable)->pixels))[(X) + (Y) * (*pTable)->row_bytes]
 
     PathCat(the_path, gApplication_path, "SHADETAB");
     PathCat(the_path, the_path, pName);
     *pTable = DRPixelmapLoad(the_path);
-    if (!*pTable) {
+    if (*pTable == NULL) {
         FatalError(87);
     }
     *pPower = Log2((*pTable)->height);
     for (i = 0; i < (*pTable)->width; i++) {
         for (j = 0; j < (*pTable)->height / 2; j++) {
-            temp = pTABLE_PIXELS[j * (*pTable)->row_bytes + i];
-            pTABLE_PIXELS[j * (*pTable)->row_bytes + i] = pTABLE_PIXELS[(*pTable)->row_bytes * ((*pTable)->height - j - 1) + i];
-            pTABLE_PIXELS[(*pTable)->row_bytes * ((*pTable)->height - j - 1) + i] = temp;
+            temp = PTABLE_PIXEL_AT(i, j);
+            PTABLE_PIXEL_AT(i, j) = PTABLE_PIXEL_AT(i, ((*pTable)->height - j - 1));
+            PTABLE_PIXEL_AT(i, ((*pTable)->height - j - 1)) = temp;
         }
     }
+
+#undef PTABLE_PIXEL_AT
 }
 
 // IDA: void __cdecl InitDepthEffects()
@@ -217,14 +220,14 @@ void InitDepthEffects() {
     if (!gHorizon_material) {
         FatalError(89);
     }
-    gHorizon_material->index_blend = BrPixelmapAllocate(3u, 256, 256, 0, 0);
+    gHorizon_material->index_blend = BrPixelmapAllocate(BR_PMT_INDEX_8, 256, 256, NULL, 0);
     BrTableAdd(gHorizon_material->index_blend);
     for (i = 0; i < 256; i++) {
         for (j = 0; j < 256; j++) {
             *((tU8*)gHorizon_material->index_blend->pixels + 256 * i + j) = j;
         }
     }
-    gHorizon_material->flags |= 0x20u;
+    gHorizon_material->flags |= BR_MATF_PERSPECTIVE;
     BrMaterialAdd(gHorizon_material);
     gForward_sky_model = CreateHorizonModel(gCamera);
     gRearview_sky_model = CreateHorizonModel(gRearview_camera);
@@ -234,12 +237,12 @@ void InitDepthEffects() {
     // gForward_sky_actor = BrActorAllocate(BR_ACTOR_MODEL, 0);
     // gForward_sky_actor->model = gForward_sky_model;
     // gForward_sky_actor->material = gHorizon_material;
-    // gForward_sky_actor->render_style = 1;
+    // gForward_sky_actor->render_style = BR_RSTYLE_NONE;
     // BrActorAdd(gUniverse_actor, gForward_sky_actor);
     // gRearview_sky_actor = BrActorAllocate(BR_ACTOR_MODEL, 0);
     // gRearview_sky_actor->model = gRearview_sky_model;
     // gRearview_sky_actor->material = gHorizon_material;
-    // gRearview_sky_actor->render_style = 1;
+    // gRearview_sky_actor->render_style = BR_RSTYLE_NONE;
     // BrActorAdd(gUniverse_actor, gRearview_sky_actor);
     gLast_camera_special_volume = 0;
 }
@@ -453,28 +456,52 @@ void DoSpecialCameraEffect(br_actor* pCamera, br_matrix34* pCamera_to_world) {
 void LessDepthFactor() {
     char s[256];
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gProgram_state.current_depth_effect.start > 3) {
+        gProgram_state.current_depth_effect.start--;
+    }
+    sprintf(s, "Depth start reduced to %d", gProgram_state.current_depth_effect.start);
+    NewTextHeadupSlot(4, 0, 500, -1, s);
+    gProgram_state.default_depth_effect.start = gProgram_state.current_depth_effect.start;
 }
 
 // IDA: void __cdecl MoreDepthFactor()
 void MoreDepthFactor() {
     char s[256];
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gProgram_state.current_depth_effect.start < 14) {
+        gProgram_state.current_depth_effect.start++;
+    }
+    sprintf(s, "Depth start increased to %d", gProgram_state.current_depth_effect.start);
+    NewTextHeadupSlot(4, 0, 500, -1, s);
+    gProgram_state.default_depth_effect.start = gProgram_state.current_depth_effect.start;
 }
 
 // IDA: void __cdecl LessDepthFactor2()
 void LessDepthFactor2() {
     char s[256];
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gProgram_state.current_depth_effect.end < 14) {
+        gProgram_state.current_depth_effect.end++;
+    }
+    sprintf(s, "Depth end reduced to %d", gProgram_state.current_depth_effect.end);
+    NewTextHeadupSlot(4, 0, 500, -1, s);
+    gProgram_state.default_depth_effect.end = gProgram_state.current_depth_effect.end;
 }
 
 // IDA: void __cdecl MoreDepthFactor2()
 void MoreDepthFactor2() {
     char s[256];
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gProgram_state.current_depth_effect.end > 0) {
+        gProgram_state.current_depth_effect.end--;
+    }
+    sprintf(s, "Depth end increased to %d", gProgram_state.current_depth_effect.end);
+    NewTextHeadupSlot(4, 0, 500, -1, s);
+    gProgram_state.default_depth_effect.end = gProgram_state.current_depth_effect.end;
 }
 
 // IDA: void __cdecl AssertYons()
@@ -483,7 +510,7 @@ void AssertYons() {
     int i;
     LOG_TRACE("()");
 
-    for (i = 0; i < 2; ++i) {
+    for (i = 0; i < COUNT_OF(gCamera_list); ++i) {
         camera_ptr = gCamera_list[i]->type_data;
         camera_ptr->yon_z = gYon_multiplier * gCamera_yon;
     }
@@ -495,7 +522,13 @@ void IncreaseYon() {
     int i;
     char s[256];
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gCamera_yon = gCamera_yon + 5.f;
+    AssertYons();
+    camera_ptr = gCamera_list[1]->type_data;
+    i = (int)camera_ptr->yon_z;
+    sprintf(s, GetMiscString(114), i);
+    NewTextHeadupSlot(4, 0, 2000, -4, s);
 }
 
 // IDA: void __cdecl DecreaseYon()
@@ -504,23 +537,31 @@ void DecreaseYon() {
     int i;
     char s[256];
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gCamera_yon = gCamera_yon - 5.f;
+    if (gCamera_yon < 5.f) {
+        gCamera_yon = 5.f;
+    }
+    AssertYons();
+    camera_ptr = gCamera_list[1]->type_data;
+    i = (int)camera_ptr->yon_z;
+    sprintf(s, GetMiscString(115), i);
+    NewTextHeadupSlot(4, 0, 2000, -4, s);
 }
 
 // IDA: void __cdecl SetYon(br_scalar pYon)
 void SetYon(br_scalar pYon) {
     int i;
     br_camera* camera_ptr;
-
     LOG_TRACE("(%d)", pYon);
 
     if (pYon < 5.0f) {
         pYon = 5.0f;
     }
 
-    for (i = 0; i < 2; i++) {
+    for (i = 0; i < COUNT_OF(gCamera_list); i++) {
         if (gCamera_list[i]) {
-            camera_ptr = (br_camera*)gCamera_list[i]->type_data;
+            camera_ptr = gCamera_list[i]->type_data;
             camera_ptr->yon_z = pYon;
         }
     }
@@ -530,7 +571,8 @@ void SetYon(br_scalar pYon) {
 // IDA: br_scalar __cdecl GetYon()
 br_scalar GetYon() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    return gCamera_yon;
 }
 
 // IDA: void __cdecl IncreaseAngle()
@@ -539,7 +581,20 @@ void IncreaseAngle() {
     int i;
     char s[256];
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < COUNT_OF(gCamera_list); i++) {
+        camera_ptr = gCamera_list[i]->type_data;
+        camera_ptr->field_of_view += 0x1c7;  // 2.4993896484375 degrees
+        if (camera_ptr->field_of_view > 0x78e3) {  // 169.9969482421875 degrees
+            camera_ptr->field_of_view = 0x78e3;
+        }
+#ifdef DETHRACE_FIX_BUGS
+        sprintf(s, "Camera angle increased to %f", BrAngleToDegrees(camera_ptr->field_of_view));
+#else
+        sprintf(s, "Camera angle increased to %d", gProgram_state.current_depth_effect.end);
+#endif
+        NewTextHeadupSlot(4, 0, 500, -1, s);
+    }
 }
 
 // IDA: void __cdecl DecreaseAngle()
@@ -548,18 +603,48 @@ void DecreaseAngle() {
     int i;
     char s[256];
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < COUNT_OF(gCamera_list); i++) {
+        camera_ptr = gCamera_list[i]->type_data;
+        camera_ptr->field_of_view -= 0x1c7;  // 2.4993896484375 degrees
+        if (camera_ptr->field_of_view < 0x71c) {  // 9.99755859375 degrees
+            camera_ptr->field_of_view = 0x71c;
+        }
+#ifdef DETHRACE_FIX_BUGS
+        sprintf(s, "Camera angle decreased to %f", BrAngleToDegrees(camera_ptr->field_of_view));
+#else
+        sprintf(s, "Camera angle decreased to %d", gProgram_state.current_depth_effect.end);
+#endif
+        NewTextHeadupSlot(4, 0, 500, -1, s);
+    }
 }
 
 // IDA: void __cdecl ToggleDepthMode()
 void ToggleDepthMode() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    switch (gProgram_state.current_depth_effect.type) {
+    case eDepth_effect_none:
+        InstantDepthChange(eDepth_effect_darkness, gProgram_state.current_depth_effect.sky_texture, 8, 0);
+        NewTextHeadupSlot(4, 0, 500, -1, "Darkness mode");
+        break;
+    case eDepth_effect_darkness:
+        InstantDepthChange(eDepth_effect_none, gProgram_state.current_depth_effect.sky_texture, 0, 0);
+        InstantDepthChange(eDepth_effect_fog, gProgram_state.current_depth_effect.sky_texture, 10, 0);
+        NewTextHeadupSlot(4, 0, 500, -1, "Fog mode");
+        break;
+    case eDepth_effect_fog:
+        InstantDepthChange(eDepth_effect_none, gProgram_state.current_depth_effect.sky_texture, 0, 0);
+        NewTextHeadupSlot(4, 0, 500, -1, "Depth effects disabled");
+        break;
+    }
+    gProgram_state.default_depth_effect.type = gProgram_state.current_depth_effect.type;
 }
 
 // IDA: int __cdecl GetSkyTextureOn()
 int GetSkyTextureOn() {
     LOG_TRACE("()");
+
     return gSky_on;
 }
 

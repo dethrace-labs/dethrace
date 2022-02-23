@@ -33,7 +33,7 @@ void BrLexerTokenError(br_lexer* l, br_lexer_token_id t);
 
 void BrLexerPosition(br_lexer* l, char* buf, br_size_t buf_size);
 
-br_scalar BrParseFixed(br_lexer* l);
+br_fixed_ls BrParseFixed(br_lexer* l);
 
 br_float BrParseFloat(br_lexer* l);
 

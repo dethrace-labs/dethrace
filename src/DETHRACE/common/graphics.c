@@ -264,7 +264,7 @@ void BuildColourTable(br_pixelmap* pPalette) {
 
 #define SQR(i) i* i
 
-    for (i = 0; i < 9; ++i) {
+    for (i = 0; i < COUNT_OF(gRGB_colours); ++i) {
         nearest_distance = 0x48400000;
         red = (gRGB_colours[i] >> 16) & 0xFF;
         green = (gRGB_colours[i] >> 8) & 0xFF;
@@ -2295,6 +2295,7 @@ void TellyOutImage(br_pixelmap* pImage, int pLeft, int pTop) {
 // IDA: void __usercall SetShadowLevel(tShadow_level pLevel@<EAX>)
 void SetShadowLevel(tShadow_level pLevel) {
     LOG_TRACE("(%d)", pLevel);
+    
     gShadow_level = pLevel;
 }
 

@@ -9,6 +9,12 @@
 #include "CORE/STD/brstdlib.h"
 #include "CORE/V1DB/def_mat.h"
 #include "CORE/V1DB/def_mdl.h"
+#include "CORE/V1DB/def_otab.h"
+#include "CORE/V1DB/prepmap.h"
+#include "CORE/V1DB/prepmatl.h"
+#include "CORE/V1DB/prepmesh.h"
+#include "CORE/V1DB/preptab.h"
+#include "CORE/V1DB/regsupt.h"
 #include "harness/hooks.h"
 #include "harness/trace.h"
 #include <stdio.h>
@@ -51,22 +57,22 @@ br_error BrV1dbBegin() {
     BrRegistryNew(&v1db.reg_tables);
     v1db.res = BrResAllocate(NULL, 0, BR_MEMORY_ANCHOR);
 
-    for (i = 0; i < 14; i++) {
+    for (i = 0; i < BR_ASIZE(v1db_resourceClasses); i++) {
         BrResClassAdd(&v1db_resourceClasses[i]);
     }
 
     v1db.default_model = BrResAllocate(v1db.res, sizeof(br_model), BR_MEMORY_MODEL);
     memcpy(v1db.default_model, &_BrDefaultModel, sizeof(br_model));
     v1db.default_material = SetupDefaultMaterial();
-    v1db.enabled_lights.type = 2;
-    v1db.enabled_clip_planes.name = "clip plane";
-    v1db.enabled_clip_planes.type = 7;
     v1db.enabled_lights.max = 16;
+    v1db.enabled_lights.type = BR_ACTOR_LIGHT;
     v1db.enabled_lights.name = "light";
     v1db.enabled_clip_planes.max = 6;
+    v1db.enabled_clip_planes.type = BR_ACTOR_CLIP_PLANE;
+    v1db.enabled_clip_planes.name = "clip plane";
     v1db.enabled_horizon_planes.max = 6;
+    v1db.enabled_horizon_planes.type = BR_ACTOR_HORIZONTAL_PLANE;
     v1db.enabled_horizon_planes.name = "horizon plane";
-    v1db.enabled_horizon_planes.type = 8;
     return 0;
 }
 
@@ -74,25 +80,35 @@ br_error BrV1dbBegin() {
 br_error BrV1dbEnd() {
     br_device* dev;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (v1db.active == 0) {
+        return 4102;
+    }
+    v1db.active = 0;
+    BrResFree(v1db.res);
+    BrMemSet(&v1db, 0, sizeof(v1db));
+    return 0;
 }
 
 // IDA: br_uint_32 __cdecl updateTable(br_pixelmap *item, void *arg)
 br_uint_32 updateTable(br_pixelmap* item, void* arg) {
     LOG_TRACE("(%p, %p)", item, arg);
-    NOT_IMPLEMENTED();
+
+    BrTableUpdate(item, BR_TABU_ALL);
 }
 
 // IDA: br_uint_32 __cdecl updateMap(br_pixelmap *item, void *arg)
 br_uint_32 updateMap(br_pixelmap* item, void* arg) {
     LOG_TRACE("(%p, %p)", item, arg);
-    NOT_IMPLEMENTED();
+    
+    BrMapUpdate(item, BR_MAPU_ALL);
 }
 
 // IDA: br_uint_32 __cdecl updateMaterial(br_material *item, void *arg)
 br_uint_32 updateMaterial(br_material* item, void* arg) {
     LOG_TRACE("(%p, %p)", item, arg);
-    NOT_IMPLEMENTED();
+
+    BrMaterialUpdate(item, BR_MATU_ALL);
 }
 
 // IDA: br_uint_32 __cdecl updateModel(br_model *item, void *arg)
@@ -104,25 +120,29 @@ br_uint_32 updateModel(br_model* item, void* arg) {
 // IDA: br_uint_32 __cdecl clearTable(br_pixelmap *item, void *arg)
 br_uint_32 clearTable(br_pixelmap* item, void* arg) {
     LOG_TRACE("(%p, %p)", item, arg);
-    NOT_IMPLEMENTED();
+
+    BrBufferClear(item);
 }
 
 // IDA: br_uint_32 __cdecl clearMap(br_pixelmap *item, void *arg)
 br_uint_32 clearMap(br_pixelmap* item, void* arg) {
     LOG_TRACE("(%p, %p)", item, arg);
-    NOT_IMPLEMENTED();
+
+    BrBufferClear(item);
 }
 
 // IDA: br_uint_32 __cdecl clearMaterial(br_material *item, void *arg)
 br_uint_32 clearMaterial(br_material* item, void* arg) {
     LOG_TRACE("(%p, %p)", item, arg);
-    NOT_IMPLEMENTED();
+
+    BrMaterialClear(item);
 }
 
 // IDA: br_uint_32 __cdecl clearModel(br_model *item, void *arg)
 br_uint_32 clearModel(br_model* item, void* arg) {
     LOG_TRACE("(%p, %p)", item, arg);
-    NOT_IMPLEMENTED();
+
+    BrModelClear(item);
 }
 
 // IDA: br_error __cdecl BrV1dbRendererBegin(br_device_pixelmap *destination, br_renderer *renderer)
@@ -134,25 +154,82 @@ br_error BrV1dbRendererBegin(br_device_pixelmap* destination, br_renderer* rende
 
     Harness_Hook_BrV1dbRendererBegin(&v1db);
     return 0;
+
+    // FIXME: use this logic once the clouds clear up
+    renderer_facility = NULL;
+    tv[0].t = 0;
+    tv[0].v.u32 = 0;
+    tv[1].t = 0;
+    tv[1].v.u32 = 0;
+
+    if (renderer == NULL) {
+        r = BrRendererFacilityFind(&renderer_facility, destination, BRT_FLOAT);
+        if (r != 0) {
+            return r;
+        }
+        if (destination != NULL) {
+            tv[0].t = BRT_DESTINATION_O;
+            tv[0].v.o = (br_object*)destination;
+        }
+        r = (*(br_renderer_facility_dispatch**)renderer_facility)->_rendererNew(renderer_facility, &renderer, tv);
+        if (r != 0) {
+            return r;
+        }
+    }
+    v1db.renderer = renderer;
+    r = BrGeometryFormatFind(&v1db.format_model, renderer, renderer_facility, BRT_FLOAT, BRT_GEOMETRY_V1_MODEL);
+    if (r != 0) {
+        return r;
+    }
+    r = BrGeometryFormatFind(&v1db.format_buckets, renderer, renderer_facility, BRT_FLOAT, BRT_GEOMETRY_V1_BUCKETS);
+    if (r != 0) {
+        return r;
+    }
+    r= BrGeometryFormatFind((br_geometry**)&v1db.format_lighting, renderer, renderer_facility, BRT_FLOAT, BRT_GEOMETRY_LIGHTING);
+    if (r != 0) {
+        return r;
+    }
+    BrModelUpdate(v1db.default_model, BR_MODU_ALL);
+    v1db.default_order_table = &_BrDefaultOrderTable;
+    v1db.primary_order_table = NULL;
+    BrTableEnum(NULL, updateTable, NULL);
+    BrMapEnum(NULL, updateMap, NULL);
+    BrMaterialEnum(NULL, updateMaterial, NULL);
+    BrMaterialUpdate(v1db.default_material, BR_MATU_ALL);
+    BrMaterialUpdate(v1db.default_material, BR_MATU_ALL);
+    return 0;
 }
 
 // IDA: br_renderer* __cdecl BrV1dbRendererQuery()
 br_renderer* BrV1dbRendererQuery() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    return v1db.renderer;
 }
 
 // IDA: br_error __cdecl BrV1dbRendererEnd()
 br_error BrV1dbRendererEnd() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    BrTableEnum(NULL, clearTable, NULL);
+    BrMapEnum(NULL, clearMap, NULL);
+    BrMaterialEnum(NULL, clearMaterial, NULL);
+    BrModelEnum(NULL, clearModel, NULL);
+    BrMaterialClear(v1db.default_material);
+    BrModelClear(v1db.default_model);
+    v1db.default_order_table = NULL;
+    v1db.default_render_data = NULL;
+    v1db.primary_order_table = NULL;
+    v1db.format_model = NULL;
+    v1db.renderer->dispatch->_free((br_object*)v1db.renderer);
+    v1db.renderer = NULL;
 }
 
 // IDA: void __cdecl BrZbBegin(br_uint_8 colour_type, br_uint_8 depth_type)
 void BrZbBegin(br_uint_8 colour_type, br_uint_8 depth_type) {
     LOG_TRACE("(%d, %d)", colour_type, depth_type);
 
-    if (!v1db.zs_active && !v1db.zb_active) {
+    if (v1db.zs_active == 0 && v1db.zb_active == 0) {
         if (BrV1dbRendererBegin((br_device_pixelmap*)BrDevLastBeginQuery(), NULL) != 0) {
             BrFailure("Failed to load renderer\n");
         }
@@ -163,19 +240,35 @@ void BrZbBegin(br_uint_8 colour_type, br_uint_8 depth_type) {
 // IDA: void __cdecl BrZsBegin(br_uint_8 colour_type, void *primitive, br_uint_32 size)
 void BrZsBegin(br_uint_8 colour_type, void* primitive, br_uint_32 size) {
     LOG_TRACE("(%d, %p, %d)", colour_type, primitive, size);
-    NOT_IMPLEMENTED();
+
+    if (v1db.zs_active == 0 && v1db.zb_active == 0) {
+        if (BrV1dbRendererBegin((br_device_pixelmap*)BrDevLastBeginQuery(), NULL) != 0) {
+            BrFailure("Failed to load renderer\n");
+        }
+    }
+    v1db.zs_active = 1;
+    v1db.heap.base = primitive;
+    v1db.heap.size = size;
 }
 
 // IDA: void __cdecl BrZbEnd()
 void BrZbEnd() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    v1db.zb_active = 0;
+    if (v1db.zs_active == 0 && v1db.renderer != NULL) {
+        BrV1dbRendererEnd();
+    }
 }
 
 // IDA: void __cdecl BrZsEnd()
 void BrZsEnd() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    v1db.zs_active = 0;
+    if (v1db.zb_active == 0 && v1db.renderer != NULL) {
+        BrV1dbRendererEnd();
+    }
 }
 
 // IDA: void __cdecl BrV1dbBeginWrapper_Float()

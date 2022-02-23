@@ -11,6 +11,7 @@ extern struct br_font* BrFontProp7x9;
 
 // BrActor
 br_actor* BrActorLoad(char* filename);
+br_uint_32 BrActorLoadMany(char* filename, br_actor** actors, br_uint_16 num);
 br_actor* BrActorAllocate(br_uint_8 type, void* type_data);
 br_actor* BrActorAdd(br_actor* parent, br_actor* a);
 void BrActorRelink(br_actor* parent, br_actor* a);
@@ -96,6 +97,7 @@ void* BrMemCalloc(int nelems, br_size_t size, br_uint_8 type);
 // BrModel
 br_model* BrModelAllocate(char* name, int nvertices, int nfaces);
 br_model* BrModelAdd(br_model* model);
+br_uint_32 BrModelAddMany(br_model** items, int n);
 br_model* BrModelRemove(br_model* model);
 br_model* BrModelLoad(char* filename);
 void BrModelFree(br_model* model);
@@ -105,6 +107,8 @@ br_uint_32 BrModelLoadMany(char* filename, br_model** models, br_uint_16 num);
 // BrPixelmap
 br_pixelmap* BrPixelmapLoad(char* filename);
 br_uint_32 BrPixelmapLoadMany(char* filename, br_pixelmap** pixelmaps, br_uint_16 num);
+br_uint_32 BrPixelmapSave(char* filename, br_pixelmap* ptr);
+br_uint_32 BrPixelmapSaveMany(char* filename, br_pixelmap** pixelmaps, br_uint_16 num);
 void BrPixelmapFree(br_pixelmap* src);
 br_pixelmap* BrPixelmapMatch(br_pixelmap* src, br_uint_8 match_type);
 br_pixelmap* BrPixelmapAllocateSub(br_pixelmap* src, br_int_32 x, br_int_32 y, br_int_32 w, br_int_32 h);
@@ -123,7 +127,6 @@ br_resource_class* BrResClassAdd(br_resource_class* rclass);
 void BrResFree(void* vres);
 char* BrResStrDup(void* vparent, char* str);
 
-br_uint_32 BrSwap32(br_uint_32 l);
 
 // BrTable
 br_pixelmap* BrTableAdd(br_pixelmap* pixelmap);
@@ -137,7 +140,7 @@ br_uint_32 BrTableEnum(char* pattern, br_table_enum_cbfn* callback, void* arg);
 void BrTransformToMatrix34(br_matrix34* mat, br_transform* xform);
 
 // BrV1db
-void BrV1dbBeginWrapper_Float();
+void BrV1dbBeginWrapper_Float(void);
 
 // BrVector3
 // void BrVector3Cross(br_vector3* v1, br_vector3* v2, br_vector3* v3);
@@ -155,8 +158,12 @@ void BrZbBegin(br_uint_8 colour_type, br_uint_8 depth_type);
 
 void BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer);
 void BrZbSceneRenderAdd(br_actor* tree);
-void BrZbSceneRenderEnd();
+void BrZbSceneRenderEnd(void);
 
 br_pixelmap* DOSGfxBegin(char* setup_string);
+
+// Various
+int BrWriteModeSet(int mode);
+br_uint_32 BrSwap32(br_uint_32 l);
 
 #endif

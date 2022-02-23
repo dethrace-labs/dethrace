@@ -11,6 +11,7 @@
 #include "CORE/FW/token.h"
 #include "CORE/STD/brstddiag.h"
 #include "CORE/STD/brstdfile.h"
+#include "CORE/STD/brstdlib.h"
 #include "CORE/STD/brstdmem.h"
 #include "harness/trace.h"
 #include <stddef.h>
@@ -77,19 +78,19 @@ br_error BrFwBegin() {
         return 4103;
     }
 
-    if (!fw.diag)
+    if (fw.diag == NULL)
         fw.diag = _BrDefaultDiagHandler;
-    if (!fw.fsys)
+    if (fw.fsys == NULL)
         fw.fsys = _BrDefaultFilesystem;
-    if (!fw.mem)
+    if (fw.mem == NULL)
         fw.mem = _BrDefaultAllocator;
     fw.open_mode = 0;
     BrRegistryNew(&fw.reg_resource_classes);
 
     fw.resource_class_index[BR_MEMORY_REGISTRY] = &fw_resourceClasses[0];
     fw.resource_class_index[BR_MEMORY_ANCHOR] = &fw_resourceClasses[1];
-    fw.res = BrResAllocate(0, 0, BR_MEMORY_ANCHOR);
-    for (i = 0; i < 25; i++) {
+    fw.res = BrResAllocate(NULL, 0, BR_MEMORY_ANCHOR);
+    for (i = 0; i < BR_ASIZE(fw_resourceClasses); i++) {
         BrResClassAdd(&fw_resourceClasses[i]);
     }
     BrNewList(&fw.images);
@@ -107,14 +108,27 @@ br_error BrFwBegin() {
 // IDA: br_error __cdecl BrFwEnd()
 br_error BrFwEnd() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (fw.active == 0) {
+        return 4102;
+    }
+    BrImageRemove(&Image_BRCORE1);
+    BrResFree(fw.res);
+    BrMemSet(&fw, 0, sizeof(fw));
+    return 0;
 }
 
 // IDA: br_diaghandler* __cdecl BrDiagHandlerSet(br_diaghandler *newdh)
 br_diaghandler* BrDiagHandlerSet(br_diaghandler* newdh) {
     br_diaghandler* old;
     LOG_TRACE("(%p)", newdh);
-    NOT_IMPLEMENTED();
+
+    old = fw.diag;
+    if (newdh == NULL) {
+        newdh = _BrDefaultDiagHandler;
+    }
+    fw.diag = newdh;
+    return old;
 }
 
 // IDA: br_filesystem* __cdecl BrFilesystemSet(br_filesystem *newfs)
@@ -122,7 +136,7 @@ br_filesystem* BrFilesystemSet(br_filesystem* newfs) {
     br_filesystem* old;
 
     old = fw.fsys;
-    if (!newfs) {
+    if (newfs == NULL) {
         newfs = _BrDefaultFilesystem;
     }
     fw.fsys = newfs;
@@ -134,10 +148,11 @@ br_allocator* BrAllocatorSet(br_allocator* newal) {
     br_allocator* old;
     LOG_TRACE("(%p)", newal);
 
-    if (!newal) {
-        fw.mem = _BrDefaultAllocator;
-    } else {
-        fw.mem = newal;
+    old = fw.mem;
+    if (newal == NULL) {
+        newal = _BrDefaultAllocator;
     }
-    return fw.mem;
+    fw.mem = newal;
+
+    return old;
 }

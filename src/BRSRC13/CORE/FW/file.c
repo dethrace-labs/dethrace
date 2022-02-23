@@ -1,7 +1,7 @@
 #include "file.h"
-#include "scratch.h"
 #include "CORE/FW/fwsetup.h"
 #include "CORE/FW/resource.h"
+#include "CORE/FW/scratch.h"
 #include "CORE/STD/brstdlib.h"
 #include "harness/trace.h"
 #include <stdarg.h>
@@ -18,7 +18,8 @@ void _BrFileFree(void* res, br_uint_8 res_class, br_size_t size) {
 // IDA: br_uint_32 __cdecl BrFileAttributes()
 br_uint_32 BrFileAttributes() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    return fw.fsys->attributes();
 }
 
 // IDA: void* __cdecl BrFileOpenRead(char *name, br_size_t n_magics, br_mode_test_cbfn *mode_test, int *mode_result)
@@ -28,20 +29,23 @@ void* BrFileOpenRead(char* name, br_size_t n_magics, br_mode_test_cbfn* mode_tes
     int bin_mode;
     LOG_TRACE("(\"%s\", %d, %p, %p)", name, n_magics, mode_test, mode_result);
 
-    if (mode_result) {
+    bin_mode = 0;
+    if (mode_result != NULL) {
         raw_file = fw.fsys->open_read(name, n_magics, mode_test, mode_result);
     } else {
         raw_file = fw.fsys->open_read(name, n_magics, mode_test, &bin_mode);
     }
 
-    if (!raw_file) {
+    if (raw_file == NULL) {
         return NULL;
     }
-    file = BrResAllocate(fw.res, sizeof(br_file) + BrStrLen(name), BR_MEMORY_FILE);
+    file = BrResAllocate(fw.res, sizeof(br_file) + BrStrLen(name) + 1, BR_MEMORY_FILE);
 
     file->writing = 0;
-    if (mode_result) {
+    if (mode_result != 0) {
         file->mode = *mode_result;
+    } else {
+        file->mode = 0;
     }
     file->raw_file = raw_file;
     BrStrCpy(file->name, name);
@@ -54,10 +58,10 @@ void* BrFileOpenWrite(char* name, int mode) {
     br_file* file;
 
     raw_file = fw.fsys->open_write(name, mode);
-    if (!raw_file) {
+    if (raw_file == NULL) {
         return NULL;
     }
-    file = BrResAllocate(fw.res, sizeof(br_file) + BrStrLen(name), BR_MEMORY_FILE);
+    file = BrResAllocate(fw.res, sizeof(br_file) + BrStrLen(name) + 1, BR_MEMORY_FILE);
     file->writing = 1;
     file->mode = mode;
     file->raw_file = raw_file;
@@ -120,5 +124,6 @@ int BrFilePrintf(void* f, char* fmt, ...) {
     va_start(args, fmt);
     n = BrVSprintf(BrScratchString(), fmt, args);
     va_end(args);
-    return BrFileWrite(BrScratchString(), 1, n, f);
+    BrFileWrite(BrScratchString(), 1, n, f);
+    return n;
 }

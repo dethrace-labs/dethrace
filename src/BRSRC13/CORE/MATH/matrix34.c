@@ -454,6 +454,7 @@ br_matrix34* BrBoundsToMatrix34(br_matrix34* mat, br_bounds* bounds) {
     M(3, 0) = tr.v[0];
     M(3, 1) = tr.v[1];
     M(3, 2) = tr.v[2];
+    return mat;
 }
 
 // IDA: void __cdecl BrMatrix34Copy4(br_matrix34 *A, br_matrix4 *B)

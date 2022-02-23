@@ -495,7 +495,7 @@ tRace_result MainGameLoop() {
     RevertPalette();
     gHost_abandon_game = 0;
     gNo_races_yet = 0;
-    gRace_over_reason = -1;
+    gRace_over_reason = eRace_not_over_yet;
     gMr_odo = 0.0;
     gReceived_game_scores = 0;
     ShowSpecialVolumesIfRequ();

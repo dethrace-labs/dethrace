@@ -7,16 +7,16 @@ br_boolean BrNamePatternMatch(char* p, char* s) {
     char* cp;
     LOG_TRACE9("(\"%s\", \"%s\")", p, s);
 
-    if (!p) {
+    if (p == NULL) {
         return 1;
     }
-    if (!s) {
+    if (s == NULL) {
         return 0;
     }
 
     for (;; s++, p++) {
 
-        if (*p == 0) {
+        if (*p == '\0') {
             // if pattern string ends at the same point as search string, we match
             return *s == 0;
         }
@@ -34,7 +34,7 @@ br_boolean BrNamePatternMatch(char* p, char* s) {
             return *s == 0;
         }
         if (*p == '?') {
-            if (*s == 0) {
+            if (*s == '\0') {
                 return 0;
             }
             continue;

@@ -2,6 +2,7 @@
 
 #include "CORE/FW/brlists.h"
 #include "CORE/FW/fwsetup.h"
+#include "CORE/FW/pattern.h"
 #include "CORE/FW/resource.h"
 #include "CORE/MATH/matrix34.h"
 #include "CORE/MATH/transfrm.h"
@@ -38,14 +39,48 @@ br_uint_32 BrActorSearchMany(br_actor* root, char* pattern, br_actor** actors, i
     int n;
     int remaining;
     LOG_TRACE("(%p, \"%s\", %p, %d)", root, pattern, actors, max);
-    NOT_IMPLEMENTED();
+
+    sub = NULL;
+    if (pattern != NULL) {
+        while (*pattern == '/') {
+            pattern++;
+        }
+        sub = pattern;
+        while (*sub != '\0' && *sub != '/') {
+            sub++;
+        }
+        while (*sub == '/') {
+            sub++;
+        }
+    }
+    a = root->children;
+    remaining = max;
+    while (a != NULL && remaining > 0) {
+        if (BrNamePatternMatch(pattern, a->identifier) != 0) {
+            if (sub == NULL || *sub == '\0') {
+                *actors = a;
+                actors++;
+                remaining--;
+            } else {
+                n = BrActorSearchMany(a, sub, actors, remaining);
+                actors += n;
+                remaining -= n;
+            }
+        }
+        a = a->next;
+    }
+    return max - remaining;
 }
 
 // IDA: br_actor* __cdecl BrActorSearch(br_actor *root, char *pattern)
 br_actor* BrActorSearch(br_actor* root, char* pattern) {
     br_actor* a;
     LOG_TRACE("(%p, \"%s\")", root, pattern);
-    NOT_IMPLEMENTED();
+
+    if (BrActorSearchMany(root, pattern, &a, 1) == 1) {
+        return a;
+    }
+    return NULL;
 }
 
 // IDA: void __usercall RenumberActor(br_actor *a@<EAX>, int d@<EDX>)
@@ -55,9 +90,8 @@ void RenumberActor(br_actor* a, int d) {
 
     ac = a->children;
     a->depth = d;
-    while (ac) {
-        d++;
-        RenumberActor(ac, d);
+    while (ac != NULL) {
+        RenumberActor(ac, d + 1);
         ac = ac->next;
     }
 }

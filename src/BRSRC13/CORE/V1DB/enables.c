@@ -1,6 +1,9 @@
 #include "enables.h"
 #include "CORE/FW/diag.h"
 #include "CORE/FW/resource.h"
+#include "CORE/MATH/matrix34.h"
+#include "CORE/MATH/transfrm.h"
+#include "CORE/V1DB/actsupt.h"
 #include "dbsetup.h"
 #include "harness/trace.h"
 #include <stddef.h>
@@ -51,13 +54,15 @@ void actorDisable(br_v1db_enable* e, br_actor* a) {
 // IDA: void __cdecl BrLightEnable(br_actor *l)
 void BrLightEnable(br_actor* l) {
     LOG_TRACE("(%p)", l);
-    NOT_IMPLEMENTED();
+
+    actorEnable(&v1db.enabled_lights, l);
 }
 
 // IDA: void __cdecl BrLightDisable(br_actor *l)
 void BrLightDisable(br_actor* l) {
     LOG_TRACE("(%p)", l);
-    NOT_IMPLEMENTED();
+
+    actorDisable(&v1db.enabled_lights, l);
 }
 
 // IDA: void __cdecl BrClipPlaneEnable(br_actor *c)
@@ -69,25 +74,29 @@ void BrClipPlaneEnable(br_actor* c) {
 
 // IDA: void __cdecl BrClipPlaneDisable(br_actor *c)
 void BrClipPlaneDisable(br_actor* c) {
+
     actorDisable(&v1db.enabled_clip_planes, c);
 }
 
 // IDA: void __cdecl BrHorizonPlaneEnable(br_actor *h)
 void BrHorizonPlaneEnable(br_actor* h) {
     LOG_TRACE("(%p)", h);
-    NOT_IMPLEMENTED();
+
+    actorEnable(&v1db.enabled_horizon_planes, h);
 }
 
 // IDA: void __cdecl BrHorizonPlaneDisable(br_actor *h)
 void BrHorizonPlaneDisable(br_actor* h) {
     LOG_TRACE("(%p)", h);
-    NOT_IMPLEMENTED();
+
+    actorDisable(&v1db.enabled_horizon_planes, h);
 }
 
 // IDA: br_actor* __cdecl BrEnvironmentSet(br_actor *a)
 br_actor* BrEnvironmentSet(br_actor* a) {
     br_actor* old_a;
     LOG_TRACE("(%p)", a);
+
     old_a = v1db.enabled_environment;
     v1db.enabled_environment = a;
     return old_a;
@@ -99,7 +108,17 @@ br_boolean setupView(br_matrix34* view_to_this, br_matrix34* this_to_view, br_ma
     br_int_32 root_t;
     br_int_32 t;
     LOG_TRACE("(%p, %p, %p, %d, %p, %p)", view_to_this, this_to_view, world_to_view, w2vt, world, a);
-    NOT_IMPLEMENTED();
+    if (ActorToRootTyped(a, world, &this_to_world, &root_t) == 0) {
+        return 0;
+    }
+    BrMatrix34Mul(this_to_view, &this_to_world, world_to_view);
+    t = BrTransformCombineTypes(root_t, w2vt);
+    if (BrTransformTypeIsLP(t) != 0) {
+        BrMatrix34LPInverse(view_to_this, this_to_view);
+    } else {
+        BrMatrix34Inverse(view_to_this, this_to_view);
+    }
+    return 1;
 }
 
 // IDA: void __usercall BrSetupLights(br_actor *world@<EAX>, br_matrix34 *world_to_view@<EDX>, br_int_32 w2vt@<EBX>)
@@ -139,7 +158,26 @@ void BrSetupEnvironment(br_actor* world, br_matrix34* world_to_view, br_int_32 w
     br_matrix34 this_to_view;
     br_token h;
     LOG_TRACE("(%p, %p, %d)", world, world_to_view, w2vt);
-    NOT_IMPLEMENTED();
+
+    h = BRT_DONT_CARE;
+    if (v1db.enabled_environment != NULL) {
+        if (v1db.enabled_environment == world) {
+            if (BrTransformTypeIsLP(w2vt) != 0) {
+                BrMatrix34LPInverse(&view_to_this, world_to_view);
+            } else {
+                BrMatrix34Inverse(&view_to_this, world_to_view);
+            }
+            h = BRT_NONE;
+        } else {
+            if (setupView(&view_to_this, &this_to_view, world_to_view, w2vt, world, v1db.enabled_environment) != 0) {
+                h = BRT_NONE;
+            }
+        }
+    }
+    if (h != BRT_DONT_CARE) {
+        v1db.renderer->dispatch->_partSet(v1db.renderer, BRT_MATRIX, 0, BRT_VIEW_TO_ENVIRONMENT_M34_F, &view_to_this);
+    }
+    v1db.renderer->dispatch->_partSet(v1db.renderer, BRT_MATRIX, 0, BRT_VIEW_TO_ENVIRONMENT_HINT_T, h);
 }
 
 // IDA: void __usercall BrSetupHorizons(br_actor *world@<EAX>, br_matrix34 *world_to_view@<EDX>, br_int_32 w2vt@<EBX>)
@@ -155,7 +193,7 @@ void BrActorEnableCheck(br_actor* a) {
     }
     if (a->type == BR_ACTOR_LIGHT) {
         actorDisable(&v1db.enabled_lights, a);
-    } else if (a->type == BR_ACTOR_MAX) {
+    } else if (a->type == BR_ACTOR_HORIZONTAL_PLANE) {
         actorDisable(&v1db.enabled_horizon_planes, a);
     } else if (a->type <= BR_ACTOR_CLIP_PLANE) {
         actorDisable(&v1db.enabled_clip_planes, a);
