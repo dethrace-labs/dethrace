@@ -1,11 +1,14 @@
 #include "brucetrk.h"
 
 #include "brender/brender.h"
+#include "errors.h"
 #include "globvars.h"
 #include "globvrbm.h"
 #include "harness/trace.h"
 #include "init.h"
+#include "utility.h"
 #include "world.h"
+#include "pd/sys.h"
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -92,7 +95,54 @@ void StripBlendedFaces(br_actor* pActor, br_model* pModel) {
     char s[256];
     static tU16 nfaces_allocated;
     LOG_TRACE("(%p, %p)", pActor, pModel);
-    STUB();
+
+    changed_one = 0;
+    face = &pModel->faces[0];
+    for (i = 0; i < pModel->nfaces; i++, face++) {
+        if (face->material != NULL && face->material->identifier != NULL && ((face->material->identifier[0] == '!' && face->material->identifier[1] == '!' && gDefault_blend_pc != 0) || face->material->identifier[1] == '\\' )) {
+            if (gMr_blendy == NULL) {
+                gMr_blendy = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+                gMr_blendy->render_style = BR_RSTYLE_NONE;
+                gMr_blendy->model = BrModelAllocate(NULL, pModel->nvertices, pModel->nfaces);
+                nfaces_allocated = pModel->nfaces;
+                gMr_blendy->model->nfaces = 0;
+                gMr_blendy->model->flags |= BR_MODF_UPDATEABLE;
+                memcpy(gMr_blendy->model->vertices, pModel->vertices, pModel->nvertices * sizeof(br_vertex));
+            }
+            if (!AlreadyBlended(face->material)) {
+                if (face->material->identifier[1] == '\\') {
+                    if (face->material->identifier[2] == '2') {
+                        BlendifyMaterial(face->material, 25);
+                    } else if (face->material->identifier[2] == '7') {
+                        BlendifyMaterial(face->material, 75);
+                    } else {
+                        BlendifyMaterial(face->material, 50);
+                    }
+                    BrMaterialUpdate(face->material, BR_MATU_ALL);
+                }
+            }
+            if (nfaces_allocated <= gMr_blendy->model->nfaces) {
+                PDFatalError("Perfectly understandable error by Batwick, thank you very much Bruce.");
+            }
+            memcpy(&gMr_blendy->model->faces[gMr_blendy->model->nfaces], face, sizeof(br_face));
+            gMr_blendy->model->nfaces++;
+            if (i < (pModel->nfaces - 1)) {
+                memcpy(&pModel->faces[i], &pModel->faces[i + 1], (pModel->nfaces - i - 1) * sizeof(br_face));
+            }
+            pModel->nfaces--;
+            changed_one = 1;
+            i--;
+            face = &pModel->faces[i];
+        }
+    }
+    if (changed_one) {
+        if (pModel->nfaces != 0) {
+            BrModelUpdate(pModel, BR_MODU_ALL);
+        } else {
+            pActor->model = NULL;
+            pActor->type = BR_ACTOR_NONE;
+        }
+    }
 }
 
 // IDA: br_uint_32 __cdecl FindNonCarsCB(br_actor *pActor, tTrack_spec *pTrack_spec)
@@ -103,8 +153,42 @@ intptr_t FindNonCarsCB(br_actor* pActor, tTrack_spec* pTrack_spec) {
     br_scalar r3;
     LOG_TRACE("(%p, %p)", pActor, pTrack_spec);
 
-    STUB();
-    return 0;
+    if (pActor->identifier != NULL && pActor->identifier[0] == '&' && pActor->identifier[1] >= '0' && pActor->identifier[1] <= '9') {
+        i = (pActor->identifier[4] - '0') * 1000 + (pActor->identifier[5] - '0') * 100 + (pActor->identifier[6] - '0') * 10 + (pActor->identifier[7] - '0');
+        if (i < 0 || pTrack_spec->ampersand_digits <= i) {
+            return 1;
+        }
+        r1 = BR_SQR3(pActor->t.t.mat.m[0][0], pActor->t.t.mat.m[0][1], pActor->t.t.mat.m[0][2]);
+        r2 = BR_SQR3(pActor->t.t.mat.m[1][0], pActor->t.t.mat.m[1][1], pActor->t.t.mat.m[1][2]);
+        r3 = BR_SQR3(pActor->t.t.mat.m[2][0], pActor->t.t.mat.m[2][1], pActor->t.t.mat.m[2][2]);
+        if (r1 < .999f || r2 < .999f || r3 < .999f) {
+            dr_dprintf("non car was scaled down %s", pActor->identifier);
+            pActor->t.t.translate.t.v[0] += 2000.f;
+        }
+        if (r1 > 1.001f || r2 > 1.001f || r3 > 1.001f) {
+            r1 = 1.f / sqrtf(r1);
+            r2 = 1.f / sqrtf(r2);
+            r3 = 1.f / sqrtf(r3);
+            pActor->t.t.mat.m[0][0] *= r1;
+            pActor->t.t.mat.m[0][1] *= r1;
+            pActor->t.t.mat.m[0][2] *= r1;
+            pActor->t.t.mat.m[1][0] *= r2;
+            pActor->t.t.mat.m[1][1] *= r2;
+            pActor->t.t.mat.m[1][2] *= r2;
+            pActor->t.t.mat.m[2][0] *= r3;
+            pActor->t.t.mat.m[2][1] *= r3;
+            pActor->t.t.mat.m[2][2] *= r3;
+            dr_dprintf("non car was scaled up %s", pActor->identifier);
+        }
+        pTrack_spec->non_car_list[i] = pActor;
+        pActor->type_data = NULL;
+        return 0;
+    } else {
+        if (pActor->model != NULL && !gAusterity_mode && pActor->identifier != NULL && pActor->identifier[0] != '&') {
+            StripBlendedFaces(pActor, pActor->model);
+        }
+        return BrActorEnum(pActor, (br_actor_enum_cbfn*)FindNonCarsCB, pTrack_spec);
+    }
 }
 
 // IDA: br_uint_32 __cdecl ProcessModelsCB(br_actor *pActor, tTrack_spec *pTrack_spec)
@@ -128,7 +212,7 @@ intptr_t ProcessModelsCB(br_actor* pActor, tTrack_spec* pTrack_spec) {
             for (group = 0; V11MODEL(gMr_blendy->model)->ngroups > group; ++group) {
                 V11MODEL(gMr_blendy->model)->groups[group].face_colours_material = gMr_blendy->model->faces[*V11MODEL(gMr_blendy->model)->groups[group].face_user].material;
             }
-            gMr_blendy->model->flags &= 0xFF7Fu;
+            gMr_blendy->model->flags &= ~BR_MODF_UPDATEABLE;
             DodgyModelUpdate(gMr_blendy->model);
             pTrack_spec->blends[z][x] = gMr_blendy;
         }
