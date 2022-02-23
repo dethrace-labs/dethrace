@@ -590,7 +590,6 @@ void ChangeTextTo(int pXcoord, int pYcoord, char* pNew_str, char* pOld_str) {
         }
     }
     for (i = len; i < len2; i++) {
-        // new_type should be calculated here.
         AddRollingLetter(pNew_str[i], gCurrent_graf_data->rolling_letter_x_pitch * i + pXcoord, pYcoord, new_type);
     }
 }
