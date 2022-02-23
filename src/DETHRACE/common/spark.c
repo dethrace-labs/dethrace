@@ -1,5 +1,6 @@
 #include "spark.h"
 #include "brender/brender.h"
+#include "car.h"
 #include "errors.h"
 #include "globvars.h"
 #include "graphics.h"
@@ -7,6 +8,8 @@
 #include "loading.h"
 #include "utility.h"
 #include "world.h"
+
+#include <math.h>
 #include <stdlib.h>
 
 int gNext_spark;
@@ -156,7 +159,69 @@ void CreateSparks(br_vector3* pos, br_vector3* v, br_vector3* pForce, br_scalar 
     int num;
     int i;
     LOG_TRACE("(%p, %p, %p, %f, %p)", pos, v, pForce, sparkiness, pCar);
-    STUB();
+
+    ts = BrVector3Length(pForce);
+    BrVector3InvScale(&normal, pForce, ts);
+    ts2 = BrVector3Dot(pForce, v);
+    if (ts2 >= 0) {
+        ts2 = 1.f / (10.f * ts);
+    } else {
+        ts2 = 1.f / (10.f * ts) - ts2 / (ts * ts);
+    }
+    BrVector3Scale(&norm, pForce, ts2);
+    BrVector3Accumulate(v, &norm);
+    num = FRandomBetween(0.f, BrVector3Length(v) / 2.f + 0.7f) * sparkiness;
+    if (num > 10) {
+        num = 10;
+    }
+    for (i = 0; i < num; i++) {
+        BrVector3Copy(&gSparks[gNext_spark].pos, pos);
+        BrVector3Copy(&gSparks[gNext_spark].normal, &normal);
+        BrVector3Copy(&gSparks[gNext_spark].v, v);
+        gSparks[gNext_spark].v.v[0] *= FRandomBetween(.5f, .9f);
+        gSparks[gNext_spark].v.v[1] *= FRandomBetween(.5f, .9f);
+        gSparks[gNext_spark].v.v[2] *= FRandomBetween(.5f, .9f);
+        gSparks[gNext_spark].count = 1000;
+        gSparks[gNext_spark].car = NULL;
+        gSpark_flags |= 1 << (gNext_spark & 0x1f);
+        gSparks[gNext_spark].time_sync = gMechanics_time_sync;
+        gSparks[gNext_spark].colour = 0;
+        gNext_spark++;
+        if (gNext_spark >= COUNT_OF(gSparks)) {
+            gNext_spark = 0;
+        }
+    }
+    if ((ts * sparkiness) >= 10.f) {
+        tv.v[0] = pos->v[0] - pCar->car_master_actor->t.t.translate.t.v[0] / WORLD_SCALE;
+        tv.v[1] = pos->v[1] - pCar->car_master_actor->t.t.translate.t.v[1] / WORLD_SCALE;
+        tv.v[2] = pos->v[2] - pCar->car_master_actor->t.t.translate.t.v[2] / WORLD_SCALE;
+        BrMatrix34TApplyV(&pos2, &tv, &pCar->car_master_actor->t.t.mat);
+        BrMatrix34TApplyV(&norm, &normal, &pCar->car_master_actor->t.t.mat);
+        BrVector3Scale(&tv, &norm, .1f);
+        BrVector3Accumulate(&pos2, &tv);
+        num = (int)(ts * sparkiness / 10.f) + 3;
+        if (num > 10) {
+            num = 10;
+        }
+        for (i = 0; i < num; i++) {
+            BrVector3Copy(&gSparks[gNext_spark].pos, &pos2);
+            BrVector3Copy(&gSparks[gNext_spark].normal, &norm);
+            BrVector3SetFloat(&tv, FRandomBetween(-1.f, 1.f), FRandomBetween(-.2f, 1.f), FRandomBetween(-1.f, 1.f));
+            ts2 = BrVector3Dot(&norm, &tv);
+            BrVector3Scale(&tv2, &norm, ts2);
+            BrVector3Sub(&gSparks[gNext_spark].v, &tv, &tv2);
+            gSparks[gNext_spark].count = 1000;
+            gSparks[gNext_spark].car = pCar;
+            gSpark_flags |= 1 << (gNext_spark & 0x1f);
+            gSparks[gNext_spark].time_sync = gMechanics_time_sync;
+            gSparks[gNext_spark].colour = 0;
+            gNext_spark++;
+            if (gNext_spark >= COUNT_OF(gSparks)) {
+                gNext_spark = 0;
+            }
+        }
+        CreateShrapnelShower(pos, v, &normal, ts, pCar, pCar);
+    }
 }
 
 // IDA: void __usercall CreateSparkShower(br_vector3 *pos@<EAX>, br_vector3 *v@<EDX>, br_vector3 *pForce@<EBX>, tCar_spec *pCar1@<ECX>, tCar_spec *pCar2)
@@ -170,7 +235,44 @@ void CreateSparkShower(br_vector3* pos, br_vector3* v, br_vector3* pForce, tCar_
     br_vector3 tv2;
     br_vector3 normal;
     LOG_TRACE("(%p, %p, %p, %p, %p)", pos, v, pForce, pCar1, pCar2);
-    NOT_IMPLEMENTED();
+
+    ts = BrVector3Length(pForce);
+    if (pCar1->driver == eDriver_local_human) {
+        c = pCar1;
+    } else {
+        c = pCar2;
+    }
+    BrVector3InvScale(&tv, pForce, ts);
+    if (ts < 10.f) {
+        return;
+    }
+    CreateShrapnelShower(pos, v, &tv, ts, pCar1, pCar2);
+    ts2 = BrVector3Dot(pForce, v) / (ts * ts);
+    BrVector3Scale(v, pForce, ts2);
+    normal.v[0] = pos->v[0] - c->car_master_actor->t.t.translate.t.v[0] / WORLD_SCALE;
+    normal.v[1] = pos->v[1] - c->car_master_actor->t.t.translate.t.v[1] / WORLD_SCALE;
+    normal.v[2] = pos->v[2] - c->car_master_actor->t.t.translate.t.v[2] / WORLD_SCALE;
+    BrMatrix34TApplyV(pos, &normal, &c->car_master_actor->t.t.mat);
+    BrMatrix34TApplyV(&normal, pForce, &c->car_master_actor->t.t.mat);
+    num = (int)(ts / 10.f) + 3;
+    for (i = 0; i < num; i++) {
+        BrVector3Copy(&gSparks[gNext_spark].pos, pos);
+        BrVector3SetFloat(&gSparks[gNext_spark].normal, 0.f, 0.f, 0.f);
+        BrVector3SetFloat(&normal, FRandomBetween(-1.f, 1.f), FRandomBetween(-.2f, 1.f), FRandomBetween(-1.f, 1.f));
+        ts2 = BrVector3LengthSquared(&normal) / (ts * ts);
+        BrVector3Scale(&tv, &normal, ts2);
+        BrVector3Sub(&gSparks[gNext_spark].v, &normal, &tv);
+        BrVector3Accumulate(&gSparks[gNext_spark].v, v);
+        gSparks[gNext_spark].count = 1000;
+        gSparks[gNext_spark].car = c;
+        gSpark_flags |= 1 << (gNext_spark & 0x1f);
+        gSparks[gNext_spark].time_sync = gMechanics_time_sync;
+        gSparks[gNext_spark].colour = 0;
+        gNext_spark++;
+        if (gNext_spark >= COUNT_OF(gSparks)) {
+            gNext_spark = 0;
+        }
+    }
 }
 
 // IDA: void __usercall AdjustSpark(int pSpark_num@<EAX>, br_vector3 *pos@<EDX>, br_vector3 *length@<EBX>)
@@ -179,27 +281,66 @@ void AdjustSpark(int pSpark_num, br_vector3* pos, br_vector3* length) {
     br_matrix34* mat;
     int i;
     LOG_TRACE("(%d, %p, %p)", pSpark_num, pos, length);
-    NOT_IMPLEMENTED();
+
+    i = pSpark_num & 0xff;
+    gSpark_flags |= 1 << pSpark_num & 0x1f;
+    if (gSparks[i].car != NULL) {
+        mat = &gSparks[i].car->car_master_actor->t.t.mat;
+        tv.v[0] = pos->v[0] - mat->m[3][0];
+        tv.v[1] = pos->v[0] - mat->m[3][1];
+        tv.v[2] = pos->v[0] - mat->m[3][2];
+        BrMatrix34TApplyV(&gSparks[i].pos, &tv, mat);
+    } else {
+        gSparks[i].pos.v[0] = pos->v[0];
+        gSparks[i].pos.v[1] = pos->v[1];
+        gSparks[i].pos.v[2] = pos->v[2];
+    }
+    gSparks[i].length.v[0] = length->v[0];
+    gSparks[i].length.v[1] = length->v[1];
+    gSparks[i].length.v[2] = length->v[2];
+    gSparks[i].colour = pSpark_num >> 8;
 }
 
 // IDA: void __usercall AdjustShrapnel(int pShrapnel_num@<EAX>, br_vector3 *pos@<EDX>, tU16 pAge@<EBX>, br_material *pMaterial@<ECX>)
 void AdjustShrapnel(int pShrapnel_num, br_vector3* pos, tU16 pAge, br_material* pMaterial) {
     int i;
     LOG_TRACE("(%d, %p, %d, %p)", pShrapnel_num, pos, pAge, pMaterial);
-    NOT_IMPLEMENTED();
+
+    i = pShrapnel_num & 0x7fff;
+    if (!(gShrapnel_flags & (1 << (i & 0x1f)))) {
+        BrActorAdd(gNon_track_actor, gShrapnel[i].actor);
+    }
+    gShrapnel_flags |= 1 << (i & 0x1f);
+    gShrapnel[i].actor->t.t.translate.t.v[0] = pos->v[0];
+    gShrapnel[i].actor->t.t.translate.t.v[1] = pos->v[1];
+    gShrapnel[i].actor->t.t.translate.t.v[2] = pos->v[2];
+    if (pShrapnel_num & 0x8000) {
+        gShrapnel[i].age = pAge;
+        gShrapnel[i].actor->material = pMaterial;
+    }
 }
 
 // IDA: void __cdecl ResetSparks()
 void ResetSparks() {
     LOG_TRACE("()");
-    STUB();
+
+    gSpark_flags = 0;
 }
 
 // IDA: void __cdecl ResetShrapnel()
 void ResetShrapnel() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gShrapnel_flags == 0) {
+        return;
+    }
+    for (i = 0; i < COUNT_OF(gShrapnel); i++) {
+        if (gShrapnel_flags & (1 << i)) {
+            BrActorRemove(gShrapnel[i].actor);
+        }
+    }
+    gShrapnel_flags = 0;
 }
 
 // IDA: void __usercall CreateShrapnelShower(br_vector3 *pos@<EAX>, br_vector3 *v@<EDX>, br_vector3 *pNormal@<EBX>, br_scalar pForce, tCar_spec *c1, tCar_spec *c2)
@@ -214,7 +355,44 @@ void CreateShrapnelShower(br_vector3* pos, br_vector3* v, br_vector3* pNormal, b
     br_vector3 tv2;
     br_vector3 vel;
     LOG_TRACE("(%p, %p, %p, %f, %p, %p)", pos, v, pNormal, pForce, c1, c2);
-    NOT_IMPLEMENTED();
+
+    if (pForce < 10.f) {
+        return;
+    }
+    ts = .3f;
+    if (v->v[1] < 0.f) {
+        ts = .3f - v->v[1];
+    }
+    ts *= pNormal->v[1];
+    tv.v[0] = v->v[0] - ts * pNormal->v[0];
+    tv.v[1] = v->v[1] + ts - pNormal->v[1] * ts;
+    tv.v[2] = v->v[2] - pNormal->v[2] * ts;
+    num = (int)(pForce / 10.f) * 3;
+    ts2 = ((pForce + 20.f) * 3.f) / 200.f;
+    for (i = 0; i < num; i++) {
+        if ((gShrapnel_flags & (1 << (gNext_shrapnel & 0x1f))) == 0) {
+            BrActorAdd(gNon_track_actor, gShrapnel[gNext_shrapnel].actor);
+        }
+        gShrapnel_flags |= 1 << (gNext_shrapnel & 0x1f);
+        BrVector3Copy(&gShrapnel[gNext_shrapnel].actor->t.t.translate.t, pos);
+        BrVector3SetFloat(&vel, FRandomBetween(-ts2, ts2), FRandomBetween(-tv.v[1] + 0.3f, ts2), FRandomBetween(-ts2, ts2));
+        ts2 = BrVector3Dot(pNormal, &vel);
+        BrVector3Scale(&tv2, pNormal, ts2);
+        BrVector3Sub(&gShrapnel[gNext_shrapnel].v, &vel, &tv2);
+        BrVector3Accumulate(&gShrapnel[gNext_shrapnel].v, &tv);
+        gShrapnel[gNext_shrapnel].time_sync = gMechanics_time_sync;
+        gShrapnel[gNext_shrapnel].age = 0;
+        if (IRandomBetween(0, 2) != 0) {
+            c = (IRandomBetween(0, 1) != 0) ? c1 : c2;
+            gShrapnel[gNext_shrapnel].actor->material = c->shrapnel_material[IRandomBetween(0, c->max_shrapnel_material - 1)];
+        } else {
+            gShrapnel[gNext_shrapnel].actor->material = gBlack_material;
+        }
+        gNext_shrapnel++;
+        if (gNext_shrapnel >= COUNT_OF(gShrapnel)) {
+            gNext_shrapnel = 0;
+        }
+    }
 }
 
 // IDA: void __cdecl InitShrapnel()
@@ -223,13 +401,31 @@ void InitShrapnel() {
     int j;
     LOG_TRACE("()");
 
-    STUB();
+    for (i = 0; i < COUNT_OF(gShrapnel); i++) {
+        gShrapnel[i].actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+        gShrapnel[i].actor->parent = NULL;
+        gShrapnel[i].actor->model = gShrapnel_model[1];
+        gShrapnel[i].actor->render_style = BR_RSTYLE_DEFAULT;
+        gShrapnel[i].actor->t.type = BR_TRANSFORM_MATRIX34;
+        gShrapnel[i].actor->material = BrMaterialFind("DEBRIS.MAT");
+        gShrapnel[i].age = 0;
+        gShrapnel[i].shear1 = FRandomBetween(-2.f, 2.f);
+        gShrapnel[i].shear2 = FRandomBetween(-2.f, 2.f);
+        BrVector3SetFloat(&gShrapnel[i].axis,
+            FRandomBetween(-1.f, 1.f), FRandomBetween(-1.f, 1.f), FRandomBetween(-1.f, 1.f));
+        BrVector3Normalise(&gShrapnel[i].axis, &gShrapnel[i].axis);
+    }
 }
 
 // IDA: void __cdecl LoadInShrapnel()
 void LoadInShrapnel() {
     LOG_TRACE("()");
-    STUB();
+
+    gShrapnel_model[0] = LoadModel("FRAG4.DAT");
+    gShrapnel_model[1] = LoadModel("FRAG5.DAT");
+    BrModelAdd(gShrapnel_model[0]);
+    BrModelAdd(gShrapnel_model[1]);
+    gBlack_material = BrMaterialFind("M14.MAT");
 }
 
 // IDA: void __usercall KillShrapnel(int i@<EAX>)
@@ -242,7 +438,18 @@ void KillShrapnel(int i) {
 void DisposeShrapnel() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < COUNT_OF(gShrapnel); i++) {
+        if (gShrapnel_flags & (1 << i)) {
+            BrActorRemove(gShrapnel[i].actor);
+        }
+        BrActorFree(gShrapnel[i].actor);
+    }
+    gShrapnel_flags = 0;
+    for (i = 0; i < COUNT_OF(gShrapnel_model); i++) {
+        BrModelRemove(gShrapnel_model[i]);
+        BrModelFree(gShrapnel_model[0]);
+    }
 }
 
 // IDA: void __usercall ReplayShrapnel(tU32 pTime@<EAX>)
@@ -566,7 +773,7 @@ void InitSplash(FILE* pF) {
 
     gSplash_flags = 0;
     gSplash_model = BrModelAllocate("Splash", 4, 2);
-    if (pF) {
+    if (pF != NULL) {
         num = GetAnInt(pF);
         gNum_splash_types = 0;
         for (i = 0; num > i; ++i) {
@@ -574,7 +781,7 @@ void InitSplash(FILE* pF) {
             PathCat(the_path, gApplication_path, "PIXELMAP");
             PathCat(the_path, the_path, s);
             num_files = DRPixelmapLoadMany(the_path, &splash_maps[gNum_splash_types], 20 - gNum_splash_types);
-            if (!num_files) {
+            if (num_files == 0) {
                 FatalError(79, the_path);
             }
             gNum_splash_types += num_files;
@@ -587,45 +794,45 @@ void InitSplash(FILE* pF) {
     BrMapAddMany(splash_maps, gNum_splash_types);
     for (i = 0; i < gNum_splash_types; ++i) {
         gSplash_material[i] = BrMaterialAllocate(0);
-        gSplash_material[i]->flags &= 0xFFFFFFFC;
-        gSplash_material[i]->flags |= 0x820u;
+        gSplash_material[i]->flags &= ~ (BR_MATF_LIGHT | BR_MATF_PRELIT);
+        gSplash_material[i]->flags |= BR_MATF_ALWAYS_VISIBLE | BR_MATF_PERSPECTIVE;
         gSplash_material[i]->index_blend = LoadSingleShadeTable(&gTrack_storage_space, "BLEND50.TAB");
         gSplash_material[i]->colour_map = splash_maps[i];
         BrMaterialAdd(gSplash_material[i]);
     }
     gSplash_model->nvertices = 4;
-    BrVector3SetFloat(&gSplash_model->vertices->p, -0.5, 0.0, 0.0);
-    BrVector3SetFloat(&gSplash_model->vertices[1].p, 0.5, 0.0, 0.0);
-    BrVector3SetFloat(&gSplash_model->vertices[2].p, 0.5, 1.0, 0.0);
-    BrVector3SetFloat(&gSplash_model->vertices[3].p, -0.5, 1.0, 0.0);
-    gSplash_model->vertices->map.v[0] = 0.0;
-    gSplash_model->vertices->map.v[1] = 1.0;
-    gSplash_model->vertices[1].map.v[0] = 1.0;
-    gSplash_model->vertices[1].map.v[1] = 1.0;
-    gSplash_model->vertices[2].map.v[0] = 1.0;
-    gSplash_model->vertices[2].map.v[1] = 0.0;
-    gSplash_model->vertices[3].map.v[0] = 0.0;
-    gSplash_model->vertices[3].map.v[1] = 0.0;
+    BrVector3SetFloat(&gSplash_model->vertices[0].p, -0.5f, 0.0f, 0.0f);
+    BrVector3SetFloat(&gSplash_model->vertices[1].p,  0.5f, 0.0f, 0.0f);
+    BrVector3SetFloat(&gSplash_model->vertices[2].p,  0.5f, 1.0f, 0.0f);
+    BrVector3SetFloat(&gSplash_model->vertices[3].p, -0.5f, 1.0f, 0.0f);
+    gSplash_model->vertices[0].map.v[0] = 0.0f;
+    gSplash_model->vertices[0].map.v[1] = 1.0f;
+    gSplash_model->vertices[1].map.v[0] = 1.0f;
+    gSplash_model->vertices[1].map.v[1] = 1.0f;
+    gSplash_model->vertices[2].map.v[0] = 1.0f;
+    gSplash_model->vertices[2].map.v[1] = 0.0f;
+    gSplash_model->vertices[3].map.v[0] = 0.0f;
+    gSplash_model->vertices[3].map.v[1] = 0.0f;
     gSplash_model->nfaces = 2;
-    gSplash_model->faces->vertices[0] = 0;
-    gSplash_model->faces->vertices[1] = 1;
-    gSplash_model->faces->vertices[2] = 2;
+    gSplash_model->faces[0].vertices[0] = 0;
+    gSplash_model->faces[0].vertices[1] = 1;
+    gSplash_model->faces[0].vertices[2] = 2;
     gSplash_model->faces[1].vertices[0] = 0;
     gSplash_model->faces[1].vertices[1] = 2;
     gSplash_model->faces[1].vertices[2] = 3;
-    gSplash_model->faces->smoothing = 1;
+    gSplash_model->faces[0].smoothing = 1;
     gSplash_model->faces[1].smoothing = 1;
     BrModelAdd(gSplash_model);
     for (i = 0; i < 32; ++i) {
-        gSplash[i].actor = BrActorAllocate(BR_ACTOR_MODEL, 0);
+        gSplash[i].actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
         actor = gSplash[i].actor;
         actor->model = gSplash_model;
-        if (gNum_splash_types) {
+        if (gNum_splash_types != 0) {
             actor->material = gSplash_material[IRandomBetween(0, gNum_splash_types - 1)];
         } else {
-            actor->material = 0;
+            actor->material = NULL;
         }
-        gSplash[i].scale_x = SRandomBetween(0.89999998, 1.1) * (float)(2 * IRandomBetween(0, 1) - 1);
+        gSplash[i].scale_x = SRandomBetween(0.9f, 1.1f) * (2 * IRandomBetween(0, 1) - 1);
     }
 }
 
