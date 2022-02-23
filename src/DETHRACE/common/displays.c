@@ -79,7 +79,7 @@ void ClearHeadupSlot(int pSlot_index) {
 
     the_headup = gHeadups;
     for (i = 0; i < COUNT_OF(gHeadups); i++) {
-        if (the_headup->type && the_headup->slot_index == pSlot_index) {
+        if (the_headup->type != eHeadup_unused && the_headup->slot_index == pSlot_index) {
             ClearHeadup(i);
             return;
         }
@@ -126,11 +126,13 @@ void DRPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFont, cha
     int ch_width;
     unsigned char* ch;
     LOG_TRACE9("(%p, %d, %d, %p, \"%s\", %d)", pPixelmap, pX, pY, pFont, pText, pRight_edge);
+
     len = strlen(pText);
-    if (pX >= 0 && pPixelmap->width >= pRight_edge && pY >= 0 && pY + pFont->height <= pPixelmap->height) {
+    if (pX >= 0 && pPixelmap->width >= pRight_edge && pY >= 0 && (pY + pFont->height) <= pPixelmap->height) {
         x = pX;
         for (i = 0; i < len; i++) {
             chr = pText[i] - pFont->offset;
+            ch_width = pFont->width_table[chr];
             DRPixelmapRectangleOnscreenCopy(
                 gBack_screen,
                 x,
@@ -138,14 +140,28 @@ void DRPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFont, cha
                 pFont->images,
                 0,
                 pFont->height * chr,
-                pFont->width_table[chr],
+                ch_width,
                 pFont->height);
 
-            x += pFont->width_table[chr] + pFont->spacing;
+            x += ch_width + pFont->spacing;
         }
     } else {
-        TELL_ME_IF_WE_PASS_THIS_WAY();
-        //DRPixelmapRectangleMaskedCopy ...
+        x = pX;
+        for (i = 0; i < len; i++) {
+            chr = pText[i] - pFont->offset;
+            ch_width = pFont->width_table[chr];
+            DRPixelmapRectangleMaskedCopy(
+                gBack_screen,
+                x,
+                pY,
+                pFont->images,
+                0,
+                pFont->height * chr,
+                ch_width,
+                pFont->height);
+
+            x += ch_width + pFont->spacing;
+        }
     }
 }
 
@@ -1214,7 +1230,37 @@ void EarnCredits2(int pAmount, char* pPrefix_text) {
     tU32 the_time;
     LOG_TRACE("(%d, \"%s\")", pAmount, pPrefix_text);
 
-    STUB();
+    if (gRace_finished) {
+        return;
+    }
+    the_time = GetTotalTime();
+    if (pAmount == 0) {
+        return;
+    }
+    if (gNet_mode != eNet_mode_none && (gProgram_state.credits_earned - gProgram_state.credits_lost + pAmount) < 0) {
+        // Should this also substract pAmount?
+        pAmount = gProgram_state.credits_lost - gProgram_state.credits_lost;
+    }
+    original_amount = pAmount;
+    if (gLast_credit_headup__displays >= 0 && (the_time - gLast_earn_time) < 2000) {
+        pAmount += gLast_credit_amount;
+    }
+    gLast_credit_amount = pAmount;
+    if (pAmount >= 2) {
+        sprintf(s, "%s%d %s", pPrefix_text, pAmount, GetMiscString(12));
+        gProgram_state.credits_earned += original_amount;
+    } else if (pAmount >= 1) {
+        sprintf(s, "%s1 %s", pPrefix_text, GetMiscString(13));
+        gProgram_state.credits_earned += original_amount;
+    } else if (pAmount >= -1) {
+        sprintf(s, "%s%s 1 %s", pPrefix_text, GetMiscString(14), GetMiscString(15));
+        gProgram_state.credits_lost -= original_amount;
+    } else {
+        sprintf(s, "%s%s %d %s", GetMiscString(14), pPrefix_text, -pAmount, GetMiscString(12));
+        gProgram_state.credits_lost -= original_amount;
+    }
+    gLast_credit_headup__displays = NewTextHeadupSlot(4, 0, 2000, -4, s);
+    gLast_earn_time = the_time;
 }
 
 // IDA: void __usercall EarnCredits(int pAmount@<EAX>)
