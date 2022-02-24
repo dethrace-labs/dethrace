@@ -5,6 +5,8 @@
 #include "CORE/MATH/vector.h"
 #include "harness/trace.h"
 
+#include <string.h>
+
 #define M34 BR_TRANSFORM_MATRIX34
 #define MLP BR_TRANSFORM_MATRIX34_LP
 #define QUT BR_TRANSFORM_QUAT
@@ -188,12 +190,53 @@ void BrMatrix4PreTransform(br_matrix4* mat, br_transform* xform) {
 // IDA: void __cdecl BrMatrix34ToTransform(br_transform *xform, br_matrix34 *mat)
 void BrMatrix34ToTransform(br_transform* xform, br_matrix34* mat) {
     LOG_TRACE("(%p, %p)", xform, mat);
-    NOT_IMPLEMENTED();
+
+    switch (xform->type) {
+    case BR_TRANSFORM_MATRIX34:
+        memcpy(&xform->t.mat, mat, sizeof(br_matrix34));
+        break;
+    case BR_TRANSFORM_MATRIX34_LP:
+        memcpy(&xform->t.mat, mat, sizeof(br_matrix34));
+        BrMatrix34LPNormalise(&xform->t.mat, &xform->t.mat);
+        break;
+    case BR_TRANSFORM_QUAT:
+        BrMatrix34ToQuat(&xform->t.quat.q, mat);
+        BrVector3Copy(&xform->t.quat.t, (br_vector3*)mat->m[3]);
+        break;
+    case BR_TRANSFORM_EULER:
+        BrMatrix34ToEuler(&xform->t.euler.e, mat);
+        BrVector3Copy(&xform->t.quat.t, (br_vector3*)mat->m[3]);
+        break;
+    case BR_TRANSFORM_LOOK_UP:
+        NOT_IMPLEMENTED();
+        break;
+    case BR_TRANSFORM_TRANSLATION:
+        BrVector3Copy(&xform->t.quat.t, (br_vector3*)mat->m[3]);
+        break;
+    default:
+        TELL_ME_IF_WE_PASS_THIS_WAY();
+    }
 }
 
 // IDA: void __cdecl BrTransformToTransform(br_transform *dest, br_transform *src)
 void BrTransformToTransform(br_transform* dest, br_transform* src) {
     br_matrix34 temp;
     LOG_TRACE("(%p, %p)", dest, src);
-    NOT_IMPLEMENTED();
+
+    if (src->type == dest->type) {
+        memcpy(dest, src, sizeof(br_transform));
+        return;
+    }
+    switch (dest->type) {
+    case BR_TRANSFORM_MATRIX34:
+        BrTransformToMatrix34(&dest->t.mat, src);
+        break;
+    case BR_TRANSFORM_MATRIX34_LP:
+        BrTransformToMatrix34(&dest->t.mat, src);
+        BrMatrix34LPNormalise(&dest->t.mat, &dest->t.mat);
+        break;
+    default:
+        BrTransformToMatrix34(&temp, src);
+        BrMatrix34ToTransform(dest, &temp);
+    }
 }
