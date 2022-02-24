@@ -149,6 +149,7 @@ int DRS3ReleaseSound(tS3_sound_id pThe_sound) {
 // IDA: void __cdecl DRS3Service()
 void DRS3Service() {
     LOG_TRACE("()");
+
     NOT_IMPLEMENTED();
 }
 

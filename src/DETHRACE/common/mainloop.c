@@ -104,7 +104,7 @@ void LoseOldestWastedMassage() {
     LOG_TRACE("()");
 
     for (i = 1; i < gQueued_wasted_massages_count; i++) {
-        gQueued_wasted_massages[0] = gQueued_wasted_massages[i];
+        gQueued_wasted_massages[i - 1] = gQueued_wasted_massages[i];
     }
     gQueued_wasted_massages_count--;
     gLast_wasted_massage_start = GetTotalTime();
@@ -113,7 +113,15 @@ void LoseOldestWastedMassage() {
 // IDA: void __usercall QueueWastedMassage(int pIndex@<EAX>)
 void QueueWastedMassage(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+
+    if (gQueued_wasted_massages_count == COUNT_OF(gQueued_wasted_massages)) {
+        LoseOldestWastedMassage();
+    }
+    if (gQueued_wasted_massages_count == 0) {
+        gLast_wasted_massage_start = GetTotalTime();
+    }
+    gQueued_wasted_massages[gQueued_wasted_massages_count + 1] = pIndex;
+    gQueued_wasted_massages_count++;
 }
 
 // IDA: void __cdecl MungeHeadups()
@@ -395,7 +403,8 @@ void UpdateFramePeriod(tU32* pCamera_period) {
 // IDA: tU32 __cdecl GetLastTickCount()
 tU32 GetLastTickCount() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    return gLast_tick_count;
 }
 
 // IDA: void __cdecl CheckTimer()

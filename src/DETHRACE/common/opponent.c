@@ -1,6 +1,8 @@
 #include "opponent.h"
 #include "brender/brender.h"
 #include "car.h"
+#include "crush.h"
+#include "displays.h"
 #include "errors.h"
 #include "globvars.h"
 #include "globvrkm.h"
@@ -191,19 +193,35 @@ tS16 FindNearestGeneralSection(tCar_spec* pPursuee, br_vector3* pActor_coords, b
 // IDA: void __usercall DeadStopCar(tCar_spec *pCar_spec@<EAX>)
 void DeadStopCar(tCar_spec* pCar_spec) {
     LOG_TRACE("(%p)", pCar_spec);
-    NOT_IMPLEMENTED();
+
+    pCar_spec->acc_force = 0.f;
+    pCar_spec->brake_force = 0.f;
+    pCar_spec->curvature = 0.f;
+    pCar_spec->gear = 0.f;
+    pCar_spec->revs = 0.f;
+    BrVector3SetFloat(&pCar_spec->omega, 0.f, 0.f, 0.f);
+    BrVector3SetFloat(&pCar_spec->v, 0.f, 0.f, 0.f);
 }
 
 // IDA: void __usercall TurnOpponentPhysicsOn(tOpponent_spec *pOpponent_spec@<EAX>)
 void TurnOpponentPhysicsOn(tOpponent_spec* pOpponent_spec) {
     LOG_TRACE("(%p)", pOpponent_spec);
-    NOT_IMPLEMENTED();
+
+    if (pOpponent_spec->physics_me == 0) {
+        pOpponent_spec->physics_me = 1;
+        gActive_car_list_rebuild_required = 1;
+    }
 }
 
 // IDA: void __usercall TurnOpponentPhysicsOff(tOpponent_spec *pOpponent_spec@<EAX>)
 void TurnOpponentPhysicsOff(tOpponent_spec* pOpponent_spec) {
     LOG_TRACE("(%p)", pOpponent_spec);
-    NOT_IMPLEMENTED();
+
+    DeadStopCar(pOpponent_spec->car_spec);
+    if (pOpponent_spec->physics_me) {
+        pOpponent_spec->physics_me = 0;
+        gActive_car_list_rebuild_required = 1;
+    }
 }
 
 // IDA: void __cdecl NewObjective(tOpponent_spec *pOpponent_spec, tOpponent_objective_type pObjective_type, ...)
@@ -475,7 +493,22 @@ int LastTwatterAPlayer(tOpponent_spec* pOpponent_spec) {
 // IDA: void __usercall ObjectiveComplete(tOpponent_spec *pOpponent_spec@<EAX>)
 void ObjectiveComplete(tOpponent_spec* pOpponent_spec) {
     LOG_TRACE("(%p)", pOpponent_spec);
-    NOT_IMPLEMENTED();
+
+    dr_dprintf("%s: Objective Completed", pOpponent_spec->car_spec->driver_name);
+    pOpponent_spec->new_objective_required = 1;
+    switch (pOpponent_spec->current_objective) {
+    case eOOT_complete_race:
+        gNum_of_opponents_completing_race--;
+        break;
+    case eOOT_pursue_and_twat:
+        gNum_of_opponents_pursuing--;
+        break;
+    case eOOT_get_near_player:
+        gNum_of_opponents_getting_near--;
+        break;
+    default:
+        break;
+    }
 }
 
 // IDA: void __usercall TeleportOpponentToNearestSafeLocation(tOpponent_spec *pOpponent_spec@<EAX>)
@@ -717,7 +750,7 @@ void LoadCopCars() {
                 gBIG_APC_index == i ? "BIGAPC.TXT" : "APC.TXT",
                 eDriver_oppo,
                 gProgram_state.AI_vehicles.cops[i].car_spec,
-                3 + (gBIG_APC_index == i),
+                (gBIG_APC_index == i) ? 4 : 3,
                 "The Cops",
                 &gTheir_cars_storage_space);
         }
@@ -960,7 +993,12 @@ void WakeUpOpponentsToTheFactThatTheStartHasBeenJumped(int pWhat_the_countdown_w
 void ReportMurderToPoliceDepartment(tCar_spec* pCar_spec) {
     int i;
     LOG_TRACE("(%p)", pCar_spec);
-    NOT_IMPLEMENTED();
+
+    if (pCar_spec == &gProgram_state.current_car) {
+        for (i = 0; i < gProgram_state.AI_vehicles.number_of_cops; i++) {
+            gProgram_state.AI_vehicles.cops[i].murder_reported = 1;
+        }
+    }
 }
 
 // IDA: int __usercall GetCarCount@<EAX>(tVehicle_type pCategory@<EAX>)
@@ -968,7 +1006,6 @@ int GetCarCount(tVehicle_type pCategory) {
     LOG_TRACE("(%d)", pCategory);
 
     switch (pCategory) {
-
     case eVehicle_self:
         return 1;
 
@@ -1033,21 +1070,54 @@ tCar_spec* GetCarSpec(tVehicle_type pCategory, int pIndex) {
 // IDA: char* __usercall GetDriverName@<EAX>(tVehicle_type pCategory@<EAX>, int pIndex@<EDX>)
 char* GetDriverName(tVehicle_type pCategory, int pIndex) {
     LOG_TRACE("(%d, %d)", pCategory, pIndex);
-    NOT_IMPLEMENTED();
+
+    switch (pCategory) {
+    case eVehicle_self:
+        return gProgram_state.player_name[gProgram_state.frank_or_anniness];
+    case eVehicle_opponent:
+        return gOpponents[gProgram_state.AI_vehicles.opponents[pIndex].index].name;
+    case eVehicle_rozzer:
+        return "Faceless Cop";
+    case eVehicle_drone:
+        return "Innocent Civilian";
+    case eVehicle_not_really:
+    default:
+        return NULL;
+    }
 }
 
 // IDA: tOpponent_spec* __usercall GetOpponentSpecFromCarSpec@<EAX>(tCar_spec *pCar_spec@<EAX>)
 tOpponent_spec* GetOpponentSpecFromCarSpec(tCar_spec* pCar_spec) {
     int i;
     LOG_TRACE("(%p)", pCar_spec);
-    NOT_IMPLEMENTED();
+
+    if ((pCar_spec->car_ID & 0xff00) == 0x200) {
+        for (i = 0; i < GetCarCount(eVehicle_opponent); i++) {
+            if (gProgram_state.AI_vehicles.opponents[i].car_spec == pCar_spec) {
+                return &gProgram_state.AI_vehicles.opponents[i];
+            }
+        }
+    } else if ((pCar_spec->car_ID & 0xff00) == 0x300) {
+        for (i = 0; i < GetCarCount(eVehicle_rozzer); i++) {
+            if (gProgram_state.AI_vehicles.cops[i].car_spec == pCar_spec) {
+                return &gProgram_state.AI_vehicles.cops[i];
+            }
+        }
+    }
+    return NULL;
 }
 
 // IDA: tCar_spec* __usercall GetCarSpecFromGlobalOppoIndex@<EAX>(int pIndex@<EAX>)
 tCar_spec* GetCarSpecFromGlobalOppoIndex(int pIndex) {
     int i;
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < gProgram_state.AI_vehicles.number_of_opponents; i++) {
+        if (gProgram_state.AI_vehicles.opponents[i].index == pIndex) {
+            return gProgram_state.AI_vehicles.opponents[i].car_spec;
+        }
+    }
+    return NULL;
 }
 
 // IDA: int __usercall GetOpponentsRealSection@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, int pSection_no@<EDX>)
@@ -1059,7 +1129,16 @@ int GetOpponentsRealSection(tOpponent_spec* pOpponent_spec, int pSection_no) {
 // IDA: int __usercall GetOpponentsFirstSection@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>)
 int GetOpponentsFirstSection(tOpponent_spec* pOpponent_spec) {
     LOG_TRACE("(%p)", pOpponent_spec);
-    NOT_IMPLEMENTED();
+
+    if (pOpponent_spec->current_objective == eOOT_pursue_and_twat) {
+        if (pOpponent_spec->pursue_car_data.state == 1) {
+            return pOpponent_spec->follow_path_data.section_no;
+        }
+        if (pOpponent_spec->pursue_car_data.state == 2) {
+            return 10000;
+        }
+    }
+    return 2000;
 }
 
 // IDA: int __usercall GetOpponentsNextSection@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, tS16 pCurrent_section@<EDX>)
@@ -1159,7 +1238,8 @@ void RecordOpponentTwattageOccurrence(tCar_spec* pTwatter, tCar_spec* pTwattee) 
 // IDA: void __cdecl ToggleOpponentTest()
 void ToggleOpponentTest() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gTest_toggle = !gTest_toggle;
 }
 
 // IDA: void __cdecl ToggleOpponentProcessing()
@@ -1173,14 +1253,31 @@ void ToggleOpponentProcessing() {
 void ToggleMellowOpponents() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gMellow_opponents = !gMellow_opponents;
+    if (gMellow_opponents) {
+        NewTextHeadupSlot(4, 0, 3000, -1, "Opponents all nice and fluffy");
+        for (i = 0; i < gProgram_state.AI_vehicles.number_of_opponents; i++) {
+            ObjectiveComplete(&gProgram_state.AI_vehicles.opponents[i]);
+        }
+    } else {
+        NewTextHeadupSlot(4, 0, 2000, -1, "Opponents hostile again");
+    }
 }
 
 // IDA: void __cdecl RepairOpponentsSystems()
 void RepairOpponentsSystems() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < gProgram_state.AI_vehicles.number_of_opponents; i++) {
+        if (!gProgram_state.AI_vehicles.opponents[i].pursue_from_start) {
+            TotallyRepairACar(gProgram_state.AI_vehicles.opponents[i].car_spec);
+            TurnOpponentPhysicsOff(&gProgram_state.AI_vehicles.opponents[i]);
+            gProgram_state.AI_vehicles.opponents[i].knackeredness_detected = 0;
+        }
+    }
+    NewTextHeadupSlot(4, 0, 3000, -1, "Opponents systems repaired (but not bodywork)");
 }
 
 //IDA: void __usercall CopyVertex(br_vertex *pDest_vertex@<EAX>, br_vertex *pSrc_vertex@<EDX>)
@@ -1205,7 +1302,35 @@ void DeleteSection(tS16 pSection_to_delete) {
     tS16 node_no_index;
     tS16 found_it;
     LOG_TRACE("(%d)", pSection_to_delete);
-    NOT_IMPLEMENTED();
+
+    for (node_no = 0; node_no < 2; node_no++) {
+        node_no_index = gProgram_state.AI_vehicles.path_sections[pSection_to_delete].node_indices[node_no];
+        if (node_no_index >= 0) {
+            found_it = 0;
+            for (section_no = 0; section_no < (gProgram_state.AI_vehicles.path_nodes[node_no_index].number_of_sections - 1); section_no++) {
+                if (gProgram_state.AI_vehicles.path_nodes[node_no_index].sections[section_no] == pSection_to_delete) {
+                    found_it = 1;
+                }
+                if (found_it) {
+                    gProgram_state.AI_vehicles.path_nodes[node_no_index].sections[section_no] = gProgram_state.AI_vehicles.path_nodes[node_no_index].sections[section_no + 1];
+                }
+            }
+            if (gProgram_state.AI_vehicles.path_nodes[node_no_index].number_of_sections != 0) {
+                gProgram_state.AI_vehicles.path_nodes[node_no_index].number_of_sections--;
+            }
+        }
+    }
+    for (section_no = pSection_to_delete; section_no < (gProgram_state.AI_vehicles.number_of_path_sections - 1); section_no++) {
+        gProgram_state.AI_vehicles.path_sections[section_no] = gProgram_state.AI_vehicles.path_sections[section_no + 1];
+    }
+    gProgram_state.AI_vehicles.number_of_path_sections--;
+    for (node_no = 0; node_no < gProgram_state.AI_vehicles.number_of_path_nodes; node_no++) {
+        for (section_no_index = 0; section_no_index < gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections; section_no_index++) {
+            if (pSection_to_delete < gProgram_state.AI_vehicles.path_nodes[node_no].sections[section_no_index]) {
+                gProgram_state.AI_vehicles.path_nodes[node_no].sections[section_no_index]--;
+            }
+        }
+    }
 }
 
 // IDA: void __usercall DeleteNode(tS16 pNode_to_delete@<EAX>, int pAnd_sections@<EDX>)
@@ -1215,14 +1340,65 @@ void DeleteNode(tS16 pNode_to_delete, int pAnd_sections) {
     tS16 section1;
     tS16 section2;
     LOG_TRACE("(%d, %d)", pNode_to_delete, pAnd_sections);
-    NOT_IMPLEMENTED();
+
+    dr_dprintf("Node to be deleted #%d", pNode_to_delete);
+    if (pAnd_sections) {
+        while (gProgram_state.AI_vehicles.path_nodes[pNode_to_delete].number_of_sections != 0) {
+            DeleteSection(gProgram_state.AI_vehicles.path_nodes[pNode_to_delete].sections[0]);
+        }
+    } else {
+        if (gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[pNode_to_delete].sections[0]].node_indices[0] == pNode_to_delete) {
+            section1 = gProgram_state.AI_vehicles.path_nodes[pNode_to_delete].sections[1];
+            section2 = gProgram_state.AI_vehicles.path_nodes[pNode_to_delete].sections[0];
+        } else {
+            section1 = gProgram_state.AI_vehicles.path_nodes[pNode_to_delete].sections[0];
+            section2 = gProgram_state.AI_vehicles.path_nodes[pNode_to_delete].sections[1];
+        }
+        dr_dprintf("Section 1#%d(#%d,#%d), section 2#%d(#%d,#%d)", section1,
+            gProgram_state.AI_vehicles.path_sections[section1].node_indices[0],
+            gProgram_state.AI_vehicles.path_sections[section1].node_indices[1],
+            section2,
+            gProgram_state.AI_vehicles.path_sections[section2].node_indices[0],
+            gProgram_state.AI_vehicles.path_sections[section2].node_indices[1]);
+        gProgram_state.AI_vehicles.path_sections[section1].min_speed[1] = gProgram_state.AI_vehicles.path_sections[section2].min_speed[1];
+        gProgram_state.AI_vehicles.path_sections[section1].max_speed[1] = gProgram_state.AI_vehicles.path_sections[section2].max_speed[1];
+        node_no = gProgram_state.AI_vehicles.path_sections[section2].node_indices[1];
+        gProgram_state.AI_vehicles.path_sections[section1].node_indices[1] = node_no;
+        dr_dprintf("Section 1's new end node is #%d", node_no);
+        if (gProgram_state.AI_vehicles.path_nodes[node_no].sections[0] == section2) {
+            gProgram_state.AI_vehicles.path_nodes[node_no].sections[0] = section1;
+        } else {
+            gProgram_state.AI_vehicles.path_nodes[node_no].sections[1] = section1;
+        }
+        gProgram_state.AI_vehicles.path_nodes[pNode_to_delete].number_of_sections = 0;
+        gProgram_state.AI_vehicles.path_sections[section2].node_indices[0] = -1;
+        gProgram_state.AI_vehicles.path_sections[section2].node_indices[1] = -1;
+        DeleteSection(section2);
+    }
+    for (node_no = pNode_to_delete; node_no < (gProgram_state.AI_vehicles.number_of_path_nodes - 1); node_no++) {
+        gProgram_state.AI_vehicles.path_nodes[node_no] = gProgram_state.AI_vehicles.path_nodes[node_no + 1];
+    }
+    for (section_no = 0; section_no < gProgram_state.AI_vehicles.number_of_path_sections; section_no++) {
+        if (pNode_to_delete < gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0]) {
+            gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0]--;
+        }
+        if (pNode_to_delete < gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0]) {
+            gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1]--;
+        }
+    }
+    gProgram_state.AI_vehicles.number_of_path_nodes--;
 }
 
 // IDA: void __cdecl DeleteOrphanNodes()
 void DeleteOrphanNodes() {
     tS16 node_no;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (node_no = 0; node_no < gProgram_state.AI_vehicles.number_of_path_nodes; node_no++) {
+        while (node_no < gProgram_state.AI_vehicles.number_of_path_nodes && gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections == 0) {
+            DeleteNode(node_no, 1);
+        }
+    }
 }
 
 // IDA: void __usercall InsertThisNodeInThisSectionHere(tS16 pInserted_node@<EAX>, tS16 pSection_no@<EDX>, br_vector3 *pWhere@<EBX>)
@@ -1280,13 +1456,20 @@ void CalcNegativeXVector(br_vector3* pNegative_x_vector, br_vector3* pStart, br_
 // IDA: void __usercall MakeVertexAndOffsetIt(br_model *pModel@<EAX>, int pVertex_num@<EDX>, br_scalar pX, br_scalar pY, br_scalar pZ, br_vector3 *pOffset)
 void MakeVertexAndOffsetIt(br_model* pModel, int pVertex_num, br_scalar pX, br_scalar pY, br_scalar pZ, br_vector3* pOffset) {
     LOG_TRACE("(%p, %d, %f, %f, %f, %p)", pModel, pVertex_num, pX, pY, pZ, pOffset);
-    NOT_IMPLEMENTED();
+
+    BrVector3SetFloat(&pModel->vertices[pVertex_num].p, pX, pY, pZ);
+    BrVector3Accumulate(&pModel->vertices[pVertex_num].p, pOffset);
 }
 
 // IDA: void __usercall MakeFaceAndTextureIt(br_model *pModel@<EAX>, int pFace_num@<EDX>, int pV0@<EBX>, int pV1@<ECX>, int pV2, br_material *pMaterial)
 void MakeFaceAndTextureIt(br_model* pModel, int pFace_num, int pV0, int pV1, int pV2, br_material* pMaterial) {
     LOG_TRACE("(%p, %d, %d, %d, %d, %p)", pModel, pFace_num, pV0, pV1, pV2, pMaterial);
-    NOT_IMPLEMENTED();
+
+    pModel->faces[pFace_num].vertices[0] = pV0;
+    pModel->faces[pFace_num].vertices[1] = pV1;
+    pModel->faces[pFace_num].vertices[2] = pV2;
+    pModel->faces[pFace_num].smoothing = -1;
+    pModel->faces[pFace_num].material = pMaterial;
 }
 
 // IDA: void __usercall MakeSection(br_uint_16 pFirst_vertex@<EAX>, br_uint_16 pFirst_face@<EDX>, br_vector3 *pStart@<EBX>, br_vector3 *pFinish@<ECX>, br_scalar pWidth, br_material *pMaterial_centre_lt, br_material *pMaterial_centre_dk, br_material *pMaterial_edges_start_lt, br_material *pMaterial_edges_start_dk, br_material *pMaterial_edges_finish_lt, br_material *pMaterial_edges_finish_dk)
@@ -1308,6 +1491,10 @@ void MakeCube(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3* pPoi
     br_vector3 offset_v;
     br_vector3 point;
     LOG_TRACE("(%d, %d, %p, %p, %p, %p)", pFirst_vertex, pFirst_face, pPoint, pMaterial_1, pMaterial_2, pMaterial_3);
+
+    DO THIS ONE NEXT
+
+
     NOT_IMPLEMENTED();
 }
 

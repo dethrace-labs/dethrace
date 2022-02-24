@@ -296,9 +296,9 @@ typedef enum keymapcodes {
 
 #define OPPONENT_COUNT 0
 
-#define WORLD_SCALE 6.9
+#define WORLD_SCALE 6.9f
 
-#define SHADOW_MAX_RENDER_DISTANCE 36.0
+#define SHADOW_MAX_RENDER_DISTANCE 36.0f
 
 #define DOUBLESIDED_FLAG_COLOR_MAP (br_pixelmap*)12345
 

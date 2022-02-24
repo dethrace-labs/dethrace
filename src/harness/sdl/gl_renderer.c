@@ -568,7 +568,7 @@ void GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
         glDrawElements(GL_TRIANGLES, group->nfaces * 3, GL_UNSIGNED_INT, (void*)(element_index * sizeof(int)));
         element_index += group->nfaces * 3;
     }
-
+    //glUniform1i(uniforms_3d.palette_index_override, 0);//material->index_base);
     glBindVertexArray(0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 

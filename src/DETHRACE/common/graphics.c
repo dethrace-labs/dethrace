@@ -168,13 +168,15 @@ br_scalar gYon_squared;
 // IDA: void __cdecl TurnOnPaletteConversion()
 void TurnOnPaletteConversion() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gCurrent_conversion_table = gPalette_conversion_table;
 }
 
 // IDA: void __cdecl TurnOffPaletteConversion()
 void TurnOffPaletteConversion() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gCurrent_conversion_table = NULL;
 }
 
 // IDA: void __cdecl ResetLollipopQueue()
@@ -1540,6 +1542,7 @@ void InitPaletteAnimate() {
 
 // IDA: void __cdecl RevertPalette()
 void RevertPalette() {
+
     memcpy(gRender_palette->pixels, gOrig_render_palette->pixels, 0x400u);
     DRSetPalette3(gRender_palette, 1);
 }
@@ -1647,10 +1650,11 @@ void FadePaletteUp() {
 
 // IDA: void __cdecl KillSplashScreen()
 void KillSplashScreen() {
-    if (gCurrent_splash) {
+
+    if (gCurrent_splash != NULL) {
         BrMapRemove(gCurrent_splash);
         BrPixelmapFree(gCurrent_splash);
-        gCurrent_splash = 0;
+        gCurrent_splash = NULL;
         FadePaletteDown();
         ClearEntireScreen();
     }
@@ -1659,6 +1663,7 @@ void KillSplashScreen() {
 // IDA: void __cdecl EnsureRenderPalette()
 void EnsureRenderPalette() {
     LOG_TRACE("()");
+
     if (gPalette_munged) {
         ResetPalette();
         gPalette_munged = 0;
@@ -1671,22 +1676,22 @@ void SplashScreenWith(char* pPixmap_name) {
     LOG_TRACE("(\"%s\")", pPixmap_name);
 
     the_map = BrMapFind(pPixmap_name);
-    if (!gCurrent_splash || the_map != gCurrent_splash) {
+    if (gCurrent_splash == NULL || the_map != gCurrent_splash) {
         FadePaletteDown();
         EnsureRenderPalette();
 
-        if (gCurrent_splash) {
+        if (gCurrent_splash != NULL) {
             KillSplashScreen();
         }
         gCurrent_splash = the_map;
-        if (!the_map) {
+        if (the_map == NULL) {
             the_map = LoadPixelmap(pPixmap_name);
             gCurrent_splash = the_map;
-            if (the_map) {
+            if (the_map != NULL) {
                 BrMapAdd(the_map);
             }
         }
-        if (gCurrent_splash) {
+        if (gCurrent_splash != NULL) {
             BrPixelmapRectangleCopy(
                 gBack_screen,
                 0,
@@ -1706,6 +1711,7 @@ void SplashScreenWith(char* pPixmap_name) {
 
 // IDA: void __cdecl EnsurePaletteUp()
 void EnsurePaletteUp() {
+
     if (gFaded_palette) {
         FadePaletteUp();
     }
@@ -1714,13 +1720,12 @@ void EnsurePaletteUp() {
 // IDA: br_uint_32 __cdecl AmbientificateMaterial(br_material *pMat, void *pArg)
 br_uint_32 AmbientificateMaterial(br_material* pMat, void* pArg) {
     float a;
+
     a = pMat->ka + *(br_scalar*)pArg;
-    if (a >= 0.0) {
-        if (a > 0.99f) {
-            a = 0.99f;
-        }
-    } else {
-        a = 0.0;
+    if (a < 0.f) {
+        a = 0.f;
+    } else if (a > 0.99f) {
+        a = 0.99f;
     }
     pMat->ka = a;
     return 0;
@@ -1729,12 +1734,14 @@ br_uint_32 AmbientificateMaterial(br_material* pMat, void* pArg) {
 // IDA: void __cdecl ChangeAmbience(br_scalar pDelta)
 void ChangeAmbience(br_scalar pDelta) {
     LOG_TRACE("(%f)", pDelta);
+
     BrMaterialEnum("*", AmbientificateMaterial, &pDelta);
 }
 
 // IDA: void __cdecl InitAmbience()
 void InitAmbience() {
     LOG_TRACE("()");
+
     gCurrent_ambience = gAmbient_adjustment;
     ChangeAmbience(gAmbient_adjustment);
 }

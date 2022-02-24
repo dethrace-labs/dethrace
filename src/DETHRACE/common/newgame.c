@@ -14,6 +14,7 @@
 #include "intrface.h"
 #include "loading.h"
 #include "utility.h"
+#include "structur.h"
 #include "world.h"
 #include <stdlib.h>
 #include <string.h>
@@ -713,7 +714,22 @@ int NetChooseLR(int* pCurrent_choice, int* pCurrent_mode) {
 // IDA: void __usercall SetGameTarget(tNet_game_type *pGame_type@<EAX>, tNet_game_options *pGame_options@<EDX>)
 void SetGameTarget(tNet_game_type* pGame_type, tNet_game_options* pGame_options) {
     LOG_TRACE("(%p, %p)", pGame_type, pGame_options);
-    NOT_IMPLEMENTED();
+
+    pGame_options->race_end_target = gNet_target[*pGame_type];
+    switch (*pGame_type) {
+    case eNet_game_type_car_crusher:
+        pGame_options->race_end_target = gNet_target[*pGame_type];
+        break;
+    case eNet_game_type_tag:
+        pGame_options->race_end_target = 1000 * gNet_target[*pGame_type];
+        break;
+    case eNet_game_type_foxy:
+        pGame_options->race_end_target = 1000 * gNet_target[*pGame_type];
+        break;
+    default:
+        pGame_options->race_end_target = gNet_target[*pGame_type];
+        break;
+    }
 }
 
 // IDA: int __usercall NetGameChoices@<EAX>(tNet_game_type *pGame_type@<EAX>, tNet_game_options *pGame_options@<EDX>, int *pRace_index@<EBX>)
@@ -731,7 +747,11 @@ int NetGameChoices(tNet_game_type* pGame_type, tNet_game_options* pGame_options,
 // IDA: void __usercall ReadNetGameChoices(tNet_game_type *pGame_type@<EAX>, tNet_game_options *pGame_options@<EDX>, int *pRace_index@<EBX>)
 void ReadNetGameChoices(tNet_game_type* pGame_type, tNet_game_options* pGame_options, int* pRace_index) {
     LOG_TRACE("(%p, %p, %p)", pGame_type, pGame_options, pRace_index);
-    NOT_IMPLEMENTED();
+
+    *pGame_type = gLast_game_type;
+    SetOptions(*pGame_type, pGame_options);
+    SetGameTarget(pGame_type, pGame_options);
+    *pRace_index = PickNetRace(-1, pGame_options->race_sequence_type);
 }
 
 // IDA: int __usercall ChooseStartRace@<EAX>(int *pRank@<EAX>)
@@ -790,13 +810,22 @@ int ChooseNetCar(tNet_game_details* pNet_game, tNet_game_options* pOptions, int*
 void InitNetStorageSpace() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < 6; i++) {
+        gCurrent_race.opponent_list[i].car_spec = NULL;
+    }
+    gNet_storage_allocated = 1;
+    InitialiseStorageSpace(&gNet_cars_storage_space, 500, 50, 500, 300);
 }
 
 // IDA: void __cdecl DisposeNetStorageSpace()
 void DisposeNetStorageSpace() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gNet_storage_allocated) {
+        DisposeStorageSpace(&gNet_cars_storage_space);
+    }
+    gNet_storage_allocated = 0;
 }
 
 // IDA: int __cdecl DoMultiPlayerStart()

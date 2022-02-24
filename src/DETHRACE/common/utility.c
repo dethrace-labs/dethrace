@@ -1421,19 +1421,30 @@ void NobbleNonzeroBlacks(br_pixelmap* pPalette) {
 // IDA: int __usercall PDCheckDriveExists@<EAX>(char *pThe_path@<EAX>)
 int PDCheckDriveExists(char* pThe_path) {
     LOG_TRACE9("(\"%s\")", pThe_path);
+
     return PDCheckDriveExists2(pThe_path, NULL, 0);
 }
 
 // IDA: int __usercall OpacityInPrims@<EAX>(br_token_value *pPrims@<EAX>)
 int OpacityInPrims(br_token_value* pPrims) {
     LOG_TRACE("(%p)", pPrims);
-    NOT_IMPLEMENTED();
+
+    for (; pPrims->t != 0 && pPrims->t != BRT_OPACITY_X; pPrims++) {
+    }
+    return pPrims->t != 0;
 }
 
 // IDA: int __usercall AlreadyBlended@<EAX>(br_material *pMaterial@<EAX>)
 int AlreadyBlended(br_material* pMaterial) {
     LOG_TRACE("(%p)", pMaterial);
-    NOT_IMPLEMENTED();
+
+    if (pMaterial->index_blend != NULL) {
+        return 1;
+    }
+    if (pMaterial->extra_prim == NULL) {
+        return 0;
+    }
+    return OpacityInPrims(pMaterial->extra_prim);
 }
 
 // IDA: void __usercall BlendifyMaterialTablishly(br_material *pMaterial@<EAX>, int pPercent@<EDX>)

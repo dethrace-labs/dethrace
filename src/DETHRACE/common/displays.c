@@ -597,9 +597,8 @@ int FindAHeadupHoleWoofBarkSoundsABitRude(int pSlot_index) {
     tHeadup* the_headup;
     LOG_TRACE("(%d)", pSlot_index);
 
-    the_headup = gHeadups;
     empty_one = -1;
-    for (i = 0; i < COUNT_OF(gHeadups); i++) {
+    for (i = 0, the_headup = gHeadups; i < COUNT_OF(gHeadups); i++, the_headup++) {
         if (pSlot_index >= 0 && the_headup->slot_index == pSlot_index) {
             return i;
         }
@@ -607,7 +606,6 @@ int FindAHeadupHoleWoofBarkSoundsABitRude(int pSlot_index) {
             empty_one = i;
             break;
         }
-        the_headup++;
     }
     return empty_one;
 }
@@ -641,20 +639,17 @@ int DRTextCleverWidth(tDR_font* pFont, signed char* pText) {
 
     result = 0;
     len = strlen((char*)pText) + 1;
-    i = 0;
-    c = (unsigned char*)pText;
-    while (len - 1 > i) {
-        if (*c < 224u) {
-            if (len - 2 > i) {
-                result += pFont->spacing + pFont->width_table[*c - pFont->offset];
-            } else {
-                result += pFont->width_table[*c - pFont->offset];
+
+    for (i = 0, c = (unsigned char*)pText; i < len; i++, c++) {
+        if (*c < 224) {
+            if (i < (len - 1)) {
+                result += pFont->spacing;
             }
+            result += pFont->width_table[*c - pFont->offset];
         } else {
-            pFont = &gFonts[-*c + 256];
+            pFont = &gFonts[256 - *c];
         }
-        ++i;
-        ++c;
+
     }
     return result;
 }
@@ -673,10 +668,10 @@ int IsHeadupTextClever(signed char* pText) {
     LOG_TRACE("(%p)", pText);
 
     while (*pText) {
-        pText++;
         if (*pText < 0) {
             return 1;
         }
+        pText++;
     }
     return 0;
 }
@@ -937,13 +932,31 @@ void ChangeHeadupText(int pHeadup_index, char* pNew_text) {
 void ChangeHeadupImage(int pHeadup_index, int pNew_image) {
     tHeadup* the_headup;
     LOG_TRACE("(%d, %d)", pHeadup_index, pNew_image);
-    NOT_IMPLEMENTED();
+
+    if (pHeadup_index >= 0) {
+        the_headup = &gHeadups[pHeadup_index];
+        the_headup->data.image_info.image = gHeadup_images[pNew_image];
+        switch (the_headup->justification) {
+        case eJust_left:
+            the_headup->x = the_headup->original_x;
+            break;
+        case eJust_right:
+            the_headup->x = the_headup->original_x - the_headup->data.image_info.image->width;
+            break;
+        case eJust_centre:
+            the_headup->x = the_headup->original_x - the_headup->data.image_info.image->width / 2;
+            break;
+        }
+    }
 }
 
 // IDA: void __usercall ChangeHeadupColour(int pHeadup_index@<EAX>, int pNew_colour@<EDX>)
 void ChangeHeadupColour(int pHeadup_index, int pNew_colour) {
     LOG_TRACE("(%d, %d)", pHeadup_index, pNew_colour);
-    NOT_IMPLEMENTED();
+
+    if (pHeadup_index >= 0) {
+        gHeadups[pHeadup_index].data.text_info.colour = gColours[pNew_colour];
+    }
 }
 
 // IDA: void __usercall DoDamageScreen(tU32 pThe_time@<EAX>)
@@ -1213,7 +1226,29 @@ void DoSteeringWheel(tU32 pThe_time) {
     br_pixelmap* hands_image;
     int hands_index;
     LOG_TRACE("(%d)", pThe_time);
-    STUB_ONCE();
+
+    if (gProgram_state.current_car_index == gProgram_state.current_car.index && gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 && gProgram_state.which_view == eView_forward) {
+        hands_index = (int)floor(gProgram_state.current_car.number_of_hands_images * ((1.f - gProgram_state.current_car.steering_angle / 10.f) / 2.f));
+        if (hands_index < 0) {
+            hands_index = 0;
+        } else if (hands_index >= gProgram_state.current_car.number_of_hands_images) {
+            hands_index = gProgram_state.current_car.number_of_hands_images - 1;
+        }
+        hands_image = gProgram_state.current_car.lhands_images[hands_index];
+        if (hands_image != NULL) {
+            DRPixelmapRectangleMaskedCopy(gBack_screen,
+                gProgram_state.current_car.lhands_x[hands_index] + gScreen_wobble_x,
+                gProgram_state.current_car.lhands_y[hands_index] + gScreen_wobble_y,
+                hands_image, 0, 0, hands_image->width, hands_image->height);
+        }
+        hands_image = gProgram_state.current_car.rhands_images[hands_index];
+        if (hands_image != NULL) {
+            DRPixelmapRectangleMaskedCopy(gBack_screen,
+                gProgram_state.current_car.rhands_x[hands_index] + gScreen_wobble_x,
+                gProgram_state.current_car.rhands_y[hands_index] + gScreen_wobble_y,
+                hands_image, 0, 0, hands_image->width, hands_image->height);
+        }
+    }
 }
 
 // IDA: void __cdecl ChangingView()

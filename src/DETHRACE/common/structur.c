@@ -282,7 +282,24 @@ void SwapNetCarsLoad() {
     int i;
     int switched_res;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DisableNetService();
+    AboutToLoadFirstCar();
+    switched_res = SwitchToRealResolution();
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (gNet_players[i].next_car_index >= 0) {
+            gNet_players[i].car_index = gNet_players[i].next_car_index;
+        }
+        gNet_players[i].next_car_index = -1;
+        LoadCar(gOpponents[gNet_players[i].car_index].car_file_name,
+            (gThis_net_player_index == i) ? eDriver_local_human : eDriver_net_human,
+            gNet_players[i].car, gNet_players[i].car_index, gNet_players[i].player_name,
+            &gNet_cars_storage_space);
+    }
+    if (switched_res) {
+        SwitchToLoresMode();
+    }
+    ReenableNetService();
 }
 
 // IDA: void __cdecl SwapNetCarsDispose()

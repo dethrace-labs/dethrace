@@ -61,18 +61,22 @@ int NetShutdown() {
     int err;
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    err = PDNetShutdown();
+    DisposeAbuseomatic();
+    BrMemFree(gMin_messages);
+    BrMemFree(gMid_messages);
+    BrMemFree(gMax_messages);
+    DisposeNetHeadups();
+    return err;
 }
 
 // IDA: void __cdecl ShutdownNetIfRequired()
 void ShutdownNetIfRequired() {
+    LOG_TRACE("()");
+
     if (gNet_initialised) {
-        PDNetShutdown();
-        DisposeAbuseomatic();
-        //BrMemFree(dword_1380E8);
-        //BrMemFree(dword_1380E0);
-        //BrMemFree(dword_138100);
-        DisposeNetHeadups();
+        NetShutdown();
         gNet_initialised = 0;
     }
 }
@@ -80,19 +84,27 @@ void ShutdownNetIfRequired() {
 // IDA: void __cdecl DisableNetService()
 void DisableNetService() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gNet_service_disable = 1;
 }
 
 // IDA: void __cdecl ReenableNetService()
 void ReenableNetService() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gNet_service_disable = 0;
 }
 
 // IDA: int __cdecl PermitNetServiceReentrancy()
 int PermitNetServiceReentrancy() {
+    int prev;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    prev = !!gIn_net_service;
+    if (prev) {
+        gIn_net_service = 0;
+    }
+    return prev;
 }
 
 // IDA: void __cdecl HaltNetServiceReentrancy()
@@ -280,6 +292,7 @@ int NetJoinGame(tNet_game_details* pDetails, char* pPlayer_name, int pCar_index)
 
 // IDA: void __usercall NetObtainSystemUserName(char *pName@<EAX>, int pMax_length@<EDX>)
 void NetObtainSystemUserName(char* pName, int pMax_length) {
+
     PDNetObtainSystemUserName(pName, pMax_length);
     pName[9] = 0;
 }
@@ -287,13 +300,15 @@ void NetObtainSystemUserName(char* pName, int pMax_length) {
 // IDA: tU32 __usercall NetExtractGameID@<EAX>(tNet_game_details *pDetails@<EAX>)
 tU32 NetExtractGameID(tNet_game_details* pDetails) {
     LOG_TRACE("(%p)", pDetails);
-    NOT_IMPLEMENTED();
+
+    return PDNetExtractGameID(pDetails);
 }
 
 // IDA: tPlayer_ID __usercall NetExtractPlayerID@<EAX>(tNet_game_details *pDetails@<EAX>)
 tPlayer_ID NetExtractPlayerID(tNet_game_details* pDetails) {
     LOG_TRACE("(%p)", pDetails);
-    NOT_IMPLEMENTED();
+
+    return PDNetExtractPlayerID(pDetails);
 }
 
 // IDA: int __usercall NetSendMessageToAddress@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>, void *pAddress@<EBX>)
@@ -331,13 +346,21 @@ int NetSendMessageToAllPlayers(tNet_game_details* pDetails, tNet_message* pMessa
 tU32 NetGetContentsSize(tNet_message_type pType, tS32 pSize_decider) {
     tU32 the_size;
     LOG_TRACE("(%d, %d)", pType, pSize_decider);
-    NOT_IMPLEMENTED();
+
+    switch (pType) {
+        case ENET_MESSAGE_HEADUP:
+            return 0x82;
+        default:
+            TELL_ME_IF_WE_PASS_THIS_WAY();
+    }
 }
 
 // IDA: tU32 __usercall NetGetMessageSize@<EAX>(tNet_message_type pType@<EAX>, tS32 pSize_decider@<EDX>)
 tU32 NetGetMessageSize(tNet_message_type pType, tS32 pSize_decider) {
     LOG_TRACE("(%d, %d)", pType, pSize_decider);
-    NOT_IMPLEMENTED();
+
+    return NetGetContentsSize(pType, pSize_decider) + 28;
+    
 }
 
 // IDA: tS32 __usercall NetCalcSizeDecider@<EAX>(tNet_contents *pContents@<EAX>)
@@ -352,7 +375,15 @@ tNet_message* NetBuildMessage(tNet_message_type pType, tS32 pSize_decider) {
     tNet_message* the_message;
     tU32 the_size;
     LOG_TRACE("(%d, %d)", pType, pSize_decider);
-    NOT_IMPLEMENTED();
+
+    the_size = NetGetMessageSize(pType, pSize_decider);
+    the_message = NetAllocateMessage(the_size);
+    if (the_message != NULL) {
+        the_message->num_contents = 1;
+        the_message->overall_size = the_size;
+        the_message->contents.header.type = pType;
+    }
+    return the_message;
 }
 
 // IDA: tNet_contents* __usercall NetGetToHostContents@<EAX>(tNet_message_type pType@<EAX>, tS32 pSize_decider@<EDX>)
