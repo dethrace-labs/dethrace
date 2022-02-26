@@ -290,6 +290,8 @@ void PDFatalError(char* pThe_str) {
     }
     been_here = 1;
 
+    dr_dprintf("FATAL ERROR: %s", pThe_str);
+
     _unittest_last_fatal_error = pThe_str;
     fprintf(stderr, "FATAL ERROR: %s\n", pThe_str);
 
@@ -381,6 +383,12 @@ void PDUnlockRealBackScreen() {
 
 // IDA: void __cdecl PDAllocateScreenAndBack()
 void PDAllocateScreenAndBack() {
+
+    dr_dprintf("PDAllocateScreenAndBack() - START...");
+    BrMaterialFindHook(PDMissingMaterial);
+    BrTableFindHook(PDMissingTable);
+    BrModelFindHook(PDMissingModel);
+    BrMapFindHook(PDMissingMap);
     gScreen = DOSGfxBegin(gGraf_specs[gGraf_spec_index].gfx_init_string);
     gScreen->origin_x = 0;
     gDOSGfx_initialized = 1;
@@ -391,6 +399,7 @@ void PDAllocateScreenAndBack() {
     gTemp_screen = BrPixelmapMatch(gScreen, BR_PMMATCH_OFFSCREEN);
     gTemp_screen->origin_x = 0;
     gTemp_screen->origin_y = 0;
+    dr_dprintf("PDAllocateScreenAndBack() - END.");
 }
 
 // IDA: void __usercall Copy8BitTo16BitPixelmap(br_pixelmap *pDst@<EAX>, br_pixelmap *pSrc@<EDX>, br_pixelmap *pPalette@<EBX>)
@@ -730,6 +739,42 @@ void PDEnterDebugger(char* pStr) {
     static unsigned char* save_it;
     LOG_TRACE("(\"%s\")", pStr);
     NOT_IMPLEMENTED();
+}
+
+// Added function
+br_material* PDMissingMaterial(char* name) {
+    LOG_TRACE("(\"%s\")", name);
+
+    // FIXME: call function in harness
+    dr_dprintf("SOMETHING MISSING WARNING - Can't find material '%s'", name);
+    return NULL;
+}
+
+// Added function
+br_pixelmap* PDMissingTable(char* name) {
+    LOG_TRACE("(\"%s\")", name);
+
+    // FIXME: call function in harness
+    dr_dprintf("SOMETHING MISSING WARNING - Can't find shade table '%s'", name);
+    return NULL;
+}
+
+// Added function
+br_model* PDMissingModel(char* name) {
+    LOG_TRACE("(\"%s\")", name);
+
+    // FIXME: call function in harness
+    dr_dprintf("SOMETHING MISSING WARNING - Can't find model '%s'", name);
+    return NULL;
+}
+
+// Added function
+br_pixelmap* PDMissingMap(char* name) {
+    LOG_TRACE("(\"%s\")", name);
+
+    // FIXME: call function in harness
+    dr_dprintf("SOMETHING MISSING WARNING - Can't find pixelmap '%s'", name);
+    return NULL;
 }
 
 // IDA: void __cdecl PDEndItAllAndReRunTheBastard()
