@@ -56,6 +56,7 @@ int CheckQuit() {
 
 //IDA: double __cdecl sqr(double pN)
 double sqr(double pN) {
+
     return pN * pN;
 }
 
@@ -185,6 +186,7 @@ void EncodeLine(char* pS) {
 int IRandomBetween(int pA, int pB) {
     int num;
     char s[32];
+
     num = (rand() % (pB - pA + 1)) + pA;
     return num;
 }
@@ -192,38 +194,43 @@ int IRandomBetween(int pA, int pB) {
 // IDA: int __usercall PercentageChance@<EAX>(int pC@<EAX>)
 int PercentageChance(int pC) {
     LOG_TRACE("(%d)", pC);
-    return (rand() % 100) < pC;
+
+    return IRandomBetween(0, 99) < pC;
 }
 
 // IDA: int __usercall IRandomPosNeg@<EAX>(int pN@<EAX>)
 int IRandomPosNeg(int pN) {
     LOG_TRACE("(%d)", pN);
-    NOT_IMPLEMENTED();
+
+    return IRandomBetween(-pN, pN);
 }
 
 // IDA: float __cdecl FRandomBetween(float pA, float pB)
 float FRandomBetween(float pA, float pB) {
     LOG_TRACE8("(%f, %f)", pA, pB);
 
-    return (double)rand() * (pB - pA) / 32768.0 + pA;
+    return (float)rand() * (pB - pA) / 32768.0f + pA;
 }
 
 // IDA: float __cdecl FRandomPosNeg(float pN)
 float FRandomPosNeg(float pN) {
     LOG_TRACE("(%f)", pN);
-    NOT_IMPLEMENTED();
+
+    return FRandomBetween(-pN, pN);
 }
 
 // IDA: br_scalar __cdecl SRandomBetween(br_scalar pA, br_scalar pB)
 br_scalar SRandomBetween(br_scalar pA, br_scalar pB) {
     LOG_TRACE8("(%f, %f)", pA, pB);
+
     return FRandomBetween(pA, pB);
 }
 
 // IDA: br_scalar __cdecl SRandomPosNeg(br_scalar pN)
 br_scalar SRandomPosNeg(br_scalar pN) {
     LOG_TRACE("(%f)", pN);
-    NOT_IMPLEMENTED();
+
+    return SRandomBetween(-pN, pN);
 }
 
 // IDA: char* __usercall GetALineWithNoPossibleService@<EAX>(FILE *pF@<EAX>, unsigned char *pS@<EDX>)
@@ -237,7 +244,7 @@ char* GetALineWithNoPossibleService(FILE* pF, /*unsigned*/ char* pS) {
 
     do {
         result = fgets(s, 256, pF);
-        if (!result) {
+        if (result == NULL) {
             s[0] = '\0';
             break;
         }
@@ -296,12 +303,14 @@ char* GetALineWithNoPossibleService(FILE* pF, /*unsigned*/ char* pS) {
 // IDA: char* __usercall GetALineAndDontArgue@<EAX>(FILE *pF@<EAX>, char *pS@<EDX>)
 char* GetALineAndDontArgue(FILE* pF, char* pS) {
     //LOG_TRACE10("(%p, \"%s\")", pF, pS);
+
     PossibleService();
     return GetALineWithNoPossibleService(pF, pS);
 }
 
 // IDA: void __usercall PathCat(char *pDestn_str@<EAX>, char *pStr_1@<EDX>, char *pStr_2@<EBX>)
 void PathCat(char* pDestn_str, char* pStr_1, char* pStr_2) {
+
     if (pDestn_str != pStr_1) { // Added to avoid strcpy overlap checks
         strcpy(pDestn_str, pStr_1);
     }
@@ -314,12 +323,14 @@ void PathCat(char* pDestn_str, char* pStr_1, char* pStr_2) {
 // IDA: int __cdecl Chance(float pChance_per_second, int pPeriod)
 int Chance(float pChance_per_second, int pPeriod) {
     LOG_TRACE("(%f, %d)", pChance_per_second, pPeriod);
-    NOT_IMPLEMENTED();
+
+    return FRandomBetween(0.f, 1.f) < (pPeriod * pChance_per_second / 1000.f);
 }
 
 // IDA: float __cdecl tandeg(float pAngle)
 float tandeg(float pAngle) {
     LOG_TRACE("(%f)", pAngle);
+
     pAngle = sin(DEG_TO_RAD(pAngle));
     return pAngle / cos(pAngle);
 }
@@ -327,6 +338,7 @@ float tandeg(float pAngle) {
 // IDA: tU32 __usercall GetFileLength@<EAX>(FILE *pF@<EAX>)
 tU32 GetFileLength(FILE* pF) {
     tU32 the_size;
+
     fseek(pF, 0, SEEK_END);
     the_size = ftell(pF);
     rewind(pF);
@@ -336,12 +348,14 @@ tU32 GetFileLength(FILE* pF) {
 // IDA: int __usercall BooleanTo1Or0@<EAX>(int pB@<EAX>)
 int BooleanTo1Or0(int pB) {
     LOG_TRACE("(%d)", pB);
-    NOT_IMPLEMENTED();
+
+    return pB != 0;
 }
 
 // IDA: br_pixelmap* __usercall DRPixelmapAllocate@<EAX>(br_uint_8 pType@<EAX>, br_uint_16 pW@<EDX>, br_uint_16 pH@<EBX>, void *pPixels@<ECX>, int pFlags)
 br_pixelmap* DRPixelmapAllocate(br_uint_8 pType, br_uint_16 pW, br_uint_16 pH, void* pPixels, int pFlags) {
     br_pixelmap* the_map;
+
     the_map = BrPixelmapAllocate(pType, pW, pH, pPixels, pFlags);
     if (the_map) {
         the_map->origin_y = 0;
@@ -354,8 +368,9 @@ br_pixelmap* DRPixelmapAllocate(br_uint_8 pType, br_uint_16 pW, br_uint_16 pH, v
 br_pixelmap* DRPixelmapAllocateSub(br_pixelmap* pPm, br_uint_16 pX, br_uint_16 pY, br_uint_16 pW, br_uint_16 pH) {
     br_pixelmap* the_map;
     LOG_TRACE("(%p, %d, %d, %d, %d)", pPm, pX, pY, pW, pH);
+
     the_map = BrPixelmapAllocateSub(pPm, pX, pY, pW, pH);
-    if (the_map) {
+    if (the_map != NULL) {
         the_map->origin_y = 0;
         the_map->origin_x = 0;
     }
@@ -426,14 +441,14 @@ br_pixelmap* PurifiedPixelmap(br_pixelmap* pSrc) {
 // IDA: br_pixelmap* __usercall DRPixelmapLoad@<EAX>(char *pFile_name@<EAX>)
 br_pixelmap* DRPixelmapLoad(char* pFile_name) {
     br_pixelmap* the_map;
-    LOG_TRACE("(\"%s\")", pFile_name);
     br_int_8 lobyte;
+    LOG_TRACE("(\"%s\")", pFile_name);
 
     the_map = BrPixelmapLoad(pFile_name);
-    if (the_map) {
+    if (the_map != NULL) {
         the_map->origin_x = 0;
         the_map->origin_y = 0;
-        the_map->row_bytes = (the_map->row_bytes + 3) & 0xFFFC;
+        the_map->row_bytes = (the_map->row_bytes + sizeof(int) - 1) & ~(sizeof(int) - 1);
     }
     return the_map;
 }
@@ -443,8 +458,8 @@ br_uint_32 DRPixelmapLoadMany(char* pFile_name, br_pixelmap** pPixelmaps, br_uin
     br_pixelmap* the_map;
     int number_loaded;
     int i;
-    LOG_TRACE("(\"%s\", %p, %d)", pFile_name, pPixelmaps, pNum);
     br_uint_8 lobyte;
+    LOG_TRACE("(\"%s\", %p, %d)", pFile_name, pPixelmaps, pNum);
 
     number_loaded = BrPixelmapLoadMany(pFile_name, pPixelmaps, pNum);
     for (i = 0; i < number_loaded; i++) {
@@ -460,7 +475,11 @@ br_uint_32 DRPixelmapLoadMany(char* pFile_name, br_pixelmap** pPixelmaps, br_uin
 void WaitFor(tU32 pDelay) {
     tU32 start_time;
     LOG_TRACE("(%d)", pDelay);
-    NOT_IMPLEMENTED();
+
+    start_time = PDGetTotalTime();
+    while ((start_time + pDelay) < PDGetTotalTime()) {
+        SoundService();
+    }
 }
 
 // IDA: br_uint_32 __usercall DRActorEnumRecurse@<EAX>(br_actor *pActor@<EAX>, br_actor_enum_cbfn *callback@<EDX>, void *arg@<EBX>)
@@ -468,22 +487,16 @@ intptr_t DRActorEnumRecurse(br_actor* pActor, br_actor_enum_cbfn* callback, void
     intptr_t result;
 
     result = callback(pActor, arg);
-    if (result == 0) {
-        pActor = pActor->children;
-        if (pActor) {
-            while (1) {
-                result = DRActorEnumRecurse(pActor, callback, arg);
-                if (result != 0) {
-                    break;
-                }
-                pActor = pActor->next;
-                if (!pActor) {
-                    return 0;
-                }
-            }
+    if (result != 0) {
+        return result;
+    }
+    for (pActor = pActor->children; pActor != NULL; pActor = pActor->next) {
+        result = DRActorEnumRecurse(pActor, callback, arg);
+        if (result != 0) {
+            return result;
         }
     }
-    return result;
+    return 0;
 }
 
 // IDA: br_uint_32 __cdecl CompareActorID(br_actor *pActor, void *pArg)
@@ -500,6 +513,7 @@ intptr_t CompareActorID(br_actor* pActor, void* pArg) {
 // IDA: br_actor* __usercall DRActorFindRecurse@<EAX>(br_actor *pSearch_root@<EAX>, char *pName@<EDX>)
 br_actor* DRActorFindRecurse(br_actor* pSearch_root, char* pName) {
     LOG_TRACE("(%p, \"%s\")", pSearch_root, pName);
+
     return (br_actor*)DRActorEnumRecurse(pSearch_root, CompareActorID, pName);
 }
 
@@ -512,12 +526,12 @@ br_uint_32 DRActorEnumRecurseWithMat(br_actor* pActor, br_material* pMat, recurs
         pMat = pActor->material;
     }
     result = pCall_back(pActor, pMat, pArg);
-    if (result) {
+    if (result != 0) {
         return result;
     }
     for (pActor = pActor->children; pActor != NULL; pActor = pActor->next) {
         result = DRActorEnumRecurseWithMat(pActor, pMat, pCall_back, pArg);
-        if (result) {
+        if (result != 0) {
             return result;
         }
     }
@@ -536,12 +550,13 @@ br_uint_32 DRActorEnumRecurseWithTrans(br_actor* pActor, br_matrix34* pMatrix, b
         BrMatrix34Mul(&combined_transform, pMatrix, &pActor->t.t.mat);
     }
     result = pCall_back(pActor, &combined_transform, pArg);
-    if (result == 0) {
-        for (pActor = pActor->children; pActor != NULL; pActor = pActor->next) {
-            result = DRActorEnumRecurseWithTrans(pActor, &combined_transform, pCall_back, pArg);
-            if (result != 0) {
-                return result;
-            }
+    if (result != 0) {
+        return result;
+    }
+    for (pActor = pActor->children; pActor != NULL; pActor = pActor->next) {
+        result = DRActorEnumRecurseWithTrans(pActor, &combined_transform, pCall_back, pArg);
+        if (result != 0) {
+            return result;
         }
     }
     return 0;
@@ -693,7 +708,7 @@ tU32 GetTotalTime() {
     if (gAction_replay_mode) {
         return gLast_replay_frame_time;
     }
-    if (gNet_mode) {
+    if (gNet_mode != eNet_mode_none) {
         return PDGetTotalTime();
     }
     return PDGetTotalTime() - gLost_time;
@@ -708,6 +723,7 @@ tU32 GetRaceTime() {
 
 // IDA: void __usercall AddLostTime(tU32 pLost_time@<EAX>)
 void AddLostTime(tU32 pLost_time) {
+
     gLost_time += pLost_time;
 }
 
@@ -730,6 +746,7 @@ void TimerString(tU32 pTime, char* pStr, int pFudge_colon, int pForce_colon) {
 
 // IDA: char* __usercall GetMiscString@<EAX>(int pIndex@<EAX>)
 char* GetMiscString(int pIndex) {
+
     return gMisc_strings[pIndex];
 }
 
@@ -747,11 +764,7 @@ int Flash(tU32 pPeriod, tU32* pLast_change, int* pCurrent_state) {
 
     the_time = PDGetTotalTime();
     if (the_time - *pLast_change > pPeriod) {
-        if (*pCurrent_state) {
-            *pCurrent_state = 0;
-        } else {
-            *pCurrent_state = 1;
-        }
+        *pCurrent_state = !*pCurrent_state;
         *pLast_change = the_time;
     }
     return *pCurrent_state;
@@ -779,9 +792,9 @@ void MaterialCopy(br_material* pDst, br_material* pSrc) {
 double RGBDifferenceSqr(tRGB_colour* pColour_1, tRGB_colour* pColour_2) {
     LOG_TRACE("(%p, %p)", pColour_1, pColour_2);
 
-    return ((pColour_1->red - pColour_2->red) * (pColour_1->red - pColour_2->red))
-        + ((pColour_1->green - pColour_2->green) * (pColour_1->green - pColour_2->green))
-        + ((pColour_1->blue - pColour_2->blue) * (pColour_1->blue - pColour_2->blue));
+    return ((pColour_1->red   - pColour_2->red)   * (pColour_1->red   - pColour_2->red))
+        +  ((pColour_1->green - pColour_2->green) * (pColour_1->green - pColour_2->green))
+        +  ((pColour_1->blue  - pColour_2->blue)  * (pColour_1->blue  - pColour_2->blue));
 }
 
 // IDA: int __usercall FindBestMatch@<EAX>(tRGB_colour *pRGB_colour@<EAX>, br_pixelmap *pPalette@<EDX>)
@@ -893,9 +906,9 @@ br_pixelmap* GenerateDarkenedShadeTable(int pHeight, br_pixelmap* pPalette, int 
         ref_col.blue = pBlue_mix;
 
         for (c = 0, tab_ptr = the_table->pixels; c < 256; c++, tab_ptr++) {
-            the_RGB.red   = ((cp[i] >> 16) & 0xff) * pDarken;
-            the_RGB.green = ((cp[i] >>  8) & 0xff) * pDarken;
-            the_RGB.blue  = ((cp[i] >>  0) & 0xff) * pDarken;
+            the_RGB.red   = ((cp[c] >> 16) & 0xff) * pDarken;
+            the_RGB.green = ((cp[c] >>  8) & 0xff) * pDarken;
+            the_RGB.blue  = ((cp[c] >>  0) & 0xff) * pDarken;
 
             if (pHeight == 1) {
                 f_total_minus_1 = 1.;
@@ -1061,7 +1074,8 @@ int NormalSideOfPlane(br_vector3* pPoint, br_vector3* pNormal, br_scalar pD) {
     br_scalar numer;
     br_scalar denom;
     LOG_TRACE("(%p, %p, %f)", pPoint, pNormal, pD);
-    NOT_IMPLEMENTED();
+
+    return (BrVector3Dot(pNormal, pPoint) - pD) >= 0.f;
 }
 
 // IDA: br_material* __usercall DRMaterialClone@<EAX>(br_material *pMaterial@<EAX>)
