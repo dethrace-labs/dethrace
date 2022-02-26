@@ -1,5 +1,6 @@
 #include "crush.h"
 #include "brender/brender.h"
+#include "car.h"
 #include "globvars.h"
 #include "harness/trace.h"
 #include "loading.h"
@@ -148,13 +149,25 @@ void CrushModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, br_vector3*
 // IDA: void __cdecl JitModelUpdate(br_actor *actor, br_model *model, br_material *material, void *render_data, br_uint_8 style, int on_screen)
 void JitModelUpdate(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen) {
     LOG_TRACE("(%p, %p, %p, %p, %d, %d)", actor, model, material, render_data, style, on_screen);
-    NOT_IMPLEMENTED();
+
+    BrModelUpdate(model, BR_MODU_NORMALS);
+    model->flags &= ~(BR_MODF_DONT_WELD | BR_MODF_KEEP_ORIGINAL);
+    BrZbModelRender(actor, model, material, style, BrOnScreenCheck(&model->bounds), 0);
 }
 
 // IDA: void __usercall SetModelForUpdate(br_model *pModel@<EAX>, tCar_spec *pCar@<EDX>, int crush_only@<EBX>)
 void SetModelForUpdate(br_model* pModel, tCar_spec* pCar, int crush_only) {
     LOG_TRACE("(%p, %p, %d)", pModel, pCar, crush_only);
-    NOT_IMPLEMENTED();
+
+    if (crush_only && pCar != NULL && pCar->car_model_actors[pCar->principal_car_actor].actor->model == pModel) {
+        CrushBoundingBox(pCar, crush_only);
+    }
+    if ((pModel->flags & BR_MODF_CUSTOM) != 0) {
+        pModel->user = JitModelUpdate;
+    } else {
+        pModel->custom = JitModelUpdate;
+        pModel->flags |= BR_MODF_CUSTOM;
+    }
 }
 
 // IDA: void __usercall TotallySpamTheModel(tCar_spec *pCar@<EAX>, int pModel_index@<EDX>, br_actor *pActor@<EBX>, tCrush_data *pCrush_data@<ECX>, br_scalar pMagnitude)
