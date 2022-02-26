@@ -567,7 +567,10 @@ void PDMouseButtons(int* pButton_1, int* pButton_2) {
     br_int_32 mouse_x;
     br_int_32 mouse_y;
     LOG_TRACE("(%p, %p)", pButton_1, pButton_2);
-    NOT_IMPLEMENTED();
+
+    STUB_ONCE();
+    *pButton_1 = 0;
+    *pButton_2 = 0;
 }
 
 // IDA: void __usercall PDGetMousePosition(int *pX_coord@<EAX>, int *pY_coord@<EDX>)
