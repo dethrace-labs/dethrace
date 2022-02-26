@@ -2423,6 +2423,7 @@ int SwitchToRealResolution() {
     gGraf_data_index = gReal_graf_data_index;
     gGraf_spec_index = gReal_graf_data_index;
     gCurrent_graf_data = &gGraf_data[gReal_graf_data_index];
+    PDSwitchToRealResolution();
     return 1;
 }
 
@@ -2435,6 +2436,7 @@ int SwitchToLoresMode() {
     gGraf_data_index = 0;
     gGraf_spec_index = 0;
     gCurrent_graf_data = gGraf_data;
+    PDSwitchToLoresMode();
     return 1;
 }
 
