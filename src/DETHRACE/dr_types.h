@@ -1639,7 +1639,7 @@ typedef struct tNet_message_crush_point {
 
 #define ENET_MESSAGE_HEADUP 0xc
 
-typedef struct tNet_contents { // size: 0x160
+typedef union tNet_contents { // size: 0x160
     struct { // size: 0x2
         tU8 contents_size; // @0x0
         tNet_message_type type; // @0x1
