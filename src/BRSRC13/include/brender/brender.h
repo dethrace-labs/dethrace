@@ -43,6 +43,7 @@ br_pixelmap* BrMapAdd(br_pixelmap* pixelmap);
 br_pixelmap* BrMapRemove(br_pixelmap* pixelmap);
 br_pixelmap* BrMapFind(char* pattern);
 br_uint_32 BrMapAddMany(br_pixelmap** items, int n);
+br_map_find_cbfn* BrMapFindHook(br_map_find_cbfn* hook) ;
 
 // BrMaterial
 br_material* BrMaterialAllocate(char* name);
@@ -55,6 +56,7 @@ br_material* BrMaterialFind(char* pattern);
 void BrMaterialFree(br_material* m);
 br_uint_32 BrMaterialAddMany(br_material** items, int n);
 br_uint_32 BrMaterialEnum(char* pattern, br_material_enum_cbfn* callback, void* arg);
+br_material_find_cbfn* BrMaterialFindHook(br_material_find_cbfn* hook);
 
 // BrMatrix34
 void BrMatrix23Identity(br_matrix23* mat);
@@ -103,6 +105,7 @@ br_model* BrModelLoad(char* filename);
 void BrModelFree(br_model* model);
 void BrModelUpdate(br_model* model, br_uint_16 flags);
 br_uint_32 BrModelLoadMany(char* filename, br_model** models, br_uint_16 num);
+br_model_find_cbfn* BrModelFindHook(br_model_find_cbfn* hook);
 
 // BrPixelmap
 br_pixelmap* BrPixelmapLoad(char* filename);
@@ -136,6 +139,7 @@ br_pixelmap* BrTableRemove(br_pixelmap* pixelmap);
 br_uint_32 BrTableAddMany(br_pixelmap** items, int n);
 void BrTableUpdate(br_pixelmap* table, br_uint_16 flags);
 br_uint_32 BrTableEnum(char* pattern, br_table_enum_cbfn* callback, void* arg);
+br_table_find_cbfn* BrTableFindHook(br_table_find_cbfn* hook);
 
 // BrTransform
 void BrTransformToMatrix34(br_matrix34* mat, br_transform* xform);
