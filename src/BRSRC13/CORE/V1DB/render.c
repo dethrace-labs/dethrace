@@ -44,7 +44,12 @@ br_uint_32 BrOnScreenCheck(br_bounds3* bounds) {
     br_token r;
     LOG_TRACE("(%p)", bounds);
 
+    STUB_ONCE(); // Add call to STUB_ONCE to mark this function as not implemented.
     return 1;
+
+    // FIXME: use this once the clouse clear up.
+    v1db.renderer->dispatch->_boundsTestF(v1db.renderer, &r, (br_bounds3_f*)bounds);
+    return r;
 }
 
 // IDA: br_uint_16 __usercall prependActorTransform@<AX>(br_actor *ap@<EAX>, br_uint_16 t@<EDX>)
