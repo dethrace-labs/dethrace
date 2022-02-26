@@ -84,9 +84,15 @@ typedef struct tPath_section_struct tPath_section;
 typedef tU32 tPlayer_ID;
 typedef void* tPipe_reset_proc();
 typedef struct tPowerup tPowerup;
+#ifdef DETHRACE_FIX_BUGS
 typedef int tGot_proc(tPowerup*, tCar_spec*);
 typedef void tLose_proc(tPowerup*, tCar_spec*);
 typedef void tPeriodic_proc(tPowerup*, tU32);
+#else
+typedef int* tGot_proc(tPowerup*, tCar_spec*);
+typedef void* tLose_proc(tPowerup*, tCar_spec*);
+typedef void* tPeriodic_proc(tPowerup*, tU32);
+#endif
 typedef char tPath_name[256];
 typedef struct tFlic_descriptor* tFlic_descriptor_ptr;
 typedef struct exception_struct* tException_list;
