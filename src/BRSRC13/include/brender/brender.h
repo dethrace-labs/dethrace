@@ -177,5 +177,6 @@ br_uint_32 BrOnScreenCheck(br_bounds3* bounds);
 
 int BrWriteModeSet(int mode);
 br_uint_32 BrSwap32(br_uint_32 l);
+br_diaghandler* BrDiagHandlerSet(br_diaghandler* newdh);
 
 #endif
