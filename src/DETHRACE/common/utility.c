@@ -1109,10 +1109,11 @@ br_material* DRMaterialClone(br_material* pMaterial) {
 // IDA: void __usercall StripCR(char *s@<EAX>)
 void StripCR(char* s) {
     char* pos;
+
     pos = s;
-    while (*pos != 0) {
+    while (*pos != '\0') {
         if (*pos == '\r' || *pos == '\n') {
-            *pos = 0;
+            *pos = '\0';
             break;
         }
         pos++;
