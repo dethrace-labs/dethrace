@@ -1633,7 +1633,7 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
     if (gGroove_funk_offset < 0) {
         FatalError(113);
     }
-    if (!strcmp(pCar_name, "STELLA.TXT")) {
+    if (strcmp(pCar_name, "STELLA.TXT") == 0) {
         pCar_spec->proxy_ray_distance = 6.0;
     } else {
         pCar_spec->proxy_ray_distance = 0.0;
@@ -1641,7 +1641,7 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
     PathCat(the_path, gApplication_path, "CARS");
     PathCat(the_path, the_path, pCar_name);
     f = DRfopen(the_path, "rt");
-    if (!f) {
+    if (f == NULL) {
         FatalError(25);
     }
     PathCat(the_path, gApplication_path, gGraf_specs[gGraf_spec_index].data_dir_name);
@@ -1649,7 +1649,7 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
     PathCat(the_path, the_path, pCar_name);
     AllowOpenToFail();
     g = DRfopen(the_path, "rt");
-    if (!g) {
+    if (g == NULL) {
         PathCat(the_path, gApplication_path, gGraf_specs[gGraf_spec_index].data_dir_name);
         PathCat(the_path, the_path, "CARS");
         PathCat(the_path, the_path, gBasic_car_names[0]);
