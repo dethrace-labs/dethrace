@@ -2501,7 +2501,7 @@ void LoadOpponents() {
 
     PathCat(the_path, gApplication_path, "OPPONENT.TXT");
     f = DRfopen(the_path, "rt");
-    if (!f) {
+    if (f == NULL) {
         FatalError(54);
     }
     GetALineAndDontArgue(f, s);
