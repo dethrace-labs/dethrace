@@ -124,6 +124,7 @@ br_uint_16 BrPixelmapTextWidth(br_pixelmap* dst, br_font* font, char* text);
 // BrRes
 void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class);
 br_resource_class* BrResClassAdd(br_resource_class* rclass);
+void* BrResRemove(void* vres);
 void BrResFree(void* vres);
 char* BrResStrDup(void* vparent, char* str);
 
@@ -149,6 +150,9 @@ void BrVector3SetFloat(br_vector3* v1, float f1, float f2, float f3);
 // void BrVector3Accumulate(br_vector3* v1, br_vector3* v2);
 // void BrVector3Normalise(br_vector3* v1, br_vector3* v2);
 
+// BrTransform
+void BrTransformToTransform(br_transform* dest, br_transform* src);
+
 // Logging
 void BrFailure(const char* s, ...);
 void BrFatal(const char* name, int line, const char* s, ...);
@@ -160,9 +164,13 @@ void BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour
 void BrZbSceneRenderAdd(br_actor* tree);
 void BrZbSceneRenderEnd(void);
 
+void BrZbModelRender(br_actor* actor, br_model* model, br_material* material, br_uint_8 style, int on_screen, int use_custom);
+
 br_pixelmap* DOSGfxBegin(char* setup_string);
 
 // Various
+br_uint_32 BrOnScreenCheck(br_bounds3* bounds);
+
 int BrWriteModeSet(int mode);
 br_uint_32 BrSwap32(br_uint_32 l);
 
