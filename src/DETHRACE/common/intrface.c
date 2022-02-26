@@ -23,13 +23,15 @@ int gDisabled_count;
 // IDA: void __cdecl SetAlwaysTyping()
 void SetAlwaysTyping() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gAlways_typing = 1;
 }
 
 // IDA: void __cdecl ClearAlwaysTyping()
 void ClearAlwaysTyping() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gAlways_typing = 0;
 }
 
 // IDA: int __usercall ChoiceDisabled@<EAX>(int pChoice@<EAX>)
@@ -48,7 +50,8 @@ int ChoiceDisabled(int pChoice) {
 // IDA: void __cdecl ResetInterfaceTimeout()
 void ResetInterfaceTimeout() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gStart_time = PDGetTotalTime();
 }
 
 // IDA: void __usercall ChangeSelection(tInterface_spec *pSpec@<EAX>, int *pOld_selection@<EDX>, int *pNew_selection@<EBX>, int pMode@<ECX>, int pSkip_disabled)
@@ -57,35 +60,29 @@ void ChangeSelection(tInterface_spec* pSpec, int* pOld_selection, int* pNew_sele
     LOG_TRACE("(%p, %p, %p, %d, %d)", pSpec, *pOld_selection, *pNew_selection, pMode, pSkip_disabled);
     //    LOG_DEBUG("on entry: old: %p, new %p", pOld_selection, pNew_selection);
 
-    for (i = 0; i < gDisabled_count; i++) {
-        if (*pNew_selection == gDisabled_choices[i]) {
-            if (pSkip_disabled) {
-                if (*pNew_selection <= *pOld_selection) {
-
-                    do {
-                        (*pNew_selection)--;
-                        if (*pNew_selection < pSpec->move_up_min[pMode]) {
-                            *pNew_selection = pSpec->move_up_max[pMode];
-                        }
-                        if (*pNew_selection > pSpec->move_up_max[pMode]) {
-                            *pNew_selection = pSpec->move_up_min[pMode];
-                        }
-                    } while (*pNew_selection != *pOld_selection && ChoiceDisabled(*pNew_selection));
-                } else {
-                    do {
-                        (*pNew_selection)++;
-                        if (*pNew_selection < pSpec->move_up_min[pMode]) {
-                            *pNew_selection = pSpec->move_up_max[pMode];
-                        }
-                        if (*pNew_selection > pSpec->move_up_max[pMode]) {
-                            *pNew_selection = pSpec->move_up_min[pMode];
-                        }
-                    } while (*pNew_selection != *pOld_selection && ChoiceDisabled(*pNew_selection));
+    if (ChoiceDisabled(*pNew_selection)) {
+        if (!pSkip_disabled) {
+            *pNew_selection = *pOld_selection;
+        } else if (*pOld_selection < *pNew_selection) {
+            do {
+                *pNew_selection = *pNew_selection + 1;
+                if (pSpec->move_up_min[pMode] != *pNew_selection && *pNew_selection <= pSpec->move_up_min[pMode]) {
+                    *pNew_selection = pSpec->move_up_max[pMode];
                 }
-            } else {
-                *pNew_selection = *pOld_selection;
-            }
-            break;
+                if (pSpec->move_up_max[pMode] < *pNew_selection) {
+                    *pNew_selection = pSpec->move_up_min[pMode];
+                }
+            } while (*pNew_selection != *pOld_selection && !ChoiceDisabled(*pNew_selection));
+        } else {
+            do {
+                *pNew_selection = *pNew_selection - 1;
+                if (pSpec->move_up_min[pMode] != *pNew_selection && *pNew_selection <= pSpec->move_up_min[pMode]) {
+                    *pNew_selection = pSpec->move_up_max[pMode];
+                }
+                if (pSpec->move_up_max[pMode] < *pNew_selection) {
+                    *pNew_selection = pSpec->move_up_min[pMode];
+                }
+            } while (*pNew_selection != *pOld_selection && !ChoiceDisabled(*pNew_selection));
         }
     }
 
@@ -145,7 +142,14 @@ void DisableChoice(int pChoice) {
 void EnableChoice(int pChoice) {
     int i;
     LOG_TRACE("(%d)", pChoice);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < gDisabled_count; i++) {
+        if (gDisabled_choices[i] == pChoice) {
+            memmove(&gDisabled_choices[i], &gDisabled_choices[i + 1], (gDisabled_count - i - 1) * sizeof(gDisabled_choices[0]));
+            gDisabled_count--;
+            break;
+        }
+    }
 }
 
 // IDA: int __usercall DoInterfaceScreen@<EAX>(tInterface_spec *pSpec@<EAX>, int pOptions@<EDX>, int pCurrent_choice@<EBX>)
@@ -199,7 +203,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
     }
 
     InitFlicQueue();
-    gStart_time = PDGetTotalTime();
+    ResetInterfaceTimeout();
     gCurrent_choice = pCurrent_choice;
     gCurrent_mode = pSpec->initial_imode;
     StartMouseCursor();
@@ -209,10 +213,10 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
     }
     old_current_splash = gCurrent_splash;
     KillSplashScreen();
-    if (pSpec->start_proc1) {
+    if (pSpec->start_proc1 != NULL) {
         pSpec->start_proc1();
     }
-    if (!gFaded_palette && !old_current_splash && !(pOptions & 2)) {
+    if (!gFaded_palette && old_current_splash == NULL && !(pOptions & 2)) {
         DRS3StartSound(gIndexed_outlets[0], 3006);
     }
     if (pOptions & 1) {
@@ -223,12 +227,12 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
         RunFlic(pSpec->first_opening_flic);
     }
 
-    if (pSpec->start_proc2) {
+    if (pSpec->start_proc2 != NULL) {
         pSpec->start_proc2();
     }
 
     copy_areas = NULL;
-    if (pSpec->number_of_recopy_areas) {
+    if (pSpec->number_of_recopy_areas != 0) {
         copy_areas = BrMemAllocate(sizeof(void*) * pSpec->number_of_recopy_areas, kMem_intf_copy_areas);
         for (i = 0; i < pSpec->number_of_recopy_areas; i++) {
             copy_areas[i] = BrPixelmapAllocate(BR_MEMORY_PIXELS,
@@ -260,12 +264,12 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
         the_key = PDAnyKeyDown();
         if (the_key != -1 && the_key != KEY_CAPSLOCK) {
             gMouse_in_use = 0;
-            gStart_time = PDGetTotalTime();
+            ResetInterfaceTimeout();
         }
         EdgeTriggerModeOn();
         if ((gTyping_slot < 0 || gAlways_typing) && (PDKeyDown(KEY_LEFT) || PDKeyDown(KEY_KP_4) || last_press == KEY_LEFT)) {
             last_press = -1;
-            if (pSpec->move_left_delta[gCurrent_mode]) {
+            if (pSpec->move_left_delta[gCurrent_mode] != 0) {
                 gCurrent_choice += pSpec->move_left_delta[gCurrent_mode];
                 if (gCurrent_choice < pSpec->move_left_min[gCurrent_mode]) {
                     gCurrent_choice = pSpec->move_left_max[gCurrent_mode];
@@ -275,7 +279,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
                 }
                 DRS3StartSound(gIndexed_outlets[0], 3000);
             }
-            if (pSpec->move_left_proc[gCurrent_mode]) {
+            if (pSpec->move_left_proc[gCurrent_mode] != NULL) {
                 defeat_mode_change = (pSpec->move_left_proc[gCurrent_mode])(&gCurrent_choice, &gCurrent_mode);
             } else {
                 defeat_mode_change = 0;
@@ -286,7 +290,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
         }
         if ((gTyping_slot < 0 || gAlways_typing) && (PDKeyDown(KEY_RIGHT) || PDKeyDown(KEY_KP_6) || last_press == KEY_RIGHT)) {
             last_press = -1;
-            if (pSpec->move_right_delta[gCurrent_mode]) {
+            if (pSpec->move_right_delta[gCurrent_mode] != 0) {
                 gCurrent_choice += pSpec->move_right_delta[gCurrent_mode];
                 if (gCurrent_choice < pSpec->move_right_min[gCurrent_mode]) {
                     gCurrent_choice = pSpec->move_right_max[gCurrent_mode];
@@ -296,7 +300,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
                 }
                 DRS3StartSound(gIndexed_outlets[0], 3000);
             }
-            if (pSpec->move_right_proc[gCurrent_mode]) {
+            if (pSpec->move_right_proc[gCurrent_mode] != NULL) {
                 defeat_mode_change = (pSpec->move_right_proc[gCurrent_mode])(&gCurrent_choice, &gCurrent_mode);
             } else {
                 defeat_mode_change = 0;
@@ -307,7 +311,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
         }
         if (PDKeyDown(KEY_UP) || PDKeyDown(KEY_KP_8) || last_press == KEY_UP) {
             last_press = -1;
-            if (pSpec->move_up_delta[gCurrent_mode]) {
+            if (pSpec->move_up_delta[gCurrent_mode] != 0) {
                 gCurrent_choice += pSpec->move_up_delta[gCurrent_mode];
                 if (gCurrent_choice < pSpec->move_up_min[gCurrent_mode]) {
                     gCurrent_choice = pSpec->move_up_max[gCurrent_mode];
@@ -317,7 +321,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
                 }
                 DRS3StartSound(gIndexed_outlets[0], 3000);
             }
-            if (pSpec->move_up_proc[gCurrent_mode]) {
+            if (pSpec->move_up_proc[gCurrent_mode] != NULL) {
                 defeat_mode_change = (pSpec->move_up_proc[gCurrent_mode])(&gCurrent_choice, &gCurrent_mode);
             } else {
                 defeat_mode_change = 0;
@@ -328,7 +332,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
         }
         if (PDKeyDown(KEY_DOWN) || PDKeyDown(KEY_KP_2) || last_press == KEY_DOWN) {
             last_press = -1;
-            if (pSpec->move_down_delta[gCurrent_mode]) {
+            if (pSpec->move_down_delta[gCurrent_mode] != 0) {
                 gCurrent_choice += pSpec->move_down_delta[gCurrent_mode];
                 if (gCurrent_choice < pSpec->move_down_min[gCurrent_mode]) {
                     gCurrent_choice = pSpec->move_down_max[gCurrent_mode];
@@ -338,7 +342,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
                 }
                 DRS3StartSound(gIndexed_outlets[0], 3000);
             }
-            if (pSpec->move_down_proc[gCurrent_mode]) {
+            if (pSpec->move_down_proc[gCurrent_mode] != NULL) {
                 defeat_mode_change = (pSpec->move_down_proc[gCurrent_mode])(&gCurrent_choice, &gCurrent_mode);
             } else {
                 defeat_mode_change = 0;
@@ -363,7 +367,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
             RollLettersIn();
         }
         ServicePanelFlics(1);
-        if (pSpec->draw_proc) {
+        if (pSpec->draw_proc != NULL) {
             pSpec->draw_proc(gCurrent_choice, gCurrent_mode);
         }
         ProcessFlicQueue(gFrame_period);
@@ -418,7 +422,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
         if (PDKeyDown(KEY_ESCAPE)) {
             DRS3StartSound(gIndexed_outlets[0], 3005);
             escaped = pSpec->escape_allowed[gCurrent_mode];
-            if (pSpec->escape_proc[gCurrent_mode]) {
+            if (pSpec->escape_proc[gCurrent_mode] != NULL) {
                 escaped = (pSpec->escape_proc[gCurrent_mode])(&gCurrent_choice, &gCurrent_mode);
             }
         } else {
@@ -505,7 +509,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
         //v100 = pSpec->escape_code;
         gCurrent_choice = pSpec->escape_code;
     }
-    if (pSpec->done_proc) {
+    if (pSpec->done_proc != NULL) {
         result = (pSpec->done_proc)(gCurrent_choice, gCurrent_mode, go_ahead, escaped, timed_out);
     } else {
         result = gCurrent_choice;
@@ -548,5 +552,9 @@ LABEL_230:
 void ChangeSelectionTo(int pNew_choice, int pNew_mode) {
     int last_choice;
     LOG_TRACE("(%d, %d)", pNew_choice, pNew_mode);
-    NOT_IMPLEMENTED();
+
+    last_choice = gCurrent_choice;
+    gCurrent_choice = pNew_choice;
+    gCurrent_mode = pNew_mode;
+    ChangeSelection(gSpec, &last_choice, &gCurrent_choice, pNew_mode, 1);
 }
