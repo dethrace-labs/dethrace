@@ -47,6 +47,7 @@ void SetJoystickArrays(int* pKeys, int pMark) {
 
 // IDA: void __cdecl PollKeys()
 void PollKeys() {
+
     gKey_poll_counter++;
     PDSetKeyArray(gKey_array, gKey_poll_counter);
     SetJoystickArrays(gKey_array, gKey_poll_counter);
@@ -56,7 +57,7 @@ void PollKeys() {
 // IDA: void __cdecl CyclePollKeys()
 void CyclePollKeys() {
     int i;
-    for (i = 0; i < 123; i++) {
+    for (i = 0; i < COUNT_OF(gKey_array); i++) {
         if (gKey_array[i] > gKey_poll_counter) {
             gKey_array[i] = 0;
             if (i > 115) {
@@ -70,10 +71,10 @@ void CyclePollKeys() {
 // IDA: void __cdecl ResetPollKeys()
 void ResetPollKeys() {
     int i;
-    for (i = 0; i < 123; i++) {
+    for (i = 0; i < COUNT_OF(gKey_array); i++) {
         gKey_array[i] = 0;
     }
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < COUNT_OF(gJoy_array); i++) {
         gJoy_array[i] = -1;
     }
 }
@@ -91,8 +92,11 @@ void CheckKeysForMouldiness() {
 
 // IDA: int __cdecl EitherMouseButtonDown()
 int EitherMouseButtonDown() {
+    int but_1;
     int but_2;
-    return 0;
+
+    PDMouseButtons(&but_1, &but_2);
+    return but_1 || but_2;
 }
 
 // IDA: tKey_down_result __usercall PDKeyDown2@<EAX>(int pKey_index@<EAX>)
@@ -106,7 +110,7 @@ tKey_down_result PDKeyDown2(int pKey_index) {
     the_time = PDGetTotalTime();
     if (gKey_array[pKey_index]) {
         if (gLast_key_down == pKey_index) {
-            if (the_time - gLast_key_down_time < 300) {
+            if ((the_time - gLast_key_down_time) < 300) {
                 return tKey_down_still;
             } else {
                 gLast_key_down_time = the_time;
@@ -121,21 +125,19 @@ tKey_down_result PDKeyDown2(int pKey_index) {
     if (gLast_key_down == pKey_index) {
         gLast_key_down_time = 0;
         gLast_key_down = -1;
+        return tKey_down_no;
     }
-    return tKey_down_no;
 }
 
 // IDA: int __usercall PDKeyDown@<EAX>(int pKey_index@<EAX>)
 int PDKeyDown(int pKey_index) {
     tKey_down_result result;
+
     result = PDKeyDown2(pKey_index);
     if (!gEdge_trigger_mode || pKey_index <= 10) {
-        return result != 0;
+        return result != tKey_down_no;
     }
-    if (result != tKey_down_yes && result != tKey_down_repeat) {
-        return 0;
-    }
-    return 1;
+    return result == tKey_down_yes || result == tKey_down_repeat;
 }
 
 // IDA: int __usercall PDKeyDown3@<EAX>(int pKey_index@<EAX>)
@@ -159,7 +161,7 @@ int PDAnyKeyDown() {
     tKey_down_result result;
 
     CheckKeysForMouldiness();
-    for (i = 122; i >= 0; --i) {
+    for (i = COUNT_OF(gKey_array) - 1; i >= 0; --i) {
         if (gKey_array[i]) {
             if (!gEdge_trigger_mode) {
                 return i;
@@ -169,11 +171,9 @@ int PDAnyKeyDown() {
             case tKey_down_no:
             case tKey_down_still:
                 return -1;
-                break;
             case tKey_down_yes:
             case tKey_down_repeat:
                 return i;
-                break;
             }
         }
     }
@@ -187,6 +187,7 @@ int PDAnyKeyDown() {
 // IDA: int __cdecl AnyKeyDown()
 int AnyKeyDown() {
     int the_key;
+
     the_key = PDAnyKeyDown();
     if ((the_key != -1 && the_key != 4) || EitherMouseButtonDown() != 0) {
         return 1;
@@ -237,8 +238,8 @@ tU32* KevKeyService() {
     if (keys && keys != last_key) {
         sum += keys;
         code += keys << 11;
-        code = (code >> 17) + 16 * code;
-        code2 = (code2 >> 29) + keys * keys + 8 * code2;
+        code = (code >> 17) + (code << 4);
+        code2 = (code2 >> 29) + keys * keys + (code2 << 3);
         //printf("accumulate: keys=%lx, sum=%lx, code=%lx, code2=%lx\n", keys, sum, code, code2);
         last_time = PDGetTotalTime();
     } else if (PDGetTotalTime() > (last_time + 1000)) {
@@ -259,17 +260,17 @@ int OldKeyIsDown(int pKey_index) {
     LOG_TRACE("(%d)", pKey_index);
 
     switch (pKey_index) {
-        case -2:
-            return 1;
-        case -1:
-            for (i = 0; i < COUNT_OF(gGo_ahead_keys); i++) {
-                if (PDKeyDown(gGo_ahead_keys[i]) != 0) {
-                    return 1;
-                }
+    case -2:
+        return 1;
+    case -1:
+        for (i = 0; i < COUNT_OF(gGo_ahead_keys); i++) {
+            if (PDKeyDown(gGo_ahead_keys[i]) != 0) {
+                return 1;
             }
-            return 0;
-        default:
-            return PDKeyDown(gKey_mapping[pKey_index]);
+        }
+        return 0;
+    default:
+        return PDKeyDown(gKey_mapping[pKey_index]);
     }
 }
 
@@ -278,19 +279,19 @@ int KeyIsDown(int pKey_index) {
     int i;
 
     CheckKeysForMouldiness();
-
-    if (pKey_index == -2) {
+    switch (pKey_index) {
+    case -2:
         return 1;
-    }
-    if (pKey_index != -1) {
+    case -1:
+        for (i = 0; i < COUNT_OF(gGo_ahead_keys); i++) {
+            if (gKey_array[gGo_ahead_keys[i]]) {
+                return 1;
+            }
+        }
+        return 0;
+    default:
         return gKey_array[gKey_mapping[pKey_index]];
     }
-    for (i = 0; i < 3; i++) {
-        if (gKey_array[gGo_ahead_keys[i]]) {
-            return 1;
-        }
-    }
-    return 0;
 }
 
 // IDA: void __cdecl WaitForNoKeys()
@@ -309,10 +310,10 @@ void WaitForAKey() {
 
     while (1) {
         CheckQuit();
-        if (AnyKeyDown() != 0) {
+        if (AnyKeyDown()) {
             break;
         }
-        if (EitherMouseButtonDown() != 0) {
+        if (EitherMouseButtonDown()) {
             break;
         }
     }
@@ -333,7 +334,7 @@ void GetMousePosition(int* pX_coord, int* pY_coord) {
     int y_bottom_margin;
     LOG_TRACE("(%p, %p)", pX_coord, pY_coord);
 
-    PDMouseButtons(pX_coord, pY_coord);
+    PDGetMousePosition(pX_coord, pY_coord);
     if (*pX_coord < 0) {
         *pX_coord = 0;
     } else if (gGraf_specs[gGraf_spec_index].total_width < *pX_coord) {
@@ -374,7 +375,6 @@ int AddRollingLetter(char pChar, int pX, int pY, tRolling_type rolling_type) {
     LOG_TRACE("(%d, %d, %d, %d)", pChar, pX, pY, rolling_type);
 
     let = &gRolling_letters[0];
-    //if (let->number_of_letters >= 0) {
     for (i = 0; i < NBR_ROLLING_LETTERS; i++) {
         let = &gRolling_letters[i];
         if (let->number_of_letters < 0) {
@@ -385,16 +385,15 @@ int AddRollingLetter(char pChar, int pX, int pY, tRolling_type rolling_type) {
         LOG_WARN("no rolling slot available");
         return -1;
     }
-    //}
-
     let->x_coord = pX;
     let->y_coord = pY;
     let->rolling_type = rolling_type;
-    if (rolling_type == eRT_looping_random) {
+    switch (rolling_type) {
+    case eRT_looping_random:
         let->number_of_letters = 9;
-    } else if (rolling_type == eRT_looping_single) {
+    case eRT_looping_single:
         let->number_of_letters = 2;
-    } else {
+    default:
         let->number_of_letters = IRandomBetween(3, 9);
     }
 
@@ -403,7 +402,7 @@ int AddRollingLetter(char pChar, int pX, int pY, tRolling_type rolling_type) {
         if (rolling_type == eRT_numeric) {
             let->letters[i] = pChar;
         } else {
-            let->letters[i] = IRandomBetween(65, 91);
+            let->letters[i] = IRandomBetween('A', 'Z' + 1);
         }
     }
     if (rolling_type != eRT_looping_random) {
@@ -429,7 +428,7 @@ void AddRollingNumber(tU32 pNumber, int pWidth, int pX, int pY) {
     char the_string[32];
     LOG_TRACE("(%d, %d, %d, %d)", pNumber, pWidth, pX, pY);
 
-    sprintf(the_string, "%0.*d", pWidth, pNumber);
+    sprintf(the_string, VARLZEROINT, pWidth, pNumber);
     AddRollingString(the_string, pX, pY, eRT_numeric);
 }
 
@@ -468,9 +467,9 @@ void RollLettersIn() {
         if (let->number_of_letters >= 0) {
             char_ptr = gBack_screen->pixels;
             char_ptr += let->y_coord * gBack_screen->row_bytes + let->x_coord;
-            if (let->current_offset > 0) {
+            if (let->current_offset > 0.0f) {
                 let->current_offset -= period * 0.18f;
-                if (let->current_offset <= 0.0) {
+                if (let->current_offset <= 0.0f) {
                     if (let->rolling_type == eRT_looping_random || let->rolling_type == eRT_looping_single) {
                         let->current_offset = (gCurrent_graf_data->save_slot_letter_height * let->number_of_letters) + let->current_offset;
                     } else {
@@ -485,8 +484,8 @@ void RollLettersIn() {
                 saved_char_ptr = char_ptr;
                 if (which_letter < let->number_of_letters && which_letter >= 0 && letter_offset >= 0 && letter_offset < font_height) {
 
-                    //                    LOG_DEBUG("chars %d, %d, %d, %d", let->letters[0], let->letters[1], let->letters[2], let->letters[3]);
-                    source_ptr = (tU8*)gFonts[FONT_TYPEABLE].images->pixels + (font_height * (let->letters[which_letter] - 32) + letter_offset) * the_row_bytes;
+                    // LOG_DEBUG("chars %d, %d, %d, %d", let->letters[0], let->letters[1], let->letters[2], let->letters[3]);
+                    source_ptr = (tU8*)gFonts[FONT_TYPEABLE].images->pixels + (font_height * (let->letters[which_letter] - ' ') + letter_offset) * the_row_bytes;
                     for (k = 0; k < font_width; k++) {
                         the_byte = *source_ptr;
                         if (the_byte) {
@@ -521,7 +520,7 @@ int ChangeCharTo(int pSlot_index, int pChar_index, char pNew_char) {
 
     if (pNew_char == ROLLING_LETTER_LOOP_RANDOM) {
         new_type = eRT_looping_random;
-    } else if (pNew_char >= 0x30 && pNew_char <= 0x39) {
+    } else if (pNew_char >= '0' && pNew_char <= '9') {
         new_type = eRT_numeric;
     } else {
         new_type = eRT_alpha;
@@ -540,7 +539,7 @@ int ChangeCharTo(int pSlot_index, int pChar_index, char pNew_char) {
         let->letters[0] = pNew_char;
     }
     if (pNew_char == ' ') {
-        let->letters[0] = 32;
+        let->letters[0] = ' ';
     }
     let->rolling_type = new_type;
     let->current_offset = gCurrent_graf_data->save_slot_letter_height * let->number_of_letters;
@@ -618,7 +617,7 @@ void DoRLBackspace(int pSlot_index) {
     int new_len;
     LOG_TRACE("(%d)", pSlot_index);
 
-    if (gCurrent_position) {
+    if (gCurrent_position != 0) {
         if (strlen(gCurrent_typing) == gCurrent_position) {
             new_len = strlen(gCurrent_typing);
         } else {
@@ -664,7 +663,7 @@ void DoRLInsert(int pSlot_index) {
 // IDA: void __usercall DoRLCursorLeft(int pSlot_index@<EAX>)
 void DoRLCursorLeft(int pSlot_index) {
     LOG_TRACE("(%d)", pSlot_index);
-    if (gCurrent_position) {
+    if (gCurrent_position != 0) {
         if (strlen(gCurrent_typing) == gCurrent_position) {
             ChangeCharTo(pSlot_index, strlen(gCurrent_typing), ' ');
         } else {
@@ -758,7 +757,7 @@ void StartTyping(int pSlot_index, char* pText, int pVisible_length) {
     strcpy(gCurrent_typing, pText);
     gVisible_length = pVisible_length;
     gCurrent_position = strlen(gCurrent_typing);
-    gCurrent_cursor = ChangeCharTo(pSlot_index, gCurrent_position, ROLLING_LETTER_LOOP_RANDOM);
+    SetRollingCursor(pSlot_index);
 }
 
 // IDA: void __usercall TypeKey(int pSlot_index@<EAX>, char pKey@<EDX>)
@@ -822,7 +821,6 @@ void KillCursor(int pSlot_index) {
     if (gCurrent_position < gVisible_length && gCurrent_position >= 0) {
         y_coord = gLetter_y_coords[pSlot_index];
         x_coord = gCurrent_graf_data->rolling_letter_x_pitch * gCurrent_position + gLetter_x_coords[pSlot_index];
-        let = gRolling_letters;
         for (i = 0; i < NBR_ROLLING_LETTERS; i++) {
             let = &gRolling_letters[i];
             if (let->number_of_letters >= 0 && x_coord == let->x_coord && y_coord == let->y_coord) {
