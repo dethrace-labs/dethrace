@@ -369,7 +369,7 @@ void SetSmokeLastDamageLevel(tCar_spec* pCar) {
     int i;
     LOG_TRACE("(%p)", pCar);
 
-    for (i = 0; i < BR_ASIZE(pCar->damage_units); i++) {
+    for (i = 0; i < COUNT_OF(pCar->damage_units); i++) {
         pCar->damage_units[i].smoke_last_level = pCar->damage_units[i].damage_level;
     }
 }
