@@ -1059,7 +1059,8 @@ void DRPixelmapRectangleCopy(br_pixelmap* dst, br_int_16 dx, br_int_16 dy, br_pi
 // IDA: void __usercall DRPixelmapCopy(br_pixelmap *dst@<EAX>, br_pixelmap *src@<EDX>)
 void DRPixelmapCopy(br_pixelmap* dst, br_pixelmap* src) {
     LOG_TRACE("(%p, %p)", dst, src);
-    NOT_IMPLEMENTED();
+
+    BrPixelmapCopy(dst, src);
 }
 
 // IDA: void __usercall DRPixelmapRectangleFill(br_pixelmap *dst@<EAX>, br_int_16 x@<EDX>, br_int_16 y@<EBX>, br_uint_16 w@<ECX>, br_uint_16 h, br_uint_32 colour)
