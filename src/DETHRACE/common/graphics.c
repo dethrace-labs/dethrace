@@ -16,6 +16,7 @@
 #include "harness/trace.h"
 #include "init.h"
 #include "loading.h"
+#include "netgame.h"
 #include "network.h"
 #include "oil.h"
 #include "opponent.h"
@@ -27,6 +28,7 @@
 #include "replay.h"
 #include "sound.h"
 #include "spark.h"
+#include "trig.h"
 #include "utility.h"
 #include "world.h"
 #include <stdlib.h>
@@ -95,11 +97,32 @@ br_matrix34 gIdentity34 = {
 tShadow_level gShadow_level = eShadow_us_only;
 br_scalar gShadow_hither_z_move;
 br_scalar gShadow_hither_min_move;
-int gArrows[2][4][60];
-float gMap_render_x;
-float gMap_render_y;
-float gMap_render_width;
-float gMap_render_height;
+// arrows pointing to 180, 202, 224, 246 degrees (step = 90 / 4 = 22(.5) degrees)
+int gArrows[2][4][60] =
+{
+    {
+        // inner arrow (=fill)
+        { 10,  0,  0, -1,  0,  1,  0,  0, -1,  0, -2,  0,  1, -1,  1,  1,  1, -2,  2,  2,  2, },
+        { 11,  0,  0, -1,  0,  1,  0,  0, -1,  1, -1,  1, -2, -2,  1, -1,  1,  0,  1,  1,  1,  1,  2, },
+        {  9,  0,  0, -2,  0, -1,  0,  1,  0,  0, -1,  1, -1,  2, -2,  0,  1,  0,  2, },
+        { 11,  0,  0, -1,  0,  1,  0, -2, -1, -1, -1,  0, -1,  1, -1,  2, -1, -1,  1,  0,  1, -1,  2, },
+    }, 
+    {
+        // outer arrow (=border)
+        { 26,  1, -3,  1, -2,  1, -1,  2, -1,  2,  0,  2,  1,  3,  1,  3,  2,  3,  3,  2,  3,  1,  3,  1,  2,  0,  2, -1,  2, 
+              -1,  3, -2,  3, -3,  3, -3,  2, -3,  1, -2,  1, -2,  0, -2, -1, -1, -1, -1, -2, -1, -3,  0, -3, },
+        { 22,  0, -3,  1, -3,  2, -3,  2, -2,  2, -1,  2,  0,  2,  1,  2,  2,  2,  3,  1,  3,  0,  3,  0,  2, -1,  2, -2,  2,
+              -3,  2, -3,  1, -3,  0, -2,  0, -2, -1, -1, -1, -1, -2,  0, -2, },
+        { 24,  1, -3,  2, -3,  3, -3,  3, -2,  3, -1,  2, -1,  2,  0,  2,  1,  1,  1,  1,  2,  1,  3,  0,  3, -1,  3, -1,  2,
+              -1,  1, -2,  1, -3,  1, -3,  0, -3, -1, -2, -1, -1, -1, -1, -2,  0, -2,  1, -2, }, 
+        { 22, -3, -2, -2, -2, -1, -2,  0, -2,  1, -2,  2, -2,  3, -2,  3, -1,  3,  0,  2,  0,  2,  1,  1,  1,  1,  2,  0,  2, 
+               0,  3, -1,  3, -2,  3, -2,  2, -2,  1, -2,  0, -3,  0, -3, -1, },
+    },
+};
+float gMap_render_x = 80.f;
+float gMap_render_y =  6.f;
+float gMap_render_width = 64.f;
+float gMap_render_height = 40.f;
 int gMouse_started;
 int gFaded_palette;
 int gAR_fudge_headups;
@@ -211,7 +234,23 @@ void RenderLollipops() {
     br_actor** the_actor;
     br_actor* old_parent;
     LOG_TRACE("()");
-    STUB_ONCE();
+
+    for (i = 0, the_actor = gLollipops; i < gNumber_of_lollipops; i++, the_actor++) {
+        if ((*the_actor)->render_style == BR_RSTYLE_NONE) {
+            must_relink = (*the_actor)->parent != gDont_render_actor;
+            if (must_relink) {
+                old_parent = (*the_actor)->parent;
+                BrActorRelink(gDont_render_actor, *the_actor);
+            }
+            (*the_actor)->render_style = BR_RSTYLE_FACES;
+            SetPedMaterialForRender(*the_actor);
+            BrZbSceneRenderAdd(*the_actor);
+            (*the_actor)->render_style = BR_RSTYLE_NONE;
+            if (must_relink) {
+                BrActorRelink(old_parent, *the_actor);
+            }
+        }
+    }
 }
 
 // IDA: void __usercall DRDrawLine(br_pixelmap *pDestn@<EAX>, int pX1@<EDX>, int pY1@<EBX>, int pX2@<ECX>, int pY2, int pColour)
@@ -697,7 +736,21 @@ void ProcessNonTrackActors(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buff
 int OppositeColour(int pColour) {
     int brightness;
     LOG_TRACE("(%d)", pColour);
-    NOT_IMPLEMENTED();
+
+    if (pColour < 224) {
+        if ((pColour & 0x7) < 4) {
+            brightness = 255;
+        } else {
+            brightness = 0;
+        }
+    } else {
+        if ((pColour & 0xf) < 8) {
+            brightness = 255;
+        } else {
+            brightness = 0;
+        }
+    }
+    return brightness;
 }
 
 // IDA: void __usercall DrawMapBlip(tCar_spec *pCar@<EAX>, tU32 pTime@<EDX>, br_matrix34 *pTrans@<EBX>, br_vector3 *pPos@<ECX>, int pColour)
@@ -725,7 +778,76 @@ void DrawMapBlip(tCar_spec* pCar, tU32 pTime, br_matrix34* pTrans, br_vector3* p
     float cos_factor;
     float sin_factor;
     LOG_TRACE("(%p, %d, %p, %p, %d)", pCar, pTime, pTrans, pPos, pColour);
-    NOT_IMPLEMENTED();
+
+    time_diff = pTime - gMap_mode;
+    BrMatrix34ApplyP(&map_pos, pPos, &gCurrent_race.map_transformation);
+    switch (gReal_graf_data_index) {
+        case 0:
+            break;
+        case 1:
+            map_pos.v[0] = map_pos.v[0] * 2.f;
+            map_pos.v[1] = map_pos.v[1] * 2.f + 40.f;
+            break;
+        default:
+            TELL_ME_IF_WE_PASS_THIS_WAY();
+    }
+    period = 256;  // Must be power of 2
+    colours[0] = pColour;
+    colours[1] = OppositeColour(pColour);
+    BrMatrix34Mul(&car_in_map_space, pTrans, &gCurrent_race.map_transformation);
+    bearing = FastScalarArcTan2(car_in_map_space.m[2][0], car_in_map_space.m[2][1]);
+
+    // Calculate in which of the 16 directions, the arrow is pointing to
+    bearing = (360.f - bearing + 12.25) / 22.5f;
+    arrow_index = ((int)bearing) % 16;
+
+    // The player's blip blinks, others are shown permanently
+    if (pCar->driver != eDriver_local_human || (period & pTime) != 0) {
+        for (i = 0; i < COUNT_OF(colours); i++) {
+            colour = colours[i];
+            point_count = gArrows[i][arrow_index & 0x3][0];
+            arrow_ptr = &gArrows[i][arrow_index & 0x3][1];
+            for (j = 0; j < point_count; j++, arrow_ptr += 2) {
+                if (arrow_index & 0x8) {
+                    x = -arrow_ptr[0];
+                    y = -arrow_ptr[1];
+                } else {
+                    x = arrow_ptr[0];
+                    y = arrow_ptr[1];
+                }
+                if (arrow_index & 0x4) {
+                    temp = x;
+                    x = -y;
+                    y = temp;
+                }
+                BrPixelmapPixelSet(gBack_screen, map_pos.v[0] + x, map_pos.v[1] + y, colour);
+            }
+        }
+    }
+    // Draw a rectangle around the fox
+    colour = colours[pTime & period];
+    if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_foxy && gNet_players[gIt_or_fox].car == pCar) {
+        from_x = map_pos.v[0] - 8.f;
+        from_y = map_pos.v[1] - 8.f;
+        to_x   = map_pos.v[0] + 8.f;
+        to_y   = map_pos.v[1] + 8.f;
+        BrPixelmapLine(gBack_screen, from_x, from_y, to_x,   from_y, colour);
+        BrPixelmapLine(gBack_screen, from_x, to_y,   to_x,   to_y, colour);
+        BrPixelmapLine(gBack_screen, from_x, from_y, from_x, to_y, colour);
+        BrPixelmapLine(gBack_screen, to_x,   from_y, to_x,   to_y, colour);
+    }
+    // To attract the player's attention, draw a rectangle around the player's position that decreases in size, 
+    if (time_diff <= 500 && pCar->driver == eDriver_local_human) {
+        offset = ((500 - time_diff) * 70) / 500;
+        from_x = map_pos.v[0] - offset - .5f;
+        from_y = map_pos.v[1] - offset - .5f;
+        to_x   = map_pos.v[0] + offset + .5f;
+        to_y   = map_pos.v[1] + offset + .5f;
+        BrPixelmapLine(gBack_screen, from_x, from_y, to_x,   from_y, colour);
+        BrPixelmapLine(gBack_screen, from_x, to_y,   to_x,   to_y,   colour);
+        BrPixelmapLine(gBack_screen, from_x, from_y, from_x, to_y,   colour);
+        BrPixelmapLine(gBack_screen, to_x,   from_y, to_x,   to_y,   colour);
+    }
 }
 
 // IDA: void __usercall DrawMapSmallBlip(tU32 pTime@<EAX>, br_vector3 *pPos@<EDX>, int pColour@<EBX>)
@@ -734,7 +856,17 @@ void DrawMapSmallBlip(tU32 pTime, br_vector3* pPos, int pColour) {
     int offset;
     tU32 time_diff;
     LOG_TRACE("(%d, %p, %d)", pTime, pPos, pColour);
-    NOT_IMPLEMENTED();
+
+    if ((pTime & 0x100) == 0) {
+        BrMatrix34ApplyP(&map_pos, pPos, &gCurrent_race.map_transformation);
+        if (gReal_graf_data_index != 0) {
+            map_pos.v[0] = 2.f * map_pos.v[0];
+            map_pos.v[1] = 2.f * map_pos.v[1] + 40.f;
+        }
+        // FIXME: Use BrPixelmapPixelSet
+        offset = map_pos.v[0] + gBack_screen->row_bytes * map_pos.v[1];
+        ((br_uint_8*)gBack_screen->pixels)[offset] = pColour;
+    }
 }
 
 // IDA: void __usercall MungeClipPlane(br_vector3 *pLight@<EAX>, tCar_spec *pCar@<EDX>, br_vector3 *p1@<EBX>, br_vector3 *p2@<ECX>, br_scalar pY_offset)
@@ -1182,7 +1314,31 @@ void FlashyMapCheckpoint(int pIndex, tU32 pTime) {
     static tU32 last_flash;
     static int flash_state;
     LOG_TRACE("(%d, %d)", pIndex, pTime);
-    STUB_ONCE();
+
+    if (pIndex >= 0 && pIndex < gCurrent_race.check_point_count && gRace_file_version > 0) {
+        if (Flash(300, &last_flash, &flash_state)) {
+            switch (gGraf_data_index) {
+            case 0:
+                DimRectangle(gBack_screen,
+                    gCurrent_race.checkpoints[pIndex].map_left[0],
+                    gCurrent_race.checkpoints[pIndex].map_top[0],
+                    gCurrent_race.checkpoints[pIndex].map_right[0],
+                    gCurrent_race.checkpoints[pIndex].map_bottom[0],
+                    0);
+                break;
+            case 1:
+                DimRectangle(gBack_screen,
+                    2 * gCurrent_race.checkpoints[pIndex].map_left[0],
+                    2 * gCurrent_race.checkpoints[pIndex].map_top[0] + 40,
+                    2 * gCurrent_race.checkpoints[pIndex].map_right[0],
+                    2 * gCurrent_race.checkpoints[pIndex].map_bottom[0] + 40,
+                    0);
+                break;
+            default:
+                TELL_ME_IF_WE_PASS_THIS_WAY();
+            }
+        }
+    }
 }
 
 // IDA: int __usercall ConditionallyFillWithSky@<EAX>(br_pixelmap *pPixelmap@<EAX>)
@@ -1238,8 +1394,9 @@ void RenderAFrame(int pDepth_mask_on) {
         gBack_screen->origin_y = 0;
         gBack_screen->base_x = 0;
         gBack_screen->base_y = 0;
-        if (gCurrent_race.map_image) {
+        if (gCurrent_race.map_image != NULL) {
             if (gReal_graf_data_index) {
+                LOG_DEBUG("DOUBLING");
                 BrPixelmapRectangleFill(gBack_screen, 0, 0, 640, 40, 0);
                 BrPixelmapRectangleFill(gBack_screen, 0, 440, 640, 40, 0);
                 DRPixelmapDoubledCopy(
@@ -1252,6 +1409,9 @@ void RenderAFrame(int pDepth_mask_on) {
             } else {
                 DRPixelmapCopy(gBack_screen, gCurrent_race.map_image);
             }
+        } else {
+            // FIXME: remove this
+            TELL_ME_IF_WE_PASS_THIS_WAY();
         }
         DimRectangle(
             gBack_screen,
@@ -1340,7 +1500,7 @@ void RenderAFrame(int pDepth_mask_on) {
         && !(gAction_replay_camera_mode && gAction_replay_mode)) {
         ExternalSky(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world);
     }
-    for (i = 0; i < (gMap_mode == 0 ? 1 : 3); i++) {
+    for (i = 0; i < (gMap_mode ? 3 : 1); i++) {
         RenderShadows(gUniverse_actor, &gProgram_state.track_spec, gCamera, &gCamera_to_world);
         BrZbSceneRenderBegin(gUniverse_actor, gCamera, gRender_screen, gDepth_buffer);
         ProcessNonTrackActors(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, &old_camera_matrix);
@@ -1404,7 +1564,7 @@ void RenderAFrame(int pDepth_mask_on) {
                 gBack_screen->width);
         }
         the_time = PDGetTotalTime();
-        if (gNet_mode) {
+        if (gNet_mode != eNet_mode_none) {
             if (gCurrent_net_game->type == eNet_game_type_checkpoint) {
                 flags = gNet_players[gThis_net_player_index].score;
                 for (i = 0; gCurrent_race.check_point_count > i; ++i) {
@@ -1524,7 +1684,7 @@ void RenderAFrame(int pDepth_mask_on) {
         PipeFrameFinish();
     }
     gRender_screen->pixels = old_pixels;
-    if (!gPalette_fade_time || GetRaceTime() > gPalette_fade_time + 500) {
+    if (!gPalette_fade_time || GetRaceTime() > (gPalette_fade_time + 500)) {
         PDScreenBufferSwap(0);
     }
     if (gAction_replay_mode) {
@@ -2454,5 +2614,32 @@ void DRPixelmapDoubledCopy(br_pixelmap* pDestn, br_pixelmap* pSource, int pSourc
     int src_row_skip;
     int width_over_2;
     LOG_TRACE("(%p, %p, %d, %d, %d, %d)", pDestn, pSource, pSource_width, pSource_height, pX_offset, pY_offset);
-    NOT_IMPLEMENTED();
+
+    dst_row_skip = 2 * pDestn->row_bytes - 2 * pSource_width;
+    src_row_skip = (pSource->row_bytes - pSource_width) / 2;
+    sptr  = (tU16*)((tU8*)pSource->pixels - 2 * src_row_skip + (pSource->row_bytes * pSource_height / 2) * 2);
+    dptr  = (tU8*)pDestn->pixels + pSource_width * 2 + (2 * pSource_height + pY_offset) * pDestn->row_bytes - pDestn->row_bytes;
+    dptr2 = dptr - pDestn->row_bytes;
+    width_over_2 = pSource_width / 2;
+    for (i = 0; i < pSource_height; i++) {
+        for (j = 0; j < width_over_2; j++) {
+            --sptr;
+            pixels =  *sptr;
+            pixel_1 = pixels >> 8;
+            pixel_2 = pixels >> 0;
+            dptr [-1] = pixel_1;
+            dptr2[-1] = pixel_1;
+            dptr [-2] = pixel_1;
+            dptr2[-2] = pixel_1;
+            dptr [-3] = pixel_2;
+            dptr2[-3] = pixel_2;
+            dptr [-4] = pixel_2;
+            dptr2[-4] = pixel_2;
+            dptr -= 4;
+            dptr2 -= 4;
+        }
+        dptr  -= dst_row_skip;
+        dptr2 -= dst_row_skip;
+        sptr -= src_row_skip;
+    }
 }
