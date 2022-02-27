@@ -202,7 +202,13 @@ void ChangeAmbientPratcamNow(int pIndex, int pStart_chunk) {
 void ChangeAmbientPratcam(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
-    STUB();
+    if (!gRace_finished && !gInterface_within_race_mode && pIndex != gCurrent_ambient_prat_sequence && gProgram_state.prat_cam_on) {
+        if (gCurrent_pratcam_index == -1) {
+            ChangeAmbientPratcamNow(pIndex, 0);
+        } else {
+            gPending_ambient_prat = pIndex;
+        }
+    }
 }
 
 // IDA: void __usercall PratcamEventNow(int pIndex@<EAX>)
