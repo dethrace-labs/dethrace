@@ -753,7 +753,6 @@ void ChangeDepthEffect() {
 // IDA: void __cdecl MungeForwardSky()
 void MungeForwardSky() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl MungeRearviewSky()
