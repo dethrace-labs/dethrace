@@ -327,8 +327,8 @@ void InitCarSkidStuff(tCar_spec* pCar) {
     pCar->old_skidding = 0;
     for (wheel = 0; wheel < 4; wheel++) {
         pCar->special_start[wheel].v[0] = FLT_MAX;
-        pCar->blood_remaining[wheel] = 0.0;
-        pCar->oil_remaining[wheel] = 0.0;
+        pCar->blood_remaining[wheel] = 0.0f;
+        pCar->oil_remaining[wheel] = 0.0f;
     }
 }
 
