@@ -3683,7 +3683,11 @@ typedef struct tRGB_colour {
     int blue;
 } tRGB_colour;
 
+#ifdef DETHRACE_FIX_BUGS
+typedef br_material* tPMFMCB(br_model*, tU16);
+#else
 typedef br_material** tPMFMCB(br_model*, tU16);
+#endif
 
 typedef enum tMatrix_mod_type {
     eMatrix_mod_none = -1,

@@ -22,6 +22,7 @@
 #include "spark.h"
 #include "trig.h"
 #include "utility.h"
+#include "brender/brender.h"
 
 #include <string.h>
 
@@ -616,7 +617,20 @@ void ProcessModelFaceMaterials(br_model* pModel, tPMFMCB pCallback) {
     br_material* possible_mat;
     br_material* new_mat;
     LOG_TRACE("(%p, %d)", pModel, pCallback);
-    NOT_IMPLEMENTED();
+
+    new_mat = NULL;
+    for (f = 0; f < pModel->nfaces; f++) {
+        if (pModel->faces[f].material != NULL) {
+            possible_mat = (*pCallback)(pModel, f);
+            if (possible_mat != NULL) {
+                pModel->faces[f].material = possible_mat;
+                new_mat = possible_mat;
+            }
+        }
+    }
+    if (new_mat != NULL) {
+        BrModelUpdate(pModel, BR_MATU_ALL);
+    }
 }
 
 // IDA: int __usercall LoadNTrackModels@<EAX>(tBrender_storage *pStorage_space@<EAX>, FILE *pF@<EDX>, int pCount@<EBX>)
@@ -655,14 +669,18 @@ int LoadNTrackModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
                     break;
                 case eStorage_allocated:
                     temp_array[j]->flags |= BR_MODF_UPDATEABLE;
-                    if (!gRoad_texturing_level) {
-                        ProcessModelFaceMaterials(temp_array[j], (tPMFMCB*)RoadPerspToUntex);
+                    if (gRoad_texturing_level == eRTL_none) {
+                        ProcessModelFaceMaterials(temp_array[j], RoadPerspToUntex);
                     }
-                    if (gWall_texturing_level == 1) {
-                        ProcessModelFaceMaterials(temp_array[j], (tPMFMCB*)WallPerspToLinear);
-                    }
-                    if (!gWall_texturing_level) {
-                        ProcessModelFaceMaterials(temp_array[j], (tPMFMCB*)WallPerspToUntex);
+                    switch (gWall_texturing_level) {
+                    case eWTL_none:
+                        ProcessModelFaceMaterials(temp_array[j], WallPerspToUntex);
+                        break;
+                    case eWTL_linear:
+                        ProcessModelFaceMaterials(temp_array[j], WallPerspToLinear);
+                        break;
+                    default:
+                        break;
                     }
                     //RemoveDoubleSided(temp_array[j]);
                     BrModelAdd(temp_array[j]);
@@ -1627,7 +1645,15 @@ void ChangeSubdivToPersp() {
 // IDA: br_uint_32 __cdecl ProcessFaceMaterials(br_actor *pActor, tPMFMCB pCallback)
 br_uint_32 ProcessFaceMaterials(br_actor* pActor, tPMFMCB pCallback) {
     LOG_TRACE("(%p, %d)", pActor, pCallback);
-    NOT_IMPLEMENTED();
+
+    if (pActor->identifier == NULL || pActor->identifier[0] == '&') {
+        if (pActor->type == BR_ACTOR_MODEL && pActor->model != NULL) {
+            ProcessModelFaceMaterials(pActor->model, pCallback);
+        }
+        return BrActorEnum(pActor, (br_actor_enum_cbfn*)ProcessFaceMaterials, pCallback);
+    } else {
+        return 0;
+    }
 }
 
 // IDA: int __usercall DRPixelmapHasZeros@<EAX>(br_pixelmap *pm@<EAX>)
@@ -1896,9 +1922,16 @@ void SetWallTexturingLevel(tWall_texturing_level pLevel) {
 
 // IDA: void __usercall ReallySetWallTexturingLevel(tWall_texturing_level pLevel@<EAX>)
 void ReallySetWallTexturingLevel(tWall_texturing_level pLevel) {
-    static tPMFMCB* tweaker[3][3];
+    static tPMFMCB* tweaker[3][3] = {
+        { NULL,              WallUntexToLinear, WallUntexToPersp, },
+        { WallLinearToUntex, NULL,              WallLinearToPersp, },
+        { WallPerspToUntex,  WallPerspToLinear, NULL, },
+    };
     LOG_TRACE("(%d)", pLevel);
-    NOT_IMPLEMENTED();
+
+    if (gWall_texturing_level != pLevel) {
+        ProcessFaceMaterials(gProgram_state.track_spec.the_actor, tweaker[gWall_texturing_level][pLevel]);
+    }
 }
 
 // IDA: br_material* __usercall DisposeSuffixedMaterials@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
@@ -3474,7 +3507,8 @@ void ResetGrooveFlags() {
 // IDA: tSpecial_volume* __cdecl GetDefaultSpecialVolumeForWater()
 tSpecial_volume* GetDefaultSpecialVolumeForWater() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    return gDefault_water_spec_vol;
 }
 
 // IDA: tSpecial_volume* __usercall FindSpecialVolume@<EAX>(br_vector3 *pP@<EAX>, tSpecial_volume *pLast_vol@<EDX>)
@@ -3483,13 +3517,28 @@ tSpecial_volume* FindSpecialVolume(br_vector3* pP, tSpecial_volume* pLast_vol) {
     tSpecial_volume* v;
     br_vector3 p;
     LOG_TRACE("(%p, %p)", pP, pLast_vol);
-    NOT_IMPLEMENTED();
+
+    for (i = 0, v = gProgram_state.special_volumes; i < gProgram_state.special_volume_count; i++, v++) {
+        if (!v->no_mat &&
+                v->bounds.min.v[0] < pP->v[0] && pP->v[0] < v->bounds.max.v[0] &&
+                v->bounds.min.v[1] < pP->v[1] && pP->v[1] < v->bounds.max.v[1] &&
+                v->bounds.min.v[2] < pP->v[2] && pP->v[2] < v->bounds.max.v[2]) {
+            BrMatrix34ApplyP(&p, pP, &v->inv_mat);
+            if (-1.f < p.v[0] && p.v[0] < 1.f &&  -1.f < p.v[1] && p.v[1] < 1.f && -1.f < p.v[2] && p.v[2] < 1.f) {
+                return v;
+            }
+        }
+    }
+    return NULL;
 }
 
 // IDA: void __cdecl SaveAdditionalActors()
 void SaveAdditionalActors() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gAdditional_actors != NULL) {
+        SaveAdditionalStuff();
+    }
 }
 
 // IDA: br_scalar __usercall DistanceFromFace@<ST0>(br_vector3 *pPos@<EAX>, tFace_ref *pFace@<EDX>)
