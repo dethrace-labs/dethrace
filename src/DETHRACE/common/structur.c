@@ -142,7 +142,10 @@ void IncrementCheckpoint() {
 void IncrementLap() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = gCheckpoint; i <= gCheckpoint_count; i++) {
+        IncrementCheckpoint();
+    }
 }
 
 // IDA: int __usercall RayHitFace@<EAX>(br_vector3 *pV0@<EAX>, br_vector3 *pV1@<EDX>, br_vector3 *pV2@<EBX>, br_vector3 *pNormal@<ECX>, br_vector3 *pStart, br_vector3 *pDir)
