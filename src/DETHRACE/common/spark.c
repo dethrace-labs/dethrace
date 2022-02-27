@@ -1026,14 +1026,24 @@ int GetSmokeOn() {
 void StopCarSmoking(tCar_spec* pCar) {
     int i;
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < 5; i++) {
+        if (gSmoke_column[i].car == pCar && gSmoke_column[i].lifetime > 2000) {
+            gSmoke_column[i].lifetime = 2000;
+        }
+    }
 }
 
 // IDA: void __usercall StopCarSmokingInstantly(tCar_spec *pCar@<EAX>)
 void StopCarSmokingInstantly(tCar_spec* pCar) {
     int i;
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < 5; i++) {
+        if (gSmoke_column[i].car == pCar) {
+            gSmoke_column[i].lifetime = 0;
+        }
+    }
 }
 
 // IDA: void __usercall ConditionalSmokeColumn(tCar_spec *pCar@<EAX>, int pDamage_index@<EDX>, int pColour@<EBX>)
