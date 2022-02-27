@@ -271,9 +271,9 @@ void SkidMark(tCar_spec* pCar, int pWheel_num) {
 
     if (((1 << pWheel_num) & pCar->new_skidding) != 0 || ((1 << pWheel_num) & pCar->old_skidding) != 0) {
         if ((pWheel_num & 1) != 0) {
-            pos.v[0] = pCar->bounds[1].max.v[0] - 0.1725;
+            pos.v[0] = pCar->bounds[1].max.v[0] - 0.1725f;
         } else {
-            pos.v[0] = pCar->bounds[1].min.v[0] + 0.1725;
+            pos.v[0] = pCar->bounds[1].min.v[0] + 0.1725f;
         }
         pos.v[1] = pCar->wpos[pWheel_num].v[1] - pCar->oldd[pWheel_num];
         pos.v[2] = pCar->wpos[pWheel_num].v[2];
@@ -293,22 +293,22 @@ void SkidMark(tCar_spec* pCar, int pWheel_num) {
             if (((1 << pWheel_num) & pCar->old_skidding) != 0) {
                 BrVector3Sub(&disp, &world_pos, &pCar->prev_skid_pos[pWheel_num]);
                 dist2 = BrVector3Length(&disp);
-                if (dist2 < 0.050000001) {
+                if (dist2 < 0.05f) {
                     return;
                 }
                 SkidSection(pCar, pWheel_num, &world_pos, material_index);
                 pCar->total_length[pWheel_num] = pCar->total_length[pWheel_num] + dist2;
                 pCar->oil_remaining[pWheel_num] = pCar->oil_remaining[pWheel_num] - dist2;
-                if (pCar->oil_remaining[pWheel_num] < 0.0) {
-                    pCar->oil_remaining[pWheel_num] = 0.0;
+                if (pCar->oil_remaining[pWheel_num] < 0.0f) {
+                    pCar->oil_remaining[pWheel_num] = 0.0f;
                 }
                 pCar->blood_remaining[pWheel_num] = pCar->blood_remaining[pWheel_num] - dist2;
-                if (pCar->blood_remaining[pWheel_num] < 0.0) {
-                    pCar->blood_remaining[pWheel_num] = 0.0;
+                if (pCar->blood_remaining[pWheel_num] < 0.0f) {
+                    pCar->blood_remaining[pWheel_num] = 0.0f;
                 }
             } else {
                 pCar->old_skidding |= 1 << pWheel_num;
-                pCar->total_length[pWheel_num] = 0.0;
+                pCar->total_length[pWheel_num] = 0.0f;
                 pCar->old_skid[pWheel_num] = -1;
             }
         } else {
