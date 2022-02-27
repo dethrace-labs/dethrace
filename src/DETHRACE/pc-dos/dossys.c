@@ -299,7 +299,6 @@ void PDFatalError(char* pThe_str) {
 
     Harness_Debug_PrintStack();
 
-    DoSaveGame(1);
     if (!_unittest_do_not_exit) {
         exit(1);
     }
