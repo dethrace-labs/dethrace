@@ -266,7 +266,7 @@ void DoDepthByShadeTable(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer
     // Added to ensure we've copied the framebuffer+depthbuffer back into main memory
     Harness_Hook_FlushRenderer();
 
-    too_near = 65536 - (1 << pStart);
+    too_near = 0xffff - (1 << pStart);
     shade_table_pixels = pShade_table->pixels;
     depth_shift_amount = pShade_table_power + 8 - pStart - pEnd;
     render_ptr = (tU8*)pRender_buffer->pixels + pRender_buffer->base_x + pRender_buffer->base_y * pRender_buffer->row_bytes;

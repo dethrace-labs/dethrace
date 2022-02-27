@@ -229,11 +229,6 @@ void InitializeOpenGLContext() {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, render_width, render_height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, 0);
     glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depth_texture, 0);
 
-    // glGenRenderbuffers(1, &rbo);
-    // glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-    // glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, render_width, render_height);
-    // glBindRenderbuffer(GL_RENDERBUFFER, 0);
-    // glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         LOG_PANIC("Framebuffer is not complete!");
     }
@@ -642,11 +637,9 @@ void GLRenderer_FlushBuffers(br_pixelmap* color_buffer, br_pixelmap* depth_buffe
 
     dest_y = render_height;
     uint16_t* depth_pixels = depth_buffer->pixels;
-    uint16_t depth_pixel;
     for (int y = 0; y < render_height; y++) {
         dest_y--;
         for (int x = 0; x < render_width; x++) {
-            depth_pixel = depth_buffer_flip_pixels[y * render_width + x];
             depth_pixels[dest_y * render_width + x] = depth_buffer_flip_pixels[y * render_width + x];
         }
     }
