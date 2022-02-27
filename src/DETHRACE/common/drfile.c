@@ -26,7 +26,7 @@ br_filesystem* gOld_file_system;
 
 // IDA: void* __cdecl DRStdioOpenRead(char *name, br_size_t n_magics, br_mode_test_cbfn *identify, int *mode_result)
 void* DRStdioOpenRead(char* name, br_size_t n_magics, br_mode_test_cbfn* identify, int* mode_result) {
-    if (mode_result) {
+    if (mode_result != NULL) {
         *mode_result = 0;
     }
     return DRfopen(name, "rb");
