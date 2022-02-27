@@ -691,13 +691,20 @@ void CheckForBeingOutOfThisWorld() {
 void CheckHornLocal(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
 
-    STUB_ONCE();
+    if (pCar->keys.horn && pCar->horn_sound_tag == 0) {
+        pCar->horn_sound_tag = DRS3StartSound(gIndexed_outlets[0], 5209);
+    } else if (!pCar->keys.horn && pCar->horn_sound_tag != 0) {
+        while (S3SoundStillPlaying(pCar->horn_sound_tag)) {
+            DRS3StopSound(pCar->horn_sound_tag);
+            DRS3StopOutletSound(gIndexed_outlets[0]);
+        }
+        pCar->horn_sound_tag = 0;
+    }
 }
 
 // IDA: void __usercall CheckHorn3D(tCar_spec *pCar@<EAX>)
 void CheckHorn3D(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
-
     STUB_ONCE();
 }
 
