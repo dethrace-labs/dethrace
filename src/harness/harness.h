@@ -14,7 +14,7 @@ typedef struct tPlatform {
     void (*EndScene)();
     void (*SetPalette)(uint8_t* palette);
     void (*RenderFullScreenQuad)(uint8_t* src, int width, int height);
-    void (*RenderModel)(br_model* model, br_matrix34 model_matrix);
+    void (*RenderModel)(br_actor* actor, br_model* model, br_matrix34 model_matrix);
     void (*Swap)();
     void (*BufferTexture)(br_pixelmap* pm);
     void (*BufferMaterial)(br_material* mat);

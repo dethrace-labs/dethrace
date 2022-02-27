@@ -491,7 +491,30 @@ void build_model(br_model* model) {
     CHECK_GL_ERROR("after build model");
 }
 
-void GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
+void setActiveMaterial(tStored_material* material) {
+    if (material) {
+        glUniform1i(uniforms_3d.palette_index_override, material->index_base);
+        if (material->shade_table) {
+            GLRenderer_SetShadeTable(material->shade_table);
+        }
+        if ((material->flags & BR_MATF_LIGHT) && material->shade_table) {
+            // TODO: light value shouldn't always be 0? Works for shadows, not sure about other things.
+            glUniform1i(uniforms_3d.light_value, 0);
+        } else {
+            glUniform1i(uniforms_3d.light_value, -1);
+        }
+
+        if (material->texture) {
+            tStored_pixelmap* stored_px = material->texture->stored;
+            if (stored_px) {
+                glBindTexture(GL_TEXTURE_2D, stored_px->id);
+                glUniform1i(uniforms_3d.palette_index_override, -1);
+            }
+        }
+    }
+}
+
+void GLRenderer_RenderModel(br_actor* actor, br_model* model, br_matrix34 model_matrix) {
     tStored_model_context* ctx;
     ctx = model->stored;
     v11model* v11 = model->prepared;
@@ -526,34 +549,15 @@ void GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
 
     int element_index = 0;
 
+    // br_actor can have a material too, which is applied to the faces if the face doesn't have a texture
+    if (actor->material) {
+        setActiveMaterial(actor->material->stored);
+    }
+
     v11group* group;
     for (int g = 0; g < v11->ngroups; g++) {
         group = &v11->groups[g];
-        tStored_material* material = group->stored;
-        if (material) {
-            glUniform1i(uniforms_3d.palette_index_override, material->index_base);
-            if (material->shade_table) {
-                GLRenderer_SetShadeTable(material->shade_table);
-            }
-            if ((material->flags & BR_MATF_LIGHT) && material->shade_table) {
-                // TODO: light value shouldn't always be 0? Works for shadows, not sure about other things.
-                glUniform1i(uniforms_3d.light_value, 0);
-            } else {
-                glUniform1i(uniforms_3d.light_value, -1);
-            }
-
-            if (material->texture) {
-                tStored_pixelmap* stored_px = material->texture->stored;
-                if (stored_px) {
-                    glBindTexture(GL_TEXTURE_2D, stored_px->id);
-                    glUniform1i(uniforms_3d.palette_index_override, -1);
-                }
-            }
-        } else {
-            // LOG_WARN("no material");
-            glUniform1i(uniforms_3d.palette_index_override, 0);
-            glUniform1i(uniforms_3d.light_value, -1);
-        }
+        setActiveMaterial(group->stored);
 
         glDrawElements(GL_TRIANGLES, group->nfaces * 3, GL_UNSIGNED_INT, (void*)(element_index * sizeof(int)));
         element_index += group->nfaces * 3;
