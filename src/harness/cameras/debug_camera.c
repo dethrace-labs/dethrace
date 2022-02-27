@@ -84,8 +84,11 @@ void DebugCamera_Update() {
     glm_normalize_to(direction, cam_front);
 }
 
+extern float gCamera_hither;
+extern float gCamera_yon;
+
 float* DebugCamera_Projection() {
-    glm_perspective(glm_rad(55.55), 320.0f / 200.0f /*4.0f / 3.0f*/, 0.1f, 10000.f, projection);
+    glm_perspective(glm_rad(55.55), 320.0f / 200.0f /*4.0f / 3.0f*/, gCamera_hither, gCamera_yon, projection);
     return (float*)&projection;
 }
 

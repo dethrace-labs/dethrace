@@ -5,6 +5,7 @@
 #include "errors.h"
 #include "globvars.h"
 #include "globvrkm.h"
+#include "harness/hooks.h"
 #include "harness/trace.h"
 #include "spark.h"
 #include "utility.h"
@@ -261,7 +262,66 @@ void DoDepthByShadeTable(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer
     int depth_line_skip;
     int render_line_skip;
     LOG_TRACE("(%p, %p, %p, %d, %d, %d)", pRender_buffer, pDepth_buffer, pShade_table, pShade_table_power, pStart, pEnd);
-    NOT_IMPLEMENTED();
+
+    // Added to ensure we've copied the framebuffer+depthbuffer back into main memory
+    Harness_Hook_FlushRenderer();
+
+    too_near = 65536 - (1 << pStart);
+    shade_table_pixels = pShade_table->pixels;
+    depth_shift_amount = pShade_table_power + 8 - pStart - pEnd;
+    render_ptr = (tU8*)pRender_buffer->pixels + pRender_buffer->base_x + pRender_buffer->base_y * pRender_buffer->row_bytes;
+    depth_ptr = pDepth_buffer->pixels;
+    render_line_skip = pRender_buffer->row_bytes - pRender_buffer->width;
+    depth_line_skip = pDepth_buffer->row_bytes / 2 - pRender_buffer->width;
+
+    if (depth_shift_amount <= 0) {
+        if (depth_shift_amount >= 0) {
+            for (y = 0; pRender_buffer->height > y; ++y) {
+                for (x = 0; pRender_buffer->width > x; ++x) {
+                    if (*depth_ptr != 0xFFFF) {
+                        depth_value = *depth_ptr - too_near;
+                        if (depth_value < -(int16_t)too_near) {
+                            *render_ptr = shade_table_pixels[(depth_value & 0xFF00) + *render_ptr];
+                        }
+                    }
+                    ++render_ptr;
+                    ++depth_ptr;
+                }
+                render_ptr += render_line_skip;
+                depth_ptr += depth_line_skip;
+            }
+        } else {
+            for (y = 0; pRender_buffer->height > y; ++y) {
+                for (x = 0; pRender_buffer->width > x; ++x) {
+                    if (*depth_ptr != 0xFFFF) {
+                        depth_value = *depth_ptr - too_near;
+                        if (depth_value < -(int16_t)too_near) {
+                            *render_ptr = shade_table_pixels[*render_ptr + ((depth_value >> (pEnd - (pShade_table_power + 8 - pStart))) & 0xFF00)];
+                        }
+                    }
+                    ++render_ptr;
+                    ++depth_ptr;
+                }
+                render_ptr += render_line_skip;
+                depth_ptr += depth_line_skip;
+            }
+        }
+    } else {
+        for (y = 0; pRender_buffer->height > y; ++y) {
+            for (x = 0; pRender_buffer->width > x; ++x) {
+                if (*depth_ptr != 0xFFFF) {
+                    depth_value = *depth_ptr - too_near;
+                    if (depth_value < -(int16_t)too_near) {
+                        *render_ptr = shade_table_pixels[*render_ptr + ((depth_value << depth_shift_amount) & 0xFF00)];
+                    }
+                }
+                ++render_ptr;
+                ++depth_ptr;
+            }
+            render_ptr += render_line_skip;
+            depth_ptr += depth_line_skip;
+        }
+    }
 }
 
 // IDA: void __usercall ExternalSky(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>)
@@ -369,31 +429,56 @@ void DoHorizon(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor
     br_angle yaw;
     br_actor* actor;
     LOG_TRACE("(%p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world);
-    NOT_IMPLEMENTED();
+
+    STUB_ONCE();
 }
 
 // IDA: void __usercall DoDepthCue(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>)
 void DoDepthCue(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer) {
     LOG_TRACE("(%p, %p)", pRender_buffer, pDepth_buffer);
-    NOT_IMPLEMENTED();
+
+    DoDepthByShadeTable(
+        pRender_buffer,
+        pDepth_buffer,
+        gDepth_shade_table,
+        gDepth_shade_table_power,
+        gProgram_state.current_depth_effect.start,
+        gProgram_state.current_depth_effect.end);
 }
 
 // IDA: void __usercall DoFog(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>)
 void DoFog(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer) {
     LOG_TRACE("(%p, %p)", pRender_buffer, pDepth_buffer);
-    NOT_IMPLEMENTED();
+
+    DoDepthByShadeTable(
+        pRender_buffer,
+        pDepth_buffer,
+        gFog_shade_table,
+        gFog_shade_table_power,
+        gProgram_state.current_depth_effect.start,
+        gProgram_state.current_depth_effect.end);
 }
 
 // IDA: void __usercall DepthEffect(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>)
 void DepthEffect(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world) {
     LOG_TRACE("(%p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world);
-    STUB_ONCE();
+
+    if (gProgram_state.current_depth_effect.type == eDepth_effect_darkness) {
+        DoDepthCue(pRender_buffer, pDepth_buffer);
+    }
+    if (gProgram_state.current_depth_effect.type == eDepth_effect_fog) {
+        DoFog(pRender_buffer, pDepth_buffer);
+    }
 }
 
 // IDA: void __usercall DepthEffectSky(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>)
 void DepthEffectSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world) {
     LOG_TRACE("(%p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world);
-    STUB_ONCE();
+
+    if (gProgram_state.current_depth_effect.sky_texture
+        && (!gLast_camera_special_volume || gLast_camera_special_volume->sky_col < 0)) {
+        DoHorizon(pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world);
+    }
 }
 
 // IDA: void __usercall DoWobbleCamera(br_actor *pCamera@<EAX>)
@@ -584,8 +669,8 @@ void IncreaseAngle() {
 
     for (i = 0; i < COUNT_OF(gCamera_list); i++) {
         camera_ptr = gCamera_list[i]->type_data;
-        camera_ptr->field_of_view += 0x1c7;  // 2.4993896484375 degrees
-        if (camera_ptr->field_of_view > 0x78e3) {  // 169.9969482421875 degrees
+        camera_ptr->field_of_view += 0x1c7; // 2.4993896484375 degrees
+        if (camera_ptr->field_of_view > 0x78e3) { // 169.9969482421875 degrees
             camera_ptr->field_of_view = 0x78e3;
         }
 #ifdef DETHRACE_FIX_BUGS
@@ -606,8 +691,8 @@ void DecreaseAngle() {
 
     for (i = 0; i < COUNT_OF(gCamera_list); i++) {
         camera_ptr = gCamera_list[i]->type_data;
-        camera_ptr->field_of_view -= 0x1c7;  // 2.4993896484375 degrees
-        if (camera_ptr->field_of_view < 0x71c) {  // 9.99755859375 degrees
+        camera_ptr->field_of_view -= 0x1c7; // 2.4993896484375 degrees
+        if (camera_ptr->field_of_view < 0x71c) { // 9.99755859375 degrees
             camera_ptr->field_of_view = 0x71c;
         }
 #ifdef DETHRACE_FIX_BUGS

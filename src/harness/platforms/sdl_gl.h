@@ -18,7 +18,8 @@ tPlatform sdl_gl_platform = {
     GLRenderer_RenderModel,
     GLRenderer_Swap,
     GLRenderer_BufferTexture,
-    GLRenderer_BufferMaterial
+    GLRenderer_BufferMaterial,
+    GLRenderer_FlushBuffers
 };
 
 #endif

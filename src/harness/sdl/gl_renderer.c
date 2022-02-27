@@ -15,7 +15,7 @@
 SDL_Window* window;
 SDL_GLContext context;
 GLuint screen_buffer_vao, screen_buffer_ebo;
-GLuint screen_texture, palette_texture;
+GLuint screen_texture, palette_texture, depth_texture;
 
 GLuint shader_program_2d;
 GLuint shader_program_3d;
@@ -23,11 +23,12 @@ GLuint framebuffer_id, framebuffer_texture = 0;
 unsigned int rbo;
 uint8_t gl_palette[4 * 256]; // RGBA
 uint8_t* screen_buffer_flip_pixels;
+uint16_t* depth_buffer_flip_pixels;
 
 int window_width, window_height, render_width, render_height;
 
-br_pixelmap* last_colour_buffer;
 br_pixelmap* last_shade_table = NULL;
+int dirty_buffers = 0;
 
 struct {
     GLuint pixels, shade_table;
@@ -210,6 +211,7 @@ void InitializeOpenGLContext() {
     glGenTextures(1, &screen_texture);
     glGenTextures(1, &palette_texture);
     glGenTextures(1, &framebuffer_texture);
+    glGenTextures(1, &depth_texture);
 
     // setup framebuffer
     glGenFramebuffers(1, &framebuffer_id);
@@ -221,11 +223,17 @@ void InitializeOpenGLContext() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer_texture, 0);
 
-    glGenRenderbuffers(1, &rbo);
-    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, render_width, render_height);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+    glBindTexture(GL_TEXTURE_2D, depth_texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, render_width, render_height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, 0);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depth_texture, 0);
+
+    // glGenRenderbuffers(1, &rbo);
+    // glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+    // glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, render_width, render_height);
+    // glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    // glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         LOG_PANIC("Framebuffer is not complete!");
     }
@@ -268,6 +276,7 @@ void GLRenderer_CreateWindow(char* title, int width, int height, int pRender_wid
     InitializeOpenGLContext();
 
     screen_buffer_flip_pixels = malloc(sizeof(uint8_t) * render_width * render_height);
+    depth_buffer_flip_pixels = malloc(sizeof(uint16_t) * render_width * render_height);
 }
 
 void GLRenderer_SetPalette(uint8_t* rgba_colors) {
@@ -317,7 +326,6 @@ void GLRenderer_SetShadeTable(br_pixelmap* table) {
 extern br_v1db_state v1db;
 
 void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer) {
-    last_colour_buffer = colour_buffer;
     glViewport(colour_buffer->base_x, colour_buffer->base_y, colour_buffer->width, colour_buffer->height);
 
     glEnable(GL_DEPTH_TEST);
@@ -363,26 +371,13 @@ void GLRenderer_EndScene() {
     //  switch back to default fb
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    // pull framebuffer into cpu memory to emulate BRender behavior
-    glBindTexture(GL_TEXTURE_2D, framebuffer_texture);
-    glGetTexImage(GL_TEXTURE_2D, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, screen_buffer_flip_pixels);
-
-    // flip texture to match the expected orientation
-    int dest_y = render_height;
-    uint8_t* pm_pixels = last_colour_buffer->pixels;
-    for (int y = 0; y < render_height; y++) {
-        dest_y--;
-        for (int x = 0; x < render_width; x++) {
-            pm_pixels[dest_y * render_width + x] = screen_buffer_flip_pixels[y * render_width + x];
-        }
-    }
+    CHECK_GL_ERROR("GLRenderer_RenderFullScreenQuad");
 }
 
 void GLRenderer_RenderFullScreenQuad(uint8_t* screen_buffer, int width, int height) {
     glViewport(0, 0, window_width, window_height);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDisable(GL_DEPTH_TEST);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     glUseProgram(shader_program_2d);
     glBindTexture(GL_TEXTURE_2D, screen_texture);
@@ -571,6 +566,7 @@ void GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix) {
 
     glBindVertexArray(0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    dirty_buffers = 1;
 
     CHECK_GL_ERROR("GLRenderer_RenderModel");
 }
@@ -614,6 +610,49 @@ void GLRenderer_BufferTexture(br_pixelmap* pm) {
     free(linear_pixels);
 
     CHECK_GL_ERROR("GLRenderer_BufferTexture");
+}
+
+void GLRenderer_FlushBuffers(br_pixelmap* color_buffer, br_pixelmap* depth_buffer) {
+
+    if (!dirty_buffers) {
+        return;
+    }
+
+    // pull framebuffer into cpu memory to emulate BRender behavior
+    glBindTexture(GL_TEXTURE_2D, framebuffer_texture);
+    glGetTexImage(GL_TEXTURE_2D, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, screen_buffer_flip_pixels);
+
+    // flip texture to match the expected orientation
+    int dest_y = render_height;
+    uint8_t* pm_pixels = color_buffer->pixels;
+    uint8_t new_pixel;
+    for (int y = 0; y < render_height; y++) {
+        dest_y--;
+        for (int x = 0; x < render_width; x++) {
+            new_pixel = screen_buffer_flip_pixels[y * render_width + x];
+            if (new_pixel != 0) {
+                pm_pixels[dest_y * render_width + x] = screen_buffer_flip_pixels[y * render_width + x];
+            }
+        }
+    }
+
+    // pull depthbuffer into cpu memory to emulate BRender behavior
+    glBindTexture(GL_TEXTURE_2D, depth_texture);
+    glGetTexImage(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, depth_buffer_flip_pixels);
+
+    dest_y = render_height;
+    uint16_t* depth_pixels = depth_buffer->pixels;
+    uint16_t depth_pixel;
+    for (int y = 0; y < render_height; y++) {
+        dest_y--;
+        for (int x = 0; x < render_width; x++) {
+            depth_pixel = depth_buffer_flip_pixels[y * render_width + x];
+            depth_pixels[dest_y * render_width + x] = depth_buffer_flip_pixels[y * render_width + x];
+        }
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    dirty_buffers = 0;
 }
 
 void Harness_GLRenderer_RenderCube(float col, float x, float y, float z) {

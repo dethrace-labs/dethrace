@@ -21,5 +21,6 @@ void GLRenderer_Swap();
 void GLRenderer_RenderModel(br_model* model, br_matrix34 model_matrix);
 void GLRenderer_BufferTexture(br_pixelmap* pm);
 void GLRenderer_BufferMaterial(br_material* mat);
+void GLRenderer_FlushBuffers(br_pixelmap* color_buffer, br_pixelmap* depth_buffer);
 
 #endif

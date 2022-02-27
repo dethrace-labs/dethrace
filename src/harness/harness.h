@@ -18,6 +18,7 @@ typedef struct tPlatform {
     void (*Swap)();
     void (*BufferTexture)(br_pixelmap* pm);
     void (*BufferMaterial)(br_material* mat);
+    void (*FlushBuffers)(br_pixelmap* color_buffer, br_pixelmap* depth_buffer);
 
 } tPlatform;
 

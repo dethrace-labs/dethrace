@@ -116,7 +116,7 @@ br_device_pixelmap* DevicePixelmapMemAllocate(br_uint_8 type, br_uint_16 w, br_u
 
     tip = &pmTypeInfo[type];
     pm = BrResAllocate(_pixelmap.res, sizeof(br_device_pixelmap), BR_MEMORY_PIXELMAP);
-    //pm->dispatch = &devicePixelmapDispatch;
+    // pm->dispatch = &devicePixelmapDispatch;
     pm->pm_identifier = NULL;
     pm->pm_map = NULL;
     pm->pm_flags = BR_PMF_LINEAR;
@@ -129,11 +129,11 @@ br_device_pixelmap* DevicePixelmapMemAllocate(br_uint_8 type, br_uint_16 w, br_u
     pm->pm_type = type;
     pm->pm_width = w;
     pm->pm_height = h;
-    //8 bits, 1, 4 align, 1
+    // 8 bits, 1, 4 align, 1
 
-    //v11 = (tip->align + w - 1) / tip->align * tip->align * tip->bits;
-    //pm->pm_row_bytes = (v11 - (__CFSHL__(v11 >> 31, 3) + 8 * (v11 >> 31))) >> 3;
-    // TODO: calculate this differently
+    // v11 = (tip->align + w - 1) / tip->align * tip->align * tip->bits;
+    // pm->pm_row_bytes = (v11 - (__CFSHL__(v11 >> 31, 3) + 8 * (v11 >> 31))) >> 3;
+    //  TODO: calculate this differently
     pm->pm_row_bytes = w;
     pm->pm_row_bytes = tip->bits * tip->align * ((w + tip->align - 1) / tip->align) / 8;
 
@@ -147,8 +147,8 @@ br_device_pixelmap* DevicePixelmapMemAllocate(br_uint_8 type, br_uint_16 w, br_u
             pm->pm_pixels = BrResAllocate(pm, pm->pm_height * pm->pm_row_bytes, BR_MEMORY_PIXELS);
         }
     }
-    //TODO: not sure we need this
-    //pm->pm_pixels_qualifier = (unsigned __int16)_GetSysQual();
+    // TODO: not sure we need this
+    // pm->pm_pixels_qualifier = (unsigned __int16)_GetSysQual();
     if (flags & BR_PMAF_INVERTED) {
         pm->pm_pixels = (char*)pm->pm_pixels + (pm->pm_height - 1) * pm->pm_row_bytes;
         pm->pm_row_bytes *= -1;
@@ -183,7 +183,7 @@ br_error _M_br_device_pixelmap_mem_allocateSub(br_device_pixelmap* self, br_devi
     pm->pm_stored = 0;
     pm->dispatch = &devicePixelmapDispatch;
     if (pm->pm_width != self->pm_width) {
-        pm->pm_flags &= 0xFDu; //unset BR_PMF_LINEAR
+        pm->pm_flags &= 0xFDu; // unset BR_PMF_LINEAR
     }
     *newpm = pm;
     return 0;
@@ -301,6 +301,9 @@ br_error _M_br_device_pixelmap_mem_match(br_device_pixelmap* self, br_device_pix
     // }
 
     if (mt.use == BRT_DEPTH) {
+
+        // TODO: hack this to make it work
+        mt.pixel_type = BR_PMT_DEPTH_16;
         pm = DevicePixelmapMemAllocate(mt.pixel_type, mt.width, mt.height, NULL, (self->pm_row_bytes < 0) | BR_PMAF_NO_PIXELS);
         r = abs(self->pm_row_bytes);
         bytes = (signed int)pmTypeInfo[self->pm_type].bits >> 3;
@@ -322,7 +325,7 @@ br_error _M_br_device_pixelmap_mem_match(br_device_pixelmap* self, br_device_pix
     }
     pm->pm_origin_x = self->pm_origin_x;
     pm->pm_origin_y = self->pm_origin_y;
-    //self->dispatch = pm;
+    // self->dispatch = pm;
     *newpm = pm;
     return 0;
 

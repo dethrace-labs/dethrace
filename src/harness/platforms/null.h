@@ -14,6 +14,7 @@ void Null_RenderFrameBuffer() {}
 void Null_Swap() {}
 void Null_BufferTexture(br_pixelmap* pm) {}
 void Null_BufferMaterial(br_material* mat) {}
+void Null_FlushBuffers(br_pixelmap* color_buffer, br_pixelmap* depth_buffer) {}
 
 tPlatform null_platform = {
     Null_Init,
@@ -28,5 +29,6 @@ tPlatform null_platform = {
     Null_RenderModel,
     Null_Swap,
     Null_BufferTexture,
-    Null_BufferMaterial
+    Null_BufferMaterial,
+    Null_FlushBuffers
 };
