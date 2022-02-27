@@ -174,10 +174,13 @@ void setup_global_vars(int argc, char* argv[]) {
     harness_debug_level = 7;
     harness_game_info.mode = eGame_carmageddon;
 
-    int fake_argc = 2;
-    char* fake_argv[2];
-    fake_argv[0] = argv[0];
-    fake_argv[1] = "--platform=null";
+    int fake_argc = 0;
+    char* fake_argv[3];
+    fake_argv[fake_argc++] = argv[0];
+    fake_argv[fake_argc++] = "--platform=null";
+    if (getenv("NO_SIGNAL_HANDLER") != NULL) {
+        fake_argv[fake_argc++] = "--no-signal-handler";
+    }
     Harness_Init(&fake_argc, fake_argv);
 }
 

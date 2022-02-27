@@ -66,9 +66,14 @@ void Harness_Init(int* argc, char* argv[]) {
     // do not freeze timer
     harness_game_config.freeze_timer = 0;
 
+    // install signal handler by default
+    harness_game_config.install_signalhandler = 1;
+
     Harness_ProcessCommandLine(argc, argv);
 
-    install_signal_handler(argv[0]);
+    if (harness_game_config.install_signalhandler) {
+        install_signal_handler(argv[0]);
+    }
     platform->Init();
 
     int* keymap = platform->GetKeyMap();
@@ -132,6 +137,10 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
             LOG_INFO("Timer frozen");
             harness_game_config.freeze_timer = 1;
             handled = 1;
+        } else if (strcasecmp(argv[i], "--no-signal-handler") == 0) {
+            LOG_INFO("Don't install the signal handler");
+            harness_game_config.install_signalhandler = 0;
+            handled = 1;
         }
 
         if (handled) {
@@ -140,6 +149,7 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
                 argv[j] = argv[j + 1];
             }
             (*argc)--;
+            i--;
         }
     }
 
