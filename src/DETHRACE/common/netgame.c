@@ -141,19 +141,33 @@ void RepositionPlayer(int pIndex) {
 // IDA: void __usercall DisableCar(tCar_spec *pCar@<EAX>)
 void DisableCar(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    if (pCar->driver_name[0] != '\0') {
+        if (!pCar->disabled) {
+            pCar->disabled = 1;
+            ForceRebuildActiveCarList();
+        }
+        if (pCar->car_master_actor->t.t.mat.m[3][0] < 500.0f) {
+            pCar->car_master_actor->t.t.mat.m[3][0] = pCar->car_master_actor->t.t.mat.m[3][0] + 1000.0f;
+            pCar->car_master_actor->t.t.mat.m[3][1] = pCar->car_master_actor->t.t.mat.m[3][1] + 1000.0f;
+            pCar->car_master_actor->t.t.mat.m[3][2] = pCar->car_master_actor->t.t.mat.m[3][2] + 1000.0f;
+            pCar->old_frame_mat.m[3][0] = pCar->car_master_actor->t.t.mat.m[3][0];
+            pCar->old_frame_mat.m[3][1] = pCar->car_master_actor->t.t.mat.m[3][1];
+            pCar->old_frame_mat.m[3][2] = pCar->car_master_actor->t.t.mat.m[3][2];
+        }
+    }
 }
 
 // IDA: void __usercall EnableCar(tCar_spec *pCar@<EAX>)
 void EnableCar(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
 
-    if (pCar->driver_name[0]) {
+    if (pCar->driver_name[0] != '\0') {
         if (pCar->disabled) {
             pCar->disabled = 0;
             ForceRebuildActiveCarList();
         }
-        if (pCar->car_master_actor->t.t.mat.m[3][0] > 500.0) {
+        if (pCar->car_master_actor->t.t.mat.m[3][0] > 500.0f) {
             pCar->car_master_actor->t.t.mat.m[3][0] = pCar->car_master_actor->t.t.mat.m[3][0] - 1000.0f;
             pCar->car_master_actor->t.t.mat.m[3][1] = pCar->car_master_actor->t.t.mat.m[3][1] - 1000.0f;
             pCar->car_master_actor->t.t.mat.m[3][2] = pCar->car_master_actor->t.t.mat.m[3][2] - 1000.0f;
