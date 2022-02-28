@@ -348,6 +348,8 @@ void ExternalSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_act
     int repetitions;
     br_pixelmap* col_map;
     LOG_TRACE("(%p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world);
+
+    // TODO: Remove commented block in `ConditionallyFillWithSky` when we implement this properly
     return;
     dx = 0;
     col_map = gHorizon_material->colour_map;
