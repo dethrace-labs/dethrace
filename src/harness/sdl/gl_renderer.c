@@ -552,13 +552,17 @@ void GLRenderer_RenderModel(br_actor* actor, br_model* model, br_matrix34 model_
     // br_actor can have a material too, which is applied to the faces if the face doesn't have a texture
     if (actor->material) {
         setActiveMaterial(actor->material->stored);
+    } else {
+        // TODO: set defaults for now. This fixes missing curb materials but probably isn't the right fix.
+        LOG_WARN_ONCE("set default palette override for missing actor material")
+        glUniform1i(uniforms_3d.palette_index_override, 227);
+        glUniform1i(uniforms_3d.light_value, -1);
     }
 
     v11group* group;
     for (int g = 0; g < v11->ngroups; g++) {
         group = &v11->groups[g];
         setActiveMaterial(group->stored);
-
         glDrawElements(GL_TRIANGLES, group->nfaces * 3, GL_UNSIGNED_INT, (void*)(element_index * sizeof(int)));
         element_index += group->nfaces * 3;
     }
