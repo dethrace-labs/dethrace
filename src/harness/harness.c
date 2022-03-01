@@ -19,7 +19,7 @@ harness_br_renderer* renderer_state;
 br_pixelmap* last_dst = NULL;
 br_pixelmap* last_src = NULL;
 
-br_pixelmap* color_buffer = NULL;
+br_pixelmap *last_colour_buffer, *last_depth_buffer;
 
 unsigned int last_frame_time = 0;
 
@@ -213,14 +213,16 @@ void Harness_Hook_MainGameLoop() {
 
 // Begin 3d scene
 void Harness_Hook_BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer) {
+    last_colour_buffer = colour_buffer;
+    last_depth_buffer = depth_buffer;
     platform->BeginScene(camera, colour_buffer);
 }
 
 void Harness_Hook_BrZbSceneRenderAdd(br_actor* tree) {
 }
 
-void Harness_Hook_renderFaces(br_model* model, br_material* material, br_token type) {
-    platform->RenderModel(model, renderer_state->state.matrix.model_to_view);
+void Harness_Hook_renderFaces(br_actor* actor, br_model* model, br_material* material, br_token type) {
+    platform->RenderModel(actor, model, renderer_state->state.matrix.model_to_view);
 }
 
 void Harness_Hook_BrZbSceneRenderEnd() {
@@ -231,6 +233,7 @@ void Harness_Hook_BrZbSceneRenderEnd() {
 void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {
 
     // draw the current colour_buffer (2d screen) contents
+    platform->FlushBuffers(last_colour_buffer, last_depth_buffer);
     Harness_RenderScreen(dst, src);
 
     platform->Swap();
@@ -266,4 +269,8 @@ void Harness_Hook_S3Service(int unk1, int unk2) {
 }
 
 void Harness_Hook_S3StopAllOutletSounds() {
+}
+
+void Harness_Hook_FlushRenderer() {
+    platform->FlushBuffers(last_colour_buffer, last_depth_buffer);
 }

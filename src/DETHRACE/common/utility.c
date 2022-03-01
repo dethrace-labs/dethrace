@@ -54,7 +54,7 @@ int CheckQuit() {
     return 0;
 }
 
-//IDA: double __cdecl sqr(double pN)
+// IDA: double __cdecl sqr(double pN)
 double sqr(double pN) {
     return pN * pN;
 }
@@ -289,13 +289,13 @@ char* GetALineWithNoPossibleService(FILE* pF, /*unsigned*/ char* pS) {
             pS[i] -= 32;
         }
     }
-    //LOG_DEBUG("%s", result);
+    // LOG_DEBUG("%s", result);
     return result;
 }
 
 // IDA: char* __usercall GetALineAndDontArgue@<EAX>(FILE *pF@<EAX>, char *pS@<EDX>)
 char* GetALineAndDontArgue(FILE* pF, char* pS) {
-    //LOG_TRACE10("(%p, \"%s\")", pF, pS);
+    // LOG_TRACE10("(%p, \"%s\")", pF, pS);
     PossibleService();
     return GetALineWithNoPossibleService(pF, pS);
 }
@@ -659,7 +659,8 @@ void PrintScreenFile(FILE* pF) {
         }
         offset -= 2 * gBack_screen->row_bytes;
     }
-    WriteU16L(pF, 0);;
+    WriteU16L(pF, 0);
+    ;
 }
 
 // IDA: void __usercall PrintScreenFile16(FILE *pF@<EAX>)
@@ -795,7 +796,7 @@ int FindBestMatch(tRGB_colour* pRGB_colour, br_pixelmap* pPalette) {
     LOG_TRACE("(%p, %p)", pRGB_colour, pPalette);
 
     near_c = 127;
-    min_d = 1.79769e+308;  // max double
+    min_d = 1.79769e+308; // max double
     dp = pPalette->pixels;
     for (n = 0; n < 256; n++) {
         trial_RGB.red = (dp[n] >> 16) & 0xff;
@@ -893,9 +894,9 @@ br_pixelmap* GenerateDarkenedShadeTable(int pHeight, br_pixelmap* pPalette, int 
         ref_col.blue = pBlue_mix;
 
         for (c = 0, tab_ptr = the_table->pixels; c < 256; c++, tab_ptr++) {
-            the_RGB.red   = ((cp[i] >> 16) & 0xff) * pDarken;
-            the_RGB.green = ((cp[i] >>  8) & 0xff) * pDarken;
-            the_RGB.blue  = ((cp[i] >>  0) & 0xff) * pDarken;
+            the_RGB.red = ((cp[c] >> 16) & 0xff) * pDarken;
+            the_RGB.green = ((cp[c] >> 8) & 0xff) * pDarken;
+            the_RGB.blue = ((cp[c] >> 0) & 0xff) * pDarken;
 
             if (pHeight == 1) {
                 f_total_minus_1 = 1.;
@@ -919,9 +920,9 @@ br_pixelmap* GenerateDarkenedShadeTable(int pHeight, br_pixelmap* pPalette, int 
                         ratio2 = 1. - (1. - pThree_quarter) * (1. - ratio1) * 4.;
                     }
                 }
-                new_RGB.red   = ref_col.red   * ratio2 + the_RGB.red   * (1. - ratio2);
+                new_RGB.red = ref_col.red * ratio2 + the_RGB.red * (1. - ratio2);
                 new_RGB.green = ref_col.green * ratio2 + the_RGB.green * (1. - ratio2);
-                new_RGB.blue  = ref_col.blue  * ratio2 + the_RGB.blue  * (1. - ratio2);
+                new_RGB.blue = ref_col.blue * ratio2 + the_RGB.blue * (1. - ratio2);
                 *shade_ptr = FindBestMatch(&new_RGB, pPalette);
             }
         }
@@ -1438,22 +1439,22 @@ int AlreadyBlended(br_material* pMaterial) {
 
 // IDA: void __usercall BlendifyMaterialTablishly(br_material *pMaterial@<EAX>, int pPercent@<EDX>)
 void BlendifyMaterialTablishly(br_material* pMaterial, int pPercent) {
-    char* s;
+    char* s = NULL;
     LOG_TRACE("(%p, %d)", pMaterial, pPercent);
 
     switch (pPercent) {
-        case 25:
-            s = "BLEND75.TAB";
-            break;
-        case 50:
-            s = "BLEND50.TAB";
-            break;
-        case 75:
-            s = "BLEND25.TAB";
-            break;
-        default:
-            PDFatalError("Invalid alpha");
-            break;
+    case 25:
+        s = "BLEND75.TAB";
+        break;
+    case 50:
+        s = "BLEND50.TAB";
+        break;
+    case 75:
+        s = "BLEND25.TAB";
+        break;
+    default:
+        PDFatalError("Invalid alpha");
+        break;
     }
     pMaterial->index_blend = BrTableFind(s);
     if (pMaterial->index_blend == NULL) {
@@ -1465,17 +1466,17 @@ void BlendifyMaterialTablishly(br_material* pMaterial, int pPercent) {
 void BlendifyMaterialPrimitively(br_material* pMaterial, int pPercent) {
     static br_token_value alpha25[3] = {
         { BRT_BLEND_B, { .b = 1 } },
-        { BRT_OPACITY_X, { .x = 0x400000 }},
+        { BRT_OPACITY_X, { .x = 0x400000 } },
         { 0 },
     };
     static br_token_value alpha50[3] = {
         { BRT_BLEND_B, { .b = 1 } },
-        { BRT_OPACITY_X, { .x = 0x800000 }},
+        { BRT_OPACITY_X, { .x = 0x800000 } },
         { 0 },
     };
     static br_token_value alpha75[3] = {
         { BRT_BLEND_B, { .b = 1 } },
-        { BRT_OPACITY_X, { .x = 0xc00000 }},
+        { BRT_OPACITY_X, { .x = 0xc00000 } },
         { 0 },
     };
     LOG_TRACE("(%p, %d)", pMaterial, pPercent);
