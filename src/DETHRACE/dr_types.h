@@ -84,9 +84,15 @@ typedef struct tPath_section_struct tPath_section;
 typedef tU32 tPlayer_ID;
 typedef void* tPipe_reset_proc();
 typedef struct tPowerup tPowerup;
+#ifdef DETHRACE_FIX_BUGS
+typedef int tGot_proc(tPowerup*, tCar_spec*);
+typedef void tLose_proc(tPowerup*, tCar_spec*);
+typedef void tPeriodic_proc(tPowerup*, tU32);
+#else
 typedef int* tGot_proc(tPowerup*, tCar_spec*);
 typedef void* tLose_proc(tPowerup*, tCar_spec*);
 typedef void* tPeriodic_proc(tPowerup*, tU32);
+#endif
 typedef char tPath_name[256];
 typedef struct tFlic_descriptor* tFlic_descriptor_ptr;
 typedef struct exception_struct* tException_list;
@@ -1636,6 +1642,8 @@ typedef struct tNet_message_crush_point {
     tU16 vertex;
     br_vector3 energy_vector;
 } tNet_message_crush_point;
+
+#define ENET_MESSAGE_HEADUP 0xc
 
 typedef union tNet_contents { // size: 0x160
     struct { // size: 0x2
@@ -3675,7 +3683,11 @@ typedef struct tRGB_colour {
     int blue;
 } tRGB_colour;
 
+#ifdef DETHRACE_FIX_BUGS
+typedef br_material* tPMFMCB(br_model*, tU16);
+#else
 typedef br_material** tPMFMCB(br_model*, tU16);
+#endif
 
 typedef enum tMatrix_mod_type {
     eMatrix_mod_none = -1,

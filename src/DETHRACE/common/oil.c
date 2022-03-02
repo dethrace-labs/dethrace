@@ -21,24 +21,24 @@ void InitOilSpills() {
     br_material* the_material;
     LOG_TRACE("()");
 
-    for (i = 0; i < 1; i++) {
+    for (i = 0; i < COUNT_OF(gOil_pixie_names); i++) {
         gOil_pixies[i] = LoadPixelmap(gOil_pixie_names[i]);
         BrMapAdd(gOil_pixies[i]);
     }
 
-    for (i = 0; i < 15; i++) {
+    for (i = 0; i < COUNT_OF(gOily_spills); i++) {
         the_material = BrMaterialAllocate(NULL);
         BrMaterialAdd(the_material);
-        the_material->ka = 0.99000001;
-        the_material->kd = 0.0;
-        the_material->ks = 0.0;
+        the_material->ka = 0.99f;
+        the_material->kd = 0.0f;
+        the_material->ks = 0.0f;
         the_material->power = 0.0;
         the_material->index_base = 0;
-        the_material->flags |= 1u;
-        the_material->flags |= 0x20u;
-        the_material->flags |= 4u;
+        the_material->flags |= BR_MATF_LIGHT;
+        the_material->flags |= BR_MATF_PERSPECTIVE;
+        the_material->flags |= 0x00000004;
         the_material->index_range = 0;
-        the_material->colour_map = 0;
+        the_material->colour_map = NULL;
         BrMatrix23Identity(&the_material->map_transform);
         the_material->index_shade = BrTableFind("IDENTITY.TAB");
         BrMaterialUpdate(the_material, BR_MATU_ALL);
@@ -48,36 +48,36 @@ void InitOilSpills() {
         the_model->faces->vertices[0] = 2;
         the_model->faces->vertices[1] = 1;
         the_model->faces->vertices[2] = 0;
-        the_model->faces->material = 0;
+        the_model->faces->material = NULL;
         the_model->faces->smoothing = 1;
         the_model->faces[1].vertices[0] = 3;
         the_model->faces[1].vertices[1] = 2;
         the_model->faces[1].vertices[2] = 0;
-        the_model->faces[1].material = 0;
+        the_model->faces[1].material = NULL;
         the_model->faces[1].smoothing = 1;
-        the_model->vertices->p.v[0] = -1.0;
-        the_model->vertices->p.v[1] = 0.0;
-        the_model->vertices->p.v[2] = -1.0;
-        the_model->vertices->map.v[0] = 0.0;
-        the_model->vertices->map.v[1] = 1.0;
-        the_model->vertices[1].p.v[0] = 1.0;
-        the_model->vertices[1].p.v[1] = 0.0;
-        the_model->vertices[1].p.v[2] = 1.0;
-        the_model->vertices[1].map.v[0] = 0.0;
-        the_model->vertices[1].map.v[1] = 0.0;
-        the_model->vertices[2].p.v[0] = 1.0;
-        the_model->vertices[2].p.v[1] = 0.0;
-        the_model->vertices[2].p.v[2] = -1.0;
-        the_model->vertices[2].map.v[0] = 1.0;
-        the_model->vertices[2].map.v[1] = 0.0;
-        the_model->vertices[3].p.v[0] = -1.0;
-        the_model->vertices[3].p.v[1] = 0.0;
-        the_model->vertices[3].p.v[2] = 1.0;
-        the_model->vertices[3].map.v[0] = 1.0;
-        the_model->vertices[3].map.v[1] = 1.0;
+        the_model->vertices[0].p.v[0] = -1.0f;
+        the_model->vertices[0].p.v[1] = 0.0f;
+        the_model->vertices[0].p.v[2] = -1.0f;
+        the_model->vertices->map.v[0] = 0.0f;
+        the_model->vertices->map.v[1] = 1.0f;
+        the_model->vertices[1].p.v[0] = 1.0f;
+        the_model->vertices[1].p.v[1] = 0.0f;
+        the_model->vertices[1].p.v[2] = 1.0f;
+        the_model->vertices[1].map.v[0] = 0.0f;
+        the_model->vertices[1].map.v[1] = 0.0f;
+        the_model->vertices[2].p.v[0] = 1.0f;
+        the_model->vertices[2].p.v[1] = 0.0f;
+        the_model->vertices[2].p.v[2] = -1.0f;
+        the_model->vertices[2].map.v[0] = 1.0f;
+        the_model->vertices[2].map.v[1] = 0.0f;
+        the_model->vertices[3].p.v[0] = -1.0f;
+        the_model->vertices[3].p.v[1] = 0.0f;
+        the_model->vertices[3].p.v[2] = 1.0f;
+        the_model->vertices[3].map.v[0] = 1.0f;
+        the_model->vertices[3].map.v[1] = 1.0f;
         gOily_spills[i].actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
         gOily_spills[i].actor->model = the_model;
-        gOily_spills[i].actor->render_style = 1;
+        gOily_spills[i].actor->render_style = BR_RSTYLE_NONE;
         gOily_spills[i].actor->material = the_material;
         BrActorAdd(gNon_track_actor, gOily_spills[i].actor);
     }
@@ -103,7 +103,38 @@ void QueueOilSpill(tCar_spec* pCar) {
     tU32 the_time;
     tU32 oldest_time;
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    oldest_one = 0;
+    oily_index = -1;
+    the_time = GetTotalTime();
+    oldest_time = GetTotalTime();
+
+    for (i = 0; i < COUNT_OF(gOily_spills); i++) {
+        if (gOily_spills[i].car == pCar && the_time < (gOily_spills[i].spill_time + 5000)) {
+            return;
+        }
+    }
+
+    for (i = 0; i < COUNT_OF(gOily_spills); i++) {
+        if (gOily_spills[i].car == NULL) {
+            oily_index = i;
+            break;
+        }
+        if (gOily_spills[i].spill_time < oldest_time) {
+            oldest_time = gOily_spills[i].spill_time;
+            oldest_one = i;
+        }
+    }
+
+    if (oily_index < 0) {
+        oily_index = oldest_one;
+    }
+    gOily_spills[oily_index].car = pCar;
+    gOily_spills[oily_index].spill_time = the_time + 500;
+    gOily_spills[oily_index].full_size = SRandomBetween(.35f, .6f);
+    gOily_spills[oily_index].grow_rate = SRandomBetween(30e-4f, 1e-4f);
+    gOily_spills[oily_index].current_size = .1f;
+    gOily_spills[oily_index].actor->render_style = BR_RSTYLE_NONE;
 }
 
 // IDA: int __usercall OKToSpillOil@<EAX>(tOil_spill_info *pOil@<EAX>)
@@ -151,12 +182,12 @@ void EnsureGroundDetailVisible(br_vector3* pNew_pos, br_vector3* pGround_normal,
     dist = BrVector3Length(&to_camera);
     if (dist > BR_SCALAR_EPSILON) {
         factor = BrVector3Dot(pGround_normal, &to_camera) / dist;
-        if (fabs(factor) <= 0.0099999998) {
-            s = 0.0099999998;
+        if (fabs(factor) <= 0.01f) {
+            s = 0.01f;
         } else {
-            s = 0.0099999998 / factor;
-            if (s > 0.1) {
-                s = 0.1;
+            s = 0.01f / factor;
+            if (s > 0.1f) {
+                s = 0.1f;
             }
         }
         Vector3Interpolate(pNew_pos, pOld_pos, (br_vector3*)gCamera_to_world.m[3], s);
@@ -166,19 +197,32 @@ void EnsureGroundDetailVisible(br_vector3* pNew_pos, br_vector3* pGround_normal,
 // IDA: void __usercall MungeOilsHeightAboveGround(tOil_spill_info *pOil@<EAX>)
 void MungeOilsHeightAboveGround(tOil_spill_info* pOil) {
     LOG_TRACE("(%p)", pOil);
-    NOT_IMPLEMENTED();
+
+    EnsureGroundDetailVisible(&pOil->actor->t.t.look_up.t, &pOil->actor->t.t.look_up.up, &pOil->pos);
 }
 
 // IDA: void __usercall MungeIndexedOilsHeightAboveGround(int pIndex@<EAX>)
 void MungeIndexedOilsHeightAboveGround(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+
+    MungeOilsHeightAboveGround(&gOily_spills[pIndex]);
 }
 
 // IDA: void __usercall SetInitialOilStuff(tOil_spill_info *pOil@<EAX>, br_model *pModel@<EDX>)
 void SetInitialOilStuff(tOil_spill_info* pOil, br_model* pModel) {
     LOG_TRACE("(%p, %p)", pOil, pModel);
-    NOT_IMPLEMENTED();
+
+    pModel->vertices[0].p.v[0] = -0.1f;
+    pModel->vertices[0].p.v[2] = -0.1f;
+    pModel->vertices[1].p.v[0] =  0.1f;
+    pModel->vertices[1].p.v[2] = -0.1f;
+    pModel->vertices[2].p.v[0] =  0.1f;
+    pModel->vertices[2].p.v[2] =  0.1f;
+    pModel->vertices[3].p.v[0] = -0.1f;
+    pModel->vertices[3].p.v[2] =  0.1f;
+    pOil->actor->render_style = BR_RSTYLE_FACES;
+    BrMaterialUpdate(pOil->actor->material, BR_MATU_ALL);
+    BrModelUpdate(pModel, BR_MODU_ALL);
 }
 
 // IDA: void __usercall ProcessOilSpills(tU32 pFrame_period@<EAX>)
@@ -198,14 +242,15 @@ void ProcessOilSpills(tU32 pFrame_period) {
 // IDA: int __cdecl GetOilSpillCount()
 int GetOilSpillCount() {
     //LOG_TRACE("()");
-    return 15;
+
+    return COUNT_OF(gOily_spills);
 }
 
 // IDA: void __usercall GetOilSpillDetails(int pIndex@<EAX>, br_actor **pActor@<EDX>, br_scalar *pSize@<EBX>)
 void GetOilSpillDetails(int pIndex, br_actor** pActor, br_scalar* pSize) {
     LOG_TRACE("(%d, %p, %p)", pIndex, pActor, pSize);
 
-    if (gOily_spills[pIndex].car) {
+    if (gOily_spills[pIndex].car != NULL) {
         *pActor = gOily_spills[pIndex].actor;
         *pSize = gOily_spills[pIndex].full_size;
     } else {
@@ -217,9 +262,9 @@ void GetOilSpillDetails(int pIndex, br_actor** pActor, br_scalar* pSize) {
 int PointInSpill(br_vector3* pV, int pSpill) {
     LOG_TRACE("(%p, %d)", pV, pSpill);
 
-    return gOily_spills[pSpill].current_size * gOily_spills[pSpill].current_size * 0.80000001 > (pV->v[0] / 6.9000001 - gOily_spills[pSpill].actor->t.t.mat.m[3][0]) * (pV->v[0] / 6.9000001 - gOily_spills[pSpill].actor->t.t.mat.m[3][0])
-        && gOily_spills[pSpill].current_size * gOily_spills[pSpill].current_size * 0.80000001 > (pV->v[2] / 6.9000001 - gOily_spills[pSpill].actor->t.t.mat.m[3][2]) * (pV->v[2] / 6.9000001 - gOily_spills[pSpill].actor->t.t.mat.m[3][2])
-        && fabs(pV->v[1] / 6.9000001 - gOily_spills[pSpill].actor->t.t.mat.m[3][1]) < 0.1;
+    return gOily_spills[pSpill].current_size * gOily_spills[pSpill].current_size * 0.8f > (pV->v[0] / WORLD_SCALE - gOily_spills[pSpill].actor->t.t.mat.m[3][0]) * (pV->v[0] / WORLD_SCALE - gOily_spills[pSpill].actor->t.t.mat.m[3][0])
+        && gOily_spills[pSpill].current_size * gOily_spills[pSpill].current_size * 0.8f > (pV->v[2] / WORLD_SCALE - gOily_spills[pSpill].actor->t.t.mat.m[3][2]) * (pV->v[2] / WORLD_SCALE - gOily_spills[pSpill].actor->t.t.mat.m[3][2])
+        && fabs(pV->v[1] / WORLD_SCALE - gOily_spills[pSpill].actor->t.t.mat.m[3][1]) < 0.1f;
 }
 
 // IDA: void __usercall GetOilFrictionFactors(tCar_spec *pCar@<EAX>, br_scalar *pFl_factor@<EDX>, br_scalar *pFr_factor@<EBX>, br_scalar *pRl_factor@<ECX>, br_scalar *pRr_factor)
@@ -232,41 +277,46 @@ void GetOilFrictionFactors(tCar_spec* pCar, br_scalar* pFl_factor, br_scalar* pF
     *pFr_factor = 1.0;
     *pRl_factor = 1.0;
     *pRr_factor = 1.0;
-    if (pCar->driver > eDriver_non_car) {
-        if (pCar->shadow_intersection_flags) {
-            for (i = 0; i < 15; i++) {
-                if (((1 << i) & pCar->shadow_intersection_flags) != 0 && gOily_spills[i].car) {
-                    BrMatrix34ApplyP(&wheel_world, &pCar->wpos[2], &pCar->car_master_actor->t.t.mat);
-                    if (PointInSpill(&wheel_world, i)) {
-                        pCar->oil_remaining[2] = SRandomBetween(1.5, 2.5);
-                    }
-                    BrMatrix34ApplyP(&wheel_world, &pCar->wpos[3], &pCar->car_master_actor->t.t.mat);
-                    if (PointInSpill(&wheel_world, i)) {
-                        pCar->oil_remaining[3] = SRandomBetween(1.5, 2.5);
-                    }
-                    BrMatrix34ApplyP(&wheel_world, &pCar->wpos[0], &pCar->car_master_actor->t.t.mat);
-                    if (PointInSpill(&wheel_world, i)) {
-                        pCar->oil_remaining[0] = SRandomBetween(1.5, 2.5);
-                    }
-                    BrMatrix34ApplyP(&wheel_world, &pCar->wpos[1], &pCar->car_master_actor->t.t.mat);
-                    if (PointInSpill(&wheel_world, i)) {
-                        pCar->oil_remaining[1] = SRandomBetween(1.5, 2.5);
-                    }
+    switch (pCar->driver) {
+    case eDriver_non_car_unused_slot:
+    case eDriver_non_car:
+        return;
+    default:
+        break;
+    }
+    if (pCar->shadow_intersection_flags != 0) {
+        for (i = 0; i < COUNT_OF(gOily_spills); i++) {
+            if (((1 << i) & pCar->shadow_intersection_flags) != 0 && gOily_spills[i].car) {
+                BrMatrix34ApplyP(&wheel_world, &pCar->wpos[2], &pCar->car_master_actor->t.t.mat);
+                if (PointInSpill(&wheel_world, i)) {
+                    pCar->oil_remaining[2] = SRandomBetween(1.5f, 2.5f);
+                }
+                BrMatrix34ApplyP(&wheel_world, &pCar->wpos[3], &pCar->car_master_actor->t.t.mat);
+                if (PointInSpill(&wheel_world, i)) {
+                    pCar->oil_remaining[3] = SRandomBetween(1.5f, 2.5f);
+                }
+                BrMatrix34ApplyP(&wheel_world, &pCar->wpos[0], &pCar->car_master_actor->t.t.mat);
+                if (PointInSpill(&wheel_world, i)) {
+                    pCar->oil_remaining[0] = SRandomBetween(1.5f, 2.5f);
+                }
+                BrMatrix34ApplyP(&wheel_world, &pCar->wpos[1], &pCar->car_master_actor->t.t.mat);
+                if (PointInSpill(&wheel_world, i)) {
+                    pCar->oil_remaining[1] = SRandomBetween(1.5f, 2.5f);
                 }
             }
         }
-        if (pCar->oil_remaining[2] != 0.0) {
-            *pFl_factor = SRandomBetween(0.0099999998, 0.15000001);
-        }
-        if (pCar->oil_remaining[3] != 0.0) {
-            *pFr_factor = SRandomBetween(0.0099999998, 0.15000001);
-        }
-        if (pCar->oil_remaining[0] != 0.0) {
-            *pRl_factor = SRandomBetween(0.0099999998, 0.15000001);
-        }
-        if (pCar->oil_remaining[1] != 0.0) {
-            *pRr_factor = SRandomBetween(0.0099999998, 0.15000001);
-        }
+    }
+    if (pCar->oil_remaining[2] != 0.0f) {
+        *pFl_factor = SRandomBetween(0.01f, 0.15f);
+    }
+    if (pCar->oil_remaining[3] != 0.0f) {
+        *pFr_factor = SRandomBetween(0.01f, 0.15f);
+    }
+    if (pCar->oil_remaining[0] != 0.0f) {
+        *pRl_factor = SRandomBetween(0.01f, 0.15f);
+    }
+    if (pCar->oil_remaining[1] != 0.0f) {
+        *pRr_factor = SRandomBetween(0.01f, 0.15f);
     }
 }
 

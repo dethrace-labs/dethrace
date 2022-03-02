@@ -4,6 +4,7 @@
 #include "car.h"
 #include "constants.h"
 #include "crush.h"
+#include "depth.h"
 #include "displays.h"
 #include "finteray.h"
 #include "flicplay.h"
@@ -12,6 +13,7 @@
 #include "globvrpb.h"
 #include "graphics.h"
 #include "harness/trace.h"
+#include "init.h"
 #include "input.h"
 #include "loadsave.h"
 #include "mainloop.h"
@@ -21,6 +23,7 @@
 #include "pd/sys.h"
 #include "pedestrn.h"
 #include "piping.h"
+#include "powerup.h"
 #include "pratcam.h"
 #include "replay.h"
 #include "s3/s3sound.h"
@@ -163,7 +166,8 @@ void SetFlag(int i) {
 // IDA: void __usercall FinishLap(int i@<EAX>)
 void FinishLap(int i) {
     LOG_TRACE("(%d)", i);
-    NOT_IMPLEMENTED();
+
+    IncrementLap();
 }
 
 // IDA: void __cdecl EnsureSpecialVolumesHidden()
@@ -191,104 +195,120 @@ void DoEditModeKey(int pIndex) {
 // IDA: void __cdecl F5Key()
 void F5Key() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(0);
 }
 
 // IDA: void __cdecl F6Key()
 void F6Key() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(1);
 }
 
 // IDA: void __cdecl F7Key()
 void F7Key() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(2);
 }
 
 // IDA: void __cdecl F8Key()
 void F8Key() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(3);
 }
 
 // IDA: void __cdecl F10Key()
 void F10Key() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(4);
 }
 
 // IDA: void __cdecl F11Key()
 void F11Key() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(5);
 }
 
 // IDA: void __cdecl F12Key()
 void F12Key() {
     LOG_TRACE("()");
 
-    STUB();
+    DoEditModeKey(6);
 }
 
 // IDA: void __cdecl NumberKey0()
 void NumberKey0() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(7);
 }
 
 // IDA: void __cdecl NumberKey1()
 void NumberKey1() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(8);
 }
 
 // IDA: void __cdecl NumberKey2()
 void NumberKey2() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(9);
 }
 
 // IDA: void __cdecl NumberKey3()
 void NumberKey3() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(10);
 }
 
 // IDA: void __cdecl NumberKey4()
 void NumberKey4() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(11);
 }
 
 // IDA: void __cdecl NumberKey5()
 void NumberKey5() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(12);
 }
 
 // IDA: void __cdecl NumberKey6()
 void NumberKey6() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(13);
 }
 
 // IDA: void __cdecl NumberKey7()
 void NumberKey7() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(14);
 }
 
 // IDA: void __cdecl NumberKey8()
 void NumberKey8() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(15);
 }
 
 // IDA: void __cdecl NumberKey9()
 void NumberKey9() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoEditModeKey(16);
 }
 
 // IDA: void __cdecl LookLeft()
@@ -510,18 +530,17 @@ void ToggleCockpit() {
 
     if ((&gProgram_state.current_car == gCar_to_view || gProgram_state.cockpit_on) && !gMap_mode) {
         if (!gAusterity_mode || gProgram_state.cockpit_on) {
-            gProgram_state.cockpit_on = gProgram_state.cockpit_on == 0;
+            gProgram_state.cockpit_on = !gProgram_state.cockpit_on;
             if (gProgram_state.cockpit_on) {
                 gCamera = gCamera_list[0];
             } else {
                 gCamera = gCamera_list[1];
-            }
-            if (!gProgram_state.cockpit_on) {
                 InitialiseExternalCamera();
                 PositionExternalCamera(&gProgram_state.current_car, 1);
             }
             AdjustRenderScreenSize();
             AdjustHeadups();
+            MungeForwardSky();
         } else {
             NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(192));
         }
@@ -645,7 +664,7 @@ void CheckForBeingOutOfThisWorld() {
 
     the_time = PDGetTotalTime();
 
-    if (!gRecover_timer || ((gProgram_state.current_car.frame_collision_flag || gProgram_state.current_car.number_of_wheels_on_ground) && !IsCarInTheSea())) {
+    if (gRecover_timer == 0 || ((gProgram_state.current_car.frame_collision_flag || gProgram_state.current_car.number_of_wheels_on_ground) && !IsCarInTheSea())) {
         gRecover_timer = 0;
         if ((the_time - sLast_check) > 200) {
             sLast_check = the_time;
@@ -672,13 +691,20 @@ void CheckForBeingOutOfThisWorld() {
 void CheckHornLocal(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
 
-    STUB_ONCE();
+    if (pCar->keys.horn && pCar->horn_sound_tag == 0) {
+        pCar->horn_sound_tag = DRS3StartSound(gIndexed_outlets[0], 5209);
+    } else if (!pCar->keys.horn && pCar->horn_sound_tag != 0) {
+        while (S3SoundStillPlaying(pCar->horn_sound_tag)) {
+            DRS3StopSound(pCar->horn_sound_tag);
+            DRS3StopOutletSound(gIndexed_outlets[0]);
+        }
+        pCar->horn_sound_tag = 0;
+    }
 }
 
 // IDA: void __usercall CheckHorn3D(tCar_spec *pCar@<EAX>)
 void CheckHorn3D(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
-
     STUB_ONCE();
 }
 
@@ -820,7 +846,7 @@ void LoseSomePSPowerups(int pNumber) {
     int index;
     LOG_TRACE("(%d)", pNumber);
 
-    if (gNet_mode && pNumber > 0) {
+    if (gNet_mode != eNet_mode_none && pNumber > 0) {
         while (pNumber--) {
             index = IRandomBetween(0, 2);
             if (gProgram_state.current_car.power_up_levels[index]) {
@@ -919,7 +945,7 @@ void CheckOtherRacingKeys() {
                 }
                 total_difference %= 100;
                 cost = 10 * (cost / 10);
-                if (((!total_repair_cost && cost) || bodywork_repair_amount != 0.0) && !sound_tag) {
+                if (((!total_repair_cost && cost) || bodywork_repair_amount != 0.0f) && !sound_tag) {
                     sound_tag = DRS3StartSound(gIndexed_outlets[1], 5200);
                 }
                 if (gProgram_state.current_car.num_smoke_columns) {
@@ -957,10 +983,10 @@ void CheckOtherRacingKeys() {
     } else if (CheckRecoverCost()) {
         gRecover_timer = 0;
         SetFlipUpCar(car);
-        if (gNet_mode) {
+        if (gNet_mode != eNet_mode_none) {
             NewTextHeadupSlot(4, 0, 1500, -4, " ");
         }
-        if (gRecovery_voucher_count) {
+        if (gRecovery_voucher_count != 0) {
             gRecovery_voucher_count--;
             sprintf(s, "%s", GetMiscString(48));
             NewTextHeadupSlot(4, 0, 1500, -4, s);
@@ -1011,14 +1037,40 @@ void SortOutRecover(tCar_spec* pCar) {
     int val;
     static int old_time;
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    the_time = GetRaceTime() - gPalette_fade_time;
+    if (the_time < 0) {
+        gPalette_fade_time = 0;
+        old_time = 0;
+    }
+    if (the_time < 500) {
+        val = 256 - (the_time * 256) / 500;
+    } else {
+        if (old_time < 500) {
+            FlipUpCar(pCar);
+            PipeSingleSpecial(ePipe_special_fade);
+        }
+        pCar->doing_nothing_flag = 1;
+        val = ((the_time - 1000) * 256) / 500;
+        if (val >= 256) {
+            val = 256;
+            gPalette_fade_time = 0;
+            old_time = 0;
+            pCar->doing_nothing_flag = 0;
+        }
+    }
+    if (val <= 0) {
+        val = 0;
+    }
+    SetFadedPalette(val);
+    old_time = the_time;
 }
 
 // IDA: void __usercall SetFlipUpCar(tCar_spec *pCar@<EAX>)
 void SetFlipUpCar(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
 
-    if (gNet_mode && pCar->driver == eDriver_local_human) {
+    if (gNet_mode != eNet_mode_none && pCar->driver == eDriver_local_human) {
         DisableCar(pCar);
         gPalette_fade_time = GetRaceTime();
         NetPlayerStatusChanged(ePlayer_status_recovering);
@@ -1135,8 +1187,12 @@ void FlipUpCar(tCar_spec* car) {
 
 // IDA: void __usercall GetPowerup(int pNum@<EAX>)
 void GetPowerup(int pNum) {
+    LOG_TRACE("()");
+
+    // FIXME: remove unittest variables from dethrace
     _unittest_controls_lastGetPowerup = pNum;
-    STUB();
+
+    GotPowerup(&gProgram_state.current_car, pNum);
 }
 
 // IDA: void __usercall CheckSystemKeys(int pRacing@<EAX>)
@@ -1375,49 +1431,78 @@ void PollCameraControls(tU32 pTime_difference) {
 // IDA: void __usercall SetFlag2(int i@<EAX>)
 void SetFlag2(int i) {
     LOG_TRACE("(%d)", i);
-    NOT_IMPLEMENTED();
+
+    gAllow_car_flying = 1;
+    ToggleFlying();
+    gAllow_car_flying = gCar_flying;
 }
 
 // IDA: void __cdecl ToggleFlying()
 void ToggleFlying() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gAllow_car_flying && gNet_mode == eNet_mode_none) {
+        gCar_flying = !gCar_flying;
+        if (gCar_flying) {
+            NewTextHeadupSlot(4, 0, 500, -4, "We have lift off!!");
+        } else {
+            NewTextHeadupSlot(4, 0, 500, -4, "Back down to Earth");
+        }
+    } else {
+        gCar_flying = 0;
+    }
 }
 
 // IDA: void __cdecl ToggleInvulnerability()
 void ToggleInvulnerability() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gProgram_state.current_car.invulnerable = !gProgram_state.current_car.invulnerable;
+    if (gProgram_state.current_car.invulnerable) {
+        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(0));
+    } else {
+        NewTextHeadupSlot(4, 0, 1000, -4, "Vulnerability returns!");
+    }
 }
 
 // IDA: void __cdecl MoreTime()
 void MoreTime() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    AwardTime(30);
 }
 
 // IDA: void __cdecl MuchMoreTime()
 void MuchMoreTime() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    AwardTime(300);
 }
 
 // IDA: void __cdecl ToggleTimerFreeze()
 void ToggleTimerFreeze() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gFreeze_timer = !gFreeze_timer;
+    if (gFreeze_timer) {
+        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(1));
+    } else {
+        NewTextHeadupSlot(4, 0, 1000, -4, "Timer thawed out");
+    }
 }
 
 // IDA: void __cdecl EarnDosh()
 void EarnDosh() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    EarnCredits(5000);
 }
 
 // IDA: void __cdecl LoseDosh()
 void LoseDosh() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    EarnCredits(-5000);
 }
 
 // IDA: void __cdecl ToggleMap()
@@ -1425,13 +1510,38 @@ void ToggleMap() {
     static int old_indent;
     static int was_in_cockpit;
     LOG_TRACE("()");
-    STUB_ONCE();
+
+    if (!gMap_mode) {
+        if (!gAction_replay_mode) {
+            if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_foxy && gThis_net_player_index == gIt_or_fox) {
+                NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(214));
+            } else if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_tag && gThis_net_player_index != gIt_or_fox) {
+                NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(215));
+            } else {
+                old_indent = gRender_indent;
+                gRender_indent = 0;
+                was_in_cockpit = gProgram_state.cockpit_on;
+                if (gProgram_state.cockpit_on) {
+                    ToggleCockpit();
+                }
+                gMap_mode = PDGetTotalTime();
+            }
+        }
+    } else {
+        gMap_mode = 0;
+        gRender_indent = old_indent;
+        if (was_in_cockpit) {
+            ToggleCockpit();
+        }
+    }
+    AdjustRenderScreenSize();
 }
 
 // IDA: int __cdecl HornBlowing()
 int HornBlowing() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    return gProgram_state.current_car.keys.horn;
 }
 
 // IDA: void __cdecl ToggleArrow()
@@ -1464,13 +1574,15 @@ void ToggleArrow() {
 // IDA: int __cdecl GetRecoverVoucherCount()
 int GetRecoverVoucherCount() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    return gRecovery_voucher_count;
 }
 
 // IDA: void __usercall AddVouchers(int pCount@<EAX>)
 void AddVouchers(int pCount) {
     LOG_TRACE("(%d)", pCount);
-    NOT_IMPLEMENTED();
+
+    gRecovery_voucher_count += pCount;
 }
 
 // IDA: void __cdecl ResetRecoveryVouchers()
@@ -1657,5 +1769,10 @@ void InitAbuseomatic() {
 void DisposeAbuseomatic() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < COUNT_OF(gAbuse_text); i++) {
+        if (gAbuse_text[i] != NULL) {
+            BrMemFree(gAbuse_text[i]);
+        }
+    }
 }

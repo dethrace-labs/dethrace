@@ -1,12 +1,17 @@
 #include "spark.h"
 #include "brender/brender.h"
+#include "car.h"
+#include "depth.h"
 #include "errors.h"
 #include "globvars.h"
+#include "globvrkm.h"
 #include "graphics.h"
 #include "harness/trace.h"
 #include "loading.h"
 #include "utility.h"
 #include "world.h"
+
+#include <math.h>
 #include <stdlib.h>
 
 int gNext_spark;
@@ -156,7 +161,69 @@ void CreateSparks(br_vector3* pos, br_vector3* v, br_vector3* pForce, br_scalar 
     int num;
     int i;
     LOG_TRACE("(%p, %p, %p, %f, %p)", pos, v, pForce, sparkiness, pCar);
-    STUB();
+
+    ts = BrVector3Length(pForce);
+    BrVector3InvScale(&normal, pForce, ts);
+    ts2 = BrVector3Dot(pForce, v);
+    if (ts2 >= 0) {
+        ts2 = 1.f / (10.f * ts);
+    } else {
+        ts2 = 1.f / (10.f * ts) - ts2 / (ts * ts);
+    }
+    BrVector3Scale(&norm, pForce, ts2);
+    BrVector3Accumulate(v, &norm);
+    num = FRandomBetween(0.f, BrVector3Length(v) / 2.f + 0.7f) * sparkiness;
+    if (num > 10) {
+        num = 10;
+    }
+    for (i = 0; i < num; i++) {
+        BrVector3Copy(&gSparks[gNext_spark].pos, pos);
+        BrVector3Copy(&gSparks[gNext_spark].normal, &normal);
+        BrVector3Copy(&gSparks[gNext_spark].v, v);
+        gSparks[gNext_spark].v.v[0] *= FRandomBetween(.5f, .9f);
+        gSparks[gNext_spark].v.v[1] *= FRandomBetween(.5f, .9f);
+        gSparks[gNext_spark].v.v[2] *= FRandomBetween(.5f, .9f);
+        gSparks[gNext_spark].count = 1000;
+        gSparks[gNext_spark].car = NULL;
+        gSpark_flags |= 1 << gNext_spark;
+        gSparks[gNext_spark].time_sync = gMechanics_time_sync;
+        gSparks[gNext_spark].colour = 0;
+        gNext_spark++;
+        if (gNext_spark >= COUNT_OF(gSparks)) {
+            gNext_spark = 0;
+        }
+    }
+    if ((ts * sparkiness) >= 10.f) {
+        tv.v[0] = pos->v[0] - pCar->car_master_actor->t.t.translate.t.v[0] / WORLD_SCALE;
+        tv.v[1] = pos->v[1] - pCar->car_master_actor->t.t.translate.t.v[1] / WORLD_SCALE;
+        tv.v[2] = pos->v[2] - pCar->car_master_actor->t.t.translate.t.v[2] / WORLD_SCALE;
+        BrMatrix34TApplyV(&pos2, &tv, &pCar->car_master_actor->t.t.mat);
+        BrMatrix34TApplyV(&norm, &normal, &pCar->car_master_actor->t.t.mat);
+        BrVector3Scale(&tv, &norm, .1f);
+        BrVector3Accumulate(&pos2, &tv);
+        num = (int)(ts * sparkiness / 10.f) + 3;
+        if (num > 10) {
+            num = 10;
+        }
+        for (i = 0; i < num; i++) {
+            BrVector3Copy(&gSparks[gNext_spark].pos, &pos2);
+            BrVector3Copy(&gSparks[gNext_spark].normal, &norm);
+            BrVector3SetFloat(&tv, FRandomBetween(-1.f, 1.f), FRandomBetween(-.2f, 1.f), FRandomBetween(-1.f, 1.f));
+            ts2 = BrVector3Dot(&norm, &tv);
+            BrVector3Scale(&tv2, &norm, ts2);
+            BrVector3Sub(&gSparks[gNext_spark].v, &tv, &tv2);
+            gSparks[gNext_spark].count = 1000;
+            gSparks[gNext_spark].car = pCar;
+            gSpark_flags |= 1 << gNext_spark;
+            gSparks[gNext_spark].time_sync = gMechanics_time_sync;
+            gSparks[gNext_spark].colour = 0;
+            gNext_spark++;
+            if (gNext_spark >= COUNT_OF(gSparks)) {
+                gNext_spark = 0;
+            }
+        }
+        CreateShrapnelShower(pos, v, &normal, ts, pCar, pCar);
+    }
 }
 
 // IDA: void __usercall CreateSparkShower(br_vector3 *pos@<EAX>, br_vector3 *v@<EDX>, br_vector3 *pForce@<EBX>, tCar_spec *pCar1@<ECX>, tCar_spec *pCar2)
@@ -170,7 +237,44 @@ void CreateSparkShower(br_vector3* pos, br_vector3* v, br_vector3* pForce, tCar_
     br_vector3 tv2;
     br_vector3 normal;
     LOG_TRACE("(%p, %p, %p, %p, %p)", pos, v, pForce, pCar1, pCar2);
-    NOT_IMPLEMENTED();
+
+    ts = BrVector3Length(pForce);
+    if (pCar1->driver == eDriver_local_human) {
+        c = pCar1;
+    } else {
+        c = pCar2;
+    }
+    BrVector3InvScale(&tv, pForce, ts);
+    if (ts < 10.f) {
+        return;
+    }
+    CreateShrapnelShower(pos, v, &tv, ts, pCar1, pCar2);
+    ts2 = BrVector3Dot(pForce, v) / (ts * ts);
+    BrVector3Scale(v, pForce, ts2);
+    normal.v[0] = pos->v[0] - c->car_master_actor->t.t.translate.t.v[0] / WORLD_SCALE;
+    normal.v[1] = pos->v[1] - c->car_master_actor->t.t.translate.t.v[1] / WORLD_SCALE;
+    normal.v[2] = pos->v[2] - c->car_master_actor->t.t.translate.t.v[2] / WORLD_SCALE;
+    BrMatrix34TApplyV(pos, &normal, &c->car_master_actor->t.t.mat);
+    BrMatrix34TApplyV(&normal, pForce, &c->car_master_actor->t.t.mat);
+    num = (int)(ts / 10.f) + 3;
+    for (i = 0; i < num; i++) {
+        BrVector3Copy(&gSparks[gNext_spark].pos, pos);
+        BrVector3SetFloat(&gSparks[gNext_spark].normal, 0.f, 0.f, 0.f);
+        BrVector3SetFloat(&normal, FRandomBetween(-1.f, 1.f), FRandomBetween(-.2f, 1.f), FRandomBetween(-1.f, 1.f));
+        ts2 = BrVector3LengthSquared(&normal) / (ts * ts);
+        BrVector3Scale(&tv, &normal, ts2);
+        BrVector3Sub(&gSparks[gNext_spark].v, &normal, &tv);
+        BrVector3Accumulate(&gSparks[gNext_spark].v, v);
+        gSparks[gNext_spark].count = 1000;
+        gSparks[gNext_spark].car = c;
+        gSpark_flags |= 1 << gNext_spark;
+        gSparks[gNext_spark].time_sync = gMechanics_time_sync;
+        gSparks[gNext_spark].colour = 0;
+        gNext_spark++;
+        if (gNext_spark >= COUNT_OF(gSparks)) {
+            gNext_spark = 0;
+        }
+    }
 }
 
 // IDA: void __usercall AdjustSpark(int pSpark_num@<EAX>, br_vector3 *pos@<EDX>, br_vector3 *length@<EBX>)
@@ -179,27 +283,66 @@ void AdjustSpark(int pSpark_num, br_vector3* pos, br_vector3* length) {
     br_matrix34* mat;
     int i;
     LOG_TRACE("(%d, %p, %p)", pSpark_num, pos, length);
-    NOT_IMPLEMENTED();
+
+    i = pSpark_num & 0xff;
+    gSpark_flags |= 1 << pSpark_num;
+    if (gSparks[i].car != NULL) {
+        mat = &gSparks[i].car->car_master_actor->t.t.mat;
+        tv.v[0] = pos->v[0] - mat->m[3][0];
+        tv.v[1] = pos->v[0] - mat->m[3][1];
+        tv.v[2] = pos->v[0] - mat->m[3][2];
+        BrMatrix34TApplyV(&gSparks[i].pos, &tv, mat);
+    } else {
+        gSparks[i].pos.v[0] = pos->v[0];
+        gSparks[i].pos.v[1] = pos->v[1];
+        gSparks[i].pos.v[2] = pos->v[2];
+    }
+    gSparks[i].length.v[0] = length->v[0];
+    gSparks[i].length.v[1] = length->v[1];
+    gSparks[i].length.v[2] = length->v[2];
+    gSparks[i].colour = pSpark_num >> 8;
 }
 
 // IDA: void __usercall AdjustShrapnel(int pShrapnel_num@<EAX>, br_vector3 *pos@<EDX>, tU16 pAge@<EBX>, br_material *pMaterial@<ECX>)
 void AdjustShrapnel(int pShrapnel_num, br_vector3* pos, tU16 pAge, br_material* pMaterial) {
     int i;
     LOG_TRACE("(%d, %p, %d, %p)", pShrapnel_num, pos, pAge, pMaterial);
-    NOT_IMPLEMENTED();
+
+    i = pShrapnel_num & 0x7fff;
+    if (!(gShrapnel_flags & (1 << i))) {
+        BrActorAdd(gNon_track_actor, gShrapnel[i].actor);
+    }
+    gShrapnel_flags |= 1 << i;
+    gShrapnel[i].actor->t.t.translate.t.v[0] = pos->v[0];
+    gShrapnel[i].actor->t.t.translate.t.v[1] = pos->v[1];
+    gShrapnel[i].actor->t.t.translate.t.v[2] = pos->v[2];
+    if (pShrapnel_num & 0x8000) {
+        gShrapnel[i].age = pAge;
+        gShrapnel[i].actor->material = pMaterial;
+    }
 }
 
 // IDA: void __cdecl ResetSparks()
 void ResetSparks() {
     LOG_TRACE("()");
-    STUB();
+
+    gSpark_flags = 0;
 }
 
 // IDA: void __cdecl ResetShrapnel()
 void ResetShrapnel() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gShrapnel_flags == 0) {
+        return;
+    }
+    for (i = 0; i < COUNT_OF(gShrapnel); i++) {
+        if (gShrapnel_flags & (1 << i)) {
+            BrActorRemove(gShrapnel[i].actor);
+        }
+    }
+    gShrapnel_flags = 0;
 }
 
 // IDA: void __usercall CreateShrapnelShower(br_vector3 *pos@<EAX>, br_vector3 *v@<EDX>, br_vector3 *pNormal@<EBX>, br_scalar pForce, tCar_spec *c1, tCar_spec *c2)
@@ -214,7 +357,44 @@ void CreateShrapnelShower(br_vector3* pos, br_vector3* v, br_vector3* pNormal, b
     br_vector3 tv2;
     br_vector3 vel;
     LOG_TRACE("(%p, %p, %p, %f, %p, %p)", pos, v, pNormal, pForce, c1, c2);
-    NOT_IMPLEMENTED();
+
+    if (pForce < 10.f) {
+        return;
+    }
+    ts = .3f;
+    if (v->v[1] < 0.f) {
+        ts = .3f - v->v[1];
+    }
+    ts *= pNormal->v[1];
+    tv.v[0] = v->v[0] - ts * pNormal->v[0];
+    tv.v[1] = v->v[1] + ts - pNormal->v[1] * ts;
+    tv.v[2] = v->v[2] - pNormal->v[2] * ts;
+    num = (int)(pForce / 10.f) * 3;
+    ts2 = ((pForce + 20.f) * 3.f) / 200.f;
+    for (i = 0; i < num; i++) {
+        if ((gShrapnel_flags & (1 << gNext_shrapnel)) == 0) {
+            BrActorAdd(gNon_track_actor, gShrapnel[gNext_shrapnel].actor);
+        }
+        gShrapnel_flags |= 1 << gNext_shrapnel;
+        BrVector3Copy(&gShrapnel[gNext_shrapnel].actor->t.t.translate.t, pos);
+        BrVector3SetFloat(&vel, FRandomBetween(-ts2, ts2), FRandomBetween(-tv.v[1] + 0.3f, ts2), FRandomBetween(-ts2, ts2));
+        ts2 = BrVector3Dot(pNormal, &vel);
+        BrVector3Scale(&tv2, pNormal, ts2);
+        BrVector3Sub(&gShrapnel[gNext_shrapnel].v, &vel, &tv2);
+        BrVector3Accumulate(&gShrapnel[gNext_shrapnel].v, &tv);
+        gShrapnel[gNext_shrapnel].time_sync = gMechanics_time_sync;
+        gShrapnel[gNext_shrapnel].age = 0;
+        if (IRandomBetween(0, 2) != 0) {
+            c = (IRandomBetween(0, 1) != 0) ? c1 : c2;
+            gShrapnel[gNext_shrapnel].actor->material = c->shrapnel_material[IRandomBetween(0, c->max_shrapnel_material - 1)];
+        } else {
+            gShrapnel[gNext_shrapnel].actor->material = gBlack_material;
+        }
+        gNext_shrapnel++;
+        if (gNext_shrapnel >= COUNT_OF(gShrapnel)) {
+            gNext_shrapnel = 0;
+        }
+    }
 }
 
 // IDA: void __cdecl InitShrapnel()
@@ -223,13 +403,31 @@ void InitShrapnel() {
     int j;
     LOG_TRACE("()");
 
-    STUB();
+    for (i = 0; i < COUNT_OF(gShrapnel); i++) {
+        gShrapnel[i].actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+        gShrapnel[i].actor->parent = NULL;
+        gShrapnel[i].actor->model = gShrapnel_model[1];
+        gShrapnel[i].actor->render_style = BR_RSTYLE_DEFAULT;
+        gShrapnel[i].actor->t.type = BR_TRANSFORM_MATRIX34;
+        gShrapnel[i].actor->material = BrMaterialFind("DEBRIS.MAT");
+        gShrapnel[i].age = 0;
+        gShrapnel[i].shear1 = FRandomBetween(-2.f, 2.f);
+        gShrapnel[i].shear2 = FRandomBetween(-2.f, 2.f);
+        BrVector3SetFloat(&gShrapnel[i].axis,
+            FRandomBetween(-1.f, 1.f), FRandomBetween(-1.f, 1.f), FRandomBetween(-1.f, 1.f));
+        BrVector3Normalise(&gShrapnel[i].axis, &gShrapnel[i].axis);
+    }
 }
 
 // IDA: void __cdecl LoadInShrapnel()
 void LoadInShrapnel() {
     LOG_TRACE("()");
-    STUB();
+
+    gShrapnel_model[0] = LoadModel("FRAG4.DAT");
+    gShrapnel_model[1] = LoadModel("FRAG5.DAT");
+    BrModelAdd(gShrapnel_model[0]);
+    BrModelAdd(gShrapnel_model[1]);
+    gBlack_material = BrMaterialFind("M14.MAT");
 }
 
 // IDA: void __usercall KillShrapnel(int i@<EAX>)
@@ -242,7 +440,18 @@ void KillShrapnel(int i) {
 void DisposeShrapnel() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < COUNT_OF(gShrapnel); i++) {
+        if (gShrapnel_flags & (1 << i)) {
+            BrActorRemove(gShrapnel[i].actor);
+        }
+        BrActorFree(gShrapnel[i].actor);
+    }
+    gShrapnel_flags = 0;
+    for (i = 0; i < COUNT_OF(gShrapnel_model); i++) {
+        BrModelRemove(gShrapnel_model[i]);
+        BrModelFree(gShrapnel_model[0]);
+    }
 }
 
 // IDA: void __usercall ReplayShrapnel(tU32 pTime@<EAX>)
@@ -448,23 +657,40 @@ void CreateSmokeColumn(tCar_spec* pCar, int pColour, int pVertex_index, tU32 pLi
 
 // IDA: void __cdecl GenerateSmokeShades()
 void GenerateSmokeShades() {
-    static int rb;
-    static int gb;
-    static int bb;
-    static int rd;
-    static int gd;
-    static int bd;
-    static int rg;
-    static int gg;
-    static int bg;
+    static int rb = 0x00;
+    static int gb = 0x00;
+    static int bb = 0x00;
+    static int rd = 0x40;
+    static int gd = 0x40;
+    static int bd = 0x40;
+    static int rg = 0x80;
+    static int gg = 0x80;
+    static int bg = 0x80;
     LOG_TRACE("()");
+
     STUB();
+    return;
+    
+    // FIXME: use this once the car can be shaded correctly
+    gBlack_smoke_shade_table = GenerateShadeTable(16, gRender_palette, rb, gb, bb, .25f, .6f, .9f);
+    gDark_smoke_shade_table =  GenerateShadeTable(16, gRender_palette, rd, gd, bd, .25f, .6f, .9f);
+    gGrey_smoke_shade_table =  GenerateShadeTable(16, gRender_palette, rg, gg, bg, .25f, .6f, .9f);
+    gIt_shade_table = GenerateDarkenedShadeTable(16, gRender_palette, 0, 255, 254, .25f, .5f, .75f, .6f);
+
+    gShade_list[0] = gBlack_smoke_shade_table;
+    gShade_list[1] = gDark_smoke_shade_table;
+    gShade_list[2] = gGrey_smoke_shade_table;
+    gShade_list[3] = gFog_shade_table;
+    gShade_list[4] = gFog_shade_table;
+    gShade_list[7] = gAcid_shade_table;
 }
 
 // IDA: void __cdecl GenerateItFoxShadeTable()
 void GenerateItFoxShadeTable() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    if (gIt_shade_table == NULL) {
+        gIt_shade_table = GenerateDarkenedShadeTable(16, gRender_palette, 0, 255, 254, .25f, .5f, .75f, .6f);
+    }
 }
 
 // IDA: void __usercall AdjustFlame(int pIndex@<EAX>, int pFrame_count@<EDX>, br_scalar pScale_x, br_scalar pScale_y, br_scalar pOffset_x, br_scalar pOffset_z)
@@ -537,7 +763,26 @@ void DisposeFlame() {
     br_actor* actor;
     br_material* material;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < COUNT_OF(gFlame_map); i++) {
+        BrMapRemove(gFlame_map[i]);
+        BrPixelmapFree(gFlame_map[i]);
+    }
+
+    for (i = 0; i < 5; i++) {
+        if ((gSplash_flags & (1 << i)) && (gSmoke_column[i].colour == 0)) {
+            BrActorRemove(gSmoke_column[i].flame_actor);
+        }
+        actor = gSmoke_column[i].flame_actor->children;
+        for (j = 0; j < COUNT_OF(gSmoke_column[0].frame_count); j++) {
+            BrMaterialRemove(actor->material);
+            BrMaterialFree(actor->material);
+            actor = actor->next;
+        }
+        BrActorFree(gSmoke_column[i].flame_actor);
+    }
+    BrModelRemove(gLollipop_model);
+    BrModelFree(gLollipop_model);
 }
 
 // IDA: void __cdecl InitFlame()
@@ -550,7 +795,54 @@ void InitFlame() {
     br_material* material;
     LOG_TRACE("()");
 
-    STUB();
+    gSplash_flags = 0;
+    gLollipop_model = BrModelAllocate("Lollipop", 4, 2);
+    PathCat(the_path, gApplication_path, "PIXELMAP");
+    PathCat(the_path, the_path, "FLAMES.PIX");
+    num = DRPixelmapLoadMany(the_path, gFlame_map, COUNT_OF(gFlame_map));
+    if (num != COUNT_OF(gFlame_map)) {
+        FatalError(79, the_path);
+    }
+    BrMapAddMany(gFlame_map, COUNT_OF(gFlame_map));
+    for (i = 0; i < 5; i++) {
+        gSmoke_column[i].flame_actor = BrActorAllocate(BR_ACTOR_NONE, NULL);
+        for (j = 0; j < COUNT_OF(gSmoke_column[0].frame_count); j++) {
+            actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+            material = BrMaterialAllocate(NULL);
+            BrActorAdd(gSmoke_column[i].flame_actor, actor);
+            actor->model = gLollipop_model;
+            actor->material = material;
+            material->flags &= ~BR_MATF_LIGHT;
+            material->flags |= BR_MATF_ALWAYS_VISIBLE;
+            material->colour_map = gFlame_map[0];
+            BrMaterialAdd(material);
+            gSmoke_column[i].frame_count[j] = 100;
+        }
+    }
+    gLollipop_model->nvertices = 4;
+    BrVector3SetFloat(&gLollipop_model->vertices[0].p, -.5f, 0.f, .0f);
+    BrVector3SetFloat(&gLollipop_model->vertices[1].p,  .5f, 0.f, .0f);
+    BrVector3SetFloat(&gLollipop_model->vertices[2].p,  .5f, 1.f, .0f);
+    BrVector3SetFloat(&gLollipop_model->vertices[3].p, -.5f, 1.f, .0f);
+    gLollipop_model->vertices[0].map.v[0] = 0.f;
+    gLollipop_model->vertices[0].map.v[1] = 1.f;
+    gLollipop_model->vertices[1].map.v[0] = 1.f;
+    gLollipop_model->vertices[1].map.v[1] = 1.f;
+    gLollipop_model->vertices[2].map.v[0] = 1.f;
+    gLollipop_model->vertices[2].map.v[1] = 0.f;
+    gLollipop_model->vertices[3].map.v[0] = 0.f;
+    gLollipop_model->vertices[3].map.v[1] = 0.f;
+
+    gLollipop_model->nfaces = 2;
+    gLollipop_model->faces[0].vertices[0] = 0;
+    gLollipop_model->faces[0].vertices[1] = 1;
+    gLollipop_model->faces[0].vertices[2] = 2;
+    gLollipop_model->faces[1].vertices[0] = 0;
+    gLollipop_model->faces[1].vertices[1] = 2;
+    gLollipop_model->faces[1].vertices[2] = 3;
+    gLollipop_model->faces[0].smoothing = 1;
+    gLollipop_model->faces[1].smoothing = 1;
+    BrModelAdd(gLollipop_model);
 }
 
 // IDA: void __usercall InitSplash(FILE *pF@<EAX>)
@@ -566,7 +858,7 @@ void InitSplash(FILE* pF) {
 
     gSplash_flags = 0;
     gSplash_model = BrModelAllocate("Splash", 4, 2);
-    if (pF) {
+    if (pF != NULL) {
         num = GetAnInt(pF);
         gNum_splash_types = 0;
         for (i = 0; num > i; ++i) {
@@ -574,7 +866,7 @@ void InitSplash(FILE* pF) {
             PathCat(the_path, gApplication_path, "PIXELMAP");
             PathCat(the_path, the_path, s);
             num_files = DRPixelmapLoadMany(the_path, &splash_maps[gNum_splash_types], 20 - gNum_splash_types);
-            if (!num_files) {
+            if (num_files == 0) {
                 FatalError(79, the_path);
             }
             gNum_splash_types += num_files;
@@ -587,45 +879,45 @@ void InitSplash(FILE* pF) {
     BrMapAddMany(splash_maps, gNum_splash_types);
     for (i = 0; i < gNum_splash_types; ++i) {
         gSplash_material[i] = BrMaterialAllocate(0);
-        gSplash_material[i]->flags &= 0xFFFFFFFC;
-        gSplash_material[i]->flags |= 0x820u;
+        gSplash_material[i]->flags &= ~ (BR_MATF_LIGHT | BR_MATF_PRELIT);
+        gSplash_material[i]->flags |= BR_MATF_ALWAYS_VISIBLE | BR_MATF_PERSPECTIVE;
         gSplash_material[i]->index_blend = LoadSingleShadeTable(&gTrack_storage_space, "BLEND50.TAB");
         gSplash_material[i]->colour_map = splash_maps[i];
         BrMaterialAdd(gSplash_material[i]);
     }
     gSplash_model->nvertices = 4;
-    BrVector3SetFloat(&gSplash_model->vertices->p, -0.5, 0.0, 0.0);
-    BrVector3SetFloat(&gSplash_model->vertices[1].p, 0.5, 0.0, 0.0);
-    BrVector3SetFloat(&gSplash_model->vertices[2].p, 0.5, 1.0, 0.0);
-    BrVector3SetFloat(&gSplash_model->vertices[3].p, -0.5, 1.0, 0.0);
-    gSplash_model->vertices->map.v[0] = 0.0;
-    gSplash_model->vertices->map.v[1] = 1.0;
-    gSplash_model->vertices[1].map.v[0] = 1.0;
-    gSplash_model->vertices[1].map.v[1] = 1.0;
-    gSplash_model->vertices[2].map.v[0] = 1.0;
-    gSplash_model->vertices[2].map.v[1] = 0.0;
-    gSplash_model->vertices[3].map.v[0] = 0.0;
-    gSplash_model->vertices[3].map.v[1] = 0.0;
+    BrVector3SetFloat(&gSplash_model->vertices[0].p, -0.5f, 0.0f, 0.0f);
+    BrVector3SetFloat(&gSplash_model->vertices[1].p,  0.5f, 0.0f, 0.0f);
+    BrVector3SetFloat(&gSplash_model->vertices[2].p,  0.5f, 1.0f, 0.0f);
+    BrVector3SetFloat(&gSplash_model->vertices[3].p, -0.5f, 1.0f, 0.0f);
+    gSplash_model->vertices[0].map.v[0] = 0.0f;
+    gSplash_model->vertices[0].map.v[1] = 1.0f;
+    gSplash_model->vertices[1].map.v[0] = 1.0f;
+    gSplash_model->vertices[1].map.v[1] = 1.0f;
+    gSplash_model->vertices[2].map.v[0] = 1.0f;
+    gSplash_model->vertices[2].map.v[1] = 0.0f;
+    gSplash_model->vertices[3].map.v[0] = 0.0f;
+    gSplash_model->vertices[3].map.v[1] = 0.0f;
     gSplash_model->nfaces = 2;
-    gSplash_model->faces->vertices[0] = 0;
-    gSplash_model->faces->vertices[1] = 1;
-    gSplash_model->faces->vertices[2] = 2;
+    gSplash_model->faces[0].vertices[0] = 0;
+    gSplash_model->faces[0].vertices[1] = 1;
+    gSplash_model->faces[0].vertices[2] = 2;
     gSplash_model->faces[1].vertices[0] = 0;
     gSplash_model->faces[1].vertices[1] = 2;
     gSplash_model->faces[1].vertices[2] = 3;
-    gSplash_model->faces->smoothing = 1;
+    gSplash_model->faces[0].smoothing = 1;
     gSplash_model->faces[1].smoothing = 1;
     BrModelAdd(gSplash_model);
-    for (i = 0; i < 32; ++i) {
-        gSplash[i].actor = BrActorAllocate(BR_ACTOR_MODEL, 0);
+    for (i = 0; i < COUNT_OF(gSplash); ++i) {
+        gSplash[i].actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
         actor = gSplash[i].actor;
         actor->model = gSplash_model;
-        if (gNum_splash_types) {
+        if (gNum_splash_types != 0) {
             actor->material = gSplash_material[IRandomBetween(0, gNum_splash_types - 1)];
         } else {
-            actor->material = 0;
+            actor->material = NULL;
         }
-        gSplash[i].scale_x = SRandomBetween(0.89999998, 1.1) * (float)(2 * IRandomBetween(0, 1) - 1);
+        gSplash[i].scale_x = SRandomBetween(0.9f, 1.1f) * (2 * IRandomBetween(0, 1) - 1);
     }
 }
 
@@ -633,7 +925,21 @@ void InitSplash(FILE* pF) {
 void DisposeSplash() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < gNum_splash_types; i++) {
+        BrMapRemove(gSplash_material[i]->colour_map);
+        BrPixelmapFree(gSplash_material[i]->colour_map);
+        BrMaterialRemove(gSplash_material[i]);
+        BrMaterialFree(gSplash_material[i]);
+    }
+    for (i = 0; i < COUNT_OF(gSplash); i++) {
+        if (gSplash_flags & (1 << i)) {
+            BrActorRemove(gSplash[i].actor);
+        }
+        BrActorFree(gSplash[i].actor);
+    }
+    BrModelRemove(gSplash_model);
+    BrModelFree(gSplash_model);
 }
 
 // IDA: void __usercall DrawTheGlow(br_pixelmap *pRender_screen@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>)
@@ -720,14 +1026,24 @@ int GetSmokeOn() {
 void StopCarSmoking(tCar_spec* pCar) {
     int i;
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < 5; i++) {
+        if (gSmoke_column[i].car == pCar && gSmoke_column[i].lifetime > 2000) {
+            gSmoke_column[i].lifetime = 2000;
+        }
+    }
 }
 
 // IDA: void __usercall StopCarSmokingInstantly(tCar_spec *pCar@<EAX>)
 void StopCarSmokingInstantly(tCar_spec* pCar) {
     int i;
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < 5; i++) {
+        if (gSmoke_column[i].car == pCar) {
+            gSmoke_column[i].lifetime = 0;
+        }
+    }
 }
 
 // IDA: void __usercall ConditionalSmokeColumn(tCar_spec *pCar@<EAX>, int pDamage_index@<EDX>, int pColour@<EBX>)
@@ -795,7 +1111,14 @@ void MungeSplash(tU32 pTime) {
 void RenderSplashes() {
     int i;
     LOG_TRACE("()");
-    STUB_ONCE();
+
+    for (i = 0; i < COUNT_OF(gSplash); i++) {
+        if (gSplash_flags & (1 << i)) {
+            BrActorRelink(gNon_track_actor, gSplash[i].actor);
+            BrZbSceneRenderAdd(gSplash[i].actor);
+            BrActorRelink(gDont_render_actor, gSplash[i].actor);
+        }
+    }
 }
 
 // IDA: void __usercall GetSmokeShadeTables(FILE *f@<EAX>)
@@ -825,7 +1148,12 @@ void GetSmokeShadeTables(FILE* f) {
 void FreeSmokeShadeTables() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < gNum_dust_tables; i++) {
+        PossibleService();
+        BrTableRemove(gDust_table[i]);
+        BrPixelmapFree(gDust_table[i]);
+    }
 }
 
 // IDA: void __usercall LoadInKevStuff(FILE *pF@<EAX>)
@@ -845,14 +1173,36 @@ void LoadInKevStuff(FILE* pF) {
 // IDA: void __cdecl DisposeKevStuff()
 void DisposeKevStuff() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DisposeShrapnel();
+    DisposeFlame();
+    DisposeSplash();
 }
 
 // IDA: void __usercall DisposeKevStuffCar(tCar_spec *pCar@<EAX>)
 void DisposeKevStuffCar(tCar_spec* pCar) {
     int i;
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < 5; i++) {
+        if (gSmoke_column[i].car == pCar) {
+            gSmoke_column[i].lifetime = 0;
+            gSmoke_column[i].car = NULL;
+        }
+    }
+    for (i = 0; i < COUNT_OF(gSparks); i++) {
+        if ((gSpark_flags & (1 << i)) && gSparks[i].car == pCar) {
+            gSparks[i].count = 0;
+            gSpark_flags &= ~(1 << i);
+        }
+        if (gCar_to_view == pCar) {
+            gCamera_yaw = 0;
+            gCar_to_view = &gProgram_state.current_car;
+            InitialiseExternalCamera();
+            PositionExternalCamera(gCar_to_view, 200);
+            gCar_to_view = &gProgram_state.current_car;
+        }
+    }
 }
 
 // IDA: void __cdecl DoTrueColModelThing(br_actor *actor, br_model *pModel, br_material *material, void *render_data, br_uint_8 style, int on_screen)
@@ -881,7 +1231,19 @@ void SetModelShade(br_actor* pActor, br_pixelmap* pShade) {
     br_material* material;
     br_model* model;
     LOG_TRACE("(%p, %p)", pActor, pShade);
-    NOT_IMPLEMENTED();
+
+    model = pActor->model;
+    if (pActor->material != NULL && pActor->material->index_shade != pShade) {
+        pActor->material->index_shade = pShade;
+        BrMaterialUpdate(pActor->material, BR_MATU_ALL);
+    }
+    for (i = 0; i < model->nfaces; i++) {
+        material = model->faces[i].material;
+        if (material != NULL && material->index_shade != pShade) {
+            material->index_shade = pShade;
+            BrMaterialUpdate(material, BR_MATU_ALL);
+        }
+    }
 }
 
 // IDA: void __usercall MakeCarIt(tCar_spec *pCar@<EAX>)
@@ -889,10 +1251,34 @@ void MakeCarIt(tCar_spec* pCar) {
     br_actor* actor;
     br_actor* bonny;
     br_pixelmap* shade[6];
-    static int shade_num;
+    static int shade_num = 0;
     int i;
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    STUB();
+    return;
+
+    shade[0] = gIt_shade_table;
+    shade[1] = gFog_shade_table;
+    shade[2] = gShade_list[0];
+    shade[3] = gShade_list[1];
+    shade[4] = gShade_list[2];
+    shade[5] = NULL;
+
+    actor = pCar->car_model_actors[pCar->principal_car_actor].actor;
+    bonny = pCar->car_model_actors[pCar->car_actor_count - 1].actor;
+    if (((actor->model->flags & BR_MODF_CUSTOM) == 0) || actor->model->custom != DoTrueColModelThing) {
+        SetModelShade(actor, shade[shade_num]);
+        actor->model->user = DoTrueColModelThing;
+        actor->model->custom = DoTrueColModelThing;
+        actor->model->flags |= BR_MODF_CUSTOM;
+        if (bonny != actor) {
+            bonny->model->user = DoTrueColModelThing;
+            bonny->model->custom = DoTrueColModelThing;
+            bonny->model->flags |= BR_MODF_CUSTOM;
+            SetModelShade(bonny, shade[shade_num]);
+        }
+    }
 }
 
 // IDA: void __usercall StopCarBeingIt(tCar_spec *pCar@<EAX>)

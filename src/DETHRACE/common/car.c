@@ -50,8 +50,12 @@ int gFace_num__car = 1; // suffix added to avoid duplicate symbol
 br_angle gOld_yaw__car; // suffix added to avoid duplicate symbol
 br_angle gOld_zoom;
 br_vector3 gCamera_pos_before_collide;
-int gMetal_crunch_sound_id__car[5]; // suffix added to avoid duplicate symbol
-int gMetal_scrape_sound_id__car[3]; // suffix added to avoid duplicate symbol
+int gMetal_crunch_sound_id__car[5] = { // suffix added to avoid duplicate symbol
+    5000, 5001, 5002, 5003, 5004,
+};
+int gMetal_scrape_sound_id__car[3] = { // suffix added to avoid duplicate symbol
+    5010, 5011, 5012,
+};
 int gCar_car_collisions;
 int gFreeze_mechanics;
 tU32 gLast_cunning_stunt;
@@ -107,13 +111,22 @@ int gNum_cars_and_non_cars;
 void DamageUnit(tCar_spec* pCar, int pUnit_type, int pDamage_amount) {
     tDamage_unit* the_damage;
     LOG_TRACE("(%p, %d, %d)", pCar, pUnit_type, pDamage_amount);
-    NOT_IMPLEMENTED();
+
+    if (pDamage_amount > 0) {
+        the_damage = &pCar->damage_units[pUnit_type];
+        the_damage->damage_level += pDamage_amount;
+        if (the_damage->damage_level >= 100) {
+        the_damage->damage_level = 99;
+        }
+    }
 }
 
 // IDA: void __usercall DamageUnitWithSmoke(tCar_spec *pCar@<EAX>, int pUnit_type@<EDX>, int pDamage_amount@<EBX>)
 void DamageUnitWithSmoke(tCar_spec* pCar, int pUnit_type, int pDamage_amount) {
     LOG_TRACE("(%p, %d, %d)", pCar, pUnit_type, pDamage_amount);
-    NOT_IMPLEMENTED();
+
+    DamageUnit(pCar, pUnit_type, pDamage_amount);
+    SortOutSmoke(pCar);
 }
 
 // IDA: void __usercall DamageEngine(int pDamage_amount@<EAX>)
@@ -252,29 +265,29 @@ void InitialiseCar2(tCar_spec* pCar, int pClear_disabled_flag) {
         pCar->car_model_actors[pCar->current_car_actor].actor->render_style = BR_RSTYLE_NONE;
     }
     SwitchCarActor(pCar, pCar->current_car_actor);
-    if (!strcmp(pCar->name, "STELLA.TXT")) {
-        pCar->proxy_ray_distance = 6.0;
+    if (strcmp(pCar->name, "STELLA.TXT") == 0) {
+        pCar->proxy_ray_distance = 6.0f;
     } else {
-        pCar->proxy_ray_distance = 0.0;
+        pCar->proxy_ray_distance = 0.0f;
     }
-    pCar->last_special_volume = 0;
-    pCar->auto_special_volume = 0;
+    pCar->last_special_volume = NULL;
+    pCar->auto_special_volume = NULL;
     pCar->num_smoke_columns = 0;
-    pCar->who_last_hit_me = 0;
-    pCar->screen_material_source = 0;
+    pCar->who_last_hit_me = NULL;
+    pCar->screen_material_source = NULL;
     if (pCar->screen_material) {
-        pCar->screen_material->colour_map = 0;
+        pCar->screen_material->colour_map = NULL;
         pCar->screen_material->index_shade = gRender_shade_table;
-        BrMaterialUpdate(pCar->screen_material, 0x7FFFu);
+        BrMaterialUpdate(pCar->screen_material, BR_MATU_ALL);
     }
     if (pCar->driver == eDriver_local_human) {
         ResetRecoveryVouchers();
     }
-    BrVector3SetFloat(&pCar->v, 0.0, 0.0, 0.0);
-    BrVector3SetFloat(&pCar->omega, 0.0, 0.0, 0.0);
-    pCar->curvature = 0.0;
+    BrVector3SetFloat(&pCar->v, 0.0f, 0.0f, 0.0f);
+    BrVector3SetFloat(&pCar->omega, 0.0f, 0.0f, 0.0f);
+    pCar->curvature = 0.0f;
     BrMatrix34Copy(&safe_position, &car_actor->t.t.mat);
-    if (safe_position.m[3][0] > 500.0) {
+    if (safe_position.m[3][0] > 500.0f) {
         safe_position.m[3][0] -= 1000.0f;
         safe_position.m[3][1] -= 1000.0f;
         safe_position.m[3][2] -= 1000.0f;
@@ -2780,7 +2793,20 @@ void ScrapeNoise(br_scalar vel, br_vector3* position, int material) {
     br_vector3 velocity;
     br_vector3 position_in_br;
     LOG_TRACE("(%f, %p, %d)", vel, position, material);
-    STUB();
+
+    vol = vel * 7.f;
+    if (gCurrent_race.material_modifiers[material].scrape_noise_index != -1) {
+        if (scrape_tag == 0 || (!DRS3SoundStillPlaying(scrape_tag) && vol > 30)) {
+            BrVector3Set(&velocity, 0.f, 0.f, 0.f);
+            scrape_tag = DRS3StartSound3D(gIndexed_outlets[1],
+                gMetal_scrape_sound_id__car[IRandomBetween(0, COUNT_OF(gMetal_scrape_sound_id__car) - 1)],
+                position, &velocity, 1, vol, IRandomBetween(49152, 81920), 0x10000);
+            last_scrape_vol = vol;
+        } else if (last_scrape_vol < vol) {
+            DRS3ChangeVolume(scrape_tag, vol);
+            last_scrape_vol = vol;
+        }
+    }
 }
 
 // IDA: void __usercall SkidNoise(tCar_spec *pC@<EAX>, int pWheel_num@<EDX>, br_scalar pV, int material)
@@ -2811,7 +2837,20 @@ void CrashNoise(br_vector3* pForce, br_vector3* position, int material) {
     tS3_volume vol;
     br_vector3 velocity;
     LOG_TRACE("(%p, %p, %d)", pForce, position, material);
-    STUB();
+
+    vol = 60.f * BrVector3Length(pForce);
+    if (gCurrent_race.material_modifiers[material].crash_noise_index != -1) {
+        if (vol >= 256) {
+            vol = 255;
+        }
+        if (crunch_tag == 0 || (!DRS3SoundStillPlaying(crunch_tag) && vol > 30)) {
+            last_crunch_vol = vol; (void)last_crunch_vol;
+            BrVector3Set(&velocity, 0.f, 0.f, 0.f);
+            crunch_tag = DRS3StartSound3D(gIndexed_outlets[1],
+                gMetal_crunch_sound_id__car[IRandomBetween(0, COUNT_OF(gMetal_crunch_sound_id__car) - 1)],
+                position, &velocity, 1, vol, IRandomBetween(49152, 81920), 0x10000);
+        }
+    }
 }
 
 // IDA: void __usercall CrushAndDamageCar(tCar_spec *c@<EAX>, br_vector3 *pPosition@<EDX>, br_vector3 *pForce_car_space@<EBX>, tCar_spec *car2@<ECX>)

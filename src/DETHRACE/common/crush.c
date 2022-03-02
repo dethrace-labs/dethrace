@@ -1,5 +1,6 @@
 #include "crush.h"
 #include "brender/brender.h"
+#include "car.h"
 #include "globvars.h"
 #include "harness/trace.h"
 #include "loading.h"
@@ -32,8 +33,7 @@ int ReadCrushData(FILE* pF, tCrush_data* pCrush_data) {
     pCrush_data->number_of_crush_points = GetAnInt(pF);
     pCrush_data->crush_points = (tCrush_point_spec*)BrMemAllocate(sizeof(tCrush_point_spec) * pCrush_data->number_of_crush_points, kMem_crush_data);
 
-    the_spec = pCrush_data->crush_points;
-    for (i = 0; i < pCrush_data->number_of_crush_points; i++) {
+    for (i = 0, the_spec = pCrush_data->crush_points; i < pCrush_data->number_of_crush_points; i++, the_spec++) {
         the_spec->vertex_index = GetAnInt(pF);
         GetThreeFloats(pF, &the_spec->limits_neg.v[0], &the_spec->limits_neg.v[1], &the_spec->limits_neg.v[2]);
         GetThreeFloats(pF, &the_spec->limits_pos.v[0], &the_spec->limits_pos.v[1], &the_spec->limits_pos.v[2]);
@@ -42,13 +42,10 @@ int ReadCrushData(FILE* pF, tCrush_data* pCrush_data) {
         the_spec->number_of_neighbours = GetAnInt(pF);
         the_spec->neighbours = BrMemAllocate(sizeof(tCrush_neighbour) * the_spec->number_of_neighbours, kMem_crush_neighbours);
 
-        the_neighbour = the_spec->neighbours;
-        for (j = 0; j < the_spec->number_of_neighbours; j++) {
+        for (j = 0, the_neighbour = the_spec->neighbours; j < the_spec->number_of_neighbours; j++, the_neighbour++) {
             the_neighbour->vertex_index = GetAnInt(pF);
             the_neighbour->factor = GetAnInt(pF);
-            the_neighbour++;
         }
-        the_spec++;
     }
     return 0;
 }
@@ -88,14 +85,42 @@ int WriteCrushData(FILE* pF, tCrush_data* pCrush_data) {
     tCrush_point_spec* the_spec;
     tCrush_neighbour* the_neighbour;
     LOG_TRACE("(%p, %p)", pF, pCrush_data);
-    NOT_IMPLEMENTED();
+
+    fprintf(pF, "%f\n\r", pCrush_data->softness_factor);
+    fprintf(pF, "%f,%f\n\r", pCrush_data->min_fold_factor, pCrush_data->max_fold_factor);
+    fprintf(pF, "%f\n\r", pCrush_data->wibble_factor);
+    fprintf(pF, "%f\n\r", pCrush_data->limit_deviant);
+    fprintf(pF, "%f\n\r", pCrush_data->split_chance);
+    fprintf(pF, "%f\n\r", pCrush_data->min_y_fold_down);
+    fprintf(pF, "%d\n\r", pCrush_data->number_of_crush_points);
+    for (i = 0, the_spec = pCrush_data->crush_points; i < pCrush_data->number_of_crush_points; i++, the_spec++) {
+        fprintf(pF, "%d\n\r", the_spec->vertex_index);
+        fprintf(pF, "%f, %f, %f\n\r", the_spec->limits_neg.v[0], the_spec->limits_neg.v[1], the_spec->limits_neg.v[2]);
+        fprintf(pF, "%f, %f, %f\n\r", the_spec->limits_pos.v[0], the_spec->limits_pos.v[1], the_spec->limits_pos.v[2]);
+        fprintf(pF, "%f, %f, %f\n\r", the_spec->softness_neg.v[0], the_spec->softness_neg.v[1], the_spec->softness_neg.v[2]);
+        fprintf(pF, "%f, %f, %f\n\r", the_spec->softness_pos.v[0], the_spec->softness_pos.v[1], the_spec->softness_pos.v[2]);
+        fprintf(pF, "%d\n\r", the_spec->number_of_neighbours);
+        for (j = 0, the_neighbour = the_spec->neighbours; j < the_spec->number_of_neighbours; j++, the_neighbour++) {
+            fprintf(pF, "%d\n\r", the_neighbour->vertex_index);
+            fprintf(pF, "%d\n\r", the_neighbour->factor);
+        }
+    }
+    return 0;
 }
 
 // IDA: void __usercall DisposeCrushData(tCrush_data *pCrush_data@<EAX>)
 void DisposeCrushData(tCrush_data* pCrush_data) {
     int i;
     LOG_TRACE("(%p)", pCrush_data);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < pCrush_data->number_of_crush_points; i++) {
+        if (pCrush_data->crush_points[i].neighbours != NULL) {
+            BrMemFree(pCrush_data->crush_points[i].neighbours);
+        }
+    }
+    if (pCrush_data->crush_points != NULL) {
+        BrMemFree(pCrush_data->crush_points);
+    }
 }
 
 // IDA: void __usercall CrushModelPoint(tCar_spec *pCar@<EAX>, int pModel_index@<EDX>, br_model *pModel@<EBX>, int pCrush_point_index@<ECX>, br_vector3 *pEnergy_vector, br_scalar total_energy, tCrush_data *pCrush_data)
@@ -148,13 +173,25 @@ void CrushModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, br_vector3*
 // IDA: void __cdecl JitModelUpdate(br_actor *actor, br_model *model, br_material *material, void *render_data, br_uint_8 style, int on_screen)
 void JitModelUpdate(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen) {
     LOG_TRACE("(%p, %p, %p, %p, %d, %d)", actor, model, material, render_data, style, on_screen);
-    NOT_IMPLEMENTED();
+
+    BrModelUpdate(model, BR_MODU_NORMALS);
+    model->flags &= ~(BR_MODF_QUICK_UPDATE | BR_MODF_CUSTOM);
+    BrZbModelRender(actor, model, material, style, BrOnScreenCheck(&model->bounds), 0);
 }
 
 // IDA: void __usercall SetModelForUpdate(br_model *pModel@<EAX>, tCar_spec *pCar@<EDX>, int crush_only@<EBX>)
 void SetModelForUpdate(br_model* pModel, tCar_spec* pCar, int crush_only) {
     LOG_TRACE("(%p, %p, %d)", pModel, pCar, crush_only);
-    NOT_IMPLEMENTED();
+
+    if (crush_only && pCar != NULL && pCar->car_model_actors[pCar->principal_car_actor].actor->model == pModel) {
+        CrushBoundingBox(pCar, crush_only);
+    }
+    if ((pModel->flags & BR_MODF_CUSTOM) != 0) {
+        pModel->user = JitModelUpdate;
+    } else {
+        pModel->custom = JitModelUpdate;
+        pModel->flags |= BR_MODF_CUSTOM;
+    }
 }
 
 // IDA: void __usercall TotallySpamTheModel(tCar_spec *pCar@<EAX>, int pModel_index@<EDX>, br_actor *pActor@<EBX>, tCrush_data *pCrush_data@<ECX>, br_scalar pMagnitude)
@@ -332,7 +369,7 @@ void SetSmokeLastDamageLevel(tCar_spec* pCar) {
     int i;
     LOG_TRACE("(%p)", pCar);
 
-    for (i = 0; i < BR_ASIZE(pCar->damage_units); i++) {
+    for (i = 0; i < COUNT_OF(pCar->damage_units); i++) {
         pCar->damage_units[i].smoke_last_level = pCar->damage_units[i].damage_level;
     }
 }

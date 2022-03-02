@@ -43,6 +43,7 @@ br_pixelmap* BrMapAdd(br_pixelmap* pixelmap);
 br_pixelmap* BrMapRemove(br_pixelmap* pixelmap);
 br_pixelmap* BrMapFind(char* pattern);
 br_uint_32 BrMapAddMany(br_pixelmap** items, int n);
+br_map_find_cbfn* BrMapFindHook(br_map_find_cbfn* hook) ;
 
 // BrMaterial
 br_material* BrMaterialAllocate(char* name);
@@ -55,6 +56,7 @@ br_material* BrMaterialFind(char* pattern);
 void BrMaterialFree(br_material* m);
 br_uint_32 BrMaterialAddMany(br_material** items, int n);
 br_uint_32 BrMaterialEnum(char* pattern, br_material_enum_cbfn* callback, void* arg);
+br_material_find_cbfn* BrMaterialFindHook(br_material_find_cbfn* hook);
 
 // BrMatrix34
 void BrMatrix23Identity(br_matrix23* mat);
@@ -103,6 +105,7 @@ br_model* BrModelLoad(char* filename);
 void BrModelFree(br_model* model);
 void BrModelUpdate(br_model* model, br_uint_16 flags);
 br_uint_32 BrModelLoadMany(char* filename, br_model** models, br_uint_16 num);
+br_model_find_cbfn* BrModelFindHook(br_model_find_cbfn* hook);
 
 // BrPixelmap
 br_pixelmap* BrPixelmapLoad(char* filename);
@@ -114,8 +117,10 @@ br_pixelmap* BrPixelmapMatch(br_pixelmap* src, br_uint_8 match_type);
 br_pixelmap* BrPixelmapAllocateSub(br_pixelmap* src, br_int_32 x, br_int_32 y, br_int_32 w, br_int_32 h);
 void BrPixelmapFill(br_pixelmap* dst, br_uint_32 colour);
 void BrPixelmapRectangleCopy(br_pixelmap* dst, br_int_32 dx, br_int_32 dy, br_pixelmap* src, br_int_32 sx, br_int_32 sy, br_int_32 w, br_int_32 h);
+void BrPixelmapCopy(br_pixelmap* dst, br_pixelmap* src);
 void BrPixelmapLine(br_pixelmap* dst, br_int_32 x1, br_int_32 y1, br_int_32 x2, br_int_32 y2, br_uint_32 colour);
 void BrPixelmapRectangleFill(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_int_32 w, br_int_32 h, br_uint_32 colour);
+void BrPixelmapPixelSet(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_uint_32 colour);
 br_pixelmap* BrPixelmapAllocate(br_uint_8 type, br_int_32 w, br_int_32 h, void* pixels, int flags);
 void BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src);
 void BrPixelmapText(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_uint_32 colour, br_font* font, char* text);
@@ -124,6 +129,7 @@ br_uint_16 BrPixelmapTextWidth(br_pixelmap* dst, br_font* font, char* text);
 // BrRes
 void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class);
 br_resource_class* BrResClassAdd(br_resource_class* rclass);
+void* BrResRemove(void* vres);
 void BrResFree(void* vres);
 char* BrResStrDup(void* vparent, char* str);
 
@@ -135,6 +141,7 @@ br_pixelmap* BrTableRemove(br_pixelmap* pixelmap);
 br_uint_32 BrTableAddMany(br_pixelmap** items, int n);
 void BrTableUpdate(br_pixelmap* table, br_uint_16 flags);
 br_uint_32 BrTableEnum(char* pattern, br_table_enum_cbfn* callback, void* arg);
+br_table_find_cbfn* BrTableFindHook(br_table_find_cbfn* hook);
 
 // BrTransform
 void BrTransformToMatrix34(br_matrix34* mat, br_transform* xform);
@@ -149,6 +156,9 @@ void BrVector3SetFloat(br_vector3* v1, float f1, float f2, float f3);
 // void BrVector3Accumulate(br_vector3* v1, br_vector3* v2);
 // void BrVector3Normalise(br_vector3* v1, br_vector3* v2);
 
+// BrTransform
+void BrTransformToTransform(br_transform* dest, br_transform* src);
+
 // Logging
 void BrFailure(const char* s, ...);
 void BrFatal(const char* name, int line, const char* s, ...);
@@ -160,10 +170,15 @@ void BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour
 void BrZbSceneRenderAdd(br_actor* tree);
 void BrZbSceneRenderEnd(void);
 
+void BrZbModelRender(br_actor* actor, br_model* model, br_material* material, br_uint_8 style, int on_screen, int use_custom);
+
 br_pixelmap* DOSGfxBegin(char* setup_string);
 
 // Various
+br_uint_32 BrOnScreenCheck(br_bounds3* bounds);
+
 int BrWriteModeSet(int mode);
 br_uint_32 BrSwap32(br_uint_32 l);
+br_diaghandler* BrDiagHandlerSet(br_diaghandler* newdh);
 
 #endif

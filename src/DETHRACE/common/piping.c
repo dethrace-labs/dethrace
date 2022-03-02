@@ -2,7 +2,11 @@
 #include "globvars.h"
 #include "harness/trace.h"
 #include "opponent.h"
+#include "pedestrn.h"
+#include "sound.h"
+#include "brender/brender.h"
 #include <stdlib.h>
+#include <string.h>
 
 tU8* gPipe_buffer_start;
 int gDisable_sound;
@@ -43,14 +47,22 @@ tU32 gLocal_buffer_size;
 // IDA: void __usercall GetReducedPos(br_vector3 *v@<EAX>, tReduced_pos *p@<EDX>)
 void GetReducedPos(br_vector3* v, tReduced_pos* p) {
     LOG_TRACE("(%p, %p)", v, p);
-    NOT_IMPLEMENTED();
+
+    v->v[0] = p->v[0] / 800.f;
+    v->v[1] = p->v[1] / 800.f;
+    v->v[2] = p->v[1] / 800.f;
+    BrVector3Accumulate(v, &gProgram_state.current_car.car_master_actor->t.t.translate.t);
 }
 
 // IDA: void __usercall SaveReducedPos(tReduced_pos *p@<EAX>, br_vector3 *v@<EDX>)
 void SaveReducedPos(tReduced_pos* p, br_vector3* v) {
     br_vector3 tv;
     LOG_TRACE("(%p, %p)", p, v);
-    NOT_IMPLEMENTED();
+
+    BrVector3Sub(&tv, v, &gProgram_state.current_car.car_master_actor->t.t.translate.t);
+    p->v[0] = tv.v[0] * 800.f;
+    p->v[1] = tv.v[1] * 800.f;
+    p->v[2] = tv.v[2] * 800.f;
 }
 
 // IDA: int __cdecl PipeSearchForwards()
@@ -74,13 +86,15 @@ int SomeReplayLeft() {
 // IDA: void __cdecl DisablePipedSounds()
 void DisablePipedSounds() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gDisable_sound = 1;
 }
 
 // IDA: void __cdecl EnablePipedSounds()
 void EnablePipedSounds() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gDisable_sound = 0;
 }
 
 // IDA: tU32 __usercall LengthOfSession@<EAX>(tPipe_session *pSession@<EAX>)
@@ -95,28 +109,30 @@ tU32 LengthOfSession(tPipe_session* pSession) {
 // IDA: void __usercall StartPipingSession2(tPipe_chunk_type pThe_type@<EAX>, int pMunge_reentrancy@<EDX>)
 void StartPipingSession2(tPipe_chunk_type pThe_type, int pMunge_reentrancy) {
     LOG_TRACE("(%d, %d)", pThe_type, pMunge_reentrancy);
-    NOT_IMPLEMENTED();
+
+    STUB_ONCE();
 }
 
 // IDA: void __usercall StartPipingSession(tPipe_chunk_type pThe_type@<EAX>)
 void StartPipingSession(tPipe_chunk_type pThe_type) {
     LOG_TRACE("(%d)", pThe_type);
 
-    STUB_ONCE();
+    StartPipingSession2(pThe_type, 1);
 }
 
 // IDA: void __usercall EndPipingSession2(int pMunge_reentrancy@<EAX>)
 void EndPipingSession2(int pMunge_reentrancy) {
     int a;
     LOG_TRACE("(%d)", pMunge_reentrancy);
-    NOT_IMPLEMENTED();
+
+    STUB_ONCE();
 }
 
 // IDA: void __cdecl EndPipingSession()
 void EndPipingSession() {
     LOG_TRACE("()");
 
-    STUB_ONCE();
+    EndPipingSession2(1);
 }
 
 // IDA: void __usercall AddDataToSession(int pSubject_index@<EAX>, void *pData@<EDX>, tU32 pData_length@<EBX>)
@@ -124,21 +140,42 @@ void AddDataToSession(int pSubject_index, void* pData, tU32 pData_length) {
     tU32 temp_buffer_size;
     int variable_for_breaking_on;
     LOG_TRACE("(%d, %p, %d)", pSubject_index, pData, pData_length);
-    NOT_IMPLEMENTED();
+
+    STUB_ONCE();
 }
 
 // IDA: void __usercall AddModelGeometryToPipingSession(tU16 pCar_ID@<EAX>, int pModel_index@<EDX>, int pVertex_count@<EBX>, tChanged_vertex *pCoordinates@<ECX>)
 void AddModelGeometryToPipingSession(tU16 pCar_ID, int pModel_index, int pVertex_count, tChanged_vertex* pCoordinates) {
     tU32 data_size;
     LOG_TRACE("(%d, %d, %d, %p)", pCar_ID, pModel_index, pVertex_count, pCoordinates);
-    NOT_IMPLEMENTED();
+
+    if (gModel_geometry_space != NULL) {
+        if (pVertex_count > 600) {
+            pVertex_count = 600;
+        }
+        data_size = offsetof(tPipe_model_geometry_data, vertex_changes) + pVertex_count * sizeof(tChanged_vertex);
+        gModel_geometry_space->vertex_count = pVertex_count;
+        gModel_geometry_space->model_index = pModel_index;
+        memcpy(gModel_geometry_space->vertex_changes, pCoordinates, pVertex_count * sizeof(tChanged_vertex));
+        AddDataToSession(pCar_ID, gModel_geometry_space, data_size);
+    }
 }
 
 // IDA: void __usercall AddSmudgeToPipingSession(tU16 pCar_ID@<EAX>, int pModel_index@<EDX>, int pVertex_count@<EBX>, tSmudged_vertex *pCoordinates@<ECX>)
 void AddSmudgeToPipingSession(tU16 pCar_ID, int pModel_index, int pVertex_count, tSmudged_vertex* pCoordinates) {
     tU32 data_size;
     LOG_TRACE("(%d, %d, %d, %p)", pCar_ID, pModel_index, pVertex_count, pCoordinates);
-    NOT_IMPLEMENTED();
+
+    if (gSmudge_space != NULL) {
+        if (pVertex_count > 600) {
+            pVertex_count = 600;
+        }
+        gSmudge_space->vertex_count = pVertex_count;
+        gSmudge_space->model_index = pModel_index;
+        memcpy(gSmudge_space->vertex_changes, pCoordinates, pVertex_count * sizeof(tSmudged_vertex));
+        data_size = offsetof(tPipe_smudge_data, vertex_changes) + pVertex_count * sizeof(tSmudged_vertex);
+        AddDataToSession(pCar_ID, gSmudge_space, data_size);
+    }
 }
 
 // IDA: void __usercall AddPedestrianToPipingSession(int pPedestrian_index@<EAX>, br_matrix34 *pTrans@<EDX>, tU8 pAction_index@<EBX>, tU8 pFrame_index@<ECX>, tS8 pHit_points, int pDone_initial, tU16 pParent_ID, float pSpin_period, br_scalar pJump_magnitude, br_vector3 *pOffset)
@@ -146,14 +183,36 @@ void AddPedestrianToPipingSession(int pPedestrian_index, br_matrix34* pTrans, tU
     tPipe_pedestrian_data data;
     tU32 data_size;
     LOG_TRACE("(%d, %p, %d, %d, %d, %d, %d, %f, %f, %p)", pPedestrian_index, pTrans, pAction_index, pFrame_index, pHit_points, pDone_initial, pParent_ID, pSpin_period, pJump_magnitude, pOffset);
-    NOT_IMPLEMENTED();
+
+    if (pFrame_index == 0xff) {
+        pFrame_index = 0;
+    }
+    data.action_and_frame_index = (pAction_index * 16 + pFrame_index) | (pDone_initial ? 0 : 0x80);
+    data.hit_points = pHit_points;
+    data.new_translation.v[0] = pTrans->m[3][0];
+    data.new_translation.v[1] = pTrans->m[3][1];
+    data.new_translation.v[2] = pTrans->m[3][2];
+    data.parent = pParent_ID;
+    if (pHit_points <= 0) {
+        data.spin_period = pSpin_period;
+        data.parent_actor = GetPedestrianActor(pPedestrian_index)->parent;
+        BrVector3Copy(&data.offset, pOffset);
+        data.jump_magnitude = pJump_magnitude;
+        data_size = sizeof(tPipe_pedestrian_data);
+    } else {
+        data_size = offsetof(tPipe_pedestrian_data, spin_period);
+    }
+    AddDataToSession(pPedestrian_index, &data, data_size);
 }
 
 // IDA: void __usercall AddSparkToPipingSession(int pSpark_index@<EAX>, br_vector3 *pPos@<EDX>, br_vector3 *pV@<EBX>)
 void AddSparkToPipingSession(int pSpark_index, br_vector3* pPos, br_vector3* pV) {
     tPipe_spark_data data;
     LOG_TRACE("(%d, %p, %p)", pSpark_index, pPos, pV);
-    NOT_IMPLEMENTED();
+
+    BrVector3Copy(&data.pos, pPos);
+    BrVector3Copy(&data.v, pV);
+    AddDataToSession(pSpark_index, &data, sizeof(tPipe_spark_data));
 }
 
 // IDA: void __usercall AddShrapnelToPipingSession(int pShrapnel_index@<EAX>, br_vector3 *pPos@<EDX>, tU16 pAge@<EBX>, br_material *pMaterial@<ECX>)
@@ -161,49 +220,84 @@ void AddShrapnelToPipingSession(int pShrapnel_index, br_vector3* pPos, tU16 pAge
     tPipe_shrapnel_data data;
     tU32 data_size;
     LOG_TRACE("(%d, %p, %d, %p)", pShrapnel_index, pPos, pAge, pMaterial);
-    NOT_IMPLEMENTED();
+
+    BrVector3Copy(&data.pos, pPos);
+    if ((pShrapnel_index & 0x8000) != 0) {
+        data.age = pAge;
+        data.material = pMaterial;
+        data_size = sizeof(tPipe_shrapnel_data);
+    } else {
+        data_size = offsetof(tPipe_shrapnel_data, age);
+    }
+    AddDataToSession(pShrapnel_index, &data, data_size);
 }
 
 // IDA: void __usercall AddScreenWobbleToPipingSession(int pWobble_x@<EAX>, int pWobble_y@<EDX>)
 void AddScreenWobbleToPipingSession(int pWobble_x, int pWobble_y) {
     tPipe_screen_shake_data data;
     LOG_TRACE("(%d, %d)", pWobble_x, pWobble_y);
-    NOT_IMPLEMENTED();
+
+    data.wobble_x = pWobble_x;
+    data.wobble_y = pWobble_y;
+    AddDataToSession(0, &data, sizeof(tPipe_screen_shake_data));
 }
 
 // IDA: void __usercall AddGrooveStopToPipingSession(int pGroove_index@<EAX>, br_matrix34 *pMatrix@<EDX>, int pPath_interrupt@<EBX>, int pObject_interrupt@<ECX>, float pPath_resumption, float pObject_resumption)
 void AddGrooveStopToPipingSession(int pGroove_index, br_matrix34* pMatrix, int pPath_interrupt, int pObject_interrupt, float pPath_resumption, float pObject_resumption) {
     tPipe_groove_stop_data data;
     LOG_TRACE("(%d, %p, %d, %d, %f, %f)", pGroove_index, pMatrix, pPath_interrupt, pObject_interrupt, pPath_resumption, pObject_resumption);
-    NOT_IMPLEMENTED();
+
+    BrMatrix34Copy(&data.matrix, pMatrix);
+    data.path_interrupt = pPath_interrupt;
+    data.object_interrupt = pObject_interrupt;
+    data.path_resumption = pPath_resumption;
+    data.object_resumption = pObject_resumption;
+    AddDataToSession(pGroove_index, &data, sizeof(tPipe_groove_stop_data));
 }
 
 // IDA: void __usercall AddNonCarToPipingSession(int pIndex@<EAX>, br_actor *pActor@<EDX>)
 void AddNonCarToPipingSession(int pIndex, br_actor* pActor) {
     tPipe_non_car_data data;
     LOG_TRACE("(%d, %p)", pIndex, pActor);
-    NOT_IMPLEMENTED();
+
+    BrMatrix34Copy(&data.mat, &pActor->t.t.mat);
+    data.actor = pActor;
+    AddDataToSession(pIndex, &data, sizeof(tPipe_non_car_data));
 }
 
 // IDA: void __usercall AddSmokeToPipingSession(int pIndex@<EAX>, tU8 pType@<EDX>, br_vector3 *pPos@<EBX>, br_scalar pRadius, br_scalar pStrength)
 void AddSmokeToPipingSession(int pIndex, tU8 pType, br_vector3* pPos, br_scalar pRadius, br_scalar pStrength) {
     tPipe_smoke_data data;
     LOG_TRACE("(%d, %d, %p, %f, %f)", pIndex, pType, pPos, pRadius, pStrength);
-    NOT_IMPLEMENTED();
+
+    SaveReducedPos(&data.pos, pPos);
+    data.type = pType;
+    data.radius = pRadius * 1024.f;
+    data.strength = pStrength * 255.f;
+    AddDataToSession(pIndex, &data, sizeof(tPipe_smoke_data));
 }
 
 // IDA: void __usercall AddSmokeColumnToPipingSession(int pIndex@<EAX>, tCar_spec *pCar@<EDX>, int pVertex@<EBX>, int pColour@<ECX>)
 void AddSmokeColumnToPipingSession(int pIndex, tCar_spec* pCar, int pVertex, int pColour) {
     tPipe_smoke_column_data data;
     LOG_TRACE("(%d, %p, %d, %d)", pIndex, pCar, pVertex, pColour);
-    NOT_IMPLEMENTED();
+
+    data.car_ID = pCar->car_ID;
+    data.vertex = pVertex;
+    AddDataToSession(pIndex + pColour * 0x4000, &data, sizeof(tPipe_smoke_column_data));
 }
 
 // IDA: void __usercall AddFlameToPipingSession(int pIndex@<EAX>, int pFrame_count@<EDX>, br_scalar pScale_x, br_scalar pScale_y, br_scalar pOffset_x, br_scalar pOffset_z)
 void AddFlameToPipingSession(int pIndex, int pFrame_count, br_scalar pScale_x, br_scalar pScale_y, br_scalar pOffset_x, br_scalar pOffset_z) {
     tPipe_flame_data data;
     LOG_TRACE("(%d, %d, %f, %f, %f, %f)", pIndex, pFrame_count, pScale_x, pScale_y, pOffset_x, pOffset_z);
-    NOT_IMPLEMENTED();
+
+    data.frame_count = pFrame_count;
+    data.scale_x = pScale_x;
+    data.scale_y = pScale_y;
+    data.offset_x = pOffset_x;
+    data.offset_z = pOffset_z;
+    AddDataToSession(pIndex, &data, sizeof(tPipe_flame_data));
 }
 
 // IDA: void __usercall AddSplashToPipingSession(tCollision_info *pCar@<EAX>)
@@ -211,35 +305,69 @@ void AddSplashToPipingSession(tCollision_info* pCar) {
     tPipe_splash_data data;
     LOG_TRACE("(%p)", pCar);
 
-    STUB_ONCE();
+    if (pCar->driver >= 0) {
+        data.d = pCar->water_d;
+        BrVector3Copy(&data.normal, &pCar->water_normal);
+        AddDataToSession(pCar->car_ID, &data, sizeof(tPipe_splash_data));
+    }
 }
 
 // IDA: void __usercall AddOilSpillToPipingSession(int pIndex@<EAX>, br_matrix34 *pMat@<EDX>, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec *pCar, br_vector3 *pOriginal_pos, br_pixelmap *pPixelmap)
 void AddOilSpillToPipingSession(int pIndex, br_matrix34* pMat, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec* pCar, br_vector3* pOriginal_pos, br_pixelmap* pPixelmap) {
     tPipe_oil_spill_data data;
     LOG_TRACE("(%d, %p, %f, %f, %d, %d, %p, %p, %p)", pIndex, pMat, pFull_size, pGrow_rate, pSpill_time, pStop_time, pCar, pOriginal_pos, pPixelmap);
-    NOT_IMPLEMENTED();
+
+    BrMatrix34Copy(&data.mat, pMat);
+    data.full_size = pFull_size;
+    data.grow_rate = pGrow_rate;
+    data.spill_time = pSpill_time;
+    data.previous_stop_time = pStop_time;
+    data.car = pCar;
+    BrVector3Copy(&data.original_pos, pOriginal_pos);
+    data.pixelmap = pPixelmap;
+    AddDataToSession(pIndex,&data,sizeof(tPipe_oil_spill_data));
 }
 
 // IDA: void __usercall AddFrameFinishToPipingSession(tU32 pThe_time@<EAX>)
 void AddFrameFinishToPipingSession(tU32 pThe_time) {
     tPipe_frame_boundary_data data;
     LOG_TRACE("(%d)", pThe_time);
-    NOT_IMPLEMENTED();
+
+    data.time = pThe_time;
+    AddDataToSession(0, &data, sizeof(tPipe_frame_boundary_data));
 }
 
 // IDA: void __usercall AddCarToPipingSession(int pCar_ID@<EAX>, br_matrix34 *pCar_mat@<EDX>, br_vector3 *pCar_velocity@<EBX>, float pSpeedo_speed, float pLf_sus_position, float pRf_sus_position, float pLr_sus_position, float pRr_sus_position, float pSteering_angle, br_scalar pRevs, int pGear, int pFrame_coll_flag)
 void AddCarToPipingSession(int pCar_ID, br_matrix34* pCar_mat, br_vector3* pCar_velocity, float pSpeedo_speed, float pLf_sus_position, float pRf_sus_position, float pLr_sus_position, float pRr_sus_position, float pSteering_angle, br_scalar pRevs, int pGear, int pFrame_coll_flag) {
     tPipe_car_data data;
     LOG_TRACE("(%d, %p, %p, %f, %f, %f, %f, %f, %f, %f, %d, %d)", pCar_ID, pCar_mat, pCar_velocity, pSpeedo_speed, pLf_sus_position, pRf_sus_position, pLr_sus_position, pRr_sus_position, pSteering_angle, pRevs, pGear, pFrame_coll_flag);
-    NOT_IMPLEMENTED();
+
+    BrMatrix34Copy(&data.transformation, pCar_mat);
+    BrVector3Copy(&data.velocity, pCar_velocity);
+    data.speedo_speed = pSpeedo_speed * 32767.f / 0.07f;
+    data.lf_sus_position = pLf_sus_position * 127.f / .15f;
+    data.rf_sus_position = pRf_sus_position * 127.f / .15f;
+    data.lr_sus_position = pLr_sus_position * 127.f / .15f;
+    data.rr_sus_position = pRr_sus_position * 127.f / .15f;
+    data.steering_angle = pSteering_angle * 32767.f / 60.f;
+    data.revs_and_gear = (((int)pRevs) / 10) + (pFrame_coll_flag ? 0 : 0x800) + (pGear + 1) * 0x1000;
+    AddDataToSession(pCar_ID, &data, sizeof(tPipe_car_data));
 }
 
 // IDA: void __usercall AddSoundToPipingSession(tS3_outlet_ptr pOutlet@<EAX>, int pSound_index@<EDX>, tS3_volume pL_volume@<EBX>, tS3_volume pR_volume@<ECX>, tS3_pitch pPitch, br_vector3 *pPos)
 void AddSoundToPipingSession(tS3_outlet_ptr pOutlet, int pSound_index, tS3_volume pL_volume, tS3_volume pR_volume, tS3_pitch pPitch, br_vector3* pPos) {
     tPipe_sound_data data;
     LOG_TRACE("(%d, %d, %d, %d, %d, %p)", pOutlet, pSound_index, pL_volume, pR_volume, pPitch, pPos);
-    NOT_IMPLEMENTED();
+
+    data.pitch = pPitch;
+    if (pPos == NULL) {
+        BrVector3Set(&data.position, 0.f, 0.f, 0.f);
+    } else {
+        BrVector3Copy(&data.position, pPos);
+    }
+    data.volume = (pR_volume << 8) | (pL_volume << 0);
+    data.outlet_index = GetIndexFromOutlet(pOutlet);
+    AddDataToSession(pSound_index, &data, sizeof(tPipe_sound_data));
 }
 
 // IDA: void __usercall AddDamageToPipingSession(int pCar_ID@<EAX>, tS8 *pDifferences@<EDX>)
@@ -247,111 +375,172 @@ void AddDamageToPipingSession(int pCar_ID, tS8* pDifferences) {
     tPipe_damage_data data;
     int i;
     LOG_TRACE("(%d, %p)", pCar_ID, pDifferences);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < COUNT_OF(data.damage_delta); i++) {
+        data.damage_delta[i] = pDifferences[i];
+    }
+    AddDataToSession(pCar_ID, &data, sizeof(tPipe_damage_data));
 }
 
 // IDA: void __usercall AddSpecialToPipingSession(tSpecial_type pType@<EAX>)
 void AddSpecialToPipingSession(tSpecial_type pType) {
     tPipe_special_data data;
     LOG_TRACE("(%d)", pType);
-    NOT_IMPLEMENTED();
+
+    AddDataToSession(pType, &data, sizeof(tPipe_special_data));
 }
 
 // IDA: void __usercall AddPedGibToPipingSession(int pIndex@<EAX>, br_matrix34 *pTrans@<EDX>, int pSize@<EBX>, int pGib_index@<ECX>, int pPed_index)
 void AddPedGibToPipingSession(int pIndex, br_matrix34* pTrans, int pSize, int pGib_index, int pPed_index) {
     tPipe_ped_gib_data data;
     LOG_TRACE("(%d, %p, %d, %d, %d)", pIndex, pTrans, pSize, pGib_index, pPed_index);
-    NOT_IMPLEMENTED();
+
+    data.ped_parent_index = pPed_index;
+    data.size = pSize;
+    data.gib_index = pGib_index;
+    BrMatrix34Copy(&data.transform, pTrans);
+    AddDataToSession(pIndex, &data, sizeof(tPipe_ped_gib_data));
 }
 
 // IDA: void __cdecl AddCarIncidentToPipingSession(float pSeverity, tCar_spec *pCar, br_vector3 *pImpact_point)
 void AddCarIncidentToPipingSession(float pSeverity, tCar_spec* pCar, br_vector3* pImpact_point) {
     tPipe_incident_data data;
     LOG_TRACE("(%f, %p, %p)", pSeverity, pCar, pImpact_point);
-    NOT_IMPLEMENTED();
+
+    data.severity = pSeverity;
+    data.info.car_info.car_ID = pCar->car_ID;
+    BrVector3Copy(&data.info.car_info.impact_point, pImpact_point);
+    AddDataToSession(1, &data, sizeof(tPipe_incident_data));
 }
 
 // IDA: void __usercall AddPedIncidentToPipingSession(int pPed_index@<EAX>, br_actor *pActor@<EDX>)
 void AddPedIncidentToPipingSession(int pPed_index, br_actor* pActor) {
     tPipe_incident_data data;
     LOG_TRACE("(%d, %p)", pPed_index, pActor);
-    NOT_IMPLEMENTED();
+
+    data.severity = 0.f;
+    data.info.ped_info.ped_index = pPed_index;
+    data.info.ped_info.actor = pActor;
+    AddDataToSession(0, &data, sizeof(tPipe_incident_data));
 }
 
 // IDA: void __cdecl AddWallIncidentToPipingSession(float pSeverity, br_vector3 *pImpact_point)
 void AddWallIncidentToPipingSession(float pSeverity, br_vector3* pImpact_point) {
     tPipe_incident_data data;
     LOG_TRACE("(%f, %p)", pSeverity, pImpact_point);
-    NOT_IMPLEMENTED();
+
+    data.severity = pSeverity;
+    BrVector3Copy(&data.info.wall_info.pos, pImpact_point);
+    AddDataToSession(2, &data, sizeof(tPipe_incident_data));
 }
 
 // IDA: void __usercall AddProxRayToPipingSession(int pRay_index@<EAX>, tCar_spec *pCar@<EDX>, tU16 pPed_index@<EBX>, tU32 pTime@<ECX>)
 void AddProxRayToPipingSession(int pRay_index, tCar_spec* pCar, tU16 pPed_index, tU32 pTime) {
     tPipe_prox_ray_data data;
     LOG_TRACE("(%d, %p, %d, %d)", pRay_index, pCar, pPed_index, pTime);
-    NOT_IMPLEMENTED();
+
+    data.ped_index = pPed_index;
+    data.car_ID = pCar->car_ID;
+    data.time = pTime;
+    AddDataToSession(pRay_index, &data, sizeof(tPipe_prox_ray_data));
 }
 
 // IDA: void __usercall AddSkidAdjustmentToPipingSession(int pSkid_num@<EAX>, br_matrix34 *pMatrix@<EDX>, int pMaterial_index@<EBX>)
 void AddSkidAdjustmentToPipingSession(int pSkid_num, br_matrix34* pMatrix, int pMaterial_index) {
     tPipe_skid_adjustment adjustment;
     LOG_TRACE("(%d, %p, %d)", pSkid_num, pMatrix, pMaterial_index);
-    NOT_IMPLEMENTED();
+
+    BrMatrix34Copy(&adjustment.matrix, pMatrix);
+    adjustment.material_index = pMaterial_index;
+    AddDataToSession(pSkid_num, &adjustment, sizeof(tPipe_skid_adjustment));
 }
 
 // IDA: void __usercall PipeSingleModelGeometry(tU16 pCar_ID@<EAX>, int pModel_index@<EDX>, int pVertex_count@<EBX>, tChanged_vertex *pCoordinates@<ECX>)
 void PipeSingleModelGeometry(tU16 pCar_ID, int pModel_index, int pVertex_count, tChanged_vertex* pCoordinates) {
     LOG_TRACE("(%d, %d, %d, %p)", pCar_ID, pModel_index, pVertex_count, pCoordinates);
-    NOT_IMPLEMENTED();
+
+    StartPipingSession(ePipe_chunk_model_geometry);
+    AddModelGeometryToPipingSession(pCar_ID, pModel_index, pVertex_count, pCoordinates);
+    EndPipingSession();
 }
 
 // IDA: void __usercall PipeSinglePedestrian(int pPedestrian_index@<EAX>, br_matrix34 *pTrans@<EDX>, tU8 pAction_index@<EBX>, tU8 pFrame_index@<ECX>, tS8 pHit_points, int pDone_initial, tU16 pParent_ID, float pSpin_period, br_scalar pJump_magnitude, br_vector3 *pOffset)
 void PipeSinglePedestrian(int pPedestrian_index, br_matrix34* pTrans, tU8 pAction_index, tU8 pFrame_index, tS8 pHit_points, int pDone_initial, tU16 pParent_ID, float pSpin_period, br_scalar pJump_magnitude, br_vector3* pOffset) {
     LOG_TRACE("(%d, %p, %d, %d, %d, %d, %d, %f, %f, %p)", pPedestrian_index, pTrans, pAction_index, pFrame_index, pHit_points, pDone_initial, pParent_ID, pSpin_period, pJump_magnitude, pOffset);
-    NOT_IMPLEMENTED();
+
+    StartPipingSession(ePipe_chunk_pedestrian);
+    AddPedestrianToPipingSession(pPedestrian_index, pTrans, pAction_index,
+        pFrame_index, pHit_points, pDone_initial, pParent_ID, pSpin_period,
+        pJump_magnitude, pOffset);
+    EndPipingSession();
 }
 
 // IDA: void __usercall PipeSingleCar(int pCar_ID@<EAX>, br_matrix34 *pCar_mat@<EDX>, br_vector3 *pCar_velocity@<EBX>, float pSpeedo_speed, float pLf_sus_position, float pRf_sus_position, float pLr_sus_position, float pRr_sus_position, float pSteering_angle, br_scalar pRevs, int pGear, int pFrame_coll_flag)
 void PipeSingleCar(int pCar_ID, br_matrix34* pCar_mat, br_vector3* pCar_velocity, float pSpeedo_speed, float pLf_sus_position, float pRf_sus_position, float pLr_sus_position, float pRr_sus_position, float pSteering_angle, br_scalar pRevs, int pGear, int pFrame_coll_flag) {
     LOG_TRACE("(%d, %p, %p, %f, %f, %f, %f, %f, %f, %f, %d, %d)", pCar_ID, pCar_mat, pCar_velocity, pSpeedo_speed, pLf_sus_position, pRf_sus_position, pLr_sus_position, pRr_sus_position, pSteering_angle, pRevs, pGear, pFrame_coll_flag);
-    NOT_IMPLEMENTED();
+
+    StartPipingSession(ePipe_chunk_car);
+    AddCarToPipingSession(pCar_ID, pCar_mat, pCar_velocity, pSpeedo_speed,
+        pLf_sus_position, pRf_sus_position, pLr_sus_position, pRr_sus_position,
+        pSteering_angle, pRevs, pGear, pFrame_coll_flag);
+    EndPipingSession();
 }
 
 // IDA: void __usercall PipeSingleSound(tS3_outlet_ptr pOutlet@<EAX>, int pSound_index@<EDX>, tS3_volume pL_volume@<EBX>, tS3_volume pR_volume@<ECX>, tS3_pitch pPitch, br_vector3 *pPos)
 void PipeSingleSound(tS3_outlet_ptr pOutlet, int pSound_index, tS3_volume pL_volume, tS3_volume pR_volume, tS3_pitch pPitch, br_vector3* pPos) {
     LOG_TRACE("(%d, %d, %d, %d, %d, %p)", pOutlet, pSound_index, pL_volume, pR_volume, pPitch, pPos);
-    NOT_IMPLEMENTED();
+
+    if (gProgram_state.racing && !gAction_replay_mode) {
+        StartPipingSession(ePipe_chunk_sound);
+        AddSoundToPipingSession(pOutlet, pSound_index, pL_volume, pR_volume, pPitch, pPos);
+        EndPipingSession();
+    }
 }
 
 // IDA: void __usercall PipeSingleOilSpill(int pIndex@<EAX>, br_matrix34 *pMat@<EDX>, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec *pCar, br_vector3 *pOriginal_pos, br_pixelmap *pPixelmap)
 void PipeSingleOilSpill(int pIndex, br_matrix34* pMat, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec* pCar, br_vector3* pOriginal_pos, br_pixelmap* pPixelmap) {
     LOG_TRACE("(%d, %p, %f, %f, %d, %d, %p, %p, %p)", pIndex, pMat, pFull_size, pGrow_rate, pSpill_time, pStop_time, pCar, pOriginal_pos, pPixelmap);
-    NOT_IMPLEMENTED();
+
+    StartPipingSession(ePipe_chunk_oil_spill);
+    AddOilSpillToPipingSession(pIndex, pMat, pFull_size, pGrow_rate, 
+        pSpill_time, pStop_time, pCar, pOriginal_pos, pPixelmap);
+    EndPipingSession();
 }
 
 // IDA: void __usercall PipeSingleDamage(int pCar_ID@<EAX>, tS8 *pDifferences@<EDX>)
 void PipeSingleDamage(int pCar_ID, tS8* pDifferences) {
     LOG_TRACE("(%d, %p)", pCar_ID, pDifferences);
-    NOT_IMPLEMENTED();
+
+    StartPipingSession(ePipe_chunk_damage);
+    AddDamageToPipingSession(pCar_ID, pDifferences);
+    EndPipingSession();
 }
 
 // IDA: void __usercall PipeSingleSpecial(tSpecial_type pType@<EAX>)
 void PipeSingleSpecial(tSpecial_type pType) {
     LOG_TRACE("(%d)", pType);
 
-    STUB();
+    StartPipingSession(ePipe_chunk_special);
+    AddSpecialToPipingSession(pType);
+    EndPipingSession();
 }
 
 // IDA: void __usercall PipeSinglePedGib(int pIndex@<EAX>, br_matrix34 *pTrans@<EDX>, int pSize@<EBX>, int pGib_index@<ECX>, int pPed_index)
 void PipeSinglePedGib(int pIndex, br_matrix34* pTrans, int pSize, int pGib_index, int pPed_index) {
     LOG_TRACE("(%d, %p, %d, %d, %d)", pIndex, pTrans, pSize, pGib_index, pPed_index);
-    NOT_IMPLEMENTED();
+
+    StartPipingSession(ePipe_chunk_ped_gib);
+    AddPedGibToPipingSession(pIndex, pTrans, pSize, pGib_index, pPed_index);
+    EndPipingSession();
 }
 
 // IDA: void __cdecl PipeSingleCarIncident(float pSeverity, tCar_spec *pCar, br_vector3 *pImpact_point)
 void PipeSingleCarIncident(float pSeverity, tCar_spec* pCar, br_vector3* pImpact_point) {
     LOG_TRACE("(%f, %p, %p)", pSeverity, pCar, pImpact_point);
-    NOT_IMPLEMENTED();
+
+    StartPipingSession(ePipe_chunk_incident);
+    AddCarIncidentToPipingSession(pSeverity, pCar, pImpact_point);
+    EndPipingSession();
 }
 
 // IDA: void __usercall PipeSinglePedIncident(int pPed_index@<EAX>, br_actor *pActor@<EDX>)
@@ -369,13 +558,19 @@ void PipeSingleWallIncident(float pSeverity, br_vector3* pImpact_point) {
 // IDA: void __usercall PipeSingleScreenShake(int pWobble_x@<EAX>, int pWobble_y@<EDX>)
 void PipeSingleScreenShake(int pWobble_x, int pWobble_y) {
     LOG_TRACE("(%d, %d)", pWobble_x, pWobble_y);
-    NOT_IMPLEMENTED();
+    StartPipingSession(ePipe_chunk_screen_shake);
+    AddScreenWobbleToPipingSession(pWobble_x, pWobble_y);
+    EndPipingSession();
 }
 
 // IDA: void __usercall PipeSingleGrooveStop(int pGroove_index@<EAX>, br_matrix34 *pMatrix@<EDX>, int pPath_interrupt@<EBX>, int pObject_interrupt@<ECX>, float pPath_resumption, float pObject_resumption)
 void PipeSingleGrooveStop(int pGroove_index, br_matrix34* pMatrix, int pPath_interrupt, int pObject_interrupt, float pPath_resumption, float pObject_resumption) {
     LOG_TRACE("(%d, %p, %d, %d, %f, %f)", pGroove_index, pMatrix, pPath_interrupt, pObject_interrupt, pPath_resumption, pObject_resumption);
-    NOT_IMPLEMENTED();
+
+    StartPipingSession(ePipe_chunk_groove_stop);
+    AddGrooveStopToPipingSession(pGroove_index, pMatrix, pPath_interrupt,
+        pObject_interrupt, pPath_resumption, pObject_resumption);
+    EndPipingSession();
 }
 
 // IDA: void __cdecl PipeFrameFinish()
@@ -388,13 +583,21 @@ void PipeFrameFinish() {
 void PipingFrameReset() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < COUNT_OF(gReset_procs); i++) {
+        if (gReset_procs[i] != NULL) {
+            gReset_procs[i]();
+        }
+    }
 }
 
 // IDA: void __usercall PipeSingleSkidAdjustment(int pSkid_num@<EAX>, br_matrix34 *pMatrix@<EDX>, int pMaterial_index@<EBX>)
 void PipeSingleSkidAdjustment(int pSkid_num, br_matrix34* pMatrix, int pMaterial_index) {
     LOG_TRACE("(%d, %p, %d)", pSkid_num, pMatrix, pMaterial_index);
-    STUB_ONCE();
+
+    StartPipingSession(ePipe_chunk_skid_adjustment);
+    AddSkidAdjustmentToPipingSession(pSkid_num, pMatrix, pMaterial_index);
+    EndPipingSession();
 }
 
 // IDA: void __cdecl ResetPiping()
@@ -442,7 +645,7 @@ void InitLastDamageArrayEtc() {
                     car->frame_start_damage[j] = 0;
                 }
             }
-            car->car_ID = i + (cat * 256);
+            car->car_ID = (cat << 8) + i;
         }
     }
 }
@@ -454,7 +657,22 @@ void ResetCars() {
     int i;
     int car_count;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (cat = eVehicle_self; cat < eVehicle_not_really; cat++) {
+        if (cat == eVehicle_self) {
+            car_count = 1;
+        } else {
+            car_count = GetCarCount(cat);
+        }
+        for (i = 0; i < car_count; i++) {
+            if (cat == eVehicle_self) {
+                car = &gProgram_state.current_car;
+            } else {
+                car = GetCarSpec(cat, i);
+            }
+            car->active = 0;
+        }
+    }
 }
 
 // IDA: void __cdecl PipeCarPositions()
@@ -469,7 +687,59 @@ void PipeCarPositions() {
     tS8 damage_deltas[12];
     LOG_TRACE("()");
 
-    STUB_ONCE();
+    StartPipingSession(ePipe_chunk_car);
+    for (cat = eVehicle_self; cat < eVehicle_not_really; cat++) {
+        if (cat == eVehicle_self) {
+            car_count = 1;
+        } else {
+            car_count = GetCarCount(cat);
+        }
+        for (i = 0; i < car_count; i++) {
+            if (cat == eVehicle_self) {
+                car = &gProgram_state.current_car;
+            } else {
+                car = GetCarSpec(cat, i);
+            }
+            AddCarToPipingSession(cat * 0x100 + i,
+                &car->car_master_actor->t.t.mat, &car->v, car->speedo_speed,
+                car->lf_sus_position, car->rf_sus_position, car->lr_sus_position, car->rr_sus_position,
+                car->steering_angle, car->revs,car->gear, car->frame_collision_flag);
+        }
+    }
+    EndPipingSession();
+    session_started = 0;
+    for (cat = eVehicle_self; cat < eVehicle_net_player; cat++) {
+        if (cat == eVehicle_self) {
+            car_count = 1;
+        } else {
+            car_count = GetCarCount(cat);
+        }
+        for (i = 0; i < car_count; i++) {
+            if (cat == eVehicle_self) {
+                car = &gProgram_state.current_car;
+            } else {
+                car = GetCarSpec(cat, i);
+            }
+            if (car->active) {
+                difference_found = 0;
+                for (j = 0; j < COUNT_OF(car->damage_units); j++) {
+                    damage_deltas[j] = car->damage_units[j].damage_level - car->frame_start_damage[j];
+                    difference_found |= damage_deltas[j];
+                    car->frame_start_damage[j] = car->damage_units[j].damage_level;
+                }
+                if (difference_found) {
+                    if (!session_started) {
+                        StartPipingSession(ePipe_chunk_damage);
+                        session_started = 1;
+                    }
+                    AddDamageToPipingSession(cat * 0x100 + i, damage_deltas);
+                }
+            }
+        }
+    }
+    if (session_started) {
+        EndPipingSession();
+    }
 }
 
 // IDA: void __cdecl ResetPipePlayToEnd()
@@ -487,13 +757,15 @@ void ResetPipePlayToStart() {
 // IDA: tU8* __cdecl GetPipePlayPtr()
 tU8* GetPipePlayPtr() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    return gPipe_play_ptr;
 }
 
 // IDA: void __usercall SetPipePlayPtr(tU8 *pPtr@<EAX>)
 void SetPipePlayPtr(tU8* pPtr) {
     LOG_TRACE("(%p)", pPtr);
-    NOT_IMPLEMENTED();
+
+    gPipe_play_ptr = pPtr;
 }
 
 // IDA: void __usercall AdvanceChunkPtr(tPipe_chunk **pChunk@<EAX>, tChunk_subject_index pType@<EDX>)

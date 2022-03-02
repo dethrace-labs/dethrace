@@ -5,13 +5,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "graphics.h"
 #include "harness/trace.h"
 #include "network.h"
 #include "pd/sys.h"
 #include "utility.h"
 
 char* gError_messages[126] = {
-    "Unable to support this screen depth setting\nCouldn't allocate off-screen buffer",
+    "Unable to support this screen depth setting",
+    "Couldn't allocate off-screen buffer",
     "Couldn't allocate Z-Buffer",
     "Couldn't allocate root actor",
     "Couldn't calculate the application's pathname",
@@ -126,9 +128,9 @@ char* gError_messages[126] = {
     "Ran out of funk/groove slot bunches",
     "Net contents too big %",
     "File % is corrupted",
-    "Random number out of range (%)"
+    "Random number out of range (%)",
 };
-int gError_code;
+int gError_code = -90000;
 char* gPalette_copy__errors; // suffix added to avoid duplicate symbol
 int gPixel_buffer_size__errors; // suffix added to avoid duplicate symbol
 int gMouse_was_started__errors; // suffix added to avoid duplicate symbol
@@ -141,12 +143,12 @@ void FatalError(int pStr_index, ...) {
     char temp_str[1024];
     char* sub_pt;
     va_list ap;
-    int i = 0;
+    int i;
     LOG_TRACE("(%d)", pStr_index);
 
     va_start(ap, pStr_index);
 
-    int read_timer = 0;
+    int read_timer = PDGetTotalTime();
     gError_code = 0x20000000 + read_timer;
     strcpy(the_str, gError_messages[pStr_index - 1]);
     sub_pt = temp_str;
@@ -164,6 +166,8 @@ void FatalError(int pStr_index, ...) {
     }
     *sub_pt = 0;
     va_end(ap);
+    dr_dprintf(the_str);
+    FadePaletteUp();
     PDFatalError(temp_str);
 }
 
@@ -174,8 +178,28 @@ void NonFatalError(int pStr_index, ...) {
     char temp_str[256];
     char* sub_pt;
     va_list ap;
+    int i;
     LOG_TRACE("(%d)", pStr_index);
-    NOT_IMPLEMENTED();
+
+    va_start(ap, pStr_index);
+
+    strcpy(the_str, gError_messages[pStr_index - 1]);
+    sub_pt = temp_str;
+
+    for (i = 0; i < strlen(the_str); i++) {
+        if (the_str[i] == '%') {
+            sub_str = va_arg(ap, char*);
+            StripCR(sub_str);
+            strcpy(sub_pt, sub_str);
+            sub_pt += strlen(sub_str);
+        } else {
+            *sub_pt = the_str[i];
+            sub_pt++;
+        }
+    }
+    *sub_pt = 0;
+    va_end(ap);
+    PDNonFatalError(temp_str);
 }
 
 // IDA: void __cdecl CloseDiagnostics()
@@ -191,6 +215,7 @@ void OpenDiagnostics() {
 // Renamed from dprintf to avoid collisions to stdio
 void dr_dprintf(char* fmt_string, ...) {
     va_list args;
+
     printf("dprintf: ");
     va_start(args, fmt_string);
     vprintf(fmt_string, args);
@@ -201,6 +226,7 @@ void dr_dprintf(char* fmt_string, ...) {
 // IDA: int __usercall DoErrorInterface@<EAX>(int pMisc_text_index@<EAX>)
 int DoErrorInterface(int pMisc_text_index) {
     LOG_TRACE("(%d)", pMisc_text_index);
+
     NetFullScreenMessage(pMisc_text_index, 0);
     return 0;
 }

@@ -563,30 +563,35 @@ void SetFlicSound(int pSound_ID, tU32 pSound_time) {
 
 // IDA: int __cdecl TranslationMode()
 int TranslationMode() {
+
     return gTranslation_count;
 }
 
 // IDA: void __cdecl DontLetFlicFuckWithPalettes()
 void DontLetFlicFuckWithPalettes() {
     LOG_TRACE8("()");
+
     gPalette_fuck_prevention = 1;
 }
 
 // IDA: void __cdecl LetFlicFuckWithPalettes()
 void LetFlicFuckWithPalettes() {
     LOG_TRACE8("()");
+
     gPalette_fuck_prevention = 0;
 }
 
 // IDA: void __cdecl PlayFlicsInDarkness()
 void PlayFlicsInDarkness() {
     LOG_TRACE("()");
+
     gDark_mode = 1;
 }
 
 // IDA: void __cdecl ReilluminateFlics()
 void ReilluminateFlics() {
     LOG_TRACE("()");
+
     gDark_mode = 0;
     FadePaletteUp();
 }
@@ -594,6 +599,7 @@ void ReilluminateFlics() {
 // IDA: void __cdecl TurnFlicTransparencyOn()
 void TurnFlicTransparencyOn() {
     LOG_TRACE8("()");
+
     gTransparency_on = 1;
 }
 
@@ -638,6 +644,7 @@ int GetPanelFlicFrameIndex(int pIndex) {
 // IDA: void __cdecl FlicPaletteAllocate()
 void FlicPaletteAllocate() {
     LOG_TRACE("()");
+
     gPalette_pixels = BrMemAllocate(0x400u, kMem_flic_pal);
     gPalette = DRPixelmapAllocate(BR_PMT_RGBX_888, 1, 256, gPalette_pixels, 0);
 }
@@ -747,20 +754,28 @@ int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU3
 // IDA: void __cdecl FreeFlicPaletteAllocate()
 void FreeFlicPaletteAllocate() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gPalette_allocate_count == 0) {
+        FatalError(41);
+    }
+    gPalette_allocate_count--;
+    if (gPalette_allocate_count == 0) {
+        BrMemFree(gPalette_pixels);
+        BrPixelmapFree(gPalette);
+    }
 }
 
 // IDA: int __usercall EndFlic@<EAX>(tFlic_descriptor_ptr pFlic_info@<EAX>)
 int EndFlic(tFlic_descriptor_ptr pFlic_info) {
     LOG_TRACE("(%p)", pFlic_info);
 
-    if (pFlic_info->f) {
+    if (pFlic_info->f != NULL) {
         BrMemFree(pFlic_info->data_start);
         pFlic_info->data_start = NULL;
         fclose(pFlic_info->f);
         pFlic_info->f = NULL;
     }
-    if (pFlic_info->data) {
+    if (pFlic_info->data != NULL) {
         pFlic_info->data = NULL;
     }
     return 0;
@@ -850,12 +865,13 @@ void DoColour256(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int packet_count;
     int skip_count;
     int change_count;
-    int current_colour = 0;
+    int current_colour;
     tU8* palette_pixels;
     tU8 red;
     tU8 green;
     tU8 blue;
 
+    current_colour = 0;
     palette_pixels = gPalette_pixels;
 
     packet_count = MemReadU16(&pFlic_info->data);
@@ -1748,6 +1764,7 @@ void ChangePanelFlic(int pIndex, tU8* pData, tU32 pData_length) {
 // IDA: br_pixelmap* __usercall GetPanelPixelmap@<EAX>(int pIndex@<EAX>)
 br_pixelmap* GetPanelPixelmap(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
+
     return gPanel_buffer[pIndex];
 }
 
@@ -1769,12 +1786,21 @@ void LoadInterfaceStrings() {
 // IDA: void __cdecl FlushInterfaceFonts()
 void FlushInterfaceFonts() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DisposeFont(19);
+    DisposeFont(18);
+    DisposeFont(20);
+    DisposeFont(17);
+    DisposeFont(15);
+    DisposeFont(14);
+    DisposeFont(16);
+    DisposeFont(13);
 }
 
 // IDA: void __cdecl SuspendPendingFlic()
 void SuspendPendingFlic() {
     LOG_TRACE("()");
+
     gPending_pending_flic = gPending_flic;
     gPending_flic = -1;
 }
@@ -1782,5 +1808,6 @@ void SuspendPendingFlic() {
 // IDA: void __cdecl ResumePendingFlic()
 void ResumePendingFlic() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gPending_flic = gPending_pending_flic;
 }

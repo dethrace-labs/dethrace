@@ -147,6 +147,18 @@ void PDDisplayGoreworthiness(int pGory);
 
 void PDEnterDebugger(char* pStr);
 
+// Added function
+br_material* PDMissingMaterial(char* name);
+
+// Added function
+br_pixelmap* PDMissingTable(char* name);
+
+// Added function
+br_model* PDMissingModel(char* name);
+
+// Added function
+br_pixelmap* PDMissingMap(char* name);
+
 void PDEndItAllAndReRunTheBastard();
 
 //int matherr(struct exception_* err);

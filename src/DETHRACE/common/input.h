@@ -4,6 +4,13 @@
 #include "brender/br_types.h"
 #include "dr_types.h"
 
+// Variable leading zero
+#ifdef DETHRACE_FIX_BUGS
+#define VARLZEROINT "%0*d"
+#else
+#define VARLZEROINT "%0.*d"
+#endif
+
 extern int gEdge_trigger_mode;
 extern tU32 gLast_poll_keys;
 extern int gInsert_mode;

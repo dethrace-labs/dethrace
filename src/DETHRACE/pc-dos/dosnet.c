@@ -348,8 +348,30 @@ tPlayer_ID PDNetExtractPlayerID(tNet_game_details* pDetails) {
 
 // IDA: void __usercall PDNetObtainSystemUserName(char *pName@<EAX>, int pMax_length@<EDX>)
 void PDNetObtainSystemUserName(char* pName, int pMax_length) {
+#ifdef _WIN32
+    int size;
+    char buffer[16];
+    BOOL result;
+#endif
+
     dr_dprintf("PDNetObtainSystemUserName()\n");
+#ifdef _WIN32
+    size = COUNT_OF(buffer);
+    result = GetComputerNameA(buffer, &size);
+    if (result && size != 0) {
+        strncpy(pName, buffer, pMax_length - 1);
+        pName[pMax_length - 1] = '\0';
+    }
+    while (1) {
+        pName = strpbrk(pName, "_=(){}[]<>!$%^&*/:@~;'#,?\\|`\"");
+        if (*pName == '\0') {
+            break;
+        }
+        *pName = '-';
+    }
+#else
     strcpy(pName, "Ron Turn");
+#endif
 }
 
 // IDA: int __usercall PDNetSendMessageToPlayer@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>, tPlayer_ID pPlayer@<EBX>)

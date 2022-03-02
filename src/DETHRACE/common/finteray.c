@@ -373,12 +373,12 @@ void FindFace(br_vector3* pPosition, br_vector3* pDir, br_vector3* nor, br_scala
     int group;
     LOG_TRACE("(%p, %p, %p, %p, %p)", pPosition, pDir, nor, t, material);
 
-    gNearest_T = 100.0;
+    gNearest_T = 100.0f;
     DRSceneRayPick2D(gTrack_actor, pPosition, pDir, FindHighestCallBack__finteray);
     *t = gNearest_T;
-    if (*t < 100.0) {
+    if (*t < 100.0f) {
         group = gNearest_face_group;
-        nor->v[0] = V11MODEL(gNearest_model)->groups[gNearest_face_group].faces[gNearest_face].eqn.v[0];
+        nor->v[0] = V11MODEL(gNearest_model)->groups[group].faces[gNearest_face].eqn.v[0];
         nor->v[1] = V11MODEL(gNearest_model)->groups[group].faces[gNearest_face].eqn.v[1];
         nor->v[2] = V11MODEL(gNearest_model)->groups[group].faces[gNearest_face].eqn.v[2];
         *material = V11MODEL(gNearest_model)->groups[group].face_colours_material;

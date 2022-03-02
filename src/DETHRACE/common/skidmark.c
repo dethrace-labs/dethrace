@@ -32,21 +32,21 @@ void StretchMark(tSkid* pMark, br_vector3* pFrom, br_vector3* pTo, br_scalar pTe
     rows[2].v[2] = pMark->normal.v[1] * temp.v[0] - pMark->normal.v[0] * temp.v[1];
 
     if (len > BR_SCALAR_EPSILON) {
-        rows[2].v[0] = 0.050000001 / len * rows[2].v[0];
-        rows[2].v[1] = 0.050000001 / len * rows[2].v[1];
-        rows[2].v[2] = 0.050000001 / len * rows[2].v[2];
+        rows[2].v[0] = 0.05f / len * rows[2].v[0];
+        rows[2].v[1] = 0.05f / len * rows[2].v[1];
+        rows[2].v[2] = 0.05f / len * rows[2].v[2];
         rows->v[0] = len / len * temp.v[0];
         rows->v[1] = len / len * temp.v[1];
         rows->v[2] = len / len * temp.v[2];
         BrVector3Add(&temp, pTo, pFrom);
-        BrVector3Scale(&pMark->pos, &temp, 0.5);
+        BrVector3Scale(&pMark->pos, &temp, 0.5f);
         rows[3] = pMark->pos;
         model = pMark->actor->model;
-        model->vertices[1].map.v[0] = pTexture_start / 0.050000001;
+        model->vertices[1].map.v[0] = pTexture_start / 0.05f;
         model->vertices[0].map.v[0] = model->vertices[1].map.v[0];
-        model->vertices[3].map.v[0] = (pTexture_start + len) / 0.050000001;
+        model->vertices[3].map.v[0] = (pTexture_start + len) / 0.05f;
         model->vertices[2].map.v[0] = model->vertices[3].map.v[0];
-        BrModelUpdate(model, 0x7FFFu);
+        BrModelUpdate(model, BR_MODU_ALL);
     }
 }
 
@@ -64,7 +64,13 @@ br_material* MaterialFromIndex(int pIndex) {
 // IDA: void __usercall AdjustSkid(int pSkid_num@<EAX>, br_matrix34 *pMatrix@<EDX>, int pMaterial_index@<EBX>)
 void AdjustSkid(int pSkid_num, br_matrix34* pMatrix, int pMaterial_index) {
     LOG_TRACE("(%d, %p, %d)", pSkid_num, pMatrix, pMaterial_index);
-    NOT_IMPLEMENTED();
+
+    gSkids[pSkid_num].actor->t.t.mat = *pMatrix;
+    gSkids[pSkid_num].pos.v[0] = pMatrix->m[3][0];
+    gSkids[pSkid_num].pos.v[1] = pMatrix->m[3][1];
+    gSkids[pSkid_num].pos.v[2] = pMatrix->m[3][2];
+    gSkids[pSkid_num].actor->material = MaterialFromIndex(pMaterial_index);
+    gSkids[pSkid_num].actor->render_data = BR_RSTYLE_DEFAULT;
 }
 
 // IDA: int __usercall FarFromLine2D@<EAX>(br_vector3 *pPt@<EAX>, br_vector3 *pL1@<EDX>, br_vector3 *pL2@<EBX>)
@@ -80,7 +86,7 @@ int FarFromLine2D(br_vector3* pPt, br_vector3* pL1, br_vector3* pL2) {
     to_pt.v[0] = pPt->v[0] - pL2->v[0];
     to_pt.v[1] = pPt->v[2] - pL2->v[2];
     cross = -line.v[0] * to_pt.v[1] + to_pt.v[0] * line.v[1];
-    line_len = sqrt(line.v[0] * line.v[0] + line.v[1] * line.v[1]);
+    line_len = sqrtf(line.v[0] * line.v[0] + line.v[1] * line.v[1]);
     return fabs(cross) > line_len * 0.050000001;
 }
 
@@ -194,7 +200,7 @@ void HideSkids() {
 br_scalar SkidLen(int pSkid) {
     LOG_TRACE("(%d)", pSkid);
 
-    return sqrt(
+    return sqrtf(
         gSkids[pSkid].actor->t.t.mat.m[0][2] * gSkids[pSkid].actor->t.t.mat.m[0][2]
         + gSkids[pSkid].actor->t.t.mat.m[0][1] * gSkids[pSkid].actor->t.t.mat.m[0][1]
         + gSkids[pSkid].actor->t.t.mat.m[0][0] * gSkids[pSkid].actor->t.t.mat.m[0][0]);
@@ -271,9 +277,9 @@ void SkidMark(tCar_spec* pCar, int pWheel_num) {
 
     if (((1 << pWheel_num) & pCar->new_skidding) != 0 || ((1 << pWheel_num) & pCar->old_skidding) != 0) {
         if ((pWheel_num & 1) != 0) {
-            pos.v[0] = pCar->bounds[1].max.v[0] - 0.1725;
+            pos.v[0] = pCar->bounds[1].max.v[0] - 0.1725f;
         } else {
-            pos.v[0] = pCar->bounds[1].min.v[0] + 0.1725;
+            pos.v[0] = pCar->bounds[1].min.v[0] + 0.1725f;
         }
         pos.v[1] = pCar->wpos[pWheel_num].v[1] - pCar->oldd[pWheel_num];
         pos.v[2] = pCar->wpos[pWheel_num].v[2];
@@ -293,22 +299,22 @@ void SkidMark(tCar_spec* pCar, int pWheel_num) {
             if (((1 << pWheel_num) & pCar->old_skidding) != 0) {
                 BrVector3Sub(&disp, &world_pos, &pCar->prev_skid_pos[pWheel_num]);
                 dist2 = BrVector3Length(&disp);
-                if (dist2 < 0.050000001) {
+                if (dist2 < 0.05f) {
                     return;
                 }
                 SkidSection(pCar, pWheel_num, &world_pos, material_index);
                 pCar->total_length[pWheel_num] = pCar->total_length[pWheel_num] + dist2;
                 pCar->oil_remaining[pWheel_num] = pCar->oil_remaining[pWheel_num] - dist2;
-                if (pCar->oil_remaining[pWheel_num] < 0.0) {
-                    pCar->oil_remaining[pWheel_num] = 0.0;
+                if (pCar->oil_remaining[pWheel_num] < 0.0f) {
+                    pCar->oil_remaining[pWheel_num] = 0.0f;
                 }
                 pCar->blood_remaining[pWheel_num] = pCar->blood_remaining[pWheel_num] - dist2;
-                if (pCar->blood_remaining[pWheel_num] < 0.0) {
-                    pCar->blood_remaining[pWheel_num] = 0.0;
+                if (pCar->blood_remaining[pWheel_num] < 0.0f) {
+                    pCar->blood_remaining[pWheel_num] = 0.0f;
                 }
             } else {
                 pCar->old_skidding |= 1 << pWheel_num;
-                pCar->total_length[pWheel_num] = 0.0;
+                pCar->total_length[pWheel_num] = 0.0f;
                 pCar->old_skid[pWheel_num] = -1;
             }
         } else {
@@ -327,8 +333,8 @@ void InitCarSkidStuff(tCar_spec* pCar) {
     pCar->old_skidding = 0;
     for (wheel = 0; wheel < 4; wheel++) {
         pCar->special_start[wheel].v[0] = FLT_MAX;
-        pCar->blood_remaining[wheel] = 0.0;
-        pCar->oil_remaining[wheel] = 0.0;
+        pCar->blood_remaining[wheel] = 0.0f;
+        pCar->oil_remaining[wheel] = 0.0f;
     }
 }
 

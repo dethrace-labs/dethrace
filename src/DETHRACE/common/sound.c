@@ -96,7 +96,9 @@ tS3_sound_tag DRS3StartSound2(tS3_outlet_ptr pOutlet, tS3_sound_id pSound, tS3_r
 // IDA: int __usercall DRS3ChangeVolume@<EAX>(tS3_sound_tag pSound_tag@<EAX>, tS3_volume pNew_volume@<EDX>)
 int DRS3ChangeVolume(tS3_sound_tag pSound_tag, tS3_volume pNew_volume) {
     LOG_TRACE("(%d, %d)", pSound_tag, pNew_volume);
-    NOT_IMPLEMENTED();
+
+    STUB_ONCE();
+    return 0;
 }
 
 // IDA: int __usercall DRS3ChangeLRVolume@<EAX>(tS3_sound_tag pSound_tag@<EAX>, tS3_volume pNew_Lvolume@<EDX>, tS3_volume pNew_Rvolume@<EBX>)
@@ -137,18 +139,21 @@ int DRS3StopSound(tS3_sound_tag pSound_tag) {
 // IDA: int __usercall DRS3LoadSound@<EAX>(tS3_sound_id pThe_sound@<EAX>)
 int DRS3LoadSound(tS3_sound_id pThe_sound) {
     LOG_TRACE("(%d)", pThe_sound);
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: int __usercall DRS3ReleaseSound@<EAX>(tS3_sound_id pThe_sound@<EAX>)
 int DRS3ReleaseSound(tS3_sound_id pThe_sound) {
     LOG_TRACE("(%d)", pThe_sound);
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __cdecl DRS3Service()
 void DRS3Service() {
     LOG_TRACE("()");
+
     NOT_IMPLEMENTED();
 }
 
@@ -161,7 +166,9 @@ int DRS3OutletSoundsPlaying(tS3_outlet_ptr pOutlet) {
 // IDA: int __usercall DRS3SoundStillPlaying@<EAX>(tS3_sound_tag pSound_tag@<EAX>)
 int DRS3SoundStillPlaying(tS3_sound_tag pSound_tag) {
     LOG_TRACE("(%d)", pSound_tag);
-    NOT_IMPLEMENTED();
+
+    STUB_ONCE();
+    return 1;
 }
 
 // IDA: void __cdecl DRS3ShutDown()
@@ -235,7 +242,9 @@ void DisposeSoundSources() {
 tS3_sound_tag DRS3StartSound3D(tS3_outlet_ptr pOutlet, tS3_sound_id pSound, br_vector3* pInitial_position, br_vector3* pInitial_velocity, tS3_repeats pRepeats, tS3_volume pVolume, tS3_pitch pPitch, tS3_speed pSpeed) {
     tS3_sound_tag tag;
     LOG_TRACE("(%d, %d, %p, %p, %d, %d, %d, %d)", pOutlet, pSound, pInitial_position, pInitial_velocity, pRepeats, pVolume, pPitch, pSpeed);
-    NOT_IMPLEMENTED();
+
+    STUB_ONCE();
+    return 0;
 }
 
 // IDA: tS3_sound_tag __usercall DRS3StartSoundFromSource3@<EAX>(tS3_sound_source_ptr pSource@<EAX>, tS3_sound_id pSound@<EDX>, tS3_repeats pRepeats@<EBX>, tS3_volume pVolume@<ECX>, tS3_pitch pPitch, tS3_speed pSpeed)

@@ -74,12 +74,12 @@ void AllocateCamera() {
 
     for (i = 0; i < 2; i++) {
         gCamera_list[i] = BrActorAllocate(BR_ACTOR_CAMERA, NULL);
-        if (!gCamera_list[i]) {
+        if (gCamera_list[i] == NULL) {
             FatalError(5);
         }
 
         camera_ptr = gCamera_list[i]->type_data;
-        camera_ptr->type = 1;
+        camera_ptr->type = BR_CAMERA_PERSPECTIVE_FOV;
         camera_ptr->field_of_view = BR_ANGLE_DEG(gCamera_angle);
         camera_ptr->hither_z = gCamera_hither;
         camera_ptr->yon_z = gCamera_yon;
@@ -87,28 +87,28 @@ void AllocateCamera() {
     }
 
     gCamera_list[0] = BrActorAdd(gSelf, gCamera_list[0]);
-    if (!gCamera_list[0]) {
+    if (gCamera_list[0] == NULL) {
         FatalError(5);
     }
     gCamera_list[1] = BrActorAdd(gUniverse_actor, gCamera_list[1]);
-    if (!gCamera_list[1]) {
+    if (gCamera_list[1] == NULL) {
         FatalError(5);
     }
     gCamera = gCamera_list[0];
     gRearview_camera = BrActorAllocate(BR_ACTOR_CAMERA, NULL);
-    if (!gRearview_camera) {
+    if (gRearview_camera == NULL) {
         FatalError(5);
     }
 
     gRearview_camera->t.t.mat.m[2][2] = -1.0f;
     camera_ptr = (br_camera*)gRearview_camera->type_data;
     camera_ptr->hither_z = gCamera_hither;
-    camera_ptr->type = 1;
+    camera_ptr->type = BR_CAMERA_PERSPECTIVE_FOV;
     camera_ptr->yon_z = gCamera_yon;
     camera_ptr->field_of_view = BR_ANGLE_DEG(gCamera_angle);
     camera_ptr->aspect = (double)gWidth / (double)gHeight;
     gRearview_camera = BrActorAdd(gSelf, gRearview_camera);
-    if (!gRearview_camera) {
+    if (gRearview_camera == NULL) {
         FatalError(5);
     }
     SetSightDistance(camera_ptr->yon_z);

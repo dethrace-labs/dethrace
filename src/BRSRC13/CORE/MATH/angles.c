@@ -1,4 +1,7 @@
 #include "angles.h"
+#include "CORE/MATH/matrix34.h"
+#include "CORE/MATH/matrix4.h"
+#include "CORE/MATH/quat.h"
 #include "harness/trace.h"
 
 order_info OrderAxes[32];
@@ -40,14 +43,18 @@ br_euler* BrMatrix34ToEuler(br_euler* euler, br_matrix34* mat) {
 br_matrix4* BrEulerToMatrix4(br_matrix4* mat, br_euler* euler) {
     br_matrix34 tmp;
     LOG_TRACE("(%p, %p)", mat, euler);
-    NOT_IMPLEMENTED();
+
+    BrEulerToMatrix34(&tmp, euler);
+    BrMatrix4Copy34(mat, &tmp);
 }
 
 // IDA: br_euler* __cdecl BrMatrix4ToEuler(br_euler *dest, br_matrix4 *mat)
 br_euler* BrMatrix4ToEuler(br_euler* dest, br_matrix4* mat) {
     br_matrix34 tmp;
     LOG_TRACE("(%p, %p)", dest, mat);
-    NOT_IMPLEMENTED();
+
+    BrMatrix34Copy4(&tmp, mat);
+    return BrMatrix34ToEuler(dest, &tmp);
 }
 
 // IDA: br_quat* __cdecl BrEulerToQuat(br_quat *q, br_euler *euler)
@@ -77,5 +84,7 @@ br_quat* BrEulerToQuat(br_quat* q, br_euler* euler) {
 br_euler* BrQuatToEuler(br_euler* euler, br_quat* q) {
     br_matrix34 mat;
     LOG_TRACE("(%p, %p)", euler, q);
-    NOT_IMPLEMENTED();
+
+    BrQuatToMatrix34(&mat, q);
+    return BrMatrix34ToEuler(euler, &mat);
 }

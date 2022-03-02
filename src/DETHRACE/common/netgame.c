@@ -1,12 +1,16 @@
 #include "netgame.h"
+#include "displays.h"
 #include "globvars.h"
 #include "globvrpb.h"
 #include "harness/trace.h"
 #include "network.h"
 #include "opponent.h"
+#include "powerup.h"
+#include "utility.h"
 #include <stdlib.h>
+#include <string.h>
 
-int gPowerup_cost[4];
+int gPowerup_cost[4] = {1500, 2500, 4000, 6000};
 int gGame_scores[6];
 int gPed_target;
 int gNot_shown_race_type_headup;
@@ -137,19 +141,33 @@ void RepositionPlayer(int pIndex) {
 // IDA: void __usercall DisableCar(tCar_spec *pCar@<EAX>)
 void DisableCar(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    if (pCar->driver_name[0] != '\0') {
+        if (!pCar->disabled) {
+            pCar->disabled = 1;
+            ForceRebuildActiveCarList();
+        }
+        if (pCar->car_master_actor->t.t.mat.m[3][0] < 500.0f) {
+            pCar->car_master_actor->t.t.mat.m[3][0] = pCar->car_master_actor->t.t.mat.m[3][0] + 1000.0f;
+            pCar->car_master_actor->t.t.mat.m[3][1] = pCar->car_master_actor->t.t.mat.m[3][1] + 1000.0f;
+            pCar->car_master_actor->t.t.mat.m[3][2] = pCar->car_master_actor->t.t.mat.m[3][2] + 1000.0f;
+            pCar->old_frame_mat.m[3][0] = pCar->car_master_actor->t.t.mat.m[3][0];
+            pCar->old_frame_mat.m[3][1] = pCar->car_master_actor->t.t.mat.m[3][1];
+            pCar->old_frame_mat.m[3][2] = pCar->car_master_actor->t.t.mat.m[3][2];
+        }
+    }
 }
 
 // IDA: void __usercall EnableCar(tCar_spec *pCar@<EAX>)
 void EnableCar(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
 
-    if (pCar->driver_name[0]) {
+    if (pCar->driver_name[0] != '\0') {
         if (pCar->disabled) {
             pCar->disabled = 0;
             ForceRebuildActiveCarList();
         }
-        if (pCar->car_master_actor->t.t.mat.m[3][0] > 500.0) {
+        if (pCar->car_master_actor->t.t.mat.m[3][0] > 500.0f) {
             pCar->car_master_actor->t.t.mat.m[3][0] = pCar->car_master_actor->t.t.mat.m[3][0] - 1000.0f;
             pCar->car_master_actor->t.t.mat.m[3][1] = pCar->car_master_actor->t.t.mat.m[3][1] - 1000.0f;
             pCar->car_master_actor->t.t.mat.m[3][2] = pCar->car_master_actor->t.t.mat.m[3][2] - 1000.0f;
@@ -333,25 +351,49 @@ void BuyPSPowerup(int pIndex) {
     char s[256];
     char s2[256];
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+
+    if (gNet_mode == eNet_mode_none) {
+        NewTextHeadupSlot(4, 0, 3000, -4, GetMiscString(178));
+    } else if (gProgram_state.current_car.power_up_levels[pIndex] < 4) {
+        if (gNet_mode == eNet_mode_none || gPowerup_cost[gProgram_state.current_car.power_up_levels[pIndex]] <= (gProgram_state.credits_earned - gProgram_state.credits_lost)) {
+            SpendCredits(gPowerup_cost[gProgram_state.current_car.power_up_levels[pIndex]]);
+            ImprovePSPowerup(&gProgram_state.current_car, pIndex);
+        } else {
+            strcpy(s, GetMiscString(179));
+            sprintf(s2, "%d", gPowerup_cost[gProgram_state.current_car.power_up_levels[pIndex]]);
+            SubsStringJob(s, s2);
+            NewTextHeadupSlot(4, 0, 3008, -4, s);
+        }
+    } else {
+        NewTextHeadupSlot(4, 0, 3000, -4, GetMiscString(174));
+    }
 }
 
 // IDA: void __cdecl BuyArmour()
 void BuyArmour() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    BuyPSPowerup(0);
 }
 
 // IDA: void __cdecl BuyPower()
 void BuyPower() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_foxy && gThis_net_player_index == gIt_or_fox) {
+        NewTextHeadupSlot(4, 0, 1000,-4, GetMiscString(214));
+    } else if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_tag && gThis_net_player_index != gIt_or_fox) {
+        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(215));
+    } else {
+        BuyPSPowerup(1);
+    }
 }
 
 // IDA: void __cdecl BuyOffense()
 void BuyOffense() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    BuyPSPowerup(2);
 }
 
 // IDA: void __usercall UseGeneralScore(int pScore@<EAX>)
