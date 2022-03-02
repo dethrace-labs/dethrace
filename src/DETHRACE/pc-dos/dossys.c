@@ -307,8 +307,15 @@ void PDInitialiseSystem() {
 
 // IDA: void __cdecl PDShutdownSystem()
 void PDShutdownSystem() {
+    static int been_here = 0;  // Added by dethrace
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (!been_here) {
+        Harness_Hook_PDShutdownSystem();
+    } else {
+        LOG_WARN("recursion detected => force exit");
+        exit(8);
+    }
 }
 
 // IDA: void __cdecl PDSaveOriginalPalette()
@@ -320,7 +327,6 @@ void PDSaveOriginalPalette() {
 // IDA: void __cdecl PDRevertPalette()
 void PDRevertPalette() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
 }
 
 // IDA: int __usercall PDInitScreenVars@<EAX>(int pArgc@<EAX>, char **pArgv@<EDX>)

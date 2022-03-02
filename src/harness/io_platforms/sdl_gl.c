@@ -14,6 +14,8 @@
 #include "grafdata.h"
 #include "pd/sys.h"
 
+#include "sdl_network.h"
+
 #define ARRAY_LEN(array) (sizeof((array)) / sizeof((array)[0]))
 
 int scancode_map[123];
@@ -136,8 +138,14 @@ struct {
     float y;
 } sdl_window_scale;
 
+static void SDLPlatform_Shutdown(void) {
+
+    SDL_Quit();
+}
+
 tRenderer gl_renderer = {
     GLRenderer_Init,
+    SDLPlatform_Shutdown,
     GLRenderer_BeginScene,
     GLRenderer_EndScene,
     GLRenderer_SetPalette,
@@ -151,7 +159,21 @@ tRenderer gl_renderer = {
     GLRenderer_GetRenderSize,
     GLRenderer_GetWindowSize,
     GLRenderer_SetWindowSize,
-    GLRenderer_GetViewport
+    GLRenderer_GetViewport,
+
+    SDLNetwork_Init,
+    SDLNetwork_Shutdown,
+    SDLNetwork_StartProducingJoinList,
+    SDLNetwork_NetEndJoinList,
+    SDLNetwork_NetGetNextJoinGame,
+    SDLNetwork_NetSendMessageToAddress,
+    SDLNetwork_FormatAddress,
+    SDLNetwork_BroadcastMessage,
+    SDLNetwork_ReceiveHostResponses,
+    SDLNetwork_PDNetGetNextMessage,
+    SDLNetwork_PDNetHostGame,
+    SDLNetwork_PDNetExtractPlayerID,
+    SDLNetwork_NetSendto,
 };
 
 tRenderer* Window_Create(char* title, int width, int height, int pRender_width, int pRender_height) {

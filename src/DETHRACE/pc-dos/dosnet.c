@@ -1,23 +1,32 @@
 #include "pd/net.h"
 
 #include "errors.h"
+#include "globvrpb.h"
+#include "network.h"
+#include "harness/hooks.h"
 #include "harness/trace.h"
+#include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 
 tU32 gNetwork_init_flags;
-tPD_net_game_info* gJoinable_games;
-int gMatts_PC;
+#if 0
+tPD_net_game_info* gJoinable_games;             // Moved to platform code + type is platform dependent
+int gMatts_PC;                                  // Matt's pc was identified by its IPX address, which is no longer applicable
 tU16 gSocket_number_pd_format;
 _IPX_ELEMENT gListen_elements[16];
 char gLocal_ipx_addr_string[32];
 _IPX_ELEMENT gSend_elements[16];
 _IPX_LOCAL_TARGET gLocal_addr_ipx;
+#endif
 char gReceive_buffer[512];
 tPD_net_player_info gRemote_net_player_info;
+#if 0
 _IPX_LOCAL_TARGET gBroadcast_addr_ipx;
 tPD_net_player_info gLocal_net_player_info;
+#endif
 char gSend_buffer[512];
+#if 0
 tIPX_netnum gNetworks[16];
 _IPX_LOCAL_TARGET gRemote_addr_ipx;
 tU8* gSend_packet;
@@ -26,15 +35,18 @@ tU8* gSend_packet_ptr;
 W32 gSend_segment;
 tU8* gListen_packet;
 tU8* gListen_packet_ptr;
+#endif
 size_t gMsg_header_strlen;
 int gNumber_of_networks;
 int gNumber_of_hosts;
+#if 0
 tRM_info RMI;
 _IPX_HEADER gLast_received_IPX_header;
 tU16 gSocket_number_network_order;
 USHORT gECB_offset;
 tU16 gListen_selector;
 tU16 gSend_selector;
+#endif
 
 // IDA: void __cdecl ClearupPDNetworkStuff()
 void ClearupPDNetworkStuff() {
@@ -85,7 +97,20 @@ int GetMessageTypeFromMessage(char* pMessage_str) {
     char* real_msg;
     int msg_type_int;
     LOG_TRACE("(\"%s\")", pMessage_str);
-    NOT_IMPLEMENTED();
+
+    real_msg = pMessage_str + 4;
+    msg_type_int = 0;
+
+    // FIXME: "CW95MSG" value is used in and depends on platform
+    if (strncmp(real_msg, "CW95MSG", gMsg_header_strlen) == 0) {
+        if (isdigit(real_msg[gMsg_header_strlen])) {
+            msg_type_int = real_msg[gMsg_header_strlen] - '0';
+        }
+        if (msg_type_int != 0 && msg_type_int < 3) {
+            return msg_type_int;
+        }
+    }
+    return 999;
 }
 
 // IDA: int __usercall SameEthernetAddress@<EAX>(_IPX_LOCAL_TARGET *pAddr_ipx1@<EAX>, _IPX_LOCAL_TARGET *pAddr_ipx2@<EDX>)
@@ -103,26 +128,37 @@ _IPX_LOCAL_TARGET* GetIPXAddrFromPlayerID(tPlayer_ID pPlayer_id) {
 // IDA: void __usercall MakeMessageToSend(int pMessage_type@<EAX>)
 void MakeMessageToSend(int pMessage_type) {
     LOG_TRACE("(%d)", pMessage_type);
-    NOT_IMPLEMENTED();
+
+#ifdef DETHRACE_FIX_BUGS
+    sprintf(gSend_buffer, "XXXX%s%1d", MESSAGE_HEADER_STR, pMessage_type);
+#else
+    sprintf(gSend_buffer, "XXXX%s%0.1d", MESSAGE_HEADER_STR, pMessage_type);
+#endif
 }
 
 // IDA: int __cdecl ReceiveHostResponses()
 int ReceiveHostResponses() {
+#if 0
     char str[256];
     int i;
     int already_registered;
+#endif
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    
+    return Harness_Hook_NetReceiveHostResponses();
 }
 
 // IDA: int __cdecl BroadcastMessage()
 int BroadcastMessage() {
+#if 0
     int i;
     int errors;
     char broadcast_addr_string[32];
     char* real_msg;
+#endif
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    
+    return Harness_Hook_NetBroadcastMessage();
 }
 
 // IDA: BOOL __usercall hmiIPXCloseSocket@<EAX>(W32 wSocket@<EAX>)
@@ -263,6 +299,7 @@ void GetIPXToStickItsEarToTheGround() {
 
 // IDA: int __cdecl PDNetInitialise()
 int PDNetInitialise() {
+#if 0
     tU32 timenow;
     char profile_string[32];
     char key_name[32];
@@ -271,67 +308,86 @@ int PDNetInitialise() {
     tU32 netnum;
     char str[256];
     int mess_num;
+#endif
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    dr_dprintf("PDNetInitialise()");
+    return Harness_Hook_PDNetInitialise();
 }
 
 // IDA: int __cdecl PDNetShutdown()
 int PDNetShutdown() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    dr_dprintf("PDNetShutdown()");
+    return Harness_Hook_PDNetShutdown();
 }
 
 // IDA: void __cdecl PDNetStartProducingJoinList()
 void PDNetStartProducingJoinList() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    dr_dprintf("PDNetStartProducingJoinList()");
+    Harness_Hook_PDNetStartProducingJoinList();
 }
 
 // IDA: void __cdecl PDNetEndJoinList()
 void PDNetEndJoinList() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    Harness_Hook_PDNetEndJoinList();
 }
 
 // IDA: int __usercall PDNetGetNextJoinGame@<EAX>(tNet_game_details *pGame@<EAX>, int pIndex@<EDX>)
 int PDNetGetNextJoinGame(tNet_game_details* pGame, int pIndex) {
+#if 0
     static tU32 next_broadcast_time;
     int i;
     int j;
     int number_of_hosts_has_changed;
     char str[256];
-    LOG_TRACE("(%p, %d)", pGame, pIndex);
-    NOT_IMPLEMENTED();
+#endif
+    LOG_TRACE9("(%p, %d)", pGame, pIndex);
+
+    dr_dprintf("PDNetGetNextJoinGame(): pIndex is %d", pIndex);
+    return Harness_Hook_PDNetGetNextJoinGame(pGame, pIndex);
 }
 
 // IDA: void __usercall PDNetDisposeGameDetails(tNet_game_details *pDetails@<EAX>)
 void PDNetDisposeGameDetails(tNet_game_details* pDetails) {
     LOG_TRACE("(%p)", pDetails);
-    NOT_IMPLEMENTED();
+
+    dr_dprintf("PDNetDisposeGameDetails()");
 }
 
 // IDA: int __usercall PDNetHostGame@<EAX>(tNet_game_details *pDetails@<EAX>, char *pHost_name@<EDX>, void **pHost_address@<EBX>)
 int PDNetHostGame(tNet_game_details* pDetails, char* pHost_name, void** pHost_address) {
     LOG_TRACE("(%p, \"%s\", %p)", pDetails, pHost_name, pHost_address);
-    NOT_IMPLEMENTED();
+
+    dr_dprintf("PDNetHostGame()");
+    return Harness_Hook_PDNetHostGame(pDetails, pHost_name, pHost_address);
 }
 
 // IDA: int __usercall PDNetJoinGame@<EAX>(tNet_game_details *pDetails@<EAX>, char *pPlayer_name@<EDX>)
 int PDNetJoinGame(tNet_game_details* pDetails, char* pPlayer_name) {
     LOG_TRACE("(%p, \"%s\")", pDetails, pPlayer_name);
-    NOT_IMPLEMENTED();
+
+    // dr_dprintf("PDNetJoinGame()");
+    return 0;
 }
 
 // IDA: void __usercall PDNetLeaveGame(tNet_game_details *pDetails@<EAX>)
 void PDNetLeaveGame(tNet_game_details* pDetails) {
     LOG_TRACE("(%p)", pDetails);
-    NOT_IMPLEMENTED();
+    
+    // dr_dprintf("PDNetLeaveGame()");
 }
 
 // IDA: void __usercall PDNetHostFinishGame(tNet_game_details *pDetails@<EAX>)
 void PDNetHostFinishGame(tNet_game_details* pDetails) {
     LOG_TRACE("(%p)", pDetails);
-    NOT_IMPLEMENTED();
+
+    dr_dprintf("PDNetHostFinishGame()");
 }
 
 // IDA: tU32 __usercall PDNetExtractGameID@<EAX>(tNet_game_details *pDetails@<EAX>)
@@ -343,32 +399,30 @@ tU32 PDNetExtractGameID(tNet_game_details* pDetails) {
 // IDA: tPlayer_ID __usercall PDNetExtractPlayerID@<EAX>(tNet_game_details *pDetails@<EAX>)
 tPlayer_ID PDNetExtractPlayerID(tNet_game_details* pDetails) {
     LOG_TRACE("(%p)", pDetails);
-    NOT_IMPLEMENTED();
+
+    dr_dprintf("PDNetExtractPlayerID()");
+    return Harness_Hook_PDNetExtractPlayerID(pDetails);
 }
 
 // IDA: void __usercall PDNetObtainSystemUserName(char *pName@<EAX>, int pMax_length@<EDX>)
 void PDNetObtainSystemUserName(char* pName, int pMax_length) {
 #ifdef _WIN32
-    DWORD size;
+    int size;
     char buffer[16];
     BOOL result;
-
 #endif
 
     dr_dprintf("PDNetObtainSystemUserName()\n");
 #ifdef _WIN32
     size = COUNT_OF(buffer);
     result = GetComputerNameA(buffer, &size);
-    if (result == 0) {
-        LOG_WARN("GetComputerNameA failed with code=%u", GetLastError());
-        buffer[0] = '\0';
-        size = 0;
+    if (result && size != 0) {
+        strncpy(pName, buffer, pMax_length - 1);
+        pName[pMax_length - 1] = '\0';
     }
-    strncpy(pName, buffer, pMax_length - 1);
-    pName[pMax_length - 1] = '\0';
     while (1) {
         pName = strpbrk(pName, "_=(){}[]<>!$%^&*/:@~;'#,?\\|`\"");
-        if (pName == NULL || *pName == '\0') {
+        if (*pName == '\0') {
             break;
         }
         *pName = '-';
@@ -390,17 +444,33 @@ int PDNetSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage
 int PDNetSendMessageToAllPlayers(tNet_game_details* pDetails, tNet_message* pMessage) {
     char str[256];
     int i;
+    int r;  // Added by dethrace
     LOG_TRACE("(%p, %p)", pDetails, pMessage);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (i != gThis_net_player_index) {
+            r = Harness_Hook_NetSendto((char*)pMessage, pMessage->overall_size, gNet_players[i].pd_net_info.pd_addr);
+            if (r == -1) {
+                dr_dprintf("PDNetSendMessageToAllPlayers(): Error on sendto()");
+                NetDisposeMessage(pDetails, pMessage);
+                return 1;
+            }
+        }
+    }
+    NetDisposeMessage(pDetails, pMessage);
+    return 0;
 }
 
 // IDA: tNet_message* __usercall PDNetGetNextMessage@<EAX>(tNet_game_details *pDetails@<EAX>, void **pSender_address@<EDX>)
 tNet_message* PDNetGetNextMessage(tNet_game_details* pDetails, void** pSender_address) {
+#if 0
     char* receive_buffer;
     char str[256];
     int msg_type;
+#endif
     LOG_TRACE("(%p, %p)", pDetails, pSender_address);
-    NOT_IMPLEMENTED();
+
+    return Harness_Hook_PDNetGetNextMessage(pDetails, pSender_address);
 }
 
 // IDA: tNet_message* __usercall PDNetAllocateMessage@<EAX>(tU32 pSize@<EAX>, tS32 pSize_decider@<EDX>)
@@ -418,7 +488,9 @@ void PDNetDisposeMessage(tNet_game_details* pDetails, tNet_message* pMessage) {
 // IDA: void __usercall PDNetSetPlayerSystemInfo(tNet_game_player_info *pPlayer@<EAX>, void *pSender_address@<EDX>)
 void PDNetSetPlayerSystemInfo(tNet_game_player_info* pPlayer, void* pSender_address) {
     LOG_TRACE("(%p, %p)", pPlayer, pSender_address);
-    NOT_IMPLEMENTED();
+
+    dr_dprintf("PDNetSetPlayerSystemInfo()");
+    memcpy(&pPlayer->pd_net_info, pSender_address, sizeof(pPlayer->pd_net_info));
 }
 
 // IDA: void __usercall PDNetDisposePlayer(tNet_game_player_info *pPlayer@<EAX>)
@@ -431,7 +503,8 @@ void PDNetDisposePlayer(tNet_game_player_info* pPlayer) {
 int PDNetSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessage, void* pAddress) {
     char str[256];
     LOG_TRACE("(%p, %p, %p)", pDetails, pMessage, pAddress);
-    NOT_IMPLEMENTED();
+
+    return Harness_Hook_PDNetSendMessageToAddress(pDetails, pMessage, pAddress);
 }
 
 // IDA: int __usercall PDNetInitClient@<EAX>(tNet_game_details *pDetails@<EAX>)
@@ -443,5 +516,6 @@ int PDNetInitClient(tNet_game_details* pDetails) {
 // IDA: int __cdecl PDNetGetHeaderSize()
 int PDNetGetHeaderSize() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    return 0;
 }

@@ -47,7 +47,15 @@ endfunction()
 
 test_big_endian(IS_BIGENDIAN)
 
-find_package(SDL2 REQUIRED)
+find_package(SDL2 CONFIG)
+if(NOT SDL2_FOUND)
+    find_package(SDL2 MODULE REQUIRED)
+endif()
+
+find_package(SDL2_net CONFIG)
+if(NOT SDL2_net_FOUND)
+    find_package(SDL2_net MODULE REQUIRED)
+endif()
 
 add_subdirectory(lib/libsmacker)
 add_subdirectory(lib/glad)

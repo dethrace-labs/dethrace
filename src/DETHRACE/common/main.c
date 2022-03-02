@@ -6,6 +6,8 @@
 #include "drmem.h"
 #include "errors.h"
 #include "globvars.h"
+#include "globvrpb.h"
+#include "graphics.h"
 #include "harness/config.h"
 #include "harness/trace.h"
 #include "init.h"
@@ -27,7 +29,22 @@ void QuitGame() {
         DoDemoGoodbye();
     }
 
-    NOT_IMPLEMENTED();
+    gProgram_state.racing = 0;
+    SaveOptions();
+    if (gNet_mode != eNet_mode_none) {
+        NetLeaveGame(gCurrent_net_game);
+    }
+    ShutdownNetIfRequired();
+    if (gSound_available) {
+        DRS3ShutDown();
+    }
+    if (gBr_initialized) {
+        ClearEntireScreen();
+    }
+    PDRevertPalette();
+    StopMusic();
+    PDShutdownSystem();
+    CloseDiagnostics();
 }
 
 // IDA: tU32 __cdecl TrackCount(br_actor *pActor, tU32 *pCount)

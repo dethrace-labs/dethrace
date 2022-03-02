@@ -395,7 +395,31 @@ int PickNetRace(int pCurrent_race, tNet_sequence_type pNet_race_sequence) {
     int most_seldom_seen;
     int races_to_pick_from[50];
     LOG_TRACE("(%d, %d)", pCurrent_race, pNet_race_sequence);
-    NOT_IMPLEMENTED();
+
+    if (pNet_race_sequence == eNet_sequence_sequential) {
+        pCurrent_race++;
+        if (pCurrent_race >= gNumber_of_races) {
+            pCurrent_race = 0;
+        }
+    } else {
+        most_seldom_seen = 10000;
+        for (i = 0; i < gNumber_of_races; i++) {
+            if (gRace_list[i].been_there_done_that < most_seldom_seen) {
+                most_seldom_seen = gRace_list[i].been_there_done_that;
+            }
+        }
+        races_count = 0;
+        for (i = 0; i < gNumber_of_races; i++) {
+            if (gRace_list[i].been_there_done_that == most_seldom_seen && (i != pCurrent_race)) {
+                races_to_pick_from[races_count] = i;
+                races_count++;
+            }
+        }
+        new_index = IRandomBetween(0, races_count - 1);
+        pCurrent_race = races_to_pick_from[new_index];
+        gRace_list[pCurrent_race].been_there_done_that++;
+    }
+    return pCurrent_race;
 }
 
 // IDA: void __cdecl SwapNetCarsLoad()
@@ -445,7 +469,7 @@ void DoGame() {
     StartLoadingScreen();
     gProgram_state.prog_status = eProg_game_ongoing;
     second_select_race = 0;
-    if (gNet_mode_of_last_game == gNet_mode) {
+    if (gNet_mode == gNet_mode_of_last_game) {
         PrintMemoryDump(0, "BEFORE START RACE SCREEN");
         SelectOpponents(&gCurrent_race);
         if (gNet_mode != eNet_mode_none) {

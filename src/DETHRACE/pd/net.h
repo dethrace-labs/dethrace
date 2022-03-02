@@ -10,7 +10,42 @@
 #include "brender/br_types.h"
 #include "dr_types.h"
 
-// void ClearupPDNetworkStuff(void);
+#define MESSAGE_HEADER_STR          "CW95MSG"
+
+extern tU32 gNetwork_init_flags;
+#if 0
+extern tPD_net_game_info* gJoinable_games;
+#endif
+extern int gMatts_PC;
+extern tU16 gSocket_number_pd_format;
+extern _IPX_ELEMENT gListen_elements[16];
+extern char gLocal_ipx_addr_string[32];
+extern _IPX_ELEMENT gSend_elements[16];
+extern _IPX_LOCAL_TARGET gLocal_addr_ipx;
+extern char gReceive_buffer[512];
+extern tPD_net_player_info gRemote_net_player_info;
+extern _IPX_LOCAL_TARGET gBroadcast_addr_ipx;
+extern tPD_net_player_info gLocal_net_player_info;
+extern char gSend_buffer[512];
+extern tIPX_netnum gNetworks[16];
+extern _IPX_LOCAL_TARGET gRemote_addr_ipx;
+extern tU8* gSend_packet;
+extern W32 gListen_segment;
+extern tU8* gSend_packet_ptr;
+extern W32 gSend_segment;
+extern tU8* gListen_packet;
+extern tU8* gListen_packet_ptr;
+extern size_t gMsg_header_strlen;
+extern int gNumber_of_networks;
+extern int gNumber_of_hosts;
+extern tRM_info RMI;
+extern _IPX_HEADER gLast_received_IPX_header;
+extern tU16 gSocket_number_network_order;
+extern USHORT gECB_offset;
+extern tU16 gListen_selector;
+extern tU16 gSend_selector;
+
+// void ClearupPDNetworkStuff();
 
 // void MATTMessageCheck(char* pFunction_name, tNet_message* pMessage, int pAlleged_size);
 
@@ -22,17 +57,17 @@
 
 // void NetNowIPXLocalTarget2String(char* pString, _IPX_LOCAL_TARGET* pSock_addr_ipx);
 
-// int GetMessageTypeFromMessage(char* pMessage_str);
+int GetMessageTypeFromMessage(char* pMessage_str);
 
 // int SameEthernetAddress(_IPX_LOCAL_TARGET* pAddr_ipx1, _IPX_LOCAL_TARGET* pAddr_ipx2);
 
 // _IPX_LOCAL_TARGET* GetIPXAddrFromPlayerID(tPlayer_ID pPlayer_id);
 
-// void MakeMessageToSend(int pMessage_type);
+void MakeMessageToSend(int pMessage_type);
 
-// int ReceiveHostResponses(void);
+int ReceiveHostResponses(void);
 
-// int BroadcastMessage(void);
+int BroadcastMessage(void);
 
 // BOOL hmiIPXCloseSocket(W32 wSocket);
 

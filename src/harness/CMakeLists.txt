@@ -85,10 +85,13 @@ if (IO_PLATFORM STREQUAL "SDL_OpenGL")
         resources/framebuffer_frag.glsl.h
         resources/3d_vert.glsl.h
         resources/3d_frag.glsl.h
+
+        io_platforms/sdl_network.c
+        io_platforms/sdl_network.h
     )
     target_include_directories(harness PRIVATE "${dethrace_SOURCE_DIR}/src/DETHRACE/common")
     target_include_directories(harness PRIVATE "${dethrace_SOURCE_DIR}/src/S3/include")
-    target_link_libraries(harness PRIVATE SDL2::SDL2 glad)
+    target_link_libraries(harness PRIVATE SDL2::SDL2 glad SDL2_net::SDL2_net)
 endif()
 
 if(WIN32)

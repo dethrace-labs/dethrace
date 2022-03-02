@@ -35,6 +35,7 @@ else()
         -Wno-format-overflow
     )
 endif()
+target_compile_definitions(dethrace_obj PRIVATE INSIDE_DETHRACE)
 if(DETHRACE_FIX_BUGS)
     target_compile_definitions(dethrace_obj PRIVATE DETHRACE_FIX_BUGS)
 endif()

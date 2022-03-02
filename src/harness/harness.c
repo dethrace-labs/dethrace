@@ -237,6 +237,10 @@ void Harness_ForceNullRenderer() {
     renderer = &null_renderer;
 }
 
+void Harness_Hook_PDShutdownSystem() {
+    renderer->Shutdown();
+}
+
 int Harness_ProcessCommandLine(int* argc, char* argv[]) {
     for (int i = 1; i < *argc; i++) {
         int handled = 0;
@@ -454,4 +458,60 @@ void Harness_Hook_S3StopAllOutletSounds() {
 // Filesystem hooks
 FILE* Harness_Hook_fopen(const char* pathname, const char* mode) {
     return OS_fopen(pathname, mode);
+}
+
+int Harness_Hook_PDNetInitialise() {
+    return renderer->NetInit();
+}
+
+int Harness_Hook_PDNetShutdown() {
+    return renderer->NetShutdown();
+}
+
+void Harness_Hook_PDNetStartProducingJoinList() {
+    renderer->NetStartProducingJoinList();
+}
+
+void Harness_Hook_PDNetEndJoinList() {
+    renderer->NetEndJoinList();
+}
+
+void Harness_Hook_PDNetGetNextJoinGame(tNet_game_details* pDetails, int pIndex) {
+    renderer->NetGetNextJoinGame(pDetails, pIndex);
+}
+
+int Harness_Hook_PDNetSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessage, void* pAddress) {
+    return renderer->NetSendMessageToAddress(pDetails, pMessage, pAddress);
+}
+
+// void Harness_Hook_PDNetDisposeGameDetails(tNet_game_details* pDetails) {
+//     renderer->NetDisposeGameDetails(pDetails);
+// }
+
+char* Harness_Hook_NetFormatAddress(void* pAddress) {
+    return renderer->NetFormatAddress(pAddress);
+}
+
+int Harness_Hook_NetBroadcastMessage() {
+    return renderer->NetBroadcastMessage();
+}
+
+int Harness_Hook_NetReceiveHostResponses() {
+    return renderer->NetReceiveHostresponses();
+}
+
+tNet_message* Harness_Hook_PDNetGetNextMessage(tNet_game_details* pDetails, void** pSender_address) {
+    return renderer->PDNetGetNextMessage(pDetails, pSender_address);
+}
+
+int Harness_Hook_PDNetHostGame(tNet_game_details* pDetails, char* pHost_name, void** pHost_address) {
+    return renderer->PDNetHostGame(pDetails, pHost_name, pHost_address);
+}
+
+tPlayer_ID Harness_Hook_PDNetExtractPlayerID(tNet_game_details* pDetails) {
+    return renderer->PDNetExtractPlayerID(pDetails);
+}
+
+int Harness_Hook_NetSendto(char* message, int size, void* pAddress) {
+    return renderer->NetSendto(message, size, pAddress);
 }

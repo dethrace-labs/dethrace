@@ -13,6 +13,4 @@ typedef struct tCamera {
     void (*setPosition)();
 } tCamera;
 
-
-
 #endif

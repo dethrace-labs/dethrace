@@ -696,7 +696,11 @@ typedef struct _NETNOW_NODE_ADDR {
 } _NETNOW_NODE_ADDR;
 
 typedef struct tPD_net_player_info {
+#if 0
     _IPX_LOCAL_TARGET addr_ipx;
+#else
+    char pd_addr[8];
+#endif
 } tPD_net_player_info;
 
 typedef struct tTrack_spec {
@@ -1631,8 +1635,6 @@ typedef struct tNet_message_crush_point {
     tU16 vertex;
     br_vector3 energy_vector;
 } tNet_message_crush_point;
-
-#define ENET_MESSAGE_HEADUP 0xc
 
 typedef union tNet_contents {                           // size: 0x160
     struct {                                            // size: 0x2

@@ -511,33 +511,29 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
     } else {
         result = gCurrent_choice;
     }
-    if (!go_ahead) {
-        if (!escaped) {
-            if (pSpec->end_flic_otherwise > 0) {
-                DRS3StartSound(gEffects_outlet, 3007);
-                RunFlic(pSpec->end_flic_otherwise);
-            } else if (pSpec->end_flic_otherwise < 0) {
-                FadePaletteDown();
-            }
-            goto LABEL_230;
-        } else {
-            if (pSpec->end_flic_escaped > 0) {
-                DRS3StartSound(gEffects_outlet, 3007);
-                RunFlic(pSpec->end_flic_escaped);
-            } else if (pSpec->end_flic_escaped < 0) {
-                FadePaletteDown();
-            }
-            goto LABEL_230;
+    if (go_ahead) {
+        if (pSpec->end_flic_go_ahead > 0) {
+            DRS3StartSound(gIndexed_outlets[0], 3007);
+            RunFlic(pSpec->end_flic_go_ahead);
+        } else if (pSpec->end_flic_go_ahead < 0) {
+            FadePaletteDown();
+        }
+    } else if (escaped) {
+        if (pSpec->end_flic_escaped > 0) {
+            DRS3StartSound(gIndexed_outlets[0], 3007);
+            RunFlic(pSpec->end_flic_escaped);
+        } else if (pSpec->end_flic_escaped < 0) {
+            FadePaletteDown();
+        }
+    } else {
+        if (pSpec->end_flic_otherwise > 0) {
+            DRS3StartSound(gIndexed_outlets[0], 3007);
+            RunFlic(pSpec->end_flic_otherwise);
+        } else if (pSpec->end_flic_otherwise < 0) {
+            FadePaletteDown();
         }
     }
-    if (pSpec->end_flic_go_ahead > 0) {
-        DRS3StartSound(gEffects_outlet, 3007);
-        RunFlic(pSpec->end_flic_go_ahead);
-    } else if (pSpec->end_flic_go_ahead < 0) {
-        FadePaletteDown();
-    }
 
-LABEL_230:
     gProgram_state.dont_save_or_load = 0;
     EndMouseCursor();
     UnlockInterfaceStuff();

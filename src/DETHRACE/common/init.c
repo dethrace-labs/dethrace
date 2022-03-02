@@ -410,7 +410,7 @@ void InitGame(int pStart_race) {
 
     gWaiting_for_unpause = 1;
     gWait_for_it = 1;
-    if (gNet_mode) {
+    if (gNet_mode != eNet_mode_none) {
         gCredit_period = gCredit_period_network[gCurrent_net_game->type];
     } else {
         gCredit_period = gCredit_period_single[gProgram_state.skill_level];
@@ -433,10 +433,10 @@ void InitGame(int pStart_race) {
             gProgram_state.current_car.power_up_levels[i] = 0;
         }
     }
-    for (i = 0; gNumber_of_races > i; ++i) {
+    for (i = 0; i < gNumber_of_races; i++) {
         gRace_list[i].been_there_done_that = 0;
     }
-    for (i = 0; gNumber_of_racers > i; ++i) {
+    for (i = 0; i < gNumber_of_racers; i++) {
         gOpponents[i].dead = 0;
     }
     gProgram_state.rank = gInitial_rank;
@@ -455,7 +455,7 @@ void DisposeGameIfNecessary() {
     int i;
     LOG_TRACE("()");
 
-    if (gNet_mode) {
+    if (gNet_mode != eNet_mode_none) {
         NetLeaveGame(gCurrent_net_game);
     }
     if (gGame_initialized) {

@@ -6,6 +6,7 @@
 #include <stdio.h>
 
 void Harness_Init(int* argc, char* argv[]);
+void Harness_Hook_PDShutdownSystem(void);
 
 // Hooks are called from original game code.
 
@@ -40,5 +41,25 @@ void Harness_Hook_S3StopAllOutletSounds();
 
 // Filesystem hooks
 FILE* Harness_Hook_fopen(const char* pathname, const char* mode);
+
+#ifdef INSIDE_DETHRACE
+#include "dr_types.h"
+
+// Network hooks
+int Harness_Hook_PDNetInitialise(void);
+int Harness_Hook_PDNetShutdown(void);
+int Harness_Hook_PDNetStartProducingJoinList(void);
+void Harness_Hook_PDNetEndJoinList(void);
+int Harness_Hook_PDNetGetNextJoinGame(tNet_game_details* pDetails, int pIndex);
+int Harness_Hook_PDNetSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessage, void* pAddress);
+//void Harness_Hook_PDNetDisposeGameDetails(tNet_game_details* pDetails);
+char* Harness_Hook_NetFormatAddress(void* pAddress);
+int Harness_Hook_NetBroadcastMessage(void);
+int Harness_Hook_NetReceiveHostResponses(void);
+tNet_message* Harness_Hook_PDNetGetNextMessage(tNet_game_details* pDetails, void** pSender_address);
+int Harness_Hook_PDNetHostGame(tNet_game_details* pDetails, char* pHost_name, void** pHost_address);
+tPlayer_ID Harness_Hook_PDNetExtractPlayerID(tNet_game_details* pDetails);
+int Harness_Hook_NetSendto(char* message, int size, void* pAddress);
+#endif
 
 #endif
