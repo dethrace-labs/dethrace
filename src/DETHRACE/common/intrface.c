@@ -186,9 +186,6 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
     void* palette_copy;
     LOG_TRACE("(%p, %d, %d)", pSpec, pOptions, pCurrent_choice);
 
-    //added
-    int last_choice_2;
-
     entry_status = gProgram_state.prog_status;
     gTyping_slot = -1;
     EdgeTriggerModeOn();
@@ -372,7 +369,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
         }
         ProcessFlicQueue(gFrame_period);
         if (DoMouseCursor() || EitherMouseButtonDown()) {
-            gStart_time = PDGetTotalTime();
+            ResetInterfaceTimeout();
         }
         PDScreenBufferSwap(0);
         if (gMouse_in_use && !selection_changed) {
@@ -500,13 +497,11 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
         UnlockFlic(pSpec->pushed_flics[i].flic_index);
     }
 
-    //v100 = gCurrent_choice;
     if (gCurrent_choice == pSpec->escape_code) {
         escaped = 1;
         go_ahead = 0;
     }
     if (escaped) {
-        //v100 = pSpec->escape_code;
         gCurrent_choice = pSpec->escape_code;
     }
     if (pSpec->done_proc != NULL) {

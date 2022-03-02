@@ -244,10 +244,9 @@ void BrPixelmapDirtyRectangleDoubleBuffer(br_pixelmap* dst, br_pixelmap* src, br
 // IDA: void __cdecl BrPixelmapPixelSet(br_pixelmap *dst, br_int_32 x, br_int_32 y, br_uint_32 colour)
 void BrPixelmapPixelSet(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_uint_32 colour) {
     br_point p;
-    //LOG_TRACE("(%p, %d, %d, %d)", dst, x, y, colour);
+    // LOG_TRACE("(%p, %d, %d, %d)", dst, x, y, colour);
 
     STUB_ONCE();  // stub because this implementation is improperly (=coordinates can lie outside pixelmap + pixel format size can be > 1 bytes)
-
     br_uint_8* dst_pix = (br_uint_8*)dst->pixels;
     dst_pix[(y * dst->row_bytes) + x] = (br_uint_8)colour;
 }
@@ -277,8 +276,8 @@ void BrPixelmapCopy(br_pixelmap* dst, br_pixelmap* src) {
 
 // IDA: void __cdecl BrPixelmapLine(br_pixelmap *dst, br_int_32 x1, br_int_32 y1, br_int_32 x2, br_int_32 y2, br_uint_32 colour)
 void BrPixelmapLine(br_pixelmap* dst, br_int_32 x1, br_int_32 y1, br_int_32 x2, br_int_32 y2, br_uint_32 colour) {
-    //br_point s;
-    //br_point e;
+    // br_point s;
+    // br_point e;
     LOG_TRACE("(%p, %d, %d, %d, %d, %d)", dst, x1, y1, x2, y2, colour);
 
     STUB_ONCE();  // stub because this implementation is improperly (=coordinates can lie outside pixelmap + pixel format size can be > 1 bytes)
