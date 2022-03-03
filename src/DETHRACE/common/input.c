@@ -125,8 +125,8 @@ tKey_down_result PDKeyDown2(int pKey_index) {
     if (gLast_key_down == pKey_index) {
         gLast_key_down_time = 0;
         gLast_key_down = -1;
-        return tKey_down_no;
     }
+    return tKey_down_no;
 }
 
 // IDA: int __usercall PDKeyDown@<EAX>(int pKey_index@<EAX>)
