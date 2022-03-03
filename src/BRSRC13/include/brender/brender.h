@@ -43,7 +43,7 @@ br_pixelmap* BrMapAdd(br_pixelmap* pixelmap);
 br_pixelmap* BrMapRemove(br_pixelmap* pixelmap);
 br_pixelmap* BrMapFind(char* pattern);
 br_uint_32 BrMapAddMany(br_pixelmap** items, int n);
-br_map_find_cbfn* BrMapFindHook(br_map_find_cbfn* hook) ;
+br_map_find_cbfn* BrMapFindHook(br_map_find_cbfn* hook);
 
 // BrMaterial
 br_material* BrMaterialAllocate(char* name);
@@ -90,6 +90,10 @@ void BrMatrix34PostShearZ(br_matrix34* mat, br_scalar sx, br_scalar sy);
 void BrMatrix4Copy(br_matrix4* A, br_matrix4* B);
 br_scalar BrMatrix4Inverse(br_matrix4* A, br_matrix4* B);
 void BrMatrix4TApply(br_vector4* A, br_vector4* B, br_matrix4* C);
+void BrMatrix4ApplyP(br_vector4* A, br_vector3* B, br_matrix4* C);
+void BrMatrix4Perspective(br_matrix4* mat, br_angle field_of_view, br_scalar aspect, br_scalar hither, br_scalar yon);
+void BrMatrix4Scale(br_matrix4* mat, br_scalar sx, br_scalar sy, br_scalar sz);
+void BrMatrix4Mul(br_matrix4* A, br_matrix4* B, br_matrix4* C);
 
 // BrMem
 void BrMemFree(void* block);
@@ -132,7 +136,6 @@ br_resource_class* BrResClassAdd(br_resource_class* rclass);
 void* BrResRemove(void* vres);
 void BrResFree(void* vres);
 char* BrResStrDup(void* vparent, char* str);
-
 
 // BrTable
 br_pixelmap* BrTableAdd(br_pixelmap* pixelmap);
