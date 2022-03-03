@@ -5,6 +5,7 @@
 #include "gl_renderer_shaders.h"
 #include "harness.h"
 #include "harness/trace.h"
+#include "platforms/platform.h"
 
 #include <cglm/cglm.h>
 #include <glad/glad.h>
@@ -264,7 +265,11 @@ void GLRenderer_CreateWindow(char* title, int width, int height, int pRender_wid
     if (!window) {
         LOG_PANIC("Failed to create window");
     }
-    SDL_SetRelativeMouseMode(SDL_TRUE);
+
+    // Don't grab the mouse when a debugger is present
+    if (!PlatformIsDebuggerPresent()) {
+        SDL_SetRelativeMouseMode(SDL_TRUE);
+    }
 
     // SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
