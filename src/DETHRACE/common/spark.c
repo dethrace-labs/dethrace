@@ -8,6 +8,7 @@
 #include "graphics.h"
 #include "harness/trace.h"
 #include "loading.h"
+#include "piping.h"
 #include "utility.h"
 #include "world.h"
 
@@ -814,7 +815,92 @@ void RenderSmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
     tU32 seed;
     tU32 not_lonely;
     LOG_TRACE("(%p, %p, %p, %p, %d)", pRender_screen, pDepth_buffer, pCamera, pCamera_to_world, pTime);
-    STUB_ONCE();
+
+    not_lonely = 0;
+    DrawTheGlow(pRender_screen, pDepth_buffer, pCamera);
+    if (gSmoke_flags) {
+        seed = rand();
+        if (gAction_replay_mode) {
+            ReplaySmoke(pRender_screen, pDepth_buffer, pCamera);
+            srand(seed);
+        } else {
+            StartPipingSession(ePipe_chunk_smoke);
+            for (i = 0; i < COUNT_OF(gSmoke); i++) {
+                if ((gSmoke_flags & (1 << i)) != 0) {
+                    if (gSmoke[i].strength > 0.0) {
+                        if (gSmoke[i].time_sync) {
+                            tv.v[0] = gSmoke[i].time_sync / 1000.0 * gSmoke[i].v.v[0];
+                            tv.v[1] = gSmoke[i].time_sync / 1000.0 * gSmoke[i].v.v[1];
+                            tv.v[2] = gSmoke[i].time_sync / 1000.0 * gSmoke[i].v.v[2];
+                            gSmoke[i].time_sync = 0;
+                        } else {
+                            tv.v[0] = pTime / 1000.0 * gSmoke[i].v.v[0];
+                            tv.v[1] = pTime / 1000.0 * gSmoke[i].v.v[1];
+                            tv.v[2] = pTime / 1000.0 * gSmoke[i].v.v[2];
+                        }
+                        gSmoke[i].pos = tv;
+                    } else {
+                        gSmoke_flags &= ~(1 << i);
+                    }
+                }
+            }
+            for (i = 0; i < COUNT_OF(gSmoke); i++) {
+                if ((gSmoke_flags & (1 << i)) != 0) {
+                    if ((gSmoke[i].type & 0xF) == 7) {
+                        not_lonely |= 1 << i;
+                    } else if ((not_lonely & (1 << i)) == 0) {
+                        for (j = i + 1; j < COUNT_OF(gSmoke); j++) {
+                            if ((gSmoke_flags & (1 << j)) != 0) {
+                                BrVector3Sub(&tv, &gSmoke[i].pos, &gSmoke[i].pos);
+                                ts = BrVector3LengthSquared(&tv);
+                                if ((gSmoke[i].radius + gSmoke[j].radius) * (gSmoke[i].radius + gSmoke[j].radius) > ts) {
+                                    not_lonely |= (1 << j) | (1 << i);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (((1 << i) & not_lonely) == 0) {
+                        gSmoke[i].strength = gSmoke[i].strength / 2.0;
+                    }
+                    aspect = (gSmoke[i].radius - 0.05) / 0.25 * 0.5 + 1.0;
+                    if ((gSmoke[i].type & 0x10) != 0) {
+                        SmokeCircle3D(&gSmoke[i].pos, gSmoke[i].radius / aspect, gSmoke[i].strength, 1.0, pRender_screen, pDepth_buffer, gShade_list[gSmoke[i].type & 0xF], pCamera);
+                    } else {
+                        SmokeCircle3D(&gSmoke[i].pos, gSmoke[i].radius, gSmoke[i].strength, aspect, pRender_screen, pDepth_buffer, gShade_list[gSmoke[i].type & 0xF], pCamera);
+                    }
+                    if (gSmoke[i].pipe_me) {
+                        AddSmokeToPipingSession(i, gSmoke[i].type, &gSmoke[i].pos, gSmoke[i].radius, gSmoke[i].strength);
+                    }
+                    gSmoke[i].radius = (double)pTime / 1000.0 * gSmoke[i].strength * 0.5 + gSmoke[i].radius;
+                    gSmoke[i].strength = gSmoke[i].strength - (double)pTime * gSmoke[i].decay_factor / 1000.0;
+                    if (gSmoke[i].radius > 0.3) {
+                        gSmoke[i].radius = 0.3;
+                    }
+                    if (gSmoke[i].strength > 0.0) {
+                        ts = 1.0 - (double)pTime * 0.002;
+                        if (ts < 0.5) {
+                            ts = 0.5;
+                        }
+                        gSmoke[i].v.v[0] = gSmoke[i].v.v[0] * ts;
+                        gSmoke[i].v.v[1] = gSmoke[i].v.v[1] * ts;
+                        gSmoke[i].v.v[2] = gSmoke[i].v.v[2] * ts;
+                        if (fabs(gSmoke[i].v.v[1]) < 0.43478259 && (gSmoke[i].type & 0xFu) < 7) {
+                            if (gSmoke[i].v.v[1] >= 0.0) {
+                                gSmoke[i].v.v[1] = 0.43478259;
+                            } else {
+                                gSmoke[i].v.v[1] = gSmoke[i].v.v[1] + 0.43478259;
+                            }
+                        }
+                    } else {
+                        gSmoke_flags &= ~(1 << i);
+                    }
+                }
+            }
+            EndPipingSession();
+            srand(seed);
+        }
+    }
 }
 
 // IDA: void __usercall CreatePuffOfSmoke(br_vector3 *pos@<EAX>, br_vector3 *v@<EDX>, br_scalar strength, br_scalar pDecay_factor, int pType, tCar_spec *pC)
@@ -903,10 +989,6 @@ void GenerateSmokeShades() {
     static int bg = 0x80;
     LOG_TRACE("()");
 
-    STUB();
-    return;
-
-    // FIXME: use this once the car can be shaded correctly
     gBlack_smoke_shade_table = GenerateShadeTable(16, gRender_palette, rb, gb, bb, .25f, .6f, .9f);
     gDark_smoke_shade_table = GenerateShadeTable(16, gRender_palette, rd, gd, bd, .25f, .6f, .9f);
     gGrey_smoke_shade_table = GenerateShadeTable(16, gRender_palette, rg, gg, bg, .25f, .6f, .9f);
@@ -1005,7 +1087,7 @@ void DisposeFlame() {
     }
 
     for (i = 0; i < 5; i++) {
-        if ((gSplash_flags & (1 << i)) && (gSmoke_column[i].colour == 0)) {
+        if ((gColumn_flags & (1 << i)) && (gSmoke_column[i].colour == 0)) {
             BrActorRemove(gSmoke_column[i].flame_actor);
         }
         actor = gSmoke_column[i].flame_actor->children;
@@ -1030,7 +1112,7 @@ void InitFlame() {
     br_material* material;
     LOG_TRACE("()");
 
-    gSplash_flags = 0;
+    gColumn_flags = 0;
     gLollipop_model = BrModelAllocate("Lollipop", 4, 2);
     PathCat(the_path, gApplication_path, "PIXELMAP");
     PathCat(the_path, the_path, "FLAMES.PIX");
@@ -1184,7 +1266,22 @@ void DrawTheGlow(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
     br_vector3 tv;
     tU32 seed;
     LOG_TRACE("(%p, %p, %p)", pRender_screen, pDepth_buffer, pCamera);
-    NOT_IMPLEMENTED();
+
+    if (gColumn_flags) {
+        seed = rand();
+        srand(GetTotalTime());
+        for (i = 0; i < 5; i++) {
+            if (((1 << i) & gColumn_flags) != 0 && gSmoke_column[i].colour <= 1) {
+                strength = 0.5;
+                if (gSmoke_column[i].lifetime < 4000) {
+                    strength = gSmoke_column[i].lifetime * 0.5 / 4000.0;
+                }
+                BrVector3Set(&tv, gSmoke_column[i].pos.v[0], gSmoke_column[i].pos.v[1] + 0.02, gSmoke_column[i].pos.v[2]);
+                SmokeCircle3D(&tv, 0.07, strength, SRandomBetween(0.5, 0.99000001), pRender_screen, pDepth_buffer, gAcid_shade_table, pCamera);
+            }
+        }
+        srand(seed);
+    }
 }
 
 // IDA: void __usercall PipeInstantUnSmudge(tCar_spec *pCar@<EAX>)

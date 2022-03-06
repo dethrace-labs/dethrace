@@ -168,7 +168,7 @@ int DRS3SoundStillPlaying(tS3_sound_tag pSound_tag) {
     LOG_TRACE("(%d)", pSound_tag);
 
     STUB_ONCE();
-    return 1;
+    return 0;
 }
 
 // IDA: void __cdecl DRS3ShutDown()
