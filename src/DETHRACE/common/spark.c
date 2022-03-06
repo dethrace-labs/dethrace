@@ -760,10 +760,8 @@ void SmokeCircle3D(br_vector3* o, br_scalar r, br_scalar strength, br_scalar pAs
     cam = pCam->type_data;
     srand(o->v[2] * 16777216.0 + o->v[1] * 65536.0 + o->v[0] * 256.0 + r);
     BrVector3Sub(&tv, o, (br_vector3*)gCamera_to_world.m[3]);
-    // tv.v[0] = o->v[0] - gCamera_to_world.m[3][0];
-    // tv.v[1] = o->v[1] - gCamera_to_world.m[3][1];
-    // tv.v[2] = o->v[2] - gCamera_to_world.m[3][2];
     BrMatrix34TApplyV(&p, &tv, &gCamera_to_world);
+
     if (-p.v[2] >= cam->hither_z && -p.v[2] <= cam->yon_z) {
         scaled_r = gCameraToScreen.m[0][0] * r / -p.v[2];
         extra_z = gCameraToScreen.m[3][2] * r / (p.v[2] * p.v[2]);
@@ -818,6 +816,7 @@ void RenderSmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
 
     not_lonely = 0;
     DrawTheGlow(pRender_screen, pDepth_buffer, pCamera);
+
     if (gSmoke_flags) {
         seed = rand();
         if (gAction_replay_mode) {
@@ -838,7 +837,7 @@ void RenderSmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
                             tv.v[1] = pTime / 1000.0 * gSmoke[i].v.v[1];
                             tv.v[2] = pTime / 1000.0 * gSmoke[i].v.v[2];
                         }
-                        gSmoke[i].pos = tv;
+                        BrVector3Add(&gSmoke[i].pos, &gSmoke[i].pos, &tv);
                     } else {
                         gSmoke_flags &= ~(1 << i);
                     }
@@ -912,32 +911,38 @@ void CreatePuffOfSmoke(br_vector3* pos, br_vector3* v, br_scalar strength, br_sc
     if (!gSmoke_on) {
         return;
     }
+    // if we are too far away from the current car...
     BrVector3Sub(&tv, pos, &gProgram_state.current_car.pos);
+    if (BrVector3LengthSquared(&tv) > 625.0) {
+        // check the distance from the car we are viewing and if it is too far away also, just return
+        BrVector3Sub(&tv, pos, &gCar_to_view->pos);
+        if (&gProgram_state.current_car != gCar_to_view && BrVector3LengthSquared(&tv) > 625.0) {
+            return;
+        }
+    }
 
-    if (BrVector3LengthSquared(&tv) <= 625.0 || &gProgram_state.current_car != gCar_to_view && (tv.v[0] = pos->v[0] - gCar_to_view->pos.v[0], tv.v[1] = pos->v[1] - gCar_to_view->pos.v[1], tv.v[2] = pos->v[2] - gCar_to_view->pos.v[2], BrVector3LengthSquared(&tv) <= 625.0)) {
-        BrVector3InvScale(&gSmoke[gSmoke_num].v, v, WORLD_SCALE);
-        gSmoke[gSmoke_num].v.v[1] = gSmoke[gSmoke_num].v.v[1] + 0.1449275362318841;
-        gSmoke[gSmoke_num].pos = *pos;
-        gSmoke[gSmoke_num].radius = 0.05;
-        if ((pType & 0xF) == 7) {
-            gSmoke[gSmoke_num].radius *= 2.0f;
-        } else {
-            gSmoke[gSmoke_num].pos.v[1] += 0.039999999;
-        }
-        gSmoke[gSmoke_num].pos.v[1] += 0.039999999;
-        if (strength > 1.0) {
-            strength = 1.0;
-        }
-        gSmoke[gSmoke_num].strength = strength;
-        gSmoke_flags |= 1 << gSmoke_num;
-        gSmoke[gSmoke_num].time_sync = gMechanics_time_sync;
-        gSmoke[gSmoke_num].type = pType;
-        gSmoke[gSmoke_num].decay_factor = pDecay_factor;
-        gSmoke[gSmoke_num].pipe_me = 1;
-        gSmoke_num++;
-        if (gSmoke_num >= 25) {
-            gSmoke_num = 0;
-        }
+    BrVector3InvScale(&gSmoke[gSmoke_num].v, v, WORLD_SCALE);
+    gSmoke[gSmoke_num].v.v[1] = gSmoke[gSmoke_num].v.v[1] + 0.1449275362318841;
+    gSmoke[gSmoke_num].pos = *pos;
+    gSmoke[gSmoke_num].radius = 0.05;
+    if ((pType & 0xF) == 7) {
+        gSmoke[gSmoke_num].radius *= 2.0f;
+    } else {
+        gSmoke[gSmoke_num].pos.v[1] += 0.04;
+    }
+    gSmoke[gSmoke_num].pos.v[1] += 0.04;
+    if (strength > 1.0) {
+        strength = 1.0;
+    }
+    gSmoke[gSmoke_num].strength = strength;
+    gSmoke_flags |= 1 << gSmoke_num;
+    gSmoke[gSmoke_num].time_sync = gMechanics_time_sync;
+    gSmoke[gSmoke_num].type = pType;
+    gSmoke[gSmoke_num].decay_factor = pDecay_factor;
+    gSmoke[gSmoke_num].pipe_me = 1;
+    gSmoke_num++;
+    if (gSmoke_num >= 25) {
+        gSmoke_num = 0;
     }
 }
 
