@@ -969,7 +969,7 @@ int FopRead_TRANSFORM(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint
         }
     }
     if (t == 7) {
-        LOG_PANIC("transform type not found!")
+        LOG_PANIC("transform type not found!");
     }
     tp = (br_transform*)BrResAllocate(v1db.res, sizeof(br_transform), BR_MEMORY_TRANSFORM);
     tp->type = t;

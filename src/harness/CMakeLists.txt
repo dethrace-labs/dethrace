@@ -52,3 +52,17 @@ target_sources(harness PRIVATE
     platforms/null.h
     stack_trace_handler.h
 )
+
+if(WIN32)
+    target_sources(harness PRIVATE
+        platforms/platform_windows.c
+    )
+elseif(APPLE)
+target_sources(harness PRIVATE
+    platforms/platform_macosx.c
+)
+else()
+    target_sources(harness PRIVATE
+        platforms/platform_linux.c
+    )
+endif()
