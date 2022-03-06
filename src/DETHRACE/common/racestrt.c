@@ -66,7 +66,94 @@ void DrawRaceList(int pOffset) {
     int text_x;
     char rank_str[256];
     LOG_TRACE("(%d)", pOffset);
-    NOT_IMPLEMENTED();
+
+    left_most = (gCurrent_graf_data->choose_race_rank_right - 2 * gBig_font->width[48] + gCurrent_graf_data->choose_race_left) / 2;
+    right_most = gCurrent_graf_data->choose_race_right - (left_most - gCurrent_graf_data->choose_race_left);
+    BrPixelmapRectangleFill(gBack_screen,
+        left_most, 
+        gCurrent_graf_data->choose_race_y_top,
+        gCurrent_graf_data->choose_race_right - gCurrent_graf_data->choose_race_left - 2 * (left_most - gCurrent_graf_data->choose_race_left),
+        gCurrent_graf_data->choose_race_y_bottom - gCurrent_graf_data->choose_race_y_top,
+        0);
+    pitch = gCurrent_graf_data->choose_race_y_pitch;
+    for (i = 0; i < gNumber_of_races; i++) {
+        y = pitch * i + gCurrent_graf_data->choose_race_curr_y - pOffset;
+        if (gCurrent_graf_data->choose_race_y_top <= (y - (TranslationMode() ? 2 : 0)) && (y + gBig_font->glyph_y) < gCurrent_graf_data->choose_race_line_y) {
+            if ((gProgram_state.rank > gRace_list[i].rank_required || gProgram_state.rank < gRace_list[i].best_rank) && !gProgram_state.game_completed && !gChange_race_net_mode) {
+                rank_colour = 44;
+                text_colour = 49;
+            } else if (gCurrent_graf_data->choose_race_curr_y == y) {
+                rank_colour = 5;
+                text_colour = 1;
+            } else {
+                rank_colour = 198;
+                text_colour = 201;
+            }
+            if (!gChange_race_net_mode) {
+                sprintf(rank_str, "%2d", gRace_list[i].rank_required);
+                TransBrPixelmapText(gBack_screen,
+                    gCurrent_graf_data->choose_race_rank_right - BrPixelmapTextWidth(gBack_screen, gBig_font, rank_str),
+                    y,
+                    rank_colour,
+                    gBig_font,
+                    (signed char*)rank_str);
+            }
+            TransBrPixelmapText(gBack_screen,
+                gCurrent_graf_data->choose_race_name_left,
+                y,
+                text_colour,
+                gBig_font,
+                (signed char*)gRace_list[i].name);
+            if (gRace_list[i].been_there_done_that && gBullet_image != NULL) {
+                BrPixelmapRectangleCopy(gBack_screen,
+                    gCurrent_graf_data->choose_race_bullet_left,
+                    y + (gBig_font->glyph_y - gBullet_image->height) / 2,
+                    gBullet_image,
+                    0,
+                    0,
+                    gBullet_image->width,
+                    gBullet_image->height);
+            }
+        }
+    }
+    if (gChange_race_net_mode) {
+        strcpy(rank_str, GetMiscString(202 + (gNet_race_sequence__racestrt == 1 ? 1 : 0)));
+        TransBrPixelmapText(gBack_screen,
+            (right_most + left_most - BrPixelmapTextWidth(gBack_screen, gBig_font, rank_str)) / 2,
+            gCurrent_graf_data->choose_race_current_text_y,
+            5,
+            gBig_font,
+            (signed char*)rank_str);
+    } else {
+        sprintf(rank_str, "%s%d", GetMiscString(27), gProgram_state.rank);
+        text_x = (gCurrent_graf_data->choose_race_left + gCurrent_graf_data->choose_race_right) / 2 - BrPixelmapTextWidth(gBack_screen, gBig_font, rank_str) / 2;
+        TransBrPixelmapText(gBack_screen,
+            text_x,
+            gCurrent_graf_data->choose_race_current_text_y,
+            3,
+            gBig_font,
+            (signed char*)GetMiscString(27));
+        sprintf(rank_str, "%d", gProgram_state.rank);
+        TransBrPixelmapText(gBack_screen,
+            text_x + BrPixelmapTextWidth(gBack_screen, gBig_font, GetMiscString(27)),
+            gCurrent_graf_data->choose_race_current_text_y,
+            5,
+            gBig_font,
+            (signed char*)rank_str);
+    }
+    BrPixelmapLine(gBack_screen,
+        left_most,
+        gCurrent_graf_data->choose_race_line_y,
+        right_most,
+        gCurrent_graf_data->choose_race_line_y,
+        6);
+    DrawRectangle(gBack_screen,
+        left_most,
+        gCurrent_graf_data->choose_race_box_top - 1,
+        right_most,
+        2 * gCurrent_graf_data->choose_race_curr_y - gCurrent_graf_data->choose_race_box_top + gBig_font->glyph_y,
+        3);
+    PDScreenBufferSwap(0);
 }
 
 // IDA: void __usercall MoveRaceList(int pFrom@<EAX>, int pTo@<EDX>, tS32 pTime_to_move@<EBX>)
@@ -76,19 +163,47 @@ void MoveRaceList(int pFrom, int pTo, tS32 pTime_to_move) {
     int move_distance;
     int pitch;
     LOG_TRACE("(%d, %d, %d)", pFrom, pTo, pTime_to_move);
-    NOT_IMPLEMENTED();
+
+    pitch = gCurrent_graf_data->choose_race_y_pitch;
+    start_time = PDGetTotalTime();
+    while (1) {
+        the_time = PDGetTotalTime();
+        if (start_time + pTime_to_move <= the_time) break;
+        DrawRaceList((the_time - start_time) * (pTo - pFrom) * pitch / pTime_to_move + pitch * pFrom);
+    }
+    DrawRaceList(pitch * pTo);
 }
 
 // IDA: int __usercall UpRace@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int UpRace(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    AddToFlicQueue(gStart_interface_spec->pushed_flics[2].flic_index,
+        gStart_interface_spec->pushed_flics[2].x[gGraf_data_index],
+        gStart_interface_spec->pushed_flics[2].y[gGraf_data_index],
+        1);
+    DRS3StartSound(gIndexed_outlets[0], 3000);
+    if (gCurrent_race_index != 0 && (gRace_list[gCurrent_race_index - 1].best_rank <= gProgram_state.rank || gProgram_state.game_completed || gChange_race_net_mode)) {
+        RemoveTransientBitmaps(1);
+        MoveRaceList(gCurrent_race_index, gCurrent_race_index - 1, 150);
+        gCurrent_race_index--;
+    }
 }
 
 // IDA: int __usercall DownRace@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int DownRace(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    AddToFlicQueue(gStart_interface_spec->pushed_flics[3].flic_index,
+        gStart_interface_spec->pushed_flics[3].x[gGraf_data_index],
+        gStart_interface_spec->pushed_flics[3].y[gGraf_data_index],
+        1);
+    DRS3StartSound(gIndexed_outlets[0], 3000);
+    if (gCurrent_race_index < gNumber_of_races - 1 && (gProgram_state.rank <= gRace_list[gCurrent_race_index + 1].rank_required || gProgram_state.game_completed || gChange_race_net_mode)) {
+        RemoveTransientBitmaps(1);
+        MoveRaceList(gCurrent_race_index, gCurrent_race_index + 1, 150);
+        gCurrent_race_index++;
+    }
 }
 
 // IDA: int __usercall ClickOnRace@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
@@ -97,43 +212,113 @@ int ClickOnRace(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_
     int y_coord;
     int race_delta;
     LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
-    NOT_IMPLEMENTED();
+
+    GetMousePosition(&x_coord, &y_coord);
+    race_delta = (y_coord - (gCurrent_graf_data->choose_race_curr_y - 5 * (gCurrent_graf_data->choose_race_y_pitch / 2) + gBig_font->glyph_y / 2)) / gCurrent_graf_data->choose_race_y_pitch - 2;
+    if (race_delta >= -2 && race_delta <= -1) {
+        do {
+            UpRace(pCurrent_choice, pCurrent_mode);
+            race_delta++;
+        } while (race_delta != 0);
+    } else if (race_delta > 0 && race_delta < 3) {
+        do {
+            DownRace(pCurrent_choice, pCurrent_mode);
+            race_delta--;
+        } while (race_delta != 0);
+    }
+    return 0;
 }
 
 // IDA: int __usercall UpClickRace@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
 int UpClickRace(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
-    NOT_IMPLEMENTED();
+
+    UpRace(pCurrent_choice, pCurrent_mode);
+    return 0;
 }
 
 // IDA: int __usercall DownClickRace@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
 int DownClickRace(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
-    NOT_IMPLEMENTED();
+
+    DownRace(pCurrent_choice, pCurrent_mode);
+    return 0;
 }
 
 // IDA: void __cdecl StartChangeRace()
 void StartChangeRace() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveRaceList(-3, gCurrent_race_index, 400);
 }
 
 // IDA: int __usercall ChangeRace@<EAX>(int *pRace_index@<EAX>, int pNet_mode@<EDX>, tNet_sequence_type pNet_race_sequence@<EBX>)
 int ChangeRace(int* pRace_index, int pNet_mode, tNet_sequence_type pNet_race_sequence) {
-    static tFlicette flicker_on[4];
-    static tFlicette flicker_off[4];
-    static tFlicette push[4];
-    static tMouse_area mouse_areas[5];
-    static tInterface_spec interface_spec;
+    static tFlicette flicker_on[4] = {
+        {  43, {  60, 120 }, { 154, 370 } },
+        {  43, { 221, 442 }, { 154, 370 } },
+        { 221, {  30,  60 }, {  78, 187 } },
+        { 221, {  30,  60 }, {  78, 187 } },
+    };
+    static tFlicette flicker_off[4] = {
+        {  42, {  60, 120 }, { 154, 370 } },
+        {  42, { 221, 442 }, { 154, 370 } },
+        { 220, {  30,  60 }, {  78, 187 } },
+        { 220, {  30,  60 }, {  78, 187 } },
+    };
+    static tFlicette push[4] = {
+        { 154, {  60, 120 }, { 154, 370 } },
+        {  45, { 221, 442 }, { 154, 370 } },
+        { 222, {  30,  60 }, {  78, 187 } },
+        { 225, {  30,  60 }, { 118, 283 } },
+    };
+    static tMouse_area mouse_areas[5] = {
+        { {  60, 120 }, { 154, 370 }, { 125, 250 }, { 174, 418 },   0,   0,   0, NULL },
+        { { 221, 442 }, { 154, 370 }, { 286, 572 }, { 174, 418 },   1,   0,   0, NULL },
+        { {  30,  60 }, {  78, 187 }, {  45,  90 }, { 104, 250 },  -1,   0,   0, UpClickRace },
+        { {  30,  60 }, { 118, 283 }, {  45,  90 }, { 145, 348 },  -1,   0,   0, DownClickRace },
+        { {  66, 132 }, {  33,  79 }, { 278, 556 }, { 144, 346 },  -1,   0,   0, ClickOnRace },
+    };
+    static tInterface_spec interface_spec = {
+        0, 230, 60, 231, 231, 231, 6,
+        { -1,  0}, { -1,  0}, {  0,  0 }, {  1,  0}, { NULL, NULL },
+        { -1,  0}, {  1,  0}, {  0,  0 }, {  1,  0}, { NULL, NULL },
+        { -1,  0}, {  0,  0}, {  0,  0 }, {  0,  0}, { UpRace, NULL },
+        { -1,  0}, {  0,  0}, {  0,  0 }, {  0,  0}, { DownRace, NULL },
+        { 1, 1 }, { NULL, NULL }, { 1, 1 }, { NULL, NULL },
+        NULL, NULL, 0, NULL, StartChangeRace, NULL, 0, {0,0},
+        NULL, 1, 1, COUNT_OF(flicker_on), flicker_on, flicker_off, push,
+        COUNT_OF(mouse_areas), mouse_areas, 0, NULL
+    };
     int result;
     LOG_TRACE("(%p, %d, %d)", pRace_index, pNet_mode, pNet_race_sequence);
-    NOT_IMPLEMENTED();
+
+    gNet_race_sequence__racestrt = pNet_race_sequence;
+    gChange_race_net_mode = pNet_mode;
+    gStart_interface_spec = &interface_spec;
+    gCurrent_race_index = *pRace_index;
+    if (pNet_mode == 0) {
+        gBullet_image = LoadPixelmap("BULLET.PIX");
+    } else {
+        gBullet_image = NULL;
+    }
+    result = DoInterfaceScreen(&interface_spec, pNet_mode != 0, 0);
+    if (result == 0) {
+        *pRace_index = gCurrent_race_index;
+    }
+    if (gBullet_image != NULL) {
+        BrPixelmapFree(gBullet_image);
+    }
+    return result == 0;
 }
 
 // IDA: void __cdecl DoChangeRace()
 void DoChangeRace() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (ChangeRace(&gProgram_state.current_race_index, 0, eNet_sequence_sequential) != 0) {
+        gProgram_state.current_race_index = gCurrent_race_index;
+    }
 }
 
 // IDA: void __usercall DrawCar(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
