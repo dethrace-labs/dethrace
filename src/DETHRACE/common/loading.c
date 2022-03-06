@@ -2244,9 +2244,9 @@ void LoadRaces(tRace_list_spec* pRace_list, int* pCount, int pRace_type_index) {
     gCurrent_race_file_index = pRace_type_index + 1;
     f = OpenRaceFile();
     number_of_racers = 0;
-    while (!last_race) {
-        GetALineAndDontArgue(f, s);
-        if (strcmp(s, "END") == 0) {
+    for (i = 0; !last_race; i++) {
+        GetALineAndDontArgue(f, pRace_list[i].name);
+        if (strcmp(pRace_list[i].name, "END") == 0) {
             last_race = 1;
         } else {
             SkipRestOfRace(f);
