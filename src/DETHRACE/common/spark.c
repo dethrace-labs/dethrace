@@ -611,17 +611,7 @@ void SmokeCircle(br_vector3* o, br_scalar r, br_scalar extra_z, br_scalar streng
                 if (min_x - x <= 0) {
                     line(x2, inc, zbuff, r_squared, scr_ptr, depth_ptr, shade_ptr, r_multiplier, z_multiplier, shade_offset);
                 } else {
-                    line(
-                        x2 - (min_x - x),
-                        min_x - x + inc,
-                        zbuff,
-                        y * y + (min_x - x + inc) * (min_x - x + inc),
-                        &scr_ptr[min_x - x],
-                        &depth_ptr[min_x - x],
-                        shade_ptr,
-                        r_multiplier,
-                        z_multiplier,
-                        shade_offset);
+                    line(x2 - (min_x - x), min_x - x + inc, zbuff, y * y + (min_x - x + inc) * (min_x - x + inc), &scr_ptr[min_x - x], &depth_ptr[min_x - x], shade_ptr, r_multiplier, z_multiplier, shade_offset);
                 }
             }
             if (y_limit <= y) {
@@ -696,17 +686,7 @@ void SmokeCircle(br_vector3* o, br_scalar r, br_scalar extra_z, br_scalar streng
                 if (min_x - x <= 0) {
                     line(x2, inc, zbuff, r_squared, scr_ptr, depth_ptr, shade_ptr, r_multiplier, z_multiplier, shade_offset);
                 } else {
-                    line(
-                        x2 - (min_x - x),
-                        min_x - x + inc,
-                        zbuff,
-                        y * y + (min_x - x + inc) * (min_x - x + inc),
-                        &scr_ptr[min_x - x],
-                        &depth_ptr[min_x - x],
-                        shade_ptr,
-                        r_multiplier,
-                        z_multiplier,
-                        shade_offset);
+                    line(x2 - (min_x - x), min_x - x + inc, zbuff, y * y + (min_x - x + inc) * (min_x - x + inc), &scr_ptr[min_x - x], &depth_ptr[min_x - x], shade_ptr, r_multiplier, z_multiplier, shade_offset);
                 }
             }
             gOffset += IRandomBetween(-1, 1);
@@ -828,14 +808,16 @@ void RenderSmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
                 if ((gSmoke_flags & (1 << i)) != 0) {
                     if (gSmoke[i].strength > 0.0) {
                         if (gSmoke[i].time_sync) {
-                            tv.v[0] = gSmoke[i].time_sync / 1000.0 * gSmoke[i].v.v[0];
-                            tv.v[1] = gSmoke[i].time_sync / 1000.0 * gSmoke[i].v.v[1];
-                            tv.v[2] = gSmoke[i].time_sync / 1000.0 * gSmoke[i].v.v[2];
+                            BrVector3Scale(&tv, &gSmoke[i].v, gSmoke[i].time_sync / 1000.0);
+                            // tv.v[0] = gSmoke[i].time_sync / 1000.0 * gSmoke[i].v.v[0];
+                            // tv.v[1] = gSmoke[i].time_sync / 1000.0 * gSmoke[i].v.v[1];
+                            // tv.v[2] = gSmoke[i].time_sync / 1000.0 * gSmoke[i].v.v[2];
                             gSmoke[i].time_sync = 0;
                         } else {
-                            tv.v[0] = pTime / 1000.0 * gSmoke[i].v.v[0];
-                            tv.v[1] = pTime / 1000.0 * gSmoke[i].v.v[1];
-                            tv.v[2] = pTime / 1000.0 * gSmoke[i].v.v[2];
+                            BrVector3Scale(&tv, &gSmoke[i].v, pTime / 1000.0);
+                            // tv.v[0] = pTime / 1000.0 * gSmoke[i].v.v[0];
+                            // tv.v[1] = pTime / 1000.0 * gSmoke[i].v.v[1];
+                            // tv.v[2] = pTime / 1000.0 * gSmoke[i].v.v[2];
                         }
                         BrVector3Add(&gSmoke[i].pos, &gSmoke[i].pos, &tv);
                     } else {
@@ -881,9 +863,7 @@ void RenderSmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
                         if (ts < 0.5) {
                             ts = 0.5;
                         }
-                        gSmoke[i].v.v[0] = gSmoke[i].v.v[0] * ts;
-                        gSmoke[i].v.v[1] = gSmoke[i].v.v[1] * ts;
-                        gSmoke[i].v.v[2] = gSmoke[i].v.v[2] * ts;
+                        BrVector3Scale(&gSmoke[i].v, &gSmoke[i].v, ts);
                         if (fabs(gSmoke[i].v.v[1]) < 0.43478259 && (gSmoke[i].type & 0xFu) < 7) {
                             if (gSmoke[i].v.v[1] >= 0.0) {
                                 gSmoke[i].v.v[1] = 0.43478259;
