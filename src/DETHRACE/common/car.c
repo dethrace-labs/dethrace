@@ -812,14 +812,11 @@ void CalcEngineForce(tCar_spec* c, br_scalar dt) {
 
     c->acc_force = 0.0;
     if (c->revs == 0.0) {
-        // LOG_DEBUG("changedown1");
         c->gear = 0;
     }
     sign = c->gear < 0 || (!c->gear && c->velocity_car_space.v[2] > 0.5);
     if (c->keys.backwards != sign) {
         c->keys.backwards = !c->keys.backwards;
-        // LOG_PANIC("not expected");
-
         temp_for_swap = c->keys.acc;
         c->keys.acc = c->keys.dec;
         c->keys.dec = temp_for_swap;
@@ -2232,7 +2229,6 @@ void DoRevs(tCar_spec* c, br_scalar dt) {
         + c->car_master_actor->t.t.mat.m[2][1] * c->v.v[1]
         + c->car_master_actor->t.t.mat.m[2][0] * c->v.v[0]);
 
-    // LOG_DEBUG("ts %f, acc %f", ts, c->acc_force);
     if (c->gear) {
         c->target_revs = ts / c->speed_revs_ratio / (double)c->gear;
     } else {
@@ -2846,7 +2842,7 @@ void SkidNoise(tCar_spec* pC, int pWheel_num, br_scalar pV, int material) {
     pos.v[2] = pC->wpos[pWheel_num].v[2];
     BrMatrix34ApplyP(&world_pos, &pos, &pC->car_master_actor->t.t.mat);
     BrVector3InvScale(&world_pos, &world_pos, WORLD_SCALE);
-    if (!DRS3SoundStillPlaying(gSkid_tag[i]) || pC->driver == eDriver_local_human && gLast_car_to_skid[i] != pC) {
+    if (!DRS3SoundStillPlaying(gSkid_tag[i]) || (pC->driver == eDriver_local_human && gLast_car_to_skid[i] != pC)) {
         gSkid_tag[i] = DRS3StartSound3D(
             gIndexed_outlets[1],
             IRandomBetween(0, 4) + 9000,
@@ -2859,19 +2855,11 @@ void SkidNoise(tCar_spec* pC, int pWheel_num, br_scalar pV, int material) {
         gLast_car_to_skid[i] = pC;
     }
     if (gCurrent_race.material_modifiers[material].smoke_type == 1) {
-        wv.v[0] = pC->omega.v[1] * pos.v[2] - pC->omega.v[2] * pos.v[1];
-        wv.v[1] = pC->omega.v[2] * pos.v[0] - pC->omega.v[0] * pos.v[2];
-        wv.v[2] = pos.v[1] * pC->omega.v[0] - pC->omega.v[1] * pos.v[0];
-        wv.v[0] = pC->velocity_car_space.v[0] + wv.v[0];
-        wv.v[1] = pC->velocity_car_space.v[1] + wv.v[1];
-        wv.v[2] = pC->velocity_car_space.v[2] + wv.v[2];
-        ts = -(pC->road_normal.v[2] * wv.v[2] + pC->road_normal.v[0] * wv.v[0] + pC->road_normal.v[1] * wv.v[1]);
-        wvw.v[0] = pC->road_normal.v[0] * ts;
-        wvw.v[1] = pC->road_normal.v[1] * ts;
-        wvw.v[2] = pC->road_normal.v[2] * ts;
-        wv.v[0] = wvw.v[0] + wv.v[0];
-        wv.v[1] = wvw.v[1] + wv.v[1];
-        wv.v[2] = wvw.v[2] + wv.v[2];
+        BrVector3Cross(&wv, &pC->omega, &pos);
+        BrVector3Add(&wv, &wv, &pC->velocity_car_space);
+        ts = -(BrVector3Dot(&wv, &pC->road_normal));
+        BrVector3Scale(&wvw, &pC->road_normal, ts);
+        BrVector3Add(&wv, &wv, &wvw);
         BrMatrix34ApplyV(&wvw, &wv, &pC->car_master_actor->t.t.mat);
         CreatePuffOfSmoke(&world_pos, &wvw, pV / 25.0, 1.0, 4, pC);
     }
