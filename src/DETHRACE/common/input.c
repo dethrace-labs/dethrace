@@ -207,7 +207,7 @@ tU32* KevKeyService() {
     tU32 keys;
 
     keys = gKeys_pressed;
-    //printf("key: %d, %lx, %lx\n", sizeof(long), keys, code2);
+    // printf("key: %d, %lx, %lx\n", sizeof(long), keys, code2);
     return_val[0] = 0;
     return_val[1] = 0;
 
@@ -240,12 +240,12 @@ tU32* KevKeyService() {
         code += keys << 11;
         code = (code >> 17) + (code << 4);
         code2 = (code2 >> 29) + keys * keys + (code2 << 3);
-        //printf("accumulate: keys=%lx, sum=%lx, code=%lx, code2=%lx\n", keys, sum, code, code2);
+        // printf("accumulate: keys=%lx, sum=%lx, code=%lx, code2=%lx\n", keys, sum, code, code2);
         last_time = PDGetTotalTime();
     } else if (PDGetTotalTime() > (last_time + 1000)) {
         return_val[0] = ((code >> 11) + (sum << 21));
         return_val[1] = code2;
-        //printf("final value: code=%lx, code2=%lx\n", return_val[0], return_val[1]);
+        // printf("final value: code=%lx, code2=%lx\n", return_val[0], return_val[1]);
         code = 0;
         code2 = 0;
         sum = 0;
@@ -692,7 +692,7 @@ void DoRLTypeLetter(int pChar, int pSlot_index) {
     int new_len;
     LOG_TRACE("(%d, %d)", pChar, pSlot_index);
 
-    //v2 = pSlot_index;
+    // v2 = pSlot_index;
     if (pChar >= 32) {
         if (gInsert_mode) {
             new_len = strlen(gCurrent_typing) + 1;
@@ -782,7 +782,7 @@ void TypeKey(int pSlot_index, char pKey) {
     case KEY_RIGHT:
         DoRLCursorRight(pSlot_index);
         break;
-    default:	
+    default:
         DoRLTypeLetter(PDGetASCIIFromKey(pKey), pSlot_index);
         break;
     }

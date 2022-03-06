@@ -497,7 +497,7 @@ void setActiveMaterial(tStored_material* material) {
         if (material->shade_table) {
             GLRenderer_SetShadeTable(material->shade_table);
         }
-        if ((material->flags & BR_MATF_LIGHT) && material->shade_table) {
+        if ((material->flags & BR_MATF_LIGHT) && !(material->flags & BR_MATF_PRELIT) && material->shade_table) {
             // TODO: light value shouldn't always be 0? Works for shadows, not sure about other things.
             glUniform1i(uniforms_3d.light_value, 0);
         } else {
@@ -566,7 +566,7 @@ void GLRenderer_RenderModel(br_actor* actor, br_model* model, br_matrix34 model_
         glDrawElements(GL_TRIANGLES, group->nfaces * 3, GL_UNSIGNED_INT, (void*)(element_index * sizeof(int)));
         element_index += group->nfaces * 3;
     }
-    //glUniform1i(uniforms_3d.palette_index_override, 0);//material->index_base);
+
     glBindVertexArray(0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     dirty_buffers = 1;

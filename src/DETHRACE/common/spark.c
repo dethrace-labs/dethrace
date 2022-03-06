@@ -8,6 +8,7 @@
 #include "graphics.h"
 #include "harness/trace.h"
 #include "loading.h"
+#include "piping.h"
 #include "utility.h"
 #include "world.h"
 
@@ -64,7 +65,10 @@ void SetWorldToScreen(br_pixelmap* pScreen) {
     br_matrix4 mat;
     br_matrix4 mat2;
     LOG_TRACE("(%p)", pScreen);
-    NOT_IMPLEMENTED();
+
+    BrMatrix4Perspective(&mat, gSpark_cam->field_of_view, gSpark_cam->aspect, -gSpark_cam->hither_z, -gSpark_cam->yon_z);
+    BrMatrix4Scale(&mat2, pScreen->width / 2, pScreen->height / 2, 1.0);
+    BrMatrix4Mul(&gCameraToScreen, &mat, &mat2);
 }
 
 // IDA: void __usercall DrawLine3DThroughBRender(br_vector3 *pStart@<EAX>, br_vector3 *pEnd@<EDX>)
@@ -140,6 +144,10 @@ void RenderSparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_ac
     br_vector3 new_pos;
     br_scalar ts;
     LOG_TRACE("(%p, %p, %p, %p, %d)", pRender_screen, pDepth_buffer, pCamera, pCamera_to_world, pTime);
+
+    gSpark_cam = pCamera->type_data;
+    SetWorldToScreen(pRender_screen);
+
     STUB_ONCE();
 }
 
@@ -494,7 +502,23 @@ void SmokeLine(int l, int x, br_scalar zbuff, int r_squared, tU8* scr_ptr, tU16*
     int shade_offset_int;
     tU16 z;
     LOG_TRACE("(%d, %d, %f, %d, %p, %p, %p, %f, %f, %f)", l, x, zbuff, r_squared, scr_ptr, depth_ptr, shade_ptr, r_multiplier, z_multiplier, shade_offset);
-    NOT_IMPLEMENTED();
+
+    scr_ptr += gOffset;
+    if (gProgram_state.cockpit_on) {
+        depth_ptr += gOffset;
+    }
+    z = (int)(uint16_t)(int)((1.0 - zbuff) * 32768.0);
+    for (i = 0; i < l; i++) {
+        if (*depth_ptr > z) {
+            shade_offset_int = (((int)((int)(shade_offset * 65536.0) - r_squared * (int)(r_multiplier * 65536.0)) >> 8) & 0xFFFFFF00);
+            *scr_ptr = shade_ptr[*scr_ptr + shade_offset_int];
+        }
+        r_multiplier_int = x + r_squared;
+        scr_ptr++;
+        x++;
+        depth_ptr++;
+        r_squared = x + r_multiplier_int;
+    }
 }
 
 // IDA: void __usercall SmokeCircle(br_vector3 *o@<EAX>, br_scalar r, br_scalar extra_z, br_scalar strength, br_scalar pAspect, br_pixelmap *pRender_screen, br_pixelmap *pDepth_buffer, br_pixelmap *pShade_table)
@@ -527,7 +551,153 @@ void SmokeCircle(br_vector3* o, br_scalar r, br_scalar extra_z, br_scalar streng
     br_scalar aspect_squared;
     void (*line)(int, int, br_scalar, int, tU8*, tU16*, tU8*, br_scalar, br_scalar, br_scalar);
     LOG_TRACE("(%p, %f, %f, %f, %f, %p, %p, %p)", o, r, extra_z, strength, pAspect, pRender_screen, pDepth_buffer, pShade_table);
-    NOT_IMPLEMENTED();
+
+    line = SmokeLine;
+    ox = pRender_screen->width / 2 + o->v[0];
+    oy = pRender_screen->height / 2 + o->v[1];
+    max_r_squared = r * r;
+    zbuff = o->v[2];
+    aspect_squared = pAspect * pAspect;
+    if (pRender_screen->width / 4 <= r
+        || pRender_screen->width <= ox - r
+        || ox + r < 0.0f) {
+        return;
+    }
+    shade_ptr = (tU8*)pShade_table->pixels + pShade_table->row_bytes * (pShade_table->base_y + 1);
+    shade_offset = strength * 14.99;
+    r_multiplier = shade_offset / (double)max_r_squared;
+    z_multiplier = extra_z / (double)max_r_squared;
+    max_x = pRender_screen->width - ox - 1;
+    min_x = -ox;
+    ry = r / pAspect;
+    l = pRender_screen->height - oy - 1;
+    scr_ptr = pRender_screen->pixels;
+    scr_ptr += pRender_screen->base_x + pRender_screen->base_y * pRender_screen->row_bytes + ox + l * pRender_screen->row_bytes;
+    depth_ptr = (tU16*)((char*)pDepth_buffer->pixels + 2 * ox + 2 * l * (pDepth_buffer->row_bytes / 2));
+    osp = scr_ptr;
+    odp = depth_ptr;
+    if (pRender_screen->height > oy && oy + ry >= 0.0) {
+        r_squared = (r * r);
+        inc = -r;
+        y = 0;
+        y_limit = ry;
+        if (oy < 0) {
+            y = -oy;
+            r_squared = (-oy * -oy) * aspect_squared;
+            scr_ptr += oy * pRender_screen->row_bytes;
+            depth_ptr += oy * (pDepth_buffer->row_bytes / 2);
+            inc = -sqrtf(max_r_squared - r_squared);
+            r_squared += inc * inc;
+        }
+        if (pRender_screen->height < oy + ry) {
+            y_limit = pRender_screen->height - oy - 1;
+        }
+        l = -2 * inc;
+        scr_ptr += inc;
+        depth_ptr += inc;
+        gOffset = 0;
+        while (1) {
+            x = inc + gOffset;
+            if (min_x <= inc + gOffset && l + x - 1 <= max_x) {
+                line(l, inc, zbuff, r_squared, scr_ptr, depth_ptr, shade_ptr, r_multiplier, z_multiplier, shade_offset);
+            } else {
+                if (max_x < x || l + x < min_x) {
+                    break;
+                }
+                x2 = l;
+                if (l + x - 1 - max_x > 0) {
+                    x2 = max_x - (x - 1);
+                }
+                if (min_x - x <= 0) {
+                    line(x2, inc, zbuff, r_squared, scr_ptr, depth_ptr, shade_ptr, r_multiplier, z_multiplier, shade_offset);
+                } else {
+                    line(x2 - (min_x - x), min_x - x + inc, zbuff, y * y + (min_x - x + inc) * (min_x - x + inc), &scr_ptr[min_x - x], &depth_ptr[min_x - x], shade_ptr, r_multiplier, z_multiplier, shade_offset);
+                }
+            }
+            if (y_limit <= y) {
+                break;
+            }
+            ++y;
+            scr_ptr -= pRender_screen->row_bytes;
+            depth_ptr -= pDepth_buffer->row_bytes / 2;
+            for (r_squared += (2 * y - 1) * aspect_squared; max_r_squared < r_squared && inc < 0; r_squared += 2 * inc - 1) {
+                inc++;
+                scr_ptr++;
+                depth_ptr++;
+                l -= 2;
+            }
+            gOffset += IRandomBetween(-1, 1);
+            if (gOffset > r / 5.0) {
+                gOffset = r / 5.0;
+            }
+            if (gOffset < -(r / 5.0)) {
+                gOffset = -(r / 5.0);
+            }
+        }
+    }
+    if (pAspect < 1.0) {
+        aspect_squared = 9.0;
+        ry = r / 3.0;
+    }
+    if (oy > 0 && oy <= pRender_screen->height + ry - 2.0) {
+        r_squared = (r * r);
+        inc = -r;
+        y = 0;
+        scr_ptr = osp;
+        depth_ptr = odp;
+        y_limit = ry;
+        if (pRender_screen->height < oy) {
+            l2 = oy - pRender_screen->height;
+            y = pRender_screen->height - oy;
+            r_squared = y * y * aspect_squared;
+            scr_ptr = &osp[l2 * pRender_screen->row_bytes];
+            depth_ptr = &odp[l2 * (pDepth_buffer->row_bytes / 2)];
+            inc = -sqrtf(max_r_squared - r_squared);
+            r_squared += inc * inc;
+        }
+        if (oy - ry < 0.0) {
+            y_limit = oy;
+        }
+        l = -2 * inc;
+        scr_ptr += inc;
+        depth_ptr += inc;
+        gOffset = 0;
+        do {
+            y--;
+            scr_ptr += pRender_screen->row_bytes;
+            depth_ptr += pDepth_buffer->row_bytes / 2;
+            for (r_squared -= (2 * y - 1) * aspect_squared; max_r_squared < r_squared && inc < 0; r_squared += 2 * inc - 1) {
+                inc++;
+                scr_ptr++;
+                depth_ptr++;
+                l -= 2;
+            }
+            x = inc + gOffset;
+            if (min_x <= inc + gOffset && l + x - 1 <= max_x) {
+                line(l, inc, zbuff, r_squared, scr_ptr, depth_ptr, shade_ptr, r_multiplier, z_multiplier, shade_offset);
+            } else {
+                if (max_x < x || l + x < min_x) {
+                    return;
+                }
+                x2 = l;
+                if (l + x - 1 - max_x > 0) {
+                    x2 = max_x - (x - 1);
+                }
+                if (min_x - x <= 0) {
+                    line(x2, inc, zbuff, r_squared, scr_ptr, depth_ptr, shade_ptr, r_multiplier, z_multiplier, shade_offset);
+                } else {
+                    line(x2 - (min_x - x), min_x - x + inc, zbuff, y * y + (min_x - x + inc) * (min_x - x + inc), &scr_ptr[min_x - x], &depth_ptr[min_x - x], shade_ptr, r_multiplier, z_multiplier, shade_offset);
+                }
+            }
+            gOffset += IRandomBetween(-1, 1);
+            if (gOffset > r / 5.0) {
+                gOffset = r / 5.0;
+            }
+            if (gOffset < -(r / 5.0)) {
+                gOffset = -r / 5.0;
+            }
+        } while (-y < y_limit);
+    }
 }
 
 // IDA: int __cdecl CmpSmokeZ(void *p1, void *p2)
@@ -566,7 +736,21 @@ void SmokeCircle3D(br_vector3* o, br_scalar r, br_scalar strength, br_scalar pAs
     int scaled_r;
     br_scalar extra_z;
     LOG_TRACE("(%p, %f, %f, %f, %p, %p, %p, %p)", o, r, strength, pAspect, pRender_screen, pDepth_buffer, pShade_table, pCam);
-    NOT_IMPLEMENTED();
+
+    cam = pCam->type_data;
+    srand(o->v[2] * 16777216.0 + o->v[1] * 65536.0 + o->v[0] * 256.0 + r);
+    BrVector3Sub(&tv, o, (br_vector3*)gCamera_to_world.m[3]);
+    BrMatrix34TApplyV(&p, &tv, &gCamera_to_world);
+
+    if (-p.v[2] >= cam->hither_z && -p.v[2] <= cam->yon_z) {
+        scaled_r = gCameraToScreen.m[0][0] * r / -p.v[2];
+        extra_z = gCameraToScreen.m[3][2] * r / (p.v[2] * p.v[2]);
+        BrMatrix4ApplyP(&o2, &p, &gCameraToScreen);
+        p.v[0] = o2.v[0] / o2.v[3];
+        p.v[1] = o2.v[1] / o2.v[3];
+        p.v[2] = o2.v[2] / o2.v[3];
+        SmokeCircle(&p, (br_scalar)scaled_r, extra_z, strength, pAspect, pRender_screen, pDepth_buffer, pShade_table);
+    }
 }
 
 // IDA: void __usercall ReplaySmoke(br_pixelmap *pRender_screen@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>)
@@ -609,7 +793,93 @@ void RenderSmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
     tU32 seed;
     tU32 not_lonely;
     LOG_TRACE("(%p, %p, %p, %p, %d)", pRender_screen, pDepth_buffer, pCamera, pCamera_to_world, pTime);
-    STUB_ONCE();
+
+    not_lonely = 0;
+    DrawTheGlow(pRender_screen, pDepth_buffer, pCamera);
+
+    if (gSmoke_flags) {
+        seed = rand();
+        if (gAction_replay_mode) {
+            ReplaySmoke(pRender_screen, pDepth_buffer, pCamera);
+            srand(seed);
+        } else {
+            StartPipingSession(ePipe_chunk_smoke);
+            for (i = 0; i < COUNT_OF(gSmoke); i++) {
+                if ((gSmoke_flags & (1 << i)) != 0) {
+                    if (gSmoke[i].strength > 0.0) {
+                        if (gSmoke[i].time_sync) {
+                            BrVector3Scale(&tv, &gSmoke[i].v, gSmoke[i].time_sync / 1000.0);
+                            // tv.v[0] = gSmoke[i].time_sync / 1000.0 * gSmoke[i].v.v[0];
+                            // tv.v[1] = gSmoke[i].time_sync / 1000.0 * gSmoke[i].v.v[1];
+                            // tv.v[2] = gSmoke[i].time_sync / 1000.0 * gSmoke[i].v.v[2];
+                            gSmoke[i].time_sync = 0;
+                        } else {
+                            BrVector3Scale(&tv, &gSmoke[i].v, pTime / 1000.0);
+                            // tv.v[0] = pTime / 1000.0 * gSmoke[i].v.v[0];
+                            // tv.v[1] = pTime / 1000.0 * gSmoke[i].v.v[1];
+                            // tv.v[2] = pTime / 1000.0 * gSmoke[i].v.v[2];
+                        }
+                        BrVector3Add(&gSmoke[i].pos, &gSmoke[i].pos, &tv);
+                    } else {
+                        gSmoke_flags &= ~(1 << i);
+                    }
+                }
+            }
+            for (i = 0; i < COUNT_OF(gSmoke); i++) {
+                if ((gSmoke_flags & (1 << i)) != 0) {
+                    if ((gSmoke[i].type & 0xF) == 7) {
+                        not_lonely |= 1 << i;
+                    } else if ((not_lonely & (1 << i)) == 0) {
+                        for (j = i + 1; j < COUNT_OF(gSmoke); j++) {
+                            if ((gSmoke_flags & (1 << j)) != 0) {
+                                BrVector3Sub(&tv, &gSmoke[i].pos, &gSmoke[i].pos);
+                                ts = BrVector3LengthSquared(&tv);
+                                if ((gSmoke[i].radius + gSmoke[j].radius) * (gSmoke[i].radius + gSmoke[j].radius) > ts) {
+                                    not_lonely |= (1 << j) | (1 << i);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (((1 << i) & not_lonely) == 0) {
+                        gSmoke[i].strength = gSmoke[i].strength / 2.0;
+                    }
+                    aspect = (gSmoke[i].radius - 0.05) / 0.25 * 0.5 + 1.0;
+                    if ((gSmoke[i].type & 0x10) != 0) {
+                        SmokeCircle3D(&gSmoke[i].pos, gSmoke[i].radius / aspect, gSmoke[i].strength, 1.0, pRender_screen, pDepth_buffer, gShade_list[gSmoke[i].type & 0xF], pCamera);
+                    } else {
+                        SmokeCircle3D(&gSmoke[i].pos, gSmoke[i].radius, gSmoke[i].strength, aspect, pRender_screen, pDepth_buffer, gShade_list[gSmoke[i].type & 0xF], pCamera);
+                    }
+                    if (gSmoke[i].pipe_me) {
+                        AddSmokeToPipingSession(i, gSmoke[i].type, &gSmoke[i].pos, gSmoke[i].radius, gSmoke[i].strength);
+                    }
+                    gSmoke[i].radius = (double)pTime / 1000.0 * gSmoke[i].strength * 0.5 + gSmoke[i].radius;
+                    gSmoke[i].strength = gSmoke[i].strength - (double)pTime * gSmoke[i].decay_factor / 1000.0;
+                    if (gSmoke[i].radius > 0.3) {
+                        gSmoke[i].radius = 0.3;
+                    }
+                    if (gSmoke[i].strength > 0.0) {
+                        ts = 1.0 - (double)pTime * 0.002;
+                        if (ts < 0.5) {
+                            ts = 0.5;
+                        }
+                        BrVector3Scale(&gSmoke[i].v, &gSmoke[i].v, ts);
+                        if (fabs(gSmoke[i].v.v[1]) < 0.43478259 && (gSmoke[i].type & 0xFu) < 7) {
+                            if (gSmoke[i].v.v[1] >= 0.0) {
+                                gSmoke[i].v.v[1] = 0.43478259;
+                            } else {
+                                gSmoke[i].v.v[1] = gSmoke[i].v.v[1] + 0.43478259;
+                            }
+                        }
+                    } else {
+                        gSmoke_flags &= ~(1 << i);
+                    }
+                }
+            }
+            EndPipingSession();
+            srand(seed);
+        }
+    }
 }
 
 // IDA: void __usercall CreatePuffOfSmoke(br_vector3 *pos@<EAX>, br_vector3 *v@<EDX>, br_scalar strength, br_scalar pDecay_factor, int pType, tCar_spec *pC)
@@ -617,7 +887,43 @@ void CreatePuffOfSmoke(br_vector3* pos, br_vector3* v, br_scalar strength, br_sc
     br_vector3 tv;
     int pipe_me;
     LOG_TRACE("(%p, %p, %f, %f, %d, %p)", pos, v, strength, pDecay_factor, pType, pC);
-    NOT_IMPLEMENTED();
+
+    if (!gSmoke_on) {
+        return;
+    }
+    // if we are too far away from the current car...
+    BrVector3Sub(&tv, pos, &gProgram_state.current_car.pos);
+    if (BrVector3LengthSquared(&tv) > 625.0) {
+        // check the distance from the car we are viewing and if it is too far away also, just return
+        BrVector3Sub(&tv, pos, &gCar_to_view->pos);
+        if (&gProgram_state.current_car != gCar_to_view && BrVector3LengthSquared(&tv) > 625.0) {
+            return;
+        }
+    }
+
+    BrVector3InvScale(&gSmoke[gSmoke_num].v, v, WORLD_SCALE);
+    gSmoke[gSmoke_num].v.v[1] = gSmoke[gSmoke_num].v.v[1] + 0.1449275362318841;
+    gSmoke[gSmoke_num].pos = *pos;
+    gSmoke[gSmoke_num].radius = 0.05;
+    if ((pType & 0xF) == 7) {
+        gSmoke[gSmoke_num].radius *= 2.0f;
+    } else {
+        gSmoke[gSmoke_num].pos.v[1] += 0.04;
+    }
+    gSmoke[gSmoke_num].pos.v[1] += 0.04;
+    if (strength > 1.0) {
+        strength = 1.0;
+    }
+    gSmoke[gSmoke_num].strength = strength;
+    gSmoke_flags |= 1 << gSmoke_num;
+    gSmoke[gSmoke_num].time_sync = gMechanics_time_sync;
+    gSmoke[gSmoke_num].type = pType;
+    gSmoke[gSmoke_num].decay_factor = pDecay_factor;
+    gSmoke[gSmoke_num].pipe_me = 1;
+    gSmoke_num++;
+    if (gSmoke_num >= 25) {
+        gSmoke_num = 0;
+    }
 }
 
 // IDA: void __cdecl ResetSmoke()
@@ -668,13 +974,9 @@ void GenerateSmokeShades() {
     static int bg = 0x80;
     LOG_TRACE("()");
 
-    STUB();
-    return;
-    
-    // FIXME: use this once the car can be shaded correctly
     gBlack_smoke_shade_table = GenerateShadeTable(16, gRender_palette, rb, gb, bb, .25f, .6f, .9f);
-    gDark_smoke_shade_table =  GenerateShadeTable(16, gRender_palette, rd, gd, bd, .25f, .6f, .9f);
-    gGrey_smoke_shade_table =  GenerateShadeTable(16, gRender_palette, rg, gg, bg, .25f, .6f, .9f);
+    gDark_smoke_shade_table = GenerateShadeTable(16, gRender_palette, rd, gd, bd, .25f, .6f, .9f);
+    gGrey_smoke_shade_table = GenerateShadeTable(16, gRender_palette, rg, gg, bg, .25f, .6f, .9f);
     gIt_shade_table = GenerateDarkenedShadeTable(16, gRender_palette, 0, 255, 254, .25f, .5f, .75f, .6f);
 
     gShade_list[0] = gBlack_smoke_shade_table;
@@ -770,7 +1072,7 @@ void DisposeFlame() {
     }
 
     for (i = 0; i < 5; i++) {
-        if ((gSplash_flags & (1 << i)) && (gSmoke_column[i].colour == 0)) {
+        if ((gColumn_flags & (1 << i)) && (gSmoke_column[i].colour == 0)) {
             BrActorRemove(gSmoke_column[i].flame_actor);
         }
         actor = gSmoke_column[i].flame_actor->children;
@@ -795,7 +1097,7 @@ void InitFlame() {
     br_material* material;
     LOG_TRACE("()");
 
-    gSplash_flags = 0;
+    gColumn_flags = 0;
     gLollipop_model = BrModelAllocate("Lollipop", 4, 2);
     PathCat(the_path, gApplication_path, "PIXELMAP");
     PathCat(the_path, the_path, "FLAMES.PIX");
@@ -821,8 +1123,8 @@ void InitFlame() {
     }
     gLollipop_model->nvertices = 4;
     BrVector3SetFloat(&gLollipop_model->vertices[0].p, -.5f, 0.f, .0f);
-    BrVector3SetFloat(&gLollipop_model->vertices[1].p,  .5f, 0.f, .0f);
-    BrVector3SetFloat(&gLollipop_model->vertices[2].p,  .5f, 1.f, .0f);
+    BrVector3SetFloat(&gLollipop_model->vertices[1].p, .5f, 0.f, .0f);
+    BrVector3SetFloat(&gLollipop_model->vertices[2].p, .5f, 1.f, .0f);
     BrVector3SetFloat(&gLollipop_model->vertices[3].p, -.5f, 1.f, .0f);
     gLollipop_model->vertices[0].map.v[0] = 0.f;
     gLollipop_model->vertices[0].map.v[1] = 1.f;
@@ -879,7 +1181,7 @@ void InitSplash(FILE* pF) {
     BrMapAddMany(splash_maps, gNum_splash_types);
     for (i = 0; i < gNum_splash_types; ++i) {
         gSplash_material[i] = BrMaterialAllocate(0);
-        gSplash_material[i]->flags &= ~ (BR_MATF_LIGHT | BR_MATF_PRELIT);
+        gSplash_material[i]->flags &= ~(BR_MATF_LIGHT | BR_MATF_PRELIT);
         gSplash_material[i]->flags |= BR_MATF_ALWAYS_VISIBLE | BR_MATF_PERSPECTIVE;
         gSplash_material[i]->index_blend = LoadSingleShadeTable(&gTrack_storage_space, "BLEND50.TAB");
         gSplash_material[i]->colour_map = splash_maps[i];
@@ -887,8 +1189,8 @@ void InitSplash(FILE* pF) {
     }
     gSplash_model->nvertices = 4;
     BrVector3SetFloat(&gSplash_model->vertices[0].p, -0.5f, 0.0f, 0.0f);
-    BrVector3SetFloat(&gSplash_model->vertices[1].p,  0.5f, 0.0f, 0.0f);
-    BrVector3SetFloat(&gSplash_model->vertices[2].p,  0.5f, 1.0f, 0.0f);
+    BrVector3SetFloat(&gSplash_model->vertices[1].p, 0.5f, 0.0f, 0.0f);
+    BrVector3SetFloat(&gSplash_model->vertices[2].p, 0.5f, 1.0f, 0.0f);
     BrVector3SetFloat(&gSplash_model->vertices[3].p, -0.5f, 1.0f, 0.0f);
     gSplash_model->vertices[0].map.v[0] = 0.0f;
     gSplash_model->vertices[0].map.v[1] = 1.0f;
@@ -949,7 +1251,22 @@ void DrawTheGlow(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
     br_vector3 tv;
     tU32 seed;
     LOG_TRACE("(%p, %p, %p)", pRender_screen, pDepth_buffer, pCamera);
-    NOT_IMPLEMENTED();
+
+    if (gColumn_flags) {
+        seed = rand();
+        srand(GetTotalTime());
+        for (i = 0; i < 5; i++) {
+            if (((1 << i) & gColumn_flags) != 0 && gSmoke_column[i].colour <= 1) {
+                strength = 0.5;
+                if (gSmoke_column[i].lifetime < 4000) {
+                    strength = gSmoke_column[i].lifetime * 0.5 / 4000.0;
+                }
+                BrVector3Set(&tv, gSmoke_column[i].pos.v[0], gSmoke_column[i].pos.v[1] + 0.02, gSmoke_column[i].pos.v[2]);
+                SmokeCircle3D(&tv, 0.07, strength, SRandomBetween(0.5, 0.99000001), pRender_screen, pDepth_buffer, gAcid_shade_table, pCamera);
+            }
+        }
+        srand(seed);
+    }
 }
 
 // IDA: void __usercall PipeInstantUnSmudge(tCar_spec *pCar@<EAX>)
@@ -997,7 +1314,7 @@ void ResetSmokeColumns() {
 // IDA: void __usercall SetSmokeOn(int pSmoke_on@<EAX>)
 void SetSmokeOn(int pSmoke_on) {
     LOG_TRACE("(%d)", pSmoke_on);
-    
+
     gSmoke_on = pSmoke_on;
 }
 

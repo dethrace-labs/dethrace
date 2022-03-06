@@ -97,6 +97,7 @@ br_matrix34 gIdentity34 = {
 tShadow_level gShadow_level = eShadow_us_only;
 br_scalar gShadow_hither_z_move;
 br_scalar gShadow_hither_min_move;
+/* clang-format off */
 // arrows pointing to 180, 202, 224, 246 degrees (step = 90 / 4 = 22(.5) degrees)
 int gArrows[2][4][60] =
 {
@@ -119,8 +120,10 @@ int gArrows[2][4][60] =
                0,  3, -1,  3, -2,  3, -2,  2, -2,  1, -2,  0, -3,  0, -3, -1, },
     },
 };
+/* clang-format on */
+
 float gMap_render_x = 80.f;
-float gMap_render_y =  6.f;
+float gMap_render_y = 6.f;
 float gMap_render_width = 64.f;
 float gMap_render_height = 40.f;
 int gMouse_started;
@@ -782,16 +785,16 @@ void DrawMapBlip(tCar_spec* pCar, tU32 pTime, br_matrix34* pTrans, br_vector3* p
     time_diff = pTime - gMap_mode;
     BrMatrix34ApplyP(&map_pos, pPos, &gCurrent_race.map_transformation);
     switch (gReal_graf_data_index) {
-        case 0:
-            break;
-        case 1:
-            map_pos.v[0] = map_pos.v[0] * 2.f;
-            map_pos.v[1] = map_pos.v[1] * 2.f + 40.f;
-            break;
-        default:
-            TELL_ME_IF_WE_PASS_THIS_WAY();
+    case 0:
+        break;
+    case 1:
+        map_pos.v[0] = map_pos.v[0] * 2.f;
+        map_pos.v[1] = map_pos.v[1] * 2.f + 40.f;
+        break;
+    default:
+        TELL_ME_IF_WE_PASS_THIS_WAY();
     }
-    period = 256;  // Must be power of 2
+    period = 256; // Must be power of 2
     colours[0] = pColour;
     colours[1] = OppositeColour(pColour);
     BrMatrix34Mul(&car_in_map_space, pTrans, &gCurrent_race.map_transformation);
@@ -829,24 +832,24 @@ void DrawMapBlip(tCar_spec* pCar, tU32 pTime, br_matrix34* pTrans, br_vector3* p
     if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_foxy && gNet_players[gIt_or_fox].car == pCar) {
         from_x = map_pos.v[0] - 8.f;
         from_y = map_pos.v[1] - 8.f;
-        to_x   = map_pos.v[0] + 8.f;
-        to_y   = map_pos.v[1] + 8.f;
-        BrPixelmapLine(gBack_screen, from_x, from_y, to_x,   from_y, colour);
-        BrPixelmapLine(gBack_screen, from_x, to_y,   to_x,   to_y, colour);
+        to_x = map_pos.v[0] + 8.f;
+        to_y = map_pos.v[1] + 8.f;
+        BrPixelmapLine(gBack_screen, from_x, from_y, to_x, from_y, colour);
+        BrPixelmapLine(gBack_screen, from_x, to_y, to_x, to_y, colour);
         BrPixelmapLine(gBack_screen, from_x, from_y, from_x, to_y, colour);
-        BrPixelmapLine(gBack_screen, to_x,   from_y, to_x,   to_y, colour);
+        BrPixelmapLine(gBack_screen, to_x, from_y, to_x, to_y, colour);
     }
-    // To attract the player's attention, draw a rectangle around the player's position that decreases in size, 
+    // To attract the player's attention, draw a rectangle around the player's position that decreases in size,
     if (time_diff <= 500 && pCar->driver == eDriver_local_human) {
         offset = ((500 - time_diff) * 70) / 500;
         from_x = map_pos.v[0] - offset - .5f;
         from_y = map_pos.v[1] - offset - .5f;
-        to_x   = map_pos.v[0] + offset + .5f;
-        to_y   = map_pos.v[1] + offset + .5f;
-        BrPixelmapLine(gBack_screen, from_x, from_y, to_x,   from_y, colour);
-        BrPixelmapLine(gBack_screen, from_x, to_y,   to_x,   to_y,   colour);
-        BrPixelmapLine(gBack_screen, from_x, from_y, from_x, to_y,   colour);
-        BrPixelmapLine(gBack_screen, to_x,   from_y, to_x,   to_y,   colour);
+        to_x = map_pos.v[0] + offset + .5f;
+        to_y = map_pos.v[1] + offset + .5f;
+        BrPixelmapLine(gBack_screen, from_x, from_y, to_x, from_y, colour);
+        BrPixelmapLine(gBack_screen, from_x, to_y, to_x, to_y, colour);
+        BrPixelmapLine(gBack_screen, from_x, from_y, from_x, to_y, colour);
+        BrPixelmapLine(gBack_screen, to_x, from_y, to_x, to_y, colour);
     }
 }
 
@@ -2635,28 +2638,28 @@ void DRPixelmapDoubledCopy(br_pixelmap* pDestn, br_pixelmap* pSource, int pSourc
 
     dst_row_skip = 2 * pDestn->row_bytes - 2 * pSource_width;
     src_row_skip = (pSource->row_bytes - pSource_width) / 2;
-    sptr  = (tU16*)((tU8*)pSource->pixels - 2 * src_row_skip + (pSource->row_bytes * pSource_height / 2) * 2);
-    dptr  = (tU8*)pDestn->pixels + pSource_width * 2 + (2 * pSource_height + pY_offset) * pDestn->row_bytes - pDestn->row_bytes;
+    sptr = (tU16*)((tU8*)pSource->pixels - 2 * src_row_skip + (pSource->row_bytes * pSource_height / 2) * 2);
+    dptr = (tU8*)pDestn->pixels + pSource_width * 2 + (2 * pSource_height + pY_offset) * pDestn->row_bytes - pDestn->row_bytes;
     dptr2 = dptr - pDestn->row_bytes;
     width_over_2 = pSource_width / 2;
     for (i = 0; i < pSource_height; i++) {
         for (j = 0; j < width_over_2; j++) {
             --sptr;
-            pixels =  *sptr;
+            pixels = *sptr;
             pixel_1 = pixels >> 8;
             pixel_2 = pixels >> 0;
-            dptr [-1] = pixel_1;
+            dptr[-1] = pixel_1;
             dptr2[-1] = pixel_1;
-            dptr [-2] = pixel_1;
+            dptr[-2] = pixel_1;
             dptr2[-2] = pixel_1;
-            dptr [-3] = pixel_2;
+            dptr[-3] = pixel_2;
             dptr2[-3] = pixel_2;
-            dptr [-4] = pixel_2;
+            dptr[-4] = pixel_2;
             dptr2[-4] = pixel_2;
             dptr -= 4;
             dptr2 -= 4;
         }
-        dptr  -= dst_row_skip;
+        dptr -= dst_row_skip;
         dptr2 -= dst_row_skip;
         sptr -= src_row_skip;
     }
