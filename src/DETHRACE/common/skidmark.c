@@ -70,7 +70,7 @@ void AdjustSkid(int pSkid_num, br_matrix34* pMatrix, int pMaterial_index) {
     gSkids[pSkid_num].pos.v[1] = pMatrix->m[3][1];
     gSkids[pSkid_num].pos.v[2] = pMatrix->m[3][2];
     gSkids[pSkid_num].actor->material = MaterialFromIndex(pMaterial_index);
-    gSkids[pSkid_num].actor->render_data = BR_RSTYLE_DEFAULT;
+    gSkids[pSkid_num].actor->render_style = BR_RSTYLE_DEFAULT;
 }
 
 // IDA: int __usercall FarFromLine2D@<EAX>(br_vector3 *pPt@<EAX>, br_vector3 *pL1@<EDX>, br_vector3 *pL2@<EBX>)
