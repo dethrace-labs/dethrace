@@ -2244,11 +2244,12 @@ void LoadRaces(tRace_list_spec* pRace_list, int* pCount, int pRace_type_index) {
     gCurrent_race_file_index = pRace_type_index + 1;
     f = OpenRaceFile();
     number_of_racers = 0;
-    while (!last_race) {
+    for (i = 0; !last_race; i++) {
         GetALineAndDontArgue(f, s);
         if (strcmp(s, "END") == 0) {
             last_race = 1;
         } else {
+            strcpy( pRace_list[i].name, s);
             SkipRestOfRace(f);
             // s = (s + 48);
             number_of_racers++;
