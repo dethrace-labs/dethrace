@@ -2246,7 +2246,7 @@ void LoadRaces(tRace_list_spec* pRace_list, int* pCount, int pRace_type_index) {
     number_of_racers = 0;
     for (i = 0; !last_race; i++) {
         GetALineAndDontArgue(f, s);
-        if (strcmp(pRace_list[i].name, "END") == 0) {
+        if (strcmp(s, "END") == 0) {
             last_race = 1;
         } else {
             strcpy( pRace_list[i].name, s);
