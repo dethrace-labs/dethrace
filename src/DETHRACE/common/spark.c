@@ -57,7 +57,11 @@ tShrapnel gShrapnel[15];
 // IDA: void __cdecl DrawDot(br_scalar z, tU8 *scr_ptr, tU16 *depth_ptr, tU8 *shade_ptr)
 void DrawDot(br_scalar z, tU8* scr_ptr, tU16* depth_ptr, tU8* shade_ptr) {
     LOG_TRACE("(%f, %p, %p, %p)", z, scr_ptr, depth_ptr, shade_ptr);
-    NOT_IMPLEMENTED();
+
+    if (*depth_ptr > (1.0 - z) * 32768.0) {
+        *depth_ptr = (1.0 - z) * 32768.0;
+        *scr_ptr = shade_ptr[*scr_ptr];
+    }
 }
 
 // IDA: void __usercall SetWorldToScreen(br_pixelmap *pScreen@<EAX>)
@@ -86,7 +90,34 @@ int DrawLine3D(br_vector3* start, br_vector3* end, br_pixelmap* pScreen, br_pixe
     br_vector4 p2;
     br_scalar ts;
     LOG_TRACE("(%p, %p, %p, %p, %p)", start, end, pScreen, pDepth_buffer, shade_table);
-    NOT_IMPLEMENTED();
+
+    o = *start;
+    p = *end;
+    if (-gSpark_cam->hither_z < o.v[2] || -gSpark_cam->hither_z < p.v[2]) {
+        if (-gSpark_cam->hither_z < o.v[2] && -gSpark_cam->hither_z < p.v[2]) {
+            return 0;
+        }
+        ts = (p.v[2] + gSpark_cam->hither_z) / (p.v[2] - o.v[2]);
+        if (-gSpark_cam->hither_z < o.v[2]) {
+            o.v[0] = p.v[0] - (p.v[0] - o.v[0]) * ts;
+            o.v[1] = p.v[1] - (p.v[1] - o.v[1]) * ts;
+            o.v[2] = -gSpark_cam->hither_z;
+        }
+        if (-gSpark_cam->hither_z < p.v[2]) {
+            p.v[0] = p.v[0] - (p.v[0] - o.v[0]) * ts;
+            p.v[1] = p.v[1] - (p.v[1] - o.v[1]) * ts;
+            p.v[2] = -gSpark_cam->hither_z;
+        }
+    }
+    BrMatrix4ApplyP(&o2, &o, &gCameraToScreen);
+    BrMatrix4ApplyP(&p2, &p, &gCameraToScreen);
+    o.v[0] = o2.v[0] / o2.v[3];
+    o.v[1] = o2.v[1] / o2.v[3];
+    o.v[2] = o2.v[2] / o2.v[3];
+    p.v[0] = p2.v[0] / p2.v[3];
+    p.v[1] = p2.v[1] / p2.v[3];
+    p.v[2] = p2.v[2] / p2.v[3];
+    return DrawLine2D(&o, &p, pScreen, pDepth_buffer, 1.0, shade_table);
 }
 
 // IDA: int __usercall DrawLine2D@<EAX>(br_vector3 *o@<EAX>, br_vector3 *p@<EDX>, br_pixelmap *pScreen@<EBX>, br_pixelmap *pDepth_buffer@<ECX>, br_scalar brightness, br_pixelmap *shade_table)
@@ -112,7 +143,147 @@ int DrawLine2D(br_vector3* o, br_vector3* p, br_pixelmap* pScreen, br_pixelmap* 
     int darken_count;
     int darken_init;
     LOG_TRACE("(%p, %p, %p, %p, %f, %p)", o, p, pScreen, pDepth_buffer, brightness, shade_table);
-    NOT_IMPLEMENTED();
+
+    scr_ptr = (tU8*)pScreen->pixels + pScreen->base_x + pScreen->base_y * pScreen->row_bytes;
+    depth_ptr = (tU16*)pDepth_buffer->pixels;
+    shade_ptr = (tU8*)shade_table->pixels + shade_table->base_y * shade_table->row_bytes;
+    x1 = pScreen->width / 2 + o->v[0];
+    x2 = pScreen->width / 2 + p->v[0];
+    y1 = pScreen->height / 2 - o->v[1];
+    y2 = pScreen->height / 2 - p->v[1];
+    if (brightness < 0.001 || brightness > 1.0) {
+        return 0;
+    }
+    if (x1 < 0 || x2 < 0) {
+        if (x1 < 0 && x2 < 0) {
+            return 0;
+        }
+        if (x1 >= 0) {
+            y2 = y1 - x1 * (y1 - y2) / (x1 - x2);
+            p->v[2] = o->v[2] - (o->v[2] - p->v[2]) * (float)x1 / (float)(x1 - x2);
+            x2 = 0;
+        } else {
+            y1 = y2 - x2 * (y2 - y1) / (x2 - x1);
+            o->v[2] = p->v[2] - (p->v[2] - o->v[2]) * (float)x2 / (float)(x2 - x1);
+            x1 = 0;
+        }
+    }
+    if (pScreen->width <= x1 || pScreen->width <= x2) {
+        if (pScreen->width <= x1 && pScreen->width <= x2) {
+            return 0;
+        }
+        if (pScreen->width > x1) {
+            y2 = y1 - (y1 - y2) * (x1 - (pScreen->width - 1)) / (x1 - x2);
+            p->v[2] = o->v[2] - (o->v[2] - p->v[2]) * (x1 - (float)(pScreen->width - 1)) / (float)(x1 - x2);
+            x2 = pScreen->width - 1;
+        } else {
+            y1 = y2 - (y2 - y1) * (x2 - (pScreen->width - 1)) / (x2 - x1);
+            o->v[2] = p->v[2] - (p->v[2] - o->v[2]) * (x2 - (float)(pScreen->width - 1)) / (float)(x2 - x1);
+            x1 = pScreen->width - 1;
+        }
+    }
+    if (y1 < 0 || y2 < 0) {
+        if (y1 < 0 && y2 < 0) {
+            return 0;
+        }
+        if (y1 >= 0) {
+            x2 = x1 - y1 * (x1 - x2) / (y1 - y2);
+            p->v[2] = o->v[2] - (o->v[2] - p->v[2]) * (float)y1 / (float)(y1 - y2);
+            y2 = 0;
+        } else {
+            x1 = x2 - y2 * (x2 - x1) / (y2 - y1);
+            o->v[2] = p->v[2] - (p->v[2] - o->v[2]) * (float)y2 / (float)(y2 - y1);
+            y1 = 0;
+        }
+    }
+    if (pScreen->height <= y1 || pScreen->height <= y2) {
+        if (pScreen->height <= y1 && pScreen->height <= y2) {
+            return 0;
+        }
+        if (pScreen->height > y1) {
+            x2 = x1 - (x1 - x2) * (y1 - (pScreen->height - 1)) / (y1 - y2);
+            p->v[2] = o->v[2] - (o->v[2] - p->v[2]) * (float)(y1 - (pScreen->height - 1)) / (float)(y1 - y2);
+            y2 = pScreen->height - 1;
+        } else {
+            x1 = x2 - (x2 - x1) * (y2 - (pScreen->height - 1)) / (y2 - y1);
+            o->v[2] = p->v[2] - (p->v[2] - o->v[2]) * (float)(y2 - (pScreen->height - 1)) / (float)(y2 - y1);
+            y1 = pScreen->height - 1;
+        }
+    }
+    zbuff = o->v[2];
+    dx = x2 - x1;
+    dy = y2 - y1;
+    ax = 2 * abs(dx);
+    if (x2 - x1 < 0) {
+        sx = -1;
+    } else {
+        sx = 1;
+    }
+    ay = 2 * abs(dy);
+    if (dy < 0) {
+        sy = -1;
+    } else {
+        sy = 1;
+    }
+    x = x1;
+    y = y1;
+    scr_ptr += x1 + y1 * pScreen->row_bytes;
+    depth_ptr += x1 + y1 * (pDepth_buffer->row_bytes / 2);
+    darken_init = (brightness - 0.001) * (double)shade_table->height;
+    if (ay >= ax) {
+        d = ax - ay / 2;
+        darken_init = 500 * ay / darken_init;
+        darken_count = darken_init;
+        zbuff_inc = (p->v[2] - o->v[2]) * 2.0 / (double)ay;
+        while (1) {
+            DrawDot(zbuff, scr_ptr, depth_ptr, shade_ptr);
+            if (y == y2) {
+                break;
+            }
+            if (d >= 0) {
+                scr_ptr += sx;
+                depth_ptr += sx;
+                d -= ay;
+            }
+            y += sy;
+            d += ax;
+            scr_ptr += sy * pScreen->row_bytes;
+            depth_ptr += sy * (pDepth_buffer->row_bytes / 2);
+            zbuff = zbuff_inc + zbuff;
+            darken_count -= 1000;
+            while (darken_count <= 0) {
+                darken_count += darken_init;
+                shade_ptr += shade_table->row_bytes;
+            }
+        }
+    } else {
+        d = ay - ax / 2;
+        darken_init = 500 * ax / darken_init;
+        darken_count = darken_init;
+        zbuff_inc = (p->v[2] - o->v[2]) * 2.0 / (double)ax;
+        while (1) {
+            DrawDot(zbuff, scr_ptr, depth_ptr, shade_ptr);
+            if (x == x2) {
+                break;
+            }
+            if (d >= 0) {
+                scr_ptr += sy * pScreen->row_bytes;
+                depth_ptr += sy * (pDepth_buffer->row_bytes / 2);
+                d -= ax;
+            }
+            x += sx;
+            scr_ptr += sx;
+            depth_ptr += sx;
+            d += ay;
+            zbuff = zbuff_inc + zbuff;
+            darken_count -= 1000;
+            while (darken_count <= 0) {
+                darken_count += darken_init;
+                shade_ptr += shade_table->row_bytes;
+            }
+        }
+    }
+    return 1;
 }
 
 // IDA: void __usercall SetLineModelCols(tU8 pCol@<EAX>)
@@ -148,7 +319,95 @@ void RenderSparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_ac
     gSpark_cam = pCamera->type_data;
     SetWorldToScreen(pRender_screen);
 
-    STUB_ONCE();
+    if (!gSpark_flags) {
+        return;
+    }
+
+    if (gAction_replay_mode) {
+        ReplaySparks(pRender_screen, pDepth_buffer, pCamera, pTime);
+    } else {
+        StartPipingSession(ePipe_chunk_spark);
+        for (i = 0; i < 32; ++i) {
+            if (((1 << i) & gSpark_flags) != 0) {
+                if (gSparks[i].count <= 0) {
+                    gSparks[i].count = 0;
+                    gSpark_flags &= ~(1 << i);
+                }
+                ts = BrVector3Dot(&gSparks[i].normal, &gSparks[i].v);
+                BrVector3Scale(&tv, &gSparks[i].normal, ts);
+                BrVector3Sub(&gSparks[i].v, &gSparks[i].v, &tv);
+                if (gSparks[i].time_sync) {
+                    BrVector3Scale(&o, &gSparks[i].v, gSparks[i].time_sync / 1000.0);
+                    gSparks[i].count = gSparks[i].time_sync + gSparks[i].count - pTime;
+                    gSparks[i].time_sync = 0;
+                } else {
+                    BrVector3Scale(&o, &gSparks[i].v, pTime / 1000.0);
+                    gSparks[i].count -= pTime;
+                }
+                BrVector3Add(&gSparks[i].pos, &gSparks[i].pos, &o);
+                time = 1000 - gSparks[i].count;
+                if (time > 150) {
+                    time = 150;
+                }
+                ts = (double)-time / 1000.0;
+                if (gSparks[i].colour) {
+                    ts = ts / 2.0;
+                }
+                BrVector3Scale(&gSparks[i].length, &gSparks[i].v, ts);
+                ts = pTime * 10.0 / 6900.0;
+                if (gSparks[i].car) {
+                    BrMatrix34ApplyV(&tv, &gSparks[i].length, &gSparks[i].car->car_master_actor->t.t.mat);
+                    BrVector3Copy(&gSparks[i].length, &tv);
+                    BrMatrix34ApplyP(&pos, &gSparks[i].pos, &gSparks[i].car->car_master_actor->t.t.mat);
+                    o = tv;
+                    gSparks[i].v.v[0] = gSparks[i].v.v[0] - gSparks[i].car->car_master_actor->t.t.mat.m[0][1] * ts;
+                    gSparks[i].v.v[1] = gSparks[i].v.v[1] - gSparks[i].car->car_master_actor->t.t.mat.m[1][1] * ts;
+                    gSparks[i].v.v[2] = gSparks[i].v.v[2] - gSparks[i].car->car_master_actor->t.t.mat.m[2][1] * ts;
+                } else {
+                    BrVector3Copy(&pos, &gSparks[i].pos);
+                    gSparks[i].v.v[1] = gSparks[i].v.v[1] - ts;
+                }
+                AddSparkToPipingSession(i + (gSparks[i].colour << 8), &pos, &gSparks[i].length);
+                // o.v[0] = gSparks[i].length.v[0] + pos.v[0];
+                // o.v[1] = gSparks[i].length.v[1] + pos.v[1];
+                // o.v[2] = gSparks[i].length.v[2] + pos.v[2];
+                BrVector3Add(&o, &gSparks[i].length, &pos);
+                // tv.v[0] = pos.v[0] - gCamera_to_world.m[3][0];
+                // tv.v[1] = pos.v[1] - gCamera_to_world.m[3][1];
+                // tv.v[2] = pos.v[2] - gCamera_to_world.m[3][2];
+                BrVector3Sub(&tv, &pos, (br_vector3*)gCamera_to_world.m[3]);
+                BrMatrix34TApplyV(&new_pos, &tv, &gCamera_to_world);
+                // tv.v[0] = o.v[0] - gCamera_to_world.m[3][0];
+                // tv.v[1] = o.v[1] - gCamera_to_world.m[3][1];
+                // tv.v[2] = o.v[2] - gCamera_to_world.m[3][2];
+                BrVector3Sub(&tv, &o, (br_vector3*)gCamera_to_world.m[3]);
+                BrMatrix34TApplyV(&p, &tv, &gCamera_to_world);
+                BrVector3SetFloat(&tv, FRandomBetween(-0.1, 0.1), FRandomBetween(-0.1, 0.1), FRandomBetween(-0.1, 0.1));
+                // gSparks[i].v.v[0] = gSparks[i].v.v[0] + tv.v[0];
+                // gSparks[i].v.v[1] = gSparks[i].v.v[1] + tv.v[1];
+                // gSparks[i].v.v[2] = gSparks[i].v.v[2] + tv.v[2];
+                BrVector3Add(&gSparks[i].v, &gSparks[i].v, &tv);
+                // v5 = sqrt(
+                //     gSparks[i].v.v[2] * gSparks[i].v.v[2]
+                //     + gSparks[i].v.v[1] * gSparks[i].v.v[1]
+                //     + gSparks[i].v.v[0] * gSparks[i].v.v[0]);
+                // ts = 1.0 - v5 / 1.4 * (double)pTime / 1000.0;
+                // if (v7) {
+                //     ts = 0.1;
+                // }
+                // gSparks[i].v.v[0] = gSparks[i].v.v[0] * ts;
+                // gSparks[i].v.v[1] = gSparks[i].v.v[1] * ts;
+                // gSparks[i].v.v[2] = gSparks[i].v.v[2] * ts;
+                BrVector3Normalise(&gSparks[i].v, &gSparks[i].v);
+                if (gSparks[i].colour) {
+                    DrawLine3D(&p, &new_pos, pRender_screen, pDepth_buffer, gFog_shade_table);
+                } else {
+                    DrawLine3D(&p, &new_pos, pRender_screen, pDepth_buffer, gAcid_shade_table);
+                }
+            }
+        }
+        EndPipingSession();
+    }
 }
 
 // IDA: void __usercall CreateSingleSpark(tCar_spec *pCar@<EAX>, br_vector3 *pPos@<EDX>, br_vector3 *pVel@<EBX>)
@@ -171,16 +430,32 @@ void CreateSparks(br_vector3* pos, br_vector3* v, br_vector3* pForce, br_scalar 
     LOG_TRACE("(%p, %p, %p, %f, %p)", pos, v, pForce, sparkiness, pCar);
 
     ts = BrVector3Length(pForce);
+
     BrVector3InvScale(&normal, pForce, ts);
+    LOG_VEC("v", v);
     ts2 = BrVector3Dot(pForce, v);
+    LOG_DEBUG("ts %f, ts2 %f", ts, ts2);
     if (ts2 >= 0) {
         ts2 = 1.f / (10.f * ts);
     } else {
         ts2 = 1.f / (10.f * ts) - ts2 / (ts * ts);
     }
+
     BrVector3Scale(&norm, pForce, ts2);
+    LOG_VEC("norm", &norm);
     BrVector3Accumulate(v, &norm);
-    num = FRandomBetween(0.f, BrVector3Length(v) / 2.f + 0.7f) * sparkiness;
+
+    LOG_VEC("v", v);
+
+    LOG_DEBUG("force len %f, dot %f, len(v) %f", ts, ts2, BrVector3Length(v));
+    LOG_DEBUG("pB %f", BrVector3Length(v) / 2.f + 0.7f);
+    LOG_DEBUG("spark %f", sparkiness);
+    float pb = BrVector3Length(v) / 2.f + 0.7f;
+    LOG_DEBUG("pb %f", pb);
+    float rd = FRandomBetween(0.f, pb) * sparkiness;
+    LOG_DEBUG("rd %f", rd);
+    num = (int)FRandomBetween(0.f, pb) * sparkiness;
+    LOG_DEBUG("num %d", num);
     if (num > 10) {
         num = 10;
     }
@@ -202,6 +477,7 @@ void CreateSparks(br_vector3* pos, br_vector3* v, br_vector3* pForce, br_scalar 
         }
     }
     if ((ts * sparkiness) >= 10.f) {
+        LOG_DEBUG("lots of sparks");
         tv.v[0] = pos->v[0] - pCar->car_master_actor->t.t.translate.t.v[0] / WORLD_SCALE;
         tv.v[1] = pos->v[1] - pCar->car_master_actor->t.t.translate.t.v[1] / WORLD_SCALE;
         tv.v[2] = pos->v[2] - pCar->car_master_actor->t.t.translate.t.v[2] / WORLD_SCALE;

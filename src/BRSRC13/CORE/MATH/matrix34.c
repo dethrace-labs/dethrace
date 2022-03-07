@@ -512,6 +512,7 @@ void BrMatrix34ApplyV(br_vector3* A, br_vector3* B, br_matrix34* C) {
     A->v[0] = BR_MAC3(B->v[0], C(0, 0), B->v[1], C(1, 0), B->v[2], C(2, 0));
     A->v[1] = BR_MAC3(B->v[0], C(0, 1), B->v[1], C(1, 1), B->v[2], C(2, 1));
     A->v[2] = BR_MAC3(B->v[0], C(0, 2), B->v[1], C(1, 2), B->v[2], C(2, 2));
+    // LOG_DEBUG("A1 %f %f %f %f", A->v[1], B->v[0] * C(0, 1), B->v[1] * C(1, 1), B->v[2] * C(2, 1));
 }
 
 // IDA: void __cdecl BrMatrix34TApply(br_vector4 *A, br_vector4 *B, br_matrix34 *C)

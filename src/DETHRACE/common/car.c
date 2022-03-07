@@ -2691,7 +2691,10 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
             }
             BrVector3InvScale(&tv, &tv, WORLD_SCALE);
             BrMatrix34ApplyV(&bb, &tv, &c->car_master_actor->t.t.mat);
+            // LOG_VEC("pvel", &p_vel);
             BrMatrix34ApplyV(&norm, &p_vel, &c->car_master_actor->t.t.mat);
+            // LOG_VEC("norm", &norm);
+            // LOG_MATRIX("master_actor", &c->car_master_actor->t.t.mat);
             CreateSparks(&pos, &bb, &norm, gCurrent_race.material_modifiers[gMaterial_index].sparkiness, car_spec);
         }
         return k;

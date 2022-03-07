@@ -208,8 +208,7 @@ int IRandomPosNeg(int pN) {
 // IDA: float __cdecl FRandomBetween(float pA, float pB)
 float FRandomBetween(float pA, float pB) {
     LOG_TRACE8("(%f, %f)", pA, pB);
-
-    return (float)rand() * (pB - pA) / 32768.0f + pA;
+    return (float)rand() * (pB - pA) / RAND_MAX + pA;
 }
 
 // IDA: float __cdecl FRandomPosNeg(float pN)
@@ -793,9 +792,9 @@ void MaterialCopy(br_material* pDst, br_material* pSrc) {
 double RGBDifferenceSqr(tRGB_colour* pColour_1, tRGB_colour* pColour_2) {
     LOG_TRACE("(%p, %p)", pColour_1, pColour_2);
 
-    return ((pColour_1->red   - pColour_2->red)   * (pColour_1->red   - pColour_2->red))
-        +  ((pColour_1->green - pColour_2->green) * (pColour_1->green - pColour_2->green))
-        +  ((pColour_1->blue  - pColour_2->blue)  * (pColour_1->blue  - pColour_2->blue));
+    return ((pColour_1->red - pColour_2->red) * (pColour_1->red - pColour_2->red))
+        + ((pColour_1->green - pColour_2->green) * (pColour_1->green - pColour_2->green))
+        + ((pColour_1->blue - pColour_2->blue) * (pColour_1->blue - pColour_2->blue));
 }
 
 // IDA: int __usercall FindBestMatch@<EAX>(tRGB_colour *pRGB_colour@<EAX>, br_pixelmap *pPalette@<EDX>)
@@ -907,9 +906,9 @@ br_pixelmap* GenerateDarkenedShadeTable(int pHeight, br_pixelmap* pPalette, int 
         ref_col.blue = pBlue_mix;
 
         for (c = 0, tab_ptr = the_table->pixels; c < 256; c++, tab_ptr++) {
-            the_RGB.red   = ((cp[c] >> 16) & 0xff) * pDarken;
-            the_RGB.green = ((cp[c] >>  8) & 0xff) * pDarken;
-            the_RGB.blue  = ((cp[c] >>  0) & 0xff) * pDarken;
+            the_RGB.red = ((cp[c] >> 16) & 0xff) * pDarken;
+            the_RGB.green = ((cp[c] >> 8) & 0xff) * pDarken;
+            the_RGB.blue = ((cp[c] >> 0) & 0xff) * pDarken;
 
             if (pHeight == 1) {
                 f_total_minus_1 = 1.;
