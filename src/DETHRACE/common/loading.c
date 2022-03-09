@@ -899,7 +899,95 @@ void DisposeCar(tCar_spec* pCar_spec, int pOwner) {
     int i;
     int j;
     LOG_TRACE("(%p, %d)", pCar_spec, pOwner);
-    NOT_IMPLEMENTED();
+
+    if (pCar_spec->driver_name[0] == '\0') {
+        return;
+    }
+    gFunk_groove_flags[pCar_spec->fg_index] = 0;
+    pCar_spec->driver_name[0] = '\0';
+    if (pCar_spec->driver == eDriver_local_human) {
+        for (i = 0; i < COUNT_OF(pCar_spec->cockpit_images); i++) {
+            if (pCar_spec->cockpit_images[i] != NULL) {
+                BrMemFree(pCar_spec->cockpit_images[i]);
+            }
+        }
+        if (pCar_spec->speedo_image[0] != NULL) {
+            BrPixelmapFree(pCar_spec->speedo_image[0]);
+        }
+        if (pCar_spec->speedo_image[1] != NULL) {
+            BrPixelmapFree(pCar_spec->speedo_image[1]);
+        }
+        if (pCar_spec->tacho_image[0] != NULL) {
+            BrPixelmapFree(pCar_spec->tacho_image[0]);
+        }
+        if (pCar_spec->tacho_image[1] != NULL) {
+            BrPixelmapFree(pCar_spec->tacho_image[1]);
+        }
+        for (i = 0; i < pCar_spec->number_of_hands_images; i++) {
+            if (pCar_spec->lhands_images[i] != NULL) {
+                BrPixelmapFree(pCar_spec->lhands_images[i]);
+            }
+            if (pCar_spec->rhands_images[i] != NULL) {
+                BrPixelmapFree(pCar_spec->rhands_images[i]);
+            }
+        }
+        if (pCar_spec->prat_cam_left != NULL) {
+            BrPixelmapFree(pCar_spec->prat_cam_left);
+        }
+        if (pCar_spec->prat_cam_top != NULL) {
+            BrPixelmapFree(pCar_spec->prat_cam_top);
+        }
+        if (pCar_spec->prat_cam_right != NULL) {
+            BrPixelmapFree(pCar_spec->prat_cam_right);
+        }
+        if (pCar_spec->prat_cam_bottom != NULL) {
+            BrPixelmapFree(pCar_spec->prat_cam_bottom);
+        }
+        for (i = 0; i < COUNT_OF(pCar_spec->damage_units); i++) {
+            if (pCar_spec->damage_units[i].images != NULL) {
+                BrPixelmapFree(pCar_spec->damage_units[i].images);
+            }
+        }
+        if (pCar_spec->damage_background != NULL) {
+            BrPixelmapFree(pCar_spec->damage_background);
+        }
+        for (i = 0; i < COUNT_OF(pCar_spec->power_ups); i++) {
+            for (j = 0; j < pCar_spec->power_ups[i].number_of_parts; j++) {
+                if (pCar_spec->power_ups[i].info[j].data_ptr != NULL) {
+                    BrMemFree(pCar_spec->power_ups[i].info[j].data_ptr);
+                }
+            }
+        }
+        gProgram_state.car_name[0] = '\0';
+    }
+    if (pCar_spec->screen_material != NULL) {
+        KillWindscreen(pCar_spec->car_model_actors[pCar_spec->principal_car_actor].actor->model,
+            pCar_spec->screen_material);
+        BrMaterialRemove(pCar_spec->screen_material);
+        BrMaterialFree(pCar_spec->screen_material);
+    }
+    for (i = 0; i < COUNT_OF(pCar_spec->damage_programs); i++) {
+        BrMemFree(pCar_spec->damage_programs[i].clauses);
+    }
+    DropOffDyingPeds(pCar_spec);
+    for (i = 0; i < pCar_spec->car_actor_count; i++) {
+        BrActorRemove(pCar_spec->car_model_actors[i].actor);
+        BrActorFree(pCar_spec->car_model_actors[i].actor);
+    }
+    if (pCar_spec->driver != eDriver_local_human) {
+        BrActorRemove(pCar_spec->car_master_actor);
+        BrActorFree(pCar_spec->car_master_actor);
+    }
+    DisposeFunkotronics(pOwner);
+    DisposeGroovidelics(pOwner);
+    for (i = 0; i < pCar_spec->car_actor_count; i++) {
+        if (pCar_spec->car_model_actors[i].crush_data.crush_points != NULL) {
+            DisposeCrushData(&pCar_spec->car_model_actors[i].crush_data);
+        }
+        if (pCar_spec->car_model_actors[i].undamaged_vertices != NULL) {
+            BrMemFree(pCar_spec->car_model_actors[i].undamaged_vertices);
+        }
+    }
 }
 
 // IDA: void __usercall AdjustCarCoordinates(tCar_spec *pCar@<EAX>)

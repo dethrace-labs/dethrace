@@ -18,6 +18,10 @@
 
 #define FLAG_WAVING_BASTARD_REF 99
 
+#define FOURCC(A,B,C,D) (((A & 0xff) << 24) | ((B & 0xff) << 16)| ((C & 0xff) << 8)| ((D & 0xff) << 0))
+#define PEDESTRIAN_MAGIC FOURCC('P', 'e', 'd', '!')
+#define ActorToPedestrianData(ACTOR) ((tPedestrian_data*)((ACTOR)->type_data))
+
 int gDetect_peds;
 int gReally_stupid_ped_bug_enable;
 int gPed_sound_disable;
@@ -111,7 +115,14 @@ void PedModelUpdate(br_model* pModel, br_scalar x0, br_scalar y0, br_scalar x1, 
 // IDA: int __usercall ActorIsPedestrian@<EAX>(br_actor *pActor@<EAX>)
 int ActorIsPedestrian(br_actor* pActor) {
     LOG_TRACE("(%p)", pActor);
-    NOT_IMPLEMENTED();
+
+    if (pActor->model == NULL) {
+        return 0;
+    }
+    if (pActor->type_data == NULL) {
+        return 0;
+    }
+    return ActorToPedestrianData(pActor)->magic_number == PEDESTRIAN_MAGIC;
 }
 
 // IDA: br_scalar __usercall PedHeightFromActor@<ST0>(br_actor *pActor@<EAX>)

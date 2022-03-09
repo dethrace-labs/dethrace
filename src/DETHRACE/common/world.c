@@ -867,7 +867,28 @@ void DisposeFunkotronics(int pOwner) {
     int i;
     tFunkotronic_spec* the_funk;
     LOG_TRACE("(%d)", pOwner);
-    NOT_IMPLEMENTED();
+
+    if (gFunkotronics_array == NULL) {
+        return;
+    }
+    for (i = 0; i < gFunkotronics_array_size; i++) {
+        the_funk = &gFunkotronics_array[i];
+        PossibleService();
+        if (the_funk->owner == pOwner) {
+            the_funk->owner = -999;
+            if (the_funk->proximity_array != NULL) {
+                BrMemFree(the_funk->proximity_array);
+            }
+            if (the_funk->texture_animation_type == eTexture_animation_flic) {
+                BrMemFree(the_funk->texture_animation_data.flic_info.flic_data);
+                EndFlic(&the_funk->texture_animation_data.flic_info.flic_descriptor);
+                BrMemFree(the_funk->material->colour_map->pixels);
+                the_funk->material->colour_map->pixels = NULL;
+                BrPixelmapFree(the_funk->material->colour_map);
+                the_funk->material->colour_map = NULL;
+            }
+        }
+    }
 }
 
 // IDA: void __usercall AddProximityVertex(br_vector3 *pV@<EAX>, tFunkotronic_spec *pThe_funk@<EDX>)
@@ -1257,7 +1278,17 @@ void DisposeGroovidelics(int pOwner) {
     int i;
     tGroovidelic_spec* the_groove;
     LOG_TRACE("(%d)", pOwner);
-    NOT_IMPLEMENTED();
+
+    if (gGroovidelics_array == NULL) {
+        return;
+    }
+    for (i = 0; i < gGroovidelics_array_size; i++) {
+        the_groove = &gGroovidelics_array[i];
+        PossibleService();
+        if (the_groove->owner == pOwner) {
+            the_groove->owner = -999;
+        }
+    }
 }
 
 // IDA: tGroovidelic_spec* __cdecl AddNewGroovidelic()
