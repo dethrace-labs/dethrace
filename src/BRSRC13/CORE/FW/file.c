@@ -6,6 +6,10 @@
 #include "harness/trace.h"
 #include <stdarg.h>
 #include <stddef.h>
+#ifdef BRENDER_FIX_BUGS
+#include <ctype.h>
+#include <string.h>
+#endif
 
 // IDA: void __cdecl _BrFileFree(void *res, br_uint_8 res_class, br_size_t size)
 void _BrFileFree(void* res, br_uint_8 res_class, br_size_t size) {
@@ -27,6 +31,9 @@ void* BrFileOpenRead(char* name, br_size_t n_magics, br_mode_test_cbfn* mode_tes
     void* raw_file;
     br_file* file;
     int bin_mode;
+#ifdef BRENDER_FIX_BUGS
+    char *s;
+#endif
     LOG_TRACE("(\"%s\", %d, %p, %p)", name, n_magics, mode_test, mode_result);
 
     bin_mode = 0;
@@ -35,6 +42,24 @@ void* BrFileOpenRead(char* name, br_size_t n_magics, br_mode_test_cbfn* mode_tes
     } else {
         raw_file = fw.fsys->open_read(name, n_magics, mode_test, &bin_mode);
     }
+
+#ifdef BRENDER_FIX_BUGS
+    // Try all-uppercase filename for case sensitive file systems
+    if (raw_file == NULL) {
+        for (s = name + strlen(name); s != name;) {
+            s--;
+            if (*s == '\\' || *s == '/') {
+                break;
+            }
+            *s = toupper(*s);
+        }
+        if (mode_result != NULL) {
+            raw_file = fw.fsys->open_read(name, n_magics, mode_test, mode_result);
+        } else {
+            raw_file = fw.fsys->open_read(name, n_magics, mode_test, &bin_mode);
+        }
+    }
+#endif
 
     if (raw_file == NULL) {
         return NULL;
