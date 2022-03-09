@@ -2887,7 +2887,20 @@ void GetFourScalars(FILE* pF, br_scalar* pF1, br_scalar* pF2, br_scalar* pF3, br
     float f3;
     float f4;
     LOG_TRACE("(%p, %p, %p, %p, %p)", pF, pF1, pF2, pF3, pF4);
-    NOT_IMPLEMENTED();
+
+    GetALineAndDontArgue(pF, s);
+    str = strtok(s, "\t ,/");
+    sscanf(str, "%f", &f1);
+    str = strtok(NULL, "\t ,/");
+    sscanf(str, "%f", &f2);
+    str = strtok(NULL, "\t ,/");
+    sscanf(str, "%f", &f3);
+    str = strtok(NULL, "\t ,/");
+    sscanf(str, "%f", &f4);
+    *pF1 = f1;
+    *pF2 = f2;
+    *pF3 = f3;
+    *pF4 = f4;
 }
 
 // IDA: void __usercall GetFiveScalars(FILE *pF@<EAX>, br_scalar *pF1@<EDX>, br_scalar *pF2@<EBX>, br_scalar *pF3@<ECX>, br_scalar *pF4, br_scalar *pF5)
