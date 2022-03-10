@@ -210,9 +210,9 @@ br_actor* BrActorAllocate(br_uint_8 type, void* type_data) {
 
 // IDA: void __usercall InternalActorFree(br_actor *a@<EAX>)
 void InternalActorFree(br_actor* a) {
-    while (a->children) {
-        BrSimpleRemove((br_simple_node*)a->children);
-        InternalActorFree(a);
+
+    while (a->children != NULL) {
+        InternalActorFree((br_actor*)BrSimpleRemove((br_simple_node*)a->children));
     }
     BrActorEnableCheck(a);
     BrResFree(a);
@@ -220,9 +220,9 @@ void InternalActorFree(br_actor* a) {
 
 // IDA: void __cdecl BrActorFree(br_actor *a)
 void BrActorFree(br_actor* a) {
-    while (a->children) {
-        BrSimpleRemove((br_simple_node*)a->children);
-        InternalActorFree(a);
+
+    while (a->children != NULL) {
+        InternalActorFree((br_actor*)BrSimpleRemove((br_simple_node*)a->children));
     }
     BrActorEnableCheck(a);
     BrResFree(a);

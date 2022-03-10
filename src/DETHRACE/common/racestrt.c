@@ -5,17 +5,20 @@
 #include "errors.h"
 #include "flicplay.h"
 #include "globvars.h"
+#include "globvrpb.h"
 #include "grafdata.h"
 #include "graphics.h"
 #include "harness/trace.h"
 #include "input.h"
 #include "intrface.h"
 #include "loading.h"
+#include "newgame.h"
 #include "opponent.h"
 #include "pd/sys.h"
 #include "sound.h"
 #include "structur.h"
 #include "utility.h"
+#include "world.h"
 #include <stdlib.h>
 
 int gGrid_number_colour[4] = { 49u, 201u, 1u, 201u };
@@ -327,63 +330,267 @@ void DrawCar(int pCurrent_choice, int pCurrent_mode) {
     int text_x;
     int text_width;
     LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    PollCarDetails(gChoose_car_net_game);
+    if (gChange_race_net_mode == 0) {
+        if (gProgram_state.number_of_cars == 1) {
+            sprintf(s, GetMiscString(34));
+        } else if (gProgram_state.cars_available[gCurrent_car_index] == gProgram_state.frank_or_anniness) {
+            sprintf(s, GetMiscString(36));
+        } else {
+            sprintf(s, "%s %s", GetMiscString(35), gOpponents[gProgram_state.cars_available[gCurrent_car_index]].name);
+        }
+    } else if (gCar_details[gProgram_state.cars_available[gCurrent_car_index]].ownership == eCar_owner_someone) {
+        sprintf(s, "%s %s", GetMiscString(204), gCar_details[gProgram_state.cars_available[gCurrent_car_index]].name);
+    } else {
+        sprintf(s, GetMiscString(205));
+    }
+    text_width = BrPixelmapTextWidth(gBack_screen, gFont_7, s);
+    text_x = (gCurrent_graf_data->change_car_line_right + gCurrent_graf_data->change_car_line_left - text_width) / 2;
+    BrPixelmapRectangleFill(gBack_screen,
+        gCurrent_graf_data->change_car_line_left,
+        gCurrent_graf_data->change_car_text_y,
+        gCurrent_graf_data->change_car_line_right - gCurrent_graf_data->change_car_line_left,
+        gFont_7->glyph_y,
+        0);
+    TransBrPixelmapText(gBack_screen,
+        text_x,
+        gCurrent_graf_data->change_car_text_y,
+        3,
+        gFont_7,
+        (signed char*)s);
+    BrPixelmapLine(gBack_screen,
+        gCurrent_graf_data->change_car_line_left,
+        gCurrent_graf_data->change_car_line_y,
+        gCurrent_graf_data->change_car_line_right,
+        gCurrent_graf_data->change_car_line_y,
+        6);
+    if (gChange_race_net_mode && gCar_details[gProgram_state.cars_available[gCurrent_car_index]].ownership == eCar_owner_someone) {
+        DRPixelmapRectangleMaskedCopy(
+            gBack_screen,
+            (gCurrent_graf_data->change_car_panel_left + gCurrent_graf_data->change_car_panel_right - gTaken_image->width) / 2,
+            (gCurrent_graf_data->change_car_panel_bottom + gCurrent_graf_data->change_car_panel_bottom - gTaken_image->height) / 2,
+            gTaken_image,
+            0,
+            0,
+            gTaken_image->width,
+            gTaken_image->height);
+    }
 }
 
 // IDA: void __cdecl SetCarFlic()
 void SetCarFlic() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    ChangePanelFlic(0,
+        gOpponents[gProgram_state.cars_available[gCurrent_car_index]].stolen_car_image_data,
+        gOpponents[gProgram_state.cars_available[gCurrent_car_index]].stolen_car_image_data_length);
 }
 
 // IDA: int __usercall UpCar@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int UpCar(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    AddToFlicQueue(gStart_interface_spec->pushed_flics[2].flic_index,
+        gStart_interface_spec->pushed_flics[2].x[gGraf_data_index],
+        gStart_interface_spec->pushed_flics[2].y[gGraf_data_index],
+        1);
+    DRS3StartSound(gIndexed_outlets[0], 3000);
+    if (gCurrent_car_index != 0) {
+        RemoveTransientBitmaps(1);
+        DropOutImageThruBottom(GetPanelPixelmap(0),
+            gCurrent_graf_data->change_car_panel_left,
+            gCurrent_graf_data->change_car_panel_top,
+            gCurrent_graf_data->change_car_panel_top_clip,
+            gCurrent_graf_data->change_car_panel_bottom_clip);
+        gCurrent_car_index--;
+        SetCarFlic();
+        DropInImageFromTop(GetPanelPixelmap(0),
+            gCurrent_graf_data->change_car_panel_left,
+            gCurrent_graf_data->change_car_panel_top,
+            gCurrent_graf_data->change_car_panel_top_clip,
+            gCurrent_graf_data->change_car_panel_bottom_clip);
+    }
+    return 0;
 }
 
 // IDA: int __usercall DownCar@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int DownCar(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    AddToFlicQueue(gStart_interface_spec->pushed_flics[3].flic_index,
+        gStart_interface_spec->pushed_flics[3].x[gGraf_data_index],
+        gStart_interface_spec->pushed_flics[3].y[gGraf_data_index],
+        1);
+    DRS3StartSound(gIndexed_outlets[0], 3000);
+    if (gCurrent_car_index < gProgram_state.number_of_cars - 1) {
+        RemoveTransientBitmaps(1);
+        DropOutImageThruTop(GetPanelPixelmap(0),
+            gCurrent_graf_data->change_car_panel_left,
+            gCurrent_graf_data->change_car_panel_top,
+            gCurrent_graf_data->change_car_panel_top_clip,
+            gCurrent_graf_data->change_car_panel_bottom_clip);
+        gCurrent_car_index++;
+        SetCarFlic();
+        DropInImageFromBottom(GetPanelPixelmap(0),
+            gCurrent_graf_data->change_car_panel_left,
+            gCurrent_graf_data->change_car_panel_top,
+            gCurrent_graf_data->change_car_panel_top_clip,
+            gCurrent_graf_data->change_car_panel_bottom_clip);
+    }
+    return 0;
 }
 
 // IDA: int __usercall UpClickCar@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
 int UpClickCar(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
-    NOT_IMPLEMENTED();
+
+    UpCar(pCurrent_choice, pCurrent_mode);
+    return 0;
 }
 
 // IDA: int __usercall DownClickCar@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
 int DownClickCar(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
-    NOT_IMPLEMENTED();
+
+    DownCar(pCurrent_choice, pCurrent_mode);
+    return 0;
 }
 
 // IDA: int __usercall ChangeCarGoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int ChangeCarGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    if (gChange_race_net_mode == 0 || gCar_details[gProgram_state.cars_available[gCurrent_car_index]].ownership != eCar_owner_someone) {
+        return 1;
+    } else {
+        DRS3StartSound(gIndexed_outlets[0], 3100);
+        return 0;
+    }
 }
 
 // IDA: int __usercall ChangeCar@<EAX>(int pNet_mode@<EAX>, int *pCar_index@<EDX>, tNet_game_details *pNet_game@<EBX>)
 int ChangeCar(int pNet_mode, int* pCar_index, tNet_game_details* pNet_game) {
-    static tFlicette flicker_on[4];
-    static tFlicette flicker_off[4];
-    static tFlicette push[4];
-    static tMouse_area mouse_areas[4];
-    static tInterface_spec interface_spec;
+    static tFlicette flicker_on[4] = {
+        {  43, {  60, 120 }, { 154, 370 } },
+        {  43, { 221, 442 }, { 154, 370 } },
+        { 221, {  30,  60 }, {  78, 187 } },
+        { 221, {  30,  60 }, {  78, 187 } },
+    };
+    static tFlicette flicker_off[4] = {
+        {  42, {  60, 120 }, { 154, 370 } },
+        {  42, { 221, 442 }, { 154, 370 } },
+        { 220, {  30,  60 }, {  78, 187 } },
+        { 220, {  30,  60 }, {  78, 187 } },
+    };
+    static tFlicette push[4] = {
+        { 154, {  60, 120 }, { 154, 370 } },
+        {  45, { 221, 442 }, { 154, 370 } },
+        { 222, {  30,  60 }, {  78, 187 } },
+        { 225, {  30,  60 }, { 118, 283 } },
+    };
+    static tMouse_area mouse_areas[4] = {
+        { {  60, 120 }, { 154, 370 }, { 125, 250 }, { 174, 418 },   0,   0,   0, NULL },
+        { { 221, 442 }, { 154, 370 }, { 286, 572 }, { 174, 418 },   1,   0,   0, NULL },
+        { {  30,  60 }, {  78, 187 }, {  45,  90 }, { 104, 250 },  -1,   0,   0, UpClickCar },
+        { {  30,  60 }, { 118, 283 }, {  45,  90 }, { 145, 348 },  -1,   0,   0, DownClickCar },
+    };
+    static tInterface_spec interface_spec = {
+        0, 236, 62, 0, 0, 0, -1,
+        { -1,  0 }, { -1,  0 }, {  0,  0 }, {  1,  0 }, { NULL, NULL },
+        { -1,  0 }, {  1,  0 }, {  0,  0 }, {  1,  0 }, { NULL, NULL },
+        { -1,  0 }, {  0,  0 }, {  0,  0 }, {  0,  0 }, { UpCar, NULL },
+        { -1,  0 }, {  0,  0 }, {  0,  0 }, {  0,  0 }, { DownCar, NULL },
+        {  1,  1 }, { ChangeCarGoAhead, NULL},
+        {  1,  1 }, { NULL, NULL },
+        NULL, DrawCar, 0, NULL, NULL, NULL, 0, {  0,  0 }, NULL, 1, 1,
+        COUNT_OF(flicker_on), flicker_on, flicker_off, push,
+        COUNT_OF(mouse_areas), mouse_areas,
+        0, NULL,
+    };
     int i;
     int result;
     int power_up_levels[3];
     LOG_TRACE("(%d, %p, %p)", pNet_mode, pCar_index, pNet_game);
-    NOT_IMPLEMENTED();
+
+    gChoose_car_net_game = pNet_game;
+    gChange_race_net_mode = pNet_mode;
+    gStart_interface_spec = &interface_spec;
+    for (i = 0; i < gProgram_state.number_of_cars; i++) {
+        if (gProgram_state.cars_available[i] == *pCar_index) {
+            gCurrent_car_index = i;
+            break;
+        }
+    }
+    if (gProgram_state.game_completed) {
+        gProgram_state.number_of_cars = gNumber_of_racers;
+        for (i = 0; i < gProgram_state.number_of_cars; i++) {
+            gProgram_state.cars_available[i] = i;
+        }
+    }
+    for (i = 0; i < gProgram_state.number_of_cars; i++) {
+        if (gOpponents[gProgram_state.cars_available[i]].stolen_car_image_data == NULL) {
+            LoadFlicData(gOpponents[gProgram_state.cars_available[i]].stolen_car_flic_name,
+                &gOpponents[gProgram_state.cars_available[i]].stolen_car_image_data,
+                &gOpponents[gProgram_state.cars_available[i]].stolen_car_image_data_length);
+        } else {
+            MAMSLock((void**)&gOpponents[gProgram_state.cars_available[i]].stolen_car_image_data);
+        }
+    }
+    InitialiseFlicPanel(0,
+        gCurrent_graf_data->change_car_panel_left,
+        gCurrent_graf_data->change_car_panel_top,
+        gCurrent_graf_data->change_car_panel_right - gCurrent_graf_data->change_car_panel_left,
+        gCurrent_graf_data->change_car_panel_bottom - gCurrent_graf_data->change_car_panel_top);
+    SetCarFlic();
+    if (pNet_mode) {
+        gTaken_image = LoadPixelmap("TAKEN.PIX");
+    }
+    result = DoInterfaceScreen(&interface_spec, pNet_mode, 0);
+    if (pNet_mode) {
+        FadePaletteDown();
+    } else {
+        RunFlic(237);
+    }
+    for (i = 0; i < gProgram_state.number_of_cars; i++) {
+        MAMSUnlock((void**)&gOpponents[gProgram_state.cars_available[i]].stolen_car_image_data);
+    }
+    DisposeFlicPanel(0);
+    if (result == 0) {
+        if (pNet_mode) {
+            *pCar_index = gProgram_state.cars_available[gCurrent_race_index];
+        } else {
+            AboutToLoadFirstCar();
+            SwitchToRealResolution();
+            for (i = 0; i < COUNT_OF(power_up_levels); i++) {
+                power_up_levels[i] = gProgram_state.current_car.power_up_levels[i];
+            }
+            LoadCar(gOpponents[gProgram_state.cars_available[gCurrent_car_index]].car_file_name,
+                eDriver_local_human,
+                &gProgram_state.current_car,
+                gProgram_state.cars_available[gCurrent_car_index],
+                gProgram_state.player_name[gProgram_state.frank_or_anniness],
+                &gOur_car_storage_space);
+            for (i = 0; i < COUNT_OF(power_up_levels); i++) {
+                gProgram_state.current_car.power_up_levels[i] = power_up_levels[i];
+            }
+            SwitchToLoresMode();
+            SetCarStorageTexturingLevel(&gOur_car_storage_space, GetCarTexturingLevel(), eCTL_full);
+            DisposeRaceInfo(&gCurrent_race);
+            SelectOpponents(&gCurrent_race);
+            LoadRaceInfo(gProgram_state.current_race_index, &gCurrent_race);
+        }
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 // IDA: void __cdecl DoChangeCar()
 void DoChangeCar() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    ChangeCar(0, &gProgram_state.current_car.index, NULL);
 }
 
 // IDA: int __cdecl PartsShopRecommended()

@@ -785,7 +785,10 @@ int PickARandomCar() {
 // IDA: void __usercall PollCarDetails(tNet_game_details *pNet_game@<EAX>)
 void PollCarDetails(tNet_game_details* pNet_game) {
     LOG_TRACE("(%p)", pNet_game);
-    NOT_IMPLEMENTED();
+
+    if (gReceived_car_details != 0) {
+        RequestCarDetails(pNet_game);
+    }
 }
 
 // IDA: void __usercall SetNetAvailability(tNet_game_options *pOptions@<EAX>)

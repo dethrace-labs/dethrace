@@ -2353,7 +2353,37 @@ void DrawDropImage(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip, int 
     int src_height;
     int y_diff;
     LOG_TRACE("(%p, %d, %d, %d, %d, %d)", pImage, pLeft, pTop, pTop_clip, pBottom_clip, pOffset);
-    NOT_IMPLEMENTED();
+
+    BrPixelmapRectangleFill(gBack_screen,
+        pLeft,
+        pTop_clip,
+        pImage->width,
+        pBottom_clip - pTop_clip,
+        0);
+    if (pOffset != 1000) {
+        src_y = 0;
+        src_height = pImage->height;
+        y = pOffset + pTop;
+        y_diff = pTop_clip - y;
+        if (y_diff > 0) {
+            src_height -= y_diff;
+            y += y_diff;
+            src_y = y_diff;
+        }
+        y_diff = pBottom_clip - y - pImage->height;
+        if (y_diff < 0) {
+            src_height += y_diff;
+        }
+        BrPixelmapRectangleCopy(gBack_screen,
+            pLeft,
+            y,
+            pImage,
+            0,
+            src_y,
+            pImage->width,
+            src_height);
+        PDScreenBufferSwap(0);
+    }
 }
 
 // IDA: void __usercall DropInImageFromTop(br_pixelmap *pImage@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pTop_clip@<ECX>, int pBottom_clip)
@@ -2362,7 +2392,22 @@ void DropInImageFromTop(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip,
     tS32 the_time;
     int drop_distance;
     LOG_TRACE("(%p, %d, %d, %d, %d)", pImage, pLeft, pTop, pTop_clip, pBottom_clip);
-    NOT_IMPLEMENTED();
+    
+    start_time = PDGetTotalTime();
+    drop_distance = pImage->height - pTop_clip + pTop;
+    while (1) {
+        the_time = PDGetTotalTime();
+        if (the_time >= start_time + 100) {
+            break;
+        }
+        DrawDropImage(pImage,
+            pLeft,
+            pTop,
+            pTop_clip,
+            pBottom_clip,
+            (the_time - start_time - 100) * drop_distance / 100);
+    }
+    DrawDropImage(pImage, pLeft, pTop, pTop_clip, pBottom_clip, 0);
 }
 
 // IDA: void __usercall DropOutImageThruBottom(br_pixelmap *pImage@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pTop_clip@<ECX>, int pBottom_clip)
@@ -2371,7 +2416,22 @@ void DropOutImageThruBottom(br_pixelmap* pImage, int pLeft, int pTop, int pTop_c
     tS32 the_time;
     int drop_distance;
     LOG_TRACE("(%p, %d, %d, %d, %d)", pImage, pLeft, pTop, pTop_clip, pBottom_clip);
-    NOT_IMPLEMENTED();
+    
+    start_time = PDGetTotalTime();
+    drop_distance = pBottom_clip - pTop;
+    while (1) {
+        the_time = PDGetTotalTime();
+        if (the_time >= start_time + 100) {
+            break;
+        }
+        DrawDropImage(pImage,
+            pLeft,
+            pTop,
+            pTop_clip,
+            pBottom_clip,
+            (the_time - start_time) * drop_distance / 100);
+    }
+    DrawDropImage(pImage, pLeft, pTop, pTop_clip, pBottom_clip, 1000);
 }
 
 // IDA: void __usercall DropInImageFromBottom(br_pixelmap *pImage@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pTop_clip@<ECX>, int pBottom_clip)
@@ -2380,7 +2440,22 @@ void DropInImageFromBottom(br_pixelmap* pImage, int pLeft, int pTop, int pTop_cl
     tS32 the_time;
     int drop_distance;
     LOG_TRACE("(%p, %d, %d, %d, %d)", pImage, pLeft, pTop, pTop_clip, pBottom_clip);
-    NOT_IMPLEMENTED();
+    
+    start_time = PDGetTotalTime();
+    drop_distance = pBottom_clip - pTop;
+    while (1) {
+        the_time = PDGetTotalTime();
+        if (the_time >= start_time + 100) {
+            break;
+        }
+        DrawDropImage(pImage,
+            pLeft,
+            pTop,
+            pTop_clip,
+            pBottom_clip,
+            (100 - the_time + start_time) * drop_distance / 100);
+    }
+    DrawDropImage(pImage, pLeft, pTop, pTop_clip, pBottom_clip, 0);
 }
 
 // IDA: void __usercall DropOutImageThruTop(br_pixelmap *pImage@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pTop_clip@<ECX>, int pBottom_clip)
@@ -2389,7 +2464,22 @@ void DropOutImageThruTop(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip
     tS32 the_time;
     int drop_distance;
     LOG_TRACE("(%p, %d, %d, %d, %d)", pImage, pLeft, pTop, pTop_clip, pBottom_clip);
-    NOT_IMPLEMENTED();
+    
+    start_time = PDGetTotalTime();
+    drop_distance = pImage->height - pTop_clip + pTop;
+    while (1) {
+        the_time = PDGetTotalTime();
+        if (the_time >= start_time + 100) {
+            break;
+        }
+        DrawDropImage(pImage,
+            pLeft,
+            pTop,
+            pTop_clip,
+            pBottom_clip,
+            (start_time - the_time) * drop_distance / 100);
+    }
+    DrawDropImage(pImage, pLeft, pTop, pTop_clip, pBottom_clip, 1000);
 }
 
 // IDA: void __usercall DrawTellyLine(br_pixelmap *pImage@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pPercentage@<ECX>)
