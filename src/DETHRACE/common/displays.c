@@ -266,9 +266,10 @@ void DimRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int p
         }
     } else {
         for (y = pTop; y < pBottom; y++) {
-            for (right_ptr = ptr + width; ptr < right_ptr; ptr += line_skip) {
+            for (right_ptr = ptr + width; ptr < right_ptr; ptr++) {
                 *ptr = depth_table_ptr[*ptr + x];
             }
+            ptr += line_skip;
         }
     }
 }
