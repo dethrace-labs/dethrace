@@ -5,6 +5,7 @@
 #include "cutscene.h"
 #include "displays.h"
 #include "drmem.h"
+#include "finteray.h"
 #include "flicplay.h"
 #include "globvars.h"
 #include "globvrkm.h"
@@ -128,14 +129,46 @@ void RaceCompleted(tRace_over_reason pReason) {
 // IDA: void __usercall Checkpoint(int pCheckpoint_index@<EAX>, int pDo_sound@<EDX>)
 void Checkpoint(int pCheckpoint_index, int pDo_sound) {
     LOG_TRACE("(%d, %d)", pCheckpoint_index, pDo_sound);
-    NOT_IMPLEMENTED();
+
+    PratcamEvent(33);  // FIXME: or PratcamEventNow
+    DoFancyHeadup(12);
+    if (pDo_sound) {
+        DRS3StartSound(gIndexed_outlets[4], 8012);
+    }
 }
 
 // IDA: void __cdecl IncrementCheckpoint()
 void IncrementCheckpoint() {
     int done_voice;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    done_voice = 0;
+    if (gRace_finished) {
+        return;
+    }
+    gLast_checkpoint_time = GetTotalTime();
+    if (gCheckpoint < gCheckpoint_count) {
+        gCheckpoint++;
+    } else {
+        gCheckpoint = 1;
+        gLap++;
+        if (gLap == gTotal_laps) {
+            PratcamEvent(33);  // FIXME: or PratcamEventNow
+            NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(42));
+            DRS3StartSound(gIndexed_outlets[4], 8014);
+            done_voice = 1;
+        } else if (gLap > gTotal_laps) {
+            gLap = gTotal_laps;
+            gCheckpoint = gCheckpoint_count;
+            RaceCompleted(eRace_over_laps);
+        }
+    }
+    if (!gRace_finished) {
+        Checkpoint(gCheckpoint, !done_voice);
+        if (gCheck_point_cash[gProgram_state.skill_level] != 0) {
+            EarnCredits(gCheck_point_cash[gProgram_state.skill_level]);
+        }
+    }
 }
 
 // IDA: void __cdecl IncrementLap()
@@ -153,13 +186,32 @@ int RayHitFace(br_vector3* pV0, br_vector3* pV1, br_vector3* pV2, br_vector3* pN
     tFace_ref the_face;
     br_scalar rt;
     LOG_TRACE("(%p, %p, %p, %p, %p, %p)", pV0, pV1, pV2, pNormal, pStart, pDir);
-    NOT_IMPLEMENTED();
+
+    the_face.material = NULL;
+    BrVector3Copy(&the_face.v[0], pV0);
+    BrVector3Copy(&the_face.v[1], pV1);
+    BrVector3Copy(&the_face.v[2], pV2);
+    BrVector3Copy(&the_face.normal, pNormal);
+    CheckSingleFace(&the_face, pStart, pDir, &the_face.normal, &rt);
+    return rt >= 0.f && rt <= 1.f;
 }
 
 // IDA: void __usercall WrongCheckpoint(int pCheckpoint_index@<EAX>)
 void WrongCheckpoint(int pCheckpoint_index) {
     LOG_TRACE("(%d)", pCheckpoint_index);
-    NOT_IMPLEMENTED();
+
+    if ((pCheckpoint_index == gLast_wrong_checkpoint && GetTotalTime() - gLast_checkpoint_time > 20000) ||
+            (pCheckpoint_index != gLast_wrong_checkpoint && GetTotalTime() - gLast_checkpoint_time > 2000)) {
+        if (gNet_mode == eNet_mode_none) {
+            if (gCheckpoint == ((gCurrent_race.check_point_count < pCheckpoint_index + 2) ? ((gLap == 1) ? -1 : 1) : (pCheckpoint_index + 2))) {
+                return;
+            }
+        }
+        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(43));
+        DRS3StartSound(gIndexed_outlets[4], 8013);
+        gLast_checkpoint_time = GetTotalTime();
+        gLast_wrong_checkpoint = pCheckpoint_index;
+    }
 }
 
 // IDA: void __cdecl CheckCheckpoints()
@@ -174,7 +226,73 @@ void CheckCheckpoints() {
     int car_index;
     tNet_game_player_info* net_player;
     LOG_TRACE("()");
-    STUB_ONCE();
+
+    if (gNet_mode == eNet_mode_client) {
+        return;
+    }
+    if (gNet_mode == eNet_mode_host && gCurrent_net_game->type != eNet_game_type_checkpoint && gCurrent_net_game->type != eNet_game_type_sudden_death) {
+        return;
+    }
+    // in single-player mode (=eNet_mode_none), only the player will be checked,
+    // in multi-player, the host + clients will be tested, there are no drone opponents there
+    for (cat = 0; cat <= gNet_mode; cat++) {
+        if (cat == eVehicle_self) {
+            car_count = 1;
+        } else {
+            car_count = GetCarCount(cat);
+        }
+        for (car_index = 0; car_index < car_count; car_index++) {
+            if (cat == eVehicle_self) {
+                car = &gProgram_state.current_car;
+            } else {
+                car = GetCarSpec(cat, car_index);
+            }
+            BrVector3Copy(&orig, (br_vector3*)car->old_frame_mat.m[3]);
+            BrVector3Sub(&dir, &car->car_master_actor->t.t.translate.t, &orig);
+            for (i = 0; i < gCurrent_race.check_point_count; i++) {
+                for (j = 0; j < gCurrent_race.checkpoints[i].quad_count; j++) {
+                    if (
+                            RayHitFace(&gCurrent_race.checkpoints[i].vertices[j][0],
+                                &gCurrent_race.checkpoints[i].vertices[j][1],
+                                &gCurrent_race.checkpoints[i].vertices[j][2],
+                                &gCurrent_race.checkpoints[i].normal[j],
+                                &orig, &dir) ||
+                            RayHitFace(&gCurrent_race.checkpoints[i].vertices[j][0],
+                                &gCurrent_race.checkpoints[i].vertices[j][2],
+                                &gCurrent_race.checkpoints[i].vertices[j][3],
+                                &gCurrent_race.checkpoints[i].normal[j],
+                                &orig,
+                                &dir)) {
+                        if (gNet_mode == eNet_mode_none) {
+                            if (i + 1 == gCheckpoint) {
+                                IncrementCheckpoint();
+                            } else {
+                                WrongCheckpoint(i);
+                            }
+                        } else {
+                            net_player = NetPlayerFromCar(car);
+                            if (gCurrent_net_game->type == eNet_game_type_checkpoint) {
+                                if (net_player->score & (1 << i)) {
+                                    net_player->score &= ~(1 << i);
+                                    SendGameplay(net_player->ID, eNet_gameplay_checkpoint, i, 0, 0, 0);
+                                } else {
+                                    SendGameplay(net_player->ID, eNet_gameplay_wrong_checkpoint, i, 0, 0, 0);
+                                }
+                            } else if (net_player->score % gCurrent_race.check_point_count == i) {
+                                net_player->score++;
+                                SendGameplay(net_player->ID, eNet_gameplay_checkpoint, i, 0, 0, 0);
+                            } else {
+                                SendGameplay(net_player->ID, eNet_gameplay_wrong_checkpoint, i, 0, 0, 0);
+                            }
+                        }
+                        break;
+                    }
+
+                }
+            }
+        }
+        car->old_frame_mat = car->car_master_actor->t.t.mat;
+    }
 }
 
 // IDA: void __cdecl TotalRepair()

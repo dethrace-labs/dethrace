@@ -220,7 +220,8 @@ void PratcamEventNow(int pIndex) {
 // IDA: void __usercall PratcamEvent(int pIndex@<EAX>)
 void PratcamEvent(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: int __cdecl HighResPratBufferWidth()

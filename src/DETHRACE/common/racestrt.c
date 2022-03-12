@@ -556,6 +556,9 @@ int ChangeCar(int pNet_mode, int* pCar_index, tNet_game_details* pNet_game) {
         MAMSUnlock((void**)&gOpponents[gProgram_state.cars_available[i]].stolen_car_image_data);
     }
     DisposeFlicPanel(0);
+    if (pNet_mode) {
+        BrPixelmapFree(gTaken_image);
+    }
     if (result == 0) {
         if (pNet_mode) {
             *pCar_index = gProgram_state.cars_available[gCurrent_race_index];

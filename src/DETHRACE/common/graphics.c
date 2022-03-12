@@ -1430,9 +1430,6 @@ void RenderAFrame(int pDepth_mask_on) {
             } else {
                 DRPixelmapCopy(gBack_screen, gCurrent_race.map_image);
             }
-        } else {
-            // FIXME: remove this
-            TELL_ME_IF_WE_PASS_THIS_WAY();
         }
         DimRectangle(
             gBack_screen,
