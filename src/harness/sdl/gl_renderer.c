@@ -509,8 +509,8 @@ void setActiveMaterial(tStored_material* material) {
             glUniform1i(uniforms_3d.light_value, -1);
         }
 
-        if (material->texture) {
-            tStored_pixelmap* stored_px = material->texture->stored;
+        if (material->pixelmap) {
+            tStored_pixelmap* stored_px = material->pixelmap->stored;
             if (stored_px) {
                 glBindTexture(GL_TEXTURE_2D, stored_px->id);
                 glUniform1i(uniforms_3d.palette_index_override, -1);
@@ -588,9 +588,10 @@ void GLRenderer_BufferMaterial(br_material* mat) {
             strcpy(stored->identifier, mat->identifier);
         }
     }
-    stored->texture = mat->colour_map;
+    stored->pixelmap = mat->colour_map;
     stored->flags = mat->flags;
     stored->shade_table = mat->index_shade;
+    stored->index_base = mat->index_base;
 }
 
 void GLRenderer_BufferTexture(br_pixelmap* pm) {
@@ -657,7 +658,7 @@ void GLRenderer_FlushBuffers(br_pixelmap* color_buffer, br_pixelmap* depth_buffe
         }
     }
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
     dirty_buffers = 0;
 }
 

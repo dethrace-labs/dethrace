@@ -49,7 +49,8 @@ int ReplayIsPaused() {
 // IDA: float __cdecl GetReplayRate()
 float GetReplayRate() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    return gReplay_rate;
 }
 
 // IDA: int __cdecl GetReplayDirection()

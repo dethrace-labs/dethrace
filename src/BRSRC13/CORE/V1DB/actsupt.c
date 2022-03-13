@@ -122,7 +122,7 @@ br_actor* BrActorRemove(br_actor* a) {
     br_actor* ac;
     LOG_TRACE("(%p)", a);
 
-    br_actor* ac2; //Added ?
+    br_actor* ac2; // Added ?
 
     BrSimpleRemove((br_simple_node*)a);
     a->parent = NULL;
@@ -141,7 +141,14 @@ br_actor* BrActorRemove(br_actor* a) {
 void BrActorRelink(br_actor* parent, br_actor* a) {
     br_matrix34 mat;
     LOG_TRACE("(%p, %p)", parent, a);
-    NOT_IMPLEMENTED();
+
+    if (a->parent == parent) {
+        return;
+    }
+
+    BrActorToActorMatrix34(&mat, a, parent);
+    BrMatrix34ToTransform(&a->t, &mat);
+    BrActorAdd(parent, BrActorRemove(a));
 }
 
 // IDA: br_actor* __cdecl BrActorAllocate(br_uint_8 type, void *type_data)

@@ -2914,7 +2914,7 @@ void CrushAndDamageCar(tCar_spec* c, br_vector3* pPosition, br_vector3* pForce_c
     br_matrix34 m;
     br_scalar fudge_multiplier;
     LOG_TRACE("(%p, %p, %p, %p)", c, pPosition, pForce_car_space, car2);
-    STUB();
+    STUB_ONCE();
 }
 
 // IDA: int __usercall ExpandBoundingBox@<EAX>(tCar_spec *c@<EAX>)
