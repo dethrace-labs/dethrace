@@ -61,8 +61,8 @@ tShrapnel gShrapnel[15];
 void DrawDot(br_scalar z, tU8* scr_ptr, tU16* depth_ptr, tU8* shade_ptr) {
     LOG_TRACE("(%f, %p, %p, %p)", z, scr_ptr, depth_ptr, shade_ptr);
 
-    if (*depth_ptr > (1.0 - z) * 32768.0) {
-        *depth_ptr = (1.0 - z) * 32768.0;
+    if (*depth_ptr > (1.0 - z) * 32768.0f) {
+        *depth_ptr = (1.0 - z) * 32768.0f;
         *scr_ptr = shade_ptr[*scr_ptr];
     }
 }
@@ -232,12 +232,12 @@ int DrawLine2D(br_vector3* o, br_vector3* p, br_pixelmap* pScreen, br_pixelmap* 
     y = y1;
     scr_ptr += x1 + y1 * pScreen->row_bytes;
     depth_ptr += x1 + y1 * (pDepth_buffer->row_bytes / 2);
-    darken_init = (brightness - 0.001) * (double)shade_table->height;
+    darken_init = (brightness - 0.001) * (float)shade_table->height;
     if (ay >= ax) {
         d = ax - ay / 2;
         darken_init = 500 * ay / darken_init;
         darken_count = darken_init;
-        zbuff_inc = (p->v[2] - o->v[2]) * 2.0 / (double)ay;
+        zbuff_inc = (p->v[2] - o->v[2]) * 2.0 / (float)ay;
         while (1) {
             DrawDot(zbuff, scr_ptr, depth_ptr, shade_ptr);
             if (y == y2) {
@@ -263,7 +263,7 @@ int DrawLine2D(br_vector3* o, br_vector3* p, br_pixelmap* pScreen, br_pixelmap* 
         d = ay - ax / 2;
         darken_init = 500 * ax / darken_init;
         darken_count = darken_init;
-        zbuff_inc = (p->v[2] - o->v[2]) * 2.0 / (double)ax;
+        zbuff_inc = (p->v[2] - o->v[2]) * 2.0 / (float)ax;
         while (1) {
             DrawDot(zbuff, scr_ptr, depth_ptr, shade_ptr);
             if (x == x2) {
@@ -379,11 +379,11 @@ void RenderSparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_ac
         BrMatrix34TApplyV(&new_pos, &tv, &gCamera_to_world);
         BrVector3Sub(&tv, &o, (br_vector3*)gCamera_to_world.m[3]);
         BrMatrix34TApplyV(&p, &tv, &gCamera_to_world);
-        BrVector3SetFloat(&tv, FRandomBetween(-0.1, 0.1), FRandomBetween(-0.1, 0.1), FRandomBetween(-0.1, 0.1));
+        BrVector3SetFloat(&tv, FRandomBetween(-0.1f, 0.1f), FRandomBetween(-0.1f, 0.1f), FRandomBetween(-0.1f, 0.1f));
         BrVector3Accumulate(&gSparks[i].v, &tv);
-        ts = 1.0 - BrVector3Length(&gSparks[i].v) / 1.4 * (double)pTime / 1000.0;
-        if (ts < 0.1) {
-            ts = 0.1;
+        ts = 1.0f - BrVector3Length(&gSparks[i].v) / 1.4f * pTime / 1000.0f;
+        if (ts < 0.1f) {
+            ts = 0.1f;
         }
         BrVector3Scale(&gSparks[i].v, &gSparks[i].v, ts);
         if (gSparks[i].colour) {
@@ -399,20 +399,16 @@ void RenderSparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_ac
 void CreateSingleSpark(tCar_spec* pCar, br_vector3* pPos, br_vector3* pVel) {
     LOG_TRACE("(%p, %p, %p)", pCar, pPos, pVel);
 
-    gSparks[gNext_spark].pos.v[0] = pPos->v[0];
-    gSparks[gNext_spark].pos.v[1] = pPos->v[1];
-    gSparks[gNext_spark].pos.v[2] = pPos->v[2];
-    BrVector3SetFloat(&gSparks[gNext_spark].normal, 0.0, 0.0, 0.0);
-    gSparks[gNext_spark].v.v[0] = pVel->v[0];
-    gSparks[gNext_spark].v.v[1] = pVel->v[1];
-    gSparks[gNext_spark].v.v[2] = pVel->v[2];
+    BrVector3Copy(&gSparks[gNext_spark].pos, pPos);
+    BrVector3SetFloat(&gSparks[gNext_spark].normal, 0.0f, 0.0f, 0.0f);
+    BrVector3Copy(&gSparks[gNext_spark].v, pVel);
     gSparks[gNext_spark].count = 500;
     gSparks[gNext_spark].car = pCar;
     gSpark_flags |= 1 << gNext_spark;
     gSparks[gNext_spark].time_sync = 1;
     gSparks[gNext_spark].colour = 1;
     gNext_spark++;
-    if (gNext_spark >= 32) {
+    if (gNext_spark >= COUNT_OF(gSparks)) {
         gNext_spark = 0;
     }
 }
@@ -649,7 +645,7 @@ void CreateShrapnelShower(br_vector3* pos, br_vector3* v, br_vector3* pNormal, b
         }
         gShrapnel_flags |= 1 << gNext_shrapnel;
         BrVector3Copy(&gShrapnel[gNext_shrapnel].actor->t.t.translate.t, pos);
-        BrVector3SetFloat(&vel, FRandomBetween(-rnd, rnd), FRandomBetween(0.3 - tv.v[1], rnd), FRandomBetween(-rnd, rnd));
+        BrVector3SetFloat(&vel, FRandomBetween(-rnd, rnd), FRandomBetween(0.3f - tv.v[1], rnd), FRandomBetween(-rnd, rnd));
         ts2 = BrVector3Dot(pNormal, &vel);
         BrVector3Scale(&tv2, pNormal, ts2);
         BrVector3Sub(&gShrapnel[gNext_shrapnel].v, &vel, &tv2);
@@ -762,16 +758,16 @@ void MungeShrapnel(tU32 pTime) {
             KillShrapnel(i);
         } else {
             if (gShrapnel[i].time_sync) {
-                BrVector3Scale(&disp, &gShrapnel[i].v, gShrapnel[i].time_sync / 1000.0);
+                BrVector3Scale(&disp, &gShrapnel[i].v, gShrapnel[i].time_sync / 1000.0f);
                 gShrapnel[i].time_sync = 0;
             } else {
-                BrVector3Scale(&disp, &gShrapnel[i].v, pTime / 1000.0);
+                BrVector3Scale(&disp, &gShrapnel[i].v, pTime / 1000.0f);
                 gShrapnel[i].age += pTime;
             }
             mat->m[3][0] = mat->m[3][0] + disp.v[0];
             mat->m[3][1] = mat->m[3][1] + disp.v[1];
             mat->m[3][2] = mat->m[3][2] + disp.v[2];
-            gShrapnel[i].v.v[1] -= (10 * pTime) * 0.00014492753;
+            gShrapnel[i].v.v[1] -= (10 * pTime) * 0.00014492753f;
             DrMatrix34Rotate(mat, 182 * gShrapnel[i].age, &gShrapnel[i].axis);
             BrMatrix34PreShearX(mat, gShrapnel[i].shear1, gShrapnel[i].shear2);
             // bug: should this be using "&gShrapnel[i].v"??
@@ -780,11 +776,7 @@ void MungeShrapnel(tU32 pTime) {
                 ts = 0.1;
             }
             BrVector3Scale(&gShrapnel[i].v, &gShrapnel[i].v, ts);
-            AddShrapnelToPipingSession(
-                i + ((gShrapnel[i].age > 1000 || gShrapnel[i].age < pTime) << 15),
-                (br_vector3*)mat->m[3],
-                gShrapnel[i].age - pTime,
-                gShrapnel[i].actor->material);
+            AddShrapnelToPipingSession(i + ((gShrapnel[i].age > 1000 || gShrapnel[i].age < pTime) << 15), (br_vector3*)mat->m[3], gShrapnel[i].age - pTime, gShrapnel[i].actor->material);
             if (gShrapnel[i].age > 1000) {
                 gShrapnel[i].age = -1;
             }
@@ -838,7 +830,7 @@ void SmokeLine(int l, int x, br_scalar zbuff, int r_squared, tU8* scr_ptr, tU16*
     if (gProgram_state.cockpit_on) {
         depth_ptr += gOffset;
     }
-    z = (int)(uint16_t)(int)((1.0 - zbuff) * 32768.0);
+    z = (1.0 - zbuff) * 32768.0f;
     for (i = 0; i < l; i++) {
         if (*depth_ptr > z) {
             shade_offset_int = (((int)((int)(shade_offset * 65536.0) - r_squared * (int)(r_multiplier * 65536.0)) >> 8) & 0xFFFFFF00);
@@ -1720,9 +1712,6 @@ void SingleSplash(tCar_spec* pCar, br_vector3* sp, br_vector3* normal, tU32 pTim
     tv.v[1] = pCar->omega.v[2] * sp->v[0] - sp->v[2] * pCar->omega.v[0];
     tv.v[2] = sp->v[1] * pCar->omega.v[0] - pCar->omega.v[1] * sp->v[0];
     BrMatrix34ApplyV(&vel, &tv, c_mat);
-    // vel.v[0] = pCar->v.v[0] + vel.v[0];
-    // vel.v[1] = pCar->v.v[1] + vel.v[1];
-    // vel.v[2] = pCar->v.v[2] + vel.v[2];
     BrVector3Accumulate(&vel, &pCar->v);
     ts = BrVector3Length(&vel);
     size = (fabs(BrVector3Dot(normal, &vel)) * 5.0 + ts) / 150.0 + 0.047826085;
@@ -1740,13 +1729,7 @@ void SingleSplash(tCar_spec* pCar, br_vector3* sp, br_vector3* normal, tU32 pTim
     gSplash_flags |= 1 << gNext_splash;
     gSplash[gNext_splash].just_done = 1;
     if ((double)pTime * 0.003 > SRandomBetween(0.0, 1.0) && !gAction_replay_mode) {
-        // vel.v[0] = vel.v[0] / 6.9000001;
-        // vel.v[1] = vel.v[1] / 6.9000001;
-        // vel.v[2] = vel.v[2] / 6.9000001;
         BrVector3InvScale(&vel, &vel, WORLD_SCALE);
-        // tv.v[0] = vel.v[0] * -0.1;
-        // tv.v[1] = vel.v[1] * -0.1;
-        // tv.v[2] = vel.v[2] * -0.1;
         BrVector3Scale(&tv, &vel, 0.1f);
         speed = sqrt(ts / 70.0) * 15.0;
         if (speed > 15.0f) {
@@ -1756,28 +1739,16 @@ void SingleSplash(tCar_spec* pCar, br_vector3* sp, br_vector3* normal, tU32 pTim
         BrMatrix34TApplyV(&vel, &tv, &pCar->car_master_actor->t.t.mat);
 
         BrVector3Cross(&tv, &vel, &pCar->water_normal);
-        // tv.v[0] = pCar->water_normal.v[2] * vel.v[1] - pCar->water_normal.v[1] * vel.v[2];
-        // tv.v[1] = pCar->water_normal.v[0] * vel.v[2] - pCar->water_normal.v[2] * vel.v[0];
-        // tv.v[2] = pCar->water_normal.v[1] * vel.v[0] - pCar->water_normal.v[0] * vel.v[1];
-        // tv.v[0] = tv.v[0] * 0.5;
-        // tv.v[1] = tv.v[1] * 0.5;
-        // tv.v[2] = tv.v[2] * 0.5;
         BrVector3Scale(&tv, &tv, 0.5f);
         if (BrVector3Dot(sp, &tv) <= 0.0) {
-            // vel.v[0] = vel.v[0] - tv.v[0];
-            // vel.v[1] = vel.v[1] - tv.v[1];
-            // vel.v[2] = vel.v[2] - tv.v[2];
             BrVector3Sub(&vel, &vel, &tv);
         } else {
-            // vel.v[0] = vel.v[0] + tv.v[0];
-            // vel.v[1] = vel.v[1] + tv.v[1];
-            // vel.v[2] = vel.v[2] + tv.v[2];
             BrVector3Accumulate(&vel, &tv);
         }
         CreateSingleSpark(pCar, sp, &vel);
     }
     gNext_splash++;
-    if (gNext_splash >= 32) {
+    if (gNext_splash >= COUNT_OF(gSplash)) {
         gNext_splash = 0;
     }
 }
@@ -1889,62 +1860,22 @@ void CreateSplash(tCar_spec* pCar, tU32 pTime) {
                 tv.v[2] = pos2.v[2] - p.v[2];
                 BrVector3Sub(&tv, &pos2, &p);
                 ts = SRandomBetween(0.4, 0.6);
-                // tv2.v[0] = tv.v[0] * ts;
-                // tv2.v[1] = tv.v[1] * ts;
-                // tv2.v[2] = tv.v[2] * ts;
                 BrVector3Scale(&tv2, &tv, ts);
-                // tv2.v[0] = p.v[0] + tv2.v[0];
-                // tv2.v[1] = p.v[1] + tv2.v[1];
-                // tv2.v[2] = p.v[2] + tv2.v[2];
                 BrVector3Accumulate(&tv2, &p);
                 ts = SRandomBetween(0.2, 0.3);
-                // cm.v[0] = tv.v[0] * ts;
-                // cm.v[1] = tv.v[1] * ts;
-                // cm.v[2] = tv.v[2] * ts;
                 BrVector3Scale(&cm, &tv, ts);
-                // p.v[0] = p.v[0] + cm.v[0];
-                // p.v[1] = p.v[1] + cm.v[1];
-                // p.v[2] = p.v[2] + cm.v[2];
                 BrVector3Accumulate(&p, &cm);
                 ts = -SRandomBetween(0.2, 0.3);
-                cm.v[0] = tv.v[0] * ts;
-                cm.v[1] = tv.v[1] * ts;
-                cm.v[2] = tv.v[2] * ts;
                 BrVector3Scale(&cm, &tv, ts);
-                // pos2.v[0] = pos2.v[0] + cm.v[0];
-                // pos2.v[1] = pos2.v[1] + cm.v[1];
-                // pos2.v[2] = pos2.v[2] + cm.v[2];
                 BrVector3Accumulate(&pos2, &cm);
                 ts = BrVector3Dot(&pCar->velocity_car_space, &normal_car_space);
-                // tv.v[0] = normal_car_space.v[0] * -ts;
-                // tv.v[1] = normal_car_space.v[1] * -ts;
-                // tv.v[2] = -ts * normal_car_space.v[2];
                 BrVector3Scale(&tv, &normal_car_space, -ts);
-                // v_plane.v[0] = pCar->velocity_car_space.v[0] + tv.v[0];
-                // v_plane.v[1] = pCar->velocity_car_space.v[1] + tv.v[1];
-                // v_plane.v[2] = pCar->velocity_car_space.v[2] + tv.v[2];
                 BrVector3Add(&v_plane, &pCar->velocity_car_space, &tv);
                 BrVector3Normalise(&tv, &v_plane);
-
-                // tv.v[0] = tv.v[0] * -0.028985508;
-                // tv.v[1] = tv.v[1] * -0.028985508;
-                // tv.v[2] = tv.v[2] * -0.028985508;
                 BrVector3Scale(&tv, &tv, -0.028985508f);
-                // tv2.v[0] = tv.v[0] + tv2.v[0];
-                // tv2.v[1] = tv.v[1] + tv2.v[1];
-                // tv2.v[2] = tv.v[2] + tv2.v[2];
                 BrVector3Accumulate(&tv2, &tv);
-                // tv.v[0] = tv.v[0] * 0.5;
-                // tv.v[1] = tv.v[1] * 0.5;
-                // tv.v[2] = tv.v[2] * 0.5;
                 BrVector3Scale(&tv, &tv, 0.5f);
-                // p.v[0] = p.v[0] + tv.v[0];
-                // p.v[1] = p.v[1] + tv.v[1];
-                // p.v[2] = p.v[2] + tv.v[2];
                 BrVector3Accumulate(&p, &tv);
-                // pos2.v[0] = pos2.v[0] + tv.v[0];
-                // pos2.v[1] = pos2.v[1] + tv.v[1];
-                // pos2.v[2] = pos2.v[2] + tv.v[2];
                 BrVector3Accumulate(&pos2, &tv);
                 SingleSplash(pCar, &tv2, &normal_car_space, pTime);
                 SingleSplash(pCar, &p, &normal_car_space, pTime);
@@ -1959,17 +1890,8 @@ void CreateSplash(tCar_spec* pCar, tU32 pTime) {
                         + pCar->extra_points[i].v[0] * normal_car_space.v[0]);
                 if (dist > 0.0 != dist2 > 0.0) {
                     ts = dist / (dist - dist2);
-                    // tv.v[0] = pCar->extra_points[i].v[0] - pCar->cmpos.v[0];
-                    // tv.v[1] = pCar->extra_points[i].v[1] - pCar->cmpos.v[1];
-                    // tv.v[2] = pCar->extra_points[i].v[2] - pCar->cmpos.v[2];
                     BrVector3Sub(&tv, &pCar->extra_points[i], &pCar->cmpos);
-                    // tv.v[0] = tv.v[0] * ts;
-                    // tv.v[1] = tv.v[1] * ts;
-                    // tv.v[2] = tv.v[2] * ts;
                     BrVector3Scale(&tv, &tv, ts);
-                    // tv.v[0] = pCar->cmpos.v[0] + tv.v[0];
-                    // tv.v[1] = pCar->cmpos.v[1] + tv.v[1];
-                    // tv.v[2] = pCar->cmpos.v[2] + tv.v[2];
                     BrVector3Accumulate(&tv, &pCar->cmpos);
                     if (pCar->bounds[1].max.v[1] - 0.028985508 > tv.v[1]
                         || pCar->bounds[1].min.v[0] > tv.v[0]
