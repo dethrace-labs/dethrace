@@ -17,7 +17,7 @@ typedef struct tStored_material {
     int index_base;
     br_uint_32 flags;
     br_pixelmap* shade_table;
-    br_pixelmap* texture;
+    br_pixelmap* pixelmap;
     char identifier[200];
 } tStored_material;
 

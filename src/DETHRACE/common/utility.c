@@ -187,7 +187,7 @@ int IRandomBetween(int pA, int pB) {
     int num;
     char s[32];
 
-    num = (rand() % (pB - pA + 1)) + pA;
+    num = (pB + 1 - pA) * (rand() / (double)RAND_MAX) + pA;
     return num;
 }
 
@@ -208,7 +208,7 @@ int IRandomPosNeg(int pN) {
 // IDA: float __cdecl FRandomBetween(float pA, float pB)
 float FRandomBetween(float pA, float pB) {
     LOG_TRACE8("(%f, %f)", pA, pB);
-    return (float)rand() * (pB - pA) / RAND_MAX + pA;
+    return (double)rand() * (pB - pA) / (double)RAND_MAX + pA;
 }
 
 // IDA: float __cdecl FRandomPosNeg(float pN)
@@ -1468,6 +1468,8 @@ void BlendifyMaterialTablishly(br_material* pMaterial, int pPercent) {
     char* s = NULL;
     LOG_TRACE("(%p, %d)", pMaterial, pPercent);
 
+    LOG_PANIC("tabishly");
+
     switch (pPercent) {
     case 25:
         s = "BLEND75.TAB";
@@ -1490,6 +1492,9 @@ void BlendifyMaterialTablishly(br_material* pMaterial, int pPercent) {
 
 // IDA: void __usercall BlendifyMaterialPrimitively(br_material *pMaterial@<EAX>, int pPercent@<EDX>)
 void BlendifyMaterialPrimitively(br_material* pMaterial, int pPercent) {
+
+    LOG_PANIC("primshly");
+
     static br_token_value alpha25[3] = {
         { BRT_BLEND_B, { .b = 1 } },
         { BRT_OPACITY_X, { .x = 0x400000 } },

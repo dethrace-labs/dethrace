@@ -496,25 +496,39 @@ void build_model(br_model* model) {
     CHECK_GL_ERROR("after build model");
 }
 
+int debug = 0;
 void setActiveMaterial(tStored_material* material) {
     if (material) {
+        if (debug) {
+            LOG_DEBUG("set palette override %s %d", material->identifier, material->index_base);
+        }
         glUniform1i(uniforms_3d.palette_index_override, material->index_base);
         if (material->shade_table) {
             GLRenderer_SetShadeTable(material->shade_table);
         }
         if ((material->flags & BR_MATF_LIGHT) && !(material->flags & BR_MATF_PRELIT) && material->shade_table) {
             // TODO: light value shouldn't always be 0? Works for shadows, not sure about other things.
+            if (debug) {
+                LOG_DEBUG("set light");
+            }
             glUniform1i(uniforms_3d.light_value, 0);
         } else {
             glUniform1i(uniforms_3d.light_value, -1);
         }
 
-        if (material->texture) {
-            tStored_pixelmap* stored_px = material->texture->stored;
+        if (material->pixelmap) {
+            tStored_pixelmap* stored_px = material->pixelmap->stored;
             if (stored_px) {
+                if (debug) {
+                    LOG_DEBUG("set texture");
+                }
                 glBindTexture(GL_TEXTURE_2D, stored_px->id);
                 glUniform1i(uniforms_3d.palette_index_override, -1);
             }
+        }
+    } else {
+        if (debug) {
+            LOG_DEBUG("skip");
         }
     }
 }
@@ -554,8 +568,17 @@ void GLRenderer_RenderModel(br_actor* actor, br_model* model, br_matrix34 model_
 
     int element_index = 0;
 
+    // "if (actor->identifier && strcmp(actor->identifier, "shrapnel") == 0) {
+    //     debug = 1;
+    // } else {
+    //     debug = 0;
+    // }"
+
     // br_actor can have a material too, which is applied to the faces if the face doesn't have a texture
     if (actor->material) {
+        if (debug) {
+            LOG_DEBUG("setting actor mat");
+        }
         setActiveMaterial(actor->material->stored);
     } else {
         // TODO: set defaults for now. This fixes missing curb materials but probably isn't the right fix.
@@ -567,6 +590,9 @@ void GLRenderer_RenderModel(br_actor* actor, br_model* model, br_matrix34 model_
     v11group* group;
     for (int g = 0; g < v11->ngroups; g++) {
         group = &v11->groups[g];
+        if (debug) {
+            LOG_DEBUG("setting group mat");
+        }
         setActiveMaterial(group->stored);
         glDrawElements(GL_TRIANGLES, group->nfaces * 3, GL_UNSIGNED_INT, (void*)(element_index * sizeof(int)));
         element_index += group->nfaces * 3;
@@ -588,9 +614,10 @@ void GLRenderer_BufferMaterial(br_material* mat) {
             strcpy(stored->identifier, mat->identifier);
         }
     }
-    stored->texture = mat->colour_map;
+    stored->pixelmap = mat->colour_map;
     stored->flags = mat->flags;
     stored->shade_table = mat->index_shade;
+    stored->index_base = mat->index_base;
 }
 
 void GLRenderer_BufferTexture(br_pixelmap* pm) {
@@ -657,7 +684,7 @@ void GLRenderer_FlushBuffers(br_pixelmap* color_buffer, br_pixelmap* depth_buffe
         }
     }
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
     dirty_buffers = 0;
 }
 

@@ -457,5 +457,5 @@ void DoWheelDamage(tU32 pFrame_period) {
 // IDA: void __usercall CrashEarnings(tCar_spec *pCar1@<EAX>, tCar_spec *pCar2@<EDX>)
 void CrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
     LOG_TRACE("(%p, %p)", pCar1, pCar2);
-    STUB();
+    STUB_ONCE();
 }

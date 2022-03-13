@@ -38,7 +38,8 @@ tStored_model_context* NewStoredModelContext() {
 tStored_material* NewStoredMaterial() {
     tStored_material* ctx = malloc(sizeof(tStored_material));
     ctx->index_base = -1;
-    ctx->texture = NULL;
+    ctx->pixelmap = NULL;
+    ctx->shade_table = NULL;
     ctx->identifier[0] = '\0';
     return ctx;
 }

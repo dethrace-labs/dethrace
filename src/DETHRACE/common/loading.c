@@ -2337,7 +2337,7 @@ void LoadRaces(tRace_list_spec* pRace_list, int* pCount, int pRace_type_index) {
         if (strcmp(s, "END") == 0) {
             last_race = 1;
         } else {
-            strcpy( pRace_list[i].name, s);
+            strcpy(pRace_list[i].name, s);
             SkipRestOfRace(f);
             // s = (s + 48);
             number_of_racers++;
@@ -3354,7 +3354,11 @@ int SaveOptions() {
         return 0;
     }
 
-#define BAIL_IF_NEGATIVE(VAL) if ((VAL) < 0) { LOG_WARN( #VAL " FAILED\n"); return 0; }
+#define BAIL_IF_NEGATIVE(VAL)       \
+    if ((VAL) < 0) {                \
+        LOG_WARN(#VAL " FAILED\n"); \
+        return 0;                   \
+    }
 
     BAIL_IF_NEGATIVE(fprintf(f, "YonFactor %f\n", GetYonFactor()));
     BAIL_IF_NEGATIVE(fprintf(f, "SkyTextureOn %d\n", GetSkyTextureOn()));
