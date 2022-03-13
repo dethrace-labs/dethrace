@@ -1720,18 +1720,16 @@ void SingleSplash(tCar_spec* pCar, br_vector3* sp, br_vector3* normal, tU32 pTim
     tv.v[1] = pCar->omega.v[2] * sp->v[0] - sp->v[2] * pCar->omega.v[0];
     tv.v[2] = sp->v[1] * pCar->omega.v[0] - pCar->omega.v[1] * sp->v[0];
     BrMatrix34ApplyV(&vel, &tv, c_mat);
-    vel.v[0] = pCar->v.v[0] + vel.v[0];
-    vel.v[1] = pCar->v.v[1] + vel.v[1];
-    vel.v[2] = pCar->v.v[2] + vel.v[2];
-    ts = sqrt(vel.v[2] * vel.v[2] + vel.v[1] * vel.v[1] + vel.v[0] * vel.v[0]);
-    size = (fabs(normal->v[2] * vel.v[2] + normal->v[1] * vel.v[1] + normal->v[0] * vel.v[0]) * 5.0 + ts) / 150.0 + 0.047826085;
+    // vel.v[0] = pCar->v.v[0] + vel.v[0];
+    // vel.v[1] = pCar->v.v[1] + vel.v[1];
+    // vel.v[2] = pCar->v.v[2] + vel.v[2];
+    BrVector3Accumulate(&vel, &pCar->v);
+    ts = BrVector3Length(&vel);
+    size = (fabs(BrVector3Dot(normal, &vel)) * 5.0 + ts) / 150.0 + 0.047826085;
     if (size > 0.5) {
         size = 0.5;
     }
-    if (pCar->velocity_car_space.v[2] * sp->v[2]
-            + pCar->velocity_car_space.v[1] * sp->v[1]
-            + pCar->velocity_car_space.v[0] * sp->v[0]
-        < 0.0) {
+    if (BrVector3Dot(&pCar->velocity_car_space, sp) < 0.0) {
         size = size / 2.0;
     }
 
@@ -1742,32 +1740,39 @@ void SingleSplash(tCar_spec* pCar, br_vector3* sp, br_vector3* normal, tU32 pTim
     gSplash_flags |= 1 << gNext_splash;
     gSplash[gNext_splash].just_done = 1;
     if ((double)pTime * 0.003 > SRandomBetween(0.0, 1.0) && !gAction_replay_mode) {
-        vel.v[0] = vel.v[0] / 6.9000001;
-        vel.v[1] = vel.v[1] / 6.9000001;
-        vel.v[2] = vel.v[2] / 6.9000001;
-        tv.v[0] = vel.v[0] * -0.1;
-        tv.v[1] = vel.v[1] * -0.1;
-        tv.v[2] = vel.v[2] * -0.1;
+        // vel.v[0] = vel.v[0] / 6.9000001;
+        // vel.v[1] = vel.v[1] / 6.9000001;
+        // vel.v[2] = vel.v[2] / 6.9000001;
+        BrVector3InvScale(&vel, &vel, WORLD_SCALE);
+        // tv.v[0] = vel.v[0] * -0.1;
+        // tv.v[1] = vel.v[1] * -0.1;
+        // tv.v[2] = vel.v[2] * -0.1;
+        BrVector3Scale(&tv, &vel, 0.1f);
         speed = sqrt(ts / 70.0) * 15.0;
         if (speed > 15.0f) {
             speed = 15.0f;
         }
         tv.v[1] += SRandomBetween(5.0, speed) / WORLD_SCALE;
         BrMatrix34TApplyV(&vel, &tv, &pCar->car_master_actor->t.t.mat);
-        tv.v[0] = pCar->water_normal.v[2] * vel.v[1] - pCar->water_normal.v[1] * vel.v[2];
-        tv.v[1] = pCar->water_normal.v[0] * vel.v[2] - pCar->water_normal.v[2] * vel.v[0];
-        tv.v[2] = pCar->water_normal.v[1] * vel.v[0] - pCar->water_normal.v[0] * vel.v[1];
-        tv.v[0] = tv.v[0] * 0.5;
-        tv.v[1] = tv.v[1] * 0.5;
-        tv.v[2] = tv.v[2] * 0.5;
-        if (sp->v[2] * tv.v[2] + sp->v[1] * tv.v[1] + sp->v[0] * tv.v[0] <= 0.0) {
-            vel.v[0] = vel.v[0] - tv.v[0];
-            vel.v[1] = vel.v[1] - tv.v[1];
-            vel.v[2] = vel.v[2] - tv.v[2];
+
+        BrVector3Cross(&tv, &vel, &pCar->water_normal);
+        // tv.v[0] = pCar->water_normal.v[2] * vel.v[1] - pCar->water_normal.v[1] * vel.v[2];
+        // tv.v[1] = pCar->water_normal.v[0] * vel.v[2] - pCar->water_normal.v[2] * vel.v[0];
+        // tv.v[2] = pCar->water_normal.v[1] * vel.v[0] - pCar->water_normal.v[0] * vel.v[1];
+        // tv.v[0] = tv.v[0] * 0.5;
+        // tv.v[1] = tv.v[1] * 0.5;
+        // tv.v[2] = tv.v[2] * 0.5;
+        BrVector3Scale(&tv, &tv, 0.5f);
+        if (BrVector3Dot(sp, &tv) <= 0.0) {
+            // vel.v[0] = vel.v[0] - tv.v[0];
+            // vel.v[1] = vel.v[1] - tv.v[1];
+            // vel.v[2] = vel.v[2] - tv.v[2];
+            BrVector3Sub(&vel, &vel, &tv);
         } else {
-            vel.v[0] = vel.v[0] + tv.v[0];
-            vel.v[1] = vel.v[1] + tv.v[1];
-            vel.v[2] = vel.v[2] + tv.v[2];
+            // vel.v[0] = vel.v[0] + tv.v[0];
+            // vel.v[1] = vel.v[1] + tv.v[1];
+            // vel.v[2] = vel.v[2] + tv.v[2];
+            BrVector3Accumulate(&vel, &tv);
         }
         CreateSingleSpark(pCar, sp, &vel);
     }
@@ -1809,10 +1814,7 @@ void CreateSplash(tCar_spec* pCar, tU32 pTime) {
     if (pCar->v.v[2] * pCar->v.v[2] + pCar->v.v[1] * pCar->v.v[1] + pCar->v.v[0] * pCar->v.v[0] >= 1.0) {
         BrMatrix34TApplyV(&normal_car_space, &pCar->water_normal, &pCar->car_master_actor->t.t.mat);
         BrMatrix34ApplyP(&tv, &pCar->bounds[0].min, &pCar->car_master_actor->t.t.mat);
-        min = pCar->water_normal.v[1] * tv.v[1]
-            + pCar->water_normal.v[2] * tv.v[2]
-            + pCar->water_normal.v[0] * tv.v[0]
-            - pCar->water_d;
+        min = BrVector3Dot(&pCar->water_normal, &tv) - pCar->water_d;
         max = min;
         for (i = 0; i < 3; ++i) {
             if (normal_car_space.v[i] <= 0.0) {
@@ -1822,22 +1824,12 @@ void CreateSplash(tCar_spec* pCar, tU32 pTime) {
             }
         }
         if (min * max <= 0.0) {
-            back_point[0].v[0] = pCar->bounds[1].min.v[0] / 6.9000001;
-            back_point[0].v[1] = pCar->bounds[1].min.v[1] / 6.9000001;
-            back_point[0].v[2] = pCar->bounds[1].min.v[2] / 6.9000001;
-            back_point[1].v[0] = pCar->bounds[1].max.v[0] / 6.9000001;
-            back_point[1].v[1] = pCar->bounds[1].max.v[1] / 6.9000001;
-            back_point[1].v[2] = pCar->bounds[1].max.v[2] / 6.9000001;
-            back_point[0].v[1] = 0.0099999998;
-            ts = pCar->velocity_car_space.v[1] * normal_car_space.v[1]
-                + pCar->velocity_car_space.v[2] * normal_car_space.v[2]
-                + pCar->velocity_car_space.v[0] * normal_car_space.v[0];
-            tv.v[0] = normal_car_space.v[0] * ts;
-            tv.v[1] = normal_car_space.v[1] * ts;
-            tv.v[2] = normal_car_space.v[2] * ts;
-            v_plane.v[0] = pCar->velocity_car_space.v[0] - tv.v[0];
-            v_plane.v[1] = pCar->velocity_car_space.v[1] - tv.v[1];
-            v_plane.v[2] = pCar->velocity_car_space.v[2] - tv.v[2];
+            BrVector3InvScale(&back_point[0], &pCar->bounds[1].min, WORLD_SCALE);
+            BrVector3InvScale(&back_point[1], &pCar->bounds[1].max, WORLD_SCALE);
+            back_point[0].v[1] = 0.01;
+            ts = BrVector3Dot(&pCar->velocity_car_space, &normal_car_space);
+            BrVector3Scale(&tv, &normal_car_space, ts);
+            BrVector3Sub(&v_plane, &pCar->velocity_car_space, &tv);
             d = pCar->water_d
                 - (pCar->car_master_actor->t.t.mat.m[3][1] * pCar->water_normal.v[1]
                     + pCar->car_master_actor->t.t.mat.m[3][2] * pCar->water_normal.v[2]
@@ -1895,62 +1887,71 @@ void CreateSplash(tCar_spec* pCar, tU32 pTime) {
                 tv.v[0] = pos2.v[0] - p.v[0];
                 tv.v[1] = pos2.v[1] - p.v[1];
                 tv.v[2] = pos2.v[2] - p.v[2];
-                ts = SRandomBetween(0.40000001, 0.60000002);
-                tv2.v[0] = tv.v[0] * ts;
-                tv2.v[1] = tv.v[1] * ts;
-                tv2.v[2] = tv.v[2] * ts;
-                tv2.v[0] = p.v[0] + tv2.v[0];
-                tv2.v[1] = p.v[1] + tv2.v[1];
-                tv2.v[2] = p.v[2] + tv2.v[2];
-                ts = SRandomBetween(0.2, 0.30000001);
+                BrVector3Sub(&tv, &pos2, &p);
+                ts = SRandomBetween(0.4, 0.6);
+                // tv2.v[0] = tv.v[0] * ts;
+                // tv2.v[1] = tv.v[1] * ts;
+                // tv2.v[2] = tv.v[2] * ts;
+                BrVector3Scale(&tv2, &tv, ts);
+                // tv2.v[0] = p.v[0] + tv2.v[0];
+                // tv2.v[1] = p.v[1] + tv2.v[1];
+                // tv2.v[2] = p.v[2] + tv2.v[2];
+                BrVector3Accumulate(&tv2, &p);
+                ts = SRandomBetween(0.2, 0.3);
+                // cm.v[0] = tv.v[0] * ts;
+                // cm.v[1] = tv.v[1] * ts;
+                // cm.v[2] = tv.v[2] * ts;
+                BrVector3Scale(&cm, &tv, ts);
+                // p.v[0] = p.v[0] + cm.v[0];
+                // p.v[1] = p.v[1] + cm.v[1];
+                // p.v[2] = p.v[2] + cm.v[2];
+                BrVector3Accumulate(&p, &cm);
+                ts = -SRandomBetween(0.2, 0.3);
                 cm.v[0] = tv.v[0] * ts;
                 cm.v[1] = tv.v[1] * ts;
                 cm.v[2] = tv.v[2] * ts;
-                p.v[0] = p.v[0] + cm.v[0];
-                p.v[1] = p.v[1] + cm.v[1];
-                p.v[2] = p.v[2] + cm.v[2];
-                ts = -SRandomBetween(0.2, 0.30000001);
-                cm.v[0] = tv.v[0] * ts;
-                cm.v[1] = tv.v[1] * ts;
-                cm.v[2] = tv.v[2] * ts;
-                pos2.v[0] = pos2.v[0] + cm.v[0];
-                pos2.v[1] = pos2.v[1] + cm.v[1];
-                pos2.v[2] = pos2.v[2] + cm.v[2];
-                ts = pCar->velocity_car_space.v[1] * normal_car_space.v[1]
-                    + pCar->velocity_car_space.v[2] * normal_car_space.v[2]
-                    + pCar->velocity_car_space.v[0] * normal_car_space.v[0];
-                tv.v[0] = normal_car_space.v[0] * -ts;
-                tv.v[1] = normal_car_space.v[1] * -ts;
-                tv.v[2] = -ts * normal_car_space.v[2];
-                v_plane.v[0] = pCar->velocity_car_space.v[0] + tv.v[0];
-                v_plane.v[1] = pCar->velocity_car_space.v[1] + tv.v[1];
-                v_plane.v[2] = pCar->velocity_car_space.v[2] + tv.v[2];
+                BrVector3Scale(&cm, &tv, ts);
+                // pos2.v[0] = pos2.v[0] + cm.v[0];
+                // pos2.v[1] = pos2.v[1] + cm.v[1];
+                // pos2.v[2] = pos2.v[2] + cm.v[2];
+                BrVector3Accumulate(&pos2, &cm);
+                ts = BrVector3Dot(&pCar->velocity_car_space, &normal_car_space);
+                // tv.v[0] = normal_car_space.v[0] * -ts;
+                // tv.v[1] = normal_car_space.v[1] * -ts;
+                // tv.v[2] = -ts * normal_car_space.v[2];
+                BrVector3Scale(&tv, &normal_car_space, -ts);
+                // v_plane.v[0] = pCar->velocity_car_space.v[0] + tv.v[0];
+                // v_plane.v[1] = pCar->velocity_car_space.v[1] + tv.v[1];
+                // v_plane.v[2] = pCar->velocity_car_space.v[2] + tv.v[2];
+                BrVector3Add(&v_plane, &pCar->velocity_car_space, &tv);
                 BrVector3Normalise(&tv, &v_plane);
 
-                tv.v[0] = tv.v[0] * -0.028985508;
-                tv.v[1] = tv.v[1] * -0.028985508;
-                tv.v[2] = tv.v[2] * -0.028985508;
-                tv2.v[0] = tv.v[0] + tv2.v[0];
-                tv2.v[1] = tv.v[1] + tv2.v[1];
-                tv2.v[2] = tv.v[2] + tv2.v[2];
-                tv.v[0] = tv.v[0] * 0.5;
-                tv.v[1] = tv.v[1] * 0.5;
-                tv.v[2] = tv.v[2] * 0.5;
-                p.v[0] = p.v[0] + tv.v[0];
-                p.v[1] = p.v[1] + tv.v[1];
-                p.v[2] = p.v[2] + tv.v[2];
-                pos2.v[0] = pos2.v[0] + tv.v[0];
-                pos2.v[1] = pos2.v[1] + tv.v[1];
-                pos2.v[2] = pos2.v[2] + tv.v[2];
+                // tv.v[0] = tv.v[0] * -0.028985508;
+                // tv.v[1] = tv.v[1] * -0.028985508;
+                // tv.v[2] = tv.v[2] * -0.028985508;
+                BrVector3Scale(&tv, &tv, -0.028985508f);
+                // tv2.v[0] = tv.v[0] + tv2.v[0];
+                // tv2.v[1] = tv.v[1] + tv2.v[1];
+                // tv2.v[2] = tv.v[2] + tv2.v[2];
+                BrVector3Accumulate(&tv2, &tv);
+                // tv.v[0] = tv.v[0] * 0.5;
+                // tv.v[1] = tv.v[1] * 0.5;
+                // tv.v[2] = tv.v[2] * 0.5;
+                BrVector3Scale(&tv, &tv, 0.5f);
+                // p.v[0] = p.v[0] + tv.v[0];
+                // p.v[1] = p.v[1] + tv.v[1];
+                // p.v[2] = p.v[2] + tv.v[2];
+                BrVector3Accumulate(&p, &tv);
+                // pos2.v[0] = pos2.v[0] + tv.v[0];
+                // pos2.v[1] = pos2.v[1] + tv.v[1];
+                // pos2.v[2] = pos2.v[2] + tv.v[2];
+                BrVector3Accumulate(&pos2, &tv);
                 SingleSplash(pCar, &tv2, &normal_car_space, pTime);
                 SingleSplash(pCar, &p, &normal_car_space, pTime);
                 SingleSplash(pCar, &pos2, &normal_car_space, pTime);
             }
-            d = d * 6.9000001;
-            dist = d
-                - (pCar->cmpos.v[1] * normal_car_space.v[1]
-                    + pCar->cmpos.v[2] * normal_car_space.v[2]
-                    + pCar->cmpos.v[0] * normal_car_space.v[0]);
+            d = d * WORLD_SCALE;
+            dist = d - BrVector3Dot(&pCar->cmpos, &normal_car_space);
             for (i = 0; pCar->extra_point_num > i; ++i) {
                 dist2 = d
                     - (pCar->extra_points[i].v[1] * normal_car_space.v[1]
@@ -1958,23 +1959,24 @@ void CreateSplash(tCar_spec* pCar, tU32 pTime) {
                         + pCar->extra_points[i].v[0] * normal_car_space.v[0]);
                 if (dist > 0.0 != dist2 > 0.0) {
                     ts = dist / (dist - dist2);
-                    tv.v[0] = pCar->extra_points[i].v[0] - pCar->cmpos.v[0];
-                    tv.v[1] = pCar->extra_points[i].v[1] - pCar->cmpos.v[1];
-                    tv.v[2] = pCar->extra_points[i].v[2] - pCar->cmpos.v[2];
-                    tv.v[0] = tv.v[0] * ts;
-                    tv.v[1] = tv.v[1] * ts;
-                    tv.v[2] = tv.v[2] * ts;
-                    tv.v[0] = pCar->cmpos.v[0] + tv.v[0];
-                    tv.v[1] = pCar->cmpos.v[1] + tv.v[1];
-                    tv.v[2] = pCar->cmpos.v[2] + tv.v[2];
+                    // tv.v[0] = pCar->extra_points[i].v[0] - pCar->cmpos.v[0];
+                    // tv.v[1] = pCar->extra_points[i].v[1] - pCar->cmpos.v[1];
+                    // tv.v[2] = pCar->extra_points[i].v[2] - pCar->cmpos.v[2];
+                    BrVector3Sub(&tv, &pCar->extra_points[i], &pCar->cmpos);
+                    // tv.v[0] = tv.v[0] * ts;
+                    // tv.v[1] = tv.v[1] * ts;
+                    // tv.v[2] = tv.v[2] * ts;
+                    BrVector3Scale(&tv, &tv, ts);
+                    // tv.v[0] = pCar->cmpos.v[0] + tv.v[0];
+                    // tv.v[1] = pCar->cmpos.v[1] + tv.v[1];
+                    // tv.v[2] = pCar->cmpos.v[2] + tv.v[2];
+                    BrVector3Accumulate(&tv, &pCar->cmpos);
                     if (pCar->bounds[1].max.v[1] - 0.028985508 > tv.v[1]
-                        || pCar->bounds[1].min.v[0] > (double)tv.v[0]
-                        || pCar->bounds[1].max.v[0] < (double)tv.v[1]
-                        || pCar->bounds[1].min.v[2] > (double)tv.v[2]
-                        || pCar->bounds[1].max.v[2] < (double)tv.v[2]) {
-                        tv.v[0] = tv.v[0] / 6.9000001;
-                        tv.v[1] = tv.v[1] / 6.9000001;
-                        tv.v[2] = tv.v[2] / 6.9000001;
+                        || pCar->bounds[1].min.v[0] > tv.v[0]
+                        || pCar->bounds[1].max.v[0] < tv.v[1]
+                        || pCar->bounds[1].min.v[2] > tv.v[2]
+                        || pCar->bounds[1].max.v[2] < tv.v[2]) {
+                        BrVector3InvScale(&tv, &tv, WORLD_SCALE);
                         SingleSplash(pCar, &tv, &normal_car_space, pTime);
                     }
                 }
@@ -1987,17 +1989,12 @@ void CreateSplash(tCar_spec* pCar, tU32 pTime) {
                 }
                 tv.v[1] = pCar->bounds[1].max.v[1];
                 tv.v[2] = pCar->wpos[i].v[2];
-                dist = d
-                    - (tv.v[0] * normal_car_space.v[0]
-                        + tv.v[1] * normal_car_space.v[1]
-                        + tv.v[2] * normal_car_space.v[2]);
-                dist2 = (pCar->bounds[1].max.v[1] - 0.0099999998) * normal_car_space.v[1] + dist;
+                dist = d - BrVector3Dot(&tv, &normal_car_space);
+                dist2 = (pCar->bounds[1].max.v[1] - 0.01) * normal_car_space.v[1] + dist;
                 if (dist > 0.0 != dist2 > 0.0) {
                     ts = dist / (dist - dist2);
-                    tv.v[1] = tv.v[1] - (pCar->bounds[1].max.v[1] - 0.0099999998) * ts;
-                    tv.v[0] = tv.v[0] / 6.9000001;
-                    tv.v[1] = tv.v[1] / 6.9000001;
-                    tv.v[2] = tv.v[2] / 6.9000001;
+                    tv.v[1] -= (pCar->bounds[1].max.v[1] - 0.01) * ts;
+                    BrVector3InvScale(&tv, &tv, WORLD_SCALE);
                     SingleSplash(pCar, &tv, &normal_car_space, pTime);
                 }
             }

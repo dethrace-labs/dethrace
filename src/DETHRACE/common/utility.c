@@ -1468,8 +1468,6 @@ void BlendifyMaterialTablishly(br_material* pMaterial, int pPercent) {
     char* s = NULL;
     LOG_TRACE("(%p, %d)", pMaterial, pPercent);
 
-    LOG_PANIC("tabishly");
-
     switch (pPercent) {
     case 25:
         s = "BLEND75.TAB";
@@ -1492,8 +1490,6 @@ void BlendifyMaterialTablishly(br_material* pMaterial, int pPercent) {
 
 // IDA: void __usercall BlendifyMaterialPrimitively(br_material *pMaterial@<EAX>, int pPercent@<EDX>)
 void BlendifyMaterialPrimitively(br_material* pMaterial, int pPercent) {
-
-    LOG_PANIC("primshly");
 
     static br_token_value alpha25[3] = {
         { BRT_BLEND_B, { .b = 1 } },
