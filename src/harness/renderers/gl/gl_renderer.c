@@ -1,20 +1,16 @@
 #include "gl_renderer.h"
 #include "brender/brender.h"
 #include "cameras/debug_camera.h"
-#include "gl_brender_stored_context.h"
-#include "gl_renderer_shaders.h"
 #include "harness.h"
 #include "harness/trace.h"
 #include "platforms/platform.h"
+#include "shaders.h"
+#include "stored_context.h"
 
 #include <cglm/cglm.h>
 #include <glad/glad.h>
+#include <string.h>
 
-// this needs to be included after glad.h
-#include <SDL_opengl.h>
-
-SDL_Window* window;
-SDL_GLContext context;
 GLuint screen_buffer_vao, screen_buffer_ebo;
 GLuint screen_texture, palette_texture, depth_texture;
 
@@ -178,18 +174,12 @@ void SetupFullScreenRectGeometry() {
     glBindVertexArray(0);
 }
 
-void InitializeOpenGLContext() {
+void GLRenderer_Init(int width, int height, int pRender_width, int pRender_height) {
 
-    context = SDL_GL_CreateContext(window);
-    if (!context) {
-        LOG_PANIC("Failed to call SDL_GL_CreateContext. %s", SDL_GetError());
-    }
-
-    // Load GL extensions using glad
-    if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
-        LOG_PANIC("Failed to initialize the OpenGL context with GLAD.");
-        exit(1);
-    }
+    window_width = width;
+    window_height = height;
+    render_width = pRender_width;
+    render_height = pRender_height;
 
     int maxTextureImageUnits;
     glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxTextureImageUnits);
@@ -235,48 +225,10 @@ void InitializeOpenGLContext() {
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    CHECK_GL_ERROR("initializeOpenGLContext");
-}
-
-void GLRenderer_CreateWindow(char* title, int width, int height, int pRender_width, int pRender_height) {
-    window_width = width;
-    window_height = height;
-    render_width = pRender_width;
-    render_height = pRender_height;
-
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        LOG_PANIC("SDL_INIT_VIDEO error: %s", SDL_GetError());
-    }
-
-    if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE) != 0) {
-        LOG_PANIC("Failed to set SDL_GL_CONTEXT_PROFILE_MASK attribute. %s", SDL_GetError());
-    };
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-
-    SDL_GL_SetSwapInterval(1);
-
-    window = SDL_CreateWindow(title,
-        SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED,
-        width, height,
-        SDL_WINDOW_OPENGL);
-
-    if (!window) {
-        LOG_PANIC("Failed to create window");
-    }
-
-    // Don't grab the mouse when a debugger is present
-    if (!PlatformIsDebuggerPresent()) {
-        SDL_SetRelativeMouseMode(SDL_TRUE);
-    }
-
-    // SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
-
-    InitializeOpenGLContext();
-
     screen_buffer_flip_pixels = malloc(sizeof(uint8_t) * render_width * render_height);
     depth_buffer_flip_pixels = malloc(sizeof(uint16_t) * render_width * render_height);
+
+    CHECK_GL_ERROR("initializeOpenGLContext");
 }
 
 void GLRenderer_SetPalette(uint8_t* rgba_colors) {
@@ -374,7 +326,7 @@ void GLRenderer_EndScene() {
     CHECK_GL_ERROR("GLRenderer_RenderFullScreenQuad");
 }
 
-void GLRenderer_RenderFullScreenQuad(uint8_t* screen_buffer, int width, int height) {
+void GLRenderer_FullScreenQuad(uint8_t* screen_buffer, int width, int height) {
     glViewport(0, 0, window_width, window_height);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDisable(GL_DEPTH_TEST);
@@ -392,8 +344,7 @@ void GLRenderer_RenderFullScreenQuad(uint8_t* screen_buffer, int width, int heig
     CHECK_GL_ERROR("GLRenderer_RenderFullScreenQuad");
 }
 
-void GLRenderer_Swap() {
-    SDL_GL_SwapWindow(window);
+void GLRenderer_ClearBuffers() {
     // clear our virtual framebuffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
@@ -519,7 +470,7 @@ void setActiveMaterial(tStored_material* material) {
     }
 }
 
-void GLRenderer_RenderModel(br_actor* actor, br_model* model, br_matrix34 model_matrix) {
+void GLRenderer_Model(br_actor* actor, br_model* model, br_matrix34 model_matrix) {
     tStored_model_context* ctx;
     ctx = model->stored;
     v11model* v11 = model->prepared;

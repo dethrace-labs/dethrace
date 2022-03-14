@@ -10,7 +10,7 @@
 #endif
 
 extern int harness_debug_level;
-extern int PlatformIsDebuggerPresent(void);
+extern int Platform_IsDebuggerPresent(void);
 
 void Harness_Debug_PrintStack();
 
@@ -46,26 +46,26 @@ void debug_print_matrix4(const char* fmt, const char* fn, char* name, br_matrix4
 #define LOG_MATRIX4(msg, m) debug_print_matrix4("\033[0;34m[DEBUG] %s ", __FUNCTION__, msg, m)
 #define LOG_INFO(...) debug_printf("\033[0;34m[INFO] %s ", __FUNCTION__, __VA_ARGS__)
 #define LOG_WARN(...) debug_printf("\033[0;33m[WARN] %s ", __FUNCTION__, __VA_ARGS__)
-#define LOG_PANIC(...)                                                       \
-    do {                                                                     \
-        debug_printf("\033[0;31m[PANIC] %s ", __FUNCTION__, __VA_ARGS__);    \
-        if (PlatformIsDebuggerPresent())                                     \
-            abort();                                                         \
-        else                                                                 \
-            exit(1);                                                         \
+#define LOG_PANIC(...)                                                    \
+    do {                                                                  \
+        debug_printf("\033[0;31m[PANIC] %s ", __FUNCTION__, __VA_ARGS__); \
+        if (Platform_IsDebuggerPresent())                                 \
+            abort();                                                      \
+        else                                                              \
+            exit(1);                                                      \
     } while (0)
 
-#define LOG_WARN_ONCE(...)                                                   \
-    static int warn_printed = 0;                                             \
-    if (!warn_printed) {                                                     \
-        debug_printf("\033[0;33m[WARN] %s ", __FUNCTION__, __VA_ARGS__);     \
-        warn_printed = 1;                                                    \
+#define LOG_WARN_ONCE(...)                                               \
+    static int warn_printed = 0;                                         \
+    if (!warn_printed) {                                                 \
+        debug_printf("\033[0;33m[WARN] %s ", __FUNCTION__, __VA_ARGS__); \
+        warn_printed = 1;                                                \
     }
 
-#define NOT_IMPLEMENTED()                                                    \
+#define NOT_IMPLEMENTED() \
     LOG_PANIC("not implemented")
 
-#define TELL_ME_IF_WE_PASS_THIS_WAY()                                        \
+#define TELL_ME_IF_WE_PASS_THIS_WAY() \
     LOG_PANIC("code path not expected")
 
 #define STUB() \
@@ -78,6 +78,6 @@ void debug_print_matrix4(const char* fmt, const char* fn, char* name, br_matrix4
         stub_printed = 1;                                                    \
     }
 
-//int count_open_fds();
+// int count_open_fds();
 
 #endif

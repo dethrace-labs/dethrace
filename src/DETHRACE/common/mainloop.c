@@ -635,8 +635,6 @@ tRace_result MainGameLoop() {
             gAbandon_game = 0;
         }
 
-        Harness_Hook_MainGameLoop();
-
     } while (gProgram_state.prog_status == eProg_game_ongoing
         && !MungeRaceFinished()
         && !gAbandon_game

@@ -1,4 +1,4 @@
-#include "gl_brender_stored_context.h"
+#include "stored_context.h"
 #include "../include/harness/trace.h"
 #include <stdlib.h>
 

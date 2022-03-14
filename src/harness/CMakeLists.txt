@@ -1,5 +1,9 @@
 add_library(harness STATIC)
 
+if (NOT DEFINED RENDERER_PLATFORM)
+    set(RENDERER_PLATFORM "SDL_OpenGL")
+endif()
+
 target_include_directories(harness 
     PRIVATE
         .
@@ -36,22 +40,25 @@ target_sources(harness PRIVATE
     harness_trace.c
     harness.c
     harness.h
-    sdl/gl_renderer.c
-    sdl/gl_renderer.h
-    sdl/gl_renderer_shaders.c
-    sdl/gl_renderer_shaders.h
-    sdl/gl_brender_stored_context.c
-    sdl/gl_brender_stored_context.h
+    platforms/null.h
+    renderers/renderer.h
     brender_emu/renderer_impl.c
     brender_emu/renderer_impl.h
     sound/sound.c
     sound/sound.h
-    sdl/common.c
-    sdl/common.h
-    platforms/sdl_gl.h
-    platforms/null.h
-    stack_trace_handler.h
 )
+
+if (RENDERER_PLATFORM STREQUAL "SDL_OpenGL")
+    target_sources(harness PRIVATE
+        window_io/sdl/sdl_gl.c
+        renderers/gl/gl_renderer.c
+        renderers/gl/gl_renderer.h
+        renderers/gl/shaders.c
+        renderers/gl/shaders.h
+        renderers/gl/stored_context.c
+        renderers/gl/stored_context.h
+    )
+endif()
 
 if(WIN32)
     target_sources(harness PRIVATE

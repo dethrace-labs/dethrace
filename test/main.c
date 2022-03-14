@@ -182,6 +182,8 @@ void setup_global_vars(int argc, char* argv[]) {
         fake_argv[fake_argc++] = "--no-signal-handler";
     }
     Harness_Init(&fake_argc, fake_argv);
+
+    Harness_ForceNullRenderer();
 }
 
 int has_data_directory() {

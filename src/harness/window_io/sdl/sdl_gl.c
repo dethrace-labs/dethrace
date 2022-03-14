@@ -1,5 +1,12 @@
-#include "common.h"
+#include <glad/glad.h>
+
+// this needs to be included after glad.h
 #include <SDL.h>
+#include <SDL_opengl.h>
+
+#include "../renderers/gl/gl_renderer.h"
+#include "../renderers/renderer.h"
+#include "harness/trace.h"
 
 // Errol's keymap
 int keymap[123] = {
@@ -112,15 +119,69 @@ int keymap[123] = {
     SDL_SCANCODE_SPACE
 };
 
+SDL_Window* window;
+SDL_GLContext context;
 uint8_t sdl_key_state[256];
 
-void SDLPlatform_Init() {
-    if (SDL_Init(SDL_INIT_TIMER) != 0) {
-        LOG_PANIC("SDL_INIT_TIMER error: %s", SDL_GetError());
+tRenderer gl_renderer = {
+    GLRenderer_Init,
+    GLRenderer_BeginScene,
+    GLRenderer_EndScene,
+    GLRenderer_SetPalette,
+    GLRenderer_FullScreenQuad,
+    GLRenderer_Model,
+    GLRenderer_ClearBuffers,
+    GLRenderer_BufferTexture,
+    GLRenderer_BufferMaterial,
+    GLRenderer_FlushBuffers
+};
+
+tRenderer* Window_Create(char* title, int width, int height, int pRender_width, int pRender_height) {
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+        LOG_PANIC("SDL_INIT_VIDEO error: %s", SDL_GetError());
     }
+
+    if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE) != 0) {
+        LOG_PANIC("Failed to set SDL_GL_CONTEXT_PROFILE_MASK attribute. %s", SDL_GetError());
+    };
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+
+    SDL_GL_SetSwapInterval(1);
+
+    window = SDL_CreateWindow(title,
+        SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED,
+        width, height,
+        SDL_WINDOW_OPENGL);
+
+    if (!window) {
+        LOG_PANIC("Failed to create window");
+    }
+
+    // Don't grab the mouse when a debugger is present
+    if (!Platform_IsDebuggerPresent()) {
+        SDL_SetRelativeMouseMode(SDL_TRUE);
+    }
+
+    // SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+
+    context = SDL_GL_CreateContext(window);
+    if (!context) {
+        LOG_PANIC("Failed to call SDL_GL_CreateContext. %s", SDL_GetError());
+    }
+
+    // Load GL extensions using glad
+    if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
+        LOG_PANIC("Failed to initialize the OpenGL context with GLAD.");
+        exit(1);
+    }
+
+    gl_renderer.Init(width, height, pRender_width, pRender_height);
+    return &gl_renderer;
 }
 
-void SDLPlatform_PollEvents() {
+void Window_PollEvents() {
     SDL_Event event;
 
     while (SDL_PollEvent(&event)) {
@@ -134,7 +195,7 @@ void SDLPlatform_PollEvents() {
             }
             if (event.key.type == SDL_KEYDOWN) {
                 sdl_key_state[event.key.keysym.scancode] = 1;
-                //LOG_DEBUG("key %d", key->keysym.scancode);
+                // LOG_DEBUG("key %d", key->keysym.scancode);
             } else {
                 sdl_key_state[event.key.keysym.scancode] = 0;
             }
@@ -148,10 +209,18 @@ void SDLPlatform_PollEvents() {
     }
 }
 
-int* SDLPlatform_GetKeyMap() {
+void Window_Swap(int delay_ms_after_swap) {
+    SDL_GL_SwapWindow(window);
+
+    if (delay_ms_after_swap != 0) {
+        SDL_Delay(delay_ms_after_swap);
+    }
+}
+
+int* Input_GetKeyMap() {
     return (int*)keymap;
 }
 
-int SDLPlatform_IsKeyDown(unsigned char scan_code) {
+int Input_IsKeyDown(unsigned char scan_code) {
     return sdl_key_state[scan_code];
 }
