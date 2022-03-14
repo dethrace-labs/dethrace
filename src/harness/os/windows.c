@@ -22,7 +22,7 @@
 
 static char _program_name[1024];
 
-int Platform_IsDebuggerPresent() {
+int OS_IsDebuggerPresent() {
     return IsDebuggerPresent();
 }
 
@@ -35,7 +35,7 @@ int addr2line(char const* const program_name, void const* const addr) {
     return system(addr2line_cmd);
 }
 
-void Platform_PrintStacktrace() {
+void OS_PrintStacktrace() {
     fprintf(stderr, "cannot print stack without context\n");
     return;
 }
@@ -151,7 +151,7 @@ LONG WINAPI windows_exception_handler(EXCEPTION_POINTERS* ExceptionInfo) {
     return EXCEPTION_EXECUTE_HANDLER;
 }
 
-void Platform_InstallSignalHandler(char* program_name) {
+void OS_InstallSignalHandler(char* program_name) {
     strcpy(_program_name, program_name);
     SetUnhandledExceptionFilter(windows_exception_handler);
 }

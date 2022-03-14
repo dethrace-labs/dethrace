@@ -40,7 +40,7 @@ target_sources(harness PRIVATE
     harness_trace.c
     harness.c
     harness.h
-    platforms/null.h
+    renderers/null.h
     renderers/renderer.h
     brender_emu/renderer_impl.c
     brender_emu/renderer_impl.h
@@ -50,7 +50,7 @@ target_sources(harness PRIVATE
 
 if (RENDERER_PLATFORM STREQUAL "SDL_OpenGL")
     target_sources(harness PRIVATE
-        window_io/sdl/sdl_gl.c
+        platforms/sdl_gl.c
         renderers/gl/gl_renderer.c
         renderers/gl/gl_renderer.h
         renderers/gl/shaders.c
@@ -62,14 +62,14 @@ endif()
 
 if(WIN32)
     target_sources(harness PRIVATE
-        platforms/platform_windows.c
+        os/windows.c
     )
 elseif(APPLE)
 target_sources(harness PRIVATE
-    platforms/platform_macosx.c
+    os/macosx.c
 )
 else()
     target_sources(harness PRIVATE
-        platforms/platform_linux.c
+        os/linux.c
     )
 endif()

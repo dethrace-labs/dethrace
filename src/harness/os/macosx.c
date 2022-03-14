@@ -1,11 +1,9 @@
 // Based on https://gist.github.com/jvranish/4441299
 
 #include <assert.h>
-#include <ctype.h>
 #include <err.h>
 #include <errno.h>
 #include <execinfo.h>
-#include <fcntl.h>
 #include <limits.h>
 #include <signal.h>
 #include <stdbool.h>
@@ -13,52 +11,51 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
 #include <sys/sysctl.h>
 #include <sys/types.h>
 #include <unistd.h>
-
-#include "platform.h"
 
 static int stack_nbr = 0;
 static char _program_name[1024];
 #define MAX_STACK_FRAMES 64
 static void* stack_traces[MAX_STACK_FRAMES];
-#define TRACER_PID_STRING "TracerPid:"
 
-int Platform_IsDebuggerPresent() {
-    char buf[4096];
-    int status_fd;
-    ssize_t num_read;
-    char* tracer_pid_ptr;
-    char* char_ptr;
+// https://developer.apple.com/library/archive/qa/qa1361/_index.html
+// FIXME:
+//     Important: Because the definition of the kinfo_proc structure (in <sys/sysctl.h>) is conditionalized by __APPLE_API_UNSTABLE,
+//     you should restrict use of the above code to the debug build of your program.
 
-    status_fd = open("/proc/self/status", O_RDONLY);
-    if (status_fd == -1) {
-        return 0;
-    }
+int OS_IsDebuggerPresent()
+// Returns true if the current process is being debugged (either
+// running under the debugger or has a debugger attached post facto).
+{
+    int junk;
+    int mib[4];
+    struct kinfo_proc info;
+    size_t size;
 
-    num_read = read(status_fd, buf, sizeof(buf) - 1);
-    close(status_fd);
-    if (num_read <= 0) {
-        return 0;
-    }
+    // Initialize the flags so that, if sysctl fails for some bizarre
+    // reason, we get a predictable result.
 
-    buf[num_read] = '\0';
-    tracer_pid_ptr = strstr(buf, TRACER_PID_STRING);
-    if (tracer_pid_ptr == NULL) {
-        return 0;
-    }
+    info.kp_proc.p_flag = 0;
 
-    for (char_ptr = tracer_pid_ptr + sizeof(TRACER_PID_STRING) - 1; char_ptr <= buf + num_read; ++char_ptr) {
-        if (isspace(*char_ptr)) {
-            continue;
-        } else {
-            return isdigit(*char_ptr) != 0 && *char_ptr != '0';
-        }
-    }
+    // Initialize mib, which tells sysctl the info we want, in this case
+    // we're looking for information about a specific process ID.
 
-    return 0;
+    mib[0] = CTL_KERN;
+    mib[1] = KERN_PROC;
+    mib[2] = KERN_PROC_PID;
+    mib[3] = getpid();
+
+    // Call sysctl.
+
+    size = sizeof(info);
+    junk = sysctl(mib, sizeof(mib) / sizeof(*mib), &info, &size, NULL, 0);
+    assert(junk == 0);
+
+    // We're being debugged if the P_TRACED flag is set.
+
+    return ((info.kp_proc.p_flag & P_TRACED) != 0);
 }
 
 // Resolve symbol name and source location given the path to the executable and an address
@@ -66,10 +63,31 @@ int addr2line(char const* const program_name, void const* const addr) {
     char addr2line_cmd[512] = { 0 };
 
     /* have addr2line map the address to the related line in the code */
-    sprintf(addr2line_cmd, "addr2line -f -p -e %.256s %p", program_name, addr);
+    sprintf(addr2line_cmd, "atos -o %.256s %p", program_name, addr);
 
     fprintf(stderr, "%d: ", stack_nbr++);
     return system(addr2line_cmd);
+}
+
+void OS_PrintStacktrace() {
+    int i, trace_size = 0;
+    char** messages = (char**)NULL;
+
+    fputs("\nStack trace:\n", stderr);
+
+    trace_size = backtrace(stack_traces, MAX_STACK_FRAMES);
+    messages = backtrace_symbols(stack_traces, trace_size);
+
+    /* skip the first couple stack frames (as they are this function and
+     our handler) and also skip the last frame as it's (always?) junk. */
+    for (i = 3; i < (trace_size - 1); ++i) {
+        if (addr2line(_program_name, stack_traces[i]) != 0) {
+            printf("  error determining line # for: %s\n", messages[i]);
+        }
+    }
+    if (messages) {
+        free(messages);
+    }
 }
 
 void signal_handler(int sig, siginfo_t* siginfo, void* context) {
@@ -155,7 +173,7 @@ void signal_handler(int sig, siginfo_t* siginfo, void* context) {
         break;
     }
     fputs("******************\n", stderr);
-    Platform_PrintStacktrace();
+    OS_PrintStacktrace();
     exit(1);
 }
 
@@ -174,7 +192,7 @@ void resolve_full_path(char* path, const char* argv0) {
     }
 }
 
-void Platform_InstallSignalHandler(char* program_name) {
+void OS_InstallSignalHandler(char* program_name) {
 
     resolve_full_path(_program_name, program_name);
 
@@ -198,7 +216,7 @@ void Platform_InstallSignalHandler(char* program_name) {
         sig_action.sa_sigaction = signal_handler;
         sigemptyset(&sig_action.sa_mask);
 
-        sig_action.sa_flags = SA_SIGINFO | SA_ONSTACK;
+        sig_action.sa_flags = SA_SIGINFO;
 
         if (sigaction(SIGSEGV, &sig_action, NULL) != 0) {
             err(1, "sigaction");
@@ -218,26 +236,5 @@ void Platform_InstallSignalHandler(char* program_name) {
         if (sigaction(SIGABRT, &sig_action, NULL) != 0) {
             err(1, "sigaction");
         }
-    }
-}
-
-void Platform_PrintStacktrace() {
-    int i, trace_size = 0;
-    char** messages = (char**)NULL;
-
-    fputs("\nStack trace:\n", stderr);
-
-    trace_size = backtrace(stack_traces, MAX_STACK_FRAMES);
-    messages = backtrace_symbols(stack_traces, trace_size);
-
-    /* skip the first couple stack frames (as they are this function and
-     our handler) and also skip the last frame as it's (always?) junk. */
-    for (i = 3; i < (trace_size - 1); ++i) {
-        if (addr2line(_program_name, stack_traces[i]) != 0) {
-            printf("  error determining line # for: %s\n", messages[i]);
-        }
-    }
-    if (messages) {
-        free(messages);
     }
 }

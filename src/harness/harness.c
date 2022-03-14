@@ -2,7 +2,7 @@
 #include "harness.h"
 #include "brender_emu/renderer_impl.h"
 #include "include/harness/config.h"
-#include "platforms/platform.h"
+#include "os/os.h"
 #include "renderers/null.h"
 #include "sound/sound.h"
 
@@ -74,7 +74,7 @@ void Harness_Init(int* argc, char* argv[]) {
     Harness_ProcessCommandLine(argc, argv);
 
     if (harness_game_config.install_signalhandler) {
-        Platform_InstallSignalHandler(argv[0]);
+        OS_InstallSignalHandler(argv[0]);
     }
 
     int* keymap = Input_GetKeyMap();
@@ -106,7 +106,7 @@ void Harness_ForceNullRenderer() {
 }
 
 void Harness_Debug_PrintStack() {
-    Platform_PrintStacktrace();
+    OS_PrintStacktrace();
 }
 
 int Harness_ProcessCommandLine(int* argc, char* argv[]) {

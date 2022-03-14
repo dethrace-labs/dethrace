@@ -10,7 +10,7 @@
 #endif
 
 extern int harness_debug_level;
-extern int Platform_IsDebuggerPresent(void);
+extern int OS_IsDebuggerPresent(void);
 
 void Harness_Debug_PrintStack();
 
@@ -49,7 +49,7 @@ void debug_print_matrix4(const char* fmt, const char* fn, char* name, br_matrix4
 #define LOG_PANIC(...)                                                    \
     do {                                                                  \
         debug_printf("\033[0;31m[PANIC] %s ", __FUNCTION__, __VA_ARGS__); \
-        if (Platform_IsDebuggerPresent())                                 \
+        if (OS_IsDebuggerPresent())                                       \
             abort();                                                      \
         else                                                              \
             exit(1);                                                      \

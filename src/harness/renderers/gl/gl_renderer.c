@@ -3,7 +3,6 @@
 #include "cameras/debug_camera.h"
 #include "harness.h"
 #include "harness/trace.h"
-#include "platforms/platform.h"
 #include "shaders.h"
 #include "stored_context.h"
 

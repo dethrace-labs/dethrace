@@ -160,7 +160,7 @@ tRenderer* Window_Create(char* title, int width, int height, int pRender_width, 
     }
 
     // Don't grab the mouse when a debugger is present
-    if (!Platform_IsDebuggerPresent()) {
+    if (!OS_IsDebuggerPresent()) {
         SDL_SetRelativeMouseMode(SDL_TRUE);
     }
 
