@@ -66,7 +66,7 @@ if(WIN32)
     )
 elseif(APPLE)
 target_sources(harness PRIVATE
-    os/macosx.c
+    os/macos.c
 )
 else()
     target_sources(harness PRIVATE
