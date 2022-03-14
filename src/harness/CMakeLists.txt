@@ -40,6 +40,7 @@ target_sources(harness PRIVATE
     harness_trace.c
     harness.c
     harness.h
+    io_platforms/io_platform.h
     renderers/null.h
     renderers/renderer.h
     brender_emu/renderer_impl.c
@@ -50,7 +51,7 @@ target_sources(harness PRIVATE
 
 if (RENDERER_PLATFORM STREQUAL "SDL_OpenGL")
     target_sources(harness PRIVATE
-        platforms/sdl_gl.c
+        io_platforms/sdl_gl.c
         renderers/gl/gl_renderer.c
         renderers/gl/gl_renderer.h
         renderers/gl/shaders.c

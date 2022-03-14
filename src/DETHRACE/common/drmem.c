@@ -282,8 +282,6 @@ void MAMSInitMem() {
     FILE* f;
     tPath_name the_path;
     LOG_TRACE("()");
-
-    LOG_WARN("nop in Windows (doing something for DOS?)");
 }
 
 // IDA: void __usercall PrintMemoryDump(int pFlags@<EAX>, char *pTitle@<EDX>)

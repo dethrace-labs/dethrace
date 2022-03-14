@@ -11,38 +11,38 @@
 
 br_file_primitives _BrFilePrimsNull = {
     "NULL",
-    (int(*)(br_datafile*,br_uint_32))&BrNullOther,
-    (int(*)(br_datafile*, br_uint_32, br_uint_32))&BrNullOther,
-    (int(*)(br_datafile*, br_uint_32*))&BrNullOther,
-    (void(*)(br_datafile*, br_uint_32))&BrNullOther,
-    (br_uint_32(*)(br_datafile*))&BrNullOther,
-    (int(*)(br_datafile*))&BrNullOther,
-    (br_uint_32(*)(br_datafile*, br_file_struct*, void*))&BrNullOther,
-    (br_uint_32(*)(br_datafile*, br_file_struct*, void*))&BrNullOther,
-    (int(*)(br_datafile*, br_file_struct*, void*))&BrNullOther,
-    (int(*)(br_datafile*, void*, int, int, int, int))&BrNullOther,
-    (void*(*)(br_datafile*, void*, int*, int, int))&BrNullOther,
-    (int(*)(br_datafile*, void*, int, int, int, int))&BrNullOther,
-    (int(*)(br_datafile*, char*))&BrNullOther,
-    (char*(*)(br_datafile*, char*))&BrNullOther,
-    (int(*)(br_datafile*, char*))&BrNullOther,
+    (int (*)(br_datafile*, br_uint_32)) & BrNullOther,
+    (int (*)(br_datafile*, br_uint_32, br_uint_32)) & BrNullOther,
+    (int (*)(br_datafile*, br_uint_32*)) & BrNullOther,
+    (void (*)(br_datafile*, br_uint_32)) & BrNullOther,
+    (br_uint_32(*)(br_datafile*)) & BrNullOther,
+    (int (*)(br_datafile*)) & BrNullOther,
+    (br_uint_32(*)(br_datafile*, br_file_struct*, void*)) & BrNullOther,
+    (br_uint_32(*)(br_datafile*, br_file_struct*, void*)) & BrNullOther,
+    (int (*)(br_datafile*, br_file_struct*, void*)) & BrNullOther,
+    (int (*)(br_datafile*, void*, int, int, int, int)) & BrNullOther,
+    (void* (*)(br_datafile*, void*, int*, int, int)) & BrNullOther,
+    (int (*)(br_datafile*, void*, int, int, int, int)) & BrNullOther,
+    (int (*)(br_datafile*, char*)) & BrNullOther,
+    (char* (*)(br_datafile*, char*)) & BrNullOther,
+    (int (*)(br_datafile*, char*)) & BrNullOther,
 };
 
 br_file_primitives _BrFilePrimsReadBinary = {
     "Read Binary",
     &DfSkipBinary,
-    (int(*)(br_datafile*, br_uint_32, br_uint_32))&BrNullOther,
+    (int (*)(br_datafile*, br_uint_32, br_uint_32)) & BrNullOther,
     &DfChunkReadBinary,
-    (void(*)(br_datafile*, br_uint_32))&BrNullOther,
+    (void (*)(br_datafile*, br_uint_32)) & BrNullOther,
     &DfCountReadBinary,
     &DfCountSizeBinary,
-    (br_uint_32(*)(br_datafile*, br_file_struct*, void*))&BrNullOther,
+    (br_uint_32(*)(br_datafile*, br_file_struct*, void*)) & BrNullOther,
     &DfStructReadBinary,
     &DfStructSizeBinary,
-    (int(*)(br_datafile*, void*, int, int, int, int))&BrNullOther,
+    (int (*)(br_datafile*, void*, int, int, int, int)) & BrNullOther,
     &DfBlockReadBinary,
     &DfBlockSizeBinary,
-    (int(*)(br_datafile*, char*))&BrNullOther,
+    (int (*)(br_datafile*, char*)) & BrNullOther,
     &DfNameReadBinary,
     &DfNameSizeBinary,
 };
@@ -51,36 +51,36 @@ br_file_primitives _BrFilePrimsWriteBinary = {
     "Write Binary",
     &DfSkipBinary,
     &DfChunkWriteBinary,
-    (int(*)(br_datafile*, br_uint_32*))&BrNullOther,
+    (int (*)(br_datafile*, br_uint_32*)) & BrNullOther,
     &DfCountWriteBinary,
-    (br_uint_32(*)(br_datafile*))&BrNullOther,
+    (br_uint_32(*)(br_datafile*)) & BrNullOther,
     &DfCountSizeBinary,
     &DfStructWriteBinary,
-    (br_uint_32(*)(br_datafile*, br_file_struct*, void*))&BrNullOther,
+    (br_uint_32(*)(br_datafile*, br_file_struct*, void*)) & BrNullOther,
     &DfStructSizeBinary,
     &DfBlockWriteBinary,
-    (void*(*)(br_datafile*, void*, int*, int, int))&BrNullOther,
+    (void* (*)(br_datafile*, void*, int*, int, int)) & BrNullOther,
     &DfBlockSizeBinary,
     &DfNameWriteBinary,
-    (char*(*)(br_datafile*, char*))&BrNullOther,
+    (char* (*)(br_datafile*, char*)) & BrNullOther,
     &DfNameSizeBinary,
 };
 
 br_file_primitives _BrFilePrimsReadText = {
     "Read Text",
     &DfSkipText,
-    (int(*)(br_datafile*, br_uint_32, br_uint_32))&BrNullOther,
+    (int (*)(br_datafile*, br_uint_32, br_uint_32)) & BrNullOther,
     &DfChunkReadText,
-    (void(*)(br_datafile*, br_uint_32))&BrNullOther,
+    (void (*)(br_datafile*, br_uint_32)) & BrNullOther,
     &DfCountReadText,
     &DfCountSizeText,
-    (br_uint_32(*)(br_datafile*, br_file_struct*, void*))&BrNullOther,
+    (br_uint_32(*)(br_datafile*, br_file_struct*, void*)) & BrNullOther,
     &DfStructReadText,
     &DfStructSizeText,
-    (int(*)(br_datafile*, void*, int, int, int, int))&BrNullOther,
+    (int (*)(br_datafile*, void*, int, int, int, int)) & BrNullOther,
     &DfBlockReadText,
     &DfBlockSizeText,
-    (int(*)(br_datafile*, char*))&BrNullOther,
+    (int (*)(br_datafile*, char*)) & BrNullOther,
     &DfNameReadText,
     &DfNameSizeText,
 };
@@ -89,18 +89,18 @@ br_file_primitives _BrFilePrimsWriteText = {
     "Write Text",
     &DfSkipText,
     &DfChunkWriteText,
-    (int(*)(br_datafile*, br_uint_32*))&BrNullOther,
+    (int (*)(br_datafile*, br_uint_32*)) & BrNullOther,
     &DfCountWriteText,
-    (br_uint_32(*)(br_datafile*))&BrNullOther,
+    (br_uint_32(*)(br_datafile*)) & BrNullOther,
     &DfCountSizeText,
     &DfStructWriteText,
-    (br_uint_32(*)(br_datafile*, br_file_struct*, void*))&BrNullOther,
+    (br_uint_32(*)(br_datafile*, br_file_struct*, void*)) & BrNullOther,
     &DfStructSizeText,
     &DfBlockWriteText,
-    (void*(*)(br_datafile*, void*, int*, int, int))&BrNullOther,
+    (void* (*)(br_datafile*, void*, int*, int, int)) & BrNullOther,
     &DfBlockSizeText,
     &DfNameWriteText,
-    (char*(*)(br_datafile*, char*))&BrNullOther,
+    (char* (*)(br_datafile*, char*)) & BrNullOther,
     &DfNameSizeText,
 };
 
@@ -289,7 +289,8 @@ int TextReadLine(br_datafile* df, char** ident, char** data) {
         }
         for (; (*cp == ' ') || (*cp == '\t'); cp++) {
         }
-        if (*cp != '\0') break;
+        if (*cp != '\0')
+            break;
     }
     *ident = cp;
     while ((*cp != ' ') && (*cp != '\t') && (*cp != '\0')) {
@@ -320,7 +321,7 @@ br_uint_16 scalarTypeConvert(br_datafile* df, br_uint_16 t) {
     LOG_TRACE9("(%p, %d)", df, t);
 
     if (df->scalar_type == BRT_FIXED) {
-        switch(t) {
+        switch (t) {
         case DF_TYPE_BR_SCALAR:
             return DF_TYPE_BR_FIXED;
         case DF_TYPE_BR_FRACTION:
@@ -418,8 +419,8 @@ br_uint_32 DfStructWriteBinary(br_datafile* df, br_file_struct* str, void* base)
             DfStructWriteBinary(df, sm->extra, mp);
             break;
         case DF_TYPE_ASCIZ:
-            if (*(char **)mp != NULL) {
-                BrFileWrite(*(char **)mp, 1, BrStrLen(*(char**)mp), df->h);
+            if (*(char**)mp != NULL) {
+                BrFileWrite(*(char**)mp, 1, BrStrLen(*(char**)mp), df->h);
             }
             BrFilePutChar('\0', df->h);
             break;
@@ -822,14 +823,14 @@ br_uint_32 StructWriteTextSub(br_datafile* df, br_file_struct* str, void* base, 
             StructWriteTextSub(df, sm->extra, mp, indent + 2);
             break;
         case DF_TYPE_ASCIZ:
-            if (*(char **)mp == NULL) {
+            if (*(char**)mp == NULL) {
                 w = BrFilePrintf(df->h, "NULL");
             } else {
-                w = BrFilePrintf(df->h, "\"%s\"", *(char **)mp);
+                w = BrFilePrintf(df->h, "\"%s\"", *(char**)mp);
             }
             break;
         case DF_TYPE_BR_COLOUR:
-            w = BrFilePrintf(df->h, "%d,%d,%d", (br_uint_8)((*(br_uint_32 *)mp) >> 16), (br_uint_8)((*(br_uint_32 *)mp) >> 8), (br_uint_8)((*(br_uint_32 *)mp)));
+            w = BrFilePrintf(df->h, "%d,%d,%d", (br_uint_8)((*(br_uint_32*)mp) >> 16), (br_uint_8)((*(br_uint_32*)mp) >> 8), (br_uint_8)((*(br_uint_32*)mp)));
             break;
         case DF_TYPE_BR_FRACTION_X:
             w = BrFilePrintf(df->h, "%g", (double)BrFixedFractionToFloat(*(br_fraction_x*)mp));
@@ -1499,7 +1500,7 @@ int DfChunksInterpret(br_datafile* df, br_chunks_table* table) {
 
     while (1) {
         id = df->prims->chunk_read(df, &length);
-        //LOG_DEBUG("chunk id=%d, len=%d", id, length);
+        // LOG_DEBUG("chunk id=%d, len=%d", id, length);
         if (id == (br_uint_32)-1) {
             break;
         }
@@ -1563,7 +1564,6 @@ br_datafile* DfOpen(char* name, int write, br_token scalar_type) {
         h = BrFileOpenRead(name, 8u, DfFileIdentify, &mode);
     }
     if (h == NULL) {
-        LOG_WARN("returning NULL");
         return NULL;
     }
     df = BrResAllocate(fw.res, sizeof(br_datafile), BR_MEMORY_DATAFILE);

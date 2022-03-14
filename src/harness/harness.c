@@ -2,6 +2,7 @@
 #include "harness.h"
 #include "brender_emu/renderer_impl.h"
 #include "include/harness/config.h"
+#include "io_platforms/io_platform.h"
 #include "os/os.h"
 #include "renderers/null.h"
 #include "sound/sound.h"
