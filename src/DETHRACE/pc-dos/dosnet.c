@@ -364,7 +364,7 @@ void PDNetObtainSystemUserName(char* pName, int pMax_length) {
     }
     while (1) {
         pName = strpbrk(pName, "_=(){}[]<>!$%^&*/:@~;'#,?\\|`\"");
-        if (*pName == '\0') {
+        if (pName == NULL || *pName == '\0') {
             break;
         }
         *pName = '-';

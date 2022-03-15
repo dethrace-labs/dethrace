@@ -1782,6 +1782,9 @@ void CreateSplash(tCar_spec* pCar, tU32 pTime) {
 
     back_val[0] = 0.0;
     back_val[1] = 0.0;
+#ifdef DETHRACE_FIX_BUGS
+    BrVector3Set(&p, 0.f, 0.f, 0.f);
+#endif
     if (pCar->v.v[2] * pCar->v.v[2] + pCar->v.v[1] * pCar->v.v[1] + pCar->v.v[0] * pCar->v.v[0] >= 1.0) {
         BrMatrix34TApplyV(&normal_car_space, &pCar->water_normal, &pCar->car_master_actor->t.t.mat);
         BrMatrix34ApplyP(&tv, &pCar->bounds[0].min, &pCar->car_master_actor->t.t.mat);

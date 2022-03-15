@@ -195,7 +195,7 @@ void NewPratcamSequence(int pSequence_index, int pStart_chunk) {
 // IDA: void __usercall ChangeAmbientPratcamNow(int pIndex@<EAX>, int pStart_chunk@<EDX>)
 void ChangeAmbientPratcamNow(int pIndex, int pStart_chunk) {
     LOG_TRACE("(%d, %d)", pIndex, pStart_chunk);
-    NOT_IMPLEMENTED();
+    STUB();
 }
 
 // IDA: void __usercall ChangeAmbientPratcam(int pIndex@<EAX>)

@@ -181,3 +181,17 @@ else()
     target_link_options(dethrace PRIVATE /subsystem:windows /ENTRY:mainCRTStartup)
     target_compile_definitions(dethrace PRIVATE -D_CRT_SECURE_NO_WARNINGS -DSDL_MAIN_HANDLED)
 endif()
+
+if(DETHRACE_IDE_ROOT_DIR)
+    set_target_properties(dethrace PROPERTIES
+        VS_DEBUGGER_ENVIRONMENT "DETHRACE_ROOT_DIR=${DETHRACE_IDE_ROOT_DIR}"
+    )
+endif()
+if(DETHRACE_IDE_ARGUMENTS)
+    message(STATUS "before: ${DETHRACE_IDE_ARGUMENTS}")
+    separate_arguments(DETHRACE_IDE_ARGUMENTS NATIVE_COMMAND "${DETHRACE_IDE_ARGUMENTS}")
+    message(STATUS "after: ${DETHRACE_IDE_ARGUMENTS}")
+    set_target_properties(dethrace PROPERTIES
+        VS_DEBUGGER_COMMAND_ARGUMENTS "${DETHRACE_IDE_ARGUMENTS}"
+    )
+endif()

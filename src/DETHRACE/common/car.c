@@ -4748,6 +4748,9 @@ int CollideCamera2(br_vector3* car_pos, br_vector3* cam_pos, br_vector3* old_cam
     tFace_ref face_list[3];
     LOG_TRACE("(%p, %p, %p, %d)", car_pos, cam_pos, old_camera_pos, manual_move);
 
+#ifdef DETHRACE_FIX_BUGS
+    ts2 = 0.f;
+#endif
     hither = ((br_camera*)gCamera->type_data)->hither_z * 3.0;
     gCamera_has_collided = 0;
     for (i = 0; i < 1; i++) {
