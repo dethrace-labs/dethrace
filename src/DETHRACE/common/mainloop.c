@@ -388,7 +388,10 @@ void UpdateFramePeriod(tU32* pCamera_period) {
             gLast_tick_count = new_tick_count;
         }
     } else {
+        // The following makes the timer go too fast when the real frame rate is high (=low frame period)
+#ifndef DETHRACE_FIX_BUGS
         gFrame_period = 10;
+#endif
         gLast_tick_count = new_tick_count;
     }
     if (*pCamera_period >= 10) {

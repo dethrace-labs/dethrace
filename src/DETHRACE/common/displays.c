@@ -356,7 +356,7 @@ void DoHeadups(tU32 pThe_time) {
     }
 
     the_headup = gHeadups;
-    for (i = 0; i < 15; i++) {
+    for (i = 0; i < COUNT_OF(gHeadups); i++) {
         the_headup = &gHeadups[i];
         if (the_headup->type
             && (gProgram_state.which_view == eView_forward || !the_headup->cockpit_anchored)

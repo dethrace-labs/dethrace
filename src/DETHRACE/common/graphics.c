@@ -614,14 +614,14 @@ void InitializePalettes() {
     gCurrent_palette_pixels = BrMemAllocate(0x400u, kMem_cur_pal_pixels);
     gCurrent_palette = DRPixelmapAllocate(BR_PMT_RGBX_888, 1u, 256, gCurrent_palette_pixels, 0);
     gRender_palette = BrTableFind("DRRENDER.PAL");
-    if (!gRender_palette) {
+    if (gRender_palette == NULL) {
         FatalError(10);
     }
     gOrig_render_palette = BrPixelmapAllocateSub(gRender_palette, 0, 0, gRender_palette->width, gRender_palette->height);
     gOrig_render_palette->pixels = BrMemAllocate(0x400u, kMem_render_pal_pixels);
     memcpy(gOrig_render_palette->pixels, gRender_palette->pixels, 0x400u);
     gFlic_palette = BrTableFind("DRACEFLC.PAL");
-    if (!gFlic_palette) {
+    if (gFlic_palette == NULL) {
         FatalError(10);
     }
     DRSetPalette(gFlic_palette);
@@ -656,7 +656,7 @@ void ClearWobbles() {
     LOG_TRACE("()");
 
     for (i = 0; i < COUNT_OF(gWobble_array); ++i) {
-        gWobble_array[i].amplitude_x = 0.0;
+        gWobble_array[i].time_started = 0;
     }
 }
 
@@ -1690,7 +1690,7 @@ void RenderAFrame(int pDepth_mask_on) {
             DrawPowerups(the_time);
         }
     }
-    if (gNet_mode) {
+    if (gNet_mode != eNet_mode_none) {
         DisplayUserMessage();
     }
     if (gAction_replay_mode && !gAR_fudge_headups) {
