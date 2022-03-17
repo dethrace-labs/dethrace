@@ -2876,17 +2876,11 @@ void InitShadow() {
     }
     gFancy_shadow = 1;
     gShadow_material = BrMaterialFind("SHADOW.MAT");
-    gShadow_light_ray.v[0] = 0.0;
-    gShadow_light_ray.v[1] = -1.0;
-    gShadow_light_ray.v[2] = 0.0;
-    gShadow_light_z.v[0] = 0.0;
-    gShadow_light_z.v[1] = 0.0;
-    gShadow_light_z.v[2] = -1.0;
-    gShadow_light_x.v[1] = 0.0;
-    gShadow_light_x.v[2] = 0.0;
-    gShadow_light_x.v[0] = 1.0;
+    BrVector3Set(&gShadow_light_ray, 0.f, -1.f, 0.f);
+    BrVector3Set(&gShadow_light_z, -0.f, -0.f, -1.f);
+    BrVector3Set(&gShadow_light_x, 1.f, 0.f, 0.f);
 
-    gShadow_model = BrModelAllocate(NULL, 0, 0);
+    gShadow_model = BrModelAllocate("", 0, 0);
     gShadow_model->flags = BR_MODF_GENERATE_TAGS | BR_MODF_KEEP_ORIGINAL;
     gShadow_actor = BrActorAllocate(BR_ACTOR_MODEL, 0);
     gShadow_actor->model = gShadow_model;
@@ -2897,7 +2891,7 @@ void InitShadow() {
 br_uint_32 SaveShadeTable(br_pixelmap* pTable, void* pArg) {
     LOG_TRACE("(%p, %p)", pTable, pArg);
 
-    if (gSaved_table_count == 100) {
+    if (gSaved_table_count == COUNT_OF(gSaved_shade_tables)) {
         return 1;
     }
     gSaved_shade_tables[gSaved_table_count].original = pTable;
@@ -2921,7 +2915,9 @@ void DisposeSavedShadeTables() {
     int i;
     LOG_TRACE("()");
 
-    STUB();
+    for (i = 0; i < gSaved_table_count; i++) {
+        BrMemFree(gSaved_shade_tables[i].copy);
+    }
 }
 
 // IDA: void __cdecl ShadowMode()

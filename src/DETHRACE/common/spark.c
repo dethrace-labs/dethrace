@@ -720,7 +720,7 @@ void DisposeShrapnel() {
     gShrapnel_flags = 0;
     for (i = 0; i < COUNT_OF(gShrapnel_model); i++) {
         BrModelRemove(gShrapnel_model[i]);
-        BrModelFree(gShrapnel_model[0]);
+        BrModelFree(gShrapnel_model[i]);
     }
 }
 
