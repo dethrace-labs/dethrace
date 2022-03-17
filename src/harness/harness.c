@@ -1,4 +1,3 @@
-
 #include "harness.h"
 #include "brender_emu/renderer_impl.h"
 #include "include/harness/config.h"
@@ -87,7 +86,7 @@ void Harness_Init(int* argc, char* argv[]) {
     }
 
     char* root_dir = getenv("DETHRACE_ROOT_DIR");
-    if (!root_dir) {
+    if (root_dir == NULL) {
         LOG_INFO("DETHRACE_ROOT_DIR is not set, assuming '.'");
     } else {
         printf("DETHRACE_ROOT_DIR: %s\n", root_dir);

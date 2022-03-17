@@ -36,7 +36,7 @@
 #include <errno.h>
 
 #define HITHER_MULTIPLIER 2.0f
-#define AMBIENT_MULTIPLIER 0.0099999998f
+#define AMBIENT_MULTIPLIER 0.01f
 #define NBR_FUNK_GROVE_FLAGS 30
 
 tHeadup_info gHeadup_image_info[31] = {
@@ -328,7 +328,7 @@ void LoadGeneralParameters() {
         }
 
         for (i = 0; i < strlen(gDecode_string); i++) {
-            gDecode_string[i] -= 50;
+            gDecode_string[i] += 50;
         }
     }
     PathCat(the_path, gApplication_path, "GENERAL.TXT");
@@ -461,7 +461,7 @@ br_pixelmap* LoadPixelmap(char* pName) {
     LOG_TRACE("(\"%s\")", pName);
 
     end = strrchr(pName, '.');
-    if (!end) {
+    if (end == NULL) {
         end = &pName[strlen(pName)];
     }
 
@@ -472,7 +472,7 @@ br_pixelmap* LoadPixelmap(char* pName) {
         PathCat(the_path, the_path, pName);
         AllowOpenToFail();
         pm = DRPixelmapLoad(the_path);
-        if (!pm) {
+        if (pm == NULL) {
             PathCat(the_path, gApplication_path, "PIXELMAP");
             PathCat(the_path, the_path, pName);
             pm = DRPixelmapLoad(the_path);
@@ -490,9 +490,9 @@ br_uint_32 LoadPixelmaps(char* pFile_name, br_pixelmap** pPixelmaps, br_uint_16 
     PathCat(path, path, "PIXELMAP");
 
     PathCat(path, path, pFile_name);
-    gAllow_open_to_fail = 1;
+    AllowOpenToFail();
     count = DRPixelmapLoadMany(path, pPixelmaps, pNum);
-    if (!count) {
+    if (count == 0) {
         PathCat(path, gApplication_path, "PIXELMAP");
         PathCat(path, path, pFile_name);
         count = DRPixelmapLoadMany(path, pPixelmaps, pNum);
@@ -736,7 +736,7 @@ void UnlockInterfaceStuff() {
         }
     }
     PossibleService();
-    for (i = 0; i < 18; i++) {
+    for (i = 0; i < COUNT_OF(gCursor_giblet_images); i++) {
         if (gCursor_giblet_images[i]) {
             BrPixelmapFree(gCursor_giblet_images[i]);
             gCursor_giblet_images[i] = NULL;
@@ -1742,14 +1742,14 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
         PathCat(the_path, the_path, "CARS");
         PathCat(the_path, the_path, gBasic_car_names[0]);
         g = DRfopen(the_path, "rt");
-        if (!g)
+        if (g == NULL)
             FatalError(104);
     }
     GetAString(f, s);
     strcpy(pCar_spec->name, s);
     if (strcmp(s, pCar_name) != 0)
-        FatalError(115);
-    if (*pDriver_name) {
+        FatalError(115, pCar_name);
+    if (*pDriver_name != '\0') {
         memcpy(pCar_spec->driver_name, pDriver_name, sizeof(pCar_spec->driver_name));
         pCar_spec->driver_name[31] = 0;
     } else {
@@ -1792,27 +1792,30 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
             PossibleService();
         }
         LoadSpeedo(g, 0, pCar_spec);
-        if (gAusterity_mode)
+        if (gAusterity_mode) {
             GetALineAndDontArgue(g, s);
-        else
+        } else {
             LoadSpeedo(g, 1, pCar_spec);
+        }
         PossibleService();
         LoadTacho(g, 0, pCar_spec);
-        if (gAusterity_mode)
+        if (gAusterity_mode) {
             GetALineAndDontArgue(g, s);
-        else
+        } else {
             LoadTacho(g, 1, pCar_spec);
+        }
         PossibleService();
         LoadGear(g, 0, pCar_spec);
-        if (gAusterity_mode)
+        if (gAusterity_mode) {
             GetALineAndDontArgue(g, s);
-        else
+        } else {
             LoadGear(g, 1, pCar_spec);
+        }
         PossibleService();
         GetALineAndDontArgue(g, s);
         str = strtok(s, "\t ,/");
         sscanf(str, "%d", &pCar_spec->number_of_hands_images);
-        for (j = 0; pCar_spec->number_of_hands_images > j; ++j) {
+        for (j = 0; j < pCar_spec->number_of_hands_images; j++) {
             GetALineAndDontArgue(g, s);
             str = strtok(s, "\t ,/");
             sscanf(str, "%d", &pCar_spec->lhands_x[j]);
@@ -1898,7 +1901,7 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
                 }
                 str = strtok(NULL, "\t ,/");
                 pCar_spec->damage_units[j].images = LoadPixelmap(str);
-                if (!pCar_spec->damage_units[j].images)
+                if (pCar_spec->damage_units[j].images == NULL)
                     FatalError(27);
             }
             pCar_spec->damage_units[j].damage_level = 0;
@@ -2385,7 +2388,7 @@ void UnlockOpponentMugshot(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
     if (pIndex >= 0) {
-        if (gOpponents[pIndex].mug_shot_image_data) {
+        if (gOpponents[pIndex].mug_shot_image_data != NULL) {
             MAMSUnlock((void**)&gOpponents[pIndex].mug_shot_image_data);
         }
     }
@@ -2394,8 +2397,9 @@ void UnlockOpponentMugshot(int pIndex) {
 // IDA: void __usercall LoadOpponentMugShot(int pIndex@<EAX>)
 void LoadOpponentMugShot(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
+
     PossibleService();
-    if (pIndex >= 0 && !gOpponents[pIndex].mug_shot_image_data) {
+    if (pIndex >= 0 && gOpponents[pIndex].mug_shot_image_data == NULL) {
         if (!LoadFlicData(
                 gOpponents[pIndex].mug_shot_name,
                 &gOpponents[pIndex].mug_shot_image_data,
@@ -2411,7 +2415,7 @@ void DisposeOpponentGridIcon(tRace_info* pRace_info, int pIndex) {
     LOG_TRACE("(%p, %d)", pRace_info, pIndex);
 
     if (pRace_info->opponent_list[pIndex].index >= 0) {
-        if (pRace_info->opponent_list[pIndex].car_spec->grid_icon_image) {
+        if (pRace_info->opponent_list[pIndex].car_spec->grid_icon_image != NULL) {
             BrPixelmapFree(pRace_info->opponent_list[pIndex].car_spec->grid_icon_image);
             pRace_info->opponent_list[pIndex].car_spec->grid_icon_image = NULL;
         }
@@ -2423,7 +2427,7 @@ void LoadOpponentGridIcon(tRace_info* pRace_info, int pIndex) {
     LOG_TRACE("(%p, %d)", pRace_info, pIndex);
 
     PossibleService();
-    if (pRace_info->opponent_list[pIndex].index >= 0 && !pRace_info->opponent_list[pIndex].car_spec->grid_icon_image) {
+    if (pRace_info->opponent_list[pIndex].index >= 0 && pRace_info->opponent_list[pIndex].car_spec->grid_icon_image == NULL) {
         pRace_info->opponent_list[pIndex].car_spec->grid_icon_image = LoadPixelmap(pRace_info->opponent_list[pIndex].car_spec->grid_icon_names[0]);
         if (!pRace_info->opponent_list[pIndex].car_spec->grid_icon_image) {
             FatalError(57);
@@ -2449,15 +2453,10 @@ void LoadRaceInfo(int pRace_index, tRace_info* pRace_info) {
     LOG_TRACE("(%d, %p)", pRace_index, pRace_info);
 
     f = OpenRaceFile();
-    temp_index = pRace_index;
-    while (1) {
-        if (!temp_index) {
-            break;
-        }
+    for (temp_index = pRace_index; temp_index != 0; temp_index--) {
         PossibleService();
         GetALineAndDontArgue(f, s);
         SkipRestOfRace(f);
-        temp_index--;
     }
     GetALineAndDontArgue(f, pRace_info->name);
     pRace_info->rank_required = gRace_list[pRace_index].rank_required;
@@ -2520,7 +2519,7 @@ void DisposeRaceInfo(tRace_info* pRace_info) {
     tText_chunk* the_chunk;
     LOG_TRACE("(%p)", pRace_info);
 
-    if (!gNet_mode) {
+    if (gNet_mode == eNet_mode_none) {
         the_chunk = pRace_info->text_chunks;
         for (i = 0; i < pRace_info->text_chunk_count; i++) {
             PossibleService();
@@ -2556,7 +2555,7 @@ void LoadGridIcons(tRace_info* pRace_info) {
     int i;
     LOG_TRACE("(%p)", pRace_info);
 
-    for (i = 0; pRace_info->number_of_racers > i; ++i) {
+    for (i = 0; i < pRace_info->number_of_racers; ++i) {
         LoadOpponentGridIcon(pRace_info, i);
     }
     gProgram_state.current_car.grid_icon_image = LoadPixelmap(gProgram_state.current_car.grid_icon_names[gProgram_state.frank_or_anniness + 1]);
@@ -2568,7 +2567,7 @@ void DisposeGridIcons(tRace_info* pRace_info) {
     int i;
     LOG_TRACE("(%p)", pRace_info);
 
-    for (i = 0; pRace_info->number_of_racers > i; i++) {
+    for (i = 0; i < pRace_info->number_of_racers; i++) {
         DisposeOpponentGridIcon(pRace_info, i);
     }
     BrPixelmapFree(gProgram_state.current_car.grid_icon_image);
@@ -2601,14 +2600,14 @@ void LoadOpponents() {
     for (i = 0; i < gNumber_of_racers; i++) {
         PossibleService();
         GetALineAndDontArgue(f, gOpponents[i].name);
-        if (!strcmp(gOpponents[i].name, "END")) {
+        if (strcmp(gOpponents[i].name, "END") == 0) {
             FatalError(55);
         }
 
         GetALineAndDontArgue(f, gOpponents[i].abbrev_name);
         gOpponents[i].car_number = GetAnInt(f);
         gOpponents[i].strength_rating = GetAnInt(f);
-        gOpponents[i].network_availability = GetALineAndInterpretCommand(f, gNet_avail_names, 4);
+        gOpponents[i].network_availability = GetALineAndInterpretCommand(f, gNet_avail_names, COUNT_OF(gNet_avail_names));
 
         GetALineAndDontArgue(f, s);
         str = strtok(s, "\t ,/");
@@ -2673,7 +2672,7 @@ br_font* LoadBRFont(char* pName) {
     the_font = BrMemAllocate(sizeof(br_font), kMem_br_font);
 
     // we read 0x18 bytes as that is the size of the struct in 32 bit code.
-    fread(the_font, 0x18, 1u, f);
+    fread(the_font, 0x18, 1, f);
     the_font->flags = BrSwap32(the_font->flags);
 
     // swap endianness
@@ -2862,6 +2861,7 @@ void GetFourInts(FILE* pF, int* pF1, int* pF2, int* pF3, int* pF4) {
 // IDA: br_scalar __usercall GetAScalar@<ST0>(FILE *pF@<EAX>)
 br_scalar GetAScalar(FILE* pF) {
     LOG_TRACE("(%p)", pF);
+
     return GetAFloat(pF);
 }
 
@@ -2944,8 +2944,8 @@ void GetPairOfFloatPercents(FILE* pF, float* pF1, float* pF2) {
     sscanf(str, "%f", pF1);
     str = strtok(NULL, "\t ,/");
     sscanf(str, "%f", pF2);
-    *pF1 = *pF1 / 100.0;
-    *pF2 = *pF2 / 100.0;
+    *pF1 = *pF1 / 100.0f;
+    *pF2 = *pF2 / 100.0f;
 }
 
 // IDA: void __usercall GetThreeFloatPercents(FILE *pF@<EAX>, float *pF1@<EDX>, float *pF2@<EBX>, float *pF3@<ECX>)
@@ -2961,9 +2961,9 @@ void GetThreeFloatPercents(FILE* pF, float* pF1, float* pF2, float* pF3) {
     sscanf(str, "%f", pF2);
     str = strtok(NULL, "\t ,/");
     sscanf(str, "%f", pF3);
-    *pF1 = *pF1 / 100.0;
-    *pF2 = *pF2 / 100.0;
-    *pF3 = *pF3 / 100.0;
+    *pF1 = *pF1 / 100.0f;
+    *pF2 = *pF2 / 100.0f;
+    *pF3 = *pF3 / 100.0f;
 }
 
 // IDA: void __usercall GetAString(FILE *pF@<EAX>, char *pString@<EDX>)
@@ -3033,7 +3033,7 @@ void LoadMiscStrings() {
 
     PathCat(the_path, gApplication_path, "TEXT.TXT");
     f = DRfopen(the_path, "rt");
-    if (!f) {
+    if (f == NULL) {
         FatalError(99);
     }
     for (i = 0; i < 250; i++) {
@@ -3164,12 +3164,14 @@ FILE* OldDRfopen(char* pFilename, char* pMode) {
 // IDA: void __cdecl AllowOpenToFail()
 void AllowOpenToFail() {
     LOG_TRACE("()");
+
     gAllow_open_to_fail = 1;
 }
 
 // IDA: void __cdecl DoNotAllowOpenToFail()
 void DoNotAllowOpenToFail() {
     LOG_TRACE("()");
+
     gAllow_open_to_fail = 0;
 }
 
@@ -3182,7 +3184,7 @@ FILE* DRfopen(char* pFilename, char* pMode) {
 
     result = OldDRfopen(pFilename, pMode);
 
-    if (!result && !gAllow_open_to_fail) {
+    if (result == NULL && !gAllow_open_to_fail) {
         if (GetCDPathFromPathsTxtFile(CD_dir) && !PDCheckDriveExists(CD_dir)) {
             if (gMisc_strings[0]) {
                 PDFatalError(GetMiscString(243));
@@ -3207,7 +3209,7 @@ int GetCDPathFromPathsTxtFile(char* pPath_name) {
     if (!got_it_already) {
         sprintf(paths_txt, "%s%s%s", gApplication_path, gDir_separator, "PATHS.TXT");
         paths_txt_fp = fopen(paths_txt, "rt");
-        if (!paths_txt_fp) {
+        if (paths_txt_fp == NULL) {
             return 0;
         }
         GetALineAndDontArgue(paths_txt_fp, cd_pathname);
@@ -3414,7 +3416,7 @@ int RestoreOptions() {
 
     PathCat(the_path, gApplication_path, "OPTIONS.TXT");
     f = DRfopen(the_path, "rt");
-    if (!f) {
+    if (f == NULL) {
         LOG_WARN("Failed to open OPTIONS.TXT");
         return 0;
     }

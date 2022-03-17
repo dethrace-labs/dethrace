@@ -151,17 +151,20 @@ static void test_resource_BrResSize_BrResSizeTotal() {
     br_uint_32 size_child2;
 
     vparent = BrResAllocate(NULL, 0, BR_MEMORY_ANCHOR);
+    TEST_ASSERT_NOT_NULL(vparent);
     size_parent = BrResSize(vparent);
     TEST_ASSERT_GREATER_THAN_UINT32(0, size_parent);
     TEST_ASSERT_EQUAL_UINT32(size_parent, BrResSizeTotal(vparent));
 
     child1 = BrResAllocate(vparent, 10, BR_MEMORY_DATAFILE);
+    TEST_ASSERT_NOT_NULL(child1);
     size_child1 = BrResSize(child1);
     TEST_ASSERT_GREATER_THAN_UINT32(0, size_child1);
     TEST_ASSERT_EQUAL(size_parent, BrResSize(vparent));
     TEST_ASSERT_EQUAL(size_parent + size_child1, BrResSizeTotal(vparent));
 
     child2 = BrResAllocate(child1, 10, BR_MEMORY_DATAFILE);
+    TEST_ASSERT_NOT_NULL(child2);
     size_child2 = BrResSize(child2);
     TEST_ASSERT_GREATER_THAN_UINT32(0, size_child2);
     TEST_ASSERT_EQUAL(size_parent, BrResSize(vparent));

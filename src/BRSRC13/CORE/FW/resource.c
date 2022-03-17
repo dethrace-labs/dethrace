@@ -35,7 +35,7 @@ resource_header* UserToRes(void* r) {
         p--;
     }
     if (((resource_header*)(p - (sizeof(resource_header) - 1)))->magic_num != 0xdeadbeef) {
-        LOG_PANIC("Bad resource header from user at %p. Was %X", r, ((resource_header*)p)->magic_num);
+        LOG_PANIC("Bad resource header from user at %p. Was 0x%x", r, ((resource_header*)p)->magic_num);
     }
     return (resource_header*)(p - (sizeof(resource_header) - 1));
 }
@@ -212,6 +212,7 @@ br_uint_32 BrResChildEnum(void* vres, br_resenum_cbfn* callback, void* arg) {
     LOG_TRACE("(%p, %p, %p)", vres, callback, arg);
 
     res = UserToRes(vres);
+    r = 0;
     for (rp = (resource_header*)res->children.head; rp != NULL; rp = (resource_header*)rp->node.next) {
         r = callback(ResToUser(rp), arg);
         if (r != 0) {

@@ -498,11 +498,16 @@ void PDForEveryFile(char* pThe_path, void (*pAction_routine)(char*)) {
     DIR* d;
     struct dirent* entry;
 
-    char* results[200];
-
-    int count = OS_GetFilesInDirectory(pThe_path, results, 200);
-
-    for (int i = 0; i < count; i++) {
+    d = opendir(pThe_path);
+    if (d) {
+        while ((entry = readdir(d)) != NULL) {
+            // only files, and only files that don't start with '.'
+            if (entry->d_type == DT_REG && entry->d_name[0] != '.') {
+                PathCat(found_path, pThe_path, entry->d_name);
+                pAction_routine(found_path);
+            }
+        }
+        closedir(d);
     }
 
     //     d = opendir(pThe_path);
