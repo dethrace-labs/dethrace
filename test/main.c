@@ -190,14 +190,6 @@ int has_data_directory() {
     return root_dir != NULL;
 }
 
-void sleep_s(int sec) {
-#ifdef _WIN32
-    Sleep(1000 * sec);
-#else
-    sleep(sec);
-#endif
-}
-
 void create_temp_file(char buffer[PATH_MAX + 1], const char* prefix) {
 #ifdef _WIN32
     DWORD attributes;

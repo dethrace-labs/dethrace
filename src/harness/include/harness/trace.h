@@ -5,10 +5,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#if defined _WIN32 && !defined sleep
-#define sleep(x) _sleep(x)
-#endif
-
 extern int harness_debug_level;
 extern int OS_IsDebuggerPresent(void);
 

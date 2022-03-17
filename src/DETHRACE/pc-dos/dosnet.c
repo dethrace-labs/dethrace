@@ -352,6 +352,8 @@ void PDNetObtainSystemUserName(char* pName, int pMax_length) {
     int size;
     char buffer[16];
     BOOL result;
+
+    PDNetObtainSystemUserName_win95sys(pName, pMax_length);
 #endif
 
     dr_dprintf("PDNetObtainSystemUserName()\n");

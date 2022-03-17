@@ -21,6 +21,23 @@
 #endif
 
 static char _program_name[1024];
+LARGE_INTEGER qpc_start_time, EndingTime, ElapsedMicroseconds;
+LARGE_INTEGER qpc_ticks_per_sec;
+
+void OS_Sleep(int delay_ms) {
+    Sleep(delay_ms);
+}
+
+uint32_t OS_GetTime() {
+    LARGE_INTEGER now;
+    if (qpc_start_time == 0) {
+        QueryPerformanceFrequency(&qpc_ticks_per_sec);
+        QueryPerformanceCounter(&qpc_start_time);
+    }
+
+    QueryPerformanceCounter(&now);
+    return (((now.QuadPart - qpc_start_time.QuadPart) * 1000) / qpc_ticks_per_sec.QuadPart);
+}
 
 int OS_IsDebuggerPresent() {
     return IsDebuggerPresent();

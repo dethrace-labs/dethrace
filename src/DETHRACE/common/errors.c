@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "globvars.h"
 #include "graphics.h"
 #include "harness/trace.h"
 #include "network.h"
@@ -148,27 +149,25 @@ void FatalError(int pStr_index, ...) {
 
     va_start(ap, pStr_index);
 
-    int read_timer = PDGetTotalTime();
-    gError_code = 0x20000000 + read_timer;
-    strcpy(the_str, gError_messages[pStr_index - 1]);
+    gError_code = 0x20000000 + PDGetTotalTime();
+    strcpy(the_str, gError_messages[pStr_index]);
     sub_pt = temp_str;
 
-    for (i = 0; i < strlen(the_str); i++) {
-        if (the_str[i] == '%') {
-            sub_str = va_arg(ap, char*);
-            StripCR(sub_str);
-            strcpy(sub_pt, sub_str);
-            sub_pt += strlen(sub_str);
-        } else {
-            *sub_pt = the_str[i];
-            sub_pt++;
+    while (1) {
+        sub_pt = strchr(the_str, '%');
+        if (!sub_pt) {
+            break;
         }
+        sub_str = va_arg(ap, char*);
+        StripCR(sub_str);
+        strcpy(temp_str, sub_pt + 1);
+        strcpy(sub_pt, sub_str);
+        strcat(the_str, temp_str);
     }
-    *sub_pt = 0;
     va_end(ap);
     dr_dprintf(the_str);
     FadePaletteUp();
-    PDFatalError(temp_str);
+    PDFatalError(the_str);
 }
 
 // IDA: void __cdecl NonFatalError(int pStr_index, ...)
@@ -205,22 +204,40 @@ void NonFatalError(int pStr_index, ...) {
 // IDA: void __cdecl CloseDiagnostics()
 void CloseDiagnostics() {
     LOG_TRACE("()");
+
+    fclose(gDiagnostic_file);
 }
 
 // IDA: void __cdecl OpenDiagnostics()
 void OpenDiagnostics() {
     LOG_TRACE("()");
+
+    gDiagnostic_file = fopen("DIAGNOST.TXT", "w");
+
+    fputs("DIAGNOSTIC OUTPUT\n", gDiagnostic_file);
+    // todo: generate a real date
+    fprintf(gDiagnostic_file, "Date / time : %s\n\n\n", "Mon Mar 24 16 : 32 : 33 1997");
 }
 
 // Renamed from dprintf to avoid collisions to stdio
+// This function is stripped from the retail binary, we've guessed at the implementation
 void dr_dprintf(char* fmt_string, ...) {
+    static tU32 first_time = 0;
     va_list args;
+    tU32 the_time;
 
-    printf("dprintf: ");
+    if (first_time == 0) {
+        first_time = GetTotalTime();
+    }
+    the_time = GetTotalTime() - first_time;
+
+    fprintf(gDiagnostic_file, "%7d.%02d: ", the_time / 1000, the_time % 100);
+
     va_start(args, fmt_string);
-    vprintf(fmt_string, args);
+    vfprintf(gDiagnostic_file, fmt_string, args);
     va_end(args);
-    printf("\n");
+
+    fputs("\n", gDiagnostic_file);
 }
 
 // IDA: int __usercall DoErrorInterface@<EAX>(int pMisc_text_index@<EAX>)

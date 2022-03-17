@@ -6,6 +6,7 @@
 #include "graphics.h"
 #include "harness/config.h"
 #include "harness/hooks.h"
+#include "harness/os.h"
 #include "harness/trace.h"
 #include "input.h"
 #include "loadsave.h"
@@ -23,33 +24,6 @@
 #include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
-
-#ifdef _WIN32
-#define NS_PER_SEC (1000ULL * 1000ULL * 1000ULL)
-#define CLOCK_MONOTONIC 1
-
-int clock_gettime(int dummy, struct timespec* tv) {
-    static LARGE_INTEGER ticksPerSec;
-    LARGE_INTEGER ticks;
-    double seconds;
-
-    if (!ticksPerSec.QuadPart) {
-        QueryPerformanceFrequency(&ticksPerSec);
-        if (!ticksPerSec.QuadPart) {
-            errno = ENOTSUP;
-            return -1;
-        }
-    }
-
-    QueryPerformanceCounter(&ticks);
-
-    seconds = (double)ticks.QuadPart / (double)ticksPerSec.QuadPart;
-    tv->tv_sec = (time_t)seconds;
-    tv->tv_nsec = (long)((ULONGLONG)(seconds * NS_PER_SEC) % NS_PER_SEC);
-
-    return 0;
-}
-#endif
 
 #ifdef __DOS__
 #define GFX_INIT_STRING_32X20X8 "MCGA,W:320,H:200,B:8"
@@ -230,9 +204,9 @@ void KeyBegin() {
     // *(_WORD *)gScan_code[9] = 56;
     // *(_WORD *)gScan_code[10] = 29;
 
-    //gPrev_keyboard_handler = (void (__fastcall *)())dos_getvect(9);
-    //unk_142E6C = v2;
-    //dos_setvect(9, KeyboardHandler);
+    // gPrev_keyboard_handler = (void (__fastcall *)())dos_getvect(9);
+    // unk_142E6C = v2;
+    // dos_setvect(9, KeyboardHandler);
 }
 
 // IDA: void __cdecl KeyEnd()
@@ -318,9 +292,9 @@ void PDInitialiseSystem() {
 
     KeyBegin();
 
-    //v4 = DOSMouseBegin();
+    // v4 = DOSMouseBegin();
     gJoystick_deadzone = 8000;
-    //gUpper_loop_limit = sub_A1940(v4, v5, v3, v6) / 2;
+    // gUpper_loop_limit = sub_A1940(v4, v5, v3, v6) / 2;
 
     // Demo does not ship with KEYBOARD.COK file
     if (harness_game_info.mode != eGame_carmageddon_demo) {
@@ -520,25 +494,32 @@ void PDBuildAppPath(char* pThe_path) {
 void PDForEveryFile(char* pThe_path, void (*pAction_routine)(char*)) {
     char find_path[256];
     char found_path[256];
-    //find_t the_find_buffer;
+    // find_t the_find_buffer;
     DIR* d;
     struct dirent* entry;
 
-    d = opendir(pThe_path);
-    if (d) {
-        while ((entry = readdir(d)) != NULL) {
-            // only files, and only files that don't start with '.'
-#ifdef _WIN32
-            if ((GetFileAttributesA(pThe_path) & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY) {
-#else
-            if (entry->d_type == DT_REG && entry->d_name[0] != '.') {
-#endif
-                PathCat(found_path, pThe_path, entry->d_name);
-                pAction_routine(found_path);
-            }
-        }
-        closedir(d);
+    char* results[200];
+
+    int count = OS_GetFilesInDirectory(pThe_path, results, 200);
+
+    for (int i = 0; i < count; i++) {
     }
+
+    //     d = opendir(pThe_path);
+    //     if (d) {
+    //         while ((entry = readdir(d)) != NULL) {
+    //             // only files, and only files that don't start with '.'
+    // #ifdef _WIN32
+    //             if ((GetFileAttributesA(pThe_path) & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY) {
+    // #else
+    //             if (entry->d_type == DT_REG && entry->d_name[0] != '.') {
+    // #endif
+    //                 PathCat(found_path, pThe_path, entry->d_name);
+    //                 pAction_routine(found_path);
+    //             }
+    //         }
+    //         closedir(d);
+    //     }
 }
 
 // IDA: void __usercall PDSetPalette(br_pixelmap *pThe_palette@<EAX>)
@@ -596,9 +577,8 @@ void PDGetMousePosition(int* pX_coord, int* pY_coord) {
 
 // IDA: int __cdecl PDGetTotalTime()
 int PDGetTotalTime() {
-    struct timespec spec;
-    clock_gettime(CLOCK_MONOTONIC, &spec);
-    return spec.tv_sec * 1000 + spec.tv_nsec / 1000000;
+
+    return OS_GetTime();
 }
 
 // IDA: int __usercall PDServiceSystem@<EAX>(tU32 pTime_since_last_call@<EAX>)

@@ -16,6 +16,7 @@
 #include <sys/stat.h>
 #include <sys/sysctl.h>
 #include <sys/types.h>
+#include <time.h>
 #include <unistd.h>
 
 static int stack_nbr = 0;
@@ -23,6 +24,19 @@ static char _program_name[1024];
 #define MAX_STACK_FRAMES 64
 static void* stack_traces[MAX_STACK_FRAMES];
 #define TRACER_PID_STRING "TracerPid:"
+
+uint32_t OS_GetTime() {
+    struct timespec spec;
+    clock_gettime(CLOCK_MONOTONIC, &spec);
+    return spec.tv_sec * 1000 + spec.tv_nsec / 1000000;
+}
+
+void OS_Sleep(int delay_ms) {
+    struct timespec ts;
+    ts.tv_sec = delay_ms / 1000;
+    ts.tv_nsec = (delay_ms % 1000) * 1000000;
+    nanosleep(&ts, &ts);
+}
 
 int OS_IsDebuggerPresent() {
     char buf[4096];

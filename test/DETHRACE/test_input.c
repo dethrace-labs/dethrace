@@ -15,7 +15,7 @@ void test_input_KevKeyService() {
         gKeys_pressed = 0;
         result = KevKeyService();
     }
-    sleep_s(2);
+    OS_Sleep(2000);
     gKeys_pressed = 0;
     result = KevKeyService();
 

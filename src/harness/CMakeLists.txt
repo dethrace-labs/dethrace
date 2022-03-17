@@ -34,6 +34,7 @@ target_sources(harness PRIVATE
     include/harness/hooks.h
     include/harness/trace.h
     include/harness/config.h
+    include/harness/os.h
 
     cameras/debug_camera.c
     cameras/debug_camera.h
