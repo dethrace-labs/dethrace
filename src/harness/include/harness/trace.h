@@ -8,8 +8,6 @@
 extern int harness_debug_level;
 extern int OS_IsDebuggerPresent(void);
 
-void Harness_Debug_PrintStack();
-
 void debug_printf(const char* fmt, const char* fn, const char* fmt2, ...);
 void debug_print_vector3(const char* fmt, const char* fn, char* msg, br_vector3* v);
 void debug_print_matrix34(const char* fmt, const char* fn, char* name, br_matrix34* m);

@@ -1,6 +1,8 @@
 // Based on https://gist.github.com/jvranish/4441299
 
+#include "harness/os.h"
 #include <assert.h>
+#include <dirent.h>
 #include <err.h>
 #include <errno.h>
 #include <execinfo.h>
@@ -20,6 +22,7 @@ static int stack_nbr = 0;
 static char _program_name[1024];
 #define MAX_STACK_FRAMES 64
 static void* stack_traces[MAX_STACK_FRAMES];
+DIR* directory_iterator;
 
 uint32_t OS_GetTime() {
     struct timespec spec;
@@ -32,6 +35,30 @@ void OS_Sleep(int delay_ms) {
     ts.tv_sec = delay_ms / 1000;
     ts.tv_nsec = (delay_ms % 1000) * 1000000;
     nanosleep(&ts, &ts);
+}
+
+char* OS_GetFirstFileInDirectory(char* path) {
+    directory_iterator = opendir(path);
+    if (directory_iterator == NULL) {
+        return NULL;
+    }
+    return OS_GetNextFileInDirectory();
+}
+
+char* OS_GetNextFileInDirectory(void) {
+    struct dirent* entry;
+
+    if (directory_iterator == NULL) {
+        return NULL;
+    }
+    while ((entry = readdir(directory_iterator)) != NULL) {
+        if (entry->d_type == DT_REG) {
+            return entry->d_name;
+        }
+    }
+    closedir(directory_iterator);
+    directory_iterator = NULL;
+    return NULL;
 }
 
 // https://developer.apple.com/library/archive/qa/qa1361/_index.html
@@ -83,7 +110,7 @@ int addr2line(char const* const program_name, void const* const addr) {
     return system(addr2line_cmd);
 }
 
-void OS_PrintStacktrace() {
+void print_stack_trace() {
     int i, trace_size = 0;
     char** messages = (char**)NULL;
 
@@ -187,7 +214,7 @@ void signal_handler(int sig, siginfo_t* siginfo, void* context) {
         break;
     }
     fputs("******************\n", stderr);
-    OS_PrintStacktrace();
+    print_stack_trace();
     exit(1);
 }
 

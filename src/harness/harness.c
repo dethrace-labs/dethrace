@@ -100,13 +100,10 @@ void Harness_Init(int* argc, char* argv[]) {
     }
 }
 
+// used by unit tests
 void Harness_ForceNullRenderer() {
     force_nullrenderer = 1;
     renderer = &null_renderer;
-}
-
-void Harness_Debug_PrintStack() {
-    OS_PrintStacktrace();
 }
 
 int Harness_ProcessCommandLine(int* argc, char* argv[]) {

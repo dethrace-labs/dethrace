@@ -24,6 +24,8 @@ static char _program_name[1024];
 LARGE_INTEGER qpc_start_time, EndingTime, ElapsedMicroseconds;
 LARGE_INTEGER qpc_ticks_per_sec;
 
+HANDLE directory_handle = NULL;
+
 void OS_Sleep(int delay_ms) {
     Sleep(delay_ms);
 }
@@ -39,6 +41,33 @@ uint32_t OS_GetTime() {
     return (((now.QuadPart - qpc_start_time.QuadPart) * 1000) / qpc_ticks_per_sec.QuadPart);
 }
 
+char* OS_GetFirstFileInDirectory(char* path) {
+
+    WIN32_FIND_DATA fdFile;
+    HANDLE hFind = NULL;
+    directory_handle = FindFirstFile(sPath, &fdFile));
+    if (directory_handle == INVALID_HANDLE_VALUE) {
+        return NULL;
+    }
+    return fdFile.cFileName;
+}
+
+// Required: continue directory iteration. If no more files, return NULL
+char* OS_GetNextFileInDirectory(void) {
+    WIN32_FIND_DATA fdFile;
+    if (directory_handle == NULL) {
+        return NULL;
+    }
+
+    while (FindNextFile(directory_handle, &fdFile)) {
+        if (fdFile.dwFileAttributes & FILE_ATTRIBUTE_NORMAL) {
+            return fdFile.cFileName;
+        }
+    }
+    FindClose(directory_handle);
+    return NULL;
+}
+
 int OS_IsDebuggerPresent() {
     return IsDebuggerPresent();
 }
@@ -52,16 +81,7 @@ int addr2line(char const* const program_name, void const* const addr) {
     return system(addr2line_cmd);
 }
 
-void OS_PrintStacktrace() {
-    fprintf(stderr, "cannot print stack without context\n");
-    return;
-}
-
-void print_stacktrace_internal(CONTEXT* context) {
-    if (!context) {
-        fprintf(stderr, "cannot print stack without context\n");
-        return;
-    }
+void print_stacktrace(CONTEXT* context) {
 
     SymInitialize(GetCurrentProcess(), 0, true);
 
@@ -160,7 +180,7 @@ LONG WINAPI windows_exception_handler(EXCEPTION_POINTERS* ExceptionInfo) {
     /* If this is a stack overflow then we can't walk the stack, so just show
       where the error happened */
     if (EXCEPTION_STACK_OVERFLOW != ExceptionInfo->ExceptionRecord->ExceptionCode) {
-        print_stacktrace_internal(ExceptionInfo->ContextRecord);
+        print_stacktrace(ExceptionInfo->ContextRecord);
     } else {
         addr2line(_program_name, (void*)ExceptionInfo->ContextRecord->Eip);
     }
