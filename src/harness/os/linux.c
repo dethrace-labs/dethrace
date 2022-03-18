@@ -1,5 +1,6 @@
 // Based on https://gist.github.com/jvranish/4441299
 
+#include "harness/os.h"
 #include <assert.h>
 #include <ctype.h>
 #include <dirent.h>
