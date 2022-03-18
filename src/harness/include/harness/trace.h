@@ -3,7 +3,6 @@
 
 #include "brender/br_types.h"
 #include <stdlib.h>
-#include <unistd.h>
 
 extern int harness_debug_level;
 extern int OS_IsDebuggerPresent(void);
