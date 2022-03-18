@@ -1,7 +1,7 @@
 #ifndef HARNESS_PLATFORM_H
 #define HARNESS_PLATFORM_H
 
-#include <unistd.h>
+#include <stdint.h>
 
 // Required
 
