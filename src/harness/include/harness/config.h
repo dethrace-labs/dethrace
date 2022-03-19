@@ -5,16 +5,26 @@ typedef enum tHarness_game_type {
     eGame_none,
     eGame_carmageddon,
     eGame_splatpack,
-    eGame_carmageddon_demo
+    eGame_carmageddon_demo,
 } tHarness_game_type;
+
+typedef enum {
+    eGameLocalization_none,
+    eGameLocalization_german,
+} tHarness_game_localization;
 
 typedef struct tHarness_game_info {
     tHarness_game_type mode;
+    tHarness_game_localization localization;
     struct {
         // different between carmageddon and splatpack
         char* INTRO_SMK_FILE;
         // different between demo and full game
         char* GERMAN_LOADSCRN;
+        // built-in keyboard look-up table for certain localized Carmageddon releases
+        int *ascii_table;
+        // built-in shifted keyboard look-up table for certain localized Carmageddon releases
+        int *ascii_shift_table;
     } defines;
 } tHarness_game_info;
 

@@ -128,10 +128,11 @@ void DRPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFont, cha
     LOG_TRACE9("(%p, %d, %d, %p, \"%s\", %d)", pPixelmap, pX, pY, pFont, pText, pRight_edge);
 
     len = strlen(pText);
+    ch = (unsigned char*)pText;
     if (pX >= 0 && pPixelmap->width >= pRight_edge && pY >= 0 && (pY + pFont->height) <= pPixelmap->height) {
         x = pX;
         for (i = 0; i < len; i++) {
-            chr = pText[i] - pFont->offset;
+            chr = ch[i] - pFont->offset;
             ch_width = pFont->width_table[chr];
             DRPixelmapRectangleOnscreenCopy(
                 gBack_screen,
@@ -148,7 +149,7 @@ void DRPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFont, cha
     } else {
         x = pX;
         for (i = 0; i < len; i++) {
-            chr = pText[i] - pFont->offset;
+            chr = ch[i] - pFont->offset;
             ch_width = pFont->width_table[chr];
             DRPixelmapRectangleMaskedCopy(
                 gBack_screen,
@@ -1445,11 +1446,10 @@ void OoerrIveGotTextInMeBoxMissus(int pFont_index, char* pText, br_pixelmap* pPi
 
 // IDA: void __usercall TransBrPixelmapText(br_pixelmap *pPixelmap@<EAX>, int pX@<EDX>, int pY@<EBX>, br_uint_32 pColour@<ECX>, br_font *pFont, signed char *pText)
 void TransBrPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, br_uint_32 pColour, br_font* pFont, signed char* pText) {
-    int i;
     int len;
     LOG_TRACE("(%p, %d, %d, %d, %p, %p)", pPixelmap, pX, pY, pColour, pFont, pText);
 
-    len = (TranslationMode() == 0 ? 0 : 2);
+    len = TranslationMode() ? 2 : 0;
     BrPixelmapText(pPixelmap, pX, pY - len, pColour, pFont, (char*)pText);
 }
 
@@ -1458,7 +1458,7 @@ void TransDRPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFont
     LOG_TRACE("(%p, %d, %d, %p, \"%s\", %d)", pPixelmap, pX, pY, pFont, pText, pRight_edge);
 
     if (gAusterity_mode && FlicsPlayedFromDisk() && pFont != gCached_font) {
-        if (gCached_font && gCached_font - gFonts > 13) {
+        if (gCached_font != NULL && gCached_font - gFonts > 13) {
             DisposeFont(gCached_font - gFonts);
         }
         gCached_font = pFont;

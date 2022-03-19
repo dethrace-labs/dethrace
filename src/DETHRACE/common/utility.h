@@ -35,7 +35,7 @@ br_scalar SRandomBetween(br_scalar pA, br_scalar pB);
 
 br_scalar SRandomPosNeg(br_scalar pN);
 
-char* GetALineWithNoPossibleService(FILE* pF, /*unsigned*/ char* pS);
+char* GetALineWithNoPossibleService(FILE* pF, unsigned char* pS);
 
 char* GetALineAndDontArgue(FILE* pF, char* pS);
 

@@ -241,7 +241,7 @@ void PDSetKeyArray(int* pKeys, int pMark) {
 int PDGetASCIIFromKey(int pKey) {
     LOG_TRACE("(%d)", pKey);
 
-    if (PDKeyDown3(KEY_LSHIFT)) {
+    if (PDKeyDown(KEY_LSHIFT)) {
         return gASCII_shift_table[pKey];
     } else {
         return gASCII_table[pKey];
@@ -292,18 +292,24 @@ void PDInitialiseSystem() {
 
     // Demo does not ship with KEYBOARD.COK file
     if (harness_game_info.mode != eGame_carmageddon_demo) {
-        PathCat(the_path, gApplication_path, "KEYBOARD.COK");
-        f = fopen(the_path, "rb");
-        if (!f) {
-            PDFatalError("This .exe must have KEYBOARD.COK in the DATA folder.");
-        }
+        // Some localized Carmageddon releases have a hardcoded keyboard look-up table
+        if (harness_game_info.defines.ascii_table == NULL) {
+            PathCat(the_path, gApplication_path, "KEYBOARD.COK");
+            f = fopen(the_path, "rb");
+            if (f == NULL) {
+                PDFatalError("This .exe must have KEYBOARD.COK in the DATA folder.");
+            }
 
-        fseek(f, 0, SEEK_END);
-        len = ftell(f);
-        rewind(f);
-        fread(gASCII_table, len / 2, 1, f);
-        fread(gASCII_shift_table, len / 2, 1, f);
-        fclose(f);
+            fseek(f, 0, SEEK_END);
+            len = ftell(f);
+            rewind(f);
+            fread(gASCII_table, len / 2, 1, f);
+            fread(gASCII_shift_table, len / 2, 1, f);
+            fclose(f);
+        } else {
+            memcpy(gASCII_table, harness_game_info.defines.ascii_table, sizeof(gASCII_table));
+            memcpy(gASCII_shift_table, harness_game_info.defines.ascii_shift_table, sizeof(gASCII_shift_table));
+        }
     }
 }
 

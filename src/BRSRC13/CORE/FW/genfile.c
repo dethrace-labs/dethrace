@@ -1,4 +1,5 @@
 #include "genfile.h"
+#include "datafile.h"
 #include "harness/trace.h"
 
 #include "CORE/V1DB/chunkids.h"
@@ -20,8 +21,8 @@ br_file_enum_member file_type_FM[10] = {
 br_file_enum file_type_F = { BR_ASIZE(file_type_FM), file_type_FM };
 
 br_file_struct_member file_info_FM[2] = {
-    { 15, offsetof(file_info, type), "type", &file_type_F },
-    { 5, offsetof(file_info, version), "version", NULL },
+    { DF_TYPE_ENUM_32,  offsetof(file_info, type), "type", &file_type_F },
+    { DF_TYPE_BR_UINT_32, offsetof(file_info, version), "version", NULL },
 };
 br_file_struct file_info_F = { "file_info", BR_ASIZE(file_info_FM), file_info_FM, sizeof(file_info) };
 

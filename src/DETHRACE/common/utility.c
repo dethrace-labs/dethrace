@@ -232,7 +232,7 @@ br_scalar SRandomPosNeg(br_scalar pN) {
 }
 
 // IDA: char* __usercall GetALineWithNoPossibleService@<EAX>(FILE *pF@<EAX>, unsigned char *pS@<EDX>)
-char* GetALineWithNoPossibleService(FILE* pF, /*unsigned*/ char* pS) {
+char* GetALineWithNoPossibleService(FILE* pF, unsigned char* pS) {
     // Jeff removed "signed' to avoid compiler warnings..
     /*signed*/ char* result;
     /*signed*/ char s[256];
@@ -248,15 +248,13 @@ char* GetALineWithNoPossibleService(FILE* pF, /*unsigned*/ char* pS) {
         }
         if (s[0] == '@') {
             EncodeLine(&s[1]);
-            goto LABEL_5;
-        }
-        while (1) {
-            if (s[0] != ' ' && s[0] != '\t') {
-                break;
-            }
-        LABEL_5:
             len = strlen(s);
             memmove(s, &s[1], len);
+        } else {
+            while (s[0] == ' ' || s[0] == '\t') {
+                len = strlen(s);
+                memmove(s, &s[1], len);
+            }
         }
 
         while (1) {
@@ -287,10 +285,10 @@ char* GetALineWithNoPossibleService(FILE* pF, /*unsigned*/ char* pS) {
             result[len - 2] = 0;
         }
     }
-    strcpy(pS, s);
+    strcpy((char*)pS, s);
     len = strlen(s);
     for (i = 0; i < len; i++) {
-        if (pS[i] >= 0xE0u) {
+        if (pS[i] >= 0xe0) {
             pS[i] -= 32;
         }
     }
@@ -303,7 +301,7 @@ char* GetALineAndDontArgue(FILE* pF, char* pS) {
     // LOG_TRACE10("(%p, \"%s\")", pF, pS);
 
     PossibleService();
-    return GetALineWithNoPossibleService(pF, pS);
+    return GetALineWithNoPossibleService(pF, (unsigned char*)pS);
 }
 
 // IDA: void __usercall PathCat(char *pDestn_str@<EAX>, char *pStr_1@<EDX>, char *pStr_2@<EBX>)

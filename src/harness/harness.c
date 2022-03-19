@@ -34,6 +34,21 @@ tHarness_game_info harness_game_info;
 // Configuration options
 tHarness_game_config harness_game_config;
 
+
+// German ASCII codes
+static int german_ascii_table[128] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107,
+    108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 122, 121, 94, -33, -76, 8, 13, 13, 0, 45, 60, -10, -28, 46, 44, -4, 43, 35, 27,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, 56, -33, -76, 46, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+};
+static int german_ascii_shift_table[128] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 61, 33, 34, -89, 36, 37, 38, 47, 40, 41, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75,
+    76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 90, 89, -80, 63, 96, 8, 13, 13, 0, 95, 62, -42, -60, 58, 44, -36, 42, 39, 27,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, 56, -33, -76, 46, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+};
+
 int Harness_ProcessCommandLine(int* argc, char* argv[]);
 
 void Harness_DetectGameMode() {
@@ -48,10 +63,42 @@ void Harness_DetectGameMode() {
         harness_game_info.mode = eGame_splatpack;
         LOG_INFO("\"%s\"", "Splat Pack");
     } else {
-        harness_game_info.defines.INTRO_SMK_FILE = "MIX_INTR.SMK";
+        if (access("DATA/CURSCENE/Mix_intr.smk", F_OK) == -1) {
+            harness_game_info.defines.INTRO_SMK_FILE = "Mix_intr.smk";
+        } else {
+            harness_game_info.defines.INTRO_SMK_FILE = "MIX_INTR.SMK";
+        }
         harness_game_info.defines.GERMAN_LOADSCRN = "LOADSCRN.PIX";
         harness_game_info.mode = eGame_carmageddon;
         LOG_INFO("\"%s\"", "Carmageddon");
+    }
+
+    harness_game_info.localization = eGameLocalization_none;
+    if (access("DATA/KEYBOARD.COK", F_OK) == -1 && access("DATA/TRNSLATE.TXT", F_OK) != -1) {
+        FILE *f = fopen("DATA/TRNSLATE.TXT", "rb");
+        fseek(f, 0, SEEK_END);
+        int filesize = ftell(f);
+        fseek(f, 0, SEEK_SET);
+        char *buffer = malloc(filesize + 1);
+        int nb = fread(buffer, 1, filesize, f);
+        if (nb != filesize) {
+            LOG_PANIC("Unable to read DATA/TRNSLATE.TXT");
+        }
+        buffer[filesize] = '\0';
+        fclose(f);
+        if (strstr(buffer, "NEUES SPIEL") != NULL) {
+            harness_game_info.localization = eGameLocalization_german;
+        }
+        free(buffer);
+    }
+
+    switch (harness_game_info.localization) {
+    case eGameLocalization_none:
+        break;
+    case eGameLocalization_german:
+        harness_game_info.defines.ascii_table = german_ascii_table;
+        harness_game_info.defines.ascii_shift_table = german_ascii_shift_table;
+        break;
     }
 }
 
