@@ -15,6 +15,7 @@
 #include "CORE/PIXELMAP/pixelmap.h"
 #include "CORE/V1DB/actsupt.h"
 #include "CORE/V1DB/dbsetup.h"
+#include "common/errors.h"
 #include "common/newgame.h"
 #include "common/utility.h"
 
@@ -166,6 +167,8 @@ void setup_global_vars(int argc, char* argv[]) {
     gNon_track_actor = BrActorAllocate(BR_ACTOR_NONE, NULL);
 
     strcpy(gBasic_car_names[0], "BLKEAGLE.TXT");
+
+    OpenDiagnostics();
 
     setup_temp_folder();
     printf("INFO: temp folder is \"%s\"\n", temp_folder);

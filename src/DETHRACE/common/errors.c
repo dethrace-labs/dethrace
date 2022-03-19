@@ -154,6 +154,7 @@ void FatalError(int pStr_index, ...) {
     sub_pt = temp_str;
 
     while (1) {
+
         sub_pt = strchr(the_str, '%');
         if (!sub_pt) {
             break;
