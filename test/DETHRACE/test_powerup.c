@@ -1,7 +1,6 @@
 #include "tests.h"
 
 #include <string.h>
-#include <unistd.h>
 
 #include "common/globvars.h"
 #include "common/powerup.h"

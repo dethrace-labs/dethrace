@@ -4,6 +4,7 @@
 #include "globvrpb.h"
 #include "graphics.h"
 #include "harness/config.h"
+#include "harness/os.h"
 #include "harness/trace.h"
 #include "input.h"
 #include "loading.h"
@@ -13,7 +14,6 @@
 #include "utility.h"
 #include <stdlib.h>
 #include <time.h>
-#include <unistd.h>
 
 tS32 gLast_demo_end_anim;
 
@@ -38,7 +38,7 @@ void PlaySmackerFile(char* pSmack_name) {
     tPath_name the_path;
     br_colour* br_colours_ptr;
     tU8* smack_colours_ptr;
-    //Smack* smk;
+    // Smack* smk;
     int i;
     int j;
     int len;
@@ -83,10 +83,7 @@ void PlaySmackerFile(char* pSmack_name) {
             smk_info_video(s, &w, &h, NULL);
             double fps = 1000000.0 / usf;
             int delay_ms = (1 / fps) * 1000;
-#ifndef _WIN32
-            ts.tv_sec = delay_ms / 1000;
-            ts.tv_nsec = (delay_ms % 1000) * 1000000;
-#endif
+
             smk_enable_video(s, 1);
 
             smk_first(s);
@@ -112,13 +109,8 @@ void PlaySmackerFile(char* pSmack_name) {
                 if (AnyKeyDown() || EitherMouseButtonDown()) {
                     break;
                 }
-
                 // wait until its time for the next frame
-#ifndef _WIN32
-                nanosleep(&ts, &ts);
-#else
-                Sleep(delay_ms);
-#endif
+                OS_Sleep(delay_ms);
             } while (smk_next(s) == SMK_MORE);
 
             smk_close(s);
@@ -138,7 +130,7 @@ void DoOpeningAnimation() {
     LOG_TRACE("()");
     PlaySmackerFile("LOGO.SMK");
     PlaySmackerFile(harness_game_info.defines.INTRO_SMK_FILE);
-    return WaitForNoKeys();
+    WaitForNoKeys();
 }
 
 // IDA: void __cdecl DoNewGameAnimation()

@@ -1,5 +1,9 @@
 add_library(harness STATIC)
 
+if (NOT DEFINED IO_PLATFORM)
+    set(IO_PLATFORM "SDL_OpenGL")
+endif()
+
 target_include_directories(harness 
     PRIVATE
         .
@@ -9,7 +13,7 @@ target_include_directories(harness
         include
 )
 
-target_link_libraries(harness PRIVATE miniposix brender SDL2::SDL2 glad s3 cglm_headers)
+target_link_libraries(harness PRIVATE brender s3 cglm_headers)
 
 if(WIN32)
     target_link_libraries(harness PRIVATE dbghelp)
@@ -30,39 +34,45 @@ target_sources(harness PRIVATE
     include/harness/hooks.h
     include/harness/trace.h
     include/harness/config.h
+    include/harness/os.h
 
     cameras/debug_camera.c
     cameras/debug_camera.h
     harness_trace.c
     harness.c
     harness.h
-    sdl/gl_renderer.c
-    sdl/gl_renderer.h
-    sdl/gl_renderer_shaders.c
-    sdl/gl_renderer_shaders.h
-    sdl/gl_brender_stored_context.c
-    sdl/gl_brender_stored_context.h
+    io_platforms/io_platform.h
+    renderers/null.h
+    renderers/renderer.h
     brender_emu/renderer_impl.c
     brender_emu/renderer_impl.h
     sound/sound.c
     sound/sound.h
-    sdl/common.c
-    sdl/common.h
-    platforms/sdl_gl.h
-    platforms/null.h
-    stack_trace_handler.h
 )
+
+if (IO_PLATFORM STREQUAL "SDL_OpenGL")
+    target_sources(harness PRIVATE
+        io_platforms/sdl_gl.c
+        renderers/gl/gl_renderer.c
+        renderers/gl/gl_renderer.h
+        renderers/gl/shaders.c
+        renderers/gl/shaders.h
+        renderers/gl/stored_context.c
+        renderers/gl/stored_context.h
+    )
+    target_link_libraries(harness PRIVATE SDL2::SDL2 glad)
+endif()
 
 if(WIN32)
     target_sources(harness PRIVATE
-        platforms/platform_windows.c
+        os/windows.c
     )
 elseif(APPLE)
 target_sources(harness PRIVATE
-    platforms/platform_macosx.c
+    os/macos.c
 )
 else()
     target_sources(harness PRIVATE
-        platforms/platform_linux.c
+        os/linux.c
     )
 endif()

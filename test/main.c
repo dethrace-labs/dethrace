@@ -1,4 +1,5 @@
 #include "harness/hooks.h"
+#include "harness/os.h"
 #include "tests.h"
 #include <assert.h>
 #include <errno.h>
@@ -6,7 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <unistd.h>
 
 #define UNITY_USE_COMMAND_LINE_ARGS 1
 
@@ -15,6 +15,7 @@
 #include "CORE/PIXELMAP/pixelmap.h"
 #include "CORE/V1DB/actsupt.h"
 #include "CORE/V1DB/dbsetup.h"
+#include "common/errors.h"
 #include "common/newgame.h"
 #include "common/utility.h"
 
@@ -23,6 +24,7 @@
 #include "common/grafdata.h"
 #include "harness.h"
 #include "harness/config.h"
+#include "harness/os.h"
 
 #define debug(format_, ...) fprintf(stderr, format_, __VA_ARGS__)
 
@@ -167,6 +169,8 @@ void setup_global_vars(int argc, char* argv[]) {
 
     strcpy(gBasic_car_names[0], "BLKEAGLE.TXT");
 
+    OpenDiagnostics();
+
     setup_temp_folder();
     printf("INFO: temp folder is \"%s\"\n", temp_folder);
 
@@ -182,18 +186,12 @@ void setup_global_vars(int argc, char* argv[]) {
         fake_argv[fake_argc++] = "--no-signal-handler";
     }
     Harness_Init(&fake_argc, fake_argv);
+
+    Harness_ForceNullRenderer();
 }
 
 int has_data_directory() {
     return root_dir != NULL;
-}
-
-void sleep_s(int sec) {
-#ifdef _WIN32
-    Sleep(1000 * sec);
-#else
-    sleep(sec);
-#endif
 }
 
 void create_temp_file(char buffer[PATH_MAX + 1], const char* prefix) {

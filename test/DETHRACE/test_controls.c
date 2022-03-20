@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #include "tests.h"
 
@@ -24,7 +23,7 @@ void test_controls_CheckKevKeys() {
         gKeys_pressed = 0;
         result = KevKeyService();
     }
-    sleep_s(2);
+    OS_Sleep(2000);
     gKeys_pressed = 0;
 
     CheckKevKeys();

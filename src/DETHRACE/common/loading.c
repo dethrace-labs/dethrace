@@ -3195,9 +3195,6 @@ FILE* DRfopen(char* pFilename, char* pMode) {
             PDFatalError(msg);
         }
     }
-    if (result == NULL) {
-        LOG_WARN("failed for %d", errno);
-    }
     return result;
 }
 

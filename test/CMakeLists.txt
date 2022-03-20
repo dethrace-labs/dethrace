@@ -1,6 +1,8 @@
 add_executable(dethrace_test)
 add_test(NAME test_dethrace COMMAND dethrace_test)
 
+set(IO_PLATFORM "SDL_OpenGL")
+
 target_link_libraries(dethrace_test PRIVATE glad dethrace_obj)
 
 target_include_directories(dethrace_test PRIVATE

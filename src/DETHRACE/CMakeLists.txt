@@ -10,7 +10,7 @@ target_include_directories(dethrace_obj
         pd
 )
 
-target_link_libraries(dethrace_obj PUBLIC miniposix SDL2::SDL2 smacker harness brender s3 cglm)
+target_link_libraries(dethrace_obj PUBLIC SDL2::SDL2 smacker harness brender s3 cglm)
 
 if (CMAKE_C_COMPILER_ID MATCHES "Clang")
     target_compile_options(dethrace_obj PRIVATE
@@ -154,8 +154,6 @@ target_sources(dethrace_obj PRIVATE
     pd/net.h
     pc-dos/dossys.c
     pd/sys.h
-    watcom_functions.c
-    watcom_functions.h
 )
 
 # Create our main game binary.

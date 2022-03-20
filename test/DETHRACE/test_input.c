@@ -3,7 +3,6 @@
 #include "common/globvars.h"
 #include "common/input.h"
 #include <string.h>
-#include <unistd.h>
 
 void test_input_KevKeyService() {
     int i;
@@ -15,7 +14,7 @@ void test_input_KevKeyService() {
         gKeys_pressed = 0;
         result = KevKeyService();
     }
-    sleep_s(2);
+    OS_Sleep(2000);
     gKeys_pressed = 0;
     result = KevKeyService();
 

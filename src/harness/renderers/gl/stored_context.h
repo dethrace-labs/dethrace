@@ -6,7 +6,7 @@
 
 typedef struct tStored_model_context {
     br_object_dispatch* dispatch;
-    GLuint vao_id, ebo_id;
+    GLuint vao_id, vbo_id, ebo_id;
 } tStored_model_context;
 
 typedef struct tStored_pixelmap {

@@ -10,7 +10,7 @@ target_include_directories(brender
         include
 )
 
-target_link_libraries(brender PRIVATE harness miniposix)
+target_link_libraries(brender PRIVATE harness)
 
 if(NOT MSVC)
     target_compile_options(brender PRIVATE

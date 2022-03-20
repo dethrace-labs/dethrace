@@ -20,7 +20,6 @@ option(BUILD_TESTS "Build unit tests." OFF)
 find_package(SDL2 REQUIRED)
 
 add_subdirectory(lib/libsmacker)
-add_subdirectory(lib/miniposix)
 add_subdirectory(lib/glad)
 add_subdirectory(lib/cglm EXCLUDE_FROM_ALL)
 

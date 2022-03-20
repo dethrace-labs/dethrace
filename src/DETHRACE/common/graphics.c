@@ -32,7 +32,6 @@
 #include "utility.h"
 #include "world.h"
 #include <stdlib.h>
-#include <unistd.h>
 
 #include <math.h>
 
@@ -2389,7 +2388,7 @@ void DropInImageFromTop(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip,
     tS32 the_time;
     int drop_distance;
     LOG_TRACE("(%p, %d, %d, %d, %d)", pImage, pLeft, pTop, pTop_clip, pBottom_clip);
-    
+
     start_time = PDGetTotalTime();
     drop_distance = pImage->height - pTop_clip + pTop;
     while (1) {
@@ -2413,7 +2412,7 @@ void DropOutImageThruBottom(br_pixelmap* pImage, int pLeft, int pTop, int pTop_c
     tS32 the_time;
     int drop_distance;
     LOG_TRACE("(%p, %d, %d, %d, %d)", pImage, pLeft, pTop, pTop_clip, pBottom_clip);
-    
+
     start_time = PDGetTotalTime();
     drop_distance = pBottom_clip - pTop;
     while (1) {
@@ -2437,7 +2436,7 @@ void DropInImageFromBottom(br_pixelmap* pImage, int pLeft, int pTop, int pTop_cl
     tS32 the_time;
     int drop_distance;
     LOG_TRACE("(%p, %d, %d, %d, %d)", pImage, pLeft, pTop, pTop_clip, pBottom_clip);
-    
+
     start_time = PDGetTotalTime();
     drop_distance = pBottom_clip - pTop;
     while (1) {
@@ -2461,7 +2460,7 @@ void DropOutImageThruTop(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip
     tS32 the_time;
     int drop_distance;
     LOG_TRACE("(%p, %d, %d, %d, %d)", pImage, pLeft, pTop, pTop_clip, pBottom_clip);
-    
+
     start_time = PDGetTotalTime();
     drop_distance = pImage->height - pTop_clip + pTop;
     while (1) {

@@ -1,16 +1,17 @@
 #include "harness.h"
 #include "brender_emu/renderer_impl.h"
 #include "include/harness/config.h"
-#include "platforms/null.h"
-#include "platforms/sdl_gl.h"
+#include "include/harness/os.h"
+#include "io_platforms/io_platform.h"
+#include "renderers/null.h"
 #include "sound/sound.h"
-#include "stack_trace_handler.h"
 
-#include <strings.h>
+#include <errno.h>
+#include <stdio.h>
+#include <string.h>
 #include <sys/stat.h>
-#include <unistd.h>
 
-tPlatform* platform;
+tRenderer* renderer;
 br_pixelmap* palette;
 uint32_t* screen_buffer;
 harness_br_renderer* renderer_state;
@@ -21,6 +22,7 @@ br_pixelmap* last_src = NULL;
 br_pixelmap *last_colour_buffer, *last_depth_buffer;
 
 unsigned int last_frame_time = 0;
+int force_nullrenderer = 0;
 
 extern unsigned int GetTotalTime();
 extern uint8_t gScan_code[123][2];
@@ -71,11 +73,10 @@ void Harness_Init(int* argc, char* argv[]) {
     Harness_ProcessCommandLine(argc, argv);
 
     if (harness_game_config.install_signalhandler) {
-        install_signal_handler(argv[0]);
+        OS_InstallSignalHandler(argv[0]);
     }
-    platform->Init();
 
-    int* keymap = platform->GetKeyMap();
+    int* keymap = Input_GetKeyMap();
     if (keymap != NULL) {
         for (int i = 0; i < 123; i++) {
             gScan_code[i][0] = keymap[i];
@@ -98,15 +99,13 @@ void Harness_Init(int* argc, char* argv[]) {
     }
 }
 
-void Harness_Debug_PrintStack() {
-#ifndef _WIN32
-    posix_print_stack_trace();
-#endif
+// used by unit tests
+void Harness_ForceNullRenderer() {
+    force_nullrenderer = 1;
+    renderer = &null_renderer;
 }
 
 int Harness_ProcessCommandLine(int* argc, char* argv[]) {
-    char* platform_name = NULL;
-
     for (int i = 1; i < *argc; i++) {
         int handled = 0;
 
@@ -117,10 +116,6 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
             char* s = strstr(argv[i], "=");
             harness_debug_level = atoi(s + 1);
             LOG_INFO("debug level set to %d", harness_debug_level);
-            handled = 1;
-        } else if (strstr(argv[i], "--platform=") != NULL) {
-            platform_name = strstr(argv[i], "=") + 1;
-            LOG_INFO("Platform set to: %s", platform_name);
             handled = 1;
         } else if (strstr(argv[i], "--physics-step-time=") != NULL) {
             char* s = strstr(argv[i], "=");
@@ -152,39 +147,31 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
         }
     }
 
-    if (platform_name == NULL) {
-        platform_name = "sdl_gl";
-    }
-
-    if (strcmp(platform_name, "sdl_gl") == 0) {
-        platform = &sdl_gl_platform;
-    } else if (strcmp(platform_name, "null") == 0) {
-        platform = &null_platform;
-    } else {
-        LOG_PANIC("Invalid platform: %s", platform_name);
-    }
     return 0;
 }
 
 void Harness_Hook_DOSGfxBegin() {
-    platform->NewWindow("Dethrace", 640, 400, 320, 200);
+    if (force_nullrenderer) {
+        return;
+    }
+    renderer = Window_Create("Dethrace", 640, 400, 320, 200);
 }
 
 // Render 2d back buffer
 void Harness_RenderScreen(br_pixelmap* dst, br_pixelmap* src) {
-    platform->RenderFullScreenQuad((uint8_t*)src->pixels, 320, 200);
+    renderer->FullScreenQuad((uint8_t*)src->pixels, 320, 200);
 
     last_dst = dst;
     last_src = src;
 }
 
 void Harness_Hook_BrDevPaletteSetOld(br_pixelmap* pm) {
-    platform->SetPalette((uint8_t*)pm->pixels);
+    renderer->SetPalette((uint8_t*)pm->pixels);
     palette = pm;
 
     if (last_dst) {
         Harness_RenderScreen(last_dst, last_src);
-        platform->Swap();
+        Window_Swap(0);
     }
 }
 
@@ -200,74 +187,78 @@ void Harness_Hook_BrV1dbRendererBegin(br_v1db_state* v1db) {
     v1db->renderer = (br_renderer*)renderer_state;
 }
 
-void Harness_Hook_MainGameLoop() {
+int Harness_CalculateFrameDelay() {
     if (harness_game_config.fps == 0) {
-        return;
+        return 0;
     }
 
-    if (last_frame_time) {
-        unsigned int frame_time = GetTotalTime() - last_frame_time;
+    unsigned int now = GetTotalTime();
 
+    if (last_frame_time != 0) {
+        unsigned int frame_time = now - last_frame_time;
+        last_frame_time = now;
         if (frame_time < 100) {
-
             int sleep_time = (1000 / harness_game_config.fps) - frame_time;
             if (sleep_time > 5) {
-                SDL_Delay(sleep_time);
+                return sleep_time;
             }
         }
     }
-
-    last_frame_time = GetTotalTime();
+    return 0;
 }
 
 // Begin 3d scene
 void Harness_Hook_BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer) {
     last_colour_buffer = colour_buffer;
     last_depth_buffer = depth_buffer;
-    platform->BeginScene(camera, colour_buffer);
+    renderer->BeginScene(camera, colour_buffer);
 }
 
 void Harness_Hook_BrZbSceneRenderAdd(br_actor* tree) {
 }
 
 void Harness_Hook_renderFaces(br_actor* actor, br_model* model, br_material* material, br_token type) {
-    platform->RenderModel(actor, model, renderer_state->state.matrix.model_to_view);
+    renderer->Model(actor, model, renderer_state->state.matrix.model_to_view);
 }
 
 void Harness_Hook_BrZbSceneRenderEnd() {
-    platform->EndScene();
+    renderer->EndScene();
 }
 
 // Called by game to swap buffers at end of frame rendering
 void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {
 
     // draw the current colour_buffer (2d screen) contents
-    platform->FlushBuffers(last_colour_buffer, last_depth_buffer);
+    renderer->FlushBuffers(last_colour_buffer, last_depth_buffer);
     Harness_RenderScreen(dst, src);
 
-    platform->Swap();
-    platform->PollEvents();
+    int delay_ms = Harness_CalculateFrameDelay();
+    Window_Swap(delay_ms);
+
+    renderer->ClearBuffers();
+    Window_PollEvents();
+
+    last_frame_time = GetTotalTime();
 }
 
 int Harness_Hook_KeyDown(unsigned char pScan_code) {
-    return platform->IsKeyDown(pScan_code);
+    return Input_IsKeyDown(pScan_code);
 }
 
 void Harness_Hook_PDServiceSystem() {
-    platform->PollEvents();
+    Window_PollEvents();
 }
 void Harness_Hook_PDSetKeyArray() {
-    platform->PollEvents();
+    Window_PollEvents();
 }
 
 void Harness_Hook_BrMaterialUpdate(br_material* mat, br_uint_16 flags) {
-    // LOG_DEBUG("buffermat %s", mat->identifier);
-    platform->BufferMaterial(mat);
+    renderer->BufferMaterial(mat);
 }
 
 void Harness_Hook_BrBufferUpdate(br_pixelmap* pm, br_token use, br_uint_16 flags) {
     if (use == BRT_COLOUR_MAP_O || use == BRT_UNKNOWN) {
-        platform->BufferTexture(pm);
+        renderer->BufferTexture(pm);
     } else {
         LOG_PANIC("use %d", use);
     }
@@ -281,6 +272,5 @@ void Harness_Hook_S3StopAllOutletSounds() {
 }
 
 void Harness_Hook_FlushRenderer() {
-    platform->FlushBuffers(last_colour_buffer, last_depth_buffer);
+    renderer->FlushBuffers(last_colour_buffer, last_depth_buffer);
 }
-

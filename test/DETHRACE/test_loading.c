@@ -1,7 +1,6 @@
 #include "tests.h"
 
 #include <string.h>
-#include <unistd.h>
 
 #include "CORE/PIXELMAP/pixelmap.h"
 #include "common/globvars.h"
