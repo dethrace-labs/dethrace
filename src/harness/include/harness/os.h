@@ -1,5 +1,5 @@
-#ifndef HARNESS_PLATFORM_H
-#define HARNESS_PLATFORM_H
+#ifndef HARNESS_OS_H
+#define HARNESS_OS_H
 
 #include <stdint.h>
 
@@ -7,8 +7,8 @@
 #include <direct.h>
 #define getcwd _getcwd
 #define chdir _chdir
-#define snprintf _snprintf
-#define vsnprintf _vsnprintf
+// #define snprintf _snprintf
+// #define vsnprintf _vsnprintf
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp
 #else
