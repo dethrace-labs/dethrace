@@ -5,8 +5,10 @@
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <direct.h>
+#include <io.h>
 #define getcwd _getcwd
 #define chdir _chdir
+#define access _access
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp
 
