@@ -1,11 +1,12 @@
 // Based on https://gist.github.com/jvranish/4441299
 
-#include <imagehlp.h>
+// this has to be first
 #include <windows.h>
+
+#include <imagehlp.h>
 
 #include "harness/os.h"
 #include <assert.h>
-#include <direct.h> /* _chdir() */
 #include <errno.h>
 #include <limits.h>
 #include <signal.h>
