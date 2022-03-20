@@ -9,6 +9,7 @@
 #define getcwd _getcwd
 #define chdir _chdir
 #define access _access
+#define F_OK 0
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp
 
