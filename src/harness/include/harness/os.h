@@ -3,6 +3,14 @@
 
 #include <stdint.h>
 
+#ifdef _WIN32
+#include <direct.h>
+#define getcwd _getcwd
+#define chdir _chdir
+#else
+#include <unistd.h>
+#endif
+
 // Required
 
 // Required: return timestamp in milliseconds.
@@ -16,8 +24,6 @@ char* OS_GetNextFileInDirectory(void);
 
 // Required: sleep for specified milliseconds
 void OS_Sleep(int ms);
-
-int OS_SetCurrentDirectory(char* path);
 
 // Optional: return true if a debugger is detected
 int OS_IsDebuggerPresent(void);

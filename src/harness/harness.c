@@ -96,7 +96,7 @@ void Harness_Init(int* argc, char* argv[]) {
         LOG_INFO("DETHRACE_ROOT_DIR is not set, assuming '.'");
     } else {
         printf("DETHRACE_ROOT_DIR: %s\n", root_dir);
-        result = OS_SetCurrentDirectory(root_dir);
+        result = chdir(root_dir);
         if (result != 0) {
             LOG_PANIC("Failed to chdir. Error is %s", strerror(errno));
         }

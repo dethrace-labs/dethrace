@@ -1,4 +1,5 @@
 #include "harness/hooks.h"
+#include "harness/os.h"
 #include "tests.h"
 #include <assert.h>
 #include <errno.h>
@@ -23,6 +24,7 @@
 #include "common/grafdata.h"
 #include "harness.h"
 #include "harness/config.h"
+#include "harness/os.h"
 
 #define debug(format_, ...) fprintf(stderr, format_, __VA_ARGS__)
 

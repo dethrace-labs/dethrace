@@ -5,6 +5,7 @@
 
 #include "harness/os.h"
 #include <assert.h>
+#include <direct.h> /* _chdir() */
 #include <errno.h>
 #include <limits.h>
 #include <signal.h>
