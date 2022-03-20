@@ -2,8 +2,6 @@
 
 ## Operating Systems
 
-See: xxx
-
 Assuming an operating system called _foo_, follow the steps to add support for it.
 
 1. Add a new file `os/foo.h` and implement the required functions defined in [os.h](https://github.com/dethrace-labs/dethrace/blob/main/src/harness/include/harness/os.h):
