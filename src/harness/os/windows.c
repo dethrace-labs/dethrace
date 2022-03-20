@@ -1,5 +1,8 @@
 // Based on https://gist.github.com/jvranish/4441299
 
+#include <imagehlp.h>
+#include <windows.h>
+
 #include "harness/os.h"
 #include <assert.h>
 #include <errno.h>
@@ -10,9 +13,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <imagehlp.h>
-#include <windows.h>
 
 #ifdef _WIN64
 #define Esp Rsp
