@@ -71,6 +71,10 @@ char* OS_GetNextFileInDirectory(void) {
     return NULL;
 }
 
+void OS_Basename(char* path, char* base) {
+    _splitpath(path, NULL, NULL, base, NULL);
+}
+
 int OS_IsDebuggerPresent() {
     return IsDebuggerPresent();
 }

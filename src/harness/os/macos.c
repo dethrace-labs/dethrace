@@ -6,6 +6,7 @@
 #include <err.h>
 #include <errno.h>
 #include <execinfo.h>
+#include <libgen.h>
 #include <limits.h>
 #include <signal.h>
 #include <stdbool.h>
@@ -59,6 +60,10 @@ char* OS_GetNextFileInDirectory(void) {
     closedir(directory_iterator);
     directory_iterator = NULL;
     return NULL;
+}
+
+void OS_Basename(char* path, char* base) {
+    strcpy(base, basename(path));
 }
 
 // https://developer.apple.com/library/archive/qa/qa1361/_index.html

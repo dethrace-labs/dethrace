@@ -3,13 +3,26 @@
 
 #include <stdint.h>
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
 #include <direct.h>
 #define getcwd _getcwd
 #define chdir _chdir
+#define snprintf _snprintf
+#define vsnprintf _vsnprintf
+#define strcasecmp _stricmp
+#define strncasecmp _strnicmp
 #else
 #include <unistd.h>
 #endif
+
+// #if defined(_WIN32) || defined(_WIN64)
+// #define snprintf _snprintf
+// #define vsnprintf _vsnprintf
+// #define strcasecmp _stricmp
+// #define strncasecmp _strnicmp
+// #else
+// #include <strings.h>
+// #endif
 
 // Required
 
@@ -24,6 +37,8 @@ char* OS_GetNextFileInDirectory(void);
 
 // Required: sleep for specified milliseconds
 void OS_Sleep(int ms);
+
+void OS_Basename(char* path, char* base);
 
 // Optional: return true if a debugger is detected
 int OS_IsDebuggerPresent(void);

@@ -154,8 +154,6 @@ target_sources(dethrace_obj PRIVATE
     pd/net.h
     pc-dos/dossys.c
     pd/sys.h
-    watcom_functions.c
-    watcom_functions.h
 )
 
 # Create our main game binary.
