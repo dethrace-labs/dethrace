@@ -29,6 +29,7 @@ LARGE_INTEGER qpc_start_time, EndingTime, ElapsedMicroseconds;
 LARGE_INTEGER qpc_ticks_per_sec;
 
 HANDLE directory_handle = NULL;
+char last_found_file[260];
 
 void OS_Sleep(int delay_ms) {
     Sleep(delay_ms);
@@ -42,18 +43,22 @@ uint32_t OS_GetTime() {
     }
 
     QueryPerformanceCounter(&now);
-    return (((now.QuadPart - qpc_start_time.QuadPart) * 1000) / qpc_ticks_per_sec.QuadPart);
+    return (uint32_t)(((now.QuadPart - qpc_start_time.QuadPart) * 1000) / qpc_ticks_per_sec.QuadPart);
 }
 
 char* OS_GetFirstFileInDirectory(char* path) {
-
+    char with_extension[256];
     WIN32_FIND_DATA find_data;
     HANDLE hFind = NULL;
-    directory_handle = FindFirstFile(path, &find_data);
+
+    strcpy(with_extension, path);
+    strcat(with_extension, "\\*.???");
+    directory_handle = FindFirstFile(with_extension, &find_data);
     if (directory_handle == INVALID_HANDLE_VALUE) {
         return NULL;
     }
-    return find_data.cFileName;
+    strcpy(last_found_file, find_data.cFileName);
+    return last_found_file;
 }
 
 // Required: continue directory iteration. If no more files, return NULL
@@ -64,9 +69,8 @@ char* OS_GetNextFileInDirectory(void) {
     }
 
     while (FindNextFile(directory_handle, &find_data)) {
-        if (find_data.dwFileAttributes & FILE_ATTRIBUTE_NORMAL) {
-            return find_data.cFileName;
-        }
+        strcpy(last_found_file, find_data.cFileName);
+        return last_found_file;
     }
     FindClose(directory_handle);
     return NULL;

@@ -130,7 +130,7 @@ void DoOpeningAnimation() {
     LOG_TRACE("()");
     PlaySmackerFile("LOGO.SMK");
     PlaySmackerFile(harness_game_info.defines.INTRO_SMK_FILE);
-    return WaitForNoKeys();
+    WaitForNoKeys();
 }
 
 // IDA: void __cdecl DoNewGameAnimation()
