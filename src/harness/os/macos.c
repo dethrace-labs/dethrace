@@ -37,6 +37,10 @@ void OS_Sleep(int delay_ms) {
     nanosleep(&ts, &ts);
 }
 
+int OS_SetCurrentDirectory(char* path) {
+    return chdir(path);
+}
+
 char* OS_GetFirstFileInDirectory(char* path) {
     directory_iterator = opendir(path);
     if (directory_iterator == NULL) {

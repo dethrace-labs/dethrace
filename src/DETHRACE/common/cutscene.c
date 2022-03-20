@@ -14,7 +14,6 @@
 #include "utility.h"
 #include <stdlib.h>
 #include <time.h>
-#include <unistd.h>
 
 tS32 gLast_demo_end_anim;
 

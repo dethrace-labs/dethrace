@@ -1,7 +1,6 @@
 #include "harness/hooks.h"
 #include "pd/sys.h"
 #include <stdlib.h>
-#include <unistd.h>
 
 extern int original_main(int pArgc, char* pArgv[]);
 

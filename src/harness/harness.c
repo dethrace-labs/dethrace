@@ -10,7 +10,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <unistd.h>
 
 tRenderer* renderer;
 br_pixelmap* palette;
@@ -38,12 +37,16 @@ tHarness_game_config harness_game_config;
 int Harness_ProcessCommandLine(int* argc, char* argv[]);
 
 void Harness_DetectGameMode() {
-    if (access("DATA/RACES/CITY01.TXT", F_OK) == -1 && access("DATA/RACES/CITYA1.TXT", F_OK) == -1) {
+    FILE* city01 = fopen("DATA/RACES/CITY01.TXT", "r");
+    FILE* citya1 = fopen("DATA/RACES/CITYA1.TXT", "r");
+    FILE* splintro = fopen("DATA/CUTSCENE/SPLINTRO.SMK", "r");
+
+    if (city01 == NULL && citya1 == NULL) {
         harness_game_info.defines.INTRO_SMK_FILE = "";
         harness_game_info.defines.GERMAN_LOADSCRN = "COWLESS.PIX";
         harness_game_info.mode = eGame_carmageddon_demo;
         LOG_INFO("\"%s\"", "Carmageddon demo");
-    } else if (access("DATA/CUTSCENE/SPLINTRO.SMK", F_OK) != -1) {
+    } else if (splintro != NULL) {
         harness_game_info.defines.INTRO_SMK_FILE = "SPLINTRO.SMK";
         harness_game_info.defines.GERMAN_LOADSCRN = "LOADSCRN.PIX";
         harness_game_info.mode = eGame_splatpack;
@@ -54,6 +57,9 @@ void Harness_DetectGameMode() {
         harness_game_info.mode = eGame_carmageddon;
         LOG_INFO("\"%s\"", "Carmageddon");
     }
+    fclose(city01);
+    fclose(citya1);
+    fclose(splintro);
 }
 
 void Harness_Init(int* argc, char* argv[]) {
@@ -90,7 +96,7 @@ void Harness_Init(int* argc, char* argv[]) {
         LOG_INFO("DETHRACE_ROOT_DIR is not set, assuming '.'");
     } else {
         printf("DETHRACE_ROOT_DIR: %s\n", root_dir);
-        result = chdir(root_dir);
+        result = OS_SetCurrentDirectory(root_dir);
         if (result != 0) {
             LOG_PANIC("Failed to chdir. Error is %s", strerror(errno));
         }

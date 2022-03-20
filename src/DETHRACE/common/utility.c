@@ -21,7 +21,6 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
 
 // Added >>
 #define MIN_SERVICE_INTERVAL 200
@@ -1312,7 +1311,7 @@ void EncodeFile(char* pThe_path) {
     fclose(d);
 
     PDFileUnlock(pThe_path);
-    unlink(pThe_path);
+    remove(pThe_path);
     rename(new_file, pThe_path);
 }
 

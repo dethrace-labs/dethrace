@@ -17,6 +17,8 @@ char* OS_GetNextFileInDirectory(void);
 // Required: sleep for specified milliseconds
 void OS_Sleep(int ms);
 
+int OS_SetCurrentDirectory(char* path);
+
 // Optional: return true if a debugger is detected
 int OS_IsDebuggerPresent(void);
 

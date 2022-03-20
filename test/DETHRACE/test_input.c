@@ -3,7 +3,6 @@
 #include "common/globvars.h"
 #include "common/input.h"
 #include <string.h>
-#include <unistd.h>
 
 void test_input_KevKeyService() {
     int i;

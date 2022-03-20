@@ -21,7 +21,6 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <time.h>
-#include <unistd.h>
 
 #ifdef __DOS__
 #define GFX_INIT_STRING_32X20X8 "MCGA,W:320,H:200,B:8"

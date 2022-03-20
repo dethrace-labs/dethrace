@@ -12,7 +12,6 @@
 #include "sound.h"
 #include "utility.h"
 #include <stdlib.h>
-#include <unistd.h>
 
 int gPalette_allocate_count;
 int gPalette_fuck_prevention;
@@ -694,7 +693,7 @@ int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU3
     } else {
         pFlic_info->f = NULL;
         pFlic_info->data = (char*)pData_ptr;
-        //TOOD: remove this - we added this line because of the padding hack in PlayNextFlicFrame2
+        // TOOD: remove this - we added this line because of the padding hack in PlayNextFlicFrame2
         pFlic_info->data_start = (char*)pData_ptr;
     }
     pFlic_info->bytes_remaining = MemReadU32(&pFlic_info->data);
@@ -746,7 +745,7 @@ int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU3
     if (pDest_pixelmap) {
         pFlic_info->first_pixel = (tU8*)pDest_pixelmap->pixels + pDest_pixelmap->row_bytes * pFlic_info->y_offset + pFlic_info->x_offset;
     }
-    //LOG_DEBUG("first pixel %p %p", pFlic_info->first_pixel, pDest_pixelmap->pixels);
+    // LOG_DEBUG("first pixel %p %p", pFlic_info->first_pixel, pDest_pixelmap->pixels);
     pFlic_info->the_pixelmap = pDest_pixelmap;
     return 0;
 }
@@ -809,7 +808,7 @@ void DoColourMap(tFlic_descriptor_ptr pFlic_info, tU32 chunk_length) {
             red = MemReadU8(&pFlic_info->data);
             blue = MemReadU8(&pFlic_info->data);
             green = MemReadU8(&pFlic_info->data);
-            //argb
+            // argb
             palette_pixels[0] = green * 4;
             palette_pixels[1] = blue * 4;
             palette_pixels[2] = red * 4;
@@ -887,13 +886,13 @@ void DoColour256(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
             red = MemReadU8(&pFlic_info->data);
             blue = MemReadU8(&pFlic_info->data);
             green = MemReadU8(&pFlic_info->data);
-            //argb
+            // argb
             palette_pixels[0] = green;
             palette_pixels[1] = blue;
             palette_pixels[2] = red;
             palette_pixels[3] = 0;
             palette_pixels += 4;
-            //LOG_DEBUG("color %d", current_colour);
+            // LOG_DEBUG("color %d", current_colour);
         }
         if (!gPalette_fuck_prevention) {
             DRSetPaletteEntries(gPalette, current_colour, change_count);
@@ -1172,7 +1171,7 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
     int data_knocked_off;
     int read_amount;
 
-    //LOG_DEBUG("%d (%p), frames left: %d offset: %d", pFlic_info->the_index, pFlic_info, pFlic_info->frames_left, (pFlic_info->data - pFlic_info->data_start) + 4);
+    // LOG_DEBUG("%d (%p), frames left: %d offset: %d", pFlic_info->the_index, pFlic_info, pFlic_info->frames_left, (pFlic_info->data - pFlic_info->data_start) + 4);
     PossibleService();
     frame_length = MemReadU32(&pFlic_info->data);
     magic_bytes = MemReadU16(&pFlic_info->data);
@@ -1229,7 +1228,7 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
                 MemSkipBytes(&pFlic_info->data, chunk_length - 6);
                 break;
             }
-            //TODO: something like // p &= 0xfffffffffffffffe;
+            // TODO: something like // p &= 0xfffffffffffffffe;
             int a = (pFlic_info->data - pFlic_info->data_start);
             if (a % 2 == 1) {
                 pFlic_info->data++;
