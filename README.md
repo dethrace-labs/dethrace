@@ -11,11 +11,12 @@ Dethrace is an attempt to learn how the 1997 driving/mayhem game [Carmageddon](h
 ## Progress
 (Follow us on Twitter to get notified of updates!)
 
-#### Last updated Feb 6 2022
-- 33% of functions implemented
+#### Last updated March 21 2022
+- 57% of functions implemented
 - Latest screenshot:
 
-![Screen Shot 2022-01-28 at 1 03 35 PM](https://user-images.githubusercontent.com/78985374/152665901-ce835fb6-fd53-44de-bcd3-eba7ac931755.png)
+![Screen Shot 2022-03-21 at 12 31 30 PM](https://user-images.githubusercontent.com/78985374/159190761-c795bef8-75bb-4b32-a14c-52929cda314c.png)
+
 
 ## Background
 Watcom debug symbols for an earlier internal build [were discovered](http://1amstudios.com/2014/12/02/carma1-symbols-dumped) named `DETHRSC.SYM` on the [Carmageddon Splat Pack](http://carmageddon.wikia.com/wiki/Carmageddon_Splat_Pack) expansion CD release. The symbols unfortunately did not match any known released executable, meaning they were interesting but not immediately usable to reverse engineer the game.
