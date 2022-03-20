@@ -22,6 +22,7 @@
 #define Ebp Rbp
 #endif
 
+static int stack_nbr = 0;
 static char _program_name[1024];
 LARGE_INTEGER qpc_start_time, EndingTime, ElapsedMicroseconds;
 LARGE_INTEGER qpc_ticks_per_sec;
@@ -34,7 +35,7 @@ void OS_Sleep(int delay_ms) {
 
 uint32_t OS_GetTime() {
     LARGE_INTEGER now;
-    if (qpc_start_time == 0) {
+    if (qpc_start_time.QuadPart == 0) {
         QueryPerformanceFrequency(&qpc_ticks_per_sec);
         QueryPerformanceCounter(&qpc_start_time);
     }
@@ -47,7 +48,7 @@ char* OS_GetFirstFileInDirectory(char* path) {
 
     WIN32_FIND_DATA fdFile;
     HANDLE hFind = NULL;
-    directory_handle = FindFirstFile(sPath, &fdFile));
+    directory_handle = FindFirstFile(path, &fdFile));
     if (directory_handle == INVALID_HANDLE_VALUE) {
         return NULL;
     }
