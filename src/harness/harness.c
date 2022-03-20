@@ -36,17 +36,45 @@ tHarness_game_config harness_game_config;
 
 
 // German ASCII codes
-static int german_ascii_table[128] = {
+static int carmageddon_german_ascii_table[128] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107,
     108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 122, 121, 94, -33, -76, 8, 13, 13, 0, 45, 60, -10, -28, 46, 44, -4, 43, 35, 27,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, 56, -33, -76, 46, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 };
-static int german_ascii_shift_table[128] = {
+static int carmageddon_german_ascii_shift_table[128] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 61, 33, 34, -89, 36, 37, 38, 47, 40, 41, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75,
     76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 90, 89, -80, 63, 96, 8, 13, 13, 0, 95, 62, -42, -60, 58, 44, -36, 42, 39, 27,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, 56, -33, -76, 46, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+};
+
+// Demo ASCII codes
+static int demo_ascii_table[128] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107,
+    108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 122, 121, 94, -33, -76, 8, 13, 13, 0, 45, 60, -10, -28, 46, 44, -4, 43, 35, 27,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, 56, -33, -76, 46, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+};
+static int demo_ascii_shift_table[128] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 61, 33, 34, -89, 36, 37, 38, 47, 40, 41, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75,
+    76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 90, 89, -80, 63, 96, 8, 13, 13, 0, 95, 62, -42, -60, 58, 44, -36, 42, 39, 27,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, 56, -33, -76, 46, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+};
+
+// Splatpack Demo ASCII codes
+static int splatpack_xmasdemo_ascii_table[128] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75,
+    76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 96, 45, 61, 8, 13, 3, 9, 47, 92, 59, 39, 46, 44, 91, 93, 35, 27,
+    0, 127, 0, 0, 0, 0, 28, 29, 30, 31, 0, 47, 42, 45, 43, 46, 61, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32,
+};
+static int splatpack_xmasdemo_ascii_shift_table[128] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 41, 33, 34, 163, 36, 37, 94, 38, 42, 40, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75,
+    76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 172, 95, 43, 8, 13, 13, 0, 63, 124, 58, 64, 62, 44, 123, 125, 126, 27,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 47, 42, 45, 43, 46, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 8,
 };
 
 int Harness_ProcessCommandLine(int* argc, char* argv[]);
@@ -86,7 +114,7 @@ void Harness_DetectGameMode() {
             goto carmageddon;
         }
     } else {
-carmageddon:   
+carmageddon:
         if (access("DATA/CURSCENE/Mix_intr.smk", F_OK) == -1) {
             harness_game_info.defines.INTRO_SMK_FILE = "Mix_intr.smk";
         } else {
@@ -116,12 +144,26 @@ carmageddon:
         free(buffer);
     }
 
-    switch (harness_game_info.localization) {
-    case eGameLocalization_none:
+    switch (harness_game_info.mode) {
+    case eGame_carmageddon:
+        switch (harness_game_info.localization) {
+        case eGameLocalization_german:
+            harness_game_info.defines.ascii_table = carmageddon_german_ascii_table;
+            harness_game_info.defines.ascii_shift_table = carmageddon_german_ascii_shift_table;
+            break;
+        default:
+            break;
+        }
         break;
-    case eGameLocalization_german:
-        harness_game_info.defines.ascii_table = german_ascii_table;
-        harness_game_info.defines.ascii_shift_table = german_ascii_shift_table;
+    case eGame_carmageddon_demo:
+        harness_game_info.defines.ascii_table = demo_ascii_table;
+        harness_game_info.defines.ascii_shift_table = demo_ascii_shift_table;
+        break;
+    case eGame_splatpack_demo:
+        harness_game_info.defines.ascii_table = splatpack_xmasdemo_ascii_table;
+        harness_game_info.defines.ascii_shift_table = splatpack_xmasdemo_ascii_shift_table;
+        break;
+    default:
         break;
     }
 }
@@ -156,7 +198,7 @@ void Harness_Init(int* argc, char* argv[]) {
     }
 
     char* root_dir = getenv("DETHRACE_ROOT_DIR");
-    if (!root_dir) {
+    if (root_dir == NULL) {
         LOG_INFO("DETHRACE_ROOT_DIR is not set, assuming '.'");
     } else {
         printf("DETHRACE_ROOT_DIR: %s\n", root_dir);
