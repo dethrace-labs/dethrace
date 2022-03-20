@@ -22,19 +22,11 @@
 #include <unistd.h>
 #endif
 
-// #if defined(_WIN32) || defined(_WIN64)
-// #define snprintf _snprintf
-// #define vsnprintf _vsnprintf
-// #define strcasecmp _stricmp
-// #define strncasecmp _strnicmp
-// #else
-// #include <strings.h>
-// #endif
-
-// Required
-
 // Required: return timestamp in milliseconds.
 uint32_t OS_GetTime(void);
+
+// Required: sleep for specified milliseconds
+void OS_Sleep(int ms);
 
 // Required: begin a directory iteration and return name of first file
 char* OS_GetFirstFileInDirectory(char* path);
@@ -42,9 +34,7 @@ char* OS_GetFirstFileInDirectory(char* path);
 // Required: continue directory iteration. If no more files, return NULL
 char* OS_GetNextFileInDirectory(void);
 
-// Required: sleep for specified milliseconds
-void OS_Sleep(int ms);
-
+// Required: copy the `basename` component of `path` into `base`
 void OS_Basename(char* path, char* base);
 
 // Optional: return true if a debugger is detected

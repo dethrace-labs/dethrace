@@ -31,10 +31,6 @@ LARGE_INTEGER qpc_ticks_per_sec;
 HANDLE directory_handle = NULL;
 char last_found_file[260];
 
-void OS_Sleep(int delay_ms) {
-    Sleep(delay_ms);
-}
-
 uint32_t OS_GetTime() {
     LARGE_INTEGER now;
     if (qpc_start_time.QuadPart == 0) {
@@ -44,6 +40,10 @@ uint32_t OS_GetTime() {
 
     QueryPerformanceCounter(&now);
     return (uint32_t)(((now.QuadPart - qpc_start_time.QuadPart) * 1000) / qpc_ticks_per_sec.QuadPart);
+}
+
+void OS_Sleep(int delay_ms) {
+    Sleep(delay_ms);
 }
 
 char* OS_GetFirstFileInDirectory(char* path) {

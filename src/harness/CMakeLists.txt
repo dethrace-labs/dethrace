@@ -1,7 +1,7 @@
 add_library(harness STATIC)
 
-if (NOT DEFINED RENDERER_PLATFORM)
-    set(RENDERER_PLATFORM "SDL_OpenGL")
+if (NOT DEFINED IO_PLATFORM)
+    set(IO_PLATFORM "SDL_OpenGL")
 endif()
 
 target_include_directories(harness 
@@ -13,7 +13,7 @@ target_include_directories(harness
         include
 )
 
-target_link_libraries(harness PRIVATE brender SDL2::SDL2 glad s3 cglm_headers)
+target_link_libraries(harness PRIVATE brender s3 cglm_headers)
 
 if(WIN32)
     target_link_libraries(harness PRIVATE dbghelp)
@@ -50,7 +50,7 @@ target_sources(harness PRIVATE
     sound/sound.h
 )
 
-if (RENDERER_PLATFORM STREQUAL "SDL_OpenGL")
+if (IO_PLATFORM STREQUAL "SDL_OpenGL")
     target_sources(harness PRIVATE
         io_platforms/sdl_gl.c
         renderers/gl/gl_renderer.c
@@ -60,6 +60,7 @@ if (RENDERER_PLATFORM STREQUAL "SDL_OpenGL")
         renderers/gl/stored_context.c
         renderers/gl/stored_context.h
     )
+    target_link_libraries(harness PRIVATE SDL2::SDL2 glad)
 endif()
 
 if(WIN32)

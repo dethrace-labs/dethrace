@@ -1,7 +1,7 @@
 add_executable(dethrace_test)
 add_test(NAME test_dethrace COMMAND dethrace_test)
 
-set(RENDERER_PLATFORM "SDL_OpenGL2")
+set(IO_PLATFORM "SDL_OpenGL")
 
 target_link_libraries(dethrace_test PRIVATE glad dethrace_obj)
 
