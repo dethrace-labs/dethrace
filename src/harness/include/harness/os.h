@@ -7,10 +7,14 @@
 #include <direct.h>
 #define getcwd _getcwd
 #define chdir _chdir
-// #define snprintf _snprintf
-// #define vsnprintf _vsnprintf
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp
+
+#if _MSC_VER < 1900
+#define snprintf _snprintf
+#define vsnprintf _vsnprintf
+#endif
+
 #else
 #include <unistd.h>
 #endif

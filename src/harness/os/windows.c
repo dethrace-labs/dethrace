@@ -7,6 +7,7 @@
 
 #include "harness/os.h"
 #include <assert.h>
+#include <direct.h>
 #include <errno.h>
 #include <limits.h>
 #include <signal.h>
