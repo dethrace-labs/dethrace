@@ -6,6 +6,7 @@ typedef enum tHarness_game_type {
     eGame_carmageddon,
     eGame_splatpack,
     eGame_carmageddon_demo,
+    eGame_splatpack_demo,
 } tHarness_game_type;
 
 typedef enum {

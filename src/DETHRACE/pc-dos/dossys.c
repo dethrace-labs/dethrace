@@ -290,8 +290,8 @@ void PDInitialiseSystem() {
     gJoystick_deadzone = 8000;
     // gUpper_loop_limit = sub_A1940(v4, v5, v3, v6) / 2;
 
-    // Demo does not ship with KEYBOARD.COK file
-    if (harness_game_info.mode != eGame_carmageddon_demo) {
+    // Demo's do not ship with KEYBOARD.COK file
+    if (harness_game_info.mode != eGame_carmageddon_demo && harness_game_info.mode != eGame_splatpack_demo) {
         // Some localized Carmageddon releases have a hardcoded keyboard look-up table
         if (harness_game_info.defines.ascii_table == NULL) {
             PathCat(the_path, gApplication_path, "KEYBOARD.COK");

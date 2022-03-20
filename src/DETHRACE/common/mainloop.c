@@ -438,7 +438,7 @@ void CheckTimer() {
             RaceCompleted(eRace_over_out_of_time);
         }
 
-        if (harness_game_info.mode == eGame_carmageddon_demo) {
+        if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo) {
             time_left = 240000 - GetRaceTime();
             time_in_seconds = (time_left + 500) / 1000;
             if (time_in_seconds != last_demo_time_in_seconds && time_in_seconds <= 10)

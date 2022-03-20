@@ -52,17 +52,41 @@ static int german_ascii_shift_table[128] = {
 int Harness_ProcessCommandLine(int* argc, char* argv[]);
 
 void Harness_DetectGameMode() {
-    if (access("DATA/RACES/CITY01.TXT", F_OK) == -1 && access("DATA/RACES/CITYA1.TXT", F_OK) == -1) {
-        harness_game_info.defines.INTRO_SMK_FILE = "";
-        harness_game_info.defines.GERMAN_LOADSCRN = "COWLESS.PIX";
-        harness_game_info.mode = eGame_carmageddon_demo;
-        LOG_INFO("\"%s\"", "Carmageddon demo");
-    } else if (access("DATA/CUTSCENE/SPLINTRO.SMK", F_OK) != -1) {
-        harness_game_info.defines.INTRO_SMK_FILE = "SPLINTRO.SMK";
-        harness_game_info.defines.GERMAN_LOADSCRN = "LOADSCRN.PIX";
-        harness_game_info.mode = eGame_splatpack;
-        LOG_INFO("\"%s\"", "Splat Pack");
+    if (access("DATA/RACES/CASTLE.TXT", F_OK) != -1) {
+        // All splatpack edition have the castle track
+        if (access("DATA/RACES/CASTLE2.TXT", F_OK) != -1) {
+            // Only the full splat release has the castle2 track
+            harness_game_info.defines.INTRO_SMK_FILE = "SPLINTRO.SMK";
+            harness_game_info.defines.GERMAN_LOADSCRN = "LOADSCRN.PIX";
+            harness_game_info.mode = eGame_splatpack;
+            LOG_INFO("\"%s\"", "Splat Pack");
+        } else if (access("DATA/RACES/TINSEL.TXT", F_OK) != -1) {
+            // Only the the splat x-mas demo has the tinsel track
+            harness_game_info.defines.INTRO_SMK_FILE = "";
+            harness_game_info.defines.GERMAN_LOADSCRN = "";
+            harness_game_info.mode = eGame_splatpack_demo;
+            LOG_INFO("\"%s\"", "Splat Pack X-mas demo");
+        } else {
+            // Assume we're using the splatpack demo
+            harness_game_info.defines.INTRO_SMK_FILE = "";
+            harness_game_info.defines.GERMAN_LOADSCRN = "";
+            harness_game_info.mode = eGame_splatpack_demo;
+            LOG_INFO("\"%s\"", "Splat Pack demo");
+        }
+    } else if (access("DATA/RACES/CITYB3.TXT", F_OK) != -1) {
+        // All non-splatpack edition have the cityb3 track
+        if (access("DATA/CITYA1.TXT", F_OK) == -1) {
+            // The demo does not have the citya1 track
+            harness_game_info.defines.INTRO_SMK_FILE = "";
+            harness_game_info.defines.GERMAN_LOADSCRN = "COWLESS.PIX";
+            harness_game_info.mode = eGame_carmageddon_demo;
+            LOG_INFO("\"%s\"", "Carmageddon");
+        }
+        else {
+            goto carmageddon;
+        }
     } else {
+carmageddon:   
         if (access("DATA/CURSCENE/Mix_intr.smk", F_OK) == -1) {
             harness_game_info.defines.INTRO_SMK_FILE = "Mix_intr.smk";
         } else {
@@ -74,7 +98,7 @@ void Harness_DetectGameMode() {
     }
 
     harness_game_info.localization = eGameLocalization_none;
-    if (access("DATA/KEYBOARD.COK", F_OK) == -1 && access("DATA/TRNSLATE.TXT", F_OK) != -1) {
+    if (access("DATA/TRNSLATE.TXT", F_OK) != -1) {
         FILE *f = fopen("DATA/TRNSLATE.TXT", "rb");
         fseek(f, 0, SEEK_END);
         int filesize = ftell(f);
@@ -132,7 +156,7 @@ void Harness_Init(int* argc, char* argv[]) {
     }
 
     char* root_dir = getenv("DETHRACE_ROOT_DIR");
-    if (root_dir == NULL) {
+    if (!root_dir) {
         LOG_INFO("DETHRACE_ROOT_DIR is not set, assuming '.'");
     } else {
         printf("DETHRACE_ROOT_DIR: %s\n", root_dir);
