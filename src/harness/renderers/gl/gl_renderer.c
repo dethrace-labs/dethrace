@@ -421,13 +421,12 @@ void build_model(br_model* model) {
     }
 
     glGenVertexArrays(1, &ctx->vao_id);
-    GLuint vbo_id;
-    glGenBuffers(1, &vbo_id);
+    glGenBuffers(1, &ctx->vbo_id);
     glGenBuffers(1, &ctx->ebo_id);
 
-    // Vertices }
+    // Vertices
     glBindVertexArray(ctx->vao_id);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
+    glBindBuffer(GL_ARRAY_BUFFER, ctx->vbo_id);
     glBufferData(GL_ARRAY_BUFFER, sizeof(fmt_vertex) * total_verts, verts, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(fmt_vertex), (void*)offsetof(fmt_vertex, p));
     glEnableVertexAttribArray(0);
@@ -443,6 +442,7 @@ void build_model(br_model* model) {
 
     free(verts);
     free(indices);
+
     model->stored = ctx;
 
     CHECK_GL_ERROR("after build model");
@@ -485,6 +485,7 @@ void GLRenderer_Model(br_actor* actor, br_model* model, br_matrix34 model_matrix
     if (ctx == NULL) {
         build_model(model);
         ctx = model->stored;
+
         // DebugCamera_SetPosition(model_matrix.m[3][0], model_matrix.m[3][1], model_matrix.m[3][2]);
     }
     CHECK_GL_ERROR("rm1");
