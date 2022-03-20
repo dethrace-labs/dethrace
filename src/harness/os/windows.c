@@ -46,25 +46,25 @@ uint32_t OS_GetTime() {
 
 char* OS_GetFirstFileInDirectory(char* path) {
 
-    WIN32_FIND_DATA fdFile;
+    WIN32_FIND_DATA find_data;
     HANDLE hFind = NULL;
-    directory_handle = FindFirstFile(path, &fdFile));
+    directory_handle = FindFirstFile(path, &find_data);
     if (directory_handle == INVALID_HANDLE_VALUE) {
         return NULL;
     }
-    return fdFile.cFileName;
+    return find_data.cFileName;
 }
 
 // Required: continue directory iteration. If no more files, return NULL
 char* OS_GetNextFileInDirectory(void) {
-    WIN32_FIND_DATA fdFile;
+    WIN32_FIND_DATA find_data;
     if (directory_handle == NULL) {
         return NULL;
     }
 
-    while (FindNextFile(directory_handle, &fdFile)) {
-        if (fdFile.dwFileAttributes & FILE_ATTRIBUTE_NORMAL) {
-            return fdFile.cFileName;
+    while (FindNextFile(directory_handle, &find_data)) {
+        if (find_data.dwFileAttributes & FILE_ATTRIBUTE_NORMAL) {
+            return find_data.cFileName;
         }
     }
     FindClose(directory_handle);
