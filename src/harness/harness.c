@@ -103,12 +103,12 @@ void Harness_DetectGameMode() {
         }
     } else if (access("DATA/RACES/CITYB3.TXT", F_OK) != -1) {
         // All non-splatpack edition have the cityb3 track
-        if (access("DATA/CITYA1.TXT", F_OK) == -1) {
+        if (access("DATA/RACES/CITYA1.TXT", F_OK) == -1) {
             // The demo does not have the citya1 track
             harness_game_info.defines.INTRO_SMK_FILE = "";
             harness_game_info.defines.GERMAN_LOADSCRN = "COWLESS.PIX";
             harness_game_info.mode = eGame_carmageddon_demo;
-            LOG_INFO("\"%s\"", "Carmageddon");
+            LOG_INFO("\"%s\"", "Carmageddon demo");
         }
         else {
             goto carmageddon;
@@ -140,6 +140,9 @@ carmageddon:
         fclose(f);
         if (strstr(buffer, "NEUES SPIEL") != NULL) {
             harness_game_info.localization = eGameLocalization_german;
+            LOG_INFO("Language: \"%s\"", "German");
+        } else {
+            LOG_INFO("Language: unrecognized");
         }
         free(buffer);
     }
