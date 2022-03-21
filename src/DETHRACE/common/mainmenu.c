@@ -168,22 +168,22 @@ int DoMainMenuInterface(tU32 pTime_out, int pContinue_allowed) {
         0, // end_flic_escaped
         0, // end_flic_otherwise
         0, // flic_bunch_to_load
-        { 0x0FFFFFFFF, 0 }, // move_left_new_mode
+        { -1, 0 }, // move_left_new_mode
         { 0, 0 }, // move_left_delta
         { 0, 0 }, // move_left_min
         { 0, 0 }, // move_left_max
         { NULL, NULL }, // move_left_proc
-        { 0x0FFFFFFFF, 0 }, // move_right_new_mode
+        { -1, 0 }, // move_right_new_mode
         { 0, 0 }, // move_right_delta
         { 0, 0 }, // move_right_min
         { 0, 0 }, // move_right_max
         { NULL, NULL }, // move_right_proc
-        { 0x0FFFFFFFF, 0 }, // move_up_new_mode
-        { 0x0FFFFFFFF, 0 }, // move_up_delta
+        { -1, 0 }, // move_up_new_mode
+        { -1, 0 }, // move_up_delta
         { 0, 0 }, // move_up_min
         { 7, 0 }, // move_up_max
         { NULL, NULL }, // move_up_proc
-        { 0x0FFFFFFFF, 0 }, // move_down_new_mode
+        { -1, 0 }, // move_down_new_mode
         { 1, 0 }, // move_down_delta
         { 0, 0 }, // move_down_min
         { 7, 0 }, // move_down_max
@@ -203,11 +203,11 @@ int DoMainMenuInterface(tU32 pTime_out, int pContinue_allowed) {
         NULL, // get_original_string
         0, // escape_code
         0, // dont_save_or_load
-        8, // number_of_button_flics
+        COUNT_OF(flicker_on1), // number_of_button_flics
         flicker_on1, // flicker_on_flics
         flicker_off1, // flicker_off_flics
         push1, // pushed_flics
-        8, // number_of_mouse_areas
+        COUNT_OF(mouse_areas1), // number_of_mouse_areas
         mouse_areas1, // mouse_areas
         0, // number_of_recopy_areas
         NULL // recopy_areas
@@ -249,22 +249,22 @@ int DoMainMenuInterface(tU32 pTime_out, int pContinue_allowed) {
         0, // end_flic_escaped
         0, // end_flic_otherwise
         0, // flic_bunch_to_load
-        { 0x0FFFFFFFF, 0 }, // move_left_new_mode
+        { -1, 0 }, // move_left_new_mode
         { 0, 0 }, // move_left_delta
         { 0, 0 }, // move_left_min
         { 0, 0 }, // move_left_max
         { NULL, NULL }, // move_left_proc
-        { 0x0FFFFFFFF, 0 }, // move_right_new_mode
+        { -1, 0 }, // move_right_new_mode
         { 0, 0 }, // move_right_delta
         { 0, 0 }, // move_right_min
         { 0, 0 }, // move_right_max
         { NULL, NULL }, // move_right_proc
-        { 0x0FFFFFFFF, 0 }, // move_up_new_mode
-        { 0x0FFFFFFFF, 0 }, // move_up_delta
+        { -1, 0 }, // move_up_new_mode
+        { -1, 0 }, // move_up_delta
         { 0, 0 }, // move_up_min
         { 4, 0 }, // move_up_max
         { NULL, NULL }, // move_up_proc
-        { 0x0FFFFFFFF, 0 }, // move_down_new_mode
+        { -1, 0 }, // move_down_new_mode
         { 1, 0 }, // move_down_delta
         { 0, 0 }, // move_down_min
         { 4, 0 }, // move_down_max
@@ -284,11 +284,11 @@ int DoMainMenuInterface(tU32 pTime_out, int pContinue_allowed) {
         NULL, // get_original_string
         4, // escape_code
         0, // dont_save_or_load
-        5, // number_of_button_flics
+        COUNT_OF(flicker_on2), // number_of_button_flics
         flicker_on2, // flicker_on_flics
         flicker_off2, // flicker_off_flics
         push2, // pushed_flics
-        5, // number_of_mouse_areas
+        COUNT_OF(mouse_areas2), // number_of_mouse_areas
         mouse_areas2, // mouse_areas
         0, // number_of_recopy_areas
         NULL // recopy_areas

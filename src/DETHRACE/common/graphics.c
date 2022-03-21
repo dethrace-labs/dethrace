@@ -15,6 +15,7 @@
 #include "harness/hooks.h"
 #include "harness/trace.h"
 #include "init.h"
+#include "input.h"
 #include "loading.h"
 #include "netgame.h"
 #include "network.h"
@@ -38,15 +39,20 @@
 int gPalette_munged;
 int gColourValues[1];
 int gNext_transient;
-int gCursor_x_offsets[8];
-int gCursor_y_offsets[8];
-int gCursor_gib_x_offsets[8];
-int gCursor_gib_y_offsets[8];
-int gCursor_giblet_sequence0[7];
-int gCursor_giblet_sequence1[5];
-int gCursor_giblet_sequence2[5];
-int gCursor_giblet_sequence3[5];
-int* gCursor_giblet_sequences[4];
+int gCursor_x_offsets[8] = { 6, 8, 16, 36, 6, 8, 16, 36, };
+int gCursor_y_offsets[8] = { 26, 19, 12, 5, 26, 19, 12, 5, };
+int gCursor_gib_x_offsets[8] = { 82, 72, 66, 36, 82, 72, 66, 36, };
+int gCursor_gib_y_offsets[8] = { 74, 86, 93, 106, 74, 86, 93, 106, };
+int gCursor_giblet_sequence0[7] = { 6, 0, 1, 2, 3, 4, 5, };
+int gCursor_giblet_sequence1[5] = { 4, 6, 7, 8, 9, };
+int gCursor_giblet_sequence2[5] = { 4, 10, 11, 12, 13, };
+int gCursor_giblet_sequence3[5] = { 4, 14, 15, 16, 17, };
+int* gCursor_giblet_sequences[4] = {
+    gCursor_giblet_sequence0,
+    gCursor_giblet_sequence1,
+    gCursor_giblet_sequence2,
+    gCursor_giblet_sequence3,
+};
 char* gFont_names[21] = {
     "TYPEABLE",
     "ORANGHED",
@@ -1242,7 +1248,7 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
                 material = gShadow_model->faces[i].material;
                 if (material) {
                     if (material->colour_map && (material->flags & BR_MATF_LIGHT) != 0) {
-                        material->flags &= 0xFFFFFFF8;
+                        material->flags &= ~(BR_MATF_LIGHT |BR_MATF_PRELIT | BR_MATF_SMOOTH);
                         BrMaterialUpdate(material, BR_MATU_RENDERING);
                     }
                 }
@@ -1950,43 +1956,57 @@ void DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int
         dest_ptr -= pDest_y * pDest->row_bytes;
         pDest_y = 0;
     }
-    if (pDest->height > pDest_y) {
-        if (pDest_y + pHeight > pDest->height) {
-            pHeight = pDest->height - pDest_y;
+    if (pDest_y >= pDest->height) {
+        return;
+    }
+    if (pDest_y + pHeight > pDest->height) {
+        pHeight = pDest->height - pDest_y;
+    }
+    if (pDest_x < 0) {
+        pWidth += pDest_x;
+        if (pWidth <= 0) {
+            return;
         }
-        if (pDest_x < 0) {
-            pWidth += pDest_x;
-            if (pWidth <= 0) {
-                return;
-            }
-            source_ptr -= pDest_x;
-            dest_ptr -= pDest_x;
-            source_row_wrap -= pDest_x;
-            dest_row_wrap -= pDest_x;
-            pDest_x = 0;
-        }
-        if (pDest->width > pDest_x) {
-            if (pDest_x + pWidth > pDest->width) {
-                pWidth = pDest->width - pDest_x;
-                source_row_wrap += pDest_x + pWidth - pDest->width;
-                dest_row_wrap += pDest_x + pWidth - pDest->width;
-            }
-            if (gCurrent_conversion_table) {
-                TELL_ME_IF_WE_PASS_THIS_WAY();
-            } else {
-                for (y_count = 0; y_count < pHeight; y_count++) {
-                    for (x_count = 0; x_count < pWidth; x_count++) {
-                        the_byte = *source_ptr;
-                        if (the_byte) {
-                            *dest_ptr = the_byte;
-                        }
-                        source_ptr++;
-                        dest_ptr++;
-                    }
-                    source_ptr += source_row_wrap;
-                    dest_ptr += dest_row_wrap;
+        source_ptr -= pDest_x;
+        dest_ptr -= pDest_x;
+        source_row_wrap -= pDest_x;
+        dest_row_wrap -= pDest_x;
+        pDest_x = 0;
+    }
+    if (pDest_x >= pDest->width) {
+        return;
+    }
+    if (pDest_x + pWidth > pDest->width) {
+        source_row_wrap += pDest_x + pWidth - pDest->width;
+        dest_row_wrap += pDest_x + pWidth - pDest->width;
+        pWidth = pDest->width - pDest_x;
+    }
+    if (gCurrent_conversion_table != NULL) {
+        conv_table = gCurrent_conversion_table->pixels;
+        for (y_count = 0; y_count < pHeight; y_count++) {
+            for (x_count = 0; x_count < pWidth; x_count++) {
+                the_byte = *source_ptr;
+                if (the_byte != 0) {
+                    *dest_ptr = conv_table[the_byte];
                 }
+                source_ptr++;
+                dest_ptr++;
             }
+            source_ptr += source_row_wrap;
+            dest_ptr += dest_row_wrap;
+        }
+    } else {
+        for (y_count = 0; y_count < pHeight; y_count++) {
+            for (x_count = 0; x_count < pWidth; x_count++) {
+                the_byte = *source_ptr;
+                if (the_byte != 0) {
+                    *dest_ptr = the_byte;
+                }
+                source_ptr++;
+                dest_ptr++;
+            }
+            source_ptr += source_row_wrap;
+            dest_ptr += dest_row_wrap;
         }
     }
 }
@@ -2166,7 +2186,8 @@ void DRPixelmapRectangleVScaledCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
 void InitTransientBitmaps() {
     int i;
     LOG_TRACE("()");
-    for (i = 0; i < 50; i++) {
+
+    for (i = 0; i < COUNT_OF(gTransient_bitmaps); i++) {
         gTransient_bitmaps[i].pixmap = NULL;
         gTransient_bitmaps[i].in_use = 0;
     }
@@ -2176,40 +2197,100 @@ void InitTransientBitmaps() {
 int AllocateTransientBitmap(int pWidth, int pHeight, int pUser_data) {
     int bm_index;
     LOG_TRACE("(%d, %d, %d)", pWidth, pHeight, pUser_data);
-    NOT_IMPLEMENTED();
+
+    for (bm_index = 0; bm_index < COUNT_OF(gTransient_bitmaps); bm_index++) {
+        if (gTransient_bitmaps[bm_index].pixmap == NULL) {
+            gTransient_bitmaps[bm_index].pixmap = DRPixelmapAllocate(BR_PMT_INDEX_8, pWidth + 8, pHeight, NULL, 0);
+            gTransient_bitmaps[bm_index].in_use = 0;
+            gTransient_bitmaps[bm_index].user_data = pUser_data;
+            return bm_index;
+        }
+    }
+    FatalError(18);
 }
 
 // IDA: void __usercall DeallocateTransientBitmap(int pIndex@<EAX>)
 void DeallocateTransientBitmap(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+
+    if (gTransient_bitmaps[pIndex].pixmap != NULL) {
+        BrPixelmapFree(gTransient_bitmaps[pIndex].pixmap);
+        gTransient_bitmaps[pIndex].pixmap = NULL;
+        gTransient_bitmaps[pIndex].in_use = 0;
+    }
 }
 
 // IDA: void __cdecl DeallocateAllTransientBitmaps()
 void DeallocateAllTransientBitmaps() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < COUNT_OF(gTransient_bitmaps); i++) {
+        DeallocateTransientBitmap(i);
+    }
 }
 
 // IDA: void __usercall RemoveTransientBitmaps(int pGraphically_remove_them@<EAX>)
 void RemoveTransientBitmaps(int pGraphically_remove_them) {
     int i;
     int order_number;
-    STUB_ONCE();
+
+    if (pGraphically_remove_them) {
+        for (order_number = gNext_transient - 1; order_number >= 0; order_number--) {
+            for (i = 0; i < COUNT_OF(gTransient_bitmaps); i++) {
+                if (gTransient_bitmaps[i].pixmap != NULL && gTransient_bitmaps[i].order_number == order_number) {
+                    if (gTransient_bitmaps[i].in_use) {
+                        BrPixelmapRectangleCopy(gBack_screen,
+                            gTransient_bitmaps[i].x_coord,
+                            gTransient_bitmaps[i].y_coord,
+                            gTransient_bitmaps[i].pixmap,
+                            0,
+                            0,
+                            gTransient_bitmaps[i].pixmap->width,
+                            gTransient_bitmaps[i].pixmap->height);
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    gNext_transient = 0;
 }
 
 // IDA: void __usercall SaveTransient(int pIndex@<EAX>, int pX_coord@<EDX>, int pY_coord@<EBX>)
 void SaveTransient(int pIndex, int pX_coord, int pY_coord) {
     LOG_TRACE("(%d, %d, %d)", pIndex, pX_coord, pY_coord);
-    NOT_IMPLEMENTED();
+
+    gTransient_bitmaps[pIndex].x_coord = pX_coord & ~3;
+    gTransient_bitmaps[pIndex].y_coord = pY_coord;
+    gTransient_bitmaps[pIndex].in_use = 1;
+    gTransient_bitmaps[pIndex].order_number = gNext_transient;
+    gNext_transient++;
+    BrPixelmapRectangleCopy(gTransient_bitmaps[pIndex].pixmap,
+        0,
+        0,
+        gBack_screen,
+        gTransient_bitmaps[pIndex].x_coord, 
+        gTransient_bitmaps[pIndex].y_coord,
+        gTransient_bitmaps[pIndex].pixmap->width, 
+        gTransient_bitmaps[pIndex].pixmap->height);
 }
 
 // IDA: void __usercall DrawCursorGiblet(tCursor_giblet *pGib@<EAX>)
 void DrawCursorGiblet(tCursor_giblet* pGib) {
     br_pixelmap* the_image;
     LOG_TRACE("(%p)", pGib);
-    NOT_IMPLEMENTED();
+
+    SaveTransient(pGib->transient_index, pGib->x_coord, pGib->y_coord);
+    the_image = gCursor_giblet_images[gCursor_giblet_sequences[pGib->sequence_index][pGib->current_giblet]];
+    DRPixelmapRectangleMaskedCopy(gBack_screen,
+        pGib->x_coord,
+        pGib->y_coord,
+        the_image,
+        0,
+        0,
+        the_image->width,
+        the_image->height);
 }
 
 // IDA: void __usercall ProcessCursorGiblets(int pPeriod@<EAX>)
@@ -2219,7 +2300,57 @@ void ProcessCursorGiblets(int pPeriod) {
     tU32 time_now;
     tCursor_giblet* gib;
     LOG_TRACE("(%d)", pPeriod);
-    NOT_IMPLEMENTED();
+
+    time_now = PDGetTotalTime();
+    for (i = 0; i < COUNT_OF(gCursor_giblets); i++) {
+        gib = &gCursor_giblets[i];
+        kill_the_giblet = 0;
+        if (gib->current_giblet == -1) {
+            continue;
+        }
+        if (!gib->landed && gib->e_t_a <= time_now) {
+            gib->landed = 1;
+            gib->the_speed = 0.f;
+        }
+        if (gib->landed) {
+            gib->giblet_change_period -= pPeriod / 2;
+            if (gib->giblet_change_period < 50) {
+                gib->giblet_change_period = 50;
+            }
+            if (gib->giblet_change_period <= time_now - gib->last_giblet_change) {
+                if (gCursor_giblet_sequences[gib->sequence_index][0] == gib->current_giblet) {
+                    gib->current_giblet = 1;
+                } else {
+                    gib->current_giblet++;
+                }
+                gib->last_giblet_change = time_now;
+            }
+            gib->y_coord += pPeriod * gib->the_speed / 1000.f;
+            if (gib->y_coord <= gGraf_data[gGraf_data_index].height) {
+                if (gib->the_speed < gGraf_specs[gGraf_spec_index].total_height * 160 / 480) {
+                    gib->the_speed += pPeriod * gGraf_specs[gGraf_spec_index].total_height * 60 / 480 / 1000.f;
+                }
+            } else {
+                kill_the_giblet = 1;
+            }
+        } else {
+            if (gib->y_speed < gGraf_specs[gGraf_spec_index].total_height * 160 / 480) {
+                gib->y_speed += pPeriod * gGraf_specs[gGraf_spec_index].total_height * 60 / 480 / 1000.f * 2.f;
+            }
+            gib->x_coord += pPeriod * gib->x_speed / 1000.f;
+            gib->y_coord += pPeriod * gib->y_speed / 1000.f;
+            if (gib->x_coord < 0.f || gib->x_coord >= gGraf_data[gGraf_spec_index].width || gib->y_coord < 0.f || gib->y_coord >= gGraf_data[gGraf_spec_index].height) {
+                kill_the_giblet = 1;
+            }
+        }
+        if (kill_the_giblet) {
+            gib->current_giblet = -1;
+            DeallocateTransientBitmap(gib->transient_index);
+        } else {
+            DrawCursorGiblet(gib);
+        }
+
+    }
 }
 
 // IDA: int __usercall NewCursorGiblet@<EAX>(int pX_coord@<EAX>, int pY_coord@<EDX>, float pX_speed, float pY_speed, tU32 pDrop_time)
@@ -2229,11 +2360,34 @@ int NewCursorGiblet(int pX_coord, int pY_coord, float pX_speed, float pY_speed, 
     int the_height;
     int sequence_number;
     LOG_TRACE("(%d, %d, %f, %f, %d)", pX_coord, pY_coord, pX_speed, pY_speed, pDrop_time);
-    NOT_IMPLEMENTED();
+
+    sequence_number = IRandomBetween(0, COUNT_OF(gCursor_giblet_sequences) - 1);
+    if (pX_coord >= 0 && pX_coord < gGraf_data[gGraf_data_index].width && pY_coord >= 0 && pY_coord < gGraf_data[gGraf_data_index].height) {
+        for (i = 0; i < COUNT_OF(gCursor_giblets); i++) {
+            if (gCursor_giblets[i].current_giblet == -1) {
+                the_width = gCursor_giblet_images[gCursor_giblet_sequences[sequence_number][1]]->width;
+                the_height = gCursor_giblet_images[gCursor_giblet_sequences[sequence_number][1]]->height;
+                gCursor_giblets[i].transient_index = AllocateTransientBitmap(the_width, the_height, 1);
+                gCursor_giblets[i].current_giblet = 1;
+                gCursor_giblets[i].sequence_index = sequence_number;
+                gCursor_giblets[i].landed = 0;
+                gCursor_giblets[i].x_coord = sequence_number * gGraf_specs[gGraf_spec_index].total_width / 640 - the_width / 2 + pX_coord;
+                gCursor_giblets[i].y_coord = FRandomPosNeg(6.f) * gGraf_specs[gGraf_spec_index].total_height / 480 - the_height / 2 + pY_coord;
+                gCursor_giblets[i].x_speed = pX_speed;
+                gCursor_giblets[i].y_speed = pY_speed;
+                gCursor_giblets[i].last_giblet_change = 0;
+                gCursor_giblets[i].giblet_change_period = 1000;
+                gCursor_giblets[i].e_t_a = PDGetTotalTime() + pDrop_time;
+                return i;
+            }
+        }
+    }
+    return -1;
 }
 
 // IDA: int __cdecl DoMouseCursor()
 int DoMouseCursor() {
+    int x_coord;  // Added by DethRace
     int y_coord;
     int mouse_moved;
     int new_required;
@@ -2251,8 +2405,84 @@ int DoMouseCursor() {
     static int required_cursor;
     static int zero_count;
     static int button_was_down;
-    STUB_ONCE();
-    return 0;
+
+    period = 0;
+    this_call_time = PDGetTotalTime();
+    if (last_call_time == 0) {
+        period = 1000;
+    }
+    while (period <= 20) {
+        // Sleep 1 ms to avoid 100% CPU usage
+        Harness_Hook_Delay_ms(1);
+        this_call_time = PDGetTotalTime();
+        period = this_call_time - last_call_time;
+    }
+    GetMousePosition(&x_coord, &y_coord);
+    mouse_moved = x_coord != gMouse_last_x_coord || y_coord != gMouse_last_y_coord;
+    button_is_down = EitherMouseButtonDown();
+    cursor_offset = button_is_down ? 4 : 0;
+    if (gMouse_in_use || mouse_moved) {
+        gMouse_in_use = 1;
+        if (gMouse_last_x_coord == x_coord) {
+            if (zero_count >= 5) {
+                delta_x = 0;
+            }
+            zero_count++;
+        } else {
+            zero_count = 0;
+            delta_x = (x_coord - gMouse_last_x_coord) * 1000 / period;
+        }
+        if (delta_x < -10) {
+            new_required = 0;
+        } else if (delta_x < 11) {
+            new_required = 2;
+        } else {
+            new_required = 3;
+        }
+        if (new_required != required_cursor && this_call_time - last_required_change >= 200) {
+            last_required_change = this_call_time;
+            required_cursor = new_required;
+        }
+        if (gCurrent_cursor_index != required_cursor && PDGetTotalTime() - last_cursor_change >= 50) {
+            if (required_cursor < gCurrent_cursor_index) {
+                gCurrent_cursor_index--;
+            } else {
+                gCurrent_cursor_index++;
+            }
+            last_cursor_change = PDGetTotalTime();
+        }
+        giblet_chance = Chance(1.f + 20.f * (abs(x_coord - gMouse_last_x_coord) + abs(y_coord - gMouse_last_y_coord)) / (float)period, period);
+        if (gProgram_state.sausage_eater_mode) {
+            giblet_count = 0;
+        } else {
+            giblet_count = 6 * BooleanTo1Or0(button_is_down && !button_was_down) + BooleanTo1Or0(giblet_chance);
+        }
+        for (; giblet_count != 0; giblet_count--) {
+            NewCursorGiblet(
+                x_coord + gCursor_gib_x_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_width / 640,
+                y_coord + gCursor_gib_y_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_height / 480,
+                ((float)(x_coord - gMouse_last_x_coord)) / period * 1000.f / 4.f,
+                ((float)(y_coord - gMouse_last_y_coord)) / period * 1000.f / 3.f,
+                (button_is_down && !button_was_down) ? 50 : 400);
+        }
+        ProcessCursorGiblets(period);
+        SaveTransient(gCursor_transient_index,
+            x_coord - gCursor_x_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_width / 640,
+            y_coord - gCursor_y_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_height / 480);
+        DRPixelmapRectangleMaskedCopy(gBack_screen,
+            x_coord - gCursor_x_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_width / 640,
+            y_coord - gCursor_y_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_height / 480,
+            gCursors[gCurrent_cursor_index + cursor_offset],
+            0,
+            0,
+            gCursors[gCurrent_cursor_index + cursor_offset]->width,
+            gCursors[gCurrent_cursor_index + cursor_offset]->height);
+    }
+    last_call_time = this_call_time;
+    button_was_down = button_is_down;
+    gMouse_last_x_coord = x_coord;
+    gMouse_last_y_coord = y_coord;
+    return mouse_moved;
 }
 
 // IDA: int __cdecl AllocateCursorTransient()
@@ -2261,17 +2491,43 @@ int AllocateCursorTransient() {
     int largest_width;
     int largest_height;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    largest_width = 0;
+    largest_height = 0;
+    for (i = 0; i < COUNT_OF(gCursors); i++) {
+        if (largest_width < gCursors[i]->width) {
+            largest_width = gCursors[i]->width;
+        }
+        if (largest_height < gCursors[i]->height) {
+            largest_height = gCursors[i]->height;
+        }
+    }
+    return AllocateTransientBitmap(largest_width, largest_height, 0);
 }
 
 // IDA: void __cdecl StartMouseCursor()
 void StartMouseCursor() {
-    STUB();
+    int i;
+    LOG_TRACE("()");
+
+    gNext_transient = 0;
+    gCursor_transient_index = AllocateCursorTransient();
+    GetMousePosition(&gMouse_last_x_coord, &gMouse_last_y_coord);
+    gMouse_in_use = 0;
+    gCurrent_cursor_index = 2;
+    for (i = 0; i < COUNT_OF(gCursor_giblets); i++) {
+        gCursor_giblets[i].current_giblet = -1;
+    }
+    gMouse_started = 1;
 }
 
 // IDA: void __cdecl EndMouseCursor()
 void EndMouseCursor() {
-    STUB();
+    LOG_TRACE("()");
+
+    RemoveTransientBitmaps(1);
+    DeallocateAllTransientBitmaps();
+    gMouse_started = 0;
 }
 
 // IDA: void __usercall LoadFont(int pFont_ID@<EAX>)

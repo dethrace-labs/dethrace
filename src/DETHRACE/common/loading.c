@@ -550,7 +550,7 @@ void DRLoadPalette(char* pPath_name) {
     br_pixelmap* palette_array[100];
     int number_of_palettes;
 
-    number_of_palettes = DRPixelmapLoadMany(pPath_name, palette_array, 100);
+    number_of_palettes = DRPixelmapLoadMany(pPath_name, palette_array, COUNT_OF(palette_array));
     BrTableAddMany(palette_array, number_of_palettes);
 }
 
@@ -559,7 +559,7 @@ void DRLoadShadeTable(char* pPath_name) {
     br_pixelmap* table_array[100];
     int number_of_tables;
 
-    number_of_tables = DRPixelmapLoadMany(pPath_name, table_array, 100);
+    number_of_tables = DRPixelmapLoadMany(pPath_name, table_array, COUNT_OF(table_array));
     BrTableAddMany(table_array, number_of_tables);
 }
 
@@ -581,7 +581,7 @@ void DRLoadPixelmaps(char* pPath_name) {
 
     int i;
     PossibleService();
-    number_of_pixelmaps = DRPixelmapLoadMany(pPath_name, pixelmap_array, 100);
+    number_of_pixelmaps = DRPixelmapLoadMany(pPath_name, pixelmap_array, COUNT_OF(pixelmap_array));
 
     RezeroPixelmaps(pixelmap_array, number_of_pixelmaps);
     BrMapAddMany(pixelmap_array, number_of_pixelmaps);
@@ -593,7 +593,7 @@ void DRLoadMaterials(char* pPath_name) {
     int number_of_materials;
 
     PossibleService();
-    number_of_materials = BrMaterialLoadMany(pPath_name, material_array, 100);
+    number_of_materials = BrMaterialLoadMany(pPath_name, material_array, COUNT_OF(material_array));
     BrMaterialAddMany(material_array, number_of_materials);
 }
 
@@ -700,7 +700,7 @@ void LoadInterfaceStuff(int pWithin_race) {
         strcpy(path, "HANDX.PIX");
     }
     PossibleService();
-    if (!gCursors[0] && !LoadPixelmaps(path, gCursors, 4)) {
+    if (gCursors[0] == NULL && LoadPixelmaps(path, gCursors, 4) == 0) {
         FatalError(22);
     }
     if (gProgram_state.sausage_eater_mode) {
@@ -709,11 +709,11 @@ void LoadInterfaceStuff(int pWithin_race) {
         strcpy(path, "HANDPX.PIX");
     }
     PossibleService();
-    if (!gCursors[4] && !LoadPixelmaps(path, &gCursors[4], 4)) {
+    if (gCursors[4] == NULL && LoadPixelmaps(path, &gCursors[4], 4) == 0) {
         FatalError(22);
     }
     PossibleService();
-    if (!gCursor_giblet_images[0] && !LoadPixelmaps("CURSGIBX.PIX", gCursor_giblet_images, 18u)) {
+    if (gCursor_giblet_images[0] == NULL && LoadPixelmaps("CURSGIBX.PIX", gCursor_giblet_images, COUNT_OF(gCursor_giblet_images)) == 0) {
         FatalError(23);
     }
 }

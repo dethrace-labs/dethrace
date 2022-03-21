@@ -532,13 +532,12 @@ void PDMouseButtons(int* pButton_1, int* pButton_2) {
     br_int_32 mouse_y;
     LOG_TRACE("(%p, %p)", pButton_1, pButton_2);
 
-    STUB_ONCE();
-    *pButton_1 = 0;
-    *pButton_2 = 0;
+    Harness_Hook_GetMouseButtons(pButton_1, pButton_2);
 }
 
 // IDA: void __usercall PDGetMousePosition(int *pX_coord@<EAX>, int *pY_coord@<EDX>)
 void PDGetMousePosition(int* pX_coord, int* pY_coord) {
+#if 0
     br_uint_32 mouse_buttons;
     br_int_32 mouse_x2;
     br_int_32 mouse_y2;
@@ -546,8 +545,15 @@ void PDGetMousePosition(int* pX_coord, int* pY_coord) {
     int delta_y;
     static br_int_32 mouse_x;
     static br_int_32 mouse_y;
+#endif
+    int w;  // Added by DethRace
+    int h;  // Added by DethRace
     LOG_TRACE("(%p, %p)", pX_coord, pY_coord);
-    NOT_IMPLEMENTED();
+
+    Harness_Hook_GetWindowSize(&w, &h);
+    Harness_Hook_GetMousePosition(pX_coord, pY_coord);
+    *pX_coord = *pX_coord * gGraf_data[gGraf_data_index].width / w;
+    *pY_coord = *pY_coord * gGraf_data[gGraf_data_index].height / h;
 }
 
 // IDA: int __cdecl PDGetTotalTime()

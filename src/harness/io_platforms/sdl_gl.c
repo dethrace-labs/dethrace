@@ -217,10 +217,28 @@ void Window_Swap(int delay_ms_after_swap) {
     }
 }
 
+void Window_GetSize(int* pW, int* pH) {
+    SDL_GetWindowSize(window, pW, pH);
+}
+
 int* Input_GetKeyMap() {
     return (int*)keymap;
 }
 
 int Input_IsKeyDown(unsigned char scan_code) {
     return sdl_key_state[scan_code];
+}
+
+void Input_GetMousePosition(int* pX, int* pY) {
+    SDL_GetMouseState(pX, pY);
+}
+
+void Input_GetMouseButtons(int* pButton1, int* pButton2) {
+    int state = SDL_GetMouseState(NULL, NULL);
+    *pButton1 = state & SDL_BUTTON_LMASK;
+    *pButton2 = state & SDL_BUTTON_RMASK;
+}
+
+void Time_Delay_ms(int ms) {
+    SDL_Delay(ms);
 }

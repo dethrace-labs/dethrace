@@ -431,7 +431,15 @@ int GraphOptDown(int* pCurrent_choice, int* pCurrent_mode) {
 int RadioClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     int i;
     LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
-    NOT_IMPLEMENTED();
+
+    for (i = gRadio_bastards__options[*pCurrent_choice - 2].count - 1; i >= 0; i--) {
+        if (gThe_interface_spec__options->mouse_areas[2].left[gGraf_data_index] + pX_offset + 3 >= gRadio_bastards__options[*pCurrent_choice - 2].left[i]) {
+            DRS3StartSound(gIndexed_outlets[0], 3000);
+            RadioChanged(*pCurrent_choice - 2, i);
+            return 0;
+        }
+    }
+    return 0;
 }
 
 // IDA: int __usercall GraphOptGoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)

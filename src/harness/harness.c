@@ -252,6 +252,10 @@ void Harness_Hook_PDSetKeyArray() {
     Window_PollEvents();
 }
 
+void Harness_Hook_FlushRenderer() {
+    renderer->FlushBuffers(last_colour_buffer, last_depth_buffer);
+}
+
 void Harness_Hook_BrMaterialUpdate(br_material* mat, br_uint_16 flags) {
     renderer->BufferMaterial(mat);
 }
@@ -264,6 +268,21 @@ void Harness_Hook_BrBufferUpdate(br_pixelmap* pm, br_token use, br_uint_16 flags
     }
 }
 
+// Input hooks
+void Harness_Hook_GetMousePosition(int* pX, int* pY) {
+    Input_GetMousePosition(pX, pY);
+}
+
+void Harness_Hook_GetMouseButtons(int* pButton1, int* pButton2) {
+    Input_GetMouseButtons(pButton1, pButton2);
+}
+
+// Window hooks
+void Harness_Hook_GetWindowSize(int* pW, int* pH) {
+    Window_GetSize(pW, pH);
+}
+
+// Sound hooks
 void Harness_Hook_S3Service(int unk1, int unk2) {
     Sound_Service();
 }
@@ -271,6 +290,7 @@ void Harness_Hook_S3Service(int unk1, int unk2) {
 void Harness_Hook_S3StopAllOutletSounds() {
 }
 
-void Harness_Hook_FlushRenderer() {
-    renderer->FlushBuffers(last_colour_buffer, last_depth_buffer);
+// Various hooks
+void Harness_Hook_Delay_ms(int ms) {
+    Time_Delay_ms(ms);
 }

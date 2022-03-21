@@ -1757,7 +1757,21 @@ int GridClickCar(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY
     int base_pos;
     int x_coord;
     LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
-    NOT_IMPLEMENTED();
+
+    rel_pos = ((gCurrent_graf_data->grid_bottom_clip - gCurrent_graf_data->grid_top_clip) / 2) < pY_offset;
+    if (rel_pos) {
+        pX_offset -= gCurrent_graf_data->grid_x_stagger;
+    }
+    x_coord = pX_offset / gCurrent_graf_data->grid_x_pitch;
+    if (x_coord > 2) {
+        x_coord = 2;
+    }
+    new_pos = 2 * x_coord + rel_pos + (gOur_starting_position & ~1) - 2;
+    if (new_pos >= 0 && new_pos < gCurrent_race.number_of_racers && gProgram_state.rank < gCurrent_race.opponent_list[new_pos].ranking) {
+        DRS3StartSound(gIndexed_outlets[0], 3000);
+        DoGridTransition(gOur_starting_position, new_pos);
+    }
+    return 0;
 }
 
 // IDA: int __usercall GridClickNumbers@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
@@ -1765,19 +1779,33 @@ int GridClickNumbers(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, in
     int new_pos;
     int i;
     LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
-    NOT_IMPLEMENTED();
+
+    new_pos = -1;
+    for (i = 0; i < gCurrent_race.number_of_racers; i++) {
+        if (gGrid_number_x_coords[i] <= pX_offset && (gCurrent_race.number_of_racers - 1 == i || pX_offset < gGrid_number_x_coords[i + 1])) {
+            new_pos = i;
+            break;
+        }
+    }
+    if (new_pos >= 0 && new_pos < gCurrent_race.number_of_racers && gProgram_state.rank <= gCurrent_race.opponent_list[new_pos].ranking) {
+        DRS3StartSound(gIndexed_outlets[0], 3000);
+        DoGridTransition(gOur_starting_position, new_pos);
+    }
+    return 0;
 }
 
 // IDA: int __usercall GridClickLeft@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
 int GridClickLeft(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
-    NOT_IMPLEMENTED();
+
+    GridMoveLeft(pCurrent_choice, pCurrent_mode);
 }
 
 // IDA: int __usercall GridClickRight@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
 int GridClickRight(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
-    NOT_IMPLEMENTED();
+
+    GridMoveRight(pCurrent_choice, pCurrent_mode);
 }
 
 // IDA: int __usercall CheckChallenge@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
