@@ -43,24 +43,6 @@ void* BrFileOpenRead(char* name, br_size_t n_magics, br_mode_test_cbfn* mode_tes
         raw_file = fw.fsys->open_read(name, n_magics, mode_test, &bin_mode);
     }
 
-#ifdef BRENDER_FIX_BUGS
-    // Try all-uppercase filename for case sensitive file systems
-    if (raw_file == NULL) {
-        for (s = name + strlen(name); s != name;) {
-            s--;
-            if (*s == '\\' || *s == '/') {
-                break;
-            }
-            *s = toupper(*s);
-        }
-        if (mode_result != NULL) {
-            raw_file = fw.fsys->open_read(name, n_magics, mode_test, mode_result);
-        } else {
-            raw_file = fw.fsys->open_read(name, n_magics, mode_test, &bin_mode);
-        }
-    }
-#endif
-
     if (raw_file == NULL) {
         return NULL;
     }

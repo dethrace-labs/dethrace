@@ -673,7 +673,7 @@ int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU3
         PathCat(the_path, the_path, pFile_name);
         pFlic_info->f = DRfopen(the_path, "rb");
 
-        if (!pFlic_info->f) {
+        if (pFlic_info->f == NULL) {
             FatalError(13, pFile_name);
         }
         total_size = GetFileLength(pFlic_info->f);
@@ -1408,7 +1408,7 @@ int LoadFlicData(char* pName, tU8** pData, tU32* pData_length) {
         PathCat(the_path, gApplication_path, "ANIM");
         PathCat(the_path, the_path, pName);
         f = DRfopen(the_path, "rb");
-        if (!f) {
+        if (f == NULL) {
             return 0;
         }
         *pData_length = GetFileLength(f);

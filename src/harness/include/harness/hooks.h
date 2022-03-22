@@ -3,6 +3,8 @@
 
 #include "brender/br_types.h"
 
+#include <stdio.h>
+
 void Harness_Init(int* argc, char* argv[]);
 
 // Hooks are called from original game code.
@@ -40,5 +42,8 @@ void Harness_Hook_GetWindowSize(int* pW, int* pH);
 
 // Various hooks
 void Harness_Hook_Delay_ms(int ms);
+
+// Filesystem hooks
+FILE* Harness_Hook_fopen(const char* pathname, const char* mode);
 
 #endif

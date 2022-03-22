@@ -284,3 +284,7 @@ void OS_InstallSignalHandler(char* program_name) {
         }
     }
 }
+
+FILE* OS_fopen(const char* pathname, const char* mode) {
+    return fopen(pathname, mode);
+}

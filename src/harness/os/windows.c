@@ -204,3 +204,16 @@ void OS_InstallSignalHandler(char* program_name) {
     strcpy(_program_name, program_name);
     SetUnhandledExceptionFilter(windows_exception_handler);
 }
+
+FILE* OS_fopen(const char* pathname, const char* mode) {
+    FILE* f;
+    errno_t err;
+
+    f = NULL;
+    err = fopen_s(&f, pathname, mode);
+    if (err != 0) {
+        LOG_WARN("Failed to open \"%s\"", pathname);
+    }
+
+    return f;
+}

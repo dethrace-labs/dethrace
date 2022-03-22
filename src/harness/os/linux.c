@@ -284,3 +284,28 @@ void OS_InstallSignalHandler(char* program_name) {
         }
     }
 }
+
+FILE* OS_fopen(const char* pathname, const char* mode) {
+    FILE* f = fopen(pathname, mode);
+    if (f != NULL) {
+        return f;
+    }
+    char buffer[512];
+    char buffer2[512];
+    strcpy(buffer, pathname);
+    strcpy(buffer2, pathname);
+    char* pDirName = dirname(buffer);
+    char* pBaseName = basename(buffer2);
+    DIR* pDir = opendir(pDirName);
+    if (pDir == NULL) {
+        return NULL;
+    }
+    for (struct dirent* pDirent = readdir(pDir); pDirent != NULL; pDirent = readdir(pDir)) {
+        if (strcasecmp(pBaseName, pDirent->d_name) == 0) {
+            strcat(pDirName, "/");
+            strcat(pDirName, pDirent->d_name);
+            return fopen(pDirName, mode);
+        }
+    }
+    return NULL;
+}

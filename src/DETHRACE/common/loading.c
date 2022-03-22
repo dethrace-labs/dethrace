@@ -20,8 +20,6 @@
 #include "globvrpb.h"
 #include "grafdata.h"
 #include "graphics.h"
-#include "harness/config.h"
-#include "harness/trace.h"
 #include "init.h"
 #include "input.h"
 #include "newgame.h"
@@ -33,6 +31,9 @@
 #include "spark.h"
 #include "utility.h"
 #include "world.h"
+#include "harness/config.h"
+#include "harness/hooks.h"
+#include "harness/trace.h"
 #include <errno.h>
 
 #define HITHER_MULTIPLIER 2.0f
@@ -2633,7 +2634,7 @@ void LoadOpponents() {
             GetPairOfInts(f, &the_chunk->x_coord, &the_chunk->y_coord);
             GetPairOfInts(f, &the_chunk->frame_cue, &the_chunk->frame_end);
             the_chunk->line_count = GetAnInt(f);
-            while (the_chunk->line_count > 8) {
+            while (the_chunk->line_count > COUNT_OF(the_chunk->text)) {
                 the_chunk->line_count--;
                 GetALineAndDontArgue(f, s);
             }
@@ -3070,9 +3071,9 @@ FILE* OldDRfopen(char* pFilename, char* pMode) {
 
     LOG_TRACE("(\"%s\", \"%s\")", pFilename, pMode);
 
-    fp = fopen(pFilename, pMode);
+    fp = Harness_Hook_fopen(pFilename, pMode);
 
-    if (fp) {
+    if (fp != NULL) {
 
         // Demo does not check gDecode_thing ("i am fiddling" in PROG.ACT)
         // If the text file starts with a '@' character, it will be decoded, otherwise used as-is.

@@ -294,3 +294,8 @@ void Harness_Hook_S3StopAllOutletSounds() {
 void Harness_Hook_Delay_ms(int ms) {
     Time_Delay_ms(ms);
 }
+
+// Filesystem hooks
+FILE* Harness_Hook_fopen(const char* pathname, const char* mode) {
+    return OS_fopen(pathname, mode);
+}
