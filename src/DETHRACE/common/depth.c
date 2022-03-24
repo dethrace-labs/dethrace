@@ -276,8 +276,8 @@ void DoDepthByShadeTable(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer
 
     if (depth_shift_amount <= 0) {
         if (depth_shift_amount >= 0) {
-            for (y = 0; pRender_buffer->height > y; ++y) {
-                for (x = 0; pRender_buffer->width > x; ++x) {
+            for (y = 0; y < pRender_buffer->height; ++y) {
+                for (x = 0; x < pRender_buffer->width; ++x) {
                     if (*depth_ptr != 0xFFFF) {
                         depth_value = *depth_ptr - too_near;
                         if (depth_value < -(int16_t)too_near) {
@@ -477,8 +477,8 @@ void DepthEffect(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_act
 void DepthEffectSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world) {
     LOG_TRACE("(%p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world);
 
-    if (gProgram_state.current_depth_effect.sky_texture
-        && (!gLast_camera_special_volume || gLast_camera_special_volume->sky_col < 0)) {
+    if (gProgram_state.current_depth_effect.sky_texture != NULL
+            && (gLast_camera_special_volume == NULL || gLast_camera_special_volume->sky_col < 0)) {
         DoHorizon(pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world);
     }
 }

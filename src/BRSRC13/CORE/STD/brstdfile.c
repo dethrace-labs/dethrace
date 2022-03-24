@@ -1,6 +1,7 @@
 #include "brstdfile.h"
 
 #include "CORE/FW/diag.h"
+#include "harness/hooks.h"
 #include "harness/trace.h"
 #include <stdio.h>
 #include <string.h>
@@ -73,9 +74,9 @@ void* BrStdioOpenWrite(char* name, int mode) {
     FILE* fh;
 
     if (mode == BR_FS_MODE_TEXT) {
-        fh = fopen(name, "w");
+        fh = Harness_Hook_fopen(name, "w");
     } else {
-        fh = fopen(name, "wb");
+        fh = Harness_Hook_fopen(name, "wb");
     }
 
     return fh;

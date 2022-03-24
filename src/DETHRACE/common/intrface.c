@@ -66,23 +66,23 @@ void ChangeSelection(tInterface_spec* pSpec, int* pOld_selection, int* pNew_sele
         } else if (*pOld_selection < *pNew_selection) {
             do {
                 *pNew_selection = *pNew_selection + 1;
-                if (pSpec->move_up_min[pMode] != *pNew_selection && *pNew_selection <= pSpec->move_up_min[pMode]) {
+                if (*pNew_selection < pSpec->move_up_min[pMode]) {
                     *pNew_selection = pSpec->move_up_max[pMode];
                 }
-                if (pSpec->move_up_max[pMode] < *pNew_selection) {
+                if (*pNew_selection > pSpec->move_up_max[pMode]) {
                     *pNew_selection = pSpec->move_up_min[pMode];
                 }
-            } while (*pNew_selection != *pOld_selection && !ChoiceDisabled(*pNew_selection));
+            } while (*pNew_selection != *pOld_selection && ChoiceDisabled(*pNew_selection));
         } else {
             do {
                 *pNew_selection = *pNew_selection - 1;
-                if (pSpec->move_up_min[pMode] != *pNew_selection && *pNew_selection <= pSpec->move_up_min[pMode]) {
+                if (*pNew_selection < pSpec->move_up_min[pMode]) {
                     *pNew_selection = pSpec->move_up_max[pMode];
                 }
-                if (pSpec->move_up_max[pMode] < *pNew_selection) {
+                if (*pNew_selection > pSpec->move_up_max[pMode]) {
                     *pNew_selection = pSpec->move_up_min[pMode];
                 }
-            } while (*pNew_selection != *pOld_selection && !ChoiceDisabled(*pNew_selection));
+            } while (*pNew_selection != *pOld_selection && ChoiceDisabled(*pNew_selection));
         }
     }
 
@@ -157,7 +157,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
     tProg_status entry_status; //
     int x_coord; //
     int y_coord; //
-    int mouse_in_somewhere;
+    int mouse_in_somewhere = 0;
     int i; //
     int key2;
     int mouse_was_started;
@@ -170,8 +170,8 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
     int the_key; //
     int the_max;
     int mouse_down; //
-    int new_mouse_down = 0; //
-    int last_mouse_down;
+    int new_mouse_down; //
+    int last_mouse_down = 0;
     int defeat_mode_change; //
     int selection_changed; //
     char the_str[256];
@@ -233,9 +233,9 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
         copy_areas = BrMemAllocate(sizeof(void*) * pSpec->number_of_recopy_areas, kMem_intf_copy_areas);
         for (i = 0; i < pSpec->number_of_recopy_areas; i++) {
             copy_areas[i] = BrPixelmapAllocate(BR_MEMORY_PIXELS,
-                ((pSpec->recopy_areas[i].right[gGraf_data_index] - pSpec->recopy_areas[i].left[gGraf_data_index]) + 3) & 0xFC,
+                ((pSpec->recopy_areas[i].right[gGraf_data_index] - pSpec->recopy_areas[i].left[gGraf_data_index]) + 3) & ~3,
                 pSpec->recopy_areas[i].bottom[gGraf_data_index] - pSpec->recopy_areas[i].top[gGraf_data_index],
-                0, 0);
+                NULL, 0);
         }
     }
 
@@ -374,9 +374,11 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
         PDScreenBufferSwap(0);
         if (gMouse_in_use && !selection_changed) {
             GetMousePosition(&x_coord, &y_coord);
-            mouse_down = EitherMouseButtonDown();
-            last_choice = 0;
-            new_mouse_down = mouse_down && !new_mouse_down;
+            new_mouse_down = EitherMouseButtonDown();
+            mouse_down = new_mouse_down && !last_mouse_down;
+            last_mouse_down = new_mouse_down;
+
+            mouse_in_somewhere = 0;
             for (i = 0; i < pSpec->number_of_mouse_areas; i++) {
                 if (x_coord >= pSpec->mouse_areas[i].left[gGraf_data_index]
                     && y_coord >= pSpec->mouse_areas[i].top[gGraf_data_index]
@@ -393,10 +395,10 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
                     }
 
                     if (pSpec->mouse_areas[i].new_mode >= 0 || pSpec->mouse_areas[i].new_choice >= 0) {
-                        last_choice = 1;
+                        mouse_in_somewhere = 1;
                     }
                     if (mouse_down) {
-                        if (pSpec->mouse_areas[i].mouse_click) {
+                        if (pSpec->mouse_areas[i].mouse_click != NULL) {
                             mouse_down = pSpec->mouse_areas[i].mouse_click(&gCurrent_choice, &gCurrent_mode,
                                 x_coord - pSpec->mouse_areas[i].left[gGraf_data_index],
                                 y_coord - pSpec->mouse_areas[i].top[gGraf_data_index]);
@@ -407,7 +409,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
             }
         }
 
-        if (PDKeyDown(KEY_RETURN) || PDKeyDown(KEY_KP_ENTER) || (gTyping_slot < 0 && PDKeyDown(KEY_SPACE)) || (gMouse_in_use && last_choice && new_mouse_down)) {
+        if (PDKeyDown(KEY_RETURN) || PDKeyDown(KEY_KP_ENTER) || (gTyping_slot < 0 && PDKeyDown(KEY_SPACE)) || (gMouse_in_use && mouse_in_somewhere && mouse_down)) {
             DRS3StartSound(gIndexed_outlets[0], 3004);
             go_ahead = pSpec->go_ahead_allowed[gCurrent_mode];
             if (pSpec->go_ahead_proc[gCurrent_mode]) {
@@ -474,7 +476,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
         if (entry_status != eProg_idling && gProgram_state.prog_status == eProg_idling) {
             escaped = 1;
         }
-    } while ((!pSpec->exit_proc || !(pSpec->exit_proc)(&gCurrent_choice, &gCurrent_mode)) && !go_ahead && !timed_out && !escaped);
+    } while ((pSpec->exit_proc == NULL || !(pSpec->exit_proc)(&gCurrent_choice, &gCurrent_mode)) && !go_ahead && !timed_out && !escaped);
 
     LOG_WARN("OUT OF LOOP %d %d %d", go_ahead, timed_out, escaped);
     gTyping = 0;

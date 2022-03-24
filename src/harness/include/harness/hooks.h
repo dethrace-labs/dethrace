@@ -3,6 +3,8 @@
 
 #include "brender/br_types.h"
 
+#include <stdio.h>
+
 void Harness_Init(int* argc, char* argv[]);
 
 // Hooks are called from original game code.
@@ -27,8 +29,15 @@ void Harness_Hook_BrZbSceneRenderEnd();
 void Harness_Hook_BrBufferUpdate(br_pixelmap* pm, br_token use, br_uint_16 flags);
 void Harness_Hook_BrMaterialUpdate(br_material* mat, br_uint_16 flags);
 
+// Input hooks
+void Harness_Hook_GetMousePosition(int* pX, int* pY);
+void Harness_Hook_GetMouseButtons(int* pButton1, int* pButton2);
+
 // Sound hooks
 void Harness_Hook_S3Service(int unk1, int unk2);
 void Harness_Hook_S3StopAllOutletSounds();
+
+// Filesystem hooks
+FILE* Harness_Hook_fopen(const char* pathname, const char* mode);
 
 #endif

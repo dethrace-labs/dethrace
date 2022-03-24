@@ -8,5 +8,7 @@ void Window_PollEvents(void);
 void Window_Swap(int delay_ms_after_swap);
 int* Input_GetKeyMap(void);
 int Input_IsKeyDown(unsigned char scan_code);
+void Input_GetMousePosition(int* pX, int* pY);
+void Input_GetMouseButtons(int* pButton1, int* pButton2);
 
 #endif

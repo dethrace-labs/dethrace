@@ -673,7 +673,6 @@ void PrintScreenFile(FILE* pF) {
         offset -= 2 * gBack_screen->row_bytes;
     }
     WriteU16L(pF, 0);
-    ;
 }
 
 // IDA: void __usercall PrintScreenFile16(FILE *pF@<EAX>)

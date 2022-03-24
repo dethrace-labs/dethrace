@@ -2,6 +2,7 @@
 #define HARNESS_OS_H
 
 #include <stdint.h>
+#include <stdio.h>
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <direct.h>
@@ -42,5 +43,7 @@ int OS_IsDebuggerPresent(void);
 
 // Optional: install a handler to print stack trace during a crash
 void OS_InstallSignalHandler(char* program_name);
+
+FILE* OS_fopen(const char* pathname, const char* mode);
 
 #endif
