@@ -277,22 +277,12 @@ void Harness_Hook_GetMouseButtons(int* pButton1, int* pButton2) {
     Input_GetMouseButtons(pButton1, pButton2);
 }
 
-// Window hooks
-void Harness_Hook_GetWindowSize(int* pW, int* pH) {
-    Window_GetSize(pW, pH);
-}
-
 // Sound hooks
 void Harness_Hook_S3Service(int unk1, int unk2) {
     Sound_Service();
 }
 
 void Harness_Hook_S3StopAllOutletSounds() {
-}
-
-// Various hooks
-void Harness_Hook_Delay_ms(int ms) {
-    Time_Delay_ms(ms);
 }
 
 // Filesystem hooks

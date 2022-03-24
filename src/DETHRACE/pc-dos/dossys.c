@@ -550,10 +550,7 @@ void PDGetMousePosition(int* pX_coord, int* pY_coord) {
     int h;  // Added by DethRace
     LOG_TRACE("(%p, %p)", pX_coord, pY_coord);
 
-    Harness_Hook_GetWindowSize(&w, &h);
     Harness_Hook_GetMousePosition(pX_coord, pY_coord);
-    *pX_coord = *pX_coord * gGraf_data[gGraf_data_index].width / w;
-    *pY_coord = *pY_coord * gGraf_data[gGraf_data_index].height / h;
 }
 
 // IDA: int __cdecl PDGetTotalTime()

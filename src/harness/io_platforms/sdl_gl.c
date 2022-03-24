@@ -122,6 +122,7 @@ int keymap[123] = {
 SDL_Window* window;
 SDL_GLContext context;
 uint8_t sdl_key_state[256];
+SDL_FPoint sdl_window_scale;
 
 tRenderer gl_renderer = {
     GLRenderer_Init,
@@ -155,7 +156,7 @@ tRenderer* Window_Create(char* title, int width, int height, int pRender_width, 
         width, height,
         SDL_WINDOW_OPENGL);
 
-    if (!window) {
+    if (window == NULL) {
         LOG_PANIC("Failed to create window");
     }
 
@@ -163,6 +164,9 @@ tRenderer* Window_Create(char* title, int width, int height, int pRender_width, 
     if (!OS_IsDebuggerPresent()) {
         SDL_SetRelativeMouseMode(SDL_TRUE);
     }
+
+    sdl_window_scale.x = ((float)pRender_width) / width;
+    sdl_window_scale.y = ((float)pRender_height) / height;
 
     // SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
@@ -217,10 +221,6 @@ void Window_Swap(int delay_ms_after_swap) {
     }
 }
 
-void Window_GetSize(int* pW, int* pH) {
-    SDL_GetWindowSize(window, pW, pH);
-}
-
 int* Input_GetKeyMap() {
     return (int*)keymap;
 }
@@ -231,14 +231,12 @@ int Input_IsKeyDown(unsigned char scan_code) {
 
 void Input_GetMousePosition(int* pX, int* pY) {
     SDL_GetMouseState(pX, pY);
+    *pX *= sdl_window_scale.x;
+    *pY *= sdl_window_scale.y;
 }
 
 void Input_GetMouseButtons(int* pButton1, int* pButton2) {
     int state = SDL_GetMouseState(NULL, NULL);
     *pButton1 = state & SDL_BUTTON_LMASK;
     *pButton2 = state & SDL_BUTTON_RMASK;
-}
-
-void Time_Delay_ms(int ms) {
-    SDL_Delay(ms);
 }

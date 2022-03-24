@@ -12,7 +12,7 @@
 #include "globvars.h"
 #include "globvrpb.h"
 #include "grafdata.h"
-#include "harness/hooks.h"
+#include "harness/os.h"
 #include "harness/trace.h"
 #include "init.h"
 #include "input.h"
@@ -2413,7 +2413,7 @@ int DoMouseCursor() {
     }
     while (period <= 20) {
         // Sleep 1 ms to avoid 100% CPU usage
-        Harness_Hook_Delay_ms(1);
+        OS_Sleep(1);
         this_call_time = PDGetTotalTime();
         period = this_call_time - last_call_time;
     }

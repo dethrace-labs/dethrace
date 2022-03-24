@@ -37,12 +37,6 @@ void Harness_Hook_GetMouseButtons(int* pButton1, int* pButton2);
 void Harness_Hook_S3Service(int unk1, int unk2);
 void Harness_Hook_S3StopAllOutletSounds();
 
-// Window hooks
-void Harness_Hook_GetWindowSize(int* pW, int* pH);
-
-// Various hooks
-void Harness_Hook_Delay_ms(int ms);
-
 // Filesystem hooks
 FILE* Harness_Hook_fopen(const char* pathname, const char* mode);
 
