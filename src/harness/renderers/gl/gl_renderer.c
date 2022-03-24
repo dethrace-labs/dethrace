@@ -357,8 +357,6 @@ void build_model(br_model* model) {
     tStored_model_context* ctx;
     v11model* v11;
 
-    LOG_DEBUG("called %s", model->identifier);
-
     v11 = model->prepared;
     ctx = NewStoredModelContext();
 

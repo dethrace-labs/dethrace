@@ -1,4 +1,12 @@
 #include "demo.h"
+#include "globvars.h"
+#include "graphics.h"
+#include "input.h"
+#include "loading.h"
+#include "sound.h"
+#include "utility.h"
+#include "s3/s3sound.h"
+#include "pd/sys.h"
 #include "harness/trace.h"
 #include <stdlib.h>
 
@@ -16,5 +24,52 @@ void DoDemo() {
     char* str;
     tS3_sound_tag song_tag;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    PathCat(the_path, gApplication_path, "DEMOFILE.TXT");
+    f = DRfopen(the_path, "rt");
+    if (f == NULL) {
+        return;
+    }
+    count = GetAnInt(f);
+    gLast_demo++;
+    if (gLast_demo >= count) {
+        gLast_demo = 0;
+    }
+    for (i = 0; i <= gLast_demo; i++) {
+        GetALineAndDontArgue(f, s);
+    }
+    fclose(f);
+    PathCat(the_path, gApplication_path, s);
+    f = DRfopen(the_path, "rb");
+    if (f == NULL) {
+        return;
+    }
+
+    ClearEntireScreen();
+    song_tag = S3StartSound(gIndexed_outlets[0], 10000);
+    DRSetPalette(gRender_palette);
+    FadePaletteUp();
+
+    while (1) {
+        SoundService();
+        start_time = PDGetTotalTime();
+        frame_time = ReadS32(f);
+        fread(gBack_screen->pixels, gBack_screen->height * gBack_screen->width, 1, f);
+        PDScreenBufferSwap(0);
+        while (frame_time > PDGetTotalTime() - start_time && !AnyKeyDown() && !EitherMouseButtonDown()) {
+            // FIXME: sleep? SoundService?
+        }
+        if (!S3SoundStillPlaying(song_tag)) {
+            song_tag = S3StartSound(gIndexed_outlets[0], 10000);
+        }
+        if (AnyKeyDown() || EitherMouseButtonDown() || feof(f)) {
+            break;
+        }
+    }
+    S3StopSound(song_tag);
+    S3StopAllOutletSounds(gIndexed_outlets[0]);
+    S3StopAllOutletSounds();
+    fclose(f);
+    FadePaletteDown();
+    WaitForNoKeys();
 }

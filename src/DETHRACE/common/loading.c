@@ -40,7 +40,7 @@
 #define AMBIENT_MULTIPLIER 0.01f
 #define NBR_FUNK_GROVE_FLAGS 30
 
-tHeadup_info gHeadup_image_info[31] = {
+tHeadup_info gHeadup_image_info[32] = {
     { "LADY.PIX", eNet_or_otherwise },
     { "GENT.PIX", eNet_or_otherwise },
     { "CODGER.PIX", eNet_or_otherwise },
@@ -71,7 +71,8 @@ tHeadup_info gHeadup_image_info[31] = {
     { "GAMEOVER.PIX", eNet_only },
     { "UBROKE.PIX", eNet_only },
     { "ULOST.PIX", eNet_only },
-    { "UWON.PIX", eNet_only }
+    { "UWON.PIX", eNet_only },
+    { "DTIMEOUT.PIX", eNot_net },
 };
 char* gYour_car_names[2][6];
 char* gDrivable_car_names[6];
@@ -676,7 +677,7 @@ void LoadKeyMapping() {
     LOG_TRACE("()");
 
     PathCat(the_path, gApplication_path, "KEYMAP_X.TXT");
-    the_path[strlen(the_path) - 5] = gKey_map_index + 48;
+    the_path[strlen(the_path) - 5] = '0' + gKey_map_index;
     f = DRfopen(the_path, "rt");
     if (!f) {
         FatalError(9);

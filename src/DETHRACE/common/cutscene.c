@@ -1,5 +1,7 @@
 #include "cutscene.h"
+#include "drmem.h"
 #include "errors.h"
+#include "flicplay.h"
 #include "globvars.h"
 #include "globvrpb.h"
 #include "graphics.h"
@@ -21,7 +23,26 @@ tS32 gLast_demo_end_anim;
 void ShowCutScene(int pIndex, int pWait_end, int pSound_ID, br_scalar pDelay) {
     LOG_TRACE("(%d, %d, %d, %f)", pIndex, pWait_end, pSound_ID, pDelay);
 
-    NOT_IMPLEMENTED();
+    gProgram_state.cut_scene = 1;
+    if (pSound_ID >= 0) {
+        DRS3LoadSound(pSound_ID);
+        SetFlicSound(pSound_ID, PDGetTotalTime() + 1000.f * pDelay);
+    }
+    SetNonFatalAllocationErrors();
+    RunFlic(pIndex);
+    ResetNonFatalAllocationErrors();
+    if (pWait_end) {
+        WaitForAKey();
+    } else {
+        WaitForNoKeys();
+    }
+    FadePaletteDown();
+    ClearEntireScreen();
+    if (pSound_ID >= 0) {
+        DRS3ReleaseSound(pSound_ID);
+        SetFlicSound(0, 0);
+    }
+    gProgram_state.cut_scene = 0;
 }
 
 // IDA: void __cdecl DoSCILogo()
@@ -128,6 +149,7 @@ void PlaySmackerFile(char* pSmack_name) {
 // IDA: void __cdecl DoOpeningAnimation()
 void DoOpeningAnimation() {
     LOG_TRACE("()");
+
     PlaySmackerFile("LOGO.SMK");
     PlaySmackerFile(harness_game_info.defines.INTRO_SMK_FILE);
     WaitForNoKeys();
@@ -192,6 +214,62 @@ void DoGameCompletedAnimation() {
     StopMusic();
     PlaySmackerFile("TOPRANK.SMK");
     StartMusic();
+}
+
+void DoFeatureUnavailableInDemo() {
+    LOG_TRACE("()");
+
+    PrintMemoryDump(0, "BEFORE DEMO-ONLY SCREEN");
+    SuspendPendingFlic();
+    FadePaletteDown();
+
+    ShowCutScene(7, 1, 8502, gCut_delay_3);
+    // gProgram_state.cut_scene = 1;
+    // DRS3LoadSound(8502);
+    // SetFlicSound(8502, PDGetTotalTime() + gCut_delay_3 * 1000.f);
+    // SetNonFatalAllocationErrors();
+    // RunFlic(7);
+    // ResetNonFatalAllocationErrors();
+    // WaitForAKey();
+    // FadePaletteDown();
+    // ClearEntireScreen();
+    // DRS3ReleaseSound(8502);
+    // SetFlicSound(0, 0);
+    // gProgram_state.cut_scene = 0;
+    FadePaletteDown();
+    PrintMemoryDump(0, "AFTER DEMO-ONLY SCREEN");
+}
+
+void DoFullVersionPowerpoint() {
+    LOG_TRACE("()");
+
+    FadePaletteDown();
+    DRSetPalette(gRender_palette);
+
+    ShowCutScene(9, 0, 8503, gCut_delay_4);
+    // gProgram_state.cut_scene = 1;
+    // DRS3LoadSound(8503);
+    // SetFlicSound(8503, PDGetTotalTime() + gCut_delay_4 * 1000.f);
+    // SetNonFatalAllocationErrors();
+    // RunFlic(9);
+    // ResetNonFatalAllocationErrors();
+    // WaitForNoKeys();
+    // FadePaletteDown();
+    // ClearEntireScreen();
+    // DRS3ReleaseSound(8503);
+    // SetFlicSound(0, 0);
+    // gProgram_state.cut_scene = 0;
+    gLast_demo_end_anim = PDGetTotalTime();
+}
+
+void DoDemoGoodbye() {
+    if (PDGetTotalTime() - gError_code > 90000) {
+        FadePaletteDown();
+        DRSetPalette(gRender_palette);
+        ShowCutScene(9, 0, 8503, gCut_delay_4);
+        FadePaletteDown();
+        gLast_demo_end_anim = PDGetTotalTime();
+    }
 }
 
 // IDA: void __cdecl StartLoadingScreen()

@@ -37,7 +37,7 @@ int gTimer_headup;
 int gTime_awarded_headup;
 int gPed_kill_count_headup;
 int gDim_amount;
-br_pixelmap* gHeadup_images[31];
+br_pixelmap* gHeadup_images[32];
 int gNet_cash_headup;
 int gNet_ped_headup;
 int gCredits_lost_headup;

@@ -1,4 +1,5 @@
 #include "loadsave.h"
+#include "cutscene.h"
 #include "errors.h"
 #include "globvars.h"
 #include "flicplay.h"
@@ -15,6 +16,7 @@
 #include "utility.h"
 #include "world.h"
 #include <brender/brender.h>
+#include "harness/config.h"
 #include "harness/trace.h"
 #include <stdlib.h>
 #include <string.h>
@@ -284,6 +286,11 @@ int DoLoadGame() {
     };
     int result;
     LOG_TRACE("()");
+
+    if (harness_game_info.mode == eGame_carmageddon_demo) {
+        DoFeatureUnavailableInDemo();
+        return 0;
+    }
 
     if (gNet_mode == eNet_mode_none) {
         if (!OriginalCarmaCDinDrive()) {
@@ -647,6 +654,11 @@ int SaveGameInterface(int pDefault_choice) {
 // IDA: void __usercall DoSaveGame(int pSave_allowed@<EAX>)
 void DoSaveGame(int pSave_allowed) {
     LOG_TRACE("()");
+
+    if (harness_game_info.mode == eGame_carmageddon_demo) {
+        DoFeatureUnavailableInDemo();
+        return;
+    }
 
     if (gNet_mode == eNet_mode_none) {
         DRS3StopOutletSound(gIndexed_outlets[0]);

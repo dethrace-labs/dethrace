@@ -25,7 +25,7 @@ int gTrans_enabled = 1;
 br_pixelmap* gPanel_buffer[2];
 tU32 gSound_time;
 tFlic_spec gMain_flic_list[372] = {
-    { "xxxxxxxx.FLI", 1, 0, 0, 0, 0, 25, NULL, 0u },
+    { "MAINSTIL.FLI", 1, 0, 0, 0, 0, 25, NULL, 0u },
     { "DEMSTRT2.FLI", 1, 0, 0, 0, 0, 0, NULL, 0u },
     { "DEMSTRT1.FLI", 1, 0, 0, 0, 0, 0, NULL, 0u },
     { "NEWFLIC.FLI", 1, 0, 0, 0, 0, 0, NULL, 0u },

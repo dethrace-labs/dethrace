@@ -35,49 +35,49 @@
 #include <stdlib.h>
 
 tToggle_element gToggle_array[] = {
-    { 34, -2, 1, 1, 0, ToggleMirror },
-    { 56, -2, 1, 1, 0, ToggleMap },
-    { 35, -2, 1, 1, 0, TogglePratcam },
-    { 59, -2, 1, 1, 0, SetRecovery },
-    { 4, 7, 1, 1, 0, AbortRace },
-    { 45, -2, 1, 1, 0, ToggleCockpit },
-    { 50, -2, 1, 1, 0, LookLeft },
-    { 51, -2, 1, 1, 0, LookRight },
-    { 52, -2, 1, 1, 0, DamageTest },
-    { 36, -2, 0, 1, 0, ToggleSoundEnable },
-    { 5, 8, 0, 1, 0, PrintScreen },
-    { 9, 7, 1, 1, 0, DrawSomeText }, // commented out in original executable  // ctrl+f5
-    { 10, 7, 1, 1, 0, ToggleFlying },
-    { 54, -2, 1, 1, 0, TogglePedestrians },
-    { 17, -2, 0, 0, 0, F4Key },
-    { 18, -2, 1, 0, 0, F5Key },
-    { 19, -2, 1, 0, 0, F6Key },
-    { 20, -2, 1, 0, 0, F7Key },
-    { 21, -2, 1, 0, 0, F8Key },
-    { 22, -2, 1, 0, 0, F10Key },
-    { 23, -2, 1, 0, 0, F11Key },
-    { 24, -2, 1, 0, 0, F12Key },
-    { 14, -2, 1, 0, 0, NumberKey0 },
-    { 37, -2, 1, 0, 0, NumberKey1 },
-    { 38, -2, 1, 0, 0, NumberKey2 },
-    { 39, -2, 1, 0, 0, NumberKey3 },
-    { 40, -2, 1, 0, 0, NumberKey4 },
-    { 41, -2, 1, 0, 0, NumberKey5 },
-    { 42, -2, 1, 0, 0, NumberKey6 },
-    { 43, -2, 1, 0, 0, NumberKey7 },
-    { 15, -2, 1, 0, 0, NumberKey8 },
-    { 16, -2, 1, 0, 0, NumberKey9 },
-    { 60, -2, 1, 0, 0, ScreenSmaller },
-    { 61, -2, 1, 0, 0, ScreenLarger },
-    { 62, -2, 1, 0, 0, BuyArmour },
-    { 63, -2, 1, 0, 0, BuyPower },
-    { 64, -2, 1, 0, 0, BuyOffense },
-    { 65, -2, 1, 0, 0, ViewNetPlayer },
-    { 66, -2, 1, 0, 0, UserSendMessage },
-    { 25, -2, 1, 1, 0, ToggleArrow }, // commented out in original executable
-    { 26, -2, 1, 1, 0, ToggleInfo },
-    { 26, 8, 1, 1, 0, ToggleInfo },
-    { 26, 7, 1, 1, 0, ToggleInfo }
+    { KEYMAP_MIRROR, -2, 1, 1, 0, ToggleMirror },
+    { KEYMAP_MAP, -2, 1, 1, 0, ToggleMap },
+    { KEYMAP_PRATCAM, -2, 1, 1, 0, TogglePratcam },
+    { KEYMAP_RECOVERY, -2, 1, 1, 0, SetRecovery },
+    { KEYMAP_CTRL_ABORT_RACE, 7, 1, 1, 0, AbortRace },
+    { KEYMAP_COCKPIT, -2, 1, 1, 0, ToggleCockpit },
+    { KEYMAP_LOOK_LEFT, -2, 1, 1, 0, LookLeft },
+    { KEYMAP_LOOK_FORWARD, -2, 1, 1, 0, LookForward },
+    { KEYMAP_LOOK_RIGHT, -2, 1, 1, 0, LookRight },
+    { KEYMAP_SOUND, -2, 0, 1, 0, ToggleSoundEnable },
+    { KEYMAP_SHIFT_DUMPSCREEN, KEYMAP_SHIFT_ANY, 0, 1, 0, PrintScreen },
+    { KEYMAP_CTRL_DRAW_SOME_TEXT, KEYMAP_CONTROL_ANY, 1, 1, 0, DrawSomeText }, // commented out in original executable
+    { KEYMAP_CTRL_FLY, KEYMAP_CONTROL_ANY, 1, 1, 0, ToggleFlying },
+    { KEYMAP_PEDESTRIANS, -2, 1, 1, 0, TogglePedestrians },
+    { KEYMAP_F4, -2, 0, 0, 0, F4Key },
+    { KEYMAP_F5, -2, 1, 0, 0, F5Key },
+    { KEYMAP_F6, -2, 1, 0, 0, F6Key },
+    { KEYMAP_F7, -2, 1, 0, 0, F7Key },
+    { KEYMAP_F8, -2, 1, 0, 0, F8Key },
+    { KEYMAP_F10, -2, 1, 0, 0, F10Key },
+    { KEYMAP_F11, -2, 1, 0, 0, F11Key },
+    { KEYMAP_F12, -2, 1, 0, 0, F12Key },
+    { KEYMAP_EDITMODE_0, -2, 1, 0, 0, NumberKey0 },
+    { KEYMAP_EDITMODE_1, -2, 1, 0, 0, NumberKey1 },
+    { KEYMAP_EDITMODE_2, -2, 1, 0, 0, NumberKey2 },
+    { KEYMAP_EDITMODE_3, -2, 1, 0, 0, NumberKey3 },
+    { KEYMAP_EDITMODE_4, -2, 1, 0, 0, NumberKey4 },
+    { KEYMAP_EDITMODE_5, -2, 1, 0, 0, NumberKey5 },
+    { KEYMAP_EDITMODE_6, -2, 1, 0, 0, NumberKey6 },
+    { KEYMAP_EDITMODE_7, -2, 1, 0, 0, NumberKey7 },
+    { KEYMAP_EDITMODE_8, -2, 1, 0, 0, NumberKey8 },
+    { KEYMAP_EDITMODE_9, -2, 1, 0, 0, NumberKey9 },
+    { KEYMAP_SCREEN_SMALLER, -2, 1, 0, 0, ScreenSmaller },
+    { KEYMAP_SCREEN_LARGER, -2, 1, 0, 0, ScreenLarger },
+    { KEYMAP_BUY_ARMOUR, -2, 1, 0, 0, BuyArmour },
+    { KEYMAP_BUY_POWER, -2, 1, 0, 0, BuyPower },
+    { KEYMAP_BUY_OFFENSE, -2, 1, 0, 0, BuyOffense },
+    { KEYMAP_VIEW_NETPLAYER, -2, 1, 0, 0, ViewNetPlayer },
+    { KEYMAP_SEND_MESSAGE, -2, 1, 0, 0, UserSendMessage },
+    { KEYMAP_ARROW, -2, 1, 1, 0, ToggleArrow }, // commented out in original executable
+    { KEYMAP_INFO, -2, 1, 1, 0, ToggleInfo },
+    { KEYMAP_INFO, KEYMAP_SHIFT_ANY, 1, 1, 0, ToggleInfo },
+    { KEYMAP_INFO, KEYMAP_CONTROL_ANY, 1, 1, 0, ToggleInfo }
 };
 int gRepair_last_time;
 int gHad_auto_recover;
@@ -146,7 +146,10 @@ int _unittest_controls_lastGetPowerup = 0;
 // IDA: void __cdecl AbortRace()
 void AbortRace() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (!gRace_finished) {
+        gAbandon_game = 1;
+    }
 }
 
 // IDA: void __cdecl F4Key()
@@ -550,7 +553,14 @@ void ToggleCockpit() {
 // IDA: void __cdecl ToggleMirror()
 void ToggleMirror() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gProgram_state.mirror_on = !gProgram_state.mirror_on;
+    ReinitialiseRearviewCamera();
+    if (gProgram_state.mirror_on) {
+        NewTextHeadupSlot(4, 0, 500, -4, GetMiscString(2));
+    } else {
+        NewTextHeadupSlot(4, 0, 500, -4, GetMiscString(3));
+    }
 }
 
 // IDA: void __cdecl ConcussMe()
@@ -573,7 +583,7 @@ void CheckLoadSave() {
 
     save_load_allowed = !gProgram_state.saving && !gProgram_state.loading && gProgram_state.prog_status == eProg_game_ongoing && !gProgram_state.dont_save_or_load;
 
-    if (CmdKeyDown(KEYMAP_F2, KEYMAP_S)) {
+    if (CmdKeyDown(KEYMAP_SAVE, KEYMAP_CTRL_SAVE)) {
         if (save_load_allowed) {
             FadePaletteDown();
             ClearEntireScreen();
@@ -587,7 +597,7 @@ void CheckLoadSave() {
         }
         WaitForNoKeys();
     }
-    if (CmdKeyDown(KEYMAP_F3, KEYMAP_L)) {
+    if (CmdKeyDown(KEYMAP_LOAD, KEYMAP_CTRL_LOAD)) {
         if (save_load_allowed && !gProgram_state.dont_load) {
             FadePaletteDown();
             ClearEntireScreen();
@@ -617,7 +627,7 @@ void CheckToggles(int pRacing) {
             new_state = 0;
             if (gToggle_array[i].key1 == -2 || KeyIsDown(gToggle_array[i].key1)) {
                 if (gToggle_array[i].key2 == -2 && gToggle_array[i].exact_modifiers) {
-                    if (!PDKeyDown(0) && !PDKeyDown(1) && !PDKeyDown(2) && !PDKeyDown(3)) {
+                    if (!PDKeyDown(KEY_SHIFT_ANY) && !PDKeyDown(KEY_ALT_ANY) && !PDKeyDown(KEY_CTRL_ANY) && !PDKeyDown(KEY_CTRL_ANY_2)) {
                         new_state = 1;
                     }
                 } else {

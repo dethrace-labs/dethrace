@@ -490,7 +490,7 @@ void DoGame() {
                     || gProgram_state.prog_status == eProg_idling
                     || gAbandon_game) {
                     DisposeRace();
-                    if (!gNet_mode && !gNet_mode_of_last_game) {
+                    if (gNet_mode == eNet_mode_none && gNet_mode_of_last_game == eNet_mode_none) {
                         DisposeOpponentsCars(&gCurrent_race);
                     }
                     DisposeTrack();
@@ -498,7 +498,7 @@ void DoGame() {
                         gProgram_state.prog_status = eProg_game_starting;
                     }
                 } else {
-                    if (gNet_mode) {
+                    if (gNet_mode != eNet_mode_none) {
                         do {
                             options_result = NetSynchRaceStart();
                             if (options_result == eSO_main_menu_invoked) {
@@ -573,6 +573,9 @@ void DoGame() {
                             DisposeOpponentsCars(&gCurrent_race);
                         }
                         DisposeTrack();
+                        if (harness_game_info.mode == eGame_carmageddon_demo) {
+                            DoFullVersionPowerpoint();
+                        }
                         gProgram_state.loaded = 0;
                         if (gProgram_state.prog_status == eProg_game_ongoing) {
                             gProgram_state.prog_status = eProg_game_starting;

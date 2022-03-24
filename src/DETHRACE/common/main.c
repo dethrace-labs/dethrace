@@ -11,15 +11,23 @@
 #include "loading.h"
 #include "loadsave.h"
 #include "network.h"
+#include "cutscene.h"
 #include "pd/sys.h"
 #include "s3/s3sound.h"
 #include "sound.h"
 #include "structur.h"
 #include "utility.h"
+#include "harness/config.h"
 
 // IDA: void __cdecl QuitGame()
 void QuitGame() {
     LOG_TRACE("()");
+
+    if (harness_game_info.mode == eGame_carmageddon_demo) {
+        DoDemoGoodbye();
+    }
+
+
     NOT_IMPLEMENTED();
 }
 

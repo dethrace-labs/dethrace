@@ -314,6 +314,8 @@ int SelectSkillLevel() {
     gProgram_state.skill_level = result;
     return 1;
 }
+#include "harness/config.h"
+#include "harness/hooks.h"
 
 // IDA: int __cdecl DoOnePlayerStart()
 int DoOnePlayerStart() {
@@ -329,6 +331,12 @@ int DoOnePlayerStart() {
                 memcpy(&gProgram_state, &saved_state, sizeof(tProgram_state));
                 return 0;
             }
+            if (harness_game_info.mode == eGame_carmageddon_demo && gProgram_state.frank_or_anniness != eFrankie) {
+                DoFeatureUnavailableInDemo();
+                memset(&gProgram_state, 0, sizeof(gProgram_state));
+                return 0;
+            }
+
             if (SelectSkillLevel()) {
                 DoGoToRaceAnimation();
                 StartLoadingScreen();
@@ -842,5 +850,11 @@ int DoMultiPlayerStart() {
     int start_rank;
     int car_index;
     LOG_TRACE("()");
+
+    if (harness_game_info.mode == eGame_carmageddon_demo) {
+        SuspendPendingFlic();
+        DoFeatureUnavailableInDemo();
+        return 0;
+    }
     NOT_IMPLEMENTED();
 }

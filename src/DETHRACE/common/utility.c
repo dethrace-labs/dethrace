@@ -39,7 +39,7 @@ br_pixelmap* gSource_for_16bit_palette;
 int CheckQuit() {
     LOG_TRACE8("()");
 
-    if (!gIn_check_quit && KeyIsDown(KEYMAP_Q) && KeyIsDown(KEYMAP_LCTRL)) {
+    if (!gIn_check_quit && KeyIsDown(KEYMAP_CTRL_QUIT) && KeyIsDown(KEYMAP_CONTROL_ANY)) {
         gIn_check_quit = 1;
         while (AnyKeyDown()) {
             ;

@@ -192,14 +192,6 @@ void Harness_Init(int* argc, char* argv[]) {
         OS_InstallSignalHandler(argv[0]);
     }
 
-    int* keymap = Input_GetKeyMap();
-    if (keymap != NULL) {
-        for (int i = 0; i < 123; i++) {
-            gScan_code[i][0] = keymap[i];
-            // gScan_code[i][1] = keymap[i];
-        }
-    }
-
     char* root_dir = getenv("DETHRACE_ROOT_DIR");
     if (root_dir == NULL) {
         LOG_INFO("DETHRACE_ROOT_DIR is not set, assuming '.'");
@@ -212,6 +204,15 @@ void Harness_Init(int* argc, char* argv[]) {
     }
     if (harness_game_info.mode == eGame_none) {
         Harness_DetectGameMode();
+    }
+
+    Input_Init();
+    int* keymap = Input_GetKeyMap();
+    if (keymap != NULL) {
+        for (int i = 0; i < 123; i++) {
+            gScan_code[i][0] = keymap[i];
+            // gScan_code[i][1] = keymap[i];
+        }
     }
 }
 

@@ -1,5 +1,6 @@
 #include "racestrt.h"
 #include "brender/brender.h"
+#include "cutscene.h"
 #include "displays.h"
 #include "drmem.h"
 #include "errors.h"
@@ -19,6 +20,7 @@
 #include "structur.h"
 #include "utility.h"
 #include "world.h"
+#include "harness/config.h"
 #include <stdlib.h>
 
 int gGrid_number_colour[4] = { 49u, 201u, 1u, 201u };
@@ -1247,12 +1249,16 @@ tSO_result DoSelectRace(int* pSecond_time_around) {
             result = DoInterfaceScreen(&interface_spec, 0, 4);
         }
 
-        if (!result || result == 2 || result == 3) {
+        if (result == 0 || result == 2 || result == 3) {
             DisposeFlicPanel(0);
 
             if (result == 2) {
-                RunFlic(192);
-                DoPartsShop(0);
+                if (harness_game_info.mode == eGame_carmageddon_demo) {
+                    DoFeatureUnavailableInDemo();
+                } else {
+                    RunFlic(192);
+                    DoPartsShop(0);
+                }
             } else if (result == 3) {
                 RunFlic(192);
                 DoChangeCar();

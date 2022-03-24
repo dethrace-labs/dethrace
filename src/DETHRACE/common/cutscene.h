@@ -28,6 +28,12 @@ void DoGameOverAnimation();
 
 void DoGameCompletedAnimation();
 
+void DoFeatureUnavailableInDemo();
+
+void DoFullVersionPowerpoint();
+
+void DoDemoGoodbye();
+
 void StartLoadingScreen();
 
 #endif

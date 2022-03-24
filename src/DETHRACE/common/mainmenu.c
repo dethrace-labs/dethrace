@@ -30,6 +30,15 @@ char* gPixels_copy__mainmenu; // suffix added to avoid duplicate symbol
 int MainMenuDone1(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
 
+    if (pCurrent_mode == 0) {
+        if (pCurrent_choice == 7) {
+            PreloadBunchOfFlics(7);
+        }
+        return pCurrent_choice;
+    } else {
+        return -1;
+    }
+
     if (pTimed_out) {
         return -1;
     }
@@ -61,6 +70,16 @@ int MainMenuDone1(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
 // IDA: int __usercall MainMenuDone2@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
 int MainMenuDone2(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
+
+    if (pCurrent_mode == 0) {
+        if (pCurrent_choice == 4) {
+            PreloadBunchOfFlics(7);
+        }
+    } else {
+        return -1;
+    }
+    return pCurrent_choice;
+
 
     if (pTimed_out) {
         return -1;
