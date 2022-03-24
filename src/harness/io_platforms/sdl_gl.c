@@ -3,6 +3,7 @@
 // this needs to be included after glad.h
 #include <SDL.h>
 #include <SDL_opengl.h>
+#include <SDL_rect.h>
 
 #include "../renderers/gl/gl_renderer.h"
 #include "../renderers/renderer.h"
