@@ -3,7 +3,6 @@
 // this needs to be included after glad.h
 #include <SDL.h>
 #include <SDL_opengl.h>
-#include <SDL_rect.h>
 
 #include "../renderers/gl/gl_renderer.h"
 #include "../renderers/renderer.h"
@@ -123,7 +122,10 @@ int keymap[123] = {
 SDL_Window* window;
 SDL_GLContext context;
 uint8_t sdl_key_state[256];
-SDL_FPoint sdl_window_scale;
+struct {
+    float x;
+    float y;
+} sdl_window_scale;
 
 tRenderer gl_renderer = {
     GLRenderer_Init,
