@@ -537,7 +537,6 @@ void PDMouseButtons(int* pButton_1, int* pButton_2) {
 
 // IDA: void __usercall PDGetMousePosition(int *pX_coord@<EAX>, int *pY_coord@<EDX>)
 void PDGetMousePosition(int* pX_coord, int* pY_coord) {
-#if 0
     br_uint_32 mouse_buttons;
     br_int_32 mouse_x2;
     br_int_32 mouse_y2;
@@ -545,9 +544,6 @@ void PDGetMousePosition(int* pX_coord, int* pY_coord) {
     int delta_y;
     static br_int_32 mouse_x;
     static br_int_32 mouse_y;
-#endif
-    int w;  // Added by DethRace
-    int h;  // Added by DethRace
     LOG_TRACE("(%p, %p)", pX_coord, pY_coord);
 
     Harness_Hook_GetMousePosition(pX_coord, pY_coord);
