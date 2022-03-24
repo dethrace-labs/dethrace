@@ -182,6 +182,8 @@ void Harness_Init(int* argc, char* argv[]) {
     harness_game_config.fps = 0;
     // do not freeze timer
     harness_game_config.freeze_timer = 0;
+    // default demo time out is 240s
+    harness_game_config.demo_timeout = 240000;
 
     // install signal handler by default
     harness_game_config.install_signalhandler = 1;
@@ -222,6 +224,7 @@ void Harness_ForceNullRenderer() {
     renderer = &null_renderer;
 }
 
+
 int Harness_ProcessCommandLine(int* argc, char* argv[]) {
     for (int i = 1; i < *argc; i++) {
         int handled = 0;
@@ -251,6 +254,11 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
         } else if (strcasecmp(argv[i], "--no-signal-handler") == 0) {
             LOG_INFO("Don't install the signal handler");
             harness_game_config.install_signalhandler = 0;
+            handled = 1;
+        } else if (strstr(argv[i], "--demo-timeout=") != NULL) {
+            char* s = strstr(argv[i], "=");
+            harness_game_config.demo_timeout = atoi(s + 1);
+            LOG_INFO("Demo timeout set to %d", harness_game_config.demo_timeout);
             handled = 1;
         }
 

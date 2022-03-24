@@ -803,6 +803,8 @@ int NewTextHeadupSlot2(int pSlot_index, int pFlash_rate, int pLifetime, int pFon
 int NewTextHeadupSlot(int pSlot_index, int pFlash_rate, int pLifetime, int pFont_index, char* pText) {
     LOG_TRACE("(%d, %d, %d, %d, \"%s\")", pSlot_index, pFlash_rate, pLifetime, pFont_index, pText);
 
+    LOG_DEBUG("(%d, %d, %d, %d, \"%s\")", pSlot_index, pFlash_rate, pLifetime, pFont_index, pText);
+
     return NewTextHeadupSlot2(pSlot_index, pFlash_rate, pLifetime, pFont_index, pText, 1);
 }
 
@@ -893,20 +895,21 @@ void AdjustHeadups() {
 
     the_headup = gHeadups;
     for (i = 0; i < COUNT_OF(gHeadups); i++) {
-        if (the_headup->type) {
-            delta_x = gProgram_state.current_car.headup_slots[gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0][the_headup->slot_index].x
-                - gProgram_state.current_car.headup_slots[!gProgram_state.cockpit_on || gProgram_state.cockpit_image_index < 0][the_headup->slot_index].x;
-            delta_y = gProgram_state.current_car.headup_slots[gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0][the_headup->slot_index].y
-                - gProgram_state.current_car.headup_slots[!gProgram_state.cockpit_on || gProgram_state.cockpit_image_index < 0][the_headup->slot_index].y;
-            the_headup->x += delta_x;
-            the_headup->original_x += delta_x;
-            the_headup->y += delta_y;
-            the_headup->dim_left += delta_x;
-            the_headup->dim_top += delta_y;
-            the_headup->dim_right += delta_x;
-            the_headup->dim_bottom += delta_y;
+        the_headup = &gHeadups[i];
+        if (the_headup->type == eHeadup_unused) {
+            continue;
         }
-        the_headup++;
+        delta_x = gProgram_state.current_car.headup_slots[gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0][the_headup->slot_index].x
+            - gProgram_state.current_car.headup_slots[!gProgram_state.cockpit_on || gProgram_state.cockpit_image_index < 0][the_headup->slot_index].x;
+        delta_y = gProgram_state.current_car.headup_slots[gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0][the_headup->slot_index].y
+            - gProgram_state.current_car.headup_slots[!gProgram_state.cockpit_on || gProgram_state.cockpit_image_index < 0][the_headup->slot_index].y;
+        the_headup->x += delta_x;
+        the_headup->original_x += delta_x;
+        the_headup->y += delta_y;
+        the_headup->dim_left += delta_x;
+        the_headup->dim_top += delta_y;
+        the_headup->dim_right += delta_x;
+        the_headup->dim_bottom += delta_y;
     }
 }
 

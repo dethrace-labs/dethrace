@@ -17,7 +17,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-tS32 gLast_demo_end_anim;
+tS32 gLast_demo_end_anim = -90000;
 
 // IDA: void __usercall ShowCutScene(int pIndex@<EAX>, int pWait_end@<EDX>, int pSound_ID@<EBX>, br_scalar pDelay)
 void ShowCutScene(int pIndex, int pWait_end, int pSound_ID, br_scalar pDelay) {
@@ -220,23 +220,12 @@ void DoFeatureUnavailableInDemo() {
     LOG_TRACE("()");
 
     PrintMemoryDump(0, "BEFORE DEMO-ONLY SCREEN");
+
     SuspendPendingFlic();
     FadePaletteDown();
-
     ShowCutScene(7, 1, 8502, gCut_delay_3);
-    // gProgram_state.cut_scene = 1;
-    // DRS3LoadSound(8502);
-    // SetFlicSound(8502, PDGetTotalTime() + gCut_delay_3 * 1000.f);
-    // SetNonFatalAllocationErrors();
-    // RunFlic(7);
-    // ResetNonFatalAllocationErrors();
-    // WaitForAKey();
-    // FadePaletteDown();
-    // ClearEntireScreen();
-    // DRS3ReleaseSound(8502);
-    // SetFlicSound(0, 0);
-    // gProgram_state.cut_scene = 0;
     FadePaletteDown();
+
     PrintMemoryDump(0, "AFTER DEMO-ONLY SCREEN");
 }
 
@@ -245,30 +234,15 @@ void DoFullVersionPowerpoint() {
 
     FadePaletteDown();
     DRSetPalette(gRender_palette);
-
     ShowCutScene(9, 0, 8503, gCut_delay_4);
-    // gProgram_state.cut_scene = 1;
-    // DRS3LoadSound(8503);
-    // SetFlicSound(8503, PDGetTotalTime() + gCut_delay_4 * 1000.f);
-    // SetNonFatalAllocationErrors();
-    // RunFlic(9);
-    // ResetNonFatalAllocationErrors();
-    // WaitForNoKeys();
-    // FadePaletteDown();
-    // ClearEntireScreen();
-    // DRS3ReleaseSound(8503);
-    // SetFlicSound(0, 0);
-    // gProgram_state.cut_scene = 0;
+    FadePaletteDown();
+
     gLast_demo_end_anim = PDGetTotalTime();
 }
 
 void DoDemoGoodbye() {
-    if (PDGetTotalTime() - gError_code > 90000) {
-        FadePaletteDown();
-        DRSetPalette(gRender_palette);
-        ShowCutScene(9, 0, 8503, gCut_delay_4);
-        FadePaletteDown();
-        gLast_demo_end_anim = PDGetTotalTime();
+    if (PDGetTotalTime() - gLast_demo_end_anim > 90000) {
+        DoFullVersionPowerpoint();
     }
 }
 

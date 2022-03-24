@@ -34,6 +34,7 @@ typedef struct tHarness_game_config {
     float physics_step_time;
     float fps;
     int freeze_timer;
+    unsigned demo_timeout;
 
     int install_signalhandler;
 } tHarness_game_config;

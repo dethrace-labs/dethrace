@@ -425,7 +425,8 @@ void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
         pSource++;
         x_byte = off_the_left;
         for (j = 0; j < number_of_chunks; j++) {
-            chunk_length = *pSource++;
+            chunk_length = *pSource;
+            pSource++;
             if (chunk_length >= 0) {
                 old_x_byte = x_byte;
                 x_byte += chunk_length;
@@ -2539,7 +2540,7 @@ void LoadFont(int pFont_ID) {
     tU32 the_size;
     LOG_TRACE("(%d)", pFont_ID);
 
-    if (gFonts[pFont_ID].images) {
+    if (gFonts[pFont_ID].images != NULL) {
         return;
     }
 
@@ -2550,14 +2551,14 @@ void LoadFont(int pFont_ID) {
     strcat(the_path, ".PIX");
     gFonts[pFont_ID].images = DRPixelmapLoad(the_path);
 
-    if (!gFonts[pFont_ID].images) {
+    if (gFonts[pFont_ID].images == NULL) {
         FatalError(20, gFont_names[pFont_ID]);
     }
     if (!gFonts[pFont_ID].file_read_once) {
         strcpy(&the_path[number_of_chars + 1], "TXT");
 
         f = DRfopen(the_path, "rt");
-        if (!f) {
+        if (f == NULL) {
             FatalError(21, gFont_names[pFont_ID]);
         }
 

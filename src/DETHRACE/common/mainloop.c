@@ -439,15 +439,16 @@ void CheckTimer() {
         }
 
         if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo) {
-            time_left = 240000 - GetRaceTime();
-            //time_left = 10000 - GetRaceTime();
-            time_in_seconds = (time_left + 500) / 1000;
-            if (time_in_seconds != last_demo_time_in_seconds && time_in_seconds <= 10)
-                DRS3StartSound(gIndexed_outlets[4], 1001);
-            last_demo_time_in_seconds = time_in_seconds;
-            if (time_left <= 0) {
-                gTimer = 0;
-                RaceCompleted(eRace_over_demo);
+            if (harness_game_config.demo_timeout != 0) {
+                time_left = harness_game_config.demo_timeout - GetRaceTime();
+                time_in_seconds = (time_left + 500) / 1000;
+                if (time_in_seconds != last_demo_time_in_seconds && time_in_seconds <= 10)
+                    DRS3StartSound(gIndexed_outlets[4], 1001);
+                last_demo_time_in_seconds = time_in_seconds;
+                if (time_left <= 0) {
+                    gTimer = 0;
+                    RaceCompleted(eRace_over_demo);
+                }
             }
         }
     }
