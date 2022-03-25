@@ -7,10 +7,20 @@ br_clip_result PixelmapPointClip(br_point* out, br_point* in, br_pixelmap* pm) {
 
     out->x = in->x + pm->origin_x;
     out->y = in->y + pm->origin_y;
-    if (out->x >= 0 && out->y >= 0 && out->x < pm->width && out->y < pm->height) {
-        return BR_CLIP_ACCEPT;
+
+    if (out->x < 0) {
+        return BR_CLIP_REJECT;
     }
-    return BR_CLIP_REJECT;
+    if (out->y < 0) {
+        return BR_CLIP_REJECT;
+    }
+    if (out->x >= pm->width) {
+        return BR_CLIP_REJECT;
+    }
+    if (out->y >= pm->height) {
+        return BR_CLIP_REJECT;
+    }
+    return BR_CLIP_ACCEPT;
 }
 
 // IDA: br_clip_result __cdecl PixelmapLineClip(br_point *s_out, br_point *e_out, br_point *s_in, br_point *e_in, br_pixelmap *pm)

@@ -228,9 +228,10 @@ void BrPixelmapPixelSet(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_uint_32 c
     br_point p;
     // LOG_TRACE("(%p, %d, %d, %d)", dst, x, y, colour);
 
-    STUB_ONCE();  // stub because this implementation is improperly (=coordinates can lie outside pixelmap + pixel format size can be > 1 bytes)
-    br_uint_8* dst_pix = (br_uint_8*)dst->pixels;
-    dst_pix[(y * dst->row_bytes) + x] = (br_uint_8)colour;
+    CheckDispatch((br_device_pixelmap*)dst);
+    p.x = x;
+    p.y = y;
+    (*(br_device_pixelmap_dispatch**)dst)->_pixelSet((br_device_pixelmap*)dst, &p, colour);
 }
 
 // IDA: br_uint_32 __cdecl BrPixelmapPixelGet(br_pixelmap *dst, br_int_32 x, br_int_32 y)

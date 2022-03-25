@@ -91,5 +91,7 @@ void pm_mem_set_colour(br_uint_8* dest, br_uint_32 dest_qual, br_uint_32 bpp, br
     case 4:
         *(br_uint_32*)dest = colour;
         break;
+    default:
+        TELL_ME_IF_WE_PASS_THIS_WAY();
     }
 }

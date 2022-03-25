@@ -475,7 +475,13 @@ br_error _M_br_device_pixelmap_mem_pixelSet(br_device_pixelmap* self, br_point* 
     br_point ap;
     br_int_8 bytes;
     LOG_TRACE("(%p, %p, %d)", self, p, colour);
-    NOT_IMPLEMENTED();
+
+    if (PixelmapPointClip(&ap, p, (br_pixelmap*)self) == BR_CLIP_REJECT) {
+        return 0;
+    }
+    bytes = pmTypeInfo[self->pm_type].bits >> 3;
+    pm_mem_set_colour(self->pm_pixels + (self->pm_base_y + ap.y) * self->pm_row_bytes + (self->pm_base_x + ap.x) * bytes, self->pm_pixels_qualifier, bytes, colour);
+    return 0;
 }
 
 // IDA: br_error __cdecl _M_br_device_pixelmap_mem_line(br_device_pixelmap *self, br_point *s, br_point *e, br_uint_32 colour)
