@@ -184,32 +184,32 @@ br_clip_result PixelmapRectangleClipTwo(br_rectangle* r_out, br_point* p_out, br
         r_out->y -= p_out->y;
         p_out->y = 0;
     }
-    if (pm_dst->width < p_out->x + r_out->w) {
+    if (p_out->x + r_out->w > pm_dst->width) {
         r_out->w = pm_dst->width - p_out->x;
     }
-    if (pm_dst->height < p_out->y + r_out->h) {
+    if (p_out->y + r_out->h > pm_dst->height) {
         r_out->h = pm_dst->height - p_out->y;
     }
     if (r_out->x < 0) {
         r_out->w += r_out->x;
-        p_out->y -= r_out->x;
-        r_out->y = 0;
+        p_out->x -= r_out->x;
+        r_out->x = 0;
     }
     if (r_out->y < 0) {
         r_out->h += r_out->y;
         p_out->y -= r_out->y;
         r_out->y = 0;
     }
-    if (pm_src->width < (r_out->x + r_out->w)) {
+    if (r_out->x + r_out->w > pm_src->width) {
         r_out->w = pm_src->width - r_out->x;
     }
-    if (pm_src->height < (r_out->y + r_out->h)) {
+    if (r_out->y + r_out->h > pm_src->height) {
         r_out->h = pm_src->height - r_out->y;
     }
-    if (r_out->w != 0 && r_out->h != 0) {
-        return BR_CLIP_PARTIAL;
+    if (r_out->w == 0 || r_out->h == 0) {
+        return BR_CLIP_REJECT;
     }
-    return BR_CLIP_REJECT;
+    return BR_CLIP_PARTIAL;
 }
 
 // IDA: br_clip_result __cdecl PixelmapCopyBitsClip(br_rectangle *r_out, br_point *p_out, br_rectangle *r_in, br_point *p_in, br_pixelmap *pm)

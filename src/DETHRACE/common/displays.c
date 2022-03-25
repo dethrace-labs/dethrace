@@ -356,7 +356,6 @@ void DoHeadups(tU32 pThe_time) {
         KillOldestQueuedHeadup();
     }
 
-    // the_headup = gHeadups;
     for (i = 0; i < COUNT_OF(gHeadups); i++) {
         the_headup = &gHeadups[i];
         if (the_headup->type != eHeadup_unused

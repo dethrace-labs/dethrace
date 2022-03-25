@@ -142,6 +142,8 @@ target_sources(brender PRIVATE
     CORE/PIXELMAP/gencopy.h
     CORE/PIXELMAP/pixelmap.c
     CORE/PIXELMAP/pixelmap.h
+    CORE/PIXELMAP/pmmemops.c
+    CORE/PIXELMAP/pmmemops.h
     CORE/PIXELMAP/pmdsptch.c
     CORE/PIXELMAP/pmdsptch.h
     CORE/PIXELMAP/pmfile.c

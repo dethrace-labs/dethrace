@@ -1,5 +1,6 @@
 #include "pmdsptch.h"
 
+#include "CORE/PIXELMAP/gencopy.h"
 #include "CORE/PIXELMAP/pmmem.h"
 #include "CORE/STD/brstdlib.h"
 #include "harness/hooks.h"
@@ -136,7 +137,19 @@ br_error DispatchCopy(br_device_pixelmap* self, br_device_pixelmap* src) {
 // IDA: br_error __usercall DispatchRectangleCopy@<EAX>(br_device_pixelmap *self@<EAX>, br_point *p@<EDX>, br_device_pixelmap *src@<EBX>, br_rectangle *r@<ECX>)
 br_error DispatchRectangleCopy(br_device_pixelmap* self, br_point* p, br_device_pixelmap* src, br_rectangle* r) {
     LOG_TRACE("(%p, %p, %p, %p)", self, p, src, r);
-    NOT_IMPLEMENTED();
+
+    CheckDispatch(self);
+    CheckDispatch(src);
+    if ((*(br_device_pixelmap_dispatch**)self)->_device((br_object*)self) == (*(br_device_pixelmap_dispatch**)src)->_device((br_object*)src)) {
+        return (*(br_device_pixelmap_dispatch**)self)->_rectangleCopy(self, p, src, r);
+    }
+    if ((src->pm_flags & BR_PMF_NO_ACCESS) == 0) {
+        return (*(br_device_pixelmap_dispatch**)self)->_rectangleCopyTo(self, p, src, r);
+    }
+    if ((self->pm_flags & BR_PMF_NO_ACCESS) == 0) {
+        return (*(br_device_pixelmap_dispatch**)self)->_rectangleCopyFrom(src, p, self, r);
+    }
+    return GeneralRectangleCopy(self, p, src, r);
 }
 
 // IDA: br_error __usercall DispatchRectangleStretchCopy@<EAX>(br_device_pixelmap *self@<EAX>, br_rectangle *r@<EDX>, br_device_pixelmap *src@<EBX>, br_rectangle *s@<ECX>)
@@ -150,44 +163,13 @@ void BrPixelmapRectangleCopy(br_pixelmap* dst, br_int_32 dx, br_int_32 dy, br_pi
     br_rectangle r;
     br_point p;
 
-    // Thanks Errol!
-
-    br_uint_8* src_pix = (br_uint_8*)src->pixels;
-    br_uint_8* dst_pix = (br_uint_8*)dst->pixels;
-
-    dx += dst->origin_x;
-    dy += dst->origin_y;
-
-    sx += src->origin_x;
-    sy += src->origin_y;
-
-    if (src->type != dst->type) {
-        LOG_PANIC("src and dst types don't match! src is %d and dst is %d", src->type, dst->type);
-        return;
-    }
-
-    if (src->type != BR_PMT_INDEX_8) {
-        LOG_PANIC("only 8 bit surfaces supported");
-        return;
-    }
-
-    for (int x = 0; x < w; x++) {
-        if (dx + x < 0 || dx + x >= dst->width) {
-            continue;
-        }
-        if (sx + x >= src->width)
-            continue;
-
-        for (int y = 0; y < h; y++) {
-            if (dy + y < 0 || dy + y >= dst->height) {
-                continue;
-            }
-            if (sy + y >= src->height)
-                continue;
-
-            dst_pix[(y + dy) * dst->row_bytes + (x + dx)] = src_pix[(sy + y) * src->row_bytes + (x + sx)];
-        }
-    }
+    r.x = sx;
+    r.y = sy;
+    r.w = w;
+    r.h = h;
+    p.x = dx;
+    p.y = dy;
+    DispatchRectangleCopy((br_device_pixelmap*)dst, &p, (br_device_pixelmap*)src, &r);
 }
 
 // IDA: void __cdecl BrPixelmapRectangleStretchCopy(br_pixelmap *dst, br_int_32 dx, br_int_32 dy, br_int_32 dw, br_int_32 dh, br_pixelmap *src, br_int_32 sx, br_int_32 sy, br_int_32 sw, br_int_32 sh)
