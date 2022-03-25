@@ -822,13 +822,13 @@ float ControlBoundFunkGroovePlus(int pSlot_number, float pValue) {
 }
 
 // IDA: void __usercall ShiftBoundGrooveFunks(char *pStart@<EAX>, char *pEnd@<EDX>, int pDelta@<EBX>)
-void ShiftBoundGrooveFunks(char* pStart, char* pEnd, int pDelta) {
+void ShiftBoundGrooveFunks(char* pStart, char* pEnd, size_t pDelta) {
     int i;
     LOG_TRACE("(\"%s\", \"%s\", %d)", pStart, pEnd, pDelta);
 
     for (i = 0; i < COUNT_OF(gGroove_funk_bindings); i++) {
         if ((char*)gGroove_funk_bindings[i] >= (char*)pStart && (char*)gGroove_funk_bindings[i] < (char*)pEnd) {
-            gGroove_funk_bindings[i] = (float*)((char*)gGroove_funk_bindings[i] + pDelta); // original code is (pDelta & 0xFFFFFFFC) but this caused problems;
+            gGroove_funk_bindings[i] = (float*)((char*)gGroove_funk_bindings[i] + (pDelta & ~(size_t)3)); // original code is (pDelta & 0xFFFFFFFC) but this caused problems;
         }
     }
 }
@@ -848,7 +848,7 @@ tFunkotronic_spec* AddNewFunkotronic() {
     gFunkotronics_array_size += 16;
     new_array = BrMemCalloc(gFunkotronics_array_size, sizeof(tFunkotronic_spec), kMem_funk_spec);
     if (gFunkotronics_array != NULL) {
-        memcpy(new_array, gFunkotronics_array, sizeof(tFunkotronic_spec) * (gFunkotronics_array_size - 16));
+        memcpy(new_array, gFunkotronics_array, (gFunkotronics_array_size - 16) * sizeof(tFunkotronic_spec));
         ShiftBoundGrooveFunks(
             (char*)gFunkotronics_array,
             (char*)&gFunkotronics_array[gFunkotronics_array_size - 16],
@@ -1305,7 +1305,7 @@ tGroovidelic_spec* AddNewGroovidelic() {
     }
     gGroovidelics_array_size += 16;
     new_array = BrMemCalloc(gGroovidelics_array_size, sizeof(tGroovidelic_spec), kMem_groove_spec);
-    if (gGroovidelics_array) {
+    if (gGroovidelics_array != NULL) {
         memcpy(new_array, gGroovidelics_array, (gGroovidelics_array_size - 16) * sizeof(tGroovidelic_spec));
         ShiftBoundGrooveFunks(
             (char*)gGroovidelics_array,
@@ -1449,7 +1449,7 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
         case eGroove_object_spin:
             if (the_groove->object_mode != eMove_controlled && the_groove->object_mode != eMove_absolute) {
                 x_0 = GetAFloat(pF);
-                the_groove->object_data.spin_info.period = x_0 == 0.0f ? 0.0f : 1000.0 / x_0;
+                the_groove->object_data.spin_info.period = (x_0 == 0.0f) ? 0.0f : (1000.0f / x_0);
             } else {
                 d_0 = GetAnInt(pF);
                 AddFunkGrooveBinding(d_0 + pRef_offset, &the_groove->object_data.spin_info.period);
@@ -1461,12 +1461,12 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
             the_groove->object_data.spin_info.axis = GetALineAndInterpretCommand(pF, gAxis_names, COUNT_OF(gAxis_names));
             break;
         case eGroove_object_rock:
-            if (the_groove->object_mode != eMove_controlled && the_groove->object_mode != eMove_absolute) {
-                x_0 = GetAFloat(pF);
-                the_groove->object_data.rock_info.period = x_0 == 0.0f ? 0.0f : 1000.0 / x_0;
-            } else {
+            if (the_groove->object_mode == eMove_controlled || the_groove->object_mode == eMove_absolute) {
                 d_0 = GetAnInt(pF);
                 AddFunkGrooveBinding(d_0 + pRef_offset, &the_groove->object_data.rock_info.period);
+            } else {
+                x_0 = GetAFloat(pF);
+                the_groove->object_data.rock_info.period = (x_0 == 0.0f) ? 0.0f : (1000.0f / x_0);
             }
             GetThreeFloats(pF,
                 &the_groove->object_centre.v[0],
@@ -1478,9 +1478,9 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
         case eGroove_object_throb:
             if (the_groove->object_mode != eMove_controlled && the_groove->object_mode != eMove_absolute) {
                 GetThreeFloats(pF, &x_0, &x_1, &x_2);
-                the_groove->object_data.throb_info.x_period = x_0 == 0.0f ? 0.0f : 1000.0 / x_0;
-                the_groove->object_data.throb_info.y_period = x_1 == 0.0f ? 0.0f : 1000.0 / x_1;
-                the_groove->object_data.throb_info.z_period = x_2 == 0.0f ? 0.0f : 1000.0 / x_2;
+                the_groove->object_data.throb_info.x_period = (x_0 == 0.0f) ? 0.0f : (1000.0f / x_0);
+                the_groove->object_data.throb_info.y_period = (x_1 == 0.0f) ? 0.0f : (1000.0f / x_1);
+                the_groove->object_data.throb_info.z_period = (x_2 == 0.0f) ? 0.0f : (1000.0f / x_2);
             } else {
                 GetThreeInts(pF, &d_0, &d_1, &d_2);
                 if (d_0 >= 0) {
