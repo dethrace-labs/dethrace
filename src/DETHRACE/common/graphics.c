@@ -497,7 +497,16 @@ void SetBRenderScreenAndBuffers(int pX_offset, int pY_offset, int pWidth, int pH
 void SetIntegerMapRenders() {
     LOG_TRACE("()");
 
-    STUB();
+    gMap_render_x_i = ((int)gMap_render_x) & ~3;
+    gMap_render_y_i = ((int)gMap_render_y) & ~3;
+    gMap_render_width_i = ((int)gMap_render_width) & ~3;
+    gMap_render_height_i = ((int)gMap_render_height) & ~3;
+    if (gReal_graf_data_index != 0) {
+        gMap_render_x_i = 2 * gMap_render_x_i;
+        gMap_render_y_i = 2 * gMap_render_y_i + 40;
+        gMap_render_width_i = 2 * gMap_render_width_i;
+        gMap_render_height_i = 2 * gMap_render_height_i;
+    }
 }
 
 // IDA: void __cdecl AdjustRenderScreenSize()
