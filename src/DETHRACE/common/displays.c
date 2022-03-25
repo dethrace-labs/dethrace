@@ -356,17 +356,17 @@ void DoHeadups(tU32 pThe_time) {
         KillOldestQueuedHeadup();
     }
 
-    the_headup = gHeadups;
+    // the_headup = gHeadups;
     for (i = 0; i < COUNT_OF(gHeadups); i++) {
         the_headup = &gHeadups[i];
-        if (the_headup->type
+        if (the_headup->type != eHeadup_unused
             && (gProgram_state.which_view == eView_forward || !the_headup->cockpit_anchored)
             && (the_headup->type == eHeadup_image
                 || the_headup->type == eHeadup_fancy
-                || (the_headup->type == eHeadup_text && the_headup->data.text_info.text[0])
+                || (the_headup->type == eHeadup_text && the_headup->data.text_info.text[0] != '\0')
                 || ((the_headup->type == eHeadup_coloured_text || the_headup->type == eHeadup_box_text)
-                    && the_headup->data.text_info.text[0]))) {
-            if (the_headup->type == eHeadup_fancy || !the_headup->end_time || the_headup->end_time > pThe_time) {
+                    && the_headup->data.text_info.text[0] != '\0'))) {
+            if (the_headup->type == eHeadup_fancy || the_headup->end_time == 0 || pThe_time < the_headup->end_time) {
                 if (the_headup->dimmed_background) {
                     DimRectangle(
                         gBack_screen,
@@ -376,7 +376,7 @@ void DoHeadups(tU32 pThe_time) {
                         the_headup->dim_bottom,
                         1);
                 }
-                if (!the_headup->flash_period
+                if (the_headup->flash_period == 0
                     || Flash(the_headup->flash_period, &the_headup->last_flash, &the_headup->flash_state)) {
                     switch (the_headup->type) {
                     case eHeadup_text:
@@ -415,7 +415,7 @@ void DoHeadups(tU32 pThe_time) {
                                 x_offset + the_headup->x,
                                 y_offset + the_headup->y,
                                 the_headup->data.coloured_text_info.coloured_font,
-                                the_headup->data.text_info.text,
+                                the_headup->data.coloured_text_info.text,
                                 the_headup->right_edge);
                         } else {
                             if (the_headup->cockpit_anchored) {
@@ -433,7 +433,7 @@ void DoHeadups(tU32 pThe_time) {
                                 x_offset + the_headup->x,
                                 y_offset + the_headup->y,
                                 the_headup->data.coloured_text_info.coloured_font,
-                                the_headup->data.text_info.text,
+                                the_headup->data.coloured_text_info.text,
                                 the_headup->right_edge);
                         }
                         break;
@@ -468,7 +468,17 @@ void DoHeadups(tU32 pThe_time) {
                                 the_headup->data.fancy_info.fancy_stage = eFancy_stage_halting;
                                 the_headup->data.fancy_info.start_time = GetTotalTime();
                             }
-                            continue;
+                            DRPixelmapRectangleShearedCopy(
+                                gBack_screen,
+                                the_headup->x + the_headup->data.fancy_info.offset,
+                                the_headup->y,
+                                the_headup->data.fancy_info.image,
+                                0,
+                                0,
+                                the_headup->data.fancy_info.image->width,
+                                the_headup->data.fancy_info.image->height,
+                                -65536);
+                            break;
                         case eFancy_stage_halting:
                             time_factor = 1000 * (pThe_time - the_headup->data.fancy_info.start_time) / 100;
                             if (time_factor > 1000) {
@@ -538,24 +548,24 @@ void DoHeadups(tU32 pThe_time) {
                                     / the_headup->data.image_info.image->height));
                             break;
                         case eFancy_stage_leaving:
-                            the_headup->data.fancy_info.offset -= 500 * gFrame_period / 0x3E8;
+                            the_headup->data.fancy_info.offset -= 500 * gFrame_period / 1000;
                             if (the_headup->data.fancy_info.offset <= the_headup->data.fancy_info.end_offset) {
                                 ClearHeadup(i);
-                                break;
+                            } else {
+                                DRPixelmapRectangleShearedCopy(
+                                    gBack_screen,
+                                    the_headup->data.fancy_info.offset + the_headup->x,
+                                    the_headup->y,
+                                    the_headup->data.image_info.image,
+                                    0,
+                                    0,
+                                    the_headup->data.image_info.image->width,
+                                    the_headup->data.image_info.image->height,
+                                    -65536);
                             }
-                            DRPixelmapRectangleShearedCopy(
-                                gBack_screen,
-                                the_headup->data.fancy_info.offset + the_headup->x,
-                                the_headup->y,
-                                the_headup->data.image_info.image,
-                                0,
-                                0,
-                                the_headup->data.image_info.image->width,
-                                the_headup->data.image_info.image->height,
-                                -65536);
                             break;
                         default:
-                            continue;
+                            break;
                         }
                         break;
 
@@ -566,7 +576,7 @@ void DoHeadups(tU32 pThe_time) {
                             y_offset = 0;
                         }
                         if (the_headup->cockpit_anchored) {
-                            x_offset = gScreen_wobble_y;
+                            x_offset = gScreen_wobble_x;
                         } else {
                             x_offset = 0;
                         }
