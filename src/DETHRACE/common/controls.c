@@ -1392,11 +1392,11 @@ void PollCameraControls(tU32 pTime_difference) {
     if (!gMap_mode && !gProgram_state.cockpit_on && (!gAction_replay_mode || gAction_replay_camera_mode <= eAction_replay_standard)) {
         if (KeyIsDown(31) || (up_and_down_mode && !going_up)) {
             gCamera_zoom = (double)pTime_difference * TIME_CONV_THING / (double)(2 * swirl_mode + 1) + gCamera_zoom;
-            if (gCamera_zoom > 2.0) {
-                gCamera_zoom = 2.0;
+            if (gCamera_zoom > 2.0f) {
+                gCamera_zoom = 2.0f;
             }
-            if (up_and_down_mode && gCamera_zoom > 1.0) {
-                gCamera_zoom = 1.0;
+            if (up_and_down_mode && gCamera_zoom > 1.0f) {
+                gCamera_zoom = 1.0f;
             }
         }
         if (KeyIsDown(30) || (up_and_down_mode && going_up)) {
@@ -1404,8 +1404,8 @@ void PollCameraControls(tU32 pTime_difference) {
             if (gCamera_zoom < 0.1) {
                 gCamera_zoom = 0.1;
                 if (up_and_down_mode) {
-                    if (gCamera_zoom < 1.0) {
-                        gCamera_zoom = 1.0;
+                    if (gCamera_zoom < 1.0f) {
+                        gCamera_zoom = 1.0f;
                     }
                 }
             }
@@ -1420,13 +1420,13 @@ void PollCameraControls(tU32 pTime_difference) {
 
         if ((gCamera_sign ? left : right)) {
             if (!gCamera_reset) {
-                gCamera_yaw += BrDegreeToAngle(pTime_difference * 0.050000001);
+                gCamera_yaw += BrDegreeToAngle(pTime_difference * 0.05f);
             }
             flag = 1;
         }
         if ((gCamera_sign ? right : left)) {
             if (!gCamera_reset) {
-                gCamera_yaw -= BrDegreeToAngle(pTime_difference * 0.050000001);
+                gCamera_yaw -= BrDegreeToAngle(pTime_difference * 0.05f);
             }
             if (flag) {
                 gCamera_yaw = 0;

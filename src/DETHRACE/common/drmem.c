@@ -295,11 +295,11 @@ void* DRStdlibAllocate(br_size_t size, br_uint_8 type) {
     int i;
     char s[256];
 
-    if (!size) {
+    if (size == 0) {
         return NULL;
     }
     p = malloc(size);
-    if (!p && !gNon_fatal_allocation_errors) {
+    if (p == NULL && !gNon_fatal_allocation_errors) {
         sprintf(s, "%s/%d", gMem_names[type], size);
         FatalError(94, s);
     }

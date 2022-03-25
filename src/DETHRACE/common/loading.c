@@ -1652,13 +1652,13 @@ void SetModelFlags(br_model* pModel, int pOwner) {
 
     if (pModel && pModel->nfaces) {
         if (pOwner == eDriver_net_human || gAusterity_mode) {
-            if ((pModel->flags & 0x80u) != 0) {
-                pModel->flags &= 0xFF7Du; // not BR_MODF_KEEP_ORIGINAL, not BR_MODF_UPDATEABLE
-                BrModelUpdate(pModel, 0x7FFFu);
+            if ((pModel->flags & BR_MODF_UPDATEABLE) != 0) {
+                pModel->flags &= ~(BR_MODF_KEEP_ORIGINAL | BR_MODF_UPDATEABLE);
+                BrModelUpdate(pModel, BR_MODU_ALL);
             }
         } else {
-            pModel->flags |= (BR_MODF_DONT_WELD | BR_MODF_KEEP_ORIGINAL | BR_MODF_UPDATEABLE);
-            BrModelUpdate(pModel, 0x7FFFu);
+            pModel->flags |= BR_MODF_DONT_WELD | BR_MODF_KEEP_ORIGINAL | BR_MODF_UPDATEABLE;
+            BrModelUpdate(pModel, BR_MODU_ALL);
         }
     }
 }
@@ -1724,9 +1724,9 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
         FatalError(113);
     }
     if (strcmp(pCar_name, "STELLA.TXT") == 0) {
-        pCar_spec->proxy_ray_distance = 6.0;
+        pCar_spec->proxy_ray_distance = 6.0f;
     } else {
-        pCar_spec->proxy_ray_distance = 0.0;
+        pCar_spec->proxy_ray_distance = 0.0f;
     }
     PathCat(the_path, gApplication_path, "CARS");
     PathCat(the_path, the_path, pCar_name);

@@ -348,7 +348,7 @@ typedef enum keymapcodes {
 
 #define DR_PI 3.141592653589793
 
-#define TIME_CONV_THING 0.00050000002
+#define TIME_CONV_THING 0.0005f
 
 #define OPPONENT_COUNT 5
 

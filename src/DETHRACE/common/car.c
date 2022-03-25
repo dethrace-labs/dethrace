@@ -4360,7 +4360,7 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
             gCamera_yaw = 0;
             manual_swing = 1;
         }
-        if (fabs(c->speedo_speed) > 0.0005999999999999999 && gCamera_mode > 0) {
+        if (fabs(c->speedo_speed) > 0.0006f && gCamera_mode > 0) {
             gCamera_mode = -1;
             gCamera_sign = m2->m[2][1] * c->direction.v[1]
                     + m2->m[2][2] * c->direction.v[2]
