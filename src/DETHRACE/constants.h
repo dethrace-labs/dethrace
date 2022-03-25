@@ -266,6 +266,10 @@ typedef enum keymapcodes {
     KEYMAP_COCKPIT = 45,            // default C
     KEYMAP_SAVE = 28,               // default F2
     KEYMAP_LOAD = 29,               // default F3
+    KEYMAP_MOVE_UP = 30,            // default UP
+    KEYMAP_MOVE_DOWN = 31,          // default DOWN
+    KEYMAP_MOVE_LEFT = 32,          // default LEFT
+    KEYMAP_MOVE_RIGHT = 33,         // default RIGHT
     KEYMAP_MIRROR = 34,             // default M
     KEYMAP_PRATCAM = 35,            // default P
     KEYMAP_LOOK_LEFT = 50,          // default Q

@@ -486,7 +486,7 @@ void SetBRenderScreenAndBuffers(int pX_offset, int pY_offset, int pWidth, int pH
         FatalError(1);
     }
     gDepth_buffer = BrPixelmapMatch(gBack_screen, BR_PMMATCH_DEPTH_16);
-    if (!gDepth_buffer) {
+    if (gDepth_buffer == NULL) {
         FatalError(2);
     }
     BrZbBegin(gRender_screen->type, gDepth_buffer->type);
@@ -498,9 +498,9 @@ void SetIntegerMapRenders() {
     LOG_TRACE("()");
 
     gMap_render_x_i = ((int)gMap_render_x) & ~3;
-    gMap_render_y_i = ((int)gMap_render_y) & ~3;
+    gMap_render_y_i = ((int)gMap_render_y) & ~1;
     gMap_render_width_i = ((int)gMap_render_width) & ~3;
-    gMap_render_height_i = ((int)gMap_render_height) & ~3;
+    gMap_render_height_i = ((int)gMap_render_height) & ~1;
     if (gReal_graf_data_index != 0) {
         gMap_render_x_i = 2 * gMap_render_x_i;
         gMap_render_y_i = 2 * gMap_render_y_i + 40;
@@ -2986,8 +2986,8 @@ void DRPixelmapDoubledCopy(br_pixelmap* pDestn, br_pixelmap* pSource, int pSourc
 
     dst_row_skip = 2 * pDestn->row_bytes - 2 * pSource_width;
     src_row_skip = (pSource->row_bytes - pSource_width) / 2;
-    sptr = (tU16*)((tU8*)pSource->pixels - 2 * src_row_skip + (pSource->row_bytes * pSource_height / 2) * 2);
-    dptr = (tU8*)pDestn->pixels + pSource_width * 2 + (2 * pSource_height + pY_offset) * pDestn->row_bytes - pDestn->row_bytes;
+    sptr = (tU16*)((tU8*)pSource->pixels - 2 * src_row_skip + 2 * (pSource->row_bytes * pSource_height / 2));
+    dptr = (tU8*)pDestn->pixels + 2 * pSource_width + (2 * pSource_height + pY_offset) * pDestn->row_bytes - pDestn->row_bytes;
     dptr2 = dptr - pDestn->row_bytes;
     width_over_2 = pSource_width / 2;
     for (i = 0; i < pSource_height; i++) {

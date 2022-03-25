@@ -11,6 +11,7 @@
 #include "globvars.h"
 #include "globvrkm.h"
 #include "globvrpb.h"
+#include "grafdata.h"
 #include "graphics.h"
 #include "harness/trace.h"
 #include "init.h"
@@ -806,7 +807,54 @@ void CheckMapRenderMove() {
     float old_y;
     LOG_TRACE("()");
 
-    STUB_ONCE();
+    old_y = gMap_render_y;
+    old_x = gMap_render_x;
+    if (gMap_mode) {
+        amount = gFrame_period * .1f;
+        if (KeyIsDown(30)) {
+            gMap_render_y -= amount;
+        } else if (KeyIsDown(31)) {
+            gMap_render_y += amount;
+        }
+        if (KeyIsDown(32)) {
+            gMap_render_x -= amount;
+        } else if (KeyIsDown(33)) {
+            gMap_render_x += amount;
+        }
+        if (gMap_render_x != old_x || gMap_render_y != old_y) {
+            SetIntegerMapRenders();
+            if (gMap_render_x_i < gCurrent_graf_data->map_render_x_marg) {
+                if (gReal_graf_data_index == 0) {
+                    gMap_render_x = (gCurrent_graf_data->map_render_x_marg + 3) & ~3;
+                } else {
+                    gMap_render_x = ((gCurrent_graf_data->map_render_x_marg + 3) & ~3) / 2;
+                }
+            }
+            if (gMap_render_y_i < gCurrent_graf_data->map_render_y_marg) {
+                if (gReal_graf_data_index == 0) {
+                    gMap_render_y = (gCurrent_graf_data->map_render_y_marg + 1) & ~1;
+                } else {
+                    gMap_render_y = (((gCurrent_graf_data->map_render_y_marg + 1) & ~1) - 40) / 2;
+                }
+            }
+            if (gBack_screen->width - gCurrent_graf_data->map_render_x_marg - gMap_render_width_i < gMap_render_x_i) {
+                if (gReal_graf_data_index == 0) {
+                    gMap_render_x = (gBack_screen->width - gCurrent_graf_data->map_render_x_marg - gMap_render_width_i) & ~3;
+                } else {
+                    gMap_render_x = ((gBack_screen->width - gCurrent_graf_data->map_render_x_marg - gMap_render_width_i) & ~3) / 2;
+                }
+            }
+            if (gBack_screen->height - gCurrent_graf_data->map_render_y_marg - gMap_render_height_i < gMap_render_y_i) {
+                if (gReal_graf_data_index == 0) {
+                    gMap_render_y = (gBack_screen->height - gCurrent_graf_data->map_render_y_marg - gMap_render_height_i) & ~1;
+                } else {
+                    gMap_render_y = (((gBack_screen->height - gCurrent_graf_data->map_render_y_marg - gMap_render_height_i) & ~3) - 40 ) / 2;
+                }
+            }
+            SetIntegerMapRenders();
+            AdjustRenderScreenSize();
+        }
+    }
 }
 
 // IDA: void __usercall ExplodeCar(tCar_spec *pCar@<EAX>)
