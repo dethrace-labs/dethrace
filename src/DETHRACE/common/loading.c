@@ -1752,7 +1752,7 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
     if (strcmp(s, pCar_name) != 0)
         FatalError(115, pCar_name);
     if (*pDriver_name != '\0') {
-        memcpy(pCar_spec->driver_name, pDriver_name, sizeof(pCar_spec->driver_name));
+        strncpy(pCar_spec->driver_name, pDriver_name, sizeof(pCar_spec->driver_name));
         pCar_spec->driver_name[31] = 0;
     } else {
         pCar_spec->driver_name[0] = 'X';
