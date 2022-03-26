@@ -1,6 +1,7 @@
 #include "displays.h"
 #include "brender/brender.h"
 #include "constants.h"
+#include "controls.h"
 #include "depth.h"
 #include "flicplay.h"
 #include "globvars.h"
@@ -1269,7 +1270,63 @@ void DoSteeringWheel(tU32 pThe_time) {
 void ChangingView() {
     tU32 the_time;
     LOG_TRACE("()");
-    STUB_ONCE();
+
+    if (gProgram_state.new_view == eView_undefined) {
+        return;
+    }
+    the_time = PDGetTotalTime() - gProgram_state.view_change_start;
+    gScreen_wobble_x = 0;
+    gScreen_wobble_y = 0;
+    if (the_time > 175 && gProgram_state.which_view == gProgram_state.new_view) {
+        if (gProgram_state.pending_view != eView_undefined) {
+            if (gProgram_state.pending_view == eView_left) {
+                LookLeft();
+                return;
+            }
+            if (gProgram_state.pending_view != eView_forward) {
+                if (gProgram_state.pending_view == eView_right) {
+                    LookRight();
+                } else {
+                    gScreen_wobble_x = 0;
+                    gScreen_wobble_y = 0;
+                }
+                return;
+            }
+        }
+        if (gProgram_state.which_view == gProgram_state.new_view) {
+            gProgram_state.new_view = eView_undefined;
+            gScreen_wobble_x = 0;
+            gScreen_wobble_y = 0;
+        }
+    }
+    if (the_time < 88) {
+        if (gProgram_state.old_view < gProgram_state.new_view) {
+            gScreen_wobble_x = -gCurrent_graf_data->cock_margin_x * the_time * 2.f / 175.f;
+        } else {
+            gScreen_wobble_x = gCurrent_graf_data->cock_margin_x * the_time * 2.f / 175.f;
+        }
+    } else {
+        gProgram_state.which_view = gProgram_state.new_view;
+        switch (gProgram_state.new_view) {
+        case eView_left:
+            gProgram_state.cockpit_image_index = 1;
+            break;
+        case eView_forward:
+            gProgram_state.cockpit_image_index = 0;
+            break;
+        case eView_right:
+            gProgram_state.cockpit_image_index = 2;
+            break;
+        default:
+            break;
+        }
+        AdjustRenderScreenSize();
+        if (gProgram_state.old_view < gProgram_state.new_view) {
+            gScreen_wobble_x = gCurrent_graf_data->cock_margin_x * (175 - the_time) * 2.f / 175.f;
+        } else {
+            gScreen_wobble_x = -gCurrent_graf_data->cock_margin_x * (175 - the_time) * 2.f / 175.f;
+        }
+    }
 }
 
 // IDA: void __usercall EarnCredits2(int pAmount@<EAX>, char *pPrefix_text@<EDX>)

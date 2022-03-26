@@ -202,7 +202,7 @@ void F4Key() {
     LOG_TRACE("()");
 
     old_edit_mode = gWhich_edit_mode;
-    if (gI_am_cheating == 0xa11ee75d || (gI_am_cheating == 0xa11ee75d && gNet_mode == eNet_mode_none)) {
+    if (gI_am_cheating == 0xa11ee75d || (gI_am_cheating == 0x564e78b9 && gNet_mode == eNet_mode_none)) {
         if (PDKeyDown(KEY_SHIFT_ANY)) {
             gWhich_edit_mode--;
             if ((int)gWhich_edit_mode == -1) {
@@ -229,7 +229,12 @@ void F4Key() {
 // IDA: void __usercall SetFlag(int i@<EAX>)
 void SetFlag(int i) {
     LOG_TRACE("(%d)", i);
-    NOT_IMPLEMENTED();
+
+    if (gNet_mode == eNet_mode_none) {
+        NewTextHeadupSlot(4, 0, 3000, -4, "You Cheat!");
+    }
+    gI_am_cheating = i;
+    F4Key();
 }
 
 // IDA: void __usercall FinishLap(int i@<EAX>)
@@ -400,19 +405,65 @@ void NumberKey9() {
 // IDA: void __cdecl LookLeft()
 void LookLeft() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gAusterity_mode) {
+        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(192));
+    } else {
+        PratcamEvent(27);
+        gProgram_state.old_view = gProgram_state.which_view;
+        if (gProgram_state.which_view == eView_left) {
+            LookForward();
+        } else if (gProgram_state.which_view == eView_right) {
+            LookForward();
+            gProgram_state.pending_view = eView_left;
+        } else {
+            ClearWobbles();
+            gProgram_state.new_view = eView_left;
+            gProgram_state.view_change_start = PDGetTotalTime();
+            gProgram_state.pending_view = eView_undefined;
+        }
+    }
 }
 
 // IDA: void __cdecl LookForward()
 void LookForward() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gProgram_state.which_view == eView_right) {
+        PratcamEvent(27);
+    } else if (gProgram_state.which_view == eView_left) {
+        PratcamEvent(28);
+    }
+    if (gProgram_state.which_view != eView_forward) {
+        gProgram_state.old_view = gProgram_state.which_view;
+        ClearWobbles();
+        gProgram_state.new_view = eView_forward;
+        gProgram_state.view_change_start = PDGetTotalTime();
+        gProgram_state.pending_view = eView_undefined;
+    }
 }
 
 // IDA: void __cdecl LookRight()
 void LookRight() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gAusterity_mode) {
+        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(192));
+    } else {
+        PratcamEvent(28);
+        gProgram_state.old_view = gProgram_state.which_view;
+        if (gProgram_state.which_view == eView_right) {
+            LookForward();
+        } else if (gProgram_state.which_view == eView_left) {
+            LookForward();
+            gProgram_state.pending_view = eView_right;
+        } else {
+            ClearWobbles();
+            gProgram_state.new_view = eView_right;
+            gProgram_state.view_change_start = PDGetTotalTime();
+            gProgram_state.pending_view = eView_undefined;
+        }
+    }
 }
 
 // IDA: void __cdecl DamageTest()
