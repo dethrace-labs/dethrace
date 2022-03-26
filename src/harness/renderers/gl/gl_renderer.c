@@ -604,13 +604,15 @@ void GLRenderer_FlushBuffers(br_pixelmap* color_buffer, br_pixelmap* depth_buffe
     glBindTexture(GL_TEXTURE_2D, depth_texture);
     glGetTexImage(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, depth_buffer_flip_pixels);
 
-    dest_y = render_height;
+    dest_y = color_buffer->height;
+    int src_y = render_height - color_buffer->base_y - color_buffer->height;
     uint16_t* depth_pixels = depth_buffer->pixels;
-    for (int y = 0; y < render_height; y++) {
+    for (int y = 0; y < color_buffer->height; y++) {
         dest_y--;
-        for (int x = 0; x < render_width; x++) {
-            depth_pixels[dest_y * render_width + x] = depth_buffer_flip_pixels[y * render_width + x];
+        for (int x = 0; x < color_buffer->width; x++) {
+            depth_pixels[dest_y * render_width + x] = depth_buffer_flip_pixels[src_y * render_width + color_buffer->base_x + x];
         }
+        src_y++;
     }
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
     glClear(GL_COLOR_BUFFER_BIT);
