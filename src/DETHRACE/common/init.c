@@ -216,8 +216,8 @@ void ReinitialiseRenderStuff() {
         gProgram_state.current_render_right = gProgram_state.current_car.render_right[gProgram_state.cockpit_image_index];
         gProgram_state.current_render_bottom = gProgram_state.current_car.render_bottom[gProgram_state.cockpit_image_index];
     } else {
-        gProgram_state.current_render_top = (gGraf_specs[gGraf_spec_index].total_height / 18 & 0xFFFFFFFE) * gRender_indent;
-        gProgram_state.current_render_left = (gGraf_specs[gGraf_spec_index].total_width / 18 & 0xFFFFFFFC) * gRender_indent;
+        gProgram_state.current_render_top = (gGraf_specs[gGraf_spec_index].total_height / 18 & ~1) * gRender_indent;
+        gProgram_state.current_render_left = (gGraf_specs[gGraf_spec_index].total_width / 18 & ~3) * gRender_indent;
         x_diff = gGraf_specs[gGraf_spec_index].total_width - gProgram_state.current_render_left;
         y_diff = gGraf_specs[gGraf_spec_index].total_height - gProgram_state.current_render_top;
         gProgram_state.current_render_right = x_diff;
@@ -659,5 +659,6 @@ int GetScreenSize() {
 // IDA: void __usercall SetScreenSize(int pNew_size@<EAX>)
 void SetScreenSize(int pNew_size) {
     LOG_TRACE("(%d)", pNew_size);
+
     gRender_indent = pNew_size;
 }
