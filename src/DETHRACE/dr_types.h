@@ -2725,7 +2725,11 @@ typedef struct tSave_camera {
     br_angle yaw;
 } tSave_camera;
 
+#ifdef DETHRACE_FIX_BUGS
+typedef void tEdit_func();
+#else
 typedef void* tEdit_func();
+#endif
 
 typedef enum tEdit_mode {
     eEdit_mode_cheat = 0,

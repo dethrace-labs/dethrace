@@ -84,8 +84,50 @@ int gRepair_last_time;
 int gHad_auto_recover;
 tU32 gLast_repair_time;
 tEdit_mode gWhich_edit_mode = eEdit_mode_options;
-char* gEdit_mode_names[10];
-tEdit_func* gEdit_funcs[10][18][8];
+char* gEdit_mode_names[10] = {
+    "Cheat",
+    "Accessories",
+    "Special Volumes",
+    "Pedestrians",
+    "Opponents",
+    "Prat-cam",
+    "Depth effects",
+    "Damage",
+    "Bonnet",
+    "Options",
+};
+// order is: { None, CTRL, ALT, CTRL+ALT, SHIFT, CTRL+SHIFT, ALT+SHIFT, CTRL+ALT+SHIFT }
+tEdit_func* gEdit_funcs[10][18][8] = {
+    {  },  // eEdit_mode_cheat
+    {  },  // eEdit_mode_acc
+    {  },  // eEdit_mode_spec_vol
+    {  },  // eEdit_mode_ped
+    {  },  // eEdit_mode_opp
+    {  },  // eEdit_mode_pratcam
+    {  },  // eEdit_mode_depth
+    {  },  // eEdit_mode_damage
+    {  },  // eEdit_mode_bonnet
+    {  // eEdit_mode_options
+        { },  // F5
+        { },  // F6
+        { },  // F7
+        { },  // F8
+        { },  // F10
+        { },  // F11
+        { },  // F12
+        { },  // 0
+        { CycleCarSimplificationLevel, NULL, NULL, NULL, CycleCarTexturingLevel, },  // 1
+        { ToggleShadow, NULL, NULL, NULL, ToggleSmoke, },  // 2
+        { CycleWallTexturingLevel, NULL, NULL, NULL, CycleRoadTexturingLevel, },  // 3
+        { ToggleSky, NULL, NULL, NULL, ToggleDepthCueing, },  // 4
+        { CycleYonFactor, NULL, NULL, NULL, ToggleAccessoryRendering, },  // 5
+        { DecreaseYon, NULL, NULL, NULL, IncreaseYon,  },  // 6
+        { CycleSoundDetailLevel,  },  // 7
+        { },  // 8
+        { },  // 9
+        { },  // not used
+    },
+};
 tCheat gKev_keys[44] = {
     { .code = 0xA11EE75D, .code2 = 0xF805EDDD, .action_proc = SetFlag, .num = 0x0A11EE75D },
     { .code = 0x564E78B9, .code2 = 0x99155115, .action_proc = SetFlag, .num = 0x564E78B9 },
@@ -158,7 +200,30 @@ void F4Key() {
     char s[256];
     tEdit_mode old_edit_mode;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    old_edit_mode = gWhich_edit_mode;
+    if (gI_am_cheating == 0xa11ee75d || (gI_am_cheating == 0xa11ee75d && gNet_mode == eNet_mode_none)) {
+        if (PDKeyDown(KEY_SHIFT_ANY)) {
+            gWhich_edit_mode--;
+            if ((int)gWhich_edit_mode == -1) {
+                gWhich_edit_mode = eEdit_mode_options;
+            }
+        } else {
+            gWhich_edit_mode++;
+            if (gWhich_edit_mode >= eEdit_mode_count) {
+                gWhich_edit_mode = eEdit_mode_cheat;
+            }
+        }
+        sprintf(s, "Edit mode: %s", gEdit_mode_names[gWhich_edit_mode]);
+        NewTextHeadupSlot2(4, 0, 2000, -4, s, 0);
+        if (gWhich_edit_mode == eEdit_mode_spec_vol && old_edit_mode != eEdit_mode_spec_vol) {
+            ShowSpecialVolumes();
+        } else if (gWhich_edit_mode != eEdit_mode_spec_vol && old_edit_mode == eEdit_mode_spec_vol) {
+            HideSpecialVolumes();
+        }
+    } else {
+        gWhich_edit_mode = eEdit_mode_options;
+    }
 }
 
 // IDA: void __usercall SetFlag(int i@<EAX>)
@@ -193,7 +258,24 @@ void ShowSpecialVolumesIfRequ() {
 void DoEditModeKey(int pIndex) {
     int modifiers;
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+
+    if (gI_am_cheating == 0xa11ee75d || (gI_am_cheating == 0x564e78b9 && gNet_mode == eNet_mode_none)) {
+        modifiers = 0;
+        if (PDKeyDown(KEY_SHIFT_ANY)) {
+            modifiers |= 4;
+        }
+        if (PDKeyDown(KEY_ALT_ANY)) {
+            modifiers |= 2;
+        }
+        if (PDKeyDown(KEY_CTRL_ANY)) {
+            modifiers |= 1;
+        }
+        if (gEdit_funcs[gWhich_edit_mode][pIndex][modifiers] != NULL) {
+            gEdit_funcs[gWhich_edit_mode][pIndex][modifiers]();
+        }
+    } else {
+        gWhich_edit_mode = eEdit_mode_options;
+    }
 }
 
 // IDA: void __cdecl F5Key()
