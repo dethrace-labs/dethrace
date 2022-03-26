@@ -436,12 +436,12 @@ br_error _M_br_device_pixelmap_mem_rectangleCopyTo(br_device_pixelmap* self, br_
         if (src->pm_row_bytes == self->pm_row_bytes && (self->pm_flags & (BR_PMF_ROW_WHOLEPIXELS | BR_PMF_LINEAR)) == (BR_PMF_ROW_WHOLEPIXELS | BR_PMF_LINEAR)) {
             if (self->pm_row_bytes > 0) {
                 pm_mem_copy_colour((br_uint_8*)self->pm_pixels + (self->pm_base_y + ap.y) * self->pm_row_bytes + (self->pm_base_x + ap.x) * bytes, self->pm_pixels_qualifier,
-                    src->pm_pixels + (src->pm_base_y + ar.y) * src->pm_row_bytes + (src->pm_base_x + ar.x) * bytes, src->pm_pixels_qualifier,
+                    (br_uint_8*)src->pm_pixels + (src->pm_base_y + ar.y) * src->pm_row_bytes + (src->pm_base_x + ar.x) * bytes, src->pm_pixels_qualifier,
                     ar.w * ar.h, bytes);
                 return 0;
             } else {
                 pm_mem_copy_colour((br_uint_8*)self->pm_pixels + (self->pm_base_y + ap.y + ar.h - 1) * self->pm_row_bytes + (self->pm_base_x + ap.x) * bytes, self->pm_pixels_qualifier,
-                    src->pm_pixels + (src->pm_base_y + ar.y + ar.h - 1) * src->pm_row_bytes + (src->pm_base_x + ar.x) * bytes, src->pm_pixels_qualifier,
+                    (br_uint_8*)src->pm_pixels + (src->pm_base_y + ar.y + ar.h - 1) * src->pm_row_bytes + (src->pm_base_x + ar.x) * bytes, src->pm_pixels_qualifier,
                     ar.w * ar.h, bytes);
                 return 0;
             }
@@ -449,13 +449,13 @@ br_error _M_br_device_pixelmap_mem_rectangleCopyTo(br_device_pixelmap* self, br_
     }
     if (self->pm_row_bytes % 8 == 0) {
         pm_mem_copy_colour_rect((br_uint_8*)self->pm_pixels + (self->pm_base_y + ap.y) * self->pm_row_bytes + (self->pm_base_x + ap.x) * bytes, self->pm_pixels_qualifier,
-            src->pm_pixels + (src->pm_base_y + ar.y) * src->pm_row_bytes + (src->pm_base_x + ar.x) * bytes, src->pm_pixels_qualifier,
+            (br_uint_8*)src->pm_pixels + (src->pm_base_y + ar.y) * src->pm_row_bytes + (src->pm_base_x + ar.x) * bytes, src->pm_pixels_qualifier,
             ar.w, ar.h, self->pm_row_bytes, src->pm_row_bytes, bytes);
         return 0;
     }
     for (i = 0; i < ar.h; i++) {
         pm_mem_copy_colour((br_uint_8*)self->pm_pixels + (self->pm_base_y + ap.y + i) * self->pm_row_bytes + (self->pm_base_x + ap.x) * bytes, self->pm_pixels_qualifier,
-            src->pm_pixels + (src->pm_base_y + ar.y + i) * src->pm_row_bytes + (src->pm_base_x + ar.x) * bytes, src->pm_pixels_qualifier,
+            (br_uint_8*)src->pm_pixels + (src->pm_base_y + ar.y + i) * src->pm_row_bytes + (src->pm_base_x + ar.x) * bytes, src->pm_pixels_qualifier,
             ar.w, bytes);
     }
     return 0;
