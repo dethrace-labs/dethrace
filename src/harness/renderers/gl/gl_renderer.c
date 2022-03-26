@@ -281,7 +281,7 @@ void GLRenderer_SetShadeTable(br_pixelmap* table) {
 extern br_v1db_state v1db;
 
 void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer) {
-    glViewport(colour_buffer->base_x, colour_buffer->base_y, colour_buffer->width, colour_buffer->height);
+    glViewport(colour_buffer->base_x, render_height - colour_buffer->height - colour_buffer->base_y, colour_buffer->width, colour_buffer->height);
 
     glEnable(GL_DEPTH_TEST);
     glUseProgram(shader_program_3d);
