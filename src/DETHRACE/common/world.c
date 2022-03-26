@@ -822,7 +822,7 @@ float ControlBoundFunkGroovePlus(int pSlot_number, float pValue) {
 }
 
 // IDA: void __usercall ShiftBoundGrooveFunks(char *pStart@<EAX>, char *pEnd@<EDX>, int pDelta@<EBX>)
-void ShiftBoundGrooveFunks(char* pStart, char* pEnd, size_t pDelta) {
+void ShiftBoundGrooveFunks(char* pStart, char* pEnd, ptrdiff_t pDelta) {
     int i;
     LOG_TRACE("(\"%s\", \"%s\", %d)", pStart, pEnd, pDelta);
 

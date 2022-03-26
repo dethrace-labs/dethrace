@@ -123,7 +123,7 @@ void ControlBoundFunkGroove(int pSlot_number, float pValue);
 
 float ControlBoundFunkGroovePlus(int pSlot_number, float pValue);
 
-void ShiftBoundGrooveFunks(char* pStart, char* pEnd, size_t pDelta);
+void ShiftBoundGrooveFunks(char* pStart, char* pEnd, ptrdiff_t pDelta);
 
 tFunkotronic_spec* AddNewFunkotronic();
 
