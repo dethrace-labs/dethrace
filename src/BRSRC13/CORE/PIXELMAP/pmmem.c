@@ -361,7 +361,27 @@ br_error _M_br_device_pixelmap_mem_copyFrom(br_device_pixelmap* self, br_device_
 br_error _M_br_device_pixelmap_mem_fill(br_device_pixelmap* self, br_uint_32 colour) {
     br_int_8 bytes;
     LOG_TRACE("(%p, %d)", self, colour);
-    NOT_IMPLEMENTED();
+
+    bytes = pmTypeInfo[self->pm_type].bits >> 3;
+    if ((self->pm_flags & (BR_PMF_ROW_WHOLEPIXELS | BR_PMF_LINEAR)) == (BR_PMF_ROW_WHOLEPIXELS | BR_PMF_LINEAR)) {
+        if (self->pm_row_bytes > 0) {
+            pm_mem_fill_colour(self->pm_pixels + self->pm_base_y * self->pm_row_bytes + self->pm_base_x * bytes, self->pm_pixels_qualifier,
+                self->pm_width * self->pm_height, bytes, colour);
+        } else {
+            pm_mem_fill_colour(self->pm_pixels + (self->pm_base_y + self->pm_height - 1) * self->pm_row_bytes + self->pm_base_x * bytes,
+                self->pm_pixels_qualifier, self->pm_width * self->pm_height, bytes, colour);
+        }
+    } else if ((self->pm_row_bytes & 7) == 0) {
+        pm_mem_fill_colour_rect(self->pm_pixels + self->pm_base_y * self->pm_row_bytes + self->pm_base_x * bytes, self->pm_pixels_qualifier,
+            self->pm_width, self->pm_height, self->pm_row_bytes, bytes, colour);
+    } else {
+        int i;
+        for (i = 0; i < self->pm_height; i++) {
+            pm_mem_fill_colour(self->pm_pixels + (i + self->pm_base_y) * self->pm_row_bytes + self->pm_base_x * bytes, self->pm_pixels_qualifier,
+                self->pm_width, bytes, colour);
+        }
+    }
+    return 0;
 }
 
 // IDA: br_error __cdecl _M_br_device_pixelmap_mem_doubleBuffer(br_device_pixelmap *self, br_device_pixelmap *src)

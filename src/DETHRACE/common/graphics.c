@@ -1366,8 +1366,8 @@ int ConditionallyFillWithSky(br_pixelmap* pPixelmap) {
 
     // TODO: Uncomment when ExternalSky is fully implemented
     LOG_WARN_ONCE("Uncomment this block when ExternalSky is fully implemented");
-    // if (gProgram_state.current_depth_effect.sky_texture
-    //     && (!gLast_camera_special_volume || gLast_camera_special_volume->sky_col < 0)) {
+    // if (gProgram_state.current_depth_effect.sky_texture != NULL
+    //     && (gLast_camera_special_volume == NULL || gLast_camera_special_volume->sky_col < 0)) {
     //     return 0;
     // }
 

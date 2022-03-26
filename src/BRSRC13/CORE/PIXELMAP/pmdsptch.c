@@ -103,15 +103,8 @@ void BrPixelmapFill(br_pixelmap* dst, br_uint_32 colour) {
     br_uint_32 y;
     char* d;
 
-    if ((dst->flags & (BR_PMF_LINEAR | BR_PMF_ROW_WHOLEPIXELS)) == (BR_PMF_LINEAR | BR_PMF_ROW_WHOLEPIXELS)) {
-        memset(dst->pixels, colour, dst->row_bytes * dst->height);
-    } else {
-        d = dst->pixels;
-        for (y = 0; y < dst->height; y++) {
-            memset(d, colour, dst->row_bytes);
-            d += dst->row_bytes;
-        }
-    }
+    CheckDispatch((br_device_pixelmap*)dst);
+    (*(br_device_pixelmap_dispatch**)dst)->_fill((br_device_pixelmap*)dst, colour);
 }
 
 // IDA: void __cdecl BrPixelmapRectangle(br_pixelmap *dst, br_int_32 x, br_int_32 y, br_int_32 w, br_int_32 h, br_uint_32 colour)
