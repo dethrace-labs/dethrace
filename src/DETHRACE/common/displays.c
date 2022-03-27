@@ -1025,9 +1025,9 @@ void DoInstruments(tU32 pThe_time) {
     LOG_TRACE("(%d)", pThe_time);
 
     if (gProgram_state.current_car_index == gProgram_state.current_car.index) {
-        speed_mph = gCar_to_view->speedo_speed * 6.9000001 / 1600.0 * 3600000.0;
-        if (speed_mph < 0.0) {
-            speed_mph = 0.0;
+        speed_mph = gCar_to_view->speedo_speed * WORLD_SCALE / 1600.0f * 3600000.0f;
+        if (speed_mph < 0.0f) {
+            speed_mph = 0.0f;
         }
         if (gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0) {
             if (gProgram_state.which_view != eView_forward) {
@@ -1057,33 +1057,25 @@ void DoInstruments(tU32 pThe_time) {
             if (the_angle2 < 0) {
                 the_angle2 = the_angle2 + 6.283185307179586;
             }
-            if (the_angle2 <= 4.71238898038469) {
-                if (the_angle2 <= DR_PI) {
-                    if (the_angle2 <= 1.570796326794897) {
-                        cos_angle = gCosine_array[(unsigned int)(the_angle2 / DR_PI * 128.0)];
-                    } else {
-                        cos_angle = -gCosine_array[(unsigned int)((DR_PI - the_angle2) / DR_PI * 128.0)];
-                    }
-                } else {
-                    cos_angle = -gCosine_array[(unsigned int)((the_angle2 - DR_PI) / DR_PI * 128.0)];
-                }
-            } else {
+            if (the_angle2 > 4.71238898038469) {
                 cos_angle = gCosine_array[(unsigned int)((6.283185307179586 - the_angle2) / DR_PI * 128.0)];
-            }
-            if (the_angle <= 4.71238898038469) {
-                if (the_angle <= DR_PI) {
-                    if (the_angle <= 1.570796326794897) {
-                        sin_angle = gCosine_array[(unsigned int)(the_angle / DR_PI * 128.0)];
-                    } else {
-                        sin_angle = -gCosine_array[(unsigned int)((DR_PI - the_angle) / DR_PI * 128.0)];
-                    }
-                } else {
-                    sin_angle = -gCosine_array[(unsigned int)((the_angle - DR_PI) / DR_PI * 128.0)];
-                }
+            } else if (the_angle2 > DR_PI) {
+                cos_angle = -gCosine_array[(unsigned int)((the_angle2 - DR_PI) / DR_PI * 128.0)];
+            } else if (the_angle2 > 1.5707963267948966) {
+                cos_angle = -gCosine_array[(unsigned int)((DR_PI - the_angle2) / DR_PI * 128.0)];
             } else {
-                sin_angle = gCosine_array[(unsigned int)((6.283185307179586 - the_angle) / DR_PI * 128.0)];
+                cos_angle = gCosine_array[(unsigned int)(the_angle2 / DR_PI * 128.0)];
             }
-            if (tacho_image) {
+            if (the_angle > 4.71238898038469) {
+                sin_angle = gCosine_array[(unsigned int)((6.283185307179586 - the_angle) / DR_PI * 128.0)];
+            } else if (the_angle > DR_PI) {
+                sin_angle = -gCosine_array[(unsigned int)((the_angle - DR_PI) / DR_PI * 128.0)];
+            } else if (the_angle > 1.5707963267948966) {
+                sin_angle = -gCosine_array[(unsigned int)((DR_PI - the_angle) / DR_PI * 128.0)];
+            } else {
+                sin_angle = gCosine_array[(unsigned int)(the_angle / DR_PI * 128.0)];
+            }
+            if (tacho_image != NULL) {
                 DRPixelmapRectangleMaskedCopy(
                     gBack_screen,
                     the_wobble_x + gProgram_state.current_car.tacho_x[gProgram_state.cockpit_on],
@@ -1111,7 +1103,7 @@ void DoInstruments(tU32 pThe_time) {
                     - (double)gProgram_state.current_car.tacho_radius_2[gProgram_state.cockpit_on] * cos_angle
                     + (double)the_wobble_y),
                 gProgram_state.current_car.tacho_needle_colour[gProgram_state.cockpit_on]);
-        } else if (tacho_image) {
+        } else if (tacho_image != NULL) {
             BrPixelmapRectangleCopy(
                 gBack_screen,
                 the_wobble_x + gProgram_state.current_car.tacho_x[gProgram_state.cockpit_on],
@@ -1168,31 +1160,24 @@ void DoInstruments(tU32 pThe_time) {
             if (the_angle2 < 0.0) {
                 the_angle2 = the_angle2 + 6.283185307179586;
             }
-            if (the_angle2 <= 4.71238898038469) {
-                if (the_angle2 <= DR_PI) {
-                    if (the_angle2 <= 1.570796326794897) {
-                        cos_angle = gCosine_array[(unsigned int)(the_angle2 / DR_PI * 128.0)];
-                    } else {
-                        cos_angle = -gCosine_array[(unsigned int)((DR_PI - the_angle2) / DR_PI * 128.0)];
-                    }
-                } else {
-                    cos_angle = -gCosine_array[(unsigned int)((the_angle2 - DR_PI) / DR_PI * 128.0)];
-                }
-            } else {
+            if (the_angle2 > 4.71238898038469) {
                 cos_angle = gCosine_array[(unsigned int)((6.283185307179586 - the_angle2) / DR_PI * 128.0)];
-            }
-            if (the_angle <= 4.71238898038469) {
-                if (the_angle <= DR_PI) {
-                    if (the_angle <= 1.570796326794897) {
-                        sin_angle = gCosine_array[(unsigned int)(the_angle / DR_PI * 128.0)];
-                    } else {
-                        sin_angle = -gCosine_array[(unsigned int)((DR_PI - the_angle) / DR_PI * 128.0)];
-                    }
-                } else {
-                    sin_angle = -gCosine_array[(unsigned int)((the_angle - DR_PI) / DR_PI * 128.0)];
-                }
+            } else if (the_angle2 > DR_PI) {
+                cos_angle = -gCosine_array[(unsigned int)((the_angle2 - DR_PI) / DR_PI * 128.0)];
+            } else if (the_angle2 > 1.5707963267948966) {
+                cos_angle = -gCosine_array[(unsigned int)((DR_PI - the_angle2) / DR_PI * 128.0)];
             } else {
+                cos_angle = gCosine_array[(unsigned int)(the_angle2 / DR_PI * 128.0)];
+            }
+
+            if (the_angle > 4.71238898038469) {
                 sin_angle = gCosine_array[(unsigned int)((6.283185307179586 - the_angle) / DR_PI * 128.0)];
+            } else if (the_angle > DR_PI) {
+                sin_angle = -gCosine_array[(unsigned int)((the_angle - DR_PI) / DR_PI * 128.0)];
+            } else if (the_angle > 1.5707963267948966) {
+                sin_angle = -gCosine_array[(unsigned int)((DR_PI - the_angle) / DR_PI * 128.0)];
+            } else {
+                sin_angle = gCosine_array[(unsigned int)(the_angle / DR_PI * 128.0)];
             }
 
             PoshDrawLine(
@@ -1211,7 +1196,7 @@ void DoInstruments(tU32 pThe_time) {
                     - (double)gProgram_state.current_car.speedo_radius_2[gProgram_state.cockpit_on] * cos_angle
                     + (double)the_wobble_y),
                 gProgram_state.current_car.speedo_needle_colour[gProgram_state.cockpit_on]);
-            if (speedo_image && gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0) {
+            if (speedo_image != NULL && gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0) {
                 DRPixelmapRectangleMaskedCopy(
                     gBack_screen,
                     the_wobble_x + gProgram_state.current_car.speedo_x[gProgram_state.cockpit_on],
@@ -1222,7 +1207,7 @@ void DoInstruments(tU32 pThe_time) {
                     speedo_image->width,
                     speedo_image->height);
             }
-        } else if (speedo_image) {
+        } else if (speedo_image != NULL) {
             DrawNumberAt(
                 speedo_image,
                 the_wobble_x + gProgram_state.current_car.speedo_x[gProgram_state.cockpit_on],
