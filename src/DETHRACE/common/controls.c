@@ -196,8 +196,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
         { 0 },  // 7
         { 0 },  // 8
         { 0 },  // 9
-        { },  // not used
-0     },
+        { 0 },  // not used
+    },
     {  // eEdit_mode_pratcam
         { 0 },  // F5
         { 0 },  // F6
