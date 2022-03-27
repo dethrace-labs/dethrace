@@ -63,7 +63,7 @@ void PlaySmackerFile(char* pSmack_name) {
 
         dr_dprintf("Trying to open smack file '%s'", the_path);
         s = smk_open_file(the_path, SMK_MODE_MEMORY);
-        if (!s) {
+        if (s == NULL) {
             dr_dprintf("Unable to open smack file - attempt to load smack from CD...");
             if (GetCDPathFromPathsTxtFile(the_path)) {
                 strcat(the_path, gDir_separator);
@@ -77,7 +77,7 @@ void PlaySmackerFile(char* pSmack_name) {
                 dr_dprintf("Can't get CD directory name");
             }
         }
-        if (s) {
+        if (s != NULL) {
             dr_dprintf("Smack file opened OK");
             smk_info_all(s, NULL, &f, &usf);
             smk_info_video(s, &w, &h, NULL);

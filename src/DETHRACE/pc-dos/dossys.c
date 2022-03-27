@@ -241,7 +241,7 @@ void PDSetKeyArray(int* pKeys, int pMark) {
 int PDGetASCIIFromKey(int pKey) {
     LOG_TRACE("(%d)", pKey);
 
-    if (PDKeyDown3(KEY_LSHIFT)) {
+    if (PDKeyDown(KEY_LSHIFT)) {
         return gASCII_shift_table[pKey];
     } else {
         return gASCII_table[pKey];
@@ -290,11 +290,11 @@ void PDInitialiseSystem() {
     gJoystick_deadzone = 8000;
     // gUpper_loop_limit = sub_A1940(v4, v5, v3, v6) / 2;
 
-    // Demo does not ship with KEYBOARD.COK file
-    if (harness_game_info.mode != eGame_carmageddon_demo) {
+    // Demo's do not ship with KEYBOARD.COK file
+    if (harness_game_info.defines.ascii_table == NULL) {
         PathCat(the_path, gApplication_path, "KEYBOARD.COK");
         f = fopen(the_path, "rb");
-        if (!f) {
+        if (f == NULL) {
             PDFatalError("This .exe must have KEYBOARD.COK in the DATA folder.");
         }
 
@@ -304,6 +304,9 @@ void PDInitialiseSystem() {
         fread(gASCII_table, len / 2, 1, f);
         fread(gASCII_shift_table, len / 2, 1, f);
         fclose(f);
+    } else {
+        memcpy(gASCII_table, harness_game_info.defines.ascii_table, sizeof(gASCII_table));
+        memcpy(gASCII_shift_table, harness_game_info.defines.ascii_shift_table, sizeof(gASCII_shift_table));
     }
 }
 

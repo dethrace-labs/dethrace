@@ -359,7 +359,7 @@ void SelectOpponents(tRace_info* pRace_info) {
     int had_scum;
     LOG_TRACE("(%p)", pRace_info);
 
-    if (harness_game_info.mode == eGame_carmageddon_demo) {
+    if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo) {
         pRace_info->number_of_racers = OPPONENT_COUNT;
         for (i = 0; i < OPPONENT_COUNT; i++) {
             pRace_info->opponent_list[i].index = gDemo_opponents[i];

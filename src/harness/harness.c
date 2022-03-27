@@ -34,24 +34,140 @@ tHarness_game_info harness_game_info;
 // Configuration options
 tHarness_game_config harness_game_config;
 
+
+// German ASCII codes
+static int carmageddon_german_ascii_table[128] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107,
+    108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 122, 121, 94, -33, -76, 8, 13, 13, 0, 45, 60, -10, -28, 46, 44, -4, 43, 35, 27,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, 56, -33, -76, 46, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+};
+static int carmageddon_german_ascii_shift_table[128] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 61, 33, 34, -89, 36, 37, 38, 47, 40, 41, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75,
+    76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 90, 89, -80, 63, 96, 8, 13, 13, 0, 95, 62, -42, -60, 58, 44, -36, 42, 39, 27,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, 56, -33, -76, 46, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+};
+
+// Demo ASCII codes
+static int demo_ascii_table[128] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107,
+    108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 122, 121, 94, -33, -76, 8, 13, 13, 0, 45, 60, -10, -28, 46, 44, -4, 43, 35, 27,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, 56, -33, -76, 46, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+};
+static int demo_ascii_shift_table[128] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 61, 33, 34, -89, 36, 37, 38, 47, 40, 41, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75,
+    76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 90, 89, -80, 63, 96, 8, 13, 13, 0, 95, 62, -42, -60, 58, 44, -36, 42, 39, 27,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, 56, -33, -76, 46, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+};
+
+// Splatpack Demo ASCII codes
+static int splatpack_xmasdemo_ascii_table[128] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75,
+    76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 96, 45, 61, 8, 13, 3, 9, 47, 92, 59, 39, 46, 44, 91, 93, 35, 27,
+    0, 127, 0, 0, 0, 0, 28, 29, 30, 31, 0, 47, 42, 45, 43, 46, 61, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32,
+};
+static int splatpack_xmasdemo_ascii_shift_table[128] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 41, 33, 34, 163, 36, 37, 94, 38, 42, 40, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75,
+    76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 172, 95, 43, 8, 13, 13, 0, 63, 124, 58, 64, 62, 44, 123, 125, 126, 27,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 47, 42, 45, 43, 46, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 8,
+};
+
 int Harness_ProcessCommandLine(int* argc, char* argv[]);
 
 void Harness_DetectGameMode() {
-    if (access("DATA/RACES/CITY01.TXT", F_OK) == -1 && access("DATA/RACES/CITYA1.TXT", F_OK) == -1) {
-        harness_game_info.defines.INTRO_SMK_FILE = "";
-        harness_game_info.defines.GERMAN_LOADSCRN = "COWLESS.PIX";
-        harness_game_info.mode = eGame_carmageddon_demo;
-        LOG_INFO("\"%s\"", "Carmageddon demo");
-    } else if (access("DATA/CUTSCENE/SPLINTRO.SMK", F_OK) != -1) {
-        harness_game_info.defines.INTRO_SMK_FILE = "SPLINTRO.SMK";
-        harness_game_info.defines.GERMAN_LOADSCRN = "LOADSCRN.PIX";
-        harness_game_info.mode = eGame_splatpack;
-        LOG_INFO("\"%s\"", "Splat Pack");
+    if (access("DATA/RACES/CASTLE.TXT", F_OK) != -1) {
+        // All splatpack edition have the castle track
+        if (access("DATA/RACES/CASTLE2.TXT", F_OK) != -1) {
+            // Only the full splat release has the castle2 track
+            harness_game_info.defines.INTRO_SMK_FILE = "SPLINTRO.SMK";
+            harness_game_info.defines.GERMAN_LOADSCRN = "LOADSCRN.PIX";
+            harness_game_info.mode = eGame_splatpack;
+            LOG_INFO("\"%s\"", "Splat Pack");
+        } else if (access("DATA/RACES/TINSEL.TXT", F_OK) != -1) {
+            // Only the the splat x-mas demo has the tinsel track
+            harness_game_info.defines.INTRO_SMK_FILE = "";
+            harness_game_info.defines.GERMAN_LOADSCRN = "";
+            harness_game_info.mode = eGame_splatpack_demo;
+            LOG_INFO("\"%s\"", "Splat Pack X-mas demo");
+        } else {
+            // Assume we're using the splatpack demo
+            harness_game_info.defines.INTRO_SMK_FILE = "";
+            harness_game_info.defines.GERMAN_LOADSCRN = "";
+            harness_game_info.mode = eGame_splatpack_demo;
+            LOG_INFO("\"%s\"", "Splat Pack demo");
+        }
+    } else if (access("DATA/RACES/CITYB3.TXT", F_OK) != -1) {
+        // All non-splatpack edition have the cityb3 track
+        if (access("DATA/RACES/CITYA1.TXT", F_OK) == -1) {
+            // The demo does not have the citya1 track
+            harness_game_info.defines.INTRO_SMK_FILE = "";
+            harness_game_info.defines.GERMAN_LOADSCRN = "COWLESS.PIX";
+            harness_game_info.mode = eGame_carmageddon_demo;
+            LOG_INFO("\"%s\"", "Carmageddon demo");
+        }
+        else {
+            goto carmageddon;
+        }
     } else {
-        harness_game_info.defines.INTRO_SMK_FILE = "MIX_INTR.SMK";
+carmageddon:
+        if (access("DATA/CUTSCENE/Mix_intr.smk", F_OK) == -1) {
+            harness_game_info.defines.INTRO_SMK_FILE = "Mix_intr.smk";
+        } else {
+            harness_game_info.defines.INTRO_SMK_FILE = "MIX_INTR.SMK";
+        }
         harness_game_info.defines.GERMAN_LOADSCRN = "LOADSCRN.PIX";
         harness_game_info.mode = eGame_carmageddon;
         LOG_INFO("\"%s\"", "Carmageddon");
+    }
+
+    harness_game_info.localization = eGameLocalization_none;
+    if (access("DATA/TRNSLATE.TXT", F_OK) != -1) {
+        FILE *f = fopen("DATA/TRNSLATE.TXT", "rb");
+        fseek(f, 0, SEEK_END);
+        int filesize = ftell(f);
+        fseek(f, 0, SEEK_SET);
+        char *buffer = malloc(filesize + 1);
+        int nb = fread(buffer, 1, filesize, f);
+        if (nb != filesize) {
+            LOG_PANIC("Unable to read DATA/TRNSLATE.TXT");
+        }
+        buffer[filesize] = '\0';
+        fclose(f);
+        if (strstr(buffer, "NEUES SPIEL") != NULL) {
+            harness_game_info.localization = eGameLocalization_german;
+            LOG_INFO("Language: \"%s\"", "German");
+        } else {
+            LOG_INFO("Language: unrecognized");
+        }
+        free(buffer);
+    }
+
+    switch (harness_game_info.mode) {
+    case eGame_carmageddon:
+        switch (harness_game_info.localization) {
+        case eGameLocalization_german:
+            harness_game_info.defines.ascii_table = carmageddon_german_ascii_table;
+            harness_game_info.defines.ascii_shift_table = carmageddon_german_ascii_shift_table;
+            break;
+        default:
+            break;
+        }
+        break;
+    case eGame_carmageddon_demo:
+        harness_game_info.defines.ascii_table = demo_ascii_table;
+        harness_game_info.defines.ascii_shift_table = demo_ascii_shift_table;
+        break;
+    case eGame_splatpack_demo:
+        harness_game_info.defines.ascii_table = splatpack_xmasdemo_ascii_table;
+        harness_game_info.defines.ascii_shift_table = splatpack_xmasdemo_ascii_shift_table;
+        break;
+    default:
+        break;
     }
 }
 

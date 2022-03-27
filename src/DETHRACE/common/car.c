@@ -3153,9 +3153,9 @@ void MultiFindFloorInBoxBU(int pNum_rays, br_vector3* a, br_vector3* b, br_vecto
     tFace_ref* face_ref;
     LOG_TRACE("(%d, %p, %p, %p, %p, %p, %p)", pNum_rays, a, b, nor, d, c, mat_ref);
 
-    for (i = 0; i < c->box_face_end; i++) {
+    for (i = c->box_face_start; i < c->box_face_end; i++) {
         face_ref = &gFace_list__car[i];
-        if (!gEliminate_faces || SLOBYTE(face_ref->flags) == 0) {
+        if (!gEliminate_faces || (face_ref->flags & 0x80) == 0x0) {
             MultiRayCheckSingleFace(pNum_rays, face_ref, a, b, &nor2, dist);
             for (j = 0; j < pNum_rays; ++j) {
                 if (d[j] > dist[j]) {

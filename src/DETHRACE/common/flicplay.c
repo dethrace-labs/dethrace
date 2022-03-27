@@ -1,5 +1,6 @@
 #include "flicplay.h"
 #include "brender/brender.h"
+#include "displays.h"
 #include "drmem.h"
 #include "errors.h"
 #include "globvars.h"
@@ -57,32 +58,32 @@ tFlic_spec gMain_flic_list[372] = {
     { "MAI2STIL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "MAI2COME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "MAI2AWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "MAINRCGY.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "MAINARGY.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "SVVYSTIL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "SVVYAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
     { "BGBUTTFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "BGBUTTGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "SVVYOKIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "CANBUTIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "SAVECOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "SAVEAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
     { "SMLBUTFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "SMLBUTGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "SMLBUTFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "SMLBUTGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "SAVECAIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "NRACCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "NRACAWAY.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
@@ -173,17 +174,17 @@ tFlic_spec gMain_flic_list[372] = {
     { "OPTNGRIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "OPTNMSIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "NOPT11FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "SNDOCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "SNDOAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "DNEBUTIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "SNDOOLFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "SNDOOLGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "GRPHCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "GRPHAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
     { "NCHO00GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
@@ -193,7 +194,7 @@ tFlic_spec gMain_flic_list[372] = {
     { "NCHO04GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "NCHO05GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "NCHO06GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "CNTLCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "CNTLAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
     { "CNTLDNIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
@@ -202,7 +203,7 @@ tFlic_spec gMain_flic_list[372] = {
     { "CNTLMRIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "CNTLDNFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "CNTLDNGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "CNTLSTIL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "OTHRCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "OTHRAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
@@ -213,17 +214,17 @@ tFlic_spec gMain_flic_list[372] = {
     { "NCHO04FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "NCHO05FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "NCHO06FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "STRTSTIL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "STRTCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "STRTAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
     { "CNTL00FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "CNTL00GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "STRTCRIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "STRTPSIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "STRTSRIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "STRTCCIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
@@ -235,31 +236,31 @@ tFlic_spec gMain_flic_list[372] = {
     { "NTSHSTEN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "NTSXSTIL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "VWSC2IN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "VWIN2OPP.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "VWOPP2SC.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "2BUTONFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "2BUTONGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "VWOPUPIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "VWOPDWFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "VWOPDWGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "VWOPDWIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "CHRCCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "CHRCAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "CHCRCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "CHCRAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
     { "GRPH00GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
@@ -276,14 +277,14 @@ tFlic_spec gMain_flic_list[372] = {
     { "GRPH11GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "PARTCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "PARTAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "PARTARGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "PARTARIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "PARTPFIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "PARTOFIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "PARTEXIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "PARTSPIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "PARTARGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
@@ -301,19 +302,19 @@ tFlic_spec gMain_flic_list[372] = {
     { "GRPH09FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "GRPH10FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "GRPH11FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "PSRMCOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "PSRMAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "PSRMDIIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "RADBUTFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "RADBUTGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "RADBUTOF.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "RADBUTON.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "GRIDSTIL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "GRIDAWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
     { "GRIDLFFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
@@ -322,28 +323,28 @@ tFlic_spec gMain_flic_list[372] = {
     { "GRIDRTFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "GRIDRTGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "GRIDRTIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "DARECOME.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "DAREACIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "DARECHIN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "SUM1STIL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "SUM1AWAY.FLI", 0, 1, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "SUM2STIL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "BGBUT8GL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "BGBUT8FL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
@@ -351,9 +352,9 @@ tFlic_spec gMain_flic_list[372] = {
     { "BKBUT8IN.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "BKBUTOFF.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "BKBUTON.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
-    { NULL, 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
+    { "", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "MAI2QTFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "MAI2QTGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "MAI2LDFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
@@ -512,15 +513,15 @@ int gFlic_bunch6[51] = {
 int gFlic_bunch7[7] = { 130, 131, 132, 42, 43, 135, 45 };
 int gFlic_bunch8[16] = { 290, 291, 292, 293, 294, 295, 296, 297, 42, 43, 154, 301, 42, 43, 304, 305 };
 tFlic_bunch gFlic_bunch[9] = {
-    { 29, gFlic_bunch0 },
-    { 31, gFlic_bunch1 },
-    { 8, gFlic_bunch2 },
-    { 13, gFlic_bunch3 },
-    { 22, gFlic_bunch4 },
-    { 5, gFlic_bunch5 },
-    { 51, gFlic_bunch6 },
-    { 7, gFlic_bunch7 },
-    { 16, gFlic_bunch8 }
+    { COUNT_OF(gFlic_bunch0), gFlic_bunch0 },
+    { COUNT_OF(gFlic_bunch1), gFlic_bunch1 },
+    { COUNT_OF(gFlic_bunch2), gFlic_bunch2 },
+    { COUNT_OF(gFlic_bunch3), gFlic_bunch3 },
+    { COUNT_OF(gFlic_bunch4), gFlic_bunch4 },
+    { COUNT_OF(gFlic_bunch5), gFlic_bunch5 },
+    { COUNT_OF(gFlic_bunch6), gFlic_bunch6 },
+    { COUNT_OF(gFlic_bunch7), gFlic_bunch7 },
+    { COUNT_OF(gFlic_bunch8), gFlic_bunch8 },
 };
 char gLast_flic_name[14];
 tU32 gPanel_flic_data_length[2];
@@ -652,7 +653,7 @@ void FlicPaletteAllocate() {
 void AssertFlicPixelmap(tFlic_descriptor_ptr pFlic_info, br_pixelmap* pDest_pixelmap) {
     LOG_TRACE("(%d, %p)", pFlic_info, pDest_pixelmap);
 
-    if (pDest_pixelmap) {
+    if (pDest_pixelmap != NULL) {
         pFlic_info->first_pixel = (tU8*)pDest_pixelmap->pixels
             + pFlic_info->x_offset
             + pFlic_info->y_offset * pDest_pixelmap->row_bytes;
@@ -682,25 +683,25 @@ int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU3
         } else {
             pFlic_info->bytes_in_buffer = total_size;
         }
-        if (!pFlic_info->data_start) {
+        if (pFlic_info->data_start == NULL) {
             pFlic_info->data_start = BrMemAllocate(pFlic_info->bytes_in_buffer, kMem_flic_data);
         }
 
         pFlic_info->data = pFlic_info->data_start;
         strcpy(gLast_flic_name, pFile_name);
-        fread(pFlic_info->data_start, 1u, pFlic_info->bytes_in_buffer, pFlic_info->f);
+        fread(pFlic_info->data_start, 1, pFlic_info->bytes_in_buffer, pFlic_info->f);
         pFlic_info->bytes_still_to_be_read = total_size - pFlic_info->bytes_in_buffer;
     } else {
         pFlic_info->f = NULL;
         pFlic_info->data = (char*)pData_ptr;
-        // TOOD: remove this - we added this line because of the padding hack in PlayNextFlicFrame2
+        // TODO: remove this - we added this line because of the padding hack in PlayNextFlicFrame2
         pFlic_info->data_start = (char*)pData_ptr;
     }
     pFlic_info->bytes_remaining = MemReadU32(&pFlic_info->data);
     magic_number = MemReadU16(&pFlic_info->data);
-    if (magic_number == 0xAF11) {
+    if (magic_number == 0xaf11) {
         pFlic_info->new_format = 0;
-    } else if (magic_number == 0xAF12) {
+    } else if (magic_number == 0xaf12) {
         pFlic_info->new_format = 1;
     } else {
         return -1;
@@ -719,20 +720,28 @@ int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU3
     pFlic_info->the_pixelmap = pDest_pixelmap;
 
     if (pX_offset == -1) {
-        pFlic_info->x_offset = (pDest_pixelmap->width - pFlic_info->width) / 2;
+        if (pDest_pixelmap != NULL) {
+            pFlic_info->x_offset = (pDest_pixelmap->width - pFlic_info->width) / 2;
+        } else {
+            pFlic_info->x_offset = 0;
+        }
     } else {
         pFlic_info->x_offset = pX_offset;
     }
     if (pY_offset == -1) {
-        pFlic_info->y_offset = (pDest_pixelmap->height - pFlic_info->height) / 2;
+        if (pDest_pixelmap != NULL) {
+            pFlic_info->y_offset = (pDest_pixelmap->height - pFlic_info->height) / 2;
+        } else {
+            pFlic_info->y_offset = 0;
+        }
     } else {
         pFlic_info->y_offset = pY_offset;
     }
 
-    if (pFrame_rate) {
+    if (pFrame_rate != 0) {
         pFlic_info->frame_period = 1000 / pFrame_rate;
     } else {
-        if (!claimed_speed) {
+        if (claimed_speed == 0) {
             FatalError(16, gLast_flic_name);
         }
         if (pFlic_info->new_format) {
@@ -742,11 +751,7 @@ int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU3
         }
     }
     pFlic_info->the_index = pIndex;
-    if (pDest_pixelmap) {
-        pFlic_info->first_pixel = (tU8*)pDest_pixelmap->pixels + pDest_pixelmap->row_bytes * pFlic_info->y_offset + pFlic_info->x_offset;
-    }
-    // LOG_DEBUG("first pixel %p %p", pFlic_info->first_pixel, pDest_pixelmap->pixels);
-    pFlic_info->the_pixelmap = pDest_pixelmap;
+    AssertFlicPixelmap(pFlic_info, pDest_pixelmap);
     return 0;
 }
 
@@ -1145,7 +1150,8 @@ void DoUncompressedTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
 // IDA: void __usercall DoMini(tFlic_descriptor *pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
 void DoMini(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
-    NOT_IMPLEMENTED();
+
+    MemSkipBytes(&pFlic_info->data, chunk_length - 6);
 }
 
 // IDA: void __usercall DrawTranslations(tFlic_descriptor *pFlic_info@<EAX>, int pLast_frame@<EDX>)
@@ -1156,7 +1162,34 @@ void DrawTranslations(tFlic_descriptor* pFlic_info, int pLast_frame) {
     int width;
     int right_edge;
     LOG_TRACE("(%p, %d)", pFlic_info, pLast_frame);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < gTranslation_count; i++) {
+        trans = &gTranslations[i];
+        if (trans->flic_index == pFlic_info->the_index && (trans->every_frame || pLast_frame)) {
+            width = DRTextWidth(gTrans_fonts[trans->font_index], trans->text);
+            switch (trans->justification) {
+            case eJust_left:
+                x = trans->x;
+                right_edge = x + width;
+                break;
+            case eJust_right:
+                x = trans->x - width;
+                right_edge = x;
+                break;
+            case eJust_centre:
+                x = trans->x - width / 2;
+                right_edge = x + width / 2;
+                break;
+            }
+            TransDRPixelmapText(
+                pFlic_info->the_pixelmap,
+                x + (trans->global ? 0 : pFlic_info->x_offset),
+                trans->y + (trans->global ? 0 : pFlic_info->y_offset),
+                gTrans_fonts[trans->font_index],
+                trans->text,
+                right_edge);
+        }
+    }
 }
 
 // IDA: int __usercall PlayNextFlicFrame2@<EAX>(tFlic_descriptor *pFlic_info@<EAX>, int pPanel_flic@<EDX>)
@@ -1178,61 +1211,58 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
     chunk_count = MemReadU16(&pFlic_info->data);
 
     MemSkipBytes(&pFlic_info->data, 8);
-    if (magic_bytes == 0xF1FA) {
+    if (magic_bytes == 0xf1fa) {
         for (chunk_counter = 0; chunk_counter < chunk_count; chunk_counter++) {
             chunk_length = MemReadU32(&pFlic_info->data);
             chunk_type = MemReadU16(&pFlic_info->data);
             switch (chunk_type) {
-            case 4u:
+            case 4:
                 DoColour256(pFlic_info, chunk_length);
                 break;
-            case 7u:
+            case 7:
                 if (gTransparency_on) {
                     DoDeltaTrans(pFlic_info, chunk_length);
                 } else {
                     DoDeltaX(pFlic_info, chunk_length);
                 }
                 break;
-            case 0xBu:
+            case 11:
                 DoColourMap(pFlic_info, chunk_length);
                 break;
-            case 0xCu:
+            case 12:
                 if (gTransparency_on) {
                     DoDifferenceTrans(pFlic_info, chunk_length);
                 } else {
                     DoDifferenceX(pFlic_info, chunk_length);
                 }
                 break;
-            case 0xD:
+            case 13:
                 DoBlack(pFlic_info, chunk_length);
                 break;
-            case 0xF:
+            case 15:
                 if (gTransparency_on) {
                     DoRunLengthTrans(pFlic_info, chunk_length);
                 } else {
                     DoRunLengthX(pFlic_info, chunk_length);
                 }
                 break;
-            case 0x10u:
+            case 16:
                 if (gTransparency_on) {
                     DoUncompressedTrans(pFlic_info, chunk_length);
                 } else {
                     DoUncompressed(pFlic_info, chunk_length);
                 }
                 break;
-            case 0x12u:
-                MemSkipBytes(&pFlic_info->data, chunk_length - 6);
+            case 18:
+                DoMini(pFlic_info, chunk_length);
                 break;
             default:
                 LOG_WARN("unrecognized chunk type");
                 MemSkipBytes(&pFlic_info->data, chunk_length - 6);
                 break;
             }
-            // TODO: something like // p &= 0xfffffffffffffffe;
-            int a = (pFlic_info->data - pFlic_info->data_start);
-            if (a % 2 == 1) {
-                pFlic_info->data++;
-            }
+            // Align on even byte
+            pFlic_info->data = (char*)((uintptr_t)(pFlic_info->data + 1) & (~(uintptr_t)1));
         }
     } else {
         LOG_WARN("not frame header");
@@ -1242,10 +1272,10 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
     }
     pFlic_info->current_frame++;
     pFlic_info->frames_left--;
-    if (gTrans_enabled && gTranslation_count && !pPanel_flic) {
+    if (gTrans_enabled && gTranslation_count != 0 && !pPanel_flic) {
         DrawTranslations(pFlic_info, pFlic_info->frames_left == 0);
     }
-    if (pFlic_info->f && pFlic_info->bytes_still_to_be_read) {
+    if (pFlic_info->f != NULL && pFlic_info->bytes_still_to_be_read) {
         data_knocked_off = pFlic_info->data - pFlic_info->data_start;
         memcpy(pFlic_info->data_start, pFlic_info->data, pFlic_info->bytes_in_buffer - data_knocked_off);
         pFlic_info->data = pFlic_info->data_start;
@@ -1256,8 +1286,8 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
         } else {
             read_amount = pFlic_info->bytes_still_to_be_read;
         }
-        if (read_amount) {
-            fread(&pFlic_info->data_start[pFlic_info->bytes_in_buffer], 1u, read_amount, pFlic_info->f);
+        if (read_amount != 0) {
+            fread(&pFlic_info->data_start[pFlic_info->bytes_in_buffer], 1, read_amount, pFlic_info->f);
         }
         pFlic_info->bytes_in_buffer += read_amount;
         pFlic_info->bytes_still_to_be_read -= read_amount;
@@ -1282,7 +1312,7 @@ int PlayFlic(int pIndex, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap
     LOG_TRACE("(%d, %u, %p, %p, %d, %d, %p, %d, %d)", pIndex, pSize, pData_ptr, pDest_pixelmap, pX_offset, pY_offset, DoPerFrame, pInterruptable, pFrame_rate);
 
     finished_playing = 0;
-    the_flic.data_start = 0;
+    the_flic.data_start = NULL;
     if (StartFlic(gMain_flic_list[pIndex].file_name, pIndex, &the_flic, pSize, pData_ptr, pDest_pixelmap, pX_offset, pY_offset, pFrame_rate)) {
         LOG_WARN("startflic returned error");
         return -1;
@@ -1300,7 +1330,7 @@ int PlayFlic(int pIndex, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap
         if (frame_period >= the_flic.frame_period) {
             finished_playing = PlayNextFlicFrame(&the_flic);
             DoPerFrame();
-            if (gDark_mode == 0) {
+            if (!gDark_mode) {
                 EnsurePaletteUp();
             }
             ServiceGame();
@@ -1331,14 +1361,15 @@ void ShowFlic(int pIndex) {
             gMain_flic_list[pIndex].interruptable,
             gMain_flic_list[pIndex].frame_rate);
     } while (gMain_flic_list[pIndex].repeat && !AnyKeyDown());
-    gLast_flic_name[0] = 0; // byte_10344C;
+    gLast_flic_name[0] = '\0'; // byte_10344C;
 }
 
 // IDA: void __cdecl InitFlics()
 void InitFlics() {
     int i;
     LOG_TRACE("()");
-    for (i = 0; i < 372; i++) {
+
+    for (i = 0; i < COUNT_OF(gMain_flic_list); i++) {
         gMain_flic_list[i].data_ptr = NULL;
     }
 }
@@ -1353,7 +1384,8 @@ int LoadFlic(int pIndex) {
     if (pIndex < 0) {
         return 0;
     }
-    if (gMain_flic_list[pIndex].data_ptr) {
+    if (gMain_flic_list[pIndex].data_ptr != NULL) {
+        MAMSLock((void**)&gMain_flic_list[pIndex].data_ptr);
         return 1;
     }
     if (gPlay_from_disk) {
@@ -1365,30 +1397,33 @@ int LoadFlic(int pIndex) {
     PathCat(the_path, the_path, gMain_flic_list[pIndex].file_name);
     f = DRfopen(the_path, "rb");
 
-    if (!f) {
+    if (f == NULL) {
         FatalError(13, gMain_flic_list[pIndex].file_name);
     }
 
     gMain_flic_list[pIndex].the_size = GetFileLength(f);
     gMain_flic_list[pIndex].data_ptr = BrMemAllocate(gMain_flic_list[pIndex].the_size, 0x90u);
 
-    if (gMain_flic_list[pIndex].data_ptr) {
-        fread(gMain_flic_list[pIndex].data_ptr, 1u, gMain_flic_list[pIndex].the_size, f);
-        strcpy(gLast_flic_name, gMain_flic_list[pIndex].file_name);
-        fclose(f);
-        return 1;
-    } else {
+    if (gMain_flic_list[pIndex].data_ptr == NULL) {
         if (AllocationErrorsAreFatal()) {
             FatalError(14, gMain_flic_list[pIndex].file_name);
         }
+#ifdef DETHRACE_FIX_BUGS
+        fclose(f);
+#endif
         return 0;
     }
+
+    fread(gMain_flic_list[pIndex].data_ptr, 1, gMain_flic_list[pIndex].the_size, f);
+    strcpy(gLast_flic_name, gMain_flic_list[pIndex].file_name);
+    fclose(f);
+    return 1;
 }
 
 // IDA: void __usercall UnlockFlic(int pIndex@<EAX>)
 void UnlockFlic(int pIndex) {
     if (pIndex >= 0) {
-        if (gMain_flic_list[pIndex].data_ptr) {
+        if (gMain_flic_list[pIndex].data_ptr != NULL) {
             MAMSUnlock((void**)&gMain_flic_list[pIndex].data_ptr);
         }
     }
@@ -1400,39 +1435,49 @@ int LoadFlicData(char* pName, tU8** pData, tU32* pData_length) {
     tPath_name the_path;
     LOG_TRACE("(\"%s\", %p, %p)", pName, pData, pData_length);
 
-    if (*pData) {
+    if (*pData != NULL) {
+        MAMSLock((void**)pData);
         return 1;
     }
-    if (!gPlay_from_disk) {
-        PossibleService();
-        PathCat(the_path, gApplication_path, "ANIM");
-        PathCat(the_path, the_path, pName);
-        f = DRfopen(the_path, "rb");
-        if (f == NULL) {
-            return 0;
-        }
-        *pData_length = GetFileLength(f);
-        *pData = BrMemAllocate(*pData_length, kMem_flic_data_2);
-        if (!*pData) {
-            fclose(f);
-            return 0;
-        }
-        fread(*pData, 1u, *pData_length, f);
-        fclose(f);
+    if (gPlay_from_disk) {
+        return 1;
     }
+    PossibleService();
+    PathCat(the_path, gApplication_path, "ANIM");
+    PathCat(the_path, the_path, pName);
+    f = DRfopen(the_path, "rb");
+    if (f == NULL) {
+        return 0;
+    }
+    *pData_length = GetFileLength(f);
+    *pData = BrMemAllocate(*pData_length, kMem_flic_data_2);
+    if (*pData == NULL) {
+        fclose(f);
+        return 0;
+    }
+    fread(*pData, 1, *pData_length, f);
+    fclose(f);
     return 1;
 }
 
 // IDA: void __usercall FreeFlic(int pIndex@<EAX>)
 void FreeFlic(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+
+    PossibleService();
+    if (gMain_flic_list[pIndex].data_ptr != NULL) {
+        BrMemFree(gMain_flic_list[pIndex].data_ptr);
+        gMain_flic_list[pIndex].data_ptr = NULL;
+    }
 }
 
 // IDA: void __usercall ForceRunFlic(int pIndex@<EAX>)
 void ForceRunFlic(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+
+        LoadFlic(pIndex);
+        ShowFlic(pIndex);
+        UnlockFlic(pIndex);
 }
 
 // IDA: void __usercall RunFlicAt(int pIndex@<EAX>, int pX@<EDX>, int pY@<EBX>)
@@ -1458,9 +1503,7 @@ void RunFlic(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
     if (gPending_flic >= 0) {
-        LoadFlic(gPending_flic);
-        ShowFlic(gPending_flic);
-        UnlockFlic(gPending_flic);
+        ForceRunFlic(gPending_flic);
         gPending_flic = -1;
     }
     if (LoadFlic(pIndex)) {
@@ -1468,11 +1511,7 @@ void RunFlic(int pIndex) {
             gPending_flic = pIndex;
         } else {
             ShowFlic(pIndex);
-            if (pIndex >= 0) {
-                if (gMain_flic_list[pIndex].data_ptr) {
-                    MAMSUnlock((void**)&gMain_flic_list[pIndex].data_ptr);
-                }
-            }
+            UnlockFlic(pIndex);
         }
     }
 }
@@ -1490,6 +1529,7 @@ void PreloadBunchOfFlics(int pBunch_index) {
 // IDA: void __usercall UnlockBunchOfFlics(int pBunch_index@<EAX>)
 void UnlockBunchOfFlics(int pBunch_index) {
     int i;
+    LOG_TRACE("(%d)", pBunch_index);
 
     for (i = 0; i < gFlic_bunch[pBunch_index].count; i++) {
         UnlockFlic(gFlic_bunch[pBunch_index].indexes[i]);
@@ -1501,7 +1541,7 @@ void FlushAllFlics(int pBunch_index) {
     int i;
     LOG_TRACE("(%d)", pBunch_index);
 
-    for (i = 0; i < COUNT_OF(gMain_flic_list); i++) {
+    for (i = 0; i < COUNT_OF(gFlic_bunch); i++) {
         FreeFlic(i);
     }
 }
@@ -1584,8 +1624,8 @@ void FlushFlicQueue() {
     }
     the_flic = gFirst_flic;
     while (the_flic != NULL) {
-        old_flic = the_flic;
         EndFlic(the_flic);
+        old_flic = the_flic;
         the_flic = the_flic->next;
         BrMemFree(old_flic);
     }
@@ -1769,6 +1809,7 @@ br_pixelmap* GetPanelPixelmap(int pIndex) {
 
 // IDA: void __cdecl LoadInterfaceStrings()
 void LoadInterfaceStrings() {
+    FILE* f; // Added by DethRace
     char s[256];
     char s2[256];
     char* str;
@@ -1779,7 +1820,106 @@ void LoadInterfaceStrings() {
     int j;
     int len;
 
-    STUB();
+    gTranslation_count = 0;
+    PathCat(the_path, gApplication_path, "TRNSLATE.TXT");
+    f = fopen(the_path, "rt");
+    if (f == NULL) {
+        return;
+    }
+    while (!feof(f)) {
+        GetALineAndDontArgue(f, s);
+        gTranslation_count++;
+    }
+    rewind(f);
+    gTranslations = BrMemAllocate(gTranslation_count * sizeof(tTranslation_record), kMem_translations);
+    for (i = 0; i < gTranslation_count; i++) {
+        GetALineAndDontArgue(f, s);
+        str = strtok(s, "\t ,/");
+        strcpy(s2, str);
+        strtok(s2, ".");
+        strcat(s2, ".FLI");
+        gTranslations[i].flic_index = -1;
+        for (j = 0; j < COUNT_OF(gMain_flic_list); j++) {
+            if (strcmp(gMain_flic_list[j].file_name, s2) == 0) {
+                gTranslations[i].flic_index = j;
+                break;
+            }
+        }
+        if (gTranslations[i].flic_index < 0) {
+            FatalError(101, s2);
+        }
+        str[strlen(str)] = ',';
+        str = strtok(s, "\t ,/");
+        str = strtok(NULL, "\t ,/");
+        sscanf(str, "%d", &gTranslations[i].x);
+        str = strtok(NULL, "\t ,/");
+        sscanf(str, "%d", &gTranslations[i].y);
+        str = strtok(NULL, "\t ,/");
+        sscanf(str, "%d", &gTranslations[i].font_index);
+        str = strtok(NULL, "\t ,/");
+        sscanf(str, "%c", &ch);
+        switch (ch) {
+        case 'C':
+        case 'c':
+            gTranslations[i].justification = eJust_centre;
+            break;
+        case 'L':
+        case 'l':
+            gTranslations[i].justification = eJust_left;
+            break;
+        case 'R':
+        case 'r':
+            gTranslations[i].justification = eJust_right;
+            break;
+        }
+        str = strtok(NULL, "\t ,/");
+        sscanf(str, "%c", &ch);
+        gTranslations[i].global = ch == 'G' || ch == 'g';
+        gTranslations[i].every_frame = strlen(str) > 1 && (str[1] == 'E' || str[1] == 'e');
+        str += strlen(str) + 1;
+        comment = strstr(str, "//");
+        if (comment != NULL) {
+            *comment = '\0';
+        }
+        len = strlen(str);
+        for (j = len - 1; j >= 0 && (str[j] == ' ' || str[j] == '\t'); j--) {
+        }
+        str[j + 1] = '\0';
+        gTranslations[i].text = BrMemAllocate(strlen(str) + 1, kMem_translations_text);
+        strcpy(gTranslations[i].text, str);
+    }
+    LoadFont(2);
+    LoadFont(1);
+    LoadFont(3);
+    LoadFont(15);
+    LoadFont(14);
+    LoadFont(16);
+    LoadFont(13);
+    LoadFont(10);
+    LoadFont(12);
+    LoadFont(9);
+    LoadFont(11);
+    LoadFont(19);
+    LoadFont(18);
+    LoadFont(20);
+    LoadFont(17);
+    gTrans_fonts[0] = &gFonts[1];
+    gTrans_fonts[1] = &gFonts[15];
+    gTrans_fonts[2] = &gFonts[14];
+    gTrans_fonts[3] = &gFonts[16];
+    gTrans_fonts[4] = &gFonts[13];
+    gTrans_fonts[5] = &gFonts[10];
+    gTrans_fonts[6] = &gFonts[12];
+    gTrans_fonts[7] = &gFonts[9];
+    gTrans_fonts[8] = &gFonts[11];
+    gTrans_fonts[9] = &gFonts[19];
+    gTrans_fonts[10] = &gFonts[20];
+    gTrans_fonts[11] = &gFonts[18];
+    gTrans_fonts[12] = &gFonts[17];
+
+#ifdef DETHRACE_FIX_BUGS
+    fclose(f);
+#endif
 }
 
 // IDA: void __cdecl FlushInterfaceFonts()

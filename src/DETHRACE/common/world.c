@@ -173,28 +173,28 @@ void ClearOutStorageSpace(tBrender_storage* pStorage_space) {
     LOG_TRACE("(%p)", pStorage_space);
 
     for (i = 0; pStorage_space->pixelmaps_count > i; ++i) {
-        if (pStorage_space->pixelmaps[i]) {
+        if (pStorage_space->pixelmaps[i] != NULL) {
             BrMapRemove(pStorage_space->pixelmaps[i]);
             BrPixelmapFree(pStorage_space->pixelmaps[i]);
         }
     }
     pStorage_space->pixelmaps_count = 0;
     for (i = 0; pStorage_space->shade_tables_count > i; ++i) {
-        if (pStorage_space->shade_tables[i]) {
+        if (pStorage_space->shade_tables[i] != NULL) {
             BrTableRemove(pStorage_space->shade_tables[i]);
             BrPixelmapFree(pStorage_space->shade_tables[i]);
         }
     }
     pStorage_space->shade_tables_count = 0;
     for (i = 0; pStorage_space->materials_count > i; ++i) {
-        if (pStorage_space->materials[i]) {
+        if (pStorage_space->materials[i] != NULL) {
             BrMaterialRemove(pStorage_space->materials[i]);
             BrMaterialFree(pStorage_space->materials[i]);
         }
     }
     pStorage_space->materials_count = 0;
     for (i = 0; pStorage_space->models_count > i; ++i) {
-        if (pStorage_space->models[i]) {
+        if (pStorage_space->models[i] != NULL) {
             BrModelRemove(pStorage_space->models[i]);
             BrModelFree(pStorage_space->models[i]);
         }
@@ -1980,7 +1980,29 @@ br_material* DisposeSuffixedMaterials(br_model* pModel, tU16 pFace) {
 // IDA: void __cdecl DisposeTexturingMaterials()
 void DisposeTexturingMaterials() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    switch (gWall_texturing_level) {
+    case eWTL_linear:
+        ProcessFaceMaterials(gProgram_state.track_spec.the_actor, WallLinearToPersp);
+        break;
+    case eWTL_none:
+        ProcessFaceMaterials(gProgram_state.track_spec.the_actor, WallUntexToPersp);
+        break;
+    default:
+        break;
+    }
+
+    switch (gRoad_texturing_level) {
+    case eRTL_none:
+        ProcessFaceMaterials(gProgram_state.track_spec.the_actor, RoadUntexToPersp);
+        break;
+    default:
+        break;
+    }
+    
+    if (gWall_texturing_level != eWTL_full || gRoad_texturing_level != eRTL_full) {
+        ProcessFaceMaterials(gProgram_state.track_spec.the_actor, DisposeSuffixedMaterials);
+    }
 }
 
 // IDA: br_uint_32 __cdecl SetAccessoryRenderingCB(br_actor *pActor, void *pFlag)
@@ -2608,13 +2630,18 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
 // IDA: br_uint_32 __cdecl RemoveBounds(br_actor *pActor, void *pArg)
 br_uint_32 RemoveBounds(br_actor* pActor, void* pArg) {
     LOG_TRACE("(%p, %p)", pActor, pArg);
-    NOT_IMPLEMENTED();
+
+    if (pActor->type == BR_ACTOR_BOUNDS || pActor->type == BR_ACTOR_BOUNDS_CORRECT) {
+        BrResFree(pActor->type_data);
+        pActor->type_data = NULL;
+    }
 }
 
 // IDA: void __usercall RemoveBoundsStructures(br_actor *pActor@<EAX>)
 void RemoveBoundsStructures(br_actor* pActor) {
     LOG_TRACE("(%p)", pActor);
-    NOT_IMPLEMENTED();
+
+    DRActorEnumRecurse(pActor, (br_actor_enum_cbfn*)RemoveBounds, NULL);
 }
 
 // IDA: void __usercall FreeTrack(tTrack_spec *pTrack_spec@<EAX>)
@@ -2623,7 +2650,49 @@ void FreeTrack(tTrack_spec* pTrack_spec) {
     tNon_car_spec* non_car;
     LOG_TRACE("(%p)", pTrack_spec);
 
-    STUB();
+    if (gAdditional_actors != NULL) {
+        BrActorRemove(gAdditional_actors);
+        BrActorFree(gAdditional_actors);
+    }
+    PossibleService();
+    DisposeTexturingMaterials();
+    PossibleService();
+    DisposeColumns(pTrack_spec);
+    PossibleService();
+    RemoveBoundsStructures(pTrack_spec->the_actor);
+    BrActorRemove(pTrack_spec->the_actor);
+    BrActorFree(pTrack_spec->the_actor);
+    pTrack_spec->the_actor = NULL;
+    gTrack_actor = NULL;
+    PossibleService();
+    DisposeFunkotronics(-2);
+    PossibleService();
+    ClearOutStorageSpace(&gTrack_storage_space);
+    PossibleService();
+    DisposeGroovidelics(-2);
+    PossibleService();
+    DisposeOpponentPaths();
+    PossibleService();
+    DisposeKevStuff();
+    PossibleService();
+    if (gCurrent_race.map_image != NULL) {
+        BrPixelmapFree(gCurrent_race.map_image);
+    }
+    if (gProgram_state.special_screens_count != 0) {
+        BrMemFree(gProgram_state.special_screens);
+    }
+    PossibleService();
+    for (i = 0, non_car = gProgram_state.non_cars; i < gProgram_state.num_non_car_spaces; i++, non_car++) {
+        PossibleService();
+        if (non_car->collision_info.driver == eDriver_non_car && non_car->collision_info.car_master_actor != NULL) {
+            BrActorRemove(non_car->collision_info.car_master_actor);
+            BrActorFree(non_car->collision_info.car_master_actor);
+        }
+    }
+    if (gProgram_state.non_cars != NULL) {
+        BrMemFree(gProgram_state.non_cars);
+    }
+    FreeSmokeShadeTables();
 }
 
 // IDA: void __usercall ProcessTrack(br_actor *pWorld@<EAX>, tTrack_spec *pTrack_spec@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world_transform@<ECX>, int pRender_blends)
