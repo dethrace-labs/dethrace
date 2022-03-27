@@ -58,9 +58,11 @@ br_uint_32 BrMaterialAddMany(br_material** items, int n);
 br_uint_32 BrMaterialEnum(char* pattern, br_material_enum_cbfn* callback, void* arg);
 br_material_find_cbfn* BrMaterialFindHook(br_material_find_cbfn* hook);
 
-// BrMatrix34
+// BrMatrix236
+void BrMatrix23Copy(br_matrix23* A, br_matrix23* B);
 void BrMatrix23Identity(br_matrix23* mat);
 
+// BrMatrix34
 void BrMatrix34Identity(br_matrix34* mat);
 void BrMatrix34Pre(br_matrix34* mat, br_matrix34* A);
 void BrMatrix34ApplyV(br_vector3* A, br_vector3* B, br_matrix34* C);

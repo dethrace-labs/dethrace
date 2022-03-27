@@ -403,8 +403,6 @@ void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
     if (pDest_y + pOffset_y >= 0) {
         destn_ptr = (char*)pDest->pixels + pDest->row_bytes * (pDest_y + pOffset_y);
     } else {
-        LOG_DEBUG("%d, %d", pDest_y, pOffset_y);
-
         pSource = SkipLines(pSource, -pDest_y - pOffset_y);
         destn_ptr = (char*)pDest->pixels;
         height += pDest_y + pOffset_y;

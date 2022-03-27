@@ -1588,14 +1588,21 @@ int FindSpecVolIndex(br_actor* pActor) {
 // IDA: void __usercall MungeMaterial(br_matrix34 *pMat@<EAX>, br_material *pMat_1@<EDX>, br_material *pMat_2@<EBX>, int pAxis_0@<ECX>, int pAxis_1)
 void MungeMaterial(br_matrix34* pMat, br_material* pMat_1, br_material* pMat_2, int pAxis_0, int pAxis_1) {
     LOG_TRACE("(%p, %p, %p, %d, %d)", pMat, pMat_1, pMat_2, pAxis_0, pAxis_1);
-    NOT_IMPLEMENTED();
+
+    pMat_1->map_transform.m[0][0] = 6.f * BrVector3Length((br_vector3*)pMat->m[pAxis_0]);
+    pMat_1->map_transform.m[1][1] = 6.f * BrVector3Length((br_vector3*)pMat->m[pAxis_1]);
+    BrMatrix23Copy(&pMat_2->map_transform, &pMat_1->map_transform);
 }
 
 // IDA: void __usercall SetSpecVolMatSize(br_actor *pActor@<EAX>)
 void SetSpecVolMatSize(br_actor* pActor) {
     br_model* model;
     LOG_TRACE("(%p)", pActor);
-    NOT_IMPLEMENTED();
+
+    model = pActor->model;
+    MungeMaterial(&pActor->t.t.mat, model->faces[5].material, model->faces[17].material, 0, 1);
+    MungeMaterial(&pActor->t.t.mat, model->faces[11].material, model->faces[23].material, 1, 2);
+    MungeMaterial(&pActor->t.t.mat, model->faces[7].material, model->faces[19].material, 0, 2);
 }
 
 // IDA: void __usercall FindInverseAndWorldBox(tSpecial_volume *pSpec@<EAX>)
@@ -4112,14 +4119,22 @@ void MoveZAccR4() {
 // IDA: br_material* __cdecl GetInternalMat()
 br_material* GetInternalMat() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    return BrMaterialFind("SPECVOL.MAT");
 }
 
 // IDA: br_material* __cdecl GetExternalMat()
 br_material* GetExternalMat() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    return BrMaterialFind("SPECVOL2.MAT");
 }
+
+#define DrVertexSet(V, X, Y, Z) do {        \
+    (V)[0] = (X);                           \
+    (V)[1] = (Y);                           \
+    (V)[2] = (Z);                           \
+} while (0)
 
 // IDA: void __usercall BuildSpecVolModel(tSpecial_volume *pSpec@<EAX>, int pIndex@<EDX>, br_material *pInt_mat@<EBX>, br_material *pExt_mat@<ECX>)
 void BuildSpecVolModel(tSpecial_volume* pSpec, int pIndex, br_material* pInt_mat, br_material* pExt_mat) {
@@ -4130,8 +4145,70 @@ void BuildSpecVolModel(tSpecial_volume* pSpec, int pIndex, br_material* pInt_mat
     br_actor* actor;
     br_model* model;
     LOG_TRACE("(%p, %d, %p, %p)", pSpec, pIndex, pInt_mat, pExt_mat);
-    NOT_IMPLEMENTED();
+
+    actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+    BrMatrix34Copy(&actor->t.t.mat, &pSpec->mat);
+    actor->render_style = BR_RSTYLE_FACES;
+    model = BrModelAllocate("", 12, 24);
+    model->flags |= BR_MODF_KEEP_ORIGINAL | BR_MODF_DONT_WELD;
+    BrVector3Set(&model->vertices[0].p, 1.f, -1.f, -1.f);
+    BrVector2Set(&model->vertices[0].map, 1.f, 0.f);
+    BrVector3Set(&model->vertices[1].p, -1.f, -1.f, -1.f);
+    BrVector2Set(&model->vertices[1].map, 0.f, 0.f);
+    BrVector3Set(&model->vertices[2].p, -1.f, 1.f, -1.f);
+    BrVector2Set(&model->vertices[2].map, 0.f, 1.f);
+    BrVector3Set(&model->vertices[3].p, 1.f, 1.f, -1.f);
+    BrVector2Set(&model->vertices[3].map, 1.f, 1.f);
+    BrVector3Set(&model->vertices[4].p, 1.f, -1.f, 1.f);
+    BrVector2Set(&model->vertices[4].map, 1.f, 1.f);
+    BrVector3Set(&model->vertices[5].p, -1.f, -1.f, 1.f);
+    BrVector2Set(&model->vertices[5].map, 0.f, 1.f);
+    BrVector3Set(&model->vertices[6].p, -1.f, 1.f, 1.f);
+    BrVector2Set(&model->vertices[6].map, 0.f, 0.f);
+    BrVector3Set(&model->vertices[7].p, 1.f, 1.f, 1.f);
+    BrVector2Set(&model->vertices[7].map, 1.f, 0.f);
+    BrVector3Set(&model->vertices[8].p, 1.f, -1.f, -1.f);
+    BrVector2Set(&model->vertices[8].map, 0.f, 1.f);
+    BrVector3Set(&model->vertices[9].p, 1.f, -1.f, 1.f);
+    BrVector2Set(&model->vertices[9].map, 0.f, 0.f);
+    BrVector3Set(&model->vertices[10].p, -1.f, -1.f, -1.f);
+    BrVector2Set(&model->vertices[10].map, 1.f, 1.f);
+    BrVector3Set(&model->vertices[11].p, -1.f, -1.f, 1.f);
+    BrVector2Set(&model->vertices[11].map, 1.f, 0.f);
+
+    DrVertexSet(model->faces[0].vertices, 0, 3, 1);
+    DrVertexSet(model->faces[1].vertices, 1, 3, 2);
+    DrVertexSet(model->faces[2].vertices, 3, 7, 2);
+    DrVertexSet(model->faces[3].vertices, 2, 7, 6);
+    DrVertexSet(model->faces[4].vertices, 6, 7, 4);
+    DrVertexSet(model->faces[5].vertices, 6, 4, 5);
+    DrVertexSet(model->faces[6].vertices, 0, 5, 4);
+    DrVertexSet(model->faces[7].vertices, 1, 5, 0);
+    DrVertexSet(model->faces[8].vertices, 9, 7, 8);
+    DrVertexSet(model->faces[9].vertices, 8, 7, 3);
+    DrVertexSet(model->faces[10].vertices, 11, 2, 6);
+    DrVertexSet(model->faces[11].vertices, 11, 10, 2);
+
+    memcpy(&model->faces[12], model->faces, 12 * sizeof(br_face));
+    for (i = 12; i < 24; i++) {
+        temp = model->faces[i].vertices[0];
+        model->faces[i].vertices[0] = model->faces[i].vertices[1];
+        model->faces[i].vertices[1] = temp;
+    }
+    model->faces[ 5].material = model->faces[ 4].material = model->faces[ 1].material = model->faces[ 0].material = DRMaterialClone(pExt_mat);
+    model->faces[11].material = model->faces[10].material = model->faces[ 9].material = model->faces[ 8].material = DRMaterialClone(pExt_mat);
+    model->faces[ 7].material = model->faces[ 6].material = model->faces[ 3].material = model->faces[ 2].material = DRMaterialClone(pExt_mat);
+    model->faces[17].material = model->faces[16].material = model->faces[13].material = model->faces[12].material = DRMaterialClone(pInt_mat);
+    model->faces[23].material = model->faces[22].material = model->faces[21].material = model->faces[20].material = DRMaterialClone(pInt_mat);
+    model->faces[19].material = model->faces[18].material = model->faces[15].material = model->faces[14].material = DRMaterialClone(pInt_mat);
+    BrModelUpdate(model, BR_MODU_ALL);
+    actor->model = model;
+    BrActorAdd(gNon_track_actor, actor);
+    gSpec_vol_actors[pIndex] = actor;
+    SetSpecVolMatSize(actor);
 }
+
+#undef DrVertexSet
 
 // IDA: void __usercall DropSpecVol(int pIndex@<EAX>)
 void DropSpecVol(int pIndex) {
@@ -4224,7 +4301,26 @@ void DelSpecVolumeGraph(int pIndex) {
     br_actor* actor;
     br_model* model;
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+
+    actor = gSpec_vol_actors[pIndex];
+    model = actor->model;
+
+    BrMaterialRemove(model->faces[5].material);
+    BrMaterialRemove(model->faces[11].material);
+    BrMaterialRemove(model->faces[7].material);
+    BrMaterialRemove(model->faces[17].material);
+    BrMaterialRemove(model->faces[23].material);
+    BrMaterialRemove(model->faces[19].material);
+    BrMaterialFree(model->faces[5].material);
+    BrMaterialFree(model->faces[11].material);
+    BrMaterialFree(model->faces[7].material);
+    BrMaterialFree(model->faces[17].material);
+    BrMaterialFree(model->faces[23].material);
+    BrMaterialFree(model->faces[19].material);
+    BrModelRemove(model);
+    BrModelFree(model);
+    BrActorRemove(actor);
+    BrActorFree(actor);
 }
 
 // IDA: void __cdecl DeleteSpecVol()
@@ -4491,7 +4587,19 @@ void ShowSpecialVolumes() {
     br_material* internal_mat;
     br_material* external_mat;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gLast_actor = NULL;
+    gSpec_vol_mode = 1;
+    internal_mat = GetInternalMat();
+    external_mat = GetExternalMat();
+    for (i = 0; i < gProgram_state.special_volume_count; i++) {
+        v = &gProgram_state.special_volumes[i];
+        if (!v->no_mat) {
+            BuildSpecVolModel(v, i, internal_mat, external_mat);
+        } else {
+            gSpec_vol_actors[i] = NULL;
+        }
+    }
 }
 
 // IDA: void __cdecl HideSpecialVolumes()
@@ -4499,5 +4607,12 @@ void HideSpecialVolumes() {
     int i;
     tSpecial_volume* v;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gSpec_vol_mode = 0;
+    for (i = 0; i < gProgram_state.special_volume_count; i++) {
+        v = &gProgram_state.special_volumes[i];
+        if (!v->no_mat) {
+            DelSpecVolumeGraph(i);
+        }
+    }
 }
