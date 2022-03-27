@@ -115,7 +115,7 @@ void Harness_DetectGameMode() {
         }
     } else {
 carmageddon:
-        if (access("DATA/CURSCENE/Mix_intr.smk", F_OK) == -1) {
+        if (access("DATA/CUTSCENE/Mix_intr.smk", F_OK) == -1) {
             harness_game_info.defines.INTRO_SMK_FILE = "Mix_intr.smk";
         } else {
             harness_game_info.defines.INTRO_SMK_FILE = "MIX_INTR.SMK";
