@@ -1268,20 +1268,23 @@ void ChangingView() {
                 LookLeft();
                 return;
             }
-            if (gProgram_state.pending_view != eView_forward) {
-                if (gProgram_state.pending_view == eView_right) {
-                    LookRight();
-                } else {
-                    gScreen_wobble_x = 0;
-                    gScreen_wobble_y = 0;
-                }
+            if (gProgram_state.pending_view == eView_forward) {
+                LookForward();
                 return;
             }
+            if (gProgram_state.pending_view == eView_right) {
+                LookRight();
+                return;
+            }
+            gScreen_wobble_x = 0;
+            gScreen_wobble_y = 0;
+            return;
         }
         if (gProgram_state.which_view == gProgram_state.new_view) {
             gProgram_state.new_view = eView_undefined;
             gScreen_wobble_x = 0;
             gScreen_wobble_y = 0;
+            return;
         }
     }
     if (the_time < 88) {
