@@ -385,8 +385,7 @@ tSO_result DoEndRaceSummary1() {
         {  1,  1 }, { Summ1GoAhead, NULL},
         {  1,  1 }, { NULL, NULL},
         SummCheckGameOver, DrawSummary,
-        // 20000,
-        0,  // FIXME: restore 20000 timeout
+        20000,
         NULL, StartSummary,
         RaceSummaryDone, 0, { 0, 0 }, NULL, -1, 1,
         COUNT_OF(flicker_on), flicker_on, flicker_off, push,
@@ -396,13 +395,6 @@ tSO_result DoEndRaceSummary1() {
     int result;
     int completed_already;
     LOG_TRACE("()");
-
-    LOG_DEBUG("start");
-    LOG_DEBUG("gProgram_state.credits_earned: %d", gProgram_state.credits_earned);
-    LOG_DEBUG("gProgram_state.credits_lost: %d", gProgram_state.credits_lost);
-    LOG_DEBUG("gRank_increase: %d", gRank_increase);
-    LOG_DEBUG("gProgram_state.rank: %d", gProgram_state.rank);
-    LOG_DEBUG("gProgram_state.credits: %d", gProgram_state.credits);
 
     NetPlayerStatusChanged(ePlayer_status_summary);
     completed_already = gProgram_state.game_completed;
@@ -432,13 +424,6 @@ tSO_result DoEndRaceSummary1() {
         FadePaletteDown();
         result = eSO_continue;
     }
-
-    LOG_DEBUG("finish");
-    LOG_DEBUG("gProgram_state.credits_earned: %d", gProgram_state.credits_earned);
-    LOG_DEBUG("gProgram_state.credits_lost: %d", gProgram_state.credits_lost);
-    LOG_DEBUG("gRank_increase: %d", gRank_increase);
-    LOG_DEBUG("gProgram_state.rank: %d", gProgram_state.rank);
-    LOG_DEBUG("gProgram_state.credits: %d", gProgram_state.credits);
 
     return result;
 }
