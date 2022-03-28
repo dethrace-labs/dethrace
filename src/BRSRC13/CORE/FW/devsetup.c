@@ -9,14 +9,14 @@ br_pixelmap* last_begin_screen;
 // IDA: br_pixelmap* __cdecl BrDevLastBeginQuery()
 br_pixelmap* BrDevLastBeginQuery() {
 
-    STUB();
-    return NULL;
+    return last_begin_screen;
 }
 
 // IDA: void __usercall BrDevLastBeginSet(br_pixelmap *pm@<EAX>)
 void BrDevLastBeginSet(br_pixelmap* pm) {
     LOG_TRACE("(%p)", pm);
-    NOT_IMPLEMENTED();
+
+    last_begin_screen = pm;
 }
 
 // IDA: br_error __cdecl BrDevBeginVar(br_pixelmap **ppm, char *setup_string, ...)
