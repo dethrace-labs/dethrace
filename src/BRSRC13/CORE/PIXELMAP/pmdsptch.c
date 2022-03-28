@@ -305,36 +305,17 @@ void BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {
 
 // IDA: void __cdecl BrPixelmapText(br_pixelmap *dst, br_int_32 x, br_int_32 y, br_uint_32 colour, br_font *font, char *text)
 void BrPixelmapText(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_uint_32 colour, br_font* font, char* text) {
+    br_point p;
     LOG_TRACE("(%p, %d, %d, %d, %p, \"%s\")", dst, x, y, colour, font, text);
 
-    // Thanks Errol!
-    br_uint_8* dst_pix = (br_uint_8*)dst->pixels;
 
-    if (font->flags & BR_FONTF_PROPORTIONAL) {
-        br_int_8* widths = font->width;
-        br_uint_8* glyphs = font->glyphs;
-        br_uint_16 dst_offset = (y * dst->row_bytes) + x;
-
-        for (int i = 0; i < strlen(text); i++) {
-            br_uint_8 pw = widths[(br_uint_8)text[i]];
-            br_uint_16 src_offset = font->encoding[(br_uint_8)text[i]];
-
-            for (int fy = 0; fy < font->glyph_y; fy++) {
-                br_uint_8 b = 0;
-
-                for (int fx = 0; fx < pw; fx++) {
-                    if (fx % 8 == 0) {
-                        b = glyphs[src_offset + fy + (fx / 8)];
-                    }
-                    dst_pix[dst_offset + (fy * dst->row_bytes) + fx + i] = (b & (1 << (7 - fx)) ? colour : 0);
-                }
-            }
-
-            dst_offset += pw;
-        }
-    } else {
-        TELL_ME_IF_WE_PASS_THIS_WAY();
+    CheckDispatch((br_device_pixelmap*)dst);
+    if (font == NULL) {
+        font = BrFontFixed3x5;
     }
+    p.x = x;
+    p.y = y;
+    ((br_device_pixelmap*)dst)->dispatch->_text((br_device_pixelmap*)dst, &p, font, text, colour);
 }
 
 // IDA: void __cdecl BrPixelmapTextF(br_pixelmap *dst, br_int_32 x, br_int_32 y, br_uint_32 colour, br_font *font, char *fmt, ...)
