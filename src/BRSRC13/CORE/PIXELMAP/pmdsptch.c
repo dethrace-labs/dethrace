@@ -1,5 +1,6 @@
 #include "pmdsptch.h"
 
+#include "CORE/FW/devsetup.h"
 #include "CORE/FW/scratch.h"
 #include "CORE/PIXELMAP/fontptrs.h"
 #include "CORE/PIXELMAP/gencopy.h"
@@ -31,7 +32,12 @@ br_pixelmap* BrPixelmapAllocateSub(br_pixelmap* src, br_int_32 x, br_int_32 y, b
 // IDA: void __cdecl BrPixelmapFree(br_pixelmap *src)
 void BrPixelmapFree(br_pixelmap* src) {
     LOG_TRACE10("(%p)", src);
-    _M_br_device_pixelmap_mem_free((br_device_pixelmap*)src);
+
+    CheckDispatch((br_device_pixelmap*)src);
+    if (BrDevLastBeginQuery() == src) {
+        BrDevLastBeginSet(NULL);
+    }
+    ((br_device_pixelmap*)src)->dispatch->_free((br_object*)src);
 }
 
 // IDA: br_pixelmap* __cdecl BrPixelmapResize(br_pixelmap *src, br_int_32 width, br_int_32 height)
@@ -311,7 +317,6 @@ void BrPixelmapText(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_uint_32 colou
     br_point p;
     LOG_TRACE("(%p, %d, %d, %d, %p, \"%s\")", dst, x, y, colour, font, text);
 
-
     CheckDispatch((br_device_pixelmap*)dst);
     if (font == NULL) {
         font = BrFontFixed3x5;
@@ -420,27 +425,22 @@ void BrPixelmapPaletteEntrySetMany(br_pixelmap* pm, br_int_32 index, br_int_32 n
 br_pixelmap* BrPixelmapDirectLock(br_pixelmap* src, br_boolean block) {
     LOG_TRACE("(%p, %d)", src, block);
 
-#if 0
-    // FIXME: use pixelmap dispatch table
-    CheckDispatch(src);
-    return ((br_device_pixelmap*)(src))->dispatch->_directLock(src) == 0 ? src : NULL;
-#else
-    STUB();
-    return src;
-#endif
+    CheckDispatch((br_device_pixelmap*)src);
+    if (((br_device_pixelmap*)(src))->dispatch->_directLock((br_device_pixelmap*)src, block) == 0) {
+        return src;
+    } else {
+        return NULL;
+    }
 }
 
 // IDA: br_pixelmap* __cdecl BrPixelmapDirectUnlock(br_pixelmap *src)
 br_pixelmap* BrPixelmapDirectUnlock(br_pixelmap* src) {
     LOG_TRACE("(%p)", src);
 
-    STUB();
-#if 0
-    // FIXME: use pixelmap dispatch table
-    CheckDispatch(src);
-    return ((br_device_pixelmap*)(src))->dispatch->_directUnlock(src) == 0 ? src : NULL;
-#else
-    STUB();
-    return src;
-#endif
+    CheckDispatch((br_device_pixelmap*)src);
+    if (((br_device_pixelmap*)(src))->dispatch->_directUnlock((br_device_pixelmap*)src) == 0) {
+        return src;
+    } else {
+        return NULL;
+    }
 }

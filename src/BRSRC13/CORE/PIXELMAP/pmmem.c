@@ -612,11 +612,13 @@ br_error _M_br_device_pixelmap_mem_synchronise(br_device_pixelmap* self, br_toke
 // IDA: br_error __cdecl _M_br_device_pixelmap_mem_directLock(br_device_pixelmap *self, br_boolean block)
 br_error _M_br_device_pixelmap_mem_directLock(br_device_pixelmap* self, br_boolean block) {
     LOG_TRACE("(%p, %d)", self, block);
-    NOT_IMPLEMENTED();
+
+    return 0;
 }
 
 // IDA: br_error __cdecl _M_br_device_pixelmap_mem_directUnlock(br_device_pixelmap *self)
 br_error _M_br_device_pixelmap_mem_directUnlock(br_device_pixelmap* self) {
     LOG_TRACE("(%p)", self);
-    NOT_IMPLEMENTED();
+
+    return 0;
 }
