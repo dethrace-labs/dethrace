@@ -205,7 +205,8 @@ int DRS3StopAllOutletSounds() {
 // IDA: void __cdecl ToggleSoundEnable()
 void ToggleSoundEnable() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    STUB();
 }
 
 // IDA: void __cdecl SoundService()

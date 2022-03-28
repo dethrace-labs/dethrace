@@ -2722,13 +2722,19 @@ void UnlockParts() {
 br_pixelmap* LoadChromeFont() {
     br_pixelmap* result;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    result = LoadPixelmap("CHRMFONT.PIX");
+    if (result == NULL) {
+        FatalError(59);
+    }
+    return result;
 }
 
 // IDA: void __usercall DisposeChromeFont(br_pixelmap *pThe_font@<EAX>)
 void DisposeChromeFont(br_pixelmap* pThe_font) {
     LOG_TRACE("(%p)", pThe_font);
-    NOT_IMPLEMENTED();
+
+    BrPixelmapFree(pThe_font);
 }
 
 // IDA: int __usercall GetALineAndInterpretCommand@<EAX>(FILE *pF@<EAX>, char **pString_list@<EDX>, int pCount@<EBX>)

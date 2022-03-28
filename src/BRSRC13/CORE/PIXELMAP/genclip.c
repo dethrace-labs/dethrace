@@ -255,14 +255,14 @@ br_clip_result PixelmapCopyBitsClip(br_rectangle* r_out, br_point* p_out, br_rec
         r_out->y -= p_out->y;
         p_out->y = 0;
     }
-    if ((p_out->x + r_out->w) > pm->width) {
+    if (p_out->x + r_out->w > pm->width) {
         r_out->w = pm->width - p_out->x;
     }
-    if ((p_out->y + r_out->h) > pm->height) {
+    if (p_out->y + r_out->h > pm->height) {
         r_out->h = pm->height - p_out->y;
     }
-    if (r_out->w != 0 && r_out->h != 0) {
-        return BR_CLIP_PARTIAL;
+    if (r_out->w == 0 || r_out->h == 0) {
+        return BR_CLIP_REJECT;
     }
-    return BR_CLIP_REJECT;
+    return BR_CLIP_PARTIAL;
 }

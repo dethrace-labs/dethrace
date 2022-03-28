@@ -473,7 +473,7 @@ void WaitFor(tU32 pDelay) {
     LOG_TRACE("(%d)", pDelay);
 
     start_time = PDGetTotalTime();
-    while ((start_time + pDelay) < PDGetTotalTime()) {
+    while (start_time + pDelay < PDGetTotalTime()) {
         SoundService();
     }
 }

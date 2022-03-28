@@ -540,7 +540,7 @@ void DoGame() {
                         race_result = DoRace();
                         SwitchToLoresMode();
                         DisposeRace();
-                        if (gNet_mode) {
+                        if (gNet_mode != eNet_mode_none) {
                             gProgram_state.current_race_index = gPending_race;
                             gCurrent_net_game->start_race = gPending_race;
                             gPending_race = -1;

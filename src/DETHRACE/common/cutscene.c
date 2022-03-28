@@ -179,21 +179,21 @@ void DoEndRaceAnimation() {
     int went_up_a_rank;
     LOG_TRACE("()");
 
-    made_a_profit = gProgram_state.credits_earned > gProgram_state.credits_lost;
-    went_up_a_rank = gProgram_state.credits_earned > gProgram_state.credits_per_rank;
+    made_a_profit = gProgram_state.credits_earned >= gProgram_state.credits_lost;
+    went_up_a_rank = gProgram_state.credits_earned >= gProgram_state.credits_per_rank;
 
     FadePaletteDown();
 
-    if (gAusterity_mode || gNet_mode) {
+    if (gAusterity_mode || gNet_mode != eNet_mode_none) {
         return;
     }
     if (gProgram_state.credits + gProgram_state.credits_earned - gProgram_state.credits_lost >= 0) {
-        if (!made_a_profit && !went_up_a_rank) {
-            PlaySmackerFile("UNSUCSES.SMK");
-        } else if (!made_a_profit || !went_up_a_rank) {
+        if (made_a_profit && went_up_a_rank) {
+            PlaySmackerFile("SUCCESS.SMK");
+        } else if (made_a_profit || went_up_a_rank) {
             PlaySmackerFile("MUNDANE.SMK");
         } else {
-            PlaySmackerFile("SUCCESS.SMK");
+            PlaySmackerFile("UNSUCSES.SMK");
         }
     }
 }

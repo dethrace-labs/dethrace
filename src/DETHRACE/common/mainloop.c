@@ -209,7 +209,7 @@ void MungeHeadups() {
         effective_timer = gFrame_period * 10.0 + gLast_time_headup;
     }
     gLast_time_headup = effective_timer;
-    if (gNet_mode) {
+    if (gNet_mode != eNet_mode_none) {
         DoNetworkHeadups(net_credits);
     } else {
         if (net_credits < 0) {
@@ -271,7 +271,7 @@ void MungeHeadups() {
             if (gTimer) {
                 if (the_time - last_rattle_time > 15) {
                     previous_gtimer = gTimer;
-                    gTimer -= 1000 * ((the_time - last_rattle_time) / 0xF);
+                    gTimer -= 1000 * ((the_time - last_rattle_time) / 15);
                     if (gTimer < 0) {
                         gTimer = 0;
                     }

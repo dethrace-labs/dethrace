@@ -1,5 +1,7 @@
 #include "pmdsptch.h"
 
+#include "CORE/FW/scratch.h"
+#include "CORE/PIXELMAP/fontptrs.h"
 #include "CORE/PIXELMAP/gencopy.h"
 #include "CORE/PIXELMAP/pmmem.h"
 #include "CORE/STD/brstdlib.h"
@@ -341,7 +343,18 @@ void BrPixelmapTextF(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_uint_32 colo
     br_point p;
     va_list args;
     LOG_TRACE("(%p, %d, %d, %d, %p, \"%s\")", dst, x, y, colour, font, fmt);
-    NOT_IMPLEMENTED();
+
+    CheckDispatch((br_device_pixelmap*)dst);
+    ss = BrScratchString();
+    if (font == NULL) {
+        font = BrFontFixed3x5;
+    }
+    va_start(args, fmt);
+    BrVSprintfN(ss, BrScratchStringSize(), fmt, args);
+    va_end(args);
+    p.x = x;
+    p.y = y;
+    (*(br_device_pixelmap_dispatch**)dst)->_text((br_device_pixelmap*)dst, &p, font, ss, colour);
 }
 
 // IDA: br_uint_16 __cdecl BrPixelmapTextWidth(br_pixelmap *dst, br_font *font, char *text)

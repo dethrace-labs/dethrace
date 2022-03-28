@@ -146,7 +146,47 @@ br_error _M_br_device_pixelmap_gen_text(br_device_pixelmap* self, br_point* poin
     br_int_32 y;
     br_int_32 s_stride;
     LOG_TRACE("(%p, %p, %p, \"%s\", %d)", self, point, font, text, colour);
-    NOT_IMPLEMENTED();
+
+    x = self->pm_origin_x + point->x;
+    y = self->pm_origin_y + point->y;
+    r.h = font->glyph_y;
+    if (-r.h >= y || y >= self->pm_height || x >= self->pm_width) {
+        return 0;
+    }
+    p.x = point->x;
+    p.y = point->y;
+    r.x = 0;
+    r.y = 0;
+    if ((font->flags & BR_FONTF_PROPORTIONAL) == 0) {
+        r.w = font->glyph_x;
+        s_stride = (r.w + 7) / 8;
+        while (*text != '\0') {
+            if (x + r.w > 0) {
+                self->dispatch->_copyBits(self, &p, &font->glyphs[font->encoding[(unsigned)*text]], s_stride, &r, colour);
+            }
+            x += r.w + 1;
+            p.x += r.w + 1;
+            if (x > self->pm_width) {
+                return 0;
+            }
+            text++;
+        }
+    } else {
+        while (*text != '\0') {
+            r.w = font->width[(int)*text];
+            s_stride = (r.w + 7) / 8;
+            if (x + r.w > 0) {
+                self->dispatch->_copyBits(self, &p, &font->glyphs[font->encoding[(unsigned)*text]], s_stride, &r, colour);
+            }
+            x += r.w + 1;
+            p.x += r.w + 1;
+            if (x > self->pm_width) {
+                return 0;
+            }
+            text++;
+        }
+    }
+    return 0;
 }
 
 // IDA: br_error __cdecl _M_br_device_pixelmap_gen_textBounds(br_device_pixelmap *self, br_rectangle *rect, br_font *font, char *text)
@@ -169,23 +209,27 @@ br_error _M_br_device_pixelmap_gen_copyBits(br_device_pixelmap* self, br_point* 
 // IDA: br_error __cdecl _M_br_device_pixelmap_gen_flush(br_device_pixelmap *self)
 br_error _M_br_device_pixelmap_gen_flush(br_device_pixelmap* self) {
     LOG_TRACE("(%p)", self);
-    NOT_IMPLEMENTED();
+    
+    return 0;
 }
 
 // IDA: br_error __cdecl _M_br_device_pixelmap_gen_synchronise(br_device_pixelmap *self, br_token sync_type, br_boolean block)
 br_error _M_br_device_pixelmap_gen_synchronise(br_device_pixelmap* self, br_token sync_type, br_boolean block) {
     LOG_TRACE("(%p, %d, %d)", self, sync_type, block);
-    NOT_IMPLEMENTED();
+
+    return 0;
 }
 
 // IDA: br_error __cdecl _M_br_device_pixelmap_gen_directLock(br_device_pixelmap *self, br_boolean block)
 br_error _M_br_device_pixelmap_gen_directLock(br_device_pixelmap* self, br_boolean block) {
     LOG_TRACE("(%p, %d)", self, block);
-    NOT_IMPLEMENTED();
+
+    return 0;
 }
 
 // IDA: br_error __cdecl _M_br_device_pixelmap_gen_directUnlock(br_device_pixelmap *self)
 br_error _M_br_device_pixelmap_gen_directUnlock(br_device_pixelmap* self) {
     LOG_TRACE("(%p)", self);
-    NOT_IMPLEMENTED();
+
+    return 0;
 }

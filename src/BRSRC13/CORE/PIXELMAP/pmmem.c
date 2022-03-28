@@ -531,6 +531,7 @@ br_error _M_br_device_pixelmap_mem_line(br_device_pixelmap* self, br_point* s, b
     NOT_IMPLEMENTED();
 }
 
+
 // IDA: br_error __cdecl _M_br_device_pixelmap_mem_copyBits(br_device_pixelmap *self, br_point *point, br_uint_8 *src, br_uint_16 s_stride, br_rectangle *bit_rect, br_uint_32 colour)
 br_error _M_br_device_pixelmap_mem_copyBits(br_device_pixelmap* self, br_point* point, br_uint_8* src, br_uint_16 s_stride, br_rectangle* bit_rect, br_uint_32 colour) {
     int bytes;
@@ -538,7 +539,16 @@ br_error _M_br_device_pixelmap_mem_copyBits(br_device_pixelmap* self, br_point* 
     br_rectangle ar;
     br_point ap;
     LOG_TRACE("(%p, %p, %p, %d, %p, %d)", self, point, src, s_stride, bit_rect, colour);
-    NOT_IMPLEMENTED();
+
+    if (PixelmapCopyBitsClip(&ar, &ap, bit_rect, point, (br_pixelmap*)self) == BR_CLIP_REJECT) {
+        return 0;
+    }
+    bytes = pmTypeInfo[self->pm_type].bits >> 3;
+    bit = ar.x & 0x7;
+
+    pm_mem_copy_bits(self->pm_pixels + (self->pm_base_y + ap.y) * self->pm_row_bytes + (self->pm_base_x + ap.x + (ar.x & ~0x7) - bit) * bytes, self->pm_pixels_qualifier,
+        self->pm_row_bytes, src + ar.y * s_stride, s_stride, bit, bit + ar.w, ar.h, bytes, colour);
+    return 0;
 }
 
 // IDA: br_error __cdecl _M_br_device_pixelmap_mem_pixelQuery(br_device_pixelmap *self, br_uint_32 *pcolour, br_point *p)
