@@ -21,7 +21,10 @@ br_pixelmap* BrPixelmapAllocateSub(br_pixelmap* src, br_int_32 x, br_int_32 y, b
     r.w = w;
     r.x = x;
     r.y = y;
-    _M_br_device_pixelmap_mem_allocateSub((br_device_pixelmap*)src, (br_device_pixelmap**)&new, &r);
+    CheckDispatch((br_device_pixelmap*)src);
+    if (((br_device_pixelmap*)src)->dispatch->_allocateSub((br_device_pixelmap*)src, (br_device_pixelmap**)&new, &r) != 0) {
+        return NULL;
+    }
     return new;
 }
 

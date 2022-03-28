@@ -186,7 +186,7 @@ br_error _M_br_device_pixelmap_mem_allocateSub(br_device_pixelmap* self, br_devi
     pm->pm_stored = 0;
     pm->dispatch = &devicePixelmapDispatch;
     if (pm->pm_width != self->pm_width) {
-        pm->pm_flags &= 0xFDu; // unset BR_PMF_LINEAR
+        pm->pm_flags &= ~BR_PMF_LINEAR;
     }
     *newpm = pm;
     return 0;
