@@ -8,7 +8,6 @@ br_pixelmap* last_begin_screen;
 
 // IDA: br_pixelmap* __cdecl BrDevLastBeginQuery()
 br_pixelmap* BrDevLastBeginQuery() {
-    LOG_TRACE("()");
 
     STUB();
     return NULL;
