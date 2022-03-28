@@ -573,7 +573,7 @@ void DoGame() {
                             DisposeOpponentsCars(&gCurrent_race);
                         }
                         DisposeTrack();
-                        if (harness_game_info.mode == eGame_carmageddon_demo) {
+                        if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo) {
                             DoFullVersionPowerpoint();
                         }
                         gProgram_state.loaded = 0;

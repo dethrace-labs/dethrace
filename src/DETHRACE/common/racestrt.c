@@ -1253,7 +1253,7 @@ tSO_result DoSelectRace(int* pSecond_time_around) {
             DisposeFlicPanel(0);
 
             if (result == 2) {
-                if (harness_game_info.mode == eGame_carmageddon_demo) {
+                if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo) {
                     DoFeatureUnavailableInDemo();
                 } else {
                     RunFlic(192);

@@ -11,6 +11,7 @@
 #include "network.h"
 #include "sound.h"
 #include "utility.h"
+#include "harness/config.h"
 #include "harness/trace.h"
 #include "pd/sys.h"
 #include "brender/brender.h"
@@ -653,6 +654,11 @@ tSO_result DoEndRaceSummary(int* pFirst_summary_done, tRace_result pRace_result)
     tSO_result result;
     LOG_TRACE("(%p, %d)", pFirst_summary_done, pRace_result);
 
+    if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_carmageddon_demo) {
+        gRank_etc_munged = 1;
+        DoEndRaceSummary2();
+        return eSO_continue;
+    }
     gRank_etc_munged = 0;
     if (!*pFirst_summary_done && pRace_result != eRace_timed_out) {
         if (gNet_mode != eNet_mode_none) {

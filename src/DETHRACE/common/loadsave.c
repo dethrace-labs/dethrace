@@ -287,7 +287,7 @@ int DoLoadGame() {
     int result;
     LOG_TRACE("()");
 
-    if (harness_game_info.mode == eGame_carmageddon_demo) {
+    if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo) {
         DoFeatureUnavailableInDemo();
         return 0;
     }
@@ -655,7 +655,7 @@ int SaveGameInterface(int pDefault_choice) {
 void DoSaveGame(int pSave_allowed) {
     LOG_TRACE("()");
 
-    if (harness_game_info.mode == eGame_carmageddon_demo) {
+    if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo) {
         DoFeatureUnavailableInDemo();
         return;
     }
