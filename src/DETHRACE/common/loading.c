@@ -3099,7 +3099,7 @@ FILE* OldDRfopen(char* pFilename, char* pMode) {
                     && strcmp(&pFilename[len - 12], "KEYMAP_2.TXT") != 0
                     && strcmp(&pFilename[len - 12], "KEYMAP_3.TXT") != 0
                     && strcmp(&pFilename[len - 11], "OPTIONS.TXT") != 0
-                    && strcmp(&pFilename[len - 11], "KEYNAMES.TXT") != 0
+                    && strcmp(&pFilename[len - 12], "KEYNAMES.TXT") != 0
                     && strcmp(&pFilename[len - 10], "KEYMAP.TXT") != 0
                     && strcmp(&pFilename[len - 9], "PATHS.TXT") != 0
                     && strcmp(&pFilename[len - 11], "PRATCAM.TXT") != 0) {
