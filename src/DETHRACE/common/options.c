@@ -1082,7 +1082,7 @@ int MouseyClickBastard(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, 
     if (gCurrent_key < 0) {
         GetMousePosition(&x_coord, &y_coord);
         for (i = gRadio_bastards__options[12].count - 1; i >= 0; i--) {
-            if (x_coord + 3 >= gRadio_bastards__options[12].left[i]) { 
+            if (x_coord + 3 >= gRadio_bastards__options[12].left[i]) {
                 DRS3StartSound(gIndexed_outlets[0], 3000);
                 ChangeKeyMapIndex(i);
                 RadioChanged(12, i);

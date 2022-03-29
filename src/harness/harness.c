@@ -257,8 +257,8 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
             handled = 1;
         } else if (strstr(argv[i], "--demo-timeout=") != NULL) {
             char* s = strstr(argv[i], "=");
-            harness_game_config.demo_timeout = atoi(s + 1);
-            LOG_INFO("Demo timeout set to %d", harness_game_config.demo_timeout);
+            harness_game_config.demo_timeout = atoi(s + 1) * 1000;
+            LOG_INFO("Demo timeout set to %d milliseconds", harness_game_config.demo_timeout);
             handled = 1;
         }
 

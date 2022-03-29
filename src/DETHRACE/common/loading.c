@@ -40,7 +40,7 @@
 #define AMBIENT_MULTIPLIER 0.01f
 #define NBR_FUNK_GROVE_FLAGS 30
 
-tHeadup_info gHeadup_image_info[32] = {
+tHeadup_info gHeadup_image_info[32] = {  // Modified by DethRace to fit the "demo timeout" fancy head-up.
     { "LADY.PIX", eNet_or_otherwise },
     { "GENT.PIX", eNet_or_otherwise },
     { "CODGER.PIX", eNet_or_otherwise },
@@ -72,7 +72,7 @@ tHeadup_info gHeadup_image_info[32] = {
     { "UBROKE.PIX", eNet_only },
     { "ULOST.PIX", eNet_only },
     { "UWON.PIX", eNet_only },
-    { "DTIMEOUT.PIX", eNot_net },
+    { "DTIMEOUT.PIX", eNot_net },   // Only used by the demo, not present in the full version
 };
 char* gYour_car_names[2][6];
 char* gDrivable_car_names[6];

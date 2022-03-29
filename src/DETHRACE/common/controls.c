@@ -1844,7 +1844,7 @@ void MuchMoreTime() {
 // IDA: void __cdecl ToggleTimerFreeze()
 void ToggleTimerFreeze() {
     LOG_TRACE("()");
-    
+
     gFreeze_timer = !gFreeze_timer;
     if (gFreeze_timer) {
         NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(1));
