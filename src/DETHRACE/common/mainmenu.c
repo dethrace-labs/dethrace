@@ -7,6 +7,7 @@
 #include "grafdata.h"
 #include "graphics.h"
 #include "harness/trace.h"
+#include "harness/config.h"
 #include "intrface.h"
 #include "loading.h"
 #include "loadsave.h"
@@ -30,13 +31,15 @@ char* gPixels_copy__mainmenu; // suffix added to avoid duplicate symbol
 int MainMenuDone1(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
 
-    if (pCurrent_mode == 0) {
-        if (pCurrent_choice == 7) {
-            PreloadBunchOfFlics(7);
+    if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo) {
+        if (pCurrent_mode == 0) {
+            if (pCurrent_choice == 7) {
+                PreloadBunchOfFlics(7);
+            }
+        } else {
+            return -1;
         }
         return pCurrent_choice;
-    } else {
-        return -1;
     }
 
     if (pTimed_out) {
@@ -71,15 +74,16 @@ int MainMenuDone1(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
 int MainMenuDone2(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
 
-    if (pCurrent_mode == 0) {
-        if (pCurrent_choice == 4) {
-            PreloadBunchOfFlics(7);
+    if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo) {
+        if (pCurrent_mode == 0) {
+            if (pCurrent_choice == 4) {
+                PreloadBunchOfFlics(7);
+            }
+        } else {
+            return -1;
         }
-    } else {
-        return -1;
+        return pCurrent_choice;
     }
-    return pCurrent_choice;
-
 
     if (pTimed_out) {
         return -1;
