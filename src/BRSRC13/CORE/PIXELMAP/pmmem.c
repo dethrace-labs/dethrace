@@ -20,62 +20,62 @@ br_tv_template_entry matchTemplateEntries[6] = {
     { BRT_HEIGHT_I32, NULL, 16, 2, 3, 0, 0 }
 };
 br_device_pixelmap_dispatch devicePixelmapDispatch = {
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     (void*)_M_br_device_pixelmap_mem_free,
-     (void*)_M_br_device_pixelmap_mem_identifier,
-     (void*)_M_br_device_pixelmap_mem_type,
-     (void*)_M_br_device_pixelmap_mem_isType,
-     (void*)_M_br_device_pixelmap_mem_device,
-     (void*)_M_br_device_pixelmap_mem_space,
-     (void*)_M_br_device_pixelmap_mem_queryTemplate,
-     (void*)_M_br_object_query,
-     (void*)_M_br_object_queryBuffer,
-     (void*)_M_br_object_queryMany,
-     (void*)_M_br_object_queryManySize,
-     (void*)_M_br_object_queryAll,
-     (void*)_M_br_object_queryAllSize,
-     (void*)_M_br_device_pixelmap_mem_validSource,
-     (void*)_M_br_device_pixelmap_mem_resize,
-     (void*)_M_br_device_pixelmap_mem_match,
-     (void*)_M_br_device_pixelmap_mem_allocateSub,
-     (void*)_M_br_device_pixelmap_mem_copyTo,
-     (void*)_M_br_device_pixelmap_mem_copyTo,
-     (void*)_M_br_device_pixelmap_mem_copyFrom,
-     (void*)_M_br_device_pixelmap_mem_fill,
-     (void*)_M_br_device_pixelmap_gen_doubleBuffer,
-     (void*)_M_br_device_pixelmap_gen_copyDirty,
-     (void*)_M_br_device_pixelmap_gen_copyToDirty,
-     (void*)_M_br_device_pixelmap_gen_copyFromDirty,
-     (void*)_M_br_device_pixelmap_gen_fillDirty,
-     (void*)_M_br_device_pixelmap_gen_doubleBufferDirty,
-     (void*)_M_br_device_pixelmap_gen_rectangle,
-     (void*)_M_br_device_pixelmap_gen_rectangle2,
-     (void*)_M_br_device_pixelmap_mem_rectangleCopyTo,
-     (void*)_M_br_device_pixelmap_mem_rectangleCopyTo,
-     (void*)_M_br_device_pixelmap_mem_rectangleCopyFrom,
-     (void*)_M_br_device_pixelmap_mem_rectangleStretchCopyTo,
-     (void*)_M_br_device_pixelmap_mem_rectangleStretchCopyTo,
-     (void*)_M_br_device_pixelmap_mem_rectangleStretchCopyFrom,
-     (void*)_M_br_device_pixelmap_mem_rectangleFill,
-     (void*)_M_br_device_pixelmap_mem_pixelSet,
-     (void*)_M_br_device_pixelmap_mem_line,
-     (void*)_M_br_device_pixelmap_mem_copyBits,
-     (void*)_M_br_device_pixelmap_gen_text,
-     (void*)_M_br_device_pixelmap_gen_textBounds,
-     (void*)_M_br_device_pixelmap_mem_rowSize,
-     (void*)_M_br_device_pixelmap_mem_rowSet,
-     (void*)_M_br_device_pixelmap_mem_rowQuery,
-     (void*)_M_br_device_pixelmap_mem_pixelQuery,
-     (void*)_M_br_device_pixelmap_mem_pixelAddressQuery,
-     (void*)_M_br_device_pixelmap_mem_pixelAddressSet,
-     (void*)_M_br_device_pixelmap_mem_originSet,
-     (void*)_M_br_device_pixelmap_mem_flush,
-     (void*)_M_br_device_pixelmap_mem_synchronise,
-     (void*)_M_br_device_pixelmap_mem_directLock,
-     (void*)_M_br_device_pixelmap_mem_directUnlock,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    (void*)_M_br_device_pixelmap_mem_free,
+    (void*)_M_br_device_pixelmap_mem_identifier,
+    (void*)_M_br_device_pixelmap_mem_type,
+    (void*)_M_br_device_pixelmap_mem_isType,
+    (void*)_M_br_device_pixelmap_mem_device,
+    (void*)_M_br_device_pixelmap_mem_space,
+    (void*)_M_br_device_pixelmap_mem_queryTemplate,
+    (void*)_M_br_object_query,
+    (void*)_M_br_object_queryBuffer,
+    (void*)_M_br_object_queryMany,
+    (void*)_M_br_object_queryManySize,
+    (void*)_M_br_object_queryAll,
+    (void*)_M_br_object_queryAllSize,
+    (void*)_M_br_device_pixelmap_mem_validSource,
+    _M_br_device_pixelmap_mem_resize,
+    _M_br_device_pixelmap_mem_match,
+    _M_br_device_pixelmap_mem_allocateSub,
+    _M_br_device_pixelmap_mem_copyTo,
+    _M_br_device_pixelmap_mem_copyTo,
+    _M_br_device_pixelmap_mem_copyFrom,
+    _M_br_device_pixelmap_mem_fill,
+    _M_br_device_pixelmap_gen_doubleBuffer,
+    _M_br_device_pixelmap_gen_copyDirty,
+    _M_br_device_pixelmap_gen_copyToDirty,
+    _M_br_device_pixelmap_gen_copyFromDirty,
+    _M_br_device_pixelmap_gen_fillDirty,
+    _M_br_device_pixelmap_gen_doubleBufferDirty,
+    _M_br_device_pixelmap_gen_rectangle,
+    _M_br_device_pixelmap_gen_rectangle2,
+    _M_br_device_pixelmap_mem_rectangleCopyTo,
+    _M_br_device_pixelmap_mem_rectangleCopyTo,
+    _M_br_device_pixelmap_mem_rectangleCopyFrom,
+    _M_br_device_pixelmap_mem_rectangleStretchCopyTo,
+    _M_br_device_pixelmap_mem_rectangleStretchCopyTo,
+    _M_br_device_pixelmap_mem_rectangleStretchCopyFrom,
+    _M_br_device_pixelmap_mem_rectangleFill,
+    _M_br_device_pixelmap_mem_pixelSet,
+    _M_br_device_pixelmap_mem_line,
+    _M_br_device_pixelmap_mem_copyBits,
+    _M_br_device_pixelmap_gen_text,
+    _M_br_device_pixelmap_gen_textBounds,
+    _M_br_device_pixelmap_mem_rowSize,
+    (void*)_M_br_device_pixelmap_mem_rowSet,
+    (void*)_M_br_device_pixelmap_mem_rowQuery,
+    _M_br_device_pixelmap_mem_pixelQuery,
+    _M_br_device_pixelmap_mem_pixelAddressQuery,
+    _M_br_device_pixelmap_mem_pixelAddressSet,
+    _M_br_device_pixelmap_mem_originSet,
+    _M_br_device_pixelmap_mem_flush,
+    _M_br_device_pixelmap_mem_synchronise,
+    _M_br_device_pixelmap_mem_directLock,
+    _M_br_device_pixelmap_mem_directUnlock,
  };
 
 br_tv_template_entry devicePixelmapTemplateEntries[4];
@@ -144,7 +144,7 @@ br_device_pixelmap* DevicePixelmapMemAllocate(br_uint_8 type, br_uint_16 w, br_u
         pm->pm_flags |= BR_PMF_ROW_WHOLEPIXELS;
     }
     if (!(flags & BR_PMAF_NO_PIXELS)) {
-        if (pixels) {
+        if (pixels != NULL) {
             pm->pm_pixels = pixels;
         } else {
             pm->pm_pixels = BrResAllocate(pm, pm->pm_height * pm->pm_row_bytes, BR_MEMORY_PIXELS);
@@ -200,19 +200,22 @@ void _M_br_device_pixelmap_mem_free(br_device_pixelmap* self) {
 // IDA: char* __cdecl _M_br_device_pixelmap_mem_identifier(br_device_pixelmap *self)
 char* _M_br_device_pixelmap_mem_identifier(br_device_pixelmap* self) {
     LOG_TRACE("(%p)", self);
-    NOT_IMPLEMENTED();
+
+    return self->pm_identifier;
 }
 
 // IDA: br_token __cdecl _M_br_device_pixelmap_mem_type(br_device_pixelmap *self)
 br_token _M_br_device_pixelmap_mem_type(br_device_pixelmap* self) {
     LOG_TRACE("(%p)", self);
-    NOT_IMPLEMENTED();
+
+    return BRT_DEVICE_PIXELMAP;
 }
 
 // IDA: br_boolean __cdecl _M_br_device_pixelmap_mem_isType(br_device_pixelmap *self, br_token t)
 br_boolean _M_br_device_pixelmap_mem_isType(br_device_pixelmap* self, br_token t) {
     LOG_TRACE("(%p, %d)", self, t);
-    NOT_IMPLEMENTED();
+
+    return t == BRT_DEVICE_PIXELMAP || t == BRT_OBJECT;
 }
 
 // IDA: br_device* __cdecl _M_br_device_pixelmap_mem_device(br_device_pixelmap *self)
@@ -225,7 +228,8 @@ br_device* _M_br_device_pixelmap_mem_device(br_device_pixelmap* self) {
 // IDA: br_int_32 __cdecl _M_br_device_pixelmap_mem_space(br_device_pixelmap *self)
 br_int_32 _M_br_device_pixelmap_mem_space(br_device_pixelmap* self) {
     LOG_TRACE("(%p)", self);
-    NOT_IMPLEMENTED();
+
+    return BrResSizeTotal(self);
 }
 
 // IDA: br_tv_template* __cdecl _M_br_device_pixelmap_mem_queryTemplate(br_device_pixelmap *self)
@@ -237,7 +241,8 @@ br_tv_template* _M_br_device_pixelmap_mem_queryTemplate(br_device_pixelmap* self
 // IDA: br_error __cdecl _M_br_device_pixelmap_mem_validSource(br_device_pixelmap *self, br_object *h)
 br_error _M_br_device_pixelmap_mem_validSource(br_device_pixelmap* self, br_object* h) {
     LOG_TRACE("(%p, %p)", self, h);
-    NOT_IMPLEMENTED();
+
+    return 0;
 }
 
 // IDA: br_error __cdecl _M_br_device_pixelmap_mem_resize(br_device_pixelmap *self, br_int_32 width, br_int_32 height)

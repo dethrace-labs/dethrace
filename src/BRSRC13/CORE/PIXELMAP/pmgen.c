@@ -209,7 +209,7 @@ br_error _M_br_device_pixelmap_gen_copyBits(br_device_pixelmap* self, br_point* 
 // IDA: br_error __cdecl _M_br_device_pixelmap_gen_flush(br_device_pixelmap *self)
 br_error _M_br_device_pixelmap_gen_flush(br_device_pixelmap* self) {
     LOG_TRACE("(%p)", self);
-    
+
     return 0;
 }
 
