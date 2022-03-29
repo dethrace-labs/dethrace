@@ -916,16 +916,15 @@ br_uint_32 CalcProximities(br_actor* pActor, br_material* pMat, tFunkotronic_spe
     int i;
     LOG_TRACE("(%p, %p, %p)", pActor, pMat, pThe_funk);
 
-    if (pActor->model) {
+    if (pActor->model != NULL) {
         if (pThe_funk->material == pMat) {
             pThe_funk->proximity_count += 8;
         } else {
-            the_face = pActor->model->faces;
             for (i = 0; i < pActor->model->nfaces; i++) {
+                the_face = &pActor->model->faces[i];
                 if (pThe_funk->material == the_face->material) {
                     pThe_funk->proximity_count += 3;
                 }
-                the_face++;
             }
         }
     }
@@ -1251,7 +1250,7 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
         the_funk->proximity_count = 0;
         the_funk->proximity_array = 0;
         if (the_funk->mode == eFunk_mode_distance) {
-            DRActorEnumRecurseWithMat(gUniverse_actor, 0, (recurse_with_mat_cbfn*)CalcProximities, the_funk);
+            DRActorEnumRecurseWithMat(gUniverse_actor, NULL, (recurse_with_mat_cbfn*)CalcProximities, the_funk);
             the_funk->proximity_array = BrMemAllocate(sizeof(br_vector3) * the_funk->proximity_count, kMem_funk_prox_array);
             the_funk->proximity_count = 0;
             DRActorEnumRecurseWithMat(gUniverse_actor, 0, (recurse_with_mat_cbfn*)AddProximities, the_funk);
@@ -1260,12 +1259,12 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
                     if (the_funk->proximity_array[j].v[0] == the_funk->proximity_array[i].v[0]
                         && the_funk->proximity_array[j].v[1] == the_funk->proximity_array[i].v[1]
                         && the_funk->proximity_array[j].v[2] == the_funk->proximity_array[i].v[2]) {
-                        memcpy(
+                        memmove(
                             &the_funk->proximity_array[j],
                             &the_funk->proximity_array[j + 1],
-                            4 * (3 * (the_funk->proximity_count - j) - 3));
-                        --j;
-                        --the_funk->proximity_count;
+                            sizeof(br_vector3) * (the_funk->proximity_count - j - 1));
+                        the_funk->proximity_count--;
+                        j--;
                     }
                 }
             }

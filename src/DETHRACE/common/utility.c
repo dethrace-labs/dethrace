@@ -518,7 +518,7 @@ br_uint_32 DRActorEnumRecurseWithMat(br_actor* pActor, br_material* pMat, recurs
     br_uint_32 result;
     LOG_TRACE("(%p, %p, %p, %p)", pActor, pMat, pCall_back, pArg);
 
-    if (pActor->material) {
+    if (pActor->material != NULL) {
         pMat = pActor->material;
     }
     result = pCall_back(pActor, pMat, pArg);
