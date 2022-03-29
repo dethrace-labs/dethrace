@@ -11,6 +11,7 @@
 #define STR_STARTS_WITH(haystack, needle) strncmp(haystack, needle, strlen(needle))
 #define STR_ENDS_WITH(haystack, needle) strcmp(haystack + strlen(haystack) - strlen(needle), needle)
 #define MAX(a, b) ((a) > (b) ? a : b)
+#define MIN(a, b) ((a) < (b) ? a : b)
 #define COUNT_OF(array) (sizeof((array)) / sizeof((array)[0]))
 #define LEN(array) (sizeof((array)) / sizeof((array)[0]))
 

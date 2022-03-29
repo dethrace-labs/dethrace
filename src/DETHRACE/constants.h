@@ -307,6 +307,31 @@ typedef enum keymapcodes {
     KEYMAP_INFO = 26,           // default I
 } keymapcodes;
 
+enum {
+    kFancyHeadupSplatterBonus = 0,
+    kFancyHeadupPileDriverBonus = 1,
+    kFancyHeadupExtraStyleBonus = 2,
+    kFancyHeadupBonusForArtisticImpression = 3,
+    kFancyHeadup2xComboBonus = 4,
+    kFancyHeadup3xComboBonus = 5,
+    kFancyHeadup4xComboBonus = 6,
+    kFancyHeadup5xComboBonus = 7,
+    kFancyHeadupNiceShotSir = 8,
+    kFancyHeadupCunningStuntBonus = 9,
+    kFancyHeadupHeadOnBonus = 10,
+    kFancyHeadupYouWastedEm = 11,
+    kFancyHeadupCheckpoint = 12,
+    kFancyHeadupOutOfTime = 13,
+    kFancyHeadupRaceCompleted = 14,
+
+    // FIXME: missing network fancy head-ups
+
+    kFancyHeadupNetworkRaceOverNetworkLoss = 17,
+    kFancyHeadupNetworkRaceNoMoreMoney = 18,
+    kFancyHeadupNetworkVictory = 20,
+    kFancyHeadupDemoTimeout = 21,
+};
+
 #define FONT_TYPEABLE 0
 #define FONT_ORANGHED 1
 #define FONT_BLUEHEAD 2

@@ -40,7 +40,7 @@ int gOppo_paths_shown;
 int gMade_path_filename;
 int gBIG_APC_index;
 char* gPath_section_type_names[3];
-int gMin_bangness;
+int gMin_bangness = 100;
 int gMax_bangness;
 tU32 gNext_elastication;
 tU32 gNext_write_during_elastication;

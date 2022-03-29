@@ -893,7 +893,7 @@ int PDCheckDriveExists2(char* pThe_path, char* pFile_name, tU32 pMin_size) {
     // <<
 
     stat_failed = stat(the_path, &buf);
-    return !stat_failed && buf.st_size >= pMin_size;
+    return stat_failed == 0 && buf.st_size >= pMin_size;
 }
 
 // IDA: int __cdecl PDDoWeLeadAnAustereExistance()

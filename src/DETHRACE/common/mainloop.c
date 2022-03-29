@@ -458,13 +458,13 @@ void CheckTimer() {
 int MungeRaceFinished() {
     LOG_TRACE("()");
 
-    if (!gRace_finished || gAction_replay_mode || (gNet_mode && gRace_over_reason == -1)) {
+    if (!gRace_finished || gAction_replay_mode || (gNet_mode != eNet_mode_none && gRace_over_reason == eRace_not_over_yet)) {
         return 0;
     }
     if (gRace_finished > gFrame_period) {
         gRace_finished -= gFrame_period;
     } else {
-        if (!gTimer || gNet_mode) {
+        if (!gTimer || gNet_mode != eNet_mode_none) {
             gRace_finished = 0;
             return 1;
         }
@@ -693,10 +693,11 @@ tRace_result MainGameLoop() {
         gProgram_state.credits_earned += gTime_bonus;
     }
     if (gTime_bonus_state < eTime_bonus_race_bonus) {
+        // FIXME: gRace_over_reason can be -1 eRace_not_over_yet (=-1) when aborting a race
         bonus = gCurrent_race.bonus_score[gRace_over_reason][gProgram_state.skill_level];
         gProgram_state.credits_earned += bonus;
     }
-    if (gNet_mode) {
+    if (gNet_mode != eNet_mode_none) {
         for (i = 0; i < gNumber_of_net_players; i++) {
             StopCarBeingIt(gNet_players[i].car);
         }

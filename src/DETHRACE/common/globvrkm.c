@@ -1,4 +1,5 @@
 #include "globvrkm.h"
+#include "globvars.h"
 #include <stdlib.h>
 
 br_scalar gCamera_zoom = 0.2f;
@@ -7,7 +8,7 @@ br_vector3 gView_direction = { { 0.0, 0.0, -1.0 } };
 int gCamera_sign;
 int gCar_flying;
 int gCamera_reset;
-tCar_spec* gCar_to_view;
+tCar_spec* gCar_to_view = &gProgram_state.current_car;
 br_actor* gCamera_list[2];
 tCar_spec* gActive_car_list[25];
 int gNum_active_cars;

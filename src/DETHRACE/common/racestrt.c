@@ -1336,7 +1336,7 @@ void DrawGrid(int pOffset, int pDraw_it) {
     done_highest = 0;
     str_index = 0;
 
-    memset(numbers_str, 0, 4 * 100 * sizeof(char));
+    memset(numbers_str, 0, sizeof(numbers_str));
     memset(total_str, 0, sizeof(total_str));
 
     the_time = PDGetTotalTime();

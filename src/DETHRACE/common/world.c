@@ -215,11 +215,12 @@ tAdd_to_storage_result AddPixelmapToStorage(tBrender_storage* pStorage_space, br
     for (i = 0; i < pStorage_space->pixelmaps_count; i++) {
         if (pStorage_space->pixelmaps[i]->identifier
             && ((br_pixelmap*)pThe_pm)->identifier
-            && !strcmp(pStorage_space->pixelmaps[i]->identifier, ((br_pixelmap*)pThe_pm)->identifier)) {
+            && strcmp(pStorage_space->pixelmaps[i]->identifier, ((br_pixelmap*)pThe_pm)->identifier) == 0) {
             return eStorage_duplicate;
         }
     }
-    pStorage_space->pixelmaps[pStorage_space->pixelmaps_count++] = (br_pixelmap*)pThe_pm;
+    pStorage_space->pixelmaps[pStorage_space->pixelmaps_count] = (br_pixelmap*)pThe_pm;
+    pStorage_space->pixelmaps_count++;
     return eStorage_allocated;
 }
 
@@ -297,7 +298,7 @@ int LoadNPixelmaps(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     LOG_TRACE("(%p, %p, %d)", pStorage_space, pF, pCount);
 
     new_ones = 0;
-    for (i = 0; pCount > i; ++i) {
+    for (i = 0; i < pCount; ++i) {
         PossibleService();
         GetALineAndDontArgue(pF, s);
         str = strtok(s, "\t ,/");
@@ -566,7 +567,19 @@ br_material* SuffixedMaterial(br_material* pOld, char* pSuffix) {
     br_material* new_mat;
     char* new_id;
     LOG_TRACE("(%p, \"%s\")", pOld, pSuffix);
-    NOT_IMPLEMENTED();
+
+    new_id = BrMemAllocate(strlen(pOld->identifier) + strlen(pSuffix) + 1, kMem_new_mat_id);
+    sprintf(new_id, "%s%s", pOld->identifier, pSuffix);
+    new_mat = BrMaterialFind(new_id);
+    if (new_mat == NULL) {
+        new_mat = BrMaterialAllocate(NULL);
+        MaterialCopy(new_mat, pOld);
+        new_mat->identifier = new_id;
+        BrMaterialAdd(new_mat);
+    } else {
+        BrMemFree(new_id);
+    }
+    return new_mat;
 }
 
 // IDA: int __usercall FaceIsRoad@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
@@ -575,7 +588,11 @@ int FaceIsRoad(br_model* pModel, tU16 pFace) {
     br_vector3 v1;
     br_vector3 cross;
     LOG_TRACE("(%p, %d)", pModel, pFace);
-    NOT_IMPLEMENTED();
+
+    BrVector3Sub(&v0, &pModel->vertices[pModel->faces[pFace].vertices[0]].p, &pModel->vertices[pModel->faces[pFace].vertices[1]].p);
+    BrVector3Sub(&v1, &pModel->vertices[pModel->faces[pFace].vertices[1]].p, &pModel->vertices[pModel->faces[pFace].vertices[2]].p);
+    BrVector3Cross(&cross, &v0, &v1);
+    return sqrtf(cross.v[0] * cross.v[0] + cross.v[2] * cross.v[2]) < 0.7f * cross.v[1];
 }
 
 // IDA: br_material* __usercall RoadPerspToUntex@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
@@ -583,7 +600,17 @@ br_material* RoadPerspToUntex(br_model* pModel, tU16 pFace) {
     br_material* old_mat;
     br_material* new_mat;
     LOG_TRACE("(%p, %d)", pModel, pFace);
-    NOT_IMPLEMENTED();
+
+    old_mat = pModel->faces[pFace].material;
+    if (old_mat->colour_map == NULL || !FaceIsRoad(pModel, pFace)) {
+        return NULL;
+    }
+    new_mat = SuffixedMaterial(old_mat, ".road");
+    if (new_mat->colour_map != NULL) {
+        new_mat->colour_map = NULL;
+        BrMaterialUpdate(new_mat, BR_MATU_ALL);
+    }
+    return new_mat;
 }
 
 // IDA: br_material* __usercall WallPerspToLinear@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
@@ -591,7 +618,17 @@ br_material* WallPerspToLinear(br_model* pModel, tU16 pFace) {
     br_material* old_mat;
     br_material* new_mat;
     LOG_TRACE("(%p, %d)", pModel, pFace);
-    NOT_IMPLEMENTED();
+
+    old_mat = pModel->faces[pFace].material;
+    if (old_mat->colour_map == NULL || !(old_mat->flags & BR_MATF_PERSPECTIVE) || FaceIsRoad(pModel, pFace)) {
+        return NULL;
+    }
+    new_mat = SuffixedMaterial(old_mat, ".pwall");
+    if (new_mat->flags & BR_MATF_PERSPECTIVE) {
+        new_mat->flags &= ~BR_MATF_PERSPECTIVE;
+        BrMaterialUpdate(new_mat, BR_MATU_ALL);
+    }
+    return new_mat;
 }
 
 // IDA: br_material* __usercall WallPerspToUntex@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
@@ -599,7 +636,21 @@ br_material* WallPerspToUntex(br_model* pModel, tU16 pFace) {
     br_material* old_mat;
     br_material* new_mat;
     LOG_TRACE("(%p, %d)", pModel, pFace);
-    NOT_IMPLEMENTED();
+
+    old_mat = pModel->faces[pFace].material;
+    if (old_mat->colour_map == NULL || FaceIsRoad(pModel, pFace)) {
+        return NULL;
+    }
+    if (old_mat->flags & BR_MATF_PERSPECTIVE) {
+        new_mat = SuffixedMaterial(old_mat, ".pwall");
+    } else {
+        new_mat = SuffixedMaterial(old_mat, ".lwall");
+    }
+    if(new_mat->colour_map != NULL) {
+        new_mat->colour_map = NULL;
+        BrMaterialUpdate(new_mat, BR_MATU_ALL);
+    }
+    return new_mat;
 }
 
 // IDA: void __usercall ProcessModelFaceMaterials2(br_model *pModel@<EAX>, tPMFM2CB pCallback@<EDX>)
@@ -1683,7 +1734,7 @@ void ChangeSubdivToPersp() {
 br_uint_32 ProcessFaceMaterials(br_actor* pActor, tPMFMCB pCallback) {
     LOG_TRACE("(%p, %d)", pActor, pCallback);
 
-    if (pActor->identifier == NULL || pActor->identifier[0] == '&') {
+    if (pActor->identifier == NULL || pActor->identifier[0] != '&') {
         if (pActor->type == BR_ACTOR_MODEL && pActor->model != NULL) {
             ProcessModelFaceMaterials(pActor->model, pCallback);
         }
@@ -1795,26 +1846,34 @@ void RevealStoredTextures(tBrender_storage* pStorage) {
 void SetCarStorageTexturingLevel(tBrender_storage* pStorage, tCar_texturing_level pNew, tCar_texturing_level pOld) {
     LOG_TRACE("(%p, %d, %d)", pStorage, pNew, pOld);
 
-    if (pNew) {
-        if (pNew == eCTL_transparent) {
-            if (pOld) {
-                if (pOld == eCTL_full) {
-                    HideStoredOpaqueTextures(pStorage);
-                }
-            } else {
-                RevealStoredTransparentTextures(pStorage);
-            }
-        } else if (pNew == eCTL_full) {
-            RevealStoredTextures(pStorage);
-        }
-    } else {
+    switch (pNew) {
+    case eCTL_none:
         HideStoredTextures(pStorage);
+        break;
+    case eCTL_transparent:
+        switch (pOld) {
+        case eCTL_none:
+            RevealStoredTransparentTextures(pStorage);
+            break;
+        case eCTL_full:
+            HideStoredOpaqueTextures(pStorage);
+            break;
+        default:
+            break;
+        }
+        break;
+    case eCTL_full:
+        RevealStoredTextures(pStorage);
+        break;
+    default:
+        break;
     }
 }
 
 // IDA: tCar_texturing_level __cdecl GetCarTexturingLevel()
 tCar_texturing_level GetCarTexturingLevel() {
     LOG_TRACE("()");
+
     return gCar_texturing_level;
 }
 
@@ -1823,47 +1882,14 @@ void SetCarTexturingLevel(tCar_texturing_level pLevel) {
     LOG_TRACE("(%d)", pLevel);
 
     if (pLevel != gCar_texturing_level) {
-        if (gOur_car_storage_space.models_count) {
-            if (pLevel == eCTL_none) {
-                HideStoredTextures(&gOur_car_storage_space);
-            } else if (pLevel == eCTL_transparent) {
-                if (gCar_texturing_level) {
-                    if (gCar_texturing_level == 2)
-                        HideStoredOpaqueTextures(&gOur_car_storage_space);
-                } else {
-                    RevealStoredTransparentTextures(&gOur_car_storage_space);
-                }
-            } else if (pLevel == eCTL_full) {
-                RevealStoredTextures(&gOur_car_storage_space);
-            }
+        if (gOur_car_storage_space.models_count != 0) {
+            SetCarStorageTexturingLevel(&gOur_car_storage_space, pLevel, gCar_texturing_level);
         }
-        if (gTheir_cars_storage_space.models_count) {
-            if (pLevel == eCTL_none) {
-                HideStoredTextures(&gTheir_cars_storage_space);
-            } else if (pLevel == eCTL_transparent) {
-                if (gCar_texturing_level) {
-                    if (gCar_texturing_level == 2)
-                        HideStoredOpaqueTextures(&gTheir_cars_storage_space);
-                } else {
-                    RevealStoredTransparentTextures(&gTheir_cars_storage_space);
-                }
-            } else if (pLevel == eCTL_full) {
-                RevealStoredTextures(&gTheir_cars_storage_space);
-            }
+        if (gTheir_cars_storage_space.models_count != 0) {
+            SetCarStorageTexturingLevel(&gTheir_cars_storage_space, pLevel, gCar_texturing_level);
         }
-        if (gNet_cars_storage_space.models_count) {
-            if (pLevel == eCTL_none) {
-                HideStoredTextures(&gTheir_cars_storage_space);
-            } else if (pLevel == eCTL_transparent) {
-                if (gCar_texturing_level) {
-                    if (gCar_texturing_level == 2)
-                        HideStoredOpaqueTextures(&gTheir_cars_storage_space);
-                } else {
-                    RevealStoredTransparentTextures(&gTheir_cars_storage_space);
-                }
-            } else if (pLevel == eCTL_full) {
-                RevealStoredTextures(&gTheir_cars_storage_space);
-            }
+        if (gNet_cars_storage_space.models_count != 0) {
+            SetCarStorageTexturingLevel(&gTheir_cars_storage_space, pLevel, gCar_texturing_level);
         }
     }
     gCar_texturing_level = pLevel;
@@ -1874,7 +1900,16 @@ int HasThisSuffix(char* pIdent, char* pSuffix) {
     size_t len_ident;
     size_t len_suffix;
     LOG_TRACE("(\"%s\", \"%s\")", pIdent, pSuffix);
-    NOT_IMPLEMENTED();
+
+    len_ident = strlen(pIdent);
+    len_suffix = strlen(pSuffix);
+    if (pIdent == NULL) {
+        return 0;
+    }
+    if (pIdent < pSuffix) {
+        return 0;
+    }
+    return strcmp(pIdent + len_ident - len_suffix, pSuffix) == 0;
 }
 
 // IDA: br_material* __usercall UnsuffixedMaterial@<EAX>(char *pOld_ident@<EAX>, char *pSuffix@<EDX>)
@@ -1883,7 +1918,13 @@ br_material* UnsuffixedMaterial(char* pOld_ident, char* pSuffix) {
     int unsuffixed_len;
     char* new_id;
     LOG_TRACE("(\"%s\", \"%s\")", pOld_ident, pSuffix);
-    NOT_IMPLEMENTED();
+
+    unsuffixed_len = strlen(pOld_ident) - strlen(pSuffix);
+    new_id = BrMemAllocate(unsuffixed_len + 1, kMem_new_mat_id_2);
+    sprintf(new_id, "%.*s", unsuffixed_len, pOld_ident);
+    result = BrMaterialFind(new_id);
+    BrMemFree(new_id);
+    return result;
 }
 
 // IDA: br_material* __usercall RoadUntexToPersp@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
@@ -1891,7 +1932,14 @@ br_material* RoadUntexToPersp(br_model* pModel, tU16 pFace) {
     br_material* old_mat;
     br_material* new_mat;
     LOG_TRACE("(%p, %d)", pModel, pFace);
-    NOT_IMPLEMENTED();
+
+    old_mat = pModel->faces[pFace].material;
+    if (HasThisSuffix(old_mat->identifier, ".road")) {
+        new_mat = UnsuffixedMaterial(old_mat->identifier, ".road");
+    } else {
+        new_mat = NULL;
+    }
+    return new_mat;
 }
 
 // IDA: br_material* __usercall WallLinearToUntex@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
@@ -1899,7 +1947,25 @@ br_material* WallLinearToUntex(br_model* pModel, tU16 pFace) {
     br_material* old_mat;
     br_material* new_mat;
     LOG_TRACE("(%p, %d)", pModel, pFace);
-    NOT_IMPLEMENTED();
+
+    old_mat = pModel->faces[pFace].material;
+    if (HasThisSuffix(old_mat->identifier, ".pwall")) {
+        if (old_mat->colour_map != NULL) {
+            old_mat->colour_map = NULL;
+            BrMaterialUpdate(old_mat, BR_MATU_ALL);
+        }
+    } else {
+        if (!FaceIsRoad(pModel, pFace) && old_mat->identifier != NULL && old_mat->colour_map != NULL) {
+            old_mat = SuffixedMaterial(old_mat, ".lwall");
+            if (old_mat->colour_map != NULL) {
+                old_mat->colour_map = NULL;
+                BrMaterialUpdate(old_mat, BR_MATU_ALL);
+            }
+        } else {
+            old_mat = NULL;
+        }
+    }
+    return old_mat;
 }
 
 // IDA: br_material* __usercall WallUntexToLinear@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
@@ -1907,7 +1973,19 @@ br_material* WallUntexToLinear(br_model* pModel, tU16 pFace) {
     br_material* old_mat;
     br_material* new_mat;
     LOG_TRACE("(%p, %d)", pModel, pFace);
-    NOT_IMPLEMENTED();
+
+    old_mat = pModel->faces[pFace].material;
+    if (HasThisSuffix(old_mat->identifier, ".lwall")) {
+        new_mat = UnsuffixedMaterial(old_mat->identifier, ".lwall");
+    } else if (HasThisSuffix(old_mat->identifier, ".pwall")) {
+        old_mat->colour_map = UnsuffixedMaterial(old_mat->identifier, ".pwall")->colour_map;
+        old_mat->flags &= ~BR_MATF_PERSPECTIVE;
+        BrMaterialUpdate(old_mat, BR_MATU_ALL);
+        new_mat = NULL;
+    } else {
+        new_mat = NULL;
+    }
+    return new_mat;
 }
 
 // IDA: br_material* __usercall WallUntexToPersp@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
@@ -1915,7 +1993,16 @@ br_material* WallUntexToPersp(br_model* pModel, tU16 pFace) {
     br_material* old_mat;
     br_material* new_mat;
     LOG_TRACE("(%p, %d)", pModel, pFace);
-    NOT_IMPLEMENTED();
+
+    old_mat = pModel->faces[pFace].material;
+    if (HasThisSuffix(old_mat->identifier, ".lwall")) {
+        new_mat = UnsuffixedMaterial(old_mat->identifier, ".lwall");
+    } else if (HasThisSuffix(old_mat->identifier, ".pwall")) {
+        new_mat = UnsuffixedMaterial(old_mat->identifier, ".pwall");
+    } else {
+        new_mat = NULL;
+    }
+    return new_mat;
 }
 
 // IDA: br_material* __usercall WallLinearToPersp@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
@@ -1923,7 +2010,14 @@ br_material* WallLinearToPersp(br_model* pModel, tU16 pFace) {
     br_material* old_mat;
     br_material* new_mat;
     LOG_TRACE("(%p, %d)", pModel, pFace);
-    NOT_IMPLEMENTED();
+
+    old_mat = pModel->faces[pFace].material;
+    if (HasThisSuffix(old_mat->identifier, ".pwall")) {
+        new_mat = UnsuffixedMaterial(old_mat->identifier, ".pwall");
+    } else {
+        new_mat = NULL;
+    }
+    return new_mat;
 }
 
 // IDA: tRoad_texturing_level __cdecl GetRoadTexturingLevel()
@@ -1976,11 +2070,31 @@ br_material* DisposeSuffixedMaterials(br_model* pModel, tU16 pFace) {
     size_t max_suffix_len;
     br_material* mat;
     br_material* victim;
-    static char* suffixes[3];
+    static char* suffixes[3] = { ".road", ".pwall", ".lwall" };
     int s;
     char* id;
     LOG_TRACE("(%p, %d)", pModel, pFace);
-    NOT_IMPLEMENTED();
+
+    mat = pModel->faces[pFace].material;
+    if (mat->identifier == NULL) {
+        return NULL;
+    }
+    max_suffix_len = 0;
+    for (s = 0; s < COUNT_OF(suffixes); s++) {
+        if (max_suffix_len < strlen(suffixes[s])) {
+            max_suffix_len = strlen(suffixes[s]);
+        }
+    }
+    id = BrMemAllocate(strlen(mat->identifier) + max_suffix_len + 1, kMem_new_mat_id_3);
+    for (s = 0; s < COUNT_OF(suffixes); s++) {
+        sprintf(id, "%s%s", mat->identifier, suffixes[s]);
+        victim = BrMaterialFind(id);
+        if (victim != NULL) {
+            BrMaterialRemove(victim);
+            BrMaterialFree(victim);
+        }
+    }
+    return NULL;
 }
 
 // IDA: void __cdecl DisposeTexturingMaterials()
@@ -2493,7 +2607,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     AddGroovidelics(f, -2, gUniverse_actor, 720, 0);
     PossibleService();
     PrintMemoryDump(0, "JUST LOADING IN FUNKS AND GROOVES");
-    ped_subs = 0;
+    ped_subs = NULL;
     count = 0;
     if (gRace_file_version > 3) {
         line_count = GetAnInt(f);
@@ -2501,7 +2615,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
             if (line_count >= 0) {
                 PathCat(the_path, gApplication_path, "PEDSUBS.TXT");
                 g = DRfopen(the_path, "rt");
-                if (!g) {
+                if (g == NULL) {
                     FatalError(50);
                 }
                 for (i = 0; i < line_count; ++i) {
@@ -2518,7 +2632,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     }
     PossibleService();
     LoadInPedestrians(f, count, ped_subs);
-    if (ped_subs) {
+    if (ped_subs != NULL) {
         BrMemFree(ped_subs);
     }
     PrintMemoryDump(0, "JUST LOADED IN PEDS");

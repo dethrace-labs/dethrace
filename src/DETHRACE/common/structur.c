@@ -89,7 +89,7 @@ void RaceCompleted(tRace_over_reason pReason) {
         case eRace_over_peds:
         case eRace_over_opponents:
             ChangeAmbientPratcam(34);
-            DoFancyHeadup(14);
+            DoFancyHeadup(kFancyHeadupRaceCompleted);
             DRS3StartSound(gIndexed_outlets[4], 8011);
             break;
         case eRace_over_abandoned:
@@ -100,20 +100,20 @@ void RaceCompleted(tRace_over_reason pReason) {
             break;
         case eRace_over_out_of_time:
             ChangeAmbientPratcam(35);
-            DoFancyHeadup(13);
+            DoFancyHeadup(kFancyHeadupOutOfTime);
             DRS3StartSound(gIndexed_outlets[4], 8010);
             break;
         case eRace_over_demo:
             ChangeAmbientPratcam(35);
-            DoFancyHeadup(21);
+            DoFancyHeadup(kFancyHeadupDemoTimeout);
             break;
         case eRace_over_network_victory:
             ChangeAmbientPratcam(34);
-            DoFancyHeadup(20);
+            DoFancyHeadup(kFancyHeadupNetworkVictory);
             break;
         case eRace_over_network_loss:
             ChangeAmbientPratcam(36);
-            DoFancyHeadup(17);
+            DoFancyHeadup(kFancyHeadupNetworkRaceOverNetworkLoss);
             break;
         default:
             break;
@@ -131,7 +131,7 @@ void Checkpoint(int pCheckpoint_index, int pDo_sound) {
     LOG_TRACE("(%d, %d)", pCheckpoint_index, pDo_sound);
 
     PratcamEvent(33);  // FIXME: or PratcamEventNow
-    DoFancyHeadup(12);
+    DoFancyHeadup(kFancyHeadupCheckpoint);
     if (pDo_sound) {
         DRS3StartSound(gIndexed_outlets[4], 8012);
     }

@@ -1428,7 +1428,7 @@ void AwardTime(tU32 pTime) {
     int i;
     LOG_TRACE("(%d)", pTime);
 
-    if (gRace_finished || gFreeze_timer || gNet_mode == eNet_mode_none || pTime == 0) {
+    if (gRace_finished || gFreeze_timer || gNet_mode != eNet_mode_none || pTime == 0) {
         return;
     }
     original_amount = pTime;
@@ -1442,7 +1442,8 @@ void AwardTime(tU32 pTime) {
     }
     gLast_time_credit_headup = pTime;
     gTimer += original_amount * 1000;
-    TimerString(1000 * pTime, s, 0, 0);
+    s[0] = '+';
+    TimerString(1000 * pTime, &s[1], 0, 0);
     gLast_time_credit_headup = NewTextHeadupSlot(11, 0, 2000, -2, s);
     gLast_time_earn_time = the_time;
 }

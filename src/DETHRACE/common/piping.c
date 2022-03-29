@@ -1,10 +1,10 @@
 #include "piping.h"
-#include "brender/brender.h"
 #include "globvars.h"
 #include "harness/trace.h"
 #include "opponent.h"
 #include "pedestrn.h"
 #include "sound.h"
+#include "brender/brender.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -75,7 +75,8 @@ int PipeSearchForwards() {
 int IsActionReplayAvailable() {
     LOG_TRACE("()");
 
-    return gPipe_buffer_start != NULL;
+    STUB_ONCE();
+    return 0;
 }
 
 // IDA: int __cdecl SomeReplayLeft()
@@ -547,7 +548,11 @@ void PipeSingleCarIncident(float pSeverity, tCar_spec* pCar, br_vector3* pImpact
 // IDA: void __usercall PipeSinglePedIncident(int pPed_index@<EAX>, br_actor *pActor@<EDX>)
 void PipeSinglePedIncident(int pPed_index, br_actor* pActor) {
     LOG_TRACE("(%d, %p)", pPed_index, pActor);
-    NOT_IMPLEMENTED();
+
+    StartPipingSession(ePipe_chunk_incident);
+    AddPedIncidentToPipingSession(pPed_index, pActor);
+    EndPipingSession();
+    gWall_severity = 0.f;
 }
 
 // IDA: void __cdecl PipeSingleWallIncident(float pSeverity, br_vector3 *pImpact_point)

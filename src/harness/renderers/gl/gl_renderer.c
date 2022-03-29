@@ -469,7 +469,7 @@ void setActiveMaterial(tStored_material* material) {
     } else {
         glUniform1i(uniforms_3d.light_value, -1);
     }
-    if (material->flags & BR_MATF_ALWAYS_VISIBLE) {
+    if (material->flags & (BR_MATF_ALWAYS_VISIBLE | BR_MATF_TWO_SIDED)) {
         glDisable(GL_CULL_FACE);
     } else {
         glEnable(GL_CULL_FACE);

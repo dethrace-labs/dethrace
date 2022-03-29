@@ -26,7 +26,7 @@ tFace_ref* gPling_face;
 int BadDiv__finteray(br_scalar a, br_scalar b) {
     //LOG_TRACE("(%f, %f)", a, b);
 
-    return fabs(b) < 1.0 && fabs(a) > fabs(b) * BR_SCALAR_MAX;
+    return fabsf(b) < 1.0f && fabsf(a) > fabsf(b) * BR_SCALAR_MAX;
 }
 
 // IDA: void __usercall DRVector2AccumulateScale(br_vector2 *a@<EAX>, br_vector2 *b@<EDX>, br_scalar s)
@@ -116,20 +116,20 @@ int ActorRayPick2D(br_actor* ap, br_vector3* pPosition, br_vector3* pDir, br_mod
     t_far = 1.0;
     r = 0;
     arg = NULL;
-    if (ap->model) {
+    if (ap->model != NULL) {
         this_model = ap->model;
     } else {
         this_model = model;
     }
-    if (ap->material) {
+    if (ap->material != NULL) {
         this_material = ap->material;
     } else {
         this_material = material;
     }
-    if (ap->render_style == 1) {
+    if (ap->render_style == BR_RSTYLE_NONE) {
         return 0;
     }
-    if (ap->identifier && *ap->identifier == '&') {
+    if (ap->identifier != NULL && ap->identifier[0] == '&') {
         BrTransformToMatrix34(&mat, &ap->t);
         BrMatrix34Inverse(&invmat, &mat);
         BrMatrix34ApplyP(&pos, pPosition, &invmat);
@@ -140,11 +140,7 @@ int ActorRayPick2D(br_actor* ap, br_vector3* pPosition, br_vector3* pDir, br_mod
     if (ap->type == BR_ACTOR_MODEL) {
         if (PickBoundsTestRay__finteray(&this_model->bounds, pPosition, pDir, t_near, t_far, &t_near, &t_far)) {
             t_near = 0.0;
-            if (gNearest_T >= 1.0) {
-                t_far = 1.0;
-            } else {
-                t_far = gNearest_T;
-            }
+            t_far = MIN(1.f, gNearest_T);
             r = callback(ap, this_model, this_material, pPosition, pDir, t_near, t_far, arg);
             if (r) {
                 return r;
@@ -155,7 +151,7 @@ int ActorRayPick2D(br_actor* ap, br_vector3* pPosition, br_vector3* pDir, br_mod
         }
     } else if (ap->type >= BR_ACTOR_BOUNDS && ap->type <= BR_ACTOR_BOUNDS_CORRECT) {
         if (PickBoundsTestRay__finteray((br_bounds*)ap->type_data, pPosition, pDir, t_near, t_far, &t_near, &t_far)) {
-            for (a = ap->children; a; a = a->next) {
+            for (a = ap->children; a != NULL; a = a->next) {
                 r = ActorRayPick2D(a, pPosition, pDir, this_model, this_material, callback);
                 if (r) {
                     break;
@@ -164,7 +160,7 @@ int ActorRayPick2D(br_actor* ap, br_vector3* pPosition, br_vector3* pDir, br_mod
         }
         return r;
     }
-    for (a = ap->children; a; a = a->next) {
+    for (a = ap->children; a != NULL; a = a->next) {
         r = ActorRayPick2D(a, pPosition, pDir, this_model, this_material, callback);
         if (r) {
             break;
@@ -218,8 +214,8 @@ int DRModelPick2D__finteray(br_model* model, br_material* material, br_vector3* 
     int group;
     LOG_TRACE("(%p, %p, %p, %p, %f, %f, %p, %p)", model, material, ray_pos, ray_dir, t_near, t_far, callback, arg);
 
-    t_near -= 0.0000099999997;
-    t_far += 0.0000099999997;
+    t_near -= 0.00001f;
+    t_far += 0.00001f;
     for (group = 0; group < V11MODEL(model)->ngroups; group++) {
         for (f = 0; f < V11MODEL(model)->groups[group].nfaces; f++) {
             fp = &V11MODEL(model)->groups[group].faces[f];
@@ -238,14 +234,10 @@ int DRModelPick2D__finteray(br_model* model, br_material* material, br_vector3* 
                 if (!BadDiv__finteray(numerator, d)) {
                     t = -(numerator / d);
                     if (t >= t_near && t <= t_far) {
-                        p.v[0] = ray_dir->v[0] * t;
-                        p.v[1] = ray_dir->v[1] * t;
-                        p.v[2] = ray_dir->v[2] * t;
-                        p.v[0] = ray_pos->v[0] + p.v[0];
-                        p.v[1] = ray_pos->v[1] + p.v[1];
-                        p.v[2] = ray_pos->v[2] + p.v[2];
-                        axis_m = fabs(fp->eqn.v[0]) < fabs(fp->eqn.v[1]);
-                        if (fabs(fp->eqn.v[2]) > fabs(fp->eqn.v[axis_m])) {
+                        BrVector3Scale(&p, ray_dir, t);
+                        BrVector3Accumulate(&p, ray_pos);
+                        axis_m = fabsf(fp->eqn.v[0]) < fabsf(fp->eqn.v[1]);
+                        if (fabsf(fp->eqn.v[2]) > fabsf(fp->eqn.v[axis_m])) {
                             axis_m = 2;
                         }
                         if (axis_m) {
@@ -284,7 +276,7 @@ int DRModelPick2D__finteray(br_model* model, br_material* material, br_vector3* 
                             }
                             alpha = (v0i1 - beta * v2) / v1;
                         } else {
-                            if (fabs(v2) < fabs(v0i1)) {
+                            if (fabsf(v2) < fabsf(v0i1)) {
                                 continue;
                             }
                             if (v2 == 0) {
@@ -1071,11 +1063,11 @@ int BoundsOverlapTest__finteray(br_bounds* b1, br_bounds* b2) {
     LOG_TRACE("(%p, %p)", b1, b2);
 
     return b1->min.v[0] <= b2->max.v[0]
-        && b1->max.v[0] >= b2->min.v[0]
+        && b1->min.v[0] <= b2->max.v[0]
         && b1->min.v[1] <= b2->max.v[1]
         && b2->min.v[1] <= b1->max.v[1]
         && b1->min.v[2] <= b2->max.v[2]
-        && b1->max.v[2] >= b2->min.v[2];
+        && b1->min.v[2] <= b2->max.v[2];
 }
 
 // IDA: int __usercall BoundsTransformTest@<EAX>(br_bounds *b1@<EAX>, br_bounds *b2@<EDX>, br_matrix34 *M@<EBX>)
@@ -1084,9 +1076,7 @@ int BoundsTransformTest(br_bounds* b1, br_bounds* b2, br_matrix34* M) {
     br_vector3 o;
     LOG_TRACE("(%p, %p, %p)", b1, b2, M);
 
-    o.v[0] = b1->max.v[0] - b1->min.v[0];
-    o.v[1] = b1->max.v[1] - b1->min.v[1];
-    o.v[2] = b1->max.v[2] - b1->min.v[2];
+    BrVector3Sub(&o, &b1->max, &b1->min);
     val = M->m[2][0] * b1->min.v[2] + b1->min.v[1] * M->m[1][0] + M->m[0][0] * b1->min.v[0] + M->m[3][0];
 
     if ((M->m[0][0] <= 0.0 ? 0.0 : M->m[0][0] * o.v[0])
@@ -1205,7 +1195,19 @@ int SphereBoxIntersection(br_bounds* pB, br_vector3* pC, br_scalar pR_squared, b
     int i;
     br_scalar d;
     LOG_TRACE("(%p, %p, %f, %p)", pB, pC, pR_squared, pHit_point);
-    NOT_IMPLEMENTED();
+
+    d = 0.f;
+    for (i = 0; i < 3; i++) {
+        if (pC->v[i] <= pB->min.v[i]) {
+            pHit_point->v[i] = pB->min.v[i];
+        } else if (pC->v[i] > pB->max.v[i]) {
+            pHit_point->v[i] = pB->max.v[i];
+        } else {
+            pHit_point->v[i] = pC->v[i];
+        }
+        d += (pC->v[i] - pHit_point->v[i]) * (pC->v[i] - pHit_point->v[i]);
+    }
+    return d <= pR_squared;
 }
 
 // IDA: int __usercall LineBoxCollWithSphere@<EAX>(br_vector3 *o@<EAX>, br_vector3 *p@<EDX>, br_bounds *pB@<EBX>, br_vector3 *pHit_point@<ECX>)
@@ -1213,7 +1215,23 @@ int LineBoxCollWithSphere(br_vector3* o, br_vector3* p, br_bounds* pB, br_vector
     int i;
     int plane;
     LOG_TRACE("(%p, %p, %p, %p)", o, p, pB, pHit_point);
-    NOT_IMPLEMENTED();
+
+    plane = LineBoxColl(o, p, pB, pHit_point);
+    if (plane != 0) {
+        return plane;
+    }
+    if (!SphereBoxIntersection(pB, p, 2.5e-5f, pHit_point)) {
+        return 0;
+    }
+    for (i = 0; i < 3; i++) {
+        if (pB->max.v[i] == pHit_point->v[i] && p->v[i] <= o->v[i]) {
+            return i + 1;
+        }
+        if (pHit_point->v[i] == pB->min.v[i] && p->v[i] >= o->v[i]) {
+            return i + 5;
+        }
+    }
+    return 0;
 }
 
 // IDA: int __usercall CompVert@<EAX>(int v1@<EAX>, int v2@<EDX>)

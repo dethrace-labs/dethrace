@@ -149,7 +149,8 @@ float FastFloatCos(int pAngle_in_degrees) {
 // IDA: float __usercall FastFloatTan@<ST0>(int pAngle_in_degrees@<EAX>)
 float FastFloatTan(int pAngle_in_degrees) {
     LOG_TRACE("(%d)", pAngle_in_degrees);
-    NOT_IMPLEMENTED();
+
+    return FastFloatSin(pAngle_in_degrees) / FastFloatCos(pAngle_in_degrees);
 }
 
 // IDA: br_scalar __usercall FastScalarSin@<ST0>(int pAngle_in_degrees@<EAX>)
@@ -169,28 +170,31 @@ br_scalar FastScalarCos(int pAngle_in_degrees) {
 // IDA: br_scalar __usercall FastScalarTan@<ST0>(int pAngle_in_degrees@<EAX>)
 br_scalar FastScalarTan(int pAngle_in_degrees) {
     LOG_TRACE("(%d)", pAngle_in_degrees);
-    NOT_IMPLEMENTED();
+
+    return FastScalarSin(pAngle_in_degrees) / FastScalarCos(pAngle_in_degrees);
 }
 
 // IDA: br_scalar __usercall FastScalarSinAngle@<ST0>(br_angle pBR_angle@<EAX>)
 br_scalar FastScalarSinAngle(br_angle pBR_angle) {
     LOG_TRACE("(%d)", pBR_angle);
 
-    return FastScalarSin(pBR_angle * 0.0054931640625);
+    return FastScalarSin(BrAngleToDegrees(pBR_angle));
 }
 
 // IDA: br_scalar __usercall FastScalarCosAngle@<ST0>(br_angle pBR_angle@<EAX>)
 br_scalar FastScalarCosAngle(br_angle pBR_angle) {
     LOG_TRACE("(%d)", pBR_angle);
 
-    return FastScalarCos(pBR_angle * 0.0054931640625);
+    return FastScalarCos(BrAngleToDegrees(pBR_angle));
 }
 
 // IDA: br_scalar __usercall FastScalarTanAngle@<ST0>(br_angle pBR_angle@<EAX>)
 br_scalar FastScalarTanAngle(br_angle pBR_angle) {
     int angle_in_degrees;
     LOG_TRACE("(%d)", pBR_angle);
-    NOT_IMPLEMENTED();
+
+    angle_in_degrees = BrAngleToDegrees(pBR_angle);
+    return FastScalarSin(angle_in_degrees) / FastScalarCos(angle_in_degrees);
 }
 
 // IDA: float __cdecl FastFloatArcSin(float pValue)
@@ -199,25 +203,46 @@ float FastFloatArcSin(float pValue) {
     float high_limit;
     float mid_point;
     LOG_TRACE("(%f)", pValue);
-    NOT_IMPLEMENTED();
+    
+    if (pValue < 0.f) {
+        return -FastFloatArcSin(-pValue);
+    }
+    high_limit = 90.f * pValue;
+    low_limit = high_limit - 19.f;
+    if (low_limit < 0.f) {
+        low_limit = 0.f;
+    }
+    while (high_limit - low_limit >= 1.f) {
+        mid_point = (low_limit + high_limit) / 2.f;
+
+        if (gFloat_sine_table[(int)mid_point] > pValue) {
+            high_limit = mid_point;
+        } else {
+            low_limit = mid_point;
+        }
+    }
+    return low_limit;
 }
 
 // IDA: float __cdecl FastFloatArcCos(float pValue)
 float FastFloatArcCos(float pValue) {
     LOG_TRACE("(%f)", pValue);
-    NOT_IMPLEMENTED();
+
+    return 90.f - FastFloatArcSin(pValue);
 }
 
 // IDA: br_scalar __cdecl FastScalarArcSin(br_scalar pValue)
 br_scalar FastScalarArcSin(br_scalar pValue) {
     LOG_TRACE("(%f)", pValue);
-    NOT_IMPLEMENTED();
+
+    return FastFloatArcSin(pValue);
 }
 
 // IDA: br_scalar __cdecl FastScalarArcCos(br_scalar pValue)
 br_scalar FastScalarArcCos(br_scalar pValue) {
     LOG_TRACE("(%f)", pValue);
-    NOT_IMPLEMENTED();
+
+    return 90.f - FastScalarArcSin(pValue);
 }
 
 // IDA: float __cdecl FastFloatArcTan2(float pY, float pX)
@@ -226,8 +251,8 @@ float FastFloatArcTan2(float pY, float pX) {
     float abs_y;
     LOG_TRACE("(%f, %f)", pY, pX);
 
-    abs_x = fabs(pX);
-    abs_y = fabs(pY);
+    abs_x = fabsf(pX);
+    abs_y = fabsf(pY);
     if (pX == 0.0) {
         if (pY >= 0.0) {
             if (pY <= 0.0) {
@@ -241,25 +266,25 @@ float FastFloatArcTan2(float pY, float pX) {
     } else if (pX >= 0.0) {
         if (pY >= 0.0) {
             if (abs_y <= (double)abs_x) {
-                return abs_y / abs_x * 45.0;
+                return abs_y / abs_x * 45.0f;
             } else {
-                return (2.0 - abs_x / abs_y) * 45.0;
+                return (2.0 - abs_x / abs_y) * 45.0f;
             }
         } else if (abs_y <= (double)abs_x) {
-            return (8.0 - abs_y / abs_x) * 45.0;
+            return (8.0 - abs_y / abs_x) * 45.0f;
         } else {
-            return (abs_x / abs_y + 6.0) * 45.0;
+            return (abs_x / abs_y + 6.0f) * 45.0f;
         }
     } else if (pY >= 0.0) {
         if (abs_y <= (double)abs_x) {
-            return (4.0 - abs_y / abs_x) * 45.0;
+            return (4.0 - abs_y / abs_x) * 45.0f;
         } else {
-            return (abs_x / abs_y + 2.0) * 45.0;
+            return (abs_x / abs_y + 2.0f) * 45.0f;
         }
     } else if (abs_y <= (double)abs_x) {
-        return (abs_y / abs_x + 4.0) * 45.0;
+        return (abs_y / abs_x + 4.0) * 45.0f;
     } else {
-        return (6.0 - abs_x / abs_y) * 45.0;
+        return (6.0 - abs_x / abs_y) * 45.0f;
     }
 }
 
@@ -278,8 +303,8 @@ br_angle FastFloatArcTan2Angle(float pY, float pX) {
     float abs_y;
     LOG_TRACE("(%f, %f)", pY, pX);
 
-    abs_x = fabs(pX);
-    abs_y = fabs(pY);
+    abs_x = fabsf(pX);
+    abs_y = fabsf(pY);
     if (pX == 0.0) {
         if (pY >= 0.0) {
             if (pY <= 0.0) {
@@ -295,23 +320,23 @@ br_angle FastFloatArcTan2Angle(float pY, float pX) {
             if (abs_y <= (double)abs_x) {
                 return (abs_y / abs_x * 8192.0);
             } else {
-                return ((2.0 - abs_x / abs_y) * 8192.0);
+                return ((2.0 - abs_x / abs_y) * 8192.0f);
             }
         } else if (abs_y <= abs_x) {
-            return ((8.0 - abs_y / abs_x) * 8192.0);
+            return ((8.0 - abs_y / abs_x) * 8192.0f);
         } else {
-            return ((abs_x / abs_y + 6.0) * 8192.0);
+            return ((abs_x / abs_y + 6.0) * 8192.0f);
         }
     } else if (pY >= 0.0) {
         if (abs_y <= abs_x) {
-            return ((4.0 - abs_y / abs_x) * 8192.0);
+            return ((4.0 - abs_y / abs_x) * 8192.0f);
         } else {
-            return ((abs_x / abs_y + 2.0) * 8192.0);
+            return ((abs_x / abs_y + 2.0) * 8192.0f);
         }
     } else if (abs_y <= abs_x) {
-        return ((abs_y / abs_x + 4.0) * 8192.0);
+        return ((abs_y / abs_x + 4.0) * 8192.0f);
     } else {
-        return ((6.0 - abs_x / abs_y) * 8192.0);
+        return ((6.0 - abs_x / abs_y) * 8192.0f);
     }
 }
 
@@ -402,13 +427,38 @@ void DRMatrix34Rotate(br_matrix34* mat, br_angle r, br_vector3* a) {
     br_scalar sy;
     br_scalar sz;
     LOG_TRACE("(%p, %d, %p)", mat, r, a);
-    NOT_IMPLEMENTED();
+
+    s = FastScalarSinAngle(r);
+    c = FastScalarCosAngle(r);
+    t = 1.f - c;
+    txy = t * a->v[0] * a->v[1];
+    txz = t * a->v[0] * a->v[2];
+    tyz = t * a->v[1] * a->v[2];
+    sx = s * a->v[0];
+    sy = s * a->v[1];
+    sz = s * a->v[2];
+
+    mat->m[0][0] = a->v[0] * a->v[0] * t + c;
+    mat->m[0][1] = sx + txy;
+    mat->m[0][2] = txz - sy;
+    mat->m[1][0] = txy - sz;
+    mat->m[1][1] = a->v[1] * a->v[1] * t + c;
+    mat->m[1][2] = sx + tyz;
+    mat->m[2][0] = sy + txz;
+    mat->m[2][1] = tyz - sx;
+    mat->m[2][2] = a->v[2] * a->v[2] * t + c;
+    mat->m[3][2] = 0.f;
+    mat->m[3][1] = 0.f;
+    mat->m[3][0] = 0.f;
 }
 
 // IDA: void __usercall DRMatrix34PreRotateX(br_matrix34 *mat@<EAX>, br_angle rx@<EDX>)
 void DRMatrix34PreRotateX(br_matrix34* mat, br_angle rx) {
     LOG_TRACE("(%p, %d)", mat, rx);
-    NOT_IMPLEMENTED();
+
+    DRMatrix34RotateX(&mattmp2__trig, rx);
+    BrMatrix34Mul(&mattmp1__trig, &mattmp2__trig, mat);
+    BrMatrix34Copy(mat, &mattmp1__trig);
 }
 
 // IDA: void __usercall DRMatrix34PostRotateX(br_matrix34 *mat@<EAX>, br_angle rx@<EDX>)
@@ -423,7 +473,10 @@ void DRMatrix34PostRotateX(br_matrix34* mat, br_angle rx) {
 // IDA: void __usercall DRMatrix34PreRotateY(br_matrix34 *mat@<EAX>, br_angle ry@<EDX>)
 void DRMatrix34PreRotateY(br_matrix34* mat, br_angle ry) {
     LOG_TRACE("(%p, %d)", mat, ry);
-    NOT_IMPLEMENTED();
+
+    DRMatrix34RotateY(&mattmp2__trig, ry);
+    BrMatrix34Mul(&mattmp1__trig, &mattmp2__trig, mat);
+    BrMatrix34Copy(mat, &mattmp1__trig);
 }
 
 // IDA: void __usercall DRMatrix34PostRotateY(br_matrix34 *mat@<EAX>, br_angle ry@<EDX>)
@@ -438,7 +491,10 @@ void DRMatrix34PostRotateY(br_matrix34* mat, br_angle ry) {
 // IDA: void __usercall DRMatrix34PreRotateZ(br_matrix34 *mat@<EAX>, br_angle rz@<EDX>)
 void DRMatrix34PreRotateZ(br_matrix34* mat, br_angle rz) {
     LOG_TRACE("(%p, %d)", mat, rz);
-    NOT_IMPLEMENTED();
+
+    DRMatrix34RotateZ(&mattmp2__trig, rz);
+    BrMatrix34Mul(&mattmp1__trig, &mattmp2__trig, mat);
+    BrMatrix34Copy(mat, &mattmp1__trig);
 }
 
 // IDA: void __usercall DRMatrix34PostRotateZ(br_matrix34 *mat@<EAX>, br_angle rz@<EDX>)
@@ -453,13 +509,19 @@ void DRMatrix34PostRotateZ(br_matrix34* mat, br_angle rz) {
 // IDA: void __usercall DRMatrix34PreRotate(br_matrix34 *mat@<EAX>, br_angle r@<EDX>, br_vector3 *axis@<EBX>)
 void DRMatrix34PreRotate(br_matrix34* mat, br_angle r, br_vector3* axis) {
     LOG_TRACE("(%p, %d, %p)", mat, r, axis);
-    NOT_IMPLEMENTED();
+
+    DRMatrix34Rotate(&mattmp2__trig, r, axis);
+    BrMatrix34Mul(&mattmp1__trig, &mattmp2__trig, mat);
+    BrMatrix34Copy(mat, &mattmp1__trig);
 }
 
 // IDA: void __usercall DRMatrix34PostRotate(br_matrix34 *mat@<EAX>, br_angle r@<EDX>, br_vector3 *axis@<EBX>)
 void DRMatrix34PostRotate(br_matrix34* mat, br_angle r, br_vector3* axis) {
     LOG_TRACE("(%p, %d, %p)", mat, r, axis);
-    NOT_IMPLEMENTED();
+
+    DRMatrix34Rotate(&mattmp2__trig, r, axis);
+    BrMatrix34Mul(&mattmp1__trig, mat, &mattmp2__trig);
+    BrMatrix34Copy(mat, &mattmp1__trig);
 }
 
 // IDA: void __usercall DRMatrix23Rotate(br_matrix23 *mat@<EAX>, br_angle rz@<EDX>)
@@ -467,17 +529,32 @@ void DRMatrix23Rotate(br_matrix23* mat, br_angle rz) {
     br_scalar s;
     br_scalar c;
     LOG_TRACE("(%p, %d)", mat, rz);
-    NOT_IMPLEMENTED();
+
+    s = FastScalarSinAngle(rz);
+    c = FastScalarCosAngle(rz);
+
+    mat->m[0][0] = c;
+    mat->m[0][1] = s;
+    mat->m[1][0] = -s;
+    mat->m[1][1] = c;
+    mat->m[2][0] = 0.f;
+    mat->m[2][1] = 0.f;
 }
 
 // IDA: void __usercall DRMatrix23PreRotate(br_matrix23 *mat@<EAX>, br_angle rz@<EDX>)
 void DRMatrix23PreRotate(br_matrix23* mat, br_angle rz) {
     LOG_TRACE("(%p, %d)", mat, rz);
-    NOT_IMPLEMENTED();
+
+    DRMatrix23Rotate(&mat23tmp2, rz);
+    BrMatrix23Mul(&mat23tmp1, &mat23tmp2, mat);
+    BrMatrix23Copy(mat, &mat23tmp1);
 }
 
 // IDA: void __usercall DRMatrix23PostRotate(br_matrix23 *mat@<EAX>, br_angle rz@<EDX>)
 void DRMatrix23PostRotate(br_matrix23* mat, br_angle rz) {
     LOG_TRACE("(%p, %d)", mat, rz);
-    NOT_IMPLEMENTED();
+
+    DRMatrix23Rotate(&mat23tmp2, rz);
+    BrMatrix23Mul(&mat23tmp1, mat, &mat23tmp2);
+    BrMatrix23Copy(mat, &mat23tmp1);
 }
