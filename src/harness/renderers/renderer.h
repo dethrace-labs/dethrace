@@ -13,6 +13,7 @@ typedef struct tRenderer {
     void (*ClearBuffers)();
     void (*BufferTexture)(br_pixelmap* pm);
     void (*BufferMaterial)(br_material* mat);
+    void (*BufferModel)(br_model* model);
     void (*FlushBuffers)(br_pixelmap* color_buffer, br_pixelmap* depth_buffer);
 
 } tRenderer;

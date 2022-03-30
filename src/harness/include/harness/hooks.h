@@ -28,6 +28,7 @@ void Harness_Hook_renderFaces(br_actor* actor, br_model* model, br_material* mat
 void Harness_Hook_BrZbSceneRenderEnd();
 void Harness_Hook_BrBufferUpdate(br_pixelmap* pm, br_token use, br_uint_16 flags);
 void Harness_Hook_BrMaterialUpdate(br_material* mat, br_uint_16 flags);
+void Harness_Hook_BrModelUpdate(br_model* model);
 
 // Input hooks
 void Harness_Hook_GetMousePosition(int* pX, int* pY);

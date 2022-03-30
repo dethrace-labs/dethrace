@@ -32,6 +32,7 @@
 #include "trig.h"
 #include "utility.h"
 #include "world.h"
+#include <limits.h>
 #include <stdlib.h>
 
 #include <math.h>
@@ -689,7 +690,23 @@ void NewScreenWobble(double pAmplitude_x, double pAmplitude_y, double pPeriod) {
     int oldest_time;
     int oldest_index;
     LOG_TRACE("(%d, %d, %d)", pAmplitude_x, pAmplitude_y, pPeriod);
-    NOT_IMPLEMENTED();
+
+    oldest_index = -1;
+    oldest_time = INT_MAX;
+    for (i = 0; i < COUNT_OF(gWobble_array); i++) {
+        if (!gWobble_array[i].time_started) {
+            oldest_index = i;
+            break;
+        }
+        if (gWobble_array[i].time_started < oldest_time) {
+            oldest_time = gWobble_array[i].time_started;
+            oldest_index = i;
+        }
+    }
+    gWobble_array[oldest_index].time_started = GetTotalTime();
+    gWobble_array[oldest_index].amplitude_x = pAmplitude_x;
+    gWobble_array[oldest_index].amplitude_y = pAmplitude_y;
+    gWobble_array[oldest_index].period = pPeriod;
 }
 
 // IDA: void __usercall SetScreenWobble(int pWobble_x@<EAX>, int pWobble_y@<EDX>)

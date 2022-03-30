@@ -15,6 +15,7 @@
 #include "harness/config.h"
 #include "harness/trace.h"
 #include "netgame.h"
+#include "network.h"
 #include "oil.h"
 #include "opponent.h"
 #include "pd/sys.h"
@@ -83,8 +84,8 @@ int gOpponent_viewing_mode;
 int gNet_player_to_view_index;
 int gDouble_pling_water;
 int gStop_opponents_moving;
-float gDefensive_powerup_factor[6];
-float gOffensive_powerup_factor[6];
+float gDefensive_powerup_factor[6] = { 1.0, 0.82499999, 0.64999998, 0.47499999, 0.30000001, 0.0099999998 };
+float gOffensive_powerup_factor[6] = { 1.0, 1.5, 2.0, 3.0, 5.0, 10.0 };
 float gEngine_powerup_factor[6] = { 1.3, 1.9, 2.5, 3.2, 4.0, 10.0 };
 br_angle gPanning_camera_angle;
 br_scalar gPanning_camera_height;
@@ -1273,7 +1274,7 @@ int CollideCarWithWall(tCollision_info* car, br_scalar dt) {
             GetFacesInBox(car);
         }
         if (car->collision_flag) {
-            CrashEarnings((tCar_spec*)car, 0);
+            CrashEarnings((tCar_spec*)car, NULL);
         }
         BrMatrix34TApplyV(&car->velocity_car_space, &car->v, &car->oldmat);
         car->frame_collision_flag += car->collision_flag;
@@ -2914,7 +2915,108 @@ void CrushAndDamageCar(tCar_spec* c, br_vector3* pPosition, br_vector3* pForce_c
     br_matrix34 m;
     br_scalar fudge_multiplier;
     LOG_TRACE("(%p, %p, %p, %p)", c, pPosition, pForce_car_space, car2);
-    STUB_ONCE();
+
+    if (car2) {
+        car2->who_last_hit_me = c;
+        c->who_last_hit_me = car2;
+    }
+    if (c->driver > eDriver_non_car) {
+        fudge_multiplier = gNet_mode == eNet_mode_none || gNet_softness[gCurrent_net_game->type] == 1.0f ? 1.0f : gNet_softness[gCurrent_net_game->type];
+        BrVector3Sub(&car_to_cam, &c->pos, (br_vector3*)gCamera_to_world.m[3]);
+        ts = BrVector3LengthSquared(&car_to_cam);
+        if (c->driver != eDriver_oppo || ts <= 200.0f) {
+            if (car2) {
+                if (car2->driver > eDriver_non_car) {
+                    TwoCarsHitEachOther(c, car2);
+                }
+                if (c->driver >= eDriver_net_human) {
+                    fudge_multiplier = gDefensive_powerup_factor[c->power_up_levels[0]] * 1.2f * fudge_multiplier;
+                }
+                if (car2->driver >= eDriver_net_human) {
+                    if (gNet_mode
+                        && (gCurrent_net_game->type == eNet_game_type_fight_to_death || gCurrent_net_game->type == eNet_game_type_car_crusher)) {
+                        fudge_multiplier = gOffensive_powerup_factor[car2->power_up_levels[2]]
+                            * gNet_offensive[gCurrent_net_game->type]
+                            * car2->damage_multiplier
+                            * fudge_multiplier;
+                    } else {
+                        fudge_multiplier = gOffensive_powerup_factor[car2->power_up_levels[2]] * car2->damage_multiplier * fudge_multiplier;
+                    }
+                }
+                if (c->driver == eDriver_oppo && car2->driver == eDriver_oppo) {
+                    fudge_multiplier = fudge_multiplier * 0.2f;
+                }
+                if (car2->driver <= eDriver_non_car) {
+                    car2 = NULL;
+                } else {
+                    fudge_multiplier = fudge_multiplier / ((car2->car_model_actors[car2->principal_car_actor].crush_data.softness_factor + 0.7f) / 0.7f);
+                }
+            }
+            BrVector3InvScale(&position, pPosition, WORLD_SCALE);
+            // position.v[0] = pPosition->v[0] / 6.9000001;
+            // position.v[1] = pPosition->v[1] / 6.9000001;
+            // position.v[2] = pPosition->v[2] / 6.9000001;
+            BrVector3Scale(&force, pForce_car_space, fudge_multiplier * 0.03f);
+            // force.v[0] = fudge_multiplier * 0.029999999 * pForce_car_space->v[0];
+            // force.v[1] = fudge_multiplier * 0.029999999 * pForce_car_space->v[1];
+            // force.v[2] = fudge_multiplier * 0.029999999 * pForce_car_space->v[2];
+            ts = BrVector3LengthSquared(&force);
+            if (c->driver <= eDriver_non_car || !c->invulnerable) {
+                c->damage_magnitude_accumulator = c->damage_magnitude_accumulator + ts;
+            }
+            if (c->driver < eDriver_net_human) {
+                BrVector3Scale(&force_for_bodywork, &force, 1.5f);
+                // force_for_bodywork.v[0] = force.v[0] * 1.5;
+                // force_for_bodywork.v[1] = force.v[1] * 1.5;
+                // force_for_bodywork.v[2] = force.v[2] * 1.5;
+            } else {
+                if (c->collision_mass_multiplier != 1.0) {
+                    BrVector3InvScale(&force, &force, c->collision_mass_multiplier);
+                    // force.v[0] = force.v[0] / c->collision_mass_multiplier;
+                    // force.v[1] = force.v[1] / c->collision_mass_multiplier;
+                    // force.v[2] = force.v[2] / c->collision_mass_multiplier;
+                }
+                BrVector3Scale(&force_for_bodywork, &force, 0.5f);
+                // force_for_bodywork.v[0] = force.v[0] * 0.5;
+                // force_for_bodywork.v[1] = force.v[1] * 0.5;
+                // force_for_bodywork.v[2] = force.v[2] * 0.5;
+                if (c->driver == eDriver_local_human) {
+                    DoPratcamHit(&force);
+                }
+            }
+            if (gNet_mode == eNet_mode_host && (gCurrent_net_game->type == eNet_game_type_tag || gCurrent_net_game->type == eNet_game_type_foxy) && car2
+                && c->driver >= eDriver_net_human && car2->driver >= eDriver_net_human) {
+                if (gNet_players[gIt_or_fox].car != c || car2->knackered) {
+                    if (gNet_players[gIt_or_fox].car == car2 && !c->knackered) {
+                        CarInContactWithItOrFox(NetPlayerFromCar(c));
+                    }
+                } else {
+                    CarInContactWithItOrFox(NetPlayerFromCar(car2));
+                }
+            }
+            if (gNet_mode != eNet_mode_client || !car2) {
+                DamageSystems(c, &position, &force, car2 != NULL);
+            }
+            if (c->driver <= eDriver_non_car || !c->invulnerable) {
+                for (i = 0; i < c->car_actor_count; i++) {
+                    if (c->car_model_actors[i].min_distance_squared != -1.0f || (pForce_car_space->v[1] >= 0.0f && pForce_car_space->v[2] >= 0.0f)) {
+                        CrushModel(c, i, c->car_model_actors[i].actor, &position, &force_for_bodywork, &c->car_model_actors[i].crush_data);
+                    }
+                }
+            }
+            if (car2 && car2->driver == eDriver_local_human && ts > 0.003f) {
+                PipeSingleCarIncident(ts, c, &position);
+            }
+            if (!car2 && c->driver == eDriver_local_human && ts > 0.003f) {
+                BrMatrix34Copy(&m, &c->car_master_actor->t.t.mat);
+                m.m[3][0] /= WORLD_SCALE;
+                m.m[3][1] /= WORLD_SCALE;
+                m.m[3][2] /= WORLD_SCALE;
+                BrMatrix34ApplyP(&pos_w, &position, &m);
+                PipeSingleWallIncident(ts, &pos_w);
+            }
+        }
+    }
 }
 
 // IDA: int __usercall ExpandBoundingBox@<EAX>(tCar_spec *c@<EAX>)
@@ -2937,7 +3039,63 @@ void CrushBoundingBox(tCar_spec* c, int crush_only) {
     int i;
     br_actor* actor;
     LOG_TRACE("(%p, %d)", c, crush_only);
-    NOT_IMPLEMENTED();
+
+    if (c == NULL) {
+        return;
+    }
+    actor = c->car_model_actors[c->principal_car_actor].actor;
+    max.v[0] = c->wpos[2].v[2] - c->non_driven_wheels_circum / 6.1999998;
+    min.v[0] = c->driven_wheels_circum / 6.1999998 + c->wpos[0].v[2];
+    max.v[0] = max.v[0] / WORLD_SCALE;
+    min.v[0] = min.v[0] / WORLD_SCALE;
+    for (i = 0; i < actor->model->nvertices; i++) {
+        if (actor->model->vertices[i].p.v[2] < max.v[0]) {
+            max.v[0] = actor->model->vertices[i].p.v[2];
+        }
+        if (actor->model->vertices[i].p.v[2] > min.v[0]) {
+            min.v[0] = actor->model->vertices[i].p.v[2];
+        }
+    }
+    max.v[0] = max.v[0] * 6.9;
+    min.v[0] = min.v[0] * 6.9;
+    if (crush_only) {
+        if (c->bounds[1].min.v[2] > max.v[0]) {
+            max.v[0] = c->bounds[1].min.v[2];
+        }
+        if (c->bounds[1].max.v[2] < min.v[0]) {
+            min.v[0] = c->bounds[1].max.v[2];
+        }
+    } else {
+        if (c->max_bounds[1].min.v[2] > max.v[0]) {
+            max.v[0] = c->max_bounds[1].min.v[2];
+        }
+        if (c->max_bounds[1].max.v[2] < min.v[0]) {
+            min.v[0] = c->max_bounds[1].max.v[2];
+        }
+    }
+    c->bounds[1].min.v[2] = max.v[0];
+    c->bounds[1].max.v[2] = min.v[0];
+    for (i = 0; i < c->extra_point_num; i++) {
+        if (c->max_bounds[1].max.v[2] + 0.01f >= c->original_extra_points_z[i] && c->max_bounds[1].min.v[2] - 0.01f <= c->original_extra_points_z[i]) {
+            if (c->original_extra_points_z[i] <= min.v[0]) {
+                if (c->original_extra_points_z[i] >= max.v[0]) {
+                    c->extra_points[i].v[2] = c->original_extra_points_z[i];
+                } else {
+                    c->extra_points[i].v[2] = max.v[0];
+                }
+            } else {
+                c->extra_points[i].v[2] = min.v[0];
+            }
+            if (c->extra_points[i].v[2] > min.v[0]) {
+                c->extra_points[i].v[2] = min.v[0];
+            }
+            if (c->extra_points[i].v[2] < max.v[0]) {
+                c->extra_points[i].v[2] = max.v[0];
+            }
+        } else {
+            c->extra_points[i].v[2] = c->original_extra_points_z[i];
+        }
+    }
 }
 
 // IDA: void __cdecl AddCollPoint(br_scalar dist, br_vector3 *p, br_vector3 *norm, br_vector3 *r, br_vector3 *n, br_vector3 *dir, int num, tCollision_info *c)

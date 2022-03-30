@@ -12,113 +12,113 @@
 
 int scancode_map[123];
 const int scancodes_dethrace2sdl[123] = {
-    -1,                             //   0 (LSHIFT || RSHIFT)
-    -1,                             //   1 (LALT || RALT)
-    -1,                             //   2 (LCTRL || RCTRL)
-    -1,                             //   3 (LCTRL || RCTRL)
-    SDL_SCANCODE_CAPSLOCK,          //   4
-    SDL_SCANCODE_RSHIFT,            //   5
-    SDL_SCANCODE_RALT,              //   6
-    SDL_SCANCODE_RCTRL,             //   7
-    SDL_SCANCODE_LSHIFT,            //   8
-    SDL_SCANCODE_LALT,              //   9
-    SDL_SCANCODE_LCTRL,             //  10
-    SDL_SCANCODE_0,                 //  11
-    SDL_SCANCODE_1,                 //  12
-    SDL_SCANCODE_2,                 //  13
-    SDL_SCANCODE_3,                 //  14
-    SDL_SCANCODE_4,                 //  15
-    SDL_SCANCODE_5,                 //  16
-    SDL_SCANCODE_6,                 //  17
-    SDL_SCANCODE_7,                 //  18
-    SDL_SCANCODE_8,                 //  19
-    SDL_SCANCODE_9,                 //  20
-    SDL_SCANCODE_A,                 //  21
-    SDL_SCANCODE_B,                 //  22
-    SDL_SCANCODE_C,                 //  23
-    SDL_SCANCODE_D,                 //  24
-    SDL_SCANCODE_E,                 //  25
-    SDL_SCANCODE_F,                 //  26
-    SDL_SCANCODE_G,                 //  27
-    SDL_SCANCODE_H,                 //  28
-    SDL_SCANCODE_I,                 //  29
-    SDL_SCANCODE_J,                 //  30
-    SDL_SCANCODE_K,                 //  31
-    SDL_SCANCODE_L,                 //  32
-    SDL_SCANCODE_M,                 //  33
-    SDL_SCANCODE_N,                 //  34
-    SDL_SCANCODE_O,                 //  35
-    SDL_SCANCODE_P,                 //  36
-    SDL_SCANCODE_Q,                 //  37
-    SDL_SCANCODE_R,                 //  38
-    SDL_SCANCODE_S,                 //  39
-    SDL_SCANCODE_T,                 //  40
-    SDL_SCANCODE_U,                 //  41
-    SDL_SCANCODE_V,                 //  42
-    SDL_SCANCODE_W,                 //  43
-    SDL_SCANCODE_X,                 //  44
-    SDL_SCANCODE_Y,                 //  45
-    SDL_SCANCODE_Z,                 //  46
-    SDL_SCANCODE_GRAVE,             //  47
-    SDL_SCANCODE_MINUS,             //  48
-    SDL_SCANCODE_EQUALS,            //  49
-    SDL_SCANCODE_BACKSPACE,         //  50
-    SDL_SCANCODE_RETURN,            //  51
-    SDL_SCANCODE_KP_ENTER,          //  52
-    SDL_SCANCODE_TAB,               //  53
-    SDL_SCANCODE_SLASH,             //  54
-    -1,                             //  55
-    SDL_SCANCODE_SEMICOLON,         //  56
-    SDL_SCANCODE_APOSTROPHE,        //  57
-    SDL_SCANCODE_PERIOD,            //  58
-    SDL_SCANCODE_COMMA,             //  59
-    SDL_SCANCODE_LEFTBRACKET,       //  60
-    SDL_SCANCODE_RIGHTBRACKET,      //  61
-    SDL_SCANCODE_BACKSLASH,         //  62
-    SDL_SCANCODE_ESCAPE,            //  63
-    SDL_SCANCODE_INSERT,            //  64
-    SDL_SCANCODE_DELETE,            //  65
-    SDL_SCANCODE_HOME,              //  66
-    SDL_SCANCODE_END,               //  67
-    SDL_SCANCODE_PAGEUP,            //  68
-    SDL_SCANCODE_PAGEDOWN,          //  69
-    SDL_SCANCODE_LEFT,              //  70
-    SDL_SCANCODE_RIGHT,             //  71
-    SDL_SCANCODE_UP,                //  72
-    SDL_SCANCODE_DOWN,              //  73
-    SDL_SCANCODE_NUMLOCKCLEAR,      //  74
-    SDL_SCANCODE_KP_DIVIDE,         //  75
-    SDL_SCANCODE_KP_MULTIPLY,       //  76
-    SDL_SCANCODE_KP_MINUS,          //  77
-    SDL_SCANCODE_KP_PLUS,           //  78
-    SDL_SCANCODE_KP_PERIOD,         //  79
-    SDL_SCANCODE_KP_EQUALS,         //  80
-    SDL_SCANCODE_KP_0,              //  81
-    SDL_SCANCODE_KP_1,              //  82
-    SDL_SCANCODE_KP_2,              //  83
-    SDL_SCANCODE_KP_3,              //  84
-    SDL_SCANCODE_KP_4,              //  85
-    SDL_SCANCODE_KP_5,              //  86
-    SDL_SCANCODE_KP_6,              //  87
-    SDL_SCANCODE_KP_7,              //  88
-    SDL_SCANCODE_KP_8,              //  89
-    SDL_SCANCODE_KP_9,              //  90
-    SDL_SCANCODE_F1,                //  91
-    SDL_SCANCODE_F2,                //  92
-    SDL_SCANCODE_F3,                //  93
-    SDL_SCANCODE_F4,                //  94
-    SDL_SCANCODE_F5,                //  95
-    SDL_SCANCODE_F6,                //  96
-    SDL_SCANCODE_F7,                //  97
-    SDL_SCANCODE_F8,                //  98
-    SDL_SCANCODE_F9,                //  99
-    SDL_SCANCODE_F10,               // 100
-    SDL_SCANCODE_F11,               // 101
-    SDL_SCANCODE_F12,               // 102
-    SDL_SCANCODE_PRINTSCREEN,       // 103
-    SDL_SCANCODE_SCROLLLOCK,        // 104
-    SDL_SCANCODE_PAUSE,             // 105
-    SDL_SCANCODE_SPACE,             // 106
+    -1, //   0 (LSHIFT || RSHIFT)
+    -1, //   1 (LALT || RALT)
+    -1, //   2 (LCTRL || RCTRL)
+    -1, //   3 (LCTRL || RCTRL)
+    SDL_SCANCODE_CAPSLOCK, //   4
+    SDL_SCANCODE_RSHIFT, //   5
+    SDL_SCANCODE_RALT, //   6
+    SDL_SCANCODE_RCTRL, //   7
+    SDL_SCANCODE_LSHIFT, //   8
+    SDL_SCANCODE_LALT, //   9
+    SDL_SCANCODE_LCTRL, //  10
+    SDL_SCANCODE_0, //  11
+    SDL_SCANCODE_1, //  12
+    SDL_SCANCODE_2, //  13
+    SDL_SCANCODE_3, //  14
+    SDL_SCANCODE_4, //  15
+    SDL_SCANCODE_5, //  16
+    SDL_SCANCODE_6, //  17
+    SDL_SCANCODE_7, //  18
+    SDL_SCANCODE_8, //  19
+    SDL_SCANCODE_9, //  20
+    SDL_SCANCODE_A, //  21
+    SDL_SCANCODE_B, //  22
+    SDL_SCANCODE_C, //  23
+    SDL_SCANCODE_D, //  24
+    SDL_SCANCODE_E, //  25
+    SDL_SCANCODE_F, //  26
+    SDL_SCANCODE_G, //  27
+    SDL_SCANCODE_H, //  28
+    SDL_SCANCODE_I, //  29
+    SDL_SCANCODE_J, //  30
+    SDL_SCANCODE_K, //  31
+    SDL_SCANCODE_L, //  32
+    SDL_SCANCODE_M, //  33
+    SDL_SCANCODE_N, //  34
+    SDL_SCANCODE_O, //  35
+    SDL_SCANCODE_P, //  36
+    SDL_SCANCODE_Q, //  37
+    SDL_SCANCODE_R, //  38
+    SDL_SCANCODE_S, //  39
+    SDL_SCANCODE_T, //  40
+    SDL_SCANCODE_U, //  41
+    SDL_SCANCODE_V, //  42
+    SDL_SCANCODE_W, //  43
+    SDL_SCANCODE_X, //  44
+    SDL_SCANCODE_Y, //  45
+    SDL_SCANCODE_Z, //  46
+    SDL_SCANCODE_GRAVE, //  47
+    SDL_SCANCODE_MINUS, //  48
+    SDL_SCANCODE_EQUALS, //  49
+    SDL_SCANCODE_BACKSPACE, //  50
+    SDL_SCANCODE_RETURN, //  51
+    SDL_SCANCODE_KP_ENTER, //  52
+    SDL_SCANCODE_TAB, //  53
+    SDL_SCANCODE_SLASH, //  54
+    -1, //  55
+    SDL_SCANCODE_SEMICOLON, //  56
+    SDL_SCANCODE_APOSTROPHE, //  57
+    SDL_SCANCODE_PERIOD, //  58
+    SDL_SCANCODE_COMMA, //  59
+    SDL_SCANCODE_LEFTBRACKET, //  60
+    SDL_SCANCODE_RIGHTBRACKET, //  61
+    SDL_SCANCODE_BACKSLASH, //  62
+    SDL_SCANCODE_ESCAPE, //  63
+    SDL_SCANCODE_INSERT, //  64
+    SDL_SCANCODE_DELETE, //  65
+    SDL_SCANCODE_HOME, //  66
+    SDL_SCANCODE_END, //  67
+    SDL_SCANCODE_PAGEUP, //  68
+    SDL_SCANCODE_PAGEDOWN, //  69
+    SDL_SCANCODE_LEFT, //  70
+    SDL_SCANCODE_RIGHT, //  71
+    SDL_SCANCODE_UP, //  72
+    SDL_SCANCODE_DOWN, //  73
+    SDL_SCANCODE_NUMLOCKCLEAR, //  74
+    SDL_SCANCODE_KP_DIVIDE, //  75
+    SDL_SCANCODE_KP_MULTIPLY, //  76
+    SDL_SCANCODE_KP_MINUS, //  77
+    SDL_SCANCODE_KP_PLUS, //  78
+    SDL_SCANCODE_KP_PERIOD, //  79
+    SDL_SCANCODE_KP_EQUALS, //  80
+    SDL_SCANCODE_KP_0, //  81
+    SDL_SCANCODE_KP_1, //  82
+    SDL_SCANCODE_KP_2, //  83
+    SDL_SCANCODE_KP_3, //  84
+    SDL_SCANCODE_KP_4, //  85
+    SDL_SCANCODE_KP_5, //  86
+    SDL_SCANCODE_KP_6, //  87
+    SDL_SCANCODE_KP_7, //  88
+    SDL_SCANCODE_KP_8, //  89
+    SDL_SCANCODE_KP_9, //  90
+    SDL_SCANCODE_F1, //  91
+    SDL_SCANCODE_F2, //  92
+    SDL_SCANCODE_F3, //  93
+    SDL_SCANCODE_F4, //  94
+    SDL_SCANCODE_F5, //  95
+    SDL_SCANCODE_F6, //  96
+    SDL_SCANCODE_F7, //  97
+    SDL_SCANCODE_F8, //  98
+    SDL_SCANCODE_F9, //  99
+    SDL_SCANCODE_F10, // 100
+    SDL_SCANCODE_F11, // 101
+    SDL_SCANCODE_F12, // 102
+    SDL_SCANCODE_PRINTSCREEN, // 103
+    SDL_SCANCODE_SCROLLLOCK, // 104
+    SDL_SCANCODE_PAUSE, // 105
+    SDL_SCANCODE_SPACE, // 106
 };
 int scancodes_sdl2dethrace[SDL_NUM_SCANCODES];
 
@@ -140,6 +140,7 @@ tRenderer gl_renderer = {
     GLRenderer_ClearBuffers,
     GLRenderer_BufferTexture,
     GLRenderer_BufferMaterial,
+    GLRenderer_BufferModel,
     GLRenderer_FlushBuffers
 };
 
@@ -204,7 +205,11 @@ void Window_PollEvents() {
                 LOG_WARN("unexpected scan code %s (%d)", SDL_GetScancodeName(event.key.keysym.scancode), event.key.keysym.scancode);
                 return;
             }
-            sdl_key_state[scancodes_sdl2dethrace[event.key.keysym.scancode]] = event.type == SDL_KEYDOWN;
+            if (event.key.type == SDL_KEYDOWN) {
+                sdl_key_state[event.key.keysym.scancode] = 1;
+            } else {
+                sdl_key_state[event.key.keysym.scancode] = 0;
+            }
 
             sdl_key_state[0] = sdl_key_state[scancodes_sdl2dethrace[SDL_SCANCODE_LSHIFT]] || sdl_key_state[scancodes_sdl2dethrace[SDL_SCANCODE_RSHIFT]];
             sdl_key_state[1] = sdl_key_state[scancodes_sdl2dethrace[SDL_SCANCODE_LALT]] || sdl_key_state[scancodes_sdl2dethrace[SDL_SCANCODE_RALT]];
@@ -232,7 +237,7 @@ void Input_Init() {
         scancodes_sdl2dethrace[i] = -1;
     }
     for (size_t i = 0; i < ARRAY_LEN(scancodes_dethrace2sdl); i++) {
-        if (scancodes_dethrace2sdl[i] != -1 ) {
+        if (scancodes_dethrace2sdl[i] != -1) {
             scancodes_sdl2dethrace[scancodes_dethrace2sdl[i]] = i;
         }
     }

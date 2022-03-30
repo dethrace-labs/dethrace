@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int gPowerup_cost[4] = {1500, 2500, 4000, 6000};
+int gPowerup_cost[4] = { 1500, 2500, 4000, 6000 };
 int gGame_scores[6];
 int gPed_target;
 int gNot_shown_race_type_headup;
@@ -381,7 +381,7 @@ void BuyPower() {
     LOG_TRACE("()");
 
     if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_foxy && gThis_net_player_index == gIt_or_fox) {
-        NewTextHeadupSlot(4, 0, 1000,-4, GetMiscString(214));
+        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(214));
     } else if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_tag && gThis_net_player_index != gIt_or_fox) {
         NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(215));
     } else {
@@ -463,7 +463,8 @@ void DefaultNetName() {
 void NetSendPointCrush(tCar_spec* pCar, tU16 pCrush_point_index, br_vector3* pEnergy_vector) {
     tNet_contents* contents;
     LOG_TRACE("(%p, %d, %p)", pCar, pCrush_point_index, pEnergy_vector);
-    NOT_IMPLEMENTED();
+
+    STUB_ONCE();
 }
 
 // IDA: void __usercall RecievedCrushPoint(tNet_contents *pContents@<EAX>)

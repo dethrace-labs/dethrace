@@ -357,9 +357,13 @@ void GLRenderer_ClearBuffers() {
     CHECK_GL_ERROR("GLRenderer_Swap");
 }
 
-void build_model(br_model* model) {
+void GLRenderer_BufferModel(br_model* model) {
     tStored_model_context* ctx;
     v11model* v11;
+
+    if (model->stored != NULL) {
+        LOG_PANIC("trying to build a stored model");
+    }
 
     v11 = model->prepared;
     ctx = NewStoredModelContext();
@@ -484,12 +488,6 @@ void GLRenderer_Model(br_actor* actor, br_model* model, br_matrix34 model_matrix
         return;
     }
 
-    if (ctx == NULL) {
-        build_model(model);
-        ctx = model->stored;
-
-        // DebugCamera_SetPosition(model_matrix.m[3][0], model_matrix.m[3][1], model_matrix.m[3][2]);
-    }
     CHECK_GL_ERROR("rm1");
 
     glEnable(GL_DEPTH_TEST);
