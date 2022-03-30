@@ -310,7 +310,7 @@ void WaitForAKey() {
 
     while (1) {
         CheckQuit();
-        if (AnyKeyDown()) {
+        if (AnyKeyDown( )) {
             break;
         }
         if (EitherMouseButtonDown()) {
@@ -323,7 +323,7 @@ void WaitForAKey() {
 
 // IDA: int __usercall CmdKeyDown@<EAX>(int pFKey_ID@<EAX>, int pCmd_key_ID@<EDX>)
 int CmdKeyDown(int pFKey_ID, int pCmd_key_ID) {
-    return KeyIsDown(pFKey_ID) || (KeyIsDown(KEYMAP_LCTRL) && KeyIsDown(pCmd_key_ID));
+    return KeyIsDown(pFKey_ID) || (KeyIsDown(KEYMAP_CONTROL_ANY) && KeyIsDown(pCmd_key_ID));
 }
 
 // IDA: void __usercall GetMousePosition(int *pX_coord@<EAX>, int *pY_coord@<EDX>)

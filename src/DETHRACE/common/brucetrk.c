@@ -33,11 +33,12 @@ void DisposeActorMatrix(tTrack_spec* pTrack_spec, br_actor**** pVictim, int pRem
     tU16 z;
     tU16 x;
     LOG_TRACE("(%p, %p, %d)", pTrack_spec, pVictim, pRemove_act_mod);
+
     if (*pVictim != NULL) {
         for (z = 0; z != pTrack_spec->ncolumns_z; z++) {
             if (pRemove_act_mod != 0) {
-                for (x = 0; x !=pTrack_spec->ncolumns_x; x++) {
-                    if ((*pVictim)[z][x] != NULL && (*pVictim)[z][z]->model != NULL) {
+                for (x = 0; x != pTrack_spec->ncolumns_x; x++) {
+                    if ((*pVictim)[z][x] != NULL && (*pVictim)[z][x]->model != NULL) {
                         BrModelRemove((*pVictim)[z][x]->model);
                         BrModelFree((*pVictim)[z][x]->model);
                     }
@@ -127,7 +128,7 @@ void StripBlendedFaces(br_actor* pActor, br_model* pModel) {
             memcpy(&gMr_blendy->model->faces[gMr_blendy->model->nfaces], face, sizeof(br_face));
             gMr_blendy->model->nfaces++;
             if (i < (pModel->nfaces - 1)) {
-                memcpy(&pModel->faces[i], &pModel->faces[i + 1], (pModel->nfaces - i - 1) * sizeof(br_face));
+                memmove(&pModel->faces[i], &pModel->faces[i + 1], (pModel->nfaces - i - 1) * sizeof(br_face));
             }
             pModel->nfaces--;
             changed_one = 1;

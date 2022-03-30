@@ -792,7 +792,7 @@ void AddFunkGrooveBinding(int pSlot_number, float* pPeriod_address) {
     }
 
     gGroove_funk_bindings[pSlot_number] = pPeriod_address;
-    *pPeriod_address = 0.0;
+    *pPeriod_address = 0.0f;
 }
 
 // IDA: void __usercall ControlBoundFunkGroove(int pSlot_number@<EAX>, float pValue)
@@ -800,7 +800,7 @@ void ControlBoundFunkGroove(int pSlot_number, float pValue) {
     LOG_TRACE("(%d, %f)", pSlot_number, pValue);
 
     if (pSlot_number >= 0) {
-        if (pSlot_number >= 960) {
+        if (pSlot_number >= COUNT_OF(gGroove_funk_bindings)) {
             FatalError(73);
         }
         *gGroove_funk_bindings[pSlot_number] = pValue;
@@ -814,7 +814,7 @@ float ControlBoundFunkGroovePlus(int pSlot_number, float pValue) {
     if (pSlot_number < 0) {
         return 0.0;
     }
-    if (pSlot_number >= 960) {
+    if (pSlot_number >= COUNT_OF(gGroove_funk_bindings)) {
         FatalError(73);
     }
     *gGroove_funk_bindings[pSlot_number] = fmod(*gGroove_funk_bindings[pSlot_number] + pValue, 1.0);
@@ -822,13 +822,13 @@ float ControlBoundFunkGroovePlus(int pSlot_number, float pValue) {
 }
 
 // IDA: void __usercall ShiftBoundGrooveFunks(char *pStart@<EAX>, char *pEnd@<EDX>, int pDelta@<EBX>)
-void ShiftBoundGrooveFunks(char* pStart, char* pEnd, int pDelta) {
+void ShiftBoundGrooveFunks(char* pStart, char* pEnd, ptrdiff_t pDelta) {
     int i;
     LOG_TRACE("(\"%s\", \"%s\", %d)", pStart, pEnd, pDelta);
 
     for (i = 0; i < COUNT_OF(gGroove_funk_bindings); i++) {
         if ((char*)gGroove_funk_bindings[i] >= (char*)pStart && (char*)gGroove_funk_bindings[i] < (char*)pEnd) {
-            gGroove_funk_bindings[i] = (float*)((char*)gGroove_funk_bindings[i] + pDelta); // original code is (pDelta & 0xFFFFFFFC) but this caused problems;
+            gGroove_funk_bindings[i] = (float*)((char*)gGroove_funk_bindings[i] + (pDelta & ~(size_t)3)); // original code is (pDelta & 0xFFFFFFFC) but this caused problems;
         }
     }
 }
@@ -847,8 +847,8 @@ tFunkotronic_spec* AddNewFunkotronic() {
     }
     gFunkotronics_array_size += 16;
     new_array = BrMemCalloc(gFunkotronics_array_size, sizeof(tFunkotronic_spec), kMem_funk_spec);
-    if (gFunkotronics_array) {
-        memcpy(new_array, gFunkotronics_array, sizeof(tFunkotronic_spec) * (gFunkotronics_array_size - 16));
+    if (gFunkotronics_array != NULL) {
+        memcpy(new_array, gFunkotronics_array, (gFunkotronics_array_size - 16) * sizeof(tFunkotronic_spec));
         ShiftBoundGrooveFunks(
             (char*)gFunkotronics_array,
             (char*)&gFunkotronics_array[gFunkotronics_array_size - 16],
@@ -857,7 +857,7 @@ tFunkotronic_spec* AddNewFunkotronic() {
     }
     gFunkotronics_array = new_array;
     for (i = 0; i < 16; i++) {
-        gFunkotronics_array[gFunkotronics_array_size - i].owner = -999;
+        gFunkotronics_array[gFunkotronics_array_size - 16 + i].owner = -999;
     }
     return &gFunkotronics_array[gFunkotronics_array_size - 16];
 }
@@ -916,16 +916,15 @@ br_uint_32 CalcProximities(br_actor* pActor, br_material* pMat, tFunkotronic_spe
     int i;
     LOG_TRACE("(%p, %p, %p)", pActor, pMat, pThe_funk);
 
-    if (pActor->model) {
+    if (pActor->model != NULL) {
         if (pThe_funk->material == pMat) {
             pThe_funk->proximity_count += 8;
         } else {
-            the_face = pActor->model->faces;
             for (i = 0; i < pActor->model->nfaces; i++) {
+                the_face = &pActor->model->faces[i];
                 if (pThe_funk->material == the_face->material) {
                     pThe_funk->proximity_count += 3;
                 }
-                the_face++;
             }
         }
     }
@@ -1046,44 +1045,40 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
         the_funk->owner = pOwner;
         str = strtok(s, "\t ,/");
         the_funk->material = BrMaterialFind(str);
-        if (!the_funk->material) {
+        if (the_funk->material == NULL) {
             FatalError(64);
         }
         the_funk->mode = GetALineAndInterpretCommand(pF, gFunk_nature_names, COUNT_OF(gFunk_nature_names));
         the_funk->matrix_mod_type = GetALineAndInterpretCommand(pF, gFunk_type_names, COUNT_OF(gFunk_type_names));
-        if (the_funk->matrix_mod_type != -1) {
+        if (the_funk->matrix_mod_type != eMatrix_mod_none) {
             the_funk->matrix_mode = GetALineAndInterpretCommand(pF, gFunk_move_names, COUNT_OF(gFunk_move_names));
         }
         switch (the_funk->matrix_mod_type) {
         case eMatrix_mod_spin:
-            if (the_funk->matrix_mode != eMove_controlled && the_funk->matrix_mode != eMove_absolute) {
-                x_0 = GetAFloat(pF);
-                the_funk->matrix_mod_data.spin_info.period = x_0 == -1 ? 0.0 : 1000.0 / x_0;
-            } else {
+            if (the_funk->matrix_mode == eMove_controlled || the_funk->matrix_mode == eMove_absolute) {
                 i = GetAnInt(pF);
                 AddFunkGrooveBinding(i + pRef_offset, &the_funk->matrix_mod_data.spin_info.period);
+            } else {
+                x_0 = GetAFloat(pF);
+                the_funk->matrix_mod_data.spin_info.period = (x_0 == 0.0f) ? 0.0f : 1000.0f / x_0;
             }
             break;
         case eMatrix_mod_rock: // rock
-            if (the_funk->matrix_mode != eMove_controlled && the_funk->matrix_mode != eMove_absolute) {
-                x_0 = GetAFloat(pF);
-                the_funk->matrix_mod_data.rock_info.period = x_0 == -1 ? 0.0 : 1000.0 / x_0;
-            } else {
+            if (the_funk->matrix_mode == eMove_controlled || the_funk->matrix_mode == eMove_absolute) {
                 d_0 = GetAnInt(pF);
                 AddFunkGrooveBinding(d_0 + pRef_offset, &the_funk->matrix_mod_data.rock_info.period);
+            } else {
+                x_0 = GetAFloat(pF);
+                the_funk->matrix_mod_data.rock_info.period = (x_0 == 0.0f) ? 0.0f : 1000.0f / x_0;
             }
 
             the_funk->matrix_mod_data.rock_info.rock_angle = GetAFloat(pF);
             GetPairOfFloats(pF, &x_0, &x_1);
-            the_funk->matrix_mod_data.rock_info.x_centre = x_0 / 100.0;
-            the_funk->matrix_mod_data.rock_info.y_centre = x_1 / 100.0;
+            the_funk->matrix_mod_data.rock_info.x_centre = x_0 / 100.0f;
+            the_funk->matrix_mod_data.rock_info.y_centre = x_1 / 100.0f;
             break;
         case eMatrix_mod_throb: // throb
-            if (the_funk->matrix_mode != eMove_controlled && the_funk->matrix_mode != eMove_absolute) {
-                GetPairOfFloats(pF, &speed1, &speed2);
-                the_funk->matrix_mod_data.throb_info.x_period = speed1 == 0.0f ? 0.0f : 1000.0f / speed1;
-                the_funk->matrix_mod_data.throb_info.y_period = speed2 == 0.0f ? 0.0f : 1000.0f / speed2;
-            } else {
+            if (the_funk->matrix_mode == eMove_controlled || the_funk->matrix_mode == eMove_absolute) {
                 GetPairOfInts(pF, &d_0, &d_1);
                 if (d_0 >= 0) {
                     AddFunkGrooveBinding(d_0 + pRef_offset, &the_funk->matrix_mod_data.throb_info.x_period);
@@ -1091,31 +1086,31 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
                 if (d_1 >= 0) {
                     AddFunkGrooveBinding(d_1 + pRef_offset, &the_funk->matrix_mod_data.throb_info.y_period);
                 }
+            } else {
+                GetPairOfFloats(pF, &speed1, &speed2);
+                the_funk->matrix_mod_data.throb_info.x_period = (speed1 == 0.0f) ? 0.0f : 1000.0f / speed1;
+                the_funk->matrix_mod_data.throb_info.y_period = (speed2 == 0.0f) ? 0.0f : 1000.0f / speed2;
             }
             GetPairOfFloatPercents(
                 pF,
                 &the_funk->matrix_mod_data.throb_info.x_magnitude,
                 &the_funk->matrix_mod_data.throb_info.y_magnitude);
             GetPairOfFloats(pF, &x_0, &x_1);
-            the_funk->matrix_mod_data.throb_info.x_centre = x_0 / 100.0;
-            the_funk->matrix_mod_data.throb_info.y_centre = x_1 / 100.0;
+            the_funk->matrix_mod_data.throb_info.x_centre = x_0 / 100.0f;
+            the_funk->matrix_mod_data.throb_info.y_centre = x_1 / 100.0f;
             if (the_funk->matrix_mode != eMove_controlled) {
-                if (the_funk->matrix_mod_data.throb_info.x_period == 0.0) {
-                    the_funk->matrix_mod_data.throb_info.x_period = 1.0;
-                    the_funk->matrix_mod_data.throb_info.x_magnitude = 0.0;
+                if (the_funk->matrix_mod_data.throb_info.x_period == 0.0f) {
+                    the_funk->matrix_mod_data.throb_info.x_period = 1.0f;
+                    the_funk->matrix_mod_data.throb_info.x_magnitude = 0.0f;
                 }
-                if (the_funk->matrix_mod_data.throb_info.y_period == 0.0) {
-                    the_funk->matrix_mod_data.throb_info.y_period = 1.0;
-                    the_funk->matrix_mod_data.throb_info.y_magnitude = 0.0;
+                if (the_funk->matrix_mod_data.throb_info.y_period == 0.0f) {
+                    the_funk->matrix_mod_data.throb_info.y_period = 1.0f;
+                    the_funk->matrix_mod_data.throb_info.y_magnitude = 0.0f;
                 }
             }
             break;
         case eMatrix_mod_slither: // slither
-            if (the_funk->matrix_mode != eMove_controlled && the_funk->matrix_mode != eMove_absolute) {
-                GetPairOfFloats(pF, &speed1, &speed2);
-                the_funk->matrix_mod_data.slither_info.x_period = speed1 == 0.0f ? 0.0f : 1000.0f / speed1;
-                the_funk->matrix_mod_data.slither_info.y_period = speed2 == 0.0f ? 0.0f : 1000.0f / speed2;
-            } else {
+            if (the_funk->matrix_mode == eMove_controlled || the_funk->matrix_mode == eMove_absolute) {
                 GetPairOfInts(pF, &d_0, &d_1);
                 if (d_0 >= 0) {
                     AddFunkGrooveBinding(d_0 + pRef_offset, &the_funk->matrix_mod_data.slither_info.x_period);
@@ -1123,28 +1118,28 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
                 if (d_1 >= 0) {
                     AddFunkGrooveBinding(d_1 + pRef_offset, &the_funk->matrix_mod_data.slither_info.y_period);
                 }
+            } else {
+                GetPairOfFloats(pF, &speed1, &speed2);
+                the_funk->matrix_mod_data.slither_info.x_period = (speed1 == 0.0f) ? 0.0f : 1000.0f / speed1;
+                the_funk->matrix_mod_data.slither_info.y_period = (speed2 == 0.0f) ? 0.0f : 1000.0f / speed2;
             }
             GetPairOfFloatPercents(
                 pF,
                 &the_funk->matrix_mod_data.slither_info.x_magnitude,
                 &the_funk->matrix_mod_data.slither_info.y_magnitude);
             if (the_funk->matrix_mode != eMove_controlled) {
-                if (the_funk->matrix_mod_data.slither_info.x_period == 0.0) {
-                    the_funk->matrix_mod_data.slither_info.x_period = 1.0;
-                    the_funk->matrix_mod_data.slither_info.x_magnitude = 0.0;
+                if (the_funk->matrix_mod_data.slither_info.x_period == 0.0f) {
+                    the_funk->matrix_mod_data.slither_info.x_period = 1.0f;
+                    the_funk->matrix_mod_data.slither_info.x_magnitude = 0.0f;
                 }
-                if (the_funk->matrix_mod_data.slither_info.y_period == 0.0) {
-                    the_funk->matrix_mod_data.slither_info.y_period = 1.0;
-                    the_funk->matrix_mod_data.slither_info.y_magnitude = 0.0;
+                if (the_funk->matrix_mod_data.slither_info.y_period == 0.0f) {
+                    the_funk->matrix_mod_data.slither_info.y_period = 1.0f;
+                    the_funk->matrix_mod_data.slither_info.y_magnitude = 0.0f;
                 }
             }
             break;
         case eMatrix_mod_roll: // roll
-            if (the_funk->matrix_mode != eMove_controlled && the_funk->matrix_mode != eMove_absolute) {
-                GetPairOfFloats(pF, &speed1, &speed2);
-                the_funk->matrix_mod_data.roll_info.x_period = speed1 == 0.0f ? 0.0f : 1000.0f / speed1;
-                the_funk->matrix_mod_data.roll_info.y_period = speed2 == 0.0f ? 0.0f : 1000.0f / speed2;
-            } else {
+            if (the_funk->matrix_mode == eMove_controlled || the_funk->matrix_mode == eMove_absolute) {
                 GetPairOfInts(pF, &d_0, &d_1);
                 if (d_0 >= 0) {
                     AddFunkGrooveBinding(d_0 + pRef_offset, &the_funk->matrix_mod_data.roll_info.x_period);
@@ -1152,38 +1147,42 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
                 if (d_1 >= 0) {
                     AddFunkGrooveBinding(d_1 + pRef_offset, &the_funk->matrix_mod_data.roll_info.y_period);
                 }
+            } else {
+                GetPairOfFloats(pF, &speed1, &speed2);
+                the_funk->matrix_mod_data.roll_info.x_period = speed1 == 0.0f ? 0.0f : 1000.0f / speed1;
+                the_funk->matrix_mod_data.roll_info.y_period = speed2 == 0.0f ? 0.0f : 1000.0f / speed2;
             }
             break;
         default:
             break;
         }
         the_funk->lighting_animation_type = GetALineAndInterpretCommand(pF, gFunk_move_names, COUNT_OF(gFunk_move_names));
-        if (the_funk->lighting_animation_type != -1) {
-            if (the_funk->lighting_animation_type != eMove_controlled && the_funk->lighting_animation_type != eMove_absolute) {
-                x_0 = GetAFloat(pF);
-                the_funk->lighting_animation_period = x_0 == 0.0f ? 0.0f : 1000.0 / x_0;
-            } else {
+        if (the_funk->lighting_animation_type != eMove_none) {
+            if (the_funk->lighting_animation_type == eMove_controlled || the_funk->lighting_animation_type == eMove_absolute) {
                 d_0 = GetAnInt(pF);
                 AddFunkGrooveBinding(d_0 + pRef_offset, &the_funk->lighting_animation_period);
+            } else {
+                x_0 = GetAFloat(pF);
+                the_funk->lighting_animation_period = (x_0 == 0.0f) ? 0.0f : 1000.0f / x_0;
             }
             GetThreeFloatPercents(pF, &a_min, &d_min, &s_min);
             GetThreeFloatPercents(pF, &a_max, &d_max, &s_max);
-            the_funk->ambient_base = (a_min + a_max) / 2.0;
-            the_funk->direct_base = (d_min + d_max) / 2.0;
-            the_funk->specular_base = (s_min + s_max) / 2.0;
-            the_funk->ambient_delta = (a_max - a_min) / 2.0;
-            the_funk->direct_delta = (d_max - d_min) / 2.0;
-            the_funk->specular_delta = (s_max - s_min) / 2.0;
+            the_funk->ambient_base = (a_min + a_max) / 2.0f;
+            the_funk->direct_base = (d_min + d_max) / 2.0f;
+            the_funk->specular_base = (s_min + s_max) / 2.0f;
+            the_funk->ambient_delta = (a_max - a_min) / 2.0f;
+            the_funk->direct_delta = (d_max - d_min) / 2.0f;
+            the_funk->specular_delta = (s_max - s_min) / 2.0f;
         }
         the_funk->texture_animation_type = GetALineAndInterpretCommand(pF, gFunk_anim_names, COUNT_OF(gFunk_anim_names));
-        if (the_funk->texture_animation_type != -1) {
+        if (the_funk->texture_animation_type != eTexture_animation_none) {
             the_funk->time_mode = GetALineAndInterpretCommand(pF, gTime_mode_names, COUNT_OF(gTime_mode_names));
         }
         if (the_funk->texture_animation_type == eTexture_animation_flic && gAusterity_mode) {
-            the_funk->texture_animation_type = -1;
+            the_funk->texture_animation_type = eTexture_animation_none;
             GetALineAndDontArgue(pF, s);
         }
-        the_funk->last_frame = 0.0;
+        the_funk->last_frame = 0.0f;
 
         if (the_funk->texture_animation_type == eTexture_animation_flic) {
             GetAString(pF, s);
@@ -1203,10 +1202,10 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
                     0,
                     0,
                     0);
-                the_funk->last_frame = 0.0;
+                the_funk->last_frame = 0.0f;
                 the_pixels = BrMemAllocate(
                     the_funk->texture_animation_data.flic_info.flic_descriptor.height
-                        * ((the_funk->texture_animation_data.flic_info.flic_descriptor.width + 3) & 0xFFFFFFFC),
+                        * ((the_funk->texture_animation_data.flic_info.flic_descriptor.width + 3) & ~3),
                     kMem_video_pixels);
                 if (gScreen->row_bytes < 0) {
                     BrFatal(
@@ -1223,27 +1222,27 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
                     0);
                 AssertFlicPixelmap(&the_funk->texture_animation_data.flic_info.flic_descriptor, the_pixelmap);
                 the_funk->material->colour_map = the_pixelmap;
-                BrMaterialUpdate(the_funk->material, 0x7FFFu);
+                BrMaterialUpdate(the_funk->material, BR_MATU_ALL);
             } else {
-                the_funk->texture_animation_type = -1;
+                the_funk->texture_animation_type = eTexture_animation_none;
             }
         } else if (the_funk->texture_animation_type == eTexture_animation_frames) {
             i = GetALineAndInterpretCommand(pF, gFunk_move_names, COUNT_OF(gFunk_move_names));
             the_funk->texture_animation_data.frames_info.mode = i;
-            if (the_funk->texture_animation_data.frames_info.mode != eMove_controlled
-                && the_funk->texture_animation_data.frames_info.mode != eMove_absolute) {
-                x_0 = GetAFloat(pF);
-                the_funk->texture_animation_data.frames_info.period = x_0 == 0.0f ? 0.0f : 1000.0 / x_0;
-            } else {
+            if (the_funk->texture_animation_data.frames_info.mode == eMove_controlled
+                || the_funk->texture_animation_data.frames_info.mode == eMove_absolute) {
                 d_0 = GetAnInt(pF);
                 AddFunkGrooveBinding(d_0 + pRef_offset, &the_funk->texture_animation_data.frames_info.period);
+            } else {
+                x_0 = GetAFloat(pF);
+                the_funk->texture_animation_data.frames_info.period = (x_0 == 0.0f) ? 0.0f : 1000.0F / x_0;
             }
 
             the_funk->texture_animation_data.frames_info.texture_count = (int)GetAFloat(pF);
             for (i = 0; i < the_funk->texture_animation_data.frames_info.texture_count; i++) {
                 GetAString(pF, s);
                 the_funk->texture_animation_data.frames_info.textures[i] = BrMapFind(s);
-                if (!the_funk->texture_animation_data.frames_info.textures[i]) {
+                if (the_funk->texture_animation_data.frames_info.textures[i] == NULL) {
                     FatalError(66);
                 }
             }
@@ -1251,21 +1250,21 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
         the_funk->proximity_count = 0;
         the_funk->proximity_array = 0;
         if (the_funk->mode == eFunk_mode_distance) {
-            DRActorEnumRecurseWithMat(gUniverse_actor, 0, (recurse_with_mat_cbfn*)CalcProximities, the_funk);
+            DRActorEnumRecurseWithMat(gUniverse_actor, NULL, (recurse_with_mat_cbfn*)CalcProximities, the_funk);
             the_funk->proximity_array = BrMemAllocate(sizeof(br_vector3) * the_funk->proximity_count, kMem_funk_prox_array);
             the_funk->proximity_count = 0;
             DRActorEnumRecurseWithMat(gUniverse_actor, 0, (recurse_with_mat_cbfn*)AddProximities, the_funk);
             for (i = 0; i < the_funk->proximity_count; i++) {
-                for (j = i + 1; the_funk->proximity_count > j; ++j) {
+                for (j = i + 1; j < the_funk->proximity_count; j++) {
                     if (the_funk->proximity_array[j].v[0] == the_funk->proximity_array[i].v[0]
                         && the_funk->proximity_array[j].v[1] == the_funk->proximity_array[i].v[1]
                         && the_funk->proximity_array[j].v[2] == the_funk->proximity_array[i].v[2]) {
-                        memcpy(
+                        memmove(
                             &the_funk->proximity_array[j],
                             &the_funk->proximity_array[j + 1],
-                            4 * (3 * (the_funk->proximity_count - j) - 3));
-                        --j;
-                        --the_funk->proximity_count;
+                            sizeof(br_vector3) * (the_funk->proximity_count - j - 1));
+                        the_funk->proximity_count--;
+                        j--;
                     }
                 }
             }
@@ -1305,7 +1304,7 @@ tGroovidelic_spec* AddNewGroovidelic() {
     }
     gGroovidelics_array_size += 16;
     new_array = BrMemCalloc(gGroovidelics_array_size, sizeof(tGroovidelic_spec), kMem_groove_spec);
-    if (gGroovidelics_array) {
+    if (gGroovidelics_array != NULL) {
         memcpy(new_array, gGroovidelics_array, (gGroovidelics_array_size - 16) * sizeof(tGroovidelic_spec));
         ShiftBoundGrooveFunks(
             (char*)gGroovidelics_array,
@@ -1449,7 +1448,7 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
         case eGroove_object_spin:
             if (the_groove->object_mode != eMove_controlled && the_groove->object_mode != eMove_absolute) {
                 x_0 = GetAFloat(pF);
-                the_groove->object_data.spin_info.period = x_0 == 0.0f ? 0.0f : 1000.0 / x_0;
+                the_groove->object_data.spin_info.period = (x_0 == 0.0f) ? 0.0f : (1000.0f / x_0);
             } else {
                 d_0 = GetAnInt(pF);
                 AddFunkGrooveBinding(d_0 + pRef_offset, &the_groove->object_data.spin_info.period);
@@ -1461,12 +1460,12 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
             the_groove->object_data.spin_info.axis = GetALineAndInterpretCommand(pF, gAxis_names, COUNT_OF(gAxis_names));
             break;
         case eGroove_object_rock:
-            if (the_groove->object_mode != eMove_controlled && the_groove->object_mode != eMove_absolute) {
-                x_0 = GetAFloat(pF);
-                the_groove->object_data.rock_info.period = x_0 == 0.0f ? 0.0f : 1000.0 / x_0;
-            } else {
+            if (the_groove->object_mode == eMove_controlled || the_groove->object_mode == eMove_absolute) {
                 d_0 = GetAnInt(pF);
                 AddFunkGrooveBinding(d_0 + pRef_offset, &the_groove->object_data.rock_info.period);
+            } else {
+                x_0 = GetAFloat(pF);
+                the_groove->object_data.rock_info.period = (x_0 == 0.0f) ? 0.0f : (1000.0f / x_0);
             }
             GetThreeFloats(pF,
                 &the_groove->object_centre.v[0],
@@ -1478,9 +1477,9 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
         case eGroove_object_throb:
             if (the_groove->object_mode != eMove_controlled && the_groove->object_mode != eMove_absolute) {
                 GetThreeFloats(pF, &x_0, &x_1, &x_2);
-                the_groove->object_data.throb_info.x_period = x_0 == 0.0f ? 0.0f : 1000.0 / x_0;
-                the_groove->object_data.throb_info.y_period = x_1 == 0.0f ? 0.0f : 1000.0 / x_1;
-                the_groove->object_data.throb_info.z_period = x_2 == 0.0f ? 0.0f : 1000.0 / x_2;
+                the_groove->object_data.throb_info.x_period = (x_0 == 0.0f) ? 0.0f : (1000.0f / x_0);
+                the_groove->object_data.throb_info.y_period = (x_1 == 0.0f) ? 0.0f : (1000.0f / x_1);
+                the_groove->object_data.throb_info.z_period = (x_2 == 0.0f) ? 0.0f : (1000.0f / x_2);
             } else {
                 GetThreeInts(pF, &d_0, &d_1, &d_2);
                 if (d_0 >= 0) {
@@ -1588,14 +1587,21 @@ int FindSpecVolIndex(br_actor* pActor) {
 // IDA: void __usercall MungeMaterial(br_matrix34 *pMat@<EAX>, br_material *pMat_1@<EDX>, br_material *pMat_2@<EBX>, int pAxis_0@<ECX>, int pAxis_1)
 void MungeMaterial(br_matrix34* pMat, br_material* pMat_1, br_material* pMat_2, int pAxis_0, int pAxis_1) {
     LOG_TRACE("(%p, %p, %p, %d, %d)", pMat, pMat_1, pMat_2, pAxis_0, pAxis_1);
-    NOT_IMPLEMENTED();
+
+    pMat_1->map_transform.m[0][0] = 6.f * BrVector3Length((br_vector3*)pMat->m[pAxis_0]);
+    pMat_1->map_transform.m[1][1] = 6.f * BrVector3Length((br_vector3*)pMat->m[pAxis_1]);
+    BrMatrix23Copy(&pMat_2->map_transform, &pMat_1->map_transform);
 }
 
 // IDA: void __usercall SetSpecVolMatSize(br_actor *pActor@<EAX>)
 void SetSpecVolMatSize(br_actor* pActor) {
     br_model* model;
     LOG_TRACE("(%p)", pActor);
-    NOT_IMPLEMENTED();
+
+    model = pActor->model;
+    MungeMaterial(&pActor->t.t.mat, model->faces[5].material, model->faces[17].material, 0, 1);
+    MungeMaterial(&pActor->t.t.mat, model->faces[11].material, model->faces[23].material, 1, 2);
+    MungeMaterial(&pActor->t.t.mat, model->faces[7].material, model->faces[19].material, 0, 2);
 }
 
 // IDA: void __usercall FindInverseAndWorldBox(tSpecial_volume *pSpec@<EAX>)
@@ -4112,14 +4118,22 @@ void MoveZAccR4() {
 // IDA: br_material* __cdecl GetInternalMat()
 br_material* GetInternalMat() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    return BrMaterialFind("SPECVOL.MAT");
 }
 
 // IDA: br_material* __cdecl GetExternalMat()
 br_material* GetExternalMat() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    return BrMaterialFind("SPECVOL2.MAT");
 }
+
+#define DrVertexSet(V, X, Y, Z) do {        \
+    (V)[0] = (X);                           \
+    (V)[1] = (Y);                           \
+    (V)[2] = (Z);                           \
+} while (0)
 
 // IDA: void __usercall BuildSpecVolModel(tSpecial_volume *pSpec@<EAX>, int pIndex@<EDX>, br_material *pInt_mat@<EBX>, br_material *pExt_mat@<ECX>)
 void BuildSpecVolModel(tSpecial_volume* pSpec, int pIndex, br_material* pInt_mat, br_material* pExt_mat) {
@@ -4130,8 +4144,70 @@ void BuildSpecVolModel(tSpecial_volume* pSpec, int pIndex, br_material* pInt_mat
     br_actor* actor;
     br_model* model;
     LOG_TRACE("(%p, %d, %p, %p)", pSpec, pIndex, pInt_mat, pExt_mat);
-    NOT_IMPLEMENTED();
+
+    actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+    BrMatrix34Copy(&actor->t.t.mat, &pSpec->mat);
+    actor->render_style = BR_RSTYLE_FACES;
+    model = BrModelAllocate("", 12, 24);
+    model->flags |= BR_MODF_KEEP_ORIGINAL | BR_MODF_DONT_WELD;
+    BrVector3Set(&model->vertices[0].p, 1.f, -1.f, -1.f);
+    BrVector2Set(&model->vertices[0].map, 1.f, 0.f);
+    BrVector3Set(&model->vertices[1].p, -1.f, -1.f, -1.f);
+    BrVector2Set(&model->vertices[1].map, 0.f, 0.f);
+    BrVector3Set(&model->vertices[2].p, -1.f, 1.f, -1.f);
+    BrVector2Set(&model->vertices[2].map, 0.f, 1.f);
+    BrVector3Set(&model->vertices[3].p, 1.f, 1.f, -1.f);
+    BrVector2Set(&model->vertices[3].map, 1.f, 1.f);
+    BrVector3Set(&model->vertices[4].p, 1.f, -1.f, 1.f);
+    BrVector2Set(&model->vertices[4].map, 1.f, 1.f);
+    BrVector3Set(&model->vertices[5].p, -1.f, -1.f, 1.f);
+    BrVector2Set(&model->vertices[5].map, 0.f, 1.f);
+    BrVector3Set(&model->vertices[6].p, -1.f, 1.f, 1.f);
+    BrVector2Set(&model->vertices[6].map, 0.f, 0.f);
+    BrVector3Set(&model->vertices[7].p, 1.f, 1.f, 1.f);
+    BrVector2Set(&model->vertices[7].map, 1.f, 0.f);
+    BrVector3Set(&model->vertices[8].p, 1.f, -1.f, -1.f);
+    BrVector2Set(&model->vertices[8].map, 0.f, 1.f);
+    BrVector3Set(&model->vertices[9].p, 1.f, -1.f, 1.f);
+    BrVector2Set(&model->vertices[9].map, 0.f, 0.f);
+    BrVector3Set(&model->vertices[10].p, -1.f, -1.f, -1.f);
+    BrVector2Set(&model->vertices[10].map, 1.f, 1.f);
+    BrVector3Set(&model->vertices[11].p, -1.f, -1.f, 1.f);
+    BrVector2Set(&model->vertices[11].map, 1.f, 0.f);
+
+    DrVertexSet(model->faces[0].vertices, 0, 3, 1);
+    DrVertexSet(model->faces[1].vertices, 1, 3, 2);
+    DrVertexSet(model->faces[2].vertices, 3, 7, 2);
+    DrVertexSet(model->faces[3].vertices, 2, 7, 6);
+    DrVertexSet(model->faces[4].vertices, 6, 7, 4);
+    DrVertexSet(model->faces[5].vertices, 6, 4, 5);
+    DrVertexSet(model->faces[6].vertices, 0, 5, 4);
+    DrVertexSet(model->faces[7].vertices, 1, 5, 0);
+    DrVertexSet(model->faces[8].vertices, 9, 7, 8);
+    DrVertexSet(model->faces[9].vertices, 8, 7, 3);
+    DrVertexSet(model->faces[10].vertices, 11, 2, 6);
+    DrVertexSet(model->faces[11].vertices, 11, 10, 2);
+
+    memcpy(&model->faces[12], model->faces, 12 * sizeof(br_face));
+    for (i = 12; i < 24; i++) {
+        temp = model->faces[i].vertices[0];
+        model->faces[i].vertices[0] = model->faces[i].vertices[1];
+        model->faces[i].vertices[1] = temp;
+    }
+    model->faces[ 5].material = model->faces[ 4].material = model->faces[ 1].material = model->faces[ 0].material = DRMaterialClone(pExt_mat);
+    model->faces[11].material = model->faces[10].material = model->faces[ 9].material = model->faces[ 8].material = DRMaterialClone(pExt_mat);
+    model->faces[ 7].material = model->faces[ 6].material = model->faces[ 3].material = model->faces[ 2].material = DRMaterialClone(pExt_mat);
+    model->faces[17].material = model->faces[16].material = model->faces[13].material = model->faces[12].material = DRMaterialClone(pInt_mat);
+    model->faces[23].material = model->faces[22].material = model->faces[21].material = model->faces[20].material = DRMaterialClone(pInt_mat);
+    model->faces[19].material = model->faces[18].material = model->faces[15].material = model->faces[14].material = DRMaterialClone(pInt_mat);
+    BrModelUpdate(model, BR_MODU_ALL);
+    actor->model = model;
+    BrActorAdd(gNon_track_actor, actor);
+    gSpec_vol_actors[pIndex] = actor;
+    SetSpecVolMatSize(actor);
 }
+
+#undef DrVertexSet
 
 // IDA: void __usercall DropSpecVol(int pIndex@<EAX>)
 void DropSpecVol(int pIndex) {
@@ -4224,7 +4300,26 @@ void DelSpecVolumeGraph(int pIndex) {
     br_actor* actor;
     br_model* model;
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+
+    actor = gSpec_vol_actors[pIndex];
+    model = actor->model;
+
+    BrMaterialRemove(model->faces[5].material);
+    BrMaterialRemove(model->faces[11].material);
+    BrMaterialRemove(model->faces[7].material);
+    BrMaterialRemove(model->faces[17].material);
+    BrMaterialRemove(model->faces[23].material);
+    BrMaterialRemove(model->faces[19].material);
+    BrMaterialFree(model->faces[5].material);
+    BrMaterialFree(model->faces[11].material);
+    BrMaterialFree(model->faces[7].material);
+    BrMaterialFree(model->faces[17].material);
+    BrMaterialFree(model->faces[23].material);
+    BrMaterialFree(model->faces[19].material);
+    BrModelRemove(model);
+    BrModelFree(model);
+    BrActorRemove(actor);
+    BrActorFree(actor);
 }
 
 // IDA: void __cdecl DeleteSpecVol()
@@ -4491,7 +4586,19 @@ void ShowSpecialVolumes() {
     br_material* internal_mat;
     br_material* external_mat;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gLast_actor = NULL;
+    gSpec_vol_mode = 1;
+    internal_mat = GetInternalMat();
+    external_mat = GetExternalMat();
+    for (i = 0; i < gProgram_state.special_volume_count; i++) {
+        v = &gProgram_state.special_volumes[i];
+        if (!v->no_mat) {
+            BuildSpecVolModel(v, i, internal_mat, external_mat);
+        } else {
+            gSpec_vol_actors[i] = NULL;
+        }
+    }
 }
 
 // IDA: void __cdecl HideSpecialVolumes()
@@ -4499,5 +4606,12 @@ void HideSpecialVolumes() {
     int i;
     tSpecial_volume* v;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gSpec_vol_mode = 0;
+    for (i = 0; i < gProgram_state.special_volume_count; i++) {
+        v = &gProgram_state.special_volumes[i];
+        if (!v->no_mat) {
+            DelSpecVolumeGraph(i);
+        }
+    }
 }

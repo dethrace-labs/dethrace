@@ -127,17 +127,17 @@ typedef enum dr_memory_classes {
 } dr_memory_classes;
 
 typedef enum keycodes {
-    KEY_LSHIFT = 0, //  0x0
-    KEY_LALT = 1, //  0x1
-    KEY_LCTRL = 2, //  0x2
-    KEY_LCTRL_DUPE_2 = 3, //  0x3
+    KEY_SHIFT_ANY = 0, //  0x0
+    KEY_ALT_ANY = 1, //  0x1
+    KEY_CTRL_ANY = 2, //  0x2
+    KEY_CTRL_ANY_2 = 3, //  0x3
     KEY_CAPSLOCK = 4, //  0x4
     KEY_RSHIFT = 5, //  0x5
     KEY_RALT = 6, //  0x6
     KEY_RCTRL = 7, //  0x7
-    KEY_LSHIFT_DUPE_2 = 8, //  0x8
-    KEY_LALT_DUPE_2 = 9, //  0x9
-    KEY_LCTRL_DUPE_3 = 10, //  0xa
+    KEY_LSHIFT = 8, //  0x8
+    KEY_LALT = 9, //  0x9
+    KEY_LCTRL = 10, //  0xa
     KEY_0 = 11, //  0xb
     KEY_1 = 12, //  0xc
     KEY_2 = 13, //  0xd
@@ -181,15 +181,15 @@ typedef enum keycodes {
     KEY_RETURN = 51, //  0x33
     KEY_KP_ENTER = 52, //  0x34
     KEY_TAB = 53, //  0x35
-    KEY_KP_DIVIDE = 54, //  0x36
-    KEY_SLASH = 55, //  0x37
+    KEY_SLASH = 54, //  0x36
+    KEY_UNKNOWN_55 = 55, //  0x37
     KEY_SEMICOLON = 56, //  0x38
     KEY_APOSTROPHE = 57, //  0x39
     KEY_PERIOD = 58, //  0x3a
     KEY_COMMA = 59, //  0x3b
-    KEY_LEFTBRACKET = 60, //  0x3c
-    KEY_RIGHTBRACKET = 61, //  0x3d
-    KEY_UNDEFINED_2 = 62, //  0x3e
+    KEY_LBRACKET = 60, //  0x3c
+    KEY_RBRACKET = 61, //  0x3d
+    KEY_BACKSLASH = 62, //  0x3e
     KEY_ESCAPE = 63, //  0x3f
     KEY_INSERT = 64, //  0x40
     KEY_DELETE = 65, //  0x41
@@ -201,8 +201,8 @@ typedef enum keycodes {
     KEY_RIGHT = 71, //  0x47
     KEY_UP = 72, //  0x48
     KEY_DOWN = 73, //  0x49
-    KEY_UNDEFINED_3 = 74, //  0x4a
-    KEY_KP_DIVIDE_2 = 75, //  0x4b
+    KEY_KP_NUMLOCK = 74, //  0x4a
+    KEY_KP_DIVIDE = 75, //  0x4b
     KEY_KP_MULTIPLY = 76, //  0x4c
     KEY_KP_MINUS = 77, //  0x4d
     KEY_KP_PLUS = 78, //  0x4e
@@ -230,22 +230,82 @@ typedef enum keycodes {
     KEY_F10 = 100, //  0x64
     KEY_F11 = 101, //  0x65
     KEY_F12 = 102, //  0x66
-    KEY_PRINTSCREEN = 103, //  0x67
-    KEY_UNDEFINED_4 = 104, //  0x68
+    KEY_PRTSCN = 103, //  0x67
+    KEY_SCRLK = 104, //  0x68
     KEY_PAUSE = 105, //  0x69
     KEY_SPACE = 106, //  0x6a
 } keycodes;
 
 typedef enum keymapcodes {
-    KEYMAP_ESCAPE = 0,
-    KEYMAP_Q = 1,
-    KEYMAP_S = 2,
-    KEYMAP_L = 3,
-    KEYMAP_LCTRL = 7,
-    KEYMAP_F2 = 28,
-    KEYMAP_F3 = 29,
-    KEYMAP_LEFT = 46,
-    KEYMAP_RIGHT = 46,
+    KEYMAP_ESCAPE = 0,              // default: ESC
+
+    KEYMAP_CONTROL_ANY = 7,         // default: LCTRL or RCTRL (any)
+    KEYMAP_SHIFT_ANY = 8,           // default: LSHIFT or RSHIFT (any)
+
+    //
+    // The following items are meant to be combined with KEYMAP_CONTROL_ANY
+    //
+
+    KEYMAP_CTRL_QUIT = 1,           // default: Q
+    KEYMAP_CTRL_SAVE = 2,           // default: S
+    KEYMAP_CTRL_LOAD = 3,           // default: L
+    KEYMAP_CTRL_ABORT_RACE = 4,     // default: A
+    KEYMAP_CTRL_DRAW_SOME_TEXT = 9, // default: KP0
+    KEYMAP_CTRL_FLY = 10,           // default: KP1
+
+    //
+    // The following items are meant to be combined with KEYMAP_SHIFT_ANY
+    //
+
+    KEYMAP_SHIFT_DUMPSCREEN = 5,    // default: D
+
+    //
+    // The following items are meant to be used standalone
+    //
+
+    KEYMAP_COCKPIT = 45,            // default C
+    KEYMAP_SAVE = 28,               // default F2
+    KEYMAP_LOAD = 29,               // default F3
+    KEYMAP_MOVE_UP = 30,            // default UP
+    KEYMAP_MOVE_DOWN = 31,          // default DOWN
+    KEYMAP_MOVE_LEFT = 32,          // default LEFT
+    KEYMAP_MOVE_RIGHT = 33,         // default RIGHT
+    KEYMAP_MIRROR = 34,             // default M
+    KEYMAP_PRATCAM = 35,            // default P
+    KEYMAP_LOOK_LEFT = 50,          // default Q
+    KEYMAP_LOOK_FORWARD = 51,       // default W
+    KEYMAP_LOOK_RIGHT = 52,         // default E
+    KEYMAP_SOUND = 36,              // default S
+    KEYMAP_PEDESTRIANS = 54,        // default KP_MINUS
+    KEYMAP_F4 = 17,                 // default F4
+    KEYMAP_F5 = 18,                 // default F5
+    KEYMAP_F6 = 19,                 // default F6
+    KEYMAP_F7 = 20,                 // default F7
+    KEYMAP_F8 = 21,                 // default F8
+    KEYMAP_F10 = 22,                // default F10
+    KEYMAP_F11 = 23,                // default F1
+    KEYMAP_F12 = 24,                // default F12
+    KEYMAP_EDITMODE_0 = 14,         // default 0
+    KEYMAP_EDITMODE_1 = 37,         // default 1
+    KEYMAP_EDITMODE_2 = 38,         // default 2
+    KEYMAP_EDITMODE_3 = 39,         // default 3
+    KEYMAP_EDITMODE_4 = 40,         // default 4
+    KEYMAP_EDITMODE_5 = 41,         // default 5
+    KEYMAP_EDITMODE_6 = 42,         // default 6
+    KEYMAP_EDITMODE_7 = 43,         // default 7
+    KEYMAP_EDITMODE_8 = 15,         // default 8
+    KEYMAP_EDITMODE_9 = 16,         // default 9
+    KEYMAP_SCREEN_SMALLER = 60,     // default -
+    KEYMAP_SCREEN_LARGER = 61,      // default =
+    KEYMAP_MAP = 56,                // default TAB
+    KEYMAP_RECOVERY = 59,           // default Insert
+    KEYMAP_BUY_ARMOUR = 62,         // default Delete
+    KEYMAP_BUY_POWER = 63,          // default End
+    KEYMAP_BUY_OFFENSE = 64,        // default PgDn
+    KEYMAP_VIEW_NETPLAYER = 65,     // default Space
+    KEYMAP_SEND_MESSAGE = 66,       // default `
+    KEYMAP_ARROW = 25,              // default R
+    KEYMAP_INFO = 26,               // default I
 } keymapcodes;
 
 #define FONT_TYPEABLE 0
@@ -292,7 +352,7 @@ typedef enum keymapcodes {
 
 #define DR_PI 3.141592653589793
 
-#define TIME_CONV_THING 0.00050000002
+#define TIME_CONV_THING 0.0005f
 
 #define OPPONENT_COUNT 5
 

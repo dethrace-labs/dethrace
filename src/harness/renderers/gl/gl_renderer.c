@@ -207,6 +207,10 @@ void GLRenderer_Init(int width, int height, int pRender_width, int pRender_heigh
     glGenFramebuffers(1, &framebuffer_id);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
 
+    // set pixel storage alignment to 1 byte
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
     glBindTexture(GL_TEXTURE_2D, framebuffer_texture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R8UI, render_width, render_height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -277,7 +281,7 @@ void GLRenderer_SetShadeTable(br_pixelmap* table) {
 extern br_v1db_state v1db;
 
 void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer) {
-    glViewport(colour_buffer->base_x, colour_buffer->base_y, colour_buffer->width, colour_buffer->height);
+    glViewport(colour_buffer->base_x, render_height - colour_buffer->height - colour_buffer->base_y, colour_buffer->width, colour_buffer->height);
 
     glEnable(GL_DEPTH_TEST);
     glUseProgram(shader_program_3d);
@@ -356,8 +360,6 @@ void GLRenderer_ClearBuffers() {
 void build_model(br_model* model) {
     tStored_model_context* ctx;
     v11model* v11;
-
-    LOG_DEBUG("called %s", model->identifier);
 
     v11 = model->prepared;
     ctx = NewStoredModelContext();
@@ -602,13 +604,15 @@ void GLRenderer_FlushBuffers(br_pixelmap* color_buffer, br_pixelmap* depth_buffe
     glBindTexture(GL_TEXTURE_2D, depth_texture);
     glGetTexImage(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, depth_buffer_flip_pixels);
 
-    dest_y = render_height;
+    dest_y = color_buffer->height;
+    int src_y = render_height - color_buffer->base_y - color_buffer->height;
     uint16_t* depth_pixels = depth_buffer->pixels;
-    for (int y = 0; y < render_height; y++) {
+    for (int y = 0; y < color_buffer->height; y++) {
         dest_y--;
-        for (int x = 0; x < render_width; x++) {
-            depth_pixels[dest_y * render_width + x] = depth_buffer_flip_pixels[y * render_width + x];
+        for (int x = 0; x < color_buffer->width; x++) {
+            depth_pixels[dest_y * render_width + x] = depth_buffer_flip_pixels[src_y * render_width + color_buffer->base_x + x];
         }
+        src_y++;
     }
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
     glClear(GL_COLOR_BUFFER_BIT);

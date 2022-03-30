@@ -4360,7 +4360,7 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
             gCamera_yaw = 0;
             manual_swing = 1;
         }
-        if (fabs(c->speedo_speed) > 0.0005999999999999999 && gCamera_mode > 0) {
+        if (fabs(c->speedo_speed) > 0.0006f && gCamera_mode > 0) {
             gCamera_mode = -1;
             gCamera_sign = m2->m[2][1] * c->direction.v[1]
                     + m2->m[2][2] * c->direction.v[2]
@@ -4981,35 +4981,22 @@ void InitialiseExternalCamera() {
         c = &gProgram_state.current_car;
     }
     gCamera_height = c->pos.v[1];
-    gView_direction.v[0] = c->direction.v[0];
-    gView_direction.v[1] = 0.0;
-    gView_direction.v[2] = c->direction.v[2];
-    ts = sqrt(gView_direction.v[0] * gView_direction.v[0] + gView_direction.v[2] * gView_direction.v[2]);
-    if (ts <= 2.3841858e-7) {
-        gView_direction.v[0] = 1.0;
-        gView_direction.v[1] = 0.0;
-        gView_direction.v[2] = 0.0;
-    } else {
-        gView_direction.v[0] *= (1.0 / ts);
-        gView_direction.v[1] *= (1.0 / ts);
-        gView_direction.v[2] *= (1.0 / ts);
-    }
-    ts = -(gView_direction.v[1] * c->car_master_actor->t.t.mat.m[2][1]
-        + gView_direction.v[0] * c->car_master_actor->t.t.mat.m[2][0]
-        + gView_direction.v[2] * c->car_master_actor->t.t.mat.m[2][2]);
+    BrVector3Set(&gView_direction, c->direction.v[0], 0.0f, c->direction.v[2]);
+    BrVector3Normalise(&gView_direction, &gView_direction);
+    ts = -BrVector3Dot(&gView_direction, (br_vector3*)c->car_master_actor->t.t.mat.m[2]);
     gCamera_sign = ts < 0;
     gCamera_mode = 0;
-    if (ts >= 0.0) {
+    if (gCamera_sign) {
         yaw = -gCamera_yaw;
     } else {
         yaw = gCamera_yaw;
     }
     DrVector3RotateY(&gView_direction, yaw);
-    gMin_camera_car_distance = 0.60000002;
+    gMin_camera_car_distance = 0.6f;
     gCamera_frozen = 0;
     gCamera_mode = -2;
-    if (gCountdown && (!gNet_mode || gCurrent_net_game->options.grid_start) && gCountdown > 4) {
-        gCamera_height = gCamera_height + 10.0;
+    if (gCountdown && (gNet_mode == eNet_mode_none || gCurrent_net_game->options.grid_start) && gCountdown > 4) {
+        gCamera_height = gCamera_height + 10.0f;
     }
 }
 

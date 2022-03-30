@@ -1,5 +1,9 @@
 #include "pmdsptch.h"
 
+#include "CORE/FW/devsetup.h"
+#include "CORE/FW/scratch.h"
+#include "CORE/PIXELMAP/fontptrs.h"
+#include "CORE/PIXELMAP/gencopy.h"
 #include "CORE/PIXELMAP/pmmem.h"
 #include "CORE/STD/brstdlib.h"
 #include "harness/hooks.h"
@@ -18,14 +22,22 @@ br_pixelmap* BrPixelmapAllocateSub(br_pixelmap* src, br_int_32 x, br_int_32 y, b
     r.w = w;
     r.x = x;
     r.y = y;
-    _M_br_device_pixelmap_mem_allocateSub((br_device_pixelmap*)src, (br_device_pixelmap**)&new, &r);
+    CheckDispatch((br_device_pixelmap*)src);
+    if (((br_device_pixelmap*)src)->dispatch->_allocateSub((br_device_pixelmap*)src, (br_device_pixelmap**)&new, &r) != 0) {
+        return NULL;
+    }
     return new;
 }
 
 // IDA: void __cdecl BrPixelmapFree(br_pixelmap *src)
 void BrPixelmapFree(br_pixelmap* src) {
     LOG_TRACE10("(%p)", src);
-    _M_br_device_pixelmap_mem_free((br_device_pixelmap*)src);
+
+    CheckDispatch((br_device_pixelmap*)src);
+    if (BrDevLastBeginQuery() == src) {
+        BrDevLastBeginSet(NULL);
+    }
+    ((br_device_pixelmap*)src)->dispatch->_free((br_object*)src);
 }
 
 // IDA: br_pixelmap* __cdecl BrPixelmapResize(br_pixelmap *src, br_int_32 width, br_int_32 height)
@@ -102,15 +114,8 @@ void BrPixelmapFill(br_pixelmap* dst, br_uint_32 colour) {
     br_uint_32 y;
     char* d;
 
-    if ((dst->flags & (BR_PMF_LINEAR | BR_PMF_ROW_WHOLEPIXELS)) == (BR_PMF_LINEAR | BR_PMF_ROW_WHOLEPIXELS)) {
-        memset(dst->pixels, colour, dst->row_bytes * dst->height);
-    } else {
-        d = dst->pixels;
-        for (y = 0; y < dst->height; y++) {
-            memset(d, colour, dst->row_bytes);
-            d += dst->row_bytes;
-        }
-    }
+    CheckDispatch((br_device_pixelmap*)dst);
+    (*(br_device_pixelmap_dispatch**)dst)->_fill((br_device_pixelmap*)dst, colour);
 }
 
 // IDA: void __cdecl BrPixelmapRectangle(br_pixelmap *dst, br_int_32 x, br_int_32 y, br_int_32 w, br_int_32 h, br_uint_32 colour)
@@ -136,7 +141,19 @@ br_error DispatchCopy(br_device_pixelmap* self, br_device_pixelmap* src) {
 // IDA: br_error __usercall DispatchRectangleCopy@<EAX>(br_device_pixelmap *self@<EAX>, br_point *p@<EDX>, br_device_pixelmap *src@<EBX>, br_rectangle *r@<ECX>)
 br_error DispatchRectangleCopy(br_device_pixelmap* self, br_point* p, br_device_pixelmap* src, br_rectangle* r) {
     LOG_TRACE("(%p, %p, %p, %p)", self, p, src, r);
-    NOT_IMPLEMENTED();
+
+    CheckDispatch(self);
+    CheckDispatch(src);
+    if ((*(br_device_pixelmap_dispatch**)self)->_device((br_object*)self) == (*(br_device_pixelmap_dispatch**)src)->_device((br_object*)src)) {
+        return (*(br_device_pixelmap_dispatch**)self)->_rectangleCopy(self, p, src, r);
+    }
+    if ((src->pm_flags & BR_PMF_NO_ACCESS) == 0) {
+        return (*(br_device_pixelmap_dispatch**)self)->_rectangleCopyTo(self, p, src, r);
+    }
+    if ((self->pm_flags & BR_PMF_NO_ACCESS) == 0) {
+        return (*(br_device_pixelmap_dispatch**)self)->_rectangleCopyFrom(src, p, self, r);
+    }
+    return GeneralRectangleCopy(self, p, src, r);
 }
 
 // IDA: br_error __usercall DispatchRectangleStretchCopy@<EAX>(br_device_pixelmap *self@<EAX>, br_rectangle *r@<EDX>, br_device_pixelmap *src@<EBX>, br_rectangle *s@<ECX>)
@@ -150,44 +167,13 @@ void BrPixelmapRectangleCopy(br_pixelmap* dst, br_int_32 dx, br_int_32 dy, br_pi
     br_rectangle r;
     br_point p;
 
-    // Thanks Errol!
-
-    br_uint_8* src_pix = (br_uint_8*)src->pixels;
-    br_uint_8* dst_pix = (br_uint_8*)dst->pixels;
-
-    dx += dst->origin_x;
-    dy += dst->origin_y;
-
-    sx += src->origin_x;
-    sy += src->origin_y;
-
-    if (src->type != dst->type) {
-        LOG_PANIC("src and dst types don't match! src is %d and dst is %d", src->type, dst->type);
-        return;
-    }
-
-    if (src->type != BR_PMT_INDEX_8) {
-        LOG_PANIC("only 8 bit surfaces supported");
-        return;
-    }
-
-    for (int x = 0; x < w; x++) {
-        if (dx + x < 0 || dx + x >= dst->width) {
-            continue;
-        }
-        if (sx + x >= src->width)
-            continue;
-
-        for (int y = 0; y < h; y++) {
-            if (dy + y < 0 || dy + y >= dst->height) {
-                continue;
-            }
-            if (sy + y >= src->height)
-                continue;
-
-            dst_pix[(y + dy) * dst->row_bytes + (x + dx)] = src_pix[(sy + y) * src->row_bytes + (x + sx)];
-        }
-    }
+    r.x = sx;
+    r.y = sy;
+    r.w = w;
+    r.h = h;
+    p.x = dx;
+    p.y = dy;
+    DispatchRectangleCopy((br_device_pixelmap*)dst, &p, (br_device_pixelmap*)src, &r);
 }
 
 // IDA: void __cdecl BrPixelmapRectangleStretchCopy(br_pixelmap *dst, br_int_32 dx, br_int_32 dy, br_int_32 dw, br_int_32 dh, br_pixelmap *src, br_int_32 sx, br_int_32 sy, br_int_32 sw, br_int_32 sh)
@@ -246,9 +232,10 @@ void BrPixelmapPixelSet(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_uint_32 c
     br_point p;
     // LOG_TRACE("(%p, %d, %d, %d)", dst, x, y, colour);
 
-    STUB_ONCE();  // stub because this implementation is improperly (=coordinates can lie outside pixelmap + pixel format size can be > 1 bytes)
-    br_uint_8* dst_pix = (br_uint_8*)dst->pixels;
-    dst_pix[(y * dst->row_bytes) + x] = (br_uint_8)colour;
+    CheckDispatch((br_device_pixelmap*)dst);
+    p.x = x;
+    p.y = y;
+    (*(br_device_pixelmap_dispatch**)dst)->_pixelSet((br_device_pixelmap*)dst, &p, colour);
 }
 
 // IDA: br_uint_32 __cdecl BrPixelmapPixelGet(br_pixelmap *dst, br_int_32 x, br_int_32 y)
@@ -327,36 +314,16 @@ void BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {
 
 // IDA: void __cdecl BrPixelmapText(br_pixelmap *dst, br_int_32 x, br_int_32 y, br_uint_32 colour, br_font *font, char *text)
 void BrPixelmapText(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_uint_32 colour, br_font* font, char* text) {
+    br_point p;
     LOG_TRACE("(%p, %d, %d, %d, %p, \"%s\")", dst, x, y, colour, font, text);
 
-    // Thanks Errol!
-    br_uint_8* dst_pix = (br_uint_8*)dst->pixels;
-
-    if (font->flags & BR_FONTF_PROPORTIONAL) {
-        br_int_8* widths = font->width;
-        br_uint_8* glyphs = font->glyphs;
-        br_uint_16 dst_offset = (y * dst->row_bytes) + x;
-
-        for (int i = 0; i < strlen(text); i++) {
-            br_uint_8 pw = widths[(br_uint_8)text[i]];
-            br_uint_16 src_offset = font->encoding[(br_uint_8)text[i]];
-
-            for (int fy = 0; fy < font->glyph_y; fy++) {
-                br_uint_8 b = 0;
-
-                for (int fx = 0; fx < pw; fx++) {
-                    if (fx % 8 == 0) {
-                        b = glyphs[src_offset + fy + (fx / 8)];
-                    }
-                    dst_pix[dst_offset + (fy * dst->row_bytes) + fx + i] = (b & (1 << (7 - fx)) ? colour : 0);
-                }
-            }
-
-            dst_offset += pw;
-        }
-    } else {
-        TELL_ME_IF_WE_PASS_THIS_WAY();
+    CheckDispatch((br_device_pixelmap*)dst);
+    if (font == NULL) {
+        font = BrFontFixed3x5;
     }
+    p.x = x;
+    p.y = y;
+    ((br_device_pixelmap*)dst)->dispatch->_text((br_device_pixelmap*)dst, &p, font, text, colour);
 }
 
 // IDA: void __cdecl BrPixelmapTextF(br_pixelmap *dst, br_int_32 x, br_int_32 y, br_uint_32 colour, br_font *font, char *fmt, ...)
@@ -365,7 +332,18 @@ void BrPixelmapTextF(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_uint_32 colo
     br_point p;
     va_list args;
     LOG_TRACE("(%p, %d, %d, %d, %p, \"%s\")", dst, x, y, colour, font, fmt);
-    NOT_IMPLEMENTED();
+
+    CheckDispatch((br_device_pixelmap*)dst);
+    ss = BrScratchString();
+    if (font == NULL) {
+        font = BrFontFixed3x5;
+    }
+    va_start(args, fmt);
+    BrVSprintfN(ss, BrScratchStringSize(), fmt, args);
+    va_end(args);
+    p.x = x;
+    p.y = y;
+    (*(br_device_pixelmap_dispatch**)dst)->_text((br_device_pixelmap*)dst, &p, font, ss, colour);
 }
 
 // IDA: br_uint_16 __cdecl BrPixelmapTextWidth(br_pixelmap *dst, br_font *font, char *text)
@@ -447,27 +425,22 @@ void BrPixelmapPaletteEntrySetMany(br_pixelmap* pm, br_int_32 index, br_int_32 n
 br_pixelmap* BrPixelmapDirectLock(br_pixelmap* src, br_boolean block) {
     LOG_TRACE("(%p, %d)", src, block);
 
-#if 0
-    // FIXME: use pixelmap dispatch table
-    CheckDispatch(src);
-    return ((br_device_pixelmap*)(src))->dispatch->_directLock(src) == 0 ? src : NULL;
-#else
-    STUB();
-    return src;
-#endif
+    CheckDispatch((br_device_pixelmap*)src);
+    if (((br_device_pixelmap*)(src))->dispatch->_directLock((br_device_pixelmap*)src, block) == 0) {
+        return src;
+    } else {
+        return NULL;
+    }
 }
 
 // IDA: br_pixelmap* __cdecl BrPixelmapDirectUnlock(br_pixelmap *src)
 br_pixelmap* BrPixelmapDirectUnlock(br_pixelmap* src) {
     LOG_TRACE("(%p)", src);
 
-    STUB();
-#if 0
-    // FIXME: use pixelmap dispatch table
-    CheckDispatch(src);
-    return ((br_device_pixelmap*)(src))->dispatch->_directUnlock(src) == 0 ? src : NULL;
-#else
-    STUB();
-    return src;
-#endif
+    CheckDispatch((br_device_pixelmap*)src);
+    if (((br_device_pixelmap*)(src))->dispatch->_directUnlock((br_device_pixelmap*)src) == 0) {
+        return src;
+    } else {
+        return NULL;
+    }
 }

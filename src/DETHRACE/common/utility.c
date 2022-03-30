@@ -39,7 +39,7 @@ br_pixelmap* gSource_for_16bit_palette;
 int CheckQuit() {
     LOG_TRACE8("()");
 
-    if (!gIn_check_quit && KeyIsDown(KEYMAP_Q) && KeyIsDown(KEYMAP_LCTRL)) {
+    if (!gIn_check_quit && KeyIsDown(KEYMAP_CTRL_QUIT) && KeyIsDown(KEYMAP_CONTROL_ANY)) {
         gIn_check_quit = 1;
         while (AnyKeyDown()) {
             ;
@@ -473,7 +473,7 @@ void WaitFor(tU32 pDelay) {
     LOG_TRACE("(%d)", pDelay);
 
     start_time = PDGetTotalTime();
-    while ((start_time + pDelay) < PDGetTotalTime()) {
+    while (start_time + pDelay < PDGetTotalTime()) {
         SoundService();
     }
 }
@@ -518,7 +518,7 @@ br_uint_32 DRActorEnumRecurseWithMat(br_actor* pActor, br_material* pMat, recurs
     br_uint_32 result;
     LOG_TRACE("(%p, %p, %p, %p)", pActor, pMat, pCall_back, pArg);
 
-    if (pActor->material) {
+    if (pActor->material != NULL) {
         pMat = pActor->material;
     }
     result = pCall_back(pActor, pMat, pArg);

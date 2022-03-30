@@ -1,5 +1,7 @@
 #include "cutscene.h"
+#include "drmem.h"
 #include "errors.h"
+#include "flicplay.h"
 #include "globvars.h"
 #include "globvrpb.h"
 #include "graphics.h"
@@ -15,13 +17,32 @@
 #include <stdlib.h>
 #include <time.h>
 
-tS32 gLast_demo_end_anim;
+tS32 gLast_demo_end_anim = -90000;
 
 // IDA: void __usercall ShowCutScene(int pIndex@<EAX>, int pWait_end@<EDX>, int pSound_ID@<EBX>, br_scalar pDelay)
 void ShowCutScene(int pIndex, int pWait_end, int pSound_ID, br_scalar pDelay) {
     LOG_TRACE("(%d, %d, %d, %f)", pIndex, pWait_end, pSound_ID, pDelay);
 
-    NOT_IMPLEMENTED();
+    gProgram_state.cut_scene = 1;
+    if (pSound_ID >= 0) {
+        DRS3LoadSound(pSound_ID);
+        SetFlicSound(pSound_ID, PDGetTotalTime() + 1000.f * pDelay);
+    }
+    SetNonFatalAllocationErrors();
+    RunFlic(pIndex);
+    ResetNonFatalAllocationErrors();
+    if (pWait_end) {
+        WaitForAKey();
+    } else {
+        WaitForNoKeys();
+    }
+    FadePaletteDown();
+    ClearEntireScreen();
+    if (pSound_ID >= 0) {
+        DRS3ReleaseSound(pSound_ID);
+        SetFlicSound(0, 0);
+    }
+    gProgram_state.cut_scene = 0;
 }
 
 // IDA: void __cdecl DoSCILogo()
@@ -128,6 +149,7 @@ void PlaySmackerFile(char* pSmack_name) {
 // IDA: void __cdecl DoOpeningAnimation()
 void DoOpeningAnimation() {
     LOG_TRACE("()");
+
     PlaySmackerFile("LOGO.SMK");
     PlaySmackerFile(harness_game_info.defines.INTRO_SMK_FILE);
     WaitForNoKeys();
@@ -157,21 +179,21 @@ void DoEndRaceAnimation() {
     int went_up_a_rank;
     LOG_TRACE("()");
 
-    made_a_profit = gProgram_state.credits_earned > gProgram_state.credits_lost;
-    went_up_a_rank = gProgram_state.credits_earned > gProgram_state.credits_per_rank;
+    made_a_profit = gProgram_state.credits_earned >= gProgram_state.credits_lost;
+    went_up_a_rank = gProgram_state.credits_earned >= gProgram_state.credits_per_rank;
 
     FadePaletteDown();
 
-    if (gAusterity_mode || gNet_mode) {
+    if (gAusterity_mode || gNet_mode != eNet_mode_none) {
         return;
     }
     if (gProgram_state.credits + gProgram_state.credits_earned - gProgram_state.credits_lost >= 0) {
-        if (!made_a_profit && !went_up_a_rank) {
-            PlaySmackerFile("UNSUCSES.SMK");
-        } else if (!made_a_profit || !went_up_a_rank) {
+        if (made_a_profit && went_up_a_rank) {
+            PlaySmackerFile("SUCCESS.SMK");
+        } else if (made_a_profit || went_up_a_rank) {
             PlaySmackerFile("MUNDANE.SMK");
         } else {
-            PlaySmackerFile("SUCCESS.SMK");
+            PlaySmackerFile("UNSUCSES.SMK");
         }
     }
 }
@@ -192,6 +214,36 @@ void DoGameCompletedAnimation() {
     StopMusic();
     PlaySmackerFile("TOPRANK.SMK");
     StartMusic();
+}
+
+void DoFeatureUnavailableInDemo() {
+    LOG_TRACE("()");
+
+    PrintMemoryDump(0, "BEFORE DEMO-ONLY SCREEN");
+
+    SuspendPendingFlic();
+    FadePaletteDown();
+    ShowCutScene(7, 1, 8502, gCut_delay_3);
+    FadePaletteDown();
+
+    PrintMemoryDump(0, "AFTER DEMO-ONLY SCREEN");
+}
+
+void DoFullVersionPowerpoint() {
+    LOG_TRACE("()");
+
+    FadePaletteDown();
+    DRSetPalette(gRender_palette);
+    ShowCutScene(9, 0, 8503, gCut_delay_4);
+    FadePaletteDown();
+
+    gLast_demo_end_anim = PDGetTotalTime();
+}
+
+void DoDemoGoodbye() {
+    if (PDGetTotalTime() - gLast_demo_end_anim > 90000) {
+        DoFullVersionPowerpoint();
+    }
 }
 
 // IDA: void __cdecl StartLoadingScreen()

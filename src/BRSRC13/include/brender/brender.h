@@ -58,9 +58,11 @@ br_uint_32 BrMaterialAddMany(br_material** items, int n);
 br_uint_32 BrMaterialEnum(char* pattern, br_material_enum_cbfn* callback, void* arg);
 br_material_find_cbfn* BrMaterialFindHook(br_material_find_cbfn* hook);
 
-// BrMatrix34
+// BrMatrix236
+void BrMatrix23Copy(br_matrix23* A, br_matrix23* B);
 void BrMatrix23Identity(br_matrix23* mat);
 
+// BrMatrix34
 void BrMatrix34Identity(br_matrix34* mat);
 void BrMatrix34Pre(br_matrix34* mat, br_matrix34* A);
 void BrMatrix34ApplyV(br_vector3* A, br_vector3* B, br_matrix34* C);
@@ -129,6 +131,7 @@ void BrPixelmapPixelSet(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_uint_32 c
 br_pixelmap* BrPixelmapAllocate(br_uint_8 type, br_int_32 w, br_int_32 h, void* pixels, int flags);
 void BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src);
 void BrPixelmapText(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_uint_32 colour, br_font* font, char* text);
+void BrPixelmapTextF(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_uint_32 colour, br_font* font, char* fmt, ...);
 br_uint_16 BrPixelmapTextWidth(br_pixelmap* dst, br_font* font, char* text);
 
 // BrRes

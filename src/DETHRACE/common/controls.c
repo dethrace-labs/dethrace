@@ -11,6 +11,7 @@
 #include "globvars.h"
 #include "globvrkm.h"
 #include "globvrpb.h"
+#include "grafdata.h"
 #include "graphics.h"
 #include "harness/trace.h"
 #include "init.h"
@@ -35,56 +36,269 @@
 #include <stdlib.h>
 
 tToggle_element gToggle_array[] = {
-    { 34, -2, 1, 1, 0, ToggleMirror },
-    { 56, -2, 1, 1, 0, ToggleMap },
-    { 35, -2, 1, 1, 0, TogglePratcam },
-    { 59, -2, 1, 1, 0, SetRecovery },
-    { 4, 7, 1, 1, 0, AbortRace },
-    { 45, -2, 1, 1, 0, ToggleCockpit },
-    { 50, -2, 1, 1, 0, LookLeft },
-    { 51, -2, 1, 1, 0, LookRight },
-    { 52, -2, 1, 1, 0, DamageTest },
-    { 36, -2, 0, 1, 0, ToggleSoundEnable },
-    { 5, 8, 0, 1, 0, PrintScreen },
-    { 9, 7, 1, 1, 0, DrawSomeText }, // commented out in original executable  // ctrl+f5
-    { 10, 7, 1, 1, 0, ToggleFlying },
-    { 54, -2, 1, 1, 0, TogglePedestrians },
-    { 17, -2, 0, 0, 0, F4Key },
-    { 18, -2, 1, 0, 0, F5Key },
-    { 19, -2, 1, 0, 0, F6Key },
-    { 20, -2, 1, 0, 0, F7Key },
-    { 21, -2, 1, 0, 0, F8Key },
-    { 22, -2, 1, 0, 0, F10Key },
-    { 23, -2, 1, 0, 0, F11Key },
-    { 24, -2, 1, 0, 0, F12Key },
-    { 14, -2, 1, 0, 0, NumberKey0 },
-    { 37, -2, 1, 0, 0, NumberKey1 },
-    { 38, -2, 1, 0, 0, NumberKey2 },
-    { 39, -2, 1, 0, 0, NumberKey3 },
-    { 40, -2, 1, 0, 0, NumberKey4 },
-    { 41, -2, 1, 0, 0, NumberKey5 },
-    { 42, -2, 1, 0, 0, NumberKey6 },
-    { 43, -2, 1, 0, 0, NumberKey7 },
-    { 15, -2, 1, 0, 0, NumberKey8 },
-    { 16, -2, 1, 0, 0, NumberKey9 },
-    { 60, -2, 1, 0, 0, ScreenSmaller },
-    { 61, -2, 1, 0, 0, ScreenLarger },
-    { 62, -2, 1, 0, 0, BuyArmour },
-    { 63, -2, 1, 0, 0, BuyPower },
-    { 64, -2, 1, 0, 0, BuyOffense },
-    { 65, -2, 1, 0, 0, ViewNetPlayer },
-    { 66, -2, 1, 0, 0, UserSendMessage },
-    { 25, -2, 1, 1, 0, ToggleArrow }, // commented out in original executable
-    { 26, -2, 1, 1, 0, ToggleInfo },
-    { 26, 8, 1, 1, 0, ToggleInfo },
-    { 26, 7, 1, 1, 0, ToggleInfo }
+    { KEYMAP_MIRROR, -2, 1, 1, 0, ToggleMirror },
+    { KEYMAP_MAP, -2, 1, 1, 0, ToggleMap },
+    { KEYMAP_PRATCAM, -2, 1, 1, 0, TogglePratcam },
+    { KEYMAP_RECOVERY, -2, 1, 1, 0, SetRecovery },
+    { KEYMAP_CTRL_ABORT_RACE, 7, 1, 1, 0, AbortRace },
+    { KEYMAP_COCKPIT, -2, 1, 1, 0, ToggleCockpit },
+    { KEYMAP_LOOK_LEFT, -2, 1, 1, 0, LookLeft },
+    { KEYMAP_LOOK_FORWARD, -2, 1, 1, 0, LookForward },
+    { KEYMAP_LOOK_RIGHT, -2, 1, 1, 0, LookRight },
+    { KEYMAP_SOUND, -2, 0, 1, 0, ToggleSoundEnable },
+    { KEYMAP_SHIFT_DUMPSCREEN, KEYMAP_SHIFT_ANY, 0, 1, 0, PrintScreen },
+    { KEYMAP_CTRL_DRAW_SOME_TEXT, KEYMAP_CONTROL_ANY, 1, 1, 0, DrawSomeText }, // commented out in original executable
+    { KEYMAP_CTRL_FLY, KEYMAP_CONTROL_ANY, 1, 1, 0, ToggleFlying },
+    { KEYMAP_PEDESTRIANS, -2, 1, 1, 0, TogglePedestrians },
+    { KEYMAP_F4, -2, 0, 0, 0, F4Key },
+    { KEYMAP_F5, -2, 1, 0, 0, F5Key },
+    { KEYMAP_F6, -2, 1, 0, 0, F6Key },
+    { KEYMAP_F7, -2, 1, 0, 0, F7Key },
+    { KEYMAP_F8, -2, 1, 0, 0, F8Key },
+    { KEYMAP_F10, -2, 1, 0, 0, F10Key },
+    { KEYMAP_F11, -2, 1, 0, 0, F11Key },
+    { KEYMAP_F12, -2, 1, 0, 0, F12Key },
+    { KEYMAP_EDITMODE_0, -2, 1, 0, 0, NumberKey0 },
+    { KEYMAP_EDITMODE_1, -2, 1, 0, 0, NumberKey1 },
+    { KEYMAP_EDITMODE_2, -2, 1, 0, 0, NumberKey2 },
+    { KEYMAP_EDITMODE_3, -2, 1, 0, 0, NumberKey3 },
+    { KEYMAP_EDITMODE_4, -2, 1, 0, 0, NumberKey4 },
+    { KEYMAP_EDITMODE_5, -2, 1, 0, 0, NumberKey5 },
+    { KEYMAP_EDITMODE_6, -2, 1, 0, 0, NumberKey6 },
+    { KEYMAP_EDITMODE_7, -2, 1, 0, 0, NumberKey7 },
+    { KEYMAP_EDITMODE_8, -2, 1, 0, 0, NumberKey8 },
+    { KEYMAP_EDITMODE_9, -2, 1, 0, 0, NumberKey9 },
+    { KEYMAP_SCREEN_SMALLER, -2, 1, 0, 0, ScreenSmaller },
+    { KEYMAP_SCREEN_LARGER, -2, 1, 0, 0, ScreenLarger },
+    { KEYMAP_BUY_ARMOUR, -2, 1, 0, 0, BuyArmour },
+    { KEYMAP_BUY_POWER, -2, 1, 0, 0, BuyPower },
+    { KEYMAP_BUY_OFFENSE, -2, 1, 0, 0, BuyOffense },
+    { KEYMAP_VIEW_NETPLAYER, -2, 1, 0, 0, ViewNetPlayer },
+    { KEYMAP_SEND_MESSAGE, -2, 1, 0, 0, UserSendMessage },
+    { KEYMAP_ARROW, -2, 1, 1, 0, ToggleArrow }, // commented out in original executable
+    { KEYMAP_INFO, -2, 1, 1, 0, ToggleInfo },
+    { KEYMAP_INFO, KEYMAP_SHIFT_ANY, 1, 1, 0, ToggleInfo },
+    { KEYMAP_INFO, KEYMAP_CONTROL_ANY, 1, 1, 0, ToggleInfo }
 };
 int gRepair_last_time;
 int gHad_auto_recover;
 tU32 gLast_repair_time;
 tEdit_mode gWhich_edit_mode = eEdit_mode_options;
-char* gEdit_mode_names[10];
-tEdit_func* gEdit_funcs[10][18][8];
+char* gEdit_mode_names[10] = {
+    "Cheat",
+    "Accessories",
+    "Special Volumes",
+    "Pedestrians",
+    "Opponents",
+    "Prat-cam",
+    "Depth effects",
+    "Damage",
+    "Bonnet",
+    "Options",
+};
+// order is: { None, CTRL, ALT, CTRL+ALT, SHIFT, CTRL+SHIFT, ALT+SHIFT, CTRL+ALT+SHIFT }
+tEdit_func* gEdit_funcs[10][18][8] = {
+    {  // eEdit_mode_cheat
+        { 0 },  // F5
+        { 0 },  // F6
+        { 0 },  // F7
+        { 0 },  // F8
+        { 0 },  // F10
+        { 0 },  // F11
+        { 0 },  // F12
+        { 0 },  // 0
+        { 0 },  // 1
+        { 0 },  // 2
+        { 0 },  // 3
+        { 0 },  // 4
+        { 0 },  // 5
+        { 0 },  // 6
+        { 0 },  // 7
+        { 0 },  // 8
+        { 0 },  // 9
+        { 0 },  // not used
+    },
+    {  // eEdit_mode_acc
+        { 0 },  // F5
+        { 0 },  // F6
+        { 0 },  // F7
+        { 0 },  // F8
+        { 0 },  // F10
+        { 0 },  // F11
+        { 0 },  // F12
+        { 0 },  // 0
+        { 0 },  // 1
+        { 0 },  // 2
+        { 0 },  // 3
+        { 0 },  // 4
+        { 0 },  // 5
+        { 0 },  // 6
+        { 0 },  // 7
+        { 0 },  // 8
+        { 0 },  // 9
+        { 0 },  // not used
+    },
+    {  // eEdit_mode_spec_vol
+        { 0 },  // F5
+        { 0 },  // F6
+        { 0 },  // F7
+        { 0 },  // F8
+        { 0 },  // F10
+        { 0 },  // F11
+        { 0 },  // F12
+        { 0 },  // 0
+        { 0 },  // 1
+        { 0 },  // 2
+        { 0 },  // 3
+        { 0 },  // 4
+        { 0 },  // 5
+        { 0 },  // 6
+        { 0 },  // 7
+        { 0 },  // 8
+        { 0 },  // 9
+        { 0 },  // not used
+    },
+    {  // eEdit_mode_ped
+        { 0 },  // F5
+        { 0 },  // F6
+        { 0 },  // F7
+        { 0 },  // F8
+        { 0 },  // F10
+        { 0 },  // F11
+        { 0 },  // F12
+        { 0 },  // 0
+        { 0 },  // 1
+        { 0 },  // 2
+        { 0 },  // 3
+        { 0 },  // 4
+        { 0 },  // 5
+        { 0 },  // 6
+        { 0 },  // 7
+        { 0 },  // 8
+        { 0 },  // 9
+        { 0 },  // not used
+    },
+    {  // eEdit_mode_opp
+        { 0 },  // F5
+        { 0 },  // F6
+        { 0 },  // F7
+        { 0 },  // F8
+        { 0 },  // F10
+        { 0 },  // F11
+        { 0 },  // F12
+        { 0 },  // 0
+        { 0 },  // 1
+        { 0 },  // 2
+        { 0 },  // 3
+        { 0 },  // 4
+        { 0 },  // 5
+        { 0 },  // 6
+        { 0 },  // 7
+        { 0 },  // 8
+        { 0 },  // 9
+        { 0 },  // not used
+    },
+    {  // eEdit_mode_pratcam
+        { 0 },  // F5
+        { 0 },  // F6
+        { 0 },  // F7
+        { 0 },  // F8
+        { 0 },  // F10
+        { 0 },  // F11
+        { 0 },  // F12
+        { 0 },  // 0
+        { 0 },  // 1
+        { 0 },  // 2
+        { 0 },  // 3
+        { 0 },  // 4
+        { 0 },  // 5
+        { 0 },  // 6
+        { 0 },  // 7
+        { 0 },  // 8
+        { 0 },  // 9
+        { 0 },  // not used
+    },
+    {  // eEdit_mode_depth
+        { 0 },  // F5
+        { 0 },  // F6
+        { 0 },  // F7
+        { 0 },  // F8
+        { 0 },  // F10
+        { 0 },  // F11
+        { 0 },  // F12
+        { 0 },  // 0
+        { 0 },  // 1
+        { 0 },  // 2
+        { 0 },  // 3
+        { 0 },  // 4
+        { 0 },  // 5
+        { 0 },  // 6
+        { 0 },  // 7
+        { 0 },  // 8
+        { 0 },  // 9
+        { 0 },  // not used
+    },
+    {  // eEdit_mode_damage
+        { 0 },  // F5
+        { 0 },  // F6
+        { 0 },  // F7
+        { 0 },  // F8
+        { 0 },  // F10
+        { 0 },  // F11
+        { 0 },  // F12
+        { 0 },  // 0
+        { 0 },  // 1
+        { 0 },  // 2
+        { 0 },  // 3
+        { 0 },  // 4
+        { 0 },  // 5
+        { 0 },  // 6
+        { 0 },  // 7
+        { 0 },  // 8
+        { 0 },  // 9
+        { 0 },  // not used
+    },
+    {  // eEdit_mode_bonnet
+        { 0 },  // F5
+        { 0 },  // F6
+        { 0 },  // F7
+        { 0 },  // F8
+        { 0 },  // F10
+        { 0 },  // F11
+        { 0 },  // F12
+        { 0 },  // 0
+        { 0 },  // 1
+        { 0 },  // 2
+        { 0 },  // 3
+        { 0 },  // 4
+        { 0 },  // 5
+        { 0 },  // 6
+        { 0 },  // 7
+        { 0 },  // 8
+        { 0 },  // 9
+        { 0 },  // not used
+    },
+    {  // eEdit_mode_options
+        { 0 },  // F5
+        { 0 },  // F6
+        { 0 },  // F7
+        { 0 },  // F8
+        { 0 },  // F10
+        { 0 },  // F11
+        { 0 },  // F12
+        { 0 },  // 0
+        { CycleCarSimplificationLevel, NULL, NULL, NULL, CycleCarTexturingLevel, },  // 1
+        { ToggleShadow, NULL, NULL, NULL, ToggleSmoke, },  // 2
+        { CycleWallTexturingLevel, NULL, NULL, NULL, CycleRoadTexturingLevel, },  // 3
+        { ToggleSky, NULL, NULL, NULL, ToggleDepthCueing, },  // 4
+        { CycleYonFactor, NULL, NULL, NULL, ToggleAccessoryRendering, },  // 5
+        { DecreaseYon, NULL, NULL, NULL, IncreaseYon,  },  // 6
+        { CycleSoundDetailLevel,  },  // 7
+        { 0 },  // 8
+        { 0 },  // 9
+        { 0 },  // not used
+    },
+};
 tCheat gKev_keys[44] = {
     { .code = 0xA11EE75D, .code2 = 0xF805EDDD, .action_proc = SetFlag, .num = 0x0A11EE75D },
     { .code = 0x564E78B9, .code2 = 0x99155115, .action_proc = SetFlag, .num = 0x564E78B9 },
@@ -146,7 +360,10 @@ int _unittest_controls_lastGetPowerup = 0;
 // IDA: void __cdecl AbortRace()
 void AbortRace() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (!gRace_finished) {
+        gAbandon_game = 1;
+    }
 }
 
 // IDA: void __cdecl F4Key()
@@ -154,13 +371,41 @@ void F4Key() {
     char s[256];
     tEdit_mode old_edit_mode;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    old_edit_mode = gWhich_edit_mode;
+    if (gI_am_cheating == 0xa11ee75d || (gI_am_cheating == 0x564e78b9 && gNet_mode == eNet_mode_none)) {
+        if (PDKeyDown(KEY_SHIFT_ANY)) {
+            gWhich_edit_mode--;
+            if ((int)gWhich_edit_mode == -1) {
+                gWhich_edit_mode = eEdit_mode_options;
+            }
+        } else {
+            gWhich_edit_mode++;
+            if (gWhich_edit_mode >= eEdit_mode_count) {
+                gWhich_edit_mode = eEdit_mode_cheat;
+            }
+        }
+        sprintf(s, "Edit mode: %s", gEdit_mode_names[gWhich_edit_mode]);
+        NewTextHeadupSlot2(4, 0, 2000, -4, s, 0);
+        if (gWhich_edit_mode == eEdit_mode_spec_vol && old_edit_mode != eEdit_mode_spec_vol) {
+            ShowSpecialVolumes();
+        } else if (gWhich_edit_mode != eEdit_mode_spec_vol && old_edit_mode == eEdit_mode_spec_vol) {
+            HideSpecialVolumes();
+        }
+    } else {
+        gWhich_edit_mode = eEdit_mode_options;
+    }
 }
 
 // IDA: void __usercall SetFlag(int i@<EAX>)
 void SetFlag(int i) {
     LOG_TRACE("(%d)", i);
-    NOT_IMPLEMENTED();
+
+    if (gNet_mode == eNet_mode_none) {
+        NewTextHeadupSlot(4, 0, 3000, -4, "You Cheat!");
+    }
+    gI_am_cheating = i;
+    F4Key();
 }
 
 // IDA: void __usercall FinishLap(int i@<EAX>)
@@ -189,7 +434,24 @@ void ShowSpecialVolumesIfRequ() {
 void DoEditModeKey(int pIndex) {
     int modifiers;
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+
+    if (gI_am_cheating == 0xa11ee75d || (gI_am_cheating == 0x564e78b9 && gNet_mode == eNet_mode_none)) {
+        modifiers = 0;
+        if (PDKeyDown(KEY_SHIFT_ANY)) {
+            modifiers |= 4;
+        }
+        if (PDKeyDown(KEY_ALT_ANY)) {
+            modifiers |= 2;
+        }
+        if (PDKeyDown(KEY_CTRL_ANY)) {
+            modifiers |= 1;
+        }
+        if (gEdit_funcs[gWhich_edit_mode][pIndex][modifiers] != NULL) {
+            gEdit_funcs[gWhich_edit_mode][pIndex][modifiers]();
+        }
+    } else {
+        gWhich_edit_mode = eEdit_mode_options;
+    }
 }
 
 // IDA: void __cdecl F5Key()
@@ -314,19 +576,65 @@ void NumberKey9() {
 // IDA: void __cdecl LookLeft()
 void LookLeft() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gAusterity_mode) {
+        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(192));
+    } else {
+        PratcamEvent(27);
+        gProgram_state.old_view = gProgram_state.which_view;
+        if (gProgram_state.which_view == eView_left) {
+            LookForward();
+        } else if (gProgram_state.which_view == eView_right) {
+            LookForward();
+            gProgram_state.pending_view = eView_left;
+        } else {
+            ClearWobbles();
+            gProgram_state.new_view = eView_left;
+            gProgram_state.view_change_start = PDGetTotalTime();
+            gProgram_state.pending_view = eView_undefined;
+        }
+    }
 }
 
 // IDA: void __cdecl LookForward()
 void LookForward() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gProgram_state.which_view == eView_right) {
+        PratcamEvent(27);
+    } else if (gProgram_state.which_view == eView_left) {
+        PratcamEvent(28);
+    }
+    if (gProgram_state.which_view != eView_forward) {
+        gProgram_state.old_view = gProgram_state.which_view;
+        ClearWobbles();
+        gProgram_state.new_view = eView_forward;
+        gProgram_state.view_change_start = PDGetTotalTime();
+        gProgram_state.pending_view = eView_undefined;
+    }
 }
 
 // IDA: void __cdecl LookRight()
 void LookRight() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gAusterity_mode) {
+        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(192));
+    } else {
+        PratcamEvent(28);
+        gProgram_state.old_view = gProgram_state.which_view;
+        if (gProgram_state.which_view == eView_right) {
+            LookForward();
+        } else if (gProgram_state.which_view == eView_left) {
+            LookForward();
+            gProgram_state.pending_view = eView_right;
+        } else {
+            ClearWobbles();
+            gProgram_state.new_view = eView_right;
+            gProgram_state.view_change_start = PDGetTotalTime();
+            gProgram_state.pending_view = eView_undefined;
+        }
+    }
 }
 
 // IDA: void __cdecl DamageTest()
@@ -550,7 +858,14 @@ void ToggleCockpit() {
 // IDA: void __cdecl ToggleMirror()
 void ToggleMirror() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gProgram_state.mirror_on = !gProgram_state.mirror_on;
+    ReinitialiseRearviewCamera();
+    if (gProgram_state.mirror_on) {
+        NewTextHeadupSlot(4, 0, 500, -4, GetMiscString(2));
+    } else {
+        NewTextHeadupSlot(4, 0, 500, -4, GetMiscString(3));
+    }
 }
 
 // IDA: void __cdecl ConcussMe()
@@ -573,7 +888,7 @@ void CheckLoadSave() {
 
     save_load_allowed = !gProgram_state.saving && !gProgram_state.loading && gProgram_state.prog_status == eProg_game_ongoing && !gProgram_state.dont_save_or_load;
 
-    if (CmdKeyDown(KEYMAP_F2, KEYMAP_S)) {
+    if (CmdKeyDown(KEYMAP_SAVE, KEYMAP_CTRL_SAVE)) {
         if (save_load_allowed) {
             FadePaletteDown();
             ClearEntireScreen();
@@ -587,7 +902,7 @@ void CheckLoadSave() {
         }
         WaitForNoKeys();
     }
-    if (CmdKeyDown(KEYMAP_F3, KEYMAP_L)) {
+    if (CmdKeyDown(KEYMAP_LOAD, KEYMAP_CTRL_LOAD)) {
         if (save_load_allowed && !gProgram_state.dont_load) {
             FadePaletteDown();
             ClearEntireScreen();
@@ -617,7 +932,7 @@ void CheckToggles(int pRacing) {
             new_state = 0;
             if (gToggle_array[i].key1 == -2 || KeyIsDown(gToggle_array[i].key1)) {
                 if (gToggle_array[i].key2 == -2 && gToggle_array[i].exact_modifiers) {
-                    if (!PDKeyDown(0) && !PDKeyDown(1) && !PDKeyDown(2) && !PDKeyDown(3)) {
+                    if (!PDKeyDown(KEY_SHIFT_ANY) && !PDKeyDown(KEY_ALT_ANY) && !PDKeyDown(KEY_CTRL_ANY) && !PDKeyDown(KEY_CTRL_ANY_2)) {
                         new_state = 1;
                     }
                 } else {
@@ -796,7 +1111,54 @@ void CheckMapRenderMove() {
     float old_y;
     LOG_TRACE("()");
 
-    STUB_ONCE();
+    old_y = gMap_render_y;
+    old_x = gMap_render_x;
+    if (gMap_mode) {
+        amount = gFrame_period * .1f;
+        if (KeyIsDown(30)) {
+            gMap_render_y -= amount;
+        } else if (KeyIsDown(31)) {
+            gMap_render_y += amount;
+        }
+        if (KeyIsDown(32)) {
+            gMap_render_x -= amount;
+        } else if (KeyIsDown(33)) {
+            gMap_render_x += amount;
+        }
+        if (gMap_render_x != old_x || gMap_render_y != old_y) {
+            SetIntegerMapRenders();
+            if (gMap_render_x_i < gCurrent_graf_data->map_render_x_marg) {
+                if (gReal_graf_data_index == 0) {
+                    gMap_render_x = (gCurrent_graf_data->map_render_x_marg + 3) & ~3;
+                } else {
+                    gMap_render_x = ((gCurrent_graf_data->map_render_x_marg + 3) & ~3) / 2;
+                }
+            }
+            if (gMap_render_y_i < gCurrent_graf_data->map_render_y_marg) {
+                if (gReal_graf_data_index == 0) {
+                    gMap_render_y = (gCurrent_graf_data->map_render_y_marg + 1) & ~1;
+                } else {
+                    gMap_render_y = (((gCurrent_graf_data->map_render_y_marg + 1) & ~1) - 40) / 2;
+                }
+            }
+            if (gBack_screen->width - gCurrent_graf_data->map_render_x_marg - gMap_render_width_i < gMap_render_x_i) {
+                if (gReal_graf_data_index == 0) {
+                    gMap_render_x = (gBack_screen->width - gCurrent_graf_data->map_render_x_marg - gMap_render_width_i) & ~3;
+                } else {
+                    gMap_render_x = ((gBack_screen->width - gCurrent_graf_data->map_render_x_marg - gMap_render_width_i) & ~3) / 2;
+                }
+            }
+            if (gBack_screen->height - gCurrent_graf_data->map_render_y_marg - gMap_render_height_i < gMap_render_y_i) {
+                if (gReal_graf_data_index == 0) {
+                    gMap_render_y = (gBack_screen->height - gCurrent_graf_data->map_render_y_marg - gMap_render_height_i) & ~1;
+                } else {
+                    gMap_render_y = (((gBack_screen->height - gCurrent_graf_data->map_render_y_marg - gMap_render_height_i) & ~3) - 40 ) / 2;
+                }
+            }
+            SetIntegerMapRenders();
+            AdjustRenderScreenSize();
+        }
+    }
 }
 
 // IDA: void __usercall ExplodeCar(tCar_spec *pCar@<EAX>)
@@ -1382,11 +1744,11 @@ void PollCameraControls(tU32 pTime_difference) {
     if (!gMap_mode && !gProgram_state.cockpit_on && (!gAction_replay_mode || gAction_replay_camera_mode <= eAction_replay_standard)) {
         if (KeyIsDown(31) || (up_and_down_mode && !going_up)) {
             gCamera_zoom = (double)pTime_difference * TIME_CONV_THING / (double)(2 * swirl_mode + 1) + gCamera_zoom;
-            if (gCamera_zoom > 2.0) {
-                gCamera_zoom = 2.0;
+            if (gCamera_zoom > 2.0f) {
+                gCamera_zoom = 2.0f;
             }
-            if (up_and_down_mode && gCamera_zoom > 1.0) {
-                gCamera_zoom = 1.0;
+            if (up_and_down_mode && gCamera_zoom > 1.0f) {
+                gCamera_zoom = 1.0f;
             }
         }
         if (KeyIsDown(30) || (up_and_down_mode && going_up)) {
@@ -1394,8 +1756,8 @@ void PollCameraControls(tU32 pTime_difference) {
             if (gCamera_zoom < 0.1) {
                 gCamera_zoom = 0.1;
                 if (up_and_down_mode) {
-                    if (gCamera_zoom < 1.0) {
-                        gCamera_zoom = 1.0;
+                    if (gCamera_zoom < 1.0f) {
+                        gCamera_zoom = 1.0f;
                     }
                 }
             }
@@ -1410,13 +1772,13 @@ void PollCameraControls(tU32 pTime_difference) {
 
         if ((gCamera_sign ? left : right)) {
             if (!gCamera_reset) {
-                gCamera_yaw += BrDegreeToAngle(pTime_difference * 0.050000001);
+                gCamera_yaw += BrDegreeToAngle(pTime_difference * 0.05f);
             }
             flag = 1;
         }
         if ((gCamera_sign ? right : left)) {
             if (!gCamera_reset) {
-                gCamera_yaw -= BrDegreeToAngle(pTime_difference * 0.050000001);
+                gCamera_yaw -= BrDegreeToAngle(pTime_difference * 0.05f);
             }
             if (flag) {
                 gCamera_yaw = 0;

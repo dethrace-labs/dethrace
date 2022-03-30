@@ -40,7 +40,7 @@
 #define AMBIENT_MULTIPLIER 0.01f
 #define NBR_FUNK_GROVE_FLAGS 30
 
-tHeadup_info gHeadup_image_info[31] = {
+tHeadup_info gHeadup_image_info[32] = {  // Modified by DethRace to fit the "demo timeout" fancy head-up.
     { "LADY.PIX", eNet_or_otherwise },
     { "GENT.PIX", eNet_or_otherwise },
     { "CODGER.PIX", eNet_or_otherwise },
@@ -71,7 +71,8 @@ tHeadup_info gHeadup_image_info[31] = {
     { "GAMEOVER.PIX", eNet_only },
     { "UBROKE.PIX", eNet_only },
     { "ULOST.PIX", eNet_only },
-    { "UWON.PIX", eNet_only }
+    { "UWON.PIX", eNet_only },
+    { "DTIMEOUT.PIX", eNot_net },   // Only used by the demo, not present in the full version
 };
 char* gYour_car_names[2][6];
 char* gDrivable_car_names[6];
@@ -676,7 +677,7 @@ void LoadKeyMapping() {
     LOG_TRACE("()");
 
     PathCat(the_path, gApplication_path, "KEYMAP_X.TXT");
-    the_path[strlen(the_path) - 5] = gKey_map_index + 48;
+    the_path[strlen(the_path) - 5] = '0' + gKey_map_index;
     f = DRfopen(the_path, "rt");
     if (!f) {
         FatalError(9);
@@ -1651,13 +1652,13 @@ void SetModelFlags(br_model* pModel, int pOwner) {
 
     if (pModel && pModel->nfaces) {
         if (pOwner == eDriver_net_human || gAusterity_mode) {
-            if ((pModel->flags & 0x80u) != 0) {
-                pModel->flags &= 0xFF7Du; // not BR_MODF_KEEP_ORIGINAL, not BR_MODF_UPDATEABLE
-                BrModelUpdate(pModel, 0x7FFFu);
+            if ((pModel->flags & BR_MODF_UPDATEABLE) != 0) {
+                pModel->flags &= ~(BR_MODF_KEEP_ORIGINAL | BR_MODF_UPDATEABLE);
+                BrModelUpdate(pModel, BR_MODU_ALL);
             }
         } else {
-            pModel->flags |= (BR_MODF_DONT_WELD | BR_MODF_KEEP_ORIGINAL | BR_MODF_UPDATEABLE);
-            BrModelUpdate(pModel, 0x7FFFu);
+            pModel->flags |= BR_MODF_DONT_WELD | BR_MODF_KEEP_ORIGINAL | BR_MODF_UPDATEABLE;
+            BrModelUpdate(pModel, BR_MODU_ALL);
         }
     }
 }
@@ -1723,9 +1724,9 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
         FatalError(113);
     }
     if (strcmp(pCar_name, "STELLA.TXT") == 0) {
-        pCar_spec->proxy_ray_distance = 6.0;
+        pCar_spec->proxy_ray_distance = 6.0f;
     } else {
-        pCar_spec->proxy_ray_distance = 0.0;
+        pCar_spec->proxy_ray_distance = 0.0f;
     }
     PathCat(the_path, gApplication_path, "CARS");
     PathCat(the_path, the_path, pCar_name);
@@ -1751,7 +1752,7 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
     if (strcmp(s, pCar_name) != 0)
         FatalError(115, pCar_name);
     if (*pDriver_name != '\0') {
-        memcpy(pCar_spec->driver_name, pDriver_name, sizeof(pCar_spec->driver_name));
+        strncpy(pCar_spec->driver_name, pDriver_name, sizeof(pCar_spec->driver_name));
         pCar_spec->driver_name[31] = 0;
     } else {
         pCar_spec->driver_name[0] = 'X';
@@ -2721,13 +2722,19 @@ void UnlockParts() {
 br_pixelmap* LoadChromeFont() {
     br_pixelmap* result;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    result = LoadPixelmap("CHRMFONT.PIX");
+    if (result == NULL) {
+        FatalError(59);
+    }
+    return result;
 }
 
 // IDA: void __usercall DisposeChromeFont(br_pixelmap *pThe_font@<EAX>)
 void DisposeChromeFont(br_pixelmap* pThe_font) {
     LOG_TRACE("(%p)", pThe_font);
-    NOT_IMPLEMENTED();
+
+    BrPixelmapFree(pThe_font);
 }
 
 // IDA: int __usercall GetALineAndInterpretCommand@<EAX>(FILE *pF@<EAX>, char **pString_list@<EDX>, int pCount@<EBX>)
@@ -3092,7 +3099,7 @@ FILE* OldDRfopen(char* pFilename, char* pMode) {
                     && strcmp(&pFilename[len - 12], "KEYMAP_2.TXT") != 0
                     && strcmp(&pFilename[len - 12], "KEYMAP_3.TXT") != 0
                     && strcmp(&pFilename[len - 11], "OPTIONS.TXT") != 0
-                    && strcmp(&pFilename[len - 11], "KEYNAMES.TXT") != 0
+                    && strcmp(&pFilename[len - 12], "KEYNAMES.TXT") != 0
                     && strcmp(&pFilename[len - 10], "KEYMAP.TXT") != 0
                     && strcmp(&pFilename[len - 9], "PATHS.TXT") != 0
                     && strcmp(&pFilename[len - 11], "PRATCAM.TXT") != 0) {

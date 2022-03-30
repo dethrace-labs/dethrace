@@ -7,10 +7,20 @@ br_clip_result PixelmapPointClip(br_point* out, br_point* in, br_pixelmap* pm) {
 
     out->x = in->x + pm->origin_x;
     out->y = in->y + pm->origin_y;
-    if (out->x >= 0 && out->y >= 0 && out->x < pm->width && out->y < pm->height) {
-        return BR_CLIP_ACCEPT;
+
+    if (out->x < 0) {
+        return BR_CLIP_REJECT;
     }
-    return BR_CLIP_REJECT;
+    if (out->y < 0) {
+        return BR_CLIP_REJECT;
+    }
+    if (out->x >= pm->width) {
+        return BR_CLIP_REJECT;
+    }
+    if (out->y >= pm->height) {
+        return BR_CLIP_REJECT;
+    }
+    return BR_CLIP_ACCEPT;
 }
 
 // IDA: br_clip_result __cdecl PixelmapLineClip(br_point *s_out, br_point *e_out, br_point *s_in, br_point *e_in, br_pixelmap *pm)
@@ -184,32 +194,32 @@ br_clip_result PixelmapRectangleClipTwo(br_rectangle* r_out, br_point* p_out, br
         r_out->y -= p_out->y;
         p_out->y = 0;
     }
-    if (pm_dst->width < p_out->x + r_out->w) {
+    if (p_out->x + r_out->w > pm_dst->width) {
         r_out->w = pm_dst->width - p_out->x;
     }
-    if (pm_dst->height < p_out->y + r_out->h) {
+    if (p_out->y + r_out->h > pm_dst->height) {
         r_out->h = pm_dst->height - p_out->y;
     }
     if (r_out->x < 0) {
         r_out->w += r_out->x;
-        p_out->y -= r_out->x;
-        r_out->y = 0;
+        p_out->x -= r_out->x;
+        r_out->x = 0;
     }
     if (r_out->y < 0) {
         r_out->h += r_out->y;
         p_out->y -= r_out->y;
         r_out->y = 0;
     }
-    if (pm_src->width < (r_out->x + r_out->w)) {
+    if (r_out->x + r_out->w > pm_src->width) {
         r_out->w = pm_src->width - r_out->x;
     }
-    if (pm_src->height < (r_out->y + r_out->h)) {
+    if (r_out->y + r_out->h > pm_src->height) {
         r_out->h = pm_src->height - r_out->y;
     }
-    if (r_out->w != 0 && r_out->h != 0) {
-        return BR_CLIP_PARTIAL;
+    if (r_out->w == 0 || r_out->h == 0) {
+        return BR_CLIP_REJECT;
     }
-    return BR_CLIP_REJECT;
+    return BR_CLIP_PARTIAL;
 }
 
 // IDA: br_clip_result __cdecl PixelmapCopyBitsClip(br_rectangle *r_out, br_point *p_out, br_rectangle *r_in, br_point *p_in, br_pixelmap *pm)
@@ -245,14 +255,14 @@ br_clip_result PixelmapCopyBitsClip(br_rectangle* r_out, br_point* p_out, br_rec
         r_out->y -= p_out->y;
         p_out->y = 0;
     }
-    if ((p_out->x + r_out->w) > pm->width) {
+    if (p_out->x + r_out->w > pm->width) {
         r_out->w = pm->width - p_out->x;
     }
-    if ((p_out->y + r_out->h) > pm->height) {
+    if (p_out->y + r_out->h > pm->height) {
         r_out->h = pm->height - p_out->y;
     }
-    if (r_out->w != 0 && r_out->h != 0) {
-        return BR_CLIP_PARTIAL;
+    if (r_out->w == 0 || r_out->h == 0) {
+        return BR_CLIP_REJECT;
     }
-    return BR_CLIP_REJECT;
+    return BR_CLIP_PARTIAL;
 }

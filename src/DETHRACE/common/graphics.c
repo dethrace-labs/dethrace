@@ -403,8 +403,6 @@ void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
     if (pDest_y + pOffset_y >= 0) {
         destn_ptr = (char*)pDest->pixels + pDest->row_bytes * (pDest_y + pOffset_y);
     } else {
-        LOG_DEBUG("%d, %d", pDest_y, pOffset_y);
-
         pSource = SkipLines(pSource, -pDest_y - pOffset_y);
         destn_ptr = (char*)pDest->pixels;
         height += pDest_y + pOffset_y;
@@ -425,7 +423,8 @@ void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
         pSource++;
         x_byte = off_the_left;
         for (j = 0; j < number_of_chunks; j++) {
-            chunk_length = *pSource++;
+            chunk_length = *pSource;
+            pSource++;
             if (chunk_length >= 0) {
                 old_x_byte = x_byte;
                 x_byte += chunk_length;
@@ -485,7 +484,7 @@ void SetBRenderScreenAndBuffers(int pX_offset, int pY_offset, int pWidth, int pH
         FatalError(1);
     }
     gDepth_buffer = BrPixelmapMatch(gBack_screen, BR_PMMATCH_DEPTH_16);
-    if (!gDepth_buffer) {
+    if (gDepth_buffer == NULL) {
         FatalError(2);
     }
     BrZbBegin(gRender_screen->type, gDepth_buffer->type);
@@ -496,7 +495,16 @@ void SetBRenderScreenAndBuffers(int pX_offset, int pY_offset, int pWidth, int pH
 void SetIntegerMapRenders() {
     LOG_TRACE("()");
 
-    STUB();
+    gMap_render_x_i = ((int)gMap_render_x) & ~3;
+    gMap_render_y_i = ((int)gMap_render_y) & ~1;
+    gMap_render_width_i = ((int)gMap_render_width) & ~3;
+    gMap_render_height_i = ((int)gMap_render_height) & ~1;
+    if (gReal_graf_data_index != 0) {
+        gMap_render_x_i = 2 * gMap_render_x_i;
+        gMap_render_y_i = 2 * gMap_render_y_i + 40;
+        gMap_render_width_i = 2 * gMap_render_width_i;
+        gMap_render_height_i = 2 * gMap_render_height_i;
+    }
 }
 
 // IDA: void __cdecl AdjustRenderScreenSize()
@@ -1356,8 +1364,8 @@ int ConditionallyFillWithSky(br_pixelmap* pPixelmap) {
 
     // TODO: Uncomment when ExternalSky is fully implemented
     LOG_WARN_ONCE("Uncomment this block when ExternalSky is fully implemented");
-    // if (gProgram_state.current_depth_effect.sky_texture
-    //     && (!gLast_camera_special_volume || gLast_camera_special_volume->sky_col < 0)) {
+    // if (gProgram_state.current_depth_effect.sky_texture != NULL
+    //     && (gLast_camera_special_volume == NULL || gLast_camera_special_volume->sky_col < 0)) {
     //     return 0;
     // }
 
@@ -2539,7 +2547,7 @@ void LoadFont(int pFont_ID) {
     tU32 the_size;
     LOG_TRACE("(%d)", pFont_ID);
 
-    if (gFonts[pFont_ID].images) {
+    if (gFonts[pFont_ID].images != NULL) {
         return;
     }
 
@@ -2550,14 +2558,14 @@ void LoadFont(int pFont_ID) {
     strcat(the_path, ".PIX");
     gFonts[pFont_ID].images = DRPixelmapLoad(the_path);
 
-    if (!gFonts[pFont_ID].images) {
+    if (gFonts[pFont_ID].images == NULL) {
         FatalError(20, gFont_names[pFont_ID]);
     }
     if (!gFonts[pFont_ID].file_read_once) {
         strcpy(&the_path[number_of_chars + 1], "TXT");
 
         f = DRfopen(the_path, "rt");
-        if (!f) {
+        if (f == NULL) {
             FatalError(21, gFont_names[pFont_ID]);
         }
 
@@ -2976,8 +2984,8 @@ void DRPixelmapDoubledCopy(br_pixelmap* pDestn, br_pixelmap* pSource, int pSourc
 
     dst_row_skip = 2 * pDestn->row_bytes - 2 * pSource_width;
     src_row_skip = (pSource->row_bytes - pSource_width) / 2;
-    sptr = (tU16*)((tU8*)pSource->pixels - 2 * src_row_skip + (pSource->row_bytes * pSource_height / 2) * 2);
-    dptr = (tU8*)pDestn->pixels + pSource_width * 2 + (2 * pSource_height + pY_offset) * pDestn->row_bytes - pDestn->row_bytes;
+    sptr = (tU16*)((tU8*)pSource->pixels - 2 * src_row_skip + 2 * (pSource->row_bytes * pSource_height / 2));
+    dptr = (tU8*)pDestn->pixels + 2 * pSource_width + (2 * pSource_height + pY_offset) * pDestn->row_bytes - pDestn->row_bytes;
     dptr2 = dptr - pDestn->row_bytes;
     width_over_2 = pSource_width / 2;
     for (i = 0; i < pSource_height; i++) {

@@ -770,14 +770,9 @@ void NetPlayerStatusChanged(tPlayer_status pNew_status) {
     LOG_TRACE("(%d)", pNew_status);
     tNet_message* the_message;
 
-    STUB();
-    return;
-
-    if (gNet_mode && pNew_status != gNet_players[gThis_net_player_index].player_status) {
+    if (gNet_mode != eNet_mode_none && pNew_status != gNet_players[gThis_net_player_index].player_status) {
         gNet_players[gThis_net_player_index].player_status = pNew_status;
-        the_message = NetBuildMessage(0xAu, 0);
-        the_message->contents.data.report.status = gNet_players[gThis_net_player_index].player_status;
-        NetSendMessageToAllPlayers(gCurrent_net_game, the_message);
+        BroadcastStatus();
         if (gProgram_state.current_car.disabled && pNew_status >= ePlayer_status_racing && pNew_status != ePlayer_status_recovering) {
             EnableCar(&gProgram_state.current_car);
         } else if (!gProgram_state.current_car.disabled && pNew_status < ePlayer_status_racing) {

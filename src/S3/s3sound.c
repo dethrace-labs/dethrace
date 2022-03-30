@@ -23,3 +23,7 @@ int S3SoundStillPlaying(tS3_sound_tag pSound) {
 int S3StopSound(tS3_sound_tag pSound_tag) {
     return 0;
 }
+
+void S3StopOutletSound(tS3_outlet_ptr pOutlet) {
+    return;
+}

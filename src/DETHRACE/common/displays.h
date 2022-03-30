@@ -26,7 +26,7 @@ extern int gTimer_headup;
 extern int gTime_awarded_headup;
 extern int gPed_kill_count_headup;
 extern int gDim_amount;
-extern br_pixelmap* gHeadup_images[31];
+extern br_pixelmap* gHeadup_images[32];
 extern int gNet_cash_headup;
 extern int gNet_ped_headup;
 extern int gCredits_lost_headup;

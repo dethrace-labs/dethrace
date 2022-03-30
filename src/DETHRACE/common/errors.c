@@ -1,16 +1,16 @@
 #include "errors.h"
-
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
+#include "cutscene.h"
 #include "globvars.h"
 #include "graphics.h"
 #include "harness/trace.h"
 #include "network.h"
 #include "pd/sys.h"
 #include "utility.h"
+
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 char* gError_messages[126] = {
     "Unable to support this screen depth setting",
@@ -131,7 +131,7 @@ char* gError_messages[126] = {
     "File % is corrupted",
     "Random number out of range (%)",
 };
-int gError_code = -90000;
+int gError_code;
 char* gPalette_copy__errors; // suffix added to avoid duplicate symbol
 int gPixel_buffer_size__errors; // suffix added to avoid duplicate symbol
 int gMouse_was_started__errors; // suffix added to avoid duplicate symbol
@@ -149,7 +149,7 @@ void FatalError(int pStr_index, ...) {
 
     va_start(ap, pStr_index);
 
-    gError_code = 0x20000000 + PDGetTotalTime();
+    gLast_demo_end_anim = 0x20000000 + PDGetTotalTime();
     strcpy(the_str, gError_messages[pStr_index]);
     sub_pt = temp_str;
 

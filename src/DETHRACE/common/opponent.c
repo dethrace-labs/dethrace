@@ -1075,7 +1075,10 @@ void DisposeOpponents() {
     int i;
     LOG_TRACE("()");
 
-    STUB();
+    for (i = 0; i < gProgram_state.AI_vehicles.number_of_cops; i++) {
+        DisposeCar(gProgram_state.AI_vehicles.cops[i].car_spec, (i == gBIG_APC_index) ? 4 : 3);
+        BrMemFree(gProgram_state.AI_vehicles.cops[i].car_spec);
+    }
 }
 
 // IDA: void __usercall WakeUpOpponentsToTheFactThatTheStartHasBeenJumped(int pWhat_the_countdown_was@<EAX>)

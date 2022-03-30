@@ -62,12 +62,12 @@ void ToggleInfo() {
     LOG_TRACE("()");
 
     if (gProgram_state.game_completed) {
-        if (KeyIsDown(KEYMAP_LCTRL)) {
-            gAR_fudge_headups = gAR_fudge_headups == 0;
+        if (KeyIsDown(KEYMAP_CONTROL_ANY)) {
+            gAR_fudge_headups = !gAR_fudge_headups;
         } else {
-            gInfo_on = gInfo_on == 0;
+            gInfo_on = !gInfo_on;
             if (gInfo_on) {
-                gInfo_mode = PDKeyDown(KEY_LSHIFT);
+                gInfo_mode = PDKeyDown(KEY_SHIFT_ANY);
             }
         }
     }
@@ -143,7 +143,7 @@ void MungeHeadups() {
     LOG_TRACE("()");
 
     ClearHeadupSlot(3);
-    gMr_odo = (double)gFrame_period * gProgram_state.current_car.speedo_speed * 6.9000001 / 1600.0 + gMr_odo;
+    gMr_odo = (double)gFrame_period * gProgram_state.current_car.speedo_speed * WORLD_SCALE / 1600.0 + gMr_odo;
     if (gInfo_on) {
         bearing = 360.0 - FastScalarArcTan2(gCamera_to_world.m[0][2], gCamera_to_world.m[2][2]);
         if (gInfo_mode) {
@@ -209,7 +209,7 @@ void MungeHeadups() {
         effective_timer = gFrame_period * 10.0 + gLast_time_headup;
     }
     gLast_time_headup = effective_timer;
-    if (gNet_mode) {
+    if (gNet_mode != eNet_mode_none) {
         DoNetworkHeadups(net_credits);
     } else {
         if (net_credits < 0) {
@@ -271,7 +271,7 @@ void MungeHeadups() {
             if (gTimer) {
                 if (the_time - last_rattle_time > 15) {
                     previous_gtimer = gTimer;
-                    gTimer -= 1000 * ((the_time - last_rattle_time) / 0xF);
+                    gTimer -= 1000 * ((the_time - last_rattle_time) / 15);
                     if (gTimer < 0) {
                         gTimer = 0;
                     }
@@ -439,14 +439,16 @@ void CheckTimer() {
         }
 
         if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo) {
-            time_left = 240000 - GetRaceTime();
-            time_in_seconds = (time_left + 500) / 1000;
-            if (time_in_seconds != last_demo_time_in_seconds && time_in_seconds <= 10)
-                DRS3StartSound(gIndexed_outlets[4], 1001);
-            last_demo_time_in_seconds = time_in_seconds;
-            if (time_left <= 0) {
-                gTimer = 0;
-                RaceCompleted(eRace_over_demo);
+            if (harness_game_config.demo_timeout != 0) {
+                time_left = harness_game_config.demo_timeout - GetRaceTime();
+                time_in_seconds = (time_left + 500) / 1000;
+                if (time_in_seconds != last_demo_time_in_seconds && time_in_seconds <= 10)
+                    DRS3StartSound(gIndexed_outlets[4], 1001);
+                last_demo_time_in_seconds = time_in_seconds;
+                if (time_left <= 0) {
+                    gTimer = 0;
+                    RaceCompleted(eRace_over_demo);
+                }
             }
         }
     }

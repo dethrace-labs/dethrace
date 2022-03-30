@@ -227,8 +227,9 @@ void PDSetKeyArray(int* pKeys, int pMark) {
     Harness_Hook_PDSetKeyArray();
 
     gKeys_pressed = 0;
-    for (i = 0; i < 123; i++) {
-        if (KeyDown(gScan_code[i][0]) || KeyDown(gScan_code[i][1])) {
+    for (i = 0; i < COUNT_OF(gScan_code); i++) {
+        if (KeyDown(gScan_code[i][0])) {  //} || KeyDown(gScan_code[i][1])) {
+
             gKeys_pressed = (gKeys_pressed << 8) + i + 1;
             pKeys[i] = pMark;
         } else if (pKeys[i] == pMark) {
