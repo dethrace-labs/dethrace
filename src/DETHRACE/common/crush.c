@@ -503,7 +503,17 @@ void RecordLastDamage(tCar_spec* pCar) {
     int i;
     LOG_TRACE("(%p)", pCar);
 
-    STUB_ONCE();
+    for (i = 0; i < COUNT_OF(pCar->damage_units); i++) {
+        pCar->damage_units[i].last_level = pCar->damage_units[i].damage_level;
+    }
+    pCar->damage_magnitude_accumulator = 0.0;
+    pCar->last_impact_location = eImpact_unknown;
+    pCar->pre_car_col_mat = pCar->car_master_actor->t.t.mat;
+    pCar->pre_car_col_speed = pCar->speed;
+    pCar->pre_car_col_knackered = pCar->knackered;
+    pCar->pre_car_col_direction = pCar->direction;
+    pCar->pre_car_col_velocity = pCar->v;
+    pCar->pre_car_col_velocity_car_space = pCar->velocity_car_space;
 }
 
 // IDA: void __usercall DoDamage(tCar_spec *pCar@<EAX>, tDamage_type pDamage_type@<EDX>, float pMagnitude, float pNastiness)
