@@ -337,7 +337,6 @@ void PrepareGroups(br_model* model) {
         for (v = 0; v < 3; v++, i++, gtvp++) {
 
             if (model->flags & BR_MODF_CUSTOM_NORMALS) {
-                LOG_DEBUG("normals?");
                 TELL_ME_IF_WE_PASS_THIS_WAY();
                 // gtvp->n.v[0] = model->vertices[fp->vertices[v]].n.v[0];
                 // gtvp->n.v[1] = model->vertices[fp->vertices[v]].n.v[1];
