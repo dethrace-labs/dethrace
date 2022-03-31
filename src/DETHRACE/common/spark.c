@@ -57,6 +57,8 @@ br_material* gBlack_material;
 tShrapnel gShrapnel[15];
 
 #define MAX_SMOKE_COLUMNS 5
+#define FLAME_ANIMATION_FRAME_INTERVAL 40
+#define SMOKE_COLUMN_NEW_PUFF_INTERVAL 30
 
 // IDA: void __cdecl DrawDot(br_scalar z, tU8 *scr_ptr, tU16 *depth_ptr, tU8 *shade_ptr)
 void DrawDot(br_scalar z, tU8* scr_ptr, tU16* depth_ptr, tU8* shade_ptr) {
@@ -1411,9 +1413,18 @@ void FlameAnimate(int c, br_vector3* pPos, tU32 pTime) {
         return;
     }
     for (i = 0; i < COUNT_OF(col->frame_count); i++) {
+
+#ifdef DETHRACE_FIX_BUGS
+        col->frame_time[i] += pTime;
+        if (col->frame_time[i] > FLAME_ANIMATION_FRAME_INTERVAL) {
+            col->frame_time[i] = 0;
+            col->frame_count[i]++;
+        }
+#else
         col->frame_count[i]++;
-        LOG_DEBUG("frame %d", col->frame_count[i]);
-        if (col->frame_count[i] >= 20) {
+#endif
+
+        if (col->frame_count[i] >= COUNT_OF(gFlame_map)) {
             StartPipingSession(ePipe_chunk_flame);
             AddFlameToPipingSession(i + 16 * c, col->frame_count[i] + 1, col->scale_x[i], col->scale_y[i], col->offset_x[i], col->offset_z[i]);
             EndPipingSession();
@@ -1424,7 +1435,7 @@ void FlameAnimate(int c, br_vector3* pPos, tU32 pTime) {
             col->offset_z[i] = SRandomBetween(-0.03f, 0.0);
             actor->type = BR_ACTOR_NONE;
         }
-        if (!col->frame_count[i]) {
+        if (col->frame_count[i] == 0) {
             if (BrVector3LengthSquared(&col->car->v) >= 80.0f || col->lifetime <= 30 * pTime) {
                 col->frame_count[i] = -5;
             } else {
@@ -1486,8 +1497,6 @@ void ReplaySmokeColumn(tU32 pTime) {
     NOT_IMPLEMENTED();
 }
 
-int munge_smoke_column_last_called = 0;
-
 // IDA: void __usercall MungeSmokeColumn(tU32 pTime@<EAX>)
 void MungeSmokeColumn(tU32 pTime) {
     int i;
@@ -1505,13 +1514,6 @@ void MungeSmokeColumn(tU32 pTime) {
     tCar_spec* c;
     LOG_TRACE("(%d)", pTime);
 
-    if (GetTotalTime() - munge_smoke_column_last_called < 40) {
-        LOG_DEBUG("skip");
-        return;
-    }
-    LOG_DEBUG("munging");
-    munge_smoke_column_last_called = GetTotalTime();
-
     if (gColumn_flags == 0) {
         return;
     }
@@ -1519,8 +1521,6 @@ void MungeSmokeColumn(tU32 pTime) {
         ReplaySmokeColumn(pTime);
         return;
     }
-
-    LOG_DEBUG("pTime %d", pTime);
 
     gMechanics_time_sync = 1;
     for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
@@ -1546,12 +1546,13 @@ void MungeSmokeColumn(tU32 pTime) {
             }
             gSmoke_column[i].time += pTime;
             if (gSmoke_column[i].time > 200) {
-                //#ifdef DETHRACE_FIX_BUGS
+#ifdef DETHRACE_FIX_BUGS
                 // At higher FPS, `CreatePuffOfSmoke` is called too often and causes smoke cirlces to be recycled too quickly
-                gSmoke_column[i].time -= fmaxf(40, pTime);
-                //#else
+                // so assume around 25fps
+                gSmoke_column[i].time -= fmaxf(SMOKE_COLUMN_NEW_PUFF_INTERVAL, pTime);
+#else
                 gSmoke_column[i].time -= pTime;
-                //#endif
+#endif
                 gSmoke_column[i].count++;
                 BrVector3Cross(&v, &c->omega, &car_pos);
                 BrMatrix34ApplyV(&car_pos, &v, &c->car_master_actor->t.t.mat);

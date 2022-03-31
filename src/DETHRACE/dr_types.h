@@ -780,7 +780,7 @@ typedef struct tCar_controls {
     unsigned int right : 1; // 0x20000   bit 18
     unsigned int acc : 1; // 0x40000   bit 19
     unsigned int dec : 1; // 0x80000   bit 20
-    unsigned int brake : 1; //0x100000   bit 21
+    unsigned int brake : 1; // 0x100000   bit 21
     unsigned int up : 1; // 0x200000   bit 22
     unsigned int down : 1; // 0x400000   bit 23
     unsigned int holdw : 1; // 0x800000   bit 24
@@ -3095,8 +3095,8 @@ typedef struct tQueued_headup {
     char text[256];
 } tQueued_headup;
 
-//typedef unsigned long time_t;
-//typedef unsigned long clock_t;
+// typedef unsigned long time_t;
+// typedef unsigned long clock_t;
 typedef struct tFlicette {
     int flic_index;
     int x[2];
@@ -3655,6 +3655,7 @@ typedef struct tSmoke_column {
     int whiter;
     br_actor* flame_actor;
     int frame_count[3];
+
     br_vector3 pos;
     br_scalar scale_x[3];
     br_scalar scale_y[3];
@@ -3663,6 +3664,9 @@ typedef struct tSmoke_column {
     tU32 smudge_timer;
     int vertex_index;
     int upright;
+#ifdef DETHRACE_FIX_BUGS
+    br_scalar frame_time[3];
+#endif
 } tSmoke_column;
 
 typedef struct tSplash {

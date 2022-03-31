@@ -8,6 +8,7 @@
 #include "loading.h"
 #include "netgame.h"
 #include "oil.h"
+#include "opponent.h"
 #include "piping.h"
 #include "spark.h"
 #include "utility.h"
@@ -325,7 +326,19 @@ void TotallySpamTheModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, tC
     br_vertex* the_vertex;
     br_vertex* vertices;
     LOG_TRACE("(%p, %d, %p, %p, %f)", pCar, pModel_index, pActor, pCrush_data, pMagnitude);
-    NOT_IMPLEMENTED();
+
+    if (gArrow_mode || pCrush_data->number_of_crush_points == 0) {
+        return;
+    }
+    the_vertex = pActor->model->vertices;
+    for (i = 0; i < 15; i++) {
+        the_index = IRandomBetween(0, pCrush_data->number_of_crush_points - 1);
+        energy_vector_model = the_vertex[pCrush_data->crush_points[the_index].vertex_index].p;
+        BrVector3Normalise(&energy_vector_model, &energy_vector_model);
+        BrVector3Scale(&energy_vector_model, &energy_vector_model, -pMagnitude);
+        CrushModelPoint(pCar, pModel_index, pActor->model, the_index, &energy_vector_model, pMagnitude, pCrush_data);
+    }
+    SetModelForUpdate(pActor->model, pCar, 1);
 }
 
 // IDA: br_scalar __usercall RepairModel@<ST0>(tCar_spec *pCar@<EAX>, int pModel_index@<EDX>, br_actor *pActor@<EBX>, br_vertex *pUndamaged_vertices@<ECX>, br_scalar pAmount, br_scalar *pTotal_deflection)
@@ -339,7 +352,47 @@ br_scalar RepairModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, br_ve
     br_scalar deviation;
     tChanged_vertex pipe_array[600];
     LOG_TRACE("(%p, %d, %p, %p, %f, %p)", pCar, pModel_index, pActor, pUndamaged_vertices, pAmount, pTotal_deflection);
-    NOT_IMPLEMENTED();
+
+    pipe_vertex_count = 0;
+    amount = 0.0f;
+    *pTotal_deflection = 0.0f;
+
+    for (i = 0; i < pActor->model->nvertices; i++) {
+        model_vertex = &pActor->model->vertices[i];
+        old_point = model_vertex->p;
+        for (j = 0; j < 3; ++j) {
+            *pTotal_deflection = fabsf(pUndamaged_vertices->p.v[j] - old_point.v[j]) + *pTotal_deflection;
+            if (pUndamaged_vertices->p.v[j] >= old_point.v[j]) {
+                if (pUndamaged_vertices->p.v[j] > old_point.v[j]) {
+                    model_vertex->p.v[j] = model_vertex->p.v[j] + pAmount;
+                    if (pUndamaged_vertices->p.v[j] < model_vertex->p.v[j]) {
+                        model_vertex->p.v[j] = pUndamaged_vertices->p.v[j];
+                    }
+                    amount = model_vertex->p.v[j] - old_point.v[j] + amount;
+                }
+            } else {
+                model_vertex->p.v[j] = model_vertex->p.v[j] - pAmount;
+                if (pUndamaged_vertices->p.v[j] > model_vertex->p.v[j]) {
+                    model_vertex->p.v[j] = pUndamaged_vertices->p.v[j];
+                }
+                amount = old_point.v[j] - model_vertex->p.v[j] + amount;
+            }
+        }
+        if (amount != 0.0 && IsActionReplayAvailable() && pipe_vertex_count < COUNT_OF(pipe_array)) {
+            pipe_array[pipe_vertex_count].vertex_index = i;
+            BrVector3Sub(&pipe_array[pipe_vertex_count].delta_coordinates, &model_vertex->p, &old_point);
+            // pipe_array[pipe_vertex_count].delta_coordinates.v[0] = model_vertex->p.v[0] - old_point.v[0];
+            // pipe_array[pipe_vertex_count].delta_coordinates.v[1] = model_vertex->p.v[1] - old_point.v[1];
+            // pipe_array[pipe_vertex_count].delta_coordinates.v[2] = model_vertex->p.v[2] - old_point.v[2];
+            pipe_vertex_count++;
+        }
+        pUndamaged_vertices++;
+    }
+    SetModelForUpdate(pActor->model, pCar, 0);
+    if (IsActionReplayAvailable() && pipe_vertex_count) {
+        PipeSingleModelGeometry(pCar->car_ID, pModel_index, pipe_vertex_count, pipe_array);
+    }
+    return amount;
 }
 
 // IDA: float __usercall RepairCar2@<ST0>(tCar_spec *pCar@<EAX>, tU32 pFrame_period@<EDX>, br_scalar *pTotal_deflection@<EBX>)
@@ -349,13 +402,36 @@ float RepairCar2(tCar_spec* pCar, tU32 pFrame_period, br_scalar* pTotal_deflecti
     br_scalar amount;
     br_scalar dummy;
     LOG_TRACE("(%p, %d, %p)", pCar, pFrame_period, pTotal_deflection);
-    NOT_IMPLEMENTED();
+
+    if (gArrow_mode) {
+        return 0.0f;
+    }
+    *pTotal_deflection = 0.0;
+    amount = 0.0;
+
+    for (i = 0; i < gProgram_state.current_car.car_actor_count; i++) {
+        the_car_actor = &pCar->car_model_actors[i];
+        if (the_car_actor->min_distance_squared == 0.0 || !the_car_actor->undamaged_vertices) {
+            if (the_car_actor->undamaged_vertices) {
+                amount = RepairModel(pCar, i, the_car_actor->actor, the_car_actor->undamaged_vertices, pFrame_period * 0.00005f, pTotal_deflection);
+            }
+        } else {
+            RepairModel(pCar, i, the_car_actor->actor, the_car_actor->undamaged_vertices, pFrame_period * 0.00005f, &dummy);
+        }
+    }
+    pCar->repair_time += pFrame_period;
+    return amount;
 }
 
 // IDA: float __usercall RepairCar@<ST0>(tU16 pCar_ID@<EAX>, tU32 pFrame_period@<EDX>, br_scalar *pTotal_deflection@<EBX>)
 float RepairCar(tU16 pCar_ID, tU32 pFrame_period, br_scalar* pTotal_deflection) {
     LOG_TRACE("(%d, %d, %p)", pCar_ID, pFrame_period, pTotal_deflection);
-    NOT_IMPLEMENTED();
+
+    if (VEHICLE_TYPE_FROM_ID(pCar_ID) == eVehicle_self) {
+        return RepairCar2(&gProgram_state.current_car, pFrame_period, pTotal_deflection);
+    }
+
+    return RepairCar2(GetCarSpec(VEHICLE_TYPE_FROM_ID(pCar_ID), VEHICLE_INDEX_FROM_ID(pCar_ID)), pFrame_period, pTotal_deflection);
 }
 
 // IDA: void __usercall TotallyRepairACar(tCar_spec *pCar@<EAX>)

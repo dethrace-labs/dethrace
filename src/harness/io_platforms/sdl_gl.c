@@ -205,11 +205,7 @@ void Window_PollEvents() {
                 LOG_WARN("unexpected scan code %s (%d)", SDL_GetScancodeName(event.key.keysym.scancode), event.key.keysym.scancode);
                 return;
             }
-            if (event.key.type == SDL_KEYDOWN) {
-                sdl_key_state[event.key.keysym.scancode] = 1;
-            } else {
-                sdl_key_state[event.key.keysym.scancode] = 0;
-            }
+            sdl_key_state[scancodes_sdl2dethrace[event.key.keysym.scancode]] = event.type == SDL_KEYDOWN;
 
             sdl_key_state[0] = sdl_key_state[scancodes_sdl2dethrace[SDL_SCANCODE_LSHIFT]] || sdl_key_state[scancodes_sdl2dethrace[SDL_SCANCODE_RSHIFT]];
             sdl_key_state[1] = sdl_key_state[scancodes_sdl2dethrace[SDL_SCANCODE_LALT]] || sdl_key_state[scancodes_sdl2dethrace[SDL_SCANCODE_RALT]];

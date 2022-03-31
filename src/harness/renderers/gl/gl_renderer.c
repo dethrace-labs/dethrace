@@ -193,7 +193,7 @@ void GLRenderer_Init(int width, int height, int pRender_width, int pRender_heigh
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDepthFunc(GL_LESS);
-    glEnable(GL_CULL_FACE);
+    // glDisable(GL_CULL_FACE);
     glClearColor(0, 0, 0, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -454,25 +454,33 @@ void GLRenderer_BufferModel(br_model* model) {
     CHECK_GL_ERROR("after build model");
 }
 
+tStored_material* current_material;
 void setActiveMaterial(tStored_material* material) {
-    if (material) {
-        glUniform1i(uniforms_3d.palette_index_override, material->index_base);
-        if (material->shade_table) {
-            GLRenderer_SetShadeTable(material->shade_table);
-        }
-        if ((material->flags & BR_MATF_LIGHT) && !(material->flags & BR_MATF_PRELIT) && material->shade_table) {
-            // TODO: light value shouldn't always be 0? Works for shadows, not sure about other things.
-            glUniform1i(uniforms_3d.light_value, 0);
-        } else {
-            glUniform1i(uniforms_3d.light_value, -1);
-        }
+    if (material == NULL || material == current_material) {
+        return;
+    }
 
-        if (material->pixelmap) {
-            tStored_pixelmap* stored_px = material->pixelmap->stored;
-            if (stored_px) {
-                glBindTexture(GL_TEXTURE_2D, stored_px->id);
-                glUniform1i(uniforms_3d.palette_index_override, -1);
-            }
+    glUniform1i(uniforms_3d.palette_index_override, material->index_base);
+    if (material->shade_table) {
+        GLRenderer_SetShadeTable(material->shade_table);
+    }
+    if ((material->flags & BR_MATF_LIGHT) && !(material->flags & BR_MATF_PRELIT) && material->shade_table) {
+        // TODO: light value shouldn't always be 0? Works for shadows, not sure about other things.
+        glUniform1i(uniforms_3d.light_value, 0);
+    } else {
+        glUniform1i(uniforms_3d.light_value, -1);
+    }
+    if (material->flags & BR_MATF_ALWAYS_VISIBLE) {
+        glDisable(GL_CULL_FACE);
+    } else {
+        glEnable(GL_CULL_FACE);
+    }
+
+    if (material->pixelmap) {
+        tStored_pixelmap* stored_px = material->pixelmap->stored;
+        if (stored_px) {
+            glBindTexture(GL_TEXTURE_2D, stored_px->id);
+            glUniform1i(uniforms_3d.palette_index_override, -1);
         }
     }
 }
