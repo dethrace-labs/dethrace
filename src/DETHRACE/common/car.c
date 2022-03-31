@@ -2935,10 +2935,7 @@ void CrushAndDamageCar(tCar_spec* c, br_vector3* pPosition, br_vector3* pForce_c
                 if (car2->driver >= eDriver_net_human) {
                     if (gNet_mode
                         && (gCurrent_net_game->type == eNet_game_type_fight_to_death || gCurrent_net_game->type == eNet_game_type_car_crusher)) {
-                        fudge_multiplier = gOffensive_powerup_factor[car2->power_up_levels[2]]
-                            * gNet_offensive[gCurrent_net_game->type]
-                            * car2->damage_multiplier
-                            * fudge_multiplier;
+                        fudge_multiplier = gOffensive_powerup_factor[car2->power_up_levels[2]] * gNet_offensive[gCurrent_net_game->type] * car2->damage_multiplier * fudge_multiplier;
                     } else {
                         fudge_multiplier = gOffensive_powerup_factor[car2->power_up_levels[2]] * car2->damage_multiplier * fudge_multiplier;
                     }
@@ -2953,33 +2950,18 @@ void CrushAndDamageCar(tCar_spec* c, br_vector3* pPosition, br_vector3* pForce_c
                 }
             }
             BrVector3InvScale(&position, pPosition, WORLD_SCALE);
-            // position.v[0] = pPosition->v[0] / 6.9000001;
-            // position.v[1] = pPosition->v[1] / 6.9000001;
-            // position.v[2] = pPosition->v[2] / 6.9000001;
             BrVector3Scale(&force, pForce_car_space, fudge_multiplier * 0.03f);
-            // force.v[0] = fudge_multiplier * 0.029999999 * pForce_car_space->v[0];
-            // force.v[1] = fudge_multiplier * 0.029999999 * pForce_car_space->v[1];
-            // force.v[2] = fudge_multiplier * 0.029999999 * pForce_car_space->v[2];
             ts = BrVector3LengthSquared(&force);
             if (c->driver <= eDriver_non_car || !c->invulnerable) {
                 c->damage_magnitude_accumulator = c->damage_magnitude_accumulator + ts;
             }
             if (c->driver < eDriver_net_human) {
                 BrVector3Scale(&force_for_bodywork, &force, 1.5f);
-                // force_for_bodywork.v[0] = force.v[0] * 1.5;
-                // force_for_bodywork.v[1] = force.v[1] * 1.5;
-                // force_for_bodywork.v[2] = force.v[2] * 1.5;
             } else {
                 if (c->collision_mass_multiplier != 1.0) {
                     BrVector3InvScale(&force, &force, c->collision_mass_multiplier);
-                    // force.v[0] = force.v[0] / c->collision_mass_multiplier;
-                    // force.v[1] = force.v[1] / c->collision_mass_multiplier;
-                    // force.v[2] = force.v[2] / c->collision_mass_multiplier;
                 }
                 BrVector3Scale(&force_for_bodywork, &force, 0.5f);
-                // force_for_bodywork.v[0] = force.v[0] * 0.5;
-                // force_for_bodywork.v[1] = force.v[1] * 0.5;
-                // force_for_bodywork.v[2] = force.v[2] * 0.5;
                 if (c->driver == eDriver_local_human) {
                     DoPratcamHit(&force);
                 }

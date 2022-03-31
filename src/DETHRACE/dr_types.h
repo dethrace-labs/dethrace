@@ -3,6 +3,7 @@
 
 #include "brender/br_types.h"
 #include "constants.h"
+#include "macros.h"
 #include "s3/s3_types.h"
 #include <assert.h>
 #include <stdarg.h>
@@ -10,15 +11,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-/*
-typedef char * va_list[1];
-typedef unsigned short wchar_t;
-typedef unsigned int size_t;
-typedef char * __va_list[1];
-typedef __iobuf FILE;
-typedef long fpos_t;
-typedef void * onexit_t();
-*/
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -3655,7 +3647,6 @@ typedef struct tSmoke_column {
     int whiter;
     br_actor* flame_actor;
     int frame_count[3];
-
     br_vector3 pos;
     br_scalar scale_x[3];
     br_scalar scale_y[3];
@@ -3664,7 +3655,9 @@ typedef struct tSmoke_column {
     tU32 smudge_timer;
     int vertex_index;
     int upright;
+
 #ifdef DETHRACE_FIX_BUGS
+    // Flames textures are animated per frame. At higher FPS, this happens too quickly
     br_scalar frame_time[3];
 #endif
 } tSmoke_column;
