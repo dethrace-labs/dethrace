@@ -46,7 +46,7 @@ void (*ControlCar[6])(tCar_spec*, br_scalar) = {
     &ControlCar5,
     NULL
 };
-int gControl__car = 3; // suffix added to avoid duplicate symbol
+int gControl__car = 3;  // suffix added to avoid duplicate symbol
 int gFace_num__car = 1; // suffix added to avoid duplicate symbol
 br_angle gOld_yaw__car; // suffix added to avoid duplicate symbol
 br_angle gOld_zoom;
@@ -109,8 +109,8 @@ int gCamera_frozen;
 int gMaterial_index;
 int gInTheSea;
 int gCamera_mode;
-br_scalar gOur_yaw__car; // suffix added to avoid duplicate symbol
-br_scalar gGravity__car; // suffix added to avoid duplicate symbol
+br_scalar gOur_yaw__car;            // suffix added to avoid duplicate symbol
+br_scalar gGravity__car;            // suffix added to avoid duplicate symbol
 br_vector3 gNew_ground_normal__car; // suffix added to avoid duplicate symbol
 char gNon_car_spec_list[100];
 tU32 gMechanics_time_sync;
@@ -750,7 +750,6 @@ void ControlOurCar(tU32 pTime_difference) {
     }
     time = GetTotalTime();
     if (car->damage_units[eDamage_steering].damage_level > 40) {
-        LOG_PANIC("this is not expected");
         if (car->end_steering_damage_effect) {
             if (car->end_steering_damage_effect > time || car->damage_units[eDamage_steering].damage_level == 99) {
                 car->keys.left = car->false_key_left;
@@ -775,7 +774,6 @@ void ControlOurCar(tU32 pTime_difference) {
         }
     }
     if (car->damage_units[eDamage_transmission].damage_level > 40) {
-        LOG_PANIC("this is not expected");
         if (car->end_trans_damage_effect) {
             if (car->end_trans_damage_effect > time || car->damage_units[eDamage_transmission].damage_level == 99) {
                 car->gear = 0;
@@ -1662,37 +1660,37 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
     br_scalar scale;
     LOG_TRACE("(%p, %f)", c, dt);
 
-    int v72; // [esp+24h] [ebp-1C8h]
-    double v73; // [esp+2Ch] [ebp-1C0h]
-    float v74; // [esp+34h] [ebp-1B8h]
-    float v75; // [esp+38h] [ebp-1B4h]
-    float v76; // [esp+3Ch] [ebp-1B0h]
-    float v77; // [esp+40h] [ebp-1ACh]
-    float v78; // [esp+44h] [ebp-1A8h]
-    float v79; // [esp+48h] [ebp-1A4h]
-    float v80; // [esp+4Ch] [ebp-1A0h] MAPDST
-    float v82; // [esp+50h] [ebp-19Ch] MAPDST
-    float v84; // [esp+54h] [ebp-198h]
-    float v85; // [esp+58h] [ebp-194h] MAPDST
-    float v87; // [esp+5Ch] [ebp-190h] MAPDST
-    float v98; // [esp+88h] [ebp-164h]
-    float v99; // [esp+8Ch] [ebp-160h]
+    int v72;         // [esp+24h] [ebp-1C8h]
+    double v73;      // [esp+2Ch] [ebp-1C0h]
+    float v74;       // [esp+34h] [ebp-1B8h]
+    float v75;       // [esp+38h] [ebp-1B4h]
+    float v76;       // [esp+3Ch] [ebp-1B0h]
+    float v77;       // [esp+40h] [ebp-1ACh]
+    float v78;       // [esp+44h] [ebp-1A8h]
+    float v79;       // [esp+48h] [ebp-1A4h]
+    float v80;       // [esp+4Ch] [ebp-1A0h] MAPDST
+    float v82;       // [esp+50h] [ebp-19Ch] MAPDST
+    float v84;       // [esp+54h] [ebp-198h]
+    float v85;       // [esp+58h] [ebp-194h] MAPDST
+    float v87;       // [esp+5Ch] [ebp-190h] MAPDST
+    float v98;       // [esp+88h] [ebp-164h]
+    float v99;       // [esp+8Ch] [ebp-160h]
     br_vector3 v102; // [esp+98h] [ebp-154h]
     br_vector3 v103; // [esp+A4h] [ebp-148h]
-    int v105; // [esp+B8h] [ebp-134h]
-    float v106; // [esp+C0h] [ebp-12Ch]
+    int v105;        // [esp+B8h] [ebp-134h]
+    float v106;      // [esp+C0h] [ebp-12Ch]
     br_vector3 v107; // [esp+C4h] [ebp-128h]
-    float v108; // [esp+D0h] [ebp-11Ch]
-    float v109; // [esp+D4h] [ebp-118h]
-    float v116; // [esp+F8h] [ebp-F4h]
-    br_vector3 B; // [esp+FCh] [ebp-F0h] BYREF
-    br_scalar pV; // [esp+10Ch] [ebp-E0h]
+    float v108;      // [esp+D0h] [ebp-11Ch]
+    float v109;      // [esp+D4h] [ebp-118h]
+    float v116;      // [esp+F8h] [ebp-F4h]
+    br_vector3 B;    // [esp+FCh] [ebp-F0h] BYREF
+    br_scalar pV;    // [esp+10Ch] [ebp-E0h]
     br_vector3 v123; // [esp+130h] [ebp-BCh]
-    float v125; // [esp+16Ch] [ebp-80h]
-    float v128; // [esp+18Ch] [ebp-60h]
-    float v129; // [esp+190h] [ebp-5Ch]
-    float v134; // [esp+1D8h] [ebp-14h]
-    float v135; // [esp+1DCh] [ebp-10h]
+    float v125;      // [esp+16Ch] [ebp-80h]
+    float v128;      // [esp+18Ch] [ebp-60h]
+    float v129;      // [esp+190h] [ebp-5Ch]
+    float v134;      // [esp+1D8h] [ebp-14h]
+    float v135;      // [esp+1DCh] [ebp-10h]
     br_vector3 v136; // [esp+1E0h] [ebp-Ch]
 
     BrVector3Set(&v136, 0, 0, 0);
