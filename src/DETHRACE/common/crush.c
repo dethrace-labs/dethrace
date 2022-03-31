@@ -2,6 +2,7 @@
 #include "brender/brender.h"
 #include "car.h"
 #include "globvars.h"
+#include "globvrkm.h"
 #include "globvrpb.h"
 #include "graphics.h"
 #include "harness/trace.h"
@@ -10,13 +11,15 @@
 #include "oil.h"
 #include "opponent.h"
 #include "piping.h"
+#include "replay.h"
 #include "spark.h"
 #include "utility.h"
+#include "world.h"
 #include <stdlib.h>
 
-float gWobble_spam_y[8];
-float gWobble_spam_z[8];
-br_scalar gWheel_circ_to_width;
+float gWobble_spam_y[8] = { 0.0f, -0.15f, 0.4f, 0.15f, -0.4f, 0.25f, 0.0f, -0.25f };
+float gWobble_spam_z[8] = { 0.4f, -0.25f, 0.0f, 0.25f, 0.0f, 0.15f, -0.4f, -0.15f };
+br_scalar gWheel_circ_to_width = 0.16f;
 tU8 gSmoke_damage_step[12] = { 20u, 20u, 0u, 10u, 10u, 10u, 10u, 10u, 10u, 10u, 10u, 10u };
 int gSteal_ranks[5];
 
@@ -851,7 +854,75 @@ void DoWheelDamage(tU32 pFrame_period) {
     br_vector3 wonky_vector;
     static int kev_index[4];
     LOG_TRACE("(%d)", pFrame_period);
-    STUB_ONCE();
+
+    if (gAction_replay_mode && ReplayIsPaused()) {
+        return;
+    }
+
+    for (i = 0; i < gNum_active_cars; i++) {
+        car = gActive_car_list[i];
+        for (j = 0; j < COUNT_OF(car->wheel_actors); j++) {
+            if (!car->wheel_actors[j]) {
+                continue;
+            }
+            old_offset = car->wheel_dam_offset[j];
+            damage = car->damage_units[j + 8].damage_level;
+            if (damage <= 30 || gRace_finished) {
+                car->wheel_dam_offset[j] = 0.0f;
+                continue;
+            }
+            if (PointOutOfSight(&car->pos, 32.0f)) {
+                break;
+            }
+            y_amount = (damage - 30) * gWobble_spam_y[damage & 7];
+            z_amount = (damage - 30) * gWobble_spam_z[damage & 7];
+            BrMatrix34PreRotateY(&car->wheel_actors[j]->t.t.mat, BrDegreeToAngle(y_amount < 0 ? y_amount + 360.f : y_amount));
+            BrMatrix34PreRotateZ(&car->wheel_actors[j]->t.t.mat, BrDegreeToAngle(z_amount < 0 ? z_amount + 360.f : z_amount));
+            if (j < 2 && car->wheel_actors[j + 4] != NULL) {
+                BrMatrix34PreRotateY(&car->wheel_actors[j + 4]->t.t.mat, BrDegreeToAngle(y_amount < 0 ? y_amount + 360.f : y_amount));
+                BrMatrix34PreRotateZ(&car->wheel_actors[j + 4]->t.t.mat, BrDegreeToAngle(z_amount < 0 ? z_amount + 360.f : z_amount));
+            }
+            switch (j) {
+            case 0:
+                if (car->driven_wheels_spin_ref_1 < 0) {
+                    wheel_circum = car->non_driven_wheels_circum;
+                } else {
+                    wheel_circum = car->driven_wheels_circum;
+                }
+                break;
+            case 1:
+                if (car->driven_wheels_spin_ref_2 < 0) {
+                    wheel_circum = car->non_driven_wheels_circum;
+                } else {
+                    wheel_circum = car->driven_wheels_circum;
+                }
+                break;
+            case 2:
+                if (car->driven_wheels_spin_ref_3 < 0) {
+                    wheel_circum = car->non_driven_wheels_circum;
+                } else {
+                    wheel_circum = car->driven_wheels_circum;
+                }
+                break;
+            case 3:
+                if (car->driven_wheels_spin_ref_4 < 0) {
+                    wheel_circum = car->non_driven_wheels_circum;
+                } else {
+                    wheel_circum = car->driven_wheels_circum;
+                }
+                break;
+            default:
+                break;
+            }
+            if (gNet_mode == eNet_mode_none || car->driver == eDriver_local_human) {
+                temp_vector.v[0] = wheel_circum * gWheel_circ_to_width;
+                temp_vector.v[1] = 0.0f;
+                temp_vector.v[2] = 0.0f;
+                BrMatrix34ApplyV(&wonky_vector, &temp_vector, &car->wheel_actors[j]->t.t.mat);
+                car->wheel_dam_offset[j] = fabsf(wonky_vector.v[1]);
+            }
+        }
+    }
 }
 
 // IDA: void __usercall CrashEarnings(tCar_spec *pCar1@<EAX>, tCar_spec *pCar2@<EDX>)
