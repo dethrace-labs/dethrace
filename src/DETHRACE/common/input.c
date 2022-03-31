@@ -310,7 +310,7 @@ void WaitForAKey() {
 
     while (1) {
         CheckQuit();
-        if (AnyKeyDown( )) {
+        if (AnyKeyDown()) {
             break;
         }
         if (EitherMouseButtonDown()) {

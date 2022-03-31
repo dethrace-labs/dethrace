@@ -3,7 +3,9 @@
 
 // Inspired by BRender SDK includes  (https://rr2000.cwaboard.co.uk/R4/BRENDER/BRENDER.zip)
 
-#define PI  3.14159265358979323846
+#include <math.h> // sqrtf
+
+#define PI 3.14159265358979323846
 #define TAU 6.283185307179586
 
 #define BR_MAC3(a, b, c, d, e, f) ((a) * (b) + (c) * (d) + (e) * (f))

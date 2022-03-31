@@ -41,6 +41,7 @@ void GLRenderer_FullScreenQuad(uint8_t* screen_buffer, int width, int height);
 void GLRenderer_Model(br_actor* actor, br_model* model, br_matrix34 model_matrix);
 void GLRenderer_BufferTexture(br_pixelmap* pm);
 void GLRenderer_BufferMaterial(br_material* mat);
+void GLRenderer_BufferModel(br_model* model);
 void GLRenderer_ClearBuffers();
 void GLRenderer_FlushBuffers(br_pixelmap* color_buffer, br_pixelmap* depth_buffer);
 

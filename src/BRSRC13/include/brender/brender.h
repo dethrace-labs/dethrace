@@ -88,6 +88,8 @@ void BrMatrix34PostShearX(br_matrix34* mat, br_scalar sy, br_scalar sz);
 void BrMatrix34PostShearY(br_matrix34* mat, br_scalar sx, br_scalar sz);
 void BrMatrix34PostShearZ(br_matrix34* mat, br_scalar sx, br_scalar sy);
 void BrMatrix34PreShearX(br_matrix34* mat, br_scalar sy, br_scalar sz);
+void BrMatrix34PreRotateY(br_matrix34* mat, br_angle ry);
+void BrMatrix34PreRotateZ(br_matrix34* mat, br_angle rz);
 
 // BrMatrix4
 void BrMatrix4Copy(br_matrix4* A, br_matrix4* B);

@@ -34,7 +34,7 @@ tHarness_game_info harness_game_info;
 // Configuration options
 tHarness_game_config harness_game_config;
 
-
+/* clang-format off */
 // German ASCII codes
 static int carmageddon_german_ascii_table[128] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107,
@@ -76,6 +76,7 @@ static int splatpack_xmasdemo_ascii_shift_table[128] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 47, 42, 45, 43, 46, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 8,
 };
+/* clang-format on */
 
 int Harness_ProcessCommandLine(int* argc, char* argv[]);
 
@@ -109,12 +110,11 @@ void Harness_DetectGameMode() {
             harness_game_info.defines.GERMAN_LOADSCRN = "COWLESS.PIX";
             harness_game_info.mode = eGame_carmageddon_demo;
             LOG_INFO("\"%s\"", "Carmageddon demo");
-        }
-        else {
+        } else {
             goto carmageddon;
         }
     } else {
-carmageddon:
+    carmageddon:
         if (access("DATA/CUTSCENE/Mix_intr.smk", F_OK) == -1) {
             harness_game_info.defines.INTRO_SMK_FILE = "Mix_intr.smk";
         } else {
@@ -127,11 +127,11 @@ carmageddon:
 
     harness_game_info.localization = eGameLocalization_none;
     if (access("DATA/TRNSLATE.TXT", F_OK) != -1) {
-        FILE *f = fopen("DATA/TRNSLATE.TXT", "rb");
+        FILE* f = fopen("DATA/TRNSLATE.TXT", "rb");
         fseek(f, 0, SEEK_END);
         int filesize = ftell(f);
         fseek(f, 0, SEEK_SET);
-        char *buffer = malloc(filesize + 1);
+        char* buffer = malloc(filesize + 1);
         int nb = fread(buffer, 1, filesize, f);
         if (nb != filesize) {
             LOG_PANIC("Unable to read DATA/TRNSLATE.TXT");
@@ -223,7 +223,6 @@ void Harness_ForceNullRenderer() {
     force_nullrenderer = 1;
     renderer = &null_renderer;
 }
-
 
 int Harness_ProcessCommandLine(int* argc, char* argv[]) {
     for (int i = 1; i < *argc; i++) {
@@ -391,6 +390,10 @@ void Harness_Hook_BrBufferUpdate(br_pixelmap* pm, br_token use, br_uint_16 flags
     } else {
         LOG_PANIC("use %d", use);
     }
+}
+
+void Harness_Hook_BrModelUpdate(br_model* model) {
+    renderer->BufferModel(model);
 }
 
 // Input hooks

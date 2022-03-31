@@ -17,15 +17,8 @@ void BrDbModelRender(br_actor* actor, br_model* model, br_material* material, vo
     br_token_value tv[5];
     LOG_TRACE("(%p, %p, %p, %p, %d, %d, %d)", actor, model, material, render_data, style, on_screen, use_custom);
 
-    // if (strcmp(model->identifier, "NEWEAGLE.DAT") == 0) {
-    //     LOG_DEBUG("rendering eagle!");
-    // } else {
-    //     return;
-    // }
-
     v1db.model_to_screen_valid = 0;
     if (use_custom && (model->flags & BR_MODF_CUSTOM)) {
-        TELL_ME_IF_WE_PASS_THIS_WAY();
         model->custom(actor, model, material, render_data, style, on_screen);
         return;
     }
@@ -296,21 +289,21 @@ void SetViewport(br_pixelmap* buffer) {
 
 // IDA: void __cdecl BrZbSceneRenderBegin(br_actor *world, br_actor *camera, br_pixelmap *colour_buffer, br_pixelmap *depth_buffer)
 void BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer) {
-    //LOG_TRACE("(%p, %p, %p, %p)", world, camera, colour_buffer, depth_buffer);
+    // LOG_TRACE("(%p, %p, %p, %p)", world, camera, colour_buffer, depth_buffer);
 
-    //BrDbSceneRenderBegin(world, camera);
+    // BrDbSceneRenderBegin(world, camera);
     Harness_Hook_BrZbSceneRenderBegin(world, camera, colour_buffer, depth_buffer);
 }
 
 // IDA: void __cdecl BrZbSceneRenderAdd(br_actor *tree)
 void BrZbSceneRenderAdd(br_actor* tree) {
-    //LOG_TRACE("(%p)", tree);
+    // LOG_TRACE("(%p)", tree);
     sceneRenderAdd(tree);
 }
 
 // IDA: void __cdecl BrZbSceneRenderEnd()
 void BrZbSceneRenderEnd() {
-    //LOG_TRACE("()");
+    // LOG_TRACE("()");
     Harness_Hook_BrZbSceneRenderEnd();
 }
 
@@ -357,7 +350,8 @@ br_primitive_cbfn* BrZsPrimitiveCallbackSet(br_primitive_cbfn* new_cbfn) {
 // IDA: void __cdecl BrZbModelRender(br_actor *actor, br_model *model, br_material *material, br_uint_8 style, int on_screen, int use_custom)
 void BrZbModelRender(br_actor* actor, br_model* model, br_material* material, br_uint_8 style, int on_screen, int use_custom) {
     LOG_TRACE("(%p, %p, %p, %d, %d, %d)", actor, model, material, style, on_screen, use_custom);
-    NOT_IMPLEMENTED();
+
+    BrDbModelRender(actor, model, material, 0, style, on_screen, use_custom);
 }
 
 // IDA: void __cdecl BrZsModelRender(br_actor *actor, br_model *model, br_material *material, br_order_table *order_table, br_uint_8 style, int on_screen, int use_custom)

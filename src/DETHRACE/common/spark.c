@@ -15,7 +15,6 @@
 #include "utility.h"
 #include "world.h"
 
-#include <math.h>
 #include <stdlib.h>
 
 int gNext_spark;
@@ -56,6 +55,15 @@ int gDust_rotate;
 br_camera* gSpark_cam;
 br_material* gBlack_material;
 tShrapnel gShrapnel[15];
+
+// gSmoke_column has 25 elements but all the code just checks the first 5 elements
+#define MAX_SMOKE_COLUMNS 5
+
+// Bugfix: At higher FPS, flame animation runs too quickly, so introduce a new frame timer
+#define FLAME_ANIMATION_FRAME_INTERVAL 40
+
+// Bugfix: At higher FPS, `CreatePuffOfSmoke` is called too often and causes smoke cirlces to be recycled too quickly so assume around 25fps
+#define SMOKE_COLUMN_NEW_PUFF_INTERVAL 30
 
 // IDA: void __cdecl DrawDot(br_scalar z, tU8 *scr_ptr, tU16 *depth_ptr, tU8 *shade_ptr)
 void DrawDot(br_scalar z, tU8* scr_ptr, tU16* depth_ptr, tU8* shade_ptr) {
@@ -1282,7 +1290,63 @@ void CreateSmokeColumn(tCar_spec* pCar, int pColour, int pVertex_index, tU32 pLi
     br_actor* actor;
     tSmoke_column* col;
     LOG_TRACE("(%p, %d, %d, %d)", pCar, pColour, pVertex_index, pLifetime);
-    NOT_IMPLEMENTED();
+
+    col = &gSmoke_column[gNext_column];
+    if (pCar->last_special_volume && pCar->last_special_volume->gravity_multiplier < 1.0f) {
+        return;
+    }
+    SmudgeCar(pCar, pVertex_index);
+    if (pCar->knackered) {
+        SmudgeCar(pCar, pCar->fire_vertex[IRandomBetween(0, 11)]);
+    }
+    if (!gSmoke_on) {
+        return;
+    }
+    if (((1 << gNext_column) & gColumn_flags) != 0) {
+        if (gSmoke_column[gNext_column].car) {
+            gSmoke_column[gNext_column].car->num_smoke_columns--;
+        }
+        StartPipingSession(ePipe_chunk_smoke_column);
+        AddSmokeColumnToPipingSession(gNext_column, gSmoke_column[gNext_column].car, gSmoke_column[gNext_column].vertex_index, gSmoke_column[gNext_column].colour);
+        EndPipingSession();
+        if (!gSmoke_column[gNext_column].colour) {
+            StartPipingSession(ePipe_chunk_flame);
+            actor = col->flame_actor->children;
+            for (i = 0; i < 3; i++) {
+                if (actor->type == BR_ACTOR_MODEL) {
+                    AddFlameToPipingSession(i + 16 * gNext_column, col->frame_count[i], col->scale_x[i], col->scale_y[i], col->offset_x[i], col->offset_z[i]);
+                }
+                actor->type = BR_ACTOR_NONE;
+                actor = actor->next;
+            }
+            EndPipingSession();
+        }
+    }
+    if (!pColour && (((1 << gNext_column) & gColumn_flags) == 0 || gSmoke_column[gNext_column].colour)) {
+        BrActorAdd(gNon_track_actor, gSmoke_column[gNext_column].flame_actor);
+    }
+    if (pColour && ((1 << gNext_column) & gColumn_flags) != 0 && !gSmoke_column[gNext_column].colour) {
+        BrActorRemove(gSmoke_column[gNext_column].flame_actor);
+    }
+    StartPipingSession(ePipe_chunk_smoke_column);
+    AddSmokeColumnToPipingSession(gNext_column, pCar, pVertex_index, pColour);
+    EndPipingSession();
+    gSmoke_column[gNext_column].car = pCar;
+    gSmoke_column[gNext_column].colour = pColour;
+    gSmoke_column[gNext_column].lifetime = pLifetime;
+    gSmoke_column[gNext_column].time = 0;
+    gSmoke_column[gNext_column].smudge_timer = 1000;
+    gSmoke_column[gNext_column].vertex_index = pVertex_index;
+    gSmoke_column[gNext_column].upright = 1;
+    gColumn_flags |= 1 << gNext_column;
+    pCar->num_smoke_columns++;
+    for (i = 0; i < COUNT_OF(gSmoke_column[gNext_column].frame_count); i++) {
+        gSmoke_column[gNext_column].frame_count[i] = 100;
+    }
+    gNext_column++;
+    if (gNext_column >= MAX_SMOKE_COLUMNS) {
+        gNext_column = 0;
+    }
 }
 
 // IDA: void __cdecl GenerateSmokeShades()
@@ -1342,7 +1406,59 @@ void FlameAnimate(int c, br_vector3* pPos, tU32 pTime) {
     br_actor* actor;
     int i;
     LOG_TRACE("(%d, %p, %d)", c, pPos, pTime);
-    NOT_IMPLEMENTED();
+
+    col = &gSmoke_column[c];
+    actor = col->flame_actor;
+    DRMatrix34RotateY(&actor->t.t.mat, FastScalarArcTan2Angle(gCamera_to_world.m[2][0], gCamera_to_world.m[2][2]));
+    actor->t.t.translate.t = *pPos;
+    actor = actor->children;
+
+    if (gAction_replay_mode) {
+        ReplayFlame(col, actor);
+        return;
+    }
+    for (i = 0; i < COUNT_OF(col->frame_count); i++) {
+
+#ifdef DETHRACE_FIX_BUGS
+        col->frame_time[i] += pTime;
+        if (col->frame_time[i] > FLAME_ANIMATION_FRAME_INTERVAL) {
+            col->frame_time[i] = 0;
+            col->frame_count[i]++;
+        }
+#else
+        col->frame_count[i]++;
+#endif
+
+        if (col->frame_count[i] >= COUNT_OF(gFlame_map)) {
+            StartPipingSession(ePipe_chunk_flame);
+            AddFlameToPipingSession(i + 16 * c, col->frame_count[i] + 1, col->scale_x[i], col->scale_y[i], col->offset_x[i], col->offset_z[i]);
+            EndPipingSession();
+            col->frame_count[i] = IRandomBetween(-5, -1);
+            col->scale_x[i] = (2 * IRandomBetween(0, 1) - 1) * SRandomBetween(1.0f, 1.5f) * 0.003f;
+            col->scale_y[i] = SRandomBetween(0.5f, 1.0f) * 0.003f;
+            col->offset_x[i] = SRandomPosNeg(0.03f);
+            col->offset_z[i] = SRandomBetween(-0.03f, 0.0);
+            actor->type = BR_ACTOR_NONE;
+        }
+        if (col->frame_count[i] == 0) {
+            if (BrVector3LengthSquared(&col->car->v) >= 80.0f || col->lifetime <= 30 * pTime) {
+                col->frame_count[i] = -5;
+            } else {
+                actor->type = BR_ACTOR_MODEL;
+                StartPipingSession(ePipe_chunk_flame);
+                AddFlameToPipingSession(i + 16 * c, col->frame_count[i] - 1, col->scale_x[i], col->scale_y[i], col->offset_x[i], col->offset_z[i]);
+                EndPipingSession();
+            }
+        }
+        if (col->frame_count[i] >= 0) {
+            actor->material->colour_map = gFlame_map[col->frame_count[i]];
+            BrMaterialUpdate(actor->material, BR_MATU_ALL);
+            BrMatrix34Scale(&actor->t.t.mat, gFlame_map[col->frame_count[i]]->width * col->scale_x[i], gFlame_map[col->frame_count[i]]->height * col->scale_y[i], 1.0);
+            actor->t.t.mat.m[3][0] = col->offset_x[i];
+            actor->t.t.mat.m[3][2] = col->offset_z[i];
+        }
+        actor = actor->next;
+    }
 }
 
 // IDA: void __usercall DoSmokeColumn(int i@<EAX>, tU32 pTime@<EDX>, br_vector3 *pRet_car_pos@<EBX>)
@@ -1352,7 +1468,30 @@ void DoSmokeColumn(int i, tU32 pTime, br_vector3* pRet_car_pos) {
     br_actor* bonny;
     int group;
     LOG_TRACE("(%d, %d, %p)", i, pTime, pRet_car_pos);
-    NOT_IMPLEMENTED();
+
+    c = gSmoke_column[i].car;
+    if (c->car_master_actor->t.t.mat.m[1][1] > 0.1f) {
+        gSmoke_column[i].upright = 1;
+    }
+    if (c->car_master_actor->t.t.mat.m[1][1] < -0.1f) {
+        gSmoke_column[i].upright = 0;
+    }
+    actor = c->car_model_actors[c->principal_car_actor].actor;
+    bonny = c->car_model_actors[c->car_actor_count - 1].actor;
+
+    BrVector3Add(pRet_car_pos, &V11MODEL(actor->model)->groups->vertices[gSmoke_column[i].vertex_index].p, (br_vector3*)actor->t.t.mat.m[3]);
+    if (gProgram_state.cockpit_on && c->driver == eDriver_local_human) {
+        if (c->driver_z_offset + 0.2f <= pRet_car_pos->v[2]) {
+            pRet_car_pos->v[1] -= -0.07f;
+        } else {
+            BrMatrix34ApplyP(pRet_car_pos, &V11MODEL(actor->model)->groups->vertices[gSmoke_column[i].vertex_index].p, &bonny->t.t.mat);
+        }
+    }
+    if (!gSmoke_column[i].upright) {
+        pRet_car_pos->v[1] = c->bounds[1].min.v[1] / WORLD_SCALE;
+    }
+    BrMatrix34ApplyP(&gSmoke_column[i].pos, pRet_car_pos, &c->car_master_actor->t.t.mat);
+    gSmoke_column[i].pos.v[1] -= 0.03f;
 }
 
 // IDA: void __usercall ReplaySmokeColumn(tU32 pTime@<EAX>)
@@ -1380,7 +1519,83 @@ void MungeSmokeColumn(tU32 pTime) {
     tCar_spec* c;
     LOG_TRACE("(%d)", pTime);
 
-    STUB_ONCE();
+    if (gColumn_flags == 0) {
+        return;
+    }
+    if (gAction_replay_mode) {
+        ReplaySmokeColumn(pTime);
+        return;
+    }
+
+    gMechanics_time_sync = 1;
+    for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
+        if (((1 << i) & gColumn_flags) == 0) {
+            continue;
+        }
+        if (gSmoke_column[i].lifetime >= pTime) {
+            gSmoke_column[i].lifetime -= pTime;
+            c = gSmoke_column[i].car;
+            DoSmokeColumn(i, pTime, &car_pos);
+            if (!gSmoke_column[i].colour) {
+                FlameAnimate(i, &gSmoke_column[i].pos, pTime);
+                if (gSmoke_column[i].smudge_timer >= pTime) {
+                    gSmoke_column[i].smudge_timer -= pTime;
+                } else {
+                    gSmoke_column[i].smudge_timer += 2000;
+                    SmudgeCar(gSmoke_column[i].car, gSmoke_column[i].vertex_index);
+                    if (gSmoke_column[i].car->knackered) {
+                        plane = IRandomBetween(0, COUNT_OF(gSmoke_column[i].car->fire_vertex) - 1);
+                        SmudgeCar(gSmoke_column[i].car, gSmoke_column[i].car->fire_vertex[plane]);
+                    }
+                }
+            }
+            gSmoke_column[i].time += pTime;
+            if (gSmoke_column[i].time > 200) {
+#ifdef DETHRACE_FIX_BUGS
+                gSmoke_column[i].time -= fmaxf(SMOKE_COLUMN_NEW_PUFF_INTERVAL, pTime);
+#else
+                gSmoke_column[i].time -= pTime;
+#endif
+                gSmoke_column[i].count++;
+                BrVector3Cross(&v, &c->omega, &car_pos);
+                BrMatrix34ApplyV(&car_pos, &v, &c->car_master_actor->t.t.mat);
+                BrVector3Add(&v, &c->v, &car_pos);
+                v.v[1] = v.v[1] + 2.898550724637681f; // 100 / 34.5 ?
+                pos.v[0] = SRandomBetween(-0.03f, 0.03f) + gSmoke_column[i].pos.v[0];
+                pos.v[1] = (gSmoke_column[i].colour == 0) * 0.05f + gSmoke_column[i].pos.v[1];
+                pos.v[2] = SRandomBetween(-0.03f, 0.03f) + gSmoke_column[i].pos.v[2];
+                if ((gSmoke_column[i].whiter & 2) == 0 || IRandomBetween(0, 3)) {
+                    if (gSmoke_column[i].whiter < 1) {
+                        gSmoke_column[i].whiter = -1;
+                    } else {
+                        gSmoke_column[i].whiter = 2;
+                    }
+                } else {
+                    gSmoke_column[i].whiter &= 1;
+                }
+                decay_factor = ((gSmoke_column[i].whiter > 0) + 1.0f) / 2.0f;
+                if (gSmoke_column[i].lifetime < 4000) {
+                    decay_factor = gSmoke_column[i].lifetime * decay_factor / 4000.0f;
+                }
+                CreatePuffOfSmoke(&pos, &v, decay_factor, decay_factor, gSmoke_column[i].colour + 16, c);
+            }
+        } else {
+            if (gSmoke_column[i].car) {
+                StartPipingSession(ePipe_chunk_smoke_column);
+                AddSmokeColumnToPipingSession(i, gSmoke_column[i].car, gSmoke_column[i].vertex_index, gSmoke_column[i].colour);
+                EndPipingSession();
+            }
+            gColumn_flags &= ~(1 << i);
+            if (!gSmoke_column[i].colour) {
+                BrActorRemove(gSmoke_column[i].flame_actor);
+            }
+            if (gSmoke_column[i].car) {
+                if (gSmoke_column[i].car->num_smoke_columns) {
+                    gSmoke_column[i].car->num_smoke_columns--;
+                }
+            }
+        }
+    }
 }
 
 // IDA: void __cdecl DisposeFlame()
@@ -1396,7 +1611,7 @@ void DisposeFlame() {
         BrPixelmapFree(gFlame_map[i]);
     }
 
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
         if ((gColumn_flags & (1 << i)) && (gSmoke_column[i].colour == 0)) {
             BrActorRemove(gSmoke_column[i].flame_actor);
         }
@@ -1431,7 +1646,7 @@ void InitFlame() {
         FatalError(79, the_path);
     }
     BrMapAddMany(gFlame_map, COUNT_OF(gFlame_map));
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
         gSmoke_column[i].flame_actor = BrActorAllocate(BR_ACTOR_NONE, NULL);
         for (j = 0; j < COUNT_OF(gSmoke_column[0].frame_count); j++) {
             actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
@@ -1580,7 +1795,7 @@ void DrawTheGlow(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
     if (gColumn_flags) {
         seed = rand();
         srand(GetTotalTime());
-        for (i = 0; i < 5; i++) {
+        for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
             if (((1 << i) & gColumn_flags) != 0 && gSmoke_column[i].colour <= 1) {
                 strength = 0.5;
                 if (gSmoke_column[i].lifetime < 4000) {
@@ -1626,7 +1841,8 @@ void SmudgeCar(tCar_spec* pCar, int fire_point) {
     tSmudged_vertex data[30];
     int n;
     LOG_TRACE("(%p, %d)", pCar, fire_point);
-    NOT_IMPLEMENTED();
+
+    STUB_ONCE();
 }
 
 // IDA: void __cdecl ResetSmokeColumns()
@@ -1669,7 +1885,7 @@ void StopCarSmoking(tCar_spec* pCar) {
     int i;
     LOG_TRACE("(%p)", pCar);
 
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
         if (gSmoke_column[i].car == pCar && gSmoke_column[i].lifetime > 2000) {
             gSmoke_column[i].lifetime = 2000;
         }
@@ -1681,7 +1897,7 @@ void StopCarSmokingInstantly(tCar_spec* pCar) {
     int i;
     LOG_TRACE("(%p)", pCar);
 
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
         if (gSmoke_column[i].car == pCar) {
             gSmoke_column[i].lifetime = 0;
         }
@@ -1692,7 +1908,21 @@ void StopCarSmokingInstantly(tCar_spec* pCar) {
 void ConditionalSmokeColumn(tCar_spec* pCar, int pDamage_index, int pColour) {
     int i;
     LOG_TRACE("(%p, %d, %d)", pCar, pDamage_index, pColour);
-    NOT_IMPLEMENTED();
+
+    if (!pColour) {
+        pColour = pCar->driver < eDriver_net_human;
+    }
+    if (pCar->num_smoke_columns != 0) {
+        for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
+            if (gSmoke_column[i].car == pCar) {
+                if (((1 << i) & gColumn_flags) != 0 && gSmoke_column[i].colour <= pColour && gSmoke_column[i].lifetime) {
+                    return;
+                }
+                gSmoke_column[i].lifetime = 2000;
+            }
+        }
+    }
+    CreateSmokeColumn(pCar, pColour, pCar->fire_vertex[pDamage_index], 10000000u);
 }
 
 // IDA: void __usercall SingleSplash(tCar_spec *pCar@<EAX>, br_vector3 *sp@<EDX>, br_vector3 *normal@<EBX>, tU32 pTime@<ECX>)
@@ -2081,7 +2311,7 @@ void DisposeKevStuffCar(tCar_spec* pCar) {
     int i;
     LOG_TRACE("(%p)", pCar);
 
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
         if (gSmoke_column[i].car == pCar) {
             gSmoke_column[i].lifetime = 0;
             gSmoke_column[i].car = NULL;

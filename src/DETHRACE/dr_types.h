@@ -3,6 +3,7 @@
 
 #include "brender/br_types.h"
 #include "constants.h"
+#include "macros.h"
 #include "s3/s3_types.h"
 #include <assert.h>
 #include <stdarg.h>
@@ -10,15 +11,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-/*
-typedef char * va_list[1];
-typedef unsigned short wchar_t;
-typedef unsigned int size_t;
-typedef char * __va_list[1];
-typedef __iobuf FILE;
-typedef long fpos_t;
-typedef void * onexit_t();
-*/
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -780,7 +772,7 @@ typedef struct tCar_controls {
     unsigned int right : 1; // 0x20000   bit 18
     unsigned int acc : 1; // 0x40000   bit 19
     unsigned int dec : 1; // 0x80000   bit 20
-    unsigned int brake : 1; //0x100000   bit 21
+    unsigned int brake : 1; // 0x100000   bit 21
     unsigned int up : 1; // 0x200000   bit 22
     unsigned int down : 1; // 0x400000   bit 23
     unsigned int holdw : 1; // 0x800000   bit 24
@@ -3095,8 +3087,6 @@ typedef struct tQueued_headup {
     char text[256];
 } tQueued_headup;
 
-//typedef unsigned long time_t;
-//typedef unsigned long clock_t;
 typedef struct tFlicette {
     int flic_index;
     int x[2];
@@ -3663,6 +3653,11 @@ typedef struct tSmoke_column {
     tU32 smudge_timer;
     int vertex_index;
     int upright;
+
+#ifdef DETHRACE_FIX_BUGS
+    // Flames textures are animated per frame. At higher FPS, this happens too quickly
+    br_scalar frame_time[3];
+#endif
 } tSmoke_column;
 
 typedef struct tSplash {

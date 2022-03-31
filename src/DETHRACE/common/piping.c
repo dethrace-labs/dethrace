@@ -1,10 +1,10 @@
 #include "piping.h"
+#include "brender/brender.h"
 #include "globvars.h"
 #include "harness/trace.h"
 #include "opponent.h"
 #include "pedestrn.h"
 #include "sound.h"
-#include "brender/brender.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -74,7 +74,8 @@ int PipeSearchForwards() {
 // IDA: int __cdecl IsActionReplayAvailable()
 int IsActionReplayAvailable() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    return gPipe_buffer_start != NULL;
 }
 
 // IDA: int __cdecl SomeReplayLeft()
@@ -325,7 +326,7 @@ void AddOilSpillToPipingSession(int pIndex, br_matrix34* pMat, br_scalar pFull_s
     data.car = pCar;
     BrVector3Copy(&data.original_pos, pOriginal_pos);
     data.pixelmap = pPixelmap;
-    AddDataToSession(pIndex,&data,sizeof(tPipe_oil_spill_data));
+    AddDataToSession(pIndex, &data, sizeof(tPipe_oil_spill_data));
 }
 
 // IDA: void __usercall AddFrameFinishToPipingSession(tU32 pThe_time@<EAX>)
@@ -502,7 +503,7 @@ void PipeSingleOilSpill(int pIndex, br_matrix34* pMat, br_scalar pFull_size, br_
     LOG_TRACE("(%d, %p, %f, %f, %d, %d, %p, %p, %p)", pIndex, pMat, pFull_size, pGrow_rate, pSpill_time, pStop_time, pCar, pOriginal_pos, pPixelmap);
 
     StartPipingSession(ePipe_chunk_oil_spill);
-    AddOilSpillToPipingSession(pIndex, pMat, pFull_size, pGrow_rate, 
+    AddOilSpillToPipingSession(pIndex, pMat, pFull_size, pGrow_rate,
         pSpill_time, pStop_time, pCar, pOriginal_pos, pPixelmap);
     EndPipingSession();
 }
@@ -552,7 +553,7 @@ void PipeSinglePedIncident(int pPed_index, br_actor* pActor) {
 // IDA: void __cdecl PipeSingleWallIncident(float pSeverity, br_vector3 *pImpact_point)
 void PipeSingleWallIncident(float pSeverity, br_vector3* pImpact_point) {
     LOG_TRACE("(%f, %p)", pSeverity, pImpact_point);
-    NOT_IMPLEMENTED();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall PipeSingleScreenShake(int pWobble_x@<EAX>, int pWobble_y@<EDX>)
@@ -703,7 +704,7 @@ void PipeCarPositions() {
             AddCarToPipingSession(cat * 0x100 + i,
                 &car->car_master_actor->t.t.mat, &car->v, car->speedo_speed,
                 car->lf_sus_position, car->rf_sus_position, car->lr_sus_position, car->rr_sus_position,
-                car->steering_angle, car->revs,car->gear, car->frame_collision_flag);
+                car->steering_angle, car->revs, car->gear, car->frame_collision_flag);
         }
     }
     EndPipingSession();

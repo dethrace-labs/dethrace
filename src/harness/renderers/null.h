@@ -10,6 +10,7 @@ void Null_RenderFrameBuffer() {}
 void Null_ClearBuffers() {}
 void Null_BufferTexture(br_pixelmap* pm) {}
 void Null_BufferMaterial(br_material* mat) {}
+void Null_BufferModel(br_model* model) {}
 void Null_FlushBuffers(br_pixelmap* color_buffer, br_pixelmap* depth_buffer) {}
 
 tRenderer null_renderer = {
@@ -22,5 +23,6 @@ tRenderer null_renderer = {
     Null_ClearBuffers,
     Null_BufferTexture,
     Null_BufferMaterial,
+    Null_BufferModel,
     Null_FlushBuffers
 };

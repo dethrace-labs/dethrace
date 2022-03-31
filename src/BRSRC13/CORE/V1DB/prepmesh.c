@@ -8,6 +8,7 @@
 #include "CORE/MATH/vector.h"
 #include "CORE/STD/brmath.h"
 #include "CORE/STD/brstdlib.h"
+#include "harness/hooks.h"
 #include "harness/trace.h"
 #include <assert.h>
 
@@ -600,139 +601,104 @@ void BrModelUpdate(br_model* model, br_uint_16 flags) {
     br_face* fp;
     LOG_TRACE("(%p, %d)", model, flags);
 
-    if (!(model->flags & BR_MODF_PREPREPARED)) {
+    if (model->flags & BR_MODF_PREPREPARED) {
+        return;
+    }
+    if (!model->faces || !model->vertices) {
+        BrFailure("BrModelUpdate: model has no faces or vertices (%s)", model->identifier ? model->identifier : "<NULL>");
+    }
+    if (flags & BR_MODU_UNKNOWN) {
+        flags |= BR_MODU_NORMALS;
+    }
+    if (model->flags & (BR_MODF_KEEP_ORIGINAL | BR_MODF_GENERATE_TAGS)) {
+        model->flags |= BR_MODF_UPDATEABLE;
+    }
+    if (!(model->flags & BR_MODF_CUSTOM_BOUNDS) && (flags & (BR_MODU_MATERIALS | BR_MODU_GROUPS | BR_MODU_NORMALS))) {
+        PrepareBoundingRadius(model);
+        PrepareBoundingBox(model);
+    }
+    if (!model->prepared || flags & 0xFFD0) {
         if (!model->faces || !model->vertices) {
-            BrFailure("BrModelUpdate: model has no faces or vertices (%s)", model->identifier ? model->identifier : "<NULL>");
+            return;
         }
-        if (flags & BR_MODU_UNKNOWN) {
-            flags |= BR_MODU_NORMALS;
-        }
-        if (model->flags & (BR_MODF_KEEP_ORIGINAL | BR_MODF_GENERATE_TAGS)) {
-            model->flags |= BR_MODF_UPDATEABLE;
-        }
-        if (!(model->flags & 0x400) && (flags & (BR_MODU_MATERIALS | BR_MODU_GROUPS | BR_MODU_NORMALS))) {
-            PrepareBoundingRadius(model);
-            PrepareBoundingBox(model);
-        }
-        if (!model->prepared || flags & 0xFFD0) {
-            if (!model->faces || !model->vertices) {
-                return;
+        PrepareFaceNormals(model);
+        f = 0;
+        fp = model->faces;
+        model->flags &= ~MODF_USES_DEFAULT;
+        for (f = 0; f < model->nfaces; f++) {
+            fp = &model->faces[f];
+            if (!fp->material) {
+                model->flags |= MODF_USES_DEFAULT;
             }
-            PrepareFaceNormals(model);
-            f = 0;
-            fp = model->faces;
-            model->flags &= ~MODF_USES_DEFAULT;
-            for (f = 0; f < model->nfaces; f++) {
-                fp = &model->faces[f];
-                if (!fp->material) {
-                    model->flags |= MODF_USES_DEFAULT;
-                }
 
-                for (v = 0; v < 3; v++) {
-                    if (fp->vertices[v] >= model->nvertices) {
-                        BrFailure("face references invalid vertex f=%d v=%d", f, v);
+            for (v = 0; v < 3; v++) {
+                if (fp->vertices[v] >= model->nvertices) {
+                    BrFailure("face references invalid vertex f=%d v=%d", f, v);
+                }
+            }
+        }
+
+        PrepareGroups(model);
+        v11m = model->prepared;
+
+        if (v11m) {
+            for (g = 0; g < v11m->ngroups; g++) {
+                // prepareEdges(&v11m->groups[g], model);
+            }
+        } else {
+            LOG_DEBUG("has prepared model FALSE");
+        }
+    } else {
+
+        // some additional code paths might exist, but maybe not used?
+        if (flags != BR_MODU_NORMALS) {
+            TELL_ME_IF_WE_PASS_THIS_WAY();
+        }
+
+        v11m = model->prepared;
+
+        if (model->vertices && (flags & BR_MODU_NORMALS)) {
+            for (g = 0; g < v11m->ngroups; g++) {
+                for (v = 0; v < v11m->groups[g].nvertices; v++) {
+                    fvp = &v11m->groups[g].vertices[v];
+                    vp = model->vertices + v11m->groups[g].vertex_user[v];
+
+                    if (flags & BR_MODU_NORMALS) {
+                        fvp->p.v[0] = vp->p.v[0] - model->pivot.v[0];
+                        fvp->p.v[1] = vp->p.v[1] - model->pivot.v[1];
+                        fvp->p.v[2] = vp->p.v[2] - model->pivot.v[2];
                     }
                 }
             }
-
-            PrepareGroups(model);
-            v11m = (v11model*)model->prepared;
-
-            if (v11m) {
-                for (g = 0; g < v11m->ngroups; g++) {
-                    // prepareEdges(&v11m->groups[g], model);
-                }
-            } else {
-                LOG_DEBUG("has prepared model FALSE");
-            }
-        } else {
-            TELL_ME_IF_WE_PASS_THIS_WAY();
-            // v11m = (v11model*)model->prepared;
-            // if (model->vertices && flags & 0xF) {
-            //     for (g = 0; g < v11m->ngroups; g++) {
-            //         // v5 = 0;
-            //         // v39 = 0;
-            //         // v30 = 0;
-            //         // v40 = 0;
-            //         // v29 = 36 * i;
-
-            //         for (v = 0; v < v11m->groups[g].nvertices; v++) {
-            //             fvp = &v11m->groups[g].vertices[v];
-            //             vp = &model->vertices[v11m->groups[g].vertex_user[v]]; // v8->vertex_user[v5]];
-            //             if (flags & BR_MODU_NORMALS) {
-            //                 fvp->p.v[0] = vp->p.v[0] - model->pivot.v[0];
-            //                 fvp->p.v[1] = vp->p.v[1] - model->pivot.v[1];
-            //                 fvp->p.v[2] = vp->p.v[2] - model->pivot.v[2];
-            //             }
-            //             if (flags & BR_MODU_EDGES) {
-            //                 v31 = _byteswap_ulong(*(_DWORD*)&vp->index);
-            //                 v11m->groups[g].vertex_colours[v] = v31;
-            //             }
-            //             if (flags & BR_MODU_RADIUS) {
-            //                 fvp->map.v[0] = vp->map.v[0];
-            //                 fvp->map.v[1] = vp->map.v[1];
-            //             }
-            //             if (flags & BR_MODU_GROUPS && model->flags & 0x200) {
-            //                 fvp->n.v[0] = vp->n.v[0];
-            //                 fvp->n.v[1] = vp->n.v[1];
-            //                 fvp->n.v[2] = vp->n.v[2];
-            //             }
-            //             ++v5;
-            //             v39 += 32;
-            //             v30 += 4;
-
-            //             ++v;
-            //         }
-            //     }
-            // }
-            // if (model->faces && flags & BR_MODU_MATERIALS) {
-            //     v35 = 0;
-            //     v27 = 0;
-            //     while (v11m->ngroups > v27) {
-            //         v9 = 0;
-            //         v10 = 0;
-            //         v28 = v35;
-            //         for (j = 0;; j += 4) {
-            //             v12 = (v11group*)((char*)v11m->groups + v28); // not sure about this one
-            //             if (v9 >= v12->nfaces) {
-            //                 break;
-            //             }
-            //             v31 = 40 * v12->face_user[v10];
-            //             fp = (br_face*)((char*)model->faces + v31);
-            //             if (flags & 0x20) {
-            //                 v32 = fp->index << 24;
-            //                 v31 = (fp->red << 16) | v32;
-            //                 v32 = fp->grn << 8;
-            //                 v12->face_colours[j / 4] = fp->blu | v32 | v31;
-            //             }
-            //             ++v9;
-            //             ++v10;
-            //         }
-            //         ++v27;
-            //         v35 += 36;
-            //     }
-            // }
-            // if (flags & 1) {
-            //     if (!(model->flags & 0x200)) {
-            //         RegenerateVertexNormals(v11m);
-            //     }
-            //     RegenerateFaceNormals(v11m);
-            // }
         }
 
-        if (!(model->flags & BR_MODF_UPDATEABLE)) {
-            if (model->faces) {
-                BrResFree(model->faces);
+        if (flags & BR_MODU_NORMALS) {
+            if (!(model->flags & BR_MODF_CUSTOM_NORMALS)) {
+                RegenerateVertexNormals(v11m);
             }
-            if (model->vertices) {
-                BrResFree(model->vertices);
-            }
-            model->vertices = 0;
-            model->nfaces = 0;
-            model->nvertices = 0;
-            model->faces = 0;
+            RegenerateFaceNormals(v11m);
         }
     }
+
+    if (!(model->flags & BR_MODF_UPDATEABLE)) {
+        if (model->faces) {
+            BrResFree(model->faces);
+        }
+        if (model->vertices) {
+            BrResFree(model->vertices);
+        }
+        model->vertices = NULL;
+        model->nfaces = 0;
+        model->nvertices = 0;
+        model->faces = NULL;
+    }
+
+    if (model->stored) {
+        ((br_object*)model->stored)->dispatch->_free((br_object*)model->stored);
+        model->stored = NULL;
+    }
+
+    Harness_Hook_BrModelUpdate(model);
 }
 
 // IDA: void __usercall BrModelClear(br_model *model@<EAX>)

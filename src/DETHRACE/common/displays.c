@@ -5,11 +5,10 @@
 #include "depth.h"
 #include "flicplay.h"
 #include "globvars.h"
-#include "globvars.h"
 #include "globvrkm.h"
 #include "globvrpb.h"
-#include "graphics.h"
 #include "grafdata.h"
+#include "graphics.h"
 #include "harness/trace.h"
 #include "netgame.h"
 #include "pd/sys.h"
@@ -38,7 +37,7 @@ int gTimer_headup;
 int gTime_awarded_headup;
 int gPed_kill_count_headup;
 int gDim_amount;
-br_pixelmap* gHeadup_images[32];  // Modified by DethRace for the demo
+br_pixelmap* gHeadup_images[32]; // Modified by DethRace for the demo
 int gNet_cash_headup;
 int gNet_ped_headup;
 int gCredits_lost_headup;
@@ -661,7 +660,6 @@ int DRTextCleverWidth(tDR_font* pFont, signed char* pText) {
         } else {
             pFont = &gFonts[256 - *c];
         }
-
     }
     return result;
 }
@@ -984,7 +982,48 @@ void DoDamageScreen(tU32 pThe_time) {
     br_pixelmap* the_image;
     tDamage_unit* the_damage;
     LOG_TRACE("(%d)", pThe_time);
-    STUB_ONCE();
+
+    if (&gProgram_state.current_car != gCar_to_view || gProgram_state.current_car_index != gProgram_state.current_car.index) {
+        return;
+    }
+    if (gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0) {
+        if (gProgram_state.which_view != eView_forward) {
+            return;
+        }
+        the_wobble_y = gScreen_wobble_x;
+        the_wobble_x = gScreen_wobble_y;
+    } else {
+        the_wobble_y = gProgram_state.current_car.damage_x_offset;
+        the_wobble_x = gProgram_state.current_car.damage_y_offset;
+        if (gProgram_state.current_car.damage_background) {
+            DRPixelmapRectangleMaskedCopy(
+                gBack_screen,
+                gProgram_state.current_car.damage_background_x,
+                gProgram_state.current_car.damage_background_y,
+                gProgram_state.current_car.damage_background,
+                0,
+                0,
+                gProgram_state.current_car.damage_background->width,
+                gProgram_state.current_car.damage_background->height);
+        }
+    }
+    for (i = 0; i < COUNT_OF(gProgram_state.current_car.damage_units); i++) {
+        the_damage = &gProgram_state.current_car.damage_units[i];
+        if (i != 2) {
+            the_image = the_damage->images;
+            the_step = 5 * the_damage->damage_level / 100;
+            y_pitch = (the_image->height / 2) / 5;
+            DRPixelmapRectangleMaskedCopy(
+                gBack_screen,
+                the_wobble_y + gProgram_state.current_car.damage_units[i].x_coord,
+                the_wobble_x + gProgram_state.current_car.damage_units[i].y_coord,
+                the_image,
+                0,
+                y_pitch * (2 * (5 * the_damage->damage_level / 100) + ((pThe_time / the_damage->periods[5 * the_damage->damage_level / 100]) & 1)),
+                the_image->width,
+                y_pitch);
+        }
+    }
 }
 
 // IDA: void __cdecl PoshDrawLine(float pAngle, br_pixelmap *pDestn, int pX1, int pY1, int pX2, int pY2, int pColour)
@@ -1412,20 +1451,20 @@ void AwardTime(tU32 pTime) {
 void DrawRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int pBottom, int pColour) {
     LOG_TRACE("(%p, %d, %d, %d, %d, %d)", pPixelmap, pLeft, pTop, pRight, pBottom, pColour);
 
-    BrPixelmapLine(pPixelmap, pLeft,  pTop,    pRight, pTop,    pColour);
-    BrPixelmapLine(pPixelmap, pLeft,  pBottom, pRight, pBottom, pColour);
-    BrPixelmapLine(pPixelmap, pLeft,  pTop,    pLeft,  pBottom, pColour);
-    BrPixelmapLine(pPixelmap, pRight, pTop,    pRight, pBottom, pColour);
+    BrPixelmapLine(pPixelmap, pLeft, pTop, pRight, pTop, pColour);
+    BrPixelmapLine(pPixelmap, pLeft, pBottom, pRight, pBottom, pColour);
+    BrPixelmapLine(pPixelmap, pLeft, pTop, pLeft, pBottom, pColour);
+    BrPixelmapLine(pPixelmap, pRight, pTop, pRight, pBottom, pColour);
 }
 
 // IDA: void __usercall DrawRRectangle(br_pixelmap *pPixelmap@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pRight@<ECX>, int pBottom, int pColour)
 void DrawRRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int pBottom, int pColour) {
     LOG_TRACE("(%p, %d, %d, %d, %d, %d)", pPixelmap, pLeft, pTop, pRight, pBottom, pColour);
 
-    BrPixelmapLine(pPixelmap, pLeft + 1, pTop,     pRight - 1, pTop,        pColour);
-    BrPixelmapLine(pPixelmap, pLeft + 1, pBottom,  pRight - 1, pBottom,     pColour);
-    BrPixelmapLine(pPixelmap, pLeft,     pTop + 1, pLeft,      pBottom - 1, pColour);
-    BrPixelmapLine(pPixelmap, pRight,    pTop + 1, pRight,     pBottom - 1, pColour);
+    BrPixelmapLine(pPixelmap, pLeft + 1, pTop, pRight - 1, pTop, pColour);
+    BrPixelmapLine(pPixelmap, pLeft + 1, pBottom, pRight - 1, pBottom, pColour);
+    BrPixelmapLine(pPixelmap, pLeft, pTop + 1, pLeft, pBottom - 1, pColour);
+    BrPixelmapLine(pPixelmap, pRight, pTop + 1, pRight, pBottom - 1, pColour);
 }
 
 // IDA: void __usercall OoerrIveGotTextInMeBoxMissus(int pFont_index@<EAX>, char *pText@<EDX>, br_pixelmap *pPixelmap@<EBX>, int pLeft@<ECX>, int pTop, int pRight, int pBottom, int pCentred)

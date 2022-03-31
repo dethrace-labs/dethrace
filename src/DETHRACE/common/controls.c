@@ -96,207 +96,256 @@ char* gEdit_mode_names[10] = {
     "Bonnet",
     "Options",
 };
+
 // order is: { None, CTRL, ALT, CTRL+ALT, SHIFT, CTRL+SHIFT, ALT+SHIFT, CTRL+ALT+SHIFT }
 tEdit_func* gEdit_funcs[10][18][8] = {
-    {  // eEdit_mode_cheat
-        { 0 },  // F5
-        { 0 },  // F6
-        { 0 },  // F7
-        { 0 },  // F8
-        { 0 },  // F10
-        { 0 },  // F11
-        { 0 },  // F12
-        { 0 },  // 0
-        { 0 },  // 1
-        { 0 },  // 2
-        { 0 },  // 3
-        { 0 },  // 4
-        { 0 },  // 5
-        { 0 },  // 6
-        { 0 },  // 7
-        { 0 },  // 8
-        { 0 },  // 9
-        { 0 },  // not used
+    {
+        // eEdit_mode_cheat
+        { 0 }, // F5
+        { 0 }, // F6
+        { 0 }, // F7
+        { 0 }, // F8
+        { 0 }, // F10
+        { 0 }, // F11
+        { 0 }, // F12
+        { 0 }, // 0
+        { 0 }, // 1
+        { 0 }, // 2
+        { 0 }, // 3
+        { 0 }, // 4
+        { 0 }, // 5
+        { 0 }, // 6
+        { 0 }, // 7
+        { 0 }, // 8
+        { 0 }, // 9
+        { 0 }, // not used
     },
-    {  // eEdit_mode_acc
-        { 0 },  // F5
-        { 0 },  // F6
-        { 0 },  // F7
-        { 0 },  // F8
-        { 0 },  // F10
-        { 0 },  // F11
-        { 0 },  // F12
-        { 0 },  // 0
-        { 0 },  // 1
-        { 0 },  // 2
-        { 0 },  // 3
-        { 0 },  // 4
-        { 0 },  // 5
-        { 0 },  // 6
-        { 0 },  // 7
-        { 0 },  // 8
-        { 0 },  // 9
-        { 0 },  // not used
+    {
+        // eEdit_mode_acc
+        { 0 }, // F5
+        { 0 }, // F6
+        { 0 }, // F7
+        { 0 }, // F8
+        { 0 }, // F10
+        { 0 }, // F11
+        { 0 }, // F12
+        { 0 }, // 0
+        { 0 }, // 1
+        { 0 }, // 2
+        { 0 }, // 3
+        { 0 }, // 4
+        { 0 }, // 5
+        { 0 }, // 6
+        { 0 }, // 7
+        { 0 }, // 8
+        { 0 }, // 9
+        { 0 }, // not used
     },
-    {  // eEdit_mode_spec_vol
-        { 0 },  // F5
-        { 0 },  // F6
-        { 0 },  // F7
-        { 0 },  // F8
-        { 0 },  // F10
-        { 0 },  // F11
-        { 0 },  // F12
-        { 0 },  // 0
-        { 0 },  // 1
-        { 0 },  // 2
-        { 0 },  // 3
-        { 0 },  // 4
-        { 0 },  // 5
-        { 0 },  // 6
-        { 0 },  // 7
-        { 0 },  // 8
-        { 0 },  // 9
-        { 0 },  // not used
+    {
+        // eEdit_mode_spec_vol
+        { 0 }, // F5
+        { 0 }, // F6
+        { 0 }, // F7
+        { 0 }, // F8
+        { 0 }, // F10
+        { 0 }, // F11
+        { 0 }, // F12
+        { 0 }, // 0
+        { 0 }, // 1
+        { 0 }, // 2
+        { 0 }, // 3
+        { 0 }, // 4
+        { 0 }, // 5
+        { 0 }, // 6
+        { 0 }, // 7
+        { 0 }, // 8
+        { 0 }, // 9
+        { 0 }, // not used
     },
-    {  // eEdit_mode_ped
-        { 0 },  // F5
-        { 0 },  // F6
-        { 0 },  // F7
-        { 0 },  // F8
-        { 0 },  // F10
-        { 0 },  // F11
-        { 0 },  // F12
-        { 0 },  // 0
-        { 0 },  // 1
-        { 0 },  // 2
-        { 0 },  // 3
-        { 0 },  // 4
-        { 0 },  // 5
-        { 0 },  // 6
-        { 0 },  // 7
-        { 0 },  // 8
-        { 0 },  // 9
-        { 0 },  // not used
+    {
+        // eEdit_mode_ped
+        { 0 }, // F5
+        { 0 }, // F6
+        { 0 }, // F7
+        { 0 }, // F8
+        { 0 }, // F10
+        { 0 }, // F11
+        { 0 }, // F12
+        { 0 }, // 0
+        { 0 }, // 1
+        { 0 }, // 2
+        { 0 }, // 3
+        { 0 }, // 4
+        { 0 }, // 5
+        { 0 }, // 6
+        { 0 }, // 7
+        { 0 }, // 8
+        { 0 }, // 9
+        { 0 }, // not used
     },
-    {  // eEdit_mode_opp
-        { 0 },  // F5
-        { 0 },  // F6
-        { 0 },  // F7
-        { 0 },  // F8
-        { 0 },  // F10
-        { 0 },  // F11
-        { 0 },  // F12
-        { 0 },  // 0
-        { 0 },  // 1
-        { 0 },  // 2
-        { 0 },  // 3
-        { 0 },  // 4
-        { 0 },  // 5
-        { 0 },  // 6
-        { 0 },  // 7
-        { 0 },  // 8
-        { 0 },  // 9
-        { 0 },  // not used
+    {
+        // eEdit_mode_opp
+        { 0 }, // F5
+        { 0 }, // F6
+        { 0 }, // F7
+        { 0 }, // F8
+        { 0 }, // F10
+        { 0 }, // F11
+        { 0 }, // F12
+        { 0 }, // 0
+        { 0 }, // 1
+        { 0 }, // 2
+        { 0 }, // 3
+        { 0 }, // 4
+        { 0 }, // 5
+        { 0 }, // 6
+        { 0 }, // 7
+        { 0 }, // 8
+        { 0 }, // 9
+        { 0 }, // not used
     },
-    {  // eEdit_mode_pratcam
-        { 0 },  // F5
-        { 0 },  // F6
-        { 0 },  // F7
-        { 0 },  // F8
-        { 0 },  // F10
-        { 0 },  // F11
-        { 0 },  // F12
-        { 0 },  // 0
-        { 0 },  // 1
-        { 0 },  // 2
-        { 0 },  // 3
-        { 0 },  // 4
-        { 0 },  // 5
-        { 0 },  // 6
-        { 0 },  // 7
-        { 0 },  // 8
-        { 0 },  // 9
-        { 0 },  // not used
+    {
+        // eEdit_mode_pratcam
+        { 0 }, // F5
+        { 0 }, // F6
+        { 0 }, // F7
+        { 0 }, // F8
+        { 0 }, // F10
+        { 0 }, // F11
+        { 0 }, // F12
+        { 0 }, // 0
+        { 0 }, // 1
+        { 0 }, // 2
+        { 0 }, // 3
+        { 0 }, // 4
+        { 0 }, // 5
+        { 0 }, // 6
+        { 0 }, // 7
+        { 0 }, // 8
+        { 0 }, // 9
+        { 0 }, // not used
     },
-    {  // eEdit_mode_depth
-        { 0 },  // F5
-        { 0 },  // F6
-        { 0 },  // F7
-        { 0 },  // F8
-        { 0 },  // F10
-        { 0 },  // F11
-        { 0 },  // F12
-        { 0 },  // 0
-        { 0 },  // 1
-        { 0 },  // 2
-        { 0 },  // 3
-        { 0 },  // 4
-        { 0 },  // 5
-        { 0 },  // 6
-        { 0 },  // 7
-        { 0 },  // 8
-        { 0 },  // 9
-        { 0 },  // not used
+    {
+        // eEdit_mode_depth
+        { 0 }, // F5
+        { 0 }, // F6
+        { 0 }, // F7
+        { 0 }, // F8
+        { 0 }, // F10
+        { 0 }, // F11
+        { 0 }, // F12
+        { 0 }, // 0
+        { 0 }, // 1
+        { 0 }, // 2
+        { 0 }, // 3
+        { 0 }, // 4
+        { 0 }, // 5
+        { 0 }, // 6
+        { 0 }, // 7
+        { 0 }, // 8
+        { 0 }, // 9
+        { 0 }, // not used
     },
-    {  // eEdit_mode_damage
-        { 0 },  // F5
-        { 0 },  // F6
-        { 0 },  // F7
-        { 0 },  // F8
-        { 0 },  // F10
-        { 0 },  // F11
-        { 0 },  // F12
-        { 0 },  // 0
-        { 0 },  // 1
-        { 0 },  // 2
-        { 0 },  // 3
-        { 0 },  // 4
-        { 0 },  // 5
-        { 0 },  // 6
-        { 0 },  // 7
-        { 0 },  // 8
-        { 0 },  // 9
-        { 0 },  // not used
+    {
+        // eEdit_mode_damage
+        { 0 }, // F5
+        { 0 }, // F6
+        { 0 }, // F7
+        { 0 }, // F8
+        { 0 }, // F10
+        { 0 }, // F11
+        { 0 }, // F12
+        { 0 }, // 0
+        { 0 }, // 1
+        { 0 }, // 2
+        { 0 }, // 3
+        { 0 }, // 4
+        { 0 }, // 5
+        { 0 }, // 6
+        { 0 }, // 7
+        { 0 }, // 8
+        { 0 }, // 9
+        { 0 }, // not used
     },
-    {  // eEdit_mode_bonnet
-        { 0 },  // F5
-        { 0 },  // F6
-        { 0 },  // F7
-        { 0 },  // F8
-        { 0 },  // F10
-        { 0 },  // F11
-        { 0 },  // F12
-        { 0 },  // 0
-        { 0 },  // 1
-        { 0 },  // 2
-        { 0 },  // 3
-        { 0 },  // 4
-        { 0 },  // 5
-        { 0 },  // 6
-        { 0 },  // 7
-        { 0 },  // 8
-        { 0 },  // 9
-        { 0 },  // not used
+    {
+        // eEdit_mode_bonnet
+        { 0 }, // F5
+        { 0 }, // F6
+        { 0 }, // F7
+        { 0 }, // F8
+        { 0 }, // F10
+        { 0 }, // F11
+        { 0 }, // F12
+        { 0 }, // 0
+        { 0 }, // 1
+        { 0 }, // 2
+        { 0 }, // 3
+        { 0 }, // 4
+        { 0 }, // 5
+        { 0 }, // 6
+        { 0 }, // 7
+        { 0 }, // 8
+        { 0 }, // 9
+        { 0 }, // not used
     },
-    {  // eEdit_mode_options
-        { 0 },  // F5
-        { 0 },  // F6
-        { 0 },  // F7
-        { 0 },  // F8
-        { 0 },  // F10
-        { 0 },  // F11
-        { 0 },  // F12
-        { 0 },  // 0
-        { CycleCarSimplificationLevel, NULL, NULL, NULL, CycleCarTexturingLevel, },  // 1
-        { ToggleShadow, NULL, NULL, NULL, ToggleSmoke, },  // 2
-        { CycleWallTexturingLevel, NULL, NULL, NULL, CycleRoadTexturingLevel, },  // 3
-        { ToggleSky, NULL, NULL, NULL, ToggleDepthCueing, },  // 4
-        { CycleYonFactor, NULL, NULL, NULL, ToggleAccessoryRendering, },  // 5
-        { DecreaseYon, NULL, NULL, NULL, IncreaseYon,  },  // 6
-        { CycleSoundDetailLevel,  },  // 7
-        { 0 },  // 8
-        { 0 },  // 9
-        { 0 },  // not used
+    {
+        // eEdit_mode_options
+        { 0 }, // F5
+        { 0 }, // F6
+        { 0 }, // F7
+        { 0 }, // F8
+        { 0 }, // F10
+        { 0 }, // F11
+        { 0 }, // F12
+        { 0 }, // 0
+        {
+            CycleCarSimplificationLevel,
+            NULL,
+            NULL,
+            NULL,
+            CycleCarTexturingLevel,
+        }, // 1
+        {
+            ToggleShadow,
+            NULL,
+            NULL,
+            NULL,
+            ToggleSmoke,
+        }, // 2
+        {
+            CycleWallTexturingLevel,
+            NULL,
+            NULL,
+            NULL,
+            CycleRoadTexturingLevel,
+        }, // 3
+        {
+            ToggleSky,
+            NULL,
+            NULL,
+            NULL,
+            ToggleDepthCueing,
+        }, // 4
+        {
+            CycleYonFactor,
+            NULL,
+            NULL,
+            NULL,
+            ToggleAccessoryRendering,
+        }, // 5
+        {
+            DecreaseYon,
+            NULL,
+            NULL,
+            NULL,
+            IncreaseYon,
+        }, // 6
+        {
+            CycleSoundDetailLevel,
+        }, // 7
+        { 0 }, // 8
+        { 0 }, // 9
+        { 0 }, // not used
     },
 };
 tCheat gKev_keys[44] = {
@@ -1152,7 +1201,7 @@ void CheckMapRenderMove() {
                 if (gReal_graf_data_index == 0) {
                     gMap_render_y = (gBack_screen->height - gCurrent_graf_data->map_render_y_marg - gMap_render_height_i) & ~1;
                 } else {
-                    gMap_render_y = (((gBack_screen->height - gCurrent_graf_data->map_render_y_marg - gMap_render_height_i) & ~3) - 40 ) / 2;
+                    gMap_render_y = (((gBack_screen->height - gCurrent_graf_data->map_render_y_marg - gMap_render_height_i) & ~3) - 40) / 2;
                 }
             }
             SetIntegerMapRenders();
@@ -1248,23 +1297,9 @@ void CheckOtherRacingKeys() {
     } else if (gNet_mode && NetGetPlayerStatus() == ePlayer_status_recovering) {
         NetPlayerStatusChanged(ePlayer_status_racing);
     }
-    if ((!gAuto_repair && !KeyIsDown(44))
-        || gRace_finished
-        || gProgram_state.current_car.knackered
-        || gWait_for_it
-        || gEntering_message) {
-        gRepair_last_time = 0;
-        stopped_repairing = 0;
-        total_repair_cost = 0;
-        total_difference = 0;
-        if (sound_tag) {
-            for (i = 0; i < 10 && S3SoundStillPlaying(sound_tag); ++i) {
-                DRS3StopSound(sound_tag);
-            }
-            sound_tag = 0;
-        }
-    } else {
-        if (!gAuto_repair && !gRepair_last_time && GetTotalTime() - gLast_repair_time < 1200) {
+
+    if ((gAuto_repair || KeyIsDown(KEYMAP_REPAIR)) && !gRace_finished && !gProgram_state.current_car.knackered && !gWait_for_it && !gEntering_message) {
+        if (!gAuto_repair && gRepair_last_time == 0 && GetTotalTime() - gLast_repair_time < 1200) {
             gAuto_repair = 1;
         }
         gLast_repair_time = GetTotalTime();
@@ -1278,7 +1313,7 @@ void CheckOtherRacingKeys() {
                 cost = 0;
                 for (j = 0; j < COUNT_OF(gProgram_state.current_car.damage_units); j++) {
                     old_level = gProgram_state.current_car.damage_units[j].damage_level;
-                    if (amount == 0.0) {
+                    if (amount == 0.0f) {
                         new_level = 0;
                     } else {
                         new_level = ((double)gProgram_state.current_car.damage_units[j].damage_level
@@ -1335,6 +1370,18 @@ void CheckOtherRacingKeys() {
                 gAuto_repair = 0;
                 stopped_repairing = 1;
             }
+        }
+
+    } else {
+        gRepair_last_time = 0;
+        stopped_repairing = 0;
+        total_repair_cost = 0;
+        total_difference = 0;
+        if (sound_tag) {
+            for (i = 0; i < 10 && S3SoundStillPlaying(sound_tag); ++i) {
+                DRS3StopSound(sound_tag);
+            }
+            sound_tag = 0;
         }
     }
     if (NeedToExpandBoundingBox) {
@@ -1986,7 +2033,7 @@ void CycleYonFactor() {
 // IDA: void __usercall SetSoundDetailLevel(int pLevel@<EAX>)
 void SetSoundDetailLevel(int pLevel) {
     LOG_TRACE("(%d)", pLevel);
-    
+
     gSound_detail_level = pLevel;
 }
 

@@ -15,6 +15,7 @@
 #include "harness/config.h"
 #include "harness/trace.h"
 #include "netgame.h"
+#include "network.h"
 #include "oil.h"
 #include "opponent.h"
 #include "pd/sys.h"
@@ -45,7 +46,7 @@ void (*ControlCar[6])(tCar_spec*, br_scalar) = {
     &ControlCar5,
     NULL
 };
-int gControl__car = 3; // suffix added to avoid duplicate symbol
+int gControl__car = 3;  // suffix added to avoid duplicate symbol
 int gFace_num__car = 1; // suffix added to avoid duplicate symbol
 br_angle gOld_yaw__car; // suffix added to avoid duplicate symbol
 br_angle gOld_zoom;
@@ -83,9 +84,9 @@ int gOpponent_viewing_mode;
 int gNet_player_to_view_index;
 int gDouble_pling_water;
 int gStop_opponents_moving;
-float gDefensive_powerup_factor[6];
-float gOffensive_powerup_factor[6];
-float gEngine_powerup_factor[6] = { 1.3, 1.9, 2.5, 3.2, 4.0, 10.0 };
+float gDefensive_powerup_factor[6] = { 1.0f, 0.825f, 0.65f, 0.475f, 0.3f, 0.01f };
+float gOffensive_powerup_factor[6] = { 1.0f, 1.5f, 2.0f, 3.0f, 5.0f, 10.0f };
+float gEngine_powerup_factor[6] = { 1.3f, 1.9f, 2.5f, 3.2f, 4.0f, 10.0f };
 br_angle gPanning_camera_angle;
 br_scalar gPanning_camera_height;
 int gFace_count;
@@ -108,8 +109,8 @@ int gCamera_frozen;
 int gMaterial_index;
 int gInTheSea;
 int gCamera_mode;
-br_scalar gOur_yaw__car; // suffix added to avoid duplicate symbol
-br_scalar gGravity__car; // suffix added to avoid duplicate symbol
+br_scalar gOur_yaw__car;            // suffix added to avoid duplicate symbol
+br_scalar gGravity__car;            // suffix added to avoid duplicate symbol
 br_vector3 gNew_ground_normal__car; // suffix added to avoid duplicate symbol
 char gNon_car_spec_list[100];
 tU32 gMechanics_time_sync;
@@ -749,7 +750,6 @@ void ControlOurCar(tU32 pTime_difference) {
     }
     time = GetTotalTime();
     if (car->damage_units[eDamage_steering].damage_level > 40) {
-        LOG_PANIC("this is not expected");
         if (car->end_steering_damage_effect) {
             if (car->end_steering_damage_effect > time || car->damage_units[eDamage_steering].damage_level == 99) {
                 car->keys.left = car->false_key_left;
@@ -774,7 +774,6 @@ void ControlOurCar(tU32 pTime_difference) {
         }
     }
     if (car->damage_units[eDamage_transmission].damage_level > 40) {
-        LOG_PANIC("this is not expected");
         if (car->end_trans_damage_effect) {
             if (car->end_trans_damage_effect > time || car->damage_units[eDamage_transmission].damage_level == 99) {
                 car->gear = 0;
@@ -1273,7 +1272,7 @@ int CollideCarWithWall(tCollision_info* car, br_scalar dt) {
             GetFacesInBox(car);
         }
         if (car->collision_flag) {
-            CrashEarnings((tCar_spec*)car, 0);
+            CrashEarnings((tCar_spec*)car, NULL);
         }
         BrMatrix34TApplyV(&car->velocity_car_space, &car->v, &car->oldmat);
         car->frame_collision_flag += car->collision_flag;
@@ -1661,37 +1660,37 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
     br_scalar scale;
     LOG_TRACE("(%p, %f)", c, dt);
 
-    int v72; // [esp+24h] [ebp-1C8h]
-    double v73; // [esp+2Ch] [ebp-1C0h]
-    float v74; // [esp+34h] [ebp-1B8h]
-    float v75; // [esp+38h] [ebp-1B4h]
-    float v76; // [esp+3Ch] [ebp-1B0h]
-    float v77; // [esp+40h] [ebp-1ACh]
-    float v78; // [esp+44h] [ebp-1A8h]
-    float v79; // [esp+48h] [ebp-1A4h]
-    float v80; // [esp+4Ch] [ebp-1A0h] MAPDST
-    float v82; // [esp+50h] [ebp-19Ch] MAPDST
-    float v84; // [esp+54h] [ebp-198h]
-    float v85; // [esp+58h] [ebp-194h] MAPDST
-    float v87; // [esp+5Ch] [ebp-190h] MAPDST
-    float v98; // [esp+88h] [ebp-164h]
-    float v99; // [esp+8Ch] [ebp-160h]
+    int v72;         // [esp+24h] [ebp-1C8h]
+    double v73;      // [esp+2Ch] [ebp-1C0h]
+    float v74;       // [esp+34h] [ebp-1B8h]
+    float v75;       // [esp+38h] [ebp-1B4h]
+    float v76;       // [esp+3Ch] [ebp-1B0h]
+    float v77;       // [esp+40h] [ebp-1ACh]
+    float v78;       // [esp+44h] [ebp-1A8h]
+    float v79;       // [esp+48h] [ebp-1A4h]
+    float v80;       // [esp+4Ch] [ebp-1A0h] MAPDST
+    float v82;       // [esp+50h] [ebp-19Ch] MAPDST
+    float v84;       // [esp+54h] [ebp-198h]
+    float v85;       // [esp+58h] [ebp-194h] MAPDST
+    float v87;       // [esp+5Ch] [ebp-190h] MAPDST
+    float v98;       // [esp+88h] [ebp-164h]
+    float v99;       // [esp+8Ch] [ebp-160h]
     br_vector3 v102; // [esp+98h] [ebp-154h]
     br_vector3 v103; // [esp+A4h] [ebp-148h]
-    int v105; // [esp+B8h] [ebp-134h]
-    float v106; // [esp+C0h] [ebp-12Ch]
+    int v105;        // [esp+B8h] [ebp-134h]
+    float v106;      // [esp+C0h] [ebp-12Ch]
     br_vector3 v107; // [esp+C4h] [ebp-128h]
-    float v108; // [esp+D0h] [ebp-11Ch]
-    float v109; // [esp+D4h] [ebp-118h]
-    float v116; // [esp+F8h] [ebp-F4h]
-    br_vector3 B; // [esp+FCh] [ebp-F0h] BYREF
-    br_scalar pV; // [esp+10Ch] [ebp-E0h]
+    float v108;      // [esp+D0h] [ebp-11Ch]
+    float v109;      // [esp+D4h] [ebp-118h]
+    float v116;      // [esp+F8h] [ebp-F4h]
+    br_vector3 B;    // [esp+FCh] [ebp-F0h] BYREF
+    br_scalar pV;    // [esp+10Ch] [ebp-E0h]
     br_vector3 v123; // [esp+130h] [ebp-BCh]
-    float v125; // [esp+16Ch] [ebp-80h]
-    float v128; // [esp+18Ch] [ebp-60h]
-    float v129; // [esp+190h] [ebp-5Ch]
-    float v134; // [esp+1D8h] [ebp-14h]
-    float v135; // [esp+1DCh] [ebp-10h]
+    float v125;      // [esp+16Ch] [ebp-80h]
+    float v128;      // [esp+18Ch] [ebp-60h]
+    float v129;      // [esp+190h] [ebp-5Ch]
+    float v134;      // [esp+1D8h] [ebp-14h]
+    float v135;      // [esp+1DCh] [ebp-10h]
     br_vector3 v136; // [esp+1E0h] [ebp-Ch]
 
     BrVector3Set(&v136, 0, 0, 0);
@@ -2914,7 +2913,90 @@ void CrushAndDamageCar(tCar_spec* c, br_vector3* pPosition, br_vector3* pForce_c
     br_matrix34 m;
     br_scalar fudge_multiplier;
     LOG_TRACE("(%p, %p, %p, %p)", c, pPosition, pForce_car_space, car2);
-    STUB_ONCE();
+
+    if (car2 != NULL) {
+        car2->who_last_hit_me = c;
+        c->who_last_hit_me = car2;
+    }
+    if (c->driver > eDriver_non_car) {
+        fudge_multiplier = gNet_mode == eNet_mode_none || gNet_softness[gCurrent_net_game->type] == 1.0f ? 1.0f : gNet_softness[gCurrent_net_game->type];
+        BrVector3Sub(&car_to_cam, &c->pos, (br_vector3*)gCamera_to_world.m[3]);
+        ts = BrVector3LengthSquared(&car_to_cam);
+        if (c->driver != eDriver_oppo || ts <= 200.0f) {
+            if (car2) {
+                if (car2->driver > eDriver_non_car) {
+                    TwoCarsHitEachOther(c, car2);
+                }
+                if (c->driver >= eDriver_net_human) {
+                    fudge_multiplier = gDefensive_powerup_factor[c->power_up_levels[0]] * 1.2f * fudge_multiplier;
+                }
+                if (car2->driver >= eDriver_net_human) {
+                    if (gNet_mode
+                        && (gCurrent_net_game->type == eNet_game_type_fight_to_death || gCurrent_net_game->type == eNet_game_type_car_crusher)) {
+                        fudge_multiplier = gOffensive_powerup_factor[car2->power_up_levels[2]] * gNet_offensive[gCurrent_net_game->type] * car2->damage_multiplier * fudge_multiplier;
+                    } else {
+                        fudge_multiplier = gOffensive_powerup_factor[car2->power_up_levels[2]] * car2->damage_multiplier * fudge_multiplier;
+                    }
+                }
+                if (c->driver == eDriver_oppo && car2->driver == eDriver_oppo) {
+                    fudge_multiplier = fudge_multiplier * 0.2f;
+                }
+                if (car2->driver <= eDriver_non_car) {
+                    car2 = NULL;
+                } else {
+                    fudge_multiplier = fudge_multiplier / ((car2->car_model_actors[car2->principal_car_actor].crush_data.softness_factor + 0.7f) / 0.7f);
+                }
+            }
+            BrVector3InvScale(&position, pPosition, WORLD_SCALE);
+            BrVector3Scale(&force, pForce_car_space, fudge_multiplier * 0.03f);
+            ts = BrVector3LengthSquared(&force);
+            if (c->driver <= eDriver_non_car || !c->invulnerable) {
+                c->damage_magnitude_accumulator = c->damage_magnitude_accumulator + ts;
+            }
+            if (c->driver < eDriver_net_human) {
+                BrVector3Scale(&force_for_bodywork, &force, 1.5f);
+            } else {
+                if (c->collision_mass_multiplier != 1.0) {
+                    BrVector3InvScale(&force, &force, c->collision_mass_multiplier);
+                }
+                BrVector3Scale(&force_for_bodywork, &force, 0.5f);
+                if (c->driver == eDriver_local_human) {
+                    DoPratcamHit(&force);
+                }
+            }
+            if (gNet_mode == eNet_mode_host && (gCurrent_net_game->type == eNet_game_type_tag || gCurrent_net_game->type == eNet_game_type_foxy) && car2
+                && c->driver >= eDriver_net_human && car2->driver >= eDriver_net_human) {
+                if (gNet_players[gIt_or_fox].car != c || car2->knackered) {
+                    if (gNet_players[gIt_or_fox].car == car2 && !c->knackered) {
+                        CarInContactWithItOrFox(NetPlayerFromCar(c));
+                    }
+                } else {
+                    CarInContactWithItOrFox(NetPlayerFromCar(car2));
+                }
+            }
+            if (gNet_mode != eNet_mode_client || !car2) {
+                DamageSystems(c, &position, &force, car2 != NULL);
+            }
+            if (c->driver <= eDriver_non_car || !c->invulnerable) {
+                for (i = 0; i < c->car_actor_count; i++) {
+                    if (c->car_model_actors[i].min_distance_squared != -1.0f || (pForce_car_space->v[1] >= 0.0f && pForce_car_space->v[2] >= 0.0f)) {
+                        CrushModel(c, i, c->car_model_actors[i].actor, &position, &force_for_bodywork, &c->car_model_actors[i].crush_data);
+                    }
+                }
+            }
+            if (car2 && car2->driver == eDriver_local_human && ts > 0.003f) {
+                PipeSingleCarIncident(ts, c, &position);
+            }
+            if (!car2 && c->driver == eDriver_local_human && ts > 0.003f) {
+                BrMatrix34Copy(&m, &c->car_master_actor->t.t.mat);
+                m.m[3][0] /= WORLD_SCALE;
+                m.m[3][1] /= WORLD_SCALE;
+                m.m[3][2] /= WORLD_SCALE;
+                BrMatrix34ApplyP(&pos_w, &position, &m);
+                PipeSingleWallIncident(ts, &pos_w);
+            }
+        }
+    }
 }
 
 // IDA: int __usercall ExpandBoundingBox@<EAX>(tCar_spec *c@<EAX>)
@@ -2927,7 +3009,43 @@ int ExpandBoundingBox(tCar_spec* c) {
     int l;
     br_matrix34 mat;
     LOG_TRACE("(%p)", c);
-    NOT_IMPLEMENTED();
+
+    l = 0;
+    min_z = c->bounds[1].min.v[2];
+    max_z = c->bounds[1].max.v[2];
+    old_pos = *(br_vector3*)&c->oldmat.m[3][0];
+    CrushBoundingBox(c, 0);
+    for (l = 0; l < 5; l++) {
+        if (TestForCarInSensiblePlace(c)) {
+            break;
+        }
+        if (c->old_point.v[2] <= 0.0f) {
+            dist = min_z - c->bounds[1].min.v[2];
+        } else {
+            dist = c->bounds[1].max.v[2] - max_z;
+        }
+        if (dist >= 0.0f) {
+            dist = dist + 0.005f;
+            BrVector3Scale(&c->old_norm, &c->old_norm, dist);
+            BrMatrix34ApplyV(&tv, &c->old_norm, &c->car_master_actor->t.t.mat);
+            c->oldmat.m[3][0] = c->oldmat.m[3][0] + tv.v[0];
+            c->oldmat.m[3][1] = c->oldmat.m[3][1] + tv.v[1];
+            c->oldmat.m[3][2] = c->oldmat.m[3][2] + tv.v[2];
+            l++;
+        } else {
+            l = 5;
+        }
+    }
+    if (l < 5) {
+        return 1;
+    }
+    *(br_vector3*)&c->oldmat.m[3][0] = old_pos;
+    c->bounds[1].min.v[2] = min_z;
+    c->bounds[1].max.v[2] = max_z;
+    if (c->driver == eDriver_local_human) {
+        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(6));
+    }
+    return 0;
 }
 
 // IDA: void __usercall CrushBoundingBox(tCar_spec *c@<EAX>, int crush_only@<EDX>)
@@ -2937,7 +3055,63 @@ void CrushBoundingBox(tCar_spec* c, int crush_only) {
     int i;
     br_actor* actor;
     LOG_TRACE("(%p, %d)", c, crush_only);
-    NOT_IMPLEMENTED();
+
+    if (c == NULL) {
+        return;
+    }
+    actor = c->car_model_actors[c->principal_car_actor].actor;
+    max.v[0] = c->wpos[2].v[2] - c->non_driven_wheels_circum / 6.2f;
+    min.v[0] = c->driven_wheels_circum / 6.2f + c->wpos[0].v[2];
+    max.v[0] = max.v[0] / WORLD_SCALE;
+    min.v[0] = min.v[0] / WORLD_SCALE;
+    for (i = 0; i < actor->model->nvertices; i++) {
+        if (actor->model->vertices[i].p.v[2] < max.v[0]) {
+            max.v[0] = actor->model->vertices[i].p.v[2];
+        }
+        if (actor->model->vertices[i].p.v[2] > min.v[0]) {
+            min.v[0] = actor->model->vertices[i].p.v[2];
+        }
+    }
+    max.v[0] = max.v[0] * WORLD_SCALE;
+    min.v[0] = min.v[0] * WORLD_SCALE;
+    if (crush_only) {
+        if (c->bounds[1].min.v[2] > max.v[0]) {
+            max.v[0] = c->bounds[1].min.v[2];
+        }
+        if (c->bounds[1].max.v[2] < min.v[0]) {
+            min.v[0] = c->bounds[1].max.v[2];
+        }
+    } else {
+        if (c->max_bounds[1].min.v[2] > max.v[0]) {
+            max.v[0] = c->max_bounds[1].min.v[2];
+        }
+        if (c->max_bounds[1].max.v[2] < min.v[0]) {
+            min.v[0] = c->max_bounds[1].max.v[2];
+        }
+    }
+    c->bounds[1].min.v[2] = max.v[0];
+    c->bounds[1].max.v[2] = min.v[0];
+    for (i = 0; i < c->extra_point_num; i++) {
+        if (c->max_bounds[1].max.v[2] + 0.01f >= c->original_extra_points_z[i] && c->max_bounds[1].min.v[2] - 0.01f <= c->original_extra_points_z[i]) {
+            if (c->original_extra_points_z[i] <= min.v[0]) {
+                if (c->original_extra_points_z[i] >= max.v[0]) {
+                    c->extra_points[i].v[2] = c->original_extra_points_z[i];
+                } else {
+                    c->extra_points[i].v[2] = max.v[0];
+                }
+            } else {
+                c->extra_points[i].v[2] = min.v[0];
+            }
+            if (c->extra_points[i].v[2] > min.v[0]) {
+                c->extra_points[i].v[2] = min.v[0];
+            }
+            if (c->extra_points[i].v[2] < max.v[0]) {
+                c->extra_points[i].v[2] = max.v[0];
+            }
+        } else {
+            c->extra_points[i].v[2] = c->original_extra_points_z[i];
+        }
+    }
 }
 
 // IDA: void __cdecl AddCollPoint(br_scalar dist, br_vector3 *p, br_vector3 *norm, br_vector3 *r, br_vector3 *n, br_vector3 *dir, int num, tCollision_info *c)
