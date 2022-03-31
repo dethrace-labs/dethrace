@@ -75,7 +75,7 @@ int PipeSearchForwards() {
 int IsActionReplayAvailable() {
     LOG_TRACE("()");
 
-    return gPipe_buffer_start != 0;
+    return gPipe_buffer_start != NULL;
 }
 
 // IDA: int __cdecl SomeReplayLeft()
