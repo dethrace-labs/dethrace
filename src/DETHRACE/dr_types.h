@@ -3087,8 +3087,6 @@ typedef struct tQueued_headup {
     char text[256];
 } tQueued_headup;
 
-// typedef unsigned long time_t;
-// typedef unsigned long clock_t;
 typedef struct tFlicette {
     int flic_index;
     int x[2];

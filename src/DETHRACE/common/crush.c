@@ -177,7 +177,7 @@ void CrushModelPoint(tCar_spec* pCar, int pModel_index, br_model* pModel, int pC
     for (i = 0; i < 3; i++) {
         pEnergy_vector->v[i] = SRandomPosNeg(working_wibble * total_energy) + pEnergy_vector->v[i];
         random_range = (the_crush_point->limits_pos.v[i] - the_crush_point->limits_neg.v[i]) * working_limit_deviant;
-        if (pEnergy_vector->v[i] >= 0.0) {
+        if (pEnergy_vector->v[i] >= 0.0f) {
             softnesss.v[i] = the_crush_point->softness_pos.v[i];
         } else {
             softnesss.v[i] = the_crush_point->softness_neg.v[i];
@@ -192,8 +192,8 @@ void CrushModelPoint(tCar_spec* pCar, int pModel_index, br_model* pModel, int pC
             target_point->v[i] = SRandomPosNeg(random_range) + the_crush_point->limits_neg.v[i];
         }
         movement.v[i] = target_point->v[i] - movement.v[i];
-        if (pEnergy_vector->v[i] * movement.v[i] < 0.0) {
-            movement.v[i] = 0.0;
+        if (pEnergy_vector->v[i] * movement.v[i] < 0.0f) {
+            movement.v[i] = 0.0f;
             target_point->v[i] = old_vector.v[i];
         }
     }
@@ -381,9 +381,6 @@ br_scalar RepairModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, br_ve
         if (amount != 0.0 && IsActionReplayAvailable() && pipe_vertex_count < COUNT_OF(pipe_array)) {
             pipe_array[pipe_vertex_count].vertex_index = i;
             BrVector3Sub(&pipe_array[pipe_vertex_count].delta_coordinates, &model_vertex->p, &old_point);
-            // pipe_array[pipe_vertex_count].delta_coordinates.v[0] = model_vertex->p.v[0] - old_point.v[0];
-            // pipe_array[pipe_vertex_count].delta_coordinates.v[1] = model_vertex->p.v[1] - old_point.v[1];
-            // pipe_array[pipe_vertex_count].delta_coordinates.v[2] = model_vertex->p.v[2] - old_point.v[2];
             pipe_vertex_count++;
         }
         pUndamaged_vertices++;
@@ -514,7 +511,7 @@ void DoDamage(tCar_spec* pCar, tDamage_type pDamage_type, float pMagnitude, floa
     LOG_TRACE("(%p, %d, %f, %f)", pCar, pDamage_type, pMagnitude, pNastiness);
 
     if (pCar->driver < eDriver_net_human) {
-        DamageUnit2(pCar, pDamage_type, ((gCurrent_race.suggested_rank < 10 ? 0.5f : gCurrent_race.suggested_rank) / 20.0 + 1.0) * (pNastiness * pMagnitude * 10.0));
+        DamageUnit2(pCar, pDamage_type, ((gCurrent_race.suggested_rank < 10 ? 0.5f : gCurrent_race.suggested_rank) / 20.0f + 1.0f) * (pNastiness * pMagnitude * 10.0f));
     } else if (gNet_mode != eNet_mode_none) {
         DamageUnit2(pCar, pDamage_type, pNastiness * pMagnitude * 15.0f);
     } else if (PercentageChance(pNastiness * pMagnitude * 1500.0f)) {
@@ -583,7 +580,7 @@ void DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEner
         return;
     }
 
-    energy_magnitude = pCar->car_model_actors[pCar->principal_car_actor].crush_data.softness_factor * pure_energy_magnitude / 0.7;
+    energy_magnitude = pCar->car_model_actors[pCar->principal_car_actor].crush_data.softness_factor * pure_energy_magnitude / 0.7f;
     BrVector3InvScale(&crushed_car_bounds.min, &pCar->bounds[1].min, WORLD_SCALE);
     BrVector3InvScale(&crushed_car_bounds.max, &pCar->bounds[1].max, WORLD_SCALE);
 

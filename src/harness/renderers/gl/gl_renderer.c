@@ -193,7 +193,6 @@ void GLRenderer_Init(int width, int height, int pRender_width, int pRender_heigh
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDepthFunc(GL_LESS);
-    // glDisable(GL_CULL_FACE);
     glClearColor(0, 0, 0, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 

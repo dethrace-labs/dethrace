@@ -56,8 +56,13 @@ br_camera* gSpark_cam;
 br_material* gBlack_material;
 tShrapnel gShrapnel[15];
 
+// gSmoke_column has 25 elements but all the code just checks the first 5 elements
 #define MAX_SMOKE_COLUMNS 5
+
+// Bugfix: At higher FPS, flame animation runs too quickly, so introduce a new frame timer
 #define FLAME_ANIMATION_FRAME_INTERVAL 40
+
+// Bugfix: At higher FPS, `CreatePuffOfSmoke` is called too often and causes smoke cirlces to be recycled too quickly so assume around 25fps
 #define SMOKE_COLUMN_NEW_PUFF_INTERVAL 30
 
 // IDA: void __cdecl DrawDot(br_scalar z, tU8 *scr_ptr, tU16 *depth_ptr, tU8 *shade_ptr)
@@ -1287,7 +1292,7 @@ void CreateSmokeColumn(tCar_spec* pCar, int pColour, int pVertex_index, tU32 pLi
     LOG_TRACE("(%p, %d, %d, %d)", pCar, pColour, pVertex_index, pLifetime);
 
     col = &gSmoke_column[gNext_column];
-    if (pCar->last_special_volume && pCar->last_special_volume->gravity_multiplier < 1.0) {
+    if (pCar->last_special_volume && pCar->last_special_volume->gravity_multiplier < 1.0f) {
         return;
     }
     SmudgeCar(pCar, pVertex_index);
@@ -1465,10 +1470,10 @@ void DoSmokeColumn(int i, tU32 pTime, br_vector3* pRet_car_pos) {
     LOG_TRACE("(%d, %d, %p)", i, pTime, pRet_car_pos);
 
     c = gSmoke_column[i].car;
-    if (c->car_master_actor->t.t.mat.m[1][1] > 0.1) {
+    if (c->car_master_actor->t.t.mat.m[1][1] > 0.1f) {
         gSmoke_column[i].upright = 1;
     }
-    if (c->car_master_actor->t.t.mat.m[1][1] < -0.1) {
+    if (c->car_master_actor->t.t.mat.m[1][1] < -0.1f) {
         gSmoke_column[i].upright = 0;
     }
     actor = c->car_model_actors[c->principal_car_actor].actor;
@@ -1547,8 +1552,6 @@ void MungeSmokeColumn(tU32 pTime) {
             gSmoke_column[i].time += pTime;
             if (gSmoke_column[i].time > 200) {
 #ifdef DETHRACE_FIX_BUGS
-                // At higher FPS, `CreatePuffOfSmoke` is called too often and causes smoke cirlces to be recycled too quickly
-                // so assume around 25fps
                 gSmoke_column[i].time -= fmaxf(SMOKE_COLUMN_NEW_PUFF_INTERVAL, pTime);
 #else
                 gSmoke_column[i].time -= pTime;
@@ -1557,7 +1560,7 @@ void MungeSmokeColumn(tU32 pTime) {
                 BrVector3Cross(&v, &c->omega, &car_pos);
                 BrMatrix34ApplyV(&car_pos, &v, &c->car_master_actor->t.t.mat);
                 BrVector3Add(&v, &c->v, &car_pos);
-                v.v[1] = v.v[1] + 2.898550724637681f;
+                v.v[1] = v.v[1] + 2.898550724637681f; // 100 / 34.5 ?
                 pos.v[0] = SRandomBetween(-0.03f, 0.03f) + gSmoke_column[i].pos.v[0];
                 pos.v[1] = (gSmoke_column[i].colour == 0) * 0.05f + gSmoke_column[i].pos.v[1];
                 pos.v[2] = SRandomBetween(-0.03f, 0.03f) + gSmoke_column[i].pos.v[2];
@@ -1894,7 +1897,6 @@ void StopCarSmokingInstantly(tCar_spec* pCar) {
     int i;
     LOG_TRACE("(%p)", pCar);
 
-    // bug ? gSmoke_column has size of 25
     for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
         if (gSmoke_column[i].car == pCar) {
             gSmoke_column[i].lifetime = 0;
