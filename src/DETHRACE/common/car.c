@@ -2914,7 +2914,7 @@ void CrushAndDamageCar(tCar_spec* c, br_vector3* pPosition, br_vector3* pForce_c
     br_scalar fudge_multiplier;
     LOG_TRACE("(%p, %p, %p, %p)", c, pPosition, pForce_car_space, car2);
 
-    if (car2) {
+    if (car2 != NULL) {
         car2->who_last_hit_me = c;
         c->who_last_hit_me = car2;
     }
