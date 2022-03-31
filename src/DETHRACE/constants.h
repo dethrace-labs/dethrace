@@ -274,7 +274,7 @@ typedef enum keymapcodes {
     KEYMAP_LOOK_FORWARD = 51, // default W
     KEYMAP_LOOK_RIGHT = 52,   // default E
     KEYMAP_SOUND = 36,        // default S
-    KEYMAP_REPAIR = 44,
+    KEYMAP_REPAIR = 44,       // default BACKSPACE
     KEYMAP_PEDESTRIANS = 54,    // default KP_MINUS
     KEYMAP_F4 = 17,             // default F4
     KEYMAP_F5 = 18,             // default F5
