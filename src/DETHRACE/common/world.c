@@ -2583,7 +2583,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     gProgram_state.non_cars = non_car;
     gProgram_state.num_non_car_spaces = num_non_cars + NONCAR_UNUSED_SLOTS;
     for (i = 0; i < COUNT_OF(gNon_car_spec_list); ++i) {
-        gNon_car_spec_list[i] = 0;
+        gNon_car_spec_list[i] = '\0';
     }
     for (i = 0; i < NONCAR_UNUSED_SLOTS; i++) {
         non_car->collision_info.driver = eDriver_non_car_unused_slot;

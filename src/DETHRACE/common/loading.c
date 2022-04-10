@@ -20,6 +20,9 @@
 #include "globvrpb.h"
 #include "grafdata.h"
 #include "graphics.h"
+#include "harness/config.h"
+#include "harness/hooks.h"
+#include "harness/trace.h"
 #include "init.h"
 #include "input.h"
 #include "newgame.h"
@@ -31,16 +34,14 @@
 #include "spark.h"
 #include "utility.h"
 #include "world.h"
-#include "harness/config.h"
-#include "harness/hooks.h"
-#include "harness/trace.h"
 #include <errno.h>
 
 #define HITHER_MULTIPLIER 2.0f
 #define AMBIENT_MULTIPLIER 0.01f
 #define NBR_FUNK_GROVE_FLAGS 30
 
-tHeadup_info gHeadup_image_info[32] = {  // Modified by DethRace to fit the "demo timeout" fancy head-up.
+tHeadup_info gHeadup_image_info[32] = {
+    // Modified by DethRace to fit the "demo timeout" fancy head-up.
     { "LADY.PIX", eNet_or_otherwise },
     { "GENT.PIX", eNet_or_otherwise },
     { "CODGER.PIX", eNet_or_otherwise },
@@ -72,7 +73,7 @@ tHeadup_info gHeadup_image_info[32] = {  // Modified by DethRace to fit the "dem
     { "UBROKE.PIX", eNet_only },
     { "ULOST.PIX", eNet_only },
     { "UWON.PIX", eNet_only },
-    { "DTIMEOUT.PIX", eNot_net },   // Only used by the demo, not present in the full version
+    { "DTIMEOUT.PIX", eNot_net }, // Only used by the demo, not present in the full version
 };
 char* gYour_car_names[2][6];
 char* gDrivable_car_names[6];
@@ -809,7 +810,7 @@ tS8* ConvertPixToStripMap(br_pixelmap* pThe_br_map) {
 
     for (i = 0; i < pThe_br_map->height; i++) {
         next_byte = (tU8*)pThe_br_map->pixels + i * pThe_br_map->row_bytes; // points to start of this line
-        new_line_length = 2; // leave space at the start of the line to store number of chunks and first chunk length
+        new_line_length = 2;                                                // leave space at the start of the line to store number of chunks and first chunk length
         j = 0;
         counter = 0;
         total = 0;
@@ -1194,7 +1195,7 @@ void ReadNonCarMechanicsData(FILE* pF, tNon_car_spec* non_car) {
     GetThreeFloats(pF, &non_car->free_cmpos.v[0], &non_car->free_cmpos.v[1], &non_car->free_cmpos.v[2]);
     GetThreeFloats(pF, &non_car->attached_cmpos.v[0], &non_car->attached_cmpos.v[1], &non_car->attached_cmpos.v[2]);
     GetThreeFloats(pF, &non_car->collision_info.bounds[1].min.v[0], &non_car->collision_info.bounds[1].min.v[1], &non_car->collision_info.bounds[1].min.v[2]);
-    GetThreeFloats(pF, &non_car->collision_info.bounds[1].max.v[0], &non_car->collision_info.bounds[1].max.v[1], &non_car->collision_info.bounds[1].max.v[1]);
+    GetThreeFloats(pF, &non_car->collision_info.bounds[1].max.v[0], &non_car->collision_info.bounds[1].max.v[1], &non_car->collision_info.bounds[1].max.v[2]);
     non_car->collision_info.extra_point_num = GetAnInt(pF);
     if (non_car->collision_info.extra_point_num > 6) {
         sprintf(s, "%d", non_car->collision_info.index);
