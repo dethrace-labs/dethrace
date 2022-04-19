@@ -1211,10 +1211,16 @@ int SphereBoxIntersection(br_bounds* pB, br_vector3* pC, br_scalar pR_squared, b
         if (pC->v[i] <= pB->min.v[i]) {
             pHit_point->v[i] = pB->min.v[i];
         } else {
+            // if (pC->v[i] <= pB->max.v[i]) {
+            //     pB->max.v[i] = pC->v[i];
+            // }
+            // pHit_point->v[i] = pB->max.v[i];
+
             if (pC->v[i] <= pB->max.v[i]) {
-                pB->max.v[i] = pC->v[i];
+                pHit_point->v[i] = pC->v[i];
+            } else {
+                pHit_point->v[i] = pB->max.v[i];
             }
-            pHit_point->v[i] = pB->max.v[i];
         }
         d += (pC->v[i] - pHit_point->v[i]) * (pC->v[i] - pHit_point->v[i]);
     }
