@@ -1293,26 +1293,21 @@ void MoveAndCollideCar(tCar_spec* car, br_scalar dt) {
 void MoveAndCollideNonCar(tNon_car_spec* non_car, br_scalar dt) {
     tCollision_info* car_info;
     LOG_TRACE("(%p, %f)", non_car, dt);
-    NOT_IMPLEMENTED();
 
-    if (non_car->collision_info.water_d != 10000.0) {
+    car_info = &non_car->collision_info;
+    if (car_info->water_d != 10000.0f) {
         TestAutoSpecialVolume(&non_car->collision_info);
     }
     MungeSpecialVolume(&non_car->collision_info);
-    if (non_car->collision_info.dt >= 0.0) {
-        dt = non_car->collision_info.dt;
+    if (car_info->dt >= 0.0) {
+        dt = car_info->dt;
     }
     NonCarCalcForce(non_car, dt);
     RotateCar(&non_car->collision_info, dt);
     TranslateCar(&non_car->collision_info, dt);
     CollideCarWithWall(&non_car->collision_info, dt);
-    BrMatrix34ApplyP(
-        &non_car->collision_info.pos,
-        &non_car->collision_info.cmpos,
-        &non_car->collision_info.car_master_actor->t.t.mat);
-    non_car->collision_info.pos.v[0] = non_car->collision_info.pos.v[0] / 6.9000001;
-    non_car->collision_info.pos.v[1] = non_car->collision_info.pos.v[1] / 6.9000001;
-    non_car->collision_info.pos.v[2] = non_car->collision_info.pos.v[2] / 6.9000001;
+    BrMatrix34ApplyP(&car_info->pos, &car_info->cmpos, &car_info->car_master_actor->t.t.mat);
+    BrVector3InvScale(&car_info->pos, &car_info->pos, WORLD_SCALE);
 }
 
 // IDA: int __usercall CollideCarWithWall@<EAX>(tCollision_info *car@<EAX>, br_scalar dt)
@@ -1629,7 +1624,66 @@ void NonCarCalcForce(tNon_car_spec* nc, br_scalar dt) {
     br_vector3 tv;
     br_vector3 v;
     LOG_TRACE("(%p, %f)", nc, dt);
-    NOT_IMPLEMENTED();
+
+    c = &nc->collision_info;
+    vol = nc->collision_info.last_special_volume;
+    if (nc->collision_info.car_master_actor->identifier[3] != '!') {
+        if (c->car_master_actor->t.t.mat.m[1][1] < nc->snap_off_cosine || c->min_torque_squared == 0.0f) {
+            c->car_master_actor->identifier[3] = '!';
+            c->M = nc->free_mass;
+            c->min_torque_squared = 0.0f;
+            // v.v[0] = nc->free_cmpos.v[0] - c->cmpos.v[0];
+            // v.v[1] = nc->free_cmpos.v[1] - c->cmpos.v[1];
+            // v.v[2] = nc->free_cmpos.v[2] - c->cmpos.v[2];
+            BrVector3Sub(&v, &nc->free_cmpos, &c->cmpos);
+            tv.v[0] = c->omega.v[1] * v.v[2] - c->omega.v[2] * v.v[1];
+            tv.v[1] = c->omega.v[2] * v.v[0] - c->omega.v[0] * v.v[2];
+            tv.v[2] = c->omega.v[0] * v.v[1] - c->omega.v[1] * v.v[0];
+
+            BrMatrix34ApplyV(&v, &tv, &c->car_master_actor->t.t.mat);
+            // c->v.v[0] = c->v.v[0] + v.v[0];
+            // c->v.v[1] = c->v.v[1] + v.v[1];
+            // c->v.v[2] = c->v.v[2] + v.v[2];
+            BrVector3Accumulate(&c->v, &v);
+            c->cmpos = nc->free_cmpos;
+        } else {
+            BrVector3SetFloat(&c->v, 0.0f, 0.0f, 0.0f);
+            ts = BrVector3LengthSquared(&c->omega);
+            BrVector3SetFloat(&c->omega, 0.0f, 0.0f, 0.0f);
+            c->doing_nothing_flag = 1;
+        }
+    }
+    if (c->car_master_actor->identifier[3] == '!') {
+        if (vol) {
+            c->v.v[1] = c->v.v[1] - dt * 10.0f * vol->gravity_multiplier;
+        } else {
+            c->v.v[1] = c->v.v[1] - dt * 10.0f;
+        }
+        ts = BrVector3Length(&c->v); // sqrtf(c->v.v[1] * c->v.v[1] + c->v.v[2] * c->v.v[2] + c->v.v[0] * c->v.v[0]);
+        if (vol) {
+            ts = vol->viscosity_multiplier * ts;
+        }
+        ts = -(dt * 0.0005f * ts);
+        ts = ts / c->M;
+        // v.v[0] = c->v.v[0] * ts;
+        // v.v[1] = c->v.v[1] * ts;
+        // v.v[2] = c->v.v[2] * ts;
+        BrVector3Scale(&v, &c->v, ts);
+        // c->v.v[0] = c->v.v[0] + v.v[0];
+        // c->v.v[1] = c->v.v[1] + v.v[1];
+        // c->v.v[2] = c->v.v[2] + v.v[2];
+        BrVector3Accumulate(&c->v, &v);
+        ts = BrVector3Length(&c->omega);
+        if (vol) {
+            ts = vol->viscosity_multiplier * ts;
+        }
+        ts = -(dt * 0.0005 * ts);
+        // v.v[0] = c->omega.v[0] * ts;
+        // v.v[1] = c->omega.v[1] * ts;
+        // v.v[2] = c->omega.v[2] * ts;
+        BrVector3Scale(&v, &c->omega, ts);
+        ApplyTorque((tCar_spec*)c, &v);
+    }
 }
 
 // IDA: void __usercall AddDrag(tCar_spec *c@<EAX>, br_scalar dt)
@@ -2852,7 +2906,86 @@ void AddFrictionCarToCar(tCollision_info* car1, tCollision_info* car2, br_vector
     br_scalar total_friction;
     int i;
     LOG_TRACE("(%p, %p, %p, %p, %p, %p, %p, %f, %p)", car1, car2, vel1, vel2, normal_force1, pos1, pos2, total_force, max_friction);
-    NOT_IMPLEMENTED();
+
+    BrMatrix34TApplyV(&tv, vel2, &car2->oldmat);
+    BrMatrix34ApplyV(&vel2_in_frame_1, &tv, &car1->oldmat);
+    v_diff1.v[0] = vel2_in_frame_1.v[0] - vel1->v[0];
+    v_diff1.v[1] = vel2_in_frame_1.v[1] - vel1->v[1];
+    v_diff1.v[2] = vel2_in_frame_1.v[2] - vel1->v[2];
+    ts = BrVector3Length(normal_force1); /* normal_force1->v[1] * normal_force1->v[1]
+        + normal_force1->v[2] * normal_force1->v[2]
+        + normal_force1->v[0] * normal_force1->v[0];*/
+    ts2 = (normal_force1->v[1] * v_diff1.v[1] + normal_force1->v[2] * v_diff1.v[2] + normal_force1->v[0] * v_diff1.v[0]) / ts;
+    tv.v[0] = normal_force1->v[0] * ts2;
+    tv.v[1] = normal_force1->v[1] * ts2;
+    tv.v[2] = normal_force1->v[2] * ts2;
+    v_diff1.v[0] = v_diff1.v[0] - tv.v[0];
+    v_diff1.v[1] = v_diff1.v[1] - tv.v[1];
+    v_diff1.v[2] = v_diff1.v[2] - tv.v[2];
+    v_diff = sqrtf(v_diff1.v[1] * v_diff1.v[1] + v_diff1.v[2] * v_diff1.v[2] + v_diff1.v[0] * v_diff1.v[0]);
+    if (v_diff < 0.01f) {
+        max_friction->v[0] = 0.0;
+        max_friction->v[1] = 0.0;
+        max_friction->v[2] = 0.0;
+    } else {
+        v_diff1.v[0] = v_diff1.v[0] / v_diff;
+        v_diff1.v[1] = v_diff1.v[1] / v_diff;
+        v_diff1.v[2] = v_diff1.v[2] / v_diff;
+        BrMatrix34ApplyV(&tv, &v_diff1, &car1->oldmat);
+        BrMatrix34TApplyV(&v_diff2, &tv, &car2->oldmat);
+        v_diff2.v[0] = -v_diff2.v[0];
+        v_diff2.v[1] = -v_diff2.v[1];
+        v_diff2.v[2] = -v_diff2.v[2];
+        tau1.v[0] = pos1->v[1] * v_diff1.v[2] - pos1->v[2] * v_diff1.v[1];
+        tau1.v[1] = pos1->v[2] * v_diff1.v[0] - pos1->v[0] * v_diff1.v[2];
+        tau1.v[2] = pos1->v[0] * v_diff1.v[1] - pos1->v[1] * v_diff1.v[0];
+        tau2.v[0] = pos2->v[1] * v_diff2.v[2] - pos2->v[2] * v_diff2.v[1];
+        tau2.v[1] = pos2->v[2] * v_diff2.v[0] - pos2->v[0] * v_diff2.v[2];
+        tau2.v[2] = pos2->v[0] * v_diff2.v[1] - pos2->v[1] * v_diff2.v[0];
+        for (i = 0; i < 3; ++i) {
+            tau1.v[i] = tau1.v[i] / car1->I.v[i];
+            tau2.v[i] = tau2.v[i] / car2->I.v[i];
+        }
+        tv.v[0] = pos1->v[2] * tau1.v[1] - pos1->v[1] * tau1.v[2];
+        tv.v[1] = pos1->v[0] * tau1.v[2] - pos1->v[2] * tau1.v[0];
+        tv.v[2] = pos1->v[1] * tau1.v[0] - pos1->v[0] * tau1.v[1];
+        tv2.v[0] = pos2->v[2] * tau2.v[1] - pos2->v[1] * tau2.v[2];
+        tv2.v[1] = pos2->v[0] * tau2.v[2] - pos2->v[2] * tau2.v[0];
+        tv2.v[2] = pos2->v[1] * tau2.v[0] - pos2->v[0] * tau2.v[1];
+        ts = tv2.v[1] * v_diff2.v[1] + tv2.v[2] * v_diff2.v[2] + v_diff2.v[0] * tv2.v[0]
+            + tv.v[1] * v_diff1.v[1] + tv.v[2] * v_diff1.v[2] + v_diff1.v[0] * tv.v[0]
+            + 1.0 / car2->M + 1.0 / car1->M;
+        if (ts < 0.0001f) {
+            max_friction->v[0] = 0.0;
+            max_friction->v[1] = 0.0;
+            max_friction->v[2] = 0.0;
+        } else {
+            stopping_impulse = v_diff / ts;
+            total_friction = total_force * 0.35f;
+            if (stopping_impulse < total_friction) {
+                total_friction = stopping_impulse;
+            }
+            if (!car1->infinite_mass) {
+                tau1.v[0] = tau1.v[0] * total_friction;
+                tau1.v[1] = tau1.v[1] * total_friction;
+                tau1.v[2] = tau1.v[2] * total_friction;
+                car1->omega.v[0] = car1->omega.v[0] + tau1.v[0];
+                car1->omega.v[1] = car1->omega.v[1] + tau1.v[1];
+                car1->omega.v[2] = car1->omega.v[2] + tau1.v[2];
+            }
+            if (!car2->infinite_mass) {
+                tau2.v[0] = tau2.v[0] * total_friction;
+                tau2.v[1] = tau2.v[1] * total_friction;
+                tau2.v[2] = tau2.v[2] * total_friction;
+                car2->omega.v[0] = car2->omega.v[0] + tau2.v[0];
+                car2->omega.v[1] = car2->omega.v[1] + tau2.v[1];
+                car2->omega.v[2] = car2->omega.v[2] + tau2.v[2];
+            }
+            max_friction->v[0] = v_diff1.v[0] * total_friction;
+            max_friction->v[1] = v_diff1.v[1] * total_friction;
+            max_friction->v[2] = v_diff1.v[2] * total_friction;
+        }
+    }
 }
 
 // IDA: void __cdecl ScrapeNoise(br_scalar vel, br_vector3 *position, int material)
@@ -7217,7 +7350,7 @@ void CheckForDeAttachmentOfNonCars(tU32 pTime) {
             }
             if (drop) {
                 LOG_DEBUG("dropping actor %s %f %f", actor->identifier, actor->t.t.mat.m[3][0], actor->t.t.mat.m[3][2]);
-                LOG_MATRIX4("act", &actor->t.t.mat);
+                // LOG_MATRIX4("act", &actor->t.t.mat);
                 BrActorRemove(actor);
                 c->driver = eDriver_non_car_unused_slot;
                 last_free_slot--;
