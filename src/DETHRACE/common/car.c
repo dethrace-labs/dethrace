@@ -4976,7 +4976,7 @@ int CollideCamera2(br_vector3* car_pos, br_vector3* cam_pos, br_vector3* old_cam
                 }
             }
         }
-        i += k + 1;
+        i += k;
     }
     return i;
 }

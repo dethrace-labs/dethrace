@@ -253,38 +253,42 @@ float FastFloatArcTan2(float pY, float pX) {
 
     abs_x = fabsf(pX);
     abs_y = fabsf(pY);
-    if (pX == 0.0) {
-        if (pY >= 0.0) {
-            if (pY <= 0.0) {
-                return 0.0;
-            } else {
-                return 90.0;
-            }
-        } else {
+    if (pX == 0.0f) {
+        if (pY < 0.0f) {
             return 270.0;
+        } else if (pY == 0.0f) {
+            return 0.0f;
+        } else {
+            return 90.0f;
         }
-    } else if (pX >= 0.0) {
+    } else if (pX > 0.0f) {
         if (pY >= 0.0) {
-            if (abs_y <= (double)abs_x) {
+            if (abs_y <= abs_x) {
                 return abs_y / abs_x * 45.0f;
             } else {
-                return (2.0 - abs_x / abs_y) * 45.0f;
+                return (2.0f - abs_x / abs_y) * 45.0f;
             }
-        } else if (abs_y <= (double)abs_x) {
-            return (8.0 - abs_y / abs_x) * 45.0f;
         } else {
-            return (abs_x / abs_y + 6.0f) * 45.0f;
+            if (abs_y <= abs_x) {
+                return (8.0f - abs_y / abs_x) * 45.0f;
+            } else {
+                return (abs_x / abs_y + 6.0f) * 45.0f;
+            }
         }
-    } else if (pY >= 0.0) {
-        if (abs_y <= (double)abs_x) {
-            return (4.0 - abs_y / abs_x) * 45.0f;
-        } else {
-            return (abs_x / abs_y + 2.0f) * 45.0f;
-        }
-    } else if (abs_y <= (double)abs_x) {
-        return (abs_y / abs_x + 4.0) * 45.0f;
     } else {
-        return (6.0 - abs_x / abs_y) * 45.0f;
+        if (pY >= 0.0f) {
+            if (abs_y <= abs_x) {
+                return (4.0f - abs_y / abs_x) * 45.0f;
+            } else {
+                return (abs_x / abs_y + 2.0f) * 45.0f;
+            }
+        } else {
+            if (abs_y <= abs_x) {
+                return (abs_y / abs_x + 4.0f) * 45.0f;
+            } else {
+                return (6.0f - abs_x / abs_y) * 45.0f;
+            }
+        }
     }
 }
 

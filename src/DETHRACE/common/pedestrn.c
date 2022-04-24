@@ -844,35 +844,30 @@ void MungePedestrianSequence(tPedestrian_data* pPedestrian, int pAction_changed)
     } else {
         heading_difference = gCamera_to_horiz_angle;
     }
-    i = 0;
-    while (1) {
-        if (i >= pPedestrian->action_list[pPedestrian->current_action].number_of_bearings) {
-            return;
-        }
+    for (i = 0; i < pPedestrian->action_list[pPedestrian->current_action].number_of_bearings; i++) {
         if (heading_difference <= pPedestrian->action_list[pPedestrian->current_action].sequences[i].max_bearing) {
+            the_sequence = pPedestrian->action_list[pPedestrian->current_action].sequences[i].sequence_index;
+            if (pPedestrian->current_sequence == the_sequence) {
+                break;
+            }
+            sequence_ptr = &pPedestrian->sequences[the_sequence];
+            current_looping = pPedestrian->sequences[pPedestrian->current_sequence].looping_frame_start;
+            if (pAction_changed || current_looping > pPedestrian->current_frame) {
+                pPedestrian->current_frame = -1;
+                pPedestrian->done_initial = 0;
+            } else if (pPedestrian->current_action != pPedestrian->fatal_car_impact_action
+                    && pPedestrian->current_action != pPedestrian->fatal_ground_impact_action
+                    && pPedestrian->current_action != pPedestrian->giblets_action) {
+                pPedestrian->current_frame += sequence_ptr->looping_frame_start - current_looping - 1;
+                pPedestrian->done_initial = 1;
+            } else if (pPedestrian->current_frame >= sequence_ptr->number_of_frames) {
+                pPedestrian->current_frame = sequence_ptr->number_of_frames - 1;
+            }
+            pPedestrian->last_frame = 0;
+            pPedestrian->current_sequence = the_sequence;
             break;
         }
-        i++;
     }
-    the_sequence = pPedestrian->action_list[pPedestrian->current_action].sequences[i].sequence_index;
-    if (pPedestrian->current_sequence == the_sequence) {
-        return;
-    }
-    sequence_ptr = &pPedestrian->sequences[the_sequence];
-    current_looping = pPedestrian->sequences[pPedestrian->current_sequence].looping_frame_start;
-    if (pAction_changed || current_looping > pPedestrian->current_frame) {
-        pPedestrian->current_frame = -1;
-        pPedestrian->done_initial = 0;
-    } else if (pPedestrian->current_action != pPedestrian->fatal_car_impact_action
-            && pPedestrian->current_action != pPedestrian->fatal_ground_impact_action
-            && pPedestrian->current_action != pPedestrian->giblets_action) {
-        pPedestrian->current_frame += sequence_ptr->looping_frame_start - current_looping - 1;
-        pPedestrian->done_initial = 1;
-    } else if (pPedestrian->current_frame >= sequence_ptr->number_of_frames) {
-        pPedestrian->current_frame = sequence_ptr->number_of_frames - 1;
-    }
-    pPedestrian->last_frame = 0;
-    pPedestrian->current_sequence = the_sequence;
 }
 
 // IDA: void __usercall DetachPedFromCar(tPedestrian_data *pPedestrian@<EAX>)
@@ -1032,10 +1027,7 @@ void MungePedestrianFrames(tPedestrian_data* pPedestrian) {
         }
     }
     new_frame = pPedestrian->current_frame;
-    if (new_frame <= 0) {
-        new_frame = 0;
-    }
-    pPedestrian->colour_map = the_sequence->frames[new_frame].pixelmap;
+    pPedestrian->colour_map = the_sequence->frames[MAX(0, new_frame)].pixelmap;
 }
 
 // IDA: void __usercall MungePedModel(tPedestrian_data *pPedestrian@<EAX>)
@@ -1476,7 +1468,7 @@ tPed_hit_position MoveToEdgeOfCar(tPedestrian_data* pPedestrian, tCollision_info
     if (fabsf(pPedestrian->current_speed) >= fabsf(pCar->speed)) {
         BrVector3Scale(&ped_move_in_global, &pPedestrian->direction, -fabsf(pPedestrian->current_speed));
     } else {
-        BrVector3Scale(&ped_move_in_global, &pPedestrian->direction, fabsf(pCar->speed));
+        BrVector3Scale(&ped_move_in_global, &pCar->direction, fabsf(pCar->speed));
     }
     if (fabsf(ped_move_in_global.v[V_X]) < 5e-5f || fabsf(ped_move_in_global.v[V_Z]) < 5e-5f) {
         return ePed_hit_unknown;
@@ -1553,7 +1545,7 @@ int BloodyWheels(tCar_spec* pCar, br_vector3* pPed_car, br_scalar pSize, br_vect
     size_sqr = pSize + .05f;
     dist_sqr = size_sqr * WORLD_SCALE * size_sqr * WORLD_SCALE;
     squish = 0;
-    for (wheel = 0; wheel < 4; wheel++) {
+    for (wheel = 0; wheel < COUNT_OF(pCar->blood_remaining); wheel++) {
         ped_m_x = pCar->wpos[wheel].v[V_X] - pPed_car->v[V_X] * WORLD_SCALE;
         ped_m_z = pCar->wpos[wheel].v[V_Z] - pPed_car->v[V_Z] * WORLD_SCALE;
         if (pCar->blood_remaining[wheel] == 0.f && ped_m_x * ped_m_x + ped_m_z * ped_m_z < dist_sqr) {
@@ -1646,7 +1638,7 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
             }
         }
     }
-    for (norman = 0, i = 0;; i++) {
+    for (norman = 0, i = 0; 1; i++) {
         while (i >= (norman == 0 ? gNum_active_cars : gNum_active_non_cars) && norman < 2) {
             norman++;
             i = 0;
@@ -1670,7 +1662,7 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
         proximity_rayed = pPedestrian->ref_number < 100
             && pPedestrian->current_action != pPedestrian->fatal_car_impact_action
             && pPedestrian->current_action != pPedestrian->fatal_ground_impact_action
-            && the_car->driver > 1
+            && the_car->driver > eDriver_non_car
             && !((tCar_spec*)the_car)->knackered
             && !gCountdown
             && distance_squared < ((tCar_spec*)the_car)->proxy_ray_distance;
@@ -1712,11 +1704,11 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
                                 || min_ped_bounds_car.v[V_Z] >= prev_car_bounds_max_z
                                 || (min_ped_bounds_car.v[V_X] > car_bounds_max_x
                                     && max_ped_bounds_car.v[V_Z] < prev_car_bounds_min_z
-                                    && prev_car_bounds_max_x - car_bounds_max_x != 0.0
+                                    && prev_car_bounds_max_x - car_bounds_max_x != 0.0f
                                     && (prev_car_bounds_min_z - car_bounds_min_z) / (prev_car_bounds_max_x - car_bounds_max_x) > (max_ped_bounds_car.v[V_Z] - car_bounds_min_z) / (min_ped_bounds_car.v[V_X] - car_bounds_max_x))
                                 || (max_ped_bounds_car.v[V_X] < prev_car_bounds_min_x
                                     && min_ped_bounds_car.v[V_Z] > car_bounds_max_z
-                                    && car_bounds_min_x - prev_car_bounds_min_x != 0.0
+                                    && car_bounds_min_x - prev_car_bounds_min_x != 0.0f
                                     && (car_bounds_max_z - prev_car_bounds_max_z) / (car_bounds_min_x - prev_car_bounds_min_x) > (min_ped_bounds_car.v[V_Z] - prev_car_bounds_max_z) / (max_ped_bounds_car.v[V_X] - prev_car_bounds_min_x))) {
                             continue;
                         }
@@ -1727,11 +1719,11 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
                             || min_ped_bounds_car.v[V_Z] >= car_bounds_max_z
                             || (max_ped_bounds_car.v[V_X] < prev_car_bounds_min_x
                                 && max_ped_bounds_car.v[V_Z] < car_bounds_min_z
-                                && car_bounds_min_x - prev_car_bounds_min_x != 0.0
+                                && car_bounds_min_x - prev_car_bounds_min_x != 0.0f
                                 && ((car_bounds_min_z - prev_car_bounds_min_z) / (car_bounds_min_x - prev_car_bounds_min_x) < (max_ped_bounds_car.v[V_Z] - prev_car_bounds_min_z) / (max_ped_bounds_car.v[V_X] - prev_car_bounds_min_x)))
                             || (min_ped_bounds_car.v[V_X] > car_bounds_max_x
                                 && min_ped_bounds_car.v[V_Z] > prev_car_bounds_max_z
-                                && prev_car_bounds_max_x - car_bounds_max_x != 0.0
+                                && prev_car_bounds_max_x - car_bounds_max_x != 0.0f
                                 && (prev_car_bounds_max_z - car_bounds_max_z) / (prev_car_bounds_max_x - car_bounds_max_x) < (min_ped_bounds_car.v[V_Z] - car_bounds_max_z) / (min_ped_bounds_car.v[V_X] - car_bounds_max_x))) {
                         continue;
                     }
@@ -1742,11 +1734,11 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
                             || min_ped_bounds_car.v[V_Z] >= prev_car_bounds_max_z
                             || (max_ped_bounds_car.v[V_X] < car_bounds_min_x
                                 && max_ped_bounds_car.v[V_Z] < prev_car_bounds_min_z
-                                && prev_car_bounds_min_x - car_bounds_min_x != 0.0
+                                && prev_car_bounds_min_x - car_bounds_min_x != 0.0f
                                 && (prev_car_bounds_min_z - car_bounds_min_z) / (prev_car_bounds_min_x - car_bounds_min_x) < (max_ped_bounds_car.v[V_Z] - car_bounds_min_z) / (max_ped_bounds_car.v[V_X] - car_bounds_min_x))
                             || (min_ped_bounds_car.v[V_X] > prev_car_bounds_max_x
                                 && min_ped_bounds_car.v[V_Z] > car_bounds_max_z
-                                && car_bounds_max_x - prev_car_bounds_max_x != 0.0
+                                && car_bounds_max_x - prev_car_bounds_max_x != 0.0f
                                 && (car_bounds_max_z - prev_car_bounds_max_z) / (car_bounds_max_x - prev_car_bounds_max_x) < (min_ped_bounds_car.v[V_Z] - prev_car_bounds_max_z) / (min_ped_bounds_car.v[V_X] - prev_car_bounds_max_x))) {
                         continue;
                     }
@@ -1756,11 +1748,11 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
                         || min_ped_bounds_car.v[V_Z] >= car_bounds_max_z
                         || (min_ped_bounds_car.v[V_X] > prev_car_bounds_max_x
                             && max_ped_bounds_car.v[V_Z] < car_bounds_min_z
-                            && car_bounds_max_x - prev_car_bounds_max_x != 0.0
+                            && car_bounds_max_x - prev_car_bounds_max_x != 0.0f
                             && (car_bounds_min_z - prev_car_bounds_min_z) / (car_bounds_max_x - prev_car_bounds_max_x) > (max_ped_bounds_car.v[V_Z] - prev_car_bounds_min_z) / (min_ped_bounds_car.v[V_X] - prev_car_bounds_max_x))
                         || (max_ped_bounds_car.v[V_X] < car_bounds_min_x
                             && min_ped_bounds_car.v[V_Z] > prev_car_bounds_max_z
-                            && prev_car_bounds_min_x - car_bounds_min_x != 0.0
+                            && prev_car_bounds_min_x - car_bounds_min_x != 0.0f
                             && (prev_car_bounds_max_z - car_bounds_max_z) / (prev_car_bounds_min_x - car_bounds_min_x) > (min_ped_bounds_car.v[V_Z] - car_bounds_max_z) / (max_ped_bounds_car.v[V_X] - car_bounds_min_x))) {
                             continue;
                 }
@@ -1795,7 +1787,7 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
     ped_centre_x = (max_ped_bounds_car.v[V_X] + min_ped_bounds_car.v[V_X]) / 2.0f;
     ped_centre_y = (max_ped_bounds_car.v[V_Z] + min_ped_bounds_car.v[V_Z]) / 2.0f;
     if (proximity_rayed) {
-        hit_pos = 0;
+        hit_pos = ePed_hit_unknown;
     } else {
         hit_pos = MoveToEdgeOfCar(pPedestrian,
             the_car,
@@ -1810,7 +1802,7 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
             &max_ped_bounds_car);
         pPedestrian->mid_air = 0;
     }
-    if (the_car->driver < 2 && the_car->who_last_hit_me != NULL && pPedestrian->ref_number != 114) {
+    if (the_car->driver <= eDriver_non_car && the_car->who_last_hit_me != NULL && pPedestrian->ref_number != 114) {
         the_car = (tCollision_info*)the_car->who_last_hit_me;
         billiards_shot = 1;
     }
@@ -1839,7 +1831,7 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
     if (pPedestrian->ref_number < 100 && (gNet_mode == eNet_mode_none || pPedestrian->murderer == -1)) {
         gProgram_state.peds_killed++;
     }
-    if (pPedestrian->ref_number < 100 && the_car->driver > 2) {
+    if (pPedestrian->ref_number < 100 && the_car->driver >= eDriver_net_human) {
         if (pPedestrian->murderer == -1 && gNet_mode == eNet_mode_host && gCurrent_net_game->type == eNet_game_type_carnage) {
             NetPlayerFromCar((tCar_spec*)the_car)->score++;
         }
@@ -1874,7 +1866,7 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
                 pPedestrian->falling_speed = -0.001f;
             }
             tossing = 1;
-            pPedestrian->actor->t.t.mat.m[3][1] += impact_speed * 15.0f;
+            pPedestrian->actor->t.t.translate.t.v[V_Y] += impact_speed * 15.0f;
             pPedestrian->pos = pPedestrian->actor->t.t.translate.t;
         } else {
             pPedestrian->actor->render_style = BR_RSTYLE_NONE;

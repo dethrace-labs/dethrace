@@ -222,18 +222,16 @@ void ResetLollipopQueue() {
 int AddToLollipopQueue(br_actor* pActor, int pIndex) {
     LOG_TRACE("(%p, %d)", pActor, pIndex);
 
-    int result; // eax
-
     if (pIndex >= 0) {
         gLollipops[pIndex] = pActor;
-        return pIndex;
     } else if (gNumber_of_lollipops >= 100) {
-        return -1;
+        pIndex = -1;
     } else {
         gLollipops[gNumber_of_lollipops] = pActor;
+        pIndex = gNumber_of_lollipops;
         gNumber_of_lollipops++;
-        return gNumber_of_lollipops - 1;
     }
+    return pIndex;
 }
 
 // IDA: void __cdecl RenderLollipops()
