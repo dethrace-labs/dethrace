@@ -1157,12 +1157,10 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
         }
         for (i = 0; i < gNum_active_non_cars; i++) {
             non_car = gActive_non_car_list[i];
-            LOG_DEBUG("active noncar %d %d", i, non_car->collision_info.doing_nothing_flag);
             if (!non_car->collision_info.doing_nothing_flag) {
-                LOG_DEBUG("active noncar22 %d %d", i, non_car->collision_info.doing_nothing_flag);
                 non_car->collision_info.dt = -1.0;
                 if (non_car->collision_info.message.type == 16 && non_car->collision_info.message.time >= gLast_mechanics_time && gLast_mechanics_time + harness_game_config.physics_step_time >= non_car->collision_info.message.time) {
-                    non_car->collision_info.dt = (double)(gLast_mechanics_time + harness_game_config.physics_step_time - non_car->collision_info.message.time) / 1000.0;
+                    non_car->collision_info.dt = (gLast_mechanics_time + harness_game_config.physics_step_time - non_car->collision_info.message.time) / 1000.0f;
                     GetNetPos((tCar_spec*)non_car);
                 }
                 if (non_car->collision_info.box_face_ref != gFace_num__car
@@ -1170,9 +1168,7 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
                         || non_car->collision_info.box_face_start <= gFace_count)) {
                     GetFacesInBox(&non_car->collision_info);
                 }
-                LOG_DEBUG("active noncar33 %d %d", i, non_car->collision_info.doing_nothing_flag);
-                if (non_car->collision_info.dt != 0.0) {
-                    LOG_DEBUG("active noncar44 %d %d", i, non_car->collision_info.doing_nothing_flag);
+                if (non_car->collision_info.dt != 0.0f) {
                     MoveAndCollideNonCar(non_car, gDt);
                 }
             }
@@ -3626,7 +3622,7 @@ int FindFloorInBoxBU2(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* 
         if (!gEliminate_faces || SLOBYTE(face_ref->flags) >= 0) {
             CheckSingleFace(face_ref, a, b, &nor2, &dist);
             if (*d > dist) {
-                if (face_ref->material->colour_map_1 == DOUBLESIDED_FLAG_COLOR_MAP || (face_ref->material->flags & 0x1800) != 0) {
+                if (face_ref->material->user == DOUBLESIDED_FLAG || (face_ref->material->flags & 0x1800) != 0) {
                     tv.v[0] = c->pos.v[0] - a->v[0];
                     tv.v[1] = c->pos.v[1] - a->v[1];
                     tv.v[2] = c->pos.v[2] - a->v[2];
@@ -5430,7 +5426,7 @@ void CrashCarsTogether(br_scalar dt) {
     }
     if (k > 0) {
         for (i = 0; i < gNum_cars_and_non_cars; i++) {
-            BringCarToAGrindingHalt(gActive_car_list[i]);
+            BringCarToAGrindingHalt((tCollision_info*)gActive_car_list[i]);
         }
     }
 }
@@ -5498,7 +5494,7 @@ int CrashCarsTogetherSinglePass(br_scalar dt, int pPass, tCollison_data* collide
                         }
                     } else if (collide_list[i].car || collide_list[j].car) {
                         if ((collide_list[j].car == NULL) == (collide_list[i].car == NULL)) {
-                            if (collide_list[j].car != collide_list[i].car || car_1->infinite_mass && car_2->infinite_mass) {
+                            if (collide_list[j].car != collide_list[i].car || (car_1->infinite_mass && car_2->infinite_mass)) {
                                 if (collide_list[i].car && collide_list[j].car) {
                                     if (car_1->infinite_mass && car_2->infinite_mass) {
                                         if ((car_1->infinite_mass != -1 || car_2->infinite_mass != -1) && CollideTwoCars(car_1, car_2, -1)) {
@@ -5676,12 +5672,12 @@ void BringCarToAGrindingHalt(tCollision_info* car) {
 int BoundsOverlapTest_car(br_bounds* b1, br_bounds* b2) {
     LOG_TRACE("(%p, %p)", b1, b2);
 
-    return b2->max.v[0] >= (double)b1->min.v[0]
-        && b1->max.v[0] >= (double)b2->min.v[0]
-        && b2->max.v[1] >= (double)b1->min.v[1]
-        && b1->max.v[1] >= (double)b2->min.v[1]
-        && b2->max.v[2] >= (double)b1->min.v[2]
-        && b1->max.v[2] >= (double)b2->min.v[2];
+    return b2->max.v[0] >= b1->min.v[0]
+        && b1->max.v[0] >= b2->min.v[0]
+        && b2->max.v[1] >= b1->min.v[1]
+        && b1->max.v[1] >= b2->min.v[1]
+        && b2->max.v[2] >= b1->min.v[2]
+        && b1->max.v[2] >= b2->min.v[2];
 }
 
 // IDA: int __usercall SimpleCarCarCollisionTest@<EAX>(tCollision_info *car1@<EAX>, tCollision_info *car2@<EDX>)
@@ -5726,24 +5722,24 @@ int CollideTwoCarsWithWalls(tCollision_info* car1, tCollision_info* car2, br_sca
                 if (p >= 10 || car1->infinite_mass || car2->infinite_mass) {
                     return -1;
                 }
-                car1->omega.v[0] = 0.0;
-                car1->omega.v[1] = 0.0;
-                car1->omega.v[2] = 0.0;
-                car2->omega.v[0] = 0.0;
-                car2->omega.v[1] = 0.0;
-                car2->omega.v[2] = 0.0;
-                mom1.v[0] = car1->v.v[0] * car1->M;
-                mom1.v[1] = car1->v.v[1] * car1->M;
-                mom1.v[2] = car1->v.v[2] * car1->M;
-                mom2.v[0] = car2->v.v[0] * car2->M;
-                mom2.v[1] = car2->v.v[1] * car2->M;
-                mom2.v[2] = car2->v.v[2] * car2->M;
-                mom1.v[0] = mom2.v[0] + mom1.v[0];
-                mom1.v[1] = mom1.v[1] + mom2.v[1];
-                mom1.v[2] = mom1.v[2] + mom2.v[2];
-                car1->v.v[0] = mom1.v[0] / (car2->M + car1->M);
-                car1->v.v[1] = mom1.v[1] / (car2->M + car1->M);
-                car1->v.v[2] = mom1.v[2] / (car2->M + car1->M);
+                BrVector3Set(&car1->omega, 0.0f, 0.0f, 0.0f);
+                BrVector3Set(&car2->omega, 0.0f, 0.0f, 0.0f);
+                // mom1.v[0] = car1->v.v[0] * car1->M;
+                // mom1.v[1] = car1->v.v[1] * car1->M;
+                // mom1.v[2] = car1->v.v[2] * car1->M;
+                BrVector3Scale(&mom1, &car1->v, car1->M);
+                // mom2.v[0] = car2->v.v[0] * car2->M;
+                // mom2.v[1] = car2->v.v[1] * car2->M;
+                // mom2.v[2] = car2->v.v[2] * car2->M;
+                BrVector3Scale(&mom2, &car2->v, car2->M);
+                // mom1.v[0] = mom2.v[0] + mom1.v[0];
+                // mom1.v[1] = mom1.v[1] + mom2.v[1];
+                // mom1.v[2] = mom1.v[2] + mom2.v[2];
+                BrVector3Accumulate(&mom1, &mom2);
+                // car1->v.v[0] = mom1.v[0] / (car2->M + car1->M);
+                // car1->v.v[1] = mom1.v[1] / (car2->M + car1->M);
+                // car1->v.v[2] = mom1.v[2] / (car2->M + car1->M);
+                BrVector3InvScale(&car1->v, &mom1, car2->M + car1->M);
                 car2->v = car1->v;
                 RotateCar(car1, dt);
                 TranslateCar(car1, dt);
@@ -5870,8 +5866,6 @@ int CollideTwoCars(tCollision_info* car1, tCollision_info* car2, int pPass) {
         return 0;
     }
 
-    LOG_DEBUG("coll2");
-
     mat1 = &car1->car_master_actor->t.t.mat;
     mat2 = &car2->car_master_actor->t.t.mat;
     oldmat1 = &car1->oldmat;
@@ -5883,16 +5877,6 @@ int CollideTwoCars(tCollision_info* car1, tCollision_info* car2, int pPass) {
     BrMatrix34Mul(&old_car2_to_car1, oldmat2, &inv_oldmat1);
     GetNewBoundingBox(&new_car1_bnds, &car1->bounds[1], &car1_to_old_car1);
     GetNewBoundingBox(&new_car2_bnds, &car2->bounds[1], &car2_to_old_car2);
-
-    // LOG_MATRIX("mat2", mat2);
-    // LOG_MATRIX("oldmat2", oldmat2);
-    // LOG_MATRIX("car2_to_old_car2", &car2_to_old_car2);
-
-    // LOG_VEC("car2 bounds min", &car2->bounds[1].min);
-    // LOG_VEC("car2 bounds max", &car2->bounds[1].max);
-
-    // LOG_VEC("car2 min", &new_car2_bnds.min);
-    // LOG_VEC("car2 max", &new_car2_bnds.max);
 
     for (i = 0; i < 3; ++i) {
         ts = car1->bounds[1].min.v[i];
@@ -5929,7 +5913,6 @@ int CollideTwoCars(tCollision_info* car1, tCollision_info* car2, int pPass) {
         || bnds.max.v[2] < new_car1_bnds.min.v[2]) {
         return 0;
     }
-    LOG_DEBUG("collided");
     BrMatrix34LPInverse(&inv_mat1, mat1);
     BrMatrix34LPInverse(&inv_mat2, mat2);
     BrMatrix34Mul(&car2_to_car1, mat2, &inv_mat1);
@@ -5939,23 +5922,18 @@ int CollideTwoCars(tCollision_info* car1, tCollision_info* car2, int pPass) {
     BrMatrix34Mul(&car1_to_old_car1, mat1, &inv_oldmat1);
     BrMatrix34Mul(&car2_to_old_car2, mat2, &inv_oldmat2);
     do {
-        LOG_DEBUG("IN COLLLIDE LOOP");
         k = 0;
         k += FacePointCarCarCollide(car1, car2, &car2_to_car1, &old_car2_to_car1, &car1_to_old_car1, r, n, 8, 0);
         k += FacePointCarCarCollide(car2, car1, &car1_to_car2, &old_car1_to_car2, &car2_to_old_car2, &r[2 * k], &n[2 * k], 8 - k, 1);
         old_k = k;
 
-        LOG_DEBUG("coll3 k %d", k);
-
         if (k < 3 || add_point) {
             k += GetEdgeEdgeCollisions(&car1->bounds[1], &car2->bounds[1], &car2_to_car1, &car1_to_car2, &old_car2_to_car1, &old_car1_to_car2, &car1_to_old_car1, &r[2 * k], &n[2 * k], 8 - k);
         }
-        LOG_DEBUG("coll4 k %d", k);
         if (k == -1) {
             TestOldMats(car1, car2, 1);
         }
         if (!k) {
-            LOG_WARN("k == 0");
             return 0;
         }
         if (k > 4) {
@@ -6354,9 +6332,10 @@ int FacePointCarCarCollide(tCollision_info* car1, tCollision_info* car2, br_matr
         }
         BrMatrix34ApplyP(&aa, &a, pMms);
         BrMatrix34ApplyP(&bb, &a, pMoms);
-        aa.v[0] = aa.v[0] - bb.v[0];
-        aa.v[1] = aa.v[1] - bb.v[1];
-        aa.v[2] = aa.v[2] - bb.v[2];
+        // aa.v[0] = aa.v[0] - bb.v[0];
+        // aa.v[1] = aa.v[1] - bb.v[1];
+        // aa.v[2] = aa.v[2] - bb.v[2];
+        BrVector3Sub(&aa, &aa, &bb);
         dist = BrVector3Length(&aa);
         if (dist >= 0.00001f) {
             BrVector3Scale(&a1, &aa, 0.0072463769f / dist); // 0.0072463769*6.9 = 0.05
@@ -6403,9 +6382,7 @@ void MungeCarsMass(tCollision_info* pCar, br_scalar pFactor) {
     LOG_TRACE("(%p, %f)", pCar, pFactor);
 
     pCar->M = pCar->M * pFactor;
-    pCar->I.v[0] = pCar->I.v[0] * pFactor;
-    pCar->I.v[1] = pCar->I.v[1] * pFactor;
-    pCar->I.v[2] = pCar->I.v[2] * pFactor;
+    BrVector3Scale(&pCar->I, &pCar->I, pFactor);
 }
 
 // IDA: void __usercall ModifyCarsMass(tCollision_info *pCar_1@<EAX>, tCollision_info *pCar_2@<EDX>)
@@ -6500,22 +6477,28 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
         tau1[i].v[0] = tau1[i].v[0] / car1->I.v[0];
         tau1[i].v[1] = tau1[i].v[1] / car1->I.v[1];
         tau1[i].v[2] = tau1[i].v[2] / car1->I.v[2];
+
         tau2[i].v[0] = tau2[i].v[0] / car2->I.v[0];
         tau2[i].v[1] = tau2[i].v[1] / car2->I.v[1];
         tau2[i].v[2] = tau2[i].v[2] / car2->I.v[2];
+
         tv.v[0] = r[2 * i].v[2] * car1->omega.v[1] - r[2 * i].v[1] * car1->omega.v[2];
         tv.v[1] = r[2 * i].v[0] * car1->omega.v[2] - r[2 * i].v[2] * car1->omega.v[0];
         tv.v[2] = r[2 * i].v[1] * car1->omega.v[0] - r[2 * i].v[0] * car1->omega.v[1];
+
         tv.v[0] = car1->velocity_car_space.v[0] + tv.v[0];
         tv.v[1] = car1->velocity_car_space.v[1] + tv.v[1];
         tv.v[2] = car1->velocity_car_space.v[2] + tv.v[2];
+
         d[i] = -(n[2 * i].v[1] * tv.v[1] + n[2 * i].v[2] * tv.v[2] + n[2 * i].v[0] * tv.v[0]);
         tv.v[0] = r[2 * i + 1].v[2] * car2->omega.v[1] - r[2 * i + 1].v[1] * car2->omega.v[2];
         tv.v[1] = r[2 * i + 1].v[0] * car2->omega.v[2] - r[2 * i + 1].v[2] * car2->omega.v[0];
         tv.v[2] = r[2 * i + 1].v[1] * car2->omega.v[0] - r[2 * i + 1].v[0] * car2->omega.v[1];
+
         tv.v[0] = car2->velocity_car_space.v[0] + tv.v[0];
         tv.v[1] = car2->velocity_car_space.v[1] + tv.v[1];
-        tv.v[2] = tv.v[2] + car2->velocity_car_space.v[2];
+        tv.v[2] = car2->velocity_car_space.v[2] + tv.v[2];
+
         d[i] = d[i] - (n[2 * i + 1].v[2] * tv.v[2] + n[2 * i + 1].v[1] * tv.v[1] + n[2 * i + 1].v[0] * tv.v[0]);
         if (d[i] > 0.0) {
             need_to_fudge = 0;
@@ -7254,8 +7237,6 @@ int DoPullActorFromWorld(br_actor* pActor) {
         gActive_car_list[gNum_cars_and_non_cars] = (tCar_spec*)non_car;
         gNum_cars_and_non_cars++;
         GetNewBoundingBox(&c->bounds_world_space, c->bounds, &pActor->t.t.mat);
-        LOG_DEBUG("pulling actor %s", pActor->identifier);
-        LOG_MATRIX4("act original", &pActor->t.t.mat);
         non_car->collision_info.bounds_ws_type = eBounds_ws;
         InitialiseNonCar(non_car);
         ResetCarSpecialVolume((tCollision_info*)non_car);
@@ -7264,9 +7245,6 @@ int DoPullActorFromWorld(br_actor* pActor) {
         }
         BrMatrix34Copy(&c->oldmat, &pActor->t.t.mat);
         if (!gDoing_physics) {
-            // non_car->collision_info.oldmat.m[3][0] = non_car->collision_info.oldmat.m[3][0] * 6.9000001;
-            // non_car->collision_info.oldmat.m[3][1] = non_car->collision_info.oldmat.m[3][1] * 6.9000001;
-            // non_car->collision_info.oldmat.m[3][2] = non_car->collision_info.oldmat.m[3][2] * 6.9000001;
             BrVector3Scale((br_vector3*)&c->oldmat.m[3][0], (br_vector3*)&c->oldmat.m[3][0], WORLD_SCALE);
         }
         PipeSingleNonCar((tCollision_info*)non_car);

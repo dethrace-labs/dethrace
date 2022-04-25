@@ -1597,7 +1597,7 @@ int RemoveDoubleSided(br_model* pModel) {
         for (i = 0; i < pModel->nfaces; i++) {
             face = &pModel->faces[i];
             if (face->material) {
-                if (face->material->colour_map_1 == DOUBLESIDED_FLAG_COLOR_MAP) {
+                if (face->material->user == DOUBLESIDED_FLAG) {
                     num_double_sided_faces++;
                 }
             }
@@ -1609,7 +1609,7 @@ int RemoveDoubleSided(br_model* pModel) {
             orig_nfaces = pModel->nfaces;
             face = pModel->faces;
             for (i = 0; i < orig_nfaces; i++) {
-                if (face->material && face->material->colour_map_1 == DOUBLESIDED_FLAG_COLOR_MAP) {
+                if (face->material && face->material->user == DOUBLESIDED_FLAG) {
                     faces[pModel->nfaces].vertices[0] = face->vertices[1];
                     faces[pModel->nfaces].vertices[1] = face->vertices[0];
                     faces[pModel->nfaces].vertices[2] = face->vertices[2];
@@ -2041,12 +2041,12 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
                     }
                 }
                 if (!its_a_floorpan) {
-                    pStorage_space->materials[i]->colour_map_1 = DOUBLESIDED_FLAG_COLOR_MAP;
+                    pStorage_space->materials[i]->user = DOUBLESIDED_FLAG;
                 }
                 pStorage_space->materials[i]->flags &= 0xFFFFEFFF;
             }
             pStorage_space->materials[i]->index_shade = gShade_list[0];
-            BrMaterialUpdate(pStorage_space->materials[i], 0x7FFF);
+            BrMaterialUpdate(pStorage_space->materials[i], BR_MATU_ALL);
         }
         PossibleService();
     }

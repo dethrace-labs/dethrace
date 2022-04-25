@@ -22,7 +22,6 @@
 #include "spark.h"
 #include "trig.h"
 #include "utility.h"
-#include "brender/brender.h"
 
 #include <string.h>
 
@@ -682,7 +681,7 @@ int LoadNTrackModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
                     default:
                         break;
                     }
-                    //RemoveDoubleSided(temp_array[j]);
+                    // RemoveDoubleSided(temp_array[j]);
                     BrModelAdd(temp_array[j]);
                     LOG_DEBUG("added track model %s %d, %d", temp_array[j]->identifier, temp_array[j]->nfaces, temp_array[j]->nvertices);
                     new_ones++;
@@ -1960,9 +1959,21 @@ void SetWallTexturingLevel(tWall_texturing_level pLevel) {
 // IDA: void __usercall ReallySetWallTexturingLevel(tWall_texturing_level pLevel@<EAX>)
 void ReallySetWallTexturingLevel(tWall_texturing_level pLevel) {
     static tPMFMCB* tweaker[3][3] = {
-        { NULL,              WallUntexToLinear, WallUntexToPersp, },
-        { WallLinearToUntex, NULL,              WallLinearToPersp, },
-        { WallPerspToUntex,  WallPerspToLinear, NULL, },
+        {
+            NULL,
+            WallUntexToLinear,
+            WallUntexToPersp,
+        },
+        {
+            WallLinearToUntex,
+            NULL,
+            WallLinearToPersp,
+        },
+        {
+            WallPerspToUntex,
+            WallPerspToLinear,
+            NULL,
+        },
     };
     LOG_TRACE("(%d)", pLevel);
 
@@ -2005,7 +2016,7 @@ void DisposeTexturingMaterials() {
     default:
         break;
     }
-    
+
     if (gWall_texturing_level != eWTL_full || gRoad_texturing_level != eRTL_full) {
         ProcessFaceMaterials(gProgram_state.track_spec.the_actor, DisposeSuffixedMaterials);
     }
@@ -2267,8 +2278,8 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
         PossibleService();
         if (gTrack_storage_space.materials[i]->flags & 7) {
             gTrack_storage_space.materials[i]->flags &= 0xFFFFFFF8;
-            if (gTrack_storage_space.materials[i]->flags & 0x1000) {
-                gTrack_storage_space.materials[i]->colour_map_1 = (br_pixelmap*)12345;
+            if (gTrack_storage_space.materials[i]->flags & BR_MATF_TWO_SIDED) {
+                gTrack_storage_space.materials[i]->user = DOUBLESIDED_FLAG;
                 gTrack_storage_space.materials[i]->flags &= 0xFFFFEFFF;
             }
             BrMaterialUpdate(gTrack_storage_space.materials[i], BR_MATU_RENDERING);
@@ -3625,12 +3636,9 @@ tSpecial_volume* FindSpecialVolume(br_vector3* pP, tSpecial_volume* pLast_vol) {
     LOG_TRACE("(%p, %p)", pP, pLast_vol);
 
     for (i = 0, v = gProgram_state.special_volumes; i < gProgram_state.special_volume_count; i++, v++) {
-        if (!v->no_mat &&
-                v->bounds.min.v[0] < pP->v[0] && pP->v[0] < v->bounds.max.v[0] &&
-                v->bounds.min.v[1] < pP->v[1] && pP->v[1] < v->bounds.max.v[1] &&
-                v->bounds.min.v[2] < pP->v[2] && pP->v[2] < v->bounds.max.v[2]) {
+        if (!v->no_mat && v->bounds.min.v[0] < pP->v[0] && pP->v[0] < v->bounds.max.v[0] && v->bounds.min.v[1] < pP->v[1] && pP->v[1] < v->bounds.max.v[1] && v->bounds.min.v[2] < pP->v[2] && pP->v[2] < v->bounds.max.v[2]) {
             BrMatrix34ApplyP(&p, pP, &v->inv_mat);
-            if (-1.f < p.v[0] && p.v[0] < 1.f &&  -1.f < p.v[1] && p.v[1] < 1.f && -1.f < p.v[2] && p.v[2] < 1.f) {
+            if (-1.f < p.v[0] && p.v[0] < 1.f && -1.f < p.v[1] && p.v[1] < 1.f && -1.f < p.v[2] && p.v[2] < 1.f) {
                 return v;
             }
         }
@@ -4129,11 +4137,12 @@ br_material* GetExternalMat() {
     return BrMaterialFind("SPECVOL2.MAT");
 }
 
-#define DrVertexSet(V, X, Y, Z) do {        \
-    (V)[0] = (X);                           \
-    (V)[1] = (Y);                           \
-    (V)[2] = (Z);                           \
-} while (0)
+#define DrVertexSet(V, X, Y, Z) \
+    do {                        \
+        (V)[0] = (X);           \
+        (V)[1] = (Y);           \
+        (V)[2] = (Z);           \
+    } while (0)
 
 // IDA: void __usercall BuildSpecVolModel(tSpecial_volume *pSpec@<EAX>, int pIndex@<EDX>, br_material *pInt_mat@<EBX>, br_material *pExt_mat@<ECX>)
 void BuildSpecVolModel(tSpecial_volume* pSpec, int pIndex, br_material* pInt_mat, br_material* pExt_mat) {
@@ -4194,9 +4203,9 @@ void BuildSpecVolModel(tSpecial_volume* pSpec, int pIndex, br_material* pInt_mat
         model->faces[i].vertices[0] = model->faces[i].vertices[1];
         model->faces[i].vertices[1] = temp;
     }
-    model->faces[ 5].material = model->faces[ 4].material = model->faces[ 1].material = model->faces[ 0].material = DRMaterialClone(pExt_mat);
-    model->faces[11].material = model->faces[10].material = model->faces[ 9].material = model->faces[ 8].material = DRMaterialClone(pExt_mat);
-    model->faces[ 7].material = model->faces[ 6].material = model->faces[ 3].material = model->faces[ 2].material = DRMaterialClone(pExt_mat);
+    model->faces[5].material = model->faces[4].material = model->faces[1].material = model->faces[0].material = DRMaterialClone(pExt_mat);
+    model->faces[11].material = model->faces[10].material = model->faces[9].material = model->faces[8].material = DRMaterialClone(pExt_mat);
+    model->faces[7].material = model->faces[6].material = model->faces[3].material = model->faces[2].material = DRMaterialClone(pExt_mat);
     model->faces[17].material = model->faces[16].material = model->faces[13].material = model->faces[12].material = DRMaterialClone(pInt_mat);
     model->faces[23].material = model->faces[22].material = model->faces[21].material = model->faces[20].material = DRMaterialClone(pInt_mat);
     model->faces[19].material = model->faces[18].material = model->faces[15].material = model->faces[14].material = DRMaterialClone(pInt_mat);
