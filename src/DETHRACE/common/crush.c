@@ -528,7 +528,7 @@ void DoDamage(tCar_spec* pCar, tDamage_type pDamage_type, float pMagnitude, floa
     } else if (gNet_mode != eNet_mode_none) {
         DamageUnit2(pCar, pDamage_type, pNastiness * pMagnitude * 15.0f);
     } else if (PercentageChance(pNastiness * pMagnitude * 1500.0f)) {
-        DamageUnit2(pCar, pDamage_type, pNastiness * pMagnitude * 30.0);
+        DamageUnit2(pCar, pDamage_type, pNastiness * pMagnitude * 30.0f);
     }
 }
 
@@ -689,10 +689,9 @@ void DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEner
                 the_condition++;
             }
             if (result) {
-                the_effect = the_clause->effects;
                 for (j = 0; j < the_clause->effect_count; j++) {
+                    the_effect = &the_clause->effects[j];
                     DoDamage(pCar, the_effect->type, energy_magnitude, the_effect->weakness_factor);
-                    the_effect++;
                 }
             }
             the_clause++;

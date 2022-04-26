@@ -458,18 +458,14 @@ void GetAverageGridPosition(tRace_info* pThe_race) {
     tCar_spec* car;
     LOG_TRACE("(%p)", pThe_race);
 
-    total_cars = 0.0;
-    BrVector3SetFloat(&gAverage_grid_position, 0.0, 0.0, 0.0);
-    for (i = 0; pThe_race->number_of_racers > i; i++) {
+    total_cars = 0.0f;
+    BrVector3SetFloat(&gAverage_grid_position, 0.0f, 0.0f, 0.0f);
+    for (i = 0; i < pThe_race->number_of_racers; i++) {
         car = pThe_race->opponent_list[i].car_spec;
-        gAverage_grid_position.v[0] = car->pos.v[0] + gAverage_grid_position.v[0];
-        gAverage_grid_position.v[1] = car->pos.v[1] + gAverage_grid_position.v[1];
-        gAverage_grid_position.v[2] = car->pos.v[2] + gAverage_grid_position.v[2];
-        total_cars = total_cars + 1.0;
+        BrVector3Accumulate(&gAverage_grid_position, &car->pos);
+        total_cars += 1.0f;
     }
-    gAverage_grid_position.v[0] = gAverage_grid_position.v[0] / total_cars;
-    gAverage_grid_position.v[1] = gAverage_grid_position.v[1] / total_cars;
-    gAverage_grid_position.v[2] = gAverage_grid_position.v[2] / total_cars;
+    BrVector3InvScale(&gAverage_grid_position, &gAverage_grid_position, total_cars);
 }
 
 // IDA: void __usercall SetInitialPosition(tRace_info *pThe_race@<EAX>, int pCar_index@<EDX>, int pGrid_index@<EBX>)
@@ -4501,7 +4497,7 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
 
     m1 = &gCamera->t.t.mat;
     m2 = &c->car_master_actor->t.t.mat;
-    swoop = gCountdown && c->pos.v[1] + 0.001 < gCamera_height;
+    swoop = gCountdown && c->pos.v[1] + 0.001f < gCamera_height;
     manual_swing = gOld_yaw__car != gCamera_yaw || swoop;
     manual_zoom = (double)gOld_zoom != gCamera_zoom;
     old_camera_pos = *(br_vector3*)&m1->m[3][0];
@@ -4523,7 +4519,7 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
         if (gCar_flying || gCamera_reset || gCamera_mode == -2) {
             gCamera_mode = 0;
         }
-        d = sqrt(gCamera_zoom) + 0.57971013;
+        d = sqrtf((float)gCamera_zoom) + 0.57971013f;
         if (!gCamera_mode || gCamera_mode == -1) {
             vn = c->direction;
             MoveWithWheels(c, &vn, manual_swing);
@@ -4554,7 +4550,7 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
             BrVector3Scale(&vn, &vn, -d);
             BrVector3Accumulate(&a, &vn);
             dist = BrVector3Length(&a);
-            l = (double)pTime / 1000.0 * (dist + 1.0) / dist;
+            l = (float)pTime / 1000.0f * (dist + 1.0f) / dist;
             if (l < 1.0f && BrVector3Dot(&a, &vn) > 0.0f) {
                 BrVector3Scale(&a, &a, (l - 1.f));
                 BrVector3Accumulate(&vn, &a);
@@ -4563,8 +4559,8 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
             m1->m[3][1] = c->pos.v[1] + vn.v[1];
             m1->m[3][2] = c->pos.v[2] + vn.v[2];
         }
-        height_inc = gCamera_zoom * gCamera_zoom + 0.30000001;
-        time = (double)pTime * 0.001;
+        height_inc = gCamera_zoom * gCamera_zoom + 0.3f;
+        time = pTime * 0.001f;
         if (!gCamera_frozen || gAction_replay_mode) {
             if (pTime < 5000) {
                 if (swoop) {
@@ -4585,8 +4581,8 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
         }
         l = c->direction.v[1] * d;
         if (l > 0) {
-            if (c->pos.v[1] - l - height_inc / 2.0 > gCamera_height) {
-                gCamera_height = c->pos.v[1] - l - height_inc / 2.0;
+            if (c->pos.v[1] - l - height_inc / 2.0f > gCamera_height) {
+                gCamera_height = c->pos.v[1] - l - height_inc / 2.0f;
             }
         }
 
@@ -4782,46 +4778,35 @@ void PointCameraAtCar(tCar_spec* c, br_matrix34* m1, br_matrix34* m2) {
     br_scalar scale;
     LOG_TRACE("(%p, %p, %p)", c, m1, m2);
 
-    camera_ptr = (br_camera*)gCamera->type_data;
+    camera_ptr = gCamera->type_data;
     theta = camera_ptr->field_of_view / 5;
     swoop = gCountdown && c->pos.v[1] + 0.01f < gCamera_height;
-    if (swoop) {
+    if (0) {
         BrVector3Sub(&tv, &gAverage_grid_position, &c->pos);
-        frac = (gCamera_height - c->pos.v[1]) / 10.0;
+        frac = (gCamera_height - c->pos.v[1]) / 10.0f;
         BrVector3Scale(&tv, &tv, frac);
         BrVector3Accumulate(&tv, &c->pos);
         pos = &tv;
-        theta = (1.0 - frac) * (double)theta;
+        theta = (1.0f - frac) * (float)theta;
     } else {
         pos = &c->pos;
     }
-    vn.v[0] = c->pos.v[0] - m2->m[3][0];
-    vn.v[2] = c->pos.v[2] - m2->m[3][2];
-    scale = sqrt(vn.v[2] * vn.v[2] + 0.0 * 0.0 + vn.v[0] * vn.v[0]);
-    if (scale <= 2.3841858e-7) {
-        vn.v[0] = 1.0;
-        vn.v[1] = 0.0;
-        vn.v[2] = 0.0;
-    } else {
-        scale = 1.0 / scale;
-        vn.v[0] *= scale;
-        vn.v[1] = 0.0;
-        vn.v[2] *= scale;
-    }
+    BrVector3Set(&vn, c->pos.v[0] - m2->m[3][0], 0.f, c->pos.v[2] - m2->m[3][2]);
+    BrVector3Normalise(&vn, &vn);
     m2->m[0][0] = -vn.v[2];
-    m2->m[0][1] = 0.0;
+    m2->m[0][1] = 0.0f;
     m2->m[0][2] = vn.v[0];
-    m2->m[1][0] = 0.0;
-    m2->m[1][1] = 1.0;
-    m2->m[1][2] = 0.0;
+    m2->m[1][0] = 0.0f;
+    m2->m[1][1] = 1.0f;
+    m2->m[1][2] = 0.0f;
     m2->m[2][0] = -vn.v[0];
-    m2->m[2][1] = 0.0;
+    m2->m[2][1] = 0.0f;
     m2->m[2][2] = -vn.v[2];
     tv2.v[0] = pos->v[0] - m2->m[3][0];
     tv2.v[1] = pos->v[1] - m2->m[3][1];
     tv2.v[2] = pos->v[2] - m2->m[3][2];
-    dist = tv2.v[2] * vn.v[2] + tv2.v[1] * vn.v[1] + tv2.v[0] * vn.v[0];
-    BrMatrix34PreRotateX(m2, theta - BrRadianToAngle(atan2(m2->m[3][1] - pos->v[1], dist)));
+    dist = BrVector3Dot(&tv2, &vn);
+    BrMatrix34PreRotateX(m2, theta - BrRadianToAngle(atan2f(m2->m[3][1] - pos->v[1], dist)));
 }
 
 // IDA: void __usercall PointCamera(br_vector3 *pos@<EAX>, br_matrix34 *m2@<EDX>)
@@ -4923,7 +4908,7 @@ int CollideCamera2(br_vector3* car_pos, br_vector3* cam_pos, br_vector3* old_cam
                         }
                         if (tv2.v[2] * b.v[2] + tv2.v[0] * b.v[0] + tv2.v[1] * b.v[1] < -0.029999999)
                             alpha = tv2.v[1] * b.v[1] + tv2.v[2] * b.v[2] + b.v[0] * tv2.v[0];
-                        alpha = (0.029999999 - ts2) / alpha;
+                        alpha = (0.03f - ts2) / alpha;
                         tv2.v[0] = tv2.v[0] * alpha;
                         tv2.v[1] = tv2.v[1] * alpha;
                         tv2.v[2] = tv2.v[2] * alpha;
