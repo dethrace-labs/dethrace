@@ -17,5 +17,6 @@
 #define DEG_TO_RAD(degrees) ((degrees)*3.141592653589793 / 180.0)
 
 #define V11MODEL(model) (((v11model*)model->prepared))
+#define CAR(c) ((tCar_spec*)c)
 
 #endif
