@@ -5979,18 +5979,19 @@ int GetEdgeEdgeCollisions(br_bounds* pB1, br_bounds* pB2, br_matrix34* pM21, br_
     int n;
     LOG_TRACE("(%p, %p, %p, %p, %p, %p, %p, %p, %p, %d)", pB1, pB2, pM21, pM12, pMo21, pMo12, pM1o1, pPoint_list, pNorm_list, pMax);
 
+    // EdgeEdge final version
     n = 0;
     if (pMax < 1) {
         return 0;
     }
-    for (i = 0; i < 4; ++i) {
+    for (i = 0; i < 4; i++) {
         if (i == 3) {
             tp1 = pB2->min;
         } else {
             tp1 = pB2->max;
             tp1.v[i] = pB2->min.v[i];
         }
-        for (j = 0; j < 3; ++j) {
+        for (j = 0; j < 3; j++) {
             tp2 = tp1;
             if (pB2->max.v[j] == tp2.v[j]) {
                 tp2.v[j] = pB2->min.v[j];
@@ -6001,182 +6002,102 @@ int GetEdgeEdgeCollisions(br_bounds* pB1, br_bounds* pB2, br_matrix34* pM21, br_
             BrMatrix34ApplyP(&p1, &tp1, pM21);
             BrMatrix34ApplyP(&p2, &tp2, pM21);
             plane1 = LineBoxColl(&p1, &p2, pB1, &hp1);
-            if (plane1) {
-                plane2 = LineBoxColl(&p2, &p1, pB1, &hp2);
-                if (plane1 != 8 && plane2 != 8 && plane2) {
-                    p1.v[0] = hp2.v[0] + hp1.v[0];
-                    p1.v[1] = hp2.v[1] + hp1.v[1];
-                    p1.v[2] = hp2.v[2] + hp1.v[2];
-                    p1.v[0] = p1.v[0] * 0.5;
-                    p1.v[1] = p1.v[1] * 0.5;
-                    p1.v[2] = p1.v[2] * 0.5;
-                    BrMatrix34ApplyP(&tp3, &p1, pM12);
-                    BrMatrix34ApplyP(&p2, &tp3, pMo21);
-                    plane3 = LineBoxColl(&p2, &p1, pB1, &hp3);
-                    if (plane3 != 8) {
-                        if (plane3) {
-                            goto LABEL_25;
-                        }
-                    }
-                    tp3.v[0] = p2.v[0] - p1.v[0];
-                    tp3.v[1] = p2.v[1] - p1.v[1];
-                    tp3.v[2] = p2.v[2] - p1.v[2];
-                    ts = sqrtf(tp3.v[2] * tp3.v[2] + tp3.v[0] * tp3.v[0] + tp3.v[1] * tp3.v[1]);
-                    ts = ts / 0.0099999998;
-                    if (ts != 0.0f) {
-                        tp3.v[0] = tp3.v[0] / ts;
-                        tp3.v[1] = tp3.v[1] / ts;
-                        tp3.v[2] = tp3.v[2] / ts;
-                        p2.v[0] = tp3.v[0] + p2.v[0];
-                        p2.v[1] = p2.v[1] + tp3.v[1];
-                        p2.v[2] = tp3.v[2] + p2.v[2];
-                        plane3 = LineBoxColl(&p2, &p1, pB1, &hp3);
-                        if (plane3 != 8) {
-                            if (plane3) {
-                            LABEL_25:
-                                BrMatrix34ApplyP(&shp1, &hp1, pM12);
-                                BrMatrix34ApplyP(&shp2, &hp2, pM12);
-                                if ((plane1 ^ plane2) != 4 && (plane3 == plane1 || plane3 == plane2)) {
-                                    if (n >= pMax) {
-                                        return n;
-                                    }
-                                    GetBoundsEdge(&pPoint_list[2 * n], &edge, pB1, plane1, plane2, &p2, &hp1, &hp2, 0);
-                                    shp1.v[0] = shp2.v[0] + shp1.v[0];
-                                    shp1.v[1] = shp2.v[1] + shp1.v[1];
-                                    shp1.v[2] = shp1.v[2] + shp2.v[2];
-                                    pPoint_list[2 * n + 1].v[0] = shp1.v[0] * 0.5;
-                                    pPoint_list[2 * n + 1].v[1] = shp1.v[1] * 0.5;
-                                    pPoint_list[2 * n + 1].v[2] = shp1.v[2] * 0.5;
-                                    p1.v[0] = hp1.v[0] - hp2.v[0];
-                                    p1.v[1] = hp1.v[1] - hp2.v[1];
-                                    p1.v[2] = hp1.v[2] - hp2.v[2];
-                                    p2.v[0] = edge.v[1] * p1.v[2] - edge.v[2] * p1.v[1];
-                                    p2.v[1] = edge.v[2] * p1.v[0] - p1.v[2] * edge.v[0];
-                                    p2.v[2] = p1.v[1] * edge.v[0] - edge.v[1] * p1.v[0];
-                                    // v15 = sqrtf(p2.v[0] * p2.v[0] + p2.v[1] * p2.v[1] + p2.v[2] * p2.v[2]);
-                                    // if (v17 | v18) {
-                                    //     p2.v[0] = 1.0;
-                                    //     p2.v[1] = 0.0;
-                                    //     p2.v[2] = 0.0;
-                                    // } else {
-                                    //     v27 = v15;
-                                    //     v19 = 1.0 / v27;
-                                    //     v28 = v19;
-                                    //     p2.v[0] = v19 * p2.v[0];
-                                    //     p2.v[1] = p2.v[1] * v28;
-                                    //     p2.v[2] = p2.v[2] * v28;
-                                    // }
-                                    BrVector3Normalise(&p2, &p2);
-                                    p1.v[0] = pB1->max.v[0] + pB1->min.v[0];
-                                    p1.v[1] = pB1->max.v[1] + pB1->min.v[1];
-                                    p1.v[2] = pB1->max.v[2] + pB1->min.v[2];
-                                    p1.v[0] = p1.v[0] * 0.5;
-                                    p1.v[1] = p1.v[1] * 0.5;
-                                    p1.v[2] = p1.v[2] * 0.5;
-                                    p1.v[0] = pPoint_list[2 * n].v[0] - p1.v[0];
-                                    p1.v[1] = pPoint_list[2 * n].v[1] - p1.v[1];
-                                    p1.v[2] = pPoint_list[2 * n].v[2] - p1.v[2];
-                                    if (p2.v[0] * p1.v[0] + p2.v[1] * p1.v[1] + p2.v[2] * p1.v[2] > 0.0) {
-                                        p2.v[0] = -p2.v[0];
-                                        p2.v[1] = -p2.v[1];
-                                        p2.v[2] = -p2.v[2];
-                                    }
-                                    BrMatrix34ApplyV(&p1, &p2, pM12);
-                                    BrMatrix34TApplyV(&pNorm_list[2 * n], &p1, pMo12);
-                                    BrMatrix34TApplyV(&pNorm_list[2 * n + 1], &p2, pMo21);
-                                    pNorm_list[2 * n + 1].v[0] = -pNorm_list[2 * n + 1].v[0];
-                                    pNorm_list[2 * n + 1].v[1] = -pNorm_list[2 * n + 1].v[1];
-                                    pNorm_list[2 * n + 1].v[2] = -pNorm_list[2 * n + 1].v[2];
-                                    ++n;
-                                } else if ((plane1 ^ plane2) == 4) {
-                                    if (pMax - 1 <= n) {
-                                        return n;
-                                    }
-                                    GetBoundsEdge(&pPoint_list[2 * n], &edge, pB1, plane1, plane3, &p2, &hp1, &hp2, 0);
-                                    GetBoundsEdge(
-                                        &pPoint_list[2 * n + 2],
-                                        &edge,
-                                        pB1,
-                                        plane2,
-                                        plane3,
-                                        &p2,
-                                        &hp1,
-                                        &hp2,
-                                        0);
-                                    pPoint_list[2 * n + 1] = shp1;
-                                    pPoint_list[2 * n + 3] = shp2;
-                                    p1.v[0] = hp1.v[0] - hp2.v[0];
-                                    p1.v[1] = hp1.v[1] - hp2.v[1];
-                                    p1.v[2] = hp1.v[2] - hp2.v[2];
-                                    BrMatrix34ApplyV(&p2, &p1, pM12);
-                                    BrMatrix34ApplyV(&p1, &p2, pMo21);
-                                    p2.v[0] = edge.v[1] * p1.v[2] - edge.v[2] * p1.v[1];
-                                    p2.v[1] = edge.v[2] * p1.v[0] - p1.v[2] * edge.v[0];
-                                    p2.v[2] = p1.v[1] * edge.v[0] - edge.v[1] * p1.v[0];
-                                    // v20 = sqrtf(p2.v[0] * p2.v[0] + p2.v[1] * p2.v[1] + p2.v[2] * p2.v[2]);
-                                    // if (v22 | v23) {
-                                    //     pNorm_list[2 * n].v[0] = 1.0;
-                                    //     pNorm_list[2 * n].v[1] = 0.0;
-                                    //     pNorm_list[2 * n].v[2] = 0.0;
-                                    // } else {
-                                    //     v25 = v20;
-                                    //     v24 = 1.0 / v25;
-                                    //     v26 = v24;
-                                    //     pNorm_list[2 * n].v[0] = v24 * p2.v[0];
-                                    //     pNorm_list[2 * n].v[1] = p2.v[1] * v26;
-                                    //     pNorm_list[2 * n].v[2] = p2.v[2] * v26;
-                                    // }
-                                    BrVector3Normalise(&pNorm_list[2 * n], &p2);
-                                    GetPlaneNormal(&edge, plane3);
-                                    if (pNorm_list[2 * n].v[2] * edge.v[2] + pNorm_list[2 * n].v[1] * edge.v[1] + pNorm_list[2 * n].v[0] * edge.v[0] < 0.0) {
-                                        pNorm_list[2 * n].v[0] = -pNorm_list[2 * n].v[0];
-                                        pNorm_list[2 * n].v[1] = -pNorm_list[2 * n].v[1];
-                                        pNorm_list[2 * n].v[2] = -pNorm_list[2 * n].v[2];
-                                    }
-                                    BrMatrix34ApplyV(&pNorm_list[2 * n + 1], &pNorm_list[2 * n], pMo12);
-                                    pNorm_list[2 * n + 1].v[0] = -pNorm_list[2 * n + 1].v[0];
-                                    pNorm_list[2 * n + 1].v[1] = -pNorm_list[2 * n + 1].v[1];
-                                    pNorm_list[2 * n + 1].v[2] = -pNorm_list[2 * n + 1].v[2];
-                                    BrMatrix34ApplyV(&tp3, &pNorm_list[2 * n], pM12);
-                                    BrMatrix34ApplyV(&pNorm_list[2 * n], &tp3, pMo21);
-                                    pNorm_list[2 * n + 2] = pNorm_list[2 * n];
-                                    pNorm_list[2 * n + 3].v[0] = pNorm_list[2 * n + 1].v[0];
-                                    pNorm_list[2 * n + 3].v[1] = pNorm_list[2 * n + 1].v[1];
-                                    pNorm_list[2 * n + 3].v[2] = pNorm_list[2 * n + 1].v[2];
-                                    n += 2;
-                                } else {
-                                    if (pMax - 1 <= n) {
-                                        return n;
-                                    }
-                                    GetBoundsEdge(&pPoint_list[2 * n], &edge, pB1, plane1, plane3, &p2, &hp1, &hp2, 0);
-                                    GetBoundsEdge(
-                                        &pPoint_list[2 * n + 2],
-                                        &edge,
-                                        pB1,
-                                        plane2,
-                                        plane3,
-                                        &p2,
-                                        &hp1,
-                                        &hp2,
-                                        0);
-                                    BrMatrix34ApplyP(&pPoint_list[2 * n + 1], &hp1, pM12);
-                                    BrMatrix34ApplyP(&pPoint_list[2 * n + 3], &hp2, pM12);
-                                    GetPlaneNormal(&pNorm_list[2 * n], plane3);
-                                    BrMatrix34ApplyV(&pNorm_list[2 * n + 2], &pNorm_list[2 * n], pM1o1);
-                                    BrMatrix34ApplyV(&pNorm_list[2 * n + 1], &pNorm_list[2 * n + 2], pMo12);
-                                    pNorm_list[2 * n] = pNorm_list[2 * n + 2];
-                                    pNorm_list[2 * n + 1].v[0] = -pNorm_list[2 * n + 1].v[0];
-                                    pNorm_list[2 * n + 1].v[1] = -pNorm_list[2 * n + 1].v[1];
-                                    pNorm_list[2 * n + 1].v[2] = -pNorm_list[2 * n + 1].v[2];
-                                    pNorm_list[2 * n + 3].v[0] = pNorm_list[2 * n + 1].v[0];
-                                    pNorm_list[2 * n + 3].v[1] = pNorm_list[2 * n + 1].v[1];
-                                    pNorm_list[2 * n + 3].v[2] = pNorm_list[2 * n + 1].v[2];
-                                    n += 2;
-                                }
-                            }
-                        }
-                    }
+            if (plane1 == 0) {
+                continue;
+            }
+            plane2 = LineBoxColl(&p2, &p1, pB1, &hp2);
+            if (plane1 == 8 || plane2 == 8 || plane2 == 0) {
+                continue;
+            }
+            // if (plane1 != 8 && plane2 != 8 && plane2) {
+            BrVector3Add(&p1, &hp1, &hp2);
+            BrVector3Scale(&p1, &p1, 0.5f);
+            BrMatrix34ApplyP(&tp3, &p1, pM12);
+            BrMatrix34ApplyP(&p2, &tp3, pMo21);
+            plane3 = LineBoxColl(&p2, &p1, pB1, &hp3);
+            // if (plane3 != 8 && plane3 != 0) {
+            //     goto LABEL_25;
+            // }
+            if (plane3 == 8 || plane3 == 0) {
+                BrVector3Sub(&tp3, &p2, &p1);
+                ts = BrVector3Length(&tp3);
+                ts = ts / 0.01f;
+                if (ts == 0.0f) {
+                    continue;
                 }
+                BrVector3InvScale(&tp3, &tp3, ts);
+                BrVector3Accumulate(&p2, &tp3);
+                plane3 = LineBoxColl(&p2, &p1, pB1, &hp3);
+                if (plane3 == 8) {
+                    continue;
+                }
+            }
+            if (plane3 == 0) {
+                continue;
+            }
+
+            BrMatrix34ApplyP(&shp1, &hp1, pM12);
+            BrMatrix34ApplyP(&shp2, &hp2, pM12);
+            if ((plane1 ^ plane2) != 4 && (plane3 == plane1 || plane3 == plane2)) {
+                if (n >= pMax) {
+                    return n;
+                }
+                GetBoundsEdge(&pPoint_list[2 * n], &edge, pB1, plane1, plane2, &p2, &hp1, &hp2, 0);
+                BrVector3Accumulate(&shp1, &shp2);
+                BrVector3Scale(&pPoint_list[2 * n + 1], &shp1, 0.5f);
+                BrVector3Sub(&p1, &hp1, &hp2);
+                BrVector3Cross(&p2, &edge, &p1);
+                BrVector3Normalise(&p2, &p2);
+                BrVector3Add(&p1, &pB1->max, &pB1->min);
+                BrVector3Scale(&p1, &p1, 0.5f);
+                BrVector3Sub(&p1, &pPoint_list[2 * n], &p1);
+                if (BrVector3Dot(&p1, &p2) > 0.0) {
+                    BrVector3Negate(&p2, &p2);
+                }
+                BrMatrix34ApplyV(&p1, &p2, pM12);
+                BrMatrix34TApplyV(&pNorm_list[2 * n], &p1, pMo12);
+                BrMatrix34TApplyV(&pNorm_list[2 * n + 1], &p2, pMo21);
+                BrVector3Negate(&pNorm_list[2 * n + 1], &pNorm_list[2 * n + 1]);
+                n++;
+            } else if ((plane1 ^ plane2) == 4) {
+                if (pMax - 1 <= n) {
+                    return n;
+                }
+                GetBoundsEdge(&pPoint_list[2 * n], &edge, pB1, plane1, plane3, &p2, &hp1, &hp2, 0);
+                GetBoundsEdge(&pPoint_list[2 * n + 2], &edge, pB1, plane2, plane3, &p2, &hp1, &hp2, 0);
+                pPoint_list[2 * n + 1] = shp1;
+                pPoint_list[2 * n + 3] = shp2;
+                BrVector3Sub(&p1, &hp1, &hp2);
+                BrMatrix34ApplyV(&p2, &p1, pM12);
+                BrMatrix34ApplyV(&p1, &p2, pMo21);
+                BrVector3Cross(&p2, &edge, &p1);
+                BrVector3Normalise(&pNorm_list[2 * n], &p2);
+                GetPlaneNormal(&edge, plane3);
+                if (BrVector3Dot(&pNorm_list[2 * n], &edge) < 0.0f) {
+                    BrVector3Negate(&pNorm_list[2 * n], &pNorm_list[2 * n]);
+                }
+                BrMatrix34ApplyV(&pNorm_list[2 * n + 1], &pNorm_list[2 * n], pMo12);
+                BrVector3Negate(&pNorm_list[2 * n + 1], &pNorm_list[2 * n + 1]);
+                BrMatrix34ApplyV(&tp3, &pNorm_list[2 * n], pM12);
+                BrMatrix34ApplyV(&pNorm_list[2 * n], &tp3, pMo21);
+                pNorm_list[2 * n + 2] = pNorm_list[2 * n];
+                pNorm_list[2 * n + 3] = pNorm_list[2 * n + 1];
+                n += 2;
+            } else {
+                if (pMax - 1 <= n) {
+                    return n;
+                }
+                GetBoundsEdge(&pPoint_list[2 * n], &edge, pB1, plane1, plane3, &p2, &hp1, &hp2, 0);
+                GetBoundsEdge(&pPoint_list[2 * n + 2], &edge, pB1, plane2, plane3, &p2, &hp1, &hp2, 0);
+                BrMatrix34ApplyP(&pPoint_list[2 * n + 1], &hp1, pM12);
+                BrMatrix34ApplyP(&pPoint_list[2 * n + 3], &hp2, pM12);
+                GetPlaneNormal(&pNorm_list[2 * n], plane3);
+                BrMatrix34ApplyV(&pNorm_list[2 * n + 2], &pNorm_list[2 * n], pM1o1);
+                BrMatrix34ApplyV(&pNorm_list[2 * n + 1], &pNorm_list[2 * n + 2], pMo12);
+                pNorm_list[2 * n] = pNorm_list[2 * n + 2];
+                BrVector3Negate(&pNorm_list[2 * n + 1], &pNorm_list[2 * n + 1]);
+                pNorm_list[2 * n + 3] = pNorm_list[2 * n + 1];
+                n += 2;
             }
         }
     }
