@@ -1129,12 +1129,9 @@ typedef struct tCar_spec_struct { // size: 0x1a9c
     struct tCar_spec_struct* last_culprit; // @0x167c
     int no_of_processes_recording_my_trail; // @0x1680
     tPursuee_trail my_trail; // @0x1684
-
-    // unsigned int grudge_raised_recently : 0; // @0x17c8
-    // unsigned int big_bang : 1; // @0x17c8
-    // unsigned int scary_bang : 2; // @0x17c8
-    unsigned int grudge_bang_scary_bang; // TODO: should use the above bit fields...
-
+    unsigned int grudge_raised_recently : 1; // @0x17c8
+    unsigned int big_bang : 1; // @0x17c8
+    unsigned int scary_bang : 1; // @0x17c8
     tU32 last_collision_time; // @0x17cc
     tU32 last_time_we_touched_a_player; // @0x17d0
     tU32 end_steering_damage_effect; // @0x17d4

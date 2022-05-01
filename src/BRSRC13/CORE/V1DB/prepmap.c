@@ -21,4 +21,11 @@ void BrBufferClear(br_pixelmap* pm) {
     LOG_TRACE("(%p)", pm);
 
     STUB_ONCE();
+    return;
+
+    // FIXME: use a proper br_buffer_storage object with br_buffer_stored_dispatch dispatch table
+    if (pm->stored != NULL) {
+        (*(br_object_dispatch**)pm->stored)->_free(pm->stored);
+        pm->stored = NULL;
+    }
 }

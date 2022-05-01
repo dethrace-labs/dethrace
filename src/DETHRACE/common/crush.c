@@ -689,10 +689,9 @@ void DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEner
                 the_condition++;
             }
             if (result) {
-                the_effect = the_clause->effects;
                 for (j = 0; j < the_clause->effect_count; j++) {
+                    the_effect = &the_clause->effects[j];
                     DoDamage(pCar, the_effect->type, energy_magnitude, the_effect->weakness_factor);
-                    the_effect++;
                 }
             }
             the_clause++;

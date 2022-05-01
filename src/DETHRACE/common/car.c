@@ -3907,7 +3907,8 @@ void CancelPendingCunningStunt() {
 // IDA: float __cdecl frac(float pN)
 float frac(float pN) {
     LOG_TRACE("(%f)", pN);
-    NOT_IMPLEMENTED();
+
+    return pN - (float)(int)pN;
 }
 
 // IDA: void __usercall SetAmbientPratCam(tCar_spec *pCar@<EAX>)
@@ -4010,7 +4011,7 @@ void MungeCarGraphics(tU32 pFrame_period) {
             }
             if (the_car->driver < eDriver_net_human && (!gAction_replay_mode || !ReplayIsPaused())) {
                 if (gCountdown) {
-                    sine_angle = FRandomBetween(0.40000001, 1.6) * ((double)GetTotalTime() / ((double)gCountdown * 100.0));
+                    sine_angle = FRandomBetween(0.4f, 1.6f) * ((double)GetTotalTime() / ((double)gCountdown * 100.0));
                     sine_angle = frac(sine_angle) * 360.0;
                     sine_angle = FastScalarSin(sine_angle);
                     raw_revs = (double)the_car->red_line * fabs(sine_angle);
