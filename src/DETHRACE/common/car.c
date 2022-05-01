@@ -6296,7 +6296,7 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
                 BrVector3Cross(&tv, &tau2[j], &r[2 * i + 1]);
                 BrVector3InvScale(&norm, &n[2 * j + 1], car2->M);
                 BrVector3Accumulate(&tv, &norm);
-                M.m[i][j] = BrVector3Dot(&n[2 * i + 1], &tv);
+                M.m[i][j] += BrVector3Dot(&n[2 * i + 1], &tv);
             }
             M.m[i][j] *= factor;
         }
@@ -6396,7 +6396,7 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
     }
     BrVector3InvScale(&pos1, &pos1, tforce);
     BrVector3InvScale(&pos2, &pos2, tforce);
-    if (!pPass) {
+    if (pPass == 0) {
         if (car1_point > -1 && move_car1) {
             f[car1_point] = f[car1_point] / car1->M;
             BrVector3Scale(&n[2 * car1_point], &n[2 * car1_point], f[car1_point]);
