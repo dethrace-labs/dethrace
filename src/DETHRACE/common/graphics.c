@@ -40,14 +40,76 @@
 int gPalette_munged;
 int gColourValues[1];
 int gNext_transient;
-int gCursor_x_offsets[8] = { 6, 8, 16, 36, 6, 8, 16, 36, };
-int gCursor_y_offsets[8] = { 26, 19, 12, 5, 26, 19, 12, 5, };
-int gCursor_gib_x_offsets[8] = { 82, 72, 66, 36, 82, 72, 66, 36, };
-int gCursor_gib_y_offsets[8] = { 74, 86, 93, 106, 74, 86, 93, 106, };
-int gCursor_giblet_sequence0[7] = { 6, 0, 1, 2, 3, 4, 5, };
-int gCursor_giblet_sequence1[5] = { 4, 6, 7, 8, 9, };
-int gCursor_giblet_sequence2[5] = { 4, 10, 11, 12, 13, };
-int gCursor_giblet_sequence3[5] = { 4, 14, 15, 16, 17, };
+int gCursor_x_offsets[8] = {
+    6,
+    8,
+    16,
+    36,
+    6,
+    8,
+    16,
+    36,
+};
+int gCursor_y_offsets[8] = {
+    26,
+    19,
+    12,
+    5,
+    26,
+    19,
+    12,
+    5,
+};
+int gCursor_gib_x_offsets[8] = {
+    82,
+    72,
+    66,
+    36,
+    82,
+    72,
+    66,
+    36,
+};
+int gCursor_gib_y_offsets[8] = {
+    74,
+    86,
+    93,
+    106,
+    74,
+    86,
+    93,
+    106,
+};
+int gCursor_giblet_sequence0[7] = {
+    6,
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+};
+int gCursor_giblet_sequence1[5] = {
+    4,
+    6,
+    7,
+    8,
+    9,
+};
+int gCursor_giblet_sequence2[5] = {
+    4,
+    10,
+    11,
+    12,
+    13,
+};
+int gCursor_giblet_sequence3[5] = {
+    4,
+    14,
+    15,
+    16,
+    17,
+};
 int* gCursor_giblet_sequences[4] = {
     gCursor_giblet_sequence0,
     gCursor_giblet_sequence1,
@@ -1273,7 +1335,7 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
                 material = gShadow_model->faces[i].material;
                 if (material) {
                     if (material->colour_map && (material->flags & BR_MATF_LIGHT) != 0) {
-                        material->flags &= ~(BR_MATF_LIGHT |BR_MATF_PRELIT | BR_MATF_SMOOTH);
+                        material->flags &= ~(BR_MATF_LIGHT | BR_MATF_PRELIT | BR_MATF_SMOOTH);
                         BrMaterialUpdate(material, BR_MATU_RENDERING);
                     }
                 }
@@ -2295,9 +2357,9 @@ void SaveTransient(int pIndex, int pX_coord, int pY_coord) {
         0,
         0,
         gBack_screen,
-        gTransient_bitmaps[pIndex].x_coord, 
+        gTransient_bitmaps[pIndex].x_coord,
         gTransient_bitmaps[pIndex].y_coord,
-        gTransient_bitmaps[pIndex].pixmap->width, 
+        gTransient_bitmaps[pIndex].pixmap->width,
         gTransient_bitmaps[pIndex].pixmap->height);
 }
 
@@ -2374,7 +2436,6 @@ void ProcessCursorGiblets(int pPeriod) {
         } else {
             DrawCursorGiblet(gib);
         }
-
     }
 }
 
@@ -2412,7 +2473,7 @@ int NewCursorGiblet(int pX_coord, int pY_coord, float pX_speed, float pY_speed, 
 
 // IDA: int __cdecl DoMouseCursor()
 int DoMouseCursor() {
-    int x_coord;  // Added by DethRace
+    int x_coord; // Added by DethRace
     int y_coord;
     int mouse_moved;
     int new_required;
@@ -2801,7 +2862,7 @@ void TellyInImage(br_pixelmap* pImage, int pLeft, int pTop) {
     start_time = PDGetTotalTime();
     while (1) {
         the_time = PDGetTotalTime();
-        if (the_time - start_time > 100) {
+        if (start_time + 100 <= the_time) {
             break;
         }
         DrawTellyLine(pImage, pLeft, pTop, 100 * (the_time - start_time) / 100);
@@ -2809,7 +2870,7 @@ void TellyInImage(br_pixelmap* pImage, int pLeft, int pTop) {
     start_time = PDGetTotalTime();
     while (1) {
         the_time = PDGetTotalTime();
-        if (the_time - start_time > 100) {
+        if (start_time + 100 <= the_time) {
             break;
         }
         DrawTellyImage(pImage, pLeft, pTop, 100 * (the_time - start_time) / 100);
@@ -2827,23 +2888,21 @@ void TellyOutImage(br_pixelmap* pImage, int pLeft, int pTop) {
     start_time = PDGetTotalTime();
     while (1) {
         the_time = PDGetTotalTime();
-        if (the_time - start_time > 100) {
+        if (start_time + 100 <= the_time) {
             break;
         }
-        DrawTellyImage(pImage, pLeft, pTop, 100 * (100 - the_time + start_time) / 100);
+        DrawTellyImage(pImage, pLeft, pTop, 100 * (start_time + 100 - the_time) / 100);
     }
-
     DrawTellyImage(pImage, pLeft, pTop, 1000);
 
     start_time = PDGetTotalTime();
     while (1) {
         the_time = PDGetTotalTime();
-        if (the_time - start_time > 100) {
+        if (start_time + 100 <= the_time) {
             break;
         }
         DrawTellyLine(pImage, pLeft, pTop, 100 * (start_time + 100 - the_time) / 100);
     }
-
     DrawTellyLine(pImage, pLeft, pTop, 0);
 }
 
