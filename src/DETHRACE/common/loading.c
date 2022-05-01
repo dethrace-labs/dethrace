@@ -1597,7 +1597,7 @@ int RemoveDoubleSided(br_model* pModel) {
         for (i = 0; i < pModel->nfaces; i++) {
             face = &pModel->faces[i];
             if (face->material) {
-                if (face->material->user == DOUBLESIDED_FLAG) {
+                if (face->material->user == DOUBLESIDED_USER_FLAG) {
                     num_double_sided_faces++;
                 }
             }
@@ -1609,7 +1609,7 @@ int RemoveDoubleSided(br_model* pModel) {
             orig_nfaces = pModel->nfaces;
             face = pModel->faces;
             for (i = 0; i < orig_nfaces; i++) {
-                if (face->material && face->material->user == DOUBLESIDED_FLAG) {
+                if (face->material && face->material->user == DOUBLESIDED_USER_FLAG) {
                     faces[pModel->nfaces].vertices[0] = face->vertices[1];
                     faces[pModel->nfaces].vertices[1] = face->vertices[0];
                     faces[pModel->nfaces].vertices[2] = face->vertices[2];
@@ -2041,7 +2041,7 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
                     }
                 }
                 if (!its_a_floorpan) {
-                    pStorage_space->materials[i]->user = DOUBLESIDED_FLAG;
+                    pStorage_space->materials[i]->user = DOUBLESIDED_USER_FLAG;
                 }
                 pStorage_space->materials[i]->flags &= 0xFFFFEFFF;
             }
@@ -2083,7 +2083,6 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
         if (!pCar_spec->car_model_actors[i].actor) {
             FatalError(71);
         }
-        // LOG_DEBUG("actor %s, model %s", pCar_spec->car_model_actors[i].actor->identifier, pCar_spec->car_model_actors[i].actor->model->identifier);
         LinkModelsToActor(
             pCar_spec->car_model_actors[i].actor,
             &pStorage_space->models[old_model_count],

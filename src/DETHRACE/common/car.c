@@ -3317,7 +3317,7 @@ br_scalar TwoPointColl(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* ta
             m->m[0][0] = m->m[1][1];
             tau[0] = tau[1];
             n[0] = n[1];
-            d = d[1];
+            d[0] = d[1];
             ts = SinglePointColl(f, m, d);
             f[1] = 0.0;
         }
@@ -3572,7 +3572,7 @@ int FindFloorInBoxBU2(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* 
         if (!gEliminate_faces || SLOBYTE(face_ref->flags) >= 0) {
             CheckSingleFace(face_ref, a, b, &nor2, &dist);
             if (*d > dist) {
-                if (face_ref->material->user == DOUBLESIDED_FLAG || (face_ref->material->flags & 0x1800) != 0) {
+                if (face_ref->material->user == DOUBLESIDED_USER_FLAG || (face_ref->material->flags & 0x1800) != 0) {
                     tv.v[0] = c->pos.v[0] - a->v[0];
                     tv.v[1] = c->pos.v[1] - a->v[1];
                     tv.v[2] = c->pos.v[2] - a->v[2];
@@ -6920,7 +6920,7 @@ int DoPullActorFromWorld(br_actor* pActor) {
             }
             non_car++;
         }
-        if (i == c) {
+        if (i == NONCAR_UNUSED_SLOTS) {
             non_car = NULL;
         } else {
             memcpy(non_car, &gProgram_state.non_cars[gNon_car_spec_list[num] + 4], sizeof(tNon_car_spec));
