@@ -1617,7 +1617,7 @@ int RemoveDoubleSided(br_model* pModel) {
                     faces[pModel->nfaces].material = face->material;
                     pModel->nfaces++;
                 }
-                ++face;
+                face++;
             }
             BrResFree(pModel->faces);
             pModel->faces = faces;

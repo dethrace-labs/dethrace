@@ -345,12 +345,12 @@ typedef enum keymapcodes {
 
 #define TIME_CONV_THING 0.0005f
 
-#define OPPONENT_COUNT 0
+#define OPPONENT_COUNT 5
 
 #define WORLD_SCALE 6.9f
 
 #define SHADOW_MAX_RENDER_DISTANCE 36.0f
 
-#define DOUBLESIDED_FLAG (void*)12345
+#define DOUBLESIDED_USER_FLAG (void*)12345
 
 #endif

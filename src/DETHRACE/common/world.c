@@ -658,7 +658,6 @@ int LoadNTrackModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
         }
         for (j = 0; j < total; j++) {
             if (temp_array[j]) {
-                LOG_DEBUG("adding track model %s %d, %d", temp_array[j]->identifier, temp_array[j]->nfaces, temp_array[j]->nvertices);
                 switch (AddModelToStorage(pStorage_space, temp_array[j])) {
                 case eStorage_not_enough_room:
                     FatalError(70);
@@ -681,9 +680,8 @@ int LoadNTrackModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
                     default:
                         break;
                     }
-                    // RemoveDoubleSided(temp_array[j]);
+                    RemoveDoubleSided(temp_array[j]);
                     BrModelAdd(temp_array[j]);
-                    LOG_DEBUG("added track model %s %d, %d", temp_array[j]->identifier, temp_array[j]->nfaces, temp_array[j]->nvertices);
                     new_ones++;
                 }
             }
@@ -2276,10 +2274,10 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     }
     for (i = 0; gTrack_storage_space.materials_count > i; ++i) {
         PossibleService();
-        if (gTrack_storage_space.materials[i]->flags & 7) {
+        if (gTrack_storage_space.materials[i]->flags & (BR_MATF_LIGHT | BR_MATF_PRELIT | BR_MATF_SMOOTH)) {
             gTrack_storage_space.materials[i]->flags &= 0xFFFFFFF8;
             if (gTrack_storage_space.materials[i]->flags & BR_MATF_TWO_SIDED) {
-                gTrack_storage_space.materials[i]->user = DOUBLESIDED_FLAG;
+                gTrack_storage_space.materials[i]->user = DOUBLESIDED_USER_FLAG;
                 gTrack_storage_space.materials[i]->flags &= 0xFFFFEFFF;
             }
             BrMaterialUpdate(gTrack_storage_space.materials[i], BR_MATU_RENDERING);

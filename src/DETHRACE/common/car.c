@@ -3295,9 +3295,9 @@ void AddCollPoint(br_scalar dist, br_vector3* p, br_vector3* norm, br_vector3* r
 br_scalar SinglePointColl(br_scalar* f, br_matrix4* m, br_scalar* d) {
     LOG_TRACE("(%p, %p, %p)", f, m, d);
 
-    *f = *d / m->m[0][0];
-    if (*f < 0.0) {
-        *f = 0.0;
+    f[0] = d[0] / m->m[0][0];
+    if (f[0] < 0.0f) {
+        f[0] = 0.0;
     }
     return fabsf(m->m[0][0]);
 }
@@ -3309,15 +3309,15 @@ br_scalar TwoPointColl(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* ta
 
     ts = m->m[1][1] * m->m[0][0] - m->m[0][1] * m->m[1][0];
     if (fabs(ts) >= 0.000001) {
-        *f = (m->m[1][1] * *d - m->m[0][1] * d[1]) / ts;
-        f[1] = (m->m[1][0] * *d - m->m[0][0] * d[1]) / -ts;
+        f[0] = (m->m[1][1] * d[0] - m->m[0][1] * d[1]) / ts;
+        f[1] = (m->m[1][0] * d[0] - m->m[0][0] * d[1]) / -ts;
     }
-    if (f[1] >= 0.0 && fabs(ts) >= 0.000001) {
-        if (*f < 0.0) {
+    if (f[1] >= 0.0f && fabs(ts) >= 0.000001f) {
+        if (f[0] < 0.0f) {
             m->m[0][0] = m->m[1][1];
-            *tau = tau[1];
-            *n = n[1];
-            *d = d[1];
+            tau[0] = tau[1];
+            n[0] = n[1];
+            d = d[1];
             ts = SinglePointColl(f, m, d);
             f[1] = 0.0;
         }
@@ -6582,19 +6582,19 @@ br_scalar TwoPointCollB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* t
 
     ts = m->m[1][1] * m->m[0][0] - m->m[0][1] * m->m[1][0];
     if (fabsf(ts) > 0.000001f) {
-        *f = (m->m[1][1] * *d - m->m[0][1] * d[1]) / ts;
-        f[1] = (m->m[1][0] * *d - m->m[0][0] * d[1]) / -ts;
+        f[0] = (m->m[1][1] * d[0] - m->m[0][1] * d[1]) / ts;
+        f[1] = (m->m[1][0] * d[0] - m->m[0][0] * d[1]) / -ts;
     }
-    if (f[1] >= 0.0) {
-        if (*f < 0.0) {
+    if (f[1] >= 0.0f) {
+        if (f[0] < 0.0f) {
             m->m[0][0] = m->m[1][1];
-            *tau = tau[1];
+            tau[0] = tau[1];
             tau[4] = tau[5];
-            *n = n[2];
+            n[0] = n[2];
             n[1] = n[3];
-            *d = d[1];
+            d[0] = d[1];
             ts = SinglePointColl(f, m, d);
-            f[1] = 0.0;
+            f[1] = 0.0f;
         }
     } else {
         ts = SinglePointColl(f, m, d);
@@ -6633,15 +6633,15 @@ br_scalar ThreePointCollRecB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vecto
     m->m[1][0] = m->m[j][i];
     m->m[0][1] = m->m[i][j];
     m->m[1][1] = m->m[0][5 * j];
-    *tau = tau[i];
+    tau[0] = tau[i];
     tau[1] = tau[j];
     tau[4] = tau[i + 4];
     tau[5] = tau[j + 4];
-    *n = n[2 * i];
+    n[0] = n[2 * i];
     n[2] = n[2 * j];
     n[1] = n[2 * i + 1];
     n[3] = n[2 * j + 1];
-    *d = d[i];
+    d[0] = d[i];
     d[1] = d[j];
     ts = TwoPointCollB(f, m, d, tau, n);
     f[2] = 0.0;
@@ -6657,7 +6657,7 @@ br_scalar FourPointCollB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* 
     LOG_TRACE("(%p, %p, %p, %p, %p)", f, m, d, tau, n);
 
     ts = ThreePointColl(f, m, d);
-    if (*f >= 0.0 && f[1] >= 0.0 && f[2] >= 0.0) {
+    if (*f >= 0.0f && f[1] >= 0.0f && f[2] >= 0.0f) {
         return ts;
     }
     if (*f >= 0.0) {
@@ -6669,23 +6669,19 @@ br_scalar FourPointCollB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* 
     } else {
         l = 0;
     }
-    for (i = l; i < 3; ++i) {
-        for (j = 0; j < 4; ++j) {
+    for (i = l; i < 3; i++) {
+        for (j = 0; j < 4; j++) {
             m->m[i][j] = m->m[i + 1][j];
         }
         d[i] = d[i + 1];
         tau[i] = tau[i + 1];
-        tau[i + 4].v[0] = tau[i + 5].v[0];
-        tau[i + 4].v[1] = tau[i + 5].v[1];
-        tau[i + 4].v[2] = tau[i + 5].v[2];
+        tau[i + 4] = tau[i + 5];
         n[2 * i] = n[2 * i + 2];
-        n[2 * i + 1].v[0] = n[2 * i + 3].v[0];
-        n[2 * i + 1].v[1] = n[2 * i + 3].v[1];
-        n[2 * i + 1].v[2] = n[2 * i + 3].v[2];
+        n[2 * i + 1] = n[2 * i + 3];
         d[i] = d[i + 1];
     }
-    for (i = l; i < 3; ++i) {
-        for (j = 0; j < 3; ++j) {
+    for (i = l; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
             m->m[j][i] = m->m[j][i + 1];
         }
     }
@@ -6912,19 +6908,19 @@ int DoPullActorFromWorld(br_actor* pActor) {
     LOG_TRACE("(%p)", pActor);
 
     non_car = NULL;
-    num = pActor->identifier[2] + 2 * (5 * pActor->identifier[1] - 240) - '0';
+    num = pActor->identifier[2] + 2 * (5 * pActor->identifier[1] - 240) - 48;
     if (gNon_car_spec_list[num]) {
         non_car = &gProgram_state.non_cars[gNon_car_spec_list[num] + 4];
     }
     if (non_car && non_car->collision_info.driver == eDriver_non_car) {
         non_car = gProgram_state.non_cars;
-        for (i = 0; i < 5; i++) {
+        for (i = 0; i < NONCAR_UNUSED_SLOTS; i++) {
             if (non_car->collision_info.driver == eDriver_non_car_unused_slot) {
                 break;
             }
             non_car++;
         }
-        if (i == 5) {
+        if (i == c) {
             non_car = NULL;
         } else {
             memcpy(non_car, &gProgram_state.non_cars[gNon_car_spec_list[num] + 4], sizeof(tNon_car_spec));
@@ -6938,7 +6934,7 @@ int DoPullActorFromWorld(br_actor* pActor) {
         BrActorRemove(pActor);
         BrActorAdd(gNon_track_actor, pActor);
         c->car_master_actor = pActor;
-        c->car_ID = pActor->identifier[7] - '0' + 25 * (4 * pActor->identifier[5] - 192) + 2 * (5 * pActor->identifier[6] - 240);
+        c->car_ID = pActor->identifier[7] - 48 + 25 * (4 * pActor->identifier[5] - 192) + 2 * (5 * pActor->identifier[6] - 240);
         gActive_non_car_list[gNum_active_non_cars] = non_car;
         gNum_active_non_cars++;
         gActive_car_list[gNum_cars_and_non_cars] = (tCar_spec*)non_car;
@@ -7005,7 +7001,6 @@ void CheckForDeAttachmentOfNonCars(tU32 pTime) {
             c->doing_nothing_flag = 1;
         }
         if (TestForNan(&c->car_master_actor->t.t.mat.m[3][1])) {
-            LOG_DEBUG("NAN!! %f", c->car_master_actor->t.t.mat.m[3][1]);
             BrVector3Set(&c->omega, 0.0f, 0.0f, 0.0f);
             BrMatrix34Identity(&c->car_master_actor->t.t.mat);
             c->car_master_actor->t.t.mat.m[3][0] = 2000.0f;
