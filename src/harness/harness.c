@@ -346,6 +346,7 @@ void Harness_Hook_renderFaces(br_actor* actor, br_model* model, br_material* mat
 }
 
 void Harness_Hook_BrZbSceneRenderEnd() {
+    renderer->FlushBuffers(last_colour_buffer, last_depth_buffer);
     renderer->EndScene();
 }
 
@@ -353,7 +354,6 @@ void Harness_Hook_BrZbSceneRenderEnd() {
 void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {
 
     // draw the current colour_buffer (2d screen) contents
-    renderer->FlushBuffers(last_colour_buffer, last_depth_buffer);
     Harness_RenderScreen(dst, src);
 
     int delay_ms = Harness_CalculateFrameDelay();
