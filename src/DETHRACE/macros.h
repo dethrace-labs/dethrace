@@ -19,4 +19,12 @@
 
 #define V11MODEL(model) (((v11model*)model->prepared))
 
+#define Vector3DistanceSquared(a, b)                                \
+        (                                                           \
+            0                                                       \
+            + ((a)->v[0] - (b)->v[0]) * ((a)->v[0] - (b)->v[0])     \
+            + ((a)->v[1] - (b)->v[1]) * ((a)->v[1] - (b)->v[1])     \
+            + ((a)->v[2] - (b)->v[2]) * ((a)->v[2] - (b)->v[2])     \
+        )
+
 #endif

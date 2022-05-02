@@ -140,7 +140,7 @@ int DRS3StopSound(tS3_sound_tag pSound_tag) {
 int DRS3LoadSound(tS3_sound_id pThe_sound) {
     LOG_TRACE("(%d)", pThe_sound);
 
-    STUB();
+    STUB_ONCE();
 }
 
 // IDA: int __usercall DRS3ReleaseSound@<EAX>(tS3_sound_id pThe_sound@<EAX>)

@@ -1602,7 +1602,6 @@ int RemoveDoubleSided(br_model* pModel) {
             }
         }
         if (num_double_sided_faces > 0) {
-            LOG_DEBUG("nbr dbl side %d, %p", num_double_sided_faces, pModel);
             faces = BrResAllocate(pModel, sizeof(br_face) * (num_double_sided_faces + pModel->nfaces), kMem_misc);
             memcpy(faces, pModel->faces, sizeof(br_face) * pModel->nfaces);
             orig_nfaces = pModel->nfaces;

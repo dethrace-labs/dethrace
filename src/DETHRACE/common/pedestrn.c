@@ -392,7 +392,7 @@ int PedestrianNextInstruction(tPedestrian_data* pPedestrian, float pDanger_level
     int the_marker_ref;
     LOG_TRACE("(%p, %f, %d, %d)", pPedestrian, pDanger_level, pPosition_explicitly, pMove_pc);
 
-    STUB();
+    STUB_ONCE();
     return 0;
 }
 

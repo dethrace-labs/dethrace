@@ -16,6 +16,7 @@
 #include "skidmark.h"
 #include "pd/sys.h"
 #include "utility.h"
+#include "trig.h"
 #include <stdlib.h>
 
 br_actor* gOppo_path_actor;
@@ -218,8 +219,7 @@ tS16 FindNearestPathNode(br_vector3* pActor_coords, br_scalar* pDistance) {
 tS16 FindNearestPathSection(br_vector3* pActor_coords, br_vector3* pPath_direction, br_vector3* pIntersect, br_scalar* pDistance) {
     LOG_TRACE("(%p, %p, %p, %p)", pActor_coords, pPath_direction, pIntersect, pDistance);
 
-    STUB();
-    return 0;
+    return FindNearestGeneralSection(NULL, pActor_coords, pPath_direction, pIntersect, pDistance);
 }
 
 // IDA: tS16 __usercall FindNearestGeneralSection@<AX>(tCar_spec *pPursuee@<EAX>, br_vector3 *pActor_coords@<EDX>, br_vector3 *pPath_direction@<EBX>, br_vector3 *pIntersect@<ECX>, br_scalar *pDistance)
@@ -241,7 +241,73 @@ tS16 FindNearestGeneralSection(tCar_spec* pPursuee, br_vector3* pActor_coords, b
     br_vector3* finish;
     br_vector3* nearest_node_v;
     LOG_TRACE("(%p, %p, %p, %p, %p)", pPursuee, pActor_coords, pPath_direction, pIntersect, pDistance);
-    NOT_IMPLEMENTED();
+
+    nearest_section = -1;
+    nearest_node_section_no = -1;
+    closest_distance_squared = BR_SCALAR_MAX;
+    nearest_node_distance_squared = BR_SCALAR_MAX;
+    for (section_no = 0; section_no < (pPursuee != NULL ? pPursuee->my_trail.number_of_nodes - 1 : gProgram_state.AI_vehicles.number_of_path_nodes); section_no++) {
+        if (pPursuee != NULL) {
+            start = &pPursuee->my_trail.trail_nodes[section_no];
+            finish = &pPursuee->my_trail.trail_nodes[section_no + 1];
+        } else {
+            start = &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0]].p;
+            finish = &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1]].p;
+        }
+        if (!gAlready_elasticating || gMobile_section != section_no) {
+            BrVector3Sub(&a, finish, start);
+            BrVector3Sub(&p, pActor_coords, start);
+            the_distance_squared = Vector3DistanceSquared(&p, &a); // FIXME: add to general header
+            if (the_distance_squared < closest_distance_squared) {
+                nearest_node_v = finish;
+                nearest_section = section_no;
+                closest_distance_squared = the_distance_squared;
+            }
+            the_distance_squared = BrVector3LengthSquared(&p);
+            if (the_distance_squared < closest_distance_squared) {
+                nearest_node_v = start;
+                nearest_section = section_no;
+                closest_distance_squared = the_distance_squared;
+            }
+            length_squared_a = BrVector3LengthSquared(&a);
+            if (length_squared_a >= 0.0001f) {
+                t = BrVector3Dot(&p, &a) / length_squared_a;
+                if (t <= 0 && t <= 1.f) {
+                    p.v[0] -= t * a.v[0];
+                    p.v[1] -= t * a.v[1];
+                    p.v[2] -= t * a.v[2];
+                    the_distance_squared = BrVector3LengthSquared(&p);
+                    if (the_distance_squared < nearest_node_distance_squared) {
+                        BrVector3Scale(&intersect, &a, t);
+                        BrVector3Add(pIntersect, start, &intersect);
+                        BrVector3NormaliseQuick(pPath_direction, &a);
+                        nearest_node_distance_squared = the_distance_squared;
+                        nearest_node_section_no = section_no;
+                    }
+                }
+            }
+        }
+    }
+    if (nearest_node_distance_squared > closest_distance_squared) {
+        nearest_node_section_no = nearest_section;
+        if (pPursuee != NULL) {
+            start = &pPursuee->my_trail.trail_nodes[section_no];
+            finish = &pPursuee->my_trail.trail_nodes[section_no + 1];
+        } else {
+            start = &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0]].p;
+            finish = &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1]].p;
+        }
+        BrVector3Sub(&p, finish, start);
+        BrVector3NormaliseQuick(pPath_direction, &p);
+        BrVector3Copy(pIntersect, nearest_node_v);
+        *pDistance = sqrtf(closest_distance_squared);
+    } else {
+        *pDistance = sqrtf(nearest_node_distance_squared);
+    }
+    if (pPursuee != NULL) {
+        nearest_node_section_no += 15000;
+    }
+    return nearest_node_section_no;
 }
 
 // IDA: void __usercall DeadStopCar(tCar_spec *pCar_spec@<EAX>)
@@ -570,7 +636,43 @@ void RecordNextTrailNode(tCar_spec* pPursuee) {
     br_scalar length;
     int visible;
     LOG_TRACE("(%p)", pPursuee);
-    NOT_IMPLEMENTED();
+
+    trail =  &pPursuee->my_trail;
+    if (trail->time_of_next_recording >= gTime_stamp_for_this_munging) {
+        return;
+    }
+    trail->time_of_next_recording = gTime_stamp_for_this_munging + 500;
+    trail->nodes_shifted_this_frame = 0;
+    if (BrVector3Dot(&trail->base_heading, &pPursuee->direction) < FastScalarCos(30)) {
+        trail->has_deviated_recently = 1;
+    }
+    BrVector3Sub(&car_to_last_point_v, &trail->trail_nodes[trail->number_of_nodes - 2], &pPursuee->car_master_actor->t.t.translate.t);
+    length = BrVector3Length(&car_to_last_point_v);
+    if (length < 0.3f) {
+        return;
+    }
+    CalcNegativeXVector(&offset_v, &trail->trail_nodes[trail->number_of_nodes - 2], &pPursuee->car_master_actor->t.t.translate.t, 0.5f);
+
+    BrVector3Add(&start1, &trail->trail_nodes[trail->number_of_nodes - 2], &offset_v);
+    BrVector3Add(&finish1, &pPursuee->car_master_actor->t.t.translate.t, &offset_v);
+    BrVector3Sub(&start2, &trail->trail_nodes[trail->number_of_nodes - 2], &offset_v);
+    BrVector3Sub(&finish2, &pPursuee->car_master_actor->t.t.translate.t, &offset_v);
+    visible = 1;
+    if ((trail->has_deviated_recently
+                || !(visible = PointVisibleFromHere(&start1, &finish1))
+                || !(visible = PointVisibleFromHere(&start2, &finish2))
+                || !(visible = PointVisibleFromHere(&trail->trail_nodes[trail->number_of_nodes - 2], &pPursuee->car_master_actor->t.t.translate.t)))
+            && ((visible && length > 2.0f) || (!visible && length > 1.5f))) {
+        if (trail->number_of_nodes >= COUNT_OF(trail->trail_nodes)) {
+            memmove(trail->trail_nodes, &trail->trail_nodes[1], (COUNT_OF(trail->trail_nodes) - 1) * sizeof(trail->trail_nodes[0]));
+            trail->nodes_shifted_this_frame = 1;
+        } else {
+            trail->number_of_nodes++;
+        }
+        trail->has_deviated_recently = 0;
+        BrVector3Copy(&trail->base_heading, &pPursuee->direction);
+    }
+    BrVector3Copy(&trail->trail_nodes[trail->number_of_nodes - 1], &pPursuee->car_master_actor->t.t.translate.t);
 }
 
 // IDA: tS16 __usercall FindNearestTrailSection@<AX>(tOpponent_spec *pOpponent_spec@<EAX>, tCar_spec *pPursuee@<EDX>, br_vector3 *pSection_v@<EBX>, br_vector3 *pIntersect@<ECX>, br_scalar *pDistance)
@@ -1206,7 +1308,7 @@ int RematerialiseOpponent(tOpponent_spec* pOpponent_spec, br_scalar pSpeed) {
                 count / total, highest);
         }
         if (sensible_place) {
-            ResetCarSpecialVolume(pOpponent_spec->car_spec);
+            ResetCarSpecialVolume((tCollision_info*)pOpponent_spec->car_spec);
         } else {
             TurnOpponentPhysicsOff(pOpponent_spec);
             RebuildActiveCarList();
@@ -1964,7 +2066,22 @@ br_vector3* GetOpponentsSectionFinishNodePoint(tOpponent_spec* pOpponent_spec, t
     tS16 node_no;
     int node_index_index;
     LOG_TRACE("(%p, %d)", pOpponent_spec, pSection);
-    NOT_IMPLEMENTED();
+
+    if (pSection >= 20000 && pOpponent_spec->nnext_sections > pSection - 20000) {
+        section_no = pOpponent_spec->next_sections[pSection - 2000].section_no;
+        node_index_index = pOpponent_spec->next_sections[pSection - 2000].direction;
+        node_no = gProgram_state.AI_vehicles.path_sections[section_no].node_indices[node_index_index];
+        return &gProgram_state.AI_vehicles.path_nodes[node_no].p;
+    } else if (pSection >= 15000) {
+        return &pOpponent_spec->pursue_car_data.pursuee->my_trail.trail_nodes[1 + pSection];
+    } else if (pSection == 10000) {
+        return &pOpponent_spec->pursue_car_data.direct_line_nodes[1].p;
+    } else {
+        dr_dprintf("BIG ERROR - GetOpponentsSectionFinishNodePoint() - section not found in next_section array for opponent %s",
+            pOpponent_spec->car_spec->driver_name);
+        PDEnterDebugger("BIG ERROR - GetOpponentsSectionFinishNodePoint()");
+        return NULL;
+    }
 }
 
 // IDA: br_scalar __usercall GetOpponentsSectionWidth@<ST0>(tOpponent_spec *pOpponent_spec@<EAX>, tS16 pSection@<EDX>)

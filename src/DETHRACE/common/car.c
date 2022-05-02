@@ -497,11 +497,9 @@ void SetInitialPosition(tRace_info* pThe_race, int pCar_index, int pGrid_index) 
         grid_offset.v[0] = 0.0 - pGrid_index % 2;
         grid_offset.v[1] = 0.0;
         grid_offset.v[2] = (double)(pGrid_index / 2) * 2.0 + (double)(pGrid_index % 2) * 0.40000001;
-        LOG_DEBUG("grid offset: %f, %f, %f", grid_offset.v[0], grid_offset.v[1], grid_offset.v[2]);
         BrMatrix34ApplyV(&car_actor->t.t.translate.t, &grid_offset, &initial_yaw_matrix);
         BrVector3Accumulate(&car_actor->t.t.translate.t, &pThe_race->initial_position);
     }
-    LOG_DEBUG("grid pos: %d, pos: x=%f, z=%f", pGrid_index, car_actor->t.t.translate.t.v[0], car_actor->t.t.translate.t.v[2]);
     FindBestY(
         &car_actor->t.t.translate.t,
         gTrack_actor,
