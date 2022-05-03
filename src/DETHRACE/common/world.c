@@ -2275,10 +2275,10 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     for (i = 0; gTrack_storage_space.materials_count > i; ++i) {
         PossibleService();
         if (gTrack_storage_space.materials[i]->flags & (BR_MATF_LIGHT | BR_MATF_PRELIT | BR_MATF_SMOOTH)) {
-            gTrack_storage_space.materials[i]->flags &= 0xFFFFFFF8;
+            gTrack_storage_space.materials[i]->flags &= ~(BR_MATF_LIGHT | BR_MATF_PRELIT | BR_MATF_SMOOTH);
             if (gTrack_storage_space.materials[i]->flags & BR_MATF_TWO_SIDED) {
                 gTrack_storage_space.materials[i]->user = DOUBLESIDED_USER_FLAG;
-                gTrack_storage_space.materials[i]->flags &= 0xFFFFEFFF;
+                gTrack_storage_space.materials[i]->flags &= ~BR_MATF_TWO_SIDED;
             }
             BrMaterialUpdate(gTrack_storage_space.materials[i], BR_MATU_RENDERING);
         }

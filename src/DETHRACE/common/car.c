@@ -1641,21 +1641,20 @@ void NonCarCalcForce(tNon_car_spec* nc, br_scalar dt) {
         }
     }
     if (c->car_master_actor->identifier[3] == '!') {
-        if (vol) {
+        if (vol != NULL) {
             c->v.v[1] = c->v.v[1] - dt * 10.0f * vol->gravity_multiplier;
         } else {
             c->v.v[1] = c->v.v[1] - dt * 10.0f;
         }
         ts = BrVector3Length(&c->v);
-        if (vol) {
+        if (vol != NULL) {
             ts = vol->viscosity_multiplier * ts;
         }
-        ts = -(dt * 0.0005f * ts);
-        ts = ts / c->M;
+        ts = -(dt * 0.0005f * ts) / c->M;
         BrVector3Scale(&v, &c->v, ts);
         BrVector3Accumulate(&c->v, &v);
         ts = BrVector3Length(&c->omega);
-        if (vol) {
+        if (vol != NULL) {
             ts = vol->viscosity_multiplier * ts;
         }
         ts = -(dt * 0.0005 * ts);
@@ -5815,29 +5814,11 @@ int CollideTwoCars(tCollision_info* car1, tCollision_info* car2, int pPass) {
     GetNewBoundingBox(&new_car2_bnds, &car2->bounds[1], &car2_to_old_car2);
 
     for (i = 0; i < 3; ++i) {
-        ts = car1->bounds[1].min.v[i];
-        if (new_car1_bnds.min.v[i] <= ts) {
-            ts = new_car1_bnds.min.v[i];
-        }
-        new_car1_bnds.min.v[i] = ts;
+        new_car1_bnds.min.v[i] = MIN(car1->bounds[1].min.v[i], new_car1_bnds.min.v[i]);
+        new_car1_bnds.max.v[i] = MAX(car1->bounds[1].max.v[i], new_car1_bnds.max.v[i]);
 
-        ts = car1->bounds[1].max.v[i];
-        if (new_car1_bnds.max.v[i] >= ts) {
-            ts = new_car1_bnds.max.v[i];
-        }
-        new_car1_bnds.max.v[i] = ts;
-
-        ts = car2->bounds[1].min.v[i];
-        if (new_car2_bnds.min.v[i] <= ts) {
-            ts = new_car2_bnds.min.v[i];
-        }
-        new_car2_bnds.min.v[i] = ts;
-
-        ts = car2->bounds[1].max.v[i];
-        if (new_car2_bnds.max.v[i] >= ts) {
-            ts = new_car2_bnds.max.v[i];
-        }
-        new_car2_bnds.max.v[i] = ts;
+        new_car2_bnds.min.v[i] = MIN(car2->bounds[1].min.v[i], new_car2_bnds.min.v[i]);
+        new_car2_bnds.max.v[i] = MAX(car2->bounds[1].max.v[i], new_car2_bnds.max.v[i]);
     }
     GetNewBoundingBox(&bnds, &new_car2_bnds, &old_car2_to_car1);
 
@@ -6578,17 +6559,15 @@ br_scalar FourPointCollB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* 
     LOG_TRACE("(%p, %p, %p, %p, %p)", f, m, d, tau, n);
 
     ts = ThreePointColl(f, m, d);
-    if (*f >= 0.0f && f[1] >= 0.0f && f[2] >= 0.0f) {
+    if (f[0] >= 0.0f && f[1] >= 0.0f && f[2] >= 0.0f) {
         return ts;
     }
-    if (*f >= 0.0) {
-        if (f[1] >= 0.0) {
-            l = 2;
-        } else {
-            l = 1;
-        }
+    if (f[0] < 0.0f) {
+         l = 0;
+    } else if (f[1] < 0.0f) {
+        l = 1;
     } else {
-        l = 0;
+        l = 2;
     }
     for (i = l; i < 3; i++) {
         for (j = 0; j < 4; j++) {
@@ -6829,7 +6808,7 @@ int DoPullActorFromWorld(br_actor* pActor) {
     LOG_TRACE("(%p)", pActor);
 
     non_car = NULL;
-    num = pActor->identifier[2] + 2 * (5 * pActor->identifier[1] - 240) - 48;
+    num = 10 * (pActor->identifier[1] - '0') + 1 * (pActor->identifier[2] - '0');
     if (gNon_car_spec_list[num]) {
         non_car = &gProgram_state.non_cars[gNon_car_spec_list[num] + 4];
     }
@@ -6847,7 +6826,7 @@ int DoPullActorFromWorld(br_actor* pActor) {
             memcpy(non_car, &gProgram_state.non_cars[gNon_car_spec_list[num] + 4], sizeof(tNon_car_spec));
         }
     }
-    if (non_car) {
+    if (non_car != NULL) {
         pActor->type_data = non_car;
         c = &non_car->collision_info;
         c->driver = eDriver_non_car;
@@ -6855,7 +6834,7 @@ int DoPullActorFromWorld(br_actor* pActor) {
         BrActorRemove(pActor);
         BrActorAdd(gNon_track_actor, pActor);
         c->car_master_actor = pActor;
-        c->car_ID = pActor->identifier[7] - 48 + 25 * (4 * pActor->identifier[5] - 192) + 2 * (5 * pActor->identifier[6] - 240);
+        c->car_ID = 100 * (pActor->identifier[5] - '0') + 10 * (pActor->identifier[6] - '0') + 1 * (pActor->identifier[7] - '0');
         gActive_non_car_list[gNum_active_non_cars] = non_car;
         gNum_active_non_cars++;
         gActive_car_list[gNum_cars_and_non_cars] = (tCar_spec*)non_car;
