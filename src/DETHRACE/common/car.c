@@ -2894,9 +2894,7 @@ void AddFrictionCarToCar(tCollision_info* car1, tCollision_info* car2, br_vector
         max_friction->v[1] = 0.0f;
         max_friction->v[2] = 0.0f;
     } else {
-        v_diff1.v[0] /= v_diff;
-        v_diff1.v[1] /= v_diff;
-        v_diff1.v[2] /= v_diff;
+        BrVector3InvScale(&v_diff1, &v_diff1, v_diff);
         BrMatrix34ApplyV(&tv, &v_diff1, &car1->oldmat);
         BrMatrix34TApplyV(&v_diff2, &tv, &car2->oldmat);
         BrVector3Negate(&v_diff2, &v_diff2);
@@ -5990,7 +5988,6 @@ int GetEdgeEdgeCollisions(br_bounds* pB1, br_bounds* pB2, br_matrix34* pM21, br_
             if (plane1 == 8 || plane2 == 8 || plane2 == 0) {
                 continue;
             }
-            // if (plane1 != 8 && plane2 != 8 && plane2) {
             BrVector3Add(&p1, &hp1, &hp2);
             BrVector3Scale(&p1, &p1, 0.5f);
             BrMatrix34ApplyP(&tp3, &p1, pM12);
@@ -6241,8 +6238,8 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
     for (i = 0; i < k; ++i) {
         BrVector3Cross(&tau1[i], &r[2 * i], &n[2 * i]);
         BrVector3Cross(&tau2[i], &r[2 * i + 1], &n[2 * i + 1]);
-        BrVector3Div(&tau1[i], &tau1[i], &car1->I);
-        BrVector3Div(&tau2[i], &tau2[i], &car2->I);
+        Vector3Div(&tau1[i], &tau1[i], &car1->I);
+        Vector3Div(&tau2[i], &tau2[i], &car2->I);
         BrVector3Cross(&tv, &car1->omega, &r[2 * i]);
         BrVector3Accumulate(&tv, &car1->velocity_car_space);
         d[i] = -BrVector3Dot(&n[2 * i], &tv);
@@ -6563,7 +6560,7 @@ br_scalar FourPointCollB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* 
         return ts;
     }
     if (f[0] < 0.0f) {
-         l = 0;
+        l = 0;
     } else if (f[1] < 0.0f) {
         l = 1;
     } else {

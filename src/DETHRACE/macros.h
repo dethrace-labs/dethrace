@@ -10,6 +10,7 @@
 
 #define STR_STARTS_WITH(haystack, needle) strncmp(haystack, needle, strlen(needle))
 #define STR_ENDS_WITH(haystack, needle) strcmp(haystack + strlen(haystack) - strlen(needle), needle)
+#define MIN(a, b) ((a) < (b) ? a : b)
 #define MAX(a, b) ((a) > (b) ? a : b)
 #define COUNT_OF(array) (sizeof((array)) / sizeof((array)[0]))
 #define LEN(array) (sizeof((array)) / sizeof((array)[0]))
@@ -18,5 +19,12 @@
 
 #define V11MODEL(model) (((v11model*)model->prepared))
 #define CAR(c) ((tCar_spec*)c)
+
+#define Vector3Div(v1, v2, v3)                \
+    do {                                      \
+        (v1)->v[0] = (v2)->v[0] / (v3)->v[0]; \
+        (v1)->v[1] = (v2)->v[1] / (v3)->v[1]; \
+        (v1)->v[2] = (v2)->v[2] / (v3)->v[2]; \
+    } while (0)
 
 #endif
