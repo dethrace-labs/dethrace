@@ -715,11 +715,11 @@ typedef br_pixelmap* dev_clone_cbfn(br_device*, br_pixelmap*);
 typedef void dev_free_cbfn(br_device*, br_pixelmap*);
 
 typedef struct br_resource_class { // size: 20
-    br_uint_32 reserved; // @0
-    char* identifier; // @4
-    br_uint_8 res_class; // @8
+    br_uint_32 reserved;           // @0
+    char* identifier;              // @4
+    br_uint_8 res_class;           // @8
     br_resourcefree_cbfn* free_cb; // @12
-    br_uint_32 alignment; // @16
+    br_uint_32 alignment;          // @16
 } br_resource_class;
 
 typedef struct br_filesystem {
@@ -957,31 +957,31 @@ typedef struct br_quat {
     br_scalar w;
 } br_quat;
 
-typedef struct br_transform { // size: 0x34
-    br_uint_16 type; // @0x0
-    union { // size: 0x30
-        br_matrix34 mat; // @0x0
-        struct { // size: 0x30
-            br_euler e; // @0x0
+typedef struct br_transform {  // size: 0x34
+    br_uint_16 type;           // @0x0
+    union {                    // size: 0x30
+        br_matrix34 mat;       // @0x0
+        struct {               // size: 0x30
+            br_euler e;        // @0x0
             br_scalar _pad[7]; // @0x8
-            br_vector3 t; // @0x24
-        } euler; // @0x0
-        struct { // size: 0x30
-            br_quat q; // @0x0
+            br_vector3 t;      // @0x24
+        } euler;               // @0x0
+        struct {               // size: 0x30
+            br_quat q;         // @0x0
             br_scalar _pad[5]; // @0x10
-            br_vector3 t; // @0x24
-        } quat; // @0x0
-        struct { // size: 0x30
-            br_vector3 look; // @0x0
-            br_vector3 up; // @0xc
+            br_vector3 t;      // @0x24
+        } quat;                // @0x0
+        struct {               // size: 0x30
+            br_vector3 look;   // @0x0
+            br_vector3 up;     // @0xc
             br_scalar _pad[3]; // @0x18
-            br_vector3 t; // @0x24
-        } look_up; // @0x0
-        struct { // size: 0x30
+            br_vector3 t;      // @0x24
+        } look_up;             // @0x0
+        struct {               // size: 0x30
             br_scalar _pad[9]; // @0x0
-            br_vector3 t; // @0x24
-        } translate; // @0x0
-    } t; // @0x4
+            br_vector3 t;      // @0x24
+        } translate;           // @0x0
+    } t;                       // @0x4
 } br_transform;
 
 typedef struct br_pixelmap {
@@ -1127,24 +1127,24 @@ typedef struct br_associative_array_tag {
     br_uint_16 max_elements;
 } br_associative_array;
 
-typedef struct br_device { // size: 68
-    br_uint_32 magic; // @0
-    char* identifier; // @4
-    br_font* default_font; // @8
-    br_uint_32 qualifier; // @12
-    dev_fill_cbfn* fill; // @16
-    dev_rectangle_copy_cbfn* rectangle_copy; // @20
-    dev_rectangle_fill_cbfn* rectangle_fill; // @24
+typedef struct br_device {                               // size: 68
+    br_uint_32 magic;                                    // @0
+    char* identifier;                                    // @4
+    br_font* default_font;                               // @8
+    br_uint_32 qualifier;                                // @12
+    dev_fill_cbfn* fill;                                 // @16
+    dev_rectangle_copy_cbfn* rectangle_copy;             // @20
+    dev_rectangle_fill_cbfn* rectangle_fill;             // @24
     dev_dirty_rectangle_copy_cbfn* dirty_rectangle_copy; // @28
     dev_dirty_rectangle_fill_cbfn* dirty_rectangle_fill; // @32
-    dev_plot_cbfn* plot; // @36
-    dev_copy_cbfn* copy; // @40
-    dev_line_cbfn* line; // @44
-    dev_copy_bits_cbfn* copy_bits; // @48
-    dev_double_buffer_cbfn* double_buffer; // @52
-    dev_match_cbfn* match; // @56
-    dev_clone_cbfn* clone; // @60
-    dev_free_cbfn* free; // @64
+    dev_plot_cbfn* plot;                                 // @36
+    dev_copy_cbfn* copy;                                 // @40
+    dev_line_cbfn* line;                                 // @44
+    dev_copy_bits_cbfn* copy_bits;                       // @48
+    dev_double_buffer_cbfn* double_buffer;               // @52
+    dev_match_cbfn* match;                               // @56
+    dev_clone_cbfn* clone;                               // @60
+    dev_free_cbfn* free;                                 // @64
 } br_device;
 
 typedef struct br_outfcty_desc {
@@ -1163,28 +1163,28 @@ typedef struct br_outfcty_desc {
 typedef struct br_renderer_facility br_renderer_facility;
 
 typedef struct br_device_pixelmap_dispatch br_device_pixelmap_dispatch;
-typedef struct br_device_pixelmap { // size: 0x44
+typedef struct br_device_pixelmap {        // size: 0x44
     br_device_pixelmap_dispatch* dispatch; // @0x0
-    char* pm_identifier; // @0x4
-    void* pm_pixels; // @0x8
-    br_uint_32 pm_pixels_qualifier; // @0xc
-    br_pixelmap* pm_map; // @0x10
-    br_colour_range pm_src_key; // @0x14
-    br_colour_range pm_dst_key; // @0x1c
-    br_uint_32 pm_key; // @0x24
-    br_int_16 pm_row_bytes; // @0x28
-    br_int_16 pm_mip_offset; // @0x2a
-    br_uint_8 pm_type; // @0x2c
-    br_uint_8 pm_flags; // @0x2d
-    br_uint_16 pm_copy_function; // @0x2e
-    br_uint_16 pm_base_x; // @0x30
-    br_uint_16 pm_base_y; // @0x32
-    br_uint_16 pm_width; // @0x34
-    br_uint_16 pm_height; // @0x36
-    br_int_16 pm_origin_x; // @0x38
-    br_int_16 pm_origin_y; // @0x3a
-    void* pm_user; // @0x3c
-    void* pm_stored; // @0x40
+    char* pm_identifier;                   // @0x4
+    void* pm_pixels;                       // @0x8
+    br_uint_32 pm_pixels_qualifier;        // @0xc
+    br_pixelmap* pm_map;                   // @0x10
+    br_colour_range pm_src_key;            // @0x14
+    br_colour_range pm_dst_key;            // @0x1c
+    br_uint_32 pm_key;                     // @0x24
+    br_int_16 pm_row_bytes;                // @0x28
+    br_int_16 pm_mip_offset;               // @0x2a
+    br_uint_8 pm_type;                     // @0x2c
+    br_uint_8 pm_flags;                    // @0x2d
+    br_uint_16 pm_copy_function;           // @0x2e
+    br_uint_16 pm_base_x;                  // @0x30
+    br_uint_16 pm_base_y;                  // @0x32
+    br_uint_16 pm_width;                   // @0x34
+    br_uint_16 pm_height;                  // @0x36
+    br_int_16 pm_origin_x;                 // @0x38
+    br_int_16 pm_origin_y;                 // @0x3a
+    void* pm_user;                         // @0x3c
+    void* pm_stored;                       // @0x40
 } br_device_pixelmap;
 
 typedef struct br_primitive_library br_primitive_library;
@@ -1197,41 +1197,32 @@ typedef struct br_renderer {
     br_renderer_dispatch* dispatch;
 } br_renderer;
 
-typedef struct br_material { // size: 0x9c
-    br_uint_32 _reserved; // @0x0
-    char* identifier; // @0x4
-    br_colour colour; // @0x8
-    br_uint_8 opacity; // @0xc
-    br_ufraction ka; // @0x10
-    br_ufraction kd; // @0x14
-    br_ufraction ks; // @0x18
-    br_scalar power; // @0x1c
-    br_uint_32 flags; // @0x20
-    br_matrix23 map_transform; // @0x24
-    br_uint_8 index_base; // @0x3c
-    br_uint_8 index_range; // @0x3d
-    br_pixelmap* colour_map; // @0x40
-    br_pixelmap* screendoor; // @0x44
-    br_pixelmap* index_shade; // @0x48
-    br_pixelmap* index_blend; // @0x4c
-    br_pixelmap* index_fog; // @0x50
-    br_token_value* extra_surf; // @0x54
-    br_token_value* extra_prim; // @0x58
-    br_scalar fog_min; // @0x5c
-    br_scalar fog_max; // @0x60
-    br_colour fog_colour; // @0x64
-    br_uint_32 flags_ext; // @0x68
-    br_pixelmap* colour_map_1; // @0x6c
-    br_matrix23 map_transform_1; // @0x70
-    br_int_8 mip_modifier; // @0x88
-    br_uint_8 min_mip; // @0x89
-    br_uint_8 max_mip; // @0x8a
-    br_uint_8 alpha_mode; // @0x8b
-    br_uint_8 zbuffer_mode; // @0x8c
-    br_uint_8 zbuffer_compare; // @0x8d
-    br_int_32 subdivide_tolerance; // @0x90
-    void* user; // @0x94
-    void* stored; // @0x98
+typedef struct br_material {       // size: 0x74
+    br_uint_32 _reserved;          // @0x0
+    char* identifier;              // @0x4
+    br_colour colour;              // @0x8
+    br_uint_8 opacity;             // @0xc
+    br_ufraction ka;               // @0x10
+    br_ufraction kd;               // @0x14
+    br_ufraction ks;               // @0x18
+    br_scalar power;               // @0x1c
+    br_uint_32 flags;              // @0x20
+    br_matrix23 map_transform;     // @0x24
+    br_uint_8 index_base;          // @0x3c
+    br_uint_8 index_range;         // @0x3d
+    br_pixelmap* colour_map;       // @0x40
+    br_pixelmap* screendoor;       // @0x44
+    br_pixelmap* index_shade;      // @0x48
+    br_pixelmap* index_blend;      // @0x4c
+    br_pixelmap* index_fog;        // @0x50
+    br_token_value* extra_surf;    // @0x54
+    br_token_value* extra_prim;    // @0x58
+    br_scalar fog_min;             // @0x5c
+    br_scalar fog_max;             // @0x60
+    br_colour fog_colour;          // @0x64
+    br_int_32 subdivide_tolerance; // @0x68
+    void* user;                    // @0x6c
+    void* stored;                  // @0x70
 } br_material;
 
 typedef struct br_vertex {
@@ -1370,41 +1361,39 @@ typedef struct br_tri_strip {
     br_strip_face_data* face_data;
 } br_tri_strip;
 
-typedef struct br_actor { // size: 0x64
-    br_actor* next; // @0x0
-    br_actor** prev; // @0x4
-    br_actor* children; // @0x8
-    br_actor* parent; // @0xc
-    br_uint_16 depth; // @0x10
-    br_uint_8 type; // @0x12
-    char* identifier; // @0x14
-    br_model* model; // @0x18
-    br_material* material; // @0x1c
+typedef struct br_actor {   // size: 0x64
+    br_actor* next;         // @0x0
+    br_actor** prev;        // @0x4
+    br_actor* children;     // @0x8
+    br_actor* parent;       // @0xc
+    br_uint_16 depth;       // @0x10
+    br_uint_8 type;         // @0x12
+    char* identifier;       // @0x14
+    br_model* model;        // @0x18
+    br_material* material;  // @0x1c
     br_uint_8 render_style; // @0x20
-    void* render_data; // @0x24
-    br_transform t; // @0x28
-    void* type_data; // @0x5c
-    void* user; // @0x60
+    void* render_data;      // @0x24
+    br_transform t;         // @0x28
+    void* type_data;        // @0x5c
+    void* user;             // @0x60
 } br_actor;
 
-typedef struct br_model { // size: 0x5c
-    br_uint_32 _reserved; // @0x0
-    char* identifier; // @0x4
-    br_vertex* vertices; // @0x8
-    br_face* faces; // @0xc
-    br_uint_16 nvertices; // @0x10
-    br_uint_16 nfaces; // @0x12
-    br_vector3 pivot; // @0x14
-    br_uint_16 flags; // @0x20
+typedef struct br_model {         // size: 0x54
+    br_uint_32 _reserved;         // @0x0
+    char* identifier;             // @0x4
+    br_vertex* vertices;          // @0x8
+    br_face* faces;               // @0xc
+    br_uint_16 nvertices;         // @0x10
+    br_uint_16 nfaces;            // @0x12
+    br_vector3 pivot;             // @0x14
+    br_uint_16 flags;             // @0x20
     br_model_custom_cbfn* custom; // @0x24
-    void* user; // @0x28
-    br_angle crease_angle; // @0x2c
-    br_scalar radius; // @0x30
-    br_bounds bounds; // @0x34
-    void* prepared; // @0x4c
-    void* stored; // @0x50
-    br_uint_16 nprimitive_lists; // @0x54
-    br_primitive_list* primitive_list; // @0x58
+    void* user;                   // @0x28
+    br_angle crease_angle;        // @0x2c
+    br_scalar radius;             // @0x30
+    br_bounds bounds;             // @0x34
+    void* prepared;               // @0x4c
+    void* stored;                 // @0x50
 } br_model;
 
 typedef struct br_camera {
@@ -1499,13 +1488,13 @@ typedef struct br_simple_list {
 } br_simple_list;
 
 typedef struct br_registry_entry { // size: 12
-    br_node node; // @0
-    char** item; // @8
+    br_node node;                  // @0
+    char** item;                   // @8
 } br_registry_entry;
 
-typedef struct br_registery { // size: 20
-    br_list list; // @0
-    int count; // @12
+typedef struct br_registery {              // size: 20
+    br_list list;                          // @0
+    int count;                             // @12
     br_find_failed_cbfn* find_failed_hook; // @16
 } br_registry;
 
@@ -1573,91 +1562,91 @@ typedef struct br_open_device {
     br_image* image;
 } br_open_device;
 
-typedef struct br_framework_state { // size: 1136
-    br_boolean active; // @0
-    br_registry reg_resource_classes; // @4
+typedef struct br_framework_state {               // size: 1136
+    br_boolean active;                            // @0
+    br_registry reg_resource_classes;             // @4
     br_resource_class* resource_class_index[256]; // @24
-    br_list tokens; // @1048
-    br_token next_free_token; // @1060
-    br_filesystem* fsys; // @1064
-    br_allocator* mem; // @1068
-    br_diaghandler* diag; // @1072
-    int open_mode; // @1076
-    void* res; // @1080
-    void* scratch_ptr; // @1084
-    br_size_t scratch_size; // @1088
-    br_size_t scratch_last; // @1092
-    int scratch_inuse; // @1096
-    br_error last_error_type; // @1100
-    void** last_error_value; // @1104
-    br_list images; // @1108
-    br_open_device* dev_slots; // @1120
-    br_int_32 ndev_slots; // @1124
-    br_associative_array* sys_config; // @1128
-    br_boolean bAlreadyLoadedDrivers; // @1132
+    br_list tokens;                               // @1048
+    br_token next_free_token;                     // @1060
+    br_filesystem* fsys;                          // @1064
+    br_allocator* mem;                            // @1068
+    br_diaghandler* diag;                         // @1072
+    int open_mode;                                // @1076
+    void* res;                                    // @1080
+    void* scratch_ptr;                            // @1084
+    br_size_t scratch_size;                       // @1088
+    br_size_t scratch_last;                       // @1092
+    int scratch_inuse;                            // @1096
+    br_error last_error_type;                     // @1100
+    void** last_error_value;                      // @1104
+    br_list images;                               // @1108
+    br_open_device* dev_slots;                    // @1120
+    br_int_32 ndev_slots;                         // @1124
+    br_associative_array* sys_config;             // @1128
+    br_boolean bAlreadyLoadedDrivers;             // @1132
 } br_framework_state;
 
 // br_framework_state defined by "C:\DETHRACE\source\common\finteray.c" module
-typedef struct br_framework_state2 { // size: 0x14d4
-    br_surface_fn* surface_fn; // @0x0
-    br_surface_fn* surface_fn_after_map; // @0x4
-    br_surface_fn* surface_fn_after_copy; // @0x8
-    br_face_surface_fn* face_surface_fn; // @0xc
-    br_matrix23 map_transform; // @0x10
-    br_scalar index_base; // @0x28
-    br_scalar index_range; // @0x2c
-    br_matrix4 model_to_screen; // @0x30
-    br_matrix4 view_to_screen; // @0x70
-    br_matrix34 model_to_view; // @0xb0
-    br_matrix34 view_to_model; // @0xe0
-    br_matrix34 model_to_environment; // @0x110
-    struct { // size: 0x34
-        br_matrix34 m; // @0x0
-        br_actor* a; // @0x30
-    } camera_path[16]; // @0x140
-    int vtos_type; // @0x480
-    br_vector3 eye_m; // @0x484
-    br_vector3 eye_m_normalised; // @0x490
-    br_material* material; // @0x49c
-    br_active_light active_lights_model[16]; // @0x4a0
-    br_active_light active_lights_view[16]; // @0x9e0
-    br_uint_16 nactive_lights_model; // @0xf20
-    br_uint_16 nactive_lights_view; // @0xf22
-    int light_is_1md; // @0xf24
-    br_vector3 eye_l; // @0xf28
-    br_active_clip_plane active_clip_planes[6]; // @0xf34
-    br_uint_16 nactive_clip_planes; // @0xf94
-    br_actor* enabled_lights[16]; // @0xf98
-    br_actor* enabled_clip_planes[6]; // @0xfd8
-    br_actor* enabled_environment; // @0xff0
-    br_pixelmap* output; // @0xff4
-    br_scalar vp_width; // @0xff8
-    br_scalar vp_height; // @0xffc
-    br_scalar vp_ox; // @0x1000
-    br_scalar vp_oy; // @0x1004
-    int rendering; // @0x1008
-    br_registry reg_models; // @0x100c
-    br_registry reg_materials; // @0x1020
-    br_registry reg_textures; // @0x1034
-    br_registry reg_tables; // @0x1048
-    br_registry reg_resource_classes; // @0x105c
+typedef struct br_framework_state2 {              // size: 0x14d4
+    br_surface_fn* surface_fn;                    // @0x0
+    br_surface_fn* surface_fn_after_map;          // @0x4
+    br_surface_fn* surface_fn_after_copy;         // @0x8
+    br_face_surface_fn* face_surface_fn;          // @0xc
+    br_matrix23 map_transform;                    // @0x10
+    br_scalar index_base;                         // @0x28
+    br_scalar index_range;                        // @0x2c
+    br_matrix4 model_to_screen;                   // @0x30
+    br_matrix4 view_to_screen;                    // @0x70
+    br_matrix34 model_to_view;                    // @0xb0
+    br_matrix34 view_to_model;                    // @0xe0
+    br_matrix34 model_to_environment;             // @0x110
+    struct {                                      // size: 0x34
+        br_matrix34 m;                            // @0x0
+        br_actor* a;                              // @0x30
+    } camera_path[16];                            // @0x140
+    int vtos_type;                                // @0x480
+    br_vector3 eye_m;                             // @0x484
+    br_vector3 eye_m_normalised;                  // @0x490
+    br_material* material;                        // @0x49c
+    br_active_light active_lights_model[16];      // @0x4a0
+    br_active_light active_lights_view[16];       // @0x9e0
+    br_uint_16 nactive_lights_model;              // @0xf20
+    br_uint_16 nactive_lights_view;               // @0xf22
+    int light_is_1md;                             // @0xf24
+    br_vector3 eye_l;                             // @0xf28
+    br_active_clip_plane active_clip_planes[6];   // @0xf34
+    br_uint_16 nactive_clip_planes;               // @0xf94
+    br_actor* enabled_lights[16];                 // @0xf98
+    br_actor* enabled_clip_planes[6];             // @0xfd8
+    br_actor* enabled_environment;                // @0xff0
+    br_pixelmap* output;                          // @0xff4
+    br_scalar vp_width;                           // @0xff8
+    br_scalar vp_height;                          // @0xffc
+    br_scalar vp_ox;                              // @0x1000
+    br_scalar vp_oy;                              // @0x1004
+    int rendering;                                // @0x1008
+    br_registry reg_models;                       // @0x100c
+    br_registry reg_materials;                    // @0x1020
+    br_registry reg_textures;                     // @0x1034
+    br_registry reg_tables;                       // @0x1048
+    br_registry reg_resource_classes;             // @0x105c
     br_resource_class* resource_class_index[256]; // @0x1070
-    br_model_update_cbfn* model_update; // @0x1470
-    br_material_update_cbfn* material_update; // @0x1474
-    br_table_update_cbfn* table_update; // @0x1478
-    br_map_update_cbfn* map_update; // @0x147c
-    br_filesystem* fsys; // @0x1480
-    br_allocator* mem; // @0x1484
-    br_errorhandler* err; // @0x1488
-    int open_mode; // @0x148c
-    void* res; // @0x1490
-    br_model* default_model; // @0x1494
-    br_material* default_material; // @0x1498
-    fw_fn_table fn_table; // @0x149c
-    void* scratch_ptr; // @0x14c4
-    br_size_t scratch_size; // @0x14c8
-    br_size_t scratch_last; // @0x14cc
-    int scratch_inuse; // @0x14d0
+    br_model_update_cbfn* model_update;           // @0x1470
+    br_material_update_cbfn* material_update;     // @0x1474
+    br_table_update_cbfn* table_update;           // @0x1478
+    br_map_update_cbfn* map_update;               // @0x147c
+    br_filesystem* fsys;                          // @0x1480
+    br_allocator* mem;                            // @0x1484
+    br_errorhandler* err;                         // @0x1488
+    int open_mode;                                // @0x148c
+    void* res;                                    // @0x1490
+    br_model* default_model;                      // @0x1494
+    br_material* default_material;                // @0x1498
+    fw_fn_table fn_table;                         // @0x149c
+    void* scratch_ptr;                            // @0x14c4
+    br_size_t scratch_size;                       // @0x14c8
+    br_size_t scratch_last;                       // @0x14cc
+    int scratch_inuse;                            // @0x14d0
 } br_framework_state2;
 
 typedef br_error br_exception;
@@ -1807,63 +1796,63 @@ typedef struct br_buffer_stored {
     br_buffer_stored_dispatch* dispatch;
 } br_buffer_stored;
 
-typedef struct br_device_pixelmap_dispatch { // size: 0xe0
-    void (*__reserved0)(br_object*); // @0x0
-    void (*__reserved1)(br_object*); // @0x4
-    void (*__reserved2)(br_object*); // @0x8
-    void (*__reserved3)(br_object*); // @0xc
-    void (*_free)(br_object*); // @0x10
-    char* (*_identifier)(br_object*); // @0x14
-    br_token (*_type)(br_object*); // @0x18
-    br_boolean (*_isType)(br_object*, br_token); // @0x1c
-    br_device* (*_device)(br_object*); // @0x20
-    br_int_32 (*_space)(br_object*); // @0x24
-    br_tv_template* (*_templateQuery)(br_object*); // @0x28
-    br_error (*_query)(br_object*, br_uint_32*, br_token); // @0x2c
-    br_error (*_queryBuffer)(br_object*, br_uint_32*, void*, br_size_t, br_token); // @0x30
-    br_error (*_queryMany)(br_object*, br_token_value*, void*, br_size_t, br_int_32*); // @0x34
-    br_error (*_queryManySize)(br_object*, br_size_t*, br_token_value*); // @0x38
-    br_error (*_queryAll)(br_object*, br_token_value*, br_size_t); // @0x3c
-    br_error (*_queryAllSize)(br_object*, br_size_t*); // @0x40
-    br_error (*_validSource)(br_device_pixelmap*, br_boolean*, br_object*); // @0x44
-    br_error (*_resize)(br_device_pixelmap*, br_int_32, br_int_32); // @0x48
-    br_error (*_match)(br_device_pixelmap*, br_device_pixelmap**, br_token_value*); // @0x4c
-    br_error (*_allocateSub)(br_device_pixelmap*, br_device_pixelmap**, br_rectangle*); // @0x50
-    br_error (*_copy)(br_device_pixelmap*, br_device_pixelmap*); // @0x54
-    br_error (*_copyTo)(br_device_pixelmap*, br_device_pixelmap*); // @0x58
-    br_error (*_copyFrom)(br_device_pixelmap*, br_device_pixelmap*); // @0x5c
-    br_error (*_fill)(br_device_pixelmap*, br_uint_32); // @0x60
-    br_error (*_doubleBuffer)(br_device_pixelmap*, br_device_pixelmap*); // @0x64
-    br_error (*_copyDirty)(br_device_pixelmap*, br_device_pixelmap*, br_rectangle*, br_int_32); // @0x68
-    br_error (*_copyToDirty)(br_device_pixelmap*, br_device_pixelmap*, br_rectangle*, br_int_32); // @0x6c
-    br_error (*_copyFromDirty)(br_device_pixelmap*, br_device_pixelmap*, br_rectangle*, br_int_32); // @0x70
-    br_error (*_fillDirty)(br_device_pixelmap*, br_uint_32, br_rectangle*, br_int_32); // @0x74
-    br_error (*_doubleBufferDirty)(br_device_pixelmap*, br_device_pixelmap*, br_rectangle*, br_int_32); // @0x78
-    br_error (*_rectangle)(br_device_pixelmap*, br_rectangle*, br_uint_32); // @0x7c
-    br_error (*_rectangle2)(br_device_pixelmap*, br_rectangle*, br_uint_32, br_uint_32); // @0x80
-    br_error (*_rectangleCopy)(br_device_pixelmap*, br_point*, br_device_pixelmap*, br_rectangle*); // @0x84
-    br_error (*_rectangleCopyTo)(br_device_pixelmap*, br_point*, br_device_pixelmap*, br_rectangle*); // @0x88
-    br_error (*_rectangleCopyFrom)(br_device_pixelmap*, br_point*, br_device_pixelmap*, br_rectangle*); // @0x8c
-    br_error (*_rectangleStretchCopy)(br_device_pixelmap*, br_rectangle*, br_device_pixelmap*, br_rectangle*); // @0x90
-    br_error (*_rectangleStretchCopyTo)(br_device_pixelmap*, br_rectangle*, br_device_pixelmap*, br_rectangle*); // @0x94
+typedef struct br_device_pixelmap_dispatch {                                                                       // size: 0xe0
+    void (*__reserved0)(br_object*);                                                                               // @0x0
+    void (*__reserved1)(br_object*);                                                                               // @0x4
+    void (*__reserved2)(br_object*);                                                                               // @0x8
+    void (*__reserved3)(br_object*);                                                                               // @0xc
+    void (*_free)(br_object*);                                                                                     // @0x10
+    char* (*_identifier)(br_object*);                                                                              // @0x14
+    br_token (*_type)(br_object*);                                                                                 // @0x18
+    br_boolean (*_isType)(br_object*, br_token);                                                                   // @0x1c
+    br_device* (*_device)(br_object*);                                                                             // @0x20
+    br_int_32 (*_space)(br_object*);                                                                               // @0x24
+    br_tv_template* (*_templateQuery)(br_object*);                                                                 // @0x28
+    br_error (*_query)(br_object*, br_uint_32*, br_token);                                                         // @0x2c
+    br_error (*_queryBuffer)(br_object*, br_uint_32*, void*, br_size_t, br_token);                                 // @0x30
+    br_error (*_queryMany)(br_object*, br_token_value*, void*, br_size_t, br_int_32*);                             // @0x34
+    br_error (*_queryManySize)(br_object*, br_size_t*, br_token_value*);                                           // @0x38
+    br_error (*_queryAll)(br_object*, br_token_value*, br_size_t);                                                 // @0x3c
+    br_error (*_queryAllSize)(br_object*, br_size_t*);                                                             // @0x40
+    br_error (*_validSource)(br_device_pixelmap*, br_boolean*, br_object*);                                        // @0x44
+    br_error (*_resize)(br_device_pixelmap*, br_int_32, br_int_32);                                                // @0x48
+    br_error (*_match)(br_device_pixelmap*, br_device_pixelmap**, br_token_value*);                                // @0x4c
+    br_error (*_allocateSub)(br_device_pixelmap*, br_device_pixelmap**, br_rectangle*);                            // @0x50
+    br_error (*_copy)(br_device_pixelmap*, br_device_pixelmap*);                                                   // @0x54
+    br_error (*_copyTo)(br_device_pixelmap*, br_device_pixelmap*);                                                 // @0x58
+    br_error (*_copyFrom)(br_device_pixelmap*, br_device_pixelmap*);                                               // @0x5c
+    br_error (*_fill)(br_device_pixelmap*, br_uint_32);                                                            // @0x60
+    br_error (*_doubleBuffer)(br_device_pixelmap*, br_device_pixelmap*);                                           // @0x64
+    br_error (*_copyDirty)(br_device_pixelmap*, br_device_pixelmap*, br_rectangle*, br_int_32);                    // @0x68
+    br_error (*_copyToDirty)(br_device_pixelmap*, br_device_pixelmap*, br_rectangle*, br_int_32);                  // @0x6c
+    br_error (*_copyFromDirty)(br_device_pixelmap*, br_device_pixelmap*, br_rectangle*, br_int_32);                // @0x70
+    br_error (*_fillDirty)(br_device_pixelmap*, br_uint_32, br_rectangle*, br_int_32);                             // @0x74
+    br_error (*_doubleBufferDirty)(br_device_pixelmap*, br_device_pixelmap*, br_rectangle*, br_int_32);            // @0x78
+    br_error (*_rectangle)(br_device_pixelmap*, br_rectangle*, br_uint_32);                                        // @0x7c
+    br_error (*_rectangle2)(br_device_pixelmap*, br_rectangle*, br_uint_32, br_uint_32);                           // @0x80
+    br_error (*_rectangleCopy)(br_device_pixelmap*, br_point*, br_device_pixelmap*, br_rectangle*);                // @0x84
+    br_error (*_rectangleCopyTo)(br_device_pixelmap*, br_point*, br_device_pixelmap*, br_rectangle*);              // @0x88
+    br_error (*_rectangleCopyFrom)(br_device_pixelmap*, br_point*, br_device_pixelmap*, br_rectangle*);            // @0x8c
+    br_error (*_rectangleStretchCopy)(br_device_pixelmap*, br_rectangle*, br_device_pixelmap*, br_rectangle*);     // @0x90
+    br_error (*_rectangleStretchCopyTo)(br_device_pixelmap*, br_rectangle*, br_device_pixelmap*, br_rectangle*);   // @0x94
     br_error (*_rectangleStretchCopyFrom)(br_device_pixelmap*, br_rectangle*, br_device_pixelmap*, br_rectangle*); // @0x98
-    br_error (*_rectangleFill)(br_device_pixelmap*, br_rectangle*, br_uint_32); // @0x9c
-    br_error (*_pixelSet)(br_device_pixelmap*, br_point*, br_uint_32); // @0xa0
-    br_error (*_line)(br_device_pixelmap*, br_point*, br_point*, br_uint_32); // @0xa4
-    br_error (*_copyBits)(br_device_pixelmap*, br_point*, br_uint_8*, br_uint_16, br_rectangle*, br_uint_32); // @0xa8
-    br_error (*_text)(br_device_pixelmap*, br_point*, br_font*, char*, br_uint_32); // @0xac
-    br_error (*_textBounds)(br_device_pixelmap*, br_rectangle*, br_font*, char*); // @0xb0
-    br_error (*_rowSize)(br_device_pixelmap*, br_size_t*); // @0xb4
-    br_error (*_rowSet)(br_device_pixelmap*, void*, br_size_t, br_uint_32); // @0xb8
-    br_error (*_rowQuery)(br_device_pixelmap*, void*, br_size_t, br_uint_32); // @0xbc
-    br_error (*_pixelQuery)(br_device_pixelmap*, br_uint_32*, br_point*); // @0xc0
-    br_error (*_pixelAddressQuery)(br_device_pixelmap*, void**, br_uint_32*, br_point*); // @0xc4
-    br_error (*_pixelAddressSet)(br_device_pixelmap*, void*, br_uint_32*); // @0xc8
-    br_error (*_originSet)(br_device_pixelmap*, br_point*); // @0xcc
-    br_error (*_flush)(br_device_pixelmap*); // @0xd0
-    br_error (*_synchronise)(br_device_pixelmap*, br_token, br_boolean); // @0xd4
-    br_error (*_directLock)(br_device_pixelmap*, br_boolean); // @0xd8
-    br_error (*_directUnlock)(br_device_pixelmap*); // @0xdc
+    br_error (*_rectangleFill)(br_device_pixelmap*, br_rectangle*, br_uint_32);                                    // @0x9c
+    br_error (*_pixelSet)(br_device_pixelmap*, br_point*, br_uint_32);                                             // @0xa0
+    br_error (*_line)(br_device_pixelmap*, br_point*, br_point*, br_uint_32);                                      // @0xa4
+    br_error (*_copyBits)(br_device_pixelmap*, br_point*, br_uint_8*, br_uint_16, br_rectangle*, br_uint_32);      // @0xa8
+    br_error (*_text)(br_device_pixelmap*, br_point*, br_font*, char*, br_uint_32);                                // @0xac
+    br_error (*_textBounds)(br_device_pixelmap*, br_rectangle*, br_font*, char*);                                  // @0xb0
+    br_error (*_rowSize)(br_device_pixelmap*, br_size_t*);                                                         // @0xb4
+    br_error (*_rowSet)(br_device_pixelmap*, void*, br_size_t, br_uint_32);                                        // @0xb8
+    br_error (*_rowQuery)(br_device_pixelmap*, void*, br_size_t, br_uint_32);                                      // @0xbc
+    br_error (*_pixelQuery)(br_device_pixelmap*, br_uint_32*, br_point*);                                          // @0xc0
+    br_error (*_pixelAddressQuery)(br_device_pixelmap*, void**, br_uint_32*, br_point*);                           // @0xc4
+    br_error (*_pixelAddressSet)(br_device_pixelmap*, void*, br_uint_32*);                                         // @0xc8
+    br_error (*_originSet)(br_device_pixelmap*, br_point*);                                                        // @0xcc
+    br_error (*_flush)(br_device_pixelmap*);                                                                       // @0xd0
+    br_error (*_synchronise)(br_device_pixelmap*, br_token, br_boolean);                                           // @0xd4
+    br_error (*_directLock)(br_device_pixelmap*, br_boolean);                                                      // @0xd8
+    br_error (*_directUnlock)(br_device_pixelmap*);                                                                // @0xdc
 } br_device_pixelmap_dispatch;
 
 typedef struct br_buffer_stored_dispatch {
@@ -1997,11 +1986,11 @@ typedef struct br_file_struct {
 } br_file_struct;
 
 typedef struct br_file_primitives br_file_primitives;
-typedef struct br_datafile { // size: 0x10
-    void* h; // @0x0
+typedef struct br_datafile {   // size: 0x10
+    void* h;                   // @0x0
     br_file_primitives* prims; // @0x4
-    br_token scalar_type; // @0x8
-    void* res; // @0xc
+    br_token scalar_type;      // @0x8
+    void* res;                 // @0xc
 } br_datafile;
 
 typedef struct br_file_primitives {
@@ -2128,52 +2117,52 @@ typedef struct br_v1db_enable {
     br_actor** enabled;
 } br_v1db_enable;
 
-typedef struct br_v1db_state { // size: 0x504
-    br_boolean active; // @0x0
-    br_boolean zs_active; // @0x4
-    br_boolean zb_active; // @0x8
-    br_int_32 rendering; // @0xc
-    br_renderer* renderer; // @0x10
-    br_renderer* query_renderer; // @0x14
-    br_geometry* format_model; // @0x18
-    br_geometry* format_buckets; // @0x1c
+typedef struct br_v1db_state {             // size: 0x504
+    br_boolean active;                     // @0x0
+    br_boolean zs_active;                  // @0x4
+    br_boolean zb_active;                  // @0x8
+    br_int_32 rendering;                   // @0xc
+    br_renderer* renderer;                 // @0x10
+    br_renderer* query_renderer;           // @0x14
+    br_geometry* format_model;             // @0x18
+    br_geometry* format_buckets;           // @0x1c
     br_geometry_lighting* format_lighting; // @0x20
-    br_matrix4 model_to_screen; // @0x24
-    br_matrix34 model_to_view; // @0x64
-    br_boolean model_to_screen_valid; // @0x94
-    br_uint_32 ttype; // @0x98
-    br_actor* render_root; // @0x9c
-    struct { // size: 0x38
-        br_matrix34 m; // @0x0
-        br_actor* a; // @0x30
-        br_uint_8 transform_type; // @0x34
-    } camera_path[16]; // @0xa0
-    br_v1db_enable enabled_lights; // @0x420
-    br_v1db_enable enabled_clip_planes; // @0x434
+    br_matrix4 model_to_screen;            // @0x24
+    br_matrix34 model_to_view;             // @0x64
+    br_boolean model_to_screen_valid;      // @0x94
+    br_uint_32 ttype;                      // @0x98
+    br_actor* render_root;                 // @0x9c
+    struct {                               // size: 0x38
+        br_matrix34 m;                     // @0x0
+        br_actor* a;                       // @0x30
+        br_uint_8 transform_type;          // @0x34
+    } camera_path[16];                     // @0xa0
+    br_v1db_enable enabled_lights;         // @0x420
+    br_v1db_enable enabled_clip_planes;    // @0x434
     br_v1db_enable enabled_horizon_planes; // @0x448
-    br_int_32 max_light; // @0x45c
-    br_int_32 max_clip; // @0x460
-    br_actor* enabled_environment; // @0x464
-    br_registry reg_models; // @0x468
-    br_registry reg_materials; // @0x47c
-    br_registry reg_textures; // @0x490
-    br_registry reg_tables; // @0x4a4
-    void* res; // @0x4b8
-    br_model* default_model; // @0x4bc
-    br_material* default_material; // @0x4c0
-    void* default_render_data; // @0x4c4
-    br_order_table* default_order_table; // @0x4c8
-    br_order_table* primary_order_table; // @0x4cc
-    br_order_table* order_table_list; // @0x4d0
-    br_primitive_heap heap; // @0x4d4
-    br_primitive_cbfn* primitive_call; // @0x4e0
-    br_renderbounds_cbfn* bounds_call; // @0x4e4
-    br_vector2 origin; // @0x4e8
-    br_scalar vp_ox; // @0x4f0
-    br_scalar vp_oy; // @0x4f4
-    br_scalar vp_width; // @0x4f8
-    br_scalar vp_height; // @0x4fc
-    br_pixelmap* colour_buffer; // @0x500
+    br_int_32 max_light;                   // @0x45c
+    br_int_32 max_clip;                    // @0x460
+    br_actor* enabled_environment;         // @0x464
+    br_registry reg_models;                // @0x468
+    br_registry reg_materials;             // @0x47c
+    br_registry reg_textures;              // @0x490
+    br_registry reg_tables;                // @0x4a4
+    void* res;                             // @0x4b8
+    br_model* default_model;               // @0x4bc
+    br_material* default_material;         // @0x4c0
+    void* default_render_data;             // @0x4c4
+    br_order_table* default_order_table;   // @0x4c8
+    br_order_table* primary_order_table;   // @0x4cc
+    br_order_table* order_table_list;      // @0x4d0
+    br_primitive_heap heap;                // @0x4d4
+    br_primitive_cbfn* primitive_call;     // @0x4e0
+    br_renderbounds_cbfn* bounds_call;     // @0x4e4
+    br_vector2 origin;                     // @0x4e8
+    br_scalar vp_ox;                       // @0x4f0
+    br_scalar vp_oy;                       // @0x4f4
+    br_scalar vp_width;                    // @0x4f8
+    br_scalar vp_height;                   // @0x4fc
+    br_pixelmap* colour_buffer;            // @0x500
 } br_v1db_state;
 
 typedef struct br_renderer_facility_dispatch {
@@ -2426,11 +2415,11 @@ typedef struct br_tv_custom {
 } br_tv_custom;
 
 typedef struct br_token_entry { // size: 24
-    br_node node; // @0
-    char* identifier; // @8
-    br_int_32 type; // @12
-    br_token token; // @16
-    br_int_32 base_length; // @20
+    br_node node;               // @0
+    char* identifier;           // @8
+    br_int_32 type;             // @12
+    br_token token;             // @16
+    br_int_32 base_length;      // @20
 } br_token_entry;
 
 typedef struct br_exception_handler br_exception_handler;
@@ -2652,14 +2641,14 @@ typedef struct section_header {
 
 #pragma pack(push, 1)
 typedef struct resource_header { // size: 24
-    br_simple_node node; // @0
-    br_simple_list children; // @8
-    br_uint_8 size_l; // @12
-    br_uint_8 size_m; // @13
-    br_uint_8 size_h; // @14
-    br_uint_8 class; // @15
-    void* magic_ptr; // @16
-    br_uint_32 magic_num; // @20
+    br_simple_node node;         // @0
+    br_simple_list children;     // @8
+    br_uint_8 size_l;            // @12
+    br_uint_8 size_m;            // @13
+    br_uint_8 size_h;            // @14
+    br_uint_8 class;             // @15
+    void* magic_ptr;             // @16
+    br_uint_32 magic_num;        // @20
 } resource_header;
 #pragma pack(pop)
 
@@ -2892,42 +2881,42 @@ enum {
  */
 enum {
     /*
-	 * Each pixel is an index into a colour map
-	 */
+     * Each pixel is an index into a colour map
+     */
     BR_PMT_INDEX_1,
     BR_PMT_INDEX_2,
     BR_PMT_INDEX_4,
     BR_PMT_INDEX_8,
 
     /*
-	 * True colour RGB
-	 */
-    BR_PMT_RGB_555, /* 16 bits per pixel */
-    BR_PMT_RGB_565, /* 16 bits per pixel */
-    BR_PMT_RGB_888, /* 24 bits per pixel */
-    BR_PMT_RGBX_888, /* 32 bits per pixel */
+     * True colour RGB
+     */
+    BR_PMT_RGB_555,   /* 16 bits per pixel */
+    BR_PMT_RGB_565,   /* 16 bits per pixel */
+    BR_PMT_RGB_888,   /* 24 bits per pixel */
+    BR_PMT_RGBX_888,  /* 32 bits per pixel */
     BR_PMT_RGBA_8888, /* 32 bits per pixel */
 
     /*
-	 * YUV
-	 */
+     * YUV
+     */
     BR_PMT_YUYV_8888, /* YU YV YU YV ... */
     BR_PMT_YUV_888,
 
     /*
-	 * Depth
-	 */
+     * Depth
+     */
     BR_PMT_DEPTH_16,
     BR_PMT_DEPTH_32,
 
     /*
-	 * Opacity
-	 */
+     * Opacity
+     */
     BR_PMT_ALPHA_8,
 
     /*
-	 * Opacity + Index
-	 */
+     * Opacity + Index
+     */
     BR_PMT_INDEXA_88
 };
 
@@ -2996,17 +2985,17 @@ enum {
  * Bits for br_model->flags
  */
 enum {
-    BR_MODF_DONT_WELD = 0x0001, /* Vertices with same x,y,z cannot be merged	*/
-    BR_MODF_KEEP_ORIGINAL = 0x0002, /* Don't release model->faces/vertices during ModelUpdate() */
-    BR_MODF_GENERATE_TAGS = 0x0004, /* Allocate and fill in the face and vertex tag structures */
-    BR_MODF_QUICK_UPDATE = 0x0010, /* ModelUpdate is fast - but may produce slower models */
-    BR_MODF_CUSTOM = 0x0020, /* Invoke custom callback for this model */
-    BR_MODF_PREPREPARED = 0x0040, /* Model structure is pre-prepared - update performs no work */
-    BR_MODF_UPDATEABLE = 0x0080, /* Added by Jeff from Errols code */
-    BR_MODF_CREASE = 0x0100, /* Create creases in smoothing along edges if face<->face angle is g.t model->crease */
+    BR_MODF_DONT_WELD = 0x0001,      /* Vertices with same x,y,z cannot be merged	*/
+    BR_MODF_KEEP_ORIGINAL = 0x0002,  /* Don't release model->faces/vertices during ModelUpdate() */
+    BR_MODF_GENERATE_TAGS = 0x0004,  /* Allocate and fill in the face and vertex tag structures */
+    BR_MODF_QUICK_UPDATE = 0x0010,   /* ModelUpdate is fast - but may produce slower models */
+    BR_MODF_CUSTOM = 0x0020,         /* Invoke custom callback for this model */
+    BR_MODF_PREPREPARED = 0x0040,    /* Model structure is pre-prepared - update performs no work */
+    BR_MODF_UPDATEABLE = 0x0080,     /* Added by Jeff from Errols code */
+    BR_MODF_CREASE = 0x0100,         /* Create creases in smoothing along edges if face<->face angle is g.t model->crease */
     BR_MODF_CUSTOM_NORMALS = 0x0200, /* Uses vertex normals from br_vertex structure */
-    BR_MODF_CUSTOM_BOUNDS = 0x0400, /* Bounding box is already set up				*/
-    //BR_MODF_FACES_ONLY = 0x0800, /* Model will only be used to render faces (not edges or points) */
+    BR_MODF_CUSTOM_BOUNDS = 0x0400,  /* Bounding box is already set up				*/
+    // BR_MODF_FACES_ONLY = 0x0800, /* Model will only be used to render faces (not edges or points) */
 
     MODF_USES_DEFAULT = 0x8000
 };
