@@ -128,7 +128,7 @@ void InstantDepthChange(tDepth_effect_type pType, br_pixelmap* pSky_texture, int
 // IDA: br_scalar __cdecl Tan(br_scalar pAngle)
 br_scalar Tan(br_scalar pAngle) {
     LOG_TRACE("(%f)", pAngle);
-    return sin(BrAngleToRadian(pAngle)) / cos(BrAngleToRadian(pAngle));
+    return sinf(BrAngleToRadian(pAngle)) / cosf(BrAngleToRadian(pAngle));
 }
 
 // IDA: br_scalar __usercall EdgeU@<ST0>(br_angle pSky@<EAX>, br_angle pView@<EDX>, br_angle pPerfect@<EBX>)
@@ -376,7 +376,7 @@ void ExternalSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_act
 
     while (dst_x < pRender_buffer->width) {
         hori_pixels = col_map->width - dx;
-        if (hori_pixels >= pRender_buffer->width - dst_x) {
+        if (hori_pixels > pRender_buffer->width - dst_x) {
             hori_pixels = pRender_buffer->width - dst_x;
         }
         src_x = dx - col_map->origin_x;
