@@ -11,7 +11,7 @@
 #define BR_MAC3(a, b, c, d, e, f) ((a) * (b) + (c) * (d) + (e) * (f))
 #define BR_SQR3(a, b, c) ((a) * (a) + (b) * (b) + (c) * (c))
 
-#define BrAngleToRadian(a) ((br_scalar)((a) * (PI / 32768.0))) // a * 0.00009587379924285257
+#define BrAngleToRadian(a) ((br_scalar)((a) * (PI / 32768.0)))      // a * 0.00009587379924285257
 #define BrRadianToAngle(r) ((br_angle)(long)((r) * (32768.0 / PI))) // r * 10430.378350470453
 
 #define BR_VECTOR3(a, b, c) \
@@ -25,8 +25,9 @@
 
 #define BR_ANGLE_DEG(deg) ((br_angle)((deg)*182))
 #define BR_ANGLE_RAD(rad) ((br_angle)((rad)*10430))
+
 #define BrDegreeToRadian(d) ((br_scalar)((d) * (PI / 180.0)))
-#define BrDegreeToAngle(d) ((br_angle)(long)((d) * (65536.0 / 360.0))) // "d * 182.044444444"
+#define BrDegreeToAngle(d) ((br_angle)(long)((d) * (65536.0 / 360.0)))  // "d * 182.044444444"
 #define BrAngleToDegrees(a) ((br_angle)(long)((a) * (360.0 / 65536.0))) // "d * 0.0054931640625"
 
 #define BR_SCALAR(x) ((br_scalar)(x))

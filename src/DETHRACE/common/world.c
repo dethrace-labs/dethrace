@@ -2387,10 +2387,9 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     }
     PossibleService();
 
-    gSky_image_width = (360.0 / (double)BR_ANGLE_DEG(GetAnInt(f)));
-    gSky_image_height = BR_ANGLE_DEG(GetAScalar(f));
-
-    gSky_image_underground = (uint16_t)gSky_image_height * (sky_pixels_high - GetAnInt(f)) / sky_pixels_high;
+    gSky_image_width = (360.0 / BrDegreeToAngle(GetAnInt(f)));
+    gSky_image_height = BrDegreeToAngle(GetAScalar(f));
+    gSky_image_underground = gSky_image_height * (sky_pixels_high - GetAnInt(f)) / sky_pixels_high;
 
     MungeRearviewSky();
     PossibleService();
