@@ -1213,7 +1213,7 @@ void ResetCarSpecialVolume(tCollision_info* pCar) {
     cast_v.v[1] = 200.0f;
     cast_v.v[2] = 0.0f;
     DisablePlingMaterials();
-    FindFace(&pCar->car_master_actor->t.t.euler.t, &cast_v, &norm, &t, &material);
+    FindFace(&pCar->car_master_actor->t.t.translate.t, &cast_v, &norm, &t, &material);
     EnablePlingMaterials();
     if (t < 100.0f && material != NULL) {
         mat_id = material->identifier;
