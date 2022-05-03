@@ -261,20 +261,20 @@ typedef enum keymapcodes {
     // The following items are meant to be used standalone
     //
 
-    KEYMAP_COCKPIT = 45,      // default C
-    KEYMAP_SAVE = 28,         // default F2
-    KEYMAP_LOAD = 29,         // default F3
-    KEYMAP_MOVE_UP = 30,      // default UP
-    KEYMAP_MOVE_DOWN = 31,    // default DOWN
-    KEYMAP_MOVE_LEFT = 32,    // default LEFT
-    KEYMAP_MOVE_RIGHT = 33,   // default RIGHT
-    KEYMAP_MIRROR = 34,       // default M
-    KEYMAP_PRATCAM = 35,      // default P
-    KEYMAP_LOOK_LEFT = 50,    // default Q
-    KEYMAP_LOOK_FORWARD = 51, // default W
-    KEYMAP_LOOK_RIGHT = 52,   // default E
-    KEYMAP_SOUND = 36,        // default S
-    KEYMAP_REPAIR = 44,       // default BACKSPACE
+    KEYMAP_COCKPIT = 45,        // default C
+    KEYMAP_SAVE = 28,           // default F2
+    KEYMAP_LOAD = 29,           // default F3
+    KEYMAP_MOVE_UP = 30,        // default UP
+    KEYMAP_MOVE_DOWN = 31,      // default DOWN
+    KEYMAP_MOVE_LEFT = 32,      // default LEFT
+    KEYMAP_MOVE_RIGHT = 33,     // default RIGHT
+    KEYMAP_MIRROR = 34,         // default M
+    KEYMAP_PRATCAM = 35,        // default P
+    KEYMAP_LOOK_LEFT = 50,      // default Q
+    KEYMAP_LOOK_FORWARD = 51,   // default W
+    KEYMAP_LOOK_RIGHT = 52,     // default E
+    KEYMAP_SOUND = 36,          // default S
+    KEYMAP_REPAIR = 44,         // default BACKSPACE
     KEYMAP_PEDESTRIANS = 54,    // default KP_MINUS
     KEYMAP_F4 = 17,             // default F4
     KEYMAP_F5 = 18,             // default F5
@@ -345,7 +345,7 @@ typedef enum keymapcodes {
 
 #define TIME_CONV_THING 0.0005f
 
-#define OPPONENT_COUNT 5
+#define OPPONENT_COUNT 0
 
 #define WORLD_SCALE 6.9f
 
