@@ -15,7 +15,7 @@ br_scalar gHighest_y_below;
 br_actor* gY_picking_camera;
 br_scalar gLowest_y_above;
 
-//Added, probably can be replaced with NULL
+// Added, probably can be replaced with NULL
 br_model* model_unk1;
 br_material* material_unk1;
 
@@ -41,37 +41,35 @@ int DRActorToRoot(br_actor* a, br_actor* world, br_matrix34* m) {
 void InitRayCasting() {
     br_camera* camera_ptr;
     LOG_TRACE("()");
-    br_actor* a;
 
-    a = BrActorAllocate(BR_ACTOR_CAMERA, NULL);
-    camera_ptr = a->type_data;
+    gY_picking_camera = BrActorAllocate(BR_ACTOR_CAMERA, NULL);
+    camera_ptr = gY_picking_camera->type_data;
     camera_ptr->type = BR_CAMERA_PERSPECTIVE_FOV;
-    camera_ptr->field_of_view = BR_ANGLE_DEG(70.0f);
-    camera_ptr->hither_z = 0.001;
-    camera_ptr->yon_z = 1000.0;
-    camera_ptr->aspect = 1.0;
-    a->t.t.quat.q.x = 1.0;
-    a->t.t.quat.q.y = 0.0;
-    a->t.t.quat.q.z = 0.0;
-    a->t.t.quat.q.w = 0.0;
-    a->t.t.mat.m[1][1] = 0.0;
-    a->t.t.mat.m[1][2] = -1.0;
-    a->t.t.mat.m[2][0] = 0.0;
-    a->t.t.mat.m[2][1] = 1.0;
-    a->t.t.mat.m[2][2] = 0.0;
-    gY_picking_camera = a;
+    camera_ptr->field_of_view = BrDegreeToAngle(70.0f);
+    camera_ptr->hither_z = 0.001f;
+    camera_ptr->yon_z = 1000.0f;
+    camera_ptr->aspect = 1.0f;
+    gY_picking_camera->t.t.mat.m[0][0] = 1.0;
+    gY_picking_camera->t.t.mat.m[0][1] = 0.0;
+    gY_picking_camera->t.t.mat.m[0][2] = 0.0;
+    gY_picking_camera->t.t.mat.m[1][0] = 0.0;
+    gY_picking_camera->t.t.mat.m[1][1] = 0.0;
+    gY_picking_camera->t.t.mat.m[1][2] = -1.0;
+    gY_picking_camera->t.t.mat.m[2][0] = 0.0;
+    gY_picking_camera->t.t.mat.m[2][1] = 1.0;
+    gY_picking_camera->t.t.mat.m[2][2] = 0.0;
 }
 
 // IDA: int __cdecl BadDiv(br_scalar a, br_scalar b)
 // Suffix added to avoid duplicate symbol
 int BadDiv__raycast(br_scalar a, br_scalar b) {
-    //LOG_TRACE("(%f, %f)", a, b);
+    // LOG_TRACE("(%f, %f)", a, b);
 
     return fabs(b) < 1.0 && fabs(a) > fabs(b) * BR_SCALAR_MAX;
 }
 
-//IDA: void __usercall DRVector2AccumulateScale(br_vector2 *a@<EAX>, br_vector2 *b@<EDX>, br_scalar s)
-// Suffix added to avoid duplicate symbol
+// IDA: void __usercall DRVector2AccumulateScale(br_vector2 *a@<EAX>, br_vector2 *b@<EDX>, br_scalar s)
+//  Suffix added to avoid duplicate symbol
 void DRVector2AccumulateScale__raycast(br_vector2* a, br_vector2* b, br_scalar s) {
     LOG_TRACE("(%p, %p, %f)", a, b, s);
 
@@ -402,8 +400,8 @@ int DRModelPick2D__raycast(br_model* model, br_material* material, br_vector3* r
     return 0;
 }
 
-//IDA: int __cdecl FindHighestPolyCallBack(br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3 *pPoint, br_vector2 *pMap, void *pArg)
-// Suffix added to avoid duplicate symbol
+// IDA: int __cdecl FindHighestPolyCallBack(br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3 *pPoint, br_vector2 *pMap, void *pArg)
+//  Suffix added to avoid duplicate symbol
 int FindHighestPolyCallBack__raycast(br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3* pPoint, br_vector2* pMap, void* pArg) {
     br_scalar the_y;
     LOG_TRACE("(%p, %p, %p, %p, %f, %d, %d, %d, %p, %p, %p)", pModel, pMaterial, pRay_pos, pRay_dir, pT, pF, pE, pV, pPoint, pMap, pArg);
@@ -422,8 +420,8 @@ int FindHighestPolyCallBack__raycast(br_model* pModel, br_material* pMaterial, b
     return 0;
 }
 
-//IDA: int __cdecl FindHighestCallBack(br_actor *pActor, br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT_near, br_scalar pT_far, void *pArg)
-// Suffix added to avoid duplicate symbol
+// IDA: int __cdecl FindHighestCallBack(br_actor *pActor, br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT_near, br_scalar pT_far, void *pArg)
+//  Suffix added to avoid duplicate symbol
 int FindHighestCallBack__raycast(br_actor* pActor, br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT_near, br_scalar pT_far, void* pArg) {
     LOG_TRACE("(%p, %p, %p, %p, %p, %f, %f, %p)", pActor, pModel, pMaterial, pRay_pos, pRay_dir, pT_near, pT_far, pArg);
 
@@ -450,7 +448,7 @@ void FindBestY(br_vector3* pPosition, br_actor* gWorld, br_scalar pStarting_heig
     *pNearest_below_model = gBelow_model;
     *pNearest_above_face_index = gAbove_face_index;
     *pNearest_below_face_index = gBelow_face_index;
-    //LOG_DEBUG("FindBestY %f %f '%s' '%s' %d %d", gLowest_y_above, gHighest_y_below, gAbove_model->identifier, gBelow_model->identifier, gAbove_face_index, gBelow_face_index);
+    // LOG_DEBUG("FindBestY %f %f '%s' '%s' %d %d", gLowest_y_above, gHighest_y_below, gAbove_model->identifier, gBelow_model->identifier, gAbove_face_index, gBelow_face_index);
 }
 
 // IDA: int __cdecl FindYVerticallyBelowPolyCallBack(br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3 *pPoint, br_vector2 *pMap, void *pArg)

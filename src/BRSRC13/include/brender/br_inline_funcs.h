@@ -107,4 +107,6 @@
         BrVector3Scale(v1, v2, _scale);                                  \
     } while (0)
 
+#define BR_ONE_LS 65536
+#define BrFixedToFloat(s) ((float)((s) * (1.0 / (float)BR_ONE_LS)))
 #endif
