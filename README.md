@@ -11,11 +11,12 @@ Dethrace is an attempt to learn how the 1997 driving/mayhem game [Carmageddon](h
 ## Progress
 (Follow us on Twitter to get notified of updates!)
 
-#### Last updated April 1 2022
-- 61% of functions implemented
+#### Last updated May 5 2022
+- 62% of functions implemented
 - Latest screenshot:
 
-![Screen Shot 2022-03-21 at 12 31 30 PM](https://user-images.githubusercontent.com/78985374/159190761-c795bef8-75bb-4b32-a14c-52929cda314c.png)
+
+<img width="752" alt="Screen Shot 2022-05-04 at 7 26 06 AM" src="https://user-images.githubusercontent.com/78985374/166819615-22a5446c-0ed1-4cab-a833-a0fcdcac8da8.png">
 
 
 ## Background
