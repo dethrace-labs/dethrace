@@ -1123,7 +1123,7 @@ void GenerateContinuousSmoke(tCar_spec* pCar, int wheel, tU32 pTime) {
     }
     decay_factor = sqrtf(ts) / 25.0f;
     if (decay_factor > 1.0f) {
-        decay_factor = 1.0;
+        decay_factor = 1.0f;
     }
     BrVector3InvScale(&tv, &pCar->wpos[wheel], WORLD_SCALE);
     tv.v[1] -= pCar->oldd[wheel] / WORLD_SCALE;
@@ -1138,7 +1138,7 @@ void GenerateContinuousSmoke(tCar_spec* pCar, int wheel, tU32 pTime) {
     beta = -1000.0f;
     if (vcs.v[0] > 0.0f) {
         beta = (pCar->bounds[0].min.v[0] - tv.v[0]) / vcs.v[0];
-    } else if (vcs.v[0] < 0.0) {
+    } else if (vcs.v[0] < 0.0f) {
         beta = (pCar->bounds[0].max.v[0] - tv.v[0]) / vcs.v[0];
     }
 
