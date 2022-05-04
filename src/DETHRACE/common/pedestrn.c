@@ -30,7 +30,7 @@
 
 #define FLAG_WAVING_BASTARD_REF 99
 
-#define FOURCC(A,B,C,D) ((((A) & 0xff) << 24) | (((B) & 0xff) << 16)| (((C) & 0xff) << 8)| (((D) & 0xff) << 0))
+#define FOURCC(A, B, C, D) (((A & 0xff) << 24) | ((B & 0xff) << 16) | ((C & 0xff) << 8) | ((D & 0xff) << 0))
 #define PEDESTRIAN_MAGIC FOURCC('P', 'e', 'd', '!')
 #define ActorToPedestrianData(ACTOR) ((tPedestrian_data*)((ACTOR)->type_data))
 
@@ -2433,6 +2433,7 @@ int GetPedPosition(int pIndex, br_vector3* pPos) {
 
     pedestrian = &gPedestrian_array[pIndex];
     if (pedestrian->ref_number < 100) {
+
         // Item is a human
         if (pedestrian->hit_points == -100
                 || pedestrian->current_action == pedestrian->fatal_car_impact_action

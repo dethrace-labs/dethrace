@@ -43,25 +43,23 @@ int DRActorToRoot(br_actor* a, br_actor* world, br_matrix34* m) {
 void InitRayCasting() {
     br_camera* camera_ptr;
     LOG_TRACE("()");
-    br_actor* a;
 
-    a = BrActorAllocate(BR_ACTOR_CAMERA, NULL);
-    camera_ptr = a->type_data;
+    gY_picking_camera = BrActorAllocate(BR_ACTOR_CAMERA, NULL);
+    camera_ptr = gY_picking_camera->type_data;
     camera_ptr->type = BR_CAMERA_PERSPECTIVE_FOV;
-    camera_ptr->field_of_view = BR_ANGLE_DEG(70.0f);
+    camera_ptr->field_of_view = BrDegreeToAngle(70.0f);
     camera_ptr->hither_z = 0.001f;
     camera_ptr->yon_z = 1000.0f;
     camera_ptr->aspect = 1.0f;
-    a->t.t.quat.q.x = 1.0f;
-    a->t.t.quat.q.y = 0.0f;
-    a->t.t.quat.q.z = 0.0f;
-    a->t.t.quat.q.w = 0.0f;
-    a->t.t.mat.m[1][1] = 0.0f;
-    a->t.t.mat.m[1][2] = -1.0f;
-    a->t.t.mat.m[2][0] = 0.0f;
-    a->t.t.mat.m[2][1] = 1.0f;
-    a->t.t.mat.m[2][2] = 0.0f;
-    gY_picking_camera = a;
+    gY_picking_camera->t.t.mat.m[0][0] = 1.0;
+    gY_picking_camera->t.t.mat.m[0][1] = 0.0;
+    gY_picking_camera->t.t.mat.m[0][2] = 0.0;
+    gY_picking_camera->t.t.mat.m[1][0] = 0.0;
+    gY_picking_camera->t.t.mat.m[1][1] = 0.0;
+    gY_picking_camera->t.t.mat.m[1][2] = -1.0;
+    gY_picking_camera->t.t.mat.m[2][0] = 0.0;
+    gY_picking_camera->t.t.mat.m[2][1] = 1.0;
+    gY_picking_camera->t.t.mat.m[2][2] = 0.0;
 }
 
 // IDA: int __cdecl BadDiv(br_scalar a, br_scalar b)

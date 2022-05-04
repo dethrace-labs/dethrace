@@ -80,7 +80,7 @@ void AllocateCamera() {
 
         camera_ptr = gCamera_list[i]->type_data;
         camera_ptr->type = BR_CAMERA_PERSPECTIVE_FOV;
-        camera_ptr->field_of_view = BR_ANGLE_DEG(gCamera_angle);
+        camera_ptr->field_of_view = BrDegreeToAngle(gCamera_angle);
         camera_ptr->hither_z = gCamera_hither;
         camera_ptr->yon_z = gCamera_yon;
         camera_ptr->aspect = (double)gWidth / (double)gHeight;
@@ -105,7 +105,7 @@ void AllocateCamera() {
     camera_ptr->hither_z = gCamera_hither;
     camera_ptr->type = BR_CAMERA_PERSPECTIVE_FOV;
     camera_ptr->yon_z = gCamera_yon;
-    camera_ptr->field_of_view = BR_ANGLE_DEG(gCamera_angle);
+    camera_ptr->field_of_view = BrDegreeToAngle(gCamera_angle);
     camera_ptr->aspect = (double)gWidth / (double)gHeight;
     gRearview_camera = BrActorAdd(gSelf, gRearview_camera);
     if (gRearview_camera == NULL) {
@@ -404,7 +404,7 @@ void InitialiseDeathRace(int pArgc, char** pArgv) {
     PDInitialiseSystem();
 
     InitialiseApplication(pArgc, pArgv);
-    //dword_112DF8 = 1;  // never checked by game
+    // dword_112DF8 = 1;  // never checked by game
 }
 
 // IDA: void __usercall InitGame(int pStart_race@<EAX>)
@@ -502,7 +502,7 @@ void InitRace() {
     LOG_TRACE("()");
 
     SwitchToRealResolution();
-    //TODO: dword_5454C4 = 0;
+    // TODO: dword_5454C4 = 0;
     ClearConcussion();
     ClearWobbles();
     ClearHeadups();
@@ -511,7 +511,7 @@ void InitRace() {
     PossibleService();
     BuildColourTable(gRender_palette);
     PossibleService();
-    //TODO: dword_55142C = 0;
+    // TODO: dword_55142C = 0;
     gStart_race_sent = 0;
     gProgram_state.frame_rate_headup = NewTextHeadupSlot(0, 0, 0, -1, "");
     if (TranslationMode()) {
@@ -620,7 +620,7 @@ void InitRace() {
 // IDA: void __cdecl DisposeRace()
 void DisposeRace() {
     LOG_TRACE("()");
-    
+
     PossibleService();
     DisposePiping();
     PossibleService();

@@ -562,7 +562,7 @@ tRace_result MainGameLoop() {
             gNasty_kludgey_cockpit_variable = 1;
             ToggleCockpit();
         }
-        gOur_pos = &gSelf->t.t.euler.t;
+        gOur_pos = &gSelf->t.t.translate.t;
         PositionExternalCamera(&gProgram_state.current_car, camera_period);
         BrActorToActorMatrix34(&gCamera_to_world, gCamera, gUniverse_actor);
         BrActorToActorMatrix34(&gRearview_camera_to_world, gRearview_camera, gUniverse_actor);

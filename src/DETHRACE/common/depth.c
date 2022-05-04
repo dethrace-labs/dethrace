@@ -128,8 +128,7 @@ void InstantDepthChange(tDepth_effect_type pType, br_pixelmap* pSky_texture, int
 // IDA: br_scalar __cdecl Tan(br_scalar pAngle)
 br_scalar Tan(br_scalar pAngle) {
     LOG_TRACE("(%f)", pAngle);
-    pAngle = sin(pAngle * 0.00009587379924285257);
-    return pAngle / cos(pAngle);
+    return sinf(BrAngleToRadian(pAngle)) / cosf(BrAngleToRadian(pAngle));
 }
 
 // IDA: br_scalar __usercall EdgeU@<ST0>(br_angle pSky@<EAX>, br_angle pView@<EDX>, br_angle pPerfect@<EBX>)
@@ -349,80 +348,52 @@ void ExternalSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_act
     br_pixelmap* col_map;
     LOG_TRACE("(%p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world);
 
-    // TODO: Remove commented block in `ConditionallyFillWithSky` when we implement this properly
-    return;
-    dx = 0;
+    dst_x = 0;
     col_map = gHorizon_material->colour_map;
     camera = (br_camera*)pCamera->type_data;
-    // LOG_DEBUG("camera fov %d", camera->field_of_view);
     tan_half_fov = Tan(camera->field_of_view / 2);
     tan_half_hori_fov = tan_half_fov * camera->aspect;
-    tan_pitch = 0;
-    // LOG_DEBUG("tan_half_fov %f, tan_half_hori_fov %f, tan_pitch %f", tan_half_fov, tan_half_hori_fov, tan_pitch);
 
-    // LOG_DEBUG("pCamera->m[2][0] %f, pCamera->m[2][2] %f", pCamera->t.t.mat.m[2][0], pCamera->t.t.mat.m[2][2]);
-    // LOG_DEBUG("pCamera_to_world->m[2][0] %f, pCamera_to_world->m[2][2] %f", pCamera_to_world->m[2][0], pCamera_to_world->m[2][2]);
+    vert_sky = BrRadianToAngle(atan2(pCamera_to_world->m[2][0], pCamera_to_world->m[2][2]));
+    hori_sky = BrRadianToAngle(atan2(col_map->width * tan_half_hori_fov / (double)pRender_buffer->width, 1));
 
-    pitch = BrRadianToAngle(atan2(pCamera_to_world->m[2][0], pCamera_to_world->m[2][2]));
-    yaw = BrRadianToAngle(atan2(col_map->width * tan_half_hori_fov / (double)pRender_buffer->width, 1));
-    tan_pitch = -((double)pitch
-        * 0.0000152587890625
-        / ((double)(uint16_t)(65520
-               / (int)(1.0
-                       / ((double)(uint16_t)(2 * yaw) * 0.0000152587890625)
-                   + 0.5))
-            * 0.0000152587890625));
+    tan_half_hori_sky = -BrFixedToFloat(vert_sky) / BrFixedToFloat(BR_ANGLE_DEG(360) / (int)(1.0f / BrFixedToFloat(2 * hori_sky) + 0.5f));
 
-    // LOG_DEBUG("tan_half_fov %f, tan_half_hori_fov %f, tan_pitch %f", tan_half_fov, tan_half_hori_fov, tan_pitch);
-    // LOG_DEBUG("rep1 %d", (int)((double)col_map->width * tan_pitch));
-    for (repetitions = (int)((double)col_map->width * tan_pitch); repetitions < 0; repetitions += col_map->width) {
-        ;
+    dx = col_map->width * tan_half_hori_sky;
+    while (dx < 0) {
+        dx += col_map->width;
     }
-    // LOG_DEBUG("rep2 %d", repetitions);
-    while (col_map->width < repetitions) {
-        repetitions -= col_map->width;
+    while (dx > col_map->width) {
+        dx -= col_map->width;
     }
-    // LOG_DEBUG("rep3 %d", repetitions);
 
-    top_y = -(pCamera_to_world->m[2][1] / sqrt(pCamera_to_world->m[2][1]) / tan_half_fov * (double)pRender_buffer->height / 2.0)
-        - (col_map->height - gSky_image_underground * col_map->height / gSky_image_height);
-    // LOG_DEBUG("gSky_image_underground %d, gSky_image_height %d", gSky_image_underground, gSky_image_height);
-    // LOG_DEBUG("top_y %d, r_o_x %d, repetitions %d", top_y, pRender_buffer->origin_x, repetitions);
-    while (pRender_buffer->width > dx) {
-        hori_pixels = col_map->width - repetitions;
-        if (hori_pixels >= pRender_buffer->width - dx) {
-            hori_pixels = pRender_buffer->width - dx;
+    hshift = col_map->height - gSky_image_underground * col_map->height / gSky_image_height;
+    tan_pitch = sqrtf(pCamera_to_world->m[2][0] * pCamera_to_world->m[2][0] + pCamera_to_world->m[2][2] * pCamera_to_world->m[2][2]);
+    hori_y = -(pCamera_to_world->m[2][1]
+                 / tan_pitch
+                 / tan_half_fov * pRender_buffer->height / 2.0f)
+        - hshift;
+
+    while (dst_x < pRender_buffer->width) {
+        hori_pixels = col_map->width - dx;
+        if (hori_pixels > pRender_buffer->width - dst_x) {
+            hori_pixels = pRender_buffer->width - dst_x;
         }
-        DRPixelmapRectangleCopy(
-            pRender_buffer,
-            dx - pRender_buffer->origin_x,
-            top_y,
-            col_map,
-            repetitions - col_map->origin_x,
-            -col_map->origin_y,
-            hori_pixels,
-            col_map->height);
-        repetitions = 0;
-        dx += hori_pixels;
+        src_x = dx - col_map->origin_x;
+        DRPixelmapRectangleCopy(pRender_buffer, dst_x - pRender_buffer->origin_x, hori_y, col_map, src_x, -col_map->origin_y, hori_pixels, col_map->height);
+        dx = 0;
+        dst_x += hori_pixels;
     }
-    if (top_y + pRender_buffer->origin_y > 0) {
-        DRPixelmapRectangleFill(
-            pRender_buffer,
-            -pRender_buffer->origin_x,
-            -pRender_buffer->origin_y,
-            pRender_buffer->width,
-            top_y + pRender_buffer->origin_y,
-            1);
+
+    top_y = hori_y + pRender_buffer->origin_y;
+    if (top_y > 0) {
+        top_col = ((tU8*)col_map->pixels)[0];
+        DRPixelmapRectangleFill(pRender_buffer, -pRender_buffer->origin_x, -pRender_buffer->origin_y, pRender_buffer->width, top_y, top_col);
     }
-    bot_height = pRender_buffer->height - pRender_buffer->origin_y - top_y - col_map->height;
+    bot_height = pRender_buffer->height - pRender_buffer->origin_y - hori_y - col_map->height;
     if (bot_height > 0) {
-        DRPixelmapRectangleFill(
-            pRender_buffer,
-            -pRender_buffer->origin_x,
-            top_y + col_map->height,
-            pRender_buffer->width,
-            bot_height,
-            *((tU8*)col_map->pixels + col_map->row_bytes * (col_map->height - 1) + 3));
+        bot_col = ((tU8*)col_map->pixels)[col_map->row_bytes * (col_map->height - 1)];
+        DRPixelmapRectangleFill(pRender_buffer, -pRender_buffer->origin_x, hori_y + col_map->height, pRender_buffer->width, bot_height, bot_col);
     }
 }
 
@@ -478,7 +449,7 @@ void DepthEffectSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_
     LOG_TRACE("(%p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world);
 
     if (gProgram_state.current_depth_effect.sky_texture != NULL
-            && (gLast_camera_special_volume == NULL || gLast_camera_special_volume->sky_col < 0)) {
+        && (gLast_camera_special_volume == NULL || gLast_camera_special_volume->sky_col < 0)) {
         DoHorizon(pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world);
     }
 }
@@ -671,7 +642,7 @@ void IncreaseAngle() {
 
     for (i = 0; i < COUNT_OF(gCamera_list); i++) {
         camera_ptr = gCamera_list[i]->type_data;
-        camera_ptr->field_of_view += 0x1c7; // 2.4993896484375 degrees
+        camera_ptr->field_of_view += 0x1c7;       // 2.4993896484375 degrees
         if (camera_ptr->field_of_view > 0x78e3) { // 169.9969482421875 degrees
             camera_ptr->field_of_view = 0x78e3;
         }
@@ -693,7 +664,7 @@ void DecreaseAngle() {
 
     for (i = 0; i < COUNT_OF(gCamera_list); i++) {
         camera_ptr = gCamera_list[i]->type_data;
-        camera_ptr->field_of_view -= 0x1c7; // 2.4993896484375 degrees
+        camera_ptr->field_of_view -= 0x1c7;      // 2.4993896484375 degrees
         if (camera_ptr->field_of_view < 0x71c) { // 9.99755859375 degrees
             camera_ptr->field_of_view = 0x71c;
         }

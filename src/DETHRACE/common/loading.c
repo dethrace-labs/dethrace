@@ -20,6 +20,9 @@
 #include "globvrpb.h"
 #include "grafdata.h"
 #include "graphics.h"
+#include "harness/config.h"
+#include "harness/hooks.h"
+#include "harness/trace.h"
 #include "init.h"
 #include "input.h"
 #include "newgame.h"
@@ -31,16 +34,14 @@
 #include "spark.h"
 #include "utility.h"
 #include "world.h"
-#include "harness/config.h"
-#include "harness/hooks.h"
-#include "harness/trace.h"
 #include <errno.h>
 
 #define HITHER_MULTIPLIER 2.0f
 #define AMBIENT_MULTIPLIER 0.01f
 #define NBR_FUNK_GROVE_FLAGS 30
 
-tHeadup_info gHeadup_image_info[32] = {  // Modified by DethRace to fit the "demo timeout" fancy head-up.
+tHeadup_info gHeadup_image_info[32] = {
+    // Modified by DethRace to fit the "demo timeout" fancy head-up.
     { "LADY.PIX", eNet_or_otherwise },
     { "GENT.PIX", eNet_or_otherwise },
     { "CODGER.PIX", eNet_or_otherwise },
@@ -72,7 +73,7 @@ tHeadup_info gHeadup_image_info[32] = {  // Modified by DethRace to fit the "dem
     { "UBROKE.PIX", eNet_only },
     { "ULOST.PIX", eNet_only },
     { "UWON.PIX", eNet_only },
-    { "DTIMEOUT.PIX", eNot_net },   // Only used by the demo, not present in the full version
+    { "DTIMEOUT.PIX", eNot_net }, // Only used by the demo, not present in the full version
 };
 char* gYour_car_names[2][6];
 char* gDrivable_car_names[6];
@@ -809,7 +810,7 @@ tS8* ConvertPixToStripMap(br_pixelmap* pThe_br_map) {
 
     for (i = 0; i < pThe_br_map->height; i++) {
         next_byte = (tU8*)pThe_br_map->pixels + i * pThe_br_map->row_bytes; // points to start of this line
-        new_line_length = 2; // leave space at the start of the line to store number of chunks and first chunk length
+        new_line_length = 2;                                                // leave space at the start of the line to store number of chunks and first chunk length
         j = 0;
         counter = 0;
         total = 0;
@@ -1194,7 +1195,7 @@ void ReadNonCarMechanicsData(FILE* pF, tNon_car_spec* non_car) {
     GetThreeFloats(pF, &non_car->free_cmpos.v[0], &non_car->free_cmpos.v[1], &non_car->free_cmpos.v[2]);
     GetThreeFloats(pF, &non_car->attached_cmpos.v[0], &non_car->attached_cmpos.v[1], &non_car->attached_cmpos.v[2]);
     GetThreeFloats(pF, &non_car->collision_info.bounds[1].min.v[0], &non_car->collision_info.bounds[1].min.v[1], &non_car->collision_info.bounds[1].min.v[2]);
-    GetThreeFloats(pF, &non_car->collision_info.bounds[1].max.v[0], &non_car->collision_info.bounds[1].max.v[1], &non_car->collision_info.bounds[1].max.v[1]);
+    GetThreeFloats(pF, &non_car->collision_info.bounds[1].max.v[0], &non_car->collision_info.bounds[1].max.v[1], &non_car->collision_info.bounds[1].max.v[2]);
     non_car->collision_info.extra_point_num = GetAnInt(pF);
     if (non_car->collision_info.extra_point_num > 6) {
         sprintf(s, "%d", non_car->collision_info.index);
@@ -1596,19 +1597,18 @@ int RemoveDoubleSided(br_model* pModel) {
         for (i = 0; i < pModel->nfaces; i++) {
             face = &pModel->faces[i];
             if (face->material) {
-                if (face->material->colour_map_1 == DOUBLESIDED_FLAG_COLOR_MAP) {
+                if (face->material->user == DOUBLESIDED_USER_FLAG) {
                     num_double_sided_faces++;
                 }
             }
         }
         if (num_double_sided_faces > 0) {
-            LOG_DEBUG("nbr dbl side %d, %p", num_double_sided_faces, pModel);
             faces = BrResAllocate(pModel, sizeof(br_face) * (num_double_sided_faces + pModel->nfaces), kMem_misc);
             memcpy(faces, pModel->faces, sizeof(br_face) * pModel->nfaces);
             orig_nfaces = pModel->nfaces;
             face = pModel->faces;
             for (i = 0; i < orig_nfaces; i++) {
-                if (face->material && face->material->colour_map_1 == DOUBLESIDED_FLAG_COLOR_MAP) {
+                if (face->material && face->material->user == DOUBLESIDED_USER_FLAG) {
                     faces[pModel->nfaces].vertices[0] = face->vertices[1];
                     faces[pModel->nfaces].vertices[1] = face->vertices[0];
                     faces[pModel->nfaces].vertices[2] = face->vertices[2];
@@ -1616,7 +1616,7 @@ int RemoveDoubleSided(br_model* pModel) {
                     faces[pModel->nfaces].material = face->material;
                     pModel->nfaces++;
                 }
-                ++face;
+                face++;
             }
             BrResFree(pModel->faces);
             pModel->faces = faces;
@@ -2040,12 +2040,12 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
                     }
                 }
                 if (!its_a_floorpan) {
-                    pStorage_space->materials[i]->colour_map_1 = DOUBLESIDED_FLAG_COLOR_MAP;
+                    pStorage_space->materials[i]->user = DOUBLESIDED_USER_FLAG;
                 }
                 pStorage_space->materials[i]->flags &= 0xFFFFEFFF;
             }
             pStorage_space->materials[i]->index_shade = gShade_list[0];
-            BrMaterialUpdate(pStorage_space->materials[i], 0x7FFF);
+            BrMaterialUpdate(pStorage_space->materials[i], BR_MATU_ALL);
         }
         PossibleService();
     }
@@ -2082,7 +2082,6 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
         if (!pCar_spec->car_model_actors[i].actor) {
             FatalError(71);
         }
-        // LOG_DEBUG("actor %s, model %s", pCar_spec->car_model_actors[i].actor->identifier, pCar_spec->car_model_actors[i].actor->model->identifier);
         LinkModelsToActor(
             pCar_spec->car_model_actors[i].actor,
             &pStorage_space->models[old_model_count],

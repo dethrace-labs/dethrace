@@ -24,7 +24,7 @@ tFace_ref* gPling_face;
 // IDA: int __cdecl BadDiv(br_scalar a, br_scalar b)
 // Suffix added to avoid duplicate symbol
 int BadDiv__finteray(br_scalar a, br_scalar b) {
-    //LOG_TRACE("(%f, %f)", a, b);
+    // LOG_TRACE("(%f, %f)", a, b);
 
     return fabsf(b) < 1.0f && fabsf(a) > fabsf(b) * BR_SCALAR_MAX;
 }
@@ -38,8 +38,8 @@ void DRVector2AccumulateScale__finteray(br_vector2* a, br_vector2* b, br_scalar 
     a->v[1] = b->v[1] * s + a->v[1];
 }
 
-//IDA: int __usercall PickBoundsTestRay@<EAX>(br_bounds *b@<EAX>, br_vector3 *rp@<EDX>, br_vector3 *rd@<EBX>, br_scalar t_near, br_scalar t_far, br_scalar *new_t_near, br_scalar *new_t_far)
-// Suffix added to avoid duplicate symbol
+// IDA: int __usercall PickBoundsTestRay@<EAX>(br_bounds *b@<EAX>, br_vector3 *rp@<EDX>, br_vector3 *rd@<EBX>, br_scalar t_near, br_scalar t_far, br_scalar *new_t_near, br_scalar *new_t_far)
+//  Suffix added to avoid duplicate symbol
 int PickBoundsTestRay__finteray(br_bounds* b, br_vector3* rp, br_vector3* rd, br_scalar t_near, br_scalar t_far, br_scalar* new_t_near, br_scalar* new_t_far) {
     int i;
     float s;
@@ -178,8 +178,8 @@ int DRSceneRayPick2D(br_actor* world, br_vector3* pPosition, br_vector3* pDir, d
     return ActorRayPick2D(world, pPosition, pDir, NULL, NULL, callback);
 }
 
-//IDA: int __usercall DRModelPick2D@<EAX>(br_model *model@<EAX>, br_material *material@<EDX>, br_vector3 *ray_pos@<EBX>, br_vector3 *ray_dir@<ECX>, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn *callback, void *arg)
-// Suffix added to avoid duplicate symbol
+// IDA: int __usercall DRModelPick2D@<EAX>(br_model *model@<EAX>, br_material *material@<EDX>, br_vector3 *ray_pos@<EBX>, br_vector3 *ray_dir@<ECX>, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn *callback, void *arg)
+//  Suffix added to avoid duplicate symbol
 int DRModelPick2D__finteray(br_model* model, br_material* material, br_vector3* ray_pos, br_vector3* ray_dir, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn* callback, void* arg) {
     DR_FACE* fp;
     int f;
@@ -380,7 +380,7 @@ void FindFace(br_vector3* pPosition, br_vector3* pDir, br_vector3* nor, br_scala
 // IDA: void __cdecl EnablePlingMaterials()
 void EnablePlingMaterials() {
     LOG_TRACE("()");
-    
+
     gPling_materials = 1;
 }
 
@@ -1217,6 +1217,7 @@ int LineBoxCollWithSphere(br_vector3* o, br_vector3* p, br_bounds* pB, br_vector
     LOG_TRACE("(%p, %p, %p, %p)", o, p, pB, pHit_point);
 
     plane = LineBoxColl(o, p, pB, pHit_point);
+
     if (plane != 0) {
         return plane;
     }

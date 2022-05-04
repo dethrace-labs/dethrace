@@ -1104,7 +1104,53 @@ void GenerateContinuousSmoke(tCar_spec* pCar, int wheel, tU32 pTime) {
     int colour;
     LOG_TRACE("(%p, %d, %d)", pCar, wheel, pTime);
 
-    STUB_ONCE();
+    if (pCar->dust_time[wheel] > pTime) {
+        pCar->dust_time[wheel] -= pTime;
+        return;
+    }
+    pCar->dust_time[wheel] += IRandomBetween(200, 400) - pTime;
+    if (pCar->dust_time[wheel] < 0) {
+        pCar->dust_time[wheel] = 0;
+    }
+    BrVector3Cross(&tv, &pCar->omega, &pCar->wpos[wheel]);
+    BrVector3Scale(&vcs, &pCar->velocity_car_space, WORLD_SCALE * 1000.0f);
+    BrVector3Accumulate(&vcs, &tv);
+    ts = BrVector3LengthSquared(&vcs);
+    if (ts < 25.0f) {
+        return;
+    }
+    decay_factor = sqrtf(ts) / 25.0f;
+    if (decay_factor > 1.0f) {
+        decay_factor = 1.0f;
+    }
+    BrVector3InvScale(&tv, &pCar->wpos[wheel], WORLD_SCALE);
+    tv.v[1] -= pCar->oldd[wheel] / WORLD_SCALE;
+
+    alpha = -1000.0f;
+    if (vcs.v[2] > 0.0f) {
+        alpha = (pCar->bounds[0].min.v[2] - tv.v[2]) / vcs.v[2];
+    } else if (vcs.v[2] < 0.0f) {
+        alpha = (pCar->bounds[0].max.v[2] - tv.v[2]) / vcs.v[2];
+    }
+
+    beta = -1000.0f;
+    if (vcs.v[0] > 0.0f) {
+        beta = (pCar->bounds[0].min.v[0] - tv.v[0]) / vcs.v[0];
+    } else if (vcs.v[0] < 0.0f) {
+        beta = (pCar->bounds[0].max.v[0] - tv.v[0]) / vcs.v[0];
+    }
+
+    ts = MAX(alpha, beta);
+    BrVector3Scale(&pos, &vcs, ts);
+    BrVector3Accumulate(&tv, &pos);
+    BrMatrix34ApplyP(&pos, &tv, &pCar->car_master_actor->t.t.mat);
+    BrMatrix34ApplyV(&v, &vcs, &pCar->car_master_actor->t.t.mat);
+
+    colour = gDust_rotate + gCurrent_race.material_modifiers[pCar->material_index[wheel]].smoke_type - 2;
+    while (colour >= gNum_dust_tables) {
+        colour -= gNum_dust_tables;
+    }
+    CreatePuffOfSmoke(&pos, &v, decay_factor, decay_factor * 2, colour + 8, pCar);
 }
 
 // IDA: void __cdecl DustRotate()
@@ -1226,7 +1272,7 @@ void CreatePuffOfSmoke(br_vector3* pos, br_vector3* v, br_scalar strength, br_sc
     }
 
     BrVector3InvScale(&gSmoke[gSmoke_num].v, v, WORLD_SCALE);
-    gSmoke[gSmoke_num].v.v[1] += 0.1449275362318841f;
+    gSmoke[gSmoke_num].v.v[1] += (1.0f / WORLD_SCALE);
     gSmoke[gSmoke_num].pos = *pos;
     gSmoke[gSmoke_num].radius = 0.05;
     if ((pType & 0xF) == 7) {
