@@ -21,7 +21,7 @@ float gWobble_spam_y[8] = { 0.0f, -0.15f, 0.4f, 0.15f, -0.4f, 0.25f, 0.0f, -0.25
 float gWobble_spam_z[8] = { 0.4f, -0.25f, 0.0f, 0.25f, 0.0f, 0.15f, -0.4f, -0.15f };
 br_scalar gWheel_circ_to_width = 0.16f;
 tU8 gSmoke_damage_step[12] = { 20u, 20u, 0u, 10u, 10u, 10u, 10u, 10u, 10u, 10u, 10u, 10u };
-int gSteal_ranks[5];
+int gSteal_ranks[5] = { 0, 89, 72, 55, 38 };
 
 // IDA: int __usercall ReadCrushData@<EAX>(FILE *pF@<EAX>, tCrush_data *pCrush_data@<EDX>)
 int ReadCrushData(FILE* pF, tCrush_data* pCrush_data) {
@@ -541,7 +541,7 @@ void CheckPiledriverBonus(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3
     br_scalar dp;
     LOG_TRACE("(%p, %p, %p)", pCar, pImpact_point, pEnergy);
 
-    STUB();
+    STUB_ONCE();
 }
 
 // IDA: tImpact_location __usercall CalcModifiedLocation@<EAX>(tCar_spec *pCar@<EAX>)
@@ -836,7 +836,7 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
     tNet_message* message;
     LOG_TRACE("(%p, %p)", pCar1, pCar2);
 
-    STUB();
+    STUB_ONCE();
 }
 
 // IDA: void __usercall DoWheelDamage(tU32 pFrame_period@<EAX>)

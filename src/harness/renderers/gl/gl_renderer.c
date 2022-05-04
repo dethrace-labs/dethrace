@@ -138,13 +138,13 @@ void SetupFullScreenRectGeometry() {
     float vertices[] = {
         // positions          // colors           // texture coords
         1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right
-        1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
+        1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,  // bottom right
         -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
         -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f // top left
     };
     unsigned int indices[] = {
         0, 1, 3, // first triangle
-        1, 2, 3 // second triangle
+        1, 2, 3  // second triangle
     };
 
     GLuint vbo;
@@ -195,6 +195,7 @@ void GLRenderer_Init(int width, int height, int pRender_width, int pRender_heigh
     glDepthFunc(GL_LESS);
     glClearColor(0, 0, 0, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+    glDisable(GL_CULL_FACE);
 
     // textures
     glGenTextures(1, &screen_texture);
@@ -463,16 +464,12 @@ void setActiveMaterial(tStored_material* material) {
     if (material->shade_table) {
         GLRenderer_SetShadeTable(material->shade_table);
     }
+
     if ((material->flags & BR_MATF_LIGHT) && !(material->flags & BR_MATF_PRELIT) && material->shade_table) {
         // TODO: light value shouldn't always be 0? Works for shadows, not sure about other things.
         glUniform1i(uniforms_3d.light_value, 0);
     } else {
         glUniform1i(uniforms_3d.light_value, -1);
-    }
-    if (material->flags & BR_MATF_ALWAYS_VISIBLE) {
-        glDisable(GL_CULL_FACE);
-    } else {
-        glEnable(GL_CULL_FACE);
     }
 
     if (material->pixelmap) {

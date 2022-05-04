@@ -3,9 +3,10 @@
 
 #include "br_defs.h"
 
-#define BrVector2Set(v1, s1, s2) do {   \
-        (v1)->v[0] = (s1);              \
-        (v1)->v[1] = (s2);              \
+#define BrVector2Set(v1, s1, s2) \
+    do {                         \
+        (v1)->v[0] = (s1);       \
+        (v1)->v[1] = (s2);       \
     } while (0)
 
 #define BrVector3Length(v1) BR_LENGTH3((v1)->v[0], (v1)->v[1], (v1)->v[2])
@@ -54,6 +55,13 @@
         (v1)->v[2] = (v2)->v[2] - (v3)->v[2]; \
     } while (0)
 
+#define BrVector3Mul(v1, v2, v3)              \
+    do {                                      \
+        (v1)->v[0] = (v2)->v[0] * (v3)->v[0]; \
+        (v1)->v[1] = (v2)->v[1] * (v3)->v[1]; \
+        (v1)->v[2] = (v2)->v[2] * (v3)->v[2]; \
+    } while (0)
+
 #define BrVector3Accumulate(v1, v2) \
     do {                            \
         (v1)->v[0] += (v2)->v[0];   \
@@ -99,4 +107,6 @@
         BrVector3Scale(v1, v2, _scale);                                   \
     } while (0)
 
+#define BR_ONE_LS 65536
+#define BrFixedToFloat(s) ((float)((s) * (1.0 / (float)BR_ONE_LS)))
 #endif

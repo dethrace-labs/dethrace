@@ -18,7 +18,7 @@
 
 #define FLAG_WAVING_BASTARD_REF 99
 
-#define FOURCC(A,B,C,D) (((A & 0xff) << 24) | ((B & 0xff) << 16)| ((C & 0xff) << 8)| ((D & 0xff) << 0))
+#define FOURCC(A, B, C, D) (((A & 0xff) << 24) | ((B & 0xff) << 16) | ((C & 0xff) << 8) | ((D & 0xff) << 0))
 #define PEDESTRIAN_MAGIC FOURCC('P', 'e', 'd', '!')
 #define ActorToPedestrianData(ACTOR) ((tPedestrian_data*)((ACTOR)->type_data))
 
@@ -487,7 +487,7 @@ void MungePedModel(tPedestrian_data* pPedestrian) {
         } else {
             temp_scalar = ((double)(GetTotalTime() - pPedestrian->last_action_change) / pPedestrian->spin_period * 360.0 + 360.0);
         }
-        DRMatrix34PostRotateZ(&pPedestrian->actor->t.t.mat, BR_ANGLE_DEG(temp_scalar));
+        DRMatrix34PostRotateZ(&pPedestrian->actor->t.t.mat, BrDegreeToAngle(temp_scalar));
         BrMatrix34PostTranslate(&pPedestrian->actor->t.t.mat, 0.0, height_over2, 0.0);
     }
     temp_scalar = FastScalarArcTan2Angle(gCamera_to_world.m[2][0], gCamera_to_world.m[2][2]);
@@ -781,8 +781,8 @@ int GetPedPosition(int pIndex, br_vector3* pPos) {
     pedestrian = &gPedestrian_array[pIndex];
     if (pedestrian->ref_number < 100) {
         if (pedestrian->hit_points == -100 || pedestrian->current_action == pedestrian->fatal_car_impact_action
-                || pedestrian->current_action == pedestrian->fatal_ground_impact_action 
-                || pedestrian->current_action == pedestrian->giblets_action) {
+            || pedestrian->current_action == pedestrian->fatal_ground_impact_action
+            || pedestrian->current_action == pedestrian->giblets_action) {
             return 0;
         } else {
             *pPos = pedestrian->pos;
