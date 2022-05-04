@@ -999,9 +999,9 @@ void FinishCars(tU32 pLast_frame_time, tU32 pTime) {
             car->lf_sus_position = (car->ride_height - car->oldd[2]) / WORLD_SCALE;
             car->rf_sus_position = (car->ride_height - car->oldd[3]) / WORLD_SCALE;
             for (wheel = 0; wheel < 4; wheel++) {
-                if (car->oldd[wheel] < car->susp_height[wheel >> 1] && gCurrent_race.material_modifiers[car->material_index[wheel]].smoke_type >= 2
-                    && !car->doing_nothing_flag)
+                if (car->oldd[wheel] < car->susp_height[wheel >> 1] && gCurrent_race.material_modifiers[car->material_index[wheel]].smoke_type >= 2 && !car->doing_nothing_flag) {
                     GenerateContinuousSmoke(car, wheel, pTime);
+                }
             }
         }
     }
@@ -1698,7 +1698,29 @@ void DoBumpiness(tCar_spec* c, br_vector3* wheel_pos, br_vector3* norm, br_scala
     tMaterial_modifiers* mat_list;
     LOG_TRACE("(%p, %p, %p, %p, %d)", c, wheel_pos, norm, d, n);
 
-    STUB_ONCE();
+    tv.v[0] = c->nor[n].v[0] * d[n] + wheel_pos[n].v[0];
+    tv.v[2] = c->nor[n].v[2] * d[n] + wheel_pos[n].v[2];
+
+    x = abs((int)(512.0f * tv.v[0])) % 2048;
+    y = abs((int)(512.0f * tv.v[2])) % 2048;
+
+    if (x > 1024) {
+        x = 2048 - x;
+    }
+    if (y > 1024) {
+        y = 2048 - y;
+    }
+    if (x + y <= 1024) {
+        delta = x + y;
+    } else {
+        delta = 2048 - x - y;
+    }
+    delta -= 400;
+    if (delta < 0) {
+        delta = 0;
+    }
+    mat_list = gCurrent_race.material_modifiers;
+    d[n] = delta * mat_list[c->material_index[n]].bumpiness / 42400.0f * norm[n].v[1] + d[n];
 }
 
 // IDA: void __usercall CalcForce(tCar_spec *c@<EAX>, br_scalar dt)
