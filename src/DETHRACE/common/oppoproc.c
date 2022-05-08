@@ -1,19 +1,11 @@
 #include "oppoproc.h"
-#include <brender/brender.h>
 #include "errors.h"
 #include "globvars.h"
-#include "opponent.h"
 #include "harness/trace.h"
+#include "opponent.h"
+#include <brender/brender.h>
 #include <math.h>
 #include <stdlib.h>
-
-// FIXME: these macro's might be useful in other places.
-#define Vector3DistanceSquared(V1, V2)                              \
-    ((((V1)->v[0] - (V2)->v[0])) * (((V1)->v[0] - (V2)->v[0])) +    \
-     (((V1)->v[1] - (V2)->v[1])) * (((V1)->v[1] - (V2)->v[1])) +    \
-     (((V1)->v[2] - (V2)->v[2])) * (((V1)->v[2] - (V2)->v[2])))
-
-#define Vector3Distance(V1, V2) sqrtf(Vector3DistanceSquared((V1), (V2)))
 
 // IDA: int __usercall StraightestArcForCorner2D@<EAX>(br_vector2 *pCent@<EAX>, br_scalar *pRadius@<EDX>, br_scalar *pEntry_length@<EBX>, int *pLeft_not_right@<ECX>, br_vector2 *p1, br_vector2 *p2, br_vector2 *p3, br_scalar pWidth12, br_scalar pWidth23)
 int StraightestArcForCorner2D(br_vector2* pCent, br_scalar* pRadius, br_scalar* pEntry_length, int* pLeft_not_right, br_vector2* p1, br_vector2* p2, br_vector2* p3, br_scalar pWidth12, br_scalar pWidth23) {
@@ -30,7 +22,6 @@ int StraightestArcForCorner2D(br_vector2* pCent, br_scalar* pRadius, br_scalar* 
     LOG_TRACE("(%p, %p, %p, %p, %p, %p, %p, %f, %f)", pCent, pRadius, pEntry_length, pLeft_not_right, p1, p2, p3, pWidth12, pWidth23);
     NOT_IMPLEMENTED();
 }
-
 
 // FIXME: is this an older implementation?
 // FIXME: is this function correct?
@@ -63,7 +54,7 @@ static void StraightestArcForCorner(float* p1, float* p2, float* p3, br_vector3*
     } else {
         tmp4 = tmp4 / tmp3;
         tmp3 = tmp3 / (tmp / tmp2 + 1.f);
-        *p2 =  tmp3 * p10 + sqrtf(tmp3 * p10) + tmp4;
+        *p2 = tmp3 * p10 + sqrtf(tmp3 * p10) + tmp4;
         *p1 = *p2 * tmp3;
     }
 }
@@ -248,7 +239,7 @@ tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_o
         }
         if (data->struggle_time == 0) {
             if (pIgnore_end) {
-                if (!pNever_struggle && speed <= (pIgnore_end ? (.2f/3.f) : .2f) && data->last_finished_struggle_time + 2000 < gTime_stamp_for_this_munging && pPursuit_mode && data->has_moved_during_this_task) {
+                if (!pNever_struggle && speed <= (pIgnore_end ? (.2f / 3.f) : .2f) && data->last_finished_struggle_time + 2000 < gTime_stamp_for_this_munging && pPursuit_mode && data->has_moved_during_this_task) {
                     dr_dprintf("%s: 'Stopped,' section #%d, speed = %.2f m/s, about to start a-strugglin'", car_spec->driver_name, data->section_no, speed);
                     data->struggle_time = gTime_stamp_for_this_munging;
                     if (!pIgnore_end && data->section_no == data->last_struggle_section) {
@@ -336,7 +327,7 @@ tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_o
                 data->last_distance = 0.f;
             }
             BrVector3Cross(&corner, &wank, (br_vector3*)car_master_actor->t.t.mat.m[2]);
-            
+
             first_straight = 0;
             if (BrVector3Dot(&wank, (br_vector3*)car_master_actor->t.t.mat.m[2]) > 0.f && speed > 10.f) {
                 data->desired_speed = 6.f;
@@ -386,13 +377,13 @@ tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_o
                         corner_speed *= WORLD_SCALE;
                         corner_speed2 *= WORLD_SCALE;
                         stopping_distance = 10.f * corner_speed * CornerFudge(car_spec) * CornerFudge(car_spec);
-                        desired_speed =  sqrtf(stopping_distance);
+                        desired_speed = sqrtf(stopping_distance);
                         if (desired_speed > GetOpponentsSectionMaxSpeed(pOpponent_spec, data->section_no, 1)) {
                             desired_speed = sqrtf(GetOpponentsSectionMaxSpeed(pOpponent_spec, data->section_no, 1));
                             stopping_distance = desired_speed * desired_speed;
                         }
                         if (speed_to_goal - corner_speed2 < desired_speed * 1.5f * (speed * speed - stopping_distance) / 24.f
-                                && data->desired_speed > desired_speed) {
+                            && data->desired_speed > desired_speed) {
                             data->desired_speed = desired_speed;
                         }
                         BrVector3Copy(&a, &p);
@@ -413,7 +404,7 @@ tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_o
                 max_acc -= .3f;
             }
             max_acc *= 10.f;
-            
+
             error = data->desired_speed * effective_speed_factor - speed;
             acc = (error - data->prev_acc_error) * 1000.f / gFrame_period_for_this_munging * .1f + error + data->prev_acc;
             if (acc > max_acc) {
