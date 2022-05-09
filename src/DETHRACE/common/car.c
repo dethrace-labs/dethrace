@@ -37,7 +37,7 @@ br_scalar gDt;
 // suffix added to avoid duplicate symbol
 int gCollision_detection_on__car = 1;
 // suffix added to avoid duplicate symbol
-br_vector3 gGround_normal__car = { { 0.0f, 1.0f, 0.0f }};
+br_vector3 gGround_normal__car = { { 0.0f, 1.0f, 0.0f } };
 // suffix added to avoid duplicate symbol
 void (*ControlCar[6])(tCar_spec*, br_scalar) = {
     &ControlCar1,
@@ -3147,7 +3147,7 @@ void CrushAndDamageCar(tCar_spec* c, br_vector3* pPosition, br_vector3* pForce_c
             PipeSingleWallIncident(ts, &pos_w);
         }
     }
-    if (car2 != NULL&& car2->driver == eDriver_local_human && ts > 0.003f) {
+    if (car2 != NULL && car2->driver == eDriver_local_human && ts > 0.003f) {
         PipeSingleCarIncident(ts, c, &position);
     }
     if (car2 == NULL && c->driver == eDriver_local_human && ts > 0.003f) {
@@ -5028,79 +5028,125 @@ int CollideCamera2(br_vector3* car_pos, br_vector3* cam_pos, br_vector3* old_cam
     hither = ((br_camera*)gCamera->type_data)->hither_z * 3.0;
     gCamera_has_collided = 0;
     for (i = 0; i < 1; i++) {
-        BrVector3Sub(&tv, cam_pos, car_pos);
-        dist = BrVector3Length(&tv);
-        BrVector3Scale(&tv, &tv, 1.2f);
+        tv.v[0] = cam_pos->v[0] - car_pos->v[0];
+        tv.v[1] = cam_pos->v[1] - car_pos->v[1];
+        tv.v[2] = cam_pos->v[2] - car_pos->v[2];
+        dist = sqrt(tv.v[1] * tv.v[1] + tv.v[2] * tv.v[2] + tv.v[0] * tv.v[0]);
+        tv.v[0] = tv.v[0] * 1.2;
+        tv.v[1] = tv.v[1] * 1.2;
+        tv.v[2] = tv.v[2] * 1.2;
         FindFace(car_pos, &tv, &a, &ts, &material);
         if (ts <= 1.0) {
             gCamera_has_collided = 1;
-            if (BrVector3Dot(&a, &tv) > 0.0) {
+            if (a.v[1] * tv.v[1] + a.v[2] * tv.v[2] + a.v[0] * tv.v[0] > 0.0) {
                 a.v[0] = -a.v[0];
                 a.v[1] = -a.v[1];
                 a.v[2] = -a.v[2];
             }
             if (gCamera_mode == 1 && !manual_move) {
-                BrVector3Sub(&tv2, car_pos, old_camera_pos);
+                tv2.v[0] = car_pos->v[0] - old_camera_pos->v[0];
+                tv2.v[1] = car_pos->v[1] - old_camera_pos->v[1];
+                tv2.v[2] = car_pos->v[2] - old_camera_pos->v[2];
                 FindFace(old_camera_pos, &tv2, &b, &ts2, &material);
                 if (ts2 > 1.0) {
                     *cam_pos = *old_camera_pos;
                     return i;
                 }
             }
-            BrVector3Scale(&tv, &tv, ts);
-            BrVector3Scale(&tv2, &a, hither);
-            BrVector3Accumulate(&tv, &tv2);
-            dist = BrVector3Length(&tv);
-            BrVector3Add(cam_pos, car_pos, &tv);
-            if (gMin_camera_car_distance > dist && i == 0 && a.v[1] > -0.7) {
-                BrVector3Scale(&tv2, &a, -a.v[1]);
-                tv2.v[1] += 1.0f;
+            tv.v[0] = tv.v[0] * ts;
+            tv.v[1] = tv.v[1] * ts;
+            tv.v[2] = tv.v[2] * ts;
+            tv2.v[0] = a.v[0] * hither;
+            tv2.v[1] = a.v[1] * hither;
+            tv2.v[2] = a.v[2] * hither;
+            tv.v[0] = tv2.v[0] + tv.v[0];
+            tv.v[1] = tv2.v[1] + tv.v[1];
+            tv.v[2] = tv2.v[2] + tv.v[2];
+            dist = sqrt(tv.v[1] * tv.v[1] + tv.v[2] * tv.v[2] + tv.v[0] * tv.v[0]);
+            cam_pos->v[0] = car_pos->v[0] + tv.v[0];
+            cam_pos->v[1] = car_pos->v[1] + tv.v[1];
+            cam_pos->v[2] = car_pos->v[2] + tv.v[2];
+            if (gMin_camera_car_distance > dist && !i && a.v[1] > -0.7) {
+                tv2.v[0] = -a.v[1] * a.v[0];
+                tv2.v[1] = -a.v[1] * a.v[1];
+                tv2.v[2] = -a.v[1] * a.v[2];
+                tv2.v[1] = tv2.v[1] + 1.0;
                 if (gProgram_state.current_car.car_master_actor->t.t.mat.m[1][1] < 0.0) {
                     tv2.v[0] = -tv2.v[0];
                     tv2.v[1] = -tv2.v[1];
                     tv2.v[2] = -tv2.v[2];
                 }
-                d = BrVector3LengthSquared(&tv2);
-                l = BrVector3Dot(&tv, &tv2);
-                alpha = BrVector3Dot(&tv, &tv) - gMin_camera_car_distance * gMin_camera_car_distance;
+                d = tv2.v[1] * tv2.v[1] + tv2.v[2] * tv2.v[2] + tv2.v[0] * tv2.v[0];
+                l = tv2.v[1] * tv.v[1] + tv2.v[2] * tv.v[2] + tv2.v[0] * tv.v[0];
+                alpha = tv.v[1] * tv.v[1]
+                    + tv.v[2] * tv.v[2]
+                    + tv.v[0] * tv.v[0]
+                    - gMin_camera_car_distance * gMin_camera_car_distance;
                 ts2 = l * l - alpha * d * 4.0;
-                if (ts2 >= 0 && d != 0.0) {
-                    sa = (sqrtf(ts2) - l) / (d * 2.0f);
-                    BrVector3Scale(&tv2, &tv2, sa);
+                if (alpha >= 0 && d != 0.0) {
+                    sa = (sqrt(ts2) - l) / (d * 2.0);
+                    tv2.v[0] = tv2.v[0] * sa;
+                    tv2.v[1] = tv2.v[1] * sa;
+                    tv2.v[2] = tv2.v[2] * sa;
                     FindFace(cam_pos, &tv2, &a, &ts, &material);
                     if (ts < 1.0) {
-                        BrVector3Scale(&tv2, &tv2, ts);
+                        tv2.v[0] = tv2.v[0] * ts;
+                        tv2.v[1] = tv2.v[1] * ts;
+                        tv2.v[2] = tv2.v[2] * ts;
                     }
-                    BrVector3Set(&b, tv.v[0], 0.0f, tv.v[2]);
-                    BrVector3Normalise(&b, &b);
-                    BrVector3Accumulate(&tv, &tv2);
-                    ts2 = BrVector3Dot(&b, &tv);
-                    if (ts2 < 0.03f && !gAction_replay_mode) {
-                        BrVector3Normalise(&tv2, &tv2);
-                        alpha = BrVector3Dot(&tv2, &b);
-                        if (alpha < -0.03f) {
-                            alpha = (0.03f - ts2) / alpha;
-                            BrVector3Scale(&tv2, &tv2, alpha);
-                            BrVector3Accumulate(&tv, &tv2);
+                    b.v[0] = tv.v[0];
+                    b.v[1] = 0.0;
+                    b.v[2] = tv.v[2];
+                    dist = sqrt(0.0 * 0.0 + tv.v[2] * tv.v[2] + tv.v[0] * tv.v[0]);
+                    if (alpha <= 2.3841858e-7) {
+                        b.v[0] = 1.0;
+                        b.v[1] = 0.0;
+                        b.v[2] = 0.0;
+                    } else {
+                        alpha = 1.0 / dist;
+                        b.v[0] = b.v[0] * alpha;
+                        b.v[1] = b.v[1] * alpha;
+                        b.v[2] = b.v[2] * alpha;
+                    }
+                    tv.v[0] = tv2.v[0] + tv.v[0];
+                    tv.v[1] = tv2.v[1] + tv.v[1];
+                    tv.v[2] = tv2.v[2] + tv.v[2];
+                    ts2 = tv.v[1] * b.v[1] + tv.v[2] * b.v[2] + b.v[0] * tv.v[0];
+                    if (ts2 < 0.029999999 && !gAction_replay_mode) {
+                        dist = sqrt(tv2.v[1] * tv2.v[1] + tv2.v[2] * tv2.v[2] + tv2.v[0] * tv2.v[0]);
+                        if (dist <= 2.3841858e-7) {
+                            tv2.v[0] = 1.0;
+                            tv2.v[1] = 0.0;
+                            tv2.v[2] = 0.0;
+                        } else {
+                            alpha = 1.0 / dist;
+                            tv2.v[0] = tv2.v[0] * alpha;
+                            tv2.v[1] = tv2.v[1] * alpha;
+                            tv2.v[2] = tv2.v[2] * alpha;
                         }
-                        if (tv2.v[2] * b.v[2] + tv2.v[0] * b.v[0] + tv2.v[1] * b.v[1] < -0.029999999)
+                        if (tv2.v[2] * b.v[2] + tv2.v[0] * b.v[0] + tv2.v[1] * b.v[1] < -0.029999999) {
                             alpha = tv2.v[1] * b.v[1] + tv2.v[2] * b.v[2] + b.v[0] * tv2.v[0];
-                        alpha = (0.03f - ts2) / alpha;
-                        tv2.v[0] = tv2.v[0] * alpha;
-                        tv2.v[1] = tv2.v[1] * alpha;
-                        tv2.v[2] = tv2.v[2] * alpha;
-                        tv.v[0] = tv2.v[0] + tv.v[0];
-                        tv.v[1] = tv2.v[1] + tv.v[1];
-                        tv.v[2] = tv2.v[2] + tv.v[2];
+                            alpha = (0.029999999 - ts2) / alpha;
+                            tv2.v[0] = tv2.v[0] * alpha;
+                            tv2.v[1] = tv2.v[1] * alpha;
+                            tv2.v[2] = tv2.v[2] * alpha;
+                            tv.v[0] = tv2.v[0] + tv.v[0];
+                            tv.v[1] = tv2.v[1] + tv.v[1];
+                            tv.v[2] = tv2.v[2] + tv.v[2];
+                        }
                     }
                 }
-                BrVector3Add(cam_pos, car_pos, &tv);
+                cam_pos->v[0] = car_pos->v[0] + tv.v[0];
+                cam_pos->v[1] = car_pos->v[1] + tv.v[1];
+                cam_pos->v[2] = car_pos->v[2] + tv.v[2];
             }
         }
 
         bnds.mat = &mat;
         BrMatrix34Identity(&mat);
-        BrVector3Set(&tv2, hither, hither, hither);
+        tv2.v[0] = hither;
+        tv2.v[1] = hither;
+        tv2.v[2] = hither;
         bnds.original_bounds.min.v[0] = cam_pos->v[0] - hither;
         bnds.original_bounds.min.v[1] = cam_pos->v[1] - hither;
         bnds.original_bounds.min.v[2] = cam_pos->v[2] - hither;
@@ -5109,31 +5155,60 @@ int CollideCamera2(br_vector3* car_pos, br_vector3* cam_pos, br_vector3* old_cam
         bnds.original_bounds.max.v[2] = cam_pos->v[2] + hither;
         k = FindFacesInBox(&bnds, face_list, 3);
         if (k > 0) {
-            BrVector3Sub(&tv2, cam_pos, &face_list[0].v[0]);
-            sa = BrVector3Dot(&face_list[0].normal, &tv2);
+            tv2.v[0] = cam_pos->v[0] - face_list[0].v[0].v[0];
+            tv2.v[1] = cam_pos->v[1] - face_list[0].v[0].v[1];
+            tv2.v[2] = cam_pos->v[2] - face_list[0].v[0].v[2];
+            sa = face_list[0].normal.v[2] * tv2.v[2]
+                + face_list[0].normal.v[1] * tv2.v[1]
+                + face_list[0].normal.v[0] * tv2.v[0];
             // ts2 = sa;
             if (sa < hither && sa >= 0.0) {
-                BrVector3Scale(&tv2, &face_list[0].normal, hither - sa);
-                BrVector3Accumulate(cam_pos, &tv2);
+                tv2.v[0] = (hither - sa) * face_list[0].normal.v[0];
+                tv2.v[1] = (hither - sa) * face_list[0].normal.v[1];
+                tv2.v[2] = (hither - sa) * face_list[0].normal.v[2];
+                cam_pos->v[0] = cam_pos->v[0] + tv2.v[0];
+                cam_pos->v[1] = cam_pos->v[1] + tv2.v[1];
+                cam_pos->v[2] = cam_pos->v[2] + tv2.v[2];
             }
             if (k > 1) {
-                sb = BrVector3Dot(&face_list[0].normal, &face_list[1].normal);
-                if (sb > 0.95f && k > 2) {
-
-                    face_list[1].normal = face_list[2].normal;
-                    face_list[1].v[0] = face_list[2].v[0];
-                    sb = BrVector3Dot(&face_list[2].normal, &face_list[0].normal);
+                sb = face_list[1].normal.v[2] * face_list[0].normal.v[2]
+                    + face_list[1].normal.v[1] * face_list[0].normal.v[1]
+                    + face_list[1].normal.v[0] * face_list[0].normal.v[0];
+                if (sb > 0.94999999 && k > 2) {
+                    face_list[1].normal.v[0] = face_list[2].normal.v[0];
+                    face_list[1].normal.v[1] = face_list[2].normal.v[1];
+                    face_list[1].normal.v[2] = face_list[2].normal.v[2];
+                    face_list[1].v[0].v[0] = face_list[2].v[0].v[0];
+                    face_list[1].v[0].v[1] = face_list[2].v[0].v[1];
+                    face_list[1].v[0].v[2] = face_list[2].v[0].v[2];
+                    sb = face_list[2].normal.v[2] * face_list[0].normal.v[2]
+                        + face_list[2].normal.v[1] * face_list[0].normal.v[1]
+                        + face_list[2].normal.v[0] * face_list[0].normal.v[0];
                     k = 2;
                 }
-                if (sb <= 0.95f) {
-                    BrVector3Sub(&tv2, cam_pos, &face_list[1].v[0]);
-                    sc = BrVector3Dot(&face_list[1].normal, &tv2);
+                if (sb <= 0.94999999) {
+                    tv2.v[0] = cam_pos->v[0] - face_list[1].v[0].v[0];
+                    tv2.v[1] = cam_pos->v[1] - face_list[1].v[0].v[1];
+                    tv2.v[2] = cam_pos->v[2] - face_list[1].v[0].v[2];
+                    sc = face_list[1].normal.v[2] * tv2.v[2]
+                        + face_list[1].normal.v[1] * tv2.v[1]
+                        + face_list[1].normal.v[0] * tv2.v[0];
                     if (sc < hither && sc >= 0.0) {
-                        sc = BrVector3Dot(&face_list[0].normal, &face_list[1].normal);
-                        BrVector3Scale(&b, &face_list[0].normal, sc);
-                        BrVector3Sub(&face_list[1].normal, &face_list[1].normal, &b);
-                        BrVector3Scale(&tv2, &face_list[1].normal, hither - ts2);
-                        BrVector3Accumulate(cam_pos, &tv2);
+                        sc = face_list[1].normal.v[2] * face_list[0].normal.v[2]
+                            + face_list[1].normal.v[1] * face_list[0].normal.v[1]
+                            + face_list[1].normal.v[0] * face_list[0].normal.v[0];
+                        b.v[0] = face_list[0].normal.v[0] * sc;
+                        b.v[1] = face_list[0].normal.v[1] * sc;
+                        b.v[2] = face_list[0].normal.v[2] * sc;
+                        face_list[1].normal.v[0] = face_list[1].normal.v[0] - b.v[0];
+                        face_list[1].normal.v[1] = face_list[1].normal.v[1] - b.v[1];
+                        face_list[1].normal.v[2] = face_list[1].normal.v[2] - b.v[2];
+                        tv2.v[0] = (hither - ts2) * face_list[1].normal.v[0];
+                        tv2.v[1] = (hither - ts2) * face_list[1].normal.v[1];
+                        tv2.v[2] = (hither - ts2) * face_list[1].normal.v[2];
+                        cam_pos->v[0] = cam_pos->v[0] + tv2.v[0];
+                        cam_pos->v[1] = cam_pos->v[1] + tv2.v[1];
+                        cam_pos->v[2] = cam_pos->v[2] + tv2.v[2];
                     }
                 }
             }
@@ -5215,9 +5290,9 @@ void FlyCar(tCar_spec* c, br_scalar dt) {
     br_vector3 step;
     br_scalar tmp_scalar1; // Added by DethRace
     br_scalar tmp_scalar2; // Added by DethRace
-    br_vector3 tmp1; // Added by DethRace
-    br_vector3 tmp2; // Added by DethRace
-    br_vector3 tmp3; // Added by DethRace
+    br_vector3 tmp1;       // Added by DethRace
+    br_vector3 tmp2;       // Added by DethRace
+    br_vector3 tmp3;       // Added by DethRace
     br_matrix34* mat;
     br_angle theta;
     static br_scalar vel = 0.f;
@@ -5270,7 +5345,7 @@ void FlyCar(tCar_spec* c, br_scalar dt) {
         BrMatrix34PreRotateX(mat, BrDegreeToAngle(5));
     }
     if (c->keys.down) {
-        BrMatrix34PreRotateX(mat, BrDegreeToAngle(360-5));
+        BrMatrix34PreRotateX(mat, BrDegreeToAngle(360 - 5));
     }
     BrVector3Scale(&c->v, (br_vector3*)mat->m[2], -vel);
     BrVector3Scale(&step, &c->v, dt);
