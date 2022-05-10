@@ -1,10 +1,10 @@
 #include "piping.h"
+#include "brender/brender.h"
 #include "globvars.h"
 #include "harness/trace.h"
 #include "opponent.h"
 #include "pedestrn.h"
 #include "sound.h"
-#include "brender/brender.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -75,8 +75,7 @@ int PipeSearchForwards() {
 int IsActionReplayAvailable() {
     LOG_TRACE("()");
 
-    STUB_ONCE();
-    return 0;
+    return gPipe_buffer_start != NULL;
 }
 
 // IDA: int __cdecl SomeReplayLeft()
