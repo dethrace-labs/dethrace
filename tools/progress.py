@@ -12,7 +12,8 @@ import sys
 def main():
     parser = argparse.ArgumentParser(description=__help__, allow_abbrev=False)
     parser.add_argument("files", metavar="FILE", nargs="+", help="sources")
-    parser.add_argument("--sort", dest="sortkey", choices=["name", "percent", "completed", "total"], default="percent")
+    parser.add_argument("--sort", dest="sortkey", choices=["name", "percent", "completed", "total", "missing_contribution"], default="missing_contribution", help="key to sort on")
+    parser.add_argument("-r", "--reverse", action="store_true", help="sort reverse")
     args = parser.parse_args()
 
     files = []
@@ -65,34 +66,29 @@ def main():
                 'total': file_total,
             }
             files.append(file)
-        # if file_total > 0:    
-        #     total_funcs = total_funcs + file_total
-        #     stubbed_funcs = stubbed_funcs + file_stubbed
-        #     unimplemented_funcs = unimplemented_funcs + file_unimplemented
 
-        #     file_completed = 
-        #     file_percent_completed = round((file_completed / file_total) * 100)
+    total_nb_functions = sum(f['total'] for f in files)
+    total_implemented_functions = sum(f['completed'] for f in files)
+    total_missing_functions = total_nb_functions - total_implemented_functions
+    for f in files:
+        f['missing_contribution'] = 100 * (f['total'] - f['completed']) / total_missing_functions
 
-        #     print('{0}\t\t\t{1}%\t{2} / {3}'.format(file_name, file_percent_completed, file_completed, file_total))
-        #     #print(file_name, 'percent', str(file_percent_completed) + '%', 'total', file_total, 'stubbed', file_stubbed, 'not implemented', file_unimplemented)
-
-    #for gv in sorted(module['global_vars'], key=lambda x: x['addr_decimal']):
-    print('{0:45} {1:5}\t{2}'.format('name', 'percent', 'completed / total'))
+    print('{0:45} {1:>7} {2:>9} / {3:>5} {4:>7}'.format('name', 'percent', 'completed', 'total', 'missing'))
     print("=======================================")
 
     completed_funcs = 0
     total_funcs = 0
-    for f in sorted(files, key=lambda x: x[args.sortkey], reverse=True):
-        print('{0:45} {1:5}%\t{2:>4} / {3:>4}'.format(f['name'], f['percent'], f['completed'], f['total']))
+    for f in sorted(files, key=lambda x: x[args.sortkey], reverse=not args.reverse):
+        print('{0:45} {1:>6}% {2:>9} / {3:>5} {4:>6.2f}%'.format(f['name'], f['percent'], f['completed'], f['total'], f['missing_contribution']))
 
         total_funcs = total_funcs + f['total']
         completed_funcs = completed_funcs + f['completed']
 
 
-    print('{0:45} {1:5}\t{2:>4}'.format('name', 'percent', 'completed / total'))
+    print('{0:45} {1:>7} {2:>9} / {3:>5} {4:>7}'.format('name', 'percent', 'completed', 'total', 'missing'))
     print("=======================================")
     percent_completed = round((completed_funcs / total_funcs) * 100)
-    print('{0:45} {1:5}%\t{2:>4} / {3:>4}'.format('total', percent_completed, completed_funcs, total_funcs))
+    print('{0:45} {1:5}% {2:>9} / {3:>4}'.format('total', percent_completed, completed_funcs, total_funcs))
 
     print()
     print('Overall progress:')

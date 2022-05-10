@@ -284,18 +284,16 @@ void ResetLollipopQueue() {
 int AddToLollipopQueue(br_actor* pActor, int pIndex) {
     LOG_TRACE("(%p, %d)", pActor, pIndex);
 
-    int result; // eax
-
     if (pIndex >= 0) {
         gLollipops[pIndex] = pActor;
-        return pIndex;
     } else if (gNumber_of_lollipops >= 100) {
-        return -1;
+        pIndex = -1;
     } else {
         gLollipops[gNumber_of_lollipops] = pActor;
+        pIndex = gNumber_of_lollipops;
         gNumber_of_lollipops++;
-        return gNumber_of_lollipops - 1;
     }
+    return pIndex;
 }
 
 // IDA: void __cdecl RenderLollipops()
@@ -756,7 +754,7 @@ void NewScreenWobble(double pAmplitude_x, double pAmplitude_y, double pPeriod) {
     oldest_index = -1;
     oldest_time = INT_MAX;
     for (i = 0; i < COUNT_OF(gWobble_array); i++) {
-        if (!gWobble_array[i].time_started) {
+        if (gWobble_array[i].time_started == 0) {
             oldest_index = i;
             break;
         }
@@ -920,7 +918,7 @@ void DrawMapBlip(tCar_spec* pCar, tU32 pTime, br_matrix34* pTrans, br_vector3* p
         }
     }
     // Draw a rectangle around the fox
-    colour = colours[pTime & period];
+    colour = colours[!!(pTime & period)];
     if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_foxy && gNet_players[gIt_or_fox].car == pCar) {
         from_x = map_pos.v[0] - 8.f;
         from_y = map_pos.v[1] - 8.f;
@@ -958,8 +956,7 @@ void DrawMapSmallBlip(tU32 pTime, br_vector3* pPos, int pColour) {
             map_pos.v[0] = 2.f * map_pos.v[0];
             map_pos.v[1] = 2.f * map_pos.v[1] + 40.f;
         }
-        // FIXME: Use BrPixelmapPixelSet
-        offset = map_pos.v[0] + gBack_screen->row_bytes * map_pos.v[1];
+        offset = (int)map_pos.v[0] + gBack_screen->row_bytes * (int)map_pos.v[1];
         ((br_uint_8*)gBack_screen->pixels)[offset] = pColour;
     }
 }
@@ -1690,11 +1687,11 @@ void RenderAFrame(int pDepth_mask_on) {
             FlashyMapCheckpoint(gCheckpoint - 1, the_time);
         }
         if (gShow_peds_on_map || (gNet_mode && gCurrent_net_game->options.show_powerups_on_map)) {
-            for (i = 0; GetPedCount() > i; ++i) {
+            for (i = 0; i < GetPedCount(); i++) {
                 ped_type = GetPedPosition(i, &pos);
                 if (ped_type > 0 && gShow_peds_on_map) {
                     DrawMapSmallBlip(the_time, &pos, 52);
-                } else if (ped_type < 0 && (gNet_mode && gCurrent_net_game->options.show_powerups_on_map)) {
+                } else if (ped_type < 0 && (gNet_mode != eNet_mode_none && gCurrent_net_game->options.show_powerups_on_map)) {
                     DrawMapSmallBlip(the_time, &pos, 4);
                 }
             }
@@ -2065,6 +2062,7 @@ void DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int
         dest_row_wrap += pDest_x + pWidth - pDest->width;
         pWidth = pDest->width - pDest_x;
     }
+    // LOG_DEBUG("2 (src->width: %d, src->height: %d, pDest_x: %d, pDest_y: %d, pSource_x: %d, pSource_y: %d, pWidth: %d, pHeight: %d)", pSource->width, pSource->height, pDest_x, pDest_y, pSource_x, pSource_y, pWidth, pHeight);
     if (gCurrent_conversion_table != NULL) {
         conv_table = gCurrent_conversion_table->pixels;
         for (y_count = 0; y_count < pHeight; y_count++) {

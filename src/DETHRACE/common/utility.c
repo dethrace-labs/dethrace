@@ -327,8 +327,8 @@ int Chance(float pChance_per_second, int pPeriod) {
 float tandeg(float pAngle) {
     LOG_TRACE("(%f)", pAngle);
 
-    pAngle = sin(DEG_TO_RAD(pAngle));
-    return pAngle / cos(pAngle);
+    pAngle = DEG_TO_RAD(pAngle);
+    return sin(pAngle) / cos(pAngle);
 }
 
 // IDA: tU32 __usercall GetFileLength@<EAX>(FILE *pF@<EAX>)

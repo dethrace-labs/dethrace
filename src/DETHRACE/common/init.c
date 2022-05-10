@@ -57,11 +57,11 @@ void AllocateSelf() {
     LOG_TRACE("()");
 
     gSelf = BrActorAllocate(BR_ACTOR_NONE, NULL);
-    if (!gSelf) {
+    if (gSelf == NULL) {
         FatalError(6);
     }
     gSelf = BrActorAdd(gNon_track_actor, gSelf);
-    if (!gSelf) {
+    if (gSelf == NULL) {
         FatalError(6);
     }
 }
@@ -72,7 +72,7 @@ void AllocateCamera() {
     int i;
     LOG_TRACE("()");
 
-    for (i = 0; i < 2; i++) {
+    for (i = 0; i < COUNT_OF(gCamera_list); i++) {
         gCamera_list[i] = BrActorAllocate(BR_ACTOR_CAMERA, NULL);
         if (gCamera_list[i] == NULL) {
             FatalError(5);
@@ -133,7 +133,7 @@ void ReinitialiseForwardCamera() {
                 / (double)(gProgram_state.current_car.render_bottom[0] - gProgram_state.current_car.render_top[0]))
             * 114.5915590261646;
         camera_ptr->field_of_view = BrDegreeToAngle(d);
-        LOG_DEBUG("%d, %f", camera_ptr->field_of_view, d);
+        LOG_DEBUG("fov: %d (%f degrees)", camera_ptr->field_of_view, d);
         BrMatrix34Identity(&gCamera->t.t.mat);
         gCamera->t.t.mat.m[3][0] = gProgram_state.current_car.driver_x_offset;
         gCamera->t.t.mat.m[3][1] = gProgram_state.current_car.driver_y_offset;
@@ -143,10 +143,10 @@ void ReinitialiseForwardCamera() {
             - (gProgram_state.current_car.render_bottom[0] + gProgram_state.current_car.render_top[0]) / 2);
 
         gCamera->t.t.mat.m[2][1] = tandeg(d / 2.0) * w * 2.0 / (float)gRender_screen->height;
-        LOG_DEBUG("w %f, gCamera->t.t.mat.m[2][1] %f", w, gCamera->t.t.mat.m[2][1]);
-        camera_ptr->aspect = (double)gWidth / (double)gHeight;
+        LOG_DEBUG("w: %f, gCamera->t.t.mat.m[2][1]: %f", w, gCamera->t.t.mat.m[2][1]);
+        camera_ptr->aspect = (float)gWidth / gHeight;
         camera_ptr->yon_z = gYon_multiplier * gCamera_yon;
-        LOG_DEBUG("ascpect %f, yon %f", camera_ptr->aspect, camera_ptr->yon_z);
+        LOG_DEBUG("aspect: %f, yon: %f", camera_ptr->aspect, camera_ptr->yon_z);
         if (gProgram_state.which_view == eView_left) {
             DRMatrix34PostRotateY(
                 &gCamera->t.t.mat,
@@ -160,6 +160,7 @@ void ReinitialiseForwardCamera() {
         gCamera->t.t.mat.m[3][1] = gProgram_state.current_car.driver_y_offset;
         gCamera->t.t.mat.m[3][2] = gProgram_state.current_car.driver_z_offset;
         SetSightDistance(camera_ptr->yon_z);
+        MungeForwardSky();
     }
     AssertYons();
 }
@@ -600,7 +601,7 @@ void InitRace() {
         gShow_peds_on_map = 0;
     }
     PossibleService();
-    SetCarSuspGiveAndHeight(&gProgram_state.current_car, 1.0, 1.0, 1.0, 0.0, 0.0);
+    SetCarSuspGiveAndHeight(&gProgram_state.current_car, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f);
     InitPowerups();
     PossibleService();
     ResetSparks();

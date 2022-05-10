@@ -72,17 +72,17 @@ void XZToColumnXZ(tU8* pColumn_x, tU8* pColumn_z, br_scalar pX, br_scalar pZ, tT
 
     x = (pX - pTrack_spec->origin_x) / pTrack_spec->column_size_x;
     z = (pZ - pTrack_spec->origin_z) / pTrack_spec->column_size_z;
-    if (x < 0.0) {
-        x = 0.0;
+    if (x < 0.0f) {
+        x = 0.0f;
     }
-    if (pTrack_spec->ncolumns_x <= x) {
-        x = pTrack_spec->ncolumns_x - 1.0;
+    if (x >= pTrack_spec->ncolumns_x) {
+        x = pTrack_spec->ncolumns_x - 1.0f;
     }
-    if (z < 0.0) {
-        z = 0.0;
+    if (z < 0.0f) {
+        z = 0.0f;
     }
-    if (pTrack_spec->ncolumns_z <= z) {
-        z = pTrack_spec->ncolumns_z - 1.0;
+    if (z >= pTrack_spec->ncolumns_z) {
+        z = pTrack_spec->ncolumns_z - 1.0f;
     }
     *pColumn_x = x;
     *pColumn_z = z;
@@ -277,7 +277,7 @@ void ExtractColumns(tTrack_spec* pTrack_spec) {
     if (pTrack_spec->ampersand_digits <= 0) {
         pTrack_spec->non_car_list = NULL;
     } else {
-        pTrack_spec->non_car_list = BrMemAllocate(sizeof(intptr_t) * pTrack_spec->ampersand_digits, kMem_non_car_list);
+        pTrack_spec->non_car_list = BrMemAllocate(sizeof(br_actor*) * pTrack_spec->ampersand_digits, kMem_non_car_list);
     }
     if (unsplit) {
         **pTrack_spec->columns = pTrack_spec->the_actor;
@@ -407,7 +407,7 @@ void RenderTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, 
     static br_actor* result;
     LOG_TRACE("(%p, %p, %p, %p, %d)", pWorld, pTrack_spec, pCamera, pCamera_to_world, pRender_blends);
 
-    if (pTrack_spec->columns) {
+    if (pTrack_spec->columns != NULL) {
         if (pRender_blends) {
             DrawColumns(1, pTrack_spec, min_x, max_x, min_z, max_z, pCamera_to_world);
         } else {
@@ -417,7 +417,7 @@ void RenderTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, 
             max_x = column_x;
             min_z = column_z;
             max_z = column_z;
-            tan_fov_ish = sin(BrAngleToRadian(camera->field_of_view / 2)) / cos(BrAngleToRadian(camera->field_of_view / 2));
+            tan_fov_ish = sinf(BrAngleToRadian(camera->field_of_view / 2)) / cosf(BrAngleToRadian(camera->field_of_view / 2));
             edge_after.v[0] = camera->aspect * tan_fov_ish;
             edge_after.v[1] = tan_fov_ish;
             edge_after.v[2] = -1.0;
@@ -426,29 +426,23 @@ void RenderTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, 
             edge_before.v[2] = camera->yon_z * gYon_factor * -1.0;
             BrMatrix34ApplyV(&edge_after, &edge_before, pCamera_to_world);
             XZToColumnXZ(&column_x, &column_z, pCamera_to_world->m[3][0] + edge_after.v[0], pCamera_to_world->m[3][2] + edge_after.v[2], pTrack_spec);
-            if (column_x >= min_x) {
-                if (column_x > max_x) {
-                    max_x = column_x;
-                }
-            } else {
+            if (column_x < min_x) {
                 min_x = column_x;
+            } else if (column_x > max_x) {
+                max_x = column_x;
             }
-            if (column_z >= min_z) {
-                if (column_z > max_z) {
-                    max_z = column_z;
-                }
-            } else {
+            if (column_z < min_z) {
                 min_z = column_z;
+            } else if (column_z > max_z) {
+                max_z = column_z;
             }
             edge_before.v[0] = -edge_before.v[0];
             BrMatrix34ApplyV(&edge_after, &edge_before, pCamera_to_world);
             XZToColumnXZ(&column_x, &column_z, pCamera_to_world->m[3][0] + edge_after.v[0], pCamera_to_world->m[3][2] + edge_after.v[2], pTrack_spec);
-            if (column_x >= min_x) {
-                if (column_x > max_x) {
-                    max_x = column_x;
-                }
-            } else {
+            if (column_x < min_x) {
                 min_x = column_x;
+            } else if (column_x > max_x) {
+                max_x = column_x;
             }
             if (column_z >= min_z) {
                 if (column_z > max_z) {
@@ -460,44 +454,36 @@ void RenderTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, 
             edge_before.v[1] = -edge_before.v[1];
             BrMatrix34ApplyV(&edge_after, &edge_before, pCamera_to_world);
             XZToColumnXZ(&column_x, &column_z, pCamera_to_world->m[3][0] + edge_after.v[0], pCamera_to_world->m[3][2] + edge_after.v[2], pTrack_spec);
-            if (column_x >= min_x) {
-                if (column_x > max_x) {
-                    max_x = column_x;
-                }
-            } else {
+            if (column_x < min_x) {
                 min_x = column_x;
+            } else if (column_x > max_x) {
+                max_x = column_x;
             }
-            if (column_z >= min_z) {
-                if (column_z > max_z) {
-                    max_z = column_z;
-                }
-            } else {
+            if (column_z < min_z) {
                 min_z = column_z;
+            } else if (column_z > max_z) {
+                max_z = column_z;
             }
             edge_before.v[0] = -edge_before.v[0];
             BrMatrix34ApplyV(&edge_after, &edge_before, pCamera_to_world);
             XZToColumnXZ(&column_x, &column_z, pCamera_to_world->m[3][0] + edge_after.v[0], pCamera_to_world->m[3][2] + edge_after.v[2], pTrack_spec);
-            if (column_x >= min_x) {
-                if (column_x > max_x) {
-                    max_x = column_x;
-                }
-            } else {
+            if (column_x < min_x) {
                 min_x = column_x;
+            } else if (column_x > max_x) {
+                max_x = column_x;
             }
-            if (column_z >= min_z) {
-                if (column_z > max_z) {
-                    max_z = column_z;
-                }
-            } else {
+            if (column_z < min_z) {
                 min_z = column_z;
+            } else if (column_z > max_z) {
+                max_z = column_z;
             }
-            if (min_x) {
+            if (min_x != 0) {
                 min_x--;
             }
             if (pTrack_spec->ncolumns_x - 1 > max_x) {
                 max_x++;
             }
-            if (min_z) {
+            if (min_z != 0) {
                 min_z--;
             }
             if (pTrack_spec->ncolumns_z - 1 > max_z) {
@@ -512,10 +498,12 @@ void RenderTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, 
 
 // IDA: br_scalar __cdecl GetYonFactor()
 br_scalar GetYonFactor() {
+
     return gYon_factor;
 }
 
 // IDA: void __cdecl SetYonFactor(br_scalar pNew)
 void SetYonFactor(br_scalar pNew) {
+
     gYon_factor = pNew;
 }

@@ -28,3 +28,18 @@
     } while (0)
 
 #endif
+
+#define Vector3DistanceSquared(V1, V2) \
+    ((((V1)->v[0] - (V2)->v[0])) * (((V1)->v[0] - (V2)->v[0])) + (((V1)->v[1] - (V2)->v[1])) * (((V1)->v[1] - (V2)->v[1])) + (((V1)->v[2] - (V2)->v[2])) * (((V1)->v[2] - (V2)->v[2])))
+#define Vector3AreEqual(V1, V2) \
+    ((V1)->v[0] == (V2)->v[0] && (V1)->v[1] == (V2)->v[1] && (V1)->v[2] == (V2)->v[2])
+#define Vector3EqualElements(V, A, B, C) \
+    ((V)->v[0] == (A) && (V)->v[1] == (B) && (V)->v[2] == (C))
+#define Vector3IsZero(V) Vector3EqualElements((V), 0.f, 0.f, 0.f)
+
+#define SwapValuesUsingTemporary(V1, V2, T) \
+    do {                                    \
+        (T) = (V1);                         \
+        (V1) = (V2);                        \
+        (V2) = (T);                         \
+    } while (0)
