@@ -936,7 +936,6 @@ void MungePedestrianFrames(tPedestrian_data* pPedestrian) {
                     pPedestrian->current_frame--;
                     if (pPedestrian->current_frame < 0) {
                         pPedestrian->reverse_frames = 0;
-                        LOG_DEBUG("2");
                         ChangeActionTo(pPedestrian, 0, 1);
                     }
                 } else {
@@ -971,7 +970,6 @@ void MungePedestrianFrames(tPedestrian_data* pPedestrian) {
                     && pPedestrian->current_action != pPedestrian->non_fatal_ground_impact_action) {
                     MungePedestrianFrames(pPedestrian);
                 } else {
-                    LOG_DEBUG("3");
                     ChangeActionTo(pPedestrian, pPedestrian->after_impact_action, 1);
                     MungePedestrianPath(pPedestrian, gDanger_level, &gDanger_direction);
                 }
@@ -993,7 +991,6 @@ void MungePedestrianFrames(tPedestrian_data* pPedestrian) {
                 pPedestrian->current_frame--;
                 if (pPedestrian->current_frame < 0) {
                     pPedestrian->reverse_frames = 0;
-                    LOG_DEBUG("4");
                     ChangeActionTo(pPedestrian, 0, 1);
                 }
             } else {
@@ -1105,11 +1102,6 @@ void ChangeActionTo(tPedestrian_data* pPedestrian, int pAction_index, int pRedo_
         return;
     }
 
-    LOG_DEBUG("%d %d => %d, time %d", pPedestrian->ref_number, pPedestrian->current_action, pAction_index, GetTotalTime() - pPedestrian->last_action_change);
-    // if (GetTotalTime() - pPedestrian->last_action_change < 50) {
-    //     return;
-    //     // the_sound++;
-    // }
     pPedestrian->last_action_change = GetTotalTime();
     pPedestrian->current_action = pAction_index;
     pPedestrian->current_frame = -1;
@@ -1186,7 +1178,6 @@ int MungePedestrianAction(tPedestrian_data* pPedestrian, float pDanger_level) {
             break;
         }
     }
-    LOG_DEBUG("5 %d %d", start_index, end_index);
     ChangeActionTo(pPedestrian, choice, 1);
     return 1;
 }
@@ -2091,7 +2082,6 @@ void DoPedestrian(tPedestrian_data* pPedestrian, int pIndex) {
             MungePedestrianPath(pPedestrian, gDanger_level, &gDanger_direction);
             if (Vector3AreEqual(&pPedestrian->pos, &old_pos)
                 && (gReally_stupid_ped_bug_enable || (pPedestrian->actor->parent == gDont_render_actor && pPedestrian->done_initial && pPedestrian->sequences[pPedestrian->current_sequence].frame_rate_type == ePed_frame_speed))) {
-                LOG_DEBUG("10");
                 ChangeActionTo(pPedestrian, 0, 0);
             }
         }
