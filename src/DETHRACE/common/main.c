@@ -2,22 +2,22 @@
 #include <stdlib.h>
 
 #include "controls.h"
+#include "cutscene.h"
 #include "drmem.h"
 #include "errors.h"
 #include "globvars.h"
+#include "harness/config.h"
 #include "harness/trace.h"
 #include "init.h"
 #include "input.h"
 #include "loading.h"
 #include "loadsave.h"
 #include "network.h"
-#include "cutscene.h"
 #include "pd/sys.h"
-#include "s3/s3sound.h"
+#include "s3/s3.h"
 #include "sound.h"
 #include "structur.h"
 #include "utility.h"
-#include "harness/config.h"
 
 // IDA: void __cdecl QuitGame()
 void QuitGame() {
@@ -26,7 +26,6 @@ void QuitGame() {
     if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo) {
         DoDemoGoodbye();
     }
-
 
     NOT_IMPLEMENTED();
 }

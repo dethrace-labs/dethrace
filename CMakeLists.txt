@@ -18,6 +18,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 option(BUILD_TESTS "Build unit tests." OFF)
 
 find_package(SDL2 REQUIRED)
+find_package(SDL2_mixer REQUIRED)
 
 add_subdirectory(lib/libsmacker)
 add_subdirectory(lib/glad)

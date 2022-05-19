@@ -1,10 +1,14 @@
 add_library(s3 STATIC)
 
-target_include_directories(s3 PUBLIC
-    include
+target_include_directories(s3 
+    PUBLIC
+        include
+    PRIVATE
+        ${CMAKE_SOURCE_DIR}
+        ${SDL2_MIXER_INCLUDE_DIRS}       
 )
 
-target_link_libraries(s3 PRIVATE)
+target_link_libraries(s3 PRIVATE brender SDL2::SDL2 ${SDL2_MIXER_LIBRARIES} harness)
 
 if(NOT MSVC)
     target_compile_options(s3 PRIVATE
@@ -23,6 +27,21 @@ else()
 endif()
 
 target_sources(s3 PRIVATE
+    3d.c
+    3d.h
+    audio.c
+    audio.h
+    ioserv.c
+    ioserv.h
+    profile.c
+    profile.h
+    resource.c
+    resource.h
+    s3cda.c
+    s3cda.h
+    s3music.c
+    s3music.h
     s3sound.c
-    include/s3/s3sound.h
+    s3sound.h
+    
 )

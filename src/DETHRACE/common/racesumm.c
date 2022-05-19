@@ -1,21 +1,21 @@
 #include "racesumm.h"
-#include "cutscene.h"
+#include "brender/brender.h"
 #include "crush.h"
+#include "cutscene.h"
 #include "flicplay.h"
 #include "globvars.h"
 #include "globvrpb.h"
 #include "grafdata.h"
 #include "graphics.h"
+#include "harness/config.h"
+#include "harness/trace.h"
 #include "intrface.h"
 #include "loading.h"
 #include "network.h"
+#include "pd/sys.h"
+#include "s3/s3.h"
 #include "sound.h"
 #include "utility.h"
-#include "harness/config.h"
-#include "harness/trace.h"
-#include "pd/sys.h"
-#include "brender/brender.h"
-#include "s3/s3sound.h"
 #include <stdlib.h>
 
 int gPlayer_lookup[6];
@@ -366,32 +366,68 @@ int SummCheckGameOver(int* pCurrent_choice, int* pCurrent_mode) {
 // IDA: tSO_result __cdecl DoEndRaceSummary1()
 tSO_result DoEndRaceSummary1() {
     static tFlicette flicker_on[1] = {
-        {  43, { 218, 436 }, { 147, 353 } },
+        { 43, { 218, 436 }, { 147, 353 } },
     };
     static tFlicette flicker_off[1] = {
-        {  42, { 218, 436 }, { 147, 353 } },
+        { 42, { 218, 436 }, { 147, 353 } },
     };
     static tFlicette push[1] = {
         { 154, { 218, 436 }, { 147, 353 } },
     };
     static tMouse_area mouse_areas[1] = {
-        { { 218, 436 }, { 147, 353 }, { 281, 562 }, { 167, 401 },   0,   0,   0, NULL },
+        { { 218, 436 }, { 147, 353 }, { 281, 562 }, { 167, 401 }, 0, 0, 0, NULL },
     };
     static tInterface_spec interface_spec = {
-        0, 310, 0, 0, 0, 0, -1,
-        { -1,  0 }, {  0,  0 }, {  0,  0 }, {  0,  0 }, { NULL, NULL },
-        { -1,  0 }, {  0,  0 }, {  0,  0 }, {  0,  0 }, { NULL, NULL },
-        { -1,  0 }, {  0,  0 }, {  0,  0 }, {  0,  0 }, { NULL, NULL },
-        { -1,  0 }, {  1,  0 }, {  0,  0 }, {  0,  0 }, { NULL, NULL },
-        {  1,  1 }, { Summ1GoAhead, NULL},
-        {  1,  1 }, { NULL, NULL},
-        SummCheckGameOver, DrawSummary,
+        0,
+        310,
+        0,
+        0,
+        0,
+        0,
+        -1,
+        { -1, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { NULL, NULL },
+        { -1, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { NULL, NULL },
+        { -1, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { NULL, NULL },
+        { -1, 0 },
+        { 1, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { NULL, NULL },
+        { 1, 1 },
+        { Summ1GoAhead, NULL },
+        { 1, 1 },
+        { NULL, NULL },
+        SummCheckGameOver,
+        DrawSummary,
         20000,
-        NULL, StartSummary,
-        RaceSummaryDone, 0, { 0, 0 }, NULL, -1, 1,
-        COUNT_OF(flicker_on), flicker_on, flicker_off, push,
-        COUNT_OF(mouse_areas), mouse_areas,
-        0, NULL,
+        NULL,
+        StartSummary,
+        RaceSummaryDone,
+        0,
+        { 0, 0 },
+        NULL,
+        -1,
+        1,
+        COUNT_OF(flicker_on),
+        flicker_on,
+        flicker_off,
+        push,
+        COUNT_OF(mouse_areas),
+        mouse_areas,
+        0,
+        NULL,
     };
     int result;
     int completed_already;
@@ -429,8 +465,8 @@ tSO_result DoEndRaceSummary1() {
     return result;
 }
 
-//IDA: void __usercall PrepareBoundingRadius(br_model *model@<EAX>)
-// Suffix added to avoid duplicate symbol
+// IDA: void __usercall PrepareBoundingRadius(br_model *model@<EAX>)
+//  Suffix added to avoid duplicate symbol
 void PrepareBoundingRadius__racesumm(br_model* model) {
     float d;
     float max;
@@ -601,15 +637,15 @@ tSO_result DoEndRaceSummary2() {
     return eSO_continue;
 }
 
-//IDA: void __usercall DrawAnItem(int pX@<EAX>, int pY_index@<EDX>, int pFont_index@<EBX>, char *pText@<ECX>)
-// Suffix added to avoid duplicate symbol
+// IDA: void __usercall DrawAnItem(int pX@<EAX>, int pY_index@<EDX>, int pFont_index@<EBX>, char *pText@<ECX>)
+//  Suffix added to avoid duplicate symbol
 void DrawAnItem__racesumm(int pX, int pY_index, int pFont_index, char* pText) {
     LOG_TRACE("(%d, %d, %d, \"%s\")", pX, pY_index, pFont_index, pText);
     NOT_IMPLEMENTED();
 }
 
-//IDA: void __usercall DrawColumnHeading(int pStr_index@<EAX>, int pX@<EDX>)
-// Suffix added to avoid duplicate symbol
+// IDA: void __usercall DrawColumnHeading(int pStr_index@<EAX>, int pX@<EDX>)
+//  Suffix added to avoid duplicate symbol
 void DrawColumnHeading__racesumm(int pStr_index, int pX) {
     LOG_TRACE("(%d, %d)", pStr_index, pX);
 }

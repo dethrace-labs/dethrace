@@ -6,11 +6,11 @@
 #include "globvars.h"
 #include "harness/trace.h"
 #include "piping.h"
-#include "s3/s3sound.h"
+#include "s3/s3.h"
 #include "utility.h"
 
 int gSound_detail_level;
-int gVirgin_pass;
+int gVirgin_pass = 1;
 int gOld_sound_detail_level;
 int gLast_tune;
 int gRandom_MIDI_tunes[3];
@@ -67,7 +67,111 @@ void InitSound() {
     int car_channel_count;
     int ped_channel_count;
 
-    LOG_WARN("Not implmented");
+    // added
+    tPath_name the_path;
+
+    if (gVirgin_pass) {
+        PathCat(the_path, gApplication_path, "SOUND");
+        if (gProgram_state.sausage_eater_mode) {
+            PathCat(the_path, the_path, "KSOUND.TXT");
+        } else {
+            PathCat(the_path, the_path, "SOUND.TXT");
+        }
+        if (gSound_override) {
+            gSound_enabled = 0;
+            gSound_available = 0;
+        } else {
+            gSound_enabled = S3Init(the_path, gAusterity_mode) == 0;
+            gSound_available = gSound_enabled;
+        }
+        S3Set3DSoundEnvironment(0.14492753, -1.0, -1.0);
+        gVirgin_pass = 0;
+        gCD_is_disabled = 0;
+        UsePathFileToDetermineIfFullInstallation();
+    }
+    if (gSound_available == 0) {
+        return;
+    }
+
+    if (gSound_detail_level == 0) {
+        engine_channel_count = 2;
+        car_channel_count = 2;
+        ped_channel_count = 3;
+    } else if (gSound_detail_level == 1) {
+        engine_channel_count = 2;
+        car_channel_count = 3;
+        ped_channel_count = 4;
+    } else if (gSound_detail_level == 2) {
+        engine_channel_count = 6;
+        car_channel_count = 4;
+        ped_channel_count = 5;
+    }
+    if (!gIndexed_outlets[3]) {
+        gIndexed_outlets[3] = S3CreateOutlet(1, 1);
+        gDriver_outlet = gIndexed_outlets[3];
+        if (!gIndexed_outlets[3]) {
+            gSound_available = 0;
+            return;
+        }
+    }
+    if (!gIndexed_outlets[5]) {
+        gIndexed_outlets[5] = S3CreateOutlet(1, 1);
+        gMusic_outlet = gIndexed_outlets[5];
+        gMusic_available = gIndexed_outlets[5] != 0;
+        DRS3SetOutletVolume(gIndexed_outlets[5], 42 * gProgram_state.music_volume);
+    }
+    if (gSound_detail_level != gOld_sound_detail_level) {
+        if (gIndexed_outlets[1]) {
+            S3DisposeOutlet(gIndexed_outlets[1]);
+            gIndexed_outlets[1] = 0;
+        }
+        if (gIndexed_outlets[4]) {
+            S3DisposeOutlet(gIndexed_outlets[4]);
+            gIndexed_outlets[4] = 0;
+        }
+        if (gIndexed_outlets[2]) {
+            S3DisposeOutlet(gIndexed_outlets[2]);
+            gIndexed_outlets[2] = 0;
+        }
+        if (!gIndexed_outlets[2]) {
+            gIndexed_outlets[2] = S3CreateOutlet(engine_channel_count, engine_channel_count);
+            gEngine_outlet = gIndexed_outlets[2];
+            if (!gIndexed_outlets[2]) {
+                gSound_available = 0;
+                return;
+            }
+            DRS3SetOutletVolume(gIndexed_outlets[2], 42 * gProgram_state.effects_volume);
+        }
+        if (!gIndexed_outlets[1]) {
+            gIndexed_outlets[1] = S3CreateOutlet(car_channel_count, car_channel_count);
+            gCar_outlet = gIndexed_outlets[1];
+            if (!gIndexed_outlets[1]) {
+                gSound_available = 0;
+                return;
+            }
+            DRS3SetOutletVolume(gIndexed_outlets[1], 42 * gProgram_state.effects_volume);
+        }
+        if (!gIndexed_outlets[4]) {
+            gIndexed_outlets[4] = S3CreateOutlet(ped_channel_count, ped_channel_count);
+            gPedestrians_outlet = gIndexed_outlets[4];
+            if (!gIndexed_outlets[4]) {
+                gSound_available = 0;
+                return;
+            }
+            DRS3SetOutletVolume(gIndexed_outlets[4], 42 * gProgram_state.effects_volume);
+        }
+    }
+    if (!gIndexed_outlets[0]) {
+        gIndexed_outlets[0] = S3CreateOutlet(2, 2);
+        gEffects_outlet = gIndexed_outlets[0];
+        if (!gIndexed_outlets[0]) {
+            gSound_available = 0;
+            return;
+        }
+        DRS3SetOutletVolume(gIndexed_outlets[0], 42 * gProgram_state.effects_volume);
+    }
+    gOld_sound_detail_level = gSound_detail_level;
+    SetSoundVolumes();
 }
 
 // IDA: tS3_sound_tag __usercall DRS3StartSound@<EAX>(tS3_outlet_ptr pOutlet@<EAX>, tS3_sound_id pSound@<EDX>)
@@ -168,8 +272,7 @@ int DRS3OutletSoundsPlaying(tS3_outlet_ptr pOutlet) {
 int DRS3SoundStillPlaying(tS3_sound_tag pSound_tag) {
     LOG_TRACE("(%d)", pSound_tag);
 
-    STUB_ONCE();
-    return 1;
+    return gSound_enabled && S3SoundStillPlaying(pSound_tag);
 }
 
 // IDA: void __cdecl DRS3ShutDown()
@@ -181,7 +284,12 @@ void DRS3ShutDown() {
 // IDA: int __usercall DRS3SetOutletVolume@<EAX>(tS3_outlet_ptr pOutlet@<EAX>, tS3_volume pVolume@<EDX>)
 int DRS3SetOutletVolume(tS3_outlet_ptr pOutlet, tS3_volume pVolume) {
     LOG_TRACE("(%d, %d)", pOutlet, pVolume);
-    NOT_IMPLEMENTED();
+
+    if (gSound_enabled) {
+        return S3SetOutletVolume(pOutlet, pVolume);
+    } else {
+        return 0;
+    }
 }
 
 // IDA: int __usercall DRS3OverallVolume@<EAX>(tS3_volume pVolume@<EAX>)
@@ -225,7 +333,52 @@ void InitSoundSources() {
     tCar_spec* the_car;
     LOG_TRACE("()");
 
-    STUB();
+    // toggle = 0;
+    // if (!gSound_available) {
+    //     return;
+    // }
+    // if (!gSound_enabled) {
+    //     ToggleSoundEnable();
+    //     toggle = 1;
+    // }
+    // gCamera_position = *(br_vector3*)&gCamera_to_world.m[3][0];
+    // gCamera_left.v[0] = gCamera_to_world.m[0][0] * -1.0;
+    // gCamera_left.v[1] = gCamera_to_world.m[0][1] * -1.0;
+    // gCamera_left.v[2] = gCamera_to_world.m[0][2] * -1.0;
+    // S3BindListenerPositionBR(&gCamera_position);
+    // S3BindListenerVelocityBR(&gCamera_velocity);
+    // S3BindListenerLeftBR(&gCamera_left);
+    // if (!gSound_sources_inited) {
+    //     for (cat = eVehicle_self; cat <= eVehicle_rozzer; ++cat) {
+    //         if (cat) {
+    //             car_count = GetCarCount(cat);
+    //         } else {
+    //             car_count = 1;
+    //         }
+    //         for (i = 0; i < car_count; i++) {
+    //             PossibleService();
+    //             if (cat) {
+    //                 the_car = GetCarSpec(cat, i);
+    //             } else {
+    //                 the_car = &gProgram_state.current_car;
+    //             }
+    //             if (the_car->driver == eDriver_local_human || gSound_detail_level == 2 || cat == eVehicle_rozzer) {
+    //                 the_car->sound_source = S3CreateSoundSourceBR(&the_car->pos, &the_car->velocity_bu_per_sec, gIndexed_outlets[2]);
+    //                 if (the_car->sound_source) {
+    //                     if (cat == eVehicle_rozzer) {
+    //                         S3BindAmbientSound(gIndexed_outlets[2], 5350, the_car->sound_source, 250.0, 0, 0, 0, 0x10000, 0x10000);
+    //                     } else {
+    //                         S3BindAmbientSound(gIndexed_outlets[2], the_car->engine_noises[0], the_car->sound_source, 250.0, 0, 0, 0, 0x10000, 0x10000);
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     gSound_sources_inited = 1;
+    // }
+    // if (toggle) {
+    //     ToggleSoundEnable();
+    // }
 }
 
 // IDA: void __cdecl DisposeSoundSources()
@@ -245,8 +398,14 @@ tS3_sound_tag DRS3StartSound3D(tS3_outlet_ptr pOutlet, tS3_sound_id pSound, br_v
     tS3_sound_tag tag;
     LOG_TRACE("(%d, %d, %p, %p, %d, %d, %d, %d)", pOutlet, pSound, pInitial_position, pInitial_velocity, pRepeats, pVolume, pPitch, pSpeed);
 
-    STUB_ONCE();
+    if (!gSound_enabled) {
+        return 0;
+    }
+    if (pVolume && pSound != 1000 && (pSound < 3000 || pSound > 3007) && (pSound < 5300 || pSound > 5320)) {
+        PipeSingleSound(pOutlet, pSound, pVolume, 0, pPitch, pInitial_position);
+    }
     return 0;
+    // return S3StartSound3D(pOutlet, pSound, pInitial_position, pInitial_velocity, pRepeats, pVolume, pPitch, pSpeed);
 }
 
 // IDA: tS3_sound_tag __usercall DRS3StartSoundFromSource3@<EAX>(tS3_sound_source_ptr pSource@<EAX>, tS3_sound_id pSound@<EDX>, tS3_repeats pRepeats@<EBX>, tS3_volume pVolume@<ECX>, tS3_pitch pPitch, tS3_speed pSpeed)

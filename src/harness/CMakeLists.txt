@@ -13,7 +13,7 @@ target_include_directories(harness
         include
 )
 
-target_link_libraries(harness PRIVATE brender s3 cglm_headers)
+target_link_libraries(harness PRIVATE brender cglm_headers)
 
 if(WIN32)
     target_link_libraries(harness PRIVATE dbghelp)

@@ -47,18 +47,18 @@ Lots of other fun things are available from the [Road Reaction site](https://rr2
 
 ## Dependencies
 
-### SDL2
+### SDL2, SDL2_mixer
 
 The easiest way to install SDL is via your favorite package manager.
 
 OSX:
 ```sh
-brew install SDL2
+brew install SDL2 sdl2_mixer
 ```
 
 Linux:
 ```sh
-apt-get install libsdl2-dev
+apt-get install libsdl2-dev libsdl2-mixer-dev
 ```
 
  
@@ -108,7 +108,7 @@ export DETHRACE_ROOT_DIR=/path/to/carmageddon_splat_pack
 To run 
 
 ```sh
-make test
+./dethrace_test
 ```
 
 To run a single test

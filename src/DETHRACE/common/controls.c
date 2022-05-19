@@ -27,7 +27,7 @@
 #include "powerup.h"
 #include "pratcam.h"
 #include "replay.h"
-#include "s3/s3sound.h"
+#include "s3/s3.h"
 #include "sound.h"
 #include "spark.h"
 #include "structur.h"
@@ -164,7 +164,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
     },
     {
         // eEdit_mode_ped
-        { // F5
+        {
+            // F5
             TogglePedDetect,
             NULL,
             NULL,
@@ -174,7 +175,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // F6
+        {
+            // F6
             ShowPedPaths,
             NULL,
             NULL,
@@ -184,7 +186,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // F7
+        {
+            // F7
             NULL,
             NULL,
             NULL,
@@ -194,7 +197,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // F8
+        {
+            // F8
             NULL,
             NULL,
             NULL,
@@ -204,7 +208,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // F10
+        {
+            // F10
             DropPedPoint,
             DropPedPointAir,
             NULL,
@@ -214,7 +219,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             PullPedPointAir,
             NULL,
         },
-        { // F11
+        {
+            // F11
             DropInitPedPoint,
             DropInitPedPointAir,
             NULL,
@@ -224,7 +230,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // F12
+        {
+            // F12
             ScrubPedestrian,
             DeletePedPoint,
             NULL,
@@ -234,7 +241,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // 0
+        {
+            // 0
             NewPed0,
             NewPed0,
             NewPed0,
@@ -244,7 +252,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NewPed0,
             NewPed0,
         },
-        { // 1
+        {
+            // 1
             NewPed1,
             NewPed1,
             NewPed1,
@@ -254,7 +263,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NewPed1,
             NewPed1,
         },
-        { // 2
+        {
+            // 2
             NewPed2,
             NewPed2,
             NewPed2,
@@ -264,7 +274,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NewPed2,
             NewPed2,
         },
-        { // 3
+        {
+            // 3
             NewPed3,
             NewPed3,
             NewPed3,
@@ -274,7 +285,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NewPed3,
             NewPed3,
         },
-        { // 4
+        {
+            // 4
             NewPed4,
             NewPed4,
             NewPed4,
@@ -284,7 +296,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NewPed4,
             NewPed4,
         },
-        { // 5
+        {
+            // 5
             NewPed5,
             NewPed5,
             NewPed5,
@@ -294,7 +307,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NewPed5,
             NewPed5,
         },
-        { // 6
+        {
+            // 6
             NewPed6,
             NewPed6,
             NewPed6,
@@ -304,7 +318,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NewPed6,
             NewPed6,
         },
-        { // 7
+        {
+            // 7
             NewPed7,
             NewPed7,
             NewPed7,
@@ -314,7 +329,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NewPed7,
             NewPed7,
         },
-        { // 8
+        {
+            // 8
             NewPed8,
             NewPed8,
             NewPed8,
@@ -324,7 +340,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NewPed8,
             NewPed8,
         },
-        { // 9
+        {
+            // 9
             NewPed9,
             NewPed9,
             NewPed9,
@@ -334,7 +351,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NewPed9,
             NewPed9,
         },
-        { // not used
+        {
+            // not used
             NULL,
             NULL,
             NULL,
@@ -410,7 +428,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
     },
     {
         // eEdit_mode_damage
-        { // F5
+        {
+            // F5
             NULL,
             NULL,
             NULL,
@@ -420,7 +439,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // F6
+        {
+            // F6
             NULL,
             NULL,
             NULL,
@@ -430,7 +450,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // F7
+        {
+            // F7
             NULL,
             NULL,
             NULL,
@@ -440,7 +461,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // F8
+        {
+            // F8
             NULL,
             NULL,
             NULL,
@@ -450,7 +472,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // F10
+        {
+            // F10
             NULL,
             NULL,
             NULL,
@@ -460,7 +483,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // F11
+        {
+            // F11
             NULL,
             NULL,
             NULL,
@@ -470,7 +494,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // F12
+        {
+            // F12
             NULL,
             NULL,
             NULL,
@@ -480,7 +505,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // 0
+        {
+            // 0
             TDamageEngine,
             NULL,
             NULL,
@@ -490,7 +516,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // 1
+        {
+            // 1
             TDamageTrans,
             NULL,
             NULL,
@@ -500,7 +527,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // 2
+        {
+            // 2
             TDamageSteering,
             NULL,
             NULL,
@@ -510,7 +538,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // 3
+        {
+            // 3
             TDamageLFWheel,
             NULL,
             NULL,
@@ -520,7 +549,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // 4
+        {
+            // 4
             TDamageLRWheel,
             NULL,
             NULL,
@@ -530,7 +560,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // 5
+        {
+            // 5
             TDamageRFWheel,
             NULL,
             NULL,
@@ -540,7 +571,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // 6
+        {
+            // 6
             TDamageRRWheel,
             NULL,
             NULL,
@@ -550,7 +582,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // 7
+        {
+            // 7
             TDamageDriver,
             NULL,
             NULL,
@@ -560,7 +593,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // 8
+        {
+            // 8
             NULL,
             NULL,
             NULL,
@@ -570,7 +604,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // 9
+        {
+            // 9
             NULL,
             NULL,
             NULL,
@@ -580,7 +615,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // not used
+        {
+            // not used
             NULL,
             NULL,
             NULL,
@@ -614,7 +650,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
     },
     {
         // eEdit_mode_options
-        { // F5
+        {
+            // F5
             NULL,
             NULL,
             NULL,
@@ -624,7 +661,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // F6
+        {
+            // F6
             NULL,
             NULL,
             NULL,
@@ -634,16 +672,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // F7
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,},
-        { // F8
+        {
+            // F7
             NULL,
             NULL,
             NULL,
@@ -653,7 +683,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // F10
+        {
+            // F8
             NULL,
             NULL,
             NULL,
@@ -663,7 +694,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // F11
+        {
+            // F10
             NULL,
             NULL,
             NULL,
@@ -673,7 +705,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // F12
+        {
+            // F11
             NULL,
             NULL,
             NULL,
@@ -683,7 +716,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // 0
+        {
+            // F12
             NULL,
             NULL,
             NULL,
@@ -693,7 +727,19 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // 1
+        {
+            // 0
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // 1
             CycleCarSimplificationLevel,
             NULL,
             NULL,
@@ -703,7 +749,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // 2
+        {
+            // 2
             ToggleShadow,
             NULL,
             NULL,
@@ -713,7 +760,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // 3
+        {
+            // 3
             CycleWallTexturingLevel,
             NULL,
             NULL,
@@ -723,7 +771,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // 4
+        {
+            // 4
             ToggleSky,
             NULL,
             NULL,
@@ -733,7 +782,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // 5
+        {
+            // 5
             CycleYonFactor,
             NULL,
             NULL,
@@ -743,7 +793,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // 6
+        {
+            // 6
             DecreaseYon,
             NULL,
             NULL,
@@ -753,7 +804,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // 7
+        {
+            // 7
             CycleSoundDetailLevel,
             NULL,
             NULL,
@@ -763,7 +815,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // 8
+        {
+            // 8
             NULL,
             NULL,
             NULL,
@@ -773,7 +826,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // 9
+        {
+            // 9
             NULL,
             NULL,
             NULL,
@@ -783,7 +837,8 @@ tEdit_func* gEdit_funcs[10][18][8] = {
             NULL,
             NULL,
         },
-        { // not used
+        {
+            // not used
             NULL,
             NULL,
             NULL,

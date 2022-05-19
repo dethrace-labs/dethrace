@@ -1,6 +1,10 @@
 #ifndef S3_TYPES_H
 #define S3_TYPES_H
 
+#include <stdint.h>
+
+// Internal typedefs
+
 typedef float tF32;
 typedef char* tS3_sound_source_ptr;
 typedef int tS3_sound_tag;
@@ -59,7 +63,7 @@ typedef enum tS3_sound_type {
     eS3_ST_cda = 2
 } tS3_sound_type;
 
-typedef void tS3_outlet_callback(tS3_outlet_ptr, tS3_sound_tag, tS3_termination_reason);
+typedef void tS3_outlet_callback(tS3_outlet*, tS3_sound_tag, tS3_termination_reason);
 typedef void tS3_sample_filter(tS3_effect_tag, tS3_sound_tag);
 
 typedef struct tS3_vector3 {
@@ -94,6 +98,9 @@ typedef struct tS3_channel {
     char* type_struct_midi;
     char* type_struct_cda;
     tS3_sound_source* sound_source_ptr;
+
+    // Added by dethrace. Used to tie this channel to an SDL2_mixer channel
+    int id;
 } tS3_channel;
 
 typedef struct tS3_outlet {
@@ -125,6 +132,8 @@ typedef struct tS3_descriptor {
     int memory_proxy;
     char* sound_data;
     char* filename;
+    // LPDIRECTSOUNDBUFFER for example
+    void* sound_buffer;
 } tS3_descriptor;
 
 typedef struct tS3_sound_source {
@@ -166,5 +175,29 @@ typedef struct tS3_hardware_info {
     int min_sample_rate;
     int independent_pitch;
 } tS3_hardware_info;
+
+// Added by dethrace
+typedef struct tS3_soundbank_read_ctx {
+    int data_len;
+    int unk1;
+    int nlines;
+    char* data;
+} tS3_soundbank_read_ctx;
+
+// Added by dethrace
+#pragma pack(push, 1)
+typedef struct tWAVEFORMATEX_ {
+    int16_t wFormatTag;
+    int16_t nChannels;
+    int32_t nSamplesPerSec;
+    int32_t nAvgBytesPerSec;
+    int16_t nBlockAlign;
+    int16_t wBitsPerSample;
+    int16_t cbSize;
+} tWAVEFORMATEX_;
+#pragma pack(pop)
+
+extern int PDGetTotalTime();
+extern void dr_dprintf(char* fmt_string, ...);
 
 #endif

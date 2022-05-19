@@ -1,13 +1,13 @@
 #include "demo.h"
 #include "globvars.h"
 #include "graphics.h"
+#include "harness/trace.h"
 #include "input.h"
 #include "loading.h"
+#include "pd/sys.h"
+#include "s3/s3.h"
 #include "sound.h"
 #include "utility.h"
-#include "s3/s3sound.h"
-#include "pd/sys.h"
-#include "harness/trace.h"
 #include <stdlib.h>
 
 int gLast_demo;

@@ -27,7 +27,7 @@
 #include "powerup.h"
 #include "pratcam.h"
 #include "replay.h"
-#include "s3/s3sound.h"
+#include "s3/s3.h"
 #include "skidmark.h"
 #include "sound.h"
 #include "spark.h"
