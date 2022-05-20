@@ -92,7 +92,6 @@ void InitSound() {
     if (gSound_available == 0) {
         return;
     }
-
     if (gSound_detail_level == 0) {
         engine_channel_count = 2;
         car_channel_count = 2;
@@ -106,69 +105,69 @@ void InitSound() {
         car_channel_count = 4;
         ped_channel_count = 5;
     }
-    if (!gIndexed_outlets[3]) {
-        gIndexed_outlets[3] = S3CreateOutlet(1, 1);
-        gDriver_outlet = gIndexed_outlets[3];
-        if (!gIndexed_outlets[3]) {
+    if (gDriver_outlet == NULL) {
+        gDriver_outlet = S3CreateOutlet(1, 1);
+        gIndexed_outlets[0] = gDriver_outlet;
+        if (gDriver_outlet == NULL) {
             gSound_available = 0;
             return;
         }
     }
-    if (!gIndexed_outlets[5]) {
-        gIndexed_outlets[5] = S3CreateOutlet(1, 1);
-        gMusic_outlet = gIndexed_outlets[5];
-        gMusic_available = gIndexed_outlets[5] != 0;
-        DRS3SetOutletVolume(gIndexed_outlets[5], 42 * gProgram_state.music_volume);
+    if (!gMusic_outlet) {
+        gMusic_outlet = S3CreateOutlet(1, 1);
+        gIndexed_outlets[2] = gMusic_outlet;
+        gMusic_available = gMusic_outlet != 0;
+        DRS3SetOutletVolume(gMusic_outlet, 42 * gProgram_state.music_volume);
     }
     if (gSound_detail_level != gOld_sound_detail_level) {
-        if (gIndexed_outlets[1]) {
-            S3DisposeOutlet(gIndexed_outlets[1]);
-            gIndexed_outlets[1] = 0;
+        if (gCar_outlet) {
+            S3DisposeOutlet(gCar_outlet);
+            gCar_outlet = 0;
         }
-        if (gIndexed_outlets[4]) {
-            S3DisposeOutlet(gIndexed_outlets[4]);
-            gIndexed_outlets[4] = 0;
+        if (gPedestrians_outlet) {
+            S3DisposeOutlet(gPedestrians_outlet);
+            gPedestrians_outlet = 0;
         }
-        if (gIndexed_outlets[2]) {
-            S3DisposeOutlet(gIndexed_outlets[2]);
-            gIndexed_outlets[2] = 0;
+        if (gEngine_outlet) {
+            S3DisposeOutlet(gEngine_outlet);
+            gEngine_outlet = 0;
         }
-        if (!gIndexed_outlets[2]) {
-            gIndexed_outlets[2] = S3CreateOutlet(engine_channel_count, engine_channel_count);
-            gEngine_outlet = gIndexed_outlets[2];
-            if (!gIndexed_outlets[2]) {
+        if (gEngine_outlet == NULL) {
+            gEngine_outlet = S3CreateOutlet(engine_channel_count, engine_channel_count);
+            gIndexed_outlets[1] = gEngine_outlet;
+            if (!gEngine_outlet) {
                 gSound_available = 0;
                 return;
             }
-            DRS3SetOutletVolume(gIndexed_outlets[2], 42 * gProgram_state.effects_volume);
+            DRS3SetOutletVolume(gEngine_outlet, 42 * gProgram_state.effects_volume);
         }
-        if (!gIndexed_outlets[1]) {
-            gIndexed_outlets[1] = S3CreateOutlet(car_channel_count, car_channel_count);
-            gCar_outlet = gIndexed_outlets[1];
-            if (!gIndexed_outlets[1]) {
+        if (gCar_outlet == NULL) {
+            gCar_outlet = S3CreateOutlet(car_channel_count, car_channel_count);
+            gIndexed_outlets[3] = gCar_outlet;
+            if (!gCar_outlet) {
                 gSound_available = 0;
                 return;
             }
-            DRS3SetOutletVolume(gIndexed_outlets[1], 42 * gProgram_state.effects_volume);
+            DRS3SetOutletVolume(gCar_outlet, 42 * gProgram_state.effects_volume);
         }
-        if (!gIndexed_outlets[4]) {
-            gIndexed_outlets[4] = S3CreateOutlet(ped_channel_count, ped_channel_count);
-            gPedestrians_outlet = gIndexed_outlets[4];
-            if (!gIndexed_outlets[4]) {
+        if (gPedestrians_outlet == NULL) {
+            gPedestrians_outlet = S3CreateOutlet(ped_channel_count, ped_channel_count);
+            gIndexed_outlets[4] = gPedestrians_outlet;
+            if (!gPedestrians_outlet) {
                 gSound_available = 0;
                 return;
             }
-            DRS3SetOutletVolume(gIndexed_outlets[4], 42 * gProgram_state.effects_volume);
+            DRS3SetOutletVolume(gPedestrians_outlet, 42 * gProgram_state.effects_volume);
         }
     }
-    if (!gIndexed_outlets[0]) {
-        gIndexed_outlets[0] = S3CreateOutlet(2, 2);
-        gEffects_outlet = gIndexed_outlets[0];
-        if (!gIndexed_outlets[0]) {
+    if (gEffects_outlet == NULL) {
+        gEffects_outlet = S3CreateOutlet(2, 2);
+        gIndexed_outlets[5] = gEffects_outlet;
+        if (!gEffects_outlet) {
             gSound_available = 0;
             return;
         }
-        DRS3SetOutletVolume(gIndexed_outlets[0], 42 * gProgram_state.effects_volume);
+        DRS3SetOutletVolume(gEffects_outlet, 42 * gProgram_state.effects_volume);
     }
     gOld_sound_detail_level = gSound_detail_level;
     SetSoundVolumes();
@@ -363,12 +362,12 @@ void InitSoundSources() {
     //                 the_car = &gProgram_state.current_car;
     //             }
     //             if (the_car->driver == eDriver_local_human || gSound_detail_level == 2 || cat == eVehicle_rozzer) {
-    //                 the_car->sound_source = S3CreateSoundSourceBR(&the_car->pos, &the_car->velocity_bu_per_sec, gIndexed_outlets[2]);
+    //                 the_car->sound_source = S3CreateSoundSourceBR(&the_car->pos, &the_car->velocity_bu_per_sec, gEngine_outlet);
     //                 if (the_car->sound_source) {
     //                     if (cat == eVehicle_rozzer) {
-    //                         S3BindAmbientSound(gIndexed_outlets[2], 5350, the_car->sound_source, 250.0, 0, 0, 0, 0x10000, 0x10000);
+    //                         S3BindAmbientSound(gEngine_outlet, 5350, the_car->sound_source, 250.0, 0, 0, 0, 0x10000, 0x10000);
     //                     } else {
-    //                         S3BindAmbientSound(gIndexed_outlets[2], the_car->engine_noises[0], the_car->sound_source, 250.0, 0, 0, 0, 0x10000, 0x10000);
+    //                         S3BindAmbientSound(gEngine_outlet, the_car->engine_noises[0], the_car->sound_source, 250.0, 0, 0, 0, 0x10000, 0x10000);
     //                     }
     //                 }
     //             }

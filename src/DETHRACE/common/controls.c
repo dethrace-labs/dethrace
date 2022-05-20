@@ -1577,11 +1577,11 @@ void CheckHornLocal(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
 
     if (pCar->keys.horn && pCar->horn_sound_tag == 0) {
-        pCar->horn_sound_tag = DRS3StartSound(gIndexed_outlets[0], 5209);
+        pCar->horn_sound_tag = DRS3StartSound(gEffects_outlet, 5209);
     } else if (!pCar->keys.horn && pCar->horn_sound_tag != 0) {
         while (S3SoundStillPlaying(pCar->horn_sound_tag)) {
             DRS3StopSound(pCar->horn_sound_tag);
-            DRS3StopOutletSound(gIndexed_outlets[0]);
+            DRS3StopOutletSound(gEffects_outlet);
         }
         pCar->horn_sound_tag = 0;
     }
@@ -1864,7 +1864,7 @@ void CheckOtherRacingKeys() {
                 total_difference %= 100;
                 cost = 10 * (cost / 10);
                 if (((!total_repair_cost && cost) || bodywork_repair_amount != 0.0f) && !sound_tag) {
-                    sound_tag = DRS3StartSound(gIndexed_outlets[1], 5200);
+                    sound_tag = DRS3StartSound(gCar_outlet, 5200);
                 }
                 if (gProgram_state.current_car.num_smoke_columns) {
                     StopCarSmoking(&gProgram_state.current_car);
@@ -2188,7 +2188,7 @@ void BrakeInstantly() {
     if (gProgram_state.current_car.number_of_wheels_on_ground != 0 && BrVector3LengthSquared(&gProgram_state.current_car.v) > 0.0001f) {
         PratcamEvent(41);
         for (i = 0; i < 5; i++) {
-            DRS3StartSound(gIndexed_outlets[1], 9000 + i);
+            DRS3StartSound(gCar_outlet, 9000 + i);
         }
     }
     BrVector3Set(&gProgram_state.current_car.v, 0.f, 0.f, 0.f);

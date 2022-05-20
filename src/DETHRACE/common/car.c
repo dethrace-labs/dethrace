@@ -2717,9 +2717,9 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
                 if (point_vel > 10.0) {
                     noise_defeat = 1;
                     if (c->driver == eDriver_local_human) {
-                        DRS3StartSound(gIndexed_outlets[1], 9011);
+                        DRS3StartSound(gCar_outlet, 9011);
                     } else {
-                        DRS3StartSound3D(gIndexed_outlets[1], 9011, &c->pos, &gZero_v__car, 1, 255, 0x10000, 0x10000);
+                        DRS3StartSound3D(gCar_outlet, 9011, &c->pos, &gZero_v__car, 1, 255, 0x10000, 0x10000);
                     }
                     if (point_vel > 10000.0) {
                         BrVector3Normalise(&p_vel, &p_vel);
@@ -2950,7 +2950,7 @@ void ScrapeNoise(br_scalar vel, br_vector3* position, int material) {
     if (gCurrent_race.material_modifiers[material].scrape_noise_index != -1) {
         if (scrape_tag == 0 || (!DRS3SoundStillPlaying(scrape_tag) && vol > 30)) {
             BrVector3Set(&velocity, 0.f, 0.f, 0.f);
-            scrape_tag = DRS3StartSound3D(gIndexed_outlets[1],
+            scrape_tag = DRS3StartSound3D(gCar_outlet,
                 gMetal_scrape_sound_id__car[IRandomBetween(0, COUNT_OF(gMetal_scrape_sound_id__car) - 1)],
                 position, &velocity, 1, vol, IRandomBetween(49152, 81920), 0x10000);
             last_scrape_vol = vol;
@@ -2992,7 +2992,7 @@ void SkidNoise(tCar_spec* pC, int pWheel_num, br_scalar pV, int material) {
     BrVector3InvScale(&world_pos, &world_pos, WORLD_SCALE);
     if (!DRS3SoundStillPlaying(gSkid_tag[i]) || (pC->driver == eDriver_local_human && gLast_car_to_skid[i] != pC)) {
         gSkid_tag[i] = DRS3StartSound3D(
-            gIndexed_outlets[1],
+            gCar_outlet,
             IRandomBetween(0, 4) + 9000,
             &world_pos,
             &pC->velocity_bu_per_sec,
@@ -3042,7 +3042,7 @@ void CrashNoise(br_vector3* pForce, br_vector3* position, int material) {
             last_crunch_vol = vol;
             (void)last_crunch_vol;
             BrVector3Set(&velocity, 0.f, 0.f, 0.f);
-            crunch_tag = DRS3StartSound3D(gIndexed_outlets[1],
+            crunch_tag = DRS3StartSound3D(gCar_outlet,
                 gMetal_crunch_sound_id__car[IRandomBetween(0, COUNT_OF(gMetal_crunch_sound_id__car) - 1)],
                 position, &velocity, 1, vol, IRandomBetween(49152, 81920), 0x10000);
         }

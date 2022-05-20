@@ -46,7 +46,7 @@ void DoDemo() {
     }
 
     ClearEntireScreen();
-    song_tag = S3StartSound(gIndexed_outlets[0], 10000);
+    song_tag = S3StartSound(gEffects_outlet, 10000);
     DRSetPalette(gRender_palette);
     FadePaletteUp();
 
@@ -60,14 +60,14 @@ void DoDemo() {
             // FIXME: sleep? SoundService?
         }
         if (!S3SoundStillPlaying(song_tag)) {
-            song_tag = S3StartSound(gIndexed_outlets[0], 10000);
+            song_tag = S3StartSound(gEffects_outlet, 10000);
         }
         if (AnyKeyDown() || EitherMouseButtonDown() || feof(f)) {
             break;
         }
     }
     S3StopSound(song_tag);
-    S3StopAllOutletSounds(gIndexed_outlets[0]);
+    S3StopAllOutletSounds(gEffects_outlet);
     S3StopAllOutletSounds();
     fclose(f);
     FadePaletteDown();

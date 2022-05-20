@@ -9,6 +9,7 @@
 #include "globvrpb.h"
 #include "grafdata.h"
 #include "graphics.h"
+#include "harness/config.h"
 #include "harness/trace.h"
 #include "input.h"
 #include "intrface.h"
@@ -20,7 +21,6 @@
 #include "structur.h"
 #include "utility.h"
 #include "world.h"
-#include "harness/config.h"
 #include <stdlib.h>
 
 int gGrid_number_colour[4] = { 49u, 201u, 1u, 201u };
@@ -75,7 +75,7 @@ void DrawRaceList(int pOffset) {
     left_most = (gCurrent_graf_data->choose_race_rank_right - 2 * gBig_font->width[48] + gCurrent_graf_data->choose_race_left) / 2;
     right_most = gCurrent_graf_data->choose_race_right - (left_most - gCurrent_graf_data->choose_race_left);
     BrPixelmapRectangleFill(gBack_screen,
-        left_most, 
+        left_most,
         gCurrent_graf_data->choose_race_y_top,
         gCurrent_graf_data->choose_race_right - gCurrent_graf_data->choose_race_left - 2 * (left_most - gCurrent_graf_data->choose_race_left),
         gCurrent_graf_data->choose_race_y_bottom - gCurrent_graf_data->choose_race_y_top,
@@ -173,7 +173,8 @@ void MoveRaceList(int pFrom, int pTo, tS32 pTime_to_move) {
     start_time = PDGetTotalTime();
     while (1) {
         the_time = PDGetTotalTime();
-        if (start_time + pTime_to_move <= the_time) break;
+        if (start_time + pTime_to_move <= the_time)
+            break;
         DrawRaceList((the_time - start_time) * (pTo - pFrom) * pitch / pTime_to_move + pitch * pFrom);
     }
     DrawRaceList(pitch * pTo);
@@ -187,7 +188,7 @@ int UpRace(int* pCurrent_choice, int* pCurrent_mode) {
         gStart_interface_spec->pushed_flics[2].x[gGraf_data_index],
         gStart_interface_spec->pushed_flics[2].y[gGraf_data_index],
         1);
-    DRS3StartSound(gIndexed_outlets[0], 3000);
+    DRS3StartSound(gEffects_outlet, 3000);
     if (gCurrent_race_index != 0 && (gRace_list[gCurrent_race_index - 1].best_rank <= gProgram_state.rank || gProgram_state.game_completed || gChange_race_net_mode)) {
         RemoveTransientBitmaps(1);
         MoveRaceList(gCurrent_race_index, gCurrent_race_index - 1, 150);
@@ -203,7 +204,7 @@ int DownRace(int* pCurrent_choice, int* pCurrent_mode) {
         gStart_interface_spec->pushed_flics[3].x[gGraf_data_index],
         gStart_interface_spec->pushed_flics[3].y[gGraf_data_index],
         1);
-    DRS3StartSound(gIndexed_outlets[0], 3000);
+    DRS3StartSound(gEffects_outlet, 3000);
     if (gCurrent_race_index < gNumber_of_races - 1 && (gProgram_state.rank <= gRace_list[gCurrent_race_index + 1].rank_required || gProgram_state.game_completed || gChange_race_net_mode)) {
         RemoveTransientBitmaps(1);
         MoveRaceList(gCurrent_race_index, gCurrent_race_index + 1, 150);
@@ -260,38 +261,38 @@ void StartChangeRace() {
 // IDA: int __usercall ChangeRace@<EAX>(int *pRace_index@<EAX>, int pNet_mode@<EDX>, tNet_sequence_type pNet_race_sequence@<EBX>)
 int ChangeRace(int* pRace_index, int pNet_mode, tNet_sequence_type pNet_race_sequence) {
     static tFlicette flicker_on[4] = {
-        {  43, {  60, 120 }, { 154, 370 } },
-        {  43, { 221, 442 }, { 154, 370 } },
-        { 221, {  30,  60 }, {  78, 187 } },
-        { 221, {  30,  60 }, {  78, 187 } },
+        { 43, { 60, 120 }, { 154, 370 } },
+        { 43, { 221, 442 }, { 154, 370 } },
+        { 221, { 30, 60 }, { 78, 187 } },
+        { 221, { 30, 60 }, { 78, 187 } },
     };
     static tFlicette flicker_off[4] = {
-        {  42, {  60, 120 }, { 154, 370 } },
-        {  42, { 221, 442 }, { 154, 370 } },
-        { 220, {  30,  60 }, {  78, 187 } },
-        { 220, {  30,  60 }, {  78, 187 } },
+        { 42, { 60, 120 }, { 154, 370 } },
+        { 42, { 221, 442 }, { 154, 370 } },
+        { 220, { 30, 60 }, { 78, 187 } },
+        { 220, { 30, 60 }, { 78, 187 } },
     };
     static tFlicette push[4] = {
-        { 154, {  60, 120 }, { 154, 370 } },
-        {  45, { 221, 442 }, { 154, 370 } },
-        { 222, {  30,  60 }, {  78, 187 } },
-        { 225, {  30,  60 }, { 118, 283 } },
+        { 154, { 60, 120 }, { 154, 370 } },
+        { 45, { 221, 442 }, { 154, 370 } },
+        { 222, { 30, 60 }, { 78, 187 } },
+        { 225, { 30, 60 }, { 118, 283 } },
     };
     static tMouse_area mouse_areas[5] = {
-        { {  60, 120 }, { 154, 370 }, { 125, 250 }, { 174, 418 },   0,   0,   0, NULL },
-        { { 221, 442 }, { 154, 370 }, { 286, 572 }, { 174, 418 },   1,   0,   0, NULL },
-        { {  30,  60 }, {  78, 187 }, {  45,  90 }, { 104, 250 },  -1,   0,   0, UpClickRace },
-        { {  30,  60 }, { 118, 283 }, {  45,  90 }, { 145, 348 },  -1,   0,   0, DownClickRace },
-        { {  66, 132 }, {  33,  79 }, { 278, 556 }, { 144, 346 },  -1,   0,   0, ClickOnRace },
+        { { 60, 120 }, { 154, 370 }, { 125, 250 }, { 174, 418 }, 0, 0, 0, NULL },
+        { { 221, 442 }, { 154, 370 }, { 286, 572 }, { 174, 418 }, 1, 0, 0, NULL },
+        { { 30, 60 }, { 78, 187 }, { 45, 90 }, { 104, 250 }, -1, 0, 0, UpClickRace },
+        { { 30, 60 }, { 118, 283 }, { 45, 90 }, { 145, 348 }, -1, 0, 0, DownClickRace },
+        { { 66, 132 }, { 33, 79 }, { 278, 556 }, { 144, 346 }, -1, 0, 0, ClickOnRace },
     };
     static tInterface_spec interface_spec = {
         0, 230, 60, 231, 231, 231, 6,
-        { -1,  0}, { -1,  0}, {  0,  0 }, {  1,  0}, { NULL, NULL },
-        { -1,  0}, {  1,  0}, {  0,  0 }, {  1,  0}, { NULL, NULL },
-        { -1,  0}, {  0,  0}, {  0,  0 }, {  0,  0}, { UpRace, NULL },
-        { -1,  0}, {  0,  0}, {  0,  0 }, {  0,  0}, { DownRace, NULL },
+        { -1, 0 }, { -1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { -1, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { UpRace, NULL },
+        { -1, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { DownRace, NULL },
         { 1, 1 }, { NULL, NULL }, { 1, 1 }, { NULL, NULL },
-        NULL, NULL, 0, NULL, StartChangeRace, NULL, 0, {0,0},
+        NULL, NULL, 0, NULL, StartChangeRace, NULL, 0, { 0, 0 },
         NULL, 1, 1, COUNT_OF(flicker_on), flicker_on, flicker_off, push,
         COUNT_OF(mouse_areas), mouse_areas, 0, NULL
     };
@@ -397,7 +398,7 @@ int UpCar(int* pCurrent_choice, int* pCurrent_mode) {
         gStart_interface_spec->pushed_flics[2].x[gGraf_data_index],
         gStart_interface_spec->pushed_flics[2].y[gGraf_data_index],
         1);
-    DRS3StartSound(gIndexed_outlets[0], 3000);
+    DRS3StartSound(gEffects_outlet, 3000);
     if (gCurrent_car_index != 0) {
         RemoveTransientBitmaps(1);
         DropOutImageThruBottom(GetPanelPixelmap(0),
@@ -424,7 +425,7 @@ int DownCar(int* pCurrent_choice, int* pCurrent_mode) {
         gStart_interface_spec->pushed_flics[3].x[gGraf_data_index],
         gStart_interface_spec->pushed_flics[3].y[gGraf_data_index],
         1);
-    DRS3StartSound(gIndexed_outlets[0], 3000);
+    DRS3StartSound(gEffects_outlet, 3000);
     if (gCurrent_car_index < gProgram_state.number_of_cars - 1) {
         RemoveTransientBitmaps(1);
         DropOutImageThruTop(GetPanelPixelmap(0),
@@ -466,7 +467,7 @@ int ChangeCarGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     if (gChange_race_net_mode == 0 || gCar_details[gProgram_state.cars_available[gCurrent_car_index]].ownership != eCar_owner_someone) {
         return 1;
     } else {
-        DRS3StartSound(gIndexed_outlets[0], 3100);
+        DRS3StartSound(gEffects_outlet, 3100);
         return 0;
     }
 }
@@ -474,41 +475,80 @@ int ChangeCarGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 // IDA: int __usercall ChangeCar@<EAX>(int pNet_mode@<EAX>, int *pCar_index@<EDX>, tNet_game_details *pNet_game@<EBX>)
 int ChangeCar(int pNet_mode, int* pCar_index, tNet_game_details* pNet_game) {
     static tFlicette flicker_on[4] = {
-        {  43, {  60, 120 }, { 154, 370 } },
-        {  43, { 221, 442 }, { 154, 370 } },
-        { 221, {  30,  60 }, {  78, 187 } },
-        { 221, {  30,  60 }, {  78, 187 } },
+        { 43, { 60, 120 }, { 154, 370 } },
+        { 43, { 221, 442 }, { 154, 370 } },
+        { 221, { 30, 60 }, { 78, 187 } },
+        { 221, { 30, 60 }, { 78, 187 } },
     };
     static tFlicette flicker_off[4] = {
-        {  42, {  60, 120 }, { 154, 370 } },
-        {  42, { 221, 442 }, { 154, 370 } },
-        { 220, {  30,  60 }, {  78, 187 } },
-        { 220, {  30,  60 }, {  78, 187 } },
+        { 42, { 60, 120 }, { 154, 370 } },
+        { 42, { 221, 442 }, { 154, 370 } },
+        { 220, { 30, 60 }, { 78, 187 } },
+        { 220, { 30, 60 }, { 78, 187 } },
     };
     static tFlicette push[4] = {
-        { 154, {  60, 120 }, { 154, 370 } },
-        {  45, { 221, 442 }, { 154, 370 } },
-        { 222, {  30,  60 }, {  78, 187 } },
-        { 225, {  30,  60 }, { 118, 283 } },
+        { 154, { 60, 120 }, { 154, 370 } },
+        { 45, { 221, 442 }, { 154, 370 } },
+        { 222, { 30, 60 }, { 78, 187 } },
+        { 225, { 30, 60 }, { 118, 283 } },
     };
     static tMouse_area mouse_areas[4] = {
-        { {  60, 120 }, { 154, 370 }, { 125, 250 }, { 174, 418 },   0,   0,   0, NULL },
-        { { 221, 442 }, { 154, 370 }, { 286, 572 }, { 174, 418 },   1,   0,   0, NULL },
-        { {  30,  60 }, {  78, 187 }, {  45,  90 }, { 104, 250 },  -1,   0,   0, UpClickCar },
-        { {  30,  60 }, { 118, 283 }, {  45,  90 }, { 145, 348 },  -1,   0,   0, DownClickCar },
+        { { 60, 120 }, { 154, 370 }, { 125, 250 }, { 174, 418 }, 0, 0, 0, NULL },
+        { { 221, 442 }, { 154, 370 }, { 286, 572 }, { 174, 418 }, 1, 0, 0, NULL },
+        { { 30, 60 }, { 78, 187 }, { 45, 90 }, { 104, 250 }, -1, 0, 0, UpClickCar },
+        { { 30, 60 }, { 118, 283 }, { 45, 90 }, { 145, 348 }, -1, 0, 0, DownClickCar },
     };
     static tInterface_spec interface_spec = {
-        0, 236, 62, 0, 0, 0, -1,
-        { -1,  0 }, { -1,  0 }, {  0,  0 }, {  1,  0 }, { NULL, NULL },
-        { -1,  0 }, {  1,  0 }, {  0,  0 }, {  1,  0 }, { NULL, NULL },
-        { -1,  0 }, {  0,  0 }, {  0,  0 }, {  0,  0 }, { UpCar, NULL },
-        { -1,  0 }, {  0,  0 }, {  0,  0 }, {  0,  0 }, { DownCar, NULL },
-        {  1,  1 }, { ChangeCarGoAhead, NULL},
-        {  1,  1 }, { NULL, NULL },
-        NULL, DrawCar, 0, NULL, NULL, NULL, 0, {  0,  0 }, NULL, 1, 1,
-        COUNT_OF(flicker_on), flicker_on, flicker_off, push,
-        COUNT_OF(mouse_areas), mouse_areas,
-        0, NULL,
+        0,
+        236,
+        62,
+        0,
+        0,
+        0,
+        -1,
+        { -1, 0 },
+        { -1, 0 },
+        { 0, 0 },
+        { 1, 0 },
+        { NULL, NULL },
+        { -1, 0 },
+        { 1, 0 },
+        { 0, 0 },
+        { 1, 0 },
+        { NULL, NULL },
+        { -1, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { UpCar, NULL },
+        { -1, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { DownCar, NULL },
+        { 1, 1 },
+        { ChangeCarGoAhead, NULL },
+        { 1, 1 },
+        { NULL, NULL },
+        NULL,
+        DrawCar,
+        0,
+        NULL,
+        NULL,
+        NULL,
+        0,
+        { 0, 0 },
+        NULL,
+        1,
+        1,
+        COUNT_OF(flicker_on),
+        flicker_on,
+        flicker_off,
+        push,
+        COUNT_OF(mouse_areas),
+        mouse_areas,
+        0,
+        NULL,
     };
     int i;
     int result;
@@ -855,7 +895,7 @@ int TryToMoveToArrows(int* pCurrent_choice, int* pCurrent_mode) {
     }
     *pCurrent_choice = 5;
     *pCurrent_mode = 1;
-    DRS3StartSound(gIndexed_outlets[0], 3000);
+    DRS3StartSound(gEffects_outlet, 3000);
     return 1;
 }
 
@@ -867,7 +907,7 @@ int UpOpponent(int* pCurrent_choice, int* pCurrent_mode) {
         gStart_interface_spec->pushed_flics[5].x[gGraf_data_index],
         gStart_interface_spec->pushed_flics[5].y[gGraf_data_index],
         1);
-    DRS3StartSound(gIndexed_outlets[0], 3000);
+    DRS3StartSound(gEffects_outlet, 3000);
     DropOutImageThruBottom(GetPanelPixelmap(0),
         gCurrent_graf_data->start_race_panel_left,
         gCurrent_graf_data->start_race_panel_top,
@@ -893,7 +933,7 @@ int DownOpponent(int* pCurrent_choice, int* pCurrent_mode) {
         gStart_interface_spec->pushed_flics[6].x[gGraf_data_index],
         gStart_interface_spec->pushed_flics[6].y[gGraf_data_index],
         1);
-    DRS3StartSound(gIndexed_outlets[0], 3000);
+    DRS3StartSound(gEffects_outlet, 3000);
     DropOutImageThruTop(GetPanelPixelmap(0),
         gCurrent_graf_data->start_race_panel_left,
         gCurrent_graf_data->start_race_panel_top,
@@ -1056,8 +1096,8 @@ void SelectRaceDraw(int pCurrent_choice, int pCurrent_mode) {
     if (*test == 0x27645433 && test[1] == 0x758F0015) {
         // cheat code: "KEVWOZEAR"
         gProgram_state.game_completed = 1;
-        DRS3StartSound(gIndexed_outlets[0], 3202);
-        DRS3StartSound(gIndexed_outlets[0], 3202);
+        DRS3StartSound(gEffects_outlet, 3202);
+        DRS3StartSound(gEffects_outlet, 3202);
     }
     if (*test == 0x33F75455 && test[1] == 0xC10AAAF2) {
         // cheat code: "IWANTTOFIDDLE"
@@ -1074,7 +1114,7 @@ void SelectRaceDraw(int pCurrent_choice, int pCurrent_mode) {
         PDFileUnlock(s);
         f = fopen(s, "wb");
         if (f) {
-            DRS3StartSound(gIndexed_outlets[0], 9000);
+            DRS3StartSound(gEffects_outlet, 9000);
             if (gDecode_thing) {
                 for (i = 0; i < strlen(gDecode_string); i++) {
                     gDecode_string[i] -= 50;
@@ -1105,7 +1145,7 @@ void SelectRaceDraw(int pCurrent_choice, int pCurrent_mode) {
             PathCat(s, "64X48X8", "FONTS");
             EncodeAllFilesInDirectory(s);
         }
-        DRS3StartSound(gIndexed_outlets[0], 9000);
+        DRS3StartSound(gEffects_outlet, 9000);
     }
 }
 
@@ -1166,56 +1206,56 @@ tSO_result DoSelectRace(int* pSecond_time_around) {
     };
 
     static tInterface_spec interface_spec = {
-        0, // initial_imode
-        191, // first_opening_flic
-        190, // second_opening_flic
-        0, // end_flic_go_ahead
-        0, // end_flic_escaped
-        0, // end_flic_otherwise
-        6, // flic_bunch_to_load
-        { -1, 0 }, // move_left_new_mode
-        { 0, -4 }, // move_left_delta
-        { 0, 1 }, // move_left_min
-        { 0, 1 }, // move_left_max
+        0,                            // initial_imode
+        191,                          // first_opening_flic
+        190,                          // second_opening_flic
+        0,                            // end_flic_go_ahead
+        0,                            // end_flic_escaped
+        0,                            // end_flic_otherwise
+        6,                            // flic_bunch_to_load
+        { -1, 0 },                    // move_left_new_mode
+        { 0, -4 },                    // move_left_delta
+        { 0, 1 },                     // move_left_min
+        { 0, 1 },                     // move_left_max
         { &TryToMoveToArrows, NULL }, // move_left_proc
-        { -1, 0 }, // move_right_new_mode
-        { 0, -4 }, // move_right_delta
-        { 0, 1 }, // move_right_min
-        { 0, 1 }, // move_right_max
+        { -1, 0 },                    // move_right_new_mode
+        { 0, -4 },                    // move_right_delta
+        { 0, 1 },                     // move_right_min
+        { 0, 1 },                     // move_right_max
         { &TryToMoveToArrows, NULL }, // move_right_proc
-        { -1, -1 }, // move_up_new_mode
-        { -1, 0 }, // move_up_delta
-        { 0, 5 }, // move_up_min
-        { 4, 5 }, // move_up_max
-        { NULL, &UpOpponent }, // move_up_proc
-        { -1, -1 }, // move_down_new_mode
-        { 1, 0 }, // move_down_delta
-        { 0, 5 }, // move_down_min
-        { 4, 5 }, // move_down_max
-        { NULL, &DownOpponent }, // move_down_proc
-        { 1, 1 }, // go_ahead_allowed
-        { &StartRaceGoAhead, NULL }, // go_ahead_proc
-        { 1, 1 }, // escape_allowed
-        { NULL, NULL }, // escape_proc
-        NULL, // exit_proc
-        &SelectRaceDraw, // draw_proc
-        0u, // time_out
-        NULL, // start_proc1
-        &SelectRaceStart, // start_proc2
-        &SelectRaceDone, // done_proc
-        0, // font_needed
-        { 0, 0 }, // typeable
-        NULL, // get_original_string
-        -1, // escape_code
-        1, // dont_save_or_load
-        7, // number_of_button_flics
-        flicker_on, // flicker_on_flics
-        flicker_off, // flicker_off_flics
-        push, // pushed_flics
-        7, // number_of_mouse_areas
-        mouse_areas, // mouse_areas
-        0, // number_of_recopy_areas
-        NULL // recopy_areas
+        { -1, -1 },                   // move_up_new_mode
+        { -1, 0 },                    // move_up_delta
+        { 0, 5 },                     // move_up_min
+        { 4, 5 },                     // move_up_max
+        { NULL, &UpOpponent },        // move_up_proc
+        { -1, -1 },                   // move_down_new_mode
+        { 1, 0 },                     // move_down_delta
+        { 0, 5 },                     // move_down_min
+        { 4, 5 },                     // move_down_max
+        { NULL, &DownOpponent },      // move_down_proc
+        { 1, 1 },                     // go_ahead_allowed
+        { &StartRaceGoAhead, NULL },  // go_ahead_proc
+        { 1, 1 },                     // escape_allowed
+        { NULL, NULL },               // escape_proc
+        NULL,                         // exit_proc
+        &SelectRaceDraw,              // draw_proc
+        0u,                           // time_out
+        NULL,                         // start_proc1
+        &SelectRaceStart,             // start_proc2
+        &SelectRaceDone,              // done_proc
+        0,                            // font_needed
+        { 0, 0 },                     // typeable
+        NULL,                         // get_original_string
+        -1,                           // escape_code
+        1,                            // dont_save_or_load
+        7,                            // number_of_button_flics
+        flicker_on,                   // flicker_on_flics
+        flicker_off,                  // flicker_off_flics
+        push,                         // pushed_flics
+        7,                            // number_of_mouse_areas
+        mouse_areas,                  // mouse_areas
+        0,                            // number_of_recopy_areas
+        NULL                          // recopy_areas
     };
 
     int result;
@@ -1533,7 +1573,7 @@ void ActuallySwapOrder(int pFirst_index, int pSecond_index) {
     gCurrent_race.opponent_list[pSecond_index] = temp_opp;
     gOur_starting_position = pSecond_index;
 
-    //LOG_DEBUG("first %d, second %d", gCurrent_race.opponent_list[pFirst_index].index, gCurrent_race.opponent_list[pSecond_index].index);
+    // LOG_DEBUG("first %d, second %d", gCurrent_race.opponent_list[pFirst_index].index, gCurrent_race.opponent_list[pSecond_index].index);
 }
 
 // IDA: void __usercall DoGridTransition(int pFirst_index@<EAX>, int pSecond_index@<EDX>)
@@ -1681,56 +1721,56 @@ void DoChallengeScreen() {
         { { 218, 436 }, { 157, 377 }, { 281, 562 }, { 178, 427 }, 1, 0, 0, NULL }
     };
     static tInterface_spec interface_spec = {
-        0, // initial_imode
-        301, // first_opening_flic
-        0, // second_opening_flic
-        -1, // end_flic_go_ahead
-        -1, // end_flic_escaped
-        -1, // end_flic_otherwise
-        0, // flic_bunch_to_load
-        { -1, 0 }, // move_left_new_mode
-        { -1, 0 }, // move_left_delta
-        { 0, 0 }, // move_left_min
-        { 1, 0 }, // move_left_max
-        { NULL, NULL }, // move_left_proc
-        { -1, 0 }, // move_right_new_mode
-        { 1, 0 }, // move_right_delta
-        { 0, 0 }, // move_right_min
-        { 1, 0 }, // move_right_max
-        { NULL, NULL }, // move_right_proc
-        { -1, 0 }, // move_up_new_mode
-        { 0, 0 }, // move_up_delta
-        { 0, 0 }, // move_up_min
-        { 0, 0 }, // move_up_max
-        { NULL, NULL }, // move_up_proc
-        { -1, 0 }, // move_down_new_mode
-        { 0, 0 }, // move_down_delta
-        { 0, 0 }, // move_down_min
-        { 0, 0 }, // move_down_max
-        { NULL, NULL }, // move_down_proc
-        { 1, 1 }, // go_ahead_allowed
-        { NULL, NULL }, // go_ahead_proc
-        { 1, 1 }, // escape_allowed
-        { NULL, NULL }, // escape_proc
+        0,               // initial_imode
+        301,             // first_opening_flic
+        0,               // second_opening_flic
+        -1,              // end_flic_go_ahead
+        -1,              // end_flic_escaped
+        -1,              // end_flic_otherwise
+        0,               // flic_bunch_to_load
+        { -1, 0 },       // move_left_new_mode
+        { -1, 0 },       // move_left_delta
+        { 0, 0 },        // move_left_min
+        { 1, 0 },        // move_left_max
+        { NULL, NULL },  // move_left_proc
+        { -1, 0 },       // move_right_new_mode
+        { 1, 0 },        // move_right_delta
+        { 0, 0 },        // move_right_min
+        { 1, 0 },        // move_right_max
+        { NULL, NULL },  // move_right_proc
+        { -1, 0 },       // move_up_new_mode
+        { 0, 0 },        // move_up_delta
+        { 0, 0 },        // move_up_min
+        { 0, 0 },        // move_up_max
+        { NULL, NULL },  // move_up_proc
+        { -1, 0 },       // move_down_new_mode
+        { 0, 0 },        // move_down_delta
+        { 0, 0 },        // move_down_min
+        { 0, 0 },        // move_down_max
+        { NULL, NULL },  // move_down_proc
+        { 1, 1 },        // go_ahead_allowed
+        { NULL, NULL },  // go_ahead_proc
+        { 1, 1 },        // escape_allowed
+        { NULL, NULL },  // escape_proc
         &CheckNextStage, // exit_proc
-        &GridDraw, // draw_proc
-        0u, // time_out
-        NULL, // start_proc1
+        &GridDraw,       // draw_proc
+        0u,              // time_out
+        NULL,            // start_proc1
         &ChallengeStart, // start_proc2
-        &ChallengeDone, // done_proc
-        0, // font_needed
-        { 0, 0 }, // typeable
-        NULL, // get_original_string
-        1, // escape_code
-        1, // dont_save_or_load
-        2, // number_of_button_flics
-        flicker_on, // flicker_on_flics
-        flicker_off, // flicker_off_flics
-        push, // pushed_flics
-        2, // number_of_mouse_areas
-        mouse_areas, // mouse_areas
-        0, // number_of_recopy_areas
-        NULL // recopy_areas
+        &ChallengeDone,  // done_proc
+        0,               // font_needed
+        { 0, 0 },        // typeable
+        NULL,            // get_original_string
+        1,               // escape_code
+        1,               // dont_save_or_load
+        2,               // number_of_button_flics
+        flicker_on,      // flicker_on_flics
+        flicker_off,     // flicker_off_flics
+        push,            // pushed_flics
+        2,               // number_of_mouse_areas
+        mouse_areas,     // mouse_areas
+        0,               // number_of_recopy_areas
+        NULL             // recopy_areas
     };
 
     int result;
@@ -1780,7 +1820,7 @@ int GridMoveLeft(int* pCurrent_choice, int* pCurrent_mode) {
             gStart_interface_spec->pushed_flics[1].x[gGraf_data_index],
             gStart_interface_spec->pushed_flics[1].y[gGraf_data_index],
             1);
-        DRS3StartSound(gIndexed_outlets[0], 3000);
+        DRS3StartSound(gEffects_outlet, 3000);
         DoGridTransition(gOur_starting_position, gOur_starting_position - 1);
     }
     return 0;
@@ -1796,7 +1836,7 @@ int GridMoveRight(int* pCurrent_choice, int* pCurrent_mode) {
             gStart_interface_spec->pushed_flics[2].x[gGraf_data_index],
             gStart_interface_spec->pushed_flics[2].y[gGraf_data_index],
             1);
-        DRS3StartSound(gIndexed_outlets[0], 3000);
+        DRS3StartSound(gEffects_outlet, 3000);
         DoGridTransition(gOur_starting_position, gOur_starting_position + 1);
     }
     return 0;
@@ -1820,7 +1860,7 @@ int GridClickCar(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY
     }
     new_pos = 2 * x_coord + rel_pos + (gOur_starting_position & ~1) - 2;
     if (new_pos >= 0 && new_pos < gCurrent_race.number_of_racers && gProgram_state.rank < gCurrent_race.opponent_list[new_pos].ranking) {
-        DRS3StartSound(gIndexed_outlets[0], 3000);
+        DRS3StartSound(gEffects_outlet, 3000);
         DoGridTransition(gOur_starting_position, new_pos);
     }
     return 0;
@@ -1840,7 +1880,7 @@ int GridClickNumbers(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, in
         }
     }
     if (new_pos >= 0 && new_pos < gCurrent_race.number_of_racers && gProgram_state.rank <= gCurrent_race.opponent_list[new_pos].ranking) {
-        DRS3StartSound(gIndexed_outlets[0], 3000);
+        DRS3StartSound(gEffects_outlet, 3000);
         DoGridTransition(gOur_starting_position, new_pos);
     }
     return 0;
@@ -1969,56 +2009,56 @@ tSO_result DoGridPosition() {
     };
 
     static tInterface_spec interface_spec = {
-        0, // initial_imode
-        290, // first_opening_flic
-        0, // second_opening_flic
-        0, // end_flic_go_ahead
-        0, // end_flic_escaped
-        0, // end_flic_otherwise
-        8, // flic_bunch_to_load
-        { -1, 0 }, // move_left_new_mode
-        { 0, 0 }, // move_left_delta
-        { 0, 0 }, // move_left_min
-        { 0, 0 }, // move_left_max
-        { GridMoveLeft, NULL }, // move_left_proc
-        { -1, 0 }, // move_right_new_mode
-        { 0, 0 }, // move_right_delta
-        { 0, 0 }, // move_right_min
-        { 0, 0 }, // move_right_max
+        0,                       // initial_imode
+        290,                     // first_opening_flic
+        0,                       // second_opening_flic
+        0,                       // end_flic_go_ahead
+        0,                       // end_flic_escaped
+        0,                       // end_flic_otherwise
+        8,                       // flic_bunch_to_load
+        { -1, 0 },               // move_left_new_mode
+        { 0, 0 },                // move_left_delta
+        { 0, 0 },                // move_left_min
+        { 0, 0 },                // move_left_max
+        { GridMoveLeft, NULL },  // move_left_proc
+        { -1, 0 },               // move_right_new_mode
+        { 0, 0 },                // move_right_delta
+        { 0, 0 },                // move_right_min
+        { 0, 0 },                // move_right_max
         { GridMoveRight, NULL }, // move_right_proc
-        { -1, 0 }, // move_up_new_mode
-        { 0, 0 }, // move_up_delta
-        { 0, 0 }, // move_up_min
-        { 0, 0 }, // move_up_max
-        { GridMoveLeft, NULL }, // move_up_proc
-        { -1, 0 }, // move_down_new_mode
-        { 0, 0 }, // move_down_delta
-        { 0, 0 }, // move_down_min
-        { 0, 0 }, // move_down_max
+        { -1, 0 },               // move_up_new_mode
+        { 0, 0 },                // move_up_delta
+        { 0, 0 },                // move_up_min
+        { 0, 0 },                // move_up_max
+        { GridMoveLeft, NULL },  // move_up_proc
+        { -1, 0 },               // move_down_new_mode
+        { 0, 0 },                // move_down_delta
+        { 0, 0 },                // move_down_min
+        { 0, 0 },                // move_down_max
         { GridMoveRight, NULL }, // move_down_proc
-        { 1, 1 }, // go_ahead_allowed
-        { NULL, NULL }, // go_ahead_proc
-        { 1, 1 }, // escape_allowed
-        { NULL, NULL }, // escape_proc
-        CheckChallenge, // exit_proc
-        GridDraw, // draw_proc
-        0u, // time_out
-        NULL, // start_proc1
-        GridStart, // start_proc2
-        GridDone, // done_proc
-        0, // font_needed
-        { 0, 0 }, // typeable
-        NULL, // get_original_string
-        -1, // escape_code
-        1, // dont_save_or_load
-        3, // number_of_button_flics
-        flicker_on, // flicker_on_flics
-        flicker_off, // flicker_off_flics
-        push, // pushed_flics
-        5, // number_of_mouse_areas
-        mouse_areas, // mouse_areas
-        0, // number_of_recopy_areas
-        NULL // recopy_areas
+        { 1, 1 },                // go_ahead_allowed
+        { NULL, NULL },          // go_ahead_proc
+        { 1, 1 },                // escape_allowed
+        { NULL, NULL },          // escape_proc
+        CheckChallenge,          // exit_proc
+        GridDraw,                // draw_proc
+        0u,                      // time_out
+        NULL,                    // start_proc1
+        GridStart,               // start_proc2
+        GridDone,                // done_proc
+        0,                       // font_needed
+        { 0, 0 },                // typeable
+        NULL,                    // get_original_string
+        -1,                      // escape_code
+        1,                       // dont_save_or_load
+        3,                       // number_of_button_flics
+        flicker_on,              // flicker_on_flics
+        flicker_off,             // flicker_off_flics
+        push,                    // pushed_flics
+        5,                       // number_of_mouse_areas
+        mouse_areas,             // mouse_areas
+        0,                       // number_of_recopy_areas
+        NULL                     // recopy_areas
     };
 
     int result;
@@ -2074,8 +2114,8 @@ void NetSynchStartStart() {
     NOT_IMPLEMENTED();
 }
 
-//IDA: void __usercall DrawAnItem(int pX@<EAX>, int pY_index@<EDX>, int pFont_index@<EBX>, char *pText@<ECX>)
-// Suffix added to avoid duplicate symbol
+// IDA: void __usercall DrawAnItem(int pX@<EAX>, int pY_index@<EDX>, int pFont_index@<EBX>, char *pText@<ECX>)
+//  Suffix added to avoid duplicate symbol
 void DrawAnItem__racestrt(int pX, int pY_index, int pFont_index, char* pText) {
     LOG_TRACE("(%d, %d, %d, \"%s\")", pX, pY_index, pFont_index, pText);
     NOT_IMPLEMENTED();

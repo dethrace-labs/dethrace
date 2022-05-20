@@ -232,7 +232,7 @@ void DrawSummary(int pCurrent_choice, int pCurrent_mode) {
         if (gTemp_earned != 0) {
             ResetInterfaceTimeout();
             if (gSumm_sound == 0) {
-                gSumm_sound = DRS3StartSound(gIndexed_outlets[0], 3200);
+                gSumm_sound = DRS3StartSound(gEffects_outlet, 3200);
             }
             credit_delta = (the_time - last_time) * gCredits_per_ms;
             gTemp_earned -= credit_delta;
@@ -240,7 +240,7 @@ void DrawSummary(int pCurrent_choice, int pCurrent_mode) {
             RampUpRate(&gCredits_per_ms, the_time - last_change_time + 1000);
             if (gTemp_earned <= 0) {
                 gTemp_credits += gTemp_earned;
-                S3StopOutletSound(gIndexed_outlets[0]);
+                S3StopOutletSound(gEffects_outlet);
                 gSumm_sound = 0;
                 gTemp_earned = 0;
                 gCredits_per_ms = 0.1f;
@@ -250,7 +250,7 @@ void DrawSummary(int pCurrent_choice, int pCurrent_mode) {
             ResetInterfaceTimeout();
             if (the_time - last_change_time > 1000) {
                 if (gSumm_sound == 0) {
-                    gSumm_sound = DRS3StartSound(gIndexed_outlets[0], 3201);
+                    gSumm_sound = DRS3StartSound(gEffects_outlet, 3201);
                 }
                 credit_delta = (the_time - last_time) * gCredits_per_ms;
                 gTemp_lost -= credit_delta;
@@ -258,7 +258,7 @@ void DrawSummary(int pCurrent_choice, int pCurrent_mode) {
                 RampUpRate(&gCredits_per_ms, the_time - last_change_time);
                 if (gTemp_lost <= 0) {
                     gTemp_credits -= gTemp_lost;
-                    S3StopOutletSound(gIndexed_outlets[0]);
+                    S3StopOutletSound(gEffects_outlet);
                     gSumm_sound = 0;
                     gTemp_lost = 0;
                     last_change_time = the_time;
@@ -274,17 +274,17 @@ void DrawSummary(int pCurrent_choice, int pCurrent_mode) {
                     if (gTemp_rank > 1) {
                         gTemp_rank -= 1;
                     }
-                    gSumm_sound = DRS3StartSound(gIndexed_outlets[0], 3202);
+                    gSumm_sound = DRS3StartSound(gEffects_outlet, 3202);
                 }
                 if (gTemp_rank_increase <= 0.f) {
-                    S3StopOutletSound(gIndexed_outlets[0]);
+                    S3StopOutletSound(gEffects_outlet);
                     gSumm_sound = 0;
                     gTemp_rank_increase = 0.f;
                     last_change_time = the_time;
                 }
             }
         } else {
-            S3StopOutletSound(gIndexed_outlets[0]);
+            S3StopOutletSound(gEffects_outlet);
             gSumm_sound = 0;
         }
     } else {
@@ -317,7 +317,7 @@ void SetUpTemps() {
 int Summ1GoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
-    S3StopOutletSound(gIndexed_outlets[0]);
+    S3StopOutletSound(gEffects_outlet);
     MungeRankEtc(&gProgram_state);
     SetUpTemps();
     DrawSummaryItems();
@@ -333,7 +333,7 @@ int SummCheckGameOver(int* pCurrent_choice, int* pCurrent_mode) {
     if (gTemp_credits > 0) {
         return 0;
     }
-    S3StopOutletSound(gIndexed_outlets[0]);
+    S3StopOutletSound(gEffects_outlet);
     RemoveTransientBitmaps(1);
     for (i = 0; i < 7; i++) {
         DrawInBox(
@@ -445,9 +445,9 @@ tSO_result DoEndRaceSummary1() {
     MungeRankEtc(&gProgram_state);
     NetPlayerStatusChanged(ePlayer_status_loading);
     DisposeChromeFont(gChrome_font);
-    DRS3StartSound(gIndexed_outlets[0], 3004);
+    DRS3StartSound(gEffects_outlet, 3004);
     if (result < 0) {
-        DRS3StartSound(gIndexed_outlets[0], 3007);
+        DRS3StartSound(gEffects_outlet, 3007);
         RunFlic(311);
         result = eSO_main_menu_invoked;
     } else if (gTemp_credits <= 0) {
@@ -457,7 +457,7 @@ tSO_result DoEndRaceSummary1() {
         FadePaletteDown();
         result = eSO_game_completed;
     } else {
-        DRS3StartSound(gIndexed_outlets[0], 3007);
+        DRS3StartSound(gEffects_outlet, 3007);
         FadePaletteDown();
         result = eSO_continue;
     }
