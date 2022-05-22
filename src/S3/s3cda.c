@@ -45,3 +45,7 @@ int S3SetCDAVolume(tS3_channel* chan, int pVolume) {
 int S3IsCDAPlaying() {
     return 0;
 }
+
+int S3IsCDAPlaying2() {
+    return S3IsCDAPlaying();
+}

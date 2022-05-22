@@ -1,7 +1,7 @@
 #ifndef _S3MUSIC_H_
 #define _S3MUSIC_H_
 
-#include "s3_types.h"
+#include "s3_defs.h"
 
 void S3DisableMIDI();
 void S3StopMIDIOutlets();

@@ -1,7 +1,7 @@
 #ifndef S3_SOUND2_H
 #define S3_SOUND2_H
 
-#include "s3_types.h"
+#include "s3_defs.h"
 
 extern int gS3_sample_filter_funcs_registered;
 extern tS3_sample_filter* gS3_sample_filter_func;

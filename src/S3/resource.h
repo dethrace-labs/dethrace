@@ -2,7 +2,7 @@
 #define _RESOURCE_H_
 
 #include "brender/brender.h"
-#include "s3_types.h"
+#include "s3_defs.h"
 
 typedef enum s3_memory_classes {
     kMem_S3_scan_name = 223,                                             //  0xdf
@@ -29,5 +29,6 @@ typedef enum s3_memory_classes {
 
 void* S3MemAllocate(br_size_t size, br_uint_8 type);
 void S3MemFree(void* p);
+void S3CopyBrVector(tS3_vector3* a1, br_vector3* a2);
 
 #endif

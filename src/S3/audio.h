@@ -2,7 +2,7 @@
 #define _DOSAUDIO_H_
 
 #include "brender/brender.h"
-#include "s3_types.h"
+#include "s3_defs.h"
 
 extern int gS3_enabled;
 extern int gS3_last_error;
@@ -40,8 +40,8 @@ char* S3GetCurrentDir();
 
 void S3CalculateRandomizedFields(tS3_channel* chan, tS3_descriptor* desc);
 int S3IRandomBetween(int min, int max, int fallback);
-int S3IRandomBetweenLog(int a1, int a2, int a3);
-double S3FRandomBetween(double a1, double a2);
+int S3IRandomBetweenLog(int pMin, int pMax, int pDefault);
+double S3FRandomBetween(double pMin, double pMax);
 
 int S3GenerateTag(tS3_outlet* outlet);
 int S3DisposeDescriptor(tS3_sound_id id);

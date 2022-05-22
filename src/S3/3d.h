@@ -2,12 +2,14 @@
 #define _3D_H_
 
 #include "brender/brender.h"
-#include "s3_types.h"
+#include "s3_defs.h"
 
 void S3Set3DSoundEnvironment(float a1, float a2, float a3);
 
 void S3UpdateListenerVectors();
 void S3ServiceSoundSources();
 int S3UpdateSpatialSound(tS3_channel* chan);
+int S3BindAmbientSoundToOutlet(tS3_outlet* pOutlet, int pSound, tS3_sound_source* source, float pMax_distance, int pPeriod, int pRepeats, int pVolume, int pPitch, int pSpeed);
+void S3UpdateSoundSource(tS3_outlet* outlet, tS3_sound_tag tag, tS3_sound_source* src, float pMax_distance_squared, int pPeriod, tS3_repeats pAmbient_repeats, tS3_volume pVolume, int pPitch, tS3_speed pSpeed);
 
 #endif

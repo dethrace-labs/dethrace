@@ -1,13 +1,14 @@
 #include "s3sound.h"
 #include "audio.h"
 #include "resource.h"
+#include <SDL_mixer.h>
 #include <stdio.h>
+
+extern void dr_dprintf(char* fmt_string, ...);
 
 int gS3_sample_filter_funcs_registered;
 tS3_sample_filter* gS3_sample_filter_func;
 tS3_sample_filter* gS3_sample_filter_disable_func;
-
-#include <SDL_mixer.h>
 
 int S3OpenSampleDevice() {
 
@@ -206,7 +207,7 @@ int S3StopSample(tS3_channel* chan) {
 
     if (chan->descriptor && chan->descriptor->type == chan->type) {
         if (Mix_Playing(chan->id)) {
-            printf("stopping channel %d\n", chan->id);
+            printf("warn - stopping channel while playing %d\n", chan->id);
         }
         Mix_HaltChannel(chan->id);
         // dsound_buffer = chan->descriptor->dsound_buffer;
@@ -238,8 +239,6 @@ int S3PlaySample(tS3_channel* chan) {
     if (Mix_Playing(chan->id)) {
         printf("WARN already playing\n");
     }
-    int left = 0;
-    Mix_SetPanning(chan->id, left, 255 - left);
     Mix_PlayChannel(chan->id, chan->descriptor->sound_buffer, 0);
     // BOOL play_flags;                   // [esp+Ch] [ebp-Ch]
     // int status;                        // [esp+10h] [ebp-8h] BYREF
