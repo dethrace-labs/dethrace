@@ -3,6 +3,7 @@
 #include "resource.h"
 #include "s3sound.h"
 #include <math.h>
+#include <string.h>
 
 tS3_vector3 gS3_listener_position_old;
 tS3_vector3 gS3_listener_position_now;
@@ -48,10 +49,28 @@ void S3Set3DSoundEnvironment(float a1, float a2, float a3) {
     gS3_listener_left_now.z = 0.0;
 }
 
+void S3CopyVector3(void* a1, void* a2, int pBrender_vector) {
+    if (pBrender_vector) {
+        S3CopyBrVector3((tS3_vector3*)a1, (br_vector3*)a2);
+    } else {
+        S3CopyS3Vector3((tS3_vector3*)a1, (tS3_vector3*)a2);
+    }
+}
+
+void S3CopyBrVector3(tS3_vector3* a1, br_vector3* a2) {
+    a1->x = a2->v[0];
+    a1->y = a2->v[1];
+    a1->z = a2->v[2];
+}
+
+void S3CopyS3Vector3(tS3_vector3* a1, tS3_vector3* a2) {
+    *a1 = *a2;
+}
+
 void S3BindListenerPositionBRender(br_vector3* pos) {
     gS3_listener_pos_ptr = pos;
     gS3_listener_pos_is_brender = 1;
-    S3CopyBrVector(&gS3_listener_position_old, pos);
+    S3CopyBrVector3(&gS3_listener_position_old, pos);
 }
 
 void S3BindListenerVelocityBRender(br_vector3* vel) {
@@ -64,8 +83,44 @@ void S3BindListenerLeftBRender(br_vector3* left) {
     gS3_listener_left_is_brender = 1;
 }
 
-void S3UpdateListenerVectors() {}
-void S3ServiceSoundSources() {}
+void S3UpdateListenerVectors() {
+}
+
+void S3ServiceSoundSources() {
+    tS3_sound_source* s; // [esp+Ch] [ebp-4h]
+
+    for (s = gS3_sound_sources; s; s = s->next) {
+        if (s->ambient == 0) {
+            continue;
+        }
+        if (s->period > 0) {
+            s->time_since_last_played += gS3_service_time_delta;
+        }
+        if (s->channel && s->channel->tag != s->tag) {
+            S3StopChannel(s->channel);
+            s->channel = NULL;
+            s->tag = 0;
+        }
+        if (s->channel == NULL) {
+            if (s->time_since_last_played <= s->period || !s->period || s->tag) {
+                if ((s->ambient_repeats == 0 || s->period == 0) && s->tag == 0) {
+                    if (s->volume > 0 && S3ServiceSoundSource(s) == 0) {
+                        s->channel = NULL;
+                        s->tag = 0;
+                    }
+                    s->time_since_last_played = 0;
+                }
+            } else {
+                if (s->volume > 0 && S3ServiceSoundSource(s) == 0) {
+                    s->channel = NULL;
+                    s->tag = 0;
+                }
+                s->time_since_last_played = 0;
+            }
+        }
+    }
+}
+
 int S3UpdateSpatialSound(tS3_channel* chan) {
     return 1;
 }
@@ -198,4 +253,186 @@ void S3UpdateSoundSource(tS3_outlet* outlet, tS3_sound_tag tag, tS3_sound_source
             src->tag = 0;
         }
     }
+}
+
+tS3_sound_tag S3ServiceSoundSource(tS3_sound_source* src) {
+    tS3_channel* chan;    // [esp+30h] [ebp-10h]
+    tS3_outlet* outlet;   // [esp+34h] [ebp-Ch]
+    tS3_descriptor* desc; // [esp+3Ch] [ebp-4h]
+
+    if (!src) {
+        return 0;
+    }
+    if (!gS3_enabled || !src->ambient) {
+        src->tag = 0;
+        src->channel = 0;
+        return 0;
+    }
+    outlet = src->bound_outlet;
+    desc = S3GetDescriptorByID(src->sound_id);
+    if (desc == NULL) {
+        gS3_last_error = eS3_error_bad_id;
+        return 0;
+    }
+    if (desc->type) {
+        return 0;
+    }
+    memset(&gS3_channel_template, 0, sizeof(gS3_channel_template));
+    gS3_channel_template.initial_volume = src->volume;
+    gS3_channel_template.rate = S3IRandomBetweenLog(desc->min_pitch, desc->max_pitch, ((tS3_sample*)desc->sound_data)->rate);
+    if (src->pitch < 0) {
+        src->pitch = 0x10000;
+    }
+    if (src->speed < 0) {
+        src->speed = 0x10000;
+    }
+    gS3_channel_template.rate = ldexp(src->pitch, -16) * gS3_channel_template.rate;
+    if (!outlet->independent_pitch) {
+        gS3_channel_template.rate = ldexp(src->speed, -16) * gS3_channel_template.rate;
+    }
+    gS3_channel_template.initial_pitch = gS3_channel_template.rate;
+    gS3_channel_template.sound_source_ptr = src;
+    if (!src->velocity_ptr) {
+        S3CopyVector3(&gS3_channel_template.lastpos, src->position_ptr, src->brender_vector);
+    }
+    gS3_channel_template.pMax_distance_squared = src->max_distance_sq;
+
+    if (S3Calculate3D(&gS3_channel_template, 1) == 0) {
+        src->tag = 0;
+        src->channel = 0;
+        return 0;
+    }
+
+    chan = S3AllocateChannel(outlet, desc->priority * (gS3_channel_template.right_volume + gS3_channel_template.left_volume + 1));
+    if (chan == NULL) {
+        gS3_last_error = eS3_error_channel_alloc;
+        src->tag = 0;
+        src->channel = NULL;
+        return 0;
+    }
+
+    if ((desc->sound_data && (desc->flags & 2) == 0) || S3LoadSample(src->sound_id)) {
+        chan->left_volume = gS3_channel_template.left_volume * chan->volume_multiplier;
+        chan->right_volume = gS3_channel_template.right_volume * chan->volume_multiplier;
+        chan->rate = gS3_channel_template.rate;
+        chan->position.x = gS3_channel_template.position.x;
+        chan->position.y = gS3_channel_template.position.y;
+        chan->position.z = gS3_channel_template.position.z;
+        chan->velocity.x = gS3_channel_template.velocity.x;
+        chan->velocity.y = gS3_channel_template.velocity.y;
+        chan->velocity.z = gS3_channel_template.velocity.z;
+        chan->lastpos.x = gS3_channel_template.lastpos.x;
+        chan->lastpos.y = gS3_channel_template.lastpos.y;
+        chan->lastpos.z = gS3_channel_template.lastpos.z;
+        chan->initial_volume = gS3_channel_template.initial_volume;
+        chan->initial_pitch = gS3_channel_template.initial_pitch;
+        chan->pMax_distance_squared = gS3_channel_template.pMax_distance_squared;
+        chan->spatial_sound = 2;
+        chan->sound_source_ptr = src;
+        chan->descriptor = desc;
+        chan->tag = S3GenerateTag(outlet);
+        chan->repetitions = src->ambient_repeats;
+        chan->needs_service = 0;
+        chan->termination_reason = 0;
+        S3ExecuteSampleFilterFuncs(chan);
+        if (S3PlaySample(chan)) {
+            src->tag = chan->tag;
+            src->channel = chan;
+            return chan->tag;
+        } else {
+            chan->needs_service = 1;
+            gS3_last_error = eS3_error_start_sound;
+            return 0;
+        }
+    } else {
+        gS3_last_error = eS3_error_load_sound;
+        chan->needs_service = 1;
+        return 0;
+    }
+}
+
+tS3_sound_tag S3StartSound3D(tS3_outlet* pOutlet, tS3_sound_id pSound, tS3_vector3* pInitial_position, tS3_vector3* pInitial_velocity, tS3_repeats pRepeats, tS3_volume pVolume, tS3_pitch pPitch, tS3_speed pSpeed) {
+    tS3_channel* chan;    // [esp+30h] [ebp-Ch]
+    tS3_descriptor* desc; // [esp+38h] [ebp-4h]
+
+    if (!gS3_enabled) {
+        return 0;
+    }
+    desc = S3GetDescriptorByID(pSound);
+    if (!desc) {
+        gS3_last_error = eS3_error_bad_id;
+        return 0;
+    }
+    if (desc->type != eS3_ST_sample) {
+        return 0;
+    }
+
+    if ((desc->sound_data == NULL || (desc->flags & 2) != 0) && S3LoadSample(pSound) == 0) {
+        gS3_last_error = eS3_error_load_sound;
+        return 0;
+    }
+    if (pVolume > 255) {
+        pVolume = 255;
+    }
+    if (pVolume < 0) {
+        pVolume = S3IRandomBetween(desc->min_volume, desc->max_volume, 128);
+    }
+    memset(&gS3_channel_template, 0, sizeof(gS3_channel_template));
+    gS3_channel_template.volume_multiplier = 1.0;
+    gS3_channel_template.sound_source_ptr = 0;
+    gS3_channel_template.pMax_distance_squared = 150.0;
+    gS3_channel_template.right_volume = pVolume;
+    gS3_channel_template.left_volume = pVolume;
+    gS3_channel_template.initial_volume = pVolume;
+    gS3_channel_template.rate = S3IRandomBetweenLog(desc->min_pitch, desc->max_pitch, ((tS3_sample*)desc->sound_data)->rate);
+    if (pPitch == -1) {
+        pPitch = 0x10000;
+    }
+    if (pSpeed == -1) {
+        pSpeed = 0x10000;
+    }
+    gS3_channel_template.rate = ldexpf(pPitch, -16) * gS3_channel_template.rate;
+    if (!pOutlet->independent_pitch) {
+        gS3_channel_template.rate = ldexpf(pSpeed, -16) * gS3_channel_template.rate;
+    }
+    gS3_channel_template.initial_pitch = gS3_channel_template.rate;
+    gS3_channel_template.position = *pInitial_position;
+    gS3_channel_template.velocity = *pInitial_velocity;
+    if (S3Calculate3D(&gS3_channel_template, 0) == 0) {
+        return 0;
+    }
+    chan = S3AllocateChannel(pOutlet, desc->priority * (gS3_channel_template.right_volume + gS3_channel_template.left_volume + 1));
+    if (chan) {
+        chan->left_volume = gS3_channel_template.left_volume * chan->volume_multiplier;
+        chan->right_volume = gS3_channel_template.right_volume * chan->volume_multiplier;
+        chan->rate = gS3_channel_template.rate;
+        chan->spatial_sound = 1;
+        chan->sound_source_ptr = 0;
+        chan->descriptor = desc;
+        chan->needs_service = 0;
+        chan->termination_reason = 0;
+        chan->position = gS3_channel_template.position;
+        chan->lastpos = gS3_channel_template.lastpos;
+        chan->velocity = gS3_channel_template.velocity;
+        chan->repetitions = MAX(pRepeats, 0);
+        chan->tag = S3GenerateTag(pOutlet);
+        chan->initial_volume = gS3_channel_template.initial_volume;
+        chan->initial_pitch = gS3_channel_template.initial_pitch;
+        chan->pMax_distance_squared = gS3_channel_template.pMax_distance_squared;
+        S3ExecuteSampleFilterFuncs(chan);
+        if (S3PlaySample(chan) != 0) {
+            return chan->tag;
+        } else {
+            chan->needs_service = 1;
+            gS3_last_error = eS3_error_start_sound;
+            return 0;
+        }
+    } else {
+        gS3_last_error = eS3_error_channel_alloc;
+        return 0;
+    }
+}
+
+int S3Calculate3D(tS3_channel* chan, int pIs_ambient) {
+    return 1;
 }

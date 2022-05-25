@@ -217,7 +217,7 @@ tS3_sound_tag DRS3StartSound2(tS3_outlet_ptr pOutlet, tS3_sound_id pSound, tS3_r
 int DRS3ChangeVolume(tS3_sound_tag pSound_tag, tS3_volume pNew_volume) {
     LOG_TRACE("(%d, %d)", pSound_tag, pNew_volume);
 
-    STUB_ONCE();
+    STUB();
     return 0;
 }
 
@@ -259,7 +259,10 @@ int DRS3StopSound(tS3_sound_tag pSound_tag) {
 int DRS3LoadSound(tS3_sound_id pThe_sound) {
     LOG_TRACE("(%d)", pThe_sound);
 
-    STUB();
+    if (!gSound_enabled) {
+        return 0;
+    }
+    return S3LoadSample(pThe_sound);
 }
 
 // IDA: int __usercall DRS3ReleaseSound@<EAX>(tS3_sound_id pThe_sound@<EAX>)
@@ -446,7 +449,7 @@ tS3_sound_tag DRS3StartSound3D(tS3_outlet_ptr pOutlet, tS3_sound_id pSound, br_v
     if (pVolume && pSound != 1000 && (pSound < 3000 || pSound > 3007) && (pSound < 5300 || pSound > 5320)) {
         PipeSingleSound(pOutlet, pSound, pVolume, 0, pPitch, pInitial_position);
     }
-    return 0; // S3StartSound3D(pOutlet, pSound, pInitial_position, pInitial_velocity, pRepeats, pVolume, pPitch, pSpeed);
+    return S3StartSound3D(pOutlet, pSound, pInitial_position, pInitial_velocity, pRepeats, pVolume, pPitch, pSpeed);
 }
 
 // IDA: tS3_sound_tag __usercall DRS3StartSoundFromSource3@<EAX>(tS3_sound_source_ptr pSource@<EAX>, tS3_sound_id pSound@<EDX>, tS3_repeats pRepeats@<EBX>, tS3_volume pVolume@<ECX>, tS3_pitch pPitch, tS3_speed pSpeed)

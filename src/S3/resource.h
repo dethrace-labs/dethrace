@@ -29,6 +29,5 @@ typedef enum s3_memory_classes {
 
 void* S3MemAllocate(br_size_t size, br_uint_8 type);
 void S3MemFree(void* p);
-void S3CopyBrVector(tS3_vector3* a1, br_vector3* a2);
 
 #endif

@@ -4,11 +4,10 @@ target_include_directories(s3
     PUBLIC
         include
     PRIVATE
-        ${CMAKE_SOURCE_DIR}
-        ${SDL2_MIXER_INCLUDE_DIRS}       
+        ${CMAKE_SOURCE_DIR}      
 )
 
-target_link_libraries(s3 PRIVATE brender SDL2::SDL2 ${SDL2_MIXER_LIBRARIES} harness)
+target_link_libraries(s3 PRIVATE brender SDL2::SDL2 harness miniaudio)
 
 if(NOT MSVC)
     target_compile_options(s3 PRIVATE

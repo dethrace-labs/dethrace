@@ -39,6 +39,8 @@ tS3_outlet_ptr S3CreateOutlet(int unk1, int pChannel_count);
 void S3DisposeOutlet(tS3_outlet_ptr outlet);
 
 void S3Service(int inside_cockpit, int unk1);
+
+int S3LoadSample(tS3_sound_id id);
 tS3_sound_tag S3StartSound(tS3_outlet_ptr pOutlet, tS3_sound_id pSound);
 tS3_sound_tag S3StartSound2(tS3_outlet_ptr pOutlet, tS3_sound_id pSound, tS3_repeats pRepeats, tS3_volume pLVolume, tS3_volume pRVolume, tS3_pitch pPitch, tS3_speed pSpeed);
 void S3StopAllOutletSounds();

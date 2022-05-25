@@ -1,8 +1,10 @@
 #include "s3sound.h"
 #include "audio.h"
+#include "miniaudio/miniaudio.h"
 #include "resource.h"
-#include <SDL_mixer.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 extern void dr_dprintf(char* fmt_string, ...);
 
@@ -10,13 +12,27 @@ int gS3_sample_filter_funcs_registered;
 tS3_sample_filter* gS3_sample_filter_func;
 tS3_sample_filter* gS3_sample_filter_disable_func;
 
+ma_engine engine;
+
 int S3OpenSampleDevice() {
 
-    if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024) == -1) {
+    ma_result result;
+
+    ma_engine_config engineConfig;
+    engineConfig = ma_engine_config_init();
+    engineConfig.sampleRate = 22050;
+    result = ma_engine_init(&engineConfig, &engine);
+    if (result != MA_SUCCESS) {
+        printf("Failed to initialize audio engine.");
         return 0;
     }
 
-    Mix_AllocateChannels(20);
+    // if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024) == -1) {
+    //     return 0;
+    // }
+
+    // Mix_AllocateChannels(20);
+
     // if (DirectSoundCreate(0, &gS3_direct_sound_ptr, 0)) {
     //     return 0;
     // }
@@ -27,6 +43,7 @@ int S3OpenSampleDevice() {
     return 1;
 }
 
+// Returns 0 if no error
 int S3LoadSample(tS3_sound_id id) {
     // LPDIRECTSOUNDBUFFER WavFile; // eax
     char filename[80];          // [esp+10h] [ebp-5Ch] BYREF
@@ -62,7 +79,7 @@ int S3LoadSample(tS3_sound_id id) {
     }
     descriptor->special_fx = 0;
     descriptor->sound_data = (char*)sample;
-    return 0;
+    return eS3_error_none;
 }
 
 int S3ReadWavHeader(char* buf, tWAVEFORMATEX_** pWav_format, char** data_ptr, int* pData_size) {
@@ -170,12 +187,21 @@ void* S3LoadWavFile(char* pFile_name, tS3_sample* pSample) {
     pSample->resolution = wav_format->nAvgBytesPerSec;
     pSample->channels = wav_format->nChannels;
 
-    Mix_Chunk* raw_chunk = Mix_LoadWAV(pFile_name); // Mix_QuickLoad_RAW((Uint8*)data_ptr, data_size);
-    if (raw_chunk == NULL) {
-        return NULL;
+    // Mix_Chunk* raw_chunk = Mix_LoadWAV(pFile_name); // Mix_QuickLoad_RAW((Uint8*)data_ptr, data_size);
+    // if (raw_chunk == NULL) {
+    //     return NULL;
+    // }
+    // return raw_chunk;
+
+    ma_sound* sound = malloc(sizeof(ma_sound));
+    if (ma_sound_init_from_file(&engine, pFile_name, MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_NO_SPATIALIZATION, NULL, NULL, sound) != MA_SUCCESS) {
+        return NULL; // Failed to load sound.
     }
+    S3MemFree(buf);
+    return sound;
+
     // S3MemFree(buf);
-    return raw_chunk;
+
     // buffer_desc.dwReserved = 0;
     // buffer_desc.dwSize = 20;
     // buffer_desc.dwFlags = 226;
@@ -204,12 +230,14 @@ void* S3LoadWavFile(char* pFile_name, tS3_sample* pSample) {
 
 int S3StopSample(tS3_channel* chan) {
     // LPDIRECTSOUNDBUFFER dsound_buffer; // [esp+Ch] [ebp-4h]
-
     if (chan->descriptor && chan->descriptor->type == chan->type) {
-        if (Mix_Playing(chan->id)) {
-            printf("warn - stopping channel while playing %d\n", chan->id);
-        }
-        Mix_HaltChannel(chan->id);
+        // if (Mix_Playing(chan->id)) {
+        //     printf("warn - stopping channel while playing %d\n", chan->id);
+        // }
+        // Mix_HaltChannel(chan->id);
+
+        ma_sound_stop(chan->descriptor->sound_buffer);
+
         // dsound_buffer = chan->descriptor->dsound_buffer;
         // if (dsound_buffer) {
         //     dsound_buffer->lpVtbl->Stop(dsound_buffer);
@@ -234,12 +262,15 @@ int S3ExecuteSampleFilterFuncs(tS3_channel* chan) {
 }
 
 int S3PlaySample(tS3_channel* chan) {
-    printf("playing on %d\n", chan->id);
+    // printf("playing on %d\n", chan->id);
 
-    if (Mix_Playing(chan->id)) {
-        printf("WARN already playing\n");
+    S3SyncSampleVolume(chan);
+    S3SyncSampleRate(chan);
+    if (chan->descriptor && chan->descriptor->type == chan->type) {
+        ma_sound_set_looping(chan->descriptor->sound_buffer, chan->repetitions == 0);
+        ma_sound_start(chan->descriptor->sound_buffer);
+        // Mix_PlayChannel(chan->id, chan->descriptor->sound_buffer, 0);
     }
-    Mix_PlayChannel(chan->id, chan->descriptor->sound_buffer, 0);
     // BOOL play_flags;                   // [esp+Ch] [ebp-Ch]
     // int status;                        // [esp+10h] [ebp-8h] BYREF
     // LPDIRECTSOUNDBUFFER dsound_buffer; // [esp+14h] [ebp-4h]
@@ -265,7 +296,18 @@ int S3PlaySample(tS3_channel* chan) {
     return 1;
 }
 
-int S3SampleSyncVolume(tS3_channel* chan) {
+int sub_49D837(tS3_channel* chan) {
+    return 1;
+}
 
+int sub_49D84C(tS3_channel* chan) {
+    return 1;
+}
+
+int S3SyncSampleVolume(tS3_channel* chan) {
+    return 0;
+}
+
+int S3SyncSampleRate(tS3_channel* chan) {
     return 0;
 }

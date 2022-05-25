@@ -13,10 +13,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <SDL.h>
-#include <SDL_mixer.h>
+#define MINIAUDIO_IMPLEMENTATION
+#include "miniaudio/miniaudio.h"
 
-extern int PDGetTotalTime();
+#include <SDL.h>
+
+extern int
+PDGetTotalTime();
 
 int gS3_enabled;
 int gS3_noutlets;
@@ -38,7 +41,7 @@ char* gS3_soundbank_buffer;
 int gS3_soundbank_buffer_len;
 int gS3_inside_cockpit;
 
-tS3_channel gS3_temp_channel;
+tS3_channel gS3_channel_template;
 int gS3_tag_seed;
 
 char gS3_directory_separator[4];
@@ -47,8 +50,6 @@ int gS3_have_current_dir;
 char gS3_current_dir[260];
 
 int dword_5216C0;
-
-int gS3_channel_count;
 
 int S3Init(char* pPath, int pLow_memory_mode) {
     tS3_descriptor* root_descriptor;
@@ -99,9 +100,6 @@ void S3Disable() {
 
 int S3OpenOutputDevices() {
 
-    if (SDL_InitSubSystem(SDL_INIT_AUDIO) != 0) {
-        return 0;
-    }
     // strcpy(gS3_directory_separator, "\\");
     strcpy(gS3_directory_separator, "/");
     strcpy(gS3_directory_name, "SOUND");
@@ -436,11 +434,7 @@ int S3CreateOutletChannels(tS3_outlet* outlet, int pChannel_count) {
 
         printf("creating channel for outlet %d\n", outlet->id);
 
-        // Added by dethrace
-        chan->id = gS3_channel_count + 1;
-        gS3_channel_count++;
-        if (!1 /*!sub_49D837()*/) // sub_49D837 always sreturns 1
-        {
+        if (sub_49D837(chan) == 0) {
             S3MemFree(chan);
             return pChannel_count;
         }
@@ -488,7 +482,7 @@ int S3UnbindChannels(tS3_outlet* outlet) {
 
     for (chan = outlet->channel_list; chan; chan = next) {
         next = chan->next;
-        // sub_49D84C();  returns 1
+        sub_49D84C(chan);
         if (gS3_unbound_channels) {
             gS3_last_unbound_channel->next = chan;
         } else {
@@ -697,9 +691,12 @@ void S3ServiceOutlets() {
 int S3ServiceChannel(tS3_channel* chan) {
     if (chan->type == eS3_ST_sample) {
         if (chan->descriptor && chan->descriptor->type == chan->type) {
-            if (Mix_Playing(chan->id)) {
+            if (ma_sound_is_playing(chan->descriptor->sound_buffer)) {
                 return 1;
             }
+            // if (Mix_Playing(chan->id)) {
+            //     return 1;
+            // }
         }
         // printf("stopping channel %d\n", chan->id);
         S3StopSample(chan);
@@ -735,18 +732,18 @@ tS3_sound_tag S3StartSound(tS3_outlet* pOutlet, tS3_sound_id pSound) {
         gS3_last_error = eS3_error_bad_id;
         return 0;
     }
-    memset(&gS3_temp_channel, 0, sizeof(gS3_temp_channel));
-    S3CalculateRandomizedFields(&gS3_temp_channel, desc);
+    memset(&gS3_channel_template, 0, sizeof(gS3_channel_template));
+    S3CalculateRandomizedFields(&gS3_channel_template, desc);
     chan = S3AllocateChannel(
         pOutlet,
-        desc->priority * (gS3_temp_channel.right_volume + gS3_temp_channel.left_volume + 1));
+        desc->priority * (gS3_channel_template.right_volume + gS3_channel_template.left_volume + 1));
     if (!chan) {
         gS3_last_error = eS3_error_channel_alloc;
         return 0;
     }
-    chan->left_volume = gS3_temp_channel.left_volume * chan->volume_multiplier;
-    chan->right_volume = gS3_temp_channel.right_volume * chan->volume_multiplier;
-    chan->rate = gS3_temp_channel.rate;
+    chan->left_volume = gS3_channel_template.left_volume * chan->volume_multiplier;
+    chan->right_volume = gS3_channel_template.right_volume * chan->volume_multiplier;
+    chan->rate = gS3_channel_template.rate;
     if (desc->type == eS3_ST_sample && (!desc->sound_data || desc->flags == 2)) {
         if (!S3LoadSample(pSound)) {
             chan->needs_service = 1;
@@ -1142,7 +1139,7 @@ int S3SetTagVolume(tS3_sound_tag pTag, tS3_volume pVolume) {
     if (chan->type == eS3_ST_sample) {
         chan->left_volume = pVolume * chan->volume_multiplier;
         chan->right_volume = pVolume * chan->volume_multiplier;
-        if (!S3SampleSyncVolume(chan)) {
+        if (!S3SyncSampleVolume(chan)) {
             return eS3_error_function_failed;
         }
     } else if (chan->type == eS3_ST_midi) {

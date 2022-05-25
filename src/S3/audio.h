@@ -6,6 +6,9 @@
 
 extern int gS3_enabled;
 extern int gS3_last_error;
+extern tS3_channel gS3_channel_template;
+extern tS3_sound_source* gS3_sound_sources;
+extern int gS3_service_time_delta;
 
 int S3Init(char* path, int low_memory_mode);
 
@@ -39,7 +42,7 @@ tS3_descriptor* S3GetDescriptorByID(tS3_sound_tag id);
 char* S3GetCurrentDir();
 
 void S3CalculateRandomizedFields(tS3_channel* chan, tS3_descriptor* desc);
-int S3IRandomBetween(int min, int max, int fallback);
+int S3IRandomBetween(int pMin, int pMax, int pDefault);
 int S3IRandomBetweenLog(int pMin, int pMax, int pDefault);
 double S3FRandomBetween(double pMin, double pMax);
 
