@@ -122,7 +122,20 @@ void S3ServiceSoundSources() {
 }
 
 int S3UpdateSpatialSound(tS3_channel* chan) {
-    return 1;
+    int v1;                   // eax
+    int close_enough_to_play; // [esp+10h] [ebp-4h]
+
+    if (chan->sound_source_ptr && chan->sound_source_ptr->ambient) {
+        v1 = S3Calculate3D(chan, 1);
+    } else {
+        v1 = S3Calculate3D(chan, 0);
+    }
+    close_enough_to_play = v1;
+    if (v1) {
+        S3SyncSampleVolume(chan);
+        S3SyncSampleRate(chan);
+    }
+    return close_enough_to_play;
 }
 
 int S3BindAmbientSoundToOutlet(tS3_outlet* pOutlet, int pSound, tS3_sound_source* source, float pMax_distance, int pPeriod, int pRepeats, int pVolume, int pPitch, int pSpeed) {

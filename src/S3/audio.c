@@ -13,7 +13,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MINIAUDIO_IMPLEMENTATION
 #include "miniaudio/miniaudio.h"
 
 #include <SDL.h>
@@ -734,9 +733,7 @@ tS3_sound_tag S3StartSound(tS3_outlet* pOutlet, tS3_sound_id pSound) {
     }
     memset(&gS3_channel_template, 0, sizeof(gS3_channel_template));
     S3CalculateRandomizedFields(&gS3_channel_template, desc);
-    chan = S3AllocateChannel(
-        pOutlet,
-        desc->priority * (gS3_channel_template.right_volume + gS3_channel_template.left_volume + 1));
+    chan = S3AllocateChannel(pOutlet, desc->priority * (gS3_channel_template.right_volume + gS3_channel_template.left_volume + 1));
     if (!chan) {
         gS3_last_error = eS3_error_channel_alloc;
         return 0;
@@ -800,6 +797,8 @@ tS3_sound_tag S3StartSound(tS3_outlet* pOutlet, tS3_sound_id pSound) {
 tS3_sound_tag S3StartSound2(tS3_outlet* pOutlet, tS3_sound_id pSound, tS3_repeats pRepeats, tS3_volume pLVolume, tS3_volume pRVolume, tS3_pitch pPitch, tS3_speed pSpeed) {
     tS3_channel* chan;    // [esp+30h] [ebp-Ch]
     tS3_descriptor* desc; // [esp+38h] [ebp-4h]
+
+    printf("start sound2 %p, %d\n", pOutlet, pSound);
 
     if (!gS3_enabled) {
         return 0;

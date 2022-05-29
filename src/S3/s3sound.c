@@ -20,12 +20,14 @@ int S3OpenSampleDevice() {
 
     ma_engine_config engineConfig;
     engineConfig = ma_engine_config_init();
-    engineConfig.sampleRate = 22050;
+    // engineConfig.sampleRate = 22050;
     result = ma_engine_init(&engineConfig, &engine);
     if (result != MA_SUCCESS) {
         printf("Failed to initialize audio engine.");
         return 0;
     }
+
+    ma_engine_set_volume(&engine, 0.1f);
 
     // if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024) == -1) {
     //     return 0;
@@ -262,11 +264,15 @@ int S3ExecuteSampleFilterFuncs(tS3_channel* chan) {
 }
 
 int S3PlaySample(tS3_channel* chan) {
-    // printf("playing on %d\n", chan->id);
+    printf("play sound %d\n", chan->descriptor->id);
 
     S3SyncSampleVolume(chan);
     S3SyncSampleRate(chan);
     if (chan->descriptor && chan->descriptor->type == chan->type) {
+        if (ma_sound_is_playing(chan->descriptor->sound_buffer)) {
+            printf("warning, still playing\n");
+        }
+        ma_sound_seek_to_pcm_frame(chan->descriptor->sound_buffer, 0);
         ma_sound_set_looping(chan->descriptor->sound_buffer, chan->repetitions == 0);
         ma_sound_start(chan->descriptor->sound_buffer);
         // Mix_PlayChannel(chan->id, chan->descriptor->sound_buffer, 0);
@@ -305,9 +311,67 @@ int sub_49D84C(tS3_channel* chan) {
 }
 
 int S3SyncSampleVolume(tS3_channel* chan) {
-    return 0;
+
+    float pan_ratio; // [esp+38h] [ebp-8h]
+    float total_vol; // [esp+3Ch] [ebp-4h]
+
+    int volume_db;
+    int pan;
+
+    if (chan->type != eS3_ST_sample) {
+        return 1;
+    }
+    total_vol = chan->left_volume + chan->right_volume;
+    if (total_vol == 0.0f) {
+        total_vol = 1.0f;
+    }
+    if (chan->descriptor && chan->descriptor->type == chan->type) {
+        // sound_buffer = chan->descriptor->sound_buffer;
+        volume_db = 510.0f / total_vol * -5.0f - 350.0f;
+        if (volume_db < 0) {
+            volume_db = 0;
+        }
+        // if (!sound_buffer->lpVtbl->SetVolume(sound_buffer, v3) {
+        //     return 1;
+        // }
+        ma_sound_set_volume(chan->descriptor->sound_buffer, ma_volume_db_to_linear(volume_db));
+        if (chan->spatial_sound) {
+            if (chan->left_volume != 0 && chan->right_volume > chan->left_volume) {
+                pan_ratio = chan->right_volume / (float)chan->left_volume;
+            } else if (chan->right_volume != 0) {
+                pan_ratio = chan->left_volume / (float)chan->right_volume;
+            }
+            if (chan->left_volume != 0 && chan->right_volume != 0) {
+                pan = (chan->right_volume - chan->left_volume) * pan_ratio;
+                pan = MAX(pan, -10000);
+                pan = MIN(pan, 10000);
+
+                // sound_buffer->lpVtbl->SetPan(sound_buffer, v4);
+            } else if (chan->left_volume != 0) {
+                // sound_buffer->lpVtbl->SetPan(sound_buffer, -10000);
+            } else {
+                // sound_buffer->lpVtbl->SetPan(sound_buffer, 10000);
+            }
+        }
+    }
+    return 1;
 }
 
 int S3SyncSampleRate(tS3_channel* chan) {
-    return 0;
+    if (!chan->type) {
+        if (chan->descriptor) {
+            if (chan->descriptor->type == chan->type) {
+                if (chan->descriptor->sound_buffer != NULL) {
+                    int rate = chan->rate;
+                    if (rate >= 100000) {
+                        rate = 100000;
+                    }
+                    printf("pitch of %d, %f\n", chan->descriptor->id, (rate / 16000.0f));
+                    ma_sound_set_pitch(chan->descriptor->sound_buffer, (rate / 16000.0f));
+                    // sound_buffer->lpVtbl->SetFrequency(sound_buffer, rate);
+                }
+            }
+        }
+    }
+    return 1;
 }
