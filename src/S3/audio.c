@@ -109,7 +109,10 @@ int S3OpenOutputDevices() {
     S3OpenCDADevice();
     gS3_hardware_info.timer_installed = 0;
     gS3_hardware_info.device_installed = 1;
-    gS3_hardware_info.independent_pitch = 0;
+
+    // changed by dethrace
+    // gS3_hardware_info.independent_pitch = 0;
+    gS3_hardware_info.independent_pitch = 1;
     return 1;
 }
 

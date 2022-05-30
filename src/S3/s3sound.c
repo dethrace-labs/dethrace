@@ -358,8 +358,8 @@ int S3SyncSampleRate(tS3_channel* chan) {
                 rate = 100000;
             }
             //  sound_buffer->lpVtbl->SetFrequency(sound_buffer, rate);
-            // TODO use real sound sample rate instead of 16000
-            ma_sound_set_pitch(chan->descriptor->sound_buffer, (rate / 16000.0f));
+            // miniaudio uses a linear pitch scale instead of sample rate, so scale it down
+            ma_sound_set_pitch(chan->descriptor->sound_buffer, (rate / (float)((tS3_sample*)chan->descriptor->sound_data)->rate));
         }
     }
     return 1;
