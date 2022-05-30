@@ -47,18 +47,18 @@ Lots of other fun things are available from the [Road Reaction site](https://rr2
 
 ## Dependencies
 
-### SDL2, SDL2_mixer
+### SDL2
 
 The easiest way to install SDL is via your favorite package manager.
 
 OSX:
 ```sh
-brew install SDL2 sdl2_mixer
+brew install SDL2
 ```
 
 Linux:
 ```sh
-apt-get install libsdl2-dev libsdl2-mixer-dev
+apt-get install libsdl2-dev
 ```
 
  
