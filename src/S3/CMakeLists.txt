@@ -12,9 +12,7 @@ target_link_libraries(s3 PRIVATE brender SDL2::SDL2 harness miniaudio)
 if(NOT MSVC)
     target_compile_options(s3 PRIVATE
         -g
-        -Wall
         -Werror
-        -Wno-unused-parameter
     )
     target_link_libraries(s3 PUBLIC pthread m)
 else()
