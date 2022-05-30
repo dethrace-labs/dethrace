@@ -13,7 +13,6 @@ if(NOT MSVC)
     target_compile_options(s3 PRIVATE
         -g
         -Wall
-        -Wextra
         -Werror
         -Wno-unused-parameter
     )

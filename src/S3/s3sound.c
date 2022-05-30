@@ -140,21 +140,19 @@ int S3ReadWavHeader(char* buf, tWAVEFORMATEX_** pWav_format, char** data_ptr, in
 }
 
 void* S3LoadWavFile(char* pFile_name, tS3_sample* pSample) {
-    FILE* f;                             // [esp+Ch] [ebp-C8h]
-    size_t bytes_read;                   // [esp+14h] [ebp-C0h] BYREF
-    unsigned int locked_buffer_data_len; // [esp+18h] [ebp-BCh] BYREF
-    // struct _OFSTRUCT ReOpenBuff;         // [esp+1Ch] [ebp-B8h] BYREF
+    FILE* f;           // [esp+Ch] [ebp-C8h]
+    size_t bytes_read; // [esp+14h] [ebp-C0h] BYREF
+    //  unsigned int locked_buffer_data_len; // [esp+18h] [ebp-BCh] BYREF
+    //   struct _OFSTRUCT ReOpenBuff;         // [esp+1Ch] [ebp-B8h] BYREF
     char* buf; // [esp+A4h] [ebp-30h]
     // LPDIRECTSOUNDBUFFER ds_buffer;       // [esp+A8h] [ebp-2Ch] BYREF
     // DSBUFFERDESC buffer_desc;   // [esp+ACh] [ebp-28h] BYREF
     int data_size;              // [esp+C0h] [ebp-14h] BYREF
     tWAVEFORMATEX_* wav_format; // [esp+C4h] [ebp-10h] BYREF
     char* data_ptr;             // [esp+C8h] [ebp-Ch] BYREF
-    char* locked_buffer_data;   // [esp+CCh] [ebp-8h] BYREF
-    size_t file_len;            // [esp+D0h] [ebp-4h]
+    // char* locked_buffer_data;   // [esp+CCh] [ebp-8h] BYREF
+    size_t file_len; // [esp+D0h] [ebp-4h]
 
-    locked_buffer_data = NULL;
-    locked_buffer_data_len = 0;
     f = fopen(pFile_name, "r");
     if (f == NULL) {
         gS3_last_error = eS3_error_readfile;
@@ -343,7 +341,7 @@ int S3SyncSampleVolume(tS3_channel* chan) {
             if (pan != 0) {
                 printf("pan of %d is %d\n", chan->descriptor->id, pan);
             }
-            // ma_sound_set_pan(chan->descriptor->sound_buffer, pan / 10000.0f);
+            ma_sound_set_pan(chan->descriptor->sound_buffer, pan / 10000.0f);
         }
     }
     return 1;

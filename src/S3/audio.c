@@ -3,6 +3,8 @@
 
 #include "3d.h"
 #include "harness/os.h"
+#include "harness/trace.h"
+#include "miniaudio/miniaudio.h"
 #include "s3cda.h"
 #include "s3music.h"
 #include "s3sound.h"
@@ -12,8 +14,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "miniaudio/miniaudio.h"
 
 #include <SDL.h>
 
@@ -353,7 +353,7 @@ int S3SoundBankReadEntry(tS3_soundbank_read_ctx* ctx, char* dir_name, int low_me
     if ((desc->flags & 1) != 0 && desc->memory_proxy == -1) {
         if (desc->type == eS3_ST_midi) {
             desc->sound_data = NULL;
-        } else if (S3LoadSample(desc->id)) {
+        } else if (S3LoadSample(desc->id) != 0) {
             printf("\nSound bank file: couldn't load '%s'\n", desc->filename);
             ctx->data_len = 1;
             return 0;
@@ -412,8 +412,6 @@ tS3_outlet* S3CreateOutlet(int unk1, int pChannel_count) {
     tS3_outlet* outlet;
     int channels_remaining;
 
-    printf("creating outlet with %d channels\n", pChannel_count);
-
     // nchannels = (int)operator new(unk1, (void*)pChannel_count);
     nchannels = pChannel_count;
 
@@ -462,8 +460,6 @@ int S3CreateOutletChannels(tS3_outlet* outlet, int pChannel_count) {
         }
         memset(chan, 0, sizeof(tS3_channel));
         chan->owner_outlet = outlet;
-
-        printf("creating channel for outlet %d\n", outlet->id);
 
         if (sub_49D837(chan) == 0) {
             S3MemFree(chan);
@@ -756,11 +752,7 @@ int S3ServiceChannel(tS3_channel* chan) {
             if (ma_sound_is_playing(chan->descriptor->sound_buffer)) {
                 return 1;
             }
-            // if (Mix_Playing(chan->id)) {
-            //     return 1;
-            // }
         }
-        // printf("stopping channel %d\n", chan->id);
         S3StopSample(chan);
         return 0;
     } else if (chan->type == eS3_ST_midi) {
@@ -1080,11 +1072,9 @@ int S3StopOutletSound(tS3_outlet* pOutlet) {
 
 char* S3GetCurrentDir() {
     if (!gS3_have_current_dir) {
-        getcwd(gS3_current_dir, 260);
-        // gS3_current_dir[0] = 0;
-        // if (GetCurrentDirectoryA(0x104u, (LPSTR)gS3_current_dir) != strlen(gS3_current_dir)) {
-        //     gS3_current_dir[0] = 0;
-        // }
+        if (getcwd(gS3_current_dir, 260) == NULL) {
+            LOG_PANIC("failed to call getcwd"); // added by dethrace
+        };
         gS3_have_current_dir = 1;
     }
     return gS3_current_dir;
