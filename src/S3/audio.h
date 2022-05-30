@@ -9,6 +9,7 @@ extern int gS3_last_error;
 extern tS3_channel gS3_channel_template;
 extern tS3_sound_source* gS3_sound_sources;
 extern int gS3_service_time_delta;
+extern int gS3_inside_cockpit;
 
 int S3Init(char* path, int low_memory_mode);
 
@@ -27,8 +28,11 @@ int S3StopChannel(tS3_channel* chan);
 void S3DisposeOutlet(tS3_outlet* outlet);
 void S3StopAllOutletSounds();
 
-int S3LoadSoundbank(const char* pSoundbank_filename, int pLow_memory_mode);
+int S3DisposeDescriptor(tS3_sound_id id);
+
 char* S3LoadSoundBankFile(char* pThe_path);
+int S3LoadSoundbank(const char* pSoundbank_filename, int pLow_memory_mode);
+
 void S3SoundBankReaderNextLine(tS3_soundbank_read_ctx* ctx);
 void S3SoundBankReaderSkipWhitespace(tS3_soundbank_read_ctx* ctx);
 void S3SoundBankReaderSkipToNewline(tS3_soundbank_read_ctx* ctx);
@@ -37,7 +41,7 @@ int S3SoundBankReaderReadFilename(char** filename, tS3_soundbank_read_ctx* ctx, 
 int S3SoundBankReadEntry(tS3_soundbank_read_ctx* ctx, char* dir_name, int low_memory_mode);
 
 tS3_descriptor* S3AllocateDescriptor();
-tS3_descriptor* S3GetDescriptorByID(tS3_sound_tag id);
+tS3_descriptor* S3GetDescriptorByID(tS3_sound_id id);
 
 char* S3GetCurrentDir();
 

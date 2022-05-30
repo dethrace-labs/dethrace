@@ -153,9 +153,8 @@ void* S3LoadWavFile(char* pFile_name, tS3_sample* pSample) {
     char* locked_buffer_data;   // [esp+CCh] [ebp-8h] BYREF
     size_t file_len;            // [esp+D0h] [ebp-4h]
 
-    locked_buffer_data = 0;
+    locked_buffer_data = NULL;
     locked_buffer_data_len = 0;
-    // f = OpenFile(lpFileName, &ReOpenBuff, 0);
     f = fopen(pFile_name, "r");
     if (f == NULL) {
         gS3_last_error = eS3_error_readfile;
@@ -189,13 +188,8 @@ void* S3LoadWavFile(char* pFile_name, tS3_sample* pSample) {
     pSample->resolution = wav_format->nAvgBytesPerSec;
     pSample->channels = wav_format->nChannels;
 
-    // Mix_Chunk* raw_chunk = Mix_LoadWAV(pFile_name); // Mix_QuickLoad_RAW((Uint8*)data_ptr, data_size);
-    // if (raw_chunk == NULL) {
-    //     return NULL;
-    // }
-    // return raw_chunk;
-
     ma_sound* sound = malloc(sizeof(ma_sound));
+    // TOOD: load from memory - we've already read the file data
     if (ma_sound_init_from_file(&engine, pFile_name, MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_NO_SPATIALIZATION, NULL, NULL, sound) != MA_SUCCESS) {
         return NULL; // Failed to load sound.
     }
@@ -231,14 +225,9 @@ void* S3LoadWavFile(char* pFile_name, tS3_sample* pSample) {
 }
 
 int S3StopSample(tS3_channel* chan) {
-    // LPDIRECTSOUNDBUFFER dsound_buffer; // [esp+Ch] [ebp-4h]
     if (chan->descriptor && chan->descriptor->type == chan->type) {
-        // if (Mix_Playing(chan->id)) {
-        //     printf("warn - stopping channel while playing %d\n", chan->id);
-        // }
-        // Mix_HaltChannel(chan->id);
-
         ma_sound_stop(chan->descriptor->sound_buffer);
+        ma_sound_seek_to_pcm_frame(chan->descriptor->sound_buffer, 0);
 
         // dsound_buffer = chan->descriptor->dsound_buffer;
         // if (dsound_buffer) {
@@ -269,9 +258,6 @@ int S3PlaySample(tS3_channel* chan) {
     S3SyncSampleVolume(chan);
     S3SyncSampleRate(chan);
     if (chan->descriptor && chan->descriptor->type == chan->type) {
-        if (ma_sound_is_playing(chan->descriptor->sound_buffer)) {
-            printf("warning, still playing\n");
-        }
         ma_sound_seek_to_pcm_frame(chan->descriptor->sound_buffer, 0);
         ma_sound_set_looping(chan->descriptor->sound_buffer, chan->repetitions == 0);
         ma_sound_start(chan->descriptor->sound_buffer);
@@ -326,15 +312,19 @@ int S3SyncSampleVolume(tS3_channel* chan) {
         total_vol = 1.0f;
     }
     if (chan->descriptor && chan->descriptor->type == chan->type) {
-        // sound_buffer = chan->descriptor->sound_buffer;
         volume_db = 510.0f / total_vol * -5.0f - 350.0f;
-        if (volume_db < 0) {
+        if (volume_db >= 0) {
             volume_db = 0;
         }
+
         // if (!sound_buffer->lpVtbl->SetVolume(sound_buffer, v3) {
         //     return 1;
         // }
-        ma_sound_set_volume(chan->descriptor->sound_buffer, ma_volume_db_to_linear(volume_db));
+
+        // convert from directsound -10000-0 volume scale
+        float linear_vol = 1.0f - (volume_db / -10000.0f);
+
+        ma_sound_set_volume(chan->descriptor->sound_buffer, linear_vol);
         if (chan->spatial_sound) {
             if (chan->left_volume != 0 && chan->right_volume > chan->left_volume) {
                 pan_ratio = chan->right_volume / (float)chan->left_volume;
@@ -345,32 +335,33 @@ int S3SyncSampleVolume(tS3_channel* chan) {
                 pan = (chan->right_volume - chan->left_volume) * pan_ratio;
                 pan = MAX(pan, -10000);
                 pan = MIN(pan, 10000);
-
-                // sound_buffer->lpVtbl->SetPan(sound_buffer, v4);
             } else if (chan->left_volume != 0) {
-                // sound_buffer->lpVtbl->SetPan(sound_buffer, -10000);
+                pan = -10000;
             } else {
-                // sound_buffer->lpVtbl->SetPan(sound_buffer, 10000);
+                pan = 10000;
             }
+            if (pan != 0) {
+                printf("pan of %d is %d\n", chan->descriptor->id, pan);
+            }
+            // ma_sound_set_pan(chan->descriptor->sound_buffer, pan / 10000.0f);
         }
     }
     return 1;
 }
 
 int S3SyncSampleRate(tS3_channel* chan) {
-    if (!chan->type) {
-        if (chan->descriptor) {
-            if (chan->descriptor->type == chan->type) {
-                if (chan->descriptor->sound_buffer != NULL) {
-                    int rate = chan->rate;
-                    if (rate >= 100000) {
-                        rate = 100000;
-                    }
-                    printf("pitch of %d, %f\n", chan->descriptor->id, (rate / 16000.0f));
-                    ma_sound_set_pitch(chan->descriptor->sound_buffer, (rate / 16000.0f));
-                    // sound_buffer->lpVtbl->SetFrequency(sound_buffer, rate);
-                }
+    if (chan->type != eS3_ST_sample) {
+        return 1;
+    }
+    if (chan->descriptor && chan->descriptor->type == chan->type) {
+        if (chan->descriptor->sound_buffer != NULL) {
+            int rate = chan->rate;
+            if (rate >= 100000) {
+                rate = 100000;
             }
+            //  sound_buffer->lpVtbl->SetFrequency(sound_buffer, rate);
+            // TODO use real sound sample rate instead of 16000
+            ma_sound_set_pitch(chan->descriptor->sound_buffer, (rate / 16000.0f));
         }
     }
     return 1;

@@ -2946,18 +2946,27 @@ void ScrapeNoise(br_scalar vel, br_vector3* position, int material) {
     br_vector3 position_in_br;
     LOG_TRACE("(%f, %p, %d)", vel, position, material);
 
-    vol = vel * 7.f;
-    if (gCurrent_race.material_modifiers[material].scrape_noise_index != -1) {
-        if (scrape_tag == 0 || (!DRS3SoundStillPlaying(scrape_tag) && vol > 30)) {
-            BrVector3Set(&velocity, 0.f, 0.f, 0.f);
-            scrape_tag = DRS3StartSound3D(gCar_outlet,
-                gMetal_scrape_sound_id__car[IRandomBetween(0, COUNT_OF(gMetal_scrape_sound_id__car) - 1)],
-                position, &velocity, 1, vol, IRandomBetween(49152, 81920), 0x10000);
-            last_scrape_vol = vol;
-        } else if (last_scrape_vol < vol) {
+    vol = vel * 7.0;
+    if (gCurrent_race.material_modifiers[material].scrape_noise_index == -1) {
+        return;
+    }
+    if ((scrape_tag && DRS3SoundStillPlaying(scrape_tag)) || vol <= 30) {
+        if (last_scrape_vol < vol) {
             DRS3ChangeVolume(scrape_tag, vol);
             last_scrape_vol = vol;
         }
+    } else {
+        BrVector3Set(&velocity, 0.f, 0.f, 0.f);
+        scrape_tag = DRS3StartSound3D(
+            gCar_outlet,
+            gMetal_scrape_sound_id__car[IRandomBetween(0, COUNT_OF(gMetal_scrape_sound_id__car) - 1)],
+            position,
+            &velocity,
+            1,
+            vol,
+            IRandomBetween(49152, 81920),
+            0x10000);
+        last_scrape_vol = vol;
     }
 }
 

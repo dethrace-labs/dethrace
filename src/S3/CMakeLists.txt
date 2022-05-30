@@ -17,6 +17,7 @@ if(NOT MSVC)
         -Werror
         -Wno-unused-parameter
     )
+    target_link_libraries(s3 PUBLIC pthread m)
 else()
     target_compile_definitions(s3 PRIVATE -D_CRT_SECURE_NO_WARNINGS)
     target_compile_options(s3 PRIVATE

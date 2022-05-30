@@ -37,6 +37,10 @@ tS3_sound_tag S3StartSound3D(tS3_outlet_ptr pOutlet, tS3_sound_id pSound, tS3_ve
 
 tS3_outlet_ptr S3CreateOutlet(int unk1, int pChannel_count);
 void S3DisposeOutlet(tS3_outlet_ptr outlet);
+int S3DisposeDescriptor(tS3_sound_id id);
+int S3DisposeSoundSource(tS3_sound_source_ptr src);
+
+int S3SetTagVolume(tS3_sound_tag pTag, tS3_volume pVolume);
 
 void S3Service(int inside_cockpit, int unk1);
 

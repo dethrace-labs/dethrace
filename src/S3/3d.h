@@ -11,6 +11,8 @@ void S3ServiceSoundSources();
 int S3UpdateSpatialSound(tS3_channel* chan);
 int S3BindAmbientSoundToOutlet(tS3_outlet* pOutlet, int pSound, tS3_sound_source* source, float pMax_distance, int pPeriod, int pRepeats, int pVolume, int pPitch, int pSpeed);
 void S3UpdateSoundSource(tS3_outlet* outlet, tS3_sound_tag tag, tS3_sound_source* src, float pMax_distance_squared, int pPeriod, tS3_repeats pAmbient_repeats, tS3_volume pVolume, int pPitch, tS3_speed pSpeed);
+void S3StopSoundSource(tS3_sound_source* src);
+
 tS3_sound_tag S3ServiceSoundSource(tS3_sound_source* src);
 
 int S3Calculate3D(tS3_channel* chan, int pIs_ambient);

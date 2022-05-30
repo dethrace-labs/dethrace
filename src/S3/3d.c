@@ -3,6 +3,7 @@
 #include "resource.h"
 #include "s3sound.h"
 #include <math.h>
+#include <stdio.h>
 #include <string.h>
 
 tS3_vector3 gS3_listener_position_old;
@@ -84,6 +85,24 @@ void S3BindListenerLeftBRender(br_vector3* left) {
 }
 
 void S3UpdateListenerVectors() {
+    if (gS3_listener_pos_ptr) {
+        S3CopyVector3(&gS3_listener_position_now, gS3_listener_pos_ptr, gS3_listener_pos_is_brender);
+    }
+    if (gS3_listener_vel_ptr) {
+        S3CopyVector3(&gS3_listener_vel_now, gS3_listener_vel_ptr, gS3_listener_vel_is_brender);
+    } else {
+        gS3_listener_vel_now.x = (gS3_listener_position_now.x - gS3_listener_position_old.x) / 1000.0 * gS3_service_time_delta;
+        gS3_listener_vel_now.y = (gS3_listener_position_now.y - gS3_listener_position_old.y) / 1000.0 * gS3_service_time_delta;
+        gS3_listener_vel_now.z = (gS3_listener_position_now.z - gS3_listener_position_old.z) / 1000.0 * gS3_service_time_delta;
+        gS3_listener_position_old = gS3_listener_position_now;
+    }
+    if (gS3_listener_left_ptr) {
+        S3CopyVector3(&gS3_listener_left_now, gS3_listener_left_ptr, gS3_listener_left_is_brender);
+    } else {
+        gS3_listener_left_now.x = gS3_listener_position_now.x + 1.0;
+        gS3_listener_left_now.y = gS3_listener_position_now.y;
+        gS3_listener_left_now.z = gS3_listener_position_now.z;
+    }
 }
 
 void S3ServiceSoundSources() {
@@ -268,6 +287,21 @@ void S3UpdateSoundSource(tS3_outlet* outlet, tS3_sound_tag tag, tS3_sound_source
     }
 }
 
+void S3StopSoundSource(tS3_sound_source* src) {
+    if (!gS3_enabled) {
+        return;
+    }
+    if (src) {
+        if (src->channel && src->tag && src->channel->tag == src->tag) {
+            src->channel->termination_reason = eS3_tr_stopped;
+            src->channel->spatial_sound = 0;
+            S3StopChannel(src->channel);
+            src->channel->sound_source_ptr = NULL;
+        }
+        src->ambient = 0;
+    }
+}
+
 tS3_sound_tag S3ServiceSoundSource(tS3_sound_source* src) {
     tS3_channel* chan;    // [esp+30h] [ebp-10h]
     tS3_outlet* outlet;   // [esp+34h] [ebp-Ch]
@@ -447,5 +481,81 @@ tS3_sound_tag S3StartSound3D(tS3_outlet* pOutlet, tS3_sound_id pSound, tS3_vecto
 }
 
 int S3Calculate3D(tS3_channel* chan, int pIs_ambient) {
+    float v10;                          // [esp+2Ch] [ebp-1Ch]
+    float v11;                          // [esp+30h] [ebp-18h]
+    float vol_multiplier;               // [esp+38h] [ebp-10h]
+    tS3_sound_source* sound_source_ptr; // [esp+3Ch] [ebp-Ch]
+    float dist_squared;                 // [esp+40h] [ebp-8h]
+    float dist;                         // [esp+44h] [ebp-4h]
+
+    sound_source_ptr = chan->sound_source_ptr;
+    if (sound_source_ptr) {
+        if (sound_source_ptr->position_ptr) {
+            S3CopyVector3(&chan->position, sound_source_ptr->position_ptr, sound_source_ptr->brender_vector);
+        }
+        if (sound_source_ptr->velocity_ptr) {
+            S3CopyVector3(&chan->velocity, sound_source_ptr->velocity_ptr, sound_source_ptr->brender_vector);
+        } else {
+            chan->velocity.x = (chan->position.x - chan->lastpos.x) / 1000.0 * (double)gS3_service_time_delta;
+            chan->velocity.y = (chan->position.y - chan->lastpos.y) / 1000.0 * (double)gS3_service_time_delta;
+            chan->velocity.z = (chan->position.z - chan->lastpos.z) / 1000.0 * (double)gS3_service_time_delta;
+            chan->lastpos = chan->position;
+        }
+    }
+    dist_squared = (chan->position.z - gS3_listener_position_now.z) * (chan->position.z - gS3_listener_position_now.z)
+        + (chan->position.x - gS3_listener_position_now.x) * (chan->position.x - gS3_listener_position_now.x)
+        + (chan->position.y - gS3_listener_position_now.y) * (chan->position.y - gS3_listener_position_now.y);
+    if (dist_squared < 0) {
+        dist_squared = dist_squared * -1.0;
+    }
+    printf("dist: %p, %f\n", chan->sound_source_ptr, dist_squared);
+    if (chan->pMax_distance_squared < dist_squared) {
+        return 0;
+    }
+    if (dist_squared == 0.0f) {
+        dist = 0.0f;
+    } else {
+        dist = sqrtf(dist_squared);
+    }
+    if (pIs_ambient) {
+        v11 = 1.0 - ((chan->position.z - gS3_listener_position_now.z) * (chan->velocity.z - gS3_listener_vel_now.z) + (chan->velocity.y - gS3_listener_vel_now.y) * (chan->position.y - gS3_listener_position_now.y) + (chan->position.x - gS3_listener_position_now.x) * (chan->velocity.x - gS3_listener_vel_now.x)) / dist / flt_531D98;
+        if (v11 <= 2.0f) {
+            if (v11 < 0.5) {
+                v11 = 0.5;
+            }
+        } else {
+            v11 = 2.0;
+        }
+        chan->rate = chan->initial_pitch * v11;
+    } else {
+        chan->rate = chan->initial_pitch;
+    }
+    vol_multiplier = 1.0 / (dist / 6.0 + 1.0);
+    if (!gS3_inside_cockpit) {
+        vol_multiplier = vol_multiplier * 1.3;
+    }
+    v10 = (chan->position.z - gS3_listener_position_now.z) * gS3_listener_left_now.z
+        + (chan->position.y - gS3_listener_position_now.y) * gS3_listener_left_now.y
+        + (chan->position.x - gS3_listener_position_now.x) * gS3_listener_left_now.x;
+    if (v10 < -1.0) {
+        v10 = v10 - ceil(v10);
+    }
+    if (v10 > 1.0) {
+        v10 = v10 - floor(v10);
+    }
+    chan->left_volume = (v10 + 1.0) / 2.0 * ((double)chan->initial_volume * vol_multiplier) * chan->volume_multiplier;
+    if (chan->left_volume < 0) {
+        chan->left_volume = 0;
+    }
+    chan->right_volume = (1.0 - v10) / 2.0 * ((double)chan->initial_volume * vol_multiplier) * chan->volume_multiplier;
+    if (chan->right_volume < 0) {
+        chan->right_volume = 0;
+    }
+    if (chan->left_volume > 255) {
+        chan->left_volume = 255;
+    }
+    if (chan->right_volume > 255) {
+        chan->right_volume = 255;
+    }
     return 1;
 }
