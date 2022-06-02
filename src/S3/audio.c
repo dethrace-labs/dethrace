@@ -192,7 +192,7 @@ char* S3LoadSoundBankFile(char* pThe_path) {
     size_t file_size;
 
     // fd = _open(pThe_path, 0x8000);
-    fd = OS_fopen(pThe_path, "r");
+    fd = OS_fopen(pThe_path, "rb");
     if (!fd) {
         gS3_last_error = eS3_error_readfile;
         return 0;
