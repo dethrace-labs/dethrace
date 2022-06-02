@@ -508,7 +508,6 @@ int S3Calculate3D(tS3_channel* chan, int pIs_ambient) {
     if (dist_squared < 0) {
         dist_squared = dist_squared * -1.0;
     }
-    printf("dist: %p, %f\n", chan->sound_source_ptr, dist_squared);
     if (chan->pMax_distance_squared < dist_squared) {
         return 0;
     }

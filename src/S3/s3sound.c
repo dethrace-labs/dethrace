@@ -338,9 +338,6 @@ int S3SyncSampleVolume(tS3_channel* chan) {
             } else {
                 pan = 10000;
             }
-            if (pan != 0) {
-                printf("pan of %d is %d\n", chan->descriptor->id, pan);
-            }
             ma_sound_set_pan(chan->descriptor->sound_buffer, pan / 10000.0f);
         }
     }

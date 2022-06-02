@@ -2303,7 +2303,7 @@ void MungePedestrians(tU32 pFrame_period) {
     LOG_TRACE("(%d)", pFrame_period);
 
     gVesuvians_this_time = 0;
-    gAttracted_pedestrians = 32;
+    // dword_550A9C = 32;
     gMax_distance_squared = 121.f;
     if (!gAction_replay_mode) {
         MungePedGibs(pFrame_period);
