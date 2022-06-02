@@ -294,7 +294,7 @@ int DRModelPick2D__raycast(br_model* model, br_material* material, br_vector3* r
                 this_material = material;
             }
             d = BrVector3Dot(&fp->eqn, ray_dir);
-            if (fabsf(d) >= 0.00000023841858f && ((this_material->flags & (BR_MATF_TWO_SIDED | BR_MATF_ALWAYS_VISIBLE)) != 0 || d <= 0.0)) // 
+            if (fabsf(d) >= 0.00000023841858f && ((this_material->flags & (BR_MATF_TWO_SIDED | BR_MATF_ALWAYS_VISIBLE)) != 0 || d <= 0.0)) //
             {
                 numerator = BrVector3Dot(&fp->eqn, ray_pos) - fp->eqn.v[3];
                 if (!BadDiv__raycast(numerator, d)) {
@@ -326,7 +326,7 @@ int DRModelPick2D__raycast(br_model* model, br_material* material, br_vector3* r
 
                         v0i1 = p.v[axis_0] - v0;
                         v0i2 = p.v[axis_1] - u0;
-                        if (fabsf(v1) > 0.0000002384185791015625f) {
+                        if (fabs(v1) > 0.0000002384185791015625) {
                             f_d = v0i2 * v1 - u1 * v0i1;
                             f_n = u2 * v1 - u1 * v2;
                             if (f_n == 0.) {
