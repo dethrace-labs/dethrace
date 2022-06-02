@@ -48,9 +48,9 @@ int S3OpenSampleDevice() {
 // Returns 0 if no error
 int S3LoadSample(tS3_sound_id id) {
     // LPDIRECTSOUNDBUFFER WavFile; // eax
-    char filename[80];          // [esp+10h] [ebp-5Ch] BYREF
-    tS3_descriptor* descriptor; // [esp+60h] [ebp-Ch]
-    tS3_sample* sample;         // [esp+68h] [ebp-4h]
+    char filename[MAX_PATH_LENGTH]; // [esp+10h] [ebp-5Ch] BYREF
+    tS3_descriptor* descriptor;     // [esp+60h] [ebp-Ch]
+    tS3_sample* sample;             // [esp+68h] [ebp-4h]
 
     if (!gS3_enabled) {
         return 0;

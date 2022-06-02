@@ -46,23 +46,31 @@ br_vector3 gCamera_velocity;
 
 // IDA: void __cdecl UsePathFileToDetermineIfFullInstallation()
 void UsePathFileToDetermineIfFullInstallation() {
-    char line2[80];
-    char line3[80];
-    char path_file[80];
+    char line1[MAX_PATH_LENGTH];
+    char line2[MAX_PATH_LENGTH];
+    char line3[MAX_PATH_LENGTH];
+    char path_file[MAX_PATH_LENGTH];
     FILE* fp;
 
     strcpy(path_file, gApplication_path);
     strcat(path_file, gDir_separator);
     strcat(path_file, "PATHS.TXT");
-
-    if (PDCheckDriveExists(path_file)) {
+    if (PDCheckDriveExists(path_file) != 0) {
         fp = fopen(path_file, "rt");
-        if (fp != NULL) {
-            if (GetALineWithNoPossibleService(fp, line2) && GetALineWithNoPossibleService(fp, line2) && GetALineWithNoPossibleService(fp, line3) && strcmp(line3, "Full") == 0) {
+        if (fp) {
+            line1[0] = 0;
+            line2[0] = 0;
+            line3[0] = 0;
+            GetALineWithNoPossibleService(fp, (unsigned char*)line1);
+            GetALineWithNoPossibleService(fp, (unsigned char*)line2);
+            GetALineWithNoPossibleService(fp, (unsigned char*)line3);
+            fclose(fp);
+            if (strcmp(line3, "Full") == 0) {
                 gCD_fully_installed = 1;
             }
-            fclose(fp);
         }
+    } else {
+        gCD_fully_installed = 1;
     }
 }
 
@@ -494,7 +502,7 @@ tS3_sound_tag DRS3StartSound3D(tS3_outlet_ptr pOutlet, tS3_sound_id pSound, br_v
     if (pVolume && pSound != 1000 && (pSound < 3000 || pSound > 3007) && (pSound < 5300 || pSound > 5320)) {
         PipeSingleSound(pOutlet, pSound, pVolume, 0, pPitch, pInitial_position);
     }
-    return S3StartSound3D(pOutlet, pSound, pInitial_position, pInitial_velocity, pRepeats, pVolume, pPitch, pSpeed);
+    return S3StartSound3D(pOutlet, pSound, (tS3_vector3*)pInitial_position, (tS3_vector3*)pInitial_velocity, pRepeats, pVolume, pPitch, pSpeed);
 }
 
 // IDA: tS3_sound_tag __usercall DRS3StartSoundFromSource3@<EAX>(tS3_sound_source_ptr pSource@<EAX>, tS3_sound_id pSound@<EDX>, tS3_repeats pRepeats@<EBX>, tS3_volume pVolume@<ECX>, tS3_pitch pPitch, tS3_speed pSpeed)

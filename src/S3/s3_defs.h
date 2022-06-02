@@ -187,7 +187,7 @@ typedef struct tS3_soundbank_read_ctx {
     char* data;
 } tS3_soundbank_read_ctx;
 
-// Added by dethrace
+// Everything below added by dethrace
 #pragma pack(push, 1)
 typedef struct tWAVEFORMATEX_ {
     int16_t wFormatTag;
@@ -199,5 +199,7 @@ typedef struct tWAVEFORMATEX_ {
     int16_t cbSize;
 } tWAVEFORMATEX_;
 #pragma pack(pop)
+
+#define MAX_PATH_LENGTH 256
 
 #endif

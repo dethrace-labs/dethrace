@@ -334,6 +334,10 @@ void DrawCar(int pCurrent_choice, int pCurrent_mode) {
     int text_width;
     LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
 
+// Added by dethrace to ignore warnings about using sprintf without a literal format string
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-security"
+
     PollCarDetails(gChoose_car_net_game);
     if (gChange_race_net_mode == 0) {
         if (gProgram_state.number_of_cars == 1) {
@@ -348,6 +352,9 @@ void DrawCar(int pCurrent_choice, int pCurrent_mode) {
     } else {
         sprintf(s, GetMiscString(205));
     }
+
+#pragma GCC diagnostic pop
+
     text_width = BrPixelmapTextWidth(gBack_screen, gFont_7, s);
     text_x = (gCurrent_graf_data->change_car_line_right + gCurrent_graf_data->change_car_line_left - text_width) / 2;
     BrPixelmapRectangleFill(gBack_screen,
