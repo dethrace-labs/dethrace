@@ -26,6 +26,7 @@ tS3_channel* S3AllocateChannel(tS3_outlet* outlet, int priority);
 int S3StopChannel(tS3_channel* chan);
 
 void S3DisposeOutlet(tS3_outlet* outlet);
+int S3StopOutletSound(tS3_outlet* pOutlet);
 void S3StopAllOutletSounds();
 
 int S3DisposeDescriptor(tS3_sound_id id);

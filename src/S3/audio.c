@@ -768,6 +768,15 @@ int S3ServiceChannel(tS3_channel* chan) {
 }
 
 void S3StopAllOutletSounds() {
+    tS3_outlet* o; // [esp+Ch] [ebp-4h]
+
+    if (!gS3_enabled) {
+        return;
+    }
+
+    for (o = gS3_outlets; o; o = o->next) {
+        S3StopOutletSound(o);
+    }
 }
 
 tS3_sound_tag S3StartSound(tS3_outlet* pOutlet, tS3_sound_id pSound) {
