@@ -771,8 +771,6 @@ void S3StopAllOutletSounds() {
 }
 
 tS3_sound_tag S3StartSound(tS3_outlet* pOutlet, tS3_sound_id pSound) {
-    printf("start sound %p, %d\n", pOutlet, pSound);
-
     int repetitions;      // eax
     tS3_channel* chan;    // [esp+14h] [ebp-Ch]
     tS3_descriptor* desc; // [esp+1Ch] [ebp-4h]
@@ -855,8 +853,6 @@ tS3_sound_tag S3StartSound(tS3_outlet* pOutlet, tS3_sound_id pSound) {
 tS3_sound_tag S3StartSound2(tS3_outlet* pOutlet, tS3_sound_id pSound, tS3_repeats pRepeats, tS3_volume pLVolume, tS3_volume pRVolume, tS3_pitch pPitch, tS3_speed pSpeed) {
     tS3_channel* chan;    // [esp+30h] [ebp-Ch]
     tS3_descriptor* desc; // [esp+38h] [ebp-4h]
-
-    printf("start sound2 %p, %d\n", pOutlet, pSound);
 
     if (!gS3_enabled) {
         return 0;
@@ -1132,7 +1128,7 @@ tS3_channel* S3GetChannelForTag(tS3_sound_tag tag) {
     if (!tag) {
         return 0;
     }
-    for (o = gS3_outlets; o && o->id != tag; o = o->next) {
+    for (o = gS3_outlets; o && o->id != (uint8_t)tag; o = o->next) {
         ;
     }
     if (!o) {

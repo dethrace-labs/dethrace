@@ -251,7 +251,6 @@ int S3ExecuteSampleFilterFuncs(tS3_channel* chan) {
 }
 
 int S3PlaySample(tS3_channel* chan) {
-    printf("play sound %d\n", chan->descriptor->id);
 
     S3SyncSampleVolume(chan);
     S3SyncSampleRate(chan);

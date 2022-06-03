@@ -1576,14 +1576,16 @@ void CheckForBeingOutOfThisWorld() {
 void CheckHornLocal(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
 
-    if (pCar->keys.horn && pCar->horn_sound_tag == 0) {
+    if (pCar->keys.horn == 1 && pCar->horn_sound_tag == 0) {
         pCar->horn_sound_tag = DRS3StartSound(gEffects_outlet, 5209);
-    } else if (!pCar->keys.horn && pCar->horn_sound_tag != 0) {
-        while (S3SoundStillPlaying(pCar->horn_sound_tag)) {
+    } else if (pCar->keys.horn == 0 && pCar->horn_sound_tag != 0) {
+        if (S3SoundStillPlaying(pCar->horn_sound_tag) != 0) {
             DRS3StopSound(pCar->horn_sound_tag);
             DRS3StopOutletSound(gEffects_outlet);
         }
-        pCar->horn_sound_tag = 0;
+        if (S3SoundStillPlaying(pCar->horn_sound_tag) == 0) {
+            pCar->horn_sound_tag = 0;
+        }
     }
 }
 
