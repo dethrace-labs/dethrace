@@ -29,12 +29,21 @@
         (v1)->v[2] = (v2)->v[2] / (v3)->v[2]; \
     } while (0)
 
-#define Vector3DistanceSquared(a, b)                        \
-    (                                                       \
-        +((a)->v[0] - (b)->v[0]) * ((a)->v[0] - (b)->v[0])  \
-        + ((a)->v[1] - (b)->v[1]) * ((a)->v[1] - (b)->v[1]) \
-        + ((a)->v[2] - (b)->v[2]) * ((a)->v[2] - (b)->v[2]))
+#define Vector3DistanceSquared(V1, V2) \
+    ((((V1)->v[0] - (V2)->v[0])) * (((V1)->v[0] - (V2)->v[0])) + (((V1)->v[1] - (V2)->v[1])) * (((V1)->v[1] - (V2)->v[1])) + (((V1)->v[2] - (V2)->v[2])) * (((V1)->v[2] - (V2)->v[2])))
 
 #define Vector3Distance(V1, V2) sqrtf(Vector3DistanceSquared((V1), (V2)))
+#define Vector3AreEqual(V1, V2) \
+    ((V1)->v[0] == (V2)->v[0] && (V1)->v[1] == (V2)->v[1] && (V1)->v[2] == (V2)->v[2])
+#define Vector3EqualElements(V, A, B, C) \
+    ((V)->v[0] == (A) && (V)->v[1] == (B) && (V)->v[2] == (C))
+#define Vector3IsZero(V) Vector3EqualElements((V), 0.f, 0.f, 0.f)
+
+#define SwapValuesUsingTemporary(V1, V2, T) \
+    do {                                    \
+        (T) = (V1);                         \
+        (V1) = (V2);                        \
+        (V2) = (T);                         \
+    } while (0)
 
 #endif

@@ -27,7 +27,8 @@ br_pixelmap* last_shade_table = NULL;
 int dirty_buffers = 0;
 
 struct {
-    GLuint pixels, shade_table;
+    GLuint pixels, pixels_transform;
+    GLuint shade_table;
     GLuint model, view, projection;
     GLuint palette_index_override;
     GLuint clip_plane_count;
@@ -123,6 +124,7 @@ void LoadShaders() {
     }
     uniforms_3d.model = glGetUniformLocation(shader_program_3d, "model");
     uniforms_3d.pixels = glGetUniformLocation(shader_program_3d, "pixels");
+    uniforms_3d.pixels_transform = glGetUniformLocation(shader_program_3d, "pixels_transform");
     uniforms_3d.shade_table = glGetUniformLocation(shader_program_3d, "shade_table");
     uniforms_3d.projection = glGetUniformLocation(shader_program_3d, "projection");
     uniforms_3d.palette_index_override = glGetUniformLocation(shader_program_3d, "palette_index_override");
@@ -190,8 +192,8 @@ void GLRenderer_Init(int width, int height, int pRender_width, int pRender_heigh
     SetupFullScreenRectGeometry();
 
     // opengl config
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_BLEND);
+    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDepthFunc(GL_LESS);
     glClearColor(0, 0, 0, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -236,7 +238,6 @@ void GLRenderer_Init(int width, int height, int pRender_width, int pRender_heigh
 
 void GLRenderer_SetPalette(uint8_t* rgba_colors) {
     for (int i = 0; i < 256; i++) {
-
         gl_palette[i * 4] = rgba_colors[i * 4 + 2];
         gl_palette[i * 4 + 1] = rgba_colors[i * 4 + 1];
         gl_palette[i * 4 + 2] = rgba_colors[i * 4];
@@ -349,12 +350,13 @@ void GLRenderer_FullScreenQuad(uint8_t* screen_buffer, int width, int height) {
 
 void GLRenderer_ClearBuffers() {
     // clear our virtual framebuffer
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
-    // clear real framebuffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // clear real framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    CHECK_GL_ERROR("GLRenderer_Swap");
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    CHECK_GL_ERROR("GLRenderer_ClearBuffers");
 }
 
 void GLRenderer_BufferModel(br_model* model) {
@@ -460,6 +462,7 @@ void setActiveMaterial(tStored_material* material) {
         return;
     }
 
+    glUniform3fv(uniforms_3d.pixels_transform, 2, material->map_transform->v);
     glUniform1i(uniforms_3d.palette_index_override, material->index_base);
     if (material->shade_table) {
         GLRenderer_SetShadeTable(material->shade_table);
@@ -474,7 +477,7 @@ void setActiveMaterial(tStored_material* material) {
 
     if (material->pixelmap) {
         tStored_pixelmap* stored_px = material->pixelmap->stored;
-        if (stored_px) {
+        if (stored_px != NULL) {
             glBindTexture(GL_TEXTURE_2D, stored_px->id);
             glUniform1i(uniforms_3d.palette_index_override, -1);
         }
@@ -545,6 +548,12 @@ void GLRenderer_BufferMaterial(br_material* mat) {
             strcpy(stored->identifier, mat->identifier);
         }
     }
+    stored->map_transform[0].v[0] = mat->map_transform.m[0][0];
+    stored->map_transform[0].v[1] = mat->map_transform.m[0][1];
+    stored->map_transform[0].v[2] = mat->map_transform.m[2][0];
+    stored->map_transform[1].v[0] = mat->map_transform.m[1][0];
+    stored->map_transform[1].v[1] = mat->map_transform.m[1][1];
+    stored->map_transform[1].v[2] = mat->map_transform.m[2][1];
     stored->pixelmap = mat->colour_map;
     stored->flags = mat->flags;
     stored->shade_table = mat->index_shade;

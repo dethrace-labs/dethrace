@@ -547,7 +547,11 @@ void PipeSingleCarIncident(float pSeverity, tCar_spec* pCar, br_vector3* pImpact
 // IDA: void __usercall PipeSinglePedIncident(int pPed_index@<EAX>, br_actor *pActor@<EDX>)
 void PipeSinglePedIncident(int pPed_index, br_actor* pActor) {
     LOG_TRACE("(%d, %p)", pPed_index, pActor);
-    NOT_IMPLEMENTED();
+
+    StartPipingSession(ePipe_chunk_incident);
+    AddPedIncidentToPipingSession(pPed_index, pActor);
+    EndPipingSession();
+    gWall_severity = 0.f;
 }
 
 // IDA: void __cdecl PipeSingleWallIncident(float pSeverity, br_vector3 *pImpact_point)

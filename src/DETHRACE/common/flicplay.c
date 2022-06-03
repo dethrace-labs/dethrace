@@ -13,6 +13,7 @@
 #include "sound.h"
 #include "utility.h"
 #include <stdlib.h>
+#include <string.h>
 
 int gPalette_allocate_count;
 int gPalette_fuck_prevention;
@@ -539,6 +540,22 @@ br_pixelmap* gPalette;
 void* gPalette_pixels;
 tFlic_descriptor* gFirst_flic;
 
+// Use this function to avoid unaligned memory access.
+// Added by DethRace
+tU16 mem_read_u16(void* memory) {
+    tU16 u16;
+
+    memcpy(&u16, memory, sizeof(tU16));
+    return u16;
+}
+
+// Use this function to avoid unaligned memory access
+// Added by DethRace
+void mem_write_u16(void* memory, tU16 u16) {
+
+    memcpy(memory, &u16, sizeof(tU16));
+}
+
 // IDA: void __cdecl EnableTranslationText()
 void EnableTranslationText() {
     LOG_TRACE("()");
@@ -944,7 +961,8 @@ void DoDeltaTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
                     if (the_byte && the_byte2) {
                         the_word = *((tU16*)pFlic_info->data - 1);
                         for (k = 0; k < -size_count; k++) {
-                            *line_pixel_ptr++ = the_word;
+                            mem_write_u16(line_pixel_ptr, the_word);
+                            line_pixel_ptr++;
                         }
                     } else {
                         for (k = 0; k < -size_count; k++) {
@@ -963,7 +981,7 @@ void DoDeltaTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
                         the_word = *(tU16*)pFlic_info->data;
                         pFlic_info->data += 2;
                         if (the_word) {
-                            *line_pixel_ptr = the_word;
+                            mem_write_u16(line_pixel_ptr, the_word);
                         }
                         line_pixel_ptr++;
                     }
@@ -1277,7 +1295,7 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
     }
     if (pFlic_info->f != NULL && pFlic_info->bytes_still_to_be_read) {
         data_knocked_off = pFlic_info->data - pFlic_info->data_start;
-        memcpy(pFlic_info->data_start, pFlic_info->data, pFlic_info->bytes_in_buffer - data_knocked_off);
+        memmove(pFlic_info->data_start, pFlic_info->data, pFlic_info->bytes_in_buffer - data_knocked_off);
         pFlic_info->data = pFlic_info->data_start;
         pFlic_info->bytes_in_buffer -= data_knocked_off;
 
@@ -1324,7 +1342,7 @@ int PlayFlic(int pIndex, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap
         frame_period = new_time - last_frame;
 
         if (gSound_time != 0 && new_time >= gSound_time) {
-            DRS3StartSound(gIndexed_outlets[0], gSound_ID);
+            DRS3StartSound(gEffects_outlet, gSound_ID);
             gSound_time = 0;
         }
         if (frame_period >= the_flic.frame_period) {
@@ -1475,9 +1493,9 @@ void FreeFlic(int pIndex) {
 void ForceRunFlic(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
-        LoadFlic(pIndex);
-        ShowFlic(pIndex);
-        UnlockFlic(pIndex);
+    LoadFlic(pIndex);
+    ShowFlic(pIndex);
+    UnlockFlic(pIndex);
 }
 
 // IDA: void __usercall RunFlicAt(int pIndex@<EAX>, int pX@<EDX>, int pY@<EBX>)

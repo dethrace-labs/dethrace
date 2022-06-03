@@ -1,6 +1,7 @@
 #include "crush.h"
 #include "brender/brender.h"
 #include "car.h"
+#include "displays.h"
 #include "globvars.h"
 #include "globvrkm.h"
 #include "globvrpb.h"
@@ -10,6 +11,7 @@
 #include "netgame.h"
 #include "oil.h"
 #include "opponent.h"
+#include "pedestrn.h"
 #include "piping.h"
 #include "replay.h"
 #include "spark.h"
@@ -528,7 +530,7 @@ void DoDamage(tCar_spec* pCar, tDamage_type pDamage_type, float pMagnitude, floa
     } else if (gNet_mode != eNet_mode_none) {
         DamageUnit2(pCar, pDamage_type, pNastiness * pMagnitude * 15.0f);
     } else if (PercentageChance(pNastiness * pMagnitude * 1500.0f)) {
-        DamageUnit2(pCar, pDamage_type, pNastiness * pMagnitude * 30.0);
+        DamageUnit2(pCar, pDamage_type, pNastiness * pMagnitude * 30.0f);
     }
 }
 
@@ -541,7 +543,26 @@ void CheckPiledriverBonus(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3
     br_scalar dp;
     LOG_TRACE("(%p, %p, %p)", pCar, pImpact_point, pEnergy);
 
-    STUB_ONCE();
+    if (pCar->current_car_actor < 0) {
+        return;
+    }
+
+    BrVector3Normalise(&norm_impact, pImpact_point);
+    norm_impact.v[1] = 0.f;
+    BrVector3Normalise(&norm_energy, pEnergy);
+
+    for (child = pCar->car_master_actor->children; child != NULL; child = child->next) {
+        if (ActorIsPedestrian(child) && PedestrianActorIsPerson(child) && pCar->speed > 0.001f) {
+            BrVector3Normalise(&norm_child, &child->t.t.translate.t);
+            norm_child.v[1] = 0.f;
+            if (BrVector3Dot(&norm_child, &norm_impact) > 0.8f && BrVector3Dot(&norm_energy, &norm_child) < -.65) {
+                DoFancyHeadup(kFancyHeadupPileDriverBonus);
+                EarnCredits(((GetPedestrianValue(child) / 2 + 12) / 25 ) * 25);
+                return;
+            }
+        }
+
+    }
 }
 
 // IDA: tImpact_location __usercall CalcModifiedLocation@<EAX>(tCar_spec *pCar@<EAX>)

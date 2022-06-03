@@ -1113,7 +1113,7 @@ int TeleportCopToStart(tOpponent_spec* pOpponent_spec) {
 
     if (pOpponent_spec->cheating || (pOpponent_spec->car_spec->car_ID & 0xff00) == 0x300) {
         BrVector3Sub(&wank, &gProgram_state.current_car.car_master_actor->t.t.translate.t, &pOpponent_spec->start_pos);
-        if (BrVector3Length(&wank) > gIn_view_distance)  {
+        if (BrVector3Length(&wank) > gIn_view_distance) {
             BrVector3Copy(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &pOpponent_spec->start_pos);
             PointActorAlongThisBloodyVector(pOpponent_spec->car_spec->car_master_actor,
                 &pOpponent_spec->start_direction);
@@ -1162,7 +1162,7 @@ int RematerialiseOpponentOnThisSection(tOpponent_spec* pOpponent_spec, br_scalar
     LOG_TRACE("(%p, %f, %d)", pOpponent_spec, pSpeed, pSection_no);
 
     NOT_IMPLEMENTED();
-    
+
     // UNFINISHED
     if (pOpponent_spec->physics_me) {
         dr_dprintf("%s: Actually, we're already materialised", pOpponent_spec->car_spec->driver_name);
@@ -1172,11 +1172,7 @@ int RematerialiseOpponentOnThisSection(tOpponent_spec* pOpponent_spec, br_scalar
     finish = GetOpponentsSectionFinishNodePoint(pOpponent_spec, pSection_no);
     BrVector3Sub(&section_v, finish, start);
     if (BrVector3Length(&section_v) != 0.f) {
-
     }
-
-
-
 }
 
 // IDA: int __usercall RematerialiseOpponentOnNearestSection@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, br_scalar pSpeed)
@@ -2125,7 +2121,13 @@ void ClearTwattageOccurrenceVariables(tOpponent_spec* pOpponent_spec) {
 // IDA: void __usercall TwoCarsHitEachOther(tCar_spec *pA_car@<EAX>, tCar_spec *pAnother_car@<EDX>)
 void TwoCarsHitEachOther(tCar_spec* pA_car, tCar_spec* pAnother_car) {
     LOG_TRACE("(%p, %p)", pA_car, pAnother_car);
-    NOT_IMPLEMENTED();
+
+    if (pA_car->driver == eDriver_local_human) {
+        pAnother_car->last_time_we_touched_a_player = gTime_stamp_for_this_munging;
+    }
+    if (pAnother_car->driver == eDriver_local_human) {
+        pA_car->last_time_we_touched_a_player = gTime_stamp_for_this_munging;
+    }
 }
 
 // IDA: void __usercall RecordOpponentTwattageOccurrence(tCar_spec *pTwatter@<EAX>, tCar_spec *pTwattee@<EDX>)
@@ -2188,31 +2190,31 @@ void RepairOpponentsSystems() {
     NewTextHeadupSlot(4, 0, 3000, -1, "Opponents systems repaired (but not bodywork)");
 }
 
-//IDA: void __usercall CopyVertex(br_vertex *pDest_vertex@<EAX>, br_vertex *pSrc_vertex@<EDX>)
-// Suffix added to avoid duplicate symbol
+// IDA: void __usercall CopyVertex(br_vertex *pDest_vertex@<EAX>, br_vertex *pSrc_vertex@<EDX>)
+//  Suffix added to avoid duplicate symbol
 void CopyVertex__opponent(br_vertex* pDest_vertex, br_vertex* pSrc_vertex) {
     LOG_TRACE("(%p, %p)", pDest_vertex, pSrc_vertex);
 
     BrVector3Copy(&pDest_vertex->p, &pSrc_vertex->p);
     pDest_vertex->map.v[0] = pSrc_vertex->map.v[0];
     pDest_vertex->map.v[1] = pSrc_vertex->map.v[1];
-    pDest_vertex->index    = pSrc_vertex->index;
-    pDest_vertex->red      = pSrc_vertex->red;
-    pDest_vertex->grn      = pSrc_vertex->grn;
-    pDest_vertex->blu      = pSrc_vertex->blu;
+    pDest_vertex->index = pSrc_vertex->index;
+    pDest_vertex->red = pSrc_vertex->red;
+    pDest_vertex->grn = pSrc_vertex->grn;
+    pDest_vertex->blu = pSrc_vertex->blu;
 }
 
-//IDA: void __usercall CopyFace(br_face *pDest_face@<EAX>, br_face *pSrc_face@<EDX>)
-// Suffix added to avoid duplicate symbol
+// IDA: void __usercall CopyFace(br_face *pDest_face@<EAX>, br_face *pSrc_face@<EDX>)
+//  Suffix added to avoid duplicate symbol
 void CopyFace__opponent(br_face* pDest_face, br_face* pSrc_face) {
     LOG_TRACE("(%p, %p)", pDest_face, pSrc_face);
 
     pDest_face->vertices[0] = pSrc_face->vertices[0];
     pDest_face->vertices[1] = pSrc_face->vertices[1];
     pDest_face->vertices[2] = pSrc_face->vertices[2];
-    pDest_face->material    = pSrc_face->material;
-    pDest_face->smoothing   = pSrc_face->smoothing;
-    pDest_face->flags       = pSrc_face->flags;
+    pDest_face->material = pSrc_face->material;
+    pDest_face->smoothing = pSrc_face->smoothing;
+    pDest_face->flags = pSrc_face->flags;
 }
 
 // IDA: void __usercall DeleteSection(tS16 pSection_to_delete@<EAX>)
@@ -2424,33 +2426,33 @@ void MakeCube(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3* pPoi
 
     BrVector3Set(&point, pPoint->v[0], pPoint->v[1] + .15f, pPoint->v[2]);
 
-    BrVector3Set(&offset_v,  .1f,  .1f,  .1f);
+    BrVector3Set(&offset_v, .1f, .1f, .1f);
     MakeVertexAndOffsetIt(gOppo_path_model, pFirst_vertex + 0, point.v[0], point.v[1], point.v[2], &offset_v);
-    BrVector3Set(&offset_v,  .1f, -.1f,  .1f);
+    BrVector3Set(&offset_v, .1f, -.1f, .1f);
     MakeVertexAndOffsetIt(gOppo_path_model, pFirst_vertex + 1, point.v[0], point.v[1], point.v[2], &offset_v);
-    BrVector3Set(&offset_v, -.1f, -.1f,  .1f);
+    BrVector3Set(&offset_v, -.1f, -.1f, .1f);
     MakeVertexAndOffsetIt(gOppo_path_model, pFirst_vertex + 2, point.v[0], point.v[1], point.v[2], &offset_v);
-    BrVector3Set(&offset_v, -.1f,  .1f,  .1f);
+    BrVector3Set(&offset_v, -.1f, .1f, .1f);
     MakeVertexAndOffsetIt(gOppo_path_model, pFirst_vertex + 3, point.v[0], point.v[1], point.v[2], &offset_v);
-    BrVector3Set(&offset_v,  .1f,  .1f, -.1f);
+    BrVector3Set(&offset_v, .1f, .1f, -.1f);
     MakeVertexAndOffsetIt(gOppo_path_model, pFirst_vertex + 4, point.v[0], point.v[1], point.v[2], &offset_v);
-    BrVector3Set(&offset_v,  .1f, -.1f, -.1f);
+    BrVector3Set(&offset_v, .1f, -.1f, -.1f);
     MakeVertexAndOffsetIt(gOppo_path_model, pFirst_vertex + 5, point.v[0], point.v[1], point.v[2], &offset_v);
     BrVector3Set(&offset_v, -.1f, -.1f, -.1f);
     MakeVertexAndOffsetIt(gOppo_path_model, pFirst_vertex + 6, point.v[0], point.v[1], point.v[2], &offset_v);
-    BrVector3Set(&offset_v, -.1f,  .1f, -.1f);
+    BrVector3Set(&offset_v, -.1f, .1f, -.1f);
     MakeVertexAndOffsetIt(gOppo_path_model, pFirst_vertex + 7, point.v[0], point.v[1], point.v[2], &offset_v);
 
-    MakeFaceAndTextureIt(gOppo_path_model, pFirst_face +  0, pFirst_vertex + 3, pFirst_vertex + 2, pFirst_vertex + 1, pMaterial_1);
-    MakeFaceAndTextureIt(gOppo_path_model, pFirst_face +  1, pFirst_vertex + 0, pFirst_vertex + 3, pFirst_vertex + 1, pMaterial_1);
-    MakeFaceAndTextureIt(gOppo_path_model, pFirst_face +  2, pFirst_vertex + 1, pFirst_vertex + 5, pFirst_vertex + 4, pMaterial_2);
-    MakeFaceAndTextureIt(gOppo_path_model, pFirst_face +  3, pFirst_vertex + 1, pFirst_vertex + 4, pFirst_vertex + 0, pMaterial_2);
-    MakeFaceAndTextureIt(gOppo_path_model, pFirst_face +  4, pFirst_vertex + 0, pFirst_vertex + 4, pFirst_vertex + 3, pMaterial_3);
-    MakeFaceAndTextureIt(gOppo_path_model, pFirst_face +  5, pFirst_vertex + 3, pFirst_vertex + 4, pFirst_vertex + 7, pMaterial_3);
-    MakeFaceAndTextureIt(gOppo_path_model, pFirst_face +  6, pFirst_vertex + 4, pFirst_vertex + 5, pFirst_vertex + 7, pMaterial_1);
-    MakeFaceAndTextureIt(gOppo_path_model, pFirst_face +  7, pFirst_vertex + 5, pFirst_vertex + 6, pFirst_vertex + 7, pMaterial_1);
-    MakeFaceAndTextureIt(gOppo_path_model, pFirst_face +  8, pFirst_vertex + 2, pFirst_vertex + 7, pFirst_vertex + 6, pMaterial_2);
-    MakeFaceAndTextureIt(gOppo_path_model, pFirst_face +  9, pFirst_vertex + 2, pFirst_vertex + 3, pFirst_vertex + 7, pMaterial_2);
+    MakeFaceAndTextureIt(gOppo_path_model, pFirst_face + 0, pFirst_vertex + 3, pFirst_vertex + 2, pFirst_vertex + 1, pMaterial_1);
+    MakeFaceAndTextureIt(gOppo_path_model, pFirst_face + 1, pFirst_vertex + 0, pFirst_vertex + 3, pFirst_vertex + 1, pMaterial_1);
+    MakeFaceAndTextureIt(gOppo_path_model, pFirst_face + 2, pFirst_vertex + 1, pFirst_vertex + 5, pFirst_vertex + 4, pMaterial_2);
+    MakeFaceAndTextureIt(gOppo_path_model, pFirst_face + 3, pFirst_vertex + 1, pFirst_vertex + 4, pFirst_vertex + 0, pMaterial_2);
+    MakeFaceAndTextureIt(gOppo_path_model, pFirst_face + 4, pFirst_vertex + 0, pFirst_vertex + 4, pFirst_vertex + 3, pMaterial_3);
+    MakeFaceAndTextureIt(gOppo_path_model, pFirst_face + 5, pFirst_vertex + 3, pFirst_vertex + 4, pFirst_vertex + 7, pMaterial_3);
+    MakeFaceAndTextureIt(gOppo_path_model, pFirst_face + 6, pFirst_vertex + 4, pFirst_vertex + 5, pFirst_vertex + 7, pMaterial_1);
+    MakeFaceAndTextureIt(gOppo_path_model, pFirst_face + 7, pFirst_vertex + 5, pFirst_vertex + 6, pFirst_vertex + 7, pMaterial_1);
+    MakeFaceAndTextureIt(gOppo_path_model, pFirst_face + 8, pFirst_vertex + 2, pFirst_vertex + 7, pFirst_vertex + 6, pMaterial_2);
+    MakeFaceAndTextureIt(gOppo_path_model, pFirst_face + 9, pFirst_vertex + 2, pFirst_vertex + 3, pFirst_vertex + 7, pMaterial_2);
     MakeFaceAndTextureIt(gOppo_path_model, pFirst_face + 10, pFirst_vertex + 1, pFirst_vertex + 2, pFirst_vertex + 6, pMaterial_3);
     MakeFaceAndTextureIt(gOppo_path_model, pFirst_face + 11, pFirst_vertex + 1, pFirst_vertex + 6, pFirst_vertex + 5, pMaterial_3);
 }
@@ -2515,20 +2517,20 @@ br_material* CreateSimpleMaterial(int pColour_index) {
 void AllocateMatsForOppoPathModel() {
     LOG_TRACE("()");
 
-    gMat_dk_yel  = CreateSimpleMaterial( 50);
-    gMat_md_yel  = CreateSimpleMaterial( 51);
-    gMat_lt_yel  = CreateSimpleMaterial( 52);
-    gMat_dk_red  = CreateSimpleMaterial(  3);
-    gMat_lt_red  = CreateSimpleMaterial(  4);
-    gMat_dk_grn  = CreateSimpleMaterial( 66);
-    gMat_lt_grn  = CreateSimpleMaterial( 68);
-    gMat_dk_blu  = CreateSimpleMaterial(162);
-    gMat_lt_blu  = CreateSimpleMaterial(164);
+    gMat_dk_yel = CreateSimpleMaterial(50);
+    gMat_md_yel = CreateSimpleMaterial(51);
+    gMat_lt_yel = CreateSimpleMaterial(52);
+    gMat_dk_red = CreateSimpleMaterial(3);
+    gMat_lt_red = CreateSimpleMaterial(4);
+    gMat_dk_grn = CreateSimpleMaterial(66);
+    gMat_lt_grn = CreateSimpleMaterial(68);
+    gMat_dk_blu = CreateSimpleMaterial(162);
+    gMat_lt_blu = CreateSimpleMaterial(164);
     gMat_dk_turq = CreateSimpleMaterial(130);
     gMat_lt_turq = CreateSimpleMaterial(132);
-    gMat_dk_gry  = CreateSimpleMaterial(253);
-    gMat_md_gry  = CreateSimpleMaterial(254);
-    gMat_lt_gry  = CreateSimpleMaterial(255);
+    gMat_dk_gry = CreateSimpleMaterial(253);
+    gMat_md_gry = CreateSimpleMaterial(254);
+    gMat_lt_gry = CreateSimpleMaterial(255);
 
     gMats_allocated = 1;
 }
@@ -2742,15 +2744,15 @@ void WriteOutOppoPaths() {
         gProgram_state.AI_vehicles.number_of_path_sections);
     for (i = 0; i < gProgram_state.AI_vehicles.number_of_path_sections; i++) {
         fprintf(f, "%4d,%4d,%4d,%4d,%4d,%4d,%7.1f,%5d   // Section #%d\n",
-             gProgram_state.AI_vehicles.path_sections[i].node_indices[0],
-             gProgram_state.AI_vehicles.path_sections[i].node_indices[1],
-             gProgram_state.AI_vehicles.path_sections[i].min_speed[0],
-             gProgram_state.AI_vehicles.path_sections[i].max_speed[0],
-             gProgram_state.AI_vehicles.path_sections[i].min_speed[1],
-             gProgram_state.AI_vehicles.path_sections[i].max_speed[1],
-             gProgram_state.AI_vehicles.path_sections[i].width,
-             gProgram_state.AI_vehicles.path_sections[i].one_way ? (gProgram_state.AI_vehicles.path_sections[i].type + 1000) : gProgram_state.AI_vehicles.path_sections[i].type,
-             i);
+            gProgram_state.AI_vehicles.path_sections[i].node_indices[0],
+            gProgram_state.AI_vehicles.path_sections[i].node_indices[1],
+            gProgram_state.AI_vehicles.path_sections[i].min_speed[0],
+            gProgram_state.AI_vehicles.path_sections[i].max_speed[0],
+            gProgram_state.AI_vehicles.path_sections[i].min_speed[1],
+            gProgram_state.AI_vehicles.path_sections[i].max_speed[1],
+            gProgram_state.AI_vehicles.path_sections[i].width,
+            gProgram_state.AI_vehicles.path_sections[i].one_way ? (gProgram_state.AI_vehicles.path_sections[i].type + 1000) : gProgram_state.AI_vehicles.path_sections[i].type,
+            i);
     }
     fprintf(f, "\n%-2d                                                            // Number of cop start points\n",
         gProgram_state.AI_vehicles.number_of_cops);

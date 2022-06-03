@@ -1,21 +1,21 @@
 #include "racesumm.h"
-#include "cutscene.h"
+#include "brender/brender.h"
 #include "crush.h"
+#include "cutscene.h"
 #include "flicplay.h"
 #include "globvars.h"
 #include "globvrpb.h"
 #include "grafdata.h"
 #include "graphics.h"
+#include "harness/config.h"
+#include "harness/trace.h"
 #include "intrface.h"
 #include "loading.h"
 #include "network.h"
+#include "pd/sys.h"
+#include "s3/s3.h"
 #include "sound.h"
 #include "utility.h"
-#include "harness/config.h"
-#include "harness/trace.h"
-#include "pd/sys.h"
-#include "brender/brender.h"
-#include "s3/s3sound.h"
 #include <stdlib.h>
 
 int gPlayer_lookup[6];
@@ -232,7 +232,7 @@ void DrawSummary(int pCurrent_choice, int pCurrent_mode) {
         if (gTemp_earned != 0) {
             ResetInterfaceTimeout();
             if (gSumm_sound == 0) {
-                gSumm_sound = DRS3StartSound(gIndexed_outlets[0], 3200);
+                gSumm_sound = DRS3StartSound(gEffects_outlet, 3200);
             }
             credit_delta = (the_time - last_time) * gCredits_per_ms;
             gTemp_earned -= credit_delta;
@@ -240,7 +240,7 @@ void DrawSummary(int pCurrent_choice, int pCurrent_mode) {
             RampUpRate(&gCredits_per_ms, the_time - last_change_time + 1000);
             if (gTemp_earned <= 0) {
                 gTemp_credits += gTemp_earned;
-                S3StopOutletSound(gIndexed_outlets[0]);
+                S3StopOutletSound(gEffects_outlet);
                 gSumm_sound = 0;
                 gTemp_earned = 0;
                 gCredits_per_ms = 0.1f;
@@ -250,7 +250,7 @@ void DrawSummary(int pCurrent_choice, int pCurrent_mode) {
             ResetInterfaceTimeout();
             if (the_time - last_change_time > 1000) {
                 if (gSumm_sound == 0) {
-                    gSumm_sound = DRS3StartSound(gIndexed_outlets[0], 3201);
+                    gSumm_sound = DRS3StartSound(gEffects_outlet, 3201);
                 }
                 credit_delta = (the_time - last_time) * gCredits_per_ms;
                 gTemp_lost -= credit_delta;
@@ -258,7 +258,7 @@ void DrawSummary(int pCurrent_choice, int pCurrent_mode) {
                 RampUpRate(&gCredits_per_ms, the_time - last_change_time);
                 if (gTemp_lost <= 0) {
                     gTemp_credits -= gTemp_lost;
-                    S3StopOutletSound(gIndexed_outlets[0]);
+                    S3StopOutletSound(gEffects_outlet);
                     gSumm_sound = 0;
                     gTemp_lost = 0;
                     last_change_time = the_time;
@@ -274,17 +274,17 @@ void DrawSummary(int pCurrent_choice, int pCurrent_mode) {
                     if (gTemp_rank > 1) {
                         gTemp_rank -= 1;
                     }
-                    gSumm_sound = DRS3StartSound(gIndexed_outlets[0], 3202);
+                    gSumm_sound = DRS3StartSound(gEffects_outlet, 3202);
                 }
                 if (gTemp_rank_increase <= 0.f) {
-                    S3StopOutletSound(gIndexed_outlets[0]);
+                    S3StopOutletSound(gEffects_outlet);
                     gSumm_sound = 0;
                     gTemp_rank_increase = 0.f;
                     last_change_time = the_time;
                 }
             }
         } else {
-            S3StopOutletSound(gIndexed_outlets[0]);
+            S3StopOutletSound(gEffects_outlet);
             gSumm_sound = 0;
         }
     } else {
@@ -317,7 +317,7 @@ void SetUpTemps() {
 int Summ1GoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
-    S3StopOutletSound(gIndexed_outlets[0]);
+    S3StopOutletSound(gEffects_outlet);
     MungeRankEtc(&gProgram_state);
     SetUpTemps();
     DrawSummaryItems();
@@ -333,7 +333,7 @@ int SummCheckGameOver(int* pCurrent_choice, int* pCurrent_mode) {
     if (gTemp_credits > 0) {
         return 0;
     }
-    S3StopOutletSound(gIndexed_outlets[0]);
+    S3StopOutletSound(gEffects_outlet);
     RemoveTransientBitmaps(1);
     for (i = 0; i < 7; i++) {
         DrawInBox(
@@ -366,32 +366,68 @@ int SummCheckGameOver(int* pCurrent_choice, int* pCurrent_mode) {
 // IDA: tSO_result __cdecl DoEndRaceSummary1()
 tSO_result DoEndRaceSummary1() {
     static tFlicette flicker_on[1] = {
-        {  43, { 218, 436 }, { 147, 353 } },
+        { 43, { 218, 436 }, { 147, 353 } },
     };
     static tFlicette flicker_off[1] = {
-        {  42, { 218, 436 }, { 147, 353 } },
+        { 42, { 218, 436 }, { 147, 353 } },
     };
     static tFlicette push[1] = {
         { 154, { 218, 436 }, { 147, 353 } },
     };
     static tMouse_area mouse_areas[1] = {
-        { { 218, 436 }, { 147, 353 }, { 281, 562 }, { 167, 401 },   0,   0,   0, NULL },
+        { { 218, 436 }, { 147, 353 }, { 281, 562 }, { 167, 401 }, 0, 0, 0, NULL },
     };
     static tInterface_spec interface_spec = {
-        0, 310, 0, 0, 0, 0, -1,
-        { -1,  0 }, {  0,  0 }, {  0,  0 }, {  0,  0 }, { NULL, NULL },
-        { -1,  0 }, {  0,  0 }, {  0,  0 }, {  0,  0 }, { NULL, NULL },
-        { -1,  0 }, {  0,  0 }, {  0,  0 }, {  0,  0 }, { NULL, NULL },
-        { -1,  0 }, {  1,  0 }, {  0,  0 }, {  0,  0 }, { NULL, NULL },
-        {  1,  1 }, { Summ1GoAhead, NULL},
-        {  1,  1 }, { NULL, NULL},
-        SummCheckGameOver, DrawSummary,
+        0,
+        310,
+        0,
+        0,
+        0,
+        0,
+        -1,
+        { -1, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { NULL, NULL },
+        { -1, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { NULL, NULL },
+        { -1, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { NULL, NULL },
+        { -1, 0 },
+        { 1, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { NULL, NULL },
+        { 1, 1 },
+        { Summ1GoAhead, NULL },
+        { 1, 1 },
+        { NULL, NULL },
+        SummCheckGameOver,
+        DrawSummary,
         20000,
-        NULL, StartSummary,
-        RaceSummaryDone, 0, { 0, 0 }, NULL, -1, 1,
-        COUNT_OF(flicker_on), flicker_on, flicker_off, push,
-        COUNT_OF(mouse_areas), mouse_areas,
-        0, NULL,
+        NULL,
+        StartSummary,
+        RaceSummaryDone,
+        0,
+        { 0, 0 },
+        NULL,
+        -1,
+        1,
+        COUNT_OF(flicker_on),
+        flicker_on,
+        flicker_off,
+        push,
+        COUNT_OF(mouse_areas),
+        mouse_areas,
+        0,
+        NULL,
     };
     int result;
     int completed_already;
@@ -409,9 +445,9 @@ tSO_result DoEndRaceSummary1() {
     MungeRankEtc(&gProgram_state);
     NetPlayerStatusChanged(ePlayer_status_loading);
     DisposeChromeFont(gChrome_font);
-    DRS3StartSound(gIndexed_outlets[0], 3004);
+    DRS3StartSound(gEffects_outlet, 3004);
     if (result < 0) {
-        DRS3StartSound(gIndexed_outlets[0], 3007);
+        DRS3StartSound(gEffects_outlet, 3007);
         RunFlic(311);
         result = eSO_main_menu_invoked;
     } else if (gTemp_credits <= 0) {
@@ -421,7 +457,7 @@ tSO_result DoEndRaceSummary1() {
         FadePaletteDown();
         result = eSO_game_completed;
     } else {
-        DRS3StartSound(gIndexed_outlets[0], 3007);
+        DRS3StartSound(gEffects_outlet, 3007);
         FadePaletteDown();
         result = eSO_continue;
     }
@@ -429,8 +465,8 @@ tSO_result DoEndRaceSummary1() {
     return result;
 }
 
-//IDA: void __usercall PrepareBoundingRadius(br_model *model@<EAX>)
-// Suffix added to avoid duplicate symbol
+// IDA: void __usercall PrepareBoundingRadius(br_model *model@<EAX>)
+//  Suffix added to avoid duplicate symbol
 void PrepareBoundingRadius__racesumm(br_model* model) {
     float d;
     float max;
@@ -601,15 +637,15 @@ tSO_result DoEndRaceSummary2() {
     return eSO_continue;
 }
 
-//IDA: void __usercall DrawAnItem(int pX@<EAX>, int pY_index@<EDX>, int pFont_index@<EBX>, char *pText@<ECX>)
-// Suffix added to avoid duplicate symbol
+// IDA: void __usercall DrawAnItem(int pX@<EAX>, int pY_index@<EDX>, int pFont_index@<EBX>, char *pText@<ECX>)
+//  Suffix added to avoid duplicate symbol
 void DrawAnItem__racesumm(int pX, int pY_index, int pFont_index, char* pText) {
     LOG_TRACE("(%d, %d, %d, \"%s\")", pX, pY_index, pFont_index, pText);
     NOT_IMPLEMENTED();
 }
 
-//IDA: void __usercall DrawColumnHeading(int pStr_index@<EAX>, int pX@<EDX>)
-// Suffix added to avoid duplicate symbol
+// IDA: void __usercall DrawColumnHeading(int pStr_index@<EAX>, int pX@<EDX>)
+//  Suffix added to avoid duplicate symbol
 void DrawColumnHeading__racesumm(int pStr_index, int pX) {
     LOG_TRACE("(%d, %d)", pStr_index, pX);
 }

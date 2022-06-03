@@ -1,13 +1,13 @@
 #include "demo.h"
 #include "globvars.h"
 #include "graphics.h"
+#include "harness/trace.h"
 #include "input.h"
 #include "loading.h"
+#include "pd/sys.h"
+#include "s3/s3.h"
 #include "sound.h"
 #include "utility.h"
-#include "s3/s3sound.h"
-#include "pd/sys.h"
-#include "harness/trace.h"
 #include <stdlib.h>
 
 int gLast_demo;
@@ -46,7 +46,7 @@ void DoDemo() {
     }
 
     ClearEntireScreen();
-    song_tag = S3StartSound(gIndexed_outlets[0], 10000);
+    song_tag = S3StartSound(gEffects_outlet, 10000);
     DRSetPalette(gRender_palette);
     FadePaletteUp();
 
@@ -60,14 +60,14 @@ void DoDemo() {
             // FIXME: sleep? SoundService?
         }
         if (!S3SoundStillPlaying(song_tag)) {
-            song_tag = S3StartSound(gIndexed_outlets[0], 10000);
+            song_tag = S3StartSound(gEffects_outlet, 10000);
         }
         if (AnyKeyDown() || EitherMouseButtonDown() || feof(f)) {
             break;
         }
     }
     S3StopSound(song_tag);
-    S3StopAllOutletSounds(gIndexed_outlets[0]);
+    S3StopAllOutletSounds(gEffects_outlet);
     S3StopAllOutletSounds();
     fclose(f);
     FadePaletteDown();

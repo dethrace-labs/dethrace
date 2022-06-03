@@ -61,6 +61,7 @@ br_material_find_cbfn* BrMaterialFindHook(br_material_find_cbfn* hook);
 // BrMatrix236
 void BrMatrix23Copy(br_matrix23* A, br_matrix23* B);
 void BrMatrix23Identity(br_matrix23* mat);
+void BrMatrix23Mul(br_matrix23* A, br_matrix23* B, br_matrix23* C);
 
 // BrMatrix34
 void BrMatrix34Identity(br_matrix34* mat);

@@ -647,7 +647,7 @@ void IncreaseAngle() {
             camera_ptr->field_of_view = 0x78e3;
         }
 #ifdef DETHRACE_FIX_BUGS
-        sprintf(s, "Camera angle increased to %f", BrAngleToDegrees(camera_ptr->field_of_view));
+        sprintf(s, "Camera angle increased to %f", (float)BrAngleToDegrees(camera_ptr->field_of_view));
 #else
         sprintf(s, "Camera angle increased to %d", gProgram_state.current_depth_effect.end);
 #endif
@@ -669,7 +669,7 @@ void DecreaseAngle() {
             camera_ptr->field_of_view = 0x71c;
         }
 #ifdef DETHRACE_FIX_BUGS
-        sprintf(s, "Camera angle decreased to %f", BrAngleToDegrees(camera_ptr->field_of_view));
+        sprintf(s, "Camera angle decreased to %f", (float)BrAngleToDegrees(camera_ptr->field_of_view));
 #else
         sprintf(s, "Camera angle decreased to %d", gProgram_state.current_depth_effect.end);
 #endif

@@ -307,6 +307,31 @@ typedef enum keymapcodes {
     KEYMAP_INFO = 26,           // default I
 } keymapcodes;
 
+enum {
+    kFancyHeadupSplatterBonus = 0,
+    kFancyHeadupPileDriverBonus = 1,
+    kFancyHeadupExtraStyleBonus = 2,
+    kFancyHeadupBonusForArtisticImpression = 3,
+    kFancyHeadup2xComboBonus = 4,
+    kFancyHeadup3xComboBonus = 5,
+    kFancyHeadup4xComboBonus = 6,
+    kFancyHeadup5xComboBonus = 7,
+    kFancyHeadupNiceShotSir = 8,
+    kFancyHeadupCunningStuntBonus = 9,
+    kFancyHeadupHeadOnBonus = 10,
+    kFancyHeadupYouWastedEm = 11,
+    kFancyHeadupCheckpoint = 12,
+    kFancyHeadupOutOfTime = 13,
+    kFancyHeadupRaceCompleted = 14,
+
+    // FIXME: missing network fancy head-ups
+
+    kFancyHeadupNetworkRaceOverNetworkLoss = 17,
+    kFancyHeadupNetworkRaceNoMoreMoney = 18,
+    kFancyHeadupNetworkVictory = 20,
+    kFancyHeadupDemoTimeout = 21,
+};
+
 #define FONT_TYPEABLE 0
 #define FONT_ORANGHED 1
 #define FONT_BLUEHEAD 2
@@ -329,6 +354,8 @@ typedef enum keymapcodes {
 #define FONT_LITPLAQ1 19
 #define FONT_DRKPLAQ1 20
 
+#define MAX_PATH_LENGTH 256
+
 #define ROLLING_LETTER_LOOP_RANDOM 96
 #define PLAYER_NAME_MAX_LENGTH 13
 #define DAMAGE_UNIT_PERIODS 5
@@ -345,7 +372,7 @@ typedef enum keymapcodes {
 
 #define TIME_CONV_THING 0.0005f
 
-#define OPPONENT_COUNT 5
+#define OPPONENT_COUNT 0
 
 #define WORLD_SCALE 6.9f
 

@@ -1,44 +1,45 @@
 #include "options.h"
-#include "dr_types.h"
 #include "brucetrk.h"
 #include "controls.h"
 #include "depth.h"
 #include "displays.h"
+#include "dr_types.h"
 #include "drmem.h"
 #include "errors.h"
 #include "flicplay.h"
 #include "globvars.h"
 #include "grafdata.h"
 #include "graphics.h"
-#include "intrface.h"
+#include "harness/trace.h"
 #include "input.h"
+#include "intrface.h"
 #include "loading.h"
 #include "network.h"
+#include "pd/sys.h"
 #include "sound.h"
 #include "spark.h"
 #include "utility.h"
 #include "world.h"
 #include <brender/brender.h>
-#include "harness/trace.h"
-#include "pd/sys.h"
 #include <stdlib.h>
 #include <string.h>
 
 int gKey_defns[18] = { 48, 49, 46, 47, 53, 44, 59, 57, 55, 45, 50, 51, 52, 56, 62, 63, 64, 66 };
-tRadio_bastards gRadio_bastards__options[13] = { // suffix added to avoid duplicate symbol
-    { 4,  36, 0, {132, 175, 221, 253, 0 } }, 
-    { 3,  45, 0, {132, 157, 217,   0, 0 } }, 
-    { 3,  54, 0, {132, 183, 236,   0, 0 } }, 
-    { 3,  67, 0, {132, 194, 234,   0, 0 } }, 
-    { 3,  76, 0, {132, 194, 234,   0, 0 } }, 
-    { 4,  89, 0, {132, 176, 204, 246, 0 } }, 
-    { 4,  98, 0, {132, 176, 204, 246, 0 } }, 
-    { 2, 111, 0, {132, 158,   0,   0, 0 } }, 
-    { 2, 120, 0, {132, 158,   0,   0, 0 } },
-    { 2, 129, 0, {132, 158,   0,   0, 0 } }, 
-    { 2, 138, 0, {132, 158,   0,   0, 0 } }, 
-    { 3, 150, 0, {132, 164, 207,   0, 0 } },
-    { 4, 153, 0, {177, 199, 220, 242, 0 } },
+tRadio_bastards gRadio_bastards__options[13] = {
+    // suffix added to avoid duplicate symbol
+    { 4, 36, 0, { 132, 175, 221, 253, 0 } },
+    { 3, 45, 0, { 132, 157, 217, 0, 0 } },
+    { 3, 54, 0, { 132, 183, 236, 0, 0 } },
+    { 3, 67, 0, { 132, 194, 234, 0, 0 } },
+    { 3, 76, 0, { 132, 194, 234, 0, 0 } },
+    { 4, 89, 0, { 132, 176, 204, 246, 0 } },
+    { 4, 98, 0, { 132, 176, 204, 246, 0 } },
+    { 2, 111, 0, { 132, 158, 0, 0, 0 } },
+    { 2, 120, 0, { 132, 158, 0, 0, 0 } },
+    { 2, 129, 0, { 132, 158, 0, 0, 0 } },
+    { 2, 138, 0, { 132, 158, 0, 0, 0 } },
+    { 3, 150, 0, { 132, 164, 207, 0, 0 } },
+    { 4, 153, 0, { 177, 199, 220, 242, 0 } },
 };
 int gKey_count;
 int gLast_graph_sel__options; // suffix added to avoid duplicate symbol
@@ -304,8 +305,8 @@ void PlayRadioOn2(int pIndex, int pValue) {
     LOG_TRACE("(%d, %d)", pIndex, pValue);
 
     RunFlicAt(288,
-            gRadio_bastards__options[pIndex].left[pValue],
-            gRadio_bastards__options[pIndex].top);
+        gRadio_bastards__options[pIndex].left[pValue],
+        gRadio_bastards__options[pIndex].top);
 }
 
 // IDA: void __usercall PlayRadioOff2(int pIndex@<EAX>, int pValue@<EDX>)
@@ -313,8 +314,8 @@ void PlayRadioOff2(int pIndex, int pValue) {
     LOG_TRACE("(%d, %d)", pIndex, pValue);
 
     RunFlicAt(287,
-            gRadio_bastards__options[pIndex].left[pValue],
-            gRadio_bastards__options[pIndex].top);
+        gRadio_bastards__options[pIndex].left[pValue],
+        gRadio_bastards__options[pIndex].top);
 }
 
 // IDA: void __usercall PlayRadioOn(int pIndex@<EAX>, int pValue@<EDX>)
@@ -371,7 +372,7 @@ int GraphOptLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int new_value;
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
-    DRS3StartSound(gIndexed_outlets[0], 3000);
+    DRS3StartSound(gEffects_outlet, 3000);
     new_value = gRadio_bastards__options[*pCurrent_choice - 2].current_value - 1;
     if (new_value < 0) {
         new_value = gRadio_bastards__options[*pCurrent_choice - 2].count - 1;
@@ -385,7 +386,7 @@ int GraphOptRight(int* pCurrent_choice, int* pCurrent_mode) {
     int new_value;
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
-    DRS3StartSound(gIndexed_outlets[0], 3000);
+    DRS3StartSound(gEffects_outlet, 3000);
     new_value = gRadio_bastards__options[*pCurrent_choice + -2].current_value + 1;
     if (new_value == gRadio_bastards__options[*pCurrent_choice - 2].count) {
         new_value = 0;
@@ -401,12 +402,12 @@ int GraphOptUp(int* pCurrent_choice, int* pCurrent_mode) {
     if (*pCurrent_mode == 0) {
         *pCurrent_mode = 1;
         *pCurrent_choice = 13;
-        DRS3StartSound(gIndexed_outlets[0], 3000);
+        DRS3StartSound(gEffects_outlet, 3000);
         return 1;
     } else if (*pCurrent_choice == 1) {
         *pCurrent_mode = 0;
         *pCurrent_choice = 0;
-        DRS3StartSound(gIndexed_outlets[0], 3000);
+        DRS3StartSound(gEffects_outlet, 3000);
         return 1;
     } else {
         return 0;
@@ -420,12 +421,12 @@ int GraphOptDown(int* pCurrent_choice, int* pCurrent_mode) {
     if (*pCurrent_mode == 0) {
         *pCurrent_mode = 1;
         *pCurrent_choice = 2;
-        DRS3StartSound(gIndexed_outlets[0], 3000);
+        DRS3StartSound(gEffects_outlet, 3000);
         return 1;
     } else if (*pCurrent_choice == 14) {
         *pCurrent_mode = 0;
         *pCurrent_choice = 0;
-        DRS3StartSound(gIndexed_outlets[0], 3000);
+        DRS3StartSound(gEffects_outlet, 3000);
         return 1;
     } else {
         return 0;
@@ -439,7 +440,7 @@ int RadioClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_o
 
     for (i = gRadio_bastards__options[*pCurrent_choice - 2].count - 1; i >= 0; i--) {
         if (gThe_interface_spec__options->mouse_areas[2].left[gGraf_data_index] + pX_offset + 3 >= gRadio_bastards__options[*pCurrent_choice - 2].left[i]) {
-            DRS3StartSound(gIndexed_outlets[0], 3000);
+            DRS3StartSound(gEffects_outlet, 3000);
             RadioChanged(*pCurrent_choice - 2, i);
             return 0;
         }
@@ -455,8 +456,8 @@ int GraphOptGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     return 0;
 }
 
-//IDA: void __usercall PlotAGraphBox(int pIndex@<EAX>, int pColour_value@<EDX>)
-// Suffix added to avoid duplicate symbol
+// IDA: void __usercall PlotAGraphBox(int pIndex@<EAX>, int pColour_value@<EDX>)
+//  Suffix added to avoid duplicate symbol
 void PlotAGraphBox__options(int pIndex, int pColour_value) {
     LOG_TRACE("(%d, %d)", pIndex, pColour_value);
 
@@ -464,22 +465,22 @@ void PlotAGraphBox__options(int pIndex, int pColour_value) {
         return;
     }
     DrawRRectangle(gBack_screen,
-            gThe_interface_spec__options->mouse_areas[2].left[gGraf_data_index] - 6,
-            gRadio_bastards__options[pIndex].top - 3,
-            gThe_interface_spec__options->mouse_areas[2].right[gGraf_data_index] + 3,
-            gRadio_bastards__options[pIndex].top + gFonts[12].height + (TranslationMode() ? 2 : 0), pColour_value);
+        gThe_interface_spec__options->mouse_areas[2].left[gGraf_data_index] - 6,
+        gRadio_bastards__options[pIndex].top - 3,
+        gThe_interface_spec__options->mouse_areas[2].right[gGraf_data_index] + 3,
+        gRadio_bastards__options[pIndex].top + gFonts[12].height + (TranslationMode() ? 2 : 0), pColour_value);
 }
 
-//IDA: void __usercall DrawAGraphBox(int pIndex@<EAX>)
-// Suffix added to avoid duplicate symbol
+// IDA: void __usercall DrawAGraphBox(int pIndex@<EAX>)
+//  Suffix added to avoid duplicate symbol
 void DrawAGraphBox__options(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
     PlotAGraphBox__options(pIndex, 45);
 }
 
-//IDA: void __usercall EraseAGraphBox(int pIndex@<EAX>)
-// Suffix added to avoid duplicate symbol
+// IDA: void __usercall EraseAGraphBox(int pIndex@<EAX>)
+//  Suffix added to avoid duplicate symbol
 void EraseAGraphBox__options(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
@@ -500,80 +501,120 @@ void DrawGraphBox(int pCurrent_choice, int pCurrent_mode) {
 // IDA: void __cdecl DoGraphicsOptions()
 void DoGraphicsOptions() {
     static tFlicette flicker_on[14] = {
-        {  43, {  45,  90 }, { 166, 398 } },
-        {  43, { 220, 440 }, { 166, 398 } },
-        { 238, {  49,  98 }, {  36,  86 } },
-        { 239, {  49,  98 }, {  45, 108 } }, 
-        { 240, {  49,  98 }, {  54, 130 } }, 
-        { 241, {  49,  98 }, {  67, 161 } }, 
-        { 242, {  49,  98 }, {  76, 182 } }, 
-        { 243, {  49,  98 }, {  89, 214 } }, 
-        { 244, {  49,  98 }, {  98, 235 } }, 
-        { 245, {  49,  98 }, { 111, 266 } }, 
-        { 246, {  49,  98 }, { 120, 288 } }, 
-        { 247, {  49,  98 }, { 129, 310 } }, 
-        { 248, {  49,  98 }, { 138, 331 } }, 
-        { 249, {  49,  98 }, { 150, 360 } },
+        { 43, { 45, 90 }, { 166, 398 } },
+        { 43, { 220, 440 }, { 166, 398 } },
+        { 238, { 49, 98 }, { 36, 86 } },
+        { 239, { 49, 98 }, { 45, 108 } },
+        { 240, { 49, 98 }, { 54, 130 } },
+        { 241, { 49, 98 }, { 67, 161 } },
+        { 242, { 49, 98 }, { 76, 182 } },
+        { 243, { 49, 98 }, { 89, 214 } },
+        { 244, { 49, 98 }, { 98, 235 } },
+        { 245, { 49, 98 }, { 111, 266 } },
+        { 246, { 49, 98 }, { 120, 288 } },
+        { 247, { 49, 98 }, { 129, 310 } },
+        { 248, { 49, 98 }, { 138, 331 } },
+        { 249, { 49, 98 }, { 150, 360 } },
     };
     static tFlicette flicker_off[14] = {
-        { 42,  {  45,  90 }, { 166, 398 } }, 
-        { 42,  { 220, 440 }, { 166, 398 } }, 
-        { 265, {  49,  98 }, {  36,  86 } }, 
-        { 266, {  49,  98 }, {  45, 108 } }, 
-        { 267, {  49,  98 }, {  54, 130 } }, 
-        { 268, {  49,  98 }, {  67, 161 } }, 
-        { 269, {  49,  98 }, {  76, 182 } }, 
-        { 270, {  49,  98 }, {  89, 214 } }, 
-        { 271, {  49,  98 }, {  98, 235 } },
-        { 272, {  49,  98 }, { 111, 266 } },
-        { 273, {  49,  98 }, { 120, 288 } },
-        { 274, {  49,  98 }, { 129, 310 } },
-        { 275, {  49,  98 }, { 138, 331 } },
-        { 276, {  49,  98 }, { 150, 360 } },
+        { 42, { 45, 90 }, { 166, 398 } },
+        { 42, { 220, 440 }, { 166, 398 } },
+        { 265, { 49, 98 }, { 36, 86 } },
+        { 266, { 49, 98 }, { 45, 108 } },
+        { 267, { 49, 98 }, { 54, 130 } },
+        { 268, { 49, 98 }, { 67, 161 } },
+        { 269, { 49, 98 }, { 76, 182 } },
+        { 270, { 49, 98 }, { 89, 214 } },
+        { 271, { 49, 98 }, { 98, 235 } },
+        { 272, { 49, 98 }, { 111, 266 } },
+        { 273, { 49, 98 }, { 120, 288 } },
+        { 274, { 49, 98 }, { 129, 310 } },
+        { 275, { 49, 98 }, { 138, 331 } },
+        { 276, { 49, 98 }, { 150, 360 } },
     };
     static tFlicette push[14] = {
-        { 154, {  45,  90 }, { 166, 398 } }, 
-        {  45, { 220, 440 }, { 166, 398 } }, 
-        {  45, { 210, 440 }, { 170, 408 } },
-        {  45, { 210, 440 }, { 170, 408 } },
-        {  45, { 210, 440 }, { 170, 408 } },
-        {  45, { 210, 440 }, { 170, 408 } },
-        {  45, { 210, 440 }, { 170, 408 } },
-        {  45, { 210, 440 }, { 170, 408 } }, 
-        {  45, { 210, 440 }, { 170, 408 } },
-        {  45, { 210, 440 }, { 170, 408 } },
-        {  45, { 210, 440 }, { 170, 408 } }, 
-        {  45, { 210, 440 }, { 170, 408 } },
-        {  45, { 210, 440 }, { 170, 408 } }, 
-        {  45, { 210, 440 }, { 170, 408 } },
+        { 154, { 45, 90 }, { 166, 398 } },
+        { 45, { 220, 440 }, { 166, 398 } },
+        { 45, { 210, 440 }, { 170, 408 } },
+        { 45, { 210, 440 }, { 170, 408 } },
+        { 45, { 210, 440 }, { 170, 408 } },
+        { 45, { 210, 440 }, { 170, 408 } },
+        { 45, { 210, 440 }, { 170, 408 } },
+        { 45, { 210, 440 }, { 170, 408 } },
+        { 45, { 210, 440 }, { 170, 408 } },
+        { 45, { 210, 440 }, { 170, 408 } },
+        { 45, { 210, 440 }, { 170, 408 } },
+        { 45, { 210, 440 }, { 170, 408 } },
+        { 45, { 210, 440 }, { 170, 408 } },
+        { 45, { 210, 440 }, { 170, 408 } },
     };
     static tMouse_area mouse_areas[14] = {
-        { {  45,  90 }, { 165, 396 }, { 104, 214 }, { 185, 444 },  0, 0, 0, NULL },
-        { { 220, 440 }, { 165, 396 }, { 276, 552 }, { 185, 444 },  1, 0, 0, NULL },
-        { {  49,  98 }, {  35,  84 }, { 284, 568 }, {  43, 103 },  2, 1, 0, RadioClick },
-        { {  49,  98 }, {  44, 106 }, { 284, 568 }, {  52, 125 },  3, 1, 0, RadioClick },
-        { {  49,  98 }, {  53, 127 }, { 284, 568 }, {  61, 146 },  4, 1, 0, RadioClick },
-        { {  49,  98 }, {  66, 158 }, { 284, 568 }, {  74, 178 },  5, 1, 0, RadioClick },
-        { {  49,  98 }, {  75, 180 }, { 284, 568 }, {  83, 199 },  6, 1, 0, RadioClick },
-        { {  49,  98 }, {  88, 192 }, { 284, 568 }, {  96, 230 },  7, 1, 0, RadioClick },
-        { {  49,  98 }, {  97, 233 }, { 284, 568 }, { 105, 252 },  8, 1, 0, RadioClick },
-        { {  49,  98 }, { 110, 264 }, { 284, 568 }, { 118, 283 },  9, 1, 0, RadioClick },
-        { {  49,  98 }, { 119, 286 }, { 284, 568 }, { 127, 305 }, 10, 1, 0, RadioClick },
-        { {  49,  98 }, { 128, 307 }, { 284, 322 }, { 136, 326 }, 11, 1, 0, RadioClick },
-        { {  49,  98 }, { 137, 329 }, { 284, 322 }, { 145, 348 }, 12, 1, 0, RadioClick },
-        { {  49,  98 }, { 149, 358 }, { 284, 322 }, { 157, 377 }, 13, 1, 0, RadioClick },
+        { { 45, 90 }, { 165, 396 }, { 104, 214 }, { 185, 444 }, 0, 0, 0, NULL },
+        { { 220, 440 }, { 165, 396 }, { 276, 552 }, { 185, 444 }, 1, 0, 0, NULL },
+        { { 49, 98 }, { 35, 84 }, { 284, 568 }, { 43, 103 }, 2, 1, 0, RadioClick },
+        { { 49, 98 }, { 44, 106 }, { 284, 568 }, { 52, 125 }, 3, 1, 0, RadioClick },
+        { { 49, 98 }, { 53, 127 }, { 284, 568 }, { 61, 146 }, 4, 1, 0, RadioClick },
+        { { 49, 98 }, { 66, 158 }, { 284, 568 }, { 74, 178 }, 5, 1, 0, RadioClick },
+        { { 49, 98 }, { 75, 180 }, { 284, 568 }, { 83, 199 }, 6, 1, 0, RadioClick },
+        { { 49, 98 }, { 88, 192 }, { 284, 568 }, { 96, 230 }, 7, 1, 0, RadioClick },
+        { { 49, 98 }, { 97, 233 }, { 284, 568 }, { 105, 252 }, 8, 1, 0, RadioClick },
+        { { 49, 98 }, { 110, 264 }, { 284, 568 }, { 118, 283 }, 9, 1, 0, RadioClick },
+        { { 49, 98 }, { 119, 286 }, { 284, 568 }, { 127, 305 }, 10, 1, 0, RadioClick },
+        { { 49, 98 }, { 128, 307 }, { 284, 322 }, { 136, 326 }, 11, 1, 0, RadioClick },
+        { { 49, 98 }, { 137, 329 }, { 284, 322 }, { 145, 348 }, 12, 1, 0, RadioClick },
+        { { 49, 98 }, { 149, 358 }, { 284, 322 }, { 157, 377 }, 13, 1, 0, RadioClick },
     };
     static tInterface_spec interface_spec = {
-        0, 160, 0, 0, 0, 0, 1,
-        { -1,  0 }, { -1,  0 }, { 0, 2 }, { 1,  2 }, { NULL,         GraphOptLeft  },
-        { -1,  0 }, {  1,  0 }, { 0, 2 }, { 1, 13 }, { NULL,         GraphOptRight },
-        { -1, -1 }, {  0, -1 }, { 0, 1 }, { 0, 13 }, { GraphOptUp,   GraphOptUp    },
-        { -1, -1 }, {  1,  1 }, { 0, 2 }, { 0, 14 }, { GraphOptDown, GraphOptDown  },
-        { 1, 1 }, { NULL, GraphOptGoAhead }, { 1, 1 }, { NULL, NULL },
-        NULL, DrawGraphBox, 0, NULL, DrawInitialRadios, NULL, 0, { 0, 0 },
-        NULL, 1, 1, 
-        COUNT_OF(flicker_on), flicker_on, flicker_off, push,
-        COUNT_OF(mouse_areas), mouse_areas, 0, NULL,
+        0,
+        160,
+        0,
+        0,
+        0,
+        0,
+        1,
+        { -1, 0 },
+        { -1, 0 },
+        { 0, 2 },
+        { 1, 2 },
+        { NULL, GraphOptLeft },
+        { -1, 0 },
+        { 1, 0 },
+        { 0, 2 },
+        { 1, 13 },
+        { NULL, GraphOptRight },
+        { -1, -1 },
+        { 0, -1 },
+        { 0, 1 },
+        { 0, 13 },
+        { GraphOptUp, GraphOptUp },
+        { -1, -1 },
+        { 1, 1 },
+        { 0, 2 },
+        { 0, 14 },
+        { GraphOptDown, GraphOptDown },
+        { 1, 1 },
+        { NULL, GraphOptGoAhead },
+        { 1, 1 },
+        { NULL, NULL },
+        NULL,
+        DrawGraphBox,
+        0,
+        NULL,
+        DrawInitialRadios,
+        NULL,
+        0,
+        { 0, 0 },
+        NULL,
+        1,
+        1,
+        COUNT_OF(flicker_on),
+        flicker_on,
+        flicker_off,
+        push,
+        COUNT_OF(mouse_areas),
+        mouse_areas,
+        0,
+        NULL,
     };
     LOG_TRACE("()");
 
@@ -768,9 +809,9 @@ void DrawKeyAssignments(int pCurrent_choice, int pCurrent_mode) {
     if (gMouse_in_use && pCurrent_choice == 4) {
         GetMousePosition(&x_coord, &y_coord);
         if (y_coord >= gCurrent_graf_data->key_assign_key_map_y
-                && y_coord <= gCurrent_graf_data->key_assign_key_map_y + gFonts[12].height + 5
-                && x_coord > gCurrent_graf_data->key_assign_col_1
-                && x_coord < gCurrent_graf_data->key_assign_col_2 + gCurrent_graf_data->key_assign_col_2 - gCurrent_graf_data->key_assign_col_1 - 7) {
+            && y_coord <= gCurrent_graf_data->key_assign_key_map_y + gFonts[12].height + 5
+            && x_coord > gCurrent_graf_data->key_assign_col_1
+            && x_coord < gCurrent_graf_data->key_assign_col_2 + gCurrent_graf_data->key_assign_col_2 - gCurrent_graf_data->key_assign_col_1 - 7) {
             gCurrent_key = -1;
         } else {
             if (x_coord > gCurrent_graf_data->key_assign_col_2) {
@@ -779,7 +820,7 @@ void DrawKeyAssignments(int pCurrent_choice, int pCurrent_mode) {
                 new_key = 0;
             }
             if (y_coord >= gCurrent_graf_data->key_assign_y - 2
-                    && y_coord < gCurrent_graf_data->key_assign_y + gCurrent_graf_data->key_assign_y_pitch * (gKey_count + 1) / 2) {
+                && y_coord < gCurrent_graf_data->key_assign_y + gCurrent_graf_data->key_assign_y_pitch * (gKey_count + 1) / 2) {
                 new_key += (y_coord - gCurrent_graf_data->key_assign_y - 2) / gCurrent_graf_data->key_assign_y_pitch;
                 if (new_key >= 0 && new_key < gKey_count) {
                     gCurrent_key = new_key;
@@ -843,7 +884,7 @@ int KeyAssignLeft(int* pCurrent_choice, int* pCurrent_mode) {
         }
         ChangeKeyMapIndex(new_index);
         RadioChanged(12, new_index);
-        DRS3StartSound(gIndexed_outlets[0], 3000);
+        DRS3StartSound(gEffects_outlet, 3000);
     } else {
         if (gCurrent_key >= (gKey_count + 1) / 2) {
             gCurrent_key -= (gKey_count + 1) / 2;
@@ -853,7 +894,7 @@ int KeyAssignLeft(int* pCurrent_choice, int* pCurrent_mode) {
                 gCurrent_key -= (gKey_count + 1) / 2;
             }
         }
-        DRS3StartSound(gIndexed_outlets[0], 3000);
+        DRS3StartSound(gEffects_outlet, 3000);
     }
     return 1;
 }
@@ -871,7 +912,7 @@ int KeyAssignRight(int* pCurrent_choice, int* pCurrent_mode) {
         }
         ChangeKeyMapIndex(new_index);
         RadioChanged(12, new_index);
-        DRS3StartSound(gIndexed_outlets[0], 3000);
+        DRS3StartSound(gEffects_outlet, 3000);
     } else {
         if (gCurrent_key >= (gKey_count + 1) / 2) {
             gCurrent_key -= (gKey_count + 1) / 2;
@@ -881,7 +922,7 @@ int KeyAssignRight(int* pCurrent_choice, int* pCurrent_mode) {
                 gCurrent_key -= (gKey_count + 1) / 2;
             }
         }
-        DRS3StartSound(gIndexed_outlets[0], 3000);
+        DRS3StartSound(gEffects_outlet, 3000);
     }
     return 1;
 }
@@ -894,12 +935,12 @@ int KeyAssignUp(int* pCurrent_choice, int* pCurrent_mode) {
         gCurrent_key = -1;
         *pCurrent_choice = 4;
         *pCurrent_mode = 1;
-        DRS3StartSound(gIndexed_outlets[0], 3000);
+        DRS3StartSound(gEffects_outlet, 3000);
     } else if (gCurrent_key < 0) {
         gCurrent_key = (gKey_count + 1) / 2 - 1;
         *pCurrent_choice = 4;
         *pCurrent_mode = 1;
-        DRS3StartSound(gIndexed_outlets[0], 3000);
+        DRS3StartSound(gEffects_outlet, 3000);
     } else if (gCurrent_key > (gKey_count + 1) / 2) {
         gCurrent_key -= 1;
     } else if (gCurrent_key == (gKey_count + 1) / 2) {
@@ -911,7 +952,7 @@ int KeyAssignUp(int* pCurrent_choice, int* pCurrent_mode) {
     } else {
         gCurrent_key -= 1;
     }
-    DRS3StartSound(gIndexed_outlets[0], 3000);
+    DRS3StartSound(gEffects_outlet, 3000);
     return 1;
 }
 
@@ -941,7 +982,7 @@ int KeyAssignDown(int* pCurrent_choice, int* pCurrent_mode) {
     } else {
         gCurrent_key = -1;
     }
-    DRS3StartSound(gIndexed_outlets[0], 3000);
+    DRS3StartSound(gEffects_outlet, 3000);
     return 1;
 }
 
@@ -989,7 +1030,7 @@ int KeyAssignGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
                 *pCurrent_mode = 1;
                 gCurrent_key = key;
                 gMouse_in_use = 0;
-                DRS3StartSound(gIndexed_outlets[0], 3100);
+                DRS3StartSound(gEffects_outlet, 3100);
                 disallowed = 0;
             }
             break;
@@ -1039,7 +1080,7 @@ int KeyAssignGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
                                 }
                             }
                             if (gPending_entry < 0) {
-                                DRS3StartSound(gIndexed_outlets[0], 3100);
+                                DRS3StartSound(gEffects_outlet, 3100);
                                 key = -1;
                                 break;
                             }
@@ -1058,7 +1099,7 @@ int KeyAssignGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
                     break;
                 }
             }
-            DRS3StartSound(gIndexed_outlets[0], 3004);
+            DRS3StartSound(gEffects_outlet, 3004);
             WaitForNoKeys();
             if (key != 63 && key != -1) {
                 gKey_mapping[gKey_defns[gCurrent_key]] = key;
@@ -1083,7 +1124,7 @@ int MouseyClickBastard(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, 
         GetMousePosition(&x_coord, &y_coord);
         for (i = gRadio_bastards__options[12].count - 1; i >= 0; i--) {
             if (x_coord + 3 >= gRadio_bastards__options[12].left[i]) {
-                DRS3StartSound(gIndexed_outlets[0], 3000);
+                DRS3StartSound(gEffects_outlet, 3000);
                 ChangeKeyMapIndex(i);
                 RadioChanged(12, i);
                 break;
@@ -1112,39 +1153,39 @@ void DrawInitialKMRadios() {
 // IDA: void __cdecl DoControlOptions()
 void DoControlOptions() {
     static tFlicette flicker_on[4] = {
-        { 177, {  51, 102 }, { 166, 398 } },
+        { 177, { 51, 102 }, { 166, 398 } },
         { 177, { 112, 224 }, { 166, 398 } },
         { 177, { 173, 346 }, { 166, 398 } },
         { 177, { 234, 468 }, { 166, 398 } },
     };
     static tFlicette flicker_off[4] = {
-        { 176, {  51, 102 }, { 166, 398 } },
+        { 176, { 51, 102 }, { 166, 398 } },
         { 176, { 112, 224 }, { 166, 398 } },
         { 176, { 173, 346 }, { 166, 398 } },
         { 176, { 234, 468 }, { 166, 398 } },
     };
     static tFlicette push[4] = {
-        { 172, {  51, 102 }, { 166, 398 } },
+        { 172, { 51, 102 }, { 166, 398 } },
         { 175, { 112, 224 }, { 166, 398 } },
         { 174, { 173, 346 }, { 166, 398 } },
         { 173, { 234, 468 }, { 166, 398 } },
     };
     static tMouse_area mouse_areas[5] = {
-        { {  51, 102 }, { 166, 398 }, { 102, 204 }, { 187, 449 },   0,   0,   0, NULL },
-        { { 112, 224 }, { 166, 398 }, { 164, 328 }, { 187, 449 },   1,   0,   0, NULL },
-        { { 173, 346 }, { 166, 398 }, { 225, 450 }, { 187, 449 },   2,   0,   0, NULL },
-        { { 234, 468 }, { 166, 398 }, { 286, 572 }, { 187, 449 },   3,   0,   0, NULL },
-        { {  45,  90 }, {  33,  79 }, { 285, 570 }, { 159, 382 },   4,   1,   0, MouseyClickBastard },
+        { { 51, 102 }, { 166, 398 }, { 102, 204 }, { 187, 449 }, 0, 0, 0, NULL },
+        { { 112, 224 }, { 166, 398 }, { 164, 328 }, { 187, 449 }, 1, 0, 0, NULL },
+        { { 173, 346 }, { 166, 398 }, { 225, 450 }, { 187, 449 }, 2, 0, 0, NULL },
+        { { 234, 468 }, { 166, 398 }, { 286, 572 }, { 187, 449 }, 3, 0, 0, NULL },
+        { { 45, 90 }, { 33, 79 }, { 285, 570 }, { 159, 382 }, 4, 1, 0, MouseyClickBastard },
     };
     static tInterface_spec interface_spec = {
         0, 170, 179, 0, 0, 0, 1,
-        { -1, -1 }, { -1, 0 }, {  0,  4 }, {  3,  4 }, { NULL, KeyAssignLeft },
-        { -1, -1 }, {  1, 0 }, {  0,  4 }, {  3,  4 }, { NULL, KeyAssignRight },
-        { -1, -1 }, {  0, 0 }, {  0,  4 }, {  3,  4 }, { KeyAssignUp, KeyAssignUp },
-        { -1, -1 }, {  0, 0 }, {  0,  4 }, {  3,  4 }, { KeyAssignDown, KeyAssignDown },
-        {  1,  1 }, { KeyAssignGoAhead, KeyAssignGoAhead }, { 1, 1 },
-        {  0,  0 }, NULL, DrawKeyAssignments, 0, NULL, DrawInitialKMRadios, NULL, 0,
-        {  0,  0 }, NULL, 3, 1,
+        { -1, -1 }, { -1, 0 }, { 0, 4 }, { 3, 4 }, { NULL, KeyAssignLeft },
+        { -1, -1 }, { 1, 0 }, { 0, 4 }, { 3, 4 }, { NULL, KeyAssignRight },
+        { -1, -1 }, { 0, 0 }, { 0, 4 }, { 3, 4 }, { KeyAssignUp, KeyAssignUp },
+        { -1, -1 }, { 0, 0 }, { 0, 4 }, { 3, 4 }, { KeyAssignDown, KeyAssignDown },
+        { 1, 1 }, { KeyAssignGoAhead, KeyAssignGoAhead }, { 1, 1 },
+        { 0, 0 }, NULL, DrawKeyAssignments, 0, NULL, DrawInitialKMRadios, NULL, 0,
+        { 0, 0 }, NULL, 3, 1,
         COUNT_OF(flicker_on), flicker_on, flicker_off, push,
         COUNT_OF(mouse_areas), mouse_areas,
         0, NULL
@@ -1222,7 +1263,7 @@ void DrawDisabledOptions() {
     DisableChoice(0);
     if (image != NULL) {
         DRPixelmapRectangleMaskedCopy(gBack_screen, gCurrent_graf_data->sound_opt_disable_x,
-                gCurrent_graf_data->sound_opt_disable_y, image, 0, 0, image->width, image->height);
+            gCurrent_graf_data->sound_opt_disable_y, image, 0, 0, image->width, image->height);
         BrPixelmapFree(image);
     }
 
@@ -1232,7 +1273,7 @@ void DrawDisabledOptions() {
         DisableChoice(1);
         if (image != NULL) {
             DRPixelmapRectangleMaskedCopy(gBack_screen, gCurrent_graf_data->graph_opt_disable_x,
-                    gCurrent_graf_data->graph_opt_disable_y, image, 0, 0, image->width, image->height);
+                gCurrent_graf_data->graph_opt_disable_y, image, 0, 0, image->width, image->height);
             BrPixelmapFree(image);
         }
     }
@@ -1241,43 +1282,80 @@ void DrawDisabledOptions() {
 // IDA: void __cdecl DoOptions()
 void DoOptions() {
     static tFlicette flicker_on[4] = {
-        { 43, { 57, 114 }, {  41,  98 } },
-        { 43, { 57, 114 }, {  78, 187 } },
+        { 43, { 57, 114 }, { 41, 98 } },
+        { 43, { 57, 114 }, { 78, 187 } },
         { 43, { 57, 114 }, { 114, 274 } },
         { 43, { 57, 114 }, { 154, 370 } }
     };
     static tFlicette flicker_off[4] = {
-        { 42, { 57, 114} , {  41,  98 } },
-        { 42, { 57, 114} , {  78, 187 } },
-        { 42, { 57, 114} , { 114, 274 } },
-        { 42, { 57, 114} , { 154, 370 } },
+        { 42, { 57, 114 }, { 41, 98 } },
+        { 42, { 57, 114 }, { 78, 187 } },
+        { 42, { 57, 114 }, { 114, 274 } },
+        { 42, { 57, 114 }, { 154, 370 } },
     };
     static tFlicette push[4] = {
-        { 144, { 57, 114 }, { 41,  98 } },
+        { 144, { 57, 114 }, { 41, 98 } },
         { 146, { 57, 114 }, { 78, 187 } },
-        { 145, { 57, 114 }, {114, 274 } },
-        {  45, { 57, 114 }, {154, 370 } },
+        { 145, { 57, 114 }, { 114, 274 } },
+        { 45, { 57, 114 }, { 154, 370 } },
     };
     static tMouse_area mouse_areas[4] = {
-        { { 57, 114 }, {  41,  98 }, { 123, 246 }, {  62, 149 }, 0, 0, 0, NULL }, 
-        { { 57, 114 }, {  78, 187 }, { 123, 246 }, {  99, 238 }, 1, 0, 0, NULL },
+        { { 57, 114 }, { 41, 98 }, { 123, 246 }, { 62, 149 }, 0, 0, 0, NULL },
+        { { 57, 114 }, { 78, 187 }, { 123, 246 }, { 99, 238 }, 1, 0, 0, NULL },
         { { 57, 114 }, { 114, 274 }, { 123, 246 }, { 135, 324 }, 2, 0, 0, NULL },
         { { 57, 114 }, { 154, 370 }, { 123, 246 }, { 175, 420 }, 3, 0, 0, NULL },
     };
     static tInterface_spec interface_spec = {
-        0, 140, 0, 141, 141, 141, 1,
-        { -1, 0 }, {  0, 0 }, { 0, 0 }, { 0, 0 },{ NULL, NULL },
-        { -1, 0 }, {  0, 0 }, { 0, 0 }, { 0, 0 },{ NULL, NULL },
-        { -1, 0 }, { -1, 0 }, { 0, 0 }, { 3, 0 },{ NULL, NULL },
-        { -1, 0 }, {  1, 0 }, { 0, 0 }, { 3, 0 },{ NULL, NULL },
-        {  1, 1 }, { NULL, NULL},
-        {  1, 1 }, { NULL, NULL},
-        NULL, NULL, 0,
-        NULL, DrawDisabledOptions, NULL, 0, { 0, 0 },
-        NULL, 3, 1,
-        COUNT_OF(flicker_on), flicker_on, flicker_off, push,
-        COUNT_OF(mouse_areas), mouse_areas,
-        0, NULL,
+        0,
+        140,
+        0,
+        141,
+        141,
+        141,
+        1,
+        { -1, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { NULL, NULL },
+        { -1, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { NULL, NULL },
+        { -1, 0 },
+        { -1, 0 },
+        { 0, 0 },
+        { 3, 0 },
+        { NULL, NULL },
+        { -1, 0 },
+        { 1, 0 },
+        { 0, 0 },
+        { 3, 0 },
+        { NULL, NULL },
+        { 1, 1 },
+        { NULL, NULL },
+        { 1, 1 },
+        { NULL, NULL },
+        NULL,
+        NULL,
+        0,
+        NULL,
+        DrawDisabledOptions,
+        NULL,
+        0,
+        { 0, 0 },
+        NULL,
+        3,
+        1,
+        COUNT_OF(flicker_on),
+        flicker_on,
+        flicker_off,
+        push,
+        COUNT_OF(mouse_areas),
+        mouse_areas,
+        0,
+        NULL,
     };
     int result;
     LOG_TRACE("()");

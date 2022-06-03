@@ -27,7 +27,7 @@
 #include "powerup.h"
 #include "pratcam.h"
 #include "replay.h"
-#include "s3/s3sound.h"
+#include "s3/s3.h"
 #include "sound.h"
 #include "spark.h"
 #include "structur.h"
@@ -164,24 +164,204 @@ tEdit_func* gEdit_funcs[10][18][8] = {
     },
     {
         // eEdit_mode_ped
-        { 0 }, // F5
-        { 0 }, // F6
-        { 0 }, // F7
-        { 0 }, // F8
-        { 0 }, // F10
-        { 0 }, // F11
-        { 0 }, // F12
-        { 0 }, // 0
-        { 0 }, // 1
-        { 0 }, // 2
-        { 0 }, // 3
-        { 0 }, // 4
-        { 0 }, // 5
-        { 0 }, // 6
-        { 0 }, // 7
-        { 0 }, // 8
-        { 0 }, // 9
-        { 0 }, // not used
+        {
+            // F5
+            TogglePedDetect,
+            NULL,
+            NULL,
+            NULL,
+            DoPedReport,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // F6
+            ShowPedPaths,
+            NULL,
+            NULL,
+            NULL,
+            ShowPedPos,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // F7
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // F8
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // F10
+            DropPedPoint,
+            DropPedPointAir,
+            NULL,
+            NULL,
+            NULL,
+            PullPedPoint,
+            PullPedPointAir,
+            NULL,
+        },
+        {
+            // F11
+            DropInitPedPoint,
+            DropInitPedPointAir,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // F12
+            ScrubPedestrian,
+            DeletePedPoint,
+            NULL,
+            NULL,
+            DeletePedPath,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // 0
+            NewPed0,
+            NewPed0,
+            NewPed0,
+            NewPed0,
+            NewPed0,
+            NewPed0,
+            NewPed0,
+            NewPed0,
+        },
+        {
+            // 1
+            NewPed1,
+            NewPed1,
+            NewPed1,
+            NewPed1,
+            NewPed1,
+            NewPed1,
+            NewPed1,
+            NewPed1,
+        },
+        {
+            // 2
+            NewPed2,
+            NewPed2,
+            NewPed2,
+            NewPed2,
+            NewPed2,
+            NewPed2,
+            NewPed2,
+            NewPed2,
+        },
+        {
+            // 3
+            NewPed3,
+            NewPed3,
+            NewPed3,
+            NewPed3,
+            NewPed3,
+            NewPed3,
+            NewPed3,
+            NewPed3,
+        },
+        {
+            // 4
+            NewPed4,
+            NewPed4,
+            NewPed4,
+            NewPed4,
+            NewPed4,
+            NewPed4,
+            NewPed4,
+            NewPed4,
+        },
+        {
+            // 5
+            NewPed5,
+            NewPed5,
+            NewPed5,
+            NewPed5,
+            NewPed5,
+            NewPed5,
+            NewPed5,
+            NewPed5,
+        },
+        {
+            // 6
+            NewPed6,
+            NewPed6,
+            NewPed6,
+            NewPed6,
+            NewPed6,
+            NewPed6,
+            NewPed6,
+            NewPed6,
+        },
+        {
+            // 7
+            NewPed7,
+            NewPed7,
+            NewPed7,
+            NewPed7,
+            NewPed7,
+            NewPed7,
+            NewPed7,
+            NewPed7,
+        },
+        {
+            // 8
+            NewPed8,
+            NewPed8,
+            NewPed8,
+            NewPed8,
+            NewPed8,
+            NewPed8,
+            NewPed8,
+            NewPed8,
+        },
+        {
+            // 9
+            NewPed9,
+            NewPed9,
+            NewPed9,
+            NewPed9,
+            NewPed9,
+            NewPed9,
+            NewPed9,
+            NewPed9,
+        },
+        {
+            // not used
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+        },
     },
     {
         // eEdit_mode_opp
@@ -248,24 +428,204 @@ tEdit_func* gEdit_funcs[10][18][8] = {
     },
     {
         // eEdit_mode_damage
-        { 0 }, // F5
-        { 0 }, // F6
-        { 0 }, // F7
-        { 0 }, // F8
-        { 0 }, // F10
-        { 0 }, // F11
-        { 0 }, // F12
-        { 0 }, // 0
-        { 0 }, // 1
-        { 0 }, // 2
-        { 0 }, // 3
-        { 0 }, // 4
-        { 0 }, // 5
-        { 0 }, // 6
-        { 0 }, // 7
-        { 0 }, // 8
-        { 0 }, // 9
-        { 0 }, // not used
+        {
+            // F5
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // F6
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // F7
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // F8
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // F10
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // F11
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // F12
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // 0
+            TDamageEngine,
+            NULL,
+            NULL,
+            NULL,
+            TDamageEngine,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // 1
+            TDamageTrans,
+            NULL,
+            NULL,
+            NULL,
+            TDamageTrans,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // 2
+            TDamageSteering,
+            NULL,
+            NULL,
+            NULL,
+            TDamageSteering,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // 3
+            TDamageLFWheel,
+            NULL,
+            NULL,
+            NULL,
+            TDamageLFBrake,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // 4
+            TDamageLRWheel,
+            NULL,
+            NULL,
+            NULL,
+            TDamageLRBrake,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // 5
+            TDamageRFWheel,
+            NULL,
+            NULL,
+            NULL,
+            TDamageRFBrake,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // 6
+            TDamageRRWheel,
+            NULL,
+            NULL,
+            NULL,
+            TDamageRRBrake,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // 7
+            TDamageDriver,
+            NULL,
+            NULL,
+            NULL,
+            TDamageDriver,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // 8
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // 9
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // not used
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+        },
     },
     {
         // eEdit_mode_bonnet
@@ -290,107 +650,249 @@ tEdit_func* gEdit_funcs[10][18][8] = {
     },
     {
         // eEdit_mode_options
-        { 0 }, // F5
-        { 0 }, // F6
-        { 0 }, // F7
-        { 0 }, // F8
-        { 0 }, // F10
-        { 0 }, // F11
-        { 0 }, // F12
-        { 0 }, // 0
         {
+            // F5
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // F6
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // F7
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // F8
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // F10
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // F11
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // F12
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // 0
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // 1
             CycleCarSimplificationLevel,
             NULL,
             NULL,
             NULL,
             CycleCarTexturingLevel,
-        }, // 1
+            NULL,
+            NULL,
+            NULL,
+        },
         {
+            // 2
             ToggleShadow,
             NULL,
             NULL,
             NULL,
             ToggleSmoke,
-        }, // 2
+            NULL,
+            NULL,
+            NULL,
+        },
         {
+            // 3
             CycleWallTexturingLevel,
             NULL,
             NULL,
             NULL,
             CycleRoadTexturingLevel,
-        }, // 3
+            NULL,
+            NULL,
+            NULL,
+        },
         {
+            // 4
             ToggleSky,
             NULL,
             NULL,
             NULL,
             ToggleDepthCueing,
-        }, // 4
+            NULL,
+            NULL,
+            NULL,
+        },
         {
+            // 5
             CycleYonFactor,
             NULL,
             NULL,
             NULL,
             ToggleAccessoryRendering,
-        }, // 5
+            NULL,
+            NULL,
+            NULL,
+        },
         {
+            // 6
             DecreaseYon,
             NULL,
             NULL,
             NULL,
             IncreaseYon,
-        }, // 6
+            NULL,
+            NULL,
+            NULL,
+        },
         {
+            // 7
             CycleSoundDetailLevel,
-        }, // 7
-        { 0 }, // 8
-        { 0 }, // 9
-        { 0 }, // not used
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // 8
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // 9
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+        },
+        {
+            // not used
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+        },
     },
 };
 tCheat gKev_keys[44] = {
-    { .code = 0xA11EE75D, .code2 = 0xF805EDDD, .action_proc = SetFlag, .num = 0x0A11EE75D },
-    { .code = 0x564E78B9, .code2 = 0x99155115, .action_proc = SetFlag, .num = 0x564E78B9 },
-    { .code = 0x1F47E5E8, .code2 = 0xA715222C, .action_proc = SetFlag2, .num = 1 },
-    { .code = 0x39D4C4C4, .code2 = 0xF0A2C5B0, .action_proc = FinishLap, .num = 0 },
-    { .code = 0x2654216C, .code2 = 0xF8256D15, .action_proc = GetPowerup, .num = 1 },
-    { .code = 0x4294EC89, .code2 = 0xC38AD60E, .action_proc = GetPowerup, .num = 2 },
-    { .code = 0x2CEB2850, .code2 = 0xA0C2D27E, .action_proc = GetPowerup, .num = 3 },
-    { .code = 0x2D5F3125, .code2 = 0x9CE8A541, .action_proc = GetPowerup, .num = 4 },
-    { .code = 0x2169C78B, .code2 = 0x7F3C9229, .action_proc = GetPowerup, .num = 5 },
-    { .code = 0x2203C0CB, .code2 = 0x79729BE4, .action_proc = GetPowerup, .num = 6 },
-    { .code = 0x34F4E3EC, .code2 = 0x868C534D, .action_proc = GetPowerup, .num = 7 },
-    { .code = 0x34010316, .code2 = 0x591D1EB2, .action_proc = GetPowerup, .num = 8 },
-    { .code = 0x214FE3BC, .code2 = 0x87285111, .action_proc = GetPowerup, .num = 9 },
-    { .code = 0x2FABC390, .code2 = 0xC93D9F7, .action_proc = GetPowerup, .num = 10 },
-    { .code = 0x2902E890, .code2 = 0x40969F67, .action_proc = GetPowerup, .num = 11 },
-    { .code = 0x2F458288, .code2 = 0x58074E2, .action_proc = GetPowerup, .num = 12 },
-    { .code = 0x249DA152, .code2 = 0x8F287346, .action_proc = GetPowerup, .num = 13 },
-    { .code = 0x23AAE08B, .code2 = 0xA668103D, .action_proc = GetPowerup, .num = 14 },
-    { .code = 0x32130661, .code2 = 0x56F03459, .action_proc = GetPowerup, .num = 15 },
-    { .code = 0x2734E944, .code2 = 0xFE1E4639, .action_proc = GetPowerup, .num = 16 },
-    { .code = 0x28341139, .code2 = 0x355F6D02, .action_proc = GetPowerup, .num = 17 },
-    { .code = 0x20508831, .code2 = 0x123D1961, .action_proc = GetPowerup, .num = 18 },
-    { .code = 0x346B8BCB, .code2 = 0x4ABA696C, .action_proc = GetPowerup, .num = 19 },
-    { .code = 0x3FC93DF0, .code2 = 0x29FA9EFB, .action_proc = GetPowerup, .num = 20 },
-    { .code = 0x2A80B09B, .code2 = 0x58516F5, .action_proc = GetPowerup, .num = 21 },
-    { .code = 0x2F548FD1, .code2 = 0x696744DA, .action_proc = GetPowerup, .num = 22 },
-    { .code = 0x3CB74F32, .code2 = 0xB915D88D, .action_proc = GetPowerup, .num = 23 },
-    { .code = 0x297B53BA, .code2 = 0x218D4D2D, .action_proc = GetPowerup, .num = 24 },
-    { .code = 0x351BC37D, .code2 = 0xB2A63343, .action_proc = GetPowerup, .num = 25 },
-    { .code = 0x2B624386, .code2 = 0x9BA6260E, .action_proc = GetPowerup, .num = 26 },
-    { .code = 0x2BA4AE23, .code2 = 0xC163A76C, .action_proc = GetPowerup, .num = 27 },
-    { .code = 0x2FB92DCA, .code2 = 0x4AD7D54E, .action_proc = GetPowerup, .num = 32 },
-    { .code = 0x3A42191B, .code2 = 0xEFF70F4C, .action_proc = GetPowerup, .num = 35 },
-    { .code = 0x2ACA3190, .code2 = 0xD9004F25, .action_proc = GetPowerup, .num = 36 },
-    { .code = 0x37C1F613, .code2 = 0xB7FAF351, .action_proc = GetPowerup, .num = 37 },
-    { .code = 0x2BA3F603, .code2 = 0x29F2425C, .action_proc = GetPowerup, .num = 38 },
-    { .code = 0x416EFF61, .code2 = 0x2667DF4B, .action_proc = GetPowerup, .num = 39 },
-    { .code = 0x2554125C, .code2 = 0x393CA35D, .action_proc = GetPowerup, .num = 41 },
-    { .code = 0x3FFF84D5, .code2 = 0x84A42DF4, .action_proc = GetPowerup, .num = 42 },
-    { .code = 0x37E83018, .code2 = 0xB609AEE6, .action_proc = GetPowerup, .num = 43 },
-    { .code = 0x2DB03B19, .code2 = 0x924A84B7, .action_proc = GetPowerup, .num = 44 },
-    { .code = 0x30A19FAB, .code2 = 0x2B0C2782, .action_proc = GetPowerup, .num = 45 },
+    { .code = 0xa11ee75d, .code2 = 0xf805eddd, .action_proc = SetFlag, .num = 0x0a11ee75d },
+    { .code = 0x564e78b9, .code2 = 0x99155115, .action_proc = SetFlag, .num = 0x0564e78b9 },
+    { .code = 0x1f47e5e8, .code2 = 0xa715222c, .action_proc = SetFlag2, .num = 1 },
+    { .code = 0x39d4c4c4, .code2 = 0xf0a2c5b0, .action_proc = FinishLap, .num = 0 },
+    { .code = 0x2654216c, .code2 = 0xf8256d15, .action_proc = GetPowerup, .num = 1 },
+    { .code = 0x4294ec89, .code2 = 0xc38ad60e, .action_proc = GetPowerup, .num = 2 },
+    { .code = 0x2ceb2850, .code2 = 0xa0c2d27e, .action_proc = GetPowerup, .num = 3 },
+    { .code = 0x2d5f3125, .code2 = 0x9ce8a541, .action_proc = GetPowerup, .num = 4 },
+    { .code = 0x2169c78b, .code2 = 0x7f3c9229, .action_proc = GetPowerup, .num = 5 },
+    { .code = 0x2203c0cb, .code2 = 0x79729be4, .action_proc = GetPowerup, .num = 6 },
+    { .code = 0x34f4e3ec, .code2 = 0x868c534d, .action_proc = GetPowerup, .num = 7 },
+    { .code = 0x34010316, .code2 = 0x591d1eb2, .action_proc = GetPowerup, .num = 8 },
+    { .code = 0x214fe3bc, .code2 = 0x87285111, .action_proc = GetPowerup, .num = 9 },
+    { .code = 0x2fabc390, .code2 = 0x0c93d9f7, .action_proc = GetPowerup, .num = 10 },
+    { .code = 0x2902e890, .code2 = 0x40969f67, .action_proc = GetPowerup, .num = 11 },
+    { .code = 0x2f458288, .code2 = 0x058074e2, .action_proc = GetPowerup, .num = 12 },
+    { .code = 0x249da152, .code2 = 0x8f287346, .action_proc = GetPowerup, .num = 13 },
+    { .code = 0x23aae08b, .code2 = 0xa668103d, .action_proc = GetPowerup, .num = 14 },
+    { .code = 0x32130661, .code2 = 0x56f03459, .action_proc = GetPowerup, .num = 15 },
+    { .code = 0x2734e944, .code2 = 0xfe1e4639, .action_proc = GetPowerup, .num = 16 },
+    { .code = 0x28341139, .code2 = 0x355f6d02, .action_proc = GetPowerup, .num = 17 },
+    { .code = 0x20508831, .code2 = 0x123d1961, .action_proc = GetPowerup, .num = 18 },
+    { .code = 0x346b8bcb, .code2 = 0x4aba696c, .action_proc = GetPowerup, .num = 19 },
+    { .code = 0x3fc93df0, .code2 = 0x29fa9efb, .action_proc = GetPowerup, .num = 20 },
+    { .code = 0x2a80b09b, .code2 = 0x058516f5, .action_proc = GetPowerup, .num = 21 },
+    { .code = 0x2f548fd1, .code2 = 0x696744da, .action_proc = GetPowerup, .num = 22 },
+    { .code = 0x3cb74f32, .code2 = 0xb915d88d, .action_proc = GetPowerup, .num = 23 },
+    { .code = 0x297b53ba, .code2 = 0x218d4d2d, .action_proc = GetPowerup, .num = 24 },
+    { .code = 0x351bc37d, .code2 = 0xb2a63343, .action_proc = GetPowerup, .num = 25 },
+    { .code = 0x2b624386, .code2 = 0x9ba6260e, .action_proc = GetPowerup, .num = 26 },
+    { .code = 0x2ba4ae23, .code2 = 0xc163a76c, .action_proc = GetPowerup, .num = 27 },
+    { .code = 0x2fb92dca, .code2 = 0x4ad7d54e, .action_proc = GetPowerup, .num = 32 },
+    { .code = 0x3a42191b, .code2 = 0xeff70f4c, .action_proc = GetPowerup, .num = 35 },
+    { .code = 0x2aca3190, .code2 = 0xd9004f25, .action_proc = GetPowerup, .num = 36 },
+    { .code = 0x37c1f613, .code2 = 0xb7faf351, .action_proc = GetPowerup, .num = 37 },
+    { .code = 0x2ba3f603, .code2 = 0x29f2425c, .action_proc = GetPowerup, .num = 38 },
+    { .code = 0x416eff61, .code2 = 0x2667df4b, .action_proc = GetPowerup, .num = 39 },
+    { .code = 0x2554125c, .code2 = 0x393ca35d, .action_proc = GetPowerup, .num = 41 },
+    { .code = 0x3fff84d5, .code2 = 0x84a42df4, .action_proc = GetPowerup, .num = 42 },
+    { .code = 0x37e83018, .code2 = 0xb609aee6, .action_proc = GetPowerup, .num = 43 },
+    { .code = 0x2db03b19, .code2 = 0x924a84b7, .action_proc = GetPowerup, .num = 44 },
+    { .code = 0x30a19fab, .code2 = 0x2b0c2782, .action_proc = GetPowerup, .num = 45 },
     { .code = 0x0, .code2 = 0x0, .action_proc = 0x0, .num = 0x0 }
 };
 int gAllow_car_flying;
@@ -425,13 +927,13 @@ void F4Key() {
     if (gI_am_cheating == 0xa11ee75d || (gI_am_cheating == 0x564e78b9 && gNet_mode == eNet_mode_none)) {
         if (PDKeyDown(KEY_SHIFT_ANY)) {
             gWhich_edit_mode--;
-            if ((int)gWhich_edit_mode == -1) {
-                gWhich_edit_mode = eEdit_mode_options;
+            if ((int)gWhich_edit_mode < 0) {
+                gWhich_edit_mode = COUNT_OF(gEdit_funcs) - 1;
             }
         } else {
             gWhich_edit_mode++;
-            if (gWhich_edit_mode >= eEdit_mode_count) {
-                gWhich_edit_mode = eEdit_mode_cheat;
+            if (gWhich_edit_mode >= COUNT_OF(gEdit_funcs)) {
+                gWhich_edit_mode = 0;
             }
         }
         sprintf(s, "Edit mode: %s", gEdit_mode_names[gWhich_edit_mode]);
@@ -467,7 +969,10 @@ void FinishLap(int i) {
 // IDA: void __cdecl EnsureSpecialVolumesHidden()
 void EnsureSpecialVolumesHidden() {
     LOG_TRACE("()");
-    STUB_ONCE();
+
+    if (gWhich_edit_mode == eEdit_mode_spec_vol) {
+        HideSpecialVolumes();
+    }
 }
 
 // IDA: void __cdecl ShowSpecialVolumesIfRequ()
@@ -695,73 +1200,89 @@ void DamageTest() {
 // IDA: void __cdecl TDamageEngine()
 void TDamageEngine() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DamageEngine(21);
 }
 
 // IDA: void __cdecl TDamageDriver()
 void TDamageDriver() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gProgram_state.current_car.damage_units[eDamage_driver].damage_level >= 80) {
+        DamageUnit(&gProgram_state.current_car, eDamage_driver, 2);
+    } else {
+        DamageUnit(&gProgram_state.current_car, eDamage_driver, 80 - gProgram_state.current_car.damage_units[2].damage_level);
+    }
 }
 
 // IDA: void __cdecl TDamageTrans()
 void TDamageTrans() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DamageTrans(21);
 }
 
 // IDA: void __cdecl TDamageSteering()
 void TDamageSteering() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DamageSteering(21);
 }
 
 // IDA: void __cdecl TDamageLFWheel()
 void TDamageLFWheel() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DamageLFWheel(21);
 }
 
 // IDA: void __cdecl TDamageLFBrake()
 void TDamageLFBrake() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DamageLFBrake(21);
 }
 
 // IDA: void __cdecl TDamageLRBrake()
 void TDamageLRBrake() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DamageLRBrake(21);
 }
 
 // IDA: void __cdecl TDamageLRWheel()
 void TDamageLRWheel() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DamageLRWheel(21);
 }
 
 // IDA: void __cdecl TDamageRFWheel()
 void TDamageRFWheel() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DamageRFWheel(21);
 }
 
 // IDA: void __cdecl TDamageRFBrake()
 void TDamageRFBrake() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DamageRFBrake(21);
 }
 
 // IDA: void __cdecl TDamageRRBrake()
 void TDamageRRBrake() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DamageRRBrake(21);
 }
 
 // IDA: void __cdecl TDamageRRWheel()
 void TDamageRRWheel() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DamageRRWheel(21);
 }
 
 // IDA: void __cdecl MoveBonnetForward()
@@ -1055,14 +1576,16 @@ void CheckForBeingOutOfThisWorld() {
 void CheckHornLocal(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
 
-    if (pCar->keys.horn && pCar->horn_sound_tag == 0) {
-        pCar->horn_sound_tag = DRS3StartSound(gIndexed_outlets[0], 5209);
-    } else if (!pCar->keys.horn && pCar->horn_sound_tag != 0) {
-        while (S3SoundStillPlaying(pCar->horn_sound_tag)) {
+    if (pCar->keys.horn == 1 && pCar->horn_sound_tag == 0) {
+        pCar->horn_sound_tag = DRS3StartSound(gEffects_outlet, 5209);
+    } else if (pCar->keys.horn == 0 && pCar->horn_sound_tag != 0) {
+        if (S3SoundStillPlaying(pCar->horn_sound_tag) != 0) {
             DRS3StopSound(pCar->horn_sound_tag);
-            DRS3StopOutletSound(gIndexed_outlets[0]);
+            DRS3StopOutletSound(gEffects_outlet);
         }
-        pCar->horn_sound_tag = 0;
+        if (S3SoundStillPlaying(pCar->horn_sound_tag) == 0) {
+            pCar->horn_sound_tag = 0;
+        }
     }
 }
 
@@ -1343,7 +1866,7 @@ void CheckOtherRacingKeys() {
                 total_difference %= 100;
                 cost = 10 * (cost / 10);
                 if (((!total_repair_cost && cost) || bodywork_repair_amount != 0.0f) && !sound_tag) {
-                    sound_tag = DRS3StartSound(gIndexed_outlets[1], 5200);
+                    sound_tag = DRS3StartSound(gCar_outlet, 5200);
                 }
                 if (gProgram_state.current_car.num_smoke_columns) {
                     StopCarSmoking(&gProgram_state.current_car);
@@ -1434,7 +1957,7 @@ int CheckRecoverCost() {
     gProgram_state.credits_earned = 0;
     gProgram_state.credits_lost = 0;
     NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(96));
-    DoFancyHeadup(18);
+    DoFancyHeadup(kFancyHeadupNetworkRaceNoMoreMoney);
     KnackerThisCar(&gProgram_state.current_car);
     SendGameplayToHost(eNet_gameplay_suicide, 0, 0, 0, 0);
     return 0;
@@ -1662,7 +2185,15 @@ void CheckKevKeys() {
 void BrakeInstantly() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gProgram_state.current_car.revs = 0.f;
+    if (gProgram_state.current_car.number_of_wheels_on_ground != 0 && BrVector3LengthSquared(&gProgram_state.current_car.v) > 0.0001f) {
+        PratcamEvent(41);
+        for (i = 0; i < 5; i++) {
+            DRS3StartSound(gCar_outlet, 9000 + i);
+        }
+    }
+    BrVector3Set(&gProgram_state.current_car.v, 0.f, 0.f, 0.f);
 }
 
 // IDA: void __usercall PollCarControls(tU32 pTime_difference@<EAX>)
@@ -1920,7 +2451,7 @@ void ToggleMap() {
     static int was_in_cockpit;
     LOG_TRACE("()");
 
-    if (!gMap_mode) {
+    if (gMap_mode == 0) {
         if (!gAction_replay_mode) {
             if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_foxy && gThis_net_player_index == gIt_or_fox) {
                 NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(214));
@@ -2137,7 +2668,10 @@ void SaySorryYouLittleBastard() {
 // IDA: void __cdecl UserSendMessage()
 void UserSendMessage() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gNet_mode != eNet_mode_none && gCurrent_net_game->options.enable_text_messages) {
+        gEntering_message = 1;
+    }
 }
 
 // IDA: void __cdecl EnterUserMessage()

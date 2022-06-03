@@ -89,8 +89,8 @@ void RaceCompleted(tRace_over_reason pReason) {
         case eRace_over_peds:
         case eRace_over_opponents:
             ChangeAmbientPratcam(34);
-            DoFancyHeadup(14);
-            DRS3StartSound(gIndexed_outlets[4], 8011);
+            DoFancyHeadup(kFancyHeadupRaceCompleted);
+            DRS3StartSound(gPedestrians_outlet, 8011);
             break;
         case eRace_over_abandoned:
             if (gNet_mode == eNet_mode_client) {
@@ -100,20 +100,20 @@ void RaceCompleted(tRace_over_reason pReason) {
             break;
         case eRace_over_out_of_time:
             ChangeAmbientPratcam(35);
-            DoFancyHeadup(13);
-            DRS3StartSound(gIndexed_outlets[4], 8010);
+            DoFancyHeadup(kFancyHeadupOutOfTime);
+            DRS3StartSound(gPedestrians_outlet, 8010);
             break;
         case eRace_over_demo:
             ChangeAmbientPratcam(35);
-            DoFancyHeadup(21);
+            DoFancyHeadup(kFancyHeadupDemoTimeout);
             break;
         case eRace_over_network_victory:
             ChangeAmbientPratcam(34);
-            DoFancyHeadup(20);
+            DoFancyHeadup(kFancyHeadupNetworkVictory);
             break;
         case eRace_over_network_loss:
             ChangeAmbientPratcam(36);
-            DoFancyHeadup(17);
+            DoFancyHeadup(kFancyHeadupNetworkRaceOverNetworkLoss);
             break;
         default:
             break;
@@ -130,10 +130,10 @@ void RaceCompleted(tRace_over_reason pReason) {
 void Checkpoint(int pCheckpoint_index, int pDo_sound) {
     LOG_TRACE("(%d, %d)", pCheckpoint_index, pDo_sound);
 
-    PratcamEvent(33);  // FIXME: or PratcamEventNow
-    DoFancyHeadup(12);
+    PratcamEvent(33); // FIXME: or PratcamEventNow
+    DoFancyHeadup(kFancyHeadupCheckpoint);
     if (pDo_sound) {
-        DRS3StartSound(gIndexed_outlets[4], 8012);
+        DRS3StartSound(gPedestrians_outlet, 8012);
     }
 }
 
@@ -153,9 +153,9 @@ void IncrementCheckpoint() {
         gCheckpoint = 1;
         gLap++;
         if (gLap == gTotal_laps) {
-            PratcamEvent(33);  // FIXME: or PratcamEventNow
+            PratcamEvent(33); // FIXME: or PratcamEventNow
             NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(42));
-            DRS3StartSound(gIndexed_outlets[4], 8014);
+            DRS3StartSound(gPedestrians_outlet, 8014);
             done_voice = 1;
         } else if (gLap > gTotal_laps) {
             gLap = gTotal_laps;
@@ -200,15 +200,14 @@ int RayHitFace(br_vector3* pV0, br_vector3* pV1, br_vector3* pV2, br_vector3* pN
 void WrongCheckpoint(int pCheckpoint_index) {
     LOG_TRACE("(%d)", pCheckpoint_index);
 
-    if ((pCheckpoint_index == gLast_wrong_checkpoint && GetTotalTime() - gLast_checkpoint_time > 20000) ||
-            (pCheckpoint_index != gLast_wrong_checkpoint && GetTotalTime() - gLast_checkpoint_time > 2000)) {
+    if ((pCheckpoint_index == gLast_wrong_checkpoint && GetTotalTime() - gLast_checkpoint_time > 20000) || (pCheckpoint_index != gLast_wrong_checkpoint && GetTotalTime() - gLast_checkpoint_time > 2000)) {
         if (gNet_mode == eNet_mode_none) {
             if (gCheckpoint == ((gCurrent_race.check_point_count < pCheckpoint_index + 2) ? ((gLap == 1) ? -1 : 1) : (pCheckpoint_index + 2))) {
                 return;
             }
         }
         NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(43));
-        DRS3StartSound(gIndexed_outlets[4], 8013);
+        DRS3StartSound(gPedestrians_outlet, 8013);
         gLast_checkpoint_time = GetTotalTime();
         gLast_wrong_checkpoint = pCheckpoint_index;
     }
@@ -252,17 +251,17 @@ void CheckCheckpoints() {
             for (i = 0; i < gCurrent_race.check_point_count; i++) {
                 for (j = 0; j < gCurrent_race.checkpoints[i].quad_count; j++) {
                     if (
-                            RayHitFace(&gCurrent_race.checkpoints[i].vertices[j][0],
-                                &gCurrent_race.checkpoints[i].vertices[j][1],
-                                &gCurrent_race.checkpoints[i].vertices[j][2],
-                                &gCurrent_race.checkpoints[i].normal[j],
-                                &orig, &dir) ||
-                            RayHitFace(&gCurrent_race.checkpoints[i].vertices[j][0],
-                                &gCurrent_race.checkpoints[i].vertices[j][2],
-                                &gCurrent_race.checkpoints[i].vertices[j][3],
-                                &gCurrent_race.checkpoints[i].normal[j],
-                                &orig,
-                                &dir)) {
+                        RayHitFace(&gCurrent_race.checkpoints[i].vertices[j][0],
+                            &gCurrent_race.checkpoints[i].vertices[j][1],
+                            &gCurrent_race.checkpoints[i].vertices[j][2],
+                            &gCurrent_race.checkpoints[i].normal[j],
+                            &orig, &dir)
+                        || RayHitFace(&gCurrent_race.checkpoints[i].vertices[j][0],
+                            &gCurrent_race.checkpoints[i].vertices[j][2],
+                            &gCurrent_race.checkpoints[i].vertices[j][3],
+                            &gCurrent_race.checkpoints[i].normal[j],
+                            &orig,
+                            &dir)) {
                         if (gNet_mode == eNet_mode_none) {
                             if (i + 1 == gCheckpoint) {
                                 IncrementCheckpoint();
@@ -287,7 +286,6 @@ void CheckCheckpoints() {
                         }
                         break;
                     }
-
                 }
             }
         }
@@ -315,7 +313,7 @@ void DoProgOpeningAnimation() {
     LOG_TRACE("()");
 
     gProgram_state.prog_status = eProg_idling;
-    DRS3StopOutletSound(gIndexed_outlets[0]);
+    DRS3StopOutletSound(gEffects_outlet);
 }
 
 // IDA: void __cdecl DoProgramDemo()
@@ -324,7 +322,7 @@ void DoProgramDemo() {
 
     DoLogos();
     gProgram_state.prog_status = eProg_idling;
-    DRS3StopOutletSound(gIndexed_outlets[0]);
+    DRS3StopOutletSound(gEffects_outlet);
 }
 
 // IDA: int __usercall ChooseOpponent@<EAX>(int pNastiness@<EAX>, int *pHad_scum@<EDX>)
@@ -661,8 +659,8 @@ void JumpTheStart() {
         || gProgram_state.credits_earned - gProgram_state.credits_lost >= gJump_start_fine[gProgram_state.skill_level]) {
         WakeUpOpponentsToTheFactThatTheStartHasBeenJumped(gCountdown);
         gCountdown = 0;
-        DRS3StopOutletSound(gIndexed_outlets[4]);
-        DRS3StartSound(gIndexed_outlets[4], 8016);
+        DRS3StopOutletSound(gPedestrians_outlet);
+        DRS3StartSound(gPedestrians_outlet, 8016);
         SpendCredits(gJump_start_fine[gProgram_state.skill_level]);
         sprintf(s, "%s %d %s", GetMiscString(gProgram_state.frank_or_anniness == eFrankie ? 44 : 49), gJump_start_fine[gProgram_state.skill_level], GetMiscString(45));
         NewTextHeadupSlot(4, 0, 1000, -4, s);

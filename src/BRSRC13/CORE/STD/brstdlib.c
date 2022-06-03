@@ -18,6 +18,10 @@ void* BrMemCpy(void* s1, void* s2, size_t n) {
 }
 
 void* BrMemSet(void* s, int c, size_t n) {
+    if (s == NULL) {
+        // Passing a null target pointer is undefined behavior
+        return NULL;
+    }
     return memset(s, c, n);
 }
 

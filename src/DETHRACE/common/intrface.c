@@ -155,32 +155,32 @@ void EnableChoice(int pChoice) {
 // IDA: int __usercall DoInterfaceScreen@<EAX>(tInterface_spec *pSpec@<EAX>, int pOptions@<EDX>, int pCurrent_choice@<EBX>)
 int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice) {
     tProg_status entry_status; //
-    int x_coord; //
-    int y_coord; //
+    int x_coord;               //
+    int y_coord;               //
     int mouse_in_somewhere = 0;
     int i; //
     int key2;
     int mouse_was_started;
     int last_choice; //
-    int escaped; //
-    int timed_out; //
-    int go_ahead; //
+    int escaped;     //
+    int timed_out;   //
+    int go_ahead;    //
     int last_mode;
-    int result; //
+    int result;  //
     int the_key; //
     int the_max;
-    int mouse_down; //
+    int mouse_down;     //
     int new_mouse_down; //
     int last_mouse_down = 0;
     int defeat_mode_change; //
-    int selection_changed; //
+    int selection_changed;  //
     char the_str[256];
     tU32 last_press; //
     tU32 last_left_press;
     tU32 last_right_press;
     tU32 last_up_press;
     tU32 last_down_press;
-    br_pixelmap** copy_areas; //
+    br_pixelmap** copy_areas;        //
     br_pixelmap* old_current_splash; //
     void* pixels_copy;
     void* palette_copy;
@@ -214,7 +214,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
         pSpec->start_proc1();
     }
     if (!gFaded_palette && old_current_splash == NULL && !(pOptions & 2)) {
-        DRS3StartSound(gIndexed_outlets[0], 3006);
+        DRS3StartSound(gEffects_outlet, 3006);
     }
     if (pOptions & 1) {
         if (pSpec->second_opening_flic > 0) {
@@ -274,7 +274,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
                 if (gCurrent_choice > pSpec->move_left_max[gCurrent_mode]) {
                     gCurrent_choice = pSpec->move_left_min[gCurrent_mode];
                 }
-                DRS3StartSound(gIndexed_outlets[0], 3000);
+                DRS3StartSound(gEffects_outlet, 3000);
             }
             if (pSpec->move_left_proc[gCurrent_mode] != NULL) {
                 defeat_mode_change = (pSpec->move_left_proc[gCurrent_mode])(&gCurrent_choice, &gCurrent_mode);
@@ -295,7 +295,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
                 if (gCurrent_choice > pSpec->move_right_max[gCurrent_mode]) {
                     gCurrent_choice = pSpec->move_right_min[gCurrent_mode];
                 }
-                DRS3StartSound(gIndexed_outlets[0], 3000);
+                DRS3StartSound(gEffects_outlet, 3000);
             }
             if (pSpec->move_right_proc[gCurrent_mode] != NULL) {
                 defeat_mode_change = (pSpec->move_right_proc[gCurrent_mode])(&gCurrent_choice, &gCurrent_mode);
@@ -316,7 +316,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
                 if (gCurrent_choice > pSpec->move_up_max[gCurrent_mode]) {
                     gCurrent_choice = pSpec->move_up_min[gCurrent_mode];
                 }
-                DRS3StartSound(gIndexed_outlets[0], 3000);
+                DRS3StartSound(gEffects_outlet, 3000);
             }
             if (pSpec->move_up_proc[gCurrent_mode] != NULL) {
                 defeat_mode_change = (pSpec->move_up_proc[gCurrent_mode])(&gCurrent_choice, &gCurrent_mode);
@@ -337,7 +337,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
                 if (gCurrent_choice > pSpec->move_down_max[gCurrent_mode]) {
                     gCurrent_choice = pSpec->move_down_min[gCurrent_mode];
                 }
-                DRS3StartSound(gIndexed_outlets[0], 3000);
+                DRS3StartSound(gEffects_outlet, 3000);
             }
             if (pSpec->move_down_proc[gCurrent_mode] != NULL) {
                 defeat_mode_change = (pSpec->move_down_proc[gCurrent_mode])(&gCurrent_choice, &gCurrent_mode);
@@ -410,7 +410,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
         }
 
         if (PDKeyDown(KEY_RETURN) || PDKeyDown(KEY_KP_ENTER) || (gTyping_slot < 0 && PDKeyDown(KEY_SPACE)) || (gMouse_in_use && mouse_in_somewhere && mouse_down)) {
-            DRS3StartSound(gIndexed_outlets[0], 3004);
+            DRS3StartSound(gEffects_outlet, 3004);
             go_ahead = pSpec->go_ahead_allowed[gCurrent_mode];
             if (pSpec->go_ahead_proc[gCurrent_mode]) {
                 go_ahead = (pSpec->go_ahead_proc[gCurrent_mode])(&gCurrent_choice, &gCurrent_mode);
@@ -419,7 +419,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
             go_ahead = 0;
         }
         if (PDKeyDown(KEY_ESCAPE)) {
-            DRS3StartSound(gIndexed_outlets[0], 3005);
+            DRS3StartSound(gEffects_outlet, 3005);
             escaped = pSpec->escape_allowed[gCurrent_mode];
             if (pSpec->escape_proc[gCurrent_mode] != NULL) {
                 escaped = (pSpec->escape_proc[gCurrent_mode])(&gCurrent_choice, &gCurrent_mode);
@@ -514,7 +514,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
     if (!go_ahead) {
         if (!escaped) {
             if (pSpec->end_flic_otherwise > 0) {
-                DRS3StartSound(gIndexed_outlets[0], 3007);
+                DRS3StartSound(gEffects_outlet, 3007);
                 RunFlic(pSpec->end_flic_otherwise);
             } else if (pSpec->end_flic_otherwise < 0) {
                 FadePaletteDown(pSpec->end_flic_otherwise);
@@ -522,7 +522,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
             goto LABEL_230;
         } else {
             if (pSpec->end_flic_escaped > 0) {
-                DRS3StartSound(gIndexed_outlets[0], 3007);
+                DRS3StartSound(gEffects_outlet, 3007);
                 RunFlic(pSpec->end_flic_escaped);
             } else if (pSpec->end_flic_escaped < 0) {
                 FadePaletteDown(pSpec->end_flic_escaped);
@@ -531,7 +531,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
         }
     }
     if (pSpec->end_flic_go_ahead > 0) {
-        DRS3StartSound(gIndexed_outlets[0], 3007);
+        DRS3StartSound(gEffects_outlet, 3007);
         RunFlic(pSpec->end_flic_go_ahead);
     } else if (pSpec->end_flic_go_ahead < 0) {
         FadePaletteDown(pSpec->end_flic_go_ahead);

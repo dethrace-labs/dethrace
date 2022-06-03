@@ -110,7 +110,7 @@ void PlaySmackerFile(char* pSmack_name) {
             smk_first(s);
             do {
                 const unsigned char* pal = smk_get_palette(s);
-                for (i = 1; i < 256; i++) {
+                for (i = 0; i < 256; i++) {
                     r = pal[(i * 3)];
                     g = pal[(i * 3) + 1];
                     b = pal[(i * 3) + 2];
