@@ -192,8 +192,8 @@ void GLRenderer_Init(int width, int height, int pRender_width, int pRender_heigh
     SetupFullScreenRectGeometry();
 
     // opengl config
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_BLEND);
+    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDepthFunc(GL_LESS);
     glClearColor(0, 0, 0, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -238,7 +238,6 @@ void GLRenderer_Init(int width, int height, int pRender_width, int pRender_heigh
 
 void GLRenderer_SetPalette(uint8_t* rgba_colors) {
     for (int i = 0; i < 256; i++) {
-
         gl_palette[i * 4] = rgba_colors[i * 4 + 2];
         gl_palette[i * 4 + 1] = rgba_colors[i * 4 + 1];
         gl_palette[i * 4 + 2] = rgba_colors[i * 4];
@@ -351,12 +350,13 @@ void GLRenderer_FullScreenQuad(uint8_t* screen_buffer, int width, int height) {
 
 void GLRenderer_ClearBuffers() {
     // clear our virtual framebuffer
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
-    // clear real framebuffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // clear real framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    CHECK_GL_ERROR("GLRenderer_Swap");
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    CHECK_GL_ERROR("GLRenderer_ClearBuffers");
 }
 
 void GLRenderer_BufferModel(br_model* model) {

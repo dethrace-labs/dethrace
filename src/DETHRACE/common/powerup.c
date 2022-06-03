@@ -1,6 +1,7 @@
 #include "powerup.h"
-#include "controls.h"
+#include "brender/brender.h"
 #include "car.h"
+#include "controls.h"
 #include "crush.h"
 #include "displays.h"
 #include "errors.h"
@@ -8,6 +9,7 @@
 #include "globvrpb.h"
 #include "grafdata.h"
 #include "graphics.h"
+#include "harness/trace.h"
 #include "input.h"
 #include "loading.h"
 #include "netgame.h"
@@ -18,8 +20,6 @@
 #include "pratcam.h"
 #include "sound.h"
 #include "utility.h"
-#include "brender/brender.h"
-#include "harness/trace.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -142,7 +142,7 @@ int gFizzle_height;
 int gNumber_of_icons;
 tPowerup* gPowerup_array;
 
-#define GET_POWERUP_INDEX(POWERUP) (((POWERUP) - gPowerup_array) / sizeof(tPowerup))
+#define GET_POWERUP_INDEX(POWERUP) (((POWERUP)-gPowerup_array) / sizeof(tPowerup))
 
 // IDA: void __usercall LosePowerupX(tPowerup *pThe_powerup@<EAX>, int pTell_net_players@<EDX>)
 void LosePowerupX(tPowerup* pThe_powerup, int pTell_net_players) {
@@ -219,9 +219,9 @@ int GotPowerupX(tCar_spec* pCar, int pIndex, int pTell_net_players, int pDisplay
     original_index = pIndex;
     if (((gProgram_state.sausage_eater_mode || gTotal_peds < 2)
             && (strstr(the_powerup->message, "Ped") != NULL
-                    || strstr(the_powerup->message, "ped") != NULL
-                    || strstr(the_powerup->message, "corpses") != NULL))
-            || (gNet_mode != eNet_mode_none && the_powerup->net_type == eNet_powerup_inappropriate)) {
+                || strstr(the_powerup->message, "ped") != NULL
+                || strstr(the_powerup->message, "corpses") != NULL))
+        || (gNet_mode != eNet_mode_none && the_powerup->net_type == eNet_powerup_inappropriate)) {
         pIndex = 0;
         the_powerup = &gPowerup_array[pIndex];
     }
@@ -286,7 +286,6 @@ int GotPowerupX(tCar_spec* pCar, int pIndex, int pTell_net_players, int pDisplay
             gIcon_list[gNumber_of_icons].fizzle_direction = 1;
             gIcon_list[gNumber_of_icons].fizzle_start = GetTotalTime();
             gNumber_of_icons++;
-
         }
     }
     return pIndex;
@@ -379,7 +378,7 @@ void InitPowerups() {
     tPowerup* the_powerup;
     LOG_TRACE("()");
 
-    for (i = 0, the_powerup=gPowerup_array; i < gNumber_of_powerups; i++, the_powerup++) {
+    for (i = 0, the_powerup = gPowerup_array; i < gNumber_of_powerups; i++, the_powerup++) {
         the_powerup->got_time = 0;
         the_powerup->current_value = -1;
     }
@@ -391,7 +390,7 @@ void CloseDownPowerUps() {
     tPowerup* the_powerup;
     LOG_TRACE("()");
 
-    for (i = 0, the_powerup=gPowerup_array; i < gNumber_of_powerups; i++, the_powerup++) {
+    for (i = 0, the_powerup = gPowerup_array; i < gNumber_of_powerups; i++, the_powerup++) {
         if (the_powerup->got_time != 0) {
             LosePowerup(the_powerup);
         }
@@ -441,7 +440,7 @@ void DrawPowerups(tU32 pTime) {
                     timer = 0;
                 }
                 TimerString(timer, s, 0, 0);
-                TransDRPixelmapText(gBack_screen, 
+                TransDRPixelmapText(gBack_screen,
                     gCurrent_graf_data->power_up_icon_countdown_x,
                     y + gCurrent_graf_data->power_up_icon_countdown_y_offset,
                     &gFonts[1], s, gCurrent_graf_data->power_up_icon_countdown_x + 30);
@@ -820,9 +819,9 @@ int TrashBodywork(tPowerup* pPowerup, tCar_spec* pCar) {
         TotallySpamTheModel(pCar, i, pCar->car_model_actors[i].actor, &pCar->car_model_actors[i].crush_data, 0.5f);
     }
     if (pCar->driver == eDriver_local_human) {
-        DRS3StartSound2(gIndexed_outlets[1], 5000, 1, 255, 255, -1, -1);
-        DRS3StartSound2(gIndexed_outlets[1], 5001, 1, 255, 255, -1, -1);
-        DRS3StartSound2(gIndexed_outlets[1], 5002, 1, 255, 255, -1, -1);
+        DRS3StartSound2(gCar_outlet, 5000, 1, 255, 255, -1, -1);
+        DRS3StartSound2(gCar_outlet, 5001, 1, 255, 255, -1, -1);
+        DRS3StartSound2(gCar_outlet, 5002, 1, 255, 255, -1, -1);
     }
     return GET_POWERUP_INDEX(pPowerup);
 }
@@ -845,7 +844,7 @@ int TakeDrugs(tPowerup* pPowerup, tCar_spec* pCar) {
 void PaletteFuckedUpByDrugs(br_pixelmap* pPixelmap, int pOffset) {
     int i;
     LOG_TRACE("(%p, %d)", pPixelmap, pOffset);
-    
+
     *(tU32*)gRender_palette->pixels = *gReal_render_palette;
     for (i = 1; i < 224; i++) {
         ((tU32*)gRender_palette->pixels)[i] = gReal_render_palette[(i + pOffset) & 0xff];
@@ -925,7 +924,7 @@ int SetSuspension(tPowerup* pPowerup, tCar_spec* pCar) {
 
     SetCarSuspGiveAndHeight(pCar,
         pPowerup->float_params[0], pPowerup->float_params[1], pPowerup->float_params[4],
-        pPowerup->float_params[2],pPowerup->float_params[3]);
+        pPowerup->float_params[2], pPowerup->float_params[3]);
     return GET_POWERUP_INDEX(pPowerup);
 }
 
@@ -1039,7 +1038,8 @@ void ResetDamageMultiplier(tPowerup* pPowerup, tCar_spec* pCar) {
 void ResetTyreGrip(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
-    pCar->grip_multiplier = 1.f;;
+    pCar->grip_multiplier = 1.f;
+    ;
 }
 
 // IDA: int __usercall PickAtRandom@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
@@ -1101,7 +1101,7 @@ void DoBouncey(tPowerup* pPowerup, tU32 pPeriod) {
         PratcamEvent(42);
         gProgram_state.current_car.last_bounce = GetTotalTime();
         gProgram_state.current_car.v.v[1] += gProgram_state.current_car.bounce_amount;
-        DRS3StartSound(gIndexed_outlets[1], 9010);
+        DRS3StartSound(gCar_outlet, 9010);
     }
 }
 
@@ -1191,7 +1191,7 @@ void ResetPedHarvest(tPowerup* pPowerup, tCar_spec* pCar) {
 
     gPedestrian_harvest = 0;
     for (i = 0; i < COUNT_OF(gPed_harvest_sounds); i++) {
-        DRS3StartSound3D(gIndexed_outlets[4], gPed_harvest_sounds[i], &pCar->pos,
+        DRS3StartSound3D(gPedestrians_outlet, gPed_harvest_sounds[i], &pCar->pos,
             &gZero_v__powerup, 1, 255, -1, -1);
     }
 }
@@ -1307,7 +1307,7 @@ void LoseAllLocalPowerups(tCar_spec* pCar) {
 
 // Added by dethrace
 void GetPowerupMessage(int pN, char* pMessage) {
-     switch (pN) {
+    switch (pN) {
     case 0:
         strcpy(pMessage, "Bonus");
         break;
@@ -1327,5 +1327,5 @@ void GetPowerupMessage(int pN, char* pMessage) {
     default:
         strcpy(pMessage, gPowerup_array[pN].message);
         break;
-     }
- }
+    }
+}

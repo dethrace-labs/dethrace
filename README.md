@@ -108,7 +108,7 @@ export DETHRACE_ROOT_DIR=/path/to/carmageddon_splat_pack
 To run 
 
 ```sh
-make test
+./dethrace_test
 ```
 
 To run a single test

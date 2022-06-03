@@ -21,6 +21,7 @@ find_package(SDL2 REQUIRED)
 
 add_subdirectory(lib/libsmacker)
 add_subdirectory(lib/glad)
+add_subdirectory(lib/miniaudio)
 add_subdirectory(lib/cglm EXCLUDE_FROM_ALL)
 
 add_subdirectory(src/harness)

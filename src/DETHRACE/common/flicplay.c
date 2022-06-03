@@ -1342,7 +1342,7 @@ int PlayFlic(int pIndex, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap
         frame_period = new_time - last_frame;
 
         if (gSound_time != 0 && new_time >= gSound_time) {
-            DRS3StartSound(gIndexed_outlets[0], gSound_ID);
+            DRS3StartSound(gEffects_outlet, gSound_ID);
             gSound_time = 0;
         }
         if (frame_period >= the_flic.frame_period) {
@@ -1493,9 +1493,9 @@ void FreeFlic(int pIndex) {
 void ForceRunFlic(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
-        LoadFlic(pIndex);
-        ShowFlic(pIndex);
-        UnlockFlic(pIndex);
+    LoadFlic(pIndex);
+    ShowFlic(pIndex);
+    UnlockFlic(pIndex);
 }
 
 // IDA: void __usercall RunFlicAt(int pIndex@<EAX>, int pX@<EDX>, int pY@<EBX>)

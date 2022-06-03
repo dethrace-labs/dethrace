@@ -6,8 +6,8 @@
 #include "globvrpb.h"
 #include "grafdata.h"
 #include "graphics.h"
-#include "harness/trace.h"
 #include "harness/config.h"
+#include "harness/trace.h"
 #include "intrface.h"
 #include "loading.h"
 #include "loadsave.h"
@@ -20,7 +20,7 @@
 #include "utility.h"
 #include <stdlib.h>
 
-char* gPalette_copy__mainmenu; // suffix added to avoid duplicate symbol
+char* gPalette_copy__mainmenu;    // suffix added to avoid duplicate symbol
 int gPixel_buffer_size__mainmenu; // suffix added to avoid duplicate symbol
 tInterface_spec* gMain_menu_spec;
 int gMouse_was_started__mainmenu; // suffix added to avoid duplicate symbol
@@ -184,56 +184,56 @@ int DoMainMenuInterface(tU32 pTime_out, int pContinue_allowed) {
         { { 64, 128 }, { 155, 372 }, { 265, 530 }, { 165, 396 }, 7, 0, 0, NULL }
     };
     static tInterface_spec interface_spec1 = {
-        0, // initial_imode
-        0, // first_opening_flic
-        0, // second_opening_flic
-        0, // end_flic_go_ahead
-        0, // end_flic_escaped
-        0, // end_flic_otherwise
-        0, // flic_bunch_to_load
-        { -1, 0 }, // move_left_new_mode
-        { 0, 0 }, // move_left_delta
-        { 0, 0 }, // move_left_min
-        { 0, 0 }, // move_left_max
-        { NULL, NULL }, // move_left_proc
-        { -1, 0 }, // move_right_new_mode
-        { 0, 0 }, // move_right_delta
-        { 0, 0 }, // move_right_min
-        { 0, 0 }, // move_right_max
-        { NULL, NULL }, // move_right_proc
-        { -1, 0 }, // move_up_new_mode
-        { -1, 0 }, // move_up_delta
-        { 0, 0 }, // move_up_min
-        { 7, 0 }, // move_up_max
-        { NULL, NULL }, // move_up_proc
-        { -1, 0 }, // move_down_new_mode
-        { 1, 0 }, // move_down_delta
-        { 0, 0 }, // move_down_min
-        { 7, 0 }, // move_down_max
-        { NULL, NULL }, // move_down_proc
-        { 1, 1 }, // go_ahead_allowed
-        { NULL, NULL }, // go_ahead_proc
-        { 1, 1 }, // escape_allowed
-        { NULL, NULL }, // escape_proc
-        NULL, // exit_proc
-        NULL, // draw_proc
-        0u, // time_out
-        StartMainMenu, // start_proc1
-        NULL, // start_proc2
-        MainMenuDone1, // done_proc
-        0, // font_needed
-        { 0, 0 }, // typeable
-        NULL, // get_original_string
-        0, // escape_code
-        0, // dont_save_or_load
-        COUNT_OF(flicker_on1), // number_of_button_flics
-        flicker_on1, // flicker_on_flics
-        flicker_off1, // flicker_off_flics
-        push1, // pushed_flics
+        0,                      // initial_imode
+        0,                      // first_opening_flic
+        0,                      // second_opening_flic
+        0,                      // end_flic_go_ahead
+        0,                      // end_flic_escaped
+        0,                      // end_flic_otherwise
+        0,                      // flic_bunch_to_load
+        { -1, 0 },              // move_left_new_mode
+        { 0, 0 },               // move_left_delta
+        { 0, 0 },               // move_left_min
+        { 0, 0 },               // move_left_max
+        { NULL, NULL },         // move_left_proc
+        { -1, 0 },              // move_right_new_mode
+        { 0, 0 },               // move_right_delta
+        { 0, 0 },               // move_right_min
+        { 0, 0 },               // move_right_max
+        { NULL, NULL },         // move_right_proc
+        { -1, 0 },              // move_up_new_mode
+        { -1, 0 },              // move_up_delta
+        { 0, 0 },               // move_up_min
+        { 7, 0 },               // move_up_max
+        { NULL, NULL },         // move_up_proc
+        { -1, 0 },              // move_down_new_mode
+        { 1, 0 },               // move_down_delta
+        { 0, 0 },               // move_down_min
+        { 7, 0 },               // move_down_max
+        { NULL, NULL },         // move_down_proc
+        { 1, 1 },               // go_ahead_allowed
+        { NULL, NULL },         // go_ahead_proc
+        { 1, 1 },               // escape_allowed
+        { NULL, NULL },         // escape_proc
+        NULL,                   // exit_proc
+        NULL,                   // draw_proc
+        0u,                     // time_out
+        StartMainMenu,          // start_proc1
+        NULL,                   // start_proc2
+        MainMenuDone1,          // done_proc
+        0,                      // font_needed
+        { 0, 0 },               // typeable
+        NULL,                   // get_original_string
+        0,                      // escape_code
+        0,                      // dont_save_or_load
+        COUNT_OF(flicker_on1),  // number_of_button_flics
+        flicker_on1,            // flicker_on_flics
+        flicker_off1,           // flicker_off_flics
+        push1,                  // pushed_flics
         COUNT_OF(mouse_areas1), // number_of_mouse_areas
-        mouse_areas1, // mouse_areas
-        0, // number_of_recopy_areas
-        NULL // recopy_areas
+        mouse_areas1,           // mouse_areas
+        0,                      // number_of_recopy_areas
+        NULL                    // recopy_areas
     };
 
     static tFlicette flicker_on2[5] = {
@@ -265,56 +265,56 @@ int DoMainMenuInterface(tU32 pTime_out, int pContinue_allowed) {
         { { 58, 116 }, { 142, 341 }, { 265, 530 }, { 152, 365 }, 4, 0, 0, NULL }
     };
     static tInterface_spec interface_spec2 = {
-        0, // initial_imode
-        31, // first_opening_flic
-        30, // second_opening_flic
-        0, // end_flic_go_ahead
-        0, // end_flic_escaped
-        0, // end_flic_otherwise
-        0, // flic_bunch_to_load
-        { -1, 0 }, // move_left_new_mode
-        { 0, 0 }, // move_left_delta
-        { 0, 0 }, // move_left_min
-        { 0, 0 }, // move_left_max
-        { NULL, NULL }, // move_left_proc
-        { -1, 0 }, // move_right_new_mode
-        { 0, 0 }, // move_right_delta
-        { 0, 0 }, // move_right_min
-        { 0, 0 }, // move_right_max
-        { NULL, NULL }, // move_right_proc
-        { -1, 0 }, // move_up_new_mode
-        { -1, 0 }, // move_up_delta
-        { 0, 0 }, // move_up_min
-        { 4, 0 }, // move_up_max
-        { NULL, NULL }, // move_up_proc
-        { -1, 0 }, // move_down_new_mode
-        { 1, 0 }, // move_down_delta
-        { 0, 0 }, // move_down_min
-        { 4, 0 }, // move_down_max
-        { NULL, NULL }, // move_down_proc
-        { 1, 1 }, // go_ahead_allowed
-        { NULL, NULL }, // go_ahead_proc
-        { 1, 1 }, // escape_allowed
-        { NULL, NULL }, // escape_proc
-        NULL, // exit_proc
-        NULL, // draw_proc
-        0u, // time_out
-        NULL, // start_proc1
-        NULL, // start_proc2
-        &MainMenuDone2, // done_proc
-        0, // font_needed
-        { 0, 0 }, // typeable
-        NULL, // get_original_string
-        4, // escape_code
-        0, // dont_save_or_load
-        COUNT_OF(flicker_on2), // number_of_button_flics
-        flicker_on2, // flicker_on_flics
-        flicker_off2, // flicker_off_flics
-        push2, // pushed_flics
+        0,                      // initial_imode
+        31,                     // first_opening_flic
+        30,                     // second_opening_flic
+        0,                      // end_flic_go_ahead
+        0,                      // end_flic_escaped
+        0,                      // end_flic_otherwise
+        0,                      // flic_bunch_to_load
+        { -1, 0 },              // move_left_new_mode
+        { 0, 0 },               // move_left_delta
+        { 0, 0 },               // move_left_min
+        { 0, 0 },               // move_left_max
+        { NULL, NULL },         // move_left_proc
+        { -1, 0 },              // move_right_new_mode
+        { 0, 0 },               // move_right_delta
+        { 0, 0 },               // move_right_min
+        { 0, 0 },               // move_right_max
+        { NULL, NULL },         // move_right_proc
+        { -1, 0 },              // move_up_new_mode
+        { -1, 0 },              // move_up_delta
+        { 0, 0 },               // move_up_min
+        { 4, 0 },               // move_up_max
+        { NULL, NULL },         // move_up_proc
+        { -1, 0 },              // move_down_new_mode
+        { 1, 0 },               // move_down_delta
+        { 0, 0 },               // move_down_min
+        { 4, 0 },               // move_down_max
+        { NULL, NULL },         // move_down_proc
+        { 1, 1 },               // go_ahead_allowed
+        { NULL, NULL },         // go_ahead_proc
+        { 1, 1 },               // escape_allowed
+        { NULL, NULL },         // escape_proc
+        NULL,                   // exit_proc
+        NULL,                   // draw_proc
+        0u,                     // time_out
+        NULL,                   // start_proc1
+        NULL,                   // start_proc2
+        &MainMenuDone2,         // done_proc
+        0,                      // font_needed
+        { 0, 0 },               // typeable
+        NULL,                   // get_original_string
+        4,                      // escape_code
+        0,                      // dont_save_or_load
+        COUNT_OF(flicker_on2),  // number_of_button_flics
+        flicker_on2,            // flicker_on_flics
+        flicker_off2,           // flicker_off_flics
+        push2,                  // pushed_flics
         COUNT_OF(mouse_areas2), // number_of_mouse_areas
-        mouse_areas2, // mouse_areas
-        0, // number_of_recopy_areas
-        NULL // recopy_areas
+        mouse_areas2,           // mouse_areas
+        0,                      // number_of_recopy_areas
+        NULL                    // recopy_areas
     };
 
     int result;
@@ -458,56 +458,56 @@ int DoVerifyQuit(int pReplace_background) {
         { { 84, 168 }, { 124, 298 }, { 147, 294 }, { 144, 346 }, 1, 0, 0, NULL }
     };
     static tInterface_spec interface_spec = {
-        0, // initial_imode
-        0, // first_opening_flic
-        0, // second_opening_flic
-        0, // end_flic_go_ahead
-        0, // end_flic_escaped
-        0, // end_flic_otherwise
-        0, // flic_bunch_to_load
+        0,                 // initial_imode
+        0,                 // first_opening_flic
+        0,                 // second_opening_flic
+        0,                 // end_flic_go_ahead
+        0,                 // end_flic_escaped
+        0,                 // end_flic_otherwise
+        0,                 // flic_bunch_to_load
         { 0xFFFFFFFF, 0 }, // move_left_new_mode
         { 0xFFFFFFFF, 0 }, // move_left_delta
-        { 0, 0 }, // move_left_min
-        { 1, 0 }, // move_left_max
-        { NULL, NULL }, // move_left_proc
+        { 0, 0 },          // move_left_min
+        { 1, 0 },          // move_left_max
+        { NULL, NULL },    // move_left_proc
         { 0xFFFFFFFF, 0 }, // move_right_new_mode
-        { 1, 0 }, // move_right_delta
-        { 0, 0 }, // move_right_min
-        { 1, 0 }, // move_right_max
-        { NULL, NULL }, // move_right_proc
+        { 1, 0 },          // move_right_delta
+        { 0, 0 },          // move_right_min
+        { 1, 0 },          // move_right_max
+        { NULL, NULL },    // move_right_proc
         { 0xFFFFFFFF, 0 }, // move_up_new_mode
-        { 0, 0 }, // move_up_delta
-        { 0, 0 }, // move_up_min
-        { 0, 0 }, // move_up_max
-        { NULL, NULL }, // move_up_proc
+        { 0, 0 },          // move_up_delta
+        { 0, 0 },          // move_up_min
+        { 0, 0 },          // move_up_max
+        { NULL, NULL },    // move_up_proc
         { 0xFFFFFFFF, 0 }, // move_down_new_mode
-        { 0, 0 }, // move_down_delta
-        { 0, 0 }, // move_down_min
-        { 0, 0 }, // move_down_max
-        { NULL, NULL }, // move_down_proc
-        { 1, 1 }, // go_ahead_allowed
-        { NULL, NULL }, // go_ahead_proc
-        { 1, 1 }, // escape_allowed
-        { NULL, NULL }, // escape_proc
-        NULL, // exit_proc
-        NULL, // draw_proc
-        0u, // time_out
-        QuitVerifyStart, // start_proc1
-        NULL, // start_proc2
-        QuitVerifyDone, // done_proc
-        0, // font_needed
-        { 0, 0 }, // typeable
-        NULL, // get_original_string
-        1, // escape_code
-        1, // dont_save_or_load
-        2, // number_of_button_flics
-        flicker_on, // flicker_on_flics
-        flicker_off, // flicker_off_flics
-        push, // pushed_flics
-        2, // number_of_mouse_areas
-        mouse_areas, // mouse_areas
-        0, // number_of_recopy_areas
-        NULL // recopy_areas
+        { 0, 0 },          // move_down_delta
+        { 0, 0 },          // move_down_min
+        { 0, 0 },          // move_down_max
+        { NULL, NULL },    // move_down_proc
+        { 1, 1 },          // go_ahead_allowed
+        { NULL, NULL },    // go_ahead_proc
+        { 1, 1 },          // escape_allowed
+        { NULL, NULL },    // escape_proc
+        NULL,              // exit_proc
+        NULL,              // draw_proc
+        0u,                // time_out
+        QuitVerifyStart,   // start_proc1
+        NULL,              // start_proc2
+        QuitVerifyDone,    // done_proc
+        0,                 // font_needed
+        { 0, 0 },          // typeable
+        NULL,              // get_original_string
+        1,                 // escape_code
+        1,                 // dont_save_or_load
+        2,                 // number_of_button_flics
+        flicker_on,        // flicker_on_flics
+        flicker_off,       // flicker_off_flics
+        push,              // pushed_flics
+        2,                 // number_of_mouse_areas
+        mouse_areas,       // mouse_areas
+        0,                 // number_of_recopy_areas
+        NULL               // recopy_areas
     };
     int result;
     int switched_res;
@@ -544,7 +544,7 @@ int DoVerifyQuit(int pReplace_background) {
     TurnOffPanelFlics();
     gReplace_background = pReplace_background;
 
-    DRS3StopOutletSound(gIndexed_outlets[0]);
+    DRS3StopOutletSound(gEffects_outlet);
     LoadInterfaceStuff(woz_in_race);
     result = DoInterfaceScreen(&interface_spec, 0, 0);
     if (gMouse_was_started__mainmenu) {

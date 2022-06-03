@@ -411,7 +411,7 @@ int BurstPedestrian(tPedestrian_data* pPedestrian, float pSplattitudinalitude, i
         }
         if (pPedestrian->number_of_exploding_sounds != 0) {
             DRS3StopSound(pPedestrian->last_sound);
-            pPedestrian->last_sound = DRS3StartSound2(gIndexed_outlets[4],
+            pPedestrian->last_sound = DRS3StartSound2(gPedestrians_outlet,
                 pPedestrian->exploding_sounds[IRandomBetween(0, pPedestrian->number_of_exploding_sounds - 1)],
                 1,
                 -1,
@@ -484,7 +484,7 @@ int BurstPedestrian(tPedestrian_data* pPedestrian, float pSplattitudinalitude, i
         the_ped_gib->parent_index = GET_PEDESTRIAN_INDEX(pPedestrian);
         MungeModelSize(the_ped_gib->actor, .0023f);
     }
-    pPedestrian->last_sound = DRS3StartSound3D(gIndexed_outlets[4],
+    pPedestrian->last_sound = DRS3StartSound3D(gPedestrians_outlet,
         4020,
         &pPedestrian->pos,
         &gZero_v__pedestrn,
@@ -492,7 +492,7 @@ int BurstPedestrian(tPedestrian_data* pPedestrian, float pSplattitudinalitude, i
         255,
         65536,
         -1);
-    PipeSingleSound(gIndexed_outlets[4], 4020, 255, 0, 65536, &pPedestrian->pos);
+    PipeSingleSound(gPedestrians_outlet, 4020, 255, 0, 65536, &pPedestrian->pos);
     return exploded;
 }
 
@@ -957,7 +957,7 @@ void MungePedestrianFrames(tPedestrian_data* pPedestrian) {
             if (PercentageChance(20)
                 && pPedestrian->number_of_actions >= 2
                 && pPedestrian->action_list[1].number_of_sounds != 0) {
-                DRS3StartSound3D(gIndexed_outlets[4], pPedestrian->action_list[1].sounds[0],
+                DRS3StartSound3D(gPedestrians_outlet, pPedestrian->action_list[1].sounds[0],
                     &pPedestrian->pos, &gZero_v__pedestrn, 1, 255, gZombie_factor * 65536.f, -1);
             }
         } else if (frame_offset <= pPedestrian->current_frame) {
@@ -1120,10 +1120,10 @@ void ChangeActionTo(tPedestrian_data* pPedestrian, int pAction_index, int pRedo_
         DRS3StopSound(pPedestrian->last_sound);
         the_sound = the_action->sounds[IRandomBetween(0, the_action->number_of_sounds - 1)];
         the_pitch = 65536.f / gPed_scale_factor * gZombie_factor;
-        pPedestrian->last_sound = DRS3StartSound3D(gIndexed_outlets[4], the_sound, &pPedestrian->pos, &gZero_v__pedestrn, 1, 255, the_pitch, -1);
+        pPedestrian->last_sound = DRS3StartSound3D(gPedestrians_outlet, the_sound, &pPedestrian->pos, &gZero_v__pedestrn, 1, 255, the_pitch, -1);
         pPedestrian->last_sound_action = pAction_index;
         pPedestrian->last_sound_make = GetTotalTime();
-        PipeSingleSound(gIndexed_outlets[4], the_sound, 255, 0, the_pitch, &pPedestrian->pos);
+        PipeSingleSound(gPedestrians_outlet, the_sound, 255, 0, the_pitch, &pPedestrian->pos);
     }
 }
 
@@ -1302,7 +1302,7 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
                         && pPedestrian->falling_speed >= 0.0008f) {
                         DRS3StopSound(pPedestrian->last_sound);
                         the_pitch = 65536.f / gPed_scale_factor;
-                        pPedestrian->last_sound = DRS3StartSound3D(gIndexed_outlets[4],
+                        pPedestrian->last_sound = DRS3StartSound3D(gPedestrians_outlet,
                             pPedestrian->falling_sound,
                             &pPedestrian->pos,
                             &gZero_v__pedestrn,
@@ -1310,7 +1310,7 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
                             255,
                             the_pitch,
                             -1);
-                        PipeSingleSound(gIndexed_outlets[4],
+                        PipeSingleSound(gPedestrians_outlet,
                             pPedestrian->falling_sound,
                             255,
                             0,
@@ -1824,10 +1824,10 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
                 gProximity_rays[i].car = (tCar_spec*)the_car;
                 gProximity_rays[i].ped = pPedestrian;
                 if (the_car->driver == eDriver_local_human) {
-                    DRS3StartSound(gIndexed_outlets[1], 5500);
+                    DRS3StartSound(gCar_outlet, 5500);
                 } else {
                     DRS3StartSound3D(
-                        gIndexed_outlets[1], 5500, &the_car->pos, &gZero_v__pedestrn,
+                        gCar_outlet, 5500, &the_car->pos, &gZero_v__pedestrn,
                         1, 255, 65536, 65536);
                 }
                 break;
@@ -1880,7 +1880,7 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
     }
     if (the_car->driver != eDriver_local_human || gRace_finished || pPedestrian->ref_number >= 100) {
         DRS3StartSound3D(
-            gIndexed_outlets[4],
+            gPedestrians_outlet,
             pPedestrian->exploding_sounds[IRandomBetween(0, pPedestrian->number_of_exploding_sounds - 1)],
             &pPedestrian->pos,
             &zero_v,
@@ -2303,7 +2303,7 @@ void MungePedestrians(tU32 pFrame_period) {
     LOG_TRACE("(%d)", pFrame_period);
 
     gVesuvians_this_time = 0;
-    gAttracted_pedestrians = 32;
+    // dword_550A9C = 32;
     gMax_distance_squared = 121.f;
     if (!gAction_replay_mode) {
         MungePedGibs(pFrame_period);
@@ -2497,7 +2497,7 @@ void CreatePedestrian(FILE* pG, tPedestrian_instruction* pInstructions, int pIns
                         BrActorRemove(the_pedestrian->actor);
                         BrActorFree(the_pedestrian->actor);
                         gPed_count--;
-                        DRS3StartSound(gIndexed_outlets[0], 3100);
+                        DRS3StartSound(gEffects_outlet, 3100);
                         return;
                     }
                     if (strcmp(s, "NEXT PEDESTRIAN") == 0) {
@@ -2762,8 +2762,8 @@ void LoadInPedestrians(FILE* pF, int pSubs_count, tPed_subs* pSubs_array) {
     gPedestrian_array = BrMemAllocate(sizeof(tPedestrian_data) * (ped_count + (gAusterity_mode ? 0 : 200)), kMem_ped_array_stain);
     if (PDKeyDown(KEY_LCTRL) && PDKeyDown(KEY_LSHIFT) && PDKeyDown(KEY_A)) {
         check_for_duplicates = 1;
-        DRS3StartSound(gIndexed_outlets[0], 3202);
-        DRS3StartSound(gIndexed_outlets[0], 3202);
+        DRS3StartSound(gEffects_outlet, 3202);
+        DRS3StartSound(gEffects_outlet, 3202);
     }
     for (i = 0; i < ped_count; i++) {
         PossibleService();

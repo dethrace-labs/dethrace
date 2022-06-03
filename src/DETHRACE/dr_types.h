@@ -4,7 +4,7 @@
 #include "brender/br_types.h"
 #include "constants.h"
 #include "macros.h"
-#include "s3/s3_types.h"
+#include "s3/s3.h"
 #include <assert.h>
 #include <stdarg.h>
 #include <stddef.h>
@@ -768,18 +768,18 @@ typedef struct tReduced_matrix {
 typedef struct tCar_controls {
     int joystick_acc : 8;
     int joystick_dec : 8;
-    unsigned int left : 1; // 0x10000   bit 17
-    unsigned int right : 1; // 0x20000   bit 18
-    unsigned int acc : 1; // 0x40000   bit 19
-    unsigned int dec : 1; // 0x80000   bit 20
-    unsigned int brake : 1; // 0x100000   bit 21
-    unsigned int up : 1; // 0x200000   bit 22
-    unsigned int down : 1; // 0x400000   bit 23
-    unsigned int holdw : 1; // 0x800000   bit 24
-    unsigned int backwards : 1; // 0x1000000   bit 25
-    unsigned int change_up : 1; // 0x2000000   bit 26
+    unsigned int left : 1;        // 0x10000   bit 17
+    unsigned int right : 1;       // 0x20000   bit 18
+    unsigned int acc : 1;         // 0x40000   bit 19
+    unsigned int dec : 1;         // 0x80000   bit 20
+    unsigned int brake : 1;       // 0x100000   bit 21
+    unsigned int up : 1;          // 0x200000   bit 22
+    unsigned int down : 1;        // 0x400000   bit 23
+    unsigned int holdw : 1;       // 0x800000   bit 24
+    unsigned int backwards : 1;   // 0x1000000   bit 25
+    unsigned int change_up : 1;   // 0x2000000   bit 26
     unsigned int change_down : 1; // 0x4000000   bit 27
-    unsigned int horn : 1; // 0x8000000   bit 28
+    unsigned int horn : 1;        // 0x8000000   bit 28
 } tCar_controls;
 
 typedef struct tNet_message_mechanics_info {
@@ -886,286 +886,286 @@ typedef struct tPursuee_trail {
     tU8 nodes_shifted_this_frame;
 } tPursuee_trail;
 
-typedef struct tCar_spec_struct { // size: 0x1a9c
-    int index; // @0x0
-    int disabled; // @0x4
-    tDriver driver; // @0x8
-    br_actor* car_master_actor; // @0xc
-    br_scalar min_torque_squared; // @0x10
-    br_scalar break_off_radians_squared; // @0x14
-    br_vector3 v; // @0x18
-    br_vector3 old_v; // @0x24
-    br_vector3 velocity_car_space; // @0x30
-    br_matrix34 oldmat; // @0x3c
-    br_matrix34 old_frame_mat; // @0x6c
-    br_vector3 pos; // @0x9c
-    br_vector3 omega; // @0xa8
-    br_vector3 oldomega; // @0xb4
-    br_scalar M; // @0xc0
-    int infinite_mass; // @0xc4
-    br_vector3 I; // @0xc8
-    br_vector3 cmpos; // @0xd4
-    int extra_point_num; // @0xe0
-    br_bounds bounds[3]; // @0xe4
-    br_bounds max_bounds[2]; // @0x12c
-    br_vector3 extra_points[6]; // @0x15c
-    br_scalar original_extra_points_z[6]; // @0x1a4
-    br_vector3 old_point; // @0x1bc
-    br_vector3 old_norm; // @0x1c8
-    int box_face_start; // @0x1d4
-    int box_face_end; // @0x1d8
-    int box_face_ref; // @0x1dc
-    br_matrix34 last_box_inv_mat; // @0x1e0
-    br_bounds last_box; // @0x210
-    int doing_nothing_flag; // @0x228
-    tSpecial_volume* last_special_volume; // @0x22c
-    tSpecial_volume* auto_special_volume; // @0x230
-    int frame_collision_flag; // @0x234
-    int collision_flag; // @0x238
-    int max_shrapnel_material; // @0x23c
-    br_vector3 direction; // @0x240
-    float speed; // @0x24c
-    tU16 car_ID; // @0x250
-    br_material* shrapnel_material[3]; // @0x254
-    br_bounds bounds_world_space; // @0x260
-    tBounds_type bounds_ws_type; // @0x278
-    tU16 fire_vertex[12]; // @0x27c
-    tU16 num_smoke_columns; // @0x294
-    br_vector3 water_normal; // @0x298
-    br_scalar water_d; // @0x2a4
-    br_scalar water_depth_factor; // @0x2a8
-    tNet_message_mechanics_info message; // @0x2ac
-    tU32 last_car_car_collision; // @0x330
-    br_scalar dt; // @0x334
-    tCar_spec* who_last_hit_me; // @0x338
-    char name[32]; // @0x33c
-    char driver_name[32]; // @0x35c
-    char grid_icon_names[3][14]; // @0x37c
-    tS8* cockpit_images[3]; // @0x3a8
-    br_pixelmap* prat_cam_left; // @0x3b4
-    br_pixelmap* prat_cam_top; // @0x3b8
-    br_pixelmap* prat_cam_right; // @0x3bc
-    br_pixelmap* prat_cam_bottom; // @0x3c0
-    br_pixelmap* prat_cam_dummy; // @0x3c4
-    br_pixelmap* speedo_image[2]; // @0x3c8
-    br_pixelmap* tacho_image[2]; // @0x3d0
-    br_pixelmap* damage_background; // @0x3d8
-    br_pixelmap* lhands_images[7]; // @0x3dc
-    br_pixelmap* rhands_images[7]; // @0x3f8
-    br_pixelmap* grid_icon_image; // @0x414
-    br_pixelmap* gears_image; // @0x418
-    int fg_index; // @0x41c
-    int underwater_ability; // @0x420
-    int invulnerable; // @0x424
-    int wall_climber_mode; // @0x428
-    int can_be_stolen; // @0x42c
-    int has_been_stolen; // @0x430
-    int active; // @0x434
-    int knackered; // @0x438
-    int pre_car_col_knackered; // @0x43c
-    int render_left[3]; // @0x440
-    int render_top[3]; // @0x44c
-    int render_right[3]; // @0x458
-    int render_bottom[3]; // @0x464
-    int mirror_left; // @0x470
-    int mirror_top; // @0x474
-    int mirror_right; // @0x478
-    int mirror_bottom; // @0x47c
-    int prat_left; // @0x480
-    int prat_top; // @0x484
-    int prat_right; // @0x488
-    int prat_bottom; // @0x48c
-    int speedo_x[2]; // @0x490
-    int speedo_y[2]; // @0x498
-    int speedo_centre_x[2]; // @0x4a0
-    int speedo_centre_y[2]; // @0x4a8
-    int speedo_x_pitch[2]; // @0x4b0
-    int speedo_y_pitch[2]; // @0x4b8
-    int speedo_radius_1[2]; // @0x4c0
-    int speedo_radius_2[2]; // @0x4c8
-    int speedo_start_angle[2]; // @0x4d0
-    int speedo_end_angle[2]; // @0x4d8
-    int speedo_needle_colour[2]; // @0x4e0
-    int tacho_x[2]; // @0x4e8
-    int tacho_y[2]; // @0x4f0
-    int tacho_centre_x[2]; // @0x4f8
-    int tacho_centre_y[2]; // @0x500
-    int tacho_x_pitch[2]; // @0x508
-    int tacho_y_pitch[2]; // @0x510
-    int tacho_radius_1[2]; // @0x518
-    int tacho_radius_2[2]; // @0x520
-    int tacho_start_angle[2]; // @0x528
-    int tacho_end_angle[2]; // @0x530
-    int tacho_needle_colour[2]; // @0x538
-    int gear_x[2]; // @0x540
-    int gear_y[2]; // @0x548
-    int red_line; // @0x550
-    int lhands_x[7]; // @0x554
-    int lhands_y[7]; // @0x570
-    int rhands_x[7]; // @0x58c
-    int rhands_y[7]; // @0x5a8
-    int number_of_hands_images; // @0x5c4
-    int max_speed; // @0x5c8
-    int damage_x_offset; // @0x5cc
-    int damage_y_offset; // @0x5d0
-    int damage_background_x; // @0x5d4
-    int damage_background_y; // @0x5d8
-    int dim_count[2]; // @0x5dc
-    int dim_left[2][4]; // @0x5e4
-    int dim_top[2][4]; // @0x604
-    int dim_right[2][4]; // @0x624
-    int dim_bottom[2][4]; // @0x644
-    int car_actor_count; // @0x664
-    int current_car_actor; // @0x668
-    int principal_car_actor; // @0x66c
-    int car_model_variable; // @0x670
-    int number_of_steerable_wheels; // @0x674
-    int steering_ref[6]; // @0x678
-    int lf_sus_ref[4]; // @0x690
-    int rf_sus_ref[4]; // @0x6a0
-    int lr_sus_ref[2]; // @0x6b0
-    int rr_sus_ref[2]; // @0x6b8
-    int driven_wheels_spin_ref_1; // @0x6c0
-    int driven_wheels_spin_ref_2; // @0x6c4
-    int driven_wheels_spin_ref_3; // @0x6c8
-    int driven_wheels_spin_ref_4; // @0x6cc
-    int non_driven_wheels_spin_ref_1; // @0x6d0
-    int non_driven_wheels_spin_ref_2; // @0x6d4
-    int non_driven_wheels_spin_ref_3; // @0x6d8
-    int non_driven_wheels_spin_ref_4; // @0x6dc
-    int engine_noises[3]; // @0x6e0
-    float driver_x_offset; // @0x6ec
-    float driver_y_offset; // @0x6f0
-    float driver_z_offset; // @0x6f4
-    float mirror_x_offset; // @0x6f8
-    float mirror_y_offset; // @0x6fc
-    float mirror_z_offset; // @0x700
-    float rearview_camera_angle; // @0x704
-    float head_left_angle; // @0x708
-    float head_right_angle; // @0x70c
-    float steering_angle; // @0x710
-    float speedo_speed; // @0x714
-    float lf_sus_position; // @0x718
-    float rf_sus_position; // @0x71c
-    float lr_sus_position; // @0x720
-    float rr_sus_position; // @0x724
-    float driven_wheels_circum; // @0x728
-    float non_driven_wheels_circum; // @0x72c
-    float bounce_rate; // @0x730
-    float bounce_amount; // @0x734
-    float collision_mass_multiplier; // @0x738
-    float damage_multiplier; // @0x73c
-    float grip_multiplier; // @0x740
-    float engine_power_multiplier; // @0x744
-    tDamage_unit damage_units[12]; // @0x748
-    tU8 frame_start_damage[12]; // @0x958
-    tImpact_location last_impact_location; // @0x964
-    tDamage_program damage_programs[6]; // @0x968
-    tHeadup_slot headup_slots[2][20]; // @0x998
-    tParts_spec power_ups[3]; // @0xfd8
-    int car_actor_pipe_ref; // @0x12b4
-    tCar_actor car_model_actors[5]; // @0x12b8
-    br_material* screen_material; // @0x13a8
-    br_material* screen_material_source; // @0x13ac
-    br_matrix34 last_safe_positions[5]; // @0x13b0
-    int wheel_slip; // @0x14a0
-    br_scalar damping; // @0x14a4
-    br_scalar sk[2]; // @0x14a8
-    br_scalar sb[2]; // @0x14b0
-    br_scalar susp_give[2]; // @0x14b8
-    br_scalar susp_height[2]; // @0x14c0
-    br_scalar ride_height; // @0x14c8
-    br_vector3 wpos[4]; // @0x14cc
-    br_scalar curvature; // @0x14fc
-    br_scalar maxcurve; // @0x1500
-    br_scalar turn_speed; // @0x1504
-    br_scalar oldd[4]; // @0x1508
-    int material_index[4]; // @0x1518
-    int dust_time[4]; // @0x1528
-    br_scalar mu[3]; // @0x1538
-    br_scalar friction_elipticity; // @0x1544
-    br_scalar down_force_speed; // @0x1548
-    int down_force_flag; // @0x154c
-    br_scalar initial_brake; // @0x1550
-    br_scalar brake_increase; // @0x1554
-    br_scalar freduction; // @0x1558
-    br_scalar acc_force; // @0x155c
-    br_scalar torque; // @0x1560
-    br_scalar brake_force; // @0x1564
-    int traction_control; // @0x1568
-    br_scalar rolling_r_front; // @0x156c
-    br_scalar rolling_r_back; // @0x1570
-    tCar_controls keys; // @0x1574
-    tJoystick joystick; // @0x1578
-    int pedals_xy; // @0x1588
-    int number_of_wheels_on_ground; // @0x158c
-    br_actor* wheel_actors[6]; // @0x1590
-    float wheel_rot_pos[4]; // @0x15a8
-    br_scalar wheel_dam_offset[4]; // @0x15b8
-    br_scalar damage_magnitude_accumulator; // @0x15c8
-    br_scalar revs; // @0x15cc
-    br_scalar target_revs; // @0x15d0
-    br_vector3 road_normal; // @0x15d4
-    br_scalar max_force_front; // @0x15e0
-    br_scalar max_force_rear; // @0x15e4
-    int gear; // @0x15e8
-    int just_changed_gear; // @0x15ec
-    int max_gear; // @0x15f0
-    br_scalar speed_revs_ratio; // @0x15f4
-    br_scalar force_torque_ratio; // @0x15f8
-    tS3_sound_source_ptr sound_source; // @0x15fc
-    br_matrix34 pre_car_col_mat; // @0x1600
-    br_scalar pre_car_col_speed; // @0x1630
-    br_vector3 pre_car_col_direction; // @0x1634
-    br_vector3 pre_car_col_velocity; // @0x1640
+typedef struct tCar_spec_struct {              // size: 0x1a9c
+    int index;                                 // @0x0
+    int disabled;                              // @0x4
+    tDriver driver;                            // @0x8
+    br_actor* car_master_actor;                // @0xc
+    br_scalar min_torque_squared;              // @0x10
+    br_scalar break_off_radians_squared;       // @0x14
+    br_vector3 v;                              // @0x18
+    br_vector3 old_v;                          // @0x24
+    br_vector3 velocity_car_space;             // @0x30
+    br_matrix34 oldmat;                        // @0x3c
+    br_matrix34 old_frame_mat;                 // @0x6c
+    br_vector3 pos;                            // @0x9c
+    br_vector3 omega;                          // @0xa8
+    br_vector3 oldomega;                       // @0xb4
+    br_scalar M;                               // @0xc0
+    int infinite_mass;                         // @0xc4
+    br_vector3 I;                              // @0xc8
+    br_vector3 cmpos;                          // @0xd4
+    int extra_point_num;                       // @0xe0
+    br_bounds bounds[3];                       // @0xe4
+    br_bounds max_bounds[2];                   // @0x12c
+    br_vector3 extra_points[6];                // @0x15c
+    br_scalar original_extra_points_z[6];      // @0x1a4
+    br_vector3 old_point;                      // @0x1bc
+    br_vector3 old_norm;                       // @0x1c8
+    int box_face_start;                        // @0x1d4
+    int box_face_end;                          // @0x1d8
+    int box_face_ref;                          // @0x1dc
+    br_matrix34 last_box_inv_mat;              // @0x1e0
+    br_bounds last_box;                        // @0x210
+    int doing_nothing_flag;                    // @0x228
+    tSpecial_volume* last_special_volume;      // @0x22c
+    tSpecial_volume* auto_special_volume;      // @0x230
+    int frame_collision_flag;                  // @0x234
+    int collision_flag;                        // @0x238
+    int max_shrapnel_material;                 // @0x23c
+    br_vector3 direction;                      // @0x240
+    float speed;                               // @0x24c
+    tU16 car_ID;                               // @0x250
+    br_material* shrapnel_material[3];         // @0x254
+    br_bounds bounds_world_space;              // @0x260
+    tBounds_type bounds_ws_type;               // @0x278
+    tU16 fire_vertex[12];                      // @0x27c
+    tU16 num_smoke_columns;                    // @0x294
+    br_vector3 water_normal;                   // @0x298
+    br_scalar water_d;                         // @0x2a4
+    br_scalar water_depth_factor;              // @0x2a8
+    tNet_message_mechanics_info message;       // @0x2ac
+    tU32 last_car_car_collision;               // @0x330
+    br_scalar dt;                              // @0x334
+    tCar_spec* who_last_hit_me;                // @0x338
+    char name[32];                             // @0x33c
+    char driver_name[32];                      // @0x35c
+    char grid_icon_names[3][14];               // @0x37c
+    tS8* cockpit_images[3];                    // @0x3a8
+    br_pixelmap* prat_cam_left;                // @0x3b4
+    br_pixelmap* prat_cam_top;                 // @0x3b8
+    br_pixelmap* prat_cam_right;               // @0x3bc
+    br_pixelmap* prat_cam_bottom;              // @0x3c0
+    br_pixelmap* prat_cam_dummy;               // @0x3c4
+    br_pixelmap* speedo_image[2];              // @0x3c8
+    br_pixelmap* tacho_image[2];               // @0x3d0
+    br_pixelmap* damage_background;            // @0x3d8
+    br_pixelmap* lhands_images[7];             // @0x3dc
+    br_pixelmap* rhands_images[7];             // @0x3f8
+    br_pixelmap* grid_icon_image;              // @0x414
+    br_pixelmap* gears_image;                  // @0x418
+    int fg_index;                              // @0x41c
+    int underwater_ability;                    // @0x420
+    int invulnerable;                          // @0x424
+    int wall_climber_mode;                     // @0x428
+    int can_be_stolen;                         // @0x42c
+    int has_been_stolen;                       // @0x430
+    int active;                                // @0x434
+    int knackered;                             // @0x438
+    int pre_car_col_knackered;                 // @0x43c
+    int render_left[3];                        // @0x440
+    int render_top[3];                         // @0x44c
+    int render_right[3];                       // @0x458
+    int render_bottom[3];                      // @0x464
+    int mirror_left;                           // @0x470
+    int mirror_top;                            // @0x474
+    int mirror_right;                          // @0x478
+    int mirror_bottom;                         // @0x47c
+    int prat_left;                             // @0x480
+    int prat_top;                              // @0x484
+    int prat_right;                            // @0x488
+    int prat_bottom;                           // @0x48c
+    int speedo_x[2];                           // @0x490
+    int speedo_y[2];                           // @0x498
+    int speedo_centre_x[2];                    // @0x4a0
+    int speedo_centre_y[2];                    // @0x4a8
+    int speedo_x_pitch[2];                     // @0x4b0
+    int speedo_y_pitch[2];                     // @0x4b8
+    int speedo_radius_1[2];                    // @0x4c0
+    int speedo_radius_2[2];                    // @0x4c8
+    int speedo_start_angle[2];                 // @0x4d0
+    int speedo_end_angle[2];                   // @0x4d8
+    int speedo_needle_colour[2];               // @0x4e0
+    int tacho_x[2];                            // @0x4e8
+    int tacho_y[2];                            // @0x4f0
+    int tacho_centre_x[2];                     // @0x4f8
+    int tacho_centre_y[2];                     // @0x500
+    int tacho_x_pitch[2];                      // @0x508
+    int tacho_y_pitch[2];                      // @0x510
+    int tacho_radius_1[2];                     // @0x518
+    int tacho_radius_2[2];                     // @0x520
+    int tacho_start_angle[2];                  // @0x528
+    int tacho_end_angle[2];                    // @0x530
+    int tacho_needle_colour[2];                // @0x538
+    int gear_x[2];                             // @0x540
+    int gear_y[2];                             // @0x548
+    int red_line;                              // @0x550
+    int lhands_x[7];                           // @0x554
+    int lhands_y[7];                           // @0x570
+    int rhands_x[7];                           // @0x58c
+    int rhands_y[7];                           // @0x5a8
+    int number_of_hands_images;                // @0x5c4
+    int max_speed;                             // @0x5c8
+    int damage_x_offset;                       // @0x5cc
+    int damage_y_offset;                       // @0x5d0
+    int damage_background_x;                   // @0x5d4
+    int damage_background_y;                   // @0x5d8
+    int dim_count[2];                          // @0x5dc
+    int dim_left[2][4];                        // @0x5e4
+    int dim_top[2][4];                         // @0x604
+    int dim_right[2][4];                       // @0x624
+    int dim_bottom[2][4];                      // @0x644
+    int car_actor_count;                       // @0x664
+    int current_car_actor;                     // @0x668
+    int principal_car_actor;                   // @0x66c
+    int car_model_variable;                    // @0x670
+    int number_of_steerable_wheels;            // @0x674
+    int steering_ref[6];                       // @0x678
+    int lf_sus_ref[4];                         // @0x690
+    int rf_sus_ref[4];                         // @0x6a0
+    int lr_sus_ref[2];                         // @0x6b0
+    int rr_sus_ref[2];                         // @0x6b8
+    int driven_wheels_spin_ref_1;              // @0x6c0
+    int driven_wheels_spin_ref_2;              // @0x6c4
+    int driven_wheels_spin_ref_3;              // @0x6c8
+    int driven_wheels_spin_ref_4;              // @0x6cc
+    int non_driven_wheels_spin_ref_1;          // @0x6d0
+    int non_driven_wheels_spin_ref_2;          // @0x6d4
+    int non_driven_wheels_spin_ref_3;          // @0x6d8
+    int non_driven_wheels_spin_ref_4;          // @0x6dc
+    int engine_noises[3];                      // @0x6e0
+    float driver_x_offset;                     // @0x6ec
+    float driver_y_offset;                     // @0x6f0
+    float driver_z_offset;                     // @0x6f4
+    float mirror_x_offset;                     // @0x6f8
+    float mirror_y_offset;                     // @0x6fc
+    float mirror_z_offset;                     // @0x700
+    float rearview_camera_angle;               // @0x704
+    float head_left_angle;                     // @0x708
+    float head_right_angle;                    // @0x70c
+    float steering_angle;                      // @0x710
+    float speedo_speed;                        // @0x714
+    float lf_sus_position;                     // @0x718
+    float rf_sus_position;                     // @0x71c
+    float lr_sus_position;                     // @0x720
+    float rr_sus_position;                     // @0x724
+    float driven_wheels_circum;                // @0x728
+    float non_driven_wheels_circum;            // @0x72c
+    float bounce_rate;                         // @0x730
+    float bounce_amount;                       // @0x734
+    float collision_mass_multiplier;           // @0x738
+    float damage_multiplier;                   // @0x73c
+    float grip_multiplier;                     // @0x740
+    float engine_power_multiplier;             // @0x744
+    tDamage_unit damage_units[12];             // @0x748
+    tU8 frame_start_damage[12];                // @0x958
+    tImpact_location last_impact_location;     // @0x964
+    tDamage_program damage_programs[6];        // @0x968
+    tHeadup_slot headup_slots[2][20];          // @0x998
+    tParts_spec power_ups[3];                  // @0xfd8
+    int car_actor_pipe_ref;                    // @0x12b4
+    tCar_actor car_model_actors[5];            // @0x12b8
+    br_material* screen_material;              // @0x13a8
+    br_material* screen_material_source;       // @0x13ac
+    br_matrix34 last_safe_positions[5];        // @0x13b0
+    int wheel_slip;                            // @0x14a0
+    br_scalar damping;                         // @0x14a4
+    br_scalar sk[2];                           // @0x14a8
+    br_scalar sb[2];                           // @0x14b0
+    br_scalar susp_give[2];                    // @0x14b8
+    br_scalar susp_height[2];                  // @0x14c0
+    br_scalar ride_height;                     // @0x14c8
+    br_vector3 wpos[4];                        // @0x14cc
+    br_scalar curvature;                       // @0x14fc
+    br_scalar maxcurve;                        // @0x1500
+    br_scalar turn_speed;                      // @0x1504
+    br_scalar oldd[4];                         // @0x1508
+    int material_index[4];                     // @0x1518
+    int dust_time[4];                          // @0x1528
+    br_scalar mu[3];                           // @0x1538
+    br_scalar friction_elipticity;             // @0x1544
+    br_scalar down_force_speed;                // @0x1548
+    int down_force_flag;                       // @0x154c
+    br_scalar initial_brake;                   // @0x1550
+    br_scalar brake_increase;                  // @0x1554
+    br_scalar freduction;                      // @0x1558
+    br_scalar acc_force;                       // @0x155c
+    br_scalar torque;                          // @0x1560
+    br_scalar brake_force;                     // @0x1564
+    int traction_control;                      // @0x1568
+    br_scalar rolling_r_front;                 // @0x156c
+    br_scalar rolling_r_back;                  // @0x1570
+    tCar_controls keys;                        // @0x1574
+    tJoystick joystick;                        // @0x1578
+    int pedals_xy;                             // @0x1588
+    int number_of_wheels_on_ground;            // @0x158c
+    br_actor* wheel_actors[6];                 // @0x1590
+    float wheel_rot_pos[4];                    // @0x15a8
+    br_scalar wheel_dam_offset[4];             // @0x15b8
+    br_scalar damage_magnitude_accumulator;    // @0x15c8
+    br_scalar revs;                            // @0x15cc
+    br_scalar target_revs;                     // @0x15d0
+    br_vector3 road_normal;                    // @0x15d4
+    br_scalar max_force_front;                 // @0x15e0
+    br_scalar max_force_rear;                  // @0x15e4
+    int gear;                                  // @0x15e8
+    int just_changed_gear;                     // @0x15ec
+    int max_gear;                              // @0x15f0
+    br_scalar speed_revs_ratio;                // @0x15f4
+    br_scalar force_torque_ratio;              // @0x15f8
+    tS3_sound_source_ptr sound_source;         // @0x15fc
+    br_matrix34 pre_car_col_mat;               // @0x1600
+    br_scalar pre_car_col_speed;               // @0x1630
+    br_vector3 pre_car_col_direction;          // @0x1634
+    br_vector3 pre_car_col_velocity;           // @0x1640
     br_vector3 pre_car_col_velocity_car_space; // @0x164c
-    br_vector3 velocity_bu_per_sec; // @0x1658
-    float last_col_prop_x; // @0x1664
-    float last_col_prop_y; // @0x1668
-    float last_col_prop_z; // @0x166c
-    tU32 time_last_hit; // @0x1670
-    tU32 time_last_victim; // @0x1674
-    struct tCar_spec_struct* last_hit_by; // @0x1678
-    struct tCar_spec_struct* last_culprit; // @0x167c
-    int no_of_processes_recording_my_trail; // @0x1680
-    tPursuee_trail my_trail; // @0x1684
+    br_vector3 velocity_bu_per_sec;            // @0x1658
+    float last_col_prop_x;                     // @0x1664
+    float last_col_prop_y;                     // @0x1668
+    float last_col_prop_z;                     // @0x166c
+    tU32 time_last_hit;                        // @0x1670
+    tU32 time_last_victim;                     // @0x1674
+    struct tCar_spec_struct* last_hit_by;      // @0x1678
+    struct tCar_spec_struct* last_culprit;     // @0x167c
+    int no_of_processes_recording_my_trail;    // @0x1680
+    tPursuee_trail my_trail;                   // @0x1684
 
     // unsigned int grudge_raised_recently : 0; // @0x17c8
     // unsigned int big_bang : 1; // @0x17c8
     // unsigned int scary_bang : 2; // @0x17c8
     unsigned int grudge_bang_scary_bang; // TODO: should use the above bit fields...
 
-    tU32 last_collision_time; // @0x17cc
+    tU32 last_collision_time;           // @0x17cc
     tU32 last_time_we_touched_a_player; // @0x17d0
-    tU32 end_steering_damage_effect; // @0x17d4
-    tU32 end_trans_damage_effect; // @0x17d8
-    int false_key_left; // @0x17dc
-    int false_key_right; // @0x17e0
-    tCar_spec* last_person_to_hit_us; // @0x17e4
-    tCar_spec* last_person_we_hit; // @0x17e8
-    br_vector3 engine_pos; // @0x17ec
-    br_model* last_wheel_models[4]; // @0x17f8
-    int last_wheel_faces[4]; // @0x1808
-    tU32 shadow_intersection_flags; // @0x1818
-    tU32 last_bounce; // @0x181c
-    unsigned int new_skidding; // @0x1820
-    unsigned int old_skidding; // @0x1824
-    tU16 old_skid[4]; // @0x1828
-    br_vector3 prev_skid_pos[4]; // @0x1830
-    br_vector3 skid_line_start[4]; // @0x1860
-    br_vector3 skid_line_end[4]; // @0x1890
-    br_vector3 nor[4]; // @0x18c0
-    br_vector3 prev_nor[4]; // @0x18f0
-    br_vector3 special_start[4]; // @0x1920
-    br_scalar oil_remaining[4]; // @0x1950
-    br_scalar blood_remaining[4]; // @0x1960
-    br_scalar total_length[4]; // @0x1970
-    float proxy_ray_distance; // @0x1980
-    tS32 powerups[64]; // @0x1984
-    tU32 time_to_recover; // @0x1a84
-    tU32 repair_time; // @0x1a88
-    int power_up_levels[3]; // @0x1a8c
-    tS3_sound_tag horn_sound_tag; // @0x1a98
+    tU32 end_steering_damage_effect;    // @0x17d4
+    tU32 end_trans_damage_effect;       // @0x17d8
+    int false_key_left;                 // @0x17dc
+    int false_key_right;                // @0x17e0
+    tCar_spec* last_person_to_hit_us;   // @0x17e4
+    tCar_spec* last_person_we_hit;      // @0x17e8
+    br_vector3 engine_pos;              // @0x17ec
+    br_model* last_wheel_models[4];     // @0x17f8
+    int last_wheel_faces[4];            // @0x1808
+    tU32 shadow_intersection_flags;     // @0x1818
+    tU32 last_bounce;                   // @0x181c
+    unsigned int new_skidding;          // @0x1820
+    unsigned int old_skidding;          // @0x1824
+    tU16 old_skid[4];                   // @0x1828
+    br_vector3 prev_skid_pos[4];        // @0x1830
+    br_vector3 skid_line_start[4];      // @0x1860
+    br_vector3 skid_line_end[4];        // @0x1890
+    br_vector3 nor[4];                  // @0x18c0
+    br_vector3 prev_nor[4];             // @0x18f0
+    br_vector3 special_start[4];        // @0x1920
+    br_scalar oil_remaining[4];         // @0x1950
+    br_scalar blood_remaining[4];       // @0x1960
+    br_scalar total_length[4];          // @0x1970
+    float proxy_ray_distance;           // @0x1980
+    tS32 powerups[64];                  // @0x1984
+    tU32 time_to_recover;               // @0x1a84
+    tU32 repair_time;                   // @0x1a88
+    int power_up_levels[3];             // @0x1a8c
+    tS3_sound_tag horn_sound_tag;       // @0x1a98
 } tCar_spec;
 
 typedef struct tOppo_psyche {
@@ -1637,45 +1637,45 @@ typedef struct tNet_message_crush_point {
 
 #define ENET_MESSAGE_HEADUP 0xc
 
-typedef union tNet_contents { // size: 0x160
-    struct { // size: 0x2
-        tU8 contents_size; // @0x0
-        tNet_message_type type; // @0x1
-    } header; // @0x0
-    union { // size: 0x160
-        tNet_message_send_me_details send_details; // @0x0
-        tNet_message_my_details details; // @0x0
-        tNet_message_join join; // @0x0
-        tNet_message_leave leave; // @0x0
-        tNet_message_host_pissing_off hosticide; // @0x0
-        tNet_message_new_player_list player_list; // @0x0
-        tNet_message_race_over race_over; // @0x0
-        tNet_message_status_report report; // @0x0
-        tNet_message_start_race start_race; // @0x0
-        tNet_message_guarantee_reply reply; // @0x0
-        tNet_message_headup headup; // @0x0
-        tNet_message_host_query where_we_at; // @0x0
-        tNet_message_host_reply heres_where_we_at; // @0x0
-        tNet_message_mechanics_info mech; // @0x0
-        tNet_message_non_car_info non_car; // @0x0
-        tNet_message_time_sync time_sync; // @0x0
-        tNet_message_players_confirm confirm; // @0x0
-        tNet_message_disable_car disable_car; // @0x0
-        tNet_message_enable_car enabled_car; // @0x0
-        tNet_message_powerup powerup; // @0x0
-        tNet_message_recover recover; // @0x0
-        tNet_message_scores scores; // @0x0
-        tNet_message_wasted wasted; // @0x0
-        tNet_message_pedestrian pedestrian; // @0x0
-        tNet_message_gameplay gameplay; // @0x0
+typedef union tNet_contents {                           // size: 0x160
+    struct {                                            // size: 0x2
+        tU8 contents_size;                              // @0x0
+        tNet_message_type type;                         // @0x1
+    } header;                                           // @0x0
+    union {                                             // size: 0x160
+        tNet_message_send_me_details send_details;      // @0x0
+        tNet_message_my_details details;                // @0x0
+        tNet_message_join join;                         // @0x0
+        tNet_message_leave leave;                       // @0x0
+        tNet_message_host_pissing_off hosticide;        // @0x0
+        tNet_message_new_player_list player_list;       // @0x0
+        tNet_message_race_over race_over;               // @0x0
+        tNet_message_status_report report;              // @0x0
+        tNet_message_start_race start_race;             // @0x0
+        tNet_message_guarantee_reply reply;             // @0x0
+        tNet_message_headup headup;                     // @0x0
+        tNet_message_host_query where_we_at;            // @0x0
+        tNet_message_host_reply heres_where_we_at;      // @0x0
+        tNet_message_mechanics_info mech;               // @0x0
+        tNet_message_non_car_info non_car;              // @0x0
+        tNet_message_time_sync time_sync;               // @0x0
+        tNet_message_players_confirm confirm;           // @0x0
+        tNet_message_disable_car disable_car;           // @0x0
+        tNet_message_enable_car enabled_car;            // @0x0
+        tNet_message_powerup powerup;                   // @0x0
+        tNet_message_recover recover;                   // @0x0
+        tNet_message_scores scores;                     // @0x0
+        tNet_message_wasted wasted;                     // @0x0
+        tNet_message_pedestrian pedestrian;             // @0x0
+        tNet_message_gameplay gameplay;                 // @0x0
         tNet_message_non_car_position non_car_position; // @0x0
-        tNet_message_cop_info cop_info; // @0x0
-        tNet_message_car_details_req car_details_req; // @0x0
-        tNet_message_car_details car_details; // @0x0
-        tNet_message_game_scores game_scores; // @0x0
-        tNet_message_oil_spill oil_spill; // @0x0
-        tNet_message_crush_point crush; // @0x0
-    } data; // @0x0
+        tNet_message_cop_info cop_info;                 // @0x0
+        tNet_message_car_details_req car_details_req;   // @0x0
+        tNet_message_car_details car_details;           // @0x0
+        tNet_message_game_scores game_scores;           // @0x0
+        tNet_message_oil_spill oil_spill;               // @0x0
+        tNet_message_crush_point crush;                 // @0x0
+    } data;                                             // @0x0
 } tNet_contents;
 
 typedef struct tNet_message {
@@ -2442,18 +2442,18 @@ typedef struct tReduced_pos {
     tS16 v[3];
 } tReduced_pos;
 
-typedef union tIncident_info { // size: 0x10
-    struct { // size: 0x10
-        tCar_spec* car; // @0x0
-        br_vector3 impact_point; // @0x4
-    } car_info; // @0x0
-    struct { // size: 0x8
-        br_actor* ped_actor; // @0x0
+typedef union tIncident_info {    // size: 0x10
+    struct {                      // size: 0x10
+        tCar_spec* car;           // @0x0
+        br_vector3 impact_point;  // @0x4
+    } car_info;                   // @0x0
+    struct {                      // size: 0x8
+        br_actor* ped_actor;      // @0x0
         br_actor* murderer_actor; // @0x4
-    } ped_info; // @0x0
-    struct { // size: 0xc
-        br_vector3 pos; // @0x0
-    } wall_info; // @0x0
+    } ped_info;                   // @0x0
+    struct {                      // size: 0xc
+        br_vector3 pos;           // @0x0
+    } wall_info;                  // @0x0
 } tIncident_info;
 
 typedef struct tChanged_vertex {
@@ -2570,20 +2570,20 @@ typedef struct tPipe_ped_gib_data {
 } tPipe_ped_gib_data;
 
 typedef struct tPipe_incident_data { // size: 0x14
-    float severity; // @0x0
-    union { // size: 0x10
-        struct { // size: 0x10
-            tU16 car_ID; // @0x0
+    float severity;                  // @0x0
+    union {                          // size: 0x10
+        struct {                     // size: 0x10
+            tU16 car_ID;             // @0x0
             br_vector3 impact_point; // @0x4
-        } car_info; // @0x0
-        struct { // size: 0x8
-            tU16 ped_index; // @0x0
-            br_actor* actor; // @0x4
-        } ped_info; // @0x0
-        struct { // size: 0xc
-            br_vector3 pos; // @0x0
-        } wall_info; // @0x0
-    } info; // @0x4
+        } car_info;                  // @0x0
+        struct {                     // size: 0x8
+            tU16 ped_index;          // @0x0
+            br_actor* actor;         // @0x4
+        } ped_info;                  // @0x0
+        struct {                     // size: 0xc
+            br_vector3 pos;          // @0x0
+        } wall_info;                 // @0x0
+    } info;                          // @0x4
 } tPipe_incident_data;
 
 typedef struct tPipe_spark_data {
@@ -2662,42 +2662,42 @@ typedef struct tPipe_skid_adjustment {
     int material_index;
 } tPipe_skid_adjustment;
 
-typedef struct tPipe_chunk { // size: 0x58
-    tChunk_subject_index subject_index; // @0x0
-    union { // size: 0x54
-        tPipe_actor_rstyle_data actor_rstyle_data; // @0x0
-        tPipe_actor_translate_data actor_translate_data; // @0x0
-        tPipe_actor_transform_data actor_transform_data; // @0x0
-        tPipe_actor_create_data actor_create_data; // @0x0
-        tPipe_actor_destroy_data actor_destroy_data; // @0x0
-        tPipe_actor_relink_data actor_relink_data; // @0x0
-        tPipe_actor_material_data actor_material_data; // @0x0
-        tPipe_face_material_data face_material_data; // @0x0
-        tPipe_material_trans_data material_trans_data; // @0x0
+typedef struct tPipe_chunk {                                 // size: 0x58
+    tChunk_subject_index subject_index;                      // @0x0
+    union {                                                  // size: 0x54
+        tPipe_actor_rstyle_data actor_rstyle_data;           // @0x0
+        tPipe_actor_translate_data actor_translate_data;     // @0x0
+        tPipe_actor_transform_data actor_transform_data;     // @0x0
+        tPipe_actor_create_data actor_create_data;           // @0x0
+        tPipe_actor_destroy_data actor_destroy_data;         // @0x0
+        tPipe_actor_relink_data actor_relink_data;           // @0x0
+        tPipe_actor_material_data actor_material_data;       // @0x0
+        tPipe_face_material_data face_material_data;         // @0x0
+        tPipe_material_trans_data material_trans_data;       // @0x0
         tPipe_material_pixelmap_data material_pixelmap_data; // @0x0
-        tPipe_model_geometry_data model_geometry_data; // @0x0
-        tPipe_pedestrian_data pedestrian_data; // @0x0
-        tPipe_frame_boundary_data frame_boundary_data; // @0x0
-        tPipe_car_data car_data; // @0x0
-        tPipe_sound_data sound_data; // @0x0
-        tPipe_damage_data damage_data; // @0x0
-        tPipe_special_data special_data; // @0x0
-        tPipe_ped_gib_data ped_gib_data; // @0x0
-        tPipe_incident_data incident_data; // @0x0
-        tPipe_spark_data spark_data; // @0x0
-        tPipe_shrapnel_data shrapnel_data; // @0x0
-        tPipe_screen_shake_data screen_shake_data; // @0x0
-        tPipe_groove_stop_data groove_stop_data; // @0x0
-        tPipe_non_car_data non_car_data; // @0x0
-        tPipe_smoke_data smoke_data; // @0x0
-        tPipe_oil_spill_data oil_data; // @0x0
-        tPipe_smoke_column_data smoke_column_data; // @0x0
-        tPipe_flame_data flame_data; // @0x0
-        tPipe_smudge_data smudge_data; // @0x0
-        tPipe_splash_data splash_data; // @0x0
-        tPipe_prox_ray_data prox_ray_data; // @0x0
-        tPipe_skid_adjustment skid_adjustment; // @0x0
-    } chunk_data; // @0x4
+        tPipe_model_geometry_data model_geometry_data;       // @0x0
+        tPipe_pedestrian_data pedestrian_data;               // @0x0
+        tPipe_frame_boundary_data frame_boundary_data;       // @0x0
+        tPipe_car_data car_data;                             // @0x0
+        tPipe_sound_data sound_data;                         // @0x0
+        tPipe_damage_data damage_data;                       // @0x0
+        tPipe_special_data special_data;                     // @0x0
+        tPipe_ped_gib_data ped_gib_data;                     // @0x0
+        tPipe_incident_data incident_data;                   // @0x0
+        tPipe_spark_data spark_data;                         // @0x0
+        tPipe_shrapnel_data shrapnel_data;                   // @0x0
+        tPipe_screen_shake_data screen_shake_data;           // @0x0
+        tPipe_groove_stop_data groove_stop_data;             // @0x0
+        tPipe_non_car_data non_car_data;                     // @0x0
+        tPipe_smoke_data smoke_data;                         // @0x0
+        tPipe_oil_spill_data oil_data;                       // @0x0
+        tPipe_smoke_column_data smoke_column_data;           // @0x0
+        tPipe_flame_data flame_data;                         // @0x0
+        tPipe_smudge_data smudge_data;                       // @0x0
+        tPipe_splash_data splash_data;                       // @0x0
+        tPipe_prox_ray_data prox_ray_data;                   // @0x0
+        tPipe_skid_adjustment skid_adjustment;               // @0x0
+    } chunk_data;                                            // @0x4
 } tPipe_chunk;
 
 typedef struct tPipe_session {
@@ -3037,47 +3037,47 @@ typedef enum tFancy_stage {
     eFancy_stage_leaving = 4
 } tFancy_stage;
 
-typedef struct tHeadup { // size: 0x14c
-    tHeadup_type type; // @0x0
-    int x; // @0x4
-    int y; // @0x8
-    int original_x; // @0xc
-    int right_edge; // @0x10
-    int flash_period; // @0x14
-    int slot_index; // @0x18
-    int dimmed_background; // @0x1c
-    int dim_left; // @0x20
-    int dim_top; // @0x24
-    int dim_right; // @0x28
-    int dim_bottom; // @0x2c
-    int clever; // @0x30
-    int cockpit_anchored; // @0x34
-    int flash_state; // @0x38
-    tJustification justification; // @0x3c
-    tU32 end_time; // @0x40
-    tU32 last_flash; // @0x44
-    union { // size: 0x104
-        struct { // size: 0x104
-            char text[250]; // @0x0
-            int colour; // @0xfc
-            br_font* font; // @0x100
-        } text_info; // @0x0
-        struct { // size: 0x100
-            char text[250]; // @0x0
-            tDR_font* coloured_font; // @0xfc
-        } coloured_text_info; // @0x0
-        struct { // size: 0x4
-            br_pixelmap* image; // @0x0
-        } image_info; // @0x0
-        struct { // size: 0x18
-            br_pixelmap* image; // @0x0
-            int offset; // @0x4
-            int shear_amount; // @0x8
-            int end_offset; // @0xc
+typedef struct tHeadup {              // size: 0x14c
+    tHeadup_type type;                // @0x0
+    int x;                            // @0x4
+    int y;                            // @0x8
+    int original_x;                   // @0xc
+    int right_edge;                   // @0x10
+    int flash_period;                 // @0x14
+    int slot_index;                   // @0x18
+    int dimmed_background;            // @0x1c
+    int dim_left;                     // @0x20
+    int dim_top;                      // @0x24
+    int dim_right;                    // @0x28
+    int dim_bottom;                   // @0x2c
+    int clever;                       // @0x30
+    int cockpit_anchored;             // @0x34
+    int flash_state;                  // @0x38
+    tJustification justification;     // @0x3c
+    tU32 end_time;                    // @0x40
+    tU32 last_flash;                  // @0x44
+    union {                           // size: 0x104
+        struct {                      // size: 0x104
+            char text[250];           // @0x0
+            int colour;               // @0xfc
+            br_font* font;            // @0x100
+        } text_info;                  // @0x0
+        struct {                      // size: 0x100
+            char text[250];           // @0x0
+            tDR_font* coloured_font;  // @0xfc
+        } coloured_text_info;         // @0x0
+        struct {                      // size: 0x4
+            br_pixelmap* image;       // @0x0
+        } image_info;                 // @0x0
+        struct {                      // size: 0x18
+            br_pixelmap* image;       // @0x0
+            int offset;               // @0x4
+            int shear_amount;         // @0x8
+            int end_offset;           // @0xc
             tFancy_stage fancy_stage; // @0x10
-            tU32 start_time; // @0x14
-        } fancy_info; // @0x0
-    } data; // @0x48
+            tU32 start_time;          // @0x14
+        } fancy_info;                 // @0x0
+    } data;                           // @0x48
 } tHeadup;
 
 typedef struct tQueued_headup {
@@ -3381,26 +3381,26 @@ typedef struct tPed_choice {
 } tPed_choice;
 
 typedef struct tPedestrian_instruction { // size: 0x14
-    tPed_instruc_type type; // @0x0
-    union { // size: 0x10
-        struct { // size: 0x10
-            br_vector3 position; // @0x0
-            int irreversable; // @0xc
-        } point_data; // @0x0
-        struct { // size: 0xc
-            int number_of_choices; // @0x0
-            tPed_choice choices[2]; // @0x4
-        } choice_data; // @0x0
-        struct { // size: 0x4
-            int death_sequence; // @0x0
-        } death_data; // @0x0
-        struct { // size: 0x4
-            int marker_ref; // @0x0
-        } marker_data; // @0x0
-        struct { // size: 0x4
-            int action_index; // @0x0
-        } action_data; // @0x0
-    } data; // @0x4
+    tPed_instruc_type type;              // @0x0
+    union {                              // size: 0x10
+        struct {                         // size: 0x10
+            br_vector3 position;         // @0x0
+            int irreversable;            // @0xc
+        } point_data;                    // @0x0
+        struct {                         // size: 0xc
+            int number_of_choices;       // @0x0
+            tPed_choice choices[2];      // @0x4
+        } choice_data;                   // @0x0
+        struct {                         // size: 0x4
+            int death_sequence;          // @0x0
+        } death_data;                    // @0x0
+        struct {                         // size: 0x4
+            int marker_ref;              // @0x0
+        } marker_data;                   // @0x0
+        struct {                         // size: 0x4
+            int action_index;            // @0x0
+        } action_data;                   // @0x0
+    } data;                              // @0x4
 } tPedestrian_instruction;
 
 typedef struct tBearing_sequence {
@@ -3769,129 +3769,129 @@ typedef enum tScale_mode {
     eScale_mode_z = 3
 } tScale_mode;
 
-typedef struct tFunkotronic_spec { // size: 0xd8
-    int owner; // @0x0
-    br_material* material; // @0x4
-    tFunk_trigger_mode mode; // @0x8
-    tMatrix_mod_type matrix_mod_type; // @0xc
-    tMove_mode matrix_mode; // @0x10
-    union { // size: 0x18
-        struct { // size: 0x4
-            float period; // @0x0
-        } spin_info; // @0x0
-        struct { // size: 0x10
-            float period; // @0x0
-            br_scalar x_centre; // @0x4
-            br_scalar y_centre; // @0x8
-            float rock_angle; // @0xc
-        } rock_info; // @0x0
-        struct { // size: 0x18
-            float x_period; // @0x0
-            float y_period; // @0x4
-            br_scalar x_centre; // @0x8
-            br_scalar y_centre; // @0xc
-            float x_magnitude; // @0x10
-            float y_magnitude; // @0x14
-        } throb_info; // @0x0
-        struct { // size: 0x10
-            float x_period; // @0x0
-            float y_period; // @0x4
-            float x_magnitude; // @0x8
-            float y_magnitude; // @0xc
-        } slither_info; // @0x0
-        struct { // size: 0x8
-            float x_period; // @0x0
-            float y_period; // @0x4
-        } roll_info; // @0x0
-    } matrix_mod_data; // @0x14
-    tMove_mode lighting_animation_type; // @0x2c
-    float lighting_animation_period; // @0x30
-    float ambient_base; // @0x34
-    float ambient_delta; // @0x38
-    float direct_base; // @0x3c
-    float direct_delta; // @0x40
-    float specular_base; // @0x44
-    float specular_delta; // @0x48
+typedef struct tFunkotronic_spec {                  // size: 0xd8
+    int owner;                                      // @0x0
+    br_material* material;                          // @0x4
+    tFunk_trigger_mode mode;                        // @0x8
+    tMatrix_mod_type matrix_mod_type;               // @0xc
+    tMove_mode matrix_mode;                         // @0x10
+    union {                                         // size: 0x18
+        struct {                                    // size: 0x4
+            float period;                           // @0x0
+        } spin_info;                                // @0x0
+        struct {                                    // size: 0x10
+            float period;                           // @0x0
+            br_scalar x_centre;                     // @0x4
+            br_scalar y_centre;                     // @0x8
+            float rock_angle;                       // @0xc
+        } rock_info;                                // @0x0
+        struct {                                    // size: 0x18
+            float x_period;                         // @0x0
+            float y_period;                         // @0x4
+            br_scalar x_centre;                     // @0x8
+            br_scalar y_centre;                     // @0xc
+            float x_magnitude;                      // @0x10
+            float y_magnitude;                      // @0x14
+        } throb_info;                               // @0x0
+        struct {                                    // size: 0x10
+            float x_period;                         // @0x0
+            float y_period;                         // @0x4
+            float x_magnitude;                      // @0x8
+            float y_magnitude;                      // @0xc
+        } slither_info;                             // @0x0
+        struct {                                    // size: 0x8
+            float x_period;                         // @0x0
+            float y_period;                         // @0x4
+        } roll_info;                                // @0x0
+    } matrix_mod_data;                              // @0x14
+    tMove_mode lighting_animation_type;             // @0x2c
+    float lighting_animation_period;                // @0x30
+    float ambient_base;                             // @0x34
+    float ambient_delta;                            // @0x38
+    float direct_base;                              // @0x3c
+    float direct_delta;                             // @0x40
+    float specular_base;                            // @0x44
+    float specular_delta;                           // @0x48
     tTexture_animation_type texture_animation_type; // @0x4c
-    tAnimation_time_mode time_mode; // @0x50
-    float last_frame; // @0x54
-    union { // size: 0x78
-        struct { // size: 0x30
-            tMove_mode mode; // @0x0
-            float period; // @0x4
-            int texture_count; // @0x8
-            int current_frame; // @0xc
-            br_pixelmap* textures[8]; // @0x10
-        } frames_info; // @0x0
-        struct { // size: 0x78
-            tU8* flic_data; // @0x0
-            tU32 flic_data_length; // @0x4
-            tFlic_descriptor flic_descriptor; // @0x8
-        } flic_info; // @0x0
-    } texture_animation_data; // @0x58
-    int proximity_count; // @0xd0
-    br_vector3* proximity_array; // @0xd4
+    tAnimation_time_mode time_mode;                 // @0x50
+    float last_frame;                               // @0x54
+    union {                                         // size: 0x78
+        struct {                                    // size: 0x30
+            tMove_mode mode;                        // @0x0
+            float period;                           // @0x4
+            int texture_count;                      // @0x8
+            int current_frame;                      // @0xc
+            br_pixelmap* textures[8];               // @0x10
+        } frames_info;                              // @0x0
+        struct {                                    // size: 0x78
+            tU8* flic_data;                         // @0x0
+            tU32 flic_data_length;                  // @0x4
+            tFlic_descriptor flic_descriptor;       // @0x8
+        } flic_info;                                // @0x0
+    } texture_animation_data;                       // @0x58
+    int proximity_count;                            // @0xd0
+    br_vector3* proximity_array;                    // @0xd4
 } tFunkotronic_spec;
 
-typedef struct tGroovidelic_spec { // size: 0x80
-    int owner; // @0x0
-    int done_this_frame; // @0x4
-    br_actor* actor; // @0x8
-    tLollipop_mode lollipop_mode; // @0xc
-    tGroove_trigger_mode mode; // @0x10
-    tGroove_path_mode path_type; // @0x14
-    tMove_mode path_mode; // @0x18
-    tInterrupt_status path_interrupt_status; // @0x1c
-    float path_resumption_value; // @0x20
-    union { // size: 0x1c
-        struct { // size: 0x1c
-            float period; // @0x0
-            float x_delta; // @0x4
-            float y_delta; // @0x8
-            float z_delta; // @0xc
-            br_vector3 centre; // @0x10
-        } straight_info; // @0x0
-        struct { // size: 0x18
-            float period; // @0x0
-            float radius; // @0x4
-            br_vector3 centre; // @0x8
-            tGroove_axis_mode axis; // @0x14
-        } circular_info; // @0x0
-    } path_data; // @0x24
-    br_vector3 object_centre; // @0x40
-    br_vector3 object_position; // @0x4c
-    tGroove_object_mode object_type; // @0x58
-    tMove_mode object_mode; // @0x5c
+typedef struct tGroovidelic_spec {             // size: 0x80
+    int owner;                                 // @0x0
+    int done_this_frame;                       // @0x4
+    br_actor* actor;                           // @0x8
+    tLollipop_mode lollipop_mode;              // @0xc
+    tGroove_trigger_mode mode;                 // @0x10
+    tGroove_path_mode path_type;               // @0x14
+    tMove_mode path_mode;                      // @0x18
+    tInterrupt_status path_interrupt_status;   // @0x1c
+    float path_resumption_value;               // @0x20
+    union {                                    // size: 0x1c
+        struct {                               // size: 0x1c
+            float period;                      // @0x0
+            float x_delta;                     // @0x4
+            float y_delta;                     // @0x8
+            float z_delta;                     // @0xc
+            br_vector3 centre;                 // @0x10
+        } straight_info;                       // @0x0
+        struct {                               // size: 0x18
+            float period;                      // @0x0
+            float radius;                      // @0x4
+            br_vector3 centre;                 // @0x8
+            tGroove_axis_mode axis;            // @0x14
+        } circular_info;                       // @0x0
+    } path_data;                               // @0x24
+    br_vector3 object_centre;                  // @0x40
+    br_vector3 object_position;                // @0x4c
+    tGroove_object_mode object_type;           // @0x58
+    tMove_mode object_mode;                    // @0x5c
     tInterrupt_status object_interrupt_status; // @0x60
-    float object_resumption_value; // @0x64
-    union { // size: 0x18
-        struct { // size: 0x8
-            float period; // @0x0
-            tGroove_axis_mode axis; // @0x4
-        } spin_info; // @0x0
-        struct { // size: 0x10
-            float period; // @0x0
-            float max_angle; // @0x4
-            float current_angle; // @0x8
-            tGroove_axis_mode axis; // @0xc
-        } rock_info; // @0x0
-        struct { // size: 0x18
-            float x_period; // @0x0
-            float y_period; // @0x4
-            float z_period; // @0x8
-            float x_magnitude; // @0xc
-            float y_magnitude; // @0x10
-            float z_magnitude; // @0x14
-        } throb_info; // @0x0
-        struct { // size: 0x18
-            float x_period; // @0x0
-            float y_period; // @0x4
-            float z_period; // @0x8
-            float x_magnitude; // @0xc
-            float y_magnitude; // @0x10
-            float z_magnitude; // @0x14
-        } shear_info; // @0x0
-    } object_data; // @0x68
+    float object_resumption_value;             // @0x64
+    union {                                    // size: 0x18
+        struct {                               // size: 0x8
+            float period;                      // @0x0
+            tGroove_axis_mode axis;            // @0x4
+        } spin_info;                           // @0x0
+        struct {                               // size: 0x10
+            float period;                      // @0x0
+            float max_angle;                   // @0x4
+            float current_angle;               // @0x8
+            tGroove_axis_mode axis;            // @0xc
+        } rock_info;                           // @0x0
+        struct {                               // size: 0x18
+            float x_period;                    // @0x0
+            float y_period;                    // @0x4
+            float z_period;                    // @0x8
+            float x_magnitude;                 // @0xc
+            float y_magnitude;                 // @0x10
+            float z_magnitude;                 // @0x14
+        } throb_info;                          // @0x0
+        struct {                               // size: 0x18
+            float x_period;                    // @0x0
+            float y_period;                    // @0x4
+            float z_period;                    // @0x8
+            float x_magnitude;                 // @0xc
+            float y_magnitude;                 // @0x10
+            float z_magnitude;                 // @0x14
+        } shear_info;                          // @0x0
+    } object_data;                             // @0x68
 } tGroovidelic_spec;
 
 typedef struct DWORDREGS {

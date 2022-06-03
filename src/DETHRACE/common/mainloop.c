@@ -27,7 +27,7 @@
 #include "powerup.h"
 #include "pratcam.h"
 #include "replay.h"
-#include "s3/s3sound.h"
+#include "s3/s3.h"
 #include "skidmark.h"
 #include "sound.h"
 #include "spark.h"
@@ -195,7 +195,7 @@ void MungeHeadups() {
         if (gCountdown != new_countdown && new_countdown <= 5) {
             gCountdown = new_countdown;
             NewImageHeadupSlot(5, 0, 800, new_countdown + 4);
-            DRS3StartSound(gIndexed_outlets[4], gCountdown + 8000);
+            DRS3StartSound(gPedestrians_outlet, gCountdown + 8000);
             if (!new_countdown) {
                 MakeFlagWavingBastardWaveHisFlagWhichIsTheProbablyTheLastThingHeWillEverDo();
             }
@@ -251,7 +251,7 @@ void MungeHeadups() {
             if (the_time >= 500) {
                 bonus = gCurrent_race.bonus_score[gRace_over_reason][gProgram_state.skill_level];
                 sprintf(the_text, "%s %d", GetMiscString(22), bonus);
-                DRS3StartSound(gIndexed_outlets[4], 8015);
+                DRS3StartSound(gPedestrians_outlet, 8015);
                 ChangeHeadupText(gRace_bonus_headup, the_text);
                 gProgram_state.credits_earned += bonus;
                 gTime_bonus_state = eTime_bonus_race_bonus;
@@ -430,7 +430,7 @@ void CheckTimer() {
             time_left = gTimer + 500;
             time_in_seconds = (time_left) / 1000;
             if (time_in_seconds != last_time_in_seconds && time_in_seconds <= 10) {
-                DRS3StartSound(gIndexed_outlets[4], 1001);
+                DRS3StartSound(gPedestrians_outlet, 1001);
             }
             last_time_in_seconds = time_in_seconds;
         } else {
@@ -443,7 +443,7 @@ void CheckTimer() {
                 time_left = harness_game_config.demo_timeout - GetRaceTime();
                 time_in_seconds = (time_left + 500) / 1000;
                 if (time_in_seconds != last_demo_time_in_seconds && time_in_seconds <= 10)
-                    DRS3StartSound(gIndexed_outlets[4], 1001);
+                    DRS3StartSound(gPedestrians_outlet, 1001);
                 last_demo_time_in_seconds = time_in_seconds;
                 if (time_left <= 0) {
                     gTimer = 0;
