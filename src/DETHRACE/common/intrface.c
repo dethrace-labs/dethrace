@@ -517,7 +517,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
                 DRS3StartSound(gEffects_outlet, 3007);
                 RunFlic(pSpec->end_flic_otherwise);
             } else if (pSpec->end_flic_otherwise < 0) {
-                FadePaletteDown(pSpec->end_flic_otherwise);
+                FadePaletteDown();
             }
             goto LABEL_230;
         } else {
@@ -525,7 +525,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
                 DRS3StartSound(gEffects_outlet, 3007);
                 RunFlic(pSpec->end_flic_escaped);
             } else if (pSpec->end_flic_escaped < 0) {
-                FadePaletteDown(pSpec->end_flic_escaped);
+                FadePaletteDown();
             }
             goto LABEL_230;
         }
@@ -534,7 +534,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
         DRS3StartSound(gEffects_outlet, 3007);
         RunFlic(pSpec->end_flic_go_ahead);
     } else if (pSpec->end_flic_go_ahead < 0) {
-        FadePaletteDown(pSpec->end_flic_go_ahead);
+        FadePaletteDown();
     }
 
 LABEL_230:

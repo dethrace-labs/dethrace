@@ -345,7 +345,7 @@ int SummCheckGameOver(int* pCurrent_choice, int* pCurrent_mode) {
             2, -1);
         ProcessFlicQueue(gFrame_period);
         PDScreenBufferSwap(0);
-        SoundService(0);
+        SoundService();
         WaitFor(300);
         DrawInBox(
             gCurrent_graf_data->summ1_credits_box_left,
@@ -356,7 +356,7 @@ int SummCheckGameOver(int* pCurrent_choice, int* pCurrent_mode) {
             2, 0);
         ProcessFlicQueue(gFrame_period);
         PDScreenBufferSwap(0);
-        SoundService(0);
+        SoundService();
         WaitFor(300);
     }
     S3StopAllOutletSounds();
