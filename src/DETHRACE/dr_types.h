@@ -1251,48 +1251,48 @@ typedef struct tRoute_section {
     tU8 direction;
 } tRoute_section;
 
-typedef struct tOpponent_spec {
-    int index;
-    tOpponent_objective_type current_objective;
-    tCar_spec* car_spec;
-    float nastiness;
-    br_scalar distance_to_camera;
-    br_scalar distance_from_home;
-    br_scalar player_to_oppo_d;
-    br_vector3 start_pos;
-    br_vector3 start_direction;
-    br_vector3 pos_last_frame;
-    br_vector3 player_to_oppo_v;
-    tU32 next_out_of_world_check;
-    tU32 stun_time_ends;
-    tU32 next_player_visibility_check;
-    tU32 last_moved_ok;
-    tU32 last_in_view;
-    tU32 time_last_processed;
-    tU32 time_this_objective_started;
-    tU32 time_for_this_objective_to_finish;
-    tU32 cunting_buttfuck_timer;
-    tS16 players_section_when_last_calced_full_path;
-    int nnext_sections;
-    tRoute_section next_sections[10];
-    unsigned int new_objective_required : 1;
-    unsigned int finished_for_this_race : 1;
-    unsigned int knackeredness_detected : 1;
-    unsigned int physics_me : 1;
-    unsigned int pursue_from_start : 1;
-    unsigned int cheating : 1;
-    unsigned int last_cheating_value : 1;
-    unsigned int pursuing_player_before_freeze : 1;
-    unsigned int has_moved_at_some_point : 1;
-    unsigned int player_in_view_now : 1;
-    unsigned int acknowledged_piv : 1;
-    unsigned int murder_reported : 1;
-    tComplete_race_data complete_race_data;
-    tFollow_path_data follow_path_data;
-    tPursue_car_data pursue_car_data;
-    tLevitate_data levitate_data;
-    tRun_away_data run_away_data;
-    tReturn_to_start_data return_to_start_data;
+typedef struct tOpponent_spec {                      // size: 0x190
+    int index;                                       // @0x0
+    tOpponent_objective_type current_objective;      // @0x4
+    tCar_spec* car_spec;                             // @0x8
+    float nastiness;                                 // @0xc
+    br_scalar distance_to_camera;                    // @0x10
+    br_scalar distance_from_home;                    // @0x14
+    br_scalar player_to_oppo_d;                      // @0x18
+    br_vector3 start_pos;                            // @0x1c
+    br_vector3 start_direction;                      // @0x28
+    br_vector3 pos_last_frame;                       // @0x34
+    br_vector3 player_to_oppo_v;                     // @0x40
+    tU32 next_out_of_world_check;                    // @0x4c
+    tU32 stun_time_ends;                             // @0x50
+    tU32 next_player_visibility_check;               // @0x54
+    tU32 last_moved_ok;                              // @0x58
+    tU32 last_in_view;                               // @0x5c
+    tU32 time_last_processed;                        // @0x60
+    tU32 time_this_objective_started;                // @0x64
+    tU32 time_for_this_objective_to_finish;          // @0x68
+    tU32 cunting_buttfuck_timer;                     // @0x6c
+    tS16 players_section_when_last_calced_full_path; // @0x70
+    int nnext_sections;                              // @0x74
+    tRoute_section next_sections[10];                // @0x78
+    unsigned int new_objective_required : 1;         // @0xa0
+    unsigned int finished_for_this_race : 1;         // @0xa0
+    unsigned int knackeredness_detected : 1;         // @0xa0
+    unsigned int physics_me : 1;                     // @0xa0
+    unsigned int pursue_from_start : 1;              // @0xa0
+    unsigned int cheating : 1;                       // @0xa0
+    unsigned int last_cheating_value : 1;            // @0xa0
+    unsigned int pursuing_player_before_freeze : 1;  // @0xa0
+    unsigned int has_moved_at_some_point : 1;        // @0xa0
+    unsigned int player_in_view_now : 1;             // @0xa0
+    unsigned int acknowledged_piv : 1;               // @0xa0
+    unsigned int murder_reported : 1;                // @0xa0
+    tComplete_race_data complete_race_data;          // @0xa4
+    tFollow_path_data follow_path_data;              // @0xa8
+    tPursue_car_data pursue_car_data;                // @0x100
+    tLevitate_data levitate_data;                    // @0x170
+    tRun_away_data run_away_data;                    // @0x17c
+    tReturn_to_start_data return_to_start_data;      // @0x180
 } tOpponent_spec;
 
 typedef struct tIntelligent_vehicles {

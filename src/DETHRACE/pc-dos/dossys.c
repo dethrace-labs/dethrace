@@ -698,7 +698,7 @@ void PDEnterDebugger(char* pStr) {
     // FIXME: uses __CrtDbgReport when using MSVC runtime
     STUB_ONCE();
 
-    dr_dprintf("PDEnterDebugger(): %s");
+    dr_dprintf("PDEnterDebugger(): %s", pStr);
     // ShowCursor(1);
     abort();
     // ShowCursor(0);
