@@ -326,7 +326,7 @@ int DoMainMenuInterface(tU32 pTime_out, int pContinue_allowed) {
         if (result != 7 && result && result != 1 && result != 2) {
             RunFlic(12);
         } else {
-            FadePaletteDown(result);
+            FadePaletteDown();
         }
         switch (result) {
         case 0:
@@ -355,7 +355,7 @@ int DoMainMenuInterface(tU32 pTime_out, int pContinue_allowed) {
         if (result != 4 && result != -1) {
             RunFlic(32);
         } else {
-            FadePaletteDown(result);
+            FadePaletteDown();
         }
         switch (result) {
         case 0:

@@ -761,7 +761,7 @@ int S3ServiceChannel(tS3_channel* chan) {
     } else if (chan->type == eS3_ST_midi) {
         return !S3IsMIDIStopped(chan);
     } else if (chan->type == eS3_ST_cda) {
-        return S3IsCDAPlaying(chan);
+        return S3IsCDAPlaying();
     } else {
         return 0;
     }
