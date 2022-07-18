@@ -1800,8 +1800,8 @@ void RenderAFrame(int pDepth_mask_on) {
 void InitPaletteAnimate() {
     LOG_TRACE("()");
 
-    // dword_53E78C = 0;
-    // dword_53F930 = 0;
+    gLast_palette_change = 0;
+    gPalette_index = 0;
 }
 
 // IDA: void __cdecl RevertPalette()

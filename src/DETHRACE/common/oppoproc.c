@@ -62,14 +62,21 @@ static void StraightestArcForCorner(float* p1, float* p2, float* p3, br_vector3*
 // IDA: br_scalar __usercall CornerFudge@<ST0>(tCar_spec *pCar_spec@<EAX>)
 br_scalar CornerFudge(tCar_spec* pCar_spec) {
     LOG_TRACE("(%p)", pCar_spec);
-    NOT_IMPLEMENTED();
+
+    return 1.4f;
 }
 
 // IDA: br_scalar __usercall MaxCurvatureForCarSpeed@<ST0>(tCar_spec *pCar@<EAX>, br_scalar pSpeed)
 br_scalar MaxCurvatureForCarSpeed(tCar_spec* pCar, br_scalar pSpeed) {
     br_scalar curv;
     LOG_TRACE("(%p, %f)", pCar, pSpeed);
-    NOT_IMPLEMENTED();
+
+    if (pSpeed >= 12.5f) {
+        curv = pCar->maxcurve * 12.5f / pSpeed;
+    } else {
+        curv = pCar->maxcurve;
+    }
+    return curv;
 }
 
 // IDA: br_scalar __usercall Vector2Cross@<ST0>(br_vector2 *pA@<EAX>, br_vector2 *pB@<EDX>)
@@ -197,6 +204,7 @@ tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_o
     car_master_actor = car_spec->car_master_actor;
     if (pCommand == ePOC_start) {
         data->first_section_no = GetOpponentsFirstSection(pOpponent_spec);
+        data->section_no = data->first_section_no;
         dr_dprintf("%s: ProcessFollowPath() - new task started, first real section #%d", pOpponent_spec->car_spec->driver_name, GetOpponentsRealSection(pOpponent_spec, data->first_section_no));
         data->has_moved_during_this_task = 0;
         data->struggle_time = 0;
@@ -237,194 +245,195 @@ tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_o
             data->has_moved_during_this_task = 1;
             pOpponent_spec->has_moved_at_some_point = 1;
         }
-        if (data->struggle_time == 0) {
+        if (data->struggle_time) {
+            if (data->struggle_time + (data->number_of_struggles - 1) * 750 + 2750 >= gTime_stamp_for_this_munging) {
+                if (data->struggle_time + (data->number_of_struggles - 1) * 750 + 2000 >= gTime_stamp_for_this_munging) {
+                    car_spec->brake_force = 0.0;
+                    car_spec->acc_force = car_spec->M * -6.0;
+                } else {
+                    car_spec->acc_force = 0.0;
+                    car_spec->brake_force = car_spec->M * 15.0;
+                }
+                car_spec->curvature = 0.0;
+                return 0;
+            }
+            dr_dprintf("%s: done struggling. speed = %.2f m/s", pOpponent_spec->car_spec->driver_name, speed);
+            data->made_it = 0;
+            data->borrowed_time_start = gTime_stamp_for_this_munging;
+            data->struggle_time = 0;
+            data->last_finished_struggle_time = gTime_stamp_for_this_munging;
+            car_spec->brake_force = 0.0;
+            car_spec->acc_force = 0.0;
+        } else {
             if (pIgnore_end) {
-                if (!pNever_struggle && speed <= (pIgnore_end ? (.2f / 3.f) : .2f) && data->last_finished_struggle_time + 2000 < gTime_stamp_for_this_munging && pPursuit_mode && data->has_moved_during_this_task) {
-                    dr_dprintf("%s: 'Stopped,' section #%d, speed = %.2f m/s, about to start a-strugglin'", car_spec->driver_name, data->section_no, speed);
-                    data->struggle_time = gTime_stamp_for_this_munging;
-                    if (!pIgnore_end && data->section_no == data->last_struggle_section) {
-                        if (data->number_of_struggles > 2) {
-                            car_spec->acc_force = 0.f;
-                            car_spec->brake_force = 0.f;
-                            dr_dprintf("%s: Giving up trying to follow path 'cos we've struggled too much", car_spec->driver_name);
-                            return eFPR_given_up;
-                        }
-                        data->number_of_struggles++;
-                    } else {
-                        data->last_struggle_section = data->section_no;
-                        data->number_of_struggles = 0;
-                    }
-                }
+                stopped_speed = 0.06666667f;
             } else {
-                if (gTime_stamp_for_this_munging <= data->struggle_time + (data->number_of_struggles - 1) * 750 + 2750) {
-                    if (gTime_stamp_for_this_munging <= data->struggle_time + (data->number_of_struggles - 1) * 750 + 2000) {
-                        car_spec->acc_force = 0.f;
-                        car_spec->brake_force = 15.f * car_spec->M;
-                        car_spec->curvature = 0.f;
-                        return eFPR_OK;
-                    } else {
-                        car_spec->acc_force = 0.f;
-                        car_spec->brake_force = -6.f * car_spec->M;
-                        car_spec->curvature = 0.f;
-                        return eFPR_OK;
-                    }
-                }
-                dr_dprintf("%s: done struggling. speed = %.2f m/s", car_spec->driver_name, speed);
-                data->made_it = 0;
-                data->borrowed_time_start = gTime_stamp_for_this_munging;
-                data->struggle_time = 0;
-                data->last_finished_struggle_time = gTime_stamp_for_this_munging;
-                car_spec->brake_force = 0.f;
-                car_spec->acc_force = 0.f;
+                stopped_speed = 0.2f;
             }
-            BrVector3Sub(&car_to_end, &car_master_actor->t.t.translate.t, GetOpponentsSectionFinishNodePoint(pOpponent_spec, data->section_no));
-            car_to_end.v[1] = 0.f;
-            dist_to_end = BrVector3Length(&car_to_end) * WORLD_SCALE;
-            if (dist_to_end > 15.f) {
-                BrVector3Sub(&section_dir, GetOpponentsSectionFinishNodePoint(pOpponent_spec, data->section_no), GetOpponentsSectionStartNodePoint(pOpponent_spec, data->section_no));
-                BrVector3Normalise(&section_dir, &section_dir);
-                BrVector3Sub(&car_to_end, &car_master_actor->t.t.translate.t, GetOpponentsSectionStartNodePoint(pOpponent_spec, data->section_no));
-                pos_error_factor = BrVector3Dot(&section_dir, &car_to_end);
-                BrVector3Scale(&wank, &section_dir, pos_error_factor);
-                BrVector3Sub(&wank, &wank, &car_to_end);
-                wank.v[1] = 0.f;
-                pos_error = BrVector3Length(&wank) * WORLD_SCALE;
-                if (pos_error < 15.f) {
-                    pos_error_next = sqrtf(15.f * 15.f - pos_error * pos_error) / WORLD_SCALE;
-                    if (pos_error_next + pos_error_factor >= 0.f) {
-                        BrVector3Scale(&wank2, &section_dir, pos_error_next);
-                        wank2.v[1] = 0.f;
-                        BrVector3Accumulate(&wank, &wank2);
-                    } else {
-                        BrVector3Sub(&wank, GetOpponentsSectionStartNodePoint(pOpponent_spec, data->section_no), &car_master_actor->t.t.translate.t);
-                        error = BrVector3Length(&wank);
-                        BrVector3Scale(&wank, &wank, 15.f / error);
+            if (!pNever_struggle && stopped_speed >= speed && data->last_finished_struggle_time + 2000 < gTime_stamp_for_this_munging && (pPursuit_mode || data->has_moved_during_this_task)) {
+                dr_dprintf("%s: 'Stopped,' section #%d, speed = %.2f m/s, about to start a-strugglin'", pOpponent_spec->car_spec->driver_name, data->section_no, speed);
+                data->struggle_time = gTime_stamp_for_this_munging;
+                if (pIgnore_end || data->section_no != data->last_struggle_section) {
+                    data->last_struggle_section = data->section_no;
+                    data->number_of_struggles = 0;
+                } else {
+                    if (data->number_of_struggles >= 3) {
+                        car_spec->acc_force = 0.0f;
+                        car_spec->brake_force = 0.0f;
+                        dr_dprintf("%s: Giving up trying to follow path 'cos we've struggled too much", pOpponent_spec->car_spec->driver_name);
+                        return eFPR_given_up;
                     }
-                    pos_error = 15.f;
-                } else if (pos_error_factor < 0.f) {
+                    data->number_of_struggles++;
+                }
+            }
+        }
+
+        BrVector3Sub(&car_to_end, &car_master_actor->t.t.translate.t, GetOpponentsSectionFinishNodePoint(pOpponent_spec, data->section_no));
+        car_to_end.v[1] = 0.f;
+        dist_to_end = BrVector3Length(&car_to_end) * WORLD_SCALE;
+        if (dist_to_end > 15.f) {
+            BrVector3Sub(&section_dir, GetOpponentsSectionFinishNodePoint(pOpponent_spec, data->section_no), GetOpponentsSectionStartNodePoint(pOpponent_spec, data->section_no));
+            BrVector3Normalise(&section_dir, &section_dir);
+            BrVector3Sub(&car_to_end, &car_master_actor->t.t.translate.t, GetOpponentsSectionStartNodePoint(pOpponent_spec, data->section_no));
+            pos_error_factor = BrVector3Dot(&section_dir, &car_to_end);
+            BrVector3Scale(&wank, &section_dir, pos_error_factor);
+            BrVector3Sub(&wank, &wank, &car_to_end);
+            wank.v[1] = 0.f;
+            pos_error = BrVector3Length(&wank) * WORLD_SCALE;
+            if (pos_error < 15.f) {
+                pos_error_next = sqrtf(15.f * 15.f - pos_error * pos_error) / WORLD_SCALE;
+                if (pos_error_next + pos_error_factor >= 0.f) {
+                    BrVector3Scale(&wank2, &section_dir, pos_error_next);
+                    wank2.v[1] = 0.f;
+                    BrVector3Accumulate(&wank, &wank2);
+                } else {
                     BrVector3Sub(&wank, GetOpponentsSectionStartNodePoint(pOpponent_spec, data->section_no), &car_master_actor->t.t.translate.t);
-                    pos_error = BrVector3Length(&wank) * WORLD_SCALE;
-                    BrVector3Scale(&wank, &wank, 15.f / pos_error);
+                    error = BrVector3Length(&wank);
+                    BrVector3Scale(&wank, &wank, 15.f / error);
                 }
+                pos_error = 15.f;
+            } else if (pos_error_factor < 0.f) {
+                BrVector3Sub(&wank, GetOpponentsSectionStartNodePoint(pOpponent_spec, data->section_no), &car_master_actor->t.t.translate.t);
+                pos_error = BrVector3Length(&wank) * WORLD_SCALE;
+                BrVector3Scale(&wank, &wank, 15.f / pos_error);
             }
-            // 1 / BrVector3Length(&wank);
-            width = GetOpponentsSectionWidth(pOpponent_spec, data->section_no) * WORLD_SCALE;
-            if (!pIgnore_end && speed * 1.5f > dist_to_end) {
-                dr_dprintf("%s: ProcessFollowPath() - *** CHANGING SECTIONS ***", car_spec->driver_name);
-                dr_dprintf("%s: ProcessFollowPath() - current section %d(#%d)", car_spec->driver_name, data->section_no, GetOpponentsRealSection(pOpponent_spec, data->section_no));
-                data->section_no = GetOpponentsNextSection(pOpponent_spec, data->section_no);
-                if (data->section_no == -1) {
-                    car_spec->acc_force = 0.f;
-                    car_spec->brake_force = 0.f;
-                    dr_dprintf("%s: ProcessFollowPath() - reached end of path", car_spec->driver_name);
-                    return eFPR_end_of_path;
-                }
-                wank.v[1] = 0.f;
-                dr_dprintf("%s: ProcessFollowPath() - next section %d(#%d)", car_spec->driver_name, data->section_no, GetOpponentsRealSection(pOpponent_spec, data->section_no));
-                data->last_struggle_section = -1;
-                data->borrowed_time_start = gTime_stamp_for_this_munging;
-                data->made_it = 1;
-                data->last_distance = 0.f;
-            }
-            BrVector3Cross(&corner, &wank, (br_vector3*)car_master_actor->t.t.mat.m[2]);
-
-            first_straight = 0;
-            if (BrVector3Dot(&wank, (br_vector3*)car_master_actor->t.t.mat.m[2]) > 0.f && speed > 10.f) {
-                data->desired_speed = 6.f;
-                car_spec->curvature = 0.f;
-                first_straight = 1;
-            } else if ((corner.v[1] > 0.f && BrVector3Dot(&wank, (br_vector3*)car_master_actor->t.t.mat.m[2]) > 0.f) || GetOpponentsSectionWidth(pOpponent_spec, data->section_no) < corner.v[1]) {
-                car_spec->curvature = MaxCurvatureForCarSpeed(car_spec, speed);
-                data->desired_speed = 6.f;
-            } else if ((corner.v[1] < 0.f && BrVector3Dot(&wank, (br_vector3*)car_master_actor->t.t.mat.m[2]) > 0.f) || -GetOpponentsSectionWidth(pOpponent_spec, data->section_no) > corner.v[1]) {
-                car_spec->curvature = -MaxCurvatureForCarSpeed(car_spec, speed);
-                data->desired_speed = 6.f;
-            } else if (corner.v[1] > .5f * GetOpponentsSectionWidth(pOpponent_spec, data->section_no)) {
-                car_spec->curvature = 0.05f * MaxCurvatureForCarSpeed(car_spec, speed);
-                data->desired_speed = 80.f;
-            } else if (corner.v[1] < -.5f * GetOpponentsSectionWidth(pOpponent_spec, data->section_no)) {
-                car_spec->curvature = -0.05f * MaxCurvatureForCarSpeed(car_spec, speed);
-                data->desired_speed = 80.f;
-            } else {
-                car_spec->curvature = 0.f;
-                data->desired_speed = 80.f;
-            }
-            if (first_straight) {
-                car_spec->brake_force = 15.f * car_spec->M;
+        }
+        // 1 / BrVector3Length(&wank);
+        width = GetOpponentsSectionWidth(pOpponent_spec, data->section_no) * WORLD_SCALE;
+        if (!pIgnore_end && speed * 1.5f > dist_to_end) {
+            dr_dprintf("%s: ProcessFollowPath() - *** CHANGING SECTIONS ***", car_spec->driver_name);
+            dr_dprintf("%s: ProcessFollowPath() - current section %d(#%d)", car_spec->driver_name, data->section_no, GetOpponentsRealSection(pOpponent_spec, data->section_no));
+            data->section_no = GetOpponentsNextSection(pOpponent_spec, data->section_no);
+            if (data->section_no == -1) {
                 car_spec->acc_force = 0.f;
-                return eFPR_OK;
+                car_spec->brake_force = 0.f;
+                dr_dprintf("%s: ProcessFollowPath() - reached end of path", car_spec->driver_name);
+                return eFPR_end_of_path;
             }
-            if (GetOpponentsNextSection(pOpponent_spec, data->section_no) != -1) {
-                next_turning_radius = (car_master_actor->t.t.translate.t.v[2] * corner.v[0] - car_master_actor->t.t.translate.t.v[0] * corner.v[2])
-                    - (GetOpponentsSectionFinishNodePoint(pOpponent_spec, data->section_no)->v[2] * corner.v[0] - GetOpponentsSectionFinishNodePoint(pOpponent_spec, data->section_no)->v[0] * corner.v[2]);
-                next_corner_size = car_master_actor->t.t.mat.m[2][2] * corner.v[0] - car_master_actor->t.t.mat.m[2][0] * corner.v[2];
-                if (next_corner_size * next_turning_radius > 0.f) {
-                    speed_to_goal = 0.f;
-                    BrVector3Copy(&a, &car_master_actor->t.t.translate.t);
-                    BrVector3Scale(&p, (br_vector3*)car_master_actor->t.t.mat.m[2], -next_turning_radius / next_corner_size);
-                    BrVector3Sub(&p, &car_master_actor->t.t.translate.t, &p);
-                    real_section_no = data->section_no;
-                    section_no = 0;
-                    while (GetOpponentsNextSection(pOpponent_spec, real_section_no) != -1 && section_no < 4) {
-                        BrVector3Copy(&next, GetOpponentsSectionFinishNodePoint(pOpponent_spec, GetOpponentsNextSection(pOpponent_spec, real_section_no)));
-                        StraightestArcForCorner(&corner_speed, &corner_speed2, &pos_error, &a, &p, &next, &a, &p,
-                            GetOpponentsSectionWidth(pOpponent_spec, data->section_no), GetOpponentsSectionWidth(pOpponent_spec, GetOpponentsNextSection(pOpponent_spec, data->section_no)));
-                        pos_error *= WORLD_SCALE;
-                        speed_to_goal += pos_error;
-                        if (speed_to_goal > speed * (1.5f + speed / 24.f)) {
-                            break;
-                        }
-                        corner_speed *= WORLD_SCALE;
-                        corner_speed2 *= WORLD_SCALE;
-                        stopping_distance = 10.f * corner_speed * CornerFudge(car_spec) * CornerFudge(car_spec);
-                        desired_speed = sqrtf(stopping_distance);
-                        if (desired_speed > GetOpponentsSectionMaxSpeed(pOpponent_spec, data->section_no, 1)) {
-                            desired_speed = sqrtf(GetOpponentsSectionMaxSpeed(pOpponent_spec, data->section_no, 1));
-                            stopping_distance = desired_speed * desired_speed;
-                        }
-                        if (speed_to_goal - corner_speed2 < desired_speed * 1.5f * (speed * speed - stopping_distance) / 24.f
-                            && data->desired_speed > desired_speed) {
-                            data->desired_speed = desired_speed;
-                        }
-                        BrVector3Copy(&a, &p);
-                        BrVector3Copy(&p, &next);
-                    }
-                }
-            }
-            effective_speed_factor = CAR_SPEC_GET_SPEED_FACTOR(car_spec);
-            max_acc = MAX(effective_speed_factor, 1.f);
-            if (engine_damage > 50 && engine_damage <= 97) {
-                max_acc -= (engine_damage - 50) * .0125f;
-            } else if (engine_damage > 97) {
-                max_acc -= .6f;
-            }
-            if (trans_damage > 50 && trans_damage <= 97) {
-                max_acc -= (trans_damage - 50) * .00625f;
-            } else if (trans_damage > 97) {
-                max_acc -= .3f;
-            }
-            max_acc *= 10.f;
+            wank.v[1] = 0.f;
+            dr_dprintf("%s: ProcessFollowPath() - next section %d(#%d)", car_spec->driver_name, data->section_no, GetOpponentsRealSection(pOpponent_spec, data->section_no));
+            data->last_struggle_section = -1;
+            data->borrowed_time_start = gTime_stamp_for_this_munging;
+            data->made_it = 1;
+            data->last_distance = 0.f;
+        }
+        BrVector3Cross(&corner, &wank, (br_vector3*)car_master_actor->t.t.mat.m[2]);
 
-            error = data->desired_speed * effective_speed_factor - speed;
-            acc = (error - data->prev_acc_error) * 1000.f / gFrame_period_for_this_munging * .1f + error + data->prev_acc;
-            if (acc > max_acc) {
-                acc = max_acc;
-            }
-            if (acc < -max_acc) {
-                acc = -max_acc;
-            }
-            data->prev_acc = acc;
-            data->prev_acc_error = error;
-
-            car_spec->acc_force = MAX(car_spec->M * acc, 0.f);
-            car_spec->brake_force = -MIN(car_spec->M * acc, 0.f);
+        first_straight = 0;
+        if (BrVector3Dot(&wank, (br_vector3*)car_master_actor->t.t.mat.m[2]) > 0.f && speed > 10.f) {
+            data->desired_speed = 6.f;
+            car_spec->curvature = 0.f;
+            first_straight = 1;
+        } else if ((corner.v[1] > 0.f && BrVector3Dot(&wank, (br_vector3*)car_master_actor->t.t.mat.m[2]) > 0.f) || GetOpponentsSectionWidth(pOpponent_spec, data->section_no) < corner.v[1]) {
+            car_spec->curvature = MaxCurvatureForCarSpeed(car_spec, speed);
+            data->desired_speed = 6.f;
+        } else if ((corner.v[1] < 0.f && BrVector3Dot(&wank, (br_vector3*)car_master_actor->t.t.mat.m[2]) > 0.f) || -GetOpponentsSectionWidth(pOpponent_spec, data->section_no) > corner.v[1]) {
+            car_spec->curvature = -MaxCurvatureForCarSpeed(car_spec, speed);
+            data->desired_speed = 6.f;
+        } else if (corner.v[1] > .5f * GetOpponentsSectionWidth(pOpponent_spec, data->section_no)) {
+            car_spec->curvature = 0.05f * MaxCurvatureForCarSpeed(car_spec, speed);
+            data->desired_speed = 80.f;
+        } else if (corner.v[1] < -.5f * GetOpponentsSectionWidth(pOpponent_spec, data->section_no)) {
+            car_spec->curvature = -0.05f * MaxCurvatureForCarSpeed(car_spec, speed);
+            data->desired_speed = 80.f;
+        } else {
+            car_spec->curvature = 0.f;
+            data->desired_speed = 80.f;
+        }
+        if (first_straight) {
+            car_spec->brake_force = 15.f * car_spec->M;
+            car_spec->acc_force = 0.f;
             return eFPR_OK;
         }
+        if (GetOpponentsNextSection(pOpponent_spec, data->section_no) != -1) {
+            next_turning_radius = (car_master_actor->t.t.translate.t.v[2] * corner.v[0] - car_master_actor->t.t.translate.t.v[0] * corner.v[2])
+                - (GetOpponentsSectionFinishNodePoint(pOpponent_spec, data->section_no)->v[2] * corner.v[0] - GetOpponentsSectionFinishNodePoint(pOpponent_spec, data->section_no)->v[0] * corner.v[2]);
+            next_corner_size = car_master_actor->t.t.mat.m[2][2] * corner.v[0] - car_master_actor->t.t.mat.m[2][0] * corner.v[2];
+            if (next_corner_size * next_turning_radius > 0.f) {
+                speed_to_goal = 0.f;
+                BrVector3Copy(&a, &car_master_actor->t.t.translate.t);
+                BrVector3Scale(&p, (br_vector3*)car_master_actor->t.t.mat.m[2], -next_turning_radius / next_corner_size);
+                BrVector3Sub(&p, &car_master_actor->t.t.translate.t, &p);
+                real_section_no = data->section_no;
+                section_no = 0;
+                while (GetOpponentsNextSection(pOpponent_spec, real_section_no) != -1 && section_no < 4) {
+                    BrVector3Copy(&next, GetOpponentsSectionFinishNodePoint(pOpponent_spec, GetOpponentsNextSection(pOpponent_spec, real_section_no)));
+                    StraightestArcForCorner(&corner_speed, &corner_speed2, &pos_error, &a, &p, &next, &a, &p,
+                        GetOpponentsSectionWidth(pOpponent_spec, data->section_no), GetOpponentsSectionWidth(pOpponent_spec, GetOpponentsNextSection(pOpponent_spec, data->section_no)));
+                    pos_error *= WORLD_SCALE;
+                    speed_to_goal += pos_error;
+                    if (speed_to_goal > speed * (1.5f + speed / 24.f)) {
+                        break;
+                    }
+                    corner_speed *= WORLD_SCALE;
+                    corner_speed2 *= WORLD_SCALE;
+                    stopping_distance = 10.f * corner_speed * CornerFudge(car_spec) * CornerFudge(car_spec);
+                    desired_speed = sqrtf(stopping_distance);
+                    if (desired_speed > GetOpponentsSectionMaxSpeed(pOpponent_spec, data->section_no, 1)) {
+                        desired_speed = sqrtf(GetOpponentsSectionMaxSpeed(pOpponent_spec, data->section_no, 1));
+                        stopping_distance = desired_speed * desired_speed;
+                    }
+                    if (speed_to_goal - corner_speed2 < desired_speed * 1.5f * (speed * speed - stopping_distance) / 24.f
+                        && data->desired_speed > desired_speed) {
+                        data->desired_speed = desired_speed;
+                    }
+                    BrVector3Copy(&a, &p);
+                    BrVector3Copy(&p, &next);
+                }
+            }
+        }
+        effective_speed_factor = CAR_SPEC_GET_SPEED_FACTOR(car_spec);
+        max_acc = MAX(effective_speed_factor, 1.f);
+        if (engine_damage > 50 && engine_damage <= 97) {
+            max_acc -= (engine_damage - 50) * .0125f;
+        } else if (engine_damage > 97) {
+            max_acc -= .6f;
+        }
+        if (trans_damage > 50 && trans_damage <= 97) {
+            max_acc -= (trans_damage - 50) * .00625f;
+        } else if (trans_damage > 97) {
+            max_acc -= .3f;
+        }
+        max_acc *= 10.f;
+
+        error = data->desired_speed * effective_speed_factor - speed;
+        acc = (error - data->prev_acc_error) * 1000.f / gFrame_period_for_this_munging * .1f + error + data->prev_acc;
+        if (acc > max_acc) {
+            acc = max_acc;
+        }
+        if (acc < -max_acc) {
+            acc = -max_acc;
+        }
+        data->prev_acc = acc;
+        data->prev_acc_error = error;
+
+        car_spec->acc_force = MAX(car_spec->M * acc, 0.f);
+        car_spec->brake_force = -MIN(car_spec->M * acc, 0.f);
+        return eFPR_OK;
     } else {
         BrFatal("C:\\Msdev\\Projects\\DethRace\\OPPOPROC.C", 1420, "C:\\Msdev\\Projects\\DethRace\\OPPOPROC.C line %d");
         return eFPR_OK;
     }
-    NOT_IMPLEMENTED();
 }
 
 // IDA: tFollow_path_result __usercall FollowCheatyPath@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>)
