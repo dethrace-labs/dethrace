@@ -9,7 +9,7 @@ endif()
 set(DETHRACE_IDE_ARGUMENTS "" CACHE STRING "DethRace arguments (only used by MSVC when debugging")
 set(DETHRACE_IDE_ROOT_DIR "" CACHE PATH "DethRace rootdir (only used by MSVC when debugging)")
 
-set(CMAKE_POSITION_INDEPENDENT_CODE OFF)
+# set(CMAKE_POSITION_INDEPENDENT_CODE OFF)
 
 project(dethrace C)
 
@@ -22,7 +22,6 @@ find_package(SDL2 REQUIRED)
 add_subdirectory(lib/libsmacker)
 add_subdirectory(lib/glad)
 add_subdirectory(lib/miniaudio)
-add_subdirectory(lib/cglm EXCLUDE_FROM_ALL)
 
 add_subdirectory(src/harness)
 add_subdirectory(src/S3)
