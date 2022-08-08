@@ -15,10 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <SDL.h>
-
-extern int
-PDGetTotalTime();
+extern int PDGetTotalTime();
 
 int gS3_enabled;
 int gS3_noutlets;

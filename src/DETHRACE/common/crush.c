@@ -474,7 +474,27 @@ void KnackerThisCar(tCar_spec* pCar) {
 // IDA: void __usercall SetKnackeredFlag(tCar_spec *pCar@<EAX>)
 void SetKnackeredFlag(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    if (gNet_mode != eNet_mode_client
+        && !pCar->knackered
+        && (pCar->damage_units[eDamage_engine].damage_level >= 99
+            || pCar->damage_units[eDamage_transmission].damage_level >= 99
+            || pCar->damage_units[eDamage_driver].damage_level >= 99
+            || (pCar->damage_units[eDamage_lf_wheel].damage_level >= 99
+                && pCar->damage_units[eDamage_rf_wheel].damage_level >= 99
+                && pCar->damage_units[eDamage_lr_wheel].damage_level >= 99
+                && pCar->damage_units[eDamage_rr_wheel].damage_level >= 99))) {
+        KnackerThisCar(pCar);
+        if (gNet_mode == eNet_mode_none) {
+            if (IRandomBetween(0, 1)) {
+                if (gNet_mode == eNet_mode_none) {
+                    StopCarSmoking(pCar);
+                    CreateSmokeColumn(pCar, 0, IRandomBetween(0, 11), 20000);
+                }
+            }
+            CreateSmokeColumn(pCar, 0, IRandomBetween(0, 11), 180000);
+        }
+    }
 }
 
 // IDA: void __usercall DamageUnit2(tCar_spec *pCar@<EAX>, int pUnit_type@<EDX>, int pDamage_amount@<EBX>)
@@ -557,11 +577,10 @@ void CheckPiledriverBonus(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3
             norm_child.v[1] = 0.f;
             if (BrVector3Dot(&norm_child, &norm_impact) > 0.8f && BrVector3Dot(&norm_energy, &norm_child) < -.65) {
                 DoFancyHeadup(kFancyHeadupPileDriverBonus);
-                EarnCredits(((GetPedestrianValue(child) / 2 + 12) / 25 ) * 25);
+                EarnCredits(((GetPedestrianValue(child) / 2 + 12) / 25) * 25);
                 return;
             }
         }
-
     }
 }
 

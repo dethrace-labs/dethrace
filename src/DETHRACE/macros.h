@@ -13,6 +13,7 @@
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define CONSTRAIN_BETWEEN(lowerbound, upperbound, val) (MIN((upperbound), MAX((lowerbound), (val))))
 
 #define COUNT_OF(array) (sizeof((array)) / sizeof((array)[0]))
 #define LEN(array) (sizeof((array)) / sizeof((array)[0]))
