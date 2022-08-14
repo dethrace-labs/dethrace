@@ -196,13 +196,12 @@ int PointVisibleFromHere(br_vector3* pFrom, br_vector3* pTo) {
     br_material* material;
     LOG_TRACE("(%p, %p)", pFrom, pTo);
 
-    BrVector3Set(&dir,
-        pTo->v[0] - pFrom->v[0],
-        pTo->v[0] - pFrom->v[0] + 0.15f,
-        pTo->v[2] - pFrom->v[2]);
-    BrVector3Copy(&from, pFrom);
+    BrVector3Sub(&dir, pTo, pFrom);
+    from = *pFrom;
+    from.v[1] += 0.15f;
+    dir.v[1] += 0.15f;
     FindFace(&from, &dir, &norm, &t, &material);
-    return t > 1.f;
+    return t > 1.0;
 }
 
 // IDA: tS16 __usercall FindNearestPathNode@<AX>(br_vector3 *pActor_coords@<EAX>, br_scalar *pDistance@<EDX>)
