@@ -27,6 +27,7 @@ int force_nullrenderer = 0;
 extern unsigned int GetTotalTime();
 extern uint8_t gScan_code[123][2];
 extern br_v1db_state v1db;
+extern uint32_t gI_am_cheating;
 
 // SplatPack or Carmageddon. This is where we represent the code differences between the two. For example, the intro smack file.
 tHarness_game_info harness_game_info;
@@ -258,6 +259,9 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
             char* s = strstr(argv[i], "=");
             harness_game_config.demo_timeout = atoi(s + 1) * 1000;
             LOG_INFO("Demo timeout set to %d milliseconds", harness_game_config.demo_timeout);
+            handled = 1;
+        } else if (strcasecmp(argv[i], "--i-am-cheating") == 0) {
+            gI_am_cheating = 0xa11ee75d;
             handled = 1;
         }
 
