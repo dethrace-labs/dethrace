@@ -843,7 +843,8 @@ void SmokeLine(int l, int x, br_scalar zbuff, int r_squared, tU8* scr_ptr, tU16*
     shade_offset_int = shade_offset * 65536.0f;
     for (i = 0; i < l; i++) {
         if (*depth_ptr > z) {
-            *scr_ptr = shade_ptr[*scr_ptr + (((shade_offset_int - r_multiplier_int * r_squared) >> 8) & 0xffffff00)];
+            tU8 tmp = shade_ptr[*scr_ptr + (((shade_offset_int - r_multiplier_int * r_squared) >> 8) & 0xffffff00)];
+            *scr_ptr = tmp;
         }
         r_squared += x;
         scr_ptr++;
@@ -929,7 +930,11 @@ void SmokeCircle(br_vector3* o, br_scalar r, br_scalar extra_z, br_scalar streng
         depth_ptr += inc;
         gOffset = 0;
         while (1) {
+
             x = inc + gOffset;
+            if (x < min_x) {
+                LOG_WARN("x is less than min_x");
+            }
             if (min_x <= inc + gOffset && l + x - 1 <= max_x) {
                 line(l, inc, zbuff, r_squared, scr_ptr, depth_ptr, shade_ptr, r_multiplier, z_multiplier, shade_offset);
             } else {
@@ -1416,7 +1421,7 @@ void GenerateSmokeShades() {
 // IDA: void __cdecl GenerateItFoxShadeTable()
 void GenerateItFoxShadeTable() {
     LOG_TRACE("()");
-    
+
     if (gIt_shade_table == NULL) {
         gIt_shade_table = GenerateDarkenedShadeTable(16, gRender_palette, 0, 255, 254, .25f, .5f, .75f, .6f);
     }

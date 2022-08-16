@@ -467,13 +467,12 @@ void TopUpRandomRoute(tOpponent_spec* pOpponent_spec, int pSections_to_add) {
         PDEnterDebugger("TopUpRandomRoute() called with no seed (woof, bark, etc.)");
     }
     if (pSections_to_add >= 0) {
-        target = MAX(10, pSections_to_add + pOpponent_spec->nnext_sections);
+        target = MIN(pSections_to_add + pOpponent_spec->nnext_sections, 10);
     } else {
         target = 10;
     }
     while (pOpponent_spec->nnext_sections < target) {
-        node_no = gProgram_state.AI_vehicles.path_sections[pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].section_no]
-                      .node_indices[pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].direction];
+        node_no = gProgram_state.AI_vehicles.path_sections[pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].section_no].node_indices[pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].direction];
         if (gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections <= 1) {
             section_no = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].section_no;
             direction = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].direction == 0;
@@ -531,6 +530,7 @@ int SearchForSection(tRoute_section* pTemp_store, tRoute_section* pPerm_store, i
         return 0;
     }
     node_no = gProgram_state.AI_vehicles.path_sections[pTemp_store[pDepth - 1].section_no].node_indices[pTemp_store[pDepth - 1].direction];
+    printf("SFS(depth=%d, node_no=%d)\n", pDepth, node_no);
     node_ptr = &gProgram_state.AI_vehicles.path_nodes[node_no];
     gBit_per_node[node_no / 8] |= 1 << (node_no % 8);
     for (section_no_index = 0; section_no_index < node_ptr->number_of_sections; section_no_index++) {
@@ -562,15 +562,16 @@ int SearchForSection(tRoute_section* pTemp_store, tRoute_section* pPerm_store, i
                 memcpy(pPerm_store, pTemp_store, sizeof(tRoute_section) * *pNum_of_perm_store_sections);
                 // dword_530DD4 = ++routes_found
                 routes_found++;
+                LOG_DEBUG("found route");
                 if (routes_found >= 2) {
                     return 1;
                 }
                 break;
+            }
 
-                if (pDepth < 9
-                    && SearchForSection(pTemp_store, pPerm_store, pNum_of_perm_store_sections, pTarget_section, pDepth + 1, distance_so_far, pOpponent_spec)) {
-                    return 1;
-                }
+            if (pDepth < 9
+                && SearchForSection(pTemp_store, pPerm_store, pNum_of_perm_store_sections, pTarget_section, pDepth + 1, distance_so_far, pOpponent_spec)) {
+                return 1;
             }
         }
     }

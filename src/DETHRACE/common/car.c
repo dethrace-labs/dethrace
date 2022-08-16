@@ -11,6 +11,7 @@
 #include "finteray.h"
 #include "globvars.h"
 #include "globvrkm.h"
+#include "globvrme.h"
 #include "globvrpb.h"
 #include "graphics.h"
 #include "harness/config.h"
@@ -143,7 +144,8 @@ void DamageUnitWithSmoke(tCar_spec* pCar, int pUnit_type, int pDamage_amount) {
 void DamageEngine(int pDamage_amount) {
     LOG_TRACE("(%d)", pDamage_amount);
 
-    DamageUnitWithSmoke(&gProgram_state.current_car, eDamage_engine, pDamage_amount);
+    // DamageUnitWithSmoke(&gProgram_state.current_car, eDamage_engine, pDamage_amount);
+    DamageUnitWithSmoke(gProgram_state.AI_vehicles.opponents[0].car_spec, eDamage_engine, pDamage_amount);
 }
 
 // IDA: void __usercall DamageTrans(int pDamage_amount@<EAX>)
@@ -4423,7 +4425,24 @@ void ViewNetPlayer() {
 void ViewOpponent() {
     static int n;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    n++;
+    if (gNet_mode) {
+        if (n >= gNumber_of_net_players) {
+            n = 0;
+        }
+        gCar_to_view = gNet_players[n].car;
+        NewTextHeadupSlot(4, 0, 2000, -3, gNet_players[n].player_name);
+    } else {
+        if (n >= gNum_viewable_cars) {
+            n = 0;
+        }
+        gCar_to_view = gViewable_car_list[n];
+        NewTextHeadupSlot(4, 0, 2000, -3, gViewable_car_list[n]->driver_name);
+    }
+    gCamera_yaw = 0;
+    InitialiseExternalCamera();
+    PositionExternalCamera(gCar_to_view, 200u);
 }
 
 // IDA: void __cdecl ToggleCarToCarCollisions()
