@@ -64,4 +64,30 @@
 
 #define BR_ASIZE(a) (sizeof(a) / sizeof((a)[0]))
 
+#if defined(__m68k__) || defined(__ppc__)
+
+#define BR_ENDIAN_BIG 1
+#define BR_ENDIAN_LITTLE 0
+
+#else
+
+#define BR_ENDIAN_BIG 0
+#define BR_ENDIAN_LITTLE 1
+
+#endif
+
+#if BR_ENDIAN_BIG
+
+#define BrHtoNL(x) (x)
+#define BrHtoNS(x) (x)
+#define BrHtoNF(x) (x)
+
+#else
+
+#define BrHtoNL(x) BrSwap32(x)
+#define BrHtoNS(x) BrSwap16(x)
+#define BrHtoNF(x) BrSwapFloat(x)
+
+#endif
+
 #endif /* BR_DEFS_H */

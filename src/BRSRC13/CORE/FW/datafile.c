@@ -9,6 +9,32 @@
 #include "CORE/STD/brstdlib.h"
 #include "harness/trace.h"
 
+#if BR_ENDIAN_BIG
+
+#define BR_HTON_32(b) (b)
+#define BR_HTON_16(b) (b)
+#define BR_HTON_F(b) (b)
+#define BR_HTON_D(b) (b)
+
+#define BR_NTOH_32(b) (b)
+#define BR_NTOH_16(b) (b)
+#define BR_NTOH_F(b) (b)
+#define BR_NTOH_D(b) (b)
+
+#else
+
+#define BR_HTON_32(b) (3-(b))
+#define BR_HTON_16(b) (1-(b))
+#define BR_HTON_F(b) (3-(b))
+#define BR_HTON_D(b) (7-(b))
+
+#define BR_NTOH_32(b) (3-(b))
+#define BR_NTOH_16(b) (1-(b))
+#define BR_NTOH_F(b) (3-(b))
+#define BR_NTOH_D(b) (7-(b))
+
+#endif
+
 br_file_primitives _BrFilePrimsNull = {
     "NULL",
     (int (*)(br_datafile*, br_uint_32)) & BrNullOther,
@@ -384,36 +410,36 @@ br_uint_32 DfStructWriteBinary(br_datafile* df, br_file_struct* str, void* base)
         case DF_TYPE_BR_INT_16:
         case DF_TYPE_BR_UINT_16:
         case DF_TYPE_ENUM_16:
-            BrFilePutChar(((br_uint_8*)mp)[1], df->h);
-            BrFilePutChar(((br_uint_8*)mp)[0], df->h);
+            BrFilePutChar(mp[BR_HTON_16(0)], df->h);
+            BrFilePutChar(mp[BR_HTON_16(1)], df->h);
             break;
         case DF_TYPE_BR_INT_32:
         case DF_TYPE_BR_UINT_32:
         case DF_TYPE_ENUM_32:
-            BrFilePutChar(((br_uint_8*)mp)[3], df->h);
-            BrFilePutChar(((br_uint_8*)mp)[2], df->h);
-            BrFilePutChar(((br_uint_8*)mp)[1], df->h);
-            BrFilePutChar(((br_uint_8*)mp)[0], df->h);
+            BrFilePutChar(mp[BR_HTON_32(0)], df->h);
+            BrFilePutChar(mp[BR_HTON_32(1)], df->h);
+            BrFilePutChar(mp[BR_HTON_32(2)], df->h);
+            BrFilePutChar(mp[BR_HTON_32(3)], df->h);
             break;
         case DF_TYPE_FLOAT:
         case DF_TYPE_BR_FRACTION_F:
         case DF_TYPE_BR_UFRACTION_F:
             conv.f = *(float*)mp;
-            BrFilePutChar(conv.b[3], df->h);
-            BrFilePutChar(conv.b[2], df->h);
-            BrFilePutChar(conv.b[1], df->h);
-            BrFilePutChar(conv.b[0], df->h);
+            BrFilePutChar(conv.b[BR_HTON_32(0)], df->h);
+            BrFilePutChar(conv.b[BR_HTON_32(1)], df->h);
+            BrFilePutChar(conv.b[BR_HTON_32(2)], df->h);
+            BrFilePutChar(conv.b[BR_HTON_32(3)], df->h);
             break;
         case DF_TYPE_DOUBLE:
             conv.d = *(double*)mp;
-            BrFilePutChar(conv.b[7], df->h);
-            BrFilePutChar(conv.b[6], df->h);
-            BrFilePutChar(conv.b[5], df->h);
-            BrFilePutChar(conv.b[4], df->h);
-            BrFilePutChar(conv.b[3], df->h);
-            BrFilePutChar(conv.b[2], df->h);
-            BrFilePutChar(conv.b[1], df->h);
-            BrFilePutChar(conv.b[0], df->h);
+            BrFilePutChar(conv.b[BR_HTON_D(0)], df->h);
+            BrFilePutChar(conv.b[BR_HTON_D(1)], df->h);
+            BrFilePutChar(conv.b[BR_HTON_D(2)], df->h);
+            BrFilePutChar(conv.b[BR_HTON_D(3)], df->h);
+            BrFilePutChar(conv.b[BR_HTON_D(4)], df->h);
+            BrFilePutChar(conv.b[BR_HTON_D(5)], df->h);
+            BrFilePutChar(conv.b[BR_HTON_D(6)], df->h);
+            BrFilePutChar(conv.b[BR_HTON_D(7)], df->h);
             break;
         case DF_TYPE_STRUCT:
             DfStructWriteBinary(df, sm->extra, mp);
@@ -425,30 +451,30 @@ br_uint_32 DfStructWriteBinary(br_datafile* df, br_file_struct* str, void* base)
             BrFilePutChar('\0', df->h);
             break;
         case DF_TYPE_BR_COLOUR:
-            BrFilePutChar(((br_uint_8*)mp)[2], df->h);
-            BrFilePutChar(((br_uint_8*)mp)[1], df->h);
-            BrFilePutChar(((br_uint_8*)mp)[0], df->h);
+            BrFilePutChar(mp[BR_HTON_32(1)], df->h);
+            BrFilePutChar(mp[BR_HTON_32(2)], df->h);
+            BrFilePutChar(mp[BR_HTON_32(3)], df->h);
             break;
         case DF_TYPE_BR_FIXED:
             conv.f = BrFixedToFloat(*(br_fixed_ls*)mp);
-            BrFilePutChar(conv.b[3], df->h);
-            BrFilePutChar(conv.b[2], df->h);
-            BrFilePutChar(conv.b[1], df->h);
-            BrFilePutChar(conv.b[0], df->h);
+            BrFilePutChar(conv.b[BR_HTON_32(0)], df->h);
+            BrFilePutChar(conv.b[BR_HTON_32(1)], df->h);
+            BrFilePutChar(conv.b[BR_HTON_32(2)], df->h);
+            BrFilePutChar(conv.b[BR_HTON_32(3)], df->h);
             break;
         case DF_TYPE_BR_FRACTION_X:
             conv.f = BrFixedFractionToFloat(*(br_fraction_x*)mp);
-            BrFilePutChar(conv.b[3], df->h);
-            BrFilePutChar(conv.b[2], df->h);
-            BrFilePutChar(conv.b[1], df->h);
-            BrFilePutChar(conv.b[0], df->h);
+            BrFilePutChar(conv.b[BR_HTON_32(0)], df->h);
+            BrFilePutChar(conv.b[BR_HTON_32(1)], df->h);
+            BrFilePutChar(conv.b[BR_HTON_32(2)], df->h);
+            BrFilePutChar(conv.b[BR_HTON_32(3)], df->h);
             break;
         case DF_TYPE_BR_UFRACTION_X:
             conv.f = BrFixedUFractionToFloat(*(br_fraction_x*)mp);
-            BrFilePutChar(conv.b[3], df->h);
-            BrFilePutChar(conv.b[2], df->h);
-            BrFilePutChar(conv.b[1], df->h);
-            BrFilePutChar(conv.b[0], df->h);
+            BrFilePutChar(conv.b[BR_HTON_32(0)], df->h);
+            BrFilePutChar(conv.b[BR_HTON_32(1)], df->h);
+            BrFilePutChar(conv.b[BR_HTON_32(2)], df->h);
+            BrFilePutChar(conv.b[BR_HTON_32(3)], df->h);
             break;
         case DF_TYPE_BR_VECTOR2_X:
             n = 2;
@@ -461,10 +487,10 @@ br_uint_32 DfStructWriteBinary(br_datafile* df, br_file_struct* str, void* base)
         copy_fixed_vector:
             for (i = 0; i < n; i++) {
                 conv.f = BrFixedToFloat(*(br_fixed_ls*)mp);
-                BrFilePutChar(conv.b[3], df->h);
-                BrFilePutChar(conv.b[2], df->h);
-                BrFilePutChar(conv.b[1], df->h);
-                BrFilePutChar(conv.b[0], df->h);
+                BrFilePutChar(conv.b[BR_HTON_32(0)], df->h);
+                BrFilePutChar(conv.b[BR_HTON_32(1)], df->h);
+                BrFilePutChar(conv.b[BR_HTON_32(2)], df->h);
+                BrFilePutChar(conv.b[BR_HTON_32(3)], df->h);
                 mp += sizeof(br_fixed_ls);
             }
             break;
@@ -479,10 +505,10 @@ br_uint_32 DfStructWriteBinary(br_datafile* df, br_file_struct* str, void* base)
         copy_float_vector:
             for (i = 0; i < n; i++) {
                 conv.f = *(float*)mp;
-                BrFilePutChar(conv.b[3], df->h);
-                BrFilePutChar(conv.b[2], df->h);
-                BrFilePutChar(conv.b[1], df->h);
-                BrFilePutChar(conv.b[0], df->h);
+                BrFilePutChar(conv.b[BR_HTON_32(0)], df->h);
+                BrFilePutChar(conv.b[BR_HTON_32(1)], df->h);
+                BrFilePutChar(conv.b[BR_HTON_32(2)], df->h);
+                BrFilePutChar(conv.b[BR_HTON_32(3)], df->h);
                 mp += sizeof(br_fixed_ls);
             }
             break;
@@ -524,8 +550,8 @@ br_uint_32 DfStructReadBinary(br_datafile* df, br_file_struct* str, void* base) 
         case DF_TYPE_BR_UINT_16:
         case DF_TYPE_BR_ANGLE:
         case DF_TYPE_ENUM_16:
-            mp[1] = BrFileGetChar(df->h);
-            mp[0] = BrFileGetChar(df->h);
+            mp[BR_NTOH_16(0)] = BrFileGetChar(df->h);
+            mp[BR_NTOH_16(1)] = BrFileGetChar(df->h);
             break;
         case DF_TYPE_BR_INT_32:
         case DF_TYPE_BR_UINT_32:
@@ -533,27 +559,27 @@ br_uint_32 DfStructReadBinary(br_datafile* df, br_file_struct* str, void* base) 
         case DF_TYPE_ENUM_32:
         case DF_TYPE_BR_FRACTION_F:
         case DF_TYPE_BR_UFRACTION_F:
-            mp[3] = BrFileGetChar(df->h);
-            mp[2] = BrFileGetChar(df->h);
-            mp[1] = BrFileGetChar(df->h);
-            mp[0] = BrFileGetChar(df->h);
+            mp[BR_NTOH_32(0)] = BrFileGetChar(df->h);
+            mp[BR_NTOH_32(1)] = BrFileGetChar(df->h);
+            mp[BR_NTOH_32(2)] = BrFileGetChar(df->h);
+            mp[BR_NTOH_32(3)] = BrFileGetChar(df->h);
             break;
         case DF_TYPE_BR_FIXED:
-            conv.b[3] = BrFileGetChar(df->h);
-            conv.b[2] = BrFileGetChar(df->h);
-            conv.b[1] = BrFileGetChar(df->h);
-            conv.b[0] = BrFileGetChar(df->h);
+            conv.b[BR_NTOH_F(0)] = BrFileGetChar(df->h);
+            conv.b[BR_NTOH_F(1)] = BrFileGetChar(df->h);
+            conv.b[BR_NTOH_F(2)] = BrFileGetChar(df->h);
+            conv.b[BR_NTOH_F(3)] = BrFileGetChar(df->h);
             *(br_fixed_ls*)mp = BrFloatToFixed(conv.f);
             break;
         case DF_TYPE_DOUBLE:
-            conv.b[7] = BrFileGetChar(df->h);
-            conv.b[6] = BrFileGetChar(df->h);
-            conv.b[5] = BrFileGetChar(df->h);
-            conv.b[4] = BrFileGetChar(df->h);
-            conv.b[3] = BrFileGetChar(df->h);
-            conv.b[2] = BrFileGetChar(df->h);
-            conv.b[1] = BrFileGetChar(df->h);
-            conv.b[0] = BrFileGetChar(df->h);
+            conv.b[BR_NTOH_D(0)] = BrFileGetChar(df->h);
+            conv.b[BR_NTOH_D(1)] = BrFileGetChar(df->h);
+            conv.b[BR_NTOH_D(2)] = BrFileGetChar(df->h);
+            conv.b[BR_NTOH_D(3)] = BrFileGetChar(df->h);
+            conv.b[BR_NTOH_D(4)] = BrFileGetChar(df->h);
+            conv.b[BR_NTOH_D(5)] = BrFileGetChar(df->h);
+            conv.b[BR_NTOH_D(6)] = BrFileGetChar(df->h);
+            conv.b[BR_NTOH_D(7)] = BrFileGetChar(df->h);
             *(double*)mp = conv.d;
             break;
         case DF_TYPE_STRUCT:
@@ -570,22 +596,22 @@ br_uint_32 DfStructReadBinary(br_datafile* df, br_file_struct* str, void* base) 
             *(char**)mp = (char*)BrResStrDup(df->res ? df->res : fw.res, tmp_string);
             break;
         case DF_TYPE_BR_COLOUR:
-            mp[2] = BrFileGetChar(df->h);
-            mp[1] = BrFileGetChar(df->h);
-            mp[0] = BrFileGetChar(df->h);
+            mp[BR_NTOH_32(1)] = BrFileGetChar(df->h);
+            mp[BR_NTOH_32(2)] = BrFileGetChar(df->h);
+            mp[BR_NTOH_32(3)] = BrFileGetChar(df->h);
             break;
         case DF_TYPE_BR_FRACTION_X:
-            conv.b[3] = BrFileGetChar(df->h);
-            conv.b[2] = BrFileGetChar(df->h);
-            conv.b[1] = BrFileGetChar(df->h);
-            conv.b[0] = BrFileGetChar(df->h);
+            conv.b[BR_NTOH_F(0)] = BrFileGetChar(df->h);
+            conv.b[BR_NTOH_F(1)] = BrFileGetChar(df->h);
+            conv.b[BR_NTOH_F(2)] = BrFileGetChar(df->h);
+            conv.b[BR_NTOH_F(3)] = BrFileGetChar(df->h);
             *((br_fraction_x*)mp) = BrFloatToFixedFraction(conv.f);
             break;
         case DF_TYPE_BR_UFRACTION_X:
-            conv.b[3] = BrFileGetChar(df->h);
-            conv.b[2] = BrFileGetChar(df->h);
-            conv.b[1] = BrFileGetChar(df->h);
-            conv.b[0] = BrFileGetChar(df->h);
+            conv.b[BR_NTOH_F(0)] = BrFileGetChar(df->h);
+            conv.b[BR_NTOH_F(1)] = BrFileGetChar(df->h);
+            conv.b[BR_NTOH_F(2)] = BrFileGetChar(df->h);
+            conv.b[BR_NTOH_F(3)] = BrFileGetChar(df->h);
             *(br_ufraction_x*)mp = BrFloatToFixedUFraction(conv.f);
             break;
         case DF_TYPE_BR_VECTOR2_X:
@@ -598,10 +624,10 @@ br_uint_32 DfStructReadBinary(br_datafile* df, br_file_struct* str, void* base) 
             n = 4;
         copy_fixed_vector:
             for (i = 0; i < n; i++) {
-                conv.b[3] = BrFileGetChar(df->h);
-                conv.b[2] = BrFileGetChar(df->h);
-                conv.b[1] = BrFileGetChar(df->h);
-                conv.b[0] = BrFileGetChar(df->h);
+                conv.b[BR_NTOH_F(0)] = BrFileGetChar(df->h);
+                conv.b[BR_NTOH_F(1)] = BrFileGetChar(df->h);
+                conv.b[BR_NTOH_F(2)] = BrFileGetChar(df->h);
+                conv.b[BR_NTOH_F(3)] = BrFileGetChar(df->h);
                 *(br_fixed_ls*)mp = BrFloatToFixed(conv.f);
                 mp += sizeof(br_fixed_ls);
             }
@@ -618,10 +644,10 @@ br_uint_32 DfStructReadBinary(br_datafile* df, br_file_struct* str, void* base) 
             n = 4;
         copy_float_vector:
             for (i = 0; i < n; i++) {
-                conv.b[3] = BrFileGetChar(df->h);
-                conv.b[2] = BrFileGetChar(df->h);
-                conv.b[1] = BrFileGetChar(df->h);
-                conv.b[0] = BrFileGetChar(df->h);
+                conv.b[BR_NTOH_F(0)] = BrFileGetChar(df->h);
+                conv.b[BR_NTOH_F(1)] = BrFileGetChar(df->h);
+                conv.b[BR_NTOH_F(2)] = BrFileGetChar(df->h);
+                conv.b[BR_NTOH_F(3)] = BrFileGetChar(df->h);
                 *(float*)mp = conv.f;
                 mp += sizeof(float);
             }
@@ -1142,9 +1168,9 @@ int DfChunkWriteBinary(br_datafile* df, br_uint_32 id, br_uint_32 length) {
     br_uint_32 l;
     LOG_TRACE("(%p, %d, %d)", df, id, length);
 
-    l = BrSwap32(id);
+    l = BrHtoNL(id);
     BrFileWrite(&l, sizeof(br_uint_32), 1, df->h);
-    l = BrSwap32(length);
+    l = BrHtoNL(length);
     BrFileWrite(&l, sizeof(br_uint_32), 1, df->h);
     return 0;
 }
@@ -1162,13 +1188,13 @@ int DfChunkReadBinary(br_datafile* df, br_uint_32* plength) {
     if (BrFileEof(df->h) != 0) {
         return -1;
     }
-    id = BrSwap32(id);
+    id = BrHtoNL(id);
     BrFileRead(&l, sizeof(br_uint_32), 1, df->h);
     if (BrFileEof(df->h) != 0) {
         return -1;
     }
     if (plength != NULL) {
-        *plength = BrSwap32(l);
+        *plength = BrHtoNL(l);
     }
     return id;
 }
@@ -1197,7 +1223,7 @@ br_uint_32 DfCountReadText(br_datafile* df) {
 void DfCountWriteBinary(br_datafile* df, br_uint_32 count) {
     br_uint_32 l;
 
-    l = BrSwap32(count);
+    l = BrHtoNL(count);
     BrFileWrite(&l, sizeof(l), 1, df->h);
 }
 
@@ -1207,7 +1233,7 @@ br_uint_32 DfCountReadBinary(br_datafile* df) {
     LOG_TRACE9("(%p)", df);
 
     BrFileRead(&l, sizeof(br_uint_32), 1, df->h);
-    return BrSwap32(l);
+    return BrHtoNL(l);
 }
 
 // IDA: int __usercall DfCountSizeText@<EAX>(br_datafile *df@<EAX>)
@@ -1247,12 +1273,18 @@ int DfBlockWriteText(br_datafile* df, void* base, int block_size, int block_stri
         block_count = 1;
     }
     block = base;
+#if !BR_ENDIAN_BIG
     if ((size != 1) || (block_count != 1)) {
+#else
+    if (block_count != 1) {
+#endif
         block = BrScratchAllocate(block_count * block_size * size);
         for (count = 0; count < block_count; count++) {
             BrMemCpy(block + count * block_size * size, (br_uint_8*)base + count * block_stride * size, block_size * size);
         }
+#if !BR_ENDIAN_BIG
         BrSwapBlock(block, block_count * block_size, size);
+#endif
     }
     BrFilePrintf(df->h, "  block %d\n", block_count * block_size);
     BrFilePrintf(df->h, "  size %d\n", size);
@@ -1320,7 +1352,9 @@ void* DfBlockReadText(br_datafile* df, void* base, int* count, int size, int mty
             a++;
         }
     }
+#if !BR_ENDIAN_BIG
     BrSwapBlock(base, l, size);
+#endif
     return base;
 }
 
@@ -1332,19 +1366,25 @@ int DfBlockWriteBinary(br_datafile* df, void* base, int block_size, int block_st
     void* block;
     LOG_TRACE("(%p, %p, %d, %d, %d, %d)", df, base, block_size, block_stride, block_count, size);
 
-    l = BrSwap32(block_count * block_size);
-    s = BrSwap32(size);
+    l = BrHtoNL(block_count * block_size);
+    s = BrHtoNL(size);
     if (block_stride == block_size) {
         block_size = block_count * block_size;
         block_count = 1;
     }
     block = base;
+#if !BR_ENDIAN_BIG
     if ((size != 1) || (block_count != 1)) {
+#else
+    if (block_count != 1) {
+#endif
         block = BrScratchAllocate(block_count * block_size * size);
         for (count = 0; count < block_count; count++) {
             BrMemCpy((br_uint_8*)block + count * block_size * size, (br_uint_8*)base + count * block_stride * size, block_size * size);
         }
+#if !BR_ENDIAN_BIG
         BrSwapBlock(block, block_count * block_size, size);
+#endif
     }
     BrFileWrite(&l, sizeof(l), 1, df->h);
     BrFileWrite(&s, sizeof(s), 1, df->h);
@@ -1362,9 +1402,9 @@ void* DfBlockReadBinary(br_datafile* df, void* base, int* count, int size, int m
     LOG_TRACE9("(%p, %p, %p, %d, %d)", df, base, count, size, mtype);
 
     BrFileRead(&l, 4, 1, df->h);
-    l = BrSwap32(l);
+    l = BrHtoNL(l);
     BrFileRead(&s, 4, 1, df->h);
-    s = BrSwap32(s);
+    s = BrHtoNL(s);
     if (s != size) {
         BrFailure("block size mismatch");
     }
@@ -1377,7 +1417,9 @@ void* DfBlockReadBinary(br_datafile* df, void* base, int* count, int size, int m
     }
     *count = l;
     BrFileRead(base, l, size, df->h);
+#if !BR_ENDIAN_BIG
     BrSwapBlock(base, l, size);
+#endif
     return base;
 }
 
