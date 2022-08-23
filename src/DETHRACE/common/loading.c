@@ -133,6 +133,9 @@ tU32 ReadU32(FILE* pF) {
     LOG_TRACE("(%p)", pF);
 
     fread(&raw_long, sizeof(raw_long), 1, pF);
+#if BR_ENDIAN_BIG
+    raw_long = BrSwap32(raw_long);
+#endif
     return raw_long;
 }
 
@@ -142,6 +145,9 @@ tU16 ReadU16(FILE* pF) {
     LOG_TRACE("(%p)", pF);
 
     fread(&raw_short, sizeof(raw_short), 1, pF);
+#if BR_ENDIAN_BIG
+    raw_short = BrSwap16(raw_short);
+#endif
     return raw_short;
 }
 
@@ -160,6 +166,9 @@ tS32 ReadS32(FILE* pF) {
     LOG_TRACE("(%p)", pF);
 
     fread(&raw_long, sizeof(raw_long), 1, pF);
+#if BR_ENDIAN_BIG
+    raw_long = BrSwap32(raw_long);
+#endif
     return raw_long;
 }
 
@@ -169,6 +178,9 @@ tS16 ReadS16(FILE* pF) {
     LOG_TRACE("(%p)", pF);
 
     fread(&raw_short, sizeof(raw_short), 1, pF);
+#if BR_ENDIAN_BIG
+    raw_short = BrSwap16(raw_short);
+#endif
     return raw_short;
 }
 
@@ -187,6 +199,9 @@ void WriteU32L(FILE* pF, tU32 pNumber) {
     LOG_TRACE("(%p, %d)", pF, pNumber);
 
     raw_long = pNumber;
+#if BR_ENDIAN_BIG
+    raw_long = BrSwap32(raw_long);
+#endif
     fwrite(&raw_long, sizeof(raw_long), 1, pF);
 }
 
@@ -196,6 +211,9 @@ void WriteU16L(FILE* pF, tU16 pNumber) {
     LOG_TRACE("(%p, %d)", pF, pNumber);
 
     raw_short = pNumber;
+#if BR_ENDIAN_BIG
+    raw_short = BrSwap16(raw_short);
+#endif
     fwrite(&raw_short, sizeof(raw_short), 1, pF);
 }
 
@@ -214,6 +232,9 @@ void WriteS32L(FILE* pF, tS32 pNumber) {
     LOG_TRACE("(%p, %d)", pF, pNumber);
 
     raw_long = pNumber;
+#if BR_ENDIAN_BIG
+    raw_long = BrSwap32(raw_long);
+#endif
     fwrite(&raw_long, sizeof(raw_long), 1, pF);
 }
 
@@ -223,6 +244,9 @@ void WriteS16L(FILE* pF, tS16 pNumber) {
     LOG_TRACE("(%p, %d)", pF, pNumber);
 
     raw_short = pNumber;
+#if BR_ENDIAN_BIG
+    raw_short = BrSwap16(raw_short);
+#endif
     fwrite(&raw_short, sizeof(raw_short), 1, pF);
 }
 
@@ -247,6 +271,9 @@ tU32 MemReadU32(char** pPtr) {
     tU32 raw_long;
 
     memcpy(&raw_long, *pPtr, sizeof(raw_long));
+#if BR_ENDIAN_BIG
+    raw_long = BrSwap32(raw_long);
+#endif
     *pPtr += sizeof(raw_long);
     return raw_long;
 }
@@ -256,6 +283,9 @@ tU16 MemReadU16(char** pPtr) {
     tU16 raw_short;
 
     memcpy(&raw_short, *pPtr, sizeof(raw_short));
+#if BR_ENDIAN_BIG
+    raw_short = BrSwap16(raw_short);
+#endif
     *pPtr += sizeof(raw_short);
     return raw_short;
 }
@@ -275,6 +305,9 @@ tS32 MemReadS32(char** pPtr) {
     LOG_TRACE("(%p)", pPtr);
 
     memcpy(&raw_long, *pPtr, sizeof(raw_long));
+#if BR_ENDIAN_BIG
+    raw_long = BrSwap32(raw_long);
+#endif
     *pPtr += sizeof(raw_long);
     return raw_long;
 }
@@ -284,6 +317,9 @@ tS16 MemReadS16(char** pPtr) {
     tS16 raw_short;
 
     memcpy(&raw_short, *pPtr, sizeof(raw_short));
+#if BR_ENDIAN_BIG
+    raw_short = BrSwap16(raw_short);
+#endif
     *pPtr += sizeof(raw_short);
     return raw_short;
 }
@@ -2674,6 +2710,7 @@ br_font* LoadBRFont(char* pName) {
 
     // we read 0x18 bytes as that is the size of the struct in 32 bit code.
     fread(the_font, 0x18, 1, f);
+#if !BR_ENDIAN_BIG
     the_font->flags = BrSwap32(the_font->flags);
 
     // swap endianness
@@ -2681,6 +2718,7 @@ br_font* LoadBRFont(char* pName) {
     the_font->glyph_y = the_font->glyph_y >> 8 | the_font->glyph_y << 8;
     the_font->spacing_x = the_font->spacing_x >> 8 | the_font->spacing_x << 8;
     the_font->spacing_y = the_font->spacing_y >> 8 | the_font->spacing_y << 8;
+#endif
 
     data_size = sizeof(br_int_8) * 256;
     the_font->width = BrMemAllocate(data_size, kMem_br_font_wid);
@@ -2688,12 +2726,16 @@ br_font* LoadBRFont(char* pName) {
     data_size = sizeof(br_uint_16) * 256;
     the_font->encoding = BrMemAllocate(data_size, kMem_br_font_enc);
     fread(the_font->encoding, data_size, 1u, f);
+#if !BR_ENDIAN_BIG
     for (i = 0; i < 256; i++) {
         the_font->encoding[i] = the_font->encoding[i] >> 8 | the_font->encoding[i] << 8;
     }
+#endif
     PossibleService();
     fread(&data_size, sizeof(tU32), 1u, f);
+#if !BR_ENDIAN_BIG
     data_size = BrSwap32(data_size);
+#endif
     PossibleService();
     the_font->glyphs = BrMemAllocate(data_size, kMem_br_font_glyphs);
     fread(the_font->glyphs, data_size, 1u, f);

@@ -109,9 +109,15 @@ int S3ReadWavHeader(char* buf, tWAVEFORMATEX_** pWav_format, char** data_ptr, in
         return 0;
     }
     memcpy(&riff_len, &buf[4], sizeof(riff_len)); // (int32_t)buf[4];
+#if BR_ENDIAN_BIG
+    riff_len = BrSwap32(riff_len);
+#endif
     file_eof = &chunk_ptr[riff_len - 4];
     while (file_eof > chunk_ptr) {
         memcpy(&chunk_len, chunk_ptr + 4, sizeof(chunk_len));
+#if BR_ENDIAN_BIG
+        chunk_len = BrSwap32(chunk_len);
+#endif
         chunk_data = chunk_ptr + 8;
         if (strncmp(chunk_ptr, "fmt ", 4) == 0) {
             if (pWav_format && *pWav_format == NULL) {
@@ -185,6 +191,11 @@ void* S3LoadWavFile(char* pFile_name, tS3_sample* pSample) {
     pSample->rate = wav_format->nSamplesPerSec;
     pSample->resolution = wav_format->nAvgBytesPerSec;
     pSample->channels = wav_format->nChannels;
+#if BR_ENDIAN_BIG
+    pSample->rate = BrSwap32(pSample->rate);
+    pSample->resolution = BrSwap32(pSample->resolution);
+    pSample->channels = BrSwap32(pSample->channels);
+#endif
 
     ma_sound* sound = malloc(sizeof(ma_sound));
     // TOOD: load from memory - we've already read the file data

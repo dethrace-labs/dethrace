@@ -831,10 +831,17 @@ void DoColourMap(tFlic_descriptor_ptr pFlic_info, tU32 chunk_length) {
             blue = MemReadU8(&pFlic_info->data);
             green = MemReadU8(&pFlic_info->data);
             // argb
+#if BR_ENDIAN_BIG
+            palette_pixels[3] = green * 4;
+            palette_pixels[2] = blue * 4;
+            palette_pixels[1] = red * 4;
+            palette_pixels[0] = 0;
+#else
             palette_pixels[0] = green * 4;
             palette_pixels[1] = blue * 4;
             palette_pixels[2] = red * 4;
             palette_pixels[3] = 0;
+#endif
             palette_pixels += 4;
         }
         if (!gPalette_fuck_prevention) {
@@ -909,10 +916,17 @@ void DoColour256(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
             blue = MemReadU8(&pFlic_info->data);
             green = MemReadU8(&pFlic_info->data);
             // argb
+#if BR_ENDIAN_BIG
+            palette_pixels[3] = green;
+            palette_pixels[2] = blue;
+            palette_pixels[1] = red;
+            palette_pixels[0] = 0;
+#else
             palette_pixels[0] = green;
             palette_pixels[1] = blue;
             palette_pixels[2] = red;
             palette_pixels[3] = 0;
+#endif
             palette_pixels += 4;
             // LOG_DEBUG("color %d", current_colour);
         }
