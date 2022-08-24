@@ -27,11 +27,9 @@ int gSave_allowed;
 
 #define SAVEGAME_VERSION 6
 
-// FIXME: not big/endian proof (build system should switch between this and a nop)
-//  ==> use TestBigEndian.cmake or CMAKE_C_BYTE_ORDER
 #define SWAP32_BE(V)       \
     do {                   \
-        (V) = BrSwap32(V); \
+        (V) = BrHtoNL(V); \
     } while (0)
 
 // IDA: void __usercall CorrectLoadByteOrdering(int pIndex@<EAX>)
