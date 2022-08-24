@@ -17,6 +17,15 @@ option(BUILD_TESTS "Build unit tests." OFF)
 
 find_package(SDL2 REQUIRED)
 
+include(TestBigEndian)
+test_big_endian(IS_BIGENDIAN)
+
+if (IS_BIGENDIAN)
+    add_compile_definitions(BR_ENDIAN_BIG=1)
+else()
+    add_compile_definitions(BR_ENDIAN_LITTLE=1)
+endif()
+
 add_subdirectory(lib/libsmacker)
 add_subdirectory(lib/glad)
 add_subdirectory(lib/miniaudio)
