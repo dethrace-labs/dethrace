@@ -932,9 +932,6 @@ void SmokeCircle(br_vector3* o, br_scalar r, br_scalar extra_z, br_scalar streng
         while (1) {
 
             x = inc + gOffset;
-            if (x < min_x) {
-                LOG_WARN("x is less than min_x");
-            }
             if (min_x <= inc + gOffset && l + x - 1 <= max_x) {
                 line(l, inc, zbuff, r_squared, scr_ptr, depth_ptr, shade_ptr, r_multiplier, z_multiplier, shade_offset);
             } else {

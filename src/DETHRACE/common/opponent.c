@@ -530,7 +530,6 @@ int SearchForSection(tRoute_section* pTemp_store, tRoute_section* pPerm_store, i
         return 0;
     }
     node_no = gProgram_state.AI_vehicles.path_sections[pTemp_store[pDepth - 1].section_no].node_indices[pTemp_store[pDepth - 1].direction];
-    printf("SFS(depth=%d, node_no=%d)\n", pDepth, node_no);
     node_ptr = &gProgram_state.AI_vehicles.path_nodes[node_no];
     gBit_per_node[node_no / 8] |= 1 << (node_no % 8);
     for (section_no_index = 0; section_no_index < node_ptr->number_of_sections; section_no_index++) {
