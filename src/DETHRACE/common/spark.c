@@ -841,16 +841,16 @@ void SmokeLine(int l, int x, br_scalar zbuff, int r_squared, tU8* scr_ptr, tU16*
     z = (1.0 - zbuff) * 32768.0f;
     r_multiplier_int = r_multiplier * 65536.0f;
     shade_offset_int = shade_offset * 65536.0f;
+
     for (i = 0; i < l; i++) {
         if (*depth_ptr > z) {
-            tU8 tmp = shade_ptr[*scr_ptr + (((shade_offset_int - r_multiplier_int * r_squared) >> 8) & 0xffffff00)];
-            *scr_ptr = tmp;
+            *scr_ptr = shade_ptr[*scr_ptr + (((shade_offset_int - r_squared * r_multiplier_int) >> 8) & 0xffffff00)];
         }
-        r_squared += x;
+        r_multiplier = x + r_squared;
         scr_ptr++;
-        depth_ptr++;
         x++;
-        r_squared += x;
+        depth_ptr++;
+        r_squared = x + r_multiplier;
     }
 }
 

@@ -607,12 +607,12 @@ tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_o
 tFollow_path_result FollowCheatyPath(tOpponent_spec* pOpponent_spec) {
     tFollow_path_data* data;
     br_vector3 a;
-    br_vector3 p;                //
-    br_vector3 section_v;        //
-    br_vector3 car_to_end;       //
-    br_vector3 car_to_intersect; //
-    br_vector3* start;           //
-    br_vector3* finish;          //
+    br_vector3 p;
+    br_vector3 section_v;
+    br_vector3 car_to_end;
+    br_vector3 car_to_intersect;
+    br_vector3* start;
+    br_vector3* finish;
     br_scalar t;
     br_scalar frame_period_in_secs;
     br_scalar distance_left;
@@ -630,231 +630,105 @@ tFollow_path_result FollowCheatyPath(tOpponent_spec* pOpponent_spec) {
         data->cheating = pOpponent_spec->cheating;
         if (data->cheating) {
             dr_dprintf("%s: Dematerialising", pOpponent_spec->car_spec->driver_name);
-            section_v.v[0] = finish->v[0] - start->v[0];
-            section_v.v[1] = finish->v[1] - start->v[1];
-            section_v.v[2] = finish->v[2] - start->v[2];
-            car_to_end.v[0] = pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][0] - start->v[0];
-            car_to_end.v[1] = pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][1] - start->v[1];
-            car_to_end.v[2] = pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][2] - start->v[2];
-            distance_left = (section_v.v[2] * car_to_end.v[2]
-                                + car_to_end.v[1] * section_v.v[1]
-                                + car_to_end.v[0] * section_v.v[0])
-                / (section_v.v[2] * section_v.v[2]
-                    + section_v.v[1] * section_v.v[1]
-                    + section_v.v[0] * section_v.v[0]);
+            BrVector3Sub(&section_v, finish, start);
+            BrVector3Sub(&car_to_end, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, start);
+            distance_left = BrVector3Dot(&section_v, &car_to_end) / BrVector3LengthSquared(&section_v);
             if (distance_left < 0.0f) {
-                data->cheaty_intersect.v[0] = start->v[0];
-                data->cheaty_intersect.v[1] = start->v[1];
-                data->cheaty_intersect.v[2] = start->v[2];
+                BrVector3Copy(&data->cheaty_intersect, start);
             } else if (distance_left <= 1.0) {
-                data->cheaty_intersect.v[0] = section_v.v[0] * distance_left;
-                data->cheaty_intersect.v[1] = section_v.v[1] * distance_left;
-                data->cheaty_intersect.v[2] = section_v.v[2] * distance_left;
-                data->cheaty_intersect.v[0] = data->cheaty_intersect.v[0] + start->v[0];
-                data->cheaty_intersect.v[1] = data->cheaty_intersect.v[1] + start->v[1];
-                data->cheaty_intersect.v[2] = data->cheaty_intersect.v[2] + start->v[2];
+                BrVector3Scale(&data->cheaty_intersect, &section_v, distance_left);
+                BrVector3Accumulate(&data->cheaty_intersect, start);
             } else {
-                data->cheaty_intersect.v[0] = finish->v[0];
-                data->cheaty_intersect.v[1] = finish->v[1];
-                data->cheaty_intersect.v[2] = finish->v[2];
+                BrVector3Copy(&data->cheaty_intersect, finish);
             }
-            car_to_intersect.v[0] = data->cheaty_intersect.v[0]
-                - pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][0];
-            car_to_intersect.v[1] = data->cheaty_intersect.v[1]
-                - pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][1];
-            car_to_intersect.v[2] = data->cheaty_intersect.v[2]
-                - pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][2];
-            distance_to_intersect = sqrtf(
-                car_to_intersect.v[1] * car_to_intersect.v[1]
-                + car_to_intersect.v[2] * car_to_intersect.v[2]
-                + car_to_intersect.v[0] * car_to_intersect.v[0]);
-            frame_period_in_secs = (double)(unsigned int)gFrame_period_for_this_munging / 1000.0 * 20.0;
+            BrVector3Sub(&car_to_intersect, &data->cheaty_intersect, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t);
+            distance_to_intersect = BrVector3Length(&car_to_intersect);
+            frame_period_in_secs = gFrame_period_for_this_munging / 1000.0f * 20.0f;
             TurnOpponentPhysicsOff(pOpponent_spec);
-            if (distance_to_intersect >= (double)frame_period_in_secs) {
+            if (distance_to_intersect >= frame_period_in_secs) {
                 data->moving_to_intersect = 1;
-                // v4 = sqrtf(
-                //     car_to_intersect_1 * car_to_intersect_1
-                //     + car_to_intersect_2 * car_to_intersect_2
-                //     + car_to_intersect_0 * car_to_intersect_0);
-                // if (v6 | v7) {
-                //     car_to_intersect_0 = 1.0;
-                //     car_to_intersect_1 = 0.0;
-                //     car_to_intersect_2 = 0.0;
-                // } else {
-                //     v41 = v4;
-                //     v8 = 1.0 / v41;
-                //     v41 = v8;
-                //     car_to_intersect_0 = v8 * car_to_intersect_0;
-                //     car_to_intersect_1 = car_to_intersect_1 * v41;
-                //     car_to_intersect_2 = car_to_intersect_2 * v41;
-                // }
                 BrVector3Normalise(&car_to_intersect, &car_to_intersect);
                 BrVector3Scale(&car_to_intersect, &car_to_intersect, frame_period_in_secs);
-                // car_to_intersect_0 = car_to_intersect_0 * frame_period_in_secs;
-                // car_to_intersect_1 = car_to_intersect_1 * frame_period_in_secs;
-                // car_to_intersect_2 = car_to_intersect_2 * frame_period_in_secs;
-                pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][0] = pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][0]
-                    + car_to_intersect.v[0];
-                pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][1] = pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][1]
-                    + car_to_intersect.v[1];
-                pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][2] = pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][2]
-                    + car_to_intersect.v[2];
-                return 0;
+                BrVector3Accumulate(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &car_to_intersect);
+                return eFPR_OK;
             } else {
                 data->moving_to_intersect = 0;
-                pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][0] = data->cheaty_intersect.v[0];
-                pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][1] = data->cheaty_intersect.v[1];
-                pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][2] = data->cheaty_intersect.v[2];
-                return 0;
+                BrVector3Copy(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &data->cheaty_intersect);
+                return eFPR_OK;
             }
         }
-        p.v[0] = finish->v[0] - start->v[0];
-        p.v[1] = finish->v[1] - start->v[1];
-        p.v[2] = finish->v[2] - start->v[2];
+        BrVector3Sub(&p, finish, start);
         PointActorAlongThisBloodyVector(pOpponent_spec->car_spec->car_master_actor, &p);
-        a.v[0] = finish->v[0] - pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][0];
-        a.v[1] = finish->v[1] - pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][1];
-        a.v[2] = finish->v[2] - pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][2];
-        distance_to_end = BrVector3Length(&a); // sqrtf(.v[0] * a_vec11 + a_vec12 * a_vec12 + a_vec10 * a_vec10);
+        BrVector3Sub(&a, finish, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t);
+        distance_to_end = BrVector3Length(&a);
         dr_dprintf("%s: Rematerialising from FollowCheatyPath()...", pOpponent_spec->car_spec->driver_name);
         if (data->section_no < 0) {
             PDEnterDebugger("No useful section number in ProcessCheatyPath()");
         }
-        float v10;
-        int v9;
-        if (GetOpponentsSectionMaxSpeed(pOpponent_spec, data->section_no, 1) >= 255) {
-            if (GetOpponentsSectionMinSpeed(pOpponent_spec, data->section_no, 1) <= 0) {
-                desired_speed_BRU = MIN(7.0f, MAX(1.0f, distance_to_end * 2.0));
-                // if (v10 >= 7.0) {
-                //     v10 = 7.0;
-                // }
-                // if (v10 <= 1.0) {
-                //     v10 = 1.0;
-                // }
-                // desired_speed_BRU = v10;
-                v9 = RematerialiseOpponentOnNearestSection(pOpponent_spec, desired_speed_BRU);
-            } else {
-                section_min = (double)GetOpponentsSectionMinSpeed(pOpponent_spec, data->section_no, 1) / 6.9;
-                v9 = RematerialiseOpponentOnNearestSection(pOpponent_spec, section_min);
-            }
+
+        section_max = GetOpponentsSectionMaxSpeed(pOpponent_spec, data->section_no, 1);
+        section_min = GetOpponentsSectionMinSpeed(pOpponent_spec, data->section_no, 1);
+
+        if (section_max < 255) {
+            desired_speed_BRU = section_max / WORLD_SCALE;
+        } else if (section_min > 0) {
+            desired_speed_BRU = section_min / WORLD_SCALE;
         } else {
-            section_max = (double)GetOpponentsSectionMaxSpeed(pOpponent_spec, data->section_no, 1) / 6.9;
-            v9 = RematerialiseOpponentOnNearestSection(pOpponent_spec, section_max);
+            desired_speed_BRU = MIN(7.0f, MAX(1.0f, distance_to_end * 2.0));
         }
-        if (v9) {
-            pOpponent_spec->car_spec->brake_force = 0.0;
-            pOpponent_spec->car_spec->acc_force = 0.0;
-            if (distance_to_end >= 5.0) {
-                pOpponent_spec->car_spec->acc_force = pOpponent_spec->car_spec->M / 2.0;
+        if (RematerialiseOpponentOnNearestSection(pOpponent_spec, desired_speed_BRU)) {
+            pOpponent_spec->car_spec->brake_force = 0.0f;
+            pOpponent_spec->car_spec->acc_force = 0.0f;
+            if (distance_to_end >= 5.0f) {
+                pOpponent_spec->car_spec->acc_force = pOpponent_spec->car_spec->M / 2.0f;
             } else {
-                pOpponent_spec->car_spec->brake_force = pOpponent_spec->car_spec->M * 15.0;
+                pOpponent_spec->car_spec->brake_force = pOpponent_spec->car_spec->M * 15.0f;
             }
-            return 0;
+            return eFPR_OK;
         }
         data->cheating = 1;
     }
-    frame_period_in_secs = (double)(unsigned int)gFrame_period_for_this_munging / 1000.0 * 20.0;
+    frame_period_in_secs = gFrame_period_for_this_munging / 1000.0f * 20.0f;
     if (data->moving_to_intersect) {
-        car_to_intersect.v[0] = data->cheaty_intersect.v[0] - pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][0];
-        car_to_intersect.v[1] = data->cheaty_intersect.v[1] - pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][1];
-        car_to_intersect.v[2] = data->cheaty_intersect.v[2] - pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][2];
-        // v11 = sqrtf(
-        //     car_to_intersect_1 * car_to_intersect_1
-        //     + car_to_intersect_2 * car_to_intersect_2
-        //     + car_to_intersect_0 * car_to_intersect_0);
+        BrVector3Sub(&car_to_intersect, &data->cheaty_intersect, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t);
         distance_to_intersect = BrVector3Length(&car_to_intersect);
         if (distance_to_intersect < frame_period_in_secs) {
             data->moving_to_intersect = 0;
-            pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][0] = data->cheaty_intersect.v[0];
-            pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][1] = data->cheaty_intersect.v[1];
-            pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][2] = data->cheaty_intersect.v[2];
+            BrVector3Copy(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &data->cheaty_intersect);
         } else {
-            // v14 = sqrtf(
-            //     car_to_intersect_1 * car_to_intersect_1
-            //     + car_to_intersect_2 * car_to_intersect_2
-            //     + car_to_intersect_0 * car_to_intersect_0);
-            // if (v16 | v17) {
-            //     car_to_intersect_0 = 1.0;
-            //     car_to_intersect_1 = 0.0;
-            //     car_to_intersect_2 = 0.0;
-            // } else {
-            //     v39 = v14;
-            //     v18 = 1.0 / v39;
-            //     v39 = v18;
-            //     car_to_intersect_0 = v18 * car_to_intersect_0;
-            //     car_to_intersect_1 = car_to_intersect_1 * v39;
-            //     car_to_intersect_2 = car_to_intersect_2 * v39;
-            // }
             BrVector3Normalise(&car_to_intersect, &car_to_intersect);
             BrVector3Scale(&car_to_intersect, &car_to_intersect, frame_period_in_secs);
-            pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][0] = pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][0]
-                + car_to_intersect.v[0];
-            pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][1] = pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][1]
-                + car_to_intersect.v[1];
-            pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][2] = pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][2]
-                + car_to_intersect.v[2];
+            BrVector3Accumulate(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &car_to_intersect);
         }
-        return 0;
+        return eFPR_OK;
     }
 
-    p.v[0] = finish->v[0] - start->v[0];
-    p.v[1] = finish->v[1] - start->v[1];
-    p.v[2] = finish->v[2] - start->v[2];
-    // v19 = sqrtf(p.v[2] * p.v[2] + p.v[1] * p.v[1] + p.v[0] * p.v[0]);
-    // if (v21 | v22) {
-    //     p.v[0] = 1.0;
-    //     p.v[1] = 0.0;
-    //     p.v[2] = 0.0;
-    // } else {
-    //     v37 = v19;
-    //     v23 = 1.0 / v37;
-    //     v37 = v23;
-    //     p.v[0] = v23 * p.v[0];
-    //     p.v[1] = p.v[1] * v37;
-    //     p.v[2] = p.v[2] * v37;
-    // }
+    BrVector3Sub(&p, finish, start);
     BrVector3Normalise(&p, &p);
     while (frame_period_in_secs > 0.0) {
-        a.v[0] = finish->v[0] - pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][0];
-        a.v[1] = finish->v[1] - pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][1];
-        a.v[2] = finish->v[2] - pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][2];
+        BrVector3Sub(&a, finish, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t);
         distance_to_end = BrVector3Length(&a);
         if (distance_to_end < frame_period_in_secs) {
-            pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][0] = pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][0]
-                + a.v[0];
-            pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][1] = pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][1]
-                + a.v[1];
-            pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][2] = pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][2]
-                + a.v[2];
+            BrVector3Accumulate(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &a);
             frame_period_in_secs = frame_period_in_secs - distance_to_end;
-
             dr_dprintf("%s: ProcessFollowPath() - current section %d(#%d) (cheating)", pOpponent_spec->car_spec->driver_name, data->section_no, GetOpponentsRealSection(pOpponent_spec, data->section_no));
             data->section_no = GetOpponentsNextSection(pOpponent_spec, data->section_no);
             if (data->section_no == -1) {
-                pOpponent_spec->car_spec->acc_force = 0.0;
-                pOpponent_spec->car_spec->brake_force = 0.0;
+                pOpponent_spec->car_spec->acc_force = 0.0f;
+                pOpponent_spec->car_spec->brake_force = 0.0f;
                 dr_dprintf("%s: ProcessFollowPath() - reached end of path while cheating", pOpponent_spec->car_spec->driver_name);
-                return 1;
+                return eFPR_end_of_path;
             }
             dr_dprintf("%s: ProcessFollowPath() - next section %d(#%d) (cheating)", pOpponent_spec->car_spec->driver_name, data->section_no, GetOpponentsRealSection(pOpponent_spec, data->section_no));
             start = GetOpponentsSectionStartNodePoint(pOpponent_spec, data->section_no);
             finish = GetOpponentsSectionFinishNodePoint(pOpponent_spec, data->section_no);
-            p.v[0] = finish->v[0] - start->v[0];
-            p.v[1] = finish->v[1] - start->v[1];
-            p.v[2] = finish->v[2] - start->v[2];
+            BrVector3Sub(&p, finish, start);
             BrVector3Normalise(&p, &p);
         } else {
-            p.v[0] = p.v[0] * frame_period_in_secs;
-            p.v[1] = p.v[1] * frame_period_in_secs;
-            p.v[2] = p.v[2] * frame_period_in_secs;
-            pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][0] = pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][0]
-                + p.v[0];
-            pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][1] = pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][1]
-                + p.v[1];
-            pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][2] = pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][2]
-                + p.v[2];
+            BrVector3Scale(&p, &p, frame_period_in_secs);
+            BrVector3Accumulate(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &p);
             frame_period_in_secs = 0.0;
         }
     }
-    return 0;
+    return eFPR_OK;
 }
