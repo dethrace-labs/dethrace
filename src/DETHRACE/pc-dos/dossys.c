@@ -694,14 +694,21 @@ void PDDisplayGoreworthiness(int pGory) {
 void PDEnterDebugger(char* pStr) {
     static unsigned char* save_it;
     LOG_TRACE("(\"%s\")", pStr);
-    NOT_IMPLEMENTED();
+
+    // FIXME: uses __CrtDbgReport when using MSVC runtime
+    STUB_ONCE();
+
+    dr_dprintf("PDEnterDebugger(): %s", pStr);
+    // ShowCursor(1);
+    abort();
+    // ShowCursor(0);
 }
 
 // Added function
 br_material* PDMissingMaterial(char* name) {
     LOG_TRACE("(\"%s\")", name);
 
-    // FIXME: call function in harness
+    // FIXME: call functiont in harness
     dr_dprintf("SOMETHING MISSING WARNING - Can't find material '%s'", name);
     return NULL;
 }

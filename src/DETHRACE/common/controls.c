@@ -99,757 +99,389 @@ char* gEdit_mode_names[10] = {
 
 // order is: { None, CTRL, ALT, CTRL+ALT, SHIFT, CTRL+SHIFT, ALT+SHIFT, CTRL+ALT+SHIFT }
 tEdit_func* gEdit_funcs[10][18][8] = {
-    {
-        // eEdit_mode_cheat
-        { 0 }, // F5
-        { 0 }, // F6
-        { 0 }, // F7
-        { 0 }, // F8
-        { 0 }, // F10
-        { 0 }, // F11
-        { 0 }, // F12
-        { 0 }, // 0
-        { 0 }, // 1
-        { 0 }, // 2
-        { 0 }, // 3
-        { 0 }, // 4
-        { 0 }, // 5
-        { 0 }, // 6
-        { 0 }, // 7
-        { 0 }, // 8
-        { 0 }, // 9
-        { 0 }, // not used
-    },
-    {
-        // eEdit_mode_acc
-        { 0 }, // F5
-        { 0 }, // F6
-        { 0 }, // F7
-        { 0 }, // F8
-        { 0 }, // F10
-        { 0 }, // F11
-        { 0 }, // F12
-        { 0 }, // 0
-        { 0 }, // 1
-        { 0 }, // 2
-        { 0 }, // 3
-        { 0 }, // 4
-        { 0 }, // 5
-        { 0 }, // 6
-        { 0 }, // 7
-        { 0 }, // 8
-        { 0 }, // 9
-        { 0 }, // not used
-    },
-    {
-        // eEdit_mode_spec_vol
-        { 0 }, // F5
-        { 0 }, // F6
-        { 0 }, // F7
-        { 0 }, // F8
-        { 0 }, // F10
-        { 0 }, // F11
-        { 0 }, // F12
-        { 0 }, // 0
-        { 0 }, // 1
-        { 0 }, // 2
-        { 0 }, // 3
-        { 0 }, // 4
-        { 0 }, // 5
-        { 0 }, // 6
-        { 0 }, // 7
-        { 0 }, // 8
-        { 0 }, // 9
-        { 0 }, // not used
-    },
-    {
-        // eEdit_mode_ped
-        {
-            // F5
-            TogglePedDetect,
-            NULL,
-            NULL,
-            NULL,
-            DoPedReport,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // F6
-            ShowPedPaths,
-            NULL,
-            NULL,
-            NULL,
-            ShowPedPos,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // F7
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // F8
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // F10
-            DropPedPoint,
-            DropPedPointAir,
-            NULL,
-            NULL,
-            NULL,
-            PullPedPoint,
-            PullPedPointAir,
-            NULL,
-        },
-        {
-            // F11
-            DropInitPedPoint,
-            DropInitPedPointAir,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // F12
-            ScrubPedestrian,
-            DeletePedPoint,
-            NULL,
-            NULL,
-            DeletePedPath,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // 0
-            NewPed0,
-            NewPed0,
-            NewPed0,
-            NewPed0,
-            NewPed0,
-            NewPed0,
-            NewPed0,
-            NewPed0,
-        },
-        {
-            // 1
-            NewPed1,
-            NewPed1,
-            NewPed1,
-            NewPed1,
-            NewPed1,
-            NewPed1,
-            NewPed1,
-            NewPed1,
-        },
-        {
-            // 2
-            NewPed2,
-            NewPed2,
-            NewPed2,
-            NewPed2,
-            NewPed2,
-            NewPed2,
-            NewPed2,
-            NewPed2,
-        },
-        {
-            // 3
-            NewPed3,
-            NewPed3,
-            NewPed3,
-            NewPed3,
-            NewPed3,
-            NewPed3,
-            NewPed3,
-            NewPed3,
-        },
-        {
-            // 4
-            NewPed4,
-            NewPed4,
-            NewPed4,
-            NewPed4,
-            NewPed4,
-            NewPed4,
-            NewPed4,
-            NewPed4,
-        },
-        {
-            // 5
-            NewPed5,
-            NewPed5,
-            NewPed5,
-            NewPed5,
-            NewPed5,
-            NewPed5,
-            NewPed5,
-            NewPed5,
-        },
-        {
-            // 6
-            NewPed6,
-            NewPed6,
-            NewPed6,
-            NewPed6,
-            NewPed6,
-            NewPed6,
-            NewPed6,
-            NewPed6,
-        },
-        {
-            // 7
-            NewPed7,
-            NewPed7,
-            NewPed7,
-            NewPed7,
-            NewPed7,
-            NewPed7,
-            NewPed7,
-            NewPed7,
-        },
-        {
-            // 8
-            NewPed8,
-            NewPed8,
-            NewPed8,
-            NewPed8,
-            NewPed8,
-            NewPed8,
-            NewPed8,
-            NewPed8,
-        },
-        {
-            // 9
-            NewPed9,
-            NewPed9,
-            NewPed9,
-            NewPed9,
-            NewPed9,
-            NewPed9,
-            NewPed9,
-            NewPed9,
-        },
-        {
-            // not used
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-        },
-    },
-    {
-        // eEdit_mode_opp
-        { 0 }, // F5
-        { 0 }, // F6
-        { 0 }, // F7
-        { 0 }, // F8
-        { 0 }, // F10
-        { 0 }, // F11
-        { 0 }, // F12
-        { 0 }, // 0
-        { 0 }, // 1
-        { 0 }, // 2
-        { 0 }, // 3
-        { 0 }, // 4
-        { 0 }, // 5
-        { 0 }, // 6
-        { 0 }, // 7
-        { 0 }, // 8
-        { 0 }, // 9
-        { 0 }, // not used
-    },
-    {
-        // eEdit_mode_pratcam
-        { 0 }, // F5
-        { 0 }, // F6
-        { 0 }, // F7
-        { 0 }, // F8
-        { 0 }, // F10
-        { 0 }, // F11
-        { 0 }, // F12
-        { 0 }, // 0
-        { 0 }, // 1
-        { 0 }, // 2
-        { 0 }, // 3
-        { 0 }, // 4
-        { 0 }, // 5
-        { 0 }, // 6
-        { 0 }, // 7
-        { 0 }, // 8
-        { 0 }, // 9
-        { 0 }, // not used
-    },
-    {
-        // eEdit_mode_depth
-        { 0 }, // F5
-        { 0 }, // F6
-        { 0 }, // F7
-        { 0 }, // F8
-        { 0 }, // F10
-        { 0 }, // F11
-        { 0 }, // F12
-        { 0 }, // 0
-        { 0 }, // 1
-        { 0 }, // 2
-        { 0 }, // 3
-        { 0 }, // 4
-        { 0 }, // 5
-        { 0 }, // 6
-        { 0 }, // 7
-        { 0 }, // 8
-        { 0 }, // 9
-        { 0 }, // not used
-    },
-    {
-        // eEdit_mode_damage
-        {
-            // F5
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // F6
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // F7
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // F8
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // F10
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // F11
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // F12
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // 0
-            TDamageEngine,
-            NULL,
-            NULL,
-            NULL,
-            TDamageEngine,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // 1
-            TDamageTrans,
-            NULL,
-            NULL,
-            NULL,
-            TDamageTrans,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // 2
-            TDamageSteering,
-            NULL,
-            NULL,
-            NULL,
-            TDamageSteering,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // 3
-            TDamageLFWheel,
-            NULL,
-            NULL,
-            NULL,
-            TDamageLFBrake,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // 4
-            TDamageLRWheel,
-            NULL,
-            NULL,
-            NULL,
-            TDamageLRBrake,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // 5
-            TDamageRFWheel,
-            NULL,
-            NULL,
-            NULL,
-            TDamageRFBrake,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // 6
-            TDamageRRWheel,
-            NULL,
-            NULL,
-            NULL,
-            TDamageRRBrake,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // 7
-            TDamageDriver,
-            NULL,
-            NULL,
-            NULL,
-            TDamageDriver,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // 8
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // 9
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // not used
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-        },
-    },
-    {
-        // eEdit_mode_bonnet
-        { 0 }, // F5
-        { 0 }, // F6
-        { 0 }, // F7
-        { 0 }, // F8
-        { 0 }, // F10
-        { 0 }, // F11
-        { 0 }, // F12
-        { 0 }, // 0
-        { 0 }, // 1
-        { 0 }, // 2
-        { 0 }, // 3
-        { 0 }, // 4
-        { 0 }, // 5
-        { 0 }, // 6
-        { 0 }, // 7
-        { 0 }, // 8
-        { 0 }, // 9
-        { 0 }, // not used
-    },
-    {
-        // eEdit_mode_options
-        {
-            // F5
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // F6
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // F7
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // F8
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // F10
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // F11
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // F12
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // 0
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // 1
-            CycleCarSimplificationLevel,
-            NULL,
-            NULL,
-            NULL,
-            CycleCarTexturingLevel,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // 2
-            ToggleShadow,
-            NULL,
-            NULL,
-            NULL,
-            ToggleSmoke,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // 3
-            CycleWallTexturingLevel,
-            NULL,
-            NULL,
-            NULL,
-            CycleRoadTexturingLevel,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // 4
-            ToggleSky,
-            NULL,
-            NULL,
-            NULL,
-            ToggleDepthCueing,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // 5
-            CycleYonFactor,
-            NULL,
-            NULL,
-            NULL,
-            ToggleAccessoryRendering,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // 6
-            DecreaseYon,
-            NULL,
-            NULL,
-            NULL,
-            IncreaseYon,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // 7
-            CycleSoundDetailLevel,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // 8
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // 9
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-        },
-        {
-            // not used
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-        },
-    },
+    { // CHEAT EDIT MODE
+
+        // F5
+        { TotalRepair, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F6
+        { ToggleInvulnerability, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F7
+        { MoreTime, NULL, NULL, NULL, MuchMoreTime, NULL, NULL, NULL },
+        // F8
+        { ToggleTimerFreeze, ShadowMode, NULL, NULL, ToggleShadow, NULL, NULL, NULL },
+        // F10
+        { IncrementLap, NULL, NULL, NULL, IncrementCheckpoint, NULL, NULL, NULL },
+        // F11
+        { EarnDosh, NULL, NULL, NULL, LoseDosh, NULL, NULL, NULL },
+        // F12
+        { ViewOpponent, ViewOpponent, ViewOpponent, ViewOpponent, ViewOpponent, ViewOpponent, ViewOpponent, ViewOpponent },
+        // 0
+        { GotPowerup0, GotPowerup0, GotPowerup0, GotPowerup0, GotPowerup0, GotPowerup0, GotPowerup0, GotPowerup0 },
+        // 1
+        { GotPowerup1, GotPowerup1, GotPowerup1, GotPowerup1, GotPowerup1, GotPowerup1, GotPowerup1, GotPowerup1 },
+        // 2
+        { GotPowerup2, GotPowerup2, GotPowerup2, GotPowerup2, GotPowerup2, GotPowerup2, GotPowerup2, GotPowerup2 },
+        // 3
+        { GotPowerup3, GotPowerup3, GotPowerup3, GotPowerup3, GotPowerup3, GotPowerup3, GotPowerup3, GotPowerup3 },
+        // 4
+        { GotPowerup4, GotPowerup4, GotPowerup4, GotPowerup4, GotPowerup4, GotPowerup4, GotPowerup4, GotPowerup4 },
+        // 5
+        { GotPowerup5, GotPowerup5, GotPowerup5, GotPowerup5, GotPowerup5, GotPowerup5, GotPowerup5, GotPowerup5 },
+        // 6
+        { GotPowerup6, GotPowerup6, GotPowerup6, GotPowerup6, GotPowerup6, GotPowerup6, GotPowerup6, GotPowerup6 },
+        // 7
+        { GotPowerup7, GotPowerup7, GotPowerup7, GotPowerup7, GotPowerup7, GotPowerup7, GotPowerup7, GotPowerup7 },
+        // 8
+        { GotPowerup8, GotPowerup8, GotPowerup8, GotPowerup8, GotPowerup8, GotPowerup8, GotPowerup8, GotPowerup8 },
+        // 9
+        { GotPowerup9, GotPowerup9, GotPowerup9, GotPowerup9, GotPowerup9, GotPowerup9, GotPowerup9, GotPowerup9 },
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL } },
+
+    { // ACCESSORIES EDIT MODE
+
+        // F5
+        { CycleAccRotate, NULL, NULL, NULL, CycleAccScale, NULL, NULL, NULL },
+        // F6
+        { IdentifyAcc, ScaleAccUp2, ScaleAccUp3, ScaleAccUp4, IdentifyAcc, ScaleAccDown2, ScaleAccDown3, ScaleAccDown4 },
+        // F7
+        { RotateAccL, RotateAccL2, RotateAccL3, RotateAccL4, RotateAccR, RotateAccR2, RotateAccR3, RotateAccR4 },
+        // F8
+        { DeleteAcc, NULL, NULL, NULL, SnapAccToVertical, NULL, NULL, NULL },
+        // F10
+        { MoveXAccL, MoveXAccL2, MoveXAccL3, MoveXAccL4, MoveXAccR, MoveXAccR2, MoveXAccR3, MoveXAccR4 },
+        // F11
+        { MoveYAccL, MoveYAccL2, MoveYAccL3, MoveYAccL4, MoveYAccR, MoveYAccR2, MoveYAccR3, MoveYAccR4 },
+        // F12
+        { MoveZAccL, MoveZAccL2, MoveZAccL3, MoveZAccL4, MoveZAccR, MoveZAccR2, MoveZAccR3, MoveZAccR4 },
+        // 0
+        { DropActor0, DropActor0, DropActor0, DropActor0, DropActor0, DropActor0, DropActor0, DropActor0 },
+        // 1
+        { DropActor1, DropActor1, DropActor1, DropActor1, DropActor1, DropActor1, DropActor1, DropActor1 },
+        // 2
+        { DropActor2, DropActor2, DropActor2, DropActor2, DropActor2, DropActor2, DropActor2, DropActor2 },
+        // 3
+        { DropActor3, DropActor3, DropActor3, DropActor3, DropActor3, DropActor3, DropActor3, DropActor3 },
+        // 4
+        { DropActor4, DropActor4, DropActor4, DropActor4, DropActor4, DropActor4, DropActor4, DropActor4 },
+        // 5
+        { DropActor5, DropActor5, DropActor5, DropActor5, DropActor5, DropActor5, DropActor5, DropActor5 },
+        // 6
+        { DropActor6, DropActor6, DropActor6, DropActor6, DropActor6, DropActor6, DropActor6, DropActor6 },
+        // 7
+        { DropActor7, DropActor7, DropActor7, DropActor7, DropActor7, DropActor7, DropActor7, DropActor7 },
+        // 8
+        { DropActor8, DropActor8, DropActor8, DropActor8, DropActor8, DropActor8, DropActor8, DropActor8 },
+        // 9
+        { DropActor9, DropActor9, DropActor9, DropActor9, DropActor9, DropActor9, DropActor9, DropActor9 },
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL } },
+
+    { // SPECVOL EDIT MODE
+
+        // F5
+        { CycleSpecVolRotate, NULL, NULL, NULL, CycleSpecVolScale, NULL, NULL, NULL },
+        // F6
+        { IdentifySpecVol, ScaleSpecVolUp2, ScaleSpecVolUp3, ScaleSpecVolUp4, IdentifySpecVol, ScaleSpecVolDown2, ScaleSpecVolDown3, ScaleSpecVolDown4 },
+        // F7
+        { RotateSpecVolL, RotateSpecVolL2, RotateSpecVolL3, RotateSpecVolL4, RotateSpecVolR, RotateSpecVolR2, RotateSpecVolR3, RotateSpecVolR4 },
+        // F8
+        { DeleteSpecVol, NULL, NULL, NULL, SnapSpecVolToVertical, NULL, NULL, NULL },
+        // F10
+        { MoveXSpecVolL, MoveXSpecVolL2, MoveXSpecVolL3, MoveXSpecVolL4, MoveXSpecVolR, MoveXSpecVolR2, MoveXSpecVolR3, MoveXSpecVolR4 },
+        // F11
+        { MoveYSpecVolL, MoveYSpecVolL2, MoveYSpecVolL3, MoveYSpecVolL4, MoveYSpecVolR, MoveYSpecVolR2, MoveYSpecVolR3, MoveYSpecVolR4 },
+        // F12
+        { MoveZSpecVolL, MoveZSpecVolL2, MoveZSpecVolL3, MoveZSpecVolL4, MoveZSpecVolR, MoveZSpecVolR2, MoveZSpecVolR3, MoveZSpecVolR4 },
+        // 0
+        { DropSpecVol0, DropSpecVol0, DropSpecVol0, DropSpecVol0, DropSpecVol0, DropSpecVol0, DropSpecVol0, DropSpecVol0 },
+        // 1
+        { DropSpecVol1, DropSpecVol1, DropSpecVol1, DropSpecVol1, DropSpecVol1, DropSpecVol1, DropSpecVol1, DropSpecVol1 },
+        // 2
+        { DropSpecVol2, DropSpecVol2, DropSpecVol2, DropSpecVol2, DropSpecVol2, DropSpecVol2, DropSpecVol2, DropSpecVol2 },
+        // 3
+        { DropSpecVol3, DropSpecVol3, DropSpecVol3, DropSpecVol3, DropSpecVol3, DropSpecVol3, DropSpecVol3, DropSpecVol3 },
+        // 4
+        { DropSpecVol4, DropSpecVol4, DropSpecVol4, DropSpecVol4, DropSpecVol4, DropSpecVol4, DropSpecVol4, DropSpecVol4 },
+        // 5
+        { DropSpecVol5, DropSpecVol5, DropSpecVol5, DropSpecVol5, DropSpecVol5, DropSpecVol5, DropSpecVol5, DropSpecVol5 },
+        // 6
+        { DropSpecVol6, DropSpecVol6, DropSpecVol6, DropSpecVol6, DropSpecVol6, DropSpecVol6, DropSpecVol6, DropSpecVol6 },
+        // 7
+        { DropSpecVol7, DropSpecVol7, DropSpecVol7, DropSpecVol7, DropSpecVol7, DropSpecVol7, DropSpecVol7, DropSpecVol7 },
+        // 8
+        { DropSpecVol8, DropSpecVol8, DropSpecVol8, DropSpecVol8, DropSpecVol8, DropSpecVol8, DropSpecVol8, DropSpecVol8 },
+        // 09
+        { DropSpecVol9, DropSpecVol9, DropSpecVol9, DropSpecVol9, DropSpecVol9, DropSpecVol9, DropSpecVol9, DropSpecVol9 },
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL } },
+
+    { // PEDESTRIAN EDIT MODE
+
+        // F5
+        { TogglePedDetect, NULL, NULL, NULL, DoPedReport, NULL, NULL, NULL },
+        // F6
+        { ShowPedPaths, NULL, NULL, NULL, ShowPedPos, NULL, NULL, NULL },
+        // F7
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F8
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F10
+        { DropPedPoint, DropPedPointAir, NULL, NULL, PullPedPoint, PullPedPointAir, NULL, NULL },
+        // F11
+        { DropInitPedPoint, DropInitPedPointAir, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F12
+        { ScrubPedestrian, DeletePedPoint, NULL, NULL, DeletePedPath, NULL, NULL, NULL },
+        // 0
+        { NewPed0, NewPed0, NewPed0, NewPed0, NewPed0, NewPed0, NewPed0, NewPed0 },
+        // 1
+        { NewPed1, NewPed1, NewPed1, NewPed1, NewPed1, NewPed1, NewPed1, NewPed1 },
+        // 2
+        { NewPed2, NewPed2, NewPed2, NewPed2, NewPed2, NewPed2, NewPed2, NewPed2 },
+        // 3
+        { NewPed3, NewPed3, NewPed3, NewPed3, NewPed3, NewPed3, NewPed3, NewPed3 },
+        // 4
+        { NewPed4, NewPed4, NewPed4, NewPed4, NewPed4, NewPed4, NewPed4, NewPed4 },
+        // 5
+        { NewPed5, NewPed5, NewPed5, NewPed5, NewPed5, NewPed5, NewPed5, NewPed5 },
+        // 6
+        { NewPed6, NewPed6, NewPed6, NewPed6, NewPed6, NewPed6, NewPed6, NewPed6 },
+        // 7
+        { NewPed7, NewPed7, NewPed7, NewPed7, NewPed7, NewPed7, NewPed7, NewPed7 },
+        // 8
+        { NewPed8, NewPed8, NewPed8, NewPed8, NewPed8, NewPed8, NewPed8, NewPed8 },
+        // 9
+        { NewPed9, NewPed9, NewPed9, NewPed9, NewPed9, NewPed9, NewPed9, NewPed9 },
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL } },
+
+    { // OPPONENTS EDIT MODE
+
+        // F5
+        { ShowHideOppoPaths, ShowSectionInfo1, NULL, NULL, ShowNodeInfo, ShowSectionInfo2, NULL, NULL },
+        // F6
+        { ReverseSectionDirection, ToggleOneWayNess, NULL, NULL, CycleSectionType, NULL, NULL, NULL },
+        // F7
+        { DropElasticateyNode, NULL, PullOppoPoint, NULL, InsertAndElasticate, NULL, NULL, NULL },
+        // F8
+        { DropNodeOnNodeAndStopElasticating, DropDeadEndNode, NULL, NULL, InsertAndDontElasticate, NULL, NULL, NULL },
+        // F10
+        { WidenOppoPathSection, IncreaseSectionMinSpeed, IncreaseSectionMaxSpeed, NULL, NarrowOppoPathSection, DecreaseSectionMinSpeed, DecreaseSectionMaxSpeed, NULL },
+        // F11
+        { NULL, DeleteOppoPathNodeAndJoin, NULL, NULL, DeleteOppoPathSection, DeleteOppoPathNodeAndSections, NULL, NULL },
+        // F12
+        { ViewOpponent, ViewOpponent, ViewOpponent, ViewOpponent, ViewOpponent, ViewOpponent, ViewOpponent, ViewOpponent },
+        // 0
+        { ViewOpponent, ViewOpponent, ViewOpponent, ViewOpponent, ViewOpponent, ViewOpponent, ViewOpponent, ViewOpponent },
+        // 1
+        { ToggleOpponentProcessing, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // 2
+        { CopStartPointInfo, DeleteCopStartPoint, DropCopStartPoint, NULL /* sub_411E7F (empty func) */, NULL, NULL, NULL },
+        // 3
+        { ToggleMellowOpponents, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // 4
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // 5
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // 6
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // 7
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // 8
+        { AdjustDownForce, NULL, NULL, NULL, PutOpponentsInNeutral, NULL, NULL, NULL },
+        // 9
+        { SwapCar, FreezeMechanics, NULL, NULL, ToggleCarToCarCollisions, NULL, NULL, NULL },
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL } },
+
+    { // PRAT-CAM EDIT MODE
+
+        // F5
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F6
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F7
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F8
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F10
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F11
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F12
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // 0
+        { PratCam0, PratCam0, PratCam0, PratCam0, PratCam0, PratCam0, PratCam0, PratCam0 },
+        // 1
+        { PratCam1, PratCam1, PratCam1, PratCam1, PratCam1, PratCam1, PratCam1, PratCam1 },
+        // 2
+        { PratCam2, PratCam2, PratCam2, PratCam2, PratCam2, PratCam2, PratCam2, PratCam2 },
+        // 3
+        { PratCam3, PratCam3, PratCam3, PratCam3, PratCam3, PratCam3, PratCam3, PratCam3 },
+        // 4
+        { PratCam4, PratCam4, PratCam4, PratCam4, PratCam4, PratCam4, PratCam4, PratCam4 },
+        // 5
+        { PratCam5, PratCam5, PratCam5, PratCam5, PratCam5, PratCam5, PratCam5, PratCam5 },
+        // 6
+        { PratCam6, PratCam6, PratCam6, PratCam6, PratCam6, PratCam6, PratCam6, PratCam6 },
+        // 7
+        { PratCam7, PratCam7, PratCam7, PratCam7, PratCam7, PratCam7, PratCam7, PratCam7 },
+        // 8
+        { PratCam8, PratCam8, PratCam8, PratCam8, PratCam8, PratCam8, PratCam8, PratCam8 },
+        // 9
+        { PratCam9, PratCam9, PratCam9, PratCam9, PratCam9, PratCam9, PratCam9, PratCam9 },
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL } },
+
+    { // DEPTH EFFECTS EDIT MODE
+
+        // F5
+        { ToggleDepthMode, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F6
+        { ToggleSky, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F7
+        { LessDepthFactor, NULL, NULL, NULL, LessDepthFactor2, NULL, NULL, NULL },
+        // F8
+        { MoreDepthFactor, NULL, NULL, NULL, MoreDepthFactor2, NULL, NULL, NULL },
+        // F10
+        { IncreaseYon, NULL, NULL, NULL, DecreaseYon, NULL, NULL, NULL },
+        // F11
+        { IncreaseAngle, NULL, NULL, NULL, DecreaseAngle, NULL, NULL, NULL },
+        // F12
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // 0
+        { ToggleShadow, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // 1
+        { ShadowMode, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // 2
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // 3
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // 4
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // 5
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // 6
+        { SelectFaceDown, NULL, NULL, NULL, SelectFaceForward, NULL, NULL, NULL },
+        // 7
+        { ScaleUpX, NULL, NULL, NULL, ScaleDnX, NULL, NULL, NULL },
+        // 8
+        { ScaleUpY, NULL, NULL, NULL, ScaleDnY, NULL, NULL, NULL },
+        // 9
+        { DustRotate, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL } },
+
+    { // DAMAGE EDIT MODE
+
+        // F5
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F6
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F7
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F8
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F10
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F11
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F12
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // 0
+        { TDamageEngine, NULL, NULL, NULL, TDamageEngine, NULL, NULL, NULL },
+        // 1
+        { TDamageTrans, NULL, NULL, NULL, TDamageTrans, NULL, NULL, NULL },
+        // 2
+        { TDamageSteering, NULL, NULL, NULL, TDamageSteering, NULL, NULL, NULL },
+        // 3
+        { TDamageLFWheel, NULL, NULL, NULL, TDamageLFBrake, NULL, NULL, NULL },
+        // 4
+        { TDamageLRWheel, NULL, NULL, NULL, TDamageLRBrake, NULL, NULL, NULL },
+        // 5
+        { TDamageRFWheel, NULL, NULL, NULL, TDamageRFBrake, NULL, NULL, NULL },
+        // 6
+        { TDamageRRWheel, NULL, NULL, NULL, TDamageRRBrake, NULL, NULL, NULL },
+        // 7
+        { TDamageDriver, NULL, NULL, NULL, TDamageDriver, NULL, NULL, NULL },
+        // 8
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // 9
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL } },
+
+    { // BONNET EDIT MODE
+
+        // F5
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F6
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F7
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F8
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F10
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F11
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F12
+        { SaveBonnet, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // 0
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // 1
+        { MoveBonnetForward, NULL, NULL, NULL, MoveBonnetBackward, NULL, NULL, NULL },
+        // 2
+        { MoveBonnetLeft, NULL, NULL, NULL, MoveBonnetRight, NULL, NULL, NULL },
+        // 3
+        { MoveBonnetUp, NULL, NULL, NULL, MoveBonnetDown, NULL, NULL, NULL },
+        // 4
+        { TiltBonnetUpX, NULL, NULL, NULL, TiltBonnetDownX, NULL, NULL, NULL },
+        // 5
+        { TiltBonnetUpY, NULL, NULL, NULL, TiltBonnetDownY, NULL, NULL, NULL },
+        // 6
+        { TiltBonnetUpZ, NULL, NULL, NULL, TiltBonnetDownZ, NULL, NULL, NULL },
+        // 7
+        { ShrinkBonnetX, NULL, NULL, NULL, SwellBonnetX, NULL, NULL, NULL },
+        // 8
+        { ShrinkBonnetY, NULL, NULL, NULL, SwellBonnetY, NULL, NULL, NULL },
+        // 9
+        { ShrinkBonnetZ, NULL, NULL, NULL, SwellBonnetZ, NULL, NULL, NULL },
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL } },
+
+    { // OPTIONS EDIT MODE
+
+        // F5
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F6
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F7
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F8
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F10
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F11
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // F12
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // 0
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // 1
+        { CycleCarSimplificationLevel, NULL, NULL, NULL, CycleCarTexturingLevel, NULL, NULL, NULL },
+        // 2
+        { ToggleShadow, NULL, NULL, NULL, ToggleSmoke, NULL, NULL, NULL },
+        // 3
+        { CycleWallTexturingLevel, NULL, NULL, NULL, CycleRoadTexturingLevel, NULL, NULL, NULL },
+        // 4
+        { ToggleSky, NULL, NULL, NULL, ToggleDepthCueing, NULL, NULL, NULL },
+        // 5
+        { CycleYonFactor, NULL, NULL, NULL, ToggleAccessoryRendering, NULL, NULL, NULL },
+        // 6
+        { DecreaseYon, NULL, NULL, NULL, IncreaseYon, NULL, NULL, NULL },
+        // 7
+        { CycleSoundDetailLevel, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // 8
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        // 9
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+        { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL }
+
+    }
 };
+
 tCheat gKev_keys[44] = {
     { .code = 0xa11ee75d, .code2 = 0xf805eddd, .action_proc = SetFlag, .num = 0x0a11ee75d },
     { .code = 0x564e78b9, .code2 = 0x99155115, .action_proc = SetFlag, .num = 0x0564e78b9 },

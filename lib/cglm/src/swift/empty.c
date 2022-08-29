@@ -1,1 +1,0 @@
-// This empty file is needed to trick swiftpm to build the header-only version of cglm as swiftpm itself does not support C targets that have no source code files

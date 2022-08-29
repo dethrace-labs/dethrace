@@ -69,11 +69,11 @@
         (v1)->v[2] += (v2)->v[2];   \
     } while (0)
 
-#define BrVector3Scale(v1, v2, s)    \
-    do {                             \
-        (v1)->v[0] = (v2)->v[0] * s; \
-        (v1)->v[1] = (v2)->v[1] * s; \
-        (v1)->v[2] = (v2)->v[2] * s; \
+#define BrVector3Scale(v1, v2, s)      \
+    do {                               \
+        (v1)->v[0] = (v2)->v[0] * (s); \
+        (v1)->v[1] = (v2)->v[1] * (s); \
+        (v1)->v[2] = (v2)->v[2] * (s); \
     } while (0)
 
 #define BrVector3InvScale(v1, v2, s)       \
@@ -89,22 +89,22 @@
         br_scalar _scale;                                        \
         _scale = BR_LENGTH3((v2)->v[0], (v2)->v[1], (v2)->v[2]); \
         if (_scale > BR_SCALAR_EPSILON * 2) {                    \
-            _scale = 1.0 / _scale;                               \
+            _scale = 1.0 / (_scale);                             \
             (v1)->v[0] = (v2)->v[0] * _scale;                    \
             (v1)->v[1] = (v2)->v[1] * _scale;                    \
             (v1)->v[2] = (v2)->v[2] * _scale;                    \
         } else {                                                 \
-            (v1)->v[0] = 1.0;                                    \
-            (v1)->v[1] = 0.0;                                    \
-            (v1)->v[2] = 0.0;                                    \
+            (v1)->v[0] = 1.0f;                                   \
+            (v1)->v[1] = 0.0f;                                   \
+            (v1)->v[2] = 0.0f;                                   \
         }                                                        \
     } while (0)
 
-#define BrVector3NormaliseQuick(v1, v2)                                  \
-    do {                                                                 \
-        br_scalar _scale;                                                \
-        _scale = 1.0 / (BR_LENGTH3((v2)->v[0], (v2)->v[1], (v2)->v[2])); \
-        BrVector3Scale(v1, v2, _scale);                                  \
+#define BrVector3NormaliseQuick(v1, v2)                                   \
+    do {                                                                  \
+        br_scalar _scale;                                                 \
+        _scale = 1.0f / (BR_LENGTH3((v2)->v[0], (v2)->v[1], (v2)->v[2])); \
+        BrVector3Scale(v1, v2, _scale);                                   \
     } while (0)
 
 #define BR_ONE_LS 65536

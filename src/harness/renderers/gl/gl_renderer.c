@@ -1,14 +1,16 @@
 #include "gl_renderer.h"
 #include "brender/brender.h"
-#include "cameras/debug_camera.h"
 #include "harness.h"
 #include "harness/trace.h"
 #include "shaders.h"
 #include "stored_context.h"
 
-#include <cglm/cglm.h>
 #include <glad/glad.h>
+#include <stdio.h>
 #include <string.h>
+
+extern float gCamera_hither;
+extern float gCamera_yon;
 
 GLuint screen_buffer_vao, screen_buffer_ebo;
 GLuint screen_texture, palette_texture, depth_texture;
@@ -299,25 +301,31 @@ void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer) {
 
     glUniform1i(uniforms_3d.clip_plane_count, enabled_clip_planes);
 
-    if (gDebugCamera_active) {
-        float m2[4][4];
-        memcpy(m2, DebugCamera_View(), sizeof(float) * 16);
-        glUniformMatrix4fv(uniforms_3d.view, 1, GL_FALSE, (GLfloat*)m2);
+    if (0 /*gDebugCamera_active*/) {
+        // float m2[4][4];
+        // memcpy(m2, DebugCamera_View(), sizeof(float) * 16);
+        // glUniformMatrix4fv(uniforms_3d.view, 1, GL_FALSE, (GLfloat*)m2);
     } else {
-        mat4 cam_matrix = {
-            { camera->t.t.mat.m[0][0], camera->t.t.mat.m[0][1], camera->t.t.mat.m[0][2], 0 },
-            { camera->t.t.mat.m[1][0], camera->t.t.mat.m[1][1], camera->t.t.mat.m[1][2], 0 },
-            { camera->t.t.mat.m[2][0], camera->t.t.mat.m[2][1], camera->t.t.mat.m[2][2], 0 },
-            { camera->t.t.mat.m[3][0], camera->t.t.mat.m[3][1], camera->t.t.mat.m[3][2], 1 }
-        };
-        mat4 cam_matrix_inv;
-        glm_mat4_inv(cam_matrix, cam_matrix_inv);
-        glUniformMatrix4fv(uniforms_3d.view, 1, GL_FALSE, &cam_matrix_inv[0][0]);
-    }
-    float* proj = DebugCamera_Projection();
-    glUniformMatrix4fv(uniforms_3d.projection, 1, GL_FALSE, proj);
 
-    DebugCamera_Update();
+        br_matrix4 cam44 = {
+            { { camera->t.t.mat.m[0][0], camera->t.t.mat.m[0][1], camera->t.t.mat.m[0][2], 0 },
+                { camera->t.t.mat.m[1][0], camera->t.t.mat.m[1][1], camera->t.t.mat.m[1][2], 0 },
+                { camera->t.t.mat.m[2][0], camera->t.t.mat.m[2][1], camera->t.t.mat.m[2][2], 0 },
+                { camera->t.t.mat.m[3][0], camera->t.t.mat.m[3][1], camera->t.t.mat.m[3][2], 1 } }
+        };
+        br_matrix4 cam44_inverse;
+        BrMatrix4Inverse(&cam44_inverse, &cam44);
+
+        glUniformMatrix4fv(uniforms_3d.view, 1, GL_FALSE, &cam44_inverse.m[0][0]);
+    }
+    br_matrix4 p;
+    br_camera* cam = camera->type_data;
+    BrMatrix4Perspective(&p, cam->field_of_view, cam->aspect, cam->hither_z, cam->yon_z);
+    // hack: not sure why we have to do this, but this makes the result the same as `glm_perspective`
+    p.m[2][2] *= -1;
+    glUniformMatrix4fv(uniforms_3d.projection, 1, GL_FALSE, &p.m[0][0]);
+
+    // DebugCamera_Update();
 
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
 }
@@ -628,32 +636,4 @@ void GLRenderer_FlushBuffers(br_pixelmap* color_buffer, br_pixelmap* depth_buffe
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
     glClear(GL_COLOR_BUFFER_BIT);
     dirty_buffers = 0;
-}
-
-void Harness_GLRenderer_RenderCube(float col, float x, float y, float z) {
-
-    // // Enable depth test
-    // glEnable(GL_DEPTH_TEST);
-    // glUseProgram(shader_program_3d);
-
-    // mat4 MVP, model, view, proj;
-    // glm_perspective(glm_rad(45), 4.0f / 3.0f, 0.1f, 10000.f, proj);
-    // glm_lookat((vec3){ -80, 25, -60 }, (vec3){ -67.514061, 20.485441, -52.174110 }, (vec3){ 0, 1, 0 }, view);
-
-    // glm_mat4_identity(model);
-    // //glm_rotate_y(model, ang, model);
-    // ang += 0.01f;
-    // glm_translate(model, (vec3){ x, y, z });
-    // glm_mat4_mulN((mat4*[]){ &proj, &view, &model }, 3, MVP);
-    // glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
-
-    // //const float c[3] = { 1, 1, 1 };
-
-    // glUniform3f(ColorID, col, col, col);
-
-    // glBindVertexArray(cube_vao);
-
-    // // Draw the triangle !
-    // glDrawArrays(GL_TRIANGLES, 0, 12 * 3); // 12*3 indices starting at 0 -> 12 triangles
-    // glBindVertexArray(0);
 }

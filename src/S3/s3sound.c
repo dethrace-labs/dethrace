@@ -27,7 +27,7 @@ int S3OpenSampleDevice() {
         return 0;
     }
 
-    ma_engine_set_volume(&engine, 0.5f);
+    // ma_engine_set_volume(&engine, 0.5f);
 
     // if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024) == -1) {
     //     return 0;

@@ -11,6 +11,7 @@
 #include "finteray.h"
 #include "globvars.h"
 #include "globvrkm.h"
+#include "globvrme.h"
 #include "globvrpb.h"
 #include "graphics.h"
 #include "harness/config.h"
@@ -143,7 +144,8 @@ void DamageUnitWithSmoke(tCar_spec* pCar, int pUnit_type, int pDamage_amount) {
 void DamageEngine(int pDamage_amount) {
     LOG_TRACE("(%d)", pDamage_amount);
 
-    DamageUnitWithSmoke(&gProgram_state.current_car, eDamage_engine, pDamage_amount);
+    // DamageUnitWithSmoke(&gProgram_state.current_car, eDamage_engine, pDamage_amount);
+    DamageUnitWithSmoke(gProgram_state.AI_vehicles.opponents[0].car_spec, eDamage_engine, pDamage_amount);
 }
 
 // IDA: void __usercall DamageTrans(int pDamage_amount@<EAX>)
@@ -505,11 +507,9 @@ void SetInitialPosition(tRace_info* pThe_race, int pCar_index, int pGrid_index) 
         grid_offset.v[0] = 0.0 - pGrid_index % 2;
         grid_offset.v[1] = 0.0;
         grid_offset.v[2] = (double)(pGrid_index / 2) * 2.0 + (double)(pGrid_index % 2) * 0.40000001;
-        LOG_DEBUG("grid offset: %f, %f, %f", grid_offset.v[0], grid_offset.v[1], grid_offset.v[2]);
         BrMatrix34ApplyV(&car_actor->t.t.translate.t, &grid_offset, &initial_yaw_matrix);
         BrVector3Accumulate(&car_actor->t.t.translate.t, &pThe_race->initial_position);
     }
-    LOG_DEBUG("grid pos: %d, pos: x=%f, z=%f", pGrid_index, car_actor->t.t.translate.t.v[0], car_actor->t.t.translate.t.v[2]);
     FindBestY(
         &car_actor->t.t.translate.t,
         gTrack_actor,
@@ -4065,7 +4065,8 @@ void CancelPendingCunningStunt() {
 // IDA: float __cdecl frac(float pN)
 float frac(float pN) {
     LOG_TRACE("(%f)", pN);
-    NOT_IMPLEMENTED();
+
+    return pN - (float)(int)pN;
 }
 
 // IDA: void __usercall SetAmbientPratCam(tCar_spec *pCar@<EAX>)
@@ -4168,7 +4169,7 @@ void MungeCarGraphics(tU32 pFrame_period) {
             }
             if (the_car->driver < eDriver_net_human && (!gAction_replay_mode || !ReplayIsPaused())) {
                 if (gCountdown) {
-                    sine_angle = FRandomBetween(0.40000001, 1.6) * ((double)GetTotalTime() / ((double)gCountdown * 100.0));
+                    sine_angle = FRandomBetween(0.4f, 1.6f) * ((double)GetTotalTime() / ((double)gCountdown * 100.0));
                     sine_angle = frac(sine_angle) * 360.0;
                     sine_angle = FastScalarSin(sine_angle);
                     raw_revs = (double)the_car->red_line * fabs(sine_angle);
@@ -4424,7 +4425,24 @@ void ViewNetPlayer() {
 void ViewOpponent() {
     static int n;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    n++;
+    if (gNet_mode) {
+        if (n >= gNumber_of_net_players) {
+            n = 0;
+        }
+        gCar_to_view = gNet_players[n].car;
+        NewTextHeadupSlot(4, 0, 2000, -3, gNet_players[n].player_name);
+    } else {
+        if (n >= gNum_viewable_cars) {
+            n = 0;
+        }
+        gCar_to_view = gViewable_car_list[n];
+        NewTextHeadupSlot(4, 0, 2000, -3, gViewable_car_list[n]->driver_name);
+    }
+    gCamera_yaw = 0;
+    InitialiseExternalCamera();
+    PositionExternalCamera(gCar_to_view, 200u);
 }
 
 // IDA: void __cdecl ToggleCarToCarCollisions()

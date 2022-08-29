@@ -335,7 +335,34 @@ void DoNetGameManagement() {
 // IDA: void __usercall InitialisePlayerScore(tNet_game_player_info *pPlayer@<EAX>)
 void InitialisePlayerScore(tNet_game_player_info* pPlayer) {
     LOG_TRACE("(%p)", pPlayer);
-    NOT_IMPLEMENTED();
+
+    PossibleService();
+    switch (gCurrent_net_game->type) {
+    case eNet_game_type_fight_to_death:
+        pPlayer->score = 100;
+        break;
+    case eNet_game_type_car_crusher:
+    case eNet_game_type_carnage:
+        pPlayer->score = 0;
+        break;
+    case eNet_game_type_checkpoint:
+        pPlayer->score = 0xffff;
+        break;
+    case eNet_game_type_sudden_death:
+        pPlayer->score = 0;
+        break;
+    case eNet_game_type_tag:
+        pPlayer->score = 0;
+        break;
+    case eNet_game_type_foxy:
+        pPlayer->score = 0;
+        break;
+    default:
+        TELL_ME_IF_WE_PASS_THIS_WAY();
+    }
+    pPlayer->credits = gInitial_net_credits[gCurrent_net_game->options.starting_money_index];
+    pPlayer->wasted = 0;
+    pPlayer->reposition_time = 0;
 }
 
 // IDA: void __cdecl InitPlayers()
@@ -343,7 +370,16 @@ void InitPlayers() {
     int i;
     LOG_TRACE("()");
 
-    STUB();
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        InitialisePlayerScore(&gNet_players[i]);
+    }
+    if (gNet_mode == eNet_mode_host) {
+        gLast_it_change = 0;
+        gLast_lepper = NULL;
+    }
+    gTime_for_punishment = 0;
+    gNot_shown_race_type_headup = 1;
+    gIt_or_fox = -1;
 }
 
 // IDA: void __usercall BuyPSPowerup(int pIndex@<EAX>)

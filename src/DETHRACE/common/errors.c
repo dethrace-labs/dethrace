@@ -132,10 +132,10 @@ char* gError_messages[126] = {
     "Random number out of range (%)",
 };
 int gError_code;
-char* gPalette_copy__errors; // suffix added to avoid duplicate symbol
+char* gPalette_copy__errors;    // suffix added to avoid duplicate symbol
 int gPixel_buffer_size__errors; // suffix added to avoid duplicate symbol
 int gMouse_was_started__errors; // suffix added to avoid duplicate symbol
-char* gPixels_copy__errors; // suffix added to avoid duplicate symbol
+char* gPixels_copy__errors;     // suffix added to avoid duplicate symbol
 
 // IDA: void __cdecl FatalError(int pStr_index, ...)
 void FatalError(int pStr_index, ...) {
@@ -203,6 +203,7 @@ void NonFatalError(int pStr_index, ...) {
 }
 
 // IDA: void __cdecl CloseDiagnostics()
+// This function is stripped from the retail binary, we've guessed at the implementation
 void CloseDiagnostics() {
     LOG_TRACE("()");
 
@@ -210,6 +211,7 @@ void CloseDiagnostics() {
 }
 
 // IDA: void __cdecl OpenDiagnostics()
+// This function is stripped from the retail binary, we've guessed at the implementation
 void OpenDiagnostics() {
     LOG_TRACE("()");
 
@@ -237,8 +239,14 @@ void dr_dprintf(char* fmt_string, ...) {
     va_start(args, fmt_string);
     vfprintf(gDiagnostic_file, fmt_string, args);
     va_end(args);
-
     fputs("\n", gDiagnostic_file);
+    fflush(gDiagnostic_file);
+
+    va_start(args, fmt_string);
+    printf("dr_dprintf: ");
+    vfprintf(stdout, fmt_string, args);
+    printf("\n");
+    va_end(args);
 }
 
 // IDA: int __usercall DoErrorInterface@<EAX>(int pMisc_text_index@<EAX>)

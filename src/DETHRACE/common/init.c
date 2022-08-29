@@ -125,7 +125,6 @@ void ReinitialiseForwardCamera() {
     camera_ptr = (br_camera*)gCamera->type_data;
     if (gProgram_state.cockpit_on) {
         the_angle = gCamera_angle / 2.0;
-        LOG_DEBUG("the_angle %f, height %d, tandeg %f", the_angle, gRender_screen->height, tandeg(the_angle));
 
         d = atan(
                 tandeg(the_angle)
@@ -133,7 +132,6 @@ void ReinitialiseForwardCamera() {
                 / (double)(gProgram_state.current_car.render_bottom[0] - gProgram_state.current_car.render_top[0]))
             * 114.5915590261646;
         camera_ptr->field_of_view = BrDegreeToAngle(d);
-        LOG_DEBUG("fov: %d (%f degrees)", camera_ptr->field_of_view, d);
         BrMatrix34Identity(&gCamera->t.t.mat);
         gCamera->t.t.mat.m[3][0] = gProgram_state.current_car.driver_x_offset;
         gCamera->t.t.mat.m[3][1] = gProgram_state.current_car.driver_y_offset;
@@ -143,10 +141,8 @@ void ReinitialiseForwardCamera() {
             - (gProgram_state.current_car.render_bottom[0] + gProgram_state.current_car.render_top[0]) / 2);
 
         gCamera->t.t.mat.m[2][1] = tandeg(d / 2.0) * w * 2.0 / (float)gRender_screen->height;
-        LOG_DEBUG("w: %f, gCamera->t.t.mat.m[2][1]: %f", w, gCamera->t.t.mat.m[2][1]);
         camera_ptr->aspect = (float)gWidth / gHeight;
         camera_ptr->yon_z = gYon_multiplier * gCamera_yon;
-        LOG_DEBUG("aspect: %f, yon: %f", camera_ptr->aspect, camera_ptr->yon_z);
         if (gProgram_state.which_view == eView_left) {
             DRMatrix34PostRotateY(
                 &gCamera->t.t.mat,

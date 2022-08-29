@@ -13,7 +13,7 @@ target_include_directories(harness
         include
 )
 
-target_link_libraries(harness PRIVATE brender cglm_headers)
+target_link_libraries(harness PRIVATE brender)
 
 if(WIN32)
     target_link_libraries(harness PRIVATE dbghelp)
@@ -36,8 +36,8 @@ target_sources(harness PRIVATE
     include/harness/config.h
     include/harness/os.h
 
-    cameras/debug_camera.c
-    cameras/debug_camera.h
+    # cameras/debug_camera.c
+    # cameras/debug_camera.h
     harness_trace.c
     harness.c
     harness.h

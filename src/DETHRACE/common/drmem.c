@@ -300,6 +300,7 @@ void* DRStdlibAllocate(br_size_t size, br_uint_8 type) {
     }
     p = malloc(size);
     if (p == NULL && !gNon_fatal_allocation_errors) {
+        PrintMemoryDump(0, "AT ERROR TIME");
         sprintf(s, "%s/%d", gMem_names[type], (int)size);
         FatalError(94, s);
     }

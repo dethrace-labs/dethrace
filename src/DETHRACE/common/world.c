@@ -645,7 +645,7 @@ br_material* WallPerspToUntex(br_model* pModel, tU16 pFace) {
     } else {
         new_mat = SuffixedMaterial(old_mat, ".lwall");
     }
-    if(new_mat->colour_map != NULL) {
+    if (new_mat->colour_map != NULL) {
         new_mat->colour_map = NULL;
         BrMaterialUpdate(new_mat, BR_MATU_ALL);
     }
@@ -704,7 +704,7 @@ int LoadNTrackModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
         PathCat(the_path, gApplication_path, "MODELS");
         PathCat(the_path, the_path, str);
         total = BrModelLoadMany(the_path, temp_array, 2000);
-        if (!total) {
+        if (total == 0) {
             FatalError(82, str);
         }
         for (j = 0; j < total; j++) {

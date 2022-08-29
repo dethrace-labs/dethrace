@@ -10,7 +10,7 @@ target_include_directories(dethrace_obj
         pd
 )
 
-target_link_libraries(dethrace_obj PUBLIC SDL2::SDL2 smacker harness brender s3 cglm)
+target_link_libraries(dethrace_obj PUBLIC SDL2::SDL2 smacker harness brender s3)
 
 if (CMAKE_C_COMPILER_ID MATCHES "Clang")
     target_compile_options(dethrace_obj PRIVATE
@@ -164,7 +164,6 @@ target_sources(dethrace PRIVATE main.c)
 if(NOT MSVC)
     if(APPLE)
         target_link_libraries(dethrace PRIVATE "-framework OpenGL")
-        target_link_options(dethrace PRIVATE -fno-pie)
     else()
         set(OpenGL_GL_PREFERENCE GLVND)
         find_package(OpenGL REQUIRED)

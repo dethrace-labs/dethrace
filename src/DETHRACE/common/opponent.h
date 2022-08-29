@@ -4,6 +4,11 @@
 #include "brender/br_types.h"
 #include "dr_types.h"
 
+#define CAR_SPEC_IS_OPPONENT(CAR_SPEC) (VEHICLE_TYPE_FROM_ID((CAR_SPEC)->car_ID) == eVehicle_opponent)
+#define CAR_SPEC_IS_ROZZER(CAR_SPEC) (VEHICLE_TYPE_FROM_ID((CAR_SPEC)->car_ID) == eVehicle_rozzer)
+
+#define CAR_SPEC_GET_SPEED_FACTOR(CAR_SPEC) (CAR_SPEC_IS_ROZZER(CAR_SPEC) ? gCop_speed_factor : gOpponent_speed_factor)
+
 extern br_actor* gOppo_path_actor;
 extern br_model* gOppo_path_model;
 extern br_material* gMat_dk_yel;
