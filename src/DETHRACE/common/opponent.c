@@ -1061,7 +1061,52 @@ void ProcessRunAway(tOpponent_spec* pOpponent_spec, tProcess_objective_command p
     br_vector3 direction_v;
     char str[256];
     LOG_TRACE("(%p, %d)", pOpponent_spec, pCommand);
-    NOT_IMPLEMENTED();
+
+    switch (pCommand) {
+
+    case ePOC_run:
+        if (pOpponent_spec->run_away_data.time_to_stop >= gTime_stamp_for_this_munging) {
+            if (pOpponent_spec->follow_path_data.section_no > 20000) {
+                ShiftOpponentsProjectedRoute(pOpponent_spec, pOpponent_spec->follow_path_data.section_no - 20000);
+                pOpponent_spec->follow_path_data.section_no = 20000;
+            }
+            if (pOpponent_spec->nnext_sections < 10) {
+                TopUpRandomRoute(pOpponent_spec, 10 - pOpponent_spec->nnext_sections);
+            }
+            if (ProcessFollowPath(pOpponent_spec, ePOC_run, 0, 0, 0) == eFPR_given_up) {
+                ClearOpponentsProjectedRoute(pOpponent_spec);
+                section_no = FindNearestPathSection(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &direction_v, &intersect, &distance);
+                if (BrVector3Dot(&pOpponent_spec->car_spec->direction, &direction_v) < 0.0f) {
+                    AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 0);
+                } else {
+                    AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 1);
+                }
+                TopUpRandomRoute(pOpponent_spec, -1);
+                ProcessFollowPath(pOpponent_spec, ePOC_start, 0, 0, 0);
+            }
+        } else {
+            ObjectiveComplete(pOpponent_spec);
+        }
+        break;
+
+    case ePOC_start:
+        dr_dprintf("%s: ProcessRunAway() - new objective started", pOpponent_spec->car_spec->driver_name);
+        pOpponent_spec->run_away_data.time_to_stop = gTime_stamp_for_this_munging + 1000 * IRandomBetween(30, 90);
+        ClearOpponentsProjectedRoute(pOpponent_spec);
+        section_no = FindNearestPathSection(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &direction_v, &intersect, &distance);
+        if (BrVector3Dot(&pOpponent_spec->car_spec->direction, &direction_v) < 0.0f) {
+            AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 0);
+        } else {
+            AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 1);
+        }
+        TopUpRandomRoute(pOpponent_spec, -1);
+        ProcessFollowPath(pOpponent_spec, ePOC_start, 0, 0, 0);
+        sprintf(str, "%s: Shit! I'm out of here...", pOpponent_spec->car_spec->driver_name);
+        break;
+
+    case ePOC_die:
+        break;
+    }
 }
 
 // IDA: void __usercall ProcessWaitForSomeHaplessSod(tOpponent_spec *pOpponent_spec@<EAX>, tProcess_objective_command pCommand@<EDX>)
@@ -1189,7 +1234,8 @@ int LastTwatteeAPlayer(tOpponent_spec* pOpponent_spec) {
 // IDA: int __usercall LastTwatterAPlayer@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>)
 int LastTwatterAPlayer(tOpponent_spec* pOpponent_spec) {
     LOG_TRACE("(%p)", pOpponent_spec);
-    NOT_IMPLEMENTED();
+
+    return pOpponent_spec->car_spec->last_person_to_hit_us && pOpponent_spec->car_spec->last_person_to_hit_us->driver == eDriver_local_human;
 }
 
 // IDA: void __usercall ObjectiveComplete(tOpponent_spec *pOpponent_spec@<EAX>)
@@ -1636,7 +1682,75 @@ int MassageOpponentPosition(tOpponent_spec* pOpponent_spec, int pMassage_count) 
     br_vector3 positive_y_vector;
     br_vector3 direction_v;
     LOG_TRACE("(%p, %d)", pOpponent_spec, pMassage_count);
-    NOT_IMPLEMENTED();
+
+    BrVector3Set(&positive_y_vector, 0, 1, 0);
+    mat = &pOpponent_spec->car_spec->car_master_actor->t.t.mat;
+    car_trans = &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t;
+    if (pMassage_count > 22) {
+        return 0;
+    }
+    if (pMassage_count <= 20) {
+        direction_v.v[0] = -pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[2][0];
+        direction_v.v[1] = -pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[2][1];
+        direction_v.v[2] = -pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[2][2];
+        if (pMassage_count % 4 >= 2) {
+            // displacement_0 = 1.0 * direction_v_2 - direction_v_1 * 0.0;
+            // displacement_1 = direction_v_0 * 0.0 - 0.0 * direction_v_2;
+            // displacement_2 = 0.0 * direction_v_1 - direction_v_0 * 1.0;
+            BrVector3Cross(&displacement, &positive_y_vector, &direction_v);
+            // v8 = sqrtf(displacement_0 * displacement_0 + displacement_1 * displacement_1 + displacement_2 * displacement_2);
+            // if (v10 | v11) {
+            //     displacement_0 = 1.0;
+            //     displacement_1 = 0.0;
+            //     displacement_2 = 0.0;
+            // } else {
+
+            //     a_0 = v8;
+            //     v12 = 1.0 / a_0;
+            //     a_1 = v12;
+            //     displacement_0 = v12 * displacement_0;
+            //     displacement_1 = displacement_1 * a_1;
+            //     displacement_2 = displacement_2 * a_1;
+            // }
+            BrVector3Normalise(&displacement, &displacement);
+            // displacement_0 = (double)(pMassage_count / 4) * 0.1 * displacement_0;
+            // displacement_1 = (double)(pMassage_count / 4) * 0.1 * displacement_1;
+            // displacement_2 = (double)(pMassage_count / 4) * 0.1 * displacement_2;
+            BrVector3Scale(&displacement, &displacement, (pMassage_count / 4) * 0.1f);
+        } else {
+            // v3 = sqrtf(direction_v_2 * direction_v_2 + direction_v_0 * direction_v_0 + direction_v_1 * direction_v_1);
+            // if (v5 | v6) {
+            //     displacement_0 = 1.0;
+            //     displacement_1 = 0.0;
+            //     displacement_2 = 0.0;
+            // } else {
+            //     a_2 = v3;
+            //     v7 = 1.0 / a_2;
+            //     a_2 = v7;
+            //     displacement_0 = v7 * direction_v_0;
+            //     displacement_1 = direction_v_1 * a_2;
+            //     displacement_2 = direction_v_2 * a_2;
+            // }
+            BrVector3Normalise(&displacement, &displacement);
+            // displacement_0 = (double)(pMassage_count / 4) * 0.5 * displacement_0;
+            // displacement_1 = (double)(pMassage_count / 4) * 0.5 * displacement_1;
+            // displacement_2 = (double)(pMassage_count / 4) * 0.5 * displacement_2;
+            BrVector3Scale(&displacement, &displacement, (pMassage_count / 4) * 0.5f);
+        }
+        if (pMassage_count % 2) {
+            // displacement_0 = -displacement_0;
+            // displacement_1 = -displacement_1;
+            // displacement_2 = -displacement_2;
+            BrVector3Negate(&displacement, &displacement);
+        }
+        // car_trans->v[0] = car_trans->v[0] + displacement_0;
+        // car_trans->v[1] = car_trans->v[1] + displacement_1;
+        // car_trans->v[2] = car_trans->v[2] + displacement_2;
+        BrVector3Accumulate(car_trans, &displacement);
+    } else {
+        car_trans->v[1] = (pMassage_count - 20) * 2.0f + car_trans->v[1];
+    }
+    return 1;
 }
 
 // IDA: int __usercall RematerialiseOpponentOnThisSection@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, br_scalar pSpeed, tS16 pSection_no)
@@ -2710,7 +2824,82 @@ void RecordOpponentTwattageOccurrence(tCar_spec* pTwatter, tCar_spec* pTwattee) 
     tOpponent_spec* twattee_opponent_spec;
     tOpponent_spec* twatter_opponent_spec;
     LOG_TRACE("(%p, %p)", pTwatter, pTwattee);
-    NOT_IMPLEMENTED();
+
+    if (pTwatter->driver != eDriver_oppo && pTwattee->driver != eDriver_oppo) {
+        return;
+    }
+    damage = pTwattee->damage_magnitude_accumulator;
+    bangness = MIN(sqrtf(damage * 300000.0f), 100);
+    grudginess_caused_by_damage = bangness / 10 + 50 * CAR_SPEC_IS_ROZZER(pTwattee);
+    dr_dprintf("Frame %0.6d: %s hit %s, damage %f, bangness %d, gBig_bang %d, grudginess %d",
+        gAcme_frame_count,
+        pTwatter->driver_name,
+        pTwattee->driver_name,
+        damage,
+        bangness,
+        gBig_bang,
+        grudginess_caused_by_damage);
+    if (gMin_bangness <= bangness) {
+        if (gMax_bangness < bangness) {
+            gMax_bangness = bangness;
+            dr_dprintf("(New gMax_bangness - %d)", bangness);
+        }
+    } else {
+        gMin_bangness = bangness;
+        dr_dprintf("(New gMin_bangness - %d)", bangness);
+    }
+    if (bangness >= 5) {
+        pTwatter->last_collision_time = gTime_stamp_for_this_munging;
+        pTwatter->last_person_we_hit = pTwattee;
+        pTwattee->last_collision_time = gTime_stamp_for_this_munging;
+        pTwattee->last_person_to_hit_us = pTwatter;
+        pTwattee->grudge_raised_recently = 1;
+        if (bangness >= gBig_bang || CAR_SPEC_IS_ROZZER(pTwattee)) {
+            pTwattee->big_bang = 1;
+        }
+        if (bangness >= 80) {
+            pTwattee->scary_bang = 1;
+        }
+        if (pTwatter->driver == eDriver_local_human) {
+            twattee_opponent_spec = GetOpponentSpecFromCarSpec(pTwattee);
+            if (pTwattee->scary_bang) {
+                StunTheBugger(twattee_opponent_spec, 30 * bangness + 1000);
+            }
+            new_grudge_value = grudginess_caused_by_damage + gOpponents[twattee_opponent_spec->index].psyche.grudge_against_player;
+            if (new_grudge_value > 100) {
+                new_grudge_value = 100;
+            }
+            gOpponents[twattee_opponent_spec->index].psyche.grudge_against_player = new_grudge_value;
+        } else if (pTwattee->driver == eDriver_local_human) {
+            twatter_opponent_spec = GetOpponentSpecFromCarSpec(pTwatter);
+            if (twatter_opponent_spec->current_objective == eOOT_pursue_and_twat && twatter_opponent_spec->pursue_car_data.pursuee == pTwattee) {
+                twatter_opponent_spec->pursue_car_data.time_last_twatted_em = gTime_stamp_for_this_munging;
+            }
+            twatter_index = twatter_opponent_spec->index;
+            new_grudge_value = gOpponents[twatter_index].psyche.grudge_against_player - (twatter_opponent_spec->current_objective == eOOT_pursue_and_twat ? 0 : 2 * grudginess_caused_by_damage);
+            if (new_grudge_value < 0) {
+                new_grudge_value = 0;
+            }
+            gOpponents[twatter_index].psyche.grudge_against_player = new_grudge_value;
+        } else {
+            twatter_opponent_spec = GetOpponentSpecFromCarSpec(pTwatter);
+            twattee_opponent_spec = GetOpponentSpecFromCarSpec(pTwattee);
+            if (pTwattee->scary_bang) {
+                StunTheBugger(twattee_opponent_spec, 30 * bangness + 1000);
+            }
+            twattee_index = twattee_opponent_spec->index;
+            if (twatter_opponent_spec->current_objective == eOOT_pursue_and_twat && twatter_opponent_spec->pursue_car_data.pursuee == pTwattee) {
+                twatter_opponent_spec->pursue_car_data.time_last_twatted_em = gTime_stamp_for_this_munging;
+            }
+            if (CAR_SPEC_IS_OPPONENT(pTwatter) && CAR_SPEC_IS_ROZZER(pTwattee)) {
+                new_grudge_value = grudginess_caused_by_damage + gOpponents[twattee_index].psyche.grudge_against_player;
+                if (new_grudge_value > 100) {
+                    new_grudge_value = 100;
+                }
+                gOpponents[twattee_index].psyche.grudge_against_player = new_grudge_value;
+            }
+        }
+    }
 }
 
 // IDA: void __cdecl ToggleOpponentTest()

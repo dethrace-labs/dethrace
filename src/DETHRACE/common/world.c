@@ -1590,7 +1590,21 @@ void KillGroovadelic(int pOwner) {
     int i;
     tGroovidelic_spec* the_groove;
     LOG_TRACE("(%d)", pOwner);
-    NOT_IMPLEMENTED();
+
+    if (gGroovidelics_array) {
+        i = 0;
+        the_groove = gGroovidelics_array;
+        for (i == 0; i < gGroovidelics_array_size; i++) {
+            if (the_groove->owner == pOwner
+                && the_groove->path_mode != eMove_controlled
+                && the_groove->path_mode != eMove_absolute
+                && the_groove->object_mode != eMove_controlled
+                && the_groove->object_mode != eMove_absolute) {
+                the_groove->owner = -999;
+            }
+            ++the_groove;
+        }
+    }
 }
 
 // IDA: void __usercall KillFunkotronic(int pOwner@<EAX>)
