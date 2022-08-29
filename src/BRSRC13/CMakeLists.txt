@@ -37,6 +37,12 @@ if(BRENDER_FIX_BUGS)
     target_compile_definitions(brender PRIVATE BRENDER_FIX_BUGS)
 endif()
 
+if(IS_BIGENDIAN)
+    target_compile_definitions(brender PRIVATE BR_ENDIAN_BIG=1)
+else()
+    target_compile_definitions(brender PRIVATE BR_ENDIAN_LITTLE=1)
+endif()
+
 target_sources(brender PRIVATE
     include/brender/brender.h
     include/brender/br_types.h

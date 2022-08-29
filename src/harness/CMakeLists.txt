@@ -30,6 +30,12 @@ else()
     target_compile_definitions(harness PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
 
+if(IS_BIGENDIAN)
+    target_compile_definitions(harness PRIVATE BR_ENDIAN_BIG=1)
+else()
+    target_compile_definitions(harness PRIVATE BR_ENDIAN_LITTLE=1)
+endif()
+
 target_sources(harness PRIVATE
     include/harness/hooks.h
     include/harness/trace.h
