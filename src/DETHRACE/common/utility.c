@@ -28,8 +28,13 @@
 
 int gIn_check_quit;
 tU32 gLost_time;
+#if BR_ENDIAN_BIG
+tU32 gLong_key[4] = { 0x6C1B995F, 0xB9CD5F13, 0xCB04200E, 0x5E1CA10E };
+tU32 gOther_long_key[4] = { 0x67A8D626, 0xB6DD451B, 0x327E2213, 0x15C29437};
+#else
 tU32 gLong_key[4] = { 0x5F991B6C, 0x135FCDB9, 0x0E2004CB, 0x0EA11C5E };
 tU32 gOther_long_key[4] = { 0x26D6A867, 0x1B45DDB6, 0x13227E32, 0x3794C215 };
+#endif
 int gEncryption_method;
 char* gMisc_strings[250];
 br_pixelmap* g16bit_palette;
@@ -68,7 +73,11 @@ void EncodeLine_DEMO(char* pS) {
     unsigned char c;
     FILE* test;
     tPath_name the_path;
+#if BR_ENDIAN_BIG
+    const tU32 gLong_key_DEMO[] = { 0x58503A76, 0xCBB68565, 0x15CD5B07, 0xB168DE3A };
+#else
     const tU32 gLong_key_DEMO[] = { 0x763A5058, 0x6585B6CB, 0x75BCD15, 0x3ADE68B1 };
+#endif
 
     len = strlen(pS);
     key = (char*)gLong_key_DEMO;
