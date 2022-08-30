@@ -1,5 +1,5 @@
 
-const char* vs_2d = "#version 130\n"
+const char* vs_2d = "#version 140\n"
                     "#extension GL_ARB_explicit_attrib_location : require\n"
                     "layout (location = 0) in vec3 aPos;\n"
                     "layout (location = 1) in vec3 aColor;\n"
@@ -11,7 +11,7 @@ const char* vs_2d = "#version 130\n"
                     "   TexCoord = aTexCoord;\n"
                     "}\0";
 
-const char* fs_2d = "#version 130\n"
+const char* fs_2d = "#version 140\n"
                     "#extension GL_ARB_explicit_attrib_location : require\n"
                     "in vec2 TexCoord;\n"
                     "uniform usampler2D pixels;\n"
@@ -25,7 +25,7 @@ const char* fs_2d = "#version 130\n"
                     "  FragColor = texel;\n"
                     "}\n\0";
 
-const char* vs_3d = "#version 130\n"
+const char* vs_3d = "#version 140\n"
                     "#extension GL_ARB_explicit_attrib_location : require\n"
                     "layout (location = 0) in vec3 aPos;\n"
                     "layout (location = 1) in vec3 aNormal;\n"
@@ -46,7 +46,7 @@ const char* vs_3d = "#version 130\n"
                     "   gl_Position = projection * view * vec4(FragPos, 1.0);\n"
                     "}\0";
 
-const char* fs_3d = "#version 130\n"
+const char* fs_3d = "#version 140\n"
                     "#extension GL_ARB_explicit_attrib_location : require\n"
                     "in vec3 Normal;\n"
                     "in vec3 FragPos;\n"
