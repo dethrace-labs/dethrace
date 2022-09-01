@@ -676,7 +676,7 @@ int FopRead_OLD_MODEL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint
     mp->nvertices = i;
     BrResAdd(mp, mp->faces);
     BrResAdd(mp, mp->vertices);
-    mp->flags = mp->flags & (BR_STATE_SURFACE | BR_STATE_MATRIX | BR_STATE_ENABLE | BR_STATE_CLIP);
+    mp->flags = mp->flags & (BR_MODF_DONT_WELD | BR_MODF_KEEP_ORIGINAL | BR_MODF_GENERATE_TAGS | BR_MODF_QUICK_UPDATE);
     DfPush(DF_MODEL, mp, 1);
     return 0;
 }
