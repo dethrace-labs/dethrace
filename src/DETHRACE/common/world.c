@@ -2546,7 +2546,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
                 GetThreeScalars(f, &spec->mat.m[2][0], &spec->mat.m[2][1], &spec->mat.m[2][2]);
                 GetThreeScalars(f, &spec->mat.m[3][0], &spec->mat.m[3][1], &spec->mat.m[3][2]);
                 FindInverseAndWorldBox(spec);
-                ParseSpecialVolume(f, spec, 0);
+                ParseSpecialVolume(f, spec, NULL);
             } else if (strcmp(s, "DEFAULT WATER") == 0) {
                 spec->bounds.min.v[0] = 0.0;
                 spec->bounds.min.v[1] = 0.0;
@@ -2554,7 +2554,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
                 spec->bounds.max.v[0] = 0.0;
                 spec->bounds.max.v[1] = 0.0;
                 spec->bounds.max.v[2] = 0.0;
-                ParseSpecialVolume(f, spec, 0);
+                ParseSpecialVolume(f, spec, NULL);
                 gDefault_water_spec_vol = spec;
                 spec->no_mat = 1;
             } else {
@@ -2572,7 +2572,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
                     // TODO: ? spec->mat.m[3][k] = (v64[k] + v63[k]) / 2.0;
                     // spec->mat.m[0][4 * k] = v64[k] - spec->mat.m[3][k];
                 }
-                ParseSpecialVolume(f, spec, 0);
+                ParseSpecialVolume(f, spec, NULL);
             }
             spec++;
         }
