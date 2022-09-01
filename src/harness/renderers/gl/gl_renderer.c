@@ -339,7 +339,22 @@ void GLRenderer_EndScene() {
 }
 
 void GLRenderer_FullScreenQuad(uint8_t* screen_buffer, int width, int height) {
-    glViewport(0, 0, window_width, window_height);
+    const float target_aspect_ratio = (float)render_width / render_height;
+    const float aspect_ratio = (float)window_width / window_height;
+    int vp_width;
+    int vp_height;
+
+    vp_width = window_width;
+    vp_height = window_height;
+    if (aspect_ratio != target_aspect_ratio) {
+        if (aspect_ratio > target_aspect_ratio) {
+            vp_width = window_height * target_aspect_ratio + .5f;
+        } else {
+            vp_height = window_width / target_aspect_ratio + .5f;
+        }
+    }
+
+    glViewport((window_width - vp_width) / 2, (window_height - vp_height) / 2, vp_width, vp_height);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDisable(GL_DEPTH_TEST);
 
