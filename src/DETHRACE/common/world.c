@@ -2569,8 +2569,9 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
                 GetThreeScalars(f, &spec->bounds.max.v[0], &spec->bounds.max.v[1], &spec->bounds.max.v[2]);
                 BrMatrix34Identity(&spec->mat);
                 for (k = 0; k < 3; ++k) {
-                    // TODO: ? spec->mat.m[3][k] = (v64[k] + v63[k]) / 2.0;
-                    // spec->mat.m[0][4 * k] = v64[k] - spec->mat.m[3][k];
+                     // FIXME: not 100% sure this is correct
+                     spec->mat.m[3][k] = (spec->bounds.max.v[k] + spec->bounds.min.v[k]) / 2.f;
+                     spec->mat.m[k][k] = spec->bounds.max.v[k] - spec->bounds.min.v[k];
                 }
                 ParseSpecialVolume(f, spec, NULL);
             }
