@@ -129,6 +129,11 @@ struct {
     float x;
     float y;
 } sdl_window_scale;
+int is_full_screen = 0;
+
+// From gl_renderer.c
+extern int window_width;
+extern int window_height;
 
 tRenderer gl_renderer = {
     GLRenderer_Init,
@@ -192,6 +197,12 @@ tRenderer* Window_Create(char* title, int width, int height, int pRender_width, 
     return &gl_renderer;
 }
 
+// Checks whether the `flag_check` is the only modifier applied.
+// e.g. is_only_modifier(event.key.keysym.mod, KMOD_ALT) returns true when only the ALT key was pressed
+static int is_only_key_modifier(int modifier_flags, int flag_check) {
+    return (modifier_flags & flag_check) && (modifier_flags & (KMOD_CTRL | KMOD_SHIFT | KMOD_ALT | KMOD_GUI)) == (modifier_flags & flag_check);
+}
+
 void Window_PollEvents() {
     SDL_Event event;
     int dethrace_key;
@@ -200,6 +211,20 @@ void Window_PollEvents() {
         switch (event.type) {
         case SDL_KEYDOWN:
         case SDL_KEYUP:
+            if (event.key.keysym.sym == SDLK_RETURN) {
+                if (event.key.type == SDL_KEYDOWN) {
+                    if ((event.key.keysym.mod & (KMOD_CTRL | KMOD_SHIFT | KMOD_ALT | KMOD_GUI))) {
+                        // Ignore keydown of RETURN when used together with some modifier
+                        return;
+                    }
+                } else if (event.key.type == SDL_KEYUP) {
+                    if (is_only_key_modifier(event.key.keysym.mod, KMOD_ALT)) {
+                        is_full_screen = !is_full_screen;
+                        SDL_SetWindowFullscreen(window, is_full_screen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+                        SDL_GetWindowSize(window, &window_width, &window_height);
+                    }
+                }
+            }
             dethrace_key = scancodes_sdl2dethrace[event.key.keysym.scancode];
             if (dethrace_key == -1) {
                 LOG_WARN("unexpected scan code %s (%d)", SDL_GetScancodeName(event.key.keysym.scancode), event.key.keysym.scancode);
