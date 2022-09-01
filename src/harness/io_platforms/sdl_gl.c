@@ -172,11 +172,6 @@ tRenderer* Window_Create(char* title, int width, int height, int pRender_width, 
         LOG_PANIC("Failed to create window");
     }
 
-    // Don't grab the mouse when a debugger is present
-    if (!OS_IsDebuggerPresent()) {
-        SDL_SetRelativeMouseMode(SDL_TRUE);
-    }
-
     sdl_window_scale.x = ((float)pRender_width) / width;
     sdl_window_scale.y = ((float)pRender_height) / height;
 
