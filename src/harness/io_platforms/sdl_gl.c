@@ -134,6 +134,8 @@ int is_full_screen = 0;
 // From gl_renderer.c
 extern int window_width;
 extern int window_height;
+extern int render_width;
+extern int render_height;
 
 tRenderer gl_renderer = {
     GLRenderer_Init,
@@ -166,7 +168,7 @@ tRenderer* Window_Create(char* title, int width, int height, int pRender_width, 
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
         width, height,
-        SDL_WINDOW_OPENGL);
+        SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
     if (window == NULL) {
         LOG_PANIC("Failed to create window");
@@ -216,7 +218,6 @@ void Window_PollEvents() {
                     if (is_only_key_modifier(event.key.keysym.mod, KMOD_ALT)) {
                         is_full_screen = !is_full_screen;
                         SDL_SetWindowFullscreen(window, is_full_screen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
-                        SDL_GetWindowSize(window, &window_width, &window_height);
                     }
                 }
             }
@@ -233,6 +234,15 @@ void Window_PollEvents() {
             sdl_key_state[3] = sdl_key_state[2];
             break;
 
+        case SDL_WINDOWEVENT:
+            switch (event.window.event) {
+            case SDL_WINDOWEVENT_SIZE_CHANGED:
+                SDL_GetWindowSize(window, &window_width, &window_height);
+                sdl_window_scale.x = (float)render_width / window_width;
+                sdl_window_scale.y = (float)render_height / window_height;
+                break;
+            }
+            break;
         case SDL_QUIT:
             LOG_PANIC("QuitGame");
             break;
