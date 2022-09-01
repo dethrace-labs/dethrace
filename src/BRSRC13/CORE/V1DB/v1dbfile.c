@@ -655,6 +655,7 @@ int FopRead_OLD_MODEL_1(br_datafile* df, br_uint_32 id, br_uint_32 length, br_ui
     mp = BrModelAllocate(NULL, 0, 0);
     df->res = mp;
     df->prims->struct_read(df, &br_old_model_1_F, mp);
+    df->res = NULL;
     DfPush(DF_MODEL, df->res, 1);
     return 0;
 }
