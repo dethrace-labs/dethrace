@@ -422,7 +422,7 @@ int FopRead_MATERIAL_INDEX(br_datafile* df, br_uint_32 id, br_uint_32 length, br
     br_uint_32 i;
     LOG_TRACE9("(%p, %d, %d, %d)", df, id, length, count);
 
-    mip = (br_material**)BrResAllocate(v1db.res, sizeof(intptr_t) * (count + 1), BR_MEMORY_MATERIAL_INDEX);
+    mip = (br_material**)BrResAllocate(v1db.res, sizeof(br_material*) * (count + 1), BR_MEMORY_MATERIAL_INDEX);
     mip[0] = NULL;
     for (i = 1; i < count + 1; i++) {
         df->prims->name_read(df, name);
