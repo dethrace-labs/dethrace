@@ -472,14 +472,15 @@ int FopRead_OLD_MATERIAL_INDEX(br_datafile* df, br_uint_32 id, br_uint_32 length
     }
     mip = BrResAllocate(v1db.res, num_materials * sizeof(br_material*), BR_MEMORY_MATERIAL_INDEX);
     cp = mblock;
-    for (i = 0; i < length; i++) {
-        *mip = BrMaterialFind(*cp);
+    for (i = 0; i < num_materials; i++) {
+        mip[i] = BrMaterialFind(cp);
         while (*cp != '\0') {
             cp++;
         }
+        cp++;
     }
     BrScratchFree(mblock);
-    DfPush(DF_MATERIAL_INDEX, mip, count);
+    DfPush(DF_MATERIAL_INDEX, mip, num_materials);
     return 0;
 }
 
