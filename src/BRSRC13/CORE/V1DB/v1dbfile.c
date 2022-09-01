@@ -42,7 +42,7 @@ br_file_struct_member br_old_vertex_uv_FM[5] = {
 br_file_struct br_old_vertex_uv_F = { "br_old_vertex_uv", BR_ASIZE(br_old_vertex_uv_FM), br_old_vertex_uv_FM, sizeof(br_vertex) };
 
 br_file_struct_member br_face_FM[5] = {
-    { DF_TYPE_BR_UINT_16, offsetof(br_face, vertices), "vertices[0]", NULL },
+    { DF_TYPE_BR_UINT_16, offsetof(br_face, vertices[0]), "vertices[0]", NULL },
     { DF_TYPE_BR_UINT_16, offsetof(br_face, vertices[1]), "vertices[1]", NULL },
     { DF_TYPE_BR_UINT_16, offsetof(br_face, vertices[2]), "vertices[2]", NULL },
     { DF_TYPE_BR_UINT_16, offsetof(br_face, smoothing), "smoothing", NULL },
@@ -77,14 +77,14 @@ br_file_struct br_model_F = { "br_model", BR_ASIZE(br_model_FM), br_model_FM, si
 br_file_struct_member br_old_model_1_FM[1] = {
     { DF_TYPE_ASCIZ, offsetof(br_model, identifier), "identifier", NULL },
 };
-br_file_struct br_old_model_1_F = { "br_old_model_1", 1, br_old_model_1_FM, sizeof(br_model) };
+br_file_struct br_old_model_1_F = { "br_old_model_1", BR_ASIZE(br_old_model_1_FM), br_old_model_1_FM, sizeof(br_model) };
 
 br_file_struct_member br_pivot_FM[3] = {
     { DF_TYPE_BR_SCALAR, offsetof(br_model, pivot.v[0]), "pivot.v[X]", NULL },
     { DF_TYPE_BR_SCALAR, offsetof(br_model, pivot.v[1]), "pivot.v[Y]", NULL },
     { DF_TYPE_BR_SCALAR, offsetof(br_model, pivot.v[2]), "pivot.v[Z]", NULL },
 };
-br_file_struct br_pivot_F = { "br_pivot", 3, br_pivot_FM, sizeof(br_model) };
+br_file_struct br_pivot_F = { "br_pivot", BR_ASIZE(br_pivot_FM), br_pivot_FM, sizeof(br_model) };
 
 br_file_struct_member br_material_old_FM[13] = {
     { DF_TYPE_BR_COLOUR, offsetof(br_material, colour), "colour", NULL },
@@ -974,7 +974,7 @@ int FopRead_TRANSFORM(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint
             break;
         }
     }
-    if (t == 7) {
+    if (t == BR_ASIZE(TransformTypes)) {
         LOG_PANIC("transform type not found!");
     }
     tp = (br_transform*)BrResAllocate(v1db.res, sizeof(br_transform), BR_MEMORY_TRANSFORM);
