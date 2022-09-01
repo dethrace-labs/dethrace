@@ -374,7 +374,12 @@ int FopRead_VERTICES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_
 int FopRead_OLD_VERTICES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     void* ptr;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
-    NOT_IMPLEMENTED();
+
+    count = length / df->prims->struct_size(df, &br_vertex_F, NULL);
+    ptr = BrResAllocate(v1db.res, count * sizeof(br_vertex), BR_MEMORY_VERTICES);
+    DfStructReadArray(df, &br_vertex_F, ptr, count);
+    DfPush(DF_VERTEX, ptr, count);
+    return 0;
 }
 
 // IDA: int __usercall FopWrite_VERTEX_UV@<EAX>(br_datafile *df@<EAX>, br_vertex *vertices@<EDX>, int nvertices@<EBX>)
