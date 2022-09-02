@@ -49,7 +49,6 @@ void OS_Sleep(int delay_ms) {
 char* OS_GetFirstFileInDirectory(char* path) {
     char with_extension[256];
     WIN32_FIND_DATA find_data;
-    HANDLE hFind = NULL;
 
     strcpy(with_extension, path);
     strcat(with_extension, "\\*.???");
