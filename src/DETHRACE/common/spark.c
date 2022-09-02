@@ -82,7 +82,7 @@ void SetWorldToScreen(br_pixelmap* pScreen) {
     LOG_TRACE("(%p)", pScreen);
 
     BrMatrix4Perspective(&mat, gSpark_cam->field_of_view, gSpark_cam->aspect, -gSpark_cam->hither_z, -gSpark_cam->yon_z);
-    BrMatrix4Scale(&mat2, pScreen->width / 2, pScreen->height / 2, 1.0);
+    BrMatrix4Scale(&mat2, pScreen->width / 2, pScreen->height / 2, 1.0f);
     BrMatrix4Mul(&gCameraToScreen, &mat, &mat2);
 }
 
