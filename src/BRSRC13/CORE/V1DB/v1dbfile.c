@@ -42,7 +42,7 @@ br_file_struct_member br_old_vertex_uv_FM[5] = {
 br_file_struct br_old_vertex_uv_F = { "br_old_vertex_uv", BR_ASIZE(br_old_vertex_uv_FM), br_old_vertex_uv_FM, sizeof(br_vertex) };
 
 br_file_struct_member br_face_FM[5] = {
-    { DF_TYPE_BR_UINT_16, offsetof(br_face, vertices), "vertices[0]", NULL },
+    { DF_TYPE_BR_UINT_16, offsetof(br_face, vertices[0]), "vertices[0]", NULL },
     { DF_TYPE_BR_UINT_16, offsetof(br_face, vertices[1]), "vertices[1]", NULL },
     { DF_TYPE_BR_UINT_16, offsetof(br_face, vertices[2]), "vertices[2]", NULL },
     { DF_TYPE_BR_UINT_16, offsetof(br_face, smoothing), "smoothing", NULL },
@@ -77,14 +77,14 @@ br_file_struct br_model_F = { "br_model", BR_ASIZE(br_model_FM), br_model_FM, si
 br_file_struct_member br_old_model_1_FM[1] = {
     { DF_TYPE_ASCIZ, offsetof(br_model, identifier), "identifier", NULL },
 };
-br_file_struct br_old_model_1_F = { "br_old_model_1", 1, br_old_model_1_FM, sizeof(br_model) };
+br_file_struct br_old_model_1_F = { "br_old_model_1", BR_ASIZE(br_old_model_1_FM), br_old_model_1_FM, sizeof(br_model) };
 
 br_file_struct_member br_pivot_FM[3] = {
     { DF_TYPE_BR_SCALAR, offsetof(br_model, pivot.v[0]), "pivot.v[X]", NULL },
     { DF_TYPE_BR_SCALAR, offsetof(br_model, pivot.v[1]), "pivot.v[Y]", NULL },
     { DF_TYPE_BR_SCALAR, offsetof(br_model, pivot.v[2]), "pivot.v[Z]", NULL },
 };
-br_file_struct br_pivot_F = { "br_pivot", 3, br_pivot_FM, sizeof(br_model) };
+br_file_struct br_pivot_F = { "br_pivot", BR_ASIZE(br_pivot_FM), br_pivot_FM, sizeof(br_model) };
 
 br_file_struct_member br_material_old_FM[13] = {
     { DF_TYPE_BR_COLOUR, offsetof(br_material, colour), "colour", NULL },
@@ -374,7 +374,12 @@ int FopRead_VERTICES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_
 int FopRead_OLD_VERTICES(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_32 count) {
     void* ptr;
     LOG_TRACE("(%p, %d, %d, %d)", df, id, length, count);
-    NOT_IMPLEMENTED();
+
+    count = length / df->prims->struct_size(df, &br_vertex_F, NULL);
+    ptr = BrResAllocate(v1db.res, count * sizeof(br_vertex), BR_MEMORY_VERTICES);
+    DfStructReadArray(df, &br_vertex_F, ptr, count);
+    DfPush(DF_VERTEX, ptr, count);
+    return 0;
 }
 
 // IDA: int __usercall FopWrite_VERTEX_UV@<EAX>(br_datafile *df@<EAX>, br_vertex *vertices@<EDX>, int nvertices@<EBX>)
@@ -417,7 +422,7 @@ int FopRead_MATERIAL_INDEX(br_datafile* df, br_uint_32 id, br_uint_32 length, br
     br_uint_32 i;
     LOG_TRACE9("(%p, %d, %d, %d)", df, id, length, count);
 
-    mip = (br_material**)BrResAllocate(v1db.res, sizeof(intptr_t) * (count + 1), BR_MEMORY_MATERIAL_INDEX);
+    mip = (br_material**)BrResAllocate(v1db.res, sizeof(br_material*) * (count + 1), BR_MEMORY_MATERIAL_INDEX);
     mip[0] = NULL;
     for (i = 1; i < count + 1; i++) {
         df->prims->name_read(df, name);
@@ -467,14 +472,15 @@ int FopRead_OLD_MATERIAL_INDEX(br_datafile* df, br_uint_32 id, br_uint_32 length
     }
     mip = BrResAllocate(v1db.res, num_materials * sizeof(br_material*), BR_MEMORY_MATERIAL_INDEX);
     cp = mblock;
-    for (i = 0; i < length; i++) {
-        *mip = BrMaterialFind(*cp);
+    for (i = 0; i < num_materials; i++) {
+        mip[i] = BrMaterialFind(cp);
         while (*cp != '\0') {
             cp++;
         }
+        cp++;
     }
     BrScratchFree(mblock);
-    DfPush(DF_MATERIAL_INDEX, mip, count);
+    DfPush(DF_MATERIAL_INDEX, mip, num_materials);
     return 0;
 }
 
@@ -649,6 +655,7 @@ int FopRead_OLD_MODEL_1(br_datafile* df, br_uint_32 id, br_uint_32 length, br_ui
     mp = BrModelAllocate(NULL, 0, 0);
     df->res = mp;
     df->prims->struct_read(df, &br_old_model_1_F, mp);
+    df->res = NULL;
     DfPush(DF_MODEL, df->res, 1);
     return 0;
 }
@@ -669,7 +676,7 @@ int FopRead_OLD_MODEL(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint
     mp->nvertices = i;
     BrResAdd(mp, mp->faces);
     BrResAdd(mp, mp->vertices);
-    mp->flags = mp->flags & (BR_STATE_SURFACE | BR_STATE_MATRIX | BR_STATE_ENABLE | BR_STATE_CLIP);
+    mp->flags = mp->flags & (BR_MODF_DONT_WELD | BR_MODF_KEEP_ORIGINAL | BR_MODF_GENERATE_TAGS | BR_MODF_QUICK_UPDATE);
     DfPush(DF_MODEL, mp, 1);
     return 0;
 }
@@ -968,7 +975,7 @@ int FopRead_TRANSFORM(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint
             break;
         }
     }
-    if (t == 7) {
+    if (t == BR_ASIZE(TransformTypes)) {
         LOG_PANIC("transform type not found!");
     }
     tp = (br_transform*)BrResAllocate(v1db.res, sizeof(br_transform), BR_MEMORY_TRANSFORM);
