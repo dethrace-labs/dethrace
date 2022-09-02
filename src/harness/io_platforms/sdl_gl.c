@@ -128,10 +128,15 @@ const int scancodes_dethrace2sdl[123] = {
 };
 int scancodes_sdl2dethrace[SDL_NUM_SCANCODES];
 
-SDL_Window* window;
-SDL_GLContext context;
-uint8_t sdl_key_state[256];
-struct {
+typedef struct {
+    SDL_Window* window;
+    SDL_GLContext glContext;
+} tWindowState;
+
+static tWindowState gMainWindow;
+
+static uint8_t sdl_key_state[256];
+static struct {
     float x;
     float y;
 } sdl_window_scale;
@@ -167,27 +172,25 @@ tRenderer* Window_Create(char* title, int width, int height, int pRender_width, 
 
     SDL_GL_SetSwapInterval(1);
 
-    window = SDL_CreateWindow(title,
+    gMainWindow.window = SDL_CreateWindow(title,
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
         width, height,
         SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
-    if (window == NULL) {
-        LOG_PANIC("Failed to create window. %s", SDL_GetError());
+    if (gMainWindow.window == NULL) {
+        LOG_PANIC("Failed to create window");
     }
 
     sdl_window_scale.x = ((float)pRender_width) / width;
     sdl_window_scale.y = ((float)pRender_height) / height;
 
     if (harness_game_config.start_full_screen) {
-        SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+        SDL_SetWindowFullscreen(gMainWindow.window, SDL_WINDOW_FULLSCREEN_DESKTOP);
     }
 
-    SDL_ShowCursor(SDL_DISABLE);
-
-    context = SDL_GL_CreateContext(window);
-    if (!context) {
+    gMainWindow.glContext = SDL_GL_CreateContext(gMainWindow.window);
+    if (gMainWindow.glContext == NULL) {
         LOG_PANIC("Failed to call SDL_GL_CreateContext. %s", SDL_GetError());
     }
 
@@ -227,7 +230,7 @@ void Window_PollEvents() {
                     }
                 } else if (event.key.type == SDL_KEYUP) {
                     if (is_only_key_modifier(event.key.keysym.mod, KMOD_ALT)) {
-                        SDL_SetWindowFullscreen(window, (SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN_DESKTOP) ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP);
+                        SDL_SetWindowFullscreen(gMainWindow.window, (SDL_GetWindowFlags(gMainWindow.window) & SDL_WINDOW_FULLSCREEN_DESKTOP) ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP);
                     }
                 }
             }
@@ -247,7 +250,7 @@ void Window_PollEvents() {
         case SDL_WINDOWEVENT:
             switch (event.window.event) {
             case SDL_WINDOWEVENT_SIZE_CHANGED:
-                SDL_GetWindowSize(window, &w_w, &w_h);
+                SDL_GetWindowSize(gMainWindow.window, &w_w, &w_h);
                 gl_renderer.SetWindowSize(w_w, w_h);
                 gl_renderer.GetViewport(&vp_x, &vp_y, &vp_w, &vp_h);
                 gl_renderer.GetRenderSize(&r_w, &r_h);
@@ -264,7 +267,7 @@ void Window_PollEvents() {
 }
 
 void Window_Swap(int delay_ms_after_swap) {
-    SDL_GL_SwapWindow(window);
+    SDL_GL_SwapWindow(gMainWindow.window);
 
     if (delay_ms_after_swap != 0) {
         SDL_Delay(delay_ms_after_swap);
