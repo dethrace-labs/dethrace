@@ -14,6 +14,7 @@ target_include_directories(harness
         "${CMAKE_CURRENT_BINARY_DIR}"
     PUBLIC
         include
+        "${CMAKE_CURRENT_SOURCE_DIR}/renderers"
 )
 
 if(DETHRACE_FIX_BUGS)
@@ -55,7 +56,8 @@ target_sources(harness PRIVATE
     harness.c
     harness.h
     io_platforms/io_platform.h
-    renderers/null.h
+    renderers/null/null.c
+    renderers/null/null.h
     renderers/renderer.h
     brender_emu/renderer_impl.c
     brender_emu/renderer_impl.h
@@ -63,7 +65,6 @@ target_sources(harness PRIVATE
     sound/sound.h
     "${CMAKE_CURRENT_BINARY_DIR}/version.h"
 )
-
 if (IO_PLATFORM STREQUAL "SDL_OpenGL")
     # generate embedded glsl resources
     foreach(elem resources/framebuffer_vert.glsl resources/framebuffer_frag.glsl resources/3d_vert.glsl resources/3d_frag.glsl)

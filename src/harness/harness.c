@@ -3,7 +3,7 @@
 #include "include/harness/config.h"
 #include "include/harness/os.h"
 #include "io_platforms/io_platform.h"
-#include "renderers/null.h"
+#include "renderers/null/null.h"
 #include "sound/sound.h"
 #include "version.h"
 
