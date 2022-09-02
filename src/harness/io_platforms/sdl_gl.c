@@ -292,13 +292,13 @@ void Input_GetMousePosition(int* pX, int* pY) {
     gl_renderer.GetViewport(&vp_x, &vp_y, &vp_w, &vp_h);
     if (*pX < vp_x) {
         *pX = vp_x;
-    } else if (*pX > vp_x + vp_w) {
-        *pX = vp_x + vp_w;
+    } else if (*pX >= vp_x + vp_w) {
+        *pX = vp_x + vp_w - 1;
     }
     if (*pY < vp_y) {
         *pY = vp_y;
-    } else if (*pY > vp_y + vp_h) {
-        *pY = vp_y + vp_h;
+    } else if (*pY >= vp_y + vp_h) {
+        *pY = vp_y + vp_h - 1;
     }
     *pX -= vp_x;
     *pY -= vp_y;
