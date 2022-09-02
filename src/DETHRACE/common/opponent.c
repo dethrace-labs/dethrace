@@ -297,11 +297,11 @@ tS16 FindNearestGeneralSection(tCar_spec* pPursuee, br_vector3* pActor_coords, b
     if (nearest_node_distance_squared > closest_distance_squared) {
         nearest_node_section_no = nearest_section;
         if (pPursuee != NULL) {
-            start = &pPursuee->my_trail.trail_nodes[section_no];
-            finish = &pPursuee->my_trail.trail_nodes[section_no + 1];
+            start = &pPursuee->my_trail.trail_nodes[nearest_section];
+            finish = &pPursuee->my_trail.trail_nodes[nearest_section + 1];
         } else {
-            start = &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0]].p;
-            finish = &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1]].p;
+            start = &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[nearest_section].node_indices[0]].p;
+            finish = &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[nearest_section].node_indices[1]].p;
         }
         BrVector3Sub(&p, finish, start);
         BrVector3NormaliseQuick(pPath_direction, &p);
