@@ -131,12 +131,6 @@ struct {
 } sdl_window_scale;
 int is_full_screen = 0;
 
-// From gl_renderer.c
-extern int window_width;
-extern int window_height;
-extern int render_width;
-extern int render_height;
-
 tRenderer gl_renderer = {
     GLRenderer_Init,
     GLRenderer_BeginScene,
@@ -148,7 +142,11 @@ tRenderer gl_renderer = {
     GLRenderer_BufferTexture,
     GLRenderer_BufferMaterial,
     GLRenderer_BufferModel,
-    GLRenderer_FlushBuffers
+    GLRenderer_FlushBuffers,
+    GLRenderer_GetRenderSize,
+    GLRenderer_GetWindowSize,
+    GLRenderer_SetWindowSize,
+    GLRenderer_GetViewport
 };
 
 tRenderer* Window_Create(char* title, int width, int height, int pRender_width, int pRender_height) {
@@ -203,6 +201,10 @@ static int is_only_key_modifier(int modifier_flags, int flag_check) {
 void Window_PollEvents() {
     SDL_Event event;
     int dethrace_key;
+    int w_w, w_h;
+    int vp_x, vp_y;
+    int vp_w, vp_h;
+    int r_w, r_h;
 
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
@@ -237,9 +239,12 @@ void Window_PollEvents() {
         case SDL_WINDOWEVENT:
             switch (event.window.event) {
             case SDL_WINDOWEVENT_SIZE_CHANGED:
-                SDL_GetWindowSize(window, &window_width, &window_height);
-                sdl_window_scale.x = (float)render_width / window_width;
-                sdl_window_scale.y = (float)render_height / window_height;
+                SDL_GetWindowSize(window, &w_w, &w_h);
+                gl_renderer.SetWindowSize(w_w, w_h);
+                gl_renderer.GetViewport(&vp_x, &vp_y, &vp_w, &vp_h);
+                gl_renderer.GetRenderSize(&r_w, &r_h);
+                sdl_window_scale.x = (float)r_w / vp_w;
+                sdl_window_scale.y = (float)r_h / vp_h;
                 break;
             }
             break;
@@ -281,7 +286,22 @@ int Input_IsKeyDown(unsigned char scan_code) {
 }
 
 void Input_GetMousePosition(int* pX, int* pY) {
+    int vp_x, vp_y, vp_w, vp_h;
+
     SDL_GetMouseState(pX, pY);
+    gl_renderer.GetViewport(&vp_x, &vp_y, &vp_w, &vp_h);
+    if (*pX < vp_x) {
+        *pX = vp_x;
+    } else if (*pX > vp_x + vp_w) {
+        *pX = vp_x + vp_w;
+    }
+    if (*pY < vp_y) {
+        *pY = vp_y;
+    } else if (*pY > vp_y + vp_h) {
+        *pY = vp_y + vp_h;
+    }
+    *pX -= vp_x;
+    *pY -= vp_y;
     *pX *= sdl_window_scale.x;
     *pY *= sdl_window_scale.y;
 }

@@ -12,21 +12,21 @@
 extern float gCamera_hither;
 extern float gCamera_yon;
 
-GLuint screen_buffer_vao, screen_buffer_ebo;
-GLuint screen_texture, palette_texture, depth_texture;
+static GLuint screen_buffer_vao, screen_buffer_ebo;
+static GLuint screen_texture, palette_texture, depth_texture;
 
-GLuint shader_program_2d;
-GLuint shader_program_3d;
-GLuint framebuffer_id, framebuffer_texture = 0;
-unsigned int rbo;
-uint8_t gl_palette[4 * 256]; // RGBA
-uint8_t* screen_buffer_flip_pixels;
-uint16_t* depth_buffer_flip_pixels;
+static GLuint shader_program_2d;
+static GLuint shader_program_3d;
+static GLuint framebuffer_id, framebuffer_texture = 0;
+static uint8_t gl_palette[4 * 256]; // RGBA
+static uint8_t* screen_buffer_flip_pixels;
+static uint16_t* depth_buffer_flip_pixels;
 
-int window_width, window_height, render_width, render_height;
+static int window_width, window_height, render_width, render_height;
+static int vp_x, vp_y, vp_width, vp_height;
 
-br_pixelmap* last_shade_table = NULL;
-int dirty_buffers = 0;
+static br_pixelmap* last_shade_table = NULL;
+static int dirty_buffers = 0;
 
 struct {
     GLuint pixels, pixels_transform;
@@ -177,12 +177,29 @@ void SetupFullScreenRectGeometry() {
     glBindVertexArray(0);
 }
 
-void GLRenderer_Init(int width, int height, int pRender_width, int pRender_height) {
+static void update_viewport() {
+    const float target_aspect_ratio = (float)render_width / render_height;
+    const float aspect_ratio = (float)window_width / window_height;
 
+    vp_width = window_width;
+    vp_height = window_height;
+    if (aspect_ratio != target_aspect_ratio) {
+        if (aspect_ratio > target_aspect_ratio) {
+            vp_width = window_height * target_aspect_ratio + .5f;
+        } else {
+            vp_height = window_width / target_aspect_ratio + .5f;
+        }
+    }
+    vp_x = (window_width - vp_width) / 2;
+    vp_y = (window_height - vp_height) / 2;
+}
+
+void GLRenderer_Init(int width, int height, int pRender_width, int pRender_height) {
     window_width = width;
     window_height = height;
     render_width = pRender_width;
     render_height = pRender_height;
+    update_viewport();
 
     int maxTextureImageUnits;
     glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxTextureImageUnits);
@@ -339,22 +356,7 @@ void GLRenderer_EndScene() {
 }
 
 void GLRenderer_FullScreenQuad(uint8_t* screen_buffer, int width, int height) {
-    const float target_aspect_ratio = (float)render_width / render_height;
-    const float aspect_ratio = (float)window_width / window_height;
-    int vp_width;
-    int vp_height;
-
-    vp_width = window_width;
-    vp_height = window_height;
-    if (aspect_ratio != target_aspect_ratio) {
-        if (aspect_ratio > target_aspect_ratio) {
-            vp_width = window_height * target_aspect_ratio + .5f;
-        } else {
-            vp_height = window_width / target_aspect_ratio + .5f;
-        }
-    }
-
-    glViewport((window_width - vp_width) / 2, (window_height - vp_height) / 2, vp_width, vp_height);
+    glViewport(vp_x, vp_y, vp_width, vp_height);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDisable(GL_DEPTH_TEST);
 
@@ -651,4 +653,27 @@ void GLRenderer_FlushBuffers(br_pixelmap* color_buffer, br_pixelmap* depth_buffe
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
     glClear(GL_COLOR_BUFFER_BIT);
     dirty_buffers = 0;
+}
+
+void GLRenderer_GetRenderSize(int* width, int* height) {
+    *width = render_width;
+    *height = render_height;
+}
+
+void GLRenderer_GetWindowSize(int* width, int* height) {
+    *width = window_width;
+    *height = window_height;
+}
+
+void GLRenderer_SetWindowSize(int width, int height) {
+    window_width = width;
+    window_height = height;
+    update_viewport();
+}
+
+void GLRenderer_GetViewport(int* x, int* y, int* width, int* height)  {
+    *x = vp_x;
+    *y = vp_y;
+    *width = vp_width;
+    *height = vp_height;
 }

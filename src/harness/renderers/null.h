@@ -12,6 +12,10 @@ void Null_BufferTexture(br_pixelmap* pm) {}
 void Null_BufferMaterial(br_material* mat) {}
 void Null_BufferModel(br_model* model) {}
 void Null_FlushBuffers(br_pixelmap* color_buffer, br_pixelmap* depth_buffer) {}
+void Null_GetRenderSize(int* width, int* height) { *width = 640; *height = 480; }
+void Null_GetWindowSize(int* width, int* height) { *width = 640; *height = 480; }
+void Null_SetWindowSize(int width, int height) {}
+void Null_GetViewportSize(int* x, int* y, int* width, int* height) { *x = 0; *y = 0; *width = 640; *height = 480; }
 
 tRenderer null_renderer = {
     Null_Init,
@@ -24,5 +28,9 @@ tRenderer null_renderer = {
     Null_BufferTexture,
     Null_BufferMaterial,
     Null_BufferModel,
-    Null_FlushBuffers
+    Null_FlushBuffers,
+    Null_GetRenderSize,
+    Null_GetWindowSize,
+    Null_SetWindowSize,
+    Null_GetViewportSize
 };
