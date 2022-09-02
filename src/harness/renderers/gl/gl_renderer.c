@@ -51,7 +51,7 @@ struct {
     GLuint pixels, palette;
 } uniforms_2dpp;
 
-GLuint CreateShaderProgram(char* name, const char* vertex_shader, const int vertex_shader_len, const char* fragment_shader, const int fragment_shader_len) {
+static GLuint CreateShaderProgram(char* name, const char* vertex_shader, const int vertex_shader_len, const char* fragment_shader, const int fragment_shader_len) {
     int success;
     char log_buffer[1024];
     GLuint program;
@@ -94,7 +94,7 @@ GLuint CreateShaderProgram(char* name, const char* vertex_shader, const int vert
     return program;
 }
 
-GLint GetValidatedUniformLocation(GLuint program, char* uniform_name) {
+static GLint GetValidatedUniformLocation(GLuint program, char* uniform_name) {
     GLint location;
     location = glGetUniformLocation(program, uniform_name);
     if (location == -1) {
@@ -103,7 +103,7 @@ GLint GetValidatedUniformLocation(GLuint program, char* uniform_name) {
     return location;
 }
 
-void LoadShaders() {
+static void LoadShaders() {
     shader_program_2d = CreateShaderProgram("framebuffer", RESOURCES_FRAMEBUFFER_VERT_GLSL, sizeof(RESOURCES_FRAMEBUFFER_VERT_GLSL), RESOURCES_FRAMEBUFFER_FRAG_GLSL, sizeof(RESOURCES_FRAMEBUFFER_FRAG_GLSL));
     glUseProgram(shader_program_2d);
     uniforms_2d.pixels = GetValidatedUniformLocation(shader_program_2d, "u_pixels");
@@ -135,7 +135,7 @@ void LoadShaders() {
     glUniform1i(uniforms_3d.shade_table, 2);
 }
 
-void SetupFullScreenRectGeometry() {
+static void SetupFullScreenRectGeometry() {
     float vertices[] = {
         // positions          // colors           // texture coords
         1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right
@@ -191,7 +191,7 @@ static void update_viewport() {
     vp_y = (window_height - vp_height) / 2;
 }
 
-void GLRenderer_Init(int width, int height, int pRender_width, int pRender_height) {
+static void GLRenderer_Init(int width, int height, int pRender_width, int pRender_height) {
     window_width = width;
     window_height = height;
     render_width = pRender_width;
@@ -257,7 +257,7 @@ void GLRenderer_Init(int width, int height, int pRender_width, int pRender_heigh
     CHECK_GL_ERROR("initializeOpenGLContext");
 }
 
-void GLRenderer_SetPalette(uint8_t* rgba_colors) {
+static void GLRenderer_SetPalette(uint8_t* rgba_colors) {
     for (int i = 0; i < 256; i++) {
         gl_palette[i * 4] = rgba_colors[i * 4 + 2];
         gl_palette[i * 4 + 1] = rgba_colors[i * 4 + 1];
@@ -282,7 +282,7 @@ void GLRenderer_SetPalette(uint8_t* rgba_colors) {
     CHECK_GL_ERROR("GLRenderer_SetPalette");
 }
 
-void GLRenderer_SetShadeTable(br_pixelmap* table) {
+static void GLRenderer_SetShadeTable(br_pixelmap* table) {
 
     if (last_shade_table == table) {
         return;
@@ -302,7 +302,7 @@ void GLRenderer_SetShadeTable(br_pixelmap* table) {
 
 extern br_v1db_state v1db;
 
-void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer) {
+static void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer) {
     glViewport(colour_buffer->base_x, render_height - colour_buffer->height - colour_buffer->base_y, colour_buffer->width, colour_buffer->height);
 
     glEnable(GL_DEPTH_TEST);
@@ -349,7 +349,7 @@ void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer) {
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
 }
 
-void GLRenderer_EndScene() {
+static void GLRenderer_EndScene() {
 
     //  switch back to default fb
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -357,7 +357,7 @@ void GLRenderer_EndScene() {
     CHECK_GL_ERROR("GLRenderer_RenderFullScreenQuad");
 }
 
-void GLRenderer_FullScreenQuad(uint8_t* screen_buffer) {
+static void GLRenderer_FullScreenQuad(uint8_t* screen_buffer) {
     glViewport(vp_x, vp_y, vp_width, vp_height);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDisable(GL_DEPTH_TEST);
@@ -375,7 +375,7 @@ void GLRenderer_FullScreenQuad(uint8_t* screen_buffer) {
     CHECK_GL_ERROR("GLRenderer_RenderFullScreenQuad");
 }
 
-void GLRenderer_ClearBuffers() {
+static void GLRenderer_ClearBuffers() {
     // clear our virtual framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -386,7 +386,7 @@ void GLRenderer_ClearBuffers() {
     CHECK_GL_ERROR("GLRenderer_ClearBuffers");
 }
 
-void GLRenderer_BufferModel(br_model* model) {
+static void GLRenderer_BufferModel(br_model* model) {
     tStored_model_context* ctx;
     v11model* v11;
 
@@ -483,7 +483,7 @@ void GLRenderer_BufferModel(br_model* model) {
     CHECK_GL_ERROR("after build model");
 }
 
-void setActiveMaterial(tStored_material* material) {
+static void setActiveMaterial(tStored_material* material) {
     if (material == NULL || material == current_material) {
         return;
     }
@@ -516,7 +516,7 @@ void setActiveMaterial(tStored_material* material) {
     }
 }
 
-void GLRenderer_Model(br_actor* actor, br_model* model, br_matrix34 model_matrix) {
+static void GLRenderer_Model(br_actor* actor, br_model* model, br_matrix34 model_matrix) {
     tStored_model_context* ctx;
     ctx = model->stored;
     v11model* v11 = model->prepared;
@@ -571,7 +571,7 @@ void GLRenderer_Model(br_actor* actor, br_model* model, br_matrix34 model_matrix
     CHECK_GL_ERROR("GLRenderer_RenderModel");
 }
 
-void GLRenderer_BufferMaterial(br_material* mat) {
+static void GLRenderer_BufferMaterial(br_material* mat) {
     tStored_material* stored = mat->stored;
     if (!stored) {
         stored = NewStoredMaterial();
@@ -587,7 +587,7 @@ void GLRenderer_BufferMaterial(br_material* mat) {
     stored->index_base = mat->index_base;
 }
 
-void GLRenderer_BufferTexture(br_pixelmap* pm) {
+static void GLRenderer_BufferTexture(br_pixelmap* pm) {
     tStored_pixelmap* stored = pm->stored;
     if (pm->stored) {
     } else {
@@ -614,7 +614,7 @@ void GLRenderer_BufferTexture(br_pixelmap* pm) {
     CHECK_GL_ERROR("GLRenderer_BufferTexture");
 }
 
-void GLRenderer_FlushBuffers(br_pixelmap* color_buffer, br_pixelmap* depth_buffer) {
+static void GLRenderer_FlushBuffers(br_pixelmap* color_buffer, br_pixelmap* depth_buffer) {
 
     if (!dirty_buffers) {
         return;
@@ -657,25 +657,43 @@ void GLRenderer_FlushBuffers(br_pixelmap* color_buffer, br_pixelmap* depth_buffe
     dirty_buffers = 0;
 }
 
-void GLRenderer_GetRenderSize(int* width, int* height) {
+static void GLRenderer_GetRenderSize(int* width, int* height) {
     *width = render_width;
     *height = render_height;
 }
 
-void GLRenderer_GetWindowSize(int* width, int* height) {
+static void GLRenderer_GetWindowSize(int* width, int* height) {
     *width = window_width;
     *height = window_height;
 }
 
-void GLRenderer_SetWindowSize(int width, int height) {
+static void GLRenderer_SetWindowSize(int width, int height) {
     window_width = width;
     window_height = height;
     update_viewport();
 }
 
-void GLRenderer_GetViewport(int* x, int* y, int* width, int* height) {
+static void GLRenderer_GetViewport(int* x, int* y, int* width, int* height) {
     *x = vp_x;
     *y = vp_y;
     *width = vp_width;
     *height = vp_height;
 }
+
+tRenderer gl_renderer = {
+    GLRenderer_Init,
+    GLRenderer_BeginScene,
+    GLRenderer_EndScene,
+    GLRenderer_SetPalette,
+    GLRenderer_FullScreenQuad,
+    GLRenderer_Model,
+    GLRenderer_ClearBuffers,
+    GLRenderer_BufferTexture,
+    GLRenderer_BufferMaterial,
+    GLRenderer_BufferModel,
+    GLRenderer_FlushBuffers,
+    GLRenderer_GetRenderSize,
+    GLRenderer_GetWindowSize,
+    GLRenderer_SetWindowSize,
+    GLRenderer_GetViewport
+};

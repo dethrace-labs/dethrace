@@ -141,24 +141,6 @@ static struct {
     float y;
 } sdl_window_scale;
 
-tRenderer gl_renderer = {
-    GLRenderer_Init,
-    GLRenderer_BeginScene,
-    GLRenderer_EndScene,
-    GLRenderer_SetPalette,
-    GLRenderer_FullScreenQuad,
-    GLRenderer_Model,
-    GLRenderer_ClearBuffers,
-    GLRenderer_BufferTexture,
-    GLRenderer_BufferMaterial,
-    GLRenderer_BufferModel,
-    GLRenderer_FlushBuffers,
-    GLRenderer_GetRenderSize,
-    GLRenderer_GetWindowSize,
-    GLRenderer_SetWindowSize,
-    GLRenderer_GetViewport
-};
-
 tRenderer* Window_Create(char* title, int width, int height, int pRender_width, int pRender_height) {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         LOG_PANIC("SDL_INIT_VIDEO error: %s", SDL_GetError());
