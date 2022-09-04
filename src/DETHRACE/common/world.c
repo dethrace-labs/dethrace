@@ -1591,18 +1591,14 @@ void KillGroovadelic(int pOwner) {
     tGroovidelic_spec* the_groove;
     LOG_TRACE("(%d)", pOwner);
 
-    if (gGroovidelics_array) {
-        i = 0;
-        the_groove = gGroovidelics_array;
-        for (i == 0; i < gGroovidelics_array_size; i++) {
-            if (the_groove->owner == pOwner
-                && the_groove->path_mode != eMove_controlled
-                && the_groove->path_mode != eMove_absolute
-                && the_groove->object_mode != eMove_controlled
-                && the_groove->object_mode != eMove_absolute) {
-                the_groove->owner = -999;
-            }
-            ++the_groove;
+    for (i = 0; i < gGroovidelics_array_size; i++) {
+        the_groove = &gGroovidelics_array[i];
+        if (the_groove->owner == pOwner
+            && the_groove->path_mode != eMove_controlled
+            && the_groove->path_mode != eMove_absolute
+            && the_groove->object_mode != eMove_controlled
+            && the_groove->object_mode != eMove_absolute) {
+            the_groove->owner = -999;
         }
     }
 }
@@ -1612,7 +1608,18 @@ void KillFunkotronic(int pOwner) {
     int i;
     tFunkotronic_spec* the_funk;
     LOG_TRACE("(%d)", pOwner);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < gFunkotronics_array_size; i++) {
+        the_funk = &gFunkotronics_array[i];
+        if (the_funk->owner == pOwner
+            && the_funk->matrix_mode != eMove_controlled
+            && the_funk->matrix_mode != eMove_absolute
+            && the_funk->lighting_animation_type != eMove_controlled
+            && the_funk->lighting_animation_type != eMove_absolute
+            && (the_funk->texture_animation_data.frames_info.mode != eMove_controlled || the_funk->texture_animation_type)) {
+            the_funk->owner = -999;
+        }
+    }
 }
 
 // IDA: br_uint_32 __usercall DeleteBastards@<EAX>(br_actor *pActor@<EAX>, br_matrix34 *pMatrix@<EDX>, void *pArg@<EBX>)

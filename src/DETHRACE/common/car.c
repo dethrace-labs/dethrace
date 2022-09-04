@@ -144,8 +144,8 @@ void DamageUnitWithSmoke(tCar_spec* pCar, int pUnit_type, int pDamage_amount) {
 void DamageEngine(int pDamage_amount) {
     LOG_TRACE("(%d)", pDamage_amount);
 
-    // DamageUnitWithSmoke(&gProgram_state.current_car, eDamage_engine, pDamage_amount);
-    DamageUnitWithSmoke(gProgram_state.AI_vehicles.opponents[0].car_spec, eDamage_engine, pDamage_amount);
+    DamageUnitWithSmoke(&gProgram_state.current_car, eDamage_engine, pDamage_amount);
+    // DamageUnitWithSmoke(gProgram_state.AI_vehicles.opponents[0].car_spec, eDamage_engine, pDamage_amount);
 }
 
 // IDA: void __usercall DamageTrans(int pDamage_amount@<EAX>)
@@ -537,6 +537,10 @@ void SetInitialPosition(tRace_info* pThe_race, int pCar_index, int pGrid_index) 
     }
     if (gNet_mode && car->disabled && car_actor->t.t.translate.t.v[0] < 500.0) {
         DisableCar(car);
+    }
+    if (strcmp(car->name, "BLKEAGLE.TXT") != 0) {
+        car_actor->t.t.translate.t.v[1] += 2;
+        car_actor->t.t.look_up.up.v[1] = -1;
     }
 }
 
@@ -5675,6 +5679,7 @@ int CrashCarsTogetherSinglePass(br_scalar dt, int pPass, tCollison_data* collide
                             collided++;
                         }
                     }
+                    LOG_DEBUG("crash earnings %s -> %s", ((tCar_spec*)car_1)->driver_name, ((tCar_spec*)car_2)->driver_name);
                     CrashEarnings((tCar_spec*)car_1, (tCar_spec*)car_2);
                 }
             }

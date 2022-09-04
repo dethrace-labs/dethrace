@@ -20,6 +20,7 @@
 #include "raycast.h"
 #include "replay.h"
 #include "spark.h"
+#include "structur.h"
 #include "utility.h"
 #include "world.h"
 #include <stdlib.h>
@@ -1036,6 +1037,7 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
             }
         }
     } else {
+        // LOG_DEBUG("no pCar2, timediff is %d", the_time - pCar1->time_last_hit);
         if (the_time - pCar1->time_last_hit >= 3000) {
             return 1;
         }
@@ -1144,7 +1146,7 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
                 // car_1_pos.v[1] = car_1_offset.v[1] + car_1_pos.v[1];
                 // car_1_pos.v[2] = car_1_offset.v[2] + car_1_pos.v[2];
                 BrVector3Accumulate(&car_1_pos, &car_1_offset);
-                car_1_pos.v[1] += +0.15f;
+                car_1_pos.v[1] += 0.15f;
                 car_1_height = FindYVerticallyBelow2(&car_1_pos);
                 car_off_ground_1 = car_1_height > -100.0f
                     && pCar1->car_model_actors[pCar1->principal_car_actor].actor->t.t.translate.t.v[1] * 4.0f <= car_1_pos.v[1] - car_1_height - 0.15f;
