@@ -1,0 +1,6 @@
+#ifndef HARNESS_VERSION_H
+#define HARNESS_VERSION_H
+
+#cmakedefine DETHRACE_VERSION "@DETHRACE_VERSION@"
+
+#endif

@@ -1,3 +1,5 @@
+configure_file(version.h.in version.h @ONLY)
+
 add_library(harness STATIC)
 
 if (NOT DEFINED IO_PLATFORM)
@@ -9,6 +11,7 @@ target_include_directories(harness
         .
         ${CMAKE_SOURCE_DIR}
         ${CMAKE_SOURCE_DIR}/src/DETHRACE
+        "${CMAKE_CURRENT_BINARY_DIR}"
     PUBLIC
         include
 )
@@ -54,6 +57,7 @@ target_sources(harness PRIVATE
     brender_emu/renderer_impl.h
     sound/sound.c
     sound/sound.h
+    "${CMAKE_CURRENT_BINARY_DIR}/version.h"
 )
 
 if (IO_PLATFORM STREQUAL "SDL_OpenGL")

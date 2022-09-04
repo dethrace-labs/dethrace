@@ -7,6 +7,16 @@ endif()
 project(dethrace C)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
+
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/VERSION")
+    file(READ "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" DETHRACE_VERSION)
+    string(STRIP "${DETHRACE_VERSION}" DETHRACE_VERSION)
+else()
+    include(GetGitRevisionDescription)
+    git_describe(DETHRACE_VERSION)
+endif()
+message(STATUS "DethRace version ${DETHRACE_VERSION}")
+
 set(DETHRACE_IDE_ARGUMENTS "" CACHE STRING "DethRace arguments (only used by MSVC when debugging")
 set(DETHRACE_IDE_ROOT_DIR "" CACHE PATH "DethRace rootdir (only used by MSVC when debugging)")
 
