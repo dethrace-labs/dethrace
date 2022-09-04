@@ -14,7 +14,6 @@ target_link_libraries(dethrace_obj PUBLIC SDL2::SDL2 smacker harness brender s3)
 
 if (CMAKE_C_COMPILER_ID MATCHES "Clang")
     target_compile_options(dethrace_obj PRIVATE
-        -g
         -Wall
         -Wno-return-type
         -Wno-unused-variable
@@ -24,7 +23,6 @@ if (CMAKE_C_COMPILER_ID MATCHES "Clang")
     )
 elseif (CMAKE_C_COMPILER_ID STREQUAL "GNU")
     target_compile_options(dethrace_obj PRIVATE
-        -g
         -Wall
         -Wno-return-type
         -Wno-unused-variable

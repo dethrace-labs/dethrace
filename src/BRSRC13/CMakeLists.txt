@@ -14,7 +14,6 @@ target_link_libraries(brender PRIVATE harness)
 
 if(NOT MSVC)
     target_compile_options(brender PRIVATE
-        -g
         -Wall
         -Werror
         -Wno-return-type
