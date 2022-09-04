@@ -1429,7 +1429,7 @@ void AwardTime(tU32 pTime) {
     if (gRace_finished || gFreeze_timer || gNet_mode != eNet_mode_none || pTime == 0) {
         return;
     }
-    LOG_DEBUG("AwardTime %d", pTime);
+
     original_amount = pTime;
     the_time = GetTotalTime();
     for (i = COUNT_OF(gOld_times) - 1; i > 0; i--) {

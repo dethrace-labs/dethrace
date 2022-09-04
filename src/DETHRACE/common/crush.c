@@ -1102,7 +1102,7 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
             if (victim->knackered && !victim->pre_car_col_knackered) {
                 victim->pre_car_col_knackered = 1;
                 credits_squared = sqr(0.7f / victim->car_model_actors[victim->principal_car_actor].crush_data.softness_factor) * gWasted_creds[gProgram_state.skill_level] + 50.0f;
-                credits = 100 * (credits_squared / 100.0f);
+                credits = 100 * (int)(credits_squared / 100.0f);
                 if (gNet_mode) {
                     message = NetBuildMessage(0x18u, 0);
                     message->contents.data.wasted.victim = NetPlayerFromCar(victim)->ID;
@@ -1117,7 +1117,7 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
                     PratcamEvent(32);
                     DoFancyHeadup(11);
                     credits_squared = sqr(0.7f / victim->car_model_actors[victim->principal_car_actor].crush_data.softness_factor) * gWasted_creds[gProgram_state.skill_level] + 50.0f;
-                    credits = 100 * (credits_squared / 100.0);
+                    credits = 100 * (int)(credits_squared / 100.0);
                     AwardTime(gWasted_time[gProgram_state.skill_level]);
                     EarnCredits(credits);
                     if (victim->can_be_stolen && !gOpponents[victim->index].dead && ((PercentageChance(50) && gSteal_ranks[gOpponents[victim->index].strength_rating] >= gProgram_state.rank) || victim->index == 4)) {
@@ -1154,14 +1154,8 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
             if (!pCar2 || pCar2->number_of_wheels_on_ground) {
                 car_off_ground_2 = 0;
             } else {
-                // car_2_pos.v[0] = pCar2->car_master_actor->t.t.mat.m[3][0] / 6.9000001;
-                // car_2_pos.v[1] = pCar2->car_master_actor->t.t.mat.m[3][1] / 6.9000001;
-                // car_2_pos.v[2] = pCar2->car_master_actor->t.t.mat.m[3][2] / 6.9000001;
                 BrVector3InvScale(&car_2_pos, &pCar2->car_master_actor->t.t.translate.t, WORLD_SCALE);
                 BrMatrix34ApplyV(&car_2_offset, &pCar2->car_model_actors[pCar2->principal_car_actor].actor->t.t.translate.t, &pCar2->car_master_actor->t.t.mat);
-                // car_2_pos.v[0] = car_2_offset.v[0] + car_2_pos.v[0];
-                // car_2_pos.v[1] = car_2_offset.v[1] + car_2_pos.v[1];
-                // car_2_pos.v[2] = car_2_pos.v[2] + car_2_offset.v[2];
                 BrVector3Accumulate(&car_2_pos, &car_2_offset);
                 car_2_pos.v[1] += 0.15f;
                 car_2_height = FindYVerticallyBelow2(&car_2_pos);
@@ -1176,7 +1170,7 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
             }
             total_units_of_damage = 0.7f / victim->car_model_actors[victim->principal_car_actor].crush_data.softness_factor * total_units_of_damage;
             if (!victim->has_been_stolen) {
-                credits = 100 * (gCar_cred_value[gProgram_state.skill_level] * MIN(bonus_level, 8) * total_units_of_damage + 50.0f) / 100.0f;
+                credits = 100 * (int)((gCar_cred_value[gProgram_state.skill_level] * MIN(bonus_level, 8) * total_units_of_damage + 50.0f) / 100.0f);
                 if (credits || victim->knackered) {
                     if (!victim->knackered) {
                         if (gNet_mode) {
@@ -1186,7 +1180,7 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
                         }
                         last_earn_time = the_time;
                         if (gNet_mode == eNet_mode_none) {
-                            time = 5 * ((total_units_of_damage * gCar_time_value[gProgram_state.skill_level] + 2.5f) / 5.0f);
+                            time = 5 * (int)((total_units_of_damage * gCar_time_value[gProgram_state.skill_level] + 2.5f) / 5.0f);
                             AwardTime(MIN(time, 90));
                             if (pCar2) {
                                 if (head_on) {
