@@ -16,7 +16,7 @@ target_include_directories(harness
         include
 )
 
-target_link_libraries(harness PRIVATE brender dethrace_werror)
+target_link_libraries(harness PRIVATE brender compile_with_werror)
 
 if(WIN32)
     target_link_libraries(harness PRIVATE dbghelp)
