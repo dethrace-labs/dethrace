@@ -129,6 +129,7 @@ struct {
     float x;
     float y;
 } sdl_window_scale;
+int is_full_screen = 0;
 
 tRenderer gl_renderer = {
     GLRenderer_Init,
@@ -141,7 +142,11 @@ tRenderer gl_renderer = {
     GLRenderer_BufferTexture,
     GLRenderer_BufferMaterial,
     GLRenderer_BufferModel,
-    GLRenderer_FlushBuffers
+    GLRenderer_FlushBuffers,
+    GLRenderer_GetRenderSize,
+    GLRenderer_GetWindowSize,
+    GLRenderer_SetWindowSize,
+    GLRenderer_GetViewport
 };
 
 tRenderer* Window_Create(char* title, int width, int height, int pRender_width, int pRender_height) {
@@ -161,15 +166,10 @@ tRenderer* Window_Create(char* title, int width, int height, int pRender_width, 
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
         width, height,
-        SDL_WINDOW_OPENGL);
+        SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
     if (window == NULL) {
         LOG_PANIC("Failed to create window");
-    }
-
-    // Don't grab the mouse when a debugger is present
-    if (!OS_IsDebuggerPresent()) {
-        SDL_SetRelativeMouseMode(SDL_TRUE);
     }
 
     sdl_window_scale.x = ((float)pRender_width) / width;
@@ -192,14 +192,37 @@ tRenderer* Window_Create(char* title, int width, int height, int pRender_width, 
     return &gl_renderer;
 }
 
+// Checks whether the `flag_check` is the only modifier applied.
+// e.g. is_only_modifier(event.key.keysym.mod, KMOD_ALT) returns true when only the ALT key was pressed
+static int is_only_key_modifier(int modifier_flags, int flag_check) {
+    return (modifier_flags & flag_check) && (modifier_flags & (KMOD_CTRL | KMOD_SHIFT | KMOD_ALT | KMOD_GUI)) == (modifier_flags & flag_check);
+}
+
 void Window_PollEvents() {
     SDL_Event event;
     int dethrace_key;
+    int w_w, w_h;
+    int vp_x, vp_y;
+    int vp_w, vp_h;
+    int r_w, r_h;
 
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
         case SDL_KEYDOWN:
         case SDL_KEYUP:
+            if (event.key.keysym.sym == SDLK_RETURN) {
+                if (event.key.type == SDL_KEYDOWN) {
+                    if ((event.key.keysym.mod & (KMOD_CTRL | KMOD_SHIFT | KMOD_ALT | KMOD_GUI))) {
+                        // Ignore keydown of RETURN when used together with some modifier
+                        return;
+                    }
+                } else if (event.key.type == SDL_KEYUP) {
+                    if (is_only_key_modifier(event.key.keysym.mod, KMOD_ALT)) {
+                        is_full_screen = !is_full_screen;
+                        SDL_SetWindowFullscreen(window, is_full_screen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+                    }
+                }
+            }
             dethrace_key = scancodes_sdl2dethrace[event.key.keysym.scancode];
             if (dethrace_key == -1) {
                 LOG_WARN("unexpected scan code %s (%d)", SDL_GetScancodeName(event.key.keysym.scancode), event.key.keysym.scancode);
@@ -213,6 +236,18 @@ void Window_PollEvents() {
             sdl_key_state[3] = sdl_key_state[2];
             break;
 
+        case SDL_WINDOWEVENT:
+            switch (event.window.event) {
+            case SDL_WINDOWEVENT_SIZE_CHANGED:
+                SDL_GetWindowSize(window, &w_w, &w_h);
+                gl_renderer.SetWindowSize(w_w, w_h);
+                gl_renderer.GetViewport(&vp_x, &vp_y, &vp_w, &vp_h);
+                gl_renderer.GetRenderSize(&r_w, &r_h);
+                sdl_window_scale.x = (float)r_w / vp_w;
+                sdl_window_scale.y = (float)r_h / vp_h;
+                break;
+            }
+            break;
         case SDL_QUIT:
             LOG_PANIC("QuitGame");
             break;
@@ -251,7 +286,22 @@ int Input_IsKeyDown(unsigned char scan_code) {
 }
 
 void Input_GetMousePosition(int* pX, int* pY) {
+    int vp_x, vp_y, vp_w, vp_h;
+
     SDL_GetMouseState(pX, pY);
+    gl_renderer.GetViewport(&vp_x, &vp_y, &vp_w, &vp_h);
+    if (*pX < vp_x) {
+        *pX = vp_x;
+    } else if (*pX >= vp_x + vp_w) {
+        *pX = vp_x + vp_w - 1;
+    }
+    if (*pY < vp_y) {
+        *pY = vp_y;
+    } else if (*pY >= vp_y + vp_h) {
+        *pY = vp_y + vp_h - 1;
+    }
+    *pX -= vp_x;
+    *pY -= vp_y;
     *pX *= sdl_window_scale.x;
     *pY *= sdl_window_scale.y;
 }

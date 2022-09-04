@@ -15,7 +15,10 @@ typedef struct tRenderer {
     void (*BufferMaterial)(br_material* mat);
     void (*BufferModel)(br_model* model);
     void (*FlushBuffers)(br_pixelmap* color_buffer, br_pixelmap* depth_buffer);
-
+    void (*GetRenderSize)(int* width, int* height);
+    void (*GetWindowSize)(int* width, int* height);
+    void (*SetWindowSize)(int width, int height);
+    void (*GetViewport)(int* x, int* y, int* width, int* height);
 } tRenderer;
 
 #endif
