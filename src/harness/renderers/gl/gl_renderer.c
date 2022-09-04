@@ -1,5 +1,6 @@
 #include "gl_renderer.h"
 #include "brender/brender.h"
+#include "debugui.h"
 #include "harness.h"
 #include "harness/trace.h"
 #include "resources/3d_frag.glsl.h"
@@ -354,7 +355,7 @@ static void GLRenderer_EndScene() {
     //  switch back to default fb
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    CHECK_GL_ERROR("GLRenderer_RenderFullScreenQuad");
+    CHECK_GL_ERROR("GLRenderer_EndScene");
 }
 
 static void GLRenderer_FullScreenQuad(uint8_t* screen_buffer) {
@@ -371,8 +372,15 @@ static void GLRenderer_FullScreenQuad(uint8_t* screen_buffer) {
     glBindVertexArray(screen_buffer_vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, screen_buffer_ebo);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-    CHECK_GL_ERROR("GLRenderer_RenderFullScreenQuad");
+    CHECK_GL_ERROR("GLRenderer_FullScreenQuad");
+}
+
+static void GLRenderer_DrawDebugUI() {
+    DebugUI_FinishFrame();
+    glViewport(0, 0, window_width, window_height);
+    DebugUI_StartFrame();
 }
 
 static void GLRenderer_ClearBuffers() {
@@ -695,5 +703,6 @@ tRenderer gl_renderer = {
     GLRenderer_GetRenderSize,
     GLRenderer_GetWindowSize,
     GLRenderer_SetWindowSize,
-    GLRenderer_GetViewport
+    GLRenderer_GetViewport,
+    GLRenderer_DrawDebugUI
 };

@@ -1,6 +1,29 @@
 configure_file(version.h.in version.h @ONLY)
 
-add_library(harness STATIC)
+add_library(harness STATIC
+    include/harness/compiler.h
+    include/harness/hooks.h
+    include/harness/trace.h
+    include/harness/config.h
+    include/harness/os.h
+
+    debugui.cpp
+    debugui.h
+    # cameras/debug_camera.c
+    # cameras/debug_camera.h
+    harness_trace.c
+    harness.c
+    harness.h
+    io_platforms/io_platform.h
+    renderers/null/null.c
+    renderers/null/null.h
+    renderers/renderer.h
+    brender_emu/renderer_impl.c
+    brender_emu/renderer_impl.h
+    sound/sound.c
+    sound/sound.h
+    "${CMAKE_CURRENT_BINARY_DIR}/version.h"
+)
 
 if (NOT DEFINED IO_PLATFORM)
     set(IO_PLATFORM "SDL_OpenGL")
@@ -13,7 +36,7 @@ target_include_directories(harness
         ${CMAKE_SOURCE_DIR}/src/DETHRACE
         "${CMAKE_CURRENT_BINARY_DIR}"
     PUBLIC
-        include
+        "${CMAKE_CURRENT_SOURCE_DIR}/include"
         "${CMAKE_CURRENT_SOURCE_DIR}/renderers"
 )
 
@@ -21,7 +44,7 @@ if(DETHRACE_FIX_BUGS)
     target_compile_definitions(harness PRIVATE DETHRACE_FIX_BUGS)
 endif()
 
-target_link_libraries(harness PRIVATE brender compile_with_werror)
+target_link_libraries(harness PRIVATE brender compile_with_werror imgui)
 
 if(WIN32)
     target_link_libraries(harness PRIVATE dbghelp)
@@ -43,28 +66,6 @@ else()
     target_compile_definitions(harness PRIVATE BR_ENDIAN_LITTLE=1)
 endif()
 
-target_sources(harness PRIVATE
-    include/harness/compiler.h
-    include/harness/hooks.h
-    include/harness/trace.h
-    include/harness/config.h
-    include/harness/os.h
-
-    # cameras/debug_camera.c
-    # cameras/debug_camera.h
-    harness_trace.c
-    harness.c
-    harness.h
-    io_platforms/io_platform.h
-    renderers/null/null.c
-    renderers/null/null.h
-    renderers/renderer.h
-    brender_emu/renderer_impl.c
-    brender_emu/renderer_impl.h
-    sound/sound.c
-    sound/sound.h
-    "${CMAKE_CURRENT_BINARY_DIR}/version.h"
-)
 if (IO_PLATFORM STREQUAL "SDL_OpenGL")
     # generate embedded glsl resources
     foreach(elem resources/framebuffer_vert.glsl resources/framebuffer_frag.glsl resources/3d_vert.glsl resources/3d_frag.glsl)

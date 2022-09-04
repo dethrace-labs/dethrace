@@ -49,6 +49,9 @@ test_big_endian(IS_BIGENDIAN)
 
 find_package(SDL2 REQUIRED)
 
+enable_language(CXX)
+add_subdirectory(lib/imgui EXCLUDE_FROM_ALL)
+
 add_subdirectory(lib/libsmacker)
 add_subdirectory(lib/glad)
 add_subdirectory(lib/miniaudio)

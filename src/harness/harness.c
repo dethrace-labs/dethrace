@@ -1,4 +1,5 @@
 #include "harness.h"
+#include "debugui.h"
 #include "brender_emu/renderer_impl.h"
 #include "include/harness/config.h"
 #include "include/harness/os.h"
@@ -289,6 +290,9 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
         } else if (strcasecmp(argv[i], "--enable-replay") == 0) {
             harness_game_config.enable_replay = 1;
             handled = 1;
+        } else if (strcmp(argv[i], "--debug-ui") == 0) {
+            gEnableDebugUi = 1;
+            handled = 1;
         }
 
         if (handled) {
@@ -333,6 +337,7 @@ void Harness_Hook_BrDevPaletteSetOld(br_pixelmap* pm) {
 
     if (last_dst) {
         Harness_RenderScreen(last_dst, last_src);
+        renderer->DrawDebugUI();
         Window_Swap(0);
     }
 }
@@ -393,6 +398,7 @@ void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {
 
     // draw the current colour_buffer (2d screen) contents
     Harness_RenderScreen(dst, src);
+    renderer->DrawDebugUI();
 
     int delay_ms = Harness_CalculateFrameDelay();
     Window_Swap(delay_ms);

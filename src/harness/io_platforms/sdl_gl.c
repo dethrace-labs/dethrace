@@ -1,3 +1,5 @@
+#include "harness/private/sdl_gl.h"
+
 #include <glad/glad.h>
 
 // this needs to be included after glad.h
@@ -6,7 +8,6 @@
 
 #include "../renderers/gl/gl_renderer.h"
 #include "../renderers/renderer.h"
-
 #include "harness/config.h"
 #include "harness/trace.h"
 
@@ -14,9 +15,11 @@
 #include "grafdata.h"
 #include "pd/sys.h"
 
+#include "debugui.h"
+
 #define ARRAY_LEN(array) (sizeof((array)) / sizeof((array)[0]))
 
-int scancode_map[123];
+static int scancode_map[123];
 const int scancodes_dethrace2sdl[123] = {
     -1,                        //   0 (LSHIFT || RSHIFT)
     -1,                        //   1 (LALT || RALT)
@@ -128,12 +131,7 @@ const int scancodes_dethrace2sdl[123] = {
 };
 int scancodes_sdl2dethrace[SDL_NUM_SCANCODES];
 
-typedef struct {
-    SDL_Window* window;
-    SDL_GLContext glContext;
-} tWindowState;
-
-static tWindowState gMainWindow;
+static tSDLGLWindowState gMainWindow;
 
 static uint8_t sdl_key_state[256];
 static struct {
@@ -158,7 +156,7 @@ tRenderer* Window_Create(char* title, int width, int height, int pRender_width, 
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
         width, height,
-        SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+        SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
 
     if (gMainWindow.window == NULL) {
         LOG_PANIC("Failed to create window");
@@ -183,6 +181,9 @@ tRenderer* Window_Create(char* title, int width, int height, int pRender_width, 
     }
 
     gl_renderer.Init(width, height, pRender_width, pRender_height);
+
+    DebugUi_Start(&gMainWindow);
+
     return &gl_renderer;
 }
 
@@ -201,6 +202,9 @@ void Window_PollEvents() {
     int r_w, r_h;
 
     while (SDL_PollEvent(&event)) {
+        if (DebugUI_OnEvent(&event)) {
+
+        }
         switch (event.type) {
         case SDL_KEYDOWN:
         case SDL_KEYUP:
@@ -309,6 +313,10 @@ void Input_GetMousePosition(int* pX, int* pY) {
 }
 
 void Input_GetMouseButtons(int* pButton1, int* pButton2) {
+    if (DebugUI_MouseCaptured()) {
+        *pButton1 = *pButton2 = 0;
+        return;
+    }
     int state = SDL_GetMouseState(NULL, NULL);
     *pButton1 = state & SDL_BUTTON_LMASK;
     *pButton2 = state & SDL_BUTTON_RMASK;
