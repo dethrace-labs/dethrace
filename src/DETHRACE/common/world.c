@@ -2567,7 +2567,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
                 GetThreeScalars(f, &spec->mat.m[2][0], &spec->mat.m[2][1], &spec->mat.m[2][2]);
                 GetThreeScalars(f, &spec->mat.m[3][0], &spec->mat.m[3][1], &spec->mat.m[3][2]);
                 FindInverseAndWorldBox(spec);
-                ParseSpecialVolume(f, spec, 0);
+                ParseSpecialVolume(f, spec, NULL);
             } else if (strcmp(s, "DEFAULT WATER") == 0) {
                 spec->bounds.min.v[0] = 0.0;
                 spec->bounds.min.v[1] = 0.0;
@@ -2575,7 +2575,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
                 spec->bounds.max.v[0] = 0.0;
                 spec->bounds.max.v[1] = 0.0;
                 spec->bounds.max.v[2] = 0.0;
-                ParseSpecialVolume(f, spec, 0);
+                ParseSpecialVolume(f, spec, NULL);
                 gDefault_water_spec_vol = spec;
                 spec->no_mat = 1;
             } else {
@@ -2590,10 +2590,11 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
                 GetThreeScalars(f, &spec->bounds.max.v[0], &spec->bounds.max.v[1], &spec->bounds.max.v[2]);
                 BrMatrix34Identity(&spec->mat);
                 for (k = 0; k < 3; ++k) {
-                    // TODO: ? spec->mat.m[3][k] = (v64[k] + v63[k]) / 2.0;
-                    // spec->mat.m[0][4 * k] = v64[k] - spec->mat.m[3][k];
+                     // FIXME: not 100% sure this is correct
+                     spec->mat.m[3][k] = (spec->bounds.max.v[k] + spec->bounds.min.v[k]) / 2.f;
+                     spec->mat.m[k][k] = spec->bounds.max.v[k] - spec->bounds.min.v[k];
                 }
-                ParseSpecialVolume(f, spec, 0);
+                ParseSpecialVolume(f, spec, NULL);
             }
             spec++;
         }

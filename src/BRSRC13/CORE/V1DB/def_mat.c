@@ -17,7 +17,7 @@ br_material* SetupDefaultMaterial() {
     default_mat->ka = 0.1f;
     default_mat->kd = 0.7f;
     default_mat->ks = 0.0f;
-    default_mat->power = 20;
+    default_mat->power = 20.f;
     default_mat->flags = BR_MATF_LIGHT;
     BrMatrix23Identity(&default_mat->map_transform);
     default_mat->index_base = 10;

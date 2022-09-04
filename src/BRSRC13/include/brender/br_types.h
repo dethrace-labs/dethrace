@@ -2643,9 +2643,15 @@ typedef struct section_header {
 typedef struct resource_header { // size: 24
     br_simple_node node;         // @0
     br_simple_list children;     // @8
+#if BR_ENDIAN_BIG
+    br_uint_8 size_h;
+    br_uint_8 size_m;
+    br_uint_8 size_l;
+#else
     br_uint_8 size_l;            // @12
     br_uint_8 size_m;            // @13
     br_uint_8 size_h;            // @14
+#endif
     br_uint_8 class;             // @15
     void* magic_ptr;             // @16
     br_uint_32 magic_num;        // @20

@@ -29,7 +29,7 @@ int S3Init(char* path, int low_memory_mode);
 void S3Disable();
 void S3Enable();
 
-int S3Set3DSoundEnvironment(float a1, float a2, float a3);
+void S3Set3DSoundEnvironment(float a1, float a2, float a3);
 tS3_sound_source_ptr S3CreateSoundSourceBR(br_vector3* pPosition, br_vector3* pVelocity, tS3_outlet_ptr pBound_outlet);
 int S3BindAmbientSoundToOutlet(tS3_outlet_ptr pOutlet, int pSound, tS3_sound_source_ptr source, float pMax_distance, int pPeriod, int pRepeats, int pVolume, int pPitch, int pSpeed);
 

@@ -145,7 +145,6 @@ void DamageEngine(int pDamage_amount) {
     LOG_TRACE("(%d)", pDamage_amount);
 
     DamageUnitWithSmoke(&gProgram_state.current_car, eDamage_engine, pDamage_amount);
-    // DamageUnitWithSmoke(gProgram_state.AI_vehicles.opponents[0].car_spec, eDamage_engine, pDamage_amount);
 }
 
 // IDA: void __usercall DamageTrans(int pDamage_amount@<EAX>)

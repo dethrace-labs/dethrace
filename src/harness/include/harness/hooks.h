@@ -21,7 +21,7 @@ void Harness_Hook_DOSGfxBegin();
 void Harness_Hook_BrDevPaletteSetOld(br_pixelmap* pm);
 void Harness_Hook_BrDevPaletteSetEntryOld(int i, br_colour colour);
 void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src);
-void Harness_Hook_BrV1dbRendererBegin();
+void Harness_Hook_BrV1dbRendererBegin(br_v1db_state* v1db);
 void Harness_Hook_BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer);
 void Harness_Hook_BrZbSceneRenderAdd(br_actor* tree);
 void Harness_Hook_renderFaces(br_actor* actor, br_model* model, br_material* material, br_token type);

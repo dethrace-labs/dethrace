@@ -44,5 +44,9 @@ void GLRenderer_BufferMaterial(br_material* mat);
 void GLRenderer_BufferModel(br_model* model);
 void GLRenderer_ClearBuffers();
 void GLRenderer_FlushBuffers(br_pixelmap* color_buffer, br_pixelmap* depth_buffer);
+void GLRenderer_GetRenderSize(int* width, int* height);
+void GLRenderer_GetWindowSize(int* width, int* height);
+void GLRenderer_SetWindowSize(int width, int height);
+void GLRenderer_GetViewport(int* x, int* y, int* width, int* height);
 
 #endif

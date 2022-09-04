@@ -48,12 +48,12 @@ def decode_line(line: bytes, method: int) -> str:
             if c == 0x9f:
                 c = ord(b'\t')
         dline[i] = c
-    return dline.decode()
+    return dline.decode(errors="replace")
 
 def main():
     parser = argparse.ArgumentParser(allow_abbrev=False, description="Decode a Carmageddon encoded file")
     parser.add_argument("file", metavar="FILE", nargs="?", help="input file (default=stdin)")
-    parser.add_argument("--method", choices=["1", "2"], default="1", help="decryption method to use")
+    parser.add_argument("--method", choices=[1, 2], type=int, default=2, help="decryption method to use")
     args = parser.parse_args()
 
     istream = open(args.file, "rb") if args.file else sys.stdin.buffer

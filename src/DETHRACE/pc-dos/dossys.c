@@ -511,7 +511,11 @@ void PDSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
     tU8* p;
     p = (tU8*)pPalette->pixels + 4 * pFirst_colour;
     for (i = pFirst_colour; i < pFirst_colour + pCount; i++) {
+#if BR_ENDIAN_BIG
+        BrDevPaletteSetEntryOld(i, (p[1] << 16) | (p[2] << 8) | p[3]);
+#else
         BrDevPaletteSetEntryOld(i, (p[2] << 16) | (p[1] << 8) | *p);
+#endif
         p += 4;
     }
 }
