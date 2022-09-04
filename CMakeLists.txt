@@ -26,6 +26,7 @@ set(DETHRACE_IDE_ARGUMENTS "" CACHE STRING "DethRace arguments (only used by MSV
 set(DETHRACE_IDE_ROOT_DIR "" CACHE PATH "DethRace rootdir (only used by MSVC when debugging)")
 option(BUILD_TESTS "Build unit tests." OFF)
 option(DETHRACE_INSTALL "Add install target" OFF)
+option(DETHRACE_WERROR "Treat warnings as errors")
 
 test_big_endian(IS_BIGENDIAN)
 
@@ -34,6 +35,15 @@ find_package(SDL2 REQUIRED)
 add_subdirectory(lib/libsmacker)
 add_subdirectory(lib/glad)
 add_subdirectory(lib/miniaudio)
+
+add_library(dethrace_werror INTERFACE)
+if(DETHRACE_WERROR)
+    if(MSVC)
+        target_compile_options(dethrace_werror INTERFACE /WX)
+    else()
+        target_compile_options(dethrace_werror INTERFACE -Werror)
+    endif()
+endif()
 
 add_subdirectory(src/harness)
 add_subdirectory(src/S3)

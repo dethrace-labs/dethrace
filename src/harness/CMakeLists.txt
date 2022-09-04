@@ -16,7 +16,7 @@ target_include_directories(harness
         include
 )
 
-target_link_libraries(harness PRIVATE brender)
+target_link_libraries(harness PRIVATE brender dethrace_werror)
 
 if(WIN32)
     target_link_libraries(harness PRIVATE dbghelp)
@@ -26,7 +26,6 @@ if(NOT MSVC)
     target_compile_options(harness PRIVATE
         -Wall
         -Wextra
-        -Werror
         -Wno-unused-parameter
     )
 else()
