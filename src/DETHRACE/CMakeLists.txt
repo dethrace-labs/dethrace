@@ -198,3 +198,15 @@ if(DETHRACE_IDE_ARGUMENTS)
         VS_DEBUGGER_COMMAND_ARGUMENTS "${DETHRACE_IDE_ARGUMENTS}"
     )
 endif()
+
+if (DETHRACE_INSTALL)
+    install(TARGETS dethrace
+        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+    )
+    if(MSVC)
+        INSTALL(FILES $<TARGET_PDB_FILE:dethrace>
+            DESTINATION "${CMAKE_INSTALL_BINDIR}"
+            OPTIONAL
+        )
+    endif()
+endif()
