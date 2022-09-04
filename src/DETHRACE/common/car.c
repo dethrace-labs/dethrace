@@ -537,10 +537,11 @@ void SetInitialPosition(tRace_info* pThe_race, int pCar_index, int pGrid_index) 
     if (gNet_mode && car->disabled && car_actor->t.t.translate.t.v[0] < 500.0) {
         DisableCar(car);
     }
-    if (strstr(car->name, "EAGLE") == 0) {
-        car_actor->t.t.translate.t.v[1] += 2;
-        car_actor->t.t.look_up.up.v[1] = -1;
-    }
+    // Enable to start all opponent cars upside down ;)
+    // if (strstr(car->name, "EAGLE") == 0) {
+    //     car_actor->t.t.translate.t.v[1] += 2;
+    //     car_actor->t.t.look_up.up.v[1] = -1;
+    // }
 }
 
 // IDA: void __usercall SetInitialPositions(tRace_info *pThe_race@<EAX>)
