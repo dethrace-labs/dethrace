@@ -4,7 +4,7 @@ if ($($Env:MATRIX_PLATFORM) -eq "x86") {
     $sdl_path = "x64"
 }
 
-$sdl2_version = "2.0.18"
+$sdl2_version = "2.24.0"
 
 # install deps
 Invoke-WebRequest -Uri https://www.libsdl.org/release/SDL2-devel-$sdl2_version-VC.zip -OutFile $Env:TEMP\SDL2-devel.zip
