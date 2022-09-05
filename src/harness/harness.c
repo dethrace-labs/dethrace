@@ -5,6 +5,7 @@
 #include "io_platforms/io_platform.h"
 #include "renderers/null.h"
 #include "sound/sound.h"
+#include "version.h"
 
 #include <errno.h>
 #include <stdio.h>
@@ -174,6 +175,8 @@ void Harness_DetectGameMode() {
 
 void Harness_Init(int* argc, char* argv[]) {
     int result;
+
+    LOG_INFO("DethRace version " DETHRACE_VERSION);
 
     // disable the original CD check code
     harness_game_config.disable_cd_check = 1;

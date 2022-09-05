@@ -1,3 +1,5 @@
+configure_file(version.h.in version.h @ONLY)
+
 add_library(harness STATIC)
 
 if (NOT DEFINED IO_PLATFORM)
@@ -9,11 +11,12 @@ target_include_directories(harness
         .
         ${CMAKE_SOURCE_DIR}
         ${CMAKE_SOURCE_DIR}/src/DETHRACE
+        "${CMAKE_CURRENT_BINARY_DIR}"
     PUBLIC
         include
 )
 
-target_link_libraries(harness PRIVATE brender)
+target_link_libraries(harness PRIVATE brender compile_with_werror)
 
 if(WIN32)
     target_link_libraries(harness PRIVATE dbghelp)
@@ -23,7 +26,6 @@ if(NOT MSVC)
     target_compile_options(harness PRIVATE
         -Wall
         -Wextra
-        -Werror
         -Wno-unused-parameter
     )
 else()
@@ -54,6 +56,7 @@ target_sources(harness PRIVATE
     brender_emu/renderer_impl.h
     sound/sound.c
     sound/sound.h
+    "${CMAKE_CURRENT_BINARY_DIR}/version.h"
 )
 
 if (IO_PLATFORM STREQUAL "SDL_OpenGL")

@@ -14,7 +14,6 @@ target_link_libraries(dethrace_obj PUBLIC SDL2::SDL2 smacker harness brender s3)
 
 if (CMAKE_C_COMPILER_ID MATCHES "Clang")
     target_compile_options(dethrace_obj PRIVATE
-        -g
         -Wall
         -Wno-return-type
         -Wno-unused-variable
@@ -24,7 +23,6 @@ if (CMAKE_C_COMPILER_ID MATCHES "Clang")
     )
 elseif (CMAKE_C_COMPILER_ID STREQUAL "GNU")
     target_compile_options(dethrace_obj PRIVATE
-        -g
         -Wall
         -Wno-return-type
         -Wno-unused-variable
@@ -164,7 +162,7 @@ target_sources(dethrace_obj PRIVATE
 
 # Create our main game binary.
 add_executable(dethrace)
-target_link_libraries(dethrace PRIVATE glad dethrace_obj)
+target_link_libraries(dethrace PRIVATE glad dethrace_obj compile_with_werror)
 target_sources(dethrace PRIVATE main.c)
 
 if(NOT MSVC)
@@ -197,4 +195,16 @@ if(DETHRACE_IDE_ARGUMENTS)
     set_target_properties(dethrace PROPERTIES
         VS_DEBUGGER_COMMAND_ARGUMENTS "${DETHRACE_IDE_ARGUMENTS}"
     )
+endif()
+
+if (DETHRACE_INSTALL)
+    install(TARGETS dethrace
+        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+    )
+    if(MSVC)
+        INSTALL(FILES $<TARGET_PDB_FILE:dethrace>
+            DESTINATION "${CMAKE_INSTALL_BINDIR}"
+            OPTIONAL
+        )
+    endif()
 endif()
