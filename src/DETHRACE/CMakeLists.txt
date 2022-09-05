@@ -162,7 +162,7 @@ target_sources(dethrace_obj PRIVATE
 
 # Create our main game binary.
 add_executable(dethrace)
-target_link_libraries(dethrace PRIVATE glad dethrace_obj)
+target_link_libraries(dethrace PRIVATE glad dethrace_obj compile_with_werror)
 target_sources(dethrace PRIVATE main.c)
 
 if(NOT MSVC)
