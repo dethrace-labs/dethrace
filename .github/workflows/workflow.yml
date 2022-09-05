@@ -14,6 +14,10 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
+      - name: Setup Ninja
+        uses: ashutoshvarma/setup-ninja@master
+        with:
+          version: 1.10.2
       - name: Build
         env:
           CC: ${{ steps.vars.outputs.cc }}
@@ -38,6 +42,10 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
+      - name: Setup Ninja
+        uses: ashutoshvarma/setup-ninja@master
+        with:
+          version: 1.10.2
       - name: Build
         run: |
           .github/scripts/build-macos.sh
@@ -62,6 +70,10 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
+      - name: Setup Ninja
+        uses: ashutoshvarma/setup-ninja@master
+        with:
+          version: 1.10.2
       - uses: ilammy/msvc-dev-cmd@v1.4.1
         with:
           arch: ${{ matrix.platform }}

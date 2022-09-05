@@ -28,7 +28,7 @@ if test -z "$MSYSTEM"; then
   $CXX --verbose
 
   # build
-  cmake -DCMAKE_SYSTEM_NAME=Windows -DSDL2_ROOT_DIR=/tmp/SDL2-$SDL2_VERSION/$sdl_path -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -B build -DCMAKE_EXE_LINKER_FLAGS_INIT=-lssp
+  cmake -DCMAKE_SYSTEM_NAME=Windows -DSDL2_ROOT_DIR=/tmp/SDL2-$SDL2_VERSION/$sdl_path -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -DDETHRACE_WERROR=ON -B build -DCMAKE_EXE_LINKER_FLAGS_INIT=-lssp
   cmake --build build -- -j 4
 
   # package artifact

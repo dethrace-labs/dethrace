@@ -15,7 +15,7 @@ sudo apt-get update -qq > /dev/null
 sudo apt-get install -qq -y libsdl2-dev > /dev/null
 
 # build
-cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -B build
+cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -DDETHRACE_WERROR=ON -B build
 cmake --build build -- -j 4
 
 # package artifact

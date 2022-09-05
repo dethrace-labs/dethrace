@@ -10,13 +10,11 @@ target_include_directories(brender
         include
 )
 
-target_link_libraries(brender PRIVATE harness)
+target_link_libraries(brender PRIVATE harness compile_with_werror)
 
 if(NOT MSVC)
     target_compile_options(brender PRIVATE
-        -g
         -Wall
-        -Werror
         -Wno-return-type
         -Wno-unused-variable
         -Wno-unused-parameter
