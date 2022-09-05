@@ -664,7 +664,38 @@ void CalcReturnToStartPointRoute(tOpponent_spec* pOpponent_spec) {
     tRoute_section temp_store[10];
     tRoute_section perm_store[10];
     LOG_TRACE("(%p)", pOpponent_spec);
-    NOT_IMPLEMENTED();
+
+    ClearOpponentsProjectedRoute(pOpponent_spec);
+    section_no = FindNearestPathSection(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &section_v, &intersect, &distance);
+    distance = BrVector3Length(&section_v);
+    BrVector3Normalise(&section_v, &section_v);
+
+    if (BrVector3Dot(&pOpponent_spec->car_spec->direction, &section_v) <= 0.0f) {
+        AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 0);
+    } else {
+        AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 1);
+    }
+    temp_store[0] = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1];
+    gSFS_count++;
+    gSFS_cycles_this_time = 0;
+    SearchForSection(temp_store, perm_store, &num_of_perm_store_sections, pOpponent_spec->return_to_start_data.section_no, 1, 0.0f, pOpponent_spec);
+    gSFS_total_cycles += gSFS_cycles_this_time;
+    if (gSFS_max_cycles < gSFS_cycles_this_time) {
+        gSFS_max_cycles = gSFS_cycles_this_time;
+    }
+    if (num_of_perm_store_sections <= 1) {
+        if (pOpponent_spec->nnext_sections <= 6) {
+            TopUpRandomRoute(pOpponent_spec, 4 - pOpponent_spec->nnext_sections + 4);
+        }
+    } else {
+        sections_to_copy = 10 - pOpponent_spec->nnext_sections;
+        if (sections_to_copy >= num_of_perm_store_sections - 1) {
+            sections_to_copy = num_of_perm_store_sections - 1;
+        }
+        memcpy(&pOpponent_spec->next_sections[pOpponent_spec->nnext_sections], &perm_store[1], sizeof(tRoute_section) * sections_to_copy);
+        pOpponent_spec->nnext_sections += sections_to_copy;
+        TopUpRandomRoute(pOpponent_spec, 1);
+    }
 }
 
 // IDA: void __usercall ClearOpponentsProjectedRoute(tOpponent_spec *pOpponent_spec@<EAX>)
@@ -921,8 +952,7 @@ void ProcessPursueAndTwat(tOpponent_spec* pOpponent_spec, tProcess_objective_com
         return;
     }
     if (data->state != ePCS_backing_up) {
-        if (data->time_last_twatted_em + 1000 >= gTime_stamp_for_this_munging || data->time_last_twatted_em + 3000 <= gTime_stamp_for_this_munging
-            || BrVector3Length(&data->pursuee->v) >= 0.3f) {
+        if (data->time_last_twatted_em + 1000 >= gTime_stamp_for_this_munging || data->time_last_twatted_em + 3000 <= gTime_stamp_for_this_munging || BrVector3Length(&data->pursuee->v) >= 0.3f) {
             if (data->time_last_away_from_pursuee + 7000 >= gTime_stamp_for_this_munging || data->time_last_twatted_em + 7000 >= gTime_stamp_for_this_munging || data->start_backup_time + 10000 >= gTime_stamp_for_this_munging) {
                 if (pOpponent_spec->cheating) {
                     if (pOpponent_spec->player_to_oppo_d < 50.0f
@@ -980,9 +1010,7 @@ void ProcessPursueAndTwat(tOpponent_spec* pOpponent_spec, tProcess_objective_com
                 data->state = ePCS_following_trail;
                 section_no = FindNearestTrailSection(pOpponent_spec, data->pursuee, &section_v, &intersect, &distance);
                 dr_dprintf("%s: Trail got away; found new trail section %d", pOpponent_spec->car_spec->driver_name, section_no);
-                if (section_no == -1
-                    || distance > 20.0f
-                    || !PointVisibleFromHere(&intersect, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t)) {
+                if (section_no == -1 || distance > 20.0f || !PointVisibleFromHere(&intersect, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t)) {
                     dr_dprintf("%s: ...which unfortunately is too far away (%fBRU) or not visible - end of pursuit", pOpponent_spec->car_spec->driver_name, distance);
                     NewObjective(pOpponent_spec, eOOT_get_near_player);
                     return;
@@ -1001,16 +1029,10 @@ void ProcessPursueAndTwat(tOpponent_spec* pOpponent_spec, tProcess_objective_com
         }
         break;
     case ePCS_following_line_of_sight:
-        data->direct_line_nodes[0].p.v[0] = pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][0];
-        data->direct_line_nodes[0].p.v[1] = pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][1];
-        data->direct_line_nodes[0].p.v[2] = pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][2];
-        wank.v[0] = data->pursuee->car_master_actor->t.t.mat.m[3][0] - pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][0];
-        wank.v[1] = data->pursuee->car_master_actor->t.t.mat.m[3][1] - pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][1];
-        wank.v[2] = data->pursuee->car_master_actor->t.t.mat.m[3][2] - pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][2];
+        BrVector3Copy(&data->direct_line_nodes[0].p, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t);
+        BrVector3Sub(&wank, &data->pursuee->car_master_actor->t.t.translate.t, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t);
         s = BrVector3Length(&wank);
-        wank.v[0] = data->pursuee->v.v[0] - pOpponent_spec->car_spec->v.v[0];
-        wank.v[1] = data->pursuee->v.v[1] - pOpponent_spec->car_spec->v.v[1];
-        wank.v[2] = data->pursuee->v.v[2] - pOpponent_spec->car_spec->v.v[2];
+        BrVector3Sub(&wank, &data->pursuee->v, &pOpponent_spec->car_spec->v);
         t = BrVector3Length(&wank);
         if (t >= 1.0f) {
             d = s / t / 2.0;
@@ -1018,13 +1040,7 @@ void ProcessPursueAndTwat(tOpponent_spec* pOpponent_spec, tProcess_objective_com
         } else {
             d = 0.0;
         }
-        // data->direct_line_nodes[1].p.v[0] = data->pursuee->v.v[0] * d;
-        // data->direct_line_nodes[1].p.v[1] = data->pursuee->v.v[1] * d;
-        // data->direct_line_nodes[1].p.v[2] = data->pursuee->v.v[2] * d;
-        BrVector3Scale(&data->direct_line_nodes[1].p, &data->direct_line_nodes[1].p, d);
-        // data->direct_line_nodes[1].p.v[0] = data->pursuee->car_master_actor->t.t.mat.m[3][0] + data->direct_line_nodes[1].p.v[0];
-        // data->direct_line_nodes[1].p.v[1] = data->pursuee->car_master_actor->t.t.mat.m[3][1] + data->direct_line_nodes[1].p.v[1];
-        // data->direct_line_nodes[1].p.v[2] = data->pursuee->car_master_actor->t.t.mat.m[3][2] + data->direct_line_nodes[1].p.v[2];
+        BrVector3Scale(&data->direct_line_nodes[1].p, &data->pursuee->v, d);
         BrVector3Accumulate(&data->direct_line_nodes[1].p, &data->pursuee->car_master_actor->t.t.translate.t);
         if (s >= 2.0f) {
             ProcessFollowPath(pOpponent_spec, ePOC_run, 1, 1, 0);
@@ -1034,14 +1050,14 @@ void ProcessPursueAndTwat(tOpponent_spec* pOpponent_spec, tProcess_objective_com
         break;
     case ePCS_backing_up:
         if (data->start_backup_time + 2200 >= gTime_stamp_for_this_munging) {
-            pOpponent_spec->car_spec->curvature = 0.0;
-            pOpponent_spec->car_spec->brake_force = 0.0;
-            pOpponent_spec->car_spec->acc_force = pOpponent_spec->car_spec->M * -8.0;
+            pOpponent_spec->car_spec->curvature = 0.0f;
+            pOpponent_spec->car_spec->brake_force = 0.0f;
+            pOpponent_spec->car_spec->acc_force = pOpponent_spec->car_spec->M * -8.0f;
         } else {
             pOpponent_spec->car_spec->acc_force = 0.0;
-            pOpponent_spec->car_spec->brake_force = pOpponent_spec->car_spec->M * 15.0;
+            pOpponent_spec->car_spec->brake_force = pOpponent_spec->car_spec->M * 15.0f;
             if (data->start_backup_time + 3000 < gTime_stamp_for_this_munging) {
-                pOpponent_spec->car_spec->brake_force = 0.0;
+                pOpponent_spec->car_spec->brake_force = 0.0f;
                 data->state = ePCS_what_now;
                 dr_dprintf("%s: Finished backing up.", pOpponent_spec->car_spec->driver_name);
             }
@@ -1131,7 +1147,54 @@ void ProcessReturnToStart(tOpponent_spec* pOpponent_spec, tProcess_objective_com
     br_scalar distance;
     int res;
     LOG_TRACE("(%p, %d)", pOpponent_spec, pCommand);
-    NOT_IMPLEMENTED();
+
+    switch (pCommand) {
+    case ePOC_run:
+        if (TeleportCopToStart(pOpponent_spec)) {
+            break;
+        }
+        if (pOpponent_spec->return_to_start_data.waiting_near_start) {
+            pOpponent_spec->car_spec->brake_force = pOpponent_spec->car_spec->M * 15.0f;
+        } else {
+            our_pos_xz = pOpponent_spec->car_spec->car_master_actor->t.t.translate.t;
+            our_pos_xz.v[1] = 0.0f;
+            BrVector3Sub(&cop_to_start, &pOpponent_spec->start_pos, &our_pos_xz);
+            if (BrVector3Length(&cop_to_start) >= 10.0) {
+                if (pOpponent_spec->follow_path_data.section_no > 20000) {
+                    ShiftOpponentsProjectedRoute(pOpponent_spec, pOpponent_spec->follow_path_data.section_no - 20000);
+                    pOpponent_spec->follow_path_data.section_no = 20000;
+                }
+                if (pOpponent_spec->nnext_sections <= 4) {
+                    CalcReturnToStartPointRoute(pOpponent_spec);
+                }
+                res = ProcessFollowPath(pOpponent_spec, ePOC_run, 0, 0, 0);
+                if (res == eFPR_given_up || res == eFPR_end_of_path) {
+                    if (res == eFPR_given_up) {
+                        dr_dprintf("%s: Restarting return_to_start route because ProcessFollowPath() gave up.", pOpponent_spec->car_spec->driver_name);
+                    } else {
+                        dr_dprintf("%s: Restarting return_to_start route because ran out of path!", pOpponent_spec->car_spec->driver_name);
+                    }
+                    ClearOpponentsProjectedRoute(pOpponent_spec);
+                    CalcReturnToStartPointRoute(pOpponent_spec);
+                    ProcessFollowPath(pOpponent_spec, ePOC_start, 0, 0, 0);
+                }
+            } else {
+                pOpponent_spec->return_to_start_data.waiting_near_start = 1;
+                pOpponent_spec->car_spec->brake_force = pOpponent_spec->car_spec->M * 15.0f;
+            }
+        }
+        break;
+    case ePOC_start:
+        dr_dprintf("%s: ProcessReturnToStart() - new objective started", pOpponent_spec->car_spec->driver_name);
+        pOpponent_spec->return_to_start_data.waiting_near_start = 0;
+        pOpponent_spec->return_to_start_data.section_no = FindNearestPathSection(&pOpponent_spec->start_pos, &section_v, &pOpponent_spec->return_to_start_data.nearest_path_point, &distance);
+        pOpponent_spec->return_to_start_data.nearest_path_point.v[1] = 0.0;
+        CalcReturnToStartPointRoute(pOpponent_spec);
+        ProcessFollowPath(pOpponent_spec, ePOC_start, 0, 0, 0);
+        break;
+    default:
+        break;
+    }
 }
 
 // IDA: void __usercall ProcessLevitate(tOpponent_spec *pOpponent_spec@<EAX>, tProcess_objective_command pCommand@<EDX>)
@@ -1649,20 +1712,21 @@ int TeleportCopToStart(tOpponent_spec* pOpponent_spec) {
     br_vector3 wank;
     LOG_TRACE("(%p)", pOpponent_spec);
 
-    if (pOpponent_spec->cheating || (pOpponent_spec->car_spec->car_ID & 0xff00) == 0x300) {
-        BrVector3Sub(&wank, &gProgram_state.current_car.car_master_actor->t.t.translate.t, &pOpponent_spec->start_pos);
-        if (BrVector3Length(&wank) > gIn_view_distance) {
-            BrVector3Copy(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &pOpponent_spec->start_pos);
-            PointActorAlongThisBloodyVector(pOpponent_spec->car_spec->car_master_actor,
-                &pOpponent_spec->start_direction);
-            RematerialiseOpponent(pOpponent_spec, 0);
-            TurnOpponentPhysicsOff(pOpponent_spec);
-            RebuildActiveCarList();
-            NewObjective(pOpponent_spec, eOOT_wait_for_some_hapless_sod);
-            return 1;
-        }
+    if (!pOpponent_spec->cheating || !CAR_SPEC_IS_ROZZER(pOpponent_spec->car_spec)) {
+        return 0;
     }
-    return 0;
+    BrVector3Sub(&wank, &gProgram_state.current_car.car_master_actor->t.t.translate.t, &pOpponent_spec->start_pos);
+    if (BrVector3Length(&wank) <= gIn_view_distance) {
+        return 0;
+    }
+    pOpponent_spec->car_spec->car_master_actor->t.t.euler.t = pOpponent_spec->start_pos;
+    PointActorAlongThisBloodyVector(pOpponent_spec->car_spec->car_master_actor, &pOpponent_spec->start_direction);
+    pOpponent_spec->physics_me = 0;
+    RematerialiseOpponent(pOpponent_spec, 0.0);
+    TurnOpponentPhysicsOff(pOpponent_spec);
+    RebuildActiveCarList();
+    NewObjective(pOpponent_spec, eOOT_wait_for_some_hapless_sod);
+    return 1;
 }
 
 // IDA: void __usercall CalcDistanceFromHome(tOpponent_spec *pOpponent_spec@<EAX>)
@@ -2146,18 +2210,13 @@ void LoadInOppoPaths(FILE* pF) {
             for (j = 0; j < gProgram_state.AI_vehicles.number_of_cops; j++) {
                 PossibleService();
                 GetNScalars(pF, 6, scalars);
-                BrVector3Set(&gProgram_state.AI_vehicles.cop_start_points[j],
-                    scalars[0], scalars[1], scalars[2]);
+                BrVector3Set(&gProgram_state.AI_vehicles.cop_start_points[j], scalars[0], scalars[1], scalars[2]);
 
                 if (scalars[3] == 9.0f && scalars[4] == 9.0f && scalars[5] == 9.0f) {
                     gBIG_APC_index = j;
                 }
 
-                FindNearestPathSection(
-                    &gProgram_state.AI_vehicles.cop_start_points[j],
-                    &cop_to_section,
-                    &intersect,
-                    &distance);
+                FindNearestPathSection(&gProgram_state.AI_vehicles.cop_start_points[j], &cop_to_section, &intersect, &distance);
                 BrVector3Set(&gProgram_state.AI_vehicles.cop_start_vectors[j],
                     cop_to_section.v[2] * 1.0f - cop_to_section.v[1] * 0.0f,
                     cop_to_section.v[0] * 0.0f - cop_to_section.v[2] * 0.0f,
@@ -2299,9 +2358,8 @@ void SetInitialCopPositions() {
 
     for (i = 0; i < GetCarCount(eVehicle_rozzer); i++) {
         BrVector3Copy(&gProgram_state.AI_vehicles.cops[i].car_spec->car_master_actor->t.t.translate.t, &gProgram_state.AI_vehicles.cop_start_points[i]);
-        PointActorAlongThisBloodyVector(gProgram_state.AI_vehicles.cops[i].car_spec->car_master_actor,
-            &gProgram_state.AI_vehicles.cop_start_vectors[i]);
-        gProgram_state.AI_vehicles.cops[i].has_moved_at_some_point = 0;
+        PointActorAlongThisBloodyVector(gProgram_state.AI_vehicles.cops[i].car_spec->car_master_actor, &gProgram_state.AI_vehicles.cop_start_vectors[i]);
+        gProgram_state.AI_vehicles.cops[i].physics_me = 0;
         RematerialiseOpponent(&gProgram_state.AI_vehicles.cops[i], 0.f);
         InitCarSkidStuff(gProgram_state.AI_vehicles.cops[i].car_spec);
     }
