@@ -615,7 +615,7 @@ void SetSoundVolumes() {
     if (!gSound_enabled) {
         return;
     }
-    if (gEffects_outlet) {
+    if (gEffects_outlet != NULL) {
         DRS3SetOutletVolume(gEffects_outlet, 42 * gProgram_state.effects_volume);
     }
     DRS3SetOutletVolume(gCar_outlet, 42 * gProgram_state.effects_volume);
