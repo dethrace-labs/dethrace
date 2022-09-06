@@ -5,6 +5,7 @@
 #include "brucetrk.h"
 #include "car.h"
 #include "depth.h"
+#include "displays.h"
 #include "drmem.h"
 #include "errors.h"
 #include "finteray.h"
@@ -13,6 +14,7 @@
 #include "globvrpb.h"
 #include "graphics.h"
 #include "harness/trace.h"
+#include "input.h"
 #include "loading.h"
 #include "opponent.h"
 #include "pd/sys.h"
@@ -23,6 +25,7 @@
 #include "trig.h"
 #include "utility.h"
 
+#include <float.h>
 #include <string.h>
 
 int gFunkotronics_array_size;
@@ -43,7 +46,7 @@ char* gGroove_object_names[] = { "spin", "rock", "throb", "shear" };
 char* gDepth_effect_names[] = { "dark", "fog" };
 br_actor* gGroove_by_proxy_actor;
 tRotate_mode gCurrent_rotate_mode = eRotate_mode_y;
-tScale_mode gCurrent_scale_mode;
+tScale_mode gCurrent_scale_mode = eScale_mode_all;
 int gNumber_of_additional_models;
 tRoad_texturing_level gRoad_texturing_level = eRTL_full;
 tWall_texturing_level gWall_texturing_level = eWTL_full;
@@ -1606,14 +1609,33 @@ br_uint_32 DeleteBastards(br_actor* pActor, br_matrix34* pMatrix, void* pArg) {
     int i;
     int parent_already_doomed;
     LOG_TRACE("(%p, %p, %p)", pActor, pMatrix, pArg);
-    NOT_IMPLEMENTED();
+
+    if ((gAdditional_actors != pActor && (pActor->identifier == NULL || pActor->identifier[0] == '&') && Vector3IsZero((br_vector3*)pMatrix->m[3])) || (pActor->model == NULL && pActor->type == BR_ACTOR_MODEL)) {
+        parent_already_doomed = 0;
+        for (i = 0; i < gDelete_count; i++) {
+            if (gDelete_list[i] == pActor) {
+                parent_already_doomed = 1;
+                break;
+            }
+        }
+        if (!parent_already_doomed) {
+            gDelete_list[gDelete_count] = pActor;
+            gDelete_count++;
+        }
+    }
+    return 0;
 }
 
 // IDA: void __cdecl DeleteAnyZeroBastards()
 void DeleteAnyZeroBastards() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gDelete_count = 0;
+    DRActorEnumRecurseWithTrans(gAdditional_actors, NULL, DeleteBastards, NULL);
+    for (i = 0; i < gDelete_count; i++) {
+        BrActorRemove(gDelete_list[i]);
+    }
 }
 
 // IDA: br_uint_32 __usercall ApplyTransToModels@<EAX>(br_actor *pActor@<EAX>, br_matrix34 *pMatrix@<EDX>, void *pArg@<EBX>)
@@ -1621,7 +1643,20 @@ br_uint_32 ApplyTransToModels(br_actor* pActor, br_matrix34* pMatrix, void* pArg
     int i;
     br_vector3 temp_point;
     LOG_TRACE("(%p, %p, %p)", pActor, pMatrix, pArg);
-    NOT_IMPLEMENTED();
+
+    if (pActor->identifier == NULL || pActor->identifier[0] == '&') {
+        return 0;
+    }
+    if (pActor->model != NULL) {
+        for (i = 0; i < pActor->model->nvertices; i++) {
+            BrVector3Copy(&temp_point, &pActor->model->vertices[i].p);
+            BrMatrix34ApplyP(&pActor->model->vertices[i].p, &temp_point, pMatrix);
+        }
+        BrModelUpdate(pActor->model, BR_MATU_ALL);
+    }
+    BrMatrix34Identity(&pActor->t.t.mat);
+    pActor->t.type = BR_TRANSFORM_IDENTITY;
+    return 0;
 }
 
 // IDA: int __usercall FindSpecVolIndex@<EAX>(br_actor *pActor@<EAX>)
@@ -1629,7 +1664,13 @@ int FindSpecVolIndex(br_actor* pActor) {
     int i;
     tSpecial_volume* v;
     LOG_TRACE("(%p)", pActor);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < gProgram_state.special_volume_count; i++) {
+        if (gSpec_vol_actors[i] == pActor) {
+            return i;
+        }
+    }
+    return -1;
 }
 
 // IDA: void __usercall MungeMaterial(br_matrix34 *pMat@<EAX>, br_material *pMat_1@<EDX>, br_material *pMat_2@<EBX>, int pAxis_0@<ECX>, int pAxis_1)
@@ -1672,7 +1713,14 @@ void UpdateSpecVol() {
     int index;
     tSpecial_volume* v;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    index = FindSpecVolIndex(gLast_actor);
+    if (index >= 0) {
+        v = &gProgram_state.special_volumes[index];
+        BrMatrix34Copy(&v->mat, &gLast_actor->t.t.mat);
+        FindInverseAndWorldBox(v);
+        SetSpecVolMatSize(gLast_actor);
+    }
 }
 
 // IDA: void __cdecl SaveSpecialVolumes()
@@ -1682,13 +1730,56 @@ void SaveSpecialVolumes() {
     int i;
     tSpecial_volume* v;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    PathCat(the_path, gApplication_path, "SPECSAVE.TXT");
+    f = DRfopen(the_path, "wt");
+    if (f == NULL) {
+        return;
+    }
+    fprintf(f, "// SPECIAL EFFECTS VOLUMES\n\n");
+    fprintf(f, "%d\t\t\t\t// # special effects volumes\n\n", gProgram_state.special_volume_count);
+    for (i = 0; i < gProgram_state.special_volume_count; i++) {
+        v = &gProgram_state.special_volumes[i];
+        if (v->no_mat) {
+            fprintf(f, "%s\n", "DEFAULT WATER");
+        } else {
+            fprintf(f, "NEW IMPROVED!\n");
+            fprintf(f, "%.3f, %.3f, %.3f\n", v->mat.m[0][0], v->mat.m[0][1], v->mat.m[0][2]);
+            fprintf(f, "%.3f, %.3f, %.3f\n", v->mat.m[1][0], v->mat.m[1][1], v->mat.m[1][2]);
+            fprintf(f, "%.3f, %.3f, %.3f\n", v->mat.m[2][0], v->mat.m[2][1], v->mat.m[2][2]);
+            fprintf(f, "%.3f, %.3f, %.3f\n", v->mat.m[3][0], v->mat.m[3][1], v->mat.m[3][2]);
+        }
+        fprintf(f, "%.0f\t\t\t\t// gravity multiplier\n", v->gravity_multiplier);
+        fprintf(f, "%.0f\t\t\t\t// viscosity multiplier\n", v->viscosity_multiplier);
+        fprintf(f, "%.0f\t\t\t\t// Car damage per millisecond\n", v->car_damage_per_ms);
+        fprintf(f, "%.0f\t\t\t\t// Pedestrian damage per millisecond\n", v->ped_damage_per_ms);
+        fprintf(f, "%d\t\t\t\t\t// camera effect index\n", v->camera_special_effect_index);
+        fprintf(f, "%d\t\t\t\t\t// sky colour\n", v->sky_col);
+        fprintf(f, "%s\t\t\t\t// Windscreen material to use\n", (v->screen_material != NULL) ? v->screen_material->identifier : "none");
+        fprintf(f, "%d\t\t\t\t\t// Sound ID of entry noise\n", v->entry_noise);
+        fprintf(f, "%d\t\t\t\t\t// Sound ID of exit noise\n", v->exit_noise);
+        fprintf(f, "%d\t\t\t\t\t// Engine noise index\n", v->engine_noise_index);
+        fprintf(f, "%d\t\t\t\t\t// material index\n", v->material_modifier_index);
+        fprintf(f, "\n");
+    }
+    fclose(f);
 }
 
 // IDA: void __cdecl SaveAdditionalStuff()
 void SaveAdditionalStuff() {
     LOG_TRACE("()");
-    STUB();
+
+    if (gSpec_vol_mode) {
+        UpdateSpecVol();
+        SaveSpecialVolumes();
+    } else {
+        DeleteAnyZeroBastards();
+        if (gLast_actor != NULL) {
+            DRActorEnumRecurseWithTrans(gLast_actor, NULL, ApplyTransToModels, NULL);
+        }
+        BrActorSave(gAdditional_actor_path, gAdditional_actors);
+        BrModelSaveMany(gAdditional_model_path, gAdditional_models, gNumber_of_additional_models);
+    }
 }
 
 // IDA: br_uint_32 __cdecl ProcessMaterials(br_actor *pActor, tPMFM2CB pCallback)
@@ -2031,7 +2122,10 @@ void SetRoadTexturingLevel(tRoad_texturing_level pLevel) {
 // IDA: void __usercall ReallySetRoadTexturingLevel(tRoad_texturing_level pLevel@<EAX>)
 void ReallySetRoadTexturingLevel(tRoad_texturing_level pLevel) {
     LOG_TRACE("(%d)", pLevel);
-    NOT_IMPLEMENTED();
+
+    if (pLevel != gRoad_texturing_level) {
+        ProcessFaceMaterials(gProgram_state.track_spec.the_actor, (pLevel == eRTL_none) ? RoadUntexToPersp : RoadPerspToUntex);
+    }
 }
 
 // IDA: tWall_texturing_level __cdecl GetWallTexturingLevel()
@@ -2872,7 +2966,75 @@ void LollipopizeActor(br_actor* pSubject_actor, br_matrix34* ref_to_world, tLoll
     br_matrix34 subject_to_world;
     br_matrix34 mat;
     LOG_TRACE("(%p, %p, %d)", pSubject_actor, ref_to_world, pWhich_axis);
-    NOT_IMPLEMENTED();
+
+    BrActorToActorMatrix34(&subject_to_world, pSubject_actor, gNon_track_actor);
+    BrVector3Sub(&ref_to_subject, (br_vector3*)ref_to_world->m[3], (br_vector3*)subject_to_world.m[3]);
+    switch (pWhich_axis) {
+    case eLollipop_none:
+        TELL_ME_IF_WE_PASS_THIS_WAY();
+        break;
+    case eLollipop_x_match:
+        BrVector3SetFloat(&vector_a, 1.f, 0.f, 0.f);
+        break;
+    case eLollipop_y_match:
+        BrVector3SetFloat(&vector_a, 0.f, 1.f, 0.f);
+        break;
+    case eLollipop_z_match:
+        BrVector3SetFloat(&vector_a, 0.f, 0.f, 1.f);
+        break;
+    }
+    BrVector3Cross(&vector_b, &ref_to_subject, &vector_a);
+    BrVector3Normalise(&vector_b, &vector_b);
+
+    BrVector3Cross(&fixed_axis, &vector_a, &vector_b);
+
+    switch (pWhich_axis) {
+    case eLollipop_none:
+        break;
+    case eLollipop_x_match:
+        mat.m[0][0] = vector_a.v[0];
+        mat.m[1][0] = vector_a.v[1];
+        mat.m[2][0] = vector_a.v[2];
+        mat.m[0][1] = vector_b.v[0];
+        mat.m[1][1] = vector_b.v[1];
+        mat.m[2][1] = vector_b.v[2];
+        mat.m[0][2] = fixed_axis.v[0];
+        mat.m[1][2] = fixed_axis.v[1];
+        mat.m[2][2] = fixed_axis.v[2];
+        mat.m[3][0] = 0.f;
+        mat.m[3][1] = 0.f;
+        mat.m[3][2] = 0.f;
+        break;
+    case eLollipop_y_match:
+        mat.m[0][0] = vector_b.v[0];
+        mat.m[1][0] = vector_b.v[1];
+        mat.m[2][0] = vector_b.v[2];
+        mat.m[0][1] = vector_a.v[0];
+        mat.m[1][1] = vector_a.v[1];
+        mat.m[2][1] = vector_a.v[2];
+        mat.m[0][2] = fixed_axis.v[0];
+        mat.m[1][2] = fixed_axis.v[1];
+        mat.m[2][2] = fixed_axis.v[2];
+        mat.m[3][0] = 0.f;
+        mat.m[3][1] = 0.f;
+        mat.m[3][2] = 0.f;
+        break;
+    case eLollipop_z_match:
+        mat.m[0][0] = vector_b.v[0];
+        mat.m[1][0] = vector_b.v[1];
+        mat.m[2][0] = vector_b.v[2];
+        mat.m[0][1] = vector_a.v[0];
+        mat.m[1][1] = vector_a.v[1];
+        mat.m[2][1] = vector_a.v[2];
+        mat.m[0][2] = fixed_axis.v[0];
+        mat.m[1][2] = fixed_axis.v[1];
+        mat.m[2][2] = fixed_axis.v[2];
+        mat.m[3][0] = 0.f;
+        mat.m[3][1] = 0.f;
+        mat.m[3][2] = 0.f;
+        break;
+    }
+    BrMatrix34Pre(&pSubject_actor->t.t.mat, &mat);
 }
 
 // IDA: void __usercall CalcActorGlobalPos(br_vector3 *pResult@<EAX>, br_actor *pActor@<EDX>)
@@ -3771,7 +3933,8 @@ void SaveAdditionalActors() {
 br_scalar DistanceFromFace(br_vector3* pPos, tFace_ref* pFace) {
     br_vector3 normal;
     LOG_TRACE("(%p, %p)", pPos, pFace);
-    NOT_IMPLEMENTED();
+
+    return BrVector3Dot(&pFace->normal, pPos) - pFace->d;
 }
 
 // IDA: br_uint_32 __cdecl CalcHighestID(br_actor *pActor, int *pHighest)
@@ -3779,21 +3942,48 @@ br_uint_32 CalcHighestID(br_actor* pActor, int* pHighest) {
     char s[256];
     int number;
     LOG_TRACE("(%p, %p)", pActor, pHighest);
-    NOT_IMPLEMENTED();
+
+    if (pActor->identifier == NULL || pActor->identifier[0] == '@') {
+        return 0;
+    }
+    strcpy(s, &pActor->identifier[4]);
+    s[4] = '\0';
+    sscanf(s, "%d", &number);
+    if (*pHighest < number) {
+        *pHighest = number;
+    }
+    return 0;
 }
 
 // IDA: br_uint_32 __cdecl SetID(br_actor *pActor, void *pArg)
 br_uint_32 SetID(br_actor* pActor, void* pArg) {
     char s[256];
     LOG_TRACE("(%p, %p)", pActor, pArg);
-    NOT_IMPLEMENTED();
+
+    if (pActor->identifier == NULL) {
+        return 0;
+    }
+    strcpy(s, pActor->identifier);
+    strtok(s, ".");
+    strcat(s, "0000");
+    sprintf(&s[4], "%04d", (int)(intptr_t)pArg);
+    strcat(s, ".ACT");
+    BrResFree(pActor->identifier);
+    pActor->identifier = BrResStrDup(pActor, s);
+    return 0;
 }
 
 // IDA: void __usercall UniquificateActorsName(br_actor *pUniverse_actor@<EAX>, br_actor *pActor@<EDX>)
 void UniquificateActorsName(br_actor* pUniverse_actor, br_actor* pActor) {
     int highest;
     LOG_TRACE("(%p, %p)", pUniverse_actor, pActor);
-    NOT_IMPLEMENTED();
+
+    if (pActor->identifier == NULL || pActor->identifier[0] == '@') {
+        return;
+    }
+    highest = 0;
+    DRActorEnumRecurse(pUniverse_actor, (br_actor_enum_cbfn*)CalcHighestNonAmID, &highest);
+    DRActorEnumRecurse(pActor, (br_actor_enum_cbfn*)SetID, (void*)(uintptr_t)(highest + 1));
 }
 
 // IDA: void __usercall AccessoryHeadup(br_actor *pActor@<EAX>, char *pPrefix@<EDX>)
@@ -3802,7 +3992,12 @@ void AccessoryHeadup(br_actor* pActor, char* pPrefix) {
     int i;
     br_actor* original_actor;
     LOG_TRACE("(%p, \"%s\")", pActor, pPrefix);
-    NOT_IMPLEMENTED();
+
+    strcpy(s, pPrefix);
+    if (pActor->identifier != NULL) {
+        strcat(s, pActor->identifier);
+    }
+    NewTextHeadupSlot(4, 0, 2000, -2, s);
 }
 
 // IDA: br_uint_32 __cdecl CalcHighestNonAmID(br_actor *pActor, int *pHighest)
@@ -3810,7 +4005,21 @@ br_uint_32 CalcHighestNonAmID(br_actor* pActor, int* pHighest) {
     char s[256];
     int number;
     LOG_TRACE("(%p, %p)", pActor, pHighest);
-    NOT_IMPLEMENTED();
+
+    if (pActor->identifier == NULL || pActor->identifier[0] == '&') {
+        return 0;
+    }
+    if (strlen(pActor->identifier) == 12) {
+        strcpy(s, &pActor->identifier[4]);
+        strtok(s, ".");
+        sscanf(s, "%d", &number);
+    } else {
+        number = 0;
+    }
+    if (*pHighest < number) {
+        *pHighest = number;
+    }
+    return 0;
 }
 
 // IDA: br_uint_32 __cdecl SetIDAndDupModel(br_actor *pActor, void *pArg)
@@ -3819,14 +4028,45 @@ br_uint_32 SetIDAndDupModel(br_actor* pActor, void* pArg) {
     char s2[256];
     br_model* new_model;
     LOG_TRACE("(%p, %p)", pActor, pArg);
-    NOT_IMPLEMENTED();
+
+    if (pActor->identifier == NULL || pActor->identifier[0] == '@') {
+        return 0;
+    }
+    *(int*)(uintptr_t)pArg = *(int*)(uintptr_t)pArg + 1;
+    strcpy(s, pActor->identifier);
+    s[0] = '@';
+    strtok(s, ".");
+    strcat(s, "0000");
+    sprintf(&s[4], "%04d", *(int*)(uintptr_t)pArg);
+    strcpy(s2, s);
+    strcat(s, ".ACT");
+    BrResFree(pActor->identifier);
+    pActor->identifier = BrResStrDup(pActor, s);
+    if (pActor->model != NULL) {
+        strcat(s2, ".DAT");
+        new_model = BrModelAllocate(s2, pActor->model->nvertices, pActor->model->nfaces);
+        memcpy(new_model->vertices, pActor->model->vertices, pActor->model->nvertices * sizeof(br_vertex));
+        memcpy(new_model->faces, pActor->model->faces, pActor->model->nfaces * sizeof(br_face));
+        new_model->flags |= 0x80; // FIXME: unknown model flag
+        BrModelAdd(new_model);
+        BrModelUpdate(new_model, BR_MODU_ALL);
+        pActor->model = new_model;
+        gAdditional_models[gNumber_of_additional_models] = new_model;
+        gNumber_of_additional_models++;
+    }
+    return 0;
 }
 
 // IDA: void __usercall DuplicateIfNotAmpersand(br_actor *pActor@<EAX>)
 void DuplicateIfNotAmpersand(br_actor* pActor) {
     int highest;
     LOG_TRACE("(%p)", pActor);
-    NOT_IMPLEMENTED();
+
+    if (pActor->identifier != NULL && pActor->identifier[0] != '&') {
+        highest = 0;
+        DRActorEnumRecurse(gUniverse_actor, (br_actor_enum_cbfn*)CalcHighestID, &highest);
+        DRActorEnumRecurse(pActor, (br_actor_enum_cbfn*)SetIDAndDupModel, &highest);
+    }
 }
 
 // IDA: void __usercall DropActor(int pIndex@<EAX>)
@@ -3849,67 +4089,154 @@ void DropActor(int pIndex) {
     br_actor* a;
     br_actor* last_non_ampersand;
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+
+    if (PDKeyDown(KEY_CTRL_ANY)) {
+        pIndex += 20;
+    }
+    if (PDKeyDown(KEY_ALT_ANY)) {
+        pIndex += 10;
+    }
+    PathCat(the_path, gApplication_path, "ACCESSRY.TXT");
+    f = DRfopen(the_path, "rt");
+    for (i = 0; i <= pIndex; i++) {
+        if (!feof(f)) {
+            GetAString(f, s);
+        } else {
+            s[0] = '\0';
+        }
+    }
+    if (s[0] != '\0') {
+        gLast_actor = LoadActor(s);
+        if (gLast_actor != NULL && gLast_actor->model != NULL) {
+            BrVector3Set(&kev_bounds.original_bounds.min, -.05f, -.05f, -.05f);
+            BrVector3Set(&kev_bounds.original_bounds.max, .05f, .05f, .05f);
+            kev_bounds.mat = &gProgram_state.current_car.car_master_actor->t.t.mat;
+
+            do {
+                face_count = FindFacesInBox(&kev_bounds, the_list, COUNT_OF(the_list));
+                BrVector3Scale(&kev_bounds.original_bounds.min, &kev_bounds.original_bounds.min, 2.f);
+                BrVector3Scale(&kev_bounds.original_bounds.max, &kev_bounds.original_bounds.max, 2.f);
+            } while (face_count == 0);
+
+            nearest_bastard = FLT_MAX;
+            face_bastard = -1;
+            for (i = 0; i < face_count; i++) {
+                distance_bastard = DistanceFromFace(gOur_pos, &the_list[i]);
+                if (distance_bastard < nearest_bastard) {
+                    nearest_bastard = distance_bastard;
+                    face_bastard = i;
+                }
+            }
+
+            if (face_bastard >= 0) {
+                BrVector3Scale(&gLast_actor->t.t.translate.t, &the_list[face_bastard].normal, nearest_bastard);
+                BrVector3Sub(&gLast_actor->t.t.translate.t, gOur_pos, &gLast_actor->t.t.translate.t);
+                if (!PDKeyDown(KEY_SHIFT_ANY)) {
+                    if (the_list[face_bastard].normal.v[1] > the_list[face_bastard].normal.v[0] && the_list[face_bastard].normal.v[2] > the_list[face_bastard].normal.v[0]) {
+                        BrVector3Set(&side_vector, -1.f, 0.f, 0.f);
+                    } else if (the_list[face_bastard].normal.v[0] <= the_list[face_bastard].normal.v[1] || the_list[face_bastard].normal.v[2] <= the_list[face_bastard].normal.v[1]) {
+                        BrVector3Set(&side_vector, 0.f, 0.f, -1.f);
+                    } else {
+                        BrVector3Set(&side_vector, 0.f, -1.f, 0.f);
+                    }
+                    new_transform.type = BR_TRANSFORM_LOOK_UP;
+                    BrVector3Cross(&new_transform.t.look_up.look, &the_list[face_bastard].normal, &side_vector);
+                    BrVector3Copy(&new_transform.t.look_up.up, &gLast_actor->t.t.translate.t);
+                    BrTransformToTransform(&gLast_actor->t, &new_transform);
+                }
+
+                gKnown_actor = gLast_actor;
+                BrVector3Copy(&gActor_centre, &gLast_actor->t.t.translate.t);
+                DuplicateIfNotAmpersand(gLast_actor);
+                UniquificateActorsName(gUniverse_actor, gLast_actor);
+                gLast_actor->model->flags |= 0x80; // FIXME: unknown flag
+                if (gLast_actor->identifier == NULL || gLast_actor->identifier[0] == '&') {
+                    last_non_ampersand = gAdditional_actors;
+                    for (a = gAdditional_actors->children; a != NULL; a = a->next) {
+                        if (a->identifier != NULL && a->identifier[0] != '&') {
+                            last_non_ampersand = a;
+                        }
+                    }
+                    BrActorAdd(last_non_ampersand, gLast_actor);
+                } else {
+                    BrActorAdd(gAdditional_actors, gLast_actor);
+                }
+                SaveAdditionalStuff();
+                AccessoryHeadup(gLast_actor, "Shat out ");
+            }
+        }
+    }
+    fclose(f);
 }
 
 // IDA: void __cdecl DropActor0()
 void DropActor0() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DropActor(0);
 }
 
 // IDA: void __cdecl DropActor1()
 void DropActor1() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DropActor(1);
 }
 
 // IDA: void __cdecl DropActor2()
 void DropActor2() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DropActor(2);
 }
 
 // IDA: void __cdecl DropActor3()
 void DropActor3() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DropActor(3);
 }
 
 // IDA: void __cdecl DropActor4()
 void DropActor4() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DropActor(4);
 }
 
 // IDA: void __cdecl DropActor5()
 void DropActor5() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DropActor(5);
 }
 
 // IDA: void __cdecl DropActor6()
 void DropActor6() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DropActor(6);
 }
 
 // IDA: void __cdecl DropActor7()
 void DropActor7() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DropActor(7);
 }
 
 // IDA: void __cdecl DropActor8()
 void DropActor8() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DropActor(8);
 }
 
 // IDA: void __cdecl DropActor9()
 void DropActor9() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DropActor(9);
 }
 
 // IDA: br_uint_32 __cdecl IdentifyAccCB(br_actor *pActor, void *pArg)
@@ -3918,13 +4245,33 @@ br_uint_32 IdentifyAccCB(br_actor* pActor, void* pArg) {
     char s[256];
     br_vector3 v;
     LOG_TRACE("(%p, %p)", pActor, pArg);
-    NOT_IMPLEMENTED();
+
+    if (pActor == NULL || pActor->model == NULL) {
+        return 0;
+    }
+    BrVector3Add(&v, &pActor->model->bounds.max, &pActor->model->bounds.min);
+    BrVector3InvScale(&v, &v, 2.f);
+    BrVector3Accumulate(&v, &pActor->t.t.translate.t);
+    BrVector3Sub(&v, &v, gOur_pos);
+    distance = BrVector3LengthSquared(&v);
+    if (distance < gNearest_distance) {
+        gNearest_actor = pActor;
+        gNearest_distance = distance;
+    }
+    return 0;
 }
 
 // IDA: void __cdecl IdentifyAcc()
 void IdentifyAcc() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gNearest_distance = FLT_MAX;
+    gNearest_actor = NULL;
+    DRActorEnumRecurse(gAdditional_actors, (br_actor_enum_cbfn*)IdentifyAccCB, NULL);
+    if (gNearest_actor != NULL) {
+        gLast_actor = gNearest_actor;
+        AccessoryHeadup(gNearest_actor, "Locked onto ");
+    }
 }
 
 // IDA: br_uint_32 __cdecl DelGrooveRef(br_actor *pActor, void *pArg)
@@ -3932,7 +4279,14 @@ br_uint_32 DelGrooveRef(br_actor* pActor, void* pArg) {
     tGroovidelic_spec* the_groove;
     int i;
     LOG_TRACE("(%p, %p)", pActor, pArg);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < gGroovidelics_array_size; i++) {
+        the_groove = &gGroovidelics_array[i];
+        if (the_groove->actor == pActor) {
+            the_groove->owner = -999;
+        }
+    }
+    return 0;
 }
 
 // IDA: br_uint_32 __cdecl DelReferencedModels(br_actor *pActor, void *pArg)
@@ -3940,299 +4294,461 @@ br_uint_32 DelReferencedModels(br_actor* pActor, void* pArg) {
     tGroovidelic_spec* the_groove;
     int i;
     LOG_TRACE("(%p, %p)", pActor, pArg);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < gNumber_of_additional_models; i++) {
+        if (pActor->model == gAdditional_models[i]) {
+            BrModelRemove(pActor->model);
+            BrModelFree(pActor->model);
+            memmove(&gAdditional_models[i], &gAdditional_models[i + 1], (gNumber_of_additional_models - i - 1) * sizeof(br_model*));
+            gNumber_of_additional_models--;
+        }
+    }
+    return 0;
 }
 
 // IDA: void __cdecl DeleteAcc()
 void DeleteAcc() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gLast_actor == NULL) {
+        return;
+    }
+    AccessoryHeadup(gLast_actor, "Murdered ");
+    DRActorEnumRecurse(gLast_actor, (br_actor_enum_cbfn*)DelReferencedModels, NULL);
+    DRActorEnumRecurse(gLast_actor, (br_actor_enum_cbfn*)DelGrooveRef, NULL);
+    BrActorRemove(gLast_actor);
+    BrActorFree(gLast_actor);
+    gLast_actor = NULL;
+    SaveAdditionalStuff();
 }
 
 // IDA: br_uint_32 __cdecl OffsetModel(br_actor *pActor, void *pArg)
 br_uint_32 OffsetModel(br_actor* pActor, void* pArg) {
     int i;
     LOG_TRACE("(%p, %p)", pActor, pArg);
-    NOT_IMPLEMENTED();
+
+    if (pActor->model == NULL) {
+        return 0;
+    }
+    for (i = 0; i < pActor->model->nvertices; i++) {
+        BrVector3Accumulate(&pActor->model->vertices[i].p, (br_vector3*)pArg);
+    }
+    return 0;
 }
 
 // IDA: void __usercall OffsetActor(br_actor *pActor@<EAX>, br_vector3 *pOffset@<EDX>)
 void OffsetActor(br_actor* pActor, br_vector3* pOffset) {
     LOG_TRACE("(%p, %p)", pActor, pOffset);
-    NOT_IMPLEMENTED();
+
+    DRActorEnumRecurse(pActor, (br_actor_enum_cbfn*)OffsetModel, pOffset);
 }
 
 // IDA: void __usercall CentreActor(br_actor *pActor@<EAX>, br_vector3 *pOffset@<EDX>)
 void CentreActor(br_actor* pActor, br_vector3* pOffset) {
     LOG_TRACE("(%p, %p)", pActor, pOffset);
-    NOT_IMPLEMENTED();
+
+    if (pActor->model == NULL) {
+        BrVector3Set(pOffset, 0.f, 0.f, 0.f);
+    } else if (gKnown_actor == gLast_actor) {
+        BrVector3Scale(pOffset, &gActor_centre, -1.f);
+    } else {
+        BrVector3Add(pOffset, &pActor->model->bounds.max, &pActor->model->bounds.min);
+        BrVector3Scale(pOffset, pOffset, -2.f);
+    }
+    DRActorEnumRecurse(pActor, (br_actor_enum_cbfn*)OffsetModel, pOffset);
+    BrVector3Scale(pOffset, pOffset, -1.f);
 }
 
 // IDA: void __cdecl SnapAccToVertical()
 void SnapAccToVertical() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gLast_actor == NULL) {
+        return;
+    }
+    BrVector3Set((br_vector3*)gLast_actor->t.t.mat.m[0], 1.f, 0.f, 0.f);
+    BrVector3Set((br_vector3*)gLast_actor->t.t.mat.m[1], 0.f, 1.f, 0.f);
+    BrVector3Set((br_vector3*)gLast_actor->t.t.mat.m[2], 0.f, 0.f, 1.f);
+    SaveAdditionalStuff();
 }
 
 // IDA: void __usercall RotateAccessory(br_angle pAngle@<EAX>)
 void RotateAccessory(br_angle pAngle) {
     br_vector3 mr_offset;
     LOG_TRACE("(%d)", pAngle);
-    NOT_IMPLEMENTED();
+
+    if (gLast_actor == NULL) {
+        return;
+    }
+    if (!gSpec_vol_mode && gLast_actor->identifier != NULL && gLast_actor->identifier[0] == '@') {
+        CentreActor(gLast_actor, &mr_offset);
+    }
+    switch (gCurrent_rotate_mode) {
+    case eRotate_mode_x:
+        BrMatrix34PreRotateX(&gLast_actor->t.t.mat, pAngle);
+        break;
+    case eRotate_mode_y:
+        BrMatrix34PreRotateY(&gLast_actor->t.t.mat, pAngle);
+        break;
+    case eRotate_mode_z:
+        BrMatrix34PreRotateZ(&gLast_actor->t.t.mat, pAngle);
+        break;
+    }
+    if (!gSpec_vol_mode && gLast_actor->identifier != NULL && gLast_actor->identifier[0] == '@') {
+        DRActorEnumRecurseWithTrans(gLast_actor, NULL, ApplyTransToModels, NULL);
+        OffsetActor(gLast_actor, &mr_offset);
+    }
+    SaveAdditionalStuff();
 }
 
 // IDA: void __cdecl ScaleAccessory(float pScaling_factor)
 void ScaleAccessory(float pScaling_factor) {
     br_vector3 mr_offset;
     LOG_TRACE("(%f)", pScaling_factor);
-    NOT_IMPLEMENTED();
+
+    if (gLast_actor == NULL) {
+        return;
+    }
+    if (!gSpec_vol_mode && gLast_actor->identifier != NULL && gLast_actor->identifier[0] == '@') {
+        CentreActor(gLast_actor, &mr_offset);
+    }
+    switch (gCurrent_scale_mode) {
+    case eScale_mode_all:
+        BrMatrix34PreScale(&gLast_actor->t.t.mat, pScaling_factor, pScaling_factor, pScaling_factor);
+        break;
+    case eScale_mode_x:
+        BrMatrix34PreScale(&gLast_actor->t.t.mat, pScaling_factor, 1.f, 1.f);
+        break;
+    case eScale_mode_y:
+        BrMatrix34PreScale(&gLast_actor->t.t.mat, 1.f, pScaling_factor, 1.f);
+        break;
+    case eScale_mode_z:
+        BrMatrix34PreScale(&gLast_actor->t.t.mat, 1.f, 1.f, pScaling_factor);
+        break;
+    }
+    if (!gSpec_vol_mode && gLast_actor->identifier != NULL && gLast_actor->identifier[0] == '@') {
+        DRActorEnumRecurseWithTrans(gLast_actor, NULL, ApplyTransToModels, NULL);
+        OffsetActor(gLast_actor, &mr_offset);
+    }
+    SaveAdditionalStuff();
 }
 
 // IDA: void __cdecl MoveAccessory(br_scalar pX_shift, br_scalar pY_shift, br_scalar pZ_shift)
 void MoveAccessory(br_scalar pX_shift, br_scalar pY_shift, br_scalar pZ_shift) {
     br_vector3 v;
     LOG_TRACE("(%f, %f, %f)", pX_shift, pY_shift, pZ_shift);
-    NOT_IMPLEMENTED();
+
+    if (gLast_actor == NULL) {
+        return;
+    }
+    BrVector3SetFloat(&v, pX_shift, pY_shift, pZ_shift);
+    BrVector3Accumulate(&gLast_actor->t.t.translate.t, &v);
+    SaveAdditionalStuff();
 }
 
 // IDA: void __cdecl RotateAccL()
 void RotateAccL() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    RotateAccessory(BrDegreeToAngle(90));
 }
 
 // IDA: void __cdecl RotateAccL2()
 void RotateAccL2() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    RotateAccessory(BrDegreeToAngle(15));
 }
 
 // IDA: void __cdecl RotateAccL3()
 void RotateAccL3() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    RotateAccessory(BrDegreeToAngle(5));
 }
 
 // IDA: void __cdecl RotateAccL4()
 void RotateAccL4() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    RotateAccessory(BrDegreeToAngle(1));
 }
 
 // IDA: void __cdecl RotateAccR()
 void RotateAccR() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    RotateAccessory(BrDegreeToAngle(270));
 }
 
 // IDA: void __cdecl RotateAccR2()
 void RotateAccR2() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    RotateAccessory(BrDegreeToAngle(345));
 }
 
 // IDA: void __cdecl RotateAccR3()
 void RotateAccR3() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    RotateAccessory(BrDegreeToAngle(355));
 }
 
 // IDA: void __cdecl RotateAccR4()
 void RotateAccR4() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    RotateAccessory(BrDegreeToAngle(359));
 }
 
 // IDA: void __cdecl CycleAccRotate()
 void CycleAccRotate() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gCurrent_rotate_mode = (gCurrent_rotate_mode == eRotate_mode_z) ? eRotate_mode_x : (gCurrent_rotate_mode + 1);
+    switch (gCurrent_rotate_mode) {
+    case eRotate_mode_x:
+        NewTextHeadupSlot(4, 0, 2000, -2, "Rotate mode: X");
+        break;
+    case eRotate_mode_y:
+        NewTextHeadupSlot(4, 0, 2000, -2, "Rotate mode: Y");
+        break;
+    case eRotate_mode_z:
+        NewTextHeadupSlot(4, 0, 2000, -2, "Rotate mode: Z");
+        break;
+    }
 }
 
 // IDA: void __cdecl CycleAccScale()
 void CycleAccScale() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gCurrent_scale_mode = (gCurrent_scale_mode == eScale_mode_z) ? eScale_mode_all : (gCurrent_scale_mode + 1);
+    switch (gCurrent_scale_mode) {
+    case eScale_mode_all:
+        NewTextHeadupSlot(4, 0, 2000, -2, "Scale mode: ALL");
+        break;
+    case eScale_mode_x:
+        NewTextHeadupSlot(4, 0, 2000, -2, "Scale mode: X");
+        break;
+    case eScale_mode_y:
+        NewTextHeadupSlot(4, 0, 2000, -2, "Scale mode: Y");
+        break;
+    case eScale_mode_z:
+        NewTextHeadupSlot(4, 0, 2000, -2, "Scale mode: Z");
+        break;
+    }
 }
 
 // IDA: void __cdecl ScaleAccUp2()
 void ScaleAccUp2() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    ScaleAccessory(1.2f);
 }
 
 // IDA: void __cdecl ScaleAccUp3()
 void ScaleAccUp3() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    ScaleAccessory(1.05f);
 }
 
 // IDA: void __cdecl ScaleAccUp4()
 void ScaleAccUp4() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    ScaleAccessory(1.002f);
 }
 
 // IDA: void __cdecl ScaleAccDown2()
 void ScaleAccDown2() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    ScaleAccessory(1 / 1.2f);
 }
 
 // IDA: void __cdecl ScaleAccDown3()
 void ScaleAccDown3() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    ScaleAccessory(1 / 1.05f);
 }
 
 // IDA: void __cdecl ScaleAccDown4()
 void ScaleAccDown4() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    ScaleAccessory(1 / 1.002f);
 }
 
 // IDA: void __cdecl MoveXAccL()
 void MoveXAccL() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveAccessory(1.f, 0.f, 0.f);
 }
 
 // IDA: void __cdecl MoveXAccL2()
 void MoveXAccL2() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveAccessory(.2f, 0.f, 0.f);
 }
 
 // IDA: void __cdecl MoveXAccL3()
 void MoveXAccL3() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveAccessory(.02f, 0.f, 0.f);
 }
 
 // IDA: void __cdecl MoveXAccL4()
 void MoveXAccL4() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveAccessory(.002f, 0.f, 0.f);
 }
 
 // IDA: void __cdecl MoveXAccR()
 void MoveXAccR() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveAccessory(-1.f, 0.f, 0.f);
 }
 
 // IDA: void __cdecl MoveXAccR2()
 void MoveXAccR2() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveAccessory(-.2f, 0.f, 0.f);
 }
 
 // IDA: void __cdecl MoveXAccR3()
 void MoveXAccR3() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveAccessory(-.02f, 0.f, 0.f);
 }
 
 // IDA: void __cdecl MoveXAccR4()
 void MoveXAccR4() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveAccessory(-.002f, 0.f, 0.f);
 }
 
 // IDA: void __cdecl MoveYAccL()
 void MoveYAccL() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveAccessory(0.f, 1.f, 0.f);
 }
 
 // IDA: void __cdecl MoveYAccL2()
 void MoveYAccL2() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveAccessory(0.f, .2f, 0.f);
 }
 
 // IDA: void __cdecl MoveYAccL3()
 void MoveYAccL3() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveAccessory(0.f, .02f, 0.f);
 }
 
 // IDA: void __cdecl MoveYAccL4()
 void MoveYAccL4() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveAccessory(0.f, .002f, 0.f);
 }
 
 // IDA: void __cdecl MoveYAccR()
 void MoveYAccR() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveAccessory(0.f, -1.f, 0.f);
 }
 
 // IDA: void __cdecl MoveYAccR2()
 void MoveYAccR2() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveAccessory(0.f, -.2f, 0.f);
 }
 
 // IDA: void __cdecl MoveYAccR3()
 void MoveYAccR3() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveAccessory(0.f, -.02f, 0.f);
 }
 
 // IDA: void __cdecl MoveYAccR4()
 void MoveYAccR4() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveAccessory(0.f, -.002f, 0.f);
 }
 
 // IDA: void __cdecl MoveZAccL()
 void MoveZAccL() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveAccessory(0.f, 0.f, 1.f);
 }
 
 // IDA: void __cdecl MoveZAccL2()
 void MoveZAccL2() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveAccessory(0.f, 0.f, .2f);
 }
 
 // IDA: void __cdecl MoveZAccL3()
 void MoveZAccL3() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveAccessory(0.f, 0.f, .02f);
 }
 
 // IDA: void __cdecl MoveZAccL4()
 void MoveZAccL4() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveAccessory(0.f, 0.f, .002f);
 }
 
 // IDA: void __cdecl MoveZAccR()
 void MoveZAccR() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveAccessory(0.f, 0.f, -1.f);
 }
 
 // IDA: void __cdecl MoveZAccR2()
 void MoveZAccR2() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveAccessory(0.f, 0.f, -.2f);
 }
 
 // IDA: void __cdecl MoveZAccR3()
 void MoveZAccR3() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveAccessory(0.f, 0.f, -.02f);
 }
 
 // IDA: void __cdecl MoveZAccR4()
 void MoveZAccR4() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveAccessory(0.f, 0.f, -.002f);
 }
 
 // IDA: br_material* __cdecl GetInternalMat()
@@ -4340,67 +4856,104 @@ void DropSpecVol(int pIndex) {
     tSpecial_volume* new_specs;
     char s[256];
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+
+    PathCat(the_path, gApplication_path, "SPECVOL.TXT");
+    f = DRfopen(the_path, "rt");
+    if (f == NULL) {
+        return;
+    }
+    spec_count = GetAnInt(f);
+    // pIndex = 1 means first special volume
+    if (pIndex > spec_count) {
+        fclose(f);
+        return;
+    }
+    for (i = 0; i < pIndex; i++) {
+        ParseSpecialVolume(f, &spec, NULL);
+    }
+    spec.no_mat = 0;
+    BrMatrix34Copy(&spec.mat, &gProgram_state.current_car.car_master_actor->t.t.mat);
+    new_specs = BrMemAllocate((gProgram_state.special_volume_count + 1) * sizeof(tSpecial_volume), kMem_new_special_vol);
+    memcpy(new_specs, gProgram_state.special_volumes, gProgram_state.special_volume_count * sizeof(tSpecial_volume));
+    memcpy(&new_specs[gProgram_state.special_volume_count], &spec, sizeof(tSpecial_volume));
+    gProgram_state.special_volume_count++;
+    BrMemFree(gProgram_state.special_volumes);
+    gProgram_state.special_volumes = new_specs;
+    BuildSpecVolModel(&spec, gProgram_state.special_volume_count - 1, GetInternalMat(), GetExternalMat());
+    gLast_actor = gSpec_vol_actors[gProgram_state.special_volume_count - 1];
+    UpdateSpecVol();
+    sprintf(s, "Shat out special volume #%d (type %d)", gProgram_state.special_volume_count - 1, pIndex);
+    NewTextHeadupSlot(4, 0, 2000, -2, s);
+    SaveSpecialVolumes();
+    fclose(f);
 }
 
 // IDA: void __cdecl DropSpecVol0()
 void DropSpecVol0() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl DropSpecVol1()
 void DropSpecVol1() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DropSpecVol(1);
 }
 
 // IDA: void __cdecl DropSpecVol2()
 void DropSpecVol2() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DropSpecVol(2);
 }
 
 // IDA: void __cdecl DropSpecVol3()
 void DropSpecVol3() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DropSpecVol(3);
 }
 
 // IDA: void __cdecl DropSpecVol4()
 void DropSpecVol4() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DropSpecVol(4);
 }
 
 // IDA: void __cdecl DropSpecVol5()
 void DropSpecVol5() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DropSpecVol(5);
 }
 
 // IDA: void __cdecl DropSpecVol6()
 void DropSpecVol6() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DropSpecVol(6);
 }
 
 // IDA: void __cdecl DropSpecVol7()
 void DropSpecVol7() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DropSpecVol(7);
 }
 
 // IDA: void __cdecl DropSpecVol8()
 void DropSpecVol8() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DropSpecVol(8);
 }
 
 // IDA: void __cdecl DropSpecVol9()
 void DropSpecVol9() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DropSpecVol(9);
 }
 
 // IDA: void __cdecl IdentifySpecVol()
@@ -4413,7 +4966,26 @@ void IdentifySpecVol() {
     br_vector3* p;
     char s[256];
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    min_d = FLT_MAX;
+    min_index = -1;
+    p = &gProgram_state.current_car.pos;
+    for (i = 0; i < gProgram_state.special_volume_count; i++) {
+        v = &gProgram_state.special_volumes[i];
+        d = Vector3DistanceSquared((br_vector3*)v->mat.m[3], p);
+        if (d < min_d) {
+            min_index = i;
+            min_d = d;
+        }
+    }
+    if (min_index < 0) {
+        gLast_actor = NULL;
+        NewTextHeadupSlot(4, 0, 2000, -2, "No special volumes to lock onto");
+    } else {
+        sprintf(s, "Locked onto Special Volume #%d", min_index);
+        NewTextHeadupSlot(4, 0, 2000, -2, s);
+        gLast_actor = gSpec_vol_actors[min_index];
+    }
 }
 
 // IDA: void __usercall DelSpecVolumeGraph(int pIndex@<EAX>)
@@ -4447,253 +5019,312 @@ void DelSpecVolumeGraph(int pIndex) {
 void DeleteSpecVol() {
     int index;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    index = FindSpecVolIndex(gLast_actor);
+    if (index < 0) {
+        return;
+    }
+    DelSpecVolumeGraph(index);
+    memmove(&gProgram_state.special_volumes[index], &gProgram_state.special_volumes[index + 1], (gProgram_state.special_volume_count - index - 1) * sizeof(tSpecial_volume));
+    memmove(&gSpec_vol_actors[index], &gSpec_vol_actors[index + 1], (gProgram_state.special_volume_count - index - 1) * sizeof(br_actor*));
+    gProgram_state.special_volume_count--;
+    NewTextHeadupSlot(4, 0, 2000, -2, "There's been a special volumes MURDER!!");
+    gLast_actor = NULL;
+    if (&gProgram_state.special_volumes[index] < gDefault_water_spec_vol) {
+        gDefault_water_spec_vol--;
+    }
+    SaveSpecialVolumes();
 }
 
 // IDA: void __cdecl RotateSpecVolL()
 void RotateSpecVolL() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    RotateAccL();
 }
 
 // IDA: void __cdecl RotateSpecVolL2()
 void RotateSpecVolL2() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    RotateAccL2();
 }
 
 // IDA: void __cdecl RotateSpecVolL3()
 void RotateSpecVolL3() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    RotateAccL3();
 }
 
 // IDA: void __cdecl RotateSpecVolL4()
 void RotateSpecVolL4() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    RotateAccL4();
 }
 
 // IDA: void __cdecl RotateSpecVolR()
 void RotateSpecVolR() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    RotateAccR();
 }
 
 // IDA: void __cdecl RotateSpecVolR2()
 void RotateSpecVolR2() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    RotateAccR2();
 }
 
 // IDA: void __cdecl RotateSpecVolR3()
 void RotateSpecVolR3() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    RotateAccR3();
 }
 
 // IDA: void __cdecl RotateSpecVolR4()
 void RotateSpecVolR4() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    RotateAccR4();
 }
 
 // IDA: void __cdecl CycleSpecVolRotate()
 void CycleSpecVolRotate() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    CycleAccRotate();
 }
 
 // IDA: void __cdecl CycleSpecVolScale()
 void CycleSpecVolScale() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    CycleAccScale();
 }
 
 // IDA: void __cdecl ScaleSpecVolUp2()
 void ScaleSpecVolUp2() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    ScaleAccUp2();
 }
 
 // IDA: void __cdecl ScaleSpecVolUp3()
 void ScaleSpecVolUp3() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    ScaleAccUp3();
 }
 
 // IDA: void __cdecl ScaleSpecVolUp4()
 void ScaleSpecVolUp4() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    ScaleAccUp4();
 }
 
 // IDA: void __cdecl ScaleSpecVolDown2()
 void ScaleSpecVolDown2() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    ScaleAccDown2();
 }
 
 // IDA: void __cdecl ScaleSpecVolDown3()
 void ScaleSpecVolDown3() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    ScaleAccDown3();
 }
 
 // IDA: void __cdecl ScaleSpecVolDown4()
 void ScaleSpecVolDown4() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    ScaleAccDown4();
 }
 
 // IDA: void __cdecl MoveXSpecVolL()
 void MoveXSpecVolL() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveXAccL();
 }
 
 // IDA: void __cdecl MoveXSpecVolL2()
 void MoveXSpecVolL2() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveXAccL2();
 }
 
 // IDA: void __cdecl MoveXSpecVolL3()
 void MoveXSpecVolL3() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveXAccL3();
 }
 
 // IDA: void __cdecl MoveXSpecVolL4()
 void MoveXSpecVolL4() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveXAccL4();
 }
 
 // IDA: void __cdecl MoveXSpecVolR()
 void MoveXSpecVolR() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveXAccR();
 }
 
 // IDA: void __cdecl MoveXSpecVolR2()
 void MoveXSpecVolR2() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveXAccR2();
 }
 
 // IDA: void __cdecl MoveXSpecVolR3()
 void MoveXSpecVolR3() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveXAccR3();
 }
 
 // IDA: void __cdecl MoveXSpecVolR4()
 void MoveXSpecVolR4() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveXAccR4();
 }
 
 // IDA: void __cdecl MoveYSpecVolL()
 void MoveYSpecVolL() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveYAccL();
 }
 
 // IDA: void __cdecl MoveYSpecVolL2()
 void MoveYSpecVolL2() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+#if defined(DETHRACE_FIX_BUGS)
+    MoveYAccL2();
+#else
+    MoveYAccL3();
+#endif
 }
 
 // IDA: void __cdecl MoveYSpecVolL3()
 void MoveYSpecVolL3() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveYAccL3();
 }
 
 // IDA: void __cdecl MoveYSpecVolL4()
 void MoveYSpecVolL4() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveYAccL4();
 }
 
 // IDA: void __cdecl MoveYSpecVolR()
 void MoveYSpecVolR() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveYAccR();
 }
 
 // IDA: void __cdecl MoveYSpecVolR2()
 void MoveYSpecVolR2() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveYAccR2();
 }
 
 // IDA: void __cdecl MoveYSpecVolR3()
 void MoveYSpecVolR3() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveYAccR3();
 }
 
 // IDA: void __cdecl MoveYSpecVolR4()
 void MoveYSpecVolR4() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveYAccR4();
 }
 
 // IDA: void __cdecl MoveZSpecVolL()
 void MoveZSpecVolL() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveZAccL();
 }
 
 // IDA: void __cdecl MoveZSpecVolL2()
 void MoveZSpecVolL2() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveZAccL2();
 }
 
 // IDA: void __cdecl MoveZSpecVolL3()
 void MoveZSpecVolL3() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveZAccL3();
 }
 
 // IDA: void __cdecl MoveZSpecVolL4()
 void MoveZSpecVolL4() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveZAccL4();
 }
 
 // IDA: void __cdecl MoveZSpecVolR()
 void MoveZSpecVolR() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveZAccR();
 }
 
 // IDA: void __cdecl MoveZSpecVolR2()
 void MoveZSpecVolR2() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveZAccR2();
 }
 
 // IDA: void __cdecl MoveZSpecVolR3()
 void MoveZSpecVolR3() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveZAccR3();
 }
 
 // IDA: void __cdecl MoveZSpecVolR4()
 void MoveZSpecVolR4() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    MoveZAccR4();
 }
 
 // IDA: void __cdecl SnapSpecVolToVertical()
 void SnapSpecVolToVertical() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    SnapAccToVertical();
 }
 
 // IDA: void __cdecl ShowSpecialVolumes()

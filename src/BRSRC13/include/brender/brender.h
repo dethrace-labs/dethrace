@@ -78,6 +78,7 @@ void BrMatrix34Copy(br_matrix34* A, br_matrix34* B);
 void BrMatrix34PreRotateY(br_matrix34* mat, br_angle ry);
 void BrMatrix34RotateY(br_matrix34* mat, br_angle ry);
 void BrMatrix34PostScale(br_matrix34* mat, br_scalar sx, br_scalar sy, br_scalar sz);
+void BrMatrix34PreScale(br_matrix34* mat, br_scalar sx, br_scalar sy, br_scalar sz);
 void BrMatrix34PreTransform(br_matrix34* mat, br_transform* xform);
 void BrMatrix34PostTransform(br_matrix34* mat, br_transform* xform);
 void BrMatrix34PreRotateX(br_matrix34* mat, br_angle rx);
@@ -116,6 +117,7 @@ br_model* BrModelLoad(char* filename);
 void BrModelFree(br_model* model);
 void BrModelUpdate(br_model* model, br_uint_16 flags);
 br_uint_32 BrModelLoadMany(char* filename, br_model** models, br_uint_16 num);
+br_uint_32 BrModelSaveMany(char* filename, br_model** models, br_uint_16 num);
 br_model_find_cbfn* BrModelFindHook(br_model_find_cbfn* hook);
 
 // BrPixelmap
