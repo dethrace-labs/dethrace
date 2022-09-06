@@ -296,7 +296,9 @@ void CheckCheckpoints() {
 // IDA: void __cdecl TotalRepair()
 void TotalRepair() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    TotallyRepairCar();
+    NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(41));
 }
 
 // IDA: void __cdecl DoLogos()
