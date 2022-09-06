@@ -12,6 +12,7 @@ extern struct br_font* BrFontProp7x9;
 // BrActor
 br_actor* BrActorLoad(char* filename);
 br_uint_32 BrActorLoadMany(char* filename, br_actor** actors, br_uint_16 num);
+br_uint_32 BrActorSave(char* filename, br_actor* ptr);
 br_actor* BrActorAllocate(br_uint_8 type, void* type_data);
 br_actor* BrActorAdd(br_actor* parent, br_actor* a);
 void BrActorRelink(br_actor* parent, br_actor* a);

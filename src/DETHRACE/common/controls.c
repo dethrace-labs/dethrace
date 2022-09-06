@@ -1,6 +1,7 @@
 #include "controls.h"
 
 #include "brender/brender.h"
+#include "brucetrk.h"
 #include "car.h"
 #include "constants.h"
 #include "crush.h"
@@ -826,7 +827,6 @@ void LookRight() {
 // IDA: void __cdecl DamageTest()
 void DamageTest() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl TDamageEngine()
@@ -920,7 +920,8 @@ void TDamageRRWheel() {
 // IDA: void __cdecl MoveBonnetForward()
 void MoveBonnetForward() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.translate.t.v[2] -= .005f;
 }
 
 // IDA: void __cdecl SaveBonnet()
@@ -928,109 +929,129 @@ void SaveBonnet() {
     br_actor* bonny;
     tPath_name the_path;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    bonny = gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor;
+    PathCat(the_path, gApplication_path, bonny->identifier);
+    BrActorSave(the_path, bonny);
 }
 
 // IDA: void __cdecl MoveBonnetBackward()
 void MoveBonnetBackward() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.translate.t.v[2] += .005f;
 }
 
 // IDA: void __cdecl MoveBonnetLeft()
 void MoveBonnetLeft() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.translate.t.v[0] -= .005f;
 }
 
 // IDA: void __cdecl ShrinkBonnetX()
 void ShrinkBonnetX() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat.m[0][0] *= .98f;
 }
 
 // IDA: void __cdecl SwellBonnetX()
 void SwellBonnetX() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat.m[0][0] *= 1.02f;
 }
 
 // IDA: void __cdecl ShrinkBonnetY()
 void ShrinkBonnetY() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat.m[1][1] *= .98f;
 }
 
 // IDA: void __cdecl SwellBonnetY()
 void SwellBonnetY() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat.m[1][1] *= 1.02f;
 }
 
 // IDA: void __cdecl ShrinkBonnetZ()
 void ShrinkBonnetZ() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat.m[2][2] *= .98f;
 }
 
 // IDA: void __cdecl SwellBonnetZ()
 void SwellBonnetZ() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat.m[2][2] *= 1.02f;
 }
 
 // IDA: void __cdecl MoveBonnetDown()
 void MoveBonnetDown() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.translate.t.v[1] += .005f;
 }
 
 // IDA: void __cdecl MoveBonnetRight()
 void MoveBonnetRight() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.translate.t.v[0] += .005f;
 }
 
 // IDA: void __cdecl MoveBonnetUp()
 void MoveBonnetUp() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.translate.t.v[1] -= .005f;
 }
 
 // IDA: void __cdecl TiltBonnetDownX()
 void TiltBonnetDownX() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    BrMatrix34PreRotateX(&gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat, BR_ANGLE_DEG(.5f));
 }
 
 // IDA: void __cdecl TiltBonnetUpX()
 void TiltBonnetUpX() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    BrMatrix34PreRotateX(&gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat, -BR_ANGLE_DEG(.5f));
 }
 
 // IDA: void __cdecl TiltBonnetDownY()
 void TiltBonnetDownY() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    BrMatrix34PreRotateY(&gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat, BR_ANGLE_DEG(.5f));
 }
 
 // IDA: void __cdecl TiltBonnetUpY()
 void TiltBonnetUpY() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    BrMatrix34PreRotateY(&gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat, -BR_ANGLE_DEG(.5f));
 }
 
 // IDA: void __cdecl TiltBonnetDownZ()
 void TiltBonnetDownZ() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    BrMatrix34PreRotateZ(&gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat, BR_ANGLE_DEG(.5f));
 }
 
 // IDA: void __cdecl TiltBonnetUpZ()
 void TiltBonnetUpZ() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    BrMatrix34PreRotateZ(&gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat, -BR_ANGLE_DEG(.5f));
 }
 
 // IDA: void __cdecl ToggleCockpit()
@@ -1073,7 +1094,10 @@ void ToggleMirror() {
 // IDA: void __cdecl ConcussMe()
 void ConcussMe() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    SufferFromConcussion(1.f);
+    NewScreenWobble(IRandomPosNeg(15), IRandomPosNeg(10), IRandomBetween(10, 60));
+    PratcamEvent(3);
 }
 
 // IDA: void __cdecl CheckHelp()
@@ -1370,7 +1394,19 @@ void ExplodeCar(tCar_spec* pCar) {
     br_vector3 tv;
     br_vector3 pos;
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    pCar->last_car_car_collision = 0;
+    pos.v[0] = .1449275f * pCar->cmpos.v[0];
+    pos.v[1] = .1449275f * pCar->cmpos.v[1];
+    pos.v[2] = pCar->bounds[0].min.v[2] + .3f * (pCar->bounds[0].max.v[2] - pCar->bounds[0].min.v[2]);
+    BrMatrix34ApplyP(&tv, &pos, &pCar->car_master_actor->t.t.mat);
+    CreatePuffOfSmoke(&tv, &pCar->v, 1.f, 1.f, 7, pCar);
+
+    pos.v[2] = pCar->bounds[0].min.v[2] + .7f * (pCar->bounds[0].max.v[2] - pCar->bounds[0].min.v[2]);
+    BrMatrix34ApplyP(&tv, &pos, &pCar->car_master_actor->t.t.mat);
+    CreatePuffOfSmoke(&tv, &pCar->v, 1.f, 1.f, 7, pCar);
+
+    DisableCar(pCar);
 }
 
 // IDA: void __usercall CheckRecoveryOfCars(tU32 pEndFrameTime@<EAX>)
@@ -2168,21 +2204,60 @@ void ResetRecoveryVouchers() {
 void CycleCarTexturingLevel() {
     tCar_texturing_level new_level;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    new_level = (GetCarTexturingLevel() + 1) % eCTL_count;
+    SetCarTexturingLevel(new_level);
+    switch (new_level) {
+    case eCTL_none:
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(50));
+        break;
+    case eCTL_transparent:
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(51));
+        break;
+    case eCTL_full:
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(52));
+        break;
+    case eCTL_count:
+        break;
+    }
 }
 
 // IDA: void __cdecl CycleWallTexturingLevel()
 void CycleWallTexturingLevel() {
     tWall_texturing_level new_level;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    new_level = (GetWallTexturingLevel() + 1) % eWTL_count;
+    ReallySetWallTexturingLevel(new_level);
+    SetWallTexturingLevel(new_level);
+    switch (new_level) {
+    case eWTL_none:
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(55));
+        break;
+    case eWTL_linear:
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(56));
+        break;
+    case eWTL_full:
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(57));
+        break;
+    case eWTL_count:
+        break;
+    }
 }
 
 // IDA: void __cdecl CycleRoadTexturingLevel()
 void CycleRoadTexturingLevel() {
     tRoad_texturing_level new_level;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    new_level = (GetRoadTexturingLevel() + 1) % 3;
+    ReallySetRoadTexturingLevel(new_level);
+    SetRoadTexturingLevel(new_level);
+    if (new_level == eRTL_none) {
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(53));
+    } else if (new_level == eRTL_full) {
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(54));
+    }
 }
 
 // IDA: void __cdecl CycleYonFactor()
@@ -2190,7 +2265,21 @@ void CycleYonFactor() {
     br_scalar new_factor;
     char factor_str[5];
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    new_factor = GetYonFactor() / 2.f;
+    if (new_factor < .1f) {
+        new_factor = 1.f;
+    }
+    SetYonFactor(new_factor);
+    if (new_factor > .75f) {
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(100));
+    } else if (new_factor > .375f) {
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(101));
+    } else if (new_factor > .187f) {
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(102));
+    } else {
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(103));
+    }
 }
 
 // IDA: void __usercall SetSoundDetailLevel(int pLevel@<EAX>)
@@ -2222,7 +2311,21 @@ int GetSoundDetailLevel() {
 void CycleSoundDetailLevel() {
     int new_level;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    new_level = (gSound_detail_level + 1) % 3;
+    ReallySetSoundDetailLevel(new_level);
+    SetSoundDetailLevel(new_level);
+    switch(new_level) {
+    case 0:
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(116));
+        break;
+    case 1:
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(117));
+        break;
+    case 2:
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(118));
+        break;
+    }
 }
 
 // IDA: void __cdecl CycleCarSimplificationLevel()
@@ -2230,21 +2333,46 @@ void CycleCarSimplificationLevel() {
     char* src;
     char* dst;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gCar_simplification_level = (gCar_simplification_level + 1) % 5;
+    src = GetMiscString(119);
+    dst = BrMemAllocate(strlen(src), kMem_simp_level);
+    sprintf(dst, src, gCar_simplification_level);
+    NewTextHeadupSlot(4, 0, 2000, -4, dst);
+    BrMemFree(dst);
 }
 
 // IDA: void __cdecl ToggleAccessoryRendering()
 void ToggleAccessoryRendering() {
     int on;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gNet_mode == eNet_mode_none) {
+        on = !GetAccessoryRendering();
+        SetAccessoryRendering(on);
+        if (on) {
+            NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(120));
+        } else {
+            NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(121));
+        }
+    } else {
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(124));
+    }
 }
 
 // IDA: void __cdecl ToggleSmoke()
 void ToggleSmoke() {
     int on;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    on = !GetSmokeOn();
+    ReallySetSmokeOn(on);
+    SetSmokeOn(on);
+    if (on) {
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(122));
+    } else {
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(123));
+    }
 }
 
 // IDA: void __usercall DrawSomeText2(tDR_font *pFont@<EAX>)
