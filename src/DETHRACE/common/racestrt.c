@@ -101,14 +101,14 @@ void DrawRaceList(int pOffset) {
                     y,
                     rank_colour,
                     gBig_font,
-                    (signed char*)rank_str);
+                    rank_str);
             }
             TransBrPixelmapText(gBack_screen,
                 gCurrent_graf_data->choose_race_name_left,
                 y,
                 text_colour,
                 gBig_font,
-                (signed char*)gRace_list[i].name);
+                gRace_list[i].name);
             if (gRace_list[i].been_there_done_that && gBullet_image != NULL) {
                 BrPixelmapRectangleCopy(gBack_screen,
                     gCurrent_graf_data->choose_race_bullet_left,
@@ -128,7 +128,7 @@ void DrawRaceList(int pOffset) {
             gCurrent_graf_data->choose_race_current_text_y,
             5,
             gBig_font,
-            (signed char*)rank_str);
+            rank_str);
     } else {
         sprintf(rank_str, "%s%d", GetMiscString(27), gProgram_state.rank);
         text_x = (gCurrent_graf_data->choose_race_left + gCurrent_graf_data->choose_race_right) / 2 - BrPixelmapTextWidth(gBack_screen, gBig_font, rank_str) / 2;
@@ -137,14 +137,14 @@ void DrawRaceList(int pOffset) {
             gCurrent_graf_data->choose_race_current_text_y,
             3,
             gBig_font,
-            (signed char*)GetMiscString(27));
+            GetMiscString(27));
         sprintf(rank_str, "%d", gProgram_state.rank);
         TransBrPixelmapText(gBack_screen,
             text_x + BrPixelmapTextWidth(gBack_screen, gBig_font, GetMiscString(27)),
             gCurrent_graf_data->choose_race_current_text_y,
             5,
             gBig_font,
-            (signed char*)rank_str);
+            rank_str);
     }
     BrPixelmapLine(gBack_screen,
         left_most,
@@ -368,7 +368,7 @@ void DrawCar(int pCurrent_choice, int pCurrent_mode) {
         gCurrent_graf_data->change_car_text_y,
         3,
         gFont_7,
-        (signed char*)s);
+        s);
     BrPixelmapLine(gBack_screen,
         gCurrent_graf_data->change_car_line_left,
         gCurrent_graf_data->change_car_line_y,
@@ -1069,7 +1069,7 @@ void SelectRaceDraw(int pCurrent_choice, int pCurrent_mode) {
                         y_coord,
                         0xC9u,
                         gFont_7,
-                        (signed char*)the_chunk->text[j]);
+                        the_chunk->text[j]);
                     y_coord += gFont_7->glyph_y + gFont_7->glyph_y / 2;
                 }
             }
@@ -1089,7 +1089,7 @@ void SelectRaceDraw(int pCurrent_choice, int pCurrent_mode) {
                         y_coord,
                         0xC9u,
                         gFont_7,
-                        (signed char*)the_chunk->text[k]);
+                        the_chunk->text[k]);
                     y_coord += gFont_7->glyph_y + gFont_7->glyph_y / 2;
                 }
             }
@@ -1515,7 +1515,7 @@ void DrawGrid(int pOffset, int pDraw_it) {
                     gCurrent_graf_data->grid_numbers_top,
                     gGrid_number_colour[i],
                     gBig_font,
-                    (signed char*)numbers_str[i]);
+                    numbers_str[i]);
             }
             str_x += BrPixelmapTextWidth(gBack_screen, gBig_font, numbers_str[i]);
         }
@@ -1650,7 +1650,7 @@ void ChallengeStart() {
     BrPixelmapFree(the_map);
     the_map = DRPixelmapAllocate(gScreen->type, gCurrent_graf_data->dare_text_width, gCurrent_graf_data->dare_mugshot_height, 0, 0);
     BrPixelmapFill(the_map, 0);
-    TransBrPixelmapText(the_map, 0, 0, 1u, gBig_font, (signed char*)gOpponents[gChallenger_index__racestrt].abbrev_name);
+    TransBrPixelmapText(the_map, 0, 0, 1u, gBig_font, gOpponents[gChallenger_index__racestrt].abbrev_name);
     PathCat(the_path, gApplication_path, "DARES.TXT");
     f = DRfopen(the_path, "rt");
     if (!f) {
@@ -1667,7 +1667,7 @@ void ChallengeStart() {
     line_count = GetAnInt(f);
     for (i = 0; i < line_count; i++) {
         GetALineAndDontArgue(f, s);
-        TransBrPixelmapText(the_map, 0, 2 * (i + 1) * gBig_font->glyph_y, 0x86u, gBig_font, (signed char*)s);
+        TransBrPixelmapText(the_map, 0, 2 * (i + 1) * gBig_font->glyph_y, 0x86u, gBig_font, s);
     }
     fclose(f);
     BrPixelmapLine(the_map, 0, gBig_font->glyph_y + 2, the_map->width, gBig_font->glyph_y + 2, 45);
