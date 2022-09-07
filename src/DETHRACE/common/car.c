@@ -22,6 +22,7 @@
 #include "opponent.h"
 #include "pd/sys.h"
 #include "piping.h"
+#include "pratcam.h"
 #include "raycast.h"
 #include "replay.h"
 #include "skidmark.h"
@@ -4084,7 +4085,54 @@ void SetAmbientPratCam(tCar_spec* pCar) {
     static tU32 last_time_on_ground;
     LOG_TRACE("(%p)", pCar);
 
-    STUB_ONCE();
+    if (gRace_finished) {
+        return;
+    }
+    the_time = GetTotalTime();
+    if (pCar->number_of_wheels_on_ground != 0) {
+        last_time_on_ground = the_time;
+    }
+    vcs_x = pCar->velocity_car_space.v[0];
+    vcs_y = pCar->velocity_car_space.v[1];
+    vcs_z = pCar->velocity_car_space.v[2];
+    abs_vcs_x = fabsf(vcs_x);
+    abs_vcs_y = fabsf(vcs_y);
+    abs_vcs_z = fabsf(vcs_z);
+    abs_omega_x = fabsf(pCar->omega.v[0]);
+    abs_omega_y = fabsf(pCar->omega.v[1]);
+    abs_omega_z = fabsf(pCar->omega.v[2]);
+
+    if (abs_omega_x > 4.5f || abs_omega_z > 4.5f) {
+        ChangeAmbientPratcam(9);
+    } else if (abs_omega_y > 4.5f) {
+        ChangeAmbientPratcam(12);
+    } else if (abs_omega_x > 3.f || abs_omega_z > 3.f) {
+        ChangeAmbientPratcam(8);
+    } else if (abs_omega_y > 3.f) {
+        ChangeAmbientPratcam(11);
+    } else if (pCar->car_master_actor->t.t.mat.m[1][1] < 0.1f) {
+        ChangeAmbientPratcam(44);
+    } else if (abs_vcs_y > abs_vcs_z && abs_vcs_y > abs_vcs_x && vcs_y < -.004f) {
+        ChangeAmbientPratcam(6);
+    } else if (the_time - last_time_on_ground > 500) {
+        ChangeAmbientPratcam(5);
+    } else if (abs_vcs_x > abs_vcs_z && vcs_x > .001f) {
+        ChangeAmbientPratcam(26);
+    } else if (abs_vcs_x > abs_vcs_z && vcs_x < -.001f) {
+        ChangeAmbientPratcam(25);
+    } else if (abs_omega_x > 1.5f || abs_omega_z > 1.5f) {
+        ChangeAmbientPratcam(7);
+    } else if (abs_omega_y > 1.5f) {
+        ChangeAmbientPratcam(10);
+    } else if (abs_vcs_z > .01f) {
+        ChangeAmbientPratcam(3);
+    } else if (abs_vcs_z > .004f) {
+        ChangeAmbientPratcam(2);
+    } else if (abs_vcs_z > .0015f) {
+        ChangeAmbientPratcam(1);
+    } else {
+        ChangeAmbientPratcam(0);
+    }
 }
 
 // IDA: void __usercall MungeCarGraphics(tU32 pFrame_period@<EAX>)

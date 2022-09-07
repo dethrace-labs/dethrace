@@ -130,7 +130,7 @@ void RaceCompleted(tRace_over_reason pReason) {
 void Checkpoint(int pCheckpoint_index, int pDo_sound) {
     LOG_TRACE("(%d, %d)", pCheckpoint_index, pDo_sound);
 
-    PratcamEvent(33); // FIXME: or PratcamEventNow
+    PratcamEvent(33);
     DoFancyHeadup(kFancyHeadupCheckpoint);
     if (pDo_sound) {
         DRS3StartSound(gPedestrians_outlet, 8012);
