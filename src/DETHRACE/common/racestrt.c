@@ -653,15 +653,30 @@ int PartsShopRecommended() {
     int counter;
     LOG_TRACE("()");
 
-    STUB();
-    return 0;
+    running_cost = 0;
+    counter = 0;
+    for (i = 0; i < eParts_count; i++) {
+        current_index = gProgram_state.current_car.power_up_levels[i];
+        if (current_index + 1 < gProgram_state.current_car.power_ups[i].number_of_parts &&
+            (gProgram_state.rank <= gProgram_state.current_car.power_ups[i].info[current_index + 1].rank_required || gProgram_state.game_completed)){
+            running_cost += gProgram_state.current_car.power_ups[i].info[current_index + 1].prices[gProgram_state.skill_level];
+            counter++;
+        }
+    }
+    return running_cost != 0 && ((float)running_cost / counter * 1.5f <= gProgram_state.credits);
 }
 
 // IDA: void __usercall CalcPartPrice(int pCategory@<EAX>, int pIndex@<EDX>, int *pPrice@<EBX>, int *pCost@<ECX>)
 void CalcPartPrice(int pCategory, int pIndex, int* pPrice, int* pCost) {
     int current_value;
     LOG_TRACE("(%d, %d, %p, %p)", pCategory, pIndex, pPrice, pCost);
-    NOT_IMPLEMENTED();
+
+    *pPrice = gProgram_state.current_car.power_ups[pCategory].info[pIndex].prices[gProgram_state.skill_level];
+    if (gProgram_state.current_car.power_up_levels[pCategory] == pIndex) {
+        *pCost = 0;
+    } else {
+        *pCost = *pPrice - 10 * (gRefund_rate * gProgram_state.current_car.power_ups[pCategory].info[gProgram_state.current_car.power_up_levels[pCategory]].prices[gProgram_state.skill_level] / 1000);
+    }
 }
 
 // IDA: int __usercall BuyPart@<EAX>(int pCategory@<EAX>, int pIndex@<EDX>)
@@ -669,7 +684,20 @@ int BuyPart(int pCategory, int pIndex) {
     int price;
     int cost;
     LOG_TRACE("(%d, %d)", pCategory, pIndex);
-    NOT_IMPLEMENTED();
+
+    CalcPartPrice(pCategory, pIndex, &price, &cost);
+    if (cost == 0) {
+        return 1;
+    } else if (gProgram_state.credits < cost) {
+        return 0;
+    } else {
+        gProgram_state.credits -= cost;
+        if (gProgram_state.credits > 999999) {
+            gProgram_state.credits = 999999;
+        }
+        gProgram_state.current_car.power_up_levels[pCategory] = pIndex;
+        return 1;
+    }
 }
 
 // IDA: void __cdecl DoAutoParts()
@@ -681,19 +709,69 @@ void DoAutoParts() {
     int cost;
     int current_level;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    while (1) {
+        if (!PartsShopRecommended()) {
+            return;
+        }
+        lowest_yet = COUNT_OF(((tParts_spec*)NULL)->info);
+        for (i = 0; i < eParts_count; i++) {
+            current_level = gProgram_state.current_car.power_up_levels[i];
+            if (current_level + 1 < gProgram_state.current_car.power_ups[i].number_of_parts &&
+                (gProgram_state.rank <= gProgram_state.current_car.power_ups[i].info[current_level + 1].rank_required || gProgram_state.game_completed)) {
+                CalcPartPrice(i, current_level + 1, &price, &cost);
+                if (cost != 0 && cost <= gProgram_state.credits && current_level < lowest_yet) {
+                    lowest_one = i;
+                    lowest_yet = current_level + 1;
+                }
+            }
+        }
+        if (lowest_yet == COUNT_OF(((tParts_spec*)NULL)->info)) {
+            break;
+        }
+        if (!BuyPart(lowest_one, lowest_yet)) {
+            return;
+        }
+    }
 }
 
 // IDA: void __cdecl DrawPartsLabel()
 void DrawPartsLabel() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    switch (gPart_category) {
+    case eParts_armour:
+        RunFlicAt(262, gCurrent_graf_data->parts_label_x, gCurrent_graf_data->parts_label_y);
+        break;
+    case eParts_power:
+        RunFlicAt(263, gCurrent_graf_data->parts_label_x, gCurrent_graf_data->parts_label_y);
+        break;
+    case eParts_offensive:
+        RunFlicAt(264, gCurrent_graf_data->parts_label_x, gCurrent_graf_data->parts_label_y);
+        break;
+    default:
+        break;
+    }
 }
 
 // IDA: void __usercall ErasePartsText(int pTotal_as_well@<EAX>)
 void ErasePartsText(int pTotal_as_well) {
     LOG_TRACE("(%d)", pTotal_as_well);
-    NOT_IMPLEMENTED();
+
+    BrPixelmapRectangleFill(gBack_screen,
+        gCurrent_graf_data->parts_cost_x,
+        gCurrent_graf_data->parts_cost_y,
+        gCurrent_graf_data->parts_image_width - (gCurrent_graf_data->parts_cost_x - gCurrent_graf_data->parts_image_x),
+        gFont_7->glyph_y + gCurrent_graf_data->parts_net_y - gCurrent_graf_data->parts_cost_y,
+        0);
+    if (pTotal_as_well) {
+        BrPixelmapRectangleFill(gBack_screen,
+            gCurrent_graf_data->parts_total_x,
+            gCurrent_graf_data->parts_total_y,
+            gCurrent_graf_data->parts_image_width - (gCurrent_graf_data->parts_total_x - gCurrent_graf_data->parts_image_x),
+            gFont_7->glyph_y,
+            0);
+    }
 }
 
 // IDA: void __cdecl DrawPartsText()
@@ -701,27 +779,62 @@ void DrawPartsText() {
     int price;
     int cost;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    CalcPartPrice(gPart_category, gPart_index, &price, &cost);
+    TransBrPixelmapText(gBack_screen, gCurrent_graf_data->parts_cost_x, gCurrent_graf_data->parts_cost_y, 5, gFont_7, GetMiscString(28));
+    BrPixelmapTextF(gBack_screen, gCurrent_graf_data->parts_numbers_x, gCurrent_graf_data->parts_cost_y - (TranslationMode() ? 0 : 2), 5, gFont_7, "%d", price);
+    if (cost > 0) {
+        TransBrPixelmapText(gBack_screen, gCurrent_graf_data->parts_net_x, gCurrent_graf_data->parts_net_y, 45, gFont_7, GetMiscString(29));
+        BrPixelmapTextF(gBack_screen, gCurrent_graf_data->parts_numbers_x, gCurrent_graf_data->parts_net_y - (TranslationMode() ? 0 : 2), 45, gFont_7, "%d", cost);
+    } else if (cost < 0) {
+        TransBrPixelmapText(gBack_screen, gCurrent_graf_data->parts_net_x, gCurrent_graf_data->parts_net_y, 201, gFont_7, GetMiscString(30));
+        BrPixelmapTextF(gBack_screen, gCurrent_graf_data->parts_numbers_x, gCurrent_graf_data->parts_net_y - (TranslationMode() ? 0 : 2), 201, gFont_7, "%d", -cost);
+    } else if (gJust_bought_part) {
+        TransBrPixelmapText(gBack_screen, gCurrent_graf_data->parts_net_x, gCurrent_graf_data->parts_net_y, 134, gFont_7, GetMiscString(33));
+    } else {
+        TransBrPixelmapText(gBack_screen, gCurrent_graf_data->parts_net_x, gCurrent_graf_data->parts_net_y, 134, gFont_7, GetMiscString(32));
+    }
+    TransBrPixelmapText(gBack_screen, gCurrent_graf_data->parts_total_x, gCurrent_graf_data->parts_total_y, 2, gFont_7, GetMiscString(31));
+    BrPixelmapTextF(gBack_screen, gCurrent_graf_data->parts_numbers_x, gCurrent_graf_data->parts_total_y - (TranslationMode() ? 0 : 2), 2, gFont_7, "%d", gProgram_state.credits);
 }
 
 // IDA: void __cdecl SetPartsImage()
 void SetPartsImage() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    ChangePanelFlic(0,
+        gProgram_state.current_car.power_ups[gPart_category].info[gPart_index].data_ptr,
+        gProgram_state.current_car.power_ups[gPart_category].info[gPart_index].data_length);
+    TellyInImage(GetPanelPixelmap(0), gCurrent_graf_data->parts_image_x, gCurrent_graf_data->parts_image_y);
+    DrawPartsText();
 }
 
 // IDA: int __cdecl GetPartsMax()
 int GetPartsMax() {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = gProgram_state.current_car.power_ups[gPart_category].number_of_parts - 1; i >= 0; i--) {
+        if (gProgram_state.rank <= gProgram_state.current_car.power_ups[gPart_category].info[i].rank_required) {
+            return i;
+        }
+        if (gProgram_state.game_completed) {
+            return i;
+        }
+    }
+    return 0;
 }
 
 // IDA: void __cdecl CalcPartsIndex()
 void CalcPartsIndex() {
     int current_index;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gPart_index = gProgram_state.current_car.power_up_levels[gPart_category];
+    if (gPart_index + 1 < gProgram_state.current_car.power_ups[gPart_category].number_of_parts &&
+        (gProgram_state.rank <= gProgram_state.current_car.power_ups[gPart_category].info[gPart_index + 1].rank_required || gProgram_state.game_completed)) {
+        gPart_index += 1;
+    }
 }
 
 // IDA: void __cdecl DoExchangePart()
@@ -729,98 +842,355 @@ void DoExchangePart() {
     int price;
     int cost;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    CalcPartPrice(gPart_category, gPart_index, &price, &cost);
+    if (cost == 0 || gProgram_state.credits < cost) {
+        DRS3StartSound(gEffects_outlet, 3100);
+    } else {
+        gJust_bought_part = 1;
+        DRS3StartSound(gEffects_outlet, 3101);
+        BuyPart(gPart_category, gPart_index);
+        ErasePartsText(1);
+        DrawPartsText();
+    }
 }
 
 // IDA: int __usercall PartsShopGoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int PartsShopGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     int flic_index;
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    if (*pCurrent_choice < 3 && *pCurrent_mode == 0) {
+        RemoveTransientBitmaps(1);
+        DontLetFlicFuckWithPalettes();
+        TurnFlicTransparencyOn();
+        RunFlicAt(
+            gStart_interface_spec->pushed_flics[*pCurrent_choice].flic_index,
+            gStart_interface_spec->pushed_flics[*pCurrent_choice].x[gGraf_data_index],
+            gStart_interface_spec->pushed_flics[*pCurrent_choice].y[gGraf_data_index]);
+        TurnFlicTransparencyOff();
+        LetFlicFuckWithPalettes();
+        gJust_bought_part = 0;
+        ErasePartsText(1);
+        TellyOutImage(GetPanelPixelmap(0), gCurrent_graf_data->parts_image_x, gCurrent_graf_data->parts_image_y);
+        gPart_category = *pCurrent_choice;
+        CalcPartsIndex();
+        RunFlic(261);
+        AddToFlicQueue(
+            gStart_interface_spec->flicker_on_flics[*pCurrent_choice].flic_index,
+            gStart_interface_spec->flicker_on_flics[*pCurrent_choice].x[gGraf_data_index],
+            gStart_interface_spec->flicker_on_flics[*pCurrent_choice].y[gGraf_data_index],
+            1);
+        DrawPartsLabel();
+        SetPartsImage();
+        ProcessFlicQueue(gFrame_period);
+        DoMouseCursor();
+        PDScreenBufferSwap(0);
+        return 0;
+    } else if (*pCurrent_mode == 1) {
+        AddToFlicQueue(
+            gStart_interface_spec->flicker_on_flics[4].flic_index,
+            gStart_interface_spec->flicker_on_flics[4].x[gGraf_data_index],
+            gStart_interface_spec->flicker_on_flics[4].y[gGraf_data_index],
+            1);
+        DoExchangePart();
+        return 0;
+    } else {
+        return 1;
+    }
 }
 
 // IDA: int __usercall UpPart@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int UpPart(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    gJust_bought_part = 0;
+    AddToFlicQueue(
+        gStart_interface_spec->pushed_flics[5].flic_index,
+        gStart_interface_spec->pushed_flics[5].x[gGraf_data_index],
+        gStart_interface_spec->pushed_flics[5].y[gGraf_data_index],
+        1);
+    DRS3StartSound(gEffects_outlet, 3000);
+    RemoveTransientBitmaps(1);
+    ErasePartsText(0);
+
+    gPart_index = (gPart_index == 0) ? GetPartsMax() : (gPart_index - 1);
+
+    DropOutImageThruBottom(
+        GetPanelPixelmap(0),
+        gCurrent_graf_data->parts_image_x,
+        gCurrent_graf_data->parts_image_y,
+        gCurrent_graf_data->parts_top_clip,
+        gCurrent_graf_data->parts_bottom_clip);
+    ChangePanelFlic(0,
+        gProgram_state.current_car.power_ups[gPart_category].info[gPart_index].data_ptr,
+        gProgram_state.current_car.power_ups[gPart_category].info[gPart_index].data_length);
+    DropInImageFromTop(
+        GetPanelPixelmap(0),
+        gCurrent_graf_data->parts_image_x,
+        gCurrent_graf_data->parts_image_y,
+        gCurrent_graf_data->parts_top_clip,
+        gCurrent_graf_data->parts_bottom_clip);
+    DrawPartsText();
+    return 0;
 }
 
 // IDA: int __usercall DownPart@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int DownPart(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    gJust_bought_part = 0;
+    AddToFlicQueue(
+        gStart_interface_spec->pushed_flics[6].flic_index,
+        gStart_interface_spec->pushed_flics[6].x[gGraf_data_index],
+        gStart_interface_spec->pushed_flics[6].y[gGraf_data_index],
+        1);
+    DRS3StartSound(gEffects_outlet, 3000);
+    RemoveTransientBitmaps(1);
+    ErasePartsText(0);
+
+    gPart_index = (gPart_index == GetPartsMax()) ? 0 : (gPart_index + 1);
+
+    DropOutImageThruTop(
+        GetPanelPixelmap(0),
+        gCurrent_graf_data->parts_image_x,
+        gCurrent_graf_data->parts_image_y,
+        gCurrent_graf_data->parts_top_clip,
+        gCurrent_graf_data->parts_bottom_clip);
+    ChangePanelFlic(0,
+        gProgram_state.current_car.power_ups[gPart_category].info[gPart_index].data_ptr,
+        gProgram_state.current_car.power_ups[gPart_category].info[gPart_index].data_length);
+    DropInImageFromBottom(
+        GetPanelPixelmap(0),
+        gCurrent_graf_data->parts_image_x,
+        gCurrent_graf_data->parts_image_y,
+        gCurrent_graf_data->parts_top_clip,
+        gCurrent_graf_data->parts_bottom_clip);
+    DrawPartsText();
+    return 0;
 }
 
 // IDA: int __usercall UpClickPart@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
 int UpClickPart(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
-    NOT_IMPLEMENTED();
+
+    UpPart(pCurrent_choice, pCurrent_mode);
+    return 0;
 }
 
 // IDA: int __usercall DownClickPart@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
 int DownClickPart(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
-    NOT_IMPLEMENTED();
+
+    DownPart(pCurrent_choice, pCurrent_mode);
+    return 0;
 }
 
 // IDA: int __usercall PartsArrowsOn@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int PartsArrowsOn(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    AddToFlicQueue(
+        gStart_interface_spec->flicker_on_flics[5].flic_index,
+        gStart_interface_spec->flicker_on_flics[5].x[gGraf_data_index],
+        gStart_interface_spec->flicker_on_flics[5].y[gGraf_data_index],
+        1);
+    AddToFlicQueue(gStart_interface_spec->flicker_on_flics[6].flic_index,
+        gStart_interface_spec->flicker_on_flics[6].x[gGraf_data_index],
+        gStart_interface_spec->flicker_on_flics[6].y[gGraf_data_index],
+        1);
+    return 0;
 }
 
 // IDA: int __usercall PartsArrowsOff@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int PartsArrowsOff(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    AddToFlicQueue(gStart_interface_spec->flicker_off_flics[5].flic_index,
+        gStart_interface_spec->flicker_off_flics[5].x[gGraf_data_index],
+        gStart_interface_spec->flicker_off_flics[5].y[gGraf_data_index],
+        1);
+    AddToFlicQueue(gStart_interface_spec->flicker_off_flics[6].flic_index,
+        gStart_interface_spec->flicker_off_flics[6].x[gGraf_data_index],
+        gStart_interface_spec->flicker_off_flics[6].y[gGraf_data_index],
+        1);
+    return 0;
 }
 
 // IDA: void __cdecl StartPartsShop()
 void StartPartsShop() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DrawPartsLabel();
+    SetPartsImage();
 }
 
 // IDA: int __usercall DonePartsShop@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
 int DonePartsShop(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
-    NOT_IMPLEMENTED();
+
+    if (gFade_away_parts_shop) {
+        FadePaletteDown();
+    } else {
+        RunFlic(251);
+    }
+    return pGo_ahead;
 }
 
 // IDA: void __usercall DrawPartsShop(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
 void DrawPartsShop(int pCurrent_choice, int pCurrent_mode) {
     LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    DrawPartsText();
 }
 
 // IDA: void __usercall DoPartsShop(int pFade_away@<EAX>)
 void DoPartsShop(int pFade_away) {
-    static tFlicette flicker_on[7];
-    static tFlicette flicker_off[7];
-    static tFlicette push[7];
-    static tMouse_area mouse_areas[7];
-    static tInterface_spec interface_spec;
+    static tFlicette flicker_on[7] = {
+        {  43, { 225, 450 }, {  30,  72 } },
+        {  43, { 225, 450 }, {  60, 144 } },
+        {  43, { 225, 450 }, {  89, 214 } },
+        {  43, { 225, 450 }, { 152, 365 } },
+        {  43, {  85, 170 }, { 152, 365 } },
+        { 221, {  30,  60 }, {  79, 190 } },
+        { 221, {  30,  60 }, {  79, 190 } },
+    };
+    static tFlicette flicker_off[7] = {
+        {  42, { 225, 450 }, {  30,  72 } },
+        {  42, { 225, 450 }, {  60, 144 } },
+        {  42, { 225, 450 }, {  89, 214 } },
+        {  42, { 225, 450 }, { 152, 365 } },
+        {  42, {  85, 170 }, { 152, 365 } },
+        { 220, {  30,  60 }, {  79, 190 } },
+        { 220, {  30,  60 }, {  79, 190 } },
+    };
+    static tFlicette push[7] = {
+        { 254, { 225, 450 }, {  30,  72 } },
+        { 255, { 225, 450 }, {  60, 144 } },
+        { 256, { 225, 450 }, {  89, 214 } },
+        { 154, { 225, 450 }, { 152, 365 } },
+        { 260, {  85, 170 }, { 152, 365 } },
+        { 222, {  30,  60 }, {  79, 190 } },
+        { 225, {  30,  60 }, { 120, 288 } },
+    };
+    static tMouse_area mouse_areas[7] = {
+        { { 225, 450 }, {  30,  72 }, { 288, 576 }, {  50, 120 },   0,   0,   0, NULL },
+        { { 225, 450 }, {  60, 144 }, { 288, 576 }, {  80, 192 },   1,   0,   0, NULL },
+        { { 225, 450 }, {  89, 214 }, { 288, 576 }, { 109, 262 },   2,   0,   0, NULL },
+        { { 225, 450 }, { 152, 365 }, { 288, 576 }, { 172, 413 },   3,   0,   0, NULL },
+        { {  85, 170 }, { 152, 365 }, { 148, 296 }, { 172, 413 },   4,   1,   0, NULL },
+        { {  30,  60 }, {  79, 190 }, {  45,  90 }, { 106, 254 },  -1,   1,   0, UpClickPart },
+        { {  30,  60 }, { 120, 288 }, {  45,  90 }, { 147, 353 },  -1,   1,   0, DownClickPart },
+    };
+    static tInterface_spec interface_spec = {
+        0, 250, 190, 0, 0, 0, 6,
+        {1, 0}, {4, -1}, {4, 0}, {4, 3}, { PartsArrowsOn, PartsArrowsOff },
+        {1, 0}, {4, -1}, {4, 0}, {4, 3}, { PartsArrowsOn, PartsArrowsOff },
+        {-1, -1}, {-1, 0}, {0, 4}, {3, 4}, { NULL, UpPart },
+        {-1, -1}, {1, 0}, {0, 4}, {3, 4}, {NULL, DownPart},
+        {1, 1}, {PartsShopGoAhead, PartsShopGoAhead},
+        {1, 1}, {NULL, NULL},
+        NULL, DrawPartsShop, 0, NULL, StartPartsShop, DonePartsShop,
+        0, {0, 0}, NULL, 3, 1,
+        COUNT_OF(flicker_on),
+        flicker_on,
+        flicker_off,
+        push,
+        COUNT_OF(mouse_areas),
+        mouse_areas,
+        0,
+        NULL
+    };
     int result;
     LOG_TRACE("(%d)", pFade_away);
-    NOT_IMPLEMENTED();
+
+    LoadParts();
+    gFade_away_parts_shop = pFade_away;
+    InitialiseFlicPanel(0,
+        gCurrent_graf_data->parts_image_x,
+        gCurrent_graf_data->parts_image_y,
+        gCurrent_graf_data->parts_image_width,
+        gCurrent_graf_data->parts_image_height);
+    gStart_interface_spec = &interface_spec;
+    gPart_category = eParts_armour;
+    gJust_bought_part = 0;
+    gRefund_rate = 75;
+    CalcPartsIndex();
+    DoInterfaceScreen(&interface_spec, gFaded_palette, 3);
+    DisposeFlicPanel(0);
+    UnlockParts();
+    gProgram_state.parts_shop_visited = 1;
 }
 
 // IDA: int __usercall AutoPartsDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
 int AutoPartsDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
-    NOT_IMPLEMENTED();
+
+    if (pEscaped) {
+        pCurrent_choice = -1;
+    }
+    return pCurrent_choice;
 }
 
 // IDA: tSO_result __cdecl DoAutoPartsShop()
 tSO_result DoAutoPartsShop() {
-    static tFlicette flicker_on[3];
-    static tFlicette flicker_off[3];
-    static tFlicette push[3];
-    static tMouse_area mouse_areas[3];
-    static tInterface_spec interface_spec;
+    static tFlicette flicker_on[3] = {
+        {  43, {  84, 168 }, {  67, 161 } },
+        {  43, {  84, 168 }, {  95, 228 } },
+        {  43, {  84, 168 }, { 124, 298 } },
+    };
+    static tFlicette flicker_off[3] = {
+        {  42, {  84, 168 }, {  67, 161 } },
+        {  42, {  84, 168 }, {  95, 228 } },
+        {  42, {  84, 168 }, { 124, 298 } },
+    };
+    static tFlicette push[3] = {
+        { 284, {  84, 168 }, {  67, 161 } },
+        { 284, {  84, 168 }, {  95, 228 } },
+        { 284, {  84, 168 }, { 124, 298 } },
+    };
+    static tMouse_area mouse_areas[3] = {
+        { {  84, 168 }, {  32,  77 }, { 147, 294 }, {  87, 209 },   0,   0,   0, NULL },
+        { {  84, 168 }, {  95, 228 }, { 147, 294 }, { 115, 276 },   1,   0,   0, NULL },
+        { {  84, 168 }, { 124, 298 }, { 147, 294 }, { 144, 346 },   2,   0,   0, NULL },
+    };
+    static tInterface_spec interface_spec = {
+        0, 280, 0, 0, 0, 0, 6,
+        {-1, 0}, {0, 0}, {0, 0}, {0, 0}, {NULL, NULL},
+        {-1, 0}, {0, 0}, {0, 0}, {0, 0}, {NULL, NULL},
+        {-1, -1}, {-1, 0}, {0, 0}, {2, 0}, {NULL, NULL},
+        {-1, -1}, {1, 0}, {0, 0}, {2, 0}, {NULL, NULL},
+        {1, 1}, {NULL, NULL},
+        {1, 1}, {NULL, NULL},
+        NULL, NULL, 0, NULL, NULL, AutoPartsDone, 0,
+        {0, 0}, NULL, -1, 1,
+        COUNT_OF(flicker_on), flicker_on, flicker_off, push,
+        COUNT_OF(mouse_areas), mouse_areas,
+        0, NULL
+    };
     int result;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gProgram_state.dont_load = 1;
+    result = DoInterfaceScreen(&interface_spec, 0, gProgram_state.auto_parts_reply);
+    gProgram_state.dont_load = 0;
+    if (result  < 0) {
+        RunFlic(281);
+        return eSO_main_menu_invoked;
+    } else {
+        gProgram_state.auto_parts_reply = result;
+        switch (result) {
+        case eAP_auto:
+            DoAutoParts();
+            break;
+        case eAP_manual:
+            RunFlic(281);
+            DoPartsShop(1);
+            break;
+        }
+        FadePaletteDown();
+        return eSO_continue;
+    }
 }
 
 // IDA: void __cdecl SetOpponentFlic()
