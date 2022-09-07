@@ -305,17 +305,17 @@ int LoadNPixelmaps(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
         PathCat(the_path, the_path, "PIXELMAP");
         PathCat(the_path, the_path, str);
         AllowOpenToFail();
-        total = DRPixelmapLoadMany(the_path, temp_array, 200);
-        if (!total) {
+        total = DRPixelmapLoadMany(the_path, temp_array, COUNT_OF(temp_array));
+        if (total == 0) {
             PathCat(the_path, gApplication_path, "PIXELMAP");
             PathCat(the_path, the_path, str);
             total = DRPixelmapLoadMany(the_path, temp_array, 200);
-            if (!total) {
+            if (total == 0) {
                 FatalError(79);
             }
         }
         for (j = 0; j < total; j++) {
-            if (temp_array[j]) {
+            if (temp_array[j] != NULL) {
                 switch (AddPixelmapToStorage(pStorage_space, (br_pixelmap**)temp_array[j])) {
                 case eStorage_not_enough_room:
                     FatalError(67);
@@ -2281,7 +2281,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     PathCat(the_path, gApplication_path, "RACES");
     PathCat(the_path, the_path, pFile_name);
     f = DRfopen(the_path, "rt");
-    if (!f) {
+    if (f == NULL) {
         FatalError(50);
     }
     GetALineAndDontArgue(f, s);

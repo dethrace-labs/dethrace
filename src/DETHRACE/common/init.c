@@ -529,7 +529,7 @@ void InitRace() {
     ResetRecoveryVouchers();
     gMap_mode = 0;
     gProgram_state.cockpit_image_index = 0;
-    if (gNet_mode) {
+    if (gNet_mode != eNet_mode_none) {
         gNet_cash_headup = NewTextHeadupSlot(13, 0, 0, -6, "");
         gNet_ped_headup = NewTextHeadupSlot(14, 0, 0, -6, "");
     } else {
