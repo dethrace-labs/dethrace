@@ -3081,7 +3081,7 @@ void CrushAndDamageCar(tCar_spec* c, br_vector3* pPosition, br_vector3* pForce_c
         c->who_last_hit_me = car2;
     }
 
-    if (c->driver == eDriver_non_car_unused_slot) {
+    if (c->driver == eDriver_non_car_unused_slot || c->driver == eDriver_non_car) {
         return;
     }
     fudge_multiplier = gNet_mode == eNet_mode_none || gNet_softness[gCurrent_net_game->type] == 1.0f ? 1.0f : gNet_softness[gCurrent_net_game->type];
