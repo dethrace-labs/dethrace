@@ -142,6 +142,8 @@ void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class);
 br_resource_class* BrResClassAdd(br_resource_class* rclass);
 void* BrResRemove(void* vres);
 void BrResFree(void* vres);
+br_uint_32 BrResCheck(void* vres, int no_tag);
+br_uint_32 BrResSize(void* vres);
 char* BrResStrDup(void* vparent, char* str);
 
 // BrTable
