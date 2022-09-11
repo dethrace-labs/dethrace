@@ -120,7 +120,7 @@ void QueueWastedMassage(int pIndex) {
     if (gQueued_wasted_massages_count == 0) {
         gLast_wasted_massage_start = GetTotalTime();
     }
-    gQueued_wasted_massages[gQueued_wasted_massages_count + 1] = pIndex;
+    gQueued_wasted_massages[gQueued_wasted_massages_count] = pIndex;
     gQueued_wasted_massages_count++;
 }
 

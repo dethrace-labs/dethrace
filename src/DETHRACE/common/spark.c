@@ -1173,7 +1173,7 @@ void RenderSmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
     LOG_TRACE("(%p, %p, %p, %p, %d)", pRender_screen, pDepth_buffer, pCamera, pCamera_to_world, pTime);
 
     not_lonely = 0;
-    DrawTheGlow(pRender_screen, pDepth_buffer, pCamera);
+    // DrawTheGlow(pRender_screen, pDepth_buffer, pCamera);
 
     if (gSmoke_flags != 0) {
         seed = rand();
