@@ -2,9 +2,11 @@
 #include "displays.h"
 #include "errors.h"
 #include "flicplay.h"
+#include "input.h"
 #include "globvars.h"
 #include "globvrpb.h"
 #include "grafdata.h"
+#include "graphics.h"
 #include "loading.h"
 #include "sound.h"
 #include "utility.h"
@@ -13,7 +15,7 @@
 #include "harness/trace.h"
 #include <stdlib.h>
 
-tS3_sound_tag gWhirr_noise;
+tS3_sound_tag gWhirr_noise = 0;
 tFlic_descriptor gPrat_flic;
 tPrat_sequence* gPratcam_sequences;
 tPrat_flic_spec* gPratcam_flics;
@@ -58,9 +60,15 @@ void TogglePratcam() {
     if (gAusterity_mode) {
         NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(192));
     } else {
+        if (gWhirr_noise == 0 || !DRS3SoundStillPlaying(gWhirr_noise)) {
+            DRS3StopSound(gWhirr_noise);
+            gWhirr_noise = DRS3StartSoundNoPiping(gCar_outlet, 1000);
+            DRS3ChangePitchSpeed(gWhirr_noise, 19660);
+        }
         the_time = GetTotalTime();
         gProgram_state.prat_cam_on = !gProgram_state.prat_cam_on;
-        time_diff = the_time = gProgram_state.pratcam_move_start;
+        time_diff = the_time - gProgram_state.pratcam_move_start;
+        gProgram_state.pratcam_move_start = the_time;
         if (time_diff <= 400) {
             gProgram_state.pratcam_move_start = the_time - 400 + time_diff;
         }
@@ -183,45 +191,116 @@ void NextPratcamChunk() {
     int count;
     tPrat_alternative* current_alternative;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gCurrent_pratcam_index == -1) {
+        gCurrent_pratcam_index = gCurrent_ambient_prat_sequence;
+    } else {
+        EndFlic(&gPrat_flic);
+    }
+    count = gCurrent_pratcam_chunk;
+    gCurrent_pratcam_chunk++;
+    if (gPratcam_sequences[gCurrent_pratcam_index].number_of_chunks <= count) {
+        if (gPending_ambient_prat == -1) {
+            ChangeAmbientPratcamNow(gCurrent_ambient_prat_sequence, gPratcam_sequences[gCurrent_pratcam_index].repeat_chunk);
+        } else {
+            ChangeAmbientPratcamNow(gPending_ambient_prat, 0);
+        }
+    } else {
+        gLast_pratcam_frame_time = 0;
+        random_number = IRandomBetween(0, 99);
+        current_alternative = gPratcam_sequences[gCurrent_pratcam_index].chunks[gCurrent_pratcam_chunk].alternatives;
+        for (i = 0; i < gPratcam_sequences[gCurrent_pratcam_index].chunks[gCurrent_pratcam_chunk].number_of_alternatives; i++) {
+            random_number -= current_alternative->chance;
+            if (random_number <= 0) {
+                gCurrent_pratcam_alternative = i;
+                gPrat_flic.data_start = NULL;
+                StartFlic(NULL, -1, &gPrat_flic, gPratcam_flics[current_alternative->ref].data_length,
+                    (tS8*)gPratcam_flics[current_alternative->ref].data, gPrat_buffer, 0, 0, 0);
+                if (current_alternative->sound_chance == 0) {
+                    return;
+                }
+                if (!PercentageChance(current_alternative->sound_chance) == 0) {
+                    return;
+                }
+                if (gCurrent_pratcam_precedence == 0 && DRS3OutletSoundsPlaying(gDriver_outlet)) {
+                    return;
+                }
+                DRS3StartSound(gDriver_outlet, current_alternative->sound_ids[IRandomBetween(0, current_alternative->number_of_sounds - 1)]);
+                return;
+            }
+        }
+        NextPratcamChunk();
+    }
 }
 
 // IDA: void __usercall NewPratcamSequence(int pSequence_index@<EAX>, int pStart_chunk@<EDX>)
 void NewPratcamSequence(int pSequence_index, int pStart_chunk) {
     LOG_TRACE("(%d, %d)", pSequence_index, pStart_chunk);
-    NOT_IMPLEMENTED();
+
+    gCurrent_pratcam_precedence = gPratcam_sequences[pSequence_index].precedence;
+    gCurrent_pratcam_index = pSequence_index;
+    gCurrent_pratcam_chunk = pStart_chunk - 1;
+    NextPratcamChunk();
 }
 
 // IDA: void __usercall ChangeAmbientPratcamNow(int pIndex@<EAX>, int pStart_chunk@<EDX>)
 void ChangeAmbientPratcamNow(int pIndex, int pStart_chunk) {
     LOG_TRACE("(%d, %d)", pIndex, pStart_chunk);
-    STUB();
+
+    gCurrent_ambient_prat_sequence = pIndex;
+    gPending_ambient_prat = -1;
+    NewPratcamSequence(pIndex, pStart_chunk);
 }
 
 // IDA: void __usercall ChangeAmbientPratcam(int pIndex@<EAX>)
 void ChangeAmbientPratcam(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
-    if (!gRace_finished && !gInterface_within_race_mode && pIndex != gCurrent_ambient_prat_sequence && gProgram_state.prat_cam_on) {
-        if (gCurrent_pratcam_index == -1) {
-            ChangeAmbientPratcamNow(pIndex, 0);
-        } else {
-            gPending_ambient_prat = pIndex;
-        }
+    if (gRace_finished) {
+        return;
+    }
+    if (gInterface_within_race_mode) {
+        return;
+    }
+    if (pIndex == gCurrent_ambient_prat_sequence) {
+        return;
+    }
+    if (!gProgram_state.prat_cam_on) {
+        return;
+    }
+
+    if (gCurrent_pratcam_index == -1) {
+        ChangeAmbientPratcamNow(pIndex, 0);
+    } else {
+        gPending_ambient_prat = pIndex;
     }
 }
 
 // IDA: void __usercall PratcamEventNow(int pIndex@<EAX>)
 void PratcamEventNow(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+
+    NewPratcamSequence(pIndex, 0);
+    gPending_ambient_prat = -1;
 }
 
 // IDA: void __usercall PratcamEvent(int pIndex@<EAX>)
 void PratcamEvent(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
-    STUB();
+    if (gRace_finished) {
+        return;
+    }
+    if (gInterface_within_race_mode) {
+        return;
+    }
+    if (gPratcam_sequences[pIndex].precedence <= gCurrent_pratcam_precedence) {
+        return;
+    }
+    if (!gProgram_state.prat_cam_on) {
+        return;
+    }
+    PratcamEventNow(pIndex);
 }
 
 // IDA: int __cdecl HighResPratBufferWidth()
@@ -251,10 +330,10 @@ void InitPratcam() {
     gCurrent_ambient_prat_sequence = -1;
     switch (gGraf_data_index) {
     case 0:
-        the_pixels = BrMemAllocate(2392, kMem_pratcam_pixelmap);
+        the_pixels = BrMemAllocate(52 * 46, kMem_pratcam_pixelmap);
         break;
     case 1:
-        the_pixels = BrMemAllocate(1140, kMem_pratcam_pixelmap);
+        the_pixels = BrMemAllocate(104 * 110, kMem_pratcam_pixelmap);
         break;
     default:
         TELL_ME_IF_WE_PASS_THIS_WAY();
@@ -338,13 +417,117 @@ void DoPratcam(tU32 pThe_time) {
     br_pixelmap* left_image;
     br_pixelmap* right_image;
     LOG_TRACE("(%d)", pThe_time);
-    STUB_ONCE();
+
+    if (gAusterity_mode) {
+        return;
+    }
+    left_image = gProgram_state.current_car.prat_cam_right;
+    right_image = gProgram_state.current_car.prat_cam_left;
+    y_offset = (gNet_mode == eNet_mode_none) ? 0 : gCurrent_graf_data->net_head_box_bot + 1;
+
+    right_hand = gProgram_state.current_car.prat_left <= gBack_screen->width / 2;
+    if (right_hand) {
+        prat_cam_move_width = gProgram_state.current_car.prat_right + (right_image != NULL ? right_image->width : 0);
+    } else {
+        prat_cam_move_width = gBack_screen->width - gProgram_state.current_car.prat_left + (left_image != NULL ? left_image->width : 0);
+    }
+    time_diff = pThe_time - gProgram_state.pratcam_move_start;
+    if (time_diff <= 400) {
+        offset = prat_cam_move_width * time_diff / (float)400;
+    } else {
+        if (gWhirr_noise) {
+            DRS3StopSound(gWhirr_noise);
+            gWhirr_noise = 0;
+        }
+        if (!gProgram_state.prat_cam_on) {
+            gCurrent_pratcam_index = -1;
+            gCurrent_pratcam_precedence = 0;
+            gPending_ambient_prat = -1;
+            return;
+        }
+        offset = prat_cam_move_width;
+    }
+
+    old_last_time = gLast_pratcam_frame_time;
+    if (gProgram_state.prat_cam_on) {
+        offset = prat_cam_move_width - offset;
+    }
+    if (right_hand) {
+        offset = -offset;
+    }
+    DontLetFlicFuckWithPalettes();
+    DisableTranslationText();
+    for (i = 0; i < (old_last_time != 0 ? ((pThe_time - old_last_time) / gPrat_flic.frame_period) : 1); i++) {
+        if (PlayNextFlicFrame(&gPrat_flic)) {
+            NextPratcamChunk();
+            break;
+        }
+        gLast_pratcam_frame_time = pThe_time;
+    }
+    EnableTranslationText();
+    LetFlicFuckWithPalettes();
+    BrPixelmapRectangleCopy(gBack_screen,
+        gProgram_state.current_car.prat_left + offset,
+        gProgram_state.current_car.prat_top + y_offset,
+        gPrat_buffer,
+        0, 0,
+        gPrat_buffer->width, gPrat_buffer->height);
+    if (gProgram_state.current_car.prat_cam_top != NULL) {
+        top_border_height = gProgram_state.current_car.prat_cam_top->height;
+        DRPixelmapRectangleMaskedCopy(
+            gBack_screen,
+            gProgram_state.current_car.prat_left + offset,
+            gProgram_state.current_car.prat_top - top_border_height + y_offset,
+            gProgram_state.current_car.prat_cam_top,
+            0, 0,
+            gProgram_state.current_car.prat_cam_top->width,
+            gProgram_state.current_car.prat_cam_top->height);
+    } else {
+        top_border_height = 0;
+    }
+    if (right_image != NULL) {
+        DRPixelmapRectangleMaskedCopy(gBack_screen,
+            gProgram_state.current_car.prat_left - right_image->width + offset,
+            gProgram_state.current_car.prat_top - top_border_height + y_offset,
+            right_image,
+            0, 0,
+            right_image->width, right_image->height);
+    }
+    if (left_image != NULL) {
+        DRPixelmapRectangleMaskedCopy(
+            gBack_screen,
+            gProgram_state.current_car.prat_right + offset - 1,
+            gProgram_state.current_car.prat_top - top_border_height - 1 + y_offset,
+            left_image,
+            0, 0,
+            left_image->width, left_image->height);
+    }
+    if (gProgram_state.current_car.prat_cam_bottom != NULL) {
+        DRPixelmapRectangleMaskedCopy(
+            gBack_screen,
+            gProgram_state.current_car.prat_left + offset,
+            gProgram_state.current_car.prat_bottom + y_offset,
+            gProgram_state.current_car.prat_cam_bottom,
+            0, 0,
+            gProgram_state.current_car.prat_cam_bottom->width,
+            gProgram_state.current_car.prat_cam_bottom->height);
+    }
 }
 
 // IDA: void __usercall TestPratCam(int pIndex@<EAX>)
 void TestPratCam(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+
+    if (PDKeyDown(KEY_CTRL_ANY)) {
+        pIndex += 40;
+    }
+    if (PDKeyDown(KEY_ALT_ANY)) {
+        pIndex += 20;
+    }
+    if (PDKeyDown(KEY_SHIFT_ANY)) {
+        pIndex += 10;
+    }
+    PratcamEventNow(pIndex);
 }
 
 // IDA: void __cdecl PratCam0()
