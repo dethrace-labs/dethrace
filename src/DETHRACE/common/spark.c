@@ -1833,6 +1833,10 @@ void DrawTheGlow(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
     tU32 seed;
     LOG_TRACE("(%p, %p, %p)", pRender_screen, pDepth_buffer, pCamera);
 
+    // FIXME: sometimes this function causes a segfault (most commonly when looking at a glow fairly close up and the camera swings away). Stubbing it out for now.
+    LOG_WARN_ONCE("DrawTheGlow is stubbed out");
+    return;
+
     if (gColumn_flags) {
         seed = rand();
         srand(GetTotalTime());
