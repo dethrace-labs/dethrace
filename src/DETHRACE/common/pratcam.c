@@ -1,18 +1,18 @@
 #include "pratcam.h"
+#include "brender/brender.h"
 #include "displays.h"
 #include "errors.h"
 #include "flicplay.h"
-#include "input.h"
 #include "globvars.h"
 #include "globvrpb.h"
 #include "grafdata.h"
 #include "graphics.h"
+#include "harness/trace.h"
+#include "input.h"
 #include "loading.h"
+#include "pd/sys.h"
 #include "sound.h"
 #include "utility.h"
-#include "brender/brender.h"
-#include "pd/sys.h"
-#include "harness/trace.h"
 #include <stdlib.h>
 
 tS3_sound_tag gWhirr_noise = 0;
@@ -208,8 +208,8 @@ void NextPratcamChunk() {
     } else {
         gLast_pratcam_frame_time = 0;
         random_number = IRandomBetween(0, 99);
-        current_alternative = gPratcam_sequences[gCurrent_pratcam_index].chunks[gCurrent_pratcam_chunk].alternatives;
         for (i = 0; i < gPratcam_sequences[gCurrent_pratcam_index].chunks[gCurrent_pratcam_chunk].number_of_alternatives; i++) {
+            current_alternative = &gPratcam_sequences[gCurrent_pratcam_index].chunks[gCurrent_pratcam_chunk].alternatives[i];
             random_number -= current_alternative->chance;
             if (random_number <= 0) {
                 gCurrent_pratcam_alternative = i;
@@ -219,7 +219,7 @@ void NextPratcamChunk() {
                 if (current_alternative->sound_chance == 0) {
                     return;
                 }
-                if (!PercentageChance(current_alternative->sound_chance) == 0) {
+                if (!PercentageChance(current_alternative->sound_chance)) {
                     return;
                 }
                 if (gCurrent_pratcam_precedence == 0 && DRS3OutletSoundsPlaying(gDriver_outlet)) {
