@@ -1148,7 +1148,22 @@ void ProcessGetNearPlayer(tOpponent_spec* pOpponent_spec, tProcess_objective_com
 // IDA: void __usercall ProcessFrozen(tOpponent_spec *pOpponent_spec@<EAX>, tProcess_objective_command pCommand@<EDX>)
 void ProcessFrozen(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand) {
     LOG_TRACE("(%p, %d)", pOpponent_spec, pCommand);
-    NOT_IMPLEMENTED();
+
+    switch (pCommand) {
+    case ePOC_start:
+        dr_dprintf("%d ProcessFrozen() - new task started", pOpponent_spec->index);
+        dr_dprintf("%s: Rematerialising from ePOC_start in ProcessFrozen()...", pOpponent_spec->car_spec->driver_name);
+        RematerialiseOpponentOnNearestSection(pOpponent_spec, 0.f);
+        pOpponent_spec->car_spec->acc_force = 0.f;
+        pOpponent_spec->car_spec->brake_force = 15.f * pOpponent_spec->car_spec->M;
+        break;
+    case ePOC_run:
+        pOpponent_spec->car_spec->brake_force = 15.f * pOpponent_spec->car_spec->M;
+        break;
+    case ePOC_die:
+        pOpponent_spec->car_spec->brake_force = 0.f;
+        break;
+    }
 }
 
 // IDA: int __usercall HeadOnWithPlayerPossible@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>)
@@ -2178,6 +2193,7 @@ void SetInitialCopPositions() {
     LOG_TRACE("()");
 
     for (i = 0; i < GetCarCount(eVehicle_rozzer); i++) {
+        PossibleService();
         BrVector3Copy(&gProgram_state.AI_vehicles.cops[i].car_spec->car_master_actor->t.t.translate.t, &gProgram_state.AI_vehicles.cop_start_points[i]);
         PointActorAlongThisBloodyVector(gProgram_state.AI_vehicles.cops[i].car_spec->car_master_actor,
             &gProgram_state.AI_vehicles.cop_start_vectors[i]);
