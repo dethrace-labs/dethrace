@@ -1758,58 +1758,17 @@ int MassageOpponentPosition(tOpponent_spec* pOpponent_spec, int pMassage_count) 
         direction_v.v[1] = -pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[2][1];
         direction_v.v[2] = -pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[2][2];
         if (pMassage_count % 4 >= 2) {
-            // displacement_0 = 1.0 * direction_v_2 - direction_v_1 * 0.0;
-            // displacement_1 = direction_v_0 * 0.0 - 0.0 * direction_v_2;
-            // displacement_2 = 0.0 * direction_v_1 - direction_v_0 * 1.0;
-            BrVector3Cross(&displacement, &positive_y_vector, &direction_v);
-            // v8 = sqrtf(displacement_0 * displacement_0 + displacement_1 * displacement_1 + displacement_2 * displacement_2);
-            // if (v10 | v11) {
-            //     displacement_0 = 1.0;
-            //     displacement_1 = 0.0;
-            //     displacement_2 = 0.0;
-            // } else {
 
-            //     a_0 = v8;
-            //     v12 = 1.0 / a_0;
-            //     a_1 = v12;
-            //     displacement_0 = v12 * displacement_0;
-            //     displacement_1 = displacement_1 * a_1;
-            //     displacement_2 = displacement_2 * a_1;
-            // }
+            BrVector3Cross(&displacement, &positive_y_vector, &direction_v);
             BrVector3Normalise(&displacement, &displacement);
-            // displacement_0 = (double)(pMassage_count / 4) * 0.1 * displacement_0;
-            // displacement_1 = (double)(pMassage_count / 4) * 0.1 * displacement_1;
-            // displacement_2 = (double)(pMassage_count / 4) * 0.1 * displacement_2;
             BrVector3Scale(&displacement, &displacement, (pMassage_count / 4) * 0.1f);
         } else {
-            // v3 = sqrtf(direction_v_2 * direction_v_2 + direction_v_0 * direction_v_0 + direction_v_1 * direction_v_1);
-            // if (v5 | v6) {
-            //     displacement_0 = 1.0;
-            //     displacement_1 = 0.0;
-            //     displacement_2 = 0.0;
-            // } else {
-            //     a_2 = v3;
-            //     v7 = 1.0 / a_2;
-            //     a_2 = v7;
-            //     displacement_0 = v7 * direction_v_0;
-            //     displacement_1 = direction_v_1 * a_2;
-            //     displacement_2 = direction_v_2 * a_2;
-            // }
             BrVector3Normalise(&displacement, &displacement);
-            // displacement_0 = (double)(pMassage_count / 4) * 0.5 * displacement_0;
-            // displacement_1 = (double)(pMassage_count / 4) * 0.5 * displacement_1;
-            // displacement_2 = (double)(pMassage_count / 4) * 0.5 * displacement_2;
             BrVector3Scale(&displacement, &displacement, (pMassage_count / 4) * 0.5f);
         }
         if (pMassage_count % 2) {
-            // displacement_0 = -displacement_0;
-            // displacement_1 = -displacement_1;
-            // displacement_2 = -displacement_2;
             BrVector3Negate(&displacement, &displacement);
         }
-        // car_trans->v[0] = car_trans->v[0] + displacement_0;
-        // car_trans->v[1] = car_trans->v[1] + displacement_1;
-        // car_trans->v[2] = car_trans->v[2] + displacement_2;
         BrVector3Accumulate(car_trans, &displacement);
     } else {
         car_trans->v[1] = (pMassage_count - 20) * 2.0f + car_trans->v[1];
