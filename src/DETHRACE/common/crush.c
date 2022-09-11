@@ -937,8 +937,6 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
     } else {
         dam_acc_1 = pCar1->damage_magnitude_accumulator;
     }
-    // dam_acc_2 = pCar2
-    //     && (pCar2->driver <= eDriver_non_car ? (v21 = 0.0) : (v21 = pCar2->damage_magnitude_accumulator), v21 != 0.0);
 
     dam_acc_2 = 0;
     if (pCar2) {
@@ -963,9 +961,6 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
     if (pCar1->pre_car_col_knackered || (pCar2 && pCar2->pre_car_col_knackered) || (pCar2 && pCar2->damage_magnitude_accumulator <= 0.00005f && pCar1->damage_magnitude_accumulator <= 0.00005f)) {
         return dam_acc_1 || (pCar2 && dam_acc_2);
     }
-    // if (!pCar1->pre_car_col_knackered
-    //     && (pCar2 == NULL || !pCar2->pre_car_col_knackered)
-    //     && (pCar2 == NULL || pCar2->damage_magnitude_accumulator > 0.00005f || pCar1->damage_magnitude_accumulator > 0.00005f)) {
 
     modified_location_1 = CalcModifiedLocation(pCar1);
     car_direction_1 = GetDirection(&pCar1->pre_car_col_velocity_car_space);
@@ -1012,9 +1007,7 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
             if (car_1_culpable) {
                 culprit = pCar1;
                 victim = pCar2;
-                dp = BrVector3Dot(&pCar1->pre_car_col_direction, &pCar1->pre_car_col_direction); /* pCar1->pre_car_col_direction.v[2] * pCar2->pre_car_col_direction.v[2]
-                     + pCar2->pre_car_col_direction.v[1] * pCar1->pre_car_col_direction.v[1]
-                     + pCar2->pre_car_col_direction.v[0] * pCar1->pre_car_col_direction.v[0];*/
+                dp = BrVector3Dot(&pCar1->pre_car_col_direction, &pCar2->pre_car_col_direction);
                 if (modified_location_1 == eImpact_front && modified_location_2 == eImpact_front && pCar1->pre_car_col_speed > 0.001f && pCar2->pre_car_col_speed > 0.001f && dp < -0.7f) {
                     head_on = 1;
                     bonus_level = 2;
@@ -1024,10 +1017,7 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
             } else if (car_2_culpable) {
                 culprit = pCar2;
                 victim = pCar1;
-                // dp = pCar1->pre_car_col_direction.v[2] * pCar2->pre_car_col_direction.v[2]
-                //     + pCar2->pre_car_col_direction.v[1] * pCar1->pre_car_col_direction.v[1]
-                //     + pCar2->pre_car_col_direction.v[0] * pCar1->pre_car_col_direction.v[0];
-                dp = BrVector3Dot(&pCar1->pre_car_col_direction, &pCar1->pre_car_col_direction);
+                dp = BrVector3Dot(&pCar1->pre_car_col_direction, &pCar2->pre_car_col_direction);
                 if (modified_location_1 == eImpact_front && modified_location_2 == eImpact_front && pCar1->pre_car_col_speed > 0.001f && pCar2->pre_car_col_speed > 0.001f && dp < -0.7f) {
                     head_on = 1;
                     bonus_level = 2;
@@ -1037,7 +1027,6 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
             }
         }
     } else {
-        // LOG_DEBUG("no pCar2, timediff is %d", the_time - pCar1->time_last_hit);
         if (the_time - pCar1->time_last_hit >= 3000) {
             return 1;
         }
@@ -1137,14 +1126,8 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
             if (pCar1->number_of_wheels_on_ground) {
                 car_off_ground_1 = 0;
             } else {
-                // car_1_pos.v[0] = pCar1->car_master_actor->t.t.mat.m[3][0] / 6.9000001;
-                // car_1_pos.v[1] = pCar1->car_master_actor->t.t.mat.m[3][1] / 6.9000001;
-                // car_1_pos.v[2] = pCar1->car_master_actor->t.t.mat.m[3][2] / 6.9000001;
                 BrVector3InvScale(&car_1_pos, &pCar1->car_master_actor->t.t.translate.t, WORLD_SCALE);
                 BrMatrix34ApplyV(&car_1_offset, &pCar1->car_model_actors[pCar1->principal_car_actor].actor->t.t.translate.t, &pCar1->car_master_actor->t.t.mat);
-                // car_1_pos.v[0] = car_1_offset.v[0] + car_1_pos.v[0];
-                // car_1_pos.v[1] = car_1_offset.v[1] + car_1_pos.v[1];
-                // car_1_pos.v[2] = car_1_offset.v[2] + car_1_pos.v[2];
                 BrVector3Accumulate(&car_1_pos, &car_1_offset);
                 car_1_pos.v[1] += 0.15f;
                 car_1_height = FindYVerticallyBelow2(&car_1_pos);
@@ -1212,8 +1195,6 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
         pCar2->damage_magnitude_accumulator = 0.0f;
     }
     return 1;
-
-    // return dam_acc_1 || pCar2 && dam_acc_2;
 }
 
 // IDA: void __usercall DoWheelDamage(tU32 pFrame_period@<EAX>)
