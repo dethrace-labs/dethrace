@@ -443,30 +443,6 @@ br_pixelmap* PurifiedPixelmap(br_pixelmap* pSrc) {
     NOT_IMPLEMENTED();
 }
 
-#if defined(DETHRACE_FIX_BUGS)
-static void align_pixelmap(br_pixelmap* pm) {
-    int i;
-    br_uint_16 original_row_bytes;
-    br_uint_16 new_row_bytes;
-    br_uint_8* original_pixels;
-    br_uint_8* new_pixels;
-
-    original_row_bytes = pm->row_bytes;
-    if (original_row_bytes % sizeof(int) == 0 || pm->height <= 1) {
-        return;
-    }
-    new_row_bytes = (original_row_bytes + sizeof(int) - 1) & ~(sizeof(int) - 1);
-    original_pixels = pm->pixels;
-    new_pixels = BrResAllocate(pm, new_row_bytes * pm->height, BR_MEMORY_PIXELS);
-    for (i = 0; i < pm->height; i++) {
-        memcpy(new_pixels + i * new_row_bytes, original_pixels + i * original_row_bytes, original_row_bytes);
-    }
-    BrResFree(original_pixels);
-    pm->pixels = new_pixels;
-    pm->row_bytes = new_row_bytes;
-}
-#endif
-
 // IDA: br_pixelmap* __usercall DRPixelmapLoad@<EAX>(char *pFile_name@<EAX>)
 br_pixelmap* DRPixelmapLoad(char* pFile_name) {
     br_pixelmap* the_map;
@@ -477,10 +453,8 @@ br_pixelmap* DRPixelmapLoad(char* pFile_name) {
     if (the_map != NULL) {
         the_map->origin_x = 0;
         the_map->origin_y = 0;
-#if defined(DETHRACE_FIX_BUGS)
-        align_pixelmap(the_map);
-#else
-        the_map->row_bytes = (the_map->row_bytes + sizeof(int) - 1) & ~(sizeof(int) - 1);
+#if !defined(DETHRACE_FIX_BUGS)
+        the_map->row_bytes = (the_map->row_bytes + sizeof(int32_t) - 1) & ~(sizeof(int32_t) - 1);
 #endif
     }
     return the_map;
@@ -497,10 +471,8 @@ br_uint_32 DRPixelmapLoadMany(char* pFile_name, br_pixelmap** pPixelmaps, br_uin
     number_loaded = BrPixelmapLoadMany(pFile_name, pPixelmaps, pNum);
     for (i = 0; i < number_loaded; i++) {
         the_map = pPixelmaps[i];
-#if defined(DETHRACE_FIX_BUGS)
-        align_pixelmap(the_map);
-#else
-        the_map->row_bytes = (the_map->row_bytes + sizeof(int) - 1) & ~(sizeof(int) - 1);
+#if !defined(DETHRACE_FIX_BUGS)
+        the_map->row_bytes = (the_map->row_bytes + sizeof(int32_t) - 1) & ~(sizeof(int32_t) - 1);
 #endif
         the_map->base_x = 0;
         the_map->base_y = 0;
