@@ -267,9 +267,7 @@ void PDFatalError(char* pThe_str) {
 
     // wait for keypress
 
-    if (!_unittest_do_not_exit) {
-        exit(1);
-    }
+    exit(1);
 }
 
 // IDA: void __usercall PDNonFatalError(char *pThe_str@<EAX>)

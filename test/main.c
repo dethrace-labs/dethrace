@@ -39,7 +39,6 @@ extern void test_utility_suite();
 extern void test_loading_suite();
 extern void test_controls_suite();
 extern void test_input_suite();
-extern void test_errors_suite();
 extern void test_dossys_suite();
 extern void test_init_suite();
 extern void test_brlists_suite();
@@ -286,7 +285,6 @@ int main(int argc, char** argv) {
     test_loading_suite();
     test_controls_suite();
     test_input_suite();
-    test_errors_suite();
     test_dossys_suite();
     test_graphics_suite();
     test_powerup_suite();

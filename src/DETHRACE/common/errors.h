@@ -2,6 +2,7 @@
 #define _ERRORS_H_
 
 #include "brender/br_types.h"
+#include "harness/compiler.h"
 #include "dr_types.h"
 
 extern char* gError_messages[126];
@@ -11,7 +12,7 @@ extern int gPixel_buffer_size__errors; // suffix added to avoid duplicate symbol
 extern int gMouse_was_started__errors; // suffix added to avoid duplicate symbol
 extern char* gPixels_copy__errors; // suffix added to avoid duplicate symbol
 
-void FatalError(int pStr_index, ...);
+HARNESS_NORETURN void FatalError(int pStr_index, ...);
 
 void NonFatalError(int pStr_index, ...);
 

@@ -10,6 +10,8 @@
 #include "brender/br_types.h"
 #include "dr_types.h"
 
+#include "harness/compiler.h"
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -63,7 +65,7 @@ void PDSetKeyArray(int* pKeys, int pMark);
 
 int PDGetASCIIFromKey(int pKey);
 
-void PDFatalError(char* pThe_str);
+HARNESS_NORETURN void PDFatalError(char* pThe_str);
 
 void PDNonFatalError(char* pThe_str);
 
