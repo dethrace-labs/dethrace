@@ -6266,7 +6266,7 @@ int FacePointCarCarCollide(tCollision_info* car1, tCollision_info* car2, br_matr
                 BrMatrix34ApplyV(&pNorm_list[j], &norm, pMsos);
                 BrMatrix34TApplyV(&pNorm_list[l], &pNorm_list[j], pMoms);
                 BrVector3Negate(&pNorm_list[l], &pNorm_list[l]);
-                if (pNorm_list[l].v[0] >= 0.0f != centre.v[0] <= a.v[0] || pNorm_list[l].v[1] >= 0.0f != centre.v[1] <= a.v[1] || pNorm_list[l].v[2] >= 0.0f != a.v[2] >= centre.v[2]
+                if ((pNorm_list[l].v[0] >= 0.0f) != (centre.v[0] <= a.v[0]) || (pNorm_list[l].v[1] >= 0.0f) != (centre.v[1] <= a.v[1]) || (pNorm_list[l].v[2] >= 0.0f) != (a.v[2] >= centre.v[2])
                     || !TestOldMats(car1, car2, 0)) {
                     pPoint_list[l] = a;
                     pPoint_list[j] = hp;
