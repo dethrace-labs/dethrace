@@ -375,6 +375,10 @@ int BurstPedestrian(tPedestrian_data* pPedestrian, float pSplattitudinalitude, i
     tU32 the_time;
     LOG_TRACE("(%p, %f, %d)", pPedestrian, pSplattitudinalitude, pAllow_explosion);
 
+    #if defined(DETHRACE_FIX_BUGS)
+        min_speed = 0;
+        max_speed = 0;
+    #endif
     exploded = 0;
     for (i = 0; i < COUNT_OF(gPed_gib_counts); i++) {
         for (j = 0; j < gPed_size_counts[i]; j++) {
@@ -716,6 +720,10 @@ int PedestrianNextInstruction(tPedestrian_data* pPedestrian, float pDanger_level
         if ((instruction->type == ePed_instruc_fchoice && pPedestrian->instruction_direction > 0)
             || (instruction->type == ePed_instruc_bchoice && pPedestrian->instruction_direction < 0)) {
             most_dangerous = -1.f;
+#if defined(DETHRACE_FIX_BUGS)
+            start_index = 0;
+            end_index = 0;
+#endif
             for (i = 0; i < instruction->data.choice_data.number_of_choices; i++) {
                 if (instruction->data.choice_data.choices[i].danger_level <= pDanger_level) {
                     if (instruction->data.choice_data.choices[i].danger_level > most_dangerous) {
@@ -922,6 +930,9 @@ void MungePedestrianFrames(tPedestrian_data* pPedestrian) {
         break;
     case ePed_frame_variable:
         frame_period = 1000.f / FRandomBetween(the_sequence->frame_rate_factor1, the_sequence->frame_rate_factor2);
+        break;
+    default:
+        TELL_ME_IF_WE_PASS_THIS_WAY();
         break;
     }
     if (frame_period == 0.f) {
@@ -1152,6 +1163,10 @@ int MungePedestrianAction(tPedestrian_data* pPedestrian, float pDanger_level) {
         return 1;
     }
     most_dangerous = -1.f;
+#if defined(DETHRACE_FIX_BUGS)
+    start_index = 0;
+    end_index = 0;
+#endif
     for (i = 0; i < pPedestrian->number_of_actions; i++) {
         if (pPedestrian->action_list[i].danger_level < 999.f
             && pPedestrian->action_list[i].danger_level <= pDanger_level
@@ -2943,6 +2958,9 @@ br_actor* BuildPedPaths(tPedestrian_instruction* pInstructions, int pInstruc_cou
             }
             SquirtPathVertex(&the_model->vertices[vertex_count], &the_point);
             vertex_count += 4;
+#if defined(DETHRACE_FIX_BUGS)
+            last_vertex_count = vertex_count;
+#endif
             if (point_count != 0) {
                 // Connect previous path vertex cross with current path vertex cross
                 the_model->faces[face_count].vertices[0] = vertex_count - 4;

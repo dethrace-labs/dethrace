@@ -104,18 +104,24 @@ void InitSound() {
     if (gSound_available == 0) {
         return;
     }
-    if (gSound_detail_level == 0) {
+    switch (gSound_detail_level) {
+    case 0:
         engine_channel_count = 2;
         car_channel_count = 2;
         ped_channel_count = 3;
-    } else if (gSound_detail_level == 1) {
+        break;
+    case 1:
         engine_channel_count = 2;
         car_channel_count = 3;
         ped_channel_count = 4;
-    } else if (gSound_detail_level == 2) {
+        break;
+    case 2:
         engine_channel_count = 6;
         car_channel_count = 4;
         ped_channel_count = 5;
+        break;
+    default:
+        TELL_ME_IF_WE_PASS_THIS_WAY();
     }
     if (gDriver_outlet == NULL) {
         gDriver_outlet = S3CreateOutlet(1, 1);
