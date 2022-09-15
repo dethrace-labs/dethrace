@@ -1,5 +1,6 @@
 #include "tests.h"
 
+#include "CORE/FW/bswap.h"
 #include "CORE/FW/datafile.h"
 #include "CORE/FW/file.h"
 #include "CORE/MATH/fixed.h"
@@ -11,6 +12,15 @@
 
 char *text_magics  = TEXT_MAGICS;
 uint8_t binary_magics[] = {BINARY_MAGICS};
+
+static unsigned float_to_binary(float f) {
+    union {
+       float f;
+       unsigned v;
+    } u;
+    u.f = f;
+    return BrHtoNL(u.v);
+}
 
 
 static void test_datafile_stack() {
@@ -64,9 +74,9 @@ static void test_datafile_stack() {
 }
 
 static void test_datafile_magics() {
-    TEST_ASSERT_EQUAL_INT(BR_FS_MODE_TEXT, DfFileIdentify(text_magics, sizeof(text_magics)));
-    TEST_ASSERT_EQUAL_INT(BR_FS_MODE_BINARY, DfFileIdentify(binary_magics, sizeof(binary_magics)));
-    TEST_ASSERT_EQUAL_INT(BR_FS_MODE_UNKNOWN, DfFileIdentify("nonsense", sizeof("nonsense")));
+    TEST_ASSERT_EQUAL_INT(BR_FS_MODE_TEXT, DfFileIdentify((br_uint_8 *)text_magics, sizeof(text_magics)));
+    TEST_ASSERT_EQUAL_INT(BR_FS_MODE_BINARY, DfFileIdentify((br_uint_8 *)binary_magics, sizeof(binary_magics)));
+    TEST_ASSERT_EQUAL_INT(BR_FS_MODE_UNKNOWN, DfFileIdentify((br_uint_8 *)"nonsense", sizeof("nonsense")));
 }
 
 typedef struct struct_br_int_8 {
@@ -2364,10 +2374,18 @@ static void test_datafile_text_br_vector2_f() {
     DfStructReadText(df_r, &struct_br_vector2_f_file, &read_struct);
     DfClose(df_r);
 
-    printf("0x%08x 0x%08x   ", br_vector2_f_ref.m1.v[0], read_struct.m1.v[0]);printf("0x%08x 0x%08x\n", br_vector2_f_ref.m1.v[1], read_struct.m1.v[0]);
-    printf("0x%08x 0x%08x   ", br_vector2_f_ref.m2.v[0], read_struct.m2.v[0]);printf("0x%08x 0x%08x\n", br_vector2_f_ref.m2.v[1], read_struct.m2.v[0]);
-    printf("0x%08x 0x%08x   ", br_vector2_f_ref.m3.v[0], read_struct.m3.v[0]);printf("0x%08x 0x%08x\n", br_vector2_f_ref.m3.v[1], read_struct.m3.v[0]);
-    printf("0x%08x 0x%08x   ", br_vector2_f_ref.m4.v[0], read_struct.m4.v[0]);printf("0x%08x 0x%08x\n", br_vector2_f_ref.m4.v[1], read_struct.m4.v[0]);
+    printf("0x%08x 0x%08x   ", float_to_binary(br_vector2_f_ref.m1.v[0]), float_to_binary(read_struct.m1.v[0]));
+    printf("0x%08x 0x%08x\n", float_to_binary(br_vector2_f_ref.m1.v[1]), float_to_binary(read_struct.m1.v[0]));
+
+    printf("0x%08x 0x%08x   ", float_to_binary(br_vector2_f_ref.m2.v[0]), float_to_binary(read_struct.m2.v[0]));
+    printf("0x%08x 0x%08x\n", float_to_binary(br_vector2_f_ref.m2.v[1]), float_to_binary(read_struct.m2.v[0]));
+
+    printf("0x%08x 0x%08x   ", float_to_binary(br_vector2_f_ref.m3.v[0]), float_to_binary(read_struct.m3.v[0]));
+    printf("0x%08x 0x%08x\n", float_to_binary(br_vector2_f_ref.m3.v[1]), float_to_binary(read_struct.m3.v[0]));
+
+    printf("0x%08x 0x%08x   ", float_to_binary(br_vector2_f_ref.m4.v[0]), float_to_binary(read_struct.m4.v[0]));
+    printf("0x%08x 0x%08x\n", float_to_binary(br_vector2_f_ref.m4.v[1]), float_to_binary(read_struct.m4.v[0]));
+
     TEST_ASSERT_EQUAL_MEMORY(&br_vector2_f_ref, &read_struct, sizeof(br_vector2_f_ref));
 }
 
@@ -2466,10 +2484,18 @@ static void test_datafile_text_br_vector3_f() {
     DfStructReadText(df_r, &struct_br_vector3_f_file, &read_struct);
     DfClose(df_r);
 
-    printf("0x%08x 0x%08x   ", br_vector3_f_ref.m1.v[0], read_struct.m1.v[0]);printf("0x%08x 0x%08x\n", br_vector3_f_ref.m1.v[1], read_struct.m1.v[0]);
-    printf("0x%08x 0x%08x   ", br_vector3_f_ref.m2.v[0], read_struct.m2.v[0]);printf("0x%08x 0x%08x\n", br_vector3_f_ref.m2.v[1], read_struct.m2.v[0]);
-    printf("0x%08x 0x%08x   ", br_vector3_f_ref.m3.v[0], read_struct.m3.v[0]);printf("0x%08x 0x%08x\n", br_vector3_f_ref.m3.v[1], read_struct.m3.v[0]);
-    printf("0x%08x 0x%08x   ", br_vector3_f_ref.m4.v[0], read_struct.m4.v[0]);printf("0x%08x 0x%08x\n", br_vector3_f_ref.m4.v[1], read_struct.m4.v[0]);
+    printf("0x%08x 0x%08x   ", float_to_binary(br_vector3_f_ref.m1.v[0]), float_to_binary(read_struct.m1.v[0]));
+    printf("0x%08x 0x%08x\n", float_to_binary(br_vector3_f_ref.m1.v[1]), float_to_binary(read_struct.m1.v[0]));
+
+    printf("0x%08x 0x%08x   ", float_to_binary(br_vector3_f_ref.m2.v[0]), float_to_binary(read_struct.m2.v[0]));
+    printf("0x%08x 0x%08x\n", float_to_binary(br_vector3_f_ref.m2.v[1]), float_to_binary(read_struct.m2.v[0]));
+
+    printf("0x%08x 0x%08x   ", float_to_binary(br_vector3_f_ref.m3.v[0]), float_to_binary(read_struct.m3.v[0]));
+    printf("0x%08x 0x%08x\n", float_to_binary(br_vector3_f_ref.m3.v[1]), float_to_binary(read_struct.m3.v[0]));
+
+    printf("0x%08x 0x%08x   ", float_to_binary(br_vector3_f_ref.m4.v[0]), float_to_binary(read_struct.m4.v[0]));
+    printf("0x%08x 0x%08x\n", float_to_binary(br_vector3_f_ref.m4.v[1]), float_to_binary(read_struct.m4.v[0]));
+
     TEST_ASSERT_EQUAL_MEMORY(&br_vector3_f_ref, &read_struct, sizeof(br_vector3_f_ref));
 }
 
@@ -3039,7 +3065,7 @@ static void test_datafile_binary_block_continguous() {
     br_datafile* df_w;
     br_datafile* df_r;
     char tmpfilename[PATH_MAX+1];
-    br_uint_32 read_count;
+    int read_count;
     br_uint_16 read_block_continguous[20][8];
     br_uint_8 *read_blocks;
 
@@ -3078,7 +3104,7 @@ static void test_datafile_text_block_continguous() {
     br_datafile* df_w;
     br_datafile* df_r;
     char tmpfilename[PATH_MAX+1];
-    br_uint_32 read_count;
+    int read_count;
     br_uint_16 read_block_continguous[20][8];
     br_uint_8 *read_blocks;
 
@@ -3147,7 +3173,7 @@ static void test_datafile_binary_block_striped() {
     br_datafile* df_w;
     br_datafile* df_r;
     char tmpfilename[PATH_MAX+1];
-    br_uint_32 read_count;
+    int read_count;
     br_uint_16 read_block_striped[20][8];
     br_uint_8 *read_blocks;
 
@@ -3186,7 +3212,7 @@ static void test_datafile_text_block_striped() {
     br_datafile* df_w;
     br_datafile* df_r;
     char tmpfilename[PATH_MAX+1];
-    br_uint_32 read_count;
+    int read_count;
     br_uint_16 read_block_striped[20][8];
     br_uint_8 *read_blocks;
 
