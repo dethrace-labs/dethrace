@@ -560,6 +560,9 @@ void ChangeTextTo(int pXcoord, int pYcoord, char* pNew_str, char* pOld_str) {
 
     len = strlen(pOld_str);
     len2 = strlen(pNew_str);
+#if defined(DETHRACE_FIX_BUGS)
+    new_type = eRT_looping_random;
+#endif
 
     for (i = 0; i < len; i++) {
         if (i < len2) {
