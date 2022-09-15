@@ -6649,25 +6649,22 @@ br_scalar ThreePointCollRecB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vecto
     if (f[0] >= 0.0f && f[1] >= 0.0f && f[2] >= 0.0f) {
         return ts;
     }
-    if (f[2] >= 0.0f) {
-        if (f[1] >= 0.0f) {
-            if (f[0] >= 0.0f) {
-                return 0.0f;
-            }
-            i = 1;
-            j = 2;
-        } else {
-            i = 0;
-            j = 2;
-        }
-    } else {
+    if (f[2] < 0.f) {
         i = 0;
         j = 1;
+    } else if (f[1] < 0.f) {
+        i = 0;
+        j = 2;
+    } else if (f[0] < 0.f) {
+        i = 1;
+        j = 2;
+    } else {
+        return 0.0f;
     }
-    m->m[0][0] = m->m[0][5 * i];
+    m->m[0][0] = ((br_scalar*)(m->m))[5 * i];
     m->m[1][0] = m->m[j][i];
     m->m[0][1] = m->m[i][j];
-    m->m[1][1] = m->m[0][5 * j];
+    m->m[1][1] = ((br_scalar*)(m->m))[5 * j];
     tau[0] = tau[i];
     tau[1] = tau[j];
     tau[4] = tau[i + 4];
