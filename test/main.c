@@ -146,7 +146,9 @@ void setup_global_vars(int argc, char* argv[]) {
     root_dir = getenv("DETHRACE_ROOT_DIR");
     if (root_dir != NULL) {
         printf("DETHRACE_ROOT_DIR: %s\n", root_dir);
-        chdir(root_dir);
+        if (chdir(root_dir)) {
+            fprintf(stderr, "Failed to chdir to \"%s\" (reason=\"%s\")\n", root_dir, strerror(errno));
+        }
         strncpy(gApplication_path, root_dir, 256);
         strcat(gApplication_path, "/DATA");
     } else {
