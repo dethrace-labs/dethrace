@@ -859,7 +859,7 @@ void DamageScrnDraw(int pCurrent_choice, int pCurrent_mode) {
             gCurrent_graf_data->wreck_name_base_line,
             84,
             gFont_7,
-            (signed char*)name);  // FIXME: remove (signed char*) cast
+            name);
     }
 }
 

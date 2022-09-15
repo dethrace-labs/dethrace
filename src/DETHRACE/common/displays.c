@@ -395,7 +395,7 @@ void DoHeadups(tU32 pThe_time) {
                             y_offset + the_headup->y,
                             the_headup->data.text_info.colour,
                             the_headup->data.text_info.font,
-                            (signed char*)the_headup->data.text_info.text);
+                            the_headup->data.text_info.text);
                         break;
                     case eHeadup_coloured_text:
                         if (the_headup->clever) {
