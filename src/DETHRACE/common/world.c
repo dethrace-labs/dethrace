@@ -4150,19 +4150,21 @@ void DropActor(int pIndex) {
             }
 
             if (face_bastard >= 0) {
-                BrVector3Scale(&gLast_actor->t.t.translate.t, &the_list[face_bastard].normal, nearest_bastard);
-                BrVector3Sub(&gLast_actor->t.t.translate.t, gOur_pos, &gLast_actor->t.t.translate.t);
+                BrVector3Scale(&gLast_actor->t.t.translate.t, &the_list[face_bastard].normal, -nearest_bastard);
+                BrVector3Accumulate(&gLast_actor->t.t.translate.t, gOur_pos);
                 if (!PDKeyDown(KEY_SHIFT_ANY)) {
                     if (the_list[face_bastard].normal.v[1] > the_list[face_bastard].normal.v[0] && the_list[face_bastard].normal.v[2] > the_list[face_bastard].normal.v[0]) {
                         BrVector3Set(&side_vector, -1.f, 0.f, 0.f);
-                    } else if (the_list[face_bastard].normal.v[0] <= the_list[face_bastard].normal.v[1] || the_list[face_bastard].normal.v[2] <= the_list[face_bastard].normal.v[1]) {
-                        BrVector3Set(&side_vector, 0.f, 0.f, -1.f);
-                    } else {
+                    } else if (the_list[face_bastard].normal.v[0] > the_list[face_bastard].normal.v[1] && the_list[face_bastard].normal.v[2] > the_list[face_bastard].normal.v[1]) {
                         BrVector3Set(&side_vector, 0.f, -1.f, 0.f);
+                    } else {
+                        BrVector3Set(&side_vector, 0.f, 0.f, -1.f);
+
                     }
                     new_transform.type = BR_TRANSFORM_LOOK_UP;
                     BrVector3Cross(&new_transform.t.look_up.look, &the_list[face_bastard].normal, &side_vector);
-                    BrVector3Copy(&new_transform.t.look_up.up, &gLast_actor->t.t.translate.t);
+                    BrVector3Copy(&new_transform.t.look_up.up, &the_list[face_bastard].normal);
+                    BrVector3Copy(&new_transform.t.look_up.t, &gLast_actor->t.t.translate.t);
                     BrTransformToTransform(&gLast_actor->t, &new_transform);
                 }
 

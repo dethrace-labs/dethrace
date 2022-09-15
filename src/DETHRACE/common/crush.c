@@ -939,7 +939,7 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
     }
 
     dam_acc_2 = 0;
-    if (pCar2) {
+    if (pCar2 != NULL) {
         if (pCar1->driver <= eDriver_non_car) {
             dam_acc_2 = 0;
         } else {
