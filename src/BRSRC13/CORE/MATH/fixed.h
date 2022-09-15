@@ -11,7 +11,7 @@
 #define BR_ONE_SU ((br_fixed_ss)0x0100)
 #define BR_ONE_SSF ((br_fixed_ss)0x0080)
 #define BR_ONE_SUF ((br_fixed_ss)0x0100)
-#define BrIntToFixed(i) ((i)<<16)
+#define BrIntToFixed(i) ((br_fixed_ls)(((unsigned)(i))<<16))
 #define BrFloatToFixed(f) ((br_fixed_ls)((f)*65536.f))
 #define BrFixedToInt(i) ((i)>>16)
 //#define BrFixedToFloat(i) ((float)((i)*(1.f/65536.f)))
