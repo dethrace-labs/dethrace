@@ -2785,6 +2785,7 @@ br_uint_32 RemoveBounds(br_actor* pActor, void* pArg) {
         BrResFree(pActor->type_data);
         pActor->type_data = NULL;
     }
+    return 0;
 }
 
 // IDA: void __usercall RemoveBoundsStructures(br_actor *pActor@<EAX>)

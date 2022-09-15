@@ -194,6 +194,7 @@ int UpRace(int* pCurrent_choice, int* pCurrent_mode) {
         MoveRaceList(gCurrent_race_index, gCurrent_race_index - 1, 150);
         gCurrent_race_index--;
     }
+    return 0;
 }
 
 // IDA: int __usercall DownRace@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
@@ -210,6 +211,7 @@ int DownRace(int* pCurrent_choice, int* pCurrent_mode) {
         MoveRaceList(gCurrent_race_index, gCurrent_race_index + 1, 150);
         gCurrent_race_index++;
     }
+    return 0;
 }
 
 // IDA: int __usercall ClickOnRace@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
@@ -1300,6 +1302,7 @@ int UpOpponent(int* pCurrent_choice, int* pCurrent_mode) {
         gCurrent_graf_data->start_race_panel_top,
         gCurrent_graf_data->start_race_panel_top_clip,
         gCurrent_graf_data->start_race_panel_bottom_clip);
+    return 0;
 }
 
 // IDA: int __usercall DownOpponent@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
@@ -1326,6 +1329,7 @@ int DownOpponent(int* pCurrent_choice, int* pCurrent_mode) {
         gCurrent_graf_data->start_race_panel_top,
         gCurrent_graf_data->start_race_panel_top_clip,
         gCurrent_graf_data->start_race_panel_bottom_clip);
+    return 0;
 }
 
 // IDA: int __usercall UpClickOpp@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
@@ -2268,6 +2272,7 @@ int GridClickLeft(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int p
     LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
 
     GridMoveLeft(pCurrent_choice, pCurrent_mode);
+    return 0;
 }
 
 // IDA: int __usercall GridClickRight@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
@@ -2275,6 +2280,7 @@ int GridClickRight(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int 
     LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
 
     GridMoveRight(pCurrent_choice, pCurrent_mode);
+    return 0;
 }
 
 // IDA: int __usercall CheckChallenge@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)

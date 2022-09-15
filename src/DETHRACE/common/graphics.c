@@ -2986,7 +2986,7 @@ void SaveShadeTables() {
 
     PossibleService();
     gSaved_table_count = 0;
-    return BrTableEnum("*", SaveShadeTable, 0);
+    BrTableEnum("*", SaveShadeTable, 0);
 }
 
 // IDA: void __cdecl DisposeSavedShadeTables()
@@ -3005,9 +3005,9 @@ void ShadowMode() {
 
     gFancy_shadow = !gFancy_shadow;
     if (gFancy_shadow) {
-        return NewTextHeadupSlot(4, 0, 2000, -4, "Translucent shadow");
+        NewTextHeadupSlot(4, 0, 2000, -4, "Translucent shadow");
     } else {
-        return NewTextHeadupSlot(4, 0, 2000, -4, "Solid shadow");
+        NewTextHeadupSlot(4, 0, 2000, -4, "Solid shadow");
     }
 }
 

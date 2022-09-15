@@ -1134,6 +1134,7 @@ int MouseyClickBastard(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, 
     } else {
         KeyAssignGoAhead(pCurrent_choice, pCurrent_mode);
     }
+    return 0;
 }
 
 // IDA: void __cdecl DrawInitialKMRadios()
