@@ -657,6 +657,12 @@ void DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEner
     tImpact_location modified_location;
     LOG_TRACE("(%p, %p, %p, %d)", pCar, pImpact_point, pEnergy_vector, pWas_hitting_a_car);
 
+#if defined(DETHRACE_FIX_BUGS)
+    proportion_x = 0;
+    proportion_y = 0;
+    proportion_z = 0;
+#endif
+
     pure_energy_magnitude = BrVector3Length(pEnergy_vector);
     if (pure_energy_magnitude == 0.0f && !pWas_hitting_a_car) {
         return;
@@ -932,6 +938,9 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
     mutual_culpability = 0;
     the_time = PDGetTotalTime();
     inherited_damage = 0;
+#if defined(DETHRACE_FIX_BUGS)
+    total_units_of_damage = 0;
+#endif
     if (pCar1->driver <= eDriver_non_car) {
         dam_acc_1 = 0;
     } else {
@@ -1269,6 +1278,7 @@ void DoWheelDamage(tU32 pFrame_period) {
                 }
                 break;
             default:
+                TELL_ME_IF_WE_PASS_THIS_WAY();
                 break;
             }
             if (gNet_mode == eNet_mode_none || car->driver == eDriver_local_human) {
