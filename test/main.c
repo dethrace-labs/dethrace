@@ -30,8 +30,6 @@
 
 #define debug(format_, ...) fprintf(stderr, format_, __VA_ARGS__)
 
-extern int _unittest_do_not_exit;
-
 extern void test_assocarr_suite();
 extern void test_brprintf_suite();
 extern void test_bswap_suite();
@@ -175,7 +173,6 @@ void setup_global_vars(int argc, char* argv[]) {
     setup_temp_folder();
     printf("INFO: temp folder is \"%s\"\n", temp_folder);
 
-    _unittest_do_not_exit = 1;
     harness_debug_level = 7;
     harness_game_info.mode = eGame_carmageddon;
 

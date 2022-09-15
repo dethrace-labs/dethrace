@@ -61,7 +61,6 @@ int gReal_back_screen_locked;
 void (*gPrev_keyboard_handler)();
 tU8 gScan_code[123][2];
 
-int _unittest_do_not_exit = 0;
 char* _unittest_last_fatal_error;
 
 // IDA: void __cdecl KeyboardHandler()
@@ -254,9 +253,7 @@ void PDFatalError(char* pThe_str) {
     LOG_TRACE("(\"%s\")", pThe_str);
 
     if (been_here) {
-        if (!_unittest_do_not_exit) {
-            exit(1);
-        }
+        exit(1);
     }
     been_here = 1;
 
