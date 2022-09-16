@@ -3355,6 +3355,11 @@ void DropPedPoint2() {
 void DropPedPoint() {
     LOG_TRACE("()");
 
+#if defined(DETHRACE_FIX_BUGS)
+    if (gPath_actor == NULL) {
+        return;
+    }
+#endif
     DropPedPoint2();
     NewTextHeadupSlot(4, 0, 2000, -1, "Dropped pedestrian point");
 }
@@ -3363,6 +3368,11 @@ void DropPedPoint() {
 void DropInitPedPoint() {
     LOG_TRACE("()");
 
+    #if defined(DETHRACE_FIX_BUGS)
+        if (gPath_actor == NULL) {
+            return;
+        }
+    #endif
     gInit_ped_instruc = gPed_instruc_count;
     DropPedPoint2();
     NewTextHeadupSlot(4, 0, 2000, -1, "Dropped initial pedestrian point");
@@ -3384,6 +3394,11 @@ void DropPedPointAir2() {
 void DropPedPointAir() {
     LOG_TRACE("()");
 
+#if defined(DETHRACE_FIX_BUGS)
+    if (gPath_actor == NULL) {
+        return;
+    }
+#endif
     DropPedPointAir2();
     NewTextHeadupSlot(4, 0, 2000, -1, "Dropped auto-y pedestrian point");
 }
@@ -3392,6 +3407,11 @@ void DropPedPointAir() {
 void DropInitPedPointAir() {
     LOG_TRACE("()");
 
+#if defined(DETHRACE_FIX_BUGS)
+    if (gPath_actor == NULL) {
+        return;
+    }
+#endif
     gInit_ped_instruc = gPed_instruc_count;
     DropPedPointAir2();
     NewTextHeadupSlot(4, 0, 2000, -1, "Dropped initial auto-y pedestrian point");
