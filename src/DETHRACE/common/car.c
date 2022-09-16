@@ -2796,21 +2796,25 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
             } else {
                 BrVector3Scale(&normal_force, &normal_force, 0.75f);
             }
-            if ((c->driver >= eDriver_net_human || (c->driver == eDriver_oppo && !PointOutOfSight(&c->pos, 150.0))) && !CAR(c)->invulnerable) {
-                v_diff = (CAR(c)->pre_car_col_velocity.v[1] - c->v.v[1]) * gDefensive_powerup_factor[CAR(c)->power_up_levels[0]];
-                if (v_diff < -20.0f && CAR(c)->number_of_wheels_on_ground < 3) {
-                    if (c->driver == eDriver_oppo && c->index == 4 && v_diff < -40.0) {
-                        KnackerThisCar(CAR(c));
-                        StealCar(CAR(c));
-                        v_diff = v_diff * 5.0;
-                    }
-                    for (i = 0; i < CAR(c)->car_actor_count; i++) {
-                        ts2 = (v_diff + 20.0) * -0.01;
-                        TotallySpamTheModel(CAR(c), i, CAR(c)->car_model_actors[i].actor, &CAR(c)->car_model_actors[i].crush_data, ts2);
-                    }
-                    for (i = 0; i < COUNT_OF(CAR(c)->damage_units); i++) {
-                        DamageUnit(CAR(c), i, IRandomPosNeg(5) + (v_diff + 20.0) * -1.5);
-                    }
+            v_diff = (car_spec->pre_car_col_velocity.v[1] - c->v.v[1]) * gDefensive_powerup_factor[car_spec->power_up_levels[0]];
+            if (CAR(c)->invulnerable
+                || (c->driver < eDriver_net_human && (c->driver != eDriver_oppo || PointOutOfSight(&c->pos, 150.0f)))
+                || (v_diff >= -20.0f)
+                || CAR(c)->number_of_wheels_on_ground >= 3) {
+                CrushAndDamageCar(CAR(c), &dir, &normal_force, NULL);
+            } else {
+                // Cops Special Forces is always stolen if destroyed!
+                if (c->driver == eDriver_oppo && c->index == 4 && v_diff < -40.0f) {
+                    KnackerThisCar(CAR(c));
+                    StealCar(CAR(c));
+                    v_diff = v_diff * 5.0f;
+                }
+                for (i = 0; i < CAR(c)->car_actor_count; i++) {
+                    ts2 = (v_diff + 20.0f) * -0.01f;
+                    TotallySpamTheModel(CAR(c), i, CAR(c)->car_model_actors[i].actor, &CAR(c)->car_model_actors[i].crush_data, ts2);
+                }
+                for (i = 0; i < COUNT_OF(CAR(c)->damage_units); i++) {
+                    DamageUnit(CAR(c), i, IRandomPosNeg(5) + (v_diff + 20.0f) * -1.5f);
                 }
             }
             if (!noise_defeat) {
