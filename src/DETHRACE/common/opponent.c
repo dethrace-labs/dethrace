@@ -1347,7 +1347,32 @@ void TeleportOpponentToNearestSafeLocation(tOpponent_spec* pOpponent_spec) {
     int section_counter;
     int found_safe_place;
     LOG_TRACE("(%p)", pOpponent_spec);
-    NOT_IMPLEMENTED();
+
+    found_safe_place = 0;
+    section_no = FindNearestPathSection(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &direction_v, &intersect, &distance);
+    if (section_no < 0) {
+        return;
+    }
+    pOpponent_spec->last_in_view = 0;
+    TurnOpponentPhysicsOff(pOpponent_spec);
+    section_direction = BrVector3Dot(&pOpponent_spec->car_spec->direction, &direction_v) < 0.0f;
+    ClearOpponentsProjectedRoute(pOpponent_spec);
+    AddToOpponentsProjectedRoute(pOpponent_spec, section_no, section_direction);
+    TopUpRandomRoute(pOpponent_spec, -1);
+    section_counter = 1;
+    while (!found_safe_place) {
+        BrVector3Copy(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[pOpponent_spec->next_sections[section_counter].section_no].node_indices[pOpponent_spec->next_sections[section_counter].direction]].p);
+        CalcOpponentConspicuousnessWithAViewToCheatingLikeFuck(pOpponent_spec);
+        if (pOpponent_spec->player_to_oppo_d > gIn_view_distance) {
+            found_safe_place = 1;
+        }
+        section_counter++;
+        if (pOpponent_spec->nnext_sections <= section_counter) {
+            ShiftOpponentsProjectedRoute(pOpponent_spec, section_counter - 1);
+            section_counter = 0;
+            TopUpRandomRoute(pOpponent_spec, -1);
+        }
+    }
 }
 
 // IDA: void __usercall ChooseNewObjective(tOpponent_spec *pOpponent_spec@<EAX>, int pMust_choose_one@<EDX>)
