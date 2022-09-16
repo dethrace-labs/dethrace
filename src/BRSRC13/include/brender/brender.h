@@ -87,12 +87,15 @@ void BrMatrix34LPNormalise(br_matrix34* A, br_matrix34* B);
 void BrMatrix34PreRotate(br_matrix34* mat, br_angle r, br_vector3* axis);
 void BrMatrix34Rotate(br_matrix34* mat, br_angle r, br_vector3* a);
 void BrMatrix34PreTranslate(br_matrix34* mat, br_scalar x, br_scalar y, br_scalar z);
+void BrMatrix34Post(br_matrix34* mat, br_matrix34* A);
 void BrMatrix34PostShearX(br_matrix34* mat, br_scalar sy, br_scalar sz);
 void BrMatrix34PostShearY(br_matrix34* mat, br_scalar sx, br_scalar sz);
 void BrMatrix34PostShearZ(br_matrix34* mat, br_scalar sx, br_scalar sy);
+void BrMatrix34PreScale(br_matrix34* mat, br_scalar sx, br_scalar sy, br_scalar sz);
 void BrMatrix34PreShearX(br_matrix34* mat, br_scalar sy, br_scalar sz);
 void BrMatrix34PreRotateY(br_matrix34* mat, br_angle ry);
 void BrMatrix34PreRotateZ(br_matrix34* mat, br_angle rz);
+void BrMatrix34RollingBall(br_matrix34* mat, int dx, int dy, int radius);
 
 // BrMatrix4
 void BrMatrix4Copy(br_matrix4* A, br_matrix4* B);
@@ -145,6 +148,8 @@ void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class);
 br_resource_class* BrResClassAdd(br_resource_class* rclass);
 void* BrResRemove(void* vres);
 void BrResFree(void* vres);
+br_uint_32 BrResCheck(void* vres, int no_tag);
+br_uint_32 BrResSize(void* vres);
 char* BrResStrDup(void* vparent, char* str);
 
 // BrTable

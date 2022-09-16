@@ -246,7 +246,7 @@ tS16 FindNearestGeneralSection(tCar_spec* pPursuee, br_vector3* pActor_coords, b
     closest_distance_squared = BR_SCALAR_MAX;
     nearest_node_distance_squared = BR_SCALAR_MAX;
 
-    if (pPursuee) {
+    if (pPursuee != NULL) {
         no_sections = pPursuee->my_trail.number_of_nodes - 1;
     } else {
         no_sections = gProgram_state.AI_vehicles.number_of_path_sections;

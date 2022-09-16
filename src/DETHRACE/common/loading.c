@@ -2748,7 +2748,22 @@ void LoadParts() {
     int i;
     int j;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < eParts_count; i++) {
+        for (j = 0; j < gProgram_state.current_car.power_ups[i].number_of_parts; j++) {
+            if (gProgram_state.current_car.power_ups[i].info[j].data_ptr == NULL) {
+                PossibleService();
+                if (!LoadFlicData(
+                        gProgram_state.current_car.power_ups[i].info[j].part_name,
+                        &gProgram_state.current_car.power_ups[i].info[j].data_ptr,
+                        &gProgram_state.current_car.power_ups[i].info[j].data_length)) {
+                    FatalError(58);
+                }
+            } else {
+                MAMSLock((void**)&gProgram_state.current_car.power_ups[i].info[j].data_ptr);
+            }
+        }
+    }
 }
 
 // IDA: void __cdecl UnlockParts()
@@ -2756,7 +2771,14 @@ void UnlockParts() {
     int i;
     int j;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < eParts_count; i++) {
+        for (j = 0; j < gProgram_state.current_car.power_ups[i].number_of_parts; j++) {
+            if (gProgram_state.current_car.power_ups[i].info[j].data_ptr != NULL) {
+                MAMSUnlock((void**)&gProgram_state.current_car.power_ups[i].info[j].data_ptr);
+            }
+        }
+    }
 }
 
 // IDA: br_pixelmap* __cdecl LoadChromeFont()

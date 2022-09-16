@@ -13,6 +13,13 @@
 #define RES_ALIGN 4
 #define RESOURCE_SIZE(RES) ((RES)->size_h << 18)  | ((RES)->size_m << 10) | ((RES)->size_l << 2)
 
+#define PANIC_ON_INVALID_RESOURCE_HEADER(RES_HDR)                                                        \
+    do {                                                                                                 \
+        if ((RES_HDR)->magic_num != 0xdeadbeef) {                                                        \
+            LOG_PANIC("Bad resource header from user at %p. Was 0x%x", (RES_HDR), (RES_HDR)->magic_num); \
+        }                                                                                                \
+    } while (0)
+
 // IDA: void* __usercall ResToUser@<EAX>(resource_header *r@<EAX>)
 void* ResToUser(resource_header* r) {
     br_int_32 align;
@@ -33,9 +40,6 @@ resource_header* UserToRes(void* r) {
     p = (br_uint_8*)r - 1;
     while (*p == 0) {
         p--;
-    }
-    if (((resource_header*)(p - (sizeof(resource_header) - 1)))->magic_num != 0xdeadbeef) {
-        LOG_PANIC("Bad resource header from user at %p. Was 0x%x", r, ((resource_header*)p)->magic_num);
     }
     return (resource_header*)(p - (sizeof(resource_header) - 1));
 }
@@ -76,6 +80,7 @@ void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class) {
     if (vparent != NULL) {
         // vparent points to a resource body, we track backwards to obtain its resource_header
         parent = UserToRes(vparent);
+        PANIC_ON_INVALID_RESOURCE_HEADER(parent);
         BrSimpleAddHead(&parent->children, &res->node);
     }
 
@@ -113,6 +118,7 @@ void BrResInternalFree(resource_header* res, br_boolean callback) {
 void BrResFree(void* vres) {
     LOG_TRACE10("(%p)", vres);
 
+    PANIC_ON_INVALID_RESOURCE_HEADER(UserToRes(vres));
     BrResInternalFree(UserToRes(vres), 1);
 }
 
@@ -120,6 +126,7 @@ void BrResFree(void* vres) {
 void BrResFreeNoCallback(void* vres) {
     LOG_TRACE("(%p)", vres);
 
+    PANIC_ON_INVALID_RESOURCE_HEADER(UserToRes(vres));
     BrResInternalFree(UserToRes(vres), 0);
 }
 
@@ -131,6 +138,9 @@ void* BrResAdd(void* vparent, void* vres) {
 
     res = UserToRes(vres);
     parent = UserToRes(vparent);
+
+    PANIC_ON_INVALID_RESOURCE_HEADER(res);
+    PANIC_ON_INVALID_RESOURCE_HEADER(parent);
 
     if (res->node.prev != NULL) {
         BrSimpleRemove(&res->node);
@@ -145,6 +155,8 @@ void* BrResRemove(void* vres) {
     LOG_TRACE("(%p)", vres);
 
     res = UserToRes(vres);
+    PANIC_ON_INVALID_RESOURCE_HEADER(res);
+
     BrSimpleRemove(&res->node);
     return vres;
 }
@@ -155,6 +167,7 @@ br_uint_8 BrResClass(void* vres) {
     LOG_TRACE("(%p)", vres);
 
     res = UserToRes(vres);
+    PANIC_ON_INVALID_RESOURCE_HEADER(res);
     return res->class;
 }
 
@@ -167,6 +180,8 @@ br_boolean BrResIsChild(void* vparent, void* vchild) {
 
     parent = UserToRes(vparent);
     child = UserToRes(vchild);
+    PANIC_ON_INVALID_RESOURCE_HEADER(parent);
+    PANIC_ON_INVALID_RESOURCE_HEADER(child);
 
     for (cp = (resource_header*)parent->children.head; cp != NULL; cp = (resource_header*)cp->node.next) {
         if (cp == child) {
@@ -182,6 +197,8 @@ br_uint_32 BrResSize(void* vres) {
     LOG_TRACE("(%p)", vres);
 
     res = UserToRes(vres);
+    PANIC_ON_INVALID_RESOURCE_HEADER(res);
+
     return RESOURCE_SIZE(res);
 }
 
@@ -212,6 +229,7 @@ br_uint_32 BrResChildEnum(void* vres, br_resenum_cbfn* callback, void* arg) {
     LOG_TRACE("(%p, %p, %p)", vres, callback, arg);
 
     res = UserToRes(vres);
+    PANIC_ON_INVALID_RESOURCE_HEADER(res);
     r = 0;
     for (rp = (resource_header*)res->children.head; rp != NULL; rp = (resource_header*)rp->node.next) {
         r = callback(ResToUser(rp), arg);
@@ -228,10 +246,9 @@ br_uint_32 BrResCheck(void* vres, int no_tag) {
     LOG_TRACE("(%p, %d)", vres, no_tag);
 
     res = UserToRes(vres);
-    if ((res->magic_ptr ==  res) & (res->magic_num == 0xdeadbeef)) {
-        return 1;
-    }
-    return 0;
+    // No PANIC_ON_INVALID_RESOURCE_HEADER check
+
+    return res->magic_ptr == res && res->magic_num == 0xdeadbeef;
 }
 
 // IDA: char* __cdecl BrResStrDup(void *vparent, char *str)
@@ -272,6 +289,7 @@ void BrResDump(void* vres, br_putline_cbfn* putline, void* arg) {
     LOG_TRACE("(%p, %p, %p)", vres, putline, arg);
 
     res = UserToRes(vres);
+    PANIC_ON_INVALID_RESOURCE_HEADER(res);
     InternalResourceDump(res, putline, arg, 0);
 }
 
