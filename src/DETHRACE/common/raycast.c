@@ -227,7 +227,19 @@ int DRScenePick2DXY(br_actor* world, br_actor* camera, br_pixelmap* viewport, in
     br_camera* camera_data;
     br_angle view_over_2;
     LOG_TRACE("(%p, %p, %p, %d, %d, %p, %p)", world, camera, viewport, pick_x, pick_y, callback, arg);
-    NOT_IMPLEMENTED();
+
+    camera_data = camera->type_data;
+    DRActorToRoot(camera, world, &camera_tfm);
+    BrMatrix34Inverse(&gPick_model_to_view__raycast, &camera_tfm);
+    view_over_2 = camera_data->field_of_view / 2;
+    cos_angle = BR_COS(view_over_2);
+    sin_angle = BR_SIN(view_over_2);
+    scale = cos_angle / sin_angle;
+    BrMatrix34PostScale(&gPick_model_to_view__raycast, scale / camera_data->aspect, scale, 1.f);
+    BrMatrix34PostShearZ(&gPick_model_to_view__raycast,
+        2 * pick_x / (float)viewport->width,
+        -2 * pick_y / (float)viewport->height);
+    return ActorPick2D(world, model_unk1, material_unk1, callback, arg);
 }
 
 // IDA: int __usercall DRScenePick2D@<EAX>(br_actor *world@<EAX>, br_actor *camera@<EDX>, dr_pick2d_cbfn *callback@<EBX>, void *arg@<ECX>)
