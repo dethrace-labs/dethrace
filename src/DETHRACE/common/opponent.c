@@ -1349,7 +1349,7 @@ void TeleportOpponentToNearestSafeLocation(tOpponent_spec* pOpponent_spec) {
     LOG_TRACE("(%p)", pOpponent_spec);
 
     found_safe_place = 0;
-    section_no = FindNearestPathSection(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t & direction_v, &intersect, &distance);
+    section_no = FindNearestPathSection(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &direction_v, &intersect, &distance);
     if (section_no < 0) {
         return;
     }
@@ -1361,7 +1361,7 @@ void TeleportOpponentToNearestSafeLocation(tOpponent_spec* pOpponent_spec) {
     TopUpRandomRoute(pOpponent_spec, -1);
     section_counter = 1;
     while (!found_safe_place) {
-        BrVector3Copy(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[pOpponent_spec->next_sections[section_counter].section_no].node_indices[pOpponent_spec->next_sections[section_counter].direction]].p);
+        BrVector3Copy(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[pOpponent_spec->next_sections[section_counter].section_no].node_indices[pOpponent_spec->next_sections[section_counter].direction]].p);
         CalcOpponentConspicuousnessWithAViewToCheatingLikeFuck(pOpponent_spec);
         if (pOpponent_spec->player_to_oppo_d > gIn_view_distance) {
             found_safe_place = 1;
