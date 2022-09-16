@@ -1579,33 +1579,7 @@ void ChooseNewObjective(tOpponent_spec* pOpponent_spec, int pMust_choose_one) {
             return;
         }
 
-        // TODO: replace to simplified version
-        int v55 = gOpponents[pOpponent_spec->index].psyche.grudge_against_player;
-        int v56, v57, v58, v63;
-        if (v55 <= 0x14u) {
-            v56 = 20;
-        } else {
-            v56 = v55;
-        }
-        if ((v56 + 20) + pOpponent_spec->nastiness * 40.0f <= 100.0f) {
-            v57 = gOpponents[pOpponent_spec->index].psyche.grudge_against_player;
-            if (v57 <= 0x14u) {
-                v58 = 20;
-            } else {
-                v58 = v57;
-            }
-            v63 = (v58 + 20) + pOpponent_spec->nastiness * 40.0f;
-        } else {
-            v63 = 100.0;
-        }
-
-        int v12 = MAX(20, gOpponents[pOpponent_spec->index].psyche.grudge_against_player);
-        v12 = MIN(100, pOpponent_spec->nastiness * 40.0 + (v12 + 20));
-        if (v12 != v63) {
-            LOG_PANIC("v12 != v63!");
-        }
-
-        gOpponents[pOpponent_spec->index].psyche.grudge_against_player = v63;
+        gOpponents[pOpponent_spec->index].psyche.grudge_against_player = MIN(100, pOpponent_spec->nastiness * 40.0 + (MAX(20, gOpponents[pOpponent_spec->index].psyche.grudge_against_player) + 20));
         NewObjective(pOpponent_spec, eOOT_pursue_and_twat, &gProgram_state.current_car);
     }
 }
