@@ -742,25 +742,29 @@ int ActorBoxPick(tBounds* bnds, br_actor* ap, br_model* model, br_material* mate
 
     i = 0;
     test_children = 1;
-    if (ap->model) {
+    if (ap->model != NULL) {
         this_model = ap->model;
     } else {
         this_model = model;
     }
-    if (ap->material) {
+    if (ap->material != NULL) {
         this_material = ap->material;
     } else {
         this_material = material;
     }
-    if (ap->render_style == 1) {
+    if (ap->render_style == BR_RSTYLE_NONE) {
         return max_face;
     }
-    if (ap->identifier && *ap->identifier == '&') {
-        if (!ap->children
-            && (ap->type != BR_ACTOR_MODEL || !BoundsTransformTest(&this_model->bounds, &bnds->real_bounds, &ap->t.t.mat))) {
-            return max_face;
+    if (ap->identifier != NULL && ap->identifier[0] == '&') {
+        if (ap->children == NULL) {
+            if (ap->type != BR_ACTOR_MODEL) {
+                return max_face;
+            }
+            if (!BoundsTransformTest(&this_model->bounds, &bnds->real_bounds, &ap->t.t.mat)) {
+                return max_face;
+            }
         }
-        if (pMat) {
+        if (pMat != NULL) {
             BrMatrix34Mul(&mat, &ap->t.t.mat, pMat);
             pMat = &mat;
         } else {
@@ -769,7 +773,8 @@ int ActorBoxPick(tBounds* bnds, br_actor* ap, br_model* model, br_material* mate
         BrMatrix34LPInverse(&invmat, &ap->t.t.mat);
         BrMatrix34Mul(&mat2, bnds->mat, &invmat);
         new_bounds.mat = &mat2;
-        new_bounds.original_bounds = bnds->original_bounds;
+        BrVector3Copy(&new_bounds.original_bounds.min, &bnds->original_bounds.min);
+        BrVector3Copy(&new_bounds.original_bounds.max, &bnds->original_bounds.max);
         BrMatrix34ApplyP(&new_bounds.box_centre, &bnds->box_centre, &invmat);
         new_bounds.radius = bnds->radius;
         GetNewBoundingBox(&new_bounds.real_bounds, &new_bounds.original_bounds, new_bounds.mat);
@@ -798,11 +803,11 @@ int ActorBoxPick(tBounds* bnds, br_actor* ap, br_model* model, br_material* mate
             i += max_face - n;
             max_face = n;
         }
-    } else if (ap->type >= 5u && ap->type <= 6u) {
+    } else if (ap->type == BR_ACTOR_BOUNDS || ap->type == BR_ACTOR_BOUNDS_CORRECT) {
         test_children = BoundsOverlapTest__finteray(&bnds->real_bounds, (br_bounds*)ap->type_data);
     }
     if (test_children) {
-        for (a = ap->children; a; a = next_a) {
+        for (a = ap->children; a != NULL; a = next_a) {
             next_a = a->next;
             n = ActorBoxPick(bnds, a, this_model, this_material, &face_list[i], max_face, pMat);
             i += max_face - n;
