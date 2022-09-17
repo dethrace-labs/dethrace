@@ -4,6 +4,7 @@
 #include "car.h"
 #include "globvars.h"
 #include "harness/trace.h"
+#include "raycast.h"
 #include "world.h"
 #include <math.h>
 #include <stdlib.h>
@@ -419,12 +420,13 @@ void CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir,
 
     this_material = pFace->material;
     *rt = 100.0;
+
     d = pFace->normal.v[1] * ray_dir->v[1] + ray_dir->v[2] * pFace->normal.v[2] + ray_dir->v[0] * pFace->normal.v[0];
-    if ((!this_material || (this_material->flags & 0x1800) != 0 || d <= 0.0)
+    if ((this_material == NULL || (this_material->flags & (BR_MATF_TWO_SIDED | BR_MATF_ALWAYS_VISIBLE )) != 0 || d <= 0.0)
         && (!this_material || !this_material->identifier || *this_material->identifier != '!' || !gPling_materials)
         && fabs(d) >= 0.00000023841858) {
         BrVector3Sub(&p, ray_pos, &pFace->v[0]);
-        numerator = pFace->normal.v[1] * p.v[1] + pFace->normal.v[2] * p.v[2] + pFace->normal.v[0] * p.v[0];
+        numerator = BrVector3Dot(&pFace->normal, &p);
         if (!BadDiv__finteray(numerator, d)) {
             if (d > 0.0) {
                 if (-numerator < -0.001 || -numerator > d + 0.003) {
@@ -437,12 +439,8 @@ void CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir,
             if (t > 1.0) {
                 t = 1.0;
             }
-            tv.v[0] = ray_dir->v[0] * t;
-            tv.v[1] = ray_dir->v[1] * t;
-            tv.v[2] = ray_dir->v[2] * t;
-            tv.v[0] = ray_pos->v[0] + tv.v[0];
-            tv.v[1] = ray_pos->v[1] + tv.v[1];
-            tv.v[2] = ray_pos->v[2] + tv.v[2];
+            BrVector3Scale(&tv, ray_dir, t);
+            BrVector3Accumulate(&tv, ray_pos);
             axis_m = fabs(pFace->normal.v[0]) < fabs(pFace->normal.v[1]);
             if (fabs(pFace->normal.v[2]) > fabs(pFace->normal.v[axis_m])) {
                 axis_m = 2;
@@ -481,9 +479,7 @@ void CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir,
                 *rt = t;
                 *normal = pFace->normal;
                 if (d > 0.0) {
-                    normal->v[0] = -normal->v[0];
-                    normal->v[1] = -normal->v[1];
-                    normal->v[2] = -normal->v[2];
+                    BrVector3Negate(normal, normal);
                 }
             }
         }
