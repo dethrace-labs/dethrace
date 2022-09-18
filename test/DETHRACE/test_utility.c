@@ -96,10 +96,36 @@ void test_utility_PathCat() {
 }
 
 void test_utility_IRandomBetween() {
-    tU32 source_y_delta;
+    int r;
+    int i;
+    int j;
+    int actual_min;
+    int actual_max;
+    struct {
+        int min;
+        int max;
+    } ranges[] = {
+        { -2, 1 },
+        { 1, -2 },
+        { 2, -1 },
+        { -1, 2 },
+        { 0, 3 },
+        { 3, 0 },
+        { 0, 10000 },
+        { 10000, 0 },
+    };
 
-    source_y_delta = ((66 << 16) / 67) - 0x10000;
-    printf("delta %x, %x\n", source_y_delta, source_y_delta >> 16);
+    for (i = 0; i < BR_ASIZE(ranges); i++) {
+        LOG_INFO("Testing min=%d max=%d", ranges[i].min, ranges[i].max);
+        actual_min = MIN(ranges[i].min, ranges[i].max);
+        actual_max = MAX(ranges[i].min, ranges[i].max);
+        for (j = 0; j < 1000; j++) {
+            r = IRandomBetween(ranges[i].min, ranges[i].max);
+
+            TEST_ASSERT_GREATER_OR_EQUAL(actual_min, r);
+            TEST_ASSERT_LESS_OR_EQUAL(actual_max, r);
+        }
+    }
 }
 
 void test_utility_suite() {
