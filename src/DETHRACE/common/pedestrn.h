@@ -239,7 +239,7 @@ void DropPedPointAir();
 
 void DropInitPedPointAir();
 
-br_uint_32 KillActorsModel(br_actor* pActor, void* pArg);
+intptr_t KillActorsModel(br_actor* pActor, void* pArg);
 
 void DisposePedPaths();
 

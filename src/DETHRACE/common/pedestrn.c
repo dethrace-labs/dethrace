@@ -3436,7 +3436,7 @@ void DropInitPedPointAir() {
 }
 
 // IDA: br_uint_32 __cdecl KillActorsModel(br_actor *pActor, void *pArg)
-br_uint_32 KillActorsModel(br_actor* pActor, void* pArg) {
+intptr_t KillActorsModel(br_actor* pActor, void* pArg) {
     LOG_TRACE("(%p, %p)", pActor, pArg);
 
     if (pActor->model != NULL) {
@@ -3451,7 +3451,7 @@ void DisposePedPaths() {
     LOG_TRACE("()");
 
     if (gPath_actor != NULL) {
-        DRActorEnumRecurse(gPath_actor, (br_actor_enum_cbfn*)KillActorsModel, NULL);
+        DRActorEnumRecurse(gPath_actor, KillActorsModel, NULL);
         BrActorRemove(gPath_actor);
         BrActorFree(gPath_actor);
         BrMaterialRemove(gPath_mat_normal);
