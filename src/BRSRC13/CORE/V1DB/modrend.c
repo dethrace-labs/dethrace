@@ -40,7 +40,7 @@ fmt_vertex bounds_vertices[8] = {
     { { { 1.0f, 1.0f, 1.0f } }, { { 1.0f, 1.0f } }, { { 0.333f, 0.666f, 0.666f } } },
 };
 v11group bounds_face_groups[1] = {
-    { NULL, bounds_faces, bounds_colours, NULL, bounds_vertices, bounds_colours, NULL, BR_ASIZE(bounds_faces), BR_ASIZE(bounds_vertices), 18 },
+    { NULL, bounds_faces, bounds_colours, NULL, bounds_vertices, bounds_colours, NULL, BR_ASIZE(bounds_faces), BR_ASIZE(bounds_vertices), 18, NULL },
 };
 v11model bounds_prepared = { 0, 0, BR_ASIZE(bounds_face_groups), { { 0 } }, bounds_face_groups };
 br_model bounds_model = {
