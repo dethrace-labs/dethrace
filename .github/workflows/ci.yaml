@@ -1,6 +1,9 @@
 name: Workflow
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+    branches: [master]
 
 jobs:
 
@@ -115,13 +118,14 @@ jobs:
         uses: mikepenz/release-changelog-builder-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          includeOpen: true
       - name: Create release
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
           draft: false
           prerelease: false
-          includeOpen: true
           body:  ${{steps.build_changelog.outputs.changelog}}
           # generate_release_notes: true
       # - name: Upload linux-amd64 artifact
