@@ -106,10 +106,10 @@ jobs:
     if: needs.bump-tag.outputs.new_tag != ''
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch build artifacts
-        uses: actions/download-artifact@v1
-        with:
-          name: artifacts
+      # - name: Fetch build artifacts
+      #   uses: actions/download-artifact@v1
+      #   with:
+      #     name: artifacts
       - name: Create release
         id: create-release
         uses: softprops/action-gh-release@v1
