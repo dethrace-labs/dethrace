@@ -118,6 +118,20 @@ jobs:
         with:
           includeOpen: true
           fromTag: "v0.3.0"
+          configurationJson: |
+            {
+              "template": "#{{CHANGELOG}}\n\n<details>\n<summary>Uncategorized</summary>\n\n#{{UNCATEGORIZED}}\n</details>",
+              "categories": [
+                {
+                    "title": "## 💬 Other",
+                    "labels": ["other"]
+                },
+                {
+                    "title": "## 📦 Dependencies",
+                    "labels": ["dependencies"]
+                }
+              ]
+            }
       - name: Create release
         id: create_release
         uses: softprops/action-gh-release@v1
