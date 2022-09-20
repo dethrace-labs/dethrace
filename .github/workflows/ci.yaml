@@ -103,7 +103,7 @@ jobs:
 
   create-release:
     needs: [bump-tag, build-linux, build-macos, build-windows]
-    if: startsWith(github.ref, 'refs/tags/')
+    if: needs.bump-tag.outputs.new_tag != ''
     runs-on: ubuntu-latest
     steps:
       - name: Fetch build artifacts
@@ -112,47 +112,46 @@ jobs:
           name: artifacts
       - name: Create release
         id: create-release
-        uses: actions/create-release@v1
+        uses: softprops/action-gh-release@v1
         with:
           draft: false
-          prerelease: true
-          release_name: ${{needs.bump-tag.outputs.new_tag}}
-          tag_name: ${{ github.ref }}
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-      - name: Upload linux-amd64 artifact
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create-release.outputs.upload_url }}
-          asset_path: ./artifacts/linux-amd64.tar.gz
-          asset_name: dethrace-${{needs.bump-tag.outputs.new_tag}}-linux-amd64.tar.gz
-          asset_content_type: application/octet-stream
-      - name: Upload darwin-amd64 artifact
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create-release.outputs.upload_url }}
-          asset_path: ./artifacts/darwin-amd64.tar.gz
-          asset_name: dethrace-${{needs.bump-tag.outputs.new_tag}}-darwin-amd64.tar.gz
-          asset_content_type: application/octet-stream
-      - name: Upload windows-x86 artifact
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create-release.outputs.upload_url }}
-          asset_path: ./artifacts/windows-x86.zip
-          asset_name: dethrace-${{needs.bump-tag.outputs.new_tag}}-windows-x86.zip
-          asset_content_type: application/octet-stream
-      - name: Upload windows-amd64 artifact
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create-release.outputs.upload_url }}
-          asset_path: ./artifacts/windows-amd64.zip
-          asset_name: dethrace-${{needs.bump-tag.outputs.new_tag}}-windows-amd64.zip
-          asset_content_type: application/octet-stream
+          prerelease: false
+          name: ${{needs.bump-tag.outputs.new_tag}}
+          tag_name: ${{needs.bump-tag.outputs.new_tag}}
+          generate_release_notes: true
+      # - name: Upload linux-amd64 artifact
+      #   uses: actions/upload-release-asset@v1.0.1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     upload_url: ${{ steps.create-release.outputs.upload_url }}
+      #     asset_path: ./artifacts/linux-amd64.tar.gz
+      #     asset_name: dethrace-${{needs.bump-tag.outputs.new_tag}}-linux-amd64.tar.gz
+      #     asset_content_type: application/octet-stream
+      # - name: Upload darwin-amd64 artifact
+      #   uses: actions/upload-release-asset@v1.0.1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     upload_url: ${{ steps.create-release.outputs.upload_url }}
+      #     asset_path: ./artifacts/darwin-amd64.tar.gz
+      #     asset_name: dethrace-${{needs.bump-tag.outputs.new_tag}}-darwin-amd64.tar.gz
+      #     asset_content_type: application/octet-stream
+      # - name: Upload windows-x86 artifact
+      #   uses: actions/upload-release-asset@v1.0.1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     upload_url: ${{ steps.create-release.outputs.upload_url }}
+      #     asset_path: ./artifacts/windows-x86.zip
+      #     asset_name: dethrace-${{needs.bump-tag.outputs.new_tag}}-windows-x86.zip
+      #     asset_content_type: application/octet-stream
+      # - name: Upload windows-amd64 artifact
+      #   uses: actions/upload-release-asset@v1.0.1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     upload_url: ${{ steps.create-release.outputs.upload_url }}
+      #     asset_path: ./artifacts/windows-amd64.zip
+      #     asset_name: dethrace-${{needs.bump-tag.outputs.new_tag}}-windows-amd64.zip
+      #     asset_content_type: application/octet-stream
