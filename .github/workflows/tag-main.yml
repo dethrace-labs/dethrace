@@ -1,4 +1,4 @@
-name: Push to main
+name: Bump release tag
 
 on:
   push:
@@ -9,163 +9,12 @@ jobs:
   tag:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Bump version and push tag
-        id: tag_version
-        uses: mathieudutour/github-tag-action@v6.0
+      - uses: actions/checkout@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          dry_run: true
-
-  # build-linux:
-  #   runs-on: ubuntu-18.04
-  #   strategy:
-  #     matrix:
-  #       platform: [gcc]
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #       with:
-  #         fetch-depth: 0
-  #         ref: ${{ github.event.pull_request.head.sha }}
-  #     - name: Setup Ninja
-  #       uses: ashutoshvarma/setup-ninja@master
-  #       with:
-  #         version: 1.10.2
-  #     - name: Build
-  #       env:
-  #         CC: ${{ steps.vars.outputs.cc }}
-  #         CXX: ${{ steps.vars.outputs.cxx }}
-  #         MATRIX_PLATFORM: ${{ matrix.platform }}
-  #       run: .github/scripts/build-linux.sh
-  #     - name: Test
-  #       run: |
-  #         cd build
-  #         ctest --verbose
-  #     - name: Upload artifact
-  #       if: startsWith(github.ref, 'refs/tags/')
-  #       uses: actions/upload-artifact@v1
-  #       with:
-  #         name: artifacts
-  #         path: linux-amd64.tar.gz
-
-  # build-macos:
-  #   runs-on: macos-10.15
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #       with:
-  #         fetch-depth: 0
-  #         ref: ${{ github.event.pull_request.head.sha }}
-  #     - name: Setup Ninja
-  #       uses: ashutoshvarma/setup-ninja@master
-  #       with:
-  #         version: 1.10.2
-  #     - name: Build
-  #       run: |
-  #         .github/scripts/build-macos.sh
-  #     - name: Test
-  #       run: |
-  #         cd build
-  #         ctest --verbose
-  #     - name: Upload artifact
-  #       if: startsWith(github.ref, 'refs/tags/')
-  #       uses: actions/upload-artifact@v1
-  #       with:
-  #         name: artifacts
-  #         path: darwin-amd64.tar.gz
-
-  # build-windows:
-  #   runs-on: windows-2019
-  #   strategy:
-  #     matrix:
-  #       platform: [x86, amd64]
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #       with:
-  #         fetch-depth: 0
-  #         ref: ${{ github.event.pull_request.head.sha }}
-  #     - name: Setup Ninja
-  #       uses: ashutoshvarma/setup-ninja@master
-  #       with:
-  #         version: 1.10.2
-  #     - uses: ilammy/msvc-dev-cmd@v1.4.1
-  #       with:
-  #         arch: ${{ matrix.platform }}
-  #     - name: Build
-  #       run: |
-  #         .github/scripts/build-msvc.ps1
-  #       env:
-  #         MATRIX_PLATFORM: ${{ matrix.platform }}
-  #     - name: Test
-  #       run: |
-  #         cd build
-  #         ctest --verbose -C RelWithDebInfo
-  #     - name: Upload artifact
-  #       if: startsWith(github.ref, 'refs/tags/')
-  #       uses: actions/upload-artifact@v1
-  #       with:
-  #         name: artifacts
-  #         path: windows-${{ matrix.platform }}.zip
-
-
-  # create-release:
-  #   needs: [build-linux, build-macos, build-windows]
-  #   if: startsWith(github.ref, 'refs/tags/')
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #       with:
-  #         fetch-depth: 0
-  #         ref: ${{ github.event.pull_request.head.sha }}
-  #     - name: Obtain tag version
-  #       id: get_version
-  #       run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
-  #     - name: Fetch build artifacts
-  #       uses: actions/download-artifact@v1
-  #       with:
-  #         name: artifacts
-  #     - name: Create release
-  #       id: create-release
-  #       uses: actions/create-release@v1
-  #       with:
-  #         draft: false
-  #         prerelease: true
-  #         release_name: ${{ steps.get_version.outputs.VERSION }}
-  #         tag_name: ${{ github.ref }}
-  #       env:
-  #         GITHUB_TOKEN: ${{ github.token }}
-  #     - name: Upload linux-amd64 artifact
-  #       uses: actions/upload-release-asset@v1.0.1
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       with:
-  #         upload_url: ${{ steps.create-release.outputs.upload_url }}
-  #         asset_path: ./artifacts/linux-amd64.tar.gz
-  #         asset_name: dethrace-${{ steps.get_version.outputs.VERSION }}-linux-amd64.tar.gz
-  #         asset_content_type: application/octet-stream
-  #     - name: Upload darwin-amd64 artifact
-  #       uses: actions/upload-release-asset@v1.0.1
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       with:
-  #         upload_url: ${{ steps.create-release.outputs.upload_url }}
-  #         asset_path: ./artifacts/darwin-amd64.tar.gz
-  #         asset_name: dethrace-${{ steps.get_version.outputs.VERSION }}-darwin-amd64.tar.gz
-  #         asset_content_type: application/octet-stream
-  #     - name: Upload windows-x86 artifact
-  #       uses: actions/upload-release-asset@v1.0.1
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       with:
-  #         upload_url: ${{ steps.create-release.outputs.upload_url }}
-  #         asset_path: ./artifacts/windows-x86.zip
-  #         asset_name: dethrace-${{ steps.get_version.outputs.VERSION }}-windows-x86.zip
-  #         asset_content_type: application/octet-stream
-  #     - name: Upload windows-amd64 artifact
-  #       uses: actions/upload-release-asset@v1.0.1
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       with:
-  #         upload_url: ${{ steps.create-release.outputs.upload_url }}
-  #         asset_path: ./artifacts/windows-amd64.zip
-  #         asset_name: dethrace-${{ steps.get_version.outputs.VERSION }}-windows-amd64.zip
-  #         asset_content_type: application/octet-stream
+          fetch-depth: '0'
+      - name: Bump version and push tag
+        uses: anothrNick/github-tag-action@1.46.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
+  
