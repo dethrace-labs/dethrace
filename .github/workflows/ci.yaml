@@ -109,7 +109,7 @@ jobs:
       # - name: Fetch build artifacts
       #   uses: actions/download-artifact@v1
       #   with:
-      #     name: artifacts
+      ##     name: artifacts
       - name: Create release
         id: create-release
         uses: softprops/action-gh-release@v1
