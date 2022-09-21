@@ -106,10 +106,10 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
-      # - name: Fetch build artifacts
-      #   uses: actions/download-artifact@v1
-      #   with:
-      ##     name: artifacts
+      - name: Fetch build artifacts
+        uses: actions/download-artifact@v1
+        with:
+          name: artifacts
       # - name: "Build Changelog"
       #   id: build_changelog
       #   uses: mikepenz/release-changelog-builder-action@v3
@@ -136,7 +136,8 @@ jobs:
         with:
           draft: false
           prerelease: false
-          body:  ${{steps.build_changelog.outputs.changelog}}
+          name: Dethrace ${{github.ref_name}}
+          #body:  ${{steps.build_changelog.outputs.changelog}}
           generate_release_notes: true
       - name: Upload linux-amd64 artifact
         uses: actions/upload-release-asset@v1.0.1
