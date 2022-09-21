@@ -116,21 +116,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          includeOpen: true
           fromTag: "v0.3.0"
           configurationJson: |
             {
               "template": "#{{CHANGELOG}}\n\n<details>\n<summary>Uncategorized</summary>\n\n#{{UNCATEGORIZED}}\n</details>",
-              "categories": [
+              categories: [
                 {
-                    "title": "## 💬 Other",
-                    "labels": ["other"]
+                    title: '## 🚀 Enhancements',
+                    labels: ['feature']
                 },
                 {
-                    "title": "## 📦 Dependencies",
-                    "labels": ["dependencies"]
+                    title: '## 🐛 Fixes',
+                    labels: ['bug']
                 }
-              ]
+              ],
             }
       - name: Create release
         id: create_release
