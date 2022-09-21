@@ -119,7 +119,7 @@ jobs:
           configurationJson: |
             {
               "template": "#{{CHANGELOG}}\n\n<details>\n<summary>Uncategorized</summary>\n\n#{{UNCATEGORIZED}}\n</details>",
-              "categories: [
+              "categories": [
                 {
                     "title": "## 🚀 Enhancements",
                     "labels": ["feature"]
