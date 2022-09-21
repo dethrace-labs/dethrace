@@ -116,18 +116,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          fromTag: "v0.3.0"
           configurationJson: |
             {
               "template": "#{{CHANGELOG}}\n\n<details>\n<summary>Uncategorized</summary>\n\n#{{UNCATEGORIZED}}\n</details>",
-              categories: [
+              "categories: [
                 {
-                    title: '## 🚀 Enhancements',
-                    labels: ['feature']
+                    "title": "## 🚀 Enhancements",
+                    "labels": ["feature"]
                 },
                 {
-                    title: '## 🐛 Fixes',
-                    labels: ['bug']
+                    "title": "## 🐛 Fixes",
+                    "labels": ["bug"]
                 }
               ],
             }
@@ -138,7 +137,7 @@ jobs:
           draft: false
           prerelease: false
           body:  ${{steps.build_changelog.outputs.changelog}}
-          # generate_release_notes: true
+          generate_release_notes: true
       # - name: Upload linux-amd64 artifact
       #   uses: actions/upload-release-asset@v1.0.1
       #   env:
