@@ -2295,7 +2295,7 @@ void RevivePedestrian(tPedestrian_data* pPedestrian, int pAnimate) {
     pPedestrian->fate = NULL;
     gInitial_instruction = NULL;
     PedestrianNextInstruction(pPedestrian, 0.f, 1, 0);
-    pPedestrian->from_pos = pPedestrian->actor->t.t.translate.t;
+    BrVector3Copy(&pPedestrian->from_pos, &pPedestrian->actor->t.t.translate.t);
     MungePedModel(pPedestrian);
     pPedestrian->pos.v[V_Y] += pPedestrian->sequences[pPedestrian->current_sequence].frames[0].offset.v[V_Y];
 }

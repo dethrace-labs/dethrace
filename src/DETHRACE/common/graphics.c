@@ -770,13 +770,16 @@ void NewScreenWobble(double pAmplitude_x, double pAmplitude_y, double pPeriod) {
 // IDA: void __usercall SetScreenWobble(int pWobble_x@<EAX>, int pWobble_y@<EDX>)
 void SetScreenWobble(int pWobble_x, int pWobble_y) {
     LOG_TRACE("(%d, %d)", pWobble_x, pWobble_y);
-    NOT_IMPLEMENTED();
+
+    gScreen_wobble_y = pWobble_y;
+    gScreen_wobble_x = pWobble_x;
 }
 
 // IDA: void __cdecl ResetScreenWobble()
 void ResetScreenWobble() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    SetScreenWobble(0, 0);
 }
 
 // IDA: void __usercall CalculateWobblitude(tU32 pThe_time@<EAX>)
@@ -1784,7 +1787,7 @@ void RenderAFrame(int pDepth_mask_on) {
         PipeFrameFinish();
     }
     gRender_screen->pixels = old_pixels;
-    if (!gPalette_fade_time || GetRaceTime() > (gPalette_fade_time + 500)) {
+    if (!gPalette_fade_time || GetRaceTime() > gPalette_fade_time + 500) {
         PDScreenBufferSwap(0);
     }
     if (gAction_replay_mode) {
@@ -2092,7 +2095,15 @@ void DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int
 // IDA: void __usercall DRMaskedStamp(br_int_16 pDest_x@<EAX>, br_int_16 pDest_y@<EDX>, br_pixelmap *pSource@<EBX>)
 void DRMaskedStamp(br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap* pSource) {
     LOG_TRACE("(%d, %d, %p)", pDest_x, pDest_y, pSource);
-    NOT_IMPLEMENTED();
+
+    DRPixelmapRectangleMaskedCopy(gBack_screen,
+        pDest_x,
+        pDest_y,
+        pSource,
+        0,
+        0,
+        pSource->width,
+        pSource->height);
 }
 
 // IDA: void __usercall DRPixelmapRectangleOnscreenCopy(br_pixelmap *pDest@<EAX>, br_int_16 pDest_x@<EDX>, br_int_16 pDest_y@<EBX>, br_pixelmap *pSource@<ECX>, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight)

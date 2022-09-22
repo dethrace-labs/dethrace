@@ -305,6 +305,7 @@ typedef enum keymapcodes {
     KEYMAP_SEND_MESSAGE = 66,   // default `
     KEYMAP_ARROW = 25,          // default R
     KEYMAP_INFO = 26,           // default I
+    KEYMAP_REPLAYMODE = 57,     // default KP_ENTER
 } keymapcodes;
 
 enum {

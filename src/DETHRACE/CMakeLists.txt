@@ -1,6 +1,8 @@
 # Create object files so we can link them into the main binary and into tests without building twice.
 add_library(dethrace_obj OBJECT)
 
+option(DETHRACE_REPLAY_DEBUG "Debug replay" OFF)
+
 target_include_directories(dethrace_obj
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
@@ -41,6 +43,10 @@ if(IS_BIGENDIAN)
     target_compile_definitions(dethrace_obj PRIVATE BR_ENDIAN_BIG=1)
 else()
     target_compile_definitions(dethrace_obj PRIVATE BR_ENDIAN_LITTLE=1)
+endif()
+
+if(DETHRACE_REPLAY_DEBUG)
+    target_compile_definitions(dethrace_obj PRIVATE DETHRACE_REPLAY_DEBUG)
 endif()
 
 target_sources(dethrace_obj PRIVATE

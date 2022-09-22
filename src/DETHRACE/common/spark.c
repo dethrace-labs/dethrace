@@ -312,7 +312,28 @@ void ReplaySparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_ac
     br_vector3 tv;
     br_vector3 new_pos;
     LOG_TRACE("(%p, %p, %p, %d)", pRender_screen, pDepth_buffer, pCamera, pTime);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < COUNT_OF(gSparks); i++) {
+        if (gSpark_flags & (1 << i)) {
+            if (gSparks[i].car == NULL) {
+                BrVector3Copy(&pos, &gSparks[i].pos);
+            } else {
+                BrMatrix34ApplyP(&tv, &o, &gSparks[i].car->car_master_actor->t.t.mat);
+                BrVector3Copy(&o, &tv);
+                BrMatrix34ApplyP(&pos, &gSparks[i].pos, &gSparks[i].car->car_master_actor->t.t.mat);
+            }
+            BrVector3Add(&o, &pos, &gSparks[i].length);
+            BrVector3Sub(&tv, &pos, (br_vector3*)gCamera_to_world.m[3]);
+            BrMatrix34TApplyV(&new_pos, &tv, &gCamera_to_world);
+            BrVector3Sub(&tv, &o, (br_vector3*)gCamera_to_world.m[3]);
+            BrMatrix34TApplyV(&p, &tv, &gCamera_to_world);
+            if (gSparks[i].colour) {
+                DrawLine3D(&p, &new_pos, pRender_screen, pDepth_buffer, gFog_shade_table);
+            } else {
+                DrawLine3D(&p, &new_pos, pRender_screen, pDepth_buffer, gAcid_shade_table);
+            }
+        }
+    }
 }
 
 // IDA: void __usercall RenderSparks(br_pixelmap *pRender_screen@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>, tU32 pTime)
@@ -737,7 +758,15 @@ void ReplayShrapnel(tU32 pTime) {
     int i;
     br_matrix34* mat;
     LOG_TRACE("(%d)", pTime);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < COUNT_OF(gShrapnel); i++) {
+        mat = &gShrapnel[i].actor->t.t.mat;
+        if (gShrapnel_flags & (1 << i)) {
+            gShrapnel[i].age += GetReplayRate() * pTime;
+            DrMatrix34Rotate(mat, gShrapnel[i].age * BrDegreeToAngle(1), &gShrapnel[i].axis);
+            BrMatrix34PreShearX(mat, gShrapnel[i].shear1, gShrapnel[i].shear2);
+        }
+    }
 }
 
 // IDA: void __usercall MungeShrapnel(tU32 pTime@<EAX>)
@@ -1090,7 +1119,19 @@ void ReplaySmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
     br_scalar aspect;
     int i;
     LOG_TRACE("(%p, %p, %p)", pRender_screen, pDepth_buffer, pCamera);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < COUNT_OF(gSmoke_column); i++) {
+        if (gSmoke_flags & (1 << i)) {
+            aspect = 1.f + (gSmoke[i].radius - .05f) / .25f * .5f;
+            if (gSmoke[i].type & 0x10) {
+                SmokeCircle3D(&gSmoke[i].pos, gSmoke[i].radius / aspect, gSmoke[i].strength, 1.f,
+                    pRender_screen, pDepth_buffer, gShade_list[gSmoke[i].type & 0xf], pCamera);
+            } else {
+                SmokeCircle3D(&gSmoke[i].pos, gSmoke[i].radius, gSmoke[i].strength, aspect,
+                    pRender_screen, pDepth_buffer, gShade_list[gSmoke[i].type & 0xf], pCamera);
+            }
+        }
+    }
 }
 
 // IDA: void __usercall GenerateContinuousSmoke(tCar_spec *pCar@<EAX>, int wheel@<EDX>, tU32 pTime@<EBX>)
@@ -1301,19 +1342,25 @@ void CreatePuffOfSmoke(br_vector3* pos, br_vector3* v, br_scalar strength, br_sc
 // IDA: void __cdecl ResetSmoke()
 void ResetSmoke() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gSmoke_flags = 0;;
 }
 
 // IDA: void __usercall AdjustSmoke(int pIndex@<EAX>, tU8 pType@<EDX>, br_vector3 *pPos@<EBX>, br_scalar pRadius, br_scalar pStrength)
 void AdjustSmoke(int pIndex, tU8 pType, br_vector3* pPos, br_scalar pRadius, br_scalar pStrength) {
     LOG_TRACE("(%d, %d, %p, %f, %f)", pIndex, pType, pPos, pRadius, pStrength);
-    NOT_IMPLEMENTED();
+
+    gSmoke[pIndex].type = pType;
+    gSmoke[pIndex].radius = pRadius;
+    gSmoke[pIndex].strength = pStrength;
+    BrVector3Copy(&gSmoke[pIndex].pos, pPos);
+    gSmoke_flags |= 1 << pIndex;
 }
 
 // IDA: void __cdecl ActorError()
 void ActorError() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
 }
 
 // IDA: void __usercall AdjustSmokeColumn(int pIndex@<EAX>, tCar_spec *pCar@<EDX>, int pVertex@<EBX>, int pColour@<ECX>)
@@ -1321,7 +1368,27 @@ void AdjustSmokeColumn(int pIndex, tCar_spec* pCar, int pVertex, int pColour) {
     int i;
     br_actor* actor;
     LOG_TRACE("(%d, %p, %d, %d)", pIndex, pCar, pVertex, pColour);
-    NOT_IMPLEMENTED();
+
+    gColumn_flags ^= 1 << pIndex;
+    gSmoke_column[pIndex].car = pCar;
+    gSmoke_column[pIndex].vertex_index = pVertex;
+    gSmoke_column[pIndex].colour = pColour;
+    for (i = 0; i < COUNT_OF(gSmoke_column->frame_count); i++) {
+        gSmoke_column[pIndex].frame_count[i] = 100;
+    }
+    if (pColour == 0) {
+        if ((gColumn_flags & (1 << pIndex)) != 0) {
+            if (gSmoke_column[pIndex].flame_actor->depth != 0) {
+                ActorError();
+            }
+            BrActorAdd(gNon_track_actor, gSmoke_column[pIndex].flame_actor);
+        } else {
+            if (gSmoke_column[pIndex].flame_actor->depth == 0) {
+                ActorError();
+            }
+            BrActorRemove(gSmoke_column[pIndex].flame_actor);
+        }
+    }
 }
 
 // IDA: void __usercall CreateSmokeColumn(tCar_spec *pCar@<EAX>, int pColour@<EDX>, int pVertex_index@<EBX>, tU32 pLifetime@<ECX>)
@@ -1431,14 +1498,38 @@ void AdjustFlame(int pIndex, int pFrame_count, br_scalar pScale_x, br_scalar pSc
     tSmoke_column* col;
     br_actor* actor;
     LOG_TRACE("(%d, %d, %f, %f, %f, %f)", pIndex, pFrame_count, pScale_x, pScale_y, pOffset_x, pOffset_z);
-    NOT_IMPLEMENTED();
+
+    i = pIndex >> 4;
+    j = pIndex & 0xf;
+    col = &gSmoke_column[i];
+    col->frame_count[j] = pFrame_count;
+    col->scale_x[j] = pScale_x;
+    col->scale_y[j] = pScale_y;
+    col->offset_x[j] = pOffset_x;
+    col->offset_z[j] = pOffset_z;
 }
 
 // IDA: void __usercall ReplayFlame(tSmoke_column *col@<EAX>, br_actor *actor@<EDX>)
 void ReplayFlame(tSmoke_column* col, br_actor* actor) {
     int i;
     LOG_TRACE("(%p, %p)", col, actor);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < COUNT_OF(col->frame_count); i++, actor = actor->next) {
+        col->frame_count[i] += GetReplayRate();
+        if (col->frame_count[i] < 0 || col->frame_count[i] >= COUNT_OF(gFlame_map)) {
+            actor->type = BR_ACTOR_NONE;
+        } else {
+            actor->type = BR_ACTOR_MODEL;
+            actor->material->colour_map = gFlame_map[col->frame_count[i]];
+            BrMaterialUpdate(actor->material, BR_MATU_ALL);
+            BrMatrix34Scale(&actor->t.t.mat,
+                col->scale_x[i] * gFlame_map[col->frame_count[i]]->width,
+                col->scale_y[i] * gFlame_map[col->frame_count[i]]->height,
+                1.f);
+            actor->t.t.translate.t.v[0] = col->offset_x[i];
+            actor->t.t.translate.t.v[2] = col->offset_z[i];
+        }
+    }
 }
 
 // IDA: void __usercall FlameAnimate(int c@<EAX>, br_vector3 *pPos@<EDX>, tU32 pTime@<EBX>)
@@ -1540,7 +1631,15 @@ void ReplaySmokeColumn(tU32 pTime) {
     int i;
     br_vector3 dummy;
     LOG_TRACE("(%d)", pTime);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
+        if ((gColumn_flags & (1 << i)) != 0) {
+            DoSmokeColumn(i, pTime, &dummy);
+            if (gSmoke_column[i].colour == 0) {
+                FlameAnimate(i, &gSmoke_column[i].pos, pTime);
+            }
+        }
+    }
 }
 
 // IDA: void __usercall MungeSmokeColumn(tU32 pTime@<EAX>)

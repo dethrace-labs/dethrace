@@ -1,19 +1,64 @@
 #include "piping.h"
 #include "brender/brender.h"
+#include "car.h"
+#include "crush.h"
+#include "errors.h"
 #include "globvars.h"
+#include "globvrpb.h"
+#include "graphics.h"
 #include "harness/trace.h"
+#include "oil.h"
 #include "opponent.h"
 #include "pedestrn.h"
+#include "replay.h"
+#include "skidmark.h"
+#include "spark.h"
+#include "sys.h"
 #include "sound.h"
+#include "utility.h"
+#include "world.h"
 #include <stdlib.h>
 #include <string.h>
 
-tU8* gPipe_buffer_start;
-int gDisable_sound;
-int gDisable_advance;
-int gMax_rewind_chunks;
-float gWall_severity;
-tPipe_reset_proc* gReset_procs[32];
+tU8* gPipe_buffer_start = NULL;
+int gDisable_sound = 0;
+int gDisable_advance = 0;
+int gMax_rewind_chunks = 1000;
+float gWall_severity = 0.f;
+tPipe_reset_proc* gReset_procs[32] = {
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    ResetAllPedestrians,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    ResetAllPedGibs,
+    NULL,
+    ResetSparks,
+    ResetShrapnel,
+    ResetScreenWobble,
+    NULL,
+    NULL,
+    ResetSmoke,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    ResetProxRay,
+    NULL,
+};
 tPiped_registration_snapshot gRegistration_snapshots[5];
 tPipe_smudge_data* gSmudge_space;
 tU32 gOldest_time;
@@ -43,6 +88,21 @@ tU8* gPipe_buffer_oldest;
 tU32 gPipe_buffer_size;
 tU8* gLocal_buffer;
 tU32 gLocal_buffer_size;
+tPipe_chunk *gIncidentChunk; // FIXME: added by DethRace (really needed?)
+
+#define LOCAL_BUFFER_SIZE 15000
+
+#if DETHRACE_REPLAY_DEBUG
+#define REPLAY_DEBUG_MAGIC1 0x1ed6ef85
+#define REPLAY_DEBUG_ASSERT(test) assert(test)
+#include <assert.h>
+#else
+#define REPLAY_DEBUG_ASSERT(test)
+#endif
+
+#if defined(DETHRACE_FIX_BUGS)
+#define PIPE_ALIGN(V) (((V) + sizeof(void*) - 1) & ~(sizeof(void*) - 1))
+#endif
 
 // IDA: void __usercall GetReducedPos(br_vector3 *v@<EAX>, tReduced_pos *p@<EDX>)
 void GetReducedPos(br_vector3* v, tReduced_pos* p) {
@@ -50,7 +110,7 @@ void GetReducedPos(br_vector3* v, tReduced_pos* p) {
 
     v->v[0] = p->v[0] / 800.f;
     v->v[1] = p->v[1] / 800.f;
-    v->v[2] = p->v[1] / 800.f;
+    v->v[2] = p->v[2] / 800.f;
     BrVector3Accumulate(v, &gProgram_state.current_car.car_master_actor->t.t.translate.t);
 }
 
@@ -68,7 +128,18 @@ void SaveReducedPos(tReduced_pos* p, br_vector3* v) {
 // IDA: int __cdecl PipeSearchForwards()
 int PipeSearchForwards() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gPipe_play_ptr == gPipe_record_ptr) {
+        return 0;
+    }
+    if (gPipe_play_ptr == gPipe_buffer_oldest) {
+        return 1;
+    }
+    if (GetReplayRate() == 0.f) {
+        return GetReplayDirection() > 0;
+    } else {
+        return GetReplayRate() > 0.f;
+    }
 }
 
 // IDA: int __cdecl IsActionReplayAvailable()
@@ -81,7 +152,9 @@ int IsActionReplayAvailable() {
 // IDA: int __cdecl SomeReplayLeft()
 int SomeReplayLeft() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    return ((GetReplayDirection() >= 1 && gPipe_play_ptr != gPipe_record_ptr) ||
+        (GetReplayDirection() <= -1 && gPipe_play_ptr != gPipe_buffer_oldest));
 }
 
 // IDA: void __cdecl DisablePipedSounds()
@@ -104,14 +177,162 @@ tU32 LengthOfSession(tPipe_session* pSession) {
     tU32 running_total;
     tPipe_chunk* the_chunk;
     LOG_TRACE("(%p)", pSession);
-    NOT_IMPLEMENTED();
+
+#define SIZEOF_CHUNK(MEMBER) (offsetof(tPipe_chunk, chunk_data) + sizeof(pSession->chunks.chunk_data.MEMBER))
+#define ROUND_UP(V, M) (((V) + (M) - 1) & (~((M) - 1)))
+
+    switch (pSession->chunk_type) {
+    case ePipe_chunk_actor_rstyle:
+        running_total = SIZEOF_CHUNK(actor_rstyle_data) * pSession->number_of_chunks;
+        break;
+    case ePipe_chunk_actor_translate:
+        running_total = SIZEOF_CHUNK(actor_translate_data) * pSession->number_of_chunks;
+        break;
+    case ePipe_chunk_actor_transform:
+        running_total = SIZEOF_CHUNK(actor_transform_data) * pSession->number_of_chunks;
+        break;
+    case ePipe_chunk_actor_create:
+        running_total = 0;
+        break;
+    case ePipe_chunk_actor_destroy:
+        running_total = 0;
+        break;
+    case ePipe_chunk_actor_relink:
+        running_total = SIZEOF_CHUNK(actor_relink_data) * pSession->number_of_chunks;
+        break;
+    case ePipe_chunk_actor_material:
+        running_total = SIZEOF_CHUNK(actor_material_data) * pSession->number_of_chunks;
+        break;
+    case ePipe_chunk_face_material:
+        running_total = SIZEOF_CHUNK(face_material_data) * pSession->number_of_chunks;
+        break;
+    case ePipe_chunk_material_trans:
+        running_total = SIZEOF_CHUNK(material_trans_data) * pSession->number_of_chunks;
+        break;
+    case ePipe_chunk_material_pixelmap:
+        running_total = SIZEOF_CHUNK(material_pixelmap_data) * pSession->number_of_chunks;
+        break;
+    case ePipe_chunk_model_geometry:
+        running_total = 0;
+        for (i = 0; i < pSession->number_of_chunks; i++) {
+            the_chunk = (tPipe_chunk*)&((tU8*)&pSession->chunks)[running_total];
+            running_total += the_chunk->chunk_data.model_geometry_data.vertex_count * sizeof(tChanged_vertex) + offsetof(tPipe_model_geometry_data, vertex_changes) + offsetof(tPipe_chunk, chunk_data);
+        }
+        break;
+    case ePipe_chunk_pedestrian:
+        running_total = 0;
+        for (i = 0; i < pSession->number_of_chunks; i++) {
+            the_chunk = (tPipe_chunk*)&(((tU8*)&pSession->chunks)[running_total]);
+            if (the_chunk->chunk_data.pedestrian_data.hit_points <= 0) {
+                running_total += SIZEOF_CHUNK(pedestrian_data);
+            } else {
+                running_total += offsetof(tPipe_pedestrian_data, spin_period) + offsetof(tPipe_chunk, chunk_data);
+            }
+        }
+        break;
+    case ePipe_chunk_frame_boundary:
+        running_total = SIZEOF_CHUNK(frame_boundary_data);
+        break;
+    case ePipe_chunk_car:
+        running_total = SIZEOF_CHUNK(car_data) * pSession->number_of_chunks;
+        break;
+    case ePipe_chunk_sound:
+        running_total = SIZEOF_CHUNK(sound_data) * pSession->number_of_chunks;
+        break;
+    case ePipe_chunk_damage:
+        running_total = SIZEOF_CHUNK(damage_data);
+        break;
+    case ePipe_chunk_special:
+        running_total = SIZEOF_CHUNK(special_data) * pSession->number_of_chunks;
+        break;
+    case ePipe_chunk_ped_gib:
+        running_total = SIZEOF_CHUNK(ped_gib_data) * pSession->number_of_chunks;
+        break;
+    case ePipe_chunk_incident:
+        running_total = SIZEOF_CHUNK(incident_data) * pSession->number_of_chunks;
+        break;
+    case ePipe_chunk_spark:
+        running_total = SIZEOF_CHUNK(spark_data) * pSession->number_of_chunks;
+        break;
+    case ePipe_chunk_shrapnel:
+        running_total = 0;
+        for (i = 0; i < pSession->number_of_chunks; i++) {
+            the_chunk = (tPipe_chunk*)&((tU8*)&pSession->chunks)[running_total];
+            if (the_chunk->subject_index & 0x8000) {
+                running_total += SIZEOF_CHUNK(shrapnel_data);
+            } else {
+                running_total += offsetof(tPipe_shrapnel_data, age) + offsetof(tPipe_chunk, chunk_data);
+            }
+        }
+        break;
+    case ePipe_chunk_screen_shake:
+        running_total = SIZEOF_CHUNK(screen_shake_data) * pSession->number_of_chunks;
+        break;
+    case ePipe_chunk_groove_stop:
+        running_total = SIZEOF_CHUNK(groove_stop_data) * pSession->number_of_chunks;
+        break;
+    case ePipe_chunk_non_car:
+        running_total = SIZEOF_CHUNK(non_car_data) * pSession->number_of_chunks;
+        break;
+    case ePipe_chunk_smoke:
+        running_total = SIZEOF_CHUNK(smoke_data) * pSession->number_of_chunks;
+        break;
+    case ePipe_chunk_oil_spill:
+        running_total = SIZEOF_CHUNK(oil_data) * pSession->number_of_chunks;
+        break;
+    case ePipe_chunk_smoke_column:
+        running_total = ROUND_UP(SIZEOF_CHUNK(smoke_column_data), 4) * pSession->number_of_chunks;
+        break;
+    case ePipe_chunk_flame:
+        running_total = SIZEOF_CHUNK(flame_data) * pSession->number_of_chunks;
+        break;
+    case ePipe_chunk_smudge:
+        running_total = 0;
+        for (i = 0; i < pSession->number_of_chunks; i++) {
+            the_chunk = (tPipe_chunk*)&((tU8*)&pSession->chunks)[running_total];
+            running_total += the_chunk->chunk_data.smudge_data.vertex_count * sizeof(tSmudged_vertex) + offsetof(tPipe_smudge_data, vertex_changes) + sizeof(int);
+        }
+        break;
+    case ePipe_chunk_splash:
+        running_total = SIZEOF_CHUNK(splash_data) * pSession->number_of_chunks;
+        break;
+    case ePipe_chunk_prox_ray:
+        running_total = SIZEOF_CHUNK(prox_ray_data) * pSession->number_of_chunks;
+        break;
+    case ePipe_chunk_skid_adjustment:
+        running_total = SIZEOF_CHUNK(skid_adjustment) * pSession->number_of_chunks;
+        break;
+    default:
+        running_total = 0;
+        break;
+    }
+    running_total += offsetof(tPipe_session, chunks) + sizeof(tU16);
+    if (running_total % 2 != 0) {
+        FatalError(98);
+    }
+    return running_total;
 }
 
 // IDA: void __usercall StartPipingSession2(tPipe_chunk_type pThe_type@<EAX>, int pMunge_reentrancy@<EDX>)
 void StartPipingSession2(tPipe_chunk_type pThe_type, int pMunge_reentrancy) {
     LOG_TRACE("(%d, %d)", pThe_type, pMunge_reentrancy);
 
-    STUB_ONCE();
+    if (gPipe_buffer_start != NULL && !gAction_replay_mode && gProgram_state.racing) {
+        if (pMunge_reentrancy) {
+            if (gReentrancy_count != 0) {
+                gReentrancy_array[gReentrancy_count - 1] = ((tPipe_session*)gLocal_buffer)->chunk_type;
+                EndPipingSession2(0);
+            }
+            gReentrancy_count++;
+        }
+        ((tPipe_session*)gLocal_buffer)->chunk_type = pThe_type;
+        ((tPipe_session*)gLocal_buffer)->number_of_chunks = 0;
+#if defined(DETHRACE_REPLAY_DEBUG)
+        ((tPipe_session*)gLocal_buffer)->magic1 = REPLAY_DEBUG_MAGIC1;
+#endif
+        gLocal_buffer_size = offsetof(tPipe_session, chunks);
+        gMr_chunky = &((tPipe_session*)gLocal_buffer)->chunks;
+    }
 }
 
 // IDA: void __usercall StartPipingSession(tPipe_chunk_type pThe_type@<EAX>)
@@ -126,7 +347,53 @@ void EndPipingSession2(int pMunge_reentrancy) {
     int a;
     LOG_TRACE("(%d)", pMunge_reentrancy);
 
-    STUB_ONCE();
+    if (gPipe_buffer_start != NULL && !gAction_replay_mode && gProgram_state.racing) {
+        // Each session ends with a tU16, containing the session size
+        *(tU16*)&gLocal_buffer[gLocal_buffer_size] = gLocal_buffer_size;
+        a = gLocal_buffer_size;
+        gLocal_buffer_size += sizeof(tU16);
+        REPLAY_DEBUG_ASSERT(LengthOfSession((tPipe_session*)gLocal_buffer) == gLocal_buffer_size);
+#if defined(DETHRACE_FIX_BUGS)
+        gLocal_buffer_size = PIPE_ALIGN(gLocal_buffer_size);
+        *(tU16*)&gLocal_buffer[gLocal_buffer_size - sizeof(tU16)] = gLocal_buffer_size - sizeof(tU16);
+#endif
+        if (((tPipe_session*)gLocal_buffer)->number_of_chunks != 0 && (gLocal_buffer_size < LOCAL_BUFFER_SIZE || a == LOCAL_BUFFER_SIZE - 2)) {
+            if (gPipe_buffer_phys_end < gPipe_record_ptr + gLocal_buffer_size) {
+                // Put session at begin of pipe, as no place at end
+                gPipe_buffer_working_end = gPipe_record_ptr;
+                gPipe_buffer_oldest = gPipe_buffer_start;
+                gPipe_record_ptr = gPipe_buffer_start;
+            }
+            while (gPipe_record_ptr <= gPipe_buffer_oldest && gPipe_buffer_oldest < gPipe_record_ptr + gLocal_buffer_size) {
+                // Remove older sessions
+#if defined(DETHRACE_FIX_BUGS)
+                gPipe_buffer_oldest += PIPE_ALIGN(LengthOfSession((tPipe_session*)gPipe_buffer_oldest));
+#else
+                gPipe_buffer_oldest += LengthOfSession((tPipe_session*)gPipe_buffer_oldest);
+#endif
+                if (gPipe_buffer_working_end <= gPipe_buffer_oldest) {
+                    gPipe_buffer_working_end = gPipe_buffer_phys_end;
+                    gPipe_buffer_oldest = gPipe_buffer_start;
+                }
+            }
+            if (gPipe_buffer_oldest == NULL) {
+                gPipe_buffer_oldest = gPipe_record_ptr;
+            }
+            memcpy(gPipe_record_ptr, gLocal_buffer, gLocal_buffer_size);
+            gPipe_record_ptr += gLocal_buffer_size;
+            if (gPipe_buffer_working_end < gPipe_record_ptr) {
+                gPipe_buffer_working_end = gPipe_record_ptr;
+            }
+        }
+        if (pMunge_reentrancy) {
+            if (gReentrancy_count != 0) {
+                gReentrancy_count--;
+                if (gReentrancy_count != 0) {
+                    StartPipingSession2(gReentrancy_array[gReentrancy_count - 1], 0);
+                }
+            }
+        }
+    }
 }
 
 // IDA: void __cdecl EndPipingSession()
@@ -142,7 +409,17 @@ void AddDataToSession(int pSubject_index, void* pData, tU32 pData_length) {
     int variable_for_breaking_on;
     LOG_TRACE("(%d, %p, %d)", pSubject_index, pData, pData_length);
 
-    STUB_ONCE();
+    if (gPipe_buffer_start != NULL && !gAction_replay_mode && gProgram_state.racing) {
+        temp_buffer_size = gLocal_buffer_size + offsetof(tPipe_chunk, chunk_data) + pData_length;
+        if (temp_buffer_size >= LOCAL_BUFFER_SIZE) {
+            return;
+        }
+        ((tPipe_session*)gLocal_buffer)->number_of_chunks++;
+        gMr_chunky->subject_index = pSubject_index;
+        memcpy(&gMr_chunky->chunk_data, pData, pData_length);
+        gMr_chunky = (tPipe_chunk*)(((tU8*)&gMr_chunky->chunk_data) + pData_length);
+        gLocal_buffer_size = temp_buffer_size;
+    }
 }
 
 // IDA: void __usercall AddModelGeometryToPipingSession(tU16 pCar_ID@<EAX>, int pModel_index@<EDX>, int pVertex_count@<EBX>, tChanged_vertex *pCoordinates@<ECX>)
@@ -188,7 +465,7 @@ void AddPedestrianToPipingSession(int pPedestrian_index, br_matrix34* pTrans, tU
     if (pFrame_index == 0xff) {
         pFrame_index = 0;
     }
-    data.action_and_frame_index = (pAction_index * 16 + pFrame_index) | (pDone_initial ? 0 : 0x80);
+    data.action_and_frame_index = (pDone_initial ? 1 : 0) << 7 | pAction_index << 4 | pFrame_index;
     data.hit_points = pHit_points;
     data.new_translation.v[0] = pTrans->m[3][0];
     data.new_translation.v[1] = pTrans->m[3][1];
@@ -285,7 +562,7 @@ void AddSmokeColumnToPipingSession(int pIndex, tCar_spec* pCar, int pVertex, int
 
     data.car_ID = pCar->car_ID;
     data.vertex = pVertex;
-    AddDataToSession(pIndex + pColour * 0x4000, &data, sizeof(tPipe_smoke_column_data));
+    AddDataToSession(pColour << 14 | pIndex, &data, sizeof(tPipe_smoke_column_data));
 }
 
 // IDA: void __usercall AddFlameToPipingSession(int pIndex@<EAX>, int pFrame_count@<EDX>, br_scalar pScale_x, br_scalar pScale_y, br_scalar pOffset_x, br_scalar pOffset_z)
@@ -306,7 +583,7 @@ void AddSplashToPipingSession(tCollision_info* pCar) {
     tPipe_splash_data data;
     LOG_TRACE("(%p)", pCar);
 
-    if (pCar->driver >= 0) {
+    if (pCar->driver >= eDriver_oppo) {
         data.d = pCar->water_d;
         BrVector3Copy(&data.normal, &pCar->water_normal);
         AddDataToSession(pCar->car_ID, &data, sizeof(tPipe_splash_data));
@@ -351,7 +628,7 @@ void AddCarToPipingSession(int pCar_ID, br_matrix34* pCar_mat, br_vector3* pCar_
     data.lr_sus_position = pLr_sus_position * 127.f / .15f;
     data.rr_sus_position = pRr_sus_position * 127.f / .15f;
     data.steering_angle = pSteering_angle * 32767.f / 60.f;
-    data.revs_and_gear = (((int)pRevs) / 10) + (pFrame_coll_flag ? 0 : 0x800) + (pGear + 1) * 0x1000;
+    data.revs_and_gear = (pGear + 1) << 12 | (pFrame_coll_flag ? 0 : 1) << 11 | ((((int)pRevs) / 10) & 0x7ff);
     AddDataToSession(pCar_ID, &data, sizeof(tPipe_car_data));
 }
 
@@ -491,7 +768,7 @@ void PipeSingleCar(int pCar_ID, br_matrix34* pCar_mat, br_vector3* pCar_velocity
 void PipeSingleSound(tS3_outlet_ptr pOutlet, int pSound_index, tS3_volume pL_volume, tS3_volume pR_volume, tS3_pitch pPitch, br_vector3* pPos) {
     LOG_TRACE("(%d, %d, %d, %d, %d, %p)", pOutlet, pSound_index, pL_volume, pR_volume, pPitch, pPos);
 
-    if (gProgram_state.racing && !gAction_replay_mode) {
+    if (!gAction_replay_mode && gProgram_state.racing) {
         StartPipingSession(ePipe_chunk_sound);
         AddSoundToPipingSession(pOutlet, pSound_index, pL_volume, pR_volume, pPitch, pPos);
         EndPipingSession();
@@ -557,12 +834,17 @@ void PipeSinglePedIncident(int pPed_index, br_actor* pActor) {
 // IDA: void __cdecl PipeSingleWallIncident(float pSeverity, br_vector3 *pImpact_point)
 void PipeSingleWallIncident(float pSeverity, br_vector3* pImpact_point) {
     LOG_TRACE("(%f, %p)", pSeverity, pImpact_point);
-    STUB_ONCE();
+
+    if (pSeverity > gWall_severity) {
+        gWall_severity = pSeverity;
+        BrVector3Copy(&gWall_impact_point, pImpact_point);
+    }
 }
 
 // IDA: void __usercall PipeSingleScreenShake(int pWobble_x@<EAX>, int pWobble_y@<EDX>)
 void PipeSingleScreenShake(int pWobble_x, int pWobble_y) {
     LOG_TRACE("(%d, %d)", pWobble_x, pWobble_y);
+
     StartPipingSession(ePipe_chunk_screen_shake);
     AddScreenWobbleToPipingSession(pWobble_x, pWobble_y);
     EndPipingSession();
@@ -581,7 +863,16 @@ void PipeSingleGrooveStop(int pGroove_index, br_matrix34* pMatrix, int pPath_int
 // IDA: void __cdecl PipeFrameFinish()
 void PipeFrameFinish() {
     LOG_TRACE("()");
-    STUB_ONCE();
+
+    if (gWall_severity != 0.f) {
+        StartPipingSession(ePipe_chunk_incident);
+        AddWallIncidentToPipingSession(gWall_severity, &gWall_impact_point);
+        EndPipingSession();
+        gWall_severity = 0.f;
+    }
+    StartPipingSession(ePipe_chunk_frame_boundary);
+    AddFrameFinishToPipingSession(GetTotalTime());
+    EndPipingSession();
 }
 
 // IDA: void __cdecl PipingFrameReset()
@@ -608,20 +899,51 @@ void PipeSingleSkidAdjustment(int pSkid_num, br_matrix34* pMatrix, int pMaterial
 // IDA: void __cdecl ResetPiping()
 void ResetPiping() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gWall_severity = 0.f;
+    gPipe_buffer_oldest = NULL;
+    gPipe_record_ptr = gPipe_buffer_start;
+    gPipe_buffer_working_end = gPipe_buffer_phys_end;
+    gReentrancy_count = 0;
 }
 
 // IDA: void __cdecl InitialisePiping()
 void InitialisePiping() {
     LOG_TRACE("()");
-    STUB_ONCE();
+
+    if (!gAusterity_mode && gNet_mode == eNet_mode_none) {
+        PDAllocateActionReplayBuffer((char**)&gPipe_buffer_start, &gPipe_buffer_size);
+        gPipe_buffer_phys_end = gPipe_buffer_start + gPipe_buffer_size;
+        gSmudge_space = BrMemAllocate(offsetof(tPipe_smudge_data, vertex_changes) + sizeof(tSmudged_vertex) * 2400, kMem_pipe_model_geometry);
+        // DAT_00532008 = 0;
+        BrVector3SetFloat(&gZero_vector, 0.f, 0.f, 0.f);
+        gModel_geometry_space = (tPipe_model_geometry_data*)gSmudge_space;
+        gLocal_buffer = BrMemAllocate(LOCAL_BUFFER_SIZE, kMem_pipe_model_geometry);
+    } else {
+        gPipe_buffer_start = NULL;
+        gLocal_buffer = NULL;
+        gModel_geometry_space = NULL;
+        gSmudge_space = NULL;
+    }
+    ResetPiping();
 }
 
 // IDA: void __cdecl DisposePiping()
 void DisposePiping() {
     LOG_TRACE("()");
 
-    STUB();
+    if (gPipe_buffer_start != NULL) {
+        PDDisposeActionReplayBuffer((char*)gPipe_buffer_start);
+    }
+    gPipe_buffer_start = NULL;
+    if (gModel_geometry_space != NULL) {
+        BrMemFree(gModel_geometry_space);
+        gModel_geometry_space = NULL;
+    }
+    if (gLocal_buffer != NULL) {
+        BrMemFree(gLocal_buffer);
+        gLocal_buffer = NULL;
+    }
 }
 
 // IDA: void __cdecl InitLastDamageArrayEtc()
@@ -650,7 +972,7 @@ void InitLastDamageArrayEtc() {
                     car->frame_start_damage[j] = 0;
                 }
             }
-            car->car_ID = (cat << 8) + i;
+            car->car_ID = (cat << 8) | i;
         }
     }
 }
@@ -705,7 +1027,7 @@ void PipeCarPositions() {
             } else {
                 car = GetCarSpec(cat, i);
             }
-            AddCarToPipingSession(cat * 0x100 + i,
+            AddCarToPipingSession((cat << 8) | i,
                 &car->car_master_actor->t.t.mat, &car->v, car->speedo_speed,
                 car->lf_sus_position, car->rf_sus_position, car->lr_sus_position, car->rr_sus_position,
                 car->steering_angle, car->revs, car->gear, car->frame_collision_flag);
@@ -737,7 +1059,7 @@ void PipeCarPositions() {
                         StartPipingSession(ePipe_chunk_damage);
                         session_started = 1;
                     }
-                    AddDamageToPipingSession(cat * 0x100 + i, damage_deltas);
+                    AddDamageToPipingSession((cat << 8) | i, damage_deltas);
                 }
             }
         }
@@ -750,13 +1072,15 @@ void PipeCarPositions() {
 // IDA: void __cdecl ResetPipePlayToEnd()
 void ResetPipePlayToEnd() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gPipe_play_ptr = gPipe_record_ptr;
 }
 
 // IDA: void __cdecl ResetPipePlayToStart()
 void ResetPipePlayToStart() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gPipe_play_ptr = gPipe_buffer_oldest;
 }
 
 // IDA: tU8* __cdecl GetPipePlayPtr()
@@ -777,7 +1101,85 @@ void SetPipePlayPtr(tU8* pPtr) {
 void AdvanceChunkPtr(tPipe_chunk** pChunk, tChunk_subject_index pType) {
     tPipe_chunk* old_chunk;
     LOG_TRACE("(%p, %d)", pChunk, pType);
-    NOT_IMPLEMENTED();
+
+    old_chunk = *pChunk;
+    if (gDisable_advance) {
+        return;
+    }
+    switch (pType) {
+    case ePipe_chunk_model_geometry:
+        *(tU8**)pChunk += offsetof(tPipe_model_geometry_data, vertex_changes) + (*pChunk)->chunk_data.model_geometry_data.vertex_count * sizeof(tChanged_vertex);
+        break;
+    case ePipe_chunk_pedestrian:
+        *(tU8**)pChunk += (((*pChunk)->chunk_data.pedestrian_data.hit_points <= 0) ? sizeof(tPipe_pedestrian_data) : offsetof(tPipe_pedestrian_data, spin_period));
+        break;
+    case ePipe_chunk_frame_boundary:
+        *(tU8**)pChunk += sizeof(tPipe_frame_boundary_data);
+        break;
+    case ePipe_chunk_car:
+        *(tU8**)pChunk += sizeof(tPipe_car_data);
+        break;
+    case ePipe_chunk_sound:
+        *(tU8**)pChunk += sizeof(tPipe_sound_data);
+        break;
+    case ePipe_chunk_damage:
+        *(tU8**)pChunk += sizeof(tPipe_damage_data);
+        break;
+    case ePipe_chunk_special:
+        *(tU8**)pChunk += sizeof(tPipe_special_data);
+        break;
+    case ePipe_chunk_ped_gib:
+        *(tU8**)pChunk += sizeof(tPipe_ped_gib_data);
+        break;
+    case ePipe_chunk_incident:
+        *(tU8**)pChunk += sizeof(tPipe_incident_data);
+        break;
+    case ePipe_chunk_spark:
+        *(tU8**)pChunk += sizeof(tPipe_spark_data);
+        break;
+    case ePipe_chunk_shrapnel:
+        *(tU8**)pChunk += (((*pChunk)->subject_index & 0x8000) ? sizeof(tPipe_shrapnel_data) : offsetof(tPipe_shrapnel_data, age));
+        break;
+    case ePipe_chunk_screen_shake:
+        *(tU8**)pChunk += sizeof(tPipe_screen_shake_data);
+        break;
+    case ePipe_chunk_groove_stop:
+        *(tU8**)pChunk += sizeof(tPipe_groove_stop_data);
+        break;
+    case ePipe_chunk_non_car:
+        *(tU8**)pChunk += sizeof(tPipe_non_car_data);
+        break;
+    case ePipe_chunk_smoke:
+        *(tU8**)pChunk += sizeof(tPipe_smoke_data);
+        break;
+    case ePipe_chunk_oil_spill:
+        *(tU8**)pChunk += sizeof(tPipe_oil_spill_data);
+        break;
+    case ePipe_chunk_smoke_column:
+        *(tU8**)pChunk += sizeof(tPipe_smoke_column_data);
+        break;
+    case ePipe_chunk_flame:
+        *(tU8**)pChunk += sizeof(tPipe_flame_data);
+        break;
+    case ePipe_chunk_smudge:
+        *(tU8**)pChunk += offsetof(tPipe_smudge_data, vertex_changes) + (*pChunk)->chunk_data.smudge_data.vertex_count * sizeof(tSmudged_vertex);
+        break;
+    case ePipe_chunk_splash:
+        *(tU8**)pChunk += sizeof(tPipe_splash_data);
+        break;
+    case ePipe_chunk_prox_ray:
+        *(tU8**)pChunk += sizeof(tPipe_prox_ray_data);
+        break;
+    case ePipe_chunk_skid_adjustment:
+        *(tU8**)pChunk += sizeof(tPipe_skid_adjustment);
+        break;
+    }
+    *(tU8**)pChunk += offsetof(tPipe_chunk, chunk_data);
+    if (*(tU8**)pChunk == gEnd_of_session) {
+        *pChunk = old_chunk;
+    } else if (*(tU8**)pChunk > gEnd_of_session) {
+        *pChunk = old_chunk;
+    }
 }
 
 // IDA: void __usercall ApplyModelGeometry(tPipe_chunk **pChunk@<EAX>)
@@ -786,7 +1188,19 @@ void ApplyModelGeometry(tPipe_chunk** pChunk) {
     br_model* model_ptr;
     tCar_spec* car;
     LOG_TRACE("(%p)", pChunk);
-    NOT_IMPLEMENTED();
+
+    if (((*pChunk)->subject_index & 0xff00) == 0) {
+        car = &gProgram_state.current_car;
+    } else {
+        car = GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff);
+    }
+    model_ptr = car->car_model_actors[(*pChunk)->chunk_data.model_geometry_data.model_index].actor->model;
+    for (i = 0; i < (*pChunk)->chunk_data.model_geometry_data.vertex_count; i++) {
+        BrVector3Accumulate(&model_ptr->vertices[(*pChunk)->chunk_data.model_geometry_data.vertex_changes[i].vertex_index].p,
+            &(*pChunk)->chunk_data.model_geometry_data.vertex_changes[i].delta_coordinates);
+    }
+    SetModelForUpdate(model_ptr, car, 0);
+    AdvanceChunkPtr(pChunk, ePipe_chunk_model_geometry);
 }
 
 // IDA: void __usercall DoSmudge(tPipe_chunk **pChunk@<EAX>, int pDir@<EDX>)
@@ -798,94 +1212,218 @@ void DoSmudge(tPipe_chunk** pChunk, int pDir) {
     tCar_spec* car;
     int group;
     LOG_TRACE("(%p, %d)", pChunk, pDir);
-    NOT_IMPLEMENTED();
+
+    if (((*pChunk)->subject_index & 0xff00) == 0) {
+        car = &gProgram_state.current_car;
+    } else {
+        car = GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff);
+    }
+    model_ptr = car->car_model_actors[(*pChunk)->chunk_data.smudge_data.model_index].actor->model;
+    for (i = 0; i < (*pChunk)->chunk_data.smudge_data.vertex_count; i++) {
+        v = (*pChunk)->chunk_data.smudge_data.vertex_changes[i].vertex_index;
+        inc = (*pChunk)->chunk_data.smudge_data.vertex_changes[i].light_index * pDir;
+        V11MODEL(model_ptr)->groups->vertex_colours[v] = ((V11MODEL(model_ptr)->groups->vertex_colours[v] >> 24) + inc) << 24;
+        if (model_ptr->flags & BR_MODF_UPDATEABLE) {
+            model_ptr->vertices[V11MODEL(model_ptr)->groups->vertex_user[v]].index = (V11MODEL(model_ptr)->groups->vertex_colours[v] >> 24) + inc;
+        }
+    }
 }
 
 // IDA: void __usercall ApplySmudge(tPipe_chunk **pChunk@<EAX>)
 void ApplySmudge(tPipe_chunk** pChunk) {
     LOG_TRACE("(%p)", pChunk);
-    NOT_IMPLEMENTED();
+
+    DoSmudge(pChunk, 1);
+    AdvanceChunkPtr(pChunk, ePipe_chunk_smudge);
 }
 
 // IDA: void __usercall ApplyPedestrian(tPipe_chunk **pChunk@<EAX>)
 void ApplyPedestrian(tPipe_chunk** pChunk) {
     LOG_TRACE("(%p)", pChunk);
-    NOT_IMPLEMENTED();
+
+    AdjustPedestrian(
+        (*pChunk)->subject_index,
+        ((*pChunk)->chunk_data.pedestrian_data.action_and_frame_index & 0x70) >> 4,
+        (*pChunk)->chunk_data.pedestrian_data.action_and_frame_index & 0x0f,
+        (*pChunk)->chunk_data.pedestrian_data.hit_points,
+        (*pChunk)->chunk_data.pedestrian_data.action_and_frame_index >> 7,
+        (*pChunk)->chunk_data.pedestrian_data.parent,
+        (*pChunk)->chunk_data.pedestrian_data.parent_actor,
+        (*pChunk)->chunk_data.pedestrian_data.spin_period,
+        (*pChunk)->chunk_data.pedestrian_data.jump_magnitude,
+        &(*pChunk)->chunk_data.pedestrian_data.offset,
+        &(*pChunk)->chunk_data.pedestrian_data.new_translation);
+    AdvanceChunkPtr(pChunk, ePipe_chunk_pedestrian);
 }
 
 // IDA: void __usercall ApplySpark(tPipe_chunk **pChunk@<EAX>)
 void ApplySpark(tPipe_chunk** pChunk) {
     LOG_TRACE("(%p)", pChunk);
-    NOT_IMPLEMENTED();
+
+    AdjustSpark((*pChunk)->subject_index,
+        &(*pChunk)->chunk_data.spark_data.pos,
+        &(*pChunk)->chunk_data.spark_data.v);
+    AdvanceChunkPtr(pChunk, ePipe_chunk_spark);
 }
 
 // IDA: void __usercall ApplyShrapnel(tPipe_chunk **pChunk@<EAX>)
 void ApplyShrapnel(tPipe_chunk** pChunk) {
     LOG_TRACE("(%p)", pChunk);
-    NOT_IMPLEMENTED();
+
+    AdjustShrapnel((*pChunk)->subject_index,
+        &(*pChunk)->chunk_data.shrapnel_data.pos,
+        (*pChunk)->chunk_data.shrapnel_data.age,
+        (*pChunk)->chunk_data.shrapnel_data.material);
+    AdvanceChunkPtr(pChunk, ePipe_chunk_shrapnel);
 }
 
 // IDA: void __usercall ApplyScreenWobble(tPipe_chunk **pChunk@<EAX>)
 void ApplyScreenWobble(tPipe_chunk** pChunk) {
     LOG_TRACE("(%p)", pChunk);
-    NOT_IMPLEMENTED();
+
+    SetScreenWobble((*pChunk)->chunk_data.screen_shake_data.wobble_x,
+        (*pChunk)->chunk_data.screen_shake_data.wobble_y);
+    AdvanceChunkPtr(pChunk, ePipe_chunk_screen_shake);
 }
 
 // IDA: void __usercall ApplyGrooveStop(tPipe_chunk **pChunk@<EAX>)
 void ApplyGrooveStop(tPipe_chunk** pChunk) {
     LOG_TRACE("(%p)", pChunk);
-    NOT_IMPLEMENTED();
+
+    SetGrooveInterrupt((*pChunk)->subject_index,
+        &(*pChunk)->chunk_data.groove_stop_data.matrix,
+        (*pChunk)->chunk_data.groove_stop_data.path_interrupt,
+        (*pChunk)->chunk_data.groove_stop_data.object_interrupt,
+        (*pChunk)->chunk_data.groove_stop_data.path_resumption,
+        (*pChunk)->chunk_data.groove_stop_data.object_resumption);
+    AdvanceChunkPtr(pChunk, ePipe_chunk_groove_stop);
 }
 
 // IDA: void __usercall ApplyNonCar(tPipe_chunk **pChunk@<EAX>)
 void ApplyNonCar(tPipe_chunk** pChunk) {
     LOG_TRACE("(%p)", pChunk);
-    NOT_IMPLEMENTED();
+
+    AdjustNonCar((*pChunk)->chunk_data.non_car_data.actor,
+        &(*pChunk)->chunk_data.non_car_data.mat);
+    AdvanceChunkPtr(pChunk, ePipe_chunk_non_car);
 }
 
 // IDA: void __usercall ApplySmoke(tPipe_chunk **pChunk@<EAX>)
 void ApplySmoke(tPipe_chunk** pChunk) {
     br_vector3 pos;
     LOG_TRACE("(%p)", pChunk);
-    NOT_IMPLEMENTED();
+
+    GetReducedPos(&pos, &(*pChunk)->chunk_data.smoke_data.pos);
+    AdjustSmoke((*pChunk)->subject_index,
+        (*pChunk)->chunk_data.smoke_data.type,
+        &pos,
+        (*pChunk)->chunk_data.smoke_data.radius / 1024.f,
+        (*pChunk)->chunk_data.smoke_data.strength / 256.f);
+    AdvanceChunkPtr(pChunk, ePipe_chunk_smoke);
 }
 
 // IDA: void __usercall ApplySmokeColumn(tPipe_chunk **pChunk@<EAX>)
 void ApplySmokeColumn(tPipe_chunk** pChunk) {
     LOG_TRACE("(%p)", pChunk);
-    NOT_IMPLEMENTED();
+
+    AdjustSmokeColumn((*pChunk)->subject_index & 0x3fff,
+        ((((*pChunk)->chunk_data.smoke_column_data.car_ID) >> 8) == 0) ? &gProgram_state.current_car : GetCarSpec((*pChunk)->chunk_data.smoke_column_data.car_ID >> 8, (*pChunk)->chunk_data.smoke_column_data.car_ID & 0xff),
+        (*pChunk)->chunk_data.smoke_column_data.vertex,
+        (*pChunk)->subject_index >> 14);
+    AdvanceChunkPtr(pChunk, ePipe_chunk_smoke_column);
 }
 
 // IDA: void __usercall ApplyFlame(tPipe_chunk **pChunk@<EAX>)
 void ApplyFlame(tPipe_chunk** pChunk) {
     LOG_TRACE("(%p)", pChunk);
-    NOT_IMPLEMENTED();
+
+    AdjustFlame((*pChunk)->subject_index,
+        (*pChunk)->chunk_data.flame_data.frame_count,
+        (*pChunk)->chunk_data.flame_data.scale_x,
+        (*pChunk)->chunk_data.flame_data.scale_y,
+        (*pChunk)->chunk_data.flame_data.offset_x,
+#if DETHRACE_FIX_BUGS
+        (*pChunk)->chunk_data.flame_data.offset_z);
+#else
+        (*pChunk)->chunk_data.flame_data.offset_x);
+#endif
+    AdvanceChunkPtr(pChunk, ePipe_chunk_flame);
 }
 
 // IDA: void __usercall ApplySplash(tPipe_chunk **pChunk@<EAX>)
 void ApplySplash(tPipe_chunk** pChunk) {
     tCar_spec* c;
     LOG_TRACE("(%p)", pChunk);
-    NOT_IMPLEMENTED();
+
+    if (((*pChunk)->subject_index & 0xff00) == 0) {
+        c = &gProgram_state.current_car;
+    } else {
+        c = GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff);
+    }
+    c->water_d = (*pChunk)->chunk_data.splash_data.d;
+    BrVector3Copy(&c->water_normal, &(*pChunk)->chunk_data.splash_data.normal);
+    AdvanceChunkPtr(pChunk, ePipe_chunk_splash);
 }
 
 // IDA: void __usercall ApplyOilSpill(tPipe_chunk **pChunk@<EAX>, tU32 pStop_time@<EDX>)
 void ApplyOilSpill(tPipe_chunk** pChunk, tU32 pStop_time) {
     LOG_TRACE("(%p, %d)", pChunk, pStop_time);
-    NOT_IMPLEMENTED();
+
+    AdjustOilSpill((*pChunk)->subject_index,
+        &(*pChunk)->chunk_data.oil_data.mat,
+        (*pChunk)->chunk_data.oil_data.full_size,
+        (*pChunk)->chunk_data.oil_data.grow_rate,
+        (*pChunk)->chunk_data.oil_data.spill_time,
+        pStop_time,
+        (*pChunk)->chunk_data.oil_data.car,
+        &(*pChunk)->chunk_data.oil_data.original_pos,
+        (*pChunk)->chunk_data.oil_data.pixelmap);
+    AdvanceChunkPtr(pChunk, ePipe_chunk_oil_spill);
 }
 
 // IDA: void __usercall ApplyFrameBoundary(tPipe_chunk **pChunk@<EAX>)
 void ApplyFrameBoundary(tPipe_chunk** pChunk) {
     tU32 result;
     LOG_TRACE("(%p)", pChunk);
-    NOT_IMPLEMENTED();
+
+    gLast_replay_frame_time = (*pChunk)->chunk_data.frame_boundary_data.time;
+    // DAT_0054b244 = PDGetTotalTime();
+    AdvanceChunkPtr(pChunk, ePipe_chunk_frame_boundary);
 }
 
 // IDA: void __usercall ApplySound(tPipe_chunk **pChunk@<EAX>)
 void ApplySound(tPipe_chunk** pChunk) {
     LOG_TRACE("(%p)", pChunk);
-    NOT_IMPLEMENTED();
+
+    if (!gDisable_sound) {
+        if ((*pChunk)->chunk_data.sound_data.volume == 0) {
+            DRS3StartSound2(GetOutletFromIndex((*pChunk)->chunk_data.sound_data.outlet_index),
+                (*pChunk)->subject_index,
+                1,
+                -1,
+                -1,
+                65535.f * GetReplayRate(),
+                0x10000);
+        } else if (BrVector3LengthSquared(&(*pChunk)->chunk_data.sound_data.position) == 0) {
+            DRS3StartSound2(GetOutletFromIndex((*pChunk)->chunk_data.sound_data.outlet_index),
+                (*pChunk)->subject_index,
+                1,
+                (*pChunk)->chunk_data.sound_data.volume & 0xff,
+                (*pChunk)->chunk_data.sound_data.volume >> 8,
+                (float)(*pChunk)->chunk_data.sound_data.pitch * fabsf(GetReplayRate()),
+                0x10000);
+        } else {
+            DRS3StartSound3D(GetOutletFromIndex((*pChunk)->chunk_data.sound_data.outlet_index),
+                (*pChunk)->subject_index,
+                &(*pChunk)->chunk_data.sound_data.position,
+                &gZero_vector,
+                1,
+                (*pChunk)->chunk_data.sound_data.volume,
+                (float)(*pChunk)->chunk_data.sound_data.pitch * fabsf(GetReplayRate()),
+                0x10000);
+        }
+    }
+    AdvanceChunkPtr(pChunk, ePipe_chunk_sound);
 }
 
 // IDA: void __usercall ApplyCar(tPipe_chunk **pChunk@<EAX>)
@@ -894,7 +1432,35 @@ void ApplyCar(tPipe_chunk** pChunk) {
     br_vector3 com_offset_c;
     br_vector3 com_offset_w;
     LOG_TRACE("(%p)", pChunk);
-    NOT_IMPLEMENTED();
+
+    if (((*pChunk)->subject_index & 0xff00) == 0) {
+        car = &gProgram_state.current_car;
+    } else {
+        car = GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0x00ff);
+    }
+    BrMatrix34Copy(&car->car_master_actor->t.t.mat, &(*pChunk)->chunk_data.car_data.transformation);
+    BrVector3Copy(&car->v, &(*pChunk)->chunk_data.car_data.velocity);
+    BrMatrix34TApplyV(&car->velocity_car_space, &car->v, &car->car_master_actor->t.t.mat);
+    BrVector3InvScale(&car->velocity_car_space, &car->velocity_car_space, WORLD_SCALE);
+    if (BrVector3LengthSquared(&car->velocity_car_space) >= .0001f) {
+        BrVector3Normalise(&car->direction, &car->v);
+    } else {
+        BrVector3Negate(&car->direction, (br_vector3*)car->car_master_actor->t.t.mat.m[2]);
+    }
+    BrVector3Copy(&car->pos, &car->car_master_actor->t.t.translate.t);
+    BrVector3InvScale(&com_offset_c, &car->cmpos, WORLD_SCALE);
+    BrMatrix34ApplyV(&com_offset_w, &com_offset_c, &car->car_master_actor->t.t.mat);
+    BrVector3Accumulate(&car->pos, &com_offset_w);
+    car->speedo_speed = .07f * (*pChunk)->chunk_data.car_data.speedo_speed / 32767.f;
+    car->lf_sus_position = 0.15f * (*pChunk)->chunk_data.car_data.lf_sus_position / 127.f;
+    car->rf_sus_position = 0.15f * (*pChunk)->chunk_data.car_data.rf_sus_position / 127.f;
+    car->lr_sus_position = 0.15f * (*pChunk)->chunk_data.car_data.lr_sus_position / 127.f;
+    car->rr_sus_position = 0.15f * (*pChunk)->chunk_data.car_data.rr_sus_position / 127.f;
+    car->steering_angle = 60.f * (*pChunk)->chunk_data.car_data.steering_angle / 32767.f;
+    car->revs = 10 * ((*pChunk)->chunk_data.car_data.revs_and_gear & 0x7ff);
+    car->gear = ((*pChunk)->chunk_data.car_data.revs_and_gear >> 12) - 1;
+    car->frame_collision_flag = ((*pChunk)->chunk_data.car_data.revs_and_gear >> 11) & 0x1;
+    AdvanceChunkPtr(pChunk, ePipe_chunk_car);
 }
 
 // IDA: void __usercall ApplyDamage(tPipe_chunk **pChunk@<EAX>)
@@ -902,31 +1468,76 @@ void ApplyDamage(tPipe_chunk** pChunk) {
     tCar_spec* car;
     int i;
     LOG_TRACE("(%p)", pChunk);
-    NOT_IMPLEMENTED();
+
+    if (((*pChunk)->subject_index & 0xff00) == 0) {
+        car = &gProgram_state.current_car;
+    } else {
+        car = GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0x00ff);
+    }
+    for (i = 0; i < COUNT_OF(car->damage_units); i++) {
+        car->damage_units[i].damage_level += (*pChunk)->chunk_data.damage_data.damage_delta[i];
+    }
+    AdvanceChunkPtr(pChunk, ePipe_chunk_damage);
 }
 
 // IDA: void __usercall ApplySpecial(tPipe_chunk **pChunk@<EAX>)
 void ApplySpecial(tPipe_chunk** pChunk) {
     LOG_TRACE("(%p)", pChunk);
-    NOT_IMPLEMENTED();
+
+    switch ((*pChunk)->subject_index) {
+    case 0:
+        if (fabsf(GetReplayRate()) <= 1.f) {
+            FadePaletteDown();
+        }
+        break;
+    case 1:
+        gPed_scale_factor = 2.0f;
+        break;
+    case 2:
+        gPed_scale_factor = 1.0f;
+        break;
+    case 3:
+        gPed_scale_factor = 0.5f;
+        break;
+    case 4:
+        gPed_scale_factor = 1.0f;
+        break;
+    }
+    AdvanceChunkPtr(pChunk, ePipe_chunk_special);
 }
 
 // IDA: void __usercall ApplyPedGib(tPipe_chunk **pChunk@<EAX>)
 void ApplyPedGib(tPipe_chunk** pChunk) {
     LOG_TRACE("(%p)", pChunk);
-    NOT_IMPLEMENTED();
+
+    AdjustPedGib((*pChunk)->subject_index,
+        (*pChunk)->chunk_data.ped_gib_data.size,
+        (*pChunk)->chunk_data.ped_gib_data.gib_index,
+        (*pChunk)->chunk_data.ped_gib_data.ped_parent_index,
+        &(*pChunk)->chunk_data.ped_gib_data.transform);
+    AdvanceChunkPtr(pChunk, ePipe_chunk_ped_gib);
 }
 
 // IDA: void __usercall ApplyProxRay(tPipe_chunk **pChunk@<EAX>)
 void ApplyProxRay(tPipe_chunk** pChunk) {
     LOG_TRACE("(%p)", pChunk);
-    NOT_IMPLEMENTED();
+
+    AdjustProxRay(
+        (*pChunk)->subject_index,
+        (*pChunk)->chunk_data.prox_ray_data.car_ID,
+        (*pChunk)->chunk_data.prox_ray_data.ped_index,
+        (*pChunk)->chunk_data.prox_ray_data.time);
+    AdvanceChunkPtr(pChunk, ePipe_chunk_prox_ray);
 }
 
 // IDA: void __usercall ApplySkidAdjustment(tPipe_chunk **pChunk@<EAX>)
 void ApplySkidAdjustment(tPipe_chunk** pChunk) {
     LOG_TRACE("(%p)", pChunk);
-    NOT_IMPLEMENTED();
+
+    AdjustSkid((*pChunk)->subject_index,
+        &(*pChunk)->chunk_data.skid_adjustment.matrix,
+        (*pChunk)->chunk_data.skid_adjustment.material_index);
+    AdvanceChunkPtr(pChunk, ePipe_chunk_skid_adjustment);
 }
 
 // IDA: int __usercall ApplyPipedSession@<EAX>(tU8 **pPtr@<EAX>)
@@ -936,19 +1547,129 @@ int ApplyPipedSession(tU8** pPtr) {
     tPipe_chunk* chunk_ptr;
     tPipe_chunk_type chunk_type;
     LOG_TRACE("(%p)", pPtr);
-    NOT_IMPLEMENTED();
+
+    if (*pPtr == gPipe_record_ptr) {
+        return 1;
+    }
+    gEnd_of_session = *pPtr + (LengthOfSession((tPipe_session *)*pPtr) - sizeof(tU16));
+    REPLAY_DEBUG_ASSERT(((tPipe_session *)*pPtr)->magic1 == REPLAY_DEBUG_MAGIC1);
+    chunk_ptr = (tPipe_chunk *)(*pPtr + offsetof(tPipe_session, chunks));
+    return_value = 0;
+    chunk_type = ((tPipe_session *)*pPtr)->chunk_type;
+    for (i = 0; i < ((tPipe_session *)*pPtr)->number_of_chunks; i++) {
+        switch (chunk_type) {
+        case ePipe_chunk_model_geometry:
+            ApplyModelGeometry(&chunk_ptr);
+            break;
+        case ePipe_chunk_pedestrian:
+            ApplyPedestrian(&chunk_ptr);
+            break;
+        case ePipe_chunk_frame_boundary:
+            ApplyFrameBoundary(&chunk_ptr);
+            return_value = 1;
+            break;
+        case ePipe_chunk_car:
+            ApplyCar(&chunk_ptr);
+            break;
+        case ePipe_chunk_sound:
+            ApplySound(&chunk_ptr);
+            break;
+        case ePipe_chunk_damage:
+            ApplyDamage(&chunk_ptr);
+            break;
+        case ePipe_chunk_special:
+            ApplySpecial(&chunk_ptr);
+            break;
+        case ePipe_chunk_ped_gib:
+            ApplyPedGib(&chunk_ptr);
+            break;
+        case ePipe_chunk_incident:
+            AdvanceChunkPtr(&chunk_ptr, ePipe_chunk_incident);
+            break;
+        case ePipe_chunk_spark:
+            ApplySpark(&chunk_ptr);
+            break;
+        case ePipe_chunk_shrapnel:
+            ApplyShrapnel(&chunk_ptr);
+            break;
+        case ePipe_chunk_screen_shake:
+            ApplyScreenWobble(&chunk_ptr);
+            break;
+        case ePipe_chunk_groove_stop:
+            ApplyGrooveStop(&chunk_ptr);
+            break;
+        case ePipe_chunk_non_car:
+            ApplyNonCar(&chunk_ptr);
+            break;
+        case ePipe_chunk_smoke:
+            ApplySmoke(&chunk_ptr);
+            break;
+        case ePipe_chunk_oil_spill:
+            ApplyOilSpill(&chunk_ptr, 0);
+            break;
+        case ePipe_chunk_smoke_column:
+            ApplySmokeColumn(&chunk_ptr);
+            break;
+        case ePipe_chunk_flame:
+            ApplyFlame(&chunk_ptr);
+            break;
+        case ePipe_chunk_smudge:
+            ApplySmudge(&chunk_ptr);
+            break;
+        case ePipe_chunk_splash:
+            ApplySplash(&chunk_ptr);
+            break;
+        case ePipe_chunk_prox_ray:
+            ApplyProxRay(&chunk_ptr);
+            break;
+        case ePipe_chunk_skid_adjustment:
+            ApplySkidAdjustment(&chunk_ptr);
+            break;
+        default:
+            break;
+        }
+    }
+#if defined(DETHRACE_FIX_BUGS)
+    *pPtr += PIPE_ALIGN(LengthOfSession((tPipe_session *)*pPtr));
+#else
+    *pPtr += LengthOfSession((tPipe_session *)*pPtr);
+#endif
+    if (*pPtr >= gPipe_buffer_working_end && *pPtr != gPipe_record_ptr) {
+        *pPtr = gPipe_buffer_start;
+    }
+    return return_value;
 }
 
 // IDA: int __usercall MoveSessionPointerBackOne@<EAX>(tU8 **pPtr@<EAX>)
 int MoveSessionPointerBackOne(tU8** pPtr) {
     LOG_TRACE("(%p)", pPtr);
-    NOT_IMPLEMENTED();
+
+    if (*pPtr == gPipe_buffer_oldest && *pPtr != gPipe_record_ptr) {
+        return 1;
+    }
+    if (*pPtr == gPipe_buffer_start) {
+        *pPtr = gPipe_buffer_working_end;
+    }
+    *pPtr -= sizeof(tU16);
+    *pPtr -= *(tU16*)*pPtr;
+    REPLAY_DEBUG_ASSERT(((tPipe_session*)*pPtr)->magic1 == REPLAY_DEBUG_MAGIC1);
+    return 0;
 }
 
 // IDA: int __usercall MoveSessionPointerForwardOne@<EAX>(tU8 **pPtr@<EAX>)
 int MoveSessionPointerForwardOne(tU8** pPtr) {
     LOG_TRACE("(%p)", pPtr);
-    NOT_IMPLEMENTED();
+
+    REPLAY_DEBUG_ASSERT(((tPipe_session*)*pPtr)->magic1 == REPLAY_DEBUG_MAGIC1);
+#if defined(DETHRACE_FIX_BUGS)
+    *pPtr += PIPE_ALIGN(LengthOfSession((tPipe_session*)*pPtr));
+#else
+    *pPtr += LengthOfSession((tPipe_session*)*pPtr);
+#endif
+    if (*pPtr >= gPipe_buffer_working_end && *pPtr != gPipe_record_ptr) {
+        *pPtr = gPipe_buffer_start;
+    }
+    return *pPtr == gPipe_record_ptr;
 }
 
 // IDA: tPipe_chunk* __usercall FindPreviousChunk@<EAX>(tU8 *pPtr@<EAX>, tPipe_chunk_type pType@<EDX>, tChunk_subject_index pIndex@<EBX>)
@@ -960,7 +1681,31 @@ tPipe_chunk* FindPreviousChunk(tU8* pPtr, tPipe_chunk_type pType, tChunk_subject
     tPipe_chunk* mr_chunky;
     tChunk_subject_index masked_index;
     LOG_TRACE("(%p, %d, %d)", pPtr, pType, pIndex);
-    NOT_IMPLEMENTED();
+
+    ptr = pPtr;
+    chunk_counter = 0;
+    masked_index = pIndex & 0x0fff;
+    while (1) {
+        if (!MoveSessionPointerBackOne(&ptr)) {
+            reached_end = chunk_counter >= gMax_rewind_chunks;
+            chunk_counter++;
+        } else {
+            reached_end = 1;
+        }
+        if (!reached_end) {
+            gEnd_of_session = ptr + LengthOfSession((tPipe_session*)ptr) - sizeof(tU16);
+            mr_chunky = &((tPipe_session*)ptr)->chunks;
+            for (i = 0; i < ((tPipe_session*)ptr)->number_of_chunks && ((tPipe_session*)ptr)->chunk_type == pType; i++) {
+                if ((mr_chunky->subject_index & 0xfff) == masked_index) {
+                    return mr_chunky;
+                }
+                AdvanceChunkPtr(&mr_chunky, pType);
+            }
+        }
+        if (reached_end) {
+            return NULL;
+        }
+    }
 }
 
 // IDA: void __usercall UndoModelGeometry(tPipe_chunk **pChunk@<EAX>)
@@ -969,7 +1714,20 @@ void UndoModelGeometry(tPipe_chunk** pChunk) {
     br_model* model_ptr;
     tCar_spec* car;
     LOG_TRACE("(%p)", pChunk);
-    NOT_IMPLEMENTED();
+
+    if (((*pChunk)->subject_index & 0xff00) == 0) {
+        car = &gProgram_state.current_car;
+    } else {
+        car = GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0x00ff);
+    }
+    model_ptr = car->car_model_actors[(*pChunk)->chunk_data.model_geometry_data.model_index].actor->model;
+    for (i = 0; i < (*pChunk)->chunk_data.model_geometry_data.vertex_count; i++) {
+        BrVector3Sub(&model_ptr->vertices[(*pChunk)->chunk_data.model_geometry_data.vertex_changes[i].vertex_index].p,
+            &model_ptr->vertices[(*pChunk)->chunk_data.model_geometry_data.vertex_changes[i].vertex_index].p,
+            &(*pChunk)->chunk_data.model_geometry_data.vertex_changes[i].delta_coordinates);
+    }
+    SetModelForUpdate(model_ptr, car, 0);
+    AdvanceChunkPtr(pChunk, ePipe_chunk_model_geometry);
 }
 
 // IDA: void __usercall UndoSmudge(tPipe_chunk **pChunk@<EAX>)
@@ -978,34 +1736,59 @@ void UndoSmudge(tPipe_chunk** pChunk) {
     br_model* model_ptr;
     tCar_spec* car;
     LOG_TRACE("(%p)", pChunk);
-    NOT_IMPLEMENTED();
+
+    DoSmudge(pChunk, -1);
+    AdvanceChunkPtr(pChunk, ePipe_chunk_smudge);
 }
 
 // IDA: void __usercall UndoPedestrian(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
 void UndoPedestrian(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
     LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
-    NOT_IMPLEMENTED();
+
+    temp_prev_chunk = pPrev_chunk;
+    if (pPrev_chunk == NULL) {
+        ApplyPedestrian(pChunk);
+    }
+    else {
+        gDisable_advance = 1;
+        ApplyPedestrian(&temp_prev_chunk);
+        gDisable_advance = 0;
+        AdvanceChunkPtr(pChunk, ePipe_chunk_pedestrian);
+    }
 }
 
 // IDA: void __usercall UndoFrameBoundary(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
 void UndoFrameBoundary(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
     LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
-    NOT_IMPLEMENTED();
+
+    ApplyFrameBoundary(pChunk);
+    AdvanceChunkPtr(pChunk, ePipe_chunk_frame_boundary);
 }
 
 // IDA: void __usercall UndoCar(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
 void UndoCar(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
     LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
-    NOT_IMPLEMENTED();
+
+    temp_prev_chunk = pPrev_chunk;
+    if (pPrev_chunk == NULL) {
+        ApplyCar(pChunk);
+    }
+    else {
+        gDisable_advance = 1;
+        ApplyCar(&temp_prev_chunk);
+        gDisable_advance = 0;
+        AdvanceChunkPtr(pChunk, ePipe_chunk_car);
+    }
 }
 
 // IDA: void __usercall UndoSound(tPipe_chunk **pChunk@<EAX>)
 void UndoSound(tPipe_chunk** pChunk) {
     LOG_TRACE("(%p)", pChunk);
-    NOT_IMPLEMENTED();
+
+    AdvanceChunkPtr(pChunk,ePipe_chunk_sound);
 }
 
 // IDA: void __usercall UndoDamage(tPipe_chunk **pChunk@<EAX>)
@@ -1013,101 +1796,211 @@ void UndoDamage(tPipe_chunk** pChunk) {
     tCar_spec* car;
     int i;
     LOG_TRACE("(%p)", pChunk);
-    NOT_IMPLEMENTED();
+
+    if (((*pChunk)->subject_index & 0xff00) == 0) {
+        car = &gProgram_state.current_car;
+    }
+    else {
+        car = GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff);
+    }
+    for (i = 0; i < COUNT_OF(car->damage_units); i++) {
+        car->damage_units[i].damage_level -= (*pChunk)->chunk_data.damage_data.damage_delta[i];
+    }
+    AdvanceChunkPtr(pChunk, ePipe_chunk_damage);
 }
 
 // IDA: void __usercall UndoSpecial(tPipe_chunk **pChunk@<EAX>)
 void UndoSpecial(tPipe_chunk** pChunk) {
     LOG_TRACE("(%p)", pChunk);
-    NOT_IMPLEMENTED();
+
+    if ((*pChunk)->subject_index == 0) {
+        ApplySpecial(pChunk);
+    } else {
+        switch ((*pChunk)->subject_index) {
+        case 1:
+            gPed_scale_factor = 1.0f;
+            break;
+        case 2:
+            gPed_scale_factor = 2.0f;
+            break;
+        case 3:
+            gPed_scale_factor = 1.0f;
+            break;
+        case 4:
+            gPed_scale_factor = 0.5f;
+            break;
+        }
+        AdvanceChunkPtr(pChunk, ePipe_chunk_special);
+    }
 }
 
 // IDA: void __usercall UndoPedGib(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
 void UndoPedGib(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
     LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
-    NOT_IMPLEMENTED();
+
+    temp_prev_chunk = pPrev_chunk;
+    gDisable_advance = 1;
+    if (pPrev_chunk != NULL) {
+        ApplyPedGib(&temp_prev_chunk);
+    }
+    gDisable_advance = 0;
+    AdvanceChunkPtr(pChunk, ePipe_chunk_ped_gib);
 }
 
 // IDA: void __usercall UndoSpark(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
 void UndoSpark(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
     LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
-    NOT_IMPLEMENTED();
+
+    temp_prev_chunk = pPrev_chunk;
+    gDisable_advance = 1;
+    if (pPrev_chunk != NULL) {
+        ApplySpark(&temp_prev_chunk);
+    }
+    gDisable_advance = 0;
+    AdvanceChunkPtr(pChunk, ePipe_chunk_spark);
 }
 
 // IDA: void __usercall UndoShrapnel(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
 void UndoShrapnel(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
     LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
-    NOT_IMPLEMENTED();
+
+    temp_prev_chunk = pPrev_chunk;
+    gDisable_advance = 1;
+    if (pPrev_chunk != NULL) {
+        ApplyShrapnel(&temp_prev_chunk);
+    }
+    gDisable_advance = 0;
+    AdvanceChunkPtr(pChunk, ePipe_chunk_shrapnel);
 }
 
 // IDA: void __usercall UndoScreenWobble(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
 void UndoScreenWobble(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
     LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
-    NOT_IMPLEMENTED();
+
+    temp_prev_chunk = pPrev_chunk;
+    gDisable_advance = 1;
+    if (pPrev_chunk == NULL) {
+        SetScreenWobble(0, 0);
+    }
+    else {
+        ApplyScreenWobble(&temp_prev_chunk);
+    }
+    gDisable_advance = 0;
+    AdvanceChunkPtr(pChunk, ePipe_chunk_screen_shake);
 }
 
 // IDA: void __usercall UndoGrooveStop(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
 void UndoGrooveStop(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
     LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
-    NOT_IMPLEMENTED();
+
+    temp_prev_chunk = pPrev_chunk;
+    gDisable_advance = 1;
+    if (pPrev_chunk != NULL) {
+        ApplyGrooveStop(&temp_prev_chunk);
+    }
+    gDisable_advance = 0;
+    AdvanceChunkPtr(pChunk, ePipe_chunk_groove_stop);
 }
 
 // IDA: void __usercall UndoNonCar(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
 void UndoNonCar(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
     LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
-    NOT_IMPLEMENTED();
+
+    temp_prev_chunk = pPrev_chunk;
+    gDisable_advance = 1;
+    if (pPrev_chunk != NULL) {
+        ApplyNonCar(&temp_prev_chunk);
+    }
+    gDisable_advance = 0;
+    AdvanceChunkPtr(pChunk, ePipe_chunk_non_car);
 }
 
 // IDA: void __usercall UndoSmoke(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
 void UndoSmoke(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
     LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
-    NOT_IMPLEMENTED();
+
+    temp_prev_chunk = pPrev_chunk;
+    gDisable_advance = 1;
+    if (pPrev_chunk != NULL) {
+        ApplySmoke(&temp_prev_chunk);
+    }
+    gDisable_advance = 0;
+    AdvanceChunkPtr(pChunk, ePipe_chunk_smoke);
 }
 
 // IDA: void __usercall UndoSmokeColumn(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
 void UndoSmokeColumn(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
     LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
-    NOT_IMPLEMENTED();
+
+    ApplySmokeColumn(pChunk);
 }
 
 // IDA: void __usercall UndoFlame(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
 void UndoFlame(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
-    NOT_IMPLEMENTED();
+
+    ApplyFlame(pChunk);
 }
 
 // IDA: void __usercall UndoSplash(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
 void UndoSplash(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
     LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
-    NOT_IMPLEMENTED();
+
+    temp_prev_chunk = pPrev_chunk;
+    gDisable_advance = 1;
+    if (pPrev_chunk == NULL) {
+        ((((*pChunk)->subject_index & 0xff00) == 0) ? &gProgram_state.current_car : GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff))->water_d = 10000.f;
+    }
+    else {
+        ApplySplash(&temp_prev_chunk);
+    }
+    gDisable_advance = 0;
+    AdvanceChunkPtr(pChunk, ePipe_chunk_splash);
 }
 
 // IDA: void __usercall UndoOilSpill(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
 void UndoOilSpill(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
     LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
-    NOT_IMPLEMENTED();
+
+    temp_prev_chunk = pPrev_chunk;
+    gDisable_advance = 1;
+    if (pPrev_chunk != NULL) {
+        ApplyOilSpill(&temp_prev_chunk, (*pChunk)->chunk_data.oil_data.previous_stop_time);
+    }
+    gDisable_advance = 0;
+    AdvanceChunkPtr(pChunk, ePipe_chunk_oil_spill);
 }
 
 // IDA: void __usercall UndoProxRay(tPipe_chunk **pChunk@<EAX>)
 void UndoProxRay(tPipe_chunk** pChunk) {
     LOG_TRACE("(%p)", pChunk);
-    NOT_IMPLEMENTED();
+
+    ApplyProxRay(pChunk);
 }
 
 // IDA: void __usercall UndoSkidAdjustment(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
 void UndoSkidAdjustment(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
-    NOT_IMPLEMENTED();
+
+    gDisable_advance = 1;
+    if (pPrev_chunk == NULL) {
+        HideSkid((*pChunk)->subject_index);
+    }
+    else {
+        ApplySkidAdjustment(&pPrev_chunk);
+    }
+    gDisable_advance = 0;
+    AdvanceChunkPtr(pChunk, ePipe_chunk_skid_adjustment);
 }
 
 // IDA: int __usercall UndoPipedSession@<EAX>(tU8 **pPtr@<EAX>)
@@ -1119,14 +2012,110 @@ int UndoPipedSession(tU8** pPtr) {
     int i;
     tPipe_chunk_type chunk_type;
     LOG_TRACE("(%p)", pPtr);
-    NOT_IMPLEMENTED();
+
+    if (MoveSessionPointerBackOne(pPtr)) {
+        return 1;
+    }
+    REPLAY_DEBUG_ASSERT(((tPipe_session*)*pPtr)->magic1 == REPLAY_DEBUG_MAGIC1);
+    gEnd_of_session = *pPtr + LengthOfSession((tPipe_session*)*pPtr) - sizeof(tU16);
+    chunk_ptr = &((tPipe_session*)*pPtr)->chunks;
+    chunk_type = ((tPipe_session*)*pPtr)->chunk_type;
+    pushed_end_of_session = gEnd_of_session;
+    for (i = 0; i < ((tPipe_session*)pPtr)->number_of_chunks; i++) {
+        if (!(chunk_type == ePipe_chunk_model_geometry || chunk_type == ePipe_chunk_sound || chunk_type == ePipe_chunk_damage || chunk_type == ePipe_chunk_special || chunk_type == ePipe_chunk_incident || chunk_type == ePipe_chunk_prox_ray || chunk_type == ePipe_chunk_smudge)) {
+            prev_chunk = FindPreviousChunk(*pPtr, ((tPipe_session*)*pPtr)->chunk_type, chunk_ptr->subject_index);
+        }
+        gEnd_of_session = pushed_end_of_session;
+        switch (chunk_type) {
+        case ePipe_chunk_model_geometry:
+            UndoModelGeometry(&chunk_ptr);
+            break;
+        case ePipe_chunk_pedestrian:
+            UndoPedestrian(&chunk_ptr, prev_chunk);
+            break;
+        case ePipe_chunk_frame_boundary:
+            UndoFrameBoundary(&chunk_ptr, prev_chunk);
+            break;
+        case ePipe_chunk_car:
+            UndoCar(&chunk_ptr, prev_chunk);
+            break;
+        case ePipe_chunk_sound:
+            UndoSound(&chunk_ptr);
+            break;
+        case ePipe_chunk_damage:
+            UndoDamage(&chunk_ptr);
+            break;
+        case ePipe_chunk_special:
+            UndoSpecial(&chunk_ptr);
+            break;
+        case ePipe_chunk_ped_gib:
+            UndoPedGib(&chunk_ptr, prev_chunk);
+            break;
+        case ePipe_chunk_incident:
+            AdvanceChunkPtr(&chunk_ptr, ePipe_chunk_incident);
+            break;
+        case ePipe_chunk_spark:
+            UndoSpark(&chunk_ptr, prev_chunk);
+            break;
+        case ePipe_chunk_shrapnel:
+            UndoShrapnel(&chunk_ptr, prev_chunk);
+            break;
+        case ePipe_chunk_screen_shake:
+            UndoScreenWobble(&chunk_ptr, prev_chunk);
+            break;
+        case ePipe_chunk_groove_stop:
+            UndoGrooveStop(&chunk_ptr, prev_chunk);
+            break;
+        case ePipe_chunk_non_car:
+            UndoNonCar(&chunk_ptr, prev_chunk);
+            break;
+        case ePipe_chunk_smoke:
+            UndoSmoke(&chunk_ptr, prev_chunk);
+            break;
+        case ePipe_chunk_oil_spill:
+            UndoOilSpill(&chunk_ptr, prev_chunk);
+            break;
+        case ePipe_chunk_smoke_column:
+            UndoSmokeColumn(&chunk_ptr, prev_chunk);
+            break;
+        case ePipe_chunk_flame:
+            UndoFlame(&chunk_ptr, prev_chunk);
+            break;
+        case ePipe_chunk_smudge:
+            UndoSmudge(&chunk_ptr);
+            break;
+        case ePipe_chunk_splash:
+            UndoSplash(&chunk_ptr, prev_chunk);
+            break;
+        case ePipe_chunk_prox_ray:
+            UndoProxRay(&chunk_ptr);
+            break;
+        case ePipe_chunk_skid_adjustment:
+            UndoSkidAdjustment(&chunk_ptr, prev_chunk);
+            break;
+        default:
+            break;
+        }
+    }
+    temp_ptr = *pPtr;
+    if (MoveSessionPointerBackOne(&temp_ptr)) {
+        return 1;
+    }
+    return ((tPipe_session*)temp_ptr)->chunk_type == ePipe_chunk_frame_boundary;
 }
 
 // IDA: tU32 __usercall FindPrevFrameTime@<EAX>(tU8 *pPtr@<EAX>)
 tU32 FindPrevFrameTime(tU8* pPtr) {
     tU8* temp_ptr;
     LOG_TRACE("(%p)", pPtr);
-    NOT_IMPLEMENTED();
+
+    temp_ptr = pPtr;
+    do {
+        if (MoveSessionPointerBackOne(&temp_ptr)) {
+          return 0;
+        }
+    } while (((tPipe_session*)temp_ptr)->chunk_type != ePipe_chunk_frame_boundary);
+    return ((tPipe_session*)temp_ptr)->chunks.chunk_data.frame_boundary_data.time;
 }
 
 // IDA: void __usercall ScanBuffer(tU8 **pPtr@<EAX>, tPipe_chunk_type pType@<EDX>, tU32 pDefault_time@<EBX>, int (*pCall_back)(tPipe_chunk*, int, tU32)@<ECX>, int (*pTime_check)(tU32))
@@ -1134,7 +2123,26 @@ void ScanBuffer(tU8** pPtr, tPipe_chunk_type pType, tU32 pDefault_time, int (*pC
     tPipe_chunk* chunk_ptr;
     tU32 the_time;
     LOG_TRACE("(%p, %d, %d, %p, %p)", pPtr, pType, pDefault_time, pCall_back, pTime_check);
-    NOT_IMPLEMENTED();
+
+    the_time = pDefault_time;
+    while (1) {
+        if (PipeSearchForwards() ? MoveSessionPointerForwardOne(pPtr) : MoveSessionPointerBackOne(pPtr)) {
+            return;
+        }
+        gEnd_of_session = *pPtr + LengthOfSession((tPipe_session*)*pPtr) - sizeof(tU16);
+        if (((tPipe_session*)*pPtr)->chunk_type == ePipe_chunk_frame_boundary) {
+            the_time = ((tPipe_session*)*pPtr)->chunks.chunk_data.frame_boundary_data.time;
+        } else if (((tPipe_session*)*pPtr)->chunk_type == pType) {
+            if (pCall_back(&((tPipe_session*)*pPtr)->chunks, ((tPipe_session*)*pPtr)->number_of_chunks, the_time)) {
+                return;
+            }
+        }
+        if (pTime_check != NULL) {
+            if (!pTime_check(the_time)) {
+                return;
+            }
+        }
+    }
 }
 
 // IDA: int __usercall CheckSound@<EAX>(tPipe_chunk *pChunk_ptr@<EAX>, int pChunk_count@<EDX>, tU32 pTime@<EBX>)
@@ -1143,7 +2151,9 @@ int CheckSound(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
     int sound_length;
     tPipe_chunk* temp_ptr;
     LOG_TRACE("(%p, %d, %d)", pChunk_ptr, pChunk_count, pTime);
-    NOT_IMPLEMENTED();
+
+    STUB_ONCE();
+    return 1;
 }
 
 // IDA: int __usercall SoundTimeout@<EAX>(tU32 pTime@<EAX>)
@@ -1168,38 +2178,148 @@ int CheckCar(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
     br_vector3 difference;
     tPipe_chunk* temp_ptr;
     LOG_TRACE("(%p, %d, %d)", pChunk_ptr, pChunk_count, pTime);
-    NOT_IMPLEMENTED();
+
+    temp_ptr = pChunk_ptr;
+    if (PipeSearchForwards()) {
+        if (pTime <= gOldest_time) {
+            return 0;
+        }
+    } else {
+        if (pTime >= gOldest_time) {
+            return 0;
+        }
+    }
+    for (i = 0; i < pChunk_count; i++) {
+        if ((temp_ptr->subject_index & 0xff00) == 0) {
+            car = &gProgram_state.current_car;
+        } else {
+            car = GetCarSpec(temp_ptr->subject_index >> 8, temp_ptr->subject_index & 0xff);
+        }
+        if (car == gCar_ptr) {
+            BrVector3Copy(&gCar_pos, (br_vector3*)temp_ptr->chunk_data.car_data.transformation.m[3]);
+            BrVector3InvScale(&com_offset_c, &car->cmpos, WORLD_SCALE);
+            BrMatrix34ApplyV(&com_offset_w, &com_offset_c, &temp_ptr->chunk_data.car_data.transformation);
+            BrVector3Accumulate(&gCar_pos, &com_offset_w);
+            BrVector3Sub(&difference, &gCar_pos, &gReference_pos);
+            if (BrVector3LengthSquared(&difference) <= gMax_distance) {
+                gTrigger_time = pTime;
+                return 0;
+            } else {
+                gTrigger_time = pTime;
+                return 1;
+            }
+        }
+        AdvanceChunkPtr(&temp_ptr, ePipe_chunk_car);
+    }
+    return 0;
 }
 
 // IDA: int __usercall CarTimeout@<EAX>(tU32 pTime@<EAX>)
 int CarTimeout(tU32 pTime) {
     LOG_TRACE("(%d)", pTime);
-    NOT_IMPLEMENTED();
+
+    if (PipeSearchForwards()) {
+        if (pTime > gYoungest_time) {
+            return 0;
+        }
+    } else {
+        if (pTime < gYoungest_time) {
+            return 0;
+        }
+    }
+    return 1;
 }
 
 // IDA: void __usercall ScanCarsPositions(tCar_spec *pCar@<EAX>, br_vector3 *pSource_pos@<EDX>, br_scalar pMax_distance_sqr, tU32 pOffset_time, tU32 pTime_period, br_vector3 *pCar_pos, tU32 *pTime_returned)
 void ScanCarsPositions(tCar_spec* pCar, br_vector3* pSource_pos, br_scalar pMax_distance_sqr, tU32 pOffset_time, tU32 pTime_period, br_vector3* pCar_pos, tU32* pTime_returned) {
     tU8* temp_ptr;
     LOG_TRACE("(%p, %p, %f, %d, %d, %p, %p)", pCar, pSource_pos, pMax_distance_sqr, pOffset_time, pTime_period, pCar_pos, pTime_returned);
-    NOT_IMPLEMENTED();
+
+    temp_ptr = gPipe_play_ptr;
+    gTrigger_time = 0;
+    gMax_distance = pMax_distance_sqr;
+    BrVector3Copy(&gReference_pos, pSource_pos);
+    gCar_ptr = pCar;
+
+    if (PipeSearchForwards()) {
+        gOldest_time = GetTotalTime() + pOffset_time;
+        gYoungest_time = gOldest_time + pTime_period;
+    } else {
+        gOldest_time = GetTotalTime() - pOffset_time;
+        gYoungest_time = gOldest_time - pTime_period;
+    }
+
+    ScanBuffer(&temp_ptr, ePipe_chunk_car, GetTotalTime(), CheckCar, CarTimeout);
+    BrVector3Copy(pCar_pos, &gCar_pos);
+    if (pCar_pos->v[0] > 500.f) {
+        Vector3AddFloats(pCar_pos, pCar_pos, -1000.f, -1000.f, -1000.f);
+    }
+    *pTime_returned = gTrigger_time;
 }
 
 // IDA: int __usercall CheckIncident@<EAX>(tPipe_chunk *pChunk_ptr@<EAX>, int pChunk_count@<EDX>, tU32 pTime@<EBX>)
 int CheckIncident(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
     LOG_TRACE("(%p, %d, %d)", pChunk_ptr, pChunk_count, pTime);
-    NOT_IMPLEMENTED();
+
+    if (PipeSearchForwards()) {
+        if (pTime <= gOldest_time) {
+            return 0;
+        }
+    } else {
+        if (gOldest_time <= pTime) {
+            return 0;
+        }
+    }
+    gIncidentChunk = pChunk_ptr;
+    gTrigger_time = pTime;
+    return 1;
 }
 
 // IDA: int __usercall GetNextIncident@<EAX>(tU32 pOffset_time@<EAX>, tIncident_type *pIncident_type@<EDX>, float *pSeverity@<EBX>, tIncident_info *pInfo@<ECX>, tU32 *pTime_away)
 int GetNextIncident(tU32 pOffset_time, tIncident_type* pIncident_type, float* pSeverity, tIncident_info* pInfo, tU32* pTime_away) {
     tU8* temp_ptr;
     LOG_TRACE("(%d, %p, %p, %p, %p)", pOffset_time, pIncident_type, pSeverity, pInfo, pTime_away);
-    NOT_IMPLEMENTED();
+
+    temp_ptr = gPipe_play_ptr;
+    gTrigger_time = 0;
+    if (PipeSearchForwards()) {
+        gOldest_time = GetTotalTime() + pOffset_time;
+    } else {
+        gOldest_time = GetTotalTime() - pOffset_time;
+    }
+    ScanBuffer(&temp_ptr, ePipe_chunk_incident, GetTotalTime(), CheckIncident, NULL);
+    if (gTrigger_time != 0) {
+        *pTime_away = gTrigger_time - GetTotalTime();
+        *pIncident_type = gIncidentChunk->subject_index;
+        *pSeverity = gIncidentChunk->chunk_data.incident_data.severity;
+        if (*pIncident_type == eIncident_ped) {
+            pInfo->ped_info.ped_actor = GetPedestrianActor(gIncidentChunk->chunk_data.incident_data.info.ped_info.ped_index);
+            pInfo->ped_info.murderer_actor = gIncidentChunk->chunk_data.incident_data.info.ped_info.actor;
+        } else if (*pIncident_type == eIncident_car) {
+            if ((gIncidentChunk->chunk_data.incident_data.info.car_info.car_ID & 0xff00) == 0) {
+                pInfo->car_info.car = &gProgram_state.current_car;
+            } else {
+                pInfo->car_info.car = GetCarSpec(gIncidentChunk->chunk_data.incident_data.info.car_info.car_ID >> 8,
+                    gIncidentChunk->chunk_data.incident_data.info.car_info.car_ID & 0xff);
+            }
+            BrVector3Copy(&pInfo->car_info.impact_point, &gIncidentChunk->chunk_data.incident_data.info.car_info.impact_point);
+        } else if (*pIncident_type == eIncident_wall) {
+            BrVector3Copy(&pInfo->wall_info.pos, &gIncidentChunk->chunk_data.incident_data.info.wall_info.pos);
+        }
+    }
+    return gTrigger_time;
 }
 
 // IDA: tU32 __cdecl GetARStartTime()
 tU32 GetARStartTime() {
     tU8* temp_ptr;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    temp_ptr = gPipe_buffer_oldest;
+    do {
+      if (MoveSessionPointerForwardOne(&temp_ptr)) {
+          return 0;
+      }
+    } while (((tPipe_session*)temp_ptr)->chunk_type != ePipe_chunk_frame_boundary);
+    return ((tPipe_session*)temp_ptr)->chunks.chunk_data.frame_boundary_data.time;
 }
