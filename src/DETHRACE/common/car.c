@@ -3387,7 +3387,7 @@ br_scalar ThreePointCollRec(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector
     LOG_TRACE("(%p, %p, %p, %p, %p, %p)", f, m, d, tau, n, c);
 
     ts = ThreePointColl(f, m, d);
-    if (*f >= 0.0 && f[1] >= 0.0 && f[2] >= 0.0 && ts >= 0.000001) {
+    if (f[0] >= 0.0f && f[1] >= 0.0f && f[2] >= 0.0f && ts >= 0.000001f) {
         c->infinite_mass = 256;
         return ts;
     }
@@ -3409,7 +3409,7 @@ br_scalar ThreePointCollRec(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector
     m->m[0][0] = ((float*)m->m)[5 * i];
     m->m[1][0] = m->m[j][i];
     m->m[0][1] = m->m[i][j];
-    m->m[1][1] = ((float*)m->m)[5 * i];
+    m->m[1][1] = ((float*)m->m)[5 * j];
     tau[0] = tau[i];
     tau[1] = tau[j];
     n[0] = n[i];
