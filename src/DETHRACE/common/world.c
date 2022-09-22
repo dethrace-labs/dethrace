@@ -150,11 +150,11 @@ void InitialiseStorageSpace(tBrender_storage* pStorage_space, int pMax_pixelmaps
     pStorage_space->max_shade_tables = pMax_shade_tables;
     pStorage_space->max_materials = pMax_materials;
     pStorage_space->max_models = pMax_models;
-    pStorage_space->pixelmaps = BrMemCalloc(pMax_pixelmaps, 4, kMem_stor_space_pix);
-    pStorage_space->shade_tables = BrMemCalloc(pMax_shade_tables, 4, kMem_stor_space_tab);
-    pStorage_space->materials = BrMemCalloc(pMax_materials, 4, kMem_stor_space_mat);
-    pStorage_space->models = BrMemCalloc(pMax_models, 4, kMem_stor_space_mod);
-    pStorage_space->saved_colour_maps = BrMemCalloc(pMax_materials, 4, kMem_stor_space_save);
+    pStorage_space->pixelmaps = BrMemCalloc(pMax_pixelmaps, sizeof(br_pixelmap*), kMem_stor_space_pix);
+    pStorage_space->shade_tables = BrMemCalloc(pMax_shade_tables, sizeof(br_pixelmap*), kMem_stor_space_tab);
+    pStorage_space->materials = BrMemCalloc(pMax_materials, sizeof(br_material*), kMem_stor_space_mat);
+    pStorage_space->models = BrMemCalloc(pMax_models, sizeof(br_model*), kMem_stor_space_mod);
+    pStorage_space->saved_colour_maps = BrMemCalloc(pMax_materials, sizeof(br_pixelmap*), kMem_stor_space_save);
 }
 
 // IDA: void __usercall DisposeStorageSpace(tBrender_storage *pStorage_space@<EAX>)
@@ -309,7 +309,7 @@ int LoadNPixelmaps(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
         if (total == 0) {
             PathCat(the_path, gApplication_path, "PIXELMAP");
             PathCat(the_path, the_path, str);
-            total = DRPixelmapLoadMany(the_path, temp_array, 200);
+            total = DRPixelmapLoadMany(the_path, temp_array, COUNT_OF(temp_array));
             if (total == 0) {
                 FatalError(79);
             }
