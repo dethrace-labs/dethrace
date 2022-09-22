@@ -195,8 +195,14 @@ int IRandomBetween(int pA, int pB) {
     int num;
     char s[32];
 
-    num = (pB + 1 - pA) * (rand() / (double)RAND_MAX) + pA;
-    return num;
+    num = rand();
+#if RAND_MAX == 0x7fff
+//  If RAND_MAX == 0x7fff, then `num` can be seen as a fixed point number with 15 fractional and 17 integral bits
+    return pA + ((num * (pB + 1 - pA)) >> 15);
+#else
+//  If RAND_MAX != 0x7fff, then use floating numbers (alternative is using modulo)
+    return pA + (int)((pB + 1 - pA) * (num / ((float)RAND_MAX + 1)));
+#endif
 }
 
 // IDA: int __usercall PercentageChance@<EAX>(int pC@<EAX>)
