@@ -3,11 +3,16 @@ set -e
 
 if [ "${MATRIX_PLATFORM}" = "clang" ]
 then
-    CC=clang
-    CXX=clang++
+    export CC=clang
+    export CXX=clang++
 else
-    CC=gcc
-    CXX=g++
+    export CC=gcc
+    export CXX=g++
+
+    # Disable PIE such that addr2line is able to convert an address info file name and line number
+    export CFLAGS=-no-pie
+    export CXXFLAGS=-no-pie
+    export LDFLAGS=-no-pie
 fi
 
 # install deps
