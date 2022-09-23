@@ -86,7 +86,9 @@ int FopRead_OLD_PIXELMAP(br_datafile* df, br_uint_32 id, br_uint_32 length, br_u
     df->res = pp;
     df->prims->struct_read(df, &br_old_pixelmap_F, pp);
     df->res = NULL;
+#if !defined(BRENDER_FIX_BUGS)
     pp->row_bytes = (pmTypeInfo[pp->type].bits >> 3) * pp->width;
+#endif
     DfPush(DF_PIXELMAP, pp, 1);
     return 0;
 }
@@ -100,7 +102,9 @@ int FopRead_PIXELMAP(br_datafile* df, br_uint_32 id, br_uint_32 length, br_uint_
     df->res = pp;
     df->prims->struct_read(df, &br_pixelmap_F, pp);
     df->res = NULL;
+#if !defined(BRENDER_FIX_BUGS)
     pp->row_bytes = (pmTypeInfo[pp->type].bits >> 3) * pp->width;
+#endif
     DfPush(DF_PIXELMAP, pp, 1);
     return 0;
 }
