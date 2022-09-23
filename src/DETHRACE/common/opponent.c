@@ -1811,8 +1811,8 @@ int MassageOpponentPosition(tOpponent_spec* pOpponent_spec, int pMassage_count) 
             BrVector3Normalise(&displacement, &displacement);
             BrVector3Scale(&displacement, &displacement, (pMassage_count / 4) * 0.1f);
         } else {
-            BrVector3Normalise(&direction_v, &direction_v);
-            BrVector3Scale(&displacement, &direction_v, (pMassage_count / 4) * 0.5f);
+            BrVector3Normalise(&displacement, &direction_v);
+            BrVector3Scale(&displacement, &displacement, (pMassage_count / 4) * 0.5f);
         }
         if (pMassage_count % 2) {
             BrVector3Negate(&displacement, &displacement);
