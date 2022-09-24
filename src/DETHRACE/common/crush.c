@@ -657,6 +657,12 @@ void DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEner
     tImpact_location modified_location;
     LOG_TRACE("(%p, %p, %p, %d)", pCar, pImpact_point, pEnergy_vector, pWas_hitting_a_car);
 
+#if defined(DETHRACE_FIX_BUGS)
+    proportion_x = 0;
+    proportion_y = 0;
+    proportion_z = 0;
+#endif
+
     pure_energy_magnitude = BrVector3Length(pEnergy_vector);
     if (pure_energy_magnitude == 0.0f && !pWas_hitting_a_car) {
         return;
@@ -932,6 +938,9 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
     mutual_culpability = 0;
     the_time = PDGetTotalTime();
     inherited_damage = 0;
+#if defined(DETHRACE_FIX_BUGS)
+    total_units_of_damage = 0;
+#endif
     if (pCar1->driver <= eDriver_non_car) {
         dam_acc_1 = 0;
     } else {
@@ -971,11 +980,11 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
         impact_in_moving_direction_2 = car_direction_2 == modified_location_2;
     }
     if (pCar1->driver >= eDriver_net_human && pCar2) {
-        if (impact_in_moving_direction_1 && (pCar1->driver < eDriver_net_human || (pCar1->pre_car_col_velocity_car_space.v[2] != 0.0 && pCar1->pre_car_col_velocity_car_space.v[2] > 0.0 != pCar1->gear > 0 && (pCar1->keys.acc != 0 || pCar1->joystick.acc > 0x8000)))) {
+        if (impact_in_moving_direction_1 && (pCar1->driver < eDriver_net_human || (pCar1->pre_car_col_velocity_car_space.v[2] != 0.0 && (pCar1->pre_car_col_velocity_car_space.v[2] > 0.0) != (pCar1->gear > 0) && (pCar1->keys.acc != 0 || pCar1->joystick.acc > 0x8000)))) {
             pCar2->time_last_hit = the_time;
             pCar2->last_hit_by = pCar1;
         }
-    } else if (pCar2 && pCar2->driver >= eDriver_net_human && impact_in_moving_direction_2 && (pCar2->driver < eDriver_net_human || (pCar2->pre_car_col_velocity_car_space.v[2] != 0.0f && pCar2->pre_car_col_velocity_car_space.v[2] > 0.0f != pCar2->gear > 0 && (pCar2->keys.acc != 0 || pCar2->joystick.acc > 0x8000)))) {
+    } else if (pCar2 && pCar2->driver >= eDriver_net_human && impact_in_moving_direction_2 && (pCar2->driver < eDriver_net_human || (pCar2->pre_car_col_velocity_car_space.v[2] != 0.0f && (pCar2->pre_car_col_velocity_car_space.v[2] > 0.0f) != (pCar2->gear > 0) && (pCar2->keys.acc != 0 || pCar2->joystick.acc > 0x8000)))) {
         pCar1->time_last_hit = the_time;
         pCar1->last_hit_by = pCar2;
     }
@@ -985,7 +994,7 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
             && pCar1->pre_car_col_speed > 0.0005f
             && (pCar1->driver < eDriver_net_human
                 || (pCar1->pre_car_col_velocity_car_space.v[2] != 0.0f
-                    && pCar1->pre_car_col_velocity_car_space.v[2] > 0.0f != pCar1->gear > 0
+                    && (pCar1->pre_car_col_velocity_car_space.v[2] > 0.0f) != (pCar1->gear > 0)
                     && (pCar1->keys.acc != 0 || pCar1->joystick.acc > 0x8000)))) {
             car_1_culpable = 1;
         }
@@ -994,7 +1003,7 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
             && pCar2->pre_car_col_speed > 0.0005f
             && (pCar2->driver < eDriver_net_human
                 || (pCar2->pre_car_col_velocity_car_space.v[2] != 0.0f
-                    && pCar2->pre_car_col_velocity_car_space.v[2] > 0.0f != pCar2->gear > 0
+                    && (pCar2->pre_car_col_velocity_car_space.v[2] > 0.0f) != (pCar2->gear > 0)
                     && (pCar2->keys.acc != 0 || pCar2->joystick.acc > 0x8000)))) {
             car_2_culpable = 1;
         }
@@ -1269,6 +1278,7 @@ void DoWheelDamage(tU32 pFrame_period) {
                 }
                 break;
             default:
+                TELL_ME_IF_WE_PASS_THIS_WAY();
                 break;
             }
             if (gNet_mode == eNet_mode_none || car->driver == eDriver_local_human) {

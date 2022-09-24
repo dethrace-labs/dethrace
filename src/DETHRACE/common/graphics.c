@@ -1094,6 +1094,9 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
     br_face faces[16];
     LOG_TRACE("(%p, %p, %p, %p, %p, %f)", pCar, pWorld, pTrack_spec, pCamera, pCamera_to_world_transform, pDistance_factor);
 
+#if defined(DETHRACE_FIX_BUGS)
+    ray_length = 0.f;
+#endif
     f_num = 0;
     bounds_x_min = pCar->bounds[1].min.v[0] / WORLD_SCALE;
     bounds_x_max = pCar->bounds[1].max.v[0] / WORLD_SCALE;
@@ -2986,7 +2989,7 @@ void SaveShadeTables() {
 
     PossibleService();
     gSaved_table_count = 0;
-    return BrTableEnum("*", SaveShadeTable, 0);
+    BrTableEnum("*", SaveShadeTable, 0);
 }
 
 // IDA: void __cdecl DisposeSavedShadeTables()
@@ -3005,9 +3008,9 @@ void ShadowMode() {
 
     gFancy_shadow = !gFancy_shadow;
     if (gFancy_shadow) {
-        return NewTextHeadupSlot(4, 0, 2000, -4, "Translucent shadow");
+        NewTextHeadupSlot(4, 0, 2000, -4, "Translucent shadow");
     } else {
-        return NewTextHeadupSlot(4, 0, 2000, -4, "Solid shadow");
+        NewTextHeadupSlot(4, 0, 2000, -4, "Solid shadow");
     }
 }
 

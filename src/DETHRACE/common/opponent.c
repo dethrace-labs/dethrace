@@ -239,12 +239,19 @@ tS16 FindNearestGeneralSection(tCar_spec* pPursuee, br_vector3* pActor_coords, b
     br_vector3* start;
     br_vector3* finish;
     br_vector3* nearest_node_v;
+#if defined(DETHRACE_FIX_BUGS)
+    br_vector3 zero_vector;
+#endif
     LOG_TRACE("(%p, %p, %p, %p, %p)", pPursuee, pActor_coords, pPath_direction, pIntersect, pDistance);
 
     nearest_section = -1;
     nearest_node_section_no = -1;
     closest_distance_squared = BR_SCALAR_MAX;
     nearest_node_distance_squared = BR_SCALAR_MAX;
+#if defined(DETHRACE_FIX_BUGS)
+    BrVector3Set(&zero_vector, 0.f, 0.f, 0.f);
+    nearest_node_v = &zero_vector;
+#endif
 
     if (pPursuee != NULL) {
         no_sections = pPursuee->my_trail.number_of_nodes - 1;
@@ -1761,33 +1768,32 @@ int MassageOpponentPosition(tOpponent_spec* pOpponent_spec, int pMassage_count) 
     br_vector3 direction_v;
     LOG_TRACE("(%p, %d)", pOpponent_spec, pMassage_count);
 
-    BrVector3Set(&positive_y_vector, 0, 1, 0);
+    BrVector3Set(&positive_y_vector, 0.f, 1.f, 0.f);
     mat = &pOpponent_spec->car_spec->car_master_actor->t.t.mat;
     car_trans = &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t;
     if (pMassage_count > 22) {
         return 0;
-    }
-    if (pMassage_count <= 20) {
+    } else if (pMassage_count > 20) {
+        car_trans->v[1] += (pMassage_count - 20) * 2.0f;
+        return 1;
+    } else {
         direction_v.v[0] = -pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[2][0];
         direction_v.v[1] = -pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[2][1];
         direction_v.v[2] = -pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[2][2];
         if (pMassage_count % 4 >= 2) {
-
             BrVector3Cross(&displacement, &positive_y_vector, &direction_v);
             BrVector3Normalise(&displacement, &displacement);
             BrVector3Scale(&displacement, &displacement, (pMassage_count / 4) * 0.1f);
         } else {
-            BrVector3Normalise(&displacement, &displacement);
+            BrVector3Normalise(&displacement, &direction_v);
             BrVector3Scale(&displacement, &displacement, (pMassage_count / 4) * 0.5f);
         }
         if (pMassage_count % 2) {
             BrVector3Negate(&displacement, &displacement);
         }
         BrVector3Accumulate(car_trans, &displacement);
-    } else {
-        car_trans->v[1] = (pMassage_count - 20) * 2.0f + car_trans->v[1];
+        return 1;
     }
-    return 1;
 }
 
 // IDA: int __usercall RematerialiseOpponentOnThisSection@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, br_scalar pSpeed, tS16 pSection_no)

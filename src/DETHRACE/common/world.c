@@ -1749,7 +1749,7 @@ void ChangeSubdivToPersp() {
 }
 
 // IDA: br_uint_32 __cdecl ProcessFaceMaterials(br_actor *pActor, tPMFMCB pCallback)
-br_uint_32 ProcessFaceMaterials(br_actor* pActor, tPMFMCB pCallback) {
+intptr_t ProcessFaceMaterials(br_actor* pActor, tPMFMCB pCallback) {
     LOG_TRACE("(%p, %d)", pActor, pCallback);
 
     if (pActor->identifier == NULL || pActor->identifier[0] != '&') {
@@ -2778,20 +2778,21 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
 }
 
 // IDA: br_uint_32 __cdecl RemoveBounds(br_actor *pActor, void *pArg)
-br_uint_32 RemoveBounds(br_actor* pActor, void* pArg) {
+intptr_t RemoveBounds(br_actor* pActor, void* pArg) {
     LOG_TRACE("(%p, %p)", pActor, pArg);
 
     if (pActor->type == BR_ACTOR_BOUNDS || pActor->type == BR_ACTOR_BOUNDS_CORRECT) {
         BrResFree(pActor->type_data);
         pActor->type_data = NULL;
     }
+    return 0;
 }
 
 // IDA: void __usercall RemoveBoundsStructures(br_actor *pActor@<EAX>)
 void RemoveBoundsStructures(br_actor* pActor) {
     LOG_TRACE("(%p)", pActor);
 
-    DRActorEnumRecurse(pActor, (br_actor_enum_cbfn*)RemoveBounds, NULL);
+    DRActorEnumRecurse(pActor, RemoveBounds, NULL);
 }
 
 // IDA: void __usercall FreeTrack(tTrack_spec *pTrack_spec@<EAX>)

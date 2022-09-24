@@ -10,6 +10,8 @@
 #include "brender/br_types.h"
 #include "dr_types.h"
 
+#include "harness/compiler.h"
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,7 +46,6 @@ extern int gReal_back_screen_locked;
 extern void (*gPrev_keyboard_handler)();
 extern tU8 gScan_code[123][2];
 
-extern int _unittest_do_not_exit;
 extern char* _unittest_last_fatal_error;
 
 // void KeyboardHandler();
@@ -63,7 +64,7 @@ void PDSetKeyArray(int* pKeys, int pMark);
 
 int PDGetASCIIFromKey(int pKey);
 
-void PDFatalError(char* pThe_str);
+HARNESS_NORETURN void PDFatalError(char* pThe_str);
 
 void PDNonFatalError(char* pThe_str);
 

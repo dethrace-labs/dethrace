@@ -8,6 +8,7 @@ project(dethrace C)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
 
+include(CheckCCompilerFlag)
 include(GNUInstallDirs)
 include(TestBigEndian)
 
@@ -27,6 +28,21 @@ set(DETHRACE_IDE_ROOT_DIR "" CACHE PATH "DethRace rootdir (only used by MSVC whe
 option(BUILD_TESTS "Build unit tests." OFF)
 option(DETHRACE_INSTALL "Add install target" OFF)
 option(DETHRACE_WERROR "Treat warnings as errors")
+
+function(add_compile_flag_if_supported TARGET FLAG)
+    string(MAKE_C_IDENTIFIER "${FLAG}" FLAG_TO_IDENTIFIER)
+    set(HAVE_FLAG_VARIABLE_NAME "HAVE_${FLAG_TO_IDENTIFIER}")
+    check_c_compiler_flag("${FLAG}" "${HAVE_FLAG_VARIABLE_NAME}")
+    if(${HAVE_FLAG_VARIABLE_NAME})
+        target_compile_options("${TARGET}" PRIVATE "${FLAG}")
+    endif()
+endfunction()
+
+function(add_compile_flags_if_supported TARGET)
+    foreach(FLAG ${ARGN})
+        add_compile_flag_if_supported("${TARGET}" "${FLAG}")
+    endforeach()
+endfunction()
 
 test_big_endian(IS_BIGENDIAN)
 

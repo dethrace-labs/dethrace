@@ -39,6 +39,7 @@ else()
 endif()
 
 target_sources(harness PRIVATE
+    include/harness/compiler.h
     include/harness/hooks.h
     include/harness/trace.h
     include/harness/config.h

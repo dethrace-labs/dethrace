@@ -167,7 +167,7 @@ void DRPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFont, cha
 }
 
 // IDA: void __usercall DRPixelmapCleverText2(br_pixelmap *pPixelmap@<EAX>, int pX@<EDX>, int pY@<EBX>, tDR_font *pFont@<ECX>, signed char *pText, int pRight_edge)
-void DRPixelmapCleverText2(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFont, signed char* pText, int pRight_edge) {
+void DRPixelmapCleverText2(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFont, char* pText, int pRight_edge) {
     int i;
     int x;
     int len;
@@ -178,7 +178,7 @@ void DRPixelmapCleverText2(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFo
     LOG_TRACE("(%p, %d, %d, %p, %p, %d)", pPixelmap, pX, pY, pFont, pText, pRight_edge);
 
     x = pX;
-    len = strlen((char*)pText);
+    len = strlen(pText);
     ch = (unsigned char*)pText;
     if (pX >= 0 && pPixelmap->width >= pRight_edge && pY >= 0 && pY + pFont->height <= pPixelmap->height) {
         for (i = 0; i < len; i++) {
@@ -395,7 +395,7 @@ void DoHeadups(tU32 pThe_time) {
                             y_offset + the_headup->y,
                             the_headup->data.text_info.colour,
                             the_headup->data.text_info.font,
-                            (signed char*)the_headup->data.text_info.text);
+                            the_headup->data.text_info.text);
                         break;
                     case eHeadup_coloured_text:
                         if (the_headup->clever) {
@@ -1574,5 +1574,5 @@ void TransDRPixelmapCleverText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font*
         gCached_font = pFont;
     }
     LoadFont(pFont - gFonts);
-    DRPixelmapCleverText2(pPixelmap, pX, pY - (TranslationMode() == 0 ? 0 : 2), pFont, (signed char*)pText, pRight_edge);
+    DRPixelmapCleverText2(pPixelmap, pX, pY - (TranslationMode() == 0 ? 0 : 2), pFont, pText, pRight_edge);
 }

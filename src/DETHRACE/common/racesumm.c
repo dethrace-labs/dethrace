@@ -859,7 +859,7 @@ void DamageScrnDraw(int pCurrent_choice, int pCurrent_mode) {
             gCurrent_graf_data->wreck_name_base_line,
             84,
             gFont_7,
-            (signed char*)name);  // FIXME: remove (signed char*) cast
+            name);
     }
 }
 
@@ -957,7 +957,7 @@ int DamageScrnUp(int* pCurrent_choice, int* pCurrent_mode) {
                         new_selection = i;
                         break;
                     }
-                    difference = abs(gWreck_array[i].pos_x - gWreck_array[gWreck_selected].pos_x);
+                    difference = abs((int)(gWreck_array[i].pos_x - gWreck_array[gWreck_selected].pos_x));
                     if (difference < new_difference) {
                         new_selection = i;
                         new_difference = difference;

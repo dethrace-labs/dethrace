@@ -42,10 +42,10 @@ void debug_print_matrix4(const char* fmt, const char* fn, char* name, br_matrix4
 #define LOG_PANIC(...)                                                    \
     do {                                                                  \
         debug_printf("\033[0;31m[PANIC] %s ", __FUNCTION__, __VA_ARGS__); \
-        if (OS_IsDebuggerPresent())                                       \
+        if (OS_IsDebuggerPresent()) {                                     \
             abort();                                                      \
-        else                                                              \
-            exit(1);                                                      \
+        }                                                                 \
+        exit(1);                                                          \
     } while (0)
 
 #define LOG_WARN_ONCE(...)                                               \

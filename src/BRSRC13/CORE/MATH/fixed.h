@@ -2,8 +2,8 @@
 #define _FIXED_H_
 
 #include "brender/br_types.h"
+#include "brender/br_inline_funcs.h"
 
-#define BR_ONE_LS ((br_fixed_ls)0x00010000)
 #define BR_ONE_LU ((br_fixed_lu)0x00010000)
 #define BR_ONE_LSF ((br_fixed_ls)0x00008000)
 #define BR_ONE_LUF ((br_fixed_lu)0x00010000)
@@ -11,10 +11,10 @@
 #define BR_ONE_SU ((br_fixed_ss)0x0100)
 #define BR_ONE_SSF ((br_fixed_ss)0x0080)
 #define BR_ONE_SUF ((br_fixed_ss)0x0100)
-#define BrIntToFixed(i) ((i)<<16)
+#define BrIntToFixed(i) ((br_fixed_ls)(((unsigned)(i))<<16))
 #define BrFloatToFixed(f) ((br_fixed_ls)((f)*65536.f))
 #define BrFixedToInt(i) ((i)>>16)
-#define BrFixedToFloat(i) ((float)((i)*(1.f/65536.f)))
+//#define BrFixedToFloat(i) ((float)((i)*(1.f/65536.f)))
 
 #define BrFloatToFixedFraction(f) ((br_fixed_lsf)((f)*32768.f))
 #define BrFixedFractionToFloat(f) ((float)(((br_fixed_lsf)(f))*(1.f/32768.f)))

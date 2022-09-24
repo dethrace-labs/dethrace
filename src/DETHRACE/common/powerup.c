@@ -1115,8 +1115,8 @@ int HitMine(tPowerup* pPowerup, tCar_spec* pCar) {
     pCar->omega.v[2] = FRandomPosNeg(pPowerup->float_params[2]) * TAU / pCar->M + pCar->omega.v[2];
     pCar->omega.v[0] = FRandomPosNeg(pPowerup->float_params[3]) * TAU / pCar->M + pCar->omega.v[0];
     if (pCar->driver != eDriver_non_car_unused_slot && !pCar->invulnerable) {
+        fudge_multiplier = pCar->car_model_actors[pCar->principal_car_actor].crush_data.softness_factor / .7f;
         for (i = 0; i < pCar->car_actor_count; i++) {
-            fudge_multiplier = pCar->car_model_actors[pCar->principal_car_actor].crush_data.softness_factor / .7f;
             TotallySpamTheModel(pCar, i, pCar->car_model_actors[i].actor,
                 &pCar->car_model_actors[i].crush_data, fudge_multiplier * .1f);
         }
@@ -1272,6 +1272,9 @@ void SendCurrentPowerups() {
             } else {
                 car = GetCarSpec(cat, i);
             }
+#if defined(DETHRACE_FIX_BUGS)
+            ID = gNet_players[0].ID;
+#endif
             for (j = 0; j < gNumber_of_net_players; j++) {
                 if (gNet_players[j].car == car) {
                     ID = gNet_players[j].ID;

@@ -806,6 +806,9 @@ void DrawKeyAssignments(int pCurrent_choice, int pCurrent_mode) {
     static int on_radios_last_time;
     LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
 
+#if defined(DETHRACE_FIX_BUGS)
+    font_k = &gFonts[11];
+#endif
     if (gMouse_in_use && pCurrent_choice == 4) {
         GetMousePosition(&x_coord, &y_coord);
         if (y_coord >= gCurrent_graf_data->key_assign_key_map_y
@@ -1134,6 +1137,7 @@ int MouseyClickBastard(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, 
     } else {
         KeyAssignGoAhead(pCurrent_choice, pCurrent_mode);
     }
+    return 0;
 }
 
 // IDA: void __cdecl DrawInitialKMRadios()

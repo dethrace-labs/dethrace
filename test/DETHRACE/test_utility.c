@@ -62,7 +62,7 @@ void test_utility_GetALineWithNoPossibleService() {
     fclose(file);
 
     file = fopen(tmpPath, "rt");
-    char s[256];
+    unsigned char s[256];
 
     char* result = GetALineWithNoPossibleService(file, s);
     TEST_ASSERT_NOT_NULL(result);

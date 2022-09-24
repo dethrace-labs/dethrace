@@ -391,10 +391,13 @@ int AddRollingLetter(char pChar, int pX, int pY, tRolling_type rolling_type) {
     switch (rolling_type) {
     case eRT_looping_random:
         let->number_of_letters = 9;
+        break;
     case eRT_looping_single:
         let->number_of_letters = 2;
+        break;
     default:
         let->number_of_letters = IRandomBetween(3, 9);
+        break;
     }
 
     let->current_offset = (gCurrent_graf_data->save_slot_letter_height * let->number_of_letters);
@@ -560,6 +563,9 @@ void ChangeTextTo(int pXcoord, int pYcoord, char* pNew_str, char* pOld_str) {
 
     len = strlen(pOld_str);
     len2 = strlen(pNew_str);
+#if defined(DETHRACE_FIX_BUGS)
+    new_type = eRT_looping_random;
+#endif
 
     for (i = 0; i < len; i++) {
         if (i < len2) {

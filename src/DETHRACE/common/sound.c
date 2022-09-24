@@ -104,18 +104,24 @@ void InitSound() {
     if (gSound_available == 0) {
         return;
     }
-    if (gSound_detail_level == 0) {
+    switch (gSound_detail_level) {
+    case 0:
         engine_channel_count = 2;
         car_channel_count = 2;
         ped_channel_count = 3;
-    } else if (gSound_detail_level == 1) {
+        break;
+    case 1:
         engine_channel_count = 2;
         car_channel_count = 3;
         ped_channel_count = 4;
-    } else if (gSound_detail_level == 2) {
+        break;
+    case 2:
         engine_channel_count = 6;
         car_channel_count = 4;
         ped_channel_count = 5;
+        break;
+    default:
+        TELL_ME_IF_WE_PASS_THIS_WAY();
     }
     if (gDriver_outlet == NULL) {
         gDriver_outlet = S3CreateOutlet(1, 1);
@@ -247,12 +253,14 @@ int DRS3ChangePitch(tS3_sound_tag pTag, tS3_pitch pNew_pitch) {
 int DRS3ChangeSpeed(tS3_sound_tag pTag, tS3_pitch pNew_speed) {
     LOG_TRACE("(%d, %d)", pTag, pNew_speed);
     NOT_IMPLEMENTED();
+    return 0;
 }
 
 // IDA: int __usercall DRS3ChangePitchSpeed@<EAX>(tS3_sound_tag pTag@<EAX>, tS3_pitch pNew_pitch@<EDX>)
 int DRS3ChangePitchSpeed(tS3_sound_tag pTag, tS3_pitch pNew_pitch) {
     LOG_TRACE("(%d, %d)", pTag, pNew_pitch);
     STUB_ONCE();
+    return 0;
 }
 
 // IDA: int __usercall DRS3StopSound@<EAX>(tS3_sound_tag pSound_tag@<EAX>)
@@ -348,6 +356,7 @@ int DRS3StopAllOutletSounds() {
     if (gSound_enabled) {
         S3StopAllOutletSounds();
     }
+    return 0;
 }
 
 // IDA: void __cdecl ToggleSoundEnable()

@@ -2,6 +2,10 @@
 #include "pd/sys.h"
 #include <stdlib.h>
 
+#ifdef _WIN32
+#include <io.h>
+#endif
+
 extern int original_main(int pArgc, char* pArgv[]);
 
 int main(int argc, char* argv[]) {

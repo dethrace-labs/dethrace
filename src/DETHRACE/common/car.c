@@ -6266,7 +6266,7 @@ int FacePointCarCarCollide(tCollision_info* car1, tCollision_info* car2, br_matr
                 BrMatrix34ApplyV(&pNorm_list[j], &norm, pMsos);
                 BrMatrix34TApplyV(&pNorm_list[l], &pNorm_list[j], pMoms);
                 BrVector3Negate(&pNorm_list[l], &pNorm_list[l]);
-                if (pNorm_list[l].v[0] >= 0.0f != centre.v[0] <= a.v[0] || pNorm_list[l].v[1] >= 0.0f != centre.v[1] <= a.v[1] || pNorm_list[l].v[2] >= 0.0f != a.v[2] >= centre.v[2]
+                if ((pNorm_list[l].v[0] >= 0.0f) != (centre.v[0] <= a.v[0]) || (pNorm_list[l].v[1] >= 0.0f) != (centre.v[1] <= a.v[1]) || (pNorm_list[l].v[2] >= 0.0f) != (a.v[2] >= centre.v[2])
                     || !TestOldMats(car1, car2, 0)) {
                     pPoint_list[l] = a;
                     pPoint_list[j] = hp;
@@ -6649,25 +6649,22 @@ br_scalar ThreePointCollRecB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vecto
     if (f[0] >= 0.0f && f[1] >= 0.0f && f[2] >= 0.0f) {
         return ts;
     }
-    if (f[2] >= 0.0f) {
-        if (f[1] >= 0.0f) {
-            if (f[0] >= 0.0f) {
-                return 0.0f;
-            }
-            i = 1;
-            j = 2;
-        } else {
-            i = 0;
-            j = 2;
-        }
-    } else {
+    if (f[2] < 0.f) {
         i = 0;
         j = 1;
+    } else if (f[1] < 0.f) {
+        i = 0;
+        j = 2;
+    } else if (f[0] < 0.f) {
+        i = 1;
+        j = 2;
+    } else {
+        return 0.0f;
     }
-    m->m[0][0] = m->m[0][5 * i];
+    m->m[0][0] = ((br_scalar*)(m->m))[5 * i];
     m->m[1][0] = m->m[j][i];
     m->m[0][1] = m->m[i][j];
-    m->m[1][1] = m->m[0][5 * j];
+    m->m[1][1] = ((br_scalar*)(m->m))[5 * j];
     tau[0] = tau[i];
     tau[1] = tau[j];
     tau[4] = tau[i + 4];

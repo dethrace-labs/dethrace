@@ -60,7 +60,6 @@ target_sources(dethrace_test PRIVATE
     BRSRC13/test_v1dbfile.c
     DETHRACE/test_controls.c
     DETHRACE/test_dossys.c
-    DETHRACE/test_errors.c
     DETHRACE/test_flicplay.c
     DETHRACE/test_graphics.c
     DETHRACE/test_init.c

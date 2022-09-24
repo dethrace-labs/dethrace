@@ -30,8 +30,6 @@
 
 #define debug(format_, ...) fprintf(stderr, format_, __VA_ARGS__)
 
-extern int _unittest_do_not_exit;
-
 extern void test_assocarr_suite();
 extern void test_brprintf_suite();
 extern void test_bswap_suite();
@@ -39,7 +37,6 @@ extern void test_utility_suite();
 extern void test_loading_suite();
 extern void test_controls_suite();
 extern void test_input_suite();
-extern void test_errors_suite();
 extern void test_dossys_suite();
 extern void test_init_suite();
 extern void test_brlists_suite();
@@ -147,7 +144,9 @@ void setup_global_vars(int argc, char* argv[]) {
     root_dir = getenv("DETHRACE_ROOT_DIR");
     if (root_dir != NULL) {
         printf("DETHRACE_ROOT_DIR: %s\n", root_dir);
-        chdir(root_dir);
+        if (chdir(root_dir)) {
+            fprintf(stderr, "Failed to chdir to \"%s\" (reason=\"%s\")\n", root_dir, strerror(errno));
+        }
         strncpy(gApplication_path, root_dir, 256);
         strcat(gApplication_path, "/DATA");
     } else {
@@ -174,7 +173,6 @@ void setup_global_vars(int argc, char* argv[]) {
     setup_temp_folder();
     printf("INFO: temp folder is \"%s\"\n", temp_folder);
 
-    _unittest_do_not_exit = 1;
     harness_debug_level = 7;
     harness_game_info.mode = eGame_carmageddon;
 
@@ -286,7 +284,6 @@ int main(int argc, char** argv) {
     test_loading_suite();
     test_controls_suite();
     test_input_suite();
-    test_errors_suite();
     test_dossys_suite();
     test_graphics_suite();
     test_powerup_suite();

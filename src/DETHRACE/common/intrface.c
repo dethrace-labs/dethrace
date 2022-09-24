@@ -186,6 +186,9 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
     void* palette_copy;
     LOG_TRACE("(%p, %d, %d)", pSpec, pOptions, pCurrent_choice);
 
+#if defined(DETHRACE_FIX_BUGS)
+    mouse_down = 0;
+#endif
     entry_status = gProgram_state.prog_status;
     gTyping_slot = -1;
     EdgeTriggerModeOn();

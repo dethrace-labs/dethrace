@@ -1212,6 +1212,8 @@ void DrawTranslations(tFlic_descriptor* pFlic_info, int pLast_frame) {
                 x = trans->x - width / 2;
                 right_edge = x + width / 2;
                 break;
+            default:
+                TELL_ME_IF_WE_PASS_THIS_WAY();
             }
             TransDRPixelmapText(
                 pFlic_info->the_pixelmap,

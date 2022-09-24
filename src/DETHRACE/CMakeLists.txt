@@ -12,31 +12,27 @@ target_include_directories(dethrace_obj
 
 target_link_libraries(dethrace_obj PUBLIC SDL2::SDL2 smacker harness brender s3)
 
-if (CMAKE_C_COMPILER_ID MATCHES "Clang")
-    target_compile_options(dethrace_obj PRIVATE
-        -Wall
-        -Wno-return-type
-        -Wno-unused-variable
-        -Wno-unused-parameter
-        -Wno-unused-result
-        -Wno-error=sign-compare
-    )
-elseif (CMAKE_C_COMPILER_ID STREQUAL "GNU")
-    target_compile_options(dethrace_obj PRIVATE
-        -Wall
-        -Wno-return-type
-        -Wno-unused-variable
-        -Wno-unused-parameter
-        -Wno-unused-result
-        -Wno-error=sign-compare
-        -Wno-error=format-overflow
-        -Wno-error=unused-but-set-variable  # (SelectRaceDraw::test2), etc
-    )
-else()
+
+
+if (CMAKE_C_COMPILER_ID MATCHES "MSVC")
     target_compile_definitions(dethrace_obj PRIVATE -D_CRT_SECURE_NO_WARNINGS)
     target_compile_options(dethrace_obj PRIVATE
         /wd4101
         /wd4996
+    )
+else()
+    target_compile_options(dethrace_obj PRIVATE
+        -Wall
+    )
+    add_compile_flags_if_supported(dethrace_obj
+        -Wformat
+        -Wno-unused-but-set-variable
+        -Wno-unused-variable
+        -Wno-unused-result
+        -Wno-error=sign-compare
+        -Wno-error=format-overflow
+        -Wno-error=unused-but-set-variable  # (SelectRaceDraw::test2), etc
+        -Wno-format-overflow
     )
 endif()
 if(BRENDER_FIX_BUGS)

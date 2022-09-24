@@ -183,7 +183,7 @@ void ChangeSubdivToPerspCB(br_material* pMaterial);
 
 void ChangeSubdivToPersp();
 
-br_uint_32 ProcessFaceMaterials(br_actor* pActor, tPMFMCB pCallback);
+intptr_t ProcessFaceMaterials(br_actor* pActor, tPMFMCB pCallback);
 
 int DRPixelmapHasZeros(br_pixelmap* pm);
 
@@ -255,7 +255,7 @@ void FreeExceptions();
 
 void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_info);
 
-br_uint_32 RemoveBounds(br_actor* pActor, void* pArg);
+intptr_t RemoveBounds(br_actor* pActor, void* pArg);
 
 void RemoveBoundsStructures(br_actor* pActor);
 

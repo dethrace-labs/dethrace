@@ -349,7 +349,7 @@ tPlayer_ID PDNetExtractPlayerID(tNet_game_details* pDetails) {
 // IDA: void __usercall PDNetObtainSystemUserName(char *pName@<EAX>, int pMax_length@<EDX>)
 void PDNetObtainSystemUserName(char* pName, int pMax_length) {
 #ifdef _WIN32
-    int size;
+    DWORD size;
     char buffer[16];
     BOOL result;
 
@@ -359,10 +359,13 @@ void PDNetObtainSystemUserName(char* pName, int pMax_length) {
 #ifdef _WIN32
     size = COUNT_OF(buffer);
     result = GetComputerNameA(buffer, &size);
-    if (result && size != 0) {
-        strncpy(pName, buffer, pMax_length - 1);
-        pName[pMax_length - 1] = '\0';
+    if (result == 0) {
+        LOG_WARN("GetComputerNameA failed with code=%u", GetLastError());
+        buffer[0] = '\0';
+        size = 0;
     }
+    strncpy(pName, buffer, pMax_length - 1);
+    pName[pMax_length - 1] = '\0';
     while (1) {
         pName = strpbrk(pName, "_=(){}[]<>!$%^&*/:@~;'#,?\\|`\"");
         if (pName == NULL || *pName == '\0') {
