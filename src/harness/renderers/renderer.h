@@ -8,7 +8,7 @@ typedef struct tRenderer {
     void (*BeginScene)(br_actor* camera, br_pixelmap* colour_buffer);
     void (*EndScene)();
     void (*SetPalette)(uint8_t* palette);
-    void (*FullScreenQuad)(uint8_t* src, int width, int height);
+    void (*FullScreenQuad)(uint8_t* src);
     void (*Model)(br_actor* actor, br_model* model, br_matrix34 model_matrix);
     void (*ClearBuffers)();
     void (*BufferTexture)(br_pixelmap* pm);

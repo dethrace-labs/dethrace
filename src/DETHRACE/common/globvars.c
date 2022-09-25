@@ -3,7 +3,7 @@
 
 int gTyping;
 int gArrow_mode;
-int gInfo_on;
+int gInfo_on = 1;
 int gHost_abandon_game;
 int gRecover_car;
 int gDisallow_abandon_race;

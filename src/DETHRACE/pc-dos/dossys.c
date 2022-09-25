@@ -354,7 +354,19 @@ void PDAllocateScreenAndBack() {
     BrTableFindHook(PDMissingTable);
     BrModelFindHook(PDMissingModel);
     BrMapFindHook(PDMissingMap);
-    gScreen = DOSGfxBegin(gGraf_specs[gGraf_spec_index].gfx_init_string);
+
+    // This is a bit of a mix between the original DOS code and windows code...
+    // DOS:
+    // gScreen = DOSGfxBegin(gGraf_specs[gGraf_spec_index].gfx_init_string);
+    //
+    // Windows:
+    // SSDXInit(gGraf_specs[gGraf_spec_index].total_width, gGraf_specs[gGraf_spec_index].total_height)
+    // gScreen = BrPixelmapAllocate(BR_PMT_INDEX_8, ...)
+    //
+
+    Harness_Hook_GraphicsInit(gGraf_specs[gGraf_spec_index].total_width, gGraf_specs[gGraf_spec_index].total_height);
+    gScreen = BrPixelmapAllocate(BR_PMT_INDEX_8, gGraf_specs[gGraf_spec_index].total_width, gGraf_specs[gGraf_spec_index].total_height, NULL, BR_PMAF_NORMAL);
+
     gScreen->origin_x = 0;
     gDOSGfx_initialized = 1;
     gScreen->origin_y = 0;
@@ -518,13 +530,13 @@ void PDSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
 // IDA: void __cdecl PDSwitchToRealResolution()
 void PDSwitchToRealResolution() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    // NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl PDSwitchToLoresMode()
 void PDSwitchToLoresMode() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    // NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall PDMouseButtons(int *pButton_1@<EAX>, int *pButton_2@<EDX>)

@@ -360,7 +360,7 @@ void GLRenderer_EndScene() {
     CHECK_GL_ERROR("GLRenderer_RenderFullScreenQuad");
 }
 
-void GLRenderer_FullScreenQuad(uint8_t* screen_buffer, int width, int height) {
+void GLRenderer_FullScreenQuad(uint8_t* screen_buffer) {
     glViewport(vp_x, vp_y, vp_width, vp_height);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDisable(GL_DEPTH_TEST);
@@ -370,7 +370,7 @@ void GLRenderer_FullScreenQuad(uint8_t* screen_buffer, int width, int height) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8UI, width, height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, screen_buffer);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8UI, render_width, render_height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, screen_buffer);
     glBindVertexArray(screen_buffer_vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, screen_buffer_ebo);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

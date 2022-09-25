@@ -286,16 +286,24 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
     return 0;
 }
 
-void Harness_Hook_DOSGfxBegin() {
+void Harness_Hook_GraphicsInit(int render_width, int render_height) {
+    int window_width, window_height;
     if (force_nullrenderer) {
         return;
     }
-    renderer = Window_Create("Dethrace", 640, 400, 320, 200);
+    if (render_width == 320) {
+        window_width = render_width * 2;
+        window_height = render_height * 2;
+    } else {
+        window_width = render_width;
+        window_height = render_height;
+    }
+    renderer = Window_Create("Dethrace", window_width, window_height, render_width, render_height);
 }
 
 // Render 2d back buffer
 void Harness_RenderScreen(br_pixelmap* dst, br_pixelmap* src) {
-    renderer->FullScreenQuad((uint8_t*)src->pixels, 320, 200);
+    renderer->FullScreenQuad((uint8_t*)src->pixels);
 
     last_dst = dst;
     last_src = src;
