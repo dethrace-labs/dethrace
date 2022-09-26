@@ -8,11 +8,6 @@ then
 else
     export CC=gcc
     export CXX=g++
-
-    # Disable PIE such that addr2line is able to convert an address info file name and line number
-    export CFLAGS=-no-pie
-    export CXXFLAGS=-no-pie
-    export LDFLAGS=-no-pie
 fi
 
 # install deps

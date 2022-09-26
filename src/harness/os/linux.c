@@ -1,5 +1,6 @@
 // Based on https://gist.github.com/jvranish/4441299
 
+#define _GNU_SOURCE
 #include "harness/os.h"
 #include <assert.h>
 #include <ctype.h>
@@ -10,6 +11,7 @@
 #include <fcntl.h>
 #include <libgen.h>
 #include <limits.h>
+#include <link.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -27,6 +29,29 @@ static char _program_name[1024];
 static void* stack_traces[MAX_STACK_FRAMES];
 #define TRACER_PID_STRING "TracerPid:"
 DIR* directory_iterator;
+
+struct dl_iterate_callback_data {
+    int initialized;
+    intptr_t start;
+} dethrace_dl_data;
+
+static int dl_iterate_callback(struct dl_phdr_info *info, size_t size, void *data)
+{
+    struct dl_iterate_callback_data *callback_data = data;
+
+    if (strcmp(info->dlpi_name, "") == 0) {
+        callback_data->start = info->dlpi_addr;
+    }
+    return 0;
+}
+
+static intptr_t get_dethrace_offset() {
+    if (!dethrace_dl_data.initialized) {
+        dethrace_dl_data.initialized = 1;
+        dl_iterate_phdr(dl_iterate_callback, &dethrace_dl_data);
+    }
+    return dethrace_dl_data.start;
+}
 
 uint32_t OS_GetTime() {
     struct timespec spec;
@@ -109,7 +134,7 @@ int addr2line(char const* const program_name, void const* const addr) {
     char addr2line_cmd[512] = { 0 };
 
     /* have addr2line map the address to the related line in the code */
-    sprintf(addr2line_cmd, "addr2line -f -p -e %.256s %p", program_name, addr);
+    sprintf(addr2line_cmd, "addr2line -f -p -e %.256s %p", program_name, addr - get_dethrace_offset());
 
     fprintf(stderr, "%d: ", stack_nbr++);
     return system(addr2line_cmd);
@@ -136,7 +161,7 @@ void print_stack_trace() {
     }
 }
 
-void signal_handler(int sig, siginfo_t* siginfo, void* context) {
+static void signal_handler(int sig, siginfo_t* siginfo, void* context) {
     (void)context;
     fputs("\n******************\n", stderr);
 
@@ -223,8 +248,6 @@ void signal_handler(int sig, siginfo_t* siginfo, void* context) {
     exit(1);
 }
 
-static uint8_t alternate_stack[SIGSTKSZ];
-
 void resolve_full_path(char* path, const char* argv0) {
     if (argv0[0] == '/') { // run with absolute path
         strcpy(path, argv0);
@@ -239,16 +262,16 @@ void resolve_full_path(char* path, const char* argv0) {
 }
 
 void OS_InstallSignalHandler(char* program_name) {
-
     resolve_full_path(_program_name, program_name);
 
     /* setup alternate stack */
     {
         stack_t ss = {};
-        /* malloc is usually used here, I'm not 100% sure my static allocation
-         is valid but it seems to work just fine. */
-        ss.ss_sp = (void*)alternate_stack;
-        ss.ss_size = SIGSTKSZ;
+        ss.ss_sp = malloc(2 * MINSIGSTKSZ);
+        if (ss.ss_sp == NULL) {
+            err(1, "malloc");
+        }
+        ss.ss_size = 2 * MINSIGSTKSZ;
         ss.ss_flags = 0;
 
         if (sigaltstack(&ss, NULL) != 0) {
