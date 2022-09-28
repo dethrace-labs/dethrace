@@ -1206,7 +1206,26 @@ void MungeSpecialVolume(tCollision_info* pCar) {
     tCar_spec* car;
     LOG_TRACE("(%p)", pCar);
 
-    STUB_ONCE();
+    new_special_volume = FindSpecialVolume(&pCar->pos, pCar->last_special_volume);
+    if (pCar->auto_special_volume != NULL && (new_special_volume == NULL || new_special_volume->gravity_multiplier == 1.f)) {
+        if (pCar->water_d == 10000.f && pCar->water_depth_factor != 1.f) {
+            pCar->auto_special_volume = NULL;
+        } else {
+            new_special_volume = pCar->auto_special_volume;
+        }
+    }
+    if (pCar->last_special_volume != new_special_volume && pCar->driver == eDriver_local_human) {
+        if (pCar->last_special_volume != NULL && pCar->last_special_volume->exit_noise >= 0 && (new_special_volume == NULL || pCar->last_special_volume->exit_noise != new_special_volume->exit_noise)) {
+            DRS3StartSound(gCar_outlet, pCar->last_special_volume->exit_noise);
+        }
+        if (new_special_volume != NULL && new_special_volume->entry_noise >= 0 && (pCar->last_special_volume == NULL || pCar->last_special_volume->entry_noise != new_special_volume->entry_noise)) {
+            DRS3StartSound(gCar_outlet, new_special_volume->entry_noise);
+        }
+    }
+    pCar->last_special_volume = new_special_volume;
+    if (new_special_volume != NULL && pCar->num_smoke_columns != 0 && pCar->last_special_volume != NULL && pCar->last_special_volume->gravity_multiplier < 1.f) {
+        StopCarSmoking((tCar_spec*)pCar);
+    }
 }
 
 // IDA: void __usercall ResetCarSpecialVolume(tCollision_info *pCar@<EAX>)

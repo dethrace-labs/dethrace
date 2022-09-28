@@ -865,7 +865,35 @@ void DoDifferenceX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU8 the_byte;
     tU32 the_row_bytes;
     LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
-    NOT_IMPLEMENTED();
+
+    first_line = MemReadU16(&pFlic_info->data);
+    line_count = MemReadU16(&pFlic_info->data);
+    the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
+    line_pixel_ptr = pFlic_info->first_pixel + first_line * the_row_bytes;
+    for (i = 0; i < line_count; i++) {
+        pixel_ptr = line_pixel_ptr;
+        number_of_packets = MemReadU8(&pFlic_info->data);
+        for (j = 0; j < number_of_packets; j++) {
+            skip_count = MemReadU8(&pFlic_info->data);
+            size_count = MemReadS8(&pFlic_info->data);
+            pixel_ptr += skip_count;
+            if (size_count >= 0) {
+                for (k = 0; k < size_count; k++) {
+                    *pixel_ptr = *pFlic_info->data;
+                    pFlic_info->data++;
+                    pixel_ptr++;
+                }
+            } else {
+                the_byte = *pFlic_info->data;
+                pFlic_info->data++;
+                for (k = 0; k < -size_count; k++) {
+                    *pixel_ptr = the_byte;
+                    pixel_ptr++;
+                }
+            }
+        }
+        line_pixel_ptr += the_row_bytes;
+    }
 }
 
 // IDA: void __usercall DoDifferenceTrans(tFlic_descriptor *pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
@@ -883,7 +911,42 @@ void DoDifferenceTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU8 the_byte;
     tU32 the_row_bytes;
     LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
-    NOT_IMPLEMENTED();
+
+    first_line = MemReadU16(&pFlic_info->data);
+    line_count = MemReadU16(&pFlic_info->data);
+    the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
+    line_pixel_ptr = pFlic_info->first_pixel + first_line * the_row_bytes;
+    for (i = 0; i < line_count; i++) {
+        pixel_ptr = line_pixel_ptr;
+        number_of_packets = MemReadU8(&pFlic_info->data);
+        for (j = 0; j < number_of_packets; j++) {
+            skip_count = MemReadU8(&pFlic_info->data);
+            size_count = MemReadS8(&pFlic_info->data);
+            pixel_ptr += skip_count;
+            if (size_count >= 0) {
+                for (k = 0; k < size_count; k++) {
+                    the_byte = *pFlic_info->data;
+                    pFlic_info->data++;
+                    if (the_byte != '\0') {
+                        *pixel_ptr = the_byte;
+                    }
+                    pixel_ptr++;
+                }
+            } else {
+                the_byte = *pFlic_info->data;
+                pFlic_info->data++;
+                if (the_byte == '\0') {
+                    pixel_ptr += size_count;
+                } else {
+                    for (k = 0; k < -size_count; k++) {
+                        *pixel_ptr = the_byte;
+                        pixel_ptr++;
+                    }
+                }
+            }
+        }
+        line_pixel_ptr += the_row_bytes;
+    }
 }
 
 // IDA: void __usercall DoColour256(tFlic_descriptor *pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
@@ -1068,7 +1131,18 @@ void DoBlack(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU32 the_row_bytes;
     tU32* line_pixel_ptr;
     LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
-    NOT_IMPLEMENTED();
+
+    pixel_ptr = pFlic_info->first_pixel;
+    the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
+    the_width = pFlic_info->width;
+    for (i = 0; i < pFlic_info->height; i++) {
+      line_pixel_ptr = (tU32*)pixel_ptr;
+      for (j = 0; j < the_width / sizeof(tU32); j++) {
+          *line_pixel_ptr = 0;
+          line_pixel_ptr++;
+      }
+      pixel_ptr += the_row_bytes;
+    }
 }
 
 // IDA: void __usercall DoRunLengthX(tFlic_descriptor *pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
@@ -1163,7 +1237,18 @@ void DoUncompressed(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU32 the_row_bytes;
     tU32* line_pixel_ptr;
     LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
-    NOT_IMPLEMENTED();
+
+    pixel_ptr = pFlic_info->first_pixel;
+    the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
+    the_width = pFlic_info->width;
+    for (i = 0; i < pFlic_info->height; i++) {
+        line_pixel_ptr = (tU32*)pixel_ptr;
+        for (j = 0; j < the_width / 4; j++) {
+            *line_pixel_ptr = MemReadU32(&pFlic_info->data);
+            line_pixel_ptr++;
+        }
+        pixel_ptr += the_row_bytes;
+    }
 }
 
 // IDA: void __usercall DoUncompressedTrans(tFlic_descriptor *pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
@@ -1176,7 +1261,25 @@ void DoUncompressedTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU8 the_byte;
     tU32 the_row_bytes;
     LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
-    NOT_IMPLEMENTED();
+
+    pixel_ptr = pFlic_info->first_pixel;
+    the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
+    the_width = pFlic_info->width;
+    for (i = 0; i < pFlic_info->height; i++) {
+        line_pixel_ptr = pixel_ptr;
+        for (j = 0; j < the_width; j++) {
+#if defined (DETHRACE_FIX_BUGS)
+            the_byte = MemReadU8(&pFlic_info->data);
+#else
+            the_byte = MemReadU32(&pFlic_info->data);
+#endif
+            if (the_byte != '\0') {
+                *line_pixel_ptr = the_byte;
+            }
+            line_pixel_ptr++;
+        }
+        pixel_ptr += the_row_bytes;
+    }
 }
 
 // IDA: void __usercall DoMini(tFlic_descriptor *pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
