@@ -19,7 +19,8 @@ else()
     include(GetGitRevisionDescription)
     git_describe(DETHRACE_VERSION)
 endif()
-message(STATUS "DethRace version ${DETHRACE_VERSION}")
+
+message(STATUS "dethrace version ${DETHRACE_VERSION}")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 
@@ -53,6 +54,7 @@ add_subdirectory(lib/glad)
 add_subdirectory(lib/miniaudio)
 
 add_library(compile_with_werror INTERFACE)
+
 if(DETHRACE_WERROR)
     if(MSVC)
         target_compile_options(compile_with_werror INTERFACE /WX)
@@ -101,10 +103,12 @@ if(DETHRACE_INSTALL)
     string(TOLOWER "${CMAKE_SYSTEM_NAME}-${DETHRACE_ARCH}" CPACK_SYSTEM_NAME)
 
     set(CPACK_PACKAGE_DIRECTORY dist)
+
     if(MSVC)
         set(CPACK_GENERATOR ZIP)
     else()
         set(CPACK_GENERATOR TGZ)
     endif()
+
     include(CPack)
 endif()
