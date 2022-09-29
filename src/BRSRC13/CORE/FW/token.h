@@ -3,7 +3,7 @@
 
 #include "brender/br_types.h"
 
-void BrTokenBegin();
+void BrTokenBegin(void);
 
 br_token BrTokenCreate(char* identifier, br_token type);
 

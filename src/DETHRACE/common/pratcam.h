@@ -19,17 +19,17 @@ extern int gCurrent_pratcam_precedence;
 extern int gCurrent_ambient_prat_sequence;
 extern int gCurrent_pratcam_alternative;
 
-int PratcamGetCurrent();
+int PratcamGetCurrent(void);
 
-int PratcamGetAmbient();
+int PratcamGetAmbient(void);
 
-int PratcamGetPending();
+int PratcamGetPending(void);
 
-void TogglePratcam();
+void TogglePratcam(void);
 
 void LoadPratcam(char* pFolder_name);
 
-void NextPratcamChunk();
+void NextPratcamChunk(void);
 
 void NewPratcamSequence(int pSequence_index, int pStart_chunk);
 
@@ -41,36 +41,36 @@ void PratcamEventNow(int pIndex);
 
 void PratcamEvent(int pIndex);
 
-int HighResPratBufferWidth();
+int HighResPratBufferWidth(void);
 
-int HighResPratBufferHeight();
+int HighResPratBufferHeight(void);
 
-void InitPratcam();
+void InitPratcam(void);
 
-void DisposePratcam();
+void DisposePratcam(void);
 
 void DoPratcam(tU32 pThe_time);
 
 void TestPratCam(int pIndex);
 
-void PratCam0();
+void PratCam0(void);
 
-void PratCam1();
+void PratCam1(void);
 
-void PratCam2();
+void PratCam2(void);
 
-void PratCam3();
+void PratCam3(void);
 
-void PratCam4();
+void PratCam4(void);
 
-void PratCam5();
+void PratCam5(void);
 
-void PratCam6();
+void PratCam6(void);
 
-void PratCam7();
+void PratCam7(void);
 
-void PratCam8();
+void PratCam8(void);
 
-void PratCam9();
+void PratCam9(void);
 
 #endif

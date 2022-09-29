@@ -24,26 +24,26 @@ extern int gQueued_wasted_massages[5];
 extern tU32 gTime_bonus_start;
 extern int gLast_credit_headup__mainloop; // suffix added to avoid duplicate symbol
 
-void ToggleInfo();
+void ToggleInfo(void);
 
-void CalculateFrameRate();
+void CalculateFrameRate(void);
 
-void LoseOldestWastedMassage();
+void LoseOldestWastedMassage(void);
 
 void QueueWastedMassage(int pIndex);
 
-void MungeHeadups();
+void MungeHeadups(void);
 
 void UpdateFramePeriod(tU32* pCamera_period);
 
-tU32 GetLastTickCount();
+tU32 GetLastTickCount(void);
 
-void CheckTimer();
+void CheckTimer(void);
 
-int MungeRaceFinished();
+int MungeRaceFinished(void);
 
-tRace_result MainGameLoop();
+tRace_result MainGameLoop(void);
 
-tRace_result DoRace();
+tRace_result DoRace(void);
 
 #endif

@@ -10,30 +10,30 @@ extern tS32 gLast_demo_end_anim;
 
 void ShowCutScene(int pIndex, int pWait_end, int pSound_ID, br_scalar pDelay);
 
-void DoSCILogo();
+void DoSCILogo(void);
 
-void DoStainlessLogo();
+void DoStainlessLogo(void);
 
 void PlaySmackerFile(char* pSmack_name);
 
-void DoOpeningAnimation();
+void DoOpeningAnimation(void);
 
-void DoNewGameAnimation();
+void DoNewGameAnimation(void);
 
-void DoGoToRaceAnimation();
+void DoGoToRaceAnimation(void);
 
-void DoEndRaceAnimation();
+void DoEndRaceAnimation(void);
 
-void DoGameOverAnimation();
+void DoGameOverAnimation(void);
 
-void DoGameCompletedAnimation();
+void DoGameCompletedAnimation(void);
 
-void DoFeatureUnavailableInDemo();
+void DoFeatureUnavailableInDemo(void);
 
-void DoFullVersionPowerpoint();
+void DoFullVersionPowerpoint(void);
 
-void DoDemoGoodbye();
+void DoDemoGoodbye(void);
 
-void StartLoadingScreen();
+void StartLoadingScreen(void);
 
 #endif

@@ -69,19 +69,19 @@ void AdjustSpark(int pSpark_num, br_vector3* pos, br_vector3* length);
 
 void AdjustShrapnel(int pShrapnel_num, br_vector3* pos, tU16 pAge, br_material* pMaterial);
 
-void ResetSparks();
+void ResetSparks(void);
 
-void ResetShrapnel();
+void ResetShrapnel(void);
 
 void CreateShrapnelShower(br_vector3* pos, br_vector3* v, br_vector3* pNormal, br_scalar pForce, tCar_spec* c1, tCar_spec* c2);
 
-void InitShrapnel();
+void InitShrapnel(void);
 
-void LoadInShrapnel();
+void LoadInShrapnel(void);
 
 void KillShrapnel(int i);
 
-void DisposeShrapnel();
+void DisposeShrapnel(void);
 
 void ReplayShrapnel(tU32 pTime);
 
@@ -95,7 +95,7 @@ void SmokeCircle(br_vector3* o, br_scalar r, br_scalar extra_z, br_scalar streng
 
 int CmpSmokeZ(void* p1, void* p2);
 
-void RenderRecordedSmokeCircles();
+void RenderRecordedSmokeCircles(void);
 
 void RecordSmokeCircle(br_vector3* pCent, br_scalar pR, br_scalar pStrength, br_pixelmap* pShade, br_scalar pAspect);
 
@@ -105,25 +105,25 @@ void ReplaySmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
 
 void GenerateContinuousSmoke(tCar_spec* pCar, int wheel, tU32 pTime);
 
-void DustRotate();
+void DustRotate(void);
 
 void RenderSmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world, tU32 pTime);
 
 void CreatePuffOfSmoke(br_vector3* pos, br_vector3* v, br_scalar strength, br_scalar pDecay_factor, int pType, tCar_spec* pC);
 
-void ResetSmoke();
+void ResetSmoke(void);
 
 void AdjustSmoke(int pIndex, tU8 pType, br_vector3* pPos, br_scalar pRadius, br_scalar pStrength);
 
-void ActorError();
+void ActorError(void);
 
 void AdjustSmokeColumn(int pIndex, tCar_spec* pCar, int pVertex, int pColour);
 
 void CreateSmokeColumn(tCar_spec* pCar, int pColour, int pVertex_index, tU32 pLifetime);
 
-void GenerateSmokeShades();
+void GenerateSmokeShades(void);
 
-void GenerateItFoxShadeTable();
+void GenerateItFoxShadeTable(void);
 
 void AdjustFlame(int pIndex, int pFrame_count, br_scalar pScale_x, br_scalar pScale_y, br_scalar pOffset_x, br_scalar pOffset_z);
 
@@ -137,13 +137,13 @@ void ReplaySmokeColumn(tU32 pTime);
 
 void MungeSmokeColumn(tU32 pTime);
 
-void DisposeFlame();
+void DisposeFlame(void);
 
-void InitFlame();
+void InitFlame(void);
 
 void InitSplash(FILE* pF);
 
-void DisposeSplash();
+void DisposeSplash(void);
 
 void DrawTheGlow(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_actor* pCamera);
 
@@ -151,7 +151,7 @@ void PipeInstantUnSmudge(tCar_spec* pCar);
 
 void SmudgeCar(tCar_spec* pCar, int fire_point);
 
-void ResetSmokeColumns();
+void ResetSmokeColumns(void);
 
 void SetSmokeOn(int pSmoke_on);
 
@@ -159,7 +159,7 @@ void ReallySetSmokeOn(int pSmoke_on);
 
 void SetSmoke(int pSmoke_on);
 
-int GetSmokeOn();
+int GetSmokeOn(void);
 
 void StopCarSmoking(tCar_spec* pCar);
 
@@ -173,15 +173,15 @@ void CreateSplash(tCar_spec* pCar, tU32 pTime);
 
 void MungeSplash(tU32 pTime);
 
-void RenderSplashes();
+void RenderSplashes(void);
 
 void GetSmokeShadeTables(FILE* f);
 
-void FreeSmokeShadeTables();
+void FreeSmokeShadeTables(void);
 
 void LoadInKevStuff(FILE* pF);
 
-void DisposeKevStuff();
+void DisposeKevStuff(void);
 
 void DisposeKevStuffCar(tCar_spec* pCar);
 

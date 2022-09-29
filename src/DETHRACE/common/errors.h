@@ -16,9 +16,9 @@ HARNESS_NORETURN void FatalError(int pStr_index, ...);
 
 void NonFatalError(int pStr_index, ...);
 
-void CloseDiagnostics();
+void CloseDiagnostics(void);
 
-void OpenDiagnostics();
+void OpenDiagnostics(void);
 
 void dr_dprintf(char* fmt_string, ...);
 

@@ -12,13 +12,13 @@ extern tInterface_spec* gSpec;
 extern int gAlways_typing;
 extern int gDisabled_count;
 
-void SetAlwaysTyping();
+void SetAlwaysTyping(void);
 
-void ClearAlwaysTyping();
+void ClearAlwaysTyping(void);
 
 int ChoiceDisabled(int pChoice);
 
-void ResetInterfaceTimeout();
+void ResetInterfaceTimeout(void);
 
 void ChangeSelection(tInterface_spec* pSpec, int* pOld_selection, int* pNew_selection, int pMode, int pSkip_disabled);
 

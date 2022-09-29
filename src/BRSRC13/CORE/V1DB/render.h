@@ -31,7 +31,7 @@ void BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour
 
 void BrZbSceneRenderAdd(br_actor* tree);
 
-void BrZbSceneRenderEnd();
+void BrZbSceneRenderEnd(void);
 
 void BrZbSceneRender(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer);
 
@@ -39,7 +39,7 @@ void BrZsSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour
 
 void BrZsSceneRenderAdd(br_actor* tree);
 
-void BrZsSceneRenderEnd();
+void BrZsSceneRenderEnd(void);
 
 void BrZsSceneRender(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer);
 

@@ -15,13 +15,13 @@ int MainMenuDone1(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
 
 int MainMenuDone2(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out);
 
-void StartMainMenu();
+void StartMainMenu(void);
 
 int DoMainMenuInterface(tU32 pTime_out, int pContinue_allowed);
 
 tMM_result GetMainMenuOption(tU32 pTime_out, int pContinue_allowed);
 
-void QuitVerifyStart();
+void QuitVerifyStart(void);
 
 int QuitVerifyDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out);
 

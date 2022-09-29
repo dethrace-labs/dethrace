@@ -3,8 +3,8 @@
 
 #include "brender/br_types.h"
 
-void _BrBeginHook();
+void _BrBeginHook(void);
 
-void _BrEndHook();
+void _BrEndHook(void);
 
 #endif

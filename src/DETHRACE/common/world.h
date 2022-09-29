@@ -125,7 +125,7 @@ float ControlBoundFunkGroovePlus(int pSlot_number, float pValue);
 
 void ShiftBoundGrooveFunks(char* pStart, char* pEnd, ptrdiff_t pDelta);
 
-tFunkotronic_spec* AddNewFunkotronic();
+tFunkotronic_spec* AddNewFunkotronic(void);
 
 void DisposeFunkotronics(int pOwner);
 
@@ -143,7 +143,7 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset);
 
 void DisposeGroovidelics(int pOwner);
 
-tGroovidelic_spec* AddNewGroovidelic();
+tGroovidelic_spec* AddNewGroovidelic(void);
 
 void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_offset, int pAllowed_to_be_absent);
 
@@ -153,7 +153,7 @@ void KillFunkotronic(int pOwner);
 
 br_uint_32 DeleteBastards(br_actor* pActor, br_matrix34* pMatrix, void* pArg);
 
-void DeleteAnyZeroBastards();
+void DeleteAnyZeroBastards(void);
 
 br_uint_32 ApplyTransToModels(br_actor* pActor, br_matrix34* pMatrix, void* pArg);
 
@@ -165,11 +165,11 @@ void SetSpecVolMatSize(br_actor* pActor);
 
 void FindInverseAndWorldBox(tSpecial_volume* pSpec);
 
-void UpdateSpecVol();
+void UpdateSpecVol(void);
 
-void SaveSpecialVolumes();
+void SaveSpecialVolumes(void);
 
-void SaveAdditionalStuff();
+void SaveAdditionalStuff(void);
 
 br_uint_32 ProcessMaterials(br_actor* pActor, tPMFM2CB pCallback);
 
@@ -177,11 +177,11 @@ br_uint_32 ProcessFaceMaterials2(br_actor* pActor, tPMFM2CB pCallback);
 
 void ChangePerspToSubdivCB(br_material* pMaterial);
 
-void ChangePerspToSubdiv();
+void ChangePerspToSubdiv(void);
 
 void ChangeSubdivToPerspCB(br_material* pMaterial);
 
-void ChangeSubdivToPersp();
+void ChangeSubdivToPersp(void);
 
 intptr_t ProcessFaceMaterials(br_actor* pActor, tPMFMCB pCallback);
 
@@ -199,7 +199,7 @@ void RevealStoredTextures(tBrender_storage* pStorage);
 
 void SetCarStorageTexturingLevel(tBrender_storage* pStorage, tCar_texturing_level pNew, tCar_texturing_level pOld);
 
-tCar_texturing_level GetCarTexturingLevel();
+tCar_texturing_level GetCarTexturingLevel(void);
 
 void SetCarTexturingLevel(tCar_texturing_level pLevel);
 
@@ -217,13 +217,13 @@ br_material* WallUntexToPersp(br_model* pModel, tU16 pFace);
 
 br_material* WallLinearToPersp(br_model* pModel, tU16 pFace);
 
-tRoad_texturing_level GetRoadTexturingLevel();
+tRoad_texturing_level GetRoadTexturingLevel(void);
 
 void SetRoadTexturingLevel(tRoad_texturing_level pLevel);
 
 void ReallySetRoadTexturingLevel(tRoad_texturing_level pLevel);
 
-tWall_texturing_level GetWallTexturingLevel();
+tWall_texturing_level GetWallTexturingLevel(void);
 
 void SetWallTexturingLevel(tWall_texturing_level pLevel);
 
@@ -231,17 +231,17 @@ void ReallySetWallTexturingLevel(tWall_texturing_level pLevel);
 
 br_material* DisposeSuffixedMaterials(br_model* pModel, tU16 pFace);
 
-void DisposeTexturingMaterials();
+void DisposeTexturingMaterials(void);
 
 /*br_uint_32*/ intptr_t SetAccessoryRenderingCB(br_actor* pActor, void* pFlag);
 
 void SetAccessoryRendering(int pOn);
 
-int GetAccessoryRendering();
+int GetAccessoryRendering(void);
 
 void SetCarSimplificationLevel(int pLevel);
 
-int GetCarSimplificationLevel();
+int GetCarSimplificationLevel(void);
 
 void ParseSpecialVolume(FILE* pF, tSpecial_volume* pSpec, char* pScreen_name_str);
 
@@ -251,7 +251,7 @@ void LoadExceptionsFile(char* pName);
 
 void LoadExceptionsFileForTrack(char* pTrack_file_name);
 
-void FreeExceptions();
+void FreeExceptions(void);
 
 void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_info);
 
@@ -265,7 +265,7 @@ void ProcessTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera,
 
 br_scalar NormaliseDegreeAngle(br_scalar pAngle);
 
-void FunkThoseTronics();
+void FunkThoseTronics(void);
 
 void LollipopizeActor(br_actor* pSubject_actor, br_matrix34* ref_to_world, tLollipop_mode pWhich_axis);
 
@@ -279,19 +279,19 @@ void ObjectGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pM
 
 void GrooveThisDelic(tGroovidelic_spec* pGroove, tU32 pTime, int pInterrupt_it);
 
-void GrooveThoseDelics();
+void GrooveThoseDelics(void);
 
 void StopGroovidelic(br_actor* pActor);
 
 void SetGrooveInterrupt(int pGroove_index, br_matrix34* pMatrix, int pPath_interrupt, int pObject_interrupt, float pPath_resumption, float pObject_resumption);
 
-void ResetGrooveFlags();
+void ResetGrooveFlags(void);
 
-tSpecial_volume* GetDefaultSpecialVolumeForWater();
+tSpecial_volume* GetDefaultSpecialVolumeForWater(void);
 
 tSpecial_volume* FindSpecialVolume(br_vector3* pP, tSpecial_volume* pLast_vol);
 
-void SaveAdditionalActors();
+void SaveAdditionalActors(void);
 
 br_scalar DistanceFromFace(br_vector3* pPos, tFace_ref* pFace);
 
@@ -311,35 +311,35 @@ void DuplicateIfNotAmpersand(br_actor* pActor);
 
 void DropActor(int pIndex);
 
-void DropActor0();
+void DropActor0(void);
 
-void DropActor1();
+void DropActor1(void);
 
-void DropActor2();
+void DropActor2(void);
 
-void DropActor3();
+void DropActor3(void);
 
-void DropActor4();
+void DropActor4(void);
 
-void DropActor5();
+void DropActor5(void);
 
-void DropActor6();
+void DropActor6(void);
 
-void DropActor7();
+void DropActor7(void);
 
-void DropActor8();
+void DropActor8(void);
 
-void DropActor9();
+void DropActor9(void);
 
 br_uint_32 IdentifyAccCB(br_actor* pActor, void* pArg);
 
-void IdentifyAcc();
+void IdentifyAcc(void);
 
 br_uint_32 DelGrooveRef(br_actor* pActor, void* pArg);
 
 br_uint_32 DelReferencedModels(br_actor* pActor, void* pArg);
 
-void DeleteAcc();
+void DeleteAcc(void);
 
 br_uint_32 OffsetModel(br_actor* pActor, void* pArg);
 
@@ -347,7 +347,7 @@ void OffsetActor(br_actor* pActor, br_vector3* pOffset);
 
 void CentreActor(br_actor* pActor, br_vector3* pOffset);
 
-void SnapAccToVertical();
+void SnapAccToVertical(void);
 
 void RotateAccessory(br_angle pAngle);
 
@@ -355,204 +355,204 @@ void ScaleAccessory(float pScaling_factor);
 
 void MoveAccessory(br_scalar pX_shift, br_scalar pY_shift, br_scalar pZ_shift);
 
-void RotateAccL();
+void RotateAccL(void);
 
-void RotateAccL2();
+void RotateAccL2(void);
 
-void RotateAccL3();
+void RotateAccL3(void);
 
-void RotateAccL4();
+void RotateAccL4(void);
 
-void RotateAccR();
+void RotateAccR(void);
 
-void RotateAccR2();
+void RotateAccR2(void);
 
-void RotateAccR3();
+void RotateAccR3(void);
 
-void RotateAccR4();
+void RotateAccR4(void);
 
-void CycleAccRotate();
+void CycleAccRotate(void);
 
-void CycleAccScale();
+void CycleAccScale(void);
 
-void ScaleAccUp2();
+void ScaleAccUp2(void);
 
-void ScaleAccUp3();
+void ScaleAccUp3(void);
 
-void ScaleAccUp4();
+void ScaleAccUp4(void);
 
-void ScaleAccDown2();
+void ScaleAccDown2(void);
 
-void ScaleAccDown3();
+void ScaleAccDown3(void);
 
-void ScaleAccDown4();
+void ScaleAccDown4(void);
 
-void MoveXAccL();
+void MoveXAccL(void);
 
-void MoveXAccL2();
+void MoveXAccL2(void);
 
-void MoveXAccL3();
+void MoveXAccL3(void);
 
-void MoveXAccL4();
+void MoveXAccL4(void);
 
-void MoveXAccR();
+void MoveXAccR(void);
 
-void MoveXAccR2();
+void MoveXAccR2(void);
 
-void MoveXAccR3();
+void MoveXAccR3(void);
 
-void MoveXAccR4();
+void MoveXAccR4(void);
 
-void MoveYAccL();
+void MoveYAccL(void);
 
-void MoveYAccL2();
+void MoveYAccL2(void);
 
-void MoveYAccL3();
+void MoveYAccL3(void);
 
-void MoveYAccL4();
+void MoveYAccL4(void);
 
-void MoveYAccR();
+void MoveYAccR(void);
 
-void MoveYAccR2();
+void MoveYAccR2(void);
 
-void MoveYAccR3();
+void MoveYAccR3(void);
 
-void MoveYAccR4();
+void MoveYAccR4(void);
 
-void MoveZAccL();
+void MoveZAccL(void);
 
-void MoveZAccL2();
+void MoveZAccL2(void);
 
-void MoveZAccL3();
+void MoveZAccL3(void);
 
-void MoveZAccL4();
+void MoveZAccL4(void);
 
-void MoveZAccR();
+void MoveZAccR(void);
 
-void MoveZAccR2();
+void MoveZAccR2(void);
 
-void MoveZAccR3();
+void MoveZAccR3(void);
 
-void MoveZAccR4();
+void MoveZAccR4(void);
 
-br_material* GetInternalMat();
+br_material* GetInternalMat(void);
 
-br_material* GetExternalMat();
+br_material* GetExternalMat(void);
 
 void BuildSpecVolModel(tSpecial_volume* pSpec, int pIndex, br_material* pInt_mat, br_material* pExt_mat);
 
 void DropSpecVol(int pIndex);
 
-void DropSpecVol0();
+void DropSpecVol0(void);
 
-void DropSpecVol1();
+void DropSpecVol1(void);
 
-void DropSpecVol2();
+void DropSpecVol2(void);
 
-void DropSpecVol3();
+void DropSpecVol3(void);
 
-void DropSpecVol4();
+void DropSpecVol4(void);
 
-void DropSpecVol5();
+void DropSpecVol5(void);
 
-void DropSpecVol6();
+void DropSpecVol6(void);
 
-void DropSpecVol7();
+void DropSpecVol7(void);
 
-void DropSpecVol8();
+void DropSpecVol8(void);
 
-void DropSpecVol9();
+void DropSpecVol9(void);
 
-void IdentifySpecVol();
+void IdentifySpecVol(void);
 
 void DelSpecVolumeGraph(int pIndex);
 
-void DeleteSpecVol();
+void DeleteSpecVol(void);
 
-void RotateSpecVolL();
+void RotateSpecVolL(void);
 
-void RotateSpecVolL2();
+void RotateSpecVolL2(void);
 
-void RotateSpecVolL3();
+void RotateSpecVolL3(void);
 
-void RotateSpecVolL4();
+void RotateSpecVolL4(void);
 
-void RotateSpecVolR();
+void RotateSpecVolR(void);
 
-void RotateSpecVolR2();
+void RotateSpecVolR2(void);
 
-void RotateSpecVolR3();
+void RotateSpecVolR3(void);
 
-void RotateSpecVolR4();
+void RotateSpecVolR4(void);
 
-void CycleSpecVolRotate();
+void CycleSpecVolRotate(void);
 
-void CycleSpecVolScale();
+void CycleSpecVolScale(void);
 
-void ScaleSpecVolUp2();
+void ScaleSpecVolUp2(void);
 
-void ScaleSpecVolUp3();
+void ScaleSpecVolUp3(void);
 
-void ScaleSpecVolUp4();
+void ScaleSpecVolUp4(void);
 
-void ScaleSpecVolDown2();
+void ScaleSpecVolDown2(void);
 
-void ScaleSpecVolDown3();
+void ScaleSpecVolDown3(void);
 
-void ScaleSpecVolDown4();
+void ScaleSpecVolDown4(void);
 
-void MoveXSpecVolL();
+void MoveXSpecVolL(void);
 
-void MoveXSpecVolL2();
+void MoveXSpecVolL2(void);
 
-void MoveXSpecVolL3();
+void MoveXSpecVolL3(void);
 
-void MoveXSpecVolL4();
+void MoveXSpecVolL4(void);
 
-void MoveXSpecVolR();
+void MoveXSpecVolR(void);
 
-void MoveXSpecVolR2();
+void MoveXSpecVolR2(void);
 
-void MoveXSpecVolR3();
+void MoveXSpecVolR3(void);
 
-void MoveXSpecVolR4();
+void MoveXSpecVolR4(void);
 
-void MoveYSpecVolL();
+void MoveYSpecVolL(void);
 
-void MoveYSpecVolL2();
+void MoveYSpecVolL2(void);
 
-void MoveYSpecVolL3();
+void MoveYSpecVolL3(void);
 
-void MoveYSpecVolL4();
+void MoveYSpecVolL4(void);
 
-void MoveYSpecVolR();
+void MoveYSpecVolR(void);
 
-void MoveYSpecVolR2();
+void MoveYSpecVolR2(void);
 
-void MoveYSpecVolR3();
+void MoveYSpecVolR3(void);
 
-void MoveYSpecVolR4();
+void MoveYSpecVolR4(void);
 
-void MoveZSpecVolL();
+void MoveZSpecVolL(void);
 
-void MoveZSpecVolL2();
+void MoveZSpecVolL2(void);
 
-void MoveZSpecVolL3();
+void MoveZSpecVolL3(void);
 
-void MoveZSpecVolL4();
+void MoveZSpecVolL4(void);
 
-void MoveZSpecVolR();
+void MoveZSpecVolR(void);
 
-void MoveZSpecVolR2();
+void MoveZSpecVolR2(void);
 
-void MoveZSpecVolR3();
+void MoveZSpecVolR3(void);
 
-void MoveZSpecVolR4();
+void MoveZSpecVolR4(void);
 
-void SnapSpecVolToVertical();
+void SnapSpecVolToVertical(void);
 
-void ShowSpecialVolumes();
+void ShowSpecialVolumes(void);
 
-void HideSpecialVolumes();
+void HideSpecialVolumes(void);
 
 #endif

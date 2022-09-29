@@ -3,7 +3,7 @@
 
 #include "brender/br_types.h"
 
-br_pixelmap* BrDevLastBeginQuery();
+br_pixelmap* BrDevLastBeginQuery(void);
 
 void BrDevLastBeginSet(br_pixelmap* pm);
 
@@ -15,7 +15,7 @@ br_error BrDevBeginTV(br_pixelmap** ppm, char* setup_string, br_token_value* set
 
 br_pixelmap* BrDevBeginOld(char* setup_string);
 
-void BrDevEndOld();
+void BrDevEndOld(void);
 
 void BrDevPaletteSetOld(br_pixelmap* pm);
 

@@ -36,9 +36,9 @@ float RepairCar(tU16 pCar_ID, tU32 pFrame_period, br_scalar* pTotal_deflection);
 
 void TotallyRepairACar(tCar_spec* pCar);
 
-void TotallyRepairCar();
+void TotallyRepairCar(void);
 
-void CheckLastCar();
+void CheckLastCar(void);
 
 void KnackerThisCar(tCar_spec* pCar);
 

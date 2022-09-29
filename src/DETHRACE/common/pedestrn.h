@@ -81,21 +81,21 @@ br_actor* GetPedestrianActor(int pIndex);
 
 br_pixelmap* GetPedestrianTexture(br_actor* pActor, int* pFlipped);
 
-void TogglePedestrians();
+void TogglePedestrians(void);
 
-void InitPedGibs();
+void InitPedGibs(void);
 
 void SetPedMaterialForRender(br_actor* pActor);
 
 void PedCallBack(br_actor* pActor, br_model* pModel, br_material* pMaterial, void* pRender_data, br_uint_8 pStyle, int pOn_screen);
 
-void InitPeds();
+void InitPeds(void);
 
 void MungeModelSize(br_actor* pActor, br_scalar pScaling_factor);
 
 int BurstPedestrian(tPedestrian_data* pPedestrian, float pSplattitudinalitude, int pAllow_explosion);
 
-void ResetAllPedGibs();
+void ResetAllPedGibs(void);
 
 void AdjustPedGib(int pIndex, int pSize, int pGib_index, int pPed_index, br_matrix34* pTrans);
 
@@ -123,7 +123,7 @@ void ChangeActionTo(tPedestrian_data* pPedestrian, int pAction_index, int pRedo_
 
 int MungePedestrianAction(tPedestrian_data* pPedestrian, float pDanger_level);
 
-void MakeFlagWavingBastardWaveHisFlagWhichIsTheProbablyTheLastThingHeWillEverDo();
+void MakeFlagWavingBastardWaveHisFlagWhichIsTheProbablyTheLastThingHeWillEverDo(void);
 
 void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_vector3* pDanger_direction);
 
@@ -131,7 +131,7 @@ float CalcPedestrianDangerLevel(tPedestrian_data* pPedestrian, br_vector3* pDang
 
 tPed_hit_position MoveToEdgeOfCar(tPedestrian_data* pPedestrian, tCollision_info* pCar, br_actor* pCar_actor, br_scalar pPed_x, br_scalar pPed_z, br_scalar pCar_bounds_min_x, br_scalar pCar_bounds_max_x, br_scalar pCar_bounds_min_z, br_scalar pCar_bounds_max_z, br_vector3* pMin_ped_bounds_car, br_vector3* pMax_ped_bounds_car);
 
-void CheckLastPed();
+void CheckLastPed(void);
 
 int BloodyWheels(tCar_spec* pCar, br_vector3* pPed_car, br_scalar pSize, br_vector3* pPed_glob);
 
@@ -147,7 +147,7 @@ void AdjustPedestrian(int pIndex, int pAction_index, int pFrame_index, int pHit_
 
 void SquirtPathVertex(br_vertex* pFirst_vertex, br_vector3* pPoint);
 
-void ResetAllPedestrians();
+void ResetAllPedestrians(void);
 
 void GroundPedestrian(tPedestrian_data* pPedestrian);
 
@@ -155,111 +155,111 @@ void RevivePedestrian(tPedestrian_data* pPedestrian, int pAnimate);
 
 void MungePedestrians(tU32 pFrame_period);
 
-void RespawnPedestrians();
+void RespawnPedestrians(void);
 
-int GetPedCount();
+int GetPedCount(void);
 
 int GetPedPosition(int pIndex, br_vector3* pPos);
 
 void CreatePedestrian(FILE* pG, tPedestrian_instruction* pInstructions, int pInstruc_count, int pInit_instruc, int pRef_num, int pForce_read);
 
-void ResetProxRay();
+void ResetProxRay(void);
 
-void PedMaterialFromHell();
+void PedMaterialFromHell(void);
 
-void ResetPedMaterial();
+void ResetPedMaterial(void);
 
 void LoadInPedestrians(FILE* pF, int pSubs_count, tPed_subs* pSubs_array);
 
 br_actor* BuildPedPaths(tPedestrian_instruction* pInstructions, int pInstruc_count, int pInit_instruc);
 
-void WriteOutPeds();
+void WriteOutPeds(void);
 
-void AddPed();
+void AddPed(void);
 
 void NewPed(int pRef_num);
 
-void RemoveCurrentPedPath();
+void RemoveCurrentPedPath(void);
 
-void ScrubPedestrian();
+void ScrubPedestrian(void);
 
-void TogglePedDetect();
+void TogglePedDetect(void);
 
-void NewPed0();
+void NewPed0(void);
 
-void NewPed1();
+void NewPed1(void);
 
-void NewPed2();
+void NewPed2(void);
 
-void NewPed3();
+void NewPed3(void);
 
-void NewPed4();
+void NewPed4(void);
 
-void NewPed5();
+void NewPed5(void);
 
-void NewPed6();
+void NewPed6(void);
 
-void NewPed7();
+void NewPed7(void);
 
-void NewPed8();
+void NewPed8(void);
 
-void NewPed9();
+void NewPed9(void);
 
-void NewPed0B();
+void NewPed0B(void);
 
-void NewPed1B();
+void NewPed1B(void);
 
-void NewPed2B();
+void NewPed2B(void);
 
-void NewPed3B();
+void NewPed3B(void);
 
-void NewPed4B();
+void NewPed4B(void);
 
-void NewPed5B();
+void NewPed5B(void);
 
-void NewPed6B();
+void NewPed6B(void);
 
-void NewPed7B();
+void NewPed7B(void);
 
-void NewPed8B();
+void NewPed8B(void);
 
-void NewPed9B();
+void NewPed9B(void);
 
-void MungeShowPedPath();
+void MungeShowPedPath(void);
 
-void DropPedPoint2();
+void DropPedPoint2(void);
 
-void DropPedPoint();
+void DropPedPoint(void);
 
-void DropInitPedPoint();
+void DropInitPedPoint(void);
 
-void DropPedPointAir2();
+void DropPedPointAir2(void);
 
-void DropPedPointAir();
+void DropPedPointAir(void);
 
-void DropInitPedPointAir();
+void DropInitPedPointAir(void);
 
 intptr_t KillActorsModel(br_actor* pActor, void* pArg);
 
-void DisposePedPaths();
+void DisposePedPaths(void);
 
 void GetPedPos(int* pPed_index, int* pPoint_index);
 
-void ShowPedPos();
+void ShowPedPos(void);
 
-void ShowPedPaths();
+void ShowPedPaths(void);
 
-void PullPedPoint();
+void PullPedPoint(void);
 
-void PullPedPointAir();
+void PullPedPointAir(void);
 
-void DeletePedPath();
+void DeletePedPath(void);
 
-void DeletePedPoint();
+void DeletePedPoint(void);
 
-void DisposePedestrians();
+void DisposePedestrians(void);
 
-void DoPedReport();
+void DoPedReport(void);
 
 void RenderProximityRays(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world, tU32 pTime);
 

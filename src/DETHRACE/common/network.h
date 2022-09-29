@@ -39,19 +39,19 @@ extern int gBastard_has_answered;
 extern int gTime_for_next_one;
 extern int gReceived_game_scores;
 
-int NetInitialise();
+int NetInitialise(void);
 
-int NetShutdown();
+int NetShutdown(void);
 
-void ShutdownNetIfRequired();
+void ShutdownNetIfRequired(void);
 
-void DisableNetService();
+void DisableNetService(void);
 
-void ReenableNetService();
+void ReenableNetService(void);
 
-int PermitNetServiceReentrancy();
+int PermitNetServiceReentrancy(void);
 
-void HaltNetServiceReentrancy();
+void HaltNetServiceReentrancy(void);
 
 void NetSendHeadupToAllPlayers(char* pMessage);
 
@@ -59,23 +59,23 @@ void NetSendHeadupToEverybody(char* pMessage);
 
 void NetSendHeadupToPlayer(char* pMessage, tPlayer_ID pPlayer);
 
-void InitialisePlayerStati();
+void InitialisePlayerStati(void);
 
-void LeaveTempGame();
+void LeaveTempGame(void);
 
-void DisposeCurrentJoinPollGame();
+void DisposeCurrentJoinPollGame(void);
 
-void DoNextJoinPoll();
+void DoNextJoinPoll(void);
 
 void NetStartProducingJoinList(void (*pAdd_proc)(tNet_game_details*));
 
-void NetEndJoinList();
+void NetEndJoinList(void);
 
 void NetDisposePIDGameInfo(tNet_game_details* pDetails);
 
 void NetDisposeGameDetails(tNet_game_details* pDetails);
 
-tNet_game_details* NetAllocatePIDGameDetails();
+tNet_game_details* NetAllocatePIDGameDetails(void);
 
 void NetLeaveGameLowLevel(tNet_game_details* pDetails);
 
@@ -131,11 +131,11 @@ tNet_contents* NetGetToHostContents(tNet_message_type pType, tS32 pSize_decider)
 
 tNet_contents* NetGetBroadcastContents(tNet_message_type pType, tS32 pSize_decider);
 
-void NetSendMessageStacks();
+void NetSendMessageStacks(void);
 
 tNet_message* NetAllocateMessage(int pSize);
 
-void NetFreeExcessMemory();
+void NetFreeExcessMemory(void);
 
 int NetDisposeMessage(tNet_game_details* pDetails, tNet_message* pMessage);
 
@@ -145,7 +145,7 @@ void ReceivedSendMeDetails(tNet_contents* pContents, void* pSender_address);
 
 void ReceivedDetails(tNet_contents* pContents);
 
-void SendOutPlayerList();
+void SendOutPlayerList(void);
 
 void ReceivedJoin(tNet_contents* pContents, void* pSender_address);
 
@@ -159,7 +159,7 @@ void HostHasBittenTheDust(int pMessage_index);
 
 void ReceivedHosticide(tNet_contents* pContents);
 
-void ConfirmReceipt();
+void ConfirmReceipt(void);
 
 void ReceivedNewPlayerList(tNet_contents* pContents, tNet_message* pM);
 
@@ -201,13 +201,13 @@ void ReceivedGameScores(tNet_contents* pContents);
 
 void ReceivedMessage(tNet_message* pMessage, void* pSender_address, tU32 pReceive_time);
 
-void NetReceiveAndProcessMessages();
+void NetReceiveAndProcessMessages(void);
 
-void BroadcastStatus();
+void BroadcastStatus(void);
 
-void CheckForDisappearees();
+void CheckForDisappearees(void);
 
-void CheckForPendingStartRace();
+void CheckForPendingStartRace(void);
 
 void NetService(int pIn_race);
 
@@ -215,7 +215,7 @@ void NetFinishRace(tNet_game_details* pDetails, tRace_over_reason pReason);
 
 void NetPlayerStatusChanged(tPlayer_status pNew_status);
 
-tPlayer_status NetGetPlayerStatus();
+tPlayer_status NetGetPlayerStatus(void);
 
 int NetGuaranteedSendMessageToAllPlayers(tNet_game_details* pDetails, tNet_message* pMessage, int (*pNotifyFail)(tU32, tNet_message*));
 
@@ -227,11 +227,11 @@ int NetGuaranteedSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* 
 
 int NetGuaranteedSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessage, void* pAddress, int (*pNotifyFail)(tU32, tNet_message*));
 
-void ResendGuaranteedMessages();
+void ResendGuaranteedMessages(void);
 
 int SampleFailNotifier(tU32 pAge, tNet_message* pMessage);
 
-void NetWaitForGuaranteeReplies();
+void NetWaitForGuaranteeReplies(void);
 
 tNet_game_player_info* NetPlayerFromID(tPlayer_ID pPlayer);
 

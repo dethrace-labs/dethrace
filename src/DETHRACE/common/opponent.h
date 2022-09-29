@@ -160,9 +160,9 @@ void ProcessThisOpponent(tOpponent_spec* pOpponent_spec);
 
 int IsNetCarActive(br_vector3* pPoint);
 
-void RebuildActiveCarList();
+void RebuildActiveCarList(void);
 
-void ForceRebuildActiveCarList();
+void ForceRebuildActiveCarList(void);
 
 void StartToCheat(tOpponent_spec* pOpponent_spec);
 
@@ -186,19 +186,19 @@ void CalcOpponentConspicuousnessWithAViewToCheatingLikeFuck(tOpponent_spec* pOpp
 
 void ChallengeOccurred(int pChallenger_index, int pAccepted);
 
-void LoadCopCars();
+void LoadCopCars(void);
 
 void LoadInOppoPaths(FILE* pF);
 
-void DisposeOpponentPaths();
+void DisposeOpponentPaths(void);
 
 void MungeOpponents(tU32 pFrame_period);
 
-void SetInitialCopPositions();
+void SetInitialCopPositions(void);
 
 void InitOpponents(tRace_info* pRace_info);
 
-void DisposeOpponents();
+void DisposeOpponents(void);
 
 void WakeUpOpponentsToTheFactThatTheStartHasBeenJumped(int pWhat_the_countdown_was);
 
@@ -242,13 +242,13 @@ void TwoCarsHitEachOther(tCar_spec* pA_car, tCar_spec* pAnother_car);
 
 void RecordOpponentTwattageOccurrence(tCar_spec* pTwatter, tCar_spec* pTwattee);
 
-void ToggleOpponentTest();
+void ToggleOpponentTest(void);
 
-void ToggleOpponentProcessing();
+void ToggleOpponentProcessing(void);
 
-void ToggleMellowOpponents();
+void ToggleMellowOpponents(void);
 
-void RepairOpponentsSystems();
+void RepairOpponentsSystems(void);
 
 void CopyVertex__opponent(br_vertex* pDest_vertex, br_vertex* pSrc_vertex);
 
@@ -258,11 +258,11 @@ void DeleteSection(tS16 pSection_to_delete);
 
 void DeleteNode(tS16 pNode_to_delete, int pAnd_sections);
 
-void DeleteOrphanNodes();
+void DeleteOrphanNodes(void);
 
 void InsertThisNodeInThisSectionHere(tS16 pInserted_node, tS16 pSection_no, br_vector3* pWhere);
 
-void TrackElasticateyPath();
+void TrackElasticateyPath(void);
 
 void RecalcNearestPathSectionSpeed(int pMax_not_min, int pAdjustment);
 
@@ -284,68 +284,68 @@ void ReallocModelFacesAndVertices(br_model* pModel, int pNum_faces, int pNum_ver
 
 br_material* CreateSimpleMaterial(int pColour_index);
 
-void AllocateMatsForOppoPathModel();
+void AllocateMatsForOppoPathModel(void);
 
-void RebuildOppoPathModel();
+void RebuildOppoPathModel(void);
 
-int ConsistencyCheck();
+int ConsistencyCheck(void);
 
-void ShowOppoPaths();
+void ShowOppoPaths(void);
 
-void WriteOutOppoPaths();
+void WriteOutOppoPaths(void);
 
-int NewNodeOKHere();
+int NewNodeOKHere(void);
 
-void ShowHideOppoPaths();
+void ShowHideOppoPaths(void);
 
-void DropElasticateyNode();
+void DropElasticateyNode(void);
 
-void InsertAndElasticate();
+void InsertAndElasticate(void);
 
-void InsertAndDontElasticate();
+void InsertAndDontElasticate(void);
 
-void DropDeadEndNode();
+void DropDeadEndNode(void);
 
-void DropNodeOnNodeAndStopElasticating();
+void DropNodeOnNodeAndStopElasticating(void);
 
-void WidenOppoPathSection();
+void WidenOppoPathSection(void);
 
-void NarrowOppoPathSection();
+void NarrowOppoPathSection(void);
 
-void IncreaseSectionMinSpeed();
+void IncreaseSectionMinSpeed(void);
 
-void DecreaseSectionMinSpeed();
+void DecreaseSectionMinSpeed(void);
 
-void IncreaseSectionMaxSpeed();
+void IncreaseSectionMaxSpeed(void);
 
-void DecreaseSectionMaxSpeed();
+void DecreaseSectionMaxSpeed(void);
 
-void PullOppoPoint();
+void PullOppoPoint(void);
 
-void ShowNodeInfo();
+void ShowNodeInfo(void);
 
-void ShowSectionInfo1();
+void ShowSectionInfo1(void);
 
-void ShowSectionInfo2();
+void ShowSectionInfo2(void);
 
-void DeleteOppoPathSection();
+void DeleteOppoPathSection(void);
 
-void DeleteOppoPathNodeAndSections();
+void DeleteOppoPathNodeAndSections(void);
 
-void DeleteOppoPathNodeAndJoin();
+void DeleteOppoPathNodeAndJoin(void);
 
-void ReverseSectionDirection();
+void ReverseSectionDirection(void);
 
-void CycleSectionType();
+void CycleSectionType(void);
 
-void ToggleOneWayNess();
+void ToggleOneWayNess(void);
 
-void CopStartPointInfo();
+void CopStartPointInfo(void);
 
-void DropCopStartPoint();
+void DropCopStartPoint(void);
 
-void DeleteCopStartPoint();
+void DeleteCopStartPoint(void);
 
-void CycleCopStartPointType();
+void CycleCopStartPointType(void);
 
 #endif

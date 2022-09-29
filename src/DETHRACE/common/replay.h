@@ -27,42 +27,42 @@ extern int gPlay_direction;
 extern int gPaused;
 extern tAction_replay_camera_type gAction_replay_camera_mode;
 
-int ReplayIsPaused();
+int ReplayIsPaused(void);
 
-float GetReplayRate();
+float GetReplayRate(void);
 
-int GetReplayDirection();
+int GetReplayDirection(void);
 
-void StopSaving();
+void StopSaving(void);
 
 void ActualActionReplayHeadups(int pSpecial_zappy_bastard);
 
-void DoActionReplayPostSwap();
+void DoActionReplayPostSwap(void);
 
 void DoZappyActionReplayHeadups(int pSpecial_zappy_bastard);
 
-void DoActionReplayHeadups();
+void DoActionReplayHeadups(void);
 
 void MoveReplayBuffer(tS32 pMove_amount);
 
-void MoveToEndOfReplay();
+void MoveToEndOfReplay(void);
 
-void MoveToStartOfReplay();
+void MoveToStartOfReplay(void);
 
-void ToggleReplay();
+void ToggleReplay(void);
 
 void ReverseSound(tS3_effect_tag pEffect_index, tS3_sound_tag pSound_tag);
 
-int FindUniqueFile();
+int FindUniqueFile(void);
 
 void PollActionReplayControls(tU32 pFrame_period);
 
-void CheckReplayTurnOn();
+void CheckReplayTurnOn(void);
 
-void InitializeActionReplay();
+void InitializeActionReplay(void);
 
 void DoActionReplay(tU32 pFrame_period);
 
-void SynchronizeActionReplay();
+void SynchronizeActionReplay(void);
 
 #endif

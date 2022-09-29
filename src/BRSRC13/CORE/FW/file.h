@@ -5,7 +5,7 @@
 
 void _BrFileFree(void* res, br_uint_8 res_class, br_size_t size);
 
-br_uint_32 BrFileAttributes();
+br_uint_32 BrFileAttributes(void);
 
 void* BrFileOpenRead(char* name, br_size_t n_magics, br_mode_test_cbfn* mode_test, int* mode_result);
 

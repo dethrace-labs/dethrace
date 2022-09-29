@@ -110,7 +110,7 @@ void* DfPop(int type, int* countp);
 
 void* DfTop(int type, int* countp);
 
-int DfTopType();
+int DfTopType(void);
 
 int TextReadLine(br_datafile* df, char** ident, char** data);
 
@@ -192,7 +192,7 @@ int DfSkipBinary(br_datafile* df, br_uint_32 length);
 
 int DfChunksInterpret(br_datafile* df, br_chunks_table* table);
 
-void BrNullOther();
+void BrNullOther(void);
 
 int DfFileIdentify(br_uint_8* magics, br_size_t n_magics);
 

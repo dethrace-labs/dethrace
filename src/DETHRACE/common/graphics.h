@@ -91,15 +91,15 @@ extern int gMap_render_y_i;
 extern int gMirror_on__graphics; // suffix added to avoid duplicate symbol
 extern br_scalar gYon_squared;
 
-void TurnOnPaletteConversion();
+void TurnOnPaletteConversion(void);
 
-void TurnOffPaletteConversion();
+void TurnOffPaletteConversion(void);
 
-void ResetLollipopQueue();
+void ResetLollipopQueue(void);
 
 int AddToLollipopQueue(br_actor* pActor, int pIndex);
 
-void RenderLollipops();
+void RenderLollipops(void);
 
 void DRDrawLine(br_pixelmap* pDestn, int pX1, int pY1, int pX2, int pY2, int pColour);
 
@@ -109,7 +109,7 @@ void DrawNumberAt(br_pixelmap* gImage, int pX, int pY, int pX_pitch, int pY_pitc
 
 void BuildColourTable(br_pixelmap* pPalette);
 
-void ClearConcussion();
+void ClearConcussion(void);
 
 tS8* SkipLines(tS8* pSource, int pCount);
 
@@ -121,13 +121,13 @@ void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
 
 void SetBRenderScreenAndBuffers(int pX_offset, int pY_offset, int pWidth, int pHeight);
 
-void SetIntegerMapRenders();
+void SetIntegerMapRenders(void);
 
-void AdjustRenderScreenSize();
+void AdjustRenderScreenSize(void);
 
-void ScreenSmaller();
+void ScreenSmaller(void);
 
-void ScreenLarger();
+void ScreenLarger(void);
 
 void DRSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount);
 
@@ -137,21 +137,21 @@ void DRSetPalette2(br_pixelmap* pThe_palette, int pSet_current_palette);
 
 void DRSetPalette(br_pixelmap* pThe_palette);
 
-void InitializePalettes();
+void InitializePalettes(void);
 
 void SwitchToPalette(char* pPal_name);
 
-void ClearEntireScreen();
+void ClearEntireScreen(void);
 
-void ClearWobbles();
+void ClearWobbles(void);
 
-void InitWobbleStuff();
+void InitWobbleStuff(void);
 
 void NewScreenWobble(double pAmplitude_x, double pAmplitude_y, double pPeriod);
 
 void SetScreenWobble(int pWobble_x, int pWobble_y);
 
-void ResetScreenWobble();
+void ResetScreenWobble(void);
 
 void CalculateWobblitude(tU32 pThe_time);
 
@@ -173,9 +173,9 @@ void TryThisEdge(tCar_spec* pCar, br_vector3* pLight, int pIndex_1, br_scalar pS
 
 br_scalar DistanceFromPlane(br_vector3* pPos, br_scalar pA, br_scalar pB, br_scalar pC, br_scalar pD);
 
-void DisableLights();
+void DisableLights(void);
 
-void EnableLights();
+void EnableLights(void);
 
 void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, br_matrix34* pCamera_to_world_transform, br_scalar pDistance_factor);
 
@@ -187,35 +187,35 @@ int ConditionallyFillWithSky(br_pixelmap* pPixelmap);
 
 void RenderAFrame(int pDepth_mask_on);
 
-void InitPaletteAnimate();
+void InitPaletteAnimate(void);
 
-void RevertPalette();
+void RevertPalette(void);
 
-void MungePalette();
+void MungePalette(void);
 
-void ResetPalette();
+void ResetPalette(void);
 
 void Darken(tU8* pPtr, unsigned int pDarken_amount);
 
 void SetFadedPalette(int pDegree);
 
-void FadePaletteDown();
+void FadePaletteDown(void);
 
-void FadePaletteUp();
+void FadePaletteUp(void);
 
-void KillSplashScreen();
+void KillSplashScreen(void);
 
-void EnsureRenderPalette();
+void EnsureRenderPalette(void);
 
 void SplashScreenWith(char* pPixmap_name);
 
-void EnsurePaletteUp();
+void EnsurePaletteUp(void);
 
 br_uint_32 AmbientificateMaterial(br_material* pMat, void* pArg);
 
 void ChangeAmbience(br_scalar pDelta);
 
-void InitAmbience();
+void InitAmbience(void);
 
 void DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap* pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight);
 
@@ -227,13 +227,13 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
 
 void DRPixelmapRectangleVScaledCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap* pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight);
 
-void InitTransientBitmaps();
+void InitTransientBitmaps(void);
 
 int AllocateTransientBitmap(int pWidth, int pHeight, int pUser_data);
 
 void DeallocateTransientBitmap(int pIndex);
 
-void DeallocateAllTransientBitmaps();
+void DeallocateAllTransientBitmaps(void);
 
 void RemoveTransientBitmaps(int pGraphically_remove_them);
 
@@ -245,19 +245,19 @@ void ProcessCursorGiblets(int pPeriod);
 
 int NewCursorGiblet(int pX_coord, int pY_coord, float pX_speed, float pY_speed, tU32 pDrop_time);
 
-int DoMouseCursor();
+int DoMouseCursor(void);
 
-int AllocateCursorTransient();
+int AllocateCursorTransient(void);
 
-void StartMouseCursor();
+void StartMouseCursor(void);
 
-void EndMouseCursor();
+void EndMouseCursor(void);
 
 void LoadFont(int pFont_ID);
 
 void DisposeFont(int pFont_ID);
 
-void InitDRFonts();
+void InitDRFonts(void);
 
 void DrawDropImage(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip, int pBottom_clip, int pOffset);
 
@@ -279,23 +279,23 @@ void TellyOutImage(br_pixelmap* pImage, int pLeft, int pTop);
 
 void SetShadowLevel(tShadow_level pLevel);
 
-tShadow_level GetShadowLevel();
+tShadow_level GetShadowLevel(void);
 
-void ToggleShadow();
+void ToggleShadow(void);
 
-void InitShadow();
+void InitShadow(void);
 
 br_uint_32 SaveShadeTable(br_pixelmap* pTable, void* pArg);
 
-void SaveShadeTables();
+void SaveShadeTables(void);
 
-void DisposeSavedShadeTables();
+void DisposeSavedShadeTables(void);
 
-void ShadowMode();
+void ShadowMode(void);
 
-int SwitchToRealResolution();
+int SwitchToRealResolution(void);
 
-int SwitchToLoresMode();
+int SwitchToLoresMode(void);
 
 void DRPixelmapDoubledCopy(br_pixelmap* pDestn, br_pixelmap* pSource, int pSource_width, int pSource_height, int pX_offset, int pY_offset);
 

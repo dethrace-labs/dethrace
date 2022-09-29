@@ -37,7 +37,7 @@ extern int gTemp_lost;
 
 void MungeRankEtc(tProgram_state* pThe_state);
 
-void CalcRankIncrease();
+void CalcRankIncrease(void);
 
 int RaceSummaryDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out);
 
@@ -45,28 +45,28 @@ void DrawInBox(int pBox_left, int pText_left, int pTop, int pRight, int pBottom,
 
 void DrawChromeNumber(int pLeft_1, int pLeft_2, int pPitch, int pTop, int pAmount);
 
-void DrawSummaryItems();
+void DrawSummaryItems(void);
 
 void RampUpRate(float* pRate, tU32 pTime);
 
 void DrawSummary(int pCurrent_choice, int pCurrent_mode);
 
-void StartSummary();
+void StartSummary(void);
 
-void SetUpTemps();
+void SetUpTemps(void);
 
 int Summ1GoAhead(int* pCurrent_choice, int* pCurrent_mode);
 
 int SummCheckGameOver(int* pCurrent_choice, int* pCurrent_mode);
 
-tSO_result DoEndRaceSummary1();
+tSO_result DoEndRaceSummary1(void);
 
 // Suffix added to avoid duplicate symbol
 void PrepareBoundingRadius__racesumm(br_model* model);
 
-void BuildWrecks();
+void BuildWrecks(void);
 
-void DisposeWrecks();
+void DisposeWrecks(void);
 
 int MatrixIsIdentity(br_matrix34* pMat);
 
@@ -98,7 +98,7 @@ int ClickDamage(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_
 
 int DamageScrnDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out);
 
-tSO_result DoEndRaceSummary2();
+tSO_result DoEndRaceSummary2(void);
 
 // Suffix added to avoid duplicate symbol
 void DrawAnItem__racesumm(int pX, int pY_index, int pFont_index, char* pText);
@@ -108,11 +108,11 @@ void DrawColumnHeading__racesumm(int pStr_index, int pX);
 
 int SortScores(void* pFirst_one, void* pSecond_one);
 
-void SortGameScores();
+void SortGameScores(void);
 
 void NetSumDraw(int pCurrent_choice, int pCurrent_mode);
 
-void DoNetRaceSummary();
+void DoNetRaceSummary(void);
 
 tSO_result DoEndRaceSummary(int* pFirst_summary_done, tRace_result pRace_result);
 

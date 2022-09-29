@@ -33,7 +33,7 @@ void DrawColumns(int pDraw_blends, tTrack_spec* pTrack_spec, int pMin_x, int pMa
 
 void RenderTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, br_matrix34* pCamera_to_world, int pRender_blends);
 
-br_scalar GetYonFactor();
+br_scalar GetYonFactor(void);
 
 void SetYonFactor(br_scalar pNew);
 

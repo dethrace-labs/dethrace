@@ -11,9 +11,9 @@ extern br_scalar gMin_z_diff;
 extern br_pixelmap* gOil_pixies[1];
 extern tOil_spill_info gOily_spills[15];
 
-void InitOilSpills();
+void InitOilSpills(void);
 
-void ResetOilSpills();
+void ResetOilSpills(void);
 
 void QueueOilSpill(tCar_spec* pCar);
 
@@ -31,7 +31,7 @@ void SetInitialOilStuff(tOil_spill_info* pOil, br_model* pModel);
 
 void ProcessOilSpills(tU32 pFrame_period);
 
-int GetOilSpillCount();
+int GetOilSpillCount(void);
 
 void GetOilSpillDetails(int pIndex, br_actor** pActor, br_scalar* pSize);
 

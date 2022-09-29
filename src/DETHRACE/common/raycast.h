@@ -16,7 +16,7 @@ extern br_scalar gLowest_y_above;
 
 int DRActorToRoot(br_actor* a, br_actor* world, br_matrix34* m);
 
-void InitRayCasting();
+void InitRayCasting(void);
 
 // Suffix added to avoid duplicate symbol
 int BadDiv__raycast(br_scalar a, br_scalar b);

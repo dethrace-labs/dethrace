@@ -638,7 +638,7 @@ typedef enum br_fitmap_axis {
 } br_fitmap_axis;
 typedef void br_putline_cbfn(char*, void*);
 typedef int br_mode_test_cbfn(br_uint_8*, br_size_t);
-typedef br_uint_32 brfile_attributes_cbfn();
+typedef br_uint_32 brfile_attributes_cbfn(void);
 typedef void* brfile_open_read_cbfn(char*, br_size_t, br_mode_test_cbfn*, int*);
 typedef void* brfile_open_write_cbfn(char*, int);
 typedef void brfile_close_cbfn(void*);
@@ -1650,7 +1650,7 @@ typedef struct br_framework_state2 {              // size: 0x14d4
 } br_framework_state2;
 
 typedef br_error br_exception;
-typedef void br_resident_fn();
+typedef void br_resident_fn(void);
 typedef struct br_tv_template_entry {
     br_token token;
     char* name;

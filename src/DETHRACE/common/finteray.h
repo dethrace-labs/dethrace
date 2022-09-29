@@ -41,9 +41,9 @@ int FindHighestCallBack__finteray(br_actor* pActor, br_model* pModel, br_materia
 
 void FindFace(br_vector3* pPosition, br_vector3* pDir, br_vector3* nor, br_scalar* t, br_material** material);
 
-void EnablePlingMaterials();
+void EnablePlingMaterials(void);
 
-void DisablePlingMaterials();
+void DisablePlingMaterials(void);
 
 void CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir, br_vector3* normal, br_scalar* rt);
 
@@ -84,16 +84,16 @@ void GetTilingLimits(br_vector2* min, br_vector2* max);
 
 void Scale(int pD, int factor);
 
-void ScaleUpX();
+void ScaleUpX(void);
 
-void ScaleDnX();
+void ScaleDnX(void);
 
-void ScaleUpY();
+void ScaleUpY(void);
 
-void ScaleDnY();
+void ScaleDnY(void);
 
-void SelectFaceForward();
+void SelectFaceForward(void);
 
-void SelectFaceDown();
+void SelectFaceDown(void);
 
 #endif

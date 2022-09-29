@@ -44,15 +44,15 @@ void GetReducedPos(br_vector3* v, tReduced_pos* p);
 
 void SaveReducedPos(tReduced_pos* p, br_vector3* v);
 
-int PipeSearchForwards();
+int PipeSearchForwards(void);
 
-int IsActionReplayAvailable();
+int IsActionReplayAvailable(void);
 
-int SomeReplayLeft();
+int SomeReplayLeft(void);
 
-void DisablePipedSounds();
+void DisablePipedSounds(void);
 
-void EnablePipedSounds();
+void EnablePipedSounds(void);
 
 tU32 LengthOfSession(tPipe_session* pSession);
 
@@ -62,7 +62,7 @@ void StartPipingSession(tPipe_chunk_type pThe_type);
 
 void EndPipingSession2(int pMunge_reentrancy);
 
-void EndPipingSession();
+void EndPipingSession(void);
 
 void AddDataToSession(int pSubject_index, void* pData, tU32 pData_length);
 
@@ -140,29 +140,29 @@ void PipeSingleScreenShake(int pWobble_x, int pWobble_y);
 
 void PipeSingleGrooveStop(int pGroove_index, br_matrix34* pMatrix, int pPath_interrupt, int pObject_interrupt, float pPath_resumption, float pObject_resumption);
 
-void PipeFrameFinish();
+void PipeFrameFinish(void);
 
-void PipingFrameReset();
+void PipingFrameReset(void);
 
 void PipeSingleSkidAdjustment(int pSkid_num, br_matrix34* pMatrix, int pMaterial_index);
 
-void ResetPiping();
+void ResetPiping(void);
 
-void InitialisePiping();
+void InitialisePiping(void);
 
-void DisposePiping();
+void DisposePiping(void);
 
-void InitLastDamageArrayEtc();
+void InitLastDamageArrayEtc(void);
 
-void ResetCars();
+void ResetCars(void);
 
-void PipeCarPositions();
+void PipeCarPositions(void);
 
-void ResetPipePlayToEnd();
+void ResetPipePlayToEnd(void);
 
-void ResetPipePlayToStart();
+void ResetPipePlayToStart(void);
 
-tU8* GetPipePlayPtr();
+tU8* GetPipePlayPtr(void);
 
 void SetPipePlayPtr(tU8* pPtr);
 
@@ -284,6 +284,6 @@ int CheckIncident(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime);
 
 int GetNextIncident(tU32 pOffset_time, tIncident_type* pIncident_type, float* pSeverity, tIncident_info* pInfo, tU32* pTime_away);
 
-tU32 GetARStartTime();
+tU32 GetARStartTime(void);
 
 #endif

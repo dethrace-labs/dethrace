@@ -18,11 +18,11 @@ int FarFromLine2D(br_vector3* pPt, br_vector3* pL1, br_vector3* pL2);
 
 int Reflex2D(br_vector3* pPt, br_vector3* pL1, br_vector3* pL2);
 
-void InitSkids();
+void InitSkids(void);
 
 void HideSkid(int pSkid_num);
 
-void HideSkids();
+void HideSkids(void);
 
 br_scalar SkidLen(int pSkid);
 
@@ -32,8 +32,8 @@ void SkidMark(tCar_spec* pCar, int pWheel_num);
 
 void InitCarSkidStuff(tCar_spec* pCar);
 
-void SkidsPerFrame();
+void SkidsPerFrame(void);
 
-void RemoveMaterialsFromSkidmarks();
+void RemoveMaterialsFromSkidmarks(void);
 
 #endif
