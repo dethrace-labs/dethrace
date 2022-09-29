@@ -54,9 +54,9 @@
 
 #define BR_FONTF_PROPORTIONAL 1
 
-#define BR_SIN(a) ((br_scalar)sin(BrAngleToRadian(a)))
-#define BR_COS(a) ((br_scalar)cos(BrAngleToRadian(a)))
-#define BR_TAN(a) ((br_scalar)tan(BrAngleToRadian(a)))
+#define BR_SIN(a) ((br_scalar)sinf(BrAngleToRadian(a)))
+#define BR_COS(a) ((br_scalar)cosf(BrAngleToRadian(a)))
+#define BR_TAN(a) ((br_scalar)tanf(BrAngleToRadian(a)))
 #define BR_ASIN(a) BrRadianToAngle(asin(a))
 #define BR_ACOS(a) BrRadianToAngle(acos(a))
 #define BR_ATAN2(a, b) BrRadianToAngle(atan2((a), (b)))
