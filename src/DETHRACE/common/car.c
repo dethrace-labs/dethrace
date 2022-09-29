@@ -2525,11 +2525,11 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
     oldmat = &c->oldmat;
     k = 0;
     gMaterial_index = 0;
-    if (c->dt >= 0.0 && gNet_mode == eNet_mode_host) {
+    if (c->dt >= 0.0f && gNet_mode == eNet_mode_host) {
         oldmat = &message_mat;
         GetExpandedMatrix(&message_mat, &c->message.mat);
     }
-    if (dt < 0.0) {
+    if (dt < 0.0f) {
         mat = oldmat;
     }
     BrMatrix34LPInverse(&tm, mat);
@@ -2557,9 +2557,8 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
         edges[j].v[1] = (bnds.max.v[j] - bnds.min.v[j]) * mat->m[j][1];
         edges[j].v[2] = (bnds.max.v[j] - bnds.min.v[j]) * mat->m[j][2];
     }
-    i = 0;
-    f_ref = &gFace_list__car[c->box_face_start];
-    while (c->box_face_end - c->box_face_start > i && i < 50) {
+    for (i = 0; i < 50 && i < c->box_face_end - c->box_face_start; i++) {
+        f_ref = &gFace_list__car[c->box_face_start + i];
         BrVector3Sub(&bb, &aa, &f_ref->v[0]);
         max = BrVector3Dot(&bb, &f_ref->normal);
         min = max;
@@ -2571,16 +2570,14 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
                 min = min + ts;
             }
         }
-        if ((max <= 0.001 || min <= 0.001) && (max >= -0.001 || min >= -0.001)) {
+        if ((max <= 0.001f || min <= 0.001f) && (max >= -0.001f || min >= -0.001f)) {
             f_ref->flags &= ~0x80u;
             k++;
         } else {
             f_ref->flags |= 0x80u;
         }
-        i++;
-        f_ref++;
     }
-    if (!k) {
+    if (k == 0) {
         return 0;
     }
     k = 0;
@@ -2592,29 +2589,29 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
             tv = c->extra_points[i - 8];
         } else {
             tv.v[0] = ((i & 2) == 0) * c->bounds[1].min.v[0] + ((i & 2) >> 1) * c->bounds[1].max.v[0];
-            tv.v[1] = ((i & 1) == 0) * c->bounds[1].min.v[1] + (i & 1) * c->bounds[1].max.v[1];
+            tv.v[1] = ((i & 1) == 0) * c->bounds[1].min.v[1] + ((i & 1) >> 0) * c->bounds[1].max.v[1];
             tv.v[2] = ((i & 4) == 0) * c->bounds[1].max.v[2] + ((i & 4) >> 2) * c->bounds[1].min.v[2];
         }
         BrMatrix34ApplyP(&dir, &tv, mat);
-        if (dt >= 0.0) {
+        if (dt >= 0.0f) {
             BrMatrix34ApplyP(&a, &tv, oldmat);
         } else {
             BrVector3Scale(&a, &c->pos, WORLD_SCALE);
         }
         BrVector3Sub(&dir, &dir, &a);
         BrVector3Normalise(&normal_force, &dir);
-        BrVector3Scale(&normal_force, &normal_force, 0.0072463769);
+        BrVector3Scale(&normal_force, &normal_force, 0.0072463769f);
         BrVector3Accumulate(&dir, &normal_force);
         material = FindFloorInBoxM2(&a, &dir, &norm, &dist, c);
-        if (dist >= 0.0 && dist < 1.0001) {
+        if (dist >= 0.0f && dist < 1.0001f) {
             BrVector3Scale(&cc, &c->pos, WORLD_SCALE);
             BrVector3Sub(&cc, &cc, &a);
             FindFloorInBoxM(&a, &cc, &bb, &ts, c);
-            if (i < 8 || ts > 1.0) {
+            if (i < 8 || ts > 1.0f) {
                 BrMatrix34TApplyV(&a, &norm, oldmat);
                 AddCollPoint(dist, &tv, &a, r, n, &dir, k, c);
                 k++;
-                if (!gMaterial_index) {
+                if (gMaterial_index == 0) {
                     gMaterial_index = material;
                 }
             }
@@ -2628,9 +2625,9 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
         k = 4;
     }
     for (i = 0; i < k; i++) {
-        if (fabs(r[i].v[1]) + fabs(r[i].v[2]) + fabs(r[i].v[0]) > 500.0) {
+        if (fabsf(r[i].v[1]) + fabsf(r[i].v[2]) + fabsf(r[i].v[0]) > 500.0) {
             for (j = i + 1; j < k; j++) {
-                if (fabs(r[j].v[1]) + fabs(r[j].v[2]) + fabs(r[j].v[0]) < 500.0) {
+                if (fabsf(r[j].v[1]) + fabsf(r[j].v[2]) + fabsf(r[j].v[0]) < 500.0) {
                     r[i] = r[j];
                     n[i] = n[j];
                     i++;
@@ -2640,11 +2637,11 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
             break;
         }
     }
-    if (dt >= 0.0) {
+    if (dt >= 0.0f) {
         if (k > 0 && c->collision_flag && k < 4
-            && (fabs(r[0].v[0] - c->old_point.v[0]) > 0.05
-                || fabs(r[0].v[1] - c->old_point.v[1]) > 0.05
-                || fabs(r[0].v[2] - c->old_point.v[2]) > 0.05)) {
+            && (fabsf(r[0].v[0] - c->old_point.v[0]) > 0.05f
+                || fabsf(r[0].v[1] - c->old_point.v[1]) > 0.05f
+                || fabsf(r[0].v[2] - c->old_point.v[2]) > 0.05f)) {
             r[k] = c->old_point;
             n[k] = c->old_norm;
             k++;
@@ -2672,15 +2669,15 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
                 if (ts > d[i]) {
                     d[i] = ts;
                 }
-                if (d[i] > 0.0) {
+                if (d[i] > 0.0f) {
                     collision = 1;
                 }
             }
             if (!collision) {
-                d[0] = 0.5;
+                d[0] = 0.5f;
             }
-            for (i = 0; k > i; ++i) {
-                for (j = 0; k > j; ++j) {
+            for (i = 0; i < k; i++) {
+                for (j = 0; j < k; j++) {
                     BrVector3Cross(&normal_force, &tau[j], &r[i]);
                     BrVector3InvScale(&norm, &n[j], c->M);
                     BrVector3Accumulate(&normal_force, &norm);
@@ -2695,7 +2692,7 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
                 ts = TwoPointColl(f, &M, d, tau, n);
                 break;
             case 3:
-                d[3] = 0.0;
+                d[3] = 0.0f;
                 ts = ThreePointCollRec(f, &M, d, tau, n, c);
                 break;
             case 4:
@@ -2707,26 +2704,26 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
             if (k > 3) {
                 k = 3;
             }
-            // if (f[0] > 10.0 || f[1] > 10.0 || f[2] > 10.0) {
+            // if (f[0] > 10.0f || f[1] > 10.0f || f[2] > 10.0f) {
             //     v31 = 0;
             // }
-            if (fabs(ts) <= 0.000001) {
-                BrVector3Set(&c->v, 0, 0, 0);
-                BrVector3Set(&c->omega, 0, 0, 0);
-                BrVector3Set(&c->oldomega, 0, 0, 0);
+            if (fabsf(ts) <= 0.000001f) {
+                BrVector3Set(&c->v, 0.f, 0.f, 0.f);
+                BrVector3Set(&c->omega, 0.f, 0.f, 0.f);
+                BrVector3Set(&c->oldomega, 0.f, 0.f, 0.f);
                 return k;
             }
-            BrVector3Set(&p_vel, 0, 0, 0);
-            BrVector3Set(&dir, 0, 0, 0);
-            BrVector3Set(&friction_force, 0, 0, 0);
-            total_force = 0.0;
-            for (i = 0; k > i; ++i) {
-                if (f[i] < 0.001) {
-                    f[i] = 0.001;
+            BrVector3Set(&p_vel, 0.f, 0.f, 0.f);
+            BrVector3Set(&dir, 0.f, 0.f, 0.f);
+            BrVector3Set(&friction_force, 0.f, 0.f, 0.f);
+            total_force = 0.f;
+            for (i = 0; i < k; i++) {
+                if (f[i] < 0.001f) {
+                    f[i] = 0.001f;
                 }
-                f[i] = f[i] * 1.001;
+                f[i] = f[i] * 1.001f;
                 BrVector3Scale(&tau[i], &tau[i], f[i]);
-                BrVector3Add(&c->omega, &tau[i], &c->omega);
+                BrVector3Accumulate(&c->omega, &tau[i]);
                 f[i] = f[i] / c->M;
                 BrVector3Scale(&n[i], &n[i], f[i]);
                 BrVector3Accumulate(&p_vel, &n[i]);
@@ -2735,17 +2732,17 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
                 BrVector3Accumulate(&dir, &bb);
                 total_force = f[i] + total_force;
             }
-            if (gPinball_factor != 0.0) {
+            if (gPinball_factor != 0.0f) {
                 BrVector3Scale(&p_vel, &p_vel, gPinball_factor);
                 point_vel = BrVector3LengthSquared(&p_vel);
-                if (point_vel > 10.0) {
+                if (point_vel > 10.0f) {
                     noise_defeat = 1;
                     if (c->driver == eDriver_local_human) {
                         DRS3StartSound(gCar_outlet, 9011);
                     } else {
                         DRS3StartSound3D(gCar_outlet, 9011, &c->pos, &gZero_v__car, 1, 255, 0x10000, 0x10000);
                     }
-                    if (point_vel > 10000.0) {
+                    if (point_vel > 10000.0f) {
                         BrVector3Normalise(&p_vel, &p_vel);
                         BrVector3Scale(&p_vel, &p_vel, 100);
                     }
@@ -2757,7 +2754,7 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
             BrVector3Accumulate(&tv, &c->velocity_car_space);
             batwick_length = BrVector3Length(&tv);
             if (!c->collision_flag || (c->collision_flag == 1 && oldk < k)) {
-                for (i = 0; k > i; ++i) {
+                for (i = 0; i < k; i++) {
                     BrVector3Cross(&vel, &c->omega, &r[i]);
                     BrVector3Accumulate(&vel, &c->velocity_car_space);
                     AddFriction(c, &vel, &n[i], &r[i], f[i], &max_friction);
@@ -2771,38 +2768,38 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
             noise_defeat = 0;
             BrVector3Add(&normal_force, &friction_force, &p_vel);
             BrMatrix34ApplyV(&norm, &normal_force, mat);
-            min = dt * 90.0 / 10.0;
-            max = dt * 110.0 / 10.0;
-            if (c->last_special_volume) {
-                min = c->last_special_volume->gravity_multiplier * min;
-                max = c->last_special_volume->gravity_multiplier * max;
+            min = dt * 90.0f / 10.0f;
+            max = dt * 110.0f / 10.0f;
+            if (c->last_special_volume != NULL) {
+                min *= c->last_special_volume->gravity_multiplier;
+                max *= c->last_special_volume->gravity_multiplier;
             }
-            if (c->velocity_car_space.v[2] * c->velocity_car_space.v[2] + c->velocity_car_space.v[1] * c->velocity_car_space.v[1] + c->velocity_car_space.v[0] * c->velocity_car_space.v[0] < 0.050000001
-                && total_force * 0.1 > c->omega.v[2] * tv.v[2] + c->omega.v[1] * tv.v[1] + c->omega.v[0] * tv.v[0]
+            if (BrVector3LengthSquared(&c->velocity_car_space) < 0.05f
+                && 0.1f * total_force > BrVector3Dot(&c->omega, &tv)
                 && k >= 3
                 && norm.v[1] > min
                 && norm.v[1] < max) {
-                if (c->driver <= eDriver_non_car || fabs(normal_force.v[2]) <= total_force * 0.89999998) {
-                    BrVector3Set(&c->v, 0, 0, 0);
-                    BrVector3Set(&norm, 0, 0, 0);
-                    BrVector3Set(&normal_force, 0, 0, 0);
-                    BrVector3Set(&c->omega, 0, 0, 0);
-                    BrVector3Set(&c->oldomega, 0, 0, 0);
-                    if (c->driver <= eDriver_non_car || car_spec->max_force_rear == 0.0) {
+                if (c->driver <= eDriver_non_car || fabsf(normal_force.v[2]) <= total_force * 0.9f) {
+                    BrVector3Set(&c->v, 0.f, 0.f, 0.f);
+                    BrVector3Set(&norm, 0.f, 0.f, 0.f);
+                    BrVector3Set(&normal_force, 0.f, 0.f, 0.f);
+                    BrVector3Set(&c->omega, 0.f, 0.f, 0.f);
+                    BrVector3Set(&c->oldomega, 0.f, 0, 0.f);
+                    if (c->driver <= eDriver_non_car || car_spec->max_force_rear == 0.0f) {
                         if (c->driver <= eDriver_non_car) {
                             PipeSingleNonCar(c);
                         }
                         c->doing_nothing_flag = 1;
                     }
                 } else {
-                    BrVector3SetFloat(&tv2, 0.0, -1.0, 0.0);
+                    BrVector3SetFloat(&tv2, 0.0f, -1.0f, 0.0f);
                     bb.v[0] = mat->m[1][2] * tv2.v[1] - mat->m[1][1] * tv2.v[2];
                     bb.v[1] = mat->m[1][0] * tv2.v[2] - mat->m[1][2] * tv2.v[0];
                     bb.v[2] = mat->m[1][1] * tv2.v[0] - mat->m[1][0] * tv2.v[1];
-                    if (BrVector3Dot(&bb, (br_vector3*)&mat->m[0][1]) <= 0.0) {
-                        c->omega.v[0] = -0.5;
+                    if (BrVector3Dot(&bb, (br_vector3*)&mat->m[0][1]) <= 0.0f) {
+                        c->omega.v[0] = -0.5f;
                     } else {
-                        c->omega.v[0] = 0.5;
+                        c->omega.v[0] = 0.5f;
                     }
                 }
             }
@@ -2847,7 +2844,7 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
         }
         return k;
     } else {
-        if (k) {
+        if (k != 0) {
             c->old_point = r[0];
             c->old_norm = n[0];
         }

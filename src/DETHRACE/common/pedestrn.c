@@ -37,12 +37,12 @@
 #define GET_PEDESTRIAN_INDEX(P) ((P)-gPedestrian_array)
 
 int gDetect_peds = 1;
-int gReally_stupid_ped_bug_enable;
-int gPed_sound_disable;
-int gVesuvians_last_time;
+int gReally_stupid_ped_bug_enable = 0;
+int gPed_sound_disable = 0;
+int gVesuvians_last_time = 0;
 int gSend_peds = 1;
-tU32 gLast_ped_message_send;
-tPedestrian_instruction* gInitial_instruction;
+tU32 gLast_ped_message_send = 0;
+tPedestrian_instruction* gInitial_instruction = NULL;
 char* gRate_commands[3] = { "fixed", "speed", "variable" };
 char* gCollide_commands[1] = { "collide" };
 char* gInstruc_commands[10] = {
@@ -81,13 +81,13 @@ int gPed_gib_maxes[4][5] = {
 };
 br_scalar gExploding_ped_scale[3] = { 0.0028f, 0.0033f, 0.0045f };
 br_vector3 gZero_v__pedestrn; // suffix added to avoid duplicate symbol
-int gPed_instruc_count;
+int gPed_instruc_count = 0;
 int gPed_count;
-br_actor* gPath_actor;
-br_actor* gCurrent_ped_path_actor;
-int gPedestrians_on;
-int gVesuvian_corpses;
-br_material* gPed_material;
+br_actor* gPath_actor = NULL;
+br_actor* gCurrent_ped_path_actor = NULL;
+int gPedestrians_on = 0;
+int gVesuvian_corpses = 0;
+br_material* gPed_material = NULL;
 int gPed_gib_counts[4][5];
 tPedestrian_instruction gPed_instrucs[100];
 tPed_gib gPed_gibs[30];
@@ -119,7 +119,7 @@ int gCurrent_lollipop_index;
 int gVesuvians_this_time;
 int gNumber_of_ped_gibs;
 tPedestrian_data* gFlag_waving_bastard;
-int gNumber_of_pedestrians;
+int gNumber_of_pedestrians = 0;
 br_pixelmap* gProx_ray_shade_table;
 tPedestrian_data* gPedestrian_array;
 tU32 gLast_ped_splat_time;
@@ -1755,13 +1755,13 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
             }
             proximity_rayed = 0;
         }
-        if (pPedestrian->fate == (tCar_spec*)the_car
+        if (pPedestrian->fate != (tCar_spec*)the_car
             && !proximity_rayed
             && (the_car->bounds[0].max.v[V_Y] < min_ped_bounds_car.v[V_Y]
                 || the_car->bounds[0].min.v[V_Y] > max_ped_bounds_car.v[V_Y])) {
             continue;
         }
-        pPedestrian->fate = 0;
+        pPedestrian->fate = NULL;
         if (pPedestrian->current_action == pPedestrian->fatal_car_impact_action
             || pPedestrian->current_action == pPedestrian->fatal_ground_impact_action) {
             if (pPedestrian->ref_number < 100) {
