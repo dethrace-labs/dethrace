@@ -2812,10 +2812,9 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
             } else {
                 BrVector3Scale(&normal_force, &normal_force, 0.75f);
             }
-            v_diff = (car_spec->pre_car_col_velocity.v[1] - c->v.v[1]) * gDefensive_powerup_factor[car_spec->power_up_levels[0]];
             if (CAR(c)->invulnerable
                 || (c->driver < eDriver_net_human && (c->driver != eDriver_oppo || PointOutOfSight(&c->pos, 150.0f)))
-                || (v_diff >= -20.0f)
+                || ((v_diff = (car_spec->pre_car_col_velocity.v[1] - c->v.v[1]) * gDefensive_powerup_factor[car_spec->power_up_levels[0]]) >= -20.0f)
                 || CAR(c)->number_of_wheels_on_ground >= 3) {
                 CrushAndDamageCar(CAR(c), &dir, &normal_force, NULL);
             } else {
