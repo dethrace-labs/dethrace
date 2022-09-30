@@ -949,5 +949,8 @@ void MungeForwardSky() {
 // IDA: void __cdecl MungeRearviewSky()
 void MungeRearviewSky() {
     LOG_TRACE("()");
-    STUB();
+
+    if (gSky_image_width != 0) {
+        MungeSkyModel(gRearview_camera, gRearview_sky_model);
+    }
 }
