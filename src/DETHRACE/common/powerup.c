@@ -356,12 +356,12 @@ void LoadPowerups() {
             the_powerup->got_proc = NULL;
         }
         the_powerup->number_of_float_params = GetAnInt(f);
-        the_powerup->float_params = BrMemAllocate(4 * the_powerup->number_of_float_params, kMem_powerup_float_parms);
+        the_powerup->float_params = BrMemAllocate(sizeof(float) * the_powerup->number_of_float_params, kMem_powerup_float_parms);
         for (j = 0; j < the_powerup->number_of_float_params; j++) {
             the_powerup->float_params[j] = GetAFloat(f);
         }
         the_powerup->number_of_integer_params = GetAnInt(f);
-        the_powerup->integer_params = BrMemAllocate(4 * the_powerup->number_of_integer_params, kMem_powerup_int_parms);
+        the_powerup->integer_params = BrMemAllocate(sizeof(int) * the_powerup->number_of_integer_params, kMem_powerup_int_parms);
         for (j = 0; j < the_powerup->number_of_integer_params; j++) {
             the_powerup->integer_params[j] = GetAnInt(f);
         }
@@ -578,7 +578,7 @@ int GotCredits(tPowerup* pPowerup, tCar_spec* pCar) {
     if (pCar->driver == eDriver_local_human) {
         strcpy(s, pPowerup->message);
         strcat(s, " ");
-        EarnCredits2((IRandomBetween(pPowerup->integer_params[0], pPowerup->integer_params[1] / 100) * 100), s);
+        EarnCredits2((IRandomBetween(pPowerup->integer_params[0], pPowerup->integer_params[1]) / 100) * 100, s);
     }
     return GET_POWERUP_INDEX(pPowerup);
 }

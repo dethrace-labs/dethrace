@@ -1368,12 +1368,11 @@ void EarnCredits2(int pAmount, char* pPrefix_text) {
     if (pAmount == 0) {
         return;
     }
-    if (gNet_mode != eNet_mode_none && (gProgram_state.credits_earned - gProgram_state.credits_lost + pAmount) < 0) {
-        // Should this also substract pAmount?
+    if (gNet_mode != eNet_mode_none && gProgram_state.credits_earned - gProgram_state.credits_lost + pAmount < 0) {
         pAmount = gProgram_state.credits_lost - gProgram_state.credits_lost;
     }
     original_amount = pAmount;
-    if (gLast_credit_headup__displays >= 0 && (the_time - gLast_earn_time) < 2000) {
+    if (gLast_credit_headup__displays >= 0 && the_time - gLast_earn_time < 2000) {
         pAmount += gLast_credit_amount;
     }
     gLast_credit_amount = pAmount;
@@ -1384,7 +1383,7 @@ void EarnCredits2(int pAmount, char* pPrefix_text) {
         sprintf(s, "%s1 %s", pPrefix_text, GetMiscString(13));
         gProgram_state.credits_earned += original_amount;
     } else if (pAmount >= -1) {
-        sprintf(s, "%s%s 1 %s", pPrefix_text, GetMiscString(14), GetMiscString(15));
+        sprintf(s, "%s%s 1 %s", pPrefix_text, GetMiscString(14), GetMiscString(13));
         gProgram_state.credits_lost -= original_amount;
     } else {
         sprintf(s, "%s%s %d %s", GetMiscString(14), pPrefix_text, -pAmount, GetMiscString(12));
