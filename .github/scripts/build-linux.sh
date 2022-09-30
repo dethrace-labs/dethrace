@@ -3,11 +3,11 @@ set -e
 
 if [ "${MATRIX_PLATFORM}" = "clang" ]
 then
-    CC=clang
-    CXX=clang++
+    export CC=clang
+    export CXX=clang++
 else
-    CC=gcc
-    CXX=g++
+    export CC=gcc
+    export CXX=g++
 fi
 
 # install deps
