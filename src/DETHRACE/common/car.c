@@ -4450,7 +4450,15 @@ void ResetCarScreens() {
     int i;
     tCar_spec* the_car;
     LOG_TRACE("()");
-    STUB();
+
+    for (cat = eVehicle_self; cat < eVehicle_drone; cat++) {
+        car_count = (cat == eVehicle_self) ? 1 : GetCarCount(cat);
+        for (i = 0; i < car_count; i++) {
+            the_car = (cat == eVehicle_self) ? &gProgram_state.current_car : GetCarSpec(cat, i);
+            the_car->last_special_volume = NULL;
+        }
+    }
+    MungeCarGraphics(gFrame_period);
 }
 
 // IDA: tCar_spec* __cdecl GetRaceLeader()
