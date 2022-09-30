@@ -483,6 +483,7 @@ void TotallyRepairACar(tCar_spec* pCar) {
                 memcpy(the_car_actor->actor->model->vertices,
                     the_car_actor->undamaged_vertices,
                     the_car_actor->actor->model->nvertices * sizeof(br_vertex));
+                // FIXME: BrModelUpdate(..., BR_MODU_EDGES | BR_MODU_NORMALS) fails on TELL_ME_IF_WE_PASS_THIS_WAY
 //                BrModelUpdate(the_car_actor->actor->model, BR_MODU_EDGES | BR_MODU_NORMALS);
                 BrModelUpdate(the_car_actor->actor->model, BR_MODU_ALL);
                 if (pipe_vertex_count != 0 && IsActionReplayAvailable()) {
