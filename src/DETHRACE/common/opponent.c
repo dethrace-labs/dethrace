@@ -568,7 +568,6 @@ int SearchForSection(tRoute_section* pTemp_store, tRoute_section* pPerm_store, i
                 memcpy(pPerm_store, pTemp_store, sizeof(tRoute_section) * *pNum_of_perm_store_sections);
                 // dword_530DD4 = ++routes_found
                 routes_found++;
-                LOG_DEBUG("found route");
                 if (routes_found >= 2) {
                     return 1;
                 }

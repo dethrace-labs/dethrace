@@ -201,6 +201,11 @@ void GLRenderer_Init(int width, int height, int pRender_width, int pRender_heigh
     render_height = pRender_height;
     update_viewport();
 
+    LOG_INFO("OpenGL vendor string: %s", glGetString(GL_VENDOR));
+    LOG_INFO("OpenGL renderer string: %s", glGetString(GL_RENDERER));
+    LOG_INFO("OpenGL version string: %s", glGetString(GL_VERSION));
+    LOG_INFO("OpenGL shading language version string: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
+
     int maxTextureImageUnits;
     glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxTextureImageUnits);
     if (maxTextureImageUnits < 3) {
@@ -671,7 +676,7 @@ void GLRenderer_SetWindowSize(int width, int height) {
     update_viewport();
 }
 
-void GLRenderer_GetViewport(int* x, int* y, int* width, int* height)  {
+void GLRenderer_GetViewport(int* x, int* y, int* width, int* height) {
     *x = vp_x;
     *y = vp_y;
     *width = vp_width;

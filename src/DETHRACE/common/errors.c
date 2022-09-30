@@ -241,12 +241,6 @@ void dr_dprintf(char* fmt_string, ...) {
     va_end(args);
     fputs("\n", gDiagnostic_file);
     fflush(gDiagnostic_file);
-
-    va_start(args, fmt_string);
-    printf("dr_dprintf: ");
-    vfprintf(stdout, fmt_string, args);
-    printf("\n");
-    va_end(args);
 }
 
 // IDA: int __usercall DoErrorInterface@<EAX>(int pMisc_text_index@<EAX>)
