@@ -2625,9 +2625,9 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
         k = 4;
     }
     for (i = 0; i < k; i++) {
-        if (fabsf(r[i].v[1]) + fabsf(r[i].v[2]) + fabsf(r[i].v[0]) > 500.0) {
+        if (fabsf(r[i].v[1]) + fabsf(r[i].v[2]) + fabsf(r[i].v[0]) > 500.0f) {
             for (j = i + 1; j < k; j++) {
-                if (fabsf(r[j].v[1]) + fabsf(r[j].v[2]) + fabsf(r[j].v[0]) < 500.0) {
+                if (fabsf(r[j].v[1]) + fabsf(r[j].v[2]) + fabsf(r[j].v[0]) < 500.0f) {
                     r[i] = r[j];
                     n[i] = n[j];
                     i++;
@@ -2784,7 +2784,7 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
                     BrVector3Set(&norm, 0.f, 0.f, 0.f);
                     BrVector3Set(&normal_force, 0.f, 0.f, 0.f);
                     BrVector3Set(&c->omega, 0.f, 0.f, 0.f);
-                    BrVector3Set(&c->oldomega, 0.f, 0, 0.f);
+                    BrVector3Set(&c->oldomega, 0.f, 0.f, 0.f);
                     if (c->driver <= eDriver_non_car || car_spec->max_force_rear == 0.0f) {
                         if (c->driver <= eDriver_non_car) {
                             PipeSingleNonCar(c);
