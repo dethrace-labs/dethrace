@@ -453,7 +453,46 @@ void TotallyRepairACar(tCar_spec* pCar) {
     br_bounds storage_bounds;
     LOG_TRACE("(%p)", pCar);
 
-    STUB();
+    StopCarSmokingInstantly(pCar);
+    if (IsActionReplayAvailable()) {
+        PipeInstantUnSmudge(pCar);
+    }
+    pCar->repair_time += 100000;
+    for (i = 0; i < COUNT_OF(pCar->damage_units); i++) {
+        pCar->damage_units[i].damage_level = 0;
+        pCar->damage_units[i].last_level = 0;
+        pCar->damage_units[i].smoke_last_level = 0;
+    }
+    memcpy(&storage_bounds, &pCar->bounds[1], sizeof(br_bounds));
+    memcpy(&pCar->bounds[1], &pCar->max_bounds[1], sizeof(br_bounds));
+    if (TestForCarInSensiblePlace(pCar)) {
+        for (j = 0; j < pCar->car_actor_count; j++) {
+            the_car_actor = &pCar->car_model_actors[j];
+            if (the_car_actor->undamaged_vertices != NULL) {
+                pipe_vertex_count = 0;
+                for (k = 0; k < the_car_actor->actor->model->nvertices; k++) {
+                    if (pipe_vertex_count < COUNT_OF(pipe_array)) {
+                        BrVector3Sub(&pipe_array[pipe_vertex_count].delta_coordinates,
+                            &the_car_actor->undamaged_vertices[k].p, &the_car_actor->actor->model->vertices[k].p);
+                        if (!Vector3IsZero(&pipe_array[pipe_vertex_count].delta_coordinates)) {
+                            pipe_array[pipe_vertex_count].vertex_index = k;
+                            pipe_vertex_count++;
+                        }
+                    }
+                }
+                memcpy(the_car_actor->actor->model->vertices,
+                    the_car_actor->undamaged_vertices,
+                    the_car_actor->actor->model->nvertices * sizeof(br_vertex));
+//                BrModelUpdate(the_car_actor->actor->model, BR_MODU_EDGES | BR_MODU_NORMALS);
+                BrModelUpdate(the_car_actor->actor->model, BR_MODU_ALL);
+                if (pipe_vertex_count != 0 && IsActionReplayAvailable()) {
+                    PipeSingleModelGeometry(pCar->car_ID, j, pipe_vertex_count, pipe_array);
+                }
+            }
+        }
+    } else {
+        memcpy(&pCar->bounds[1], &storage_bounds, sizeof(br_bounds));
+    }
 }
 
 // IDA: void __cdecl TotallyRepairCar()
