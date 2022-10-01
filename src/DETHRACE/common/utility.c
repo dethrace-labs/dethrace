@@ -912,7 +912,7 @@ br_pixelmap* GenerateDarkenedShadeTable(int pHeight, br_pixelmap* pPalette, int 
     if (the_table == NULL) {
         the_table = BrPixelmapAllocate(BR_PMT_INDEX_8, 256, pHeight, NULL, 0);
         if (the_table == NULL) {
-            FatalError(109);
+            FatalError(kFatalError_LoadGeneratedShadeTable);
         }
         cp = pPalette->pixels;
 
@@ -1267,8 +1267,8 @@ void EncodeFile(char* pThe_path) {
     strcat(new_file, "ENC");
 
     f = fopen(pThe_path, "rt");
-    if (!f) {
-        FatalError(0x6b, new_file);
+    if (f == NULL) {
+        FatalError(kFatalError_Open_S, new_file);
     }
 
     ch = fgetc(f);
@@ -1280,8 +1280,8 @@ void EncodeFile(char* pThe_path) {
     }
 
     d = fopen(new_file, "wb");
-    if (!d) {
-        FatalError(0x6b, new_file);
+    if (d == NULL) {
+        FatalError(kFatalError_Open_S, new_file);
     }
 
     result = &line[1];

@@ -318,7 +318,7 @@ void LoadPowerups() {
     PathCat(the_path, gApplication_path, "POWERUP.TXT");
     f = DRfopen(the_path, "rt");
     if (f == NULL) {
-        FatalError(25);
+        FatalError(kFatalError_LoadResolutionIndependentFile);
     }
     gNumber_of_powerups = GetAnInt(f);
     gPowerup_array = BrMemAllocate(sizeof(tPowerup) * gNumber_of_powerups, kMem_powerup_array);

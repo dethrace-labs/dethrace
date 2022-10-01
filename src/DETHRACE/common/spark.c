@@ -1684,7 +1684,7 @@ void InitFlame() {
     PathCat(the_path, the_path, "FLAMES.PIX");
     num = DRPixelmapLoadMany(the_path, gFlame_map, COUNT_OF(gFlame_map));
     if (num != COUNT_OF(gFlame_map)) {
-        FatalError(79, the_path);
+        FatalError(kFatalError_LoadPixelmapFile_S, the_path);
     }
     BrMapAddMany(gFlame_map, COUNT_OF(gFlame_map));
     for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
@@ -1750,7 +1750,7 @@ void InitSplash(FILE* pF) {
             PathCat(the_path, the_path, s);
             num_files = DRPixelmapLoadMany(the_path, &splash_maps[gNum_splash_types], 20 - gNum_splash_types);
             if (num_files == 0) {
-                FatalError(79, the_path);
+                FatalError(kFatalError_LoadPixelmapFile_S, the_path);
             }
             gNum_splash_types += num_files;
         }

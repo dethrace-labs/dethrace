@@ -61,12 +61,12 @@ void FrankAnneStart1() {
     StartRollingPlayerNamesIn();
     if (!gFrank_flic_data) {
         if (!LoadFlicData("FRANK.FLI", &gFrank_flic_data, &gFrank_flic_data_length)) {
-            FatalError(56);
+            FatalError(kFatalError_LoadOpponentMugShotFile);
         }
     }
     if (!gAnne_flic_data) {
         if (!LoadFlicData("ANNIE.FLI", &gAnne_flic_data, &gAnne_flic_data_length)) {
-            FatalError(56);
+            FatalError(kFatalError_LoadOpponentMugShotFile);
         }
     }
     InitialiseFlicPanel(0,

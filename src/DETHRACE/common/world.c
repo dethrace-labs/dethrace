@@ -314,14 +314,14 @@ int LoadNPixelmaps(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
             PathCat(the_path, the_path, str);
             total = DRPixelmapLoadMany(the_path, temp_array, COUNT_OF(temp_array));
             if (total == 0) {
-                FatalError(79);
+                FatalError(kFatalError_LoadPixelmapFile_S, str);
             }
         }
         for (j = 0; j < total; j++) {
             if (temp_array[j] != NULL) {
                 switch (AddPixelmapToStorage(pStorage_space, (br_pixelmap**)temp_array[j])) {
                 case eStorage_not_enough_room:
-                    FatalError(67);
+                    FatalError(kFatalError_InsufficientPixelmapSlots);
                     break;
                 case eStorage_duplicate:
                     BrPixelmapFree(temp_array[j]);
@@ -349,7 +349,7 @@ br_pixelmap* LoadSinglePixelmap(tBrender_storage* pStorage_space, char* pName) {
 
     switch (AddPixelmapToStorage(pStorage_space, (br_pixelmap**)temp)) {
     case eStorage_not_enough_room:
-        FatalError(67);
+        FatalError(kFatalError_InsufficientPixelmapSlots);
         break;
 
     case eStorage_duplicate:
@@ -376,7 +376,7 @@ br_material* LoadSingleMaterial(tBrender_storage* pStorage_space, char* pName) {
 
     switch (AddMaterialToStorage(pStorage_space, temp)) {
     case eStorage_not_enough_room:
-        FatalError(69);
+        FatalError(kFatalError_InsufficientMaterialSlots);
         break;
 
     case eStorage_duplicate:
@@ -411,14 +411,14 @@ int LoadNShadeTables(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
         PathCat(the_path, gApplication_path, "SHADETAB");
         PathCat(the_path, the_path, str);
         total = DRPixelmapLoadMany(the_path, temp_array, 50);
-        if (!total) {
-            FatalError(80);
+        if (total == 0) {
+            FatalError(kFatalError_LoadShadeTableFile_S, str);
         }
         for (j = 0; j < total; j++) {
             if (temp_array[j]) {
                 switch (AddShadeTableToStorage(pStorage_space, temp_array[j])) {
                 case eStorage_not_enough_room:
-                    FatalError(68);
+                    FatalError(kFatalError_InsufficientShadeTableSlots);
                     break;
 
                 case eStorage_duplicate:
@@ -447,7 +447,7 @@ br_pixelmap* LoadSingleShadeTable(tBrender_storage* pStorage_space, char* pName)
 
     switch (AddShadeTableToStorage(pStorage_space, temp)) {
     case eStorage_not_enough_room:
-        FatalError(68);
+        FatalError(kFatalError_InsufficientShadeTableSlots);
         break;
 
     case eStorage_duplicate:
@@ -482,14 +482,14 @@ int LoadNMaterials(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
         PathCat(the_path, gApplication_path, "MATERIAL");
         PathCat(the_path, the_path, str);
         total = BrMaterialLoadMany(the_path, temp_array, 200);
-        if (!total) {
-            FatalError(81);
+        if (total == 0) {
+            FatalError(kFatalError_LoadMaterialFile_S, str);
         }
         for (j = 0; j < total; j++) {
             if (temp_array[j]) {
                 switch (AddMaterialToStorage(pStorage_space, temp_array[j])) {
                 case eStorage_not_enough_room:
-                    FatalError(69);
+                    FatalError(kFatalError_InsufficientMaterialSlots);
                     break;
                 case eStorage_duplicate:
                     BrMaterialFree(temp_array[j]);
@@ -526,14 +526,14 @@ int LoadNModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
         PathCat(the_path, gApplication_path, "MODELS");
         PathCat(the_path, the_path, str);
         total = BrModelLoadMany(the_path, temp_array, 2000);
-        if (!total) {
-            FatalError(82);
+        if (total == 0) {
+            FatalError(kFatalError_LoadModelFile_S, str);
         }
         for (j = 0; j < total; j++) {
             if (temp_array[j]) {
                 switch (AddModelToStorage(pStorage_space, temp_array[j])) {
                 case eStorage_not_enough_room:
-                    FatalError(70);
+                    FatalError(kFatalError_InsufficientModelSlots);
                     break;
                 case eStorage_duplicate:
                     BrModelFree(temp_array[j]);
@@ -708,13 +708,13 @@ int LoadNTrackModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
         PathCat(the_path, the_path, str);
         total = BrModelLoadMany(the_path, temp_array, 2000);
         if (total == 0) {
-            FatalError(82, str);
+            FatalError(kFatalError_LoadModelFile_S, str);
         }
         for (j = 0; j < total; j++) {
             if (temp_array[j]) {
                 switch (AddModelToStorage(pStorage_space, temp_array[j])) {
                 case eStorage_not_enough_room:
-                    FatalError(70);
+                    FatalError(kFatalError_InsufficientModelSlots);
                     break;
                 case eStorage_duplicate:
                     BrModelFree(temp_array[j]);
@@ -839,7 +839,7 @@ void AddFunkGrooveBinding(int pSlot_number, float* pPeriod_address) {
     LOG_TRACE("(%d, %p)", pSlot_number, pPeriod_address);
 
     if (pSlot_number < 0 || pSlot_number >= COUNT_OF(gGroove_funk_bindings)) {
-        FatalError(72);
+        FatalError(kFatalError_DefinedRefNumGrooveFunkOutOfRange);
     }
 
     gGroove_funk_bindings[pSlot_number] = pPeriod_address;
@@ -852,7 +852,7 @@ void ControlBoundFunkGroove(int pSlot_number, float pValue) {
 
     if (pSlot_number >= 0) {
         if (pSlot_number >= COUNT_OF(gGroove_funk_bindings)) {
-            FatalError(73);
+            FatalError(kFatalError_UsedRefNumGrooveFunkOutOfRange);
         }
         *gGroove_funk_bindings[pSlot_number] = pValue;
     }
@@ -863,10 +863,10 @@ float ControlBoundFunkGroovePlus(int pSlot_number, float pValue) {
     LOG_TRACE("(%d, %f)", pSlot_number, pValue);
 
     if (pSlot_number < 0) {
-        return 0.0;
+        return 0.0f;
     }
     if (pSlot_number >= COUNT_OF(gGroove_funk_bindings)) {
-        FatalError(73);
+        FatalError(kFatalError_UsedRefNumGrooveFunkOutOfRange);
     }
     *gGroove_funk_bindings[pSlot_number] = fmod(*gGroove_funk_bindings[pSlot_number] + pValue, 1.0);
     return *gGroove_funk_bindings[pSlot_number];
@@ -1086,7 +1086,7 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
 
         if (!first_time) {
             if (strcmp(s, "NEXT FUNK") != 0) {
-                FatalError(62);
+                FatalError(kFatalError_FunkotronicFile);
             }
             GetALineAndDontArgue(pF, s);
         }
@@ -1097,7 +1097,7 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
         str = strtok(s, "\t ,/");
         the_funk->material = BrMaterialFind(str);
         if (the_funk->material == NULL) {
-            FatalError(64);
+            FatalError(kFatalError_FindMaterialUsedByFunkotronicFile_S, str);
         }
         the_funk->mode = GetALineAndInterpretCommand(pF, gFunk_nature_names, COUNT_OF(gFunk_nature_names));
         the_funk->matrix_mod_type = GetALineAndInterpretCommand(pF, gFunk_type_names, COUNT_OF(gFunk_type_names));
@@ -1294,7 +1294,7 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
                 GetAString(pF, s);
                 the_funk->texture_animation_data.frames_info.textures[i] = BrMapFind(s);
                 if (the_funk->texture_animation_data.frames_info.textures[i] == NULL) {
-                    FatalError(66);
+                    FatalError(kFatalError_AnimationFramePixelmapUsedByFunkotronicFile);
                 }
             }
         }
@@ -1397,7 +1397,7 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
 
         if (!first_time) {
             if (strcmp(s, "NEXT GROOVE") != 0) {
-                FatalError(63);
+                FatalError(kFatalError_GroovidelicFile);
             }
             GetALineAndDontArgue(pF, s);
         }
@@ -1409,7 +1409,7 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
 
         if (!the_groove->actor) {
             if (!pAllowed_to_be_absent && !gAusterity_mode) {
-                FatalError(65, str);
+                FatalError(kFatalError_FindActorUsedByGroovidelicFile_S, str);
             }
             if (!gGroove_by_proxy_actor) {
                 gGroove_by_proxy_actor = BrActorAllocate(BR_ACTOR_MODEL, 0);
@@ -2397,7 +2397,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     PathCat(the_path, the_path, pFile_name);
     f = DRfopen(the_path, "rt");
     if (f == NULL) {
-        FatalError(50);
+        FatalError(kFatalError_OpenRacesFile);
     }
     GetALineAndDontArgue(f, s);
     str = strtok(s, "\t ,/");
@@ -2740,7 +2740,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
                 PathCat(the_path, gApplication_path, "PEDSUBS.TXT");
                 g = DRfopen(the_path, "rt");
                 if (g == NULL) {
-                    FatalError(50);
+                    FatalError(kFatalError_OpenRacesFile);
                 }
                 for (i = 0; i < line_count; ++i) {
                     SkipNLines(g);
@@ -2816,7 +2816,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     num_non_cars = GetAnInt(f);
     non_car = BrMemCalloc(num_non_cars + 5, sizeof(tNon_car_spec), kMem_non_car_spec);
     if (!non_car && num_non_cars) {
-        FatalError(50);
+        FatalError(kFatalError_OpenRacesFile);
     }
     gProgram_state.non_cars = non_car;
     gProgram_state.num_non_car_spaces = num_non_cars + NONCAR_UNUSED_SLOTS;
@@ -2834,8 +2834,8 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
         PathCat(the_path, gApplication_path, "NONCARS");
         PathCat(the_path, the_path, s);
         non_car_f = DRfopen(the_path, "rt");
-        if (!non_car_f) {
-            FatalError(107, the_path);
+        if (non_car_f == NULL) {
+            FatalError(kFatalError_Open_S, the_path);
         }
         ReadNonCarMechanicsData(non_car_f, non_car);
         PossibleService();
@@ -2866,7 +2866,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     }
     GetAString(f, s);
     if (strcmp(s, pFile_name) != 0) {
-        FatalError(115, pFile_name);
+        FatalError(kFatalError_FileCorrupt_S, pFile_name);
     }
     fclose(f);
 }

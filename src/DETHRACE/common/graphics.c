@@ -541,12 +541,12 @@ void SetBRenderScreenAndBuffers(int pX_offset, int pY_offset, int pWidth, int pH
 
     gScreen->origin_x = 0;
     gScreen->origin_y = 0;
-    if (!gBack_screen) {
-        FatalError(1);
+    if (gBack_screen == NULL) {
+        FatalError(kFatalError_AllocateOffScreenBuffer);
     }
     gDepth_buffer = BrPixelmapMatch(gBack_screen, BR_PMMATCH_DEPTH_16);
     if (gDepth_buffer == NULL) {
-        FatalError(2);
+        FatalError(kFatalError_AllocateZBuffer);
     }
     BrZbBegin(gRender_screen->type, gDepth_buffer->type);
     gBrZb_initialized = 1;
@@ -689,14 +689,14 @@ void InitializePalettes() {
     gCurrent_palette = DRPixelmapAllocate(BR_PMT_RGBX_888, 1u, 256, gCurrent_palette_pixels, 0);
     gRender_palette = BrTableFind("DRRENDER.PAL");
     if (gRender_palette == NULL) {
-        FatalError(10);
+        FatalError(kFatalError_RequiredPalette);
     }
     gOrig_render_palette = BrPixelmapAllocateSub(gRender_palette, 0, 0, gRender_palette->width, gRender_palette->height);
     gOrig_render_palette->pixels = BrMemAllocate(0x400u, kMem_render_pal_pixels);
     memcpy(gOrig_render_palette->pixels, gRender_palette->pixels, 0x400u);
     gFlic_palette = BrTableFind("DRACEFLC.PAL");
     if (gFlic_palette == NULL) {
-        FatalError(10);
+        FatalError(kFatalError_RequiredPalette);
     }
     DRSetPalette(gFlic_palette);
     gScratch_pixels = BrMemAllocate(0x400u, kMem_scratch_pal_pixels);
@@ -2291,7 +2291,7 @@ int AllocateTransientBitmap(int pWidth, int pHeight, int pUser_data) {
             return bm_index;
         }
     }
-    FatalError(18);
+    FatalError(kFatalError_FindSpareTransientBitmap);
 }
 
 // IDA: void __usercall DeallocateTransientBitmap(int pIndex@<EAX>)
@@ -2635,14 +2635,14 @@ void LoadFont(int pFont_ID) {
     gFonts[pFont_ID].images = DRPixelmapLoad(the_path);
 
     if (gFonts[pFont_ID].images == NULL) {
-        FatalError(20, gFont_names[pFont_ID]);
+        FatalError(kFatalError_LoadFontImage_S, gFont_names[pFont_ID]);
     }
     if (!gFonts[pFont_ID].file_read_once) {
         strcpy(&the_path[number_of_chars + 1], "TXT");
 
         f = DRfopen(the_path, "rt");
         if (f == NULL) {
-            FatalError(21, gFont_names[pFont_ID]);
+            FatalError(kFatalError_LoadFontWidthTable_S, gFont_names[pFont_ID]);
         }
 
         gFonts[pFont_ID].height = GetAnInt(f);
