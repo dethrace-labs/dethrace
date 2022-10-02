@@ -23,8 +23,8 @@ jobs:
         run: |
           cd build
           ctest --verbose
-      - name: Upload artifact
-        if: startsWith(github.ref, 'refs/tags/') || github.ref_name == 'main'
+      - name: Upload Artifact
+        if: startsWith(github.ref, 'refs/tags/v') || github.ref_name == 'main'
         uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.build.outputs.filename }}
@@ -55,8 +55,8 @@ jobs:
         run: |
           cd build
           ctest --verbose -C RelWithDebInfo
-      - name: Upload artifact
-        if: startsWith(github.ref, 'refs/tags/') || github.ref_name == 'main'
+      - name: Upload Artifact
+        if: startsWith(github.ref, 'refs/tags/v') || github.ref_name == 'main'
         uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.build.outputs.filename }}
@@ -66,20 +66,24 @@ jobs:
   create-release:
     name: Create Release
     needs: [ci, ci-windows]
-    if: startsWith(github.ref, 'refs/tags/')
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch build artifacts
+      - name: Fetch Build Artifacts
         uses: actions/download-artifact@v3
         with:
           path: artifacts
-      - name: Create release
+      - name: Calculate Variables
+        id: vars
+        run: |
+          echo "::set-output name=ref_name_without_v::$(echo ${GITHUB_REF_NAME} | cut -c2-20)"
+      - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v0.1.14
         with:
           draft: false
           prerelease: false
-          name: Dethrace ${{github.ref_name}}
+          name: Dethrace ${{ steps.vars.outputs.ref_name_without_v }}
           generate_release_notes: true
           files: |
             artifacts/**
