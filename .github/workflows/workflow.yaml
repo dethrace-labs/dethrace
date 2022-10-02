@@ -65,7 +65,7 @@ jobs:
 
   create-release:
     name: Create Release
-    needs: [build-nix, build-windows]
+    needs: [ci, ci-windows]
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
