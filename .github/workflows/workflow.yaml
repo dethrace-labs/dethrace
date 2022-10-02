@@ -3,7 +3,8 @@ name: Workflow
 on: 
   push:
     branches:
-      - main
+      - 'main'
+      - 'ci-*'
   pull_request:
 
 jobs:
