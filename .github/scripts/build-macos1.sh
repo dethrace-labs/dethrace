@@ -11,7 +11,7 @@ fi
 brew install SDL2
 
 # build
-cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -DDETHRACE_WERROR=ON -B build
+cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_OSX_ARCHITECTURES=x86_64 -DBUILD_TESTS=ON -DDETHRACE_WERROR=ON -B build
 cmake --build build -- -j 4
 
 # package artifact
