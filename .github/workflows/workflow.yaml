@@ -15,17 +15,19 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
+        platform: ['x86', 'amd64']
         include:
-        - os: ubuntu-latest
-          script: build-linux.sh
-        - os: macos-latest
-          script: build-macos.sh
-        - os: windows-latest
-          script: build-msvc.ps1
-          platform: x86
-        - os: windows-latest
-          script: build-msvc.ps1
-          platform: amd64
+          - os: ubuntu-latest
+            script: build-linux.sh
+          - os: macos-latest
+            script: build-macos.sh
+          - os: windows-latest
+            script: build-msvc.ps1
+        exclude:
+          - os: ubuntu-latest
+            platform: x86
+          - os: macos-latest
+            platform: x86
     steps:
       - uses: actions/checkout@v3
       - name: Setup Ninja
