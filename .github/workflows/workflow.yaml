@@ -4,7 +4,8 @@ on: [push, pull_request]
 
 jobs:
 
-  build-nix:
+  ci:
+    name: CI
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -17,74 +18,20 @@ jobs:
           version: 1.10.2
       - name: Build
         id: build
-        # env:
-        #   MATRIX_PLATFORM: ${{ matrix.platform }}
-
-
-
-
         run: .github/scripts/build-${{ runner.os }}.sh
       - name: Test
         run: |
           cd build
           ctest --verbose
       - name: Upload artifact
-        #if: startsWith(github.ref, 'refs/tags/') || github.ref_name == 'main'
+        if: startsWith(github.ref, 'refs/tags/') || github.ref_name == 'main'
         uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.build.outputs.filename }}
           path: ${{ steps.build.outputs.filename }}
 
-  # build-linux:
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix:
-  #       platform: [gcc]
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - name: Setup Ninja
-  #       uses: ashutoshvarma/setup-ninja@master
-  #       with:
-  #         version: 1.10.2
-  #     - name: Build
-  #       id: build
-  #       env:
-  #         MATRIX_PLATFORM: ${{ matrix.platform }}
-  #       run: .github/scripts/build-linux.sh
-  #     - name: Test
-  #       run: |
-  #         cd build
-  #         ctest --verbose
-  #     - name: Upload artifact
-  #       #if: startsWith(github.ref, 'refs/tags/') || github.ref_name == 'main'
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: ${{ steps.build.outputs.filename }}
-  #         path: ${{ steps.build.outputs.filename }}
-
-  # build-macos:
-  #   runs-on: macos-latest
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - name: Setup Ninja
-  #       uses: ashutoshvarma/setup-ninja@master
-  #       with:
-  #         version: 1.10.2
-  #     - name: Build
-  #       run: |
-  #         .github/scripts/build-macos.sh
-  #     - name: Test
-  #       run: |
-  #         cd build
-  #         ctest --verbose
-  #     - name: Upload artifact
-  #       #if: startsWith(github.ref, 'refs/tags/') || github.ref_name == 'main'
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: ${{ steps.build.outputs.filename }}
-  #         path: ${{ steps.build.outputs.filename }}
-
-  build-windows:
+  ci-windows:
+    name: CI (Windows)
     runs-on: windows-2019
     strategy:
       matrix:
@@ -109,7 +56,7 @@ jobs:
           cd build
           ctest --verbose -C RelWithDebInfo
       - name: Upload artifact
-        #if: startsWith(github.ref, 'refs/tags/') || github.ref_name == 'main'
+        if: startsWith(github.ref, 'refs/tags/') || github.ref_name == 'main'
         uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.build.outputs.filename }}
@@ -117,6 +64,7 @@ jobs:
 
 
   create-release:
+    name: Create Release
     needs: [build-nix, build-windows]
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
@@ -127,7 +75,7 @@ jobs:
           path: artifacts
       - name: Create release
         id: create_release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v0.1.14
         with:
           draft: false
           prerelease: false
