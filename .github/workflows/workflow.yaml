@@ -8,7 +8,7 @@ jobs:
     runs-on: ${matrix.os}
     strategy:
       matrix:
-        os: [ubuntu-latest, macOS-latest]
+        os: [ubuntu-latest, macos-latest]
     steps:
       - uses: actions/checkout@v3
       - name: Setup Ninja
@@ -95,6 +95,7 @@ jobs:
         with:
           arch: ${{ matrix.platform }}
       - name: Build
+        id: build
         run: |
           .github/scripts/build-msvc.ps1
         env:
