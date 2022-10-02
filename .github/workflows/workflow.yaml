@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
 
-    build-nix:
+  build-nix:
     runs-on: ${matrix.os}
     strategy:
       matrix:
