@@ -4,6 +4,12 @@ if ($($Env:MATRIX_PLATFORM) -eq "x86") {
     $sdl_path = "x64"
 }
 
+if ($($Env:GITHUB_REF_TYPE) -eq "tag") {
+    $BUILD_TAG=$Env:GITHUB_REF_NAME
+} else {
+    $BUILD_TAG=$(git rev-parse --short HEAD)
+}
+
 $sdl2_version = "2.24.0"
 
 # install deps
@@ -18,4 +24,6 @@ cmake --build build --config RelWithDebInfo
 cp $Env:TEMP\SDL2-$sdl2_version\lib\$sdl_path\SDL2.dll build
 
 # package artifact
-7z a windows-$Env:MATRIX_PLATFORM.zip .\build\dethrace.exe .\build\dethrace.pdb $Env:TEMP\SDL2-$sdl2_version\lib\$sdl_path\SDL2.dll
+7z a dethrace-$BUILD_TAG-windows-$Env:MATRIX_PLATFORM.zip .\build\dethrace.exe .\build\dethrace.pdb $Env:TEMP\SDL2-$sdl2_version\lib\$sdl_path\SDL2.dll
+
+echo "::set-output name=filename::dethrace-$BUILD_TAG-windows-$Env:MATRIX_PLATFORM.zip"
