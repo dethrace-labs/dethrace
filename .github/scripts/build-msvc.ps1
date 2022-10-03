@@ -25,7 +25,7 @@ cp $Env:TEMP\SDL2-$sdl2_version\lib\$sdl_path\SDL2.dll build
 
 # package artifact
 $releasename="dethrace-$build_tag-windows-$Env:PLATFORM_ARCH"
-rmdir /s /q $releasename
+rm $releasename -r rm <directory-path> -r -f
 mkdir $releasename
 cp build/dethrace.exe "$releasename/dethrace.exe"
 cp build/dethrace.pdb "$releasename/dethrace.pdb"
@@ -35,7 +35,7 @@ echo "dir releasename"
 echo "dir $releasename"
 dir $releasename
 
-7z a -tzip $releasename.zip $releasename
+7z a -tzip $releasename.zip $releasename/
 
 echo "dir ."
 dir 
