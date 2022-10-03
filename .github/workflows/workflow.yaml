@@ -15,10 +15,10 @@ jobs:
     strategy:
       matrix:
         platform:
-        # - { name: Linux,    os: ubuntu-latest,  arch: amd64, script: build-linux.sh }
-        # - { name: MacOS,    os: macos-latest,   arch: amd64, script: build-macos.sh }
-        - { name: Windows,  os: windows-latest, arch: amd64, script: build-msvc.ps1 }
-        - { name: Windows,  os: windows-latest, arch: x86, script: build-msvc.ps1 }
+          - { name: Linux,    os: ubuntu-latest,  arch: amd64,  script: build-linux.sh }
+          - { name: MacOS,    os: macos-latest,   arch: amd64,  script: build-macos.sh }
+          - { name: Windows,  os: windows-latest, arch: amd64,  script: build-msvc.ps1 }
+          - { name: Windows,  os: windows-latest, arch: x86,    script: build-msvc.ps1 }
     
     runs-on: ${{ matrix.platform.os }}  
     name: CI (${{ matrix.platform.name }} ${{ matrix.platform.arch }})
@@ -42,7 +42,7 @@ jobs:
           cd build
           ctest --verbose
       - name: Upload Artifact
-        #if: startsWith(github.ref, 'refs/tags/') || github.ref_name == 'main'
+        if: startsWith(github.ref, 'refs/tags/') || github.ref_name == 'main'
         uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.build.outputs.filename }}
