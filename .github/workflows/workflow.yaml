@@ -15,10 +15,10 @@ jobs:
     strategy:
       matrix:
         platform:
-        - { os: ubuntu-latest,  arch: amd64, script: build-linux.sh }
-        - { os: macos-latest,   arch: amd64, script: build-macos.sh }
-        - { os: windows-latest, arch: amd64, script: build-msvc.ps1 }
-        - { os: windows-latest, arch: x86, script: build-msvc.ps1 }
+        - { os: ubuntu-latest,  arch: amd64,  script: build-linux.sh }
+        - { os: macos-latest,   arch: amd64,  script: build-macos.sh }
+        - { os: windows-latest, arch: amd64,  script: build-msvc.ps1 }
+        - { os: windows-latest, arch: x86,    script: build-msvc.ps1 }
     
     runs-on: ${{ matrix.platform.os }}  
     name: CI (${{ runner.os }} ${{ matrix.platform.arch }})
