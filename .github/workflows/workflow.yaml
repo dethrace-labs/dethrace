@@ -41,7 +41,7 @@ jobs:
           cd build
           ctest --verbose
       - name: Upload Artifact
-        if: startsWith(github.ref, 'refs/tags/') || github.ref_name == 'main'
+        #if: startsWith(github.ref, 'refs/tags/') || github.ref_name == 'main'
         uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.build.outputs.filename }}

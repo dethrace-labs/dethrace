@@ -25,6 +25,10 @@ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -DDETHRACE_WERROR=ON -B
 cmake --build build -- -j 4
 
 # package artifact
-tar -czvf dethrace-${BUILD_TAG}-linux-amd64.tar.gz build/dethrace
+releasename="dethrace-${BUILD_TAG}-linux-amd64"
+rm -rf "$releasename"
+mkdir "$releasename"
+cp build/dethrace "$releasename/dethrace"
+tar -czvf "$releasename.tar.gz" "$releasename"
+echo "::set-output name=filename::$releasename.tar.gz"
 
-echo "::set-output name=filename::dethrace-${BUILD_TAG}-linux-amd64.tar.gz"

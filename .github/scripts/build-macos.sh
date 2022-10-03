@@ -15,6 +15,9 @@ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_OSX_ARCHITECTURES=x86_64 -DBUILD
 cmake --build build -- -j 4
 
 # package artifact
-tar -czvf dethrace-${BUILD_TAG}-darwin-amd64.tar.gz build/dethrace
-
-echo "::set-output name=filename::dethrace-${BUILD_TAG}-darwin-amd64.tar.gz"
+releasename="dethrace-${BUILD_TAG}-darwin-amd64"
+rm -rf "$releasename"
+mkdir "$releasename"
+cp build/dethrace "$releasename/dethrace"
+tar -czvf "$releasename.tar.gz" "$releasename"
+echo "::set-output name=filename::$releasename.tar.gz"
