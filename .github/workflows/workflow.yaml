@@ -15,8 +15,8 @@ jobs:
     strategy:
       matrix:
         platform:
-        - { name: Linux,    os: ubuntu-latest,  arch: amd64, script: build-linux.sh }
-        - { name: MacOS,    os: macos-latest,   arch: amd64, script: build-macos.sh }
+        # - { name: Linux,    os: ubuntu-latest,  arch: amd64, script: build-linux.sh }
+        # - { name: MacOS,    os: macos-latest,   arch: amd64, script: build-macos.sh }
         - { name: Windows,  os: windows-latest, arch: amd64, script: build-msvc.ps1 }
         - { name: Windows,  os: windows-latest, arch: x86, script: build-msvc.ps1 }
     
