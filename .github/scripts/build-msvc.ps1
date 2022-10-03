@@ -35,7 +35,7 @@ echo "dir releasename"
 echo "dir $releasename"
 dir $releasename
 
-7z a -tzip $releasename.zip $releasename/
+7z a helloworld.zip $releasename
 
 echo "dir ."
 dir 
