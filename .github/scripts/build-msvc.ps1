@@ -23,6 +23,8 @@ cmake --build build --config RelWithDebInfo
 # copy SDL2.dll to build folder, so tests can run
 cp $Env:TEMP\SDL2-$sdl2_version\lib\$sdl_path\SDL2.dll build
 
+Set-PSDebug -Trace 1
+
 # package artifact
 $releasename="dethrace-$build_tag-windows-$Env:PLATFORM_ARCH"
 # rm $releasename -r -Force
@@ -35,7 +37,7 @@ echo "dir releasename"
 echo "dir $releasename"
 dir $releasename
 
-7z "a -tzip $releasename.zip $releasename"
+7z a -tzip "$releasename.zip" $releasename
 
 echo "dir ."
 dir 
