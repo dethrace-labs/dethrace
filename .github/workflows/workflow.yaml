@@ -13,23 +13,14 @@ jobs:
 
   ci:
     name: CI
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.platform.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        platform: ['x86', 'amd64']
-        include:
-          - os: ubuntu-latest
-            script: build-linux.sh
-          - os: macos-latest
-            script: build-macos.sh
-          - os: windows-latest
-            script: build-msvc.ps1
-        exclude:
-          - os: ubuntu-latest
-            platform: x86
-          - os: macos-latest
-            platform: x86
+        platform:
+        - { name: Windows (x86),  os: windows-latest, arch: x86, script: build-msvc.ps1 }
+        - { name: Windows (x64),  os: windows-latest, arch: x64, script: build-msvc.ps1 }
+        - { name: Linux (x64),    os: ubuntu-latest,  arch: x64, script: build-linux.sh }
+        - { name: MacOS (x64),    os: macos-latest,   arch: x64, script: build-macos.sh }
     steps:
       - uses: actions/checkout@v3
       - name: Setup Ninja
@@ -39,12 +30,12 @@ jobs:
       - uses: ilammy/msvc-dev-cmd@v1.4.1
         if: runner.os == 'Windows'
         with:
-          arch: ${{ matrix.platform }}
+          arch: ${{ matrix.platform.arch }}
       - name: Build
         id: build
-        run: .github/scripts/${{ matrix.script }}
+        run: .github/scripts/${{ matrix.platform.script }}
         env:
-          MATRIX_PLATFORM: ${{ matrix.platform }}
+          PLATFORM_ARCH: ${{ matrix.platform.arch }}
       - name: Test
         run: |
           cd build

@@ -1,4 +1,4 @@
-if ($($Env:MATRIX_PLATFORM) -eq "x86") {
+if ($($Env:PLATFORM_ARCH) -eq "x86") {
     $sdl_path = "x86"
 } else {
     $sdl_path = "x64"
