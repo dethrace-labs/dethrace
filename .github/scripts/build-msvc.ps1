@@ -5,9 +5,9 @@ if ($($Env:PLATFORM_ARCH) -eq "x86") {
 }
 
 if ($($Env:GITHUB_REF_TYPE) -eq "tag") {
-    $BUILD_TAG=$Env:GITHUB_REF_NAME
+    $build_tag=$Env:GITHUB_REF_NAME
 } else {
-    $BUILD_TAG=$(git rev-parse --short HEAD)
+    $build_tag=$(git rev-parse --short HEAD)
 }
 
 $sdl2_version = "2.24.0"
@@ -24,16 +24,12 @@ cmake --build build --config RelWithDebInfo
 cp $Env:TEMP\SDL2-$sdl2_version\lib\$sdl_path\SDL2.dll build
 
 # package artifact
-
-$releasename="dethrace-$Env:BUILD_TAG-windows-$Env:PLATFORM_ARCH"
-#rm -rf "$releasename"
+$releasename="dethrace-$build_tag-windows-$Env:PLATFORM_ARCH"
 mkdir "$releasename"
 cp build/dethrace.exe "$releasename/dethrace.exe"
 cp build/dethrace.pdb "$releasename/dethrace.pdb"
 cp build/SDL2.dll "$releasename/SDL2.dll"
 
-7z a dethrace-$BUILD_TAG-windows-$Env:PLATFORM_ARCH.zip $releasename
-
-# 7z a dethrace-$BUILD_TAG-windows-$Env:PLATFORM_ARCH.zip .\build\dethrace.exe .\build\dethrace.pdb $Env:TEMP\SDL2-$sdl2_version\lib\$sdl_path\SDL2.dll
+7z a $releasename.zip $releasename
 
 echo "::set-output name=filename:$releasename.zip"
