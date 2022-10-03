@@ -30,6 +30,10 @@ cp build/dethrace.exe "$releasename/dethrace.exe"
 cp build/dethrace.pdb "$releasename/dethrace.pdb"
 cp build/SDL2.dll "$releasename/SDL2.dll"
 
-7z a $releasename.zip $releasename
+dir $releasename
+
+7z a -tzip $releasename.zip $releasename
+
+7z l $releasename.zip
 
 echo "::set-output name=filename::$releasename.zip"
