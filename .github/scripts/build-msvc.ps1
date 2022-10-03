@@ -26,7 +26,7 @@ cp $Env:TEMP\SDL2-$sdl2_version\lib\$sdl_path\SDL2.dll build
 # package artifact
 
 $releasename="dethrace-$Env:BUILD_TAG-windows-$Env:PLATFORM_ARCH"
-rm -rf "$releasename"
+#rm -rf "$releasename"
 mkdir "$releasename"
 cp build/dethrace "$releasename/dethrace"
 cp build/dethrace.pdb "$releasename/dethrace.pdb"
