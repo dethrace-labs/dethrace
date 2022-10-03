@@ -31,9 +31,14 @@ cp build/dethrace.exe "$releasename/dethrace.exe"
 cp build/dethrace.pdb "$releasename/dethrace.pdb"
 cp build/SDL2.dll "$releasename/SDL2.dll"
 
+echo "dir releasename"
+echo "dir $releasename"
 dir $releasename
 
 7z a -tzip $releasename.zip $releasename
+
+echo "dir ."
+dir 
 
 7z l $releasename.zip
 
