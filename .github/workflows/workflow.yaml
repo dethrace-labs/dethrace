@@ -12,15 +12,16 @@ on:
 jobs:
 
   ci:
-    runs-on: ${{ matrix.platform.os }}
     strategy:
       matrix:
         platform:
-        - { name: 'Linux x64',    os: ubuntu-latest,  arch: amd64, script: build-linux.sh }
-        - { name: 'MacOS x64',    os: macos-latest,   arch: amd64, script: build-macos.sh }
-        - { name: 'Windows x86',  os: windows-latest, arch: x86, script: build-msvc.ps1 }
-        - { name: 'Windows x64',  os: windows-latest, arch: amd64, script: build-msvc.ps1 }
-    name: CI (${{ matrix.platform.name }})
+        - { os: ubuntu-latest,  arch: amd64, script: build-linux.sh }
+        - { os: macos-latest,   arch: amd64, script: build-macos.sh }
+        - { os: windows-latest, arch: amd64, script: build-msvc.ps1 }
+        - { os: windows-latest, arch: x86, script: build-msvc.ps1 }
+    
+    runs-on: ${{ matrix.platform.os }}  
+    name: CI (${{ runner.os }} ${{ matrix.platform.arch }})
     steps:
       - uses: actions/checkout@v3
       - name: Setup Ninja
