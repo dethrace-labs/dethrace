@@ -32,4 +32,4 @@ cp build/SDL2.dll "$releasename/SDL2.dll"
 
 7z a $releasename.zip $releasename
 
-echo "::set-output name=filename:$releasename.zip"
+echo "::set-output name=filename::$releasename.zip"
