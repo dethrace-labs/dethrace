@@ -28,9 +28,9 @@ cp $Env:TEMP\SDL2-$sdl2_version\lib\$sdl_path\SDL2.dll build
 $releasename="dethrace-$Env:BUILD_TAG-windows-$Env:PLATFORM_ARCH"
 #rm -rf "$releasename"
 mkdir "$releasename"
-cp build/dethrace "$releasename/dethrace"
-cp build/dethrace.pdb "$releasename/dethrace.pdb"
-cp build/SDL2.dll "$releasename/SDL2.dll"
+cp build/dethrace.exe "$releasename"
+cp build/dethrace.pdb "$releasename"
+cp build/SDL2.dll "$releasename"
 
 7z a dethrace-$BUILD_TAG-windows-$Env:PLATFORM_ARCH.zip $releasename
 
