@@ -24,6 +24,6 @@ cmake --build build --config RelWithDebInfo
 cp $Env:TEMP\SDL2-$sdl2_version\lib\$sdl_path\SDL2.dll build
 
 # package artifact
-7z a dethrace-$BUILD_TAG-windows-$Env:MATRIX_PLATFORM.zip .\build\dethrace.exe .\build\dethrace.pdb $Env:TEMP\SDL2-$sdl2_version\lib\$sdl_path\SDL2.dll
+7z a dethrace-$BUILD_TAG-windows-$Env:PLATFORM_ARCH.zip .\build\dethrace.exe .\build\dethrace.pdb $Env:TEMP\SDL2-$sdl2_version\lib\$sdl_path\SDL2.dll
 
-echo "::set-output name=filename::dethrace-$BUILD_TAG-windows-$Env:MATRIX_PLATFORM.zip"
+echo "::set-output name=filename::dethrace-$BUILD_TAG-windows-$Env:PLATFORM_ARCH.zip"
