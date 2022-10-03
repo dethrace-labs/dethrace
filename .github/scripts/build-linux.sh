@@ -25,7 +25,7 @@ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -DDETHRACE_WERROR=ON -B
 cmake --build build -- -j 4
 
 # package artifact
-releasename="dethrace-${BUILD_TAG}-linux-amd64"
+releasename="dethrace-${BUILD_TAG}-linux-${PLATFORM_ARCH}"
 rm -rf "$releasename"
 mkdir "$releasename"
 cp build/dethrace "$releasename/dethrace"

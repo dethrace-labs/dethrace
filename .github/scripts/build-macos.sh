@@ -15,7 +15,7 @@ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_OSX_ARCHITECTURES=x86_64 -DBUILD
 cmake --build build -- -j 4
 
 # package artifact
-releasename="dethrace-${BUILD_TAG}-darwin-amd64"
+releasename="dethrace-${BUILD_TAG}-darwin-${PLATFORM_ARCH}"
 rm -rf "$releasename"
 mkdir "$releasename"
 cp build/dethrace "$releasename/dethrace"
