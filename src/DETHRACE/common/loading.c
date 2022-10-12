@@ -3295,7 +3295,7 @@ int GetCDPathFromPathsTxtFile(char* pPath_name) {
 int TestForOriginalCarmaCDinDrive() {
     LOG_TRACE("()");
 
-    // Jeff: the symbol dump didn't include any local variable information.
+    // The symbol dump didn't include any local variable information.
     // These names are not necessarily the original names.
     tPath_name cd_pathname;
     tPath_name cd_data_pathname;
@@ -3304,8 +3304,7 @@ int TestForOriginalCarmaCDinDrive() {
     tPath_name paths_txt;
     int paths_txt_first_char;
 
-    // Jeff: Added to optionally bypass this check
-    if (harness_game_config.disable_cd_check) {
+    if (harness_game_config.enable_cd_check == 0) {
         return 1;
     }
 

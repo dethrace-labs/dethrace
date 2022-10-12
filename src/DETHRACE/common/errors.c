@@ -2,6 +2,7 @@
 #include "cutscene.h"
 #include "globvars.h"
 #include "graphics.h"
+#include "harness/config.h"
 #include "harness/trace.h"
 #include "network.h"
 #include "pd/sys.h"
@@ -228,6 +229,10 @@ void dr_dprintf(char* fmt_string, ...) {
     static tU32 first_time = 0;
     va_list args;
     tU32 the_time;
+
+    if (harness_game_config.enable_diagnostics == 0) {
+        return;
+    }
 
     if (first_time == 0) {
         first_time = GetTotalTime();
