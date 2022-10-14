@@ -4,6 +4,7 @@
 #include "car.h"
 #include "globvars.h"
 #include "harness/trace.h"
+#include "raycast.h"
 #include "world.h"
 #include <math.h>
 #include <stdlib.h>
@@ -419,12 +420,13 @@ void CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir,
 
     this_material = pFace->material;
     *rt = 100.0;
+
     d = pFace->normal.v[1] * ray_dir->v[1] + ray_dir->v[2] * pFace->normal.v[2] + ray_dir->v[0] * pFace->normal.v[0];
-    if ((!this_material || (this_material->flags & 0x1800) != 0 || d <= 0.0)
+    if ((this_material == NULL || (this_material->flags & (BR_MATF_TWO_SIDED | BR_MATF_ALWAYS_VISIBLE )) != 0 || d <= 0.0)
         && (!this_material || !this_material->identifier || *this_material->identifier != '!' || !gPling_materials)
         && fabs(d) >= 0.00000023841858) {
         BrVector3Sub(&p, ray_pos, &pFace->v[0]);
-        numerator = pFace->normal.v[1] * p.v[1] + pFace->normal.v[2] * p.v[2] + pFace->normal.v[0] * p.v[0];
+        numerator = BrVector3Dot(&pFace->normal, &p);
         if (!BadDiv__finteray(numerator, d)) {
             if (d > 0.0) {
                 if (-numerator < -0.001 || -numerator > d + 0.003) {
@@ -437,12 +439,8 @@ void CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir,
             if (t > 1.0) {
                 t = 1.0;
             }
-            tv.v[0] = ray_dir->v[0] * t;
-            tv.v[1] = ray_dir->v[1] * t;
-            tv.v[2] = ray_dir->v[2] * t;
-            tv.v[0] = ray_pos->v[0] + tv.v[0];
-            tv.v[1] = ray_pos->v[1] + tv.v[1];
-            tv.v[2] = ray_pos->v[2] + tv.v[2];
+            BrVector3Scale(&tv, ray_dir, t);
+            BrVector3Accumulate(&tv, ray_pos);
             axis_m = fabs(pFace->normal.v[0]) < fabs(pFace->normal.v[1]);
             if (fabs(pFace->normal.v[2]) > fabs(pFace->normal.v[axis_m])) {
                 axis_m = 2;
@@ -481,9 +479,7 @@ void CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir,
                 *rt = t;
                 *normal = pFace->normal;
                 if (d > 0.0) {
-                    normal->v[0] = -normal->v[0];
-                    normal->v[1] = -normal->v[1];
-                    normal->v[2] = -normal->v[2];
+                    BrVector3Negate(normal, normal);
                 }
             }
         }
@@ -663,61 +659,53 @@ int FindFacesInBox(tBounds* bnds, tFace_ref* face_list, int max_face) {
 
     j = 0;
     track_spec = &gProgram_state.track_spec;
-    a.v[0] = bnds->original_bounds.min.v[0] + bnds->original_bounds.max.v[0];
-    a.v[1] = bnds->original_bounds.min.v[1] + bnds->original_bounds.max.v[1];
-    a.v[2] = bnds->original_bounds.min.v[2] + bnds->original_bounds.max.v[2];
-    b.v[0] = a.v[0] * 0.5;
-    b.v[1] = a.v[1] * 0.5;
-    b.v[2] = a.v[2] * 0.5;
-    BrMatrix34ApplyP(&bnds->box_centre, &b, bnds->mat);
-    b.v[0] = bnds->original_bounds.max.v[0] - bnds->original_bounds.min.v[0];
-    b.v[1] = bnds->original_bounds.max.v[1] - bnds->original_bounds.min.v[1];
-    b.v[2] = bnds->original_bounds.max.v[2] - bnds->original_bounds.min.v[2];
-    bnds->radius = sqrt(b.v[1] * b.v[1] + b.v[2] * b.v[2] + b.v[0] * b.v[0]) / 2.0;
+    BrVector3Add(&a, &bnds->original_bounds.min, &bnds->original_bounds.max);
+    BrVector3Scale(&a, &a, 0.5f);
+    BrMatrix34ApplyP(&bnds->box_centre, &a, bnds->mat);
+    BrVector3Sub(&b, &bnds->original_bounds.max, &bnds->original_bounds.min);
+    bnds->radius = BrVector3Length(&b) / 2.f;
     BrMatrix34ApplyP(&bnds->real_bounds.min, &bnds->original_bounds.min, bnds->mat);
-    bnds->real_bounds.max = bnds->real_bounds.min;
+    BrVector3Copy(&bnds->real_bounds.max, &bnds->real_bounds.min);
     for (i = 0; i < 3; ++i) {
         c[i].v[0] = bnds->mat->m[i][0] * b.v[i];
         c[i].v[1] = bnds->mat->m[i][1] * b.v[i];
         c[i].v[2] = bnds->mat->m[i][2] * b.v[i];
     }
     for (i = 0; i < 3; ++i) {
-        bnds->real_bounds.min.v[i] = (double)(c[2].v[i] < 0.0) * c[2].v[i]
-            + (double)(c[1].v[i] < 0.0) * c[1].v[i]
-            + (double)(c[0].v[i] < 0.0) * c[0].v[i]
-            + bnds->real_bounds.min.v[i];
-        bnds->real_bounds.max.v[i] = (double)(c[2].v[i] > 0.0) * c[2].v[i]
-            + (double)(c[1].v[i] > 0.0) * c[1].v[i]
-            + (double)(c[0].v[i] > 0.0) * c[0].v[i]
-            + bnds->real_bounds.max.v[i];
+        bnds->real_bounds.min.v[i] += MIN(c[0].v[i], 0.f)
+            + MIN(c[1].v[i], 0.f)
+            + MIN(c[2].v[i], 0.f);
+        bnds->real_bounds.max.v[i] += MAX(c[0].v[i], 0.f)
+            + MAX(c[1].v[i], 0.f)
+            + MAX(c[2].v[i], 0.f);
     }
     XZToColumnXZ(&cx_min, &cz_min, bnds->real_bounds.min.v[0], bnds->real_bounds.min.v[2], track_spec);
     XZToColumnXZ(&cx_max, &cz_max, bnds->real_bounds.max.v[0], bnds->real_bounds.max.v[2], track_spec);
-    if (cx_min) {
+    if (cx_min != 0) {
         cx_min--;
     }
-    if (cz_min) {
+    if (cz_min != 0) {
         cz_min--;
     }
-    if (track_spec->ncolumns_x > cx_max + 1) {
+    if (cx_max + 1 < track_spec->ncolumns_x) {
         cx_max++;
     }
-    if (track_spec->ncolumns_z > cz_max + 1) {
+    if (cz_max + 1 < track_spec->ncolumns_z) {
         cz_max++;
     }
-    for (x = cx_min; cx_max >= x; ++x) {
-        for (z = cz_min; cz_max >= z; ++z) {
-            if (track_spec->columns[z][x]) {
-                if (track_spec->blends[z][x]) {
+    for (x = cx_min; x <= cx_max; x++) {
+        for (z = cz_min; z <= cz_max; z++) {
+            if (track_spec->columns[z][x] != NULL) {
+                if (track_spec->blends[z][x] != NULL) {
                     track_spec->blends[z][x]->render_style = BR_RSTYLE_FACES;
                 }
-                j = max_face - ActorBoxPick(bnds, track_spec->columns[z][x], NULL, NULL, &face_list[j], max_face - j, 0);
-                if (track_spec->blends[z][x]) {
+                j = max_face - ActorBoxPick(bnds, track_spec->columns[z][x], model_unk1, material_unk1, &face_list[j], max_face - j, NULL);
+                if (track_spec->blends[z][x] != NULL) {
                     track_spec->blends[z][x]->render_style = BR_RSTYLE_NONE;
                 }
             }
-            if (track_spec->lollipops[z][x]) {
-                j = max_face - ActorBoxPick(bnds, track_spec->lollipops[z][x], NULL, NULL, &face_list[j], max_face - j, 0);
+            if (track_spec->lollipops[z][x] != NULL) {
+                j = max_face - ActorBoxPick(bnds, track_spec->lollipops[z][x], model_unk1, material_unk1, &face_list[j], max_face - j, NULL);
             }
         }
     }
@@ -754,25 +742,29 @@ int ActorBoxPick(tBounds* bnds, br_actor* ap, br_model* model, br_material* mate
 
     i = 0;
     test_children = 1;
-    if (ap->model) {
+    if (ap->model != NULL) {
         this_model = ap->model;
     } else {
         this_model = model;
     }
-    if (ap->material) {
+    if (ap->material != NULL) {
         this_material = ap->material;
     } else {
         this_material = material;
     }
-    if (ap->render_style == 1) {
+    if (ap->render_style == BR_RSTYLE_NONE) {
         return max_face;
     }
-    if (ap->identifier && *ap->identifier == '&') {
-        if (!ap->children
-            && (ap->type != BR_ACTOR_MODEL || !BoundsTransformTest(&this_model->bounds, &bnds->real_bounds, &ap->t.t.mat))) {
-            return max_face;
+    if (ap->identifier != NULL && ap->identifier[0] == '&') {
+        if (ap->children == NULL) {
+            if (ap->type != BR_ACTOR_MODEL) {
+                return max_face;
+            }
+            if (!BoundsTransformTest(&this_model->bounds, &bnds->real_bounds, &ap->t.t.mat)) {
+                return max_face;
+            }
         }
-        if (pMat) {
+        if (pMat != NULL) {
             BrMatrix34Mul(&mat, &ap->t.t.mat, pMat);
             pMat = &mat;
         } else {
@@ -781,7 +773,8 @@ int ActorBoxPick(tBounds* bnds, br_actor* ap, br_model* model, br_material* mate
         BrMatrix34LPInverse(&invmat, &ap->t.t.mat);
         BrMatrix34Mul(&mat2, bnds->mat, &invmat);
         new_bounds.mat = &mat2;
-        new_bounds.original_bounds = bnds->original_bounds;
+        BrVector3Copy(&new_bounds.original_bounds.min, &bnds->original_bounds.min);
+        BrVector3Copy(&new_bounds.original_bounds.max, &bnds->original_bounds.max);
         BrMatrix34ApplyP(&new_bounds.box_centre, &bnds->box_centre, &invmat);
         new_bounds.radius = bnds->radius;
         GetNewBoundingBox(&new_bounds.real_bounds, &new_bounds.original_bounds, new_bounds.mat);
@@ -810,11 +803,11 @@ int ActorBoxPick(tBounds* bnds, br_actor* ap, br_model* model, br_material* mate
             i += max_face - n;
             max_face = n;
         }
-    } else if (ap->type >= 5u && ap->type <= 6u) {
+    } else if (ap->type == BR_ACTOR_BOUNDS || ap->type == BR_ACTOR_BOUNDS_CORRECT) {
         test_children = BoundsOverlapTest__finteray(&bnds->real_bounds, (br_bounds*)ap->type_data);
     }
     if (test_children) {
-        for (a = ap->children; a; a = next_a) {
+        for (a = ap->children; a != NULL; a = next_a) {
             next_a = a->next;
             n = ActorBoxPick(bnds, a, this_model, this_material, &face_list[i], max_face, pMat);
             i += max_face - n;

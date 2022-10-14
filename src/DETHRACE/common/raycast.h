@@ -14,6 +14,10 @@ extern br_scalar gHighest_y_below;
 extern br_actor* gY_picking_camera;
 extern br_scalar gLowest_y_above;
 
+// Added, probably can be replaced with NULL
+extern br_model* model_unk1;
+extern br_material* material_unk1;
+
 int DRActorToRoot(br_actor* a, br_actor* world, br_matrix34* m);
 
 void InitRayCasting();
