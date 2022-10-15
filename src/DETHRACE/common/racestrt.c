@@ -1818,16 +1818,14 @@ void DrawGrid(int pOffset, int pDraw_it) {
                     45);
             }
         }
-        if (gCurrent_race.opponent_list[i].index >= 0) {
-            if (gCurrent_race.opponent_list[i].ranking >= gProgram_state.rank) {
-                if (str_index >= 2) {
-                    str_index = 3;
-                } else {
-                    str_index = 1;
-                }
-            }
-        } else {
+        if (gCurrent_race.opponent_list[i].index < 0) {
             str_index = 2;
+        } else if (gProgram_state.rank <= gCurrent_race.opponent_list[i].ranking) {
+            if (str_index >= 2) {
+                str_index = 3;
+            } else {
+                str_index = 1;
+            }
         }
         if (gCurrent_race.opponent_list[i].index >= 0) {
             if (gOpponents[gCurrent_race.opponent_list[i].index].car_number <= 0
@@ -1842,7 +1840,7 @@ void DrawGrid(int pOffset, int pDraw_it) {
                     gOpponents[gCurrent_race.opponent_list[i].index].car_number);
             }
         } else {
-            if (gProgram_state.frank_or_anniness) {
+            if (gProgram_state.frank_or_anniness == eAnnie) {
                 sprintf(&numbers_str[str_index][strlen(numbers_str[str_index])], "%c ", '<');
             } else {
                 sprintf(&numbers_str[str_index][strlen(numbers_str[str_index])], "%c ", ';');
@@ -1861,12 +1859,12 @@ void DrawGrid(int pOffset, int pDraw_it) {
     }
     if (gDraw_grid_status == eGrid_draw_all) {
         if (strlen(numbers_str[3])) {
-            numbers_str[2][strlen(numbers_str[3]) + 99] = 0;
+            numbers_str[3][strlen(numbers_str[3]) - 1] = '\0';
         } else {
-            numbers_str[1][strlen(numbers_str[2]) + 99] = 0;
+            numbers_str[2][strlen(numbers_str[2]) - 1] = '\0';
         }
-        strcpy(total_str, (const char*)numbers_str);
-        for (i = 1; i <= 3; i++) {
+        strcpy(total_str, numbers_str[0]);
+        for (i = 1; i < COUNT_OF(numbers_str); i++) {
             strcat(total_str, numbers_str[i]);
         }
         str_x = (gCurrent_graf_data->grid_numbers_left + gCurrent_graf_data->grid_numbers_right) / 2
@@ -1894,7 +1892,7 @@ void DrawGrid(int pOffset, int pDraw_it) {
         for (i = gCurrent_race.number_of_racers - 1; i > 0; i--) {
             for (j = strlen(total_str) - 2; j >= 0; j--) {
                 if (total_str[j] == ' ') {
-                    total_str[j + 1] = 0;
+                    total_str[j + 1] = '\0';
                     break;
                 }
             }
