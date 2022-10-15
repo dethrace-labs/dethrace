@@ -498,6 +498,9 @@ void DoHeadups(tU32 pThe_time) {
                                     (((1500 - time_factor) * the_headup->data.fancy_info.shear_amount / 500) << 16)
                                         / the_headup->data.image_info.image->height);
                             } else {
+#if DETHRACE_FIX_BUGS
+                                time_factor = MAX(time_factor, 0);
+#endif
                                 DRPixelmapRectangleShearedCopy(
                                     gBack_screen,
                                     the_headup->x - the_headup->data.fancy_info.shear_amount * (time_factor - 500) / 500,
