@@ -5,7 +5,7 @@
 
 extern br_filesystem* _BrDefaultFilesystem;
 
-br_uint_32 BrStdioAttributes();
+br_uint_32 BrStdioAttributes(void);
 
 void* BrStdioOpenRead(char* name, br_size_t n_magics, br_mode_test_cbfn* identify, int* mode_result);
 

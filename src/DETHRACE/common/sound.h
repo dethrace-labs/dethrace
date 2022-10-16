@@ -33,9 +33,9 @@ extern br_vector3 gCamera_position;
 extern br_vector3 gOld_camera_position;
 extern br_vector3 gCamera_velocity;
 
-void UsePathFileToDetermineIfFullInstallation();
+void UsePathFileToDetermineIfFullInstallation(void);
 
-void InitSound();
+void InitSound(void);
 
 tS3_sound_tag DRS3StartSound(tS3_outlet_ptr pOutlet, tS3_sound_id pSound);
 
@@ -59,13 +59,13 @@ int DRS3LoadSound(tS3_sound_id pThe_sound);
 
 int DRS3ReleaseSound(tS3_sound_id pThe_sound);
 
-void DRS3Service();
+void DRS3Service(void);
 
 int DRS3OutletSoundsPlaying(tS3_outlet_ptr pOutlet);
 
 int DRS3SoundStillPlaying(tS3_sound_tag pSound_tag);
 
-void DRS3ShutDown();
+void DRS3ShutDown(void);
 
 int DRS3SetOutletVolume(tS3_outlet_ptr pOutlet, tS3_volume pVolume);
 
@@ -73,15 +73,15 @@ int DRS3OverallVolume(tS3_volume pVolume);
 
 int DRS3StopOutletSound(tS3_outlet_ptr pOutlet);
 
-int DRS3StopAllOutletSounds();
+int DRS3StopAllOutletSounds(void);
 
-void ToggleSoundEnable();
+void ToggleSoundEnable(void);
 
-void SoundService();
+void SoundService(void);
 
-void InitSoundSources();
+void InitSoundSources(void);
 
-void DisposeSoundSources();
+void DisposeSoundSources(void);
 
 tS3_sound_tag DRS3StartSound3D(tS3_outlet_ptr pOutlet, tS3_sound_id pSound, br_vector3* pInitial_position, br_vector3* pInitial_velocity, tS3_repeats pRepeats, tS3_volume pVolume, tS3_pitch pPitch, tS3_speed pSpeed);
 
@@ -89,9 +89,9 @@ tS3_sound_tag DRS3StartSoundFromSource3(tS3_sound_source_ptr pSource, tS3_sound_
 
 tS3_sound_tag DRS3StartSoundFromSource(tS3_sound_source_ptr pSource, tS3_sound_id pSound);
 
-void MungeEngineNoise();
+void MungeEngineNoise(void);
 
-void SetSoundVolumes();
+void SetSoundVolumes(void);
 
 tS3_outlet_ptr GetOutletFromIndex(int pIndex);
 
@@ -99,10 +99,10 @@ int GetIndexFromOutlet(tS3_outlet_ptr pOutlet);
 
 int DRS3StartCDA(tS3_sound_id pCDA_id);
 
-int DRS3StopCDA();
+int DRS3StopCDA(void);
 
-void StartMusic();
+void StartMusic(void);
 
-void StopMusic();
+void StopMusic(void);
 
 #endif

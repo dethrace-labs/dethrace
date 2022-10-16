@@ -5,8 +5,8 @@
 
 extern br_pixelmap_state _pixelmap;
 
-void BrPixelmapBegin();
+void BrPixelmapBegin(void);
 
-void BrPixelmapEnd();
+void BrPixelmapEnd(void);
 
 #endif

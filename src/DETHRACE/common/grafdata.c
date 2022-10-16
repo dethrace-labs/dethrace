@@ -581,5 +581,5 @@ void CalcGrafDataIndex() {
             return;
         }
     }
-    FatalError(0x18);
+    FatalError(kFatalError_ScreenGrafDataWidthHeightMismatch);
 }

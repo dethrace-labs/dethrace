@@ -17,6 +17,6 @@ br_size_t DRStdioRead(void* buf, br_size_t size, unsigned int n, void* f);
 
 br_size_t DRStdioWrite(void* buf, br_size_t size, unsigned int n, void* f);
 
-void InstallDRFileCalls();
+void InstallDRFileCalls(void);
 
 #endif

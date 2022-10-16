@@ -34,13 +34,13 @@ extern int gCredits_won_headup;
 
 void GetTimerString(char* pStr, int pFudge_colon);
 
-void InitHeadups();
+void InitHeadups(void);
 
 void ClearHeadup(int pIndex);
 
 void ClearHeadupSlot(int pSlot_index);
 
-void ClearHeadups();
+void ClearHeadups(void);
 
 int HeadupActive(int pIndex);
 
@@ -52,15 +52,15 @@ void DeviouslyDimRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRig
 
 void DimRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int pBottom, int pKnock_out_corners);
 
-void DimAFewBits();
+void DimAFewBits(void);
 
-void KillOldestQueuedHeadup();
+void KillOldestQueuedHeadup(void);
 
 void DubreyBar(int pX_index, int pY, int pColour);
 
 void DoPSPowerHeadup(int pY, int pLevel, char* pName, int pBar_colour);
 
-void DoPSPowerupHeadups();
+void DoPSPowerupHeadups(void);
 
 void DoHeadups(tU32 pThe_time);
 
@@ -84,7 +84,7 @@ int NewImageHeadupSlot(int pSlot_index, int pFlash_rate, int pLifetime, int pIma
 
 void DoFancyHeadup(int pIndex);
 
-void AdjustHeadups();
+void AdjustHeadups(void);
 
 void MoveHeadupTo(int pHeadup_index, int pNew_x, int pNew_y);
 
@@ -102,7 +102,7 @@ void DoInstruments(tU32 pThe_time);
 
 void DoSteeringWheel(tU32 pThe_time);
 
-void ChangingView();
+void ChangingView(void);
 
 void EarnCredits2(int pAmount, char* pPrefix_text);
 

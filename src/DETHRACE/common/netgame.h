@@ -24,7 +24,7 @@ void ReceivedMechanics(tNet_contents* pContents);
 
 void ReceivedCopInfo(tNet_contents* pContents);
 
-void SendAllNonCarPositions();
+void SendAllNonCarPositions(void);
 
 void ReceivedNonCarPosition(tNet_contents* pContents);
 
@@ -32,9 +32,9 @@ void ReceivedNonCar(tNet_contents* pContents);
 
 void SignalToStartRace2(int pIndex);
 
-void SignalToStartRace();
+void SignalToStartRace(void);
 
-void SetUpNetCarPositions();
+void SetUpNetCarPositions(void);
 
 void ReinitialiseCar(tCar_spec* pCar);
 
@@ -54,13 +54,13 @@ void ClipName(char* pName, tDR_font* pFont, int pMax_width);
 
 void DoNetScores2(int pOnly_sort_scores);
 
-void DoNetScores();
+void DoNetScores(void);
 
-void InitNetHeadups();
+void InitNetHeadups(void);
 
-void DisposeNetHeadups();
+void DisposeNetHeadups(void);
 
-void EverybodysLost();
+void EverybodysLost(void);
 
 void DeclareWinner(int pWinner_index);
 
@@ -72,29 +72,29 @@ void CarInContactWithItOrFox(tNet_game_player_info* pPlayer);
 
 void SelectRandomItOrFox(int pNot_this_one);
 
-void CalcPlayerScores();
+void CalcPlayerScores(void);
 
-void SendPlayerScores();
+void SendPlayerScores(void);
 
-void DoNetGameManagement();
+void DoNetGameManagement(void);
 
 void InitialisePlayerScore(tNet_game_player_info* pPlayer);
 
-void InitPlayers();
+void InitPlayers(void);
 
 void BuyPSPowerup(int pIndex);
 
-void BuyArmour();
+void BuyArmour(void);
 
-void BuyPower();
+void BuyPower(void);
 
-void BuyOffense();
+void BuyOffense(void);
 
 void UseGeneralScore(int pScore);
 
 void NetSendEnvironmentChanges(tNet_game_player_info* pPlayer);
 
-void UpdateEnvironments();
+void UpdateEnvironments(void);
 
 void ReceivedGameplay(tNet_contents* pContents, tNet_message* pMessage, tU32 pReceive_time);
 
@@ -104,9 +104,9 @@ void SendGameplayToAllPlayers(tNet_gameplay_mess pMess, int pParam_1, int pParam
 
 void SendGameplayToHost(tNet_gameplay_mess pMess, int pParam_1, int pParam_2, int pParam_3, int pParam_4);
 
-void InitNetGameplayStuff();
+void InitNetGameplayStuff(void);
 
-void DefaultNetName();
+void DefaultNetName(void);
 
 void NetSendPointCrush(tCar_spec* pCar, tU16 pCrush_point_index, br_vector3* pEnergy_vector);
 

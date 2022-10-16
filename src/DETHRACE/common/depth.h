@@ -44,7 +44,7 @@ br_scalar DepthCueingShiftToDistance(int pShift);
 
 void FogAccordingToGPSCDE(br_material* pMaterial);
 
-void FrobFog();
+void FrobFog(void);
 
 void InstantDepthChange(tDepth_effect_type pType, br_pixelmap* pSky_texture, int pStart, int pEnd);
 
@@ -58,7 +58,7 @@ br_model* CreateHorizonModel(br_actor* pCamera);
 
 void LoadDepthTable(char* pName, br_pixelmap** pTable, int* pPower);
 
-void InitDepthEffects();
+void InitDepthEffects(void);
 
 void DoDepthByShadeTable(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_pixelmap* pShade_table, int pShade_table_power, int pStart, int pEnd);
 
@@ -80,50 +80,50 @@ void DoDrugWobbleCamera(br_actor* pCamera);
 
 void DoSpecialCameraEffect(br_actor* pCamera, br_matrix34* pCamera_to_world);
 
-void LessDepthFactor();
+void LessDepthFactor(void);
 
-void MoreDepthFactor();
+void MoreDepthFactor(void);
 
-void LessDepthFactor2();
+void LessDepthFactor2(void);
 
-void MoreDepthFactor2();
+void MoreDepthFactor2(void);
 
-void AssertYons();
+void AssertYons(void);
 
-void IncreaseYon();
+void IncreaseYon(void);
 
-void DecreaseYon();
+void DecreaseYon(void);
 
 void SetYon(br_scalar pYon);
 
-br_scalar GetYon();
+br_scalar GetYon(void);
 
-void IncreaseAngle();
+void IncreaseAngle(void);
 
-void DecreaseAngle();
+void DecreaseAngle(void);
 
-void ToggleDepthMode();
+void ToggleDepthMode(void);
 
-int GetSkyTextureOn();
+int GetSkyTextureOn(void);
 
 void SetSkyTextureOn(int pOn);
 
-void ToggleSkyQuietly();
+void ToggleSkyQuietly(void);
 
-void ToggleSky();
+void ToggleSky(void);
 
-int GetDepthCueingOn();
+int GetDepthCueingOn(void);
 
 void SetDepthCueingOn(int pOn);
 
-void ToggleDepthCueingQuietly();
+void ToggleDepthCueingQuietly(void);
 
-void ToggleDepthCueing();
+void ToggleDepthCueing(void);
 
-void ChangeDepthEffect();
+void ChangeDepthEffect(void);
 
-void MungeForwardSky();
+void MungeForwardSky(void);
 
-void MungeRearviewSky();
+void MungeRearviewSky(void);
 
 #endif

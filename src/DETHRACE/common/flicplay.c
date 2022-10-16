@@ -692,7 +692,7 @@ int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU3
         pFlic_info->f = DRfopen(the_path, "rb");
 
         if (pFlic_info->f == NULL) {
-            FatalError(13, pFile_name);
+            FatalError(kFatalError_LoadFlicFile_S, pFile_name);
         }
         total_size = GetFileLength(pFlic_info->f);
         if (total_size >= 75000) {
@@ -729,7 +729,7 @@ int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU3
     pFlic_info->width = MemReadU16(&pFlic_info->data);
     pFlic_info->height = MemReadU16(&pFlic_info->data);
     if (MemReadU16(&pFlic_info->data) != 8) {
-        FatalError(15, gLast_flic_name);
+        FatalError(kFatalError_FlicFileNot8Bits_S, gLast_flic_name);
     }
     MemSkipBytes(&pFlic_info->data, 2);
     claimed_speed = MemReadU16(&pFlic_info->data);
@@ -759,7 +759,7 @@ int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU3
         pFlic_info->frame_period = 1000 / pFrame_rate;
     } else {
         if (claimed_speed == 0) {
-            FatalError(16, gLast_flic_name);
+            FatalError(kFatalError_FlicFileNoFrameRate_S, gLast_flic_name);
         }
         if (pFlic_info->new_format) {
             pFlic_info->frame_period = claimed_speed;
@@ -777,7 +777,7 @@ void FreeFlicPaletteAllocate() {
     LOG_TRACE("()");
 
     if (gPalette_allocate_count == 0) {
-        FatalError(41);
+        FatalError(kFatalError_FlicPaletteDisposeBeforeAllocation);
     }
     gPalette_allocate_count--;
     if (gPalette_allocate_count == 0) {
@@ -1535,7 +1535,7 @@ int LoadFlic(int pIndex) {
     f = DRfopen(the_path, "rb");
 
     if (f == NULL) {
-        FatalError(13, gMain_flic_list[pIndex].file_name);
+        FatalError(kFatalError_LoadFlicFile_S, gMain_flic_list[pIndex].file_name);
     }
 
     gMain_flic_list[pIndex].the_size = GetFileLength(f);
@@ -1543,7 +1543,7 @@ int LoadFlic(int pIndex) {
 
     if (gMain_flic_list[pIndex].data_ptr == NULL) {
         if (AllocationErrorsAreFatal()) {
-            FatalError(14, gMain_flic_list[pIndex].file_name);
+            FatalError(kFatalError_AllocateFlicFile_S, gMain_flic_list[pIndex].file_name);
         }
 #ifdef DETHRACE_FIX_BUGS
         fclose(f);
@@ -1983,7 +1983,7 @@ void LoadInterfaceStrings() {
             }
         }
         if (gTranslations[i].flic_index < 0) {
-            FatalError(101, s2);
+            FatalError(kFatalError_FindFlicUsedInTranslationFile_S, s2);
         }
         str[strlen(str)] = ',';
         str = strtok(s, "\t ,/");

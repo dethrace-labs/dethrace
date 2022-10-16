@@ -19,7 +19,7 @@ void DrawDial(int pWhich_one, int pWhich_stage);
 
 void MoveDialFromTo(int pWhich_one, int pOld_stage, int pNew_stage);
 
-void SoundOptionsStart();
+void SoundOptionsStart(void);
 
 int SoundOptionsDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out);
 
@@ -29,11 +29,11 @@ int SoundOptionsRight(int* pCurrent_choice, int* pCurrent_mode);
 
 int SoundClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset);
 
-void DoSoundOptions();
+void DoSoundOptions(void);
 
-void GetGraphicsOptions();
+void GetGraphicsOptions(void);
 
-void SetGraphicsOptions();
+void SetGraphicsOptions(void);
 
 void PlayRadioOn2(int pIndex, int pValue);
 
@@ -43,7 +43,7 @@ void PlayRadioOn__options(int pIndex, int pValue);
 
 void PlayRadioOff__options(int pIndex, int pValue);
 
-void DrawInitialRadios();
+void DrawInitialRadios(void);
 
 void RadioChanged(int pIndex, int pNew_value);
 
@@ -70,23 +70,23 @@ void EraseAGraphBox__options(int pIndex);
 
 void DrawGraphBox(int pCurrent_choice, int pCurrent_mode);
 
-void DoGraphicsOptions();
+void DoGraphicsOptions(void);
 
-void CalibrateJoysticks();
+void CalibrateJoysticks(void);
 
 void StripControls(unsigned char* pStr);
 
-void LoadKeyNames();
+void LoadKeyNames(void);
 
-void DisposeKeyNames();
+void DisposeKeyNames(void);
 
-void SaveOrigKeyMapping();
+void SaveOrigKeyMapping(void);
 
 void GetKeyCoords(int pIndex, int* pY, int* pName_x, int* pKey_x, int* pEnd_box);
 
-void SetKeysToDefault();
+void SetKeysToDefault(void);
 
-void SaveKeyMapping();
+void SaveKeyMapping(void);
 
 void ChangeKeyMapIndex(int pNew_one);
 
@@ -104,16 +104,16 @@ int KeyAssignGoAhead(int* pCurrent_choice, int* pCurrent_mode);
 
 int MouseyClickBastard(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset);
 
-void DrawInitialKMRadios();
+void DrawInitialKMRadios(void);
 
-void DoControlOptions();
+void DoControlOptions(void);
 
-void LoadSoundOptionsData();
+void LoadSoundOptionsData(void);
 
-void FreeSoundOptionsData();
+void FreeSoundOptionsData(void);
 
-void DrawDisabledOptions();
+void DrawDisabledOptions(void);
 
-void DoOptions();
+void DoOptions(void);
 
 #endif

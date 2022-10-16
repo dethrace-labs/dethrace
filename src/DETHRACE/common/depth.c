@@ -296,7 +296,7 @@ void LoadDepthTable(char* pName, br_pixelmap** pTable, int* pPower) {
     PathCat(the_path, the_path, pName);
     *pTable = DRPixelmapLoad(the_path);
     if (*pTable == NULL) {
-        FatalError(87);
+        FatalError(kFatalError_LoadDepthCueShadeTable);
     }
     *pPower = Log2((*pTable)->height);
     for (i = 0; i < (*pTable)->width; i++) {
@@ -324,8 +324,8 @@ void InitDepthEffects() {
     PathCat(the_path, gApplication_path, "MATERIAL");
     PathCat(the_path, the_path, "HORIZON.MAT");
     gHorizon_material = BrMaterialLoad(the_path);
-    if (!gHorizon_material) {
-        FatalError(89);
+    if (gHorizon_material == NULL) {
+        FatalError(kFatalError_FindSkyMaterial_S, "HORIZON.MAT"); // 2nd argument added
     }
     gHorizon_material->index_blend = BrPixelmapAllocate(BR_PMT_INDEX_8, 256, 256, NULL, 0);
     BrTableAdd(gHorizon_material->index_blend);

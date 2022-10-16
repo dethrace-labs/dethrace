@@ -67,9 +67,9 @@ tS8 MemReadS8(char** pPtr);
 
 void MemSkipBytes(char** pPtr, int pBytes_to_skip);
 
-void LoadGeneralParameters();
+void LoadGeneralParameters(void);
 
-void FinishLoadingGeneral();
+void FinishLoadingGeneral(void);
 
 br_pixelmap* LoadPixelmap(char* pName);
 
@@ -103,15 +103,15 @@ void LoadInFiles(char* pThe_base_path, char* pThe_dir_name, void (*pLoad_routine
 
 void LoadInRegisteeDir(char* pThe_dir_path);
 
-void LoadInRegistees();
+void LoadInRegistees(void);
 
-void LoadKeyMapping();
+void LoadKeyMapping(void);
 
 void LoadInterfaceStuff(int pWithin_race);
 
-void UnlockInterfaceStuff();
+void UnlockInterfaceStuff(void);
 
-void InitInterfaceLoadState();
+void InitInterfaceLoadState(void);
 
 tS8* ConvertPixTo16BitStripMap(br_pixelmap* pBr_map);
 
@@ -161,11 +161,11 @@ void SetModelFlags(br_model* pModel, int pOwner);
 
 void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner, char* pDriver_name, tBrender_storage* pStorage_space);
 
-void LoadHeadupImages();
+void LoadHeadupImages(void);
 
-void DisposeHeadupImages();
+void DisposeHeadupImages(void);
 
-FILE* OpenRaceFile();
+FILE* OpenRaceFile(void);
 
 void SkipRestOfRace(FILE* pF);
 
@@ -187,15 +187,15 @@ void LoadGridIcons(tRace_info* pRace_info);
 
 void DisposeGridIcons(tRace_info* pRace_info);
 
-void LoadOpponents();
+void LoadOpponents(void);
 
 br_font* LoadBRFont(char* pName);
 
-void LoadParts();
+void LoadParts(void);
 
-void UnlockParts();
+void UnlockParts(void);
 
-br_pixelmap* LoadChromeFont();
+br_pixelmap* LoadChromeFont(void);
 
 void DisposeChromeFont(br_pixelmap* pThe_font);
 
@@ -237,40 +237,40 @@ void GetThreeFloatPercents(FILE* pF, float* pF1, float* pF2, float* pF3);
 
 void GetAString(FILE* pF, char* pString);
 
-void AboutToLoadFirstCar();
+void AboutToLoadFirstCar(void);
 
 void LoadOpponentsCars(tRace_info* pRace_info);
 
 void DisposeOpponentsCars(tRace_info* pRace_info);
 
-void LoadMiscStrings();
+void LoadMiscStrings(void);
 
 void FillInRaceInfo(tRace_info* pThe_race);
 
 FILE* OldDRfopen(char* pFilename, char* pMode);
 
-void AllowOpenToFail();
+void AllowOpenToFail(void);
 
-void DoNotAllowOpenToFail();
+void DoNotAllowOpenToFail(void);
 
 FILE* DRfopen(char* pFilename, char* pMode);
 
 int GetCDPathFromPathsTxtFile(char* pPath_name);
 
-int TestForOriginalCarmaCDinDrive();
+int TestForOriginalCarmaCDinDrive(void);
 
-int OriginalCarmaCDinDrive();
+int OriginalCarmaCDinDrive(void);
 
-int CarmaCDinDriveOrFullGameInstalled();
+int CarmaCDinDriveOrFullGameInstalled(void);
 
 void ReadNetworkSettings(FILE* pF, tNet_game_options* pOptions);
 
 int PrintNetOptions(FILE* pF, int pIndex);
 
-int SaveOptions();
+int SaveOptions(void);
 
-int RestoreOptions();
+int RestoreOptions(void);
 
-void InitFunkGrooveFlags();
+void InitFunkGrooveFlags(void);
 
 #endif

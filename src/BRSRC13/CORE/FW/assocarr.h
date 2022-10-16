@@ -3,7 +3,7 @@
 
 #include "brender/br_types.h"
 
-br_associative_array* BrAssociativeArrayAllocate();
+br_associative_array* BrAssociativeArrayAllocate(void);
 
 br_error Set_Associative_Array_Value(br_associative_array* pArray, int index, br_value v);
 

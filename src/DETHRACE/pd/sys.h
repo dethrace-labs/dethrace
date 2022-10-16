@@ -43,20 +43,20 @@ extern br_pixelmap* gTemp_screen;
 extern tU32 gUpper_loop_limit;
 extern int gExtra_mem;
 extern int gReal_back_screen_locked;
-extern void (*gPrev_keyboard_handler)();
+extern void (*gPrev_keyboard_handler)(void);
 extern tU8 gScan_code[123][2];
 
 extern char* _unittest_last_fatal_error;
 
-// void KeyboardHandler();
+// void KeyboardHandler(void);
 
 //int KeyDown(tU8 pScan_code);
 
 // void KeyTranslation(tU8 pKey_index, tU8 pScan_code_1, tU8 pScan_code_2);
 
-//void KeyBegin();
+//void KeyBegin(void);
 
-//void KeyEnd();
+//void KeyEnd(void);
 
 //int KeyDown22(int pKey_index);
 
@@ -68,31 +68,31 @@ HARNESS_NORETURN void PDFatalError(char* pThe_str);
 
 void PDNonFatalError(char* pThe_str);
 
-void PDInitialiseSystem();
+void PDInitialiseSystem(void);
 
-void PDShutdownSystem();
+void PDShutdownSystem(void);
 
-void PDSaveOriginalPalette();
+void PDSaveOriginalPalette(void);
 
-void PDRevertPalette();
+void PDRevertPalette(void);
 
 int PDInitScreenVars(int pArgc, char** pArgv);
 
-void PDInitScreen();
+void PDInitScreen(void);
 
-void PDLockRealBackScreen();
+void PDLockRealBackScreen(void);
 
-void PDUnlockRealBackScreen();
+void PDUnlockRealBackScreen(void);
 
-void PDAllocateScreenAndBack();
+void PDAllocateScreenAndBack(void);
 
 //void Copy8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette);
 
 //void Double8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette, tU16 pOff, tU16 pSrc_width, tU16 pSrc_height);
 
-br_pixelmap* PDInterfacePixelmap();
+br_pixelmap* PDInterfacePixelmap(void);
 
-//void SwapBackScreen();
+//void SwapBackScreen(void);
 
 //void ReallyCopyBackScreen(int pRendering_area_only, int pClear_top_and_bottom);
 
@@ -106,9 +106,9 @@ void PDPixelmapHLineOnScreen(br_pixelmap* dst, br_int_16 x1, br_int_16 y1, br_in
 
 void PDPixelmapVLineOnScreen(br_pixelmap* dst, br_int_16 x1, br_int_16 y1, br_int_16 x2, br_int_16 y2, br_uint_32 colour);
 
-void PDInstallErrorHandlers();
+void PDInstallErrorHandlers(void);
 
-void PDSetFileVariables();
+void PDSetFileVariables(void);
 
 void PDBuildAppPath(char* pThe_path);
 
@@ -118,19 +118,19 @@ void PDSetPalette(br_pixelmap* pThe_palette);
 
 void PDSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount);
 
-void PDSwitchToRealResolution();
+void PDSwitchToRealResolution(void);
 
-void PDSwitchToLoresMode();
+void PDSwitchToLoresMode(void);
 
 void PDMouseButtons(int* pButton_1, int* pButton_2);
 
 void PDGetMousePosition(int* pX_coord, int* pY_coord);
 
-int PDGetTotalTime();
+int PDGetTotalTime(void);
 
 int PDServiceSystem(tU32 pTime_since_last_call);
 
-//tU32 LargestBlockAvail();
+//tU32 LargestBlockAvail(void);
 
 void* PDGrabLargestMammaryWeCanPlayWith(tU32 pMaximum_required, tU32* pAmount_allocated);
 
@@ -140,9 +140,9 @@ void PDDisposeActionReplayBuffer(char* pBuffer);
 
 //void Usage(char* pProgpath);
 
-//int OurGetChar();
+//int OurGetChar(void);
 
-int PDGetGorePassword();
+int PDGetGorePassword(void);
 
 void PDDisplayGoreworthiness(int pGory);
 
@@ -160,43 +160,43 @@ br_model* PDMissingModel(char* name);
 // Added function
 br_pixelmap* PDMissingMap(char* name);
 
-void PDEndItAllAndReRunTheBastard();
+void PDEndItAllAndReRunTheBastard(void);
 
 //int matherr(struct exception_* err);
 
 //int LoopLimitTooLow(tU32 limit);
 
-//tS32 UpperLoopLimit();
+//tS32 UpperLoopLimit(void);
 
-//int InitJoysticks();
+//int InitJoysticks(void);
 
 //tU32 ReadJoystickAxis(int pBit);
 
-void PDReadJoySticks();
+void PDReadJoySticks(void);
 
-tS32 PDGetJoy1X();
+tS32 PDGetJoy1X(void);
 
-tS32 PDGetJoy1Y();
+tS32 PDGetJoy1Y(void);
 
-tS32 PDGetJoy2X();
+tS32 PDGetJoy2X(void);
 
-tS32 PDGetJoy2Y();
+tS32 PDGetJoy2Y(void);
 
-int PDGetJoy1Button1();
+int PDGetJoy1Button1(void);
 
-int PDGetJoy1Button2();
+int PDGetJoy1Button2(void);
 
-int PDGetJoy1Button3();
+int PDGetJoy1Button3(void);
 
-int PDGetJoy1Button4();
+int PDGetJoy1Button4(void);
 
-int PDGetJoy2Button1();
+int PDGetJoy2Button1(void);
 
-int PDGetJoy2Button2();
+int PDGetJoy2Button2(void);
 
-int PDGetJoy2Button3();
+int PDGetJoy2Button3(void);
 
-int PDGetJoy2Button4();
+int PDGetJoy2Button4(void);
 
 int PDFileUnlock(char* pThe_path);
 
@@ -204,6 +204,6 @@ int PDFileUnlock(char* pThe_path);
 
 int PDCheckDriveExists2(char* pThe_path, char* pFile_name, tU32 pMin_size);
 
-int PDDoWeLeadAnAustereExistance();
+int PDDoWeLeadAnAustereExistance(void);
 
 #endif

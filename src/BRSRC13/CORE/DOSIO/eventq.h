@@ -3,9 +3,9 @@
 
 #include "brender/br_types.h"
 
-br_error DOSEventBegin();
+br_error DOSEventBegin(void);
 
-void DOSEventEnd();
+void DOSEventEnd(void);
 
 br_boolean DOSEventWait(dosio_event* event, br_boolean block);
 

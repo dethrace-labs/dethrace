@@ -5,9 +5,9 @@
 
 extern br_framework_state fw;
 
-br_error BrFwBegin();
+br_error BrFwBegin(void);
 
-br_error BrFwEnd();
+br_error BrFwEnd(void);
 
 br_diaghandler* BrDiagHandlerSet(br_diaghandler* newdh);
 

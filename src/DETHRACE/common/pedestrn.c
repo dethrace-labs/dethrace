@@ -755,7 +755,7 @@ int PedestrianNextInstruction(tPedestrian_data* pPedestrian, float pDanger_level
                 }
             }
             if (pPedestrian->current_instruction < 0) {
-                FatalError(86);
+                FatalError(kFatalError_PedInstructionMarkerNotFound);
             }
         }
         result = PedestrianNextInstruction(pPedestrian, pDanger_level, pPosition_explicitly, 1);
@@ -2546,7 +2546,7 @@ void CreatePedestrian(FILE* pG, tPedestrian_instruction* pInstructions, int pIns
             PathCat(the_path, the_path, s2);
             gPed_material = BrMaterialLoad(the_path);
             if (gPed_material == NULL) {
-                FatalError(77, s2);
+                FatalError(kFatalError_FindPedestrianMaterial_S, s2);
             }
             gPed_material->flags &= ~BR_MATF_TWO_SIDED;
             gPed_material->flags &= ~(BR_MATF_LIGHT | BR_MATF_PRELIT | BR_MATF_SMOOTH);
@@ -2606,7 +2606,7 @@ void CreatePedestrian(FILE* pG, tPedestrian_instruction* pInstructions, int pIns
             }
             the_action->number_of_bearings = GetAnInt(pG);
             if (the_action->number_of_bearings > COUNT_OF(the_action->sequences)) {
-                FatalError(85);
+                FatalError(kFatalError_PedSeqTooManyBearings);
             }
             for (j = 0; j < the_action->number_of_bearings; j++) {
                 GetPairOfFloats(pG, &the_action->sequences[j].max_bearing, &temp_float1);
@@ -2632,7 +2632,7 @@ void CreatePedestrian(FILE* pG, tPedestrian_instruction* pInstructions, int pIns
             for (j = 0; j < 2; j++) {
                 new_frames = GetAnInt(pG);
                 if (new_frames + the_sequence->number_of_frames > COUNT_OF(the_sequence->frames)) {
-                    FatalError(83);
+                    FatalError(kFatalError_PedSeqTooManyFrames);
                 }
                 for (k = the_sequence->number_of_frames; k < new_frames + the_sequence->number_of_frames; k++) {
                     GetAString(pG, s);
@@ -2640,7 +2640,7 @@ void CreatePedestrian(FILE* pG, tPedestrian_instruction* pInstructions, int pIns
                     if (the_sequence->frames[k].pixelmap == NULL) {
                         the_sequence->frames[k].pixelmap = LoadPixelmap(s);
                         if (the_sequence->frames[k].pixelmap == NULL) {
-                            FatalError(78, s);
+                            FatalError(kFatalError_FindPedestrianPixelmap_S, s);
                         }
                         BrMapAdd(the_sequence->frames[k].pixelmap);
                     }
@@ -2764,7 +2764,7 @@ void LoadInPedestrians(FILE* pF, int pSubs_count, tPed_subs* pSubs_array) {
     }
     g = DRfopen(the_path, "rt");
     if (g == NULL) {
-        FatalError(75);
+        FatalError(kFatalError_OpenPedestrianFile);
     }
     gPed_count = 0;
     gLast_ped_splat_time = 0;
@@ -2797,7 +2797,7 @@ void LoadInPedestrians(FILE* pF, int pSubs_count, tPed_subs* pSubs_array) {
             PossibleService();
             the_instruction->type = GetALineAndInterpretCommand(pF, gInstruc_commands, COUNT_OF(gInstruc_commands));
             if (the_instruction->type != ePed_instruc_point && the_instruction->type != ePed_instruc_reverse) {
-                FatalError(76);
+                FatalError(kFatalError_FindPedestrianRefNum_S, "");
             }
             switch (the_instruction->type) {
             case ePed_instruc_point:
@@ -2816,7 +2816,7 @@ void LoadInPedestrians(FILE* pF, int pSubs_count, tPed_subs* pSubs_array) {
                 str = strtok(s, "\t ,/");
                 sscanf(str, "%d", &the_instruction->data.choice_data.number_of_choices);
                 if (the_instruction->data.choice_data.number_of_choices > COUNT_OF(the_instruction->data.choice_data.choices)) {
-                    FatalError(84);
+                    FatalError(kFatalError_PedSeqTooManyChoices);
                 }
                 for (k = 0; k < the_instruction->data.choice_data.number_of_choices; k++) {
                     str = strtok(NULL, "\t ,/");
@@ -3121,7 +3121,7 @@ void AddPed() {
     PathCat(the_path, gApplication_path, "PEDESTRN.TXT");
     g = DRfopen(the_path, "rt");
     if (g == NULL) {
-        FatalError(75);
+        FatalError(kFatalError_OpenPedestrianFile);
     }
     gPed_instrucs[gPed_instruc_count].type = ePed_instruc_reverse;
     gPed_instruc_count++;

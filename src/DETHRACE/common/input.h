@@ -34,15 +34,15 @@ extern char gCurrent_typing[110];
 
 void SetJoystickArrays(int* pKeys, int pMark);
 
-void PollKeys();
+void PollKeys(void);
 
-void CyclePollKeys();
+void CyclePollKeys(void);
 
-void ResetPollKeys();
+void ResetPollKeys(void);
 
-void CheckKeysForMouldiness();
+void CheckKeysForMouldiness(void);
 
-int EitherMouseButtonDown();
+int EitherMouseButtonDown(void);
 
 tKey_down_result PDKeyDown2(int pKey_index);
 
@@ -50,27 +50,27 @@ int PDKeyDown(int pKey_index);
 
 int PDKeyDown3(int pKey_index);
 
-int PDAnyKeyDown();
+int PDAnyKeyDown(void);
 
-int AnyKeyDown();
+int AnyKeyDown(void);
 
-tU32* KevKeyService();
+tU32* KevKeyService(void);
 
 int OldKeyIsDown(int pKey_index);
 
 int KeyIsDown(int pKey_index);
 
-void WaitForNoKeys();
+void WaitForNoKeys(void);
 
-void WaitForAKey();
+void WaitForAKey(void);
 
 int CmdKeyDown(int pFKey_ID, int pCmd_key_ID);
 
 void GetMousePosition(int* pX_coord, int* pY_coord);
 
-void InitRollingLetters();
+void InitRollingLetters(void);
 
-void EndRollingLetters();
+void EndRollingLetters(void);
 
 int AddRollingLetter(char pChar, int pX, int pY, tRolling_type rolling_type);
 
@@ -78,7 +78,7 @@ void AddRollingString(char* pStr, int pX, int pY, tRolling_type rolling_type);
 
 void AddRollingNumber(tU32 pNumber, int pWidth, int pX, int pY);
 
-void RollLettersIn();
+void RollLettersIn(void);
 
 int ChangeCharTo(int pSlot_index, int pChar_index, char pNew_char);
 
@@ -114,8 +114,8 @@ void GetTypedName(char* pDestn, int pMax_length);
 
 void KillCursor(int pSlot_index);
 
-void EdgeTriggerModeOn();
+void EdgeTriggerModeOn(void);
 
-void EdgeTriggerModeOff();
+void EdgeTriggerModeOff(void);
 
 #endif

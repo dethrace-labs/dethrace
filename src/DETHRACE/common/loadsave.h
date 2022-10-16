@@ -12,27 +12,27 @@ void CorrectLoadByteOrdering(int pIndex);
 
 tU32 CalcLSChecksum(tSave_game* pSaved_game);
 
-void LoadSavedGames();
+void LoadSavedGames(void);
 
-void DisposeSavedGames();
+void DisposeSavedGames(void);
 
 void LoadTheGame(int pSlot_index);
 
-void StartRollingSaveNamesIn();
+void StartRollingSaveNamesIn(void);
 
-void LoadStart();
+void LoadStart(void);
 
-int DoLoadGame();
+int DoLoadGame(void);
 
 void CorrectSaveByteOrdering(int pIndex);
 
 void SaveTheGame(int pSlot_number);
 
-int ConfirmMidGameSave();
+int ConfirmMidGameSave(void);
 
 void MakeSavedGame(tSave_game** pSave_record);
 
-void SaveStart();
+void SaveStart(void);
 
 void GetSaveName(int pStarting_to_type, int pCurrent_choice, char* pString, int* pMax_length);
 

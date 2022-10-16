@@ -687,7 +687,7 @@ void LoadKeyNames() {
     PathCat(the_path, gApplication_path, "KEYNAMES.TXT");
     f = DRfopen(the_path, "rt");
     if (f == NULL) {
-        FatalError(106);
+        FatalError(kFatalError_OpenKeyNamesFile);
     }
     for (i = 0; i < COUNT_OF(gKey_names); i++) {
         fgets((char*)s, sizeof(s), f);
@@ -751,7 +751,7 @@ void SetKeysToDefault() {
     the_path[strlen(the_path) - 5] = '0' + gKey_map_index;
     f = DRfopen(the_path, "rt");
     if (f == NULL) {
-        FatalError(9);
+        FatalError(kFatalError_OpenKeyMapFile);
     }
     for (i = 0; i < COUNT_OF(gKey_mapping); i++) {
         fscanf(f, "%d", &gKey_mapping[i]);
@@ -771,7 +771,7 @@ void SaveKeyMapping() {
     PDFileUnlock(the_path);
     f = DRfopen(the_path, "wb");
     if (f == NULL) {
-        FatalError(9);
+        FatalError(kFatalError_OpenKeyMapFile);
     }
     for (i = 0; i < COUNT_OF(gKey_mapping); i++) {
         fprintf(f, "%d", gKey_mapping[i]);
@@ -1244,7 +1244,7 @@ void LoadSoundOptionsData() {
 
     gDials_pix = LoadPixelmap("DIALSTCK.PIX");
     if (gDials_pix == NULL) {
-        FatalError(42);
+        FatalError(kFatalError_LoadDialsPix);
     }
 }
 

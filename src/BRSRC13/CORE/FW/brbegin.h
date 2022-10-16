@@ -3,8 +3,8 @@
 
 #include "brender/br_types.h"
 
-br_error BrBegin();
+br_error BrBegin(void);
 
-br_error BrEnd();
+br_error BrEnd(void);
 
 #endif

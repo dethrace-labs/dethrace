@@ -116,7 +116,7 @@ void InitialiseNonCar(tNon_car_spec* non_car);
 
 void GetFacesInBox(tCollision_info* c);
 
-int IsCarInTheSea();
+int IsCarInTheSea(void);
 
 void RememberSafePosition(tCar_spec* car, tU32 pTime);
 
@@ -130,9 +130,9 @@ void FinishCars(tU32 pLast_frame_time, tU32 pTime);
 
 void InterpolateCars(tU32 pLast_frame_time, tU32 pTime);
 
-void ResetOldmat();
+void ResetOldmat(void);
 
-void GetNonCars();
+void GetNonCars(void);
 
 void GetNetPos(tCar_spec* pCar);
 
@@ -150,7 +150,7 @@ void MoveAndCollideNonCar(tNon_car_spec* non_car, br_scalar dt);
 
 int CollideCarWithWall(tCollision_info* car, br_scalar dt);
 
-void ToggleControls();
+void ToggleControls(void);
 
 void ControlCar2(tCar_spec* c, br_scalar dt);
 
@@ -248,9 +248,9 @@ int GetBoundsEdge(br_vector3* pos, br_vector3* edge, br_bounds* pB, int plane1, 
 
 void oldMoveOurCar(tU32 pTime_difference);
 
-void ToggleCollisionDetection();
+void ToggleCollisionDetection(void);
 
-void CancelPendingCunningStunt();
+void CancelPendingCunningStunt(void);
 
 float frac(float pN);
 
@@ -258,27 +258,27 @@ void SetAmbientPratCam(tCar_spec* pCar);
 
 void MungeCarGraphics(tU32 pFrame_period);
 
-void ResetCarScreens();
+void ResetCarScreens(void);
 
-tCar_spec* GetRaceLeader();
+tCar_spec* GetRaceLeader(void);
 
-void AmIGettingBoredWatchingCameraSpin();
+void AmIGettingBoredWatchingCameraSpin(void);
 
-void ViewNetPlayer();
+void ViewNetPlayer(void);
 
-void ViewOpponent();
+void ViewOpponent(void);
 
-void ToggleCarToCarCollisions();
+void ToggleCarToCarCollisions(void);
 
-void SwapCar();
+void SwapCar(void);
 
-void AdjustDownForce();
+void AdjustDownForce(void);
 
-void FreezeMechanics();
+void FreezeMechanics(void);
 
-void PutOpponentsInNeutral();
+void PutOpponentsInNeutral(void);
 
-void SetPanningFieldOfView();
+void SetPanningFieldOfView(void);
 
 void CheckDisablePlingMaterials(tCar_spec* pCar);
 
@@ -320,9 +320,9 @@ int BoundsTest(br_bounds* bnds, br_vector3* p);
 
 int CollideCameraWithOtherCars(br_vector3* car_pos, br_vector3* cam_pos);
 
-void InitialiseExternalCamera();
+void InitialiseExternalCamera(void);
 
-void FreezeCamera();
+void FreezeCamera(void);
 
 void FlyCar(tCar_spec* c, br_scalar dt);
 
@@ -364,7 +364,7 @@ br_scalar FourPointCollB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* 
 
 int TestForNan(float* f);
 
-void CheckCameraHither();
+void CheckCameraHither(void);
 
 void SetCarSuspGiveAndHeight(tCar_spec* pCar, br_scalar pFront_give_factor, br_scalar pRear_give_factor, br_scalar pDamping_factor, br_scalar pExtra_front_height, br_scalar pExtra_rear_height);
 
@@ -384,6 +384,6 @@ void PipeSingleNonCar(tCollision_info* c);
 
 int GetPrecalculatedFacesUnderCar(tCar_spec* pCar, tFace_ref** pFace_refs);
 
-br_material* SomeNearbyMaterial();
+br_material* SomeNearbyMaterial(void);
 
 #endif

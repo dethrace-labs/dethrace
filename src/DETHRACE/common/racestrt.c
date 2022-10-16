@@ -2025,8 +2025,8 @@ void ChallengeStart() {
     TransBrPixelmapText(the_map, 0, 0, 1u, gBig_font, gOpponents[gChallenger_index__racestrt].abbrev_name);
     PathCat(the_path, gApplication_path, "DARES.TXT");
     f = DRfopen(the_path, "rt");
-    if (!f) {
-        FatalError(100);
+    if (f == NULL) {
+        FatalError(kFatalError_OpenDareTxt);
     }
 
     dare_index = IRandomBetween(0, GetAnInt(f) - 1);

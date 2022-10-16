@@ -74,7 +74,7 @@ typedef struct tCar_spec_struct2 tCar_spec2;
 typedef struct tPath_node_struct tPath_node;
 typedef struct tPath_section_struct tPath_section;
 typedef tU32 tPlayer_ID;
-typedef void* tPipe_reset_proc();
+typedef void* tPipe_reset_proc(void);
 typedef struct tPowerup tPowerup;
 #ifdef DETHRACE_FIX_BUGS
 typedef int tGot_proc(tPowerup*, tCar_spec*);
@@ -2715,9 +2715,9 @@ typedef struct tSave_camera {
 } tSave_camera;
 
 #ifdef DETHRACE_FIX_BUGS
-typedef void tEdit_func();
+typedef void tEdit_func(void);
 #else
-typedef void* tEdit_func();
+typedef void* tEdit_func(void);
 #endif
 
 typedef enum tEdit_mode {
@@ -2739,7 +2739,7 @@ typedef struct tToggle_element {
     int in_game_only;
     int exact_modifiers;
     int on_last_time;
-    void (*action_proc)();
+    void (*action_proc)(void);
 } tToggle_element;
 
 typedef struct tCheat {
@@ -2768,9 +2768,9 @@ typedef struct _tag_sos_timer_system _SOS_TIMER_SYSTEM;
 typedef _SOS_TIMER_SYSTEM* PSOSTIMERSYSTEM;
 typedef struct SmackTag Smack;
 typedef struct SmackSumTag SmackSum;
-typedef void* SmackTimerSetupType();
-typedef unsigned long* SmackTimerReadType();
-typedef void* SmackTimerDoneType();
+typedef void* SmackTimerSetupType(void);
+typedef unsigned long* SmackTimerReadType(void);
+typedef void* SmackTimerDoneType(void);
 typedef struct _heapinfo _HEAPINFO;
 typedef struct _tag_sos_evds_struct {
     unsigned int region_size;
@@ -2862,7 +2862,7 @@ typedef struct _tag_sos_driver {
     PSTR pXFERPosition;
     DWORD wXFERJumpAhead;
     _SOS_SAMPLE* pSampleList;
-    void (*pfnPseudoDMAFunction)();
+    void (*pfnPseudoDMAFunction)(void);
     PSTR pDMABuffer;
     PSTR pDMABufferEnd;
     DWORD wDMABufferSize;
@@ -2882,7 +2882,7 @@ typedef struct _tag_sos_driver {
     W32 hMemory;
     W32 wDMARealSeg;
     W32 wID;
-    void (*pfnMixFunction)();
+    void (*pfnMixFunction)(void);
 } _SOS_DIGI_DRIVER;
 
 typedef struct _SOS_DRV_FILEHEADER {
@@ -2933,7 +2933,7 @@ typedef struct _tag_sos_det_system {
 typedef struct _tag_sos_timer_system {
     W32 wFlags;
     W32 wChipDivisor;
-    void (*pfnEvent[16])();
+    void (*pfnEvent[16])(void);
     W32 wEventRate[16];
     DWORD dwAdditiveFraction[16];
     DWORD dwCurrentSummation[16];
@@ -3143,8 +3143,8 @@ typedef struct tInterface_spec {
     int (*exit_proc)(int*, int*);
     void (*draw_proc)(int, int);
     tU32 time_out;
-    void (*start_proc1)();
-    void (*start_proc2)();
+    void (*start_proc1)(void);
+    void (*start_proc2)(void);
     int (*done_proc)(int, int, int, int, int);
     int font_needed;
     int typeable[2];

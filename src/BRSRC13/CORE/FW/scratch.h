@@ -7,12 +7,12 @@ void* BrScratchAllocate(br_size_t size);
 
 void BrScratchFree(void* scratch);
 
-void BrScratchFlush();
+void BrScratchFlush(void);
 
-br_size_t BrScratchInquire();
+br_size_t BrScratchInquire(void);
 
-char* BrScratchString();
+char* BrScratchString(void);
 
-br_size_t BrScratchStringSize();
+br_size_t BrScratchStringSize(void);
 
 #endif

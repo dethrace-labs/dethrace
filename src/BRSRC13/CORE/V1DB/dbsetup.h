@@ -5,9 +5,9 @@
 
 extern br_v1db_state v1db;
 
-br_error BrV1dbBegin();
+br_error BrV1dbBegin(void);
 
-br_error BrV1dbEnd();
+br_error BrV1dbEnd(void);
 
 br_uint_32 updateTable(br_pixelmap* item, void* arg);
 
@@ -27,20 +27,20 @@ br_uint_32 clearModel(br_model* item, void* arg);
 
 br_error BrV1dbRendererBegin(br_device_pixelmap* destination, br_renderer* renderer);
 
-br_renderer* BrV1dbRendererQuery();
+br_renderer* BrV1dbRendererQuery(void);
 
-br_error BrV1dbRendererEnd();
+br_error BrV1dbRendererEnd(void);
 
 void BrZbBegin(br_uint_8 colour_type, br_uint_8 depth_type);
 
 void BrZsBegin(br_uint_8 colour_type, void* primitive, br_uint_32 size);
 
-void BrZbEnd();
+void BrZbEnd(void);
 
-void BrZsEnd();
+void BrZsEnd(void);
 
-void BrV1dbBeginWrapper_Float();
+void BrV1dbBeginWrapper_Float(void);
 
-void BrV1dbEndWrapper();
+void BrV1dbEndWrapper(void);
 
 #endif

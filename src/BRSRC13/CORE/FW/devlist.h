@@ -3,7 +3,7 @@
 
 #include "brender/br_types.h"
 
-br_error AddRequestedDrivers();
+br_error AddRequestedDrivers(void);
 
 br_error devAdd(br_device** pdev, br_device_begin_fn* dev_begin, char* args, br_image* image);
 

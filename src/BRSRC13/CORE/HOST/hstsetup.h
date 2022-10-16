@@ -3,9 +3,9 @@
 
 #include "brender/br_types.h"
 
-void HostBegin();
+void HostBegin(void);
 
-void HostEnd();
+void HostEnd(void);
 
 br_error HostInfo(host_info* buffer, br_size_t buffersize);
 

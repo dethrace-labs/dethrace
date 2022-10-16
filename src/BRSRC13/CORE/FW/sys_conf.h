@@ -15,7 +15,7 @@ br_error LoadRegistryConfig(char* Reg_Path, void* hKey);
 
 br_error BrSetDefaultConfig(br_token t, char* Entry);
 
-br_error BrSystemConfigBegin();
+br_error BrSystemConfigBegin(void);
 
 br_error BrSystemConfigLoad(br_token t, char* Param1, void* Param2);
 

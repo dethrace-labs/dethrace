@@ -41,45 +41,45 @@ extern br_pixelmap* gPalette;
 extern void* gPalette_pixels;
 extern tFlic_descriptor* gFirst_flic;
 
-void EnableTranslationText();
+void EnableTranslationText(void);
 
-void DisableTranslationText();
+void DisableTranslationText(void);
 
 void SetFlicSound(int pSound_ID, tU32 pSound_time);
 
-int TranslationMode();
+int TranslationMode(void);
 
-void DontLetFlicFuckWithPalettes();
+void DontLetFlicFuckWithPalettes(void);
 
-void LetFlicFuckWithPalettes();
+void LetFlicFuckWithPalettes(void);
 
-void PlayFlicsInDarkness();
+void PlayFlicsInDarkness(void);
 
-void ReilluminateFlics();
+void ReilluminateFlics(void);
 
-void TurnFlicTransparencyOn();
+void TurnFlicTransparencyOn(void);
 
-void TurnFlicTransparencyOff();
+void TurnFlicTransparencyOff(void);
 
-void PlayFlicsFromDisk();
+void PlayFlicsFromDisk(void);
 
-void PlayFlicsFromMemory();
+void PlayFlicsFromMemory(void);
 
-int FlicsPlayedFromDisk();
+int FlicsPlayedFromDisk(void);
 
-void TurnOffPanelFlics();
+void TurnOffPanelFlics(void);
 
-void TurnOnPanelFlics();
+void TurnOnPanelFlics(void);
 
 int GetPanelFlicFrameIndex(int pIndex);
 
-void FlicPaletteAllocate();
+void FlicPaletteAllocate(void);
 
 void AssertFlicPixelmap(tFlic_descriptor_ptr pFlic_info, br_pixelmap* pDest_pixelmap);
 
 int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap, int pX_offset, int pY_offset, int pFrame_rate);
 
-void FreeFlicPaletteAllocate();
+void FreeFlicPaletteAllocate(void);
 
 int EndFlic(tFlic_descriptor_ptr pFlic_info);
 
@@ -113,13 +113,13 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic);
 
 int PlayNextFlicFrame(tFlic_descriptor* pFlic_info);
 
-int PlayFlic(int pIndex, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap, int pX_offset, int pY_offset, void (*DoPerFrame)(), int pInterruptable, int pFrame_rate);
+int PlayFlic(int pIndex, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap, int pX_offset, int pY_offset, void (*DoPerFrame)(void), int pInterruptable, int pFrame_rate);
 
-void SwapScreen();
+void SwapScreen(void);
 
 void ShowFlic(int pIndex);
 
-void InitFlics();
+void InitFlics(void);
 
 int LoadFlic(int pIndex);
 
@@ -141,13 +141,13 @@ void UnlockBunchOfFlics(int pBunch_index);
 
 void FlushAllFlics(int pBunch_index);
 
-void InitFlicQueue();
+void InitFlicQueue(void);
 
-int FlicQueueFinished();
+int FlicQueueFinished(void);
 
 void ProcessFlicQueue(tU32 pInterval);
 
-void FlushFlicQueue();
+void FlushFlicQueue(void);
 
 void AddToFlicQueue(int pIndex, int pX, int pY, int pMust_finish);
 
@@ -161,12 +161,12 @@ void ChangePanelFlic(int pIndex, tU8* pData, tU32 pData_length);
 
 br_pixelmap* GetPanelPixelmap(int pIndex);
 
-void LoadInterfaceStrings();
+void LoadInterfaceStrings(void);
 
-void FlushInterfaceFonts();
+void FlushInterfaceFonts(void);
 
-void SuspendPendingFlic();
+void SuspendPendingFlic(void);
 
-void ResumePendingFlic();
+void ResumePendingFlic(void);
 
 #endif

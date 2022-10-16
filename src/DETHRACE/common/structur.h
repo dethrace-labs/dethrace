@@ -12,29 +12,29 @@ extern int gOpponent_mix[10][5];
 extern tU32 gLast_checkpoint_time;
 extern tRace_over_reason gRace_over_reason;
 
-int NumberOfOpponentsLeft();
+int NumberOfOpponentsLeft(void);
 
 void RaceCompleted(tRace_over_reason pReason);
 
 void Checkpoint(int pCheckpoint_index, int pDo_sound);
 
-void IncrementCheckpoint();
+void IncrementCheckpoint(void);
 
-void IncrementLap();
+void IncrementLap(void);
 
 int RayHitFace(br_vector3* pV0, br_vector3* pV1, br_vector3* pV2, br_vector3* pNormal, br_vector3* pStart, br_vector3* pDir);
 
 void WrongCheckpoint(int pCheckpoint_index);
 
-void CheckCheckpoints();
+void CheckCheckpoints(void);
 
-void TotalRepair();
+void TotalRepair(void);
 
-void DoLogos();
+void DoLogos(void);
 
-void DoProgOpeningAnimation();
+void DoProgOpeningAnimation(void);
 
-void DoProgramDemo();
+void DoProgramDemo(void);
 
 int ChooseOpponent(int pNastiness, int* pHad_scum);
 
@@ -42,20 +42,20 @@ void SelectOpponents(tRace_info* pRace_info);
 
 int PickNetRace(int pCurrent_race, tNet_sequence_type pNet_race_sequence);
 
-void SwapNetCarsLoad();
+void SwapNetCarsLoad(void);
 
-void SwapNetCarsDispose();
+void SwapNetCarsDispose(void);
 
-void DoGame();
+void DoGame(void);
 
-void InitialiseProgramState();
+void InitialiseProgramState(void);
 
-void DoProgram();
+void DoProgram(void);
 
-void JumpTheStart();
+void JumpTheStart(void);
 
-void GoingToInterfaceFromRace();
+void GoingToInterfaceFromRace(void);
 
-void GoingBackToRaceFromInterface();
+void GoingBackToRaceFromInterface(void);
 
 #endif

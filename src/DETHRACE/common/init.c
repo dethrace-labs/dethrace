@@ -58,11 +58,11 @@ void AllocateSelf() {
 
     gSelf = BrActorAllocate(BR_ACTOR_NONE, NULL);
     if (gSelf == NULL) {
-        FatalError(6);
+        FatalError(kFatalError_AllocateSelf);
     }
     gSelf = BrActorAdd(gNon_track_actor, gSelf);
     if (gSelf == NULL) {
-        FatalError(6);
+        FatalError(kFatalError_AllocateSelf);
     }
 }
 
@@ -75,7 +75,7 @@ void AllocateCamera() {
     for (i = 0; i < COUNT_OF(gCamera_list); i++) {
         gCamera_list[i] = BrActorAllocate(BR_ACTOR_CAMERA, NULL);
         if (gCamera_list[i] == NULL) {
-            FatalError(5);
+            FatalError(kFatalError_AllocateCamera);
         }
 
         camera_ptr = gCamera_list[i]->type_data;
@@ -88,16 +88,16 @@ void AllocateCamera() {
 
     gCamera_list[0] = BrActorAdd(gSelf, gCamera_list[0]);
     if (gCamera_list[0] == NULL) {
-        FatalError(5);
+        FatalError(kFatalError_AllocateCamera);
     }
     gCamera_list[1] = BrActorAdd(gUniverse_actor, gCamera_list[1]);
     if (gCamera_list[1] == NULL) {
-        FatalError(5);
+        FatalError(kFatalError_AllocateCamera);
     }
     gCamera = gCamera_list[0];
     gRearview_camera = BrActorAllocate(BR_ACTOR_CAMERA, NULL);
     if (gRearview_camera == NULL) {
-        FatalError(5);
+        FatalError(kFatalError_AllocateCamera);
     }
 
     gRearview_camera->t.t.mat.m[2][2] = -1.0f;
@@ -109,7 +109,7 @@ void AllocateCamera() {
     camera_ptr->aspect = (double)gWidth / (double)gHeight;
     gRearview_camera = BrActorAdd(gSelf, gRearview_camera);
     if (gRearview_camera == NULL) {
-        FatalError(5);
+        FatalError(kFatalError_AllocateCamera);
     }
     SetSightDistance(camera_ptr->yon_z);
 }
@@ -245,19 +245,19 @@ void InitializeBRenderEnvironment() {
     InstallDRFileCalls();
     SetBRenderScreenAndBuffers(0, 0, 0, 0);
     gUniverse_actor = BrActorAllocate(BR_ACTOR_NONE, NULL);
-    if (!gUniverse_actor) {
-        FatalError(3);
+    if (gUniverse_actor == NULL) {
+        FatalError(kFatalError_AllocateRootActor);
     }
     gUniverse_actor->identifier = BrResStrDup(gUniverse_actor, "Root");
     BrEnvironmentSet(gUniverse_actor);
     gNon_track_actor = BrActorAllocate(BR_ACTOR_NONE, NULL);
-    if (!gNon_track_actor) {
-        FatalError(3);
+    if (gNon_track_actor == NULL) {
+        FatalError(kFatalError_AllocateRootActor);
     }
     BrActorAdd(gUniverse_actor, gNon_track_actor);
     gDont_render_actor = BrActorAllocate(BR_ACTOR_NONE, 0);
-    if (!gDont_render_actor) {
-        FatalError(3);
+    if (gDont_render_actor == NULL) {
+        FatalError(kFatalError_AllocateRootActor);
     }
     gDont_render_actor->render_style = BR_RSTYLE_NONE;
     BrActorAdd(gUniverse_actor, gDont_render_actor);
@@ -345,7 +345,7 @@ void InitialiseApplication(int pArgc, char** pArgv) {
     RestoreOptions();
     LoadKeyMapping();
     if (!PDInitScreenVars(pArgc, pArgv)) {
-        FatalError(0);
+        FatalError(kFatalError_UnsupportedScreenDepth);
     }
     CalcGrafDataIndex();
     InitializeBRenderEnvironment();

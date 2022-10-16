@@ -15,7 +15,7 @@ extern br_pixelmap* gSource_for_16bit_palette;
 
 typedef br_uint_32 recurse_with_mat_cbfn(br_actor*, br_material*, void*);
 
-int CheckQuit();
+int CheckQuit(void);
 
 double sqr(double pN);
 
@@ -91,11 +91,11 @@ void PrintScreenFile(FILE* pF);
 
 void PrintScreenFile16(FILE* pF);
 
-void PrintScreen();
+void PrintScreen(void);
 
-tU32 GetTotalTime();
+tU32 GetTotalTime(void);
 
-tU32 GetRaceTime();
+tU32 GetRaceTime(void);
 
 void AddLostTime(tU32 pLost_time);
 
@@ -123,7 +123,7 @@ br_pixelmap* GenerateShadeTable(int pHeight, br_pixelmap* pPalette, int pRed_mix
 
 br_pixelmap* GenerateDarkenedShadeTable(int pHeight, br_pixelmap* pPalette, int pRed_mix, int pGreen_mix, int pBlue_mix, float pQuarter, float pHalf, float pThree_quarter, br_scalar pDarken);
 
-void PossibleService();
+void PossibleService(void);
 
 void DRMatrix34TApplyP(br_vector3* pA, br_vector3* pB, br_matrix34* pC);
 

@@ -51,15 +51,15 @@ int UpClickRace(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_
 
 int DownClickRace(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset);
 
-void StartChangeRace();
+void StartChangeRace(void);
 
 int ChangeRace(int* pRace_index, int pNet_mode, tNet_sequence_type pNet_race_sequence);
 
-void DoChangeRace();
+void DoChangeRace(void);
 
 void DrawCar(int pCurrent_choice, int pCurrent_mode);
 
-void SetCarFlic();
+void SetCarFlic(void);
 
 int UpCar(int* pCurrent_choice, int* pCurrent_mode);
 
@@ -73,29 +73,29 @@ int ChangeCarGoAhead(int* pCurrent_choice, int* pCurrent_mode);
 
 int ChangeCar(int pNet_mode, int* pCar_index, tNet_game_details* pNet_game);
 
-void DoChangeCar();
+void DoChangeCar(void);
 
-int PartsShopRecommended();
+int PartsShopRecommended(void);
 
 void CalcPartPrice(int pCategory, int pIndex, int* pPrice, int* pCost);
 
 int BuyPart(int pCategory, int pIndex);
 
-void DoAutoParts();
+void DoAutoParts(void);
 
-void DrawPartsLabel();
+void DrawPartsLabel(void);
 
 void ErasePartsText(int pTotal_as_well);
 
-void DrawPartsText();
+void DrawPartsText(void);
 
-void SetPartsImage();
+void SetPartsImage(void);
 
-int GetPartsMax();
+int GetPartsMax(void);
 
-void CalcPartsIndex();
+void CalcPartsIndex(void);
 
-void DoExchangePart();
+void DoExchangePart(void);
 
 int PartsShopGoAhead(int* pCurrent_choice, int* pCurrent_mode);
 
@@ -111,7 +111,7 @@ int PartsArrowsOn(int* pCurrent_choice, int* pCurrent_mode);
 
 int PartsArrowsOff(int* pCurrent_choice, int* pCurrent_mode);
 
-void StartPartsShop();
+void StartPartsShop(void);
 
 int DonePartsShop(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out);
 
@@ -121,13 +121,13 @@ void DoPartsShop(int pFade_away);
 
 int AutoPartsDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out);
 
-tSO_result DoAutoPartsShop();
+tSO_result DoAutoPartsShop(void);
 
-void SetOpponentFlic();
+void SetOpponentFlic(void);
 
-void DrawSceneyMappyInfoVieweyThing();
+void DrawSceneyMappyInfoVieweyThing(void);
 
-void DismissSceneyMappyInfoVieweyThing();
+void DismissSceneyMappyInfoVieweyThing(void);
 
 int SelectRaceDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out);
 
@@ -143,9 +143,9 @@ int UpClickOpp(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_o
 
 int DownClickOpp(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset);
 
-void SelectRaceStart();
+void SelectRaceStart(void);
 
-int SuggestRace();
+int SuggestRace(void);
 
 void SelectRaceDraw(int pCurrent_choice, int pCurrent_mode);
 
@@ -165,17 +165,17 @@ void ActuallySwapOrder(int pFirst_index, int pSecond_index);
 
 void DoGridTransition(int pFirst_index, int pSecond_index);
 
-void ChallengeStart();
+void ChallengeStart(void);
 
 int CheckNextStage(int* pCurrent_choice, int* pCurrent_mode);
 
 int ChallengeDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out);
 
-void DoChallengeScreen();
+void DoChallengeScreen(void);
 
 int GridDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out);
 
-void GridStart();
+void GridStart(void);
 
 int GridMoveLeft(int* pCurrent_choice, int* pCurrent_mode);
 
@@ -195,13 +195,13 @@ int FindBestPos(int pOur_rank);
 
 int SortGridFunction(const void* pFirst_one, const void* pSecond_one);
 
-void SortOpponents();
+void SortOpponents(void);
 
-tSO_result DoGridPosition();
+tSO_result DoGridPosition(void);
 
-void CheckPlayersAreResponding();
+void CheckPlayersAreResponding(void);
 
-void NetSynchStartStart();
+void NetSynchStartStart(void);
 
 // Suffix added to avoid duplicate symbol
 void DrawAnItem__racestrt(int pX, int pY_index, int pFont_index, char* pText);
@@ -216,6 +216,6 @@ int ExitWhenReady(int* pCurrent_choice, int* pCurrent_mode);
 
 tSO_result NetSynchRaceStart2(tNet_synch_mode pMode);
 
-tSO_result NetSynchRaceStart();
+tSO_result NetSynchRaceStart(void);
 
 #endif

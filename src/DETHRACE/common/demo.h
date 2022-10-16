@@ -6,6 +6,6 @@
 
 extern int gLast_demo;
 
-void DoDemo();
+void DoDemo(void);
 
 #endif

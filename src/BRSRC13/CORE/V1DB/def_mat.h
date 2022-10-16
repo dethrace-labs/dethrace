@@ -3,6 +3,6 @@
 
 #include "brender/br_types.h"
 
-br_material* SetupDefaultMaterial();
+br_material* SetupDefaultMaterial(void);
 
 #endif

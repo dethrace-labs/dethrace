@@ -28,11 +28,11 @@ int GotPowerupX(tCar_spec* pCar, int pIndex, int pTell_net_players, int pDisplay
 
 int GotPowerup(tCar_spec* pCar, int pIndex);
 
-void LoadPowerups();
+void LoadPowerups(void);
 
-void InitPowerups();
+void InitPowerups(void);
 
-void CloseDownPowerUps();
+void CloseDownPowerUps(void);
 
 void DrawPowerups(tU32 pTime);
 
@@ -40,25 +40,25 @@ void DoPowerupPeriodics(tU32 pFrame_period);
 
 void GotPowerupN(int pN);
 
-void GotPowerup0();
+void GotPowerup0(void);
 
-void GotPowerup1();
+void GotPowerup1(void);
 
-void GotPowerup2();
+void GotPowerup2(void);
 
-void GotPowerup3();
+void GotPowerup3(void);
 
-void GotPowerup4();
+void GotPowerup4(void);
 
-void GotPowerup5();
+void GotPowerup5(void);
 
-void GotPowerup6();
+void GotPowerup6(void);
 
-void GotPowerup7();
+void GotPowerup7(void);
 
-void GotPowerup8();
+void GotPowerup8(void);
 
-void GotPowerup9();
+void GotPowerup9(void);
 
 int GotCredits(tPowerup* pPowerup, tCar_spec* pCar);
 
@@ -192,7 +192,7 @@ void ResetVesuvianCorpses(tPowerup* pPowerup, tCar_spec* pCar);
 
 void ReceivedPowerup(tNet_contents* pContents);
 
-void SendCurrentPowerups();
+void SendCurrentPowerups(void);
 
 void LoseAllLocalPowerups(tCar_spec* pCar);
 

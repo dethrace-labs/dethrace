@@ -302,7 +302,7 @@ void* DRStdlibAllocate(br_size_t size, br_uint_8 type) {
     if (p == NULL && !gNon_fatal_allocation_errors) {
         PrintMemoryDump(0, "AT ERROR TIME");
         sprintf(s, "%s/%d", gMem_names[type], (int)size);
-        FatalError(94, s);
+        FatalError(kFatalError_OOMCarmageddon_S, s);
     }
     return p;
 }
@@ -346,7 +346,7 @@ void CreateStainlessClasses() {
     for (i = 129; i < 246; i++) {
         gStainless_classes[i - 129].res_class = i;
         if (!BrResClassAdd(&gStainless_classes[i - 129])) {
-            FatalError(94);
+            FatalError(kFatalError_OOMCarmageddon_S, gStainless_classes[i - 129].identifier);
         }
     }
 }

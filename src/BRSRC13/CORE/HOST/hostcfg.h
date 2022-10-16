@@ -3,7 +3,7 @@
 
 #include "brender/br_types.h"
 
-char* HostDefaultDevice();
+char* HostDefaultDevice(void);
 
 br_boolean HostIniSectionExists(char* ini_file, char* section_name);
 

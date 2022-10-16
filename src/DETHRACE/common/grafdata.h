@@ -8,6 +8,6 @@ extern tGraf_data gGraf_data[2];
 extern tGraf_data* gCurrent_graf_data;
 extern int gGraf_data_index;
 
-void CalcGrafDataIndex();
+void CalcGrafDataIndex(void);
 
 #endif

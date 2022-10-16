@@ -9,13 +9,13 @@ extern int gNon_fatal_allocation_errors;
 extern char* gMem_names[247];
 extern br_resource_class gStainless_classes[118];
 
-void SetNonFatalAllocationErrors();
+void SetNonFatalAllocationErrors(void);
 
-void ResetNonFatalAllocationErrors();
+void ResetNonFatalAllocationErrors(void);
 
-int AllocationErrorsAreFatal();
+int AllocationErrorsAreFatal(void);
 
-void MAMSInitMem();
+void MAMSInitMem(void);
 
 void PrintMemoryDump(int pFlags, char* pTitle);
 
@@ -27,14 +27,14 @@ br_size_t DRStdlibInquire(br_uint_8 type);
 
 br_uint_32 Claim4ByteAlignment(br_uint_8 type);
 
-void InstallDRMemCalls();
+void InstallDRMemCalls(void);
 
 void MAMSUnlock(void** pPtr);
 
 void MAMSLock(void** pPtr);
 
-void CreateStainlessClasses();
+void CreateStainlessClasses(void);
 
-void CheckMemory();
+void CheckMemory(void);
 
 #endif

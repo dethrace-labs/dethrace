@@ -27,11 +27,11 @@ extern int gCurrent_game_selection;
 extern int gRace_index;
 extern int gRadio_selected;
 
-void StartRollingPlayerNamesIn();
+void StartRollingPlayerNamesIn(void);
 
-void FrankAnneStart1();
+void FrankAnneStart1(void);
 
-void FrankAnneStart2();
+void FrankAnneStart2(void);
 
 void GetPlayerName(int pStarting_to_type, int pCurrent_choice, char* pString, int* pMax_length);
 
@@ -39,11 +39,11 @@ int FrankAnneDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
 
 void FrankAnneDraw(int pCurrent_choice, int pCurrent_mode);
 
-int FrankieOrAnnie();
+int FrankieOrAnnie(void);
 
-int SelectSkillLevel();
+int SelectSkillLevel(void);
 
-int DoOnePlayerStart();
+int DoOnePlayerStart(void);
 
 int NewNetGameUp(int* pCurrent_choice, int* pCurrent_mode);
 
@@ -57,15 +57,15 @@ void DrawColumnHeading__newgame(int pStr_index, int pX);
 
 void DrawGames(int pCurrent_choice, int pCurrent_mode);
 
-void InitGamesToJoin();
+void InitGamesToJoin(void);
 
 void DisposeJoinList(int pExemption);
 
 void AddToJoinList(tNet_game_details* pGame);
 
-void NewNetStart1();
+void NewNetStart1(void);
 
-void NewNetStart2();
+void NewNetStart2(void);
 
 void NewNetGetName(int pStarting_to_type, int pCurrent_choice, char* pString, int* pMax_length);
 
@@ -95,7 +95,7 @@ void NetPlayRadioOn(int pIndex, int pValue);
 
 void NetPlayRadioOff(int pIndex, int pValue);
 
-void DrawNOptInitialRadios();
+void DrawNOptInitialRadios(void);
 
 void NetRadioChanged(int pIndex, int pNew_value);
 
@@ -111,9 +111,9 @@ int NetOptDown(int* pCurrent_choice, int* pCurrent_mode);
 
 int NetRadioClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset);
 
-void RevertToDefaults();
+void RevertToDefaults(void);
 
-void DefaultNetSettings();
+void DefaultNetSettings(void);
 
 int NetOptGoAhead(int* pCurrent_choice, int* pCurrent_mode);
 
@@ -135,7 +135,7 @@ void PlayRadioOff__newgame(int pIndex);
 
 void SetOptions(tNet_game_type pGame_type, tNet_game_options* pGame_options);
 
-void DrawNetChooseInitial();
+void DrawNetChooseInitial(void);
 
 int NetChooseGoAhead(int* pCurrent_choice, int* pCurrent_mode);
 
@@ -164,7 +164,7 @@ void SetUpOtherNetThings(tNet_game_details* pNet_game);
 
 void RequestCarDetails(tNet_game_details* pNet_game);
 
-int PickARandomCar();
+int PickARandomCar(void);
 
 void PollCarDetails(tNet_game_details* pNet_game);
 
@@ -172,10 +172,10 @@ void SetNetAvailability(tNet_game_options* pOptions);
 
 int ChooseNetCar(tNet_game_details* pNet_game, tNet_game_options* pOptions, int* pCar_index, int pIm_the_host_so_fuck_off);
 
-void InitNetStorageSpace();
+void InitNetStorageSpace(void);
 
-void DisposeNetStorageSpace();
+void DisposeNetStorageSpace(void);
 
-int DoMultiPlayerStart();
+int DoMultiPlayerStart(void);
 
 #endif

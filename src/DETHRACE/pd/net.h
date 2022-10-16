@@ -10,13 +10,13 @@
 #include "brender/br_types.h"
 #include "dr_types.h"
 
-// void ClearupPDNetworkStuff();
+// void ClearupPDNetworkStuff(void);
 
 // void MATTMessageCheck(char* pFunction_name, tNet_message* pMessage, int pAlleged_size);
 
 // int GetProfileText(char* pDest, int pDest_len, char* pFname, char* pKeyname);
 
-// int GetSocketNumberFromProfileFile();
+// int GetSocketNumberFromProfileFile(void);
 
 // tU32 EthernetAddressToU32(_IPX_LOCAL_TARGET* pAddr_ipx);
 
@@ -30,9 +30,9 @@
 
 // void MakeMessageToSend(int pMessage_type);
 
-// int ReceiveHostResponses();
+// int ReceiveHostResponses(void);
 
-// int BroadcastMessage();
+// int BroadcastMessage(void);
 
 // BOOL hmiIPXCloseSocket(W32 wSocket);
 
@@ -54,23 +54,23 @@
 
 // BOOL FreeRealMem(tU16 pSelector);
 
-// BOOL hmiIPXInstalled();
+// BOOL hmiIPXInstalled(void);
 
 // BOOL hmiIPXOpenSocket(W32 wSocket);
 
-// void GetLargestPacketSizeOoErBetterInsertLinfordChristieJokeHere();
+// void GetLargestPacketSizeOoErBetterInsertLinfordChristieJokeHere(void);
 
 // BOOL hmiIPXInitSystem(W32 wSocket);
 
-// void GetIPXToStickItsEarToTheGround();
+// void GetIPXToStickItsEarToTheGround(void);
 
-int PDNetInitialise();
+int PDNetInitialise(void);
 
-int PDNetShutdown();
+int PDNetShutdown(void);
 
-void PDNetStartProducingJoinList();
+void PDNetStartProducingJoinList(void);
 
-void PDNetEndJoinList();
+void PDNetEndJoinList(void);
 
 int PDNetGetNextJoinGame(tNet_game_details* pGame, int pIndex);
 
@@ -108,6 +108,6 @@ int PDNetSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessag
 
 int PDNetInitClient(tNet_game_details* pDetails);
 
-int PDNetGetHeaderSize();
+int PDNetGetHeaderSize(void);
 
 #endif

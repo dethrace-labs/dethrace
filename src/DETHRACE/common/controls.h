@@ -23,133 +23,133 @@ extern int gRecovery_voucher_count;
 extern int gInstant_handbrake;
 extern int gAuto_repair;
 
-void AbortRace();
+void AbortRace(void);
 
-void F4Key();
+void F4Key(void);
 
 void SetFlag(int i);
 
 void FinishLap(int i);
 
-void EnsureSpecialVolumesHidden();
+void EnsureSpecialVolumesHidden(void);
 
-void ShowSpecialVolumesIfRequ();
+void ShowSpecialVolumesIfRequ(void);
 
 void DoEditModeKey(int pIndex);
 
-void F5Key();
+void F5Key(void);
 
-void F6Key();
+void F6Key(void);
 
-void F7Key();
+void F7Key(void);
 
-void F8Key();
+void F8Key(void);
 
-void F10Key();
+void F10Key(void);
 
-void F11Key();
+void F11Key(void);
 
-void F12Key();
+void F12Key(void);
 
-void NumberKey0();
+void NumberKey0(void);
 
-void NumberKey1();
+void NumberKey1(void);
 
-void NumberKey2();
+void NumberKey2(void);
 
-void NumberKey3();
+void NumberKey3(void);
 
-void NumberKey4();
+void NumberKey4(void);
 
-void NumberKey5();
+void NumberKey5(void);
 
-void NumberKey6();
+void NumberKey6(void);
 
-void NumberKey7();
+void NumberKey7(void);
 
-void NumberKey8();
+void NumberKey8(void);
 
-void NumberKey9();
+void NumberKey9(void);
 
-void LookLeft();
+void LookLeft(void);
 
-void LookForward();
+void LookForward(void);
 
-void LookRight();
+void LookRight(void);
 
-void DamageTest();
+void DamageTest(void);
 
-void TDamageEngine();
+void TDamageEngine(void);
 
-void TDamageDriver();
+void TDamageDriver(void);
 
-void TDamageTrans();
+void TDamageTrans(void);
 
-void TDamageSteering();
+void TDamageSteering(void);
 
-void TDamageLFWheel();
+void TDamageLFWheel(void);
 
-void TDamageLFBrake();
+void TDamageLFBrake(void);
 
-void TDamageLRBrake();
+void TDamageLRBrake(void);
 
-void TDamageLRWheel();
+void TDamageLRWheel(void);
 
-void TDamageRFWheel();
+void TDamageRFWheel(void);
 
-void TDamageRFBrake();
+void TDamageRFBrake(void);
 
-void TDamageRRBrake();
+void TDamageRRBrake(void);
 
-void TDamageRRWheel();
+void TDamageRRWheel(void);
 
-void MoveBonnetForward();
+void MoveBonnetForward(void);
 
-void SaveBonnet();
+void SaveBonnet(void);
 
-void MoveBonnetBackward();
+void MoveBonnetBackward(void);
 
-void MoveBonnetLeft();
+void MoveBonnetLeft(void);
 
-void ShrinkBonnetX();
+void ShrinkBonnetX(void);
 
-void SwellBonnetX();
+void SwellBonnetX(void);
 
-void ShrinkBonnetY();
+void ShrinkBonnetY(void);
 
-void SwellBonnetY();
+void SwellBonnetY(void);
 
-void ShrinkBonnetZ();
+void ShrinkBonnetZ(void);
 
-void SwellBonnetZ();
+void SwellBonnetZ(void);
 
-void MoveBonnetDown();
+void MoveBonnetDown(void);
 
-void MoveBonnetRight();
+void MoveBonnetRight(void);
 
-void MoveBonnetUp();
+void MoveBonnetUp(void);
 
-void TiltBonnetDownX();
+void TiltBonnetDownX(void);
 
-void TiltBonnetUpX();
+void TiltBonnetUpX(void);
 
-void TiltBonnetDownY();
+void TiltBonnetDownY(void);
 
-void TiltBonnetUpY();
+void TiltBonnetUpY(void);
 
-void TiltBonnetDownZ();
+void TiltBonnetDownZ(void);
 
-void TiltBonnetUpZ();
+void TiltBonnetUpZ(void);
 
-void ToggleCockpit();
+void ToggleCockpit(void);
 
-void ToggleMirror();
+void ToggleMirror(void);
 
-void ConcussMe();
+void ConcussMe(void);
 
-void CheckHelp();
+void CheckHelp(void);
 
-void CheckLoadSave();
+void CheckLoadSave(void);
 
 void CheckToggles(int pRacing);
 
@@ -157,19 +157,19 @@ int CarWorldOffFallenCheckThingy(tCar_spec* pCar, int pCheck_around);
 
 int HasCarFallenOffWorld(tCar_spec* pCar);
 
-void CheckForBeingOutOfThisWorld();
+void CheckForBeingOutOfThisWorld(void);
 
 void CheckHornLocal(tCar_spec* pCar);
 
 void CheckHorn3D(tCar_spec* pCar);
 
-void CheckHorns();
+void CheckHorns(void);
 
-void SetRecovery();
+void SetRecovery(void);
 
-void RecoverCar();
+void RecoverCar(void);
 
-void CheckMapRenderMove();
+void CheckMapRenderMove(void);
 
 void ExplodeCar(tCar_spec* pCar);
 
@@ -177,9 +177,9 @@ void CheckRecoveryOfCars(tU32 pEndFrameTime);
 
 void LoseSomePSPowerups(int pNumber);
 
-void CheckOtherRacingKeys();
+void CheckOtherRacingKeys(void);
 
-int CheckRecoverCost();
+int CheckRecoverCost(void);
 
 void SortOutRecover(tCar_spec* pCar);
 
@@ -191,9 +191,9 @@ void GetPowerup(int pNum);
 
 void CheckSystemKeys(int pRacing);
 
-void CheckKevKeys();
+void CheckKevKeys(void);
 
-void BrakeInstantly();
+void BrakeInstantly(void);
 
 void PollCarControls(tU32 pTime_difference);
 
@@ -201,68 +201,68 @@ void PollCameraControls(tU32 pTime_difference);
 
 void SetFlag2(int i);
 
-void ToggleFlying();
+void ToggleFlying(void);
 
-void ToggleInvulnerability();
+void ToggleInvulnerability(void);
 
-void MoreTime();
+void MoreTime(void);
 
-void MuchMoreTime();
+void MuchMoreTime(void);
 
-void ToggleTimerFreeze();
+void ToggleTimerFreeze(void);
 
-void EarnDosh();
+void EarnDosh(void);
 
-void LoseDosh();
+void LoseDosh(void);
 
-void ToggleMap();
+void ToggleMap(void);
 
-int HornBlowing();
+int HornBlowing(void);
 
-void ToggleArrow();
+void ToggleArrow(void);
 
-int GetRecoverVoucherCount();
+int GetRecoverVoucherCount(void);
 
 void AddVouchers(int pCount);
 
-void ResetRecoveryVouchers();
+void ResetRecoveryVouchers(void);
 
-void CycleCarTexturingLevel();
+void CycleCarTexturingLevel(void);
 
-void CycleWallTexturingLevel();
+void CycleWallTexturingLevel(void);
 
-void CycleRoadTexturingLevel();
+void CycleRoadTexturingLevel(void);
 
-void CycleYonFactor();
+void CycleYonFactor(void);
 
 void SetSoundDetailLevel(int pLevel);
 
 void ReallySetSoundDetailLevel(int pLevel);
 
-int GetSoundDetailLevel();
+int GetSoundDetailLevel(void);
 
-void CycleSoundDetailLevel();
+void CycleSoundDetailLevel(void);
 
-void CycleCarSimplificationLevel();
+void CycleCarSimplificationLevel(void);
 
-void ToggleAccessoryRendering();
+void ToggleAccessoryRendering(void);
 
-void ToggleSmoke();
+void ToggleSmoke(void);
 
 void DrawSomeText2(tDR_font* pFont);
 
-void DrawSomeText();
+void DrawSomeText(void);
 
-void SaySorryYouLittleBastard();
+void SaySorryYouLittleBastard(void);
 
-void UserSendMessage();
+void UserSendMessage(void);
 
-void EnterUserMessage();
+void EnterUserMessage(void);
 
-void DisplayUserMessage();
+void DisplayUserMessage(void);
 
-void InitAbuseomatic();
+void InitAbuseomatic(void);
 
-void DisposeAbuseomatic();
+void DisposeAbuseomatic(void);
 
 #endif
