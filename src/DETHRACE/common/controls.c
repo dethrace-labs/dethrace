@@ -27,6 +27,7 @@
 #include "piping.h"
 #include "powerup.h"
 #include "pratcam.h"
+#include "raycast.h"
 #include "replay.h"
 #include "s3/s3.h"
 #include "sound.h"
@@ -1185,8 +1186,41 @@ int CarWorldOffFallenCheckThingy(tCar_spec* pCar, int pCheck_around) {
     int result;
     LOG_TRACE("(%p, %d)", pCar, pCheck_around);
 
-    STUB_ONCE();
-    return 0;
+    if (pCar->number_of_wheels_on_ground != 0) {
+        return 0;
+    }
+    if (pCar->driver == eDriver_local_human && gCar_flying) {
+        return 0;
+    }
+    if (gAction_replay_mode) {
+        return 0;
+    }
+    BrVector3Copy(&car_pos, &pCar->car_master_actor->t.t.translate.t);
+    if (FindYVerticallyBelow2(&car_pos) >= -100.f) {
+        return 0;
+    }
+    BrVector3Set(&offset_c, 0.f, 1.f, 0.f);
+    BrMatrix34ApplyV(&offset_w, &offset_c, &pCar->car_master_actor->t.t.mat);
+    if (FindYVerticallyBelow2(&car_pos) >= -100.f) {
+        // FIXME: testing twice using `FindYVerticallyBelow2' is meaningless
+        return 0;
+    }
+    if (!pCheck_around) {
+        return 1;
+    }
+    pCar->car_master_actor->t.t.translate.t.v[0] += 0.05f;
+    result = CarWorldOffFallenCheckThingy(pCar, 0);
+    pCar->car_master_actor->t.t.translate.t.v[0] -= 0.05f;
+    if (!result) {
+        return 0;
+    }
+    pCar->car_master_actor->t.t.translate.t.v[2] += 0.05f;
+    result = CarWorldOffFallenCheckThingy(pCar, 0);
+    pCar->car_master_actor->t.t.translate.t.v[2] -= 0.05f;
+    if (!result) {
+        return 0;
+    }
+    return 1;
 }
 
 // IDA: int __usercall HasCarFallenOffWorld@<EAX>(tCar_spec *pCar@<EAX>)
