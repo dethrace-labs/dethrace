@@ -784,20 +784,20 @@ void DrawPartsText() {
 
     CalcPartPrice(gPart_category, gPart_index, &price, &cost);
     TransBrPixelmapText(gBack_screen, gCurrent_graf_data->parts_cost_x, gCurrent_graf_data->parts_cost_y, 5, gFont_7, GetMiscString(28));
-    BrPixelmapTextF(gBack_screen, gCurrent_graf_data->parts_numbers_x, gCurrent_graf_data->parts_cost_y - (TranslationMode() ? 0 : 2), 5, gFont_7, "%d", price);
+    BrPixelmapTextF(gBack_screen, gCurrent_graf_data->parts_numbers_x, gCurrent_graf_data->parts_cost_y - (TranslationMode() ? 2 : 0), 5, gFont_7, "%d", price);
     if (cost > 0) {
         TransBrPixelmapText(gBack_screen, gCurrent_graf_data->parts_net_x, gCurrent_graf_data->parts_net_y, 45, gFont_7, GetMiscString(29));
-        BrPixelmapTextF(gBack_screen, gCurrent_graf_data->parts_numbers_x, gCurrent_graf_data->parts_net_y - (TranslationMode() ? 0 : 2), 45, gFont_7, "%d", cost);
+        BrPixelmapTextF(gBack_screen, gCurrent_graf_data->parts_numbers_x, gCurrent_graf_data->parts_net_y - (TranslationMode() ? 2 : 0), 45, gFont_7, "%d", cost);
     } else if (cost < 0) {
         TransBrPixelmapText(gBack_screen, gCurrent_graf_data->parts_net_x, gCurrent_graf_data->parts_net_y, 201, gFont_7, GetMiscString(30));
-        BrPixelmapTextF(gBack_screen, gCurrent_graf_data->parts_numbers_x, gCurrent_graf_data->parts_net_y - (TranslationMode() ? 0 : 2), 201, gFont_7, "%d", -cost);
+        BrPixelmapTextF(gBack_screen, gCurrent_graf_data->parts_numbers_x, gCurrent_graf_data->parts_net_y - (TranslationMode() ? 2 : 0), 201, gFont_7, "%d", -cost);
     } else if (gJust_bought_part) {
         TransBrPixelmapText(gBack_screen, gCurrent_graf_data->parts_net_x, gCurrent_graf_data->parts_net_y, 134, gFont_7, GetMiscString(33));
     } else {
         TransBrPixelmapText(gBack_screen, gCurrent_graf_data->parts_net_x, gCurrent_graf_data->parts_net_y, 134, gFont_7, GetMiscString(32));
     }
     TransBrPixelmapText(gBack_screen, gCurrent_graf_data->parts_total_x, gCurrent_graf_data->parts_total_y, 2, gFont_7, GetMiscString(31));
-    BrPixelmapTextF(gBack_screen, gCurrent_graf_data->parts_numbers_x, gCurrent_graf_data->parts_total_y - (TranslationMode() ? 0 : 2), 2, gFont_7, "%d", gProgram_state.credits);
+    BrPixelmapTextF(gBack_screen, gCurrent_graf_data->parts_numbers_x, gCurrent_graf_data->parts_total_y - (TranslationMode() ? 2 : 0), 2, gFont_7, "%d", gProgram_state.credits);
 }
 
 // IDA: void __cdecl SetPartsImage()
