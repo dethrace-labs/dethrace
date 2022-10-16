@@ -1428,10 +1428,10 @@ void SelectRaceDraw(int pCurrent_choice, int pCurrent_mode) {
     static tU32 test2;
     LOG_TRACE8("(%d, %d)", pCurrent_choice, pCurrent_mode);
 
-    if (gProgram_state.view_type == 2) {
+    if (gProgram_state.view_type == eVT_Opponents) {
         the_opponent = &gOpponents[gCurrent_race.opponent_list[gOpponent_index].index];
-        the_chunk = the_opponent->text_chunks;
         for (j = 0; j < the_opponent->text_chunk_count; j++) {
+            the_chunk = &the_opponent->text_chunks[j];
             if (GetPanelFlicFrameIndex(0) >= the_chunk->frame_cue && GetPanelFlicFrameIndex(0) < the_chunk->frame_end) {
                 y_coord = the_chunk->y_coord * gGraf_specs[gGraf_spec_index].total_height / 200
                     + gCurrent_graf_data->start_race_panel_top;
@@ -1441,46 +1441,44 @@ void SelectRaceDraw(int pCurrent_choice, int pCurrent_mode) {
                         the_chunk->x_coord * gGraf_specs[gGraf_spec_index].total_width / 320
                             + gCurrent_graf_data->start_race_panel_left,
                         y_coord,
-                        0xC9u,
-                        gFont_7,
-                        the_chunk->text[j]);
-                    y_coord += gFont_7->glyph_y + gFont_7->glyph_y / 2;
-                }
-            }
-            ++the_chunk;
-        }
-    } else if (gProgram_state.view_type == 1) {
-        the_chunk = gCurrent_race.text_chunks;
-        for (j = 0; j < gCurrent_race.text_chunk_count; j++) {
-            if (GetPanelFlicFrameIndex(0) >= the_chunk->frame_cue && GetPanelFlicFrameIndex(0) < the_chunk->frame_end) {
-                y_coord = the_chunk->y_coord * gGraf_specs[gGraf_spec_index].total_height / 200
-                    + gCurrent_graf_data->start_race_panel_top;
-                for (k = 0; k < the_chunk->line_count; k++) {
-                    TransBrPixelmapText(
-                        gBack_screen,
-                        the_chunk->x_coord * gGraf_specs[gGraf_spec_index].total_width / 320
-                            + gCurrent_graf_data->start_race_panel_left,
-                        y_coord,
-                        0xC9u,
+                        201,
                         gFont_7,
                         the_chunk->text[k]);
                     y_coord += gFont_7->glyph_y + gFont_7->glyph_y / 2;
                 }
             }
-            ++the_chunk;
+        }
+    } else if (gProgram_state.view_type == eVT_Info) {
+        for (j = 0; j < gCurrent_race.text_chunk_count; j++) {
+            the_chunk = &gCurrent_race.text_chunks[j];
+            if (GetPanelFlicFrameIndex(0) >= the_chunk->frame_cue && GetPanelFlicFrameIndex(0) < the_chunk->frame_end) {
+                y_coord = the_chunk->y_coord * gGraf_specs[gGraf_spec_index].total_height / 200
+                    + gCurrent_graf_data->start_race_panel_top;
+                for (k = 0; k < the_chunk->line_count; k++) {
+                    TransBrPixelmapText(
+                        gBack_screen,
+                        the_chunk->x_coord * gGraf_specs[gGraf_spec_index].total_width / 320
+                            + gCurrent_graf_data->start_race_panel_left,
+                        y_coord,
+                        201,
+                        gFont_7,
+                        the_chunk->text[k]);
+                    y_coord += gFont_7->glyph_y + gFont_7->glyph_y / 2;
+                }
+            }
         }
     }
     test = KevKeyService();
     if (*test) {
         test2 = *test;
     }
-    if (*test == 0x27645433 && test[1] == 0x758F0015) {
+    if (test[0] == 0x27645433 && test[1] == 0x758f0015) {
         // cheat code: "KEVWOZEAR"
         gProgram_state.game_completed = 1;
         DRS3StartSound(gEffects_outlet, 3202);
         DRS3StartSound(gEffects_outlet, 3202);
     }
-    if (*test == 0x33F75455 && test[1] == 0xC10AAAF2) {
+    if (test[0] == 0x33f75455 && test[1] == 0xC10AAAF2) {
         // cheat code: "IWANTTOFIDDLE"
 
         char s[128];
@@ -1494,7 +1492,7 @@ void SelectRaceDraw(int pCurrent_choice, int pCurrent_mode) {
         PathCat(s, s, "PROG.ACT");
         PDFileUnlock(s);
         f = fopen(s, "wb");
-        if (f) {
+        if (f != NULL) {
             DRS3StartSound(gEffects_outlet, 9000);
             if (gDecode_thing) {
                 for (i = 0; i < strlen(gDecode_string); i++) {
