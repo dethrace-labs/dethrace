@@ -208,6 +208,10 @@ void NonFatalError(int pStr_index, ...) {
 void CloseDiagnostics() {
     LOG_TRACE("()");
 
+    if (harness_game_config.enable_diagnostics == 0) {
+        return;
+    }
+
     fclose(gDiagnostic_file);
 }
 
@@ -215,6 +219,10 @@ void CloseDiagnostics() {
 // This function is stripped from the retail binary, we've guessed at the implementation
 void OpenDiagnostics() {
     LOG_TRACE("()");
+
+    if (harness_game_config.enable_diagnostics == 0) {
+        return;
+    }
 
     gDiagnostic_file = fopen("DIAGNOST.TXT", "w");
 
