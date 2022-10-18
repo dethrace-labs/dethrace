@@ -2,6 +2,7 @@
 #include "cutscene.h"
 #include "globvars.h"
 #include "graphics.h"
+#include "harness/config.h"
 #include "harness/trace.h"
 #include "network.h"
 #include "pd/sys.h"
@@ -207,6 +208,10 @@ void NonFatalError(int pStr_index, ...) {
 void CloseDiagnostics() {
     LOG_TRACE("()");
 
+    if (harness_game_config.enable_diagnostics == 0) {
+        return;
+    }
+
     fclose(gDiagnostic_file);
 }
 
@@ -214,6 +219,10 @@ void CloseDiagnostics() {
 // This function is stripped from the retail binary, we've guessed at the implementation
 void OpenDiagnostics() {
     LOG_TRACE("()");
+
+    if (harness_game_config.enable_diagnostics == 0) {
+        return;
+    }
 
     gDiagnostic_file = fopen("DIAGNOST.TXT", "w");
 
@@ -229,6 +238,10 @@ void dr_dprintf(char* fmt_string, ...) {
     va_list args;
     tU32 the_time;
 
+    if (harness_game_config.enable_diagnostics == 0) {
+        return;
+    }
+
     if (first_time == 0) {
         first_time = GetTotalTime();
     }
@@ -241,12 +254,6 @@ void dr_dprintf(char* fmt_string, ...) {
     va_end(args);
     fputs("\n", gDiagnostic_file);
     fflush(gDiagnostic_file);
-
-    va_start(args, fmt_string);
-    printf("dr_dprintf: ");
-    vfprintf(stdout, fmt_string, args);
-    printf("\n");
-    va_end(args);
 }
 
 // IDA: int __usercall DoErrorInterface@<EAX>(int pMisc_text_index@<EAX>)

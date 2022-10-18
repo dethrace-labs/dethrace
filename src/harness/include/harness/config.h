@@ -23,18 +23,19 @@ typedef struct tHarness_game_info {
         // different between demo and full game
         char* GERMAN_LOADSCRN;
         // built-in keyboard look-up table for certain localized Carmageddon releases
-        int *ascii_table;
+        int* ascii_table;
         // built-in shifted keyboard look-up table for certain localized Carmageddon releases
-        int *ascii_shift_table;
+        int* ascii_shift_table;
     } defines;
 } tHarness_game_info;
 
 typedef struct tHarness_game_config {
-    int disable_cd_check;
+    int enable_cd_check;
     float physics_step_time;
     float fps;
     int freeze_timer;
     unsigned demo_timeout;
+    int enable_diagnostics;
 
     int install_signalhandler;
 } tHarness_game_config;

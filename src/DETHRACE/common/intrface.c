@@ -58,7 +58,6 @@ void ResetInterfaceTimeout() {
 void ChangeSelection(tInterface_spec* pSpec, int* pOld_selection, int* pNew_selection, int pMode, int pSkip_disabled) {
     int i;
     LOG_TRACE("(%p, %p, %p, %d, %d)", pSpec, *pOld_selection, *pNew_selection, pMode, pSkip_disabled);
-    //    LOG_DEBUG("on entry: old: %p, new %p", pOld_selection, pNew_selection);
 
     if (ChoiceDisabled(*pNew_selection)) {
         if (!pSkip_disabled) {
@@ -103,7 +102,6 @@ void ChangeSelection(tInterface_spec* pSpec, int* pOld_selection, int* pNew_sele
         }
         *pOld_selection = *pNew_selection;
     }
-    LOG_DEBUG("new: %d, old %d, new mode %d", *pNew_selection, *pOld_selection, pMode);
 }
 
 // IDA: void __usercall RecopyAreas(tInterface_spec *pSpec@<EAX>, br_pixelmap **pCopy_areas@<EDX>)
@@ -481,7 +479,6 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
         }
     } while ((pSpec->exit_proc == NULL || !(pSpec->exit_proc)(&gCurrent_choice, &gCurrent_mode)) && !go_ahead && !timed_out && !escaped);
 
-    LOG_WARN("OUT OF LOOP %d %d %d", go_ahead, timed_out, escaped);
     gTyping = 0;
     if (pSpec->font_needed) {
         EndRollingLetters();

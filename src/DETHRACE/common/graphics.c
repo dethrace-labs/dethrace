@@ -585,13 +585,11 @@ void AdjustRenderScreenSize() {
         gRender_screen->base_y = gProgram_state.current_render_top;
         gRender_screen->height = gProgram_state.current_render_bottom - gProgram_state.current_render_top;
         gRender_screen->width = gProgram_state.current_render_right - gProgram_state.current_render_left;
-        LOG_DEBUG("renderscreen is %d %d, %d x %d", gRender_screen->base_x, gRender_screen->base_y, gRender_screen->width, gRender_screen->height);
     }
     if (gRender_screen->row_bytes == gRender_screen->width) {
         gRender_screen->flags |= BR_PMF_ROW_WHOLEPIXELS;
     } else {
         gRender_screen->flags &= ~BR_PMF_ROW_WHOLEPIXELS;
-        // TELL_ME_IF_WE_PASS_THIS_WAY();
     }
     gRender_screen->origin_x = gRender_screen->width / 2;
     gRender_screen->origin_y = gRender_screen->height / 2;

@@ -179,7 +179,7 @@ void Harness_Init(int* argc, char* argv[]) {
     LOG_INFO("version: " DETHRACE_VERSION);
 
     // disable the original CD check code
-    harness_game_config.disable_cd_check = 1;
+    harness_game_config.enable_cd_check = 0;
     // original physics time step. Lower values seem to work better at 30+ fps
     harness_game_config.physics_step_time = 40;
     // do not limit fps by default
@@ -188,6 +188,8 @@ void Harness_Init(int* argc, char* argv[]) {
     harness_game_config.freeze_timer = 0;
     // default demo time out is 240s
     harness_game_config.demo_timeout = 240000;
+    // disable developer diagnostics by default
+    harness_game_config.enable_diagnostics = 0;
 
     // install signal handler by default
     harness_game_config.install_signalhandler = 1;
@@ -233,7 +235,7 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
         int handled = 0;
 
         if (strcasecmp(argv[i], "--cdcheck") == 0) {
-            harness_game_config.disable_cd_check = 0;
+            harness_game_config.enable_cd_check = 1;
             handled = 1;
         } else if (strstr(argv[i], "--debug=") != NULL) {
             char* s = strstr(argv[i], "=");
@@ -265,6 +267,9 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
             handled = 1;
         } else if (strcasecmp(argv[i], "--i-am-cheating") == 0) {
             gI_am_cheating = 0xa11ee75d;
+            handled = 1;
+        } else if (strcasecmp(argv[i], "--enable-diagnostics") == 0) {
+            harness_game_config.enable_diagnostics = 1;
             handled = 1;
         }
 
