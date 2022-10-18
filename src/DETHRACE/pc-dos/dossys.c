@@ -530,13 +530,11 @@ void PDSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
 // IDA: void __cdecl PDSwitchToRealResolution()
 void PDSwitchToRealResolution() {
     LOG_TRACE("()");
-    // NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl PDSwitchToLoresMode()
 void PDSwitchToLoresMode() {
     LOG_TRACE("()");
-    // NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall PDMouseButtons(int *pButton_1@<EAX>, int *pButton_2@<EDX>)
