@@ -15,9 +15,9 @@ void Harness_Hook_PDServiceSystem();
 void Harness_Hook_PDSetKeyArray();
 // void Harness_Hook_MainGameLoop(); // limit FPS
 void Harness_Hook_FlushRenderer(); // synchronize in-memory framebuffer and depthbuffer
+void Harness_Hook_GraphicsInit(int render_width, int render_height);
 
 // BRender hooks
-void Harness_Hook_DOSGfxBegin();
 void Harness_Hook_BrDevPaletteSetOld(br_pixelmap* pm);
 void Harness_Hook_BrDevPaletteSetEntryOld(int i, br_colour colour);
 void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src);

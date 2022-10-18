@@ -175,7 +175,7 @@ tRenderer* Window_Create(char* title, int width, int height, int pRender_width, 
     sdl_window_scale.x = ((float)pRender_width) / width;
     sdl_window_scale.y = ((float)pRender_height) / height;
 
-    // SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+    SDL_ShowCursor(SDL_DISABLE);
 
     context = SDL_GL_CreateContext(window);
     if (!context) {

@@ -1504,7 +1504,6 @@ void RenderAFrame(int pDepth_mask_on) {
         gBack_screen->base_y = 0;
         if (gCurrent_race.map_image != NULL) {
             if (gReal_graf_data_index) {
-                LOG_DEBUG("DOUBLING");
                 BrPixelmapRectangleFill(gBack_screen, 0, 0, 640, 40, 0);
                 BrPixelmapRectangleFill(gBack_screen, 0, 440, 640, 40, 0);
                 DRPixelmapDoubledCopy(
