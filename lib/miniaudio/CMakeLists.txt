@@ -5,7 +5,6 @@ target_include_directories(miniaudio
         include
     PRIVATE
         include/miniaudio
-        
 )
 
 target_sources(miniaudio PRIVATE

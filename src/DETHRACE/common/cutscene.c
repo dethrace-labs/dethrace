@@ -5,15 +5,18 @@
 #include "globvars.h"
 #include "globvrpb.h"
 #include "graphics.h"
-#include "harness/config.h"
-#include "harness/os.h"
-#include "harness/trace.h"
 #include "input.h"
 #include "loading.h"
 #include "pd/sys.h"
 #include "smacker.h"
 #include "sound.h"
 #include "utility.h"
+
+#include "harness/config.h"
+#include "harness/hooks.h"
+#include "harness/os.h"
+#include "harness/trace.h"
+
 #include <stdlib.h>
 #include <time.h>
 
@@ -73,6 +76,7 @@ void PlaySmackerFile(char* pSmack_name) {
     unsigned char r, g, b;
     double usf;
     struct timespec ts;
+    tU32 time_next_frame;
 
     if (!gSound_override && !gCut_scene_override) {
         StopMusic();
@@ -107,17 +111,19 @@ void PlaySmackerFile(char* pSmack_name) {
 
             smk_enable_video(s, 1);
 
+            int audio_valid = 0;
+            smacker_audio* smacker_audio_handle;
+            if (Harness_Hook_smacker_audio_init(&smacker_audio_handle, s) == 0) {
+                smk_enable_audio(s, 0, 1);
+                audio_valid = 1;
+            } else {
+                LOG_INFO("Smacker file does not contain audio or failed to initialize smacker audio engine");
+            }
+
+            time_next_frame = PDGetTotalTime();
             smk_first(s);
+            EnsurePaletteUp();
             do {
-                const unsigned char* pal = smk_get_palette(s);
-                for (i = 0; i < 256; i++) {
-                    r = pal[(i * 3)];
-                    g = pal[(i * 3) + 1];
-                    b = pal[(i * 3) + 2];
-                    br_colours_ptr[i] = b | (g << 8) | (r << 16);
-                }
-                DRSetPalette(gCurrent_palette);
-                EnsurePaletteUp();
 
                 const unsigned char* frame = smk_get_video(s);
                 for (i = 0; i < h; i++) {
@@ -125,17 +131,36 @@ void PlaySmackerFile(char* pSmack_name) {
                         dest_pix[(i * gBack_screen->row_bytes) + j] = frame[i * w + j];
                     }
                 }
+
+                const unsigned char* pal = smk_get_palette(s);
+                for (i = 0; i < 256; i++) {
+                    r = pal[(i * 3) + 0];
+                    g = pal[(i * 3) + 1];
+                    b = pal[(i * 3) + 2];
+                    br_colours_ptr[i] = (r << 16) | (g << 8) | (b << 0);
+                }
+                DRSetPalette(gCurrent_palette);
+
+                if (audio_valid) {
+                    Harness_Hook_smacker_audio_step(smacker_audio_handle);
+                }
+                while (PDGetTotalTime() < time_next_frame) {
+                    PossibleService();
+                    OS_Sleep(1);
+                }
+                time_next_frame += delay_ms;
+
                 PDScreenBufferSwap(0);
 
                 if (AnyKeyDown() || EitherMouseButtonDown()) {
                     break;
                 }
-                // wait until its time for the next frame
-                OS_Sleep(delay_ms);
             } while (smk_next(s) == SMK_MORE);
 
+            if (audio_valid) {
+                Harness_Hook_smacker_audio_uninit(smacker_audio_handle);
+            }
             smk_close(s);
-
             FadePaletteDown();
             ClearEntireScreen();
             StartMusic();
@@ -164,7 +189,7 @@ void DoNewGameAnimation() {
 void DoGoToRaceAnimation() {
     LOG_TRACE("()");
 
-    if (!gNet_mode) {
+    if (gNet_mode == eNet_mode_none) {
         if (PercentageChance(50)) {
             PlaySmackerFile("GARAGE2.SMK");
         } else {

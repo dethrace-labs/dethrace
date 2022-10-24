@@ -40,4 +40,12 @@ void Harness_Hook_S3StopAllOutletSounds();
 // Filesystem hooks
 FILE* Harness_Hook_fopen(const char* pathname, const char* mode);
 
+// Smacker audio hooks
+typedef struct smacker_audio smacker_audio;
+
+int Harness_Hook_smacker_audio_init(smacker_audio** ppSmackerAudio, void* smack_handle);
+void Harness_Hook_smacker_audio_uninit(smacker_audio* ppSmackerAudio);
+void Harness_Hook_smacker_audio_step(smacker_audio* ppSmackerAudio);
+
+
 #endif
