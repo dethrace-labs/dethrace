@@ -6,6 +6,8 @@
 
 #include "../renderers/gl/gl_renderer.h"
 #include "../renderers/renderer.h"
+
+#include "harness/config.h"
 #include "harness/trace.h"
 
 #define ARRAY_LEN(array) (sizeof((array)) / sizeof((array)[0]))
@@ -173,6 +175,10 @@ tRenderer* Window_Create(char* title, int width, int height, int pRender_width, 
 
     sdl_window_scale.x = ((float)pRender_width) / width;
     sdl_window_scale.y = ((float)pRender_height) / height;
+
+    if (harness_game_config.start_full_screen) {
+        SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+    }
 
     SDL_ShowCursor(SDL_DISABLE);
 

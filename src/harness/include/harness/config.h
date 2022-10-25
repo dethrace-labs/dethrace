@@ -38,6 +38,7 @@ typedef struct tHarness_game_config {
     unsigned demo_timeout;
     int enable_diagnostics;
     float volume_multiplier;
+    int start_full_screen;
 
     int install_signalhandler;
 } tHarness_game_config;
