@@ -129,7 +129,6 @@ struct {
     float x;
     float y;
 } sdl_window_scale;
-int is_full_screen = 0;
 
 tRenderer gl_renderer = {
     GLRenderer_Init,
@@ -218,8 +217,7 @@ void Window_PollEvents() {
                     }
                 } else if (event.key.type == SDL_KEYUP) {
                     if (is_only_key_modifier(event.key.keysym.mod, KMOD_ALT)) {
-                        is_full_screen = !is_full_screen;
-                        SDL_SetWindowFullscreen(window, is_full_screen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+                        SDL_SetWindowFullscreen(window, (SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN_DESKTOP) ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP);
                     }
                 }
             }
