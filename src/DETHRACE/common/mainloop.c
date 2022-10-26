@@ -664,6 +664,10 @@ tRace_result MainGameLoop() {
     if (gAction_replay_mode) {
         ToggleReplay();
     }
+    // From splatpack x-mas demo
+    if (gArrow_mode) {
+        ToggleArrow();
+    }
 
     if (gHost_abandon_game) {
         result = eRace_game_abandonned;
