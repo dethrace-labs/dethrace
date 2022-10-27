@@ -732,7 +732,7 @@ int ShiftOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec, int pPlaces) {
     if (pOpponent_spec->nnext_sections <= pPlaces) {
         return 0;
     }
-    for (i = 0; COUNT_OF(pOpponent_spec->next_sections) - pPlaces > i; i++) {
+    for (i = 0; i < COUNT_OF(pOpponent_spec->next_sections) - pPlaces; i++) {
         pOpponent_spec->next_sections[i].section_no = pOpponent_spec->next_sections[pPlaces + i].section_no;
         pOpponent_spec->next_sections[i].direction = pOpponent_spec->next_sections[pPlaces + i].direction;
     }

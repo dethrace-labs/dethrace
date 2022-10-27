@@ -863,12 +863,12 @@ float ControlBoundFunkGroovePlus(int pSlot_number, float pValue) {
     LOG_TRACE("(%d, %f)", pSlot_number, pValue);
 
     if (pSlot_number < 0) {
-        return 0.0f;
+        return 0.f;
     }
     if (pSlot_number >= COUNT_OF(gGroove_funk_bindings)) {
         FatalError(kFatalError_UsedRefNumGrooveFunkOutOfRange);
     }
-    *gGroove_funk_bindings[pSlot_number] = fmod(*gGroove_funk_bindings[pSlot_number] + pValue, 1.0);
+    *gGroove_funk_bindings[pSlot_number] = fmodf(*gGroove_funk_bindings[pSlot_number] + pValue, 1.f);
     return *gGroove_funk_bindings[pSlot_number];
 }
 
