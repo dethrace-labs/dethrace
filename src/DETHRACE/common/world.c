@@ -3799,14 +3799,8 @@ void GrooveThisDelic(tGroovidelic_spec* pGroove, tU32 pTime, int pInterrupt_it) 
     the_actor = pGroove->actor;
     pGroove->done_this_frame = 1;
     CalcActorGlobalPos(&actor_pos, the_actor);
-    if (pGroove->mode == eGroove_mode_distance) {
-        if (PointOutOfSight(&actor_pos, gYon_squared)) {
-            return;
-        }
-    } else {
-        if (PointOutOfSight(&actor_pos, 36.0)) {
-            return;
-        }
+    if (PointOutOfSight(&actor_pos, pGroove->mode == eGroove_mode_distance ? gYon_squared : 36.f)) {
+        return;
     }
 
     the_mat = &the_actor->t.t.mat;
@@ -3816,34 +3810,28 @@ void GrooveThisDelic(tGroovidelic_spec* pGroove, tU32 pTime, int pInterrupt_it) 
         || pGroove->path_mode == eMove_absolute) {
         PathGrooveBastard(pGroove, pTime, the_mat, pInterrupt_it);
     }
-    if ((pGroove->object_type != -1 || pGroove->lollipop_mode != -1)
+    if ((pGroove->object_type != eGroove_object_none || pGroove->lollipop_mode != eLollipop_none)
         && (!gAction_replay_mode
             || !ReplayIsPaused()
             || pGroove->object_mode == eMove_controlled
             || pGroove->object_mode == eMove_absolute)) {
-        the_mat->m[0][0] = 1.0;
-        the_actor->t.t.mat.m[0][1] = 0.0;
-        the_actor->t.t.mat.m[0][2] = 0.0;
-        the_actor->t.t.mat.m[1][0] = 0.0;
-        the_actor->t.t.mat.m[1][1] = 1.0;
-        the_actor->t.t.mat.m[1][2] = 0.0;
-        the_actor->t.t.mat.m[2][0] = 0.0;
-        the_actor->t.t.mat.m[2][1] = 0.0;
-        the_actor->t.t.mat.m[2][2] = 1.0;
-        the_actor->t.t.mat.m[3][0] = -pGroove->object_centre.v[0];
-        the_actor->t.t.mat.m[3][1] = -pGroove->object_centre.v[1];
-        the_actor->t.t.mat.m[3][2] = -pGroove->object_centre.v[2];
+        the_mat->m[0][0] = 1.0f;
+        the_mat->m[0][1] = 0.0f;
+        the_mat->m[0][2] = 0.0f;
+        the_mat->m[1][0] = 0.0f;
+        the_mat->m[1][1] = 1.0f;
+        the_mat->m[1][2] = 0.0f;
+        the_mat->m[2][0] = 0.0f;
+        the_mat->m[2][1] = 0.0f;
+        the_mat->m[2][2] = 1.0f;
+        the_mat->m[3][0] = -pGroove->object_centre.v[0];
+        the_mat->m[3][1] = -pGroove->object_centre.v[1];
+        the_mat->m[3][2] = -pGroove->object_centre.v[2];
         ObjectGrooveBastard(pGroove, pTime, the_mat, pInterrupt_it);
-        the_actor->t.t.mat.m[3][0] = the_actor->t.t.mat.m[3][0]
-            + pGroove->object_position.v[0]
-            + pGroove->object_centre.v[0];
-        the_actor->t.t.mat.m[3][1] = pGroove->object_position.v[1]
-            + the_actor->t.t.mat.m[3][1]
-            + pGroove->object_centre.v[1];
-        the_actor->t.t.mat.m[3][2] = pGroove->object_position.v[2]
-            + pGroove->object_centre.v[2]
-            + the_actor->t.t.mat.m[3][2];
-        if (pGroove->lollipop_mode != -1) {
+        the_actor->t.t.mat.m[3][0] += pGroove->object_position.v[0] + pGroove->object_centre.v[0];
+        the_actor->t.t.mat.m[3][1] += pGroove->object_position.v[1] + pGroove->object_centre.v[1];
+        the_actor->t.t.mat.m[3][2] += pGroove->object_position.v[2] + pGroove->object_centre.v[2];
+        if (pGroove->lollipop_mode != eLollipop_none) {
             LollipopizeActor(pGroove->actor, &gCamera_to_world, pGroove->lollipop_mode);
         }
     }
