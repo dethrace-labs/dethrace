@@ -197,7 +197,7 @@ int PointVisibleFromHere(br_vector3* pFrom, br_vector3* pTo) {
     LOG_TRACE("(%p, %p)", pFrom, pTo);
 
     BrVector3Sub(&dir, pTo, pFrom);
-    from = *pFrom;
+    BrVector3Copy(&from, pFrom);
     from.v[1] += 0.15f;
     dir.v[1] += 0.15f;
     FindFace(&from, &dir, &norm, &t, &material);
