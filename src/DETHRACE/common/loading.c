@@ -2812,9 +2812,6 @@ int GetALineAndInterpretCommand(FILE* pF, char** pString_list, int pCount) {
     GetALineAndDontArgue(pF, s);
 
     str = strtok(s, "\t ,/");
-    if (pCount <= 0) {
-        return -1;
-    }
     for (i = 0; i < pCount; i++) {
         if (strcmp(str, pString_list[i]) == 0) {
             return i;
