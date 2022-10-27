@@ -1730,9 +1730,9 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
     LOG_TRACE("(\"%s\", %d, %p, %d, \"%s\", %p)", pCar_name, pDriver, pCar_spec, pOwner, pDriver_name, pStorage_space);
 
     if (pDriver == eDriver_local_human) {
-        if (!strcmp(gProgram_state.car_name, pCar_name))
+        if (strcmp(gProgram_state.car_name, pCar_name) == 0)
             return;
-        if (gProgram_state.car_name[0]) {
+        if (gProgram_state.car_name[0] != '\0') {
             DisposeCar(&gProgram_state.current_car, gProgram_state.current_car.index);
             ClearOutStorageSpace(&gOur_car_storage_space);
         }
@@ -1780,19 +1780,20 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
         PathCat(the_path, the_path, "CARS");
         PathCat(the_path, the_path, gBasic_car_names[0]);
         g = DRfopen(the_path, "rt");
-        if (g == NULL)
+        if (g == NULL) {
             FatalError(kFatalError_OpenResolutionDependentFile);
+        }
     }
     GetAString(f, s);
     strcpy(pCar_spec->name, s);
-    if (strcmp(s, pCar_name) != 0)
+    if (strcmp(s, pCar_name) != 0) {
         FatalError(kFatalError_FileCorrupt_S, pCar_name);
+    }
     if (*pDriver_name != '\0') {
-        strncpy(pCar_spec->driver_name, pDriver_name, sizeof(pCar_spec->driver_name));
-        pCar_spec->driver_name[31] = 0;
+        memcpy(pCar_spec->driver_name, pDriver_name, sizeof(pCar_spec->driver_name));
+        pCar_spec->driver_name[sizeof(pCar_spec->driver_name) - 1] = '\0';
     } else {
-        pCar_spec->driver_name[0] = 'X';
-        pCar_spec->driver_name[1] = 0;
+        strcpy(pCar_spec->driver_name, "X");
     }
     pCar_spec->can_be_stolen = 0;
     pCar_spec->has_been_stolen = 0;
@@ -1810,7 +1811,7 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
             GetALineAndDontArgue(g, s);
             str = strtok(s, "\t ,/");
             if (gAusterity_mode) {
-                pCar_spec->cockpit_images[j] = 0;
+                pCar_spec->cockpit_images[j] = NULL;
             } else {
                 the_image = LoadPixelmap(str);
                 if (the_image == NULL)
@@ -1923,8 +1924,8 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
         pCar_spec->prat_cam_bottom = LoadPixelmap(str);
         PossibleService();
         for (j = 0; j < COUNT_OF(pCar_spec->damage_units); ++j) {
-            if (j == 2) {
-                pCar_spec->damage_units[2].images = 0;
+            if (j == eDamage_driver) {
+                pCar_spec->damage_units[eDamage_driver].images = NULL;
             } else {
                 GetALineAndDontArgue(g, s);
                 str = strtok(s, "\t ,/");
@@ -1987,14 +1988,14 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
             GetALineAndDontArgue(h, s);
             str = strtok(s, "\t ,/");
             sscanf(str, "%d", &pCar_spec->power_ups[i].number_of_parts);
-            for (j = 0; pCar_spec->power_ups[i].number_of_parts > j; ++j) {
+            for (j = 0; j < pCar_spec->power_ups[i].number_of_parts; j++) {
                 GetALineAndDontArgue(h, s);
                 str = strtok(s, "\t ,/");
                 sscanf(str, "%d", &pCar_spec->power_ups[i].info[j].rank_required);
                 str = strtok(NULL, "\t ,/");
                 strcpy(pCar_spec->power_ups[i].info[j].part_name, str);
                 pCar_spec->power_ups[i].info[j].data_ptr = NULL;
-                for (k = 0; k < 3; ++k) {
+                for (k = 0; k < COUNT_OF(pCar_spec->power_ups[i].info[j].prices); k++) {
                     str = strtok(NULL, "\t ,/");
                     sscanf(str, "%d", &pCar_spec->power_ups[i].info[j].prices[k]);
                 }
@@ -2017,15 +2018,15 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
         pCar_spec->red_line = 8000;
     }
     PossibleService();
-    GetThreeInts(f, pCar_spec->engine_noises, &pCar_spec->engine_noises[1], &pCar_spec->engine_noises[2]);
+    GetThreeInts(f, &pCar_spec->engine_noises[0], &pCar_spec->engine_noises[1], &pCar_spec->engine_noises[2]);
     GetAString(f, s);
     pCar_spec->can_be_stolen = strcmp(s, "stealworthy") == 0;
-    GetDamageProgram(f, pCar_spec, 0);
-    GetDamageProgram(f, pCar_spec, 1);
-    GetDamageProgram(f, pCar_spec, 2);
-    GetDamageProgram(f, pCar_spec, 3);
-    GetDamageProgram(f, pCar_spec, 4);
-    GetDamageProgram(f, pCar_spec, 5);
+    GetDamageProgram(f, pCar_spec, eImpact_top);
+    GetDamageProgram(f, pCar_spec, eImpact_bottom);
+    GetDamageProgram(f, pCar_spec, eImpact_left);
+    GetDamageProgram(f, pCar_spec, eImpact_right);
+    GetDamageProgram(f, pCar_spec, eImpact_front);
+    GetDamageProgram(f, pCar_spec, eImpact_back);
     GetALineAndDontArgue(f, s);
     str = strtok(s, "\t ,/");
     strcpy(pCar_spec->grid_icon_names[0], str);
@@ -2033,7 +2034,7 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
     strcpy(pCar_spec->grid_icon_names[1], str);
     str = strtok(NULL, "\t ,/");
     strcpy(pCar_spec->grid_icon_names[2], str);
-    pCar_spec->grid_icon_image = 0;
+    pCar_spec->grid_icon_image = NULL;
     if (gAusterity_mode) {
         LoadSomePixelmaps(pStorage_space, f);
         SkipNLines(f);
@@ -2065,12 +2066,12 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
 
     number_of_floorpans = 5;
     for (i = old_material_count; i < pStorage_space->materials_count; i++) {
-        if (pStorage_space->materials[i] && pStorage_space->materials[i]->colour_map) {
-            pStorage_space->materials[i]->flags |= (BR_MATF_LIGHT | BR_MATF_PRELIT | BR_MATF_SMOOTH);
+        if (pStorage_space->materials[i] != NULL && pStorage_space->materials[i]->colour_map != NULL) {
+            pStorage_space->materials[i]->flags |= BR_MATF_LIGHT | BR_MATF_PRELIT | BR_MATF_SMOOTH;
             if (pStorage_space->materials[i]->flags & BR_MATF_TWO_SIDED) {
                 its_a_floorpan = 0;
                 for (j = 0; j < number_of_floorpans; j++) {
-                    if (!strcmp(gFloorpan_names[j], pStorage_space->materials[i]->identifier)) {
+                    if (strcmp(gFloorpan_names[j], pStorage_space->materials[i]->identifier) == 0) {
                         its_a_floorpan = 1;
                         break;
                     }
@@ -2078,7 +2079,7 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
                 if (!its_a_floorpan) {
                     pStorage_space->materials[i]->user = DOUBLESIDED_USER_FLAG;
                 }
-                pStorage_space->materials[i]->flags &= 0xFFFFEFFF;
+                pStorage_space->materials[i]->flags &= ~BR_MATF_TWO_SIDED;
             }
             pStorage_space->materials[i]->index_shade = gShade_list[0];
             BrMaterialUpdate(pStorage_space->materials[i], BR_MATU_ALL);
@@ -2090,7 +2091,7 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
     if (pDriver == eDriver_local_human) {
         pCar_spec->car_master_actor = gSelf;
     } else {
-        pCar_spec->car_master_actor = BrActorAllocate(0, NULL);
+        pCar_spec->car_master_actor = BrActorAllocate(BR_ACTOR_NONE, NULL);
         BrActorAdd(gNon_track_actor, pCar_spec->car_master_actor);
     }
     GetALineAndDontArgue(f, s);
@@ -2102,20 +2103,21 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
         GetALineAndDontArgue(f, s);
         str = strtok(s, "\t ,/");
         sscanf(str, "%f", &temp_float);
-        if (temp_float < 0.0 && pDriver != eDriver_local_human) {
+        if (temp_float < 0.f && pDriver != eDriver_local_human) {
             FreeUpBonnetModels(&pStorage_space->models[old_model_count], pStorage_space->models_count - old_model_count);
             pCar_spec->car_actor_count--;
             break;
         }
-        if (temp_float >= 1.0)
+        if (temp_float >= 1.f) {
             pCar_spec->car_model_actors[i].min_distance_squared = temp_float * temp_float;
-        else
+        } else {
             pCar_spec->car_model_actors[i].min_distance_squared = temp_float;
+        }
         str = strtok(NULL, "\t ,/");
         PathCat(the_path, gApplication_path, "ACTORS");
         PathCat(the_path, the_path, str);
         pCar_spec->car_model_actors[i].actor = BrActorLoad(the_path);
-        if (!pCar_spec->car_model_actors[i].actor) {
+        if (pCar_spec->car_model_actors[i].actor == NULL) {
             FatalError(kFatalError_LoadCarActor);
         }
         LinkModelsToActor(
@@ -2127,18 +2129,18 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
             SetModelFlags(pStorage_space->models[j], pOwner);
         }
         BrActorAdd(pCar_spec->car_master_actor, pCar_spec->car_model_actors[i].actor);
-        if (pCar_spec->car_model_actors[i].min_distance_squared == 0.0) {
+        if (pCar_spec->car_model_actors[i].min_distance_squared == 0.f) {
             pCar_spec->principal_car_actor = i;
         }
     }
-    if (pDriver != eDriver_local_human && pCar_spec->car_model_actors[pCar_spec->car_actor_count - 1].min_distance_squared < 0.0) {
+    if (pDriver != eDriver_local_human && pCar_spec->car_model_actors[pCar_spec->car_actor_count - 1].min_distance_squared < 0.f) {
         SwitchCarActor(pCar_spec, pCar_spec->car_actor_count - 2);
     } else {
         SwitchCarActor(pCar_spec, pCar_spec->car_actor_count - 1);
     }
     GetAString(f, s);
     pCar_spec->screen_material = BrMaterialFind(s);
-    if (pCar_spec->screen_material) {
+    if (pCar_spec->screen_material != NULL) {
         gSource_screen_mat = pCar_spec->screen_material;
         pCar_spec->screen_material = DRMaterialClone(pCar_spec->screen_material);
         gDestn_screen_mat = pCar_spec->screen_material;
@@ -2147,12 +2149,13 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
         gDestn_screen_mat = NULL;
     }
     pCar_spec->screen_material_source = NULL;
-    if (gDestn_screen_mat)
+    if (gDestn_screen_mat != NULL) {
         MungeWindscreen(pCar_spec->car_model_actors[pCar_spec->principal_car_actor].actor->model);
+    }
     GetALineAndDontArgue(f, s);
     str = strtok(s, "\t ,/");
     sscanf(str, "%d", &pCar_spec->number_of_steerable_wheels);
-    for (i = 0; pCar_spec->number_of_steerable_wheels > i; ++i) {
+    for (i = 0; i < pCar_spec->number_of_steerable_wheels; i++) {
         GetALineAndDontArgue(f, s);
         str = strtok(s, "\t ,/");
         sscanf(str, "%d", &pCar_spec->steering_ref[i]);
@@ -2160,7 +2163,7 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
     }
     GetALineAndDontArgue(f, s);
     str = strtok(s, "\t ,/");
-    for (i = 0; i < 4; ++i) {
+    for (i = 0; i < COUNT_OF(pCar_spec->lf_sus_ref); i++) {
         sscanf(str, "%d", &pCar_spec->lf_sus_ref[i]);
         AddRefOffset(&pCar_spec->lf_sus_ref[i]);
         str = strtok(NULL, "\t ,/");
@@ -2168,21 +2171,21 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
     PossibleService();
     GetALineAndDontArgue(f, s);
     str = strtok(s, "\t ,/");
-    for (i = 0; i < 4; ++i) {
+    for (i = 0; i < COUNT_OF(pCar_spec->rf_sus_ref); i++) {
         sscanf(str, "%d", &pCar_spec->rf_sus_ref[i]);
         AddRefOffset(&pCar_spec->rf_sus_ref[i]);
         str = strtok(NULL, "\t ,/");
     }
     GetALineAndDontArgue(f, s);
     str = strtok(s, "\t ,/");
-    for (i = 0; i < 2; ++i) {
+    for (i = 0; i < COUNT_OF(pCar_spec->lr_sus_ref); i++) {
         sscanf(str, "%d", &pCar_spec->lr_sus_ref[i]);
         AddRefOffset(&pCar_spec->lr_sus_ref[i]);
         str = strtok(NULL, "\t ,/");
     }
     GetALineAndDontArgue(f, s);
     str = strtok(s, "\t ,/");
-    for (i = 0; i < 2; ++i) {
+    for (i = 0; i < COUNT_OF(pCar_spec->rr_sus_ref); i++) {
         sscanf(str, "%d", &pCar_spec->rr_sus_ref[i]);
         AddRefOffset(&pCar_spec->rr_sus_ref[i]);
         str = strtok(NULL, "\t ,/");
@@ -2216,7 +2219,7 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
     str = strtok(s, "\t ,/");
     sscanf(str, "%f", &temp_float);
     pCar_spec->non_driven_wheels_circum = temp_float * 2.0 * 3.141592653589793;
-    pCar_spec->car_model_variable = pDriver != 4;
+    pCar_spec->car_model_variable = pDriver != eDriver_local_human;
     PossibleService();
     GetALineAndDontArgue(f, s);
     AddFunkotronics(f, pOwner, gGroove_funk_offset);
@@ -2226,9 +2229,8 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
         PossibleService();
         // Jeff: Bug? pOwner will never be 3. Probably this was supposed to be "pDriver == eDriver_net_human"?
         if (pOwner == 3 || gAusterity_mode) {
-            temp_float = SkipCrushData(f);
-            pCar_spec->car_model_actors[i].crush_data.softness_factor = temp_float;
-            pCar_spec->car_model_actors[i].crush_data.crush_points = 0;
+            pCar_spec->car_model_actors[i].crush_data.softness_factor = SkipCrushData(f);
+            pCar_spec->car_model_actors[i].crush_data.crush_points = NULL;
             pCar_spec->car_model_actors[i].crush_data.number_of_crush_points = 0;
         } else {
             ReadCrushData(f, &pCar_spec->car_model_actors[i].crush_data);
@@ -2249,7 +2251,7 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
         SkipCrushData(f);
     }
     PossibleService();
-    for (i = 0; i < COUNT_OF(gWheel_actor_names); ++i) {
+    for (i = 0; i < COUNT_OF(gWheel_actor_names); i++) {
         pCar_spec->wheel_actors[i] = DRActorFindRecurse(pCar_spec->car_master_actor, gWheel_actor_names[i]);
     }
     PossibleService();
@@ -2268,8 +2270,9 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
         } else {
             initial_vertex = GetAnInt(f);
             pCar_spec->fire_vertex[i] = initial_vertex;
-            if (pCar_spec->fire_vertex[i] >= vertex_total)
+            if (pCar_spec->fire_vertex[i] >= vertex_total) {
                 pCar_spec->fire_vertex[i] = 0;
+            }
             v_num = 0;
             for (group = 0; group < V11MODEL(model)->ngroups; group++) {
                 for (v = 0; v < V11MODEL(model)->groups[group].nvertices; v++) {
