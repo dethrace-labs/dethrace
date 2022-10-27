@@ -635,7 +635,7 @@ void CalcGetNearPlayerRoute(tOpponent_spec* pOpponent_spec, tCar_spec* pPlayer) 
         dr_dprintf("%s: CalcGetNearPlayerRoute() - In loop; our section #%d, player's section #%d", pOpponent_spec->car_spec->driver_name, temp_store[0].section_no, players_section);
         gSFS_count++;
         gSFS_cycles_this_time = 0;
-        SearchForSection(temp_store, perm_store, &num_of_perm_store_sections, players_section, 1, 0.0, pOpponent_spec);
+        SearchForSection(temp_store, perm_store, &num_of_perm_store_sections, players_section, 1, 0.f, pOpponent_spec);
         gSFS_total_cycles += gSFS_cycles_this_time;
         if (gSFS_max_cycles < gSFS_cycles_this_time) {
             gSFS_max_cycles = gSFS_cycles_this_time;
