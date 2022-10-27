@@ -2285,6 +2285,42 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
     }
     fclose(f);
     fclose(g);
+
+#if DETHRACE_FIX_BUGS
+#define CHECK_BINDING_INDEX(IDX)                                                                                 \
+    do {                                                                                                         \
+        if ((IDX) >= 0) {                                                                                        \
+            if (gGroove_funk_bindings[IDX] == NULL) {                                                            \
+                LOG_WARN("Disabling invalid groove binding for " #IDX "=%d (%d)", IDX, IDX-gGroove_funk_offset); \
+                IDX = -1;                                                                                        \
+            }                                                                                                    \
+        }                                                                                                        \
+    } while (0)
+    for (i = 0; i < pCar_spec->number_of_steerable_wheels; i++) {
+        CHECK_BINDING_INDEX(pCar_spec->steering_ref[i]);
+    }
+    for (i = 0; i < COUNT_OF(pCar_spec->lf_sus_ref); i++) {
+        CHECK_BINDING_INDEX(pCar_spec->lf_sus_ref[i]);
+    }
+    for (i = 0; i < COUNT_OF(pCar_spec->rf_sus_ref); i++) {
+        CHECK_BINDING_INDEX(pCar_spec->rf_sus_ref[i]);
+    }
+    for (i = 0; i < COUNT_OF(pCar_spec->lr_sus_ref); i++) {
+        CHECK_BINDING_INDEX(pCar_spec->lr_sus_ref[i]);
+    }
+    for (i = 0; i < COUNT_OF(pCar_spec->rr_sus_ref); i++) {
+        CHECK_BINDING_INDEX(pCar_spec->rr_sus_ref[i]);
+    }
+    CHECK_BINDING_INDEX(pCar_spec->driven_wheels_spin_ref_1);
+    CHECK_BINDING_INDEX(pCar_spec->driven_wheels_spin_ref_2);
+    CHECK_BINDING_INDEX(pCar_spec->driven_wheels_spin_ref_3);
+    CHECK_BINDING_INDEX(pCar_spec->driven_wheels_spin_ref_4);
+    CHECK_BINDING_INDEX(pCar_spec->non_driven_wheels_spin_ref_1);
+    CHECK_BINDING_INDEX(pCar_spec->non_driven_wheels_spin_ref_2);
+    CHECK_BINDING_INDEX(pCar_spec->non_driven_wheels_spin_ref_3);
+    CHECK_BINDING_INDEX(pCar_spec->non_driven_wheels_spin_ref_4);
+#undef CHECK_BINDING_INDEX
+#endif
 }
 
 // IDA: void __cdecl LoadHeadupImages()
