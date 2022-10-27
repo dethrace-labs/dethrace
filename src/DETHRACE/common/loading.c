@@ -1673,7 +1673,7 @@ void MungeWindscreen(br_model* pModel) {
         for (i = 0; i < pModel->nfaces; i++) {
             if (!face->material
                 || (face->material->identifier
-                    && gSource_screen_mat && !strcmp(face->material->identifier, gSource_screen_mat->identifier))) {
+                    && gSource_screen_mat != NULL && !strcmp(face->material->identifier, gSource_screen_mat->identifier))) {
                 face->material = gDestn_screen_mat;
             }
             face++;
