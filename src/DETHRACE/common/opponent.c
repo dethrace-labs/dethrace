@@ -439,7 +439,7 @@ void CalcRaceRoute(tOpponent_spec* pOpponent_spec) {
                 } else if (race_section_count == 0 && gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0] == node_no) {
                     temp_section_array[normal_section_ok_direction_count] = section_no;
                     normal_section_ok_direction_count++;
-                } else if (race_section_count == 0 && normal_section_ok_direction_count == 0 && (!gProgram_state.AI_vehicles.path_sections[section_no].one_way || gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1] == node_no)) {
+                } else if (race_section_count == 0 && normal_section_ok_direction_count == 0 && (!gProgram_state.AI_vehicles.path_sections[section_no].one_way || gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1] != node_no)) {
                     temp_section_array[normal_section_wrong_direction_count] = section_no;
                     normal_section_wrong_direction_count++;
                 }
