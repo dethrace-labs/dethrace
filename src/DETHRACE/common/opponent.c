@@ -330,7 +330,7 @@ void DeadStopCar(tCar_spec* pCar_spec) {
     pCar_spec->acc_force = 0.f;
     pCar_spec->brake_force = 0.f;
     pCar_spec->curvature = 0.f;
-    pCar_spec->gear = 0.f;
+    pCar_spec->gear = 0;
     pCar_spec->revs = 0.f;
     BrVector3Set(&pCar_spec->omega, 0.f, 0.f, 0.f);
     BrVector3Set(&pCar_spec->v, 0.f, 0.f, 0.f);
