@@ -988,7 +988,7 @@ br_uint_32 AddProximities(br_actor* pActor, br_material* pMat, tFunkotronic_spec
     int i;
     LOG_TRACE("(%p, %p, %p)", pActor, pMat, pThe_funk);
 
-    if (pActor->model) {
+    if (pActor->model != NULL) {
         if (pThe_funk->material == pMat) {
             AddProximityVertexXYZ(
                 pActor->model->bounds.min.v[0],
@@ -1031,14 +1031,13 @@ br_uint_32 AddProximities(br_actor* pActor, br_material* pMat, tFunkotronic_spec
                 pActor->model->bounds.max.v[2],
                 pThe_funk);
         } else {
-            the_face = pActor->model->faces;
             for (i = 0; i < pActor->model->nfaces; i++) {
+                the_face = &pActor->model->faces[i];
                 if (pThe_funk->material == the_face->material) {
                     AddProximityVertex(&pActor->model->vertices[the_face->vertices[0]].p, pThe_funk);
                     AddProximityVertex(&pActor->model->vertices[the_face->vertices[1]].p, pThe_funk);
                     AddProximityVertex(&pActor->model->vertices[the_face->vertices[2]].p, pThe_funk);
                 }
-                the_face++;
             }
         }
     }
