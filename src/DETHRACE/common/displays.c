@@ -746,7 +746,7 @@ int NewTextHeadupSlot2(int pSlot_index, int pFlash_rate, int pLifetime, int pFon
     LOG_TRACE("(%d, %d, %d, %d, \"%s\", %d)", pSlot_index, pFlash_rate, pLifetime, pFont_index, pText, pQueue_it);
 
     time = PDGetTotalTime();
-    if (pQueue_it && pSlot_index == 4 && (unsigned int)(time - gLast_centre_headup) < 1000) {
+    if (pQueue_it && pSlot_index == 4 && time - gLast_centre_headup < 1000) {
         if (gQueued_headup_count == 4) {
             KillOldestQueuedHeadup();
         }

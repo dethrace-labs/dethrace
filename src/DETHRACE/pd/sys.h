@@ -146,7 +146,7 @@ int PDGetGorePassword(void);
 
 void PDDisplayGoreworthiness(int pGory);
 
-void PDEnterDebugger(char* pStr);
+HARNESS_NORETURN void PDEnterDebugger(char* pStr);
 
 // Added function
 br_material* PDMissingMaterial(char* name);

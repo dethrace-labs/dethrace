@@ -4527,13 +4527,18 @@ void ViewOpponent() {
 // IDA: void __cdecl ToggleCarToCarCollisions()
 void ToggleCarToCarCollisions() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+   gCar_car_collisions = !gCar_car_collisions;
+   if (gCar_car_collisions) {
+       NewTextHeadupSlot(4, 0, 3000, -4, "Car Car Collisions");
+   } else {
+       NewTextHeadupSlot(4, 0, 3000, -4, "Ghost Cars");
+   }
 }
 
 // IDA: void __cdecl SwapCar()
 void SwapCar() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl AdjustDownForce()
@@ -4541,19 +4546,41 @@ void AdjustDownForce() {
     char s[100];
     tCar_spec* c;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    c = gCar_to_view;
+    c->down_force_speed += 50.f;
+    if (c->down_force_speed > 2000.f) {
+        c->down_force_speed = 50.f;
+    }
+    if (c->down_force_speed > 300.f) {
+        c->down_force_speed = 2000.0;
+    }
+    sprintf(s, "DownForceSpeed %f", c->down_force_speed);
+    NewTextHeadupSlot(4, 0, 1500, -4, s);
 }
 
 // IDA: void __cdecl FreezeMechanics()
 void FreezeMechanics() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gFreeze_mechanics = !gFreeze_mechanics;
+    if (gFreeze_mechanics) {
+        NewTextHeadupSlot(4, 0, 3000, -4, "Mechanics Frozen");
+    } else {
+        NewTextHeadupSlot(4, 0, 3000, -4, "Thawed Mechanics");
+    }
 }
 
 // IDA: void __cdecl PutOpponentsInNeutral()
 void PutOpponentsInNeutral() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gStop_opponents_moving = !gStop_opponents_moving;
+    if (gStop_opponents_moving == 0) {
+        NewTextHeadupSlot(4, 0, 3000, -4, "Opponents in neutral");
+    } else {
+        NewTextHeadupSlot(4, 0, 3000, -4, "Back in gear");
+    }
 }
 
 // IDA: void __cdecl SetPanningFieldOfView()
