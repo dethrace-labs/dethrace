@@ -141,16 +141,14 @@ void S3ServiceSoundSources() {
 }
 
 int S3UpdateSpatialSound(tS3_channel* chan) {
-    int v1;                   // eax
     int close_enough_to_play; // [esp+10h] [ebp-4h]
 
     if (chan->sound_source_ptr && chan->sound_source_ptr->ambient) {
-        v1 = S3Calculate3D(chan, 1);
+        close_enough_to_play = S3Calculate3D(chan, 1);
     } else {
-        v1 = S3Calculate3D(chan, 0);
+        close_enough_to_play = S3Calculate3D(chan, 0);
     }
-    close_enough_to_play = v1;
-    if (v1) {
+    if (close_enough_to_play) {
         S3SyncSampleVolume(chan);
         S3SyncSampleRate(chan);
     }
@@ -346,7 +344,7 @@ tS3_sound_tag S3ServiceSoundSource(tS3_sound_source* src) {
 
     if (S3Calculate3D(&gS3_channel_template, 1) == 0) {
         src->tag = 0;
-        src->channel = 0;
+        src->channel = NULL;
         return 0;
     }
 
@@ -496,9 +494,9 @@ int S3Calculate3D(tS3_channel* chan, int pIs_ambient) {
         if (sound_source_ptr->velocity_ptr) {
             S3CopyVector3(&chan->velocity, sound_source_ptr->velocity_ptr, sound_source_ptr->brender_vector);
         } else {
-            chan->velocity.x = (chan->position.x - chan->lastpos.x) / 1000.0 * (double)gS3_service_time_delta;
-            chan->velocity.y = (chan->position.y - chan->lastpos.y) / 1000.0 * (double)gS3_service_time_delta;
-            chan->velocity.z = (chan->position.z - chan->lastpos.z) / 1000.0 * (double)gS3_service_time_delta;
+            chan->velocity.x = (chan->position.x - chan->lastpos.x) / 1000.0f * gS3_service_time_delta;
+            chan->velocity.y = (chan->position.y - chan->lastpos.y) / 1000.0f * gS3_service_time_delta;
+            chan->velocity.z = (chan->position.z - chan->lastpos.z) / 1000.0f * gS3_service_time_delta;
             chan->lastpos = chan->position;
         }
     }
@@ -508,6 +506,7 @@ int S3Calculate3D(tS3_channel* chan, int pIs_ambient) {
     if (dist_squared < 0) {
         dist_squared = dist_squared * -1.0;
     }
+
     if (chan->pMax_distance_squared < dist_squared) {
         return 0;
     }
@@ -517,21 +516,21 @@ int S3Calculate3D(tS3_channel* chan, int pIs_ambient) {
         dist = sqrtf(dist_squared);
     }
     if (pIs_ambient) {
-        v11 = 1.0 - ((chan->position.z - gS3_listener_position_now.z) * (chan->velocity.z - gS3_listener_vel_now.z) + (chan->velocity.y - gS3_listener_vel_now.y) * (chan->position.y - gS3_listener_position_now.y) + (chan->position.x - gS3_listener_position_now.x) * (chan->velocity.x - gS3_listener_vel_now.x)) / dist / flt_531D98;
+        v11 = 1.0f - ((chan->position.z - gS3_listener_position_now.z) * (chan->velocity.z - gS3_listener_vel_now.z) + (chan->velocity.y - gS3_listener_vel_now.y) * (chan->position.y - gS3_listener_position_now.y) + (chan->position.x - gS3_listener_position_now.x) * (chan->velocity.x - gS3_listener_vel_now.x)) / dist / flt_531D98;
         if (v11 <= 2.0f) {
-            if (v11 < 0.5) {
-                v11 = 0.5;
+            if (v11 < 0.5f) {
+                v11 = 0.5f;
             }
         } else {
-            v11 = 2.0;
+            v11 = 2.0f;
         }
         chan->rate = chan->initial_pitch * v11;
     } else {
         chan->rate = chan->initial_pitch;
     }
-    vol_multiplier = 1.0 / (dist / 6.0 + 1.0);
+    vol_multiplier = 1.0f / (dist / 6.0f + 1.0f);
     if (!gS3_inside_cockpit) {
-        vol_multiplier = vol_multiplier * 1.3;
+        vol_multiplier = vol_multiplier * 1.3f;
     }
     v10 = (chan->position.z - gS3_listener_position_now.z) * gS3_listener_left_now.z
         + (chan->position.y - gS3_listener_position_now.y) * gS3_listener_left_now.y
@@ -542,11 +541,11 @@ int S3Calculate3D(tS3_channel* chan, int pIs_ambient) {
     if (v10 > 1.0) {
         v10 = v10 - floor(v10);
     }
-    chan->left_volume = (v10 + 1.0) / 2.0 * ((double)chan->initial_volume * vol_multiplier) * chan->volume_multiplier;
+    chan->left_volume = (v10 + 1.0f) / 2.0f * ((double)chan->initial_volume * vol_multiplier) * chan->volume_multiplier;
     if (chan->left_volume < 0) {
         chan->left_volume = 0;
     }
-    chan->right_volume = (1.0 - v10) / 2.0 * ((double)chan->initial_volume * vol_multiplier) * chan->volume_multiplier;
+    chan->right_volume = (1.0f - v10) / 2.0f * ((double)chan->initial_volume * vol_multiplier) * chan->volume_multiplier;
     if (chan->right_volume < 0) {
         chan->right_volume = 0;
     }
