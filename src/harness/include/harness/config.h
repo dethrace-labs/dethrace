@@ -36,6 +36,7 @@ typedef struct tHarness_game_config {
     int freeze_timer;
     unsigned demo_timeout;
     int enable_diagnostics;
+    float volume_multiplier;
 
     int install_signalhandler;
 } tHarness_game_config;

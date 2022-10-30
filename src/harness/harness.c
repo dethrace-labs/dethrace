@@ -190,6 +190,8 @@ void Harness_Init(int* argc, char* argv[]) {
     harness_game_config.demo_timeout = 240000;
     // disable developer diagnostics by default
     harness_game_config.enable_diagnostics = 0;
+    // no volume multiplier
+    harness_game_config.volume_multiplier = 1.0f;
 
     // install signal handler by default
     harness_game_config.install_signalhandler = 1;
@@ -270,6 +272,11 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
             handled = 1;
         } else if (strcasecmp(argv[i], "--enable-diagnostics") == 0) {
             harness_game_config.enable_diagnostics = 1;
+            handled = 1;
+        } else if (strstr(argv[i], "--volume-multiplier=") != NULL) {
+            char* s = strstr(argv[i], "=");
+            harness_game_config.volume_multiplier = atof(s + 1);
+            LOG_INFO("Volume multiplier set to %f", harness_game_config.volume_multiplier);
             handled = 1;
         }
 

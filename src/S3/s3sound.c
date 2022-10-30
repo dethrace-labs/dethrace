@@ -1,5 +1,6 @@
 #include "s3sound.h"
 #include "audio.h"
+#include "harness/config.h"
 #include "miniaudio/miniaudio.h"
 #include "resource.h"
 #include <stdio.h>
@@ -15,33 +16,20 @@ tS3_sample_filter* gS3_sample_filter_disable_func;
 ma_engine engine;
 
 int S3OpenSampleDevice() {
-
     ma_result result;
 
     ma_engine_config engineConfig;
     engineConfig = ma_engine_config_init();
-
     engineConfig.sampleRate = 22050;
+
     result = ma_engine_init(&engineConfig, &engine);
     if (result != MA_SUCCESS) {
         printf("Failed to initialize audio engine.");
         return 0;
     }
 
-    ma_engine_set_volume(&engine, 0.5f);
+    ma_engine_set_volume(&engine, harness_game_config.volume_multiplier);
 
-    // if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024) == -1) {
-    //     return 0;
-    // }
-
-    // Mix_AllocateChannels(20);
-
-    // if (DirectSoundCreate(0, &gS3_direct_sound_ptr, 0)) {
-    //     return 0;
-    // }
-    // if (gS3_direct_sound_ptr->lpVtbl->SetCooperativeLevel(gS3_direct_sound_ptr, hWnd, 3)) {
-    //     return 0;
-    // }
     S3Enable();
     return 1;
 }
