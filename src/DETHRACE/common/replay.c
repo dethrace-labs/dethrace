@@ -7,8 +7,6 @@
 #include "globvrpb.h"
 #include "grafdata.h"
 #include "graphics.h"
-#include "harness/os.h"
-#include "harness/trace.h"
 #include "input.h"
 #include "loading.h"
 #include "main.h"
@@ -20,6 +18,10 @@
 #include "sys.h"
 #include "utility.h"
 #include "world.h"
+
+#include "harness/config.h"
+#include "harness/os.h"
+#include "harness/trace.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -303,6 +305,11 @@ void MoveToStartOfReplay() {
 // IDA: void __cdecl ToggleReplay()
 void ToggleReplay() {
     LOG_TRACE("()");
+
+    if (!harness_game_config.enable_replay) {
+        NewTextHeadupSlot(4, 0, 1000, -4, "Action replay disabled (start dethrace with --enable-replay)");
+        return;
+    }
 
     if (!IsActionReplayAvailable()) {
         NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(37));
