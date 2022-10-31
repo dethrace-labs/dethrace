@@ -2290,7 +2290,7 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
 #define CHECK_BINDING_INDEX(IDX)                                                                                 \
     do {                                                                                                         \
         if ((IDX) >= 0) {                                                                                        \
-            if (gGroove_funk_bindings[IDX] == NULL) {                                                            \
+            if (IDX >= COUNT_OF(gGroove_funk_bindings) || gGroove_funk_bindings[IDX] == NULL) {                                                            \
                 LOG_WARN("Disabling invalid groove binding for " #IDX "=%d (%d)", IDX, IDX-gGroove_funk_offset); \
                 IDX = -1;                                                                                        \
             }                                                                                                    \
