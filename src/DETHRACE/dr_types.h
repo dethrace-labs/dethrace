@@ -74,7 +74,7 @@ typedef struct tCar_spec_struct2 tCar_spec2;
 typedef struct tPath_node_struct tPath_node;
 typedef struct tPath_section_struct tPath_section;
 typedef tU32 tPlayer_ID;
-typedef void tPipe_reset_proc();
+typedef void tPipe_reset_proc(void);
 typedef struct tPowerup tPowerup;
 #ifdef DETHRACE_FIX_BUGS
 typedef int tGot_proc(tPowerup*, tCar_spec*);
