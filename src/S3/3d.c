@@ -517,12 +517,10 @@ int S3Calculate3D(tS3_channel* chan, int pIs_ambient) {
     }
     if (pIs_ambient) {
         v11 = 1.0f - ((chan->position.z - gS3_listener_position_now.z) * (chan->velocity.z - gS3_listener_vel_now.z) + (chan->velocity.y - gS3_listener_vel_now.y) * (chan->position.y - gS3_listener_position_now.y) + (chan->position.x - gS3_listener_position_now.x) * (chan->velocity.x - gS3_listener_vel_now.x)) / dist / flt_531D98;
-        if (v11 <= 2.0f) {
-            if (v11 < 0.5f) {
-                v11 = 0.5f;
-            }
-        } else {
+        if (v11 > 2.0f) {
             v11 = 2.0f;
+        } else if (v11 < 0.5f) {
+            v11 = 0.5;
         }
         chan->rate = chan->initial_pitch * v11;
     } else {
