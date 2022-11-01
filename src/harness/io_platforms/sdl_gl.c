@@ -169,7 +169,7 @@ tRenderer* Window_Create(char* title, int width, int height, int pRender_width, 
         SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
     if (window == NULL) {
-        LOG_PANIC("Failed to create window");
+        LOG_PANIC("Failed to create window. %s", SDL_GetError());
     }
 
     sdl_window_scale.x = ((float)pRender_width) / width;

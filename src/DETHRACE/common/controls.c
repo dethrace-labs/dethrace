@@ -274,7 +274,7 @@ tEdit_func* gEdit_funcs[10][18][8] = {
         // 1
         { ToggleOpponentProcessing, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
         // 2
-        { CopStartPointInfo, DeleteCopStartPoint, DropCopStartPoint, NULL /* sub_411E7F (empty func) */, NULL, NULL, NULL },
+        { CopStartPointInfo, DeleteCopStartPoint, DropCopStartPoint, NULL, CycleCopStartPointType, NULL, NULL, NULL },
         // 3
         { ToggleMellowOpponents, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
         // 4
