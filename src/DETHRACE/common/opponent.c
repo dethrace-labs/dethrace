@@ -2336,7 +2336,7 @@ void MungeOpponents(tU32 pFrame_period) {
             }
         }
         for (i = 0; i < gNumber_of_cops_before_faffage; i++) {
-            if (!gProgram_state.AI_vehicles.opponents[i].finished_for_this_race) {
+            if (!gProgram_state.AI_vehicles.cops[i].finished_for_this_race) {
                 if (un_stun_flag) {
                     UnStunTheBugger(&gProgram_state.AI_vehicles.cops[i]);
                 }

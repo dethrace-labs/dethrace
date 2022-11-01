@@ -498,6 +498,9 @@ void DoHeadups(tU32 pThe_time) {
                                     (((1500 - time_factor) * the_headup->data.fancy_info.shear_amount / 500) << 16)
                                         / the_headup->data.image_info.image->height);
                             } else {
+#if DETHRACE_FIX_BUGS
+                                time_factor = MAX(time_factor, 0);
+#endif
                                 DRPixelmapRectangleShearedCopy(
                                     gBack_screen,
                                     the_headup->x - the_headup->data.fancy_info.shear_amount * (time_factor - 500) / 500,
@@ -988,11 +991,11 @@ void DoDamageScreen(tU32 pThe_time) {
         if (gProgram_state.which_view != eView_forward) {
             return;
         }
-        the_wobble_y = gScreen_wobble_x;
-        the_wobble_x = gScreen_wobble_y;
+        the_wobble_x = gScreen_wobble_x;
+        the_wobble_y = gScreen_wobble_y;
     } else {
-        the_wobble_y = gProgram_state.current_car.damage_x_offset;
-        the_wobble_x = gProgram_state.current_car.damage_y_offset;
+        the_wobble_x = gProgram_state.current_car.damage_x_offset;
+        the_wobble_y = gProgram_state.current_car.damage_y_offset;
         if (gProgram_state.current_car.damage_background) {
             DRPixelmapRectangleMaskedCopy(
                 gBack_screen,
@@ -1007,17 +1010,17 @@ void DoDamageScreen(tU32 pThe_time) {
     }
     for (i = 0; i < COUNT_OF(gProgram_state.current_car.damage_units); i++) {
         the_damage = &gProgram_state.current_car.damage_units[i];
-        if (i != 2) {
+        if (i != eDamage_driver) {
             the_image = the_damage->images;
             the_step = 5 * the_damage->damage_level / 100;
             y_pitch = (the_image->height / 2) / 5;
             DRPixelmapRectangleMaskedCopy(
                 gBack_screen,
-                the_wobble_y + gProgram_state.current_car.damage_units[i].x_coord,
-                the_wobble_x + gProgram_state.current_car.damage_units[i].y_coord,
+                the_wobble_x + gProgram_state.current_car.damage_units[i].x_coord,
+                the_wobble_y + gProgram_state.current_car.damage_units[i].y_coord,
                 the_image,
                 0,
-                y_pitch * (2 * (5 * the_damage->damage_level / 100) + ((pThe_time / the_damage->periods[5 * the_damage->damage_level / 100]) & 1)),
+                y_pitch * (2 * the_step + ((pThe_time / the_damage->periods[5 * the_damage->damage_level / 100]) & 1)),
                 the_image->width,
                 y_pitch);
         }
