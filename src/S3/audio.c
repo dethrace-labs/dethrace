@@ -710,11 +710,11 @@ void S3Service(int inside_cockpit, int unk1) {
             } else if (c->spatial_sound && c->active) {
                 if (S3UpdateSpatialSound(c)) {
                     if (c->sound_source_ptr && c->sound_source_ptr->ambient && !S3SoundStillPlaying(c->tag)) {
-                        // TODO: S3UpdateSound(0, -1, c->sound_source_ptr, -1.0, -1, -1, 0, -1, -1);
+                        S3UpdateSoundSource(NULL, -1, c->sound_source_ptr, -1.0f, -1, -1, 0, -1, -1);
                     }
                 } else if (c->sound_source_ptr) {
                     if (c->sound_source_ptr->ambient) {
-                        // TODO: S3UpdateSound(0, -1, c->sound_source_ptr, -1.0, -1, -1, 0, -1, -1);
+                        S3UpdateSoundSource(NULL, -1, c->sound_source_ptr, -1.0f, -1, -1, 0, -1, -1);
                     }
                 } else {
                     S3StopChannel(c);
