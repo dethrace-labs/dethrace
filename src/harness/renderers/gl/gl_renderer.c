@@ -215,13 +215,13 @@ void GLRenderer_Init(int width, int height, int pRender_width, int pRender_heigh
     LoadShaders();
     SetupFullScreenRectGeometry();
 
-    // opengl config
+    // config
     glDisable(GL_BLEND);
-    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDepthFunc(GL_LESS);
     glClearColor(0, 0, 0, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-    glDisable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
     // textures
     glGenTextures(1, &screen_texture);
