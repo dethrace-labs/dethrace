@@ -1290,8 +1290,8 @@ void CheckHorns() {
     int i;
     LOG_TRACE("()");
 
-    if (gNet_mode) {
-        for (i = 0; i < gNumber_of_net_players; ++i) {
+    if (gNet_mode != eNet_mode_none) {
+        for (i = 0; i < gNumber_of_net_players; i++) {
             CheckHorn3D(gNet_players[i].car);
         }
     } else {
