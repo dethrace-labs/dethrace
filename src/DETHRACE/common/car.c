@@ -5172,7 +5172,7 @@ int CollideCamera2(br_vector3* car_pos, br_vector3* cam_pos, br_vector3* old_cam
                 l = BrVector3Dot(&tv2, &tv);
                 alpha = BrVector3LengthSquared(&tv) - gMin_camera_car_distance * gMin_camera_car_distance;
                 ts2 = l * l - alpha * d * 4.0;
-                if (alpha >= 0.f && d != 0.f) {
+                if (ts2 >= 0.f && d != 0.f) {
                     sa = (sqrtf(ts2) - l) / (d * 2.0f);
                     BrVector3Scale(&tv2, &tv2, sa);
                     FindFace(cam_pos, &tv2, &a, &ts, &material);
