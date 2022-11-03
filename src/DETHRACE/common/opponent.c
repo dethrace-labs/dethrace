@@ -172,11 +172,11 @@ tS16 ReallocExtraPathSections(int pHow_many_then) {
     LOG_TRACE("(%d)", pHow_many_then);
 
     first_new_section = -1;
-    if (pHow_many_then) {
+    if (pHow_many_then != 0) {
         first_new_section = gProgram_state.AI_vehicles.number_of_path_sections;
         new_sections = BrMemAllocate(sizeof(tPath_section) * (pHow_many_then + gProgram_state.AI_vehicles.number_of_path_sections), kMem_oppo_new_sections);
         memcpy(new_sections, gProgram_state.AI_vehicles.path_sections, sizeof(tPath_section) * gProgram_state.AI_vehicles.number_of_path_sections);
-        if (gProgram_state.AI_vehicles.path_sections) {
+        if (gProgram_state.AI_vehicles.path_sections != NULL) {
             BrMemFree(gProgram_state.AI_vehicles.path_sections);
         }
         gProgram_state.AI_vehicles.number_of_path_sections += pHow_many_then;
@@ -199,7 +199,7 @@ int PointVisibleFromHere(br_vector3* pFrom, br_vector3* pTo) {
     LOG_TRACE("(%p, %p)", pFrom, pTo);
 
     BrVector3Sub(&dir, pTo, pFrom);
-    from = *pFrom;
+    BrVector3Copy(&from, pFrom);
     from.v[1] += 0.15f;
     dir.v[1] += 0.15f;
     FindFace(&from, &dir, &norm, &t, &material);
@@ -343,7 +343,7 @@ void DeadStopCar(tCar_spec* pCar_spec) {
     pCar_spec->acc_force = 0.f;
     pCar_spec->brake_force = 0.f;
     pCar_spec->curvature = 0.f;
-    pCar_spec->gear = 0.f;
+    pCar_spec->gear = 0;
     pCar_spec->revs = 0.f;
     BrVector3Set(&pCar_spec->omega, 0.f, 0.f, 0.f);
     BrVector3Set(&pCar_spec->v, 0.f, 0.f, 0.f);
@@ -576,7 +576,7 @@ int SearchForSection(tRoute_section* pTemp_store, tRoute_section* pPerm_store, i
             distance_so_far = gProgram_state.AI_vehicles.path_sections[section_no].length + pDistance_so_far;
 
             if (pTarget_section == section_no && distance_so_far < shortest_dist) {
-                shortest_dist = gProgram_state.AI_vehicles.path_sections[section_no].length + pDistance_so_far;
+                shortest_dist = distance_so_far;
                 *pNum_of_perm_store_sections = pDepth + 1;
                 memcpy(pPerm_store, pTemp_store, sizeof(tRoute_section) * *pNum_of_perm_store_sections);
                 // dword_530DD4 = ++routes_found
@@ -648,7 +648,7 @@ void CalcGetNearPlayerRoute(tOpponent_spec* pOpponent_spec, tCar_spec* pPlayer) 
         dr_dprintf("%s: CalcGetNearPlayerRoute() - In loop; our section #%d, player's section #%d", pOpponent_spec->car_spec->driver_name, temp_store[0].section_no, players_section);
         gSFS_count++;
         gSFS_cycles_this_time = 0;
-        SearchForSection(temp_store, perm_store, &num_of_perm_store_sections, players_section, 1, 0.0, pOpponent_spec);
+        SearchForSection(temp_store, perm_store, &num_of_perm_store_sections, players_section, 1, 0.f, pOpponent_spec);
         gSFS_total_cycles += gSFS_cycles_this_time;
         if (gSFS_max_cycles < gSFS_cycles_this_time) {
             gSFS_max_cycles = gSFS_cycles_this_time;
@@ -745,7 +745,7 @@ int ShiftOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec, int pPlaces) {
     if (pOpponent_spec->nnext_sections <= pPlaces) {
         return 0;
     }
-    for (i = 0; COUNT_OF(pOpponent_spec->next_sections) - pPlaces > i; i++) {
+    for (i = 0; i < COUNT_OF(pOpponent_spec->next_sections) - pPlaces; i++) {
         pOpponent_spec->next_sections[i].section_no = pOpponent_spec->next_sections[pPlaces + i].section_no;
         pOpponent_spec->next_sections[i].direction = pOpponent_spec->next_sections[pPlaces + i].direction;
     }

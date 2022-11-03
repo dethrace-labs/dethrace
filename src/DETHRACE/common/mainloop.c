@@ -86,11 +86,11 @@ void CalculateFrameRate() {
     if (new_time != last_time) {
         new_rate = 10000u / (new_time - last_time);
         gFrame_rate = new_rate;
-        for (i = 0; i < 30; ++i) {
+        for (i = 0; i < COUNT_OF(last_rates); ++i) {
             gFrame_rate += last_rates[i];
         }
-        gFrame_rate /= 31;
-        for (i = 0; i < 29; i++) {
+        gFrame_rate /= COUNT_OF(last_rates) + 1;
+        for (i = 0; i < COUNT_OF(last_rates) - 1; i++) {
             last_rates[i] = last_rates[i + 1];
         }
         last_rates[29] = new_rate;
