@@ -1586,15 +1586,27 @@ void KillGroovadelic(int pOwner) {
     tGroovidelic_spec* the_groove;
     LOG_TRACE("(%d)", pOwner);
 
+    if (gGroovidelics_array == NULL) {
+        return;
+    }
     for (i = 0; i < gGroovidelics_array_size; i++) {
         the_groove = &gGroovidelics_array[i];
-        if (the_groove->owner == pOwner
-            && the_groove->path_mode != eMove_controlled
-            && the_groove->path_mode != eMove_absolute
-            && the_groove->object_mode != eMove_controlled
-            && the_groove->object_mode != eMove_absolute) {
-            the_groove->owner = -999;
+        if (the_groove->owner != pOwner) {
+            continue;
         }
+        if (the_groove->path_mode == eMove_controlled) {
+            continue;
+        }
+        if (the_groove->path_mode == eMove_absolute) {
+            continue;
+        }
+        if (the_groove->object_mode == eMove_controlled) {
+            continue;
+        }
+        if (the_groove->object_mode == eMove_absolute) {
+            continue;
+        }
+        the_groove->owner = -999;
     }
 }
 
@@ -1604,16 +1616,30 @@ void KillFunkotronic(int pOwner) {
     tFunkotronic_spec* the_funk;
     LOG_TRACE("(%d)", pOwner);
 
+    if (gFunkotronics_array == NULL) {
+        return;
+    }
     for (i = 0; i < gFunkotronics_array_size; i++) {
         the_funk = &gFunkotronics_array[i];
-        if (the_funk->owner == pOwner
-            && the_funk->matrix_mode != eMove_controlled
-            && the_funk->matrix_mode != eMove_absolute
-            && the_funk->lighting_animation_type != eMove_controlled
-            && the_funk->lighting_animation_type != eMove_absolute
-            && (the_funk->texture_animation_data.frames_info.mode != eMove_controlled || the_funk->texture_animation_type)) {
-            the_funk->owner = -999;
+        if (the_funk->owner != pOwner) {
+            continue;
         }
+        if (the_funk->matrix_mode == eMove_controlled) {
+            continue;
+        }
+        if (the_funk->matrix_mode == eMove_absolute) {
+            continue;
+        }
+        if (the_funk->lighting_animation_type == eMove_controlled) {
+            continue;
+        }
+        if (the_funk->lighting_animation_type == eMove_absolute) {
+            continue;
+        }
+        if (the_funk->texture_animation_data.frames_info.mode == eMove_controlled && the_funk->texture_animation_type == eTexture_animation_frames) {
+            continue;
+        }
+        the_funk->owner = -999;
     }
 }
 
@@ -2947,8 +2973,57 @@ void ProcessTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera,
 // IDA: br_scalar __cdecl NormaliseDegreeAngle(br_scalar pAngle)
 br_scalar NormaliseDegreeAngle(br_scalar pAngle) {
     LOG_TRACE("(%f)", pAngle);
-    NOT_IMPLEMENTED();
+
+    while (pAngle < .0f) {
+        pAngle += 360.f;
+    }
+    return pAngle;
 }
+
+
+#define SAW(T, PERIOD) (fmodf((T), (PERIOD)) / (PERIOD))
+
+#define MOVE_FUNK_PARAMETER(DEST, MODE, PERIOD, AMPLITUDE, FLASH_VALUE)                     \
+    do {                                                                                    \
+        switch (MODE) {                                                                     \
+        case eMove_continuous:                                                              \
+            if ((PERIOD) == 0.f) {                                                          \
+                DEST = 0.f;                                                                 \
+            } else {                                                                        \
+                DEST = (AMPLITUDE) * SAW(f_the_time, (PERIOD));                             \
+            }                                                                               \
+            break;                                                                          \
+        case eMove_controlled:                                                              \
+            DEST = (PERIOD) * (AMPLITUDE);                                                  \
+            break;                                                                          \
+        case eMove_absolute:                                                                \
+            DEST = (PERIOD);                                                                \
+            break;                                                                          \
+        case eMove_linear:                                                                  \
+            if ((PERIOD) == 0.f) {                                                          \
+                DEST = 0.f;                                                                 \
+            } else {                                                                        \
+                DEST = (AMPLITUDE) * MapSawToTriangle(SAW(f_the_time, (PERIOD)));           \
+            }                                                                               \
+            break;                                                                          \
+        case eMove_flash:                                                                   \
+            if (2 * fmodf(f_the_time, (PERIOD)) > (PERIOD)) {                               \
+                DEST = (FLASH_VALUE);                                                       \
+            } else {                                                                        \
+                DEST = -(FLASH_VALUE);                                                      \
+            }                                                                               \
+            break;                                                                          \
+        case eMove_harmonic:                                                                \
+            if ((PERIOD) == 0.f) {                                                          \
+                DEST = 0.f;                                                                 \
+            } else {                                                                        \
+                DEST = (AMPLITUDE) * BR_SIN(BR_ANGLE_DEG(SAW(f_the_time, (PERIOD)) * 360)); \
+            }                                                                               \
+            break;                                                                          \
+        default:                                                                            \
+            TELL_ME_IF_WE_PASS_THIS_WAY();                                                  \
+        }                                                                                   \
+    } while (0)
 
 // IDA: void __cdecl FunkThoseTronics()
 void FunkThoseTronics() {
@@ -2966,9 +3041,159 @@ void FunkThoseTronics() {
     float f_the_time;
     float rot_amount;
     float f_time_diff;
+    br_vector2 tmp_v2;
     br_pixelmap* old_colour_map;
     LOG_TRACE("()");
-    STUB_ONCE();
+
+    if (gFunkotronics_array == NULL) {
+        return;
+    }
+    DontLetFlicFuckWithPalettes();
+    the_time = GetTotalTime();
+    f_the_time = (float)the_time;
+    for (i = 0; i < gFunkotronics_array_size; i++) {
+        the_funk = &gFunkotronics_array[i];
+        if (the_funk->owner == -999) {
+            continue;
+        }
+        j = 0;
+        if (the_funk->mode == eFunk_mode_distance && the_funk->proximity_array != NULL) {
+            j = -2;
+            for (j = 0; j < the_funk->proximity_count; j++) {
+                if (Vector3DistanceSquared(&the_funk->proximity_array[j], gOur_pos) <= gSight_distance_squared) {
+                    j = -1;
+                    break;
+                }
+            }
+        }
+        if (j == -1 || (j != -2 && (the_funk->mode != eFunk_mode_last_lap_only || gLap >= gTotal_laps) && (the_funk->mode != eFunk_mode_all_laps_but_last || gLap < gTotal_laps))) {
+            the_material = the_funk->material;
+            mat_matrix = &the_material->map_transform;
+            if (!gAction_replay_mode || !ReplayIsPaused() || the_funk->matrix_mode == eMove_controlled || the_funk->matrix_mode == eMove_absolute) {
+                switch (the_funk->matrix_mod_type) {
+                case eMatrix_mod_spin:
+
+                    BrMatrix23Identity(mat_matrix);
+                    the_material->map_transform.m[2][0] -= .5f;
+                    the_material->map_transform.m[2][1] -= .5f;
+                    if (the_funk->matrix_mod_data.spin_info.period > 0.f) {
+                        f_time_diff = 1.f - fmodf(the_funk->matrix_mod_data.spin_info.period, 1.f);
+                    } else {
+                        f_time_diff = fmodf(-the_funk->matrix_mod_data.spin_info.period, 1.f);
+                    }
+
+                    MOVE_FUNK_PARAMETER(rot_amount, the_funk->matrix_mode, f_time_diff, 65536.f, 7.5f);
+                    DRMatrix23PostRotate(mat_matrix, (br_angle)rot_amount);
+
+                    the_material->map_transform.m[2][0] += .5f;
+                    the_material->map_transform.m[2][1] += .5f;
+                    break;
+                case eMatrix_mod_rock:
+                    BrMatrix23Identity(mat_matrix);
+                    the_material->map_transform.m[2][0] -= the_funk->matrix_mod_data.rock_info.x_centre;
+                    the_material->map_transform.m[2][1] -= the_funk->matrix_mod_data.rock_info.y_centre;
+
+                    MOVE_FUNK_PARAMETER(rot_amount, the_funk->matrix_mode, the_funk->matrix_mod_data.rock_info.period, the_funk->matrix_mod_data.rock_info.rock_angle, the_funk->matrix_mod_data.rock_info.rock_angle);
+                    DRMatrix23PostRotate(mat_matrix, BrDegreeToAngle(NormaliseDegreeAngle(rot_amount)));
+
+                    the_material->map_transform.m[2][0] += the_funk->matrix_mod_data.rock_info.x_centre;
+                    the_material->map_transform.m[2][1] += the_funk->matrix_mod_data.rock_info.y_centre;
+                    break;
+                case eMatrix_mod_throb:
+                    BrMatrix23Identity(mat_matrix);
+                    the_material->map_transform.m[2][0] -= the_funk->matrix_mod_data.throb_info.x_centre;
+                    the_material->map_transform.m[2][1] -= the_funk->matrix_mod_data.throb_info.y_centre;
+
+                    MOVE_FUNK_PARAMETER(tmp_v2.v[1], the_funk->matrix_mode, the_funk->matrix_mod_data.throb_info.y_period, the_funk->matrix_mod_data.throb_info.y_magnitude, the_funk->matrix_mod_data.throb_info.y_magnitude);
+                    MOVE_FUNK_PARAMETER(tmp_v2.v[0], the_funk->matrix_mode, the_funk->matrix_mod_data.throb_info.x_period, the_funk->matrix_mod_data.throb_info.x_magnitude, the_funk->matrix_mod_data.throb_info.x_magnitude);
+                    BrMatrix23PostScale(mat_matrix, tmp_v2.v[0] + 1.f, tmp_v2.v[1] + 1.f);
+
+                    the_material->map_transform.m[2][0] += the_funk->matrix_mod_data.throb_info.x_centre;
+                    the_material->map_transform.m[2][1] += the_funk->matrix_mod_data.throb_info.y_centre;
+                    break;
+                case eMatrix_mod_slither:
+                    MOVE_FUNK_PARAMETER(the_material->map_transform.m[2][0], the_funk->matrix_mode, the_funk->matrix_mod_data.slither_info.x_period, the_funk->matrix_mod_data.slither_info.x_magnitude, the_funk->matrix_mod_data.slither_info.x_magnitude);
+                    MOVE_FUNK_PARAMETER(the_material->map_transform.m[2][1], the_funk->matrix_mode, the_funk->matrix_mod_data.slither_info.y_period, the_funk->matrix_mod_data.slither_info.y_magnitude, the_funk->matrix_mod_data.slither_info.y_magnitude);
+                    break;
+                case eMatrix_mod_roll:
+                    MOVE_FUNK_PARAMETER(the_material->map_transform.m[2][0], the_funk->matrix_mode, the_funk->matrix_mod_data.roll_info.x_period, 1.f, 1.875f);
+                    MOVE_FUNK_PARAMETER(the_material->map_transform.m[2][1], the_funk->matrix_mode, the_funk->matrix_mod_data.roll_info.y_period, 1.f, 1.875f);
+                    break;
+                case eMatrix_mod_none:
+                    break;
+                }
+                if (the_funk->matrix_mod_type != eMatrix_mod_none) {
+                    BrMaterialUpdate(the_funk->material, BR_MATU_MAP_TRANSFORM);
+                }
+            }
+            if (the_funk->lighting_animation_type != eMove_none) {
+                MOVE_FUNK_PARAMETER(the_material->ka, the_funk->lighting_animation_type, the_funk->lighting_animation_period, the_funk->ambient_delta, the_funk->ambient_delta);
+                the_material->ka += the_funk->ambient_base;
+
+                MOVE_FUNK_PARAMETER(the_material->kd, the_funk->lighting_animation_type, the_funk->lighting_animation_period, the_funk->direct_delta, the_funk->direct_delta);
+                the_material->kd += the_funk->direct_base;
+
+                MOVE_FUNK_PARAMETER(the_material->ks, the_funk->lighting_animation_type, the_funk->lighting_animation_period, the_funk->specular_delta, the_funk->specular_delta);
+                the_material->ks += the_funk->specular_base;
+            }
+            if (the_funk->texture_animation_type == eTexture_animation_frames) {
+                if (!gAction_replay_mode || !ReplayIsPaused() || the_funk->mode == eFunk_mode_all_laps_but_last || the_funk->mode == 4) {
+                    old_colour_map = the_material->colour_map;
+                    if (the_funk->time_mode == eTime_mode_accurate) {
+                        MOVE_FUNK_PARAMETER(rot_amount, the_funk->texture_animation_data.frames_info.mode, the_funk->texture_animation_data.frames_info.period, the_funk->texture_animation_data.frames_info.texture_count, the_funk->texture_animation_data.frames_info.texture_count);
+                        the_material->colour_map = the_funk->texture_animation_data.frames_info.textures[(int)rot_amount];
+                    } else {
+                        if (the_funk->texture_animation_data.frames_info.period <= fabsf(f_the_time - the_funk->last_frame)) {
+                            the_funk->last_frame = f_the_time;
+                            the_funk->texture_animation_data.frames_info.current_frame++;
+                            if (the_funk->texture_animation_data.frames_info.current_frame >= the_funk->texture_animation_data.frames_info.texture_count) {
+                                the_funk->texture_animation_data.frames_info.current_frame = 0;
+                            }
+                            the_material->colour_map = the_funk->texture_animation_data.frames_info.textures[(int)rot_amount];
+                        }
+                    }
+                    if (the_material->colour_map != old_colour_map) {
+                        BrMaterialUpdate(the_funk->material, BR_MATU_COLOURMAP);
+                    }
+                }
+            } else if (the_funk->texture_animation_type == eTexture_animation_flic && (!gAction_replay_mode || !ReplayIsPaused())) {
+                f_time_diff = f_the_time;
+                if (f_time_diff < the_funk->last_frame) {
+                    f_time_diff = 2 * the_funk->last_frame - f_time_diff;
+                }
+                if (the_funk->time_mode == eTime_mode_accurate) {
+                    if (the_funk->last_frame) {
+                        iteration_count = (f_time_diff - the_funk->last_frame) / the_funk->texture_animation_data.flic_info.flic_descriptor.frame_period;
+                    } else {
+                        iteration_count = 1;
+                    }
+                } else {
+                    if (f_time_diff - the_funk->last_frame > the_funk->texture_animation_data.flic_info.flic_descriptor.frame_period) {
+                        iteration_count = 1;
+                    } else {
+                        iteration_count = 0;
+                    }
+                }
+                for (j = 0; j < iteration_count; j++) {
+                    finished = PlayNextFlicFrame(&the_funk->texture_animation_data.flic_info.flic_descriptor);
+                    BrMapUpdate(the_funk->material->colour_map, BR_MAPU_ALL);
+                    BrMaterialUpdate(the_funk->material, BR_MATU_COLOURMAP);
+                    if (finished) {
+                        EndFlic(&the_funk->texture_animation_data.flic_info.flic_descriptor);
+                        StartFlic(
+                            the_funk->texture_animation_data.flic_info.flic_descriptor.file_name,
+                            -1,
+                            &the_funk->texture_animation_data.flic_info.flic_descriptor,
+                            the_funk->texture_animation_data.flic_info.flic_data_length,
+                            (tS8*)the_funk->texture_animation_data.flic_info.flic_data,
+                            the_material->colour_map, 0, 0, 0);
+                    }
+                    the_funk->last_frame = f_the_time;
+                }
+            }
+        }
+    }
+    LetFlicFuckWithPalettes();
 }
 
 // IDA: void __usercall LollipopizeActor(br_actor *pSubject_actor@<EAX>, br_matrix34 *ref_to_world@<EDX>, tLollipop_mode pWhich_axis@<EBX>)
@@ -3880,7 +4105,13 @@ void StopGroovidelic(br_actor* pActor) {
 void SetGrooveInterrupt(int pGroove_index, br_matrix34* pMatrix, int pPath_interrupt, int pObject_interrupt, float pPath_resumption, float pObject_resumption) {
     tGroovidelic_spec* the_groove;
     LOG_TRACE("(%d, %p, %d, %d, %f, %f)", pGroove_index, pMatrix, pPath_interrupt, pObject_interrupt, pPath_resumption, pObject_resumption);
-    NOT_IMPLEMENTED();
+
+    the_groove = &gGroovidelics_array[pGroove_index];
+    the_groove->path_interrupt_status = pPath_interrupt;
+    the_groove->object_interrupt_status = pObject_interrupt;
+    the_groove->path_resumption_value = pPath_resumption;
+    the_groove->object_resumption_value = pObject_resumption;
+    BrMatrix34Copy(&the_groove->actor->t.t.mat, pMatrix);
 }
 
 // IDA: void __cdecl ResetGrooveFlags()
