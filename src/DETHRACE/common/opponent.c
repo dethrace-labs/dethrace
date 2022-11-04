@@ -3665,7 +3665,7 @@ void RebuildOppoPathModel() {
                 edge_mat_finish_lt = gMat_lt_turq;
                 edge_mat_finish_dk = gMat_dk_turq;
             }
-            if (gAlready_elasticating != 0 && gMobile_section == i) {
+            if (gAlready_elasticating && gMobile_section == i) {
                 BrVector3Copy(&gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[i].node_indices[1]].p,
                     &gSelf->t.t.translate.t);
             }
@@ -4393,7 +4393,7 @@ void DeleteOppoPathNodeAndSections() {
     tS16 node_no;
     LOG_TRACE("()");
 
-    if (!gOppo_paths_shown == 0) {
+    if (!gOppo_paths_shown) {
         NewTextHeadupSlot(4, 0, 2000, -1, "Show paths first (F5)");
     }
     else if (gAlready_elasticating) {
