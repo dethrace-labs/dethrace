@@ -30,5 +30,5 @@ rm -rf "$releasename"
 mkdir "$releasename"
 cp build/dethrace "$releasename/dethrace"
 tar -czvf "$releasename.tar.gz" "$releasename"
-echo "::set-output name=filename::$releasename.tar.gz"
+echo "filename=$releasename.tar.gz" >>$GITHUB_OUTPUT
 
