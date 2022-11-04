@@ -1873,9 +1873,9 @@ int RematerialiseOpponentOnThisSection(tOpponent_spec* pOpponent_spec, br_scalar
         } else if (t > 1.f) {
             BrVector3Copy(&p, finish);
         } else {
-            p.v[0] = start->v[0] + t * car_to_end.v[0];
-            p.v[1] = start->v[1] + t * car_to_end.v[1];
-            p.v[2] = start->v[2] + t * car_to_end.v[2];
+            p.v[0] = start->v[0] + t * section_v.v[0];
+            p.v[1] = start->v[1] + t * section_v.v[1];
+            p.v[2] = start->v[2] + t * section_v.v[2];
         }
         BrVector3Copy(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &p);
         BrVector3Sub(&a, finish, start);
