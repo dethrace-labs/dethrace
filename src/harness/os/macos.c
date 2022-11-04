@@ -19,6 +19,8 @@
 #include <time.h>
 #include <unistd.h>
 
+#define ARRAY_SIZE(A) (sizeof(A) / sizeof(A[0]))
+
 static int stack_nbr = 0;
 static char _program_name[1024];
 #define MAX_STACK_FRAMES 64
