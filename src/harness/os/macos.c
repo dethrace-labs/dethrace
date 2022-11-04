@@ -294,3 +294,31 @@ void OS_InstallSignalHandler(char* program_name) {
 FILE* OS_fopen(const char* pathname, const char* mode) {
     return fopen(pathname, mode);
 }
+
+void OS_AllocateActionReplayBuffer(char** pBuffer, unsigned* pBuffer_size) {
+    static int allocated = 0;
+    static char* buffer = NULL;
+    static unsigned buffer_size = 0;
+    unsigned i;
+    const int wanted_sizes[] = {
+        20000000,
+        16000000,
+        6000000,
+        4000000,
+        500000,
+    };
+
+    if (!allocated) {
+        allocated = 1;
+        buffer_size = 0;
+        for (i = 0; i < ARRAY_SIZE(wanted_sizes); i++) {
+            buffer = malloc(wanted_sizes[i]);
+            if (buffer != NULL) {
+                buffer_size = wanted_sizes[i];
+                break;
+            }
+        }
+    }
+    *pBuffer = buffer;
+    *pBuffer_size = buffer_size;
+}
