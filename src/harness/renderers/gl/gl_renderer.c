@@ -36,6 +36,7 @@ struct {
     GLuint clip_plane_count;
     GLuint clip_planes[6];
     GLuint light_value;
+    GLuint tex_offs;
 } uniforms_3d;
 
 struct {
@@ -132,6 +133,7 @@ void LoadShaders() {
     uniforms_3d.palette_index_override = glGetUniformLocation(shader_program_3d, "palette_index_override");
     uniforms_3d.view = glGetUniformLocation(shader_program_3d, "view");
     uniforms_3d.light_value = glGetUniformLocation(shader_program_3d, "light_value");
+    uniforms_3d.tex_offs = glGetUniformLocation(shader_program_3d, "tex_offs");
 
     // bind the uniform samplers to texture units. palette=1, shadetable=2
     glUniform1i(uniforms_3d.pixels, 0);
@@ -487,12 +489,43 @@ void GLRenderer_BufferModel(br_model* model) {
 }
 
 tStored_material* current_material;
+float xx = 0;
 void setActiveMaterial(tStored_material* material) {
-    if (material == NULL || material == current_material) {
+    if (material == NULL) {
         return;
     }
 
-    glUniform3fv(uniforms_3d.pixels_transform, 2, material->map_transform->v);
+    xx += 0.0001f;
+    if (xx > 0.999f) {
+        xx = 0;
+    }
+    // material->map_transform[0].v[2] = xx;
+    // material->map_transform[0].v[2] = xx;
+    // material->map_transform[0].v[2] = xx;
+
+    //  material->map_transform[1].v[1] = xx;
+    //   material->map_transform[0].v[2] += 0.01f;
+    //   material->map_transform[1].v[0] += 0.01f;
+
+    // if (material == current_material) {
+    //     return;
+    // }
+
+    if (strcmp(material->identifier, "CHECK.MAT") == 0) {
+        LOG_DEBUG("funk properties %i - %f, %f", uniforms_3d.pixels_transform);
+        // material->map_transform[0].v[0] = 0;
+        // material->map_transform[0].v[1] = 0;
+        // material->map_transform[0].v[2] = xx;
+        // material->map_transform[1].v[0] = 0;
+        // material->map_transform[1].v[1] = 0;
+        // material->map_transform[1].v[2] = xx;
+        LOG_VEC("v0", &material->map_transform[0]);
+        LOG_VEC("v1", &material->map_transform[1]);
+    }
+
+    glUniform1f(uniforms_3d.tex_offs, material->map_transform[0].v[2]);
+
+    glUniform3fv(uniforms_3d.pixels_transform, 2, &material->map_transform[0].v[0]);
     glUniform1i(uniforms_3d.palette_index_override, material->index_base);
     if (material->shade_table) {
         GLRenderer_SetShadeTable(material->shade_table);

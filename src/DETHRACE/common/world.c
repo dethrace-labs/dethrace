@@ -1470,7 +1470,7 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
 
             if (Vector3IsZero(&the_groove->path_data.straight_info.centre)) {
                 BrVector3Copy(&the_groove->path_data.straight_info.centre,
-                        &the_groove->actor->t.t.translate.t);
+                    &the_groove->actor->t.t.translate.t);
             }
             if (the_groove->path_mode == eMove_controlled || the_groove->path_mode == eMove_absolute) {
                 AddFunkGrooveBinding(pRef_offset + GetAnInt(pF), &the_groove->path_data.straight_info.period);
@@ -2702,9 +2702,9 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
                 GetThreeScalars(f, &spec->bounds.max.v[0], &spec->bounds.max.v[1], &spec->bounds.max.v[2]);
                 BrMatrix34Identity(&spec->mat);
                 for (k = 0; k < 3; ++k) {
-                     // FIXME: not 100% sure this is correct
-                     spec->mat.m[3][k] = (spec->bounds.max.v[k] + spec->bounds.min.v[k]) / 2.f;
-                     spec->mat.m[k][k] = spec->bounds.max.v[k] - spec->bounds.min.v[k];
+                    // FIXME: not 100% sure this is correct
+                    spec->mat.m[3][k] = (spec->bounds.max.v[k] + spec->bounds.min.v[k]) / 2.f;
+                    spec->mat.m[k][k] = spec->bounds.max.v[k] - spec->bounds.min.v[k];
                 }
                 ParseSpecialVolume(f, spec, NULL);
             }
@@ -2980,49 +2980,48 @@ br_scalar NormaliseDegreeAngle(br_scalar pAngle) {
     return pAngle;
 }
 
-
 #define SAW(T, PERIOD) (fmodf((T), (PERIOD)) / (PERIOD))
 
-#define MOVE_FUNK_PARAMETER(DEST, MODE, PERIOD, AMPLITUDE, FLASH_VALUE)                     \
-    do {                                                                                    \
-        switch (MODE) {                                                                     \
-        case eMove_continuous:                                                              \
-            if ((PERIOD) == 0.f) {                                                          \
-                DEST = 0.f;                                                                 \
-            } else {                                                                        \
-                DEST = (AMPLITUDE) * SAW(f_the_time, (PERIOD));                             \
-            }                                                                               \
-            break;                                                                          \
-        case eMove_controlled:                                                              \
-            DEST = (PERIOD) * (AMPLITUDE);                                                  \
-            break;                                                                          \
-        case eMove_absolute:                                                                \
-            DEST = (PERIOD);                                                                \
-            break;                                                                          \
-        case eMove_linear:                                                                  \
-            if ((PERIOD) == 0.f) {                                                          \
-                DEST = 0.f;                                                                 \
-            } else {                                                                        \
-                DEST = (AMPLITUDE) * MapSawToTriangle(SAW(f_the_time, (PERIOD)));           \
-            }                                                                               \
-            break;                                                                          \
-        case eMove_flash:                                                                   \
-            if (2 * fmodf(f_the_time, (PERIOD)) > (PERIOD)) {                               \
-                DEST = (FLASH_VALUE);                                                       \
-            } else {                                                                        \
-                DEST = -(FLASH_VALUE);                                                      \
-            }                                                                               \
-            break;                                                                          \
-        case eMove_harmonic:                                                                \
-            if ((PERIOD) == 0.f) {                                                          \
-                DEST = 0.f;                                                                 \
-            } else {                                                                        \
-                DEST = (AMPLITUDE) * BR_SIN(BR_ANGLE_DEG(SAW(f_the_time, (PERIOD)) * 360)); \
-            }                                                                               \
-            break;                                                                          \
-        default:                                                                            \
-            TELL_ME_IF_WE_PASS_THIS_WAY();                                                  \
-        }                                                                                   \
+#define MOVE_FUNK_PARAMETER(DEST, MODE, PERIOD, AMPLITUDE, FLASH_VALUE)                   \
+    do {                                                                                  \
+        switch (MODE) {                                                                   \
+        case eMove_continuous:                                                            \
+            if ((PERIOD) == 0.f) {                                                        \
+                DEST = 0.f;                                                               \
+            } else {                                                                      \
+                DEST = (AMPLITUDE)*SAW(f_the_time, (PERIOD));                             \
+            }                                                                             \
+            break;                                                                        \
+        case eMove_controlled:                                                            \
+            DEST = (PERIOD) * (AMPLITUDE);                                                \
+            break;                                                                        \
+        case eMove_absolute:                                                              \
+            DEST = (PERIOD);                                                              \
+            break;                                                                        \
+        case eMove_linear:                                                                \
+            if ((PERIOD) == 0.f) {                                                        \
+                DEST = 0.f;                                                               \
+            } else {                                                                      \
+                DEST = (AMPLITUDE)*MapSawToTriangle(SAW(f_the_time, (PERIOD)));           \
+            }                                                                             \
+            break;                                                                        \
+        case eMove_flash:                                                                 \
+            if (2 * fmodf(f_the_time, (PERIOD)) > (PERIOD)) {                             \
+                DEST = (FLASH_VALUE);                                                     \
+            } else {                                                                      \
+                DEST = -(FLASH_VALUE);                                                    \
+            }                                                                             \
+            break;                                                                        \
+        case eMove_harmonic:                                                              \
+            if ((PERIOD) == 0.f) {                                                        \
+                DEST = 0.f;                                                               \
+            } else {                                                                      \
+                DEST = (AMPLITUDE)*BR_SIN(BR_ANGLE_DEG(SAW(f_the_time, (PERIOD)) * 360)); \
+            }                                                                             \
+            break;                                                                        \
+        default:                                                                          \
+            TELL_ME_IF_WE_PASS_THIS_WAY();                                                \
+        }                                                                                 \
     } while (0)
 
 // IDA: void __cdecl FunkThoseTronics()
@@ -3116,6 +3115,7 @@ void FunkThoseTronics() {
                     MOVE_FUNK_PARAMETER(the_material->map_transform.m[2][1], the_funk->matrix_mode, the_funk->matrix_mod_data.slither_info.y_period, the_funk->matrix_mod_data.slither_info.y_magnitude, the_funk->matrix_mod_data.slither_info.y_magnitude);
                     break;
                 case eMatrix_mod_roll:
+                    LOG_DEBUG("roll");
                     MOVE_FUNK_PARAMETER(the_material->map_transform.m[2][0], the_funk->matrix_mode, the_funk->matrix_mod_data.roll_info.x_period, 1.f, 1.875f);
                     MOVE_FUNK_PARAMETER(the_material->map_transform.m[2][1], the_funk->matrix_mode, the_funk->matrix_mod_data.roll_info.y_period, 1.f, 1.875f);
                     break;
@@ -4370,7 +4370,6 @@ void DropActor(int pIndex) {
                         BrVector3Set(&side_vector, 0.f, -1.f, 0.f);
                     } else {
                         BrVector3Set(&side_vector, 0.f, 0.f, -1.f);
-
                     }
                     new_transform.type = BR_TRANSFORM_LOOK_UP;
                     BrVector3Cross(&new_transform.t.look_up.look, &the_list[face_bastard].normal, &side_vector);
