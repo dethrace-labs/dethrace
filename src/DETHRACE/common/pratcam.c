@@ -10,6 +10,7 @@
 #include "harness/trace.h"
 #include "input.h"
 #include "loading.h"
+#include "minimap.h"
 #include "pd/sys.h"
 #include "sound.h"
 #include "utility.h"
@@ -51,6 +52,12 @@ int PratcamGetPending() {
     return gPending_ambient_prat;
 }
 
+/*
+ * Keep track of pratcam slide out/slide in count.
+ * If enabled, minimap is drawn in pratcam view on every 2nd slide out.
+ */
+static int pratcam_slide_count;
+
 // IDA: void __cdecl TogglePratcam()
 void TogglePratcam() {
     tU32 the_time;
@@ -60,6 +67,10 @@ void TogglePratcam() {
     if (gAusterity_mode) {
         NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(192));
     } else {
+#if defined(DETHRACE_FIX_BUGS)
+        pratcam_slide_count = (pratcam_slide_count + 1) % 4;
+        minimap.show = pratcam_slide_count & 2;
+#endif
         if (gWhirr_noise == 0 || !DRS3SoundStillPlaying(gWhirr_noise)) {
             DRS3StopSound(gWhirr_noise);
             gWhirr_noise = DRS3StartSoundNoPiping(gCar_outlet, 1000);
@@ -365,6 +376,8 @@ void InitPratcam() {
     } else {
         LoadPratcam("FRANK");
     }
+
+    init_minimap(gPrat_buffer->width, gPrat_buffer->height);
 }
 
 // IDA: void __cdecl DisposePratcam()
@@ -401,6 +414,8 @@ void DisposePratcam() {
     }
     BrMemFree(gPratcam_flics);
     BrMemFree(gPratcam_sequences);
+
+    dispose_minimap();
 }
 
 // IDA: void __usercall DoPratcam(tU32 pThe_time@<EAX>)
@@ -466,10 +481,14 @@ void DoPratcam(tU32 pThe_time) {
     }
     EnableTranslationText();
     LetFlicFuckWithPalettes();
+
+    if (minimap.show)
+        display_minimap(pThe_time);
+
     BrPixelmapRectangleCopy(gBack_screen,
         gProgram_state.current_car.prat_left + offset,
         gProgram_state.current_car.prat_top + y_offset,
-        gPrat_buffer,
+        minimap.show ? minimap.map_scaled : gPrat_buffer,
         0, 0,
         gPrat_buffer->width, gPrat_buffer->height);
     if (gProgram_state.current_car.prat_cam_top != NULL) {

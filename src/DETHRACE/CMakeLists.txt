@@ -102,6 +102,8 @@ target_sources(dethrace_obj PRIVATE
     common/mainloop.h
     common/mainmenu.c
     common/mainmenu.h
+    common/minimap.c
+    common/minimap.h
     common/netgame.c
     common/netgame.h
     common/network.c
