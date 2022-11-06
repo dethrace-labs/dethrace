@@ -3149,7 +3149,7 @@ void FunkThoseTronics() {
                             if (the_funk->texture_animation_data.frames_info.current_frame >= the_funk->texture_animation_data.frames_info.texture_count) {
                                 the_funk->texture_animation_data.frames_info.current_frame = 0;
                             }
-                            the_material->colour_map = the_funk->texture_animation_data.frames_info.textures[(int)rot_amount];
+                            the_material->colour_map = the_funk->texture_animation_data.frames_info.textures[the_funk->texture_animation_data.frames_info.current_frame];
                         }
                     }
                     if (the_material->colour_map != old_colour_map) {
