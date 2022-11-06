@@ -493,8 +493,8 @@ void setActiveMaterial(tStored_material* material) {
         return;
     }
 
-    glUniform3fv(uniforms_3d.pixels_transform, 2, material->map_transform->v)
-        glUniform1i(uniforms_3d.palette_index_override, material->index_base);
+    glUniform3fv(uniforms_3d.pixels_transform, 2, material->map_transform->v);
+    glUniform1i(uniforms_3d.palette_index_override, material->index_base);
     if (material->shade_table) {
         GLRenderer_SetShadeTable(material->shade_table);
     }

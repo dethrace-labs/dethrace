@@ -58,7 +58,6 @@ uint32_t OS_GetTime() {
     clock_gettime(CLOCK_MONOTONIC, &spec);
     if (first_clock_time == 0) {
         first_clock_time = spec.tv_sec * 1000 + spec.tv_nsec / 1000000;
-        return 0;
     }
     return (spec.tv_sec * 1000 + spec.tv_nsec / 1000000) - first_clock_time;
 }
