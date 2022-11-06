@@ -231,9 +231,6 @@ void SkidSection(tCar_spec* pCar, int pWheel_num, br_vector3* pPos, int pMateria
         gSkids[skid].actor->render_style = BR_RSTYLE_DEFAULT;
         gSkids[skid].actor->material = material;
         gSkids[skid].normal = pCar->nor[pWheel_num];
-        gSkids[skid].normal.v[0] = 0;
-        gSkids[skid].normal.v[1] = 1;
-        gSkids[skid].normal.v[2] = 0;
         StretchMark(&gSkids[skid], &pCar->prev_skid_pos[pWheel_num], pPos, pCar->total_length[pWheel_num]);
         PipeSingleSkidAdjustment(skid, &gSkids[skid].actor->t.t.mat, pMaterial_index);
         pCar->old_skid[pWheel_num] = skid;
