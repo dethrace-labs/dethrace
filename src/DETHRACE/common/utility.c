@@ -581,14 +581,12 @@ br_uint_32 DRActorEnumRecurseWithTrans(br_actor* pActor, br_matrix34* pMatrix, b
 int sign(int pNumber) {
     LOG_TRACE("(%d)", pNumber);
 
-    if (pNumber < 1) {
-        if (pNumber < 0) {
-            return -1;
-        } else {
-            return 0;
-        }
-    } else {
+    if (pNumber > 0) {
         return 1;
+    } else if (pNumber < 0) {
+        return -1;
+    } else {
+        return 0;
     }
 }
 
