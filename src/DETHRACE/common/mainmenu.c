@@ -31,7 +31,7 @@ char* gPixels_copy__mainmenu; // suffix added to avoid duplicate symbol
 int MainMenuDone1(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
 
-    if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo) {
+    if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
         if (pCurrent_mode == 0) {
             if (pCurrent_choice == 7) {
                 PreloadBunchOfFlics(7);
@@ -74,7 +74,7 @@ int MainMenuDone1(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
 int MainMenuDone2(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
 
-    if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo) {
+    if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
         if (pCurrent_mode == 0) {
             if (pCurrent_choice == 4) {
                 PreloadBunchOfFlics(7);

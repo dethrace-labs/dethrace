@@ -2430,11 +2430,11 @@ void LoadRaces(tRace_list_spec* pRace_list, int* pCount, int pRace_type_index) {
     *pCount = number_of_racers;
     fclose(f);
     j = 0;
-    if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo) {
+    if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
         j = 99;
     }
     for (i = 0; i < number_of_racers; i++) {
-        if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo) {
+        if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
             pRace_list[i].suggested_rank = gDemo_rank;
             pRace_list[i].rank_required = j;
             j -= 3;

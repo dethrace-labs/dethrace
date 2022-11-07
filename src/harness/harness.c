@@ -93,13 +93,13 @@ void Harness_DetectGameMode() {
             printf("Game mode: Splat Pack\n");
         } else if (access("DATA/RACES/TINSEL.TXT", F_OK) != -1) {
             // Only the the splat x-mas demo has the tinsel track
-            harness_game_info.defines.INTRO_SMK_FILE = "";
+            harness_game_info.defines.INTRO_SMK_FILE = "MIX_INTR.SMK";
             harness_game_info.defines.GERMAN_LOADSCRN = "";
-            harness_game_info.mode = eGame_splatpack_demo;
+            harness_game_info.mode = eGame_splatpack_xmas_demo;
             printf("Game mode: Splat Pack X-mas demo\n");
         } else {
             // Assume we're using the splatpack demo
-            harness_game_info.defines.INTRO_SMK_FILE = "";
+            harness_game_info.defines.INTRO_SMK_FILE = "MIX_INTR.SMK";
             harness_game_info.defines.GERMAN_LOADSCRN = "";
             harness_game_info.mode = eGame_splatpack_demo;
             printf("Game mode: Splat Pack demo\n");
@@ -165,6 +165,7 @@ void Harness_DetectGameMode() {
         harness_game_info.defines.ascii_shift_table = demo_ascii_shift_table;
         break;
     case eGame_splatpack_demo:
+    case eGame_splatpack_xmas_demo:
         harness_game_info.defines.ascii_table = splatpack_xmasdemo_ascii_table;
         harness_game_info.defines.ascii_shift_table = splatpack_xmasdemo_ascii_shift_table;
         break;

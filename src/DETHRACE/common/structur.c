@@ -359,7 +359,7 @@ void SelectOpponents(tRace_info* pRace_info) {
     int had_scum;
     LOG_TRACE("(%p)", pRace_info);
 
-    if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo) {
+    if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
         pRace_info->number_of_racers = OPPONENT_COUNT;
         for (i = 0; i < OPPONENT_COUNT; i++) {
             pRace_info->opponent_list[i].index = gDemo_opponents[i];
@@ -573,7 +573,7 @@ void DoGame() {
                             DisposeOpponentsCars(&gCurrent_race);
                         }
                         DisposeTrack();
-                        if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo) {
+                        if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
                             DoFullVersionPowerpoint();
                         }
                         gProgram_state.loaded = 0;
