@@ -4098,7 +4098,15 @@ void StopGroovidelic(br_actor* pActor) {
     tGroovidelic_spec* the_groove;
     LOG_TRACE("(%p)", pActor);
 
-    STUB();
+    for (i = 0; i < gGroovidelics_array_size; i++) {
+        the_groove = &gGroovidelics_array[i];
+        if (the_groove->actor == pActor) {
+            if (the_groove->path_interrupt_status == eInterrupt_none && the_groove->object_interrupt_status == eInterrupt_none) {
+                GrooveThisDelic(the_groove, gPrevious_groove_times[1], 1);
+            }
+            return;
+        }
+    }
 }
 
 // IDA: void __usercall SetGrooveInterrupt(int pGroove_index@<EAX>, br_matrix34 *pMatrix@<EDX>, int pPath_interrupt@<EBX>, int pObject_interrupt@<ECX>, float pPath_resumption, float pObject_resumption)
