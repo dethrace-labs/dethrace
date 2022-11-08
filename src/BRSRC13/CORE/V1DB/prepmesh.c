@@ -604,8 +604,8 @@ void BrModelUpdate(br_model* model, br_uint_16 flags) {
     if (model->flags & BR_MODF_PREPREPARED) {
         return;
     }
-    if (!model->faces || !model->vertices) {
-        BrFailure("BrModelUpdate: model has no faces or vertices (%s)", model->identifier ? model->identifier : "<NULL>");
+    if (model->faces == NULL || model->vertices == NULL) {
+        BrFailure("BrModelUpdate: model has no faces or vertices (%s)", model->identifier != NULL ? model->identifier : "<NULL>");
     }
     if (flags & BR_MODU_UNKNOWN) {
         flags |= BR_MODU_NORMALS;

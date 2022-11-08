@@ -368,7 +368,7 @@ br_pixelmap* DRPixelmapAllocate(br_uint_8 pType, br_uint_16 pW, br_uint_16 pH, v
     br_pixelmap* the_map;
 
     the_map = BrPixelmapAllocate(pType, pW, pH, pPixels, pFlags);
-    if (the_map) {
+    if (the_map != NULL) {
         the_map->origin_y = 0;
         the_map->origin_x = 0;
     }

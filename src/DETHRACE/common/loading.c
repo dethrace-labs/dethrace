@@ -1687,7 +1687,7 @@ void MungeWindscreen(br_model* pModel) {
 void SetModelFlags(br_model* pModel, int pOwner) {
     LOG_TRACE("(%p, %d)", pModel, pOwner);
 
-    if (pModel && pModel->nfaces) {
+    if (pModel != NULL&& pModel->nfaces != 0) {
 #if defined(DETHRACE_FIX_BUGS) /* Show Squad Car in the wreck gallery. */
         if (gAusterity_mode) {
 #else
