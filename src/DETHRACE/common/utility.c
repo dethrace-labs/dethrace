@@ -343,7 +343,7 @@ float tandeg(float pAngle) {
     LOG_TRACE("(%f)", pAngle);
 
     pAngle = DEG_TO_RAD(pAngle);
-    return sin(pAngle) / cos(pAngle);
+    return sinf(pAngle) / cosf(pAngle);
 }
 
 // IDA: tU32 __usercall GetFileLength@<EAX>(FILE *pF@<EAX>)
