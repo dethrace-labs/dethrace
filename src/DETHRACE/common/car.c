@@ -1276,7 +1276,64 @@ void TestAutoSpecialVolume(tCollision_info* pCar) {
     int i;
     LOG_TRACE("(%p)", pCar);
 
-    STUB_ONCE();
+    mat = &pCar->car_master_actor->t.t.mat;
+    highest_p = 0.f;
+    for (i = 0; i < 3; i++) {
+        highest_p += BrVector3Dot((br_vector3*)mat->m[i], &pCar->water_normal) * pCar->bounds[0].min.v[i];
+    }
+    highest_p += BrVector3Dot((br_vector3*)mat->m[3], &pCar->water_normal) / WORLD_SCALE;
+    lowest_p = highest_p;
+    for (i = 0; i < 3; i++) {
+        val = (pCar->bounds[0].max.v[i] - pCar->bounds[0].min.v[i]) * BrVector3Dot((br_vector3*)mat->m[i], &pCar->water_normal);
+        if (val >= 0.f) {
+            highest_p += val;
+        } else {
+            lowest_p += val;
+        }
+    }
+
+    if (pCar->water_d > lowest_p) {
+        if (pCar->water_d >= highest_p) {
+            pCar->water_depth_factor = 1.f;
+        } else {
+            pCar->water_depth_factor = (pCar->water_d - lowest_p) / (highest_p - lowest_p);
+        }
+        if (pCar->auto_special_volume == NULL) {
+            vol = GetDefaultSpecialVolumeForWater();
+            if (vol == NULL) {
+                pCar->water_depth_factor = 1.f;
+                pCar->auto_special_volume = NULL;
+            } else {
+                BrVector3Scale(&tv, &pCar->bounds[0].min, WORLD_SCALE);
+                BrMatrix34ApplyP(&lp, &tv, mat);
+                BrVector3InvScale(&lp, &lp, WORLD_SCALE);
+                BrVector3Copy(&hp, &lp);
+                for (i = 0; i < 3; i++) {
+                    val = pCar->bounds[0].max.v[i] - pCar->bounds[0].min.v[i];
+                    BrVector3Scale(&tv, (br_vector3*)mat->m[i], val);
+                    if (BrVector3Dot(&pCar->water_normal, &tv) > 0.f) {
+                        BrVector3Accumulate(&hp, &tv);
+                    } else {
+                        BrVector3Accumulate(&lp, &tv);
+                    }
+                }
+                BrVector3Sub(&dir, &hp, &lp);
+                DisablePlingMaterials();
+                FindFloorInBoxBU(&lp, &dir, &tv, &d, pCar);
+                EnablePlingMaterials();
+                FindFloorInBoxBU(&pos, &dir, &tv, &d2, pCar);
+                if (d2 <= d) {
+                    pCar->water_depth_factor = 1.f;
+                    pCar->auto_special_volume = NULL;
+                } else {
+                    pCar->auto_special_volume = vol;
+                }
+            }
+        }
+    } else {
+        pCar->auto_special_volume = NULL;
+        pCar->water_depth_factor = 1.f;
+    }
 }
 
 // IDA: void __usercall MoveAndCollideCar(tCar_spec *car@<EAX>, br_scalar dt)
