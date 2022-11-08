@@ -26,16 +26,16 @@
 #define MIN_SERVICE_INTERVAL 200
 // <<
 
-int gIn_check_quit;
-tU32 gLost_time;
+int gIn_check_quit = 0;
+tU32 gLost_time = 0;
 #if BR_ENDIAN_BIG
-tU32 gLong_key[4] = { 0x6C1B995F, 0xB9CD5F13, 0xCB04200E, 0x5E1CA10E };
-tU32 gOther_long_key[4] = { 0x67A8D626, 0xB6DD451B, 0x327E2213, 0x15C29437};
+tU32 gLong_key[4] = { 0x6c1b995f, 0xb9cd5f13, 0xcb04200e, 0x5e1ca10e };
+tU32 gOther_long_key[4] = { 0x67a8d626, 0xb6dd451b, 0x327e2213, 0x15c29437};
 #else
-tU32 gLong_key[4] = { 0x5F991B6C, 0x135FCDB9, 0x0E2004CB, 0x0EA11C5E };
-tU32 gOther_long_key[4] = { 0x26D6A867, 0x1B45DDB6, 0x13227E32, 0x3794C215 };
+tU32 gLong_key[4] = { 0x5f991b6c, 0x135fcdb9, 0x0e2004cb, 0x0ea11c5e };
+tU32 gOther_long_key[4] = { 0x26d6a867, 0x1b45ddb6, 0x13227e32, 0x3794c215 };
 #endif
-int gEncryption_method;
+int gEncryption_method = 0;
 char* gMisc_strings[250];
 br_pixelmap* g16bit_palette;
 br_pixelmap* gSource_for_16bit_palette;
@@ -1168,31 +1168,34 @@ void DecodeLine2(char* pS) {
         }
         if (gEncryption_method == 1) {
             if (c == '\t') {
-                c = 0x80;
+                c = 0x9f;
             }
-            c -= 0x20;
-            if (!(c & 0x80)) {
-                c = (c ^ key[seed]) & 0x7f;
-                c += 0x20;
-            }
-            seed += 7;
-            seed = seed % 16;
 
-            if (c == 0x80) {
+            c -= 0x20;
+            c ^= key[seed];
+            c &= 0x7f;
+            c += 0x20;
+
+            seed += 7;
+            seed %= 16;
+
+            if (c == 0x9f) {
                 c = '\t';
             }
         } else {
             if (c == '\t') {
-                c = 0x9f;
+                c = 0x80;
             }
             c -= 0x20;
-            c = (c ^ key[seed]) & 0x7f;
+            if ((c & 0x80) == 0) {
+                c ^= key[seed] & 0x7f;
+            }
             c += 0x20;
 
             seed += 7;
-            seed = seed % 16;
+            seed %= 16;
 
-            if (c == 0x9f) {
+            if (c == 0x80) {
                 c = '\t';
             }
         }

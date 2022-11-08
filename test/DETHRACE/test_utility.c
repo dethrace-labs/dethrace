@@ -18,7 +18,7 @@ void test_utility_EncodeLinex() {
 
 void test_utility_DecodeLine2() {
     char buf[50];
-    gEncryption_method = 1;
+    gEncryption_method = 2;
     // first line of GENERAL.TXT, "@" prefix and line ending stripped
     char input[] = "\x29\x2a\x9c\x22\x61\x4d\x5e\x5f\x60\x34\x64\x57\x8d\x2b\x82\x7b\x33\x4c";
     strcpy(buf, input);
