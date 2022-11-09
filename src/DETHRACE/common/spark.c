@@ -24,7 +24,7 @@ int gShrapnel_flags;
 br_model* gShrapnel_model[2];
 int gSmoke_flags;
 int gSmoke_num;
-int gOffset;
+int gOffset = 0;
 int gColumn_flags;
 int gNext_column;
 br_pixelmap* gBlack_smoke_shade_table;
