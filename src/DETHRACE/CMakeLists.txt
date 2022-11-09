@@ -33,7 +33,7 @@ else()
         -Wno-format-overflow
     )
 endif()
-if(BRENDER_FIX_BUGS)
+if(DETHRACE_FIX_BUGS)
     target_compile_definitions(dethrace_obj PRIVATE DETHRACE_FIX_BUGS)
 endif()
 
