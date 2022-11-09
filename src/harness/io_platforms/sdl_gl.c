@@ -10,6 +10,10 @@
 #include "harness/config.h"
 #include "harness/trace.h"
 
+#include "globvars.h"
+#include "grafdata.h"
+#include "pd/sys.h"
+
 #define ARRAY_LEN(array) (sizeof((array)) / sizeof((array)[0]))
 
 int scancode_map[123];
@@ -308,6 +312,15 @@ void Input_GetMousePosition(int* pX, int* pY) {
     *pY -= vp_y;
     *pX *= sdl_window_scale.x;
     *pY *= sdl_window_scale.y;
+
+#if defined(DETHRACE_FIX_BUGS)
+    // In hires mode (640x480), the menus are still rendered at (320x240),
+    // so prescale the cursor coordinates accordingly.
+    *pX *= gGraf_specs[gGraf_data_index].phys_width;
+    *pX /= gGraf_specs[gReal_graf_data_index].phys_width;
+    *pY *= gGraf_specs[gGraf_data_index].phys_height;
+    *pY /= gGraf_specs[gReal_graf_data_index].phys_height;
+#endif
 }
 
 void Input_GetMouseButtons(int* pButton1, int* pButton2) {
