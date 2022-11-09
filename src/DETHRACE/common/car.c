@@ -3938,9 +3938,7 @@ void GetPlaneNormal(br_vector3* n, int p) {
     LOG_TRACE("(%p, %d)", n, p);
 
     d = (p - 1) & 3;
-    n->v[0] = 0.0;
-    n->v[1] = 0.0;
-    n->v[2] = 0.0;
+    BrVector3Set(n, 0.f, 0.f, 0.f);
     if ((p & 4) != 0) {
         n->v[d] = 1.0;
     } else {
