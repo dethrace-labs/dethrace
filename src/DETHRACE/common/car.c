@@ -3960,15 +3960,9 @@ int GetBoundsEdge(br_vector3* pos, br_vector3* edge, br_bounds* pB, int plane1, 
 
     d1 = (plane1 - 1) & 3;
     d2 = (plane2 - 1) & 3;
-    n.v[0] = b->v[0] - a->v[0];
-    n.v[1] = b->v[1] - a->v[1];
-    n.v[2] = b->v[2] - a->v[2];
-    p.v[0] = c->v[0] - a->v[0];
-    p.v[1] = c->v[1] - a->v[1];
-    p.v[2] = c->v[2] - a->v[2];
-    q.v[0] = p.v[2] * n.v[1] - p.v[1] * n.v[2];
-    q.v[1] = n.v[2] * p.v[0] - p.v[2] * n.v[0];
-    q.v[2] = p.v[1] * n.v[0] - n.v[1] * p.v[0];
+    BrVector3Sub(&n, b, a);
+    BrVector3Sub(&p, c, a);
+    BrVector3Cross(&q, &n, &p);
     if ((plane1 & 4) != 0) {
         pos->v[d1] = pB->min.v[d1];
     } else {
@@ -3980,11 +3974,11 @@ int GetBoundsEdge(br_vector3* pos, br_vector3* edge, br_bounds* pB, int plane1, 
         pos->v[d2] = pB->max.v[d2];
     }
     d3 = 3 - d1 - d2;
-    edge->v[d1] = 0.0;
-    edge->v[d2] = 0.0;
-    edge->v[d3] = 1.0;
+    edge->v[d1] = 0.f;
+    edge->v[d2] = 0.f;
+    edge->v[d3] = 1.f;
     if ((flag & 1) != 0) {
-        pos->v[d3] = (c->v[d3] + b->v[d3]) / 2.0;
+        pos->v[d3] = (c->v[d3] + b->v[d3]) / 2.f;
     } else {
         pos->v[d3] = a->v[d3] - ((pos->v[d2] - a->v[d2]) * q.v[d2] + (pos->v[d1] - a->v[d1]) * q.v[d1]) / q.v[d3];
     }
