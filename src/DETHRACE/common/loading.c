@@ -1795,7 +1795,11 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
         FatalError(kFatalError_FileCorrupt_S, pCar_name);
     }
     if (*pDriver_name != '\0') {
+#if defined(DETHRACE_FIX_BUGS)
+        memcpy(pCar_spec->driver_name, pDriver_name, MIN(sizeof(pCar_spec->driver_name), strlen(pDriver_name)));
+#else
         memcpy(pCar_spec->driver_name, pDriver_name, sizeof(pCar_spec->driver_name));
+#endif
         pCar_spec->driver_name[sizeof(pCar_spec->driver_name) - 1] = '\0';
     } else {
         strcpy(pCar_spec->driver_name, "X");
