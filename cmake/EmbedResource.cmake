@@ -10,8 +10,6 @@ if(EXISTS "${source_file_name}")
     endif()
 endif()
 
-message("Updating ${resource_file_name} embeded resource")
-
 file(READ "${resource_file_name}" hex_content HEX)
 
 string(REPEAT "[0-9a-f]" 32 pattern)

@@ -2,11 +2,10 @@
 #include "brender/brender.h"
 #include "harness.h"
 #include "harness/trace.h"
-#include "resources/glsl_3d.fs.h"
-#include "resources/glsl_3d.vs.h"
-#include "resources/glsl_framebuffer.fs.h"
-#include "resources/glsl_framebuffer.vs.h"
-#include "shaders.h"
+#include "resources/3d_frag.glsl.h"
+#include "resources/3d_vert.glsl.h"
+#include "resources/framebuffer_frag.glsl.h"
+#include "resources/framebuffer_vert.glsl.h"
 #include "stored_context.h"
 
 #include <glad/glad.h>
@@ -138,31 +137,31 @@ GLint GetValidatedUniformLocation(GLuint program, char* uniform_name) {
 }
 
 void LoadShaders() {
-    shader_program_2d = CreateShaderProgram("framebuffer", RESOURCES_GLSL_FRAMEBUFFER_VS, sizeof(RESOURCES_GLSL_FRAMEBUFFER_VS), RESOURCES_GLSL_FRAMEBUFFER_FS, sizeof(RESOURCES_GLSL_FRAMEBUFFER_FS));
+    shader_program_2d = CreateShaderProgram("framebuffer", RESOURCES_FRAMEBUFFER_VERT_GLSL, sizeof(RESOURCES_FRAMEBUFFER_VERT_GLSL), RESOURCES_FRAMEBUFFER_FRAG_GLSL, sizeof(RESOURCES_FRAMEBUFFER_FRAG_GLSL));
     glUseProgram(shader_program_2d);
-    uniforms_2d.pixels = GetValidatedUniformLocation(shader_program_2d, "pixels");
-    uniforms_2d.palette = GetValidatedUniformLocation(shader_program_2d, "palette");
+    uniforms_2d.pixels = GetValidatedUniformLocation(shader_program_2d, "u_pixels");
+    uniforms_2d.palette = GetValidatedUniformLocation(shader_program_2d, "u_palette");
 
     // bind the uniform samplers to texture units:
     glUniform1i(uniforms_2d.pixels, 0);
     glUniform1i(uniforms_2d.palette, 1);
 
-    shader_program_3d = CreateShaderProgram("3d", RESOURCES_GLSL_3D_VS, sizeof(RESOURCES_GLSL_3D_VS), RESOURCES_GLSL_3D_FS, sizeof(RESOURCES_GLSL_3D_FS));
+    shader_program_3d = CreateShaderProgram("3d", RESOURCES_3D_VERT_GLSL, sizeof(RESOURCES_3D_VERT_GLSL), RESOURCES_3D_FRAG_GLSL, sizeof(RESOURCES_3D_FRAG_GLSL));
     glUseProgram(shader_program_3d);
-    uniforms_3d.clip_plane_count = GetValidatedUniformLocation(shader_program_3d, "clip_plane_count");
+    uniforms_3d.clip_plane_count = GetValidatedUniformLocation(shader_program_3d, "u_clip_plane_count");
     for (int i = 0; i < 6; i++) {
         char name[32];
-        sprintf(name, "clip_planes[%d]", i);
+        sprintf(name, "u_clip_planes[%d]", i);
         uniforms_3d.clip_planes[i] = GetValidatedUniformLocation(shader_program_3d, name);
     }
-    uniforms_3d.model = GetValidatedUniformLocation(shader_program_3d, "model");
-    uniforms_3d.pixels = GetValidatedUniformLocation(shader_program_3d, "pixels");
-    uniforms_3d.uv_transform = GetValidatedUniformLocation(shader_program_3d, "uv_transform");
-    uniforms_3d.shade_table = GetValidatedUniformLocation(shader_program_3d, "shade_table");
-    uniforms_3d.projection = GetValidatedUniformLocation(shader_program_3d, "projection");
-    uniforms_3d.palette_index_override = GetValidatedUniformLocation(shader_program_3d, "palette_index_override");
-    uniforms_3d.view = GetValidatedUniformLocation(shader_program_3d, "view");
-    uniforms_3d.light_value = GetValidatedUniformLocation(shader_program_3d, "light_value");
+    uniforms_3d.model = GetValidatedUniformLocation(shader_program_3d, "u_model");
+    uniforms_3d.pixels = GetValidatedUniformLocation(shader_program_3d, "u_pixels");
+    uniforms_3d.uv_transform = GetValidatedUniformLocation(shader_program_3d, "u_texture_coords_transform");
+    uniforms_3d.shade_table = GetValidatedUniformLocation(shader_program_3d, "u_shade_table");
+    uniforms_3d.projection = GetValidatedUniformLocation(shader_program_3d, "u_projection");
+    uniforms_3d.palette_index_override = GetValidatedUniformLocation(shader_program_3d, "u_palette_index_override");
+    uniforms_3d.view = GetValidatedUniformLocation(shader_program_3d, "u_view");
+    uniforms_3d.light_value = GetValidatedUniformLocation(shader_program_3d, "u_light_value");
 
     // bind the uniform samplers to texture units. palette=1, shadetable=2
     glUniform1i(uniforms_3d.pixels, 0);
@@ -524,8 +523,8 @@ void setActiveMaterial(tStored_material* material) {
     }
 
     // glUniform3fv(uniforms_3d.uv_transform, 2, material->transforms->v);
-    glUniformMatrix3x2fv(uniforms_3d.uv_transform, 1, GL_FALSE, &material->map_transform.m[0][0]);
-    //   glUniformMatrix3x2fv
+    glUniformMatrix2x3fv(uniforms_3d.uv_transform, 1, GL_TRUE, &material->map_transform.m[0][0]);
+    //    glUniformMatrix3x2fv
     glUniform1i(uniforms_3d.palette_index_override, material->index_base);
     if (material->shade_table) {
         GLRenderer_SetShadeTable(material->shade_table);
