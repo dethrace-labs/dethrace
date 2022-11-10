@@ -65,7 +65,7 @@ if (IO_PLATFORM STREQUAL "SDL_OpenGL")
     foreach(elem resources/framebuffer_vert.glsl resources/framebuffer_frag.glsl resources/3d_vert.glsl resources/3d_frag.glsl)
         add_custom_command(
             OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${elem}.h"
-            COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} -DFILE="${elem}" -P ${CMAKE_SOURCE_DIR}/cmake/EmbedResource.cmake
+            COMMAND "${CMAKE_COMMAND}" "-DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}" "-DFILE=${elem}" -P "${dethrace_SOURCE_DIR}/cmake/EmbedResource.cmake"
             DEPENDS "${elem}"
         )
     endforeach()
