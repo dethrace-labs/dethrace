@@ -39,6 +39,7 @@
 #define HITHER_MULTIPLIER 2.0f
 #define AMBIENT_MULTIPLIER 0.01f
 #define NBR_FUNK_GROVE_FLAGS 30
+#define OPPONENT_APC_IDX 3
 
 tHeadup_info gHeadup_image_info[32] = {
     // Modified by DethRace to fit the "demo timeout" fancy head-up.
@@ -1687,7 +1688,11 @@ void SetModelFlags(br_model* pModel, int pOwner) {
     LOG_TRACE("(%p, %d)", pModel, pOwner);
 
     if (pModel && pModel->nfaces) {
-        if (pOwner == eDriver_net_human || gAusterity_mode) {
+#if defined(DETHRACE_FIX_BUGS) /* Show Squad Car in the wreck gallery. */
+        if (gAusterity_mode) {
+#else
+        if (pOwner == OPPONENT_APC_IDX || gAusterity_mode) {
+#endif
             if ((pModel->flags & BR_MODF_UPDATEABLE) != 0) {
                 pModel->flags &= ~(BR_MODF_KEEP_ORIGINAL | BR_MODF_UPDATEABLE);
                 BrModelUpdate(pModel, BR_MODU_ALL);
@@ -2227,8 +2232,7 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
     AddGroovidelics(f, pOwner, pCar_spec->car_master_actor, gGroove_funk_offset, 1);
     for (i = 0; i < pCar_spec->car_actor_count; i++) {
         PossibleService();
-        // Jeff: Bug? pOwner will never be 3. Probably this was supposed to be "pDriver == eDriver_net_human"?
-        if (pOwner == 3 || gAusterity_mode) {
+        if (pOwner == OPPONENT_APC_IDX || gAusterity_mode) {
             pCar_spec->car_model_actors[i].crush_data.softness_factor = SkipCrushData(f);
             pCar_spec->car_model_actors[i].crush_data.crush_points = NULL;
             pCar_spec->car_model_actors[i].crush_data.number_of_crush_points = 0;
