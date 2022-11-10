@@ -6,8 +6,8 @@ in vec2 TexCoord;
 
 out uint palette_index;
 
-//uniform mat3x2 texture_uv_transform;
-uniform vec3 texture_uv_transform[2];
+uniform mat3x2 uv_transform;
+//uniform vec3 uv_transform[2];
 uniform usampler2D pixels;
 uniform usampler2D shade_table;
 uniform int palette_index_override = -1;
@@ -26,7 +26,8 @@ void main() {
 
     if (palette_index_override == -1) {
         //vec3 sample_coord = mat3(pixels_transform[0], pixels_transform[1], vec3(0, 0, 1)) * vec3(TexCoord.xy, 1);
-        vec3 sample_coord = vec3(TexCoord.xy, 1) * mat3(texture_uv_transform[0], texture_uv_transform[1], vec3(0, 0, 1));
+        //vec3 sample_coord = vec3(TexCoord.xy, 1) * mat3(uv_transform[0], uv_transform[1], vec3(0, 0, 1));
+        vec3 sample_coord = vec2(TexCoord.xy) * uv_transform;
         uint texel = texture(pixels, sample_coord.xy).x;
         if (light_value == -1) {
             palette_index = texel;
