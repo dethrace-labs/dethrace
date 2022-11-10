@@ -49,48 +49,13 @@ struct {
     GLuint pixels, palette;
 } uniforms_2dpp;
 
-// GLuint CreateShaderFromFile(const char* filename, const char* fallback, GLenum type) {
-//     int success;
-
-//     GLuint res = glCreateShader(type);
-
-//     FILE* f = fopen(filename, "r");
-//     if (f) {
-//         fseek(f, 0, SEEK_END);
-//         long fsize = ftell(f);
-//         fseek(f, 0, SEEK_SET);
-//         char* file_bytes = malloc(fsize + 1);
-//         fsize = fread(file_bytes, fsize, 1, f);
-//         fclose(f);
-//         file_bytes[fsize] = 0;
-//         const GLchar* sources[] = { file_bytes };
-//         glShaderSource(res, 1, sources, NULL);
-//     } else {
-//         const GLchar* sources[] = { fallback };
-//         glShaderSource(res, 1, sources, NULL);
-//     }
-
-//     glCompileShader(res);
-//     glGetShaderiv(res, GL_COMPILE_STATUS, &success);
-//     if (!success) {
-//         char log_buffer[1024];
-//         glGetShaderInfoLog(res, 1024, NULL, log_buffer);
-//         LOG_PANIC("shader %s failed to compile: %s", filename, log_buffer);
-//     }
-//     return res;
-// }
-
 GLuint CreateShaderProgram(char* name, const char* vertex_shader, const int vertex_shader_len, const char* fragment_shader, const int fragment_shader_len) {
+    int success;
     char log_buffer[1024];
-    GLuint program = glCreateProgram();
+    GLuint program;
     GLuint v_shader, f_shader;
 
-    // printf("\n\nvs: %s\n", vertex_fallback);
-    // printf("\n\nfs: %s\n", fragment_fallback);
-    // v_shader = CreateShaderFromFile(vertex_file, vertex_fallback, GL_VERTEX_SHADER);
-    // if (!v_shader)
-    //     return 0;
-    int success;
+    program = glCreateProgram();
     v_shader = glCreateShader(GL_VERTEX_SHADER);
     const GLchar* vertex_sources[] = { vertex_shader };
     glShaderSource(v_shader, 1, vertex_sources, &vertex_shader_len);
@@ -522,9 +487,7 @@ void setActiveMaterial(tStored_material* material) {
         return;
     }
 
-    // glUniform3fv(uniforms_3d.uv_transform, 2, material->transforms->v);
     glUniformMatrix2x3fv(uniforms_3d.uv_transform, 1, GL_TRUE, &material->map_transform.m[0][0]);
-    //    glUniformMatrix3x2fv
     glUniform1i(uniforms_3d.palette_index_override, material->index_base);
     if (material->shade_table) {
         GLRenderer_SetShadeTable(material->shade_table);
@@ -611,15 +574,6 @@ void GLRenderer_BufferMaterial(br_material* mat) {
         }
     }
     BrMatrix23Copy(&stored->map_transform, &mat->map_transform);
-    stored->transforms[0].v[0] = mat->map_transform.m[0][0];
-    stored->transforms[0].v[1] = mat->map_transform.m[0][1];
-    stored->transforms[0].v[2] = mat->map_transform.m[2][0];
-    stored->transforms[1].v[0] = mat->map_transform.m[1][0];
-    stored->transforms[1].v[1] = mat->map_transform.m[1][1];
-    stored->transforms[1].v[2] = mat->map_transform.m[2][1];
-    // stored->map_transform[2].v[0] = 0.f;
-    // stored->map_transform[2].v[1] = 0.f;
-    // stored->map_transform[2].v[2] = 1.f;
     stored->pixelmap = mat->colour_map;
     stored->flags = mat->flags;
     stored->shade_table = mat->index_shade;

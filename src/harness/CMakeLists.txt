@@ -2,18 +2,18 @@ configure_file(version.h.in version.h @ONLY)
 
 add_library(harness STATIC)
 
-if(NOT DEFINED IO_PLATFORM)
+if (NOT DEFINED IO_PLATFORM)
     set(IO_PLATFORM "SDL_OpenGL")
 endif()
 
 target_include_directories(harness
     PRIVATE
-    .
-    ${CMAKE_SOURCE_DIR}
-    ${CMAKE_SOURCE_DIR}/src/DETHRACE
-    "${CMAKE_CURRENT_BINARY_DIR}"
+        .
+        ${CMAKE_SOURCE_DIR}
+        ${CMAKE_SOURCE_DIR}/src/DETHRACE
+        "${CMAKE_CURRENT_BINARY_DIR}"
     PUBLIC
-    include
+        include
 )
 
 target_link_libraries(harness PRIVATE brender compile_with_werror)
@@ -57,11 +57,10 @@ target_sources(harness PRIVATE
     brender_emu/renderer_impl.h
     sound/sound.c
     sound/sound.h
-
     "${CMAKE_CURRENT_BINARY_DIR}/version.h"
 )
 
-if(IO_PLATFORM STREQUAL "SDL_OpenGL")
+if (IO_PLATFORM STREQUAL "SDL_OpenGL")
     # generate embedded glsl resources
     foreach(elem resources/framebuffer_vert.glsl resources/framebuffer_frag.glsl resources/3d_vert.glsl resources/3d_frag.glsl)
         add_custom_command(
