@@ -2,6 +2,10 @@
 #include "brender/brender.h"
 #include "harness.h"
 #include "harness/trace.h"
+#include "resources/glsl_3d.fs.h"
+#include "resources/glsl_3d.vs.h"
+#include "resources/glsl_framebuffer.fs.h"
+#include "resources/glsl_framebuffer.vs.h"
 #include "shaders.h"
 #include "stored_context.h"
 
@@ -29,7 +33,7 @@ static br_pixelmap* last_shade_table = NULL;
 static int dirty_buffers = 0;
 
 struct {
-    GLuint pixels, pixels_transform;
+    GLuint pixels, uv_transform;
     GLuint shade_table;
     GLuint model, view, projection;
     GLuint palette_index_override;
@@ -107,7 +111,7 @@ GLuint CreateShaderProgram(const char* vertex_file, const char* fragment_file, c
 }
 
 void LoadShaders() {
-    shader_program_2d = CreateShaderProgram("vertex_shader_2d.glsl", "fragment_shader_2d.glsl", vs_2d, fs_2d);
+    shader_program_2d = CreateShaderProgram("vertex_shader_2d.glsl", "fragment_shader_2d.glsl", RESOURCES_GLSL_FRAMEBUFFER_VS, RESOURCES_GLSL_FRAMEBUFFER_FS);
     glUseProgram(shader_program_2d);
     uniforms_2d.pixels = glGetUniformLocation(shader_program_2d, "pixels");
     uniforms_2d.palette = glGetUniformLocation(shader_program_2d, "palette");
@@ -116,7 +120,7 @@ void LoadShaders() {
     glUniform1i(uniforms_2d.pixels, 0);
     glUniform1i(uniforms_2d.palette, 1);
 
-    shader_program_3d = CreateShaderProgram("vertex_shader_3d.glsl", "fragment_shader_3d.glsl", vs_3d, fs_3d);
+    shader_program_3d = CreateShaderProgram("vertex_shader_3d.glsl", "fragment_shader_3d.glsl", RESOURCES_GLSL_3D_VS, RESOURCES_GLSL_3D_FS);
     glUseProgram(shader_program_3d);
     uniforms_3d.clip_plane_count = glGetUniformLocation(shader_program_3d, "clip_plane_count");
     for (int i = 0; i < 6; i++) {
@@ -126,7 +130,7 @@ void LoadShaders() {
     }
     uniforms_3d.model = glGetUniformLocation(shader_program_3d, "model");
     uniforms_3d.pixels = glGetUniformLocation(shader_program_3d, "pixels");
-    uniforms_3d.pixels_transform = glGetUniformLocation(shader_program_3d, "pixels_transform");
+    uniforms_3d.uv_transform = glGetUniformLocation(shader_program_3d, "uv_transform");
     uniforms_3d.shade_table = glGetUniformLocation(shader_program_3d, "shade_table");
     uniforms_3d.projection = glGetUniformLocation(shader_program_3d, "projection");
     uniforms_3d.palette_index_override = glGetUniformLocation(shader_program_3d, "palette_index_override");
@@ -492,7 +496,9 @@ void setActiveMaterial(tStored_material* material) {
         return;
     }
 
-    glUniform3fv(uniforms_3d.pixels_transform, 2, material->map_transform->v);
+    glUniform3fv(uniforms_3d.uv_transform, 2, material->transforms->v);
+    // glUniformMatrix3x2fv(uniforms_3d.uv_transform, 1, GL_FALSE, &material->map_transform.m[0][0]);
+    //   glUniformMatrix3x2fv
     glUniform1i(uniforms_3d.palette_index_override, material->index_base);
     if (material->shade_table) {
         GLRenderer_SetShadeTable(material->shade_table);
@@ -578,12 +584,16 @@ void GLRenderer_BufferMaterial(br_material* mat) {
             strcpy(stored->identifier, mat->identifier);
         }
     }
-    stored->map_transform[0].v[0] = mat->map_transform.m[0][0];
-    stored->map_transform[0].v[1] = mat->map_transform.m[0][1];
-    stored->map_transform[0].v[2] = mat->map_transform.m[2][0];
-    stored->map_transform[1].v[0] = mat->map_transform.m[1][0];
-    stored->map_transform[1].v[1] = mat->map_transform.m[1][1];
-    stored->map_transform[1].v[2] = mat->map_transform.m[2][1];
+    BrMatrix23Copy(&stored->map_transform, &mat->map_transform);
+    stored->transforms[0].v[0] = mat->map_transform.m[0][0];
+    stored->transforms[0].v[1] = mat->map_transform.m[0][1];
+    stored->transforms[0].v[2] = mat->map_transform.m[2][0];
+    stored->transforms[1].v[0] = mat->map_transform.m[1][0];
+    stored->transforms[1].v[1] = mat->map_transform.m[1][1];
+    stored->transforms[1].v[2] = mat->map_transform.m[2][1];
+    // stored->map_transform[2].v[0] = 0.f;
+    // stored->map_transform[2].v[1] = 0.f;
+    // stored->map_transform[2].v[2] = 1.f;
     stored->pixelmap = mat->colour_map;
     stored->flags = mat->flags;
     stored->shade_table = mat->index_shade;

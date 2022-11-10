@@ -6,7 +6,7 @@ if (NOT DEFINED IO_PLATFORM)
     set(IO_PLATFORM "SDL_OpenGL")
 endif()
 
-target_include_directories(harness 
+target_include_directories(harness
     PRIVATE
         .
         ${CMAKE_SOURCE_DIR}
@@ -15,6 +15,14 @@ target_include_directories(harness
     PUBLIC
         include
 )
+
+foreach(elem resources/glsl_framebuffer.vs resources/glsl_framebuffer.fs resources/glsl_3d.vs resources/glsl_3d.fs)
+        add_custom_command(
+            OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${elem}.h"
+            COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} -DFILE="${elem}" -P ${CMAKE_SOURCE_DIR}/cmake/EmbedResource.cmake
+            DEPENDS "${elem}"
+        )
+    endforeach()
 
 target_link_libraries(harness PRIVATE brender compile_with_werror)
 
@@ -38,6 +46,7 @@ else()
     target_compile_definitions(harness PRIVATE BR_ENDIAN_LITTLE=1)
 endif()
 
+
 target_sources(harness PRIVATE
     include/harness/compiler.h
     include/harness/hooks.h
@@ -57,10 +66,18 @@ target_sources(harness PRIVATE
     brender_emu/renderer_impl.h
     sound/sound.c
     sound/sound.h
+
+    resources/glsl_framebuffer.vs.h
+    resources/glsl_framebuffer.fs.h
+    resources/glsl_3d.vs.h
+    resources/glsl_3d.fs.h
+
     "${CMAKE_CURRENT_BINARY_DIR}/version.h"
 )
 
 if (IO_PLATFORM STREQUAL "SDL_OpenGL")
+
+
     target_sources(harness PRIVATE
         io_platforms/sdl_gl.c
         renderers/gl/gl_renderer.c
@@ -69,6 +86,8 @@ if (IO_PLATFORM STREQUAL "SDL_OpenGL")
         renderers/gl/shaders.h
         renderers/gl/stored_context.c
         renderers/gl/stored_context.h
+
+
     )
     target_link_libraries(harness PRIVATE SDL2::SDL2 glad)
 endif()

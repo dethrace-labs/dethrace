@@ -18,7 +18,8 @@ typedef struct tStored_material {
     br_uint_32 flags;
     br_pixelmap* shade_table;
     br_pixelmap* pixelmap;
-    br_vector3 map_transform[2];
+    br_vector3 transforms[2];
+    br_matrix23 map_transform;
     char identifier[200];
 } tStored_material;
 

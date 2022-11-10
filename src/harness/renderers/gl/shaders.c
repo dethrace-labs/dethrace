@@ -11,19 +11,19 @@ const char* vs_2d = "#version 140\n"
                     "   TexCoord = aTexCoord;\n"
                     "}\0";
 
-const char* fs_2d = "#version 140\n"
-                    "#extension GL_ARB_explicit_attrib_location : require\n"
-                    "in vec2 TexCoord;\n"
-                    "uniform usampler2D pixels;\n"
-                    "uniform sampler2D palette;\n"
-                    "layout (location = 0) out vec4 FragColor;\n"
+// const char* fs_2d = "#version 140\n"
+//                     "#extension GL_ARB_explicit_attrib_location : require\n"
+//                     "in vec2 TexCoord;\n"
+//                     "uniform usampler2D pixels;\n"
+//                     "uniform sampler2D palette;\n"
+//                     "layout (location = 0) out vec4 FragColor;\n"
 
-                    "void main()\n"
-                    "{\n"
-                    "   uint palette_index = texture(pixels, TexCoord.xy).x;\n"
-                    "  vec4 texel = texelFetch(palette, ivec2(palette_index, 0), 0);\n"
-                    "  FragColor = texel;\n"
-                    "}\n\0";
+//                     "void main()\n"
+//                     "{\n"
+//                     "   uint palette_index = texture(pixels, TexCoord.xy).x;\n"
+//                     "  vec4 texel = texelFetch(palette, ivec2(palette_index, 0), 0);\n"
+//                     "  FragColor = texel;\n"
+//                     "}\n\0";
 
 const char* vs_3d = "#version 140\n"
                     "#extension GL_ARB_explicit_attrib_location : require\n"
