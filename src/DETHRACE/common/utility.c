@@ -120,13 +120,11 @@ void EncodeLine(char* pS) {
 
     len = strlen(pS);
     key = (char*)gLong_key;
-    if (!gEncryption_method) {
-        strcpy(the_path, gApplication_path);
-        strcat(the_path, gDir_separator);
-        strcat(the_path, "GENERAL.TXT");
+    if (gEncryption_method == 0) {
+        PathCat(the_path, gApplication_path, "GENERAL.TXT");
 
         test = fopen(the_path, "rt");
-        if (test) {
+        if (test != NULL) {
             fgets(s, 256, test);
             if (s[0] != '@') {
                 gEncryption_method = 2;
@@ -144,45 +142,52 @@ void EncodeLine(char* pS) {
         }
     }
     while (len > 0 && (pS[len - 1] == '\r' || pS[len - 1] == '\n')) {
-        --len;
-        pS[len] = 0;
+        len--;
+        pS[len] = '\0';
     }
 
     seed = len % 16;
+
     for (i = 0; i < len; i++) {
         c = pS[i];
+#if defined(DETHRACE_FIX_BUGS)
         if (i >= 2) {
             if (pS[i - 1] == '/' && pS[i - 2] == '/') {
                 key = (char*)gOther_long_key;
             }
         }
+#endif
         if (gEncryption_method == 1) {
             if (c == '\t') {
-                c = 0x80;
+                c = 0x9f;
             }
-            c -= 0x20;
-            if (!(c & 0x80)) {
-                c = (c ^ key[seed]) & 0x7f;
-                c += 0x20;
-            }
-            seed += 7;
-            seed = seed % 16;
 
-            if (c == 0x80) {
+            c -= 0x20;
+            c ^= key[seed];
+            c &= 0x7f;
+            c += 0x20;
+
+            seed += 7;
+            seed %= 16;
+
+            if (c == 0x9f) {
                 c = '\t';
             }
         } else {
             if (c == '\t') {
-                c = 0x9f;
+                c = 0x80;
             }
+
             c -= 0x20;
-            c = (c ^ key[seed]) & 0x7f;
+            if ((c & 0x80) == 0) {
+                c ^= key[seed] & 0x7f;
+            }
             c += 0x20;
 
             seed += 7;
-            seed = seed % 16;
+            seed %= 16;
 
-            if (c == 0x9f) {
+            if (c == 0x80) {
                 c = '\t';
             }
         }
@@ -1155,8 +1160,8 @@ void DecodeLine2(char* pS) {
     len = strlen(pS);
     key = (char*)gLong_key;
     while (len > 0 && (pS[len - 1] == '\r' || pS[len - 1] == '\n')) {
-        --len;
-        pS[len] = 0;
+        len--;
+        pS[len] = '\0';
     }
     seed = len % 16;
     for (i = 0; i < len; i++) {
@@ -1215,37 +1220,39 @@ void EncodeLine2(char* pS) {
     len = strlen(pS);
     count = 0;
     key = (char*)gLong_key;
-    while (len > 0 && (pS[len - 1] == 13 || pS[len - 1] == 10)) {
-        --len;
-        pS[len] = 0;
+    while (len > 0 && (pS[len - 1] == '\r' || pS[len - 1] == '\n')) {
+        len--;
+        pS[len] = '\0';
     }
 
     seed = len % 16;
 
-    for (i = 0; i < len; ++pS) {
-        if (count == 2)
+    for (i = 0; i < len; i++) {
+        if (count == 2) {
             key = (char*)gOther_long_key;
-        if (*pS == '/') {
-            ++count;
+        }
+        if (pS[i] == '/') {
+            count++;
         } else {
             count = 0;
         }
-        if (*pS == '\t') {
-            *pS = 0x80;
+        if (pS[i] == '\t') {
+            pS[i] = 0x80;
         }
-        c = *pS - 0x20;
-        if (!(c & 0x80)) {
-            c = c ^ (key[seed] & 0x7F);
-            c += 0x20;
+
+        c = pS[i] - 0x20;
+        if ((c & 0x80) == 0) {
+            c ^= key[seed] & 0x7f;
         }
+        c += 0x20;
+
         seed += 7;
-        seed = seed % 16;
+        seed %= 16;
 
         if (c == 0x80) {
             c = '\t';
         }
-        *pS = c;
-        ++i;
+        pS[i] = c;
     }
 }
 
@@ -1265,11 +1272,11 @@ void EncodeFile(char* pThe_path) {
 
     len = strlen(pThe_path);
     strcpy(new_file, pThe_path);
-    strcat(new_file, "ENC");
+    strcpy(&new_file[len - 3], "ENC");
 
     f = fopen(pThe_path, "rt");
     if (f == NULL) {
-        FatalError(kFatalError_Open_S, new_file);
+        FatalError(kFatalError_Open_S, pThe_path);
     }
 
     ch = fgetc(f);
@@ -1288,37 +1295,44 @@ void EncodeFile(char* pThe_path) {
     result = &line[1];
 
     while (!feof(f)) {
-        fgets(result, 256, f);
+        s = fgets(result, 256, f);
 
-        if (ch == '@') {
+        if (s == NULL) {
+            continue;
+        }
+
+        if (result[0] == '@') {
             decode = 1;
         } else {
             decode = 0;
-            s = &result[1];
-            while (line[0] == ' ' || line[0] == '\t') {
-                memmove(result, s, strlen(result));
+            // Strip leading whitespace
+            while (result[0] == ' ' || result[0] == '\t') {
+                memmove(result, &result[1], strlen(result));
             }
         }
 
-        if (decode == 0) {
-            EncodeLine2(result + decode);
+        if (decode) {
+            DecodeLine2(&result[decode]);
         } else {
-            DecodeLine2(result + decode);
+            EncodeLine2(&result[decode]);
         }
 
         line[0] = '@';
         fputs(&line[decode * 2], d);
         count = -1;
-        ch = fgetc(f);
-        while (ch == '\r' || ch == '\n') {
+        while (1) {
             count++;
+            ch = fgetc(f);
+            if (ch != '\r' && ch != '\n') {
+                break;
+            }
         }
-        if (count >= 2) {
-            fputc(0x0d, d);
-            fputc(0x0a, d);
+        if (count > 2) {
+            fputc('\r', d);
+            fputc('\n', d);
         }
-        fputc(0x0d, d);
-        fputc(0x0a, d);
+        fputc('\r', d);
+        fputc('\n', d);
 
         if (ch != -1) {
             ungetc(ch, f);
