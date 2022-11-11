@@ -1965,7 +1965,66 @@ void PipeInstantUnSmudge(tCar_spec* pCar) {
     int group;
     tSmudged_vertex data[1000];
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    if (!gAction_replay_mode) {
+        return;
+    }
+    actor = pCar->car_model_actors[pCar->principal_car_actor].actor;
+    model = actor->model;
+    bonny = pCar->car_model_actors[pCar->car_actor_count - 1].actor;
+    n = 0;
+    if ((model->flags & BR_MODF_KEEP_ORIGINAL) != 0 || (model->flags & BR_MODF_UPDATEABLE) != 0) {
+        StartPipingSession(ePipe_chunk_smudge);
+        j = 0;
+        for (group = 0; group < V11MODEL(model)->ngroups; group++) {
+            for (v = 0; v < V11MODEL(model)->groups[group].nvertices; v++) {
+                if ((V11MODEL(model)->groups[group].vertex_colours[v] >> 24) != 0) {
+                    data[n].vertex_index = j;
+                    data[n].light_index = -(V11MODEL(model)->groups[group].vertex_colours[v] >> 24);
+                    n += 1;
+                    V11MODEL(model)->groups[group].vertex_colours[v] = 0;
+                    if ((model->flags & 0x80) != 0) {
+                        model->vertices[V11MODEL(model)->groups[group].vertex_user[v]].index = 0;
+                    }
+                    if (n >= COUNT_OF(data)) {
+                        group = V11MODEL(model)->ngroups;
+                        break;
+                    }
+                }
+                j += 1;
+            }
+        }
+        if (n != 0) {
+            AddSmudgeToPipingSession(pCar->car_ID, pCar->principal_car_actor, n, data);
+        }
+        if (bonny != actor) {
+            b_model = bonny->model;
+            n = 0;
+            j = 0;
+            for (group = 0; group < V11MODEL(model)->ngroups; group++) {
+                for (v = 0; v < V11MODEL(model)->groups[group].nvertices; v++) {
+                    if ((V11MODEL(model)->groups[group].vertex_colours[v] >> 24) != 0) {
+                        data[n].vertex_index = j;
+                        data[n].light_index = -V11MODEL(model)->groups[group].nvertices;
+                        n += 1;
+                        V11MODEL(model)->groups[group].vertex_colours[v] = 0;
+                        if ((b_model->flags & BR_MODF_UPDATEABLE) != 0) {
+                            b_model->vertices[V11MODEL(model)->groups[group].vertex_user[v]].index = 0;
+                        }
+                        if (n >= COUNT_OF(data)) {
+                            group = V11MODEL(model)->groups[group].nvertices;
+                            break;
+                        }
+                    }
+                    j += 1;
+                }
+            }
+            if (n != 0) {
+                AddSmudgeToPipingSession(pCar->car_ID, pCar->car_actor_count - 1, n, data);
+            }
+        }
+        EndPipingSession();
+    }
 }
 
 // IDA: void __usercall SmudgeCar(tCar_spec *pCar@<EAX>, int fire_point@<EDX>)
