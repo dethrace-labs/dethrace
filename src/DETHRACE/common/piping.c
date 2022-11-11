@@ -290,7 +290,7 @@ tU32 LengthOfSession(tPipe_session* pSession) {
         running_total = 0;
         for (i = 0; i < pSession->number_of_chunks; i++) {
             the_chunk = (tPipe_chunk*)&((tU8*)&pSession->chunks)[running_total];
-            running_total += the_chunk->chunk_data.smudge_data.vertex_count * sizeof(tSmudged_vertex) + offsetof(tPipe_smudge_data, vertex_changes) + sizeof(int);
+            running_total += the_chunk->chunk_data.smudge_data.vertex_count * sizeof(tSmudged_vertex) + offsetof(tPipe_smudge_data, vertex_changes) + offsetof(tPipe_chunk, chunk_data);
         }
         break;
     case ePipe_chunk_splash:
