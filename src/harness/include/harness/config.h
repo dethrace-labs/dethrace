@@ -7,6 +7,7 @@ typedef enum tHarness_game_type {
     eGame_splatpack,
     eGame_carmageddon_demo,
     eGame_splatpack_demo,
+    eGame_splatpack_xmas_demo,
 } tHarness_game_type;
 
 typedef enum {
@@ -37,6 +38,7 @@ typedef struct tHarness_game_config {
     unsigned demo_timeout;
     int enable_diagnostics;
     float volume_multiplier;
+    int start_full_screen;
 
     int install_signalhandler;
 } tHarness_game_config;

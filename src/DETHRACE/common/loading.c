@@ -1687,7 +1687,7 @@ void MungeWindscreen(br_model* pModel) {
 void SetModelFlags(br_model* pModel, int pOwner) {
     LOG_TRACE("(%p, %d)", pModel, pOwner);
 
-    if (pModel && pModel->nfaces) {
+    if (pModel != NULL&& pModel->nfaces != 0) {
 #if defined(DETHRACE_FIX_BUGS) /* Show Squad Car in the wreck gallery. */
         if (gAusterity_mode) {
 #else
@@ -1795,7 +1795,12 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
         FatalError(kFatalError_FileCorrupt_S, pCar_name);
     }
     if (*pDriver_name != '\0') {
+#if defined(DETHRACE_FIX_BUGS)
+        // Make sure to not read and write out of bounds.
+        memcpy(pCar_spec->driver_name, pDriver_name, MIN(sizeof(pCar_spec->driver_name), strlen(pDriver_name)));
+#else
         memcpy(pCar_spec->driver_name, pDriver_name, sizeof(pCar_spec->driver_name));
+#endif
         pCar_spec->driver_name[sizeof(pCar_spec->driver_name) - 1] = '\0';
     } else {
         strcpy(pCar_spec->driver_name, "X");
@@ -2430,11 +2435,11 @@ void LoadRaces(tRace_list_spec* pRace_list, int* pCount, int pRace_type_index) {
     *pCount = number_of_racers;
     fclose(f);
     j = 0;
-    if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo) {
+    if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
         j = 99;
     }
     for (i = 0; i < number_of_racers; i++) {
-        if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo) {
+        if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
             pRace_list[i].suggested_rank = gDemo_rank;
             pRace_list[i].rank_required = j;
             j -= 3;

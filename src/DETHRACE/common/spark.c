@@ -24,7 +24,7 @@ int gShrapnel_flags;
 br_model* gShrapnel_model[2];
 int gSmoke_flags;
 int gSmoke_num;
-int gOffset;
+int gOffset = 0;
 int gColumn_flags;
 int gNext_column;
 br_pixelmap* gBlack_smoke_shade_table;
@@ -838,7 +838,7 @@ void SmokeLine(int l, int x, br_scalar zbuff, int r_squared, tU8* scr_ptr, tU16*
     if (gProgram_state.cockpit_on) {
         depth_ptr += gOffset;
     }
-    z = (1.0 - zbuff) * 32768.0f;
+    z = (1.f - zbuff) * 32768.0f;
     r_multiplier_int = r_multiplier * 65536.0f;
     shade_offset_int = shade_offset * 65536.0f;
 
@@ -897,7 +897,7 @@ void SmokeCircle(br_vector3* o, br_scalar r, br_scalar extra_z, br_scalar streng
         return;
     }
     shade_ptr = (tU8*)pShade_table->pixels + pShade_table->row_bytes * (pShade_table->base_y + 1);
-    shade_offset = strength * 14.99;
+    shade_offset = strength * 14.99f;
     r_multiplier = shade_offset / (double)max_r_squared;
     z_multiplier = extra_z / (double)max_r_squared;
     max_x = pRender_screen->width - ox - 1;
@@ -910,7 +910,7 @@ void SmokeCircle(br_vector3* o, br_scalar r, br_scalar extra_z, br_scalar streng
     osp = scr_ptr;
     odp = depth_ptr;
     if (pRender_screen->height > oy && oy + ry >= 0.0) {
-        r_squared = (r * r);
+        r_squared = r * r;
         inc = -r;
         y = 0;
         y_limit = ry;
@@ -951,7 +951,7 @@ void SmokeCircle(br_vector3* o, br_scalar r, br_scalar extra_z, br_scalar streng
             if (y_limit <= y) {
                 break;
             }
-            ++y;
+            y++;
             scr_ptr -= pRender_screen->row_bytes;
             depth_ptr -= pDepth_buffer->row_bytes / 2;
             for (r_squared += (2 * y - 1) * aspect_squared; max_r_squared < r_squared && inc < 0; r_squared += 2 * inc - 1) {
@@ -961,19 +961,19 @@ void SmokeCircle(br_vector3* o, br_scalar r, br_scalar extra_z, br_scalar streng
                 l -= 2;
             }
             gOffset += IRandomBetween(-1, 1);
-            if (gOffset > r / 5.0) {
-                gOffset = r / 5.0;
+            if (gOffset > r / 5.f) {
+                gOffset = r / 5.f;
             }
-            if (gOffset < -(r / 5.0)) {
-                gOffset = -(r / 5.0);
+            if (gOffset < -(r / 5.f)) {
+                gOffset = -(r / 5.f);
             }
         }
     }
     if (pAspect < 1.0) {
-        aspect_squared = 9.0;
-        ry = r / 3.0;
+        aspect_squared = 9.f;
+        ry = r / 3.f;
     }
-    if (oy > 0 && oy <= pRender_screen->height + ry - 2.0) {
+    if (oy > 0 && oy <= pRender_screen->height + ry - 2.f) {
         r_squared = (r * r);
         inc = -r;
         y = 0;
@@ -989,7 +989,7 @@ void SmokeCircle(br_vector3* o, br_scalar r, br_scalar extra_z, br_scalar streng
             inc = -sqrtf(max_r_squared - r_squared);
             r_squared += inc * inc;
         }
-        if (oy - ry < 0.0) {
+        if (oy - ry < 0.f) {
             y_limit = oy;
         }
         l = -2 * inc;

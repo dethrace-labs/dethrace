@@ -63,6 +63,8 @@ if(DETHRACE_WERROR)
     endif()
 endif()
 
+option(DETHRACE_FIX_BUGS "Fix Dethrace bugs" ON)
+
 add_subdirectory(src/harness)
 add_subdirectory(src/S3)
 add_subdirectory(src/BRSRC13)

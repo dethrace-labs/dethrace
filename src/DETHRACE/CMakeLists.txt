@@ -1,8 +1,6 @@
 # Create object files so we can link them into the main binary and into tests without building twice.
 add_library(dethrace_obj OBJECT)
 
-option(DETHRACE_FIX_BUGS "Fix Dethrace bugs" ON)
-
 target_include_directories(dethrace_obj
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
@@ -35,7 +33,7 @@ else()
         -Wno-format-overflow
     )
 endif()
-if(BRENDER_FIX_BUGS)
+if(DETHRACE_FIX_BUGS)
     target_compile_definitions(dethrace_obj PRIVATE DETHRACE_FIX_BUGS)
 endif()
 

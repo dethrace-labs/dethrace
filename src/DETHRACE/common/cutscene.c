@@ -234,7 +234,11 @@ void DoFullVersionPowerpoint() {
 
     FadePaletteDown();
     DRSetPalette(gRender_palette);
-    ShowCutScene(9, 0, 8503, gCut_delay_4);
+    if (harness_game_info.mode == eGame_splatpack_demo) {
+        PlaySmackerFile("DEMOEND.SMK");
+    } else {
+        ShowCutScene(9, 0, 8503, gCut_delay_4);
+    }
     FadePaletteDown();
 
     gLast_demo_end_anim = PDGetTotalTime();
