@@ -151,6 +151,7 @@ void EncodeLine(char* pS) {
     for (i = 0; i < len; i++) {
         c = pS[i];
 #if defined(DETHRACE_FIX_BUGS)
+        // When loading game data, Carmageddon does not switch the XOR cypher when the comments start.
         if (i >= 2) {
             if (pS[i - 1] == '/' && pS[i - 2] == '/') {
                 key = (char*)gOther_long_key;

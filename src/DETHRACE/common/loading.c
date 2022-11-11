@@ -1796,6 +1796,7 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
     }
     if (*pDriver_name != '\0') {
 #if defined(DETHRACE_FIX_BUGS)
+        // Make sure to not read and write out of bounds.
         memcpy(pCar_spec->driver_name, pDriver_name, MIN(sizeof(pCar_spec->driver_name), strlen(pDriver_name)));
 #else
         memcpy(pCar_spec->driver_name, pDriver_name, sizeof(pCar_spec->driver_name));
