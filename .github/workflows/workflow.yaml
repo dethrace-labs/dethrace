@@ -61,7 +61,7 @@ jobs:
       - name: Calculate Variables
         id: vars
         run: |
-          echo "::set-output name=ref_name_without_v::$(echo ${GITHUB_REF_NAME} | cut -c2-)"
+          echo "ref_name_without_v=$(echo ${GITHUB_REF_NAME} | cut -c2-)" >>$GITHUB_OUTPUT
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v0.1.14

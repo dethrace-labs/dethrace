@@ -1873,9 +1873,9 @@ int RematerialiseOpponentOnThisSection(tOpponent_spec* pOpponent_spec, br_scalar
         } else if (t > 1.f) {
             BrVector3Copy(&p, finish);
         } else {
-            p.v[0] = start->v[0] + t * car_to_end.v[0];
-            p.v[1] = start->v[1] + t * car_to_end.v[1];
-            p.v[2] = start->v[2] + t * car_to_end.v[2];
+            p.v[0] = start->v[0] + t * section_v.v[0];
+            p.v[1] = start->v[1] + t * section_v.v[1];
+            p.v[2] = start->v[2] + t * section_v.v[2];
         }
         BrVector3Copy(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &p);
         BrVector3Sub(&a, finish, start);
@@ -3665,7 +3665,7 @@ void RebuildOppoPathModel() {
                 edge_mat_finish_lt = gMat_lt_turq;
                 edge_mat_finish_dk = gMat_dk_turq;
             }
-            if (gAlready_elasticating != 0 && gMobile_section == i) {
+            if (gAlready_elasticating && gMobile_section == i) {
                 BrVector3Copy(&gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[i].node_indices[1]].p,
                     &gSelf->t.t.translate.t);
             }
@@ -4393,7 +4393,7 @@ void DeleteOppoPathNodeAndSections() {
     tS16 node_no;
     LOG_TRACE("()");
 
-    if (!gOppo_paths_shown == 0) {
+    if (!gOppo_paths_shown) {
         NewTextHeadupSlot(4, 0, 2000, -1, "Show paths first (F5)");
     }
     else if (gAlready_elasticating) {

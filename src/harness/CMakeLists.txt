@@ -6,7 +6,7 @@ if (NOT DEFINED IO_PLATFORM)
     set(IO_PLATFORM "SDL_OpenGL")
 endif()
 
-target_include_directories(harness 
+target_include_directories(harness
     PRIVATE
         .
         ${CMAKE_SOURCE_DIR}
@@ -61,14 +61,26 @@ target_sources(harness PRIVATE
 )
 
 if (IO_PLATFORM STREQUAL "SDL_OpenGL")
+    # generate embedded glsl resources
+    foreach(elem resources/framebuffer_vert.glsl resources/framebuffer_frag.glsl resources/3d_vert.glsl resources/3d_frag.glsl)
+        add_custom_command(
+            OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${elem}.h"
+            COMMAND "${CMAKE_COMMAND}" "-DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}" "-DFILE=${elem}" -P "${dethrace_SOURCE_DIR}/cmake/EmbedResource.cmake"
+            DEPENDS "${elem}"
+        )
+    endforeach()
+
     target_sources(harness PRIVATE
         io_platforms/sdl_gl.c
         renderers/gl/gl_renderer.c
         renderers/gl/gl_renderer.h
-        renderers/gl/shaders.c
-        renderers/gl/shaders.h
         renderers/gl/stored_context.c
         renderers/gl/stored_context.h
+
+        resources/framebuffer_vert.glsl.h
+        resources/framebuffer_frag.glsl.h
+        resources/3d_vert.glsl.h
+        resources/3d_frag.glsl.h
     )
     target_link_libraries(harness PRIVATE SDL2::SDL2 glad)
 endif()
@@ -78,9 +90,9 @@ if(WIN32)
         os/windows.c
     )
 elseif(APPLE)
-target_sources(harness PRIVATE
-    os/macos.c
-)
+    target_sources(harness PRIVATE
+        os/macos.c
+    )
 else()
     target_sources(harness PRIVATE
         os/linux.c
