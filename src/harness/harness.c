@@ -90,19 +90,19 @@ void Harness_DetectGameMode() {
             harness_game_info.defines.INTRO_SMK_FILE = "SPLINTRO.SMK";
             harness_game_info.defines.GERMAN_LOADSCRN = "LOADSCRN.PIX";
             harness_game_info.mode = eGame_splatpack;
-            LOG_INFO("\"%s\"", "Splat Pack");
+            printf("Game mode: Splat Pack\n");
         } else if (access("DATA/RACES/TINSEL.TXT", F_OK) != -1) {
             // Only the the splat x-mas demo has the tinsel track
             harness_game_info.defines.INTRO_SMK_FILE = "";
             harness_game_info.defines.GERMAN_LOADSCRN = "";
             harness_game_info.mode = eGame_splatpack_demo;
-            LOG_INFO("\"%s\"", "Splat Pack X-mas demo");
+            printf("Game mode: Splat Pack X-mas demo\n");
         } else {
             // Assume we're using the splatpack demo
             harness_game_info.defines.INTRO_SMK_FILE = "";
             harness_game_info.defines.GERMAN_LOADSCRN = "";
             harness_game_info.mode = eGame_splatpack_demo;
-            LOG_INFO("\"%s\"", "Splat Pack demo");
+            printf("Game mode: Splat Pack demo\n");
         }
     } else if (access("DATA/RACES/CITYB3.TXT", F_OK) != -1) {
         // All non-splatpack edition have the cityb3 track
@@ -111,7 +111,7 @@ void Harness_DetectGameMode() {
             harness_game_info.defines.INTRO_SMK_FILE = "";
             harness_game_info.defines.GERMAN_LOADSCRN = "COWLESS.PIX";
             harness_game_info.mode = eGame_carmageddon_demo;
-            LOG_INFO("\"%s\"", "Carmageddon demo");
+            printf("Game mode: Carmageddon demo\n");
         } else {
             goto carmageddon;
         }
@@ -124,7 +124,7 @@ void Harness_DetectGameMode() {
         }
         harness_game_info.defines.GERMAN_LOADSCRN = "LOADSCRN.PIX";
         harness_game_info.mode = eGame_carmageddon;
-        LOG_INFO("\"%s\"", "Carmageddon");
+        printf("Game mode: Carmageddon\n");
     }
 
     harness_game_info.localization = eGameLocalization_none;
@@ -176,7 +176,7 @@ void Harness_DetectGameMode() {
 void Harness_Init(int* argc, char* argv[]) {
     int result;
 
-    LOG_INFO("version: " DETHRACE_VERSION);
+    printf("Dethrace version: %s\n", DETHRACE_VERSION);
 
     // disable the original CD check code
     harness_game_config.enable_cd_check = 0;
@@ -206,7 +206,7 @@ void Harness_Init(int* argc, char* argv[]) {
     if (root_dir == NULL) {
         LOG_INFO("DETHRACE_ROOT_DIR is not set, assuming '.'");
     } else {
-        printf("DETHRACE_ROOT_DIR: %s\n", root_dir);
+        printf("Data directory: %s\n", root_dir);
         result = chdir(root_dir);
         if (result != 0) {
             LOG_PANIC("Failed to chdir. Error is %s", strerror(errno));
