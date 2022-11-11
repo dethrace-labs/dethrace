@@ -500,6 +500,12 @@ void setActiveMaterial(tStored_material* material) {
         glUniform1i(uniforms_3d.light_value, -1);
     }
 
+    if (material->flags & (BR_MATF_TWO_SIDED | BR_MATF_ALWAYS_VISIBLE)) {
+        glDisable(GL_CULL_FACE);
+    } else {
+        glEnable(GL_CULL_FACE);
+    }
+
     if (material->pixelmap) {
         tStored_pixelmap* stored_px = material->pixelmap->stored;
         if (stored_px != NULL) {
