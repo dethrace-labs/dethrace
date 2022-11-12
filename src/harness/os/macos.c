@@ -25,10 +25,15 @@ static char _program_name[1024];
 static void* stack_traces[MAX_STACK_FRAMES];
 DIR* directory_iterator;
 
+uint32_t first_clock_time = 0;
+
 uint32_t OS_GetTime() {
     struct timespec spec;
     clock_gettime(CLOCK_MONOTONIC, &spec);
-    return spec.tv_sec * 1000 + spec.tv_nsec / 1000000;
+    if (first_clock_time == 0) {
+        first_clock_time = spec.tv_sec * 1000 + spec.tv_nsec / 1000000;
+    }
+    return (spec.tv_sec * 1000 + spec.tv_nsec / 1000000) - first_clock_time;
 }
 
 void OS_Sleep(int delay_ms) {

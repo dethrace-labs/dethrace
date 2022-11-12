@@ -31,6 +31,8 @@ static int vp_x, vp_y, vp_width, vp_height;
 static br_pixelmap* last_shade_table = NULL;
 static int dirty_buffers = 0;
 
+tStored_material* current_material;
+
 struct {
     GLuint pixels, uv_transform;
     GLuint shade_table;
@@ -481,7 +483,6 @@ void GLRenderer_BufferModel(br_model* model) {
     CHECK_GL_ERROR("after build model");
 }
 
-tStored_material* current_material;
 void setActiveMaterial(tStored_material* material) {
     if (material == NULL || material == current_material) {
         return;

@@ -29,15 +29,15 @@ static char _program_name[1024];
 static void* stack_traces[MAX_STACK_FRAMES];
 #define TRACER_PID_STRING "TracerPid:"
 DIR* directory_iterator;
+uint32_t first_clock_time = 0;
 
 struct dl_iterate_callback_data {
     int initialized;
     intptr_t start;
 } dethrace_dl_data;
 
-static int dl_iterate_callback(struct dl_phdr_info *info, size_t size, void *data)
-{
-    struct dl_iterate_callback_data *callback_data = data;
+static int dl_iterate_callback(struct dl_phdr_info* info, size_t size, void* data) {
+    struct dl_iterate_callback_data* callback_data = data;
 
     if (strcmp(info->dlpi_name, "") == 0) {
         callback_data->start = info->dlpi_addr;
@@ -56,7 +56,10 @@ static intptr_t get_dethrace_offset() {
 uint32_t OS_GetTime() {
     struct timespec spec;
     clock_gettime(CLOCK_MONOTONIC, &spec);
-    return spec.tv_sec * 1000 + spec.tv_nsec / 1000000;
+    if (first_clock_time == 0) {
+        first_clock_time = spec.tv_sec * 1000 + spec.tv_nsec / 1000000;
+    }
+    return (spec.tv_sec * 1000 + spec.tv_nsec / 1000000) - first_clock_time;
 }
 
 void OS_Sleep(int delay_ms) {
