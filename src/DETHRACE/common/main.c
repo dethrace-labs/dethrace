@@ -23,7 +23,7 @@
 void QuitGame() {
     LOG_TRACE("()");
 
-    if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo) {
+    if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
         DoDemoGoodbye();
     }
 

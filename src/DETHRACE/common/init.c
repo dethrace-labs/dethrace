@@ -424,7 +424,7 @@ void InitGame(int pStart_race) {
     gNo_races_yet = 1;
     NetPlayerStatusChanged(ePlayer_status_loading);
     gProgram_state.current_race_index = pStart_race;
-    if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo) {
+    if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
         gProgram_state.current_car.power_up_levels[0] = gDemo_armour;
         gProgram_state.current_car.power_up_levels[1] = gDemo_power;
         gProgram_state.current_car.power_up_levels[2] = gDemo_offensive;

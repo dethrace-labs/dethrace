@@ -13,42 +13,93 @@ OTHER_LONG_KEY = (
 )
 
 
+class Byte:
+    def __init__(self, v: int):
+        self.v = v & 0xff
+
+    def __add__(self, v: int):
+        return Byte(self.v + v)
+
+    def __iadd__(self, v: "Byte"):
+        self.v = (self.v + v) & 0xff
+        return self
+
+    def __sub__(self, v: int):
+        return Byte(self.v - v)
+
+    def __isub__(self, v: "Byte"):
+        self.v = (self.v - v) & 0xff
+        return self
+
+    def __mod__(self, v: int):
+        return Byte(self.v % v)
+
+    def __imod__(self, v: int):
+        self.v %= v
+        return self
+
+    def __xor__(self, v: int):
+        return Byte(self.v ^ v)
+
+    def __ixor__(self, v: int):
+        self.v = (self.v ^ v) & 0xff
+        return self
+
+    def __and__(self, v: int):
+        return Byte(self.v & v)
+
+    def __iand__(self, v: int):
+        self.v = (self.v & v) & 0xff
+        return self
+
+    def __eq__(self, other):
+        if isinstance(other, Byte):
+            return self.v == other.v
+        elif isinstance(other, int):
+            return self.v == (other & 0xff)
+        raise ValueError(f"Object {other:r} of invalid type {type(other)}")
+
+
 def decode_line(line: bytes, method: int) -> str:
     line = line.rstrip(b"\r\n")
     key = LONG_KEY
-    seed = len(line) % 16
+    seed = len(line) % len(LONG_KEY)
     dline = bytearray(len(line))
     for i, c in enumerate(line):
-        if i >= 2:
-            if line[i - 1] == b'/' and line[i - 2] == b'/':
-                key = OTHER_LONG_KEY
+        b = Byte(c)
+        if dline[i - 2:i] == b'//':
+            key = OTHER_LONG_KEY
         if method == 1:
-            if c == ord(b'\t'):
-                c = 0x80
-            c -= 0x20
-            if not (c & 0x80):
-                c ^= key[seed]
-                c &= 0x7f
-                c += 0x20
+            if b == ord(b'\t'):
+                b = Byte(0x9f)
+
+            b -= 0x20
+            b ^= key[seed]
+            b &= 0x7f
+            b += 0x20
 
             seed += 7
-            seed %= 16
-            if c == 0x80:
-                c = ord(b'\t')
+            seed %= len(key)
+
+            if b == 0x9f:
+                b = Byte(ord(b'\t'))
         else:
-            if c == ord(b'\t'):
-                c = 0x9f
-            c -= 0x20
-            c ^= key[seed]
-            c &= 0x7f
-            c += 0x20
+            if b == ord(b'\t'):
+                b = Byte(0x80)
+
+            b -= 0x20
+            if (b & 0x80) == 0:
+                b ^= key[seed] & 0x7f
+            b += 0x20
 
             seed += 7
-            seed %= 16
-            if c == 0x9f:
-                c = ord(b'\t')
-        dline[i] = c
+            seed %= len(key)
+
+            if b == 0x80:
+                b = Byte(ord(b'\t'))
+        dline[i] = b.v
     return dline.decode(errors="replace")
+
 
 def main():
     parser = argparse.ArgumentParser(allow_abbrev=False, description="Decode a Carmageddon encoded file")

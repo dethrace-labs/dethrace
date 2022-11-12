@@ -1214,7 +1214,7 @@ tSO_result DoEndRaceSummary(int* pFirst_summary_done, tRace_result pRace_result)
     tSO_result result;
     LOG_TRACE("(%p, %d)", pFirst_summary_done, pRace_result);
 
-    if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo) {
+    if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
         gRank_etc_munged = 1;
         DoEndRaceSummary2();
         return eSO_continue;
