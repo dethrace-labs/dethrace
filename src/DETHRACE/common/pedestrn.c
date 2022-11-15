@@ -2402,11 +2402,24 @@ void RespawnPedestrians() {
     for (i = 0; i < gPed_count; i++) {
         the_pedestrian = &gPedestrian_array[i];
         if (the_pedestrian->ref_number < 100) {
+#if defined(DETHRACE_FIX_BUGS)
+            // Only animate the respawn when we are in viewing distance.
+            // This is done such that the "Peds visible on map" powerup draws far away items.
+            // (far away animated pedestrians would otherwise remain invisible on the map)
+            br_scalar x_delta;
+            br_scalar z_delta;
+            int ped_respawn_animate;
+            x_delta = fabsf(the_pedestrian->pos.v[V_X] - gCamera_to_world.m[3][V_X]);
+            z_delta = fabsf(the_pedestrian->pos.v[V_Z] - gCamera_to_world.m[3][V_Z]);
+            ped_respawn_animate = x_delta <= ACTIVE_PED_DXDZ && z_delta <= ACTIVE_PED_DXDZ;
+#else
+#define ped_respawn_animate 1
+#endif
             if (the_pedestrian->hit_points == -100) {
-                RevivePedestrian(the_pedestrian, 1);
+                RevivePedestrian(the_pedestrian, ped_respawn_animate);
             } else if ((the_pedestrian->current_action == the_pedestrian->fatal_car_impact_action || the_pedestrian->current_action == the_pedestrian->fatal_ground_impact_action || the_pedestrian->current_action == the_pedestrian->giblets_action)
                 && the_pedestrian->actor->parent == gDont_render_actor) {
-                RevivePedestrian(the_pedestrian, 1);
+                RevivePedestrian(the_pedestrian, ped_respawn_animate);
             }
         }
     }
