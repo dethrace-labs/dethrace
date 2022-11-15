@@ -1682,7 +1682,7 @@ void RenderAFrame(int pDepth_mask_on) {
         } else {
             FlashyMapCheckpoint(gCheckpoint - 1, the_time);
         }
-        if (gShow_peds_on_map || (gNet_mode && gCurrent_net_game->options.show_powerups_on_map)) {
+        if (gShow_peds_on_map || (gNet_mode != eNet_mode_none && gCurrent_net_game->options.show_powerups_on_map)) {
             for (i = 0; i < GetPedCount(); i++) {
                 ped_type = GetPedPosition(i, &pos);
                 if (ped_type > 0 && gShow_peds_on_map) {
