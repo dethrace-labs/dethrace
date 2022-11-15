@@ -29,6 +29,7 @@
 #include <time.h>
 
 #define FLAG_WAVING_BASTARD_REF 99
+#define ACTIVE_PED_DXDZ 11.f
 
 #define FOURCC(A, B, C, D) (((A & 0xff) << 24) | ((B & 0xff) << 16) | ((C & 0xff) << 8) | ((D & 0xff) << 0))
 #define PEDESTRIAN_MAGIC FOURCC('P', 'e', 'd', '!')
@@ -2336,7 +2337,7 @@ void MungePedestrians(tU32 pFrame_period) {
             the_pedestrian = &gPedestrian_array[i];
             x_delta = fabsf(the_pedestrian->pos.v[V_X] - gCamera_to_world.m[3][V_X]);
             z_delta = fabsf(the_pedestrian->pos.v[V_Z] - gCamera_to_world.m[3][V_Z]);
-            if ((the_pedestrian->actor->parent != gDont_render_actor || (x_delta <= 11.f && z_delta <= 11.f))
+            if ((the_pedestrian->actor->parent != gDont_render_actor || (x_delta <= ACTIVE_PED_DXDZ && z_delta <= ACTIVE_PED_DXDZ))
                 && (gPedestrians_on || the_pedestrian->ref_number >= 100)
                 && the_pedestrian->hit_points != -100) {
                 gCurrent_lollipop_index = -1;
@@ -2349,7 +2350,7 @@ void MungePedestrians(tU32 pFrame_period) {
             x_delta = fabsf(the_pedestrian->pos.v[V_X] - gCamera_to_world.m[3][V_X]);
             z_delta = fabsf(the_pedestrian->pos.v[V_Z] - gCamera_to_world.m[3][V_Z]);
             if (the_pedestrian->actor->parent == gDont_render_actor
-                && (x_delta > 11.f || z_delta > 11.f)) {
+                && (x_delta > ACTIVE_PED_DXDZ || z_delta > ACTIVE_PED_DXDZ)) {
                 the_pedestrian->active = 0;
             } else if (the_pedestrian->hit_points == -100) {
                 if (the_pedestrian->respawn_time == 0) {
