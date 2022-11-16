@@ -1551,9 +1551,7 @@ void RotateCarSecondOrder(tCollision_info* c, br_scalar dt) {
     rad = rad_rate * dt;
 
     BrVector3InvScale(&axis, &c->omega, rad_rate);
-    L.v[0] = c->I.v[0] * c->omega.v[0];
-    L.v[1] = c->I.v[1] * c->omega.v[1];
-    L.v[2] = c->I.v[2] * c->omega.v[2];
+    BrVector3Mul(&L, &c->I, &c->omega);
 
     BrMatrix34Rotate(&m, BrRadianToAngle(rad) / 2, &axis);
     BrMatrix34TApplyV(&L2, &L, &m);
