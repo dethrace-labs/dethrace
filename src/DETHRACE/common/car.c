@@ -6746,7 +6746,7 @@ int TestOldMats(tCollision_info* c1, tCollision_info* c2, int newmats) {
             }
             BrMatrix34ApplyP(&p1, &edge, &mat21);
             BrMatrix34ApplyP(&p2, &tp1, &mat21);
-            if (LineBoxColl(&p1, &p2, &c1->bounds[1], &hp1)) {
+            if (LineBoxColl(&p1, &p2, b1, &hp1)) {
                 n++;
             }
         }
