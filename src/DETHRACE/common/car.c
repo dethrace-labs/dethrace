@@ -6573,10 +6573,8 @@ br_scalar FourPointCollB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* 
 int TestForNan(float* f) {
     tU32 i;
     LOG_TRACE("(%p)", f);
-    // i = *f;
-    // LOG_DEBUG("i %x", i);
+
     return isnan(*f);
-    // return (~i & 0x7F800000) == 0;
 }
 
 // IDA: void __cdecl CheckCameraHither()
