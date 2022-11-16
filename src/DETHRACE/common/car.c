@@ -3708,28 +3708,22 @@ int BoxFaceIntersect(br_bounds* pB, br_matrix34* pM, br_matrix34* pMold, br_vect
         for (i = 0; i < n - 1; i++) {
             flag = 1;
             for (j = i + 1; j < n; j++) {
-                if (fabs(pPoint_list[i].v[0] - pPoint_list[j].v[0]) <= 0.001
-                    && fabs(pPoint_list[i].v[1] - pPoint_list[j].v[1]) <= 0.001
-                    && fabs(pPoint_list[i].v[2] - pPoint_list[j].v[2]) <= 0.001) {
+                if (fabsf(pPoint_list[i].v[0] - pPoint_list[j].v[0]) <= 0.001f
+                    && fabsf(pPoint_list[i].v[1] - pPoint_list[j].v[1]) <= 0.001f
+                    && fabsf(pPoint_list[i].v[2] - pPoint_list[j].v[2]) <= 0.001f) {
                     flag = 0;
                     break;
                 }
             }
             if (flag) {
-                pPoint_list[m].v[0] = pPoint_list[i].v[0];
-                pPoint_list[m].v[1] = pPoint_list[i].v[1];
-                pPoint_list[m].v[2] = pPoint_list[i].v[2];
+                BrVector3Copy(&pPoint_list[m], &pPoint_list[i]);
                 m++;
             }
         }
-        pPoint_list[m].v[0] = pPoint_list[n - 1].v[0];
-        pPoint_list[m].v[1] = pPoint_list[n - 1].v[1];
-        pPoint_list[m].v[2] = pPoint_list[n - 1].v[2];
+        BrVector3Copy(&pPoint_list[m], &pPoint_list[n - 1]);
         n = m + 1;
     }
-    pMold->m[3][0] = pMold->m[3][0] * WORLD_SCALE;
-    pMold->m[3][1] = pMold->m[3][1] * WORLD_SCALE;
-    pMold->m[3][2] = pMold->m[3][2] * WORLD_SCALE;
+    BrVector3Scale((br_vector3*)pMold->m[3], (br_vector3*)pMold->m[3], WORLD_SCALE);
     return n;
 }
 
