@@ -6649,16 +6649,12 @@ int TestForCarInSensiblePlace(tCar_spec* car) {
     }
     mat1 = &car_info->car_master_actor->t.t.mat;
     if (!gDoing_physics) {
-        mat1->m[3][0] = mat1->m[3][0] * WORLD_SCALE;
-        mat1->m[3][1] = mat1->m[3][1] * WORLD_SCALE;
-        mat1->m[3][2] = mat1->m[3][2] * WORLD_SCALE;
+        BrVector3Scale((br_vector3*)mat1->m[3], (br_vector3*)mat1->m[3], WORLD_SCALE);
     }
     GetFacesInBox(car_info);
-    BrMatrix34ApplyP(&car_info->pos, &car_info->cmpos, &car_info->car_master_actor->t.t.mat);
-    car_info->pos.v[0] = car_info->pos.v[0] / WORLD_SCALE;
-    car_info->pos.v[1] = car_info->pos.v[1] / WORLD_SCALE;
-    car_info->pos.v[2] = car_info->pos.v[2] / WORLD_SCALE;
-    k = CollCheck(car_info, -2.0);
+    BrMatrix34ApplyP(&car_info->pos, &car_info->cmpos, mat1);
+    BrVector3InvScale(&car_info->pos, &car_info->pos, WORLD_SCALE);
+    k = CollCheck(car_info, -2.f);
     if (!k) {
         if (gNum_active_non_cars + gNum_active_cars != gNum_cars_and_non_cars) {
             GetNonCars();
@@ -6667,12 +6663,8 @@ int TestForCarInSensiblePlace(tCar_spec* car) {
             c2 = (tCollision_info*)gActive_car_list[i];
             if (car_info != c2) {
                 mat2 = &c2->car_master_actor->t.t.mat;
-                mat2->m[3][0] = mat2->m[3][0] * WORLD_SCALE;
-                mat2->m[3][1] = mat2->m[3][1] * WORLD_SCALE;
-                mat2->m[3][2] = mat2->m[3][2] * WORLD_SCALE;
-                sep.v[0] = mat1->m[3][0] - mat2->m[3][0];
-                sep.v[1] = mat1->m[3][1] - mat2->m[3][1];
-                sep.v[2] = mat1->m[3][2] - mat2->m[3][2];
+                BrVector3Scale((br_vector3*)mat2->m[3], (br_vector3*)mat2->m[3], WORLD_SCALE);
+                BrVector3Sub(&sep, (br_vector3*)mat1->m[3], (br_vector3*)mat2->m[3]);
                 if (BrVector3LengthSquared(&sep) <= 100.0) {
                     k += TestOldMats(car_info, c2, 0);
                     k += TestOldMats(c2, car_info, 0);
@@ -6681,13 +6673,11 @@ int TestForCarInSensiblePlace(tCar_spec* car) {
                     BrMatrix34ApplyP(&tv, &car_info->cmpos, mat1);
                     BrMatrix34ApplyP(&tv2, &c2->cmpos, mat2);
                     BrVector3Sub(&tv, &tv2, &tv);
-                    BrMatrix34TApplyV(&car_info->old_point, &tv, &car_info->car_master_actor->t.t.mat);
+                    BrMatrix34TApplyV(&car_info->old_point, &tv, mat1);
                     BrVector3Normalise(&car_info->old_norm, &car_info->old_point);
                     BrVector3Negate(&car_info->old_norm, &car_info->old_norm);
                 }
-                mat2->m[3][0] = mat2->m[3][0] / WORLD_SCALE;
-                mat2->m[3][1] = mat2->m[3][1] / WORLD_SCALE;
-                mat2->m[3][2] = mat2->m[3][2] / WORLD_SCALE;
+                BrVector3InvScale((br_vector3*)mat2->m[3], (br_vector3*)mat2->m[3], WORLD_SCALE);
                 if (k != 0) {
                     break;
                 }
@@ -6695,9 +6685,7 @@ int TestForCarInSensiblePlace(tCar_spec* car) {
         }
     }
     if (!gDoing_physics) {
-        mat1->m[3][0] = mat1->m[3][0] / WORLD_SCALE;
-        mat1->m[3][1] = mat1->m[3][1] / WORLD_SCALE;
-        mat1->m[3][2] = mat1->m[3][2] / WORLD_SCALE;
+        BrVector3InvScale((br_vector3*)mat1->m[3], (br_vector3*)mat1->m[3], WORLD_SCALE);
     }
     if (k != 0) {
         return 0;
