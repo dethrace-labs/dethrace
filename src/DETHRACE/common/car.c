@@ -3864,9 +3864,9 @@ void GetPlaneNormal(br_vector3* n, int p) {
     d = (p - 1) & 3;
     BrVector3Set(n, 0.f, 0.f, 0.f);
     if ((p & 4) != 0) {
-        n->v[d] = 1.0;
+        n->v[d] = 1.0f;
     } else {
-        n->v[d] = -1.0;
+        n->v[d] = -1.0f;
     }
 }
 
