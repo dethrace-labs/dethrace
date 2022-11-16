@@ -1458,62 +1458,50 @@ void ControlCar4(tCar_spec* c, br_scalar dt) {
     LOG_TRACE("(%p, %f)", c, dt);
 
     if (c->keys.left) {
-        if (c->turn_speed < 0.0) {
-            c->turn_speed = 0.0;
+        if (c->turn_speed < 0.f) {
+            c->turn_speed = 0.f;
         }
-        if (c->velocity_car_space.v[2] <= 0.0) {
-            if ((c->curvature < 0.0 || c->omega.v[1] < -0.001) && c->turn_speed == 0.0) {
-                c->turn_speed = 0.050000001 / (BrVector3Length(&c->v) + 5.0) * (dt * 25.0) * 4.0 / 2.0 * 0.5;
-                if (c->omega.v[1] < -0.01) {
-                    c->turn_speed = c->turn_speed - dt * 0.01 / 0.04 / 2.0 * c->omega.v[1] * 2.0;
-                }
-            } else {
-                c->turn_speed = 0.050000001 / (BrVector3Length(&c->v) + 5.0) * (dt * 25.0) / 2.0 * 0.5 + c->turn_speed;
-            }
+        if (c->velocity_car_space.v[2] > 0.f) {
+            c->turn_speed += dt * 0.01f / (harness_game_config.physics_step_time / 1000.f) / 2.f * 2.f;
+        } else if ((c->curvature >= 0.f && c->omega.v[1] >= -.001f) || c->turn_speed != 0.f) {
+            c->turn_speed += dt / (harness_game_config.physics_step_time / 1000.f) * (0.05f / (BrVector3Length(&c->v) + 5.f)) / 2.f * .5f;
         } else {
-            c->turn_speed = dt * 0.01 / 0.04 / 2.0 * 2.0 + c->turn_speed;
+            c->turn_speed = dt / (harness_game_config.physics_step_time / 1000.f) * (.05f / (BrVector3Length(&c->v) + 5.f)) * 4.f / 2.f * .5f;
+            if (c->omega.v[1] < -.01f) {
+                c->turn_speed -= dt * .01f / (harness_game_config.physics_step_time / 1000.f) / 2.f * c->omega.v[1] * 2.f;
+            }
         }
     }
     if (c->keys.right) {
-        if (c->turn_speed > 0.0) {
-            c->turn_speed = 0.0;
+        if (c->turn_speed > 0.f) {
+            c->turn_speed = 0.f;
         }
-        if (c->velocity_car_space.v[2] <= 0.0) {
-            if ((c->curvature > 0.0 || c->omega.v[1] > 0.001) && c->turn_speed == 0.0) {
-                c->turn_speed = 0.050000001
-                    / (BrVector3Length(&c->v) + 5.0) * (dt * 25.0) * -4.0 / 2.0 * 0.5;
-                if (c->omega.v[1] < -0.01) {
-                    c->turn_speed = c->turn_speed - dt * 0.01 / 0.04 / 2.0 * c->omega.v[1] * 2.0;
-                }
-            } else {
-                c->turn_speed = c->turn_speed
-                    - 0.050000001
-                        / (BrVector3Length(&c->v) + 5.0) * (dt * 25.0) / 2.0 * 0.5;
-            }
+        if (c->velocity_car_space.v[2] > 0.f) {
+            c->turn_speed -= dt * .01f / (harness_game_config.physics_step_time / 1000.f) / 2.f * 2.f;
+        } else if ((c->curvature <= 0.f && c->omega.v[1] <= .001f) || c->turn_speed != 0.f) {
+            c->turn_speed -= dt / (harness_game_config.physics_step_time / 1000.f) * (.05f / (BrVector3Length(&c->v) + 5.f)) / 2.f * .5f;
         } else {
-            c->turn_speed = c->turn_speed - dt * 0.01 / 0.04 / 2.0 * 2.0;
+            c->turn_speed = dt / (harness_game_config.physics_step_time / 1000.f) * (.05f / (BrVector3Length(&c->v) + 5.f)) * -4.f / 2.f * .5f;
+            if (c->omega.v[1] < -.01f) {
+                c->turn_speed -= dt * .01f / (harness_game_config.physics_step_time / 1000.f) / 2.f * c->omega.v[1] * 2.f;
+            }
         }
     }
-    if (c->keys.left || c->keys.right) {
-        if (fabs(c->turn_speed) < fabs(dt * 2.0 * c->curvature) && c->curvature * c->turn_speed < 0.0) {
-            c->turn_speed = -(dt * 2.0 * c->curvature);
-        }
-    } else {
-        c->turn_speed = 0.0;
+    if (!c->keys.left && !c->keys.right) {
+        c->turn_speed = 0.f;
+    } else if (fabsf(c->turn_speed) < fabsf(dt * 2.f * c->curvature) && c->curvature * c->turn_speed < 0.f) {
+        c->turn_speed = -(dt * 2.f * c->curvature);
     }
-    c->curvature = c->curvature + c->turn_speed;
-    if (c->joystick.left <= 0) {
-        if (c->joystick.right >= 0) {
-            ts = (double)c->joystick.right * (double)c->joystick.right / 4294967300.0;
-            c->curvature = c->maxcurve * -ts;
-        }
-    } else {
-        c->curvature = (double)c->joystick.left * (double)c->joystick.left / 4294967300.0 * c->maxcurve;
+    c->curvature += c->turn_speed;
+    if (c->joystick.left > 0) {
+        c->curvature = (float)c->joystick.left * (float)c->joystick.left / 4294967300.f * c->maxcurve;
+    } else if (c->joystick.right >= 0) {
+        c->curvature = -((float)c->joystick.right * (float)c->joystick.right / 4294967300.f) * c->maxcurve;
     }
-    if (c->curvature > (double)c->maxcurve) {
+    if (c->curvature > c->maxcurve) {
         c->curvature = c->maxcurve;
     }
-    if (-c->maxcurve > c->curvature) {
+    if (c->curvature < -c->maxcurve) {
         c->curvature = -c->maxcurve;
     }
 }
