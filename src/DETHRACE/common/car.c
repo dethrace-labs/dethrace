@@ -972,26 +972,22 @@ void FinishCars(tU32 pLast_frame_time, tU32 pTime) {
 
     for (i = 0; i < gNum_cars_and_non_cars; i++) {
         car = gActive_car_list[i];
-        if (fabs(car->omega.v[0]) > 10000.0
-            || fabs(car->omega.v[1]) > 10000.0
-            || fabs(car->omega.v[2]) > 10000.0) {
-            BrVector3SetFloat(&car->omega, 0.0, 0.0, 0.0);
-            BrVector3SetFloat(&car->v, 0.0, 0.0, 0.0);
+        if (fabsf(car->omega.v[0]) > 10000.f
+            || fabsf(car->omega.v[1]) > 10000.f
+            || fabsf(car->omega.v[2]) > 10000.f) {
+            BrVector3SetFloat(&car->omega, 0.f, 0.f, 0.f);
+            BrVector3SetFloat(&car->v, 0.f, 0.f, 0.f);
         }
         BrVector3InvScale(&car->velocity_car_space, &car->velocity_car_space, WORLD_SCALE * 1000.0f);
-        car->car_master_actor->t.t.mat.m[3][0] = car->car_master_actor->t.t.mat.m[3][0] / WORLD_SCALE;
-        car->car_master_actor->t.t.mat.m[3][1] = car->car_master_actor->t.t.mat.m[3][1] / WORLD_SCALE;
-        car->car_master_actor->t.t.mat.m[3][2] = car->car_master_actor->t.t.mat.m[3][2] / WORLD_SCALE;
+        BrVector3InvScale(&car->car_master_actor->t.t.translate.t, &car->car_master_actor->t.t.translate.t, WORLD_SCALE);
 
         car->speed = BR_LENGTH2(car->v.v[0], car->v.v[2]) / (WORLD_SCALE * 1000.0f);
-        minus_k.v[0] = -car->car_master_actor->t.t.mat.m[2][0];
-        minus_k.v[1] = -car->car_master_actor->t.t.mat.m[2][1];
-        minus_k.v[2] = -car->car_master_actor->t.t.mat.m[2][2];
-        if (car->speed <= 0.000099999997) {
-            if (car->direction.v[1] * minus_k.v[1] + car->direction.v[2] * minus_k.v[2] + car->direction.v[0] * minus_k.v[0] < 0.0) {
-                BrVector3SetFloat(&minus_k, 0.0, 0.0, 1.0);
+        BrVector3Negate(&minus_k, (br_vector3*)car->car_master_actor->t.t.mat.m[2]);
+        if (car->speed <= 0.0001f) {
+            if (BrVector3Dot(&car->direction, &minus_k) < 0.f) {
+                BrVector3SetFloat(&minus_k, 0.f, 0.f, 1.f);
             } else {
-                BrVector3SetFloat(&minus_k, 0.0, 0.0, -1.0);
+                BrVector3SetFloat(&minus_k, 0.f, 0.f, -1.f);
             }
             BrMatrix34ApplyV(&car->direction, &minus_k, &car->car_master_actor->t.t.mat);
         } else if (gLast_mechanics_time > pLast_frame_time && gCar_to_view == car) {
@@ -1002,10 +998,10 @@ void FinishCars(tU32 pLast_frame_time, tU32 pTime) {
         } else {
             BrVector3Normalise(&car->direction, &car->v);
         }
-        if (car->driver > eDriver_non_car) {
+        if (car->driver >= eDriver_oppo) {
             car->speedo_speed = BrVector3Dot(&minus_k, &car->v) / (WORLD_SCALE * 1000.0f);
 
-            car->steering_angle = d180_OVER_PI * atan((car->wpos[0].v[2] - car->wpos[2].v[2]) * car->curvature);
+            car->steering_angle = d180_OVER_PI * atanf((car->wpos[0].v[2] - car->wpos[2].v[2]) * car->curvature);
 
             car->lr_sus_position = (car->ride_height - car->oldd[0]) / WORLD_SCALE;
             car->rr_sus_position = (car->ride_height - car->oldd[1]) / WORLD_SCALE;
