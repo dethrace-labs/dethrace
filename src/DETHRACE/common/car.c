@@ -4752,16 +4752,16 @@ void MoveWithWheels(tCar_spec* c, br_vector3* vn, int manual_swing) {
     static int move_with_wheels;
     LOG_TRACE("(%p, %p, %d)", c, vn, manual_swing);
 
-    if (c->speed <= 0.000099999997 && !gCamera_mode) {
+    if (c->speed <= 0.0001f && !gCamera_mode) {
         if (manual_swing) {
             if (gCamera_yaw <= 32760u) {
                 yaw = gCamera_yaw;
             } else {
                 yaw = gCamera_yaw - 32760;
             }
-            if (yaw <= 8190u || yaw >= 24570u) {
+            if (yaw <= BrDegreeToAngle(45) || yaw >= BrDegreeToAngle(135)) {
                 if (!move_with_wheels) {
-                    theta = BrRadianToAngle(atan2(c->wpos[0].v[2] * c->curvature, 1.0));
+                    theta = BrRadianToAngle(atan2f(c->wpos[0].v[2] * c->curvature, 1.0f));
                     gCamera_yaw -= (-2 * gCamera_sign + 1) * theta;
                     move_with_wheels = 1;
                 }
