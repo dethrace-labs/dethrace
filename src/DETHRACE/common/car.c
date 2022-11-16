@@ -1733,9 +1733,9 @@ void AddDrag(tCar_spec* c, br_scalar dt) {
 
     vol = c->last_special_volume;
     drag_multiplier = -(dt * TIME_CONV_THING);
-    if (vol) {
+    if (vol != NULL) {
         if (c->underwater_ability) {
-            drag_multiplier = vol->viscosity_multiplier * drag_multiplier * 0.6;
+            drag_multiplier = vol->viscosity_multiplier * drag_multiplier * .6f;
         } else {
             drag_multiplier = vol->viscosity_multiplier * drag_multiplier;
         }
