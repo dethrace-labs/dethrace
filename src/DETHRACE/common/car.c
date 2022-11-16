@@ -420,23 +420,23 @@ void InitialiseCarsEtc(tRace_info* pThe_race) {
     br_bounds bnds;
     LOG_TRACE("(%p)", pThe_race);
 
-    gProgram_state.initial_position = pThe_race->initial_position;
+    BrVector3Copy(&gProgram_state.initial_position, &pThe_race->initial_position);
     gProgram_state.initial_yaw = pThe_race->initial_yaw;
     BrActorToBounds(&bnds, gProgram_state.track_spec.the_actor);
     gMin_world_y = bnds.min.v[1];
     gNum_active_non_cars = 0;
-    for (cat = eVehicle_self; cat <= eVehicle_not_really; ++cat) {
-        if (cat) {
-            car_count = GetCarCount(cat);
-        } else {
+    for (cat = eVehicle_self; cat <= eVehicle_not_really; cat++) {
+        if (cat == eVehicle_self) {
             car_count = 1;
+        } else {
+            car_count = GetCarCount(cat);
         }
-        for (i = 0; car_count > i; i++) {
+        for (i = 0; i < car_count; i++) {
             PossibleService();
-            if (cat) {
-                car = GetCarSpec(cat, i);
-            } else {
+            if (cat == eVehicle_self) {
                 car = &gProgram_state.current_car;
+            } else {
+                car = GetCarSpec(cat, i);
             }
             if (cat != eVehicle_not_really) {
                 InitialiseCar(car);
