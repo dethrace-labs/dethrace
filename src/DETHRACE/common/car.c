@@ -1396,12 +1396,8 @@ int CollideCarWithWall(tCollision_info* car, br_scalar dt) {
             car->collision_flag++;
             if (car->collision_flag - 1 > 20) {
                 car->collision_flag = 1;
-                car->v.v[0] = 0.0;
-                car->v.v[1] = 0.0;
-                car->v.v[2] = 0.0;
-                car->omega.v[0] = 0.0;
-                car->omega.v[1] = 0.0;
-                car->omega.v[2] = 0.0;
+                BrVector3Set(&car->v, 0.f, 0.f, 0.f);
+                BrVector3Set(&car->omega, 0.f, 0.f, 0.f);
                 break;
             }
             RotateCar(car, dt);
@@ -1409,7 +1405,7 @@ int CollideCarWithWall(tCollision_info* car, br_scalar dt) {
             GetFacesInBox(car);
         }
         if (car->collision_flag) {
-            CrashEarnings((tCar_spec*)car, NULL);
+            CrashEarnings(CAR(car), NULL);
         }
         BrMatrix34TApplyV(&car->velocity_car_space, &car->v, &car->oldmat);
         car->frame_collision_flag += car->collision_flag;
@@ -1421,7 +1417,8 @@ int CollideCarWithWall(tCollision_info* car, br_scalar dt) {
 void ToggleControls() {
     LOG_TRACE("()");
 
-    if (!ControlCar[++gControl__car]) {
+    gControl__car++;
+    if (ControlCar[gControl__car] == 0) {
         gControl__car = 0;
     }
     switch (gControl__car) {
