@@ -1589,13 +1589,11 @@ void RotateCarFirstOrder(tCollision_info* c, br_scalar dt) {
     rad_rate = BrVector3Length(&c->omega);
     rad = rad_rate * dt;
 
-    if (rad < 0.0001) {
+    if (rad < .0001f) {
         return;
     }
     BrVector3InvScale(&axis, &c->omega, rad_rate);
-    L.v[0] = c->I.v[0] * c->omega.v[0];
-    L.v[1] = c->I.v[1] * c->omega.v[1];
-    L.v[2] = c->I.v[2] * c->omega.v[2];
+    BrVector3Mul(&L, &c->I, &c->omega);
     BrMatrix34Rotate(&m, BrRadianToAngle(rad), &axis);
     BrMatrix34TApplyV(&L2, &L, &m);
     BrMatrix34PreTranslate(&m, -c->cmpos.v[0], -c->cmpos.v[1], -c->cmpos.v[2]);
@@ -1629,14 +1627,14 @@ void RotateCar(tCollision_info* c, br_scalar dt) {
     LOG_TRACE("(%p, %f)", c, dt);
 
     rad_squared = BrVector3LengthSquared(&c->omega) * dt;
-    c->oldomega = c->omega;
+    BrVector3Copy(&c->oldomega, &c->omega);
 
-    if (rad_squared < 0.0000001) {
+    if (rad_squared < .0000001f) {
         return;
     }
 
-    if (rad_squared > 0.008f) {
-        steps = sqrt(rad_squared / 0.032) + 1;
+    if (rad_squared > .008f) {
+        steps = sqrtf(rad_squared / .032f) + 1;
         dt = dt / steps;
 
         for (i = 0; i < steps && i < 20; i++) {
