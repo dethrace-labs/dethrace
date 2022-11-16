@@ -761,32 +761,27 @@ void ControlOurCar(tU32 pTime_difference) {
 
     car = &gProgram_state.current_car;
     if (gCar_flying) {
-        if (gNet_mode) {
+        if (gNet_mode != eNet_mode_none) {
             gCar_flying = 0;
         } else {
-            car->car_master_actor->t.t.mat.m[3][0] = car->car_master_actor->t.t.mat.m[3][0] * WORLD_SCALE;
-            car->car_master_actor->t.t.mat.m[3][1] = car->car_master_actor->t.t.mat.m[3][1] * WORLD_SCALE;
-            car->car_master_actor->t.t.mat.m[3][2] = car->car_master_actor->t.t.mat.m[3][2] * WORLD_SCALE;
-            ts = (double)pTime_difference / 1000.0;
-            FlyCar(car, ts);
-            car->car_master_actor->t.t.mat.m[3][0] = car->car_master_actor->t.t.mat.m[3][0] / WORLD_SCALE;
-            car->car_master_actor->t.t.mat.m[3][1] = car->car_master_actor->t.t.mat.m[3][1] / WORLD_SCALE;
-            car->car_master_actor->t.t.mat.m[3][2] = car->car_master_actor->t.t.mat.m[3][2] / WORLD_SCALE;
+            BrVector3Scale(&car->car_master_actor->t.t.translate.t, &car->car_master_actor->t.t.translate.t, WORLD_SCALE);
+            FlyCar(car, pTime_difference / 1000.f);
+            BrVector3InvScale(&car->car_master_actor->t.t.translate.t, &car->car_master_actor->t.t.translate.t, WORLD_SCALE);
         }
         return;
     }
     time = GetTotalTime();
     if (car->damage_units[eDamage_steering].damage_level > 40) {
         if (car->end_steering_damage_effect) {
-            if (car->end_steering_damage_effect > time || car->damage_units[eDamage_steering].damage_level == 99) {
+            if (time < car->end_steering_damage_effect || car->damage_units[eDamage_steering].damage_level == 99) {
                 car->keys.left = car->false_key_left;
                 car->keys.right = car->false_key_right;
             } else {
                 car->end_steering_damage_effect = 0;
             }
         } else {
-            ts = pTime_difference * (car->damage_units[eDamage_steering].damage_level - 40) * 0.0045;
-            if (PercentageChance(ts) && fabs(car->velocity_car_space.v[2]) > 0.0001) {
+            ts = pTime_difference * (car->damage_units[eDamage_steering].damage_level - 40) * 0.0045f;
+            if (PercentageChance(ts) && fabsf(car->velocity_car_space.v[2]) > 0.0001f) {
                 if (car->keys.left || car->keys.right) {
                     car->false_key_left = !car->keys.left;
                     car->false_key_right = !car->keys.right;
@@ -796,31 +791,31 @@ void ControlOurCar(tU32 pTime_difference) {
                     car->false_key_right = 1;
                 }
                 ts = 5 * (5 * car->damage_units[eDamage_steering].damage_level - 200);
-                car->end_steering_damage_effect = FRandomBetween(0.0, ts) + time;
+                car->end_steering_damage_effect = FRandomBetween(0.0f, ts) + time;
             }
         }
     }
     if (car->damage_units[eDamage_transmission].damage_level > 40) {
         if (car->end_trans_damage_effect) {
-            if (car->end_trans_damage_effect > time || car->damage_units[eDamage_transmission].damage_level == 99) {
+            if (time < car->end_trans_damage_effect || car->damage_units[eDamage_transmission].damage_level == 99) {
                 car->gear = 0;
                 car->just_changed_gear = 1;
             } else {
                 car->end_trans_damage_effect = 0;
             }
         } else {
-            ts = pTime_difference * (car->damage_units[eDamage_transmission].damage_level - 40);
-            if (PercentageChance(ts) * 0.006 != 0) {
+            ts = pTime_difference * (car->damage_units[eDamage_transmission].damage_level - 40) * 0.006;
+            if (PercentageChance(ts) != 0) {
                 ts = 10 * (5 * car->damage_units[eDamage_transmission].damage_level - 200);
-                car->end_trans_damage_effect = FRandomBetween(0.0, ts) + time;
+                car->end_trans_damage_effect = FRandomBetween(0.f, ts) + time;
             }
         }
     }
-    ts = (double)pTime_difference / 1000.0;
+    ts = pTime_difference / 1000.0f;
     ControlCar[gControl__car](car, ts);
     RememberSafePosition(car, pTime_difference);
     if (gCamera_reset) {
-        BrVector3SetFloat(&minus_k, 0.0, 0.0, -1.0);
+        BrVector3SetFloat(&minus_k, 0.0f, 0.0f, -1.0f);
         gCamera_sign = 0;
         BrMatrix34ApplyV(&car->direction, &minus_k, &car->car_master_actor->t.t.mat);
     }
