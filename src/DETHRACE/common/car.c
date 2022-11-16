@@ -4803,20 +4803,18 @@ void SwingCamera(tCar_spec* c, br_matrix34* m1, br_matrix34* m2, br_vector3* vn,
     if (elapsed_time >= 0) {
         elapsed_time += pTime;
     }
-    sign = -(m1->m[2][0] * vn->v[0] + m1->m[2][1] * vn->v[1] + m1->m[2][2] * vn->v[2]);
+    sign = -BrVector3Dot((br_vector3*)m1->m[2], vn);
     ts = BrVector3Dot(vn, &old_vn);
 
-    old_vn = *vn;
-    if ((sign < 0.0) == gCamera_sign) {
+    BrVector3Copy(&old_vn, vn);
+    if ((sign < 0.0f) == gCamera_sign) {
         elapsed_time = -1;
     } else if (ts <= 0.0 || elapsed_time >= 0) {
         if (elapsed_time < 0) {
             elapsed_time = 0;
         }
-        if (elapsed_time < 500 && sign <= 0.0) {
-            vn->v[0] = -vn->v[0];
-            vn->v[1] = -vn->v[1];
-            vn->v[2] = -vn->v[2];
+        if (elapsed_time < 500 && sign <= 0.0f) {
+            BrVector3Negate(vn, vn);
         } else {
             elapsed_time = 500;
             if (sign <= 0.0) {
@@ -4824,13 +4822,11 @@ void SwingCamera(tCar_spec* c, br_matrix34* m1, br_matrix34* m2, br_vector3* vn,
             } else {
                 ts = 0.0001f;
             }
-            if (fabs(c->speedo_speed) <= ts || gCar_flying) {
-                vn->v[0] = -vn->v[0];
-                vn->v[1] = -vn->v[1];
-                vn->v[2] = -vn->v[2];
+            if (fabsf(c->speedo_speed) <= ts || gCar_flying) {
+                BrVector3Negate(vn, vn);
             } else {
                 gCamera_sign = gCamera_sign == 0;
-                omega = BrDegreeToAngle(pTime * 0.03);
+                omega = BrDegreeToAngle(pTime * 0.03f);
                 if (gCamera_yaw <= 32760) {
                     yaw = gCamera_yaw;
                 } else {
@@ -4887,15 +4883,15 @@ void SwingCamera(tCar_spec* c, br_matrix34* m1, br_matrix34* m2, br_vector3* vn,
             } else {
                 ts = BrAngleToRadian(omega);
                 if (v16 <= 0.0) {
-                    vn->v[0] = cos(ts) * gView_direction.v[0] - sin(ts) * gView_direction.v[2];
-                    vn->v[2] = sin(ts) * gView_direction.v[0] + cos(ts) * gView_direction.v[2];
+                    vn->v[0] = cosf(ts) * gView_direction.v[0] - sinf(ts) * gView_direction.v[2];
+                    vn->v[2] = sinf(ts) * gView_direction.v[0] + cosf(ts) * gView_direction.v[2];
                 } else {
-                    vn->v[0] = sin(ts) * gView_direction.v[2] + cos(ts) * gView_direction.v[0];
-                    vn->v[2] = cos(ts) * gView_direction.v[2] - sin(ts) * gView_direction.v[0];
+                    vn->v[0] = sinf(ts) * gView_direction.v[2] + cosf(ts) * gView_direction.v[0];
+                    vn->v[2] = cosf(ts) * gView_direction.v[2] - sinf(ts) * gView_direction.v[0];
                 }
-                omega += BrDegreeToAngle(pTime * 0.03);
-                if (BrDegreeToAngle(pTime * 0.1) < omega) {
-                    omega = BrDegreeToAngle(pTime * 0.1);
+                omega += BrDegreeToAngle(pTime * 0.03f);
+                if (BrDegreeToAngle(pTime * 0.1f) < omega) {
+                    omega = BrDegreeToAngle(pTime * 0.1f);
                 }
                 if (omega < theta) {
                     omega = theta;
