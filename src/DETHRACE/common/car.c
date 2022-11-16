@@ -1125,29 +1125,27 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
     while (gLast_mechanics_time < frame_end_time && step_number < 5) {
         step_number++;
         ResetOldmat();
-        gProgram_state.current_car.old_v = gProgram_state.current_car.v;
+        BrVector3Copy(&gProgram_state.current_car.old_v, &gProgram_state.current_car.v);
         if (&gProgram_state.current_car != gCar_to_view) {
-            gCar_to_view->old_v.v[0] = gCar_to_view->v.v[0];
-            gCar_to_view->old_v.v[1] = gCar_to_view->v.v[1];
-            gCar_to_view->old_v.v[2] = gCar_to_view->v.v[2];
+            BrVector3Copy(&gCar_to_view->old_v, &gCar_to_view->v);
         }
-        for (i = 0; gNum_active_cars > i; ++i) {
+        for (i = 0; i < gNum_active_cars; i++) {
             car = gActive_car_list[i];
-            car->dt = -1.0;
+            car->dt = -1.f;
             if (car->message.type == 15 && car->message.time >= gLast_mechanics_time && gLast_mechanics_time + harness_game_config.physics_step_time >= car->message.time) {
                 car->dt = (double)(gLast_mechanics_time + harness_game_config.physics_step_time - car->message.time) / 1000.0;
-                if (gDt - 0.0001 <= car->dt) {
+                if (gDt - 0.0001f <= car->dt) {
                     GetNetPos(car);
                 } else if (gNet_mode == eNet_mode_host) {
-                    car->dt = -1.0;
+                    car->dt = -1.f;
                 } else {
-                    for (dam_index = 0; dam_index < 12; ++dam_index) {
+                    for (dam_index = 0; dam_index < COUNT_OF(car->damage_units); dam_index++) {
                         if (car->damage_units[dam_index].damage_level < car->message.damage[dam_index]) {
-                            car->dt = -1.0;
+                            car->dt = -1.f;
                             break;
                         }
                     }
-                    if (car->dt >= 0.0) {
+                    if (car->dt >= 0.f) {
                         GetNetPos(car);
                     }
                 }
@@ -1159,7 +1157,7 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
                     car_info = (tCollision_info*)car;
                     GetFacesInBox(car_info);
                 }
-                if (car->dt != 0.0) {
+                if (car->dt != 0.f) {
                     MoveAndCollideCar(car, gDt);
                 }
             }
@@ -1167,7 +1165,7 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
         for (i = 0; i < gNum_active_non_cars; i++) {
             non_car = gActive_non_car_list[i];
             if (!non_car->collision_info.doing_nothing_flag) {
-                non_car->collision_info.dt = -1.0;
+                non_car->collision_info.dt = -1.f;
                 if (non_car->collision_info.message.type == 16 && non_car->collision_info.message.time >= gLast_mechanics_time && gLast_mechanics_time + harness_game_config.physics_step_time >= non_car->collision_info.message.time) {
                     non_car->collision_info.dt = (gLast_mechanics_time + harness_game_config.physics_step_time - non_car->collision_info.message.time) / 1000.0f;
                     GetNetPos((tCar_spec*)non_car);
