@@ -6219,8 +6219,8 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
     }
     BrMatrix34Copy(mat1, oldmat1);
     BrMatrix34Copy(mat2, oldmat2);
-    car1->omega = car1->oldomega;
-    car2->omega = car2->oldomega;
+    BrVector3Copy(&car1->omega, &car1->oldomega);
+    BrVector3Copy(&car2->omega, &car2->oldomega);
     BrMatrix34TApplyV(&car1->velocity_car_space, &car1->v, mat1);
     BrMatrix34TApplyV(&car2->velocity_car_space, &car2->v, mat2);
     need_to_fudge = 1;
@@ -6276,7 +6276,7 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
         ts = TwoPointCollB(f, &M, d, tau1, n);
         break;
     case 3:
-        d[3] = 0.0;
+        d[3] = 0.f;
         ts = ThreePointCollRecB(f, &M, d, tau1, n);
         break;
     case 4:
@@ -6289,7 +6289,7 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
     if (k > 3) {
         k = 3;
     }
-    if (fabs(ts) <= 0.000001f) {
+    if (fabsf(ts) <= 0.000001f) {
         return 0;
     }
     BrVector3SetFloat(&f1, 0.0f, 0.0f, 0.0f);
@@ -6312,14 +6312,14 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
         if (f[i] > 10.0f) {
             ts = 0.0f;
         }
-        f[i] = f[i] + 0.1f;
+        f[i] += 0.1f;
         BrVector3Scale(&tau1[i], &tau1[i], f[i]);
         BrVector3Scale(&tau2[i], &tau2[i], f[i]);
         BrVector3Accumulate(&torque1, &tau1[i]);
         BrVector3Accumulate(&torque2, &tau2[i]);
-        if (!pPass && n[2 * i].v[0] == 0.0f && n[2 * i].v[1] == 0.0f && n[2 * i].v[2] == 0.0f) {
+        if (!pPass && Vector3IsZero(&n[2 * i])) {
             car2_point = i;
-        } else if (!pPass && n[2 * i + 1].v[0] == 0.0f && n[2 * i + 1].v[1] == 0.0f && n[2 * i + 1].v[2] == 0.0f) {
+        } else if (!pPass && Vector3IsZero(&n[2 * i + 1])) {
             car1_point = i;
         } else {
             ts = f[i] / car1->M;
@@ -6332,13 +6332,13 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
             BrVector3Accumulate(&pos1, &tv2);
             BrVector3Scale(&tv2, &r[2 * i + 1], f[i]);
             BrVector3Accumulate(&pos2, &tv2);
-            tforce = f[i] + tforce;
+            tforce += f[i];
         }
     }
     if (car1->min_torque_squared != 0.0f && !car1->infinite_mass && BrVector3LengthSquared(&torque1) > car1->min_torque_squared) {
         BrVector3Scale(&car1->omega, &car1->omega, gDt);
-        car1->omega.v[0] += torque1.v[0] * 0.04f;
-        car1->omega.v[2] += torque1.v[2] * 0.04f;
+        car1->omega.v[0] += torque1.v[0] * (harness_game_config.physics_step_time / 1000.f);
+        car1->omega.v[2] += torque1.v[2] * (harness_game_config.physics_step_time / 1000.f);
         if (BrVector3LengthSquared(&car1->omega) > car1->break_off_radians_squared) {
             car1->min_torque_squared = 0.0f;
             return 1;
@@ -6347,8 +6347,8 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
     }
     if (car2->min_torque_squared != 0.0f && !car2->infinite_mass && BrVector3LengthSquared(&torque2) > car2->min_torque_squared) {
         BrVector3Scale(&car2->omega, &car2->omega, gDt);
-        car2->omega.v[0] += torque2.v[0] * 0.04f;
-        car2->omega.v[2] += torque2.v[2] * 0.04f;
+        car2->omega.v[0] += torque2.v[0] * (harness_game_config.physics_step_time / 1000.f);
+        car2->omega.v[2] += torque2.v[2] * (harness_game_config.physics_step_time / 1000.f);
         if (BrVector3LengthSquared(&car2->omega) > car2->break_off_radians_squared) {
             car2->min_torque_squared = 0.0f;
             return 1;
@@ -6364,7 +6364,7 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
     BrVector3InvScale(&pos1, &pos1, tforce);
     BrVector3InvScale(&pos2, &pos2, tforce);
     if (pPass == 0) {
-        if (car1_point > -1 && move_car1) {
+        if (car1_point >= 0 && move_car1) {
             f[car1_point] = f[car1_point] / car1->M;
             BrVector3Scale(&n[2 * car1_point], &n[2 * car1_point], f[car1_point]);
             BrVector3Cross(&tv2, &car1->oldomega, &r[2 * car1_point]);
@@ -6377,7 +6377,7 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
             BrMatrix34ApplyV(&tv, &n[2 * car1_point], mat1);
             BrVector3Accumulate(&car1->v, &tv);
         }
-        if (car2_point > -1 && move_car2) {
+        if (car2_point >= 0 && move_car2) {
             f[car2_point] = f[car2_point] / car2->M;
             BrVector3Scale(&n[2 * car2_point + 1], &n[2 * car2_point + 1], f[car2_point]);
             BrVector3Cross(&tv2, &car2->oldomega, &r[2 * car2_point + 1]);
@@ -6416,7 +6416,7 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
     if (move_car1) {
         BrVector3Accumulate(&car1->v, &tv);
     }
-    CrushAndDamageCar((tCar_spec*)car1, &pos1, &f1, (tCar_spec*)car2);
+    CrushAndDamageCar(CAR(car1), &pos1, &f1, CAR(car2));
     if ((car1->infinite_mass & 0x100) != 0) {
         BrVector3Sub(&tv2, &car1->cmpos, &pos1);
         BrVector3Accumulate(&tv2, &car1->cmpos);
@@ -6442,7 +6442,7 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
         BrVector3Accumulate(&tv2, &car2->cmpos);
         ts = BrVector3Length(&f2);
         if (ts > 0.0001f) {
-            ts = 5.0 / ts;
+            ts = 5.0f / ts;
             BrVector3Scale(&a, &f2, ts);
             BrVector3Accumulate(&tv2, &a);
             plane = LineBoxColl(&tv2, &pos2, &car2->bounds[1], &a);
