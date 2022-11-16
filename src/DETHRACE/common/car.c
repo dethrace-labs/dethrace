@@ -34,8 +34,8 @@
 #include <math.h>
 #include <stdlib.h>
 
-int gDoing_physics;
-br_scalar gDt;
+int gDoing_physics = 0;
+br_scalar gDt = 0.f;
 // suffix added to avoid duplicate symbol
 int gCollision_detection_on__car = 1;
 // suffix added to avoid duplicate symbol
@@ -47,13 +47,13 @@ void (*ControlCar[6])(tCar_spec*, br_scalar) = {
     &ControlCar3,
     &ControlCar4,
     &ControlCar5,
-    NULL
+    NULL,
 };
 int gControl__car = 3;  // suffix added to avoid duplicate symbol
 int gFace_num__car = 1; // suffix added to avoid duplicate symbol
-br_angle gOld_yaw__car; // suffix added to avoid duplicate symbol
-br_angle gOld_zoom;
-br_vector3 gCamera_pos_before_collide;
+br_angle gOld_yaw__car = 0; // suffix added to avoid duplicate symbol
+br_angle gOld_zoom = 0;
+br_vector3 gCamera_pos_before_collide = { 0 };
 int gMetal_crunch_sound_id__car[5] = {
     // suffix added to avoid duplicate symbol
     5000,
@@ -69,24 +69,24 @@ int gMetal_scrape_sound_id__car[3] = {
     5012,
 };
 int gCar_car_collisions = 1;
-int gFreeze_mechanics;
-tU32 gLast_cunning_stunt;
-tU32 gWild_start;
-tU32 gQuite_wild_start;
-tU32 gQuite_wild_end;
-tU32 gOn_me_wheels_start;
-int gWoz_upside_down_at_all;
-tS3_sound_tag gSkid_tag[2];
-tCar_spec* gLast_car_to_skid[2];
-int gEliminate_faces;
-br_vector3 gZero_v__car; // suffix added to avoid duplicate symbol
-tU32 gSwitch_time;
-tSave_camera gSave_camera[2];
-tU32 gLast_mechanics_time;
-int gOpponent_viewing_mode;
-int gNet_player_to_view_index;
-int gDouble_pling_water;
-int gStop_opponents_moving;
+int gFreeze_mechanics = 0;
+tU32 gLast_cunning_stunt = 0;
+tU32 gWild_start = 0;
+tU32 gQuite_wild_start = 0;
+tU32 gQuite_wild_end = 0;
+tU32 gOn_me_wheels_start = 0;
+int gWoz_upside_down_at_all = 0;
+tS3_sound_tag gSkid_tag[2] = { 0 };
+tCar_spec* gLast_car_to_skid[2] = { 0 };
+int gEliminate_faces = 0;
+br_vector3 gZero_v__car = { 0 }; // suffix added to avoid duplicate symbol
+tU32 gSwitch_time = 0;
+tSave_camera gSave_camera[2] = { 0 };
+tU32 gLast_mechanics_time = 0;
+int gOpponent_viewing_mode = 0;
+int gNet_player_to_view_index = -1;
+int gDouble_pling_water = 0;
+int gStop_opponents_moving = 0;
 float gDefensive_powerup_factor[6] = { 1.0f, 0.825f, 0.65f, 0.475f, 0.3f, 0.01f };
 float gOffensive_powerup_factor[6] = { 1.0f, 1.5f, 2.0f, 3.0f, 5.0f, 10.0f };
 float gEngine_powerup_factor[6] = { 1.3f, 1.9f, 2.5f, 3.2f, 4.0f, 10.0f };
@@ -97,9 +97,9 @@ float gCar_simplification_factor[2][5] = {
     { 10.0f, 3.0f, 1.5f, 0.75f, 0.0f },
     { 10.0f, 5.0f, 2.5f, 1.5f, 0.0f }
 };
-int gCar_simplification_level;
-int gNum_active_non_cars;
-int gCamera_has_collided;
+int gCar_simplification_level = 0;
+int gNum_active_non_cars = 0;
+int gCamera_has_collided = 0;
 tFace_ref gFace_list__car[150]; // suffix added to avoid duplicate symbol
 tNon_car_spec* gActive_non_car_list[50];
 int gOver_shoot;
