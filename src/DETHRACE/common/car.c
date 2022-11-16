@@ -6730,15 +6730,15 @@ int TestOldMats(tCollision_info* c1, tCollision_info* c2, int newmats) {
         BrMatrix34LPInverse(&invmat1, &c1->oldmat);
         BrMatrix34Mul(&mat21, &c2->oldmat, &invmat1);
     }
-    for (i = 0; i < 4; ++i) {
+    for (i = 0; i < 4; i++) {
         if (i == 3) {
-            edge = b2->min;
+            BrVector3Copy(&edge, &b2->min);
         } else {
-            edge = b2->max;
+            BrVector3Copy(&edge, &b2->max);
             edge.v[i] = b2->min.v[i];
         }
-        for (j = 0; j < 3; ++j) {
-            tp1 = edge;
+        for (j = 0; j < 3; j++) {
+            BrVector3Copy(&tp1, &edge);
             if (b2->max.v[j] == tp1.v[j]) {
                 tp1.v[j] = b2->min.v[j];
             } else {
