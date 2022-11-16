@@ -6788,7 +6788,7 @@ int DoPullActorFromWorld(br_actor* pActor) {
         if (i == NONCAR_UNUSED_SLOTS) {
             non_car = NULL;
         } else {
-            memcpy(non_car, &gProgram_state.non_cars[gNon_car_spec_list[num] + 4], sizeof(tNon_car_spec));
+            memcpy(non_car, &gProgram_state.non_cars[gNon_car_spec_list[num] + NONCAR_UNUSED_SLOTS - 1], sizeof(tNon_car_spec));
         }
     }
     if (non_car != NULL) {
