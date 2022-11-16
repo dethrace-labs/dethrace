@@ -831,11 +831,11 @@ void CalcEngineForce(tCar_spec* c, br_scalar dt) {
     tS32 temp_for_swap;
     LOG_TRACE("(%p, %f)", c, dt);
 
-    c->acc_force = 0.0;
-    if (c->revs == 0.0) {
+    c->acc_force = 0.0f;
+    if (c->revs == 0.0f) {
         c->gear = 0;
     }
-    sign = c->gear < 0 || (!c->gear && c->velocity_car_space.v[2] > 0.5);
+    sign = c->gear < 0 || (c->gear == 0 && c->velocity_car_space.v[2] > 0.5f);
     if (c->keys.backwards != sign) {
         c->keys.backwards = !c->keys.backwards;
         temp_for_swap = c->keys.acc;
@@ -854,10 +854,10 @@ void CalcEngineForce(tCar_spec* c, br_scalar dt) {
         c->joystick.acc = c->joystick.dec;
         c->joystick.dec = temp_for_swap;
     }
-    c->torque = -(c->revs * c->revs / 100000000.0) - 0.2;
+    c->torque = -(c->revs * c->revs / 100000000.0f) - 0.2f;
     if (c->keys.acc || c->joystick.acc >= 0) {
-        if (fabs(c->curvature) > c->maxcurve / 2.0 && c->gear < 2 && c->gear && c->traction_control) {
-            ts = 0.69999999;
+        if (fabsf(c->curvature) > c->maxcurve / 2.0f && c->gear < 2 && c->gear && c->traction_control) {
+            ts = 0.7f;
         } else if (c->joystick.acc < 0) {
             ts = 1.2;
         } else {
@@ -867,33 +867,33 @@ void CalcEngineForce(tCar_spec* c, br_scalar dt) {
 
         torque = c->engine_power_multiplier * ts * gEngine_powerup_factor[c->power_up_levels[1]];
         if (c->damage_units[0].damage_level > 10) {
-            torque = (1.0 - (double)(c->damage_units[0].damage_level - 10) / 100.0) * torque;
+            torque = (1.0f - (double)(c->damage_units[0].damage_level - 10) / 100.0f) * torque;
         }
-        c->torque = c->torque + torque;
+        c->torque += torque;
     } else {
         c->traction_control = 1;
     }
     if (!c->keys.dec && (!c->keys.acc || c->gear) && c->joystick.dec <= 0 && (c->joystick.acc <= 0 || c->gear)) {
-        c->brake_force = 0.0;
+        c->brake_force = 0.0f;
     } else {
         if (c->joystick.dec > 0) {
             c->brake_force = (double)(c->joystick.dec / 0x10000) * c->brake_increase + c->initial_brake;
         }
-        if (c->brake_force == 0.0) {
+        if (c->brake_force == 0.0f) {
             c->brake_force = c->initial_brake;
         } else {
-            c->brake_force = c->brake_increase * dt + c->brake_force;
+            c->brake_force += c->brake_increase * dt;
             if (c->initial_brake + c->brake_increase < c->brake_force) {
                 c->brake_force = c->initial_brake + c->brake_increase;
             }
         }
     }
     if (c->gear) {
-        c->acc_force = c->force_torque_ratio * c->torque / (double)c->gear;
-        if (c->brake_force == 0.0) {
-            if (c->revs - 1.0 > c->target_revs || c->revs + 1.0 < c->target_revs) {
+        c->acc_force = c->force_torque_ratio * c->torque / (float)c->gear;
+        if (c->brake_force == 0.0f) {
+            if (c->revs - 1.0f > c->target_revs || c->revs + 1.0f < c->target_revs) {
                 ts2 = c->torque * dt / 0.0002 + c->revs - c->target_revs;
-                c->acc_force = ts2 / ((1.0 / (c->speed_revs_ratio * c->M) / (double)c->gear + 1.0 / (c->force_torque_ratio * 0.0002) * (double)c->gear) * dt) + c->acc_force;
+                c->acc_force += ts2 / ((1.0f / (c->speed_revs_ratio * c->M) / (float)c->gear + 1.0 / (c->force_torque_ratio * 0.0002) * (double)c->gear) * dt);
             }
         } else {
             c->revs = c->target_revs;
