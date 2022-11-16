@@ -3664,59 +3664,41 @@ int BoxFaceIntersect(br_bounds* pB, br_matrix34* pM, br_matrix34* pMold, br_vect
     LOG_TRACE("(%p, %p, %p, %p, %p, %p, %d, %p)", pB, pM, pMold, pPoint_list, pNorm_list, pDist_list, pMax_pnts, c);
 
     n = 0;
-    bnds.min.v[0] = pB->min.v[0] * 0.14492753;
-    bnds.min.v[1] = pB->min.v[1] * 0.14492753;
-    bnds.min.v[2] = pB->min.v[2] * 0.14492753;
-    bnds.max.v[0] = pB->max.v[0] * 0.14492753;
-    bnds.max.v[1] = pB->max.v[1] * 0.14492753;
-    bnds.max.v[2] = pB->max.v[2] * 0.14492753;
-    pos.v[0] = pM->m[3][0] * 0.14492753;
-    pos.v[1] = pM->m[3][1] * 0.14492753;
-    pos.v[2] = pM->m[3][2] * 0.14492753;
-    pMold->m[3][0] = pMold->m[3][0] * 0.14492753;
-    pMold->m[3][1] = pMold->m[3][1] * 0.14492753;
-    pMold->m[3][2] = pMold->m[3][2] * 0.14492753;
+    BrVector3Scale(&bnds.min, &pB->min, 1.f / WORLD_SCALE);
+    BrVector3Scale(&bnds.max, &pB->max, 1.f / WORLD_SCALE);
+    BrVector3Scale(&pos, (br_vector3*)pM->m[3], 1.f / WORLD_SCALE);
+    BrVector3Scale((br_vector3*)pMold->m[3], (br_vector3*)pMold->m[3], 1.f / WORLD_SCALE);
 
     for (i = c->box_face_start; i < c->box_face_end && i < c->box_face_start + 50; i++) {
         f_ref = &gFace_list__car[i];
-        if (SLOBYTE(f_ref->flags) >= 0 && *f_ref->material->identifier != '!') {
-            tv.v[0] = f_ref->v[0].v[0] - pos.v[0];
-            tv.v[1] = f_ref->v[0].v[1] - pos.v[1];
-            tv.v[2] = f_ref->v[0].v[2] - pos.v[2];
-            BrMatrix34TApplyV(p, &tv, pM);
-            tv.v[0] = f_ref->v[1].v[0] - pos.v[0];
-            tv.v[1] = f_ref->v[1].v[1] - pos.v[1];
-            tv.v[2] = f_ref->v[1].v[2] - pos.v[2];
+        if (SLOBYTE(f_ref->flags) >= 0 && f_ref->material->identifier[0] != '!') {
+            BrVector3Sub(&tv, &f_ref->v[0], &pos);
+            BrMatrix34TApplyV(&p[0], &tv, pM);
+            BrVector3Sub(&tv, &f_ref->v[1], &pos);
             BrMatrix34TApplyV(&p[1], &tv, pM);
-            tv.v[0] = f_ref->v[2].v[0] - pos.v[0];
-            tv.v[1] = f_ref->v[2].v[1] - pos.v[1];
-            tv.v[2] = f_ref->v[2].v[2] - pos.v[2];
+            BrVector3Sub(&tv, &f_ref->v[2], &pos);
             BrMatrix34TApplyV(&p[2], &tv, pM);
             j = n;
             if ((f_ref->flags & 1) == 0) {
-                n += AddEdgeCollPoints(p, &p[1], &bnds, pMold, pPoint_list, pNorm_list, n, pMax_pnts, c);
+                n += AddEdgeCollPoints(&p[0], &p[1], &bnds, pMold, pPoint_list, pNorm_list, n, pMax_pnts, c);
             }
             if ((f_ref->flags & 2) == 0) {
                 n += AddEdgeCollPoints(&p[1], &p[2], &bnds, pMold, pPoint_list, pNorm_list, n, pMax_pnts, c);
             }
             if ((f_ref->flags & 4) == 0) {
-                n += AddEdgeCollPoints(&p[2], p, &bnds, pMold, pPoint_list, pNorm_list, n, pMax_pnts, c);
+                n += AddEdgeCollPoints(&p[2], &p[0], &bnds, pMold, pPoint_list, pNorm_list, n, pMax_pnts, c);
             }
             if (n > j) {
-                if (!gMaterial_index) {
-                    m = *f_ref->material->identifier - '/';
+                if (gMaterial_index == 0) {
+                    m = f_ref->material->identifier[0] - '/';
                     if (m > 0 && m < 11) {
                         gMaterial_index = m;
                     }
                 }
-                while (n > j) {
-                    pPoint_list[j].v[0] = pPoint_list[j].v[0] * WORLD_SCALE;
-                    pPoint_list[j].v[1] = pPoint_list[j].v[1] * WORLD_SCALE;
-                    pPoint_list[j].v[2] = pPoint_list[j].v[2] * WORLD_SCALE;
-                    pPoint_list[j].v[0] = pPoint_list[j].v[0] - c->cmpos.v[0];
-                    pPoint_list[j].v[1] = pPoint_list[j].v[1] - c->cmpos.v[1];
-                    pPoint_list[j].v[2] = pPoint_list[j].v[2] - c->cmpos.v[2];
-                    ++j;
+                while (j < n) {
+                    BrVector3Scale(&pPoint_list[j], &pPoint_list[j], WORLD_SCALE);
+                    BrVector3Sub(&pPoint_list[j], &pPoint_list[j], &c->cmpos);
+                    j++;
                 }
             }
         }
