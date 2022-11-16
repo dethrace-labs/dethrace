@@ -1024,7 +1024,7 @@ void InterpolateCars(tU32 pLast_frame_time, tU32 pTime) {
     LOG_TRACE("(%d, %d)", pLast_frame_time, pTime);
 
     dt = ((int)(gLast_mechanics_time - pLast_frame_time)) / 1000.0;
-    if (dt > 0.04 || dt < 0)
+    if (dt > harness_game_config.physics_step_time / 1000.f || dt < 0)
         dt = 0;
 
     gOver_shoot = dt > 0.0;
