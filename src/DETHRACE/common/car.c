@@ -2948,9 +2948,7 @@ void AddFrictionCarToCar(tCollision_info* car1, tCollision_info* car2, br_vector
     BrVector3Sub(&v_diff1, &v_diff1, &tv);
     v_diff = BrVector3Length(&v_diff1);
     if (v_diff < 0.01f) {
-        max_friction->v[0] = 0.0f;
-        max_friction->v[1] = 0.0f;
-        max_friction->v[2] = 0.0f;
+        BrVector3Set(max_friction, 0.f, 0.f, 0.f);
     } else {
         BrVector3InvScale(&v_diff1, &v_diff1, v_diff);
         BrMatrix34ApplyV(&tv, &v_diff1, &car1->oldmat);
@@ -2964,11 +2962,9 @@ void AddFrictionCarToCar(tCollision_info* car1, tCollision_info* car2, br_vector
         }
         BrVector3Cross(&tv, &tau1, pos1);
         BrVector3Cross(&tv2, &tau2, pos2);
-        ts = BrVector3Dot(&tv, &v_diff1) + BrVector3Dot(&tv2, &v_diff2) + 1.0 / car2->M + 1.0 / car1->M;
+        ts = BrVector3Dot(&tv, &v_diff1) + BrVector3Dot(&tv2, &v_diff2) + 1.f / car2->M + 1.f / car1->M;
         if (ts < 0.0001f) {
-            max_friction->v[0] = 0.0;
-            max_friction->v[1] = 0.0;
-            max_friction->v[2] = 0.0;
+            BrVector3Set(max_friction, 0.f, 0.f, 0.f);
         } else {
             stopping_impulse = v_diff / ts;
             total_friction = total_force * 0.35f;
