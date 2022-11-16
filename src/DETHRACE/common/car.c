@@ -1370,11 +1370,11 @@ void MoveAndCollideNonCar(tNon_car_spec* non_car, br_scalar dt) {
     LOG_TRACE("(%p, %f)", non_car, dt);
 
     car_info = &non_car->collision_info;
-    if (car_info->water_d != 10000.0f) {
+    if (car_info->water_d != 10000.f) {
         TestAutoSpecialVolume(&non_car->collision_info);
     }
     MungeSpecialVolume(&non_car->collision_info);
-    if (car_info->dt >= 0.0) {
+    if (car_info->dt >= 0.f) {
         dt = car_info->dt;
     }
     NonCarCalcForce(non_car, dt);
