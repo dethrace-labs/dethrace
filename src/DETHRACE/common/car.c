@@ -4653,18 +4653,15 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
     swoop = gCountdown && c->pos.v[1] + 0.001f < gCamera_height;
     manual_swing = gOld_yaw__car != gCamera_yaw || swoop;
     manual_zoom = (double)gOld_zoom != gCamera_zoom;
-    old_camera_pos = *(br_vector3*)&m1->m[3][0];
+    BrVector3Copy(&old_camera_pos, &gCamera->t.t.translate.t);
     if (!gProgram_state.cockpit_on) {
         if (swoop) {
             gCamera_yaw = 0;
             manual_swing = 1;
         }
-        if (fabs(c->speedo_speed) > 0.0006f && gCamera_mode > 0) {
+        if (fabsf(c->speedo_speed) > 0.0006f && gCamera_mode > 0) {
             gCamera_mode = -1;
-            gCamera_sign = m2->m[2][1] * c->direction.v[1]
-                    + m2->m[2][2] * c->direction.v[2]
-                    + m2->m[2][0] * c->direction.v[0]
-                > 0.0;
+            gCamera_sign = BrVector3Dot((br_vector3*)m2->m[2], &c->direction) > 0.0;
         }
         if (c->frame_collision_flag && gCamera_mode != -2) {
             gCamera_mode = 1;
@@ -4672,25 +4669,23 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
         if (gCar_flying || gCamera_reset || gCamera_mode == -2) {
             gCamera_mode = 0;
         }
-        d = sqrtf((float)gCamera_zoom) + 0.57971013f;
+        d = sqrtf(gCamera_zoom) + 0.57971013f;
         if (!gCamera_mode || gCamera_mode == -1) {
-            vn = c->direction;
+            BrVector3Copy(&vn, &c->direction);
             MoveWithWheels(c, &vn, manual_swing);
-            vn.v[1] = 0.0;
+            vn.v[1] = 0.0f;
             BrVector3Normalise(&vn, &vn);
             if (gCar_flying) {
                 gCamera_sign = 0;
             }
             SwingCamera(c, m2, m1, &vn, pTime);
             BrVector3Scale(&a, &vn, d);
-            m1->m[3][0] = c->pos.v[0] - a.v[0];
-            m1->m[3][1] = c->pos.v[1] - a.v[1];
-            m1->m[3][2] = c->pos.v[2] - a.v[2];
-            gView_direction = vn;
+            BrVector3Sub((br_vector3*)m1->m[3], &c->pos, &a);
+            BrVector3Copy(&gView_direction, &vn);
         }
         if (gCamera_mode == 1) {
             if (manual_swing || manual_zoom) {
-                old_camera_pos = gCamera_pos_before_collide;
+                BrVector3Copy(&old_camera_pos, &gCamera_pos_before_collide);
             }
             BrVector3Sub(&a, &c->pos, &old_camera_pos);
             a.v[1] = 0.0;
@@ -4699,7 +4694,7 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
                 gCamera_yaw = gOld_yaw__car;
             }
             BrVector3Normalise(&vn, &a);
-            gView_direction = vn;
+            BrVector3Copy(&gView_direction, &vn);
             BrVector3Scale(&vn, &vn, -d);
             BrVector3Accumulate(&a, &vn);
             dist = BrVector3Length(&a);
@@ -4708,25 +4703,23 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
                 BrVector3Scale(&a, &a, (l - 1.f));
                 BrVector3Accumulate(&vn, &a);
             }
-            m1->m[3][0] = c->pos.v[0] + vn.v[0];
-            m1->m[3][1] = c->pos.v[1] + vn.v[1];
-            m1->m[3][2] = c->pos.v[2] + vn.v[2];
+            BrVector3Add((br_vector3*)m1->m[3], &c->pos, &vn);
         }
         height_inc = gCamera_zoom * gCamera_zoom + 0.3f;
         time = pTime * 0.001f;
         if (!gCamera_frozen || gAction_replay_mode) {
             if (pTime < 5000) {
                 if (swoop) {
-                    if (time > 0.2) {
-                        time = 0.2;
+                    if (time > 0.2f) {
+                        time = 0.2f;
                     }
-                    gCamera_height -= time * 5.0;
+                    gCamera_height -= time * 5.0f;
                     if (gCamera_height < c->pos.v[1]) {
                         gCamera_height = c->pos.v[1];
                     }
                 } else {
-                    gCamera_height = time * 5.0 * c->pos.v[1] + gCamera_height;
-                    gCamera_height = gCamera_height / (time * 5.0 + 1.0);
+                    gCamera_height += time * 5.0f * c->pos.v[1];
+                    gCamera_height /= time * 5.0f + 1.0f;
                 }
             } else {
                 gCamera_height = c->pos.v[1];
@@ -4740,13 +4733,9 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
         }
 
         m1->m[3][1] = height_inc + gCamera_height;
-        gCamera_pos_before_collide = *(br_vector3*)&m1->m[3][0];
+        BrVector3Copy(&gCamera_pos_before_collide, (br_vector3*)m1->m[3]);
         CollideCameraWithOtherCars(&c->pos, (br_vector3*)m1->m[3]);
-        if (manual_swing || manual_zoom) {
-            CollideCamera2(&c->pos, (br_vector3*)m1->m[3], &old_camera_pos, 1);
-        } else {
-            CollideCamera2(&c->pos, (br_vector3*)m1->m[3], &old_camera_pos, 0);
-        }
+        CollideCamera2(&c->pos, (br_vector3*)m1->m[3], &old_camera_pos, manual_swing || manual_zoom);
         if (gCamera_has_collided && swoop) {
             gCamera_height = c->pos.v[1];
         }
