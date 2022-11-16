@@ -569,10 +569,10 @@ void InitialiseNonCar(tNon_car_spec* non_car) {
     if (c->car_master_actor->identifier[3] == '!') {
         c->M = non_car->free_mass;
         c->min_torque_squared = 0.0f;
-        c->cmpos = non_car->free_cmpos;
+        BrVector3Copy(&c->cmpos, &non_car->free_cmpos);
     } else {
         c->M = non_car->attached_mass;
-        c->cmpos = non_car->attached_cmpos;
+        BrVector3Copy(&c->cmpos, &non_car->attached_cmpos);
         c->min_torque_squared = non_car->min_torque_squared;
     }
     BrVector3Scale(&c->I, &non_car->I_over_M, c->M);
