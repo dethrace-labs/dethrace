@@ -298,7 +298,7 @@ void InitialiseCar2(tCar_spec* pCar, int pClear_disabled_flag) {
     pCar->num_smoke_columns = 0;
     pCar->who_last_hit_me = NULL;
     pCar->screen_material_source = NULL;
-    if (pCar->screen_material) {
+    if (pCar->screen_material != NULL) {
         pCar->screen_material->colour_map = NULL;
         pCar->screen_material->index_shade = gRender_shade_table;
         BrMaterialUpdate(pCar->screen_material, BR_MATU_ALL);
@@ -317,28 +317,22 @@ void InitialiseCar2(tCar_spec* pCar, int pClear_disabled_flag) {
     }
     BrMatrix34Copy(&pCar->old_frame_mat, &safe_position);
     BrMatrix34Copy(&pCar->oldmat, &safe_position);
-    pCar->oldmat.m[3][0] *= WORLD_SCALE;
-    pCar->oldmat.m[3][1] *= WORLD_SCALE;
-    pCar->oldmat.m[3][2] *= WORLD_SCALE;
+    BrVector3Scale((br_vector3*)pCar->oldmat.m[3], (br_vector3*)pCar->oldmat.m[3], WORLD_SCALE);
     BrMatrix34ApplyP(&pCar->pos, &pCar->cmpos, &pCar->oldmat);
-    pCar->pos.v[0] /= WORLD_SCALE;
-    pCar->pos.v[1] /= WORLD_SCALE;
-    pCar->pos.v[2] /= WORLD_SCALE;
+    BrVector3InvScale(&pCar->pos, &pCar->pos, WORLD_SCALE);
     for (j = 0; j < COUNT_OF(pCar->oldd); j++) {
         pCar->oldd[j] = pCar->ride_height;
     }
     pCar->gear = 0;
-    pCar->revs = 0.0;
+    pCar->revs = 0.f;
     pCar->traction_control = 1;
-    pCar->direction.v[0] = -car_actor->t.t.mat.m[2][0];
-    pCar->direction.v[1] = -car_actor->t.t.mat.m[2][1];
-    pCar->direction.v[2] = -car_actor->t.t.mat.m[2][2];
+    BrVector3Negate(&pCar->direction, (br_vector3*)car_actor->t.t.mat.m[2]);
     for (j = 0; j < COUNT_OF(pCar->last_safe_positions); j++) {
         BrMatrix34Copy(&pCar->last_safe_positions[j], &safe_position);
     }
     pCar->message.type = 0;
     pCar->message.time = 0;
-    pCar->dt = -1.0;
+    pCar->dt = -1.f;
     pCar->last_car_car_collision = 1;
     pCar->time_to_recover = 0;
     pCar->repair_time = 0;
@@ -347,7 +341,7 @@ void InitialiseCar2(tCar_spec* pCar, int pClear_disabled_flag) {
 
     case eDriver_oppo:
         index = 0;
-        for (j = 0; gCurrent_race.number_of_racers > j; ++j) {
+        for (j = 0; j < gCurrent_race.number_of_racers; j++) {
             if (gCurrent_race.opponent_list[j].car_spec->driver == eDriver_oppo) {
                 if (gCurrent_race.opponent_list[j].car_spec == pCar) {
                     pCar->car_ID = index + 512;
@@ -359,7 +353,7 @@ void InitialiseCar2(tCar_spec* pCar, int pClear_disabled_flag) {
 
     case eDriver_net_human:
         index = 0;
-        for (j = 0; gCurrent_race.number_of_racers > j; ++j) {
+        for (j = 0; j < gCurrent_race.number_of_racers; j++) {
             if (gCurrent_race.opponent_list[j].car_spec
                 && gCurrent_race.opponent_list[j].car_spec->driver == eDriver_net_human) {
                 if (gCurrent_race.opponent_list[j].car_spec == pCar) {
@@ -383,28 +377,28 @@ void InitialiseCar2(tCar_spec* pCar, int pClear_disabled_flag) {
     pCar->doing_nothing_flag = 0;
     pCar->end_steering_damage_effect = 0;
     pCar->end_trans_damage_effect = 0;
-    pCar->wheel_dam_offset[0] = 0.0;
-    pCar->wheel_dam_offset[1] = 0.0;
-    pCar->wheel_dam_offset[2] = 0.0;
-    pCar->wheel_dam_offset[3] = 0.0;
+    pCar->wheel_dam_offset[0] = 0.f;
+    pCar->wheel_dam_offset[1] = 0.f;
+    pCar->wheel_dam_offset[2] = 0.f;
+    pCar->wheel_dam_offset[3] = 0.f;
     pCar->shadow_intersection_flags = 0;
     pCar->underwater_ability = 0;
     pCar->invulnerable = 0;
     pCar->wall_climber_mode = 0;
-    pCar->grip_multiplier = 1.0;
-    pCar->damage_multiplier = 1.0;
-    pCar->collision_mass_multiplier = 1.0;
-    pCar->engine_power_multiplier = 1.0;
-    pCar->bounce_rate = 0.0;
-    pCar->bounce_amount = 0.0;
+    pCar->grip_multiplier = 1.f;
+    pCar->damage_multiplier = 1.f;
+    pCar->collision_mass_multiplier = 1.f;
+    pCar->engine_power_multiplier = 1.f;
+    pCar->bounce_rate = 0.f;
+    pCar->bounce_amount = 0.f;
     pCar->knackered = 0;
     TotallyRepairACar(pCar);
-    SetCarSuspGiveAndHeight(pCar, 1.0, 1.0, 1.0, 0.0, 0.0);
-    for (j = 0; j < 64; ++j) {
+    SetCarSuspGiveAndHeight(pCar, 1.f, 1.f, 1.f, 0.f, 0.f);
+    for (j = 0; j < COUNT_OF(pCar->powerups); ++j) {
         pCar->powerups[j] = 0;
     }
-    if (gNet_mode) {
-        for (j = 0; j < 3; ++j) {
+    if (gNet_mode != eNet_mode_none) {
+        for (j = 0; j < COUNT_OF(pCar->power_up_levels); j++) {
             pCar->power_up_levels[j] = 0;
         }
     }
