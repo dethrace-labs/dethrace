@@ -727,19 +727,17 @@ void RememberSafePosition(tCar_spec* car, tU32 pTime) {
             return;
         }
     }
-    if ((!car->last_special_volume || car->last_special_volume->gravity_multiplier == 1.0)
-        && gCurrent_race.material_modifiers[car->material_index[0]].tyre_road_friction >= 0.1
-        && gCurrent_race.material_modifiers[car->material_index[1]].tyre_road_friction >= 0.1
-        && gCurrent_race.material_modifiers[car->material_index[2]].tyre_road_friction >= 0.1
-        && gCurrent_race.material_modifiers[car->material_index[3]].tyre_road_friction >= 0.1
-        && car->car_master_actor->t.t.mat.m[1][1] >= 0.80000001) {
+    if ((car->last_special_volume == NULL || car->last_special_volume->gravity_multiplier == 1.f)
+        && gCurrent_race.material_modifiers[car->material_index[0]].tyre_road_friction >= 0.1f
+        && gCurrent_race.material_modifiers[car->material_index[1]].tyre_road_friction >= 0.1f
+        && gCurrent_race.material_modifiers[car->material_index[2]].tyre_road_friction >= 0.1f
+        && gCurrent_race.material_modifiers[car->material_index[3]].tyre_road_friction >= 0.1f
+        && car->car_master_actor->t.t.mat.m[1][1] >= 0.8f) {
 
         for (j = 0; j < 5; j++) {
-            r.v[0] = car->car_master_actor->t.t.mat.m[3][0] - car->last_safe_positions[j].m[3][0];
-            r.v[1] = car->car_master_actor->t.t.mat.m[3][1] - car->last_safe_positions[j].m[3][1];
-            r.v[2] = car->car_master_actor->t.t.mat.m[3][2] - car->last_safe_positions[j].m[3][2];
+            BrVector3Sub(&r, &car->car_master_actor->t.t.translate.t, (br_vector3*)car->last_safe_positions[j].m[3]);
 
-            if (BrVector3LengthSquared(&r) < 8.4015961) {
+            if (BrVector3LengthSquared(&r) < 8.4015961f) {
                 return;
             }
         }
