@@ -4085,20 +4085,20 @@ void MungeCarGraphics(tU32 pFrame_period) {
                 GetOilSpillDetails(i, &oily_actor, &oily_size);
                 if (oily_actor != NULL) {
                     car_radius = the_car->bounds[1].max.v[2] / WORLD_SCALE * 1.5f;
-                    if (oily_actor->t.t.mat.m[3][0] - oily_size < car_x + car_radius
-                        && oily_actor->t.t.mat.m[3][0] + oily_size > car_x - car_radius
-                        && oily_actor->t.t.mat.m[3][2] - oily_size < car_z + car_radius
-                        && oily_actor->t.t.mat.m[3][2] + oily_size > car_z - car_radius) {
+                    if (oily_actor->t.t.translate.t.v[0] - oily_size < car_x + car_radius
+                        && oily_actor->t.t.translate.t.v[0] + oily_size > car_x - car_radius
+                        && oily_actor->t.t.translate.t.v[2] - oily_size < car_z + car_radius
+                        && oily_actor->t.t.translate.t.v[2] + oily_size > car_z - car_radius) {
                         the_car->shadow_intersection_flags |= 1 << i;
                     }
                 }
             }
             if (the_car->driver < eDriver_net_human && (!gAction_replay_mode || !ReplayIsPaused())) {
                 if (gCountdown) {
-                    sine_angle = FRandomBetween(0.4f, 1.6f) * ((double)GetTotalTime() / ((double)gCountdown * 100.0));
-                    sine_angle = frac(sine_angle) * 360.0;
+                    sine_angle = FRandomBetween(0.4f, 1.6f) * ((double)GetTotalTime() / ((double)gCountdown * 100.0f));
+                    sine_angle = frac(sine_angle) * 360.0f;
                     sine_angle = FastScalarSin(sine_angle);
-                    raw_revs = (double)the_car->red_line * fabs(sine_angle);
+                    raw_revs = (double)the_car->red_line * fabsf(sine_angle);
                     rev_reducer = (11.0 - (double)gCountdown) / 10.0;
                     the_car->revs = rev_reducer * raw_revs;
                 } else {
@@ -4111,7 +4111,7 @@ void MungeCarGraphics(tU32 pFrame_period) {
             for (i = 0; i < the_car->number_of_steerable_wheels; i++) {
                 ControlBoundFunkGroove(the_car->steering_ref[i], the_car->steering_angle);
             }
-            for (i = 0; i < 4; i++) {
+            for (i = 0; i < COUNT_OF(the_car->rf_sus_ref); i++) {
                 ControlBoundFunkGroove(the_car->rf_sus_ref[i], the_car->rf_sus_position);
                 if ((i & 1) != 0) {
                     ControlBoundFunkGroove(the_car->lf_sus_ref[i], -the_car->lf_sus_position);
@@ -4119,7 +4119,7 @@ void MungeCarGraphics(tU32 pFrame_period) {
                     ControlBoundFunkGroove(the_car->lf_sus_ref[i], the_car->lf_sus_position);
                 }
             }
-            for (i = 0; i < 2; i++) {
+            for (i = 0; i < COUNT_OF(the_car->rr_sus_ref); i++) {
                 ControlBoundFunkGroove(the_car->rr_sus_ref[i], the_car->rr_sus_position);
                 if ((i & 1) != 0) {
                     ControlBoundFunkGroove(the_car->lr_sus_ref[i], -the_car->lr_sus_position);
@@ -4128,7 +4128,7 @@ void MungeCarGraphics(tU32 pFrame_period) {
                 }
             }
             if (!gAction_replay_mode || !ReplayIsPaused()) {
-                wheel_speed = -(the_car->speedo_speed / the_car->non_driven_wheels_circum * (double)gFrame_period);
+                wheel_speed = -(the_car->speedo_speed / the_car->non_driven_wheels_circum * (float)gFrame_period);
                 ControlBoundFunkGroovePlus(the_car->non_driven_wheels_spin_ref_1, wheel_speed);
                 ControlBoundFunkGroovePlus(the_car->non_driven_wheels_spin_ref_2, wheel_speed);
                 ControlBoundFunkGroovePlus(the_car->non_driven_wheels_spin_ref_3, wheel_speed);
@@ -4137,7 +4137,7 @@ void MungeCarGraphics(tU32 pFrame_period) {
                     if (the_car->gear) {
                         wheel_speed = -(the_car->revs
                             * the_car->speed_revs_ratio
-                            / 6900.0
+                            / (WORLD_SCALE * 1000.f)
                             * (double)the_car->gear
                             / the_car->driven_wheels_circum
                             * (double)gFrame_period);
@@ -4155,10 +4155,10 @@ void MungeCarGraphics(tU32 pFrame_period) {
             if (gAction_replay_mode) {
                 MungeSpecialVolume((tCollision_info*)the_car);
             } else if (the_car->driver == eDriver_local_human) {
-                abs_omega_x = (fabs(the_car->I.v[0]) + 3.3) / 2.0 * fabs(the_car->omega.v[0]);
-                abs_omega_y = (fabs(the_car->I.v[1]) + 3.57) / 2.0 * fabs(the_car->omega.v[1]);
-                abs_omega_z = (fabs(the_car->I.v[2]) + 0.44) / 2.0 * fabs(the_car->omega.v[2]);
-                spinning_wildly = abs_omega_x > 26.4 || abs_omega_y > 49.98 || abs_omega_z > 3.52;
+                abs_omega_x = (fabsf(the_car->I.v[0]) + 3.3f) / 2.0f * fabsf(the_car->omega.v[0]);
+                abs_omega_y = (fabsf(the_car->I.v[1]) + 3.57f) / 2.0f * fabsf(the_car->omega.v[1]);
+                abs_omega_z = (fabsf(the_car->I.v[2]) + 0.44f) / 2.0f * fabsf(the_car->omega.v[2]);
+                spinning_wildly = abs_omega_x > 26.4f || abs_omega_y > 49.98f || abs_omega_z > 3.52f;
                 if (spinning_wildly && the_time - gLast_cunning_stunt > 10000) {
                     if (!gWild_start
                         || (the_car->last_special_volume != NULL && the_car->last_special_volume->gravity_multiplier != 1.f)) {
@@ -4174,7 +4174,7 @@ void MungeCarGraphics(tU32 pFrame_period) {
                     }
                 } else {
                     gWild_start = 0;
-                    spinning_mildly = abs_omega_x > 1.65 || abs_omega_z > 0.22;
+                    spinning_mildly = abs_omega_x > 1.65f || abs_omega_z > 0.22f;
                     if (the_car->number_of_wheels_on_ground <= 3) {
                         gOn_me_wheels_start = 0;
                         if (the_car->number_of_wheels_on_ground || !spinning_mildly) {
