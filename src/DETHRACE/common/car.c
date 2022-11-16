@@ -4349,7 +4349,7 @@ void ViewOpponent() {
     LOG_TRACE("()");
 
     n++;
-    if (gNet_mode) {
+    if (gNet_mode != eNet_mode_none) {
         if (n >= gNumber_of_net_players) {
             n = 0;
         }
@@ -4364,7 +4364,7 @@ void ViewOpponent() {
     }
     gCamera_yaw = 0;
     InitialiseExternalCamera();
-    PositionExternalCamera(gCar_to_view, 200u);
+    PositionExternalCamera(gCar_to_view, 200);
 }
 
 // IDA: void __cdecl ToggleCarToCarCollisions()
