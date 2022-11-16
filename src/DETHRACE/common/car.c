@@ -911,18 +911,14 @@ void PrepareCars(tU32 pFrame_start_time) {
     last_frame_start = pFrame_start_time;
     for (i = 0; i < gNum_cars_and_non_cars; i++) {
         car = gActive_car_list[i];
-        car->car_master_actor->t.t.mat.m[3][0] = car->car_master_actor->t.t.mat.m[3][0] * WORLD_SCALE;
-        car->car_master_actor->t.t.mat.m[3][1] = car->car_master_actor->t.t.mat.m[3][1] * WORLD_SCALE;
-        car->car_master_actor->t.t.mat.m[3][2] = car->car_master_actor->t.t.mat.m[3][2] * WORLD_SCALE;
-        car->velocity_car_space.v[0] = car->velocity_car_space.v[0] * WORLD_SCALE * 1000.0f;
-        car->velocity_car_space.v[1] = car->velocity_car_space.v[1] * WORLD_SCALE * 1000.0f;
-        car->velocity_car_space.v[2] = car->velocity_car_space.v[2] * WORLD_SCALE * 1000.0f;
+        BrVector3Scale(&car->car_master_actor->t.t.translate.t, &car->car_master_actor->t.t.translate.t, WORLD_SCALE);
+        BrVector3Scale(&car->velocity_car_space, &car->velocity_car_space, WORLD_SCALE * 1000.f);
         car->frame_collision_flag = gOver_shoot && car->collision_flag;
         if (car->driver > eDriver_non_car) {
             RecordLastDamage(car);
             if (car->driver == eDriver_oppo && gStop_opponents_moving) {
-                car->acc_force = 0.0;
-                car->brake_force = 0.0;
+                car->acc_force = 0.0f;
+                car->brake_force = 0.0f;
                 car->keys.acc = 0;
                 car->keys.dec = 0;
                 car->joystick.acc = -1;
