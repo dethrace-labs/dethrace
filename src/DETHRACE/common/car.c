@@ -6862,15 +6862,13 @@ void CheckForDeAttachmentOfNonCars(tU32 pTime) {
     total_time = 0;
     for (i = 0; i < gNum_active_non_cars; i++) {
         c = &gActive_non_car_list[i]->collision_info;
-        if (c->car_master_actor->t.t.mat.m[3][1] < (double)gMin_world_y) {
+        if (c->car_master_actor->t.t.mat.m[3][1] < gMin_world_y) {
             c->doing_nothing_flag = 1;
         }
         if (TestForNan(&c->car_master_actor->t.t.mat.m[3][1])) {
             BrVector3Set(&c->omega, 0.0f, 0.0f, 0.0f);
             BrMatrix34Identity(&c->car_master_actor->t.t.mat);
-            c->car_master_actor->t.t.mat.m[3][0] = 2000.0f;
-            c->car_master_actor->t.t.mat.m[3][1] = 0.0f;
-            c->car_master_actor->t.t.mat.m[3][2] = 0.0f;
+            BrVector3Set(&c->car_master_actor->t.t.translate.t, 2000.f, 0.f, 0.f);
             c->doing_nothing_flag = 1;
         }
         actor = c->car_master_actor;
@@ -6898,7 +6896,7 @@ void CheckForDeAttachmentOfNonCars(tU32 pTime) {
                 c->driver = eDriver_non_car_unused_slot;
                 last_free_slot--;
                 XZToColumnXZ(&cx, &cz, actor->t.t.mat.m[3][0], actor->t.t.mat.m[3][2], track_spec);
-                if (track_spec->columns[cz][cx]) {
+                if (track_spec->columns[cz][cx] != NULL) {
                     BrActorAdd(track_spec->columns[cz][cx], actor);
                 } else {
                     BrActorAdd(gTrack_actor, actor);
