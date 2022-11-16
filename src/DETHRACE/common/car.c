@@ -4940,9 +4940,7 @@ void PointCameraAtCar(tCar_spec* c, br_matrix34* m1, br_matrix34* m2) {
     m2->m[2][0] = -vn.v[0];
     m2->m[2][1] = 0.0f;
     m2->m[2][2] = -vn.v[2];
-    tv2.v[0] = pos->v[0] - m2->m[3][0];
-    tv2.v[1] = pos->v[1] - m2->m[3][1];
-    tv2.v[2] = pos->v[2] - m2->m[3][2];
+    BrVector3Sub(&tv2, pos, (br_vector3*)m2->m[3]);
     dist = BrVector3Dot(&tv2, &vn);
     BrMatrix34PreRotateX(m2, theta - BrRadianToAngle(atan2f(m2->m[3][1] - pos->v[1], dist)));
 }
