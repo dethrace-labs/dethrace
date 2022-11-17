@@ -3534,7 +3534,7 @@ int RestoreOptions() {
         LOG_WARN("Failed to open OPTIONS.TXT");
         return 0;
     }
-    while (fgets(line, 80, f)) {
+    while (fgets(line, COUNT_OF(line), f)) {
         if (sscanf(line, "%79s%f", token, &arg) == 2) {
             if (!strcmp(token, "YonFactor")) {
                 SetYonFactor(arg);
