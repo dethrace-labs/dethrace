@@ -1267,8 +1267,8 @@ void DoWheelDamage(tU32 pFrame_period) {
 
     for (i = 0; i < gNum_active_cars; i++) {
         car = gActive_car_list[i];
-        for (j = 0; j < COUNT_OF(car->wheel_actors); j++) {
-            if (!car->wheel_actors[j]) {
+        for (j = 0; j < COUNT_OF(car->wheel_dam_offset); j++) {
+            if (car->wheel_actors[j] == NULL) {
                 continue;
             }
             old_offset = car->wheel_dam_offset[j];
@@ -1322,9 +1322,7 @@ void DoWheelDamage(tU32 pFrame_period) {
                 break;
             }
             if (gNet_mode == eNet_mode_none || car->driver == eDriver_local_human) {
-                temp_vector.v[0] = wheel_circum * gWheel_circ_to_width;
-                temp_vector.v[1] = 0.0f;
-                temp_vector.v[2] = 0.0f;
+                BrVector3Set(&temp_vector, wheel_circum * gWheel_circ_to_width, 0.f, 0.f);
                 BrMatrix34ApplyV(&wonky_vector, &temp_vector, &car->wheel_actors[j]->t.t.mat);
                 car->wheel_dam_offset[j] = fabsf(wonky_vector.v[1]);
             }
