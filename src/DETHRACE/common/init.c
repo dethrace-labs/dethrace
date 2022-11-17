@@ -327,7 +327,13 @@ void Init2DStuff() {
 // IDA: void __usercall InitialiseApplication(int pArgc@<EAX>, char **pArgv@<EDX>)
 void InitialiseApplication(int pArgc, char** pArgv) {
 
-    gProgram_state.sausage_eater_mode = gSausage_override;
+    if (harness_game_config.dos_mode) {
+        gProgram_state.sausage_eater_mode = gSausage_override ? 1 : (PDGetGorePassword() ? 0 : 1);
+        PDDisplayGoreworthiness(!gProgram_state.sausage_eater_mode);
+    } else {
+        gProgram_state.sausage_eater_mode = gSausage_override;
+    }
+
     MAMSInitMem();
     PrintMemoryDump(gSausage_override, *pArgv);
     if (gAustere_override || PDDoWeLeadAnAustereExistance() != 0) {

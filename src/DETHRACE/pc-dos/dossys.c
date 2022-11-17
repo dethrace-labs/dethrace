@@ -682,6 +682,34 @@ int OurGetChar() {
     NOT_IMPLEMENTED();
 }
 
+int CheckGorePasswordFile(char* pPassword) {
+    tPath_name path;
+    FILE* f;
+    char line[10];
+
+    PathCat(path, "DATA", "PASS.TXT");
+    f = fopen(path, "rb");
+    if (f == NULL) {
+        return 0;
+    }
+    if (fgets(line, sizeof(line), f) == NULL) {
+        fclose(f);
+        return 0;
+    }
+    fclose(f);
+#if defined(DETHRACE_FIX_BUGS)
+    // Allow a final newline in DATA/PASS.TXT
+    while (strlen(line) > 0 && (line[strlen(line) - 1] == '\n' || line[strlen(line) - 1] == '\r')) {
+        line[strlen(line) - 1] = '\0';
+    }
+#endif
+#ifdef _WIN32
+    return stricmp(line, pPassword) == 0;
+#else
+    return strcasecmp(line, pPassword) == 0;
+#endif
+}
+
 // IDA: int __cdecl PDGetGorePassword()
 int PDGetGorePassword() {
     int ch;
@@ -689,14 +717,26 @@ int PDGetGorePassword() {
     int chances;
     char password[17];
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (chances = 0; chances < 3; chances++) {
+        printf(chances == 0 ? "\n\n\n\n\nEnter password for uncut version...\n" : "\nIncorrect password, please try again...\n");
+        OS_ConsoleReadPassword(password, sizeof(password));
+        dr_dprintf("Password entered is '%s'", password);
+        if (CheckGorePasswordFile(password)) {
+            return 1;
+        }
+    }
+    return 0;
 }
 
 // IDA: void __usercall PDDisplayGoreworthiness(int pGory@<EAX>)
 void PDDisplayGoreworthiness(int pGory) {
     tU32 delay_start;
     LOG_TRACE("(%d)", pGory);
-    NOT_IMPLEMENTED();
+
+    printf(pGory ? "\nPlaying full version...\n" : "\nPlaying zombie version...\n");
+    delay_start = 2;
+    OS_Sleep(delay_start * 1000);
 }
 
 // IDA: void __usercall PDEnterDebugger(char *pStr@<EAX>)

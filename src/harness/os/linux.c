@@ -20,6 +20,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <termios.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -364,4 +365,46 @@ void OS_AllocateActionReplayBuffer(char** pBuffer, unsigned* pBuffer_size) {
     }
     *pBuffer = buffer;
     *pBuffer_size = buffer_size;
+}
+
+size_t OS_ConsoleReadPassword(char* pBuffer, size_t pBufferLen) {
+    struct termios old, new;
+    char c;
+    size_t len;
+
+    tcgetattr(STDIN_FILENO, &old);
+    new = old;
+    new.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &new);
+
+    len = 0;
+    pBuffer[len] = '\0';
+    while (1) {
+        if (read(STDIN_FILENO, &c, 1) == 1) {
+            if (c == 0x7f) {
+                if (len > 0) {
+                    len--;
+                    pBuffer[len] = '\0';
+                    printf("\033[1D \033[1D");
+                    fflush(stdout);
+                    continue;
+                }
+            } else if (c == '\r' || c == '\n') {
+                printf("\n");
+                fflush(stdout);
+                break;
+            } else if (len < pBufferLen - 1) {
+                if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
+                    pBuffer[len] = c;
+                    printf("*");
+                    fflush(stdout);
+                    len++;
+                    pBuffer[len] = '\0';
+                }
+            }
+        }
+    }
+
+    tcsetattr(STDIN_FILENO, TCSANOW, &old);
+    return len;
 }
