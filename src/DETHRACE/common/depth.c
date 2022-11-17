@@ -8,9 +8,12 @@
 #include "globvrpb.h"
 #include "harness/hooks.h"
 #include "harness/trace.h"
+#include "pd/sys.h"
 #include "replay.h"
 #include "spark.h"
+#include "trig.h"
 #include "utility.h"
+#include "world.h"
 #include <math.h>
 #include <stdlib.h>
 
@@ -179,7 +182,7 @@ void MungeSkyModel(br_actor* pCamera, br_model* pModel) {
     camera_data = pCamera->type_data;
 
     tan_half_fov = Tan(camera_data->field_of_view / 2);
-//    BR_ANGLE_RAD(atan2f(tan_half_fov, camera_data->aspect / 2));
+    //    BR_ANGLE_RAD(atan2f(tan_half_fov, camera_data->aspect / 2));
     horizon_half_width = (camera_data->yon_z - 1.f) * tan_half_fov;
     horizon_half_height = horizon_half_width * camera_data->aspect;
     horizon_half_diag = BR_LENGTH2(horizon_half_width, horizon_half_height);
@@ -590,26 +593,36 @@ void DepthEffectSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_
 // IDA: void __usercall DoWobbleCamera(br_actor *pCamera@<EAX>)
 void DoWobbleCamera(br_actor* pCamera) {
     float f_time;
-    static br_scalar mag00;
-    static br_scalar mag01;
-    static br_scalar mag02;
-    static br_scalar mag10;
-    static br_scalar mag11;
-    static br_scalar mag12;
-    static br_scalar mag20;
-    static br_scalar mag21;
-    static br_scalar mag22;
-    static float period00;
-    static float period01;
-    static float period02;
-    static float period10;
-    static float period11;
-    static float period12;
-    static float period20;
-    static float period21;
-    static float period22;
+    static br_scalar mag00 = 0.02f;
+    static br_scalar mag01 = 0.02f;
+    static br_scalar mag02 = 0.02f;
+    static br_scalar mag10 = 0.15f;
+    static br_scalar mag11 = 0.05f;
+    static br_scalar mag12 = 0.02f;
+    static br_scalar mag20 = 0.f;
+    static br_scalar mag21 = 0.f;
+    static br_scalar mag22 = 0.f;
+    static float period00 = 3000.f;
+    static float period01 = 3000.f;
+    static float period02 = 4000.f;
+    static float period10 = 2200.f;
+    static float period11 = 3300.f;
+    static float period12 = 3100.f;
+    static float period20 = 2800.f;
+    static float period21 = 2500.f;
+    static float period22 = 3900.f;
     LOG_TRACE("(%p)", pCamera);
-    NOT_IMPLEMENTED();
+
+    f_time = (float)PDGetTotalTime();
+    pCamera->t.t.mat.m[0][0] += FastScalarSin(fmod(f_time / period00 * 360.f, 360.f)) * mag00;
+    pCamera->t.t.mat.m[0][1] += FastScalarSin(fmod(f_time / period01 * 360.f, 360.f)) * mag01;
+    pCamera->t.t.mat.m[0][2] += FastScalarSin(fmod(f_time / period02 * 360.f, 360.f)) * mag02;
+    pCamera->t.t.mat.m[1][0] += FastScalarSin(fmod(f_time / period10 * 360.f, 360.f)) * mag10;
+    pCamera->t.t.mat.m[1][1] += FastScalarSin(fmod(f_time / period11 * 360.f, 360.f)) * mag11;
+    pCamera->t.t.mat.m[1][2] += FastScalarSin(fmod(f_time / period12 * 360.f, 360.f)) * mag12;
+    pCamera->t.t.mat.m[2][0] += FastScalarSin(fmod(f_time / period20 * 360.f, 360.f)) * mag20;
+    pCamera->t.t.mat.m[2][1] += FastScalarSin(fmod(f_time / period21 * 360.f, 360.f)) * mag21;
+    pCamera->t.t.mat.m[2][2] += FastScalarSin(fmod(f_time / period22 * 360.f, 360.f)) * mag22;
 }
 
 // IDA: void __usercall DoDrugWobbleCamera(br_actor *pCamera@<EAX>)
@@ -640,7 +653,17 @@ void DoDrugWobbleCamera(br_actor* pCamera) {
 // IDA: void __usercall DoSpecialCameraEffect(br_actor *pCamera@<EAX>, br_matrix34 *pCamera_to_world@<EDX>)
 void DoSpecialCameraEffect(br_actor* pCamera, br_matrix34* pCamera_to_world) {
     LOG_TRACE("(%p, %p)", pCamera, pCamera_to_world);
-    STUB_ONCE();
+
+    if (gOn_drugs) {
+        DoDrugWobbleCamera(pCamera);
+    } else {
+        gLast_camera_special_volume = FindSpecialVolume((br_vector3*)pCamera_to_world->m[3], gLast_camera_special_volume);
+        if (gLast_camera_special_volume != NULL) {
+            if (gLast_camera_special_volume->camera_special_effect_index == 0) {
+                DoWobbleCamera(pCamera);
+            }
+        }
+    }
 }
 
 // IDA: void __cdecl LessDepthFactor()

@@ -487,13 +487,13 @@ void GotPowerupN(int pN) {
     LOG_TRACE("(%d)", pN);
 
     modifiers = 0;
-    if (PDKeyDown(0) != 0) {
+    if (PDKeyDown(KEY_SHIFT_ANY) != 0) {
         modifiers += 10;
     }
-    if (PDKeyDown(1) != 0) {
+    if (PDKeyDown(KEY_ALT_ANY) != 0) {
         modifiers += 20;
     }
-    if (PDKeyDown(2) != 0) {
+    if (PDKeyDown(KEY_CTRL_ANY) != 0) {
         modifiers += 40;
     }
     GotPowerup(&gProgram_state.current_car, modifiers + pN);
