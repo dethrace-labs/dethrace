@@ -614,15 +614,15 @@ void DoWobbleCamera(br_actor* pCamera) {
     LOG_TRACE("(%p)", pCamera);
 
     f_time = (float)PDGetTotalTime();
-    pCamera->t.t.mat.m[0][0] += FastScalarSin(fmod(f_time / period00 * 360.0, 360.0)) * mag00;
-    pCamera->t.t.mat.m[0][1] += FastScalarSin(fmod(f_time / period01 * 360.0, 360.0)) * mag01;
-    pCamera->t.t.mat.m[0][2] += FastScalarSin(fmod(f_time / period02 * 360.0, 360.0)) * mag02;
-    pCamera->t.t.mat.m[1][0] += FastScalarSin(fmod(f_time / period10 * 360.0, 360.0)) * mag10;
-    pCamera->t.t.mat.m[1][1] += FastScalarSin(fmod(f_time / period11 * 360.0, 360.0)) * mag11;
-    pCamera->t.t.mat.m[1][2] += FastScalarSin(fmod(f_time / period12 * 360.0, 360.0)) * mag12;
-    pCamera->t.t.mat.m[2][0] += FastScalarSin(fmod(f_time / period20 * 360.0, 360.0)) * mag20;
-    pCamera->t.t.mat.m[2][1] += FastScalarSin(fmod(f_time / period21 * 360.0, 360.0)) * mag21;
-    pCamera->t.t.mat.m[2][2] += FastScalarSin(fmod(f_time / period22 * 360.0, 360.0)) * mag22;
+    pCamera->t.t.mat.m[0][0] += FastScalarSin(fmod(f_time / period00 * 360.f, 360.f)) * mag00;
+    pCamera->t.t.mat.m[0][1] += FastScalarSin(fmod(f_time / period01 * 360.f, 360.f)) * mag01;
+    pCamera->t.t.mat.m[0][2] += FastScalarSin(fmod(f_time / period02 * 360.f, 360.f)) * mag02;
+    pCamera->t.t.mat.m[1][0] += FastScalarSin(fmod(f_time / period10 * 360.f, 360.f)) * mag10;
+    pCamera->t.t.mat.m[1][1] += FastScalarSin(fmod(f_time / period11 * 360.f, 360.f)) * mag11;
+    pCamera->t.t.mat.m[1][2] += FastScalarSin(fmod(f_time / period12 * 360.f, 360.f)) * mag12;
+    pCamera->t.t.mat.m[2][0] += FastScalarSin(fmod(f_time / period20 * 360.f, 360.f)) * mag20;
+    pCamera->t.t.mat.m[2][1] += FastScalarSin(fmod(f_time / period21 * 360.f, 360.f)) * mag21;
+    pCamera->t.t.mat.m[2][2] += FastScalarSin(fmod(f_time / period22 * 360.f, 360.f)) * mag22;
 }
 
 // IDA: void __usercall DoDrugWobbleCamera(br_actor *pCamera@<EAX>)
