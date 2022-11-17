@@ -971,16 +971,12 @@ void MungeClipPlane(br_vector3* pLight, tCar_spec* pCar, br_vector3* p1, br_vect
 
     BrMatrix34ApplyP(&v1, p1, &pCar->car_master_actor->t.t.mat);
     BrMatrix34ApplyP(&v2, p2, &pCar->car_master_actor->t.t.mat);
-    v3.v[0] = p2->v[0] - p1->v[0];
-    v3.v[1] = p2->v[1] - p1->v[1];
-    v3.v[2] = p2->v[2] - p1->v[2];
-    v4.v[0] = pLight->v[2] * v3.v[1] - pLight->v[1] * v3.v[2];
-    v4.v[1] = pLight->v[0] * v3.v[2] - pLight->v[2] * v3.v[0];
-    v4.v[2] = pLight->v[1] * v3.v[0] - v3.v[1] * pLight->v[0];
-    if (fabs(v4.v[0]) >= 0.01 || fabs(v4.v[1]) >= 0.01 || fabs(v4.v[2]) >= 0.01) {
-        v3 = *p1;
-        v3.v[1] = v3.v[1] - pY_offset;
-        if (v3.v[1] * v4.v[1] + v4.v[2] * v3.v[2] + v4.v[0] * v3.v[0] > 0.0) {
+    BrVector3Sub(&v3, p2, p1);
+    BrVector3Cross(&v4, &v3, pLight);
+    if (fabsf(v4.v[0]) >= 0.01f || fabsf(v4.v[1]) >= 0.01f || fabsf(v4.v[2]) >= 0.01f) {
+        BrVector3Copy(&v3, p1);
+        v3.v[1] -= pY_offset;
+        if (BrVector3Dot(&v3, &v4) > 0.f) {
             BrVector3Negate(&v4, &v4);
         }
         BrVector3Normalise(&v3, &v4);
@@ -991,7 +987,7 @@ void MungeClipPlane(br_vector3* pLight, tCar_spec* pCar, br_vector3* p1, br_vect
         ((br_vector4*)new_clip->type_data)->v[0] = v4.v[0];
         ((br_vector4*)new_clip->type_data)->v[1] = v4.v[1];
         ((br_vector4*)new_clip->type_data)->v[2] = v4.v[2];
-        ((br_vector4*)new_clip->type_data)->v[3] = -(v4.v[1] * v1.v[1] + v4.v[2] * v1.v[2] + v1.v[0] * v4.v[0]);
+        ((br_vector4*)new_clip->type_data)->v[3] = -BrVector3Dot(&v1, &v4);
         gShadow_clip_planes[gShadow_clip_plane_count].length = length;
         gShadow_clip_plane_count++;
     }
@@ -1686,7 +1682,7 @@ void RenderAFrame(int pDepth_mask_on) {
         } else {
             FlashyMapCheckpoint(gCheckpoint - 1, the_time);
         }
-        if (gShow_peds_on_map || (gNet_mode && gCurrent_net_game->options.show_powerups_on_map)) {
+        if (gShow_peds_on_map || (gNet_mode != eNet_mode_none && gCurrent_net_game->options.show_powerups_on_map)) {
             for (i = 0; i < GetPedCount(); i++) {
                 ped_type = GetPedPosition(i, &pos);
                 if (ped_type > 0 && gShow_peds_on_map) {

@@ -29,6 +29,7 @@
 #include <time.h>
 
 #define FLAG_WAVING_BASTARD_REF 99
+#define ACTIVE_PED_DXDZ 11.f
 
 #define FOURCC(A, B, C, D) (((A & 0xff) << 24) | ((B & 0xff) << 16) | ((C & 0xff) << 8) | ((D & 0xff) << 0))
 #define PEDESTRIAN_MAGIC FOURCC('P', 'e', 'd', '!')
@@ -2336,7 +2337,7 @@ void MungePedestrians(tU32 pFrame_period) {
             the_pedestrian = &gPedestrian_array[i];
             x_delta = fabsf(the_pedestrian->pos.v[V_X] - gCamera_to_world.m[3][V_X]);
             z_delta = fabsf(the_pedestrian->pos.v[V_Z] - gCamera_to_world.m[3][V_Z]);
-            if ((the_pedestrian->actor->parent != gDont_render_actor || (x_delta <= 11.f && z_delta <= 11.f))
+            if ((the_pedestrian->actor->parent != gDont_render_actor || (x_delta <= ACTIVE_PED_DXDZ && z_delta <= ACTIVE_PED_DXDZ))
                 && (gPedestrians_on || the_pedestrian->ref_number >= 100)
                 && the_pedestrian->hit_points != -100) {
                 gCurrent_lollipop_index = -1;
@@ -2349,7 +2350,7 @@ void MungePedestrians(tU32 pFrame_period) {
             x_delta = fabsf(the_pedestrian->pos.v[V_X] - gCamera_to_world.m[3][V_X]);
             z_delta = fabsf(the_pedestrian->pos.v[V_Z] - gCamera_to_world.m[3][V_Z]);
             if (the_pedestrian->actor->parent == gDont_render_actor
-                && (x_delta > 11.f || z_delta > 11.f)) {
+                && (x_delta > ACTIVE_PED_DXDZ || z_delta > ACTIVE_PED_DXDZ)) {
                 the_pedestrian->active = 0;
             } else if (the_pedestrian->hit_points == -100) {
                 if (the_pedestrian->respawn_time == 0) {
@@ -2401,11 +2402,24 @@ void RespawnPedestrians() {
     for (i = 0; i < gPed_count; i++) {
         the_pedestrian = &gPedestrian_array[i];
         if (the_pedestrian->ref_number < 100) {
+#if defined(DETHRACE_FIX_BUGS)
+            // Only animate the respawn when we are in viewing distance.
+            // This is done such that the "Peds visible on map" powerup draws far away items.
+            // (far away animated pedestrians would otherwise remain invisible on the map)
+            br_scalar x_delta;
+            br_scalar z_delta;
+            int ped_respawn_animate;
+            x_delta = fabsf(the_pedestrian->pos.v[V_X] - gCamera_to_world.m[3][V_X]);
+            z_delta = fabsf(the_pedestrian->pos.v[V_Z] - gCamera_to_world.m[3][V_Z]);
+            ped_respawn_animate = x_delta <= ACTIVE_PED_DXDZ && z_delta <= ACTIVE_PED_DXDZ;
+#else
+#define ped_respawn_animate 1
+#endif
             if (the_pedestrian->hit_points == -100) {
-                RevivePedestrian(the_pedestrian, 1);
+                RevivePedestrian(the_pedestrian, ped_respawn_animate);
             } else if ((the_pedestrian->current_action == the_pedestrian->fatal_car_impact_action || the_pedestrian->current_action == the_pedestrian->fatal_ground_impact_action || the_pedestrian->current_action == the_pedestrian->giblets_action)
                 && the_pedestrian->actor->parent == gDont_render_actor) {
-                RevivePedestrian(the_pedestrian, 1);
+                RevivePedestrian(the_pedestrian, ped_respawn_animate);
             }
         }
     }
