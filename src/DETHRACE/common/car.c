@@ -4280,8 +4280,8 @@ void MungeCarGraphics(tU32 pFrame_period) {
                         } else if (!gOn_me_wheels_start) {
                             gOn_me_wheels_start = the_time;
                         } else if (the_time - gOn_me_wheels_start > 500
-                                && (the_car->last_special_volume == NULL
-                                    || the_car->last_special_volume->gravity_multiplier == 1.0f)) {
+                            && (the_car->last_special_volume == NULL
+                                || the_car->last_special_volume->gravity_multiplier == 1.0f)) {
                             DoFancyHeadup(kFancyHeadupCunningStuntBonus);
                             EarnCredits(gCunning_stunt_bonus[gProgram_state.skill_level]);
                             gLast_cunning_stunt = PDGetTotalTime();
@@ -4294,8 +4294,7 @@ void MungeCarGraphics(tU32 pFrame_period) {
                 }
             }
             if (the_car->driver != eDriver_local_human && the_car->car_model_variable) {
-                distance_from_camera = Vector3DistanceSquared(&the_car->car_master_actor->t.t.translate.t,
-                       (br_vector3*)gCamera_to_world.m[3]) / gCar_simplification_factor[gGraf_spec_index][gCar_simplification_level];
+                distance_from_camera = Vector3DistanceSquared(&the_car->car_master_actor->t.t.translate.t, (br_vector3*)gCamera_to_world.m[3]) / gCar_simplification_factor[gGraf_spec_index][gCar_simplification_level];
                 if (gNet_mode != eNet_mode_none && gNet_players[gIt_or_fox].car == the_car) {
                     distance_from_camera = 0.f;
                 }
@@ -4321,7 +4320,7 @@ void MungeCarGraphics(tU32 pFrame_period) {
                 } else {
                     if (gProgram_state.current_depth_effect.type == eDepth_effect_fog) {
                         the_material = gProgram_state.standard_screen_fog;
-                    }  else if (gProgram_state.current_depth_effect.sky_texture != NULL) {
+                    } else if (gProgram_state.current_depth_effect.sky_texture != NULL) {
                         the_material = gProgram_state.standard_screen;
                     } else {
                         the_material = gProgram_state.standard_screen_dark;
@@ -4447,12 +4446,12 @@ void ViewOpponent() {
 void ToggleCarToCarCollisions() {
     LOG_TRACE("()");
 
-   gCar_car_collisions = !gCar_car_collisions;
-   if (gCar_car_collisions) {
-       NewTextHeadupSlot(4, 0, 3000, -4, "Car Car Collisions");
-   } else {
-       NewTextHeadupSlot(4, 0, 3000, -4, "Ghost Cars");
-   }
+    gCar_car_collisions = !gCar_car_collisions;
+    if (gCar_car_collisions) {
+        NewTextHeadupSlot(4, 0, 3000, -4, "Car Car Collisions");
+    } else {
+        NewTextHeadupSlot(4, 0, 3000, -4, "Ghost Cars");
+    }
 }
 
 // IDA: void __cdecl SwapCar()
@@ -5255,7 +5254,7 @@ void FlyCar(tCar_spec* c, br_scalar dt) {
     static br_scalar vel = 0.f;
     tFace_ref faces[20];
     tBounds bnds;
-    int i; // Added by DethRace
+    int i;                 // Added by DethRace
     br_scalar tmp_scalar1; // Added by DethRace
     br_scalar tmp_scalar2; // Added by DethRace
     br_vector3 tmp1;       // Added by DethRace
@@ -6634,32 +6633,27 @@ void SetCarSuspGiveAndHeight(tCar_spec* pCar, br_scalar pFront_give_factor, br_s
     int i;
     LOG_TRACE("(%p, %f, %f, %f, %f, %f)", pCar, pFront_give_factor, pRear_give_factor, pDamping_factor, pExtra_front_height, pExtra_rear_height);
 
+#define UNK_SUSPENION_FACTOR 5.0f
+
     front_give = pCar->susp_give[1] * pFront_give_factor * WORLD_SCALE;
     rear_give = pCar->susp_give[0] * pRear_give_factor * WORLD_SCALE;
     damping = pCar->damping * pDamping_factor;
     ratio = fabs((pCar->wpos[0].v[2] - pCar->cmpos.v[2]) / (pCar->wpos[2].v[2] - pCar->cmpos.v[2]));
-    pCar->sk[0] = pCar->M / (ratio + 1.0) * 5.0 / rear_give;
-    pCar->sb[0] = pCar->M / (ratio + 1.0) * sqrt(5.0) / sqrt(rear_give);
-    ratio = 1.0 / ratio;
-    pCar->sk[1] = pCar->M / (ratio + 1.0) * 5.0 / front_give;
-    pCar->sb[1] = pCar->M / (ratio + 1.0) * sqrt(5.0) / sqrt(front_give);
-    pCar->sb[0] = pCar->sb[0] * damping;
-    pCar->sb[1] = pCar->sb[1] * damping;
+    pCar->sk[0] = pCar->M / (ratio + 1.0f) * UNK_SUSPENION_FACTOR / rear_give;
+    pCar->sb[0] = pCar->M / (ratio + 1.0f) * sqrt(UNK_SUSPENION_FACTOR) / sqrt(rear_give);
+    ratio = 1.0f / ratio;
+    pCar->sk[1] = pCar->M / (ratio + 1.0f) * UNK_SUSPENION_FACTOR / front_give;
+    pCar->sb[1] = pCar->M / (ratio + 1.0f) * sqrt(UNK_SUSPENION_FACTOR) / sqrt(front_give);
+
+    pCar->sb[0] *= damping;
+    pCar->sb[1] *= damping;
     pCar->susp_height[0] = pCar->ride_height + rear_give + pExtra_rear_height;
     pCar->susp_height[1] = pCar->ride_height + front_give + pExtra_front_height;
 
-    if (rear_give >= front_give) {
-        i = -rear_give;
-    } else {
-        i = -front_give;
-    }
-    if (pExtra_rear_height >= pExtra_front_height) {
-        i -= pExtra_rear_height;
-    } else {
-        i -= pExtra_front_height;
-    }
-    pCar->bounds[0].min.v[1] = i;
-    pCar->bounds[0].min.v[1] = pCar->bounds[0].min.v[1] / WORLD_SCALE;
+    pCar->bounds[0].min.v[1] = -MAX(rear_give, front_give) + -MAX(pExtra_rear_height, pExtra_front_height);
+    pCar->bounds[0].min.v[1] /= WORLD_SCALE;
+
+#undef UNK_SUSPENION_FACTOR
 }
 
 // IDA: int __usercall TestForCarInSensiblePlace@<EAX>(tCar_spec *car@<EAX>)
