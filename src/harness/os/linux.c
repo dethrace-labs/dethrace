@@ -23,6 +23,8 @@
 #include <time.h>
 #include <unistd.h>
 
+#define ARRAY_SIZE(A) (sizeof(A) / sizeof(A[0]))
+
 static int stack_nbr = 0;
 static char _program_name[1024];
 #define MAX_STACK_FRAMES 64
@@ -334,4 +336,32 @@ FILE* OS_fopen(const char* pathname, const char* mode) {
         }
     }
     return NULL;
+}
+
+void OS_AllocateActionReplayBuffer(char** pBuffer, unsigned* pBuffer_size) {
+    static int allocated = 0;
+    static char* buffer = NULL;
+    static unsigned buffer_size = 0;
+    unsigned i;
+    const int wanted_sizes[] = {
+        20000000,
+        16000000,
+        6000000,
+        4000000,
+        500000,
+    };
+
+    if (!allocated) {
+        allocated = 1;
+        buffer_size = 0;
+        for (i = 0; i < ARRAY_SIZE(wanted_sizes); i++) {
+            buffer = malloc(wanted_sizes[i]);
+            if (buffer != NULL) {
+                buffer_size = wanted_sizes[i];
+                break;
+            }
+        }
+    }
+    *pBuffer = buffer;
+    *pBuffer_size = buffer_size;
 }
