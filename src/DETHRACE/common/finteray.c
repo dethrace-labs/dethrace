@@ -833,133 +833,113 @@ int ModelPickBox(br_actor* actor, tBounds* bnds, br_model* model, br_material* m
         return 0;
     }
     for (group = 0; prepared->ngroups > group; group++) {
-        fp = prepared->groups[group].faces;
         for (f = 0; f < prepared->groups[group].nfaces; f++) {
+            fp = &prepared->groups[group].faces[f];
             v1 = fp->vertices[0];
-            a.v[0] = prepared->groups[group].vertices[v1].p.v[0] - bnds->box_centre.v[0];
-            a.v[1] = prepared->groups[group].vertices[v1].p.v[1] - bnds->box_centre.v[1];
-            a.v[2] = prepared->groups[group].vertices[v1].p.v[2] - bnds->box_centre.v[2];
-            t = fp->eqn.v[1] * a.v[1] + fp->eqn.v[2] * a.v[2] + fp->eqn.v[0] * a.v[0];
-            if (fabs(t) <= bnds->radius) {
-                v2 = fp->vertices[1];
-                v3 = fp->vertices[2];
-                t = bnds->real_bounds.min.v[0];
-                if (prepared->groups[group].vertices[v1].p.v[0] >= (double)t
-                    || prepared->groups[group].vertices[v2].p.v[0] >= (double)t
-                    || prepared->groups[group].vertices[v3].p.v[0] >= (double)t) {
-                    t = bnds->real_bounds.max.v[0];
-                    if (prepared->groups[group].vertices[v1].p.v[0] <= (double)t
-                        || prepared->groups[group].vertices[v2].p.v[0] <= (double)t
-                        || prepared->groups[group].vertices[v3].p.v[0] <= (double)t) {
-                        t = bnds->real_bounds.min.v[1];
-                        if (prepared->groups[group].vertices[v1].p.v[1] >= (double)t
-                            || prepared->groups[group].vertices[v2].p.v[1] >= (double)t
-                            || prepared->groups[group].vertices[v3].p.v[1] >= (double)t) {
-                            t = bnds->real_bounds.max.v[1];
-                            if (prepared->groups[group].vertices[v1].p.v[1] <= (double)t
-                                || prepared->groups[group].vertices[v2].p.v[1] <= (double)t
-                                || prepared->groups[group].vertices[v3].p.v[1] <= (double)t) {
-                                t = bnds->real_bounds.min.v[2];
-                                if (prepared->groups[group].vertices[v1].p.v[2] >= (double)t
-                                    || prepared->groups[group].vertices[v2].p.v[2] >= (double)t
-                                    || prepared->groups[group].vertices[v3].p.v[2] >= (double)t) {
-                                    t = bnds->real_bounds.max.v[2];
-                                    if (prepared->groups[group].vertices[v1].p.v[2] <= (double)t
-                                        || prepared->groups[group].vertices[v2].p.v[2] <= (double)t
-                                        || prepared->groups[group].vertices[v3].p.v[2] <= (double)t) {
-                                        polygon[1].v[0] = prepared->groups[group].vertices[v1].p.v[0]
-                                            - bnds->mat->m[3][0];
-                                        polygon[1].v[1] = prepared->groups[group].vertices[v1].p.v[1]
-                                            - bnds->mat->m[3][1];
-                                        polygon[1].v[2] = prepared->groups[group].vertices[v1].p.v[2]
-                                            - bnds->mat->m[3][2];
-                                        polygon[2].v[0] = prepared->groups[group].vertices[v2].p.v[0]
-                                            - bnds->mat->m[3][0];
-                                        polygon[2].v[1] = prepared->groups[group].vertices[v2].p.v[1]
-                                            - bnds->mat->m[3][1];
-                                        polygon[2].v[2] = prepared->groups[group].vertices[v2].p.v[2]
-                                            - bnds->mat->m[3][2];
-                                        polygon[3].v[0] = prepared->groups[group].vertices[v3].p.v[0]
-                                            - bnds->mat->m[3][0];
-                                        polygon[3].v[1] = prepared->groups[group].vertices[v3].p.v[1]
-                                            - bnds->mat->m[3][1];
-                                        polygon[3].v[2] = prepared->groups[group].vertices[v3].p.v[2]
-                                            - bnds->mat->m[3][2];
-                                        BrMatrix34TApplyV(polygon, &polygon[1], bnds->mat);
-                                        BrMatrix34TApplyV(&polygon[1], &polygon[2], bnds->mat);
-                                        BrMatrix34TApplyV(&polygon[2], &polygon[3], bnds->mat);
-                                        n = 3;
-                                        for (i = 0; i < 3; i++) {
-                                            ClipToPlaneGE(polygon, &n, i, bnds->original_bounds.min.v[i]);
-                                            if (n < 3) {
-                                                break;
-                                            }
-                                            ClipToPlaneLE(polygon, &n, i, bnds->original_bounds.max.v[i]);
-                                            if (n < 3) {
-                                                break;
-                                            }
-                                        }
-                                        if (n >= 3) {
-                                            if (pMat) {
-                                                BrMatrix34ApplyP(&face_list->v[0], &prepared->groups[group].vertices[v1].p, pMat);
-                                                BrMatrix34ApplyP(&face_list->v[1], &prepared->groups[group].vertices[v2].p, pMat);
-                                                BrMatrix34ApplyP(&face_list->v[2], &prepared->groups[group].vertices[v3].p, pMat);
-                                                tv.v[0] = fp->eqn.v[0];
-                                                tv.v[1] = fp->eqn.v[1];
-                                                tv.v[2] = fp->eqn.v[2];
-                                                BrMatrix34ApplyV(&face_list->normal, &tv, pMat);
-                                            } else {
-                                                face_list->v[0].v[0] = prepared->groups[group].vertices[v1].p.v[0];
-                                                face_list->v[0].v[1] = prepared->groups[group].vertices[v1].p.v[1];
-                                                face_list->v[0].v[2] = prepared->groups[group].vertices[v1].p.v[2];
-                                                face_list->v[1].v[0] = prepared->groups[group].vertices[v2].p.v[0];
-                                                face_list->v[1].v[1] = prepared->groups[group].vertices[v2].p.v[1];
-                                                face_list->v[1].v[2] = prepared->groups[group].vertices[v2].p.v[2];
-                                                face_list->v[2].v[0] = prepared->groups[group].vertices[v3].p.v[0];
-                                                face_list->v[2].v[1] = prepared->groups[group].vertices[v3].p.v[1];
-                                                face_list->v[2].v[2] = prepared->groups[group].vertices[v3].p.v[2];
-                                                face_list->normal.v[0] = fp->eqn.v[0];
-                                                face_list->normal.v[1] = fp->eqn.v[1];
-                                                face_list->normal.v[2] = fp->eqn.v[2];
-                                            }
-                                            if (prepared->groups[group].face_colours_material) {
-                                                face_list->material = prepared->groups[group].face_colours_material;
-                                            } else {
-                                                face_list->material = model_material;
-                                            }
-                                            face_list->flags = 0;
-                                            if (face_list->material && (face_list->material->flags & 0x1800) == 0) {
-                                                face_list->flags |= (v2 > v1) + 2 * (v3 > v2) + 4 * (v3 < v1);
-                                            }
-                                            if (pMat) {
-                                                face_list->d = BrVector3LengthSquared(&face_list->v[0]);
-                                            } else {
-                                                face_list->d = fp->eqn.v[3];
-                                            }
-                                            face_list->map[0] = &prepared->groups[group].vertices[v1].map;
-                                            face_list->map[1] = &prepared->groups[group].vertices[v2].map;
-                                            face_list->map[2] = &prepared->groups[group].vertices[v3].map;
-                                            if (face_list->material
-                                                && face_list->material->identifier
-                                                && *face_list->material->identifier == '!') {
-                                                gPling_face = face_list;
-                                            }
-                                            face_list++;
-                                            max_face--;
-                                            if (!max_face) {
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+            BrVector3Sub(&a, &prepared->groups[group].vertices[v1].p, &bnds->box_centre);
+            t = BrVector3Dot((br_vector3*)&fp->eqn, &a);
+            if (fabsf(t) > bnds->radius) {
+                continue;
+            }
+            v2 = fp->vertices[1];
+            v3 = fp->vertices[2];
+
+            t = bnds->real_bounds.min.v[0];
+            if (t > prepared->groups[group].vertices[v1].p.v[0]
+                && t > prepared->groups[group].vertices[v2].p.v[0]
+                && t > prepared->groups[group].vertices[v3].p.v[0]) {
+                continue;
+            }
+            t = bnds->real_bounds.max.v[0];
+            if (t < prepared->groups[group].vertices[v1].p.v[0]
+                && t < prepared->groups[group].vertices[v2].p.v[0]
+                && t < prepared->groups[group].vertices[v3].p.v[0]) {
+                continue;
+            }
+            t = bnds->real_bounds.min.v[1];
+            if (t > prepared->groups[group].vertices[v1].p.v[1]
+                && t > prepared->groups[group].vertices[v2].p.v[1]
+                && t > prepared->groups[group].vertices[v3].p.v[1]) {
+                continue;
+            }
+            t = bnds->real_bounds.max.v[1];
+            if (t < prepared->groups[group].vertices[v1].p.v[1]
+                && t < prepared->groups[group].vertices[v2].p.v[1]
+                && t < prepared->groups[group].vertices[v3].p.v[1]) {
+                continue;
+            }
+            t = bnds->real_bounds.min.v[2];
+            if (t > prepared->groups[group].vertices[v1].p.v[2]
+                && t > prepared->groups[group].vertices[v2].p.v[2]
+                && t > prepared->groups[group].vertices[v3].p.v[2]) {
+                continue;
+            }
+            t = bnds->real_bounds.max.v[2];
+            if (t < prepared->groups[group].vertices[v1].p.v[2]
+                && t < prepared->groups[group].vertices[v2].p.v[2]
+                && t < prepared->groups[group].vertices[v3].p.v[2]) {
+                continue;
+            }
+            BrVector3Sub(&polygon[1], &prepared->groups[group].vertices[v1].p, (br_vector3*)bnds->mat->m[3]);
+            BrVector3Sub(&polygon[2], &prepared->groups[group].vertices[v2].p, (br_vector3*)bnds->mat->m[3]);
+            BrVector3Sub(&polygon[3], &prepared->groups[group].vertices[v3].p, (br_vector3*)bnds->mat->m[3]);
+            BrMatrix34TApplyV(&polygon[0], &polygon[1], bnds->mat);
+            BrMatrix34TApplyV(&polygon[1], &polygon[2], bnds->mat);
+            BrMatrix34TApplyV(&polygon[2], &polygon[3], bnds->mat);
+            n = 3;
+            for (i = 0; i < 3; i++) {
+                ClipToPlaneGE(&polygon[0], &n, i, bnds->original_bounds.min.v[i]);
+                if (n < 3) {
+                    break;
+                }
+                ClipToPlaneLE(&polygon[0], &n, i, bnds->original_bounds.max.v[i]);
+                if (n < 3) {
+                    break;
                 }
             }
-            ++fp;
+            if (n >= 3) {
+                if (pMat != NULL) {
+                    BrMatrix34ApplyP(&face_list->v[0], &prepared->groups[group].vertices[v1].p, pMat);
+                    BrMatrix34ApplyP(&face_list->v[1], &prepared->groups[group].vertices[v2].p, pMat);
+                    BrMatrix34ApplyP(&face_list->v[2], &prepared->groups[group].vertices[v3].p, pMat);
+                    BrVector3Copy(&tv, (br_vector3*)&fp->eqn);
+                    BrMatrix34ApplyV(&face_list->normal, &tv, pMat);
+                } else {
+                    BrVector3Copy(&face_list->v[0], &prepared->groups[group].vertices[v1].p);
+                    BrVector3Copy(&face_list->v[1], &prepared->groups[group].vertices[v2].p);
+                    BrVector3Copy(&face_list->v[2], &prepared->groups[group].vertices[v3].p);
+                    BrVector3Copy(&face_list->normal, (br_vector3*)&fp->eqn);
+                }
+                if (prepared->groups[group].face_colours_material != NULL) {
+                    face_list->material = prepared->groups[group].face_colours_material;
+                } else {
+                    face_list->material = model_material;
+                }
+                face_list->flags = 0;
+                if (face_list->material != NULL && (face_list->material->flags & (BR_MATF_TWO_SIDED | BR_MATF_ALWAYS_VISIBLE)) == 0) {
+                    face_list->flags |= (v1 < v2) | (v2 < v3) << 1 | (v3 < v1) << 2;
+                }
+                if (pMat != NULL) {
+                    face_list->d = BrVector3LengthSquared(&face_list->v[0]);
+                } else {
+                    face_list->d = fp->eqn.v[3];
+                }
+                face_list->map[0] = &prepared->groups[group].vertices[v1].map;
+                face_list->map[1] = &prepared->groups[group].vertices[v2].map;
+                face_list->map[2] = &prepared->groups[group].vertices[v3].map;
+                if (face_list->material!= NULL
+                    && face_list->material->identifier != NULL
+                    && face_list->material->identifier[0] == '!') {
+                    gPling_face = face_list;
+                }
+                face_list++;
+                max_face--;
+                if (max_face == 0) {
+                    break;
+                }
+            }
         }
-        if (!max_face) {
+        if (max_face == 0) {
             break;
         }
     }
