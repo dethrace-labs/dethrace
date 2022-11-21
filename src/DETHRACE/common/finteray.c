@@ -970,18 +970,14 @@ void ClipToPlaneGE(br_vector3* p, int* nv, int i, br_scalar limit) {
             p2[j++].v[i] = limit;
         }
         if (p[vertex].v[i] >= limit) {
-            p2[j].v[0] = p[vertex].v[0];
-            p2[j].v[1] = p[vertex].v[1];
-            p2[j].v[2] = p[vertex].v[2];
+            BrVector3Copy(&p2[j], &p[vertex]);
             j++;
         }
         last_vertex = vertex;
     }
     *nv = j;
     for (k = 0; k < j; k++) {
-        p[k].v[0] = p2[k].v[0];
-        p[k].v[1] = p2[k].v[1];
-        p[k].v[2] = p2[k].v[2];
+        BrVector3Copy(&p[k], &p2[k]);
     }
 }
 
