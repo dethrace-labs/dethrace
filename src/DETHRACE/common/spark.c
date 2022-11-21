@@ -2045,7 +2045,91 @@ void SmudgeCar(tCar_spec* pCar, int fire_point) {
     int n;
     LOG_TRACE("(%p, %d)", pCar, fire_point);
 
-    STUB_ONCE();
+    if (gAusterity_mode) {
+        return;
+    }
+    actor = pCar->car_model_actors[pCar->principal_car_actor].actor;
+    model = actor->model;
+    bonny = pCar->car_model_actors[pCar->car_actor_count - 1].actor;
+    n = 0;
+    j = 0;
+    if ((model->flags & BR_MODF_KEEP_ORIGINAL) != 0 || (model->flags & BR_MODF_UPDATEABLE) != 0) {
+        BrVector3Copy(&bonny_pos, &V11MODEL(model)->groups->vertices[fire_point].p);
+        StartPipingSession(ePipe_chunk_smudge);
+        for (group = 0; group < V11MODEL(model)->ngroups; group++) {
+            for (v = 0; v < V11MODEL(model)->groups[group].nvertices; v++) {
+                BrVector3Sub(&tv, &V11MODEL(model)->groups[group].vertices[v].p, &bonny_pos);
+                ts = (.0144f - BrVector3LengthSquared(&tv) / SRandomBetween(.5f, 1.f)) / .0144f * 127.f;
+                if (ts > 0.f) {
+                    ts += V11MODEL(model)->groups[group].vertex_colours[v] >> 24;
+                    if (ts > 255.f) {
+                        ts = 255.f;
+                    }
+                    real_vertex_number = ts;
+                    if (V11MODEL(model)->groups[group].vertex_colours[v] >> 24 != real_vertex_number) {
+                        data[n].vertex_index = j;
+                        data[n].light_index = real_vertex_number - (V11MODEL(model)->groups[group].vertex_colours[v] >> 24);
+                        V11MODEL(model)->groups[group].vertex_colours[v] = real_vertex_number << 24;
+                        if ((model->flags & BR_MODF_UPDATEABLE) != 0) {
+                            model->vertices[V11MODEL(model)->groups[group].vertex_user[v]].index = real_vertex_number;
+                        }
+                        n += 1;
+                        if (n >= COUNT_OF(data)) {
+                            break;
+                        }
+                    }
+                }
+                j = j + 1;
+            }
+            if (n >= COUNT_OF(data)) {
+                break;
+            }
+        }
+        if (n != 0) {
+            AddSmudgeToPipingSession(pCar->car_ID, pCar->principal_car_actor, n, data);
+        }
+        n = 0;
+        j = 0;
+        if (actor != bonny) {
+            b_model = bonny->model;
+            BrVector3Add(&tv, &actor->t.t.translate.t, &bonny_pos);
+            BrVector3Sub(&tv, &tv, &bonny->t.t.translate.t);
+            BrMatrix34TApplyV(&point, &tv, &bonny->t.t.mat);
+            for (group = 0; group < V11MODEL(b_model)->ngroups; group++) {
+                for (v = 0; v < V11MODEL(b_model)->groups[group].nvertices; v++) {
+                    BrVector3Sub(&tv, &V11MODEL(b_model)->groups[group].vertices[v].p, &point);
+                    ts = (.0144f - BrVector3LengthSquared(&tv)) / SRandomBetween(.5f, 1.f) / .0144f * 127.f;
+                    if (ts > 0.f) {
+                        ts += V11MODEL(b_model)->groups[group].vertex_colours[v] >> 24;
+                        if (ts > 255.f) {
+                            ts = 255.f;
+                        }
+                        real_vertex_number = ts;
+                        if (V11MODEL(b_model)->groups[group].vertex_colours[v] >> 24 != real_vertex_number) {
+                            data[n].vertex_index = j;
+                            data[n].light_index = real_vertex_number - (V11MODEL(b_model)->groups[group].vertex_colours[v] >> 24);
+                            V11MODEL(b_model)->groups[group].vertex_colours[v] = real_vertex_number << 24;
+                            if ((b_model->flags & BR_MODF_UPDATEABLE) != 0) {
+                                b_model->vertices[V11MODEL(b_model)->groups[group].vertex_user[v]].index = real_vertex_number;
+                            }
+                            n += 1;
+                            if (n > COUNT_OF(data)) {
+                                break;
+                            }
+                        }
+                    }
+                    j += 1;
+                }
+                if (n >= COUNT_OF(data)) {
+                    break;
+                }
+            }
+            if (n != 0) {
+                AddSmudgeToPipingSession(pCar->car_ID, pCar->car_actor_count - 1, n, data);
+            }
+        }
+        EndPipingSession();
+    }
 }
 
 // IDA: void __cdecl ResetSmokeColumns()
