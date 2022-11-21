@@ -618,25 +618,19 @@ void GetNewBoundingBox(br_bounds* b2, br_bounds* b1, br_matrix34* m) {
     LOG_TRACE("(%p, %p, %p)", b2, b1, m);
 
     BrMatrix34ApplyP(&b2->min, &b1->min, m);
-    b2->max.v[0] = b2->min.v[0];
-    b2->max.v[1] = b2->min.v[1];
-    b2->max.v[2] = b2->min.v[2];
-    a.v[0] = b1->max.v[0] - b1->min.v[0];
-    a.v[1] = b1->max.v[1] - b1->min.v[1];
-    a.v[2] = b1->max.v[2] - b1->min.v[2];
+    BrVector3Copy(&b2->max, &b2->min);
+    BrVector3Sub(&a, &b1->max, &b1->min);
     for (j = 0; j < 3; j++) {
-        c[j].v[0] = m->m[j][0] * a.v[j];
-        c[j].v[1] = m->m[j][1] * a.v[j];
-        c[j].v[2] = m->m[j][2] * a.v[j];
+        BrVector3Scale(&c[j], (br_vector3*)m->m[j], a.v[j]);
     }
     for (j = 0; j < 3; ++j) {
-        b2->min.v[j] = (double)(c[2].v[j] < 0.0) * c[2].v[j]
-            + (double)(c[1].v[j] < 0.0) * c[1].v[j]
-            + (double)(c[0].v[j] < 0.0) * c[0].v[j]
+        b2->min.v[j] = (float)(c[2].v[j] < 0.f) * c[2].v[j]
+            + (float)(c[1].v[j] < 0.f) * c[1].v[j]
+            + (float)(c[0].v[j] < 0.f) * c[0].v[j]
             + b2->min.v[j];
-        b2->max.v[j] = (double)(c[0].v[j] > 0.0) * c[0].v[j]
-            + (double)(c[2].v[j] > 0.0) * c[2].v[j]
-            + (double)(c[1].v[j] > 0.0) * c[1].v[j]
+        b2->max.v[j] = (float)(c[0].v[j] > 0.f) * c[0].v[j]
+            + (float)(c[2].v[j] > 0.f) * c[2].v[j]
+            + (float)(c[1].v[j] > 0.f) * c[1].v[j]
             + b2->max.v[j];
     }
 }
