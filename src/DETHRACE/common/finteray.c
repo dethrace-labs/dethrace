@@ -1005,18 +1005,14 @@ void ClipToPlaneLE(br_vector3* p, int* nv, int i, br_scalar limit) {
             p2[j++].v[i] = limit;
         }
         if (p[vertex].v[i] <= (double)limit) {
-            p2[j].v[0] = p[vertex].v[0];
-            p2[j].v[1] = p[vertex].v[1];
-            p2[j].v[2] = p[vertex].v[2];
+            BrVector3Copy(&p2[j], &p[vertex]);
             j++;
         }
         last_vertex = vertex;
     }
     *nv = j;
     for (k = 0; k < j; k++) {
-        p[k].v[0] = p2[k].v[0];
-        p[k].v[1] = p2[k].v[1];
-        p[k].v[2] = p2[k].v[2];
+        BrVector3Copy(&p[k], &p2[k]);
     }
 }
 
@@ -1026,11 +1022,11 @@ int BoundsOverlapTest__finteray(br_bounds* b1, br_bounds* b2) {
     LOG_TRACE("(%p, %p)", b1, b2);
 
     return b1->min.v[0] <= b2->max.v[0]
-        && b1->min.v[0] <= b2->max.v[0]
+        && b2->min.v[0] <= b1->max.v[0]
         && b1->min.v[1] <= b2->max.v[1]
         && b2->min.v[1] <= b1->max.v[1]
         && b1->min.v[2] <= b2->max.v[2]
-        && b1->min.v[2] <= b2->max.v[2];
+        && b2->min.v[2] <= b1->max.v[2];
 }
 
 // IDA: int __usercall BoundsTransformTest@<EAX>(br_bounds *b1@<EAX>, br_bounds *b2@<EDX>, br_matrix34 *M@<EBX>)
