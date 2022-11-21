@@ -1100,9 +1100,7 @@ int LineBoxColl(br_vector3* o, br_vector3* p, br_bounds* pB, br_vector3* pHit_po
     LOG_TRACE("(%p, %p, %p, %p)", o, p, pB, pHit_point);
 
     inside = 1;
-    dir.v[0] = p->v[0] - o->v[0];
-    dir.v[1] = p->v[1] - o->v[1];
-    dir.v[2] = p->v[2] - o->v[2];
+    BrVector3Sub(&dir, p, o);
     for (i = 0; i < 3; ++i) {
         if (pB->min.v[i] <= o->v[i]) {
             if (pB->max.v[i] >= o->v[i]) {
@@ -1119,7 +1117,7 @@ int LineBoxColl(br_vector3* o, br_vector3* p, br_bounds* pB, br_vector3* pHit_po
         }
     }
     if (inside) {
-        *pHit_point = *o;
+        BrVector3Copy(pHit_point, o);
         return 8;
     } else {
         for (i = 0; i < 3; ++i) {
