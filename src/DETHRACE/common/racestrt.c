@@ -1282,6 +1282,11 @@ int TryToMoveToArrows(int* pCurrent_choice, int* pCurrent_mode) {
 int UpOpponent(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
+#if defined(DETHRACE_FIX_BUGS)
+    if (gProgram_state.view_type != eVT_Opponents) {
+        return 0;
+    }
+#endif
     AddToFlicQueue(gStart_interface_spec->pushed_flics[5].flic_index,
         gStart_interface_spec->pushed_flics[5].x[gGraf_data_index],
         gStart_interface_spec->pushed_flics[5].y[gGraf_data_index],
@@ -1310,6 +1315,11 @@ int UpOpponent(int* pCurrent_choice, int* pCurrent_mode) {
 int DownOpponent(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
+#if defined(DETHRACE_FIX_BUGS)
+    if (gProgram_state.view_type != eVT_Opponents) {
+        return 0;
+    }
+#endif
     AddToFlicQueue(gStart_interface_spec->pushed_flics[6].flic_index,
         gStart_interface_spec->pushed_flics[6].x[gGraf_data_index],
         gStart_interface_spec->pushed_flics[6].y[gGraf_data_index],
