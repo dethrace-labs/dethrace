@@ -1439,9 +1439,9 @@ void AwardTime(tU32 pTime) {
     }
     gOld_times[0] = pTime;
     if (gLast_time_credit_headup >= 0 && (the_time - gLast_time_earn_time) < 2000) {
-        pTime += gLast_time_credit_headup;
+        pTime += gLast_time_credit_amount;
     }
-    gLast_time_credit_headup = pTime;
+    gLast_time_credit_amount = pTime;
     gTimer += original_amount * 1000;
     s[0] = '+';
     TimerString(1000 * pTime, &s[1], 0, 0);
