@@ -2390,6 +2390,9 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     int style;
     int cp_rect_w[2];
     int cp_rect_h[2];
+#if defined(DETHRACE_FIX_BUGS)
+    int skid_mark_cnt = 0;
+#endif
     tPath_name the_path;
     tPath_name general_file_path;
     char s[256];
@@ -2806,8 +2809,21 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
             strcat(str, ".MAT");
             material = LoadSingleMaterial(&gTrack_storage_space, str);
             pRace_info->material_modifiers[i].skid_mark_material = material;
+#if defined(DETHRACE_FIX_BUGS)
+            skid_mark_cnt++;
+#endif
         }
     }
+#if defined(DETHRACE_FIX_BUGS)
+    /* Display skidmarks even if the race has no specified skidmark material. */
+    if (!skid_mark_cnt && num_materials) {
+        LOG_WARN("Track %s has no valid skid mark material, setting the default one",
+                 pRace_info->track_file_name);
+        LoadSinglePixelmap(&gTrack_storage_space, "SKIDMARK.PIX");
+        material = LoadSingleMaterial(&gTrack_storage_space, "SKIDMARK.MAT");
+        pRace_info->material_modifiers[0].skid_mark_material = material;
+    }
+#endif
     for (i = num_materials; i < 10; ++i) {
         pRace_info->material_modifiers[i].car_wall_friction = 1.0;
         pRace_info->material_modifiers[i].tyre_road_friction = 1.0;
