@@ -1287,6 +1287,7 @@ int UpOpponent(int* pCurrent_choice, int* pCurrent_mode) {
         gStart_interface_spec->pushed_flics[5].y[gGraf_data_index],
         1);
     DRS3StartSound(gEffects_outlet, 3000);
+    RemoveTransientBitmaps(1);
     DropOutImageThruBottom(GetPanelPixelmap(0),
         gCurrent_graf_data->start_race_panel_left,
         gCurrent_graf_data->start_race_panel_top,
@@ -1314,6 +1315,7 @@ int DownOpponent(int* pCurrent_choice, int* pCurrent_mode) {
         gStart_interface_spec->pushed_flics[6].y[gGraf_data_index],
         1);
     DRS3StartSound(gEffects_outlet, 3000);
+    RemoveTransientBitmaps(1);
     DropOutImageThruTop(GetPanelPixelmap(0),
         gCurrent_graf_data->start_race_panel_left,
         gCurrent_graf_data->start_race_panel_top,
