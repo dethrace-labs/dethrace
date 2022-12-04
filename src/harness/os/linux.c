@@ -332,10 +332,12 @@ FILE* OS_fopen(const char* pathname, const char* mode) {
         if (strcasecmp(pBaseName, pDirent->d_name) == 0) {
             strcat(pDirName, "/");
             strcat(pDirName, pDirent->d_name);
-            return fopen(pDirName, mode);
+            f = fopen(pDirName, mode);
+            break;
         }
     }
-    return NULL;
+    closedir(pDir);
+    return f;
 }
 
 void OS_AllocateActionReplayBuffer(char** pBuffer, unsigned* pBuffer_size) {
