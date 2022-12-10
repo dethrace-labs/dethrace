@@ -12,6 +12,7 @@
 #include "globvars.h"
 #include "globvrpb.h"
 #include "grafdata.h"
+#include "harness/hooks.h"
 #include "harness/os.h"
 #include "harness/trace.h"
 #include "init.h"
@@ -1615,6 +1616,7 @@ void RenderAFrame(int pDepth_mask_on) {
             ProcessTrack(gUniverse_actor, &gProgram_state.track_spec, gCamera, &gCamera_to_world, 1);
         }
         RenderSplashes();
+	Harness_Hook_FlushRenderer(); /* Dethrace. Flush buffers into memory. */
         RenderSmoke(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, gFrame_period);
         RenderSparks(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, gFrame_period);
         RenderProximityRays(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, gFrame_period);
