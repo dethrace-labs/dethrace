@@ -618,7 +618,6 @@ int FindAHeadupHoleWoofBarkSoundsABitRude(int pSlot_index) {
         }
         if (the_headup->type == eHeadup_unused) {
             empty_one = i;
-            break;
         }
     }
     return empty_one;
