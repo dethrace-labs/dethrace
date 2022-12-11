@@ -1283,6 +1283,7 @@ int UpOpponent(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
 #if defined(DETHRACE_FIX_BUGS)
+    // fixes bug where racers could be scrolled in other race menu modes
     if (gProgram_state.view_type != eVT_Opponents) {
         return 0;
     }
@@ -1316,6 +1317,7 @@ int DownOpponent(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
 #if defined(DETHRACE_FIX_BUGS)
+    // fixes bug where racers could be scrolled in other race menu modes
     if (gProgram_state.view_type != eVT_Opponents) {
         return 0;
     }
