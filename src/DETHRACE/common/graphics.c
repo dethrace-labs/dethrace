@@ -2150,6 +2150,7 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
     int last_shear_x;
     int current_shear_x;
     int shear_x_difference;
+    int pWidth_orig;
     tU8 the_byte;
     tU8* source_ptr;
     tU8* dest_ptr;
@@ -2188,13 +2189,27 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
             pDest_x = 0;
         }
         if (pDest->width > pDest_x) {
-            if (pDest_x + pWidth > pDest->width) {
-                shear_x_difference = pDest_x + pWidth - pDest->width;
-                pWidth = pDest->width - pDest_x;
-                source_row_wrap += shear_x_difference;
-                dest_row_wrap += shear_x_difference;
-            }
+            pWidth_orig = pWidth;
             for (y_count = 0; pHeight > y_count; ++y_count) {
+#if !defined(DETHRACE_FIX_BUGS)
+                /*
+                 * The OG compares against pWidth instead of pWidth_orig, which
+                 * ends up clipped to the dest pixelmap width. This effectively
+                 * clips the consecutive rows of pixels along the shear, leaving
+                 * a visible gap on the screen. Instead, when comparing against
+                 * pWidth_orig, the clip takes place vertically along the dest
+                 * pixelmap edge, allowing all pixels to be displayed.
+                 *
+                 * Simulate OG behavior by overwriting pWidth_orig with pWidth.
+                 */
+                pWidth_orig = pWidth;
+#endif
+                if (pDest_x + pWidth_orig > pDest->width) {
+                    shear_x_difference = pDest_x + pWidth - pDest->width;
+                    pWidth = pDest->width - pDest_x;
+                    source_row_wrap += shear_x_difference;
+                    dest_row_wrap += shear_x_difference;
+                }
                 for (x_count = 0; pWidth > x_count; ++x_count) {
                     the_byte = *source_ptr++;
                     if (the_byte) {
@@ -2218,12 +2233,6 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
                 }
                 if (pDest->width <= pDest_x) {
                     break;
-                }
-                if (pDest_x + pWidth > pDest->width) {
-                    shear_x_difference = pDest_x + pWidth - pDest->width;
-                    pWidth = pDest->width - pDest_x;
-                    source_row_wrap += shear_x_difference;
-                    dest_row_wrap += shear_x_difference;
                 }
             }
         }
