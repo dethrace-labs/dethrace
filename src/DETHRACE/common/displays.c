@@ -1057,6 +1057,7 @@ void DoInstruments(tU32 pThe_time) {
     int the_wobble_x;
     int the_wobble_y;
     int gear;
+    int gear_height; /* Added by dethrace. */
     double the_angle;
     double the_angle2;
     double sin_angle;
@@ -1162,24 +1163,27 @@ void DoInstruments(tU32 pThe_time) {
             }
 #if defined(DETHRACE_FIX_BUGS)
 /*
- * The OG derives gear mask height of 28 by `gears_image->height / 8`, but
+ * The OG derives gear mask height of 16 or 28 by `gears_image->height / 8`, but
  * this is only valid for HGEARS.PIX, which contains 8 gear images. Hardcoding
  * this number fixes gear rendering for cars using HGEARS4.PIX, which consists
  * of 11 gear images.
  */
-#define GEAR_HEIGHT 28
+#define GEAR_HEIGHT 16
+#define GEAR_HEIGHT_HIRES 28
 #else
 #define GEAR_HEIGHT ((int)gProgram_state.current_car.gears_image->height / 8)
+#define GEAR_HEIGHT_HIRES GEAR_HEIGHT
 #endif
+	    gear_height = gGraf_spec_index ? GEAR_HEIGHT_HIRES : GEAR_HEIGHT;
             DRPixelmapRectangleMaskedCopy(
                 gBack_screen,
                 the_wobble_x + gProgram_state.current_car.gear_x[gProgram_state.cockpit_on],
                 the_wobble_y + gProgram_state.current_car.gear_y[gProgram_state.cockpit_on],
                 gProgram_state.current_car.gears_image,
                 0,
-                (gear + 1) * GEAR_HEIGHT,
+                (gear + 1) * gear_height,
                 gProgram_state.current_car.gears_image->width,
-                GEAR_HEIGHT);
+                gear_height);
         }
         speedo_image = gProgram_state.current_car.speedo_image[gProgram_state.cockpit_on];
         if (gProgram_state.current_car.speedo_radius_2[gProgram_state.cockpit_on] >= 0) {
