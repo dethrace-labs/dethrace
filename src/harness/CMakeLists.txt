@@ -44,7 +44,7 @@ if(DETHRACE_FIX_BUGS)
     target_compile_definitions(harness PRIVATE DETHRACE_FIX_BUGS)
 endif()
 
-target_link_libraries(harness PRIVATE brender compile_with_werror imgui)
+target_link_libraries(harness PRIVATE brender compile_with_werror cimgui imgui)
 
 if(WIN32)
     target_link_libraries(harness PRIVATE dbghelp)
