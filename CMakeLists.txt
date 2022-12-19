@@ -22,6 +22,13 @@ endif()
 
 message(STATUS "dethrace version ${DETHRACE_VERSION}")
 
+set(IO_PLATFORMS "SDL_OpenGL;GLFW_OpenGL")
+set(IO_PLATFORM "SDL_OpenGL" CACHE STRING "Dethrace platform")
+set_property(CACHE IO_PLATFORM PROPERTY STRINGS "${IO_PLATFORMS}")
+if(NOT IO_PLATFORM IN_LIST IO_PLATFORMS)
+    message(FATAL_ERROR "Invalid IO_PLATFORM=${IO_PLATFORM} (choices=${IO_PLATFORMS})")
+endif()
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 
 set(DETHRACE_IDE_ARGUMENTS "" CACHE STRING "DethRace arguments (only used by MSVC when debugging")
@@ -47,7 +54,11 @@ endfunction()
 
 test_big_endian(IS_BIGENDIAN)
 
-find_package(SDL2 REQUIRED)
+if(IO_PLATFORM STREQUAL "SDL_OpenGL")
+    find_package(SDL2 REQUIRED)
+elseif(IO_PLATFORM STREQUAL "GLFW_OpenGL")
+    find_package(glfw3 REQUIRED CONFIG)
+endif()
 
 option(DETHRACE_DEBUGUI "Build Dethrace with debug ui" ON)
 

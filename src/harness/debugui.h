@@ -7,15 +7,6 @@
 extern "C" {
 #endif
 
-#if defined(PLATFORM_SDL2)
-
-typedef struct tSDLGLWindowState tSDLGLWindowState;
-typedef union SDL_Event SDL_Event;
-
-int DebugUI_OnEvent(SDL_Event* event);
-
-#endif
-
 extern int gEnableDebugUi;
 
 void DebugUi_Start(void* windowState);
@@ -25,6 +16,8 @@ void DebugUI_StartFrame(void);
 void DebugUI_FinishFrame(void);
 
 int DebugUI_MouseCaptured(void);
+
+int DebugUI_OnEvent(void* event);
 
 #if defined(__cplusplus)
 }

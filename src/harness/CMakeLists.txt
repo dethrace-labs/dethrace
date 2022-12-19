@@ -31,7 +31,7 @@ if(DETHRACE_DEBUGUI)
     target_link_libraries(harness PRIVATE cimgui imgui)
 endif()
 
-if (NOT DEFINED IO_PLATFORM)
+if(NOT DEFINED IO_PLATFORM)
     set(IO_PLATFORM "SDL_OpenGL")
 endif()
 
@@ -72,7 +72,8 @@ else()
     target_compile_definitions(harness PRIVATE BR_ENDIAN_LITTLE=1)
 endif()
 
-if (IO_PLATFORM STREQUAL "SDL_OpenGL")
+
+if(IO_PLATFORM MATCHES ".*OpenGL$")
     # generate embedded glsl resources
     foreach(elem resources/framebuffer_vert.glsl resources/framebuffer_frag.glsl resources/3d_vert.glsl resources/3d_frag.glsl)
         add_custom_command(
@@ -83,7 +84,6 @@ if (IO_PLATFORM STREQUAL "SDL_OpenGL")
     endforeach()
 
     target_sources(harness PRIVATE
-        io_platforms/sdl_gl.c
         renderers/gl/gl_renderer.c
         renderers/gl/gl_renderer.h
         renderers/gl/stored_context.c
@@ -95,13 +95,33 @@ if (IO_PLATFORM STREQUAL "SDL_OpenGL")
         resources/3d_frag.glsl.h
     )
     target_compile_definitions(harness PUBLIC RENDERER_OPENGL3)
-    target_compile_definitions(harness PUBLIC PLATFORM_SDL2)
     target_include_directories(harness PRIVATE "${dethrace_SOURCE_DIR}/src/DETHRACE/common")
     target_include_directories(harness PRIVATE "${dethrace_SOURCE_DIR}/src/S3/include")
+    if(DETHRACE_DEBUGUI)
+        target_link_libraries(harness PRIVATE imgui_opengl3)
+    endif()
+endif()
+
+if(IO_PLATFORM MATCHES "^SDL")
+    target_sources(harness PRIVATE
+        io_platforms/sdl_gl.c
+    )
+    target_compile_definitions(harness PUBLIC PLATFORM_SDL2)
     target_link_libraries(harness PRIVATE SDL2::SDL2 glad)
     if(DETHRACE_DEBUGUI)
-        target_link_libraries(harness PRIVATE imgui_opengl3 imgui_sdl2)
+        target_link_libraries(harness PRIVATE imgui_sdl2)
     endif()
+elseif(IO_PLATFORM MATCHES "^GLFW")
+    target_sources(harness PRIVATE
+        io_platforms/glfw_gl.c
+    )
+    target_compile_definitions(harness PUBLIC PLATFORM_GLFW)
+    target_link_libraries(harness PRIVATE glad)
+    if(DETHRACE_DEBUGUI)
+        target_link_libraries(harness PRIVATE imgui_glfw)
+    endif()
+else()
+    message(FATAL_ERROR "Unknown IO_PLATFORM")
 endif()
 
 if(WIN32)

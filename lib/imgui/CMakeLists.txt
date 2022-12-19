@@ -19,12 +19,26 @@ add_library(imgui_opengl3 STATIC
 )
 target_link_libraries(imgui_opengl3 PRIVATE imgui)
 
-add_library(imgui_sdl2 STATIC
-    backends/imgui_impl_sdl.cpp
-    backends/imgui_impl_sdl.h
-)
-target_link_libraries(imgui_sdl2 PRIVATE imgui)
-target_link_libraries(imgui_sdl2
-    PRIVATE
-        SDL2::SDL2
-)
+if(TARGET SDL2::SDL2)
+    add_library(imgui_sdl2 STATIC
+        backends/imgui_impl_sdl.cpp
+        backends/imgui_impl_sdl.h
+    )
+    target_link_libraries(imgui_sdl2 PRIVATE imgui)
+    target_link_libraries(imgui_sdl2
+        PRIVATE
+            SDL2::SDL2
+    )
+endif()
+
+if(TARGET glfw)
+    add_library(imgui_glfw STATIC
+        backends/imgui_impl_glfw.cpp
+        backends/imgui_impl_glfw.h
+    )
+    target_link_libraries(imgui_glfw PRIVATE imgui)
+    target_link_libraries(imgui_glfw
+        PRIVATE
+            glfw
+    )
+endif()
