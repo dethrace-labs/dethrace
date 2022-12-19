@@ -23,16 +23,12 @@ add_library(harness STATIC
     "${CMAKE_CURRENT_BINARY_DIR}/version.h"
 )
 if(DETHRACE_DEBUGUI)
-    target_compile_definitions(harness PUBLIC DETHRACE_DEBUGUI)
     target_sources(harness PRIVATE
         debugui.cpp
         debugui.h
     )
+    target_compile_definitions(harness PUBLIC DETHRACE_DEBUGUI)
     target_link_libraries(harness PRIVATE cimgui imgui)
-endif()
-
-if(NOT DEFINED IO_PLATFORM)
-    set(IO_PLATFORM "SDL_OpenGL")
 endif()
 
 target_include_directories(harness
@@ -73,7 +69,7 @@ else()
 endif()
 
 
-if(IO_PLATFORM MATCHES ".*OpenGL$")
+if(RENDERER_OPENGL)
     # generate embedded glsl resources
     foreach(elem resources/framebuffer_vert.glsl resources/framebuffer_frag.glsl resources/3d_vert.glsl resources/3d_frag.glsl)
         add_custom_command(
@@ -102,20 +98,22 @@ if(IO_PLATFORM MATCHES ".*OpenGL$")
     endif()
 endif()
 
-if(IO_PLATFORM MATCHES "^SDL")
+if(IOPLATFORM_SDL)
     target_sources(harness PRIVATE
         io_platforms/sdl_gl.c
+        include/harness/private/platform_glfw.h
     )
-    target_compile_definitions(harness PUBLIC PLATFORM_SDL2)
+    target_compile_definitions(harness PUBLIC IOPLATFORM_SDL2)
     target_link_libraries(harness PRIVATE SDL2::SDL2 glad)
     if(DETHRACE_DEBUGUI)
         target_link_libraries(harness PRIVATE imgui_sdl2)
     endif()
-elseif(IO_PLATFORM MATCHES "^GLFW")
+elseif(IOPLATFORM_GLFW)
     target_sources(harness PRIVATE
         io_platforms/glfw_gl.c
+        include/harness/private/platform_glfw.h
     )
-    target_compile_definitions(harness PUBLIC PLATFORM_GLFW)
+    target_compile_definitions(harness PUBLIC IOPLATFORM_GLFW)
     target_link_libraries(harness PRIVATE glad)
     if(DETHRACE_DEBUGUI)
         target_link_libraries(harness PRIVATE imgui_glfw)

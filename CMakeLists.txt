@@ -29,6 +29,23 @@ if(NOT IO_PLATFORM IN_LIST IO_PLATFORMS)
     message(FATAL_ERROR "Invalid IO_PLATFORM=${IO_PLATFORM} (choices=${IO_PLATFORMS})")
 endif()
 
+set(RENDERER_OPENGL FALSE)
+if(IO_PLATFORM MATCHES ".*OpenGL$")
+    set(RENDERER_OPENGL TRUE)
+else()
+    message(FATAL_ERROR "Unknown Renderer")
+endif()
+
+set(IOPLATFORM_GLFW FALSE)
+set(IOPLATFORM_SDL FALSE)
+if(IO_PLATFORM MATCHES "^GLFW")
+    set(IOPLATFORM_GLFW TRUE)
+elseif(IO_PLATFORM MATCHES "^SDL")
+    set(IOPLATFORM_SDL TRUE)
+else()
+    message(FATAL_ERROR "Unknown io platform")
+endif()
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 
 set(DETHRACE_IDE_ARGUMENTS "" CACHE STRING "DethRace arguments (only used by MSVC when debugging")

@@ -1,12 +1,15 @@
-#include "harness/private/glfw_gl.h"
+#include "harness/private/platform_glfw.h"
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
 #include <glad/glad.h>
 
+#if defined(RENDERER_OPENGL3)
 #include "../renderers/gl/gl_renderer.h"
-#include "../renderers/renderer.h"
+#define RENDERER gl_renderer
+#endif
+
 #include "harness/config.h"
 #include "harness/trace.h"
 
@@ -128,7 +131,7 @@ const int scancodes_dethrace2glfw[123] = {
     GLFW_KEY_PAUSE,             // 105
     GLFW_KEY_SPACE,             // 106
 };
-int scancodes_glfw2dethrace[GLFW_KEY_LAST];
+static int scancodes_glfw2dethrace[GLFW_KEY_LAST];
 
 static tGLFWGLWindowState gMainWindow;
 
@@ -160,7 +163,7 @@ static void swap_full_screen(void) {
         glfwSetWindowMonitor(gMainWindow.window, monitor, 0, 0, mw, mh, GLFW_DONT_CARE);
     } else {
         int w, h;
-        gl_renderer.GetRenderSize(&w, &h);
+        RENDERER.GetRenderSize(&w, &h);
         glfwSetWindowMonitor(gMainWindow.window, NULL, window_pos.x, window_pos.y, w, h, GLFW_DONT_CARE);
     }
 }
@@ -198,9 +201,9 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 static void resize_callback(GLFWwindow* window, int width, int height) {
     int vp_x, vp_y, vp_w, vp_h;
     int r_w, r_h;
-    gl_renderer.SetWindowSize(width, height);
-    gl_renderer.GetViewport(&vp_x, &vp_y, &vp_w, &vp_h);
-    gl_renderer.GetRenderSize(&r_w, &r_h);
+    RENDERER.SetWindowSize(width, height);
+    RENDERER.GetViewport(&vp_x, &vp_y, &vp_w, &vp_h);
+    RENDERER.GetRenderSize(&r_w, &r_h);
     glfw_window_scale.x = (float)r_w / vp_w;
     glfw_window_scale.y = (float)r_h / vp_h;
 }
@@ -235,11 +238,11 @@ tRenderer* Window_Create(char* title, int width, int height, int pRender_width, 
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
     glfwSwapInterval(1);
 
-    gl_renderer.Init(width, height, pRender_width, pRender_height);
+    RENDERER.Init(width, height, pRender_width, pRender_height);
 
     DebugUi_Start(&gMainWindow);
 
-    return &gl_renderer;
+    return &RENDERER;
 }
 
 void Window_PollEvents() {
@@ -287,7 +290,7 @@ void Input_GetMousePosition(int* pX, int* pY) {
     glfwGetCursorPos(gMainWindow.window, &xpos, &ypos);
     *pX = xpos;
     *pY = ypos;
-    gl_renderer.GetViewport(&vp_x, &vp_y, &vp_w, &vp_h);
+    RENDERER.GetViewport(&vp_x, &vp_y, &vp_w, &vp_h);
     if (*pX < vp_x) {
         *pX = vp_x;
     } else if (*pX >= vp_x + vp_w) {

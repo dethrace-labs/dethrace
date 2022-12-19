@@ -1,13 +1,15 @@
-#include "harness/private/sdl_gl.h"
+#include "harness/private/platform_sdl.h"
 
 #include <glad/glad.h>
 
 // this needs to be included after glad.h
 #include <SDL.h>
-#include <SDL_opengl.h>
 
+#if defined(RENDERER_OPENGL3)
 #include "../renderers/gl/gl_renderer.h"
-#include "../renderers/renderer.h"
+#define RENDERER gl_renderer
+#endif
+
 #include "harness/config.h"
 #include "harness/trace.h"
 
@@ -144,6 +146,7 @@ tRenderer* Window_Create(char* title, int width, int height, int pRender_width, 
         LOG_PANIC("SDL_INIT_VIDEO error: %s", SDL_GetError());
     }
 
+#if defined(RENDERER_OPENGL3)
     if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE) != 0) {
         LOG_PANIC("Failed to set SDL_GL_CONTEXT_PROFILE_MASK attribute. %s", SDL_GetError());
     }
@@ -151,6 +154,7 @@ tRenderer* Window_Create(char* title, int width, int height, int pRender_width, 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 
     SDL_GL_SetSwapInterval(1);
+#endif
 
     gMainWindow.window = SDL_CreateWindow(title,
         SDL_WINDOWPOS_CENTERED,
@@ -169,6 +173,7 @@ tRenderer* Window_Create(char* title, int width, int height, int pRender_width, 
         SDL_SetWindowFullscreen(gMainWindow.window, SDL_WINDOW_FULLSCREEN_DESKTOP);
     }
 
+#if defined(RENDERER_OPENGL3)
     gMainWindow.glContext = SDL_GL_CreateContext(gMainWindow.window);
     if (gMainWindow.glContext == NULL) {
         LOG_PANIC("Failed to call SDL_GL_CreateContext. %s", SDL_GetError());
@@ -179,12 +184,13 @@ tRenderer* Window_Create(char* title, int width, int height, int pRender_width, 
         LOG_PANIC("Failed to initialize the OpenGL context with GLAD.");
         exit(1);
     }
+#endif
 
-    gl_renderer.Init(width, height, pRender_width, pRender_height);
+    RENDERER.Init(width, height, pRender_width, pRender_height);
 
     DebugUi_Start(&gMainWindow);
 
-    return &gl_renderer;
+    return &RENDERER;
 }
 
 // Checks whether the `flag_check` is the only modifier applied.
@@ -203,7 +209,6 @@ void Window_PollEvents() {
 
     while (SDL_PollEvent(&event)) {
         if (DebugUI_OnEvent(&event)) {
-
         }
         switch (event.type) {
         case SDL_KEYDOWN:
@@ -237,9 +242,9 @@ void Window_PollEvents() {
             switch (event.window.event) {
             case SDL_WINDOWEVENT_SIZE_CHANGED:
                 SDL_GetWindowSize(gMainWindow.window, &w_w, &w_h);
-                gl_renderer.SetWindowSize(w_w, w_h);
-                gl_renderer.GetViewport(&vp_x, &vp_y, &vp_w, &vp_h);
-                gl_renderer.GetRenderSize(&r_w, &r_h);
+                RENDERER.SetWindowSize(w_w, w_h);
+                RENDERER.GetViewport(&vp_x, &vp_y, &vp_w, &vp_h);
+                RENDERER.GetRenderSize(&r_w, &r_h);
                 sdl_window_scale.x = (float)r_w / vp_w;
                 sdl_window_scale.y = (float)r_h / vp_h;
                 break;
@@ -286,7 +291,7 @@ void Input_GetMousePosition(int* pX, int* pY) {
     int vp_x, vp_y, vp_w, vp_h;
 
     SDL_GetMouseState(pX, pY);
-    gl_renderer.GetViewport(&vp_x, &vp_y, &vp_w, &vp_h);
+    RENDERER.GetViewport(&vp_x, &vp_y, &vp_w, &vp_h);
     if (*pX < vp_x) {
         *pX = vp_x;
     } else if (*pX >= vp_x + vp_w) {

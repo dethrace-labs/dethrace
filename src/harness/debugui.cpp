@@ -2,14 +2,14 @@
 
 #include "imgui.h"
 
-#if defined(PLATFORM_SDL2)
+#if defined(IOPLATFORM_SDL2)
 #include "SDL.h"
 #include "backends/imgui_impl_sdl.h"
-#include "harness/private/sdl_gl.h"
-#elif defined(PLATFORM_GLFW)
+#include "harness/private/platform_sdl.h"
+#elif defined(IOPLATFORM_GLFW)
 #include <GLFW/glfw3.h>
 #include "backends/imgui_impl_glfw.h"
-#include "harness/private/glfw_gl.h"
+#include "harness/private/platform_glfw.h"
 #endif
 
 #if defined(RENDERER_OPENGL3)
@@ -31,17 +31,17 @@ void DebugUi_Start(void* windowState) {
     (void)io;
 
     ImGui::StyleColorsDark();
-#if defined(PLATFORM_SDL2)
+#if defined(IOPLATFORM_SDL2)
     ImGui_ImplSDL2_InitForOpenGL(((tSDLGLWindowState*)windowState)->window, ((tSDLGLWindowState*)windowState)->glContext);
-#elif defined(PLATFORM_GLFW)
-    ImGui_ImplGlfw_InitForOpenGL(((tGLFWGLWindowState*)windowState)->window, 0);
+#elif defined(IOPLATFORM_GLFW)
+    ImGui_ImplGlfw_InitForOpenGL(((tGLFWGLWindowState*)windowState)->window, true);
 #endif
 #if defined(RENDERER_OPENGL3)
     ImGui_ImplOpenGL3_Init();
 #endif
 }
 
-#if defined(PLATFORM_SDL2)
+#if defined(IOPLATFORM_SDL2)
 int DebugUI_OnEvent(void* event) {
     if (!gEnableDebugUi) {
         return 0;
@@ -57,15 +57,11 @@ void DebugUI_StartFrame() {
     // Start the Dear ImGui frame
 #if defined(RENDERER_OPENGL3)
     ImGui_ImplOpenGL3_NewFrame();
-#else
-#error "debugui does not support this renderer"
 #endif
-#if defined(PLATFORM_SDL2)
+#if defined(IOPLATFORM_SDL2)
     ImGui_ImplSDL2_NewFrame();
-#elif defined(PLATFORM_GLFW)
+#elif defined(IOPLATFORM_GLFW)
     ImGui_ImplGlfw_NewFrame();
-#else
-#error "debugui does not support this platform"
 #endif
     ImGui::NewFrame();
 
@@ -86,9 +82,8 @@ void DebugUI_FinishFrame() {
     frame_started = false;
 
     ImGui::Render();
-#if defined(PLATFORM_SDL2)
+#if defined(RENDERER_OPENGL3)
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-#else
 #endif
 }
 
