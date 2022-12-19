@@ -1,20 +1,24 @@
 #ifndef DEBUGUI_H
 #define DEBUGUI_H
 
-typedef struct tSDLGLWindowState tSDLGLWindowState;
-typedef union SDL_Event SDL_Event;
+#if defined(DETHRACE_DEBUGUI)
 
 #if defined(__cplusplus)
 extern "C" {
 #endif
 
-extern int gEnableDebugUi;
+#if defined(PLATFORM_SDL2)
 
-typedef struct tWindowState tWindowState;
-
-void DebugUi_Start(tSDLGLWindowState* windowState);
+typedef struct tSDLGLWindowState tSDLGLWindowState;
+typedef union SDL_Event SDL_Event;
 
 int DebugUI_OnEvent(SDL_Event* event);
+
+#endif
+
+extern int gEnableDebugUi;
+
+void DebugUi_Start(void* windowState);
 
 void DebugUI_StartFrame(void);
 
@@ -24,6 +28,20 @@ int DebugUI_MouseCaptured(void);
 
 #if defined(__cplusplus)
 }
+#endif
+
+#else
+
+#define DebugUI_OnEvent(EVENT) (0)
+
+#define DebugUi_Start(STATE)
+
+#define DebugUI_StartFrame()
+
+#define DebugUI_FinishFrame()
+
+#define DebugUI_MouseCaptured() (0)
+
 #endif
 
 #endif

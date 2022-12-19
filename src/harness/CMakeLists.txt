@@ -7,8 +7,6 @@ add_library(harness STATIC
     include/harness/config.h
     include/harness/os.h
 
-    debugui.cpp
-    debugui.h
     # cameras/debug_camera.c
     # cameras/debug_camera.h
     harness_trace.c
@@ -24,6 +22,14 @@ add_library(harness STATIC
     sound/sound.h
     "${CMAKE_CURRENT_BINARY_DIR}/version.h"
 )
+if(DETHRACE_DEBUGUI)
+    target_compile_definitions(harness PUBLIC DETHRACE_DEBUGUI)
+    target_sources(harness PRIVATE
+        debugui.cpp
+        debugui.h
+    )
+    target_link_libraries(harness PRIVATE cimgui imgui)
+endif()
 
 if (NOT DEFINED IO_PLATFORM)
     set(IO_PLATFORM "SDL_OpenGL")
@@ -44,7 +50,7 @@ if(DETHRACE_FIX_BUGS)
     target_compile_definitions(harness PRIVATE DETHRACE_FIX_BUGS)
 endif()
 
-target_link_libraries(harness PRIVATE brender compile_with_werror cimgui imgui)
+target_link_libraries(harness PRIVATE brender compile_with_werror)
 
 if(WIN32)
     target_link_libraries(harness PRIVATE dbghelp)
@@ -88,9 +94,14 @@ if (IO_PLATFORM STREQUAL "SDL_OpenGL")
         resources/3d_vert.glsl.h
         resources/3d_frag.glsl.h
     )
+    target_compile_definitions(harness PUBLIC RENDERER_OPENGL3)
+    target_compile_definitions(harness PUBLIC PLATFORM_SDL2)
     target_include_directories(harness PRIVATE "${dethrace_SOURCE_DIR}/src/DETHRACE/common")
     target_include_directories(harness PRIVATE "${dethrace_SOURCE_DIR}/src/S3/include")
     target_link_libraries(harness PRIVATE SDL2::SDL2 glad)
+    if(DETHRACE_DEBUGUI)
+        target_link_libraries(harness PRIVATE imgui_opengl3 imgui_sdl2)
+    endif()
 endif()
 
 if(WIN32)

@@ -291,8 +291,10 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
             harness_game_config.enable_replay = 1;
             handled = 1;
         } else if (strcmp(argv[i], "--debug-ui") == 0) {
+#if defined(DETHRACE_DEBUGUI)
             gEnableDebugUi = 1;
             handled = 1;
+#endif
         }
 
         if (handled) {

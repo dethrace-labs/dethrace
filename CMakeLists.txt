@@ -49,9 +49,13 @@ test_big_endian(IS_BIGENDIAN)
 
 find_package(SDL2 REQUIRED)
 
-enable_language(CXX)
-add_subdirectory(lib/imgui EXCLUDE_FROM_ALL)
-add_subdirectory(lib/cimgui EXCLUDE_FROM_ALL)
+option(DETHRACE_DEBUGUI "Build Dethrace with debug ui" ON)
+
+if(DETHRACE_DEBUGUI)
+    enable_language(CXX)
+    add_subdirectory(lib/imgui EXCLUDE_FROM_ALL)
+    add_subdirectory(lib/cimgui EXCLUDE_FROM_ALL)
+endif()
 
 add_subdirectory(lib/libsmacker)
 add_subdirectory(lib/glad)
