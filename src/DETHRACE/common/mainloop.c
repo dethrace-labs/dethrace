@@ -35,7 +35,6 @@
 #include "trig.h"
 #include "utility.h"
 #include "world.h"
-#include <stdlib.h>
 
 int gNasty_kludgey_cockpit_variable;
 tInfo_mode gInfo_mode;

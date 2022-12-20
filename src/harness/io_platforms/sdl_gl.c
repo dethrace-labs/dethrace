@@ -133,7 +133,7 @@ const int scancodes_dethrace2sdl[123] = {
 };
 int scancodes_sdl2dethrace[SDL_NUM_SCANCODES];
 
-static tSDLGLWindowState gMainWindow;
+static tPlatformState gMainWindow;
 
 static uint8_t sdl_key_state[256];
 static struct {

@@ -7,9 +7,11 @@
 extern "C" {
 #endif
 
+typedef struct tPlatformState tPlatformState;
+
 extern int gEnableDebugUi;
 
-void DebugUi_Start(void* windowState);
+void DebugUi_Start(tPlatformState* windowState);
 
 void DebugUI_StartFrame(void);
 

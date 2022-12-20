@@ -79,10 +79,13 @@ endif()
 
 option(DETHRACE_DEBUGUI "Build Dethrace with debug ui" ON)
 
+if(MSVC)
+    add_definitions(-DNOMINMAX)
+endif()
+
 if(DETHRACE_DEBUGUI)
     enable_language(CXX)
     add_subdirectory(lib/imgui EXCLUDE_FROM_ALL)
-    add_subdirectory(lib/cimgui EXCLUDE_FROM_ALL)
 endif()
 
 add_subdirectory(lib/libsmacker)

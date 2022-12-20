@@ -133,7 +133,7 @@ const int scancodes_dethrace2glfw[123] = {
 };
 static int scancodes_glfw2dethrace[GLFW_KEY_LAST];
 
-static tGLFWGLWindowState gMainWindow;
+static tPlatformState gMainWindow;
 
 static uint8_t sdl_key_state[256];
 static struct {

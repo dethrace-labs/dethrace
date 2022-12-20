@@ -6,11 +6,11 @@ typedef struct SDL_Window SDL_Window;
 typedef void *SDL_GLContext;
 #endif
 
-typedef struct tSDLGLWindowState {
+typedef struct tPlatformState {
     SDL_Window* window;
 #if defined(RENDERER_OPENGL3)
     SDL_GLContext glContext;
 #endif
-} tSDLGLWindowState;
+} tPlatformState;
 
 #endif

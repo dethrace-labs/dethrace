@@ -3,8 +3,8 @@
 
 typedef struct GLFWwindow GLFWwindow;
 
-typedef struct tGLFWGLWindowState {
+typedef struct tPlatformState {
     GLFWwindow* window;
-} tGLFWGLWindowState;
+} tPlatformState;
 
 #endif

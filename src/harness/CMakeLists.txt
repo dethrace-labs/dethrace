@@ -22,13 +22,18 @@ add_library(harness STATIC
     sound/sound.h
     "${CMAKE_CURRENT_BINARY_DIR}/version.h"
 )
+target_include_directories(harness PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/harness")
+
 if(DETHRACE_DEBUGUI)
     target_sources(harness PRIVATE
         debugui.cpp
-        debugui.h
+        include/harness/debugui.h
     )
-    target_compile_definitions(harness PUBLIC DETHRACE_DEBUGUI)
-    target_link_libraries(harness PRIVATE cimgui imgui)
+    add_library(harness_debugui INTERFACE)
+    target_compile_definitions(harness_debugui INTERFACE DETHRACE_DEBUGUI)
+    target_link_libraries(harness_debugui INTERFACE imgui)
+
+    target_link_libraries(harness PUBLIC harness_debugui)
 endif()
 
 target_include_directories(harness
