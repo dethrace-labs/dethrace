@@ -95,6 +95,10 @@ typedef void* tPMFM2CB(br_material*);
 typedef struct v11face DR_FACE;
 typedef struct fmt_vertex DR_VERTEX;
 
+#ifdef __cplusplus
+#define class klass
+#endif
+
 typedef enum tDriver {
     eDriver_non_car_unused_slot = 0,
     eDriver_non_car = 1,
@@ -4166,5 +4170,9 @@ typedef struct tMem_info {
     unsigned int size_of_page_file;
     unsigned int reserved[3];
 } tMem_info;
+
+#ifdef __cplusplus
+#undef class
+#endif
 
 #endif

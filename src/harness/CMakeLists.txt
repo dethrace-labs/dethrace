@@ -1,9 +1,39 @@
 configure_file(version.h.in version.h @ONLY)
 
-add_library(harness STATIC)
+add_library(harness STATIC
+    include/harness/compiler.h
+    include/harness/hooks.h
+    include/harness/trace.h
+    include/harness/config.h
+    include/harness/os.h
 
-if (NOT DEFINED IO_PLATFORM)
-    set(IO_PLATFORM "SDL_OpenGL")
+    # cameras/debug_camera.c
+    # cameras/debug_camera.h
+    harness_trace.c
+    harness.c
+    harness.h
+    io_platforms/io_platform.h
+    renderers/null/null.c
+    renderers/null/null.h
+    renderers/renderer.h
+    brender_emu/renderer_impl.c
+    brender_emu/renderer_impl.h
+    sound/sound.c
+    sound/sound.h
+    "${CMAKE_CURRENT_BINARY_DIR}/version.h"
+)
+target_include_directories(harness PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/harness")
+
+if(DETHRACE_DEBUGUI)
+    target_sources(harness PRIVATE
+        debugui.cpp
+        include/harness/debugui.h
+    )
+    add_library(harness_debugui INTERFACE)
+    target_compile_definitions(harness_debugui INTERFACE DETHRACE_DEBUGUI)
+    target_link_libraries(harness_debugui INTERFACE imgui)
+
+    target_link_libraries(harness PUBLIC harness_debugui)
 endif()
 
 target_include_directories(harness
@@ -13,7 +43,8 @@ target_include_directories(harness
         ${CMAKE_SOURCE_DIR}/src/DETHRACE
         "${CMAKE_CURRENT_BINARY_DIR}"
     PUBLIC
-        include
+        "${CMAKE_CURRENT_SOURCE_DIR}/include"
+        "${CMAKE_CURRENT_SOURCE_DIR}/renderers"
 )
 
 if(DETHRACE_FIX_BUGS)
@@ -42,29 +73,8 @@ else()
     target_compile_definitions(harness PRIVATE BR_ENDIAN_LITTLE=1)
 endif()
 
-target_sources(harness PRIVATE
-    include/harness/compiler.h
-    include/harness/hooks.h
-    include/harness/trace.h
-    include/harness/config.h
-    include/harness/os.h
 
-    # cameras/debug_camera.c
-    # cameras/debug_camera.h
-    harness_trace.c
-    harness.c
-    harness.h
-    io_platforms/io_platform.h
-    renderers/null.h
-    renderers/renderer.h
-    brender_emu/renderer_impl.c
-    brender_emu/renderer_impl.h
-    sound/sound.c
-    sound/sound.h
-    "${CMAKE_CURRENT_BINARY_DIR}/version.h"
-)
-
-if (IO_PLATFORM STREQUAL "SDL_OpenGL")
+if(RENDERER_OPENGL)
     # generate embedded glsl resources
     foreach(elem resources/framebuffer_vert.glsl resources/framebuffer_frag.glsl resources/3d_vert.glsl resources/3d_frag.glsl)
         add_custom_command(
@@ -75,7 +85,6 @@ if (IO_PLATFORM STREQUAL "SDL_OpenGL")
     endforeach()
 
     target_sources(harness PRIVATE
-        io_platforms/sdl_gl.c
         renderers/gl/gl_renderer.c
         renderers/gl/gl_renderer.h
         renderers/gl/stored_context.c
@@ -86,9 +95,36 @@ if (IO_PLATFORM STREQUAL "SDL_OpenGL")
         resources/3d_vert.glsl.h
         resources/3d_frag.glsl.h
     )
+    target_compile_definitions(harness PUBLIC RENDERER_OPENGL3)
     target_include_directories(harness PRIVATE "${dethrace_SOURCE_DIR}/src/DETHRACE/common")
     target_include_directories(harness PRIVATE "${dethrace_SOURCE_DIR}/src/S3/include")
+    if(DETHRACE_DEBUGUI)
+        target_link_libraries(harness PRIVATE imgui_opengl3)
+    endif()
+endif()
+
+if(IOPLATFORM_SDL)
+    target_sources(harness PRIVATE
+        io_platforms/sdl_gl.c
+        include/harness/private/platform_glfw.h
+    )
+    target_compile_definitions(harness PUBLIC IOPLATFORM_SDL2)
     target_link_libraries(harness PRIVATE SDL2::SDL2 glad)
+    if(DETHRACE_DEBUGUI)
+        target_link_libraries(harness PRIVATE imgui_sdl2)
+    endif()
+elseif(IOPLATFORM_GLFW)
+    target_sources(harness PRIVATE
+        io_platforms/glfw_gl.c
+        include/harness/private/platform_glfw.h
+    )
+    target_compile_definitions(harness PUBLIC IOPLATFORM_GLFW)
+    target_link_libraries(harness PRIVATE glad)
+    if(DETHRACE_DEBUGUI)
+        target_link_libraries(harness PRIVATE imgui_glfw)
+    endif()
+else()
+    message(FATAL_ERROR "Unknown IO_PLATFORM")
 endif()
 
 if(WIN32)

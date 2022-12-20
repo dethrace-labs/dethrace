@@ -6,6 +6,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+#define class klass
+#endif
+
 typedef int32_t br_int_32;
 typedef uint32_t br_uint_32;
 typedef int16_t br_int_16;
@@ -3023,5 +3027,9 @@ enum {
 
     BR_STATE_ALL = 0xFFFFFFFF
 };
+
+#ifdef __cplusplus
+#undef class
+#endif
 
 #endif /* BR_TYPES_H */
