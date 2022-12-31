@@ -9,8 +9,11 @@
 #include "harness/trace.h"
 #include "loading.h"
 #include "netgame.h"
+#include "oil.h"
 #include "opponent.h"
+#include "pedestrn.h"
 #include "piping.h"
+#include "powerup.h"
 #include "replay.h"
 #include "spark.h"
 #include "structur.h"
@@ -1217,7 +1220,117 @@ void ReceivedMessage(tNet_message* pMessage, void* pSender_address, tU32 pReceiv
     tNet_contents* contents;
     int i;
     LOG_TRACE("(%p, %p, %d)", pMessage, pSender_address, pReceive_time);
-    NOT_IMPLEMENTED();
+
+    contents = &pMessage->contents;
+    if (pMessage->guarantee_number != 0) {
+        SendGuaranteeReply(pMessage, pSender_address);
+    }
+    if ((gProgram_state.racing || gRace_only_flags[pMessage->contents.header.type == 0])
+        && (!gOnly_receive_guarantee_replies || pMessage->contents.header.type == NETMSGID_GUARANTEEREPLY)) {
+        for (i = 0; i < pMessage->num_contents; i++) {
+            if (contents->header.type <= NETMSGID_CARDETAILS || PlayerIsInList(pMessage->sender)) {
+                switch (contents->header.type) {
+                case NETMSGID_SENDMEDETAILS:    // 0x00,
+                    ReceivedSendMeDetails(contents, pSender_address);
+                    break;
+                case NETMSGID_DETAILS:          // 0x01,
+                    ReceivedDetails(contents);
+                    break;
+                case NETMSGID_JOIN:             // 0x02,
+                    ReceivedJoin(contents, pSender_address);
+                    break;
+                case NETMSGID_NEWPLAYERLIST:    // 0x03,
+                    ReceivedNewPlayerList(contents, pMessage);
+                    break;
+                case NETMSGID_GUARANTEEREPLY:   // 0x04,
+                    ReceivedGuaranteeReply(contents);
+                    break;
+                case NETMSGID_CARDETAILSREQ:    // 0x05,
+                    ReceivedCarDetailsReq(contents, pSender_address);
+                    break;
+                case NETMSGID_CARDETAILS:       // 0x06,
+                    ReceivedCarDetails(contents);
+                    break;
+                case NETMSGID_LEAVE:            // 0x07,
+                    ReceivedLeave(contents, pMessage);
+                    break;
+                case NETMSGID_HOSTICIDE:        // 0x08,
+                    ReceivedHosticide(contents);
+                    break;
+                case NETMSGID_RACEOVER:         // 0x09,
+                    ReceivedRaceOver(contents);
+                    break;
+                case NETMSGID_STATUSREPORT:     // 0x0a,
+                    ReceivedStatusReport(contents, pMessage);
+                    break;
+                case NETMSGID_STARTRACE:        // 0x0b,
+                    ReceivedStartRace(contents);
+                    break;
+                case NETMSGID_HEADUP:           // 0x0c,
+                    ReceivedHeadup(contents);
+                    break;
+                case NETMSGID_HOSTQUERY:        // 0x0d,
+                    ReceivedHostQuery(contents, pMessage);
+                    break;
+                case NETMSGID_HOSTREPLY:        // 0x0e,
+                    ReceivedHostReply(contents);
+                    break;
+                case NETMSGID_MECHANICS:        // 0x0f,
+                    ReceivedMechanics(contents);
+                    break;
+                case NETMSGID_NONCAR_INFO:      // 0x10,
+                    ReceivedNonCar(contents);
+                    break;
+                case NETMSGID_TIMESYNC:         // 0x11,
+                    ReceivedTimeSync(contents, pMessage, pReceive_time);
+                    break;
+                case NETMSGID_CONFIRM:          // 0x12,
+                    ReceivedConfirm(contents);
+                    break;
+                case NETMSGID_DISABLECAR:       // 0x13,
+                    ReceivedDisableCar(contents);
+                    break;
+                case NETMSGID_ENABLECAR:        // 0x14,
+                    ReceivedEnableCar(contents);
+                    break;
+                case NETMSGID_POWERUP:          // 0x15,
+                    ReceivedPowerup(contents);
+                    break;
+                case NETMSGID_RECOVER:          // 0x16,
+                    ReceivedRecover(contents);
+                    break;
+                case NETMSGID_SCORES:           // 0x17,
+                    ReceivedScores(contents);
+                    break;
+                case NETMSGID_WASTED:           // 0x18,
+                    ReceivedWasted(contents);
+                    break;
+                case NETMSGID_PEDESTRIAN:       // 0x19,
+                    ReceivedPedestrian(contents, pMessage, pReceive_time);
+                    break;
+                case NETMSGID_GAMEPLAY:         // 0x1a,
+                    ReceivedGameplay(contents, pMessage, pReceive_time);
+                    break;
+                case NETMSGID_NONCARPOSITION:   // 0x1b,
+                    ReceivedNonCarPosition(contents);
+                    break;
+                case NETMSGID_COPINFO:          // 0x1c,
+                    ReceivedCopInfo(contents);
+                    break;
+                case NETMSGID_GAMESCORES:       // 0x1d,
+                    ReceivedGameScores(contents);
+                    break;
+                case NETMSGID_OILSPILL:         // 0x1e,
+                    ReceivedOilSpill(contents);
+                    break;
+                case NETMSGID_CRUSHPOINT:       // 0x1f,
+                    RecievedCrushPoint(contents);
+                    break;
+                }
+            }
+            contents = (tNet_contents*)((tU8*)contents + contents->header.contents_size);
+        }
+    }
 }
 
 // IDA: void __cdecl NetReceiveAndProcessMessages()

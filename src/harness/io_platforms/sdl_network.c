@@ -10,10 +10,12 @@
 #include "SDL.h"
 #include "SDL_net.h"
 
-#define JOINABLE_GAMES_CAPACITY     2
+#define DEBUG_NETWORKING
+
+#define JOINABLE_GAMES_CAPACITY     10
 
 #define DEFAULT_PORT 6969
-#define NBPORTS 10  // DEFAULT_PORT, DEFAULT_PORT+1, DEFAULT_PORT+2, ...
+#define NBPORTS 2  // DEFAULT_PORT, DEFAULT_PORT+1, DEFAULT_PORT+2, ...
 
 typedef struct {
     tU32 last_response;
@@ -50,8 +52,29 @@ static char* FormatIPaddress(IPaddress* address) {
 }
 
 static int CompareAddress(IPaddress* ipAddress1, IPaddress* ipAddress2) {
-    return (ipAddress1->host == ipAddress2->host && ipAddress1->port == ipAddress2->port) ? 0 : 1;
+    return !(ipAddress1->host == ipAddress2->host && ipAddress1->port == ipAddress2->port);
 }
+
+static int SendMessage(UDPsocket pFromSocket, UDPpacket* pPacket) {
+    int res;
+
+#ifdef DEBUG_NETWORKING
+    int i;
+    printf("Sending %d bytes to %s:", pPacket->len, FormatIPaddress(&pPacket->address));
+    for (i = 0; i < pPacket->len; i++) {
+        printf(" 0x%x", pPacket->data[i]);
+    }
+    printf("\n");
+#endif
+
+    res = SDLNet_UDP_Send(pFromSocket, -1, pPacket);
+    if (res == -1) {
+        dr_dprintf("SDLNet_UDP_Send failed: %s", SDLNet_GetError());
+    }
+
+    return res;
+}
+
 
 int SDLNetwork_Init() {
     SDL_version compile_version;
@@ -210,7 +233,7 @@ int SDLNetwork_NetSendMessageToAddress(tNet_game_details* pDetails, tNet_message
 
     memcpy(gPDSDLNetwork_SendPacket->data, pMessage, pMessage->overall_size);
     gPDSDLNetwork_SendPacket->len = pMessage->overall_size;
-    r = SDLNet_UDP_Send(gPDSDLNetwork_Socket, -1, gPDSDLNetwork_SendPacket);
+    r = SendMessage(gPDSDLNetwork_Socket, gPDSDLNetwork_SendPacket);
     if (r == -1) {
         dr_dprintf("PDNetSendMessageToAddress(): Error on send - %s", SDLNet_GetError());
         NetDisposeMessage(pDetails, pMessage);
@@ -253,8 +276,8 @@ int SDLNetwork_BroadcastMessage() {
     for (i = 0; i < NBPORTS; i++) {
         gPDSDLNetwork_SendPacket->address = create_broadcast_address(DEFAULT_PORT + i);
 //        printf("addr: %s, len=%d\n", FormatIPaddress(&gPDSDLNetwork_SendPacket->address), gPDSDLNetwork_SendPacket->len);
-        res = SDLNet_UDP_Send(gPDSDLNetwork_Socket, -1, gPDSDLNetwork_SendPacket);
-        if (res == 0) {
+        res = SendMessage(gPDSDLNetwork_Socket, gPDSDLNetwork_SendPacket);
+        if (res == -1) {
             dr_dprintf("Failed to broadcast message to port %d.", DEFAULT_PORT + i);
         }
     }
@@ -338,9 +361,9 @@ tNet_message* SDLNetwork_PDNetGetNextMessage(tNet_game_details* pDetails, void**
     }
 
     printf("Received message from %s\n", FormatIPaddress(&gPDSDLNetwork_RecvPacket->address));
-    if (AddressInInterfaces(&gPDSDLNetwork_RecvPacket->address)) {
-        return NULL;
-    }
+//    if (AddressInInterfaces(&gPDSDLNetwork_RecvPacket->address)) {
+//        return NULL;
+//    }
     messageType = GetMessageTypeFromMessage((char*)gPDSDLNetwork_RecvPacket->data);
     if (messageType == NETMSGID_DETAILS) {
         if (gNet_mode == eNet_mode_host) {
@@ -350,10 +373,7 @@ tNet_message* SDLNetwork_PDNetGetNextMessage(tNet_game_details* pDetails, void**
             gPDSDLNetwork_SendPacket->len = strlen(gSend_buffer);
             memcpy(gPDSDLNetwork_SendPacket->data, gSend_buffer, gPDSDLNetwork_SendPacket->len);
             gPDSDLNetwork_SendPacket->address = gPDSDLNetwork_RecvPacket->address;
-            r = SDLNet_UDP_Send(gPDSDLNetwork_Socket, -1, gPDSDLNetwork_SendPacket);
-            if (r == -1) {
-                dr_dprintf("SDLNet_UDP_Send failed: %s", SDLNet_GetError());
-            }
+            SendMessage(gPDSDLNetwork_Socket, gPDSDLNetwork_SendPacket);
             return NULL;
         }
     } else if (messageType != 2) {
