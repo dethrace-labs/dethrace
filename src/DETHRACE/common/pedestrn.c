@@ -376,10 +376,10 @@ int BurstPedestrian(tPedestrian_data* pPedestrian, float pSplattitudinalitude, i
     tU32 the_time;
     LOG_TRACE("(%p, %f, %d)", pPedestrian, pSplattitudinalitude, pAllow_explosion);
 
-    #if defined(DETHRACE_FIX_BUGS)
-        min_speed = 0;
-        max_speed = 0;
-    #endif
+#if defined(DETHRACE_FIX_BUGS)
+    min_speed = 0;
+    max_speed = 0;
+#endif
     exploded = 0;
     for (i = 0; i < COUNT_OF(gPed_gib_counts); i++) {
         for (j = 0; j < gPed_size_counts[i]; j++) {
@@ -2765,7 +2765,7 @@ void LoadInPedestrians(FILE* pF, int pSubs_count, tPed_subs* pSubs_array) {
     duplicates_found = 0;
     gTotal_peds = 0;
     gFlag_waving_bastard = NULL;
-    gPedestrians_on = 1;
+    gPedestrians_on = 0;
     gPed_scale_factor = 1.0f;
     gAttracted_pedestrians = 0;
     gExploding_pedestrians = 0;
@@ -3400,11 +3400,11 @@ void DropPedPoint() {
 void DropInitPedPoint() {
     LOG_TRACE("()");
 
-    #if defined(DETHRACE_FIX_BUGS)
-        if (gPath_actor == NULL) {
-            return;
-        }
-    #endif
+#if defined(DETHRACE_FIX_BUGS)
+    if (gPath_actor == NULL) {
+        return;
+    }
+#endif
     gInit_ped_instruc = gPed_instruc_count;
     DropPedPoint2();
     NewTextHeadupSlot(4, 0, 2000, -1, "Dropped initial pedestrian point");

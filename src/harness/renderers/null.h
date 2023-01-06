@@ -1,7 +1,7 @@
 #include "renderer.h"
 
 void Null_Init() {}
-void Null_BeginFrame(br_actor* camera, br_pixelmap* colour_buffer) {}
+void Null_BeginFrame(br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer) {}
 void Null_EndFrame() {}
 void Null_SetPalette(uint8_t* palette) {}
 void Null_RenderFullScreenQuad(uint8_t* src) {}
@@ -11,7 +11,7 @@ void Null_ClearBuffers() {}
 void Null_BufferTexture(br_pixelmap* pm) {}
 void Null_BufferMaterial(br_material* mat) {}
 void Null_BufferModel(br_model* model) {}
-void Null_FlushBuffers(br_pixelmap* color_buffer, br_pixelmap* depth_buffer) {}
+void Null_FlushBuffers() {}
 void Null_GetRenderSize(int* width, int* height) {
     *width = 640;
     *height = 480;

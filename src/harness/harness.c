@@ -20,8 +20,6 @@ harness_br_renderer* renderer_state;
 br_pixelmap* last_dst = NULL;
 br_pixelmap* last_src = NULL;
 
-br_pixelmap *last_colour_buffer, *last_depth_buffer;
-
 unsigned int last_frame_time = 0;
 int force_nullrenderer = 0;
 
@@ -371,9 +369,7 @@ int Harness_CalculateFrameDelay() {
 
 // Begin 3d scene
 void Harness_Hook_BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer) {
-    last_colour_buffer = colour_buffer;
-    last_depth_buffer = depth_buffer;
-    renderer->BeginScene(camera, colour_buffer);
+    renderer->BeginScene(camera, colour_buffer, depth_buffer);
 }
 
 void Harness_Hook_BrZbSceneRenderAdd(br_actor* tree) {
@@ -384,7 +380,7 @@ void Harness_Hook_renderFaces(br_actor* actor, br_model* model, br_material* mat
 }
 
 void Harness_Hook_BrZbSceneRenderEnd() {
-    renderer->FlushBuffers(last_colour_buffer, last_depth_buffer);
+    renderer->FlushBuffers();
     renderer->EndScene();
 }
 
@@ -415,7 +411,7 @@ void Harness_Hook_PDSetKeyArray() {
 }
 
 void Harness_Hook_FlushRenderer() {
-    renderer->FlushBuffers(last_colour_buffer, last_depth_buffer);
+    renderer->FlushBuffers();
 }
 
 void Harness_Hook_BrMaterialUpdate(br_material* mat, br_uint_16 flags) {

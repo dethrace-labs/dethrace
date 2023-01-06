@@ -41,6 +41,7 @@ tStored_material* NewStoredMaterial() {
     ctx->index_base = -1;
     ctx->pixelmap = NULL;
     ctx->shade_table = NULL;
+    ctx->index_blend = NULL;
     ctx->identifier[0] = '\0';
     return ctx;
 }
