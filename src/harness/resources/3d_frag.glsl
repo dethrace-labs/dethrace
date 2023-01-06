@@ -47,7 +47,6 @@ void main() {
             uint fb_color = texelFetch(u_blend_input, ivec2(gl_FragCoord.xy), 0).r;
             uint blended_color = texelFetch(u_blend_table, ivec2(out_palette_index, fb_color), 0).r;
             out_palette_index = blended_color;
-            out_palette_index = 2u;
         }
     }
     // color 0 is always transparent

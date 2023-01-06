@@ -298,8 +298,6 @@ void GLRenderer_SetPalette(uint8_t* rgba_colors) {
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, palette_texture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 256, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, gl_palette);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     // reset active texture back to default
     glActiveTexture(GL_TEXTURE0);
@@ -317,9 +315,6 @@ void GLRenderer_SetShadeTable(br_pixelmap* table) {
     tStored_pixelmap* stored = table->stored;
     glBindTexture(GL_TEXTURE_2D, stored->id);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
     // reset active texture back to default
     glActiveTexture(GL_TEXTURE0);
     last_shade_table = table;
@@ -331,8 +326,6 @@ void GLRenderer_SetBlendTable(br_pixelmap* table) {
     glActiveTexture(GL_TEXTURE3);
     tStored_pixelmap* stored = table->stored;
     glBindTexture(GL_TEXTURE_2D, stored->id);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     if (!generated_blend_input_for_this_frame) {
         glBindTexture(GL_TEXTURE_2D, blend_input_texture);
@@ -340,8 +333,6 @@ void GLRenderer_SetBlendTable(br_pixelmap* table) {
         glActiveTexture(GL_TEXTURE4);
         glBindTexture(GL_TEXTURE_2D, blend_input_texture);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_R8UI, render_width, render_height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, last_colour_buffer->pixels);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         generated_blend_input_for_this_frame = 1;
     }
 
