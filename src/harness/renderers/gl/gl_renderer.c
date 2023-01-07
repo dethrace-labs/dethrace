@@ -12,9 +12,6 @@
 #include <stdio.h>
 #include <string.h>
 
-extern float gCamera_hither;
-extern float gCamera_yon;
-
 static GLuint screen_buffer_vao, screen_buffer_ebo;
 static GLuint screen_texture, palette_texture, depth_texture;
 
@@ -28,15 +25,13 @@ static uint16_t* depth_buffer_flip_pixels;
 static int window_width, window_height, render_width, render_height;
 static int vp_x, vp_y, vp_width, vp_height;
 
-static br_pixelmap* last_shade_table = NULL;
+static br_pixelmap *last_colour_buffer, *last_depth_buffer, *last_shade_table;
 static int dirty_buffers = 0;
 
-br_pixelmap *last_colour_buffer, *last_depth_buffer;
-
 static GLuint blend_input_texture;
-int generated_blend_input_for_this_frame = 0;
+static int generated_blend_input_for_this_frame = 0;
 
-tStored_material* current_material;
+static tStored_material* current_material;
 
 struct {
     GLuint texture_pixelmap;
@@ -55,10 +50,6 @@ struct {
 struct {
     GLuint texture_pixelmap, palette;
 } uniforms_2d;
-
-struct {
-    GLuint texture_pixelmap, palette;
-} uniforms_2dpp;
 
 GLuint CreateShaderProgram(char* name, const char* vertex_shader, const int vertex_shader_len, const char* fragment_shader, const int fragment_shader_len) {
     int success;
@@ -396,7 +387,7 @@ void GLRenderer_EndScene() {
     //  switch back to default fb
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    CHECK_GL_ERROR("GLRenderer_RenderFullScreenQuad");
+    CHECK_GL_ERROR("GLRenderer_EndScene");
     generated_blend_input_for_this_frame = 0;
 }
 
@@ -405,12 +396,12 @@ void GLRenderer_FullScreenQuad(uint8_t* screen_buffer) {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDisable(GL_DEPTH_TEST);
 
-    glUseProgram(shader_program_2d);
     glBindTexture(GL_TEXTURE_2D, screen_texture);
-
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R8UI, render_width, render_height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, screen_buffer);
+
     glBindVertexArray(screen_buffer_vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, screen_buffer_ebo);
+    glUseProgram(shader_program_2d);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
     CHECK_GL_ERROR("GLRenderer_RenderFullScreenQuad");

@@ -100,7 +100,7 @@ void StripBlendedFaces(br_actor* pActor, br_model* pModel) {
     changed_one = 0;
     face = &pModel->faces[0];
     for (i = 0; i < pModel->nfaces; i++, face++) {
-        if (face->material != NULL && face->material->identifier != NULL && (face->material->identifier[0] == '!' && face->material->identifier[1] != '!' && gDefault_blend_pc != 0 || face->material->identifier[1] == '\\')) {
+        if (face->material != NULL && face->material->identifier != NULL && ((face->material->identifier[0] == '!' && face->material->identifier[1] != '!' && gDefault_blend_pc != 0) || face->material->identifier[1] == '\\')) {
             if (gMr_blendy == NULL) {
                 gMr_blendy = BrActorAllocate(BR_ACTOR_MODEL, NULL);
                 gMr_blendy->render_style = BR_RSTYLE_NONE;
