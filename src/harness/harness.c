@@ -515,3 +515,7 @@ tPlayer_ID Harness_Hook_PDNetExtractPlayerID(tNet_game_details* pDetails) {
 int Harness_Hook_NetSendto(char* message, int size, void* pAddress) {
     return renderer->NetSendto(message, size, pAddress);
 }
+
+void Harness_Hook_CopyAddress(void* pDest, const void* pSrc) {
+    renderer->NetCopyAddress(pDest, pSrc);
+}

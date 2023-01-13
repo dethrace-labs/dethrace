@@ -98,7 +98,7 @@ int GetMessageTypeFromMessage(char* pMessage_str) {
     int msg_type_int;
     LOG_TRACE("(\"%s\")", pMessage_str);
 
-    real_msg = pMessage_str + 4;
+    real_msg = &pMessage_str[4];
     msg_type_int = 0;
 
     // FIXME: "CW95MSG" value is used in and depends on platform
@@ -372,7 +372,7 @@ int PDNetHostGame(tNet_game_details* pDetails, char* pHost_name, void** pHost_ad
 int PDNetJoinGame(tNet_game_details* pDetails, char* pPlayer_name) {
     LOG_TRACE("(%p, \"%s\")", pDetails, pPlayer_name);
 
-    // dr_dprintf("PDNetJoinGame()");
+    dr_dprintf("PDNetJoinGame()");
     return 0;
 }
 
@@ -380,7 +380,7 @@ int PDNetJoinGame(tNet_game_details* pDetails, char* pPlayer_name) {
 void PDNetLeaveGame(tNet_game_details* pDetails) {
     LOG_TRACE("(%p)", pDetails);
     
-    // dr_dprintf("PDNetLeaveGame()");
+    dr_dprintf("PDNetLeaveGame()");
 }
 
 // IDA: void __usercall PDNetHostFinishGame(tNet_game_details *pDetails@<EAX>)
@@ -393,7 +393,9 @@ void PDNetHostFinishGame(tNet_game_details* pDetails) {
 // IDA: tU32 __usercall PDNetExtractGameID@<EAX>(tNet_game_details *pDetails@<EAX>)
 tU32 PDNetExtractGameID(tNet_game_details* pDetails) {
     LOG_TRACE("(%p)", pDetails);
-    NOT_IMPLEMENTED();
+
+    // FIXME: this is shared with PDNetExtractPlayerID ==> rename name of hook
+    return Harness_Hook_PDNetExtractPlayerID(pDetails);
 }
 
 // IDA: tPlayer_ID __usercall PDNetExtractPlayerID@<EAX>(tNet_game_details *pDetails@<EAX>)

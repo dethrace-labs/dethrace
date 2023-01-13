@@ -469,13 +469,22 @@ int NewNetGameDown(int* pCurrent_choice, int* pCurrent_mode) {
 // IDA: void __usercall DisposeJoinableGame(int pIndex@<EAX>)
 void DisposeJoinableGame(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+
+    LOG_WARN("DisposeJoinableGame(%d)", pIndex);
+    NetDisposeGameDetails(gGames_to_join[pIndex].game);
+    gGames_to_join[pIndex].game = NULL;
 }
 
 // IDA: void __usercall DrawAnItem(int pX@<EAX>, int pY_index@<EDX>, int pFont_index@<EBX>, char *pText@<ECX>)
 void DrawAnItem__newgame(int pX, int pY_index, int pFont_index, char* pText) {
     LOG_TRACE("(%d, %d, %d, \"%s\")", pX, pY_index, pFont_index, pText);
-    NOT_IMPLEMENTED();
+
+    TransDRPixelmapText(gBack_screen,
+        pX,
+        gCurrent_graf_data->joinable_games_y + gCurrent_graf_data->joinable_games_y_pitch * pY_index,
+        &gFonts[pFont_index],
+        pText,
+        pX + DRTextWidth(&gFonts[pFont_index], pText));
 }
 
 // IDA: void __usercall DrawColumnHeading(int pStr_index@<EAX>, int pX@<EDX>)
@@ -563,18 +572,18 @@ void DrawGames(int pCurrent_choice, int pCurrent_mode) {
         if (i == gLast_graph_sel__newgame) {
             DrawRectangle(gBack_screen,
                 gCurrent_graf_data->joinable_games_sel_left,
-                gCurrent_graf_data->joinable_games_y + gCurrent_graf_data->joinable_games_y_pitch * current_index + gCurrent_graf_data->joinable_games_sel_top_marg,
+                gCurrent_graf_data->joinable_games_y + gCurrent_graf_data->joinable_games_sel_top_marg + gCurrent_graf_data->joinable_games_y_pitch * current_index,
                 gCurrent_graf_data->joinable_games_sel_right - 1,
-                gCurrent_graf_data->joinable_games_y + gCurrent_graf_data->joinable_games_y_pitch * current_index + gCurrent_graf_data->joinable_games_sel_bot_marg - 1,
+                gCurrent_graf_data->joinable_games_y + gCurrent_graf_data->joinable_games_sel_bot_marg + gCurrent_graf_data->joinable_games_y_pitch * current_index - 1,
                 45);
         }
         current_index++;
     }
 
      if (current_index != 0 && (gCurrent_game_selection == 0 || 
-            ((gLast_graph_sel__newgame >= 0 && gGames_to_join[gLast_graph_sel__newgame].game == NULL)
+            (gLast_graph_sel__newgame >= 0 && (gGames_to_join[gLast_graph_sel__newgame].game == NULL
                 || (!gGames_to_join[gLast_graph_sel__newgame].game->options.open_game && !gGames_to_join[gLast_graph_sel__newgame].game->no_races_yet)
-                || gGames_to_join[gLast_graph_sel__newgame].game->num_players > 5))) {
+                || gGames_to_join[gLast_graph_sel__newgame].game->num_players > 5)))) {
         gCurrent_game_selection = 1;
         for (i = 0; i < COUNT_OF(gGames_to_join); i++) {
             if (gGames_to_join[i].game != NULL && (gGames_to_join[i].game->options.open_game || gGames_to_join[i].game->no_races_yet) && gGames_to_join[i].game->num_players <= 5) {
@@ -585,6 +594,9 @@ void DrawGames(int pCurrent_choice, int pCurrent_mode) {
         }
     }
     if (pCurrent_mode != 0 &&
+#if defined(DETHRACE_FIX_BUGS)
+        (gLast_graph_sel__newgame >= 0) &&
+#endif
             (current_index == 0
                 || gGames_to_join[gLast_graph_sel__newgame].game == NULL
                 || (!gGames_to_join[gLast_graph_sel__newgame].game->options.open_game && !gGames_to_join[gLast_graph_sel__newgame].game->no_races_yet)

@@ -35,7 +35,8 @@ typedef struct tRenderer {
     tNet_message* (*PDNetGetNextMessage)(tNet_game_details* pDetails, void** pSender_address);
     int (*PDNetHostGame)(tNet_game_details* pDetails, char* pHost_name, void** pHost_address);
     tPlayer_ID (*PDNetExtractPlayerID)(tNet_game_details* pDetails);
-    int (*NetSendto)(char* message, int size, void* pAddress);
+    int (*NetSendto)(char* message, int size, const void* pAddress);
+    void (*NetCopyAddress)(void* pDest, void* pSrc);
 } tRenderer;
 
 #endif

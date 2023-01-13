@@ -31,4 +31,6 @@ tPlayer_ID SDLNetwork_PDNetExtractPlayerID(tNet_game_details* pDetails);
 
 int SDLNetwork_NetSendto(char* message, int size, void* pAddress);
 
+void SDLNetwork_CopyAddress(void* pDest, const void* pSrc);
+
 #endif

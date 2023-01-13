@@ -9,6 +9,7 @@
 #include "harness/trace.h"
 #include "loading.h"
 #include "netgame.h"
+#include "newgame.h"
 #include "oil.h"
 #include "opponent.h"
 #include "pedestrn.h"
@@ -30,13 +31,17 @@ tU32 gMess_min_flags;
 tU32 gGuarantee_number;
 int gNet_service_disable = 0;
 int gIn_net_service = 0;
-int gPlayer_list_batch_number;
-int gOnly_receive_guarantee_replies;
+int gPlayer_list_batch_number = 0;
+int gOnly_receive_guarantee_replies = 0;
 void* gMessage_to_free;
 tNet_message* gBroadcast_stack;
 tNet_message* gTo_host_stack;
-tU32 gLast_flush_message;
-int gRace_only_flags[33];
+tU32 gLast_flush_message = 0;
+int gRace_only_flags[33] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1,
+    0
+};
 int gJoin_list_mode;
 tNet_game_player_info gNew_net_players[6];
 tGuaranteed_message gGuarantee_list[150];
@@ -195,7 +200,7 @@ void LeaveTempGame() {
     if (gCurrent_join_poll_game != NULL) {
         NetLeaveGameLowLevel(gCurrent_join_poll_game);
     }
-    gJoin_request_denied = 1;
+    gTime_for_next_one = 1;
     gCurrent_join_poll_game = NULL;
 }
 
@@ -212,20 +217,21 @@ void DisposeCurrentJoinPollGame() {
 // IDA: void __cdecl DoNextJoinPoll()
 void DoNextJoinPoll() {
     tNet_message* the_message;
+    static tU32 time_last_poll = 0;
     LOG_TRACE("()");
 
-    if (gJoin_request_denied) {
+    if (gTime_for_next_one) {
         gCurrent_join_poll_game = NetAllocatePIDGameDetails();
         if (gCurrent_join_poll_game != NULL) {
             if (PDNetGetNextJoinGame(gCurrent_join_poll_game, gJoin_poll_index)) {
                 if (NetJoinGameLowLevel(gCurrent_join_poll_game, "!TEMP!")) {
                     DisposeCurrentJoinPollGame();
                 } else {
-                    gJoin_request_denied = 0;
+                    gTime_for_next_one = 0;
                     the_message = NetBuildMessage(NETMSGID_SENDMEDETAILS, 0);
                     NetSendMessageToAddress(gCurrent_join_poll_game, the_message, gCurrent_join_poll_game);
                     gBastard_has_answered = 0;
-                    gLast_player_list_received = PDGetTotalTime();
+                    time_last_poll = PDGetTotalTime();
                 }
                 gJoin_poll_index++;
             } else {
@@ -240,7 +246,7 @@ void DoNextJoinPoll() {
             gAdd_proc(gCurrent_join_poll_game);
             LeaveTempGame();
         } else {
-            if (PDGetTotalTime() - gLast_player_list_received > 10000) {
+            if (PDGetTotalTime() - time_last_poll > 10000) {
                 LeaveTempGame();
                 DisposeCurrentJoinPollGame();
             }
@@ -255,7 +261,7 @@ void NetStartProducingJoinList(void (*pAdd_proc)(tNet_game_details*)) {
     gAdd_proc = pAdd_proc;
     gJoin_list_mode = 1;
     gBastard_has_answered = 0;
-    gJoin_request_denied = 1;
+    gTime_for_next_one = 1;
     gJoin_poll_index = 0;
     gCurrent_join_poll_game = NULL;
     PDNetStartProducingJoinList();
@@ -284,6 +290,7 @@ void NetDisposePIDGameInfo(tNet_game_details* pDetails) {
 void NetDisposeGameDetails(tNet_game_details* pDetails) {
     LOG_TRACE("(%p)", pDetails);
 
+    LOG_WARN("NetDisposeGameDetails(%p)", pDetails);
     if (pDetails != NULL) {
         NetDisposePIDGameInfo(pDetails);
     }
@@ -617,14 +624,63 @@ int NetJoinGame(tNet_game_details* pDetails, char* pPlayer_name, int pCar_index)
     tNet_message* the_message;
     tU32 start_time;
     LOG_TRACE("(%p, \"%s\", %d)", pDetails, pPlayer_name, pCar_index);
-    NOT_IMPLEMENTED();
+
+    result = NetJoinGameLowLevel(pDetails, pPlayer_name);
+    if (result != 0) {
+        return result;
+    }
+    DisableNetService();
+    gReceiving_new_players = 0;
+    gNet_mode = eNet_mode_client;
+    gCurrent_net_game = pDetails;
+    gLocal_net_ID = NetExtractPlayerID(pDetails);
+    gNumber_of_net_players = 0;
+    gLast_player_list_received = 0;
+    gJoin_request_denied = 0;
+    gCar_was_taken = 0;
+    gHost_died = 0;
+    the_message = NetBuildMessage(NETMSGID_JOIN, 0);
+    FillInThisPlayer(pDetails, &the_message->contents.data.join.player_info, pCar_index, 0);
+    ReenableNetService();
+    NetGuaranteedSendMessageToAddress(pDetails, the_message, pDetails, NULL);
+    start_time = PDGetTotalTime();
+    while (1) {
+        NetService(0);
+        if (gNumber_of_net_players != 0) {
+            break;
+        }
+        if (PDGetTotalTime() - start_time >= 30000 || gJoin_request_denied || gHost_died) {
+            break;
+        }
+    }
+    DisableNetService();
+    InitialisePlayerStati();
+    if (gNumber_of_net_players == 0) {
+        ReenableNetService();
+        if (gJoin_request_denied && gCar_was_taken) {
+            result = -4;
+        } else {
+            gNet_mode = eNet_mode_none;
+#if !defined(DETHRACE_FIX_BUGS)
+            // Avoid double free
+            NetDisposeGameDetails(gCurrent_net_game);
+#endif
+            gCurrent_net_game = NULL;
+            if (gJoin_request_denied) {
+                result = -1;
+            } else {
+                result = -2;
+            }
+        }
+    }
+    return result;
 }
 
 // IDA: void __usercall NetObtainSystemUserName(char *pName@<EAX>, int pMax_length@<EDX>)
 void NetObtainSystemUserName(char* pName, int pMax_length) {
 
     PDNetObtainSystemUserName(pName, pMax_length);
-    pName[9] = 0;
+    pName[9] = '\0';
 }
 
 // IDA: tU32 __usercall NetExtractGameID@<EAX>(tNet_game_details *pDetails@<EAX>)
@@ -847,7 +903,7 @@ tNet_message* NetAllocateMessage(int pSize) {
     LOG_TRACE("(%d)", pSize);
 
     pointer = NULL;
-    if (pSize <= sizeof(tMin_message) - sizeof(int)) {
+    if (pSize <= sizeof(tMin_message) - sizeof(void*)) {
         for (i = 0; i < MIN_MESSAGES_CAPACITY; i++) {
             if (((tNet_message*)&gMin_messages[rr_min])->contents.header.type == FREE_NETMSGID) {
                 pointer = &gMin_messages[rr_min];
@@ -859,7 +915,7 @@ tNet_message* NetAllocateMessage(int pSize) {
             }
         }
     }
-    if (pointer == NULL && pSize <= sizeof(tMid_message) - sizeof(int)) {
+    if (pointer == NULL && pSize <= sizeof(tMid_message) - sizeof(void*)) {
         for (i = 0; i < MID_MESSAGES_CAPACITY; i++) {
             if (((tNet_message*)&gMid_messages[rr_mid])->contents.header.type == FREE_NETMSGID) {
                 pointer = &gMid_messages[rr_mid];
@@ -871,7 +927,7 @@ tNet_message* NetAllocateMessage(int pSize) {
             }
         }
     }
-    if (pointer == NULL && pSize <= sizeof(tMax_message) - sizeof(int)) {
+    if (pointer == NULL && pSize <= sizeof(tMax_message) - sizeof(void*)) {
         for (i = 0; i < MAX_MESSAGES_CAPACITY; i++) {
             if (((tNet_message*)&gMax_messages[rr_max])->contents.header.type == FREE_NETMSGID) {
                 pointer = &gMax_messages[rr_max];
@@ -942,13 +998,24 @@ tNet_message* NetGetNextMessage(tNet_game_details* pDetails, void** pSender_addr
 void ReceivedSendMeDetails(tNet_contents* pContents, void* pSender_address) {
     tNet_message* message;
     LOG_TRACE("(%p, %p)", pContents, pSender_address);
-    NOT_IMPLEMENTED();
+
+    if (gDont_allow_joiners) {
+        return;
+    }
+    message = NetBuildMessage(NETMSGID_DETAILS, 0);
+    memcpy(&message->contents.data.details.details, gCurrent_net_game, sizeof(*gCurrent_net_game));
+    NetSendMessageToAddress(gCurrent_net_game, message, pSender_address);
 }
 
 // IDA: void __usercall ReceivedDetails(tNet_contents *pContents@<EAX>)
 void ReceivedDetails(tNet_contents* pContents) {
     LOG_TRACE("(%p)", pContents);
-    NOT_IMPLEMENTED();
+
+    if (gCurrent_join_poll_game == NULL) {
+        return;
+    }
+    gBastard_has_answered = 1;
+    memcpy(gCurrent_join_poll_game, &pContents->data.details.details, sizeof(*gCurrent_join_poll_game));
 }
 
 // IDA: void __cdecl SendOutPlayerList()
@@ -956,7 +1023,27 @@ void SendOutPlayerList() {
     tNet_message* message;
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gCurrent_net_game->num_players = gNumber_of_net_players;
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        message = NetBuildMessage(NETMSGID_NEWPLAYERLIST, 1);
+        message->contents.data.player_list.player.this_players_time_stamp = gNumber_of_net_players;
+        message->contents.data.player_list.player.last_heard_from_him = i;
+        message->contents.data.player_list.player.reposition_time = gPlayer_list_batch_number;
+        // FIXME: tNet_game_player_info contains architecture dependant data types (=pointers)
+        memcpy(&message->contents.data.player_list.player, &gNet_players[i], sizeof(gNet_players[i]));
+        NetGuaranteedSendMessageToAllPlayers(gCurrent_net_game, message, NULL);
+    }
+    gPlayer_list_batch_number++;
+    if (gInitialised_grid) {
+        SetUpNetCarPositions();
+        if (gStart_race_sent) {
+            gSynch_race_start = 1;
+            for (i = 1; i < gNumber_of_net_players; i++) {
+                gNet_players[i].awaiting_confirmation = 1;
+            }
+        }
+    }
 }
 
 // IDA: void __usercall ReceivedJoin(tNet_contents *pContents@<EAX>, void *pSender_address@<EDX>)
@@ -967,7 +1054,51 @@ void ReceivedJoin(tNet_contents* pContents, void* pSender_address) {
     tNet_message* message;
     tNet_game_player_info* new_players;
     LOG_TRACE("(%p, %p)", pContents, pSender_address);
-    NOT_IMPLEMENTED();
+
+    new_player_count = gNumber_of_net_players + 1;
+    new_players = BrMemAllocate(new_player_count * sizeof(tNet_game_player_info), kMem_player_list_join);
+    memcpy(new_players, gNet_players, gNumber_of_net_players * sizeof(tNet_game_player_info));
+    if ((!gCurrent_net_game->options.open_game && gProgram_state.racing) || gCurrent_net_game->num_players > 5 || gDont_allow_joiners) {
+        message = NetBuildMessage(NETMSGID_NEWPLAYERLIST, 0);
+        // Send player count = 0 when race has already begun or is full
+        message->contents.data.player_list.number_of_players = 0;
+        NetSendMessageToAddress(gCurrent_net_game, message, pSender_address);
+    } else {
+        slot_index = -1;
+        for (i = 0; i < gNumber_of_net_players; i++) {
+            if (new_players[i].ID == pContents->data.join.player_info.ID) {
+                return;
+            }
+        }
+        if (pContents->data.join.player_info.car_index < 0) {
+            pContents->data.join.player_info.car_index = PickARandomCar();
+        } else {
+            for (i = 0; i < gNumber_of_net_players; i++) {
+                if (gNet_players[i].car_index == pContents->data.join.player_info.car_index) {
+                    message = NetBuildMessage(NETMSGID_NEWPLAYERLIST, 0);
+                    // Send player count = -1 when selected car is unavailable
+                    message->contents.data.player_list.number_of_players = -1;
+                    NetSendMessageToAddress(gCurrent_net_game, message, pSender_address);
+                    return;
+                }
+            }
+        }
+        if (pContents->data.join.player_info.car_index >= 0) {
+            gCar_details[pContents->data.join.player_info.car_index].ownership = eCar_owner_someone;
+        }
+        // FIXME: tNet_game_player_info contains arch dependent data types (pointers)
+        memcpy(&new_players[gNumber_of_net_players], &pContents->data.join.player_info, sizeof(tNet_game_player_info));
+        new_players[gNumber_of_net_players].player_status = ePlayer_status_loading;
+        new_players[gNumber_of_net_players].last_heard_from_him = PDGetTotalTime();
+        new_players[gNumber_of_net_players].grid_position_set = 0;
+        if (new_players[gNumber_of_net_players].player_name[0] == '\0') {
+            sprintf(new_players[gNumber_of_net_players].player_name, "%s %d", "PLAYER", gNumber_of_net_players);
+        }
+        NetSetPlayerSystemInfo(&new_players[gNumber_of_net_players], pSender_address);
+        NetPlayersChanged(new_player_count, new_players);
+        BrMemFree(new_players);
+        SendOutPlayerList();
+    }
 }
 
 // IDA: void __usercall KickPlayerOut(tPlayer_ID pID@<EAX>)
@@ -1108,7 +1239,12 @@ void ReceivedStartRace(tNet_contents* pContents) {
 void ReceivedGuaranteeReply(tNet_contents* pContents) {
     int i;
     LOG_TRACE("(%p)", pContents);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < gNext_guarantee; i++) {
+        if (gGuarantee_list[i].guarantee_number == pContents->data.reply.guarantee_number) {
+            gGuarantee_list[i].recieved = 1;
+        }
+    }
 }
 
 // IDA: void __usercall ReceivedHeadup(tNet_contents *pContents@<EAX>)
@@ -1135,14 +1271,25 @@ void ReceivedHostReply(tNet_contents* pContents) {
 void SendGuaranteeReply(tNet_message* pMessage, void* pSender_address) {
     tNet_message* message;
     LOG_TRACE("(%p, %p)", pMessage, pSender_address);
-    NOT_IMPLEMENTED();
+
+    message = NetBuildMessage(NETMSGID_GUARANTEEREPLY, 0);
+    message->contents.data.reply.guarantee_number = pMessage->guarantee_number;
+    pMessage->guarantee_number = 0;
+    NetSendMessageToAddress(gCurrent_net_game, message, pSender_address);
 }
 
 // IDA: int __usercall PlayerIsInList@<EAX>(tPlayer_ID pID@<EAX>)
 int PlayerIsInList(tPlayer_ID pID) {
     int i;
     LOG_TRACE("(%d)", pID);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (gNet_players[i].ID == pID) {
+            gNet_players[i].last_heard_from_him = PDGetTotalTime();
+            return 1;
+        }
+    }
+    return 0;
 }
 
 // IDA: void __usercall ReceivedTimeSync(tNet_contents *pContents@<EAX>, tNet_message *pMessage@<EDX>, tU32 pReceive_time@<EBX>)
@@ -1197,7 +1344,15 @@ void ReceivedCarDetailsReq(tNet_contents* pContents, void* pSender_address) {
     tNet_message* message;
     int i;
     LOG_TRACE("(%p, %p)", pContents, pSender_address);
-    NOT_IMPLEMENTED();
+
+    message = NetBuildMessage(NETMSGID_CARDETAILS, 0);
+    message->contents.data.car_details.count = gNumber_of_net_players;
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        message->contents.data.car_details.details[i].car_index = gNet_players[i].car_index;
+        memcpy(message->contents.data.car_details.details[i].owner, gNet_players[i].player_name, sizeof(gNet_players[i].player_name));
+        message->contents.data.car_details.details[i].owner[sizeof(gNet_players[i].player_name)-1] = '\0';
+    }
+    NetGuaranteedSendMessageToAddress(gCurrent_net_game, message, pSender_address, NULL);
 }
 
 // IDA: void __usercall ReceivedCarDetails(tNet_contents *pContents@<EAX>)
@@ -1205,7 +1360,17 @@ void ReceivedCarDetails(tNet_contents* pContents) {
     int i;
     int j;
     LOG_TRACE("(%p)", pContents);
-    NOT_IMPLEMENTED();
+
+    SetNetAvailability(gNet_options);
+    for (i = 0; i < gNumber_of_racers; i++) {
+        for (j = 0; j < pContents->data.car_details.count; j++) {
+            if (i == pContents->data.car_details.details[j].car_index) {
+                gCar_details[i].ownership = eCar_owner_someone;
+                strcpy(gCar_details[i].name, pContents->data.car_details.details[i].owner);
+            }
+        }
+    }
+    gReceived_car_details = 1;
 }
 
 // IDA: void __usercall ReceivedGameScores(tNet_contents *pContents@<EAX>)
@@ -1225,7 +1390,7 @@ void ReceivedMessage(tNet_message* pMessage, void* pSender_address, tU32 pReceiv
     if (pMessage->guarantee_number != 0) {
         SendGuaranteeReply(pMessage, pSender_address);
     }
-    if ((gProgram_state.racing || gRace_only_flags[pMessage->contents.header.type == 0])
+    if ((gProgram_state.racing || !gRace_only_flags[pMessage->contents.header.type])
         && (!gOnly_receive_guarantee_replies || pMessage->contents.header.type == NETMSGID_GUARANTEEREPLY)) {
         for (i = 0; i < pMessage->num_contents; i++) {
             if (contents->header.type <= NETMSGID_CARDETAILS || PlayerIsInList(pMessage->sender)) {
@@ -1522,8 +1687,33 @@ int NetGuaranteedSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* 
 
 // IDA: int __usercall NetGuaranteedSendMessageToAddress@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>, void *pAddress@<EBX>, int (*pNotifyFail)(tU32, tNet_message*)@<ECX>)
 int NetGuaranteedSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessage, void* pAddress, int (*pNotifyFail)(tU32, tNet_message*)) {
+    char buffer[256];  // Added by Dethrace
     LOG_TRACE("(%p, %p, %p, %p)", pDetails, pMessage, pAddress, pNotifyFail);
-    NOT_IMPLEMENTED();
+
+    if (gNet_mode == eNet_mode_none && !gJoin_list_mode) {
+        return -3;
+    }
+    pMessage->sender = gLocal_net_ID;
+    pMessage->senders_time_stamp = PDGetTotalTime();
+    if (gNext_guarantee >= 100) {
+        sprintf(buffer, "Guarantee list full %d", pMessage->contents.header.type);
+        NewTextHeadupSlot(4, 0, 500, -1, buffer);
+        pMessage->guarantee_number = 0;
+        return 0;
+    }
+    pMessage->guarantee_number = gGuarantee_number;
+    gGuarantee_list[gNext_guarantee].guarantee_number = gGuarantee_number;
+    gGuarantee_number++;
+    gGuarantee_list[gNext_guarantee].message = pMessage;
+    gGuarantee_list[gNext_guarantee].send_time = PDGetTotalTime();
+    gGuarantee_list[gNext_guarantee].next_resend_time = gGuarantee_list[gNext_guarantee].send_time + 100;
+    gGuarantee_list[gNext_guarantee].resend_period = 100;
+    Harness_Hook_CopyAddress(gGuarantee_list[gNext_guarantee].pd_address.pd_addr, pAddress);
+    gGuarantee_list[gNext_guarantee].NotifyFail = pNotifyFail;
+    gGuarantee_list[gNext_guarantee].recieved = 0;
+    gNext_guarantee++;
+    GetCheckSum(pMessage);
+    return PDNetSendMessageToAddress(pDetails, pMessage, pAddress);
 }
 
 // IDA: void __cdecl ResendGuaranteedMessages()

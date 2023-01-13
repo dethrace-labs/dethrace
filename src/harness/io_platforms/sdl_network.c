@@ -55,22 +55,68 @@ static int CompareAddress(IPaddress* ipAddress1, IPaddress* ipAddress2) {
     return !(ipAddress1->host == ipAddress2->host && ipAddress1->port == ipAddress2->port);
 }
 
-static int SendMessage(UDPsocket pFromSocket, UDPpacket* pPacket) {
+void SDLNetwork_CopyAddress(void* pDest, const void* pSrc) {
+    memcpy(pDest, pSrc, sizeof(IPaddress));
+}
+
+static void print_hex_message(br_uint_8* data, br_size_t size) {
+    size_t i;
+    int j;
+    char c;
+    for (i = 0; i < size; i++) {
+        for (j = 0; j < 16; j++) {
+            if (i + j < size) {
+                printf("%02x", data[i + j]);
+            } else {
+                printf("  ");
+            }
+            if (j % 2 == 1) {
+                printf(" ");
+            }
+        }
+        for (j = 0; j < 16; j++) {
+            if (i + j < size) {
+                c = data[i + j];
+                if (c >= ' ' && c <= '~') {
+                    printf("%c", c);
+                } else {
+                    printf("%c", '.');
+                }
+            } else {
+                printf(" ");
+            }
+        }
+        printf("\n");
+        i += 16;
+    }
+}
+
+static int SendMessage(UDPsocket pSocket, UDPpacket* pPacket) {
     int res;
 
 #ifdef DEBUG_NETWORKING
-    int i;
-    printf("Sending %d bytes to %s:", pPacket->len, FormatIPaddress(&pPacket->address));
-    for (i = 0; i < pPacket->len; i++) {
-        printf(" 0x%x", pPacket->data[i]);
-    }
-    printf("\n");
+    printf("Sending %d bytes to %s:\n", pPacket->len, FormatIPaddress(&pPacket->address));
+    print_hex_message(pPacket->data, pPacket->len);
 #endif
 
-    res = SDLNet_UDP_Send(pFromSocket, -1, pPacket);
+    res = SDLNet_UDP_Send(pSocket, -1, pPacket);
     if (res == -1) {
         dr_dprintf("SDLNet_UDP_Send failed: %s", SDLNet_GetError());
     }
+
+    return res;
+}
+
+static int ReceiveMessage(UDPsocket pSocket, UDPpacket* pPacket) {
+    int res;
+
+    res = SDLNet_UDP_Recv(pSocket, pPacket);
+#ifdef DEBUG_NETWORKING
+    if (res == 1) {
+        printf("Received %d bytes from %s:\n", pPacket->len, FormatIPaddress(&pPacket->address));
+        print_hex_message(pPacket->data, pPacket->len);
+    }
+#endif
 
     return res;
 }
@@ -233,6 +279,7 @@ int SDLNetwork_NetSendMessageToAddress(tNet_game_details* pDetails, tNet_message
 
     memcpy(gPDSDLNetwork_SendPacket->data, pMessage, pMessage->overall_size);
     gPDSDLNetwork_SendPacket->len = pMessage->overall_size;
+    SDLNetwork_CopyAddress(&gPDSDLNetwork_SendPacket->address, pAddress);
     r = SendMessage(gPDSDLNetwork_Socket, gPDSDLNetwork_SendPacket);
     if (r == -1) {
         dr_dprintf("PDNetSendMessageToAddress(): Error on send - %s", SDLNet_GetError());
@@ -301,7 +348,7 @@ int SDLNetwork_ReceiveHostResponses(void) {
     int already_registered;
 
     while (1) {
-        r = SDLNet_UDP_Recv(gPDSDLNetwork_Socket, gPDSDLNetwork_RecvPacket);
+        r = ReceiveMessage(gPDSDLNetwork_Socket, gPDSDLNetwork_RecvPacket);
         if (r == -1) {
             dr_dprintf("ReceiveHostResponses(SDLNet_UDP_Recv) failed: %s\n", SDLNet_GetError());
             return 1;
@@ -352,7 +399,7 @@ tNet_message* SDLNetwork_PDNetGetNextMessage(tNet_game_details* pDetails, void**
     int r;
     int messageType;
 
-    r = SDLNet_UDP_Recv(gPDSDLNetwork_Socket, gPDSDLNetwork_RecvPacket);
+    r = ReceiveMessage(gPDSDLNetwork_Socket, gPDSDLNetwork_RecvPacket);
     if (r == -1) {
         dr_dprintf("SDLNet_UDP_Recv() failed: %s", SDLNet_GetError());
         return NULL;
@@ -360,27 +407,27 @@ tNet_message* SDLNetwork_PDNetGetNextMessage(tNet_game_details* pDetails, void**
         return NULL;
     }
 
-    printf("Received message from %s\n", FormatIPaddress(&gPDSDLNetwork_RecvPacket->address));
-//    if (AddressInInterfaces(&gPDSDLNetwork_RecvPacket->address)) {
-//        return NULL;
-//    }
+    if (AddressInInterfaces(&gPDSDLNetwork_RecvPacket->address)) {
+        return NULL;
+    }
     messageType = GetMessageTypeFromMessage((char*)gPDSDLNetwork_RecvPacket->data);
     if (messageType == NETMSGID_DETAILS) {
+        // Received 'XXXXCW95MSG1`
         if (gNet_mode == eNet_mode_host) {
             dr_dprintf("PDNetGetNextMessage(): Received '%s' from '%s', replying to joiner", gPDSDLNetwork_RecvPacket->data, FormatIPaddress(&gPDSDLNetwork_RecvPacket->address));
+            // Answer with 'XXXXCW95MSG2'
             MakeMessageToSend(NETMSGID_JOIN);
-            gPDSDLNetwork_SendPacket->maxlen = COUNT_OF(gSend_buffer);
             gPDSDLNetwork_SendPacket->len = strlen(gSend_buffer);
             memcpy(gPDSDLNetwork_SendPacket->data, gSend_buffer, gPDSDLNetwork_SendPacket->len);
-            gPDSDLNetwork_SendPacket->address = gPDSDLNetwork_RecvPacket->address;
+            SDLNetwork_CopyAddress(&gPDSDLNetwork_SendPacket->address, &gPDSDLNetwork_RecvPacket->address);
             SendMessage(gPDSDLNetwork_Socket, gPDSDLNetwork_SendPacket);
             return NULL;
         }
     } else if (messageType != 2) {
-        message = NetAllocateMessage(gPDSDLNetwork_RecvPacket->len);
+        message = NetAllocateMessage(0x200);
         memcpy(message, gPDSDLNetwork_RecvPacket->data, gPDSDLNetwork_RecvPacket->len);
         dr_dprintf("PDNetGetNextMessage(): res is %d, received message type %d from '%s', passing up", r, message->contents.header.type, FormatIPaddress(&gPDSDLNetwork_RecvPacket->address));
-        gPDSDLNetwork_AddressBuffer = gPDSDLNetwork_RecvPacket->address;
+        SDLNetwork_CopyAddress(&gPDSDLNetwork_AddressBuffer, &gPDSDLNetwork_RecvPacket->address);
         *pSender_address = (void*)&gPDSDLNetwork_AddressBuffer;
         return message;
     }

@@ -60,6 +60,7 @@ tNet_message* Harness_Hook_PDNetGetNextMessage(tNet_game_details* pDetails, void
 int Harness_Hook_PDNetHostGame(tNet_game_details* pDetails, char* pHost_name, void** pHost_address);
 tPlayer_ID Harness_Hook_PDNetExtractPlayerID(tNet_game_details* pDetails);
 int Harness_Hook_NetSendto(char* message, int size, void* pAddress);
+void Harness_Hook_CopyAddress(void* pDest, const void* pSrc);
 #endif
 
 #endif

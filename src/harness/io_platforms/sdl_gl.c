@@ -174,6 +174,7 @@ tRenderer gl_renderer = {
     SDLNetwork_PDNetHostGame,
     SDLNetwork_PDNetExtractPlayerID,
     SDLNetwork_NetSendto,
+    SDLNetwork_CopyAddress,
 };
 
 tRenderer* Window_Create(char* title, int width, int height, int pRender_width, int pRender_height) {
