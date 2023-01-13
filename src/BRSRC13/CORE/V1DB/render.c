@@ -265,7 +265,38 @@ void BrDbSceneRenderBegin(br_actor* world, br_actor* camera) {
     br_token vtos_type;
     br_uint_32 dummy;
     LOG_TRACE("(%p, %p)", world, camera);
-    NOT_IMPLEMENTED();
+
+    // this is not complete
+    STUB_ONCE();
+
+/*
+ * Collect transforms from camera to root
+ *
+ * Make a stack of cumulative transforms for each level between
+ * the camera and the root - this is so that model->view
+ * transforms can use the shortest route, rather than via the root
+ */
+#define MAX_CAMERA_DEPTH 16
+    for (i = 0; i < MAX_CAMERA_DEPTH; i++)
+        v1db.camera_path[i].a = NULL;
+
+    i = camera->depth;
+    a = camera;
+    BrMatrix34Identity(&v1db.camera_path[i].m);
+    v1db.camera_path[i].transform_type = BR_TRANSFORM_IDENTITY;
+
+    for (; (i > 0) && (a != world); a = a->parent, i--) {
+        BrTransformToMatrix34(&tfm, &a->t);
+        BrMatrix34Mul(&v1db.camera_path[i - 1].m, &v1db.camera_path[i].m, &tfm);
+
+        v1db.camera_path[i - 1].transform_type = BrTransformCombineTypes(v1db.camera_path[i].transform_type, a->t.type);
+
+        v1db.camera_path[i].a = a;
+    }
+
+    if (world != a) {
+        // BrFailure("camera is not in world hierachy");
+    }
 }
 
 // IDA: br_renderbounds_cbfn* __cdecl BrDbSetRenderBoundsCallback(br_renderbounds_cbfn *new_cbfn)
@@ -291,7 +322,7 @@ void SetViewport(br_pixelmap* buffer) {
 void BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer) {
     // LOG_TRACE("(%p, %p, %p, %p)", world, camera, colour_buffer, depth_buffer);
 
-    // BrDbSceneRenderBegin(world, camera);
+    BrDbSceneRenderBegin(world, camera);
     Harness_Hook_BrZbSceneRenderBegin(world, camera, colour_buffer, depth_buffer);
 }
 

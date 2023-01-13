@@ -1551,9 +1551,9 @@ void RenderAFrame(int pDepth_mask_on) {
         x_shift = 0;
         y_shift = 0;
     }
-    old_camera_matrix = gCamera->t.t.mat;
+    BrMatrix34Copy(&old_camera_matrix, &gCamera->t.t.mat);
     if (gMirror_on__graphics) {
-        old_mirror_cam_matrix = gRearview_camera->t.t.mat;
+        BrMatrix34Copy(&old_mirror_cam_matrix, &gRearview_camera->t.t.mat);
     }
     if (cockpit_on) {
         gSheer_mat.m[2][1] = (double)y_shift / (double)gRender_screen->height;
@@ -1616,15 +1616,14 @@ void RenderAFrame(int pDepth_mask_on) {
             ProcessTrack(gUniverse_actor, &gProgram_state.track_spec, gCamera, &gCamera_to_world, 1);
         }
         RenderSplashes();
-	Harness_Hook_FlushRenderer(); /* Dethrace. Flush buffers into memory. */
+        Harness_Hook_FlushRenderer(); /* Dethrace. Flush buffers into memory. */
         RenderSmoke(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, gFrame_period);
         RenderSparks(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, gFrame_period);
         RenderProximityRays(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, gFrame_period);
         BrZbSceneRenderEnd();
     }
-    gCamera->t.t.mat = old_camera_matrix;
+    BrMatrix34Copy(&gCamera->t.t.mat, &old_camera_matrix);
     if (gMirror_on__graphics) {
-        // LOG_PANIC("mirror is on");
         BrPixelmapFill(gRearview_depth_buffer, 0xFFFFFFFF);
         gRendering_mirror = 1;
         DoSpecialCameraEffect(gRearview_camera, &gRearview_camera_to_world);
@@ -1645,7 +1644,7 @@ void RenderAFrame(int pDepth_mask_on) {
         }
         RenderSplashes();
         BrZbSceneRenderEnd();
-        gRearview_camera->t.t.mat = old_mirror_cam_matrix;
+        BrMatrix34Copy(&gRearview_camera->t.t.mat, &old_mirror_cam_matrix);
         gRendering_mirror = 0;
     }
     if (gMap_mode) {

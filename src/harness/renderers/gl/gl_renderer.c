@@ -327,10 +327,10 @@ void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer) {
     } else {
 
         br_matrix4 cam44 = {
-            { { camera->t.t.mat.m[0][0], camera->t.t.mat.m[0][1], camera->t.t.mat.m[0][2], 0 },
-                { camera->t.t.mat.m[1][0], camera->t.t.mat.m[1][1], camera->t.t.mat.m[1][2], 0 },
-                { camera->t.t.mat.m[2][0], camera->t.t.mat.m[2][1], camera->t.t.mat.m[2][2], 0 },
-                { camera->t.t.mat.m[3][0], camera->t.t.mat.m[3][1], camera->t.t.mat.m[3][2], 1 } }
+            { { v1db.camera_path[0].m.m[0][0], v1db.camera_path[0].m.m[0][1], v1db.camera_path[0].m.m[0][2], 0 },
+                { v1db.camera_path[0].m.m[1][0], v1db.camera_path[0].m.m[1][1], v1db.camera_path[0].m.m[1][2], 0 },
+                { v1db.camera_path[0].m.m[2][0], v1db.camera_path[0].m.m[2][1], v1db.camera_path[0].m.m[2][2], 0 },
+                { v1db.camera_path[0].m.m[3][0], v1db.camera_path[0].m.m[3][1], v1db.camera_path[0].m.m[3][2], 1 } }
         };
         br_matrix4 cam44_inverse;
         BrMatrix4Inverse(&cam44_inverse, &cam44);
