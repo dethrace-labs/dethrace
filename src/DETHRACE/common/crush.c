@@ -308,7 +308,7 @@ void CrushModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, br_vector3*
 void JitModelUpdate(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen) {
     LOG_TRACE("(%p, %p, %p, %p, %d, %d)", actor, model, material, render_data, style, on_screen);
 
-    BrModelUpdate(model, BR_MODU_NORMALS);
+    BrModelUpdate(model, BR_MODU_VERTEX_POSITIONS);
     model->flags &= ~(BR_MODF_CUSTOM);
     BrZbModelRender(actor, model, material, style, BrOnScreenCheck(&model->bounds), 0);
 }
@@ -483,8 +483,8 @@ void TotallyRepairACar(tCar_spec* pCar) {
                 memcpy(the_car_actor->actor->model->vertices,
                     the_car_actor->undamaged_vertices,
                     the_car_actor->actor->model->nvertices * sizeof(br_vertex));
-                // FIXME: BrModelUpdate(..., BR_MODU_EDGES | BR_MODU_NORMALS) fails on TELL_ME_IF_WE_PASS_THIS_WAY
-//                BrModelUpdate(the_car_actor->actor->model, BR_MODU_EDGES | BR_MODU_NORMALS);
+                // FIXME: BrModelUpdate(..., BR_MODU_VERTEX_COLOURS | BR_MODU_VERTEX_POSITIONS) fails on TELL_ME_IF_WE_PASS_THIS_WAY
+//                BrModelUpdate(the_car_actor->actor->model, BR_MODU_VERTEX_COLOURS | BR_MODU_VERTEX_POSITIONS);
                 BrModelUpdate(the_car_actor->actor->model, BR_MODU_ALL);
                 if (pipe_vertex_count != 0 && IsActionReplayAvailable()) {
                     PipeSingleModelGeometry(pCar->car_ID, j, pipe_vertex_count, pipe_array);

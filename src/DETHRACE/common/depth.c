@@ -180,16 +180,16 @@ void MungeSkyModel(br_actor* pCamera, br_model* pModel) {
     LOG_TRACE("(%p, %p)", pCamera, pModel);
 
     camera_data = pCamera->type_data;
-
     tan_half_fov = Tan(camera_data->field_of_view / 2);
-    //    BR_ANGLE_RAD(atan2f(tan_half_fov, camera_data->aspect / 2));
-    horizon_half_width = (camera_data->yon_z - 1.f) * tan_half_fov;
+    sky_distance = camera_data->yon_z - 1.0;
+    horizon_half_width = sky_distance * tan_half_fov;
     horizon_half_height = horizon_half_width * camera_data->aspect;
-    horizon_half_diag = BR_LENGTH2(horizon_half_width, horizon_half_height);
-    min_angle = BR_ANGLE_RAD(atan2f(horizon_half_diag, camera_data->yon_z - 1.f));
-    edge_u = EdgeU(gSky_image_width, 2 * min_angle, BR_ANGLE_DEG(10));
-    gSky_width = 2.f * horizon_half_width;
-    gSky_height = 2.f * horizon_half_height;
+    horizon_half_diag = sqrtf(horizon_half_height * horizon_half_height + horizon_half_width * horizon_half_width);
+    half_diag_fov = BrRadianToAngle(atan2f(sky_distance, horizon_half_width));
+    edge_u = EdgeU(gSky_image_width, 2 * half_diag_fov, BR_ANGLE_DEG(10));
+    narrow_u = edge_u / 2.f;
+    gSky_width = horizon_half_width * 2.f;
+    gSky_height = horizon_half_height * 2.f;
     gSky_x_multiplier = CalculateWrappingMultiplier(gSky_width, camera_data->yon_z);
     gSky_y_multiplier = CalculateWrappingMultiplier(gSky_height, camera_data->yon_z);
 
@@ -197,10 +197,10 @@ void MungeSkyModel(br_actor* pCamera, br_model* pModel) {
         pModel->vertices[vertex].map.v[0] = -edge_u;
     }
     for (vertex = 1; vertex < 88; vertex += 4) {
-        pModel->vertices[vertex].map.v[0] = -edge_u / 2.f;
+        pModel->vertices[vertex].map.v[0] = -narrow_u;
     }
     for (vertex = 2; vertex < 88; vertex += 4) {
-        pModel->vertices[vertex].map.v[0] = edge_u / 2.f;
+        pModel->vertices[vertex].map.v[0] = narrow_u;
     }
     for (vertex = 3; vertex < 88; vertex += 4) {
         pModel->vertices[vertex].map.v[0] = edge_u;
@@ -209,7 +209,7 @@ void MungeSkyModel(br_actor* pCamera, br_model* pModel) {
         pModel->vertices[vertex].p.v[0] = -horizon_half_diag;
     }
     for (vertex = 1; vertex < 88; vertex += 4) {
-        pModel->vertices[vertex].p.v[0] = -horizon_half_diag / 2.f;
+        pModel->vertices[vertex].p.v[0] = -(horizon_half_diag / 2.f);
     }
     for (vertex = 2; vertex < 88; vertex += 4) {
         pModel->vertices[vertex].p.v[0] = horizon_half_diag / 2.f;
@@ -218,31 +218,39 @@ void MungeSkyModel(br_actor* pCamera, br_model* pModel) {
         pModel->vertices[vertex].p.v[0] = horizon_half_diag;
     }
     PossibleService();
-    angle_range = -(gSky_image_underground + (BR_ANGLE_DEG(90) - min_angle));
-    for (vertex = 0; vertex < 2; vertex++) {
-        angle = vertex * angle_range / 2 - (BR_ANGLE_DEG(90) + min_angle);
-        pModel->vertices[0 + 4 * vertex].p.v[1] = sinf(BrAngleToRadian(angle)) * (camera_data->yon_z - 1.f);
-        pModel->vertices[0 + 4 * vertex].p.v[2] = -cosf(BrAngleToRadian(angle)) * (camera_data->yon_z - 1.f);
+    angle_range = -gSky_image_underground - (-BR_ANGLE_DEG(90) - half_diag_fov);
+    for (band = 0; band < 2u; band++) {
+        vertex = 4 * band;
+        angle = -BR_ANGLE_DEG(90) - half_diag_fov + angle_range * band / 2;
+        pModel->vertices[vertex].p.v[1] = sinf(BrAngleToRadian(angle)) * sky_distance;
+        pModel->vertices[vertex].p.v[2] = -cosf(BrAngleToRadian(angle)) * sky_distance;
     }
-    for (vertex = 0; vertex < 18; vertex++) {
-        angle = vertex * gSky_image_height / 18 - gSky_image_height;
-        pModel->vertices[8 + 4 * vertex].p.v[1] = sinf(BrAngleToRadian(angle)) * (camera_data->yon_z - 1.f);
-        pModel->vertices[8 + 4 * vertex].p.v[2] = -cosf(BrAngleToRadian(angle)) * (camera_data->yon_z - 1.f);
+    min_angle = -gSky_image_underground;
+    angle_range = gSky_image_height;
+    nbands = 18;
+    for (band = 0; band < nbands; band++) {
+        vertex = 4 * band + 8;
+        pModel->vertices[vertex].p.v[1] = sinf(BrAngleToRadian(min_angle + angle_range * band / nbands)) * sky_distance;
+        pModel->vertices[vertex].p.v[2] = -cosf(BrAngleToRadian(min_angle + angle_range * band / nbands)) * sky_distance;
     }
-    for (vertex = 0; vertex < 2; vertex++) {
-        angle = vertex * (min_angle + BR_ANGLE_DEG(90) - (gSky_image_height - gSky_image_underground)) - (gSky_image_height - gSky_image_underground);
-        pModel->vertices[80 + 4 * vertex].p.v[1] = sinf(BrAngleToRadian(angle)) * (camera_data->yon_z - 1.f);
-        pModel->vertices[80 + 4 * vertex].p.v[2] = -cosf(BrAngleToRadian(angle)) * (camera_data->yon_z - 1.f);
+    min_angle = gSky_image_height - gSky_image_underground;
+    angle_range = half_diag_fov + BR_ANGLE_DEG(90) - (gSky_image_height - gSky_image_underground);
+    for (band = 0; band <= 1u; band++) {
+        vertex = 4 * band + 80;
+        angle = min_angle + angle_range * band;
+        pModel->vertices[vertex].p.v[1] = sinf(BrAngleToRadian(angle)) * sky_distance;
+        pModel->vertices[vertex].p.v[2] = -cosf(BrAngleToRadian(angle)) * sky_distance;
     }
     PossibleService();
-    for (band = 0; band < 22; band++) {
-        for (vertex = 1; vertex < 4; vertex++) {
-            pModel->vertices[4 * band + vertex].p.v[1] = pModel->vertices[vertex].p.v[1];
-            pModel->vertices[4 * band + vertex].p.v[2] = pModel->vertices[vertex].p.v[2];
+    for (band = 0; band <= 21u; ++band) {
+        vertex = 4 * band;
+        for (stripe = 1; stripe < 4u; ++stripe) {
+            pModel->vertices[vertex + stripe].p.v[1] = pModel->vertices[vertex].p.v[1];
+            pModel->vertices[vertex + stripe].p.v[2] = pModel->vertices[vertex].p.v[2];
         }
     }
-    // FIXME: unknown model flag disabled
-    BrModelUpdate(pModel, BR_MODU_ALL & ~0x80);
+
+    BrModelUpdate(pModel, BR_MODU_ALL & ~BR_MODU_VERTEX_NORMALS);
 }
 
 // IDA: br_model* __usercall CreateHorizonModel@<EAX>(br_actor *pCamera@<EAX>)

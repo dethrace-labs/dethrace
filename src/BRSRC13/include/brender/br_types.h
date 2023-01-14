@@ -2648,13 +2648,13 @@ typedef struct resource_header { // size: 24
     br_uint_8 size_m;
     br_uint_8 size_l;
 #else
-    br_uint_8 size_l;            // @12
-    br_uint_8 size_m;            // @13
-    br_uint_8 size_h;            // @14
+    br_uint_8 size_l; // @12
+    br_uint_8 size_m; // @13
+    br_uint_8 size_h; // @14
 #endif
-    br_uint_8 class;             // @15
-    void* magic_ptr;             // @16
-    br_uint_32 magic_num;        // @20
+    br_uint_8 class;      // @15
+    void* magic_ptr;      // @16
+    br_uint_32 magic_num; // @20
 } resource_header;
 #pragma pack(pop)
 
@@ -2952,14 +2952,20 @@ enum {
  * Flags to BrModelUpdate()
  */
 enum {
-    BR_MODU_NORMALS = 0x0001,
-    BR_MODU_EDGES = 0x0002,
-    BR_MODU_RADIUS = 0x0004,
-    BR_MODU_GROUPS = 0x0008,
-    BR_MODU_BOUNDING_BOX = 0x0010,
-    BR_MODU_MATERIALS = 0x0020,
-    BR_MODU_UNKNOWN = 0x0100, /* Added by Jeff. Referred to in code */
-    BR_MODU_ALL = 0x7fff
+    BR_MODU_VERTEX_POSITIONS = 0x0001,
+    BR_MODU_VERTEX_COLOURS = 0x0002,
+    BR_MODU_VERTEX_MAPPING = 0x0004,
+    BR_MODU_VERTEX_NORMALS = 0x0008,
+    BR_MODU_PRIMITIVE_MATERIALS = 0x0010,
+    BR_MODU_PRIMITIVE_COLOURS = 0x0020,
+    BR_MODU_VERTICES = 0x0040,
+    BR_MODU_FACES = 0x0080,
+    BR_MODU_PIVOT = 0x0100,
+    BR_MODU_PREPARED = 0x0200,
+    BR_MODU_PRIMITIVE_EQUATIONS = 0x0400,
+    BR_MODU_ALL = 0x7FFF,
+
+    _BR_MODU_RESERVED = 0x8000
 };
 
 /*

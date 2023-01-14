@@ -2638,7 +2638,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     }
     PossibleService();
 
-    gSky_image_width = (360.0 / BrDegreeToAngle(GetAnInt(f)));
+    gSky_image_width = BrDegreeToAngle(360.0 / GetAnInt(f));
     gSky_image_height = BrDegreeToAngle(GetAScalar(f));
     gSky_image_underground = gSky_image_height * (sky_pixels_high - GetAnInt(f)) / sky_pixels_high;
 
@@ -2818,7 +2818,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     /* Display skidmarks even if the race has no specified skidmark material. */
     if (!skid_mark_cnt && num_materials) {
         LOG_WARN("Track %s has no valid skid mark material, setting the default one",
-                 pRace_info->track_file_name);
+            pRace_info->track_file_name);
         LoadSinglePixelmap(&gTrack_storage_space, "SKIDMARK.PIX");
         material = LoadSingleMaterial(&gTrack_storage_space, "SKIDMARK.MAT");
         pRace_info->material_modifiers[0].skid_mark_material = material;
