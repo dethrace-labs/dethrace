@@ -6800,7 +6800,7 @@ void CheckForDeAttachmentOfNonCars(tU32 pTime) {
     total_time = 0;
     for (i = 0; i < gNum_active_non_cars; i++) {
         c = &gActive_non_car_list[i]->collision_info;
-        if (c->car_master_actor->t.t.mat.m[3][1] < gMin_world_y) {
+        if (c->car_master_actor->t.t.translate.t.v[1] < gMin_world_y) {
             c->doing_nothing_flag = 1;
         }
         if (TestForNan(&c->car_master_actor->t.t.mat.m[3][1])) {
