@@ -48,7 +48,7 @@ struct {
 } uniforms_3d;
 
 struct {
-    GLuint texture_pixelmap, palette;
+    GLuint pixels, palette;
 } uniforms_2d;
 
 GLuint CreateShaderProgram(char* name, const char* vertex_shader, const int vertex_shader_len, const char* fragment_shader, const int fragment_shader_len) {
@@ -106,11 +106,11 @@ GLint GetValidatedUniformLocation(GLuint program, char* uniform_name) {
 void LoadShaders() {
     shader_program_2d = CreateShaderProgram("framebuffer", RESOURCES_FRAMEBUFFER_VERT_GLSL, sizeof(RESOURCES_FRAMEBUFFER_VERT_GLSL), RESOURCES_FRAMEBUFFER_FRAG_GLSL, sizeof(RESOURCES_FRAMEBUFFER_FRAG_GLSL));
     glUseProgram(shader_program_2d);
-    uniforms_2d.texture_pixelmap = GetValidatedUniformLocation(shader_program_2d, "u_texture_pixelmap");
+    uniforms_2d.pixels = GetValidatedUniformLocation(shader_program_2d, "u_pixels");
     uniforms_2d.palette = GetValidatedUniformLocation(shader_program_2d, "u_palette");
 
     // bind the uniform samplers to texture units:
-    glUniform1i(uniforms_2d.texture_pixelmap, 0);
+    glUniform1i(uniforms_2d.pixels, 0);
     glUniform1i(uniforms_2d.palette, 1);
 
     shader_program_3d = CreateShaderProgram("3d", RESOURCES_3D_VERT_GLSL, sizeof(RESOURCES_3D_VERT_GLSL), RESOURCES_3D_FRAG_GLSL, sizeof(RESOURCES_3D_FRAG_GLSL));
