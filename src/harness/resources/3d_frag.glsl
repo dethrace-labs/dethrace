@@ -1,7 +1,6 @@
 #version 140
 #extension GL_ARB_explicit_attrib_location : require
 
-
 in vec3 v_frag_pos;
 in vec3 v_normal;
 in vec2 v_tex_coord;
