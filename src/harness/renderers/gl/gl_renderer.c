@@ -13,7 +13,7 @@
 #include <string.h>
 
 static GLuint screen_buffer_vao, screen_buffer_ebo;
-static GLuint screen_texture, palette_texture, depth_texture;
+static GLuint fullscreen_quad_texture, palette_texture, depth_texture;
 
 static GLuint shader_program_2d;
 static GLuint shader_program_3d;
@@ -28,8 +28,8 @@ static int vp_x, vp_y, vp_width, vp_height;
 static br_pixelmap *last_colour_buffer, *last_depth_buffer, *last_shade_table;
 static int dirty_buffers = 0;
 
-static GLuint blend_input_texture;
-static int generated_blend_input_for_this_frame = 0;
+static GLuint current_framebuffer_texture;
+static int generated_current_framebuffer_for_this_frame = 0;
 
 static tStored_material* current_material;
 
@@ -39,7 +39,7 @@ struct {
     GLuint shade_table;
     GLuint blend_table;
     GLuint blend_enabled;
-    GLuint blend_input;
+    GLuint current_framebuffer;
     GLuint model, view, projection;
     GLuint palette_index_override;
     GLuint clip_plane_count;
@@ -127,7 +127,7 @@ void LoadShaders() {
     uniforms_3d.shade_table = GetValidatedUniformLocation(shader_program_3d, "u_shade_table");
     uniforms_3d.blend_table = GetValidatedUniformLocation(shader_program_3d, "u_blend_table");
     uniforms_3d.blend_enabled = GetValidatedUniformLocation(shader_program_3d, "u_blend_enabled");
-    uniforms_3d.blend_input = GetValidatedUniformLocation(shader_program_3d, "u_blend_input");
+    uniforms_3d.current_framebuffer = GetValidatedUniformLocation(shader_program_3d, "u_current_framebuffer");
     uniforms_3d.projection = GetValidatedUniformLocation(shader_program_3d, "u_projection");
     uniforms_3d.palette_index_override = GetValidatedUniformLocation(shader_program_3d, "u_palette_index_override");
     uniforms_3d.view = GetValidatedUniformLocation(shader_program_3d, "u_view");
@@ -137,7 +137,7 @@ void LoadShaders() {
     glUniform1i(uniforms_3d.texture_pixelmap, 0);
     glUniform1i(uniforms_3d.shade_table, 2);
     glUniform1i(uniforms_3d.blend_table, 3);
-    glUniform1i(uniforms_3d.blend_input, 4);
+    glUniform1i(uniforms_3d.current_framebuffer, 4);
 }
 
 void SetupFullScreenRectGeometry() {
@@ -226,11 +226,11 @@ void GLRenderer_Init(int width, int height, int pRender_width, int pRender_heigh
     glCullFace(GL_BACK);
 
     // textures
-    glGenTextures(1, &screen_texture);
+    glGenTextures(1, &fullscreen_quad_texture);
     glGenTextures(1, &palette_texture);
     glGenTextures(1, &framebuffer_texture);
     glGenTextures(1, &depth_texture);
-    glGenTextures(1, &blend_input_texture);
+    glGenTextures(1, &current_framebuffer_texture);
 
     // setup framebuffer
     glGenFramebuffers(1, &framebuffer_id);
@@ -240,7 +240,7 @@ void GLRenderer_Init(int width, int height, int pRender_width, int pRender_heigh
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-    glBindTexture(GL_TEXTURE_2D, screen_texture);
+    glBindTexture(GL_TEXTURE_2D, fullscreen_quad_texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
@@ -254,7 +254,7 @@ void GLRenderer_Init(int width, int height, int pRender_width, int pRender_heigh
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer_texture, 0);
 
-    glBindTexture(GL_TEXTURE_2D, blend_input_texture);
+    glBindTexture(GL_TEXTURE_2D, current_framebuffer_texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
@@ -313,19 +313,17 @@ void GLRenderer_SetShadeTable(br_pixelmap* table) {
 
 void GLRenderer_SetBlendTable(br_pixelmap* table) {
 
+    if (!generated_current_framebuffer_for_this_frame) {
+        glActiveTexture(GL_TEXTURE4);
+        glBindTexture(GL_TEXTURE_2D, current_framebuffer_texture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_R8UI, render_width, render_height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, last_colour_buffer->pixels);
+        generated_current_framebuffer_for_this_frame = 1;
+    }
+
     // blend table uses texture unit 3
     glActiveTexture(GL_TEXTURE3);
     tStored_pixelmap* stored = table->stored;
     glBindTexture(GL_TEXTURE_2D, stored->id);
-
-    if (!generated_blend_input_for_this_frame) {
-        glBindTexture(GL_TEXTURE_2D, blend_input_texture);
-
-        glActiveTexture(GL_TEXTURE4);
-        glBindTexture(GL_TEXTURE_2D, blend_input_texture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_R8UI, render_width, render_height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, last_colour_buffer->pixels);
-        generated_blend_input_for_this_frame = 1;
-    }
 
     // reset active texture back to default
     glActiveTexture(GL_TEXTURE0);
@@ -377,26 +375,26 @@ void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer, br_pixe
     p.m[2][2] *= -1;
     glUniformMatrix4fv(uniforms_3d.projection, 1, GL_FALSE, &p.m[0][0]);
 
-    // DebugCamera_Update();
-
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
 }
 
 void GLRenderer_EndScene() {
 
-    //  switch back to default fb
+    //  switch back to default fb and reset
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDepthMask(GL_TRUE);
 
+    generated_current_framebuffer_for_this_frame = 0;
     CHECK_GL_ERROR("GLRenderer_EndScene");
-    generated_blend_input_for_this_frame = 0;
 }
 
 void GLRenderer_FullScreenQuad(uint8_t* screen_buffer) {
+
     glViewport(vp_x, vp_y, vp_width, vp_height);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDisable(GL_DEPTH_TEST);
 
-    glBindTexture(GL_TEXTURE_2D, screen_texture);
+    glBindTexture(GL_TEXTURE_2D, fullscreen_quad_texture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R8UI, render_width, render_height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, screen_buffer);
 
     glBindVertexArray(screen_buffer_vao);
@@ -404,6 +402,7 @@ void GLRenderer_FullScreenQuad(uint8_t* screen_buffer) {
     glUseProgram(shader_program_2d);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+
     CHECK_GL_ERROR("GLRenderer_RenderFullScreenQuad");
 }
 
@@ -415,6 +414,7 @@ void GLRenderer_ClearBuffers() {
     // clear real framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     CHECK_GL_ERROR("GLRenderer_ClearBuffers");
 }
 
@@ -529,8 +529,11 @@ void setActiveMaterial(tStored_material* material) {
     if (material->index_blend) {
         glUniform1i(uniforms_3d.blend_enabled, 1);
         GLRenderer_SetBlendTable(material->index_blend);
+        // materials with index_blend do not write to depth buffer (https://www.cwaboard.co.uk/viewtopic.php?p=105846&sid=58ad8910238000ca14b01dad85117175#p105846)
+        glDepthMask(GL_FALSE);
     } else {
         glUniform1i(uniforms_3d.blend_enabled, 0);
+        glDepthMask(GL_TRUE);
     }
 
     if ((material->flags & BR_MATF_LIGHT) && !(material->flags & BR_MATF_PRELIT) && material->shade_table) {

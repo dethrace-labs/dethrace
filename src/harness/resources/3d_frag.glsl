@@ -12,7 +12,7 @@ uniform mat2x3 u_texture_coords_transform;
 uniform usampler2D u_texture_pixelmap;
 uniform usampler2D u_shade_table;
 uniform usampler2D u_blend_table;
-uniform usampler2D u_blend_input;
+uniform usampler2D u_current_framebuffer;
 uniform int u_palette_index_override = -1;
 uniform int u_light_value = -1;
 uniform vec4 u_clip_planes[6];
@@ -44,7 +44,7 @@ void main() {
         }
 
         if (u_blend_enabled == 1 && out_palette_index != 0u) {
-            uint fb_color = texelFetch(u_blend_input, ivec2(gl_FragCoord.xy), 0).r;
+            uint fb_color = texelFetch(u_current_framebuffer, ivec2(gl_FragCoord.xy), 0).r;
             uint blended_color = texelFetch(u_blend_table, ivec2(out_palette_index, fb_color), 0).r;
             out_palette_index = blended_color;
         }
