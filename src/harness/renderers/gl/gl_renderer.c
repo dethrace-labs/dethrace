@@ -45,6 +45,7 @@ struct {
     GLuint clip_plane_count;
     GLuint clip_planes[6];
     GLuint light_value;
+    GLuint viewport_height;
 } uniforms_3d;
 
 struct {
@@ -132,6 +133,7 @@ void LoadShaders() {
     uniforms_3d.palette_index_override = GetValidatedUniformLocation(shader_program_3d, "u_palette_index_override");
     uniforms_3d.view = GetValidatedUniformLocation(shader_program_3d, "u_view");
     uniforms_3d.light_value = GetValidatedUniformLocation(shader_program_3d, "u_light_value");
+    uniforms_3d.viewport_height = GetValidatedUniformLocation(shader_program_3d, "u_viewport_height");
 
     // bind the uniform samplers to texture units
     glUniform1i(uniforms_3d.texture_pixelmap, 0);
@@ -334,10 +336,11 @@ extern br_v1db_state v1db;
 void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer) {
     last_colour_buffer = colour_buffer;
     last_depth_buffer = depth_buffer;
-    glViewport(colour_buffer->base_x, render_height - colour_buffer->height - colour_buffer->base_y, colour_buffer->width, colour_buffer->height);
 
-    glEnable(GL_DEPTH_TEST);
+    glViewport(colour_buffer->base_x, render_height - colour_buffer->height - colour_buffer->base_y, colour_buffer->width, colour_buffer->height);
     glUseProgram(shader_program_3d);
+    glEnable(GL_DEPTH_TEST);
+    glUniform1i(uniforms_3d.viewport_height, colour_buffer->height);
 
     int enabled_clip_planes = 0;
     for (int i = 0; i < v1db.enabled_clip_planes.max; i++) {

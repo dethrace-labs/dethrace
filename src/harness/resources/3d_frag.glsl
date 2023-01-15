@@ -1,10 +1,11 @@
 #version 140
 #extension GL_ARB_explicit_attrib_location : require
 
+
 in vec3 v_frag_pos;
 in vec3 v_normal;
 in vec2 v_tex_coord;
-layout(origin_upper_left) in vec4 gl_FragCoord;
+in vec4 gl_FragCoord;
 
 out uint out_palette_index;
 
@@ -18,6 +19,7 @@ uniform int u_light_value = -1;
 uniform vec4 u_clip_planes[6];
 uniform int u_clip_plane_count = 0;
 uniform int u_blend_enabled = 0;
+uniform int u_viewport_height;
 
 void main() {
 
@@ -36,7 +38,7 @@ void main() {
         vec2 sample_coord = vec3(v_tex_coord.xy, 1) * u_texture_coords_transform;
         uint texel = texture(u_texture_pixelmap, sample_coord.xy).r;
         if (u_light_value >= 0) {
-            // shadetable is a 256x256 image which encodes 256 shades for each color
+            // shade_table is a 256x256 image which encodes 256 lit shades for each color
             out_palette_index = texelFetch(u_shade_table, ivec2(texel, u_light_value), 0).r;
         } else {
             // no shadetable
@@ -44,7 +46,9 @@ void main() {
         }
 
         if (u_blend_enabled == 1 && out_palette_index != 0u) {
-            uint fb_color = texelFetch(u_current_framebuffer, ivec2(gl_FragCoord.xy), 0).r;
+            // blend_table is a 256x256 image which encodes 256 values of blending between texture and existing screen pixel for each color
+            // current_framebuffer is upside down from opengl perspective. We need to sample it upside down.
+            uint fb_color = texelFetch(u_current_framebuffer, ivec2(gl_FragCoord.x, u_viewport_height - gl_FragCoord.y), 0).r;
             uint blended_color = texelFetch(u_blend_table, ivec2(out_palette_index, fb_color), 0).r;
             out_palette_index = blended_color;
         }
