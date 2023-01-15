@@ -4138,7 +4138,7 @@ void MungeCarGraphics(tU32 pFrame_period) {
                     if (the_car->gear) {
                         wheel_speed = -(the_car->revs
                             * the_car->speed_revs_ratio
-                            / (6900.f * 1000.f)
+                            / 6900.f
                             * (double)the_car->gear
                             / the_car->driven_wheels_circum
                             * (double)gFrame_period);
@@ -4246,7 +4246,7 @@ void MungeCarGraphics(tU32 pFrame_period) {
                 } else {
                     if (gProgram_state.current_depth_effect.type == eDepth_effect_fog) {
                         the_material = gProgram_state.standard_screen_fog;
-                    }  else if (gProgram_state.current_depth_effect.sky_texture != NULL) {
+                    } else if (gProgram_state.current_depth_effect.sky_texture != NULL) {
                         the_material = gProgram_state.standard_screen;
                     } else {
                         the_material = gProgram_state.standard_screen_dark;
@@ -4373,11 +4373,11 @@ void ToggleCarToCarCollisions() {
     LOG_TRACE("()");
 
    gCar_car_collisions = !gCar_car_collisions;
-   if (gCar_car_collisions) {
-       NewTextHeadupSlot(4, 0, 3000, -4, "Car Car Collisions");
-   } else {
-       NewTextHeadupSlot(4, 0, 3000, -4, "Ghost Cars");
-   }
+    if (gCar_car_collisions) {
+        NewTextHeadupSlot(4, 0, 3000, -4, "Car Car Collisions");
+    } else {
+        NewTextHeadupSlot(4, 0, 3000, -4, "Ghost Cars");
+    }
 }
 
 // IDA: void __cdecl SwapCar()
