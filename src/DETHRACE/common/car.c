@@ -1441,11 +1441,11 @@ void ControlCar4(tCar_spec* c, br_scalar dt) {
             c->turn_speed = 0.f;
         }
         if (c->velocity_car_space.v[2] > 0.f) {
-            c->turn_speed += dt * 0.01f / (harness_game_config.physics_step_time / 1000.f) / 2.f * 2.f;
+            c->turn_speed += dt * 0.01f / .04f / 2.f * 2.f;
         } else if ((c->curvature >= 0.f && c->omega.v[1] >= -.001f) || c->turn_speed != 0.f) {
-            c->turn_speed += dt / (harness_game_config.physics_step_time / 1000.f) * (0.05f / (BrVector3Length(&c->v) + 5.f)) / 2.f * .5f;
+            c->turn_speed += dt / .04f * (0.05f / (BrVector3Length(&c->v) + 5.f)) / 2.f * .5f;
         } else {
-            c->turn_speed = dt / (harness_game_config.physics_step_time / 1000.f) * (.05f / (BrVector3Length(&c->v) + 5.f)) * 4.f / 2.f * .5f;
+            c->turn_speed = dt / .04f * (.05f / (BrVector3Length(&c->v) + 5.f)) * 4.f / 2.f * .5f;
             if (c->omega.v[1] < -.01f) {
                 c->turn_speed -= dt * .01f / (harness_game_config.physics_step_time / 1000.f) / 2.f * c->omega.v[1] * 2.f;
             }
@@ -1456,11 +1456,11 @@ void ControlCar4(tCar_spec* c, br_scalar dt) {
             c->turn_speed = 0.f;
         }
         if (c->velocity_car_space.v[2] > 0.f) {
-            c->turn_speed -= dt * .01f / (harness_game_config.physics_step_time / 1000.f) / 2.f * 2.f;
+            c->turn_speed -= dt * .01f / .04f / 2.f * 2.f;
         } else if ((c->curvature <= 0.f && c->omega.v[1] <= .001f) || c->turn_speed != 0.f) {
-            c->turn_speed -= dt / (harness_game_config.physics_step_time / 1000.f) * (.05f / (BrVector3Length(&c->v) + 5.f)) / 2.f * .5f;
+            c->turn_speed -= dt / .04f * (.05f / (BrVector3Length(&c->v) + 5.f)) / 2.f * .5f;
         } else {
-            c->turn_speed = dt / (harness_game_config.physics_step_time / 1000.f) * (.05f / (BrVector3Length(&c->v) + 5.f)) * -4.f / 2.f * .5f;
+            c->turn_speed = dt / .04f * (.05f / (BrVector3Length(&c->v) + 5.f)) * -4.f / 2.f * .5f;
             if (c->omega.v[1] < -.01f) {
                 c->turn_speed -= dt * .01f / (harness_game_config.physics_step_time / 1000.f) / 2.f * c->omega.v[1] * 2.f;
             }
@@ -3664,10 +3664,10 @@ int BoxFaceIntersect(br_bounds* pB, br_matrix34* pM, br_matrix34* pMold, br_vect
     LOG_TRACE("(%p, %p, %p, %p, %p, %p, %d, %p)", pB, pM, pMold, pPoint_list, pNorm_list, pDist_list, pMax_pnts, c);
 
     n = 0;
-    BrVector3Scale(&bnds.min, &pB->min, 1.f / WORLD_SCALE);
-    BrVector3Scale(&bnds.max, &pB->max, 1.f / WORLD_SCALE);
-    BrVector3Scale(&pos, (br_vector3*)pM->m[3], 1.f / WORLD_SCALE);
-    BrVector3Scale((br_vector3*)pMold->m[3], (br_vector3*)pMold->m[3], 1.f / WORLD_SCALE);
+    BrVector3InvScale(&bnds.min, &pB->min, WORLD_SCALE);
+    BrVector3InvScale(&bnds.max, &pB->max, WORLD_SCALE);
+    BrVector3InvScale(&pos, (br_vector3*)pM->m[3], WORLD_SCALE);
+    BrVector3InvScale((br_vector3*)pMold->m[3], (br_vector3*)pMold->m[3], WORLD_SCALE);
 
     for (i = c->box_face_start; i < c->box_face_end && i < c->box_face_start + 50; i++) {
         f_ref = &gFace_list__car[i];
@@ -4098,7 +4098,7 @@ void MungeCarGraphics(tU32 pFrame_period) {
                     sine_angle = FRandomBetween(0.4f, 1.6f) * ((double)GetTotalTime() / ((double)gCountdown * 100.0f));
                     sine_angle = frac(sine_angle) * 360.0f;
                     sine_angle = FastScalarSin(sine_angle);
-                    raw_revs = (double)the_car->red_line * fabsf(sine_angle);
+                    raw_revs = the_car->red_line * fabsf(sine_angle);
                     rev_reducer = (11.0 - (double)gCountdown) / 10.0;
                     the_car->revs = rev_reducer * raw_revs;
                 } else {
@@ -4137,7 +4137,7 @@ void MungeCarGraphics(tU32 pFrame_period) {
                     if (the_car->gear) {
                         wheel_speed = -(the_car->revs
                             * the_car->speed_revs_ratio
-                            / (WORLD_SCALE * 1000.f)
+                            / (6900.f * 1000.f)
                             * (double)the_car->gear
                             / the_car->driven_wheels_circum
                             * (double)gFrame_period);
@@ -4669,7 +4669,7 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
         if (gCar_flying || gCamera_reset || gCamera_mode == -2) {
             gCamera_mode = 0;
         }
-        d = sqrtf(gCamera_zoom) + 0.57971013f;
+        d = sqrtf(gCamera_zoom) + 4.f / WORLD_SCALE;
         if (!gCamera_mode || gCamera_mode == -1) {
             BrVector3Copy(&vn, &c->direction);
             MoveWithWheels(c, &vn, manual_swing);
