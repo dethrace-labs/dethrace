@@ -4,7 +4,6 @@
 in vec3 v_frag_pos;
 in vec3 v_normal;
 in vec2 v_tex_coord;
-in vec4 gl_FragCoord;
 
 out uint out_palette_index;
 
