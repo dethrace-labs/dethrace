@@ -850,12 +850,13 @@ void AddFunkGrooveBinding(int pSlot_number, float* pPeriod_address) {
 void ControlBoundFunkGroove(int pSlot_number, float pValue) {
     LOG_TRACE("(%d, %f)", pSlot_number, pValue);
 
-    if (pSlot_number >= 0) {
-        if (pSlot_number >= COUNT_OF(gGroove_funk_bindings)) {
-            FatalError(kFatalError_UsedRefNumGrooveFunkOutOfRange);
-        }
-        *gGroove_funk_bindings[pSlot_number] = pValue;
+    if (pSlot_number < 0) {
+        return;
     }
+    if (pSlot_number >= COUNT_OF(gGroove_funk_bindings)) {
+        FatalError(kFatalError_UsedRefNumGrooveFunkOutOfRange);
+    }
+    *gGroove_funk_bindings[pSlot_number] = pValue;
 }
 
 // IDA: float __usercall ControlBoundFunkGroovePlus@<ST0>(int pSlot_number@<EAX>, float pValue)
@@ -1470,7 +1471,7 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
 
             if (Vector3IsZero(&the_groove->path_data.straight_info.centre)) {
                 BrVector3Copy(&the_groove->path_data.straight_info.centre,
-                        &the_groove->actor->t.t.translate.t);
+                    &the_groove->actor->t.t.translate.t);
             }
             if (the_groove->path_mode == eMove_controlled || the_groove->path_mode == eMove_absolute) {
                 AddFunkGrooveBinding(pRef_offset + GetAnInt(pF), &the_groove->path_data.straight_info.period);
@@ -2389,6 +2390,9 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     int style;
     int cp_rect_w[2];
     int cp_rect_h[2];
+#if defined(DETHRACE_FIX_BUGS)
+    int skid_mark_cnt = 0;
+#endif
     tPath_name the_path;
     tPath_name general_file_path;
     char s[256];
@@ -2702,9 +2706,9 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
                 GetThreeScalars(f, &spec->bounds.max.v[0], &spec->bounds.max.v[1], &spec->bounds.max.v[2]);
                 BrMatrix34Identity(&spec->mat);
                 for (k = 0; k < 3; ++k) {
-                     // FIXME: not 100% sure this is correct
-                     spec->mat.m[3][k] = (spec->bounds.max.v[k] + spec->bounds.min.v[k]) / 2.f;
-                     spec->mat.m[k][k] = spec->bounds.max.v[k] - spec->bounds.min.v[k];
+                    // FIXME: not 100% sure this is correct
+                    spec->mat.m[3][k] = (spec->bounds.max.v[k] + spec->bounds.min.v[k]) / 2.f;
+                    spec->mat.m[k][k] = spec->bounds.max.v[k] - spec->bounds.min.v[k];
                 }
                 ParseSpecialVolume(f, spec, NULL);
             }
@@ -2805,8 +2809,21 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
             strcat(str, ".MAT");
             material = LoadSingleMaterial(&gTrack_storage_space, str);
             pRace_info->material_modifiers[i].skid_mark_material = material;
+#if defined(DETHRACE_FIX_BUGS)
+            skid_mark_cnt++;
+#endif
         }
     }
+#if defined(DETHRACE_FIX_BUGS)
+    /* Display skidmarks even if the race has no specified skidmark material. */
+    if (!skid_mark_cnt && num_materials) {
+        LOG_WARN("Track %s has no valid skid mark material, setting the default one",
+                 pRace_info->track_file_name);
+        LoadSinglePixelmap(&gTrack_storage_space, "SKIDMARK.PIX");
+        material = LoadSingleMaterial(&gTrack_storage_space, "SKIDMARK.MAT");
+        pRace_info->material_modifiers[0].skid_mark_material = material;
+    }
+#endif
     for (i = num_materials; i < 10; ++i) {
         pRace_info->material_modifiers[i].car_wall_friction = 1.0;
         pRace_info->material_modifiers[i].tyre_road_friction = 1.0;
@@ -2980,49 +2997,48 @@ br_scalar NormaliseDegreeAngle(br_scalar pAngle) {
     return pAngle;
 }
 
-
 #define SAW(T, PERIOD) (fmodf((T), (PERIOD)) / (PERIOD))
 
-#define MOVE_FUNK_PARAMETER(DEST, MODE, PERIOD, AMPLITUDE, FLASH_VALUE)                     \
-    do {                                                                                    \
-        switch (MODE) {                                                                     \
-        case eMove_continuous:                                                              \
-            if ((PERIOD) == 0.f) {                                                          \
-                DEST = 0.f;                                                                 \
-            } else {                                                                        \
-                DEST = (AMPLITUDE) * SAW(f_the_time, (PERIOD));                             \
-            }                                                                               \
-            break;                                                                          \
-        case eMove_controlled:                                                              \
-            DEST = (PERIOD) * (AMPLITUDE);                                                  \
-            break;                                                                          \
-        case eMove_absolute:                                                                \
-            DEST = (PERIOD);                                                                \
-            break;                                                                          \
-        case eMove_linear:                                                                  \
-            if ((PERIOD) == 0.f) {                                                          \
-                DEST = 0.f;                                                                 \
-            } else {                                                                        \
-                DEST = (AMPLITUDE) * MapSawToTriangle(SAW(f_the_time, (PERIOD)));           \
-            }                                                                               \
-            break;                                                                          \
-        case eMove_flash:                                                                   \
-            if (2 * fmodf(f_the_time, (PERIOD)) > (PERIOD)) {                               \
-                DEST = (FLASH_VALUE);                                                       \
-            } else {                                                                        \
-                DEST = -(FLASH_VALUE);                                                      \
-            }                                                                               \
-            break;                                                                          \
-        case eMove_harmonic:                                                                \
-            if ((PERIOD) == 0.f) {                                                          \
-                DEST = 0.f;                                                                 \
-            } else {                                                                        \
-                DEST = (AMPLITUDE) * BR_SIN(BR_ANGLE_DEG(SAW(f_the_time, (PERIOD)) * 360)); \
-            }                                                                               \
-            break;                                                                          \
-        default:                                                                            \
-            TELL_ME_IF_WE_PASS_THIS_WAY();                                                  \
-        }                                                                                   \
+#define MOVE_FUNK_PARAMETER(DEST, MODE, PERIOD, AMPLITUDE, FLASH_VALUE)                   \
+    do {                                                                                  \
+        switch (MODE) {                                                                   \
+        case eMove_continuous:                                                            \
+            if ((PERIOD) == 0.f) {                                                        \
+                DEST = 0.f;                                                               \
+            } else {                                                                      \
+                DEST = (AMPLITUDE)*SAW(f_the_time, (PERIOD));                             \
+            }                                                                             \
+            break;                                                                        \
+        case eMove_controlled:                                                            \
+            DEST = (PERIOD) * (AMPLITUDE);                                                \
+            break;                                                                        \
+        case eMove_absolute:                                                              \
+            DEST = (PERIOD);                                                              \
+            break;                                                                        \
+        case eMove_linear:                                                                \
+            if ((PERIOD) == 0.f) {                                                        \
+                DEST = 0.f;                                                               \
+            } else {                                                                      \
+                DEST = (AMPLITUDE)*MapSawToTriangle(SAW(f_the_time, (PERIOD)));           \
+            }                                                                             \
+            break;                                                                        \
+        case eMove_flash:                                                                 \
+            if (2 * fmodf(f_the_time, (PERIOD)) > (PERIOD)) {                             \
+                DEST = (FLASH_VALUE);                                                     \
+            } else {                                                                      \
+                DEST = -(FLASH_VALUE);                                                    \
+            }                                                                             \
+            break;                                                                        \
+        case eMove_harmonic:                                                              \
+            if ((PERIOD) == 0.f) {                                                        \
+                DEST = 0.f;                                                               \
+            } else {                                                                      \
+                DEST = (AMPLITUDE)*BR_SIN(BR_ANGLE_DEG(SAW(f_the_time, (PERIOD)) * 360)); \
+            }                                                                             \
+            break;                                                                        \
+        default:                                                                          \
+            TELL_ME_IF_WE_PASS_THIS_WAY();                                                \
+        }                                                                                 \
     } while (0)
 
 // IDA: void __cdecl FunkThoseTronics()
@@ -3323,50 +3339,51 @@ void PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat
     br_scalar pos;
     LOG_TRACE("(%p, %d, %p, %d)", pGroove, pTime, pMat, pInterrupt_it);
 
-    pos = 0;
     if (pGroove->path_type == eGroove_path_straight) {
-        if (pGroove->path_data.straight_info.x_delta != 0.0) {
+        if (pGroove->path_data.straight_info.x_delta != 0.0f) {
 
             switch (pGroove->path_mode) {
             case eMove_continuous:
-                if (pGroove->path_data.straight_info.period != 0.0) {
-                    pos = fmod(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period * pGroove->path_data.straight_info.x_delta;
+                if (pGroove->path_data.straight_info.period == 0.0f) {
+                    pos = 0.f;
+                } else {
+                    pos = fmodf(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period * pGroove->path_data.straight_info.x_delta;
                 }
                 break;
             case eMove_controlled:
                 pos = pGroove->path_data.straight_info.period * pGroove->path_data.straight_info.x_delta;
                 break;
-
             case eMove_absolute:
                 pos = pGroove->path_data.straight_info.period;
                 break;
             case eMove_flash:
-                if (fmod(pTime, pGroove->path_data.straight_info.period) * 2.0 <= pGroove->path_data.straight_info.period) {
+                if (fmodf(pTime, pGroove->path_data.straight_info.period) * 2.0f <= pGroove->path_data.straight_info.period) {
                     pos = pGroove->path_data.straight_info.x_delta;
                 } else {
                     pos = -pGroove->path_data.straight_info.x_delta;
                 }
                 break;
             case eMove_harmonic:
-                if (pGroove->path_data.straight_info.period != 0.0) {
-                    pos = sin(
-                              BrAngleToRadian(
-                                  BrDegreeToAngle(
-                                      fmod(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period * 360.0)))
+                if (pGroove->path_data.straight_info.period == 0.0f) {
+                    pos = 0.f;
+                } else {
+                    pos = sinf(BrAngleToRadian(BrDegreeToAngle(fmodf(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period * 360.0f)))
                         * pGroove->path_data.straight_info.x_delta;
                 }
                 break;
             case eMove_linear:
-                if (pGroove->path_data.straight_info.period != 0.0) {
-                    pos = MapSawToTriangle(fmod(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period)
+                if (pGroove->path_data.straight_info.period == 0.0f) {
+                    pos = 0.f;
+                } else {
+                    pos = MapSawToTriangle(fmodf(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period)
                         * pGroove->path_data.straight_info.x_delta;
                 }
                 break;
-            case eMove_none:
-                break;
+            default:
+                TELL_ME_IF_WE_PASS_THIS_WAY();
             }
 
-            pos = pGroove->path_data.straight_info.centre.v[0] + pos;
+            pos += pGroove->path_data.straight_info.centre.v[0];
             if (pInterrupt_it) {
                 pGroove->path_resumption_value = pos;
                 if (pMat->m[3][0] <= pos) {
@@ -3374,63 +3391,65 @@ void PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat
                 } else {
                     pGroove->path_interrupt_status = eInterrupt_less_than;
                 }
-            } else if (pGroove->path_interrupt_status) {
-                if (pGroove->path_interrupt_status == eInterrupt_less_than) {
-                    if (pGroove->path_resumption_value > pos) {
-                        pGroove->path_interrupt_status = eInterrupt_none;
-                        pGroove->actor->t.t.translate.t = pGroove->path_data.straight_info.centre;
-                        pMat->m[3][0] = pos;
-                    }
-                } else if (pGroove->path_resumption_value < pos) {
+            } else if (pGroove->path_interrupt_status == eInterrupt_none) {
+                BrVector3Copy(&pGroove->actor->t.t.translate.t, &pGroove->path_data.straight_info.centre);
+                pMat->m[3][0] = pos;
+            } else if (pGroove->path_interrupt_status == eInterrupt_less_than) {
+                if (pGroove->path_resumption_value > pos) {
                     pGroove->path_interrupt_status = eInterrupt_none;
-                    pGroove->actor->t.t.euler.t = pGroove->path_data.straight_info.centre;
+                    BrVector3Copy(&pGroove->actor->t.t.translate.t, &pGroove->path_data.straight_info.centre);
                     pMat->m[3][0] = pos;
                 }
+            } else if (pGroove->path_resumption_value < pos) {
+                pGroove->path_interrupt_status = eInterrupt_none;
+                BrVector3Copy(&pGroove->actor->t.t.euler.t, &pGroove->path_data.straight_info.centre);
+                pMat->m[3][0] = pos;
             }
         }
 
-        if (pGroove->path_data.straight_info.y_delta != 0.0) {
-            pos = 0;
+        if (pGroove->path_data.straight_info.y_delta != 0.0f) {
             switch (pGroove->path_mode) {
             case eMove_continuous:
-                if (pGroove->path_data.straight_info.period != 0.0) {
-                    pos = fmod(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period * pGroove->path_data.straight_info.y_delta;
+                if (pGroove->path_data.straight_info.period == 0.0f) {
+                    pos = 0.f;
+                } else {
+                    pos = fmodf(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period * pGroove->path_data.straight_info.y_delta;
                 }
                 break;
             case eMove_controlled:
                 pos = pGroove->path_data.straight_info.period * pGroove->path_data.straight_info.y_delta;
                 break;
-
             case eMove_absolute:
                 pos = pGroove->path_data.straight_info.period;
                 break;
             case eMove_flash:
-                if (fmod(pTime, pGroove->path_data.straight_info.period) * 2.0 <= pGroove->path_data.straight_info.period) {
+                if (fmodf(pTime, pGroove->path_data.straight_info.period) * 2.0f <= pGroove->path_data.straight_info.period) {
                     pos = pGroove->path_data.straight_info.y_delta;
                 } else {
                     pos = -pGroove->path_data.straight_info.y_delta;
                 }
                 break;
             case eMove_harmonic:
-                if (pGroove->path_data.straight_info.period != 0.0) {
-                    pos = sin(
-                              BrAngleToRadian(
-                                  BrDegreeToAngle(
-                                      fmod(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period * 360.0)))
+                if (pGroove->path_data.straight_info.period == 0.0) {
+                    pos = 0.f;
+                } else {
+                    pos = sinf(BrAngleToRadian(BrDegreeToAngle(fmodf(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period * 360.0f)))
                         * pGroove->path_data.straight_info.y_delta;
                 }
                 break;
             case eMove_linear:
-                if (pGroove->path_data.straight_info.period != 0.0) {
-                    pos = MapSawToTriangle(fmod(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period)
+                if (pGroove->path_data.straight_info.period == 0.0f) {
+                    pos = 0.f;
+                } else {
+                    pos = MapSawToTriangle(fmodf(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period)
                         * pGroove->path_data.straight_info.y_delta;
                 }
                 break;
-            case eMove_none:
-                break;
+            default:
+                TELL_ME_IF_WE_PASS_THIS_WAY();
             }
 
-            pos = pGroove->path_data.straight_info.centre.v[1] + pos;
+            pos += pGroove->path_data.straight_info.centre.v[1];
             if (pInterrupt_it) {
                 pGroove->path_resumption_value = pos;
                 if (pMat->m[3][1] <= pos) {
@@ -3438,27 +3457,29 @@ void PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat
                 } else {
                     pGroove->path_interrupt_status = eInterrupt_less_than;
                 }
-            } else if (pGroove->path_interrupt_status) {
-                if (pGroove->path_interrupt_status == eInterrupt_less_than) {
-                    if (pGroove->path_resumption_value > pos) {
-                        pGroove->path_interrupt_status = eInterrupt_none;
-                        pGroove->actor->t.t.translate.t = pGroove->path_data.straight_info.centre;
-                        pMat->m[3][1] = pos;
-                    }
-                } else if (pGroove->path_resumption_value < pos) {
+            } else if (pGroove->path_interrupt_status == eInterrupt_none) {
+                BrVector3Copy(&pGroove->actor->t.t.translate.t, &pGroove->path_data.straight_info.centre);
+                pMat->m[3][1] = pos;
+            } else if (pGroove->path_interrupt_status == eInterrupt_less_than) {
+                if (pGroove->path_resumption_value > pos) {
                     pGroove->path_interrupt_status = eInterrupt_none;
-                    pGroove->actor->t.t.euler.t = pGroove->path_data.straight_info.centre;
+                    BrVector3Copy(&pGroove->actor->t.t.translate.t, &pGroove->path_data.straight_info.centre);
                     pMat->m[3][1] = pos;
                 }
+            } else if (pGroove->path_resumption_value < pos) {
+                pGroove->path_interrupt_status = eInterrupt_none;
+                pGroove->actor->t.t.euler.t = pGroove->path_data.straight_info.centre;
+                pMat->m[3][1] = pos;
             }
         }
 
-        if (pGroove->path_data.straight_info.z_delta != 0.0) {
-            pos = 0;
+        if (pGroove->path_data.straight_info.z_delta != 0.0f) {
             switch (pGroove->path_mode) {
             case eMove_continuous:
-                if (pGroove->path_data.straight_info.period != 0.0) {
-                    pos = fmod(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period * pGroove->path_data.straight_info.z_delta;
+                if (pGroove->path_data.straight_info.period == 0.0f) {
+                    pos = 0.f;
+                } else {
+                    pos = fmodf(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period * pGroove->path_data.straight_info.z_delta;
                 }
                 break;
             case eMove_controlled:
@@ -3468,32 +3489,33 @@ void PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat
                 pos = pGroove->path_data.straight_info.period;
                 break;
             case eMove_flash:
-                if (fmod(pTime, pGroove->path_data.straight_info.period) * 2.0 <= pGroove->path_data.straight_info.period) {
+                if (fmodf(pTime, pGroove->path_data.straight_info.period) * 2.0f <= pGroove->path_data.straight_info.period) {
                     pos = pGroove->path_data.straight_info.z_delta;
                 } else {
                     pos = -pGroove->path_data.straight_info.z_delta;
                 }
                 break;
             case eMove_harmonic:
-                if (pGroove->path_data.straight_info.period != 0.0) {
-                    pos = sin(
-                              BrAngleToRadian(
-                                  BrDegreeToAngle(
-                                      fmod(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period * 360.0)))
+                if (pGroove->path_data.straight_info.period == 0.0f) {
+                    pos = 0.f;
+                } else {
+                    pos = sinf(BrAngleToRadian(BrDegreeToAngle(fmodf(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period * 360.0f)))
                         * pGroove->path_data.straight_info.z_delta;
                 }
                 break;
             case eMove_linear:
-                if (pGroove->path_data.straight_info.period != 0.0) {
-                    pos = MapSawToTriangle(fmod(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period)
+                if (pGroove->path_data.straight_info.period == 0.0f) {
+                    pos = 0.f;
+                } else {
+                    pos = MapSawToTriangle(fmodf(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period)
                         * pGroove->path_data.straight_info.z_delta;
                 }
                 break;
-            case eMove_none:
-                break;
+            default:
+                TELL_ME_IF_WE_PASS_THIS_WAY();
             }
 
-            pos = pGroove->path_data.straight_info.centre.v[1] + pos;
+            pos += pGroove->path_data.straight_info.centre.v[1];
             if (pInterrupt_it) {
                 pGroove->path_resumption_value = pos;
                 if (pMat->m[3][2] <= pos) {
@@ -3501,62 +3523,74 @@ void PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat
                 } else {
                     pGroove->path_interrupt_status = eInterrupt_less_than;
                 }
-            } else if (pGroove->path_interrupt_status) {
-                if (pGroove->path_interrupt_status == eInterrupt_less_than) {
+            } else {
+                if (pGroove->path_interrupt_status == eInterrupt_none) {
+                    BrVector3Copy(&pGroove->actor->t.t.translate.t, &pGroove->path_data.straight_info.centre);
+                    pMat->m[3][2] = pos;
+                } else if (pGroove->path_interrupt_status == eInterrupt_less_than) {
                     if (pGroove->path_resumption_value > pos) {
                         pGroove->path_interrupt_status = eInterrupt_none;
-                        pGroove->actor->t.t.translate.t = pGroove->path_data.straight_info.centre;
+                        BrVector3Copy(&pGroove->actor->t.t.translate.t, &pGroove->path_data.straight_info.centre);
                         pMat->m[3][2] = pos;
                     }
                 } else if (pGroove->path_resumption_value < pos) {
                     pGroove->path_interrupt_status = eInterrupt_none;
-                    pGroove->actor->t.t.euler.t = pGroove->path_data.straight_info.centre;
+                    BrVector3Copy(&pGroove->actor->t.t.translate.t, &pGroove->path_data.straight_info.centre);
                     pMat->m[3][2] = pos;
                 }
             }
         }
-        pGroove->object_position = pGroove->actor->t.t.translate.t;
+        BrVector3Copy(&pGroove->object_position, &pGroove->actor->t.t.translate.t);
     } else if (pGroove->path_type == eGroove_path_circular) {
-        pGroove->actor->t.t.translate.t = pGroove->path_data.circular_info.centre;
+        BrVector3Copy(&pGroove->actor->t.t.translate.t, &pGroove->path_data.circular_info.centre);
         if (pGroove->path_data.circular_info.axis == eGroove_axis_y) {
-            if (pGroove->path_data.circular_info.period != 0.0) {
-                pos = cos(BrAngleToRadian(BrDegreeToAngle(fmod(pTime, pGroove->path_data.circular_info.period) / pGroove->path_data.circular_info.period * 360.0))) * pGroove->path_data.circular_info.radius;
-                pMat->m[3][0] = pGroove->path_data.circular_info.centre.v[0] + pos;
+            if (pGroove->path_data.circular_info.period == 0.0f) {
+                pos = 0.f;
+            } else {
+                pos = cosf(BrAngleToRadian(BrDegreeToAngle(fmodf(pTime, pGroove->path_data.circular_info.period) / pGroove->path_data.circular_info.period * 360.0f))) * pGroove->path_data.circular_info.radius;
             }
-
+            pMat->m[3][0] = pGroove->path_data.circular_info.centre.v[0] + pos;
         } else if (pGroove->path_data.circular_info.axis == eGroove_axis_z) {
-            if (pGroove->path_data.circular_info.period != 0.0) {
-                pos = sin(BrAngleToRadian(BrDegreeToAngle(fmod(pTime, pGroove->path_data.circular_info.period) / pGroove->path_data.circular_info.period * 360.0))) * pGroove->path_data.circular_info.radius;
-                pMat->m[3][0] = pGroove->path_data.circular_info.centre.v[0] + pos;
-            }
-        }
-        if (pGroove->path_data.circular_info.axis) {
-            if (pGroove->path_data.circular_info.axis == eGroove_axis_z) {
-                if (pGroove->path_data.circular_info.period != 0.0) {
-                    pos = cos(BrAngleToRadian(BrDegreeToAngle(fmod(pTime, pGroove->path_data.circular_info.period) / pGroove->path_data.circular_info.period * 360.0))) * pGroove->path_data.circular_info.radius;
-                    pMat->m[3][1] = pGroove->path_data.circular_info.centre.v[1] + pos;
-                }
+            if (pGroove->path_data.circular_info.period == 0.0f) {
+                pos = 0.f;
             } else {
-                if (pGroove->path_data.circular_info.period != 0.0) {
-                    pos = sin(BrAngleToRadian(BrDegreeToAngle(fmod(pTime, pGroove->path_data.circular_info.period) / pGroove->path_data.circular_info.period * 360.0))) * pGroove->path_data.circular_info.radius;
-                    pMat->m[3][1] = pGroove->path_data.circular_info.centre.v[1] + pos;
-                }
+                pos = sinf(BrAngleToRadian(BrDegreeToAngle(fmodf(pTime, pGroove->path_data.circular_info.period) / pGroove->path_data.circular_info.period * 360.0f))) * pGroove->path_data.circular_info.radius;
             }
+            pMat->m[3][0] = pGroove->path_data.circular_info.centre.v[0] + pos;
         }
-        if (pGroove->path_data.circular_info.axis) {
-            if (pGroove->path_data.circular_info.axis == eGroove_axis_y) {
-                if (pGroove->path_data.circular_info.period != 0.0) {
-                    pos = sin(BrAngleToRadian(BrDegreeToAngle(fmod(pTime, pGroove->path_data.circular_info.period) / pGroove->path_data.circular_info.period * 360.0))) * pGroove->path_data.circular_info.radius;
-                    pMat->m[3][2] = pGroove->path_data.circular_info.centre.v[2] + pos;
-                }
+
+        if (pGroove->path_data.circular_info.axis == eGroove_axis_x) {
+            if (pGroove->path_data.circular_info.period == 0.0f) {
+                pos = 0.f;
             } else {
-                if (pGroove->path_data.circular_info.period != 0.0) {
-                    pos = cos(BrAngleToRadian(BrDegreeToAngle(fmod(pTime, pGroove->path_data.circular_info.period) / pGroove->path_data.circular_info.period * 360.0))) * pGroove->path_data.circular_info.radius;
-                    pMat->m[3][2] = pGroove->path_data.circular_info.centre.v[2] + pos;
-                }
+                pos = sinf(BrAngleToRadian(BrDegreeToAngle(fmodf(pTime, pGroove->path_data.circular_info.period) / pGroove->path_data.circular_info.period * 360.0f))) * pGroove->path_data.circular_info.radius;
             }
-            pGroove->object_position = pGroove->actor->t.t.translate.t;
+            pMat->m[3][1] = pGroove->path_data.circular_info.centre.v[1] + pos;
+        } else if (pGroove->path_data.circular_info.axis == eGroove_axis_z) {
+            if (pGroove->path_data.circular_info.period == 0.0f) {
+                pos = 0.f;
+            } else {
+                pos = cosf(BrAngleToRadian(BrDegreeToAngle(fmodf(pTime, pGroove->path_data.circular_info.period) / pGroove->path_data.circular_info.period * 360.0f))) * pGroove->path_data.circular_info.radius;
+            }
+            pMat->m[3][1] = pGroove->path_data.circular_info.centre.v[1] + pos;
         }
+
+        if (pGroove->path_data.circular_info.axis == eGroove_axis_x) {
+            if (pGroove->path_data.circular_info.period == 0.0f) {
+                pos = 0.f;
+            } else {
+                pos = cosf(BrAngleToRadian(BrDegreeToAngle(fmodf(pTime, pGroove->path_data.circular_info.period) / pGroove->path_data.circular_info.period * 360.0f))) * pGroove->path_data.circular_info.radius;
+            }
+            pMat->m[3][2] = pGroove->path_data.circular_info.centre.v[1] + pos;
+        } else if (pGroove->path_data.circular_info.axis == eGroove_axis_z) {
+            if (pGroove->path_data.circular_info.period == 0.0f) {
+                pos = 0.f;
+            } else {
+                pos = sinf(BrAngleToRadian(BrDegreeToAngle(fmodf(pTime, pGroove->path_data.circular_info.period) / pGroove->path_data.circular_info.period * 360.0f))) * pGroove->path_data.circular_info.radius;
+            }
+            pMat->m[3][2] = pGroove->path_data.circular_info.centre.v[1] + pos;
+        }
+        BrVector3Copy(&pGroove->object_position, &pGroove->actor->t.t.translate.t);
     }
 }
 
@@ -4378,7 +4412,6 @@ void DropActor(int pIndex) {
                         BrVector3Set(&side_vector, 0.f, -1.f, 0.f);
                     } else {
                         BrVector3Set(&side_vector, 0.f, 0.f, -1.f);
-
                     }
                     new_transform.type = BR_TRANSFORM_LOOK_UP;
                     BrVector3Cross(&new_transform.t.look_up.look, &the_list[face_bastard].normal, &side_vector);

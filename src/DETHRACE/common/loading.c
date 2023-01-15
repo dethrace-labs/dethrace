@@ -842,7 +842,7 @@ tS8* ConvertPixToStripMap(br_pixelmap* pThe_br_map) {
     temp_strip_image = BrMemAllocate(pThe_br_map->row_bytes * pThe_br_map->height, kMem_strip_image);
     current_size = 2;
 
-    *temp_strip_image = pThe_br_map->height;
+    *(br_uint_16 *)temp_strip_image = pThe_br_map->height;
     current_strip_pointer = temp_strip_image;
 
     for (i = 0; i < pThe_br_map->height; i++) {

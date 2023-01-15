@@ -1282,11 +1282,18 @@ int TryToMoveToArrows(int* pCurrent_choice, int* pCurrent_mode) {
 int UpOpponent(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
+#if defined(DETHRACE_FIX_BUGS)
+    // fixes bug where racers could be scrolled in other race menu modes
+    if (gProgram_state.view_type != eVT_Opponents) {
+        return 0;
+    }
+#endif
     AddToFlicQueue(gStart_interface_spec->pushed_flics[5].flic_index,
         gStart_interface_spec->pushed_flics[5].x[gGraf_data_index],
         gStart_interface_spec->pushed_flics[5].y[gGraf_data_index],
         1);
     DRS3StartSound(gEffects_outlet, 3000);
+    RemoveTransientBitmaps(1);
     DropOutImageThruBottom(GetPanelPixelmap(0),
         gCurrent_graf_data->start_race_panel_left,
         gCurrent_graf_data->start_race_panel_top,
@@ -1309,11 +1316,18 @@ int UpOpponent(int* pCurrent_choice, int* pCurrent_mode) {
 int DownOpponent(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
+#if defined(DETHRACE_FIX_BUGS)
+    // fixes bug where racers could be scrolled in other race menu modes
+    if (gProgram_state.view_type != eVT_Opponents) {
+        return 0;
+    }
+#endif
     AddToFlicQueue(gStart_interface_spec->pushed_flics[6].flic_index,
         gStart_interface_spec->pushed_flics[6].x[gGraf_data_index],
         gStart_interface_spec->pushed_flics[6].y[gGraf_data_index],
         1);
     DRS3StartSound(gEffects_outlet, 3000);
+    RemoveTransientBitmaps(1);
     DropOutImageThruTop(GetPanelPixelmap(0),
         gCurrent_graf_data->start_race_panel_left,
         gCurrent_graf_data->start_race_panel_top,

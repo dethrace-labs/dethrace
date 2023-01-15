@@ -195,6 +195,8 @@ void Harness_Init(int* argc, char* argv[]) {
     harness_game_config.volume_multiplier = 1.0f;
     // start window in windowed mode
     harness_game_config.start_full_screen = 0;
+    // disable replay by default
+    harness_game_config.enable_replay = 0;
 
     // install signal handler by default
     harness_game_config.install_signalhandler = 1;
@@ -283,6 +285,9 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
             handled = 1;
         } else if (strcasecmp(argv[i], "--full-screen") == 0) {
             harness_game_config.start_full_screen = 1;
+            handled = 1;
+        } else if (strcasecmp(argv[i], "--enable-replay") == 0) {
+            harness_game_config.enable_replay = 1;
             handled = 1;
         }
 

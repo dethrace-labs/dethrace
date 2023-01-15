@@ -22,6 +22,9 @@ br_uint_32 BrActorEnum(br_actor* parent, br_actor_enum_cbfn* callback, void* arg
 br_bounds* BrActorToBounds(br_bounds* b, br_actor* ap);
 br_uint_16 BrActorToActorMatrix34(br_matrix34* m, br_actor* a, br_actor* b);
 
+void BrLightEnable(br_actor* l);
+void BrLightDisable(br_actor* l);
+
 // BrAllocator
 br_allocator* BrAllocatorSet(br_allocator* newal);
 

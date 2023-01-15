@@ -6,6 +6,7 @@
 #include <imagehlp.h>
 
 #include "harness/os.h"
+
 #include <assert.h>
 #include <direct.h>
 #include <errno.h>
@@ -22,6 +23,8 @@
 #define Eip Rip
 #define Ebp Rbp
 #endif
+
+void dr_dprintf(char* fmt_string, ...);
 
 static int stack_nbr = 0;
 static char _program_name[1024];
@@ -215,4 +218,93 @@ FILE* OS_fopen(const char* pathname, const char* mode) {
     }
 
     return f;
+}
+
+void OS_AllocateActionReplayBuffer(char** pBuffer, unsigned* pBuffer_size) {
+    static int allocated = 0;
+    static char* buffer = NULL;
+    static unsigned buffer_size = 0;
+    MEMORYSTATUS memory_status;
+    unsigned wanted;
+
+    if (allocated) {
+        *pBuffer = buffer;
+        *pBuffer_size = buffer_size;
+        return;
+    }
+    allocated = 1;
+    buffer = NULL;
+    memory_status.dwLength = sizeof(memory_status);
+    GlobalMemoryStatus(&memory_status);
+    dr_dprintf(
+        "Win32AllocateActionReplayBuffer(): Memory Status BEFORE Action Replay Allocation:\n"
+        "             dwLength        %u\n"
+        "             dwMemoryLoad    %u\n"
+        "             dwTotalPhys     %u\n"
+        "             dwAvailPhys     %u\n"
+        "             dwTotalPageFile %u\n"
+        "             dwAvailPageFile %u\n"
+        "             dwTotalVirtual  %u\n"
+        "             dwAvailVirtual  %u",
+        memory_status.dwLength,
+        memory_status.dwMemoryLoad,
+        memory_status.dwTotalPhys,
+        memory_status.dwAvailPhys,
+        memory_status.dwTotalPageFile,
+        memory_status.dwAvailPageFile,
+        memory_status.dwTotalVirtual,
+        memory_status.dwAvailVirtual);
+    wanted = 20000000;
+    if (memory_status.dwTotalPhys < 16000000) {
+        wanted = 500000;
+    } else if (memory_status.dwTotalPhys < 24000000) {
+        wanted = 4000000;
+    } else if (memory_status.dwTotalPhys < 32000000) {
+        wanted = 6000000;
+    } else if (memory_status.dwTotalPhys < 48000000) {
+        wanted = 12000000;
+    }
+    dr_dprintf("Win32AllocateActionReplayBuffer(): We want %d bytes...", wanted);
+    if (memory_status.dwAvailPageFile + memory_status.dwAvailPhys < wanted) {
+        wanted = (memory_status.dwAvailPageFile + memory_status.dwAvailPhys) - 0x100000;
+        dr_dprintf("Win32AllocateActionReplayBuffer(): ...but there's only %d bytes available...", wanted);
+    }
+    if (wanted < 0x10000) {
+        wanted = 0x10000;
+        dr_dprintf("Win32AllocateActionReplayBuffer(): ...but we have to have a minimum size of %d bytes...", wanted);
+    }
+    while (wanted >= 0x10000) {
+        buffer = malloc(wanted);
+        if (buffer != NULL) {
+            break;
+        }
+    }
+    if (buffer == NULL) {
+        buffer_size = 0;
+    } else {
+        buffer_size = wanted;
+        // Sleep(1000); // Commented out 1s sleep
+    }
+    dr_dprintf("Win32AllocateActionReplayBuffer(): Actually allocated %d bytes.", wanted);
+    GlobalMemoryStatus(&memory_status);
+    dr_dprintf(
+        "Win32AllocateActionReplayBuffer(): Memory Status AFTER Action Replay Allocation:\n"
+        "             dwLength        %u\n"
+        "             dwMemoryLoad    %u\n"
+        "             dwTotalPhys     %u\n"
+        "             dwAvailPhys     %u\n"
+        "             dwTotalPageFile %u\n"
+        "             dwAvailPageFile %u\n"
+        "             dwTotalVirtual  %u\n"
+        "             dwAvailVirtual  %u",
+        memory_status.dwLength,
+        memory_status.dwMemoryLoad,
+        memory_status.dwTotalPhys,
+        memory_status.dwAvailPhys,
+        memory_status.dwTotalPageFile,
+        memory_status.dwAvailPageFile,
+        memory_status.dwTotalVirtual,
+        memory_status.dwAvailVirtual);
+    *pBuffer = buffer;
+    *pBuffer_size = buffer_size;
 }

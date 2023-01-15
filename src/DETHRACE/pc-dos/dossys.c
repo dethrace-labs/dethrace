@@ -264,7 +264,7 @@ void PDFatalError(char* pThe_str) {
 
     // wait for keypress
 
-    exit(1);
+    abort();
 }
 
 // IDA: void __usercall PDNonFatalError(char *pThe_str@<EAX>)
@@ -595,13 +595,13 @@ void PDAllocateActionReplayBuffer(char** pBuffer, tU32* pBuffer_size) {
     tU32 lba;
     tU32 required;
     LOG_TRACE("(%p, %p)", pBuffer, pBuffer_size);
-    NOT_IMPLEMENTED();
+
+    OS_AllocateActionReplayBuffer(pBuffer, pBuffer_size);
 }
 
 // IDA: void __usercall PDDisposeActionReplayBuffer(char *pBuffer@<EAX>)
 void PDDisposeActionReplayBuffer(char* pBuffer) {
     LOG_TRACE("(\"%s\")", pBuffer);
-    NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall Usage(char *pProgpath@<EAX>)

@@ -12,6 +12,7 @@
 #include "globvars.h"
 #include "globvrpb.h"
 #include "grafdata.h"
+#include "harness/hooks.h"
 #include "harness/os.h"
 #include "harness/trace.h"
 #include "init.h"
@@ -770,13 +771,16 @@ void NewScreenWobble(double pAmplitude_x, double pAmplitude_y, double pPeriod) {
 // IDA: void __usercall SetScreenWobble(int pWobble_x@<EAX>, int pWobble_y@<EDX>)
 void SetScreenWobble(int pWobble_x, int pWobble_y) {
     LOG_TRACE("(%d, %d)", pWobble_x, pWobble_y);
-    NOT_IMPLEMENTED();
+
+    gScreen_wobble_y = pWobble_y;
+    gScreen_wobble_x = pWobble_x;
 }
 
 // IDA: void __cdecl ResetScreenWobble()
 void ResetScreenWobble() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    SetScreenWobble(0, 0);
 }
 
 // IDA: void __usercall CalculateWobblitude(tU32 pThe_time@<EAX>)
@@ -1612,6 +1616,7 @@ void RenderAFrame(int pDepth_mask_on) {
             ProcessTrack(gUniverse_actor, &gProgram_state.track_spec, gCamera, &gCamera_to_world, 1);
         }
         RenderSplashes();
+	Harness_Hook_FlushRenderer(); /* Dethrace. Flush buffers into memory. */
         RenderSmoke(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, gFrame_period);
         RenderSparks(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, gFrame_period);
         RenderProximityRays(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, gFrame_period);
@@ -1784,7 +1789,7 @@ void RenderAFrame(int pDepth_mask_on) {
         PipeFrameFinish();
     }
     gRender_screen->pixels = old_pixels;
-    if (!gPalette_fade_time || GetRaceTime() > (gPalette_fade_time + 500)) {
+    if (!gPalette_fade_time || GetRaceTime() > gPalette_fade_time + 500) {
         PDScreenBufferSwap(0);
     }
     if (gAction_replay_mode) {
@@ -2092,7 +2097,15 @@ void DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int
 // IDA: void __usercall DRMaskedStamp(br_int_16 pDest_x@<EAX>, br_int_16 pDest_y@<EDX>, br_pixelmap *pSource@<EBX>)
 void DRMaskedStamp(br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap* pSource) {
     LOG_TRACE("(%d, %d, %p)", pDest_x, pDest_y, pSource);
-    NOT_IMPLEMENTED();
+
+    DRPixelmapRectangleMaskedCopy(gBack_screen,
+        pDest_x,
+        pDest_y,
+        pSource,
+        0,
+        0,
+        pSource->width,
+        pSource->height);
 }
 
 // IDA: void __usercall DRPixelmapRectangleOnscreenCopy(br_pixelmap *pDest@<EAX>, br_int_16 pDest_x@<EDX>, br_int_16 pDest_y@<EBX>, br_pixelmap *pSource@<ECX>, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight)
@@ -2137,6 +2150,7 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
     int last_shear_x;
     int current_shear_x;
     int shear_x_difference;
+    int pWidth_orig;
     tU8 the_byte;
     tU8* source_ptr;
     tU8* dest_ptr;
@@ -2175,13 +2189,27 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
             pDest_x = 0;
         }
         if (pDest->width > pDest_x) {
-            if (pDest_x + pWidth > pDest->width) {
-                shear_x_difference = pDest_x + pWidth - pDest->width;
-                pWidth = pDest->width - pDest_x;
-                source_row_wrap += shear_x_difference;
-                dest_row_wrap += shear_x_difference;
-            }
+            pWidth_orig = pWidth;
             for (y_count = 0; pHeight > y_count; ++y_count) {
+#if !defined(DETHRACE_FIX_BUGS)
+                /*
+                 * The OG compares against pWidth instead of pWidth_orig, which
+                 * ends up clipped to the dest pixelmap width. This effectively
+                 * clips the consecutive rows of pixels along the shear, leaving
+                 * a visible gap on the screen. Instead, when comparing against
+                 * pWidth_orig, the clip takes place vertically along the dest
+                 * pixelmap edge, allowing all pixels to be displayed.
+                 *
+                 * Simulate OG behavior by overwriting pWidth_orig with pWidth.
+                 */
+                pWidth_orig = pWidth;
+#endif
+                if (pDest_x + pWidth_orig > pDest->width) {
+                    shear_x_difference = pDest_x + pWidth - pDest->width;
+                    pWidth = pDest->width - pDest_x;
+                    source_row_wrap += shear_x_difference;
+                    dest_row_wrap += shear_x_difference;
+                }
                 for (x_count = 0; pWidth > x_count; ++x_count) {
                     the_byte = *source_ptr++;
                     if (the_byte) {
@@ -2205,12 +2233,6 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
                 }
                 if (pDest->width <= pDest_x) {
                     break;
-                }
-                if (pDest_x + pWidth > pDest->width) {
-                    shear_x_difference = pDest_x + pWidth - pDest->width;
-                    pWidth = pDest->width - pDest_x;
-                    source_row_wrap += shear_x_difference;
-                    dest_row_wrap += shear_x_difference;
                 }
             }
         }

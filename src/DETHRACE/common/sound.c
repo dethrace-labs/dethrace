@@ -637,7 +637,8 @@ void SetSoundVolumes() {
 // IDA: tS3_outlet_ptr __usercall GetOutletFromIndex@<EAX>(int pIndex@<EAX>)
 tS3_outlet_ptr GetOutletFromIndex(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+
+    return gIndexed_outlets[pIndex];
 }
 
 // IDA: int __usercall GetIndexFromOutlet@<EAX>(tS3_outlet_ptr pOutlet@<EAX>)
