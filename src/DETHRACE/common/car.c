@@ -4484,23 +4484,25 @@ void PositionExternalCamera(tCar_spec* c, tU32 pTime) {
         } else {
             c = gCar_to_view;
         }
-        if (c->car_master_actor->t.t.mat.m[3][0] <= 500.0) {
+        if (c->car_master_actor->t.t.translate.t.v[0] <= 500.0) {
             if (gAction_replay_mode && gAction_replay_camera_mode) {
-                LOG_PANIC("%d, %d", gAction_replay_mode, gAction_replay_camera_mode);
-                if (gAction_replay_camera_mode == eAction_replay_action && (CheckDisablePlingMaterials(c), IncidentCam(c, pTime))) {
-                    SetPanningFieldOfView();
-                    EnablePlingMaterials();
-                    old_camera_mode = gAction_replay_camera_mode;
-                } else {
+                if (gAction_replay_camera_mode == eAction_replay_action) {
                     CheckDisablePlingMaterials(c);
-                    SetPanningFieldOfView();
-                    if (gAction_replay_camera_mode != old_camera_mode) {
-                        SetUpPanningCamera(c);
+                    if (IncidentCam(c, pTime)) {
+                        SetPanningFieldOfView();
+                        EnablePlingMaterials();
                         old_camera_mode = gAction_replay_camera_mode;
+                        return;
                     }
-                    PanningExternalCamera(c, pTime);
-                    EnablePlingMaterials();
                 }
+                CheckDisablePlingMaterials(c);
+                SetPanningFieldOfView();
+                if (gAction_replay_camera_mode != old_camera_mode) {
+                    SetUpPanningCamera(c);
+                    old_camera_mode = gAction_replay_camera_mode;
+                }
+                PanningExternalCamera(c, pTime);
+                EnablePlingMaterials();
             } else {
                 NormalPositionExternalCamera(c, pTime);
             }
@@ -4937,7 +4939,7 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
         }
         if (fabsf(c->speedo_speed) > 0.0006f && gCamera_mode > 0) {
             gCamera_mode = -1;
-            gCamera_sign = BrVector3Dot((br_vector3*)m2->m[2], &c->direction) > 0.0;
+            gCamera_sign = BrVector3Dot((br_vector3*)m2->m[2], &c->direction) > 0.0f;
         }
         if (c->frame_collision_flag && gCamera_mode != -2) {
             gCamera_mode = 1;
