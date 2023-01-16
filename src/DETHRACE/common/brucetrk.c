@@ -98,8 +98,9 @@ void StripBlendedFaces(br_actor* pActor, br_model* pModel) {
     LOG_TRACE("(%p, %p)", pActor, pModel);
 
     changed_one = 0;
-    face = &pModel->faces[0];
-    for (i = 0; i < pModel->nfaces; i++, face++) {
+
+    for (i = 0; i < pModel->nfaces; i++) {
+        face = &pModel->faces[i];
         if (face->material != NULL && face->material->identifier != NULL && ((face->material->identifier[0] == '!' && face->material->identifier[1] != '!' && gDefault_blend_pc != 0) || face->material->identifier[1] == '\\')) {
             if (gMr_blendy == NULL) {
                 gMr_blendy = BrActorAllocate(BR_ACTOR_MODEL, NULL);
@@ -135,7 +136,6 @@ void StripBlendedFaces(br_actor* pActor, br_model* pModel) {
             pModel->nfaces--;
             changed_one = 1;
             i--;
-            face = &pModel->faces[i];
         }
     }
     if (changed_one) {
