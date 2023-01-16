@@ -650,7 +650,7 @@ void GetFacesInBox(tCollision_info* c) {
         if (gFace_count >= COUNT_OF(gFace_list__car)) {
             c->box_face_start = 0;
             gFace_count = FindFacesInBox(&bnds, gFace_list__car, COUNT_OF(gFace_list__car));
-            ++gFace_num__car;
+            gFace_num__car++;
         }
         old_d = c->water_d;
         if (c->driver == eDriver_local_human
@@ -660,7 +660,7 @@ void GetFacesInBox(tCollision_info* c) {
             gInTheSea = 1;
             FreezeCamera();
         }
-        if (gPling_face != NULL && fabsf(gPling_face->normal.v[1]) > 0.9f) {
+        if (gPling_face != NULL && fabsf(gPling_face->normal.v[1]) >= 0.9f) {
             BrVector3Copy(&c->water_normal, &gPling_face->normal);
             if (c->water_normal.v[1] < 0.f) {
                 BrVector3Negate(&c->water_normal, &c->water_normal);
@@ -733,7 +733,7 @@ void RememberSafePosition(tCar_spec* car, tU32 pTime) {
         && gCurrent_race.material_modifiers[car->material_index[1]].tyre_road_friction >= 0.1f
         && gCurrent_race.material_modifiers[car->material_index[2]].tyre_road_friction >= 0.1f
         && gCurrent_race.material_modifiers[car->material_index[3]].tyre_road_friction >= 0.1f
-        && car->car_master_actor->t.t.mat.m[1][1] >= 0.8f) {
+        && car->car_master_actor->t.t.mat.m[1][1] > 0.8f) {
 
         for (j = 0; j < 5; j++) {
             BrVector3Sub(&r, &car->car_master_actor->t.t.translate.t, (br_vector3*)car->last_safe_positions[j].m[3]);
@@ -5028,7 +5028,7 @@ void MoveWithWheels(tCar_spec* c, br_vector3* vn, int manual_swing) {
     static int move_with_wheels;
     LOG_TRACE("(%p, %p, %d)", c, vn, manual_swing);
 
-    if (c->speed <= 0.0001f && !gCamera_mode) {
+    if (c->speed < 0.0001f && !gCamera_mode) {
         if (manual_swing) {
             if (gCamera_yaw <= 32760u) {
                 yaw = gCamera_yaw;
