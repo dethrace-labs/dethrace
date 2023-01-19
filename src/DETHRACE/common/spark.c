@@ -837,7 +837,7 @@ void DrMatrix34Rotate(br_matrix34* mat, br_angle r, br_vector3* a) {
 
     s = FastScalarSinAngle(r);
     c = FastScalarCosAngle(r);
-    t = 1.0 - c;
+    t = 1.0f - c;
     txy = t * a->v[0] * a->v[1];
     txz = t * a->v[0] * a->v[2];
     tyz = t * a->v[1] * a->v[2];
@@ -1316,8 +1316,8 @@ void CreatePuffOfSmoke(br_vector3* pos, br_vector3* v, br_scalar strength, br_sc
 
     BrVector3InvScale(&gSmoke[gSmoke_num].v, v, WORLD_SCALE);
     gSmoke[gSmoke_num].v.v[1] += (1.0f / WORLD_SCALE);
-    gSmoke[gSmoke_num].pos = *pos;
-    gSmoke[gSmoke_num].radius = 0.05;
+    BrVector3Copy(&gSmoke[gSmoke_num].pos, pos);
+    gSmoke[gSmoke_num].radius = 0.05f;
     if ((pType & 0xF) == 7) {
         gSmoke[gSmoke_num].radius *= 2.0f;
     } else {

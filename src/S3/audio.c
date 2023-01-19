@@ -612,7 +612,7 @@ tS3_sound_source* S3CreateSoundSourceBR(br_vector3* pPosition, br_vector3* pVelo
         return 0;
     }
     source = S3CreateSoundSource(pPosition, pVelocity, pBound_outlet);
-    if (source) {
+    if (source != NULL) {
         source->brender_vector = 1;
     }
     return source;

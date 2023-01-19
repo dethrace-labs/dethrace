@@ -118,7 +118,7 @@ void RaceCompleted(tRace_over_reason pReason) {
         default:
             break;
         }
-        if (gNet_mode) {
+        if (gNet_mode != eNet_mode_none) {
             gRace_finished = 8000;
         } else {
             gRace_finished = 4000;
