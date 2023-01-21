@@ -340,7 +340,7 @@ void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer, br_pixe
     glViewport(colour_buffer->base_x, render_height - colour_buffer->height - colour_buffer->base_y, colour_buffer->width, colour_buffer->height);
     glUseProgram(shader_program_3d);
     glEnable(GL_DEPTH_TEST);
-    glUniform1i(uniforms_3d.viewport_height, colour_buffer->height);
+    glUniform1i(uniforms_3d.viewport_height, render_height);
 
     int enabled_clip_planes = 0;
     for (int i = 0; i < v1db.enabled_clip_planes.max; i++) {
