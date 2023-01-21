@@ -594,6 +594,20 @@ void AdjustRenderScreenSize() {
     }
     gRender_screen->origin_x = gRender_screen->width / 2;
     gRender_screen->origin_y = gRender_screen->height / 2;
+
+#if defined(DETHRACE_FIX_BUGS)
+/*
+ * Depth buffer should update along the color buffer. This makes it easier for
+ * the rendering backends.
+ */
+    gDepth_buffer->base_x = gRender_screen->base_x;
+    gDepth_buffer->base_y = gRender_screen->base_y;
+    gDepth_buffer->width = gRender_screen->width;
+    gDepth_buffer->height = gRender_screen->height;
+    gDepth_buffer->origin_x = gRender_screen->origin_x;
+    gDepth_buffer->origin_y = gRender_screen->origin_y;
+#endif
+
     gWidth = gRender_screen->width;
     gHeight = gRender_screen->height;
     ReinitialiseForwardCamera();
