@@ -389,6 +389,10 @@ void GLRenderer_EndScene() {
 
     generated_current_framebuffer_for_this_frame = 0;
     CHECK_GL_ERROR("GLRenderer_EndScene");
+
+    /* Fixes blending in map mode, which renders the scene thrice per frame. */
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
+    glClear(GL_DEPTH_BUFFER_BIT);
 }
 
 void GLRenderer_FullScreenQuad(uint8_t* screen_buffer) {
