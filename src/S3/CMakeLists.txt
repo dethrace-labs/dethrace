@@ -18,6 +18,9 @@ else()
         /wd4996
     )
 endif()
+if(DETHRACE_FIX_BUGS)
+    target_compile_definitions(s3 PRIVATE DETHRACE_FIX_BUGS)
+endif()
 
 if(IS_BIGENDIAN)
     target_compile_definitions(s3 PRIVATE BR_ENDIAN_BIG=1)
