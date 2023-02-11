@@ -224,9 +224,10 @@ void* S3LoadWavFile(char* pFile_name, tS3_sample* pSample) {
 }
 
 int S3StopSample(tS3_channel* chan) {
-    if (chan->descriptor && chan->descriptor->type == chan->type) {
-        ma_sound_stop(chan->descriptor->sound_buffer);
-        ma_sound_seek_to_pcm_frame(chan->descriptor->sound_buffer, 0);
+    if (chan->descriptor && chan->descriptor->type == chan->type &&
+        DR_SOUND_BUFFER != NULL) {
+        ma_sound_stop(DR_SOUND_BUFFER);
+        ma_sound_seek_to_pcm_frame(DR_SOUND_BUFFER, 0);
 
         // dsound_buffer = chan->descriptor->dsound_buffer;
         // if (dsound_buffer) {
@@ -252,13 +253,35 @@ int S3ExecuteSampleFilterFuncs(tS3_channel* chan) {
 }
 
 int S3PlaySample(tS3_channel* chan) {
+#if defined(DETHRACE_FIX_BUGS)
+/*
+ * Create a local copy of the sample and store it in the channel. This allows
+ * for simultaneous playback of sound effects sharing the same id.
+ * Different samples played on the same channel will reuse `chan->sound_buffer`.
+ * As such, this memory is never freed.
+ */
+    if (chan->descriptor &&
+        (!chan->sound_buffer || chan->id != chan->descriptor->id)) {
+        if (!chan->sound_buffer) {
+            chan->sound_buffer = malloc(sizeof(ma_sound));
+        } else {
+            ma_sound_uninit(chan->sound_buffer);
+        }
+        chan->id = chan->descriptor->id;
+        ma_sound_init_copy(&engine,
+                           chan->descriptor->sound_buffer,
+                           MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_NO_SPATIALIZATION,
+                           NULL,
+                           chan->sound_buffer);
+    }
+#endif
 
     S3SyncSampleVolume(chan);
     S3SyncSampleRate(chan);
     if (chan->descriptor && chan->descriptor->type == chan->type) {
-        ma_sound_seek_to_pcm_frame(chan->descriptor->sound_buffer, 0);
-        ma_sound_set_looping(chan->descriptor->sound_buffer, chan->repetitions == 0);
-        ma_sound_start(chan->descriptor->sound_buffer);
+        ma_sound_seek_to_pcm_frame(DR_SOUND_BUFFER, 0);
+        ma_sound_set_looping(DR_SOUND_BUFFER, chan->repetitions == 0);
+        ma_sound_start(DR_SOUND_BUFFER);
         // Mix_PlayChannel(chan->id, chan->descriptor->sound_buffer, 0);
     }
     // BOOL play_flags;                   // [esp+Ch] [ebp-Ch]
@@ -310,7 +333,8 @@ int S3SyncSampleVolume(tS3_channel* chan) {
     if (total_vol == 0.0f) {
         total_vol = 1.0f;
     }
-    if (chan->descriptor && chan->descriptor->type == chan->type) {
+    if (chan->descriptor && chan->descriptor->type == chan->type &&
+	DR_SOUND_BUFFER != NULL) {
         volume_db = 510.0f / total_vol * -5.0f - 350.0f;
         if (volume_db >= 0) {
             volume_db = 0;
@@ -318,7 +342,7 @@ int S3SyncSampleVolume(tS3_channel* chan) {
 
         // convert from directsound -10000-0 volume scale
         linear_volume = ma_volume_db_to_linear(volume_db / 100.0f);
-        ma_sound_set_volume(chan->descriptor->sound_buffer, linear_volume);
+        ma_sound_set_volume(DR_SOUND_BUFFER, linear_volume);
 
         if (chan->spatial_sound) {
             if (chan->left_volume != 0 && chan->right_volume > chan->left_volume) {
@@ -335,7 +359,7 @@ int S3SyncSampleVolume(tS3_channel* chan) {
             } else {
                 pan = 10000;
             }
-            ma_sound_set_pan(chan->descriptor->sound_buffer, pan / 10000.0f);
+            ma_sound_set_pan(DR_SOUND_BUFFER, pan / 10000.0f);
         }
     }
     return 1;
@@ -346,14 +370,14 @@ int S3SyncSampleRate(tS3_channel* chan) {
         return 1;
     }
     if (chan->descriptor && chan->descriptor->type == chan->type) {
-        if (chan->descriptor->sound_buffer != NULL) {
+        if (DR_SOUND_BUFFER != NULL) {
             int rate = chan->rate;
             if (rate >= 100000) {
                 rate = 100000;
             }
             //  sound_buffer->lpVtbl->SetFrequency(sound_buffer, rate);
             // miniaudio uses a linear pitch scale instead of sample rate, so scale it down
-            ma_sound_set_pitch(chan->descriptor->sound_buffer, (rate / (float)((tS3_sample*)chan->descriptor->sound_data)->rate));
+            ma_sound_set_pitch(DR_SOUND_BUFFER, (rate / (float)((tS3_sample*)chan->descriptor->sound_data)->rate));
         }
     }
     return 1;

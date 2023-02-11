@@ -748,8 +748,9 @@ void S3ServiceOutlets() {
 
 int S3ServiceChannel(tS3_channel* chan) {
     if (chan->type == eS3_ST_sample) {
-        if (chan->descriptor && chan->descriptor->type == chan->type) {
-            if (ma_sound_is_playing(chan->descriptor->sound_buffer)) {
+        if (chan->descriptor && chan->descriptor->type == chan->type &&
+            DR_SOUND_BUFFER != NULL) {
+            if (ma_sound_is_playing(DR_SOUND_BUFFER)) {
                 return 1;
             }
         }

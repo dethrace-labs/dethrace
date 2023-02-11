@@ -9,6 +9,12 @@
 #define MIN(a, b) ((a) < (b) ? a : b)
 #define MAX(a, b) ((a) > (b) ? a : b)
 
+#if defined(DETHRACE_FIX_BUGS)
+#define DR_SOUND_BUFFER (chan->sound_buffer)
+#else
+#define DR_SOUND_BUFFER (chan->descriptor->sound_buffer)
+#endif
+
 // Internal typedefs
 
 typedef float tF32;
@@ -104,6 +110,10 @@ typedef struct tS3_channel {
     char* type_struct_midi;
     char* type_struct_cda;
     tS3_sound_source* sound_source_ptr;
+#if defined(DETHRACE_FIX_BUGS)
+    void *sound_buffer;
+    tS3_sound_id id;
+#endif
 } tS3_channel;
 
 typedef struct tS3_outlet {
