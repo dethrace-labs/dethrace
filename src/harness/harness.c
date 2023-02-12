@@ -376,11 +376,8 @@ void Harness_Hook_BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pix
     renderer->BeginScene(camera, colour_buffer);
 }
 
-void Harness_Hook_BrZbSceneRenderAdd(br_actor* tree) {
-}
-
-void Harness_Hook_renderFaces(br_actor* actor, br_model* model, br_material* material, br_token type) {
-    renderer->Model(actor, model, renderer_state->state.matrix.model_to_view);
+void Harness_Hook_renderActor(br_actor* actor, br_model* model, br_material* material, br_token type) {
+    renderer->Model(actor, model, renderer_state->state.matrix.model_to_view, type);
 }
 
 void Harness_Hook_BrZbSceneRenderEnd() {

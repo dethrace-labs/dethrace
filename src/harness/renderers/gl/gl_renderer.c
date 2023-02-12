@@ -308,16 +308,18 @@ void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer) {
     glEnable(GL_DEPTH_TEST);
     glUseProgram(shader_program_3d);
 
+    current_material = NULL;
+    last_shade_table = NULL;
+
     int enabled_clip_planes = 0;
     for (int i = 0; i < v1db.enabled_clip_planes.max; i++) {
-        if (!v1db.enabled_clip_planes.enabled || !v1db.enabled_clip_planes.enabled[i]) {
+        if (v1db.enabled_clip_planes.enabled == NULL || !v1db.enabled_clip_planes.enabled[i]) {
             continue;
         }
         br_vector4* v4 = v1db.enabled_clip_planes.enabled[i]->type_data;
         glUniform4f(uniforms_3d.clip_planes[enabled_clip_planes], v4->v[0], v4->v[1], v4->v[2], v4->v[3]);
         enabled_clip_planes++;
     }
-
     glUniform1i(uniforms_3d.clip_plane_count, enabled_clip_planes);
 
     if (0 /*gDebugCamera_active*/) {
@@ -361,6 +363,7 @@ void GLRenderer_FullScreenQuad(uint8_t* screen_buffer) {
     glViewport(vp_x, vp_y, vp_width, vp_height);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDisable(GL_DEPTH_TEST);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     glUseProgram(shader_program_2d);
     glBindTexture(GL_TEXTURE_2D, screen_texture);
@@ -516,7 +519,7 @@ void setActiveMaterial(tStored_material* material) {
     }
 }
 
-void GLRenderer_Model(br_actor* actor, br_model* model, br_matrix34 model_matrix) {
+void GLRenderer_Model(br_actor* actor, br_model* model, br_matrix34 model_matrix, br_token render_type) {
     tStored_model_context* ctx;
     ctx = model->stored;
     v11model* v11 = model->prepared;
@@ -526,11 +529,6 @@ void GLRenderer_Model(br_actor* actor, br_model* model, br_matrix34 model_matrix
         // LOG_WARN("No model prepared for %s", model->identifier);
         return;
     }
-
-    CHECK_GL_ERROR("rm1");
-
-    glEnable(GL_DEPTH_TEST);
-    glUseProgram(shader_program_3d);
 
     GLfloat m[16] = {
         model_matrix.m[0][0], model_matrix.m[0][1], model_matrix.m[0][2], 0,
@@ -542,9 +540,6 @@ void GLRenderer_Model(br_actor* actor, br_model* model, br_matrix34 model_matrix
     glUniformMatrix4fv(uniforms_3d.model, 1, GL_FALSE, m);
     glBindVertexArray(ctx->vao_id);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx->ebo_id);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-    int element_index = 0;
 
     // br_actor can have a material too, which is applied to the faces if the face doesn't have a texture
     if (actor->material) {
@@ -556,7 +551,21 @@ void GLRenderer_Model(br_actor* actor, br_model* model, br_matrix34 model_matrix
         glUniform1i(uniforms_3d.light_value, -1);
     }
 
+    switch (render_type) {
+    case BRT_TRIANGLE:
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        break;
+    case BRT_LINE:
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glUniform1i(uniforms_3d.palette_index_override, 255);
+        glUniform1i(uniforms_3d.light_value, -1);
+        break;
+    default:
+        LOG_PANIC("render_type %d is not supported?!", render_type);
+    }
+
     v11group* group;
+    int element_index = 0;
     for (int g = 0; g < v11->ngroups; g++) {
         group = &v11->groups[g];
         setActiveMaterial(group->stored);
@@ -633,7 +642,7 @@ void GLRenderer_FlushBuffers(br_pixelmap* color_buffer, br_pixelmap* depth_buffe
         for (int x = 0; x < render_width; x++) {
             new_pixel = screen_buffer_flip_pixels[y * render_width + x];
             if (new_pixel != 0) {
-                pm_pixels[dest_y * render_width + x] = screen_buffer_flip_pixels[y * render_width + x];
+                pm_pixels[dest_y * render_width + x] = new_pixel;
             }
         }
     }

@@ -181,11 +181,11 @@ void MungeSkyModel(br_actor* pCamera, br_model* pModel) {
 
     camera_data = pCamera->type_data;
     tan_half_fov = Tan(camera_data->field_of_view / 2);
-    sky_distance = camera_data->yon_z - 1.0;
+    sky_distance = camera_data->yon_z - 1.f;
     horizon_half_width = sky_distance * tan_half_fov;
     horizon_half_height = horizon_half_width * camera_data->aspect;
     horizon_half_diag = sqrtf(horizon_half_height * horizon_half_height + horizon_half_width * horizon_half_width);
-    half_diag_fov = BrRadianToAngle(atan2f(sky_distance, horizon_half_width));
+    half_diag_fov = BrRadianToAngle(atan2f(horizon_half_diag, sky_distance));
     edge_u = EdgeU(gSky_image_width, 2 * half_diag_fov, BR_ANGLE_DEG(10));
     narrow_u = edge_u / 2.f;
     gSky_width = horizon_half_width * 2.f;
@@ -522,10 +522,12 @@ void DoHorizon(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor
     br_actor* actor;
     LOG_TRACE("(%p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world);
 
-    yaw = BR_ANGLE_RAD(atan2f(pCamera_to_world->m[2][0], pCamera_to_world->m[2][2]));
+    yaw = BrRadianToAngle(atan2(pCamera_to_world->m[2][0], pCamera_to_world->m[2][2]));
+
     if (!gProgram_state.cockpit_on && !(gAction_replay_mode && gAction_replay_camera_mode)) {
         return;
     }
+
     if (gRendering_mirror) {
         actor = gRearview_sky_actor;
     } else {
@@ -545,7 +547,7 @@ void DoHorizon(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor
     gHorizon_material->map_transform.m[2][0] = -BrFixedToFloat(yaw) / BrFixedToFloat(gSky_image_width);
     gHorizon_material->map_transform.m[2][1] = 0.f;
     BrMaterialUpdate(gHorizon_material, BR_MATU_ALL);
-    actor->render_style = BR_RSTYLE_FACES;
+    actor->render_style = BR_RSTYLE_EDGES;
     BrZbSceneRenderAdd(actor);
     actor->render_style = BR_RSTYLE_NONE;
 }
