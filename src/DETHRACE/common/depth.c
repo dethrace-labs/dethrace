@@ -547,7 +547,7 @@ void DoHorizon(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor
     gHorizon_material->map_transform.m[2][0] = -BrFixedToFloat(yaw) / BrFixedToFloat(gSky_image_width);
     gHorizon_material->map_transform.m[2][1] = 0.f;
     BrMaterialUpdate(gHorizon_material, BR_MATU_ALL);
-    actor->render_style = BR_RSTYLE_EDGES;
+    actor->render_style = BR_RSTYLE_FACES;
     BrZbSceneRenderAdd(actor);
     actor->render_style = BR_RSTYLE_NONE;
 }

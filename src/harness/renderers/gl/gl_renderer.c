@@ -504,6 +504,12 @@ void setActiveMaterial(tStored_material* material) {
         glUniform1i(uniforms_3d.light_value, -1);
     }
 
+    if (material->blend) {
+        glDepthMask(GL_FALSE);
+    } else {
+        glDepthMask(GL_TRUE);
+    }
+
     if (material->flags & (BR_MATF_TWO_SIDED | BR_MATF_ALWAYS_VISIBLE)) {
         glDisable(GL_CULL_FACE);
     } else {
@@ -553,7 +559,7 @@ void GLRenderer_Model(br_actor* actor, br_model* model, br_matrix34 model_matrix
 
     switch (render_type) {
     case BRT_TRIANGLE:
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         break;
     case BRT_LINE:
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -594,6 +600,7 @@ void GLRenderer_BufferMaterial(br_material* mat) {
     stored->flags = mat->flags;
     stored->shade_table = mat->index_shade;
     stored->index_base = mat->index_base;
+    stored->blend = mat->index_blend != NULL;
 }
 
 void GLRenderer_BufferTexture(br_pixelmap* pm) {
