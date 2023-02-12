@@ -356,6 +356,8 @@ void GLRenderer_EndScene() {
     //  switch back to default fb
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    glDepthMask(GL_TRUE);
+
     CHECK_GL_ERROR("GLRenderer_RenderFullScreenQuad");
 }
 
@@ -487,7 +489,8 @@ void GLRenderer_BufferModel(br_model* model) {
 }
 
 void setActiveMaterial(tStored_material* material) {
-    if (material == NULL || material == current_material) {
+    // glDepthMask(GL_TRUE);
+    if (material == NULL /*|| material == current_material*/) {
         return;
     }
 
