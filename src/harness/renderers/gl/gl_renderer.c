@@ -29,12 +29,15 @@ static br_pixelmap *last_colour_buffer, *last_depth_buffer;
 static int dirty_buffers = 0;
 
 static GLuint current_framebuffer_texture;
-static int generated_current_framebuffer_for_this_frame = 0;
 
 static br_pixelmap *last_colour_buffer, *last_depth_buffer;
 
 static tStored_material* current_material;
 static br_pixelmap* current_shade_table;
+
+// Increment flush_counter during flush, and upload_counter when we upload the framebuffer texture.
+// If the counters are equal, we can avoid re-uploading the same thing.
+static int flush_counter = 0, framebuffer_upload_counter = 0;
 
 struct {
     GLuint texture_pixelmap;
@@ -320,11 +323,11 @@ void GLRenderer_SetShadeTable(br_pixelmap* table) {
 
 void GLRenderer_SetBlendTable(br_pixelmap* table) {
 
-    if (!generated_current_framebuffer_for_this_frame) {
+    if (flush_counter != framebuffer_upload_counter) {
         glActiveTexture(GL_TEXTURE4);
         glBindTexture(GL_TEXTURE_2D, current_framebuffer_texture);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_R8UI, render_width, render_height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, last_colour_buffer->pixels);
-        generated_current_framebuffer_for_this_frame = 1;
+        framebuffer_upload_counter = flush_counter;
     }
 
     // blend table uses texture unit 3
@@ -342,13 +345,11 @@ void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer, br_pixe
     last_colour_buffer = colour_buffer;
     last_depth_buffer = depth_buffer;
     glViewport(colour_buffer->base_x, render_height - colour_buffer->height - colour_buffer->base_y, colour_buffer->width, colour_buffer->height);
-
     glUseProgram(shader_program_3d);
-    glUniform1i(uniforms_3d.viewport_height, colour_buffer->height);
+    glUniform1i(uniforms_3d.viewport_height, render_height);
 
     current_material = NULL;
     current_shade_table = NULL;
-    generated_current_framebuffer_for_this_frame = 0;
 
     int enabled_clip_planes = 0;
     for (int i = 0; i < v1db.enabled_clip_planes.max; i++) {
@@ -710,6 +711,7 @@ void GLRenderer_FlushBuffers() {
     }
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
     glClear(GL_COLOR_BUFFER_BIT);
+    flush_counter++;
     dirty_buffers = 0;
 }
 

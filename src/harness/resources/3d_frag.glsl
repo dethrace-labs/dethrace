@@ -5,8 +5,6 @@ in vec3 v_frag_pos;
 in vec3 v_normal;
 in vec2 v_tex_coord;
 
-layout(origin_upper_left) in vec4 gl_FragCoord;
-
 out uint out_palette_index;
 
 uniform mat2x3 u_texture_coords_transform;
@@ -47,11 +45,9 @@ void main() {
 
         if (u_blend_enabled == 1 && out_palette_index != 0u) {
             // blend_table is a 256x256 image which encodes 256 values of blending between texture and existing screen pixel for each color
-            // current_framebuffer is upside down from opengl perspective. We need to sample it upside down.
-            int x = u_viewport_height;
-            uint fb_color = texelFetch(u_current_framebuffer, ivec2(gl_FragCoord.xy), 0).r;
+            // u_current_framebuffer is upside down from opengl perspective. We need to sample it upside down.
+            uint fb_color = texelFetch(u_current_framebuffer, ivec2(gl_FragCoord.x, u_viewport_height - gl_FragCoord.y), 0).r;
             uint blended_color = texelFetch(u_blend_table, ivec2(out_palette_index, fb_color), 0).r;
-            uint old_out = out_palette_index;
             out_palette_index = blended_color;
             
         }
