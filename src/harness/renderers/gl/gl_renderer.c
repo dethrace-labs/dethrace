@@ -241,6 +241,7 @@ void GLRenderer_Init(int width, int height, int pRender_width, int pRender_heigh
     glGenTextures(1, &palette_texture);
     glGenTextures(1, &framebuffer_texture);
     glGenTextures(1, &depth_texture);
+    glGenTextures(1, &current_framebuffer_texture);
 
     // setup framebuffer
     glGenFramebuffers(1, &framebuffer_id);
@@ -255,6 +256,10 @@ void GLRenderer_Init(int width, int height, int pRender_width, int pRender_heigh
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer_texture, 0);
+
+    glBindTexture(GL_TEXTURE_2D, current_framebuffer_texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     glBindTexture(GL_TEXTURE_2D, depth_texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -307,8 +312,6 @@ void GLRenderer_SetShadeTable(br_pixelmap* table) {
     glActiveTexture(GL_TEXTURE2);
     tStored_pixelmap* stored = table->stored;
     glBindTexture(GL_TEXTURE_2D, stored->id);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     // reset active texture back to default
     glActiveTexture(GL_TEXTURE0);
@@ -316,14 +319,24 @@ void GLRenderer_SetShadeTable(br_pixelmap* table) {
     last_shade_table = table;
 }
 
+// void PrintScreenFile2(uint8_t* pixels, int w, int h, FILE* pF);
+
+int blendcount = 0;
 void GLRenderer_SetBlendTable(br_pixelmap* table) {
 
-    if (!generated_current_framebuffer_for_this_frame) {
-        glActiveTexture(GL_TEXTURE4);
-        glBindTexture(GL_TEXTURE_2D, current_framebuffer_texture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_R8UI, render_width, render_height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, last_colour_buffer->pixels);
-        generated_current_framebuffer_for_this_frame = 1;
+    // if (!generated_current_framebuffer_for_this_frame) {
+    glActiveTexture(GL_TEXTURE4);
+    glBindTexture(GL_TEXTURE_2D, current_framebuffer_texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8UI, render_width, render_height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, last_colour_buffer->pixels);
+    generated_current_framebuffer_for_this_frame = 1;
+    printf("generated blend table\n");
+
+    if (blendcount == 0) {
+        // FILE* f = fopen("blend.bmp", "wb");
+        //  PrintScreenFile2(last_colour_buffer->pixels, 320, 200, f);
     }
+    blendcount++;
+    //}
 
     // blend table uses texture unit 3
     glActiveTexture(GL_TEXTURE3);
@@ -340,6 +353,8 @@ void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer, br_pixe
     last_colour_buffer = colour_buffer;
     last_depth_buffer = depth_buffer;
     glViewport(colour_buffer->base_x, render_height - colour_buffer->height - colour_buffer->base_y, colour_buffer->width, colour_buffer->height);
+
+    printf("beginscene\n");
 
     glEnable(GL_DEPTH_TEST);
     glUseProgram(shader_program_3d);
@@ -393,6 +408,7 @@ void GLRenderer_EndScene() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     generated_current_framebuffer_for_this_frame = 0;
+    glUniform1i(uniforms_3d.blend_enabled, 0);
     glDepthMask(GL_TRUE);
 
     CHECK_GL_ERROR("GLRenderer_RenderFullScreenQuad");
@@ -426,6 +442,7 @@ void GLRenderer_ClearBuffers() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     CHECK_GL_ERROR("GLRenderer_ClearBuffers");
+    blendcount = 0;
 }
 
 void GLRenderer_BufferModel(br_model* model) {
@@ -574,7 +591,9 @@ void GLRenderer_Model(br_actor* actor, br_model* model, br_matrix34 model_matrix
     ctx = model->stored;
     v11model* v11 = model->prepared;
 
-    // LOG_DEBUG("model rendering %s", model->identifier);
+    // if (model->identifier) {
+    //     LOG_DEBUG("model rendering %s", model->identifier);
+    // }
     if (v11 == NULL) {
         // LOG_WARN("No model prepared for %s", model->identifier);
         return;
@@ -644,6 +663,7 @@ void GLRenderer_BufferMaterial(br_material* mat) {
     stored->flags = mat->flags;
     stored->shade_table = mat->index_shade;
     stored->index_base = mat->index_base;
+
     stored->index_blend = mat->index_blend;
 }
 
@@ -657,8 +677,9 @@ void GLRenderer_BufferTexture(br_pixelmap* pm) {
     }
 
     // sometimes the pixelmap has row_bytes > width. OpenGL expects linear pixels, so flatten it out
-    uint8_t* linear_pixels = malloc(sizeof(uint8_t) * pm->width * pm->height);
     uint8_t* original_pixels = pm->pixels;
+    uint8_t* linear_pixels = malloc(sizeof(uint8_t) * pm->width * pm->height);
+
     for (int y = 0; y < pm->height; y++) {
         for (int x = 0; x < pm->width; x++) {
             linear_pixels[y * pm->width + x] = original_pixels[y * pm->row_bytes + x];

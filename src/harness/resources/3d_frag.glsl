@@ -50,9 +50,11 @@ void main() {
             // current_framebuffer is upside down from opengl perspective. We need to sample it upside down.
             int x=  u_viewport_height;
             uint fb_color = texelFetch(u_current_framebuffer, ivec2(gl_FragCoord.xy), 0).r;
+            uint x2 = fb_color;
             uint blended_color = texelFetch(u_blend_table, ivec2(out_palette_index, fb_color), 0).r;
+            uint old_out = out_palette_index;
             out_palette_index = blended_color;
-            //out_palette_index = out_palette_index;// 1u;
+            
         }
     }
     // color 0 is always transparent
