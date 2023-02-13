@@ -618,25 +618,19 @@ void GetNewBoundingBox(br_bounds* b2, br_bounds* b1, br_matrix34* m) {
     LOG_TRACE("(%p, %p, %p)", b2, b1, m);
 
     BrMatrix34ApplyP(&b2->min, &b1->min, m);
-    b2->max.v[0] = b2->min.v[0];
-    b2->max.v[1] = b2->min.v[1];
-    b2->max.v[2] = b2->min.v[2];
-    a.v[0] = b1->max.v[0] - b1->min.v[0];
-    a.v[1] = b1->max.v[1] - b1->min.v[1];
-    a.v[2] = b1->max.v[2] - b1->min.v[2];
+    BrVector3Copy(&b2->max, &b2->min);
+    BrVector3Sub(&a, &b1->max, &b1->min);
     for (j = 0; j < 3; j++) {
-        c[j].v[0] = m->m[j][0] * a.v[j];
-        c[j].v[1] = m->m[j][1] * a.v[j];
-        c[j].v[2] = m->m[j][2] * a.v[j];
+        BrVector3Scale(&c[j], (br_vector3*)m->m[j], a.v[j]);
     }
     for (j = 0; j < 3; ++j) {
-        b2->min.v[j] = (double)(c[2].v[j] < 0.0) * c[2].v[j]
-            + (double)(c[1].v[j] < 0.0) * c[1].v[j]
-            + (double)(c[0].v[j] < 0.0) * c[0].v[j]
+        b2->min.v[j] = (float)(c[2].v[j] < 0.f) * c[2].v[j]
+            + (float)(c[1].v[j] < 0.f) * c[1].v[j]
+            + (float)(c[0].v[j] < 0.f) * c[0].v[j]
             + b2->min.v[j];
-        b2->max.v[j] = (double)(c[0].v[j] > 0.0) * c[0].v[j]
-            + (double)(c[2].v[j] > 0.0) * c[2].v[j]
-            + (double)(c[1].v[j] > 0.0) * c[1].v[j]
+        b2->max.v[j] = (float)(c[0].v[j] > 0.f) * c[0].v[j]
+            + (float)(c[2].v[j] > 0.f) * c[2].v[j]
+            + (float)(c[1].v[j] > 0.f) * c[1].v[j]
             + b2->max.v[j];
     }
 }
@@ -839,133 +833,113 @@ int ModelPickBox(br_actor* actor, tBounds* bnds, br_model* model, br_material* m
         return 0;
     }
     for (group = 0; prepared->ngroups > group; group++) {
-        fp = prepared->groups[group].faces;
         for (f = 0; f < prepared->groups[group].nfaces; f++) {
+            fp = &prepared->groups[group].faces[f];
             v1 = fp->vertices[0];
-            a.v[0] = prepared->groups[group].vertices[v1].p.v[0] - bnds->box_centre.v[0];
-            a.v[1] = prepared->groups[group].vertices[v1].p.v[1] - bnds->box_centre.v[1];
-            a.v[2] = prepared->groups[group].vertices[v1].p.v[2] - bnds->box_centre.v[2];
-            t = fp->eqn.v[1] * a.v[1] + fp->eqn.v[2] * a.v[2] + fp->eqn.v[0] * a.v[0];
-            if (fabs(t) <= bnds->radius) {
-                v2 = fp->vertices[1];
-                v3 = fp->vertices[2];
-                t = bnds->real_bounds.min.v[0];
-                if (prepared->groups[group].vertices[v1].p.v[0] >= (double)t
-                    || prepared->groups[group].vertices[v2].p.v[0] >= (double)t
-                    || prepared->groups[group].vertices[v3].p.v[0] >= (double)t) {
-                    t = bnds->real_bounds.max.v[0];
-                    if (prepared->groups[group].vertices[v1].p.v[0] <= (double)t
-                        || prepared->groups[group].vertices[v2].p.v[0] <= (double)t
-                        || prepared->groups[group].vertices[v3].p.v[0] <= (double)t) {
-                        t = bnds->real_bounds.min.v[1];
-                        if (prepared->groups[group].vertices[v1].p.v[1] >= (double)t
-                            || prepared->groups[group].vertices[v2].p.v[1] >= (double)t
-                            || prepared->groups[group].vertices[v3].p.v[1] >= (double)t) {
-                            t = bnds->real_bounds.max.v[1];
-                            if (prepared->groups[group].vertices[v1].p.v[1] <= (double)t
-                                || prepared->groups[group].vertices[v2].p.v[1] <= (double)t
-                                || prepared->groups[group].vertices[v3].p.v[1] <= (double)t) {
-                                t = bnds->real_bounds.min.v[2];
-                                if (prepared->groups[group].vertices[v1].p.v[2] >= (double)t
-                                    || prepared->groups[group].vertices[v2].p.v[2] >= (double)t
-                                    || prepared->groups[group].vertices[v3].p.v[2] >= (double)t) {
-                                    t = bnds->real_bounds.max.v[2];
-                                    if (prepared->groups[group].vertices[v1].p.v[2] <= (double)t
-                                        || prepared->groups[group].vertices[v2].p.v[2] <= (double)t
-                                        || prepared->groups[group].vertices[v3].p.v[2] <= (double)t) {
-                                        polygon[1].v[0] = prepared->groups[group].vertices[v1].p.v[0]
-                                            - bnds->mat->m[3][0];
-                                        polygon[1].v[1] = prepared->groups[group].vertices[v1].p.v[1]
-                                            - bnds->mat->m[3][1];
-                                        polygon[1].v[2] = prepared->groups[group].vertices[v1].p.v[2]
-                                            - bnds->mat->m[3][2];
-                                        polygon[2].v[0] = prepared->groups[group].vertices[v2].p.v[0]
-                                            - bnds->mat->m[3][0];
-                                        polygon[2].v[1] = prepared->groups[group].vertices[v2].p.v[1]
-                                            - bnds->mat->m[3][1];
-                                        polygon[2].v[2] = prepared->groups[group].vertices[v2].p.v[2]
-                                            - bnds->mat->m[3][2];
-                                        polygon[3].v[0] = prepared->groups[group].vertices[v3].p.v[0]
-                                            - bnds->mat->m[3][0];
-                                        polygon[3].v[1] = prepared->groups[group].vertices[v3].p.v[1]
-                                            - bnds->mat->m[3][1];
-                                        polygon[3].v[2] = prepared->groups[group].vertices[v3].p.v[2]
-                                            - bnds->mat->m[3][2];
-                                        BrMatrix34TApplyV(polygon, &polygon[1], bnds->mat);
-                                        BrMatrix34TApplyV(&polygon[1], &polygon[2], bnds->mat);
-                                        BrMatrix34TApplyV(&polygon[2], &polygon[3], bnds->mat);
-                                        n = 3;
-                                        for (i = 0; i < 3; i++) {
-                                            ClipToPlaneGE(polygon, &n, i, bnds->original_bounds.min.v[i]);
-                                            if (n < 3) {
-                                                break;
-                                            }
-                                            ClipToPlaneLE(polygon, &n, i, bnds->original_bounds.max.v[i]);
-                                            if (n < 3) {
-                                                break;
-                                            }
-                                        }
-                                        if (n >= 3) {
-                                            if (pMat) {
-                                                BrMatrix34ApplyP(&face_list->v[0], &prepared->groups[group].vertices[v1].p, pMat);
-                                                BrMatrix34ApplyP(&face_list->v[1], &prepared->groups[group].vertices[v2].p, pMat);
-                                                BrMatrix34ApplyP(&face_list->v[2], &prepared->groups[group].vertices[v3].p, pMat);
-                                                tv.v[0] = fp->eqn.v[0];
-                                                tv.v[1] = fp->eqn.v[1];
-                                                tv.v[2] = fp->eqn.v[2];
-                                                BrMatrix34ApplyV(&face_list->normal, &tv, pMat);
-                                            } else {
-                                                face_list->v[0].v[0] = prepared->groups[group].vertices[v1].p.v[0];
-                                                face_list->v[0].v[1] = prepared->groups[group].vertices[v1].p.v[1];
-                                                face_list->v[0].v[2] = prepared->groups[group].vertices[v1].p.v[2];
-                                                face_list->v[1].v[0] = prepared->groups[group].vertices[v2].p.v[0];
-                                                face_list->v[1].v[1] = prepared->groups[group].vertices[v2].p.v[1];
-                                                face_list->v[1].v[2] = prepared->groups[group].vertices[v2].p.v[2];
-                                                face_list->v[2].v[0] = prepared->groups[group].vertices[v3].p.v[0];
-                                                face_list->v[2].v[1] = prepared->groups[group].vertices[v3].p.v[1];
-                                                face_list->v[2].v[2] = prepared->groups[group].vertices[v3].p.v[2];
-                                                face_list->normal.v[0] = fp->eqn.v[0];
-                                                face_list->normal.v[1] = fp->eqn.v[1];
-                                                face_list->normal.v[2] = fp->eqn.v[2];
-                                            }
-                                            if (prepared->groups[group].face_colours_material) {
-                                                face_list->material = prepared->groups[group].face_colours_material;
-                                            } else {
-                                                face_list->material = model_material;
-                                            }
-                                            face_list->flags = 0;
-                                            if (face_list->material && (face_list->material->flags & 0x1800) == 0) {
-                                                face_list->flags |= (v2 > v1) + 2 * (v3 > v2) + 4 * (v3 < v1);
-                                            }
-                                            if (pMat) {
-                                                face_list->d = BrVector3LengthSquared(&face_list->v[0]);
-                                            } else {
-                                                face_list->d = fp->eqn.v[3];
-                                            }
-                                            face_list->map[0] = &prepared->groups[group].vertices[v1].map;
-                                            face_list->map[1] = &prepared->groups[group].vertices[v2].map;
-                                            face_list->map[2] = &prepared->groups[group].vertices[v3].map;
-                                            if (face_list->material
-                                                && face_list->material->identifier
-                                                && *face_list->material->identifier == '!') {
-                                                gPling_face = face_list;
-                                            }
-                                            face_list++;
-                                            max_face--;
-                                            if (!max_face) {
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+            BrVector3Sub(&a, &prepared->groups[group].vertices[v1].p, &bnds->box_centre);
+            t = BrVector3Dot((br_vector3*)&fp->eqn, &a);
+            if (fabsf(t) > bnds->radius) {
+                continue;
+            }
+            v2 = fp->vertices[1];
+            v3 = fp->vertices[2];
+
+            t = bnds->real_bounds.min.v[0];
+            if (t > prepared->groups[group].vertices[v1].p.v[0]
+                && t > prepared->groups[group].vertices[v2].p.v[0]
+                && t > prepared->groups[group].vertices[v3].p.v[0]) {
+                continue;
+            }
+            t = bnds->real_bounds.max.v[0];
+            if (t < prepared->groups[group].vertices[v1].p.v[0]
+                && t < prepared->groups[group].vertices[v2].p.v[0]
+                && t < prepared->groups[group].vertices[v3].p.v[0]) {
+                continue;
+            }
+            t = bnds->real_bounds.min.v[1];
+            if (t > prepared->groups[group].vertices[v1].p.v[1]
+                && t > prepared->groups[group].vertices[v2].p.v[1]
+                && t > prepared->groups[group].vertices[v3].p.v[1]) {
+                continue;
+            }
+            t = bnds->real_bounds.max.v[1];
+            if (t < prepared->groups[group].vertices[v1].p.v[1]
+                && t < prepared->groups[group].vertices[v2].p.v[1]
+                && t < prepared->groups[group].vertices[v3].p.v[1]) {
+                continue;
+            }
+            t = bnds->real_bounds.min.v[2];
+            if (t > prepared->groups[group].vertices[v1].p.v[2]
+                && t > prepared->groups[group].vertices[v2].p.v[2]
+                && t > prepared->groups[group].vertices[v3].p.v[2]) {
+                continue;
+            }
+            t = bnds->real_bounds.max.v[2];
+            if (t < prepared->groups[group].vertices[v1].p.v[2]
+                && t < prepared->groups[group].vertices[v2].p.v[2]
+                && t < prepared->groups[group].vertices[v3].p.v[2]) {
+                continue;
+            }
+            BrVector3Sub(&polygon[1], &prepared->groups[group].vertices[v1].p, (br_vector3*)bnds->mat->m[3]);
+            BrVector3Sub(&polygon[2], &prepared->groups[group].vertices[v2].p, (br_vector3*)bnds->mat->m[3]);
+            BrVector3Sub(&polygon[3], &prepared->groups[group].vertices[v3].p, (br_vector3*)bnds->mat->m[3]);
+            BrMatrix34TApplyV(&polygon[0], &polygon[1], bnds->mat);
+            BrMatrix34TApplyV(&polygon[1], &polygon[2], bnds->mat);
+            BrMatrix34TApplyV(&polygon[2], &polygon[3], bnds->mat);
+            n = 3;
+            for (i = 0; i < 3; i++) {
+                ClipToPlaneGE(&polygon[0], &n, i, bnds->original_bounds.min.v[i]);
+                if (n < 3) {
+                    break;
+                }
+                ClipToPlaneLE(&polygon[0], &n, i, bnds->original_bounds.max.v[i]);
+                if (n < 3) {
+                    break;
                 }
             }
-            ++fp;
+            if (n >= 3) {
+                if (pMat != NULL) {
+                    BrMatrix34ApplyP(&face_list->v[0], &prepared->groups[group].vertices[v1].p, pMat);
+                    BrMatrix34ApplyP(&face_list->v[1], &prepared->groups[group].vertices[v2].p, pMat);
+                    BrMatrix34ApplyP(&face_list->v[2], &prepared->groups[group].vertices[v3].p, pMat);
+                    BrVector3Copy(&tv, (br_vector3*)&fp->eqn);
+                    BrMatrix34ApplyV(&face_list->normal, &tv, pMat);
+                } else {
+                    BrVector3Copy(&face_list->v[0], &prepared->groups[group].vertices[v1].p);
+                    BrVector3Copy(&face_list->v[1], &prepared->groups[group].vertices[v2].p);
+                    BrVector3Copy(&face_list->v[2], &prepared->groups[group].vertices[v3].p);
+                    BrVector3Copy(&face_list->normal, (br_vector3*)&fp->eqn);
+                }
+                if (prepared->groups[group].face_colours_material != NULL) {
+                    face_list->material = prepared->groups[group].face_colours_material;
+                } else {
+                    face_list->material = model_material;
+                }
+                face_list->flags = 0;
+                if (face_list->material != NULL && (face_list->material->flags & (BR_MATF_TWO_SIDED | BR_MATF_ALWAYS_VISIBLE)) == 0) {
+                    face_list->flags |= (v1 < v2) | (v2 < v3) << 1 | (v3 < v1) << 2;
+                }
+                if (pMat != NULL) {
+                    face_list->d = BrVector3LengthSquared(&face_list->v[0]);
+                } else {
+                    face_list->d = fp->eqn.v[3];
+                }
+                face_list->map[0] = &prepared->groups[group].vertices[v1].map;
+                face_list->map[1] = &prepared->groups[group].vertices[v2].map;
+                face_list->map[2] = &prepared->groups[group].vertices[v3].map;
+                if (face_list->material!= NULL
+                    && face_list->material->identifier != NULL
+                    && face_list->material->identifier[0] == '!') {
+                    gPling_face = face_list;
+                }
+                face_list++;
+                max_face--;
+                if (max_face == 0) {
+                    break;
+                }
+            }
         }
-        if (!max_face) {
+        if (max_face == 0) {
             break;
         }
     }
@@ -996,18 +970,14 @@ void ClipToPlaneGE(br_vector3* p, int* nv, int i, br_scalar limit) {
             p2[j++].v[i] = limit;
         }
         if (p[vertex].v[i] >= limit) {
-            p2[j].v[0] = p[vertex].v[0];
-            p2[j].v[1] = p[vertex].v[1];
-            p2[j].v[2] = p[vertex].v[2];
+            BrVector3Copy(&p2[j], &p[vertex]);
             j++;
         }
         last_vertex = vertex;
     }
     *nv = j;
     for (k = 0; k < j; k++) {
-        p[k].v[0] = p2[k].v[0];
-        p[k].v[1] = p2[k].v[1];
-        p[k].v[2] = p2[k].v[2];
+        BrVector3Copy(&p[k], &p2[k]);
     }
 }
 
@@ -1035,18 +1005,14 @@ void ClipToPlaneLE(br_vector3* p, int* nv, int i, br_scalar limit) {
             p2[j++].v[i] = limit;
         }
         if (p[vertex].v[i] <= (double)limit) {
-            p2[j].v[0] = p[vertex].v[0];
-            p2[j].v[1] = p[vertex].v[1];
-            p2[j].v[2] = p[vertex].v[2];
+            BrVector3Copy(&p2[j], &p[vertex]);
             j++;
         }
         last_vertex = vertex;
     }
     *nv = j;
     for (k = 0; k < j; k++) {
-        p[k].v[0] = p2[k].v[0];
-        p[k].v[1] = p2[k].v[1];
-        p[k].v[2] = p2[k].v[2];
+        BrVector3Copy(&p[k], &p2[k]);
     }
 }
 
@@ -1056,11 +1022,11 @@ int BoundsOverlapTest__finteray(br_bounds* b1, br_bounds* b2) {
     LOG_TRACE("(%p, %p)", b1, b2);
 
     return b1->min.v[0] <= b2->max.v[0]
-        && b1->min.v[0] <= b2->max.v[0]
+        && b2->min.v[0] <= b1->max.v[0]
         && b1->min.v[1] <= b2->max.v[1]
         && b2->min.v[1] <= b1->max.v[1]
         && b1->min.v[2] <= b2->max.v[2]
-        && b1->min.v[2] <= b2->max.v[2];
+        && b2->min.v[2] <= b1->max.v[2];
 }
 
 // IDA: int __usercall BoundsTransformTest@<EAX>(br_bounds *b1@<EAX>, br_bounds *b2@<EDX>, br_matrix34 *M@<EBX>)
@@ -1070,52 +1036,56 @@ int BoundsTransformTest(br_bounds* b1, br_bounds* b2, br_matrix34* M) {
     LOG_TRACE("(%p, %p, %p)", b1, b2, M);
 
     BrVector3Sub(&o, &b1->max, &b1->min);
-    val = M->m[2][0] * b1->min.v[2] + b1->min.v[1] * M->m[1][0] + M->m[0][0] * b1->min.v[0] + M->m[3][0];
+    val = M->m[0][0] * b1->min.v[0] + M->m[1][0] * b1->min.v[1] + M->m[2][0] * b1->min.v[2] + M->m[3][0];
 
-    if ((M->m[0][0] <= 0.0 ? 0.0 : M->m[0][0] * o.v[0])
-            + (M->m[1][0] <= 0.0 ? 0.0 : M->m[1][0] * o.v[1])
-            + (M->m[2][0] <= 0.0 ? 0.0 : M->m[2][0] * o.v[2])
+    if ((M->m[0][0] <= 0.0f ? 0.0f : M->m[0][0] * o.v[0])
+            + (M->m[1][0] <= 0.0f ? 0.0f : M->m[1][0] * o.v[1])
+            + (M->m[2][0] <= 0.0f ? 0.0f : M->m[2][0] * o.v[2])
             + val
         < b2->min.v[0]) {
         return 0;
     }
-    if ((M->m[0][0] < 0.0 ? M->m[0][0] * o.v[0] : 0.0)
-            + (M->m[1][0] < 0.0 ? M->m[1][0] * o.v[1] : 0.0)
-            + (M->m[2][0] < 0.0 ? M->m[2][0] * o.v[2] : 0.0)
+    if ((M->m[0][0] < 0.0f ? M->m[0][0] * o.v[0] : 0.0f)
+            + (M->m[1][0] < 0.0f ? M->m[1][0] * o.v[1] : 0.0f)
+            + (M->m[2][0] < 0.0f ? M->m[2][0] * o.v[2] : 0.0f)
             + val
         > b2->max.v[0]) {
         return 0;
     }
 
-    val = M->m[1][2] * b1->min.v[1] + b1->min.v[2] * M->m[2][2] + M->m[0][2] * b1->min.v[0] + M->m[3][2];
-    if ((M->m[0][2] <= 0.0 ? 0.0 : M->m[0][2] * o.v[0])
-            + (M->m[1][2] <= 0.0 ? 0.0 : M->m[1][2] * o.v[1])
-            + (M->m[2][2] <= 0.0 ? 0.0 : M->m[2][2] * o.v[2])
+    val = M->m[0][2] * b1->min.v[0] + M->m[1][2] * b1->min.v[1] + M->m[2][2] * b1->min.v[2] + M->m[3][2];
+    if ((M->m[0][2] <= 0.0f ? 0.0f : M->m[0][2] * o.v[0])
+            + (M->m[1][2] <= 0.0f ? 0.0f : M->m[1][2] * o.v[1])
+            + (M->m[2][2] <= 0.0f ? 0.0f : M->m[2][2] * o.v[2])
             + val
         < b2->min.v[2]) {
         return 0;
     }
-    if ((M->m[0][2] < 0.0 ? M->m[0][2] * o.v[0] : 0.0)
-            + (M->m[1][2] < 0.0 ? M->m[1][2] * o.v[1] : 0.0)
-            + (M->m[2][2] < 0.0 ? M->m[2][2] * o.v[2] : 0.0)
+    if ((M->m[0][2] < 0.0f ? M->m[0][2] * o.v[0] : 0.0f)
+            + (M->m[1][2] < 0.0f ? M->m[1][2] * o.v[1] : 0.0f)
+            + (M->m[2][2] < 0.0f ? M->m[2][2] * o.v[2] : 0.0f)
             + val
         > b2->max.v[2]) {
         return 0;
     }
 
-    val = b1->min.v[2] * M->m[2][1] + b1->min.v[1] * M->m[1][1] + M->m[0][1] * b1->min.v[0] + M->m[3][1];
-    if ((M->m[0][1] <= 0.0 ? 0.0 : M->m[0][1] * o.v[0])
-            + (M->m[1][1] <= 0.0 ? 0.0 : M->m[1][1] * o.v[1])
-            + (M->m[2][1] <= 0.0 ? 0.0 : M->m[2][1] * o.v[2])
+    val = M->m[0][1] * b1->min.v[0] + M->m[1][1] * b1->min.v[1] + M->m[2][1] * b1->min.v[2] + M->m[3][1];
+    if ((M->m[0][1] <= 0.0f ? 0.0f : M->m[0][1] * o.v[0])
+            + (M->m[1][1] <= 0.0f ? 0.0f : M->m[1][1] * o.v[1])
+            + (M->m[2][1] <= 0.0f ? 0.0f : M->m[2][1] * o.v[2])
             + val
         < b2->min.v[1]) {
         return 0;
     }
-    return ((M->m[0][1] < 0.0 ? M->m[0][1] * o.v[0] : 0.0)
+    if ((M->m[0][1] < 0.0 ? M->m[0][1] * o.v[0] : 0.0)
             + (M->m[1][1] < 0.0 ? M->m[1][1] * o.v[1] : 0.0)
             + (M->m[2][1] < 0.0 ? M->m[2][1] * o.v[2] : 0.0)
             + val
-        <= b2->max.v[1]);
+        > b2->max.v[1]) {
+        return 0;
+    }
+
+    return 1;
 }
 
 // IDA: int __usercall LineBoxColl@<EAX>(br_vector3 *o@<EAX>, br_vector3 *p@<EDX>, br_bounds *pB@<EBX>, br_vector3 *pHit_point@<ECX>)
@@ -1130,9 +1100,7 @@ int LineBoxColl(br_vector3* o, br_vector3* p, br_bounds* pB, br_vector3* pHit_po
     LOG_TRACE("(%p, %p, %p, %p)", o, p, pB, pHit_point);
 
     inside = 1;
-    dir.v[0] = p->v[0] - o->v[0];
-    dir.v[1] = p->v[1] - o->v[1];
-    dir.v[2] = p->v[2] - o->v[2];
+    BrVector3Sub(&dir, p, o);
     for (i = 0; i < 3; ++i) {
         if (pB->min.v[i] <= o->v[i]) {
             if (pB->max.v[i] >= o->v[i]) {
@@ -1149,7 +1117,7 @@ int LineBoxColl(br_vector3* o, br_vector3* p, br_bounds* pB, br_vector3* pHit_po
         }
     }
     if (inside) {
-        *pHit_point = *o;
+        BrVector3Copy(pHit_point, o);
         return 8;
     } else {
         for (i = 0; i < 3; ++i) {
