@@ -21,7 +21,6 @@ typedef struct tStored_material {
     br_pixelmap* index_blend;
     br_matrix23 map_transform;
     char identifier[200];
-    int blend;
 } tStored_material;
 
 tStored_model_context* NewStoredModelContext();

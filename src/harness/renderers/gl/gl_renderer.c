@@ -18,6 +18,10 @@ static GLuint fullscreen_quad_texture, palette_texture, depth_texture;
 static GLuint shader_program_2d;
 static GLuint shader_program_3d;
 static GLuint framebuffer_id, framebuffer_texture = 0;
+
+// holds the latest uploaded version of the colour_buffer. Available in shader for blending
+static GLuint current_colourbuffer_texture;
+
 static uint8_t gl_palette[4 * 256]; // RGBA
 static uint8_t* screen_buffer_flip_pixels;
 static uint16_t* depth_buffer_flip_pixels;
@@ -28,16 +32,14 @@ static int vp_x, vp_y, vp_width, vp_height;
 static br_pixelmap *last_colour_buffer, *last_depth_buffer;
 static int dirty_buffers = 0;
 
-static GLuint current_framebuffer_texture;
-
 static br_pixelmap *last_colour_buffer, *last_depth_buffer;
 
 static tStored_material* current_material;
 static br_pixelmap* current_shade_table;
 
-// Increment flush_counter during flush, and upload_counter when we upload the framebuffer texture.
+// Increment flush_counter during flush, and upload_counter when we upload the colour_buffer texture.
 // If the counters are equal, we can avoid re-uploading the same thing.
-static int flush_counter = 0, framebuffer_upload_counter = 0;
+static unsigned int flush_counter = 0, colourbuffer_upload_counter = 0;
 
 struct {
     GLuint texture_pixelmap;
@@ -45,7 +47,7 @@ struct {
     GLuint shade_table;
     GLuint blend_table;
     GLuint blend_enabled;
-    GLuint current_framebuffer;
+    GLuint colour_buffer_texture;
     GLuint model, view, projection;
     GLuint palette_index_override;
     GLuint clip_plane_count;
@@ -134,7 +136,7 @@ void LoadShaders() {
     uniforms_3d.shade_table = GetValidatedUniformLocation(shader_program_3d, "u_shade_table");
     uniforms_3d.blend_table = GetValidatedUniformLocation(shader_program_3d, "u_blend_table");
     uniforms_3d.blend_enabled = GetValidatedUniformLocation(shader_program_3d, "u_blend_enabled");
-    uniforms_3d.current_framebuffer = GetValidatedUniformLocation(shader_program_3d, "u_current_framebuffer");
+    uniforms_3d.colour_buffer_texture = GetValidatedUniformLocation(shader_program_3d, "u_colour_buffer");
     uniforms_3d.projection = GetValidatedUniformLocation(shader_program_3d, "u_projection");
     uniforms_3d.palette_index_override = GetValidatedUniformLocation(shader_program_3d, "u_palette_index_override");
     uniforms_3d.view = GetValidatedUniformLocation(shader_program_3d, "u_view");
@@ -145,7 +147,7 @@ void LoadShaders() {
     glUniform1i(uniforms_3d.texture_pixelmap, 0);
     glUniform1i(uniforms_3d.shade_table, 2);
     glUniform1i(uniforms_3d.blend_table, 3);
-    glUniform1i(uniforms_3d.current_framebuffer, 4);
+    glUniform1i(uniforms_3d.colour_buffer_texture, 4);
 }
 
 void SetupFullScreenRectGeometry() {
@@ -238,7 +240,7 @@ void GLRenderer_Init(int width, int height, int pRender_width, int pRender_heigh
     glGenTextures(1, &palette_texture);
     glGenTextures(1, &framebuffer_texture);
     glGenTextures(1, &depth_texture);
-    glGenTextures(1, &current_framebuffer_texture);
+    glGenTextures(1, &current_colourbuffer_texture);
 
     // setup framebuffer
     glGenFramebuffers(1, &framebuffer_id);
@@ -262,14 +264,12 @@ void GLRenderer_Init(int width, int height, int pRender_width, int pRender_heigh
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer_texture, 0);
 
-    glBindTexture(GL_TEXTURE_2D, current_framebuffer_texture);
+    glBindTexture(GL_TEXTURE_2D, current_colourbuffer_texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     glBindTexture(GL_TEXTURE_2D, depth_texture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, render_width, render_height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, 0);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_texture, 0);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
@@ -323,11 +323,11 @@ void GLRenderer_SetShadeTable(br_pixelmap* table) {
 
 void GLRenderer_SetBlendTable(br_pixelmap* table) {
 
-    if (flush_counter != framebuffer_upload_counter) {
+    if (flush_counter != colourbuffer_upload_counter) {
         glActiveTexture(GL_TEXTURE4);
-        glBindTexture(GL_TEXTURE_2D, current_framebuffer_texture);
+        glBindTexture(GL_TEXTURE_2D, current_colourbuffer_texture);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_R8UI, render_width, render_height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, last_colour_buffer->pixels);
-        framebuffer_upload_counter = flush_counter;
+        colourbuffer_upload_counter = flush_counter;
     }
 
     // blend table uses texture unit 3
@@ -568,9 +568,7 @@ void GLRenderer_Model(br_actor* actor, br_model* model, br_matrix34 model_matrix
     ctx = model->stored;
     v11model* v11 = model->prepared;
 
-    // if (model->identifier) {
-    //     LOG_DEBUG("model rendering %s", model->identifier);
-    // }
+    // LOG_DEBUG("model rendering %s", model->identifier);
     if (v11 == NULL) {
         // LOG_WARN("No model prepared for %s", model->identifier);
         return;
@@ -653,9 +651,8 @@ void GLRenderer_BufferTexture(br_pixelmap* pm) {
     }
 
     // sometimes the pixelmap has row_bytes > width. OpenGL expects linear pixels, so flatten it out
-    uint8_t* original_pixels = pm->pixels;
     uint8_t* linear_pixels = malloc(sizeof(uint8_t) * pm->width * pm->height);
-
+    uint8_t* original_pixels = pm->pixels;
     for (int y = 0; y < pm->height; y++) {
         for (int x = 0; x < pm->width; x++) {
             linear_pixels[y * pm->width + x] = original_pixels[y * pm->row_bytes + x];

@@ -347,8 +347,8 @@ void InitDepthEffects() {
             *((tU8*)gHorizon_material->index_blend->pixels + 256 * i + j) = j;
         }
     }
-    // HACK: this should be above the for loop. Not sure how this is working in OG, as changes made to the object
-    // should include a call to `BrTableUpdate`.
+    // HACK: this should be above the for loop. Haven't been able to figure out how this is working in OG, as changes made to the pixelmap
+    // don't update the stored copy without calling `BrTableUpdate`.
     BrTableAdd(gHorizon_material->index_blend);
 
     gHorizon_material->flags |= BR_MATF_PERSPECTIVE;
@@ -525,12 +525,10 @@ void DoHorizon(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor
     br_actor* actor;
     LOG_TRACE("(%p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world);
 
-    yaw = BrRadianToAngle(atan2(pCamera_to_world->m[2][0], pCamera_to_world->m[2][2]));
-
+    yaw = BrRadianToAngle(atan2f(pCamera_to_world->m[2][0], pCamera_to_world->m[2][2]));
     if (!gProgram_state.cockpit_on && !(gAction_replay_mode && gAction_replay_camera_mode)) {
         return;
     }
-
     if (gRendering_mirror) {
         actor = gRearview_sky_actor;
     } else {

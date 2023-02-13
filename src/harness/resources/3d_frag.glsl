@@ -11,7 +11,7 @@ uniform mat2x3 u_texture_coords_transform;
 uniform usampler2D u_texture_pixelmap;
 uniform usampler2D u_shade_table;
 uniform usampler2D u_blend_table;
-uniform usampler2D u_current_framebuffer;
+uniform usampler2D u_colour_buffer;
 uniform int u_palette_index_override = -1;
 uniform int u_light_value = -1;
 uniform vec4 u_clip_planes[6];
@@ -45,11 +45,10 @@ void main() {
 
         if (u_blend_enabled == 1 && out_palette_index != 0u) {
             // blend_table is a 256x256 image which encodes 256 values of blending between texture and existing screen pixel for each color
-            // u_current_framebuffer is upside down from opengl perspective. We need to sample it upside down.
-            uint fb_color = texelFetch(u_current_framebuffer, ivec2(gl_FragCoord.x, u_viewport_height - gl_FragCoord.y), 0).r;
+            // u_colour_buffer is upside down from opengl perspective. We need to sample it upside down.
+            uint fb_color = texelFetch(u_colour_buffer, ivec2(gl_FragCoord.x, u_viewport_height - gl_FragCoord.y), 0).r;
             uint blended_color = texelFetch(u_blend_table, ivec2(out_palette_index, fb_color), 0).r;
             out_palette_index = blended_color;
-            
         }
     }
     // color 0 is always transparent
