@@ -1487,7 +1487,6 @@ void RenderAFrame(int pDepth_mask_on) {
     static int frame_counter;
 
     frame_counter++;
-
     gRender_screen->pixels = gBack_screen->pixels;
     the_time = GetTotalTime();
     old_pixels = gRender_screen->pixels;
@@ -1610,13 +1609,19 @@ void RenderAFrame(int pDepth_mask_on) {
         ProcessNonTrackActors(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, &old_camera_matrix);
         ProcessTrack(gUniverse_actor, &gProgram_state.track_spec, gCamera, &gCamera_to_world, 0);
         RenderLollipops();
+
+        // dethrace: must flush gpu buffer before rendering depth effect into framebuffer
+        Harness_Hook_FlushRenderer();
         DepthEffectSky(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world);
         DepthEffect(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world);
         if (!gAusterity_mode) {
+            // dethrace: must flush gpu buffer before rendering blended materials
+            Harness_Hook_FlushRenderer();
             ProcessTrack(gUniverse_actor, &gProgram_state.track_spec, gCamera, &gCamera_to_world, 1);
         }
         RenderSplashes();
-        Harness_Hook_FlushRenderer(); /* Dethrace. Flush buffers into memory. */
+        // dethrace: must flush gpu buffer before rendering smoke into framebuffer
+        Harness_Hook_FlushRenderer();
         RenderSmoke(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, gFrame_period);
         RenderSparks(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, gFrame_period);
         RenderProximityRays(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, gFrame_period);

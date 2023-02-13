@@ -48,6 +48,7 @@ void main() {
         if (u_blend_enabled == 1 && out_palette_index != 0u) {
             // blend_table is a 256x256 image which encodes 256 values of blending between texture and existing screen pixel for each color
             // current_framebuffer is upside down from opengl perspective. We need to sample it upside down.
+            int x = u_viewport_height;
             uint fb_color = texelFetch(u_current_framebuffer, ivec2(gl_FragCoord.xy), 0).r;
             uint blended_color = texelFetch(u_blend_table, ivec2(out_palette_index, fb_color), 0).r;
             uint old_out = out_palette_index;

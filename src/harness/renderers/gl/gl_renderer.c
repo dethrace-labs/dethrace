@@ -25,7 +25,7 @@ static uint16_t* depth_buffer_flip_pixels;
 static int window_width, window_height, render_width, render_height;
 static int vp_x, vp_y, vp_width, vp_height;
 
-static br_pixelmap *last_colour_buffer, *last_depth_buffer, *last_shade_table;
+static br_pixelmap *last_colour_buffer, *last_depth_buffer;
 static int dirty_buffers = 0;
 
 static GLuint current_framebuffer_texture;
@@ -34,6 +34,7 @@ static int generated_current_framebuffer_for_this_frame = 0;
 static br_pixelmap *last_colour_buffer, *last_depth_buffer;
 
 static tStored_material* current_material;
+static br_pixelmap* current_shade_table;
 
 struct {
     GLuint texture_pixelmap;
@@ -303,7 +304,7 @@ void GLRenderer_SetPalette(uint8_t* rgba_colors) {
 }
 
 void GLRenderer_SetShadeTable(br_pixelmap* table) {
-    if (last_shade_table == table) {
+    if (current_shade_table == table) {
         return;
     }
 
@@ -314,7 +315,7 @@ void GLRenderer_SetShadeTable(br_pixelmap* table) {
 
     // reset active texture back to default
     glActiveTexture(GL_TEXTURE0);
-    last_shade_table = table;
+    current_shade_table = table;
 }
 
 void GLRenderer_SetBlendTable(br_pixelmap* table) {
@@ -343,11 +344,11 @@ void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer, br_pixe
     glViewport(colour_buffer->base_x, render_height - colour_buffer->height - colour_buffer->base_y, colour_buffer->width, colour_buffer->height);
 
     glUseProgram(shader_program_3d);
-    glEnable(GL_DEPTH_TEST);
     glUniform1i(uniforms_3d.viewport_height, colour_buffer->height);
 
     current_material = NULL;
-    last_shade_table = NULL;
+    current_shade_table = NULL;
+    generated_current_framebuffer_for_this_frame = 0;
 
     int enabled_clip_planes = 0;
     for (int i = 0; i < v1db.enabled_clip_planes.max; i++) {
@@ -360,23 +361,17 @@ void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer, br_pixe
     }
     glUniform1i(uniforms_3d.clip_plane_count, enabled_clip_planes);
 
-    if (0 /*gDebugCamera_active*/) {
-        // float m2[4][4];
-        // memcpy(m2, DebugCamera_View(), sizeof(float) * 16);
-        // glUniformMatrix4fv(uniforms_3d.view, 1, GL_FALSE, (GLfloat*)m2);
-    } else {
+    br_matrix4 cam44 = {
+        { { v1db.camera_path[0].m.m[0][0], v1db.camera_path[0].m.m[0][1], v1db.camera_path[0].m.m[0][2], 0 },
+            { v1db.camera_path[0].m.m[1][0], v1db.camera_path[0].m.m[1][1], v1db.camera_path[0].m.m[1][2], 0 },
+            { v1db.camera_path[0].m.m[2][0], v1db.camera_path[0].m.m[2][1], v1db.camera_path[0].m.m[2][2], 0 },
+            { v1db.camera_path[0].m.m[3][0], v1db.camera_path[0].m.m[3][1], v1db.camera_path[0].m.m[3][2], 1 } }
+    };
+    br_matrix4 cam44_inverse;
+    BrMatrix4Inverse(&cam44_inverse, &cam44);
 
-        br_matrix4 cam44 = {
-            { { v1db.camera_path[0].m.m[0][0], v1db.camera_path[0].m.m[0][1], v1db.camera_path[0].m.m[0][2], 0 },
-                { v1db.camera_path[0].m.m[1][0], v1db.camera_path[0].m.m[1][1], v1db.camera_path[0].m.m[1][2], 0 },
-                { v1db.camera_path[0].m.m[2][0], v1db.camera_path[0].m.m[2][1], v1db.camera_path[0].m.m[2][2], 0 },
-                { v1db.camera_path[0].m.m[3][0], v1db.camera_path[0].m.m[3][1], v1db.camera_path[0].m.m[3][2], 1 } }
-        };
-        br_matrix4 cam44_inverse;
-        BrMatrix4Inverse(&cam44_inverse, &cam44);
+    glUniformMatrix4fv(uniforms_3d.view, 1, GL_FALSE, &cam44_inverse.m[0][0]);
 
-        glUniformMatrix4fv(uniforms_3d.view, 1, GL_FALSE, &cam44_inverse.m[0][0]);
-    }
     br_matrix4 p;
     br_camera* cam = camera->type_data;
     BrMatrix4Perspective(&p, cam->field_of_view, cam->aspect, cam->hither_z, cam->yon_z);
@@ -388,15 +383,10 @@ void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer, br_pixe
 }
 
 void GLRenderer_EndScene() {
-
-    //  switch back to default fb and reset
+    //  switch back to default fb and reset state
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDepthMask(GL_TRUE);
-
-    generated_current_framebuffer_for_this_frame = 0;
-    glUniform1i(uniforms_3d.blend_enabled, 0);
     glDepthMask(GL_TRUE);
-
     CHECK_GL_ERROR("GLRenderer_EndScene");
 }
 
@@ -416,6 +406,7 @@ void GLRenderer_FullScreenQuad(uint8_t* screen_buffer) {
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
+    glEnable(GL_DEPTH_TEST);
     CHECK_GL_ERROR("GLRenderer_RenderFullScreenQuad");
 }
 
@@ -429,7 +420,6 @@ void GLRenderer_ClearBuffers() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     CHECK_GL_ERROR("GLRenderer_ClearBuffers");
-    blendcount = 0;
 }
 
 void GLRenderer_BufferModel(br_model* model) {
@@ -530,8 +520,7 @@ void GLRenderer_BufferModel(br_model* model) {
 }
 
 void setActiveMaterial(tStored_material* material) {
-    // glDepthMask(GL_TRUE);
-    if (material == NULL /*|| material == current_material*/) {
+    if (material == NULL || material == current_material) {
         return;
     }
 
