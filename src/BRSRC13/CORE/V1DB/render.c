@@ -276,9 +276,9 @@ void BrDbSceneRenderBegin(br_actor* world, br_actor* camera) {
  * the camera and the root - this is so that model->view
  * transforms can use the shortest route, rather than via the root
  */
-#define MAX_CAMERA_DEPTH 16
-    for (i = 0; i < MAX_CAMERA_DEPTH; i++)
+    for (i = 0; i < BR_ASIZE(v1db.camera_path); i++) {
         v1db.camera_path[i].a = NULL;
+    }
 
     i = camera->depth;
     a = camera;
