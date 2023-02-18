@@ -18,6 +18,10 @@ static GLuint fullscreen_quad_texture, palette_texture, depth_texture;
 static GLuint shader_program_2d;
 static GLuint shader_program_3d;
 static GLuint framebuffer_id, framebuffer_texture = 0;
+
+// holds the latest uploaded version of the colour_buffer. Available in shader for blending
+static GLuint current_colourbuffer_texture;
+
 static uint8_t gl_palette[4 * 256]; // RGBA
 static uint8_t* screen_buffer_flip_pixels;
 static uint16_t* depth_buffer_flip_pixels;
@@ -25,13 +29,17 @@ static uint16_t* depth_buffer_flip_pixels;
 static int window_width, window_height, render_width, render_height;
 static int vp_x, vp_y, vp_width, vp_height;
 
-static br_pixelmap *last_colour_buffer, *last_depth_buffer, *last_shade_table;
+static br_pixelmap *last_colour_buffer, *last_depth_buffer;
 static int dirty_buffers = 0;
 
-static GLuint current_framebuffer_texture;
-static int generated_current_framebuffer_for_this_frame = 0;
+static br_pixelmap *last_colour_buffer, *last_depth_buffer;
 
 static tStored_material* current_material;
+static br_pixelmap* current_shade_table;
+
+// Increment flush_counter during flush, and upload_counter when we upload the colour_buffer texture.
+// If the counters are equal, we can avoid re-uploading the same thing.
+static unsigned int flush_counter = 0, colourbuffer_upload_counter = 0;
 
 struct {
     GLuint texture_pixelmap;
@@ -39,7 +47,7 @@ struct {
     GLuint shade_table;
     GLuint blend_table;
     GLuint blend_enabled;
-    GLuint current_framebuffer;
+    GLuint colour_buffer_texture;
     GLuint model, view, projection;
     GLuint palette_index_override;
     GLuint clip_plane_count;
@@ -128,7 +136,7 @@ void LoadShaders() {
     uniforms_3d.shade_table = GetValidatedUniformLocation(shader_program_3d, "u_shade_table");
     uniforms_3d.blend_table = GetValidatedUniformLocation(shader_program_3d, "u_blend_table");
     uniforms_3d.blend_enabled = GetValidatedUniformLocation(shader_program_3d, "u_blend_enabled");
-    uniforms_3d.current_framebuffer = GetValidatedUniformLocation(shader_program_3d, "u_current_framebuffer");
+    uniforms_3d.colour_buffer_texture = GetValidatedUniformLocation(shader_program_3d, "u_colour_buffer");
     uniforms_3d.projection = GetValidatedUniformLocation(shader_program_3d, "u_projection");
     uniforms_3d.palette_index_override = GetValidatedUniformLocation(shader_program_3d, "u_palette_index_override");
     uniforms_3d.view = GetValidatedUniformLocation(shader_program_3d, "u_view");
@@ -139,7 +147,7 @@ void LoadShaders() {
     glUniform1i(uniforms_3d.texture_pixelmap, 0);
     glUniform1i(uniforms_3d.shade_table, 2);
     glUniform1i(uniforms_3d.blend_table, 3);
-    glUniform1i(uniforms_3d.current_framebuffer, 4);
+    glUniform1i(uniforms_3d.colour_buffer_texture, 4);
 }
 
 void SetupFullScreenRectGeometry() {
@@ -232,7 +240,7 @@ void GLRenderer_Init(int width, int height, int pRender_width, int pRender_heigh
     glGenTextures(1, &palette_texture);
     glGenTextures(1, &framebuffer_texture);
     glGenTextures(1, &depth_texture);
-    glGenTextures(1, &current_framebuffer_texture);
+    glGenTextures(1, &current_colourbuffer_texture);
 
     // setup framebuffer
     glGenFramebuffers(1, &framebuffer_id);
@@ -256,7 +264,7 @@ void GLRenderer_Init(int width, int height, int pRender_width, int pRender_heigh
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer_texture, 0);
 
-    glBindTexture(GL_TEXTURE_2D, current_framebuffer_texture);
+    glBindTexture(GL_TEXTURE_2D, current_colourbuffer_texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
@@ -299,7 +307,7 @@ void GLRenderer_SetPalette(uint8_t* rgba_colors) {
 }
 
 void GLRenderer_SetShadeTable(br_pixelmap* table) {
-    if (last_shade_table == table) {
+    if (current_shade_table == table) {
         return;
     }
 
@@ -310,16 +318,16 @@ void GLRenderer_SetShadeTable(br_pixelmap* table) {
 
     // reset active texture back to default
     glActiveTexture(GL_TEXTURE0);
-    last_shade_table = table;
+    current_shade_table = table;
 }
 
 void GLRenderer_SetBlendTable(br_pixelmap* table) {
 
-    if (!generated_current_framebuffer_for_this_frame) {
+    if (flush_counter != colourbuffer_upload_counter) {
         glActiveTexture(GL_TEXTURE4);
-        glBindTexture(GL_TEXTURE_2D, current_framebuffer_texture);
+        glBindTexture(GL_TEXTURE_2D, current_colourbuffer_texture);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_R8UI, render_width, render_height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, last_colour_buffer->pixels);
-        generated_current_framebuffer_for_this_frame = 1;
+        colourbuffer_upload_counter = flush_counter;
     }
 
     // blend table uses texture unit 3
@@ -336,41 +344,35 @@ extern br_v1db_state v1db;
 void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer) {
     last_colour_buffer = colour_buffer;
     last_depth_buffer = depth_buffer;
-
     glViewport(colour_buffer->base_x, render_height - colour_buffer->height - colour_buffer->base_y, colour_buffer->width, colour_buffer->height);
     glUseProgram(shader_program_3d);
-    glEnable(GL_DEPTH_TEST);
-    glUniform1i(uniforms_3d.viewport_height, colour_buffer->height);
+    glUniform1i(uniforms_3d.viewport_height, render_height);
+
+    current_material = NULL;
+    current_shade_table = NULL;
 
     int enabled_clip_planes = 0;
     for (int i = 0; i < v1db.enabled_clip_planes.max; i++) {
-        if (!v1db.enabled_clip_planes.enabled || !v1db.enabled_clip_planes.enabled[i]) {
+        if (v1db.enabled_clip_planes.enabled == NULL || !v1db.enabled_clip_planes.enabled[i]) {
             continue;
         }
         br_vector4* v4 = v1db.enabled_clip_planes.enabled[i]->type_data;
         glUniform4f(uniforms_3d.clip_planes[enabled_clip_planes], v4->v[0], v4->v[1], v4->v[2], v4->v[3]);
         enabled_clip_planes++;
     }
-
     glUniform1i(uniforms_3d.clip_plane_count, enabled_clip_planes);
 
-    if (0 /*gDebugCamera_active*/) {
-        // float m2[4][4];
-        // memcpy(m2, DebugCamera_View(), sizeof(float) * 16);
-        // glUniformMatrix4fv(uniforms_3d.view, 1, GL_FALSE, (GLfloat*)m2);
-    } else {
+    br_matrix4 cam44 = {
+        { { v1db.camera_path[0].m.m[0][0], v1db.camera_path[0].m.m[0][1], v1db.camera_path[0].m.m[0][2], 0 },
+            { v1db.camera_path[0].m.m[1][0], v1db.camera_path[0].m.m[1][1], v1db.camera_path[0].m.m[1][2], 0 },
+            { v1db.camera_path[0].m.m[2][0], v1db.camera_path[0].m.m[2][1], v1db.camera_path[0].m.m[2][2], 0 },
+            { v1db.camera_path[0].m.m[3][0], v1db.camera_path[0].m.m[3][1], v1db.camera_path[0].m.m[3][2], 1 } }
+    };
+    br_matrix4 cam44_inverse;
+    BrMatrix4Inverse(&cam44_inverse, &cam44);
 
-        br_matrix4 cam44 = {
-            { { camera->t.t.mat.m[0][0], camera->t.t.mat.m[0][1], camera->t.t.mat.m[0][2], 0 },
-                { camera->t.t.mat.m[1][0], camera->t.t.mat.m[1][1], camera->t.t.mat.m[1][2], 0 },
-                { camera->t.t.mat.m[2][0], camera->t.t.mat.m[2][1], camera->t.t.mat.m[2][2], 0 },
-                { camera->t.t.mat.m[3][0], camera->t.t.mat.m[3][1], camera->t.t.mat.m[3][2], 1 } }
-        };
-        br_matrix4 cam44_inverse;
-        BrMatrix4Inverse(&cam44_inverse, &cam44);
+    glUniformMatrix4fv(uniforms_3d.view, 1, GL_FALSE, &cam44_inverse.m[0][0]);
 
-        glUniformMatrix4fv(uniforms_3d.view, 1, GL_FALSE, &cam44_inverse.m[0][0]);
-    }
     br_matrix4 p;
     br_camera* cam = camera->type_data;
     BrMatrix4Perspective(&p, cam->field_of_view, cam->aspect, cam->hither_z, cam->yon_z);
@@ -382,12 +384,10 @@ void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer, br_pixe
 }
 
 void GLRenderer_EndScene() {
-
-    //  switch back to default fb and reset
+    //  switch back to default fb and reset state
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDepthMask(GL_TRUE);
-
-    generated_current_framebuffer_for_this_frame = 0;
+    glDepthMask(GL_TRUE);
     CHECK_GL_ERROR("GLRenderer_EndScene");
 }
 
@@ -396,6 +396,7 @@ void GLRenderer_FullScreenQuad(uint8_t* screen_buffer) {
     glViewport(vp_x, vp_y, vp_width, vp_height);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDisable(GL_DEPTH_TEST);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     glBindTexture(GL_TEXTURE_2D, fullscreen_quad_texture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R8UI, render_width, render_height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, screen_buffer);
@@ -406,6 +407,7 @@ void GLRenderer_FullScreenQuad(uint8_t* screen_buffer) {
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
+    glEnable(GL_DEPTH_TEST);
     CHECK_GL_ERROR("GLRenderer_RenderFullScreenQuad");
 }
 
@@ -561,7 +563,7 @@ void setActiveMaterial(tStored_material* material) {
     }
 }
 
-void GLRenderer_Model(br_actor* actor, br_model* model, br_matrix34 model_matrix) {
+void GLRenderer_Model(br_actor* actor, br_model* model, br_matrix34 model_matrix, br_token render_type) {
     tStored_model_context* ctx;
     ctx = model->stored;
     v11model* v11 = model->prepared;
@@ -571,11 +573,6 @@ void GLRenderer_Model(br_actor* actor, br_model* model, br_matrix34 model_matrix
         // LOG_WARN("No model prepared for %s", model->identifier);
         return;
     }
-
-    CHECK_GL_ERROR("rm1");
-
-    glEnable(GL_DEPTH_TEST);
-    glUseProgram(shader_program_3d);
 
     GLfloat m[16] = {
         model_matrix.m[0][0], model_matrix.m[0][1], model_matrix.m[0][2], 0,
@@ -587,9 +584,6 @@ void GLRenderer_Model(br_actor* actor, br_model* model, br_matrix34 model_matrix
     glUniformMatrix4fv(uniforms_3d.model, 1, GL_FALSE, m);
     glBindVertexArray(ctx->vao_id);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx->ebo_id);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-    int element_index = 0;
 
     // br_actor can have a material too, which is applied to the faces if the face doesn't have a texture
     if (actor->material) {
@@ -601,7 +595,21 @@ void GLRenderer_Model(br_actor* actor, br_model* model, br_matrix34 model_matrix
         glUniform1i(uniforms_3d.light_value, -1);
     }
 
+    switch (render_type) {
+    case BRT_TRIANGLE:
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        break;
+    case BRT_LINE:
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glUniform1i(uniforms_3d.palette_index_override, 255);
+        glUniform1i(uniforms_3d.light_value, -1);
+        break;
+    default:
+        LOG_PANIC("render_type %d is not supported?!", render_type);
+    }
+
     v11group* group;
+    int element_index = 0;
     for (int g = 0; g < v11->ngroups; g++) {
         group = &v11->groups[g];
         setActiveMaterial(group->stored);
@@ -679,7 +687,7 @@ void GLRenderer_FlushBuffers() {
         for (int x = 0; x < render_width; x++) {
             new_pixel = screen_buffer_flip_pixels[y * render_width + x];
             if (new_pixel != 0) {
-                pm_pixels[dest_y * render_width + x] = screen_buffer_flip_pixels[y * render_width + x];
+                pm_pixels[dest_y * render_width + x] = new_pixel;
             }
         }
     }
@@ -688,18 +696,19 @@ void GLRenderer_FlushBuffers() {
     glBindTexture(GL_TEXTURE_2D, depth_texture);
     glGetTexImage(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, depth_buffer_flip_pixels);
 
-    dest_y = last_depth_buffer->height;
-    int src_y = render_height - last_depth_buffer->base_y - last_depth_buffer->height;
+    dest_y = last_colour_buffer->height;
+    int src_y = render_height - last_colour_buffer->base_y - last_colour_buffer->height;
     uint16_t* depth_pixels = last_depth_buffer->pixels;
-    for (int y = 0; y < last_depth_buffer->height; y++) {
+    for (int y = 0; y < last_colour_buffer->height; y++) {
         dest_y--;
-        for (int x = 0; x < last_depth_buffer->width; x++) {
-            depth_pixels[dest_y * render_width + x] = depth_buffer_flip_pixels[src_y * render_width + last_depth_buffer->base_x + x];
+        for (int x = 0; x < last_colour_buffer->width; x++) {
+            depth_pixels[dest_y * render_width + x] = depth_buffer_flip_pixels[src_y * render_width + last_colour_buffer->base_x + x];
         }
         src_y++;
     }
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
     glClear(GL_COLOR_BUFFER_BIT);
+    flush_counter++;
     dirty_buffers = 0;
 }
 

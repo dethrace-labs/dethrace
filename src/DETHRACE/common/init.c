@@ -198,7 +198,15 @@ void AllocateRearviewPixelmap() {
 void ReinitialiseRearviewCamera() {
     br_camera* camera_ptr;
     LOG_TRACE("()");
-    STUB();
+
+    camera_ptr = gRearview_camera->type_data;
+    camera_ptr->field_of_view = BrDegreeToAngle(gProgram_state.current_car.rearview_camera_angle);
+    camera_ptr->aspect = (gProgram_state.current_car.mirror_right - gProgram_state.current_car.mirror_left) / (float)(gProgram_state.current_car.mirror_bottom - gProgram_state.current_car.mirror_top);
+    gRearview_camera->t.t.translate.t.v[0] = gProgram_state.current_car.mirror_x_offset;
+    gRearview_camera->t.t.translate.t.v[1] = gProgram_state.current_car.mirror_y_offset;
+    gRearview_camera->t.t.translate.t.v[2] = gProgram_state.current_car.mirror_z_offset;
+    AllocateRearviewPixelmap();
+    MungeRearviewSky();
 }
 
 // IDA: void __cdecl ReinitialiseRenderStuff()

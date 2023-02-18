@@ -46,7 +46,7 @@ void GLRenderer_SetPalette(uint8_t* rgba_colors);
 void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer);
 void GLRenderer_EndScene();
 void GLRenderer_FullScreenQuad(uint8_t* screen_buffer);
-void GLRenderer_Model(br_actor* actor, br_model* model, br_matrix34 model_matrix);
+void GLRenderer_Model(br_actor* actor, br_model* model, br_matrix34 model_matrix, br_token render_type);
 void GLRenderer_BufferTexture(br_pixelmap* pm);
 void GLRenderer_BufferMaterial(br_material* mat);
 void GLRenderer_BufferModel(br_model* model);

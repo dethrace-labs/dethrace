@@ -2947,7 +2947,7 @@ br_actor* BuildPedPaths(tPedestrian_instruction* pInstructions, int pInstruc_cou
     }
     face_count -= 4;
     the_model = BrModelAllocate(NULL, vertex_count, face_count);
-    the_model->flags |= BR_MODU_EDGES | BR_MODU_NORMALS;
+    the_model->flags |= BR_MODU_VERTEX_COLOURS | BR_MODU_VERTEX_POSITIONS;
 
     vertex_count = 0;
     face_count = 0;
