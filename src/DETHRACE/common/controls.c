@@ -1093,6 +1093,7 @@ void ToggleMirror() {
 }
 
 // IDA: void __cdecl ConcussMe()
+// dethrace: this is not referenced in the retail executables. Left over debug code.
 void ConcussMe() {
     LOG_TRACE("()");
 

@@ -1598,23 +1598,19 @@ void RenderAFrame(int pDepth_mask_on) {
         CalculateWobblitude(the_time);
     }
     if (cockpit_on) {
-        if (-gScreen_wobble_x <= gX_offset) {
-            if (gScreen_wobble_x + gX_offset + gRender_screen->width <= gBack_screen->width) {
-                x_shift = gScreen_wobble_x;
-            } else {
-                x_shift = gBack_screen->width - gRender_screen->width - gX_offset;
-            }
-        } else {
+        if (-gScreen_wobble_x > gX_offset) {
             x_shift = -gX_offset;
-        }
-        if (-gScreen_wobble_y <= gY_offset) {
-            if (gScreen_wobble_y + gY_offset + gRender_screen->height <= gBack_screen->height) {
-                y_shift = gScreen_wobble_y;
-            } else {
-                y_shift = gBack_screen->height - gRender_screen->height - gY_offset;
-            }
+        } else if (gScreen_wobble_x + gX_offset + gRender_screen->width > gBack_screen->width) {
+            x_shift = gBack_screen->width - gRender_screen->width - gX_offset;
         } else {
+            x_shift = gScreen_wobble_x;
+        }
+        if (-gScreen_wobble_y > gY_offset) {
             y_shift = -gY_offset;
+        } else if (gScreen_wobble_y + gY_offset + gRender_screen->height > gBack_screen->height) {
+            y_shift = gBack_screen->height - gRender_screen->height - gY_offset;
+        } else {
+            y_shift = gScreen_wobble_y;
         }
     } else {
         x_shift = 0;
@@ -1625,13 +1621,11 @@ void RenderAFrame(int pDepth_mask_on) {
         BrMatrix34Copy(&old_mirror_cam_matrix, &gRearview_camera->t.t.mat);
     }
     if (cockpit_on) {
-        gSheer_mat.m[2][1] = (double)y_shift / (double)gRender_screen->height;
-        gSheer_mat.m[2][0] = (double)-x_shift / (double)gRender_screen->width;
+        gSheer_mat.m[2][1] = y_shift / (float)gRender_screen->height;
+        gSheer_mat.m[2][0] = -x_shift / (float)gRender_screen->width;
         BrMatrix34Pre(&gCamera->t.t.mat, &gSheer_mat);
-        gCamera->t.t.mat.m[3][0] = gCamera->t.t.mat.m[3][0]
-            - (double)gScreen_wobble_x * 1.5 / (double)gRender_screen->width / 6.9000001;
-        gCamera->t.t.mat.m[3][1] = (double)gScreen_wobble_y * 1.5 / (double)gRender_screen->width / 6.9000001
-            + gCamera->t.t.mat.m[3][1];
+        gCamera->t.t.translate.t.v[0] -= gScreen_wobble_x * 1.5f / gRender_screen->width / WORLD_SCALE;
+        gCamera->t.t.translate.t.v[1] += gScreen_wobble_y * 1.5f / gRender_screen->width / WORLD_SCALE;
     }
     gRender_screen->pixels = (char*)gRender_screen->pixels + x_shift + y_shift * gRender_screen->row_bytes;
     CalculateConcussion(the_time);

@@ -1087,18 +1087,18 @@ void DoInstruments(tU32 pThe_time) {
                 the_angle = DEG_TO_RAD((double)gProgram_state.current_car.tacho_end_angle[gProgram_state.cockpit_on]);
             }
             if (the_angle >= 0.0) {
-                if (the_angle >= 6.283185307179586) {
-                    the_angle = the_angle - 6.283185307179586;
+                if (the_angle >= TAU) {
+                    the_angle = the_angle - TAU;
                 }
             } else {
-                the_angle = the_angle + 6.283185307179586;
+                the_angle = the_angle + TAU;
             }
             the_angle2 = 1.570796326794897 - the_angle;
             if (the_angle2 < 0) {
-                the_angle2 = the_angle2 + 6.283185307179586;
+                the_angle2 = the_angle2 + TAU;
             }
             if (the_angle2 > 4.71238898038469) {
-                cos_angle = gCosine_array[(unsigned int)((6.283185307179586 - the_angle2) / DR_PI * 128.0)];
+                cos_angle = gCosine_array[(unsigned int)((TAU - the_angle2) / DR_PI * 128.0)];
             } else if (the_angle2 > DR_PI) {
                 cos_angle = -gCosine_array[(unsigned int)((the_angle2 - DR_PI) / DR_PI * 128.0)];
             } else if (the_angle2 > 1.5707963267948966) {
@@ -1107,7 +1107,7 @@ void DoInstruments(tU32 pThe_time) {
                 cos_angle = gCosine_array[(unsigned int)(the_angle2 / DR_PI * 128.0)];
             }
             if (the_angle > 4.71238898038469) {
-                sin_angle = gCosine_array[(unsigned int)((6.283185307179586 - the_angle) / DR_PI * 128.0)];
+                sin_angle = gCosine_array[(unsigned int)((TAU - the_angle) / DR_PI * 128.0)];
             } else if (the_angle > DR_PI) {
                 sin_angle = -gCosine_array[(unsigned int)((the_angle - DR_PI) / DR_PI * 128.0)];
             } else if (the_angle > 1.5707963267948966) {
@@ -1173,7 +1173,7 @@ void DoInstruments(tU32 pThe_time) {
 #define GEAR_HEIGHT ((int)gProgram_state.current_car.gears_image->height / 8)
 #define GEAR_HEIGHT_HIRES GEAR_HEIGHT
 #endif
-	    gear_height = gGraf_spec_index ? GEAR_HEIGHT_HIRES : GEAR_HEIGHT;
+            gear_height = gGraf_spec_index ? GEAR_HEIGHT_HIRES : GEAR_HEIGHT;
             DRPixelmapRectangleMaskedCopy(
                 gBack_screen,
                 the_wobble_x + gProgram_state.current_car.gear_x[gProgram_state.cockpit_on],
@@ -1204,18 +1204,18 @@ void DoInstruments(tU32 pThe_time) {
             }
 
             if (the_angle >= 0.0) {
-                if (the_angle >= 6.283185307179586) {
-                    the_angle = the_angle - 6.283185307179586;
+                if (the_angle >= TAU) {
+                    the_angle = the_angle - TAU;
                 }
             } else {
-                the_angle = the_angle + 6.283185307179586;
+                the_angle = the_angle + TAU;
             }
             the_angle2 = 1.570796326794897 - the_angle;
             if (the_angle2 < 0.0) {
-                the_angle2 = the_angle2 + 6.283185307179586;
+                the_angle2 = the_angle2 + TAU;
             }
             if (the_angle2 > 4.71238898038469) {
-                cos_angle = gCosine_array[(unsigned int)((6.283185307179586 - the_angle2) / DR_PI * 128.0)];
+                cos_angle = gCosine_array[(unsigned int)((TAU - the_angle2) / DR_PI * 128.0)];
             } else if (the_angle2 > DR_PI) {
                 cos_angle = -gCosine_array[(unsigned int)((the_angle2 - DR_PI) / DR_PI * 128.0)];
             } else if (the_angle2 > 1.5707963267948966) {
@@ -1225,7 +1225,7 @@ void DoInstruments(tU32 pThe_time) {
             }
 
             if (the_angle > 4.71238898038469) {
-                sin_angle = gCosine_array[(unsigned int)((6.283185307179586 - the_angle) / DR_PI * 128.0)];
+                sin_angle = gCosine_array[(unsigned int)((TAU - the_angle) / DR_PI * 128.0)];
             } else if (the_angle > DR_PI) {
                 sin_angle = -gCosine_array[(unsigned int)((the_angle - DR_PI) / DR_PI * 128.0)];
             } else if (the_angle > 1.5707963267948966) {
