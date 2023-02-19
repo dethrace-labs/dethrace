@@ -728,7 +728,7 @@ void ClearWobbles() {
     int i;
     LOG_TRACE("()");
 
-    for (i = 0; i < COUNT_OF(gWobble_array); ++i) {
+    for (i = 0; i < COUNT_OF(gWobble_array); i++) {
         gWobble_array[i].time_started = 0;
     }
 }
@@ -739,7 +739,7 @@ void InitWobbleStuff() {
 
     ClearWobbles();
     for (i = 0; i < COUNT_OF(gCosine_array); i++) {
-        gCosine_array[i] = cosf(i / 64.0f * 3.141592653589793f / 2.0f);
+        gCosine_array[i] = cosf(i / 64.0f * DR_PI / 2.0f);
     }
 }
 
@@ -792,9 +792,48 @@ void CalculateWobblitude(tU32 pThe_time) {
     double cosine_over_angle;
     LOG_TRACE("(%d)", pThe_time);
 
+    if (gProgram_state.new_view != eView_undefined) {
+        return;
+    }
     gScreen_wobble_x = 0;
     gScreen_wobble_y = 0;
-    STUB_ONCE();
+    for (i = 0; i < COUNT_OF(gWobble_array); i++) {
+        if (gWobble_array[i].time_started != 0) {
+            time_going = pThe_time - gWobble_array[i].time_started;
+            if (time_going > 1000) {
+                gWobble_array[i].time_started = 0;
+            } else {
+                mod_angle = fmod(time_going / gWobble_array[i].period, TAU);
+                if (mod_angle > DR_3PI_OVER_2) {
+                    cosine_over_angle = gCosine_array[(unsigned int)((TAU - mod_angle) / DR_PI * 128.0)];
+                } else if (mod_angle > DR_PI) {
+                    cosine_over_angle = -gCosine_array[(unsigned int)((mod_angle - DR_PI) / DR_PI * 128.0)];
+                } else if (mod_angle > DR_PI_OVER_2) {
+                    cosine_over_angle = -gCosine_array[(unsigned int)((DR_PI - mod_angle) / DR_PI * 128.0)];
+                } else {
+                    cosine_over_angle = gCosine_array[(unsigned int)(mod_angle / DR_PI * 128.0)];
+                }
+                angle = cosine_over_angle / ((double)(pThe_time - gWobble_array[i].time_started) * 0.0035f + 1.0f);
+                gScreen_wobble_x = (gWobble_array[i].amplitude_x * angle + gScreen_wobble_x);
+                gScreen_wobble_y = (gWobble_array[i].amplitude_y * angle + gScreen_wobble_y);
+            }
+        }
+    }
+    if (gCurrent_graf_data->cock_margin_x >= gScreen_wobble_x) {
+        if (-gCurrent_graf_data->cock_margin_x > gScreen_wobble_x) {
+            gScreen_wobble_x = -gCurrent_graf_data->cock_margin_x;
+        }
+    } else {
+        gScreen_wobble_x = gCurrent_graf_data->cock_margin_x;
+    }
+    if (gCurrent_graf_data->cock_margin_y >= gScreen_wobble_y) {
+        if (-gCurrent_graf_data->cock_margin_y > gScreen_wobble_y) {
+            gScreen_wobble_y = -gCurrent_graf_data->cock_margin_y;
+        }
+    } else {
+        gScreen_wobble_y = gCurrent_graf_data->cock_margin_y;
+    }
+    PipeSingleScreenShake(gScreen_wobble_x, gScreen_wobble_y);
 }
 
 // IDA: void __usercall CalculateConcussion(tU32 pThe_time@<EAX>)
@@ -808,8 +847,34 @@ void CalculateConcussion(tU32 pThe_time) {
     float cosine_over_angle;
     LOG_TRACE("(%d)", pThe_time);
 
-    gConcussion.concussed = 0;
-    STUB_ONCE();
+    if (!gConcussion.concussed) {
+        return;
+    }
+    time_difference = pThe_time - gConcussion.time_started;
+    if (pThe_time - gConcussion.time_started > 2000) {
+        gConcussion.concussed = 0;
+    } else {
+        for (i = 0; i < 3; ++i) {
+            for (j = 0; j < 3; ++j) {
+                the_amplitude = gConcussion.amplitudes.m[i][j];
+                if (the_amplitude != 0.0) {
+                    mod_angle = fmodf(time_difference / gConcussion.periods.m[i][j], TAU);
+                    if (mod_angle > DR_3PI_OVER_2) {
+                        cosine_over_angle = gCosine_array[(unsigned int)((TAU - mod_angle) / DR_PI * 128.f)];
+                    } else if (mod_angle > DR_PI) {
+                        cosine_over_angle = -gCosine_array[(unsigned int)((mod_angle - DR_PI) / DR_PI * 128.f)];
+                    } else if (mod_angle > DR_PI_OVER_2) {
+                        cosine_over_angle = -gCosine_array[(unsigned int)((DR_PI - mod_angle) / DR_PI * 128.f)];
+                    } else {
+                        cosine_over_angle = gCosine_array[(unsigned int)(mod_angle / DR_PI * 128.f)];
+                    }
+                    angle = cosine_over_angle / ((double)time_difference * 0.02f + 1.0f);
+                    gCamera->t.t.mat.m[i][j] = angle * the_amplitude + gCamera->t.t.mat.m[i][j];
+                    gRearview_camera->t.t.mat.m[i][j] = angle * the_amplitude + gRearview_camera->t.t.mat.m[i][j];
+                }
+            }
+        }
+    }
 }
 
 // IDA: void __cdecl SufferFromConcussion(float pSeriousness)
@@ -817,7 +882,15 @@ void SufferFromConcussion(float pSeriousness) {
     int i;
     int j;
     LOG_TRACE("(%f)", pSeriousness);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
+            gConcussion.amplitudes.m[i][j] = FRandomPosNeg(pSeriousness);
+            gConcussion.periods.m[i][j] = FRandomBetween(20.f, 100.f);
+        }
+    }
+    gConcussion.concussed = 1;
+    gConcussion.time_started = GetTotalTime();
 }
 
 // IDA: void __usercall ProcessNonTrackActors(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>, br_matrix34 *pOld_camera_matrix)
