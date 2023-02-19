@@ -50,8 +50,8 @@ void (*ControlCar[6])(tCar_spec*, br_scalar) = {
     &ControlCar5,
     NULL,
 };
-int gControl__car = 3;  // suffix added to avoid duplicate symbol
-int gFace_num__car = 1; // suffix added to avoid duplicate symbol
+int gControl__car = 3;      // suffix added to avoid duplicate symbol
+int gFace_num__car = 1;     // suffix added to avoid duplicate symbol
 br_angle gOld_yaw__car = 0; // suffix added to avoid duplicate symbol
 br_angle gOld_zoom = 0;
 br_vector3 gCamera_pos_before_collide = { { 0 } };
@@ -78,7 +78,7 @@ tU32 gQuite_wild_end = 0;
 tU32 gOn_me_wheels_start = 0;
 int gWoz_upside_down_at_all = 0;
 tS3_sound_tag gSkid_tag[2] = { 0, 0 };
-tCar_spec* gLast_car_to_skid[2] = { NULL, NULL};
+tCar_spec* gLast_car_to_skid[2] = { NULL, NULL };
 int gEliminate_faces = 0;
 br_vector3 gZero_v__car = { { 0 } }; // suffix added to avoid duplicate symbol
 tU32 gSwitch_time = 0;
@@ -981,7 +981,7 @@ void FinishCars(tU32 pLast_frame_time, tU32 pTime) {
         if (car->driver >= eDriver_oppo) {
             car->speedo_speed = BrVector3Dot(&minus_k, &car->v) / (WORLD_SCALE * 1000.0f);
 
-            car->steering_angle = d180_OVER_PI * atanf((car->wpos[0].v[2] - car->wpos[2].v[2]) * car->curvature);
+            car->steering_angle = BrRadianToDegree(atanf((car->wpos[0].v[2] - car->wpos[2].v[2]) * car->curvature));
 
             car->lr_sus_position = (car->ride_height - car->oldd[0]) / WORLD_SCALE;
             car->rr_sus_position = (car->ride_height - car->oldd[1]) / WORLD_SCALE;
@@ -4205,8 +4205,8 @@ void MungeCarGraphics(tU32 pFrame_period) {
                         } else if (!gOn_me_wheels_start) {
                             gOn_me_wheels_start = the_time;
                         } else if (the_time - gOn_me_wheels_start > 500
-                                && (the_car->last_special_volume == NULL
-                                    || the_car->last_special_volume->gravity_multiplier == 1.0f)) {
+                            && (the_car->last_special_volume == NULL
+                                || the_car->last_special_volume->gravity_multiplier == 1.0f)) {
                             DoFancyHeadup(kFancyHeadupCunningStuntBonus);
                             EarnCredits(gCunning_stunt_bonus[gProgram_state.skill_level]);
                             gLast_cunning_stunt = PDGetTotalTime();
@@ -4220,7 +4220,8 @@ void MungeCarGraphics(tU32 pFrame_period) {
             }
             if (the_car->driver != eDriver_local_human && the_car->car_model_variable) {
                 distance_from_camera = Vector3DistanceSquared(&the_car->car_master_actor->t.t.translate.t,
-                       (br_vector3*)gCamera_to_world.m[3]) / gCar_simplification_factor[gGraf_spec_index][gCar_simplification_level];
+                                           (br_vector3*)gCamera_to_world.m[3])
+                    / gCar_simplification_factor[gGraf_spec_index][gCar_simplification_level];
                 if (gNet_mode != eNet_mode_none && gNet_players[gIt_or_fox].car == the_car) {
                     distance_from_camera = 0.f;
                 }
@@ -4372,7 +4373,7 @@ void ViewOpponent() {
 void ToggleCarToCarCollisions() {
     LOG_TRACE("()");
 
-   gCar_car_collisions = !gCar_car_collisions;
+    gCar_car_collisions = !gCar_car_collisions;
     if (gCar_car_collisions) {
         NewTextHeadupSlot(4, 0, 3000, -4, "Car Car Collisions");
     } else {

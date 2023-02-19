@@ -842,7 +842,7 @@ tS8* ConvertPixToStripMap(br_pixelmap* pThe_br_map) {
     temp_strip_image = BrMemAllocate(pThe_br_map->row_bytes * pThe_br_map->height, kMem_strip_image);
     current_size = 2;
 
-    *(br_uint_16 *)temp_strip_image = pThe_br_map->height;
+    *(br_uint_16*)temp_strip_image = pThe_br_map->height;
     current_strip_pointer = temp_strip_image;
 
     for (i = 0; i < pThe_br_map->height; i++) {
@@ -1245,8 +1245,8 @@ void ReadNonCarMechanicsData(FILE* pF, tNon_car_spec* non_car) {
     GetThreeFloats(pF, &len, &wid, &het);
     snap_angle = GetAFloat(pF);
 
-    non_car->snap_off_cosine = cosf(snap_angle * ONEEIGHTTWO * 0.00009587379924285257);
-    non_car->collision_info.break_off_radians_squared = snap_angle * 3.14 / 180.0 * (snap_angle * 3.14 / 180.0);
+    non_car->snap_off_cosine = cosf(BrAngleToRadian(BrDegreeToAngle(snap_angle)));
+    non_car->collision_info.break_off_radians_squared = snap_angle * 3.14f / 180.f * (snap_angle * 3.14f / 180.f);
     ts = GetAFloat(pF);
 
     non_car->min_torque_squared = ts * ts;
@@ -1687,7 +1687,7 @@ void MungeWindscreen(br_model* pModel) {
 void SetModelFlags(br_model* pModel, int pOwner) {
     LOG_TRACE("(%p, %d)", pModel, pOwner);
 
-    if (pModel != NULL&& pModel->nfaces != 0) {
+    if (pModel != NULL && pModel->nfaces != 0) {
 #if defined(DETHRACE_FIX_BUGS) /* Show Squad Car in the wreck gallery. */
         if (gAusterity_mode) {
 #else
@@ -2224,11 +2224,11 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
     GetALineAndDontArgue(f, s);
     str = strtok(s, "\t ,/");
     sscanf(str, "%f", &temp_float);
-    pCar_spec->driven_wheels_circum = temp_float * 2.0 * 3.141592653589793;
+    pCar_spec->driven_wheels_circum = temp_float * 2.f * DR_PI;
     GetALineAndDontArgue(f, s);
     str = strtok(s, "\t ,/");
     sscanf(str, "%f", &temp_float);
-    pCar_spec->non_driven_wheels_circum = temp_float * 2.0 * 3.141592653589793;
+    pCar_spec->non_driven_wheels_circum = temp_float * 2.f * DR_PI;
     pCar_spec->car_model_variable = pDriver != eDriver_local_human;
     PossibleService();
     GetALineAndDontArgue(f, s);
@@ -2299,14 +2299,14 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
     fclose(g);
 
 #if DETHRACE_FIX_BUGS
-#define CHECK_BINDING_INDEX(IDX)                                                                                 \
-    do {                                                                                                         \
-        if ((IDX) >= 0) {                                                                                        \
-            if (IDX >= COUNT_OF(gGroove_funk_bindings) || gGroove_funk_bindings[IDX] == NULL) {                                                            \
-                LOG_WARN("Disabling invalid groove binding for " #IDX "=%d (%d)", IDX, IDX-gGroove_funk_offset); \
-                IDX = -1;                                                                                        \
-            }                                                                                                    \
-        }                                                                                                        \
+#define CHECK_BINDING_INDEX(IDX)                                                                                   \
+    do {                                                                                                           \
+        if ((IDX) >= 0) {                                                                                          \
+            if (IDX >= COUNT_OF(gGroove_funk_bindings) || gGroove_funk_bindings[IDX] == NULL) {                    \
+                LOG_WARN("Disabling invalid groove binding for " #IDX "=%d (%d)", IDX, IDX - gGroove_funk_offset); \
+                IDX = -1;                                                                                          \
+            }                                                                                                      \
+        }                                                                                                          \
     } while (0)
     for (i = 0; i < pCar_spec->number_of_steerable_wheels; i++) {
         CHECK_BINDING_INDEX(pCar_spec->steering_ref[i]);
