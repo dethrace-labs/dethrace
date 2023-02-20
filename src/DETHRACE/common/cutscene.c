@@ -113,11 +113,13 @@ void PlaySmackerFile(char* pSmack_name) {
 
             int audio_valid = 0;
             smacker_audio* smacker_audio_handle;
-            if (Harness_Hook_smacker_audio_init(&smacker_audio_handle, s) == 0) {
-                smk_enable_audio(s, 0, 1);
-                audio_valid = 1;
-            } else {
-                LOG_INFO("Smacker file does not contain audio or failed to initialize smacker audio engine");
+            if (gSound_enabled) {
+                if (Harness_Hook_smacker_audio_init(&smacker_audio_handle, s) == 0) {
+                    smk_enable_audio(s, 0, 1);
+                    audio_valid = 1;
+                } else {
+                    LOG_INFO("Smacker file does not contain audio or failed to initialize smacker audio engine");
+                }
             }
 
             time_next_frame = PDGetTotalTime();
