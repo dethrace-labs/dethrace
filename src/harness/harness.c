@@ -377,7 +377,7 @@ void Harness_Hook_renderActor(br_actor* actor, br_model* model, br_material* mat
 }
 
 void Harness_Hook_BrZbSceneRenderEnd() {
-    renderer->FlushBuffers();
+    renderer->FlushBuffers(eFlush_all);
     renderer->EndScene();
 }
 
@@ -408,7 +408,7 @@ void Harness_Hook_PDSetKeyArray() {
 }
 
 void Harness_Hook_FlushRenderer() {
-    renderer->FlushBuffers();
+    renderer->FlushBuffers(eFlush_all);
 }
 
 void Harness_Hook_BrMaterialUpdate(br_material* mat, br_uint_16 flags) {

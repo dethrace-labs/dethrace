@@ -3,6 +3,11 @@
 
 #include "brender/br_types.h"
 
+typedef enum {
+    eFlush_all,
+    eFlush_color_buffer
+} tRenderer_flush_type;
+
 typedef struct tRenderer {
     void (*Init)(int width, int height, int pRender_width, int pRender_height);
     void (*BeginScene)(br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer);
@@ -14,7 +19,7 @@ typedef struct tRenderer {
     void (*BufferTexture)(br_pixelmap* pm);
     void (*BufferMaterial)(br_material* mat);
     void (*BufferModel)(br_model* model);
-    void (*FlushBuffers)();
+    void (*FlushBuffers)(tRenderer_flush_type);
     void (*GetRenderSize)(int* width, int* height);
     void (*GetWindowSize)(int* width, int* height);
     void (*SetWindowSize)(int width, int height);

@@ -1612,8 +1612,6 @@ void RenderAFrame(int pDepth_mask_on) {
         DepthEffectSky(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world);
         DepthEffect(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world);
         if (!gAusterity_mode) {
-            // dethrace: must flush gpu buffer before rendering blended materials
-            Harness_Hook_FlushRenderer();
             ProcessTrack(gUniverse_actor, &gProgram_state.track_spec, gCamera, &gCamera_to_world, 1);
         }
         RenderSplashes();

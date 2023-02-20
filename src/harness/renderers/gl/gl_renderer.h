@@ -2,6 +2,7 @@
 #define HARNESS_GL_RENDERER
 
 #include "harness.h"
+#include "renderers/renderer.h"
 
 #define CHECK_GL_ERROR(msg)                                \
     {                                                      \
@@ -51,7 +52,7 @@ void GLRenderer_BufferTexture(br_pixelmap* pm);
 void GLRenderer_BufferMaterial(br_material* mat);
 void GLRenderer_BufferModel(br_model* model);
 void GLRenderer_ClearBuffers();
-void GLRenderer_FlushBuffers();
+void GLRenderer_FlushBuffers(tRenderer_flush_type flush_type);
 void GLRenderer_GetRenderSize(int* width, int* height);
 void GLRenderer_GetWindowSize(int* width, int* height);
 void GLRenderer_SetWindowSize(int width, int height);
