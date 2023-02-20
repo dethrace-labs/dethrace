@@ -27,6 +27,7 @@
 #define BR_ANGLE_RAD(rad) ((br_angle)((rad)*10430))
 
 #define BrDegreeToRadian(d) ((br_scalar)((d) * (PI / 180.0)))
+#define BrRadianToDegree(r) ((br_scalar)((r) * (180.0 / PI)))
 
 #define BrDegreeToAngle(d) ((br_angle)(long)((d) * (65536.0f / 360.0f)))  // "d * 182.044444444"
 #define BrAngleToDegrees(a) ((br_angle)(long)((a) * (360.0f / 65536.0f))) // "d * 0.0054931640625"
