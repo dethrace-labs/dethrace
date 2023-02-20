@@ -1203,16 +1203,14 @@ void DoInstruments(tU32 pThe_time) {
                 the_angle = DEG_TO_RAD((double)gProgram_state.current_car.speedo_end_angle[gProgram_state.cockpit_on]);
             }
 
-            if (the_angle >= 0.0) {
-                if (the_angle >= TAU) {
-                    the_angle = the_angle - TAU;
-                }
-            } else {
+            if (the_angle < 0.0) {
                 the_angle = the_angle + TAU;
+            } else if (the_angle >= TAU) {
+                the_angle -= TAU;
             }
             the_angle2 = DR_PI_OVER_2 - the_angle;
             if (the_angle2 < 0.0) {
-                the_angle2 = the_angle2 + TAU;
+                the_angle2 += TAU;
             }
             if (the_angle2 > DR_3PI_OVER_2) {
                 cos_angle = gCosine_array[(unsigned int)((TAU - the_angle2) / DR_PI * 128.0)];
