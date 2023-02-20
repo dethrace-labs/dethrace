@@ -819,19 +819,15 @@ void CalculateWobblitude(tU32 pThe_time) {
             }
         }
     }
-    if (gCurrent_graf_data->cock_margin_x >= gScreen_wobble_x) {
-        if (-gCurrent_graf_data->cock_margin_x > gScreen_wobble_x) {
-            gScreen_wobble_x = -gCurrent_graf_data->cock_margin_x;
-        }
-    } else {
+    if (gScreen_wobble_x > gCurrent_graf_data->cock_margin_x) {
         gScreen_wobble_x = gCurrent_graf_data->cock_margin_x;
+    } else if (gScreen_wobble_x < -gCurrent_graf_data->cock_margin_x) {
+        gScreen_wobble_x = -gCurrent_graf_data->cock_margin_x;
     }
-    if (gCurrent_graf_data->cock_margin_y >= gScreen_wobble_y) {
-        if (-gCurrent_graf_data->cock_margin_y > gScreen_wobble_y) {
-            gScreen_wobble_y = -gCurrent_graf_data->cock_margin_y;
-        }
-    } else {
+    if (gScreen_wobble_y > gCurrent_graf_data->cock_margin_y) {
         gScreen_wobble_y = gCurrent_graf_data->cock_margin_y;
+    } else if (gScreen_wobble_y < -gCurrent_graf_data->cock_margin_y) {
+        gScreen_wobble_y = -gCurrent_graf_data->cock_margin_y;
     }
     PipeSingleScreenShake(gScreen_wobble_x, gScreen_wobble_y);
 }
