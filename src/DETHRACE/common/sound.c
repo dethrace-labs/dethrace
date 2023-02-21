@@ -322,7 +322,11 @@ int DRS3SoundStillPlaying(tS3_sound_tag pSound_tag) {
 // IDA: void __cdecl DRS3ShutDown()
 void DRS3ShutDown() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gSound_enabled) {
+        gSound_enabled = 0;
+        S3Shutdown();
+    }
 }
 
 // IDA: int __usercall DRS3SetOutletVolume@<EAX>(tS3_outlet_ptr pOutlet@<EAX>, tS3_volume pVolume@<EDX>)

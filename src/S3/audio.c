@@ -2,6 +2,7 @@
 #include "resource.h"
 
 #include "3d.h"
+#include "harness/config.h"
 #include "harness/os.h"
 #include "harness/trace.h"
 #include "miniaudio/miniaudio.h"
@@ -45,6 +46,9 @@ char gS3_directory_name[8];
 int gS3_have_current_dir;
 char gS3_current_dir[260];
 
+// dethrace
+ma_engine miniaudio_engine;
+
 int dword_5216C0;
 
 int S3Init(char* pPath, int pLow_memory_mode) {
@@ -85,6 +89,33 @@ int S3Init(char* pPath, int pLow_memory_mode) {
     return 0;
 }
 
+void S3Shutdown() {
+    tS3_outlet* outlet;              // [esp+10h] [ebp-10h]
+    tS3_outlet* next_outlet;         // [esp+14h] [ebp-Ch]
+    tS3_descriptor* next_descriptor; // [esp+18h] [ebp-8h]
+    tS3_descriptor* descriptor;      // [esp+1Ch] [ebp-4h]
+
+    S3StopAllOutletSounds();
+    S3DisableMIDI();
+    S3DisableCDA();
+    if (gS3_enabled) {
+        S3Disable();
+        for (descriptor = gS3_descriptors; descriptor != NULL; descriptor = next_descriptor) {
+            next_descriptor = descriptor->next;
+            S3DisposeDescriptor(descriptor->id);
+            S3MemFree(descriptor);
+        }
+        for (outlet = gS3_outlets; outlet != NULL; outlet = next_outlet) {
+            next_outlet = outlet->next;
+            S3DisposeOutlet(outlet);
+        }
+        S3DisposeUnboundChannels();
+    }
+    if (gS3_opened_output_devices) {
+        S3CloseDevices();
+    }
+}
+
 void S3Enable() {
     gS3_enabled = 1;
 }
@@ -111,6 +142,51 @@ int S3OpenOutputDevices() {
     // gS3_hardware_info.independent_pitch = 0;
     gS3_hardware_info.independent_pitch = 1;
     return 1;
+}
+
+int S3OpenSampleDevice() {
+    ma_result result;
+
+    ma_engine_config engineConfig;
+    engineConfig = ma_engine_config_init();
+    engineConfig.sampleRate = 22050;
+
+    result = ma_engine_init(&engineConfig, &miniaudio_engine);
+    if (result != MA_SUCCESS) {
+        printf("Failed to initialize audio engine.");
+        return 0;
+    }
+
+    ma_engine_set_volume(&miniaudio_engine, harness_game_config.volume_multiplier);
+
+    S3Enable();
+    return 1;
+}
+
+int S3OpenCDADevice() {
+    // gS3_cda_device.lpstrDeviceType = (LPCSTR)516;
+    // if (mciSendCommandA(0, 0x803u, 0x3000u, (DWORD_PTR)&gS3_cda_device)
+    //     && mciSendCommandA(0, 0x803u, 0x3100u, (DWORD_PTR)&gS3_cda_device)) {
+    //     return 0;
+    // }
+    // stru_550560.dwTimeFormat = 10; // MCI_FORMAT_TMSF
+    // mciSendCommandA(gS3_cda_device.wDeviceID, 0x80Du, 0x400u, (DWORD_PTR)&stru_550560);
+    // S3CDAEnable();
+    // return 1;
+
+    return 0;
+}
+
+void S3CloseDevices() {
+    // if (gS3_hardware_info.device_installed) {
+    //     gS3_direct_sound_ptr->lpVtbl->Release(gS3_direct_sound_ptr);
+    //     gS3_direct_sound_ptr = NULL;
+    // }
+    // if (gS3_cda_device.wDeviceID) {
+    //     mciSendCommandA(gS3_cda_device.wDeviceID, 0x804u, 0, 0); // MCI_CLOSE
+    // }
+
+    ma_engine_uninit(&miniaudio_engine);
 }
 
 int S3DisposeDescriptor(tS3_sound_id id) {
@@ -520,6 +596,16 @@ int S3UnbindChannels(tS3_outlet* outlet) {
     }
     outlet->channel_list = NULL;
     return 1;
+}
+
+void S3DisposeUnboundChannels() {
+    tS3_channel* channel;      // [esp+Ch] [ebp-8h]
+    tS3_channel* next_channel; // [esp+10h] [ebp-4h]
+
+    for (channel = gS3_unbound_channels; channel != NULL; channel = next_channel) {
+        next_channel = channel->next;
+        S3MemFree(channel);
+    }
 }
 
 tS3_channel* S3AllocateChannel(tS3_outlet* outlet, int priority) {

@@ -14,6 +14,8 @@
 #include "grafdata.h"
 #include "pd/sys.h"
 
+extern void QuitGame();
+
 #define ARRAY_LEN(array) (sizeof((array)) / sizeof((array)[0]))
 
 int scancode_map[123];
@@ -257,7 +259,7 @@ void Window_PollEvents() {
             }
             break;
         case SDL_QUIT:
-            LOG_PANIC("QuitGame");
+            QuitGame();
             break;
         }
     }
