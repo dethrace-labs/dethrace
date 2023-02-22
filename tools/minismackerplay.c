@@ -3,7 +3,6 @@
 #include <miniaudio.h>
 #include <smacker.h>
 
-#include <inttypes.h>
 #include <stdio.h>
 
 typedef struct {
