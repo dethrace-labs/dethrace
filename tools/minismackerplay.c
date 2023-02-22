@@ -43,29 +43,29 @@ void PlaySmackerFile(SDL_Window *window, SDL_Renderer *renderer, const char *pat
     int need_resampler;
     ma_sound sound;
 
-    printf("Trying to open smack file '%s'\n", path);
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "Trying to open smack file '%s'", path);
     s = smk_open_file(path, SMK_MODE_MEMORY);
     if (s == NULL) {
-        printf("smk_open_file failed\n");
+        SDL_Log("smk_open_file failed");
         return;
     }
     smk_info_all(s, NULL, &f, &usf);
-    printf("frame_count=%"PRId64", usf=%g\n", f, usf);
-    printf("duration=%g\n", (double)f * usf / 1000000.);
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "frame_count=%"PRId64", usf=%g", f, usf);
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "duration=%g", (double)f * usf / 1000000.);
 
     counter_frametime = (Uint64)((double)SDL_GetPerformanceFrequency() * usf / 1000000);
 
     smk_info_video(s, &w, &h, NULL);
-    printf("width=%"PRId64", height=%"PRId64"\n", w, h);
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "width=%"PRId64", height=%"PRId64"", w, h);
 
     smacker_data_source data_source;
     SDL_SetWindowTitle(window, path);
 
     smk_info_audio(s, &track_mask, channels_smk, bitdepth_smk, samplerate_smk);
-    printf("tracks mask = 0x%x\n", track_mask);
-    printf("#channels = %d %d %d %d %d %d %d\n", channels_smk[0], channels_smk[1], channels_smk[2], channels_smk[3], channels_smk[4], channels_smk[5], channels_smk[6]);
-    printf("sample bitsize = %d %d %d %d %d %d %d\n", bitdepth_smk[0], bitdepth_smk[1], bitdepth_smk[2], bitdepth_smk[3], bitdepth_smk[4], bitdepth_smk[5], bitdepth_smk[6]);
-    printf("sample rate = %"PRId64" %"PRId64" %"PRId64" %"PRId64" %"PRId64" %"PRId64" %"PRId64"\n", samplerate_smk[0], samplerate_smk[1], samplerate_smk[2], samplerate_smk[3], samplerate_smk[4], samplerate_smk[5], samplerate_smk[6]);
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "tracks mask = 0x%x", track_mask);
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "#channels = %d %d %d %d %d %d %d", channels_smk[0], channels_smk[1], channels_smk[2], channels_smk[3], channels_smk[4], channels_smk[5], channels_smk[6]);
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "sample bitsize = %d %d %d %d %d %d %d", bitdepth_smk[0], bitdepth_smk[1], bitdepth_smk[2], bitdepth_smk[3], bitdepth_smk[4], bitdepth_smk[5], bitdepth_smk[6]);
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "sample rate = %"PRId64" %"PRId64" %"PRId64" %"PRId64" %"PRId64" %"PRId64" %"PRId64"", samplerate_smk[0], samplerate_smk[1], samplerate_smk[2], samplerate_smk[3], samplerate_smk[4], samplerate_smk[5], samplerate_smk[6]);
 
     switch (bitdepth_smk[0]) {
         case 8:
@@ -85,25 +85,25 @@ void PlaySmackerFile(SDL_Window *window, SDL_Renderer *renderer, const char *pat
             data_source.frame_size_in_bytes = 4 * channels_smk[0];
             break;
         default:
-            fprintf(stderr, "Smacker audio stream has invalid bit depth: %d\n", bitdepth_smk[0]);
+            SDL_Log("Smacker audio stream has invalid bit depth: %d", bitdepth_smk[0]);
             break;
     }
     result_ma = ma_paged_audio_buffer_data_init(audioformat_ma, channels_smk[0], &data_source.paged_audio_buffer_data);
     if (result_ma != MA_SUCCESS) {
-        fprintf(stderr, "Failed to create paged audio buffer data");
+            SDL_Log("Failed to create paged audio buffer data (%s)", ma_result_description(result_ma));
     }
 
     ma_paged_audio_buffer_config paged_audio_buffer_config = ma_paged_audio_buffer_config_init(&data_source.paged_audio_buffer_data);
     result_ma = ma_paged_audio_buffer_init(&paged_audio_buffer_config, &data_source.paged_audio_buffer);
     if (result_ma != MA_SUCCESS) {
-        fprintf(stderr, "Failed to create paged audio buffer for smacker audio stream");
+        SDL_Log("Failed to create paged audio buffer for smacker audio stream (%s)", ma_result_description(result_ma));
     }
     ma_sound_config soundConfig = ma_sound_config_init();
     soundConfig.pDataSource = &data_source;
     soundConfig.flags = MA_SOUND_FLAG_NO_PITCH | MA_SOUND_FLAG_NO_SPATIALIZATION;
     result_ma = ma_sound_init_ex(&engine, &soundConfig, &sound);
     if (result_ma != MA_SUCCESS) {
-        fprintf(stderr, "Failed to create sound from data source\n");
+        SDL_Log("Failed to create sound from data source (%s)", ma_result_description(result_ma));
     }
 
     need_resampler = ma_engine_get_sample_rate(&engine) != samplerate_smk[0];
@@ -114,7 +114,7 @@ void PlaySmackerFile(SDL_Window *window, SDL_Renderer *renderer, const char *pat
                                                                                      ma_engine_get_sample_rate(&engine));
         result_ma = ma_data_converter_init(&dataConverterConfig, NULL, &data_converter);
         if (result_ma != MA_SUCCESS) {
-            fprintf(stderr, "Failed to create data converter\n");
+            SDL_Log("Failed to create data converter (%s)", ma_result_description(result_ma));
         }
     }
 
@@ -123,15 +123,15 @@ void PlaySmackerFile(SDL_Window *window, SDL_Renderer *renderer, const char *pat
 
     SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, (int)w, (int)h);
     if (texture == NULL) {
-        printf("SDL_CreateTexture returned NULL (%s)\n", SDL_GetError());
+        SDL_Log("SDL_CreateTexture returned NULL (%s)", SDL_GetError());
         return;
     }
 
     SDL_QueryTexture(texture, &real_format, &real_access, &real_w, &real_h);
-    printf("real_format: %d (req=%d)\n", real_format, SDL_PIXELFORMAT_RGB24);
-    printf("real_access: %d (req=%d)\n", real_access, SDL_TEXTUREACCESS_STREAMING);
-    printf("real_w: %d    (req=%"PRId64")\n", real_w, w);
-    printf("real_h: %d    (req=%"PRId64")\n", real_h, h);
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "real_format: %d (req=%d)\n", real_format, SDL_PIXELFORMAT_RGB24);
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "real_access: %d (req=%d)\n", real_access, SDL_TEXTUREACCESS_STREAMING);
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "real_w: %d    (req=%"PRId64")\n", real_w, w);
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "real_h: %d    (req=%"PRId64")\n", real_h, h);
 
     smk_first(s);
     counter_deadline_next_frame = SDL_GetPerformanceCounter();
@@ -158,7 +158,7 @@ void PlaySmackerFile(SDL_Window *window, SDL_Renderer *renderer, const char *pat
                 ma_paged_audio_buffer_page *newPage;
                 result_ma = ma_paged_audio_buffer_data_allocate_page(&data_source.paged_audio_buffer_data, framesOut, NULL, NULL, &newPage);
                 if (result_ma != MA_SUCCESS) {
-                    fprintf(stderr, "ma_paged_audio_buffer_data_allocate_page failed\n");
+                    SDL_Log("ma_paged_audio_buffer_data_allocate_page failed (%s)", ma_result_description(result_ma));
                 }
 
                 ma_data_converter_process_pcm_frames(&data_converter,
@@ -168,7 +168,7 @@ void PlaySmackerFile(SDL_Window *window, SDL_Renderer *renderer, const char *pat
                                                 &framesOut);
                 result_ma = ma_paged_audio_buffer_data_append_page(&data_source.paged_audio_buffer_data, newPage);
                 if (result_ma != MA_SUCCESS) {
-                    fprintf(stderr, "ma_paged_audio_buffer_data_append_page failed\n");
+                    SDL_Log("ma_paged_audio_buffer_data_append_page failed (%s)", ma_result_description(result_ma));
                 }
             } else {
                 ma_paged_audio_buffer_data_allocate_and_append_page(
@@ -227,10 +227,15 @@ void PlaySmackerFile(SDL_Window *window, SDL_Renderer *renderer, const char *pat
 }
 
 static void PrintUsage(int argc, char *argv[]) {
-    printf("Usage: %s [FILE [ FILE ... ] ]\n", argv[0]);
+    printf("Usage: %s [--debug] FILE [FILE ...]\n", argv[0]);
     printf("\n");
-    printf("  FILE      Path to a smack video file.");
+    printf("Required options:\n");
     printf("\n");
+    printf("  FILE      Path to a smack video file.\n");
+    printf("\n");
+    printf("Optional options:\n");
+    printf("\n");
+    printf("  --debug   Print debug information.\n");
 }
 
 int main(int argc, char *argv[]) {
@@ -242,31 +247,43 @@ int main(int argc, char *argv[]) {
     SDL_Window *window;
     SDL_Renderer *renderer;
 
-    if (argc < 2) {
+    int start_i = 1;
+    while (start_i < argc) {
+        if (strcmp(argv[start_i], "--debug") == 0) {
+            SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG);
+        } else {
+            break;
+        }
+        start_i++;
+    }
+
+    if (start_i >= argc) {
         PrintUsage(argc, argv);
         return 1;
     }
+
+
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        fprintf(stderr, "SDL_Init failed\n");
+        SDL_Log("SDL_Init failed (%s)", SDL_GetError());
+        return 1;
     }
 
     engineConfig = ma_engine_config_init();
     result_ma = ma_engine_init(&engineConfig, &engine);
     if (result_ma != MA_SUCCESS) {
-        printf("Failed to initialize audio engine.");
-        return 0;
+        SDL_Log("ma_engine_init failed (%s)", ma_result_description(result_ma));
+        return 1;
     }
 
     if (SDL_CreateWindowAndRenderer(640, 480, SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN, &window, &renderer) < 0) {
-        fprintf(stderr, "SDL_CreateWindowAndRenderer failed\n");
+        fprintf(stderr, "SDL_CreateWindowAndRenderer failed (%s)", SDL_GetError());
         return 1;
     }
 
     SDL_ShowWindow(window);
-    for (i = 1; i < argc; i++) {
+    for (i = start_i; i < argc; i++) {
         PlaySmackerFile(window, renderer, argv[i]);
     }
-    SDL_HideWindow(window);
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
