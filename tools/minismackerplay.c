@@ -50,13 +50,13 @@ void PlaySmackerFile(SDL_Window *window, SDL_Renderer *renderer, const char *pat
         return;
     }
     smk_info_all(s, NULL, &f, &usf);
-    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "frame_count=%"PRId64", usf=%g", f, usf);
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "frame_count=%"SDL_PRIu64", usf=%g", (Uint64)f, usf);
     SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "duration=%g", (double)f * usf / 1000000.);
 
     counter_frametime = (Uint64)((double)SDL_GetPerformanceFrequency() * usf / 1000000);
 
     smk_info_video(s, &w, &h, NULL);
-    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "width=%"PRId64", height=%"PRId64"", w, h);
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "width=%"SDL_PRIu64", height=%"SDL_PRIu64"", (Uint64)w, (Uint64)h);
 
     smacker_data_source data_source;
     SDL_SetWindowTitle(window, path);
@@ -65,7 +65,7 @@ void PlaySmackerFile(SDL_Window *window, SDL_Renderer *renderer, const char *pat
     SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "tracks mask = 0x%x", track_mask);
     SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "#channels = %d %d %d %d %d %d %d", channels_smk[0], channels_smk[1], channels_smk[2], channels_smk[3], channels_smk[4], channels_smk[5], channels_smk[6]);
     SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "sample bitsize = %d %d %d %d %d %d %d", bitdepth_smk[0], bitdepth_smk[1], bitdepth_smk[2], bitdepth_smk[3], bitdepth_smk[4], bitdepth_smk[5], bitdepth_smk[6]);
-    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "sample rate = %"PRId64" %"PRId64" %"PRId64" %"PRId64" %"PRId64" %"PRId64" %"PRId64"", samplerate_smk[0], samplerate_smk[1], samplerate_smk[2], samplerate_smk[3], samplerate_smk[4], samplerate_smk[5], samplerate_smk[6]);
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "sample rate = %"SDL_PRIu64" %"SDL_PRIu64" %"SDL_PRIu64" %"SDL_PRIu64" %"SDL_PRIu64" %"SDL_PRIu64" %"SDL_PRIu64"", (Uint64)samplerate_smk[0], (Uint64)samplerate_smk[1], (Uint64)samplerate_smk[2], (Uint64)samplerate_smk[3], (Uint64)samplerate_smk[4], (Uint64)samplerate_smk[5], (Uint64)samplerate_smk[6]);
 
     switch (bitdepth_smk[0]) {
         case 8:
@@ -131,13 +131,12 @@ void PlaySmackerFile(SDL_Window *window, SDL_Renderer *renderer, const char *pat
     SDL_QueryTexture(texture, &real_format, &real_access, &real_w, &real_h);
     SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "real_format: %d (req=%d)\n", real_format, SDL_PIXELFORMAT_RGB24);
     SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "real_access: %d (req=%d)\n", real_access, SDL_TEXTUREACCESS_STREAMING);
-    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "real_w: %d    (req=%"PRId64")\n", real_w, w);
-    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "real_h: %d    (req=%"PRId64")\n", real_h, h);
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "real_w: %d    (req=%"SDL_PRIu64")\n", real_w, (Uint64)w);
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "real_h: %d    (req=%"SDL_PRIu64")\n", real_h, (Uint64)h);
 
     smk_first(s);
     counter_deadline_next_frame = SDL_GetPerformanceCounter();
     int audio_started = 0;
-    unsigned long running_counter = 0;
     do {
         const unsigned char* raw_palette = smk_get_palette(s);
         for (i = 0; i < 256; i++) {
@@ -148,7 +147,6 @@ void PlaySmackerFile(SDL_Window *window, SDL_Renderer *renderer, const char *pat
         }
         const unsigned char *audio_data = smk_get_audio(s, 0);
         unsigned long audio_data_size = smk_get_audio_size(s, 0);
-        running_counter += audio_data_size;
         const unsigned char* frame = smk_get_video(s);
 
         if (audio_data != NULL) {
