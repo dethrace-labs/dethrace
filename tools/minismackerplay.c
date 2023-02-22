@@ -85,12 +85,13 @@ void PlaySmackerFile(SDL_Window *window, SDL_Renderer *renderer, const char *pat
             data_source.frame_size_in_bytes = 4 * channels_smk[0];
             break;
         default:
+            audioformat_ma = ma_format_unknown;
             SDL_Log("Smacker audio stream has invalid bit depth: %d", bitdepth_smk[0]);
             break;
     }
     result_ma = ma_paged_audio_buffer_data_init(audioformat_ma, channels_smk[0], &data_source.paged_audio_buffer_data);
     if (result_ma != MA_SUCCESS) {
-            SDL_Log("Failed to create paged audio buffer data (%s)", ma_result_description(result_ma));
+        SDL_Log("Failed to create paged audio buffer data (%s)", ma_result_description(result_ma));
     }
 
     ma_paged_audio_buffer_config paged_audio_buffer_config = ma_paged_audio_buffer_config_init(&data_source.paged_audio_buffer_data);
