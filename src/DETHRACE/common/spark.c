@@ -1343,7 +1343,8 @@ void CreatePuffOfSmoke(br_vector3* pos, br_vector3* v, br_scalar strength, br_sc
 void ResetSmoke() {
     LOG_TRACE("()");
 
-    gSmoke_flags = 0;;
+    gSmoke_flags = 0;
+    ;
 }
 
 // IDA: void __usercall AdjustSmoke(int pIndex@<EAX>, tU8 pType@<EDX>, br_vector3 *pPos@<EBX>, br_scalar pRadius, br_scalar pStrength)
@@ -1360,7 +1361,6 @@ void AdjustSmoke(int pIndex, tU8 pType, br_vector3* pPos, br_scalar pRadius, br_
 // IDA: void __cdecl ActorError()
 void ActorError() {
     LOG_TRACE("()");
-
 }
 
 // IDA: void __usercall AdjustSmokeColumn(int pIndex@<EAX>, tCar_spec *pCar@<EDX>, int pVertex@<EBX>, int pColour@<ECX>)
@@ -1932,21 +1932,17 @@ void DrawTheGlow(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
     tU32 seed;
     LOG_TRACE("(%p, %p, %p)", pRender_screen, pDepth_buffer, pCamera);
 
-    // FIXME: sometimes this function causes a segfault (most commonly when looking at a glow fairly close up and the camera swings away). Stubbing it out for now.
-    LOG_WARN_ONCE("DrawTheGlow is stubbed out");
-    return;
-
     if (gColumn_flags) {
         seed = rand();
         srand(GetTotalTime());
         for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
             if (((1u << i) & gColumn_flags) != 0 && gSmoke_column[i].colour <= 1) {
-                strength = 0.5;
+                strength = 0.5f;
                 if (gSmoke_column[i].lifetime < 4000) {
-                    strength = gSmoke_column[i].lifetime * 0.5 / 4000.0;
+                    strength = gSmoke_column[i].lifetime * 0.5f / 4000.f;
                 }
-                BrVector3Set(&tv, gSmoke_column[i].pos.v[0], gSmoke_column[i].pos.v[1] + 0.02, gSmoke_column[i].pos.v[2]);
-                SmokeCircle3D(&tv, 0.07, strength, SRandomBetween(0.5, 0.99000001), pRender_screen, pDepth_buffer, gAcid_shade_table, pCamera);
+                BrVector3Set(&tv, gSmoke_column[i].pos.v[0], gSmoke_column[i].pos.v[1] + 0.02f, gSmoke_column[i].pos.v[2]);
+                SmokeCircle3D(&tv, 0.07f, strength, SRandomBetween(0.5f, 0.99f), pRender_screen, pDepth_buffer, gAcid_shade_table, pCamera);
             }
         }
         srand(seed);
