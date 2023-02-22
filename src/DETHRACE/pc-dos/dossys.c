@@ -309,6 +309,9 @@ void PDInitialiseSystem() {
 void PDShutdownSystem() {
     LOG_TRACE("()");
 
+    Harness_Hook_PDShutdownSystem();
+
+    CloseDiagnostics();
     exit(0);
 }
 

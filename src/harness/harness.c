@@ -317,6 +317,10 @@ void Harness_Hook_GraphicsInit(int render_width, int render_height) {
     renderer = Window_Create("Dethrace", window_width, window_height, render_width, render_height);
 }
 
+void Harness_Hook_PDShutdownSystem() {
+    Window_Close();
+}
+
 // Render 2d back buffer
 void Harness_RenderScreen(br_pixelmap* dst, br_pixelmap* src) {
     renderer->FullScreenQuad((uint8_t*)src->pixels);

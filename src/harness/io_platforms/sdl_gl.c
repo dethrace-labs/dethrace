@@ -203,6 +203,12 @@ tRenderer* Window_Create(char* title, int width, int height, int pRender_width, 
     return &gl_renderer;
 }
 
+void Window_Close() {
+    SDL_GL_DeleteContext(context);
+    SDL_DestroyWindow(window);
+    window = NULL;
+}
+
 // Checks whether the `flag_check` is the only modifier applied.
 // e.g. is_only_modifier(event.key.keysym.mod, KMOD_ALT) returns true when only the ALT key was pressed
 static int is_only_key_modifier(int modifier_flags, int flag_check) {
