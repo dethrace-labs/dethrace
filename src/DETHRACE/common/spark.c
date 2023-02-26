@@ -858,6 +858,7 @@ void DrMatrix34Rotate(br_matrix34* mat, br_angle r, br_vector3* a) {
 // IDA: void __usercall SmokeLine(int l@<EAX>, int x@<EDX>, br_scalar zbuff, int r_squared, tU8 *scr_ptr, tU16 *depth_ptr, tU8 *shade_ptr, br_scalar r_multiplier, br_scalar z_multiplier, br_scalar shade_offset)
 void SmokeLine(int l, int x, br_scalar zbuff, int r_squared, tU8* scr_ptr, tU16* depth_ptr, tU8* shade_ptr, br_scalar r_multiplier, br_scalar z_multiplier, br_scalar shade_offset) {
     int i;
+    int offset; /* Added by dethrace. */
     int r_multiplier_int;
     int shade_offset_int;
     tU16 z;
@@ -873,7 +874,13 @@ void SmokeLine(int l, int x, br_scalar zbuff, int r_squared, tU8* scr_ptr, tU16*
 
     for (i = 0; i < l; i++) {
         if (*depth_ptr > z) {
-            *scr_ptr = shade_ptr[*scr_ptr + (((shade_offset_int - r_squared * r_multiplier_int) >> 8) & 0xffffff00)];
+            offset = ((shade_offset_int - r_squared * r_multiplier_int) >> 8) &
+                     0xffffff00;
+#if defined(DETHRACE_FIX_BUGS)
+            /* Prevent buffer underflows by capping negative offsets. */
+            offset = MAX(0, offset);
+#endif
+            *scr_ptr = shade_ptr[*scr_ptr + offset];
         }
         r_multiplier = x + r_squared;
         scr_ptr++;
