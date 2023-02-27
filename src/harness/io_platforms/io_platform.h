@@ -6,7 +6,7 @@
 tRenderer* Window_Create(char* title, int width, int height, int pRender_width, int pRender_height);
 void Window_PollEvents(void);
 void Window_Swap(int delay_ms_after_swap);
-void Window_Close();
+void IOPlatform_Shutdown();
 
 void Input_Init();
 int* Input_GetKeyMap(void);

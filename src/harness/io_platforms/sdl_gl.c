@@ -203,9 +203,10 @@ tRenderer* Window_Create(char* title, int width, int height, int pRender_width, 
     return &gl_renderer;
 }
 
-void Window_Close() {
+void IOPlatform_Shutdown() {
     SDL_GL_DeleteContext(context);
     SDL_DestroyWindow(window);
+    SDL_Quit();
     window = NULL;
 }
 

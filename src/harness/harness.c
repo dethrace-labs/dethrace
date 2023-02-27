@@ -318,7 +318,7 @@ void Harness_Hook_GraphicsInit(int render_width, int render_height) {
 }
 
 void Harness_Hook_PDShutdownSystem() {
-    Window_Close();
+    IOPlatform_Shutdown();
 }
 
 // Render 2d back buffer
