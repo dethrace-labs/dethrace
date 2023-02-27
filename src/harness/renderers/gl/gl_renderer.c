@@ -542,6 +542,16 @@ void setActiveMaterial(tStored_material* material) {
         glDepthMask(GL_TRUE);
     }
 
+    // printf("id %s\n", material->identifier);
+
+    // if (strstr(material->identifier, "BE2") != 0) {
+    //     int x = 0;
+    printf("id %s, %d, %p, %d %d\n", material->identifier, material->flags, material->shade_table, material->index_base, material->index_range);
+    if (material->shade_table) {
+        printf("shade height: %d", material->shade_table->height);
+    }
+    // }
+
     if ((material->flags & BR_MATF_LIGHT) && !(material->flags & BR_MATF_PRELIT) && material->shade_table) {
         // TODO: light value shouldn't always be 0? Works for shadows, not sure about other things.
         glUniform1i(uniforms_3d.light_value, 0);
@@ -639,6 +649,7 @@ void GLRenderer_BufferMaterial(br_material* mat) {
     stored->flags = mat->flags;
     stored->shade_table = mat->index_shade;
     stored->index_base = mat->index_base;
+    stored->index_range = mat->index_range;
     stored->index_blend = mat->index_blend;
 }
 
