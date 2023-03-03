@@ -38,7 +38,7 @@ To add a new `IOPlatform`:
 - `Window_Create`
 - `Window_PollEvents`
 - `Window_Swap`
-- `Window_Close`
+- `IOPlatform_Shutdown`
 - `Input_GetKeyMap`
 - `Input_IsKeyDown`
 
