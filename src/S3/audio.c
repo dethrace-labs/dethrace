@@ -1048,6 +1048,13 @@ void S3CalculateRandomizedFields(tS3_channel* chan, tS3_descriptor* desc) {
     chan->left_volume = vol;
     chan->right_volume = vol;
     if (desc->type == eS3_ST_sample) {
+#if defined(DETHRACE_FIX_BUGS)
+    /* Avoid a possible NULL pointer dereference. */
+    if (desc->sound_data == NULL) {
+        chan->rate = desc->min_pitch;
+        return;
+    }
+#endif
         chan->rate = S3IRandomBetweenLog(desc->min_pitch, desc->max_pitch, ((tS3_sample*)desc->sound_data)->rate);
     }
 }
