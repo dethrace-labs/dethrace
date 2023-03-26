@@ -436,15 +436,15 @@ void Harness_Hook_GetMouseButtons(int* pButton1, int* pButton2) {
     Input_GetMouseButtons(pButton1, pButton2);
 }
 
-// Sound hooks
-void Harness_Hook_S3Service(int unk1, int unk2) {
-    Sound_Service();
-}
-
-void Harness_Hook_S3StopAllOutletSounds() {
-}
-
 // Filesystem hooks
 FILE* Harness_Hook_fopen(const char* pathname, const char* mode) {
     return OS_fopen(pathname, mode);
+}
+
+void Harness_Hook_ForceModelUpload(br_model* model) {
+    if (model->stored) {
+        ((br_object*)model->stored)->dispatch->_free((br_object*)model->stored);
+        model->stored = NULL;
+    }
+    renderer->BufferModel(model);
 }

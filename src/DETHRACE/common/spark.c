@@ -6,6 +6,7 @@
 #include "globvars.h"
 #include "globvrkm.h"
 #include "graphics.h"
+#include "harness/hooks.h"
 #include "harness/trace.h"
 #include "loading.h"
 #include "opponent.h"
@@ -2085,15 +2086,25 @@ void SmudgeCar(tCar_spec* pCar, int fire_point) {
                         }
                     }
                 }
+                // int old = BR_ALPHA(V11MODEL(model)->groups[group].vertex_colours[j]);
+                // old += 20;
+                // old %= 255;
+                // n = 1;
+                // LOG_DEBUG("changing from %d to %d", BR_ALPHA(V11MODEL(model)->groups[group].vertex_colours[j]), old);
+                // V11MODEL(model)->groups[group].vertex_colours[j] = old << 24;
+
                 real_vertex_number++;
             }
             if (n >= COUNT_OF(data)) {
                 break;
             }
         }
-        if (n) {
+        if (n > 0) {
             AddSmudgeToPipingSession(pCar->car_ID, pCar->principal_car_actor, n, data);
+            // added by dethrace to update gpu-buffered vertices
+            Harness_Hook_ForceModelUpload(model);
         }
+
         n = 0;
         real_vertex_number = 0;
         if (actor != bonny) {
@@ -2130,8 +2141,11 @@ void SmudgeCar(tCar_spec* pCar, int fire_point) {
                     break;
                 }
             }
-            if (n) {
+            if (n > 0) {
                 AddSmudgeToPipingSession(pCar->car_ID, pCar->car_actor_count - 1, n, data);
+
+                // added by dethrace to update gpu-buffered vertices
+                Harness_Hook_ForceModelUpload(b_model);
             }
         }
         EndPipingSession();
