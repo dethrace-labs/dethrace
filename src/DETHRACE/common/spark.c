@@ -2062,7 +2062,7 @@ void SmudgeCar(tCar_spec* pCar, int fire_point) {
     if ((model->flags & BR_MODF_KEEP_ORIGINAL) != 0 || (model->flags & BR_MODF_UPDATEABLE) != 0) {
         point = V11MODEL(model)->groups[group].vertices[fire_point].p;
         StartPipingSession(ePipe_chunk_smudge);
-        for (group = 0; V11MODEL(model)->ngroups > group; group++) {
+        for (group = 0; group < V11MODEL(model)->ngroups; group++) {
             for (j = 0; j < V11MODEL(model)->groups[group].nvertices; j++) {
                 BrVector3Sub(&tv, &V11MODEL(model)->groups[group].vertices[j].p, &point);
                 ts = (.0144f - BrVector3LengthSquared(&tv) / SRandomBetween(.5f, 1.f)) / .0144f * 127.f;
