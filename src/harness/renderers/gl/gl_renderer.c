@@ -596,6 +596,18 @@ void setActiveMaterial(tStored_material* material) {
 
 void GLRenderer_Model(br_actor* actor, br_model* model, br_material* material, br_token render_type, br_matrix34 model_matrix) {
     tStored_model_context* ctx;
+    v11group* group;
+    int element_index = 0;
+
+    if (model->flags & BR_MODF_DETHRACE_FORCE_BUFFER_UPDATE) {
+        if (model->stored) {
+            ((br_object*)model->stored)->dispatch->_free((br_object*)model->stored);
+            model->stored = NULL;
+        }
+        GLRenderer_BufferModel(model);
+        model->flags &= ~BR_MODF_DETHRACE_FORCE_BUFFER_UPDATE;
+    }
+
     ctx = model->stored;
     v11model* v11 = model->prepared;
 
@@ -631,8 +643,6 @@ void GLRenderer_Model(br_actor* actor, br_model* model, br_material* material, b
         LOG_PANIC("render_type %d is not supported?!", render_type);
     }
 
-    v11group* group;
-    int element_index = 0;
     for (int g = 0; g < v11->ngroups; g++) {
         group = &v11->groups[g];
         setActiveMaterial(group->stored);

@@ -440,11 +440,3 @@ void Harness_Hook_GetMouseButtons(int* pButton1, int* pButton2) {
 FILE* Harness_Hook_fopen(const char* pathname, const char* mode) {
     return OS_fopen(pathname, mode);
 }
-
-void Harness_Hook_ForceModelUpload(br_model* model) {
-    if (model->stored) {
-        ((br_object*)model->stored)->dispatch->_free((br_object*)model->stored);
-        model->stored = NULL;
-    }
-    renderer->BufferModel(model);
-}

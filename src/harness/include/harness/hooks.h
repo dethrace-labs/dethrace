@@ -17,8 +17,6 @@ void Harness_Hook_PDSetKeyArray();
 void Harness_Hook_FlushRenderer(); // synchronize in-memory framebuffer and depthbuffer
 void Harness_Hook_GraphicsInit(int render_width, int render_height);
 
-void Harness_Hook_ForceModelUpload(br_model* model);
-
 // BRender hooks
 void Harness_Hook_BrDevPaletteSetOld(br_pixelmap* pm);
 void Harness_Hook_BrDevPaletteSetEntryOld(int i, br_colour colour);
