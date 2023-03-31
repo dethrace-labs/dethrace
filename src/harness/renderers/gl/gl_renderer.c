@@ -735,18 +735,11 @@ void GLRenderer_FlushBuffers(tRenderer_flush_type flush_type) {
         dest_y = last_colour_buffer->height;
         int src_y = render_height - last_colour_buffer->base_y - last_colour_buffer->height;
         uint16_t* depth_pixels = last_depth_buffer->pixels;
-
         for (int y = 0; y < last_colour_buffer->height; y++) {
             dest_y--;
             for (int x = 0; x < last_colour_buffer->width; x++) {
-                uint16_t incoming_depth = depth_buffer_flip_pixels[src_y * render_width + last_colour_buffer->base_x + x];
-                // if (incoming_depth != 65535 && depth_pixels[dest_y * render_width + x] > incoming_depth) {
-                //     new_pixel = screen_buffer_flip_pixels[y * render_width + x];
-                //     // if (new_pixel != 0) {
-                //     pm_pixels[dest_y * render_width + x] = new_pixel;
-                //     //}
-                // }
-                depth_pixels[dest_y * render_width + x] = incoming_depth;
+                uint16_t new_depth = depth_buffer_flip_pixels[src_y * render_width + last_colour_buffer->base_x + x];
+                depth_pixels[dest_y * render_width + x] = new_depth;
             }
             src_y++;
         }
