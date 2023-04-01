@@ -18,10 +18,15 @@ void S3Disable();
 
 int S3OpenOutputDevices();
 int S3OpenSampleDevice();
+int S3OpenCDADevice();
+
+int S3OpenSampleDevice();
+void S3CloseDevices();
 tS3_outlet* S3CreateOutlet(int unk1, int pChannel_count);
 int S3CreateOutletChannels(tS3_outlet* outlet, int pChannel_count);
 void S3DisposeOutlet(tS3_outlet* outlet);
 int S3UnbindChannels(tS3_outlet* outlet);
+void S3DisposeUnboundChannels();
 tS3_channel* S3AllocateChannel(tS3_outlet* outlet, int priority);
 int S3StopChannel(tS3_channel* chan);
 

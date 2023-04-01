@@ -14,6 +14,8 @@
 #include "grafdata.h"
 #include "pd/sys.h"
 
+extern void QuitGame();
+
 #define ARRAY_LEN(array) (sizeof((array)) / sizeof((array)[0]))
 
 int scancode_map[123];
@@ -154,7 +156,7 @@ tRenderer gl_renderer = {
     GLRenderer_GetViewport
 };
 
-tRenderer* Window_Create(char* title, int width, int height, int pRender_width, int pRender_height) {
+tRenderer* IOPlatform_CreateWindow(char* title, int width, int height, int pRender_width, int pRender_height) {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         LOG_PANIC("SDL_INIT_VIDEO error: %s", SDL_GetError());
     }
@@ -201,13 +203,20 @@ tRenderer* Window_Create(char* title, int width, int height, int pRender_width, 
     return &gl_renderer;
 }
 
+void IOPlatform_Shutdown() {
+    SDL_GL_DeleteContext(context);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+    window = NULL;
+}
+
 // Checks whether the `flag_check` is the only modifier applied.
 // e.g. is_only_modifier(event.key.keysym.mod, KMOD_ALT) returns true when only the ALT key was pressed
 static int is_only_key_modifier(int modifier_flags, int flag_check) {
     return (modifier_flags & flag_check) && (modifier_flags & (KMOD_CTRL | KMOD_SHIFT | KMOD_ALT | KMOD_GUI)) == (modifier_flags & flag_check);
 }
 
-void Window_PollEvents() {
+void IOPlatform_PollEvents() {
     SDL_Event event;
     int dethrace_key;
     int w_w, w_h;
@@ -257,13 +266,13 @@ void Window_PollEvents() {
             }
             break;
         case SDL_QUIT:
-            LOG_PANIC("QuitGame");
+            QuitGame();
             break;
         }
     }
 }
 
-void Window_Swap(int delay_ms_after_swap) {
+void IOPlatform_SwapWindow(int delay_ms_after_swap) {
     SDL_GL_SwapWindow(window);
 
     if (delay_ms_after_swap != 0) {
@@ -271,7 +280,7 @@ void Window_Swap(int delay_ms_after_swap) {
     }
 }
 
-void Input_Init() {
+void IOPlatform_Init() {
     for (size_t i = 0; i < ARRAY_LEN(scancodes_sdl2dethrace); i++) {
         scancodes_sdl2dethrace[i] = -1;
     }
@@ -285,15 +294,15 @@ void Input_Init() {
     }
 }
 
-int* Input_GetKeyMap() {
+int* IOPlatform_GetKeyMap() {
     return (int*)scancode_map;
 }
 
-int Input_IsKeyDown(unsigned char scan_code) {
+int IOPlatform_IsKeyDown(unsigned char scan_code) {
     return sdl_key_state[scan_code];
 }
 
-void Input_GetMousePosition(int* pX, int* pY) {
+void IOPlatform_GetMousePosition(int* pX, int* pY) {
     int vp_x, vp_y, vp_w, vp_h;
 
     SDL_GetMouseState(pX, pY);
@@ -323,7 +332,7 @@ void Input_GetMousePosition(int* pX, int* pY) {
 #endif
 }
 
-void Input_GetMouseButtons(int* pButton1, int* pButton2) {
+void IOPlatform_GetMouseButtons(int* pButton1, int* pButton2) {
     int state = SDL_GetMouseState(NULL, NULL);
     *pButton1 = state & SDL_BUTTON_LMASK;
     *pButton2 = state & SDL_BUTTON_RMASK;

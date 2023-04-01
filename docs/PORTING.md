@@ -35,13 +35,17 @@ The default IO platform is `SDL_OpenGL`, which uses SDL for windowing and input,
 To add a new `IOPlatform`:
 
 1. Create `io_platforms/my_platform.c` file and implement the required functions defined in [io_platforms/io_platform.h](https://github.com/dethrace-labs/dethrace/blob/main/src/harness/io_platforms/io_platform.h):
-- `Window_Create`
-- `Window_PollEvents`
-- `Window_Swap`
-- `Input_GetKeyMap`
-- `Input_IsKeyDown`
+- `IOPlatform_Init`
+- `IOPlatform_CreateWindow`
+- `IOPlatform_PollEvents`
+- `IOPlatform_SwapWindow`
+- `IOPlatform_GetKeyMap`
+- `IOPlatform_IsKeyDown`
+- `IOPlatform_GetMousePosition`
+- `IOPlatform_GetMouseButtons`
+- `IOPlatform_Shutdown`
 
-`Window_Create` returns a `tRenderer*`, which must implement the interface defined in [renderers/renderer.h](https://github.com/dethrace-labs/dethrace/blob/main/src/harness/renderers/renderer.h). See [renderers/gl](https://github.com/dethrace-labs/dethrace/tree/main/src/harness/renderers/gl) for an example.
+`IOPlatform_CreateWindow` returns a `tRenderer*`, which must implement the interface defined in [renderers/renderer.h](https://github.com/dethrace-labs/dethrace/blob/main/src/harness/renderers/renderer.h). See [renderers/gl](https://github.com/dethrace-labs/dethrace/tree/main/src/harness/renderers/gl) for an example.
 
 2. Add a new conditional section in `src/harness/CMakeLists.txt` for your new platform
 

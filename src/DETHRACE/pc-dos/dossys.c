@@ -308,7 +308,11 @@ void PDInitialiseSystem() {
 // IDA: void __cdecl PDShutdownSystem()
 void PDShutdownSystem() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    Harness_Hook_PDShutdownSystem();
+
+    CloseDiagnostics();
+    exit(0);
 }
 
 // IDA: void __cdecl PDSaveOriginalPalette()
@@ -320,7 +324,8 @@ void PDSaveOriginalPalette() {
 // IDA: void __cdecl PDRevertPalette()
 void PDRevertPalette() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    // empty function
 }
 
 // IDA: int __usercall PDInitScreenVars@<EAX>(int pArgc@<EAX>, char **pArgv@<EDX>)
