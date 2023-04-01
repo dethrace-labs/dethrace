@@ -308,3 +308,10 @@ void OS_AllocateActionReplayBuffer(char** pBuffer, unsigned* pBuffer_size) {
     *pBuffer = buffer;
     *pBuffer_size = buffer_size;
 }
+
+size_t OS_ConsoleReadPassword(char* pBuffer, size_t pBufferLen) {
+    // FIXME: unsafe implementation (echos the password)
+    pBuffer[0] = '\0';
+    fgets(pBuffer, pBufferLen, stdin);
+    return strlen(pBuffer);
+}
