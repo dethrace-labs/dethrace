@@ -22,7 +22,7 @@ typedef unsigned int UINT;
 typedef unsigned char BYTE;
 typedef unsigned short WORD;
 typedef long LONG;
-typedef unsigned long DWORD;
+typedef uint32_t DWORD;
 typedef BYTE* PBYTE;
 typedef char* PSTR;
 typedef WORD* PWORD;
@@ -38,7 +38,7 @@ typedef BYTE* HPBYTE;
 typedef BYTE* HPSTR;
 typedef LONG* HPLONG;
 typedef void* HPVOID;
-typedef unsigned int HANDLE;
+typedef void* HANDLE;
 #endif
 typedef unsigned int W32;
 typedef unsigned short W16;

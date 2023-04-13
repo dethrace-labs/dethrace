@@ -46,6 +46,11 @@ br_vector3 gCamera_velocity;
 
 // IDA: void __cdecl UsePathFileToDetermineIfFullInstallation()
 void UsePathFileToDetermineIfFullInstallation() {
+    // changed by dethrace for compatibility
+    // char line1[80];
+    // char line2[80];
+    // char line3[80];
+    // char path_file[80];
     char line1[MAX_PATH_LENGTH];
     char line2[MAX_PATH_LENGTH];
     char line3[MAX_PATH_LENGTH];

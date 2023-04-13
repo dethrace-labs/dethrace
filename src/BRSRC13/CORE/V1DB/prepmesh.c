@@ -698,7 +698,8 @@ void BrModelUpdate(br_model* model, br_uint_16 flags) {
         model->stored = NULL;
     }
 
-    Harness_Hook_BrModelUpdate(model);
+    // Added by dethrace
+    gHarness_platform.BufferModel(model);
 }
 
 // IDA: void __usercall BrModelClear(br_model *model@<EAX>)

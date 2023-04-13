@@ -9,9 +9,10 @@ void BrMaterialUpdate(br_material* mat, br_uint_16 flags) {
     br_token t;
     br_int_32 c;
 
-    //TODO: ?
+    // TODO: ?
 
-    Harness_Hook_BrMaterialUpdate(mat, flags);
+    // Added by dethrace
+    gHarness_platform.BufferMaterial(mat);
 }
 
 // IDA: void __usercall BrMaterialClear(br_material *mat@<EAX>)

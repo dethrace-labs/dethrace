@@ -1,6 +1,7 @@
 #include "harness.h"
 #include "brender_emu/renderer_impl.h"
 #include "include/harness/config.h"
+#include "include/harness/hooks.h"
 #include "include/harness/os.h"
 #include "io_platforms/io_platform.h"
 #include "renderers/null.h"
@@ -24,7 +25,7 @@ unsigned int last_frame_time = 0;
 int force_nullrenderer = 0;
 
 extern unsigned int GetTotalTime();
-extern uint8_t gScan_code[123][2];
+
 extern br_v1db_state v1db;
 extern uint32_t gI_am_cheating;
 
@@ -33,6 +34,36 @@ tHarness_game_info harness_game_info;
 
 // Configuration options
 tHarness_game_config harness_game_config;
+
+// Platform hooks
+tPlatform_hooks gHarness_platform = {
+    IOPlatform_missing_hook,
+    IOPlatform_missing_hook, // void (*Init)(int width, int height, int pRender_width, int pRender_height);
+    IOPlatform_missing_hook, // void (*BeginScene)(br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer);
+    IOPlatform_missing_hook, // void (*EndScene)();
+    IOPlatform_missing_hook, // void (*SetPalette)(uint8_t* palette);
+    IOPlatform_missing_hook, // void (*FullScreenQuad)(uint8_t* src);
+    IOPlatform_missing_hook, // void (*Model)(br_actor* actor, br_model* model, br_matrix34 model_matrix, br_token render_type);
+    IOPlatform_missing_hook, // void (*ClearBuffers)();
+    IOPlatform_missing_hook, // void (*BufferTexture)(br_pixelmap* pm);
+    IOPlatform_missing_hook, // void (*BufferMaterial)(br_material* mat);
+    IOPlatform_missing_hook, // void (*BufferModel)(br_model* model);
+    IOPlatform_missing_hook, // void (*GetRenderSize)(int* width, int* height);
+    IOPlatform_missing_hook, // void (*GetWindowSize)(int* width, int* height);
+    IOPlatform_missing_hook, // void (*SetWindowSize)(int width, int height);
+    IOPlatform_missing_hook, // void (*GetViewport)(int* x, int* y, int* width, int* height);
+    IOPlatform_missing_hook, // void* (*CreateWindow)(char* title, int x, int y, int nWidth, int nHeight);
+    IOPlatform_missing_hook, // void (*SetPaletteEntries)(PALETTEENTRY* palette, int pFirst_colour, int pCount);
+    IOPlatform_missing_hook, // int (*GetCursorPos)(LPPOINT lpPoint);
+    IOPlatform_missing_hook, // int (*ScreenToClient)(HWND hWnd, LPPOINT lpPoint);
+    IOPlatform_missing_hook, // void (*DestroyWindow)(HWND window);
+    IOPlatform_missing_hook, // int (*GetMessage)(LPMSG msg);
+    IOPlatform_missing_hook, // int (*SetWindowPos)(HWND hWnd, int x, int y, int nWidth, int nHeight);
+    IOPlatform_missing_hook, // int (*ShowCursor)(int show);
+    IOPlatform_missing_hook, // void (*GetKeyboardState)(unsigned int count, uint8_t* buffer);
+    IOPlatform_missing_hook, // void (*Sleep)(DWORD dwMilliseconds);
+    IOPlatform_missing_hook  // uint32_t (*GetTicks)();
+};
 
 /* clang-format off */
 // German ASCII codes
@@ -221,13 +252,7 @@ void Harness_Init(int* argc, char* argv[]) {
         Harness_DetectGameMode();
     }
 
-    IOPlatform_Init();
-    int* keymap = IOPlatform_GetKeyMap();
-    if (keymap != NULL) {
-        for (int i = 0; i < 123; i++) {
-            gScan_code[i][0] = keymap[i];
-        }
-    }
+    IOPlatform_Init(&gHarness_platform);
 }
 
 // used by unit tests
@@ -318,7 +343,7 @@ void Harness_Hook_GraphicsInit(int render_width, int render_height) {
         window_width = render_width;
         window_height = render_height;
     }
-    renderer = IOPlatform_CreateWindow("Dethrace", window_width, window_height, render_width, render_height);
+    // renderer = IOPlatform_CreateWindow("Dethrace", window_width, window_height, render_width, render_height);
 }
 
 void Harness_Hook_PDShutdownSystem() {
@@ -327,7 +352,7 @@ void Harness_Hook_PDShutdownSystem() {
 
 // Render 2d back buffer
 void Harness_RenderScreen(br_pixelmap* dst, br_pixelmap* src) {
-    renderer->FullScreenQuad((uint8_t*)src->pixels);
+    gHarness_platform.RenderFullScreenQuad((uint8_t*)src->pixels);
 
     last_dst = dst;
     last_src = src;
@@ -339,7 +364,7 @@ void Harness_Hook_BrDevPaletteSetOld(br_pixelmap* pm) {
 
     if (last_dst) {
         Harness_RenderScreen(last_dst, last_src);
-        IOPlatform_SwapWindow(0);
+        // IOPlatform_SwapWindow(0);
     }
 }
 
@@ -396,43 +421,23 @@ void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {
     Harness_RenderScreen(dst, src);
 
     int delay_ms = Harness_CalculateFrameDelay();
-    IOPlatform_SwapWindow(delay_ms);
+    gHarness_platform.SwapWindow(delay_ms);
 
-    renderer->ClearBuffers();
-    IOPlatform_PollEvents();
+    gHarness_platform.ClearBuffers();
+    // IOPlatform_PollEvents();
 
     last_frame_time = GetTotalTime();
 }
 
-int Harness_Hook_KeyDown(unsigned char pScan_code) {
-    return IOPlatform_IsKeyDown(pScan_code);
-}
-
-void Harness_Hook_PDServiceSystem() {
-    IOPlatform_PollEvents();
-}
-void Harness_Hook_PDSetKeyArray() {
-    IOPlatform_PollEvents();
+void Harness_RenderLastScreen() {
+    if (last_dst) {
+        Harness_RenderScreen(last_dst, last_src);
+        gHarness_platform.SwapWindow(0);
+    }
 }
 
 void Harness_Hook_FlushRenderer() {
     renderer->FlushBuffers(eFlush_all);
-}
-
-void Harness_Hook_BrMaterialUpdate(br_material* mat, br_uint_16 flags) {
-    renderer->BufferMaterial(mat);
-}
-
-void Harness_Hook_BrBufferUpdate(br_pixelmap* pm, br_token use, br_uint_16 flags) {
-    if (use == BRT_COLOUR_MAP_O || use == BRT_UNKNOWN) {
-        renderer->BufferTexture(pm);
-    } else {
-        LOG_PANIC("use %d", use);
-    }
-}
-
-void Harness_Hook_BrModelUpdate(br_model* model) {
-    renderer->BufferModel(model);
 }
 
 // Input hooks
@@ -455,4 +460,8 @@ void Harness_Hook_S3StopAllOutletSounds() {
 // Filesystem hooks
 FILE* Harness_Hook_fopen(const char* pathname, const char* mode) {
     return OS_fopen(pathname, mode);
+}
+
+void IOPlatform_missing_hook() {
+    NOT_IMPLEMENTED();
 }

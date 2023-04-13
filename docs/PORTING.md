@@ -39,8 +39,7 @@ To add a new `IOPlatform`:
 - `IOPlatform_CreateWindow`
 - `IOPlatform_PollEvents`
 - `IOPlatform_SwapWindow`
-- `IOPlatform_GetKeyMap`
-- `IOPlatform_IsKeyDown`
+- `IOPlatform_GetKeyboardState`
 - `IOPlatform_GetMousePosition`
 - `IOPlatform_GetMouseButtons`
 - `IOPlatform_Shutdown`

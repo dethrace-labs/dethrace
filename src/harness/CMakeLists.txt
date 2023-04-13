@@ -31,6 +31,8 @@ if(NOT MSVC)
         -Wall
         -Wextra
         -Wno-unused-parameter
+        -Wno-incompatible-function-pointer-types
+        -Wno-incompatible-pointer-types
     )
 else()
     target_compile_definitions(harness PRIVATE -D_CRT_SECURE_NO_WARNINGS)
@@ -48,7 +50,7 @@ target_sources(harness PRIVATE
     include/harness/trace.h
     include/harness/config.h
     include/harness/os.h
-
+    include/harness/win95_polyfill.h
     # cameras/debug_camera.c
     # cameras/debug_camera.h
     harness_trace.c
@@ -61,6 +63,9 @@ target_sources(harness PRIVATE
     brender_emu/renderer_impl.h
     sound/sound.c
     sound/sound.h
+    win95/polyfill.c
+    win95/real_windows_funcs.c
+    
     "${CMAKE_CURRENT_BINARY_DIR}/version.h"
 )
 
@@ -76,6 +81,7 @@ if (IO_PLATFORM STREQUAL "SDL_OpenGL")
 
     target_sources(harness PRIVATE
         io_platforms/sdl_gl.c
+        io_platforms/sdl2_scancode_to_dinput.h
         renderers/gl/gl_renderer.c
         renderers/gl/gl_renderer.h
         renderers/gl/stored_context.c

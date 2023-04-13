@@ -1671,7 +1671,7 @@ void RenderAFrame(int pDepth_mask_on) {
         RenderLollipops();
 
         // dethrace: must flush gpu buffer before rendering depth effect into framebuffer
-        Harness_Hook_FlushRenderer();
+        gHarness_platform.FlushBuffers();
         DepthEffectSky(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world);
         DepthEffect(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world);
         if (!gAusterity_mode) {
@@ -1679,7 +1679,7 @@ void RenderAFrame(int pDepth_mask_on) {
         }
         RenderSplashes();
         // dethrace: must flush gpu buffer before rendering smoke into framebuffer
-        Harness_Hook_FlushRenderer();
+        gHarness_platform.FlushBuffers();
         RenderSmoke(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, gFrame_period);
         RenderSparks(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, gFrame_period);
         RenderProximityRays(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, gFrame_period);
