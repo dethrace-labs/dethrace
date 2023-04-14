@@ -17,7 +17,7 @@ HANDLE Real_FindFirstFile(char* lpFileName, char* lpFindFileData_filename) {
     return res;
 }
 
-HANDLE Real_FindNextFile(HANDLE hFindFile, char* lpFindFileData_filename) {
+BOOL Real_FindNextFile(HANDLE hFindFile, char* lpFindFileData_filename) {
     WIN32_FIND_DATA find_data;
     HANDLE res = FindNextFile(hFindFile, &find_data);
     if (res) {

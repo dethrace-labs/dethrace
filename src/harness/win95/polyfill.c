@@ -1,6 +1,5 @@
 
 #include "harness/hooks.h"
-#include "harness/os.h"
 #include "harness/win95_polyfill.h"
 
 #include <assert.h>
@@ -10,15 +9,12 @@
 
 #if defined(_WIN32) || defined(_WIN64)
 
-LARGE_INTEGER qpc_start_time, EndingTime, ElapsedMicroseconds;
-LARGE_INTEGER qpc_ticks_per_sec;
-
 #include <direct.h>
 // https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/getcwd-wgetcwd?view=msvc-170
 #define getcwd _getcwd
 #define chdir _chdir
 extern HANDLE Real_FindFirstFile(char* lpFileName, char* lpFindFileData_filename);
-extern HANDLE Real_FindNextFile(HANDLE hFindFile, char* lpFindFileData_filename);
+extern BOOL Real_FindNextFile(HANDLE hFindFile, char* lpFindFileData_filename);
 extern BOOL Real_FindClose(HANDLE hFindFile);
 #else
 #include <dirent.h>
@@ -120,7 +116,7 @@ HANDLE FindFirstFileA(char* lpFileName, WIN32_FIND_DATAA* lpFindFileData) {
     assert(strcmp(lpFileName, "*.???") == 0);
 
 #if defined(_WIN32) || defined(_WIN64)
-    return Real_FindFirstFile(lpFileName, lpFindFileData.cFileName);
+    return Real_FindFirstFile(lpFileName, lpFindFileData->cFileName);
 #else
     DIR* dir;
     strcpy(lpFileName, ".");
@@ -139,7 +135,7 @@ HANDLE FindFirstFileA(char* lpFileName, WIN32_FIND_DATAA* lpFindFileData) {
 
 BOOL FindNextFileA(HANDLE hFindFile, WIN32_FIND_DATAA* lpFindFileData) {
 #if defined(_WIN32) || defined(_WIN64)
-    return Real_FindNextFile(hFindFile, lpFindFileData.cFileName);
+    return Real_FindNextFile(hFindFile, lpFindFileData->cFileName);
 #else
     struct dirent* entry;
 
@@ -234,7 +230,8 @@ void _splitpath(const char* path, char* drive, char* dir, char* fname, char* ext
 #ifdef _WIN32
     _splitpath(path, NULL, NULL, fname, NULL);
 #else
-    basename_r(path, fname);
+    char* base = basename(path);
+    strcpy(fname, base);
 #endif
 }
 
