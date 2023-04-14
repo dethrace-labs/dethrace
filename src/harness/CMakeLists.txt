@@ -79,7 +79,7 @@ if (IO_PLATFORM STREQUAL "SDL_OpenGL")
     endforeach()
 
     target_sources(harness PRIVATE
-        platforms/sdl_gl.c
+        platforms/sdl_opengl.c
         platforms/sdl2_scancode_to_dinput.h
         renderers/gl/gl_renderer.c
         renderers/gl/gl_renderer.h

@@ -445,8 +445,6 @@ void Usage(char* pProgpath) {
     // char basename[9];
     char basename[256]; // fix: changed from 9 to avoid overflow on longer filenames
 
-    OS_Basename(pProgpath, basename);
-
     fprintf(stderr,
         "Usage: %s [%s] [%s YonFactor] [%s CarSimplificationLevel] [%s SoundDetailLevel] [%s] [%s] [%s] [%s] [%s] [%s]\nWhere YonFactor is between 0 and 1,\nCarSimplificationLevel is a whole number between 0 and %d,\nand SoundDetailLevel is a whole number.\n",
         basename,

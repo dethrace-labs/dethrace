@@ -29,14 +29,6 @@ void dr_dprintf(char* fmt_string, ...);
 static int stack_nbr = 0;
 static char _program_name[1024];
 
-void OS_Sleep(int delay_ms) {
-    Sleep(delay_ms);
-}
-
-void OS_Basename(char* path, char* base) {
-    _splitpath(path, NULL, NULL, base, NULL);
-}
-
 int addr2line(char const* const program_name, void const* const addr) {
     char addr2line_cmd[512] = { 0 };
 
