@@ -42,19 +42,31 @@ static br_pixelmap* current_shade_table;
 // If the counters are equal, we can avoid re-uploading the same thing.
 static unsigned int flush_counter = 0, colourbuffer_upload_counter = 0;
 
+typedef struct gl_vertex {
+    br_vector3 p;
+    br_vector2 map;
+    br_vector3 n;
+    float colour_index; // float to allow interpolation
+} gl_vertex;
+
 struct {
-    GLuint texture_pixelmap;
-    GLuint uv_transform;
-    GLuint shade_table;
-    GLuint blend_table;
-    GLuint blend_enabled;
-    GLuint colour_buffer_texture;
     GLuint model, view, projection;
-    GLuint palette_index_override;
     GLuint clip_plane_count;
     GLuint clip_planes[6];
-    GLuint light_value;
+    GLuint colour_buffer_texture;
     GLuint viewport_height;
+
+    GLuint material_flags;
+    GLuint material_texture_enabled;
+    GLuint material_texture_pixelmap;
+    GLuint material_uv_transform;
+    GLuint material_shade_table;
+    GLuint material_blend_enabled;
+    GLuint material_blend_table;
+    GLuint material_index_base;
+    GLuint material_index_range;
+    GLuint material_shade_table_height;
+
 } uniforms_3d;
 
 struct {
@@ -131,23 +143,29 @@ void LoadShaders() {
         sprintf(name, "u_clip_planes[%d]", i);
         uniforms_3d.clip_planes[i] = GetValidatedUniformLocation(shader_program_3d, name);
     }
+
     uniforms_3d.model = GetValidatedUniformLocation(shader_program_3d, "u_model");
-    uniforms_3d.texture_pixelmap = GetValidatedUniformLocation(shader_program_3d, "u_texture_pixelmap");
-    uniforms_3d.uv_transform = GetValidatedUniformLocation(shader_program_3d, "u_texture_coords_transform");
-    uniforms_3d.shade_table = GetValidatedUniformLocation(shader_program_3d, "u_shade_table");
-    uniforms_3d.blend_table = GetValidatedUniformLocation(shader_program_3d, "u_blend_table");
-    uniforms_3d.blend_enabled = GetValidatedUniformLocation(shader_program_3d, "u_blend_enabled");
     uniforms_3d.colour_buffer_texture = GetValidatedUniformLocation(shader_program_3d, "u_colour_buffer");
     uniforms_3d.projection = GetValidatedUniformLocation(shader_program_3d, "u_projection");
-    uniforms_3d.palette_index_override = GetValidatedUniformLocation(shader_program_3d, "u_palette_index_override");
     uniforms_3d.view = GetValidatedUniformLocation(shader_program_3d, "u_view");
-    uniforms_3d.light_value = GetValidatedUniformLocation(shader_program_3d, "u_light_value");
     uniforms_3d.viewport_height = GetValidatedUniformLocation(shader_program_3d, "u_viewport_height");
 
+    uniforms_3d.material_flags = GetValidatedUniformLocation(shader_program_3d, "u_material_flags");
+    uniforms_3d.material_texture_enabled = GetValidatedUniformLocation(shader_program_3d, "u_material_texture_enabled");
+    uniforms_3d.material_texture_pixelmap = GetValidatedUniformLocation(shader_program_3d, "u_material_texture_pixelmap");
+    uniforms_3d.material_uv_transform = GetValidatedUniformLocation(shader_program_3d, "u_material_uv_transform");
+    uniforms_3d.material_shade_table = GetValidatedUniformLocation(shader_program_3d, "u_material_shade_table");
+    uniforms_3d.material_shade_table_height = GetValidatedUniformLocation(shader_program_3d, "u_material_shade_table_height");
+    uniforms_3d.material_blend_enabled = GetValidatedUniformLocation(shader_program_3d, "u_material_blend_enabled");
+    uniforms_3d.material_blend_table = GetValidatedUniformLocation(shader_program_3d, "u_material_blend_table");
+    uniforms_3d.material_index_base = GetValidatedUniformLocation(shader_program_3d, "u_material_index_base");
+    uniforms_3d.material_index_range = GetValidatedUniformLocation(shader_program_3d, "u_material_index_range");
+
     // bind the uniform samplers to texture units
-    glUniform1i(uniforms_3d.texture_pixelmap, 0);
-    glUniform1i(uniforms_3d.shade_table, 2);
-    glUniform1i(uniforms_3d.blend_table, 3);
+    glUniform1i(uniforms_3d.material_texture_pixelmap, 0);
+    // palette occupies texture unit 1 but not required during 3d rendering
+    glUniform1i(uniforms_3d.material_shade_table, 2);
+    glUniform1i(uniforms_3d.material_blend_table, 3);
     glUniform1i(uniforms_3d.colour_buffer_texture, 4);
 }
 
@@ -328,7 +346,7 @@ void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer, br_pixe
     last_depth_buffer = depth_buffer;
     glViewport(colour_buffer->base_x, render_height - colour_buffer->height - colour_buffer->base_y, colour_buffer->width, colour_buffer->height);
     glUseProgram(shader_program_3d);
-    glUniform1i(uniforms_3d.viewport_height, render_height);
+    glUniform1ui(uniforms_3d.viewport_height, render_height);
 
     current_material = NULL;
     current_shade_table = NULL;
@@ -451,7 +469,7 @@ void GLRenderer_BufferModel(br_model* model) {
         }
     }
 
-    fmt_vertex* verts = malloc(sizeof(fmt_vertex) * total_verts);
+    gl_vertex* verts = malloc(sizeof(gl_vertex) * total_verts);
     unsigned int* indices = malloc(sizeof(int) * 3 * total_faces);
 
     int v_index = 0;
@@ -463,6 +481,7 @@ void GLRenderer_BufferModel(br_model* model) {
             verts[v_index].p = v->p;
             verts[v_index].n = v->n;
             verts[v_index].map = v->map;
+            verts[v_index].colour_index = BR_ALPHA(v11->groups[g].vertex_colours[i]);
             v_index++;
         }
         for (int i = 0; i < v11->groups[g].nfaces; i++) {
@@ -481,13 +500,19 @@ void GLRenderer_BufferModel(br_model* model) {
     // Vertices
     glBindVertexArray(ctx->vao_id);
     glBindBuffer(GL_ARRAY_BUFFER, ctx->vbo_id);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(fmt_vertex) * total_verts, verts, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(fmt_vertex), (void*)offsetof(fmt_vertex, p));
+    glBufferData(GL_ARRAY_BUFFER, sizeof(gl_vertex) * total_verts, verts, GL_STATIC_DRAW);
+    // pos
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(gl_vertex), (void*)offsetof(gl_vertex, p));
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(fmt_vertex), (void*)offsetof(fmt_vertex, n));
+    // normal
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(gl_vertex), (void*)offsetof(gl_vertex, n));
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(fmt_vertex), (void*)offsetof(fmt_vertex, map));
+    // uv coordinates
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(gl_vertex), (void*)offsetof(gl_vertex, map));
     glEnableVertexAttribArray(2);
+    // color
+    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(gl_vertex), (void*)offsetof(gl_vertex, colour_index));
+    glEnableVertexAttribArray(3);
 
     // Indices
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx->ebo_id);
@@ -507,28 +532,39 @@ void setActiveMaterial(tStored_material* material) {
         return;
     }
 
-    glUniformMatrix2x3fv(uniforms_3d.uv_transform, 1, GL_TRUE, &material->map_transform.m[0][0]);
-    glUniform1i(uniforms_3d.palette_index_override, material->index_base);
+    glUniformMatrix2x3fv(uniforms_3d.material_uv_transform, 1, GL_TRUE, &material->map_transform.m[0][0]);
+
+    if (material->pixelmap) {
+        tStored_pixelmap* stored_px = material->pixelmap->stored;
+        if (stored_px == NULL) {
+            LOG_PANIC("stored_px is null for pixelmap %s", material->pixelmap->identifier);
+        }
+        glBindTexture(GL_TEXTURE_2D, stored_px->id);
+        glUniform1ui(uniforms_3d.material_texture_enabled, 1);
+    } else {
+        glUniform1ui(uniforms_3d.material_texture_enabled, 0);
+
+        // index_base and index_range are only used for untextured materials
+        glUniform1ui(uniforms_3d.material_index_base, material->index_base);
+        glUniform1ui(uniforms_3d.material_index_range, material->index_range);
+    }
+
     if (material->shade_table) {
+        glUniform1ui(uniforms_3d.material_shade_table_height, material->shade_table->height);
         GLRenderer_SetShadeTable(material->shade_table);
     }
 
     if (material->index_blend) {
-        glUniform1i(uniforms_3d.blend_enabled, 1);
+        glUniform1ui(uniforms_3d.material_blend_enabled, 1);
         GLRenderer_SetBlendTable(material->index_blend);
         // materials with index_blend do not write to depth buffer (https://www.cwaboard.co.uk/viewtopic.php?p=105846&sid=58ad8910238000ca14b01dad85117175#p105846)
         glDepthMask(GL_FALSE);
     } else {
-        glUniform1i(uniforms_3d.blend_enabled, 0);
+        glUniform1ui(uniforms_3d.material_blend_enabled, 0);
         glDepthMask(GL_TRUE);
     }
 
-    if ((material->flags & BR_MATF_LIGHT) && !(material->flags & BR_MATF_PRELIT) && material->shade_table) {
-        // TODO: light value shouldn't always be 0? Works for shadows, not sure about other things.
-        glUniform1i(uniforms_3d.light_value, 0);
-    } else {
-        glUniform1i(uniforms_3d.light_value, -1);
-    }
+    glUniform1ui(uniforms_3d.material_flags, material->flags);
 
     if (material->flags & (BR_MATF_TWO_SIDED | BR_MATF_ALWAYS_VISIBLE)) {
         glDisable(GL_CULL_FACE);
@@ -536,21 +572,26 @@ void setActiveMaterial(tStored_material* material) {
         glEnable(GL_CULL_FACE);
     }
 
-    if (material->pixelmap) {
-        tStored_pixelmap* stored_px = material->pixelmap->stored;
-        if (stored_px != NULL) {
-            glBindTexture(GL_TEXTURE_2D, stored_px->id);
-            glUniform1i(uniforms_3d.palette_index_override, -1);
-        }
-    }
+    CHECK_GL_ERROR("GLRenderer_RenderModelxx");
 }
 
-void GLRenderer_Model(br_actor* actor, br_model* model, br_matrix34 model_matrix, br_token render_type) {
+void GLRenderer_Model(br_actor* actor, br_model* model, br_material* material, br_token render_type, br_matrix34 model_matrix) {
     tStored_model_context* ctx;
+    v11group* group;
+    int element_index = 0;
+
+    if (model->flags & BR_MODF_DETHRACE_FORCE_BUFFER_UPDATE) {
+        if (model->stored) {
+            ((br_object*)model->stored)->dispatch->_free((br_object*)model->stored);
+            model->stored = NULL;
+        }
+        GLRenderer_BufferModel(model);
+        model->flags &= ~BR_MODF_DETHRACE_FORCE_BUFFER_UPDATE;
+    }
+
     ctx = model->stored;
     v11model* v11 = model->prepared;
 
-    // LOG_DEBUG("model rendering %s", model->identifier);
     if (v11 == NULL) {
         // LOG_WARN("No model prepared for %s", model->identifier);
         return;
@@ -567,15 +608,8 @@ void GLRenderer_Model(br_actor* actor, br_model* model, br_matrix34 model_matrix
     glBindVertexArray(ctx->vao_id);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx->ebo_id);
 
-    // br_actor can have a material too, which is applied to the faces if the face doesn't have a texture
-    if (actor->material) {
-        setActiveMaterial(actor->material->stored);
-    } else {
-        // TODO: set defaults for now. This fixes missing curb materials but probably isn't the right fix.
-        LOG_WARN_ONCE("set default palette override for missing actor material")
-        glUniform1i(uniforms_3d.palette_index_override, 227);
-        glUniform1i(uniforms_3d.light_value, -1);
-    }
+    // set default material for this actor/model
+    setActiveMaterial(material->stored);
 
     switch (render_type) {
     case BRT_TRIANGLE:
@@ -583,15 +617,13 @@ void GLRenderer_Model(br_actor* actor, br_model* model, br_matrix34 model_matrix
         break;
     case BRT_LINE:
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        glUniform1i(uniforms_3d.palette_index_override, 255);
-        glUniform1i(uniforms_3d.light_value, -1);
+        glUniform1ui(uniforms_3d.material_index_base, 255);
+        glUniform1ui(uniforms_3d.material_flags, 0);
         break;
     default:
         LOG_PANIC("render_type %d is not supported?!", render_type);
     }
 
-    v11group* group;
-    int element_index = 0;
     for (int g = 0; g < v11->ngroups; g++) {
         group = &v11->groups[g];
         setActiveMaterial(group->stored);
@@ -620,6 +652,7 @@ void GLRenderer_BufferMaterial(br_material* mat) {
     stored->flags = mat->flags;
     stored->shade_table = mat->index_shade;
     stored->index_base = mat->index_base;
+    stored->index_range = mat->index_range;
     stored->index_blend = mat->index_blend;
 }
 
@@ -686,7 +719,8 @@ void GLRenderer_FlushBuffers(tRenderer_flush_type flush_type) {
         for (int y = 0; y < last_colour_buffer->height; y++) {
             dest_y--;
             for (int x = 0; x < last_colour_buffer->width; x++) {
-                depth_pixels[dest_y * render_width + x] = depth_buffer_flip_pixels[src_y * render_width + last_colour_buffer->base_x + x];
+                uint16_t new_depth = depth_buffer_flip_pixels[src_y * render_width + last_colour_buffer->base_x + x];
+                depth_pixels[dest_y * render_width + x] = new_depth;
             }
             src_y++;
         }

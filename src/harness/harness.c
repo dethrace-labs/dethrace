@@ -338,7 +338,16 @@ int Harness_CalculateFrameDelay() {
 }
 
 void Harness_Hook_renderActor(br_actor* actor, br_model* model, br_material* material, br_token type) {
+<<<<<<< HEAD
     gHarness_platform.Renderer_Model(actor, model, renderer_state->state.matrix.model_to_view, type);
+=======
+    renderer->Model(actor, model, material, type, renderer_state->state.matrix.model_to_view);
+}
+
+void Harness_Hook_BrZbSceneRenderEnd() {
+    renderer->FlushBuffers(eFlush_all);
+    renderer->EndScene();
+>>>>>>> 1a0301b6ee5e72991099ec56deeda52d2766705c
 }
 
 // Called by game to swap buffers at end of frame rendering
@@ -364,12 +373,26 @@ void Harness_RenderLastScreen() {
     }
 }
 
+<<<<<<< HEAD
 // Sound hooks
 void Harness_Hook_S3Service(int unk1, int unk2) {
     Sound_Service();
 }
 
 void Harness_Hook_S3StopAllOutletSounds() {
+=======
+void Harness_Hook_BrModelUpdate(br_model* model) {
+    renderer->BufferModel(model);
+}
+
+// Input hooks
+void Harness_Hook_GetMousePosition(int* pX, int* pY) {
+    IOPlatform_GetMousePosition(pX, pY);
+}
+
+void Harness_Hook_GetMouseButtons(int* pButton1, int* pButton2) {
+    IOPlatform_GetMouseButtons(pButton1, pButton2);
+>>>>>>> 1a0301b6ee5e72991099ec56deeda52d2766705c
 }
 
 // Filesystem hooks

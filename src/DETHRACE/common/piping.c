@@ -12,9 +12,9 @@
 #include "pedestrn.h"
 #include "replay.h"
 #include "skidmark.h"
+#include "sound.h"
 #include "spark.h"
 #include "sys.h"
-#include "sound.h"
 #include "utility.h"
 #include "world.h"
 #include <stdlib.h>
@@ -88,7 +88,7 @@ tU8* gPipe_buffer_oldest;
 tU32 gPipe_buffer_size;
 tU8* gLocal_buffer;
 tU32 gLocal_buffer_size;
-tPipe_chunk *gIncidentChunk; // FIXME: added by DethRace (really needed?)
+tPipe_chunk* gIncidentChunk; // FIXME: added by DethRace (really needed?)
 
 #define LOCAL_BUFFER_SIZE 15000
 
@@ -153,8 +153,7 @@ int IsActionReplayAvailable() {
 int SomeReplayLeft() {
     LOG_TRACE("()");
 
-    return ((GetReplayDirection() >= 1 && gPipe_play_ptr != gPipe_record_ptr) ||
-        (GetReplayDirection() <= -1 && gPipe_play_ptr != gPipe_buffer_oldest));
+    return ((GetReplayDirection() >= 1 && gPipe_play_ptr != gPipe_record_ptr) || (GetReplayDirection() <= -1 && gPipe_play_ptr != gPipe_buffer_oldest));
 }
 
 // IDA: void __cdecl DisablePipedSounds()
@@ -179,7 +178,7 @@ tU32 LengthOfSession(tPipe_session* pSession) {
     LOG_TRACE("(%p)", pSession);
 
 #define SIZEOF_CHUNK(MEMBER) (offsetof(tPipe_chunk, chunk_data) + sizeof(pSession->chunks.chunk_data.MEMBER))
-#define ROUND_UP(V, M) (((V) + (M) - 1) & (~((M) - 1)))
+#define ROUND_UP(V, M) (((V) + (M)-1) & (~((M)-1)))
 
     switch (pSession->chunk_type) {
     case ePipe_chunk_actor_rstyle:
@@ -1551,12 +1550,12 @@ int ApplyPipedSession(tU8** pPtr) {
     if (*pPtr == gPipe_record_ptr) {
         return 1;
     }
-    gEnd_of_session = *pPtr + (LengthOfSession((tPipe_session *)*pPtr) - sizeof(tU16));
-    REPLAY_DEBUG_ASSERT(((tPipe_session *)*pPtr)->magic1 == REPLAY_DEBUG_MAGIC1);
-    chunk_ptr = (tPipe_chunk *)(*pPtr + offsetof(tPipe_session, chunks));
+    gEnd_of_session = *pPtr + (LengthOfSession((tPipe_session*)*pPtr) - sizeof(tU16));
+    REPLAY_DEBUG_ASSERT(((tPipe_session*)*pPtr)->magic1 == REPLAY_DEBUG_MAGIC1);
+    chunk_ptr = (tPipe_chunk*)(*pPtr + offsetof(tPipe_session, chunks));
     return_value = 0;
-    chunk_type = ((tPipe_session *)*pPtr)->chunk_type;
-    for (i = 0; i < ((tPipe_session *)*pPtr)->number_of_chunks; i++) {
+    chunk_type = ((tPipe_session*)*pPtr)->chunk_type;
+    for (i = 0; i < ((tPipe_session*)*pPtr)->number_of_chunks; i++) {
         switch (chunk_type) {
         case ePipe_chunk_model_geometry:
             ApplyModelGeometry(&chunk_ptr);
@@ -1630,9 +1629,9 @@ int ApplyPipedSession(tU8** pPtr) {
         }
     }
 #if defined(DETHRACE_FIX_BUGS)
-    *pPtr += PIPE_ALIGN(LengthOfSession((tPipe_session *)*pPtr));
+    *pPtr += PIPE_ALIGN(LengthOfSession((tPipe_session*)*pPtr));
 #else
-    *pPtr += LengthOfSession((tPipe_session *)*pPtr);
+    *pPtr += LengthOfSession((tPipe_session*)*pPtr);
 #endif
     if (*pPtr >= gPipe_buffer_working_end && *pPtr != gPipe_record_ptr) {
         *pPtr = gPipe_buffer_start;
@@ -1749,8 +1748,7 @@ void UndoPedestrian(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     temp_prev_chunk = pPrev_chunk;
     if (pPrev_chunk == NULL) {
         ApplyPedestrian(pChunk);
-    }
-    else {
+    } else {
         gDisable_advance = 1;
         ApplyPedestrian(&temp_prev_chunk);
         gDisable_advance = 0;
@@ -1775,8 +1773,7 @@ void UndoCar(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     temp_prev_chunk = pPrev_chunk;
     if (pPrev_chunk == NULL) {
         ApplyCar(pChunk);
-    }
-    else {
+    } else {
         gDisable_advance = 1;
         ApplyCar(&temp_prev_chunk);
         gDisable_advance = 0;
@@ -1788,7 +1785,7 @@ void UndoCar(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 void UndoSound(tPipe_chunk** pChunk) {
     LOG_TRACE("(%p)", pChunk);
 
-    AdvanceChunkPtr(pChunk,ePipe_chunk_sound);
+    AdvanceChunkPtr(pChunk, ePipe_chunk_sound);
 }
 
 // IDA: void __usercall UndoDamage(tPipe_chunk **pChunk@<EAX>)
@@ -1799,8 +1796,7 @@ void UndoDamage(tPipe_chunk** pChunk) {
 
     if (((*pChunk)->subject_index & 0xff00) == 0) {
         car = &gProgram_state.current_car;
-    }
-    else {
+    } else {
         car = GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff);
     }
     for (i = 0; i < COUNT_OF(car->damage_units); i++) {
@@ -1885,8 +1881,7 @@ void UndoScreenWobble(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     gDisable_advance = 1;
     if (pPrev_chunk == NULL) {
         SetScreenWobble(0, 0);
-    }
-    else {
+    } else {
         ApplyScreenWobble(&temp_prev_chunk);
     }
     gDisable_advance = 0;
@@ -1959,8 +1954,7 @@ void UndoSplash(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     gDisable_advance = 1;
     if (pPrev_chunk == NULL) {
         ((((*pChunk)->subject_index & 0xff00) == 0) ? &gProgram_state.current_car : GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff))->water_d = 10000.f;
-    }
-    else {
+    } else {
         ApplySplash(&temp_prev_chunk);
     }
     gDisable_advance = 0;
@@ -1995,8 +1989,7 @@ void UndoSkidAdjustment(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     gDisable_advance = 1;
     if (pPrev_chunk == NULL) {
         HideSkid((*pChunk)->subject_index);
-    }
-    else {
+    } else {
         ApplySkidAdjustment(&pPrev_chunk);
     }
     gDisable_advance = 0;
@@ -2112,7 +2105,7 @@ tU32 FindPrevFrameTime(tU8* pPtr) {
     temp_ptr = pPtr;
     do {
         if (MoveSessionPointerBackOne(&temp_ptr)) {
-          return 0;
+            return 0;
         }
     } while (((tPipe_session*)temp_ptr)->chunk_type != ePipe_chunk_frame_boundary);
     return ((tPipe_session*)temp_ptr)->chunks.chunk_data.frame_boundary_data.time;
@@ -2317,9 +2310,9 @@ tU32 GetARStartTime() {
 
     temp_ptr = gPipe_buffer_oldest;
     do {
-      if (MoveSessionPointerForwardOne(&temp_ptr)) {
-          return 0;
-      }
+        if (MoveSessionPointerForwardOne(&temp_ptr)) {
+            return 0;
+        }
     } while (((tPipe_session*)temp_ptr)->chunk_type != ePipe_chunk_frame_boundary);
     return ((tPipe_session*)temp_ptr)->chunks.chunk_data.frame_boundary_data.time;
 }
