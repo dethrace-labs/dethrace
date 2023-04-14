@@ -26,10 +26,11 @@ static uint8_t gl_palette[4 * 256]; // RGBA
 static uint8_t* screen_buffer_flip_pixels;
 static uint16_t* depth_buffer_flip_pixels;
 
-static int window_width, window_height, render_width, render_height;
+static int render_width, render_height;
 static int vp_x, vp_y, vp_width, vp_height;
 
-static br_pixelmap *last_colour_buffer, *last_depth_buffer;
+static br_pixelmap *last_colour_buffer,
+    *last_depth_buffer;
 static int dirty_buffers = 0;
 
 static br_pixelmap *last_colour_buffer, *last_depth_buffer;
@@ -189,29 +190,9 @@ void SetupFullScreenRectGeometry() {
     glBindVertexArray(0);
 }
 
-static void update_viewport() {
-    const float target_aspect_ratio = (float)render_width / render_height;
-    const float aspect_ratio = (float)window_width / window_height;
-
-    vp_width = window_width;
-    vp_height = window_height;
-    if (aspect_ratio != target_aspect_ratio) {
-        if (aspect_ratio > target_aspect_ratio) {
-            vp_width = window_height * target_aspect_ratio + .5f;
-        } else {
-            vp_height = window_width / target_aspect_ratio + .5f;
-        }
-    }
-    vp_x = (window_width - vp_width) / 2;
-    vp_y = (window_height - vp_height) / 2;
-}
-
-void GLRenderer_Init(int width, int height, int pRender_width, int pRender_height) {
-    window_width = width;
-    window_height = height;
+void GLRenderer_Init(int pRender_width, int pRender_height) {
     render_width = pRender_width;
     render_height = pRender_height;
-    update_viewport();
 
     LOG_INFO("OpenGL vendor string: %s", glGetString(GL_VENDOR));
     LOG_INFO("OpenGL renderer string: %s", glGetString(GL_RENDERER));
@@ -716,25 +697,9 @@ void GLRenderer_FlushBuffers(tRenderer_flush_type flush_type) {
     dirty_buffers = 0;
 }
 
-void GLRenderer_GetRenderSize(int* width, int* height) {
-    *width = render_width;
-    *height = render_height;
-}
-
-void GLRenderer_GetWindowSize(int* width, int* height) {
-    *width = window_width;
-    *height = window_height;
-}
-
-void GLRenderer_SetWindowSize(int width, int height) {
-    window_width = width;
-    window_height = height;
-    update_viewport();
-}
-
-void GLRenderer_GetViewport(int* x, int* y, int* width, int* height) {
-    *x = vp_x;
-    *y = vp_y;
-    *width = vp_width;
-    *height = vp_height;
+void GLRenderer_SetViewport(int x, int y, int width, int height) {
+    vp_x = x;
+    vp_y = y;
+    vp_width = width;
+    vp_height = height;
 }

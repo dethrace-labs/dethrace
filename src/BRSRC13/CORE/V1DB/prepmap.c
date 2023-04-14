@@ -17,7 +17,7 @@ void BrBufferUpdate(br_pixelmap* pm, br_token use, br_uint_16 flags) {
     if (use != BRT_COLOUR_MAP_O && use != BRT_UNKNOWN) {
         LOG_PANIC("use %d", use);
     }
-    gHarness_platform.BufferTexture(pm);
+    gHarness_platform.Renderer_BufferTexture(pm);
 }
 
 // IDA: void __usercall BrBufferClear(br_pixelmap *pm@<EAX>)

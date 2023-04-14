@@ -13,7 +13,7 @@
 #include <string.h>
 #include <sys/stat.h>
 
-tRenderer* renderer;
+// tRenderer* renderer;
 br_pixelmap* palette;
 uint32_t* screen_buffer;
 harness_br_renderer* renderer_state;
@@ -36,34 +36,7 @@ tHarness_game_info harness_game_info;
 tHarness_game_config harness_game_config;
 
 // Platform hooks
-tPlatform_hooks gHarness_platform = {
-    IOPlatform_missing_hook,
-    IOPlatform_missing_hook, // void (*Init)(int width, int height, int pRender_width, int pRender_height);
-    IOPlatform_missing_hook, // void (*BeginScene)(br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer);
-    IOPlatform_missing_hook, // void (*EndScene)();
-    IOPlatform_missing_hook, // void (*SetPalette)(uint8_t* palette);
-    IOPlatform_missing_hook, // void (*FullScreenQuad)(uint8_t* src);
-    IOPlatform_missing_hook, // void (*Model)(br_actor* actor, br_model* model, br_matrix34 model_matrix, br_token render_type);
-    IOPlatform_missing_hook, // void (*ClearBuffers)();
-    IOPlatform_missing_hook, // void (*BufferTexture)(br_pixelmap* pm);
-    IOPlatform_missing_hook, // void (*BufferMaterial)(br_material* mat);
-    IOPlatform_missing_hook, // void (*BufferModel)(br_model* model);
-    IOPlatform_missing_hook, // void (*GetRenderSize)(int* width, int* height);
-    IOPlatform_missing_hook, // void (*GetWindowSize)(int* width, int* height);
-    IOPlatform_missing_hook, // void (*SetWindowSize)(int width, int height);
-    IOPlatform_missing_hook, // void (*GetViewport)(int* x, int* y, int* width, int* height);
-    IOPlatform_missing_hook, // void* (*CreateWindow)(char* title, int x, int y, int nWidth, int nHeight);
-    IOPlatform_missing_hook, // void (*SetPaletteEntries)(PALETTEENTRY* palette, int pFirst_colour, int pCount);
-    IOPlatform_missing_hook, // int (*GetCursorPos)(LPPOINT lpPoint);
-    IOPlatform_missing_hook, // int (*ScreenToClient)(HWND hWnd, LPPOINT lpPoint);
-    IOPlatform_missing_hook, // void (*DestroyWindow)(HWND window);
-    IOPlatform_missing_hook, // int (*GetMessage)(LPMSG msg);
-    IOPlatform_missing_hook, // int (*SetWindowPos)(HWND hWnd, int x, int y, int nWidth, int nHeight);
-    IOPlatform_missing_hook, // int (*ShowCursor)(int show);
-    IOPlatform_missing_hook, // void (*GetKeyboardState)(unsigned int count, uint8_t* buffer);
-    IOPlatform_missing_hook, // void (*Sleep)(DWORD dwMilliseconds);
-    IOPlatform_missing_hook  // uint32_t (*GetTicks)();
-};
+tPlatform_hooks gHarness_platform;
 
 /* clang-format off */
 // German ASCII codes
@@ -258,7 +231,7 @@ void Harness_Init(int* argc, char* argv[]) {
 // used by unit tests
 void Harness_ForceNullRenderer() {
     force_nullrenderer = 1;
-    renderer = &null_renderer;
+    // renderer = &null_renderer;
 }
 
 int Harness_ProcessCommandLine(int* argc, char* argv[]) {
@@ -331,48 +304,12 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
     return 0;
 }
 
-void Harness_Hook_GraphicsInit(int render_width, int render_height) {
-    int window_width, window_height;
-    if (force_nullrenderer) {
-        return;
-    }
-    if (render_width == 320) {
-        window_width = render_width * 2;
-        window_height = render_height * 2;
-    } else {
-        window_width = render_width;
-        window_height = render_height;
-    }
-    // renderer = IOPlatform_CreateWindow("Dethrace", window_width, window_height, render_width, render_height);
-}
-
-void Harness_Hook_PDShutdownSystem() {
-    IOPlatform_Shutdown();
-}
-
 // Render 2d back buffer
 void Harness_RenderScreen(br_pixelmap* dst, br_pixelmap* src) {
-    gHarness_platform.RenderFullScreenQuad((uint8_t*)src->pixels);
+    gHarness_platform.Renderer_FullScreenQuad((uint8_t*)src->pixels);
 
     last_dst = dst;
     last_src = src;
-}
-
-void Harness_Hook_BrDevPaletteSetOld(br_pixelmap* pm) {
-    renderer->SetPalette((uint8_t*)pm->pixels);
-    palette = pm;
-
-    if (last_dst) {
-        Harness_RenderScreen(last_dst, last_src);
-        // IOPlatform_SwapWindow(0);
-    }
-}
-
-void Harness_Hook_BrDevPaletteSetEntryOld(int i, br_colour colour) {
-    if (palette != NULL) {
-        uint32_t* colors = palette->pixels;
-        colors[i] = colour;
-    }
 }
 
 void Harness_Hook_BrV1dbRendererBegin(br_v1db_state* v1db) {
@@ -400,18 +337,8 @@ int Harness_CalculateFrameDelay() {
     return 0;
 }
 
-// Begin 3d scene
-void Harness_Hook_BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer) {
-    renderer->BeginScene(camera, colour_buffer, depth_buffer);
-}
-
 void Harness_Hook_renderActor(br_actor* actor, br_model* model, br_material* material, br_token type) {
-    renderer->Model(actor, model, renderer_state->state.matrix.model_to_view, type);
-}
-
-void Harness_Hook_BrZbSceneRenderEnd() {
-    renderer->FlushBuffers(eFlush_all);
-    renderer->EndScene();
+    gHarness_platform.Renderer_Model(actor, model, renderer_state->state.matrix.model_to_view, type);
 }
 
 // Called by game to swap buffers at end of frame rendering
@@ -421,11 +348,12 @@ void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {
     Harness_RenderScreen(dst, src);
 
     int delay_ms = Harness_CalculateFrameDelay();
-    gHarness_platform.SwapWindow(delay_ms);
+    gHarness_platform.SwapWindow();
+    if (delay_ms > 0) {
+        gHarness_platform.Sleep(delay_ms);
+    }
 
-    gHarness_platform.ClearBuffers();
-    // IOPlatform_PollEvents();
-
+    gHarness_platform.Renderer_ClearBuffers();
     last_frame_time = GetTotalTime();
 }
 
@@ -434,19 +362,6 @@ void Harness_RenderLastScreen() {
         Harness_RenderScreen(last_dst, last_src);
         gHarness_platform.SwapWindow(0);
     }
-}
-
-void Harness_Hook_FlushRenderer() {
-    renderer->FlushBuffers(eFlush_all);
-}
-
-// Input hooks
-void Harness_Hook_GetMousePosition(int* pX, int* pY) {
-    IOPlatform_GetMousePosition(pX, pY);
-}
-
-void Harness_Hook_GetMouseButtons(int* pButton1, int* pButton2) {
-    IOPlatform_GetMouseButtons(pButton1, pButton2);
 }
 
 // Sound hooks

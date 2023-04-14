@@ -1,3 +1,4 @@
+
 #include "harness/hooks.h"
 #include "harness/os.h"
 #include "harness/win95_polyfill.h"
@@ -80,11 +81,16 @@ void GlobalMemoryStatus(MEMORYSTATUS* lpBuffer) {
 }
 
 BOOL GetCursorPos(LPPOINT lpPoint) {
-    return gHarness_platform.GetCursorPos(lpPoint);
+    int x, y;
+    gHarness_platform.GetMousePosition(&x, &y);
+    lpPoint->x = x;
+    lpPoint->y = y;
+    return 0;
 }
 
 BOOL ScreenToClient(HWND hWnd, LPPOINT lpPoint) {
     // no-op, we assume the point is already relative to client
+    return 0;
 }
 
 DWORD timeGetTime() {
@@ -206,21 +212,6 @@ int GetMessageA(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax) 
 
 void Sleep(DWORD dwMilliseconds) {
     gHarness_platform.Sleep(dwMilliseconds);
-    // #if defined(_WIN32) || defined(_WIN64)
-    //     LARGE_INTEGER now;
-    //     if (qpc_start_time.QuadPart == 0) {
-    //         QueryPerformanceFrequency(&qpc_ticks_per_sec);
-    //         QueryPerformanceCounter(&qpc_start_time);
-    //     }
-
-    //     QueryPerformanceCounter(&now);
-    //     return (uint32_t)(((now.QuadPart - qpc_start_time.QuadPart) * 1000) / qpc_ticks_per_sec.QuadPart);
-    // #else
-    //     struct timespec ts;
-    //     ts.tv_sec = dwMilliseconds / 1000;
-    //     ts.tv_nsec = (dwMilliseconds % 1000) * 1000000;
-    //     nanosleep(&ts, &ts);
-    // #endif
 }
 
 void DirectDraw_CreateSurface(int width, int height) {
@@ -234,6 +225,11 @@ void DirectInputDevice_GetDeviceState(unsigned int count, uint8_t* buffer) {
 void DirectDrawDevice_SetPaletteEntries(PALETTEENTRY* palette, int pFirst_colour, int pCount) {
     assert(pFirst_colour == 0);
     assert(pCount == 256);
-    gHarness_platform.SetPalette(palette);
+    gHarness_platform.Renderer_SetPalette(palette);
     Harness_RenderLastScreen();
+}
+
+int _CrtDbgReport(int reportType, const char* filename, int linenumber, const char* moduleName, const char* format, ...) {
+    printf("_CrtDbgReport: (TODO)\n");
+    return 1;
 }

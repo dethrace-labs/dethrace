@@ -74,6 +74,7 @@ int gWin32_rbutton_down;
 PALETTEENTRY gWin32_palette[256];
 br_diaghandler gWin32_br_diaghandler;
 int gWin32_window_has_focus = 1;
+int gNetwork_profile_file_exists = 0;
 
 char* _unittest_last_fatal_error;
 
@@ -89,7 +90,6 @@ void Win32InitInputDevice();
 
 extern void QuitGame();
 
-// IDA: void __cdecl KeyboardHandler()
 void KeyboardHandler() {
     tU8 scan_code;
     tU8 up;
@@ -98,18 +98,15 @@ void KeyboardHandler() {
     NOT_IMPLEMENTED();
 }
 
-// IDA: int __usercall KeyDown@<EAX>(tU8 pScan_code@<EAX>)
 int KeyDown(tU8 pScan_code) {
     NOT_IMPLEMENTED();
 }
 
-// IDA: void __usercall KeyTranslation(tU8 pKey_index@<EAX>, tU8 pScan_code_1@<EDX>, tU8 pScan_code_2@<EBX>)
 void KeyTranslation(tU8 pKey_index, tU8 pScan_code_1, tU8 pScan_code_2) {
     LOG_TRACE("(%d, %d, %d)", pKey_index, pScan_code_1, pScan_code_2);
     NOT_IMPLEMENTED();
 }
 
-// IDA: void __cdecl KeyBegin()
 void KeyBegin() {
     gScan_code[KEY_0] = DIK_0;
     gScan_code[KEY_1] = DIK_1;
@@ -220,19 +217,16 @@ void KeyBegin() {
     gScan_code[KEY_CTRL_ANY] = 0xff;
 }
 
-// IDA: void __cdecl KeyEnd()
 void KeyEnd() {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// IDA: int __usercall KeyDown22@<EAX>(int pKey_index@<EAX>)
 int KeyDown22(int pKey_index) {
     LOG_TRACE("(%d)", pKey_index);
     NOT_IMPLEMENTED();
 }
 
-// IDA: void __usercall PDSetKeyArray(int *pKeys@<EAX>, int pMark@<EDX>)
 void PDSetKeyArray(int* pKeys, int pMark) {
     int i;
     uint8_t keystate[256];
@@ -296,7 +290,6 @@ void PDSetKeyArray(int* pKeys, int pMark) {
 void Win32ReleaseInputDevice() {
 }
 
-// IDA: int __usercall PDGetASCIIFromKey@<EAX>(int pKey@<EAX>)
 int PDGetASCIIFromKey(int pKey) {
     LOG_TRACE("(%d)", pKey);
 
@@ -328,7 +321,6 @@ void Win32PumpMessages() {
     PDLockRealBackScreen();
 }
 
-// IDA: void __usercall PDFatalError(char *pThe_str@<EAX>)
 void PDFatalError(char* pThe_str) {
     LOG_TRACE("(\"%s\")", pThe_str);
 
@@ -343,13 +335,11 @@ void Win32FatalError(char* pStr_1, char* pStr_2) {
     PDShutdownSystem();
 }
 
-// IDA: void __usercall PDNonFatalError(char *pThe_str@<EAX>)
 void PDNonFatalError(char* pThe_str) {
     LOG_TRACE("(\"%s\")", pThe_str);
     NOT_IMPLEMENTED();
 }
 
-// IDA: void __cdecl PDInitialiseSystem()
 void PDInitialiseSystem() {
     tPath_name the_path;
     FILE* f;
@@ -411,7 +401,6 @@ void Win32CreateWindow() {
     // SetFocus(gWin32_hwnd);
 }
 
-// IDA: void __cdecl PDShutdownSystem()
 void PDShutdownSystem() {
     static int been_here = 0;
     LOG_TRACE("()");
@@ -446,28 +435,24 @@ void PDShutdownSystem() {
     ExitProcess(8u);
 }
 
-// IDA: void __cdecl PDSaveOriginalPalette()
 void PDSaveOriginalPalette() {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// IDA: void __cdecl PDRevertPalette()
 void PDRevertPalette() {
     LOG_TRACE("()");
 
     // empty function
 }
 
-// IDA: int __usercall PDInitScreenVars@<EAX>(int pArgc@<EAX>, char **pArgv@<EDX>)
 int PDInitScreenVars(int pArgc, char** pArgv) {
-    // TODO: DOS implementation
+    // this codes from dossys
     gGraf_specs[gGraf_spec_index].phys_width = gGraf_specs[gGraf_spec_index].total_width;
     gGraf_specs[gGraf_spec_index].phys_height = gGraf_specs[gGraf_spec_index].total_height;
     return 1;
 }
 
-// IDA: void __cdecl PDInitScreen()
 void PDInitScreen() {
     Win32InitScreen();
 }
@@ -479,22 +464,20 @@ void Win32InitScreen() {
     Win32PumpMessages();
 }
 
-// IDA: void __cdecl PDLockRealBackScreen()
 void PDLockRealBackScreen() {
     LOG_TRACE("()");
 
     // no-op
 }
 
-// IDA: void __cdecl PDUnlockRealBackScreen()
 void PDUnlockRealBackScreen() {
     LOG_TRACE("()");
 
     // no-op
 }
 
-// IDA: void __cdecl PDAllocateScreenAndBack()
 void PDAllocateScreenAndBack() {
+    // this is a mix of windows and dos code
 
     dr_dprintf("PDAllocateScreenAndBack() - START...");
     BrMaterialFindHook(PDMissingMaterial);
@@ -502,13 +485,12 @@ void PDAllocateScreenAndBack() {
     BrModelFindHook(PDMissingModel);
     BrMapFindHook(PDMissingMap);
 
-    // Harness_Hook_GraphicsInit(gGraf_specs[gGraf_spec_index].total_width, gGraf_specs[gGraf_spec_index].total_height);
     int row_bytes;
     SSDXInitDirectDraw(gGraf_specs[gGraf_spec_index].total_width, gGraf_specs[gGraf_spec_index].total_height, &row_bytes);
     gScreen = BrPixelmapAllocate(BR_PMT_INDEX_8, gGraf_specs[gGraf_spec_index].total_width, gGraf_specs[gGraf_spec_index].total_height, NULL, BR_PMAF_NORMAL);
 
     gScreen->origin_x = 0;
-    // gDOSGfx_initialized = 1;
+    gGfx_initialized = 1;
     gScreen->origin_y = 0;
     gBack_screen = BrPixelmapMatch(gScreen, BR_PMMATCH_OFFSCREEN);
     gBack_screen->origin_x = 0;
@@ -572,7 +554,6 @@ void PDAllocateScreenAndBack() {
     // dr_dprintf("PDAllocateScreenAndBack() - END.");
 }
 
-// IDA: void __usercall Copy8BitTo16BitPixelmap(br_pixelmap *pDst@<EAX>, br_pixelmap *pSrc@<EDX>, br_pixelmap *pPalette@<EBX>)
 void Copy8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette) {
     int x;
     int y;
@@ -587,7 +568,6 @@ void Copy8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* 
     NOT_IMPLEMENTED();
 }
 
-// IDA: void __usercall Double8BitTo16BitPixelmap(br_pixelmap *pDst@<EAX>, br_pixelmap *pSrc@<EDX>, br_pixelmap *pPalette@<EBX>, tU16 pOff@<ECX>, tU16 pSrc_width, tU16 pSrc_height)
 void Double8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette, tU16 pOff, tU16 pSrc_width, tU16 pSrc_height) {
     int x;
     int y;
@@ -604,33 +584,29 @@ void Double8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap
     NOT_IMPLEMENTED();
 }
 
-// IDA: br_pixelmap* __cdecl PDInterfacePixelmap()
 br_pixelmap* PDInterfacePixelmap() {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// IDA: void __cdecl SwapBackScreen()
 void SwapBackScreen() {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// IDA: void __usercall ReallyCopyBackScreen(int pRendering_area_only@<EAX>, int pClear_top_and_bottom@<EDX>)
 void ReallyCopyBackScreen(int pRendering_area_only, int pClear_top_and_bottom) {
     LOG_TRACE("(%d, %d)", pRendering_area_only, pClear_top_and_bottom);
     NOT_IMPLEMENTED();
 }
 
-// IDA: void __usercall CopyBackScreen(int pRendering_area_only@<EAX>)
 void CopyBackScreen(int pRendering_area_only) {
     LOG_TRACE("(%d)", pRendering_area_only);
     NOT_IMPLEMENTED();
 }
 
-// IDA: void __usercall PDScreenBufferSwap(int pRendering_area_only@<EAX>)
 void PDScreenBufferSwap(int pRendering_area_only) {
-    LOG_TRACE10("(%d)", pRendering_area_only);
+    // taken from dossys
+
     if (pRendering_area_only) {
         BrPixelmapRectangleCopy(gScreen, gY_offset, gX_offset, gRender_screen, 0, 0, gWidth, gHeight);
     } else {
@@ -643,25 +619,21 @@ void PDScreenBufferSwap(int pRendering_area_only) {
     }
 }
 
-// IDA: void __usercall PDPixelmapToScreenRectangleCopy(br_pixelmap *dst@<EAX>, br_int_16 dx@<EDX>, br_int_16 dy@<EBX>, br_pixelmap *src@<ECX>, br_int_16 sx, br_int_16 sy, br_uint_16 w, br_uint_16 h)
 void PDPixelmapToScreenRectangleCopy(br_pixelmap* dst, br_int_16 dx, br_int_16 dy, br_pixelmap* src, br_int_16 sx, br_int_16 sy, br_uint_16 w, br_uint_16 h) {
     LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d)", dst, dx, dy, src, sx, sy, w, h);
     NOT_IMPLEMENTED();
 }
 
-// IDA: void __usercall PDPixelmapHLineOnScreen(br_pixelmap *dst@<EAX>, br_int_16 x1@<EDX>, br_int_16 y1@<EBX>, br_int_16 x2@<ECX>, br_int_16 y2, br_uint_32 colour)
 void PDPixelmapHLineOnScreen(br_pixelmap* dst, br_int_16 x1, br_int_16 y1, br_int_16 x2, br_int_16 y2, br_uint_32 colour) {
     LOG_TRACE("(%p, %d, %d, %d, %d, %d)", dst, x1, y1, x2, y2, colour);
     NOT_IMPLEMENTED();
 }
 
-// IDA: void __usercall PDPixelmapVLineOnScreen(br_pixelmap *dst@<EAX>, br_int_16 x1@<EDX>, br_int_16 y1@<EBX>, br_int_16 x2@<ECX>, br_int_16 y2, br_uint_32 colour)
 void PDPixelmapVLineOnScreen(br_pixelmap* dst, br_int_16 x1, br_int_16 y1, br_int_16 x2, br_int_16 y2, br_uint_32 colour) {
     LOG_TRACE("(%p, %d, %d, %d, %d, %d)", dst, x1, y1, x2, y2, colour);
     NOT_IMPLEMENTED();
 }
 
-// IDA: void __cdecl PDInstallErrorHandlers()
 void PDInstallErrorHandlers() {
     LOG_TRACE("()");
 
@@ -671,7 +643,6 @@ void PDInstallErrorHandlers() {
     BrDiagHandlerSet(&gWin32_br_diaghandler);
 }
 
-// IDA: void __cdecl PDSetFileVariables()
 void PDSetFileVariables() {
 
     // Changed by dethrace for cross-platform
@@ -679,7 +650,6 @@ void PDSetFileVariables() {
     strcpy(gDir_separator, "/");
 }
 
-// IDA: void __usercall PDBuildAppPath(char *pThe_path@<EAX>)
 void PDBuildAppPath(char* pThe_path) {
     GetCurrentDirectoryA(253, pThe_path);
     // GetShortPathNameA(pThe_path, pThe_path, 253);
@@ -687,7 +657,6 @@ void PDBuildAppPath(char* pThe_path) {
     dr_dprintf("Application path '%s'", pThe_path);
 }
 
-// IDA: void __usercall PDForEveryFile(char *pThe_path@<EAX>, void (*pAction_routine)(char*)@<EDX>)
 void PDForEveryFile(char* pThe_path, void (*pAction_routine)(char*)) {
     char found_path[256];       // [esp+Ch] [ebp-448h] BYREF
     WIN32_FIND_DATAA find_data; // [esp+10Ch] [ebp-348h] BYREF
@@ -699,7 +668,7 @@ void PDForEveryFile(char* pThe_path, void (*pAction_routine)(char*)) {
     if (SetCurrentDirectoryA(pThe_path)) {
         strcpy(file_filter, "*.???");
         hFindFile = FindFirstFileA(file_filter, &find_data);
-        if (hFindFile != -1) {
+        if (hFindFile != INVALID_HANDLE_VALUE) {
             do {
                 PathCat(found_path, pThe_path, find_data.cFileName);
                 pAction_routine(found_path);
@@ -710,7 +679,6 @@ void PDForEveryFile(char* pThe_path, void (*pAction_routine)(char*)) {
     }
 }
 
-// IDA: void __usercall PDSetPalette(br_pixelmap *pThe_palette@<EAX>)
 void PDSetPalette(br_pixelmap* pThe_palette) {
     PDSetPaletteEntries(pThe_palette, 0, 256);
 }
@@ -723,8 +691,7 @@ void Win32SetPaletteEntries(uint8_t* entries, int pFirst_colour, int pCount) {
     if (last_colour > 255) {
         last_colour = 255;
     }
-
-    for (i = pFirst_colour; i < last_colour; i++) {
+    for (i = pFirst_colour; i <= last_colour; i++) {
         gWin32_palette[i].peFlags = 0;
         gWin32_palette[i].peRed = entries[i * 4 + 2];
         gWin32_palette[i].peGreen = entries[i * 4 + 1];
@@ -733,47 +700,42 @@ void Win32SetPaletteEntries(uint8_t* entries, int pFirst_colour, int pCount) {
     SSDXSetPaleeteEntries(gWin32_palette, 0, 256);
 }
 
-// IDA: void __usercall PDSetPaletteEntries(br_pixelmap *pPalette@<EAX>, int pFirst_colour@<EDX>, int pCount@<EBX>)
 void PDSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
     Win32SetPaletteEntries(pPalette->pixels, pFirst_colour, pCount);
 }
 
-// IDA: void __cdecl PDSwitchToRealResolution()
 void PDSwitchToRealResolution() {
     LOG_TRACE("()");
 }
 
-// IDA: void __cdecl PDSwitchToLoresMode()
 void PDSwitchToLoresMode() {
     LOG_TRACE("()");
 }
 
-// IDA: void __usercall PDMouseButtons(int *pButton_1@<EAX>, int *pButton_2@<EDX>)
 void PDMouseButtons(int* pButton_1, int* pButton_2) {
     br_uint_32 mouse_buttons;
     br_int_32 mouse_x;
     br_int_32 mouse_y;
     LOG_TRACE("(%p, %p)", pButton_1, pButton_2);
 
-    *pButton_1 = gWin32_lbutton_down;
-    *pButton_2 = gWin32_rbutton_down;
+    // added by dethrace
+    gHarness_platform.GetMouseButtons(pButton_1, pButton_2);
 }
 
-// IDA: void __usercall PDGetMousePosition(int *pX_coord@<EAX>, int *pY_coord@<EDX>)
 void PDGetMousePosition(int* pX_coord, int* pY_coord) {
     POINT p;
     LOG_TRACE("(%p, %p)", pX_coord, pY_coord);
 
     GetCursorPos(&p);
     ScreenToClient(gWin32_hwnd, &p);
+    *pX_coord = p.x;
+    *pY_coord = p.y;
 }
 
-// IDA: int __cdecl PDGetTotalTime()
 int PDGetTotalTime() {
     return timeGetTime();
 }
 
-// IDA: int __usercall PDServiceSystem@<EAX>(tU32 pTime_since_last_call@<EAX>)
 int PDServiceSystem(tU32 pTime_since_last_call) {
     Win32PumpMessages();
     return 0;
@@ -875,7 +837,6 @@ void Win32AllocateActionReplayBuffer() {
         mem_status.dwAvailVirtual);
 }
 
-// IDA: void __usercall PDAllocateActionReplayBuffer(char **pBuffer@<EAX>, tU32 *pBuffer_size@<EDX>)
 void PDAllocateActionReplayBuffer(char** pBuffer, tU32* pBuffer_size) {
     LOG_TRACE("(%p, %p)", pBuffer, pBuffer_size);
 
@@ -884,14 +845,13 @@ void PDAllocateActionReplayBuffer(char** pBuffer, tU32* pBuffer_size) {
     *pBuffer_size = gWin32_action_replay_buffer_size;
 }
 
-// IDA: void __usercall PDDisposeActionReplayBuffer(char *pBuffer@<EAX>)
 void PDDisposeActionReplayBuffer(char* pBuffer) {
     LOG_TRACE("(\"%s\")", pBuffer);
 }
 
-// IDA: void __usercall Usage(char *pProgpath@<EAX>)
+// this function is taken from dossys
 void Usage(char* pProgpath) {
-    // char basename[9];
+
     char basename[256]; // fix: changed from 9 to avoid overflow on longer filenames
 
     OS_Basename(pProgpath, basename);
@@ -920,6 +880,7 @@ int original_main(int pArgc, char** pArgv) {
     float f;
 
     for (i = 1; i < pArgc; i++) {
+        printf("arg %s\n", pArgv[i]);
         if (strcasecmp(pArgv[i], "-hires") == 0) {
             gGraf_spec_index = 1;
         } else if (strcasecmp(pArgv[i], "-yon") == 0 && i < pArgc - 1) {
@@ -956,29 +917,40 @@ int original_main(int pArgc, char** pArgv) {
         }
     }
 
+    gNetwork_profile_fname[0] = 0;
+    DWORD len = GetCurrentDirectoryA(240, gNetwork_profile_fname);
+    if (len > 0 && len == strlen(gNetwork_profile_fname)) {
+        gNetwork_profile_file_exists = 1;
+        strcat(gNetwork_profile_fname, "/");
+        strcat(gNetwork_profile_fname, "NETWORK.INI");
+    }
+
     GameMain(pArgc, pArgv);
     return 0;
 }
 
-// IDA: int __cdecl OurGetChar()
 int OurGetChar() {
     int key;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// IDA: void __usercall PDEnterDebugger(char *pStr@<EAX>)
 void PDEnterDebugger(char* pStr) {
     static unsigned char* save_it;
     LOG_TRACE("(\"%s\")", pStr);
 
-    // FIXME: uses __CrtDbgReport when using MSVC runtime
-    STUB_ONCE();
-
     dr_dprintf("PDEnterDebugger(): %s", pStr);
-    // ShowCursor(1);
-    abort();
-    // ShowCursor(0);
+    ShowCursor(1);
+#ifdef DETHRACE_FIX_BUGS
+    if (strcmp(pStr, "Bet you weren't expecting this") != 0
+#else
+    if (pStr != "Bet you weren't expecting this"
+#endif
+        && _CrtDbgReport(_CRT_ASSERT, "C:\\Msdev\\Projects\\DethRace\\Win95sys.c", 437, 0, 0) == 1) {
+
+        abort(); // original: __debugbreak();
+    }
+    ShowCursor(0);
 }
 
 // Added function
@@ -1017,19 +989,16 @@ br_pixelmap* PDMissingMap(char* name) {
     return NULL;
 }
 
-// IDA: void __cdecl PDEndItAllAndReRunTheBastard()
 void PDEndItAllAndReRunTheBastard() {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// IDA: int __cdecl InitJoysticks()
 int InitJoysticks() {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// IDA: tU32 __usercall ReadJoystickAxis@<EAX>(int pBit@<EAX>)
 tU32 ReadJoystickAxis(int pBit) {
     tU32 val;
     tU32 count;
@@ -1037,7 +1006,6 @@ tU32 ReadJoystickAxis(int pBit) {
     NOT_IMPLEMENTED();
 }
 
-// IDA: void __cdecl PDReadJoySticks()
 void PDReadJoySticks() {
     tU32 temp1x;
     tU32 temp1y;
@@ -1047,83 +1015,70 @@ void PDReadJoySticks() {
     NOT_IMPLEMENTED();
 }
 
-// IDA: tS32 __cdecl PDGetJoy1X()
 tS32 PDGetJoy1X() {
     tS32 joy;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// IDA: tS32 __cdecl PDGetJoy1Y()
 tS32 PDGetJoy1Y() {
     tS32 joy;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// IDA: tS32 __cdecl PDGetJoy2X()
 tS32 PDGetJoy2X() {
     tS32 joy;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// IDA: tS32 __cdecl PDGetJoy2Y()
 tS32 PDGetJoy2Y() {
     tS32 joy;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// IDA: int __cdecl PDGetJoy1Button1()
 int PDGetJoy1Button1() {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// IDA: int __cdecl PDGetJoy1Button2()
 int PDGetJoy1Button2() {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// IDA: int __cdecl PDGetJoy1Button3()
 int PDGetJoy1Button3() {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// IDA: int __cdecl PDGetJoy1Button4()
 int PDGetJoy1Button4() {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// IDA: int __cdecl PDGetJoy2Button1()
 int PDGetJoy2Button1() {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// IDA: int __cdecl PDGetJoy2Button2()
 int PDGetJoy2Button2() {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// IDA: int __cdecl PDGetJoy2Button3()
 int PDGetJoy2Button3() {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// IDA: int __cdecl PDGetJoy2Button4()
 int PDGetJoy2Button4() {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// IDA: int __usercall PDFileUnlock@<EAX>(char *pThe_path@<EAX>)
 int PDFileUnlock(char* pThe_path) {
     DWORD dwFileAttributes; // [esp+Ch] [ebp-4h]
     LOG_TRACE("(\"%s\")", pThe_path);
@@ -1132,7 +1087,6 @@ int PDFileUnlock(char* pThe_path) {
     return dwFileAttributes != INVALID_FILE_ATTRIBUTES && SetFileAttributesA(pThe_path, dwFileAttributes & ~FILE_ATTRIBUTE_READONLY);
 }
 
-// IDA: int __usercall PDCheckDriveExists2@<EAX>(char *pThe_path@<EAX>, char *pFile_name@<EDX>, tU32 pMin_size@<EBX>)
 int PDCheckDriveExists2(char* pThe_path, char* pFile_name, tU32 pMin_size) {
 
     char the_path[256]; // [esp+Ch] [ebp-108h] BYREF
@@ -1153,14 +1107,13 @@ int PDCheckDriveExists2(char* pThe_path, char* pFile_name, tU32 pMin_size) {
         return 0;
     }
     hFile = CreateFileA(the_path, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-    if (hFile != -1) {
+    if (hFile != INVALID_HANDLE_VALUE) {
         file_size = GetFileSize(hFile, 0);
         CloseHandle(hFile);
     }
     return file_size >= pMin_size;
 }
 
-// IDA: int __cdecl PDDoWeLeadAnAustereExistance()
 int PDDoWeLeadAnAustereExistance() {
     return 0;
 }

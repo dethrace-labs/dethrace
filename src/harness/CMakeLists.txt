@@ -51,6 +51,7 @@ target_sources(harness PRIVATE
     include/harness/config.h
     include/harness/os.h
     include/harness/win95_polyfill.h
+    include/harness/win95_polyfill_defs.h
     # cameras/debug_camera.c
     # cameras/debug_camera.h
     harness_trace.c

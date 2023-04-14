@@ -74,7 +74,7 @@ void PDNonFatalError(char* pThe_str);
 
 void PDInitialiseSystem(void);
 
-void PDShutdownSystem(void);
+HARNESS_NORETURN void PDShutdownSystem(void);
 
 void PDSaveOriginalPalette(void);
 
@@ -150,7 +150,7 @@ int PDGetGorePassword(void);
 
 void PDDisplayGoreworthiness(int pGory);
 
-HARNESS_NORETURN void PDEnterDebugger(char* pStr);
+void PDEnterDebugger(char* pStr);
 
 // Added function
 br_material* PDMissingMaterial(char* name);

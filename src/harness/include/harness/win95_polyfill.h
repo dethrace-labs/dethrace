@@ -1,7 +1,8 @@
 #ifndef _POLYFILL_H_
 #define _POLYFILL_H_
 
-#include "win95_polyfill_types.h"
+#include "harness/compiler.h"
+#include "win95_polyfill_defs.h"
 #include <assert.h>
 #include <stdarg.h>
 #include <stddef.h>
@@ -60,7 +61,7 @@ int MessageBoxA(HWND hWnd, char* lpText, char* lpCaption, UINT uType);
 
 BOOL DestroyWindow(HWND hWnd);
 
-void ExitProcess(UINT uExitCode);
+HARNESS_NORETURN void ExitProcess(UINT uExitCode);
 
 void TranslateMessage(MSG* lpMsg);
 
@@ -77,5 +78,7 @@ void DirectDraw_CreateSurface();
 void DirectDrawDevice_SetPaletteEntries(PALETTEENTRY* palette, int pFirst_colour, int pCount);
 
 void DirectInputDevice_GetDeviceState(unsigned int keys, uint8_t* buffer);
+
+int _CrtDbgReport(int reportType, const char* filename, int linenumber, const char* moduleName, const char* format, ...);
 
 #endif

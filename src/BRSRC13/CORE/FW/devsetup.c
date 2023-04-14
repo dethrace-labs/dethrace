@@ -72,12 +72,12 @@ void BrDevEndOld() {
 
 // IDA: void __cdecl BrDevPaletteSetOld(br_pixelmap *pm)
 void BrDevPaletteSetOld(br_pixelmap* pm) {
-    Harness_Hook_BrDevPaletteSetOld(pm);
+    NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl BrDevPaletteSetEntryOld(int i, br_colour colour)
 void BrDevPaletteSetEntryOld(int i, br_colour colour) {
-    Harness_Hook_BrDevPaletteSetEntryOld(i, colour);
+    NOT_IMPLEMENTED();
 }
 
 // IDA: br_error __cdecl BrRendererFacilityFind(br_renderer_facility **prf, br_device_pixelmap *destination, br_token scalar_type)

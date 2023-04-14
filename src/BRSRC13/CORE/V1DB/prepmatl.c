@@ -12,7 +12,7 @@ void BrMaterialUpdate(br_material* mat, br_uint_16 flags) {
     // TODO: ?
 
     // Added by dethrace
-    gHarness_platform.BufferMaterial(mat);
+    gHarness_platform.Renderer_BufferMaterial(mat);
 }
 
 // IDA: void __usercall BrMaterialClear(br_material *mat@<EAX>)
