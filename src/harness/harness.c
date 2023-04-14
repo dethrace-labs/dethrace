@@ -152,8 +152,6 @@ void Harness_DetectGameMode() {
         free(buffer);
     }
 
-    LOG_PANIC("help");
-
     switch (harness_game_info.mode) {
     case eGame_carmageddon:
         switch (harness_game_info.localization) {

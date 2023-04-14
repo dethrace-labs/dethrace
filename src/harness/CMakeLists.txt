@@ -57,8 +57,6 @@ target_sources(harness PRIVATE
     harness_trace.c
     harness.c
     harness.h
-    renderers/null.h
-    renderers/renderer.h
     brender_emu/renderer_impl.c
     brender_emu/renderer_impl.h
     sound/sound.c

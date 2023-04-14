@@ -26,17 +26,6 @@ static char _program_name[1024];
 #define MAX_STACK_FRAMES 64
 static void* stack_traces[MAX_STACK_FRAMES];
 
-void OS_Sleep(int delay_ms) {
-    struct timespec ts;
-    ts.tv_sec = delay_ms / 1000;
-    ts.tv_nsec = (delay_ms % 1000) * 1000000;
-    nanosleep(&ts, &ts);
-}
-
-void OS_Basename(char* path, char* base) {
-    strcpy(base, basename(path));
-}
-
 // Resolve symbol name and source location given the path to the executable and an address
 int addr2line(char const* const program_name, void const* const addr) {
     char addr2line_cmd[512] = { 0 };

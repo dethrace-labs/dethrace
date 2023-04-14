@@ -54,13 +54,6 @@ static intptr_t get_dethrace_offset() {
     return dethrace_dl_data.start;
 }
 
-void OS_Sleep(int delay_ms) {
-    struct timespec ts;
-    ts.tv_sec = delay_ms / 1000;
-    ts.tv_nsec = (delay_ms % 1000) * 1000000;
-    nanosleep(&ts, &ts);
-}
-
 void OS_Basename(char* path, char* base) {
     strcpy(base, basename(path));
 }

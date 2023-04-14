@@ -23,12 +23,6 @@
 #include <unistd.h>
 #endif
 
-// Required: sleep for specified milliseconds
-void OS_Sleep(int ms);
-
-// Required: copy the `basename` component of `path` into `base`
-void OS_Basename(char* path, char* base);
-
 // Optional: install a handler to print stack trace during a crash
 void OS_InstallSignalHandler(char* program_name);
 

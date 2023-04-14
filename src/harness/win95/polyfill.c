@@ -22,6 +22,7 @@ extern HANDLE Real_FindNextFile(HANDLE hFindFile, char* lpFindFileData_filename)
 extern BOOL Real_FindClose(HANDLE hFindFile);
 #else
 #include <dirent.h>
+#include <libgen.h>
 #include <unistd.h>
 #endif
 
@@ -227,6 +228,14 @@ void DirectDrawDevice_SetPaletteEntries(PALETTEENTRY* palette, int pFirst_colour
     assert(pCount == 256);
     gHarness_platform.Renderer_SetPalette(palette);
     Harness_RenderLastScreen();
+}
+
+void _splitpath(const char* path, char* drive, char* dir, char* fname, char* ext) {
+#ifdef _WIN32
+    _splitpath(path, NULL, NULL, fname, NULL);
+#else
+    strcpy(fname, basename(path));
+#endif
 }
 
 int _CrtDbgReport(int reportType, const char* filename, int linenumber, const char* moduleName, const char* format, ...) {

@@ -79,6 +79,8 @@ void DirectDrawDevice_SetPaletteEntries(PALETTEENTRY* palette, int pFirst_colour
 
 void DirectInputDevice_GetDeviceState(unsigned int keys, uint8_t* buffer);
 
+void _splitpath(const char* path, char* drive, char* dir, char* fname, char* ext);
+
 int _CrtDbgReport(int reportType, const char* filename, int linenumber, const char* moduleName, const char* format, ...);
 
 #endif

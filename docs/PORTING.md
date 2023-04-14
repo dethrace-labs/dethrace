@@ -5,13 +5,9 @@
 Assuming an operating system called _foo_, follow the steps to add support for it.
 
 1. Add a new file `os/foo.h` and implement the required functions defined in [os.h](https://github.com/dethrace-labs/dethrace/blob/main/src/harness/include/harness/os.h):
-- `OS_GetTime`
-- `OS_Sleep`
-- `OS_Basename`
-- `OS_GetFirstFileInDirectory`
-- `OS_GetNextFileInDirectory`
-- `OS_IsDebuggerPresent`
 - `OS_InstallSignalHandler`
+- `OS_fopen`
+- `OS_ConsoleReadPassword`
 
 2. Update `src/harness/CMakeLists.h` and add a new conditional section for "os/foo.h", based on existing conditions for Windows, MacOS etc. 
 
@@ -28,23 +24,13 @@ target_sources(harness PRIVATE
 
 ## IO Platform (windowing / input / rendering)
 
-An `IOPlatform` in _dethrace_ implements windowing and input handling, and points to a _renderer_.
+A `Platform` in _dethrace_ implements windowing, rendering and input handling.
 
-The default IO platform is `SDL_OpenGL`, which uses SDL for windowing and input, and OpenGL for rendering. See [io_platforms/sdl_gl.c](https://github.com/dethrace-labs/dethrace/blob/main/src/harness/io_platforms/sdl_gl.c).
+The default platform is `SDL_OpenGL`, which uses SDL for windowing and input, and OpenGL for rendering. See [platforms/sdl_opengl.c](https://github.com/dethrace-labs/dethrace/blob/main/src/harness/platforms/sdl_opengl.c).
 
-To add a new `IOPlatform`:
+To add a new `Platform`:
 
-1. Create `io_platforms/my_platform.c` file and implement the required functions defined in [io_platforms/io_platform.h](https://github.com/dethrace-labs/dethrace/blob/main/src/harness/io_platforms/io_platform.h):
-- `IOPlatform_Init`
-- `IOPlatform_CreateWindow`
-- `IOPlatform_PollEvents`
-- `IOPlatform_SwapWindow`
-- `IOPlatform_GetKeyboardState`
-- `IOPlatform_GetMousePosition`
-- `IOPlatform_GetMouseButtons`
-- `IOPlatform_Shutdown`
-
-`IOPlatform_CreateWindow` returns a `tRenderer*`, which must implement the interface defined in [renderers/renderer.h](https://github.com/dethrace-labs/dethrace/blob/main/src/harness/renderers/renderer.h). See [renderers/gl](https://github.com/dethrace-labs/dethrace/tree/main/src/harness/renderers/gl) for an example.
+1. Create `platforms/my_platform.c` file and add a `Harness_Platform_Init` function. Hook up all the function pointers using the `sdl_opengl` [implementation](https://github.com/dethrace-labs/dethrace/blob/main/src/harness/platforms/sdl_opengl.h) as a guide.
 
 2. Add a new conditional section in `src/harness/CMakeLists.txt` for your new platform
 
