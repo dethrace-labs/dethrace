@@ -234,7 +234,7 @@ void _splitpath(const char* path, char* drive, char* dir, char* fname, char* ext
 #ifdef _WIN32
     _splitpath(path, NULL, NULL, fname, NULL);
 #else
-    strcpy(fname, basename(path));
+    basename_r(path, fname);
 #endif
 }
 
