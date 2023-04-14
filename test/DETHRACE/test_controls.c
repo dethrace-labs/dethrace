@@ -24,6 +24,7 @@ void test_controls_CheckKevKeys() {
         result = KevKeyService();
     }
     OS_Sleep(2000);
+
     gKeys_pressed = 0;
 
     CheckKevKeys();

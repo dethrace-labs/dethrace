@@ -3,8 +3,7 @@
 #include "include/harness/config.h"
 #include "include/harness/hooks.h"
 #include "include/harness/os.h"
-#include "io_platforms/io_platform.h"
-#include "renderers/null.h"
+#include "platforms/null.h"
 #include "sound/sound.h"
 #include "version.h"
 
@@ -22,7 +21,7 @@ br_pixelmap* last_dst = NULL;
 br_pixelmap* last_src = NULL;
 
 unsigned int last_frame_time = 0;
-int force_nullrenderer = 0;
+int force_null_platform = 0;
 
 extern unsigned int GetTotalTime();
 
@@ -36,7 +35,7 @@ tHarness_game_info harness_game_info;
 tHarness_game_config harness_game_config;
 
 // Platform hooks
-tPlatform_hooks gHarness_platform;
+tHarness_platform gHarness_platform;
 
 /* clang-format off */
 // German ASCII codes
@@ -81,6 +80,8 @@ static int splatpack_xmasdemo_ascii_shift_table[128] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 8,
 };
 /* clang-format on */
+
+extern void Harness_Platform_Init();
 
 int Harness_ProcessCommandLine(int* argc, char* argv[]);
 
@@ -150,6 +151,8 @@ void Harness_DetectGameMode() {
         }
         free(buffer);
     }
+
+    LOG_PANIC("help");
 
     switch (harness_game_info.mode) {
     case eGame_carmageddon:
@@ -225,13 +228,16 @@ void Harness_Init(int* argc, char* argv[]) {
         Harness_DetectGameMode();
     }
 
-    IOPlatform_Init(&gHarness_platform);
+    if (force_null_platform) {
+        Null_Platform_Init(&gHarness_platform);
+    } else {
+        Harness_Platform_Init(&gHarness_platform);
+    }
 }
 
 // used by unit tests
-void Harness_ForceNullRenderer() {
-    force_nullrenderer = 1;
-    // renderer = &null_renderer;
+void Harness_ForceNullPlatform() {
+    force_null_platform = 1;
 }
 
 int Harness_ProcessCommandLine(int* argc, char* argv[]) {
@@ -338,16 +344,7 @@ int Harness_CalculateFrameDelay() {
 }
 
 void Harness_Hook_renderActor(br_actor* actor, br_model* model, br_material* material, br_token type) {
-<<<<<<< HEAD
-    gHarness_platform.Renderer_Model(actor, model, renderer_state->state.matrix.model_to_view, type);
-=======
-    renderer->Model(actor, model, material, type, renderer_state->state.matrix.model_to_view);
-}
-
-void Harness_Hook_BrZbSceneRenderEnd() {
-    renderer->FlushBuffers(eFlush_all);
-    renderer->EndScene();
->>>>>>> 1a0301b6ee5e72991099ec56deeda52d2766705c
+    gHarness_platform.Renderer_Model(actor, model, material, renderer_state->state.matrix.model_to_view, type);
 }
 
 // Called by game to swap buffers at end of frame rendering
@@ -371,28 +368,6 @@ void Harness_RenderLastScreen() {
         Harness_RenderScreen(last_dst, last_src);
         gHarness_platform.SwapWindow(0);
     }
-}
-
-<<<<<<< HEAD
-// Sound hooks
-void Harness_Hook_S3Service(int unk1, int unk2) {
-    Sound_Service();
-}
-
-void Harness_Hook_S3StopAllOutletSounds() {
-=======
-void Harness_Hook_BrModelUpdate(br_model* model) {
-    renderer->BufferModel(model);
-}
-
-// Input hooks
-void Harness_Hook_GetMousePosition(int* pX, int* pY) {
-    IOPlatform_GetMousePosition(pX, pY);
-}
-
-void Harness_Hook_GetMouseButtons(int* pButton1, int* pButton2) {
-    IOPlatform_GetMouseButtons(pButton1, pButton2);
->>>>>>> 1a0301b6ee5e72991099ec56deeda52d2766705c
 }
 
 // Filesystem hooks

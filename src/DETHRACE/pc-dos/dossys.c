@@ -765,5 +765,5 @@ void PDDisplayGoreworthiness(int pGory) {
 
     printf(pGory ? "\nPlaying full version...\n" : "\nPlaying zombie version...\n");
     delay_start = 2;
-    OS_Sleep(delay_start * 1000);
+    gHarness_platform.Sleep(delay_start * 1000);
 }

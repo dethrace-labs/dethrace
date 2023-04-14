@@ -5,6 +5,11 @@
 #include "harness/win95_polyfill_defs.h"
 #include <stdio.h>
 
+typedef enum {
+    eFlush_all,
+    eFlush_color_buffer
+} tRenderer_flush_type;
+
 // Platform implementation functions
 typedef struct tHarness_platform {
     // Initialize the renderer
@@ -16,7 +21,7 @@ typedef struct tHarness_platform {
     // Render a fullscreen quad using the specified pixel data
     void (*Renderer_FullScreenQuad)(uint8_t* src);
     // Render a model
-    void (*Renderer_Model)(br_actor* actor, br_model* model, br_matrix34 model_matrix, br_token render_type);
+    void (*Renderer_Model)(br_actor* actor, br_model* model, br_material* material, br_matrix34 model_matrix, br_token render_type);
     // Clear frame and depth buffers
     void (*Renderer_ClearBuffers)();
     // Load pixelmap into video memory

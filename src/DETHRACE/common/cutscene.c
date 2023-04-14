@@ -6,6 +6,7 @@
 #include "globvrpb.h"
 #include "graphics.h"
 #include "harness/config.h"
+#include "harness/hooks.h"
 #include "harness/os.h"
 #include "harness/trace.h"
 #include "input.h"
@@ -130,6 +131,8 @@ void PlaySmackerFile(char* pSmack_name) {
 
                 do {
                     fuck_off = AnyKeyDown() || EitherMouseButtonDown();
+                    // added by dethrace to avoid 100% cpu
+                    gHarness_platform.Sleep(1);
                 } while (!fuck_off && PDGetTotalTime() - last_frame_time < delay_ms);
                 if (fuck_off) {
                     break;

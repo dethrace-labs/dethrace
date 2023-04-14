@@ -2,7 +2,7 @@
 #define HARNESS_GL_RENDERER
 
 #include "harness.h"
-#include "renderers/renderer.h"
+#include "harness/hooks.h"
 
 #define CHECK_GL_ERROR(msg)                                \
     {                                                      \

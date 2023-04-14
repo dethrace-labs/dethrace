@@ -31,8 +31,6 @@ static char _program_name[1024];
 #define MAX_STACK_FRAMES 64
 static void* stack_traces[MAX_STACK_FRAMES];
 #define TRACER_PID_STRING "TracerPid:"
-DIR* directory_iterator;
-uint32_t first_clock_time = 0;
 
 struct dl_iterate_callback_data {
     int initialized;
@@ -56,15 +54,6 @@ static intptr_t get_dethrace_offset() {
     return dethrace_dl_data.start;
 }
 
-uint32_t OS_GetTime() {
-    struct timespec spec;
-    clock_gettime(CLOCK_MONOTONIC, &spec);
-    if (first_clock_time == 0) {
-        first_clock_time = spec.tv_sec * 1000 + spec.tv_nsec / 1000000;
-    }
-    return (spec.tv_sec * 1000 + spec.tv_nsec / 1000000) - first_clock_time;
-}
-
 void OS_Sleep(int delay_ms) {
     struct timespec ts;
     ts.tv_sec = delay_ms / 1000;
@@ -72,67 +61,8 @@ void OS_Sleep(int delay_ms) {
     nanosleep(&ts, &ts);
 }
 
-char* OS_GetFirstFileInDirectory(char* path) {
-    directory_iterator = opendir(path);
-    if (directory_iterator == NULL) {
-        return NULL;
-    }
-    return OS_GetNextFileInDirectory();
-}
-
-char* OS_GetNextFileInDirectory(void) {
-    struct dirent* entry;
-
-    if (directory_iterator == NULL) {
-        return NULL;
-    }
-    while ((entry = readdir(directory_iterator)) != NULL) {
-        if (entry->d_type == DT_REG) {
-            return entry->d_name;
-        }
-    }
-    closedir(directory_iterator);
-    directory_iterator = NULL;
-    return NULL;
-}
-
 void OS_Basename(char* path, char* base) {
     strcpy(base, basename(path));
-}
-
-int OS_IsDebuggerPresent() {
-    char buf[4096];
-    int status_fd;
-    ssize_t num_read;
-    char* tracer_pid_ptr;
-    char* char_ptr;
-
-    status_fd = open("/proc/self/status", O_RDONLY);
-    if (status_fd == -1) {
-        return 0;
-    }
-
-    num_read = read(status_fd, buf, sizeof(buf) - 1);
-    close(status_fd);
-    if (num_read <= 0) {
-        return 0;
-    }
-
-    buf[num_read] = '\0';
-    tracer_pid_ptr = strstr(buf, TRACER_PID_STRING);
-    if (tracer_pid_ptr == NULL) {
-        return 0;
-    }
-
-    for (char_ptr = tracer_pid_ptr + sizeof(TRACER_PID_STRING) - 1; char_ptr <= buf + num_read; ++char_ptr) {
-        if (isspace(*char_ptr)) {
-            continue;
-        } else {
-            return isdigit(*char_ptr) != 0 && *char_ptr != '0';
-        }
-    }
-
-    return 0;
 }
 
 // Resolve symbol name and source location given the path to the executable and an address

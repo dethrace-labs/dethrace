@@ -2574,10 +2574,10 @@ int DoMouseCursor() {
         period = 1000;
     }
     while (period <= 20) {
-        // Sleep 1 ms to avoid 100% CPU usage
-        OS_Sleep(1);
         this_call_time = PDGetTotalTime();
         period = this_call_time - last_call_time;
+        // added by dethrace to avoid 100% CPU usage
+        gHarness_platform.Sleep(1);
     }
     GetMousePosition(&x_coord, &y_coord);
     mouse_moved = x_coord != gMouse_last_x_coord || y_coord != gMouse_last_y_coord;

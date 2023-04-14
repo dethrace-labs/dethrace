@@ -23,31 +23,16 @@
 #include <unistd.h>
 #endif
 
-// Required: return timestamp in milliseconds.
-uint32_t OS_GetTime(void);
-
 // Required: sleep for specified milliseconds
 void OS_Sleep(int ms);
 
-// Required: begin a directory iteration and return name of first file
-char* OS_GetFirstFileInDirectory(char* path);
-
-// Required: continue directory iteration. If no more files, return NULL
-char* OS_GetNextFileInDirectory(void);
-
 // Required: copy the `basename` component of `path` into `base`
 void OS_Basename(char* path, char* base);
-
-// Optional: return true if a debugger is detected
-int OS_IsDebuggerPresent(void);
 
 // Optional: install a handler to print stack trace during a crash
 void OS_InstallSignalHandler(char* program_name);
 
 FILE* OS_fopen(const char* pathname, const char* mode);
-
-// Required: return a buffer for action replay. Preferably 20MB. If that is not available, then allocate a buffer of 12MB, 6MB, 4MB, 500kB or 64kiB
-void OS_AllocateActionReplayBuffer(char** pBuffer, unsigned* pBuffer_size);
 
 size_t OS_ConsoleReadPassword(char* pBuffer, size_t pBufferLen);
 

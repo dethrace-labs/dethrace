@@ -57,7 +57,6 @@ target_sources(harness PRIVATE
     harness_trace.c
     harness.c
     harness.h
-    io_platforms/io_platform.h
     renderers/null.h
     renderers/renderer.h
     brender_emu/renderer_impl.c
@@ -66,6 +65,7 @@ target_sources(harness PRIVATE
     sound/sound.h
     win95/polyfill.c
     win95/real_windows_funcs.c
+    platforms/null.h
     
     "${CMAKE_CURRENT_BINARY_DIR}/version.h"
 )
@@ -81,8 +81,8 @@ if (IO_PLATFORM STREQUAL "SDL_OpenGL")
     endforeach()
 
     target_sources(harness PRIVATE
-        io_platforms/sdl_gl.c
-        io_platforms/sdl2_scancode_to_dinput.h
+        platforms/sdl_gl.c
+        platforms/sdl2_scancode_to_dinput.h
         renderers/gl/gl_renderer.c
         renderers/gl/gl_renderer.h
         renderers/gl/stored_context.c

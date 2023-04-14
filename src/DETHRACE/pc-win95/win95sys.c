@@ -64,7 +64,7 @@ tU32 gScan_code[123]; // was tU8 [123][2] in symbol dump
 // Added by dethrace. Windows-specific. Original variable names unknown.
 int gWin32_fatal_error_exit_code;
 int gWin32_show_fatal_error_message;
-char* gWin32_fatal_error_message;
+char gWin32_fatal_error_message[512];
 int gWin32_action_replay_buffer_allocated;
 void* gWin32_action_replay_buffer;
 int gWin32_action_replay_buffer_size;

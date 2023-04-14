@@ -28,62 +28,13 @@ void dr_dprintf(char* fmt_string, ...);
 
 static int stack_nbr = 0;
 static char _program_name[1024];
-LARGE_INTEGER qpc_start_time, EndingTime, ElapsedMicroseconds;
-LARGE_INTEGER qpc_ticks_per_sec;
-
-HANDLE directory_handle = NULL;
-char last_found_file[260];
-
-uint32_t OS_GetTime() {
-    LARGE_INTEGER now;
-    if (qpc_start_time.QuadPart == 0) {
-        QueryPerformanceFrequency(&qpc_ticks_per_sec);
-        QueryPerformanceCounter(&qpc_start_time);
-    }
-
-    QueryPerformanceCounter(&now);
-    return (uint32_t)(((now.QuadPart - qpc_start_time.QuadPart) * 1000) / qpc_ticks_per_sec.QuadPart);
-}
 
 void OS_Sleep(int delay_ms) {
     Sleep(delay_ms);
 }
 
-char* OS_GetFirstFileInDirectory(char* path) {
-    char with_extension[256];
-    WIN32_FIND_DATA find_data;
-
-    strcpy(with_extension, path);
-    strcat(with_extension, "\\*.???");
-    directory_handle = FindFirstFile(with_extension, &find_data);
-    if (directory_handle == INVALID_HANDLE_VALUE) {
-        return NULL;
-    }
-    strcpy(last_found_file, find_data.cFileName);
-    return last_found_file;
-}
-
-// Required: continue directory iteration. If no more files, return NULL
-char* OS_GetNextFileInDirectory(void) {
-    WIN32_FIND_DATA find_data;
-    if (directory_handle == NULL) {
-        return NULL;
-    }
-
-    while (FindNextFile(directory_handle, &find_data)) {
-        strcpy(last_found_file, find_data.cFileName);
-        return last_found_file;
-    }
-    FindClose(directory_handle);
-    return NULL;
-}
-
 void OS_Basename(char* path, char* base) {
     _splitpath(path, NULL, NULL, base, NULL);
-}
-
-int OS_IsDebuggerPresent() {
-    return IsDebuggerPresent();
 }
 
 int addr2line(char const* const program_name, void const* const addr) {
@@ -218,95 +169,6 @@ FILE* OS_fopen(const char* pathname, const char* mode) {
     }
 
     return f;
-}
-
-void OS_AllocateActionReplayBuffer(char** pBuffer, unsigned* pBuffer_size) {
-    static int allocated = 0;
-    static char* buffer = NULL;
-    static unsigned buffer_size = 0;
-    MEMORYSTATUS memory_status;
-    unsigned wanted;
-
-    if (allocated) {
-        *pBuffer = buffer;
-        *pBuffer_size = buffer_size;
-        return;
-    }
-    allocated = 1;
-    buffer = NULL;
-    memory_status.dwLength = sizeof(memory_status);
-    GlobalMemoryStatus(&memory_status);
-    dr_dprintf(
-        "Win32AllocateActionReplayBuffer(): Memory Status BEFORE Action Replay Allocation:\n"
-        "             dwLength        %u\n"
-        "             dwMemoryLoad    %u\n"
-        "             dwTotalPhys     %u\n"
-        "             dwAvailPhys     %u\n"
-        "             dwTotalPageFile %u\n"
-        "             dwAvailPageFile %u\n"
-        "             dwTotalVirtual  %u\n"
-        "             dwAvailVirtual  %u",
-        memory_status.dwLength,
-        memory_status.dwMemoryLoad,
-        memory_status.dwTotalPhys,
-        memory_status.dwAvailPhys,
-        memory_status.dwTotalPageFile,
-        memory_status.dwAvailPageFile,
-        memory_status.dwTotalVirtual,
-        memory_status.dwAvailVirtual);
-    wanted = 20000000;
-    if (memory_status.dwTotalPhys < 16000000) {
-        wanted = 500000;
-    } else if (memory_status.dwTotalPhys < 24000000) {
-        wanted = 4000000;
-    } else if (memory_status.dwTotalPhys < 32000000) {
-        wanted = 6000000;
-    } else if (memory_status.dwTotalPhys < 48000000) {
-        wanted = 12000000;
-    }
-    dr_dprintf("Win32AllocateActionReplayBuffer(): We want %d bytes...", wanted);
-    if (memory_status.dwAvailPageFile + memory_status.dwAvailPhys < wanted) {
-        wanted = (memory_status.dwAvailPageFile + memory_status.dwAvailPhys) - 0x100000;
-        dr_dprintf("Win32AllocateActionReplayBuffer(): ...but there's only %d bytes available...", wanted);
-    }
-    if (wanted < 0x10000) {
-        wanted = 0x10000;
-        dr_dprintf("Win32AllocateActionReplayBuffer(): ...but we have to have a minimum size of %d bytes...", wanted);
-    }
-    while (wanted >= 0x10000) {
-        buffer = malloc(wanted);
-        if (buffer != NULL) {
-            break;
-        }
-    }
-    if (buffer == NULL) {
-        buffer_size = 0;
-    } else {
-        buffer_size = wanted;
-        // Sleep(1000); // Commented out 1s sleep
-    }
-    dr_dprintf("Win32AllocateActionReplayBuffer(): Actually allocated %d bytes.", wanted);
-    GlobalMemoryStatus(&memory_status);
-    dr_dprintf(
-        "Win32AllocateActionReplayBuffer(): Memory Status AFTER Action Replay Allocation:\n"
-        "             dwLength        %u\n"
-        "             dwMemoryLoad    %u\n"
-        "             dwTotalPhys     %u\n"
-        "             dwAvailPhys     %u\n"
-        "             dwTotalPageFile %u\n"
-        "             dwAvailPageFile %u\n"
-        "             dwTotalVirtual  %u\n"
-        "             dwAvailVirtual  %u",
-        memory_status.dwLength,
-        memory_status.dwMemoryLoad,
-        memory_status.dwTotalPhys,
-        memory_status.dwAvailPhys,
-        memory_status.dwTotalPageFile,
-        memory_status.dwAvailPageFile,
-        memory_status.dwTotalVirtual,
-        memory_status.dwAvailVirtual);
-    *pBuffer = buffer;
-    *pBuffer_size = buffer_size;
 }
 
 size_t OS_ConsoleReadPassword(char* pBuffer, size_t pBufferLen) {

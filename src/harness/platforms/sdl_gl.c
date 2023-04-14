@@ -5,7 +5,6 @@
 #include <SDL_opengl.h>
 
 #include "../renderers/gl/gl_renderer.h"
-#include "../renderers/renderer.h"
 #include "harness/config.h"
 #include "harness/hooks.h"
 #include "harness/trace.h"
@@ -213,7 +212,7 @@ void get_mouse_position(int* pX, int* pY) {
 #endif
 }
 
-void IOPlatform_Init(tPlatform_hooks* platform) {
+void Harness_Platform_Init(tHarness_platform* platform) {
     platform->GetMessage = get_and_handle_message;
     platform->Sleep = SDL_Delay;
     platform->GetTicks = SDL_GetTicks;
