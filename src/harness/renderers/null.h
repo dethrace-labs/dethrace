@@ -5,7 +5,7 @@ void Null_BeginFrame(br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* 
 void Null_EndFrame() {}
 void Null_SetPalette(uint8_t* palette) {}
 void Null_RenderFullScreenQuad(uint8_t* src) {}
-void Null_RenderModel(br_actor* actor, br_model* model, br_matrix34 model_matrix, br_token render_type) {}
+void Null_RenderModel(br_actor* actor, br_model* model, br_material* material, br_token render_type, br_matrix34 model_matrix) {}
 void Null_RenderFrameBuffer() {}
 void Null_ClearBuffers() {}
 void Null_BufferTexture(br_pixelmap* pm) {}

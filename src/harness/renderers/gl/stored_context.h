@@ -15,6 +15,7 @@ typedef struct tStored_pixelmap {
 
 typedef struct tStored_material {
     int index_base;
+    int index_range;
     br_uint_32 flags;
     br_pixelmap* shade_table;
     br_pixelmap* pixelmap;

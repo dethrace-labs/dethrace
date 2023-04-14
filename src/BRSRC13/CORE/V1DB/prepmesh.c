@@ -20,6 +20,8 @@ pm_temp_edge* pm_edge_table;
 
 #define PREP_ALIGN(f) (f)
 
+#define MODF_USES_DEFAULT 0x8000
+
 // IDA: int __usercall addEdge@<EAX>(br_uint_16 first@<EAX>, br_uint_16 last@<EDX>)
 int addEdge(br_uint_16 first, br_uint_16 last) {
     pm_temp_edge* tep;
