@@ -54,10 +54,6 @@ static intptr_t get_dethrace_offset() {
     return dethrace_dl_data.start;
 }
 
-void OS_Basename(char* path, char* base) {
-    strcpy(base, basename(path));
-}
-
 // Resolve symbol name and source location given the path to the executable and an address
 int addr2line(char const* const program_name, void const* const addr) {
     char addr2line_cmd[512] = { 0 };
@@ -262,34 +258,6 @@ FILE* OS_fopen(const char* pathname, const char* mode) {
     }
     closedir(pDir);
     return f;
-}
-
-void OS_AllocateActionReplayBuffer(char** pBuffer, unsigned* pBuffer_size) {
-    static int allocated = 0;
-    static char* buffer = NULL;
-    static unsigned buffer_size = 0;
-    unsigned i;
-    const int wanted_sizes[] = {
-        20000000,
-        16000000,
-        6000000,
-        4000000,
-        500000,
-    };
-
-    if (!allocated) {
-        allocated = 1;
-        buffer_size = 0;
-        for (i = 0; i < ARRAY_SIZE(wanted_sizes); i++) {
-            buffer = malloc(wanted_sizes[i]);
-            if (buffer != NULL) {
-                buffer_size = wanted_sizes[i];
-                break;
-            }
-        }
-    }
-    *pBuffer = buffer;
-    *pBuffer_size = buffer_size;
 }
 
 size_t OS_ConsoleReadPassword(char* pBuffer, size_t pBufferLen) {
