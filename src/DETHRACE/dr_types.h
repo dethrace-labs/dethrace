@@ -11,9 +11,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#ifdef _WIN32
-#include <windows.h>
-#else
 typedef short SHORT;
 typedef unsigned short USHORT;
 typedef int INT;
@@ -39,7 +36,7 @@ typedef BYTE* HPSTR;
 typedef LONG* HPLONG;
 typedef void* HPVOID;
 typedef void* HANDLE;
-#endif
+
 typedef unsigned int W32;
 typedef unsigned short W16;
 typedef W32* LPW32;
