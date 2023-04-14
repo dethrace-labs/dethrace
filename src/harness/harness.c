@@ -195,6 +195,8 @@ void Harness_Init(int* argc, char* argv[]) {
     harness_game_config.start_full_screen = 0;
     // disable replay by default
     harness_game_config.enable_replay = 0;
+    // Emulate DOS behavior
+    harness_game_config.dos_mode = 0;
 
     // install signal handler by default
     harness_game_config.install_signalhandler = 1;
@@ -219,12 +221,11 @@ void Harness_Init(int* argc, char* argv[]) {
         Harness_DetectGameMode();
     }
 
-    Input_Init();
-    int* keymap = Input_GetKeyMap();
+    IOPlatform_Init();
+    int* keymap = IOPlatform_GetKeyMap();
     if (keymap != NULL) {
         for (int i = 0; i < 123; i++) {
             gScan_code[i][0] = keymap[i];
-            // gScan_code[i][1] = keymap[i];
         }
     }
 }
@@ -287,6 +288,9 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
         } else if (strcasecmp(argv[i], "--enable-replay") == 0) {
             harness_game_config.enable_replay = 1;
             handled = 1;
+        } else if (strcasecmp(argv[i], "--dos-mode") == 0) {
+            harness_game_config.dos_mode = 1;
+            handled = 1;
         }
 
         if (handled) {
@@ -314,7 +318,11 @@ void Harness_Hook_GraphicsInit(int render_width, int render_height) {
         window_width = render_width;
         window_height = render_height;
     }
-    renderer = Window_Create("Dethrace", window_width, window_height, render_width, render_height);
+    renderer = IOPlatform_CreateWindow("Dethrace", window_width, window_height, render_width, render_height);
+}
+
+void Harness_Hook_PDShutdownSystem() {
+    IOPlatform_Shutdown();
 }
 
 // Render 2d back buffer
@@ -331,7 +339,7 @@ void Harness_Hook_BrDevPaletteSetOld(br_pixelmap* pm) {
 
     if (last_dst) {
         Harness_RenderScreen(last_dst, last_src);
-        Window_Swap(0);
+        IOPlatform_SwapWindow(0);
     }
 }
 
@@ -388,23 +396,23 @@ void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {
     Harness_RenderScreen(dst, src);
 
     int delay_ms = Harness_CalculateFrameDelay();
-    Window_Swap(delay_ms);
+    IOPlatform_SwapWindow(delay_ms);
 
     renderer->ClearBuffers();
-    Window_PollEvents();
+    IOPlatform_PollEvents();
 
     last_frame_time = GetTotalTime();
 }
 
 int Harness_Hook_KeyDown(unsigned char pScan_code) {
-    return Input_IsKeyDown(pScan_code);
+    return IOPlatform_IsKeyDown(pScan_code);
 }
 
 void Harness_Hook_PDServiceSystem() {
-    Window_PollEvents();
+    IOPlatform_PollEvents();
 }
 void Harness_Hook_PDSetKeyArray() {
-    Window_PollEvents();
+    IOPlatform_PollEvents();
 }
 
 void Harness_Hook_FlushRenderer() {
@@ -429,11 +437,11 @@ void Harness_Hook_BrModelUpdate(br_model* model) {
 
 // Input hooks
 void Harness_Hook_GetMousePosition(int* pX, int* pY) {
-    Input_GetMousePosition(pX, pY);
+    IOPlatform_GetMousePosition(pX, pY);
 }
 
 void Harness_Hook_GetMouseButtons(int* pButton1, int* pButton2) {
-    Input_GetMouseButtons(pButton1, pButton2);
+    IOPlatform_GetMouseButtons(pButton1, pButton2);
 }
 
 // Filesystem hooks

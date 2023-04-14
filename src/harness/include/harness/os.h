@@ -49,4 +49,6 @@ FILE* OS_fopen(const char* pathname, const char* mode);
 // Required: return a buffer for action replay. Preferably 20MB. If that is not available, then allocate a buffer of 12MB, 6MB, 4MB, 500kB or 64kiB
 void OS_AllocateActionReplayBuffer(char** pBuffer, unsigned* pBuffer_size);
 
+size_t OS_ConsoleReadPassword(char* pBuffer, size_t pBufferLen);
+
 #endif
