@@ -226,7 +226,7 @@ void DirectDrawDevice_SetPaletteEntries(PALETTEENTRY* palette, int pFirst_colour
     Harness_RenderLastScreen();
 }
 
-void _splitpath(const char* path, char* drive, char* dir, char* fname, char* ext) {
+void windows_splitpath(const char* path, char* drive, char* dir, char* fname, char* ext) {
 #ifdef _WIN32
     _splitpath(path, NULL, NULL, fname, NULL);
 #else

@@ -4,10 +4,6 @@
 
 #include <io.h>
 
-typedef struct _WIN32_FIND_DATA {
-    char cFileName[1024];
-} WIN32_FIND_DATAA;
-
 HANDLE Real_FindFirstFile(char* lpFileName, char* lpFindFileData_filename) {
     WIN32_FIND_DATA find_data;
     HANDLE res = FindFirstFile(lpFileName, &find_data);

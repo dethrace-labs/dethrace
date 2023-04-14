@@ -852,7 +852,7 @@ void PDDisposeActionReplayBuffer(char* pBuffer) {
 void Usage(char* pProgpath) {
     char base_name[256]; // fix: changed from 9 to avoid overflow on longer filenames
 
-    _splitpath(pProgpath, NULL, NULL, base_name, NULL);
+    windows_splitpath(pProgpath, NULL, NULL, base_name, NULL);
 
     fprintf(stderr,
         "Usage: %s [%s] [%s YonFactor] [%s CarSimplificationLevel] [%s SoundDetailLevel] [%s] [%s] [%s] [%s] [%s] [%s]\nWhere YonFactor is between 0 and 1,\nCarSimplificationLevel is a whole number between 0 and %d,\nand SoundDetailLevel is a whole number.\n",
