@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
-
+/*
 typedef short SHORT;
 typedef unsigned short USHORT;
 typedef int INT;
@@ -12,7 +12,7 @@ typedef unsigned int UINT;
 typedef unsigned char BYTE;
 typedef unsigned short WORD;
 typedef long LONG;
-typedef uint32_t DWORD;
+typedef uint32_t uint32_t;
 typedef BYTE* PBYTE;
 typedef char* PSTR;
 typedef WORD* PWORD;
@@ -28,71 +28,70 @@ typedef BYTE* HPBYTE;
 typedef BYTE* HPSTR;
 typedef LONG* HPLONG;
 typedef void* HPVOID;
-typedef void* HANDLE;
+typedef void* void*;
+*/
 
 #define GENERIC_READ 0x80000000
 #define OPEN_EXISTING 3
 #define FILE_ATTRIBUTE_NORMAL 0x80
-#define INVALID_HANDLE_VALUE ((HANDLE)-1)
+#define INVALID_HANDLE_VALUE ((void*)-1)
 #define INVALID_FILE_ATTRIBUTES -1
 
 #define FILE_ATTRIBUTE_READONLY 0x01
 #define FILE_ATTRIBUTE_NORMAL 0x80
 
-#define HWND_BROADCAST ((HWND)0xffff)
+#define HWND_BROADCAST ((void*)0xffff)
 
 #define _CRT_ASSERT 2
 
 #define WM_QUIT 0x0012
 
-typedef struct _MEMORYSTATUS {
-    DWORD dwLength;
-    DWORD dwMemoryLoad;
+typedef struct _MEMORYSTATUS_ {
+    uint32_t dwLength;
+    uint32_t dwMemoryLoad;
     size_t dwTotalPhys;
     size_t dwAvailPhys;
     size_t dwTotalPageFile;
     size_t dwAvailPageFile;
     size_t dwTotalVirtual;
     size_t dwAvailVirtual;
-} MEMORYSTATUS;
+} MEMORYSTATUS_;
 
-typedef HANDLE HWND;
-
-typedef struct tagPOINT {
-    LONG x;
-    LONG y;
-} POINT, *PPOINT, *NPPOINT, *LPPOINT;
+typedef struct tagPOINT_ {
+    long x;
+    long y;
+} POINT_;
 
 #pragma pack(push, 1)
 typedef struct tagPALETTEENTRY_ {
-    BYTE peRed;
-    BYTE peGreen;
-    BYTE peBlue;
-    BYTE peFlags;
+    uint8_t peRed;
+    uint8_t peGreen;
+    uint8_t peBlue;
+    uint8_t peFlags;
 } PALETTEENTRY_;
 #pragma pack(pop)
 
 typedef struct _WIN32_FIND_DATA_ {
-    // DWORD dwFileAttributes;
+    // uint32_t dwFileAttributes;
     // FILETIME ftCreationTime;
     // FILETIME ftLastAccessTime;
     // FILETIME ftLastWriteTime;
-    // DWORD nFileSizeHigh;
-    // DWORD nFileSizeLow;
-    // DWORD dwReserved0;
-    // DWORD dwReserved1;
+    // uint32_t nFileSizeHigh;
+    // uint32_t nFileSizeLow;
+    // uint32_t dwReserved0;
+    // uint32_t dwReserved1;
     char cFileName[1024];
     // char cAlternateFileName[14];
 } WIN32_FIND_DATAA_;
 
-typedef struct tagMSG {
-    HWND hwnd;
-    UINT message;
+typedef struct tagMSG_ {
+    void* hwnd;
+    unsigned int message;
     int wParam;
     long lParam;
-    DWORD time;
-    POINT pt;
-    DWORD lPrivate;
-} MSG, *PMSG, *NPMSG, *LPMSG;
+    uint32_t time;
+    POINT_ pt;
+    uint32_t lPrivate;
+} MSG_;
 
 #endif

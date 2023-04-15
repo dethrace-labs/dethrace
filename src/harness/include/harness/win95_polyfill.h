@@ -9,69 +9,69 @@
 #include <stdint.h>
 #include <stdio.h>
 
-DWORD GetFileAttributesA_(char* path);
+uint32_t GetFileAttributesA_(char* path);
 
-BOOL SetFileAttributesA_(char* lpFileName, DWORD dwFileAttributes);
+int SetFileAttributesA_(char* lpFileName, uint32_t dwFileAttributes);
 
-HANDLE CreateFileA_(
+void* CreateFileA_(
     char* lpFileName,
-    DWORD dwDesiredAccess,
-    DWORD dwShareMode,
+    uint32_t dwDesiredAccess,
+    uint32_t dwShareMode,
     void* lpSecurityAttributes,
-    DWORD dwCreationDisposition,
-    DWORD dwFlagsAndAttributes,
-    HANDLE hTemplateFile);
+    uint32_t dwCreationDisposition,
+    uint32_t dwFlagsAndAttributes,
+    void* hTemplateFile);
 
-DWORD GetFileSize_(
-    HANDLE hFile,
-    DWORD* lpFileSizeHigh);
+uint32_t GetFileSize_(
+    void* hFile,
+    uint32_t* lpFileSizeHigh);
 
-BOOL CloseHandle_(
-    HANDLE hObject);
+int CloseHandle_(
+    void* hObject);
 
-void GlobalMemoryStatus_(MEMORYSTATUS* lpBuffer);
+void GlobalMemoryStatus_(MEMORYSTATUS_* lpBuffer);
 
-BOOL GetCursorPos_(LPPOINT lpPoint);
+int GetCursorPos_(POINT_* lpPoint);
 
-BOOL ScreenToClient_(HWND hWnd, LPPOINT lpPoint);
+int ScreenToClient_(void * hWnd, POINT_* lpPoint);
 
-DWORD timeGetTime_();
+uint32_t timeGetTime_();
 
-DWORD GetCurrentDirectoryA_(DWORD nBufferLength, char* lpBuffer);
+uint32_t GetCurrentDirectoryA_(uint32_t nBufferLength, char* lpBuffer);
 
-BOOL SetCurrentDirectoryA_(char* lpPathName);
+int SetCurrentDirectoryA_(char* lpPathName);
 
-DWORD GetShortPathNameA_(char* lpszLongPath, char* lpszShortPath, DWORD cchBuffer);
+uint32_t GetShortPathNameA_(char* lpszLongPath, char* lpszShortPath, uint32_t cchBuffer);
 
-HANDLE FindFirstFileA_(char* lpFileName, WIN32_FIND_DATAA_* lpFindFileData);
+void* FindFirstFileA_(char* lpFileName, WIN32_FIND_DATAA_* lpFindFileData);
 
-BOOL FindNextFileA_(HANDLE hFindFile, WIN32_FIND_DATAA_* lpFindFileData);
+int FindNextFileA_(void* hFindFile, WIN32_FIND_DATAA_* lpFindFileData);
 
-BOOL FindClose_(HANDLE hFindFile);
+int FindClose_(void* hFindFile);
 
-HWND CreateWindowExA_(DWORD dwExStyle, char* lpClassName, char* lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight, HWND hWndParent, void* hMenu, void* hInstance, LPVOID lpParam);
+void * CreateWindowExA_(uint32_t dwExStyle, char* lpClassName, char* lpWindowName, uint32_t dwStyle, int X, int Y, int nWidth, int nHeight, void * hWndParent, void* hMenu, void* hInstance, void* lpParam);
 
-BOOL SetWindowPos_(HWND hWnd, HWND hWndInsertAfter, int X, int Y, int cx, int cy, UINT uFlags);
+int SetWindowPos_(void * hWnd, void * hWndInsertAfter, int X, int Y, int cx, int cy, unsigned int uFlags);
 
-int ShowCursor_(BOOL bShow);
+int ShowCursor_(int bShow);
 
-int SendMessageA_(HWND hWnd, UINT Msg, UINT wParam, long lParam);
+int SendMessageA_(void * hWnd, unsigned int Msg, unsigned int wParam, long lParam);
 
-int MessageBoxA_(HWND hWnd, char* lpText, char* lpCaption, UINT uType);
+int MessageBoxA_(void * hWnd, char* lpText, char* lpCaption, unsigned int uType);
 
-BOOL DestroyWindow_(HWND hWnd);
+int DestroyWindow_(void * hWnd);
 
-HARNESS_NORETURN void ExitProcess_(UINT uExitCode);
+HARNESS_NORETURN void ExitProcess_(unsigned int uExitCode);
 
-void TranslateMessage_(MSG* lpMsg);
+void TranslateMessage_(MSG_* lpMsg);
 
-void DispatchMessageA_(MSG* lpMsg);
+void DispatchMessageA_(MSG_* lpMsg);
 
-BOOL PeekMessageA_(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT wRemoveMsg);
+int PeekMessageA_(MSG_* lpMsg, void * hWnd, unsigned int wMsgFilterMin, unsigned int wMsgFilterMax, unsigned int wRemoveMsg);
 
-BOOL GetMessageA_(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax);
+int GetMessageA_(MSG_* lpMsg, void * hWnd, unsigned int wMsgFilterMin, unsigned int wMsgFilterMax);
 
-void Sleep_(DWORD dwMilliseconds);
+void Sleep_(uint32_t dwMilliseconds);
 
 void DirectDraw_CreateSurface();
 
@@ -79,7 +79,6 @@ void DirectDrawDevice_SetPaletteEntries(PALETTEENTRY_* palette, int pFirst_colou
 
 void DirectInputDevice_GetDeviceState(unsigned int keys, uint8_t* buffer);
 
-// renamed from _splitpath to avoid conflict with stdlib
 void _splitpath_(char* path, char* drive, char* dir, char* fname, char* ext);
 
 int _CrtDbgReport_(int reportType, const char* filename, int linenumber, const char* moduleName, const char* format, ...);

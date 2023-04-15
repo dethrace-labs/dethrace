@@ -3,9 +3,9 @@
 #include "harness/hooks.h"
 
 int gSSDX_windowed;
-HWND gSSDX_hwnd;
+void* gSSDX_hwnd;
 
-int SSDXStart(HWND hWnd, int windowed, int flags) {
+int SSDXStart(void* hWnd, int windowed, int flags) {
     int res = 0;
     dr_dprintf("SSDXStart(): START...");
     if (windowed) {
@@ -46,7 +46,7 @@ int SSDXInitDirectDraw(int width, int height, int* row_bytes) {
 
 void SSDXRelease() {}
 
-void SSDXGetWindowRect(HWND hWnd) {
+void SSDXGetWindowRect(void* hWnd) {
     // none of this is required
 
     // GetClientRect(hWnd, &gSSDX_rect);

@@ -67,7 +67,7 @@ char gWin32_fatal_error_message[512];
 int gWin32_action_replay_buffer_allocated;
 void* gWin32_action_replay_buffer;
 int gWin32_action_replay_buffer_size;
-HWND gWin32_hwnd;
+void* gWin32_hwnd;
 int gWin32_lbutton_down;
 int gWin32_rbutton_down;
 PALETTEENTRY_ gWin32_palette[256];
@@ -300,7 +300,7 @@ int PDGetASCIIFromKey(int pKey) {
 }
 
 void Win32PumpMessages() {
-    struct tagMSG msg; // [esp+Ch] [ebp-20h] BYREF
+     MSG_ msg; // [esp+Ch] [ebp-20h] BYREF
 
     PDUnlockRealBackScreen();
     while ((!gWin32_window_has_focus || PeekMessageA_(&msg, 0, 0, 0, 1u)) && (gWin32_window_has_focus || GetMessageA_(&msg, 0, 0, 0) != -1)) {
@@ -722,7 +722,7 @@ void PDMouseButtons(int* pButton_1, int* pButton_2) {
 }
 
 void PDGetMousePosition(int* pX_coord, int* pY_coord) {
-    POINT p;
+    POINT_ p;
     LOG_TRACE("(%p, %p)", pX_coord, pY_coord);
 
     GetCursorPos_(&p);
@@ -746,7 +746,7 @@ void Win32InitInputDevice() {
 }
 
 void Win32AllocateActionReplayBuffer() {
-    struct _MEMORYSTATUS mem_status; // [esp+Ch] [ebp-28h] BYREF
+    MEMORYSTATUS_ mem_status; // [esp+Ch] [ebp-28h] BYREF
     size_t buf_size;                 // [esp+2Ch] [ebp-8h]
     void* buf;                       // [esp+30h] [ebp-4h]
 

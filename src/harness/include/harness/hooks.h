@@ -43,11 +43,11 @@ typedef struct tHarness_platform {
     // Get mouse position
     int (*GetMousePosition)(int* pX, int* pY);
     // Close specified window
-    void (*DestroyWindow)(HWND window);
+    void (*DestroyWindow)(void* window);
     // Pull a message from the window event queue
-    int (*GetMessage)(LPMSG msg);
+    int (*GetMessage)(MSG_* msg);
     // Set position of a window
-    int (*SetWindowPos)(HWND hWnd, int x, int y, int nWidth, int nHeight);
+    int (*SetWindowPos)(void* hWnd, int x, int y, int nWidth, int nHeight);
     // Show/hide the cursor
     int (*ShowCursor)(int show);
     // Get keyboard state. Expected to be in DirectInput key codes

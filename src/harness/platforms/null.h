@@ -9,13 +9,13 @@ void* null_create_window_and_renderer(char* title, int x, int y, int width, int 
     return 0;
 }
 
-void null_set_window_pos(HWND hWnd, int x, int y, int nWidth, int nHeight) {
+void null_set_window_pos(void* hWnd, int x, int y, int nWidth, int nHeight) {
 }
 
-void null_destroy_window(HWND hWnd) {
+void null_destroy_window(void* hWnd) {
 }
 
-int null_get_and_handle_message(MSG* msg) {
+int null_get_and_handle_message(MSG_* msg) {
 
     return 0;
 }

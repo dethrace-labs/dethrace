@@ -3,6 +3,7 @@
 
 #ifdef _WIN32
 #include <io.h>
+#include <stdio.h>
 #include <windows.h>
 #endif
 

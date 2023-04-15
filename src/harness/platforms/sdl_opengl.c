@@ -96,7 +96,7 @@ void* create_window_and_renderer(char* title, int x, int y, int width, int heigh
     return window;
 }
 
-void set_window_pos(HWND hWnd, int x, int y, int nWidth, int nHeight) {
+void set_window_pos(void* hWnd, int x, int y, int nWidth, int nHeight) {
     // SDL_SetWindowPosition(hWnd, x, y);
     if (nWidth == 320 && nHeight == 200) {
         nWidth = 640;
@@ -105,7 +105,7 @@ void set_window_pos(HWND hWnd, int x, int y, int nWidth, int nHeight) {
     SDL_SetWindowSize(hWnd, nWidth, nHeight);
 }
 
-void destroy_window(HWND hWnd) {
+void destroy_window(void* hWnd) {
     SDL_GL_DeleteContext(context);
     SDL_DestroyWindow(window);
     SDL_Quit();
@@ -118,7 +118,7 @@ static int is_only_key_modifier(int modifier_flags, int flag_check) {
     return (modifier_flags & flag_check) && (modifier_flags & (KMOD_CTRL | KMOD_SHIFT | KMOD_ALT | KMOD_GUI)) == (modifier_flags & flag_check);
 }
 
-int get_and_handle_message(MSG* msg) {
+int get_and_handle_message(MSG_* msg) {
     SDL_Event event;
     int dinput_key;
 
