@@ -11,6 +11,7 @@
 
 #ifdef _WIN32
 #define HOST_NL "\r\n"
+#include <windows.h>
 #else
 #define HOST_NL "\n"
 #endif

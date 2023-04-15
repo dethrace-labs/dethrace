@@ -26,11 +26,6 @@
 #include "harness/config.h"
 #include "harness/os.h"
 
-#if defined(_WIN32) || defined(_WIN64)
-
-#include <windows.h>
-#endif
-
 #define debug(format_, ...) fprintf(stderr, format_, __VA_ARGS__)
 
 #define debug(format_, ...) fprintf(stderr, format_, __VA_ARGS__)

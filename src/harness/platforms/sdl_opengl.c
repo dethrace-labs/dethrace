@@ -213,10 +213,10 @@ void get_mouse_position(int* pX, int* pY) {
 }
 
 void Harness_Platform_Init(tHarness_platform* platform) {
-    platform->GetMessage = get_and_handle_message;
+    platform->ProcessWindowMessages = get_and_handle_message;
     platform->Sleep = SDL_Delay;
     platform->GetTicks = SDL_GetTicks;
-    platform->CreateWindow = create_window_and_renderer;
+    platform->CreateWindowAndRenderer = create_window_and_renderer;
     platform->ShowCursor = SDL_ShowCursor;
     platform->SetWindowPos = set_window_pos;
     platform->SwapWindow = swap_window;

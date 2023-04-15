@@ -11,8 +11,6 @@
 
 #include <direct.h>
 #include <windows.h>
-#undef GetMessage
-#undef CreateWindow
 // https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/getcwd-wgetcwd?view=msvc-170
 #define getcwd _getcwd
 #define chdir _chdir
@@ -170,7 +168,7 @@ int FindClose_(void* hFindFile) {
 }
 
 void* CreateWindowExA_(uint32_t dwExStyle, char* lpClassName, char* lpWindowName, uint32_t dwStyle, int X, int Y, int nWidth, int nHeight, void* hWndParent, void* hMenu, void* hInstance, void* lpParam) {
-    return gHarness_platform.CreateWindow(lpWindowName, X, Y, nWidth, nHeight);
+    return gHarness_platform.CreateWindowAndRenderer(lpWindowName, X, Y, nWidth, nHeight);
 }
 
 int SetWindowPos_(void* hWnd, void* hWndInsertAfter, int X, int Y, int cx, int cy, unsigned int uFlags) {
@@ -208,11 +206,11 @@ void DispatchMessageA_(MSG_* lpMsg) {
 }
 
 int PeekMessageA_(MSG_* lpMsg, void* hWnd, unsigned int wMsgFilterMin, unsigned int wMsgFilterMax, unsigned int wRemoveMsg) {
-    return gHarness_platform.GetMessage(lpMsg);
+    return gHarness_platform.ProcessWindowMessages(lpMsg);
 }
 
 int GetMessageA_(MSG_* lpMsg, void* hWnd, unsigned int wMsgFilterMin, unsigned int wMsgFilterMax) {
-    return gHarness_platform.GetMessage(lpMsg);
+    return gHarness_platform.ProcessWindowMessages(lpMsg);
 }
 
 void Sleep_(uint32_t dwMilliseconds) {

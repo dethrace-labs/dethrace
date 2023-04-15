@@ -37,15 +37,15 @@ typedef struct tHarness_platform {
     // Set the viewport for 3d rendering
     void (*Renderer_SetViewport)(int x, int y, int width, int height);
     // Create a window. Return a handle to the window
-    void* (*CreateWindow)(char* title, int x, int y, int nWidth, int nHeight);
+    void* (*CreateWindowAndRenderer)(char* title, int x, int y, int nWidth, int nHeight);
     // Get mouse button state
     int (*GetMouseButtons)(int* button_1, int* button_2);
     // Get mouse position
     int (*GetMousePosition)(int* pX, int* pY);
     // Close specified window
     void (*DestroyWindow)(void* window);
-    // Pull a message from the window event queue
-    int (*GetMessage)(MSG_* msg);
+    // Process window messages, return any WM_QUIT message
+    int (*ProcessWindowMessages)(MSG_* msg);
     // Set position of a window
     int (*SetWindowPos)(void* hWnd, int x, int y, int nWidth, int nHeight);
     // Show/hide the cursor

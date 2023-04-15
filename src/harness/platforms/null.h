@@ -38,7 +38,7 @@ void null_show_cursor(int show) {
 void NullRenderer_Init() {}
 void NullRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer) {}
 void NullRenderer_EndScene() {}
-void NullRenderer_SetPalette(uint8_t* palette) {}
+void NullRenderer_SetPalette(PALETTEENTRY_* palette) {}
 void NullRenderer_FullScreenQuad(uint8_t* src) {}
 void NullRenderer_Model(br_actor* actor, br_model* model, br_material* material, br_token render_type, br_matrix34 model_matrix) {}
 void NullRenderer_RenderFrameBuffer() {}
@@ -50,11 +50,11 @@ void NullRenderer_FlushBuffers() {}
 void NullRenderer_SetViewport(int x, int y, int width, int height) {}
 
 void Null_Platform_Init(tHarness_platform* platform) {
-    platform->GetMessage = null_get_and_handle_message;
+    platform->ProcessWindowMessages = null_get_and_handle_message;
     // todo: shouldnt depend on sdl...
     platform->Sleep = SDL_Delay;
     platform->GetTicks = SDL_GetTicks;
-    platform->CreateWindow = null_create_window_and_renderer;
+    platform->CreateWindowAndRenderer = null_create_window_and_renderer;
     platform->ShowCursor = null_show_cursor;
     platform->SetWindowPos = null_set_window_pos;
     platform->SwapWindow = null_swap_window;
