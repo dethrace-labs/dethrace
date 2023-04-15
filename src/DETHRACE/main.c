@@ -1,5 +1,4 @@
-#include "harness/hooks.h"
-#include "pd/sys.h"
+
 #include <stdlib.h>
 
 #ifdef _WIN32
@@ -7,6 +6,7 @@
 #include <windows.h>
 #endif
 
+extern void Harness_Init(int* argc, char* argv[]);
 extern int original_main(int pArgc, char* pArgv[]);
 
 int main(int argc, char* argv[]) {
