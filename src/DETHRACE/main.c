@@ -4,6 +4,7 @@
 
 #ifdef _WIN32
 #include <io.h>
+#include <windows.h>
 #endif
 
 extern int original_main(int pArgc, char* pArgv[]);
