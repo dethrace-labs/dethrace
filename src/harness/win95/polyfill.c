@@ -10,12 +10,10 @@
 #if defined(_WIN32) || defined(_WIN64)
 
 #include <direct.h>
+#include <windows.h>
 // https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/getcwd-wgetcwd?view=msvc-170
 #define getcwd _getcwd
 #define chdir _chdir
-extern HANDLE Real_FindFirstFile(char* lpFileName, char* lpFindFileData_filename);
-extern BOOL Real_FindNextFile(HANDLE hFindFile, char* lpFindFileData_filename);
-extern BOOL Real_FindClose(HANDLE hFindFile);
 #else
 #include <dirent.h>
 #include <libgen.h>
@@ -24,7 +22,7 @@ extern BOOL Real_FindClose(HANDLE hFindFile);
 
 uint32_t polyfill_first_clock_time = 0;
 
-DWORD GetFileAttributesA(char* lpFileName) {
+DWORD GetFileAttributesA_(char* lpFileName) {
 
     FILE* f = fopen(lpFileName, "r");
     if (!f) {
@@ -33,12 +31,12 @@ DWORD GetFileAttributesA(char* lpFileName) {
     return FILE_ATTRIBUTE_NORMAL;
 }
 
-BOOL SetFileAttributesA(char* lpFileName, DWORD dwFileAttributes) {
+BOOL SetFileAttributesA_(char* lpFileName, DWORD dwFileAttributes) {
     // no-op for now
     return 0;
 }
 
-HANDLE CreateFileA(char* lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, void* lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile) {
+HANDLE CreateFileA_(char* lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, void* lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile) {
 
     assert(dwDesiredAccess == GENERIC_READ);
     assert(lpSecurityAttributes == NULL);
@@ -52,7 +50,7 @@ HANDLE CreateFileA(char* lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, v
     return f;
 }
 
-DWORD GetFileSize(HANDLE hFile, DWORD* lpFileSizeHigh) {
+DWORD GetFileSize_(HANDLE hFile, DWORD* lpFileSizeHigh) {
     assert(lpFileSizeHigh == NULL);
 
     long current_offset = ftell(hFile);
@@ -62,12 +60,12 @@ DWORD GetFileSize(HANDLE hFile, DWORD* lpFileSizeHigh) {
     return size;
 }
 
-int CloseHandle(HANDLE hObject) {
+int CloseHandle_(HANDLE hObject) {
     fclose(hObject);
     return 0;
 }
 
-void GlobalMemoryStatus(MEMORYSTATUS* lpBuffer) {
+void GlobalMemoryStatus_(MEMORYSTATUS* lpBuffer) {
     lpBuffer->dwTotalPhys = 64000000;
     lpBuffer->dwAvailPhys = 64000000; // pretend we have a whole 64mb of ram!
     lpBuffer->dwAvailPageFile = 0;
@@ -77,7 +75,7 @@ void GlobalMemoryStatus(MEMORYSTATUS* lpBuffer) {
     lpBuffer->dwTotalPageFile = 0;
 }
 
-BOOL GetCursorPos(LPPOINT lpPoint) {
+BOOL GetCursorPos_(LPPOINT lpPoint) {
     int x, y;
     gHarness_platform.GetMousePosition(&x, &y);
     lpPoint->x = x;
@@ -85,16 +83,16 @@ BOOL GetCursorPos(LPPOINT lpPoint) {
     return 0;
 }
 
-BOOL ScreenToClient(HWND hWnd, LPPOINT lpPoint) {
+BOOL ScreenToClient_(HWND hWnd, LPPOINT lpPoint) {
     // no-op, we assume the point is already relative to client
     return 0;
 }
 
-DWORD timeGetTime() {
+DWORD timeGetTime_() {
     return gHarness_platform.GetTicks();
 }
 
-DWORD GetCurrentDirectoryA(DWORD nBufferLength, char* lpBuffer) {
+DWORD GetCurrentDirectoryA_(DWORD nBufferLength, char* lpBuffer) {
     char* ret = getcwd(lpBuffer, nBufferLength);
     if (ret == NULL) {
         return 0;
@@ -102,7 +100,7 @@ DWORD GetCurrentDirectoryA(DWORD nBufferLength, char* lpBuffer) {
     return strlen(lpBuffer);
 }
 
-BOOL SetCurrentDirectoryA(char* lpPathName) {
+BOOL SetCurrentDirectoryA_(char* lpPathName) {
     int ret = chdir(lpPathName);
     // chdir returning zero means success, SetCurrentDirectory returning non-zero means success
     if (ret == 0) {
@@ -112,11 +110,16 @@ BOOL SetCurrentDirectoryA(char* lpPathName) {
     }
 }
 
-HANDLE FindFirstFileA(char* lpFileName, WIN32_FIND_DATAA* lpFindFileData) {
+HANDLE FindFirstFileA_(char* lpFileName, WIN32_FIND_DATAA_* lpFindFileData) {
     assert(strcmp(lpFileName, "*.???") == 0);
 
 #if defined(_WIN32) || defined(_WIN64)
-    return Real_FindFirstFile(lpFileName, lpFindFileData->cFileName);
+    WIN32_FIND_DATA fd;
+    HANDLE hFile = FindFirstFile(lpFileName, &fd);
+    if (hFile != INVALID_HANDLE_VALUE) {
+        strcpy(lpFindFileData->cFileName, fd.cFileName);
+    }
+    return hFile;
 #else
     DIR* dir;
     strcpy(lpFileName, ".");
@@ -124,7 +127,7 @@ HANDLE FindFirstFileA(char* lpFileName, WIN32_FIND_DATAA* lpFindFileData) {
     if (dir == NULL) {
         return INVALID_HANDLE_VALUE;
     }
-    if (FindNextFileA(dir, lpFindFileData)) {
+    if (FindNextFileA_(dir, lpFindFileData)) {
         return dir;
     } else {
         closedir(dir);
@@ -133,9 +136,14 @@ HANDLE FindFirstFileA(char* lpFileName, WIN32_FIND_DATAA* lpFindFileData) {
 #endif
 }
 
-BOOL FindNextFileA(HANDLE hFindFile, WIN32_FIND_DATAA* lpFindFileData) {
+BOOL FindNextFileA_(HANDLE hFindFile, WIN32_FIND_DATAA_* lpFindFileData) {
 #if defined(_WIN32) || defined(_WIN64)
-    return Real_FindNextFile(hFindFile, lpFindFileData->cFileName);
+    WIN32_FIND_DATA fd;
+    int result = FindNextFile(hFindFile, fd);
+    if (result) {
+        strcpy(lpFindFileData->cFileName, fd.cFileName);
+    }
+    return result;
 #else
     struct dirent* entry;
 
@@ -152,62 +160,62 @@ BOOL FindNextFileA(HANDLE hFindFile, WIN32_FIND_DATAA* lpFindFileData) {
 #endif
 }
 
-BOOL FindClose(HANDLE hFindFile) {
+BOOL FindClose_(HANDLE hFindFile) {
 #if defined(_WIN32) || defined(_WIN64)
-    Real_FindClose(hFindFile);
+    FindClose(hFindFile);
 #else
     return closedir(hFindFile);
 
 #endif
 }
 
-HWND CreateWindowExA(DWORD dwExStyle, char* lpClassName, char* lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight, HWND hWndParent, void* hMenu, void* hInstance, LPVOID lpParam) {
+HWND CreateWindowExA_(DWORD dwExStyle, char* lpClassName, char* lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight, HWND hWndParent, void* hMenu, void* hInstance, LPVOID lpParam) {
     return gHarness_platform.CreateWindow(lpWindowName, X, Y, nWidth, nHeight);
 }
 
-int SetWindowPos(HWND hWnd, HWND hWndInsertAfter, int X, int Y, int cx, int cy, UINT uFlags) {
+int SetWindowPos_(HWND hWnd, HWND hWndInsertAfter, int X, int Y, int cx, int cy, UINT uFlags) {
     return gHarness_platform.SetWindowPos(hWnd, X, Y, cx, cy);
 }
 
-int ShowCursor(int bShow) {
+int ShowCursor_(int bShow) {
     gHarness_platform.ShowCursor(bShow);
     return 0;
 }
 
-int SendMessageA(HWND hWnd, UINT Msg, UINT wParam, long lParam) {
+int SendMessageA_(HWND hWnd, UINT Msg, UINT wParam, long lParam) {
     return 0;
 }
 
-int MessageBoxA(HWND hWnd, char* lpText, char* lpCaption, UINT uType) {
+int MessageBoxA_(HWND hWnd, char* lpText, char* lpCaption, UINT uType) {
     return 0;
 }
 
-BOOL DestroyWindow(HWND hWnd) {
+BOOL DestroyWindow_(HWND hWnd) {
     gHarness_platform.DestroyWindow(hWnd);
     return 0;
 }
 
-void ExitProcess(UINT uExitCode) {
+void ExitProcess_(UINT uExitCode) {
     exit(uExitCode);
 }
 
-void TranslateMessage(MSG* lpMsg) {
+void TranslateMessage_(MSG* lpMsg) {
     // no-op
 }
 
-void DispatchMessageA(MSG* lpMsg) {
+void DispatchMessageA_(MSG* lpMsg) {
     // no-op
 }
 
-int PeekMessageA(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT wRemoveMsg) {
+int PeekMessageA_(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT wRemoveMsg) {
     return gHarness_platform.GetMessage(lpMsg);
 }
 
-int GetMessageA(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax) {
+int GetMessageA_(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax) {
     return gHarness_platform.GetMessage(lpMsg);
 }
 
-void Sleep(DWORD dwMilliseconds) {
+void Sleep_(DWORD dwMilliseconds) {
     gHarness_platform.Sleep(dwMilliseconds);
 }
 
@@ -219,14 +227,14 @@ void DirectInputDevice_GetDeviceState(unsigned int count, uint8_t* buffer) {
     gHarness_platform.GetKeyboardState(count, buffer);
 }
 
-void DirectDrawDevice_SetPaletteEntries(PALETTEENTRY* palette, int pFirst_colour, int pCount) {
+void DirectDrawDevice_SetPaletteEntries(PALETTEENTRY_* palette, int pFirst_colour, int pCount) {
     assert(pFirst_colour == 0);
     assert(pCount == 256);
     gHarness_platform.Renderer_SetPalette(palette);
     Harness_RenderLastScreen();
 }
 
-void windows_splitpath(char* path, char* drive, char* dir, char* fname, char* ext) {
+void _splitpath_(char* path, char* drive, char* dir, char* fname, char* ext) {
 #ifdef _WIN32
     _splitpath(path, NULL, NULL, fname, NULL);
 #else
@@ -235,7 +243,7 @@ void windows_splitpath(char* path, char* drive, char* dir, char* fname, char* ex
 #endif
 }
 
-int _CrtDbgReport(int reportType, const char* filename, int linenumber, const char* moduleName, const char* format, ...) {
+int _CrtDbgReport_(int reportType, const char* filename, int linenumber, const char* moduleName, const char* format, ...) {
     printf("_CrtDbgReport: (TODO)\n");
     return 1;
 }

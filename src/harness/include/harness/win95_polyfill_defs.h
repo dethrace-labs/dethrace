@@ -64,15 +64,15 @@ typedef struct tagPOINT {
 } POINT, *PPOINT, *NPPOINT, *LPPOINT;
 
 #pragma pack(push, 1)
-typedef struct tagPALETTEENTRY {
+typedef struct tagPALETTEENTRY_ {
     BYTE peRed;
     BYTE peGreen;
     BYTE peBlue;
     BYTE peFlags;
-} PALETTEENTRY;
+} PALETTEENTRY_;
 #pragma pack(pop)
 
-typedef struct _WIN32_FIND_DATA {
+typedef struct _WIN32_FIND_DATA_ {
     // DWORD dwFileAttributes;
     // FILETIME ftCreationTime;
     // FILETIME ftLastAccessTime;
@@ -83,7 +83,7 @@ typedef struct _WIN32_FIND_DATA {
     // DWORD dwReserved1;
     char cFileName[1024];
     // char cAlternateFileName[14];
-} WIN32_FIND_DATAA;
+} WIN32_FIND_DATAA_;
 
 typedef struct tagMSG {
     HWND hwnd;

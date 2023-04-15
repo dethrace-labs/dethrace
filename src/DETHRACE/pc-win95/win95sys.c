@@ -70,7 +70,7 @@ int gWin32_action_replay_buffer_size;
 HWND gWin32_hwnd;
 int gWin32_lbutton_down;
 int gWin32_rbutton_down;
-PALETTEENTRY gWin32_palette[256];
+PALETTEENTRY_ gWin32_palette[256];
 br_diaghandler gWin32_br_diaghandler;
 int gWin32_window_has_focus = 1;
 int gNetwork_profile_file_exists = 0;
@@ -303,7 +303,7 @@ void Win32PumpMessages() {
     struct tagMSG msg; // [esp+Ch] [ebp-20h] BYREF
 
     PDUnlockRealBackScreen();
-    while ((!gWin32_window_has_focus || PeekMessageA(&msg, 0, 0, 0, 1u)) && (gWin32_window_has_focus || GetMessageA(&msg, 0, 0, 0) != -1)) {
+    while ((!gWin32_window_has_focus || PeekMessageA_(&msg, 0, 0, 0, 1u)) && (gWin32_window_has_focus || GetMessageA_(&msg, 0, 0, 0) != -1)) {
         if (msg.message == WM_QUIT) {
             dr_dprintf("WM_QUIT received.");
             if (gWin32_window_has_focus) {
@@ -314,8 +314,8 @@ void Win32PumpMessages() {
             }
             PDShutdownSystem();
         }
-        TranslateMessage(&msg);
-        DispatchMessageA(&msg);
+        TranslateMessage_(&msg);
+        DispatchMessageA_(&msg);
     }
     PDLockRealBackScreen();
 }
@@ -348,7 +348,7 @@ void PDInitialiseSystem() {
     gBack_screen = NULL;
     gScreen = NULL;
     Win32CreateWindow();
-    ShowCursor(0);
+    ShowCursor_(0);
     KeyBegin();
 
     // dethrace: demos do not ship with KEYBOARD.COK file
@@ -391,7 +391,7 @@ void Win32CreateWindow() {
     int height = 200;
     int width = 320;
     // WS_VISIBLE | WS_POPUP
-    gWin32_hwnd = CreateWindowExA(0, "CarmageddonClass", "Carmageddon", 0x90000000, 0, 0, width, height, 0, NULL, NULL, NULL);
+    gWin32_hwnd = CreateWindowExA_(0, "CarmageddonClass", "Carmageddon", 0x90000000, 0, 0, width, height, 0, NULL, NULL, NULL);
     SSDXGetWindowRect(gWin32_hwnd);
     // hdc = GetDC(gWin32_hwnd);
     // GetSystemPaletteEntries(hdc, 0, 256u, &gWin32_palette);
@@ -409,29 +409,29 @@ void PDShutdownSystem() {
         dr_dprintf("PDShutdownSystem()...");
         SSDXRelease();
         Win32ReleaseInputDevice();
-        ShowCursor(1);
+        ShowCursor_(1);
         if (gWin32_hwnd) {
             dr_dprintf("Resizing main window...");
-            SetWindowPos(gWin32_hwnd, 0, -100, -100, 64, 64, 0x414u);
+            SetWindowPos_(gWin32_hwnd, 0, -100, -100, 64, 64, 0x414u);
         }
         dr_dprintf("Servicing messages...");
         Win32PumpMessages();
         dr_dprintf("Sending WM_SHOWWINDOW broadcast message...");
-        SendMessageA(HWND_BROADCAST, 0x18u, 1u, 0);
+        SendMessageA_(HWND_BROADCAST, 0x18u, 1u, 0);
         if (gWin32_show_fatal_error_message) {
             dr_dprintf("Displaying fatal error...");
-            MessageBoxA(0, gWin32_fatal_error_message, "Carmageddon Fatal Error", 0x10u);
+            MessageBoxA_(0, gWin32_fatal_error_message, "Carmageddon Fatal Error", 0x10u);
         }
         if (gWin32_hwnd) {
             dr_dprintf("Destroying window...");
-            DestroyWindow(gWin32_hwnd);
+            DestroyWindow_(gWin32_hwnd);
             gWin32_hwnd = 0;
         }
         dr_dprintf("End of PDShutdownSystem().");
         CloseDiagnostics();
-        ExitProcess(gWin32_fatal_error_exit_code);
+        ExitProcess_(gWin32_fatal_error_exit_code);
     }
-    ExitProcess(8u);
+    ExitProcess_(8u);
 }
 
 void PDSaveOriginalPalette() {
@@ -458,7 +458,7 @@ void PDInitScreen() {
 
 void Win32InitScreen() {
     // SWP_NOSENDCHANGING | SWP_NOACTIVATE | SWP_NOZORDER
-    SetWindowPos(gWin32_hwnd, 0, 0, 0, gGraf_specs[gReal_graf_data_index].total_width, gGraf_specs[gReal_graf_data_index].total_height, 0x414u);
+    SetWindowPos_(gWin32_hwnd, 0, 0, 0, gGraf_specs[gReal_graf_data_index].total_width, gGraf_specs[gReal_graf_data_index].total_height, 0x414u);
     // get_window_rect(gWin32_hwnd);
     Win32PumpMessages();
 }
@@ -650,31 +650,31 @@ void PDSetFileVariables() {
 }
 
 void PDBuildAppPath(char* pThe_path) {
-    GetCurrentDirectoryA(253, pThe_path);
+    GetCurrentDirectoryA_(253, pThe_path);
     // GetShortPathNameA(pThe_path, pThe_path, 253);
     strcat(pThe_path, "/"); // original: strcat(pThe_path, "\\")
     dr_dprintf("Application path '%s'", pThe_path);
 }
 
 void PDForEveryFile(char* pThe_path, void (*pAction_routine)(char*)) {
-    char found_path[256];       // [esp+Ch] [ebp-448h] BYREF
-    WIN32_FIND_DATAA find_data; // [esp+10Ch] [ebp-348h] BYREF
-    HANDLE hFindFile;           // [esp+24Ch] [ebp-208h]
-    char file_filter[256];      // [esp+250h] [ebp-204h] BYREF
-    char current_dir[260];      // [esp+350h] [ebp-104h] BYREF
+    char found_path[256];        // [esp+Ch] [ebp-448h] BYREF
+    WIN32_FIND_DATAA_ find_data; // [esp+10Ch] [ebp-348h] BYREF
+    HANDLE hFindFile;            // [esp+24Ch] [ebp-208h]
+    char file_filter[256];       // [esp+250h] [ebp-204h] BYREF
+    char current_dir[260];       // [esp+350h] [ebp-104h] BYREF
 
-    GetCurrentDirectoryA(sizeof(current_dir), current_dir);
-    if (SetCurrentDirectoryA(pThe_path)) {
+    GetCurrentDirectoryA_(sizeof(current_dir), current_dir);
+    if (SetCurrentDirectoryA_(pThe_path)) {
         strcpy(file_filter, "*.???");
-        hFindFile = FindFirstFileA(file_filter, &find_data);
+        hFindFile = FindFirstFileA_(file_filter, &find_data);
         if (hFindFile != INVALID_HANDLE_VALUE) {
             do {
                 PathCat(found_path, pThe_path, find_data.cFileName);
                 pAction_routine(found_path);
-            } while (FindNextFileA(hFindFile, &find_data));
-            FindClose(hFindFile);
+            } while (FindNextFileA_(hFindFile, &find_data));
+            FindClose_(hFindFile);
         }
-        SetCurrentDirectoryA(current_dir);
+        SetCurrentDirectoryA_(current_dir);
     }
 }
 
@@ -725,14 +725,14 @@ void PDGetMousePosition(int* pX_coord, int* pY_coord) {
     POINT p;
     LOG_TRACE("(%p, %p)", pX_coord, pY_coord);
 
-    GetCursorPos(&p);
-    ScreenToClient(gWin32_hwnd, &p);
+    GetCursorPos_(&p);
+    ScreenToClient_(gWin32_hwnd, &p);
     *pX_coord = p.x;
     *pY_coord = p.y;
 }
 
 int PDGetTotalTime() {
-    return timeGetTime();
+    return timeGetTime_();
 }
 
 int PDServiceSystem(tU32 pTime_since_last_call) {
@@ -756,7 +756,7 @@ void Win32AllocateActionReplayBuffer() {
     }
     gWin32_action_replay_buffer_allocated = 1;
     mem_status.dwLength = sizeof(mem_status);
-    GlobalMemoryStatus(&mem_status);
+    GlobalMemoryStatus_(&mem_status);
     dr_dprintf(
         "Win32AllocateActionReplayBuffer(): Memory Status BEFORE Action Replay Allocation:\n"
         "             dwLength        %u\n"
@@ -810,12 +810,12 @@ void Win32AllocateActionReplayBuffer() {
     gWin32_action_replay_buffer = buf;
     if (buf) {
         gWin32_action_replay_buffer_size = buf_size;
-        Sleep(1000u);
+        Sleep_(1000u);
     } else {
         gWin32_action_replay_buffer_size = 0;
     }
     dr_dprintf("Win32AllocateActionReplayBuffer(): Actually allocated %d bytes.", buf_size);
-    GlobalMemoryStatus(&mem_status);
+    GlobalMemoryStatus_(&mem_status);
     dr_dprintf(
         "Win32AllocateActionReplayBuffer(): Memory Status AFTER Action Replay Allocation:\n"
         "             dwLength        %u\n"
@@ -852,7 +852,7 @@ void PDDisposeActionReplayBuffer(char* pBuffer) {
 void Usage(char* pProgpath) {
     char base_name[256]; // fix: changed from 9 to avoid overflow on longer filenames
 
-    windows_splitpath(pProgpath, NULL, NULL, base_name, NULL);
+    _splitpath_(pProgpath, NULL, NULL, base_name, NULL);
 
     fprintf(stderr,
         "Usage: %s [%s] [%s YonFactor] [%s CarSimplificationLevel] [%s SoundDetailLevel] [%s] [%s] [%s] [%s] [%s] [%s]\nWhere YonFactor is between 0 and 1,\nCarSimplificationLevel is a whole number between 0 and %d,\nand SoundDetailLevel is a whole number.\n",
@@ -878,7 +878,6 @@ int original_main(int pArgc, char** pArgv) {
     float f;
 
     for (i = 1; i < pArgc; i++) {
-        printf("arg %s\n", pArgv[i]);
         if (strcasecmp(pArgv[i], "-hires") == 0) {
             gGraf_spec_index = 1;
         } else if (strcasecmp(pArgv[i], "-yon") == 0 && i < pArgc - 1) {
@@ -916,7 +915,7 @@ int original_main(int pArgc, char** pArgv) {
     }
 
     gNetwork_profile_fname[0] = 0;
-    DWORD len = GetCurrentDirectoryA(240, gNetwork_profile_fname);
+    DWORD len = GetCurrentDirectoryA_(240, gNetwork_profile_fname);
     if (len > 0 && len == strlen(gNetwork_profile_fname)) {
         gNetwork_profile_file_exists = 1;
         strcat(gNetwork_profile_fname, "/");
@@ -938,17 +937,17 @@ void PDEnterDebugger(char* pStr) {
     LOG_TRACE("(\"%s\")", pStr);
 
     dr_dprintf("PDEnterDebugger(): %s", pStr);
-    ShowCursor(1);
+    ShowCursor_(1);
 #ifdef DETHRACE_FIX_BUGS
     if (strcmp(pStr, "Bet you weren't expecting this") != 0
 #else
     if (pStr != "Bet you weren't expecting this"
 #endif
-        && _CrtDbgReport(_CRT_ASSERT, "C:\\Msdev\\Projects\\DethRace\\Win95sys.c", 437, 0, 0) == 1) {
+        && _CrtDbgReport_(_CRT_ASSERT, "C:\\Msdev\\Projects\\DethRace\\Win95sys.c", 437, 0, 0) == 1) {
 
         abort(); // original: __debugbreak();
     }
-    ShowCursor(0);
+    ShowCursor_(0);
 }
 
 // Added function
@@ -1081,8 +1080,8 @@ int PDFileUnlock(char* pThe_path) {
     DWORD dwFileAttributes; // [esp+Ch] [ebp-4h]
     LOG_TRACE("(\"%s\")", pThe_path);
 
-    dwFileAttributes = GetFileAttributesA(pThe_path);
-    return dwFileAttributes != INVALID_FILE_ATTRIBUTES && SetFileAttributesA(pThe_path, dwFileAttributes & ~FILE_ATTRIBUTE_READONLY);
+    dwFileAttributes = GetFileAttributesA_(pThe_path);
+    return dwFileAttributes != INVALID_FILE_ATTRIBUTES && SetFileAttributesA_(pThe_path, dwFileAttributes & ~FILE_ATTRIBUTE_READONLY);
 }
 
 int PDCheckDriveExists2(char* pThe_path, char* pFile_name, tU32 pMin_size) {
@@ -1101,13 +1100,13 @@ int PDCheckDriveExists2(char* pThe_path, char* pFile_name, tU32 pMin_size) {
     if (the_path[0] && the_path[1] == ':' && !the_path[2]) {
         strcat(the_path, gDir_separator);
     }
-    if (GetFileAttributesA(pThe_path) == INVALID_FILE_ATTRIBUTES) {
+    if (GetFileAttributesA_(pThe_path) == INVALID_FILE_ATTRIBUTES) {
         return 0;
     }
-    hFile = CreateFileA(the_path, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+    hFile = CreateFileA_(the_path, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
     if (hFile != INVALID_HANDLE_VALUE) {
-        file_size = GetFileSize(hFile, 0);
-        CloseHandle(hFile);
+        file_size = GetFileSize_(hFile, 0);
+        CloseHandle_(hFile);
     }
     return file_size >= pMin_size;
 }

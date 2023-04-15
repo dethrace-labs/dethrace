@@ -33,7 +33,7 @@ typedef struct tHarness_platform {
     // Pull contents of frame and depth buffers from video into main memory for software effects
     void (*Renderer_FlushBuffers)();
     // Set the 256 color palette to use (BGRA format)
-    void (*Renderer_SetPalette)(PALETTEENTRY* palette);
+    void (*Renderer_SetPalette)(PALETTEENTRY_* palette);
     // Set the viewport for 3d rendering
     void (*Renderer_SetViewport)(int x, int y, int width, int height);
     // Create a window. Return a handle to the window

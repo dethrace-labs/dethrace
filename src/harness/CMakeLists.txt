@@ -62,7 +62,6 @@ target_sources(harness PRIVATE
     sound/sound.c
     sound/sound.h
     win95/polyfill.c
-    win95/real_windows_funcs.c
     platforms/null.h
     
     "${CMAKE_CURRENT_BINARY_DIR}/version.h"

@@ -13,6 +13,6 @@ void SSDXLockAttachedSurface();
 void SSDXGetWindowRect(HWND hWnd);
 void SSDXHandleError(int error);
 
-void SSDXSetPaleeteEntries(PALETTEENTRY* palette, int pFirst_color, int pCount);
+void SSDXSetPaleeteEntries(PALETTEENTRY_* palette, int pFirst_color, int pCount);
 
 #endif

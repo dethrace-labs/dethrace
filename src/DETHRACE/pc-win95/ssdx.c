@@ -59,6 +59,6 @@ void SSDXHandleError(int error) {
     // no-op
 }
 
-void SSDXSetPaleeteEntries(PALETTEENTRY* palette, int pFirst_color, int pCount) {
+void SSDXSetPaleeteEntries(PALETTEENTRY_* palette, int pFirst_color, int pCount) {
     DirectDrawDevice_SetPaletteEntries(palette, pFirst_color, pCount);
 }
