@@ -21,7 +21,7 @@ typedef struct tHarness_platform {
     // Render a fullscreen quad using the specified pixel data
     void (*Renderer_FullScreenQuad)(uint8_t* src);
     // Render a model
-    void (*Renderer_Model)(br_actor* actor, br_model* model, br_material* material, br_matrix34 model_matrix, br_token render_type);
+    void (*Renderer_Model)(br_actor* actor, br_model* model, br_material* material, br_token render_type, br_matrix34 model_matrix);
     // Clear frame and depth buffers
     void (*Renderer_ClearBuffers)();
     // Load pixelmap into video memory

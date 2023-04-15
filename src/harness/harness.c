@@ -342,7 +342,7 @@ int Harness_CalculateFrameDelay() {
 }
 
 void Harness_Hook_renderActor(br_actor* actor, br_model* model, br_material* material, br_token type) {
-    gHarness_platform.Renderer_Model(actor, model, material, renderer_state->state.matrix.model_to_view, type);
+    gHarness_platform.Renderer_Model(actor, model, material, type, renderer_state->state.matrix.model_to_view);
 }
 
 // Called by game to swap buffers at end of frame rendering

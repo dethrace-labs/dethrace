@@ -80,7 +80,7 @@ void DirectDrawDevice_SetPaletteEntries(PALETTEENTRY* palette, int pFirst_colour
 void DirectInputDevice_GetDeviceState(unsigned int keys, uint8_t* buffer);
 
 // renamed from _splitpath to avoid conflict with stdlib
-void windows_splitpath(const char* path, char* drive, char* dir, char* fname, char* ext);
+void windows_splitpath(char* path, char* drive, char* dir, char* fname, char* ext);
 
 int _CrtDbgReport(int reportType, const char* filename, int linenumber, const char* moduleName, const char* format, ...);
 

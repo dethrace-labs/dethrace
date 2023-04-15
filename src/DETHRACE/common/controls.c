@@ -1159,7 +1159,6 @@ void CheckToggles(int pRacing) {
             && ((!gTyping && !gEntering_message) || gToggle_array[i].key2 != -2)) {
             new_state = 0;
             if (gToggle_array[i].key1 == -2 || KeyIsDown(gToggle_array[i].key1)) {
-                LOG_INFO("key is down for %d", i);
                 if (gToggle_array[i].key2 == -2 && gToggle_array[i].exact_modifiers) {
                     if (!PDKeyDown(KEY_SHIFT_ANY) && !PDKeyDown(KEY_ALT_ANY) && !PDKeyDown(KEY_CTRL_ANY) && !PDKeyDown(KEY_CTRL_ANY_2)) {
                         new_state = 1;
@@ -1167,7 +1166,6 @@ void CheckToggles(int pRacing) {
                 } else {
 
                     int keymap = gKey_mapping[gToggle_array[i].key2];
-                    LOG_INFO("key down? %d. mapped to %d", KeyIsDown(gToggle_array[i].key2), keymap);
                     if (KeyIsDown(gToggle_array[i].key2)) {
                         new_state = 1;
                     }
