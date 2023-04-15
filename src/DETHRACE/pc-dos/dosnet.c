@@ -356,7 +356,8 @@ void PDNetObtainSystemUserName(char* pName, int pMax_length) {
 #endif
 
     dr_dprintf("PDNetObtainSystemUserName()\n");
-#ifdef 0 // todo
+    // todo
+#ifdef 0
     size = COUNT_OF(buffer);
     result = GetComputerNameA(buffer, &size);
     if (result == 0) {
