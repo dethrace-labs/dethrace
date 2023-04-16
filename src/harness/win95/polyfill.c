@@ -22,7 +22,6 @@
 #include <unistd.h>
 #endif
 
-
 uint32_t GetFileAttributesA_(char* lpFileName) {
 
     FILE* f = fopen(lpFileName, "r");
@@ -84,7 +83,7 @@ int GetCursorPos_(POINT_* lpPoint) {
     return 0;
 }
 
-int ScreenToClient_(void * hWnd, POINT_* lpPoint) {
+int ScreenToClient_(void* hWnd, POINT_* lpPoint) {
     // no-op, we assume the point is already relative to client
     return 0;
 }
@@ -126,13 +125,13 @@ void* FindFirstFileA_(char* lpFileName, WIN32_FIND_DATAA_* lpFindFileData) {
     strcpy(lpFileName, ".");
     dir = opendir(lpFileName);
     if (dir == NULL) {
-        return INVALID_void*_VALUE;
+        return INVALID_HANDLE_VALUE;
     }
     if (FindNextFileA_(dir, lpFindFileData)) {
         return dir;
     } else {
         closedir(dir);
-        return INVALID_void*_VALUE;
+        return INVALID_HANDLE_VALUE;
     }
 #endif
 }
@@ -174,7 +173,7 @@ void* CreateWindowExA_(uint32_t dwExStyle, char* lpClassName, char* lpWindowName
     return gHarness_platform.CreateWindow(lpWindowName, X, Y, nWidth, nHeight);
 }
 
-int SetWindowPos_(void * hWnd, void * hWndInsertAfter, int X, int Y, int cx, int cy, unsigned int uFlags) {
+int SetWindowPos_(void* hWnd, void* hWndInsertAfter, int X, int Y, int cx, int cy, unsigned int uFlags) {
     return gHarness_platform.SetWindowPos(hWnd, X, Y, cx, cy);
 }
 
@@ -183,15 +182,15 @@ int ShowCursor_(int bShow) {
     return 0;
 }
 
-int SendMessageA_(void * hWnd, unsigned int Msg, unsigned int wParam, long lParam) {
+int SendMessageA_(void* hWnd, unsigned int Msg, unsigned int wParam, long lParam) {
     return 0;
 }
 
-int MessageBoxA_(void * hWnd, char* lpText, char* lpCaption, unsigned int uType) {
+int MessageBoxA_(void* hWnd, char* lpText, char* lpCaption, unsigned int uType) {
     return 0;
 }
 
-int DestroyWindow_(void * hWnd) {
+int DestroyWindow_(void* hWnd) {
     gHarness_platform.DestroyWindow(hWnd);
     return 0;
 }
@@ -208,11 +207,11 @@ void DispatchMessageA_(MSG_* lpMsg) {
     // no-op
 }
 
-int PeekMessageA_(MSG_* lpMsg, void * hWnd, unsigned int wMsgFilterMin, unsigned int wMsgFilterMax, unsigned int wRemoveMsg) {
+int PeekMessageA_(MSG_* lpMsg, void* hWnd, unsigned int wMsgFilterMin, unsigned int wMsgFilterMax, unsigned int wRemoveMsg) {
     return gHarness_platform.GetMessage(lpMsg);
 }
 
-int GetMessageA_(MSG_* lpMsg, void * hWnd, unsigned int wMsgFilterMin, unsigned int wMsgFilterMax) {
+int GetMessageA_(MSG_* lpMsg, void* hWnd, unsigned int wMsgFilterMin, unsigned int wMsgFilterMax) {
     return gHarness_platform.GetMessage(lpMsg);
 }
 
