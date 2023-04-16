@@ -23,6 +23,8 @@
 #define BR_COLOUR_RGB(r, g, b) \
     ((((unsigned int)(r)) << 16) | (((unsigned int)(g)) << 8) | ((unsigned int)(b)))
 
+#define BR_ALPHA(c) (((c) >> 24) & 0xFF)
+
 #define BR_ANGLE_DEG(deg) ((br_angle)((deg)*182))
 #define BR_ANGLE_RAD(rad) ((br_angle)((rad)*10430))
 
