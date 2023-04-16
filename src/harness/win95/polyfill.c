@@ -20,6 +20,8 @@
 #include <unistd.h>
 #endif
 
+// All functions have a "_" suffix to avoid collisions with <windows.h>-defined types
+
 uint32_t GetFileAttributesA_(char* lpFileName) {
 
     FILE* f = fopen(lpFileName, "r");
@@ -108,7 +110,7 @@ int SetCurrentDirectoryA_(char* lpPathName) {
     }
 }
 
-void* FindFirstFileA_(char* lpFileName, WIN32_FIND_DATAA_* lpFindFileData) {
+HANDLE_ FindFirstFileA_(char* lpFileName, WIN32_FIND_DATAA_* lpFindFileData) {
     assert(strcmp(lpFileName, "*.???") == 0);
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -134,7 +136,7 @@ void* FindFirstFileA_(char* lpFileName, WIN32_FIND_DATAA_* lpFindFileData) {
 #endif
 }
 
-int FindNextFileA_(void* hFindFile, WIN32_FIND_DATAA_* lpFindFileData) {
+int FindNextFileA_(HANDLE_ hFindFile, WIN32_FIND_DATAA_* lpFindFileData) {
 #if defined(_WIN32) || defined(_WIN64)
     WIN32_FIND_DATA fd;
     int result = FindNextFile(hFindFile, &fd);
@@ -158,7 +160,7 @@ int FindNextFileA_(void* hFindFile, WIN32_FIND_DATAA_* lpFindFileData) {
 #endif
 }
 
-int FindClose_(void* hFindFile) {
+int FindClose_(HANDLE_ hFindFile) {
 #if defined(_WIN32) || defined(_WIN64)
     return FindClose(hFindFile);
 #else

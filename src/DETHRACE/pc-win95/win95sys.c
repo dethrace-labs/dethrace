@@ -300,7 +300,7 @@ int PDGetASCIIFromKey(int pKey) {
 }
 
 void Win32PumpMessages() {
-     MSG_ msg; // [esp+Ch] [ebp-20h] BYREF
+    MSG_ msg; // [esp+Ch] [ebp-20h] BYREF
 
     PDUnlockRealBackScreen();
     while ((!gWin32_window_has_focus || PeekMessageA_(&msg, 0, 0, 0, 1u)) && (gWin32_window_has_focus || GetMessageA_(&msg, 0, 0, 0) != -1)) {
@@ -659,7 +659,7 @@ void PDBuildAppPath(char* pThe_path) {
 void PDForEveryFile(char* pThe_path, void (*pAction_routine)(char*)) {
     char found_path[256];        // [esp+Ch] [ebp-448h] BYREF
     WIN32_FIND_DATAA_ find_data; // [esp+10Ch] [ebp-348h] BYREF
-    HANDLE hFindFile;            // [esp+24Ch] [ebp-208h]
+    HANDLE_ hFindFile;           // [esp+24Ch] [ebp-208h]
     char file_filter[256];       // [esp+250h] [ebp-204h] BYREF
     char current_dir[260];       // [esp+350h] [ebp-104h] BYREF
 
@@ -747,8 +747,8 @@ void Win32InitInputDevice() {
 
 void Win32AllocateActionReplayBuffer() {
     MEMORYSTATUS_ mem_status; // [esp+Ch] [ebp-28h] BYREF
-    size_t buf_size;                 // [esp+2Ch] [ebp-8h]
-    void* buf;                       // [esp+30h] [ebp-4h]
+    size_t buf_size;          // [esp+2Ch] [ebp-8h]
+    void* buf;                // [esp+30h] [ebp-4h]
 
     buf = 0;
     if (gWin32_action_replay_buffer_allocated) {
@@ -915,7 +915,7 @@ int original_main(int pArgc, char** pArgv) {
     }
 
     gNetwork_profile_fname[0] = 0;
-    DWORD len = GetCurrentDirectoryA_(240, gNetwork_profile_fname);
+    uint32_t len = GetCurrentDirectoryA_(240, gNetwork_profile_fname);
     if (len > 0 && len == strlen(gNetwork_profile_fname)) {
         gNetwork_profile_file_exists = 1;
         strcat(gNetwork_profile_fname, "/");
@@ -1077,7 +1077,7 @@ int PDGetJoy2Button4() {
 }
 
 int PDFileUnlock(char* pThe_path) {
-    DWORD dwFileAttributes; // [esp+Ch] [ebp-4h]
+    uint32_t dwFileAttributes; // [esp+Ch] [ebp-4h]
     LOG_TRACE("(\"%s\")", pThe_path);
 
     dwFileAttributes = GetFileAttributesA_(pThe_path);
@@ -1088,7 +1088,7 @@ int PDCheckDriveExists2(char* pThe_path, char* pFile_name, tU32 pMin_size) {
 
     char the_path[256]; // [esp+Ch] [ebp-108h] BYREF
     tU32 file_size;     // [esp+10Ch] [ebp-8h]
-    HANDLE hFile;       // [esp+110h] [ebp-4h]
+    HANDLE_ hFile;      // [esp+110h] [ebp-4h]
     LOG_TRACE("(\"%s\", \"%s\", %d)", pThe_path, pFile_name, pMin_size);
 
     file_size = 0;

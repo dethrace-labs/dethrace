@@ -4,10 +4,12 @@
 #include <stddef.h>
 #include <stdint.h>
 
+typedef void* HANDLE_;
+
 #define GENERIC_READ 0x80000000
 #define OPEN_EXISTING 3
 #define FILE_ATTRIBUTE_NORMAL 0x80
-#define INVALID_HANDLE_VALUE ((void*)-1)
+#define INVALID_HANDLE_VALUE ((HANDLE_*)-1)
 #define INVALID_FILE_ATTRIBUTES -1
 
 #define FILE_ATTRIBUTE_READONLY 0x01

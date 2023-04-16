@@ -96,13 +96,14 @@ void* create_window_and_renderer(char* title, int x, int y, int width, int heigh
     return window;
 }
 
-void set_window_pos(void* hWnd, int x, int y, int nWidth, int nHeight) {
+int set_window_pos(void* hWnd, int x, int y, int nWidth, int nHeight) {
     // SDL_SetWindowPosition(hWnd, x, y);
     if (nWidth == 320 && nHeight == 200) {
         nWidth = 640;
         nHeight = 400;
     }
     SDL_SetWindowSize(hWnd, nWidth, nHeight);
+    return 0;
 }
 
 void destroy_window(void* hWnd) {
@@ -178,13 +179,14 @@ void get_keyboard_state(unsigned int count, uint8_t* buffer) {
     memcpy(buffer, directinput_key_state, count);
 }
 
-void get_mouse_buttons(int* pButton1, int* pButton2) {
+int get_mouse_buttons(int* pButton1, int* pButton2) {
     int state = SDL_GetMouseState(NULL, NULL);
     *pButton1 = state & SDL_BUTTON_LMASK;
     *pButton2 = state & SDL_BUTTON_RMASK;
+    return 0;
 }
 
-void get_mouse_position(int* pX, int* pY) {
+int get_mouse_position(int* pX, int* pY) {
     SDL_GetMouseState(pX, pY);
 
     if (*pX < vp_x) {
@@ -210,6 +212,11 @@ void get_mouse_position(int* pX, int* pY) {
     *pY *= gGraf_specs[gGraf_data_index].phys_height;
     *pY /= gGraf_specs[gReal_graf_data_index].phys_height;
 #endif
+    return 0;
+}
+
+void set_palette(PALETTEENTRY_* pal) {
+    GLRenderer_SetPalette((uint8_t*)pal);
 }
 
 void Harness_Platform_Init(tHarness_platform* platform) {
@@ -229,7 +236,7 @@ void Harness_Platform_Init(tHarness_platform* platform) {
     platform->Renderer_BufferModel = GLRenderer_BufferModel;
     platform->Renderer_BufferMaterial = GLRenderer_BufferMaterial;
     platform->Renderer_BufferTexture = GLRenderer_BufferTexture;
-    platform->Renderer_SetPalette = GLRenderer_SetPalette;
+    platform->Renderer_SetPalette = set_palette;
     platform->Renderer_FullScreenQuad = GLRenderer_FullScreenQuad;
     platform->Renderer_Model = GLRenderer_Model;
     platform->Renderer_ClearBuffers = GLRenderer_ClearBuffers;

@@ -9,14 +9,14 @@ void* null_create_window_and_renderer(char* title, int x, int y, int width, int 
     return 0;
 }
 
-void null_set_window_pos(void* hWnd, int x, int y, int nWidth, int nHeight) {
+int null_set_window_pos(void* hWnd, int x, int y, int nWidth, int nHeight) {
+    return 0;
 }
 
 void null_destroy_window(void* hWnd) {
 }
 
 int null_get_and_handle_message(MSG_* msg) {
-
     return 0;
 }
 
@@ -26,13 +26,16 @@ void null_swap_window() {
 void null_get_keyboard_state(unsigned int count, uint8_t* buffer) {
 }
 
-void null_get_mouse_buttons(int* pButton1, int* pButton2) {
+int null_get_mouse_buttons(int* pButton1, int* pButton2) {
+    return 0;
 }
 
-void null_get_mouse_position(int* pX, int* pY) {
+int null_get_mouse_position(int* pX, int* pY) {
+    return 0;
 }
 
-void null_show_cursor(int show) {
+int null_show_cursor(int show) {
+    return 0;
 }
 
 void NullRenderer_Init() {}
