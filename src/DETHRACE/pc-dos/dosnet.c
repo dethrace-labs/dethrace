@@ -349,7 +349,7 @@ tPlayer_ID PDNetExtractPlayerID(tNet_game_details* pDetails) {
 // IDA: void __usercall PDNetObtainSystemUserName(char *pName@<EAX>, int pMax_length@<EDX>)
 void PDNetObtainSystemUserName(char* pName, int pMax_length) {
 #ifdef _WIN32
-    DWORD size;
+    uint32_t size;
     char buffer[16];
     int result;
 
