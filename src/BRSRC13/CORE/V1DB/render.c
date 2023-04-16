@@ -323,7 +323,6 @@ void BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour
     // LOG_TRACE("(%p, %p, %p, %p)", world, camera, colour_buffer, depth_buffer);
 
     BrDbSceneRenderBegin(world, camera);
-    // Harness_Hook_BrZbSceneRenderBegin(world, camera, colour_buffer, depth_buffer);
     gHarness_platform.Renderer_BeginScene(camera, colour_buffer, depth_buffer);
 }
 

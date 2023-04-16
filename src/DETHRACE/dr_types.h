@@ -12,7 +12,7 @@
 #include <stdio.h>
 
 #ifdef _WIN32
-#include <Windows.h>
+#include <windows.h>
 #else
 typedef short SHORT;
 typedef unsigned short USHORT;
@@ -22,7 +22,7 @@ typedef unsigned int UINT;
 typedef unsigned char BYTE;
 typedef unsigned short WORD;
 typedef long LONG;
-typedef uint32_t DWORD;
+typedef unsigned long DWORD;
 typedef BYTE* PBYTE;
 typedef char* PSTR;
 typedef WORD* PWORD;
@@ -38,7 +38,7 @@ typedef BYTE* HPBYTE;
 typedef BYTE* HPSTR;
 typedef LONG* HPLONG;
 typedef void* HPVOID;
-typedef void* HANDLE;
+typedef unsigned int HANDLE;
 #endif
 typedef unsigned int W32;
 typedef unsigned short W16;

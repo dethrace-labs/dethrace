@@ -1164,8 +1164,6 @@ void CheckToggles(int pRacing) {
                         new_state = 1;
                     }
                 } else {
-
-                    int keymap = gKey_mapping[gToggle_array[i].key2];
                     if (KeyIsDown(gToggle_array[i].key2)) {
                         new_state = 1;
                     }

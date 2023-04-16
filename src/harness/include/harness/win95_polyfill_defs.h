@@ -3,33 +3,6 @@
 
 #include <stddef.h>
 #include <stdint.h>
-/*
-typedef short SHORT;
-typedef unsigned short USHORT;
-typedef int INT;
-typedef int BOOL;
-typedef unsigned int UINT;
-typedef unsigned char BYTE;
-typedef unsigned short WORD;
-typedef long LONG;
-typedef uint32_t uint32_t;
-typedef BYTE* PBYTE;
-typedef char* PSTR;
-typedef WORD* PWORD;
-typedef unsigned short* PSHORT;
-typedef LONG* PLONG;
-typedef void* PVOID;
-typedef BYTE* LPBYTE;
-typedef BYTE* LPSTR;
-typedef WORD* LPWORD;
-typedef LONG* LPLONG;
-typedef void* LPVOID;
-typedef BYTE* HPBYTE;
-typedef BYTE* HPSTR;
-typedef LONG* HPLONG;
-typedef void* HPVOID;
-typedef void* void*;
-*/
 
 #define GENERIC_READ 0x80000000
 #define OPEN_EXISTING 3

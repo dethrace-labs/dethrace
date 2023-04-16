@@ -31,8 +31,6 @@ if(NOT MSVC)
         -Wall
         -Wextra
         -Wno-unused-parameter
-        -Wno-incompatible-function-pointer-types
-        -Wno-incompatible-pointer-types
     )
 else()
     target_compile_definitions(harness PRIVATE -D_CRT_SECURE_NO_WARNINGS)

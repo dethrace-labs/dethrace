@@ -12,7 +12,6 @@
 #include <string.h>
 #include <sys/stat.h>
 
-// tRenderer* renderer;
 br_pixelmap* palette;
 uint32_t* screen_buffer;
 harness_br_renderer* renderer_state;
@@ -371,8 +370,4 @@ void Harness_RenderLastScreen() {
 // Filesystem hooks
 FILE* Harness_Hook_fopen(const char* pathname, const char* mode) {
     return OS_fopen(pathname, mode);
-}
-
-void IOPlatform_missing_hook() {
-    NOT_IMPLEMENTED();
 }
