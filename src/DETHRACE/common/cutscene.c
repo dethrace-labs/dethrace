@@ -11,7 +11,7 @@
 #include "input.h"
 #include "loading.h"
 #include "pd/sys.h"
-#include "smacker.h"
+#include "smackw32/smack.h"
 #include "sound.h"
 #include "utility.h"
 #include <stdlib.h>
@@ -59,20 +59,12 @@ void PlaySmackerFile(char* pSmack_name) {
     tPath_name the_path;
     br_colour* br_colours_ptr;
     tU8* smack_colours_ptr;
-    // Smack* smk;
+    Smack* smk;
     int i;
     int j;
     int len;
     int fuck_off;
-
     LOG_TRACE("(\"%s\")", pSmack_name);
-
-    smk s;
-    br_uint_8* dest_pix = (br_uint_8*)gBack_screen->pixels;
-    unsigned long w, h, f;
-    unsigned char r, g, b;
-    double usf;
-    struct timespec ts;
 
     if (!gSound_override && !gCut_scene_override) {
         StopMusic();
@@ -83,8 +75,8 @@ void PlaySmackerFile(char* pSmack_name) {
         PathCat(the_path, the_path, pSmack_name);
 
         dr_dprintf("Trying to open smack file '%s'", the_path);
-        s = smk_open_file(the_path, SMK_MODE_MEMORY);
-        if (s == NULL) {
+        smk = SmackOpen(the_path, 0xfe000, -1);
+        if (smk == NULL) {
             dr_dprintf("Unable to open smack file - attempt to load smack from CD...");
             if (GetCDPathFromPathsTxtFile(the_path)) {
                 strcat(the_path, gDir_separator);
@@ -92,57 +84,50 @@ void PlaySmackerFile(char* pSmack_name) {
                 PathCat(the_path, the_path, "CUTSCENE");
                 PathCat(the_path, the_path, pSmack_name);
                 if (PDCheckDriveExists(the_path)) {
-                    s = smk_open_file(the_path, SMK_MODE_MEMORY);
+                    smk = SmackOpen(the_path, 0xfe000, -1);
                 }
             } else {
                 dr_dprintf("Can't get CD directory name");
             }
         }
-        if (s != NULL) {
+        if (smk != NULL) {
             dr_dprintf("Smack file opened OK");
-            smk_info_all(s, NULL, &f, &usf);
-            smk_info_video(s, &w, &h, NULL);
-            double fps = 1000000.0 / usf;
-            int delay_ms = (1 / fps) * 1000;
+            smk->NewPalette = 1;
+            for (i = 1; i <= smk->Frames; i++) {
+                SmackToBuffer(smk, 0, 0, gBack_screen->row_bytes, gBack_screen->height, gBack_screen->pixels, 0);
 
-            smk_enable_video(s, 1);
-
-            smk_first(s);
-            do {
-                const unsigned char* pal = smk_get_palette(s);
-                for (i = 0; i < 256; i++) {
-                    r = pal[(i * 3)];
-                    g = pal[(i * 3) + 1];
-                    b = pal[(i * 3) + 2];
-                    br_colours_ptr[i] = b | (g << 8) | (r << 16);
-                }
-                DRSetPalette(gCurrent_palette);
-                EnsurePaletteUp();
-
-                const unsigned char* frame = smk_get_video(s);
-                for (i = 0; i < h; i++) {
-                    for (j = 0; j < w; j++) {
-                        dest_pix[(i * gBack_screen->row_bytes) + j] = frame[i * w + j];
+                if (smk->NewPalette) {
+                    smack_colours_ptr = smk->Palette;
+                    for (j = 0; j < 256; j++) {
+                        br_colours_ptr[j] = (smack_colours_ptr[j * 3] << 16) | smack_colours_ptr[j * 3 + 2] | (smack_colours_ptr[j * 3 + 1] << 8);
                     }
+
+                    // TOOD: remove the commented-out line below when smk->NewPalette is set correctly per-frame
+                    // memset(gBack_screen->pixels, 0, gBack_screen->row_bytes * gBack_screen->height);
+                    DRSetPalette(gCurrent_palette);
+                    PDScreenBufferSwap(0);
+                    EnsurePaletteUp();
+                }
+
+                SmackDoFrame(smk);
+                if (i != smk->Frames) {
+                    SmackNextFrame(smk);
                 }
                 PDScreenBufferSwap(0);
-
-                if (AnyKeyDown() || EitherMouseButtonDown()) {
+                do {
+                    fuck_off = AnyKeyDown() || EitherMouseButtonDown();
+                } while (!fuck_off && SmackWait(smk));
+                if (fuck_off) {
                     break;
                 }
-                // wait until its time for the next frame
-                OS_Sleep(delay_ms);
-            } while (smk_next(s) == SMK_MORE);
-
-            smk_close(s);
-
+            }
             FadePaletteDown();
             ClearEntireScreen();
-            StartMusic();
+            SmackClose(smk);
         } else {
             dr_dprintf("Smack file '%s' failed to open", pSmack_name);
-            StartMusic();
         }
+        StartMusic();
     }
 }
 

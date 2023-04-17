@@ -40,17 +40,17 @@
 
 // BOOL hmiIPXPostListen(_IPX_ECB* pECB_ptr, tU32 pOffset);
 
-// BOOL hmiIPXGetData(PSTR pData, tU32 wDSize);
+// int hmiIPXGetData(char* pData, tU32 wDSize);
 
-// void hmiIPXSendPacket(_IPX_ECB* sECB, _IPX_ECB** pPacket, PSTR pHeader, W32 wSize);
+// void hmiIPXSendPacket(_IPX_ECB* sECB, _IPX_ECB** pPacket, char* pHeader, W32 wSize);
 
-// BOOL hmiIPXSendDataDirect(PSTR pHeader, W32 wHSize, PSTR pData, W32 wDSize, _NETNOW_NODE_ADDR* sNode);
+// int hmiIPXSendDataDirect(char* pHeader, W32 wHSize, char* pData, W32 wDSize, _NETNOW_NODE_ADDR* sNode);
 
 // void hmiIPXGetInternetworkAddr(_IPX_INTERNET_ADDR* sInterworkAddr);
 
 // void hmiIPXGetLocalTarget(_IPX_LOCAL_TARGET* sNetworkAddr);
 
-// BOOL AllocateRealMem(W32 wSize, PSTR* pPtr, W32* pSegment, tU16* pSelector);
+// int AllocateRealMem(W32 wSize, char** pPtr, W32* pSegment, tU16* pSelector);
 
 // BOOL FreeRealMem(tU16 pSelector);
 
