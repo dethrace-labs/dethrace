@@ -10,7 +10,7 @@
 // lib/libsmacker
 #include "smacker.h"
 
-uint32_t last_frame_time;
+uint32_t smack_last_frame_time;
 
 void copy_palette(Smack* smack) {
     const unsigned char* pal = smk_get_palette(smack->smk_handle);
@@ -73,7 +73,7 @@ void SmackToBuffer(Smack* smack, uint32_t left, uint32_t top, uint32_t pitch, ui
 }
 
 uint32_t SmackDoFrame(Smack* smack) {
-    last_frame_time = OS_GetTime();
+    smack_last_frame_time = OS_GetTime();
 
     // TODO: audio processing
     return 0;
@@ -86,7 +86,7 @@ void SmackNextFrame(Smack* smack) {
 
 uint32_t SmackWait(Smack* smack) {
     uint32_t now = OS_GetTime();
-    if (now < last_frame_time + smack->MSPerFrame) {
+    if (now < smack_last_frame_time + smack->MSPerFrame) {
         OS_Sleep(1);
         return 1;
     }
