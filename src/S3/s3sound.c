@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define MAX_PATH_LENGTH 1024
 extern void dr_dprintf(char* fmt_string, ...);
 
 int gS3_sample_filter_funcs_registered;
@@ -17,10 +18,12 @@ tS3_sample_filter* gS3_sample_filter_disable_func;
 extern ma_engine miniaudio_engine;
 
 int S3LoadSample(tS3_sound_id id) {
+    // changed by dethrace for compatibility
+    // char filename[80]; // [esp+10h] [ebp-5Ch] BYREF
+    char filename[MAX_PATH_LENGTH];
+    tS3_descriptor* descriptor; // [esp+60h] [ebp-Ch]
+    tS3_sample* sample;         // [esp+68h] [ebp-4h]
     // LPDIRECTSOUNDBUFFER WavFile; // eax
-    char filename[MAX_PATH_LENGTH]; // [esp+10h] [ebp-5Ch] BYREF
-    tS3_descriptor* descriptor;     // [esp+60h] [ebp-Ch]
-    tS3_sample* sample;             // [esp+68h] [ebp-4h]
 
     if (!gS3_enabled) {
         return 0;

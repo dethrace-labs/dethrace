@@ -48,19 +48,20 @@ target_sources(harness PRIVATE
     include/harness/trace.h
     include/harness/config.h
     include/harness/os.h
-
+    include/harness/win95_polyfill.h
+    include/harness/win95_polyfill_defs.h
     # cameras/debug_camera.c
     # cameras/debug_camera.h
     harness_trace.c
     harness.c
     harness.h
-    io_platforms/io_platform.h
-    renderers/null.h
-    renderers/renderer.h
     brender_emu/renderer_impl.c
     brender_emu/renderer_impl.h
     sound/sound.c
     sound/sound.h
+    win95/polyfill.c
+    platforms/null.h
+    
     "${CMAKE_CURRENT_BINARY_DIR}/version.h"
 )
 
@@ -75,7 +76,8 @@ if (IO_PLATFORM STREQUAL "SDL_OpenGL")
     endforeach()
 
     target_sources(harness PRIVATE
-        io_platforms/sdl_gl.c
+        platforms/sdl_opengl.c
+        platforms/sdl2_scancode_to_dinput.h
         renderers/gl/gl_renderer.c
         renderers/gl/gl_renderer.h
         renderers/gl/stored_context.c

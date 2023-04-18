@@ -639,26 +639,36 @@ void DoWobbleCamera(br_actor* pCamera) {
 // IDA: void __usercall DoDrugWobbleCamera(br_actor *pCamera@<EAX>)
 void DoDrugWobbleCamera(br_actor* pCamera) {
     float f_time;
-    static br_scalar mag00;
-    static br_scalar mag01;
-    static br_scalar mag02;
-    static br_scalar mag10;
-    static br_scalar mag11;
-    static br_scalar mag12;
-    static br_scalar mag20;
-    static br_scalar mag21;
-    static br_scalar mag22;
-    static float period00;
-    static float period01;
-    static float period02;
-    static float period10;
-    static float period11;
-    static float period12;
-    static float period20;
-    static float period21;
-    static float period22;
+    static br_scalar mag00 = 0.03f;
+    static br_scalar mag01 = 0.03f;
+    static br_scalar mag02 = 0.03f;
+    static br_scalar mag10 = 0.2f;
+    static br_scalar mag11 = 0.07;
+    static br_scalar mag12 = 0.03f;
+    static br_scalar mag20 = 0.02f;
+    static br_scalar mag21 = 0.03f;
+    static br_scalar mag22 = 0.01f;
+    static float period00 = 550.f;
+    static float period01 = 700.f;
+    static float period02 = 200.f;
+    static float period10 = 100.f;
+    static float period11 = 1300.f;
+    static float period12 = 500.f;
+    static float period20 = 800.f;
+    static float period21 = 1500.f;
+    static float period22 = 300.f;
     LOG_TRACE("(%p)", pCamera);
-    NOT_IMPLEMENTED();
+
+    f_time = (float)PDGetTotalTime();
+    pCamera->t.t.mat.m[0][0] += FastScalarSin(fmod(f_time / period00 * 360.f, 360.f)) * mag00;
+    pCamera->t.t.mat.m[0][1] += FastScalarSin(fmod(f_time / period01 * 360.f, 360.f)) * mag01;
+    pCamera->t.t.mat.m[0][2] += FastScalarSin(fmod(f_time / period02 * 360.f, 360.f)) * mag02;
+    pCamera->t.t.mat.m[1][0] += FastScalarSin(fmod(f_time / period10 * 360.f, 360.f)) * mag10;
+    pCamera->t.t.mat.m[1][1] += FastScalarSin(fmod(f_time / period11 * 360.f, 360.f)) * mag11;
+    pCamera->t.t.mat.m[1][2] += FastScalarSin(fmod(f_time / period12 * 360.f, 360.f)) * mag12;
+    pCamera->t.t.mat.m[2][0] += FastScalarSin(fmod(f_time / period20 * 360.f, 360.f)) * mag20;
+    pCamera->t.t.mat.m[2][1] += FastScalarSin(fmod(f_time / period21 * 360.f, 360.f)) * mag21;
+    pCamera->t.t.mat.m[2][2] += FastScalarSin(fmod(f_time / period22 * 360.f, 360.f)) * mag22;
 }
 
 // IDA: void __usercall DoSpecialCameraEffect(br_actor *pCamera@<EAX>, br_matrix34 *pCamera_to_world@<EDX>)

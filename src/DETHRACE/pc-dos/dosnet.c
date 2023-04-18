@@ -32,7 +32,7 @@ int gNumber_of_hosts;
 tRM_info RMI;
 _IPX_HEADER gLast_received_IPX_header;
 tU16 gSocket_number_network_order;
-USHORT gECB_offset;
+unsigned short gECB_offset;
 tU16 gListen_selector;
 tU16 gSend_selector;
 
@@ -125,8 +125,8 @@ int BroadcastMessage() {
     NOT_IMPLEMENTED();
 }
 
-// IDA: BOOL __usercall hmiIPXCloseSocket@<EAX>(W32 wSocket@<EAX>)
-BOOL hmiIPXCloseSocket(W32 wSocket) {
+// IDA: int __usercall hmiIPXCloseSocket@<EAX>(W32 wSocket@<EAX>)
+int hmiIPXCloseSocket(W32 wSocket) {
     REGS regs;
     SREGS sregs;
     LOG_TRACE("(%d)", wSocket);
@@ -143,14 +143,14 @@ void hmiIPXListenForPacket(_IPX_ECB* pECB_ptr, tU32 pOffset) {
     NOT_IMPLEMENTED();
 }
 
-// IDA: BOOL __usercall hmiIPXPostListen@<EAX>(_IPX_ECB *pECB_ptr@<EAX>, tU32 pOffset@<EDX>)
-BOOL hmiIPXPostListen(_IPX_ECB* pECB_ptr, tU32 pOffset) {
+// IDA: int __usercall hmiIPXPostListen@<EAX>(_IPX_ECB *pECB_ptr@<EAX>, tU32 pOffset@<EDX>)
+int hmiIPXPostListen(_IPX_ECB* pECB_ptr, tU32 pOffset) {
     LOG_TRACE("(%p, %d)", pECB_ptr, pOffset);
     NOT_IMPLEMENTED();
 }
 
-// IDA: BOOL __cdecl hmiIPXGetData(PSTR pData, tU32 wDSize)
-BOOL hmiIPXGetData(PSTR pData, tU32 wDSize) {
+// IDA: int __cdecl hmiIPXGetData(char* pData, tU32 wDSize)
+int hmiIPXGetData(char* pData, tU32 wDSize) {
     tU32 packets_checked;
     tU32 full_packet_ooer_missus;
     _IPX_ECB* ECB_ptr;
@@ -159,19 +159,19 @@ BOOL hmiIPXGetData(PSTR pData, tU32 wDSize) {
     NOT_IMPLEMENTED();
 }
 
-// IDA: void __usercall hmiIPXSendPacket(_IPX_ECB *sECB@<EAX>, _IPX_ECB **pPacket@<EDX>, PSTR pHeader@<EBX>, W32 wSize@<ECX>)
-void hmiIPXSendPacket(_IPX_ECB* sECB, _IPX_ECB** pPacket, PSTR pHeader, W32 wSize) {
+// IDA: void __usercall hmiIPXSendPacket(_IPX_ECB *sECB@<EAX>, _IPX_ECB **pPacket@<EDX>, char* pHeader@<EBX>, W32 wSize@<ECX>)
+void hmiIPXSendPacket(_IPX_ECB* sECB, _IPX_ECB** pPacket, char* pHeader, W32 wSize) {
     SREGS sregs;
     REGS regs;
     _IPX_HEADER* sIPXHeader;
     _IPX_ECB* sIPXECB;
-    PSTR pIPXData;
+    char* pIPXData;
     LOG_TRACE("(%p, %p, %d, %d)", sECB, pPacket, pHeader, wSize);
     NOT_IMPLEMENTED();
 }
 
-// IDA: BOOL __usercall hmiIPXSendDataDirect@<EAX>(PSTR pHeader@<EAX>, W32 wHSize@<EDX>, PSTR pData@<EBX>, W32 wDSize@<ECX>, _NETNOW_NODE_ADDR *sNode)
-BOOL hmiIPXSendDataDirect(PSTR pHeader, W32 wHSize, PSTR pData, W32 wDSize, _NETNOW_NODE_ADDR* sNode) {
+// IDA: int __usercall hmiIPXSendDataDirect@<EAX>(char* pHeader@<EAX>, W32 wHSize@<EDX>, char* pData@<EBX>, W32 wDSize@<ECX>, _NETNOW_NODE_ADDR *sNode)
+int hmiIPXSendDataDirect(char* pHeader, W32 wHSize, char* pData, W32 wDSize, _NETNOW_NODE_ADDR* sNode) {
     W32 wIndex;
     _IPX_ELEMENT* sElement;
     W32* pSequence;
@@ -195,8 +195,8 @@ void hmiIPXGetLocalTarget(_IPX_LOCAL_TARGET* sNetworkAddr) {
     NOT_IMPLEMENTED();
 }
 
-// IDA: BOOL __usercall AllocateRealMem@<EAX>(W32 wSize@<EAX>, PSTR *pPtr@<EDX>, W32 *pSegment@<EBX>, tU16 *pSelector@<ECX>)
-BOOL AllocateRealMem(W32 wSize, PSTR* pPtr, W32* pSegment, tU16* pSelector) {
+// IDA: int __usercall AllocateRealMem@<EAX>(W32 wSize@<EAX>, char* *pPtr@<EDX>, W32 *pSegment@<EBX>, tU16 *pSelector@<ECX>)
+int AllocateRealMem(W32 wSize, char** pPtr, W32* pSegment, tU16* pSelector) {
     REGS regs;
     SREGS sregs;
     W32 wAddress;
@@ -207,8 +207,8 @@ BOOL AllocateRealMem(W32 wSize, PSTR* pPtr, W32* pSegment, tU16* pSelector) {
     NOT_IMPLEMENTED();
 }
 
-// IDA: BOOL __usercall FreeRealMem@<EAX>(tU16 pSelector@<EAX>)
-BOOL FreeRealMem(tU16 pSelector) {
+// IDA: int __usercall FreeRealMem@<EAX>(tU16 pSelector@<EAX>)
+int FreeRealMem(tU16 pSelector) {
     REGS regs;
     SREGS sregs;
     W32 wAddress;
@@ -219,16 +219,16 @@ BOOL FreeRealMem(tU16 pSelector) {
     NOT_IMPLEMENTED();
 }
 
-// IDA: BOOL __cdecl hmiIPXInstalled()
-BOOL hmiIPXInstalled() {
+// IDA: int __cdecl hmiIPXInstalled()
+int hmiIPXInstalled() {
     SREGS sregs;
     REGS regs;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-// IDA: BOOL __usercall hmiIPXOpenSocket@<EAX>(W32 wSocket@<EAX>)
-BOOL hmiIPXOpenSocket(W32 wSocket) {
+// IDA: int __usercall hmiIPXOpenSocket@<EAX>(W32 wSocket@<EAX>)
+int hmiIPXOpenSocket(W32 wSocket) {
     SREGS sregs;
     REGS regs;
     LOG_TRACE("(%d)", wSocket);
@@ -243,13 +243,13 @@ void GetLargestPacketSizeOoErBetterInsertLinfordChristieJokeHere() {
     NOT_IMPLEMENTED();
 }
 
-// IDA: BOOL __usercall hmiIPXInitSystem@<EAX>(W32 wSocket@<EAX>)
-BOOL hmiIPXInitSystem(W32 wSocket) {
+// IDA: int __usercall hmiIPXInitSystem@<EAX>(W32 wSocket@<EAX>)
+int hmiIPXInitSystem(W32 wSocket) {
     W32 wNIndex;
     W32 wIndex;
     W32 wMIndex;
-    USHORT wSOffset;
-    USHORT wLOffset;
+    unsigned short wSOffset;
+    unsigned short wLOffset;
     LOG_TRACE("(%d)", wSocket);
     NOT_IMPLEMENTED();
 }
@@ -349,14 +349,15 @@ tPlayer_ID PDNetExtractPlayerID(tNet_game_details* pDetails) {
 // IDA: void __usercall PDNetObtainSystemUserName(char *pName@<EAX>, int pMax_length@<EDX>)
 void PDNetObtainSystemUserName(char* pName, int pMax_length) {
 #ifdef _WIN32
-    DWORD size;
+    uint32_t size;
     char buffer[16];
-    BOOL result;
+    int result;
 
 #endif
 
     dr_dprintf("PDNetObtainSystemUserName()\n");
-#ifdef _WIN32
+    // todo
+#if 0
     size = COUNT_OF(buffer);
     result = GetComputerNameA(buffer, &size);
     if (result == 0) {

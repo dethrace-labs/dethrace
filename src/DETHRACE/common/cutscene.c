@@ -6,6 +6,7 @@
 #include "globvrpb.h"
 #include "graphics.h"
 #include "harness/config.h"
+#include "harness/hooks.h"
 #include "harness/os.h"
 #include "harness/trace.h"
 #include "input.h"
@@ -114,6 +115,7 @@ void PlaySmackerFile(char* pSmack_name) {
                     SmackNextFrame(smk);
                 }
                 PDScreenBufferSwap(0);
+
                 do {
                     fuck_off = AnyKeyDown() || EitherMouseButtonDown();
                 } while (!fuck_off && SmackWait(smk));
