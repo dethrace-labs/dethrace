@@ -25,92 +25,6 @@ static int stack_nbr = 0;
 static char _program_name[1024];
 #define MAX_STACK_FRAMES 64
 static void* stack_traces[MAX_STACK_FRAMES];
-DIR* directory_iterator;
-
-uint32_t first_clock_time = 0;
-
-uint32_t OS_GetTime() {
-    struct timespec spec;
-    clock_gettime(CLOCK_MONOTONIC, &spec);
-    if (first_clock_time == 0) {
-        first_clock_time = spec.tv_sec * 1000 + spec.tv_nsec / 1000000;
-    }
-    return (spec.tv_sec * 1000 + spec.tv_nsec / 1000000) - first_clock_time;
-}
-
-void OS_Sleep(int delay_ms) {
-    struct timespec ts;
-    ts.tv_sec = delay_ms / 1000;
-    ts.tv_nsec = (delay_ms % 1000) * 1000000;
-    nanosleep(&ts, &ts);
-}
-
-char* OS_GetFirstFileInDirectory(char* path) {
-    directory_iterator = opendir(path);
-    if (directory_iterator == NULL) {
-        return NULL;
-    }
-    return OS_GetNextFileInDirectory();
-}
-
-char* OS_GetNextFileInDirectory(void) {
-    struct dirent* entry;
-
-    if (directory_iterator == NULL) {
-        return NULL;
-    }
-    while ((entry = readdir(directory_iterator)) != NULL) {
-        if (entry->d_type == DT_REG) {
-            return entry->d_name;
-        }
-    }
-    closedir(directory_iterator);
-    directory_iterator = NULL;
-    return NULL;
-}
-
-void OS_Basename(char* path, char* base) {
-    strcpy(base, basename(path));
-}
-
-// https://developer.apple.com/library/archive/qa/qa1361/_index.html
-// FIXME:
-//     Important: Because the definition of the kinfo_proc structure (in <sys/sysctl.h>) is conditionalized by __APPLE_API_UNSTABLE,
-//     you should restrict use of the above code to the debug build of your program.
-
-int OS_IsDebuggerPresent()
-// Returns true if the current process is being debugged (either
-// running under the debugger or has a debugger attached post facto).
-{
-    int junk;
-    int mib[4];
-    struct kinfo_proc info;
-    size_t size;
-
-    // Initialize the flags so that, if sysctl fails for some bizarre
-    // reason, we get a predictable result.
-
-    info.kp_proc.p_flag = 0;
-
-    // Initialize mib, which tells sysctl the info we want, in this case
-    // we're looking for information about a specific process ID.
-
-    mib[0] = CTL_KERN;
-    mib[1] = KERN_PROC;
-    mib[2] = KERN_PROC_PID;
-    mib[3] = getpid();
-
-    // Call sysctl.
-
-    size = sizeof(info);
-    junk = sysctl(mib, sizeof(mib) / sizeof(*mib), &info, &size, NULL, 0);
-    (void)junk;
-    assert(junk == 0);
-
-    // We're being debugged if the P_TRACED flag is set.
-
-    return ((info.kp_proc.p_flag & P_TRACED) != 0);
-}
 
 // Resolve symbol name and source location given the path to the executable and an address
 int addr2line(char const* const program_name, void const* const addr) {
@@ -295,34 +209,6 @@ void OS_InstallSignalHandler(char* program_name) {
 
 FILE* OS_fopen(const char* pathname, const char* mode) {
     return fopen(pathname, mode);
-}
-
-void OS_AllocateActionReplayBuffer(char** pBuffer, unsigned* pBuffer_size) {
-    static int allocated = 0;
-    static char* buffer = NULL;
-    static unsigned buffer_size = 0;
-    unsigned i;
-    const int wanted_sizes[] = {
-        20000000,
-        16000000,
-        6000000,
-        4000000,
-        500000,
-    };
-
-    if (!allocated) {
-        allocated = 1;
-        buffer_size = 0;
-        for (i = 0; i < ARRAY_SIZE(wanted_sizes); i++) {
-            buffer = malloc(wanted_sizes[i]);
-            if (buffer != NULL) {
-                buffer_size = wanted_sizes[i];
-                break;
-            }
-        }
-    }
-    *pBuffer = buffer;
-    *pBuffer_size = buffer_size;
 }
 
 size_t OS_ConsoleReadPassword(char* pBuffer, size_t pBufferLen) {

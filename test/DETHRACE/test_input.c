@@ -2,6 +2,7 @@
 
 #include "common/globvars.h"
 #include "common/input.h"
+#include "harness/hooks.h"
 #include <string.h>
 
 void test_input_KevKeyService() {
@@ -14,7 +15,7 @@ void test_input_KevKeyService() {
         gKeys_pressed = 0;
         result = KevKeyService();
     }
-    OS_Sleep(2000);
+    gHarness_platform.Sleep(2000);
     gKeys_pressed = 0;
     result = KevKeyService();
 

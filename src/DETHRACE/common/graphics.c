@@ -637,7 +637,7 @@ void ScreenLarger() {
 // IDA: void __usercall DRSetPaletteEntries(br_pixelmap *pPalette@<EAX>, int pFirst_colour@<EDX>, int pCount@<EBX>)
 void DRSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
     LOG_TRACE("(%p, %d, %d)", pPalette, pFirst_colour, pCount);
-    if (!pFirst_colour) {
+    if (pFirst_colour == 0) {
         ((br_int_32*)pPalette->pixels)[0] = 0;
     }
     memcpy(gCurrent_palette_pixels + 4 * pFirst_colour, (char*)pPalette->pixels + 4 * pFirst_colour, 4 * pCount);
@@ -1671,7 +1671,7 @@ void RenderAFrame(int pDepth_mask_on) {
         RenderLollipops();
 
         // dethrace: must flush gpu buffer before rendering depth effect into framebuffer
-        Harness_Hook_FlushRenderer();
+        gHarness_platform.Renderer_FlushBuffers();
         DepthEffectSky(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world);
         DepthEffect(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world);
         if (!gAusterity_mode) {
@@ -1679,7 +1679,7 @@ void RenderAFrame(int pDepth_mask_on) {
         }
         RenderSplashes();
         // dethrace: must flush gpu buffer before rendering smoke into framebuffer
-        Harness_Hook_FlushRenderer();
+        gHarness_platform.Renderer_FlushBuffers();
         RenderSmoke(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, gFrame_period);
         RenderSparks(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, gFrame_period);
         RenderProximityRays(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, gFrame_period);
@@ -2574,10 +2574,10 @@ int DoMouseCursor() {
         period = 1000;
     }
     while (period <= 20) {
-        // Sleep 1 ms to avoid 100% CPU usage
-        OS_Sleep(1);
         this_call_time = PDGetTotalTime();
         period = this_call_time - last_call_time;
+        // added by dethrace to avoid 100% CPU usage
+        gHarness_platform.Sleep(1);
     }
     GetMousePosition(&x_coord, &y_coord);
     mouse_moved = x_coord != gMouse_last_x_coord || y_coord != gMouse_last_y_coord;

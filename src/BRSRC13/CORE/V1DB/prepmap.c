@@ -11,9 +11,13 @@ void BrMapUpdate(br_pixelmap* map, br_uint_16 flags) {
 void BrBufferUpdate(br_pixelmap* pm, br_token use, br_uint_16 flags) {
     br_token_value tv[3];
 
-    Harness_Hook_BrBufferUpdate(pm, use, flags);
-
     // renderer->dispatch->bufferStoredNew ...
+
+    // Added by dethrace
+    if (use != BRT_COLOUR_MAP_O && use != BRT_UNKNOWN) {
+        LOG_PANIC("use %d", use);
+    }
+    gHarness_platform.Renderer_BufferTexture(pm);
 }
 
 // IDA: void __usercall BrBufferClear(br_pixelmap *pm@<EAX>)

@@ -6,6 +6,7 @@
 #include "globvrpb.h"
 #include "graphics.h"
 #include "harness/config.h"
+#include "harness/hooks.h"
 #include "harness/os.h"
 #include "harness/trace.h"
 #include "input.h"
@@ -72,7 +73,7 @@ void PlaySmackerFile(char* pSmack_name) {
     unsigned long w, h, f;
     unsigned char r, g, b;
     double usf;
-    struct timespec ts;
+    tU32 last_frame_time;
 
     if (!gSound_override && !gCut_scene_override) {
         StopMusic();
@@ -126,12 +127,16 @@ void PlaySmackerFile(char* pSmack_name) {
                     }
                 }
                 PDScreenBufferSwap(0);
+                last_frame_time = PDGetTotalTime();
 
-                if (AnyKeyDown() || EitherMouseButtonDown()) {
+                do {
+                    fuck_off = AnyKeyDown() || EitherMouseButtonDown();
+                    // added by dethrace to avoid 100% cpu
+                    gHarness_platform.Sleep(1);
+                } while (!fuck_off && PDGetTotalTime() - last_frame_time < delay_ms);
+                if (fuck_off) {
                     break;
                 }
-                // wait until its time for the next frame
-                OS_Sleep(delay_ms);
             } while (smk_next(s) == SMK_MORE);
 
             smk_close(s);

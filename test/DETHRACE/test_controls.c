@@ -10,6 +10,7 @@
 #include "common/input.h"
 #include "common/loading.h"
 #include "common/utility.h"
+#include "harness/hooks.h"
 
 extern int _unittest_controls_lastGetPowerup;
 
@@ -23,7 +24,8 @@ void test_controls_CheckKevKeys() {
         gKeys_pressed = 0;
         result = KevKeyService();
     }
-    OS_Sleep(2000);
+    gHarness_platform.Sleep(2000);
+
     gKeys_pressed = 0;
 
     CheckKevKeys();
