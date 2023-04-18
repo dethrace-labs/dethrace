@@ -70,10 +70,10 @@ void PlaySmackerFile(char* pSmack_name) {
         StopMusic();
         FadePaletteDown();
         ClearEntireScreen();
+        SmackSoundUseDirectSound(NULL);
         br_colours_ptr = gCurrent_palette->pixels;
         PathCat(the_path, gApplication_path, "CUTSCENE");
         PathCat(the_path, the_path, pSmack_name);
-
         dr_dprintf("Trying to open smack file '%s'", the_path);
         smk = SmackOpen(the_path, 0xfe000, -1);
         if (smk == NULL) {

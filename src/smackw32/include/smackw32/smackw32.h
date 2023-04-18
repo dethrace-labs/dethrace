@@ -37,6 +37,7 @@ typedef struct SmackTag {
 } Smack;
 
 Smack* SmackOpen(const char* name, uint32_t flags, uint32_t extrabuf);
+int SmackSoundUseDirectSound(void* dd); // NULL mean create instance (apparently)
 void SmackToBuffer(Smack* smack, uint32_t left, uint32_t top, uint32_t pitch, uint32_t destheight, void* buf, uint32_t flags);
 uint32_t SmackDoFrame(Smack* smack);
 void SmackNextFrame(Smack* smack);
