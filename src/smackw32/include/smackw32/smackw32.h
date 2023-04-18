@@ -1,6 +1,16 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#define SMACKTRACK1 0x02000 // Play audio track 1
+#define SMACKTRACK2 0x04000 // Play audio track 2
+#define SMACKTRACK3 0x08000 // Play audio track 3
+#define SMACKTRACK4 0x10000 // Play audio track 4
+#define SMACKTRACK5 0x20000 // Play audio track 5
+#define SMACKTRACK6 0x40000 // Play audio track 6
+#define SMACKTRACK7 0x80000 // Play audio track 7
+#define SMACKTRACKS (SMACKTRACK1 | SMACKTRACK2 | SMACKTRACK3 | SMACKTRACK4 | SMACKTRACK5 | SMACKTRACK6 | SMACKTRACK7)
+#define SMACKAUTOEXTRA 0xffffffff
+
 typedef struct SmackTag {
     unsigned long Version;
     unsigned long Width;

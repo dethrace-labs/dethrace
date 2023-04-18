@@ -75,7 +75,7 @@ void PlaySmackerFile(char* pSmack_name) {
         PathCat(the_path, gApplication_path, "CUTSCENE");
         PathCat(the_path, the_path, pSmack_name);
         dr_dprintf("Trying to open smack file '%s'", the_path);
-        smk = SmackOpen(the_path, 0xfe000, -1);
+        smk = SmackOpen(the_path, SMACKTRACKS, SMACKAUTOEXTRA);
         if (smk == NULL) {
             dr_dprintf("Unable to open smack file - attempt to load smack from CD...");
             if (GetCDPathFromPathsTxtFile(the_path)) {
@@ -84,7 +84,7 @@ void PlaySmackerFile(char* pSmack_name) {
                 PathCat(the_path, the_path, "CUTSCENE");
                 PathCat(the_path, the_path, pSmack_name);
                 if (PDCheckDriveExists(the_path)) {
-                    smk = SmackOpen(the_path, 0xfe000, -1);
+                    smk = SmackOpen(the_path, SMACKTRACKS, SMACKAUTOEXTRA);
                 }
             } else {
                 dr_dprintf("Can't get CD directory name");
