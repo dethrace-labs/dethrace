@@ -66,7 +66,7 @@ void SmackToBuffer(Smack* smack, uint32_t left, uint32_t top, uint32_t pitch, ui
 
     const unsigned char* frame = smk_get_video(smack->smk_handle);
     for (i = 0; i < destheight; i++) {
-        memcpy(&buf[(i * pitch)], &frame[i * pitch], pitch);
+        memcpy((char*)&buf[(i * pitch)], &frame[i * pitch], pitch);
     }
 }
 
