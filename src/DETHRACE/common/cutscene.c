@@ -11,7 +11,7 @@
 #include "input.h"
 #include "loading.h"
 #include "pd/sys.h"
-#include "smackw32/smack.h"
+#include "smackw32/smackw32.h"
 #include "sound.h"
 #include "utility.h"
 #include <stdlib.h>

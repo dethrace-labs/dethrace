@@ -20,5 +20,5 @@ else()
 endif()
 
 target_sources(smackw32 PRIVATE
-    smack.c
+    smackw32.c
 )

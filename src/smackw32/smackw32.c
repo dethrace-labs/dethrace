@@ -1,4 +1,4 @@
-#include "include/smackw32/smack.h"
+#include "include/smackw32/smackw32.h"
 
 #include <assert.h>
 #include <stddef.h>
@@ -6,8 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-// lib/libsmacker
 #include "harness/os.h"
+// lib/libsmacker
 #include "smacker.h"
 
 uint32_t last_frame_time;
@@ -32,7 +32,7 @@ Smack* SmackOpen(const char* name, uint32_t flags, uint32_t extrabuf) {
     // libsmacker doesn't tell us whether the palette is new on each frame or not, so just assume it always is new
     smack->NewPalette = 1;
 
-    // libsmk_handle is added to hold a pointer to the underlying libsmacker instance
+    // smk_handle is added to hold a pointer to the underlying libsmacker instance
     smack->smk_handle = smk_handle;
 
     smk_info_all(smk_handle, NULL, &smack->Frames, &usf);
