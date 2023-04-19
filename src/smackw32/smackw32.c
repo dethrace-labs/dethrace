@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "harness/os.h"
+#include "harness/hooks.h"
 // lib/libsmacker
 #include "smacker.h"
 
@@ -73,7 +73,7 @@ void SmackToBuffer(Smack* smack, uint32_t left, uint32_t top, uint32_t pitch, ui
 }
 
 uint32_t SmackDoFrame(Smack* smack) {
-    smack_last_frame_time = OS_GetTime();
+    smack_last_frame_time = gHarness_platform.GetTicks();
 
     // TODO: audio processing
     return 0;
@@ -85,9 +85,9 @@ void SmackNextFrame(Smack* smack) {
 }
 
 uint32_t SmackWait(Smack* smack) {
-    uint32_t now = OS_GetTime();
+    uint32_t now = gHarness_platform.GetTicks();
     if (now < smack_last_frame_time + smack->MSPerFrame) {
-        OS_Sleep(1);
+        gHarness_platform.Sleep(1);
         return 1;
     }
     return 0;
