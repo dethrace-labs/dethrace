@@ -95,4 +95,5 @@ uint32_t SmackWait(Smack* smack) {
 
 void SmackClose(Smack* smack) {
     smk_close(smack->smk_handle);
+    free(smack);
 }

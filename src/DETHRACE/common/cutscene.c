@@ -93,7 +93,6 @@ void PlaySmackerFile(char* pSmack_name) {
         }
         if (smk != NULL) {
             dr_dprintf("Smack file opened OK");
-            smk->NewPalette = 1;
             for (i = 1; i <= smk->Frames; i++) {
                 SmackToBuffer(smk, 0, 0, gBack_screen->row_bytes, gBack_screen->height, gBack_screen->pixels, 0);
 
