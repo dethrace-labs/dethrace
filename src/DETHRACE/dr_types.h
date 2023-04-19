@@ -2942,62 +2942,6 @@ typedef struct _tag_sos_timer_system {
     W32 wMIDIActiveSongHandle;
 } _SOS_TIMER_SYSTEM;
 
-typedef struct SmackTag {
-    unsigned long Version;
-    unsigned long Width;
-    unsigned long Height;
-    unsigned long Frames;
-    unsigned long MSPerFrame;
-    unsigned long SmackerType;
-    unsigned long LargestInTrack[7];
-    unsigned long tablesize;
-    unsigned long codesize;
-    unsigned long absize;
-    unsigned long detailsize;
-    unsigned long typesize;
-    unsigned long TrackType[7];
-    unsigned long extra;
-    unsigned long NewPalette;
-    unsigned char Palette[772];
-    unsigned long PalType;
-    unsigned long FrameNum;
-    unsigned long FrameSize;
-    unsigned long SndSize;
-    unsigned long LastRectx;
-    unsigned long LastRecty;
-    unsigned long LastRectw;
-    unsigned long LastRecth;
-    unsigned long OpenFlags;
-    unsigned long LeftOfs;
-    unsigned long TopOfs;
-    unsigned long ReadError;
-    unsigned long addr32;
-} Smack;
-
-typedef struct SmackSumTag {
-    unsigned long TotalTime;
-    unsigned long MS100PerFrame;
-    unsigned long TotalOpenTime;
-    unsigned long TotalFrames;
-    unsigned long SkippedFrames;
-    unsigned long SoundSkips;
-    unsigned long TotalBlitTime;
-    unsigned long TotalReadTime;
-    unsigned long TotalDecompTime;
-    unsigned long TotalBackReadTime;
-    unsigned long TotalReadSpeed;
-    unsigned long SlowestFrameTime;
-    unsigned long Slowest2FrameTime;
-    unsigned long SlowestFrameNum;
-    unsigned long Slowest2FrameNum;
-    unsigned long AverageFrameSize;
-    unsigned long Highest1SecRate;
-    unsigned long Highest1SecFrame;
-    unsigned long HighestMemAmount;
-    unsigned long TotalExtraMemory;
-    unsigned long HighestExtraUsed;
-} SmackSum;
-
 #ifndef _WIN32
 typedef struct _heapinfo {
     void* _pentry;

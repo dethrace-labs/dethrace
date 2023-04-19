@@ -6,21 +6,21 @@ if(NOT DEFINED CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo" FORCE)
 endif()
 
-project(smacker C)
+project(libsmacker C)
 
-add_library(smacker STATIC)
+add_library(libsmacker STATIC)
 
-target_include_directories(smacker PUBLIC
+target_include_directories(libsmacker PUBLIC
     .
 )
 
 if(NOT MSVC)
-    target_compile_options(smacker PRIVATE -Wall)
+    target_compile_options(libsmacker PRIVATE -Wall)
 else()
-    target_compile_definitions(smacker PRIVATE -D_CRT_SECURE_NO_WARNINGS)
+    target_compile_definitions(libsmacker PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
 
-target_sources(smacker PRIVATE
+target_sources(libsmacker PRIVATE
     smacker.c
     smk_bitstream.c
     smk_hufftree.c

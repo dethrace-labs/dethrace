@@ -20,7 +20,7 @@ if(DETHRACE_FIX_BUGS)
     target_compile_definitions(harness PRIVATE DETHRACE_FIX_BUGS)
 endif()
 
-target_link_libraries(harness PRIVATE brender compile_with_werror)
+target_link_libraries(harness PRIVATE brender s3 compile_with_werror)
 
 if(WIN32)
     target_link_libraries(harness PRIVATE dbghelp)
@@ -89,7 +89,6 @@ if (IO_PLATFORM STREQUAL "SDL_OpenGL")
         resources/3d_frag.glsl.h
     )
     target_include_directories(harness PRIVATE "${dethrace_SOURCE_DIR}/src/DETHRACE/common")
-    target_include_directories(harness PRIVATE "${dethrace_SOURCE_DIR}/src/S3/include")
     target_link_libraries(harness PRIVATE SDL2::SDL2 glad)
 endif()
 
