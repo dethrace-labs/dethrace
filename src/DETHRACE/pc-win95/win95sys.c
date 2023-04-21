@@ -388,8 +388,9 @@ void Win32CreateWindow() {
 
     // int height = GetSystemMetrics(SM_CYSCREEN);
     // int width = GetSystemMetrics(SM_CXSCREEN);
-    int height = 200;
-    int width = 320;
+
+    int width = gGraf_specs[gGraf_spec_index].total_width;
+    int height = gGraf_specs[gGraf_spec_index].total_height;
     // WS_VISIBLE | WS_POPUP
     gWin32_hwnd = CreateWindowExA_(0, "CarmageddonClass", "Carmageddon", 0x90000000, 0, 0, width, height, 0, NULL, NULL, NULL);
     SSDXGetWindowRect(gWin32_hwnd);
