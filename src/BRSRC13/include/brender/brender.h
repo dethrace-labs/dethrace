@@ -110,6 +110,7 @@ void BrMatrix4ApplyP(br_vector4* A, br_vector3* B, br_matrix4* C);
 void BrMatrix4Perspective(br_matrix4* mat, br_angle field_of_view, br_scalar aspect, br_scalar hither, br_scalar yon);
 void BrMatrix4Scale(br_matrix4* mat, br_scalar sx, br_scalar sy, br_scalar sz);
 void BrMatrix4Mul(br_matrix4* A, br_matrix4* B, br_matrix4* C);
+void BrMatrix4Copy34(br_matrix4* A, br_matrix34* B);
 
 // BrMem
 void BrMemFree(void* block);

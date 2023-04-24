@@ -29,14 +29,13 @@ static uint16_t* depth_buffer_flip_pixels;
 static int render_width, render_height;
 static int vp_x, vp_y, vp_width, vp_height;
 
-static br_pixelmap *last_colour_buffer,
-    *last_depth_buffer;
-static int dirty_buffers = 0;
-
 static br_pixelmap *last_colour_buffer, *last_depth_buffer;
+static int dirty_buffers = 0;
 
 static tStored_material* current_material;
 static br_pixelmap* current_shade_table;
+
+static br_matrix4 view_matrix;
 
 // Increment flush_counter during flush, and upload_counter when we upload the colour_buffer texture.
 // If the counters are equal, we can avoid re-uploading the same thing.
@@ -51,6 +50,8 @@ typedef struct gl_vertex {
 
 struct {
     GLuint model, view, projection;
+    // gl_NormalMatrix replacement
+    GLuint normal_matrix;
     GLuint clip_plane_count;
     GLuint clip_planes[6];
     GLuint colour_buffer_texture;
@@ -149,6 +150,7 @@ void LoadShaders() {
     uniforms_3d.projection = GetValidatedUniformLocation(shader_program_3d, "u_projection");
     uniforms_3d.view = GetValidatedUniformLocation(shader_program_3d, "u_view");
     uniforms_3d.viewport_height = GetValidatedUniformLocation(shader_program_3d, "u_viewport_height");
+    uniforms_3d.normal_matrix = GetValidatedUniformLocation(shader_program_3d, "u_normal_matrix");
 
     uniforms_3d.material_flags = GetValidatedUniformLocation(shader_program_3d, "u_material_flags");
     uniforms_3d.material_texture_enabled = GetValidatedUniformLocation(shader_program_3d, "u_material_texture_enabled");
@@ -348,9 +350,11 @@ void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer, br_pixe
     glUseProgram(shader_program_3d);
     glUniform1ui(uniforms_3d.viewport_height, render_height);
 
+    br_camera* cam = camera->type_data;
     current_material = NULL;
     current_shade_table = NULL;
 
+    // clip planes
     int enabled_clip_planes = 0;
     for (int i = 0; i < v1db.enabled_clip_planes.max; i++) {
         if (v1db.enabled_clip_planes.enabled == NULL || !v1db.enabled_clip_planes.enabled[i]) {
@@ -362,23 +366,17 @@ void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer, br_pixe
     }
     glUniform1i(uniforms_3d.clip_plane_count, enabled_clip_planes);
 
-    br_matrix4 cam44 = {
-        { { v1db.camera_path[0].m.m[0][0], v1db.camera_path[0].m.m[0][1], v1db.camera_path[0].m.m[0][2], 0 },
-            { v1db.camera_path[0].m.m[1][0], v1db.camera_path[0].m.m[1][1], v1db.camera_path[0].m.m[1][2], 0 },
-            { v1db.camera_path[0].m.m[2][0], v1db.camera_path[0].m.m[2][1], v1db.camera_path[0].m.m[2][2], 0 },
-            { v1db.camera_path[0].m.m[3][0], v1db.camera_path[0].m.m[3][1], v1db.camera_path[0].m.m[3][2], 1 } }
-    };
-    br_matrix4 cam44_inverse;
-    BrMatrix4Inverse(&cam44_inverse, &cam44);
+    // view matrix
+    BrMatrix4Copy34(&view_matrix, &v1db.camera_path[0].m);
+    BrMatrix4Inverse(&view_matrix, &view_matrix);
+    glUniformMatrix4fv(uniforms_3d.view, 1, GL_FALSE, &view_matrix.m[0][0]);
 
-    glUniformMatrix4fv(uniforms_3d.view, 1, GL_FALSE, &cam44_inverse.m[0][0]);
-
-    br_matrix4 p;
-    br_camera* cam = camera->type_data;
-    BrMatrix4Perspective(&p, cam->field_of_view, cam->aspect, cam->hither_z, cam->yon_z);
+    // projection matrix
+    br_matrix4 projection;
+    BrMatrix4Perspective(&projection, cam->field_of_view, cam->aspect, cam->hither_z, cam->yon_z);
     // hack: not sure why we have to do this, but this makes the result the same as `glm_perspective`
-    p.m[2][2] *= -1;
-    glUniformMatrix4fv(uniforms_3d.projection, 1, GL_FALSE, &p.m[0][0]);
+    projection.m[2][2] *= -1;
+    glUniformMatrix4fv(uniforms_3d.projection, 1, GL_FALSE, &projection.m[0][0]);
 
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
 }
@@ -597,14 +595,22 @@ void GLRenderer_Model(br_actor* actor, br_model* model, br_material* material, b
         return;
     }
 
-    GLfloat m[16] = {
-        model_matrix.m[0][0], model_matrix.m[0][1], model_matrix.m[0][2], 0,
-        model_matrix.m[1][0], model_matrix.m[1][1], model_matrix.m[1][2], 0,
-        model_matrix.m[2][0], model_matrix.m[2][1], model_matrix.m[2][2], 0,
-        model_matrix.m[3][0], model_matrix.m[3][1], model_matrix.m[3][2], 1
-    };
+    // model matrix
+    br_matrix4 view_model_matrix, model_matrix4, inverse, inverse_transpose;
+    BrMatrix4Copy34(&model_matrix4, &model_matrix);
+    glUniformMatrix4fv(uniforms_3d.model, 1, GL_FALSE, model_matrix4.m[0]);
 
-    glUniformMatrix4fv(uniforms_3d.model, 1, GL_FALSE, m);
+    // normal matrix (http://www.lighthouse3d.com/tutorials/glsl-12-tutorial/the-normal-matrix/)
+    BrMatrix4Mul(&view_model_matrix, &view_matrix, &model_matrix4);
+    BrMatrix4Inverse(&inverse, &view_model_matrix);
+    // transpose
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            inverse_transpose.m[i][j] = inverse.m[j][i];
+        }
+    }
+    glUniformMatrix4fv(uniforms_3d.normal_matrix, 1, GL_FALSE, &inverse_transpose.m[0][0]);
+
     glBindVertexArray(ctx->vao_id);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx->ebo_id);
 
