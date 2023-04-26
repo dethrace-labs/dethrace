@@ -115,10 +115,10 @@ static void audio_exit(Smack *smack) {
 
     if (user->miniaudio.audio_valid) {
 
+        /* FIXME: or just quit immediately? */
         while (ma_sound_is_playing(&user->miniaudio.sound)) {
-            // FIXME: sleep
-            //        PossibleService();
-            //        OS_Sleep(1);
+            /* FIXME: Service? */
+            gHarness_platform.Sleep(1);
         }
         ma_sound_stop(&user->miniaudio.sound);
         ma_data_converter_uninit(&user->miniaudio.data_converter, NULL);
@@ -231,6 +231,9 @@ error:
 }
 
 int SmackSoundUseDirectSound(void* dd) {
+    // FIXME: is this a more appropriate place to init miniaudio? What is type of argument?
+
+    return 0;
 }
 
 void SmackToBuffer(Smack* smack, uint32_t left, uint32_t top, uint32_t pitch, uint32_t destheight, void* buf, uint32_t flags) {
@@ -271,6 +274,7 @@ uint32_t SmackWait(Smack* smack) {
     SmackUserData *const user = smack->user;
 
     uint32_t now = gHarness_platform.GetTicks();
+    /* FIXME: get rid of bodge term */
     if (now < user->smack_last_frame_time + smack->MSPerFrame - 5) {
         gHarness_platform.Sleep(1);
         return 1;
