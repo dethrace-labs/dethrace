@@ -11,8 +11,6 @@ target_include_directories(miniaudio
         include/miniaudio
 )
 
-
-
 cmake_push_check_state(RESET)
 check_symbol_exists("exp" "math.h" HAVE_EXP)
 if(NOT HAVE_EXP)

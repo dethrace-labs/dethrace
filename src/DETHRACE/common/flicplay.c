@@ -1136,12 +1136,12 @@ void DoBlack(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
     the_width = pFlic_info->width;
     for (i = 0; i < pFlic_info->height; i++) {
-      line_pixel_ptr = (tU32*)pixel_ptr;
-      for (j = 0; j < the_width / sizeof(tU32); j++) {
-          *line_pixel_ptr = 0;
-          line_pixel_ptr++;
-      }
-      pixel_ptr += the_row_bytes;
+        line_pixel_ptr = (tU32*)pixel_ptr;
+        for (j = 0; j < the_width / sizeof(tU32); j++) {
+            *line_pixel_ptr = 0;
+            line_pixel_ptr++;
+        }
+        pixel_ptr += the_row_bytes;
     }
 }
 
@@ -1268,7 +1268,7 @@ void DoUncompressedTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     for (i = 0; i < pFlic_info->height; i++) {
         line_pixel_ptr = pixel_ptr;
         for (j = 0; j < the_width; j++) {
-#if defined (DETHRACE_FIX_BUGS)
+#if defined(DETHRACE_FIX_BUGS)
             the_byte = MemReadU8(&pFlic_info->data);
 #else
             the_byte = MemReadU32(&pFlic_info->data);
@@ -1465,13 +1465,13 @@ int PlayFlic(int pIndex, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap
             gSound_time = 0;
         }
         if (frame_period >= the_flic.frame_period) {
+            last_frame = new_time;
             finished_playing = PlayNextFlicFrame(&the_flic);
             DoPerFrame();
             if (!gDark_mode) {
                 EnsurePaletteUp();
             }
             ServiceGame();
-            last_frame = new_time;
         }
     }
     ServiceGame();

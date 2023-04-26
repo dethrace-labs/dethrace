@@ -10,8 +10,7 @@ target_include_directories(dethrace_obj
         pd
 )
 
-target_link_libraries(dethrace_obj PUBLIC SDL2::SDL2 smacker harness brender s3)
-
+target_link_libraries(dethrace_obj PUBLIC SDL2::SDL2 smackw32 harness brender s3)
 
 
 if (CMAKE_C_COMPILER_ID MATCHES "MSVC")
@@ -158,6 +157,10 @@ target_sources(dethrace_obj PRIVATE
     pd/net.h
     pc-dos/dossys.c
     pd/sys.h
+    pc-win95/win95sys.c
+    pc-win95/dinput.h
+    pc-win95/ssdx.c
+    pc-win95/ssdx.h
 )
 
 # Create our main game binary.

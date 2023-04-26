@@ -269,13 +269,13 @@ void BrDbSceneRenderBegin(br_actor* world, br_actor* camera) {
     // this is not complete
     STUB_ONCE();
 
-/*
- * Collect transforms from camera to root
- *
- * Make a stack of cumulative transforms for each level between
- * the camera and the root - this is so that model->view
- * transforms can use the shortest route, rather than via the root
- */
+    /*
+     * Collect transforms from camera to root
+     *
+     * Make a stack of cumulative transforms for each level between
+     * the camera and the root - this is so that model->view
+     * transforms can use the shortest route, rather than via the root
+     */
     for (i = 0; i < BR_ASIZE(v1db.camera_path); i++) {
         v1db.camera_path[i].a = NULL;
     }
@@ -323,7 +323,7 @@ void BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour
     // LOG_TRACE("(%p, %p, %p, %p)", world, camera, colour_buffer, depth_buffer);
 
     BrDbSceneRenderBegin(world, camera);
-    Harness_Hook_BrZbSceneRenderBegin(world, camera, colour_buffer, depth_buffer);
+    gHarness_platform.Renderer_BeginScene(camera, colour_buffer, depth_buffer);
 }
 
 // IDA: void __cdecl BrZbSceneRenderAdd(br_actor *tree)
@@ -335,7 +335,9 @@ void BrZbSceneRenderAdd(br_actor* tree) {
 // IDA: void __cdecl BrZbSceneRenderEnd()
 void BrZbSceneRenderEnd() {
     // LOG_TRACE("()");
-    Harness_Hook_BrZbSceneRenderEnd();
+
+    gHarness_platform.Renderer_FlushBuffers();
+    gHarness_platform.Renderer_EndScene();
 }
 
 // IDA: void __cdecl BrZbSceneRender(br_actor *world, br_actor *camera, br_pixelmap *colour_buffer, br_pixelmap *depth_buffer)

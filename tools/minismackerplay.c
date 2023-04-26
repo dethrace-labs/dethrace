@@ -11,7 +11,7 @@ typedef struct {
     int frame_size_in_bytes;
 } smacker_data_source;
 
-ma_engine engine;
+static ma_engine engine;
 
 void PlaySmackerFile(SDL_Window *window, SDL_Renderer *renderer, const char *path) {
     unsigned int i, j;
@@ -49,13 +49,13 @@ void PlaySmackerFile(SDL_Window *window, SDL_Renderer *renderer, const char *pat
         return;
     }
     smk_info_all(s, NULL, &f, &usf);
-    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "frame_count=%"SDL_PRIu64", usf=%g", (Uint64)f, usf);
-    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "duration=%g", (double)f * usf / 1000000.);
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "frame count=%"SDL_PRIu64", frame time=%gus", (Uint64)f, usf);
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "duration=%gs", (double)f * usf / 1000000.);
 
     counter_frametime = (Uint64)((double)SDL_GetPerformanceFrequency() * usf / 1000000);
 
     smk_info_video(s, &w, &h, NULL);
-    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "width=%"SDL_PRIu64", height=%"SDL_PRIu64"", (Uint64)w, (Uint64)h);
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "size=%"SDL_PRIu64"x%"SDL_PRIu64"", (Uint64)w, (Uint64)h);
 
     smacker_data_source data_source;
     SDL_SetWindowTitle(window, path);
@@ -63,8 +63,8 @@ void PlaySmackerFile(SDL_Window *window, SDL_Renderer *renderer, const char *pat
     smk_info_audio(s, &track_mask, channels_smk, bitdepth_smk, samplerate_smk);
     SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "tracks mask = 0x%x", track_mask);
     SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "#channels = %d %d %d %d %d %d %d", channels_smk[0], channels_smk[1], channels_smk[2], channels_smk[3], channels_smk[4], channels_smk[5], channels_smk[6]);
-    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "sample bitsize = %d %d %d %d %d %d %d", bitdepth_smk[0], bitdepth_smk[1], bitdepth_smk[2], bitdepth_smk[3], bitdepth_smk[4], bitdepth_smk[5], bitdepth_smk[6]);
-    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "sample rate = %"SDL_PRIu64" %"SDL_PRIu64" %"SDL_PRIu64" %"SDL_PRIu64" %"SDL_PRIu64" %"SDL_PRIu64" %"SDL_PRIu64"", (Uint64)samplerate_smk[0], (Uint64)samplerate_smk[1], (Uint64)samplerate_smk[2], (Uint64)samplerate_smk[3], (Uint64)samplerate_smk[4], (Uint64)samplerate_smk[5], (Uint64)samplerate_smk[6]);
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "sample bitsizes = %d %d %d %d %d %d %d", bitdepth_smk[0], bitdepth_smk[1], bitdepth_smk[2], bitdepth_smk[3], bitdepth_smk[4], bitdepth_smk[5], bitdepth_smk[6]);
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "sample rates = %"SDL_PRIu64" %"SDL_PRIu64" %"SDL_PRIu64" %"SDL_PRIu64" %"SDL_PRIu64" %"SDL_PRIu64" %"SDL_PRIu64"", (Uint64)samplerate_smk[0], (Uint64)samplerate_smk[1], (Uint64)samplerate_smk[2], (Uint64)samplerate_smk[3], (Uint64)samplerate_smk[4], (Uint64)samplerate_smk[5], (Uint64)samplerate_smk[6]);
 
     switch (bitdepth_smk[0]) {
         case 8:
@@ -128,10 +128,9 @@ void PlaySmackerFile(SDL_Window *window, SDL_Renderer *renderer, const char *pat
     }
 
     SDL_QueryTexture(texture, &real_format, &real_access, &real_w, &real_h);
-    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "real_format: %d (req=%d)\n", real_format, SDL_PIXELFORMAT_RGB24);
-    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "real_access: %d (req=%d)\n", real_access, SDL_TEXTUREACCESS_STREAMING);
-    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "real_w: %d    (req=%"SDL_PRIu64")\n", real_w, (Uint64)w);
-    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "real_h: %d    (req=%"SDL_PRIu64")\n", real_h, (Uint64)h);
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "format: %s (requested=%s)", SDL_GetPixelFormatName(real_format), SDL_GetPixelFormatName(SDL_PIXELFORMAT_RGB24));
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "access: %d (requested=%d)", real_access, SDL_TEXTUREACCESS_STREAMING);
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "size: %dx%d (requested=%"SDL_PRIu64"x%"SDL_PRIu64")", real_w, real_h, (Uint64)w, (Uint64)h);
 
     smk_first(s);
     counter_deadline_next_frame = SDL_GetPerformanceCounter();
@@ -274,7 +273,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (SDL_CreateWindowAndRenderer(640, 480, SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN, &window, &renderer) < 0) {
-        fprintf(stderr, "SDL_CreateWindowAndRenderer failed (%s)", SDL_GetError());
+        SDL_Log("SDL_CreateWindowAndRenderer failed (%s)", SDL_GetError());
         return 1;
     }
 

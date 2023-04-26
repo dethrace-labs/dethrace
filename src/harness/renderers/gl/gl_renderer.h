@@ -2,6 +2,7 @@
 #define HARNESS_GL_RENDERER
 
 #include "harness.h"
+#include "harness/hooks.h"
 
 #define CHECK_GL_ERROR(msg)                                \
     {                                                      \
@@ -41,20 +42,17 @@
         }                                                  \
     }
 
-void GLRenderer_Init(int width, int height, int render_width, int render_height);
+void GLRenderer_Init(int render_width, int render_height);
 void GLRenderer_SetPalette(uint8_t* rgba_colors);
 void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer);
 void GLRenderer_EndScene();
 void GLRenderer_FullScreenQuad(uint8_t* screen_buffer);
-void GLRenderer_Model(br_actor* actor, br_model* model, br_matrix34 model_matrix, br_token render_type);
+void GLRenderer_Model(br_actor* actor, br_model* model, br_material* material, br_token render_type, br_matrix34 model_matrix);
 void GLRenderer_BufferTexture(br_pixelmap* pm);
 void GLRenderer_BufferMaterial(br_material* mat);
 void GLRenderer_BufferModel(br_model* model);
 void GLRenderer_ClearBuffers();
-void GLRenderer_FlushBuffers();
-void GLRenderer_GetRenderSize(int* width, int* height);
-void GLRenderer_GetWindowSize(int* width, int* height);
-void GLRenderer_SetWindowSize(int width, int height);
-void GLRenderer_GetViewport(int* x, int* y, int* width, int* height);
+void GLRenderer_FlushBuffers(tRenderer_flush_type flush_type);
+void GLRenderer_SetViewport(int x, int y, int width, int height);
 
 #endif

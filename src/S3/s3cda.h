@@ -5,7 +5,6 @@
 
 void S3DisableCDA();
 void S3StopCDAOutlets();
-int S3OpenCDADevice();
 
 int S3PlayCDA(tS3_channel* chan);
 int S3StopCDA(tS3_channel* chan);

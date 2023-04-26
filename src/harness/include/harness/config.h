@@ -40,6 +40,7 @@ typedef struct tHarness_game_config {
     float volume_multiplier;
     int start_full_screen;
     int enable_replay;
+    int dos_mode;
 
     int install_signalhandler;
 } tHarness_game_config;

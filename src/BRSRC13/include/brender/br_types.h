@@ -2997,19 +2997,24 @@ enum {
  * Bits for br_model->flags
  */
 enum {
-    BR_MODF_DONT_WELD = 0x0001,      /* Vertices with same x,y,z cannot be merged	*/
-    BR_MODF_KEEP_ORIGINAL = 0x0002,  /* Don't release model->faces/vertices during ModelUpdate() */
-    BR_MODF_GENERATE_TAGS = 0x0004,  /* Allocate and fill in the face and vertex tag structures */
-    BR_MODF_QUICK_UPDATE = 0x0010,   /* ModelUpdate is fast - but may produce slower models */
-    BR_MODF_CUSTOM = 0x0020,         /* Invoke custom callback for this model */
-    BR_MODF_PREPREPARED = 0x0040,    /* Model structure is pre-prepared - update performs no work */
-    BR_MODF_UPDATEABLE = 0x0080,     /* Added by Jeff from Errols code */
-    BR_MODF_CREASE = 0x0100,         /* Create creases in smoothing along edges if face<->face angle is g.t model->crease */
-    BR_MODF_CUSTOM_NORMALS = 0x0200, /* Uses vertex normals from br_vertex structure */
-    BR_MODF_CUSTOM_BOUNDS = 0x0400,  /* Bounding box is already set up				*/
-    // BR_MODF_FACES_ONLY = 0x0800, /* Model will only be used to render faces (not edges or points) */
+    BR_MODF_DONT_WELD = 0x0001,          /* Vertices with same x,y,z cannot be merged	*/
+    BR_MODF_KEEP_ORIGINAL = 0x0002,      /* Don't release model->faces/vertices during ModelUpdate() */
+    BR_MODF_GENERATE_TAGS = 0x0004,      /* Allocate and fill in the face and vertex tag structures */
+    BR_MODF_QUICK_UPDATE = 0x0010,       /* ModelUpdate is fast - but may produce slower models */
+    BR_MODF_CUSTOM = 0x0020,             /* Invoke custom callback for this model */
+    BR_MODF_PREPREPARED = 0x0040,        /* Model structure is pre-prepared - update performs no work */
+    BR_MODF_UPDATEABLE = 0x0080,         /* Added by Jeff from Errols code */
+    BR_MODF_CREASE = 0x0100,             /* Create creases in smoothing along edges if face<->face angle is g.t model->crease */
+    BR_MODF_CUSTOM_NORMALS = 0x0200,     /* Uses vertex normals from br_vertex structure */
+    BR_MODF_CUSTOM_BOUNDS = 0x0400,      /* Bounding box is already set up				*/
+    BR_MODF_FACES_ONLY = 0x0800,         /* Model will only be used to render faces (not edges or points) */
+    BR_MODF_USED_PREPARED_USER = 0x1000, /* User fields in prepared data used */
+    BR_MODF_CUSTOM_EQUATIONS = 0x2000,   /* Uses face equations from br_face structure */
+    _BR_MODF_RESERVED = 0x8000,
 
-    MODF_USES_DEFAULT = 0x8000
+    // Added by dethrace to force the vertex data to be reuploaded to GPU
+    BR_MODF_DETHRACE_FORCE_BUFFER_UPDATE = 0x4000
+
 };
 
 enum {

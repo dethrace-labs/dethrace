@@ -110,22 +110,30 @@ void InitSkids() {
     int sl;
     br_model* square;
     char* str;
+#if defined(DETHRACE_FIX_BUGS)
+    char mat_name[32];
+#endif
     LOG_TRACE("()");
 
-    for (mat = 0; mat < 2; mat++) {
+    for (mat = 0; mat < COUNT_OF(gMaterial_names); mat++) {
         if (gProgram_state.sausage_eater_mode) {
             str = gBoring_material_names[mat];
         } else {
             str = gMaterial_names[mat];
         }
         gMaterial[mat] = BrMaterialFind(str);
-        if (!gMaterial[mat]) {
+        if (gMaterial[mat] == NULL) {
             if (gProgram_state.sausage_eater_mode) {
                 str = gBoring_material_names[mat];
             } else {
                 str = gMaterial_names[mat];
             }
 
+#if defined(DETHRACE_FIX_BUGS)
+            // Avoid modification of read-only data by strtok.
+            strcpy(mat_name, str);
+            str = mat_name;
+#endif
             sl = strlen(strtok(str, "."));
             strcpy(str + sl, ".PIX");
             BrMapAdd(LoadPixelmap(str));

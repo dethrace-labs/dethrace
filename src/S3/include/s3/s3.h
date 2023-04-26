@@ -25,6 +25,7 @@ typedef struct tS3_vector3 {
 } tS3_vector3;
 
 int S3Init(char* path, int low_memory_mode);
+void S3Shutdown();
 
 void S3Disable();
 void S3Enable();

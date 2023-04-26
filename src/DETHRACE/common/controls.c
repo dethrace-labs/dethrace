@@ -1093,6 +1093,7 @@ void ToggleMirror() {
 }
 
 // IDA: void __cdecl ConcussMe()
+// dethrace: this is not referenced in the retail executables. Left over debug code.
 void ConcussMe() {
     LOG_TRACE("()");
 
@@ -2349,7 +2350,7 @@ void CycleSoundDetailLevel() {
     new_level = (gSound_detail_level + 1) % 3;
     ReallySetSoundDetailLevel(new_level);
     SetSoundDetailLevel(new_level);
-    switch(new_level) {
+    switch (new_level) {
     case 0:
         NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(116));
         break;

@@ -637,7 +637,7 @@ void ScreenLarger() {
 // IDA: void __usercall DRSetPaletteEntries(br_pixelmap *pPalette@<EAX>, int pFirst_colour@<EDX>, int pCount@<EBX>)
 void DRSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
     LOG_TRACE("(%p, %d, %d)", pPalette, pFirst_colour, pCount);
-    if (!pFirst_colour) {
+    if (pFirst_colour == 0) {
         ((br_int_32*)pPalette->pixels)[0] = 0;
     }
     memcpy(gCurrent_palette_pixels + 4 * pFirst_colour, (char*)pPalette->pixels + 4 * pFirst_colour, 4 * pCount);
@@ -728,7 +728,7 @@ void ClearWobbles() {
     int i;
     LOG_TRACE("()");
 
-    for (i = 0; i < COUNT_OF(gWobble_array); ++i) {
+    for (i = 0; i < COUNT_OF(gWobble_array); i++) {
         gWobble_array[i].time_started = 0;
     }
 }
@@ -739,7 +739,7 @@ void InitWobbleStuff() {
 
     ClearWobbles();
     for (i = 0; i < COUNT_OF(gCosine_array); i++) {
-        gCosine_array[i] = cosf(i / 64.0f * 3.141592653589793f / 2.0f);
+        gCosine_array[i] = cosf(i / 64.0f * DR_PI / 2.0f);
     }
 }
 
@@ -792,9 +792,44 @@ void CalculateWobblitude(tU32 pThe_time) {
     double cosine_over_angle;
     LOG_TRACE("(%d)", pThe_time);
 
+    if (gProgram_state.new_view != eView_undefined) {
+        return;
+    }
     gScreen_wobble_x = 0;
     gScreen_wobble_y = 0;
-    STUB_ONCE();
+    for (i = 0; i < COUNT_OF(gWobble_array); i++) {
+        if (gWobble_array[i].time_started != 0) {
+            time_going = pThe_time - gWobble_array[i].time_started;
+            if (time_going > 1000) {
+                gWobble_array[i].time_started = 0;
+            } else {
+                mod_angle = fmod(time_going / gWobble_array[i].period, TAU);
+                if (mod_angle > DR_3PI_OVER_2) {
+                    cosine_over_angle = gCosine_array[(unsigned int)((TAU - mod_angle) / DR_PI * 128.0)];
+                } else if (mod_angle > DR_PI) {
+                    cosine_over_angle = -gCosine_array[(unsigned int)((mod_angle - DR_PI) / DR_PI * 128.0)];
+                } else if (mod_angle > DR_PI_OVER_2) {
+                    cosine_over_angle = -gCosine_array[(unsigned int)((DR_PI - mod_angle) / DR_PI * 128.0)];
+                } else {
+                    cosine_over_angle = gCosine_array[(unsigned int)(mod_angle / DR_PI * 128.0)];
+                }
+                angle = cosine_over_angle / ((double)(pThe_time - gWobble_array[i].time_started) * 0.0035f + 1.0f);
+                gScreen_wobble_x = (gWobble_array[i].amplitude_x * angle + gScreen_wobble_x);
+                gScreen_wobble_y = (gWobble_array[i].amplitude_y * angle + gScreen_wobble_y);
+            }
+        }
+    }
+    if (gScreen_wobble_x > gCurrent_graf_data->cock_margin_x) {
+        gScreen_wobble_x = gCurrent_graf_data->cock_margin_x;
+    } else if (gScreen_wobble_x < -gCurrent_graf_data->cock_margin_x) {
+        gScreen_wobble_x = -gCurrent_graf_data->cock_margin_x;
+    }
+    if (gScreen_wobble_y > gCurrent_graf_data->cock_margin_y) {
+        gScreen_wobble_y = gCurrent_graf_data->cock_margin_y;
+    } else if (gScreen_wobble_y < -gCurrent_graf_data->cock_margin_y) {
+        gScreen_wobble_y = -gCurrent_graf_data->cock_margin_y;
+    }
+    PipeSingleScreenShake(gScreen_wobble_x, gScreen_wobble_y);
 }
 
 // IDA: void __usercall CalculateConcussion(tU32 pThe_time@<EAX>)
@@ -808,8 +843,34 @@ void CalculateConcussion(tU32 pThe_time) {
     float cosine_over_angle;
     LOG_TRACE("(%d)", pThe_time);
 
-    gConcussion.concussed = 0;
-    STUB_ONCE();
+    if (!gConcussion.concussed) {
+        return;
+    }
+    time_difference = pThe_time - gConcussion.time_started;
+    if (pThe_time - gConcussion.time_started > 2000) {
+        gConcussion.concussed = 0;
+    } else {
+        for (i = 0; i < 3; ++i) {
+            for (j = 0; j < 3; ++j) {
+                the_amplitude = gConcussion.amplitudes.m[i][j];
+                if (the_amplitude != 0.0) {
+                    mod_angle = fmodf(time_difference / gConcussion.periods.m[i][j], TAU);
+                    if (mod_angle > DR_3PI_OVER_2) {
+                        cosine_over_angle = gCosine_array[(unsigned int)((TAU - mod_angle) / DR_PI * 128.f)];
+                    } else if (mod_angle > DR_PI) {
+                        cosine_over_angle = -gCosine_array[(unsigned int)((mod_angle - DR_PI) / DR_PI * 128.f)];
+                    } else if (mod_angle > DR_PI_OVER_2) {
+                        cosine_over_angle = -gCosine_array[(unsigned int)((DR_PI - mod_angle) / DR_PI * 128.f)];
+                    } else {
+                        cosine_over_angle = gCosine_array[(unsigned int)(mod_angle / DR_PI * 128.f)];
+                    }
+                    angle = cosine_over_angle / ((double)time_difference * 0.02f + 1.0f);
+                    gCamera->t.t.mat.m[i][j] = angle * the_amplitude + gCamera->t.t.mat.m[i][j];
+                    gRearview_camera->t.t.mat.m[i][j] = angle * the_amplitude + gRearview_camera->t.t.mat.m[i][j];
+                }
+            }
+        }
+    }
 }
 
 // IDA: void __cdecl SufferFromConcussion(float pSeriousness)
@@ -817,7 +878,15 @@ void SufferFromConcussion(float pSeriousness) {
     int i;
     int j;
     LOG_TRACE("(%f)", pSeriousness);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
+            gConcussion.amplitudes.m[i][j] = FRandomPosNeg(pSeriousness);
+            gConcussion.periods.m[i][j] = FRandomBetween(20.f, 100.f);
+        }
+    }
+    gConcussion.concussed = 1;
+    gConcussion.time_started = GetTotalTime();
 }
 
 // IDA: void __usercall ProcessNonTrackActors(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>, br_matrix34 *pOld_camera_matrix)
@@ -1525,23 +1594,19 @@ void RenderAFrame(int pDepth_mask_on) {
         CalculateWobblitude(the_time);
     }
     if (cockpit_on) {
-        if (-gScreen_wobble_x <= gX_offset) {
-            if (gScreen_wobble_x + gX_offset + gRender_screen->width <= gBack_screen->width) {
-                x_shift = gScreen_wobble_x;
-            } else {
-                x_shift = gBack_screen->width - gRender_screen->width - gX_offset;
-            }
-        } else {
+        if (-gScreen_wobble_x > gX_offset) {
             x_shift = -gX_offset;
-        }
-        if (-gScreen_wobble_y <= gY_offset) {
-            if (gScreen_wobble_y + gY_offset + gRender_screen->height <= gBack_screen->height) {
-                y_shift = gScreen_wobble_y;
-            } else {
-                y_shift = gBack_screen->height - gRender_screen->height - gY_offset;
-            }
+        } else if (gScreen_wobble_x + gX_offset + gRender_screen->width > gBack_screen->width) {
+            x_shift = gBack_screen->width - gRender_screen->width - gX_offset;
         } else {
+            x_shift = gScreen_wobble_x;
+        }
+        if (-gScreen_wobble_y > gY_offset) {
             y_shift = -gY_offset;
+        } else if (gScreen_wobble_y + gY_offset + gRender_screen->height > gBack_screen->height) {
+            y_shift = gBack_screen->height - gRender_screen->height - gY_offset;
+        } else {
+            y_shift = gScreen_wobble_y;
         }
     } else {
         x_shift = 0;
@@ -1552,13 +1617,11 @@ void RenderAFrame(int pDepth_mask_on) {
         BrMatrix34Copy(&old_mirror_cam_matrix, &gRearview_camera->t.t.mat);
     }
     if (cockpit_on) {
-        gSheer_mat.m[2][1] = (double)y_shift / (double)gRender_screen->height;
-        gSheer_mat.m[2][0] = (double)-x_shift / (double)gRender_screen->width;
+        gSheer_mat.m[2][1] = y_shift / (float)gRender_screen->height;
+        gSheer_mat.m[2][0] = -x_shift / (float)gRender_screen->width;
         BrMatrix34Pre(&gCamera->t.t.mat, &gSheer_mat);
-        gCamera->t.t.mat.m[3][0] = gCamera->t.t.mat.m[3][0]
-            - (double)gScreen_wobble_x * 1.5 / (double)gRender_screen->width / 6.9000001;
-        gCamera->t.t.mat.m[3][1] = (double)gScreen_wobble_y * 1.5 / (double)gRender_screen->width / 6.9000001
-            + gCamera->t.t.mat.m[3][1];
+        gCamera->t.t.translate.t.v[0] -= gScreen_wobble_x * 1.5f / gRender_screen->width / WORLD_SCALE;
+        gCamera->t.t.translate.t.v[1] += gScreen_wobble_y * 1.5f / gRender_screen->width / WORLD_SCALE;
     }
     gRender_screen->pixels = (char*)gRender_screen->pixels + x_shift + y_shift * gRender_screen->row_bytes;
     CalculateConcussion(the_time);
@@ -1608,17 +1671,15 @@ void RenderAFrame(int pDepth_mask_on) {
         RenderLollipops();
 
         // dethrace: must flush gpu buffer before rendering depth effect into framebuffer
-        Harness_Hook_FlushRenderer();
+        gHarness_platform.Renderer_FlushBuffers();
         DepthEffectSky(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world);
         DepthEffect(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world);
         if (!gAusterity_mode) {
-            // dethrace: must flush gpu buffer before rendering blended materials
-            Harness_Hook_FlushRenderer();
             ProcessTrack(gUniverse_actor, &gProgram_state.track_spec, gCamera, &gCamera_to_world, 1);
         }
         RenderSplashes();
         // dethrace: must flush gpu buffer before rendering smoke into framebuffer
-        Harness_Hook_FlushRenderer();
+        gHarness_platform.Renderer_FlushBuffers();
         RenderSmoke(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, gFrame_period);
         RenderSparks(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, gFrame_period);
         RenderProximityRays(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, gFrame_period);
@@ -2513,10 +2574,10 @@ int DoMouseCursor() {
         period = 1000;
     }
     while (period <= 20) {
-        // Sleep 1 ms to avoid 100% CPU usage
-        OS_Sleep(1);
         this_call_time = PDGetTotalTime();
         period = this_call_time - last_call_time;
+        // added by dethrace to avoid 100% CPU usage
+        gHarness_platform.Sleep(1);
     }
     GetMousePosition(&x_coord, &y_coord);
     mouse_moved = x_coord != gMouse_last_x_coord || y_coord != gMouse_last_y_coord;

@@ -1,9 +1,9 @@
 #include "harness.h"
 #include "brender_emu/renderer_impl.h"
 #include "include/harness/config.h"
+#include "include/harness/hooks.h"
 #include "include/harness/os.h"
-#include "io_platforms/io_platform.h"
-#include "renderers/null.h"
+#include "platforms/null.h"
 #include "sound/sound.h"
 #include "version.h"
 
@@ -12,7 +12,6 @@
 #include <string.h>
 #include <sys/stat.h>
 
-tRenderer* renderer;
 br_pixelmap* palette;
 uint32_t* screen_buffer;
 harness_br_renderer* renderer_state;
@@ -21,10 +20,10 @@ br_pixelmap* last_dst = NULL;
 br_pixelmap* last_src = NULL;
 
 unsigned int last_frame_time = 0;
-int force_nullrenderer = 0;
+int force_null_platform = 0;
 
 extern unsigned int GetTotalTime();
-extern uint8_t gScan_code[123][2];
+
 extern br_v1db_state v1db;
 extern uint32_t gI_am_cheating;
 
@@ -33,6 +32,9 @@ tHarness_game_info harness_game_info;
 
 // Configuration options
 tHarness_game_config harness_game_config;
+
+// Platform hooks
+tHarness_platform gHarness_platform;
 
 /* clang-format off */
 // German ASCII codes
@@ -77,6 +79,8 @@ static int splatpack_xmasdemo_ascii_shift_table[128] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 8,
 };
 /* clang-format on */
+
+extern void Harness_Platform_Init();
 
 int Harness_ProcessCommandLine(int* argc, char* argv[]);
 
@@ -195,6 +199,8 @@ void Harness_Init(int* argc, char* argv[]) {
     harness_game_config.start_full_screen = 0;
     // disable replay by default
     harness_game_config.enable_replay = 0;
+    // Emulate DOS behavior
+    harness_game_config.dos_mode = 0;
 
     // install signal handler by default
     harness_game_config.install_signalhandler = 1;
@@ -219,20 +225,16 @@ void Harness_Init(int* argc, char* argv[]) {
         Harness_DetectGameMode();
     }
 
-    Input_Init();
-    int* keymap = Input_GetKeyMap();
-    if (keymap != NULL) {
-        for (int i = 0; i < 123; i++) {
-            gScan_code[i][0] = keymap[i];
-            // gScan_code[i][1] = keymap[i];
-        }
+    if (force_null_platform) {
+        Null_Platform_Init(&gHarness_platform);
+    } else {
+        Harness_Platform_Init(&gHarness_platform);
     }
 }
 
 // used by unit tests
-void Harness_ForceNullRenderer() {
-    force_nullrenderer = 1;
-    renderer = &null_renderer;
+void Harness_ForceNullPlatform() {
+    force_null_platform = 1;
 }
 
 int Harness_ProcessCommandLine(int* argc, char* argv[]) {
@@ -287,6 +289,9 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
         } else if (strcasecmp(argv[i], "--enable-replay") == 0) {
             harness_game_config.enable_replay = 1;
             handled = 1;
+        } else if (strcasecmp(argv[i], "--dos-mode") == 0) {
+            harness_game_config.dos_mode = 1;
+            handled = 1;
         }
 
         if (handled) {
@@ -302,44 +307,12 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
     return 0;
 }
 
-void Harness_Hook_GraphicsInit(int render_width, int render_height) {
-    int window_width, window_height;
-    if (force_nullrenderer) {
-        return;
-    }
-    if (render_width == 320) {
-        window_width = render_width * 2;
-        window_height = render_height * 2;
-    } else {
-        window_width = render_width;
-        window_height = render_height;
-    }
-    renderer = Window_Create("Dethrace", window_width, window_height, render_width, render_height);
-}
-
 // Render 2d back buffer
 void Harness_RenderScreen(br_pixelmap* dst, br_pixelmap* src) {
-    renderer->FullScreenQuad((uint8_t*)src->pixels);
+    gHarness_platform.Renderer_FullScreenQuad((uint8_t*)src->pixels);
 
     last_dst = dst;
     last_src = src;
-}
-
-void Harness_Hook_BrDevPaletteSetOld(br_pixelmap* pm) {
-    renderer->SetPalette((uint8_t*)pm->pixels);
-    palette = pm;
-
-    if (last_dst) {
-        Harness_RenderScreen(last_dst, last_src);
-        Window_Swap(0);
-    }
-}
-
-void Harness_Hook_BrDevPaletteSetEntryOld(int i, br_colour colour) {
-    if (palette != NULL) {
-        uint32_t* colors = palette->pixels;
-        colors[i] = colour;
-    }
 }
 
 void Harness_Hook_BrV1dbRendererBegin(br_v1db_state* v1db) {
@@ -367,18 +340,8 @@ int Harness_CalculateFrameDelay() {
     return 0;
 }
 
-// Begin 3d scene
-void Harness_Hook_BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer) {
-    renderer->BeginScene(camera, colour_buffer, depth_buffer);
-}
-
 void Harness_Hook_renderActor(br_actor* actor, br_model* model, br_material* material, br_token type) {
-    renderer->Model(actor, model, renderer_state->state.matrix.model_to_view, type);
-}
-
-void Harness_Hook_BrZbSceneRenderEnd() {
-    renderer->FlushBuffers();
-    renderer->EndScene();
+    gHarness_platform.Renderer_Model(actor, model, material, type, renderer_state->state.matrix.model_to_view);
 }
 
 // Called by game to swap buffers at end of frame rendering
@@ -388,60 +351,20 @@ void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {
     Harness_RenderScreen(dst, src);
 
     int delay_ms = Harness_CalculateFrameDelay();
-    Window_Swap(delay_ms);
+    gHarness_platform.SwapWindow();
+    if (delay_ms > 0) {
+        gHarness_platform.Sleep(delay_ms);
+    }
 
-    renderer->ClearBuffers();
-    Window_PollEvents();
-
+    gHarness_platform.Renderer_ClearBuffers();
     last_frame_time = GetTotalTime();
 }
 
-int Harness_Hook_KeyDown(unsigned char pScan_code) {
-    return Input_IsKeyDown(pScan_code);
-}
-
-void Harness_Hook_PDServiceSystem() {
-    Window_PollEvents();
-}
-void Harness_Hook_PDSetKeyArray() {
-    Window_PollEvents();
-}
-
-void Harness_Hook_FlushRenderer() {
-    renderer->FlushBuffers();
-}
-
-void Harness_Hook_BrMaterialUpdate(br_material* mat, br_uint_16 flags) {
-    renderer->BufferMaterial(mat);
-}
-
-void Harness_Hook_BrBufferUpdate(br_pixelmap* pm, br_token use, br_uint_16 flags) {
-    if (use == BRT_COLOUR_MAP_O || use == BRT_UNKNOWN) {
-        renderer->BufferTexture(pm);
-    } else {
-        LOG_PANIC("use %d", use);
+void Harness_RenderLastScreen() {
+    if (last_dst) {
+        Harness_RenderScreen(last_dst, last_src);
+        gHarness_platform.SwapWindow(0);
     }
-}
-
-void Harness_Hook_BrModelUpdate(br_model* model) {
-    renderer->BufferModel(model);
-}
-
-// Input hooks
-void Harness_Hook_GetMousePosition(int* pX, int* pY) {
-    Input_GetMousePosition(pX, pY);
-}
-
-void Harness_Hook_GetMouseButtons(int* pButton1, int* pButton2) {
-    Input_GetMouseButtons(pButton1, pButton2);
-}
-
-// Sound hooks
-void Harness_Hook_S3Service(int unk1, int unk2) {
-    Sound_Service();
-}
-
-void Harness_Hook_S3StopAllOutletSounds() {
 }
 
 // Filesystem hooks

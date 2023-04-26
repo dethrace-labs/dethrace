@@ -4,7 +4,7 @@
 #include "brender/br_types.h"
 #include "harness/trace.h"
 
-void Harness_ForceNullRenderer();
+void Harness_ForceNullPlatform();
 
 typedef struct tCamera {
     void (*update)();
@@ -12,7 +12,5 @@ typedef struct tCamera {
     float* (*getView)();
     void (*setPosition)();
 } tCamera;
-
-
 
 #endif

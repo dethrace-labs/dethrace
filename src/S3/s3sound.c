@@ -1,46 +1,29 @@
 #include "s3sound.h"
 #include "audio.h"
-#include "harness/config.h"
+#include "harness/trace.h"
 #include "miniaudio/miniaudio.h"
 #include "resource.h"
-#include "harness/trace.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#define MAX_PATH_LENGTH 1024
 extern void dr_dprintf(char* fmt_string, ...);
 
 int gS3_sample_filter_funcs_registered;
 tS3_sample_filter* gS3_sample_filter_func;
 tS3_sample_filter* gS3_sample_filter_disable_func;
 
-ma_engine engine;
+// dethrace
+extern ma_engine miniaudio_engine;
 
-int S3OpenSampleDevice() {
-    ma_result result;
-
-    ma_engine_config engineConfig;
-    engineConfig = ma_engine_config_init();
-    engineConfig.sampleRate = 22050;
-
-    result = ma_engine_init(&engineConfig, &engine);
-    if (result != MA_SUCCESS) {
-        printf("Failed to initialize audio engine.");
-        return 0;
-    }
-
-    ma_engine_set_volume(&engine, harness_game_config.volume_multiplier);
-
-    S3Enable();
-    return 1;
-}
-
-// Returns 0 if no error
 int S3LoadSample(tS3_sound_id id) {
+    // changed by dethrace for compatibility
+    // char filename[80]; // [esp+10h] [ebp-5Ch] BYREF
+    char filename[MAX_PATH_LENGTH];
+    tS3_descriptor* descriptor; // [esp+60h] [ebp-Ch]
+    tS3_sample* sample;         // [esp+68h] [ebp-4h]
     // LPDIRECTSOUNDBUFFER WavFile; // eax
-    char filename[MAX_PATH_LENGTH]; // [esp+10h] [ebp-5Ch] BYREF
-    tS3_descriptor* descriptor;     // [esp+60h] [ebp-Ch]
-    tS3_sample* sample;             // [esp+68h] [ebp-4h]
 
     if (!gS3_enabled) {
         return 0;
@@ -189,7 +172,7 @@ void* S3LoadWavFile(char* pFile_name, tS3_sample* pSample) {
 
     ma_sound* sound = malloc(sizeof(ma_sound));
     // TOOD: load from memory - we've already read the file data
-    if (ma_sound_init_from_file(&engine, pFile_name, MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_NO_SPATIALIZATION, NULL, NULL, sound) != MA_SUCCESS) {
+    if (ma_sound_init_from_file(&miniaudio_engine, pFile_name, MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_NO_SPATIALIZATION, NULL, NULL, sound) != MA_SUCCESS) {
         return NULL; // Failed to load sound.
     }
     S3MemFree(buf);

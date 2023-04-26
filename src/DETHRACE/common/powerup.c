@@ -845,7 +845,7 @@ void PaletteFuckedUpByDrugs(br_pixelmap* pPixelmap, int pOffset) {
     int i;
     LOG_TRACE("(%p, %d)", pPixelmap, pOffset);
 
-    *(tU32*)gRender_palette->pixels = *gReal_render_palette;
+    ((tU32*)gRender_palette->pixels)[0] = gReal_render_palette[0];
     for (i = 1; i < 224; i++) {
         ((tU32*)gRender_palette->pixels)[i] = gReal_render_palette[(i + pOffset) & 0xff];
     }

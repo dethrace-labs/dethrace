@@ -200,6 +200,4 @@ typedef struct tWAVEFORMATEX_ {
 } tWAVEFORMATEX_;
 #pragma pack(pop)
 
-#define MAX_PATH_LENGTH 256
-
 #endif

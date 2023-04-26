@@ -67,6 +67,7 @@ option(DETHRACE_FIX_BUGS "Fix Dethrace bugs" ON)
 
 add_subdirectory(src/harness)
 add_subdirectory(src/S3)
+add_subdirectory(src/smackw32)
 add_subdirectory(src/BRSRC13)
 add_subdirectory(src/DETHRACE)
 add_subdirectory(tools)

@@ -46,6 +46,11 @@ br_vector3 gCamera_velocity;
 
 // IDA: void __cdecl UsePathFileToDetermineIfFullInstallation()
 void UsePathFileToDetermineIfFullInstallation() {
+    // changed by dethrace for compatibility
+    // char line1[80];
+    // char line2[80];
+    // char line3[80];
+    // char path_file[80];
     char line1[MAX_PATH_LENGTH];
     char line2[MAX_PATH_LENGTH];
     char line3[MAX_PATH_LENGTH];
@@ -322,7 +327,11 @@ int DRS3SoundStillPlaying(tS3_sound_tag pSound_tag) {
 // IDA: void __cdecl DRS3ShutDown()
 void DRS3ShutDown() {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gSound_enabled) {
+        gSound_enabled = 0;
+        S3Shutdown();
+    }
 }
 
 // IDA: int __usercall DRS3SetOutletVolume@<EAX>(tS3_outlet_ptr pOutlet@<EAX>, tS3_volume pVolume@<EDX>)
