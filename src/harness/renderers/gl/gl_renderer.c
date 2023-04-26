@@ -65,7 +65,7 @@ struct {
     GLuint material_blend_enabled;
     GLuint material_blend_table;
     GLuint material_index_base;
-    GLuint material_index_range;
+    // GLuint material_index_range;  TODO: re-add when we add untextured lighting
     GLuint material_shade_table_height;
 
 } uniforms_3d;
@@ -161,7 +161,8 @@ void LoadShaders() {
     uniforms_3d.material_blend_enabled = GetValidatedUniformLocation(shader_program_3d, "u_material_blend_enabled");
     uniforms_3d.material_blend_table = GetValidatedUniformLocation(shader_program_3d, "u_material_blend_table");
     uniforms_3d.material_index_base = GetValidatedUniformLocation(shader_program_3d, "u_material_index_base");
-    uniforms_3d.material_index_range = GetValidatedUniformLocation(shader_program_3d, "u_material_index_range");
+    // TODO: re-add when we support untextured lighting
+    // uniforms_3d.material_index_range = GetValidatedUniformLocation(shader_program_3d, "u_material_index_range");
 
     // bind the uniform samplers to texture units
     glUniform1i(uniforms_3d.material_texture_pixelmap, 0);
@@ -544,7 +545,7 @@ void setActiveMaterial(tStored_material* material) {
 
         // index_base and index_range are only used for untextured materials
         glUniform1ui(uniforms_3d.material_index_base, material->index_base);
-        glUniform1ui(uniforms_3d.material_index_range, material->index_range);
+        // glUniform1ui(uniforms_3d.material_index_range, material->index_range);  TODO: re-add when we support untextured lighting
     }
 
     if (material->shade_table) {
