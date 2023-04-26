@@ -66,7 +66,6 @@ void main() {
 
         if ((u_material_flags & BR_MATF_LIGHT) != 0u) {
             // TODO: lighting calculations based on https://rr2000.cwaboard.co.uk/R4/BRENDER/TEBK_43.HTM#0
-            uint range = u_material_index_range;
         }
     }
     else {
