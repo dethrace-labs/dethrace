@@ -80,7 +80,7 @@ char* _unittest_last_fatal_error;
 void Win32InitScreen();
 void Win32PumpMessages();
 void Win32ReleaseInputDevice();
-void Win32FatalError(char* pStr_1, char* pStr_2);
+HARNESS_NORETURN void Win32FatalError(char* pStr_1, char* pStr_2);
 void Win32BRenderWarningFunc(char* msg);
 void Win32BRenderFailureFunc(char* msg);
 void Win32AllocateActionReplayBuffer();
