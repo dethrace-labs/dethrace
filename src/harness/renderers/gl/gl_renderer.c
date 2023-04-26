@@ -161,6 +161,8 @@ void LoadShaders() {
     uniforms_3d.material_blend_enabled = GetValidatedUniformLocation(shader_program_3d, "u_material_blend_enabled");
     uniforms_3d.material_blend_table = GetValidatedUniformLocation(shader_program_3d, "u_material_blend_table");
     uniforms_3d.material_index_base = GetValidatedUniformLocation(shader_program_3d, "u_material_index_base");
+    // TODO: re-add when we support untextured lighting
+    // uniforms_3d.material_index_range = GetValidatedUniformLocation(shader_program_3d, "u_material_index_range");
 
     // bind the uniform samplers to texture units
     glUniform1i(uniforms_3d.material_texture_pixelmap, 0);
