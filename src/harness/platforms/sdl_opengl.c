@@ -219,6 +219,10 @@ void set_palette(PALETTEENTRY_* pal) {
     GLRenderer_SetPalette((uint8_t*)pal);
 }
 
+void flush_buffers() {
+    GLRenderer_FlushBuffers(eFlush_all);
+}
+
 void Harness_Platform_Init(tHarness_platform* platform) {
     platform->ProcessWindowMessages = get_and_handle_message;
     platform->Sleep = SDL_Delay;
@@ -240,7 +244,7 @@ void Harness_Platform_Init(tHarness_platform* platform) {
     platform->Renderer_FullScreenQuad = GLRenderer_FullScreenQuad;
     platform->Renderer_Model = GLRenderer_Model;
     platform->Renderer_ClearBuffers = GLRenderer_ClearBuffers;
-    platform->Renderer_FlushBuffers = GLRenderer_FlushBuffers;
+    platform->Renderer_FlushBuffers = flush_buffers;
     platform->Renderer_BeginScene = GLRenderer_BeginScene;
     platform->Renderer_EndScene = GLRenderer_EndScene;
     platform->Renderer_SetViewport = GLRenderer_SetViewport;
