@@ -8,8 +8,8 @@
 
 int SSDXStart(void* hWnd, int windowed, int flags);
 int SSDXInitDirectDraw(int width, int height, int* row_bytes);
-void SSDXRelease();
-void SSDXLockAttachedSurface();
+void SSDXRelease(void);
+void SSDXLockAttachedSurface(void);
 void SSDXGetWindowRect(void* hWnd);
 void SSDXHandleError(int error);
 

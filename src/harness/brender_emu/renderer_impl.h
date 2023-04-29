@@ -38,6 +38,6 @@ typedef struct harness_br_renderer {
 
 } harness_br_renderer;
 
-harness_br_renderer* NewHarnessBrRenderer();
+harness_br_renderer* NewHarnessBrRenderer(void);
 
 #endif

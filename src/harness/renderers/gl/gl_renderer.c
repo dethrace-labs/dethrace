@@ -74,7 +74,7 @@ struct {
     GLuint pixels, palette;
 } uniforms_2d;
 
-GLuint CreateShaderProgram(char* name, const char* vertex_shader, const int vertex_shader_len, const char* fragment_shader, const int fragment_shader_len) {
+static GLuint CreateShaderProgram(char* name, const char* vertex_shader, const int vertex_shader_len, const char* fragment_shader, const int fragment_shader_len) {
     int success;
     char log_buffer[1024];
     GLuint program;
@@ -117,7 +117,7 @@ GLuint CreateShaderProgram(char* name, const char* vertex_shader, const int vert
     return program;
 }
 
-GLint GetValidatedUniformLocation(GLuint program, char* uniform_name) {
+static GLint GetValidatedUniformLocation(GLuint program, char* uniform_name) {
     GLint location;
     location = glGetUniformLocation(program, uniform_name);
     if (location == -1) {
@@ -126,7 +126,7 @@ GLint GetValidatedUniformLocation(GLuint program, char* uniform_name) {
     return location;
 }
 
-void LoadShaders() {
+static void LoadShaders(void) {
     shader_program_2d = CreateShaderProgram("framebuffer", RESOURCES_FRAMEBUFFER_VERT_GLSL, sizeof(RESOURCES_FRAMEBUFFER_VERT_GLSL), RESOURCES_FRAMEBUFFER_FRAG_GLSL, sizeof(RESOURCES_FRAMEBUFFER_FRAG_GLSL));
     glUseProgram(shader_program_2d);
     uniforms_2d.pixels = GetValidatedUniformLocation(shader_program_2d, "u_pixels");
@@ -172,7 +172,7 @@ void LoadShaders() {
     glUniform1i(uniforms_3d.colour_buffer_texture, 4);
 }
 
-void SetupFullScreenRectGeometry() {
+static void SetupFullScreenRectGeometry(void) {
     float vertices[] = {
         // positions          // colors           // texture coords
         1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right

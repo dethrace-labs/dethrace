@@ -25,10 +25,10 @@ typedef struct tS3_vector3 {
 } tS3_vector3;
 
 int S3Init(char* path, int low_memory_mode);
-void S3Shutdown();
+void S3Shutdown(void);
 
-void S3Disable();
-void S3Enable();
+void S3Disable(void);
+void S3Enable(void);
 
 void S3Set3DSoundEnvironment(float a1, float a2, float a3);
 tS3_sound_source_ptr S3CreateSoundSourceBR(br_vector3* pPosition, br_vector3* pVelocity, tS3_outlet_ptr pBound_outlet);
@@ -48,7 +48,7 @@ void S3Service(int inside_cockpit, int unk1);
 int S3LoadSample(tS3_sound_id id);
 tS3_sound_tag S3StartSound(tS3_outlet_ptr pOutlet, tS3_sound_id pSound);
 tS3_sound_tag S3StartSound2(tS3_outlet_ptr pOutlet, tS3_sound_id pSound, tS3_repeats pRepeats, tS3_volume pLVolume, tS3_volume pRVolume, tS3_pitch pPitch, tS3_speed pSpeed);
-void S3StopAllOutletSounds();
+void S3StopAllOutletSounds(void);
 int S3SoundStillPlaying(tS3_sound_tag pSound);
 int S3StopSound(tS3_sound_tag pSound_tag);
 int S3StopOutletSound(tS3_outlet_ptr pOutlet);
@@ -59,7 +59,7 @@ void S3BindListenerPositionBRender(br_vector3* pos);
 void S3BindListenerVelocityBRender(br_vector3* vel);
 void S3BindListenerLeftBRender(br_vector3* left);
 
-int S3IsCDAPlaying2();
+int S3IsCDAPlaying2(void);
 
 int S3SetEffects(tS3_sample_filter* filter1, tS3_sample_filter* filter2);
 

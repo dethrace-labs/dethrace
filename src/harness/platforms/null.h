@@ -20,7 +20,7 @@ int null_get_and_handle_message(MSG_* msg) {
     return 0;
 }
 
-void null_swap_window() {
+void null_swap_window(void) {
 }
 
 void null_get_keyboard_state(unsigned int count, uint8_t* buffer) {
@@ -38,18 +38,18 @@ int null_show_cursor(int show) {
     return 0;
 }
 
-void NullRenderer_Init() {}
+void NullRenderer_Init(void) {}
 void NullRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer) {}
-void NullRenderer_EndScene() {}
+void NullRenderer_EndScene(void) {}
 void NullRenderer_SetPalette(PALETTEENTRY_* palette) {}
 void NullRenderer_FullScreenQuad(uint8_t* src) {}
 void NullRenderer_Model(br_actor* actor, br_model* model, br_material* material, br_token render_type, br_matrix34 model_matrix) {}
-void NullRenderer_RenderFrameBuffer() {}
-void NullRenderer_ClearBuffers() {}
+void NullRenderer_RenderFrameBuffer(void) {}
+void NullRenderer_ClearBuffers(void) {}
 void NullRenderer_BufferTexture(br_pixelmap* pm) {}
 void NullRenderer_BufferMaterial(br_material* mat) {}
 void NullRenderer_BufferModel(br_model* model) {}
-void NullRenderer_FlushBuffers() {}
+void NullRenderer_FlushBuffers(void) {}
 void NullRenderer_SetViewport(int x, int y, int width, int height) {}
 
 void Null_Platform_Init(tHarness_platform* platform) {

@@ -46,7 +46,7 @@ static int dl_iterate_callback(struct dl_phdr_info* info, size_t size, void* dat
     return 0;
 }
 
-static intptr_t get_dethrace_offset() {
+static intptr_t get_dethrace_offset(void) {
     if (!dethrace_dl_data.initialized) {
         dethrace_dl_data.initialized = 1;
         dl_iterate_phdr(dl_iterate_callback, &dethrace_dl_data);
@@ -65,7 +65,7 @@ int addr2line(char const* const program_name, void const* const addr) {
     return system(addr2line_cmd);
 }
 
-void print_stack_trace() {
+static void print_stack_trace(void) {
     int i, trace_size = 0;
     char** messages = (char**)NULL;
 
