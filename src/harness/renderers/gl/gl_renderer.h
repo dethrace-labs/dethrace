@@ -52,7 +52,8 @@ void GLRenderer_BufferTexture(br_pixelmap* pm);
 void GLRenderer_BufferMaterial(br_material* mat);
 void GLRenderer_BufferModel(br_model* model);
 void GLRenderer_ClearBuffers();
-void GLRenderer_FlushBuffers(tRenderer_flush_type flush_type);
+void GLRenderer_FlushBuffer(tRenderer_flush_type flush_type);
+void GLRenderer_FlushBuffers();
 void GLRenderer_SetViewport(int x, int y, int width, int height);
 
 #endif
