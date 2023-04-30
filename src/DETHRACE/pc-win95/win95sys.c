@@ -104,9 +104,6 @@ static void Usage(char* pProgpath);
 static void Win32BRenderWarningFunc(char* msg);
 static void Win32BRenderFailureFunc(char* msg);
 
-
-
-
 extern void QuitGame(void);
 
 void KeyboardHandler() {

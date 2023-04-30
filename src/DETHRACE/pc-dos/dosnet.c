@@ -62,7 +62,7 @@ tU16 gSend_selector;
 /*static*/ void GetLargestPacketSizeOoErBetterInsertLinfordChristieJokeHere(void);
 /*static*/ void GetIPXToStickItsEarToTheGround(void);
 
-    // IDA: void __cdecl ClearupPDNetworkStuff()
+// IDA: void __cdecl ClearupPDNetworkStuff()
 void ClearupPDNetworkStuff() {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
