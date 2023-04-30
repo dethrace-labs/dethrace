@@ -326,7 +326,7 @@ void GLRenderer_SetShadeTable(br_pixelmap* table) {
 void GLRenderer_SetBlendTable(br_pixelmap* table) {
 
     if (flush_counter != colourbuffer_upload_counter) {
-        GLRenderer_FlushBuffers(eFlush_color_buffer);
+        GLRenderer_FlushBuffer(eFlush_color_buffer);
         glActiveTexture(GL_TEXTURE4);
         glBindTexture(GL_TEXTURE_2D, current_colourbuffer_texture);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_R8UI, render_width, render_height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, last_colour_buffer->pixels);
@@ -690,7 +690,7 @@ void GLRenderer_BufferTexture(br_pixelmap* pm) {
     CHECK_GL_ERROR("GLRenderer_BufferTexture");
 }
 
-void GLRenderer_FlushBuffers(tRenderer_flush_type flush_type) {
+void GLRenderer_FlushBuffer(tRenderer_flush_type flush_type) {
 
     if (!dirty_buffers) {
         return;
@@ -736,6 +736,10 @@ void GLRenderer_FlushBuffers(tRenderer_flush_type flush_type) {
     glClear(GL_COLOR_BUFFER_BIT);
     flush_counter++;
     dirty_buffers = 0;
+}
+
+void GLRenderer_FlushBuffers() {
+    GLRenderer_FlushBuffer(eFlush_all);
 }
 
 void GLRenderer_SetViewport(int x, int y, int width, int height) {
