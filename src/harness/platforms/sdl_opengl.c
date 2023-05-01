@@ -26,7 +26,7 @@ struct {
     float y;
 } sdl_window_scale;
 
-static void update_viewport() {
+static void update_viewport(void) {
     const float target_aspect_ratio = (float)render_width / render_height;
     const float aspect_ratio = (float)window_width / window_height;
 
@@ -44,7 +44,7 @@ static void update_viewport() {
     GLRenderer_SetViewport(vp_x, vp_y, vp_width, vp_height);
 }
 
-void* create_window_and_renderer(char* title, int x, int y, int width, int height) {
+static void* create_window_and_renderer(char* title, int x, int y, int width, int height) {
     window_width = width;
     window_height = height;
     render_width = width;
@@ -96,7 +96,7 @@ void* create_window_and_renderer(char* title, int x, int y, int width, int heigh
     return window;
 }
 
-int set_window_pos(void* hWnd, int x, int y, int nWidth, int nHeight) {
+static int set_window_pos(void* hWnd, int x, int y, int nWidth, int nHeight) {
     // SDL_SetWindowPosition(hWnd, x, y);
     if (nWidth == 320 && nHeight == 200) {
         nWidth = 640;
@@ -106,7 +106,7 @@ int set_window_pos(void* hWnd, int x, int y, int nWidth, int nHeight) {
     return 0;
 }
 
-void destroy_window(void* hWnd) {
+static void destroy_window(void* hWnd) {
     SDL_GL_DeleteContext(context);
     SDL_DestroyWindow(window);
     SDL_Quit();
@@ -119,7 +119,7 @@ static int is_only_key_modifier(int modifier_flags, int flag_check) {
     return (modifier_flags & flag_check) && (modifier_flags & (KMOD_CTRL | KMOD_SHIFT | KMOD_ALT | KMOD_GUI)) == (modifier_flags & flag_check);
 }
 
-int get_and_handle_message(MSG_* msg) {
+static int get_and_handle_message(MSG_* msg) {
     SDL_Event event;
     int dinput_key;
 
@@ -171,22 +171,22 @@ int get_and_handle_message(MSG_* msg) {
     return 0;
 }
 
-void swap_window() {
+static void swap_window(void) {
     SDL_GL_SwapWindow(window);
 }
 
-void get_keyboard_state(unsigned int count, uint8_t* buffer) {
+static void get_keyboard_state(unsigned int count, uint8_t* buffer) {
     memcpy(buffer, directinput_key_state, count);
 }
 
-int get_mouse_buttons(int* pButton1, int* pButton2) {
+static int get_mouse_buttons(int* pButton1, int* pButton2) {
     int state = SDL_GetMouseState(NULL, NULL);
     *pButton1 = state & SDL_BUTTON_LMASK;
     *pButton2 = state & SDL_BUTTON_RMASK;
     return 0;
 }
 
-int get_mouse_position(int* pX, int* pY) {
+static int get_mouse_position(int* pX, int* pY) {
     SDL_GetMouseState(pX, pY);
 
     if (*pX < vp_x) {
@@ -215,7 +215,7 @@ int get_mouse_position(int* pX, int* pY) {
     return 0;
 }
 
-void set_palette(PALETTEENTRY_* pal) {
+static void set_palette(PALETTEENTRY_* pal) {
     GLRenderer_SetPalette((uint8_t*)pal);
 }
 

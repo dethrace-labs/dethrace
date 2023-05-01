@@ -1,6 +1,8 @@
 #ifndef S3_TYPES_H
 #define S3_TYPES_H
 
+#include "s3/s3.h"
+
 #include <stdint.h>
 
 // extern int PDGetTotalTime();
@@ -12,7 +14,7 @@
 // Internal typedefs
 
 typedef float tF32;
-typedef char* tS3_sound_source_ptr;
+typedef tS3_sound_source* tS3_sound_source_ptr;
 typedef int tS3_sound_tag;
 typedef int tS3_sound_id;
 typedef int tS3_type;
@@ -22,11 +24,11 @@ typedef int tS3_effect_tag;
 typedef long tS3_priority;
 typedef long tS3_pitch;
 typedef long tS3_speed;
-typedef char* tS3_outlet_ptr;
 typedef struct tS3_outlet tS3_outlet;
 typedef struct tS3_descriptor tS3_descriptor;
 typedef struct tS3_channel tS3_channel;
 typedef struct tS3_sound_source tS3_sound_source;
+typedef tS3_outlet* tS3_outlet_ptr;
 
 typedef enum tS3_error_codes {
     eS3_error_none = 0,
@@ -71,12 +73,6 @@ typedef enum tS3_sound_type {
 
 typedef void tS3_outlet_callback(tS3_outlet*, tS3_sound_tag, tS3_termination_reason);
 typedef void tS3_sample_filter(tS3_effect_tag, tS3_sound_tag);
-
-typedef struct tS3_vector3 {
-    tF32 x;
-    tF32 y;
-    tF32 z;
-} tS3_vector3;
 
 typedef struct tS3_channel {
     int active;

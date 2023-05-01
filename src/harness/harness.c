@@ -22,7 +22,7 @@ br_pixelmap* last_src = NULL;
 unsigned int last_frame_time = 0;
 int force_null_platform = 0;
 
-extern unsigned int GetTotalTime();
+extern unsigned int GetTotalTime(void);
 
 extern br_v1db_state v1db;
 extern uint32_t gI_am_cheating;
@@ -84,7 +84,7 @@ extern void Harness_Platform_Init(tHarness_platform* platform);
 
 int Harness_ProcessCommandLine(int* argc, char* argv[]);
 
-void Harness_DetectGameMode() {
+static void Harness_DetectGameMode(void) {
     if (access("DATA/RACES/CASTLE.TXT", F_OK) != -1) {
         // All splatpack edition have the castle track
         if (access("DATA/RACES/CASTLE2.TXT", F_OK) != -1) {
@@ -320,7 +320,7 @@ void Harness_Hook_BrV1dbRendererBegin(br_v1db_state* v1db) {
     v1db->renderer = (br_renderer*)renderer_state;
 }
 
-int Harness_CalculateFrameDelay() {
+static int Harness_CalculateFrameDelay(void) {
     if (harness_game_config.fps == 0) {
         return 0;
     }

@@ -342,6 +342,7 @@ int S3SyncSampleRate(tS3_channel* chan) {
     return 1;
 }
 
-void S3SetEffects(tS3_sample_filter* filter1, tS3_sample_filter* filter2) {
+int S3SetEffects(tS3_sample_filter* filter1, tS3_sample_filter* filter2) {
     STUB_ONCE();
+    return 0;
 }

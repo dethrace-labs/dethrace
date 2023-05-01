@@ -13,6 +13,7 @@
 #include "piping.h"
 #include "replay.h"
 #include "s3/s3.h"
+#include "s3/s3_brender.h"
 #include "utility.h"
 
 int gSound_detail_level;

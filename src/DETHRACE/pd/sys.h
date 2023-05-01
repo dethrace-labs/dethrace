@@ -68,7 +68,7 @@ void PDSetKeyArray(int* pKeys, int pMark);
 
 int PDGetASCIIFromKey(int pKey);
 
-void PDFatalError(char* pThe_str);
+HARNESS_NORETURN void PDFatalError(char* pThe_str);
 
 void PDNonFatalError(char* pThe_str);
 

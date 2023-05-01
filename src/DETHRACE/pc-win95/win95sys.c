@@ -77,17 +77,34 @@ int gNetwork_profile_file_exists = 0;
 
 char* _unittest_last_fatal_error;
 
-void Win32InitScreen();
-void Win32PumpMessages();
-void Win32ReleaseInputDevice();
-void Win32FatalError(char* pStr_1, char* pStr_2);
-void Win32BRenderWarningFunc(char* msg);
-void Win32BRenderFailureFunc(char* msg);
-void Win32AllocateActionReplayBuffer();
-void Win32CreateWindow();
-void Win32InitInputDevice();
+int original_main(int pArgc, char** pArgv);
 
-extern void QuitGame();
+/*static*/ void KeyboardHandler(void);
+/*static*/ int KeyDown(tU8 pScan_code);
+/*static*/ void KeyTranslation(tU8 pKey_index, tU8 pScan_code_1, tU8 pScan_code_2);
+/*static*/ void KeyBegin(void);
+/*static*/ void KeyEnd(void);
+/*static*/ int KeyDown22(int pKey_index);
+static void Win32ReleaseInputDevice(void);
+static void Win32PumpMessages(void);
+static HARNESS_NORETURN void Win32FatalError(char* pStr_1, char* pStr_2);
+static void Win32CreateWindow(void);
+static void Win32InitScreen(void);
+/*static*/ void Copy8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette);
+/*static*/ void SwapBackScreen(void);
+/*static*/ void ReallyCopyBackScreen(int pRendering_area_only, int pClear_top_and_bottom);
+/*static*/ void CopyBackScreen(int pRendering_area_only);
+static void Win32SetPaletteEntries(uint8_t* entries, int pFirst_colour, int pCount);
+static void Win32InitInputDevice(void);
+static  void Win32AllocateActionReplayBuffer(void);
+static void Usage(char* pProgpath);
+/*static*/ int OurGetChar(void);
+/*static*/ int InitJoysticks(void);
+/*static*/ tU32 ReadJoystickAxis(int pBit);
+static void Win32BRenderWarningFunc(char* msg);
+static void Win32BRenderFailureFunc(char* msg);
+
+extern void QuitGame(void);
 
 void KeyboardHandler() {
     tU8 scan_code;

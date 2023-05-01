@@ -37,7 +37,7 @@ int GetCursorPos_(POINT_* lpPoint);
 
 int ScreenToClient_(void* hWnd, POINT_* lpPoint);
 
-uint32_t timeGetTime_();
+uint32_t timeGetTime_(void);
 
 uint32_t GetCurrentDirectoryA_(uint32_t nBufferLength, char* lpBuffer);
 
