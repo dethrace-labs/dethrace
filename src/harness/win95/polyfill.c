@@ -187,7 +187,7 @@ int SendMessageA_(void* hWnd, unsigned int Msg, unsigned int wParam, long lParam
 }
 
 int MessageBoxA_(void* hWnd, char* lpText, char* lpCaption, unsigned int uType) {
-    return 0;
+    return gHarness_platform.MessageBox(hWnd, lpText, lpCaption);
 }
 
 int DestroyWindow_(void* hWnd) {

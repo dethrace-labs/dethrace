@@ -75,7 +75,7 @@ int GetMessageA_(MSG_* lpMsg, void* hWnd, unsigned int wMsgFilterMin, unsigned i
 
 void Sleep_(uint32_t dwMilliseconds);
 
-void DirectDraw_CreateSurface();
+void DirectDraw_CreateSurface(int width, int height);
 
 void DirectDrawDevice_SetPaletteEntries(PALETTEENTRY_* palette, int pFirst_colour, int pCount);
 

@@ -80,7 +80,7 @@ static int splatpack_xmasdemo_ascii_shift_table[128] = {
 };
 /* clang-format on */
 
-extern void Harness_Platform_Init();
+extern void Harness_Platform_Init(tHarness_platform* platform);
 
 int Harness_ProcessCommandLine(int* argc, char* argv[]);
 
@@ -363,7 +363,7 @@ void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {
 void Harness_RenderLastScreen() {
     if (last_dst) {
         Harness_RenderScreen(last_dst, last_src);
-        gHarness_platform.SwapWindow(0);
+        gHarness_platform.SwapWindow();
     }
 }
 

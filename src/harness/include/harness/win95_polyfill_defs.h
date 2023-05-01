@@ -21,6 +21,8 @@ typedef void* HANDLE_;
 
 #define WM_QUIT 0x0012
 
+#define MB_ICONERROR 0x00000010
+
 typedef struct _MEMORYSTATUS_ {
     uint32_t dwLength;
     uint32_t dwMemoryLoad;

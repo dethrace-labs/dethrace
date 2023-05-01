@@ -219,6 +219,12 @@ void set_palette(PALETTEENTRY_* pal) {
     GLRenderer_SetPalette((uint8_t*)pal);
 }
 
+int show_message(void* window, char* text, char* caption) {
+    fprintf(stderr, "%s", text);
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, caption, text, window);
+    return 0;
+}
+
 void Harness_Platform_Init(tHarness_platform* platform) {
     platform->ProcessWindowMessages = get_and_handle_message;
     platform->Sleep = SDL_Delay;
@@ -232,6 +238,7 @@ void Harness_Platform_Init(tHarness_platform* platform) {
     platform->GetMousePosition = get_mouse_position;
     platform->GetMouseButtons = get_mouse_buttons;
     platform->DestroyWindow = destroy_window;
+    platform->MessageBox = show_message;
 
     platform->Renderer_BufferModel = GLRenderer_BufferModel;
     platform->Renderer_BufferMaterial = GLRenderer_BufferMaterial;
