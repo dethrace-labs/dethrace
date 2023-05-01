@@ -63,7 +63,7 @@ tU16 gSend_selector;
 /*static*/ void GetIPXToStickItsEarToTheGround(void);
 
 // IDA: void __cdecl ClearupPDNetworkStuff()
-void ClearupPDNetworkStuff() {
+void ClearupPDNetworkStuff(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -86,7 +86,7 @@ int GetProfileText(char* pDest, int pDest_len, char* pFname, char* pKeyname) {
 }
 
 // IDA: int __cdecl GetSocketNumberFromProfileFile()
-int GetSocketNumberFromProfileFile() {
+int GetSocketNumberFromProfileFile(void) {
     char str[256];
     int sscanf_res;
     tU32 socknum;
@@ -133,7 +133,7 @@ void MakeMessageToSend(int pMessage_type) {
 }
 
 // IDA: int __cdecl ReceiveHostResponses()
-int ReceiveHostResponses() {
+int ReceiveHostResponses(void) {
     char str[256];
     int i;
     int already_registered;
@@ -142,7 +142,7 @@ int ReceiveHostResponses() {
 }
 
 // IDA: int __cdecl BroadcastMessage()
-int BroadcastMessage() {
+int BroadcastMessage(void) {
     int i;
     int errors;
     char broadcast_addr_string[32];
@@ -246,7 +246,7 @@ int FreeRealMem(tU16 pSelector) {
 }
 
 // IDA: int __cdecl hmiIPXInstalled()
-int hmiIPXInstalled() {
+int hmiIPXInstalled(void) {
     SREGS sregs;
     REGS regs;
     LOG_TRACE("()");
@@ -262,7 +262,7 @@ int hmiIPXOpenSocket(W32 wSocket) {
 }
 
 // IDA: void __cdecl GetLargestPacketSizeOoErBetterInsertLinfordChristieJokeHere()
-void GetLargestPacketSizeOoErBetterInsertLinfordChristieJokeHere() {
+void GetLargestPacketSizeOoErBetterInsertLinfordChristieJokeHere(void) {
     SREGS sregs;
     REGS regs;
     LOG_TRACE("()");
@@ -281,14 +281,14 @@ int hmiIPXInitSystem(W32 wSocket) {
 }
 
 // IDA: void __cdecl GetIPXToStickItsEarToTheGround()
-void GetIPXToStickItsEarToTheGround() {
+void GetIPXToStickItsEarToTheGround(void) {
     int i;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl PDNetInitialise()
-int PDNetInitialise() {
+int PDNetInitialise(void) {
     tU32 timenow;
     char profile_string[32];
     char key_name[32];
@@ -302,19 +302,19 @@ int PDNetInitialise() {
 }
 
 // IDA: int __cdecl PDNetShutdown()
-int PDNetShutdown() {
+int PDNetShutdown(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl PDNetStartProducingJoinList()
-void PDNetStartProducingJoinList() {
+void PDNetStartProducingJoinList(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl PDNetEndJoinList()
-void PDNetEndJoinList() {
+void PDNetEndJoinList(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -468,7 +468,7 @@ int PDNetInitClient(tNet_game_details* pDetails) {
 }
 
 // IDA: int __cdecl PDNetGetHeaderSize()
-int PDNetGetHeaderSize() {
+int PDNetGetHeaderSize(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

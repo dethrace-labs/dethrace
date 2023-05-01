@@ -497,7 +497,7 @@ void TotallyRepairACar(tCar_spec* pCar) {
 }
 
 // IDA: void __cdecl TotallyRepairCar()
-void TotallyRepairCar() {
+void TotallyRepairCar(void) {
     LOG_TRACE("()");
 
     if (!gArrow_mode) {
@@ -506,7 +506,7 @@ void TotallyRepairCar() {
 }
 
 // IDA: void __cdecl CheckLastCar()
-void CheckLastCar() {
+void CheckLastCar(void) {
     LOG_TRACE("()");
 
     if (gNet_mode == eNet_mode_none && GetCarCount(eVehicle_opponent) != 0 && NumberOfOpponentsLeft() == 0) {

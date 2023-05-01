@@ -84,7 +84,7 @@ void S3BindListenerLeftBRender(br_vector3* left) {
     gS3_listener_left_is_brender = 1;
 }
 
-void S3UpdateListenerVectors() {
+void S3UpdateListenerVectors(void) {
     if (gS3_listener_pos_ptr) {
         S3CopyVector3(&gS3_listener_position_now, gS3_listener_pos_ptr, gS3_listener_pos_is_brender);
     }
@@ -105,7 +105,7 @@ void S3UpdateListenerVectors() {
     }
 }
 
-void S3ServiceSoundSources() {
+void S3ServiceSoundSources(void) {
     tS3_sound_source* s; // [esp+Ch] [ebp-4h]
 
     for (s = gS3_sound_sources; s; s = s->next) {

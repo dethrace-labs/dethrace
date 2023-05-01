@@ -7,7 +7,7 @@
 br_pixelmap* last_begin_screen;
 
 // IDA: br_pixelmap* __cdecl BrDevLastBeginQuery()
-br_pixelmap* BrDevLastBeginQuery() {
+br_pixelmap* BrDevLastBeginQuery(void) {
 
     return last_begin_screen;
 }
@@ -65,7 +65,7 @@ br_pixelmap* BrDevBeginOld(char* setup_string) {
 }
 
 // IDA: void __cdecl BrDevEndOld()
-void BrDevEndOld() {
+void BrDevEndOld(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

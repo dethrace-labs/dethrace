@@ -8,13 +8,13 @@ char* namePointers_BRHOST1[50];
 br_uint_16 nameOrdinals_BRHOST1[50];
 
 // IDA: void __cdecl HostBegin()
-void HostBegin() {
+void HostBegin(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl HostEnd()
-void HostEnd() {
+void HostEnd(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

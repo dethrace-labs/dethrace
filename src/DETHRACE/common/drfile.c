@@ -52,7 +52,7 @@ br_size_t DRStdioWrite(void* buf, br_size_t size, unsigned int n, void* f) {
 }
 
 // IDA: void __cdecl InstallDRFileCalls()
-void InstallDRFileCalls() {
+void InstallDRFileCalls(void) {
     br_filesystem* temp_system;
     LOG_TRACE("()");
     temp_system = BrMemAllocate(sizeof(br_filesystem), kMem_temp_fs);

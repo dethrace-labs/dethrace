@@ -17,7 +17,7 @@ float yaw = 0, pitch = 0;
 
 int gDebugCamera_active = 0;
 
-void DebugCamera_Update() {
+void DebugCamera_Update(void) {
     const Uint8* state = SDL_GetKeyboardState(NULL);
     if (state[SDL_SCANCODE_UP]) {
         vec3 s;
@@ -87,12 +87,12 @@ void DebugCamera_Update() {
 extern float gCamera_hither;
 extern float gCamera_yon;
 
-float* DebugCamera_Projection() {
+float* DebugCamera_Projection(void) {
     glm_perspective(glm_rad(55.55), 320.0f / 200.0f /*4.0f / 3.0f*/, gCamera_hither, gCamera_yon, projection);
     return (float*)&projection;
 }
 
-float* DebugCamera_View() {
+float* DebugCamera_View(void) {
     vec3 look;
     glm_vec3_add(cam_pos, cam_front, look);
     glm_lookat(cam_pos, look, cam_up, view);

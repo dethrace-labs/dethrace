@@ -5,7 +5,7 @@
 #include "harness/trace.h"
 
 // IDA: br_material* __cdecl SetupDefaultMaterial()
-br_material* SetupDefaultMaterial() {
+br_material* SetupDefaultMaterial(void) {
     static br_material* default_mat;
 
     default_mat = BrResAllocate(v1db.res, sizeof(br_material), BR_MEMORY_MATERIAL);

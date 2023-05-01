@@ -55,7 +55,7 @@ void BrZsOrderTablePrimaryEnable(br_order_table* order_table) {
 }
 
 // IDA: void __cdecl BrZsOrderTablePrimaryDisable()
-void BrZsOrderTablePrimaryDisable() {
+void BrZsOrderTablePrimaryDisable(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -89,14 +89,14 @@ void SetOrderTableRange(br_order_table* order_table) {
 }
 
 // IDA: void __cdecl RenderOrderTableList()
-void RenderOrderTableList() {
+void RenderOrderTableList(void) {
     br_order_table* order_table;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl RenderPrimaryOrderTable()
-void RenderPrimaryOrderTable() {
+void RenderPrimaryOrderTable(void) {
     br_uint_16 m;
     br_uint_16 size;
     br_scalar bucket_size;

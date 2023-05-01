@@ -2,7 +2,7 @@
 #include "harness/trace.h"
 
 // IDA: char* __cdecl HostDefaultDevice()
-char* HostDefaultDevice() {
+char* HostDefaultDevice(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

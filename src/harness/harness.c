@@ -233,7 +233,7 @@ void Harness_Init(int* argc, char* argv[]) {
 }
 
 // used by unit tests
-void Harness_ForceNullPlatform() {
+void Harness_ForceNullPlatform(void) {
     force_null_platform = 1;
 }
 
@@ -360,7 +360,7 @@ void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {
     last_frame_time = GetTotalTime();
 }
 
-void Harness_RenderLastScreen() {
+void Harness_RenderLastScreen(void) {
     if (last_dst) {
         Harness_RenderScreen(last_dst, last_src);
         gHarness_platform.SwapWindow();

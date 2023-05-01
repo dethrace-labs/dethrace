@@ -333,7 +333,7 @@ void BrZbSceneRenderAdd(br_actor* tree) {
 }
 
 // IDA: void __cdecl BrZbSceneRenderEnd()
-void BrZbSceneRenderEnd() {
+void BrZbSceneRenderEnd(void) {
     // LOG_TRACE("()");
 
     gHarness_platform.Renderer_FlushBuffers();
@@ -361,7 +361,7 @@ void BrZsSceneRenderAdd(br_actor* tree) {
 }
 
 // IDA: void __cdecl BrZsSceneRenderEnd()
-void BrZsSceneRenderEnd() {
+void BrZsSceneRenderEnd(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

@@ -7,7 +7,7 @@
 #include "harness/trace.h"
 
 // IDA: br_associative_array* __cdecl BrAssociativeArrayAllocate()
-br_associative_array* BrAssociativeArrayAllocate() {
+br_associative_array* BrAssociativeArrayAllocate(void) {
     br_associative_array* pArray;
     LOG_TRACE("()");
 

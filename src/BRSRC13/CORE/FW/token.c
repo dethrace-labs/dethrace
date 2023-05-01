@@ -506,7 +506,7 @@ token_type tokenTypes[37] = {
 };
 
 // IDA: void __cdecl BrTokenBegin()
-void BrTokenBegin() {
+void BrTokenBegin(void) {
     int i;
     LOG_TRACE("()");
 

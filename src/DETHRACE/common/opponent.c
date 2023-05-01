@@ -1681,7 +1681,7 @@ int IsNetCarActive(br_vector3* pPoint) {
 }
 
 // IDA: void __cdecl RebuildActiveCarList()
-void RebuildActiveCarList() {
+void RebuildActiveCarList(void) {
     int i;
     tCar_spec* car_spec;
     LOG_TRACE("()");
@@ -1741,7 +1741,7 @@ void RebuildActiveCarList() {
 }
 
 // IDA: void __cdecl ForceRebuildActiveCarList()
-void ForceRebuildActiveCarList() {
+void ForceRebuildActiveCarList(void) {
     LOG_TRACE("()");
 
     gActive_car_list_rebuild_required = 1;
@@ -2109,7 +2109,7 @@ void ChallengeOccurred(int pChallenger_index, int pAccepted) {
 }
 
 // IDA: void __cdecl LoadCopCars()
-void LoadCopCars() {
+void LoadCopCars(void) {
     int i;
     LOG_TRACE("()");
 
@@ -2293,7 +2293,7 @@ void LoadInOppoPaths(FILE* pF) {
 }
 
 // IDA: void __cdecl DisposeOpponentPaths()
-void DisposeOpponentPaths() {
+void DisposeOpponentPaths(void) {
     LOG_TRACE("()");
 
     if (gProgram_state.AI_vehicles.path_nodes != NULL) {
@@ -2402,7 +2402,7 @@ void MungeOpponents(tU32 pFrame_period) {
 }
 
 // IDA: void __cdecl SetInitialCopPositions()
-void SetInitialCopPositions() {
+void SetInitialCopPositions(void) {
     int i;
     LOG_TRACE("()");
 
@@ -2562,7 +2562,7 @@ void InitOpponents(tRace_info* pRace_info) {
 }
 
 // IDA: void __cdecl DisposeOpponents()
-void DisposeOpponents() {
+void DisposeOpponents(void) {
     int i;
     LOG_TRACE("()");
 
@@ -3038,14 +3038,14 @@ void RecordOpponentTwattageOccurrence(tCar_spec* pTwatter, tCar_spec* pTwattee) 
 }
 
 // IDA: void __cdecl ToggleOpponentTest()
-void ToggleOpponentTest() {
+void ToggleOpponentTest(void) {
     LOG_TRACE("()");
 
     gTest_toggle = !gTest_toggle;
 }
 
 // IDA: void __cdecl ToggleOpponentProcessing()
-void ToggleOpponentProcessing() {
+void ToggleOpponentProcessing(void) {
     int i;
     LOG_TRACE("()");
 
@@ -3072,7 +3072,7 @@ void ToggleOpponentProcessing() {
 }
 
 // IDA: void __cdecl ToggleMellowOpponents()
-void ToggleMellowOpponents() {
+void ToggleMellowOpponents(void) {
     int i;
     LOG_TRACE("()");
 
@@ -3088,7 +3088,7 @@ void ToggleMellowOpponents() {
 }
 
 // IDA: void __cdecl RepairOpponentsSystems()
-void RepairOpponentsSystems() {
+void RepairOpponentsSystems(void) {
     int i;
     LOG_TRACE("()");
 
@@ -3225,7 +3225,7 @@ void DeleteNode(tS16 pNode_to_delete, int pAnd_sections) {
 }
 
 // IDA: void __cdecl DeleteOrphanNodes()
-void DeleteOrphanNodes() {
+void DeleteOrphanNodes(void) {
     tS16 node_no;
     LOG_TRACE("()");
 
@@ -3281,7 +3281,7 @@ void InsertThisNodeInThisSectionHere(tS16 pInserted_node, tS16 pSection_no, br_v
 }
 
 // IDA: void __cdecl TrackElasticateyPath()
-void TrackElasticateyPath() {
+void TrackElasticateyPath(void) {
     LOG_TRACE("()");
 
     if (gAlready_elasticating && gNext_elastication < gTime_stamp_for_this_munging) {
@@ -3563,7 +3563,7 @@ br_material* CreateSimpleMaterial(int pColour_index) {
 }
 
 // IDA: void __cdecl AllocateMatsForOppoPathModel()
-void AllocateMatsForOppoPathModel() {
+void AllocateMatsForOppoPathModel(void) {
     LOG_TRACE("()");
 
     gMat_dk_yel = CreateSimpleMaterial(50);
@@ -3585,7 +3585,7 @@ void AllocateMatsForOppoPathModel() {
 }
 
 // IDA: void __cdecl RebuildOppoPathModel()
-void RebuildOppoPathModel() {
+void RebuildOppoPathModel(void) {
     static int nvertices_last_time = 0;
     static int nfaces_last_time = 0;
     int i;
@@ -3690,7 +3690,7 @@ void RebuildOppoPathModel() {
 }
 
 // IDA: int __cdecl ConsistencyCheck()
-int ConsistencyCheck() {
+int ConsistencyCheck(void) {
     tS16 node_no;
     tS16 section_no;
     tS16 start_node;
@@ -3832,7 +3832,7 @@ int ConsistencyCheck() {
 }
 
 // IDA: void __cdecl ShowOppoPaths()
-void ShowOppoPaths() {
+void ShowOppoPaths(void) {
     char str[256];
     LOG_TRACE("()");
 
@@ -3857,7 +3857,7 @@ void ShowOppoPaths() {
 #include <string.h>
 
 // IDA: void __cdecl WriteOutOppoPaths()
-void WriteOutOppoPaths() {
+void WriteOutOppoPaths(void) {
     char the_path[256];
     char str[13];
     FILE* f;
@@ -3930,7 +3930,7 @@ void WriteOutOppoPaths() {
 }
 
 // IDA: int __cdecl NewNodeOKHere()
-int NewNodeOKHere() {
+int NewNodeOKHere(void) {
     br_vector3 last_node_to_this;
     LOG_TRACE("()");
 
@@ -3944,7 +3944,7 @@ int NewNodeOKHere() {
 }
 
 // IDA: void __cdecl ShowHideOppoPaths()
-void ShowHideOppoPaths() {
+void ShowHideOppoPaths(void) {
     LOG_TRACE("()");
 
     if (!gAlready_elasticating) {
@@ -3954,7 +3954,7 @@ void ShowHideOppoPaths() {
 }
 
 // IDA: void __cdecl DropElasticateyNode()
-void DropElasticateyNode() {
+void DropElasticateyNode(void) {
     char str[256];
     tS16 old_node;
     tS16 new_node;
@@ -4034,7 +4034,7 @@ void DropElasticateyNode() {
 }
 
 // IDA: void __cdecl InsertAndElasticate()
-void InsertAndElasticate() {
+void InsertAndElasticate(void) {
     tS16 inserted_node;
     tS16 elasticatey_node;
     tS16 section_no;
@@ -4108,7 +4108,7 @@ void InsertAndElasticate() {
 }
 
 // IDA: void __cdecl InsertAndDontElasticate()
-void InsertAndDontElasticate() {
+void InsertAndDontElasticate(void) {
     tS16 inserted_node;
     tS16 section_no;
     br_vector3 direction_v;
@@ -4149,7 +4149,7 @@ void InsertAndDontElasticate() {
 }
 
 // IDA: void __cdecl DropDeadEndNode()
-void DropDeadEndNode() {
+void DropDeadEndNode(void) {
     char str[256];
     LOG_TRACE("()");
 
@@ -4167,7 +4167,7 @@ void DropDeadEndNode() {
 }
 
 // IDA: void __cdecl DropNodeOnNodeAndStopElasticating()
-void DropNodeOnNodeAndStopElasticating() {
+void DropNodeOnNodeAndStopElasticating(void) {
     int node_no;
     char str[256];
     br_scalar distance;
@@ -4196,7 +4196,7 @@ void DropNodeOnNodeAndStopElasticating() {
 }
 
 // IDA: void __cdecl WidenOppoPathSection()
-void WidenOppoPathSection() {
+void WidenOppoPathSection(void) {
     LOG_TRACE("()");
 
 
@@ -4206,7 +4206,7 @@ void WidenOppoPathSection() {
 }
 
 // IDA: void __cdecl NarrowOppoPathSection()
-void NarrowOppoPathSection() {
+void NarrowOppoPathSection(void) {
     LOG_TRACE("()");
 
     if (gOppo_paths_shown) {
@@ -4215,7 +4215,7 @@ void NarrowOppoPathSection() {
 }
 
 // IDA: void __cdecl IncreaseSectionMinSpeed()
-void IncreaseSectionMinSpeed() {
+void IncreaseSectionMinSpeed(void) {
     LOG_TRACE("()");
 
     if (gOppo_paths_shown) {
@@ -4224,7 +4224,7 @@ void IncreaseSectionMinSpeed() {
 }
 
 // IDA: void __cdecl DecreaseSectionMinSpeed()
-void DecreaseSectionMinSpeed() {
+void DecreaseSectionMinSpeed(void) {
     LOG_TRACE("()");
 
     if (gOppo_paths_shown) {
@@ -4233,7 +4233,7 @@ void DecreaseSectionMinSpeed() {
 }
 
 // IDA: void __cdecl IncreaseSectionMaxSpeed()
-void IncreaseSectionMaxSpeed() {
+void IncreaseSectionMaxSpeed(void) {
     LOG_TRACE("()");
 
    if (gOppo_paths_shown) {
@@ -4242,7 +4242,7 @@ void IncreaseSectionMaxSpeed() {
 }
 
 // IDA: void __cdecl DecreaseSectionMaxSpeed()
-void DecreaseSectionMaxSpeed() {
+void DecreaseSectionMaxSpeed(void) {
     LOG_TRACE("()");
 
     if (gOppo_paths_shown) {
@@ -4251,7 +4251,7 @@ void DecreaseSectionMaxSpeed() {
 }
 
 // IDA: void __cdecl PullOppoPoint()
-void PullOppoPoint() {
+void PullOppoPoint(void) {
     tS16 node_no;
     br_scalar distance;
     LOG_TRACE("()");
@@ -4273,7 +4273,7 @@ void PullOppoPoint() {
 }
 
 // IDA: void __cdecl ShowNodeInfo()
-void ShowNodeInfo() {
+void ShowNodeInfo(void) {
     tS16 node_no;
     char str[256];
     br_scalar distance;
@@ -4299,7 +4299,7 @@ void ShowNodeInfo() {
 }
 
 // IDA: void __cdecl ShowSectionInfo1()
-void ShowSectionInfo1() {
+void ShowSectionInfo1(void) {
     tS16 section_no;
     char str[256];
     br_scalar distance;
@@ -4330,7 +4330,7 @@ void ShowSectionInfo1() {
 }
 
 // IDA: void __cdecl ShowSectionInfo2()
-void ShowSectionInfo2() {
+void ShowSectionInfo2(void) {
     tS16 section_no;
     char str[256];
     br_scalar distance;
@@ -4363,7 +4363,7 @@ void ShowSectionInfo2() {
 }
 
 // IDA: void __cdecl DeleteOppoPathSection()
-void DeleteOppoPathSection() {
+void DeleteOppoPathSection(void) {
     br_scalar distance;
     br_vector3 intersect;
     br_vector3 direction_v;
@@ -4388,7 +4388,7 @@ void DeleteOppoPathSection() {
 }
 
 // IDA: void __cdecl DeleteOppoPathNodeAndSections()
-void DeleteOppoPathNodeAndSections() {
+void DeleteOppoPathNodeAndSections(void) {
     br_scalar distance;
     tS16 node_no;
     LOG_TRACE("()");
@@ -4412,7 +4412,7 @@ void DeleteOppoPathNodeAndSections() {
 }
 
 // IDA: void __cdecl DeleteOppoPathNodeAndJoin()
-void DeleteOppoPathNodeAndJoin() {
+void DeleteOppoPathNodeAndJoin(void) {
     br_scalar distance;
     tS16 node_no;
     LOG_TRACE("()");
@@ -4446,7 +4446,7 @@ void DeleteOppoPathNodeAndJoin() {
 }
 
 // IDA: void __cdecl ReverseSectionDirection()
-void ReverseSectionDirection() {
+void ReverseSectionDirection(void) {
     tS16 temp;
     tU8 speed_temp;
     br_scalar distance;
@@ -4485,7 +4485,7 @@ void ReverseSectionDirection() {
 }
 
 // IDA: void __cdecl CycleSectionType()
-void CycleSectionType() {
+void CycleSectionType(void) {
     br_scalar distance;
     br_vector3 intersect;
     br_vector3 direction_v;
@@ -4512,7 +4512,7 @@ void CycleSectionType() {
 }
 
 // IDA: void __cdecl ToggleOneWayNess()
-void ToggleOneWayNess() {
+void ToggleOneWayNess(void) {
     br_scalar distance;
     br_vector3 intersect;
     br_vector3 direction_v;
@@ -4545,7 +4545,7 @@ void ToggleOneWayNess() {
 }
 
 // IDA: void __cdecl CopStartPointInfo()
-void CopStartPointInfo() {
+void CopStartPointInfo(void) {
     char str[256];
     int i;
     int closest;
@@ -4577,7 +4577,7 @@ void CopStartPointInfo() {
 }
 
 // IDA: void __cdecl DropCopStartPoint()
-void DropCopStartPoint() {
+void DropCopStartPoint(void) {
     char str[256];
     LOG_TRACE("()");
 
@@ -4600,7 +4600,7 @@ void DropCopStartPoint() {
 }
 
 // IDA: void __cdecl DeleteCopStartPoint()
-void DeleteCopStartPoint() {
+void DeleteCopStartPoint(void) {
     char str[256];
     int i;
     int closest;
@@ -4640,7 +4640,7 @@ void DeleteCopStartPoint() {
 }
 
 // IDA: void __cdecl CycleCopStartPointType()
-void CycleCopStartPointType() {
+void CycleCopStartPointType(void) {
     LOG_TRACE("()");
 
 }

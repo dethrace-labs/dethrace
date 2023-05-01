@@ -570,7 +570,7 @@ tGraf_data* gCurrent_graf_data;
 int gGraf_data_index;
 
 // IDA: void __cdecl CalcGrafDataIndex()
-void CalcGrafDataIndex() {
+void CalcGrafDataIndex(void) {
     int i;
 
     for (i = 0; i < 2; i++) {

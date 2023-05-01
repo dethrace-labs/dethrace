@@ -5,7 +5,7 @@ int _DOSEventQEnabled;
 host_real_memory _DOSEventMemory;
 
 // IDA: br_error __cdecl DOSEventBegin()
-br_error DOSEventBegin() {
+br_error DOSEventBegin(void) {
     host_info hi;
     int s;
     LOG_TRACE("()");
@@ -13,7 +13,7 @@ br_error DOSEventBegin() {
 }
 
 // IDA: void __cdecl DOSEventEnd()
-void DOSEventEnd() {
+void DOSEventEnd(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

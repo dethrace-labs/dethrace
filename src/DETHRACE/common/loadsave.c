@@ -78,7 +78,7 @@ tU32 CalcLSChecksum(tSave_game* pSaved_game) {
 }
 
 // IDA: void __cdecl LoadSavedGames()
-void LoadSavedGames() {
+void LoadSavedGames(void) {
     tPath_name the_path;
     int i;
     FILE* f;
@@ -116,7 +116,7 @@ void LoadSavedGames() {
 }
 
 // IDA: void __cdecl DisposeSavedGames()
-void DisposeSavedGames() {
+void DisposeSavedGames(void) {
     int i;
     LOG_TRACE("()");
 
@@ -174,7 +174,7 @@ void LoadTheGame(int pSlot_index) {
 }
 
 // IDA: void __cdecl StartRollingSaveNamesIn()
-void StartRollingSaveNamesIn() {
+void StartRollingSaveNamesIn(void) {
     int i;
     int save_slot_height;
     LOG_TRACE("()");
@@ -193,14 +193,14 @@ void StartRollingSaveNamesIn() {
 }
 
 // IDA: void __cdecl LoadStart()
-void LoadStart() {
+void LoadStart(void) {
     LOG_TRACE("()");
 
     StartRollingSaveNamesIn();
 }
 
 // IDA: int __usercall DoLoadGame@<EAX>(int pSave_allowed@<EAX>)
-int DoLoadGame() {
+int DoLoadGame(void) {
     static tFlicette flicker_on[9] = {
         { 74, { 47, 94 }, { 23, 55 } },
         { 74, { 47, 94 }, { 44, 110 } },
@@ -545,7 +545,7 @@ void SaveTheGame(int pSlot_number) {
 }
 
 // IDA: int __cdecl ConfirmMidGameSave()
-int ConfirmMidGameSave() {
+int ConfirmMidGameSave(void) {
     static tFlicette flicker_on[2] = {
         { 43, { 84, 168 }, { 124, 298 } },
         { 43, { 181, 362 }, { 124, 298 } },
@@ -617,7 +617,7 @@ void MakeSavedGame(tSave_game** pSave_record) {
 }
 
 // IDA: void __cdecl SaveStart()
-void SaveStart() {
+void SaveStart(void) {
     LOG_TRACE("()");
 
     StartRollingSaveNamesIn();

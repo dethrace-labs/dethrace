@@ -701,7 +701,7 @@ void GetFacesInBox(tCollision_info* c) {
 }
 
 // IDA: int __cdecl IsCarInTheSea()
-int IsCarInTheSea() {
+int IsCarInTheSea(void) {
     LOG_TRACE("()");
 
     return gInTheSea;
@@ -1020,7 +1020,7 @@ void InterpolateCars(tU32 pLast_frame_time, tU32 pTime) {
 }
 
 // IDA: void __cdecl ResetOldmat()
-void ResetOldmat() {
+void ResetOldmat(void) {
     tCar_spec* car;
     int i;
     br_matrix34 mat;
@@ -1042,7 +1042,7 @@ void ResetOldmat() {
 }
 
 // IDA: void __cdecl GetNonCars()
-void GetNonCars() {
+void GetNonCars(void) {
     int i;
     int j;
     LOG_TRACE("()");
@@ -1394,7 +1394,7 @@ int CollideCarWithWall(tCollision_info* car, br_scalar dt) {
 }
 
 // IDA: void __cdecl ToggleControls()
-void ToggleControls() {
+void ToggleControls(void) {
     LOG_TRACE("()");
 
     gControl__car++;
@@ -3926,13 +3926,13 @@ void oldMoveOurCar(tU32 pTime_difference) {
 }
 
 // IDA: void __cdecl ToggleCollisionDetection()
-void ToggleCollisionDetection() {
+void ToggleCollisionDetection(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl CancelPendingCunningStunt()
-void CancelPendingCunningStunt() {
+void CancelPendingCunningStunt(void) {
     LOG_TRACE("()");
 
     gQuite_wild_end = 0;
@@ -4285,7 +4285,7 @@ void MungeCarGraphics(tU32 pFrame_period) {
 }
 
 // IDA: void __cdecl ResetCarScreens()
-void ResetCarScreens() {
+void ResetCarScreens(void) {
     int cat;
     int car_count;
     int i;
@@ -4303,7 +4303,7 @@ void ResetCarScreens() {
 }
 
 // IDA: tCar_spec* __cdecl GetRaceLeader()
-tCar_spec* GetRaceLeader() {
+tCar_spec* GetRaceLeader(void) {
     int i;
     int score;
     tCar_spec* car;
@@ -4312,7 +4312,7 @@ tCar_spec* GetRaceLeader() {
 }
 
 // IDA: void __cdecl AmIGettingBoredWatchingCameraSpin()
-void AmIGettingBoredWatchingCameraSpin() {
+void AmIGettingBoredWatchingCameraSpin(void) {
     static tU32 time_of_death;
     static tU32 headup_timer;
     tCar_spec* car;
@@ -4323,7 +4323,7 @@ void AmIGettingBoredWatchingCameraSpin() {
 }
 
 // IDA: void __cdecl ViewNetPlayer()
-void ViewNetPlayer() {
+void ViewNetPlayer(void) {
     LOG_TRACE("()");
 
     if (gOpponent_viewing_mode) {
@@ -4346,7 +4346,7 @@ void ViewNetPlayer() {
 }
 
 // IDA: void __cdecl ViewOpponent()
-void ViewOpponent() {
+void ViewOpponent(void) {
     static int n;
     LOG_TRACE("()");
 
@@ -4370,7 +4370,7 @@ void ViewOpponent() {
 }
 
 // IDA: void __cdecl ToggleCarToCarCollisions()
-void ToggleCarToCarCollisions() {
+void ToggleCarToCarCollisions(void) {
     LOG_TRACE("()");
 
     gCar_car_collisions = !gCar_car_collisions;
@@ -4382,12 +4382,12 @@ void ToggleCarToCarCollisions() {
 }
 
 // IDA: void __cdecl SwapCar()
-void SwapCar() {
+void SwapCar(void) {
     LOG_TRACE("()");
 }
 
 // IDA: void __cdecl AdjustDownForce()
-void AdjustDownForce() {
+void AdjustDownForce(void) {
     char s[100];
     tCar_spec* c;
     LOG_TRACE("()");
@@ -4405,7 +4405,7 @@ void AdjustDownForce() {
 }
 
 // IDA: void __cdecl FreezeMechanics()
-void FreezeMechanics() {
+void FreezeMechanics(void) {
     LOG_TRACE("()");
 
     gFreeze_mechanics = !gFreeze_mechanics;
@@ -4417,7 +4417,7 @@ void FreezeMechanics() {
 }
 
 // IDA: void __cdecl PutOpponentsInNeutral()
-void PutOpponentsInNeutral() {
+void PutOpponentsInNeutral(void) {
     LOG_TRACE("()");
 
     gStop_opponents_moving = !gStop_opponents_moving;
@@ -4429,7 +4429,7 @@ void PutOpponentsInNeutral() {
 }
 
 // IDA: void __cdecl SetPanningFieldOfView()
-void SetPanningFieldOfView() {
+void SetPanningFieldOfView(void) {
     br_camera* camera_ptr;
     static br_angle panning_angle = 0; // Added by DethRace
     LOG_TRACE("()");
@@ -5407,7 +5407,7 @@ int CollideCameraWithOtherCars(br_vector3* car_pos, br_vector3* cam_pos) {
 }
 
 // IDA: void __cdecl InitialiseExternalCamera()
-void InitialiseExternalCamera() {
+void InitialiseExternalCamera(void) {
     br_scalar ts;
     tCar_spec* c;
     br_vector3 r;
@@ -5439,7 +5439,7 @@ void InitialiseExternalCamera() {
 }
 
 // IDA: void __cdecl FreezeCamera()
-void FreezeCamera() {
+void FreezeCamera(void) {
     LOG_TRACE("()");
 
     gCamera_frozen = 1;
@@ -6811,7 +6811,7 @@ int TestForNan(float* f) {
 }
 
 // IDA: void __cdecl CheckCameraHither()
-void CheckCameraHither() {
+void CheckCameraHither(void) {
     br_camera* cam;
     static int old_hither;
     LOG_TRACE("()");
@@ -7182,7 +7182,7 @@ int GetPrecalculatedFacesUnderCar(tCar_spec* pCar, tFace_ref** pFace_refs) {
 }
 
 // IDA: br_material* __cdecl SomeNearbyMaterial()
-br_material* SomeNearbyMaterial() {
+br_material* SomeNearbyMaterial(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

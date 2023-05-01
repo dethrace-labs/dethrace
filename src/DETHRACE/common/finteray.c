@@ -379,14 +379,14 @@ void FindFace(br_vector3* pPosition, br_vector3* pDir, br_vector3* nor, br_scala
 }
 
 // IDA: void __cdecl EnablePlingMaterials()
-void EnablePlingMaterials() {
+void EnablePlingMaterials(void) {
     LOG_TRACE("()");
 
     gPling_materials = 1;
 }
 
 // IDA: void __cdecl DisablePlingMaterials()
-void DisablePlingMaterials() {
+void DisablePlingMaterials(void) {
     LOG_TRACE("()");
 
     gPling_materials = 0;
@@ -1251,38 +1251,38 @@ void Scale(int pD, int factor) {
 }
 
 // IDA: void __cdecl ScaleUpX()
-void ScaleUpX() {
+void ScaleUpX(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl ScaleDnX()
-void ScaleDnX() {
+void ScaleDnX(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl ScaleUpY()
-void ScaleUpY() {
+void ScaleUpY(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl ScaleDnY()
-void ScaleDnY() {
+void ScaleDnY(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl SelectFaceForward()
-void SelectFaceForward() {
+void SelectFaceForward(void) {
     br_vector3 dir;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl SelectFaceDown()
-void SelectFaceDown() {
+void SelectFaceDown(void) {
     br_vector3 dir;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();

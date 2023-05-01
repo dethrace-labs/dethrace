@@ -65,7 +65,7 @@ void MoveDialFromTo(int pWhich_one, int pOld_stage, int pNew_stage) {
 }
 
 // IDA: void __cdecl SoundOptionsStart()
-void SoundOptionsStart() {
+void SoundOptionsStart(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -104,7 +104,7 @@ int SoundClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_o
 }
 
 // IDA: void __cdecl DoSoundOptions()
-void DoSoundOptions() {
+void DoSoundOptions(void) {
     static tFlicette flicker_on[3];
     static tFlicette flicker_off[3];
     static tFlicette push[3];
@@ -116,7 +116,7 @@ void DoSoundOptions() {
 }
 
 // IDA: void __cdecl GetGraphicsOptions()
-void GetGraphicsOptions() {
+void GetGraphicsOptions(void) {
     int value;
     br_scalar br_value;
     LOG_TRACE("()");
@@ -221,7 +221,7 @@ void GetGraphicsOptions() {
 }
 
 // IDA: void __cdecl SetGraphicsOptions()
-void SetGraphicsOptions() {
+void SetGraphicsOptions(void) {
     LOG_TRACE("()");
 
     if (gRadio_bastards__options[0].current_value < 2) {
@@ -343,7 +343,7 @@ void PlayRadioOff__options(int pIndex, int pValue) {
 }
 
 // IDA: void __cdecl DrawInitialRadios()
-void DrawInitialRadios() {
+void DrawInitialRadios(void) {
     int i;
     LOG_TRACE("()");
 
@@ -499,7 +499,7 @@ void DrawGraphBox(int pCurrent_choice, int pCurrent_mode) {
 }
 
 // IDA: void __cdecl DoGraphicsOptions()
-void DoGraphicsOptions() {
+void DoGraphicsOptions(void) {
     static tFlicette flicker_on[14] = {
         { 43, { 45, 90 }, { 166, 398 } },
         { 43, { 220, 440 }, { 166, 398 } },
@@ -634,7 +634,7 @@ void DoGraphicsOptions() {
 }
 
 // IDA: void __cdecl CalibrateJoysticks()
-void CalibrateJoysticks() {
+void CalibrateJoysticks(void) {
     tJoy_calib_stage stage;
     int escaped;
     int joy_value_x;
@@ -677,7 +677,7 @@ void StripControls(unsigned char* pStr) {
 }
 
 // IDA: void __cdecl LoadKeyNames()
-void LoadKeyNames() {
+void LoadKeyNames(void) {
     int i;
     FILE* f;
     tPath_name the_path;
@@ -699,7 +699,7 @@ void LoadKeyNames() {
 }
 
 // IDA: void __cdecl DisposeKeyNames()
-void DisposeKeyNames() {
+void DisposeKeyNames(void) {
     int i;
     LOG_TRACE("()");
 
@@ -709,7 +709,7 @@ void DisposeKeyNames() {
 }
 
 // IDA: void __cdecl SaveOrigKeyMapping()
-void SaveOrigKeyMapping() {
+void SaveOrigKeyMapping(void) {
     LOG_TRACE("()");
 
     memcpy(gOrig_key_mapping, gKey_mapping, sizeof(gKey_mapping));
@@ -741,7 +741,7 @@ void GetKeyCoords(int pIndex, int* pY, int* pName_x, int* pKey_x, int* pEnd_box)
 }
 
 // IDA: void __cdecl SetKeysToDefault()
-void SetKeysToDefault() {
+void SetKeysToDefault(void) {
     FILE* f;
     tPath_name the_path;
     int i;
@@ -760,7 +760,7 @@ void SetKeysToDefault() {
 }
 
 // IDA: void __cdecl SaveKeyMapping()
-void SaveKeyMapping() {
+void SaveKeyMapping(void) {
     FILE* f;
     tPath_name the_path;
     int i;
@@ -1141,7 +1141,7 @@ int MouseyClickBastard(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, 
 }
 
 // IDA: void __cdecl DrawInitialKMRadios()
-void DrawInitialKMRadios() {
+void DrawInitialKMRadios(void) {
     int i;
     LOG_TRACE("()");
 
@@ -1155,7 +1155,7 @@ void DrawInitialKMRadios() {
 }
 
 // IDA: void __cdecl DoControlOptions()
-void DoControlOptions() {
+void DoControlOptions(void) {
     static tFlicette flicker_on[4] = {
         { 177, { 51, 102 }, { 166, 398 } },
         { 177, { 112, 224 }, { 166, 398 } },
@@ -1239,7 +1239,7 @@ void DoControlOptions() {
 }
 
 // IDA: void __cdecl LoadSoundOptionsData()
-void LoadSoundOptionsData() {
+void LoadSoundOptionsData(void) {
     LOG_TRACE("()");
 
     gDials_pix = LoadPixelmap("DIALSTCK.PIX");
@@ -1249,14 +1249,14 @@ void LoadSoundOptionsData() {
 }
 
 // IDA: void __cdecl FreeSoundOptionsData()
-void FreeSoundOptionsData() {
+void FreeSoundOptionsData(void) {
     LOG_TRACE("()");
 
     BrPixelmapFree(gDials_pix);
 }
 
 // IDA: void __cdecl DrawDisabledOptions()
-void DrawDisabledOptions() {
+void DrawDisabledOptions(void) {
     br_pixelmap* image;
     LOG_TRACE("()");
 
@@ -1284,7 +1284,7 @@ void DrawDisabledOptions() {
 }
 
 // IDA: void __cdecl DoOptions()
-void DoOptions() {
+void DoOptions(void) {
     static tFlicette flicker_on[4] = {
         { 43, { 57, 114 }, { 41, 98 } },
         { 43, { 57, 114 }, { 78, 187 } },

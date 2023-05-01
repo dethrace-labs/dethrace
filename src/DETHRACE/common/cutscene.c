@@ -47,11 +47,11 @@ void ShowCutScene(int pIndex, int pWait_end, int pSound_ID, br_scalar pDelay) {
 }
 
 // IDA: void __cdecl DoSCILogo()
-void DoSCILogo() {
+void DoSCILogo(void) {
 }
 
 // IDA: void __cdecl DoStainlessLogo()
-void DoStainlessLogo() {
+void DoStainlessLogo(void) {
     LOG_TRACE("()");
 }
 
@@ -133,7 +133,7 @@ void PlaySmackerFile(char* pSmack_name) {
 }
 
 // IDA: void __cdecl DoOpeningAnimation()
-void DoOpeningAnimation() {
+void DoOpeningAnimation(void) {
     LOG_TRACE("()");
 
     PlaySmackerFile("LOGO.SMK");
@@ -142,12 +142,12 @@ void DoOpeningAnimation() {
 }
 
 // IDA: void __cdecl DoNewGameAnimation()
-void DoNewGameAnimation() {
+void DoNewGameAnimation(void) {
     LOG_TRACE("()");
 }
 
 // IDA: void __cdecl DoGoToRaceAnimation()
-void DoGoToRaceAnimation() {
+void DoGoToRaceAnimation(void) {
     LOG_TRACE("()");
 
     if (!gNet_mode) {
@@ -160,7 +160,7 @@ void DoGoToRaceAnimation() {
 }
 
 // IDA: void __cdecl DoEndRaceAnimation()
-void DoEndRaceAnimation() {
+void DoEndRaceAnimation(void) {
     int made_a_profit;
     int went_up_a_rank;
     LOG_TRACE("()");
@@ -185,7 +185,7 @@ void DoEndRaceAnimation() {
 }
 
 // IDA: void __cdecl DoGameOverAnimation()
-void DoGameOverAnimation() {
+void DoGameOverAnimation(void) {
     LOG_TRACE("()");
 
     StopMusic();
@@ -194,7 +194,7 @@ void DoGameOverAnimation() {
 }
 
 // IDA: void __cdecl DoGameCompletedAnimation()
-void DoGameCompletedAnimation() {
+void DoGameCompletedAnimation(void) {
     LOG_TRACE("()");
 
     StopMusic();
@@ -202,7 +202,7 @@ void DoGameCompletedAnimation() {
     StartMusic();
 }
 
-void DoFeatureUnavailableInDemo() {
+void DoFeatureUnavailableInDemo(void) {
     LOG_TRACE("()");
 
     PrintMemoryDump(0, "BEFORE DEMO-ONLY SCREEN");
@@ -215,7 +215,7 @@ void DoFeatureUnavailableInDemo() {
     PrintMemoryDump(0, "AFTER DEMO-ONLY SCREEN");
 }
 
-void DoFullVersionPowerpoint() {
+void DoFullVersionPowerpoint(void) {
     LOG_TRACE("()");
 
     FadePaletteDown();
@@ -230,14 +230,14 @@ void DoFullVersionPowerpoint() {
     gLast_demo_end_anim = PDGetTotalTime();
 }
 
-void DoDemoGoodbye() {
+void DoDemoGoodbye(void) {
     if (PDGetTotalTime() - gLast_demo_end_anim > 90000) {
         DoFullVersionPowerpoint();
     }
 }
 
 // IDA: void __cdecl StartLoadingScreen()
-void StartLoadingScreen() {
+void StartLoadingScreen(void) {
     LOG_TRACE("()");
 
     PossibleService();

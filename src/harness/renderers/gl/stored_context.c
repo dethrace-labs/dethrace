@@ -30,13 +30,13 @@ br_object_dispatch dispatch_funcs = {
     NULL
 };
 
-tStored_model_context* NewStoredModelContext() {
+tStored_model_context* NewStoredModelContext(void) {
     tStored_model_context* ctx = malloc(sizeof(tStored_model_context));
     ctx->dispatch = &dispatch_funcs;
     return ctx;
 }
 
-tStored_material* NewStoredMaterial() {
+tStored_material* NewStoredMaterial(void) {
     tStored_material* ctx = malloc(sizeof(tStored_material));
     ctx->index_base = -1;
     ctx->pixelmap = NULL;
@@ -46,7 +46,7 @@ tStored_material* NewStoredMaterial() {
     return ctx;
 }
 
-tStored_pixelmap* NewStoredPixelmap() {
+tStored_pixelmap* NewStoredPixelmap(void) {
     tStored_pixelmap* ctx = malloc(sizeof(tStored_pixelmap));
     ctx->id = 0;
     return ctx;

@@ -2,7 +2,7 @@
 #include "harness/trace.h"
 
 // IDA: br_error __cdecl AddRequestedDrivers()
-br_error AddRequestedDrivers() {
+br_error AddRequestedDrivers(void) {
     char devstr[256];
     static br_boolean bAlreadyDone;
     LOG_TRACE("()");

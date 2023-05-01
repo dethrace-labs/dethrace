@@ -19,7 +19,7 @@ br_pixelmap* gOil_pixies[1];
 tOil_spill_info gOily_spills[15];
 
 // IDA: void __cdecl InitOilSpills()
-void InitOilSpills() {
+void InitOilSpills(void) {
     int i;
     br_model* the_model;
     br_material* the_material;
@@ -78,7 +78,7 @@ void InitOilSpills() {
 }
 
 // IDA: void __cdecl ResetOilSpills()
-void ResetOilSpills() {
+void ResetOilSpills(void) {
     int i;
     LOG_TRACE("()");
 
@@ -373,7 +373,7 @@ void ProcessOilSpills(tU32 pFrame_period) {
 }
 
 // IDA: int __cdecl GetOilSpillCount()
-int GetOilSpillCount() {
+int GetOilSpillCount(void) {
     //LOG_TRACE("()");
 
     return COUNT_OF(gOily_spills);

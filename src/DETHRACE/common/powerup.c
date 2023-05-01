@@ -299,7 +299,7 @@ int GotPowerup(tCar_spec* pCar, int pIndex) {
 }
 
 // IDA: void __cdecl LoadPowerups()
-void LoadPowerups() {
+void LoadPowerups(void) {
     FILE* f;
     tPath_name the_path;
     char s[256];
@@ -373,7 +373,7 @@ void LoadPowerups() {
 }
 
 // IDA: void __cdecl InitPowerups()
-void InitPowerups() {
+void InitPowerups(void) {
     int i;
     tPowerup* the_powerup;
     LOG_TRACE("()");
@@ -385,7 +385,7 @@ void InitPowerups() {
 }
 
 // IDA: void __cdecl CloseDownPowerUps()
-void CloseDownPowerUps() {
+void CloseDownPowerUps(void) {
     int i;
     tPowerup* the_powerup;
     LOG_TRACE("()");
@@ -500,70 +500,70 @@ void GotPowerupN(int pN) {
 }
 
 // IDA: void __cdecl GotPowerup0()
-void GotPowerup0() {
+void GotPowerup0(void) {
     LOG_TRACE("()");
 
     GotPowerupN(0);
 }
 
 // IDA: void __cdecl GotPowerup1()
-void GotPowerup1() {
+void GotPowerup1(void) {
     LOG_TRACE("()");
 
     GotPowerupN(1);
 }
 
 // IDA: void __cdecl GotPowerup2()
-void GotPowerup2() {
+void GotPowerup2(void) {
     LOG_TRACE("()");
 
     GotPowerupN(2);
 }
 
 // IDA: void __cdecl GotPowerup3()
-void GotPowerup3() {
+void GotPowerup3(void) {
     LOG_TRACE("()");
 
     GotPowerupN(3);
 }
 
 // IDA: void __cdecl GotPowerup4()
-void GotPowerup4() {
+void GotPowerup4(void) {
     LOG_TRACE("()");
 
     GotPowerupN(4);
 }
 
 // IDA: void __cdecl GotPowerup5()
-void GotPowerup5() {
+void GotPowerup5(void) {
     LOG_TRACE("()");
 
     GotPowerupN(5);
 }
 
 // IDA: void __cdecl GotPowerup6()
-void GotPowerup6() {
+void GotPowerup6(void) {
     LOG_TRACE("()");
 
     GotPowerupN(6);
 }
 
 // IDA: void __cdecl GotPowerup7()
-void GotPowerup7() {
+void GotPowerup7(void) {
     LOG_TRACE("()");
 
     GotPowerupN(7);
 }
 
 // IDA: void __cdecl GotPowerup8()
-void GotPowerup8() {
+void GotPowerup8(void) {
     LOG_TRACE("()");
 
     GotPowerupN(8);
 }
 
 // IDA: void __cdecl GotPowerup9()
-void GotPowerup9() {
+void GotPowerup9(void) {
     LOG_TRACE("()");
 
     GotPowerupN(9);
@@ -1250,7 +1250,7 @@ void ReceivedPowerup(tNet_contents* pContents) {
 }
 
 // IDA: void __cdecl SendCurrentPowerups()
-void SendCurrentPowerups() {
+void SendCurrentPowerups(void) {
     int i;
     int cat;
     int j;

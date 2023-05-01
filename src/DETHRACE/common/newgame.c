@@ -13,8 +13,8 @@
 #include "input.h"
 #include "intrface.h"
 #include "loading.h"
-#include "utility.h"
 #include "structur.h"
+#include "utility.h"
 #include "world.h"
 #include <stdlib.h>
 #include <string.h>
@@ -23,15 +23,15 @@ tU8* gFrank_flic_data;
 tU8* gAnne_flic_data;
 int gNet_storage_allocated;
 tRadio_bastards gRadio_bastards__newgame[11]; // suffix added to avoid duplicate symbol
-char _name1[] = "xxxxxxxx.TXT"; // keep compiler happy
-char _name2[] = "yyyyyyyy.TXT"; // keep compiler happy
+char _name1[] = "xxxxxxxx.TXT";               // keep compiler happy
+char _name2[] = "yyyyyyyy.TXT";               // keep compiler happy
 char* gBasic_car_names[2] = { _name1, _name2 };
 tNet_game_options gNet_settings[8];
 tJoinable_game gGames_to_join[6];
 tNet_game_options* gOptions;
 int gNet_target[7];
-int gLast_graph_sel__newgame; // suffix added to avoid duplicate symbol
-tInterface_spec* gThe_interface_spec__newgame; // suffix added to avoid duplicate symbol
+int gLast_graph_sel__newgame;                   // suffix added to avoid duplicate symbol
+tInterface_spec* gThe_interface_spec__newgame;  // suffix added to avoid duplicate symbol
 tNet_sequence_type gNet_race_sequence__newgame; // suffix added to avoid duplicate symbol
 tNet_game_type gLast_game_type;
 int gCurrent_net_game_count;
@@ -45,7 +45,7 @@ int gRace_index;
 int gRadio_selected;
 
 // IDA: void __cdecl StartRollingPlayerNamesIn()
-void StartRollingPlayerNamesIn() {
+void StartRollingPlayerNamesIn(void) {
     int i;
     LOG_TRACE("()");
 
@@ -56,7 +56,7 @@ void StartRollingPlayerNamesIn() {
 }
 
 // IDA: void __cdecl FrankAnneStart1()
-void FrankAnneStart1() {
+void FrankAnneStart1(void) {
     LOG_TRACE("()");
     StartRollingPlayerNamesIn();
     if (!gFrank_flic_data) {
@@ -82,7 +82,7 @@ void FrankAnneStart1() {
 }
 
 // IDA: void __cdecl FrankAnneStart2()
-void FrankAnneStart2() {
+void FrankAnneStart2(void) {
     LOG_TRACE("()");
     ChangePanelFlic(0, gFrank_flic_data, gFrank_flic_data_length);
     ChangePanelFlic(1, gAnne_flic_data, gAnne_flic_data_length);
@@ -133,7 +133,7 @@ void FrankAnneDraw(int pCurrent_choice, int pCurrent_mode) {
 }
 
 // IDA: int __cdecl FrankieOrAnnie()
-int FrankieOrAnnie() {
+int FrankieOrAnnie(void) {
     static tFlicette flicker_on[3] = {
         { 83, { 61, 122 }, { 52, 125 } },
         { 83, { 184, 398 }, { 52, 125 } },
@@ -159,56 +159,56 @@ int FrankieOrAnnie() {
         { { 178, 356 }, { 132, 317 }, { 295, 590 }, { 154, 370 } }
     };
     static tInterface_spec interface_spec = {
-        0, // initial_imode
-        80, // first_opening_flic
-        0, // second_opening_flic
-        81, // end_flic_go_ahead
-        81, // end_flic_escaped
-        81, // end_flic_otherwise
-        0, // flic_bunch_to_load
-        { -1, -1 }, // move_left_new_mode
-        { -1, 0 }, // move_left_delta
-        { 0, 2 }, // move_left_min
-        { 1, 2 }, // move_left_max
-        { NULL, NULL }, // move_left_proc
-        { -1, -1 }, // move_right_new_mode
-        { 1, 0 }, // move_right_delta
-        { 0, 2 }, // move_right_min
-        { 1, 2 }, // move_right_max
-        { NULL, NULL }, // move_right_proc
-        { 1, 0 }, // move_up_new_mode
-        { -2, -1 }, // move_up_delta
-        { 2, 1 }, // move_up_min
-        { 2, 1 }, // move_up_max
-        { NULL, NULL }, // move_up_proc
-        { 1, 0 }, // move_down_new_mode
-        { 2, -1 }, // move_down_delta
-        { 2, 1 }, // move_down_min
-        { 2, 1 }, // move_down_max
-        { NULL, NULL }, // move_down_proc
-        { 1, 1 }, // go_ahead_allowed
-        { NULL, NULL }, // go_ahead_proc
-        { 1, 1 }, // escape_allowed
-        { NULL, NULL }, // escape_proc
-        NULL, // exit_proc
-        FrankAnneDraw, // draw_proc
-        0, // time_out
+        0,               // initial_imode
+        80,              // first_opening_flic
+        0,               // second_opening_flic
+        81,              // end_flic_go_ahead
+        81,              // end_flic_escaped
+        81,              // end_flic_otherwise
+        0,               // flic_bunch_to_load
+        { -1, -1 },      // move_left_new_mode
+        { -1, 0 },       // move_left_delta
+        { 0, 2 },        // move_left_min
+        { 1, 2 },        // move_left_max
+        { NULL, NULL },  // move_left_proc
+        { -1, -1 },      // move_right_new_mode
+        { 1, 0 },        // move_right_delta
+        { 0, 2 },        // move_right_min
+        { 1, 2 },        // move_right_max
+        { NULL, NULL },  // move_right_proc
+        { 1, 0 },        // move_up_new_mode
+        { -2, -1 },      // move_up_delta
+        { 2, 1 },        // move_up_min
+        { 2, 1 },        // move_up_max
+        { NULL, NULL },  // move_up_proc
+        { 1, 0 },        // move_down_new_mode
+        { 2, -1 },       // move_down_delta
+        { 2, 1 },        // move_down_min
+        { 2, 1 },        // move_down_max
+        { NULL, NULL },  // move_down_proc
+        { 1, 1 },        // go_ahead_allowed
+        { NULL, NULL },  // go_ahead_proc
+        { 1, 1 },        // escape_allowed
+        { NULL, NULL },  // escape_proc
+        NULL,            // exit_proc
+        FrankAnneDraw,   // draw_proc
+        0,               // time_out
         FrankAnneStart1, // start_proc1
         FrankAnneStart2, // start_proc2
-        FrankAnneDone, // done_proc
-        1, // font_needed
-        { 1, 0 }, // typeable
-        GetPlayerName, // get_original_string
-        2, // escape_code
-        1, // dont_save_or_load
-        3, // number_of_button_flics
-        flicker_on, // flicker_on_flics
-        flicker_off, // flicker_off_flics
-        push, // pushed_flics
-        3, // number_of_mouse_areas
-        mouse_areas, // mouse_areas
-        2, // number_of_recopy_areas
-        recopy_areas // recopy_areas
+        FrankAnneDone,   // done_proc
+        1,               // font_needed
+        { 1, 0 },        // typeable
+        GetPlayerName,   // get_original_string
+        2,               // escape_code
+        1,               // dont_save_or_load
+        3,               // number_of_button_flics
+        flicker_on,      // flicker_on_flics
+        flicker_off,     // flicker_off_flics
+        push,            // pushed_flics
+        3,               // number_of_mouse_areas
+        mouse_areas,     // mouse_areas
+        2,               // number_of_recopy_areas
+        recopy_areas     // recopy_areas
     };
 
     int result;
@@ -223,7 +223,7 @@ int FrankieOrAnnie() {
 }
 
 // IDA: int __cdecl SelectSkillLevel()
-int SelectSkillLevel() {
+int SelectSkillLevel(void) {
     static tFlicette flicker_on[4] = {
         { 116, { 38, 76 }, { 55, 132 } },
         { 119, { 36, 72 }, { 83, 199 } },
@@ -252,56 +252,56 @@ int SelectSkillLevel() {
     };
 
     static tInterface_spec interface_spec = {
-        0, // initial_imode
-        110, // first_opening_flic
-        0, // second_opening_flic
-        -1, // end_flic_go_ahead
-        111, // end_flic_escaped
-        -1, // end_flic_otherwise
-        0, // flic_bunch_to_load
-        { -1, 0 }, // move_left_new_mode
-        { 0, 0 }, // move_left_delta
-        { 0, 0 }, // move_left_min
-        { 0, 0 }, // move_left_max
+        0,              // initial_imode
+        110,            // first_opening_flic
+        0,              // second_opening_flic
+        -1,             // end_flic_go_ahead
+        111,            // end_flic_escaped
+        -1,             // end_flic_otherwise
+        0,              // flic_bunch_to_load
+        { -1, 0 },      // move_left_new_mode
+        { 0, 0 },       // move_left_delta
+        { 0, 0 },       // move_left_min
+        { 0, 0 },       // move_left_max
         { NULL, NULL }, // move_left_proc
-        { -1, 0 }, // move_right_new_mode
-        { 0, 0 }, // move_right_delta
-        { 0, 0 }, // move_right_min
-        { 0, 0 }, // move_right_max
+        { -1, 0 },      // move_right_new_mode
+        { 0, 0 },       // move_right_delta
+        { 0, 0 },       // move_right_min
+        { 0, 0 },       // move_right_max
         { NULL, NULL }, // move_right_proc
-        { -1, 0 }, // move_up_new_mode
-        { -1, 0 }, // move_up_delta
-        { 0, 0 }, // move_up_min
-        { 3, 0 }, // move_up_max
+        { -1, 0 },      // move_up_new_mode
+        { -1, 0 },      // move_up_delta
+        { 0, 0 },       // move_up_min
+        { 3, 0 },       // move_up_max
         { NULL, NULL }, // move_up_proc
-        { -1, 0 }, // move_down_new_mode
-        { 1, 0 }, // move_down_delta
-        { 0, 0 }, // move_down_min
-        { 3, 0 }, // move_down_max
+        { -1, 0 },      // move_down_new_mode
+        { 1, 0 },       // move_down_delta
+        { 0, 0 },       // move_down_min
+        { 3, 0 },       // move_down_max
         { NULL, NULL }, // move_down_proc
-        { 1, 1 }, // go_ahead_allowed
+        { 1, 1 },       // go_ahead_allowed
         { NULL, NULL }, // go_ahead_proc
-        { 1, 1 }, // escape_allowed
+        { 1, 1 },       // escape_allowed
         { NULL, NULL }, // escape_proc
-        NULL, // exit_proc
-        NULL, // draw_proc
-        0u, // time_out
-        NULL, // start_proc1
-        NULL, // start_proc2
-        NULL, // done_proc
-        0, // font_needed
-        { 0, 0 }, // typeable
-        NULL, // get_original_string
-        3, // escape_code
-        1, // dont_save_or_load
-        4, // number_of_button_flics
-        flicker_on, // flicker_on_flics
-        flicker_off, // flicker_off_flics
-        push, // pushed_flics
-        4, // number_of_mouse_areas
-        mouse_areas, // mouse_areas
-        0, // number_of_recopy_areas
-        NULL // recopy_areas
+        NULL,           // exit_proc
+        NULL,           // draw_proc
+        0u,             // time_out
+        NULL,           // start_proc1
+        NULL,           // start_proc2
+        NULL,           // done_proc
+        0,              // font_needed
+        { 0, 0 },       // typeable
+        NULL,           // get_original_string
+        3,              // escape_code
+        1,              // dont_save_or_load
+        4,              // number_of_button_flics
+        flicker_on,     // flicker_on_flics
+        flicker_off,    // flicker_off_flics
+        push,           // pushed_flics
+        4,              // number_of_mouse_areas
+        mouse_areas,    // mouse_areas
+        0,              // number_of_recopy_areas
+        NULL            // recopy_areas
     };
 
     int result;
@@ -318,7 +318,7 @@ int SelectSkillLevel() {
 #include "harness/hooks.h"
 
 // IDA: int __cdecl DoOnePlayerStart()
-int DoOnePlayerStart() {
+int DoOnePlayerStart(void) {
     int merrily_looping;
     tProgram_state saved_state;
     LOG_TRACE("()");
@@ -415,7 +415,7 @@ void DrawGames(int pCurrent_choice, int pCurrent_mode) {
 }
 
 // IDA: void __cdecl InitGamesToJoin()
-void InitGamesToJoin() {
+void InitGamesToJoin(void) {
     int i;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
@@ -438,13 +438,13 @@ void AddToJoinList(tNet_game_details* pGame) {
 }
 
 // IDA: void __cdecl NewNetStart1()
-void NewNetStart1() {
+void NewNetStart1(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl NewNetStart2()
-void NewNetStart2() {
+void NewNetStart2(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -541,7 +541,7 @@ void NetPlayRadioOff(int pIndex, int pValue) {
 }
 
 // IDA: void __cdecl DrawNOptInitialRadios()
-void DrawNOptInitialRadios() {
+void DrawNOptInitialRadios(void) {
     int i;
     int j;
     LOG_TRACE("()");
@@ -594,7 +594,7 @@ int NetRadioClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int p
 }
 
 // IDA: void __cdecl RevertToDefaults()
-void RevertToDefaults() {
+void RevertToDefaults(void) {
     tPath_name the_path;
     FILE* f;
     tNet_game_options net_options;
@@ -604,7 +604,7 @@ void RevertToDefaults() {
 }
 
 // IDA: void __cdecl DefaultNetSettings()
-void DefaultNetSettings() {
+void DefaultNetSettings(void) {
     FILE* f;
     int i;
     STUB();
@@ -651,15 +651,15 @@ void DoNetOptions(tNet_game_options* pGame_options) {
     NOT_IMPLEMENTED();
 }
 
-//IDA: void __usercall PlayRadioOn(int pIndex@<EAX>)
-// Suffix added to avoid duplicate symbol
+// IDA: void __usercall PlayRadioOn(int pIndex@<EAX>)
+//  Suffix added to avoid duplicate symbol
 void PlayRadioOn__newgame(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
     NOT_IMPLEMENTED();
 }
 
-//IDA: void __usercall PlayRadioOff(int pIndex@<EAX>)
-// Suffix added to avoid duplicate symbol
+// IDA: void __usercall PlayRadioOff(int pIndex@<EAX>)
+//  Suffix added to avoid duplicate symbol
 void PlayRadioOff__newgame(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
     NOT_IMPLEMENTED();
@@ -672,7 +672,7 @@ void SetOptions(tNet_game_type pGame_type, tNet_game_options* pGame_options) {
 }
 
 // IDA: void __cdecl DrawNetChooseInitial()
-void DrawNetChooseInitial() {
+void DrawNetChooseInitial(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -782,7 +782,7 @@ void RequestCarDetails(tNet_game_details* pNet_game) {
 }
 
 // IDA: int __cdecl PickARandomCar()
-int PickARandomCar() {
+int PickARandomCar(void) {
     int i;
     int cars[120];
     int array_size;
@@ -818,7 +818,7 @@ int ChooseNetCar(tNet_game_details* pNet_game, tNet_game_options* pOptions, int*
 }
 
 // IDA: void __cdecl InitNetStorageSpace()
-void InitNetStorageSpace() {
+void InitNetStorageSpace(void) {
     int i;
     LOG_TRACE("()");
 
@@ -830,7 +830,7 @@ void InitNetStorageSpace() {
 }
 
 // IDA: void __cdecl DisposeNetStorageSpace()
-void DisposeNetStorageSpace() {
+void DisposeNetStorageSpace(void) {
     LOG_TRACE("()");
 
     if (gNet_storage_allocated) {
@@ -840,7 +840,7 @@ void DisposeNetStorageSpace() {
 }
 
 // IDA: int __cdecl DoMultiPlayerStart()
-int DoMultiPlayerStart() {
+int DoMultiPlayerStart(void) {
     tJoin_or_host_result result;
     tNet_game_details* game_to_join;
     char s[256];

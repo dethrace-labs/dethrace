@@ -24,7 +24,7 @@ br_filesystem BrStdioFilesystem = {
 };
 br_filesystem* _BrDefaultFilesystem = &BrStdioFilesystem;
 
-br_uint_32 BrStdioAttributes() {
+br_uint_32 BrStdioAttributes(void) {
     return BR_FS_ATTR_READABLE | BR_FS_ATTR_WRITEABLE | BR_FS_ATTR_HAS_TEXT | BR_FS_ATTR_HAS_BINARY | BR_FS_ATTR_HAS_ADVANCE;
 }
 
@@ -84,7 +84,7 @@ void* BrStdioOpenWrite(char* name, int mode) {
 
 void BrStdioClose(void* f) {
     LOG_TRACE("(%p)", f);
-    
+
     fclose(f);
 }
 
@@ -95,7 +95,7 @@ int BrStdioEof(void* f) {
 int BrStdioGetChar(void* f) {
     int c;
     c = fgetc(f);
-    //LOG_DEBUG("file pos: %d, char: %d", ftell(f) - 1, c);
+    // LOG_DEBUG("file pos: %d, char: %d", ftell(f) - 1, c);
     return c;
 }
 

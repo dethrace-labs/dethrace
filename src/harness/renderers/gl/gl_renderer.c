@@ -382,7 +382,7 @@ void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer, br_pixe
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
 }
 
-void GLRenderer_EndScene() {
+void GLRenderer_EndScene(void) {
     //  switch back to default fb and reset state
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDepthMask(GL_TRUE);
@@ -410,7 +410,7 @@ void GLRenderer_FullScreenQuad(uint8_t* screen_buffer) {
     CHECK_GL_ERROR("GLRenderer_RenderFullScreenQuad");
 }
 
-void GLRenderer_ClearBuffers() {
+void GLRenderer_ClearBuffers(void) {
     // clear our virtual framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -738,7 +738,7 @@ void GLRenderer_FlushBuffer(tRenderer_flush_type flush_type) {
     dirty_buffers = 0;
 }
 
-void GLRenderer_FlushBuffers() {
+void GLRenderer_FlushBuffers(void) {
     GLRenderer_FlushBuffer(eFlush_all);
 }
 

@@ -13,7 +13,7 @@
 int gLast_demo;
 
 // IDA: void __cdecl DoDemo()
-void DoDemo() {
+void DoDemo(void) {
     tS32 start_time;
     tS32 frame_time;
     FILE* f;

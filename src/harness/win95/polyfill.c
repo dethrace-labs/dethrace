@@ -88,7 +88,7 @@ int ScreenToClient_(void* hWnd, POINT_* lpPoint) {
     return 0;
 }
 
-uint32_t timeGetTime_() {
+uint32_t timeGetTime_(void) {
     return gHarness_platform.GetTicks();
 }
 
