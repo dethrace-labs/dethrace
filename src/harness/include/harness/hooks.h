@@ -59,7 +59,7 @@ typedef struct tHarness_platform {
     // Swap window
     void (*SwapWindow)();
     // Show message (generally for errors)
-    int (*MessageBox)(void* window, char* text, char* caption);
+    int (*ShowErrorMessage)(void* window, char* text, char* caption);
 
 } tHarness_platform;
 
