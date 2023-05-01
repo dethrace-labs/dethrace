@@ -1663,7 +1663,11 @@ void RenderAFrame(int pDepth_mask_on) {
         && !(gAction_replay_camera_mode && gAction_replay_mode)) {
         ExternalSky(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world);
     }
-    for (i = 0; i < (gMap_mode ? 3 : 1); i++) {
+#if !defined(DETHRACE_FIX_BUGS)
+    // in map mode, the scene is rendered 3 times. We have no idea why.
+    for (i = 0; i < (gMap_mode ? 3 : 1); i++)
+#endif
+    {
         RenderShadows(gUniverse_actor, &gProgram_state.track_spec, gCamera, &gCamera_to_world);
         BrZbSceneRenderBegin(gUniverse_actor, gCamera, gRender_screen, gDepth_buffer);
         ProcessNonTrackActors(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, &old_camera_matrix);
