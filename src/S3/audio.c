@@ -1,6 +1,7 @@
 #include "audio.h"
 #include "resource.h"
 
+#include "s3/s3.h"
 #include "3d.h"
 #include "harness/config.h"
 #include "harness/os.h"
@@ -16,7 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-extern int PDGetTotalTime();
+extern int PDGetTotalTime(void);
 
 int gS3_enabled;
 int gS3_noutlets;
