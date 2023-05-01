@@ -37,7 +37,7 @@ int addr2line(char const* const program_name, void const* const addr) {
     return system(addr2line_cmd);
 }
 
-void print_stack_trace() {
+static void print_stack_trace(void) {
     int i, trace_size = 0;
     char** messages = (char**)NULL;
 

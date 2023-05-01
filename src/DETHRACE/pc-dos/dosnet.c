@@ -36,6 +36,32 @@ unsigned short gECB_offset;
 tU16 gListen_selector;
 tU16 gSend_selector;
 
+/*static*/ void ClearupPDNetworkStuff(void);
+/*static*/ void MATTMessageCheck(char* pFunction_name, tNet_message* pMessage, int pAlleged_size);
+/*static*/ int GetProfileText(char* pDest, int pDest_len, char* pFname, char* pKeyname);
+/*static*/ int GetSocketNumberFromProfileFile(void);
+/*static*/ tU32 EthernetAddressToU32(_IPX_LOCAL_TARGET* pAddr_ipx);
+/*static*/ void NetNowIPXLocalTarget2String(char* pString, _IPX_LOCAL_TARGET* pSock_addr_ipx);
+/*static*/ int GetMessageTypeFromMessage(char* pMessage_str)  ;
+/*static*/ int SameEthernetAddress(_IPX_LOCAL_TARGET* pAddr_ipx1, _IPX_LOCAL_TARGET* pAddr_ipx2);
+/*static*/ _IPX_LOCAL_TARGET* GetIPXAddrFromPlayerID(tPlayer_ID pPlayer_id);
+/*static*/ void MakeMessageToSend(int pMessage_type);
+/*static*/ int ReceiveHostResponses(void);
+/*static*/ int BroadcastMessage(void);
+/*static*/ int hmiIPXCloseSocket(W32 wSocket);
+/*static*/ void hmiIPXListenForPacket(_IPX_ECB* pECB_ptr, tU32 pOffset);
+/*static*/ int hmiIPXPostListen(_IPX_ECB* pECB_ptr, tU32 pOffset);
+/*static*/ int hmiIPXGetData(char* pData, tU32 wDSize);
+/*static*/ void hmiIPXSendPacket(_IPX_ECB* sECB, _IPX_ECB** pPacket, char* pHeader, W32 wSize);
+/*static*/ int hmiIPXSendDataDirect(char* pHeader, W32 wHSize, char* pData, W32 wDSize, _NETNOW_NODE_ADDR* sNode);
+/*static*/ void hmiIPXGetInternetworkAddr(_IPX_INTERNET_ADDR* sInterworkAddr);
+/*static*/ void hmiIPXGetLocalTarget(_IPX_LOCAL_TARGET* sNetworkAddr);
+/*static*/ int AllocateRealMem(W32 wSize, char** pPtr, W32* pSegment, tU16* pSelector);
+/*static*/ int FreeRealMem(tU16 pSelector);
+/*static*/ int hmiIPXInstalled(void);
+/*static*/ void GetLargestPacketSizeOoErBetterInsertLinfordChristieJokeHere(void);
+/*static*/ void GetIPXToStickItsEarToTheGround(void);
+
 // IDA: void __cdecl ClearupPDNetworkStuff()
 void ClearupPDNetworkStuff() {
     LOG_TRACE("()");

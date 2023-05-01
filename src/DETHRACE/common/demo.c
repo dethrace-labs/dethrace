@@ -67,7 +67,7 @@ void DoDemo() {
         }
     }
     S3StopSound(song_tag);
-    S3StopAllOutletSounds(gEffects_outlet);
+    S3StopOutletSound(gEffects_outlet);
     S3StopAllOutletSounds();
     fclose(f);
     FadePaletteDown();

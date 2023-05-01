@@ -32,6 +32,9 @@ if(NOT MSVC)
         -Wextra
         -Wno-unused-parameter
     )
+    add_compile_flags_if_supported(harness
+        -Wstrict-prototypes
+    )
 else()
     target_compile_definitions(harness PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
@@ -60,8 +63,9 @@ target_sources(harness PRIVATE
     sound/sound.c
     sound/sound.h
     win95/polyfill.c
+    platforms/null.c
     platforms/null.h
-    
+
     "${CMAKE_CURRENT_BINARY_DIR}/version.h"
 )
 
