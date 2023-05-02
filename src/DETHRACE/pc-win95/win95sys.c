@@ -309,7 +309,7 @@ void Win32ReleaseInputDevice(void) {
 int PDGetASCIIFromKey(int pKey) {
     LOG_TRACE("(%d)", pKey);
 
-    if (PDKeyDown(KEY_LSHIFT)) {
+    if (PDKeyDown(KEY_SHIFT_ANY)) {
         return gASCII_shift_table[pKey];
     } else {
         return gASCII_table[pKey];
