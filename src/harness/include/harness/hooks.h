@@ -58,6 +58,8 @@ typedef struct tHarness_platform {
     uint32_t (*GetTicks)(void);
     // Swap window
     void (*SwapWindow)(void);
+    // Show error message
+    int (*ShowErrorMessage)(void* window, char* text, char* caption);
 
 } tHarness_platform;
 

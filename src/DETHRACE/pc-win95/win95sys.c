@@ -341,7 +341,7 @@ void PDFatalError(char* pThe_str) {
     LOG_TRACE("(\"%s\")", pThe_str);
 
     dr_dprintf("FATAL ERROR: %s", pThe_str);
-    Win32FatalError(pThe_str, NULL);
+    Win32FatalError(pThe_str, "");
 }
 
 void Win32FatalError(char* pStr_1, char* pStr_2) {
@@ -438,7 +438,7 @@ void PDShutdownSystem() {
         SendMessageA_(HWND_BROADCAST, 0x18u, 1u, 0);
         if (gWin32_show_fatal_error_message) {
             dr_dprintf("Displaying fatal error...");
-            MessageBoxA_(0, gWin32_fatal_error_message, "Carmageddon Fatal Error", 0x10u);
+            MessageBoxA_(0, gWin32_fatal_error_message, "Carmageddon Fatal Error", MB_ICONERROR);
         }
         if (gWin32_hwnd) {
             dr_dprintf("Destroying window...");
