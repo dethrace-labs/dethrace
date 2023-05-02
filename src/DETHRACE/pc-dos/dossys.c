@@ -488,7 +488,7 @@ int original_main(int pArgc, char** pArgv) {
             sscanf(pArgv[i], "%d", &arg);
             gSound_detail_level = arg;
 
-        } else if (strcasecmp(pArgv[i], "-robots") == 0) {
+        } else if (strcasecmp(pArgv[i], "-robots") == 0 || strcasecmp(pArgv[i], "-german") == 0) {
             gSausage_override = 1;
         } else if (strcasecmp(pArgv[i], "-lomem") == 0) {
             gAustere_override = 1;
