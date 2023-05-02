@@ -270,7 +270,6 @@ void PDSetKeyArray(int* pKeys, int pMark) {
             case KEY_ALT_ANY:
                 if (KEYDOWN(keystate, gScan_code[KEY_LALT]) || KEYDOWN(keystate, gScan_code[KEY_RALT])) {
                     pKeys[KEY_ALT_ANY] = pMark;
-
                 } else {
                     if (pKeys[KEY_ALT_ANY] == pMark) {
                         pKeys[KEY_ALT_ANY] = 0;
