@@ -83,7 +83,7 @@ void ResetPollKeys(void) {
 void CheckKeysForMouldiness(void) {
     LOG_TRACE9("()");
 
-    if ((PDGetTotalTime() - gLast_poll_keys) > 500) {
+    if (PDGetTotalTime() - gLast_poll_keys > 500) {
         ResetPollKeys();
         CyclePollKeys();
         PollKeys();
@@ -110,7 +110,7 @@ tKey_down_result PDKeyDown2(int pKey_index) {
     the_time = PDGetTotalTime();
     if (gKey_array[pKey_index]) {
         if (gLast_key_down == pKey_index) {
-            if ((the_time - gLast_key_down_time) < 300) {
+            if (the_time - gLast_key_down_time < 300) {
                 return tKey_down_still;
             } else {
                 gLast_key_down_time = the_time;
