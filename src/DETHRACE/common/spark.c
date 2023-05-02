@@ -619,14 +619,14 @@ void AdjustShrapnel(int pShrapnel_num, br_vector3* pos, tU16 pAge, br_material* 
 }
 
 // IDA: void __cdecl ResetSparks()
-void ResetSparks() {
+void ResetSparks(void) {
     LOG_TRACE("()");
 
     gSpark_flags = 0;
 }
 
 // IDA: void __cdecl ResetShrapnel()
-void ResetShrapnel() {
+void ResetShrapnel(void) {
     int i;
     LOG_TRACE("()");
 
@@ -696,7 +696,7 @@ void CreateShrapnelShower(br_vector3* pos, br_vector3* v, br_vector3* pNormal, b
 }
 
 // IDA: void __cdecl InitShrapnel()
-void InitShrapnel() {
+void InitShrapnel(void) {
     int i;
     int j;
     LOG_TRACE("()");
@@ -718,7 +718,7 @@ void InitShrapnel() {
 }
 
 // IDA: void __cdecl LoadInShrapnel()
-void LoadInShrapnel() {
+void LoadInShrapnel(void) {
     LOG_TRACE("()");
 
     gShrapnel_model[0] = LoadModel("FRAG4.DAT");
@@ -737,7 +737,7 @@ void KillShrapnel(int i) {
 }
 
 // IDA: void __cdecl DisposeShrapnel()
-void DisposeShrapnel() {
+void DisposeShrapnel(void) {
     int i;
     LOG_TRACE("()");
 
@@ -1079,7 +1079,7 @@ int CmpSmokeZ(void* p1, void* p2) {
 }
 
 // IDA: void __cdecl RenderRecordedSmokeCircles()
-void RenderRecordedSmokeCircles() {
+void RenderRecordedSmokeCircles(void) {
     int i;
     tBRender_smoke* smoke;
     tU8 red;
@@ -1204,7 +1204,7 @@ void GenerateContinuousSmoke(tCar_spec* pCar, int wheel, tU32 pTime) {
 }
 
 // IDA: void __cdecl DustRotate()
-void DustRotate() {
+void DustRotate(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -1347,7 +1347,7 @@ void CreatePuffOfSmoke(br_vector3* pos, br_vector3* v, br_scalar strength, br_sc
 }
 
 // IDA: void __cdecl ResetSmoke()
-void ResetSmoke() {
+void ResetSmoke(void) {
     LOG_TRACE("()");
 
     gSmoke_flags = 0;
@@ -1366,7 +1366,7 @@ void AdjustSmoke(int pIndex, tU8 pType, br_vector3* pPos, br_scalar pRadius, br_
 }
 
 // IDA: void __cdecl ActorError()
-void ActorError() {
+void ActorError(void) {
     LOG_TRACE("()");
 }
 
@@ -1464,7 +1464,7 @@ void CreateSmokeColumn(tCar_spec* pCar, int pColour, int pVertex_index, tU32 pLi
 }
 
 // IDA: void __cdecl GenerateSmokeShades()
-void GenerateSmokeShades() {
+void GenerateSmokeShades(void) {
     static int rb = 0x00;
     static int gb = 0x00;
     static int bb = 0x00;
@@ -1490,7 +1490,7 @@ void GenerateSmokeShades() {
 }
 
 // IDA: void __cdecl GenerateItFoxShadeTable()
-void GenerateItFoxShadeTable() {
+void GenerateItFoxShadeTable(void) {
     LOG_TRACE("()");
 
     if (gIt_shade_table == NULL) {
@@ -1746,7 +1746,7 @@ void MungeSmokeColumn(tU32 pTime) {
 }
 
 // IDA: void __cdecl DisposeFlame()
-void DisposeFlame() {
+void DisposeFlame(void) {
     int i;
     int j;
     br_actor* actor;
@@ -1775,7 +1775,7 @@ void DisposeFlame() {
 }
 
 // IDA: void __cdecl InitFlame()
-void InitFlame() {
+void InitFlame(void) {
     int i;
     int j;
     int num;
@@ -1911,7 +1911,7 @@ void InitSplash(FILE* pF) {
 }
 
 // IDA: void __cdecl DisposeSplash()
-void DisposeSplash() {
+void DisposeSplash(void) {
     int i;
     LOG_TRACE("()");
 
@@ -2144,7 +2144,7 @@ void SmudgeCar(tCar_spec* pCar, int fire_point) {
 }
 
 // IDA: void __cdecl ResetSmokeColumns()
-void ResetSmokeColumns() {
+void ResetSmokeColumns(void) {
     int i;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
@@ -2172,7 +2172,7 @@ void SetSmoke(int pSmoke_on) {
 }
 
 // IDA: int __cdecl GetSmokeOn()
-int GetSmokeOn() {
+int GetSmokeOn(void) {
     LOG_TRACE("()");
 
     return gSmoke_on;
@@ -2533,7 +2533,7 @@ void MungeSplash(tU32 pTime) {
 }
 
 // IDA: void __cdecl RenderSplashes()
-void RenderSplashes() {
+void RenderSplashes(void) {
     int i;
     LOG_TRACE("()");
 
@@ -2570,7 +2570,7 @@ void GetSmokeShadeTables(FILE* f) {
 }
 
 // IDA: void __cdecl FreeSmokeShadeTables()
-void FreeSmokeShadeTables() {
+void FreeSmokeShadeTables(void) {
     int i;
     LOG_TRACE("()");
 
@@ -2596,7 +2596,7 @@ void LoadInKevStuff(FILE* pF) {
 }
 
 // IDA: void __cdecl DisposeKevStuff()
-void DisposeKevStuff() {
+void DisposeKevStuff(void) {
     LOG_TRACE("()");
 
     DisposeShrapnel();

@@ -22,7 +22,7 @@ const uint BR_MATF_ENVIRONMENT_L = 0x10u;
 
 // https://rr2000.cwaboard.co.uk/R4/BRENDER/TEBK_43.HTM#HEADING331
 // https://www.clicktorelease.com/blog/creating-spherical-environment-mapping-shader/
-void do_spherical_environment_map() {
+void do_spherical_environment_map(void) {
     mat4 view_model = u_view * u_model;
     vec3 e = normalize( vec3( view_model * vec4( a_pos, 1.0 ) ) );
     vec3 n = normalize( mat3(u_normal_matrix) * a_normal );
@@ -31,7 +31,7 @@ void do_spherical_environment_map() {
     v_tex_coord = r.xy / m + .5;
 }
 
-void main() {
+void main(void) {
     v_frag_pos = vec3(u_model * vec4(a_pos, 1.0));
     v_normal = a_normal;
     v_tex_coord = a_uv;

@@ -35,7 +35,7 @@ void BrScratchFree(void* scratch) {
 }
 
 // IDA: void __cdecl BrScratchFlush()
-void BrScratchFlush() {
+void BrScratchFlush(void) {
     LOG_TRACE("()");
 
     if (fw.scratch_inuse != 0) {
@@ -49,21 +49,21 @@ void BrScratchFlush() {
 }
 
 // IDA: br_size_t __cdecl BrScratchInquire()
-br_size_t BrScratchInquire() {
+br_size_t BrScratchInquire(void) {
     LOG_TRACE("()");
 
     return fw.scratch_size;
 }
 
 // IDA: char* __cdecl BrScratchString()
-char* BrScratchString() {
+char* BrScratchString(void) {
     LOG_TRACE9("()");
 
     return scratchString;
 }
 
 // IDA: br_size_t __cdecl BrScratchStringSize()
-br_size_t BrScratchStringSize() {
+br_size_t BrScratchStringSize(void) {
     LOG_TRACE9("()");
 
     return sizeof(scratchString);

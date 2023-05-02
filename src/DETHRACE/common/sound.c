@@ -46,7 +46,7 @@ br_vector3 gOld_camera_position;
 br_vector3 gCamera_velocity;
 
 // IDA: void __cdecl UsePathFileToDetermineIfFullInstallation()
-void UsePathFileToDetermineIfFullInstallation() {
+void UsePathFileToDetermineIfFullInstallation(void) {
     // changed by dethrace for compatibility
     // char line1[80];
     // char line2[80];
@@ -81,7 +81,7 @@ void UsePathFileToDetermineIfFullInstallation() {
 }
 
 // IDA: void __cdecl InitSound()
-void InitSound() {
+void InitSound(void) {
     tPath_name the_path;
     tS3_sound_tag tag;
     int engine_channel_count;
@@ -300,7 +300,7 @@ int DRS3ReleaseSound(tS3_sound_id pThe_sound) {
 }
 
 // IDA: void __cdecl DRS3Service()
-void DRS3Service() {
+void DRS3Service(void) {
     LOG_TRACE("()");
 
     if (gSound_enabled) {
@@ -326,7 +326,7 @@ int DRS3SoundStillPlaying(tS3_sound_tag pSound_tag) {
 }
 
 // IDA: void __cdecl DRS3ShutDown()
-void DRS3ShutDown() {
+void DRS3ShutDown(void) {
     LOG_TRACE("()");
 
     if (gSound_enabled) {
@@ -360,7 +360,7 @@ int DRS3StopOutletSound(tS3_outlet_ptr pOutlet) {
 }
 
 // IDA: int __cdecl DRS3StopAllOutletSounds()
-int DRS3StopAllOutletSounds() {
+int DRS3StopAllOutletSounds(void) {
     LOG_TRACE("()");
 
     if (gSound_enabled) {
@@ -370,7 +370,7 @@ int DRS3StopAllOutletSounds() {
 }
 
 // IDA: void __cdecl ToggleSoundEnable()
-void ToggleSoundEnable() {
+void ToggleSoundEnable(void) {
     LOG_TRACE("()");
 
     if (gSound_enabled) {
@@ -384,7 +384,7 @@ void ToggleSoundEnable() {
 }
 
 // IDA: void __cdecl SoundService()
-void SoundService() {
+void SoundService(void) {
     br_matrix34 mat;
 
     if (gSound_enabled && !gServicing_sound) {
@@ -402,7 +402,7 @@ void SoundService() {
 }
 
 // IDA: void __cdecl InitSoundSources()
-void InitSoundSources() {
+void InitSoundSources(void) {
     int cat;
     int car_count;
     int i;
@@ -459,7 +459,7 @@ void InitSoundSources() {
 }
 
 // IDA: void __cdecl DisposeSoundSources()
-void DisposeSoundSources() {
+void DisposeSoundSources(void) {
     int cat;
     int car_count;
     int i;
@@ -539,7 +539,7 @@ tS3_sound_tag DRS3StartSoundFromSource(tS3_sound_source_ptr pSource, tS3_sound_i
 }
 
 // IDA: void __cdecl MungeEngineNoise()
-void MungeEngineNoise() {
+void MungeEngineNoise(void) {
     tCar_spec* the_car;
     tU32 pitch;
     int vol;
@@ -629,7 +629,7 @@ void MungeEngineNoise() {
 }
 
 // IDA: void __cdecl SetSoundVolumes()
-void SetSoundVolumes() {
+void SetSoundVolumes(void) {
 
     if (!gSound_enabled) {
         return;
@@ -671,15 +671,15 @@ int DRS3StartCDA(tS3_sound_id pCDA_id) {
 }
 
 // IDA: int __cdecl DRS3StopCDA()
-int DRS3StopCDA() {
+int DRS3StopCDA(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl StartMusic()
-void StartMusic() {
+void StartMusic(void) {
 }
 
 // IDA: void __cdecl StopMusic()
-void StopMusic() {
+void StopMusic(void) {
 }

@@ -293,7 +293,7 @@ void* DfTop(int type, int* countp) {
 }
 
 // IDA: int __cdecl DfTopType()
-int DfTopType() {
+int DfTopType(void) {
     LOG_TRACE9("()");
     if (DatafileStackTop > 0) {
         return DatafileStack[DatafileStackTop - 1].type;
@@ -1569,7 +1569,7 @@ int DfChunksInterpret(br_datafile* df, br_chunks_table* table) {
 }
 
 // IDA: void __cdecl BrNullOther()
-void BrNullOther() {
+void BrNullOther(void) {
     LOG_TRACE("()");
 
     // Yes, "invalid" is misspelled.

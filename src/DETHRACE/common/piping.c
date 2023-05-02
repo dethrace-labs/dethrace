@@ -126,7 +126,7 @@ void SaveReducedPos(tReduced_pos* p, br_vector3* v) {
 }
 
 // IDA: int __cdecl PipeSearchForwards()
-int PipeSearchForwards() {
+int PipeSearchForwards(void) {
     LOG_TRACE("()");
 
     if (gPipe_play_ptr == gPipe_record_ptr) {
@@ -143,28 +143,28 @@ int PipeSearchForwards() {
 }
 
 // IDA: int __cdecl IsActionReplayAvailable()
-int IsActionReplayAvailable() {
+int IsActionReplayAvailable(void) {
     LOG_TRACE("()");
 
     return gPipe_buffer_start != NULL;
 }
 
 // IDA: int __cdecl SomeReplayLeft()
-int SomeReplayLeft() {
+int SomeReplayLeft(void) {
     LOG_TRACE("()");
 
     return ((GetReplayDirection() >= 1 && gPipe_play_ptr != gPipe_record_ptr) || (GetReplayDirection() <= -1 && gPipe_play_ptr != gPipe_buffer_oldest));
 }
 
 // IDA: void __cdecl DisablePipedSounds()
-void DisablePipedSounds() {
+void DisablePipedSounds(void) {
     LOG_TRACE("()");
 
     gDisable_sound = 1;
 }
 
 // IDA: void __cdecl EnablePipedSounds()
-void EnablePipedSounds() {
+void EnablePipedSounds(void) {
     LOG_TRACE("()");
 
     gDisable_sound = 0;
@@ -396,7 +396,7 @@ void EndPipingSession2(int pMunge_reentrancy) {
 }
 
 // IDA: void __cdecl EndPipingSession()
-void EndPipingSession() {
+void EndPipingSession(void) {
     LOG_TRACE("()");
 
     EndPipingSession2(1);
@@ -860,7 +860,7 @@ void PipeSingleGrooveStop(int pGroove_index, br_matrix34* pMatrix, int pPath_int
 }
 
 // IDA: void __cdecl PipeFrameFinish()
-void PipeFrameFinish() {
+void PipeFrameFinish(void) {
     LOG_TRACE("()");
 
     if (gWall_severity != 0.f) {
@@ -875,7 +875,7 @@ void PipeFrameFinish() {
 }
 
 // IDA: void __cdecl PipingFrameReset()
-void PipingFrameReset() {
+void PipingFrameReset(void) {
     int i;
     LOG_TRACE("()");
 
@@ -896,7 +896,7 @@ void PipeSingleSkidAdjustment(int pSkid_num, br_matrix34* pMatrix, int pMaterial
 }
 
 // IDA: void __cdecl ResetPiping()
-void ResetPiping() {
+void ResetPiping(void) {
     LOG_TRACE("()");
 
     gWall_severity = 0.f;
@@ -907,7 +907,7 @@ void ResetPiping() {
 }
 
 // IDA: void __cdecl InitialisePiping()
-void InitialisePiping() {
+void InitialisePiping(void) {
     LOG_TRACE("()");
 
     if (!gAusterity_mode && gNet_mode == eNet_mode_none) {
@@ -928,7 +928,7 @@ void InitialisePiping() {
 }
 
 // IDA: void __cdecl DisposePiping()
-void DisposePiping() {
+void DisposePiping(void) {
     LOG_TRACE("()");
 
     if (gPipe_buffer_start != NULL) {
@@ -946,7 +946,7 @@ void DisposePiping() {
 }
 
 // IDA: void __cdecl InitLastDamageArrayEtc()
-void InitLastDamageArrayEtc() {
+void InitLastDamageArrayEtc(void) {
     int i;
     int j;
     int cat;
@@ -977,7 +977,7 @@ void InitLastDamageArrayEtc() {
 }
 
 // IDA: void __cdecl ResetCars()
-void ResetCars() {
+void ResetCars(void) {
     tCar_spec* car;
     int cat;
     int i;
@@ -1002,7 +1002,7 @@ void ResetCars() {
 }
 
 // IDA: void __cdecl PipeCarPositions()
-void PipeCarPositions() {
+void PipeCarPositions(void) {
     tCar_spec* car;
     int cat;
     int i;
@@ -1069,21 +1069,21 @@ void PipeCarPositions() {
 }
 
 // IDA: void __cdecl ResetPipePlayToEnd()
-void ResetPipePlayToEnd() {
+void ResetPipePlayToEnd(void) {
     LOG_TRACE("()");
 
     gPipe_play_ptr = gPipe_record_ptr;
 }
 
 // IDA: void __cdecl ResetPipePlayToStart()
-void ResetPipePlayToStart() {
+void ResetPipePlayToStart(void) {
     LOG_TRACE("()");
 
     gPipe_play_ptr = gPipe_buffer_oldest;
 }
 
 // IDA: tU8* __cdecl GetPipePlayPtr()
-tU8* GetPipePlayPtr() {
+tU8* GetPipePlayPtr(void) {
     LOG_TRACE("()");
 
     return gPipe_play_ptr;
@@ -2304,7 +2304,7 @@ int GetNextIncident(tU32 pOffset_time, tIncident_type* pIncident_type, float* pS
 }
 
 // IDA: tU32 __cdecl GetARStartTime()
-tU32 GetARStartTime() {
+tU32 GetARStartTime(void) {
     tU8* temp_ptr;
     LOG_TRACE("()");
 

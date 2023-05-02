@@ -44,7 +44,7 @@ int SSDXInitDirectDraw(int width, int height, int* row_bytes) {
     return 0;
 }
 
-void SSDXRelease() {}
+void SSDXRelease(void) {}
 
 void SSDXGetWindowRect(void* hWnd) {
     // none of this is required

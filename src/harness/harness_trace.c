@@ -43,7 +43,7 @@ void debug_print_matrix4(const char* fmt, const char* fn, char* msg, br_matrix4*
     puts("\033[0m");
 }
 
-// int count_open_fds() {
+// int count_open_fds(void) {
 //     DIR* dp = opendir("/dev/fd/");
 //     struct dirent* de;
 //     int count = -3; // '.', '..', dp

@@ -96,7 +96,7 @@ static void Win32InitScreen(void);
 /*static*/ void CopyBackScreen(int pRendering_area_only);
 static void Win32SetPaletteEntries(uint8_t* entries, int pFirst_colour, int pCount);
 static void Win32InitInputDevice(void);
-static  void Win32AllocateActionReplayBuffer(void);
+static void Win32AllocateActionReplayBuffer(void);
 static void Usage(char* pProgpath);
 /*static*/ int OurGetChar(void);
 /*static*/ int InitJoysticks(void);
@@ -106,7 +106,7 @@ static void Win32BRenderFailureFunc(char* msg);
 
 extern void QuitGame(void);
 
-void KeyboardHandler() {
+void KeyboardHandler(void) {
     tU8 scan_code;
     tU8 up;
     static tU8 extended;
@@ -123,7 +123,7 @@ void KeyTranslation(tU8 pKey_index, tU8 pScan_code_1, tU8 pScan_code_2) {
     NOT_IMPLEMENTED();
 }
 
-void KeyBegin() {
+void KeyBegin(void) {
     gScan_code[KEY_0] = DIK_0;
     gScan_code[KEY_1] = DIK_1;
     gScan_code[KEY_2] = DIK_2;
@@ -233,7 +233,7 @@ void KeyBegin() {
     gScan_code[KEY_CTRL_ANY] = 0xff;
 }
 
-void KeyEnd() {
+void KeyEnd(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -303,7 +303,7 @@ void PDSetKeyArray(int* pKeys, int pMark) {
     }
 }
 
-void Win32ReleaseInputDevice() {
+void Win32ReleaseInputDevice(void) {
 }
 
 int PDGetASCIIFromKey(int pKey) {
@@ -316,7 +316,7 @@ int PDGetASCIIFromKey(int pKey) {
     }
 }
 
-void Win32PumpMessages() {
+void Win32PumpMessages(void) {
     MSG_ msg; // [esp+Ch] [ebp-20h] BYREF
 
     PDUnlockRealBackScreen();
@@ -356,7 +356,7 @@ void PDNonFatalError(char* pThe_str) {
     NOT_IMPLEMENTED();
 }
 
-void PDInitialiseSystem() {
+void PDInitialiseSystem(void) {
     tPath_name the_path;
     FILE* f;
     int len;
@@ -388,7 +388,7 @@ void PDInitialiseSystem() {
     Win32InitInputDevice();
 }
 
-void Win32CreateWindow() {
+void Win32CreateWindow(void) {
     // wnd_class.style = 3;
     // wnd_class.lpfnWndProc = window_proc;
     // wnd_class.cbClsExtra = 0;
@@ -418,7 +418,7 @@ void Win32CreateWindow() {
     // SetFocus(gWin32_hwnd);
 }
 
-void PDShutdownSystem() {
+void PDShutdownSystem(void) {
     static int been_here = 0;
     LOG_TRACE("()");
 
@@ -452,12 +452,12 @@ void PDShutdownSystem() {
     ExitProcess_(8u);
 }
 
-void PDSaveOriginalPalette() {
+void PDSaveOriginalPalette(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-void PDRevertPalette() {
+void PDRevertPalette(void) {
     LOG_TRACE("()");
 
     // empty function
@@ -470,30 +470,30 @@ int PDInitScreenVars(int pArgc, char** pArgv) {
     return 1;
 }
 
-void PDInitScreen() {
+void PDInitScreen(void) {
     Win32InitScreen();
 }
 
-void Win32InitScreen() {
+void Win32InitScreen(void) {
     // SWP_NOSENDCHANGING | SWP_NOACTIVATE | SWP_NOZORDER
     SetWindowPos_(gWin32_hwnd, 0, 0, 0, gGraf_specs[gReal_graf_data_index].total_width, gGraf_specs[gReal_graf_data_index].total_height, 0x414u);
     // get_window_rect(gWin32_hwnd);
     Win32PumpMessages();
 }
 
-void PDLockRealBackScreen() {
+void PDLockRealBackScreen(void) {
     LOG_TRACE("()");
 
     // no-op
 }
 
-void PDUnlockRealBackScreen() {
+void PDUnlockRealBackScreen(void) {
     LOG_TRACE("()");
 
     // no-op
 }
 
-void PDAllocateScreenAndBack() {
+void PDAllocateScreenAndBack(void) {
     // this is a mix of windows and dos code
 
     dr_dprintf("PDAllocateScreenAndBack() - START...");
@@ -601,12 +601,12 @@ void Double8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap
     NOT_IMPLEMENTED();
 }
 
-br_pixelmap* PDInterfacePixelmap() {
+br_pixelmap* PDInterfacePixelmap(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-void SwapBackScreen() {
+void SwapBackScreen(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -651,7 +651,7 @@ void PDPixelmapVLineOnScreen(br_pixelmap* dst, br_int_16 x1, br_int_16 y1, br_in
     NOT_IMPLEMENTED();
 }
 
-void PDInstallErrorHandlers() {
+void PDInstallErrorHandlers(void) {
     LOG_TRACE("()");
 
     gWin32_br_diaghandler.identifier = "LlantisilioBlahBlahBlahOgOgOch";
@@ -660,7 +660,7 @@ void PDInstallErrorHandlers() {
     BrDiagHandlerSet(&gWin32_br_diaghandler);
 }
 
-void PDSetFileVariables() {
+void PDSetFileVariables(void) {
 
     // Changed by dethrace for cross-platform
     // strcpy(gDir_separator, "\\");
@@ -721,11 +721,11 @@ void PDSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
     Win32SetPaletteEntries(pPalette->pixels, pFirst_colour, pCount);
 }
 
-void PDSwitchToRealResolution() {
+void PDSwitchToRealResolution(void) {
     LOG_TRACE("()");
 }
 
-void PDSwitchToLoresMode() {
+void PDSwitchToLoresMode(void) {
     LOG_TRACE("()");
 }
 
@@ -749,7 +749,7 @@ void PDGetMousePosition(int* pX_coord, int* pY_coord) {
     *pY_coord = p.y;
 }
 
-int PDGetTotalTime() {
+int PDGetTotalTime(void) {
     return timeGetTime_();
 }
 
@@ -758,12 +758,12 @@ int PDServiceSystem(tU32 pTime_since_last_call) {
     return 0;
 }
 
-void Win32InitInputDevice() {
+void Win32InitInputDevice(void) {
     // do directinput stuff
     gJoystick_deadzone = 8000;
 }
 
-void Win32AllocateActionReplayBuffer() {
+void Win32AllocateActionReplayBuffer(void) {
     MEMORYSTATUS_ mem_status; // [esp+Ch] [ebp-28h] BYREF
     size_t buf_size;          // [esp+2Ch] [ebp-8h]
     void* buf;                // [esp+30h] [ebp-4h]
@@ -944,7 +944,7 @@ int original_main(int pArgc, char** pArgv) {
     return 0;
 }
 
-int OurGetChar() {
+int OurGetChar(void) {
     int key;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
@@ -1004,12 +1004,12 @@ br_pixelmap* PDMissingMap(char* name) {
     return NULL;
 }
 
-void PDEndItAllAndReRunTheBastard() {
+void PDEndItAllAndReRunTheBastard(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-int InitJoysticks() {
+int InitJoysticks(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -1021,7 +1021,7 @@ tU32 ReadJoystickAxis(int pBit) {
     NOT_IMPLEMENTED();
 }
 
-void PDReadJoySticks() {
+void PDReadJoySticks(void) {
     tU32 temp1x;
     tU32 temp1y;
     tU32 temp2x;
@@ -1030,66 +1030,66 @@ void PDReadJoySticks() {
     NOT_IMPLEMENTED();
 }
 
-tS32 PDGetJoy1X() {
+tS32 PDGetJoy1X(void) {
     tS32 joy;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-tS32 PDGetJoy1Y() {
+tS32 PDGetJoy1Y(void) {
     tS32 joy;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-tS32 PDGetJoy2X() {
+tS32 PDGetJoy2X(void) {
     tS32 joy;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-tS32 PDGetJoy2Y() {
+tS32 PDGetJoy2Y(void) {
     tS32 joy;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-int PDGetJoy1Button1() {
+int PDGetJoy1Button1(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-int PDGetJoy1Button2() {
+int PDGetJoy1Button2(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-int PDGetJoy1Button3() {
+int PDGetJoy1Button3(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-int PDGetJoy1Button4() {
+int PDGetJoy1Button4(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-int PDGetJoy2Button1() {
+int PDGetJoy2Button1(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-int PDGetJoy2Button2() {
+int PDGetJoy2Button2(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-int PDGetJoy2Button3() {
+int PDGetJoy2Button3(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
-int PDGetJoy2Button4() {
+int PDGetJoy2Button4(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -1129,7 +1129,7 @@ int PDCheckDriveExists2(char* pThe_path, char* pFile_name, tU32 pMin_size) {
     return file_size >= pMin_size;
 }
 
-int PDDoWeLeadAnAustereExistance() {
+int PDDoWeLeadAnAustereExistance(void) {
     return 0;
 }
 

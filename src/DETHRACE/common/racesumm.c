@@ -91,7 +91,7 @@ void MungeRankEtc(tProgram_state* pThe_state) {
 }
 
 // IDA: void __cdecl CalcRankIncrease()
-void CalcRankIncrease() {
+void CalcRankIncrease(void) {
     LOG_TRACE("()");
 
     if (gNet_mode == eNet_mode_none) {
@@ -151,7 +151,7 @@ void DrawChromeNumber(int pLeft_1, int pLeft_2, int pPitch, int pTop, int pAmoun
 }
 
 // IDA: void __cdecl DrawSummaryItems()
-void DrawSummaryItems() {
+void DrawSummaryItems(void) {
     LOG_TRACE("()");
 
     DrawInBox(
@@ -301,7 +301,7 @@ void DrawSummary(int pCurrent_choice, int pCurrent_mode) {
 }
 
 // IDA: void __cdecl StartSummary()
-void StartSummary() {
+void StartSummary(void) {
     LOG_TRACE("()");
 
     DrawSummaryItems();
@@ -309,7 +309,7 @@ void StartSummary() {
 }
 
 // IDA: void __cdecl SetUpTemps()
-void SetUpTemps() {
+void SetUpTemps(void) {
     LOG_TRACE("()");
 
     gTemp_earned = gProgram_state.credits_earned;
@@ -370,7 +370,7 @@ int SummCheckGameOver(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: tSO_result __cdecl DoEndRaceSummary1()
-tSO_result DoEndRaceSummary1() {
+tSO_result DoEndRaceSummary1(void) {
     static tFlicette flicker_on[1] = {
         { 43, { 218, 436 }, { 147, 353 } },
     };
@@ -493,7 +493,7 @@ void PrepareBoundingRadius__racesumm(br_model* model) {
 }
 
 // IDA: void __cdecl BuildWrecks()
-void BuildWrecks() {
+void BuildWrecks(void) {
     int cat;
     int i;
     int position;
@@ -561,7 +561,7 @@ void BuildWrecks() {
 }
 
 // IDA: void __cdecl DisposeWrecks()
-void DisposeWrecks() {
+void DisposeWrecks(void) {
     int cat;
     int i;
     int position;
@@ -573,15 +573,13 @@ void DisposeWrecks() {
     for (cat = eVehicle_self; cat < eVehicle_rozzer; cat++) {
         if (cat == eVehicle_self) {
             car_count = 1;
-        }
-        else {
+        } else {
             car_count = GetCarCount(cat);
         }
         for (i = 0; i < car_count; i++) {
             if (cat == eVehicle_self) {
                 the_car = &gProgram_state.current_car;
-            }
-            else {
+            } else {
                 the_car = GetCarSpec(cat, i);
             }
             this_car = the_car->car_model_actors[the_car->principal_car_actor].actor;
@@ -606,10 +604,7 @@ void DisposeWrecks() {
 int MatrixIsIdentity(br_matrix34* pMat) {
     LOG_TRACE("(%p)", pMat);
 
-    return (pMat->m[0][0] == 1.f && pMat->m[1][1] == 1.f && pMat->m[2][2] == 1.f &&
-        pMat->m[0][1] == 0.f && pMat->m[0][2] == 0.f &&
-        pMat->m[1][0] == 0.f && pMat->m[1][2] == 0.f &&
-        pMat->m[2][0] == 0.f && pMat->m[2][1] == 0.f);
+    return (pMat->m[0][0] == 1.f && pMat->m[1][1] == 1.f && pMat->m[2][2] == 1.f && pMat->m[0][1] == 0.f && pMat->m[0][2] == 0.f && pMat->m[1][0] == 0.f && pMat->m[1][2] == 0.f && pMat->m[2][0] == 0.f && pMat->m[2][1] == 0.f);
 }
 
 // IDA: void __usercall SpinWrecks(tU32 pFrame_period@<EAX>)
@@ -743,12 +738,10 @@ int DamageScrnExit(int* pCurrent_choice, int* pCurrent_mode) {
 
     if (gProgram_state.prog_status == eProg_idling) {
         return 1;
-    }
-    else {
+    } else {
         if (gWreck_gallery_start == 0) {
             gWreck_gallery_start = PDGetTotalTime();
-        }
-        else if (!gDone_initial && gWreck_selected == 0) {
+        } else if (!gDone_initial && gWreck_selected == 0) {
             if (PDGetTotalTime() - gWreck_gallery_start > 1500) {
                 ZoomOutTo(gWreck_selected, pCurrent_choice, pCurrent_mode);
                 gDone_initial = 1;
@@ -776,9 +769,9 @@ void DamageScrnDraw(int pCurrent_choice, int pCurrent_mode) {
     if (((pCurrent_choice == 0 && pCurrent_mode == 0) || !gDone_initial) && (gWreck_zoomed_in < 0 && gWreck_selected >= 0)) {
         sel_actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
         sel_actor->render_style = BR_RSTYLE_BOUNDING_EDGES;
-        sel_actor->render_style = BR_RSTYLE_NONE;  // FIXME: remove this line once BR_RSTYLE_BOUNDING_EDGES rener style has been implemente
+        sel_actor->render_style = BR_RSTYLE_NONE; // FIXME: remove this line once BR_RSTYLE_BOUNDING_EDGES rener style has been implemente
         sel_actor->model = gWreck_array[gWreck_selected].actor->model;
-         BrActorAdd(gWreck_array[gWreck_selected].actor, sel_actor);
+        BrActorAdd(gWreck_array[gWreck_selected].actor, sel_actor);
     } else {
         sel_actor = NULL;
     }
@@ -873,7 +866,7 @@ int DamageScrnLeft(int* pCurrent_choice, int* pCurrent_mode) {
     if (*pCurrent_mode == 0 && gWreck_zoomed_in < 0) {
         if (gWreck_selected < 0) {
             gWreck_selected = gWreck_count - 1;
-        } else if (gWreck_selected != 0 && gWreck_array[gWreck_selected - 1].pos_y == gWreck_array[gWreck_selected]. pos_y) {
+        } else if (gWreck_selected != 0 && gWreck_array[gWreck_selected - 1].pos_y == gWreck_array[gWreck_selected].pos_y) {
             gWreck_selected--;
         } else {
             for (i = gWreck_count - 1; i >= 0; i--) {
@@ -902,7 +895,7 @@ int DamageScrnRight(int* pCurrent_choice, int* pCurrent_mode) {
     if (*pCurrent_mode == 0 && gWreck_zoomed_in < 0) {
         if (gWreck_selected < 0) {
             gWreck_selected = 0;
-        } else if (gWreck_selected - 1 != gWreck_count && gWreck_array[gWreck_selected + 1].pos_y == gWreck_array[gWreck_selected]. pos_y) {
+        } else if (gWreck_selected - 1 != gWreck_count && gWreck_array[gWreck_selected + 1].pos_y == gWreck_array[gWreck_selected].pos_y) {
             gWreck_selected++;
         } else {
             for (i = 0; i < gWreck_count; i++) {
@@ -1035,7 +1028,7 @@ int DamageScrnGoHead(int* pCurrent_choice, int* pCurrent_mode) {
             gUser_interacted = 1;
         }
     } else if (*pCurrent_choice == 1) {
-            ZoomInTo(gWreck_selected, pCurrent_choice, pCurrent_mode);
+        ZoomInTo(gWreck_selected, pCurrent_choice, pCurrent_mode);
     }
     gDone_initial = 1;
     return 0;
@@ -1050,8 +1043,8 @@ int ClickDamage(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_
     LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
 
 #if defined(DETHRACE_FIX_BUGS)
-    old_mouse_x = 0;     // Fixes warning caused by -Wsometimes-uninitialized
-    old_mouse_y = 0;    // Fixes warning caused by -Wsometimes-uninitialized
+    old_mouse_x = 0; // Fixes warning caused by -Wsometimes-uninitialized
+    old_mouse_y = 0; // Fixes warning caused by -Wsometimes-uninitialized
 #endif
     GetMousePosition(&old_mouse_y, &old_mouse_y);
     if (gWreck_zoomed_in < 0) {
@@ -1093,38 +1086,38 @@ int DamageScrnDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pE
 }
 
 // IDA: tSO_result __cdecl DoEndRaceSummary2()
-tSO_result DoEndRaceSummary2() {
+tSO_result DoEndRaceSummary2(void) {
     static tFlicette flicker_on[3] = {
-        {  -1, {   0,   0 }, {   0,   0 } },
-        { 321, {   9,  18 }, { 174, 418 } },
+        { -1, { 0, 0 }, { 0, 0 } },
+        { 321, { 9, 18 }, { 174, 418 } },
         { 321, { 247, 494 }, { 174, 418 } },
     };
     static tFlicette flicker_off[3] = {
-        {  -1, {   0,   0 }, {   0,   0 } },
-        { 322, {   9,  18 }, { 174, 418 } },
+        { -1, { 0, 0 }, { 0, 0 } },
+        { 322, { 9, 18 }, { 174, 418 } },
         { 322, { 247, 494 }, { 174, 418 } },
     };
     static tFlicette push[3] = {
-        {  -1, {   0,   0 }, {   0,   0 } },
-        { 324, {   9,  18 }, { 174, 418 } },
+        { -1, { 0, 0 }, { 0, 0 } },
+        { 324, { 9, 18 }, { 174, 418 } },
         { 323, { 247, 494 }, { 174, 418 } },
     };
     static tMouse_area mouse_areas[3] = {
-        { {  11,  22 }, {  20,  48 }, { 309, 618 }, { 169, 406 },   0,   0,   0, ClickDamage },
-        { {   9,  18 }, { 174, 418 }, {  72, 144 }, { 194, 466 },   1,   1,   0, NULL },
-        { { 247, 494 }, { 174, 418 }, { 310, 620 }, { 194, 466 },   2,   1,   0, NULL },
+        { { 11, 22 }, { 20, 48 }, { 309, 618 }, { 169, 406 }, 0, 0, 0, ClickDamage },
+        { { 9, 18 }, { 174, 418 }, { 72, 144 }, { 194, 466 }, 1, 1, 0, NULL },
+        { { 247, 494 }, { 174, 418 }, { 310, 620 }, { 194, 466 }, 2, 1, 0, NULL },
     };
     static tInterface_spec interface_spec = {
         1, 320, 0, -1, -1, -1, -1,
-        {-1, -1}, {0, 0}, {0, 0}, {0, 2}, {DamageScrnLeft,DamageScrnLeft},
-        {-1, -1}, {0, 0}, {0, 0}, {0, 2}, {DamageScrnRight, DamageScrnRight},
-        {1, 0}, {0, 0}, {1, 0}, {2, 0}, {DamageScrnUp, DamageScrnUp},
-        {1,0}, {0, 0}, {1, 0}, {2, 0}, {DamageScrnDown, DamageScrnDown},
-        {1, 1}, {DamageScrnGoHead, DamageScrnGoHead},
-        {1, 1}, {NULL, NULL},
+        { -1, -1 }, { 0, 0 }, { 0, 0 }, { 0, 2 }, { DamageScrnLeft, DamageScrnLeft },
+        { -1, -1 }, { 0, 0 }, { 0, 0 }, { 0, 2 }, { DamageScrnRight, DamageScrnRight },
+        { 1, 0 }, { 0, 0 }, { 1, 0 }, { 2, 0 }, { DamageScrnUp, DamageScrnUp },
+        { 1, 0 }, { 0, 0 }, { 1, 0 }, { 2, 0 }, { DamageScrnDown, DamageScrnDown },
+        { 1, 1 }, { DamageScrnGoHead, DamageScrnGoHead },
+        { 1, 1 }, { NULL, NULL },
         DamageScrnExit, DamageScrnDraw,
         20000, NULL, NULL, DamageScrnDone, 0,
-        {0, 0}, NULL, 2, 1,
+        { 0, 0 }, NULL, 2, 1,
         COUNT_OF(flicker_on), flicker_on, flicker_off, push,
         COUNT_OF(mouse_areas), mouse_areas,
         0, NULL
@@ -1181,7 +1174,7 @@ int SortScores(void* pFirst_one, void* pSecond_one) {
 }
 
 // IDA: void __cdecl SortGameScores()
-void SortGameScores() {
+void SortGameScores(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -1196,7 +1189,7 @@ void NetSumDraw(int pCurrent_choice, int pCurrent_mode) {
 }
 
 // IDA: void __cdecl DoNetRaceSummary()
-void DoNetRaceSummary() {
+void DoNetRaceSummary(void) {
     static tFlicette flicker_on[1];
     static tFlicette flicker_off[1];
     static tFlicette push[1];

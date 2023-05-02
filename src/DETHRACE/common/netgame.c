@@ -68,7 +68,7 @@ void ReceivedCopInfo(tNet_contents* pContents) {
 }
 
 // IDA: void __cdecl SendAllNonCarPositions()
-void SendAllNonCarPositions() {
+void SendAllNonCarPositions(void) {
     int i;
     br_actor** list;
     tNon_car_spec* non_car;
@@ -107,13 +107,13 @@ void SignalToStartRace2(int pIndex) {
 }
 
 // IDA: void __cdecl SignalToStartRace()
-void SignalToStartRace() {
+void SignalToStartRace(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl SetUpNetCarPositions()
-void SetUpNetCarPositions() {
+void SetUpNetCarPositions(void) {
     int i;
     int j;
     int k;
@@ -226,25 +226,25 @@ void DoNetScores2(int pOnly_sort_scores) {
 }
 
 // IDA: void __cdecl DoNetScores()
-void DoNetScores() {
+void DoNetScores(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl InitNetHeadups()
-void InitNetHeadups() {
+void InitNetHeadups(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl DisposeNetHeadups()
-void DisposeNetHeadups() {
+void DisposeNetHeadups(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl EverybodysLost()
-void EverybodysLost() {
+void EverybodysLost(void) {
     tNet_message* the_message;
     int i;
     LOG_TRACE("()");
@@ -292,7 +292,7 @@ void SelectRandomItOrFox(int pNot_this_one) {
 }
 
 // IDA: void __cdecl CalcPlayerScores()
-void CalcPlayerScores() {
+void CalcPlayerScores(void) {
     int i;
     int j;
     int knock_out_bit;
@@ -319,7 +319,7 @@ void CalcPlayerScores() {
 }
 
 // IDA: void __cdecl SendPlayerScores()
-void SendPlayerScores() {
+void SendPlayerScores(void) {
     tNet_contents* the_contents;
     int i;
     LOG_TRACE("()");
@@ -327,7 +327,7 @@ void SendPlayerScores() {
 }
 
 // IDA: void __cdecl DoNetGameManagement()
-void DoNetGameManagement() {
+void DoNetGameManagement(void) {
     LOG_TRACE("()");
     STUB_ONCE();
 }
@@ -366,7 +366,7 @@ void InitialisePlayerScore(tNet_game_player_info* pPlayer) {
 }
 
 // IDA: void __cdecl InitPlayers()
-void InitPlayers() {
+void InitPlayers(void) {
     int i;
     LOG_TRACE("()");
 
@@ -406,14 +406,14 @@ void BuyPSPowerup(int pIndex) {
 }
 
 // IDA: void __cdecl BuyArmour()
-void BuyArmour() {
+void BuyArmour(void) {
     LOG_TRACE("()");
 
     BuyPSPowerup(0);
 }
 
 // IDA: void __cdecl BuyPower()
-void BuyPower() {
+void BuyPower(void) {
     LOG_TRACE("()");
 
     if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_foxy && gThis_net_player_index == gIt_or_fox) {
@@ -426,7 +426,7 @@ void BuyPower() {
 }
 
 // IDA: void __cdecl BuyOffense()
-void BuyOffense() {
+void BuyOffense(void) {
     LOG_TRACE("()");
 
     BuyPSPowerup(2);
@@ -446,7 +446,7 @@ void NetSendEnvironmentChanges(tNet_game_player_info* pPlayer) {
 }
 
 // IDA: void __cdecl UpdateEnvironments()
-void UpdateEnvironments() {
+void UpdateEnvironments(void) {
     int i;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
@@ -486,12 +486,12 @@ void SendGameplayToHost(tNet_gameplay_mess pMess, int pParam_1, int pParam_2, in
 }
 
 // IDA: void __cdecl InitNetGameplayStuff()
-void InitNetGameplayStuff() {
+void InitNetGameplayStuff(void) {
     LOG_TRACE("()");
 }
 
 // IDA: void __cdecl DefaultNetName()
-void DefaultNetName() {
+void DefaultNetName(void) {
     NetObtainSystemUserName(gNet_player_name, 32);
 }
 

@@ -1,12 +1,12 @@
 #include "audio.h"
 #include "resource.h"
 
-#include "s3/s3.h"
 #include "3d.h"
 #include "harness/config.h"
 #include "harness/os.h"
 #include "harness/trace.h"
 #include "miniaudio/miniaudio.h"
+#include "s3/s3.h"
 #include "s3cda.h"
 #include "s3music.h"
 #include "s3sound.h"
@@ -90,7 +90,7 @@ int S3Init(char* pPath, int pLow_memory_mode) {
     return 0;
 }
 
-void S3Shutdown() {
+void S3Shutdown(void) {
     tS3_outlet* outlet;              // [esp+10h] [ebp-10h]
     tS3_outlet* next_outlet;         // [esp+14h] [ebp-Ch]
     tS3_descriptor* next_descriptor; // [esp+18h] [ebp-8h]
@@ -117,16 +117,16 @@ void S3Shutdown() {
     }
 }
 
-void S3Enable() {
+void S3Enable(void) {
     gS3_enabled = 1;
 }
 
-void S3Disable() {
+void S3Disable(void) {
     S3StopAllOutletSounds();
     gS3_enabled = 0;
 }
 
-int S3OpenOutputDevices() {
+int S3OpenOutputDevices(void) {
 
     // strcpy(gS3_directory_separator, "\\");
     strcpy(gS3_directory_separator, "/");
@@ -145,7 +145,7 @@ int S3OpenOutputDevices() {
     return 1;
 }
 
-int S3OpenSampleDevice() {
+int S3OpenSampleDevice(void) {
     ma_result result;
 
     ma_engine_config engineConfig;
@@ -164,7 +164,7 @@ int S3OpenSampleDevice() {
     return 1;
 }
 
-int S3OpenCDADevice() {
+int S3OpenCDADevice(void) {
     // gS3_cda_device.lpstrDeviceType = (LPCSTR)516;
     // if (mciSendCommandA(0, 0x803u, 0x3000u, (DWORD_PTR)&gS3_cda_device)
     //     && mciSendCommandA(0, 0x803u, 0x3100u, (DWORD_PTR)&gS3_cda_device)) {
@@ -178,7 +178,7 @@ int S3OpenCDADevice() {
     return 0;
 }
 
-void S3CloseDevices() {
+void S3CloseDevices(void) {
     // if (gS3_hardware_info.device_installed) {
     //     gS3_direct_sound_ptr->lpVtbl->Release(gS3_direct_sound_ptr);
     //     gS3_direct_sound_ptr = NULL;
@@ -439,7 +439,7 @@ int S3SoundBankReadEntry(tS3_soundbank_read_ctx* ctx, char* dir_name, int low_me
     return 1;
 }
 
-tS3_descriptor* S3AllocateDescriptor() {
+tS3_descriptor* S3AllocateDescriptor(void) {
     tS3_descriptor* root;
     tS3_descriptor* d;
 
@@ -599,7 +599,7 @@ int S3UnbindChannels(tS3_outlet* outlet) {
     return 1;
 }
 
-void S3DisposeUnboundChannels() {
+void S3DisposeUnboundChannels(void) {
     tS3_channel* channel;      // [esp+Ch] [ebp-8h]
     tS3_channel* next_channel; // [esp+10h] [ebp-4h]
 
@@ -822,7 +822,7 @@ void S3Service(int inside_cockpit, int unk1) {
     }
 }
 
-void S3ServiceOutlets() {
+void S3ServiceOutlets(void) {
     tS3_channel* c; // [esp+Ch] [ebp-8h]
     tS3_outlet* o;  // [esp+10h] [ebp-4h]
 
@@ -851,7 +851,7 @@ int S3ServiceChannel(tS3_channel* chan) {
     }
 }
 
-void S3StopAllOutletSounds() {
+void S3StopAllOutletSounds(void) {
     tS3_outlet* o; // [esp+Ch] [ebp-4h]
 
     if (!gS3_enabled) {
@@ -1050,11 +1050,11 @@ void S3CalculateRandomizedFields(tS3_channel* chan, tS3_descriptor* desc) {
     chan->right_volume = vol;
     if (desc->type == eS3_ST_sample) {
 #if defined(DETHRACE_FIX_BUGS)
-    /* Avoid a possible NULL pointer dereference. */
-    if (desc->sound_data == NULL) {
-        chan->rate = desc->min_pitch;
-        return;
-    }
+        /* Avoid a possible NULL pointer dereference. */
+        if (desc->sound_data == NULL) {
+            chan->rate = desc->min_pitch;
+            return;
+        }
 #endif
         chan->rate = S3IRandomBetweenLog(desc->min_pitch, desc->max_pitch, ((tS3_sample*)desc->sound_data)->rate);
     }
@@ -1169,7 +1169,7 @@ int S3StopOutletSound(tS3_outlet* pOutlet) {
     return 0;
 }
 
-char* S3GetCurrentDir() {
+char* S3GetCurrentDir(void) {
     if (!gS3_have_current_dir) {
         if (getcwd(gS3_current_dir, 260) == NULL) {
             LOG_PANIC("failed to call getcwd"); // added by dethrace

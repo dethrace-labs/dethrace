@@ -3,12 +3,12 @@
 
 int gS3_cda_enabled;
 
-void S3DisableCDA() {
+void S3DisableCDA(void) {
     S3StopCDAOutlets();
     gS3_cda_enabled = 0;
 }
 
-void S3StopCDAOutlets() {
+void S3StopCDAOutlets(void) {
     STUB();
 }
 
@@ -28,10 +28,10 @@ int S3SetCDAVolume(tS3_channel* chan, int pVolume) {
     return 0;
 }
 
-int S3IsCDAPlaying() {
+int S3IsCDAPlaying(void) {
     return 0;
 }
 
-int S3IsCDAPlaying2() {
+int S3IsCDAPlaying2(void) {
     return S3IsCDAPlaying();
 }

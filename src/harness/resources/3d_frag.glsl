@@ -49,7 +49,7 @@ uniform uint u_material_index_range;
 const uint BR_MATF_LIGHT = 1u;
 const uint BR_MATF_PRELIT = 2u;
 
-void main() {
+void main(void) {
 
     for(int i = 0; i < u_clip_plane_count; i++) {
         // calculate signed plane-vertex distance

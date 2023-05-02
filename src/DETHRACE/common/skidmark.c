@@ -104,7 +104,7 @@ int Reflex2D(br_vector3* pPt, br_vector3* pL1, br_vector3* pL2) {
 }
 
 // IDA: void __cdecl InitSkids()
-void InitSkids() {
+void InitSkids(void) {
     int skid;
     int mat;
     int sl;
@@ -183,7 +183,7 @@ void HideSkid(int pSkid_num) {
 }
 
 // IDA: void __cdecl HideSkids()
-void HideSkids() {
+void HideSkids(void) {
     int skid;
     LOG_TRACE("()");
 
@@ -332,7 +332,7 @@ void InitCarSkidStuff(tCar_spec* pCar) {
 }
 
 // IDA: void __cdecl SkidsPerFrame()
-void SkidsPerFrame() {
+void SkidsPerFrame(void) {
     int skid;
     LOG_TRACE("()");
 
@@ -344,7 +344,7 @@ void SkidsPerFrame() {
 }
 
 // IDA: void __cdecl RemoveMaterialsFromSkidmarks()
-void RemoveMaterialsFromSkidmarks() {
+void RemoveMaterialsFromSkidmarks(void) {
     int skid;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();

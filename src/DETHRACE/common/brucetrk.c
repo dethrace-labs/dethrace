@@ -499,7 +499,7 @@ void RenderTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, 
 }
 
 // IDA: br_scalar __cdecl GetYonFactor()
-br_scalar GetYonFactor() {
+br_scalar GetYonFactor(void) {
 
     return gYon_factor;
 }

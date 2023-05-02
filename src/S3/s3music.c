@@ -3,12 +3,12 @@
 
 int gS3_midi_enabled;
 
-void S3DisableMIDI() {
+void S3DisableMIDI(void) {
     S3StopMIDIOutlets();
     gS3_midi_enabled = 0;
 }
 
-void S3StopMIDIOutlets() {
+void S3StopMIDIOutlets(void) {
     STUB();
 }
 
