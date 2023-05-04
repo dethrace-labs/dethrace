@@ -270,7 +270,6 @@ void PDSetKeyArray(int* pKeys, int pMark) {
             case KEY_ALT_ANY:
                 if (KEYDOWN(keystate, gScan_code[KEY_LALT]) || KEYDOWN(keystate, gScan_code[KEY_RALT])) {
                     pKeys[KEY_ALT_ANY] = pMark;
-
                 } else {
                     if (pKeys[KEY_ALT_ANY] == pMark) {
                         pKeys[KEY_ALT_ANY] = 0;
@@ -309,7 +308,7 @@ void Win32ReleaseInputDevice(void) {
 int PDGetASCIIFromKey(int pKey) {
     LOG_TRACE("(%d)", pKey);
 
-    if (PDKeyDown(KEY_LSHIFT)) {
+    if (PDKeyDown(KEY_SHIFT_ANY)) {
         return gASCII_shift_table[pKey];
     } else {
         return gASCII_table[pKey];
@@ -368,11 +367,21 @@ void PDInitialiseSystem(void) {
     ShowCursor_(0);
     KeyBegin();
 
-    // dethrace: demos do not ship with KEYBOARD.COK file
-    if (harness_game_info.defines.ascii_table == NULL) {
+    PathCat(the_path, gApplication_path, "KEYBOARD.COK");
+    f = fopen(the_path, "rb");
+    if (f == NULL) {
+        if (harness_game_info.defines.requires_ascii_table) {
+#if !defined(DETHRACE_FIX_BUGS)
+            PDFatalError("This .exe must have KEYBOARD.COK in the DATA folder.");
+#endif
+        }
+        // dethrace: demos do not ship with KEYBOARD.COK file
+        memcpy(gASCII_table, harness_game_info.defines.ascii_table, sizeof(gASCII_table));
+        memcpy(gASCII_shift_table, harness_game_info.defines.ascii_shift_table, sizeof(gASCII_shift_table));
+    } else {
         PathCat(the_path, gApplication_path, "KEYBOARD.COK");
         f = fopen(the_path, "rb");
-        if (!f) {
+        if (f == NULL) {
             PDFatalError("This .exe must have KEYBOARD.COK in the DATA folder.");
         }
         fseek(f, 0, 2);
@@ -381,9 +390,6 @@ void PDInitialiseSystem(void) {
         fread(gASCII_table, len, 1u, f);
         fread(gASCII_shift_table, len, 1u, f);
         fclose(f);
-    } else {
-        memcpy(gASCII_table, harness_game_info.defines.ascii_table, sizeof(gASCII_table));
-        memcpy(gASCII_shift_table, harness_game_info.defines.ascii_shift_table, sizeof(gASCII_shift_table));
     }
     Win32InitInputDevice();
 }
@@ -915,7 +921,7 @@ int original_main(int pArgc, char** pArgv) {
             sscanf(pArgv[i], "%d", &arg);
             gSound_detail_level = arg;
 
-        } else if (strcasecmp(pArgv[i], "-robots") == 0) {
+        } else if (strcasecmp(pArgv[i], "-robots") == 0 || strcasecmp(pArgv[i], "-german") == 0) {
             gSausage_override = 1;
         } else if (strcasecmp(pArgv[i], "-lomem") == 0) {
             gAustere_override = 1;

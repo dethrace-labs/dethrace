@@ -83,7 +83,7 @@ void ResetPollKeys(void) {
 void CheckKeysForMouldiness(void) {
     LOG_TRACE9("()");
 
-    if ((PDGetTotalTime() - gLast_poll_keys) > 500) {
+    if (PDGetTotalTime() - gLast_poll_keys > 500) {
         ResetPollKeys();
         CyclePollKeys();
         PollKeys();
@@ -110,7 +110,7 @@ tKey_down_result PDKeyDown2(int pKey_index) {
     the_time = PDGetTotalTime();
     if (gKey_array[pKey_index]) {
         if (gLast_key_down == pKey_index) {
-            if ((the_time - gLast_key_down_time) < 300) {
+            if (the_time - gLast_key_down_time < 300) {
                 return tKey_down_still;
             } else {
                 gLast_key_down_time = the_time;
@@ -403,13 +403,15 @@ int AddRollingLetter(char pChar, int pX, int pY, tRolling_type rolling_type) {
     let->current_offset = (gCurrent_graf_data->save_slot_letter_height * let->number_of_letters);
     for (i = 0; i < let->number_of_letters; i++) {
         if (rolling_type == eRT_numeric) {
-            let->letters[i] = pChar;
+            /* The (tU8) cast makes sure extended ASCII is positive. */
+            let->letters[i] = (tU8)pChar;
         } else {
             let->letters[i] = IRandomBetween('A', 'Z' + 1);
         }
     }
     if (rolling_type != eRT_looping_random) {
-        let->letters[0] = pChar;
+        /* The (tU8) cast makes sure extended ASCII is positive. */
+        let->letters[0] = (tU8)pChar;
     }
 
     return 0;
@@ -539,7 +541,8 @@ int ChangeCharTo(int pSlot_index, int pChar_index, char pNew_char) {
         return AddRollingLetter(pNew_char, x_coord, y_coord, new_type);
     }
     if (pNew_char != ROLLING_LETTER_LOOP_RANDOM) {
-        let->letters[0] = pNew_char;
+        /* The (tU8) cast makes sure extended ASCII is positive. */
+        let->letters[0] = (tU8)pNew_char;
     }
     if (pNew_char == ' ') {
         let->letters[0] = ' ';
