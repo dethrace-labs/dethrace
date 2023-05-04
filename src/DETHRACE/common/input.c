@@ -46,7 +46,7 @@ void SetJoystickArrays(int* pKeys, int pMark) {
 }
 
 // IDA: void __cdecl PollKeys()
-void PollKeys() {
+void PollKeys(void) {
 
     gKey_poll_counter++;
     PDSetKeyArray(gKey_array, gKey_poll_counter);
@@ -55,7 +55,7 @@ void PollKeys() {
 }
 
 // IDA: void __cdecl CyclePollKeys()
-void CyclePollKeys() {
+void CyclePollKeys(void) {
     int i;
     for (i = 0; i < COUNT_OF(gKey_array); i++) {
         if (gKey_array[i] > gKey_poll_counter) {
@@ -69,7 +69,7 @@ void CyclePollKeys() {
 }
 
 // IDA: void __cdecl ResetPollKeys()
-void ResetPollKeys() {
+void ResetPollKeys(void) {
     int i;
     for (i = 0; i < COUNT_OF(gKey_array); i++) {
         gKey_array[i] = 0;
@@ -80,10 +80,10 @@ void ResetPollKeys() {
 }
 
 // IDA: void __cdecl CheckKeysForMouldiness()
-void CheckKeysForMouldiness() {
+void CheckKeysForMouldiness(void) {
     LOG_TRACE9("()");
 
-    if ((PDGetTotalTime() - gLast_poll_keys) > 500) {
+    if (PDGetTotalTime() - gLast_poll_keys > 500) {
         ResetPollKeys();
         CyclePollKeys();
         PollKeys();
@@ -91,7 +91,7 @@ void CheckKeysForMouldiness() {
 }
 
 // IDA: int __cdecl EitherMouseButtonDown()
-int EitherMouseButtonDown() {
+int EitherMouseButtonDown(void) {
     int but_1;
     int but_2;
 
@@ -110,7 +110,7 @@ tKey_down_result PDKeyDown2(int pKey_index) {
     the_time = PDGetTotalTime();
     if (gKey_array[pKey_index]) {
         if (gLast_key_down == pKey_index) {
-            if ((the_time - gLast_key_down_time) < 300) {
+            if (the_time - gLast_key_down_time < 300) {
                 return tKey_down_still;
             } else {
                 gLast_key_down_time = the_time;
@@ -156,7 +156,7 @@ int PDKeyDown3(int pKey_index) {
 }
 
 // IDA: int __cdecl PDAnyKeyDown()
-int PDAnyKeyDown() {
+int PDAnyKeyDown(void) {
     int i;
     tKey_down_result result;
 
@@ -185,7 +185,7 @@ int PDAnyKeyDown() {
 }
 
 // IDA: int __cdecl AnyKeyDown()
-int AnyKeyDown() {
+int AnyKeyDown(void) {
     int the_key;
 
     the_key = PDAnyKeyDown();
@@ -196,7 +196,7 @@ int AnyKeyDown() {
 }
 
 // IDA: tU32* __cdecl KevKeyService()
-tU32* KevKeyService() {
+tU32* KevKeyService(void) {
     static tU32 sum = 0;
     static tU32 code = 0;
     static tU32 code2 = 0;
@@ -295,7 +295,7 @@ int KeyIsDown(int pKey_index) {
 }
 
 // IDA: void __cdecl WaitForNoKeys()
-void WaitForNoKeys() {
+void WaitForNoKeys(void) {
     LOG_TRACE("()");
 
     while (AnyKeyDown() || EitherMouseButtonDown()) {
@@ -305,7 +305,7 @@ void WaitForNoKeys() {
 }
 
 // IDA: void __cdecl WaitForAKey()
-void WaitForAKey() {
+void WaitForAKey(void) {
     LOG_TRACE("()");
 
     while (1) {
@@ -348,7 +348,7 @@ void GetMousePosition(int* pX_coord, int* pY_coord) {
 }
 
 // IDA: void __cdecl InitRollingLetters()
-void InitRollingLetters() {
+void InitRollingLetters(void) {
     int i;
     LOG_TRACE("()");
 
@@ -361,7 +361,7 @@ void InitRollingLetters() {
 }
 
 // IDA: void __cdecl EndRollingLetters()
-void EndRollingLetters() {
+void EndRollingLetters(void) {
     LOG_TRACE("()");
 
     BrMemFree(gRolling_letters);
@@ -403,13 +403,15 @@ int AddRollingLetter(char pChar, int pX, int pY, tRolling_type rolling_type) {
     let->current_offset = (gCurrent_graf_data->save_slot_letter_height * let->number_of_letters);
     for (i = 0; i < let->number_of_letters; i++) {
         if (rolling_type == eRT_numeric) {
-            let->letters[i] = pChar;
+            /* The (tU8) cast makes sure extended ASCII is positive. */
+            let->letters[i] = (tU8)pChar;
         } else {
             let->letters[i] = IRandomBetween('A', 'Z' + 1);
         }
     }
     if (rolling_type != eRT_looping_random) {
-        let->letters[0] = pChar;
+        /* The (tU8) cast makes sure extended ASCII is positive. */
+        let->letters[0] = (tU8)pChar;
     }
 
     return 0;
@@ -436,7 +438,7 @@ void AddRollingNumber(tU32 pNumber, int pWidth, int pX, int pY) {
 }
 
 // IDA: void __cdecl RollLettersIn()
-void RollLettersIn() {
+void RollLettersIn(void) {
     tU32 new_time;
     tU32 period;
     tRolling_letter* let;
@@ -539,7 +541,8 @@ int ChangeCharTo(int pSlot_index, int pChar_index, char pNew_char) {
         return AddRollingLetter(pNew_char, x_coord, y_coord, new_type);
     }
     if (pNew_char != ROLLING_LETTER_LOOP_RANDOM) {
-        let->letters[0] = pNew_char;
+        /* The (tU8) cast makes sure extended ASCII is positive. */
+        let->letters[0] = (tU8)pNew_char;
     }
     if (pNew_char == ' ') {
         let->letters[0] = ' ';
@@ -838,11 +841,11 @@ void KillCursor(int pSlot_index) {
 }
 
 // IDA: void __cdecl EdgeTriggerModeOn()
-void EdgeTriggerModeOn() {
+void EdgeTriggerModeOn(void) {
     gEdge_trigger_mode = 1;
 }
 
 // IDA: void __cdecl EdgeTriggerModeOff()
-void EdgeTriggerModeOff() {
+void EdgeTriggerModeOff(void) {
     gEdge_trigger_mode = 0;
 }

@@ -71,7 +71,7 @@ br_image Image_BRCORE1 = {
 #define NBR_DEV_SLOTS 16
 
 // IDA: br_error __cdecl BrFwBegin()
-br_error BrFwBegin() {
+br_error BrFwBegin(void) {
     int i;
 
     if (fw.active) {
@@ -106,7 +106,7 @@ br_error BrFwBegin() {
 }
 
 // IDA: br_error __cdecl BrFwEnd()
-br_error BrFwEnd() {
+br_error BrFwEnd(void) {
     LOG_TRACE("()");
 
     if (fw.active == 0) {

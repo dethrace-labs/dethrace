@@ -261,21 +261,21 @@ br_scalar gYon_squared;
 #define SHADOW_D_IGNORE_FLAG 10000.0
 
 // IDA: void __cdecl TurnOnPaletteConversion()
-void TurnOnPaletteConversion() {
+void TurnOnPaletteConversion(void) {
     LOG_TRACE("()");
 
     gCurrent_conversion_table = gPalette_conversion_table;
 }
 
 // IDA: void __cdecl TurnOffPaletteConversion()
-void TurnOffPaletteConversion() {
+void TurnOffPaletteConversion(void) {
     LOG_TRACE("()");
 
     gCurrent_conversion_table = NULL;
 }
 
 // IDA: void __cdecl ResetLollipopQueue()
-void ResetLollipopQueue() {
+void ResetLollipopQueue(void) {
     LOG_TRACE("()");
 
     gNumber_of_lollipops = 0;
@@ -298,7 +298,7 @@ int AddToLollipopQueue(br_actor* pActor, int pIndex) {
 }
 
 // IDA: void __cdecl RenderLollipops()
-void RenderLollipops() {
+void RenderLollipops(void) {
     int i;
     int must_relink;
     br_actor** the_actor;
@@ -394,7 +394,7 @@ void BuildColourTable(br_pixelmap* pPalette) {
 }
 
 // IDA: void __cdecl ClearConcussion()
-void ClearConcussion() {
+void ClearConcussion(void) {
     LOG_TRACE("()");
 
     gConcussion.concussed = 0;
@@ -554,7 +554,7 @@ void SetBRenderScreenAndBuffers(int pX_offset, int pY_offset, int pWidth, int pH
 }
 
 // IDA: void __cdecl SetIntegerMapRenders()
-void SetIntegerMapRenders() {
+void SetIntegerMapRenders(void) {
     LOG_TRACE("()");
 
     gMap_render_x_i = ((int)gMap_render_x) & ~3;
@@ -570,7 +570,7 @@ void SetIntegerMapRenders() {
 }
 
 // IDA: void __cdecl AdjustRenderScreenSize()
-void AdjustRenderScreenSize() {
+void AdjustRenderScreenSize(void) {
     int switched_res;
     LOG_TRACE("()");
 
@@ -603,7 +603,7 @@ void AdjustRenderScreenSize() {
 }
 
 // IDA: void __cdecl ScreenSmaller()
-void ScreenSmaller() {
+void ScreenSmaller(void) {
     LOG_TRACE("()");
 
     if (!gMap_mode) {
@@ -619,7 +619,7 @@ void ScreenSmaller() {
 }
 
 // IDA: void __cdecl ScreenLarger()
-void ScreenLarger() {
+void ScreenLarger(void) {
     LOG_TRACE("()");
 
     if (!gMap_mode) {
@@ -682,7 +682,7 @@ void DRSetPalette(br_pixelmap* pThe_palette) {
 }
 
 // IDA: void __cdecl InitializePalettes()
-void InitializePalettes() {
+void InitializePalettes(void) {
     int j;
     gCurrent_palette_pixels = BrMemAllocate(0x400u, kMem_cur_pal_pixels);
     gCurrent_palette = DRPixelmapAllocate(BR_PMT_RGBX_888, 1u, 256, gCurrent_palette_pixels, 0);
@@ -713,7 +713,7 @@ void SwitchToPalette(char* pPal_name) {
 }
 
 // IDA: void __cdecl ClearEntireScreen()
-void ClearEntireScreen() {
+void ClearEntireScreen(void) {
     LOG_TRACE("()");
 
     if (gScreen) {
@@ -724,7 +724,7 @@ void ClearEntireScreen() {
 }
 
 // IDA: void __cdecl ClearWobbles()
-void ClearWobbles() {
+void ClearWobbles(void) {
     int i;
     LOG_TRACE("()");
 
@@ -734,7 +734,7 @@ void ClearWobbles() {
 }
 
 // IDA: void __cdecl InitWobbleStuff()
-void InitWobbleStuff() {
+void InitWobbleStuff(void) {
     int i;
 
     ClearWobbles();
@@ -777,7 +777,7 @@ void SetScreenWobble(int pWobble_x, int pWobble_y) {
 }
 
 // IDA: void __cdecl ResetScreenWobble()
-void ResetScreenWobble() {
+void ResetScreenWobble(void) {
     LOG_TRACE("()");
 
     SetScreenWobble(0, 0);
@@ -1092,14 +1092,14 @@ br_scalar DistanceFromPlane(br_vector3* pPos, br_scalar pA, br_scalar pB, br_sca
 }
 
 // IDA: void __cdecl DisableLights()
-void DisableLights() {
+void DisableLights(void) {
     int i;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl EnableLights()
-void EnableLights() {
+void EnableLights(void) {
     int i;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
@@ -1663,7 +1663,11 @@ void RenderAFrame(int pDepth_mask_on) {
         && !(gAction_replay_camera_mode && gAction_replay_mode)) {
         ExternalSky(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world);
     }
-    for (i = 0; i < (gMap_mode ? 3 : 1); i++) {
+#if !defined(DETHRACE_FIX_BUGS)
+    // in map mode, the scene is rendered 3 times. We have no idea why.
+    for (i = 0; i < (gMap_mode ? 3 : 1); i++)
+#endif
+    {
         RenderShadows(gUniverse_actor, &gProgram_state.track_spec, gCamera, &gCamera_to_world);
         BrZbSceneRenderBegin(gUniverse_actor, gCamera, gRender_screen, gDepth_buffer);
         ProcessNonTrackActors(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, &old_camera_matrix);
@@ -1861,7 +1865,7 @@ void RenderAFrame(int pDepth_mask_on) {
 }
 
 // IDA: void __cdecl InitPaletteAnimate()
-void InitPaletteAnimate() {
+void InitPaletteAnimate(void) {
     LOG_TRACE("()");
 
     gLast_palette_change = 0;
@@ -1869,14 +1873,14 @@ void InitPaletteAnimate() {
 }
 
 // IDA: void __cdecl RevertPalette()
-void RevertPalette() {
+void RevertPalette(void) {
 
     memcpy(gRender_palette->pixels, gOrig_render_palette->pixels, 0x400u);
     DRSetPalette3(gRender_palette, 1);
 }
 
 // IDA: void __cdecl MungePalette()
-void MungePalette() {
+void MungePalette(void) {
     tU8* p;
     tU8* q;
     int i;
@@ -1897,7 +1901,7 @@ void MungePalette() {
 }
 
 // IDA: void __cdecl ResetPalette()
-void ResetPalette() {
+void ResetPalette(void) {
     LOG_TRACE("()");
 
     InitPaletteAnimate();
@@ -1930,7 +1934,7 @@ void SetFadedPalette(int pDegree) {
 }
 
 // IDA: void __cdecl FadePaletteDown()
-void FadePaletteDown() {
+void FadePaletteDown(void) {
     int i;
     int start_time;
     int the_time;
@@ -1955,7 +1959,7 @@ void FadePaletteDown() {
 }
 
 // IDA: void __cdecl FadePaletteUp()
-void FadePaletteUp() {
+void FadePaletteUp(void) {
     int i;
     int start_time;
     int the_time;
@@ -1977,7 +1981,7 @@ void FadePaletteUp() {
 }
 
 // IDA: void __cdecl KillSplashScreen()
-void KillSplashScreen() {
+void KillSplashScreen(void) {
 
     if (gCurrent_splash != NULL) {
         BrMapRemove(gCurrent_splash);
@@ -1989,7 +1993,7 @@ void KillSplashScreen() {
 }
 
 // IDA: void __cdecl EnsureRenderPalette()
-void EnsureRenderPalette() {
+void EnsureRenderPalette(void) {
     LOG_TRACE("()");
 
     if (gPalette_munged) {
@@ -2038,7 +2042,7 @@ void SplashScreenWith(char* pPixmap_name) {
 }
 
 // IDA: void __cdecl EnsurePaletteUp()
-void EnsurePaletteUp() {
+void EnsurePaletteUp(void) {
 
     if (gFaded_palette) {
         FadePaletteUp();
@@ -2067,7 +2071,7 @@ void ChangeAmbience(br_scalar pDelta) {
 }
 
 // IDA: void __cdecl InitAmbience()
-void InitAmbience() {
+void InitAmbience(void) {
     LOG_TRACE("()");
 
     gCurrent_ambience = gAmbient_adjustment;
@@ -2346,7 +2350,7 @@ void DRPixelmapRectangleVScaledCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
 }
 
 // IDA: void __cdecl InitTransientBitmaps()
-void InitTransientBitmaps() {
+void InitTransientBitmaps(void) {
     int i;
     LOG_TRACE("()");
 
@@ -2384,7 +2388,7 @@ void DeallocateTransientBitmap(int pIndex) {
 }
 
 // IDA: void __cdecl DeallocateAllTransientBitmaps()
-void DeallocateAllTransientBitmaps() {
+void DeallocateAllTransientBitmaps(void) {
     int i;
     LOG_TRACE("()");
 
@@ -2548,7 +2552,7 @@ int NewCursorGiblet(int pX_coord, int pY_coord, float pX_speed, float pY_speed, 
 }
 
 // IDA: int __cdecl DoMouseCursor()
-int DoMouseCursor() {
+int DoMouseCursor(void) {
     int x_coord; // Added by DethRace
     int y_coord;
     int mouse_moved;
@@ -2648,7 +2652,7 @@ int DoMouseCursor() {
 }
 
 // IDA: int __cdecl AllocateCursorTransient()
-int AllocateCursorTransient() {
+int AllocateCursorTransient(void) {
     int i;
     int largest_width;
     int largest_height;
@@ -2668,7 +2672,7 @@ int AllocateCursorTransient() {
 }
 
 // IDA: void __cdecl StartMouseCursor()
-void StartMouseCursor() {
+void StartMouseCursor(void) {
     int i;
     LOG_TRACE("()");
 
@@ -2684,7 +2688,7 @@ void StartMouseCursor() {
 }
 
 // IDA: void __cdecl EndMouseCursor()
-void EndMouseCursor() {
+void EndMouseCursor(void) {
     LOG_TRACE("()");
 
     RemoveTransientBitmaps(1);
@@ -2750,7 +2754,7 @@ void DisposeFont(int pFont_ID) {
 }
 
 // IDA: void __cdecl InitDRFonts()
-void InitDRFonts() {
+void InitDRFonts(void) {
     int i;
     LOG_TRACE("()");
 
@@ -2990,14 +2994,14 @@ void SetShadowLevel(tShadow_level pLevel) {
 }
 
 // IDA: tShadow_level __cdecl GetShadowLevel()
-tShadow_level GetShadowLevel() {
+tShadow_level GetShadowLevel(void) {
     LOG_TRACE("()");
 
     return gShadow_level;
 }
 
 // IDA: void __cdecl ToggleShadow()
-void ToggleShadow() {
+void ToggleShadow(void) {
     LOG_TRACE("()");
 
     gShadow_level++;
@@ -3023,7 +3027,7 @@ void ToggleShadow() {
 }
 
 // IDA: void __cdecl InitShadow()
-void InitShadow() {
+void InitShadow(void) {
     int i;
     br_vector3 temp_v;
     LOG_TRACE("()");
@@ -3062,7 +3066,7 @@ br_uint_32 SaveShadeTable(br_pixelmap* pTable, void* pArg) {
 }
 
 // IDA: void __cdecl SaveShadeTables()
-void SaveShadeTables() {
+void SaveShadeTables(void) {
     LOG_TRACE("()");
 
     PossibleService();
@@ -3071,7 +3075,7 @@ void SaveShadeTables() {
 }
 
 // IDA: void __cdecl DisposeSavedShadeTables()
-void DisposeSavedShadeTables() {
+void DisposeSavedShadeTables(void) {
     int i;
     LOG_TRACE("()");
 
@@ -3081,7 +3085,7 @@ void DisposeSavedShadeTables() {
 }
 
 // IDA: void __cdecl ShadowMode()
-void ShadowMode() {
+void ShadowMode(void) {
     LOG_TRACE("()");
 
     gFancy_shadow = !gFancy_shadow;
@@ -3093,7 +3097,7 @@ void ShadowMode() {
 }
 
 // IDA: int __cdecl SwitchToRealResolution()
-int SwitchToRealResolution() {
+int SwitchToRealResolution(void) {
     LOG_TRACE("()");
 
     if (gGraf_data_index == gReal_graf_data_index) {
@@ -3107,7 +3111,7 @@ int SwitchToRealResolution() {
 }
 
 // IDA: int __cdecl SwitchToLoresMode()
-int SwitchToLoresMode() {
+int SwitchToLoresMode(void) {
     LOG_TRACE("()");
     if (!gGraf_data_index || gGraf_data_index != gReal_graf_data_index) {
         return 0;

@@ -13,7 +13,7 @@
 int gLast_demo;
 
 // IDA: void __cdecl DoDemo()
-void DoDemo() {
+void DoDemo(void) {
     tS32 start_time;
     tS32 frame_time;
     FILE* f;
@@ -67,7 +67,7 @@ void DoDemo() {
         }
     }
     S3StopSound(song_tag);
-    S3StopAllOutletSounds(gEffects_outlet);
+    S3StopOutletSound(gEffects_outlet);
     S3StopAllOutletSounds();
     fclose(f);
     FadePaletteDown();

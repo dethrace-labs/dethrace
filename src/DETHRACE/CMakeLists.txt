@@ -32,6 +32,7 @@ else()
         -Wno-error=format-overflow
         -Wno-error=unused-but-set-variable  # (SelectRaceDraw::test2), etc
         -Wno-format-overflow
+        -Wstrict-prototypes
     )
 endif()
 if(DETHRACE_FIX_BUGS)

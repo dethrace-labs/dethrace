@@ -36,8 +36,34 @@ unsigned short gECB_offset;
 tU16 gListen_selector;
 tU16 gSend_selector;
 
+/*static*/ void ClearupPDNetworkStuff(void);
+/*static*/ void MATTMessageCheck(char* pFunction_name, tNet_message* pMessage, int pAlleged_size);
+/*static*/ int GetProfileText(char* pDest, int pDest_len, char* pFname, char* pKeyname);
+/*static*/ int GetSocketNumberFromProfileFile(void);
+/*static*/ tU32 EthernetAddressToU32(_IPX_LOCAL_TARGET* pAddr_ipx);
+/*static*/ void NetNowIPXLocalTarget2String(char* pString, _IPX_LOCAL_TARGET* pSock_addr_ipx);
+/*static*/ int GetMessageTypeFromMessage(char* pMessage_str)  ;
+/*static*/ int SameEthernetAddress(_IPX_LOCAL_TARGET* pAddr_ipx1, _IPX_LOCAL_TARGET* pAddr_ipx2);
+/*static*/ _IPX_LOCAL_TARGET* GetIPXAddrFromPlayerID(tPlayer_ID pPlayer_id);
+/*static*/ void MakeMessageToSend(int pMessage_type);
+/*static*/ int ReceiveHostResponses(void);
+/*static*/ int BroadcastMessage(void);
+/*static*/ int hmiIPXCloseSocket(W32 wSocket);
+/*static*/ void hmiIPXListenForPacket(_IPX_ECB* pECB_ptr, tU32 pOffset);
+/*static*/ int hmiIPXPostListen(_IPX_ECB* pECB_ptr, tU32 pOffset);
+/*static*/ int hmiIPXGetData(char* pData, tU32 wDSize);
+/*static*/ void hmiIPXSendPacket(_IPX_ECB* sECB, _IPX_ECB** pPacket, char* pHeader, W32 wSize);
+/*static*/ int hmiIPXSendDataDirect(char* pHeader, W32 wHSize, char* pData, W32 wDSize, _NETNOW_NODE_ADDR* sNode);
+/*static*/ void hmiIPXGetInternetworkAddr(_IPX_INTERNET_ADDR* sInterworkAddr);
+/*static*/ void hmiIPXGetLocalTarget(_IPX_LOCAL_TARGET* sNetworkAddr);
+/*static*/ int AllocateRealMem(W32 wSize, char** pPtr, W32* pSegment, tU16* pSelector);
+/*static*/ int FreeRealMem(tU16 pSelector);
+/*static*/ int hmiIPXInstalled(void);
+/*static*/ void GetLargestPacketSizeOoErBetterInsertLinfordChristieJokeHere(void);
+/*static*/ void GetIPXToStickItsEarToTheGround(void);
+
 // IDA: void __cdecl ClearupPDNetworkStuff()
-void ClearupPDNetworkStuff() {
+void ClearupPDNetworkStuff(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -60,7 +86,7 @@ int GetProfileText(char* pDest, int pDest_len, char* pFname, char* pKeyname) {
 }
 
 // IDA: int __cdecl GetSocketNumberFromProfileFile()
-int GetSocketNumberFromProfileFile() {
+int GetSocketNumberFromProfileFile(void) {
     char str[256];
     int sscanf_res;
     tU32 socknum;
@@ -107,7 +133,7 @@ void MakeMessageToSend(int pMessage_type) {
 }
 
 // IDA: int __cdecl ReceiveHostResponses()
-int ReceiveHostResponses() {
+int ReceiveHostResponses(void) {
     char str[256];
     int i;
     int already_registered;
@@ -116,7 +142,7 @@ int ReceiveHostResponses() {
 }
 
 // IDA: int __cdecl BroadcastMessage()
-int BroadcastMessage() {
+int BroadcastMessage(void) {
     int i;
     int errors;
     char broadcast_addr_string[32];
@@ -220,7 +246,7 @@ int FreeRealMem(tU16 pSelector) {
 }
 
 // IDA: int __cdecl hmiIPXInstalled()
-int hmiIPXInstalled() {
+int hmiIPXInstalled(void) {
     SREGS sregs;
     REGS regs;
     LOG_TRACE("()");
@@ -236,7 +262,7 @@ int hmiIPXOpenSocket(W32 wSocket) {
 }
 
 // IDA: void __cdecl GetLargestPacketSizeOoErBetterInsertLinfordChristieJokeHere()
-void GetLargestPacketSizeOoErBetterInsertLinfordChristieJokeHere() {
+void GetLargestPacketSizeOoErBetterInsertLinfordChristieJokeHere(void) {
     SREGS sregs;
     REGS regs;
     LOG_TRACE("()");
@@ -255,14 +281,14 @@ int hmiIPXInitSystem(W32 wSocket) {
 }
 
 // IDA: void __cdecl GetIPXToStickItsEarToTheGround()
-void GetIPXToStickItsEarToTheGround() {
+void GetIPXToStickItsEarToTheGround(void) {
     int i;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl PDNetInitialise()
-int PDNetInitialise() {
+int PDNetInitialise(void) {
     tU32 timenow;
     char profile_string[32];
     char key_name[32];
@@ -276,19 +302,19 @@ int PDNetInitialise() {
 }
 
 // IDA: int __cdecl PDNetShutdown()
-int PDNetShutdown() {
+int PDNetShutdown(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl PDNetStartProducingJoinList()
-void PDNetStartProducingJoinList() {
+void PDNetStartProducingJoinList(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl PDNetEndJoinList()
-void PDNetEndJoinList() {
+void PDNetEndJoinList(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -442,7 +468,7 @@ int PDNetInitClient(tNet_game_details* pDetails) {
 }
 
 // IDA: int __cdecl PDNetGetHeaderSize()
-int PDNetGetHeaderSize() {
+int PDNetGetHeaderSize(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

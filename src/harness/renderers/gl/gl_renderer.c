@@ -74,7 +74,7 @@ struct {
     GLuint pixels, palette;
 } uniforms_2d;
 
-GLuint CreateShaderProgram(char* name, const char* vertex_shader, const int vertex_shader_len, const char* fragment_shader, const int fragment_shader_len) {
+static GLuint CreateShaderProgram(char* name, const char* vertex_shader, const int vertex_shader_len, const char* fragment_shader, const int fragment_shader_len) {
     int success;
     char log_buffer[1024];
     GLuint program;
@@ -117,7 +117,7 @@ GLuint CreateShaderProgram(char* name, const char* vertex_shader, const int vert
     return program;
 }
 
-GLint GetValidatedUniformLocation(GLuint program, char* uniform_name) {
+static GLint GetValidatedUniformLocation(GLuint program, char* uniform_name) {
     GLint location;
     location = glGetUniformLocation(program, uniform_name);
     if (location == -1) {
@@ -126,7 +126,7 @@ GLint GetValidatedUniformLocation(GLuint program, char* uniform_name) {
     return location;
 }
 
-void LoadShaders() {
+static void LoadShaders(void) {
     shader_program_2d = CreateShaderProgram("framebuffer", RESOURCES_FRAMEBUFFER_VERT_GLSL, sizeof(RESOURCES_FRAMEBUFFER_VERT_GLSL), RESOURCES_FRAMEBUFFER_FRAG_GLSL, sizeof(RESOURCES_FRAMEBUFFER_FRAG_GLSL));
     glUseProgram(shader_program_2d);
     uniforms_2d.pixels = GetValidatedUniformLocation(shader_program_2d, "u_pixels");
@@ -172,7 +172,7 @@ void LoadShaders() {
     glUniform1i(uniforms_3d.colour_buffer_texture, 4);
 }
 
-void SetupFullScreenRectGeometry() {
+static void SetupFullScreenRectGeometry(void) {
     float vertices[] = {
         // positions          // colors           // texture coords
         1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right
@@ -326,7 +326,7 @@ void GLRenderer_SetShadeTable(br_pixelmap* table) {
 void GLRenderer_SetBlendTable(br_pixelmap* table) {
 
     if (flush_counter != colourbuffer_upload_counter) {
-        GLRenderer_FlushBuffers(eFlush_color_buffer);
+        GLRenderer_FlushBuffer(eFlush_color_buffer);
         glActiveTexture(GL_TEXTURE4);
         glBindTexture(GL_TEXTURE_2D, current_colourbuffer_texture);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_R8UI, render_width, render_height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, last_colour_buffer->pixels);
@@ -382,7 +382,7 @@ void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer, br_pixe
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
 }
 
-void GLRenderer_EndScene() {
+void GLRenderer_EndScene(void) {
     //  switch back to default fb and reset state
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDepthMask(GL_TRUE);
@@ -410,7 +410,7 @@ void GLRenderer_FullScreenQuad(uint8_t* screen_buffer) {
     CHECK_GL_ERROR("GLRenderer_RenderFullScreenQuad");
 }
 
-void GLRenderer_ClearBuffers() {
+void GLRenderer_ClearBuffers(void) {
     // clear our virtual framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -690,7 +690,7 @@ void GLRenderer_BufferTexture(br_pixelmap* pm) {
     CHECK_GL_ERROR("GLRenderer_BufferTexture");
 }
 
-void GLRenderer_FlushBuffers(tRenderer_flush_type flush_type) {
+void GLRenderer_FlushBuffer(tRenderer_flush_type flush_type) {
 
     if (!dirty_buffers) {
         return;
@@ -736,6 +736,10 @@ void GLRenderer_FlushBuffers(tRenderer_flush_type flush_type) {
     glClear(GL_COLOR_BUFFER_BIT);
     flush_counter++;
     dirty_buffers = 0;
+}
+
+void GLRenderer_FlushBuffers(void) {
+    GLRenderer_FlushBuffer(eFlush_all);
 }
 
 void GLRenderer_SetViewport(int x, int y, int width, int height) {

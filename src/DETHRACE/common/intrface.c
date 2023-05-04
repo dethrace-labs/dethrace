@@ -21,14 +21,14 @@ int gAlways_typing;
 int gDisabled_count;
 
 // IDA: void __cdecl SetAlwaysTyping()
-void SetAlwaysTyping() {
+void SetAlwaysTyping(void) {
     LOG_TRACE("()");
 
     gAlways_typing = 1;
 }
 
 // IDA: void __cdecl ClearAlwaysTyping()
-void ClearAlwaysTyping() {
+void ClearAlwaysTyping(void) {
     LOG_TRACE("()");
 
     gAlways_typing = 0;
@@ -48,7 +48,7 @@ int ChoiceDisabled(int pChoice) {
 }
 
 // IDA: void __cdecl ResetInterfaceTimeout()
-void ResetInterfaceTimeout() {
+void ResetInterfaceTimeout(void) {
     LOG_TRACE("()");
 
     gStart_time = PDGetTotalTime();

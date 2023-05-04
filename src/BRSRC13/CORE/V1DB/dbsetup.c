@@ -40,7 +40,7 @@ br_resource_class v1db_resourceClasses[14] = {
 br_v1db_state v1db;
 
 // IDA: br_error __cdecl BrV1dbBegin()
-br_error BrV1dbBegin() {
+br_error BrV1dbBegin(void) {
     char* devstr;
     br_size_t s;
     int i;
@@ -77,7 +77,7 @@ br_error BrV1dbBegin() {
 }
 
 // IDA: br_error __cdecl BrV1dbEnd()
-br_error BrV1dbEnd() {
+br_error BrV1dbEnd(void) {
     br_device* dev;
     LOG_TRACE("()");
 
@@ -100,7 +100,7 @@ br_uint_32 updateTable(br_pixelmap* item, void* arg) {
 // IDA: br_uint_32 __cdecl updateMap(br_pixelmap *item, void *arg)
 br_uint_32 updateMap(br_pixelmap* item, void* arg) {
     LOG_TRACE("(%p, %p)", item, arg);
-    
+
     BrMapUpdate(item, BR_MAPU_ALL);
 }
 
@@ -185,7 +185,7 @@ br_error BrV1dbRendererBegin(br_device_pixelmap* destination, br_renderer* rende
     if (r != 0) {
         return r;
     }
-    r= BrGeometryFormatFind((br_geometry**)&v1db.format_lighting, renderer, renderer_facility, BRT_FLOAT, BRT_GEOMETRY_LIGHTING);
+    r = BrGeometryFormatFind((br_geometry**)&v1db.format_lighting, renderer, renderer_facility, BRT_FLOAT, BRT_GEOMETRY_LIGHTING);
     if (r != 0) {
         return r;
     }
@@ -201,14 +201,14 @@ br_error BrV1dbRendererBegin(br_device_pixelmap* destination, br_renderer* rende
 }
 
 // IDA: br_renderer* __cdecl BrV1dbRendererQuery()
-br_renderer* BrV1dbRendererQuery() {
+br_renderer* BrV1dbRendererQuery(void) {
     LOG_TRACE("()");
 
     return v1db.renderer;
 }
 
 // IDA: br_error __cdecl BrV1dbRendererEnd()
-br_error BrV1dbRendererEnd() {
+br_error BrV1dbRendererEnd(void) {
     LOG_TRACE("()");
 
     BrTableEnum(NULL, clearTable, NULL);
@@ -252,7 +252,7 @@ void BrZsBegin(br_uint_8 colour_type, void* primitive, br_uint_32 size) {
 }
 
 // IDA: void __cdecl BrZbEnd()
-void BrZbEnd() {
+void BrZbEnd(void) {
     LOG_TRACE("()");
 
     v1db.zb_active = 0;
@@ -262,7 +262,7 @@ void BrZbEnd() {
 }
 
 // IDA: void __cdecl BrZsEnd()
-void BrZsEnd() {
+void BrZsEnd(void) {
     LOG_TRACE("()");
 
     v1db.zs_active = 0;
@@ -272,13 +272,13 @@ void BrZsEnd() {
 }
 
 // IDA: void __cdecl BrV1dbBeginWrapper_Float()
-void BrV1dbBeginWrapper_Float() {
+void BrV1dbBeginWrapper_Float(void) {
     BrBegin();
     BrV1dbBegin();
 }
 
 // IDA: void __cdecl BrV1dbEndWrapper()
-void BrV1dbEndWrapper() {
+void BrV1dbEndWrapper(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

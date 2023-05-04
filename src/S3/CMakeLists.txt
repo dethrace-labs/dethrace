@@ -2,15 +2,18 @@ add_library(s3 STATIC)
 
 target_include_directories(s3 
     PUBLIC
-        include
+        "${CMAKE_CURRENT_SOURCE_DIR}/include"
     PRIVATE
-        ${CMAKE_SOURCE_DIR}      
+        ${PROJECT_SOURCE_DIR}      
 )
 
 target_link_libraries(s3 PRIVATE brender SDL2::SDL2 harness miniaudio compile_with_werror)
 
 if(NOT MSVC)
     target_link_libraries(s3 PUBLIC pthread)
+    add_compile_flags_if_supported(s3
+        -Wstrict-prototypes
+    )
 else()
     target_compile_definitions(s3 PRIVATE -D_CRT_SECURE_NO_WARNINGS)
     target_compile_options(s3 PRIVATE
@@ -45,5 +48,4 @@ target_sources(s3 PRIVATE
     s3music.h
     s3sound.c
     s3sound.h
-    
 )

@@ -41,7 +41,7 @@ br_pixelmap* g16bit_palette;
 br_pixelmap* gSource_for_16bit_palette;
 
 // IDA: int __cdecl CheckQuit()
-int CheckQuit() {
+int CheckQuit(void) {
     LOG_TRACE8("()");
 
     if (!gIn_check_quit && KeyIsDown(KEYMAP_CTRL_QUIT) && KeyIsDown(KEYMAP_CONTROL_ANY)) {
@@ -709,7 +709,7 @@ void PrintScreenFile16(FILE* pF) {
 }
 
 // IDA: void __cdecl PrintScreen()
-void PrintScreen() {
+void PrintScreen(void) {
     FILE* f;
     LOG_TRACE("()");
 
@@ -721,7 +721,7 @@ void PrintScreen() {
 }
 
 // IDA: tU32 __cdecl GetTotalTime()
-tU32 GetTotalTime() {
+tU32 GetTotalTime(void) {
     LOG_TRACE9("()");
 
     if (gAction_replay_mode) {
@@ -734,7 +734,7 @@ tU32 GetTotalTime() {
 }
 
 // IDA: tU32 __cdecl GetRaceTime()
-tU32 GetRaceTime() {
+tU32 GetRaceTime(void) {
     LOG_TRACE("()");
 
     return GetTotalTime() - gRace_start;
@@ -965,7 +965,7 @@ br_pixelmap* GenerateDarkenedShadeTable(int pHeight, br_pixelmap* pPalette, int 
 }
 
 // IDA: void __cdecl PossibleService()
-void PossibleService() {
+void PossibleService(void) {
     tU32 time;
     static tU32 last_service = 0;
 

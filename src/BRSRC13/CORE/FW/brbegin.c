@@ -8,7 +8,7 @@
 br_boolean active;
 
 // IDA: br_error __cdecl BrBegin()
-br_error BrBegin() {
+br_error BrBegin(void) {
     LOG_TRACE("()");
 
     if (active) {
@@ -24,7 +24,7 @@ br_error BrBegin() {
 }
 
 // IDA: br_error __cdecl BrEnd()
-br_error BrEnd() {
+br_error BrEnd(void) {
     br_device* dev;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();

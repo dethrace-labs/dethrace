@@ -18,7 +18,7 @@ br_pixelmap_state _pixelmap;
 br_uint_16 nameOrdinals_BRPMAP1[77];
 
 // IDA: void __cdecl BrPixelmapBegin()
-void BrPixelmapBegin() {
+void BrPixelmapBegin(void) {
     int i;
 
     BrMemSet(&_pixelmap, 0, sizeof(br_pixelmap_state));
@@ -30,7 +30,7 @@ void BrPixelmapBegin() {
 }
 
 // IDA: void __cdecl BrPixelmapEnd()
-void BrPixelmapEnd() {
+void BrPixelmapEnd(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

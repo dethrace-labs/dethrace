@@ -111,7 +111,7 @@ void FogAccordingToGPSCDE(br_material* pMaterial) {
 }
 
 // IDA: void __cdecl FrobFog()
-void FrobFog() {
+void FrobFog(void) {
     int i;
     br_material* mat;
     LOG_TRACE("()");
@@ -322,7 +322,7 @@ void LoadDepthTable(char* pName, br_pixelmap** pTable, int* pPower) {
 }
 
 // IDA: void __cdecl InitDepthEffects()
-void InitDepthEffects() {
+void InitDepthEffects(void) {
     tPath_name the_path;
     int i;
     int j;
@@ -688,7 +688,7 @@ void DoSpecialCameraEffect(br_actor* pCamera, br_matrix34* pCamera_to_world) {
 }
 
 // IDA: void __cdecl LessDepthFactor()
-void LessDepthFactor() {
+void LessDepthFactor(void) {
     char s[256];
     LOG_TRACE("()");
 
@@ -701,7 +701,7 @@ void LessDepthFactor() {
 }
 
 // IDA: void __cdecl MoreDepthFactor()
-void MoreDepthFactor() {
+void MoreDepthFactor(void) {
     char s[256];
     LOG_TRACE("()");
 
@@ -714,7 +714,7 @@ void MoreDepthFactor() {
 }
 
 // IDA: void __cdecl LessDepthFactor2()
-void LessDepthFactor2() {
+void LessDepthFactor2(void) {
     char s[256];
     LOG_TRACE("()");
 
@@ -727,7 +727,7 @@ void LessDepthFactor2() {
 }
 
 // IDA: void __cdecl MoreDepthFactor2()
-void MoreDepthFactor2() {
+void MoreDepthFactor2(void) {
     char s[256];
     LOG_TRACE("()");
 
@@ -740,7 +740,7 @@ void MoreDepthFactor2() {
 }
 
 // IDA: void __cdecl AssertYons()
-void AssertYons() {
+void AssertYons(void) {
     br_camera* camera_ptr;
     int i;
     LOG_TRACE("()");
@@ -752,7 +752,7 @@ void AssertYons() {
 }
 
 // IDA: void __cdecl IncreaseYon()
-void IncreaseYon() {
+void IncreaseYon(void) {
     br_camera* camera_ptr;
     int i;
     char s[256];
@@ -767,7 +767,7 @@ void IncreaseYon() {
 }
 
 // IDA: void __cdecl DecreaseYon()
-void DecreaseYon() {
+void DecreaseYon(void) {
     br_camera* camera_ptr;
     int i;
     char s[256];
@@ -804,14 +804,14 @@ void SetYon(br_scalar pYon) {
 }
 
 // IDA: br_scalar __cdecl GetYon()
-br_scalar GetYon() {
+br_scalar GetYon(void) {
     LOG_TRACE("()");
 
     return gCamera_yon;
 }
 
 // IDA: void __cdecl IncreaseAngle()
-void IncreaseAngle() {
+void IncreaseAngle(void) {
     br_camera* camera_ptr;
     int i;
     char s[256];
@@ -833,7 +833,7 @@ void IncreaseAngle() {
 }
 
 // IDA: void __cdecl DecreaseAngle()
-void DecreaseAngle() {
+void DecreaseAngle(void) {
     br_camera* camera_ptr;
     int i;
     char s[256];
@@ -855,7 +855,7 @@ void DecreaseAngle() {
 }
 
 // IDA: void __cdecl ToggleDepthMode()
-void ToggleDepthMode() {
+void ToggleDepthMode(void) {
     LOG_TRACE("()");
 
     switch (gProgram_state.current_depth_effect.type) {
@@ -877,7 +877,7 @@ void ToggleDepthMode() {
 }
 
 // IDA: int __cdecl GetSkyTextureOn()
-int GetSkyTextureOn() {
+int GetSkyTextureOn(void) {
     LOG_TRACE("()");
 
     return gSky_on;
@@ -905,7 +905,7 @@ void SetSkyTextureOn(int pOn) {
 }
 
 // IDA: void __cdecl ToggleSkyQuietly()
-void ToggleSkyQuietly() {
+void ToggleSkyQuietly(void) {
     br_pixelmap* temp;
     LOG_TRACE("()");
 
@@ -922,13 +922,13 @@ void ToggleSkyQuietly() {
 }
 
 // IDA: void __cdecl ToggleSky()
-void ToggleSky() {
+void ToggleSky(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl GetDepthCueingOn()
-int GetDepthCueingOn() {
+int GetDepthCueingOn(void) {
     LOG_TRACE("()");
     return gDepth_cueing_on;
 }
@@ -946,7 +946,7 @@ void SetDepthCueingOn(int pOn) {
 }
 
 // IDA: void __cdecl ToggleDepthCueingQuietly()
-void ToggleDepthCueingQuietly() {
+void ToggleDepthCueingQuietly(void) {
     tDepth_effect_type temp_type;
     int temp_start;
     int temp_end;
@@ -966,13 +966,13 @@ void ToggleDepthCueingQuietly() {
 }
 
 // IDA: void __cdecl ToggleDepthCueing()
-void ToggleDepthCueing() {
+void ToggleDepthCueing(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl ChangeDepthEffect()
-void ChangeDepthEffect() {
+void ChangeDepthEffect(void) {
     br_scalar x1;
     br_scalar x2;
     br_scalar y1;
@@ -986,12 +986,12 @@ void ChangeDepthEffect() {
 }
 
 // IDA: void __cdecl MungeForwardSky()
-void MungeForwardSky() {
+void MungeForwardSky(void) {
     LOG_TRACE("()");
 }
 
 // IDA: void __cdecl MungeRearviewSky()
-void MungeRearviewSky() {
+void MungeRearviewSky(void) {
     LOG_TRACE("()");
 
     if (gSky_image_width != 0) {

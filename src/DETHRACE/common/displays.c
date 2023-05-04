@@ -51,7 +51,7 @@ void GetTimerString(char* pStr, int pFudge_colon) {
 }
 
 // IDA: void __cdecl InitHeadups()
-void InitHeadups() {
+void InitHeadups(void) {
     int i;
     LOG_TRACE("()");
 
@@ -88,7 +88,7 @@ void ClearHeadupSlot(int pSlot_index) {
 }
 
 // IDA: void __cdecl ClearHeadups()
-void ClearHeadups() {
+void ClearHeadups(void) {
     int i;
     LOG_TRACE("()");
 
@@ -276,7 +276,7 @@ void DimRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int p
 }
 
 // IDA: void __cdecl DimAFewBits()
-void DimAFewBits() {
+void DimAFewBits(void) {
     int i;
     LOG_TRACE("()");
 
@@ -294,7 +294,7 @@ void DimAFewBits() {
 }
 
 // IDA: void __cdecl KillOldestQueuedHeadup()
-void KillOldestQueuedHeadup() {
+void KillOldestQueuedHeadup(void) {
     LOG_TRACE("()");
 
     gQueued_headup_count--;
@@ -328,7 +328,7 @@ void DoPSPowerHeadup(int pY, int pLevel, char* pName, int pBar_colour) {
 }
 
 // IDA: void __cdecl DoPSPowerupHeadups()
-void DoPSPowerupHeadups() {
+void DoPSPowerupHeadups(void) {
     LOG_TRACE("()");
 
     DoPSPowerHeadup(gCurrent_graf_data->armour_headup_y[gProgram_state.cockpit_on], gProgram_state.current_car.power_up_levels[0], "A", 45);
@@ -894,7 +894,7 @@ void DoFancyHeadup(int pIndex) {
 }
 
 // IDA: void __cdecl AdjustHeadups()
-void AdjustHeadups() {
+void AdjustHeadups(void) {
     int i;
     int delta_x;
     int delta_y;
@@ -1304,7 +1304,7 @@ void DoSteeringWheel(tU32 pThe_time) {
 }
 
 // IDA: void __cdecl ChangingView()
-void ChangingView() {
+void ChangingView(void) {
     tU32 the_time;
     LOG_TRACE("()");
 

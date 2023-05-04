@@ -557,14 +557,14 @@ void mem_write_u16(void* memory, tU16 u16) {
 }
 
 // IDA: void __cdecl EnableTranslationText()
-void EnableTranslationText() {
+void EnableTranslationText(void) {
     LOG_TRACE("()");
 
     gTrans_enabled = 1;
 }
 
 // IDA: void __cdecl DisableTranslationText()
-void DisableTranslationText() {
+void DisableTranslationText(void) {
     LOG_TRACE("()");
 
     gTrans_enabled = 0;
@@ -579,34 +579,34 @@ void SetFlicSound(int pSound_ID, tU32 pSound_time) {
 }
 
 // IDA: int __cdecl TranslationMode()
-int TranslationMode() {
+int TranslationMode(void) {
 
     return gTranslation_count;
 }
 
 // IDA: void __cdecl DontLetFlicFuckWithPalettes()
-void DontLetFlicFuckWithPalettes() {
+void DontLetFlicFuckWithPalettes(void) {
     LOG_TRACE8("()");
 
     gPalette_fuck_prevention = 1;
 }
 
 // IDA: void __cdecl LetFlicFuckWithPalettes()
-void LetFlicFuckWithPalettes() {
+void LetFlicFuckWithPalettes(void) {
     LOG_TRACE8("()");
 
     gPalette_fuck_prevention = 0;
 }
 
 // IDA: void __cdecl PlayFlicsInDarkness()
-void PlayFlicsInDarkness() {
+void PlayFlicsInDarkness(void) {
     LOG_TRACE("()");
 
     gDark_mode = 1;
 }
 
 // IDA: void __cdecl ReilluminateFlics()
-void ReilluminateFlics() {
+void ReilluminateFlics(void) {
     LOG_TRACE("()");
 
     gDark_mode = 0;
@@ -614,40 +614,40 @@ void ReilluminateFlics() {
 }
 
 // IDA: void __cdecl TurnFlicTransparencyOn()
-void TurnFlicTransparencyOn() {
+void TurnFlicTransparencyOn(void) {
     LOG_TRACE8("()");
 
     gTransparency_on = 1;
 }
 
 // IDA: void __cdecl TurnFlicTransparencyOff()
-void TurnFlicTransparencyOff() {
+void TurnFlicTransparencyOff(void) {
     LOG_TRACE8("()");
     gTransparency_on = 0;
 }
 
 // IDA: void __cdecl PlayFlicsFromDisk()
-void PlayFlicsFromDisk() {
+void PlayFlicsFromDisk(void) {
     gPlay_from_disk = 1;
 }
 
 // IDA: void __cdecl PlayFlicsFromMemory()
-void PlayFlicsFromMemory() {
+void PlayFlicsFromMemory(void) {
     gPlay_from_disk = 0;
 }
 
 // IDA: int __cdecl FlicsPlayedFromDisk()
-int FlicsPlayedFromDisk() {
+int FlicsPlayedFromDisk(void) {
     return gPlay_from_disk;
 }
 
 // IDA: void __cdecl TurnOffPanelFlics()
-void TurnOffPanelFlics() {
+void TurnOffPanelFlics(void) {
     gPanel_flic_disable = 1;
 }
 
 // IDA: void __cdecl TurnOnPanelFlics()
-void TurnOnPanelFlics() {
+void TurnOnPanelFlics(void) {
     gPanel_flic_disable = 0;
 }
 
@@ -659,7 +659,7 @@ int GetPanelFlicFrameIndex(int pIndex) {
 }
 
 // IDA: void __cdecl FlicPaletteAllocate()
-void FlicPaletteAllocate() {
+void FlicPaletteAllocate(void) {
     LOG_TRACE("()");
 
     gPalette_pixels = BrMemAllocate(0x400u, kMem_flic_pal);
@@ -773,7 +773,7 @@ int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU3
 }
 
 // IDA: void __cdecl FreeFlicPaletteAllocate()
-void FreeFlicPaletteAllocate() {
+void FreeFlicPaletteAllocate(void) {
     LOG_TRACE("()");
 
     if (gPalette_allocate_count == 0) {
@@ -1440,7 +1440,7 @@ int PlayNextFlicFrame(tFlic_descriptor* pFlic_info) {
 }
 
 // IDA: int __usercall PlayFlic@<EAX>(int pIndex@<EAX>, tU32 pSize@<EDX>, tS8 *pData_ptr@<EBX>, br_pixelmap *pDest_pixelmap@<ECX>, int pX_offset, int pY_offset, void (*DoPerFrame)(), int pInterruptable, int pFrame_rate)
-int PlayFlic(int pIndex, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap, int pX_offset, int pY_offset, void (*DoPerFrame)(), int pInterruptable, int pFrame_rate) {
+int PlayFlic(int pIndex, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap, int pX_offset, int pY_offset, void (*DoPerFrame)(void), int pInterruptable, int pFrame_rate) {
     int finished_playing;
     tFlic_descriptor the_flic;
     tU32 last_frame;
@@ -1480,7 +1480,7 @@ int PlayFlic(int pIndex, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap
 }
 
 // IDA: void __cdecl SwapScreen()
-void SwapScreen() {
+void SwapScreen(void) {
     PDScreenBufferSwap(0);
 }
 
@@ -1502,7 +1502,7 @@ void ShowFlic(int pIndex) {
 }
 
 // IDA: void __cdecl InitFlics()
-void InitFlics() {
+void InitFlics(void) {
     int i;
     LOG_TRACE("()");
 
@@ -1684,12 +1684,12 @@ void FlushAllFlics(int pBunch_index) {
 }
 
 // IDA: void __cdecl InitFlicQueue()
-void InitFlicQueue() {
+void InitFlicQueue(void) {
     gFirst_flic = NULL;
 }
 
 // IDA: int __cdecl FlicQueueFinished()
-int FlicQueueFinished() {
+int FlicQueueFinished(void) {
     tFlic_descriptor* the_flic;
     LOG_TRACE("()");
 
@@ -1744,7 +1744,7 @@ void ProcessFlicQueue(tU32 pInterval) {
 }
 
 // IDA: void __cdecl FlushFlicQueue()
-void FlushFlicQueue() {
+void FlushFlicQueue(void) {
     tFlic_descriptor* the_flic;
     tFlic_descriptor* old_flic;
     LOG_TRACE("()");
@@ -1945,7 +1945,7 @@ br_pixelmap* GetPanelPixelmap(int pIndex) {
 }
 
 // IDA: void __cdecl LoadInterfaceStrings()
-void LoadInterfaceStrings() {
+void LoadInterfaceStrings(void) {
     FILE* f; // Added by DethRace
     char s[256];
     char s2[256];
@@ -2060,7 +2060,7 @@ void LoadInterfaceStrings() {
 }
 
 // IDA: void __cdecl FlushInterfaceFonts()
-void FlushInterfaceFonts() {
+void FlushInterfaceFonts(void) {
     LOG_TRACE("()");
 
     DisposeFont(19);
@@ -2074,7 +2074,7 @@ void FlushInterfaceFonts() {
 }
 
 // IDA: void __cdecl SuspendPendingFlic()
-void SuspendPendingFlic() {
+void SuspendPendingFlic(void) {
     LOG_TRACE("()");
 
     gPending_pending_flic = gPending_flic;
@@ -2082,7 +2082,7 @@ void SuspendPendingFlic() {
 }
 
 // IDA: void __cdecl ResumePendingFlic()
-void ResumePendingFlic() {
+void ResumePendingFlic(void) {
     LOG_TRACE("()");
 
     gPending_flic = gPending_pending_flic;

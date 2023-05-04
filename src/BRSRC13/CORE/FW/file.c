@@ -20,7 +20,7 @@ void _BrFileFree(void* res, br_uint_8 res_class, br_size_t size) {
 }
 
 // IDA: br_uint_32 __cdecl BrFileAttributes()
-br_uint_32 BrFileAttributes() {
+br_uint_32 BrFileAttributes(void) {
     LOG_TRACE("()");
 
     return fw.fsys->attributes();

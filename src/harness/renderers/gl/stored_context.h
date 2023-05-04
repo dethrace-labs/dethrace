@@ -24,10 +24,10 @@ typedef struct tStored_material {
     char identifier[200];
 } tStored_material;
 
-tStored_model_context* NewStoredModelContext();
+tStored_model_context* NewStoredModelContext(void);
 
-tStored_material* NewStoredMaterial();
+tStored_material* NewStoredMaterial(void);
 
-tStored_pixelmap* NewStoredPixelmap();
+tStored_pixelmap* NewStoredPixelmap(void);
 
 #endif

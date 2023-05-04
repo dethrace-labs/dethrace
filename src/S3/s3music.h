@@ -3,8 +3,8 @@
 
 #include "s3_defs.h"
 
-void S3DisableMIDI();
-void S3StopMIDIOutlets();
+void S3DisableMIDI(void);
+void S3StopMIDIOutlets(void);
 void S3DisposeMIDIChannel(tS3_sound_tag);
 int S3PlayMIDI(tS3_channel* chan);
 int S3MIDILoadSong(tS3_channel* chan);

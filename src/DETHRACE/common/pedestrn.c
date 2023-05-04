@@ -196,7 +196,7 @@ br_pixelmap* GetPedestrianTexture(br_actor* pActor, int* pFlipped) {
 }
 
 // IDA: void __cdecl TogglePedestrians()
-void TogglePedestrians() {
+void TogglePedestrians(void) {
     LOG_TRACE("()");
 
     if (!gProgram_state.sausage_eater_mode) {
@@ -210,7 +210,7 @@ void TogglePedestrians() {
 }
 
 // IDA: void __cdecl InitPedGibs()
-void InitPedGibs() {
+void InitPedGibs(void) {
     int i;
     int j;
     br_model* the_model;
@@ -317,7 +317,7 @@ void PedCallBack(br_actor* pActor, br_model* pModel, br_material* pMaterial, voi
 }
 
 // IDA: void __cdecl InitPeds()
-void InitPeds() {
+void InitPeds(void) {
     LOG_TRACE("()");
 
     gPed_model = BrModelAllocate(NULL, 4, 2);
@@ -502,7 +502,7 @@ int BurstPedestrian(tPedestrian_data* pPedestrian, float pSplattitudinalitude, i
 }
 
 // IDA: void __cdecl ResetAllPedGibs()
-void ResetAllPedGibs() {
+void ResetAllPedGibs(void) {
     int i;
     tPed_gib* the_ped_gib;
     LOG_TRACE("()");
@@ -1199,7 +1199,7 @@ int MungePedestrianAction(tPedestrian_data* pPedestrian, float pDanger_level) {
 }
 
 // IDA: void __cdecl MakeFlagWavingBastardWaveHisFlagWhichIsTheProbablyTheLastThingHeWillEverDo()
-void MakeFlagWavingBastardWaveHisFlagWhichIsTheProbablyTheLastThingHeWillEverDo() {
+void MakeFlagWavingBastardWaveHisFlagWhichIsTheProbablyTheLastThingHeWillEverDo(void) {
     LOG_TRACE("()");
 
     if (gFlag_waving_bastard != NULL
@@ -1521,7 +1521,7 @@ tPed_hit_position MoveToEdgeOfCar(tPedestrian_data* pPedestrian, tCollision_info
 }
 
 // IDA: void __cdecl CheckLastPed()
-void CheckLastPed() {
+void CheckLastPed(void) {
     LOG_TRACE("()");
 
     if (gNet_mode == eNet_mode_none && gProgram_state.peds_killed >= gTotal_peds) {
@@ -2201,7 +2201,7 @@ void SquirtPathVertex(br_vertex* pFirst_vertex, br_vector3* pPoint) {
 }
 
 // IDA: void __cdecl ResetAllPedestrians()
-void ResetAllPedestrians() {
+void ResetAllPedestrians(void) {
     int i;
     tPedestrian_data* the_pedestrian;
     LOG_TRACE("()");
@@ -2394,7 +2394,7 @@ void MungePedestrians(tU32 pFrame_period) {
 }
 
 // IDA: void __cdecl RespawnPedestrians()
-void RespawnPedestrians() {
+void RespawnPedestrians(void) {
     int i;
     tPedestrian_data* the_pedestrian;
     LOG_TRACE("()");
@@ -2426,7 +2426,7 @@ void RespawnPedestrians() {
 }
 
 // IDA: int __cdecl GetPedCount()
-int GetPedCount() {
+int GetPedCount(void) {
     LOG_TRACE("()");
 
     return gPed_count;
@@ -2711,7 +2711,7 @@ void CreatePedestrian(FILE* pG, tPedestrian_instruction* pInstructions, int pIns
 }
 
 // IDA: void __cdecl ResetProxRay()
-void ResetProxRay() {
+void ResetProxRay(void) {
     int i;
     LOG_TRACE("()");
 
@@ -2721,12 +2721,12 @@ void ResetProxRay() {
 }
 
 // IDA: void __cdecl PedMaterialFromHell()
-void PedMaterialFromHell() {
+void PedMaterialFromHell(void) {
     LOG_TRACE("()");
 }
 
 // IDA: void __cdecl ResetPedMaterial()
-void ResetPedMaterial() {
+void ResetPedMaterial(void) {
     int i;
     int j;
     LOG_TRACE("()");
@@ -2789,7 +2789,7 @@ void LoadInPedestrians(FILE* pF, int pSubs_count, tPed_subs* pSubs_array) {
         ped_count = temp_int;
     }
     gPedestrian_array = BrMemAllocate(sizeof(tPedestrian_data) * (ped_count + (gAusterity_mode ? 0 : 200)), kMem_ped_array_stain);
-    if (PDKeyDown(KEY_LCTRL) && PDKeyDown(KEY_LSHIFT) && PDKeyDown(KEY_A)) {
+    if (PDKeyDown(KEY_CTRL_ANY) && PDKeyDown(KEY_SHIFT_ANY) && PDKeyDown(KEY_A)) {
         check_for_duplicates = 1;
         DRS3StartSound(gEffects_outlet, 3202);
         DRS3StartSound(gEffects_outlet, 3202);
@@ -3036,7 +3036,7 @@ br_actor* BuildPedPaths(tPedestrian_instruction* pInstructions, int pInstruc_cou
 }
 
 // IDA: void __cdecl WriteOutPeds()
-void WriteOutPeds() {
+void WriteOutPeds(void) {
     int i;
     int j;
     int k;
@@ -3126,7 +3126,7 @@ void WriteOutPeds() {
 }
 
 // IDA: void __cdecl AddPed()
-void AddPed() {
+void AddPed(void) {
     tPedestrian_instruction* instructions;
     FILE* g;
     tPath_name the_path;
@@ -3188,7 +3188,7 @@ void NewPed(int pRef_num) {
 }
 
 // IDA: void __cdecl RemoveCurrentPedPath()
-void RemoveCurrentPedPath() {
+void RemoveCurrentPedPath(void) {
     LOG_TRACE("()");
 
     if (gCurrent_ped_path_actor != NULL) {
@@ -3201,7 +3201,7 @@ void RemoveCurrentPedPath() {
 }
 
 // IDA: void __cdecl ScrubPedestrian()
-void ScrubPedestrian() {
+void ScrubPedestrian(void) {
     LOG_TRACE("()");
 
     gPed_instruc_count = 0;
@@ -3212,7 +3212,7 @@ void ScrubPedestrian() {
 }
 
 // IDA: void __cdecl TogglePedDetect()
-void TogglePedDetect() {
+void TogglePedDetect(void) {
     LOG_TRACE("()");
 
     gDetect_peds = !gDetect_peds;
@@ -3224,147 +3224,147 @@ void TogglePedDetect() {
 }
 
 // IDA: void __cdecl NewPed0()
-void NewPed0() {
+void NewPed0(void) {
     LOG_TRACE("()");
 
     NewPed(0);
 }
 
 // IDA: void __cdecl NewPed1()
-void NewPed1() {
+void NewPed1(void) {
     LOG_TRACE("()");
 
     NewPed(1);
 }
 
 // IDA: void __cdecl NewPed2()
-void NewPed2() {
+void NewPed2(void) {
     LOG_TRACE("()");
 
     NewPed(2);
 }
 
 // IDA: void __cdecl NewPed3()
-void NewPed3() {
+void NewPed3(void) {
     LOG_TRACE("()");
 
     NewPed(3);
 }
 
 // IDA: void __cdecl NewPed4()
-void NewPed4() {
+void NewPed4(void) {
     LOG_TRACE("()");
 
     NewPed(4);
 }
 
 // IDA: void __cdecl NewPed5()
-void NewPed5() {
+void NewPed5(void) {
     LOG_TRACE("()");
 
     NewPed(5);
 }
 
 // IDA: void __cdecl NewPed6()
-void NewPed6() {
+void NewPed6(void) {
     LOG_TRACE("()");
 
     NewPed(6);
 }
 
 // IDA: void __cdecl NewPed7()
-void NewPed7() {
+void NewPed7(void) {
     LOG_TRACE("()");
 
     NewPed(7);
 }
 
 // IDA: void __cdecl NewPed8()
-void NewPed8() {
+void NewPed8(void) {
     LOG_TRACE("()");
 
     NewPed(8);
 }
 
 // IDA: void __cdecl NewPed9()
-void NewPed9() {
+void NewPed9(void) {
     LOG_TRACE("()");
 
     NewPed(9);
 }
 
 // IDA: void __cdecl NewPed0B()
-void NewPed0B() {
+void NewPed0B(void) {
     LOG_TRACE("()");
 
     NewPed(61);
 }
 
 // IDA: void __cdecl NewPed1B()
-void NewPed1B() {
+void NewPed1B(void) {
     LOG_TRACE("()");
 
     NewPed(51);
 }
 
 // IDA: void __cdecl NewPed2B()
-void NewPed2B() {
+void NewPed2B(void) {
     LOG_TRACE("()");
 
     NewPed(52);
 }
 
 // IDA: void __cdecl NewPed3B()
-void NewPed3B() {
+void NewPed3B(void) {
     LOG_TRACE("()");
 
     NewPed(53);
 }
 
 // IDA: void __cdecl NewPed4B()
-void NewPed4B() {
+void NewPed4B(void) {
     LOG_TRACE("()");
 
     NewPed(54);
 }
 
 // IDA: void __cdecl NewPed5B()
-void NewPed5B() {
+void NewPed5B(void) {
     LOG_TRACE("()");
 
     NewPed(55);
 }
 
 // IDA: void __cdecl NewPed6B()
-void NewPed6B() {
+void NewPed6B(void) {
     LOG_TRACE("()");
 
     NewPed(56);
 }
 
 // IDA: void __cdecl NewPed7B()
-void NewPed7B() {
+void NewPed7B(void) {
     LOG_TRACE("()");
 
     NewPed(57);
 }
 
 // IDA: void __cdecl NewPed8B()
-void NewPed8B() {
+void NewPed8B(void) {
     LOG_TRACE("()");
 
     NewPed(58);
 }
 
 // IDA: void __cdecl NewPed9B()
-void NewPed9B() {
+void NewPed9B(void) {
     LOG_TRACE("()");
 
     NewPed(59);
 }
 
 // IDA: void __cdecl MungeShowPedPath()
-void MungeShowPedPath() {
+void MungeShowPedPath(void) {
     LOG_TRACE("()");
 
     RemoveCurrentPedPath();
@@ -3373,7 +3373,7 @@ void MungeShowPedPath() {
 }
 
 // IDA: void __cdecl DropPedPoint2()
-void DropPedPoint2() {
+void DropPedPoint2(void) {
     LOG_TRACE("()");
 
     gPed_instrucs[gPed_instruc_count].type = ePed_instruc_point;
@@ -3384,7 +3384,7 @@ void DropPedPoint2() {
 }
 
 // IDA: void __cdecl DropPedPoint()
-void DropPedPoint() {
+void DropPedPoint(void) {
     LOG_TRACE("()");
 
 #if defined(DETHRACE_FIX_BUGS)
@@ -3397,7 +3397,7 @@ void DropPedPoint() {
 }
 
 // IDA: void __cdecl DropInitPedPoint()
-void DropInitPedPoint() {
+void DropInitPedPoint(void) {
     LOG_TRACE("()");
 
 #if defined(DETHRACE_FIX_BUGS)
@@ -3411,7 +3411,7 @@ void DropInitPedPoint() {
 }
 
 // IDA: void __cdecl DropPedPointAir2()
-void DropPedPointAir2() {
+void DropPedPointAir2(void) {
     LOG_TRACE("()");
 
     gPed_instrucs[gPed_instruc_count].type = ePed_instruc_point;
@@ -3423,7 +3423,7 @@ void DropPedPointAir2() {
 }
 
 // IDA: void __cdecl DropPedPointAir()
-void DropPedPointAir() {
+void DropPedPointAir(void) {
     LOG_TRACE("()");
 
 #if defined(DETHRACE_FIX_BUGS)
@@ -3436,7 +3436,7 @@ void DropPedPointAir() {
 }
 
 // IDA: void __cdecl DropInitPedPointAir()
-void DropInitPedPointAir() {
+void DropInitPedPointAir(void) {
     LOG_TRACE("()");
 
 #if defined(DETHRACE_FIX_BUGS)
@@ -3461,7 +3461,7 @@ intptr_t KillActorsModel(br_actor* pActor, void* pArg) {
 }
 
 // IDA: void __cdecl DisposePedPaths()
-void DisposePedPaths() {
+void DisposePedPaths(void) {
     LOG_TRACE("()");
 
     if (gPath_actor != NULL) {
@@ -3513,7 +3513,7 @@ void GetPedPos(int* pPed_index, int* pPoint_index) {
 }
 
 // IDA: void __cdecl ShowPedPos()
-void ShowPedPos() {
+void ShowPedPos(void) {
     int min_ped;
     int min_point;
     char s[255];
@@ -3525,7 +3525,7 @@ void ShowPedPos() {
 }
 
 // IDA: void __cdecl ShowPedPaths()
-void ShowPedPaths() {
+void ShowPedPaths(void) {
     int i;
     br_model* the_model;
     LOG_TRACE("()");
@@ -3566,7 +3566,7 @@ void ShowPedPaths() {
 }
 
 // IDA: void __cdecl PullPedPoint()
-void PullPedPoint() {
+void PullPedPoint(void) {
     int the_ped;
     int the_point;
     LOG_TRACE("()");
@@ -3581,7 +3581,7 @@ void PullPedPoint() {
 }
 
 // IDA: void __cdecl PullPedPointAir()
-void PullPedPointAir() {
+void PullPedPointAir(void) {
     int the_ped;
     int the_point;
     LOG_TRACE("()");
@@ -3597,7 +3597,7 @@ void PullPedPointAir() {
 }
 
 // IDA: void __cdecl DeletePedPath()
-void DeletePedPath() {
+void DeletePedPath(void) {
     int the_ped;
     int the_point;
     int i;
@@ -3614,7 +3614,7 @@ void DeletePedPath() {
 }
 
 // IDA: void __cdecl DeletePedPoint()
-void DeletePedPoint() {
+void DeletePedPoint(void) {
     LOG_TRACE("()");
 
     if (gPed_instruc_count == 0) {
@@ -3632,7 +3632,7 @@ void DeletePedPoint() {
 }
 
 // IDA: void __cdecl DisposePedestrians()
-void DisposePedestrians() {
+void DisposePedestrians(void) {
     int i;
     int j;
     tPedestrian_data* the_pedestrian;
@@ -3682,7 +3682,7 @@ void DisposePedestrians() {
 }
 
 // IDA: void __cdecl DoPedReport()
-void DoPedReport() {
+void DoPedReport(void) {
     FILE* f;
     tPath_name the_path;
     time_t the_bloody_time;

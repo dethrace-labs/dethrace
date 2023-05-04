@@ -5,6 +5,7 @@
 #include "include/harness/os.h"
 #include "platforms/null.h"
 #include "sound/sound.h"
+#include "ascii_tables.h"
 #include "version.h"
 
 #include <errno.h>
@@ -22,7 +23,7 @@ br_pixelmap* last_src = NULL;
 unsigned int last_frame_time = 0;
 int force_null_platform = 0;
 
-extern unsigned int GetTotalTime();
+extern unsigned int GetTotalTime(void);
 
 extern br_v1db_state v1db;
 extern uint32_t gI_am_cheating;
@@ -36,55 +37,11 @@ tHarness_game_config harness_game_config;
 // Platform hooks
 tHarness_platform gHarness_platform;
 
-/* clang-format off */
-// German ASCII codes
-static int carmageddon_german_ascii_table[128] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107,
-    108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 122, 121, 94, -33, -76, 8, 13, 13, 0, 45, 60, -10, -28, 46, 44, -4, 43, 35, 27,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, 56, -33, -76, 46, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-};
-static int carmageddon_german_ascii_shift_table[128] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 61, 33, 34, -89, 36, 37, 38, 47, 40, 41, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75,
-    76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 90, 89, -80, 63, 96, 8, 13, 13, 0, 95, 62, -42, -60, 58, 44, -36, 42, 39, 27,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, 56, -33, -76, 46, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-};
-
-// Demo ASCII codes
-static int demo_ascii_table[128] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107,
-    108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 122, 121, 94, -33, -76, 8, 13, 13, 0, 45, 60, -10, -28, 46, 44, -4, 43, 35, 27,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, 56, -33, -76, 46, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-};
-static int demo_ascii_shift_table[128] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 61, 33, 34, -89, 36, 37, 38, 47, 40, 41, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75,
-    76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 90, 89, -80, 63, 96, 8, 13, 13, 0, 95, 62, -42, -60, 58, 44, -36, 42, 39, 27,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, 56, -33, -76, 46, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-};
-
-// Splatpack Demo ASCII codes
-static int splatpack_xmasdemo_ascii_table[128] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75,
-    76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 96, 45, 61, 8, 13, 3, 9, 47, 92, 59, 39, 46, 44, 91, 93, 35, 27,
-    0, 127, 0, 0, 0, 0, 28, 29, 30, 31, 0, 47, 42, 45, 43, 46, 61, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32,
-};
-static int splatpack_xmasdemo_ascii_shift_table[128] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 41, 33, 34, 163, 36, 37, 94, 38, 42, 40, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75,
-    76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 172, 95, 43, 8, 13, 13, 0, 63, 124, 58, 64, 62, 44, 123, 125, 126, 27,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 47, 42, 45, 43, 46, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 8,
-};
-/* clang-format on */
-
-extern void Harness_Platform_Init();
+extern void Harness_Platform_Init(tHarness_platform* platform);
 
 int Harness_ProcessCommandLine(int* argc, char* argv[]);
 
-void Harness_DetectGameMode() {
+static void Harness_DetectGameMode(void) {
     if (access("DATA/RACES/CASTLE.TXT", F_OK) != -1) {
         // All splatpack edition have the castle track
         if (access("DATA/RACES/CASTLE2.TXT", F_OK) != -1) {
@@ -155,21 +112,24 @@ void Harness_DetectGameMode() {
     case eGame_carmageddon:
         switch (harness_game_info.localization) {
         case eGameLocalization_german:
-            harness_game_info.defines.ascii_table = carmageddon_german_ascii_table;
-            harness_game_info.defines.ascii_shift_table = carmageddon_german_ascii_shift_table;
+            harness_game_info.defines.requires_ascii_table = 1;
+            harness_game_info.defines.ascii_table = carmageddon_german_ascii_tables.ascii;
+            harness_game_info.defines.ascii_shift_table = carmageddon_german_ascii_tables.ascii_shift;
             break;
         default:
+            harness_game_info.defines.ascii_table = carmageddon_ascii_tables.ascii;
+            harness_game_info.defines.ascii_shift_table = carmageddon_ascii_tables.ascii_shift;
             break;
         }
         break;
     case eGame_carmageddon_demo:
-        harness_game_info.defines.ascii_table = demo_ascii_table;
-        harness_game_info.defines.ascii_shift_table = demo_ascii_shift_table;
+        harness_game_info.defines.ascii_table = demo_ascii_tables.ascii;
+        harness_game_info.defines.ascii_shift_table = demo_ascii_tables.ascii_shift;
         break;
     case eGame_splatpack_demo:
     case eGame_splatpack_xmas_demo:
-        harness_game_info.defines.ascii_table = splatpack_xmasdemo_ascii_table;
-        harness_game_info.defines.ascii_shift_table = splatpack_xmasdemo_ascii_shift_table;
+        harness_game_info.defines.ascii_table = xmas_ascii_tables.ascii;
+        harness_game_info.defines.ascii_shift_table = xmas_ascii_tables.ascii_shift;
         break;
     default:
         break;
@@ -180,6 +140,8 @@ void Harness_Init(int* argc, char* argv[]) {
     int result;
 
     printf("Dethrace version: %s\n", DETHRACE_VERSION);
+
+    memset(&harness_game_info, 0, sizeof(harness_game_info));
 
     // disable the original CD check code
     harness_game_config.enable_cd_check = 0;
@@ -233,7 +195,7 @@ void Harness_Init(int* argc, char* argv[]) {
 }
 
 // used by unit tests
-void Harness_ForceNullPlatform() {
+void Harness_ForceNullPlatform(void) {
     force_null_platform = 1;
 }
 
@@ -320,7 +282,7 @@ void Harness_Hook_BrV1dbRendererBegin(br_v1db_state* v1db) {
     v1db->renderer = (br_renderer*)renderer_state;
 }
 
-int Harness_CalculateFrameDelay() {
+static int Harness_CalculateFrameDelay(void) {
     if (harness_game_config.fps == 0) {
         return 0;
     }
@@ -360,10 +322,10 @@ void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {
     last_frame_time = GetTotalTime();
 }
 
-void Harness_RenderLastScreen() {
+void Harness_RenderLastScreen(void) {
     if (last_dst) {
         Harness_RenderScreen(last_dst, last_src);
-        gHarness_platform.SwapWindow(0);
+        gHarness_platform.SwapWindow();
     }
 }
 

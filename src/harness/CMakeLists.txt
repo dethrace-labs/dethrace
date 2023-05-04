@@ -32,6 +32,9 @@ if(NOT MSVC)
         -Wextra
         -Wno-unused-parameter
     )
+    add_compile_flags_if_supported(harness
+        -Wstrict-prototypes
+    )
 else()
     target_compile_definitions(harness PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
@@ -52,6 +55,7 @@ target_sources(harness PRIVATE
     include/harness/win95_polyfill_defs.h
     # cameras/debug_camera.c
     # cameras/debug_camera.h
+    ascii_tables.h
     harness_trace.c
     harness.c
     harness.h
@@ -60,8 +64,9 @@ target_sources(harness PRIVATE
     sound/sound.c
     sound/sound.h
     win95/polyfill.c
+    platforms/null.c
     platforms/null.h
-    
+
     "${CMAKE_CURRENT_BINARY_DIR}/version.h"
 )
 

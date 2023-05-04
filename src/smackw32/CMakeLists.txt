@@ -10,7 +10,9 @@ target_include_directories(smackw32
 target_link_libraries(smackw32 PRIVATE harness brender libsmacker miniaudio compile_with_werror)
 
 if(NOT MSVC)
-    
+    add_compile_flags_if_supported(smackw32
+        -Wstrict-prototypes
+    )
 else()
     target_compile_definitions(smackw32 PRIVATE -D_CRT_SECURE_NO_WARNINGS)
     target_compile_options(smackw32 PRIVATE

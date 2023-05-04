@@ -17,13 +17,13 @@ typedef struct tHarness_platform {
     // Called when beginning a 3D scene
     void (*Renderer_BeginScene)(br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer);
     // Called at the end of a 3D scene
-    void (*Renderer_EndScene)();
+    void (*Renderer_EndScene)(void);
     // Render a fullscreen quad using the specified pixel data
     void (*Renderer_FullScreenQuad)(uint8_t* src);
     // Render a model
     void (*Renderer_Model)(br_actor* actor, br_model* model, br_material* material, br_token render_type, br_matrix34 model_matrix);
     // Clear frame and depth buffers
-    void (*Renderer_ClearBuffers)();
+    void (*Renderer_ClearBuffers)(void);
     // Load pixelmap into video memory
     void (*Renderer_BufferTexture)(br_pixelmap* pm);
     // Load material
@@ -31,7 +31,7 @@ typedef struct tHarness_platform {
     // Load model into video memory
     void (*Renderer_BufferModel)(br_model* model);
     // Pull contents of frame and depth buffers from video into main memory for software effects
-    void (*Renderer_FlushBuffers)();
+    void (*Renderer_FlushBuffers)(void);
     // Set the 256 color palette to use (BGRA format)
     void (*Renderer_SetPalette)(PALETTEENTRY_* palette);
     // Set the viewport for 3d rendering
@@ -55,9 +55,11 @@ typedef struct tHarness_platform {
     // Sleep
     void (*Sleep)(uint32_t dwMilliseconds);
     // Get ticks
-    uint32_t (*GetTicks)();
+    uint32_t (*GetTicks)(void);
     // Swap window
-    void (*SwapWindow)();
+    void (*SwapWindow)(void);
+    // Show error message
+    int (*ShowErrorMessage)(void* window, char* text, char* caption);
 
 } tHarness_platform;
 
@@ -74,11 +76,11 @@ void Harness_Hook_renderActor(br_actor* actor, br_model* model, br_material* mat
 
 // Sound hooks
 void Harness_Hook_S3Service(int unk1, int unk2);
-void Harness_Hook_S3StopAllOutletSounds();
+void Harness_Hook_S3StopAllOutletSounds(void);
 
 // Filesystem hooks
 FILE* Harness_Hook_fopen(const char* pathname, const char* mode);
 
-void Harness_RenderLastScreen();
+void Harness_RenderLastScreen(void);
 
 #endif

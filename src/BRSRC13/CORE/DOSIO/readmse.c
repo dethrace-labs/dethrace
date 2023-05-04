@@ -7,14 +7,14 @@ br_boolean mouseActive;
 unsigned char mouseHandler[245];
 
 // IDA: br_error __cdecl DOSMouseBegin()
-br_error DOSMouseBegin() {
+br_error DOSMouseBegin(void) {
     host_info hi;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl DOSMouseEnd()
-void DOSMouseEnd() {
+void DOSMouseEnd(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

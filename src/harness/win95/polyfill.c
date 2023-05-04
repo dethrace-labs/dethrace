@@ -88,7 +88,7 @@ int ScreenToClient_(void* hWnd, POINT_* lpPoint) {
     return 0;
 }
 
-uint32_t timeGetTime_() {
+uint32_t timeGetTime_(void) {
     return gHarness_platform.GetTicks();
 }
 
@@ -187,7 +187,9 @@ int SendMessageA_(void* hWnd, unsigned int Msg, unsigned int wParam, long lParam
 }
 
 int MessageBoxA_(void* hWnd, char* lpText, char* lpCaption, unsigned int uType) {
-    return 0;
+    // only ever used for errors
+    assert(uType == MB_ICONERROR);
+    return gHarness_platform.ShowErrorMessage(hWnd, lpText, lpCaption);
 }
 
 int DestroyWindow_(void* hWnd) {

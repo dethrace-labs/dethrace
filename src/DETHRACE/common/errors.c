@@ -205,7 +205,7 @@ void NonFatalError(int pStr_index, ...) {
 
 // IDA: void __cdecl CloseDiagnostics()
 // This function is stripped from the retail binary, we've guessed at the implementation
-void CloseDiagnostics() {
+void CloseDiagnostics(void) {
     LOG_TRACE("()");
 
     if (harness_game_config.enable_diagnostics == 0) {
@@ -217,7 +217,7 @@ void CloseDiagnostics() {
 
 // IDA: void __cdecl OpenDiagnostics()
 // This function is stripped from the retail binary, we've guessed at the implementation
-void OpenDiagnostics() {
+void OpenDiagnostics(void) {
     LOG_TRACE("()");
 
     if (harness_game_config.enable_diagnostics == 0) {
