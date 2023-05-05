@@ -324,6 +324,7 @@ int S3SyncSampleVolume(tS3_channel* chan) {
     return 1;
 }
 
+int last_rate = 0;
 int S3SyncSampleRate(tS3_channel* chan) {
     if (chan->type != eS3_ST_sample) {
         return 1;
@@ -334,8 +335,16 @@ int S3SyncSampleRate(tS3_channel* chan) {
             if (rate >= 100000) {
                 rate = 100000;
             }
+
             //  sound_buffer->lpVtbl->SetFrequency(sound_buffer, rate);
             // miniaudio uses a linear pitch scale instead of sample rate, so scale it down
+            if (chan->descriptor->id == 5300) {
+                if (rate < last_rate) {
+                    printf("*** lower\n");
+                }
+                printf("rate now %d\n", rate);
+                last_rate = rate;
+            }
             ma_sound_set_pitch(chan->descriptor->sound_buffer, (rate / (float)((tS3_sample*)chan->descriptor->sound_data)->rate));
         }
     }

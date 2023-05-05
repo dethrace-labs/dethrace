@@ -621,6 +621,7 @@ void MungeEngineNoise(void) {
                         vol = MIN(vol, 255);
                     }
                 }
+                printf("calling S3UpdateSoundSource with %s, %f, %d\n", the_car->name, the_car->revs, pitch);
                 S3UpdateSoundSource(gEngine_outlet, -1, the_car->sound_source, gAction_replay_mode == 0 ? 250.0f : 300.0f, 0, 0, vol, pitch, 0x10000);
             }
         }

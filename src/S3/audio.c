@@ -785,6 +785,9 @@ void S3Service(int inside_cockpit, int unk1) {
     }
     for (o = gS3_outlets; o; o = o->next) {
         for (c = o->channel_list; c; c = c->next) {
+            if (c->descriptor && c->active) {
+                LOG_DEBUG("service channel: %d %d %d", c->descriptor->id, c->spatial_sound, c->active);
+            }
             if (c->needs_service) {
                 c->needs_service = 0;
                 if (c->descriptor && c->descriptor->flags == 2) {
@@ -890,6 +893,7 @@ tS3_sound_tag S3StartSound(tS3_outlet* pOutlet, tS3_sound_id pSound) {
     chan->left_volume = gS3_channel_template.left_volume * chan->volume_multiplier;
     chan->right_volume = gS3_channel_template.right_volume * chan->volume_multiplier;
     chan->rate = gS3_channel_template.rate;
+    printf("rate3 %d\n", chan->rate);
     if (desc->type == eS3_ST_sample && (!desc->sound_data || desc->flags == 2)) {
         if (!S3LoadSample(pSound)) {
             chan->needs_service = 1;
@@ -1006,6 +1010,7 @@ tS3_sound_tag S3StartSound2(tS3_outlet* pOutlet, tS3_sound_id pSound, tS3_repeat
     if (!pOutlet->independent_pitch) {
         chan->rate = ldexpf(pSpeed, -16) * chan->rate;
     }
+    printf("rate2 %d\n", chan->rate);
     if (desc->type == eS3_ST_midi && desc->sound_data == NULL && S3MIDILoadSong(chan)) {
         chan->needs_service = 1;
         return 0;
@@ -1051,12 +1056,13 @@ void S3CalculateRandomizedFields(tS3_channel* chan, tS3_descriptor* desc) {
     if (desc->type == eS3_ST_sample) {
 #if defined(DETHRACE_FIX_BUGS)
         /* Avoid a possible NULL pointer dereference. */
-        if (desc->sound_data == NULL) {
-            chan->rate = desc->min_pitch;
-            return;
-        }
+        // if (desc->sound_data == NULL) {
+        //     chan->rate = desc->min_pitch;
+        //     return;
+        // }
 #endif
         chan->rate = S3IRandomBetweenLog(desc->min_pitch, desc->max_pitch, ((tS3_sample*)desc->sound_data)->rate);
+        printf("rate1 %d\n", chan->rate);
     }
 }
 
