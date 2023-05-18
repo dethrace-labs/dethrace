@@ -135,8 +135,6 @@ void S3ServiceSoundSources(void) {
                 }
                 s->time_since_last_played = 0;
             }
-        } else {
-            LOG_DEBUG("has channel, skipping");
         }
     }
 }
@@ -172,7 +170,7 @@ int S3BindAmbientSoundToOutlet(tS3_outlet* pOutlet, int pSound, tS3_sound_source
     if (desc->type != eS3_ST_sample) {
         return 0;
     }
-    if ((!desc->sound_data || (desc->flags & 2) != 0) && !S3LoadSound(pSound)) {
+    if ((!desc->sound_data || (desc->flags & 2) != 0) && !S3LoadSample(pSound)) {
         return eS3_error_load_sound;
     }
     if (pVolume > 255) {
@@ -220,7 +218,7 @@ void S3UpdateSoundSource(tS3_outlet* outlet, tS3_sound_tag tag, tS3_sound_source
         }
         if (desc->type == eS3_ST_sample) {
             src->sound_id = tag;
-            if ((desc->sound_data == NULL || (desc->flags & 2) != 0) && !S3LoadSound(tag)) {
+            if ((desc->sound_data == NULL || (desc->flags & 2) != 0) && !S3LoadSample(tag)) {
                 return;
             }
             is_sample = 1;
@@ -357,7 +355,7 @@ tS3_sound_tag S3ServiceSoundSource(tS3_sound_source* src) {
         return 0;
     }
 
-    if ((desc->sound_data && (desc->flags & 2) == 0) || S3LoadSound(src->sound_id)) {
+    if ((desc->sound_data && (desc->flags & 2) == 0) || S3LoadSample(src->sound_id)) {
         chan->left_volume = gS3_channel_template.left_volume * chan->volume_multiplier;
         chan->right_volume = gS3_channel_template.right_volume * chan->volume_multiplier;
         chan->rate = gS3_channel_template.rate;
@@ -416,7 +414,7 @@ tS3_sound_tag S3StartSound3D(tS3_outlet* pOutlet, tS3_sound_id pSound, tS3_vecto
         return 0;
     }
 
-    if ((desc->sound_data == NULL || (desc->flags & 2) != 0) && S3LoadSound(pSound) == 0) {
+    if ((desc->sound_data == NULL || (desc->flags & 2) != 0) && S3LoadSample(pSound) == 0) {
         gS3_last_error = eS3_error_load_sound;
         return 0;
     }
@@ -528,11 +526,9 @@ int S3Calculate3D(tS3_channel* chan, int pIs_ambient) {
         } else if (v11 < 0.5f) {
             v11 = 0.5;
         }
-        printf("Calculate3d setting rate to %f, was %d (%p)\n", chan->initial_pitch * v11, chan->rate, chan);
         chan->rate = chan->initial_pitch * v11;
     } else {
         chan->rate = chan->initial_pitch;
-        printf("Calculate3d setting rate to %d (%p) (2)\n", chan->rate, chan);
     }
 
     vol_multiplier = 1.0f / (dist / 6.0f + 1.0f);

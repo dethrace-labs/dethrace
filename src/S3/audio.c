@@ -210,16 +210,14 @@ int S3ReleaseSound(tS3_sound_id id) {
             }
         }
     } else if (desc->type == eS3_ST_sample) {
-        if (desc->sound_data == NULL) {
+        sample_ptr = (tS3_sample*)desc->sound_data;
+        if (sample_ptr == NULL) {
             return 0;
         }
-        sample_ptr = desc->sound_data;
-
         S3MemFree(sample_ptr->freeptr);
         S3MemFree(sample_ptr);
         desc->sound_data = NULL;
     }
-
     return 0;
 }
 
@@ -888,7 +886,6 @@ tS3_sound_tag S3StartSound(tS3_outlet* pOutlet, tS3_sound_id pSound) {
     S3CalculateRandomizedFields(&gS3_channel_template, desc);
     chan = S3AllocateChannel(pOutlet, desc->priority * (gS3_channel_template.right_volume + gS3_channel_template.left_volume + 1));
     if (!chan) {
-        LOG_DEBUG("failed to get channel");
         gS3_last_error = eS3_error_channel_alloc;
         return 0;
     }

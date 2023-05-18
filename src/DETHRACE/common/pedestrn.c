@@ -2765,7 +2765,7 @@ void LoadInPedestrians(FILE* pF, int pSubs_count, tPed_subs* pSubs_array) {
     duplicates_found = 0;
     gTotal_peds = 0;
     gFlag_waving_bastard = NULL;
-    gPedestrians_on = 0;
+    gPedestrians_on = 1;
     gPed_scale_factor = 1.0f;
     gAttracted_pedestrians = 0;
     gExploding_pedestrians = 0;
