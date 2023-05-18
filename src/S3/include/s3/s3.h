@@ -5,7 +5,7 @@
 
 typedef float tF32;
 typedef struct tS3_sound_source tS3_sound_source;
-typedef tS3_sound_source *tS3_sound_source_ptr;
+typedef tS3_sound_source* tS3_sound_source_ptr;
 typedef int tS3_sound_tag;
 typedef int tS3_sound_id;
 typedef int tS3_type;
@@ -38,11 +38,11 @@ int S3BindAmbientSoundToOutlet(tS3_outlet_ptr pOutlet, int pSound, tS3_sound_sou
 tS3_sound_tag S3StartSound3D(tS3_outlet_ptr pOutlet, tS3_sound_id pSound, tS3_vector3* pInitial_position, tS3_vector3* pInitial_velocity, tS3_repeats pRepeats, tS3_volume pVolume, tS3_pitch pPitch, tS3_speed pSpeed);
 
 tS3_outlet_ptr S3CreateOutlet(int unk1, int pChannel_count);
-void S3DisposeOutlet(tS3_outlet_ptr outlet);
-int S3DisposeDescriptor(tS3_sound_id id);
-int S3DisposeSoundSource(tS3_sound_source_ptr src);
+void S3ReleaseOutlet(tS3_outlet_ptr outlet);
+int S3ReleaseSound(tS3_sound_id id);
+int S3ReleaseSoundSource(tS3_sound_source_ptr src);
 
-int S3SetTagVolume(tS3_sound_tag pTag, tS3_volume pVolume);
+int S3ChangeVolume(tS3_sound_tag pTag, tS3_volume pVolume);
 
 void S3Service(int inside_cockpit, int unk1);
 

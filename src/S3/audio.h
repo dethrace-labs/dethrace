@@ -24,17 +24,17 @@ int S3OpenSampleDevice(void);
 void S3CloseDevices(void);
 tS3_outlet* S3CreateOutlet(int unk1, int pChannel_count);
 int S3CreateOutletChannels(tS3_outlet* outlet, int pChannel_count);
-void S3DisposeOutlet(tS3_outlet* outlet);
+void S3ReleaseOutlet(tS3_outlet* outlet);
 int S3UnbindChannels(tS3_outlet* outlet);
-void S3DisposeUnboundChannels(void);
+void S3ReleaseUnboundChannels(void);
 tS3_channel* S3AllocateChannel(tS3_outlet* outlet, int priority);
 int S3StopChannel(tS3_channel* chan);
 
-void S3DisposeOutlet(tS3_outlet* outlet);
+void S3ReleaseOutlet(tS3_outlet* outlet);
 int S3StopOutletSound(tS3_outlet* pOutlet);
 void S3StopAllOutletSounds(void);
 
-int S3DisposeDescriptor(tS3_sound_id id);
+int S3ReleaseSound(tS3_sound_id id);
 
 char* S3LoadSoundBankFile(char* pThe_path);
 int S3LoadSoundbank(const char* pSoundbank_filename, int pLow_memory_mode);
@@ -46,7 +46,7 @@ void S3SoundBankReaderAdvance(tS3_soundbank_read_ctx* buffer, int bytes_read);
 int S3SoundBankReaderReadFilename(char** filename, tS3_soundbank_read_ctx* ctx, const char* dir_name);
 int S3SoundBankReadEntry(tS3_soundbank_read_ctx* ctx, char* dir_name, int low_memory_mode);
 
-tS3_descriptor* S3AllocateDescriptor(void);
+tS3_descriptor* S3CreateDescriptor(void);
 tS3_descriptor* S3GetDescriptorByID(tS3_sound_id id);
 
 char* S3GetCurrentDir(void);
@@ -57,10 +57,10 @@ int S3IRandomBetweenLog(int pMin, int pMax, int pDefault);
 double S3FRandomBetween(double pMin, double pMax);
 
 int S3GenerateTag(tS3_outlet* outlet);
-int S3DisposeDescriptor(tS3_sound_id id);
+int S3ReleaseSound(tS3_sound_id id);
 int S3SetOutletVolume(tS3_outlet* pOutlet, tS3_volume pVolume);
 tS3_channel* S3GetChannelForTag(tS3_sound_tag tag);
-int S3SetTagVolume(tS3_sound_tag pTag, tS3_volume pVolume);
+int S3ChangeVolume(tS3_sound_tag pTag, tS3_volume pVolume);
 
 void S3ServiceOutlets(void);
 int S3ServiceChannel(tS3_channel* chan);

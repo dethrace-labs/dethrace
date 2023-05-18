@@ -109,13 +109,7 @@ void S3UpdateListenerVectors(void) {
 void S3ServiceSoundSources(void) {
     tS3_sound_source* s; // [esp+Ch] [ebp-4h]
 
-    printf("servicesoundsounrces\n");
     for (s = gS3_sound_sources; s; s = s->next) {
-        printf("ss %d\n", s->sound_id);
-        if (s->ambient == 0) {
-            printf("ambient not\n");
-            continue;
-        }
         if (s->period > 0) {
             s->time_since_last_played += gS3_service_time_delta;
         }
@@ -128,8 +122,6 @@ void S3ServiceSoundSources(void) {
         if (s->channel == NULL) {
             if (s->time_since_last_played <= s->period || !s->period || s->tag) {
                 if ((s->ambient_repeats == 0 || s->period == 0) && s->tag == 0) {
-                    LOG_DEBUG("going to service channel");
-                    printf("going to service\n");
                     if (s->volume > 0 && S3ServiceSoundSource(s) == 0) {
                         s->channel = NULL;
                         s->tag = 0;
@@ -137,7 +129,6 @@ void S3ServiceSoundSources(void) {
                     s->time_since_last_played = 0;
                 }
             } else {
-                LOG_DEBUG("going to service channel 2");
                 if (s->volume > 0 && S3ServiceSoundSource(s) == 0) {
                     s->channel = NULL;
                     s->tag = 0;
@@ -152,7 +143,6 @@ void S3ServiceSoundSources(void) {
 
 int S3UpdateSpatialSound(tS3_channel* chan) {
     int close_enough_to_play; // [esp+10h] [ebp-4h]
-    LOG_DEBUG("updating spatial sound for chan playing %d", chan->descriptor->id);
     if (chan->sound_source_ptr && chan->sound_source_ptr->ambient) {
 
         close_enough_to_play = S3Calculate3D(chan, 1);
@@ -182,7 +172,7 @@ int S3BindAmbientSoundToOutlet(tS3_outlet* pOutlet, int pSound, tS3_sound_source
     if (desc->type != eS3_ST_sample) {
         return 0;
     }
-    if ((!desc->sound_data || (desc->flags & 2) != 0) && !S3LoadSample(pSound)) {
+    if ((!desc->sound_data || (desc->flags & 2) != 0) && !S3LoadSound(pSound)) {
         return eS3_error_load_sound;
     }
     if (pVolume > 255) {
@@ -223,7 +213,6 @@ void S3UpdateSoundSource(tS3_outlet* outlet, tS3_sound_tag tag, tS3_sound_source
         return;
     }
     chan = src->channel;
-    LOG_DEBUG("channel %p", chan);
     if (tag != -1 && src->sound_id != tag) {
         desc = S3GetDescriptorByID(tag);
         if (desc == NULL) {
@@ -231,7 +220,7 @@ void S3UpdateSoundSource(tS3_outlet* outlet, tS3_sound_tag tag, tS3_sound_source
         }
         if (desc->type == eS3_ST_sample) {
             src->sound_id = tag;
-            if ((desc->sound_data == NULL || (desc->flags & 2) != 0) && !S3LoadSample(tag)) {
+            if ((desc->sound_data == NULL || (desc->flags & 2) != 0) && !S3LoadSound(tag)) {
                 return;
             }
             is_sample = 1;
@@ -250,8 +239,8 @@ void S3UpdateSoundSource(tS3_outlet* outlet, tS3_sound_tag tag, tS3_sound_source
         src->pitch = pPitch;
         if (chan && chan->descriptor && chan->descriptor->type == eS3_ST_sample) {
             chan->initial_pitch = S3IRandomBetweenLog(chan->descriptor->min_pitch, chan->descriptor->max_pitch, ((tS3_sample*)chan->descriptor->sound_data)->rate);
-            chan->initial_pitch = ldexpf(src->pitch, -16) * chan->initial_pitch;
-            chan->initial_pitch = ldexpf(src->speed, -16) * chan->initial_pitch;
+            chan->initial_pitch *= ldexpf(src->pitch, -16);
+            chan->initial_pitch *= ldexpf(src->speed, -16);
         }
     }
     if (pAmbient_repeats != -1) {
@@ -320,7 +309,6 @@ tS3_sound_tag S3ServiceSoundSource(tS3_sound_source* src) {
     if (!src) {
         return 0;
     }
-    printf("servicesoundsounrc ambient %d\n", src->ambient);
     if (!gS3_enabled || !src->ambient) {
         src->tag = 0;
         src->channel = 0;
@@ -346,9 +334,6 @@ tS3_sound_tag S3ServiceSoundSource(tS3_sound_source* src) {
     }
 
     gS3_channel_template.rate = ldexp(src->pitch, -16) * gS3_channel_template.rate;
-    printf("servicesoundsounrc\n");
-    printf("servicesoundsounrce %lu, converted to %d, \n", src->pitch, gS3_channel_template.rate);
-
     if (!outlet->independent_pitch) {
         gS3_channel_template.rate = ldexp(src->speed, -16) * gS3_channel_template.rate;
     }
@@ -358,7 +343,6 @@ tS3_sound_tag S3ServiceSoundSource(tS3_sound_source* src) {
         S3CopyVector3(&gS3_channel_template.lastpos, src->position_ptr, src->brender_vector);
     }
     gS3_channel_template.pMax_distance_squared = src->max_distance_sq;
-    printf("calling calc3d\n");
     if (S3Calculate3D(&gS3_channel_template, 1) == 0) {
         src->tag = 0;
         src->channel = NULL;
@@ -373,7 +357,7 @@ tS3_sound_tag S3ServiceSoundSource(tS3_sound_source* src) {
         return 0;
     }
 
-    if ((desc->sound_data && (desc->flags & 2) == 0) || S3LoadSample(src->sound_id)) {
+    if ((desc->sound_data && (desc->flags & 2) == 0) || S3LoadSound(src->sound_id)) {
         chan->left_volume = gS3_channel_template.left_volume * chan->volume_multiplier;
         chan->right_volume = gS3_channel_template.right_volume * chan->volume_multiplier;
         chan->rate = gS3_channel_template.rate;
@@ -432,7 +416,7 @@ tS3_sound_tag S3StartSound3D(tS3_outlet* pOutlet, tS3_sound_id pSound, tS3_vecto
         return 0;
     }
 
-    if ((desc->sound_data == NULL || (desc->flags & 2) != 0) && S3LoadSample(pSound) == 0) {
+    if ((desc->sound_data == NULL || (desc->flags & 2) != 0) && S3LoadSound(pSound) == 0) {
         gS3_last_error = eS3_error_load_sound;
         return 0;
     }
@@ -546,7 +530,6 @@ int S3Calculate3D(tS3_channel* chan, int pIs_ambient) {
         }
         printf("Calculate3d setting rate to %f, was %d (%p)\n", chan->initial_pitch * v11, chan->rate, chan);
         chan->rate = chan->initial_pitch * v11;
-
     } else {
         chan->rate = chan->initial_pitch;
         printf("Calculate3d setting rate to %d (%p) (2)\n", chan->rate, chan);

@@ -491,7 +491,7 @@ enum {
 
 #define TIME_CONV_THING 0.0005f
 
-#define OPPONENT_COUNT 0
+#define OPPONENT_COUNT 5
 
 #define WORLD_SCALE 6.9f
 
