@@ -145,15 +145,15 @@ void InitSound(void) {
     }
     if (gSound_detail_level != gOld_sound_detail_level) {
         if (gCar_outlet) {
-            S3DisposeOutlet(gCar_outlet);
+            S3ReleaseOutlet(gCar_outlet);
             gCar_outlet = 0;
         }
         if (gPedestrians_outlet) {
-            S3DisposeOutlet(gPedestrians_outlet);
+            S3ReleaseOutlet(gPedestrians_outlet);
             gPedestrians_outlet = 0;
         }
         if (gEngine_outlet) {
-            S3DisposeOutlet(gEngine_outlet);
+            S3ReleaseOutlet(gEngine_outlet);
             gEngine_outlet = 0;
         }
         if (gEngine_outlet == NULL) {
@@ -240,7 +240,7 @@ int DRS3ChangeVolume(tS3_sound_tag pSound_tag, tS3_volume pNew_volume) {
     if (gSound_enabled == 0) {
         return 0;
     }
-    return S3SetTagVolume(pSound_tag, pNew_volume);
+    return S3ChangeVolume(pSound_tag, pNew_volume);
 }
 
 // IDA: int __usercall DRS3ChangeLRVolume@<EAX>(tS3_sound_tag pSound_tag@<EAX>, tS3_volume pNew_Lvolume@<EDX>, tS3_volume pNew_Rvolume@<EBX>)
@@ -296,7 +296,7 @@ int DRS3ReleaseSound(tS3_sound_id pThe_sound) {
     if (gSound_enabled == 0) {
         return 0;
     }
-    return S3DisposeDescriptor(pThe_sound);
+    return S3ReleaseSound(pThe_sound);
 }
 
 // IDA: void __cdecl DRS3Service()
@@ -497,7 +497,7 @@ void DisposeSoundSources(void) {
                 if (the_car->driver == eDriver_local_human || gSound_detail_level == 2 || cat == eVehicle_rozzer) {
                     if (the_car->sound_source) {
                         S3UpdateSoundSource(gEngine_outlet, -1, the_car->sound_source, 0.0f, 0, 0, 0, 0x10000, 0x10000);
-                        S3DisposeSoundSource(the_car->sound_source);
+                        S3ReleaseSoundSource(the_car->sound_source);
                     }
                     the_car->sound_source = NULL;
                 }

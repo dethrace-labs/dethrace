@@ -103,14 +103,14 @@ void S3Shutdown(void) {
         S3Disable();
         for (descriptor = gS3_descriptors; descriptor != NULL; descriptor = next_descriptor) {
             next_descriptor = descriptor->next;
-            S3DisposeDescriptor(descriptor->id);
+            S3ReleaseSound(descriptor->id);
             S3MemFree(descriptor);
         }
         for (outlet = gS3_outlets; outlet != NULL; outlet = next_outlet) {
             next_outlet = outlet->next;
-            S3DisposeOutlet(outlet);
+            S3ReleaseOutlet(outlet);
         }
-        S3DisposeUnboundChannels();
+        S3ReleaseUnboundChannels();
     }
     if (gS3_opened_output_devices) {
         S3CloseDevices();
@@ -138,10 +138,7 @@ int S3OpenOutputDevices(void) {
     S3OpenCDADevice();
     gS3_hardware_info.timer_installed = 0;
     gS3_hardware_info.device_installed = 1;
-
-    // changed by dethrace
-    // gS3_hardware_info.independent_pitch = 0;
-    gS3_hardware_info.independent_pitch = 1;
+    gS3_hardware_info.independent_pitch = 0;
     return 1;
 }
 
@@ -190,10 +187,11 @@ void S3CloseDevices(void) {
     ma_engine_uninit(&miniaudio_engine);
 }
 
-int S3DisposeDescriptor(tS3_sound_id id) {
+int S3ReleaseSound(tS3_sound_id id) {
     tS3_channel* c;       // [esp+Ch] [ebp-10h]
     tS3_outlet* o;        // [esp+10h] [ebp-Ch]
     tS3_descriptor* desc; // [esp+14h] [ebp-8h]
+    tS3_sample* sample_ptr;
 
     if (!gS3_enabled) {
         return 0;
@@ -207,18 +205,19 @@ int S3DisposeDescriptor(tS3_sound_id id) {
         for (o = gS3_outlets; o; o = o->next) {
             for (c = o->channel_list; c; c = c->next) {
                 if (c->descriptor && c->descriptor->id == id) {
-                    S3DisposeMIDIChannel(c->tag);
+                    S3ReleaseMIDI(c->tag);
                 }
             }
         }
     } else if (desc->type == eS3_ST_sample) {
-        if (desc->sound_data == NULL) {
+        sample_ptr = (tS3_sample*)desc->sound_data;
+        if (sample_ptr == NULL) {
             return 0;
         }
-        S3MemFree(desc->sound_data);
+        S3MemFree(sample_ptr->freeptr);
+        S3MemFree(sample_ptr);
         desc->sound_data = NULL;
     }
-
     return 0;
 }
 
@@ -343,7 +342,7 @@ int S3SoundBankReadEntry(tS3_soundbank_read_ctx* ctx, char* dir_name, int low_me
     int char_count;       // [esp+2Ch] [ebp-4h] BYREF
     char cda_dir_name[4];
 
-    desc = S3AllocateDescriptor();
+    desc = S3CreateDescriptor();
     if (!desc) {
         return gS3_last_error;
     }
@@ -439,7 +438,7 @@ int S3SoundBankReadEntry(tS3_soundbank_read_ctx* ctx, char* dir_name, int low_me
     return 1;
 }
 
-tS3_descriptor* S3AllocateDescriptor(void) {
+tS3_descriptor* S3CreateDescriptor(void) {
     tS3_descriptor* root;
     tS3_descriptor* d;
 
@@ -538,7 +537,7 @@ int S3CreateOutletChannels(tS3_outlet* outlet, int pChannel_count) {
         memset(chan, 0, sizeof(tS3_channel));
         chan->owner_outlet = outlet;
 
-        if (sub_49D837(chan) == 0) {
+        if (S3CreateTypeStructs(chan) == 0) {
             S3MemFree(chan);
             return pChannel_count;
         }
@@ -554,7 +553,7 @@ int S3CreateOutletChannels(tS3_outlet* outlet, int pChannel_count) {
     return 0;
 }
 
-void S3DisposeOutlet(tS3_outlet* outlet) {
+void S3ReleaseOutlet(tS3_outlet* outlet) {
     tS3_outlet* next;
     tS3_outlet* prev;
 
@@ -586,7 +585,7 @@ int S3UnbindChannels(tS3_outlet* outlet) {
 
     for (chan = outlet->channel_list; chan; chan = next) {
         next = chan->next;
-        sub_49D84C(chan);
+        S3ReleaseTypeStructs(chan);
         if (gS3_unbound_channels) {
             gS3_last_unbound_channel->next = chan;
         } else {
@@ -599,7 +598,7 @@ int S3UnbindChannels(tS3_outlet* outlet) {
     return 1;
 }
 
-void S3DisposeUnboundChannels(void) {
+void S3ReleaseUnboundChannels(void) {
     tS3_channel* channel;      // [esp+Ch] [ebp-8h]
     tS3_channel* next_channel; // [esp+10h] [ebp-4h]
 
@@ -686,7 +685,7 @@ int S3StopChannel(tS3_channel* chan) {
     }
 
     if ((chan->descriptor->flags & 2) != 0) {
-        S3DisposeDescriptor(chan->descriptor->id);
+        S3ReleaseSound(chan->descriptor->id);
     }
     chan->repetitions = 1;
     return 0;
@@ -732,7 +731,7 @@ tS3_sound_source* S3CreateSoundSource(void* pPosition, void* pVelocity, tS3_outl
     return src;
 }
 
-int S3DisposeSoundSource(tS3_sound_source* src) {
+int S3ReleaseSoundSource(tS3_sound_source* src) {
     tS3_sound_source* prev; // [esp+Ch] [ebp-8h]
     tS3_sound_source* next; // [esp+10h] [ebp-4h]
 
@@ -781,14 +780,14 @@ void S3Service(int inside_cockpit, int unk1) {
     S3ServiceOutlets();
     if (unk1 == 1) {
         S3UpdateListenerVectors();
-        S3ServiceSoundSources();
+        S3ServiceAmbientSoundSources();
     }
     for (o = gS3_outlets; o; o = o->next) {
         for (c = o->channel_list; c; c = c->next) {
             if (c->needs_service) {
                 c->needs_service = 0;
                 if (c->descriptor && c->descriptor->flags == 2) {
-                    S3DisposeDescriptor(c->descriptor->id);
+                    S3ReleaseSound(c->descriptor->id);
                 }
                 c->active = 0;
                 if (c->type != eS3_ST_midi) {
@@ -834,9 +833,12 @@ void S3ServiceOutlets(void) {
 }
 
 int S3ServiceChannel(tS3_channel* chan) {
+    tS3_sample_struct_miniaudio* miniaudio;
+
     if (chan->type == eS3_ST_sample) {
+        miniaudio = (tS3_sample_struct_miniaudio*)chan->type_struct_sample;
         if (chan->descriptor && chan->descriptor->type == chan->type) {
-            if (ma_sound_is_playing(chan->descriptor->sound_buffer)) {
+            if (ma_sound_is_playing(&miniaudio->sound)) {
                 return 1;
             }
         }
@@ -898,7 +900,7 @@ tS3_sound_tag S3StartSound(tS3_outlet* pOutlet, tS3_sound_id pSound) {
         }
     }
     if (chan->descriptor && chan->descriptor->type == 1 && chan->descriptor->id != pSound) {
-        S3DisposeMIDIChannel(chan->tag);
+        S3ReleaseMIDI(chan->tag);
     }
     chan->spatial_sound = 0;
     chan->sound_source_ptr = 0;
@@ -982,7 +984,7 @@ tS3_sound_tag S3StartSound2(tS3_outlet* pOutlet, tS3_sound_id pSound, tS3_repeat
 
     if (chan->descriptor && chan->descriptor->type == eS3_ST_midi) {
         if (chan->descriptor->id != pSound) {
-            S3DisposeMIDIChannel(chan->tag);
+            S3ReleaseMIDI(chan->tag);
         }
     }
     chan->spatial_sound = 0;
@@ -1078,8 +1080,8 @@ int S3IRandomBetweenLog(int pMin, int pMax, int pDefault) {
     if (pMin == -1 || pMin >= pMax) {
         return pDefault;
     }
-    v4 = S3FRandomBetween(logf(pMin), logf(pMax));
-    return ldexpf(expf(v4), -16) * pDefault;
+    v4 = S3FRandomBetween(log(pMin), log(pMax));
+    return ldexp(exp(v4), -16) * pDefault;
 }
 
 // duplicate of S3FRandomBetween2
@@ -1146,7 +1148,7 @@ int S3StopSound(tS3_sound_tag pTag) {
     }
 
     if ((chan->descriptor->flags & 2) != 0) {
-        S3DisposeDescriptor(chan->descriptor->id);
+        S3ReleaseSound(chan->descriptor->id);
     }
     chan->repetitions = 1;
     return 0;
@@ -1215,7 +1217,7 @@ int S3SetOutletVolume(tS3_outlet* pOutlet, tS3_volume pVolume) {
     for (c = pOutlet->channel_list; c; c = c->next) {
         c->volume_multiplier = pVolume / 150.0f;
         if (c->active) {
-            S3SetTagVolume(c->tag, pVolume);
+            S3ChangeVolume(c->tag, pVolume);
         }
     }
     return 0;
@@ -1242,7 +1244,7 @@ tS3_channel* S3GetChannelForTag(tS3_sound_tag tag) {
     return 0;
 }
 
-int S3SetTagVolume(tS3_sound_tag pTag, tS3_volume pVolume) {
+int S3ChangeVolume(tS3_sound_tag pTag, tS3_volume pVolume) {
     tS3_channel* chan; // [esp+14h] [ebp-4h]
 
     if (!gS3_enabled) {

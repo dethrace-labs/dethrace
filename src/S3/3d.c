@@ -1,5 +1,6 @@
 #include "3d.h"
 #include "audio.h"
+#include "harness/trace.h"
 #include "resource.h"
 #include "s3sound.h"
 #include <math.h>
@@ -105,7 +106,7 @@ void S3UpdateListenerVectors(void) {
     }
 }
 
-void S3ServiceSoundSources(void) {
+void S3ServiceAmbientSoundSources(void) {
     tS3_sound_source* s; // [esp+Ch] [ebp-4h]
 
     for (s = gS3_sound_sources; s; s = s->next) {
@@ -120,6 +121,7 @@ void S3ServiceSoundSources(void) {
             s->channel = NULL;
             s->tag = 0;
         }
+
         if (s->channel == NULL) {
             if (s->time_since_last_played <= s->period || !s->period || s->tag) {
                 if ((s->ambient_repeats == 0 || s->period == 0) && s->tag == 0) {
@@ -142,7 +144,6 @@ void S3ServiceSoundSources(void) {
 
 int S3UpdateSpatialSound(tS3_channel* chan) {
     int close_enough_to_play; // [esp+10h] [ebp-4h]
-
     if (chan->sound_source_ptr && chan->sound_source_ptr->ambient) {
         close_enough_to_play = S3Calculate3D(chan, 1);
     } else {
@@ -238,8 +239,8 @@ void S3UpdateSoundSource(tS3_outlet* outlet, tS3_sound_tag tag, tS3_sound_source
         src->pitch = pPitch;
         if (chan && chan->descriptor && chan->descriptor->type == eS3_ST_sample) {
             chan->initial_pitch = S3IRandomBetweenLog(chan->descriptor->min_pitch, chan->descriptor->max_pitch, ((tS3_sample*)chan->descriptor->sound_data)->rate);
-            chan->initial_pitch = ldexpf(src->pitch, -16) * chan->initial_pitch;
-            chan->initial_pitch = ldexpf(src->speed, -16) * chan->initial_pitch;
+            chan->initial_pitch *= ldexpf(src->pitch, -16);
+            chan->initial_pitch *= ldexpf(src->speed, -16);
         }
     }
     if (pAmbient_repeats != -1) {
@@ -331,6 +332,7 @@ tS3_sound_tag S3ServiceSoundSource(tS3_sound_source* src) {
     if (src->speed < 0) {
         src->speed = 0x10000;
     }
+
     gS3_channel_template.rate = ldexp(src->pitch, -16) * gS3_channel_template.rate;
     if (!outlet->independent_pitch) {
         gS3_channel_template.rate = ldexp(src->speed, -16) * gS3_channel_template.rate;
@@ -341,7 +343,6 @@ tS3_sound_tag S3ServiceSoundSource(tS3_sound_source* src) {
         S3CopyVector3(&gS3_channel_template.lastpos, src->position_ptr, src->brender_vector);
     }
     gS3_channel_template.pMax_distance_squared = src->max_distance_sq;
-
     if (S3Calculate3D(&gS3_channel_template, 1) == 0) {
         src->tag = 0;
         src->channel = NULL;
@@ -443,6 +444,7 @@ tS3_sound_tag S3StartSound3D(tS3_outlet* pOutlet, tS3_sound_id pSound, tS3_vecto
     gS3_channel_template.initial_pitch = gS3_channel_template.rate;
     gS3_channel_template.position = *pInitial_position;
     gS3_channel_template.velocity = *pInitial_velocity;
+
     if (S3Calculate3D(&gS3_channel_template, 0) == 0) {
         return 0;
     }
@@ -526,6 +528,7 @@ int S3Calculate3D(tS3_channel* chan, int pIs_ambient) {
     } else {
         chan->rate = chan->initial_pitch;
     }
+
     vol_multiplier = 1.0f / (dist / 6.0f + 1.0f);
     if (!gS3_inside_cockpit) {
         vol_multiplier = vol_multiplier * 1.3f;
