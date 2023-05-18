@@ -106,10 +106,13 @@ void S3UpdateListenerVectors(void) {
     }
 }
 
-void S3ServiceSoundSources(void) {
+void S3ServiceAmbientSoundSources(void) {
     tS3_sound_source* s; // [esp+Ch] [ebp-4h]
 
     for (s = gS3_sound_sources; s; s = s->next) {
+        if (s->ambient == 0) {
+            continue;
+        }
         if (s->period > 0) {
             s->time_since_last_played += gS3_service_time_delta;
         }
@@ -142,7 +145,6 @@ void S3ServiceSoundSources(void) {
 int S3UpdateSpatialSound(tS3_channel* chan) {
     int close_enough_to_play; // [esp+10h] [ebp-4h]
     if (chan->sound_source_ptr && chan->sound_source_ptr->ambient) {
-
         close_enough_to_play = S3Calculate3D(chan, 1);
     } else {
         close_enough_to_play = S3Calculate3D(chan, 0);
@@ -359,7 +361,6 @@ tS3_sound_tag S3ServiceSoundSource(tS3_sound_source* src) {
         chan->left_volume = gS3_channel_template.left_volume * chan->volume_multiplier;
         chan->right_volume = gS3_channel_template.right_volume * chan->volume_multiplier;
         chan->rate = gS3_channel_template.rate;
-        printf("rate6 %d\n", chan->rate);
         chan->position.x = gS3_channel_template.position.x;
         chan->position.y = gS3_channel_template.position.y;
         chan->position.z = gS3_channel_template.position.z;
@@ -399,8 +400,6 @@ tS3_sound_tag S3ServiceSoundSource(tS3_sound_source* src) {
 tS3_sound_tag S3StartSound3D(tS3_outlet* pOutlet, tS3_sound_id pSound, tS3_vector3* pInitial_position, tS3_vector3* pInitial_velocity, tS3_repeats pRepeats, tS3_volume pVolume, tS3_pitch pPitch, tS3_speed pSpeed) {
     tS3_channel* chan;    // [esp+30h] [ebp-Ch]
     tS3_descriptor* desc; // [esp+38h] [ebp-4h]
-
-    printf("S3StartSound3D\n");
 
     if (!gS3_enabled) {
         return 0;
@@ -454,7 +453,6 @@ tS3_sound_tag S3StartSound3D(tS3_outlet* pOutlet, tS3_sound_id pSound, tS3_vecto
         chan->left_volume = gS3_channel_template.left_volume * chan->volume_multiplier;
         chan->right_volume = gS3_channel_template.right_volume * chan->volume_multiplier;
         chan->rate = gS3_channel_template.rate;
-        printf("rate5 %d\n", chan->rate);
         chan->spatial_sound = 1;
         chan->sound_source_ptr = 0;
         chan->descriptor = desc;

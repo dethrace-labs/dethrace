@@ -56,8 +56,8 @@ int S3LoadSample(tS3_sound_id id) {
     sample->freeptr = buf;
     if (memcmp(buf, "RIFF", 4) == 0) {
         wav_header* hdr = (wav_header*)buf;
-        sample->dataptr = &buf[44];
-        sample->size = hdr->data_bytes - 44;
+        sample->dataptr = &buf[sizeof(wav_header)];
+        sample->size = hdr->data_bytes;
         sample->rate = hdr->sample_rate;
         sample->resolution = hdr->bit_depth;
         sample->channels = hdr->num_channels;
@@ -408,7 +408,6 @@ int S3SyncSampleVolume(tS3_channel* chan) {
     return 1;
 }
 
-int last_rate = 0;
 int S3SyncSampleRate(tS3_channel* chan) {
     tS3_sample_struct_miniaudio* miniaudio;
 

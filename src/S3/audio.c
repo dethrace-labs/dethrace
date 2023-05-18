@@ -780,7 +780,7 @@ void S3Service(int inside_cockpit, int unk1) {
     S3ServiceOutlets();
     if (unk1 == 1) {
         S3UpdateListenerVectors();
-        S3ServiceSoundSources();
+        S3ServiceAmbientSoundSources();
     }
     for (o = gS3_outlets; o; o = o->next) {
         for (c = o->channel_list; c; c = c->next) {
