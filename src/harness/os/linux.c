@@ -257,6 +257,9 @@ FILE* OS_fopen(const char* pathname, const char* mode) {
         }
     }
     closedir(pDir);
+    if (f == NULL) {
+        fprintf(stderr, "Failed to open \"%s\" (%s)\n", pathname, strerror(errno));
+    }
     return f;
 }
 

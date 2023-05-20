@@ -208,7 +208,14 @@ void OS_InstallSignalHandler(char* program_name) {
 }
 
 FILE* OS_fopen(const char* pathname, const char* mode) {
-    return fopen(pathname, mode);
+    FILE* f;
+
+    f = fopen(pathname, mode);
+    if (f == NULL) {
+        fprintf(stderr, "Failed to open \"%s\" (%s)\n", pathname, strerror(errno));
+    }
+
+    return f;
 }
 
 size_t OS_ConsoleReadPassword(char* pBuffer, size_t pBufferLen) {
