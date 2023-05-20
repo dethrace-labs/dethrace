@@ -4,7 +4,7 @@ target_include_directories(s3
     PUBLIC
         "${CMAKE_CURRENT_SOURCE_DIR}/include"
     PRIVATE
-        ${CMAKE_SOURCE_DIR}      
+        ${CMAKE_CURRENT_SOURCE_DIR}      
 )
 
 target_link_libraries(s3 PRIVATE brender SDL2::SDL2 harness miniaudio compile_with_werror)
@@ -23,6 +23,9 @@ else()
 endif()
 if(DETHRACE_FIX_BUGS)
     target_compile_definitions(s3 PRIVATE DETHRACE_FIX_BUGS)
+endif()
+if (DETHRACE_S3_BACKEND_SPATIALIZATION)
+    target_compile_definitions(s3 PRIVATE DETHRACE_S3_BACKEND_SPATIALIZATION)
 endif()
 
 if(IS_BIGENDIAN)
@@ -48,4 +51,6 @@ target_sources(s3 PRIVATE
     s3music.h
     s3sound.c
     s3sound.h
+    backends/miniaudio_backend.c
+    backends/backend.h
 )

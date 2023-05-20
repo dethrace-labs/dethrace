@@ -2,10 +2,10 @@
 #include "resource.h"
 
 #include "3d.h"
+#include "backends/backend.h"
 #include "harness/config.h"
 #include "harness/os.h"
 #include "harness/trace.h"
-#include "miniaudio/miniaudio.h"
 #include "s3/s3.h"
 #include "s3cda.h"
 #include "s3music.h"
@@ -46,9 +46,6 @@ char gS3_directory_separator[4];
 char gS3_directory_name[8];
 int gS3_have_current_dir;
 char gS3_current_dir[260];
-
-// dethrace
-ma_engine miniaudio_engine;
 
 int dword_5216C0;
 
@@ -143,20 +140,8 @@ int S3OpenOutputDevices(void) {
 }
 
 int S3OpenSampleDevice(void) {
-    ma_result result;
 
-    ma_engine_config engineConfig;
-    engineConfig = ma_engine_config_init();
-    engineConfig.sampleRate = 22050;
-
-    result = ma_engine_init(&engineConfig, &miniaudio_engine);
-    if (result != MA_SUCCESS) {
-        printf("Failed to initialize audio engine.");
-        return 0;
-    }
-
-    ma_engine_set_volume(&miniaudio_engine, harness_game_config.volume_multiplier);
-
+    AudioBackend_Init();
     S3Enable();
     return 1;
 }
@@ -176,15 +161,15 @@ int S3OpenCDADevice(void) {
 }
 
 void S3CloseDevices(void) {
-    // if (gS3_hardware_info.device_installed) {
-    //     gS3_direct_sound_ptr->lpVtbl->Release(gS3_direct_sound_ptr);
-    //     gS3_direct_sound_ptr = NULL;
-    // }
+    if (gS3_hardware_info.device_installed) {
+        // gS3_direct_sound_ptr->lpVtbl->Release(gS3_direct_sound_ptr);
+        // gS3_direct_sound_ptr = NULL;
+
+        AudioBackend_UnInit();
+    }
     // if (gS3_cda_device.wDeviceID) {
     //     mciSendCommandA(gS3_cda_device.wDeviceID, 0x804u, 0, 0); // MCI_CLOSE
     // }
-
-    ma_engine_uninit(&miniaudio_engine);
 }
 
 int S3ReleaseSound(tS3_sound_id id) {
@@ -833,14 +818,9 @@ void S3ServiceOutlets(void) {
 }
 
 int S3ServiceChannel(tS3_channel* chan) {
-    tS3_sample_struct_miniaudio* miniaudio;
-
     if (chan->type == eS3_ST_sample) {
-        miniaudio = (tS3_sample_struct_miniaudio*)chan->type_struct_sample;
-        if (chan->descriptor && chan->descriptor->type == chan->type) {
-            if (ma_sound_is_playing(&miniaudio->sound)) {
-                return 1;
-            }
+        if (AudioBackend_SoundIsPlaying(chan)) {
+            return 1;
         }
         S3StopSample(chan);
         return 0;
