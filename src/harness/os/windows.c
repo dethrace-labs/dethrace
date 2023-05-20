@@ -157,7 +157,7 @@ FILE* OS_fopen(const char* pathname, const char* mode) {
     f = NULL;
     err = fopen_s(&f, pathname, mode);
     if (err != 0) {
-        fprintf(stderr, "Failed to open \"%s\"", pathname);
+        fprintf(stderr, "Failed to open \"%s\" (%s)\n", pathname, strerror(err));
     }
 
     return f;
