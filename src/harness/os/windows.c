@@ -29,7 +29,7 @@ void dr_dprintf(char* fmt_string, ...);
 static int stack_nbr = 0;
 static char windows_program_name[1024];
 
-int addr2line(char const* const program_name, void const* const addr) {
+static int addr2line(char const* const program_name, void const* const addr) {
     char addr2line_cmd[512] = { 0 };
 
     sprintf(addr2line_cmd, "addr2line -f -p -e %.256s %p", program_name, addr);
@@ -38,7 +38,7 @@ int addr2line(char const* const program_name, void const* const addr) {
     return system(addr2line_cmd);
 }
 
-void print_stacktrace(CONTEXT* context) {
+static void print_stacktrace(CONTEXT* context) {
 
     SymInitialize(GetCurrentProcess(), 0, true);
 
@@ -67,7 +67,7 @@ void print_stacktrace(CONTEXT* context) {
     SymCleanup(GetCurrentProcess());
 }
 
-LONG WINAPI windows_exception_handler(EXCEPTION_POINTERS* ExceptionInfo) {
+static LONG WINAPI windows_exception_handler(EXCEPTION_POINTERS* ExceptionInfo) {
     switch (ExceptionInfo->ExceptionRecord->ExceptionCode) {
     case EXCEPTION_ACCESS_VIOLATION:
         fputs("Error: EXCEPTION_ACCESS_VIOLATION\n", stderr);
