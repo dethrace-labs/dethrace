@@ -27,7 +27,7 @@
 void dr_dprintf(char* fmt_string, ...);
 
 static int stack_nbr = 0;
-static char _program_name[1024];
+static char windows_program_name[1024];
 
 int addr2line(char const* const program_name, void const* const addr) {
     char addr2line_cmd[512] = { 0 };
@@ -61,7 +61,7 @@ void print_stacktrace(CONTEXT* context) {
         SymFunctionTableAccess,
         SymGetModuleBase,
         0)) {
-        addr2line(_program_name, (void*)frame.AddrPC.Offset);
+        addr2line(windows_program_name, (void*)frame.AddrPC.Offset);
     }
 
     SymCleanup(GetCurrentProcess());
@@ -139,14 +139,14 @@ LONG WINAPI windows_exception_handler(EXCEPTION_POINTERS* ExceptionInfo) {
     if (EXCEPTION_STACK_OVERFLOW != ExceptionInfo->ExceptionRecord->ExceptionCode) {
         print_stacktrace(ExceptionInfo->ContextRecord);
     } else {
-        addr2line(_program_name, (void*)ExceptionInfo->ContextRecord->Eip);
+        addr2line(windows_program_name, (void*)ExceptionInfo->ContextRecord->Eip);
     }
 
     return EXCEPTION_EXECUTE_HANDLER;
 }
 
 void OS_InstallSignalHandler(char* program_name) {
-    strcpy(_program_name, program_name);
+    strcpy(windows_program_name, program_name);
     SetUnhandledExceptionFilter(windows_exception_handler);
 }
 
