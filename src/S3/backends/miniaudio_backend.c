@@ -21,7 +21,6 @@ int AudioBackend_Init(void) {
 
     ma_engine_config engineConfig;
     engineConfig = ma_engine_config_init();
-
     result = ma_engine_init(&engineConfig, &miniaudio_engine);
     if (result != MA_SUCCESS) {
         printf("Failed to initialize audio engine.");
@@ -54,6 +53,7 @@ int AudioBackend_PlaySample(tS3_channel* chan) {
     tS3_sample_struct_miniaudio* miniaudio;
     tS3_sample* sample_data;
     ma_result result;
+    ma_int32 flags;
 
     miniaudio = (tS3_sample_struct_miniaudio*)chan->type_struct_sample;
     assert(miniaudio != NULL);
@@ -65,7 +65,9 @@ int AudioBackend_PlaySample(tS3_channel* chan) {
     if (result != MA_SUCCESS) {
         return 0;
     }
-    result = ma_sound_init_from_data_source(&miniaudio_engine, &miniaudio->buffer_ref, MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_NO_SPATIALIZATION, NULL, &miniaudio->sound);
+
+    flags = MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_NO_SPATIALIZATION;
+    result = ma_sound_init_from_data_source(&miniaudio_engine, &miniaudio->buffer_ref, flags, NULL, &miniaudio->sound);
     if (result != MA_SUCCESS) {
         return 0;
     }
@@ -109,6 +111,7 @@ int AudioBackend_SetPan(tS3_channel* chan, int pan) {
 
     // convert from directsound -10000 - 10000 pan scale
     ma_sound_set_pan(&miniaudio->sound, pan / 10000.0f);
+
     return 1;
 }
 

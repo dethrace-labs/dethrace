@@ -30,7 +30,6 @@ option(BUILD_TESTS "Build unit tests." OFF)
 option(DETHRACE_INSTALL "Add install target" OFF)
 option(DETHRACE_WERROR "Treat warnings as errors")
 option(DETHRACE_FIX_BUGS "Fix Dethrace bugs" ON)
-option(DETHRACE_S3_BACKEND_SPATIALIZATION "Use audio backend spatialization, disables S3 spatialization" ON)
 
 function(add_compile_flag_if_supported TARGET FLAG)
     string(MAKE_C_IDENTIFIER "${FLAG}" FLAG_TO_IDENTIFIER)
