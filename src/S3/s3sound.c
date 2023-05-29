@@ -77,7 +77,7 @@ int S3LoadSample(tS3_sound_id id) {
     return eS3_error_none;
 }
 
-int S3ReadWavHeader(char* buf, tWAVEFORMATEX_** pWav_format, char** data_ptr, int* pData_size) {
+int S3ReadWavHeader_Win95(char* buf, tWAVEFORMATEX_** pWav_format, char** data_ptr, int* pData_size) {
     int riff_len;
     char* file_eof;         // [esp+10h] [ebp-14h]
     unsigned int chunk_len; // [esp+18h] [ebp-Ch]
@@ -206,7 +206,7 @@ void* S3LoadWavFile_Win95(char* pFile_name, tS3_sample* pSample) {
     data_size = 0;
     wav_format = 0;
     data_ptr = 0;
-    if (S3ReadWavHeader(buf, &wav_format, &data_ptr, &data_size) == 0) {
+    if (S3ReadWavHeader_Win95(buf, &wav_format, &data_ptr, &data_size) == 0) {
         gS3_last_error = eS3_error_readfile;
         dr_dprintf("ERROR: .WAV file '%s' is crap", pFile_name);
         return 0;
@@ -254,9 +254,11 @@ int S3StopSample(tS3_channel* chan) {
         return 1;
     }
 
-    if (AudioBackend_StopSample(chan) == 0) {
+    if (chan->type_struct_sample == NULL) {
         return 0;
     }
+
+    AudioBackend_StopSample(chan);
 
     if (chan->active) {
         chan->needs_service = 1;
@@ -277,10 +279,15 @@ int S3ExecuteSampleFilterFuncs(tS3_channel* chan) {
 }
 
 int S3PlaySample(tS3_channel* chan) {
-    S3SyncSampleVolume(chan);
+
+    if (chan->type_struct_sample == NULL) {
+        return 0;
+    }
+
+    S3SyncSampleVolumeAndPan(chan);
     S3SyncSampleRate(chan);
 
-    if (AudioBackend_PlaySample(chan) == 0) {
+    if (AudioBackend_PlaySample(chan) != eAB_success) {
         return 0;
     }
     // if (chan->descriptor && chan->descriptor->type == chan->type) {
@@ -305,7 +312,16 @@ int S3PlaySample(tS3_channel* chan) {
 
 // this function was only called in DOS build
 int S3CreateTypeStructs(tS3_channel* chan) {
-    return AudioBackend_InitChannel(chan);
+    void* result;
+
+    result = AudioBackend_AllocateSampleTypeStruct();
+    if (result == NULL) {
+        return 0;
+    }
+    chan->type_struct_midi = NULL;
+    chan->type_struct_cda = NULL;
+    chan->type_struct_sample = (char*)result;
+    return 1;
 }
 
 int S3ReleaseTypeStructs(tS3_channel* chan) {
@@ -320,7 +336,7 @@ int S3ReleaseTypeStructs(tS3_channel* chan) {
     return 1;
 }
 
-int S3SyncSampleVolume(tS3_channel* chan) {
+int S3SyncSampleVolumeAndPan(tS3_channel* chan) {
 
     float pan_ratio; // [esp+38h] [ebp-8h]
     float total_vol; // [esp+3Ch] [ebp-4h]
@@ -342,9 +358,8 @@ int S3SyncSampleVolume(tS3_channel* chan) {
             volume_db = 0;
         }
 
-        AudioBackend_SetVolume(chan, volume_db);
+        if (AudioBackend_SetVolume(chan, volume_db) == eAB_success && chan->spatial_sound) {
 
-        if (chan->spatial_sound) {
             if (chan->left_volume != 0 && chan->right_volume > chan->left_volume) {
                 pan_ratio = chan->right_volume / (float)chan->left_volume;
             } else if (chan->right_volume != 0) {

@@ -152,10 +152,9 @@ int S3UpdateSpatialSound(tS3_channel* chan) {
         close_enough_to_play = S3Calculate3D(chan, 0);
     }
     if (close_enough_to_play) {
-        S3SyncSampleVolume(chan);
+        S3SyncSampleVolumeAndPan(chan);
         S3SyncSampleRate(chan);
     }
-
     return close_enough_to_play;
 }
 
@@ -361,7 +360,6 @@ tS3_sound_tag S3ServiceSoundSource(tS3_sound_source* src) {
     }
 
     if ((desc->sound_data && (desc->flags & 2) == 0) || S3LoadSample(src->sound_id)) {
-
         chan->left_volume = gS3_channel_template.left_volume * chan->volume_multiplier;
         chan->right_volume = gS3_channel_template.right_volume * chan->volume_multiplier;
         chan->rate = gS3_channel_template.rate;

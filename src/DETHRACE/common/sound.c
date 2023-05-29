@@ -265,8 +265,11 @@ int DRS3ChangeSpeed(tS3_sound_tag pTag, tS3_pitch pNew_speed) {
 // IDA: int __usercall DRS3ChangePitchSpeed@<EAX>(tS3_sound_tag pTag@<EAX>, tS3_pitch pNew_pitch@<EDX>)
 int DRS3ChangePitchSpeed(tS3_sound_tag pTag, tS3_pitch pNew_pitch) {
     LOG_TRACE("(%d, %d)", pTag, pNew_pitch);
-    STUB_ONCE();
-    return 0;
+
+    if (!gSound_enabled) {
+        return 0;
+    }
+    return S3ChangePitchSpeed(pTag, pNew_pitch);
 }
 
 // IDA: int __usercall DRS3StopSound@<EAX>(tS3_sound_tag pSound_tag@<EAX>)

@@ -141,11 +141,21 @@ int S3OpenOutputDevices(void) {
 
 int S3OpenSampleDevice(void) {
 
-    AudioBackend_Init();
+    // if (DirectSoundCreate(0, &gS3_direct_sound_ptr, 0)) {
+    //     return 0;
+    // }
+    // if (gS3_direct_sound_ptr->lpVtbl->SetCooperativeLevel(gS3_direct_sound_ptr, gWin32_hwnd, 3)) {
+    //     return 0;
+    // }
+
+    if (AudioBackend_Init() != eAB_success) {
+        return 0;
+    }
     S3Enable();
     return 1;
 }
 
+// returns 0 on failure, 1 on success
 int S3OpenCDADevice(void) {
     // gS3_cda_device.lpstrDeviceType = (LPCSTR)516;
     // if (mciSendCommandA(0, 0x803u, 0x3000u, (DWORD_PTR)&gS3_cda_device)
@@ -154,10 +164,13 @@ int S3OpenCDADevice(void) {
     // }
     // stru_550560.dwTimeFormat = 10; // MCI_FORMAT_TMSF
     // mciSendCommandA(gS3_cda_device.wDeviceID, 0x80Du, 0x400u, (DWORD_PTR)&stru_550560);
-    // S3CDAEnable();
-    // return 1;
 
-    return 0;
+    if (AudioBackend_InitCDA() != eAB_success) {
+        return 0;
+    }
+
+    S3EnableCDA();
+    return 1;
 }
 
 void S3CloseDevices(void) {
@@ -170,6 +183,8 @@ void S3CloseDevices(void) {
     // if (gS3_cda_device.wDeviceID) {
     //     mciSendCommandA(gS3_cda_device.wDeviceID, 0x804u, 0, 0); // MCI_CLOSE
     // }
+
+    AudioBackend_UnInitCDA();
 }
 
 int S3ReleaseSound(tS3_sound_id id) {
@@ -1090,6 +1105,30 @@ int S3SoundStillPlaying(tS3_sound_tag pTag) {
     return S3ServiceChannel(chan) != 0;
 }
 
+int S3ChangePitchSpeed(tS3_sound_tag pTag, tS3_pitch pNew_pitch) {
+    tS3_channel* chan;
+
+    if (!gS3_enabled) {
+        return 0;
+    }
+    if (pNew_pitch == -1) {
+        pNew_pitch = 0x10000;
+    }
+    chan = S3GetChannelForTag(pTag);
+    if (chan == NULL) {
+        return eS3_error_bad_stag;
+    }
+    if (chan->type != eS3_ST_sample) {
+        return 0;
+    }
+    chan->rate = ldexp(pNew_pitch, -16) * ((tS3_sample*)chan->descriptor->sound_data)->rate;
+    if (S3SyncSampleRate(chan)) {
+        return 0;
+    } else {
+        return eS3_error_function_failed;
+    }
+}
+
 int S3StopSound(tS3_sound_tag pTag) {
     tS3_channel* chan; // [esp+Ch] [ebp-4h]
 
@@ -1243,7 +1282,7 @@ int S3ChangeVolume(tS3_sound_tag pTag, tS3_volume pVolume) {
     if (chan->type == eS3_ST_sample) {
         chan->left_volume = pVolume * chan->volume_multiplier;
         chan->right_volume = pVolume * chan->volume_multiplier;
-        if (!S3SyncSampleVolume(chan)) {
+        if (!S3SyncSampleVolumeAndPan(chan)) {
             return eS3_error_function_failed;
         }
     } else if (chan->type == eS3_ST_midi) {
