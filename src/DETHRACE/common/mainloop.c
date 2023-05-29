@@ -342,8 +342,7 @@ void UpdateFramePeriod(tU32* pCamera_period) {
         last_AR_mode = gAction_replay_mode;
     }
     if (gAction_replay_mode) {
-        // Was (removed abs to avoid compiler warning) gFrame_period = abs(gLast_replay_frame_time - gLast_tick_count);
-        gFrame_period = gLast_replay_frame_time - gLast_tick_count;
+        gFrame_period = abs((int)(gLast_replay_frame_time - gLast_tick_count));
         gLast_tick_count = gLast_replay_frame_time;
         new_camera_tick_count = PDGetTotalTime();
         new_tick_count = GetTotalTime();
