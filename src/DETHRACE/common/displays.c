@@ -1101,7 +1101,11 @@ void DoInstruments(tU32 pThe_time) {
                 cos_angle = gCosine_array[(unsigned int)((TAU - the_angle2) / DR_PI * 128.0)];
             } else if (the_angle2 > DR_PI) {
                 cos_angle = -gCosine_array[(unsigned int)((the_angle2 - DR_PI) / DR_PI * 128.0)];
+#if defined(DETHRACE_FIX_BUGS)
+            } else if (the_angle2 >= DR_PI_OVER_2) {
+#else
             } else if (the_angle2 > DR_PI_OVER_2) {
+#endif
                 cos_angle = -gCosine_array[(unsigned int)((DR_PI - the_angle2) / DR_PI * 128.0)];
             } else {
                 cos_angle = gCosine_array[(unsigned int)(the_angle2 / DR_PI * 128.0)];
@@ -1110,7 +1114,11 @@ void DoInstruments(tU32 pThe_time) {
                 sin_angle = gCosine_array[(unsigned int)((TAU - the_angle) / DR_PI * 128.0)];
             } else if (the_angle > DR_PI) {
                 sin_angle = -gCosine_array[(unsigned int)((the_angle - DR_PI) / DR_PI * 128.0)];
+#if defined(DETHRACE_FIX_BUGS)
+            } else if (the_angle >= DR_PI_OVER_2) {
+#else
             } else if (the_angle > DR_PI_OVER_2) {
+#endif
                 sin_angle = -gCosine_array[(unsigned int)((DR_PI - the_angle) / DR_PI * 128.0)];
             } else {
                 sin_angle = gCosine_array[(unsigned int)(the_angle / DR_PI * 128.0)];
