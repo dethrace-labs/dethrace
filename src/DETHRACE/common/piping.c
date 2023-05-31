@@ -310,7 +310,7 @@ tU32 LengthOfSession(tPipe_session* pSession) {
     }
     running_total += offsetof(tPipe_session, chunks) + sizeof(tU16);
     if (running_total % 2 != 0) {
-        FatalError(98);
+        FatalError(kFatalError_PipingSystem);
     }
     return running_total;
 }
