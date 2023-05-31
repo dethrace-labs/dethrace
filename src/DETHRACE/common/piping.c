@@ -92,8 +92,9 @@ tPipe_chunk* gIncidentChunk; // FIXME: added by DethRace (really needed?)
 
 #define LOCAL_BUFFER_SIZE 15000
 
-#if DETHRACE_REPLAY_DEBUG
-#define REPLAY_DEBUG_MAGIC1 0x1ed6ef85
+#if defined(DETHRACE_REPLAY_DEBUG)
+#define REPLAY_DEBUG_CHUNK_MAGIC1 0x1ed6ef85
+#define REPLAY_DEBUG_SESSION_MAGIC1 0x617bbc04
 #define REPLAY_DEBUG_ASSERT(test) assert(test)
 #include <assert.h>
 #else
@@ -179,6 +180,8 @@ tU32 LengthOfSession(tPipe_session* pSession) {
 
 #define SIZEOF_CHUNK(MEMBER) (offsetof(tPipe_chunk, chunk_data) + sizeof(pSession->chunks.chunk_data.MEMBER))
 #define ROUND_UP(V, M) (((V) + (M)-1) & (~((M)-1)))
+
+    REPLAY_DEBUG_ASSERT(pSession->pipe_magic1 == REPLAY_DEBUG_SESSION_MAGIC1);
 
     switch (pSession->chunk_type) {
     case ePipe_chunk_actor_rstyle:
@@ -327,7 +330,7 @@ void StartPipingSession2(tPipe_chunk_type pThe_type, int pMunge_reentrancy) {
         ((tPipe_session*)gLocal_buffer)->chunk_type = pThe_type;
         ((tPipe_session*)gLocal_buffer)->number_of_chunks = 0;
 #if defined(DETHRACE_REPLAY_DEBUG)
-        ((tPipe_session*)gLocal_buffer)->magic1 = REPLAY_DEBUG_MAGIC1;
+        ((tPipe_session*)gLocal_buffer)->pipe_magic1 = REPLAY_DEBUG_SESSION_MAGIC1;
 #endif
         gLocal_buffer_size = offsetof(tPipe_session, chunks);
         gMr_chunky = &((tPipe_session*)gLocal_buffer)->chunks;
@@ -413,8 +416,12 @@ void AddDataToSession(int pSubject_index, void* pData, tU32 pData_length) {
         if (temp_buffer_size >= LOCAL_BUFFER_SIZE) {
             return;
         }
+        REPLAY_DEBUG_ASSERT(((tPipe_session*)gLocal_buffer)->pipe_magic1 == REPLAY_DEBUG_SESSION_MAGIC1);
         ((tPipe_session*)gLocal_buffer)->number_of_chunks++;
         gMr_chunky->subject_index = pSubject_index;
+#if defined(DETHRACE_REPLAY_DEBUG)
+        gMr_chunky->chunk_magic1 = REPLAY_DEBUG_CHUNK_MAGIC1;
+#endif
         memcpy(&gMr_chunky->chunk_data, pData, pData_length);
         gMr_chunky = (tPipe_chunk*)(((tU8*)&gMr_chunky->chunk_data) + pData_length);
         gLocal_buffer_size = temp_buffer_size;
@@ -1174,6 +1181,8 @@ void AdvanceChunkPtr(tPipe_chunk** pChunk, tChunk_subject_index pType) {
         break;
     }
     *(tU8**)pChunk += offsetof(tPipe_chunk, chunk_data);
+
+    /* Fail-safe to avoid reading junk data from the session after */
     if (*(tU8**)pChunk == gEnd_of_session) {
         *pChunk = old_chunk;
     } else if (*(tU8**)pChunk > gEnd_of_session) {
@@ -1551,7 +1560,7 @@ int ApplyPipedSession(tU8** pPtr) {
         return 1;
     }
     gEnd_of_session = *pPtr + (LengthOfSession((tPipe_session*)*pPtr) - sizeof(tU16));
-    REPLAY_DEBUG_ASSERT(((tPipe_session*)*pPtr)->magic1 == REPLAY_DEBUG_MAGIC1);
+    REPLAY_DEBUG_ASSERT(((tPipe_session*)*pPtr)->pipe_magic1 == REPLAY_DEBUG_SESSION_MAGIC1);
     chunk_ptr = (tPipe_chunk*)(*pPtr + offsetof(tPipe_session, chunks));
     return_value = 0;
     chunk_type = ((tPipe_session*)*pPtr)->chunk_type;
@@ -1650,8 +1659,9 @@ int MoveSessionPointerBackOne(tU8** pPtr) {
         *pPtr = gPipe_buffer_working_end;
     }
     *pPtr -= sizeof(tU16);
+    REPLAY_DEBUG_ASSERT(*(tU16*)*pPtr != 0);
     *pPtr -= *(tU16*)*pPtr;
-    REPLAY_DEBUG_ASSERT(((tPipe_session*)*pPtr)->magic1 == REPLAY_DEBUG_MAGIC1);
+    REPLAY_DEBUG_ASSERT(((tPipe_session*)*pPtr)->pipe_magic1 == REPLAY_DEBUG_SESSION_MAGIC1);
     return 0;
 }
 
@@ -1659,7 +1669,7 @@ int MoveSessionPointerBackOne(tU8** pPtr) {
 int MoveSessionPointerForwardOne(tU8** pPtr) {
     LOG_TRACE("(%p)", pPtr);
 
-    REPLAY_DEBUG_ASSERT(((tPipe_session*)*pPtr)->magic1 == REPLAY_DEBUG_MAGIC1);
+    REPLAY_DEBUG_ASSERT(((tPipe_session*)*pPtr)->pipe_magic1 == REPLAY_DEBUG_SESSION_MAGIC1);
 #if defined(DETHRACE_FIX_BUGS)
     *pPtr += PIPE_ALIGN(LengthOfSession((tPipe_session*)*pPtr));
 #else
@@ -2009,7 +2019,7 @@ int UndoPipedSession(tU8** pPtr) {
     if (MoveSessionPointerBackOne(pPtr)) {
         return 1;
     }
-    REPLAY_DEBUG_ASSERT(((tPipe_session*)*pPtr)->magic1 == REPLAY_DEBUG_MAGIC1);
+    REPLAY_DEBUG_ASSERT(((tPipe_session*)*pPtr)->pipe_magic1 == REPLAY_DEBUG_SESSION_MAGIC1);
     gEnd_of_session = *pPtr + LengthOfSession((tPipe_session*)*pPtr) - sizeof(tU16);
     chunk_ptr = &((tPipe_session*)*pPtr)->chunks;
     chunk_type = ((tPipe_session*)*pPtr)->chunk_type;
@@ -2018,6 +2028,7 @@ int UndoPipedSession(tU8** pPtr) {
         if (!(chunk_type == ePipe_chunk_model_geometry || chunk_type == ePipe_chunk_sound || chunk_type == ePipe_chunk_damage || chunk_type == ePipe_chunk_special || chunk_type == ePipe_chunk_incident || chunk_type == ePipe_chunk_prox_ray || chunk_type == ePipe_chunk_smudge)) {
             prev_chunk = FindPreviousChunk(*pPtr, ((tPipe_session*)*pPtr)->chunk_type, chunk_ptr->subject_index);
         }
+        REPLAY_DEBUG_ASSERT(((tPipe_chunk*)chunk_ptr)->chunk_magic1 == REPLAY_DEBUG_CHUNK_MAGIC1);
         gEnd_of_session = pushed_end_of_session;
         switch (chunk_type) {
         case ePipe_chunk_model_geometry:
