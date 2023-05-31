@@ -995,7 +995,7 @@ void DoDamageScreen(tU32 pThe_time) {
     } else {
         the_wobble_x = gProgram_state.current_car.damage_x_offset;
         the_wobble_y = gProgram_state.current_car.damage_y_offset;
-        if (gProgram_state.current_car.damage_background) {
+        if (gProgram_state.current_car.damage_background != NULL) {
             DRPixelmapRectangleMaskedCopy(
                 gBack_screen,
                 gProgram_state.current_car.damage_background_x,
@@ -1019,7 +1019,7 @@ void DoDamageScreen(tU32 pThe_time) {
                 the_wobble_y + gProgram_state.current_car.damage_units[i].y_coord,
                 the_image,
                 0,
-                y_pitch * (2 * the_step + ((pThe_time / the_damage->periods[5 * the_damage->damage_level / 100]) & 1)),
+                y_pitch * (2 * the_step + ((pThe_time / the_damage->periods[the_step]) & 1)),
                 the_image->width,
                 y_pitch);
         }

@@ -445,7 +445,7 @@ tS3_descriptor* S3CreateDescriptor(void) {
     d = S3MemAllocate(sizeof(tS3_descriptor), kMem_S3_descriptor);
     if (!d) {
         gS3_last_error = eS3_error_memory;
-        return 0;
+        return NULL;
     }
     memset(d, 0, sizeof(tS3_descriptor));
     root = gS3_root_descriptor;
@@ -561,12 +561,12 @@ void S3ReleaseOutlet(tS3_outlet* outlet) {
         S3UnbindChannels(outlet);
         prev = outlet->prev;
         next = outlet->next;
-        if (prev) {
+        if (prev != NULL) {
             prev->next = next;
         } else {
             gS3_outlets = outlet->next;
         }
-        if (next) {
+        if (next != NULL) {
             next->prev = prev;
         }
         if (gS3_noutlets) {
@@ -654,7 +654,7 @@ tS3_channel* S3AllocateChannel(tS3_outlet* outlet, int priority) {
         lowest_priority_chan->active = 1;
     }
 
-    return 0;
+    return NULL;
 }
 
 int S3StopChannel(tS3_channel* chan) {

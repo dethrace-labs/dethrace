@@ -129,7 +129,7 @@ void InstantDepthChange(tDepth_effect_type pType, br_pixelmap* pSky_texture, int
 
     gProgram_state.current_depth_effect.sky_texture = pSky_texture;
     gHorizon_material->colour_map = pSky_texture;
-    BrMaterialUpdate(gHorizon_material, 0x7FFFu);
+    BrMaterialUpdate(gHorizon_material, BR_MATU_ALL);
     gProgram_state.current_depth_effect.type = pType;
     gProgram_state.current_depth_effect.start = pStart;
     gProgram_state.current_depth_effect.end = pEnd;
