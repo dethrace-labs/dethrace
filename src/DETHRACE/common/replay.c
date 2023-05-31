@@ -306,11 +306,6 @@ void MoveToStartOfReplay(void) {
 void ToggleReplay(void) {
     LOG_TRACE("()");
 
-    if (!harness_game_config.enable_replay) {
-        NewTextHeadupSlot(4, 0, 1000, -4, "Action replay disabled (start dethrace with --enable-replay)");
-        return;
-    }
-
     if (!IsActionReplayAvailable()) {
         NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(37));
         return;
