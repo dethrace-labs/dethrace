@@ -2611,7 +2611,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     strcat(str, ".ACT");
     PathCat(gAdditional_actor_path, gApplication_path, "ACTORS");
     PathCat(gAdditional_actor_path, gAdditional_actor_path, str);
-    gAdditional_actors = BrActorAllocate(0, 0);
+    gAdditional_actors = BrActorAllocate(BR_ACTOR_NONE, NULL);
     BrActorAdd(gUniverse_actor, gAdditional_actors);
     gLast_actor = NULL;
     SaveAdditionalStuff();

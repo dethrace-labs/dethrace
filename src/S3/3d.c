@@ -198,9 +198,9 @@ int S3BindAmbientSoundToOutlet(tS3_outlet* pOutlet, int pSound, tS3_sound_source
 
     source->ambient_repeats = pRepeats < 0 ? 0 : pRepeats;
     source->time_since_last_played = pPeriod;
-    source->channel = 0;
+    source->channel = NULL;
     source->tag = 0;
-    return 0;
+    return eS3_error_none;
 }
 
 void S3UpdateSoundSource(tS3_outlet* outlet, tS3_sound_tag tag, tS3_sound_source* src, float pMax_distance_squared, int pPeriod, tS3_repeats pAmbient_repeats, tS3_volume pVolume, int pPitch, tS3_speed pSpeed) {

@@ -2660,6 +2660,9 @@ typedef struct tPipe_skid_adjustment {
 
 typedef struct tPipe_chunk {                                 // size: 0x58
     tChunk_subject_index subject_index;                      // @0x0
+#if defined(DETHRACE_REPLAY_DEBUG)
+    int chunk_magic1;
+#endif
     union {                                                  // size: 0x54
         tPipe_actor_rstyle_data actor_rstyle_data;           // @0x0
         tPipe_actor_translate_data actor_translate_data;     // @0x0
@@ -2700,7 +2703,7 @@ typedef struct tPipe_session {
     tPipe_chunk_type chunk_type;
     tU8 number_of_chunks;
 #if defined(DETHRACE_REPLAY_DEBUG)
-    int magic1;
+    int pipe_magic1;
 #endif
     tPipe_chunk chunks;
 } tPipe_session;
