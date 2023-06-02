@@ -42,7 +42,7 @@ br_error modelMulF(struct br_renderer* r, br_matrix34_f* m) {
 
     BrMatrix34Mul(&self->state.matrix.model_to_view, (br_matrix34*)m, &om);
 
-    //TouchModelToView(self);
+    // TouchModelToView(self);
     return 0;
 }
 
@@ -79,7 +79,7 @@ br_error stateDefault(struct br_renderer* r, br_uint_32 mask) {
     return StateCopy(&self->state, self->default_state, mask, self);
 }
 
-harness_br_renderer* NewHarnessBrRenderer() {
+harness_br_renderer* NewHarnessBrRenderer(void) {
 
     harness_br_renderer* self;
 
@@ -99,6 +99,6 @@ harness_br_renderer* NewHarnessBrRenderer() {
     self->dispatch = &dispatch_table;
     self->identifier = "harness_renderer_state";
     return self;
-    //self->device = device;
-    //self->renderer_facility = facility;
+    // self->device = device;
+    // self->renderer_facility = facility;
 }

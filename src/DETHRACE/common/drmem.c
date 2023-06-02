@@ -258,26 +258,26 @@ char* gMem_names[247] = {
 br_resource_class gStainless_classes[118];
 
 // IDA: void __cdecl SetNonFatalAllocationErrors()
-void SetNonFatalAllocationErrors() {
+void SetNonFatalAllocationErrors(void) {
     LOG_TRACE("()");
 
     gNon_fatal_allocation_errors = 1;
 }
 
 // IDA: void __cdecl ResetNonFatalAllocationErrors()
-void ResetNonFatalAllocationErrors() {
+void ResetNonFatalAllocationErrors(void) {
     LOG_TRACE("()");
 
     gNon_fatal_allocation_errors = 0;
 }
 
 // IDA: int __cdecl AllocationErrorsAreFatal()
-int AllocationErrorsAreFatal() {
+int AllocationErrorsAreFatal(void) {
     return gNon_fatal_allocation_errors == 0;
 }
 
 // IDA: void __cdecl MAMSInitMem()
-void MAMSInitMem() {
+void MAMSInitMem(void) {
     int i;
     FILE* f;
     tPath_name the_path;
@@ -324,7 +324,7 @@ br_uint_32 Claim4ByteAlignment(br_uint_8 type) {
 }
 
 // IDA: void __cdecl InstallDRMemCalls()
-void InstallDRMemCalls() {
+void InstallDRMemCalls(void) {
     BrAllocatorSet(&gAllocator);
 }
 
@@ -340,7 +340,7 @@ void MAMSLock(void** pPtr) {
 }
 
 // IDA: void __cdecl CreateStainlessClasses()
-void CreateStainlessClasses() {
+void CreateStainlessClasses(void) {
     int i;
 
     for (i = 129; i < 246; i++) {
@@ -352,5 +352,5 @@ void CreateStainlessClasses() {
 }
 
 // IDA: void __cdecl CheckMemory()
-void CheckMemory() {
+void CheckMemory(void) {
 }

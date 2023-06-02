@@ -40,7 +40,7 @@ int DRActorToRoot(br_actor* a, br_actor* world, br_matrix34* m) {
 }
 
 // IDA: void __cdecl InitRayCasting()
-void InitRayCasting() {
+void InitRayCasting(void) {
     br_camera* camera_ptr;
     LOG_TRACE("()");
 

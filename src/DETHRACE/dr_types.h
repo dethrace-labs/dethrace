@@ -11,35 +11,34 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#ifdef _WIN32
-#include <windows.h>
-#else
-typedef short SHORT;
-typedef unsigned short USHORT;
-typedef int INT;
-typedef int BOOL;
-typedef unsigned int UINT;
-typedef unsigned char BYTE;
-typedef unsigned short WORD;
-typedef long LONG;
-typedef unsigned long DWORD;
-typedef BYTE* PBYTE;
-typedef char* PSTR;
-typedef WORD* PWORD;
-typedef unsigned short* PSHORT;
-typedef LONG* PLONG;
-typedef void* PVOID;
-typedef BYTE* LPBYTE;
-typedef BYTE* LPSTR;
-typedef WORD* LPWORD;
-typedef LONG* LPLONG;
-typedef void* LPVOID;
-typedef BYTE* HPBYTE;
-typedef BYTE* HPSTR;
-typedef LONG* HPLONG;
-typedef void* HPVOID;
-typedef unsigned int HANDLE;
-#endif
+// #ifdef _WIN32
+// #include <windows.h>
+// #else
+// typedef short short;
+// typedef unsigned short unsigned short;
+// typedef int INT;
+// typedef int BOOL;
+// typedef unsigned int UINT;
+// typedef unsigned char unsigned char;
+// typedef unsigned short WORD;
+// typedef long long;
+// typedef unsigned long unsigned long;
+// typedef unsigned char* Punsigned char;
+// typedef char* char*;
+// typedef WORD* PWORD;
+// typedef unsigned short* Pshort;
+// typedef long* Plong;
+// typedef void* PVOID;
+// typedef unsigned char* LPunsigned char;
+// typedef unsigned char* Lchar*;
+// typedef WORD* LPWORD;
+// typedef long* LPlong;
+// typedef void* LPVOID;
+// typedef unsigned char* HPunsigned char;
+// typedef unsigned char* Hchar*;
+// typedef long* HPlong;
+// typedef void* HPVOID;
+// #endif
 typedef unsigned int W32;
 typedef unsigned short W16;
 typedef W32* LPW32;
@@ -534,27 +533,27 @@ typedef struct _HMI_REGS {
 } _HMI_REGS;
 
 typedef struct _tagIPX_HEADER {
-    USHORT wChecksum;
-    USHORT wLength;
-    BYTE bTransportControl;
-    BYTE bPacketType;
-    BYTE bDestNetworkNumber[4];
-    BYTE bDestNetworkNode[6];
-    USHORT wDestNetworkSocket;
-    BYTE bSourceNetworkNumber[4];
-    BYTE bSourceNetworkNode[6];
-    USHORT wSourceNetworkSocket;
+    unsigned short wChecksum;
+    unsigned short wLength;
+    unsigned char bTransportControl;
+    unsigned char bPacketType;
+    unsigned char bDestNetworkNumber[4];
+    unsigned char bDestNetworkNode[6];
+    unsigned short wDestNetworkSocket;
+    unsigned char bSourceNetworkNumber[4];
+    unsigned char bSourceNetworkNode[6];
+    unsigned short wSourceNetworkSocket;
 } _IPX_HEADER;
 
 typedef struct _PACKET {
-    PSTR pData;
-    USHORT wLength;
+    char* pData;
+    unsigned short wLength;
 } _PACKET;
 
 typedef struct _REAL_PACKET {
-    SHORT wOffset;
-    SHORT wSegment;
-    USHORT wLength;
+    short wOffset;
+    short wSegment;
+    unsigned short wLength;
 } _REAL_PACKET;
 
 typedef struct _ECB_PACKET {
@@ -563,52 +562,52 @@ typedef struct _ECB_PACKET {
 } _ECB_PACKET;
 
 typedef struct _tagIPX_ECB {
-    PSTR pLinkAddress;
-    PSTR pESRRoutine;
-    BYTE bInUse;
-    BYTE bCompletionCode;
-    USHORT wSocket;
-    USHORT wConnectionID;
-    USHORT wWorkSpace;
-    BYTE bDriverWorkSpace[12];
-    BYTE bImmediateAddress[6];
-    USHORT wPacketCount;
+    char* pLinkAddress;
+    char* pESRRoutine;
+    unsigned char bInUse;
+    unsigned char bCompletionCode;
+    unsigned short wSocket;
+    unsigned short wConnectionID;
+    unsigned short wWorkSpace;
+    unsigned char bDriverWorkSpace[12];
+    unsigned char bImmediateAddress[6];
+    unsigned short wPacketCount;
     _ECB_PACKET sPacket[2];
 } _IPX_ECB;
 
 typedef struct _tagIPX_INTERNET_ADDR {
-    BYTE bNetwork[4];
-    BYTE bNode[6];
+    unsigned char bNetwork[4];
+    unsigned char bNode[6];
 } _IPX_INTERNET_ADDR;
 
 typedef struct _tagIPX_NETWORK_ADDR {
     _IPX_INTERNET_ADDR sInternetAddr;
-    BYTE bSocket[2];
+    unsigned char bSocket[2];
 } _IPX_NETWORK_ADDR;
 
 typedef struct _tagIPX_LOCAL_TARGET {
     _IPX_INTERNET_ADDR sInternetAddr;
-    BYTE bImmediate[6];
+    unsigned char bImmediate[6];
 } _IPX_LOCAL_TARGET;
 
 typedef struct _tagIPX_ELEMENT {
-    USHORT wFlags;
-    USHORT wOffset;
+    unsigned short wFlags;
+    unsigned short wOffset;
     _IPX_HEADER sHeader;
     _IPX_ECB sECB;
     _IPX_ECB* pECB;
     _IPX_HEADER* pIPXHeader;
-    PSTR pHeader;
-    USHORT wHSize;
+    char* pHeader;
+    unsigned short wHSize;
 } _IPX_ELEMENT;
 
 typedef struct _PROT_PTR {
-    PSTR pData;
+    char* pData;
 } _PROT_PTR;
 
 typedef struct _REAL_PTR {
-    SHORT wOffset;
-    SHORT wSegment;
+    short wOffset;
+    short wSegment;
 } _REAL_PTR;
 
 typedef struct _PTR {
@@ -617,68 +616,68 @@ typedef struct _PTR {
 } _PTR;
 
 typedef struct _tag_NETBIOS_NCB {
-    BYTE bCommand;
-    BYTE bReturnCode;
-    BYTE bLocalSession;
-    BYTE bNetworkNameNumber;
+    unsigned char bCommand;
+    unsigned char bReturnCode;
+    unsigned char bLocalSession;
+    unsigned char bNetworkNameNumber;
     _PTR sPtr;
-    USHORT wLength;
-    BYTE bCallName[16];
-    BYTE bName[16];
-    BYTE bReceiveTimeOut;
-    BYTE bSendTimeOut;
-    PSTR pPostFunction;
-    BYTE bAdapter;
-    BYTE bCompletionCode;
-    BYTE bReserve[14];
+    unsigned short wLength;
+    unsigned char bCallName[16];
+    unsigned char bName[16];
+    unsigned char bReceiveTimeOut;
+    unsigned char bSendTimeOut;
+    char* pPostFunction;
+    unsigned char bAdapter;
+    unsigned char bCompletionCode;
+    unsigned char bReserve[14];
 } _NETBIOS_NCB;
 
 typedef struct _tagNETBIOS_ADAPTER_STATUS {
-    BYTE bCardID[6];
-    BYTE bReleaseLevel;
-    BYTE bReserved1;
-    BYTE bTypeOfAdapter;
-    BYTE bOldOrNewParameters;
-    USHORT wReportingPeriodMinutes;
-    USHORT wFrameRejectReceivedCount;
-    USHORT wFrameRejectSentCount;
-    USHORT wReceivedDataFrameErrors;
-    USHORT wUnsuccessfulTransmissions;
-    LONG dwGoodTransmissions;
-    LONG dwGoodReceptions;
-    USHORT wRetransmissions;
-    USHORT wExhaustedResourceCount;
-    USHORT wT1TimerExpiredCount;
-    USHORT wTITimerExpiredCount;
-    BYTE bReserved2[4];
-    USHORT wAvailableNCBS;
-    USHORT wMaxNCBSConfigured;
-    USHORT wMaxNCBSPossible;
-    USHORT wBufferOrStationBusyCount;
-    USHORT wMaxDatagramSize;
-    USHORT wPendingSessions;
-    USHORT wMaxSessionsConfigured;
-    USHORT wMaxSessionsPossible;
-    USHORT wMaxFrameSize;
-    USHORT wNameCount;
+    unsigned char bCardID[6];
+    unsigned char bReleaseLevel;
+    unsigned char bReserved1;
+    unsigned char bTypeOfAdapter;
+    unsigned char bOldOrNewParameters;
+    unsigned short wReportingPeriodMinutes;
+    unsigned short wFrameRejectReceivedCount;
+    unsigned short wFrameRejectSentCount;
+    unsigned short wReceivedDataFrameErrors;
+    unsigned short wUnsuccessfulTransmissions;
+    long dwGoodTransmissions;
+    long dwGoodReceptions;
+    unsigned short wRetransmissions;
+    unsigned short wExhaustedResourceCount;
+    unsigned short wT1TimerExpiredCount;
+    unsigned short wTITimerExpiredCount;
+    unsigned char bReserved2[4];
+    unsigned short wAvailableNCBS;
+    unsigned short wMaxNCBSConfigured;
+    unsigned short wMaxNCBSPossible;
+    unsigned short wBufferOrStationBusyCount;
+    unsigned short wMaxDatagramSize;
+    unsigned short wPendingSessions;
+    unsigned short wMaxSessionsConfigured;
+    unsigned short wMaxSessionsPossible;
+    unsigned short wMaxFrameSize;
+    unsigned short wNameCount;
     struct {
-        BYTE bName[16];
-        BYTE bNameNumber;
-        BYTE bNameStatus;
+        unsigned char bName[16];
+        unsigned char bNameNumber;
+        unsigned char bNameStatus;
     } sNameTable[20];
 } _NETBIOS_ADAPTER_STATUS;
 
 typedef struct _tagNETBIOS_ELEMENT {
-    USHORT wFlags;
-    USHORT wOffset;
+    unsigned short wFlags;
+    unsigned short wOffset;
     _NETBIOS_NCB sNCB;
     _NETBIOS_NCB* pNCB;
-    PSTR pHeader;
-    USHORT wHSize;
+    char* pHeader;
+    unsigned short wHSize;
 } _NETBIOS_ELEMENT;
 
 typedef struct _tagNETBIOS_LOCAL_TARGET {
-    BYTE bNode[16];
+    unsigned char bNode[16];
 } _NETBIOS_LOCAL_TARGET;
 
 typedef struct _tagXFER_BLOCK_HEADER {
@@ -2663,6 +2662,9 @@ typedef struct tPipe_skid_adjustment {
 
 typedef struct tPipe_chunk {                                 // size: 0x58
     tChunk_subject_index subject_index;                      // @0x0
+#if defined(DETHRACE_REPLAY_DEBUG)
+    int chunk_magic1;
+#endif
     union {                                                  // size: 0x54
         tPipe_actor_rstyle_data actor_rstyle_data;           // @0x0
         tPipe_actor_translate_data actor_translate_data;     // @0x0
@@ -2703,7 +2705,7 @@ typedef struct tPipe_session {
     tPipe_chunk_type chunk_type;
     tU8 number_of_chunks;
 #if defined(DETHRACE_REPLAY_DEBUG)
-    int magic1;
+    int pipe_magic1;
 #endif
     tPipe_chunk chunks;
 } tPipe_session;
@@ -2795,40 +2797,40 @@ typedef struct _tag_sos_vds_struct {
 } _SOS_VDS_STRUCT;
 
 typedef struct _tag_sos_sample {
-    PSTR pSample;
-    PSTR pSampleCurrent;
-    PSTR pSampleLoop;
-    DWORD wLength;
-    DWORD wLoopLength;
-    DWORD wLoopEndLength;
-    DWORD wLoopStage;
-    DWORD wID;
-    DWORD wFlags;
-    DWORD wPriority;
-    DWORD hSample;
-    DWORD wVolume;
-    DWORD wLoopCount;
-    DWORD wRate;
-    DWORD wBitsPerSample;
-    DWORD wChannels;
-    DWORD wFormat;
-    DWORD wPanPosition;
-    DWORD wPanSpeed;
-    DWORD wPanStart;
-    DWORD wPanEnd;
-    DWORD wPanMode;
-    DWORD wTotalBytesProcessed;
+    char* pSample;
+    char* pSampleCurrent;
+    char* pSampleLoop;
+    unsigned long wLength;
+    unsigned long wLoopLength;
+    unsigned long wLoopEndLength;
+    unsigned long wLoopStage;
+    unsigned long wID;
+    unsigned long wFlags;
+    unsigned long wPriority;
+    unsigned long hSample;
+    unsigned long wVolume;
+    unsigned long wLoopCount;
+    unsigned long wRate;
+    unsigned long wBitsPerSample;
+    unsigned long wChannels;
+    unsigned long wFormat;
+    unsigned long wPanPosition;
+    unsigned long wPanSpeed;
+    unsigned long wPanStart;
+    unsigned long wPanEnd;
+    unsigned long wPanMode;
+    unsigned long wTotalBytesProcessed;
     void (*pfnSampleProcessed)(PSOSSAMPLE*);
     void (*pfnSampleDone)(PSOSSAMPLE*);
     void (*pfnSampleLoop)(PSOSSAMPLE*);
-    DWORD wSystem[16];
-    DWORD wUser[16];
+    unsigned long wSystem[16];
+    unsigned long wUser[16];
     PSOSSAMPLE* pLink;
     PSOSSAMPLE* pNext;
 } _SOS_SAMPLE;
 
 typedef struct _tagCAPABILITIES {
-    BYTE szDeviceName[32];
+    unsigned char szDeviceName[32];
     W32 wDeviceVersion;
     W32 wBitsPerSample;
     W32 wChannels;
@@ -2855,35 +2857,35 @@ typedef struct _SOS_HARDWARE {
 
 typedef struct _tag_sos_driver {
     W32 wFlags;
-    DWORD wDriverRate;
-    DWORD wDriverChannels;
-    DWORD wDriverBitsPerSample;
-    DWORD wDriverFormat;
-    DWORD wMixerChannels;
-    DWORD wDMACountRegister;
-    DWORD wDMAPosition;
-    DWORD wDMALastPosition;
-    DWORD wDMADistance;
-    PSTR pXFERPosition;
-    DWORD wXFERJumpAhead;
+    unsigned long wDriverRate;
+    unsigned long wDriverChannels;
+    unsigned long wDriverBitsPerSample;
+    unsigned long wDriverFormat;
+    unsigned long wMixerChannels;
+    unsigned long wDMACountRegister;
+    unsigned long wDMAPosition;
+    unsigned long wDMALastPosition;
+    unsigned long wDMADistance;
+    char* pXFERPosition;
+    unsigned long wXFERJumpAhead;
     _SOS_SAMPLE* pSampleList;
     void (*pfnPseudoDMAFunction)(void);
-    PSTR pDMABuffer;
-    PSTR pDMABufferEnd;
-    DWORD wDMABufferSize;
-    PSTR pMixingBuffer;
-    PSTR pMixingBufferEnd;
-    DWORD wMixingBufferSize;
-    DWORD wActiveChannels;
+    char* pDMABuffer;
+    char* pDMABufferEnd;
+    unsigned long wDMABufferSize;
+    char* pMixingBuffer;
+    char* pMixingBufferEnd;
+    unsigned long wMixingBufferSize;
+    unsigned long wActiveChannels;
     _SOS_SAMPLE* pSamples;
     _SOS_HARDWARE sHardware;
     _SOS_CAPABILITIES sCaps;
-    LPSTR lpDriverDS;
-    LPSTR lpDriverCS;
+    char* lpDriverDS;
+    char* lpDriverCS;
     W32 wSize;
-    DWORD dwLinear;
-    DWORD dwDMAPhysical;
-    LPSTR lpDMABuffer;
+    unsigned long dwLinear;
+    unsigned long dwDMAPhysical;
+    char* lpDMABuffer;
     W32 hMemory;
     W32 wDMARealSeg;
     W32 wID;
@@ -2891,14 +2893,14 @@ typedef struct _tag_sos_driver {
 } _SOS_DIGI_DRIVER;
 
 typedef struct _SOS_DRV_FILEHEADER {
-    BYTE szName[32];
+    unsigned char szName[32];
     W32 wDrivers;
     W32 lOffset;
     W32 lFileSize;
 } _SOS_DRV_FILEHEADER;
 
 typedef struct _SOS_DRV_DRIVERHEADER {
-    BYTE szName[32];
+    unsigned char szName[32];
     W32 lNextDriver;
     W32 wSize;
     W32 wDeviceID;
@@ -2907,32 +2909,31 @@ typedef struct _SOS_DRV_DRIVERHEADER {
 
 typedef struct _tag_sos_system {
     W32 wFlags;
-    BYTE szDriverPath[128];
-    BYTE szTempDriverPath[128];
+    unsigned char szDriverPath[128];
+    unsigned char szTempDriverPath[128];
     PSOSDIGIDRIVER pDriver[5];
     _SOS_VDS_STRUCT sVDS;
     _SOS_DRV_FILEHEADER sFileHeader;
     _SOS_DRV_DRIVERHEADER sDriverHeader;
-    PSTR(*pMemAllocFunction)
-    (DWORD);
-    void (*pMemFreeFunction)(PSTR, W32);
+    char* (*pMemAllocFunction)(unsigned long);
+    void (*pMemFreeFunction)(char*, W32);
 } _SOS_SYSTEM;
 
 typedef struct _tag_sos_det_system {
     W32 wFlags;
-    BYTE szDriverPath[128];
-    BYTE szTempDriverPath[128];
+    unsigned char szDriverPath[128];
+    unsigned char szTempDriverPath[128];
     _SOS_DRV_FILEHEADER sFileHeader;
     _SOS_DRV_DRIVERHEADER sDriverHeader;
     _SOS_CAPABILITIES sCaps;
     PSOSCAPABILITIES pCaps;
-    LPSTR lpBufferDS;
-    LPSTR lpBufferCS;
+    char* lpBufferDS;
+    char* lpBufferCS;
     W32 hFile;
-    DWORD dwDriverIndex;
+    unsigned long dwDriverIndex;
     W32 wDriverIndexCur;
     W32 hMemory;
-    DWORD dwLinear;
+    unsigned long dwLinear;
 } _SOS_DET_SYSTEM;
 
 typedef struct _tag_sos_timer_system {
@@ -2940,67 +2941,11 @@ typedef struct _tag_sos_timer_system {
     W32 wChipDivisor;
     void (*pfnEvent[16])(void);
     W32 wEventRate[16];
-    DWORD dwAdditiveFraction[16];
-    DWORD dwCurrentSummation[16];
+    unsigned long dwAdditiveFraction[16];
+    unsigned long dwCurrentSummation[16];
     W32 wMIDIEventSongHandle[16];
     W32 wMIDIActiveSongHandle;
 } _SOS_TIMER_SYSTEM;
-
-typedef struct SmackTag {
-    unsigned long Version;
-    unsigned long Width;
-    unsigned long Height;
-    unsigned long Frames;
-    unsigned long MSPerFrame;
-    unsigned long SmackerType;
-    unsigned long LargestInTrack[7];
-    unsigned long tablesize;
-    unsigned long codesize;
-    unsigned long absize;
-    unsigned long detailsize;
-    unsigned long typesize;
-    unsigned long TrackType[7];
-    unsigned long extra;
-    unsigned long NewPalette;
-    unsigned char Palette[772];
-    unsigned long PalType;
-    unsigned long FrameNum;
-    unsigned long FrameSize;
-    unsigned long SndSize;
-    unsigned long LastRectx;
-    unsigned long LastRecty;
-    unsigned long LastRectw;
-    unsigned long LastRecth;
-    unsigned long OpenFlags;
-    unsigned long LeftOfs;
-    unsigned long TopOfs;
-    unsigned long ReadError;
-    unsigned long addr32;
-} Smack;
-
-typedef struct SmackSumTag {
-    unsigned long TotalTime;
-    unsigned long MS100PerFrame;
-    unsigned long TotalOpenTime;
-    unsigned long TotalFrames;
-    unsigned long SkippedFrames;
-    unsigned long SoundSkips;
-    unsigned long TotalBlitTime;
-    unsigned long TotalReadTime;
-    unsigned long TotalDecompTime;
-    unsigned long TotalBackReadTime;
-    unsigned long TotalReadSpeed;
-    unsigned long SlowestFrameTime;
-    unsigned long Slowest2FrameTime;
-    unsigned long SlowestFrameNum;
-    unsigned long Slowest2FrameNum;
-    unsigned long AverageFrameSize;
-    unsigned long Highest1SecRate;
-    unsigned long Highest1SecFrame;
-    unsigned long HighestMemAmount;
-    unsigned long TotalExtraMemory;
-    unsigned long HighestExtraUsed;
-} SmackSum;
 
 #ifndef _WIN32
 typedef struct _heapinfo {
@@ -3937,7 +3882,7 @@ typedef struct BYTEREGS {
     unsigned short _4;
 } BYTEREGS;
 
-typedef struct REGS {
+typedef union REGS {
     DWORDREGS x;
     WORDREGS w;
     BYTEREGS h;
@@ -4133,7 +4078,7 @@ typedef struct tPD_net_game_info {
 } tPD_net_game_info;
 
 typedef struct tIPX_netnum {
-    BYTE bNetwork[4];
+    unsigned char bNetwork[4];
 } tIPX_netnum;
 
 typedef struct tRM_info {

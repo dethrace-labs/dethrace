@@ -61,28 +61,28 @@ int gPaused;
 tAction_replay_camera_type gAction_replay_camera_mode;
 
 // IDA: int __cdecl ReplayIsPaused()
-int ReplayIsPaused() {
+int ReplayIsPaused(void) {
     LOG_TRACE8("()");
 
     return gReplay_rate == 0.f;
 }
 
 // IDA: float __cdecl GetReplayRate()
-float GetReplayRate() {
+float GetReplayRate(void) {
     LOG_TRACE("()");
 
     return gReplay_rate;
 }
 
 // IDA: int __cdecl GetReplayDirection()
-int GetReplayDirection() {
+int GetReplayDirection(void) {
     LOG_TRACE("()");
 
     return gPlay_direction;
 }
 
 // IDA: void __cdecl StopSaving()
-void StopSaving() {
+void StopSaving(void) {
     LOG_TRACE("()");
 
     gSave_file = 0;
@@ -199,7 +199,7 @@ void ActualActionReplayHeadups(int pSpecial_zappy_bastard) {
 }
 
 // IDA: void __cdecl DoActionReplayPostSwap()
-void DoActionReplayPostSwap() {
+void DoActionReplayPostSwap(void) {
     LOG_TRACE("()");
 
     RemoveTransientBitmaps(1);
@@ -221,7 +221,7 @@ void DoZappyActionReplayHeadups(int pSpecial_zappy_bastard) {
 }
 
 // IDA: void __cdecl DoActionReplayHeadups()
-void DoActionReplayHeadups() {
+void DoActionReplayHeadups(void) {
     LOG_TRACE("()");
 
     ActualActionReplayHeadups(0);
@@ -277,7 +277,7 @@ void MoveReplayBuffer(tS32 pMove_amount) {
 }
 
 // IDA: void __cdecl MoveToEndOfReplay()
-void MoveToEndOfReplay() {
+void MoveToEndOfReplay(void) {
     float old_replay_rate;
     LOG_TRACE("()");
 
@@ -290,7 +290,7 @@ void MoveToEndOfReplay() {
 }
 
 // IDA: void __cdecl MoveToStartOfReplay()
-void MoveToStartOfReplay() {
+void MoveToStartOfReplay(void) {
     float old_replay_rate;
     LOG_TRACE("()");
 
@@ -303,13 +303,8 @@ void MoveToStartOfReplay() {
 }
 
 // IDA: void __cdecl ToggleReplay()
-void ToggleReplay() {
+void ToggleReplay(void) {
     LOG_TRACE("()");
-
-    if (!harness_game_config.enable_replay) {
-        NewTextHeadupSlot(4, 0, 1000, -4, "Action replay disabled (start dethrace with --enable-replay)");
-        return;
-    }
 
     if (!IsActionReplayAvailable()) {
         NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(37));
@@ -362,7 +357,7 @@ void ReverseSound(tS3_effect_tag pEffect_index, tS3_sound_tag pSound_tag) {
 }
 
 // IDA: int __cdecl FindUniqueFile()
-int FindUniqueFile() {
+int FindUniqueFile(void) {
     int index;
     FILE* f;
     tPath_name the_path;
@@ -567,7 +562,7 @@ void PollActionReplayControls(tU32 pFrame_period) {
 }
 
 // IDA: void __cdecl CheckReplayTurnOn()
-void CheckReplayTurnOn() {
+void CheckReplayTurnOn(void) {
     LOG_TRACE("()");
 
     if (!gAction_replay_mode) {
@@ -580,7 +575,7 @@ void CheckReplayTurnOn() {
 }
 
 // IDA: void __cdecl InitializeActionReplay()
-void InitializeActionReplay() {
+void InitializeActionReplay(void) {
     int i;
     LOG_TRACE("()");
 
@@ -600,7 +595,7 @@ void DoActionReplay(tU32 pFrame_period) {
 }
 
 // IDA: void __cdecl SynchronizeActionReplay()
-void SynchronizeActionReplay() {
+void SynchronizeActionReplay(void) {
     FILE* f;
     tPath_name the_path;
     static tU32 gLast_synch_time;

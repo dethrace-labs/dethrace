@@ -257,7 +257,7 @@ int DownClickRace(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int p
 }
 
 // IDA: void __cdecl StartChangeRace()
-void StartChangeRace() {
+void StartChangeRace(void) {
     LOG_TRACE("()");
 
     MoveRaceList(-3, gCurrent_race_index, 400);
@@ -324,7 +324,7 @@ int ChangeRace(int* pRace_index, int pNet_mode, tNet_sequence_type pNet_race_seq
 }
 
 // IDA: void __cdecl DoChangeRace()
-void DoChangeRace() {
+void DoChangeRace(void) {
     LOG_TRACE("()");
 
     if (ChangeRace(&gProgram_state.current_race_index, 0, eNet_sequence_sequential) != 0) {
@@ -394,7 +394,7 @@ void DrawCar(int pCurrent_choice, int pCurrent_mode) {
 }
 
 // IDA: void __cdecl SetCarFlic()
-void SetCarFlic() {
+void SetCarFlic(void) {
     LOG_TRACE("()");
 
     ChangePanelFlic(0,
@@ -644,14 +644,14 @@ int ChangeCar(int pNet_mode, int* pCar_index, tNet_game_details* pNet_game) {
 }
 
 // IDA: void __cdecl DoChangeCar()
-void DoChangeCar() {
+void DoChangeCar(void) {
     LOG_TRACE("()");
 
     ChangeCar(0, &gProgram_state.current_car.index, NULL);
 }
 
 // IDA: int __cdecl PartsShopRecommended()
-int PartsShopRecommended() {
+int PartsShopRecommended(void) {
     int running_cost;
     int i;
     int current_index;
@@ -662,8 +662,7 @@ int PartsShopRecommended() {
     counter = 0;
     for (i = 0; i < eParts_count; i++) {
         current_index = gProgram_state.current_car.power_up_levels[i];
-        if (current_index + 1 < gProgram_state.current_car.power_ups[i].number_of_parts &&
-            (gProgram_state.rank <= gProgram_state.current_car.power_ups[i].info[current_index + 1].rank_required || gProgram_state.game_completed)){
+        if (current_index + 1 < gProgram_state.current_car.power_ups[i].number_of_parts && (gProgram_state.rank <= gProgram_state.current_car.power_ups[i].info[current_index + 1].rank_required || gProgram_state.game_completed)) {
             running_cost += gProgram_state.current_car.power_ups[i].info[current_index + 1].prices[gProgram_state.skill_level];
             counter++;
         }
@@ -706,7 +705,7 @@ int BuyPart(int pCategory, int pIndex) {
 }
 
 // IDA: void __cdecl DoAutoParts()
-void DoAutoParts() {
+void DoAutoParts(void) {
     int i;
     int lowest_yet;
     int lowest_one;
@@ -722,8 +721,7 @@ void DoAutoParts() {
         lowest_yet = COUNT_OF(((tParts_spec*)NULL)->info);
         for (i = 0; i < eParts_count; i++) {
             current_level = gProgram_state.current_car.power_up_levels[i];
-            if (current_level + 1 < gProgram_state.current_car.power_ups[i].number_of_parts &&
-                (gProgram_state.rank <= gProgram_state.current_car.power_ups[i].info[current_level + 1].rank_required || gProgram_state.game_completed)) {
+            if (current_level + 1 < gProgram_state.current_car.power_ups[i].number_of_parts && (gProgram_state.rank <= gProgram_state.current_car.power_ups[i].info[current_level + 1].rank_required || gProgram_state.game_completed)) {
                 CalcPartPrice(i, current_level + 1, &price, &cost);
                 if (cost != 0 && cost <= gProgram_state.credits && current_level < lowest_yet) {
                     lowest_one = i;
@@ -741,7 +739,7 @@ void DoAutoParts() {
 }
 
 // IDA: void __cdecl DrawPartsLabel()
-void DrawPartsLabel() {
+void DrawPartsLabel(void) {
     LOG_TRACE("()");
 
     switch (gPart_category) {
@@ -780,7 +778,7 @@ void ErasePartsText(int pTotal_as_well) {
 }
 
 // IDA: void __cdecl DrawPartsText()
-void DrawPartsText() {
+void DrawPartsText(void) {
     int price;
     int cost;
     LOG_TRACE("()");
@@ -804,7 +802,7 @@ void DrawPartsText() {
 }
 
 // IDA: void __cdecl SetPartsImage()
-void SetPartsImage() {
+void SetPartsImage(void) {
     LOG_TRACE("()");
 
     ChangePanelFlic(0,
@@ -815,7 +813,7 @@ void SetPartsImage() {
 }
 
 // IDA: int __cdecl GetPartsMax()
-int GetPartsMax() {
+int GetPartsMax(void) {
     int i;
     LOG_TRACE("()");
 
@@ -831,19 +829,18 @@ int GetPartsMax() {
 }
 
 // IDA: void __cdecl CalcPartsIndex()
-void CalcPartsIndex() {
+void CalcPartsIndex(void) {
     int current_index;
     LOG_TRACE("()");
 
     gPart_index = gProgram_state.current_car.power_up_levels[gPart_category];
-    if (gPart_index + 1 < gProgram_state.current_car.power_ups[gPart_category].number_of_parts &&
-        (gProgram_state.rank <= gProgram_state.current_car.power_ups[gPart_category].info[gPart_index + 1].rank_required || gProgram_state.game_completed)) {
+    if (gPart_index + 1 < gProgram_state.current_car.power_ups[gPart_category].number_of_parts && (gProgram_state.rank <= gProgram_state.current_car.power_ups[gPart_category].info[gPart_index + 1].rank_required || gProgram_state.game_completed)) {
         gPart_index += 1;
     }
 }
 
 // IDA: void __cdecl DoExchangePart()
-void DoExchangePart() {
+void DoExchangePart(void) {
     int price;
     int cost;
     LOG_TRACE("()");
@@ -1023,7 +1020,7 @@ int PartsArrowsOff(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: void __cdecl StartPartsShop()
-void StartPartsShop() {
+void StartPartsShop(void) {
     LOG_TRACE("()");
 
     DrawPartsLabel();
@@ -1052,51 +1049,51 @@ void DrawPartsShop(int pCurrent_choice, int pCurrent_mode) {
 // IDA: void __usercall DoPartsShop(int pFade_away@<EAX>)
 void DoPartsShop(int pFade_away) {
     static tFlicette flicker_on[7] = {
-        {  43, { 225, 450 }, {  30,  72 } },
-        {  43, { 225, 450 }, {  60, 144 } },
-        {  43, { 225, 450 }, {  89, 214 } },
-        {  43, { 225, 450 }, { 152, 365 } },
-        {  43, {  85, 170 }, { 152, 365 } },
-        { 221, {  30,  60 }, {  79, 190 } },
-        { 221, {  30,  60 }, {  79, 190 } },
+        { 43, { 225, 450 }, { 30, 72 } },
+        { 43, { 225, 450 }, { 60, 144 } },
+        { 43, { 225, 450 }, { 89, 214 } },
+        { 43, { 225, 450 }, { 152, 365 } },
+        { 43, { 85, 170 }, { 152, 365 } },
+        { 221, { 30, 60 }, { 79, 190 } },
+        { 221, { 30, 60 }, { 79, 190 } },
     };
     static tFlicette flicker_off[7] = {
-        {  42, { 225, 450 }, {  30,  72 } },
-        {  42, { 225, 450 }, {  60, 144 } },
-        {  42, { 225, 450 }, {  89, 214 } },
-        {  42, { 225, 450 }, { 152, 365 } },
-        {  42, {  85, 170 }, { 152, 365 } },
-        { 220, {  30,  60 }, {  79, 190 } },
-        { 220, {  30,  60 }, {  79, 190 } },
+        { 42, { 225, 450 }, { 30, 72 } },
+        { 42, { 225, 450 }, { 60, 144 } },
+        { 42, { 225, 450 }, { 89, 214 } },
+        { 42, { 225, 450 }, { 152, 365 } },
+        { 42, { 85, 170 }, { 152, 365 } },
+        { 220, { 30, 60 }, { 79, 190 } },
+        { 220, { 30, 60 }, { 79, 190 } },
     };
     static tFlicette push[7] = {
-        { 254, { 225, 450 }, {  30,  72 } },
-        { 255, { 225, 450 }, {  60, 144 } },
-        { 256, { 225, 450 }, {  89, 214 } },
+        { 254, { 225, 450 }, { 30, 72 } },
+        { 255, { 225, 450 }, { 60, 144 } },
+        { 256, { 225, 450 }, { 89, 214 } },
         { 154, { 225, 450 }, { 152, 365 } },
-        { 260, {  85, 170 }, { 152, 365 } },
-        { 222, {  30,  60 }, {  79, 190 } },
-        { 225, {  30,  60 }, { 120, 288 } },
+        { 260, { 85, 170 }, { 152, 365 } },
+        { 222, { 30, 60 }, { 79, 190 } },
+        { 225, { 30, 60 }, { 120, 288 } },
     };
     static tMouse_area mouse_areas[7] = {
-        { { 225, 450 }, {  30,  72 }, { 288, 576 }, {  50, 120 },   0,   0,   0, NULL },
-        { { 225, 450 }, {  60, 144 }, { 288, 576 }, {  80, 192 },   1,   0,   0, NULL },
-        { { 225, 450 }, {  89, 214 }, { 288, 576 }, { 109, 262 },   2,   0,   0, NULL },
-        { { 225, 450 }, { 152, 365 }, { 288, 576 }, { 172, 413 },   3,   0,   0, NULL },
-        { {  85, 170 }, { 152, 365 }, { 148, 296 }, { 172, 413 },   4,   1,   0, NULL },
-        { {  30,  60 }, {  79, 190 }, {  45,  90 }, { 106, 254 },  -1,   1,   0, UpClickPart },
-        { {  30,  60 }, { 120, 288 }, {  45,  90 }, { 147, 353 },  -1,   1,   0, DownClickPart },
+        { { 225, 450 }, { 30, 72 }, { 288, 576 }, { 50, 120 }, 0, 0, 0, NULL },
+        { { 225, 450 }, { 60, 144 }, { 288, 576 }, { 80, 192 }, 1, 0, 0, NULL },
+        { { 225, 450 }, { 89, 214 }, { 288, 576 }, { 109, 262 }, 2, 0, 0, NULL },
+        { { 225, 450 }, { 152, 365 }, { 288, 576 }, { 172, 413 }, 3, 0, 0, NULL },
+        { { 85, 170 }, { 152, 365 }, { 148, 296 }, { 172, 413 }, 4, 1, 0, NULL },
+        { { 30, 60 }, { 79, 190 }, { 45, 90 }, { 106, 254 }, -1, 1, 0, UpClickPart },
+        { { 30, 60 }, { 120, 288 }, { 45, 90 }, { 147, 353 }, -1, 1, 0, DownClickPart },
     };
     static tInterface_spec interface_spec = {
         0, 250, 190, 0, 0, 0, 6,
-        {1, 0}, {4, -1}, {4, 0}, {4, 3}, { PartsArrowsOn, PartsArrowsOff },
-        {1, 0}, {4, -1}, {4, 0}, {4, 3}, { PartsArrowsOn, PartsArrowsOff },
-        {-1, -1}, {-1, 0}, {0, 4}, {3, 4}, { NULL, UpPart },
-        {-1, -1}, {1, 0}, {0, 4}, {3, 4}, {NULL, DownPart},
-        {1, 1}, {PartsShopGoAhead, PartsShopGoAhead},
-        {1, 1}, {NULL, NULL},
+        { 1, 0 }, { 4, -1 }, { 4, 0 }, { 4, 3 }, { PartsArrowsOn, PartsArrowsOff },
+        { 1, 0 }, { 4, -1 }, { 4, 0 }, { 4, 3 }, { PartsArrowsOn, PartsArrowsOff },
+        { -1, -1 }, { -1, 0 }, { 0, 4 }, { 3, 4 }, { NULL, UpPart },
+        { -1, -1 }, { 1, 0 }, { 0, 4 }, { 3, 4 }, { NULL, DownPart },
+        { 1, 1 }, { PartsShopGoAhead, PartsShopGoAhead },
+        { 1, 1 }, { NULL, NULL },
         NULL, DrawPartsShop, 0, NULL, StartPartsShop, DonePartsShop,
-        0, {0, 0}, NULL, 3, 1,
+        0, { 0, 0 }, NULL, 3, 1,
         COUNT_OF(flicker_on),
         flicker_on,
         flicker_off,
@@ -1138,37 +1135,37 @@ int AutoPartsDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
 }
 
 // IDA: tSO_result __cdecl DoAutoPartsShop()
-tSO_result DoAutoPartsShop() {
+tSO_result DoAutoPartsShop(void) {
     static tFlicette flicker_on[3] = {
-        {  43, {  84, 168 }, {  67, 161 } },
-        {  43, {  84, 168 }, {  95, 228 } },
-        {  43, {  84, 168 }, { 124, 298 } },
+        { 43, { 84, 168 }, { 67, 161 } },
+        { 43, { 84, 168 }, { 95, 228 } },
+        { 43, { 84, 168 }, { 124, 298 } },
     };
     static tFlicette flicker_off[3] = {
-        {  42, {  84, 168 }, {  67, 161 } },
-        {  42, {  84, 168 }, {  95, 228 } },
-        {  42, {  84, 168 }, { 124, 298 } },
+        { 42, { 84, 168 }, { 67, 161 } },
+        { 42, { 84, 168 }, { 95, 228 } },
+        { 42, { 84, 168 }, { 124, 298 } },
     };
     static tFlicette push[3] = {
-        { 284, {  84, 168 }, {  67, 161 } },
-        { 284, {  84, 168 }, {  95, 228 } },
-        { 284, {  84, 168 }, { 124, 298 } },
+        { 284, { 84, 168 }, { 67, 161 } },
+        { 284, { 84, 168 }, { 95, 228 } },
+        { 284, { 84, 168 }, { 124, 298 } },
     };
     static tMouse_area mouse_areas[3] = {
-        { {  84, 168 }, {  32,  77 }, { 147, 294 }, {  87, 209 },   0,   0,   0, NULL },
-        { {  84, 168 }, {  95, 228 }, { 147, 294 }, { 115, 276 },   1,   0,   0, NULL },
-        { {  84, 168 }, { 124, 298 }, { 147, 294 }, { 144, 346 },   2,   0,   0, NULL },
+        { { 84, 168 }, { 32, 77 }, { 147, 294 }, { 87, 209 }, 0, 0, 0, NULL },
+        { { 84, 168 }, { 95, 228 }, { 147, 294 }, { 115, 276 }, 1, 0, 0, NULL },
+        { { 84, 168 }, { 124, 298 }, { 147, 294 }, { 144, 346 }, 2, 0, 0, NULL },
     };
     static tInterface_spec interface_spec = {
         0, 280, 0, 0, 0, 0, 6,
-        {-1, 0}, {0, 0}, {0, 0}, {0, 0}, {NULL, NULL},
-        {-1, 0}, {0, 0}, {0, 0}, {0, 0}, {NULL, NULL},
-        {-1, -1}, {-1, 0}, {0, 0}, {2, 0}, {NULL, NULL},
-        {-1, -1}, {1, 0}, {0, 0}, {2, 0}, {NULL, NULL},
-        {1, 1}, {NULL, NULL},
-        {1, 1}, {NULL, NULL},
+        { -1, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { NULL, NULL },
+        { -1, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { NULL, NULL },
+        { -1, -1 }, { -1, 0 }, { 0, 0 }, { 2, 0 }, { NULL, NULL },
+        { -1, -1 }, { 1, 0 }, { 0, 0 }, { 2, 0 }, { NULL, NULL },
+        { 1, 1 }, { NULL, NULL },
+        { 1, 1 }, { NULL, NULL },
         NULL, NULL, 0, NULL, NULL, AutoPartsDone, 0,
-        {0, 0}, NULL, -1, 1,
+        { 0, 0 }, NULL, -1, 1,
         COUNT_OF(flicker_on), flicker_on, flicker_off, push,
         COUNT_OF(mouse_areas), mouse_areas,
         0, NULL
@@ -1179,7 +1176,7 @@ tSO_result DoAutoPartsShop() {
     gProgram_state.dont_load = 1;
     result = DoInterfaceScreen(&interface_spec, 0, gProgram_state.auto_parts_reply);
     gProgram_state.dont_load = 0;
-    if (result  < 0) {
+    if (result < 0) {
         RunFlic(281);
         return eSO_main_menu_invoked;
     } else {
@@ -1199,7 +1196,7 @@ tSO_result DoAutoPartsShop() {
 }
 
 // IDA: void __cdecl SetOpponentFlic()
-void SetOpponentFlic() {
+void SetOpponentFlic(void) {
     LOG_TRACE("()");
     ChangePanelFlic(0,
         gOpponents[gCurrent_race.opponent_list[gOpponent_index].index].mug_shot_image_data,
@@ -1207,7 +1204,7 @@ void SetOpponentFlic() {
 }
 
 // IDA: void __cdecl DrawSceneyMappyInfoVieweyThing()
-void DrawSceneyMappyInfoVieweyThing() {
+void DrawSceneyMappyInfoVieweyThing(void) {
     LOG_TRACE("()");
 
     RemoveTransientBitmaps(1);
@@ -1224,7 +1221,7 @@ void DrawSceneyMappyInfoVieweyThing() {
 }
 
 // IDA: void __cdecl DismissSceneyMappyInfoVieweyThing()
-void DismissSceneyMappyInfoVieweyThing() {
+void DismissSceneyMappyInfoVieweyThing(void) {
     LOG_TRACE("()");
 
     RemoveTransientBitmaps(1);
@@ -1366,7 +1363,7 @@ int DownClickOpp(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY
 }
 
 // IDA: void __cdecl SelectRaceStart()
-void SelectRaceStart() {
+void SelectRaceStart(void) {
     LOG_TRACE("()");
 
     DrawSceneyMappyInfoVieweyThing();
@@ -1374,7 +1371,7 @@ void SelectRaceStart() {
 }
 
 // IDA: int __cdecl SuggestRace()
-int SuggestRace() {
+int SuggestRace(void) {
     int i;
     int least_done;
     int suggested_so_far;
@@ -2000,7 +1997,7 @@ void DoGridTransition(int pFirst_index, int pSecond_index) {
 }
 
 // IDA: void __cdecl ChallengeStart()
-void ChallengeStart() {
+void ChallengeStart(void) {
     br_pixelmap* the_map;
     int i;
     int j;
@@ -2106,7 +2103,7 @@ int ChallengeDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
 }
 
 // IDA: void __cdecl DoChallengeScreen()
-void DoChallengeScreen() {
+void DoChallengeScreen(void) {
     static tFlicette flicker_on[2] = { { 43, { 54, 108 }, { 157, 377 } }, { 43, { 218, 436 }, { 157, 377 } } };
     static tFlicette flicker_off[2] = { { 42, { 54, 108 }, { 157, 377 } }, { 42, { 218, 436 }, { 157, 377 } } };
     static tFlicette push[2] = { { 304, { 54, 108 }, { 157, 377 } }, { 305, { 218, 436 }, { 157, 377 } } };
@@ -2196,7 +2193,7 @@ int GridDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped
 }
 
 // IDA: void __cdecl GridStart()
-void GridStart() {
+void GridStart(void) {
     LOG_TRACE("()");
 
     MoveGrid(-2, CalcGridOffset(gOur_starting_position), 400);
@@ -2328,7 +2325,7 @@ int SortGridFunction(const void* pFirst_one, const void* pSecond_one) {
 }
 
 // IDA: void __cdecl SortOpponents()
-void SortOpponents() {
+void SortOpponents(void) {
     int i;
     LOG_TRACE("()");
 
@@ -2350,7 +2347,7 @@ void SortOpponents() {
 }
 
 // IDA: tSO_result __cdecl DoGridPosition()
-tSO_result DoGridPosition() {
+tSO_result DoGridPosition(void) {
     static tFlicette flicker_on[3] = {
         { 43, { 240, 480 }, { 158, 379 } },
         { 293, { 56, 112 }, { 151, 362 } },
@@ -2496,7 +2493,7 @@ tSO_result DoGridPosition() {
 }
 
 // IDA: void __cdecl CheckPlayersAreResponding()
-void CheckPlayersAreResponding() {
+void CheckPlayersAreResponding(void) {
     int i;
     tU32 time;
     tNet_message* message;
@@ -2516,7 +2513,7 @@ void CheckPlayersAreResponding() {
 }
 
 // IDA: void __cdecl NetSynchStartStart()
-void NetSynchStartStart() {
+void NetSynchStartStart(void) {
     LOG_TRACE("()");
 
     CheckPlayersAreResponding();
@@ -2756,7 +2753,7 @@ tSO_result NetSynchRaceStart2(tNet_synch_mode pMode) {
 }
 
 // IDA: tSO_result __cdecl NetSynchRaceStart()
-tSO_result NetSynchRaceStart() {
+tSO_result NetSynchRaceStart(void) {
     LOG_TRACE("()");
 
     SuspendPendingFlic();

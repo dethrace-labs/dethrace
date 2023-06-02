@@ -16,18 +16,19 @@
 #include "intrface.h"
 #include "loading.h"
 #include "network.h"
+#include "pd/sys.h"
 #include "racestrt.h"
 #include "sound.h"
 #include "structur.h"
 #include "utility.h"
 #include "world.h"
-#include "pd/sys.h"
 #include <stdlib.h>
 #include <string.h>
 
 tU8* gFrank_flic_data;
 tU8* gAnne_flic_data;
 int gNet_storage_allocated;
+// clang-format off
 tRadio_bastards gRadio_bastards__newgame[11] = { // suffix added to avoid duplicate symbol
     { 1,  32, 0, { 245,   0,   0,   0,   0, }, },
     { 1,  43, 0, { 245,   0,   0,   0,   0, }, },
@@ -41,6 +42,7 @@ tRadio_bastards gRadio_bastards__newgame[11] = { // suffix added to avoid duplic
     { 4, 130, 0, { 115, 150, 183, 215,   0, }, },
     { 5, 141, 0, { 142, 160, 182, 204, 230, }, },
 };
+// clang-format on
 char _name1[] = "xxxxxxxx.TXT"; // keep compiler happy
 char _name2[] = "yyyyyyyy.TXT"; // keep compiler happy
 char* gBasic_car_names[2] = { _name1, _name2 };
@@ -48,8 +50,8 @@ tNet_game_options gNet_settings[8];
 tJoinable_game gGames_to_join[6];
 tNet_game_options* gOptions;
 int gNet_target[7];
-int gLast_graph_sel__newgame; // suffix added to avoid duplicate symbol
-tInterface_spec* gThe_interface_spec__newgame; // suffix added to avoid duplicate symbol
+int gLast_graph_sel__newgame;                   // suffix added to avoid duplicate symbol
+tInterface_spec* gThe_interface_spec__newgame;  // suffix added to avoid duplicate symbol
 tNet_sequence_type gNet_race_sequence__newgame; // suffix added to avoid duplicate symbol
 tNet_game_type gLast_game_type;
 int gCurrent_net_game_count;
@@ -63,7 +65,7 @@ int gRace_index;
 int gRadio_selected;
 
 // IDA: void __cdecl StartRollingPlayerNamesIn()
-void StartRollingPlayerNamesIn() {
+void StartRollingPlayerNamesIn(void) {
     int i;
     LOG_TRACE("()");
 
@@ -74,7 +76,7 @@ void StartRollingPlayerNamesIn() {
 }
 
 // IDA: void __cdecl FrankAnneStart1()
-void FrankAnneStart1() {
+void FrankAnneStart1(void) {
     LOG_TRACE("()");
 
     StartRollingPlayerNamesIn();
@@ -105,7 +107,7 @@ void FrankAnneStart1() {
 }
 
 // IDA: void __cdecl FrankAnneStart2()
-void FrankAnneStart2() {
+void FrankAnneStart2(void) {
     LOG_TRACE("()");
 
     ChangePanelFlic(0, gFrank_flic_data, gFrank_flic_data_length);
@@ -160,7 +162,7 @@ void FrankAnneDraw(int pCurrent_choice, int pCurrent_mode) {
 }
 
 // IDA: int __cdecl FrankieOrAnnie()
-int FrankieOrAnnie() {
+int FrankieOrAnnie(void) {
     static tFlicette flicker_on[3] = {
         { 83, { 61, 122 }, { 52, 125 } },
         { 83, { 184, 398 }, { 52, 125 } },
@@ -186,56 +188,56 @@ int FrankieOrAnnie() {
         { { 178, 356 }, { 132, 317 }, { 295, 590 }, { 154, 370 } }
     };
     static tInterface_spec interface_spec = {
-        0, // initial_imode
-        80, // first_opening_flic
-        0, // second_opening_flic
-        81, // end_flic_go_ahead
-        81, // end_flic_escaped
-        81, // end_flic_otherwise
-        0, // flic_bunch_to_load
-        { -1, -1 }, // move_left_new_mode
-        { -1, 0 }, // move_left_delta
-        { 0, 2 }, // move_left_min
-        { 1, 2 }, // move_left_max
-        { NULL, NULL }, // move_left_proc
-        { -1, -1 }, // move_right_new_mode
-        { 1, 0 }, // move_right_delta
-        { 0, 2 }, // move_right_min
-        { 1, 2 }, // move_right_max
-        { NULL, NULL }, // move_right_proc
-        { 1, 0 }, // move_up_new_mode
-        { -2, -1 }, // move_up_delta
-        { 2, 1 }, // move_up_min
-        { 2, 1 }, // move_up_max
-        { NULL, NULL }, // move_up_proc
-        { 1, 0 }, // move_down_new_mode
-        { 2, -1 }, // move_down_delta
-        { 2, 1 }, // move_down_min
-        { 2, 1 }, // move_down_max
-        { NULL, NULL }, // move_down_proc
-        { 1, 1 }, // go_ahead_allowed
-        { NULL, NULL }, // go_ahead_proc
-        { 1, 1 }, // escape_allowed
-        { NULL, NULL }, // escape_proc
-        NULL, // exit_proc
-        FrankAnneDraw, // draw_proc
-        0, // time_out
+        0,               // initial_imode
+        80,              // first_opening_flic
+        0,               // second_opening_flic
+        81,              // end_flic_go_ahead
+        81,              // end_flic_escaped
+        81,              // end_flic_otherwise
+        0,               // flic_bunch_to_load
+        { -1, -1 },      // move_left_new_mode
+        { -1, 0 },       // move_left_delta
+        { 0, 2 },        // move_left_min
+        { 1, 2 },        // move_left_max
+        { NULL, NULL },  // move_left_proc
+        { -1, -1 },      // move_right_new_mode
+        { 1, 0 },        // move_right_delta
+        { 0, 2 },        // move_right_min
+        { 1, 2 },        // move_right_max
+        { NULL, NULL },  // move_right_proc
+        { 1, 0 },        // move_up_new_mode
+        { -2, -1 },      // move_up_delta
+        { 2, 1 },        // move_up_min
+        { 2, 1 },        // move_up_max
+        { NULL, NULL },  // move_up_proc
+        { 1, 0 },        // move_down_new_mode
+        { 2, -1 },       // move_down_delta
+        { 2, 1 },        // move_down_min
+        { 2, 1 },        // move_down_max
+        { NULL, NULL },  // move_down_proc
+        { 1, 1 },        // go_ahead_allowed
+        { NULL, NULL },  // go_ahead_proc
+        { 1, 1 },        // escape_allowed
+        { NULL, NULL },  // escape_proc
+        NULL,            // exit_proc
+        FrankAnneDraw,   // draw_proc
+        0,               // time_out
         FrankAnneStart1, // start_proc1
         FrankAnneStart2, // start_proc2
-        FrankAnneDone, // done_proc
-        1, // font_needed
-        { 1, 0 }, // typeable
-        GetPlayerName, // get_original_string
-        2, // escape_code
-        1, // dont_save_or_load
-        3, // number_of_button_flics
-        flicker_on, // flicker_on_flics
-        flicker_off, // flicker_off_flics
-        push, // pushed_flics
-        3, // number_of_mouse_areas
-        mouse_areas, // mouse_areas
-        2, // number_of_recopy_areas
-        recopy_areas // recopy_areas
+        FrankAnneDone,   // done_proc
+        1,               // font_needed
+        { 1, 0 },        // typeable
+        GetPlayerName,   // get_original_string
+        2,               // escape_code
+        1,               // dont_save_or_load
+        3,               // number_of_button_flics
+        flicker_on,      // flicker_on_flics
+        flicker_off,     // flicker_off_flics
+        push,            // pushed_flics
+        3,               // number_of_mouse_areas
+        mouse_areas,     // mouse_areas
+        2,               // number_of_recopy_areas
+        recopy_areas     // recopy_areas
     };
 
     int result;
@@ -250,7 +252,7 @@ int FrankieOrAnnie() {
 }
 
 // IDA: int __cdecl SelectSkillLevel()
-int SelectSkillLevel() {
+int SelectSkillLevel(void) {
     static tFlicette flicker_on[4] = {
         { 116, { 38, 76 }, { 55, 132 } },
         { 119, { 36, 72 }, { 83, 199 } },
@@ -279,56 +281,56 @@ int SelectSkillLevel() {
     };
 
     static tInterface_spec interface_spec = {
-        0, // initial_imode
-        110, // first_opening_flic
-        0, // second_opening_flic
-        -1, // end_flic_go_ahead
-        111, // end_flic_escaped
-        -1, // end_flic_otherwise
-        0, // flic_bunch_to_load
-        { -1, 0 }, // move_left_new_mode
-        { 0, 0 }, // move_left_delta
-        { 0, 0 }, // move_left_min
-        { 0, 0 }, // move_left_max
+        0,              // initial_imode
+        110,            // first_opening_flic
+        0,              // second_opening_flic
+        -1,             // end_flic_go_ahead
+        111,            // end_flic_escaped
+        -1,             // end_flic_otherwise
+        0,              // flic_bunch_to_load
+        { -1, 0 },      // move_left_new_mode
+        { 0, 0 },       // move_left_delta
+        { 0, 0 },       // move_left_min
+        { 0, 0 },       // move_left_max
         { NULL, NULL }, // move_left_proc
-        { -1, 0 }, // move_right_new_mode
-        { 0, 0 }, // move_right_delta
-        { 0, 0 }, // move_right_min
-        { 0, 0 }, // move_right_max
+        { -1, 0 },      // move_right_new_mode
+        { 0, 0 },       // move_right_delta
+        { 0, 0 },       // move_right_min
+        { 0, 0 },       // move_right_max
         { NULL, NULL }, // move_right_proc
-        { -1, 0 }, // move_up_new_mode
-        { -1, 0 }, // move_up_delta
-        { 0, 0 }, // move_up_min
-        { 3, 0 }, // move_up_max
+        { -1, 0 },      // move_up_new_mode
+        { -1, 0 },      // move_up_delta
+        { 0, 0 },       // move_up_min
+        { 3, 0 },       // move_up_max
         { NULL, NULL }, // move_up_proc
-        { -1, 0 }, // move_down_new_mode
-        { 1, 0 }, // move_down_delta
-        { 0, 0 }, // move_down_min
-        { 3, 0 }, // move_down_max
+        { -1, 0 },      // move_down_new_mode
+        { 1, 0 },       // move_down_delta
+        { 0, 0 },       // move_down_min
+        { 3, 0 },       // move_down_max
         { NULL, NULL }, // move_down_proc
-        { 1, 1 }, // go_ahead_allowed
+        { 1, 1 },       // go_ahead_allowed
         { NULL, NULL }, // go_ahead_proc
-        { 1, 1 }, // escape_allowed
+        { 1, 1 },       // escape_allowed
         { NULL, NULL }, // escape_proc
-        NULL, // exit_proc
-        NULL, // draw_proc
-        0u, // time_out
-        NULL, // start_proc1
-        NULL, // start_proc2
-        NULL, // done_proc
-        0, // font_needed
-        { 0, 0 }, // typeable
-        NULL, // get_original_string
-        3, // escape_code
-        1, // dont_save_or_load
-        4, // number_of_button_flics
-        flicker_on, // flicker_on_flics
-        flicker_off, // flicker_off_flics
-        push, // pushed_flics
-        4, // number_of_mouse_areas
-        mouse_areas, // mouse_areas
-        0, // number_of_recopy_areas
-        NULL // recopy_areas
+        NULL,           // exit_proc
+        NULL,           // draw_proc
+        0u,             // time_out
+        NULL,           // start_proc1
+        NULL,           // start_proc2
+        NULL,           // done_proc
+        0,              // font_needed
+        { 0, 0 },       // typeable
+        NULL,           // get_original_string
+        3,              // escape_code
+        1,              // dont_save_or_load
+        4,              // number_of_button_flics
+        flicker_on,     // flicker_on_flics
+        flicker_off,    // flicker_off_flics
+        push,           // pushed_flics
+        4,              // number_of_mouse_areas
+        mouse_areas,    // mouse_areas
+        0,              // number_of_recopy_areas
+        NULL            // recopy_areas
     };
 
     int result;
@@ -343,7 +345,7 @@ int SelectSkillLevel() {
 }
 
 // IDA: int __cdecl DoOnePlayerStart()
-int DoOnePlayerStart() {
+int DoOnePlayerStart(void) {
     int merrily_looping;
     tProgram_state saved_state;
     LOG_TRACE("()");
@@ -529,7 +531,7 @@ void DrawGames(int pCurrent_choice, int pCurrent_mode) {
     BrPixelmapLine(gBack_screen,
         gCurrent_graf_data->joinable_games_sel_left,
         gCurrent_graf_data->joinable_games_y + gFonts[12].height + 1 - (TranslationMode() ? 2 : 0) - gCurrent_graf_data->joinable_games_y_pitch,
-        gCurrent_graf_data->joinable_games_sel_right - 1, 
+        gCurrent_graf_data->joinable_games_sel_right - 1,
         gCurrent_graf_data->joinable_games_y + gFonts[12].height + 1 - (TranslationMode() ? 2 : 0) - gCurrent_graf_data->joinable_games_y_pitch,
         6);
     for (i = 0; i < COUNT_OF(gGames_to_join); i++) {
@@ -543,15 +545,15 @@ void DrawGames(int pCurrent_choice, int pCurrent_mode) {
             DisposeJoinableGame(i);
             continue;
         }
-        if (gMouse_in_use 
-                && pCurrent_mode != 0
-                && gGames_to_join[i].game != NULL
-                && (gGames_to_join[i].game->options.open_game || gGames_to_join[i].game->no_races_yet)
-                && gGames_to_join[i].game->num_players <= 5
-                && x_coord >= gCurrent_graf_data->joinable_games_sel_left
-                && x_coord <= gCurrent_graf_data->joinable_games_sel_right
-                && y_coord >= (gCurrent_graf_data->joinable_games_y + gCurrent_graf_data->joinable_games_sel_top_marg + current_index * gCurrent_graf_data->joinable_games_y_pitch)
-                && y_coord <= (gCurrent_graf_data->joinable_games_y + gCurrent_graf_data->joinable_games_sel_bot_marg + current_index * gCurrent_graf_data->joinable_games_y_pitch - 1)) {
+        if (gMouse_in_use
+            && pCurrent_mode != 0
+            && gGames_to_join[i].game != NULL
+            && (gGames_to_join[i].game->options.open_game || gGames_to_join[i].game->no_races_yet)
+            && gGames_to_join[i].game->num_players <= 5
+            && x_coord >= gCurrent_graf_data->joinable_games_sel_left
+            && x_coord <= gCurrent_graf_data->joinable_games_sel_right
+            && y_coord >= (gCurrent_graf_data->joinable_games_y + gCurrent_graf_data->joinable_games_sel_top_marg + current_index * gCurrent_graf_data->joinable_games_y_pitch)
+            && y_coord <= (gCurrent_graf_data->joinable_games_y + gCurrent_graf_data->joinable_games_sel_bot_marg + current_index * gCurrent_graf_data->joinable_games_y_pitch - 1)) {
             gLast_graph_sel__newgame = i;
         }
         if (i == gLast_graph_sel__newgame) {
@@ -580,10 +582,7 @@ void DrawGames(int pCurrent_choice, int pCurrent_mode) {
         current_index++;
     }
 
-     if (current_index != 0 && (gCurrent_game_selection == 0 || 
-            (gLast_graph_sel__newgame >= 0 && (gGames_to_join[gLast_graph_sel__newgame].game == NULL
-                || (!gGames_to_join[gLast_graph_sel__newgame].game->options.open_game && !gGames_to_join[gLast_graph_sel__newgame].game->no_races_yet)
-                || gGames_to_join[gLast_graph_sel__newgame].game->num_players > 5)))) {
+    if (current_index != 0 && (gCurrent_game_selection == 0 || (gLast_graph_sel__newgame >= 0 && (gGames_to_join[gLast_graph_sel__newgame].game == NULL || (!gGames_to_join[gLast_graph_sel__newgame].game->options.open_game && !gGames_to_join[gLast_graph_sel__newgame].game->no_races_yet) || gGames_to_join[gLast_graph_sel__newgame].game->num_players > 5)))) {
         gCurrent_game_selection = 1;
         for (i = 0; i < COUNT_OF(gGames_to_join); i++) {
             if (gGames_to_join[i].game != NULL && (gGames_to_join[i].game->options.open_game || gGames_to_join[i].game->no_races_yet) && gGames_to_join[i].game->num_players <= 5) {
@@ -597,17 +596,17 @@ void DrawGames(int pCurrent_choice, int pCurrent_mode) {
 #if defined(DETHRACE_FIX_BUGS)
         (gLast_graph_sel__newgame >= 0) &&
 #endif
-            (current_index == 0
-                || gGames_to_join[gLast_graph_sel__newgame].game == NULL
-                || (!gGames_to_join[gLast_graph_sel__newgame].game->options.open_game && !gGames_to_join[gLast_graph_sel__newgame].game->no_races_yet)
-                || gGames_to_join[gLast_graph_sel__newgame].game->num_players > 5)) {
+        (current_index == 0
+            || gGames_to_join[gLast_graph_sel__newgame].game == NULL
+            || (!gGames_to_join[gLast_graph_sel__newgame].game->options.open_game && !gGames_to_join[gLast_graph_sel__newgame].game->no_races_yet)
+            || gGames_to_join[gLast_graph_sel__newgame].game->num_players > 5)) {
         gLast_graph_sel__newgame = -1;
         ChangeSelectionTo(0, 0);
     }
 }
 
 // IDA: void __cdecl InitGamesToJoin()
-void InitGamesToJoin() {
+void InitGamesToJoin(void) {
     int i;
     LOG_TRACE("()");
 
@@ -665,7 +664,7 @@ void AddToJoinList(tNet_game_details* pGame) {
 }
 
 // IDA: void __cdecl NewNetStart1()
-void NewNetStart1() {
+void NewNetStart1(void) {
     LOG_TRACE("()");
 
     gTyping = 1;
@@ -675,7 +674,7 @@ void NewNetStart1() {
 }
 
 // IDA: void __cdecl NewNetStart2()
-void NewNetStart2() {
+void NewNetStart2(void) {
     LOG_TRACE("()");
 
     gTyping_slot = 0;
@@ -710,37 +709,81 @@ int NewNetGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 // IDA: tJoin_or_host_result __usercall JoinOrHostGame@<EAX>(tNet_game_details **pGame_to_join@<EAX>)
 tJoin_or_host_result JoinOrHostGame(tNet_game_details** pGame_to_join) {
     static tFlicette flicker_on[2] = {
-        {  43, {  41, 122 }, { 164, 370 } },
-        {  43, { 230, 440 }, { 164, 370 } },
+        { 43, { 41, 122 }, { 164, 370 } },
+        { 43, { 230, 440 }, { 164, 370 } },
     };
     static tFlicette flicker_off[2] = {
-        {  42, {  41, 122 }, { 164, 370 } },
-        {  42, { 230, 440 }, { 164, 370 } },
+        { 42, { 41, 122 }, { 164, 370 } },
+        { 42, { 230, 440 }, { 164, 370 } },
     };
     static tFlicette push[2] = {
-        {  90, {  41, 122 }, { 164, 370 } },
-        {  45, { 230, 440 }, { 164, 370 } },
+        { 90, { 41, 122 }, { 164, 370 } },
+        { 45, { 230, 440 }, { 164, 370 } },
     };
     static tMouse_area mouse_areas[3] = {
-        { {  41, 122 }, { 164, 370 }, { 104, 326 }, { 184, 422 },   0,   0,   1, NULL },
-        { { 230, 440 }, { 164, 370 }, { 293, 568 }, { 184, 422 },   1,   0,   1, NULL },
-        { {  42,  94 }, {  57, 137 }, { 290, 556 }, { 150, 341 },   2,   1,   1, NULL },
+        { { 41, 122 }, { 164, 370 }, { 104, 326 }, { 184, 422 }, 0, 0, 1, NULL },
+        { { 230, 440 }, { 164, 370 }, { 293, 568 }, { 184, 422 }, 1, 0, 1, NULL },
+        { { 42, 94 }, { 57, 137 }, { 290, 556 }, { 150, 341 }, 2, 1, 1, NULL },
     };
     static tRectile recopy_areas[1] = {
-        { { 124, 110 }, { 163, 317 }, { 212, 322 }, { 180, 370 }, },
+        {
+            { 124, 110 },
+            { 163, 317 },
+            { 212, 322 },
+            { 180, 370 },
+        },
     };
     static tInterface_spec interface_spec = {
-        0, 100, 0, 101, 101, 101, -1,
-        {  0, -1 }, { -1, -1}, {  0,  2}, {  1,  2}, { NULL, NULL },
-        {  0, -1 }, {  1, -1}, {  0,  2}, {  1,  2}, { NULL, NULL },
-        {  1, -1 }, {  0,  0}, {  2,  0}, {  2,  0}, { NewNetGameUp, NewNetGameUp },
-        {  1, -1 }, {  0,  0}, {  2,  0}, {  2,  0}, { NewNetGameDown, NewNetGameDown },
-        {  1,  1 }, { NULL, NewNetGoAhead }, { 1, 1 }, { NULL, NULL },
-        NULL, DrawGames, 0, NewNetStart1, NewNetStart2, NewNetDone,
-        1, { 1, 1 }, NewNetGetName, 1, 1,
-        COUNT_OF(flicker_on), flicker_on, flicker_off, push,
-        COUNT_OF(mouse_areas), mouse_areas,
-        COUNT_OF(recopy_areas), recopy_areas,
+        0,
+        100,
+        0,
+        101,
+        101,
+        101,
+        -1,
+        { 0, -1 },
+        { -1, -1 },
+        { 0, 2 },
+        { 1, 2 },
+        { NULL, NULL },
+        { 0, -1 },
+        { 1, -1 },
+        { 0, 2 },
+        { 1, 2 },
+        { NULL, NULL },
+        { 1, -1 },
+        { 0, 0 },
+        { 2, 0 },
+        { 2, 0 },
+        { NewNetGameUp, NewNetGameUp },
+        { 1, -1 },
+        { 0, 0 },
+        { 2, 0 },
+        { 2, 0 },
+        { NewNetGameDown, NewNetGameDown },
+        { 1, 1 },
+        { NULL, NewNetGoAhead },
+        { 1, 1 },
+        { NULL, NULL },
+        NULL,
+        DrawGames,
+        0,
+        NewNetStart1,
+        NewNetStart2,
+        NewNetDone,
+        1,
+        { 1, 1 },
+        NewNetGetName,
+        1,
+        1,
+        COUNT_OF(flicker_on),
+        flicker_on,
+        flicker_off,
+        push,
+        COUNT_OF(mouse_areas),
+        mouse_areas,
+        COUNT_OF(recopy_areas),
+        recopy_areas,
     };
     int result;
     LOG_TRACE("(%p)", pGame_to_join);
@@ -856,7 +899,7 @@ void NetPlayCheckboxOff(int pIndex) {
 void NetPlayRadioOn2(int pIndex, int pValue) {
     LOG_TRACE("(%d, %d)", pIndex, pValue);
 
-    RunFlicAt(288, 
+    RunFlicAt(288,
         gRadio_bastards__newgame[pIndex].left[pValue],
         gRadio_bastards__newgame[pIndex].top + 1);
 }
@@ -865,7 +908,7 @@ void NetPlayRadioOn2(int pIndex, int pValue) {
 void NetPlayRadioOff2(int pIndex, int pValue) {
     LOG_TRACE("(%d, %d)", pIndex, pValue);
 
-    RunFlicAt(287, 
+    RunFlicAt(287,
         gRadio_bastards__newgame[pIndex].left[pValue],
         gRadio_bastards__newgame[pIndex].top + 1);
 }
@@ -895,7 +938,7 @@ void NetPlayRadioOff(int pIndex, int pValue) {
 }
 
 // IDA: void __cdecl DrawNOptInitialRadios()
-void DrawNOptInitialRadios() {
+void DrawNOptInitialRadios(void) {
     int i;
     int j;
     LOG_TRACE("()");
@@ -1038,13 +1081,12 @@ int NetRadioClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int p
 }
 
 // IDA: void __cdecl RevertToDefaults()
-void RevertToDefaults() {
+void RevertToDefaults(void) {
     tPath_name the_path;
     FILE* f;
     tNet_game_options net_options;
     int i;
     LOG_TRACE("()");
-
 
     PathCat(the_path, gApplication_path, "NETDEFLT.TXT");
     f = DRfopen(the_path, "rt");
@@ -1060,10 +1102,10 @@ void RevertToDefaults() {
 }
 
 // IDA: void __cdecl DefaultNetSettings()
-void DefaultNetSettings() {
-    tPath_name the_path;  // added
+void DefaultNetSettings(void) {
     FILE* f;
     int i;
+    tPath_name the_path; // added
 
     PathCat(the_path, gApplication_path, "NETDEFLT.TXT");
     f = DRfopen(the_path, "rt");
@@ -1137,78 +1179,78 @@ void DrawNetOptBox(int pCurrent_choice, int pCurrent_mode) {
 // IDA: void __usercall DoNetOptions(tNet_game_options *pGame_options@<EAX>)
 void DoNetOptions(tNet_game_options* pGame_options) {
     static tFlicette flicker_on[14] = {
-        {  43, { 169,  90 }, { 156, 398 } },
-        {  43, { 236, 440 }, { 156, 398 } },
-        {  43, {  37, 440 }, { 156, 398 } },
-        {  68, {  81,  98 }, {  32,  86 } },
-        {  75, {  81,  98 }, {  43, 108 } },
-        {  77, {  81,  98 }, {  54, 130 } },
-        {  79, {  81,  98 }, {  65, 161 } },
-        { 112, {  81,  98 }, {  76, 182 } },
-        { 127, {  81,  98 }, {  86, 214 } },
-        { 129, {  81,  98 }, {  97, 235 } },
-        { 134, {  81,  98 }, { 108, 266 } },
-        { 137, {  81,  98 }, { 119, 288 } },
-        { 139, {  81,  98 }, { 130, 310 } },
-        { 143, {  81,  98 }, { 141, 331 } },
+        { 43, { 169, 90 }, { 156, 398 } },
+        { 43, { 236, 440 }, { 156, 398 } },
+        { 43, { 37, 440 }, { 156, 398 } },
+        { 68, { 81, 98 }, { 32, 86 } },
+        { 75, { 81, 98 }, { 43, 108 } },
+        { 77, { 81, 98 }, { 54, 130 } },
+        { 79, { 81, 98 }, { 65, 161 } },
+        { 112, { 81, 98 }, { 76, 182 } },
+        { 127, { 81, 98 }, { 86, 214 } },
+        { 129, { 81, 98 }, { 97, 235 } },
+        { 134, { 81, 98 }, { 108, 266 } },
+        { 137, { 81, 98 }, { 119, 288 } },
+        { 139, { 81, 98 }, { 130, 310 } },
+        { 143, { 81, 98 }, { 141, 331 } },
     };
     static tFlicette flicker_off[14] = {
-        {  42, { 169,  90 }, { 156, 398 } },
-        {  42, { 236, 440 }, { 156, 398 } },
-        {  42, {  37, 440 }, { 156, 398 } },
-        {  69, {  81,  98 }, {  32,  86 } },
-        {  76, {  81,  98 }, {  43, 108 } },
-        {  78, {  81,  98 }, {  54, 130 } },
-        { 109, {  81,  98 }, {  65, 161 } },
-        { 113, {  81,  98 }, {  76, 182 } },
-        { 128, {  81,  98 }, {  86, 214 } },
-        { 133, {  81,  98 }, {  97, 235 } },
-        { 136, {  81,  98 }, { 108, 266 } },
-        { 138, {  81,  98 }, { 119, 288 } },
-        { 142, {  81,  98 }, { 130, 310 } },
-        { 148, {  81,  98 }, { 141, 331 } },
+        { 42, { 169, 90 }, { 156, 398 } },
+        { 42, { 236, 440 }, { 156, 398 } },
+        { 42, { 37, 440 }, { 156, 398 } },
+        { 69, { 81, 98 }, { 32, 86 } },
+        { 76, { 81, 98 }, { 43, 108 } },
+        { 78, { 81, 98 }, { 54, 130 } },
+        { 109, { 81, 98 }, { 65, 161 } },
+        { 113, { 81, 98 }, { 76, 182 } },
+        { 128, { 81, 98 }, { 86, 214 } },
+        { 133, { 81, 98 }, { 97, 235 } },
+        { 136, { 81, 98 }, { 108, 266 } },
+        { 138, { 81, 98 }, { 119, 288 } },
+        { 142, { 81, 98 }, { 130, 310 } },
+        { 148, { 81, 98 }, { 141, 331 } },
     };
     static tFlicette push[14] = {
-        { 154, { 169,  90 }, { 156, 398 } },
-        {  45, { 236, 440 }, { 156, 398 } },
-        {  67, {  37, 440 }, { 156, 398 } },
-        {  68, {  81,  98 }, {  32,  86 } },
-        {  75, {  81,  98 }, {  43, 108 } },
-        {  77, {  81,  98 }, {  54, 130 } },
-        {  79, {  81,  98 }, {  65, 161 } },
-        { 112, {  81,  98 }, {  76, 182 } },
-        { 127, {  81,  98 }, {  86, 214 } },
-        { 129, {  81,  98 }, {  97, 235 } },
-        { 134, {  81,  98 }, { 108, 266 } },
-        { 137, {  81,  98 }, { 119, 288 } },
-        { 139, {  81,  98 }, { 130, 310 } },
-        { 143, {  81,  98 }, { 141, 331 } },
+        { 154, { 169, 90 }, { 156, 398 } },
+        { 45, { 236, 440 }, { 156, 398 } },
+        { 67, { 37, 440 }, { 156, 398 } },
+        { 68, { 81, 98 }, { 32, 86 } },
+        { 75, { 81, 98 }, { 43, 108 } },
+        { 77, { 81, 98 }, { 54, 130 } },
+        { 79, { 81, 98 }, { 65, 161 } },
+        { 112, { 81, 98 }, { 76, 182 } },
+        { 127, { 81, 98 }, { 86, 214 } },
+        { 129, { 81, 98 }, { 97, 235 } },
+        { 134, { 81, 98 }, { 108, 266 } },
+        { 137, { 81, 98 }, { 119, 288 } },
+        { 139, { 81, 98 }, { 130, 310 } },
+        { 143, { 81, 98 }, { 141, 331 } },
     };
     static tMouse_area mouse_areas[14] = {
-        { { 169,  90 }, { 156, 396 }, { 232, 214 }, { 176, 444 },   0,   0,   0, NULL },
-        { { 236, 440 }, { 156, 396 }, { 299, 552 }, { 176, 444 },   1,   0,   0, NULL },
-        { {  37,  98 }, { 156,  84 }, { 100, 568 }, { 176, 103 },   2,   0,   0, NULL },
-        { {  61,  98 }, {  30, 106 }, { 270, 568 }, {  40, 125 },   3,   1,   0, NetRadioClick },
-        { {  61,  98 }, {  41, 127 }, { 270, 568 }, {  51, 146 },   4,   1,   0, NetRadioClick },
-        { {  61,  98 }, {  52, 158 }, { 270, 568 }, {  62, 178 },   5,   1,   0, NetRadioClick },
-        { {  61,  98 }, {  63, 180 }, { 270, 568 }, {  73, 199 },   6,   1,   0, NetRadioClick },
-        { {  61,  98 }, {  74, 192 }, { 270, 568 }, {  84, 230 },   7,   1,   0, NetRadioClick },
-        { {  61,  98 }, {  84, 233 }, { 270, 568 }, {  94, 252 },   8,   1,   0, NetRadioClick },
-        { {  61,  98 }, {  95, 264 }, { 270, 568 }, { 105, 283 },   9,   1,   0, NetRadioClick },
-        { {  61,  98 }, { 106, 286 }, { 270, 568 }, { 116, 305 },  10,   1,   0, NetRadioClick },
-        { {  61,  98 }, { 117, 307 }, { 270, 322 }, { 127, 326 },  11,   1,   0, NetRadioClick },
-        { {  61,  98 }, { 128, 329 }, { 270, 322 }, { 138, 348 },  12,   1,   0, NetRadioClick },
-        { {  61,  98 }, { 139, 358 }, { 270, 322 }, { 149, 377 },  13,   1,   0, NetRadioClick },
+        { { 169, 90 }, { 156, 396 }, { 232, 214 }, { 176, 444 }, 0, 0, 0, NULL },
+        { { 236, 440 }, { 156, 396 }, { 299, 552 }, { 176, 444 }, 1, 0, 0, NULL },
+        { { 37, 98 }, { 156, 84 }, { 100, 568 }, { 176, 103 }, 2, 0, 0, NULL },
+        { { 61, 98 }, { 30, 106 }, { 270, 568 }, { 40, 125 }, 3, 1, 0, NetRadioClick },
+        { { 61, 98 }, { 41, 127 }, { 270, 568 }, { 51, 146 }, 4, 1, 0, NetRadioClick },
+        { { 61, 98 }, { 52, 158 }, { 270, 568 }, { 62, 178 }, 5, 1, 0, NetRadioClick },
+        { { 61, 98 }, { 63, 180 }, { 270, 568 }, { 73, 199 }, 6, 1, 0, NetRadioClick },
+        { { 61, 98 }, { 74, 192 }, { 270, 568 }, { 84, 230 }, 7, 1, 0, NetRadioClick },
+        { { 61, 98 }, { 84, 233 }, { 270, 568 }, { 94, 252 }, 8, 1, 0, NetRadioClick },
+        { { 61, 98 }, { 95, 264 }, { 270, 568 }, { 105, 283 }, 9, 1, 0, NetRadioClick },
+        { { 61, 98 }, { 106, 286 }, { 270, 568 }, { 116, 305 }, 10, 1, 0, NetRadioClick },
+        { { 61, 98 }, { 117, 307 }, { 270, 322 }, { 127, 326 }, 11, 1, 0, NetRadioClick },
+        { { 61, 98 }, { 128, 329 }, { 270, 322 }, { 138, 348 }, 12, 1, 0, NetRadioClick },
+        { { 61, 98 }, { 139, 358 }, { 270, 322 }, { 149, 377 }, 13, 1, 0, NetRadioClick },
     };
     static tInterface_spec interface_spec = {
         0, 65, 0, 66, 66, 66, -1,
-        { -1,  0 }, { -1,  0}, {  0,  3}, {  2, 13}, { NULL, NetOptLeft},
-        { -1,  0 }, {  1,  0}, {  0,  3}, {  2, 13}, { NULL, NetOptRight},
-        { -1, -1 }, {  0, -1}, {  0,  2}, {  0, 13}, { NetOptUp, NetOptUp},
-        { -1, -1 }, {  1,  1}, {  0,  3}, {  0, 14}, { NetOptDown, NetOptDown},
-        {  1,  1 }, { NetOptGoAhead, NetOptGoAhead}, { 1, 1}, { NULL, NULL},
+        { -1, 0 }, { -1, 0 }, { 0, 3 }, { 2, 13 }, { NULL, NetOptLeft },
+        { -1, 0 }, { 1, 0 }, { 0, 3 }, { 2, 13 }, { NULL, NetOptRight },
+        { -1, -1 }, { 0, -1 }, { 0, 2 }, { 0, 13 }, { NetOptUp, NetOptUp },
+        { -1, -1 }, { 1, 1 }, { 0, 3 }, { 0, 14 }, { NetOptDown, NetOptDown },
+        { 1, 1 }, { NetOptGoAhead, NetOptGoAhead }, { 1, 1 }, { NULL, NULL },
         NULL, DrawNetOptBox, 0,
-        NULL, DrawNOptInitialRadios, NULL, 0, { 0, 0}, NULL, 1, 1,
+        NULL, DrawNOptInitialRadios, NULL, 0, { 0, 0 }, NULL, 1, 1,
         COUNT_OF(flicker_on), flicker_on, flicker_off, push,
         COUNT_OF(mouse_areas), mouse_areas,
         0, NULL
@@ -1225,8 +1267,8 @@ void DoNetOptions(tNet_game_options* pGame_options) {
     DisposeFont(12);
 }
 
-//IDA: void __usercall PlayRadioOn(int pIndex@<EAX>)
-// Suffix added to avoid duplicate symbol
+// IDA: void __usercall PlayRadioOn(int pIndex@<EAX>)
+//  Suffix added to avoid duplicate symbol
 void PlayRadioOn__newgame(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
@@ -1235,8 +1277,8 @@ void PlayRadioOn__newgame(int pIndex) {
         gThe_interface_spec__newgame->pushed_flics[pIndex + 4].y[gGraf_data_index]);
 }
 
-//IDA: void __usercall PlayRadioOff(int pIndex@<EAX>)
-// Suffix added to avoid duplicate symbol
+// IDA: void __usercall PlayRadioOff(int pIndex@<EAX>)
+//  Suffix added to avoid duplicate symbol
 void PlayRadioOff__newgame(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
@@ -1263,7 +1305,7 @@ void SetOptions(tNet_game_type pGame_type, tNet_game_options* pGame_options) {
 }
 
 // IDA: void __cdecl DrawNetChooseInitial()
-void DrawNetChooseInitial() {
+void DrawNetChooseInitial(void) {
     LOG_TRACE("()");
 
     PlayRadioOn__newgame(gLast_game_type);
@@ -1414,63 +1456,63 @@ void SetGameTarget(tNet_game_type* pGame_type, tNet_game_options* pGame_options)
 // IDA: int __usercall NetGameChoices@<EAX>(tNet_game_type *pGame_type@<EAX>, tNet_game_options *pGame_options@<EDX>, int *pRace_index@<EBX>)
 int NetGameChoices(tNet_game_type* pGame_type, tNet_game_options* pGame_options, int* pRace_index) {
     static tFlicette flicker_on[11] = {
-        {  43, { 226,  90 }, { 117, 398 } },
-        {  43, { 226, 440 }, { 148, 398 } },
-        {  43, { 226,  98 }, {  42,  86 } },
-        {  43, { 226,  98 }, {  74, 108 } },
-        { 162, {  74,  98 }, {  73, 130 } },
-        { 163, {  74,  98 }, {  83, 161 } },
-        { 164, {  74,  98 }, {  93, 182 } },
-        { 165, {  74,  98 }, { 103, 214 } },
-        { 166, {  74,  98 }, { 113, 235 } },
-        { 167, {  74,  98 }, { 123, 266 } },
-        { 168, {  74,  98 }, { 133, 288 } },
+        { 43, { 226, 90 }, { 117, 398 } },
+        { 43, { 226, 440 }, { 148, 398 } },
+        { 43, { 226, 98 }, { 42, 86 } },
+        { 43, { 226, 98 }, { 74, 108 } },
+        { 162, { 74, 98 }, { 73, 130 } },
+        { 163, { 74, 98 }, { 83, 161 } },
+        { 164, { 74, 98 }, { 93, 182 } },
+        { 165, { 74, 98 }, { 103, 214 } },
+        { 166, { 74, 98 }, { 113, 235 } },
+        { 167, { 74, 98 }, { 123, 266 } },
+        { 168, { 74, 98 }, { 133, 288 } },
     };
     static tFlicette flicker_off[11] = {
-        {  42, { 226,  90 }, { 117, 398 } },
-        {  42, { 226, 440 }, { 148, 398 } },
-        {  42, { 226,  98 }, {  42,  86 } },
-        {  42, { 226,  98 }, {  74, 108 } },
-        { 182, {  74,  98 }, {  73, 130 } },
-        { 183, {  74,  98 }, {  83, 161 } },
-        { 184, {  74,  98 }, {  93, 182 } },
-        { 185, {  74,  98 }, { 103, 214 } },
-        { 186, {  74,  98 }, { 113, 235 } },
-        { 187, {  74,  98 }, { 123, 266 } },
-        { 188, {  74,  98 }, { 133, 288 } },
+        { 42, { 226, 90 }, { 117, 398 } },
+        { 42, { 226, 440 }, { 148, 398 } },
+        { 42, { 226, 98 }, { 42, 86 } },
+        { 42, { 226, 98 }, { 74, 108 } },
+        { 182, { 74, 98 }, { 73, 130 } },
+        { 183, { 74, 98 }, { 83, 161 } },
+        { 184, { 74, 98 }, { 93, 182 } },
+        { 185, { 74, 98 }, { 103, 214 } },
+        { 186, { 74, 98 }, { 113, 235 } },
+        { 187, { 74, 98 }, { 123, 266 } },
+        { 188, { 74, 98 }, { 133, 288 } },
     };
     static tFlicette push[11] = {
-        {  88, { 227,  90 }, { 117, 398 } },
-        {  45, { 226, 440 }, { 148, 398 } },
-        { 195, { 227,  98 }, {  42,  86 } },
-        { 124, { 226,  98 }, {  74, 108 } },
-        { 162, {  74,  98 }, {  73, 130 } },
-        { 163, {  74,  98 }, {  83, 161 } },
-        { 164, {  74,  98 }, {  93, 182 } },
-        { 165, {  74,  98 }, { 103, 214 } },
-        { 166, {  74,  98 }, { 113, 235 } },
-        { 167, {  74,  98 }, { 123, 266 } },
-        { 168, {  74,  98 }, { 133, 288 } },
+        { 88, { 227, 90 }, { 117, 398 } },
+        { 45, { 226, 440 }, { 148, 398 } },
+        { 195, { 227, 98 }, { 42, 86 } },
+        { 124, { 226, 98 }, { 74, 108 } },
+        { 162, { 74, 98 }, { 73, 130 } },
+        { 163, { 74, 98 }, { 83, 161 } },
+        { 164, { 74, 98 }, { 93, 182 } },
+        { 165, { 74, 98 }, { 103, 214 } },
+        { 166, { 74, 98 }, { 113, 235 } },
+        { 167, { 74, 98 }, { 123, 266 } },
+        { 168, { 74, 98 }, { 133, 288 } },
     };
     static tMouse_area mouse_areas[11] = {
-        { { 226,  90 }, { 117, 396 }, { 290, 214 }, { 137, 444 },   0,   0,   0, NULL },
-        { { 226, 440 }, { 148, 396 }, { 290, 552 }, { 168, 444 },   1,   0,   0, NULL },
-        { { 226,  98 }, {  42,  84 }, { 290, 568 }, {  62, 103 },   2,   0,   0, NULL },
-        { { 226,  98 }, {  74, 106 }, { 290, 568 }, {  94, 125 },   3,   0,   0, NULL },
-        { {  53,  98 }, {  71, 127 }, { 211, 568 }, {  79, 146 },   4,   1,   0, NULL },
-        { {  53,  98 }, {  81, 158 }, { 211, 568 }, {  89, 178 },   5,   1,   0, NULL },
-        { {  53,  98 }, {  91, 180 }, { 211, 568 }, {  99, 199 },   6,   1,   0, NULL },
-        { {  53,  98 }, { 101, 192 }, { 211, 568 }, { 109, 230 },   7,   1,   0, NULL },
-        { {  53,  98 }, { 111, 233 }, { 211, 568 }, { 119, 252 },   8,   1,   0, NULL },
-        { {  53,  98 }, { 121, 264 }, { 211, 568 }, { 129, 283 },   9,   1,   0, NULL },
-        { {  53,  98 }, { 131, 264 }, { 211, 568 }, { 139, 283 },  10,   1,   0, NULL },
+        { { 226, 90 }, { 117, 396 }, { 290, 214 }, { 137, 444 }, 0, 0, 0, NULL },
+        { { 226, 440 }, { 148, 396 }, { 290, 552 }, { 168, 444 }, 1, 0, 0, NULL },
+        { { 226, 98 }, { 42, 84 }, { 290, 568 }, { 62, 103 }, 2, 0, 0, NULL },
+        { { 226, 98 }, { 74, 106 }, { 290, 568 }, { 94, 125 }, 3, 0, 0, NULL },
+        { { 53, 98 }, { 71, 127 }, { 211, 568 }, { 79, 146 }, 4, 1, 0, NULL },
+        { { 53, 98 }, { 81, 158 }, { 211, 568 }, { 89, 178 }, 5, 1, 0, NULL },
+        { { 53, 98 }, { 91, 180 }, { 211, 568 }, { 99, 199 }, 6, 1, 0, NULL },
+        { { 53, 98 }, { 101, 192 }, { 211, 568 }, { 109, 230 }, 7, 1, 0, NULL },
+        { { 53, 98 }, { 111, 233 }, { 211, 568 }, { 119, 252 }, 8, 1, 0, NULL },
+        { { 53, 98 }, { 121, 264 }, { 211, 568 }, { 129, 283 }, 9, 1, 0, NULL },
+        { { 53, 98 }, { 131, 264 }, { 211, 568 }, { 139, 283 }, 10, 1, 0, NULL },
     };
     static tInterface_spec interface_spec = {
         0, 122, 0, 0, 0, 0, -1,
-        {  1,  0 }, {  4, -10 }, {  4,  0 }, {  4,  0}, { NetChooseLR, NULL },
-        {  1,  0 }, {  3, -10 }, {  4,  0 }, {  4,  0}, { NetChooseLR, NULL },
-        { -1, -1 }, { -1,  -1 }, {  0,  4 }, {  3, 10}, { NULL, NULL },
-        { -1, -1 }, {  1,   1 }, {  0,  4 }, {  3, 10}, { NULL, NULL },
+        { 1, 0 }, { 4, -10 }, { 4, 0 }, { 4, 0 }, { NetChooseLR, NULL },
+        { 1, 0 }, { 3, -10 }, { 4, 0 }, { 4, 0 }, { NetChooseLR, NULL },
+        { -1, -1 }, { -1, -1 }, { 0, 4 }, { 3, 10 }, { NULL, NULL },
+        { -1, -1 }, { 1, 1 }, { 0, 4 }, { 3, 10 }, { NULL, NULL },
         { 1, 1 }, { NetChooseGoAhead, NetChooseGoAhead }, { 1, 1 }, { NULL, NULL },
         NULL, DrawNetChoose, 0, NULL, DrawNetChooseInitial, NULL, 0, { 0, 0 }, NULL,
         1, 1,
@@ -1559,7 +1601,7 @@ void RequestCarDetails(tNet_game_details* pNet_game) {
 }
 
 // IDA: int __cdecl PickARandomCar()
-int PickARandomCar() {
+int PickARandomCar(void) {
     int i;
     int cars[120];
     int array_size;
@@ -1630,7 +1672,7 @@ int ChooseNetCar(tNet_game_details* pNet_game, tNet_game_options* pOptions, int*
     int car_index;
     int the_car_index;
     LOG_TRACE("(%p, %p, %p, %d)", pNet_game, pOptions, pCar_index, pIm_the_host_so_fuck_off);
-    
+
     if (!pOptions->random_car_choice || pIm_the_host_so_fuck_off) {
         gNet_options = pOptions;
         if (pIm_the_host_so_fuck_off) {
@@ -1678,7 +1720,7 @@ int ChooseNetCar(tNet_game_details* pNet_game, tNet_game_options* pOptions, int*
 }
 
 // IDA: void __cdecl InitNetStorageSpace()
-void InitNetStorageSpace() {
+void InitNetStorageSpace(void) {
     int i;
     LOG_TRACE("()");
 
@@ -1690,7 +1732,7 @@ void InitNetStorageSpace() {
 }
 
 // IDA: void __cdecl DisposeNetStorageSpace()
-void DisposeNetStorageSpace() {
+void DisposeNetStorageSpace(void) {
     LOG_TRACE("()");
 
     if (gNet_storage_allocated) {
@@ -1700,7 +1742,7 @@ void DisposeNetStorageSpace() {
 }
 
 // IDA: int __cdecl DoMultiPlayerStart()
-int DoMultiPlayerStart() {
+int DoMultiPlayerStart(void) {
     tJoin_or_host_result result;
     tNet_game_details* game_to_join;
     char s[256];
@@ -1782,7 +1824,7 @@ int DoMultiPlayerStart() {
         LoadRaces(gRace_list, &gNumber_of_races, new_game_type);
         start_rank = PickNetRace(-1, new_game_options.race_sequence_type);
         if (NetGameChoices(&new_game_type, &new_game_options, &start_rank) != 0
-                && ChooseNetCar(gCurrent_net_game, &new_game_options, &car_index, 1) != 0) {
+            && ChooseNetCar(gCurrent_net_game, &new_game_options, &car_index, 1) != 0) {
             StartLoadingScreen();
             InitNetStorageSpace();
             if (NetHostGame(new_game_type, &new_game_options, start_rank, gProgram_state.player_name[0], car_index) != NULL) {

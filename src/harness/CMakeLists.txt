@@ -20,7 +20,7 @@ if(DETHRACE_FIX_BUGS)
     target_compile_definitions(harness PRIVATE DETHRACE_FIX_BUGS)
 endif()
 
-target_link_libraries(harness PRIVATE brender compile_with_werror)
+target_link_libraries(harness PRIVATE brender s3 compile_with_werror)
 
 if(WIN32)
     target_link_libraries(harness PRIVATE dbghelp)
@@ -31,6 +31,9 @@ if(NOT MSVC)
         -Wall
         -Wextra
         -Wno-unused-parameter
+    )
+    add_compile_flags_if_supported(harness
+        -Wstrict-prototypes
     )
 else()
     target_compile_definitions(harness PRIVATE -D_CRT_SECURE_NO_WARNINGS)
@@ -48,19 +51,22 @@ target_sources(harness PRIVATE
     include/harness/trace.h
     include/harness/config.h
     include/harness/os.h
-
+    include/harness/win95_polyfill.h
+    include/harness/win95_polyfill_defs.h
     # cameras/debug_camera.c
     # cameras/debug_camera.h
+    ascii_tables.h
     harness_trace.c
     harness.c
     harness.h
-    io_platforms/io_platform.h
-    renderers/null.h
-    renderers/renderer.h
     brender_emu/renderer_impl.c
     brender_emu/renderer_impl.h
     sound/sound.c
     sound/sound.h
+    win95/polyfill.c
+    platforms/null.c
+    platforms/null.h
+
     "${CMAKE_CURRENT_BINARY_DIR}/version.h"
 )
 
@@ -75,7 +81,8 @@ if (IO_PLATFORM STREQUAL "SDL_OpenGL")
     endforeach()
 
     target_sources(harness PRIVATE
-        io_platforms/sdl_gl.c
+        platforms/sdl_opengl.c
+        platforms/sdl2_scancode_to_dinput.h
         renderers/gl/gl_renderer.c
         renderers/gl/gl_renderer.h
         renderers/gl/stored_context.c
@@ -90,8 +97,7 @@ if (IO_PLATFORM STREQUAL "SDL_OpenGL")
         io_platforms/sdl_network.h
     )
     target_include_directories(harness PRIVATE "${dethrace_SOURCE_DIR}/src/DETHRACE/common")
-    target_include_directories(harness PRIVATE "${dethrace_SOURCE_DIR}/src/S3/include")
-    target_link_libraries(harness PRIVATE SDL2::SDL2 glad SDL2_net::SDL2_net)
+    target_link_libraries(harness PRIVATE SDL2::SDL2 glad)
 endif()
 
 if(WIN32)

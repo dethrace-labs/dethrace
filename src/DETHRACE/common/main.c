@@ -22,7 +22,7 @@
 #include "utility.h"
 
 // IDA: void __cdecl QuitGame()
-void QuitGame() {
+void QuitGame(void) {
     LOG_TRACE("()");
 
     if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
@@ -58,7 +58,7 @@ tU32 TrackCount(br_actor* pActor, tU32* pCount) {
 }
 
 // IDA: void __cdecl CheckNumberOfTracks()
-void CheckNumberOfTracks() {
+void CheckNumberOfTracks(void) {
     tU32 track_count;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
@@ -90,12 +90,12 @@ void ServiceTheGame(int pRacing) {
 }
 
 // IDA: void __cdecl ServiceGame()
-void ServiceGame() {
+void ServiceGame(void) {
     ServiceTheGame(0);
 }
 
 // IDA: void __cdecl ServiceGameInRace()
-void ServiceGameInRace() {
+void ServiceGameInRace(void) {
     LOG_TRACE("()");
 
     ServiceTheGame(1);

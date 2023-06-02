@@ -23,6 +23,8 @@ typedef struct tHarness_game_info {
         char* INTRO_SMK_FILE;
         // different between demo and full game
         char* GERMAN_LOADSCRN;
+        // some versions have an ascii table built-in, others provide it through KEYBOARD.COK
+        int requires_ascii_table;
         // built-in keyboard look-up table for certain localized Carmageddon releases
         int* ascii_table;
         // built-in shifted keyboard look-up table for certain localized Carmageddon releases
@@ -39,7 +41,7 @@ typedef struct tHarness_game_config {
     int enable_diagnostics;
     float volume_multiplier;
     int start_full_screen;
-    int enable_replay;
+    int dos_mode;
 
     int install_signalhandler;
 } tHarness_game_config;

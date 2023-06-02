@@ -72,7 +72,7 @@ int gReceived_game_scores;
 
 
 // IDA: int __cdecl NetInitialise()
-int NetInitialise() {
+int NetInitialise(void) {
     int i;
     LOG_TRACE("()");
 
@@ -105,7 +105,7 @@ int NetInitialise() {
 }
 
 // IDA: int __cdecl NetShutdown()
-int NetShutdown() {
+int NetShutdown(void) {
     int err;
     int i;
     LOG_TRACE("()");
@@ -120,7 +120,7 @@ int NetShutdown() {
 }
 
 // IDA: void __cdecl ShutdownNetIfRequired()
-void ShutdownNetIfRequired() {
+void ShutdownNetIfRequired(void) {
     LOG_TRACE("()");
 
     if (gNet_initialised) {
@@ -130,21 +130,21 @@ void ShutdownNetIfRequired() {
 }
 
 // IDA: void __cdecl DisableNetService()
-void DisableNetService() {
+void DisableNetService(void) {
     LOG_TRACE("()");
 
     gNet_service_disable = 1;
 }
 
 // IDA: void __cdecl ReenableNetService()
-void ReenableNetService() {
+void ReenableNetService(void) {
     LOG_TRACE("()");
 
     gNet_service_disable = 0;
 }
 
 // IDA: int __cdecl PermitNetServiceReentrancy()
-int PermitNetServiceReentrancy() {
+int PermitNetServiceReentrancy(void) {
     int prev;
     LOG_TRACE("()");
 
@@ -156,7 +156,7 @@ int PermitNetServiceReentrancy() {
 }
 
 // IDA: void __cdecl HaltNetServiceReentrancy()
-void HaltNetServiceReentrancy() {
+void HaltNetServiceReentrancy(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -183,7 +183,7 @@ void NetSendHeadupToPlayer(char* pMessage, tPlayer_ID pPlayer) {
 }
 
 // IDA: void __cdecl InitialisePlayerStati()
-void InitialisePlayerStati() {
+void InitialisePlayerStati(void) {
     int i;
     LOG_TRACE("()");
 
@@ -194,7 +194,7 @@ void InitialisePlayerStati() {
 }
 
 // IDA: void __cdecl LeaveTempGame()
-void LeaveTempGame() {
+void LeaveTempGame(void) {
     LOG_TRACE("()");
 
     if (gCurrent_join_poll_game != NULL) {
@@ -205,7 +205,7 @@ void LeaveTempGame() {
 }
 
 // IDA: void __cdecl DisposeCurrentJoinPollGame()
-void DisposeCurrentJoinPollGame() {
+void DisposeCurrentJoinPollGame(void) {
     LOG_TRACE("()");
 
     if (gCurrent_join_poll_game != NULL) {
@@ -215,7 +215,7 @@ void DisposeCurrentJoinPollGame() {
 }
 
 // IDA: void __cdecl DoNextJoinPoll()
-void DoNextJoinPoll() {
+void DoNextJoinPoll(void) {
     tNet_message* the_message;
     static tU32 time_last_poll = 0;
     LOG_TRACE("()");
@@ -268,7 +268,7 @@ void NetStartProducingJoinList(void (*pAdd_proc)(tNet_game_details*)) {
 }
 
 // IDA: void __cdecl NetEndJoinList()
-void NetEndJoinList() {
+void NetEndJoinList(void) {
     LOG_TRACE("()");
 
     gJoin_list_mode = 0;
@@ -297,7 +297,7 @@ void NetDisposeGameDetails(tNet_game_details* pDetails) {
 }
 
 // IDA: tNet_game_details* __cdecl NetAllocatePIDGameDetails()
-tNet_game_details* NetAllocatePIDGameDetails() {
+tNet_game_details* NetAllocatePIDGameDetails(void) {
     tNet_game_details* game;
     LOG_TRACE("()");
 
@@ -876,7 +876,7 @@ tNet_contents* NetGetBroadcastContents(tNet_message_type pType, tS32 pSize_decid
 }
 
 // IDA: void __cdecl NetSendMessageStacks()
-void NetSendMessageStacks() {
+void NetSendMessageStacks(void) {
     LOG_TRACE("()");
 
     gLast_flush_message = PDGetTotalTime();
@@ -965,7 +965,7 @@ tNet_message* NetAllocateMessage(int pSize) {
 }
 
 // IDA: void __cdecl NetFreeExcessMemory()
-void NetFreeExcessMemory() {
+void NetFreeExcessMemory(void) {
     void* temp;
     LOG_TRACE("()");
 
@@ -1019,7 +1019,7 @@ void ReceivedDetails(tNet_contents* pContents) {
 }
 
 // IDA: void __cdecl SendOutPlayerList()
-void SendOutPlayerList() {
+void SendOutPlayerList(void) {
     tNet_message* message;
     int i;
     LOG_TRACE("()");
@@ -1197,7 +1197,7 @@ void ReceivedHosticide(tNet_contents* pContents) {
 }
 
 // IDA: void __cdecl ConfirmReceipt()
-void ConfirmReceipt() {
+void ConfirmReceipt(void) {
     tNet_message* the_message;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
@@ -1499,7 +1499,7 @@ void ReceivedMessage(tNet_message* pMessage, void* pSender_address, tU32 pReceiv
 }
 
 // IDA: void __cdecl NetReceiveAndProcessMessages()
-void NetReceiveAndProcessMessages() {
+void NetReceiveAndProcessMessages(void) {
     tNet_message* message;
     void* sender_address;
     tU32 receive_time;
@@ -1524,7 +1524,7 @@ void NetReceiveAndProcessMessages() {
 }
 
 // IDA: void __cdecl BroadcastStatus()
-void BroadcastStatus() {
+void BroadcastStatus(void) {
     tNet_message* message;
     LOG_TRACE("()");
 
@@ -1534,7 +1534,7 @@ void BroadcastStatus() {
 }
 
 // IDA: void __cdecl CheckForDisappearees()
-void CheckForDisappearees() {
+void CheckForDisappearees(void) {
     int i;
     int j;
     tU32 the_time;
@@ -1562,7 +1562,7 @@ void CheckForDisappearees() {
 }
 
 // IDA: void __cdecl CheckForPendingStartRace()
-void CheckForPendingStartRace() {
+void CheckForPendingStartRace(void) {
     int i;
     LOG_TRACE("()");
 
@@ -1641,7 +1641,7 @@ void NetPlayerStatusChanged(tPlayer_status pNew_status) {
 }
 
 // IDA: tPlayer_status __cdecl NetGetPlayerStatus()
-tPlayer_status NetGetPlayerStatus() {
+tPlayer_status NetGetPlayerStatus(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -1717,7 +1717,7 @@ int NetGuaranteedSendMessageToAddress(tNet_game_details* pDetails, tNet_message*
 }
 
 // IDA: void __cdecl ResendGuaranteedMessages()
-void ResendGuaranteedMessages() {
+void ResendGuaranteedMessages(void) {
     int i;
     int j;
     tU32 time;
@@ -1763,7 +1763,7 @@ int SampleFailNotifier(tU32 pAge, tNet_message* pMessage) {
 }
 
 // IDA: void __cdecl NetWaitForGuaranteeReplies()
-void NetWaitForGuaranteeReplies() {
+void NetWaitForGuaranteeReplies(void) {
     tU32 start_time;
     LOG_TRACE("()");
 

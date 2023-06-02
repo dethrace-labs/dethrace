@@ -49,7 +49,7 @@ tU32 gLast_checkpoint_time;
 tRace_over_reason gRace_over_reason;
 
 // IDA: int __cdecl NumberOfOpponentsLeft()
-int NumberOfOpponentsLeft() {
+int NumberOfOpponentsLeft(void) {
     int i;
     int car_count;
     int result;
@@ -118,7 +118,7 @@ void RaceCompleted(tRace_over_reason pReason) {
         default:
             break;
         }
-        if (gNet_mode) {
+        if (gNet_mode != eNet_mode_none) {
             gRace_finished = 8000;
         } else {
             gRace_finished = 4000;
@@ -138,7 +138,7 @@ void Checkpoint(int pCheckpoint_index, int pDo_sound) {
 }
 
 // IDA: void __cdecl IncrementCheckpoint()
-void IncrementCheckpoint() {
+void IncrementCheckpoint(void) {
     int done_voice;
     LOG_TRACE("()");
 
@@ -172,7 +172,7 @@ void IncrementCheckpoint() {
 }
 
 // IDA: void __cdecl IncrementLap()
-void IncrementLap() {
+void IncrementLap(void) {
     int i;
     LOG_TRACE("()");
 
@@ -214,7 +214,7 @@ void WrongCheckpoint(int pCheckpoint_index) {
 }
 
 // IDA: void __cdecl CheckCheckpoints()
-void CheckCheckpoints() {
+void CheckCheckpoints(void) {
     tCar_spec* car;
     br_vector3 orig;
     br_vector3 dir;
@@ -294,7 +294,7 @@ void CheckCheckpoints() {
 }
 
 // IDA: void __cdecl TotalRepair()
-void TotalRepair() {
+void TotalRepair(void) {
     LOG_TRACE("()");
 
     TotallyRepairCar();
@@ -302,7 +302,7 @@ void TotalRepair() {
 }
 
 // IDA: void __cdecl DoLogos()
-void DoLogos() {
+void DoLogos(void) {
     ClearEntireScreen();
     DoSCILogo();
     DoOpeningAnimation();
@@ -311,7 +311,7 @@ void DoLogos() {
 }
 
 // IDA: void __cdecl DoProgOpeningAnimation()
-void DoProgOpeningAnimation() {
+void DoProgOpeningAnimation(void) {
     LOG_TRACE("()");
 
     gProgram_state.prog_status = eProg_idling;
@@ -319,7 +319,7 @@ void DoProgOpeningAnimation() {
 }
 
 // IDA: void __cdecl DoProgramDemo()
-void DoProgramDemo() {
+void DoProgramDemo(void) {
     LOG_TRACE("()");
 
     DoLogos();
@@ -423,7 +423,7 @@ int PickNetRace(int pCurrent_race, tNet_sequence_type pNet_race_sequence) {
 }
 
 // IDA: void __cdecl SwapNetCarsLoad()
-void SwapNetCarsLoad() {
+void SwapNetCarsLoad(void) {
     int i;
     int switched_res;
     LOG_TRACE("()");
@@ -448,14 +448,14 @@ void SwapNetCarsLoad() {
 }
 
 // IDA: void __cdecl SwapNetCarsDispose()
-void SwapNetCarsDispose() {
+void SwapNetCarsDispose(void) {
     int i;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl DoGame()
-void DoGame() {
+void DoGame(void) {
     tSO_result options_result;
     tRace_result race_result;
     int second_select_race;
@@ -616,7 +616,7 @@ void DoGame() {
 }
 
 // IDA: void __cdecl InitialiseProgramState()
-void InitialiseProgramState() {
+void InitialiseProgramState(void) {
     gProgram_state.loaded = 0;
     gProgram_state.last_slot = 0;
     gProgram_state.frank_or_anniness = eFrankie;
@@ -644,7 +644,7 @@ void InitialiseProgramState() {
 }
 
 // IDA: void __cdecl DoProgram()
-void DoProgram() {
+void DoProgram(void) {
     InitialiseProgramState();
     while (gProgram_state.prog_status != eProg_quit) {
         switch (gProgram_state.prog_status) {
@@ -677,7 +677,7 @@ void DoProgram() {
 }
 
 // IDA: void __cdecl JumpTheStart()
-void JumpTheStart() {
+void JumpTheStart(void) {
     char s[256];
     LOG_TRACE("()");
 
@@ -694,7 +694,7 @@ void JumpTheStart() {
 }
 
 // IDA: void __cdecl GoingToInterfaceFromRace()
-void GoingToInterfaceFromRace() {
+void GoingToInterfaceFromRace(void) {
     LOG_TRACE("()");
 
     gInterface_within_race_mode = 1;
@@ -706,7 +706,7 @@ void GoingToInterfaceFromRace() {
 }
 
 // IDA: void __cdecl GoingBackToRaceFromInterface()
-void GoingBackToRaceFromInterface() {
+void GoingBackToRaceFromInterface(void) {
     LOG_TRACE("()");
 
     gInterface_within_race_mode = 0;

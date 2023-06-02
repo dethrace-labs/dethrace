@@ -109,7 +109,7 @@ int MainMenuDone2(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
 }
 
 // IDA: void __cdecl StartMainMenu()
-void StartMainMenu() {
+void StartMainMenu(void) {
     LOG_TRACE("()");
 
     if (gFaded_palette) {
@@ -417,7 +417,7 @@ tMM_result GetMainMenuOption(tU32 pTime_out, int pContinue_allowed) {
 }
 
 // IDA: void __cdecl QuitVerifyStart()
-void QuitVerifyStart() {
+void QuitVerifyStart(void) {
     gPixel_buffer_size__mainmenu = gBack_screen->height * gBack_screen->row_bytes;
     gPixels_copy__mainmenu = BrMemAllocate(gPixel_buffer_size__mainmenu, kMem_quit_vfy_pixels);
     gPalette_copy__mainmenu = BrMemAllocate(0x400u, kMem_quit_vfy_pal);

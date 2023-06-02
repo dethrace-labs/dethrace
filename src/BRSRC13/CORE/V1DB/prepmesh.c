@@ -20,6 +20,8 @@ pm_temp_edge* pm_edge_table;
 
 #define PREP_ALIGN(f) (f)
 
+#define MODF_USES_DEFAULT 0x8000
+
 // IDA: int __usercall addEdge@<EAX>(br_uint_16 first@<EAX>, br_uint_16 last@<EDX>)
 int addEdge(br_uint_16 first, br_uint_16 last) {
     pm_temp_edge* tep;
@@ -607,13 +609,13 @@ void BrModelUpdate(br_model* model, br_uint_16 flags) {
     if (model->faces == NULL || model->vertices == NULL) {
         BrFailure("BrModelUpdate: model has no faces or vertices (%s)", model->identifier != NULL ? model->identifier : "<NULL>");
     }
-    if (flags & BR_MODU_UNKNOWN) {
-        flags |= BR_MODU_NORMALS;
+    if (flags & BR_MODU_PIVOT) {
+        flags |= BR_MODU_VERTEX_POSITIONS;
     }
     if (model->flags & (BR_MODF_KEEP_ORIGINAL | BR_MODF_GENERATE_TAGS)) {
         model->flags |= BR_MODF_UPDATEABLE;
     }
-    if (!(model->flags & BR_MODF_CUSTOM_BOUNDS) && (flags & (BR_MODU_MATERIALS | BR_MODU_GROUPS | BR_MODU_NORMALS))) {
+    if (!(model->flags & BR_MODF_CUSTOM_BOUNDS) && (flags & (BR_MODU_PRIMITIVE_COLOURS | BR_MODU_VERTEX_NORMALS | BR_MODU_VERTEX_POSITIONS))) {
         PrepareBoundingRadius(model);
         PrepareBoundingBox(model);
     }
@@ -651,19 +653,19 @@ void BrModelUpdate(br_model* model, br_uint_16 flags) {
     } else {
 
         // some additional code paths might exist, but maybe not used?
-        if (flags != BR_MODU_NORMALS) {
+        if (flags != BR_MODU_VERTEX_POSITIONS) {
             TELL_ME_IF_WE_PASS_THIS_WAY();
         }
 
         v11m = model->prepared;
 
-        if (model->vertices && (flags & BR_MODU_NORMALS)) {
+        if (model->vertices && (flags & BR_MODU_VERTEX_POSITIONS)) {
             for (g = 0; g < v11m->ngroups; g++) {
                 for (v = 0; v < v11m->groups[g].nvertices; v++) {
                     fvp = &v11m->groups[g].vertices[v];
                     vp = model->vertices + v11m->groups[g].vertex_user[v];
 
-                    if (flags & BR_MODU_NORMALS) {
+                    if (flags & BR_MODU_VERTEX_POSITIONS) {
                         fvp->p.v[0] = vp->p.v[0] - model->pivot.v[0];
                         fvp->p.v[1] = vp->p.v[1] - model->pivot.v[1];
                         fvp->p.v[2] = vp->p.v[2] - model->pivot.v[2];
@@ -672,7 +674,7 @@ void BrModelUpdate(br_model* model, br_uint_16 flags) {
             }
         }
 
-        if (flags & BR_MODU_NORMALS) {
+        if (flags & BR_MODU_VERTEX_POSITIONS) {
             if (!(model->flags & BR_MODF_CUSTOM_NORMALS)) {
                 RegenerateVertexNormals(v11m);
             }
@@ -698,7 +700,8 @@ void BrModelUpdate(br_model* model, br_uint_16 flags) {
         model->stored = NULL;
     }
 
-    Harness_Hook_BrModelUpdate(model);
+    // Added by dethrace
+    gHarness_platform.Renderer_BufferModel(model);
 }
 
 // IDA: void __usercall BrModelClear(br_model *model@<EAX>)

@@ -886,7 +886,7 @@ void ShiftBoundGrooveFunks(char* pStart, char* pEnd, ptrdiff_t pDelta) {
 }
 
 // IDA: tFunkotronic_spec* __cdecl AddNewFunkotronic()
-tFunkotronic_spec* AddNewFunkotronic() {
+tFunkotronic_spec* AddNewFunkotronic(void) {
     void* new_array;
     int i;
     LOG_TRACE("()");
@@ -1342,7 +1342,7 @@ void DisposeGroovidelics(int pOwner) {
 }
 
 // IDA: tGroovidelic_spec* __cdecl AddNewGroovidelic()
-tGroovidelic_spec* AddNewGroovidelic() {
+tGroovidelic_spec* AddNewGroovidelic(void) {
     void* new_array;
     int i;
     LOG_TRACE("()");
@@ -1667,7 +1667,7 @@ br_uint_32 DeleteBastards(br_actor* pActor, br_matrix34* pMatrix, void* pArg) {
 }
 
 // IDA: void __cdecl DeleteAnyZeroBastards()
-void DeleteAnyZeroBastards() {
+void DeleteAnyZeroBastards(void) {
     int i;
     LOG_TRACE("()");
 
@@ -1749,7 +1749,7 @@ void FindInverseAndWorldBox(tSpecial_volume* pSpec) {
 }
 
 // IDA: void __cdecl UpdateSpecVol()
-void UpdateSpecVol() {
+void UpdateSpecVol(void) {
     int index;
     tSpecial_volume* v;
     LOG_TRACE("()");
@@ -1764,7 +1764,7 @@ void UpdateSpecVol() {
 }
 
 // IDA: void __cdecl SaveSpecialVolumes()
-void SaveSpecialVolumes() {
+void SaveSpecialVolumes(void) {
     tPath_name the_path;
     FILE* f;
     int i;
@@ -1806,7 +1806,7 @@ void SaveSpecialVolumes() {
 }
 
 // IDA: void __cdecl SaveAdditionalStuff()
-void SaveAdditionalStuff() {
+void SaveAdditionalStuff(void) {
     LOG_TRACE("()");
 
     if (gSpec_vol_mode) {
@@ -1841,7 +1841,7 @@ void ChangePerspToSubdivCB(br_material* pMaterial) {
 }
 
 // IDA: void __cdecl ChangePerspToSubdiv()
-void ChangePerspToSubdiv() {
+void ChangePerspToSubdiv(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -1853,7 +1853,7 @@ void ChangeSubdivToPerspCB(br_material* pMaterial) {
 }
 
 // IDA: void __cdecl ChangeSubdivToPersp()
-void ChangeSubdivToPersp() {
+void ChangeSubdivToPersp(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -1999,7 +1999,7 @@ void SetCarStorageTexturingLevel(tBrender_storage* pStorage, tCar_texturing_leve
 }
 
 // IDA: tCar_texturing_level __cdecl GetCarTexturingLevel()
-tCar_texturing_level GetCarTexturingLevel() {
+tCar_texturing_level GetCarTexturingLevel(void) {
     LOG_TRACE("()");
 
     return gCar_texturing_level;
@@ -2149,7 +2149,7 @@ br_material* WallLinearToPersp(br_model* pModel, tU16 pFace) {
 }
 
 // IDA: tRoad_texturing_level __cdecl GetRoadTexturingLevel()
-tRoad_texturing_level GetRoadTexturingLevel() {
+tRoad_texturing_level GetRoadTexturingLevel(void) {
     return gRoad_texturing_level;
 }
 
@@ -2169,7 +2169,7 @@ void ReallySetRoadTexturingLevel(tRoad_texturing_level pLevel) {
 }
 
 // IDA: tWall_texturing_level __cdecl GetWallTexturingLevel()
-tWall_texturing_level GetWallTexturingLevel() {
+tWall_texturing_level GetWallTexturingLevel(void) {
     LOG_TRACE("()");
 
     return gWall_texturing_level;
@@ -2241,7 +2241,7 @@ br_material* DisposeSuffixedMaterials(br_model* pModel, tU16 pFace) {
 }
 
 // IDA: void __cdecl DisposeTexturingMaterials()
-void DisposeTexturingMaterials() {
+void DisposeTexturingMaterials(void) {
     LOG_TRACE("()");
 
     switch (gWall_texturing_level) {
@@ -2294,7 +2294,7 @@ void SetAccessoryRendering(int pOn) {
 }
 
 // IDA: int __cdecl GetAccessoryRendering()
-int GetAccessoryRendering() {
+int GetAccessoryRendering(void) {
     LOG_TRACE("()");
 
     return gRendering_accessories;
@@ -2308,7 +2308,7 @@ void SetCarSimplificationLevel(int pLevel) {
 }
 
 // IDA: int __cdecl GetCarSimplificationLevel()
-int GetCarSimplificationLevel() {
+int GetCarSimplificationLevel(void) {
     LOG_TRACE("()");
 
     return gCar_simplification_level;
@@ -2362,7 +2362,7 @@ void LoadExceptionsFileForTrack(char* pTrack_file_name) {
 }
 
 // IDA: void __cdecl FreeExceptions()
-void FreeExceptions() {
+void FreeExceptions(void) {
     tException_list list;
     tException_list next;
     LOG_TRACE("()");
@@ -2611,7 +2611,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     strcat(str, ".ACT");
     PathCat(gAdditional_actor_path, gApplication_path, "ACTORS");
     PathCat(gAdditional_actor_path, gAdditional_actor_path, str);
-    gAdditional_actors = BrActorAllocate(0, 0);
+    gAdditional_actors = BrActorAllocate(BR_ACTOR_NONE, NULL);
     BrActorAdd(gUniverse_actor, gAdditional_actors);
     gLast_actor = NULL;
     SaveAdditionalStuff();
@@ -2638,7 +2638,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     }
     PossibleService();
 
-    gSky_image_width = (360.0 / BrDegreeToAngle(GetAnInt(f)));
+    gSky_image_width = BrDegreeToAngle(360.0 / GetAnInt(f));
     gSky_image_height = BrDegreeToAngle(GetAScalar(f));
     gSky_image_underground = gSky_image_height * (sky_pixels_high - GetAnInt(f)) / sky_pixels_high;
 
@@ -2818,7 +2818,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     /* Display skidmarks even if the race has no specified skidmark material. */
     if (!skid_mark_cnt && num_materials) {
         LOG_WARN("Track %s has no valid skid mark material, setting the default one",
-                 pRace_info->track_file_name);
+            pRace_info->track_file_name);
         LoadSinglePixelmap(&gTrack_storage_space, "SKIDMARK.PIX");
         material = LoadSingleMaterial(&gTrack_storage_space, "SKIDMARK.MAT");
         pRace_info->material_modifiers[0].skid_mark_material = material;
@@ -3042,7 +3042,7 @@ br_scalar NormaliseDegreeAngle(br_scalar pAngle) {
     } while (0)
 
 // IDA: void __cdecl FunkThoseTronics()
-void FunkThoseTronics() {
+void FunkThoseTronics(void) {
     int i;
     int j;
     int iteration_count;
@@ -4106,7 +4106,7 @@ void GrooveThisDelic(tGroovidelic_spec* pGroove, tU32 pTime, int pInterrupt_it) 
 }
 
 // IDA: void __cdecl GrooveThoseDelics()
-void GrooveThoseDelics() {
+void GrooveThoseDelics(void) {
     int i;
     tGroovidelic_spec* the_groove;
     float f_the_time;
@@ -4157,7 +4157,7 @@ void SetGrooveInterrupt(int pGroove_index, br_matrix34* pMatrix, int pPath_inter
 }
 
 // IDA: void __cdecl ResetGrooveFlags()
-void ResetGrooveFlags() {
+void ResetGrooveFlags(void) {
     int i;
     tGroovidelic_spec* the_groove;
     LOG_TRACE("()");
@@ -4170,7 +4170,7 @@ void ResetGrooveFlags() {
 }
 
 // IDA: tSpecial_volume* __cdecl GetDefaultSpecialVolumeForWater()
-tSpecial_volume* GetDefaultSpecialVolumeForWater() {
+tSpecial_volume* GetDefaultSpecialVolumeForWater(void) {
     LOG_TRACE("()");
 
     return gDefault_water_spec_vol;
@@ -4195,7 +4195,7 @@ tSpecial_volume* FindSpecialVolume(br_vector3* pP, tSpecial_volume* pLast_vol) {
 }
 
 // IDA: void __cdecl SaveAdditionalActors()
-void SaveAdditionalActors() {
+void SaveAdditionalActors(void) {
     LOG_TRACE("()");
 
     if (gAdditional_actors != NULL) {
@@ -4445,70 +4445,70 @@ void DropActor(int pIndex) {
 }
 
 // IDA: void __cdecl DropActor0()
-void DropActor0() {
+void DropActor0(void) {
     LOG_TRACE("()");
 
     DropActor(0);
 }
 
 // IDA: void __cdecl DropActor1()
-void DropActor1() {
+void DropActor1(void) {
     LOG_TRACE("()");
 
     DropActor(1);
 }
 
 // IDA: void __cdecl DropActor2()
-void DropActor2() {
+void DropActor2(void) {
     LOG_TRACE("()");
 
     DropActor(2);
 }
 
 // IDA: void __cdecl DropActor3()
-void DropActor3() {
+void DropActor3(void) {
     LOG_TRACE("()");
 
     DropActor(3);
 }
 
 // IDA: void __cdecl DropActor4()
-void DropActor4() {
+void DropActor4(void) {
     LOG_TRACE("()");
 
     DropActor(4);
 }
 
 // IDA: void __cdecl DropActor5()
-void DropActor5() {
+void DropActor5(void) {
     LOG_TRACE("()");
 
     DropActor(5);
 }
 
 // IDA: void __cdecl DropActor6()
-void DropActor6() {
+void DropActor6(void) {
     LOG_TRACE("()");
 
     DropActor(6);
 }
 
 // IDA: void __cdecl DropActor7()
-void DropActor7() {
+void DropActor7(void) {
     LOG_TRACE("()");
 
     DropActor(7);
 }
 
 // IDA: void __cdecl DropActor8()
-void DropActor8() {
+void DropActor8(void) {
     LOG_TRACE("()");
 
     DropActor(8);
 }
 
 // IDA: void __cdecl DropActor9()
-void DropActor9() {
+void DropActor9(void) {
     LOG_TRACE("()");
 
     DropActor(9);
@@ -4537,7 +4537,7 @@ br_uint_32 IdentifyAccCB(br_actor* pActor, void* pArg) {
 }
 
 // IDA: void __cdecl IdentifyAcc()
-void IdentifyAcc() {
+void IdentifyAcc(void) {
     LOG_TRACE("()");
 
     gNearest_distance = FLT_MAX;
@@ -4582,7 +4582,7 @@ br_uint_32 DelReferencedModels(br_actor* pActor, void* pArg) {
 }
 
 // IDA: void __cdecl DeleteAcc()
-void DeleteAcc() {
+void DeleteAcc(void) {
     LOG_TRACE("()");
 
     if (gLast_actor == NULL) {
@@ -4635,7 +4635,7 @@ void CentreActor(br_actor* pActor, br_vector3* pOffset) {
 }
 
 // IDA: void __cdecl SnapAccToVertical()
-void SnapAccToVertical() {
+void SnapAccToVertical(void) {
     LOG_TRACE("()");
 
     if (gLast_actor == NULL) {
@@ -4722,63 +4722,63 @@ void MoveAccessory(br_scalar pX_shift, br_scalar pY_shift, br_scalar pZ_shift) {
 }
 
 // IDA: void __cdecl RotateAccL()
-void RotateAccL() {
+void RotateAccL(void) {
     LOG_TRACE("()");
 
     RotateAccessory(BrDegreeToAngle(90));
 }
 
 // IDA: void __cdecl RotateAccL2()
-void RotateAccL2() {
+void RotateAccL2(void) {
     LOG_TRACE("()");
 
     RotateAccessory(BrDegreeToAngle(15));
 }
 
 // IDA: void __cdecl RotateAccL3()
-void RotateAccL3() {
+void RotateAccL3(void) {
     LOG_TRACE("()");
 
     RotateAccessory(BrDegreeToAngle(5));
 }
 
 // IDA: void __cdecl RotateAccL4()
-void RotateAccL4() {
+void RotateAccL4(void) {
     LOG_TRACE("()");
 
     RotateAccessory(BrDegreeToAngle(1));
 }
 
 // IDA: void __cdecl RotateAccR()
-void RotateAccR() {
+void RotateAccR(void) {
     LOG_TRACE("()");
 
     RotateAccessory(BrDegreeToAngle(270));
 }
 
 // IDA: void __cdecl RotateAccR2()
-void RotateAccR2() {
+void RotateAccR2(void) {
     LOG_TRACE("()");
 
     RotateAccessory(BrDegreeToAngle(345));
 }
 
 // IDA: void __cdecl RotateAccR3()
-void RotateAccR3() {
+void RotateAccR3(void) {
     LOG_TRACE("()");
 
     RotateAccessory(BrDegreeToAngle(355));
 }
 
 // IDA: void __cdecl RotateAccR4()
-void RotateAccR4() {
+void RotateAccR4(void) {
     LOG_TRACE("()");
 
     RotateAccessory(BrDegreeToAngle(359));
 }
 
 // IDA: void __cdecl CycleAccRotate()
-void CycleAccRotate() {
+void CycleAccRotate(void) {
     LOG_TRACE("()");
 
     gCurrent_rotate_mode = (gCurrent_rotate_mode == eRotate_mode_z) ? eRotate_mode_x : (gCurrent_rotate_mode + 1);
@@ -4796,7 +4796,7 @@ void CycleAccRotate() {
 }
 
 // IDA: void __cdecl CycleAccScale()
-void CycleAccScale() {
+void CycleAccScale(void) {
     LOG_TRACE("()");
 
     gCurrent_scale_mode = (gCurrent_scale_mode == eScale_mode_z) ? eScale_mode_all : (gCurrent_scale_mode + 1);
@@ -4817,224 +4817,224 @@ void CycleAccScale() {
 }
 
 // IDA: void __cdecl ScaleAccUp2()
-void ScaleAccUp2() {
+void ScaleAccUp2(void) {
     LOG_TRACE("()");
 
     ScaleAccessory(1.2f);
 }
 
 // IDA: void __cdecl ScaleAccUp3()
-void ScaleAccUp3() {
+void ScaleAccUp3(void) {
     LOG_TRACE("()");
 
     ScaleAccessory(1.05f);
 }
 
 // IDA: void __cdecl ScaleAccUp4()
-void ScaleAccUp4() {
+void ScaleAccUp4(void) {
     LOG_TRACE("()");
 
     ScaleAccessory(1.002f);
 }
 
 // IDA: void __cdecl ScaleAccDown2()
-void ScaleAccDown2() {
+void ScaleAccDown2(void) {
     LOG_TRACE("()");
 
     ScaleAccessory(1 / 1.2f);
 }
 
 // IDA: void __cdecl ScaleAccDown3()
-void ScaleAccDown3() {
+void ScaleAccDown3(void) {
     LOG_TRACE("()");
 
     ScaleAccessory(1 / 1.05f);
 }
 
 // IDA: void __cdecl ScaleAccDown4()
-void ScaleAccDown4() {
+void ScaleAccDown4(void) {
     LOG_TRACE("()");
 
     ScaleAccessory(1 / 1.002f);
 }
 
 // IDA: void __cdecl MoveXAccL()
-void MoveXAccL() {
+void MoveXAccL(void) {
     LOG_TRACE("()");
 
     MoveAccessory(1.f, 0.f, 0.f);
 }
 
 // IDA: void __cdecl MoveXAccL2()
-void MoveXAccL2() {
+void MoveXAccL2(void) {
     LOG_TRACE("()");
 
     MoveAccessory(.2f, 0.f, 0.f);
 }
 
 // IDA: void __cdecl MoveXAccL3()
-void MoveXAccL3() {
+void MoveXAccL3(void) {
     LOG_TRACE("()");
 
     MoveAccessory(.02f, 0.f, 0.f);
 }
 
 // IDA: void __cdecl MoveXAccL4()
-void MoveXAccL4() {
+void MoveXAccL4(void) {
     LOG_TRACE("()");
 
     MoveAccessory(.002f, 0.f, 0.f);
 }
 
 // IDA: void __cdecl MoveXAccR()
-void MoveXAccR() {
+void MoveXAccR(void) {
     LOG_TRACE("()");
 
     MoveAccessory(-1.f, 0.f, 0.f);
 }
 
 // IDA: void __cdecl MoveXAccR2()
-void MoveXAccR2() {
+void MoveXAccR2(void) {
     LOG_TRACE("()");
 
     MoveAccessory(-.2f, 0.f, 0.f);
 }
 
 // IDA: void __cdecl MoveXAccR3()
-void MoveXAccR3() {
+void MoveXAccR3(void) {
     LOG_TRACE("()");
 
     MoveAccessory(-.02f, 0.f, 0.f);
 }
 
 // IDA: void __cdecl MoveXAccR4()
-void MoveXAccR4() {
+void MoveXAccR4(void) {
     LOG_TRACE("()");
 
     MoveAccessory(-.002f, 0.f, 0.f);
 }
 
 // IDA: void __cdecl MoveYAccL()
-void MoveYAccL() {
+void MoveYAccL(void) {
     LOG_TRACE("()");
 
     MoveAccessory(0.f, 1.f, 0.f);
 }
 
 // IDA: void __cdecl MoveYAccL2()
-void MoveYAccL2() {
+void MoveYAccL2(void) {
     LOG_TRACE("()");
 
     MoveAccessory(0.f, .2f, 0.f);
 }
 
 // IDA: void __cdecl MoveYAccL3()
-void MoveYAccL3() {
+void MoveYAccL3(void) {
     LOG_TRACE("()");
 
     MoveAccessory(0.f, .02f, 0.f);
 }
 
 // IDA: void __cdecl MoveYAccL4()
-void MoveYAccL4() {
+void MoveYAccL4(void) {
     LOG_TRACE("()");
 
     MoveAccessory(0.f, .002f, 0.f);
 }
 
 // IDA: void __cdecl MoveYAccR()
-void MoveYAccR() {
+void MoveYAccR(void) {
     LOG_TRACE("()");
 
     MoveAccessory(0.f, -1.f, 0.f);
 }
 
 // IDA: void __cdecl MoveYAccR2()
-void MoveYAccR2() {
+void MoveYAccR2(void) {
     LOG_TRACE("()");
 
     MoveAccessory(0.f, -.2f, 0.f);
 }
 
 // IDA: void __cdecl MoveYAccR3()
-void MoveYAccR3() {
+void MoveYAccR3(void) {
     LOG_TRACE("()");
 
     MoveAccessory(0.f, -.02f, 0.f);
 }
 
 // IDA: void __cdecl MoveYAccR4()
-void MoveYAccR4() {
+void MoveYAccR4(void) {
     LOG_TRACE("()");
 
     MoveAccessory(0.f, -.002f, 0.f);
 }
 
 // IDA: void __cdecl MoveZAccL()
-void MoveZAccL() {
+void MoveZAccL(void) {
     LOG_TRACE("()");
 
     MoveAccessory(0.f, 0.f, 1.f);
 }
 
 // IDA: void __cdecl MoveZAccL2()
-void MoveZAccL2() {
+void MoveZAccL2(void) {
     LOG_TRACE("()");
 
     MoveAccessory(0.f, 0.f, .2f);
 }
 
 // IDA: void __cdecl MoveZAccL3()
-void MoveZAccL3() {
+void MoveZAccL3(void) {
     LOG_TRACE("()");
 
     MoveAccessory(0.f, 0.f, .02f);
 }
 
 // IDA: void __cdecl MoveZAccL4()
-void MoveZAccL4() {
+void MoveZAccL4(void) {
     LOG_TRACE("()");
 
     MoveAccessory(0.f, 0.f, .002f);
 }
 
 // IDA: void __cdecl MoveZAccR()
-void MoveZAccR() {
+void MoveZAccR(void) {
     LOG_TRACE("()");
 
     MoveAccessory(0.f, 0.f, -1.f);
 }
 
 // IDA: void __cdecl MoveZAccR2()
-void MoveZAccR2() {
+void MoveZAccR2(void) {
     LOG_TRACE("()");
 
     MoveAccessory(0.f, 0.f, -.2f);
 }
 
 // IDA: void __cdecl MoveZAccR3()
-void MoveZAccR3() {
+void MoveZAccR3(void) {
     LOG_TRACE("()");
 
     MoveAccessory(0.f, 0.f, -.02f);
 }
 
 // IDA: void __cdecl MoveZAccR4()
-void MoveZAccR4() {
+void MoveZAccR4(void) {
     LOG_TRACE("()");
 
     MoveAccessory(0.f, 0.f, -.002f);
 }
 
 // IDA: br_material* __cdecl GetInternalMat()
-br_material* GetInternalMat() {
+br_material* GetInternalMat(void) {
     LOG_TRACE("()");
 
     return BrMaterialFind("SPECVOL.MAT");
 }
 
 // IDA: br_material* __cdecl GetExternalMat()
-br_material* GetExternalMat() {
+br_material* GetExternalMat(void) {
     LOG_TRACE("()");
 
     return BrMaterialFind("SPECVOL2.MAT");
@@ -5164,75 +5164,75 @@ void DropSpecVol(int pIndex) {
 }
 
 // IDA: void __cdecl DropSpecVol0()
-void DropSpecVol0() {
+void DropSpecVol0(void) {
     LOG_TRACE("()");
 }
 
 // IDA: void __cdecl DropSpecVol1()
-void DropSpecVol1() {
+void DropSpecVol1(void) {
     LOG_TRACE("()");
 
     DropSpecVol(1);
 }
 
 // IDA: void __cdecl DropSpecVol2()
-void DropSpecVol2() {
+void DropSpecVol2(void) {
     LOG_TRACE("()");
 
     DropSpecVol(2);
 }
 
 // IDA: void __cdecl DropSpecVol3()
-void DropSpecVol3() {
+void DropSpecVol3(void) {
     LOG_TRACE("()");
 
     DropSpecVol(3);
 }
 
 // IDA: void __cdecl DropSpecVol4()
-void DropSpecVol4() {
+void DropSpecVol4(void) {
     LOG_TRACE("()");
 
     DropSpecVol(4);
 }
 
 // IDA: void __cdecl DropSpecVol5()
-void DropSpecVol5() {
+void DropSpecVol5(void) {
     LOG_TRACE("()");
 
     DropSpecVol(5);
 }
 
 // IDA: void __cdecl DropSpecVol6()
-void DropSpecVol6() {
+void DropSpecVol6(void) {
     LOG_TRACE("()");
 
     DropSpecVol(6);
 }
 
 // IDA: void __cdecl DropSpecVol7()
-void DropSpecVol7() {
+void DropSpecVol7(void) {
     LOG_TRACE("()");
 
     DropSpecVol(7);
 }
 
 // IDA: void __cdecl DropSpecVol8()
-void DropSpecVol8() {
+void DropSpecVol8(void) {
     LOG_TRACE("()");
 
     DropSpecVol(8);
 }
 
 // IDA: void __cdecl DropSpecVol9()
-void DropSpecVol9() {
+void DropSpecVol9(void) {
     LOG_TRACE("()");
 
     DropSpecVol(9);
 }
 
 // IDA: void __cdecl IdentifySpecVol()
-void IdentifySpecVol() {
+void IdentifySpecVol(void) {
     int i;
     int min_index;
     tSpecial_volume* v;
@@ -5291,7 +5291,7 @@ void DelSpecVolumeGraph(int pIndex) {
 }
 
 // IDA: void __cdecl DeleteSpecVol()
-void DeleteSpecVol() {
+void DeleteSpecVol(void) {
     int index;
     LOG_TRACE("()");
 
@@ -5312,182 +5312,182 @@ void DeleteSpecVol() {
 }
 
 // IDA: void __cdecl RotateSpecVolL()
-void RotateSpecVolL() {
+void RotateSpecVolL(void) {
     LOG_TRACE("()");
 
     RotateAccL();
 }
 
 // IDA: void __cdecl RotateSpecVolL2()
-void RotateSpecVolL2() {
+void RotateSpecVolL2(void) {
     LOG_TRACE("()");
 
     RotateAccL2();
 }
 
 // IDA: void __cdecl RotateSpecVolL3()
-void RotateSpecVolL3() {
+void RotateSpecVolL3(void) {
     LOG_TRACE("()");
 
     RotateAccL3();
 }
 
 // IDA: void __cdecl RotateSpecVolL4()
-void RotateSpecVolL4() {
+void RotateSpecVolL4(void) {
     LOG_TRACE("()");
 
     RotateAccL4();
 }
 
 // IDA: void __cdecl RotateSpecVolR()
-void RotateSpecVolR() {
+void RotateSpecVolR(void) {
     LOG_TRACE("()");
 
     RotateAccR();
 }
 
 // IDA: void __cdecl RotateSpecVolR2()
-void RotateSpecVolR2() {
+void RotateSpecVolR2(void) {
     LOG_TRACE("()");
 
     RotateAccR2();
 }
 
 // IDA: void __cdecl RotateSpecVolR3()
-void RotateSpecVolR3() {
+void RotateSpecVolR3(void) {
     LOG_TRACE("()");
 
     RotateAccR3();
 }
 
 // IDA: void __cdecl RotateSpecVolR4()
-void RotateSpecVolR4() {
+void RotateSpecVolR4(void) {
     LOG_TRACE("()");
 
     RotateAccR4();
 }
 
 // IDA: void __cdecl CycleSpecVolRotate()
-void CycleSpecVolRotate() {
+void CycleSpecVolRotate(void) {
     LOG_TRACE("()");
 
     CycleAccRotate();
 }
 
 // IDA: void __cdecl CycleSpecVolScale()
-void CycleSpecVolScale() {
+void CycleSpecVolScale(void) {
     LOG_TRACE("()");
 
     CycleAccScale();
 }
 
 // IDA: void __cdecl ScaleSpecVolUp2()
-void ScaleSpecVolUp2() {
+void ScaleSpecVolUp2(void) {
     LOG_TRACE("()");
 
     ScaleAccUp2();
 }
 
 // IDA: void __cdecl ScaleSpecVolUp3()
-void ScaleSpecVolUp3() {
+void ScaleSpecVolUp3(void) {
     LOG_TRACE("()");
 
     ScaleAccUp3();
 }
 
 // IDA: void __cdecl ScaleSpecVolUp4()
-void ScaleSpecVolUp4() {
+void ScaleSpecVolUp4(void) {
     LOG_TRACE("()");
 
     ScaleAccUp4();
 }
 
 // IDA: void __cdecl ScaleSpecVolDown2()
-void ScaleSpecVolDown2() {
+void ScaleSpecVolDown2(void) {
     LOG_TRACE("()");
 
     ScaleAccDown2();
 }
 
 // IDA: void __cdecl ScaleSpecVolDown3()
-void ScaleSpecVolDown3() {
+void ScaleSpecVolDown3(void) {
     LOG_TRACE("()");
 
     ScaleAccDown3();
 }
 
 // IDA: void __cdecl ScaleSpecVolDown4()
-void ScaleSpecVolDown4() {
+void ScaleSpecVolDown4(void) {
     LOG_TRACE("()");
 
     ScaleAccDown4();
 }
 
 // IDA: void __cdecl MoveXSpecVolL()
-void MoveXSpecVolL() {
+void MoveXSpecVolL(void) {
     LOG_TRACE("()");
 
     MoveXAccL();
 }
 
 // IDA: void __cdecl MoveXSpecVolL2()
-void MoveXSpecVolL2() {
+void MoveXSpecVolL2(void) {
     LOG_TRACE("()");
 
     MoveXAccL2();
 }
 
 // IDA: void __cdecl MoveXSpecVolL3()
-void MoveXSpecVolL3() {
+void MoveXSpecVolL3(void) {
     LOG_TRACE("()");
 
     MoveXAccL3();
 }
 
 // IDA: void __cdecl MoveXSpecVolL4()
-void MoveXSpecVolL4() {
+void MoveXSpecVolL4(void) {
     LOG_TRACE("()");
 
     MoveXAccL4();
 }
 
 // IDA: void __cdecl MoveXSpecVolR()
-void MoveXSpecVolR() {
+void MoveXSpecVolR(void) {
     LOG_TRACE("()");
 
     MoveXAccR();
 }
 
 // IDA: void __cdecl MoveXSpecVolR2()
-void MoveXSpecVolR2() {
+void MoveXSpecVolR2(void) {
     LOG_TRACE("()");
 
     MoveXAccR2();
 }
 
 // IDA: void __cdecl MoveXSpecVolR3()
-void MoveXSpecVolR3() {
+void MoveXSpecVolR3(void) {
     LOG_TRACE("()");
 
     MoveXAccR3();
 }
 
 // IDA: void __cdecl MoveXSpecVolR4()
-void MoveXSpecVolR4() {
+void MoveXSpecVolR4(void) {
     LOG_TRACE("()");
 
     MoveXAccR4();
 }
 
 // IDA: void __cdecl MoveYSpecVolL()
-void MoveYSpecVolL() {
+void MoveYSpecVolL(void) {
     LOG_TRACE("()");
 
     MoveYAccL();
 }
 
 // IDA: void __cdecl MoveYSpecVolL2()
-void MoveYSpecVolL2() {
+void MoveYSpecVolL2(void) {
     LOG_TRACE("()");
 
 #if defined(DETHRACE_FIX_BUGS)
@@ -5498,112 +5498,112 @@ void MoveYSpecVolL2() {
 }
 
 // IDA: void __cdecl MoveYSpecVolL3()
-void MoveYSpecVolL3() {
+void MoveYSpecVolL3(void) {
     LOG_TRACE("()");
 
     MoveYAccL3();
 }
 
 // IDA: void __cdecl MoveYSpecVolL4()
-void MoveYSpecVolL4() {
+void MoveYSpecVolL4(void) {
     LOG_TRACE("()");
 
     MoveYAccL4();
 }
 
 // IDA: void __cdecl MoveYSpecVolR()
-void MoveYSpecVolR() {
+void MoveYSpecVolR(void) {
     LOG_TRACE("()");
 
     MoveYAccR();
 }
 
 // IDA: void __cdecl MoveYSpecVolR2()
-void MoveYSpecVolR2() {
+void MoveYSpecVolR2(void) {
     LOG_TRACE("()");
 
     MoveYAccR2();
 }
 
 // IDA: void __cdecl MoveYSpecVolR3()
-void MoveYSpecVolR3() {
+void MoveYSpecVolR3(void) {
     LOG_TRACE("()");
 
     MoveYAccR3();
 }
 
 // IDA: void __cdecl MoveYSpecVolR4()
-void MoveYSpecVolR4() {
+void MoveYSpecVolR4(void) {
     LOG_TRACE("()");
 
     MoveYAccR4();
 }
 
 // IDA: void __cdecl MoveZSpecVolL()
-void MoveZSpecVolL() {
+void MoveZSpecVolL(void) {
     LOG_TRACE("()");
 
     MoveZAccL();
 }
 
 // IDA: void __cdecl MoveZSpecVolL2()
-void MoveZSpecVolL2() {
+void MoveZSpecVolL2(void) {
     LOG_TRACE("()");
 
     MoveZAccL2();
 }
 
 // IDA: void __cdecl MoveZSpecVolL3()
-void MoveZSpecVolL3() {
+void MoveZSpecVolL3(void) {
     LOG_TRACE("()");
 
     MoveZAccL3();
 }
 
 // IDA: void __cdecl MoveZSpecVolL4()
-void MoveZSpecVolL4() {
+void MoveZSpecVolL4(void) {
     LOG_TRACE("()");
 
     MoveZAccL4();
 }
 
 // IDA: void __cdecl MoveZSpecVolR()
-void MoveZSpecVolR() {
+void MoveZSpecVolR(void) {
     LOG_TRACE("()");
 
     MoveZAccR();
 }
 
 // IDA: void __cdecl MoveZSpecVolR2()
-void MoveZSpecVolR2() {
+void MoveZSpecVolR2(void) {
     LOG_TRACE("()");
 
     MoveZAccR2();
 }
 
 // IDA: void __cdecl MoveZSpecVolR3()
-void MoveZSpecVolR3() {
+void MoveZSpecVolR3(void) {
     LOG_TRACE("()");
 
     MoveZAccR3();
 }
 
 // IDA: void __cdecl MoveZSpecVolR4()
-void MoveZSpecVolR4() {
+void MoveZSpecVolR4(void) {
     LOG_TRACE("()");
 
     MoveZAccR4();
 }
 
 // IDA: void __cdecl SnapSpecVolToVertical()
-void SnapSpecVolToVertical() {
+void SnapSpecVolToVertical(void) {
     LOG_TRACE("()");
 
     SnapAccToVertical();
 }
 
 // IDA: void __cdecl ShowSpecialVolumes()
-void ShowSpecialVolumes() {
+void ShowSpecialVolumes(void) {
     int i;
     int j;
     int temp;
@@ -5629,7 +5629,7 @@ void ShowSpecialVolumes() {
 }
 
 // IDA: void __cdecl HideSpecialVolumes()
-void HideSpecialVolumes() {
+void HideSpecialVolumes(void) {
     int i;
     tSpecial_volume* v;
     LOG_TRACE("()");

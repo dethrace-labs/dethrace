@@ -1,46 +1,31 @@
 #include "s3sound.h"
 #include "audio.h"
-#include "harness/config.h"
+#include "harness/trace.h"
 #include "miniaudio/miniaudio.h"
 #include "resource.h"
-#include "harness/trace.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#define MAX_PATH_LENGTH 1024
 extern void dr_dprintf(char* fmt_string, ...);
 
 int gS3_sample_filter_funcs_registered;
+long gS3_last_file_length;
 tS3_sample_filter* gS3_sample_filter_func;
 tS3_sample_filter* gS3_sample_filter_disable_func;
 
-ma_engine engine;
+// dethrace
+extern ma_engine miniaudio_engine;
 
-int S3OpenSampleDevice() {
-    ma_result result;
-
-    ma_engine_config engineConfig;
-    engineConfig = ma_engine_config_init();
-    engineConfig.sampleRate = 22050;
-
-    result = ma_engine_init(&engineConfig, &engine);
-    if (result != MA_SUCCESS) {
-        printf("Failed to initialize audio engine.");
-        return 0;
-    }
-
-    ma_engine_set_volume(&engine, harness_game_config.volume_multiplier);
-
-    S3Enable();
-    return 1;
-}
-
-// Returns 0 if no error
 int S3LoadSample(tS3_sound_id id) {
-    // LPDIRECTSOUNDBUFFER WavFile; // eax
-    char filename[MAX_PATH_LENGTH]; // [esp+10h] [ebp-5Ch] BYREF
-    tS3_descriptor* descriptor;     // [esp+60h] [ebp-Ch]
-    tS3_sample* sample;             // [esp+68h] [ebp-4h]
+    // changed by dethrace for compatibility
+    // char filename[80]; // [esp+10h] [ebp-5Ch] BYREF
+    char filename[MAX_PATH_LENGTH];
+    tS3_descriptor* descriptor;
+    tS3_sample* sample;
+    char* buf;
+    // LPDIRECTSOUNDBUFFER dsound_buffer; // win95 only
 
     if (!gS3_enabled) {
         return 0;
@@ -63,12 +48,33 @@ int S3LoadSample(tS3_sound_id id) {
     }
 
     memset(sample, 0, sizeof(tS3_sample));
-    descriptor->sound_buffer = S3LoadWavFile(filename, sample);
-
-    if (!descriptor->sound_buffer) {
+    buf = S3LoadWavFile_DOS(filename);
+    if (buf == NULL) {
         S3MemFree(sample);
         return gS3_last_error;
     }
+    sample->freeptr = buf;
+    if (memcmp(buf, "RIFF", 4) == 0) {
+        wav_header* hdr = (wav_header*)buf;
+        sample->dataptr = &buf[sizeof(wav_header)];
+        sample->size = hdr->data_bytes;
+        sample->rate = hdr->sample_rate;
+        sample->resolution = hdr->bit_depth;
+        sample->channels = hdr->num_channels;
+    } else {
+        sample->rate = 16000;
+        sample->resolution = 8;
+        sample->channels = 1;
+        sample->dataptr = buf;
+        sample->size = gS3_last_file_length;
+    }
+
+    // win95
+    // descriptor->sound_buffer = S3LoadWavFile(filename, sample);
+    // if (!descriptor->sound_buffer) {
+    //     S3MemFree(sample);
+    //     return gS3_last_error;
+    // }
     descriptor->special_fx = 0;
     descriptor->sound_data = (char*)sample;
     return eS3_error_none;
@@ -135,7 +141,40 @@ int S3ReadWavHeader(char* buf, tWAVEFORMATEX_** pWav_format, char** data_ptr, in
     return 0;
 }
 
-void* S3LoadWavFile(char* pFile_name, tS3_sample* pSample) {
+void* S3LoadWavFile_DOS(char* pFile_name) {
+    FILE* f;
+    long file_len;
+    size_t bytes_read;
+    char* buf;
+
+    f = fopen(pFile_name, "rb");
+    if (f == NULL) {
+        gS3_last_error = eS3_error_readfile;
+        return 0;
+    }
+    fseek(f, 0, SEEK_END);
+    file_len = ftell(f);
+    fseek(f, 0, SEEK_SET);
+
+    buf = S3MemAllocate(file_len + 1, kMem_S3_sample);
+
+    if (buf) {
+        bytes_read = fread(buf, 1, file_len, f);
+        if (bytes_read == file_len) {
+            gS3_last_file_length = file_len;
+            fclose(f);
+            return buf;
+        } else {
+            gS3_last_error = 4;
+        }
+    } else {
+        fclose(f);
+        gS3_last_error = eS3_error_memory;
+    }
+    return 0;
+}
+
+void* S3LoadWavFile_Win95(char* pFile_name, tS3_sample* pSample) {
     FILE* f;           // [esp+Ch] [ebp-C8h]
     size_t bytes_read; // [esp+14h] [ebp-C0h] BYREF
     //  unsigned int locked_buffer_data_len; // [esp+18h] [ebp-BCh] BYREF
@@ -149,7 +188,7 @@ void* S3LoadWavFile(char* pFile_name, tS3_sample* pSample) {
     // char* locked_buffer_data;   // [esp+CCh] [ebp-8h] BYREF
     size_t file_len; // [esp+D0h] [ebp-4h]
 
-    f = fopen(pFile_name, "r");
+    f = fopen(pFile_name, "rb");
     if (f == NULL) {
         gS3_last_error = eS3_error_readfile;
         return 0;
@@ -187,16 +226,6 @@ void* S3LoadWavFile(char* pFile_name, tS3_sample* pSample) {
     pSample->channels = BrSwap32(pSample->channels);
 #endif
 
-    ma_sound* sound = malloc(sizeof(ma_sound));
-    // TOOD: load from memory - we've already read the file data
-    if (ma_sound_init_from_file(&engine, pFile_name, MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_NO_SPATIALIZATION, NULL, NULL, sound) != MA_SUCCESS) {
-        return NULL; // Failed to load sound.
-    }
-    S3MemFree(buf);
-    return sound;
-
-    // S3MemFree(buf);
-
     // buffer_desc.dwReserved = 0;
     // buffer_desc.dwSize = 20;
     // buffer_desc.dwFlags = 226;
@@ -224,19 +253,27 @@ void* S3LoadWavFile(char* pFile_name, tS3_sample* pSample) {
 }
 
 int S3StopSample(tS3_channel* chan) {
-    if (chan->descriptor && chan->descriptor->type == chan->type) {
-        ma_sound_stop(chan->descriptor->sound_buffer);
-        ma_sound_seek_to_pcm_frame(chan->descriptor->sound_buffer, 0);
+    tS3_sample_struct_miniaudio* miniaudio;
 
-        // dsound_buffer = chan->descriptor->dsound_buffer;
-        // if (dsound_buffer) {
-        //     dsound_buffer->lpVtbl->Stop(dsound_buffer);
-        //     dsound_buffer->lpVtbl->SetCurrentPosition(dsound_buffer, 0);
-        // }
+    if (chan->tag == 0) {
+        return 1;
     }
-    if (chan->active) {
-        chan->needs_service = 1;
+
+    miniaudio = (tS3_sample_struct_miniaudio*)chan->type_struct_sample;
+    if (miniaudio == NULL) {
+        return 0;
     }
+    if (miniaudio->initialized) {
+        ma_sound_stop(&miniaudio->sound);
+        ma_sound_uninit(&miniaudio->sound);
+        ma_audio_buffer_ref_uninit(&miniaudio->buffer_ref);
+        miniaudio->initialized = 0;
+
+        if (chan->active) {
+            chan->needs_service = 1;
+        }
+    }
+
     return 1;
 }
 
@@ -253,44 +290,72 @@ int S3ExecuteSampleFilterFuncs(tS3_channel* chan) {
 
 int S3PlaySample(tS3_channel* chan) {
 
+    tS3_sample_struct_miniaudio* miniaudio;
+    tS3_sample* sample_data;
+    ma_result result;
+
     S3SyncSampleVolume(chan);
     S3SyncSampleRate(chan);
     if (chan->descriptor && chan->descriptor->type == chan->type) {
-        ma_sound_seek_to_pcm_frame(chan->descriptor->sound_buffer, 0);
-        ma_sound_set_looping(chan->descriptor->sound_buffer, chan->repetitions == 0);
-        ma_sound_start(chan->descriptor->sound_buffer);
-        // Mix_PlayChannel(chan->id, chan->descriptor->sound_buffer, 0);
+        miniaudio = (tS3_sample_struct_miniaudio*)chan->type_struct_sample;
+        sample_data = (tS3_sample*)chan->descriptor->sound_data;
+
+        result = ma_audio_buffer_ref_init(ma_format_u8, sample_data->channels, sample_data->dataptr, sample_data->size / sample_data->channels, &miniaudio->buffer_ref);
+        miniaudio->buffer_ref.sampleRate = sample_data->rate;
+        if (result != MA_SUCCESS) {
+            return 0;
+        }
+        result = ma_sound_init_from_data_source(&miniaudio_engine, &miniaudio->buffer_ref, MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_NO_SPATIALIZATION, NULL, &miniaudio->sound);
+        if (result != MA_SUCCESS) {
+            return 0;
+        }
+        miniaudio->initialized = 1;
+
+        ma_sound_set_looping(&miniaudio->sound, chan->repetitions == 0);
+        ma_sound_start(&miniaudio->sound);
+
+        //     dsound_buffer = chan->descriptor->dsound_buffer;
+        //     if (dsound_buffer) {
+        //         dsound_buffer->lpVtbl->SetCurrentPosition(dsound_buffer, 0);
+        //         play_flags = chan->repetitions == 0; // 1 = DSBPLAY_LOOPING
+        //         dsound_buffer->lpVtbl->Play(dsound_buffer, 0, 0, play_flags);
+        //         if (!dsound_buffer->lpVtbl->GetStatus(dsound_buffer, (LPDWORD)&status)) {
+        //             if ((status & 1) != 0) // DSBSTATUS_PLAYING
+        //             {
+        //                 dsound_buffer->lpVtbl->SetCurrentPosition(dsound_buffer, 0);
+        //             } else {
+        //                 dsound_buffer->lpVtbl->Play(dsound_buffer, 0, 0, play_flags);
+        //             }
+        //         }
+        //     }
     }
-    // BOOL play_flags;                   // [esp+Ch] [ebp-Ch]
-    // int status;                        // [esp+10h] [ebp-8h] BYREF
-    // LPDIRECTSOUNDBUFFER dsound_buffer; // [esp+14h] [ebp-4h]
 
-    // S3SampleSyncVolume(chan);
-    // S3SampleSyncRate(chan);
-    // if (chan->descriptor && chan->descriptor->type == chan->type) {
-    //     dsound_buffer = chan->descriptor->dsound_buffer;
-    //     if (dsound_buffer) {
-    //         dsound_buffer->lpVtbl->SetCurrentPosition(dsound_buffer, 0);
-    //         play_flags = chan->repetitions == 0; // 1 = DSBPLAY_LOOPING
-    //         dsound_buffer->lpVtbl->Play(dsound_buffer, 0, 0, play_flags);
-    //         if (!dsound_buffer->lpVtbl->GetStatus(dsound_buffer, (LPDWORD)&status)) {
-    //             if ((status & 1) != 0) // DSBSTATUS_PLAYING
-    //             {
-    //                 dsound_buffer->lpVtbl->SetCurrentPosition(dsound_buffer, 0);
-    //             } else {
-    //                 dsound_buffer->lpVtbl->Play(dsound_buffer, 0, 0, play_flags);
-    //             }
-    //         }
-    //     }
-    // }
     return 1;
 }
 
-int sub_49D837(tS3_channel* chan) {
+// this function was only called in DOS build
+int S3CreateTypeStructs(tS3_channel* chan) {
+    tS3_sample_struct_miniaudio* sample_struct;
+    sample_struct = S3MemAllocate(sizeof(tS3_sample_struct_miniaudio), kMem_S3_DOS_SOS_channel);
+    if (sample_struct == NULL) {
+        return 0;
+    }
+    memset(sample_struct, 0, sizeof(tS3_sample_struct_miniaudio));
+    chan->type_struct_midi = NULL;
+    chan->type_struct_cda = NULL;
+    chan->type_struct_sample = (char*)sample_struct;
     return 1;
 }
 
-int sub_49D84C(tS3_channel* chan) {
+int S3ReleaseTypeStructs(tS3_channel* chan) {
+    if (chan->type_struct_sample) {
+        S3MemFree(chan->type_struct_sample);
+        chan->type_struct_sample = NULL;
+    }
+    if (chan->type_struct_cda) {
+        S3MemFree(chan->type_struct_cda);
+        chan->type_struct_cda = NULL;
+    }
     return 1;
 }
 
@@ -302,6 +367,7 @@ int S3SyncSampleVolume(tS3_channel* chan) {
     int volume_db;
     int pan;
     float linear_volume;
+    tS3_sample_struct_miniaudio* miniaudio;
 
     if (chan->type != eS3_ST_sample) {
         return 1;
@@ -317,8 +383,9 @@ int S3SyncSampleVolume(tS3_channel* chan) {
         }
 
         // convert from directsound -10000-0 volume scale
+        miniaudio = (tS3_sample_struct_miniaudio*)chan->type_struct_sample;
         linear_volume = ma_volume_db_to_linear(volume_db / 100.0f);
-        ma_sound_set_volume(chan->descriptor->sound_buffer, linear_volume);
+        ma_sound_set_volume(&miniaudio->sound, linear_volume);
 
         if (chan->spatial_sound) {
             if (chan->left_volume != 0 && chan->right_volume > chan->left_volume) {
@@ -335,30 +402,35 @@ int S3SyncSampleVolume(tS3_channel* chan) {
             } else {
                 pan = 10000;
             }
-            ma_sound_set_pan(chan->descriptor->sound_buffer, pan / 10000.0f);
+            ma_sound_set_pan(&miniaudio->sound, pan / 10000.0f);
         }
     }
     return 1;
 }
 
 int S3SyncSampleRate(tS3_channel* chan) {
+    tS3_sample_struct_miniaudio* miniaudio;
+
     if (chan->type != eS3_ST_sample) {
         return 1;
     }
     if (chan->descriptor && chan->descriptor->type == chan->type) {
-        if (chan->descriptor->sound_buffer != NULL) {
+        miniaudio = (tS3_sample_struct_miniaudio*)chan->type_struct_sample;
+        if (miniaudio != NULL) {
             int rate = chan->rate;
             if (rate >= 100000) {
                 rate = 100000;
             }
+
             //  sound_buffer->lpVtbl->SetFrequency(sound_buffer, rate);
             // miniaudio uses a linear pitch scale instead of sample rate, so scale it down
-            ma_sound_set_pitch(chan->descriptor->sound_buffer, (rate / (float)((tS3_sample*)chan->descriptor->sound_data)->rate));
+            ma_sound_set_pitch(&miniaudio->sound, (rate / (float)((tS3_sample*)chan->descriptor->sound_data)->rate));
         }
     }
     return 1;
 }
 
-void S3SetEffects(tS3_sample_filter* filter1, tS3_sample_filter* filter2) {
+int S3SetEffects(tS3_sample_filter* filter1, tS3_sample_filter* filter2) {
     STUB_ONCE();
+    return 0;
 }

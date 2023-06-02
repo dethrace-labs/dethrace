@@ -1,6 +1,9 @@
 #ifndef S3_TYPES_H
 #define S3_TYPES_H
 
+#include "s3/s3.h"
+
+#include <miniaudio/miniaudio.h>
 #include <stdint.h>
 
 // extern int PDGetTotalTime();
@@ -12,7 +15,7 @@
 // Internal typedefs
 
 typedef float tF32;
-typedef char* tS3_sound_source_ptr;
+typedef tS3_sound_source* tS3_sound_source_ptr;
 typedef int tS3_sound_tag;
 typedef int tS3_sound_id;
 typedef int tS3_type;
@@ -22,11 +25,11 @@ typedef int tS3_effect_tag;
 typedef long tS3_priority;
 typedef long tS3_pitch;
 typedef long tS3_speed;
-typedef char* tS3_outlet_ptr;
 typedef struct tS3_outlet tS3_outlet;
 typedef struct tS3_descriptor tS3_descriptor;
 typedef struct tS3_channel tS3_channel;
 typedef struct tS3_sound_source tS3_sound_source;
+typedef tS3_outlet* tS3_outlet_ptr;
 
 typedef enum tS3_error_codes {
     eS3_error_none = 0,
@@ -71,12 +74,6 @@ typedef enum tS3_sound_type {
 
 typedef void tS3_outlet_callback(tS3_outlet*, tS3_sound_tag, tS3_termination_reason);
 typedef void tS3_sample_filter(tS3_effect_tag, tS3_sound_tag);
-
-typedef struct tS3_vector3 {
-    tF32 x;
-    tF32 y;
-    tF32 z;
-} tS3_vector3;
 
 typedef struct tS3_channel {
     int active;
@@ -135,8 +132,8 @@ typedef struct tS3_descriptor {
     int memory_proxy;
     char* sound_data;
     char* filename;
-    // LPDIRECTSOUNDBUFFER for example
-    void* sound_buffer;
+    // win95 only
+    // LPDIRECTSOUNDBUFFER sound_buffer;
 } tS3_descriptor;
 
 typedef struct tS3_sound_source {
@@ -179,7 +176,7 @@ typedef struct tS3_hardware_info {
     int independent_pitch;
 } tS3_hardware_info;
 
-// Added by dethrace
+// Everything below added by dethrace
 typedef struct tS3_soundbank_read_ctx {
     int data_len;
     int unk1;
@@ -187,7 +184,6 @@ typedef struct tS3_soundbank_read_ctx {
     char* data;
 } tS3_soundbank_read_ctx;
 
-// Everything below added by dethrace
 #pragma pack(push, 1)
 typedef struct tWAVEFORMATEX_ {
     int16_t wFormatTag;
@@ -200,6 +196,33 @@ typedef struct tWAVEFORMATEX_ {
 } tWAVEFORMATEX_;
 #pragma pack(pop)
 
-#define MAX_PATH_LENGTH 256
+#pragma pack(push, 1)
+typedef struct wav_header {
+    // RIFF Header
+    char riff_header[4]; // Contains "RIFF"
+    int32_t wav_size;    // Size of the wav portion of the file, which follows the first 8 bytes. File size - 8
+    char wave_header[4]; // Contains "WAVE"
+
+    // Format Header
+    char fmt_header[4];     // Contains "fmt " (includes trailing space)
+    int32_t fmt_chunk_size; // Should be 16 for PCM
+    int16_t audio_format;   // Should be 1 for PCM. 3 for IEEE Float
+    int16_t num_channels;
+    int32_t sample_rate;
+    int32_t byte_rate;        // Number of bytes per second. sample_rate * num_channels * Bytes Per Sample
+    int16_t sample_alignment; // num_channels * Bytes Per Sample
+    int16_t bit_depth;        // Number of bits per sample
+
+    // Data
+    char data_header[4]; // Contains "data"
+    int32_t data_bytes;  // Number of bytes in data. Number of samples * num_channels * sample byte size
+} wav_header;
+#pragma pack(pop)
+
+typedef struct tS3_sample_struct_miniaudio {
+    ma_audio_buffer_ref buffer_ref;
+    ma_sound sound;
+    int initialized;
+} tS3_sample_struct_miniaudio;
 
 #endif

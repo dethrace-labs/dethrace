@@ -58,7 +58,7 @@ tU32 gTime_bonus_start;
 int gLast_credit_headup__mainloop; // suffix added to avoid duplicate symbol
 
 // IDA: void __cdecl ToggleInfo()
-void ToggleInfo() {
+void ToggleInfo(void) {
     LOG_TRACE("()");
 
     if (gProgram_state.game_completed) {
@@ -74,7 +74,7 @@ void ToggleInfo() {
 }
 
 // IDA: void __cdecl CalculateFrameRate()
-void CalculateFrameRate() {
+void CalculateFrameRate(void) {
     static tU32 last_time;
     tU32 new_time;
     static int last_rates[30];
@@ -99,7 +99,7 @@ void CalculateFrameRate() {
 }
 
 // IDA: void __cdecl LoseOldestWastedMassage()
-void LoseOldestWastedMassage() {
+void LoseOldestWastedMassage(void) {
     int i;
     LOG_TRACE("()");
 
@@ -125,7 +125,7 @@ void QueueWastedMassage(int pIndex) {
 }
 
 // IDA: void __cdecl MungeHeadups()
-void MungeHeadups() {
+void MungeHeadups(void) {
     char the_text[256];
     int flash_rate;
     int new_countdown;
@@ -342,8 +342,7 @@ void UpdateFramePeriod(tU32* pCamera_period) {
         last_AR_mode = gAction_replay_mode;
     }
     if (gAction_replay_mode) {
-        // Was (removed abs to avoid compiler warning) gFrame_period = abs(gLast_replay_frame_time - gLast_tick_count);
-        gFrame_period = gLast_replay_frame_time - gLast_tick_count;
+        gFrame_period = abs((int)(gLast_replay_frame_time - gLast_tick_count));
         gLast_tick_count = gLast_replay_frame_time;
         new_camera_tick_count = PDGetTotalTime();
         new_tick_count = GetTotalTime();
@@ -404,14 +403,14 @@ void UpdateFramePeriod(tU32* pCamera_period) {
 }
 
 // IDA: tU32 __cdecl GetLastTickCount()
-tU32 GetLastTickCount() {
+tU32 GetLastTickCount(void) {
     LOG_TRACE("()");
 
     return gLast_tick_count;
 }
 
 // IDA: void __cdecl CheckTimer()
-void CheckTimer() {
+void CheckTimer(void) {
     tS32 time_in_seconds;
     tS32 time_left;
     static tU32 last_time_in_seconds = 0;
@@ -455,7 +454,7 @@ void CheckTimer() {
 }
 
 // IDA: int __cdecl MungeRaceFinished()
-int MungeRaceFinished() {
+int MungeRaceFinished(void) {
     LOG_TRACE("()");
 
     if (!gRace_finished || gAction_replay_mode || (gNet_mode != eNet_mode_none && gRace_over_reason == eRace_not_over_yet)) {
@@ -479,7 +478,7 @@ int MungeRaceFinished() {
 }
 
 // IDA: tRace_result __cdecl MainGameLoop()
-tRace_result MainGameLoop() {
+tRace_result MainGameLoop(void) {
     tU32 camera_period;
     tU32 start_menu_time;
     tU32 frame_start_time;
@@ -718,7 +717,7 @@ tRace_result MainGameLoop() {
 }
 
 // IDA: tRace_result __cdecl DoRace()
-tRace_result DoRace() {
+tRace_result DoRace(void) {
     tRace_result result;
     LOG_TRACE("()");
 

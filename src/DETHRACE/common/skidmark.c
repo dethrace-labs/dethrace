@@ -104,28 +104,36 @@ int Reflex2D(br_vector3* pPt, br_vector3* pL1, br_vector3* pL2) {
 }
 
 // IDA: void __cdecl InitSkids()
-void InitSkids() {
+void InitSkids(void) {
     int skid;
     int mat;
     int sl;
     br_model* square;
     char* str;
+#if defined(DETHRACE_FIX_BUGS)
+    char mat_name[32];
+#endif
     LOG_TRACE("()");
 
-    for (mat = 0; mat < 2; mat++) {
+    for (mat = 0; mat < COUNT_OF(gMaterial_names); mat++) {
         if (gProgram_state.sausage_eater_mode) {
             str = gBoring_material_names[mat];
         } else {
             str = gMaterial_names[mat];
         }
         gMaterial[mat] = BrMaterialFind(str);
-        if (!gMaterial[mat]) {
+        if (gMaterial[mat] == NULL) {
             if (gProgram_state.sausage_eater_mode) {
                 str = gBoring_material_names[mat];
             } else {
                 str = gMaterial_names[mat];
             }
 
+#if defined(DETHRACE_FIX_BUGS)
+            // Avoid modification of read-only data by strtok.
+            strcpy(mat_name, str);
+            str = mat_name;
+#endif
             sl = strlen(strtok(str, "."));
             strcpy(str + sl, ".PIX");
             BrMapAdd(LoadPixelmap(str));
@@ -142,29 +150,17 @@ void InitSkids() {
     for (skid = 0; skid < COUNT_OF(gSkids); skid++) {
         gSkids[skid].actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
         BrActorAdd(gNon_track_actor, gSkids[skid].actor);
-        gSkids[skid].actor->t.t.mat.m[1][1] = 0.0099999998;
+        gSkids[skid].actor->t.t.mat.m[1][1] = 0.01f;
         gSkids[skid].actor->render_style = BR_RSTYLE_NONE;
         square = BrModelAllocate(NULL, 4, 2);
-        square->vertices[0].p.v[0] = -0.5;
-        square->vertices[0].p.v[1] = 1.0;
-        square->vertices[0].p.v[2] = -0.5;
-        square->vertices[1].p.v[0] = -0.5;
-        square->vertices[1].p.v[1] = 1.0;
-        square->vertices[1].p.v[2] = 0.5;
-        square->vertices[2].p.v[0] = 0.5;
-        square->vertices[2].p.v[1] = 1.0;
-        square->vertices[2].p.v[2] = 0.5;
-        square->vertices[3].p.v[0] = 0.5;
-        square->vertices[3].p.v[1] = 1.0;
-        square->vertices[3].p.v[2] = -0.5;
-        square->vertices[0].map.v[0] = 0.0;
-        square->vertices[0].map.v[1] = 0.0;
-        square->vertices[1].map.v[0] = 0.0;
-        square->vertices[1].map.v[1] = 1.0;
-        square->vertices[2].map.v[0] = 1.0;
-        square->vertices[2].map.v[1] = 1.0;
-        square->vertices[3].map.v[0] = 1.0;
-        square->vertices[3].map.v[1] = 0.0;
+        BrVector3Set(&square->vertices[0].p, -0.5f, 1.0f, -0.5f);
+        BrVector3Set(&square->vertices[1].p, -0.5f, 1.0f, 0.5f);
+        BrVector3Set(&square->vertices[2].p, 0.5f, 1.0f, 0.5f);
+        BrVector3Set(&square->vertices[3].p, 0.5f, 1.0f, -0.5f);
+        BrVector2Set(&square->vertices[0].map, 0.0f, 0.0f);
+        BrVector2Set(&square->vertices[1].map, 0.0f, 1.0f);
+        BrVector2Set(&square->vertices[2].map, 1.0f, 1.0f);
+        BrVector2Set(&square->vertices[3].map, 1.0f, 0.0f);
         square->faces[0].vertices[0] = 0;
         square->faces[0].vertices[1] = 1;
         square->faces[0].vertices[2] = 2;
@@ -187,7 +183,7 @@ void HideSkid(int pSkid_num) {
 }
 
 // IDA: void __cdecl HideSkids()
-void HideSkids() {
+void HideSkids(void) {
     int skid;
     LOG_TRACE("()");
 
@@ -336,7 +332,7 @@ void InitCarSkidStuff(tCar_spec* pCar) {
 }
 
 // IDA: void __cdecl SkidsPerFrame()
-void SkidsPerFrame() {
+void SkidsPerFrame(void) {
     int skid;
     LOG_TRACE("()");
 
@@ -348,7 +344,7 @@ void SkidsPerFrame() {
 }
 
 // IDA: void __cdecl RemoveMaterialsFromSkidmarks()
-void RemoveMaterialsFromSkidmarks() {
+void RemoveMaterialsFromSkidmarks(void) {
     int skid;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();

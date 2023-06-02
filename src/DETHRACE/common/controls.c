@@ -543,7 +543,7 @@ int gAuto_repair;
 int _unittest_controls_lastGetPowerup = 0;
 
 // IDA: void __cdecl AbortRace()
-void AbortRace() {
+void AbortRace(void) {
     LOG_TRACE("()");
 
     if (!gRace_finished) {
@@ -552,7 +552,7 @@ void AbortRace() {
 }
 
 // IDA: void __cdecl F4Key()
-void F4Key() {
+void F4Key(void) {
     char s[256];
     tEdit_mode old_edit_mode;
     LOG_TRACE("()");
@@ -601,7 +601,7 @@ void FinishLap(int i) {
 }
 
 // IDA: void __cdecl EnsureSpecialVolumesHidden()
-void EnsureSpecialVolumesHidden() {
+void EnsureSpecialVolumesHidden(void) {
     LOG_TRACE("()");
 
     if (gWhich_edit_mode == eEdit_mode_spec_vol) {
@@ -610,7 +610,7 @@ void EnsureSpecialVolumesHidden() {
 }
 
 // IDA: void __cdecl ShowSpecialVolumesIfRequ()
-void ShowSpecialVolumesIfRequ() {
+void ShowSpecialVolumesIfRequ(void) {
     LOG_TRACE("()");
 
     if (gWhich_edit_mode == eEdit_mode_spec_vol) {
@@ -643,126 +643,126 @@ void DoEditModeKey(int pIndex) {
 }
 
 // IDA: void __cdecl F5Key()
-void F5Key() {
+void F5Key(void) {
     LOG_TRACE("()");
 
     DoEditModeKey(0);
 }
 
 // IDA: void __cdecl F6Key()
-void F6Key() {
+void F6Key(void) {
     LOG_TRACE("()");
 
     DoEditModeKey(1);
 }
 
 // IDA: void __cdecl F7Key()
-void F7Key() {
+void F7Key(void) {
     LOG_TRACE("()");
 
     DoEditModeKey(2);
 }
 
 // IDA: void __cdecl F8Key()
-void F8Key() {
+void F8Key(void) {
     LOG_TRACE("()");
 
     DoEditModeKey(3);
 }
 
 // IDA: void __cdecl F10Key()
-void F10Key() {
+void F10Key(void) {
     LOG_TRACE("()");
 
     DoEditModeKey(4);
 }
 
 // IDA: void __cdecl F11Key()
-void F11Key() {
+void F11Key(void) {
     LOG_TRACE("()");
 
     DoEditModeKey(5);
 }
 
 // IDA: void __cdecl F12Key()
-void F12Key() {
+void F12Key(void) {
     LOG_TRACE("()");
 
     DoEditModeKey(6);
 }
 
 // IDA: void __cdecl NumberKey0()
-void NumberKey0() {
+void NumberKey0(void) {
     LOG_TRACE("()");
 
     DoEditModeKey(7);
 }
 
 // IDA: void __cdecl NumberKey1()
-void NumberKey1() {
+void NumberKey1(void) {
     LOG_TRACE("()");
 
     DoEditModeKey(8);
 }
 
 // IDA: void __cdecl NumberKey2()
-void NumberKey2() {
+void NumberKey2(void) {
     LOG_TRACE("()");
 
     DoEditModeKey(9);
 }
 
 // IDA: void __cdecl NumberKey3()
-void NumberKey3() {
+void NumberKey3(void) {
     LOG_TRACE("()");
 
     DoEditModeKey(10);
 }
 
 // IDA: void __cdecl NumberKey4()
-void NumberKey4() {
+void NumberKey4(void) {
     LOG_TRACE("()");
 
     DoEditModeKey(11);
 }
 
 // IDA: void __cdecl NumberKey5()
-void NumberKey5() {
+void NumberKey5(void) {
     LOG_TRACE("()");
 
     DoEditModeKey(12);
 }
 
 // IDA: void __cdecl NumberKey6()
-void NumberKey6() {
+void NumberKey6(void) {
     LOG_TRACE("()");
 
     DoEditModeKey(13);
 }
 
 // IDA: void __cdecl NumberKey7()
-void NumberKey7() {
+void NumberKey7(void) {
     LOG_TRACE("()");
 
     DoEditModeKey(14);
 }
 
 // IDA: void __cdecl NumberKey8()
-void NumberKey8() {
+void NumberKey8(void) {
     LOG_TRACE("()");
 
     DoEditModeKey(15);
 }
 
 // IDA: void __cdecl NumberKey9()
-void NumberKey9() {
+void NumberKey9(void) {
     LOG_TRACE("()");
 
     DoEditModeKey(16);
 }
 
 // IDA: void __cdecl LookLeft()
-void LookLeft() {
+void LookLeft(void) {
     LOG_TRACE("()");
 
     if (gAusterity_mode) {
@@ -785,7 +785,7 @@ void LookLeft() {
 }
 
 // IDA: void __cdecl LookForward()
-void LookForward() {
+void LookForward(void) {
     LOG_TRACE("()");
 
     if (gProgram_state.which_view == eView_right) {
@@ -803,7 +803,7 @@ void LookForward() {
 }
 
 // IDA: void __cdecl LookRight()
-void LookRight() {
+void LookRight(void) {
     LOG_TRACE("()");
 
     if (gAusterity_mode) {
@@ -826,19 +826,19 @@ void LookRight() {
 }
 
 // IDA: void __cdecl DamageTest()
-void DamageTest() {
+void DamageTest(void) {
     LOG_TRACE("()");
 }
 
 // IDA: void __cdecl TDamageEngine()
-void TDamageEngine() {
+void TDamageEngine(void) {
     LOG_TRACE("()");
 
     DamageEngine(21);
 }
 
 // IDA: void __cdecl TDamageDriver()
-void TDamageDriver() {
+void TDamageDriver(void) {
     LOG_TRACE("()");
 
     if (gProgram_state.current_car.damage_units[eDamage_driver].damage_level >= 80) {
@@ -849,84 +849,84 @@ void TDamageDriver() {
 }
 
 // IDA: void __cdecl TDamageTrans()
-void TDamageTrans() {
+void TDamageTrans(void) {
     LOG_TRACE("()");
 
     DamageTrans(21);
 }
 
 // IDA: void __cdecl TDamageSteering()
-void TDamageSteering() {
+void TDamageSteering(void) {
     LOG_TRACE("()");
 
     DamageSteering(21);
 }
 
 // IDA: void __cdecl TDamageLFWheel()
-void TDamageLFWheel() {
+void TDamageLFWheel(void) {
     LOG_TRACE("()");
 
     DamageLFWheel(21);
 }
 
 // IDA: void __cdecl TDamageLFBrake()
-void TDamageLFBrake() {
+void TDamageLFBrake(void) {
     LOG_TRACE("()");
 
     DamageLFBrake(21);
 }
 
 // IDA: void __cdecl TDamageLRBrake()
-void TDamageLRBrake() {
+void TDamageLRBrake(void) {
     LOG_TRACE("()");
 
     DamageLRBrake(21);
 }
 
 // IDA: void __cdecl TDamageLRWheel()
-void TDamageLRWheel() {
+void TDamageLRWheel(void) {
     LOG_TRACE("()");
 
     DamageLRWheel(21);
 }
 
 // IDA: void __cdecl TDamageRFWheel()
-void TDamageRFWheel() {
+void TDamageRFWheel(void) {
     LOG_TRACE("()");
 
     DamageRFWheel(21);
 }
 
 // IDA: void __cdecl TDamageRFBrake()
-void TDamageRFBrake() {
+void TDamageRFBrake(void) {
     LOG_TRACE("()");
 
     DamageRFBrake(21);
 }
 
 // IDA: void __cdecl TDamageRRBrake()
-void TDamageRRBrake() {
+void TDamageRRBrake(void) {
     LOG_TRACE("()");
 
     DamageRRBrake(21);
 }
 
 // IDA: void __cdecl TDamageRRWheel()
-void TDamageRRWheel() {
+void TDamageRRWheel(void) {
     LOG_TRACE("()");
 
     DamageRRWheel(21);
 }
 
 // IDA: void __cdecl MoveBonnetForward()
-void MoveBonnetForward() {
+void MoveBonnetForward(void) {
     LOG_TRACE("()");
 
     gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.translate.t.v[2] -= .005f;
 }
 
 // IDA: void __cdecl SaveBonnet()
-void SaveBonnet() {
+void SaveBonnet(void) {
     br_actor* bonny;
     tPath_name the_path;
     LOG_TRACE("()");
@@ -937,126 +937,126 @@ void SaveBonnet() {
 }
 
 // IDA: void __cdecl MoveBonnetBackward()
-void MoveBonnetBackward() {
+void MoveBonnetBackward(void) {
     LOG_TRACE("()");
 
     gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.translate.t.v[2] += .005f;
 }
 
 // IDA: void __cdecl MoveBonnetLeft()
-void MoveBonnetLeft() {
+void MoveBonnetLeft(void) {
     LOG_TRACE("()");
 
     gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.translate.t.v[0] -= .005f;
 }
 
 // IDA: void __cdecl ShrinkBonnetX()
-void ShrinkBonnetX() {
+void ShrinkBonnetX(void) {
     LOG_TRACE("()");
 
     gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat.m[0][0] *= .98f;
 }
 
 // IDA: void __cdecl SwellBonnetX()
-void SwellBonnetX() {
+void SwellBonnetX(void) {
     LOG_TRACE("()");
 
     gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat.m[0][0] *= 1.02f;
 }
 
 // IDA: void __cdecl ShrinkBonnetY()
-void ShrinkBonnetY() {
+void ShrinkBonnetY(void) {
     LOG_TRACE("()");
 
     gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat.m[1][1] *= .98f;
 }
 
 // IDA: void __cdecl SwellBonnetY()
-void SwellBonnetY() {
+void SwellBonnetY(void) {
     LOG_TRACE("()");
 
     gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat.m[1][1] *= 1.02f;
 }
 
 // IDA: void __cdecl ShrinkBonnetZ()
-void ShrinkBonnetZ() {
+void ShrinkBonnetZ(void) {
     LOG_TRACE("()");
 
     gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat.m[2][2] *= .98f;
 }
 
 // IDA: void __cdecl SwellBonnetZ()
-void SwellBonnetZ() {
+void SwellBonnetZ(void) {
     LOG_TRACE("()");
 
     gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat.m[2][2] *= 1.02f;
 }
 
 // IDA: void __cdecl MoveBonnetDown()
-void MoveBonnetDown() {
+void MoveBonnetDown(void) {
     LOG_TRACE("()");
 
     gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.translate.t.v[1] += .005f;
 }
 
 // IDA: void __cdecl MoveBonnetRight()
-void MoveBonnetRight() {
+void MoveBonnetRight(void) {
     LOG_TRACE("()");
 
     gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.translate.t.v[0] += .005f;
 }
 
 // IDA: void __cdecl MoveBonnetUp()
-void MoveBonnetUp() {
+void MoveBonnetUp(void) {
     LOG_TRACE("()");
 
     gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.translate.t.v[1] -= .005f;
 }
 
 // IDA: void __cdecl TiltBonnetDownX()
-void TiltBonnetDownX() {
+void TiltBonnetDownX(void) {
     LOG_TRACE("()");
 
     BrMatrix34PreRotateX(&gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat, BR_ANGLE_DEG(.5f));
 }
 
 // IDA: void __cdecl TiltBonnetUpX()
-void TiltBonnetUpX() {
+void TiltBonnetUpX(void) {
     LOG_TRACE("()");
 
     BrMatrix34PreRotateX(&gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat, -BR_ANGLE_DEG(.5f));
 }
 
 // IDA: void __cdecl TiltBonnetDownY()
-void TiltBonnetDownY() {
+void TiltBonnetDownY(void) {
     LOG_TRACE("()");
 
     BrMatrix34PreRotateY(&gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat, BR_ANGLE_DEG(.5f));
 }
 
 // IDA: void __cdecl TiltBonnetUpY()
-void TiltBonnetUpY() {
+void TiltBonnetUpY(void) {
     LOG_TRACE("()");
 
     BrMatrix34PreRotateY(&gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat, -BR_ANGLE_DEG(.5f));
 }
 
 // IDA: void __cdecl TiltBonnetDownZ()
-void TiltBonnetDownZ() {
+void TiltBonnetDownZ(void) {
     LOG_TRACE("()");
 
     BrMatrix34PreRotateZ(&gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat, BR_ANGLE_DEG(.5f));
 }
 
 // IDA: void __cdecl TiltBonnetUpZ()
-void TiltBonnetUpZ() {
+void TiltBonnetUpZ(void) {
     LOG_TRACE("()");
 
     BrMatrix34PreRotateZ(&gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat, -BR_ANGLE_DEG(.5f));
 }
 
 // IDA: void __cdecl ToggleCockpit()
-void ToggleCockpit() {
+void ToggleCockpit(void) {
     br_scalar ts;
     LOG_TRACE("()");
 
@@ -1080,7 +1080,7 @@ void ToggleCockpit() {
 }
 
 // IDA: void __cdecl ToggleMirror()
-void ToggleMirror() {
+void ToggleMirror(void) {
     LOG_TRACE("()");
 
     gProgram_state.mirror_on = !gProgram_state.mirror_on;
@@ -1093,7 +1093,8 @@ void ToggleMirror() {
 }
 
 // IDA: void __cdecl ConcussMe()
-void ConcussMe() {
+// dethrace: this is not referenced in the retail executables. Left over debug code.
+void ConcussMe(void) {
     LOG_TRACE("()");
 
     SufferFromConcussion(1.f);
@@ -1102,13 +1103,13 @@ void ConcussMe() {
 }
 
 // IDA: void __cdecl CheckHelp()
-void CheckHelp() {
+void CheckHelp(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl CheckLoadSave()
-void CheckLoadSave() {
+void CheckLoadSave(void) {
     int save_load_allowed;
     int switched_res;
     LOG_TRACE8("()");
@@ -1231,7 +1232,7 @@ int HasCarFallenOffWorld(tCar_spec* pCar) {
 }
 
 // IDA: void __cdecl CheckForBeingOutOfThisWorld()
-void CheckForBeingOutOfThisWorld() {
+void CheckForBeingOutOfThisWorld(void) {
     static tU32 the_time;
     static tU32 sLast_check;
     int time_step;
@@ -1286,7 +1287,7 @@ void CheckHorn3D(tCar_spec* pCar) {
 }
 
 // IDA: void __cdecl CheckHorns()
-void CheckHorns() {
+void CheckHorns(void) {
     int i;
     LOG_TRACE("()");
 
@@ -1300,7 +1301,7 @@ void CheckHorns() {
 }
 
 // IDA: void __cdecl SetRecovery()
-void SetRecovery() {
+void SetRecovery(void) {
     LOG_TRACE("()");
 
     if (gRace_finished
@@ -1356,7 +1357,7 @@ void SetRecovery() {
 }
 
 // IDA: void __cdecl RecoverCar()
-void RecoverCar() {
+void RecoverCar(void) {
     LOG_TRACE("()");
 
     if (gNet_mode == eNet_mode_none || !gPalette_fade_time) {
@@ -1366,7 +1367,7 @@ void RecoverCar() {
 }
 
 // IDA: void __cdecl CheckMapRenderMove()
-void CheckMapRenderMove() {
+void CheckMapRenderMove(void) {
     int shift_down;
     int amount;
     float old_x;
@@ -1493,7 +1494,7 @@ void LoseSomePSPowerups(int pNumber) {
 }
 
 // IDA: void __cdecl CheckOtherRacingKeys()
-void CheckOtherRacingKeys() {
+void CheckOtherRacingKeys(void) {
     int i;
     int j;
     int new_level;
@@ -1647,7 +1648,7 @@ void CheckOtherRacingKeys() {
 }
 
 // IDA: int __cdecl CheckRecoverCost()
-int CheckRecoverCost() {
+int CheckRecoverCost(void) {
     LOG_TRACE("()");
 
     if (gProgram_state.current_car.knackered
@@ -1847,7 +1848,7 @@ void CheckSystemKeys(int pRacing) {
 }
 
 // IDA: void __cdecl CheckKevKeys()
-void CheckKevKeys() {
+void CheckKevKeys(void) {
     int i;
     tU32* value;
     char s[128];
@@ -1884,7 +1885,7 @@ void CheckKevKeys() {
 }
 
 // IDA: void __cdecl BrakeInstantly()
-void BrakeInstantly() {
+void BrakeInstantly(void) {
     int i;
     LOG_TRACE("()");
 
@@ -2080,7 +2081,7 @@ void SetFlag2(int i) {
 }
 
 // IDA: void __cdecl ToggleFlying()
-void ToggleFlying() {
+void ToggleFlying(void) {
     LOG_TRACE("()");
 
     if (gAllow_car_flying && gNet_mode == eNet_mode_none) {
@@ -2096,7 +2097,7 @@ void ToggleFlying() {
 }
 
 // IDA: void __cdecl ToggleInvulnerability()
-void ToggleInvulnerability() {
+void ToggleInvulnerability(void) {
     LOG_TRACE("()");
 
     gProgram_state.current_car.invulnerable = !gProgram_state.current_car.invulnerable;
@@ -2108,21 +2109,21 @@ void ToggleInvulnerability() {
 }
 
 // IDA: void __cdecl MoreTime()
-void MoreTime() {
+void MoreTime(void) {
     LOG_TRACE("()");
 
     AwardTime(30);
 }
 
 // IDA: void __cdecl MuchMoreTime()
-void MuchMoreTime() {
+void MuchMoreTime(void) {
     LOG_TRACE("()");
 
     AwardTime(300);
 }
 
 // IDA: void __cdecl ToggleTimerFreeze()
-void ToggleTimerFreeze() {
+void ToggleTimerFreeze(void) {
     LOG_TRACE("()");
 
     gFreeze_timer = !gFreeze_timer;
@@ -2134,21 +2135,21 @@ void ToggleTimerFreeze() {
 }
 
 // IDA: void __cdecl EarnDosh()
-void EarnDosh() {
+void EarnDosh(void) {
     LOG_TRACE("()");
 
     EarnCredits(5000);
 }
 
 // IDA: void __cdecl LoseDosh()
-void LoseDosh() {
+void LoseDosh(void) {
     LOG_TRACE("()");
 
     EarnCredits(-5000);
 }
 
 // IDA: void __cdecl ToggleMap()
-void ToggleMap() {
+void ToggleMap(void) {
     static int old_indent;
     static int was_in_cockpit;
     LOG_TRACE("()");
@@ -2180,14 +2181,14 @@ void ToggleMap() {
 }
 
 // IDA: int __cdecl HornBlowing()
-int HornBlowing() {
+int HornBlowing(void) {
     LOG_TRACE("()");
 
     return gProgram_state.current_car.keys.horn;
 }
 
 // IDA: void __cdecl ToggleArrow()
-void ToggleArrow() {
+void ToggleArrow(void) {
     static br_actor* old_actor;
     LOG_TRACE("()");
 
@@ -2214,7 +2215,7 @@ void ToggleArrow() {
 }
 
 // IDA: int __cdecl GetRecoverVoucherCount()
-int GetRecoverVoucherCount() {
+int GetRecoverVoucherCount(void) {
     LOG_TRACE("()");
 
     return gRecovery_voucher_count;
@@ -2228,14 +2229,14 @@ void AddVouchers(int pCount) {
 }
 
 // IDA: void __cdecl ResetRecoveryVouchers()
-void ResetRecoveryVouchers() {
+void ResetRecoveryVouchers(void) {
     LOG_TRACE("()");
 
     gRecovery_voucher_count = 0;
 }
 
 // IDA: void __cdecl CycleCarTexturingLevel()
-void CycleCarTexturingLevel() {
+void CycleCarTexturingLevel(void) {
     tCar_texturing_level new_level;
     LOG_TRACE("()");
 
@@ -2257,7 +2258,7 @@ void CycleCarTexturingLevel() {
 }
 
 // IDA: void __cdecl CycleWallTexturingLevel()
-void CycleWallTexturingLevel() {
+void CycleWallTexturingLevel(void) {
     tWall_texturing_level new_level;
     LOG_TRACE("()");
 
@@ -2280,7 +2281,7 @@ void CycleWallTexturingLevel() {
 }
 
 // IDA: void __cdecl CycleRoadTexturingLevel()
-void CycleRoadTexturingLevel() {
+void CycleRoadTexturingLevel(void) {
     tRoad_texturing_level new_level;
     LOG_TRACE("()");
 
@@ -2295,7 +2296,7 @@ void CycleRoadTexturingLevel() {
 }
 
 // IDA: void __cdecl CycleYonFactor()
-void CycleYonFactor() {
+void CycleYonFactor(void) {
     br_scalar new_factor;
     char factor_str[5];
     LOG_TRACE("()");
@@ -2335,21 +2336,21 @@ void ReallySetSoundDetailLevel(int pLevel) {
 }
 
 // IDA: int __cdecl GetSoundDetailLevel()
-int GetSoundDetailLevel() {
+int GetSoundDetailLevel(void) {
     LOG_TRACE("()");
 
     return gSound_detail_level;
 }
 
 // IDA: void __cdecl CycleSoundDetailLevel()
-void CycleSoundDetailLevel() {
+void CycleSoundDetailLevel(void) {
     int new_level;
     LOG_TRACE("()");
 
     new_level = (gSound_detail_level + 1) % 3;
     ReallySetSoundDetailLevel(new_level);
     SetSoundDetailLevel(new_level);
-    switch(new_level) {
+    switch (new_level) {
     case 0:
         NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(116));
         break;
@@ -2363,7 +2364,7 @@ void CycleSoundDetailLevel() {
 }
 
 // IDA: void __cdecl CycleCarSimplificationLevel()
-void CycleCarSimplificationLevel() {
+void CycleCarSimplificationLevel(void) {
     char* src;
     char* dst;
     LOG_TRACE("()");
@@ -2377,7 +2378,7 @@ void CycleCarSimplificationLevel() {
 }
 
 // IDA: void __cdecl ToggleAccessoryRendering()
-void ToggleAccessoryRendering() {
+void ToggleAccessoryRendering(void) {
     int on;
     LOG_TRACE("()");
 
@@ -2395,7 +2396,7 @@ void ToggleAccessoryRendering() {
 }
 
 // IDA: void __cdecl ToggleSmoke()
-void ToggleSmoke() {
+void ToggleSmoke(void) {
     int on;
     LOG_TRACE("()");
 
@@ -2443,7 +2444,7 @@ void DrawSomeText2(tDR_font* pFont) {
 }
 
 // IDA: void __cdecl DrawSomeText()
-void DrawSomeText() {
+void DrawSomeText(void) {
     DrawSomeText2(&gFonts[1]);
     DrawSomeText2(&gFonts[2]);
     DrawSomeText2(&gFonts[3]);
@@ -2454,13 +2455,13 @@ void DrawSomeText() {
 }
 
 // IDA: void __cdecl SaySorryYouLittleBastard()
-void SaySorryYouLittleBastard() {
+void SaySorryYouLittleBastard(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl UserSendMessage()
-void UserSendMessage() {
+void UserSendMessage(void) {
     LOG_TRACE("()");
 
     if (gNet_mode != eNet_mode_none && gCurrent_net_game->options.enable_text_messages) {
@@ -2469,7 +2470,7 @@ void UserSendMessage() {
 }
 
 // IDA: void __cdecl EnterUserMessage()
-void EnterUserMessage() {
+void EnterUserMessage(void) {
     static int last_key;
     static int about_to_die;
     static tU32 next_time;
@@ -2483,7 +2484,7 @@ void EnterUserMessage() {
 }
 
 // IDA: void __cdecl DisplayUserMessage()
-void DisplayUserMessage() {
+void DisplayUserMessage(void) {
     char* the_message;
     int len;
     tDR_font* font;
@@ -2492,7 +2493,7 @@ void DisplayUserMessage() {
 }
 
 // IDA: void __cdecl InitAbuseomatic()
-void InitAbuseomatic() {
+void InitAbuseomatic(void) {
     char path[256];
     char s[256];
     FILE* f;
@@ -2530,7 +2531,7 @@ void InitAbuseomatic() {
 }
 
 // IDA: void __cdecl DisposeAbuseomatic()
-void DisposeAbuseomatic() {
+void DisposeAbuseomatic(void) {
     int i;
     LOG_TRACE("()");
 

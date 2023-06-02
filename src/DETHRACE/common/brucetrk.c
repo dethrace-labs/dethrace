@@ -6,9 +6,9 @@
 #include "globvrbm.h"
 #include "harness/trace.h"
 #include "init.h"
+#include "pd/sys.h"
 #include "utility.h"
 #include "world.h"
-#include "pd/sys.h"
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -98,9 +98,10 @@ void StripBlendedFaces(br_actor* pActor, br_model* pModel) {
     LOG_TRACE("(%p, %p)", pActor, pModel);
 
     changed_one = 0;
-    face = &pModel->faces[0];
-    for (i = 0; i < pModel->nfaces; i++, face++) {
-        if (face->material != NULL && face->material->identifier != NULL && ((face->material->identifier[0] == '!' && face->material->identifier[1] == '!' && gDefault_blend_pc != 0) || face->material->identifier[1] == '\\' )) {
+
+    for (i = 0; i < pModel->nfaces; i++) {
+        face = &pModel->faces[i];
+        if (face->material != NULL && face->material->identifier != NULL && ((face->material->identifier[0] == '!' && face->material->identifier[1] != '!' && gDefault_blend_pc != 0) || face->material->identifier[1] == '\\')) {
             if (gMr_blendy == NULL) {
                 gMr_blendy = BrActorAllocate(BR_ACTOR_MODEL, NULL);
                 gMr_blendy->render_style = BR_RSTYLE_NONE;
@@ -119,8 +120,10 @@ void StripBlendedFaces(br_actor* pActor, br_model* pModel) {
                     } else {
                         BlendifyMaterial(face->material, 50);
                     }
-                    BrMaterialUpdate(face->material, BR_MATU_ALL);
+                } else {
+                    BlendifyMaterial(face->material, gDefault_blend_pc);
                 }
+                BrMaterialUpdate(face->material, BR_MATU_ALL);
             }
             if (nfaces_allocated <= gMr_blendy->model->nfaces) {
                 PDFatalError("Perfectly understandable error by Batwick, thank you very much Bruce.");
@@ -133,7 +136,6 @@ void StripBlendedFaces(br_actor* pActor, br_model* pModel) {
             pModel->nfaces--;
             changed_one = 1;
             i--;
-            face = &pModel->faces[i];
         }
     }
     if (changed_one) {
@@ -497,7 +499,7 @@ void RenderTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, 
 }
 
 // IDA: br_scalar __cdecl GetYonFactor()
-br_scalar GetYonFactor() {
+br_scalar GetYonFactor(void) {
 
     return gYon_factor;
 }

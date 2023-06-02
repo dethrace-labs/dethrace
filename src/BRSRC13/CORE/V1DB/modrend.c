@@ -4,14 +4,14 @@
 #include "harness/trace.h"
 
 render_style_cbfn RenderStyleCalls[8] = {
-    renderFaces, /* BR_RSTYLE_DEFAULT			*/
-    nullRender, /* BR_RSTYLE_NONE				*/
-    renderPoints, /* BR_RSTYLE_POINTS				*/
-    renderEdges, /* BR_RSTYLE_EDGES				*/
-    renderFaces, /* BR_RSTYLE_FACES				*/
+    renderFaces,             /* BR_RSTYLE_DEFAULT			*/
+    nullRender,              /* BR_RSTYLE_NONE				*/
+    renderPoints,            /* BR_RSTYLE_POINTS				*/
+    renderEdges,             /* BR_RSTYLE_EDGES				*/
+    renderFaces,             /* BR_RSTYLE_FACES				*/
     boundingBoxRenderPoints, /* BR_RSTYLE_BOUNDING_POINTS	*/
-    boundingBoxRenderEdges, /* BR_RSTYLE_BOUNDING_EDGES		*/
-    boundingBoxRenderFaces, /* BR_RSTYLE_BOUNDING_FACES		*/
+    boundingBoxRenderEdges,  /* BR_RSTYLE_BOUNDING_EDGES		*/
+    boundingBoxRenderFaces,  /* BR_RSTYLE_BOUNDING_FACES		*/
 };
 
 v11face bounds_faces[12] = {
@@ -64,13 +64,13 @@ br_model bounds_model = {
 // IDA: void __usercall renderFaces(br_actor *actor@<EAX>, br_model *model@<EDX>, br_material *material@<EBX>, void *render_data@<ECX>, br_uint_8 style, int on_screen)
 void renderFaces(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen) {
     LOG_TRACE9("(%p, %p, %p, %p, %d, %d)", actor, model, material, render_data, style, on_screen);
-    Harness_Hook_renderFaces(actor, model, material, BRT_TRIANGLE);
+    Harness_Hook_renderActor(actor, model, material, BRT_TRIANGLE);
 }
 
 // IDA: void __usercall renderEdges(br_actor *actor@<EAX>, br_model *model@<EDX>, br_material *material@<EBX>, void *render_data@<ECX>, br_uint_8 style, int on_screen)
 void renderEdges(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen) {
     LOG_TRACE("(%p, %p, %p, %p, %d, %d)", actor, model, material, render_data, style, on_screen);
-    NOT_IMPLEMENTED();
+    Harness_Hook_renderActor(actor, model, material, BRT_LINE);
 }
 
 // IDA: void __usercall renderPoints(br_actor *actor@<EAX>, br_model *model@<EDX>, br_material *material@<EBX>, void *render_data@<ECX>, br_uint_8 style, int on_screen)

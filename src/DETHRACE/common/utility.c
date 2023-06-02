@@ -30,7 +30,7 @@ int gIn_check_quit = 0;
 tU32 gLost_time = 0;
 #if BR_ENDIAN_BIG
 tU32 gLong_key[4] = { 0x6c1b995f, 0xb9cd5f13, 0xcb04200e, 0x5e1ca10e };
-tU32 gOther_long_key[4] = { 0x67a8d626, 0xb6dd451b, 0x327e2213, 0x15c29437};
+tU32 gOther_long_key[4] = { 0x67a8d626, 0xb6dd451b, 0x327e2213, 0x15c29437 };
 #else
 tU32 gLong_key[4] = { 0x5f991b6c, 0x135fcdb9, 0x0e2004cb, 0x0ea11c5e };
 tU32 gOther_long_key[4] = { 0x26d6a867, 0x1b45ddb6, 0x13227e32, 0x3794c215 };
@@ -41,7 +41,7 @@ br_pixelmap* g16bit_palette;
 br_pixelmap* gSource_for_16bit_palette;
 
 // IDA: int __cdecl CheckQuit()
-int CheckQuit() {
+int CheckQuit(void) {
     LOG_TRACE8("()");
 
     if (!gIn_check_quit && KeyIsDown(KEYMAP_CTRL_QUIT) && KeyIsDown(KEYMAP_CONTROL_ANY)) {
@@ -203,10 +203,10 @@ int IRandomBetween(int pA, int pB) {
 
     num = rand();
 #if RAND_MAX == 0x7fff
-//  If RAND_MAX == 0x7fff, then `num` can be seen as a fixed point number with 15 fractional and 17 integral bits
+    //  If RAND_MAX == 0x7fff, then `num` can be seen as a fixed point number with 15 fractional and 17 integral bits
     return pA + ((num * (pB + 1 - pA)) >> 15);
 #else
-//  If RAND_MAX != 0x7fff, then use floating numbers (alternative is using modulo)
+    //  If RAND_MAX != 0x7fff, then use floating numbers (alternative is using modulo)
     return pA + (int)((pB + 1 - pA) * (num / ((float)RAND_MAX + 1)));
 #endif
 }
@@ -708,7 +708,7 @@ void PrintScreenFile16(FILE* pF) {
 }
 
 // IDA: void __cdecl PrintScreen()
-void PrintScreen() {
+void PrintScreen(void) {
     FILE* f;
     LOG_TRACE("()");
 
@@ -720,7 +720,7 @@ void PrintScreen() {
 }
 
 // IDA: tU32 __cdecl GetTotalTime()
-tU32 GetTotalTime() {
+tU32 GetTotalTime(void) {
     LOG_TRACE9("()");
 
     if (gAction_replay_mode) {
@@ -733,7 +733,7 @@ tU32 GetTotalTime() {
 }
 
 // IDA: tU32 __cdecl GetRaceTime()
-tU32 GetRaceTime() {
+tU32 GetRaceTime(void) {
     LOG_TRACE("()");
 
     return GetTotalTime() - gRace_start;
@@ -855,6 +855,7 @@ void BuildShadeTablePath(char* pThe_path, int pR, int pG, int pB) {
     s[6] = 'A' + ((pB & 0xf0) >> 4);
     s[7] = 'A' + ((pB & 0x0f) >> 0);
     s[8] = '\0';
+    strcat(s, ".TAB");
     PathCat(pThe_path, gApplication_path, "SHADETAB");
     PathCat(pThe_path, pThe_path, s);
 }
@@ -963,7 +964,7 @@ br_pixelmap* GenerateDarkenedShadeTable(int pHeight, br_pixelmap* pPalette, int 
 }
 
 // IDA: void __cdecl PossibleService()
-void PossibleService() {
+void PossibleService(void) {
     tU32 time;
     static tU32 last_service = 0;
 

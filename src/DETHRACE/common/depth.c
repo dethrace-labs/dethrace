@@ -111,7 +111,7 @@ void FogAccordingToGPSCDE(br_material* pMaterial) {
 }
 
 // IDA: void __cdecl FrobFog()
-void FrobFog() {
+void FrobFog(void) {
     int i;
     br_material* mat;
     LOG_TRACE("()");
@@ -129,7 +129,7 @@ void InstantDepthChange(tDepth_effect_type pType, br_pixelmap* pSky_texture, int
 
     gProgram_state.current_depth_effect.sky_texture = pSky_texture;
     gHorizon_material->colour_map = pSky_texture;
-    BrMaterialUpdate(gHorizon_material, 0x7FFFu);
+    BrMaterialUpdate(gHorizon_material, BR_MATU_ALL);
     gProgram_state.current_depth_effect.type = pType;
     gProgram_state.current_depth_effect.start = pStart;
     gProgram_state.current_depth_effect.end = pEnd;
@@ -180,16 +180,16 @@ void MungeSkyModel(br_actor* pCamera, br_model* pModel) {
     LOG_TRACE("(%p, %p)", pCamera, pModel);
 
     camera_data = pCamera->type_data;
-
     tan_half_fov = Tan(camera_data->field_of_view / 2);
-    //    BR_ANGLE_RAD(atan2f(tan_half_fov, camera_data->aspect / 2));
-    horizon_half_width = (camera_data->yon_z - 1.f) * tan_half_fov;
+    sky_distance = camera_data->yon_z - 1.f;
+    horizon_half_width = sky_distance * tan_half_fov;
     horizon_half_height = horizon_half_width * camera_data->aspect;
-    horizon_half_diag = BR_LENGTH2(horizon_half_width, horizon_half_height);
-    min_angle = BR_ANGLE_RAD(atan2f(horizon_half_diag, camera_data->yon_z - 1.f));
-    edge_u = EdgeU(gSky_image_width, 2 * min_angle, BR_ANGLE_DEG(10));
-    gSky_width = 2.f * horizon_half_width;
-    gSky_height = 2.f * horizon_half_height;
+    horizon_half_diag = sqrtf(horizon_half_height * horizon_half_height + horizon_half_width * horizon_half_width);
+    half_diag_fov = BrRadianToAngle(atan2f(horizon_half_diag, sky_distance));
+    edge_u = EdgeU(gSky_image_width, 2 * half_diag_fov, BR_ANGLE_DEG(10));
+    narrow_u = edge_u / 2.f;
+    gSky_width = horizon_half_width * 2.f;
+    gSky_height = horizon_half_height * 2.f;
     gSky_x_multiplier = CalculateWrappingMultiplier(gSky_width, camera_data->yon_z);
     gSky_y_multiplier = CalculateWrappingMultiplier(gSky_height, camera_data->yon_z);
 
@@ -197,10 +197,10 @@ void MungeSkyModel(br_actor* pCamera, br_model* pModel) {
         pModel->vertices[vertex].map.v[0] = -edge_u;
     }
     for (vertex = 1; vertex < 88; vertex += 4) {
-        pModel->vertices[vertex].map.v[0] = -edge_u / 2.f;
+        pModel->vertices[vertex].map.v[0] = -narrow_u;
     }
     for (vertex = 2; vertex < 88; vertex += 4) {
-        pModel->vertices[vertex].map.v[0] = edge_u / 2.f;
+        pModel->vertices[vertex].map.v[0] = narrow_u;
     }
     for (vertex = 3; vertex < 88; vertex += 4) {
         pModel->vertices[vertex].map.v[0] = edge_u;
@@ -209,7 +209,7 @@ void MungeSkyModel(br_actor* pCamera, br_model* pModel) {
         pModel->vertices[vertex].p.v[0] = -horizon_half_diag;
     }
     for (vertex = 1; vertex < 88; vertex += 4) {
-        pModel->vertices[vertex].p.v[0] = -horizon_half_diag / 2.f;
+        pModel->vertices[vertex].p.v[0] = -(horizon_half_diag / 2.f);
     }
     for (vertex = 2; vertex < 88; vertex += 4) {
         pModel->vertices[vertex].p.v[0] = horizon_half_diag / 2.f;
@@ -218,31 +218,39 @@ void MungeSkyModel(br_actor* pCamera, br_model* pModel) {
         pModel->vertices[vertex].p.v[0] = horizon_half_diag;
     }
     PossibleService();
-    angle_range = -(gSky_image_underground + (BR_ANGLE_DEG(90) - min_angle));
-    for (vertex = 0; vertex < 2; vertex++) {
-        angle = vertex * angle_range / 2 - (BR_ANGLE_DEG(90) + min_angle);
-        pModel->vertices[0 + 4 * vertex].p.v[1] = sinf(BrAngleToRadian(angle)) * (camera_data->yon_z - 1.f);
-        pModel->vertices[0 + 4 * vertex].p.v[2] = -cosf(BrAngleToRadian(angle)) * (camera_data->yon_z - 1.f);
+    angle_range = -gSky_image_underground - (-BR_ANGLE_DEG(90) - half_diag_fov);
+    for (band = 0; band < 2u; band++) {
+        vertex = 4 * band;
+        angle = -BR_ANGLE_DEG(90) - half_diag_fov + angle_range * band / 2;
+        pModel->vertices[vertex].p.v[1] = sinf(BrAngleToRadian(angle)) * sky_distance;
+        pModel->vertices[vertex].p.v[2] = -cosf(BrAngleToRadian(angle)) * sky_distance;
     }
-    for (vertex = 0; vertex < 18; vertex++) {
-        angle = vertex * gSky_image_height / 18 - gSky_image_height;
-        pModel->vertices[8 + 4 * vertex].p.v[1] = sinf(BrAngleToRadian(angle)) * (camera_data->yon_z - 1.f);
-        pModel->vertices[8 + 4 * vertex].p.v[2] = -cosf(BrAngleToRadian(angle)) * (camera_data->yon_z - 1.f);
+    min_angle = -gSky_image_underground;
+    angle_range = gSky_image_height;
+    nbands = 18;
+    for (band = 0; band < nbands; band++) {
+        vertex = 4 * band + 8;
+        pModel->vertices[vertex].p.v[1] = sinf(BrAngleToRadian(min_angle + angle_range * band / nbands)) * sky_distance;
+        pModel->vertices[vertex].p.v[2] = -cosf(BrAngleToRadian(min_angle + angle_range * band / nbands)) * sky_distance;
     }
-    for (vertex = 0; vertex < 2; vertex++) {
-        angle = vertex * (min_angle + BR_ANGLE_DEG(90) - (gSky_image_height - gSky_image_underground)) - (gSky_image_height - gSky_image_underground);
-        pModel->vertices[80 + 4 * vertex].p.v[1] = sinf(BrAngleToRadian(angle)) * (camera_data->yon_z - 1.f);
-        pModel->vertices[80 + 4 * vertex].p.v[2] = -cosf(BrAngleToRadian(angle)) * (camera_data->yon_z - 1.f);
+    min_angle = gSky_image_height - gSky_image_underground;
+    angle_range = half_diag_fov + BR_ANGLE_DEG(90) - (gSky_image_height - gSky_image_underground);
+    for (band = 0; band <= 1u; band++) {
+        vertex = 4 * band + 80;
+        angle = min_angle + angle_range * band;
+        pModel->vertices[vertex].p.v[1] = sinf(BrAngleToRadian(angle)) * sky_distance;
+        pModel->vertices[vertex].p.v[2] = -cosf(BrAngleToRadian(angle)) * sky_distance;
     }
     PossibleService();
-    for (band = 0; band < 22; band++) {
-        for (vertex = 1; vertex < 4; vertex++) {
-            pModel->vertices[4 * band + vertex].p.v[1] = pModel->vertices[vertex].p.v[1];
-            pModel->vertices[4 * band + vertex].p.v[2] = pModel->vertices[vertex].p.v[2];
+    for (band = 0; band <= 21u; ++band) {
+        vertex = 4 * band;
+        for (stripe = 1; stripe < 4u; ++stripe) {
+            pModel->vertices[vertex + stripe].p.v[1] = pModel->vertices[vertex].p.v[1];
+            pModel->vertices[vertex + stripe].p.v[2] = pModel->vertices[vertex].p.v[2];
         }
     }
-    // FIXME: unknown model flag disabled
-    BrModelUpdate(pModel, BR_MODU_ALL & ~0x80);
+
+    BrModelUpdate(pModel, BR_MODU_ALL & ~BR_MODU_VERTEX_NORMALS);
 }
 
 // IDA: br_model* __usercall CreateHorizonModel@<EAX>(br_actor *pCamera@<EAX>)
@@ -314,7 +322,7 @@ void LoadDepthTable(char* pName, br_pixelmap** pTable, int* pPower) {
 }
 
 // IDA: void __cdecl InitDepthEffects()
-void InitDepthEffects() {
+void InitDepthEffects(void) {
     tPath_name the_path;
     int i;
     int j;
@@ -331,12 +339,18 @@ void InitDepthEffects() {
         FatalError(kFatalError_FindSkyMaterial_S, "HORIZON.MAT"); // 2nd argument added
     }
     gHorizon_material->index_blend = BrPixelmapAllocate(BR_PMT_INDEX_8, 256, 256, NULL, 0);
-    BrTableAdd(gHorizon_material->index_blend);
+
+    // HACK: moved below loop
+    // BrTableAdd(gHorizon_material->index_blend);
     for (i = 0; i < 256; i++) {
         for (j = 0; j < 256; j++) {
             *((tU8*)gHorizon_material->index_blend->pixels + 256 * i + j) = j;
         }
     }
+    // HACK: this should be above the for loop. Haven't been able to figure out how this is working in OG, as changes made to the pixelmap
+    // don't update the stored copy without calling `BrTableUpdate`.
+    BrTableAdd(gHorizon_material->index_blend);
+
     gHorizon_material->flags |= BR_MATF_PERSPECTIVE;
     BrMaterialAdd(gHorizon_material);
     gForward_sky_model = CreateHorizonModel(gCamera);
@@ -370,9 +384,6 @@ void DoDepthByShadeTable(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer
     int depth_line_skip;
     int render_line_skip;
     LOG_TRACE("(%p, %p, %p, %d, %d, %d)", pRender_buffer, pDepth_buffer, pShade_table, pShade_table_power, pStart, pEnd);
-
-    // Added to ensure we've copied the framebuffer+depthbuffer back into main memory
-    Harness_Hook_FlushRenderer();
 
     too_near = 0xffff - (1 << pStart);
     shade_table_pixels = pShade_table->pixels;
@@ -514,7 +525,7 @@ void DoHorizon(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor
     br_actor* actor;
     LOG_TRACE("(%p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world);
 
-    yaw = BR_ANGLE_RAD(atan2f(pCamera_to_world->m[2][0], pCamera_to_world->m[2][2]));
+    yaw = BrRadianToAngle(atan2f(pCamera_to_world->m[2][0], pCamera_to_world->m[2][2]));
     if (!gProgram_state.cockpit_on && !(gAction_replay_mode && gAction_replay_camera_mode)) {
         return;
     }
@@ -628,26 +639,36 @@ void DoWobbleCamera(br_actor* pCamera) {
 // IDA: void __usercall DoDrugWobbleCamera(br_actor *pCamera@<EAX>)
 void DoDrugWobbleCamera(br_actor* pCamera) {
     float f_time;
-    static br_scalar mag00;
-    static br_scalar mag01;
-    static br_scalar mag02;
-    static br_scalar mag10;
-    static br_scalar mag11;
-    static br_scalar mag12;
-    static br_scalar mag20;
-    static br_scalar mag21;
-    static br_scalar mag22;
-    static float period00;
-    static float period01;
-    static float period02;
-    static float period10;
-    static float period11;
-    static float period12;
-    static float period20;
-    static float period21;
-    static float period22;
+    static br_scalar mag00 = 0.03f;
+    static br_scalar mag01 = 0.03f;
+    static br_scalar mag02 = 0.03f;
+    static br_scalar mag10 = 0.2f;
+    static br_scalar mag11 = 0.07;
+    static br_scalar mag12 = 0.03f;
+    static br_scalar mag20 = 0.02f;
+    static br_scalar mag21 = 0.03f;
+    static br_scalar mag22 = 0.01f;
+    static float period00 = 550.f;
+    static float period01 = 700.f;
+    static float period02 = 200.f;
+    static float period10 = 100.f;
+    static float period11 = 1300.f;
+    static float period12 = 500.f;
+    static float period20 = 800.f;
+    static float period21 = 1500.f;
+    static float period22 = 300.f;
     LOG_TRACE("(%p)", pCamera);
-    NOT_IMPLEMENTED();
+
+    f_time = (float)PDGetTotalTime();
+    pCamera->t.t.mat.m[0][0] += FastScalarSin(fmod(f_time / period00 * 360.f, 360.f)) * mag00;
+    pCamera->t.t.mat.m[0][1] += FastScalarSin(fmod(f_time / period01 * 360.f, 360.f)) * mag01;
+    pCamera->t.t.mat.m[0][2] += FastScalarSin(fmod(f_time / period02 * 360.f, 360.f)) * mag02;
+    pCamera->t.t.mat.m[1][0] += FastScalarSin(fmod(f_time / period10 * 360.f, 360.f)) * mag10;
+    pCamera->t.t.mat.m[1][1] += FastScalarSin(fmod(f_time / period11 * 360.f, 360.f)) * mag11;
+    pCamera->t.t.mat.m[1][2] += FastScalarSin(fmod(f_time / period12 * 360.f, 360.f)) * mag12;
+    pCamera->t.t.mat.m[2][0] += FastScalarSin(fmod(f_time / period20 * 360.f, 360.f)) * mag20;
+    pCamera->t.t.mat.m[2][1] += FastScalarSin(fmod(f_time / period21 * 360.f, 360.f)) * mag21;
+    pCamera->t.t.mat.m[2][2] += FastScalarSin(fmod(f_time / period22 * 360.f, 360.f)) * mag22;
 }
 
 // IDA: void __usercall DoSpecialCameraEffect(br_actor *pCamera@<EAX>, br_matrix34 *pCamera_to_world@<EDX>)
@@ -667,7 +688,7 @@ void DoSpecialCameraEffect(br_actor* pCamera, br_matrix34* pCamera_to_world) {
 }
 
 // IDA: void __cdecl LessDepthFactor()
-void LessDepthFactor() {
+void LessDepthFactor(void) {
     char s[256];
     LOG_TRACE("()");
 
@@ -680,7 +701,7 @@ void LessDepthFactor() {
 }
 
 // IDA: void __cdecl MoreDepthFactor()
-void MoreDepthFactor() {
+void MoreDepthFactor(void) {
     char s[256];
     LOG_TRACE("()");
 
@@ -693,7 +714,7 @@ void MoreDepthFactor() {
 }
 
 // IDA: void __cdecl LessDepthFactor2()
-void LessDepthFactor2() {
+void LessDepthFactor2(void) {
     char s[256];
     LOG_TRACE("()");
 
@@ -706,7 +727,7 @@ void LessDepthFactor2() {
 }
 
 // IDA: void __cdecl MoreDepthFactor2()
-void MoreDepthFactor2() {
+void MoreDepthFactor2(void) {
     char s[256];
     LOG_TRACE("()");
 
@@ -719,7 +740,7 @@ void MoreDepthFactor2() {
 }
 
 // IDA: void __cdecl AssertYons()
-void AssertYons() {
+void AssertYons(void) {
     br_camera* camera_ptr;
     int i;
     LOG_TRACE("()");
@@ -731,7 +752,7 @@ void AssertYons() {
 }
 
 // IDA: void __cdecl IncreaseYon()
-void IncreaseYon() {
+void IncreaseYon(void) {
     br_camera* camera_ptr;
     int i;
     char s[256];
@@ -746,7 +767,7 @@ void IncreaseYon() {
 }
 
 // IDA: void __cdecl DecreaseYon()
-void DecreaseYon() {
+void DecreaseYon(void) {
     br_camera* camera_ptr;
     int i;
     char s[256];
@@ -783,14 +804,14 @@ void SetYon(br_scalar pYon) {
 }
 
 // IDA: br_scalar __cdecl GetYon()
-br_scalar GetYon() {
+br_scalar GetYon(void) {
     LOG_TRACE("()");
 
     return gCamera_yon;
 }
 
 // IDA: void __cdecl IncreaseAngle()
-void IncreaseAngle() {
+void IncreaseAngle(void) {
     br_camera* camera_ptr;
     int i;
     char s[256];
@@ -812,7 +833,7 @@ void IncreaseAngle() {
 }
 
 // IDA: void __cdecl DecreaseAngle()
-void DecreaseAngle() {
+void DecreaseAngle(void) {
     br_camera* camera_ptr;
     int i;
     char s[256];
@@ -834,7 +855,7 @@ void DecreaseAngle() {
 }
 
 // IDA: void __cdecl ToggleDepthMode()
-void ToggleDepthMode() {
+void ToggleDepthMode(void) {
     LOG_TRACE("()");
 
     switch (gProgram_state.current_depth_effect.type) {
@@ -856,7 +877,7 @@ void ToggleDepthMode() {
 }
 
 // IDA: int __cdecl GetSkyTextureOn()
-int GetSkyTextureOn() {
+int GetSkyTextureOn(void) {
     LOG_TRACE("()");
 
     return gSky_on;
@@ -884,7 +905,7 @@ void SetSkyTextureOn(int pOn) {
 }
 
 // IDA: void __cdecl ToggleSkyQuietly()
-void ToggleSkyQuietly() {
+void ToggleSkyQuietly(void) {
     br_pixelmap* temp;
     LOG_TRACE("()");
 
@@ -901,13 +922,13 @@ void ToggleSkyQuietly() {
 }
 
 // IDA: void __cdecl ToggleSky()
-void ToggleSky() {
+void ToggleSky(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl GetDepthCueingOn()
-int GetDepthCueingOn() {
+int GetDepthCueingOn(void) {
     LOG_TRACE("()");
     return gDepth_cueing_on;
 }
@@ -925,7 +946,7 @@ void SetDepthCueingOn(int pOn) {
 }
 
 // IDA: void __cdecl ToggleDepthCueingQuietly()
-void ToggleDepthCueingQuietly() {
+void ToggleDepthCueingQuietly(void) {
     tDepth_effect_type temp_type;
     int temp_start;
     int temp_end;
@@ -945,13 +966,13 @@ void ToggleDepthCueingQuietly() {
 }
 
 // IDA: void __cdecl ToggleDepthCueing()
-void ToggleDepthCueing() {
+void ToggleDepthCueing(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl ChangeDepthEffect()
-void ChangeDepthEffect() {
+void ChangeDepthEffect(void) {
     br_scalar x1;
     br_scalar x2;
     br_scalar y1;
@@ -965,12 +986,12 @@ void ChangeDepthEffect() {
 }
 
 // IDA: void __cdecl MungeForwardSky()
-void MungeForwardSky() {
+void MungeForwardSky(void) {
     LOG_TRACE("()");
 }
 
 // IDA: void __cdecl MungeRearviewSky()
-void MungeRearviewSky() {
+void MungeRearviewSky(void) {
     LOG_TRACE("()");
 
     if (gSky_image_width != 0) {

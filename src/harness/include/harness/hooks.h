@@ -2,65 +2,86 @@
 #define HARNESS_HOOKS_H
 
 #include "brender/br_types.h"
-
+#include "harness/win95_polyfill_defs.h"
 #include <stdio.h>
+
+typedef enum {
+    eFlush_all,
+    eFlush_color_buffer
+} tRenderer_flush_type;
+
+// Platform implementation functions
+typedef struct tHarness_platform {
+    // Initialize the renderer
+    void (*Renderer_Init)(int width, int height, int pRender_width, int pRender_height);
+    // Called when beginning a 3D scene
+    void (*Renderer_BeginScene)(br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer);
+    // Called at the end of a 3D scene
+    void (*Renderer_EndScene)(void);
+    // Render a fullscreen quad using the specified pixel data
+    void (*Renderer_FullScreenQuad)(uint8_t* src);
+    // Render a model
+    void (*Renderer_Model)(br_actor* actor, br_model* model, br_material* material, br_token render_type, br_matrix34 model_matrix);
+    // Clear frame and depth buffers
+    void (*Renderer_ClearBuffers)(void);
+    // Load pixelmap into video memory
+    void (*Renderer_BufferTexture)(br_pixelmap* pm);
+    // Load material
+    void (*Renderer_BufferMaterial)(br_material* mat);
+    // Load model into video memory
+    void (*Renderer_BufferModel)(br_model* model);
+    // Pull contents of frame and depth buffers from video into main memory for software effects
+    void (*Renderer_FlushBuffers)(void);
+    // Set the 256 color palette to use (BGRA format)
+    void (*Renderer_SetPalette)(PALETTEENTRY_* palette);
+    // Set the viewport for 3d rendering
+    void (*Renderer_SetViewport)(int x, int y, int width, int height);
+    // Create a window. Return a handle to the window
+    void* (*CreateWindowAndRenderer)(char* title, int x, int y, int nWidth, int nHeight);
+    // Get mouse button state
+    int (*GetMouseButtons)(int* button_1, int* button_2);
+    // Get mouse position
+    int (*GetMousePosition)(int* pX, int* pY);
+    // Close specified window
+    void (*DestroyWindow)(void* window);
+    // Process window messages, return any WM_QUIT message
+    int (*ProcessWindowMessages)(MSG_* msg);
+    // Set position of a window
+    int (*SetWindowPos)(void* hWnd, int x, int y, int nWidth, int nHeight);
+    // Show/hide the cursor
+    int (*ShowCursor)(int show);
+    // Get keyboard state. Expected to be in DirectInput key codes
+    void (*GetKeyboardState)(unsigned int count, uint8_t* buffer);
+    // Sleep
+    void (*Sleep)(uint32_t dwMilliseconds);
+    // Get ticks
+    uint32_t (*GetTicks)(void);
+    // Swap window
+    void (*SwapWindow)(void);
+    // Show error message
+    int (*ShowErrorMessage)(void* window, char* text, char* caption);
+
+} tHarness_platform;
+
+extern tHarness_platform gHarness_platform;
 
 void Harness_Init(int* argc, char* argv[]);
 void Harness_Hook_PDShutdownSystem(void);
 
 // Hooks are called from original game code.
 
-// Dethrace hooks
-int Harness_Hook_KeyDown(unsigned char pScan_code);
-void Harness_Hook_PDServiceSystem();
-void Harness_Hook_PDSetKeyArray();
-// void Harness_Hook_MainGameLoop(); // limit FPS
-void Harness_Hook_FlushRenderer(); // synchronize in-memory framebuffer and depthbuffer
-void Harness_Hook_GraphicsInit(int render_width, int render_height);
-
 // BRender hooks
-void Harness_Hook_BrDevPaletteSetOld(br_pixelmap* pm);
-void Harness_Hook_BrDevPaletteSetEntryOld(int i, br_colour colour);
 void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src);
 void Harness_Hook_BrV1dbRendererBegin(br_v1db_state* v1db);
-void Harness_Hook_BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer);
-void Harness_Hook_BrZbSceneRenderAdd(br_actor* tree);
-void Harness_Hook_renderFaces(br_actor* actor, br_model* model, br_material* material, br_token type);
-void Harness_Hook_BrZbSceneRenderEnd();
-void Harness_Hook_BrBufferUpdate(br_pixelmap* pm, br_token use, br_uint_16 flags);
-void Harness_Hook_BrMaterialUpdate(br_material* mat, br_uint_16 flags);
-void Harness_Hook_BrModelUpdate(br_model* model);
-
-// Input hooks
-void Harness_Hook_GetMousePosition(int* pX, int* pY);
-void Harness_Hook_GetMouseButtons(int* pButton1, int* pButton2);
+void Harness_Hook_renderActor(br_actor* actor, br_model* model, br_material* material, br_token type);
 
 // Sound hooks
 void Harness_Hook_S3Service(int unk1, int unk2);
-void Harness_Hook_S3StopAllOutletSounds();
+void Harness_Hook_S3StopAllOutletSounds(void);
 
 // Filesystem hooks
 FILE* Harness_Hook_fopen(const char* pathname, const char* mode);
 
-#ifdef INSIDE_DETHRACE
-#include "dr_types.h"
-
-// Network hooks
-int Harness_Hook_PDNetInitialise(void);
-int Harness_Hook_PDNetShutdown(void);
-int Harness_Hook_PDNetStartProducingJoinList(void);
-void Harness_Hook_PDNetEndJoinList(void);
-int Harness_Hook_PDNetGetNextJoinGame(tNet_game_details* pDetails, int pIndex);
-int Harness_Hook_PDNetSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessage, void* pAddress);
-//void Harness_Hook_PDNetDisposeGameDetails(tNet_game_details* pDetails);
-char* Harness_Hook_NetFormatAddress(void* pAddress);
-int Harness_Hook_NetBroadcastMessage(void);
-int Harness_Hook_NetReceiveHostResponses(void);
-tNet_message* Harness_Hook_PDNetGetNextMessage(tNet_game_details* pDetails, void** pSender_address);
-int Harness_Hook_PDNetHostGame(tNet_game_details* pDetails, char* pHost_name, void** pHost_address);
-tPlayer_ID Harness_Hook_PDNetExtractPlayerID(tNet_game_details* pDetails);
-int Harness_Hook_NetSendto(char* message, int size, void* pAddress);
-void Harness_Hook_CopyAddress(void* pDest, const void* pSrc);
-#endif
+void Harness_RenderLastScreen(void);
 
 #endif

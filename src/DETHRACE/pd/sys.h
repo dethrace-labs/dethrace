@@ -39,26 +39,30 @@ extern int gReplay_override;
 extern br_pixelmap* gReal_back_screen;
 extern tS32 gJoystick_min1x;
 extern br_pixelmap* gTemp_screen;
-//extern int gDOSGfx_initialized;
+extern int gDOSGfx_initialized;
 extern tU32 gUpper_loop_limit;
 extern int gExtra_mem;
 extern int gReal_back_screen_locked;
 extern void (*gPrev_keyboard_handler)(void);
-extern tU8 gScan_code[123][2];
+
+// DOS
+// extern tU8 gScan_code[123][2];
+// Windows
+extern tU32 gScan_code[123];
 
 extern char* _unittest_last_fatal_error;
 
 // void KeyboardHandler(void);
 
-//int KeyDown(tU8 pScan_code);
+// int KeyDown(tU8 pScan_code);
 
 // void KeyTranslation(tU8 pKey_index, tU8 pScan_code_1, tU8 pScan_code_2);
 
-//void KeyBegin(void);
+// void KeyBegin(void);
 
-//void KeyEnd(void);
+// void KeyEnd(void);
 
-//int KeyDown22(int pKey_index);
+// int KeyDown22(int pKey_index);
 
 void PDSetKeyArray(int* pKeys, int pMark);
 
@@ -70,7 +74,7 @@ void PDNonFatalError(char* pThe_str);
 
 void PDInitialiseSystem(void);
 
-void PDShutdownSystem(void);
+HARNESS_NORETURN void PDShutdownSystem(void);
 
 void PDSaveOriginalPalette(void);
 
@@ -86,17 +90,17 @@ void PDUnlockRealBackScreen(void);
 
 void PDAllocateScreenAndBack(void);
 
-//void Copy8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette);
+// void Copy8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette);
 
-//void Double8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette, tU16 pOff, tU16 pSrc_width, tU16 pSrc_height);
+// void Double8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette, tU16 pOff, tU16 pSrc_width, tU16 pSrc_height);
 
 br_pixelmap* PDInterfacePixelmap(void);
 
-//void SwapBackScreen(void);
+// void SwapBackScreen(void);
 
-//void ReallyCopyBackScreen(int pRendering_area_only, int pClear_top_and_bottom);
+// void ReallyCopyBackScreen(int pRendering_area_only, int pClear_top_and_bottom);
 
-//void CopyBackScreen(int pRendering_area_only);
+// void CopyBackScreen(int pRendering_area_only);
 
 void PDScreenBufferSwap(int pRendering_area_only);
 
@@ -130,7 +134,7 @@ int PDGetTotalTime(void);
 
 int PDServiceSystem(tU32 pTime_since_last_call);
 
-//tU32 LargestBlockAvail(void);
+// tU32 LargestBlockAvail(void);
 
 void* PDGrabLargestMammaryWeCanPlayWith(tU32 pMaximum_required, tU32* pAmount_allocated);
 
@@ -138,15 +142,15 @@ void PDAllocateActionReplayBuffer(char** pBuffer, tU32* pBuffer_size);
 
 void PDDisposeActionReplayBuffer(char* pBuffer);
 
-//void Usage(char* pProgpath);
+// void Usage(char* pProgpath);
 
-//int OurGetChar(void);
+// int OurGetChar(void);
 
 int PDGetGorePassword(void);
 
 void PDDisplayGoreworthiness(int pGory);
 
-HARNESS_NORETURN void PDEnterDebugger(char* pStr);
+void PDEnterDebugger(char* pStr);
 
 // Added function
 br_material* PDMissingMaterial(char* name);
@@ -162,15 +166,15 @@ br_pixelmap* PDMissingMap(char* name);
 
 void PDEndItAllAndReRunTheBastard(void);
 
-//int matherr(struct exception_* err);
+// int matherr(struct exception_* err);
 
-//int LoopLimitTooLow(tU32 limit);
+// int LoopLimitTooLow(tU32 limit);
 
-//tS32 UpperLoopLimit(void);
+// tS32 UpperLoopLimit(void);
 
-//int InitJoysticks(void);
+// int InitJoysticks(void);
 
-//tU32 ReadJoystickAxis(int pBit);
+// tU32 ReadJoystickAxis(int pBit);
 
 void PDReadJoySticks(void);
 

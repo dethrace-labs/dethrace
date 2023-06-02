@@ -1,7 +1,7 @@
 #include "brexcept.h"
 
-#include "CORE/FW/resource.h"
 #include "CORE/FW/diag.h"
+#include "CORE/FW/resource.h"
 #include "harness/trace.h"
 
 #include <string.h>
@@ -10,7 +10,7 @@ void* exceptionValue;
 br_exception_handler* _BrExceptionHandler;
 
 // IDA: br_exception_handler* __cdecl _BrExceptionBegin()
-br_exception_handler* _BrExceptionBegin() {
+br_exception_handler* _BrExceptionBegin(void) {
     br_exception_handler* h;
     LOG_TRACE("()");
 
@@ -21,7 +21,7 @@ br_exception_handler* _BrExceptionBegin() {
 }
 
 // IDA: void __cdecl _BrExceptionEnd()
-void _BrExceptionEnd() {
+void _BrExceptionEnd(void) {
     br_exception_handler* old;
     LOG_TRACE("()");
 
@@ -61,7 +61,7 @@ br_exception _BrExceptionValueFetch(br_exception type, void** evp) {
 }
 
 // IDA: void* __cdecl _BrExceptionResource()
-void* _BrExceptionResource() {
+void* _BrExceptionResource(void) {
     LOG_TRACE("()");
 
     return _BrExceptionHandler;

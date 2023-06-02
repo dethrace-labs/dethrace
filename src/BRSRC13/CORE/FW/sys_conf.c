@@ -55,7 +55,7 @@ br_error BrSetDefaultConfig(br_token t, char* Entry) {
 }
 
 // IDA: br_error __cdecl BrSystemConfigBegin()
-br_error BrSystemConfigBegin() {
+br_error BrSystemConfigBegin(void) {
     char temp[255];
     br_value v;
     STUB();

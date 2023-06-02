@@ -7,7 +7,7 @@
 br_pixelmap* last_begin_screen;
 
 // IDA: br_pixelmap* __cdecl BrDevLastBeginQuery()
-br_pixelmap* BrDevLastBeginQuery() {
+br_pixelmap* BrDevLastBeginQuery(void) {
 
     return last_begin_screen;
 }
@@ -65,19 +65,19 @@ br_pixelmap* BrDevBeginOld(char* setup_string) {
 }
 
 // IDA: void __cdecl BrDevEndOld()
-void BrDevEndOld() {
+void BrDevEndOld(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl BrDevPaletteSetOld(br_pixelmap *pm)
 void BrDevPaletteSetOld(br_pixelmap* pm) {
-    Harness_Hook_BrDevPaletteSetOld(pm);
+    NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl BrDevPaletteSetEntryOld(int i, br_colour colour)
 void BrDevPaletteSetEntryOld(int i, br_colour colour) {
-    Harness_Hook_BrDevPaletteSetEntryOld(i, colour);
+    NOT_IMPLEMENTED();
 }
 
 // IDA: br_error __cdecl BrRendererFacilityFind(br_renderer_facility **prf, br_device_pixelmap *destination, br_token scalar_type)

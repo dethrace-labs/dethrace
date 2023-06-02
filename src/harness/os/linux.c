@@ -20,6 +20,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <termios.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -30,8 +31,6 @@ static char _program_name[1024];
 #define MAX_STACK_FRAMES 64
 static void* stack_traces[MAX_STACK_FRAMES];
 #define TRACER_PID_STRING "TracerPid:"
-DIR* directory_iterator;
-uint32_t first_clock_time = 0;
 
 struct dl_iterate_callback_data {
     int initialized;
@@ -47,91 +46,12 @@ static int dl_iterate_callback(struct dl_phdr_info* info, size_t size, void* dat
     return 0;
 }
 
-static intptr_t get_dethrace_offset() {
+static intptr_t get_dethrace_offset(void) {
     if (!dethrace_dl_data.initialized) {
         dethrace_dl_data.initialized = 1;
         dl_iterate_phdr(dl_iterate_callback, &dethrace_dl_data);
     }
     return dethrace_dl_data.start;
-}
-
-uint32_t OS_GetTime() {
-    struct timespec spec;
-    clock_gettime(CLOCK_MONOTONIC, &spec);
-    if (first_clock_time == 0) {
-        first_clock_time = spec.tv_sec * 1000 + spec.tv_nsec / 1000000;
-    }
-    return (spec.tv_sec * 1000 + spec.tv_nsec / 1000000) - first_clock_time;
-}
-
-void OS_Sleep(int delay_ms) {
-    struct timespec ts;
-    ts.tv_sec = delay_ms / 1000;
-    ts.tv_nsec = (delay_ms % 1000) * 1000000;
-    nanosleep(&ts, &ts);
-}
-
-char* OS_GetFirstFileInDirectory(char* path) {
-    directory_iterator = opendir(path);
-    if (directory_iterator == NULL) {
-        return NULL;
-    }
-    return OS_GetNextFileInDirectory();
-}
-
-char* OS_GetNextFileInDirectory(void) {
-    struct dirent* entry;
-
-    if (directory_iterator == NULL) {
-        return NULL;
-    }
-    while ((entry = readdir(directory_iterator)) != NULL) {
-        if (entry->d_type == DT_REG) {
-            return entry->d_name;
-        }
-    }
-    closedir(directory_iterator);
-    directory_iterator = NULL;
-    return NULL;
-}
-
-void OS_Basename(char* path, char* base) {
-    strcpy(base, basename(path));
-}
-
-int OS_IsDebuggerPresent() {
-    char buf[4096];
-    int status_fd;
-    ssize_t num_read;
-    char* tracer_pid_ptr;
-    char* char_ptr;
-
-    status_fd = open("/proc/self/status", O_RDONLY);
-    if (status_fd == -1) {
-        return 0;
-    }
-
-    num_read = read(status_fd, buf, sizeof(buf) - 1);
-    close(status_fd);
-    if (num_read <= 0) {
-        return 0;
-    }
-
-    buf[num_read] = '\0';
-    tracer_pid_ptr = strstr(buf, TRACER_PID_STRING);
-    if (tracer_pid_ptr == NULL) {
-        return 0;
-    }
-
-    for (char_ptr = tracer_pid_ptr + sizeof(TRACER_PID_STRING) - 1; char_ptr <= buf + num_read; ++char_ptr) {
-        if (isspace(*char_ptr)) {
-            continue;
-        } else {
-            return isdigit(*char_ptr) != 0 && *char_ptr != '0';
-        }
-    }
-
-    return 0;
 }
 
 // Resolve symbol name and source location given the path to the executable and an address
@@ -145,7 +65,7 @@ int addr2line(char const* const program_name, void const* const addr) {
     return system(addr2line_cmd);
 }
 
-void print_stack_trace() {
+static void print_stack_trace(void) {
     int i, trace_size = 0;
     char** messages = (char**)NULL;
 
@@ -340,30 +260,44 @@ FILE* OS_fopen(const char* pathname, const char* mode) {
     return f;
 }
 
-void OS_AllocateActionReplayBuffer(char** pBuffer, unsigned* pBuffer_size) {
-    static int allocated = 0;
-    static char* buffer = NULL;
-    static unsigned buffer_size = 0;
-    unsigned i;
-    const int wanted_sizes[] = {
-        20000000,
-        16000000,
-        6000000,
-        4000000,
-        500000,
-    };
+size_t OS_ConsoleReadPassword(char* pBuffer, size_t pBufferLen) {
+    struct termios old, new;
+    char c;
+    size_t len;
 
-    if (!allocated) {
-        allocated = 1;
-        buffer_size = 0;
-        for (i = 0; i < ARRAY_SIZE(wanted_sizes); i++) {
-            buffer = malloc(wanted_sizes[i]);
-            if (buffer != NULL) {
-                buffer_size = wanted_sizes[i];
+    tcgetattr(STDIN_FILENO, &old);
+    new = old;
+    new.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &new);
+
+    len = 0;
+    pBuffer[len] = '\0';
+    while (1) {
+        if (read(STDIN_FILENO, &c, 1) == 1) {
+            if (c == 0x7f) {
+                if (len > 0) {
+                    len--;
+                    pBuffer[len] = '\0';
+                    printf("\033[1D \033[1D");
+                    fflush(stdout);
+                    continue;
+                }
+            } else if (c == '\r' || c == '\n') {
+                printf("\n");
+                fflush(stdout);
                 break;
+            } else if (len < pBufferLen - 1) {
+                if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
+                    pBuffer[len] = c;
+                    printf("*");
+                    fflush(stdout);
+                    len++;
+                    pBuffer[len] = '\0';
+                }
             }
         }
     }
-    *pBuffer = buffer;
-    *pBuffer_size = buffer_size;
+
+    tcsetattr(STDIN_FILENO, TCSANOW, &old);
+    return len;
 }

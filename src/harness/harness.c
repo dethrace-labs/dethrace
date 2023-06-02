@@ -1,10 +1,11 @@
 #include "harness.h"
 #include "brender_emu/renderer_impl.h"
 #include "include/harness/config.h"
+#include "include/harness/hooks.h"
 #include "include/harness/os.h"
-#include "io_platforms/io_platform.h"
-#include "renderers/null.h"
+#include "platforms/null.h"
 #include "sound/sound.h"
+#include "ascii_tables.h"
 #include "version.h"
 
 #include <errno.h>
@@ -12,7 +13,6 @@
 #include <string.h>
 #include <sys/stat.h>
 
-tRenderer* renderer;
 br_pixelmap* palette;
 uint32_t* screen_buffer;
 harness_br_renderer* renderer_state;
@@ -20,13 +20,11 @@ harness_br_renderer* renderer_state;
 br_pixelmap* last_dst = NULL;
 br_pixelmap* last_src = NULL;
 
-br_pixelmap *last_colour_buffer, *last_depth_buffer;
-
 unsigned int last_frame_time = 0;
-int force_nullrenderer = 0;
+int force_null_platform = 0;
 
-extern unsigned int GetTotalTime();
-extern uint8_t gScan_code[123][2];
+extern unsigned int GetTotalTime(void);
+
 extern br_v1db_state v1db;
 extern uint32_t gI_am_cheating;
 
@@ -36,53 +34,14 @@ tHarness_game_info harness_game_info;
 // Configuration options
 tHarness_game_config harness_game_config;
 
-/* clang-format off */
-// German ASCII codes
-static int carmageddon_german_ascii_table[128] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107,
-    108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 122, 121, 94, -33, -76, 8, 13, 13, 0, 45, 60, -10, -28, 46, 44, -4, 43, 35, 27,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, 56, -33, -76, 46, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-};
-static int carmageddon_german_ascii_shift_table[128] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 61, 33, 34, -89, 36, 37, 38, 47, 40, 41, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75,
-    76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 90, 89, -80, 63, 96, 8, 13, 13, 0, 95, 62, -42, -60, 58, 44, -36, 42, 39, 27,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, 56, -33, -76, 46, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-};
+// Platform hooks
+tHarness_platform gHarness_platform;
 
-// Demo ASCII codes
-static int demo_ascii_table[128] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107,
-    108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 122, 121, 94, -33, -76, 8, 13, 13, 0, 45, 60, -10, -28, 46, 44, -4, 43, 35, 27,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, 56, -33, -76, 46, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-};
-static int demo_ascii_shift_table[128] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 61, 33, 34, -89, 36, 37, 38, 47, 40, 41, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75,
-    76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 90, 89, -80, 63, 96, 8, 13, 13, 0, 95, 62, -42, -60, 58, 44, -36, 42, 39, 27,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, 56, -33, -76, 46, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-};
-
-// Splatpack Demo ASCII codes
-static int splatpack_xmasdemo_ascii_table[128] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75,
-    76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 96, 45, 61, 8, 13, 3, 9, 47, 92, 59, 39, 46, 44, 91, 93, 35, 27,
-    0, 127, 0, 0, 0, 0, 28, 29, 30, 31, 0, 47, 42, 45, 43, 46, 61, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32,
-};
-static int splatpack_xmasdemo_ascii_shift_table[128] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 41, 33, 34, 163, 36, 37, 94, 38, 42, 40, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75,
-    76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 172, 95, 43, 8, 13, 13, 0, 63, 124, 58, 64, 62, 44, 123, 125, 126, 27,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 47, 42, 45, 43, 46, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 8,
-};
-/* clang-format on */
+extern void Harness_Platform_Init(tHarness_platform* platform);
 
 int Harness_ProcessCommandLine(int* argc, char* argv[]);
 
-void Harness_DetectGameMode() {
+static void Harness_DetectGameMode(void) {
     if (access("DATA/RACES/CASTLE.TXT", F_OK) != -1) {
         // All splatpack edition have the castle track
         if (access("DATA/RACES/CASTLE2.TXT", F_OK) != -1) {
@@ -153,21 +112,24 @@ void Harness_DetectGameMode() {
     case eGame_carmageddon:
         switch (harness_game_info.localization) {
         case eGameLocalization_german:
-            harness_game_info.defines.ascii_table = carmageddon_german_ascii_table;
-            harness_game_info.defines.ascii_shift_table = carmageddon_german_ascii_shift_table;
+            harness_game_info.defines.requires_ascii_table = 1;
+            harness_game_info.defines.ascii_table = carmageddon_german_ascii_tables.ascii;
+            harness_game_info.defines.ascii_shift_table = carmageddon_german_ascii_tables.ascii_shift;
             break;
         default:
+            harness_game_info.defines.ascii_table = carmageddon_ascii_tables.ascii;
+            harness_game_info.defines.ascii_shift_table = carmageddon_ascii_tables.ascii_shift;
             break;
         }
         break;
     case eGame_carmageddon_demo:
-        harness_game_info.defines.ascii_table = demo_ascii_table;
-        harness_game_info.defines.ascii_shift_table = demo_ascii_shift_table;
+        harness_game_info.defines.ascii_table = demo_ascii_tables.ascii;
+        harness_game_info.defines.ascii_shift_table = demo_ascii_tables.ascii_shift;
         break;
     case eGame_splatpack_demo:
     case eGame_splatpack_xmas_demo:
-        harness_game_info.defines.ascii_table = splatpack_xmasdemo_ascii_table;
-        harness_game_info.defines.ascii_shift_table = splatpack_xmasdemo_ascii_shift_table;
+        harness_game_info.defines.ascii_table = xmas_ascii_tables.ascii;
+        harness_game_info.defines.ascii_shift_table = xmas_ascii_tables.ascii_shift;
         break;
     default:
         break;
@@ -178,6 +140,8 @@ void Harness_Init(int* argc, char* argv[]) {
     int result;
 
     printf("Dethrace version: %s\n", DETHRACE_VERSION);
+
+    memset(&harness_game_info, 0, sizeof(harness_game_info));
 
     // disable the original CD check code
     harness_game_config.enable_cd_check = 0;
@@ -195,8 +159,8 @@ void Harness_Init(int* argc, char* argv[]) {
     harness_game_config.volume_multiplier = 1.0f;
     // start window in windowed mode
     harness_game_config.start_full_screen = 0;
-    // disable replay by default
-    harness_game_config.enable_replay = 0;
+    // Emulate DOS behavior
+    harness_game_config.dos_mode = 0;
 
     // install signal handler by default
     harness_game_config.install_signalhandler = 1;
@@ -221,20 +185,16 @@ void Harness_Init(int* argc, char* argv[]) {
         Harness_DetectGameMode();
     }
 
-    Input_Init();
-    int* keymap = Input_GetKeyMap();
-    if (keymap != NULL) {
-        for (int i = 0; i < 123; i++) {
-            gScan_code[i][0] = keymap[i];
-            // gScan_code[i][1] = keymap[i];
-        }
+    if (force_null_platform) {
+        Null_Platform_Init(&gHarness_platform);
+    } else {
+        Harness_Platform_Init(&gHarness_platform);
     }
 }
 
 // used by unit tests
-void Harness_ForceNullRenderer() {
-    force_nullrenderer = 1;
-    renderer = &null_renderer;
+void Harness_ForceNullPlatform(void) {
+    force_null_platform = 1;
 }
 
 void Harness_Hook_PDShutdownSystem() {
@@ -290,8 +250,8 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
         } else if (strcasecmp(argv[i], "--full-screen") == 0) {
             harness_game_config.start_full_screen = 1;
             handled = 1;
-        } else if (strcasecmp(argv[i], "--enable-replay") == 0) {
-            harness_game_config.enable_replay = 1;
+        } else if (strcasecmp(argv[i], "--dos-mode") == 0) {
+            harness_game_config.dos_mode = 1;
             handled = 1;
         }
 
@@ -308,44 +268,12 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
     return 0;
 }
 
-void Harness_Hook_GraphicsInit(int render_width, int render_height) {
-    int window_width, window_height;
-    if (force_nullrenderer) {
-        return;
-    }
-    if (render_width == 320) {
-        window_width = render_width * 2;
-        window_height = render_height * 2;
-    } else {
-        window_width = render_width;
-        window_height = render_height;
-    }
-    renderer = Window_Create("Dethrace", window_width, window_height, render_width, render_height);
-}
-
 // Render 2d back buffer
 void Harness_RenderScreen(br_pixelmap* dst, br_pixelmap* src) {
-    renderer->FullScreenQuad((uint8_t*)src->pixels);
+    gHarness_platform.Renderer_FullScreenQuad((uint8_t*)src->pixels);
 
     last_dst = dst;
     last_src = src;
-}
-
-void Harness_Hook_BrDevPaletteSetOld(br_pixelmap* pm) {
-    renderer->SetPalette((uint8_t*)pm->pixels);
-    palette = pm;
-
-    if (last_dst) {
-        Harness_RenderScreen(last_dst, last_src);
-        Window_Swap(0);
-    }
-}
-
-void Harness_Hook_BrDevPaletteSetEntryOld(int i, br_colour colour) {
-    if (palette != NULL) {
-        uint32_t* colors = palette->pixels;
-        colors[i] = colour;
-    }
 }
 
 void Harness_Hook_BrV1dbRendererBegin(br_v1db_state* v1db) {
@@ -353,7 +281,7 @@ void Harness_Hook_BrV1dbRendererBegin(br_v1db_state* v1db) {
     v1db->renderer = (br_renderer*)renderer_state;
 }
 
-int Harness_CalculateFrameDelay() {
+static int Harness_CalculateFrameDelay(void) {
     if (harness_game_config.fps == 0) {
         return 0;
     }
@@ -373,23 +301,8 @@ int Harness_CalculateFrameDelay() {
     return 0;
 }
 
-// Begin 3d scene
-void Harness_Hook_BrZbSceneRenderBegin(br_actor* world, br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer) {
-    last_colour_buffer = colour_buffer;
-    last_depth_buffer = depth_buffer;
-    renderer->BeginScene(camera, colour_buffer);
-}
-
-void Harness_Hook_BrZbSceneRenderAdd(br_actor* tree) {
-}
-
-void Harness_Hook_renderFaces(br_actor* actor, br_model* model, br_material* material, br_token type) {
-    renderer->Model(actor, model, renderer_state->state.matrix.model_to_view);
-}
-
-void Harness_Hook_BrZbSceneRenderEnd() {
-    renderer->FlushBuffers(last_colour_buffer, last_depth_buffer);
-    renderer->EndScene();
+void Harness_Hook_renderActor(br_actor* actor, br_model* model, br_material* material, br_token type) {
+    gHarness_platform.Renderer_Model(actor, model, material, type, renderer_state->state.matrix.model_to_view);
 }
 
 // Called by game to swap buffers at end of frame rendering
@@ -399,60 +312,20 @@ void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {
     Harness_RenderScreen(dst, src);
 
     int delay_ms = Harness_CalculateFrameDelay();
-    Window_Swap(delay_ms);
+    gHarness_platform.SwapWindow();
+    if (delay_ms > 0) {
+        gHarness_platform.Sleep(delay_ms);
+    }
 
-    renderer->ClearBuffers();
-    Window_PollEvents();
-
+    gHarness_platform.Renderer_ClearBuffers();
     last_frame_time = GetTotalTime();
 }
 
-int Harness_Hook_KeyDown(unsigned char pScan_code) {
-    return Input_IsKeyDown(pScan_code);
-}
-
-void Harness_Hook_PDServiceSystem() {
-    Window_PollEvents();
-}
-void Harness_Hook_PDSetKeyArray() {
-    Window_PollEvents();
-}
-
-void Harness_Hook_FlushRenderer() {
-    renderer->FlushBuffers(last_colour_buffer, last_depth_buffer);
-}
-
-void Harness_Hook_BrMaterialUpdate(br_material* mat, br_uint_16 flags) {
-    renderer->BufferMaterial(mat);
-}
-
-void Harness_Hook_BrBufferUpdate(br_pixelmap* pm, br_token use, br_uint_16 flags) {
-    if (use == BRT_COLOUR_MAP_O || use == BRT_UNKNOWN) {
-        renderer->BufferTexture(pm);
-    } else {
-        LOG_PANIC("use %d", use);
+void Harness_RenderLastScreen(void) {
+    if (last_dst) {
+        Harness_RenderScreen(last_dst, last_src);
+        gHarness_platform.SwapWindow();
     }
-}
-
-void Harness_Hook_BrModelUpdate(br_model* model) {
-    renderer->BufferModel(model);
-}
-
-// Input hooks
-void Harness_Hook_GetMousePosition(int* pX, int* pY) {
-    Input_GetMousePosition(pX, pY);
-}
-
-void Harness_Hook_GetMouseButtons(int* pButton1, int* pButton2) {
-    Input_GetMouseButtons(pButton1, pButton2);
-}
-
-// Sound hooks
-void Harness_Hook_S3Service(int unk1, int unk2) {
-    Sound_Service();
-}
-
-void Harness_Hook_S3StopAllOutletSounds() {
 }
 
 // Filesystem hooks

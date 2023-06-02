@@ -15,12 +15,15 @@ target_link_libraries(brender PRIVATE harness compile_with_werror)
 if(NOT MSVC)
     target_compile_options(brender PRIVATE
         -Wall
+    )
+    add_compile_flags_if_supported(brender
         -Wno-return-type
         -Wno-unused-variable
         -Wno-unused-parameter
         -Wno-sign-compare
         -Wno-int-conversion  #todo!
         -Wno-strict-aliasing
+        -Wstrict-prototypes
     )
     
     target_link_libraries(brender PUBLIC m)

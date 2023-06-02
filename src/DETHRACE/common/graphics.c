@@ -176,16 +176,16 @@ int gArrows[2][4][60] =
         { 11,  0,  0, -1,  0,  1,  0,  0, -1,  1, -1,  1, -2, -2,  1, -1,  1,  0,  1,  1,  1,  1,  2, },
         {  9,  0,  0, -2,  0, -1,  0,  1,  0,  0, -1,  1, -1,  2, -2,  0,  1,  0,  2, },
         { 11,  0,  0, -1,  0,  1,  0, -2, -1, -1, -1,  0, -1,  1, -1,  2, -1, -1,  1,  0,  1, -1,  2, },
-    }, 
+    },
     {
         // outer arrow (=border)
-        { 26,  1, -3,  1, -2,  1, -1,  2, -1,  2,  0,  2,  1,  3,  1,  3,  2,  3,  3,  2,  3,  1,  3,  1,  2,  0,  2, -1,  2, 
+        { 26,  1, -3,  1, -2,  1, -1,  2, -1,  2,  0,  2,  1,  3,  1,  3,  2,  3,  3,  2,  3,  1,  3,  1,  2,  0,  2, -1,  2,
               -1,  3, -2,  3, -3,  3, -3,  2, -3,  1, -2,  1, -2,  0, -2, -1, -1, -1, -1, -2, -1, -3,  0, -3, },
         { 22,  0, -3,  1, -3,  2, -3,  2, -2,  2, -1,  2,  0,  2,  1,  2,  2,  2,  3,  1,  3,  0,  3,  0,  2, -1,  2, -2,  2,
               -3,  2, -3,  1, -3,  0, -2,  0, -2, -1, -1, -1, -1, -2,  0, -2, },
         { 24,  1, -3,  2, -3,  3, -3,  3, -2,  3, -1,  2, -1,  2,  0,  2,  1,  1,  1,  1,  2,  1,  3,  0,  3, -1,  3, -1,  2,
-              -1,  1, -2,  1, -3,  1, -3,  0, -3, -1, -2, -1, -1, -1, -1, -2,  0, -2,  1, -2, }, 
-        { 22, -3, -2, -2, -2, -1, -2,  0, -2,  1, -2,  2, -2,  3, -2,  3, -1,  3,  0,  2,  0,  2,  1,  1,  1,  1,  2,  0,  2, 
+              -1,  1, -2,  1, -3,  1, -3,  0, -3, -1, -2, -1, -1, -1, -1, -2,  0, -2,  1, -2, },
+        { 22, -3, -2, -2, -2, -1, -2,  0, -2,  1, -2,  2, -2,  3, -2,  3, -1,  3,  0,  2,  0,  2,  1,  1,  1,  1,  2,  0,  2,
                0,  3, -1,  3, -2,  3, -2,  2, -2,  1, -2,  0, -3,  0, -3, -1, },
     },
 };
@@ -261,21 +261,21 @@ br_scalar gYon_squared;
 #define SHADOW_D_IGNORE_FLAG 10000.0
 
 // IDA: void __cdecl TurnOnPaletteConversion()
-void TurnOnPaletteConversion() {
+void TurnOnPaletteConversion(void) {
     LOG_TRACE("()");
 
     gCurrent_conversion_table = gPalette_conversion_table;
 }
 
 // IDA: void __cdecl TurnOffPaletteConversion()
-void TurnOffPaletteConversion() {
+void TurnOffPaletteConversion(void) {
     LOG_TRACE("()");
 
     gCurrent_conversion_table = NULL;
 }
 
 // IDA: void __cdecl ResetLollipopQueue()
-void ResetLollipopQueue() {
+void ResetLollipopQueue(void) {
     LOG_TRACE("()");
 
     gNumber_of_lollipops = 0;
@@ -298,7 +298,7 @@ int AddToLollipopQueue(br_actor* pActor, int pIndex) {
 }
 
 // IDA: void __cdecl RenderLollipops()
-void RenderLollipops() {
+void RenderLollipops(void) {
     int i;
     int must_relink;
     br_actor** the_actor;
@@ -375,8 +375,8 @@ void BuildColourTable(br_pixelmap* pPalette) {
 
 #define SQR(i) i* i
 
-    for (i = 0; i < COUNT_OF(gRGB_colours); ++i) {
-        nearest_distance = 0x48400000;
+    for (i = 0; i < COUNT_OF(gRGB_colours); i++) {
+        nearest_distance = 196608.f;
         red = (gRGB_colours[i] >> 16) & 0xFF;
         green = (gRGB_colours[i] >> 8) & 0xFF;
         blue = gRGB_colours[i] & 0xFF;
@@ -394,7 +394,7 @@ void BuildColourTable(br_pixelmap* pPalette) {
 }
 
 // IDA: void __cdecl ClearConcussion()
-void ClearConcussion() {
+void ClearConcussion(void) {
     LOG_TRACE("()");
 
     gConcussion.concussed = 0;
@@ -554,7 +554,7 @@ void SetBRenderScreenAndBuffers(int pX_offset, int pY_offset, int pWidth, int pH
 }
 
 // IDA: void __cdecl SetIntegerMapRenders()
-void SetIntegerMapRenders() {
+void SetIntegerMapRenders(void) {
     LOG_TRACE("()");
 
     gMap_render_x_i = ((int)gMap_render_x) & ~3;
@@ -570,7 +570,7 @@ void SetIntegerMapRenders() {
 }
 
 // IDA: void __cdecl AdjustRenderScreenSize()
-void AdjustRenderScreenSize() {
+void AdjustRenderScreenSize(void) {
     int switched_res;
     LOG_TRACE("()");
 
@@ -603,7 +603,7 @@ void AdjustRenderScreenSize() {
 }
 
 // IDA: void __cdecl ScreenSmaller()
-void ScreenSmaller() {
+void ScreenSmaller(void) {
     LOG_TRACE("()");
 
     if (!gMap_mode) {
@@ -619,7 +619,7 @@ void ScreenSmaller() {
 }
 
 // IDA: void __cdecl ScreenLarger()
-void ScreenLarger() {
+void ScreenLarger(void) {
     LOG_TRACE("()");
 
     if (!gMap_mode) {
@@ -637,7 +637,7 @@ void ScreenLarger() {
 // IDA: void __usercall DRSetPaletteEntries(br_pixelmap *pPalette@<EAX>, int pFirst_colour@<EDX>, int pCount@<EBX>)
 void DRSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
     LOG_TRACE("(%p, %d, %d)", pPalette, pFirst_colour, pCount);
-    if (!pFirst_colour) {
+    if (pFirst_colour == 0) {
         ((br_int_32*)pPalette->pixels)[0] = 0;
     }
     memcpy(gCurrent_palette_pixels + 4 * pFirst_colour, (char*)pPalette->pixels + 4 * pFirst_colour, 4 * pCount);
@@ -682,7 +682,7 @@ void DRSetPalette(br_pixelmap* pThe_palette) {
 }
 
 // IDA: void __cdecl InitializePalettes()
-void InitializePalettes() {
+void InitializePalettes(void) {
     int j;
     gCurrent_palette_pixels = BrMemAllocate(0x400u, kMem_cur_pal_pixels);
     gCurrent_palette = DRPixelmapAllocate(BR_PMT_RGBX_888, 1u, 256, gCurrent_palette_pixels, 0);
@@ -713,7 +713,7 @@ void SwitchToPalette(char* pPal_name) {
 }
 
 // IDA: void __cdecl ClearEntireScreen()
-void ClearEntireScreen() {
+void ClearEntireScreen(void) {
     LOG_TRACE("()");
 
     if (gScreen) {
@@ -724,22 +724,22 @@ void ClearEntireScreen() {
 }
 
 // IDA: void __cdecl ClearWobbles()
-void ClearWobbles() {
+void ClearWobbles(void) {
     int i;
     LOG_TRACE("()");
 
-    for (i = 0; i < COUNT_OF(gWobble_array); ++i) {
+    for (i = 0; i < COUNT_OF(gWobble_array); i++) {
         gWobble_array[i].time_started = 0;
     }
 }
 
 // IDA: void __cdecl InitWobbleStuff()
-void InitWobbleStuff() {
+void InitWobbleStuff(void) {
     int i;
 
     ClearWobbles();
     for (i = 0; i < COUNT_OF(gCosine_array); i++) {
-        gCosine_array[i] = cosf(i / 64.0f * 3.141592653589793f / 2.0f);
+        gCosine_array[i] = cosf(i / 64.0f * DR_PI / 2.0f);
     }
 }
 
@@ -777,7 +777,7 @@ void SetScreenWobble(int pWobble_x, int pWobble_y) {
 }
 
 // IDA: void __cdecl ResetScreenWobble()
-void ResetScreenWobble() {
+void ResetScreenWobble(void) {
     LOG_TRACE("()");
 
     SetScreenWobble(0, 0);
@@ -792,9 +792,44 @@ void CalculateWobblitude(tU32 pThe_time) {
     double cosine_over_angle;
     LOG_TRACE("(%d)", pThe_time);
 
+    if (gProgram_state.new_view != eView_undefined) {
+        return;
+    }
     gScreen_wobble_x = 0;
     gScreen_wobble_y = 0;
-    STUB_ONCE();
+    for (i = 0; i < COUNT_OF(gWobble_array); i++) {
+        if (gWobble_array[i].time_started != 0) {
+            time_going = pThe_time - gWobble_array[i].time_started;
+            if (time_going > 1000) {
+                gWobble_array[i].time_started = 0;
+            } else {
+                mod_angle = fmod(time_going / gWobble_array[i].period, TAU);
+                if (mod_angle > DR_3PI_OVER_2) {
+                    cosine_over_angle = gCosine_array[(unsigned int)((TAU - mod_angle) / DR_PI * 128.0)];
+                } else if (mod_angle > DR_PI) {
+                    cosine_over_angle = -gCosine_array[(unsigned int)((mod_angle - DR_PI) / DR_PI * 128.0)];
+                } else if (mod_angle > DR_PI_OVER_2) {
+                    cosine_over_angle = -gCosine_array[(unsigned int)((DR_PI - mod_angle) / DR_PI * 128.0)];
+                } else {
+                    cosine_over_angle = gCosine_array[(unsigned int)(mod_angle / DR_PI * 128.0)];
+                }
+                angle = cosine_over_angle / ((double)(pThe_time - gWobble_array[i].time_started) * 0.0035f + 1.0f);
+                gScreen_wobble_x = (gWobble_array[i].amplitude_x * angle + gScreen_wobble_x);
+                gScreen_wobble_y = (gWobble_array[i].amplitude_y * angle + gScreen_wobble_y);
+            }
+        }
+    }
+    if (gScreen_wobble_x > gCurrent_graf_data->cock_margin_x) {
+        gScreen_wobble_x = gCurrent_graf_data->cock_margin_x;
+    } else if (gScreen_wobble_x < -gCurrent_graf_data->cock_margin_x) {
+        gScreen_wobble_x = -gCurrent_graf_data->cock_margin_x;
+    }
+    if (gScreen_wobble_y > gCurrent_graf_data->cock_margin_y) {
+        gScreen_wobble_y = gCurrent_graf_data->cock_margin_y;
+    } else if (gScreen_wobble_y < -gCurrent_graf_data->cock_margin_y) {
+        gScreen_wobble_y = -gCurrent_graf_data->cock_margin_y;
+    }
+    PipeSingleScreenShake(gScreen_wobble_x, gScreen_wobble_y);
 }
 
 // IDA: void __usercall CalculateConcussion(tU32 pThe_time@<EAX>)
@@ -808,8 +843,34 @@ void CalculateConcussion(tU32 pThe_time) {
     float cosine_over_angle;
     LOG_TRACE("(%d)", pThe_time);
 
-    gConcussion.concussed = 0;
-    STUB_ONCE();
+    if (!gConcussion.concussed) {
+        return;
+    }
+    time_difference = pThe_time - gConcussion.time_started;
+    if (pThe_time - gConcussion.time_started > 2000) {
+        gConcussion.concussed = 0;
+    } else {
+        for (i = 0; i < 3; ++i) {
+            for (j = 0; j < 3; ++j) {
+                the_amplitude = gConcussion.amplitudes.m[i][j];
+                if (the_amplitude != 0.0) {
+                    mod_angle = fmodf(time_difference / gConcussion.periods.m[i][j], TAU);
+                    if (mod_angle > DR_3PI_OVER_2) {
+                        cosine_over_angle = gCosine_array[(unsigned int)((TAU - mod_angle) / DR_PI * 128.f)];
+                    } else if (mod_angle > DR_PI) {
+                        cosine_over_angle = -gCosine_array[(unsigned int)((mod_angle - DR_PI) / DR_PI * 128.f)];
+                    } else if (mod_angle > DR_PI_OVER_2) {
+                        cosine_over_angle = -gCosine_array[(unsigned int)((DR_PI - mod_angle) / DR_PI * 128.f)];
+                    } else {
+                        cosine_over_angle = gCosine_array[(unsigned int)(mod_angle / DR_PI * 128.f)];
+                    }
+                    angle = cosine_over_angle / ((double)time_difference * 0.02f + 1.0f);
+                    gCamera->t.t.mat.m[i][j] = angle * the_amplitude + gCamera->t.t.mat.m[i][j];
+                    gRearview_camera->t.t.mat.m[i][j] = angle * the_amplitude + gRearview_camera->t.t.mat.m[i][j];
+                }
+            }
+        }
+    }
 }
 
 // IDA: void __cdecl SufferFromConcussion(float pSeriousness)
@@ -817,7 +878,15 @@ void SufferFromConcussion(float pSeriousness) {
     int i;
     int j;
     LOG_TRACE("(%f)", pSeriousness);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
+            gConcussion.amplitudes.m[i][j] = FRandomPosNeg(pSeriousness);
+            gConcussion.periods.m[i][j] = FRandomBetween(20.f, 100.f);
+        }
+    }
+    gConcussion.concussed = 1;
+    gConcussion.time_started = GetTotalTime();
 }
 
 // IDA: void __usercall ProcessNonTrackActors(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>, br_matrix34 *pOld_camera_matrix)
@@ -1019,18 +1088,18 @@ br_scalar DistanceFromPlane(br_vector3* pPos, br_scalar pA, br_scalar pB, br_sca
     br_vector3 normal;
     LOG_TRACE("(%p, %f, %f, %f, %f)", pPos, pA, pB, pC, pD);
 
-    return fabs((pPos->v[1] * pB + pPos->v[0] * pA + pPos->v[2] * pC + pD) / (pA * pA + pC * pC + pB * pB));
+    return fabsf((pPos->v[1] * pB + pPos->v[0] * pA + pPos->v[2] * pC + pD) / (pA * pA + pC * pC + pB * pB));
 }
 
 // IDA: void __cdecl DisableLights()
-void DisableLights() {
+void DisableLights(void) {
     int i;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl EnableLights()
-void EnableLights() {
+void EnableLights(void) {
     int i;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
@@ -1484,10 +1553,6 @@ void RenderAFrame(int pDepth_mask_on) {
     tCar_spec* car;
     LOG_TRACE("(%d)", pDepth_mask_on);
 
-    static int frame_counter;
-
-    frame_counter++;
-
     gRender_screen->pixels = gBack_screen->pixels;
     the_time = GetTotalTime();
     old_pixels = gRender_screen->pixels;
@@ -1529,40 +1594,34 @@ void RenderAFrame(int pDepth_mask_on) {
         CalculateWobblitude(the_time);
     }
     if (cockpit_on) {
-        if (-gScreen_wobble_x <= gX_offset) {
-            if (gScreen_wobble_x + gX_offset + gRender_screen->width <= gBack_screen->width) {
-                x_shift = gScreen_wobble_x;
-            } else {
-                x_shift = gBack_screen->width - gRender_screen->width - gX_offset;
-            }
-        } else {
+        if (-gScreen_wobble_x > gX_offset) {
             x_shift = -gX_offset;
-        }
-        if (-gScreen_wobble_y <= gY_offset) {
-            if (gScreen_wobble_y + gY_offset + gRender_screen->height <= gBack_screen->height) {
-                y_shift = gScreen_wobble_y;
-            } else {
-                y_shift = gBack_screen->height - gRender_screen->height - gY_offset;
-            }
+        } else if (gScreen_wobble_x + gX_offset + gRender_screen->width > gBack_screen->width) {
+            x_shift = gBack_screen->width - gRender_screen->width - gX_offset;
         } else {
+            x_shift = gScreen_wobble_x;
+        }
+        if (-gScreen_wobble_y > gY_offset) {
             y_shift = -gY_offset;
+        } else if (gScreen_wobble_y + gY_offset + gRender_screen->height > gBack_screen->height) {
+            y_shift = gBack_screen->height - gRender_screen->height - gY_offset;
+        } else {
+            y_shift = gScreen_wobble_y;
         }
     } else {
         x_shift = 0;
         y_shift = 0;
     }
-    old_camera_matrix = gCamera->t.t.mat;
+    BrMatrix34Copy(&old_camera_matrix, &gCamera->t.t.mat);
     if (gMirror_on__graphics) {
-        old_mirror_cam_matrix = gRearview_camera->t.t.mat;
+        BrMatrix34Copy(&old_mirror_cam_matrix, &gRearview_camera->t.t.mat);
     }
     if (cockpit_on) {
-        gSheer_mat.m[2][1] = (double)y_shift / (double)gRender_screen->height;
-        gSheer_mat.m[2][0] = (double)-x_shift / (double)gRender_screen->width;
+        gSheer_mat.m[2][1] = y_shift / (float)gRender_screen->height;
+        gSheer_mat.m[2][0] = -x_shift / (float)gRender_screen->width;
         BrMatrix34Pre(&gCamera->t.t.mat, &gSheer_mat);
-        gCamera->t.t.mat.m[3][0] = gCamera->t.t.mat.m[3][0]
-            - (double)gScreen_wobble_x * 1.5 / (double)gRender_screen->width / 6.9000001;
-        gCamera->t.t.mat.m[3][1] = (double)gScreen_wobble_y * 1.5 / (double)gRender_screen->width / 6.9000001
-            + gCamera->t.t.mat.m[3][1];
+        gCamera->t.t.translate.t.v[0] -= gScreen_wobble_x * 1.5f / gRender_screen->width / WORLD_SCALE;
+        gCamera->t.t.translate.t.v[1] += gScreen_wobble_y * 1.5f / gRender_screen->width / WORLD_SCALE;
     }
     gRender_screen->pixels = (char*)gRender_screen->pixels + x_shift + y_shift * gRender_screen->row_bytes;
     CalculateConcussion(the_time);
@@ -1604,49 +1663,57 @@ void RenderAFrame(int pDepth_mask_on) {
         && !(gAction_replay_camera_mode && gAction_replay_mode)) {
         ExternalSky(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world);
     }
-    for (i = 0; i < (gMap_mode ? 3 : 1); i++) {
+#if !defined(DETHRACE_FIX_BUGS)
+    // in map mode, the scene is rendered 3 times. We have no idea why.
+    for (i = 0; i < (gMap_mode ? 3 : 1); i++)
+#endif
+    {
         RenderShadows(gUniverse_actor, &gProgram_state.track_spec, gCamera, &gCamera_to_world);
         BrZbSceneRenderBegin(gUniverse_actor, gCamera, gRender_screen, gDepth_buffer);
         ProcessNonTrackActors(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, &old_camera_matrix);
         ProcessTrack(gUniverse_actor, &gProgram_state.track_spec, gCamera, &gCamera_to_world, 0);
         RenderLollipops();
+
+        // dethrace: must flush gpu buffer before rendering depth effect into framebuffer
+        gHarness_platform.Renderer_FlushBuffers();
         DepthEffectSky(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world);
         DepthEffect(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world);
         if (!gAusterity_mode) {
             ProcessTrack(gUniverse_actor, &gProgram_state.track_spec, gCamera, &gCamera_to_world, 1);
         }
         RenderSplashes();
-	Harness_Hook_FlushRenderer(); /* Dethrace. Flush buffers into memory. */
+        // dethrace: must flush gpu buffer before rendering smoke into framebuffer
+        gHarness_platform.Renderer_FlushBuffers();
         RenderSmoke(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, gFrame_period);
         RenderSparks(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, gFrame_period);
         RenderProximityRays(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, gFrame_period);
         BrZbSceneRenderEnd();
     }
-    gCamera->t.t.mat = old_camera_matrix;
+    BrMatrix34Copy(&gCamera->t.t.mat, &old_camera_matrix);
     if (gMirror_on__graphics) {
-        // LOG_PANIC("mirror is on");
-        BrPixelmapFill(gRearview_depth_buffer, 0xFFFFFFFF);
-        gRendering_mirror = 1;
-        DoSpecialCameraEffect(gRearview_camera, &gRearview_camera_to_world);
-        ConditionallyFillWithSky(gRearview_screen);
-        BrZbSceneRenderBegin(gUniverse_actor, gRearview_camera, gRearview_screen, gRearview_depth_buffer);
-        ProcessNonTrackActors(
-            gRearview_screen,
-            gRearview_depth_buffer,
-            gRearview_camera,
-            &gRearview_camera_to_world,
-            &old_mirror_cam_matrix);
-        ProcessTrack(gUniverse_actor, &gProgram_state.track_spec, gRearview_camera, &gRearview_camera_to_world, 0);
-        RenderLollipops();
-        DepthEffectSky(gRearview_screen, gRearview_depth_buffer, gRearview_camera, &gRearview_camera_to_world);
-        DepthEffect(gRearview_screen, gRearview_depth_buffer, gRearview_camera, &gRearview_camera_to_world);
-        if (!gAusterity_mode) {
-            ProcessTrack(gUniverse_actor, &gProgram_state.track_spec, gRearview_camera, &gRearview_camera_to_world, 1);
-        }
-        RenderSplashes();
-        BrZbSceneRenderEnd();
-        gRearview_camera->t.t.mat = old_mirror_cam_matrix;
-        gRendering_mirror = 0;
+        LOG_WARN_ONCE("rearview mirror not implemented");
+        // BrPixelmapFill(gRearview_depth_buffer, 0xFFFFFFFF);
+        // gRendering_mirror = 1;
+        // DoSpecialCameraEffect(gRearview_camera, &gRearview_camera_to_world);
+        // ConditionallyFillWithSky(gRearview_screen);
+        // BrZbSceneRenderBegin(gUniverse_actor, gRearview_camera, gRearview_screen, gRearview_depth_buffer);
+        // ProcessNonTrackActors(
+        //     gRearview_screen,
+        //     gRearview_depth_buffer,
+        //     gRearview_camera,
+        //     &gRearview_camera_to_world,
+        //     &old_mirror_cam_matrix);
+        // ProcessTrack(gUniverse_actor, &gProgram_state.track_spec, gRearview_camera, &gRearview_camera_to_world, 0);
+        // RenderLollipops();
+        // DepthEffectSky(gRearview_screen, gRearview_depth_buffer, gRearview_camera, &gRearview_camera_to_world);
+        // DepthEffect(gRearview_screen, gRearview_depth_buffer, gRearview_camera, &gRearview_camera_to_world);
+        // if (!gAusterity_mode) {
+        //     ProcessTrack(gUniverse_actor, &gProgram_state.track_spec, gRearview_camera, &gRearview_camera_to_world, 1);
+        // }
+        // RenderSplashes();
+        // BrZbSceneRenderEnd();
+        // BrMatrix34Copy(&gRearview_camera->t.t.mat, &old_mirror_cam_matrix);
+        // gRendering_mirror = 0;
     }
     if (gMap_mode) {
         if (gNet_mode == eNet_mode_none) {
@@ -1798,7 +1865,7 @@ void RenderAFrame(int pDepth_mask_on) {
 }
 
 // IDA: void __cdecl InitPaletteAnimate()
-void InitPaletteAnimate() {
+void InitPaletteAnimate(void) {
     LOG_TRACE("()");
 
     gLast_palette_change = 0;
@@ -1806,14 +1873,14 @@ void InitPaletteAnimate() {
 }
 
 // IDA: void __cdecl RevertPalette()
-void RevertPalette() {
+void RevertPalette(void) {
 
     memcpy(gRender_palette->pixels, gOrig_render_palette->pixels, 0x400u);
     DRSetPalette3(gRender_palette, 1);
 }
 
 // IDA: void __cdecl MungePalette()
-void MungePalette() {
+void MungePalette(void) {
     tU8* p;
     tU8* q;
     int i;
@@ -1834,7 +1901,7 @@ void MungePalette() {
 }
 
 // IDA: void __cdecl ResetPalette()
-void ResetPalette() {
+void ResetPalette(void) {
     LOG_TRACE("()");
 
     InitPaletteAnimate();
@@ -1867,7 +1934,7 @@ void SetFadedPalette(int pDegree) {
 }
 
 // IDA: void __cdecl FadePaletteDown()
-void FadePaletteDown() {
+void FadePaletteDown(void) {
     int i;
     int start_time;
     int the_time;
@@ -1892,7 +1959,7 @@ void FadePaletteDown() {
 }
 
 // IDA: void __cdecl FadePaletteUp()
-void FadePaletteUp() {
+void FadePaletteUp(void) {
     int i;
     int start_time;
     int the_time;
@@ -1914,7 +1981,7 @@ void FadePaletteUp() {
 }
 
 // IDA: void __cdecl KillSplashScreen()
-void KillSplashScreen() {
+void KillSplashScreen(void) {
 
     if (gCurrent_splash != NULL) {
         BrMapRemove(gCurrent_splash);
@@ -1926,7 +1993,7 @@ void KillSplashScreen() {
 }
 
 // IDA: void __cdecl EnsureRenderPalette()
-void EnsureRenderPalette() {
+void EnsureRenderPalette(void) {
     LOG_TRACE("()");
 
     if (gPalette_munged) {
@@ -1975,7 +2042,7 @@ void SplashScreenWith(char* pPixmap_name) {
 }
 
 // IDA: void __cdecl EnsurePaletteUp()
-void EnsurePaletteUp() {
+void EnsurePaletteUp(void) {
 
     if (gFaded_palette) {
         FadePaletteUp();
@@ -2004,7 +2071,7 @@ void ChangeAmbience(br_scalar pDelta) {
 }
 
 // IDA: void __cdecl InitAmbience()
-void InitAmbience() {
+void InitAmbience(void) {
     LOG_TRACE("()");
 
     gCurrent_ambience = gAmbient_adjustment;
@@ -2283,7 +2350,7 @@ void DRPixelmapRectangleVScaledCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
 }
 
 // IDA: void __cdecl InitTransientBitmaps()
-void InitTransientBitmaps() {
+void InitTransientBitmaps(void) {
     int i;
     LOG_TRACE("()");
 
@@ -2321,7 +2388,7 @@ void DeallocateTransientBitmap(int pIndex) {
 }
 
 // IDA: void __cdecl DeallocateAllTransientBitmaps()
-void DeallocateAllTransientBitmaps() {
+void DeallocateAllTransientBitmaps(void) {
     int i;
     LOG_TRACE("()");
 
@@ -2485,7 +2552,7 @@ int NewCursorGiblet(int pX_coord, int pY_coord, float pX_speed, float pY_speed, 
 }
 
 // IDA: int __cdecl DoMouseCursor()
-int DoMouseCursor() {
+int DoMouseCursor(void) {
     int x_coord; // Added by DethRace
     int y_coord;
     int mouse_moved;
@@ -2511,10 +2578,10 @@ int DoMouseCursor() {
         period = 1000;
     }
     while (period <= 20) {
-        // Sleep 1 ms to avoid 100% CPU usage
-        OS_Sleep(1);
         this_call_time = PDGetTotalTime();
         period = this_call_time - last_call_time;
+        // added by dethrace to avoid 100% CPU usage
+        gHarness_platform.Sleep(1);
     }
     GetMousePosition(&x_coord, &y_coord);
     mouse_moved = x_coord != gMouse_last_x_coord || y_coord != gMouse_last_y_coord;
@@ -2585,7 +2652,7 @@ int DoMouseCursor() {
 }
 
 // IDA: int __cdecl AllocateCursorTransient()
-int AllocateCursorTransient() {
+int AllocateCursorTransient(void) {
     int i;
     int largest_width;
     int largest_height;
@@ -2605,7 +2672,7 @@ int AllocateCursorTransient() {
 }
 
 // IDA: void __cdecl StartMouseCursor()
-void StartMouseCursor() {
+void StartMouseCursor(void) {
     int i;
     LOG_TRACE("()");
 
@@ -2621,7 +2688,7 @@ void StartMouseCursor() {
 }
 
 // IDA: void __cdecl EndMouseCursor()
-void EndMouseCursor() {
+void EndMouseCursor(void) {
     LOG_TRACE("()");
 
     RemoveTransientBitmaps(1);
@@ -2687,7 +2754,7 @@ void DisposeFont(int pFont_ID) {
 }
 
 // IDA: void __cdecl InitDRFonts()
-void InitDRFonts() {
+void InitDRFonts(void) {
     int i;
     LOG_TRACE("()");
 
@@ -2927,14 +2994,14 @@ void SetShadowLevel(tShadow_level pLevel) {
 }
 
 // IDA: tShadow_level __cdecl GetShadowLevel()
-tShadow_level GetShadowLevel() {
+tShadow_level GetShadowLevel(void) {
     LOG_TRACE("()");
 
     return gShadow_level;
 }
 
 // IDA: void __cdecl ToggleShadow()
-void ToggleShadow() {
+void ToggleShadow(void) {
     LOG_TRACE("()");
 
     gShadow_level++;
@@ -2960,7 +3027,7 @@ void ToggleShadow() {
 }
 
 // IDA: void __cdecl InitShadow()
-void InitShadow() {
+void InitShadow(void) {
     int i;
     br_vector3 temp_v;
     LOG_TRACE("()");
@@ -2999,7 +3066,7 @@ br_uint_32 SaveShadeTable(br_pixelmap* pTable, void* pArg) {
 }
 
 // IDA: void __cdecl SaveShadeTables()
-void SaveShadeTables() {
+void SaveShadeTables(void) {
     LOG_TRACE("()");
 
     PossibleService();
@@ -3008,7 +3075,7 @@ void SaveShadeTables() {
 }
 
 // IDA: void __cdecl DisposeSavedShadeTables()
-void DisposeSavedShadeTables() {
+void DisposeSavedShadeTables(void) {
     int i;
     LOG_TRACE("()");
 
@@ -3018,7 +3085,7 @@ void DisposeSavedShadeTables() {
 }
 
 // IDA: void __cdecl ShadowMode()
-void ShadowMode() {
+void ShadowMode(void) {
     LOG_TRACE("()");
 
     gFancy_shadow = !gFancy_shadow;
@@ -3030,7 +3097,7 @@ void ShadowMode() {
 }
 
 // IDA: int __cdecl SwitchToRealResolution()
-int SwitchToRealResolution() {
+int SwitchToRealResolution(void) {
     LOG_TRACE("()");
 
     if (gGraf_data_index == gReal_graf_data_index) {
@@ -3044,7 +3111,7 @@ int SwitchToRealResolution() {
 }
 
 // IDA: int __cdecl SwitchToLoresMode()
-int SwitchToLoresMode() {
+int SwitchToLoresMode(void) {
     LOG_TRACE("()");
     if (!gGraf_data_index || gGraf_data_index != gReal_graf_data_index) {
         return 0;

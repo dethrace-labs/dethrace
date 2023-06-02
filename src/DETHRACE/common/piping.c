@@ -12,9 +12,9 @@
 #include "pedestrn.h"
 #include "replay.h"
 #include "skidmark.h"
+#include "sound.h"
 #include "spark.h"
 #include "sys.h"
-#include "sound.h"
 #include "utility.h"
 #include "world.h"
 #include <stdlib.h>
@@ -88,12 +88,13 @@ tU8* gPipe_buffer_oldest;
 tU32 gPipe_buffer_size;
 tU8* gLocal_buffer;
 tU32 gLocal_buffer_size;
-tPipe_chunk *gIncidentChunk; // FIXME: added by DethRace (really needed?)
+tPipe_chunk* gIncidentChunk; // FIXME: added by DethRace (really needed?)
 
 #define LOCAL_BUFFER_SIZE 15000
 
-#if DETHRACE_REPLAY_DEBUG
-#define REPLAY_DEBUG_MAGIC1 0x1ed6ef85
+#if defined(DETHRACE_REPLAY_DEBUG)
+#define REPLAY_DEBUG_CHUNK_MAGIC1 0x1ed6ef85
+#define REPLAY_DEBUG_SESSION_MAGIC1 0x617bbc04
 #define REPLAY_DEBUG_ASSERT(test) assert(test)
 #include <assert.h>
 #else
@@ -126,7 +127,7 @@ void SaveReducedPos(tReduced_pos* p, br_vector3* v) {
 }
 
 // IDA: int __cdecl PipeSearchForwards()
-int PipeSearchForwards() {
+int PipeSearchForwards(void) {
     LOG_TRACE("()");
 
     if (gPipe_play_ptr == gPipe_record_ptr) {
@@ -143,29 +144,28 @@ int PipeSearchForwards() {
 }
 
 // IDA: int __cdecl IsActionReplayAvailable()
-int IsActionReplayAvailable() {
+int IsActionReplayAvailable(void) {
     LOG_TRACE("()");
 
     return gPipe_buffer_start != NULL;
 }
 
 // IDA: int __cdecl SomeReplayLeft()
-int SomeReplayLeft() {
+int SomeReplayLeft(void) {
     LOG_TRACE("()");
 
-    return ((GetReplayDirection() >= 1 && gPipe_play_ptr != gPipe_record_ptr) ||
-        (GetReplayDirection() <= -1 && gPipe_play_ptr != gPipe_buffer_oldest));
+    return ((GetReplayDirection() >= 1 && gPipe_play_ptr != gPipe_record_ptr) || (GetReplayDirection() <= -1 && gPipe_play_ptr != gPipe_buffer_oldest));
 }
 
 // IDA: void __cdecl DisablePipedSounds()
-void DisablePipedSounds() {
+void DisablePipedSounds(void) {
     LOG_TRACE("()");
 
     gDisable_sound = 1;
 }
 
 // IDA: void __cdecl EnablePipedSounds()
-void EnablePipedSounds() {
+void EnablePipedSounds(void) {
     LOG_TRACE("()");
 
     gDisable_sound = 0;
@@ -179,7 +179,9 @@ tU32 LengthOfSession(tPipe_session* pSession) {
     LOG_TRACE("(%p)", pSession);
 
 #define SIZEOF_CHUNK(MEMBER) (offsetof(tPipe_chunk, chunk_data) + sizeof(pSession->chunks.chunk_data.MEMBER))
-#define ROUND_UP(V, M) (((V) + (M) - 1) & (~((M) - 1)))
+#define ROUND_UP(V, M) (((V) + (M)-1) & (~((M)-1)))
+
+    REPLAY_DEBUG_ASSERT(pSession->pipe_magic1 == REPLAY_DEBUG_SESSION_MAGIC1);
 
     switch (pSession->chunk_type) {
     case ePipe_chunk_actor_rstyle:
@@ -308,7 +310,7 @@ tU32 LengthOfSession(tPipe_session* pSession) {
     }
     running_total += offsetof(tPipe_session, chunks) + sizeof(tU16);
     if (running_total % 2 != 0) {
-        FatalError(98);
+        FatalError(kFatalError_PipingSystem);
     }
     return running_total;
 }
@@ -328,7 +330,7 @@ void StartPipingSession2(tPipe_chunk_type pThe_type, int pMunge_reentrancy) {
         ((tPipe_session*)gLocal_buffer)->chunk_type = pThe_type;
         ((tPipe_session*)gLocal_buffer)->number_of_chunks = 0;
 #if defined(DETHRACE_REPLAY_DEBUG)
-        ((tPipe_session*)gLocal_buffer)->magic1 = REPLAY_DEBUG_MAGIC1;
+        ((tPipe_session*)gLocal_buffer)->pipe_magic1 = REPLAY_DEBUG_SESSION_MAGIC1;
 #endif
         gLocal_buffer_size = offsetof(tPipe_session, chunks);
         gMr_chunky = &((tPipe_session*)gLocal_buffer)->chunks;
@@ -397,7 +399,7 @@ void EndPipingSession2(int pMunge_reentrancy) {
 }
 
 // IDA: void __cdecl EndPipingSession()
-void EndPipingSession() {
+void EndPipingSession(void) {
     LOG_TRACE("()");
 
     EndPipingSession2(1);
@@ -414,8 +416,12 @@ void AddDataToSession(int pSubject_index, void* pData, tU32 pData_length) {
         if (temp_buffer_size >= LOCAL_BUFFER_SIZE) {
             return;
         }
+        REPLAY_DEBUG_ASSERT(((tPipe_session*)gLocal_buffer)->pipe_magic1 == REPLAY_DEBUG_SESSION_MAGIC1);
         ((tPipe_session*)gLocal_buffer)->number_of_chunks++;
         gMr_chunky->subject_index = pSubject_index;
+#if defined(DETHRACE_REPLAY_DEBUG)
+        gMr_chunky->chunk_magic1 = REPLAY_DEBUG_CHUNK_MAGIC1;
+#endif
         memcpy(&gMr_chunky->chunk_data, pData, pData_length);
         gMr_chunky = (tPipe_chunk*)(((tU8*)&gMr_chunky->chunk_data) + pData_length);
         gLocal_buffer_size = temp_buffer_size;
@@ -861,7 +867,7 @@ void PipeSingleGrooveStop(int pGroove_index, br_matrix34* pMatrix, int pPath_int
 }
 
 // IDA: void __cdecl PipeFrameFinish()
-void PipeFrameFinish() {
+void PipeFrameFinish(void) {
     LOG_TRACE("()");
 
     if (gWall_severity != 0.f) {
@@ -876,7 +882,7 @@ void PipeFrameFinish() {
 }
 
 // IDA: void __cdecl PipingFrameReset()
-void PipingFrameReset() {
+void PipingFrameReset(void) {
     int i;
     LOG_TRACE("()");
 
@@ -897,7 +903,7 @@ void PipeSingleSkidAdjustment(int pSkid_num, br_matrix34* pMatrix, int pMaterial
 }
 
 // IDA: void __cdecl ResetPiping()
-void ResetPiping() {
+void ResetPiping(void) {
     LOG_TRACE("()");
 
     gWall_severity = 0.f;
@@ -908,7 +914,7 @@ void ResetPiping() {
 }
 
 // IDA: void __cdecl InitialisePiping()
-void InitialisePiping() {
+void InitialisePiping(void) {
     LOG_TRACE("()");
 
     if (!gAusterity_mode && gNet_mode == eNet_mode_none) {
@@ -929,7 +935,7 @@ void InitialisePiping() {
 }
 
 // IDA: void __cdecl DisposePiping()
-void DisposePiping() {
+void DisposePiping(void) {
     LOG_TRACE("()");
 
     if (gPipe_buffer_start != NULL) {
@@ -947,7 +953,7 @@ void DisposePiping() {
 }
 
 // IDA: void __cdecl InitLastDamageArrayEtc()
-void InitLastDamageArrayEtc() {
+void InitLastDamageArrayEtc(void) {
     int i;
     int j;
     int cat;
@@ -978,7 +984,7 @@ void InitLastDamageArrayEtc() {
 }
 
 // IDA: void __cdecl ResetCars()
-void ResetCars() {
+void ResetCars(void) {
     tCar_spec* car;
     int cat;
     int i;
@@ -1003,7 +1009,7 @@ void ResetCars() {
 }
 
 // IDA: void __cdecl PipeCarPositions()
-void PipeCarPositions() {
+void PipeCarPositions(void) {
     tCar_spec* car;
     int cat;
     int i;
@@ -1070,21 +1076,21 @@ void PipeCarPositions() {
 }
 
 // IDA: void __cdecl ResetPipePlayToEnd()
-void ResetPipePlayToEnd() {
+void ResetPipePlayToEnd(void) {
     LOG_TRACE("()");
 
     gPipe_play_ptr = gPipe_record_ptr;
 }
 
 // IDA: void __cdecl ResetPipePlayToStart()
-void ResetPipePlayToStart() {
+void ResetPipePlayToStart(void) {
     LOG_TRACE("()");
 
     gPipe_play_ptr = gPipe_buffer_oldest;
 }
 
 // IDA: tU8* __cdecl GetPipePlayPtr()
-tU8* GetPipePlayPtr() {
+tU8* GetPipePlayPtr(void) {
     LOG_TRACE("()");
 
     return gPipe_play_ptr;
@@ -1175,6 +1181,8 @@ void AdvanceChunkPtr(tPipe_chunk** pChunk, tChunk_subject_index pType) {
         break;
     }
     *(tU8**)pChunk += offsetof(tPipe_chunk, chunk_data);
+
+    /* Fail-safe to avoid reading junk data from the session after */
     if (*(tU8**)pChunk == gEnd_of_session) {
         *pChunk = old_chunk;
     } else if (*(tU8**)pChunk > gEnd_of_session) {
@@ -1551,12 +1559,12 @@ int ApplyPipedSession(tU8** pPtr) {
     if (*pPtr == gPipe_record_ptr) {
         return 1;
     }
-    gEnd_of_session = *pPtr + (LengthOfSession((tPipe_session *)*pPtr) - sizeof(tU16));
-    REPLAY_DEBUG_ASSERT(((tPipe_session *)*pPtr)->magic1 == REPLAY_DEBUG_MAGIC1);
-    chunk_ptr = (tPipe_chunk *)(*pPtr + offsetof(tPipe_session, chunks));
+    gEnd_of_session = *pPtr + (LengthOfSession((tPipe_session*)*pPtr) - sizeof(tU16));
+    REPLAY_DEBUG_ASSERT(((tPipe_session*)*pPtr)->pipe_magic1 == REPLAY_DEBUG_SESSION_MAGIC1);
+    chunk_ptr = (tPipe_chunk*)(*pPtr + offsetof(tPipe_session, chunks));
     return_value = 0;
-    chunk_type = ((tPipe_session *)*pPtr)->chunk_type;
-    for (i = 0; i < ((tPipe_session *)*pPtr)->number_of_chunks; i++) {
+    chunk_type = ((tPipe_session*)*pPtr)->chunk_type;
+    for (i = 0; i < ((tPipe_session*)*pPtr)->number_of_chunks; i++) {
         switch (chunk_type) {
         case ePipe_chunk_model_geometry:
             ApplyModelGeometry(&chunk_ptr);
@@ -1630,9 +1638,9 @@ int ApplyPipedSession(tU8** pPtr) {
         }
     }
 #if defined(DETHRACE_FIX_BUGS)
-    *pPtr += PIPE_ALIGN(LengthOfSession((tPipe_session *)*pPtr));
+    *pPtr += PIPE_ALIGN(LengthOfSession((tPipe_session*)*pPtr));
 #else
-    *pPtr += LengthOfSession((tPipe_session *)*pPtr);
+    *pPtr += LengthOfSession((tPipe_session*)*pPtr);
 #endif
     if (*pPtr >= gPipe_buffer_working_end && *pPtr != gPipe_record_ptr) {
         *pPtr = gPipe_buffer_start;
@@ -1651,8 +1659,9 @@ int MoveSessionPointerBackOne(tU8** pPtr) {
         *pPtr = gPipe_buffer_working_end;
     }
     *pPtr -= sizeof(tU16);
+    REPLAY_DEBUG_ASSERT(*(tU16*)*pPtr != 0);
     *pPtr -= *(tU16*)*pPtr;
-    REPLAY_DEBUG_ASSERT(((tPipe_session*)*pPtr)->magic1 == REPLAY_DEBUG_MAGIC1);
+    REPLAY_DEBUG_ASSERT(((tPipe_session*)*pPtr)->pipe_magic1 == REPLAY_DEBUG_SESSION_MAGIC1);
     return 0;
 }
 
@@ -1660,7 +1669,7 @@ int MoveSessionPointerBackOne(tU8** pPtr) {
 int MoveSessionPointerForwardOne(tU8** pPtr) {
     LOG_TRACE("(%p)", pPtr);
 
-    REPLAY_DEBUG_ASSERT(((tPipe_session*)*pPtr)->magic1 == REPLAY_DEBUG_MAGIC1);
+    REPLAY_DEBUG_ASSERT(((tPipe_session*)*pPtr)->pipe_magic1 == REPLAY_DEBUG_SESSION_MAGIC1);
 #if defined(DETHRACE_FIX_BUGS)
     *pPtr += PIPE_ALIGN(LengthOfSession((tPipe_session*)*pPtr));
 #else
@@ -1749,8 +1758,7 @@ void UndoPedestrian(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     temp_prev_chunk = pPrev_chunk;
     if (pPrev_chunk == NULL) {
         ApplyPedestrian(pChunk);
-    }
-    else {
+    } else {
         gDisable_advance = 1;
         ApplyPedestrian(&temp_prev_chunk);
         gDisable_advance = 0;
@@ -1775,8 +1783,7 @@ void UndoCar(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     temp_prev_chunk = pPrev_chunk;
     if (pPrev_chunk == NULL) {
         ApplyCar(pChunk);
-    }
-    else {
+    } else {
         gDisable_advance = 1;
         ApplyCar(&temp_prev_chunk);
         gDisable_advance = 0;
@@ -1788,7 +1795,7 @@ void UndoCar(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 void UndoSound(tPipe_chunk** pChunk) {
     LOG_TRACE("(%p)", pChunk);
 
-    AdvanceChunkPtr(pChunk,ePipe_chunk_sound);
+    AdvanceChunkPtr(pChunk, ePipe_chunk_sound);
 }
 
 // IDA: void __usercall UndoDamage(tPipe_chunk **pChunk@<EAX>)
@@ -1799,8 +1806,7 @@ void UndoDamage(tPipe_chunk** pChunk) {
 
     if (((*pChunk)->subject_index & 0xff00) == 0) {
         car = &gProgram_state.current_car;
-    }
-    else {
+    } else {
         car = GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff);
     }
     for (i = 0; i < COUNT_OF(car->damage_units); i++) {
@@ -1885,8 +1891,7 @@ void UndoScreenWobble(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     gDisable_advance = 1;
     if (pPrev_chunk == NULL) {
         SetScreenWobble(0, 0);
-    }
-    else {
+    } else {
         ApplyScreenWobble(&temp_prev_chunk);
     }
     gDisable_advance = 0;
@@ -1959,8 +1964,7 @@ void UndoSplash(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     gDisable_advance = 1;
     if (pPrev_chunk == NULL) {
         ((((*pChunk)->subject_index & 0xff00) == 0) ? &gProgram_state.current_car : GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff))->water_d = 10000.f;
-    }
-    else {
+    } else {
         ApplySplash(&temp_prev_chunk);
     }
     gDisable_advance = 0;
@@ -1995,8 +1999,7 @@ void UndoSkidAdjustment(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     gDisable_advance = 1;
     if (pPrev_chunk == NULL) {
         HideSkid((*pChunk)->subject_index);
-    }
-    else {
+    } else {
         ApplySkidAdjustment(&pPrev_chunk);
     }
     gDisable_advance = 0;
@@ -2016,15 +2019,16 @@ int UndoPipedSession(tU8** pPtr) {
     if (MoveSessionPointerBackOne(pPtr)) {
         return 1;
     }
-    REPLAY_DEBUG_ASSERT(((tPipe_session*)*pPtr)->magic1 == REPLAY_DEBUG_MAGIC1);
+    REPLAY_DEBUG_ASSERT(((tPipe_session*)*pPtr)->pipe_magic1 == REPLAY_DEBUG_SESSION_MAGIC1);
     gEnd_of_session = *pPtr + LengthOfSession((tPipe_session*)*pPtr) - sizeof(tU16);
     chunk_ptr = &((tPipe_session*)*pPtr)->chunks;
     chunk_type = ((tPipe_session*)*pPtr)->chunk_type;
     pushed_end_of_session = gEnd_of_session;
-    for (i = 0; i < ((tPipe_session*)pPtr)->number_of_chunks; i++) {
+    for (i = 0; i < ((tPipe_session*)*pPtr)->number_of_chunks; i++) {
         if (!(chunk_type == ePipe_chunk_model_geometry || chunk_type == ePipe_chunk_sound || chunk_type == ePipe_chunk_damage || chunk_type == ePipe_chunk_special || chunk_type == ePipe_chunk_incident || chunk_type == ePipe_chunk_prox_ray || chunk_type == ePipe_chunk_smudge)) {
             prev_chunk = FindPreviousChunk(*pPtr, ((tPipe_session*)*pPtr)->chunk_type, chunk_ptr->subject_index);
         }
+        REPLAY_DEBUG_ASSERT(((tPipe_chunk*)chunk_ptr)->chunk_magic1 == REPLAY_DEBUG_CHUNK_MAGIC1);
         gEnd_of_session = pushed_end_of_session;
         switch (chunk_type) {
         case ePipe_chunk_model_geometry:
@@ -2112,7 +2116,7 @@ tU32 FindPrevFrameTime(tU8* pPtr) {
     temp_ptr = pPtr;
     do {
         if (MoveSessionPointerBackOne(&temp_ptr)) {
-          return 0;
+            return 0;
         }
     } while (((tPipe_session*)temp_ptr)->chunk_type != ePipe_chunk_frame_boundary);
     return ((tPipe_session*)temp_ptr)->chunks.chunk_data.frame_boundary_data.time;
@@ -2311,15 +2315,15 @@ int GetNextIncident(tU32 pOffset_time, tIncident_type* pIncident_type, float* pS
 }
 
 // IDA: tU32 __cdecl GetARStartTime()
-tU32 GetARStartTime() {
+tU32 GetARStartTime(void) {
     tU8* temp_ptr;
     LOG_TRACE("()");
 
     temp_ptr = gPipe_buffer_oldest;
     do {
-      if (MoveSessionPointerForwardOne(&temp_ptr)) {
-          return 0;
-      }
+        if (MoveSessionPointerForwardOne(&temp_ptr)) {
+            return 0;
+        }
     } while (((tPipe_session*)temp_ptr)->chunk_type != ePipe_chunk_frame_boundary);
     return ((tPipe_session*)temp_ptr)->chunks.chunk_data.frame_boundary_data.time;
 }

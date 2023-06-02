@@ -24,47 +24,17 @@
 #ifdef __DOS__
 #define GFX_INIT_STRING_32X20X8 "MCGA,W:320,H:200,B:8"
 #define GFX_INIT_STRING_64X48X8 "VESA,W:640,H:480,B:8"
-#else
-#define GFX_INIT_STRING_32X20X8 "320x200 init string"
-#define GFX_INIT_STRING_64X48X8 "640x480 init string"
-#endif
 
 int gDOSGfx_initialized;
-int gExtra_mem;
-int gReplay_override;
-tGraf_spec gGraf_specs[2] = {
-    { 8, 1, 0, 320, 200, 0, 0, "32X20X8", GFX_INIT_STRING_32X20X8, 320, 320, 200, NULL },
-    { 8, 1, 0, 640, 480, 0, 0, "64X48X8", GFX_INIT_STRING_64X48X8, 640, 640, 480, NULL }
-};
-int gASCII_table[128];
-tU32 gKeyboard_bits[8];
-int gASCII_shift_table[128];
-char gNetwork_profile_fname[256];
-tS32 gJoystick_min1y;
-tS32 gJoystick_min2y;
-tS32 gJoystick_min2x;
-tS32 gRaw_joystick2y;
-tS32 gRaw_joystick2x;
-tS32 gRaw_joystick1y;
-tS32 gRaw_joystick1x;
-tS32 gJoystick_range2y;
-tS32 gJoystick_range2x;
-tS32 gJoystick_range1y;
-tS32 gJoystick_range1x;
-int gNo_voodoo;
-int gSwitched_resolution;
-br_pixelmap* gReal_back_screen;
-tS32 gJoystick_min1x;
-br_pixelmap* gTemp_screen;
+
 tU32 gUpper_loop_limit;
 int gReal_back_screen_locked;
 void (*gPrev_keyboard_handler)();
-tU8 gScan_code[123][2];
 
 char* _unittest_last_fatal_error;
 
 // IDA: void __cdecl KeyboardHandler()
-void KeyboardHandler() {
+void KeyboardHandler(void) {
     tU8 scan_code;
     tU8 up;
     static tU8 extended;
@@ -74,7 +44,7 @@ void KeyboardHandler() {
 
 // IDA: int __usercall KeyDown@<EAX>(tU8 pScan_code@<EAX>)
 int KeyDown(tU8 pScan_code) {
-    return Harness_Hook_KeyDown(pScan_code);
+    NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall KeyTranslation(tU8 pKey_index@<EAX>, tU8 pScan_code_1@<EDX>, tU8 pScan_code_2@<EBX>)
@@ -84,128 +54,12 @@ void KeyTranslation(tU8 pKey_index, tU8 pScan_code_1, tU8 pScan_code_2) {
 }
 
 // IDA: void __cdecl KeyBegin()
-void KeyBegin() {
-
-    // int v0; // edx@0
-    // int v1; // ST00_4@1
-    // __int16 v2; // dx@1
-
-    // *(_WORD *)gScan_code[11] = 11;
-    // *(_WORD *)gScan_code[13] = 3;
-    // *(_WORD *)gScan_code[14] = 4;
-    // *(_WORD *)gScan_code[12] = 2;
-    // *(_WORD *)gScan_code[15] = 5;
-    // *(_WORD *)gScan_code[17] = 7;
-    // *(_WORD *)gScan_code[18] = 8;
-    // *(_WORD *)gScan_code[16] = 6;
-    // *(_WORD *)gScan_code[19] = 9;
-    // *(_WORD *)gScan_code[21] = 30;
-    // *(_WORD *)gScan_code[22] = 48;
-    // *(_WORD *)gScan_code[20] = 10;
-    // *(_WORD *)gScan_code[23] = 46;
-    // *(_WORD *)gScan_code[25] = 18;
-    // *(_WORD *)gScan_code[26] = 33;
-    // *(_WORD *)gScan_code[24] = 32;
-    // *(_WORD *)gScan_code[27] = 34;
-    // *(_WORD *)gScan_code[29] = 23;
-    // *(_WORD *)gScan_code[30] = 36;
-    // *(_WORD *)gScan_code[28] = 35;
-    // *(_WORD *)gScan_code[31] = 37;
-    // *(_WORD *)gScan_code[33] = 50;
-    // *(_WORD *)gScan_code[34] = 49;
-    // *(_WORD *)gScan_code[32] = 38;
-    // *(_WORD *)gScan_code[35] = 24;
-    // *(_WORD *)gScan_code[37] = 16;
-    // *(_WORD *)gScan_code[38] = 19;
-    // *(_WORD *)gScan_code[36] = 25;
-    // *(_WORD *)gScan_code[39] = 31;
-    // *(_WORD *)gScan_code[41] = 22;
-    // *(_WORD *)gScan_code[42] = 47;
-    // *(_WORD *)gScan_code[40] = 20;
-    // *(_WORD *)gScan_code[43] = 17;
-    // *(_WORD *)gScan_code[44] = 45;
-    // *(_WORD *)gScan_code[45] = 21;
-    // *(_WORD *)gScan_code[46] = 44;
-    // *(_WORD *)gScan_code[47] = 41;
-    // *(_WORD *)gScan_code[48] = 12;
-    // *(_WORD *)gScan_code[49] = 13;
-    // *(_WORD *)gScan_code[50] = 14;
-    // *(_WORD *)gScan_code[51] = 28;
-    // *(_WORD *)gScan_code[52] = 156;
-
-    // *(_WORD *)gScan_code[0] = 13866;
-    // *(_WORD *)gScan_code[1] = -18376;
-    // *(_WORD *)gScan_code[2] = -25315;
-    // *(_WORD *)gScan_code[3] = -25315;
-    // *(_WORD *)gScan_code[4] = 58;
-    // *(_WORD *)gScan_code[55] = 86;
-    // *(_WORD *)gScan_code[54] = 53;
-    // *(_WORD *)gScan_code[56] = 39;
-    // *(_WORD *)gScan_code[59] = 51;
-    // *(_WORD *)gScan_code[53] = 15;
-    // *(_WORD *)gScan_code[58] = 52;
-    // *(_WORD *)gScan_code[60] = 26;
-    // *(_WORD *)gScan_code[63] = 1;
-    // *(_WORD *)gScan_code[57] = 40;
-    // *(_WORD *)gScan_code[62] = 43;
-    // *(_WORD *)gScan_code[64] = 210;
-    // *(_WORD *)gScan_code[67] = 207;
-    // *(_WORD *)gScan_code[61] = 27;
-    // *(_WORD *)gScan_code[66] = 199;
-    // *(_WORD *)gScan_code[68] = 201;
-    // *(_WORD *)gScan_code[71] = 205;
-    // *(_WORD *)gScan_code[65] = 211;
-    // *(_WORD *)gScan_code[70] = 203;
-    // *(_WORD *)gScan_code[72] = 200;
-    // *(_WORD *)gScan_code[69] = 209;
-    // *(_WORD *)gScan_code[74] = 69;
-    // *(_WORD *)gScan_code[73] = 208;
-    // *(_WORD *)gScan_code[75] = 181;
-    // *(_WORD *)gScan_code[76] = 55;
-    // *(_WORD *)gScan_code[78] = 78;
-    // *(_WORD *)gScan_code[77] = 74;
-    // *(_WORD *)gScan_code[80] = 0;
-    // *(_WORD *)gScan_code[79] = 83;
-    // *(_WORD *)gScan_code[82] = 79;
-    // *(_WORD *)gScan_code[84] = 81;
-    // *(_WORD *)gScan_code[81] = 82;
-    // *(_WORD *)gScan_code[83] = 80;
-    // *(_WORD *)gScan_code[86] = 76;
-    // *(_WORD *)gScan_code[88] = 71;
-    // *(_WORD *)gScan_code[85] = 75;
-    // *(_WORD *)gScan_code[87] = 77;
-    // *(_WORD *)gScan_code[90] = 73;
-    // *(_WORD *)gScan_code[92] = 60;
-    // *(_WORD *)gScan_code[89] = 72;
-    // *(_WORD *)gScan_code[91] = 59;
-    // *(_WORD *)gScan_code[94] = 62;
-    // *(_WORD *)gScan_code[96] = 64;
-    // *(_WORD *)gScan_code[93] = 61;
-    // *(_WORD *)gScan_code[95] = 63;
-    // *(_WORD *)gScan_code[98] = 66;
-    // *(_WORD *)gScan_code[100] = 68;
-    // *(_WORD *)gScan_code[97] = 65;
-    // *(_WORD *)gScan_code[99] = 67;
-    // *(_WORD *)gScan_code[102] = 88;
-    // *(_WORD *)gScan_code[104] = 70;
-    // *(_WORD *)gScan_code[101] = 87;
-    // *(_WORD *)gScan_code[103] = 0;
-    // *(_WORD *)gScan_code[105] = 0;
-    // *(_WORD *)gScan_code[106] = 57;
-    // *(_WORD *)gScan_code[5] = 54;
-    // *(_WORD *)gScan_code[6] = 184;
-    // *(_WORD *)gScan_code[7] = 157;
-    // *(_WORD *)gScan_code[8] = 42;
-    // *(_WORD *)gScan_code[9] = 56;
-    // *(_WORD *)gScan_code[10] = 29;
-
-    // gPrev_keyboard_handler = (void (__fastcall *)())dos_getvect(9);
-    // unk_142E6C = v2;
-    // dos_setvect(9, KeyboardHandler);
+void KeyBegin(void) {
+    NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl KeyEnd()
-void KeyEnd() {
+void KeyEnd(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -222,29 +76,6 @@ void PDSetKeyArray(int* pKeys, int pMark) {
     tS32 joyX;
     tS32 joyY;
     LOG_TRACE10("(%p, %d)", pKeys, pMark);
-
-    Harness_Hook_PDSetKeyArray();
-
-    gKeys_pressed = 0;
-    for (i = 0; i < COUNT_OF(gScan_code); i++) {
-        if (KeyDown(gScan_code[i][0])) { //} || KeyDown(gScan_code[i][1])) {
-            gKeys_pressed = (gKeys_pressed << 8) + i + 1;
-            pKeys[i] = pMark;
-        } else if (pKeys[i] == pMark) {
-            pKeys[i] = 0;
-        }
-    }
-}
-
-// IDA: int __usercall PDGetASCIIFromKey@<EAX>(int pKey@<EAX>)
-int PDGetASCIIFromKey(int pKey) {
-    LOG_TRACE("(%d)", pKey);
-
-    if (PDKeyDown(KEY_LSHIFT)) {
-        return gASCII_shift_table[pKey];
-    } else {
-        return gASCII_table[pKey];
-    }
 }
 
 // IDA: void __usercall PDFatalError(char *pThe_str@<EAX>)
@@ -274,7 +105,7 @@ void PDNonFatalError(char* pThe_str) {
 }
 
 // IDA: void __cdecl PDInitialiseSystem()
-void PDInitialiseSystem() {
+void PDInitialiseSystem(void) {
     tPath_name the_path;
     FILE* f;
     int len;
@@ -307,7 +138,7 @@ void PDInitialiseSystem() {
 
 // IDA: void __cdecl PDShutdownSystem()
 void PDShutdownSystem() {
-    static int been_here = 0;  // Added by dethrace
+    static int been_here = 0; // Added by dethrace
     LOG_TRACE("()");
 
     if (!been_here) {
@@ -319,14 +150,16 @@ void PDShutdownSystem() {
 }
 
 // IDA: void __cdecl PDSaveOriginalPalette()
-void PDSaveOriginalPalette() {
+void PDSaveOriginalPalette(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl PDRevertPalette()
-void PDRevertPalette() {
+void PDRevertPalette(void) {
     LOG_TRACE("()");
+
+    // empty function
 }
 
 // IDA: int __usercall PDInitScreenVars@<EAX>(int pArgc@<EAX>, char **pArgv@<EDX>)
@@ -337,23 +170,23 @@ int PDInitScreenVars(int pArgc, char** pArgv) {
 }
 
 // IDA: void __cdecl PDInitScreen()
-void PDInitScreen() {
+void PDInitScreen(void) {
 }
 
 // IDA: void __cdecl PDLockRealBackScreen()
-void PDLockRealBackScreen() {
+void PDLockRealBackScreen(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl PDUnlockRealBackScreen()
-void PDUnlockRealBackScreen() {
+void PDUnlockRealBackScreen(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl PDAllocateScreenAndBack()
-void PDAllocateScreenAndBack() {
+void PDAllocateScreenAndBack(void) {
 
     dr_dprintf("PDAllocateScreenAndBack() - START...");
     BrMaterialFindHook(PDMissingMaterial);
@@ -418,13 +251,13 @@ void Double8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap
 }
 
 // IDA: br_pixelmap* __cdecl PDInterfacePixelmap()
-br_pixelmap* PDInterfacePixelmap() {
+br_pixelmap* PDInterfacePixelmap(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl SwapBackScreen()
-void SwapBackScreen() {
+void SwapBackScreen(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -475,13 +308,13 @@ void PDPixelmapVLineOnScreen(br_pixelmap* dst, br_int_16 x1, br_int_16 y1, br_in
 }
 
 // IDA: void __cdecl PDInstallErrorHandlers()
-void PDInstallErrorHandlers() {
+void PDInstallErrorHandlers(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl PDSetFileVariables()
-void PDSetFileVariables() {
+void PDSetFileVariables(void) {
     gDir_separator[0] = '\\';
 
     // Added >>
@@ -534,12 +367,12 @@ void PDSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
 }
 
 // IDA: void __cdecl PDSwitchToRealResolution()
-void PDSwitchToRealResolution() {
+void PDSwitchToRealResolution(void) {
     LOG_TRACE("()");
 }
 
 // IDA: void __cdecl PDSwitchToLoresMode()
-void PDSwitchToLoresMode() {
+void PDSwitchToLoresMode(void) {
     LOG_TRACE("()");
 }
 
@@ -568,7 +401,7 @@ void PDGetMousePosition(int* pX_coord, int* pY_coord) {
 }
 
 // IDA: int __cdecl PDGetTotalTime()
-int PDGetTotalTime() {
+int PDGetTotalTime(void) {
     return OS_GetTime();
 }
 
@@ -579,7 +412,7 @@ int PDServiceSystem(tU32 pTime_since_last_call) {
 }
 
 // IDA: tU32 __cdecl LargestBlockAvail()
-tU32 LargestBlockAvail() {
+tU32 LargestBlockAvail(void) {
     SREGS sregs;
     tMem_info mem_info;
     size_t memmax;
@@ -614,8 +447,6 @@ void PDDisposeActionReplayBuffer(char* pBuffer) {
 void Usage(char* pProgpath) {
     // char basename[9];
     char basename[256]; // fix: changed from 9 to avoid overflow on longer filenames
-
-    OS_Basename(pProgpath, basename);
 
     fprintf(stderr,
         "Usage: %s [%s] [%s YonFactor] [%s CarSimplificationLevel] [%s SoundDetailLevel] [%s] [%s] [%s] [%s] [%s] [%s]\nWhere YonFactor is between 0 and 1,\nCarSimplificationLevel is a whole number between 0 and %d,\nand SoundDetailLevel is a whole number.\n",
@@ -660,7 +491,7 @@ int original_main(int pArgc, char** pArgv) {
             sscanf(pArgv[i], "%d", &arg);
             gSound_detail_level = arg;
 
-        } else if (strcasecmp(pArgv[i], "-robots") == 0) {
+        } else if (strcasecmp(pArgv[i], "-robots") == 0 || strcasecmp(pArgv[i], "-german") == 0) {
             gSausage_override = 1;
         } else if (strcasecmp(pArgv[i], "-lomem") == 0) {
             gAustere_override = 1;
@@ -682,26 +513,9 @@ int original_main(int pArgc, char** pArgv) {
 }
 
 // IDA: int __cdecl OurGetChar()
-int OurGetChar() {
+int OurGetChar(void) {
     int key;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
-}
-
-// IDA: int __cdecl PDGetGorePassword()
-int PDGetGorePassword() {
-    int ch;
-    int len;
-    int chances;
-    char password[17];
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
-}
-
-// IDA: void __usercall PDDisplayGoreworthiness(int pGory@<EAX>)
-void PDDisplayGoreworthiness(int pGory) {
-    tU32 delay_start;
-    LOG_TRACE("(%d)", pGory);
     NOT_IMPLEMENTED();
 }
 
@@ -719,44 +533,8 @@ void PDEnterDebugger(char* pStr) {
     // ShowCursor(0);
 }
 
-// Added function
-br_material* PDMissingMaterial(char* name) {
-    LOG_TRACE("(\"%s\")", name);
-
-    // FIXME: call functiont in harness
-    dr_dprintf("SOMETHING MISSING WARNING - Can't find material '%s'", name);
-    return NULL;
-}
-
-// Added function
-br_pixelmap* PDMissingTable(char* name) {
-    LOG_TRACE("(\"%s\")", name);
-
-    // FIXME: call function in harness
-    dr_dprintf("SOMETHING MISSING WARNING - Can't find shade table '%s'", name);
-    return NULL;
-}
-
-// Added function
-br_model* PDMissingModel(char* name) {
-    LOG_TRACE("(\"%s\")", name);
-
-    // FIXME: call function in harness
-    dr_dprintf("SOMETHING MISSING WARNING - Can't find model '%s'", name);
-    return NULL;
-}
-
-// Added function
-br_pixelmap* PDMissingMap(char* name) {
-    LOG_TRACE("(\"%s\")", name);
-
-    // FIXME: call function in harness
-    dr_dprintf("SOMETHING MISSING WARNING - Can't find pixelmap '%s'", name);
-    return NULL;
-}
-
 // IDA: void __cdecl PDEndItAllAndReRunTheBastard()
-void PDEndItAllAndReRunTheBastard() {
+void PDEndItAllAndReRunTheBastard(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -771,14 +549,14 @@ int LoopLimitTooLow(tU32 limit) {
 }
 
 // IDA: tS32 __cdecl UpperLoopLimit()
-tS32 UpperLoopLimit() {
+tS32 UpperLoopLimit(void) {
     tU32 limit;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl InitJoysticks()
-int InitJoysticks() {
+int InitJoysticks(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -792,7 +570,7 @@ tU32 ReadJoystickAxis(int pBit) {
 }
 
 // IDA: void __cdecl PDReadJoySticks()
-void PDReadJoySticks() {
+void PDReadJoySticks(void) {
     tU32 temp1x;
     tU32 temp1y;
     tU32 temp2x;
@@ -802,77 +580,77 @@ void PDReadJoySticks() {
 }
 
 // IDA: tS32 __cdecl PDGetJoy1X()
-tS32 PDGetJoy1X() {
+tS32 PDGetJoy1X(void) {
     tS32 joy;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: tS32 __cdecl PDGetJoy1Y()
-tS32 PDGetJoy1Y() {
+tS32 PDGetJoy1Y(void) {
     tS32 joy;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: tS32 __cdecl PDGetJoy2X()
-tS32 PDGetJoy2X() {
+tS32 PDGetJoy2X(void) {
     tS32 joy;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: tS32 __cdecl PDGetJoy2Y()
-tS32 PDGetJoy2Y() {
+tS32 PDGetJoy2Y(void) {
     tS32 joy;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl PDGetJoy1Button1()
-int PDGetJoy1Button1() {
+int PDGetJoy1Button1(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl PDGetJoy1Button2()
-int PDGetJoy1Button2() {
+int PDGetJoy1Button2(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl PDGetJoy1Button3()
-int PDGetJoy1Button3() {
+int PDGetJoy1Button3(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl PDGetJoy1Button4()
-int PDGetJoy1Button4() {
+int PDGetJoy1Button4(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl PDGetJoy2Button1()
-int PDGetJoy2Button1() {
+int PDGetJoy2Button1(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl PDGetJoy2Button2()
-int PDGetJoy2Button2() {
+int PDGetJoy2Button2(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl PDGetJoy2Button3()
-int PDGetJoy2Button3() {
+int PDGetJoy2Button3(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl PDGetJoy2Button4()
-int PDGetJoy2Button4() {
+int PDGetJoy2Button4(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -919,7 +697,7 @@ int PDCheckDriveExists2(char* pThe_path, char* pFile_name, tU32 pMin_size) {
 }
 
 // IDA: int __cdecl PDDoWeLeadAnAustereExistance()
-int PDDoWeLeadAnAustereExistance() {
+int PDDoWeLeadAnAustereExistance(void) {
     tU32 block;
 
     block = LargestBlockAvail();
@@ -930,4 +708,63 @@ int PDDoWeLeadAnAustereExistance() {
         return block < 13000000;
     }
     return block < 15000000;
+}
+
+#endif
+
+int CheckGorePasswordFile(char* pPassword) {
+    tPath_name path;
+    FILE* f;
+    char line[10];
+
+    PathCat(path, "DATA", "PASS.TXT");
+    f = fopen(path, "rb");
+    if (f == NULL) {
+        return 0;
+    }
+    if (fgets(line, sizeof(line), f) == NULL) {
+        fclose(f);
+        return 0;
+    }
+    fclose(f);
+#if defined(DETHRACE_FIX_BUGS)
+    // Allow a final newline in DATA/PASS.TXT
+    while (strlen(line) > 0 && (line[strlen(line) - 1] == '\n' || line[strlen(line) - 1] == '\r')) {
+        line[strlen(line) - 1] = '\0';
+    }
+#endif
+#ifdef _WIN32
+    return stricmp(line, pPassword) == 0;
+#else
+    return strcasecmp(line, pPassword) == 0;
+#endif
+}
+
+// IDA: int __cdecl PDGetGorePassword()
+int PDGetGorePassword(void) {
+    int ch;
+    int len;
+    int chances;
+    char password[17];
+    LOG_TRACE("()");
+
+    for (chances = 0; chances < 3; chances++) {
+        printf(chances == 0 ? "\n\n\n\n\nEnter password for uncut version...\n" : "\nIncorrect password, please try again...\n");
+        OS_ConsoleReadPassword(password, sizeof(password));
+        dr_dprintf("Password entered is '%s'", password);
+        if (CheckGorePasswordFile(password)) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+// IDA: void __usercall PDDisplayGoreworthiness(int pGory@<EAX>)
+void PDDisplayGoreworthiness(int pGory) {
+    tU32 delay_start;
+    LOG_TRACE("(%d)", pGory);
+
+    printf(pGory ? "\nPlaying full version...\n" : "\nPlaying zombie version...\n");
+    delay_start = 2;
+    gHarness_platform.Sleep(delay_start * 1000);
 }

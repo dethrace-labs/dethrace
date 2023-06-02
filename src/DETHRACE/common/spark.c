@@ -6,6 +6,7 @@
 #include "globvars.h"
 #include "globvrkm.h"
 #include "graphics.h"
+#include "harness/hooks.h"
 #include "harness/trace.h"
 #include "loading.h"
 #include "opponent.h"
@@ -618,14 +619,14 @@ void AdjustShrapnel(int pShrapnel_num, br_vector3* pos, tU16 pAge, br_material* 
 }
 
 // IDA: void __cdecl ResetSparks()
-void ResetSparks() {
+void ResetSparks(void) {
     LOG_TRACE("()");
 
     gSpark_flags = 0;
 }
 
 // IDA: void __cdecl ResetShrapnel()
-void ResetShrapnel() {
+void ResetShrapnel(void) {
     int i;
     LOG_TRACE("()");
 
@@ -695,7 +696,7 @@ void CreateShrapnelShower(br_vector3* pos, br_vector3* v, br_vector3* pNormal, b
 }
 
 // IDA: void __cdecl InitShrapnel()
-void InitShrapnel() {
+void InitShrapnel(void) {
     int i;
     int j;
     LOG_TRACE("()");
@@ -717,7 +718,7 @@ void InitShrapnel() {
 }
 
 // IDA: void __cdecl LoadInShrapnel()
-void LoadInShrapnel() {
+void LoadInShrapnel(void) {
     LOG_TRACE("()");
 
     gShrapnel_model[0] = LoadModel("FRAG4.DAT");
@@ -736,7 +737,7 @@ void KillShrapnel(int i) {
 }
 
 // IDA: void __cdecl DisposeShrapnel()
-void DisposeShrapnel() {
+void DisposeShrapnel(void) {
     int i;
     LOG_TRACE("()");
 
@@ -837,7 +838,7 @@ void DrMatrix34Rotate(br_matrix34* mat, br_angle r, br_vector3* a) {
 
     s = FastScalarSinAngle(r);
     c = FastScalarCosAngle(r);
-    t = 1.0 - c;
+    t = 1.0f - c;
     txy = t * a->v[0] * a->v[1];
     txz = t * a->v[0] * a->v[2];
     tyz = t * a->v[1] * a->v[2];
@@ -858,6 +859,7 @@ void DrMatrix34Rotate(br_matrix34* mat, br_angle r, br_vector3* a) {
 // IDA: void __usercall SmokeLine(int l@<EAX>, int x@<EDX>, br_scalar zbuff, int r_squared, tU8 *scr_ptr, tU16 *depth_ptr, tU8 *shade_ptr, br_scalar r_multiplier, br_scalar z_multiplier, br_scalar shade_offset)
 void SmokeLine(int l, int x, br_scalar zbuff, int r_squared, tU8* scr_ptr, tU16* depth_ptr, tU8* shade_ptr, br_scalar r_multiplier, br_scalar z_multiplier, br_scalar shade_offset) {
     int i;
+    int offset; /* Added by dethrace. */
     int r_multiplier_int;
     int shade_offset_int;
     tU16 z;
@@ -873,7 +875,12 @@ void SmokeLine(int l, int x, br_scalar zbuff, int r_squared, tU8* scr_ptr, tU16*
 
     for (i = 0; i < l; i++) {
         if (*depth_ptr > z) {
-            *scr_ptr = shade_ptr[*scr_ptr + (((shade_offset_int - r_squared * r_multiplier_int) >> 8) & 0xffffff00)];
+            offset = ((shade_offset_int - r_squared * r_multiplier_int) >> 8) & 0xffffff00;
+#if defined(DETHRACE_FIX_BUGS)
+            /* Prevent buffer underflows by capping negative offsets. */
+            offset = MAX(0, offset);
+#endif
+            *scr_ptr = shade_ptr[*scr_ptr + offset];
         }
         r_multiplier = x + r_squared;
         scr_ptr++;
@@ -1072,7 +1079,7 @@ int CmpSmokeZ(void* p1, void* p2) {
 }
 
 // IDA: void __cdecl RenderRecordedSmokeCircles()
-void RenderRecordedSmokeCircles() {
+void RenderRecordedSmokeCircles(void) {
     int i;
     tBRender_smoke* smoke;
     tU8 red;
@@ -1197,7 +1204,7 @@ void GenerateContinuousSmoke(tCar_spec* pCar, int wheel, tU32 pTime) {
 }
 
 // IDA: void __cdecl DustRotate()
-void DustRotate() {
+void DustRotate(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -1316,8 +1323,8 @@ void CreatePuffOfSmoke(br_vector3* pos, br_vector3* v, br_scalar strength, br_sc
 
     BrVector3InvScale(&gSmoke[gSmoke_num].v, v, WORLD_SCALE);
     gSmoke[gSmoke_num].v.v[1] += (1.0f / WORLD_SCALE);
-    gSmoke[gSmoke_num].pos = *pos;
-    gSmoke[gSmoke_num].radius = 0.05;
+    BrVector3Copy(&gSmoke[gSmoke_num].pos, pos);
+    gSmoke[gSmoke_num].radius = 0.05f;
     if ((pType & 0xF) == 7) {
         gSmoke[gSmoke_num].radius *= 2.0f;
     } else {
@@ -1340,10 +1347,11 @@ void CreatePuffOfSmoke(br_vector3* pos, br_vector3* v, br_scalar strength, br_sc
 }
 
 // IDA: void __cdecl ResetSmoke()
-void ResetSmoke() {
+void ResetSmoke(void) {
     LOG_TRACE("()");
 
-    gSmoke_flags = 0;;
+    gSmoke_flags = 0;
+    ;
 }
 
 // IDA: void __usercall AdjustSmoke(int pIndex@<EAX>, tU8 pType@<EDX>, br_vector3 *pPos@<EBX>, br_scalar pRadius, br_scalar pStrength)
@@ -1358,9 +1366,8 @@ void AdjustSmoke(int pIndex, tU8 pType, br_vector3* pPos, br_scalar pRadius, br_
 }
 
 // IDA: void __cdecl ActorError()
-void ActorError() {
+void ActorError(void) {
     LOG_TRACE("()");
-
 }
 
 // IDA: void __usercall AdjustSmokeColumn(int pIndex@<EAX>, tCar_spec *pCar@<EDX>, int pVertex@<EBX>, int pColour@<ECX>)
@@ -1457,7 +1464,7 @@ void CreateSmokeColumn(tCar_spec* pCar, int pColour, int pVertex_index, tU32 pLi
 }
 
 // IDA: void __cdecl GenerateSmokeShades()
-void GenerateSmokeShades() {
+void GenerateSmokeShades(void) {
     static int rb = 0x00;
     static int gb = 0x00;
     static int bb = 0x00;
@@ -1483,7 +1490,7 @@ void GenerateSmokeShades() {
 }
 
 // IDA: void __cdecl GenerateItFoxShadeTable()
-void GenerateItFoxShadeTable() {
+void GenerateItFoxShadeTable(void) {
     LOG_TRACE("()");
 
     if (gIt_shade_table == NULL) {
@@ -1739,7 +1746,7 @@ void MungeSmokeColumn(tU32 pTime) {
 }
 
 // IDA: void __cdecl DisposeFlame()
-void DisposeFlame() {
+void DisposeFlame(void) {
     int i;
     int j;
     br_actor* actor;
@@ -1768,7 +1775,7 @@ void DisposeFlame() {
 }
 
 // IDA: void __cdecl InitFlame()
-void InitFlame() {
+void InitFlame(void) {
     int i;
     int j;
     int num;
@@ -1904,7 +1911,7 @@ void InitSplash(FILE* pF) {
 }
 
 // IDA: void __cdecl DisposeSplash()
-void DisposeSplash() {
+void DisposeSplash(void) {
     int i;
     LOG_TRACE("()");
 
@@ -1932,21 +1939,17 @@ void DrawTheGlow(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
     tU32 seed;
     LOG_TRACE("(%p, %p, %p)", pRender_screen, pDepth_buffer, pCamera);
 
-    // FIXME: sometimes this function causes a segfault (most commonly when looking at a glow fairly close up and the camera swings away). Stubbing it out for now.
-    LOG_WARN_ONCE("DrawTheGlow is stubbed out");
-    return;
-
     if (gColumn_flags) {
         seed = rand();
         srand(GetTotalTime());
         for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
             if (((1u << i) & gColumn_flags) != 0 && gSmoke_column[i].colour <= 1) {
-                strength = 0.5;
+                strength = 0.5f;
                 if (gSmoke_column[i].lifetime < 4000) {
-                    strength = gSmoke_column[i].lifetime * 0.5 / 4000.0;
+                    strength = gSmoke_column[i].lifetime * 0.5f / 4000.f;
                 }
-                BrVector3Set(&tv, gSmoke_column[i].pos.v[0], gSmoke_column[i].pos.v[1] + 0.02, gSmoke_column[i].pos.v[2]);
-                SmokeCircle3D(&tv, 0.07, strength, SRandomBetween(0.5, 0.99000001), pRender_screen, pDepth_buffer, gAcid_shade_table, pCamera);
+                BrVector3Set(&tv, gSmoke_column[i].pos.v[0], gSmoke_column[i].pos.v[1] + 0.02f, gSmoke_column[i].pos.v[2]);
+                SmokeCircle3D(&tv, 0.07f, strength, SRandomBetween(0.5f, 0.99f), pRender_screen, pDepth_buffer, gAcid_shade_table, pCamera);
             }
         }
         srand(seed);
@@ -2048,84 +2051,92 @@ void SmudgeCar(tCar_spec* pCar, int fire_point) {
     if (gAusterity_mode) {
         return;
     }
+
+    v = fire_point;
+    group = 0;
     actor = pCar->car_model_actors[pCar->principal_car_actor].actor;
     model = actor->model;
     bonny = pCar->car_model_actors[pCar->car_actor_count - 1].actor;
     n = 0;
-    j = 0;
+    real_vertex_number = 0;
     if ((model->flags & BR_MODF_KEEP_ORIGINAL) != 0 || (model->flags & BR_MODF_UPDATEABLE) != 0) {
-        BrVector3Copy(&bonny_pos, &V11MODEL(model)->groups->vertices[fire_point].p);
+        point = V11MODEL(model)->groups[group].vertices[fire_point].p;
         StartPipingSession(ePipe_chunk_smudge);
         for (group = 0; group < V11MODEL(model)->ngroups; group++) {
-            for (v = 0; v < V11MODEL(model)->groups[group].nvertices; v++) {
-                BrVector3Sub(&tv, &V11MODEL(model)->groups[group].vertices[v].p, &bonny_pos);
+            for (j = 0; j < V11MODEL(model)->groups[group].nvertices; j++) {
+                BrVector3Sub(&tv, &V11MODEL(model)->groups[group].vertices[j].p, &point);
                 ts = (.0144f - BrVector3LengthSquared(&tv) / SRandomBetween(.5f, 1.f)) / .0144f * 127.f;
                 if (ts > 0.f) {
-                    ts += V11MODEL(model)->groups[group].vertex_colours[v] >> 24;
+                    ts += BR_ALPHA(V11MODEL(model)->groups[group].vertex_colours[j]);
                     if (ts > 255.f) {
                         ts = 255.f;
                     }
-                    real_vertex_number = ts;
-                    if (V11MODEL(model)->groups[group].vertex_colours[v] >> 24 != real_vertex_number) {
-                        data[n].vertex_index = j;
-                        data[n].light_index = real_vertex_number - (V11MODEL(model)->groups[group].vertex_colours[v] >> 24);
-                        V11MODEL(model)->groups[group].vertex_colours[v] = real_vertex_number << 24;
+                    if (BR_ALPHA(V11MODEL(model)->groups[group].vertex_colours[j]) != (int)ts) {
+                        data[n].vertex_index = real_vertex_number;
+                        data[n].light_index = (int)ts - BR_ALPHA(V11MODEL(model)->groups[group].vertex_colours[j]);
+                        V11MODEL(model)->groups[group].vertex_colours[j] = (int)ts << 24;
                         if ((model->flags & BR_MODF_UPDATEABLE) != 0) {
-                            model->vertices[V11MODEL(model)->groups[group].vertex_user[v]].index = real_vertex_number;
+                            model->vertices[V11MODEL(model)->groups[group].vertex_user[j]].index = (int)ts;
                         }
-                        n += 1;
+                        n++;
                         if (n >= COUNT_OF(data)) {
                             break;
                         }
                     }
                 }
-                j = j + 1;
+                real_vertex_number++;
             }
             if (n >= COUNT_OF(data)) {
                 break;
             }
         }
-        if (n != 0) {
+        if (n > 0) {
             AddSmudgeToPipingSession(pCar->car_ID, pCar->principal_car_actor, n, data);
+            // Added by dethrace to update gpu-buffered vertices
+            model->flags |= BR_MODF_DETHRACE_FORCE_BUFFER_UPDATE;
         }
+
         n = 0;
-        j = 0;
+        real_vertex_number = 0;
         if (actor != bonny) {
             b_model = bonny->model;
-            BrVector3Add(&tv, &actor->t.t.translate.t, &bonny_pos);
-            BrVector3Sub(&tv, &tv, &bonny->t.t.translate.t);
-            BrMatrix34TApplyV(&point, &tv, &bonny->t.t.mat);
+            BrVector3Add(&tv, &actor->t.t.translate.t, &point);
+            BrVector3Accumulate(&tv, &bonny->t.t.translate.t);
+            BrMatrix34TApplyV(&bonny_pos, &tv, &bonny->t.t.mat);
             for (group = 0; group < V11MODEL(b_model)->ngroups; group++) {
-                for (v = 0; v < V11MODEL(b_model)->groups[group].nvertices; v++) {
-                    BrVector3Sub(&tv, &V11MODEL(b_model)->groups[group].vertices[v].p, &point);
-                    ts = (.0144f - BrVector3LengthSquared(&tv)) / SRandomBetween(.5f, 1.f) / .0144f * 127.f;
+                j = 0;
+                for (j = 0; j < V11MODEL(b_model)->groups[group].nvertices; j++) {
+                    BrVector3Sub(&tv, &V11MODEL(b_model)->groups[group].vertices[j].p, &bonny_pos);
+                    ts = (.0144f - BrVector3LengthSquared(&tv) / SRandomBetween(.5f, 1.f)) / .0144f * 127.f;
                     if (ts > 0.f) {
-                        ts += V11MODEL(b_model)->groups[group].vertex_colours[v] >> 24;
+                        ts += BR_ALPHA(V11MODEL(b_model)->groups[group].vertex_colours[j]);
                         if (ts > 255.f) {
                             ts = 255.f;
                         }
-                        real_vertex_number = ts;
-                        if (V11MODEL(b_model)->groups[group].vertex_colours[v] >> 24 != real_vertex_number) {
-                            data[n].vertex_index = j;
-                            data[n].light_index = real_vertex_number - (V11MODEL(b_model)->groups[group].vertex_colours[v] >> 24);
-                            V11MODEL(b_model)->groups[group].vertex_colours[v] = real_vertex_number << 24;
+                        if (BR_ALPHA(V11MODEL(b_model)->groups[group].vertex_colours[j]) != (int)ts) {
+                            data[n].vertex_index = real_vertex_number;
+                            data[n].light_index = (int)ts - BR_ALPHA(V11MODEL(b_model)->groups[group].vertex_colours[j]);
+                            V11MODEL(b_model)->groups[group].vertex_colours[j] = (int)ts << 24;
                             if ((b_model->flags & BR_MODF_UPDATEABLE) != 0) {
-                                b_model->vertices[V11MODEL(b_model)->groups[group].vertex_user[v]].index = real_vertex_number;
+                                b_model->vertices[V11MODEL(b_model)->groups[group].vertex_user[j]].index = (int)ts;
                             }
-                            n += 1;
-                            if (n > COUNT_OF(data)) {
+                            n++;
+                            if (n >= COUNT_OF(data)) {
                                 break;
                             }
                         }
                     }
-                    j += 1;
+                    real_vertex_number++;
                 }
                 if (n >= COUNT_OF(data)) {
                     break;
                 }
             }
-            if (n != 0) {
+            if (n > 0) {
                 AddSmudgeToPipingSession(pCar->car_ID, pCar->car_actor_count - 1, n, data);
+
+                // Added by dethrace to update gpu-buffered vertices
+                b_model->flags |= BR_MODF_DETHRACE_FORCE_BUFFER_UPDATE;
             }
         }
         EndPipingSession();
@@ -2133,7 +2144,7 @@ void SmudgeCar(tCar_spec* pCar, int fire_point) {
 }
 
 // IDA: void __cdecl ResetSmokeColumns()
-void ResetSmokeColumns() {
+void ResetSmokeColumns(void) {
     int i;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
@@ -2161,7 +2172,7 @@ void SetSmoke(int pSmoke_on) {
 }
 
 // IDA: int __cdecl GetSmokeOn()
-int GetSmokeOn() {
+int GetSmokeOn(void) {
     LOG_TRACE("()");
 
     return gSmoke_on;
@@ -2522,7 +2533,7 @@ void MungeSplash(tU32 pTime) {
 }
 
 // IDA: void __cdecl RenderSplashes()
-void RenderSplashes() {
+void RenderSplashes(void) {
     int i;
     LOG_TRACE("()");
 
@@ -2559,7 +2570,7 @@ void GetSmokeShadeTables(FILE* f) {
 }
 
 // IDA: void __cdecl FreeSmokeShadeTables()
-void FreeSmokeShadeTables() {
+void FreeSmokeShadeTables(void) {
     int i;
     LOG_TRACE("()");
 
@@ -2585,7 +2596,7 @@ void LoadInKevStuff(FILE* pF) {
 }
 
 // IDA: void __cdecl DisposeKevStuff()
-void DisposeKevStuff() {
+void DisposeKevStuff(void) {
     LOG_TRACE("()");
 
     DisposeShrapnel();

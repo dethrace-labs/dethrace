@@ -31,28 +31,28 @@ int gCurrent_ambient_prat_sequence;
 int gCurrent_pratcam_alternative;
 
 // IDA: int __cdecl PratcamGetCurrent()
-int PratcamGetCurrent() {
+int PratcamGetCurrent(void) {
     LOG_TRACE("()");
 
     return gCurrent_pratcam_index;
 }
 
 // IDA: int __cdecl PratcamGetAmbient()
-int PratcamGetAmbient() {
+int PratcamGetAmbient(void) {
     LOG_TRACE("()");
 
     return gCurrent_ambient_prat_sequence;
 }
 
 // IDA: int __cdecl PratcamGetPending()
-int PratcamGetPending() {
+int PratcamGetPending(void) {
     LOG_TRACE("()");
 
     return gPending_ambient_prat;
 }
 
 // IDA: void __cdecl TogglePratcam()
-void TogglePratcam() {
+void TogglePratcam(void) {
     tU32 the_time;
     tU32 time_diff;
     LOG_TRACE("()");
@@ -185,7 +185,7 @@ void LoadPratcam(char* pFolder_name) {
 }
 
 // IDA: void __cdecl NextPratcamChunk()
-void NextPratcamChunk() {
+void NextPratcamChunk(void) {
     int i;
     int random_number;
     int count;
@@ -310,21 +310,21 @@ void PratcamEvent(int pIndex) {
 }
 
 // IDA: int __cdecl HighResPratBufferWidth()
-int HighResPratBufferWidth() {
+int HighResPratBufferWidth(void) {
     int prat_width;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl HighResPratBufferHeight()
-int HighResPratBufferHeight() {
+int HighResPratBufferHeight(void) {
     int prat_height;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl InitPratcam()
-void InitPratcam() {
+void InitPratcam(void) {
     void* the_pixels;
     LOG_TRACE("()");
 
@@ -374,7 +374,7 @@ void InitPratcam() {
 }
 
 // IDA: void __cdecl DisposePratcam()
-void DisposePratcam() {
+void DisposePratcam(void) {
     int i;
     int j;
     int k;
@@ -537,70 +537,70 @@ void TestPratCam(int pIndex) {
 }
 
 // IDA: void __cdecl PratCam0()
-void PratCam0() {
+void PratCam0(void) {
     LOG_TRACE("()");
 
     TestPratCam(0);
 }
 
 // IDA: void __cdecl PratCam1()
-void PratCam1() {
+void PratCam1(void) {
     LOG_TRACE("()");
 
     TestPratCam(1);
 }
 
 // IDA: void __cdecl PratCam2()
-void PratCam2() {
+void PratCam2(void) {
     LOG_TRACE("()");
 
     TestPratCam(2);
 }
 
 // IDA: void __cdecl PratCam3()
-void PratCam3() {
+void PratCam3(void) {
     LOG_TRACE("()");
 
     TestPratCam(3);
 }
 
 // IDA: void __cdecl PratCam4()
-void PratCam4() {
+void PratCam4(void) {
     LOG_TRACE("()");
 
     TestPratCam(4);
 }
 
 // IDA: void __cdecl PratCam5()
-void PratCam5() {
+void PratCam5(void) {
     LOG_TRACE("()");
 
     TestPratCam(5);
 }
 
 // IDA: void __cdecl PratCam6()
-void PratCam6() {
+void PratCam6(void) {
     LOG_TRACE("()");
 
     TestPratCam(6);
 }
 
 // IDA: void __cdecl PratCam7()
-void PratCam7() {
+void PratCam7(void) {
     LOG_TRACE("()");
 
     TestPratCam(7);
 }
 
 // IDA: void __cdecl PratCam8()
-void PratCam8() {
+void PratCam8(void) {
     LOG_TRACE("()");
 
     TestPratCam(8);
 }
 
 // IDA: void __cdecl PratCam9()
-void PratCam9() {
+void PratCam9(void) {
     LOG_TRACE("()");
 
     TestPratCam(9);
