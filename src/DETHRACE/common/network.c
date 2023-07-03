@@ -989,7 +989,7 @@ void NetFreeExcessMemory(void) {
     void* temp;
     LOG_TRACE("()");
 
-    while (gMessage_to_free != NULL && ((tNet_message*)(gMessage_to_free + sizeof(void*)))->contents.header.type == NETMSGID_NONE) {
+    while (gMessage_to_free != NULL && ((tNet_message*)((char*)gMessage_to_free + sizeof(void*)))->contents.header.type == NETMSGID_NONE) {
         temp = *(void**)gMessage_to_free;
         BrMemFree(gMessage_to_free);
         gMessage_to_free = temp;
