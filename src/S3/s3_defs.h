@@ -219,10 +219,4 @@ typedef struct wav_header {
 } wav_header;
 #pragma pack(pop)
 
-typedef struct tS3_sample_struct_miniaudio {
-    ma_audio_buffer_ref buffer_ref;
-    ma_sound sound;
-    int initialized;
-} tS3_sample_struct_miniaudio;
-
 #endif
