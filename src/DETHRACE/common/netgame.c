@@ -92,7 +92,7 @@ void SendAllNonCarPositions(void) {
             if (non_car->collision_info.driver == eDriver_non_car_unused_slot || non_car->collision_info.car_ID != i) {
                 contents = NetGetBroadcastContents(NETMSGID_NONCARPOSITION, 0);
                 BrMatrix34Copy(&contents->data.non_car_position.mat, &list[i]->t.t.mat);
-                contents->data.player_list.number_of_players = i;
+                contents->data.non_car_position.ID = i;
                 contents->data.non_car_position.flags = list[i]->identifier[3] == '!';
             }
         }

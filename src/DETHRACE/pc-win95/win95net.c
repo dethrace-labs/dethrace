@@ -15,6 +15,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+// dethrace: have switched out IPX implementation for IP
+
 tU32 gNetwork_init_flags;
 tPD_net_game_info* gJoinable_games;
 int gMatts_PC;
@@ -49,7 +51,6 @@ struct sockaddr_in gLocal_addr;
 struct sockaddr_in gRemote_addr;
 struct sockaddr_in gBroadcast_addr;
 struct sockaddr_in gLast_received_addr;
-
 int gSocket;
 
 #define MESSAGE_HEADER_STR "CW95MSG"
@@ -87,10 +88,10 @@ int GetSocketNumberFromProfileFile(void) {
     NOT_IMPLEMENTED();
 }
 
-tU32 EthernetAddressToU32(SOCKADDR_IPX_* pAddr_ipx) {
-    LOG_TRACE("(%p)", pAddr_ipx);
-    NOT_IMPLEMENTED();
-}
+// tU32 EthernetAddressToU32(SOCKADDR_IPX_* pAddr_ipx) {
+//     LOG_TRACE("(%p)", pAddr_ipx);
+//     NOT_IMPLEMENTED();
+// }
 
 void NetNowIPXLocalTarget2String(char* pString, struct sockaddr_in* pSock_addr_ipx) {
     LOG_TRACE("(\"%s\", %p)", pString, pSock_addr_ipx);
@@ -129,7 +130,7 @@ int SameEthernetAddress(struct sockaddr_in* pAddr_ipx1, struct sockaddr_in* pAdd
     return memcmp(pAddr_ipx1, pAddr_ipx2, sizeof(struct sockaddr_in)) == 0;
 }
 
-SOCKADDR_IPX_* GetIPXAddrFromPlayerID(tPlayer_ID pPlayer_id) {
+/*SOCKADDR_IPX_* */ void GetIPXAddrFromPlayerID(tPlayer_ID pPlayer_id) {
     int i;
     tU8* nodenum;
     NOT_IMPLEMENTED();
@@ -537,7 +538,7 @@ void PDNetObtainSystemUserName(char* pName, int pMax_length) {
 // IDA: int __usercall PDNetSendMessageToPlayer@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>, tPlayer_ID pPlayer@<EBX>)
 int PDNetSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage, tPlayer_ID pPlayer) {
     char str[256];
-    SOCKADDR_IPX_* remote_addr_ipx;
+    // SOCKADDR_IPX_* remote_addr_ipx;
     LOG_TRACE("(%p, %p, %d)", pDetails, pMessage, pPlayer);
     NOT_IMPLEMENTED();
 }

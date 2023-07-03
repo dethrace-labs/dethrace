@@ -238,11 +238,6 @@ void dr_dprintf(char* fmt_string, ...) {
     va_list args;
     tU32 the_time;
 
-    va_start(args, fmt_string);
-    vprintf(fmt_string, args);
-    va_end(args);
-    printf("\n");
-
     if (harness_game_config.enable_diagnostics == 0) {
         return;
     }
@@ -259,6 +254,12 @@ void dr_dprintf(char* fmt_string, ...) {
     va_end(args);
     fputs("\n", gDiagnostic_file);
     fflush(gDiagnostic_file);
+
+    // Added by dethrace for debugging
+    // va_start(args, fmt_string);
+    // vprintf(fmt_string, args);
+    // va_end(args);
+    // printf("\n");
 }
 
 // IDA: int __usercall DoErrorInterface@<EAX>(int pMisc_text_index@<EAX>)

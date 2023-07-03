@@ -88,15 +88,15 @@ int NetInitialise(void) {
     gMid_messages = BrMemAllocate(MID_MESSAGES_CAPACITY * (gMessage_header_size + sizeof(tMid_message)), kMem_net_mid_messages);
     gMax_messages = BrMemAllocate(MAX_MESSAGES_CAPACITY * (gMessage_header_size + sizeof(tMax_message)), kMem_net_max_messages);
     for (i = 0; i < MIN_MESSAGES_CAPACITY; i++) {
-        ((tNet_message*)&gMin_messages[i])->contents.header.type = FREE_NETMSGID;
+        ((tNet_message*)&gMin_messages[i])->contents.header.type = NETMSGID_NONE;
     }
     for (i = 0; i < MID_MESSAGES_CAPACITY; i++) {
-        ((tNet_message*)&gMid_messages[i])->contents.header.type = FREE_NETMSGID;
+        ((tNet_message*)&gMid_messages[i])->contents.header.type = NETMSGID_NONE;
     }
     for (i = 0; i < MAX_MESSAGES_CAPACITY; i++) {
-        ((tNet_message*)&gMax_messages[i])->contents.header.type = FREE_NETMSGID;
+        ((tNet_message*)&gMax_messages[i])->contents.header.type = NETMSGID_NONE;
     }
-    gNet_initialised = !PDNetInitialise();
+    gNet_initialised = PDNetInitialise() == 0;
     if (gNet_initialised) {
         InitNetHeadups();
     }
@@ -223,7 +223,6 @@ void DisposeCurrentJoinPollGame(void) {
 // IDA: void __cdecl DoNextJoinPoll()
 void DoNextJoinPoll(void) {
     tNet_message* the_message;
-    static tU32 time_last_poll = 0;
     LOG_TRACE("()");
 
     if (gTime_for_next_one) {
@@ -237,7 +236,7 @@ void DoNextJoinPoll(void) {
                     the_message = NetBuildMessage(NETMSGID_SENDMEDETAILS, 0);
                     NetSendMessageToAddress(gCurrent_join_poll_game, the_message, gCurrent_join_poll_game);
                     gBastard_has_answered = 0;
-                    time_last_poll = PDGetTotalTime();
+                    gAsk_time = PDGetTotalTime();
                 }
                 gJoin_poll_index++;
             } else {
@@ -252,7 +251,7 @@ void DoNextJoinPoll(void) {
             gAdd_proc(gCurrent_join_poll_game);
             LeaveTempGame();
         } else {
-            if (PDGetTotalTime() - time_last_poll > 10000) {
+            if (PDGetTotalTime() - gAsk_time > 10000) {
                 LeaveTempGame();
                 DisposeCurrentJoinPollGame();
             }
@@ -925,7 +924,7 @@ tNet_message* NetAllocateMessage(int pSize) {
     pointer = NULL;
     if (pSize <= sizeof(tMin_message) - sizeof(void*)) {
         for (i = 0; i < MIN_MESSAGES_CAPACITY; i++) {
-            if (((tNet_message*)&gMin_messages[rr_min])->contents.header.type == FREE_NETMSGID) {
+            if (((tNet_message*)&gMin_messages[rr_min])->contents.header.type == NETMSGID_NONE) {
                 pointer = &gMin_messages[rr_min];
                 break;
             }
@@ -937,7 +936,7 @@ tNet_message* NetAllocateMessage(int pSize) {
     }
     if (pointer == NULL && pSize <= sizeof(tMid_message) - sizeof(void*)) {
         for (i = 0; i < MID_MESSAGES_CAPACITY; i++) {
-            if (((tNet_message*)&gMid_messages[rr_mid])->contents.header.type == FREE_NETMSGID) {
+            if (((tNet_message*)&gMid_messages[rr_mid])->contents.header.type == NETMSGID_NONE) {
                 pointer = &gMid_messages[rr_mid];
                 break;
             }
@@ -949,7 +948,7 @@ tNet_message* NetAllocateMessage(int pSize) {
     }
     if (pointer == NULL && pSize <= sizeof(tMax_message) - sizeof(void*)) {
         for (i = 0; i < MAX_MESSAGES_CAPACITY; i++) {
-            if (((tNet_message*)&gMax_messages[rr_max])->contents.header.type == FREE_NETMSGID) {
+            if (((tNet_message*)&gMax_messages[rr_max])->contents.header.type == NETMSGID_NONE) {
                 pointer = &gMax_messages[rr_max];
                 break;
             }
@@ -990,7 +989,7 @@ void NetFreeExcessMemory(void) {
     void* temp;
     LOG_TRACE("()");
 
-    while (gMessage_to_free != NULL && ((tNet_message*)(gMessage_to_free + sizeof(void*)))->contents.header.type == FREE_NETMSGID) {
+    while (gMessage_to_free != NULL && ((tNet_message*)(gMessage_to_free + sizeof(void*)))->contents.header.type == NETMSGID_NONE) {
         temp = *(void**)gMessage_to_free;
         BrMemFree(gMessage_to_free);
         gMessage_to_free = temp;
@@ -1004,7 +1003,7 @@ int NetDisposeMessage(tNet_game_details* pDetails, tNet_message* pMessage) {
     if (pMessage->guarantee_number != 0) {
         return -1;
     }
-    pMessage->contents.header.type = FREE_NETMSGID;
+    pMessage->contents.header.type = NETMSGID_NONE;
     return 0;
 }
 
@@ -1458,10 +1457,9 @@ void ReceivedCarDetailsReq(tNet_contents* pContents, void* pSender_address) {
     message->contents.data.car_details.count = gNumber_of_net_players;
     for (i = 0; i < gNumber_of_net_players; i++) {
         message->contents.data.car_details.details[i].car_index = gNet_players[i].car_index;
-        // memcpy(message->contents.data.car_details.details[i].owner, gNet_players[i].player_name, sizeof(gNet_players[i].player_name));
-        // message->contents.data.car_details.details[i].owner[sizeof(gNet_players[i].player_name) - 1] = '\0';
-        // TOOD: dest is smaller than src
-        strcpy(message->contents.data.car_details.details[i].owner, gNet_players[i].player_name);
+        // truncates from 32 to 16 characters
+        memcpy(message->contents.data.car_details.details[i].owner, gNet_players[i].player_name, sizeof(message->contents.data.car_details.details[i].owner));
+        message->contents.data.car_details.details[i].owner[sizeof(message->contents.data.car_details.details[i].owner) - 1] = '\0';
     }
     NetGuaranteedSendMessageToAddress(gCurrent_net_game, message, pSender_address, NULL);
 }
@@ -1477,7 +1475,7 @@ void ReceivedCarDetails(tNet_contents* pContents) {
         for (j = 0; j < pContents->data.car_details.count; j++) {
             if (i == pContents->data.car_details.details[j].car_index) {
                 gCar_details[i].ownership = eCar_owner_someone;
-                strcpy(gCar_details[i].name, pContents->data.car_details.details[i].owner);
+                strcpy(gCar_details[i].name, pContents->data.car_details.details[j].owner);
             }
         }
     }
@@ -1501,111 +1499,115 @@ void ReceivedMessage(tNet_message* pMessage, void* pSender_address, tU32 pReceiv
     if (pMessage->guarantee_number != 0) {
         SendGuaranteeReply(pMessage, pSender_address);
     }
-    if ((gProgram_state.racing || !gRace_only_flags[pMessage->contents.header.type])
-        && (!gOnly_receive_guarantee_replies || pMessage->contents.header.type == NETMSGID_GUARANTEEREPLY)) {
-        for (i = 0; i < pMessage->num_contents; i++) {
-            if (contents->header.type <= NETMSGID_CARDETAILS || PlayerIsInList(pMessage->sender)) {
-                switch (contents->header.type) {
-                case NETMSGID_SENDMEDETAILS: // 0x00,
-                    ReceivedSendMeDetails(contents, pSender_address);
-                    break;
-                case NETMSGID_DETAILS: // 0x01,
-                    ReceivedDetails(contents);
-                    break;
-                case NETMSGID_JOIN: // 0x02,
-                    ReceivedJoin(contents, pSender_address);
-                    break;
-                case NETMSGID_NEWPLAYERLIST: // 0x03,
-                    ReceivedNewPlayerList(contents, pMessage);
-                    break;
-                case NETMSGID_GUARANTEEREPLY: // 0x04,
-                    ReceivedGuaranteeReply(contents);
-                    break;
-                case NETMSGID_CARDETAILSREQ: // 0x05,
-                    ReceivedCarDetailsReq(contents, pSender_address);
-                    break;
-                case NETMSGID_CARDETAILS: // 0x06,
-                    ReceivedCarDetails(contents);
-                    break;
-                case NETMSGID_LEAVE: // 0x07,
-                    ReceivedLeave(contents, pMessage);
-                    break;
-                case NETMSGID_HOSTICIDE: // 0x08,
-                    ReceivedHosticide(contents);
-                    break;
-                case NETMSGID_RACEOVER: // 0x09,
-                    ReceivedRaceOver(contents);
-                    break;
-                case NETMSGID_STATUSREPORT: // 0x0a,
-                    ReceivedStatusReport(contents, pMessage);
-                    break;
-                case NETMSGID_STARTRACE: // 0x0b,
-                    ReceivedStartRace(contents);
-                    break;
-                case NETMSGID_HEADUP: // 0x0c,
-                    ReceivedHeadup(contents);
-                    break;
-                case NETMSGID_HOSTQUERY: // 0x0d,
-                    ReceivedHostQuery(contents, pMessage);
-                    break;
-                case NETMSGID_HOSTREPLY: // 0x0e,
-                    ReceivedHostReply(contents);
-                    break;
-                case NETMSGID_MECHANICS: // 0x0f,
-                    ReceivedMechanics(contents);
-                    break;
-                case NETMSGID_NONCAR_INFO: // 0x10,
-                    ReceivedNonCar(contents);
-                    break;
-                case NETMSGID_TIMESYNC: // 0x11,
-                    ReceivedTimeSync(contents, pMessage, pReceive_time);
-                    break;
-                case NETMSGID_CONFIRM: // 0x12,
-                    ReceivedConfirm(contents);
-                    break;
-                case NETMSGID_DISABLECAR: // 0x13,
-                    ReceivedDisableCar(contents);
-                    break;
-                case NETMSGID_ENABLECAR: // 0x14,
-                    ReceivedEnableCar(contents);
-                    break;
-                case NETMSGID_POWERUP: // 0x15,
-                    ReceivedPowerup(contents);
-                    break;
-                case NETMSGID_RECOVER: // 0x16,
-                    ReceivedRecover(contents);
-                    break;
-                case NETMSGID_SCORES: // 0x17,
-                    ReceivedScores(contents);
-                    break;
-                case NETMSGID_WASTED: // 0x18,
-                    ReceivedWasted(contents);
-                    break;
-                case NETMSGID_PEDESTRIAN: // 0x19,
-                    ReceivedPedestrian(contents, pMessage, pReceive_time);
-                    break;
-                case NETMSGID_GAMEPLAY: // 0x1a,
-                    ReceivedGameplay(contents, pMessage, pReceive_time);
-                    break;
-                case NETMSGID_NONCARPOSITION: // 0x1b,
-                    ReceivedNonCarPosition(contents);
-                    break;
-                case NETMSGID_COPINFO: // 0x1c,
-                    ReceivedCopInfo(contents);
-                    break;
-                case NETMSGID_GAMESCORES: // 0x1d,
-                    ReceivedGameScores(contents);
-                    break;
-                case NETMSGID_OILSPILL: // 0x1e,
-                    ReceivedOilSpill(contents);
-                    break;
-                case NETMSGID_CRUSHPOINT: // 0x1f,
-                    RecievedCrushPoint(contents);
-                    break;
-                }
+    if (!gProgram_state.racing && gRace_only_flags[pMessage->contents.header.type]) {
+        return;
+    }
+    if (gOnly_receive_guarantee_replies && pMessage->contents.header.type != NETMSGID_GUARANTEEREPLY) {
+        return;
+    }
+
+    for (i = 0; i < pMessage->num_contents; i++) {
+        if (contents->header.type <= NETMSGID_CARDETAILS || PlayerIsInList(pMessage->sender)) {
+            switch (contents->header.type) {
+            case NETMSGID_SENDMEDETAILS: // 0x00,
+                ReceivedSendMeDetails(contents, pSender_address);
+                break;
+            case NETMSGID_DETAILS: // 0x01,
+                ReceivedDetails(contents);
+                break;
+            case NETMSGID_JOIN: // 0x02,
+                ReceivedJoin(contents, pSender_address);
+                break;
+            case NETMSGID_NEWPLAYERLIST: // 0x03,
+                ReceivedNewPlayerList(contents, pMessage);
+                break;
+            case NETMSGID_GUARANTEEREPLY: // 0x04,
+                ReceivedGuaranteeReply(contents);
+                break;
+            case NETMSGID_CARDETAILSREQ: // 0x05,
+                ReceivedCarDetailsReq(contents, pSender_address);
+                break;
+            case NETMSGID_CARDETAILS: // 0x06,
+                ReceivedCarDetails(contents);
+                break;
+            case NETMSGID_LEAVE: // 0x07,
+                ReceivedLeave(contents, pMessage);
+                break;
+            case NETMSGID_HOSTICIDE: // 0x08,
+                ReceivedHosticide(contents);
+                break;
+            case NETMSGID_RACEOVER: // 0x09,
+                ReceivedRaceOver(contents);
+                break;
+            case NETMSGID_STATUSREPORT: // 0x0a,
+                ReceivedStatusReport(contents, pMessage);
+                break;
+            case NETMSGID_STARTRACE: // 0x0b,
+                ReceivedStartRace(contents);
+                break;
+            case NETMSGID_HEADUP: // 0x0c,
+                ReceivedHeadup(contents);
+                break;
+            case NETMSGID_HOSTQUERY: // 0x0d,
+                ReceivedHostQuery(contents, pMessage);
+                break;
+            case NETMSGID_HOSTREPLY: // 0x0e,
+                ReceivedHostReply(contents);
+                break;
+            case NETMSGID_MECHANICS: // 0x0f,
+                ReceivedMechanics(contents);
+                break;
+            case NETMSGID_NONCAR_INFO: // 0x10,
+                ReceivedNonCar(contents);
+                break;
+            case NETMSGID_TIMESYNC: // 0x11,
+                ReceivedTimeSync(contents, pMessage, pReceive_time);
+                break;
+            case NETMSGID_CONFIRM: // 0x12,
+                ReceivedConfirm(contents);
+                break;
+            case NETMSGID_DISABLECAR: // 0x13,
+                ReceivedDisableCar(contents);
+                break;
+            case NETMSGID_ENABLECAR: // 0x14,
+                ReceivedEnableCar(contents);
+                break;
+            case NETMSGID_POWERUP: // 0x15,
+                ReceivedPowerup(contents);
+                break;
+            case NETMSGID_RECOVER: // 0x16,
+                ReceivedRecover(contents);
+                break;
+            case NETMSGID_SCORES: // 0x17,
+                ReceivedScores(contents);
+                break;
+            case NETMSGID_WASTED: // 0x18,
+                ReceivedWasted(contents);
+                break;
+            case NETMSGID_PEDESTRIAN: // 0x19,
+                ReceivedPedestrian(contents, pMessage, pReceive_time);
+                break;
+            case NETMSGID_GAMEPLAY: // 0x1a,
+                ReceivedGameplay(contents, pMessage, pReceive_time);
+                break;
+            case NETMSGID_NONCARPOSITION: // 0x1b,
+                ReceivedNonCarPosition(contents);
+                break;
+            case NETMSGID_COPINFO: // 0x1c,
+                ReceivedCopInfo(contents);
+                break;
+            case NETMSGID_GAMESCORES: // 0x1d,
+                ReceivedGameScores(contents);
+                break;
+            case NETMSGID_OILSPILL: // 0x1e,
+                ReceivedOilSpill(contents);
+                break;
+            case NETMSGID_CRUSHPOINT: // 0x1f,
+                RecievedCrushPoint(contents);
+                break;
             }
-            contents = (tNet_contents*)((tU8*)contents + contents->header.contents_size);
         }
+        contents = (tNet_contents*)((tU8*)contents + contents->header.contents_size);
     }
 }
 
@@ -1796,13 +1798,13 @@ int NetGuaranteedSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* 
     int i;
     LOG_TRACE("(%p, %p, %d, %p)", pDetails, pMessage, pPlayer, pNotifyFail);
 
-    for (i = 0;; i++) {
-        if (i >= gNumber_of_net_players) {
-            return -1;
-        }
+    for (i = 0; i <= gNumber_of_net_players; i++) {
         if (pPlayer == gNet_players[i].ID) {
             break;
         }
+    }
+    if (i == gNumber_of_net_players) {
+        return -1;
     }
     if (gLocal_net_ID != pPlayer) {
         return NetGuaranteedSendMessageToAddress(pDetails, pMessage, &gNet_players[i].pd_net_info, pNotifyFail);

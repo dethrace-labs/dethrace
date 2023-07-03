@@ -40,7 +40,7 @@ tParts_category gPart_category;
 tU32 gNet_synch_start;
 tNet_game_details* gChoose_car_net_game;
 int gPart_index;
-int gChallenger_index__racestrt; // suffix added to avoid duplicate symbol
+int gChallenger_index__racestrt;                 // suffix added to avoid duplicate symbol
 tGrid_draw gDraw_grid_status;
 tNet_sequence_type gNet_race_sequence__racestrt; // suffix added to avoid duplicate symbol
 br_pixelmap* gTaken_image;
@@ -2505,10 +2505,10 @@ void CheckPlayersAreResponding(void) {
             gNet_players[i].player_status = ePlayer_status_not_responding;
         }
     }
-    if (gNet_mode == eNet_mode_client && gAsk_time == 0) {
+    if (gNet_mode == eNet_mode_client && gLast_host_query == 0) {
         message = NetBuildMessage(NETMSGID_HOSTQUERY, 0);
         NetGuaranteedSendMessageToHost(gCurrent_net_game, message, NULL);
-        gAsk_time = time;
+        gLast_host_query = time;
     }
 }
 
@@ -2568,10 +2568,10 @@ void NetSynchStartDraw(int pCurrent_choice, int pCurrent_mode) {
             gCurrent_graf_data->net_head_icon_height);
         TurnOnPaletteConversion();
         DrawAnItem__racestrt(
-                gCurrent_graf_data->start_synch_x_1,
-                i,
-                (gNet_players[i].player_status == ePlayer_status_ready) ? 66 : 4,
-                s);
+            gCurrent_graf_data->start_synch_x_1,
+            i,
+            (gNet_players[i].player_status == ePlayer_status_ready) ? 66 : 4,
+            s);
         DrawAnItem__racestrt(gCurrent_graf_data->start_synch_x_2,
             i,
             (gNet_players[i].player_status == ePlayer_status_ready) ? 83 : ((gNet_players[i].player_status == ePlayer_status_not_responding) ? 247 : 4),
@@ -2646,31 +2646,71 @@ int ExitWhenReady(int* pCurrent_choice, int* pCurrent_mode) {
 tSO_result NetSynchRaceStart2(tNet_synch_mode pMode) {
     static tFlicette flicker_on_hf[2] = {
         { 321, { 219, 112 }, { 172, 362 } },
-        { 321, {  39, 480 }, { 172, 379 } },
+        { 321, { 39, 480 }, { 172, 379 } },
     };
     static tFlicette flicker_off_hf[2] = {
         { 322, { 219, 112 }, { 172, 362 } },
-        { 322, {  39, 480 }, { 172, 379 } },
+        { 322, { 39, 480 }, { 172, 379 } },
     };
     static tFlicette push_hf[2] = {
         { 206, { 219, 112 }, { 172, 362 } },
-        { 205, {  39, 480 }, { 172, 379 } },
+        { 205, { 39, 480 }, { 172, 379 } },
     };
     static tMouse_area mouse_areas_hf[2] = {
-        { { 219, 480 }, { 172, 379 }, { 282, 182 }, { 192, 427 },   0,   0,   0, NULL },
-        { {  39, 112 }, { 172, 362 }, { 102, 182 }, { 192, 379 },   1,   0,   0, NULL },
+        { { 219, 480 }, { 172, 379 }, { 282, 182 }, { 192, 427 }, 0, 0, 0, NULL },
+        { { 39, 112 }, { 172, 362 }, { 102, 182 }, { 192, 379 }, 1, 0, 0, NULL },
     };
     static tInterface_spec interface_spec_hf = {
-        0, 203, 0, 0, 0, 0, 8,
-        { -1,  0}, {  1,  0}, {  0,  0}, {  1,  0}, { NULL, NULL},
-        { -1,  0}, {  1,  0}, {  0,  0}, {  1,  0}, { NULL, NULL},
-        { -1,  0}, {  1,  0}, {  0,  0}, {  1,  0}, { NULL, NULL},
-        { -1,  0}, {  1,  0}, {  0,  0}, {  1,  0}, { NULL, NULL},
-        { 1, 1}, { NetSynchStartGoAhead, NetSynchStartGoAhead}, { 1, 1}, { NULL, NULL},
-        ExitWhenReady, NetSynchStartDraw, 0, NULL, NetSynchStartStart, NetSynchStartDone, 0, { 0, 0},
-        NULL, -1, 1,
-        COUNT_OF(flicker_on_hf), flicker_on_hf, flicker_off_hf, push_hf,
-        COUNT_OF(mouse_areas_hf), mouse_areas_hf, 0, NULL,
+        0,
+        203,
+        0,
+        0,
+        0,
+        0,
+        8,
+        { -1, 0 },
+        { 1, 0 },
+        { 0, 0 },
+        { 1, 0 },
+        { NULL, NULL },
+        { -1, 0 },
+        { 1, 0 },
+        { 0, 0 },
+        { 1, 0 },
+        { NULL, NULL },
+        { -1, 0 },
+        { 1, 0 },
+        { 0, 0 },
+        { 1, 0 },
+        { NULL, NULL },
+        { -1, 0 },
+        { 1, 0 },
+        { 0, 0 },
+        { 1, 0 },
+        { NULL, NULL },
+        { 1, 1 },
+        { NetSynchStartGoAhead, NetSynchStartGoAhead },
+        { 1, 1 },
+        { NULL, NULL },
+        ExitWhenReady,
+        NetSynchStartDraw,
+        0,
+        NULL,
+        NetSynchStartStart,
+        NetSynchStartDone,
+        0,
+        { 0, 0 },
+        NULL,
+        -1,
+        1,
+        COUNT_OF(flicker_on_hf),
+        flicker_on_hf,
+        flicker_off_hf,
+        push_hf,
+        COUNT_OF(mouse_areas_hf),
+        mouse_areas_hf,
+        0,
+        NULL,
     };
     static tFlicette flicker_on_hs[1] = {
         { 321, { 219, 112 }, { 172, 362 } },
@@ -2682,16 +2722,16 @@ tSO_result NetSynchRaceStart2(tNet_synch_mode pMode) {
         { 206, { 219, 112 }, { 172, 362 } },
     };
     static tMouse_area mouse_areas_hs[1] = {
-        { { 219, 480 }, { 172, 379 }, { 282, 182 }, { 192, 427 },   0,   0,   0, NULL },
+        { { 219, 480 }, { 172, 379 }, { 282, 182 }, { 192, 427 }, 0, 0, 0, NULL },
     };
     static tInterface_spec interface_spec_hs = {
         0, 209, 0, 0, 0, 0, 8,
-        { -1,  0}, {  1,  0}, {  0,  0}, {  1,  0}, { NULL, NULL},
-        { -1,  0}, {  1,  0}, {  0,  0}, {  1,  0}, { NULL, NULL},
-        { -1,  0}, {  1,  0}, {  0,  0}, {  1,  0}, { NULL, NULL},
-        { -1,  0}, {  1,  0}, {  0,  0}, {  1,  0}, { NULL, NULL},
-        { 1, 1}, { NetSynchStartGoAhead, NetSynchStartGoAhead}, { 1, 1}, { NULL, NULL},
-        ExitWhenReady, NetSynchStartDraw, 0, NULL, NetSynchStartStart, NetSynchStartDone, 0, { 0, 0},
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { 1, 1 }, { NetSynchStartGoAhead, NetSynchStartGoAhead }, { 1, 1 }, { NULL, NULL },
+        ExitWhenReady, NetSynchStartDraw, 0, NULL, NetSynchStartStart, NetSynchStartDone, 0, { 0, 0 },
         NULL, -1, 1,
         COUNT_OF(flicker_on_hs), flicker_on_hs, flicker_off_hs, push_hs,
         COUNT_OF(mouse_areas_hs), mouse_areas_hs, 0, NULL
@@ -2706,16 +2746,16 @@ tSO_result NetSynchRaceStart2(tNet_synch_mode pMode) {
         { 207, { 219, 112 }, { 172, 362 } },
     };
     static tMouse_area mouse_areas_c[1] = {
-        { { 219, 112 }, { 172, 362 }, { 282, 182 }, { 192, 379 },   0,   0,   0, NULL },
+        { { 219, 112 }, { 172, 362 }, { 282, 182 }, { 192, 379 }, 0, 0, 0, NULL },
     };
     static tInterface_spec interface_spec_c = {
-        0, 204, 0,0,0,0,8,
-        { -1,  0}, {  1,  0}, {  0,  0}, {  1,  0}, { NULL, NULL},
-        { -1,  0}, {  1,  0}, {  0,  0}, {  1,  0}, { NULL, NULL},
-        { -1,  0}, {  1,  0}, {  0,  0}, {  1,  0}, { NULL, NULL},
-        { -1,  0}, {  1,  0}, {  0,  0}, {  1,  0}, { NULL, NULL},
-        { 1, 1}, { NetSynchStartGoAhead, NetSynchStartGoAhead}, { 1, 1}, { NULL, NULL},
-        ExitWhenReady, NetSynchStartDraw, 0, NULL, NetSynchStartStart, NetSynchStartDone, 0, { 0, 0},
+        0, 204, 0, 0, 0, 0, 8,
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { 1, 1 }, { NetSynchStartGoAhead, NetSynchStartGoAhead }, { 1, 1 }, { NULL, NULL },
+        ExitWhenReady, NetSynchStartDraw, 0, NULL, NetSynchStartStart, NetSynchStartDone, 0, { 0, 0 },
         NULL, -1, 1,
         COUNT_OF(flicker_on_c), flicker_on_c, flicker_off_c, push_c,
         COUNT_OF(mouse_areas_c), mouse_areas_c, 0, NULL
@@ -2746,7 +2786,7 @@ tSO_result NetSynchRaceStart2(tNet_synch_mode pMode) {
     }
     TurnOffPaletteConversion();
     FadePaletteDown();
-    if (result > -2  && result < 1) {
+    if (result > -2 && result < 1) {
         NetLeaveGame(gCurrent_net_game);
     }
     return eSO_continue;

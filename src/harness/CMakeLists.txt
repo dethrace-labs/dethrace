@@ -29,8 +29,8 @@ endif()
 if(NOT MSVC)
     target_compile_options(harness PRIVATE
         -Wall
+        -Wextra
         -Wno-unused-parameter
-        -Wno-unused-function
     )
     add_compile_flags_if_supported(harness
         -Wstrict-prototypes
@@ -67,7 +67,6 @@ target_sources(harness PRIVATE
     win95/winsock.c
     platforms/null.c
     platforms/null.h
-    
 
     "${CMAKE_CURRENT_BINARY_DIR}/version.h"
 )

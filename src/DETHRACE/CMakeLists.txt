@@ -10,8 +10,8 @@ target_include_directories(dethrace_obj
         pd
 )
 
-add_compile_options(-fsanitize=address)
-add_link_options(-fsanitize=address)
+# add_compile_options(-fsanitize=address)
+# add_link_options(-fsanitize=address)
 
 target_link_libraries(dethrace_obj PUBLIC SDL2::SDL2 smackw32 harness brender s3)
 
@@ -163,6 +163,7 @@ target_sources(dethrace_obj PRIVATE
     pc-win95/win95sys.c
     pc-win95/dinput.h
     pc-win95/ssdx.c
+    pc-win95/ssdx.h
     pc-win95/win95net.c
     pc-dos/dosnet.c
     pc-dos/dossys.c

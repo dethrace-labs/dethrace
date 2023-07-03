@@ -45,6 +45,7 @@ void QuitGame(void) {
     StopMusic();
     PDShutdownSystem();
     CloseDiagnostics();
+    exit(0);
 }
 
 // IDA: tU32 __cdecl TrackCount(br_actor *pActor, tU32 *pCount)
