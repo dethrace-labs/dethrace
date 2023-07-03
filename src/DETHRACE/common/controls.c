@@ -2524,7 +2524,7 @@ void InitAbuseomatic(void) {
             s[len - 1] = '\0';
             len--;
         }
-        gAbuse_text[i] = BrMemAllocate(strlen(s), kMem_abuse_text);
+        gAbuse_text[i] = BrMemAllocate(strlen(s) + 1, kMem_abuse_text);
         strcpy(gAbuse_text[i], s);
     }
     fclose(f);

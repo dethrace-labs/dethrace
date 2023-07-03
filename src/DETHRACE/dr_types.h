@@ -4,6 +4,7 @@
 #include "brender/br_types.h"
 #include "constants.h"
 #include "macros.h"
+
 #include "s3/s3.h"
 #include <assert.h>
 #include <stdarg.h>
@@ -11,53 +12,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-// #ifdef _WIN32
-// #include <windows.h>
-// #else
-// typedef short short;
-// typedef unsigned short unsigned short;
-// typedef int INT;
-// typedef int BOOL;
-// typedef unsigned int UINT;
-// typedef unsigned char unsigned char;
-// typedef unsigned short WORD;
-// typedef long long;
-// typedef unsigned long unsigned long;
-// typedef unsigned char* Punsigned char;
-// typedef char* char*;
-// typedef WORD* PWORD;
-// typedef unsigned short* Pshort;
-// typedef long* Plong;
-// typedef void* PVOID;
-// typedef unsigned char* LPunsigned char;
-// typedef unsigned char* Lchar*;
-// typedef WORD* LPWORD;
-// typedef long* LPlong;
-// typedef void* LPVOID;
-// typedef unsigned char* HPunsigned char;
-// typedef unsigned char* Hchar*;
-// typedef long* HPlong;
-// typedef void* HPVOID;
-// #endif
-typedef unsigned int W32;
-typedef unsigned short W16;
-typedef W32* LPW32;
-typedef struct _tagRMI_REGS _RMI_REGS;
-typedef struct _tagBREGS _HMI_BREGS;
-typedef struct _tagWREGS _HMI_WREGS;
-typedef struct _tagDREGS _HMI_DREGS;
-typedef struct _tagSREGS _HMI_SREGS;
-typedef struct _tagIPX_HEADER _IPX_HEADER;
-typedef struct _tagIPX_ECB _IPX_ECB;
-typedef struct _tagIPX_INTERNET_ADDR _IPX_INTERNET_ADDR;
-typedef struct _tagIPX_NETWORK_ADDR _IPX_NETWORK_ADDR;
-typedef struct _tagIPX_LOCAL_TARGET _IPX_LOCAL_TARGET;
-typedef struct _tagIPX_ELEMENT _IPX_ELEMENT;
-typedef struct _tag_NETBIOS_NCB _NETBIOS_NCB;
-typedef struct _tagNETBIOS_ADAPTER_STATUS _NETBIOS_ADAPTER_STATUS;
-typedef struct _tagNETBIOS_ELEMENT _NETBIOS_ELEMENT;
-typedef struct _tagNETBIOS_LOCAL_TARGET _NETBIOS_LOCAL_TARGET;
-typedef struct _tagXFER_BLOCK_HEADER _XFER_BLOCK_HEADER;
 typedef unsigned char tU8;
 typedef signed char tS8;
 typedef uint16_t tU16;
@@ -75,6 +29,10 @@ typedef struct tPath_section_struct tPath_section;
 typedef tU32 tPlayer_ID;
 typedef void tPipe_reset_proc(void);
 typedef struct tPowerup tPowerup;
+
+// FIXME? hardcoding pc-win95 here
+#include "pc-win95/win95net_types.h"
+
 #ifdef DETHRACE_FIX_BUGS
 typedef int tGot_proc(tPowerup*, tCar_spec*);
 typedef void tLose_proc(tPowerup*, tCar_spec*);
@@ -439,8 +397,6 @@ typedef enum tSmear_type {
     eSmear_blood = 1,
     eSmear_count = 2
 } tSmear_type;
-typedef struct ot_vertex ot_vertex;
-typedef void zs_order_table_traversal_cbfn(int, ot_vertex*, ot_vertex*, ot_vertex*);
 
 // Make gcc happy
 typedef struct exception_ {
@@ -450,257 +406,6 @@ typedef struct exception_ {
     double arg2;
     double retval;
 } exception_;
-
-typedef struct ot_vertex {
-    br_scalar screenX;
-    br_scalar screenY;
-    br_scalar distanceZ;
-} ot_vertex;
-
-typedef struct _tagRMI_REGS {
-    long EDI;
-    long ESI;
-    long EBP;
-    long reserved_by_system;
-    long EBX;
-    long EDX;
-    long ECX;
-    long EAX;
-    short flags;
-    short ES;
-    short DS;
-    short FS;
-    short GS;
-    short IP;
-    short CS;
-    short SP;
-    short SS;
-} _RMI_REGS;
-
-typedef struct _tagBREGS {
-    char al;
-    char ah;
-    unsigned short _1;
-    char bl;
-    char bh;
-    unsigned short _2;
-    char cl;
-    char ch;
-    unsigned short _3;
-    char dl;
-    char dh;
-    unsigned short _4;
-} _HMI_BREGS;
-
-typedef struct _tagWREGS {
-    unsigned short ax;
-    unsigned short _1;
-    unsigned short bx;
-    unsigned short _2;
-    unsigned short cx;
-    unsigned short _3;
-    unsigned short dx;
-    unsigned short _4;
-    unsigned short si;
-    unsigned short _5;
-    unsigned short di;
-    unsigned short _6;
-} _HMI_WREGS;
-
-typedef struct _tagDREGS {
-    unsigned int eax;
-    unsigned int ebx;
-    unsigned int ecx;
-    unsigned int edx;
-    unsigned int esi;
-    unsigned int edi;
-    unsigned int cflags;
-} _HMI_DREGS;
-
-typedef struct _tagSREGS {
-    unsigned short es;
-    unsigned short cs;
-    unsigned short ss;
-    unsigned short ds;
-    unsigned short fs;
-    unsigned short gs;
-} _HMI_SREGS;
-
-typedef struct _HMI_REGS {
-    _HMI_DREGS x;
-    _HMI_WREGS w;
-    _HMI_BREGS h;
-} _HMI_REGS;
-
-typedef struct _tagIPX_HEADER {
-    unsigned short wChecksum;
-    unsigned short wLength;
-    unsigned char bTransportControl;
-    unsigned char bPacketType;
-    unsigned char bDestNetworkNumber[4];
-    unsigned char bDestNetworkNode[6];
-    unsigned short wDestNetworkSocket;
-    unsigned char bSourceNetworkNumber[4];
-    unsigned char bSourceNetworkNode[6];
-    unsigned short wSourceNetworkSocket;
-} _IPX_HEADER;
-
-typedef struct _PACKET {
-    char* pData;
-    unsigned short wLength;
-} _PACKET;
-
-typedef struct _REAL_PACKET {
-    short wOffset;
-    short wSegment;
-    unsigned short wLength;
-} _REAL_PACKET;
-
-typedef struct _ECB_PACKET {
-    _PACKET sPacket;
-    _REAL_PACKET sRealPacket;
-} _ECB_PACKET;
-
-typedef struct _tagIPX_ECB {
-    char* pLinkAddress;
-    char* pESRRoutine;
-    unsigned char bInUse;
-    unsigned char bCompletionCode;
-    unsigned short wSocket;
-    unsigned short wConnectionID;
-    unsigned short wWorkSpace;
-    unsigned char bDriverWorkSpace[12];
-    unsigned char bImmediateAddress[6];
-    unsigned short wPacketCount;
-    _ECB_PACKET sPacket[2];
-} _IPX_ECB;
-
-typedef struct _tagIPX_INTERNET_ADDR {
-    unsigned char bNetwork[4];
-    unsigned char bNode[6];
-} _IPX_INTERNET_ADDR;
-
-typedef struct _tagIPX_NETWORK_ADDR {
-    _IPX_INTERNET_ADDR sInternetAddr;
-    unsigned char bSocket[2];
-} _IPX_NETWORK_ADDR;
-
-typedef struct _tagIPX_LOCAL_TARGET {
-    _IPX_INTERNET_ADDR sInternetAddr;
-    unsigned char bImmediate[6];
-} _IPX_LOCAL_TARGET;
-
-typedef struct _tagIPX_ELEMENT {
-    unsigned short wFlags;
-    unsigned short wOffset;
-    _IPX_HEADER sHeader;
-    _IPX_ECB sECB;
-    _IPX_ECB* pECB;
-    _IPX_HEADER* pIPXHeader;
-    char* pHeader;
-    unsigned short wHSize;
-} _IPX_ELEMENT;
-
-typedef struct _PROT_PTR {
-    char* pData;
-} _PROT_PTR;
-
-typedef struct _REAL_PTR {
-    short wOffset;
-    short wSegment;
-} _REAL_PTR;
-
-typedef struct _PTR {
-    _PROT_PTR sPointer;
-    _REAL_PTR sRealPtr;
-} _PTR;
-
-typedef struct _tag_NETBIOS_NCB {
-    unsigned char bCommand;
-    unsigned char bReturnCode;
-    unsigned char bLocalSession;
-    unsigned char bNetworkNameNumber;
-    _PTR sPtr;
-    unsigned short wLength;
-    unsigned char bCallName[16];
-    unsigned char bName[16];
-    unsigned char bReceiveTimeOut;
-    unsigned char bSendTimeOut;
-    char* pPostFunction;
-    unsigned char bAdapter;
-    unsigned char bCompletionCode;
-    unsigned char bReserve[14];
-} _NETBIOS_NCB;
-
-typedef struct _tagNETBIOS_ADAPTER_STATUS {
-    unsigned char bCardID[6];
-    unsigned char bReleaseLevel;
-    unsigned char bReserved1;
-    unsigned char bTypeOfAdapter;
-    unsigned char bOldOrNewParameters;
-    unsigned short wReportingPeriodMinutes;
-    unsigned short wFrameRejectReceivedCount;
-    unsigned short wFrameRejectSentCount;
-    unsigned short wReceivedDataFrameErrors;
-    unsigned short wUnsuccessfulTransmissions;
-    long dwGoodTransmissions;
-    long dwGoodReceptions;
-    unsigned short wRetransmissions;
-    unsigned short wExhaustedResourceCount;
-    unsigned short wT1TimerExpiredCount;
-    unsigned short wTITimerExpiredCount;
-    unsigned char bReserved2[4];
-    unsigned short wAvailableNCBS;
-    unsigned short wMaxNCBSConfigured;
-    unsigned short wMaxNCBSPossible;
-    unsigned short wBufferOrStationBusyCount;
-    unsigned short wMaxDatagramSize;
-    unsigned short wPendingSessions;
-    unsigned short wMaxSessionsConfigured;
-    unsigned short wMaxSessionsPossible;
-    unsigned short wMaxFrameSize;
-    unsigned short wNameCount;
-    struct {
-        unsigned char bName[16];
-        unsigned char bNameNumber;
-        unsigned char bNameStatus;
-    } sNameTable[20];
-} _NETBIOS_ADAPTER_STATUS;
-
-typedef struct _tagNETBIOS_ELEMENT {
-    unsigned short wFlags;
-    unsigned short wOffset;
-    _NETBIOS_NCB sNCB;
-    _NETBIOS_NCB* pNCB;
-    char* pHeader;
-    unsigned short wHSize;
-} _NETBIOS_ELEMENT;
-
-typedef struct _tagNETBIOS_LOCAL_TARGET {
-    unsigned char bNode[16];
-} _NETBIOS_LOCAL_TARGET;
-
-typedef struct _tagXFER_BLOCK_HEADER {
-    W32 wSequence;
-    W32 wType;
-    W32 wID;
-    W32 wLength;
-    W32 wNode;
-    W32 wUser1;
-} _XFER_BLOCK_HEADER;
-
-typedef struct _NETNOW_NODE_ADDR {
-    _IPX_LOCAL_TARGET sIPX;
-    _NETBIOS_LOCAL_TARGET sNETBIOS;
-} _NETNOW_NODE_ADDR;
-
-typedef struct tPD_net_player_info {
-#if 0
-    _IPX_LOCAL_TARGET addr_ipx;
-#else
-    char pd_addr[8];
-#endif
-} tPD_net_player_info;
 
 typedef struct tTrack_spec {
     tU8 ncolumns_x;
@@ -1328,65 +1033,65 @@ typedef struct tFace_ref {
     br_scalar d;
 } tFace_ref;
 
-typedef struct tNet_game_player_info {
-    tPD_net_player_info pd_net_info;
-    tU32 this_players_time_stamp;
-    tU32 last_heard_from_him;
-    tU32 reposition_time;
-    tU32 last_waste_message;
-    int host;
-    tPlayer_ID ID;
-    char player_name[32];
-    tPlayer_status player_status;
-    int car_index;
-    int grid_index;
-    int grid_position_set;
-    int opponent_list_index;
-    int awaiting_confirmation;
-    int score;
-    int credits;
-    int wasted;
-    int wasteage_attributed;
-    int name_not_clipped;
-    int race_stuff_initialised;
-    int played;
-    int won;
-    int next_car_index;
-    int games_score;
-    int last_score_index;
-    br_matrix34 initial_position;
-    tCar_spec* car;
+typedef struct tNet_game_player_info { // size: 0xc0
+    tPD_net_player_info pd_net_info;   // @0x0
+    tU32 this_players_time_stamp;      // @0x10
+    tU32 last_heard_from_him;          // @0x14
+    tU32 reposition_time;              // @0x18
+    tU32 last_waste_message;           // @0x1c
+    int host;                          // @0x20
+    tPlayer_ID ID;                     // @0x24
+    char player_name[32];              // @0x28
+    tPlayer_status player_status;      // @0x48
+    int car_index;                     // @0x4c
+    int grid_index;                    // @0x50
+    int grid_position_set;             // @0x54
+    int opponent_list_index;           // @0x58
+    int awaiting_confirmation;         // @0x5c
+    int score;                         // @0x60
+    int credits;                       // @0x64
+    int wasted;                        // @0x68
+    int wasteage_attributed;           // @0x6c
+    int name_not_clipped;              // @0x70
+    int race_stuff_initialised;        // @0x74
+    int played;                        // @0x78
+    int won;                           // @0x7c
+    int next_car_index;                // @0x80
+    int games_score;                   // @0x84
+    int last_score_index;              // @0x88
+    br_matrix34 initial_position;      // @0x8c
+    tCar_spec* car;                    // @0xbc
 } tNet_game_player_info;
 
-typedef struct tNet_game_options {
-    int show_players_on_map;
-    int show_peds_on_map;
-    int enable_text_messages;
-    int show_powerups_on_map;
-    int powerup_respawn;
-    int open_game;
-    int starting_money_index;
-    int grid_start;
-    int race_end_target;
-    int random_car_choice;
-    tNet_sequence_type race_sequence_type;
-    tCar_choice car_choice;
+typedef struct tNet_game_options {         // size: 0x30
+    int show_players_on_map;               // @0x0
+    int show_peds_on_map;                  // @0x4
+    int enable_text_messages;              // @0x8
+    int show_powerups_on_map;              // @0xc
+    int powerup_respawn;                   // @0x10
+    int open_game;                         // @0x14
+    int starting_money_index;              // @0x18
+    int grid_start;                        // @0x1c
+    int race_end_target;                   // @0x20
+    int random_car_choice;                 // @0x24
+    tNet_sequence_type race_sequence_type; // @0x28
+    tCar_choice car_choice;                // @0x2c
 } tNet_game_options;
 
-typedef struct tNet_game_status {
-    tNet_game_stage stage;
+typedef struct tNet_game_status { // size: 0x4
+    tNet_game_stage stage;        // @0x0
 } tNet_game_status;
 
-typedef struct tNet_game_details {
-    tPD_net_player_info pd_net_info;
-    char host_name[32];
-    tPlayer_ID host_ID;
-    int num_players;
-    int start_race;
-    int no_races_yet;
-    tNet_game_status status;
-    tNet_game_options options;
-    tNet_game_type type;
+typedef struct tNet_game_details {   // size: 0x78
+    tPD_net_player_info pd_net_info; // @0x0
+    char host_name[32];              // @0x10
+    tPlayer_ID host_ID;              // @0x30
+    int num_players;                 // @0x34
+    int start_race;                  // @0x38
+    int no_races_yet;                // @0x3c
+    tNet_game_status status;         // @0x40
+    tNet_game_options options;       // @0x44
+    tNet_game_type type;             // @0x74
 } tNet_game_details;
 
 typedef struct tNet_message_send_me_details {
@@ -1676,16 +1381,16 @@ typedef union tNet_contents {                           // size: 0x160
     } data;                                             // @0x0
 } tNet_contents;
 
-typedef struct tNet_message {
-    tU32 pd_stuff_so_DO_NOT_USE;
-    tU32 magic_number;
-    tU32 guarantee_number;
-    tPlayer_ID sender;
-    int version;
-    tU32 senders_time_stamp;
-    tU16 num_contents;
-    tU16 overall_size;
-    tNet_contents contents;
+typedef struct tNet_message {    // size: 0x17c
+    tU32 pd_stuff_so_DO_NOT_USE; // @0x0
+    tU32 magic_number;           // @0x4
+    tU32 guarantee_number;       // @0x8
+    tPlayer_ID sender;           // @0xc
+    int version;                 // @0x10
+    tU32 senders_time_stamp;     // @0x14
+    tU16 num_contents;           // @0x18
+    tU16 overall_size;           // @0x1a
+    tNet_contents contents;      // @0x1c
 } tNet_message;
 
 typedef struct tCar_detail_info {
@@ -2660,8 +2365,8 @@ typedef struct tPipe_skid_adjustment {
     int material_index;
 } tPipe_skid_adjustment;
 
-typedef struct tPipe_chunk {                                 // size: 0x58
-    tChunk_subject_index subject_index;                      // @0x0
+typedef struct tPipe_chunk {            // size: 0x58
+    tChunk_subject_index subject_index; // @0x0
 #if defined(DETHRACE_REPLAY_DEBUG)
     int chunk_magic1;
 #endif
@@ -2755,205 +2460,6 @@ typedef struct tCheat {
     void (*action_proc)(int);
     int num;
 } tCheat;
-
-typedef struct _tag_sos_evds_struct _SOS_EVDS_STRUCT;
-typedef struct _tag_sos_vds_struct _SOS_VDS_STRUCT;
-typedef struct _tag_sos_sample _SOS_SAMPLE;
-typedef _SOS_SAMPLE* PSOSSAMPLE;
-typedef struct _tagCAPABILITIES _SOS_CAPABILITIES;
-typedef _SOS_CAPABILITIES* PSOSCAPABILITIES;
-typedef struct _SOS_HARDWARE* PSOSHARDWARE;
-typedef struct _tag_sos_driver _SOS_DIGI_DRIVER;
-typedef _SOS_DIGI_DRIVER* PSOSDIGIDRIVER;
-typedef struct _SOS_DRV_FILEHEADER* PSOSDRVFILEHEADER;
-typedef struct _SOS_DRV_DRIVERHEADER* PSOSDRVDRIVERHEADER;
-typedef struct _tag_sos_system _SOS_SYSTEM;
-typedef _SOS_SYSTEM* PSOSSYSTEM;
-typedef struct _tag_sos_det_system _SOS_DET_SYSTEM;
-typedef _SOS_DET_SYSTEM* PSOSDETSYSTEM;
-typedef struct _tag_sos_timer_system _SOS_TIMER_SYSTEM;
-typedef _SOS_TIMER_SYSTEM* PSOSTIMERSYSTEM;
-typedef struct SmackTag Smack;
-typedef struct SmackSumTag SmackSum;
-typedef void* SmackTimerSetupType(void);
-typedef unsigned long* SmackTimerReadType(void);
-typedef void* SmackTimerDoneType(void);
-typedef struct _heapinfo _HEAPINFO;
-typedef struct _tag_sos_evds_struct {
-    unsigned int region_size;
-    unsigned int offset;
-    unsigned int segment;
-    unsigned short number_available;
-    unsigned short number_used;
-    unsigned int page0;
-} _SOS_EVDS_STRUCT;
-
-typedef struct _tag_sos_vds_struct {
-    unsigned int region_size;
-    unsigned int offset;
-    unsigned short segment;
-    unsigned short ID;
-    unsigned int physical;
-} _SOS_VDS_STRUCT;
-
-typedef struct _tag_sos_sample {
-    char* pSample;
-    char* pSampleCurrent;
-    char* pSampleLoop;
-    unsigned long wLength;
-    unsigned long wLoopLength;
-    unsigned long wLoopEndLength;
-    unsigned long wLoopStage;
-    unsigned long wID;
-    unsigned long wFlags;
-    unsigned long wPriority;
-    unsigned long hSample;
-    unsigned long wVolume;
-    unsigned long wLoopCount;
-    unsigned long wRate;
-    unsigned long wBitsPerSample;
-    unsigned long wChannels;
-    unsigned long wFormat;
-    unsigned long wPanPosition;
-    unsigned long wPanSpeed;
-    unsigned long wPanStart;
-    unsigned long wPanEnd;
-    unsigned long wPanMode;
-    unsigned long wTotalBytesProcessed;
-    void (*pfnSampleProcessed)(PSOSSAMPLE*);
-    void (*pfnSampleDone)(PSOSSAMPLE*);
-    void (*pfnSampleLoop)(PSOSSAMPLE*);
-    unsigned long wSystem[16];
-    unsigned long wUser[16];
-    PSOSSAMPLE* pLink;
-    PSOSSAMPLE* pNext;
-} _SOS_SAMPLE;
-
-typedef struct _tagCAPABILITIES {
-    unsigned char szDeviceName[32];
-    W32 wDeviceVersion;
-    W32 wBitsPerSample;
-    W32 wChannels;
-    W32 wMinRate;
-    W32 wMaxRate;
-    W32 wMixerOnBoard;
-    W32 wMixerFlags;
-    W32 wFlags;
-    short* lpPortList;
-    short* lpDMAList;
-    short* lpIRQList;
-    short* lpRateList;
-    W32 fBackground;
-    W32 wID;
-    W32 wTimerID;
-} _SOS_CAPABILITIES;
-
-typedef struct _SOS_HARDWARE {
-    W32 wPort;
-    W32 wIRQ;
-    W32 wDMA;
-    W32 wParam;
-} _SOS_HARDWARE;
-
-typedef struct _tag_sos_driver {
-    W32 wFlags;
-    unsigned long wDriverRate;
-    unsigned long wDriverChannels;
-    unsigned long wDriverBitsPerSample;
-    unsigned long wDriverFormat;
-    unsigned long wMixerChannels;
-    unsigned long wDMACountRegister;
-    unsigned long wDMAPosition;
-    unsigned long wDMALastPosition;
-    unsigned long wDMADistance;
-    char* pXFERPosition;
-    unsigned long wXFERJumpAhead;
-    _SOS_SAMPLE* pSampleList;
-    void (*pfnPseudoDMAFunction)(void);
-    char* pDMABuffer;
-    char* pDMABufferEnd;
-    unsigned long wDMABufferSize;
-    char* pMixingBuffer;
-    char* pMixingBufferEnd;
-    unsigned long wMixingBufferSize;
-    unsigned long wActiveChannels;
-    _SOS_SAMPLE* pSamples;
-    _SOS_HARDWARE sHardware;
-    _SOS_CAPABILITIES sCaps;
-    char* lpDriverDS;
-    char* lpDriverCS;
-    W32 wSize;
-    unsigned long dwLinear;
-    unsigned long dwDMAPhysical;
-    char* lpDMABuffer;
-    W32 hMemory;
-    W32 wDMARealSeg;
-    W32 wID;
-    void (*pfnMixFunction)(void);
-} _SOS_DIGI_DRIVER;
-
-typedef struct _SOS_DRV_FILEHEADER {
-    unsigned char szName[32];
-    W32 wDrivers;
-    W32 lOffset;
-    W32 lFileSize;
-} _SOS_DRV_FILEHEADER;
-
-typedef struct _SOS_DRV_DRIVERHEADER {
-    unsigned char szName[32];
-    W32 lNextDriver;
-    W32 wSize;
-    W32 wDeviceID;
-    W32 wExtenderType;
-} _SOS_DRV_DRIVERHEADER;
-
-typedef struct _tag_sos_system {
-    W32 wFlags;
-    unsigned char szDriverPath[128];
-    unsigned char szTempDriverPath[128];
-    PSOSDIGIDRIVER pDriver[5];
-    _SOS_VDS_STRUCT sVDS;
-    _SOS_DRV_FILEHEADER sFileHeader;
-    _SOS_DRV_DRIVERHEADER sDriverHeader;
-    char* (*pMemAllocFunction)(unsigned long);
-    void (*pMemFreeFunction)(char*, W32);
-} _SOS_SYSTEM;
-
-typedef struct _tag_sos_det_system {
-    W32 wFlags;
-    unsigned char szDriverPath[128];
-    unsigned char szTempDriverPath[128];
-    _SOS_DRV_FILEHEADER sFileHeader;
-    _SOS_DRV_DRIVERHEADER sDriverHeader;
-    _SOS_CAPABILITIES sCaps;
-    PSOSCAPABILITIES pCaps;
-    char* lpBufferDS;
-    char* lpBufferCS;
-    W32 hFile;
-    unsigned long dwDriverIndex;
-    W32 wDriverIndexCur;
-    W32 hMemory;
-    unsigned long dwLinear;
-} _SOS_DET_SYSTEM;
-
-typedef struct _tag_sos_timer_system {
-    W32 wFlags;
-    W32 wChipDivisor;
-    void (*pfnEvent[16])(void);
-    W32 wEventRate[16];
-    unsigned long dwAdditiveFraction[16];
-    unsigned long dwCurrentSummation[16];
-    W32 wMIDIEventSongHandle[16];
-    W32 wMIDIActiveSongHandle;
-} _SOS_TIMER_SYSTEM;
-
-#ifndef _WIN32
-typedef struct _heapinfo {
-    void* _pentry;
-    size_t _size;
-    int _useflag;
-} _HEAPINFO;
-#endif
 
 typedef enum tSpec_vol_depth_effect {
     eSpec_dep_acid = 0,
@@ -3237,26 +2743,29 @@ typedef struct tHeadup_pair {
 } tHeadup_pair;
 
 typedef struct tMax_message {
-    char buffer[516];
+    // char buffer[516];  // 512 + sizeof(void*)
+    char buffer[520];
 } tMax_message;
 
 typedef struct tMid_message {
-    char buffer[132];
+    // char buffer[132];  // 128 + sizeof(void*)
+    char buffer[136];
 } tMid_message;
 
 typedef struct tMin_message {
-    char buffer[36];
+    // char buffer[36];   // 32 + sizeof(void*)
+    char buffer[40];
 } tMin_message;
 
-typedef struct tGuaranteed_message {
-    tNet_message* message;
-    tU32 send_time;
-    tU32 next_resend_time;
-    tU32 resend_period;
-    int recieved;
-    tPD_net_player_info pd_address;
-    int (*NotifyFail)(tU32, tNet_message*);
-    tU32 guarantee_number;
+typedef struct tGuaranteed_message {        // size: 0x2c
+    tNet_message* message;                  // @0x0
+    tU32 send_time;                         // @0x4
+    tU32 next_resend_time;                  // @0x8
+    tU32 resend_period;                     // @0xc
+    int recieved;                           // @0x10
+    tPD_net_player_info pd_address;         // @0x14
+    int (*NotifyFail)(tU32, tNet_message*); // @0x24
+    tU32 guarantee_number;                  // @0x28
 } tGuaranteed_message;
 
 typedef enum tJoin_or_host_result {
@@ -3841,265 +3350,256 @@ typedef struct tGroovidelic_spec {             // size: 0x80
     } object_data;                             // @0x68
 } tGroovidelic_spec;
 
-typedef struct DWORDREGS {
-    unsigned int eax;
-    unsigned int ebx;
-    unsigned int ecx;
-    unsigned int edx;
-    unsigned int esi;
-    unsigned int edi;
-    unsigned int cflag;
-} DWORDREGS;
+// typedef struct DWORDREGS {
+//     unsigned int eax;
+//     unsigned int ebx;
+//     unsigned int ecx;
+//     unsigned int edx;
+//     unsigned int esi;
+//     unsigned int edi;
+//     unsigned int cflag;
+// } DWORDREGS;
 
-typedef struct WORDREGS {
-    unsigned short ax;
-    unsigned short _1;
-    unsigned short bx;
-    unsigned short _2;
-    unsigned short cx;
-    unsigned short _3;
-    unsigned short dx;
-    unsigned short _4;
-    unsigned short si;
-    unsigned short _5;
-    unsigned short di;
-    unsigned short _6;
-    unsigned int cflag;
-} WORDREGS;
+// typedef struct WORDREGS {
+//     unsigned short ax;
+//     unsigned short _1;
+//     unsigned short bx;
+//     unsigned short _2;
+//     unsigned short cx;
+//     unsigned short _3;
+//     unsigned short dx;
+//     unsigned short _4;
+//     unsigned short si;
+//     unsigned short _5;
+//     unsigned short di;
+//     unsigned short _6;
+//     unsigned int cflag;
+// } WORDREGS;
 
-typedef struct BYTEREGS {
-    unsigned char al;
-    unsigned char ah;
-    unsigned short _1;
-    unsigned char bl;
-    unsigned char bh;
-    unsigned short _2;
-    unsigned char cl;
-    unsigned char ch;
-    unsigned short _3;
-    unsigned char dl;
-    unsigned char dh;
-    unsigned short _4;
-} BYTEREGS;
+// typedef struct BYTEREGS {
+//     unsigned char al;
+//     unsigned char ah;
+//     unsigned short _1;
+//     unsigned char bl;
+//     unsigned char bh;
+//     unsigned short _2;
+//     unsigned char cl;
+//     unsigned char ch;
+//     unsigned short _3;
+//     unsigned char dl;
+//     unsigned char dh;
+//     unsigned short _4;
+// } BYTEREGS;
 
-typedef union REGS {
-    DWORDREGS x;
-    WORDREGS w;
-    BYTEREGS h;
-} REGS;
+// typedef union REGS {
+//     DWORDREGS x;
+//     WORDREGS w;
+//     BYTEREGS h;
+// } REGS;
 
-typedef struct SREGS {
-    unsigned short es;
-    unsigned short cs;
-    unsigned short ss;
-    unsigned short ds;
-    unsigned short fs;
-    unsigned short gs;
-} SREGS;
+// typedef struct SREGS {
+//     unsigned short es;
+//     unsigned short cs;
+//     unsigned short ss;
+//     unsigned short ds;
+//     unsigned short fs;
+//     unsigned short gs;
+// } SREGS;
 
-typedef struct REGPACKB {
-    unsigned char al;
-    unsigned char ah;
-    unsigned short _1;
-    unsigned char bl;
-    unsigned char bh;
-    unsigned short _2;
-    unsigned char cl;
-    unsigned char ch;
-    unsigned short _3;
-    unsigned char dl;
-    unsigned char dh;
-    unsigned short _4;
-} REGPACKB;
+// typedef struct REGPACKB {
+//     unsigned char al;
+//     unsigned char ah;
+//     unsigned short _1;
+//     unsigned char bl;
+//     unsigned char bh;
+//     unsigned short _2;
+//     unsigned char cl;
+//     unsigned char ch;
+//     unsigned short _3;
+//     unsigned char dl;
+//     unsigned char dh;
+//     unsigned short _4;
+// } REGPACKB;
 
-typedef struct REGPACKW {
-    unsigned short ax;
-    unsigned short _1;
-    unsigned short bx;
-    unsigned short _2;
-    unsigned short cx;
-    unsigned short _3;
-    unsigned short dx;
-    unsigned short _4;
-    unsigned short bp;
-    unsigned short _5;
-    unsigned short si;
-    unsigned short _6;
-    unsigned short di;
-    unsigned short _7;
-    unsigned short ds;
-    unsigned short es;
-    unsigned short fs;
-    unsigned short gs;
-    unsigned int flags;
-} REGPACKW;
+// typedef struct REGPACKW {
+//     unsigned short ax;
+//     unsigned short _1;
+//     unsigned short bx;
+//     unsigned short _2;
+//     unsigned short cx;
+//     unsigned short _3;
+//     unsigned short dx;
+//     unsigned short _4;
+//     unsigned short bp;
+//     unsigned short _5;
+//     unsigned short si;
+//     unsigned short _6;
+//     unsigned short di;
+//     unsigned short _7;
+//     unsigned short ds;
+//     unsigned short es;
+//     unsigned short fs;
+//     unsigned short gs;
+//     unsigned int flags;
+// } REGPACKW;
 
-typedef struct REGPACKX {
-    unsigned int eax;
-    unsigned int ebx;
-    unsigned int ecx;
-    unsigned int edx;
-    unsigned int ebp;
-    unsigned int esi;
-    unsigned int edi;
-    unsigned short ds;
-    unsigned short es;
-    unsigned short fs;
-    unsigned short gs;
-    unsigned int flags;
-} REGPACKX;
+// typedef struct REGPACKX {
+//     unsigned int eax;
+//     unsigned int ebx;
+//     unsigned int ecx;
+//     unsigned int edx;
+//     unsigned int ebp;
+//     unsigned int esi;
+//     unsigned int edi;
+//     unsigned short ds;
+//     unsigned short es;
+//     unsigned short fs;
+//     unsigned short gs;
+//     unsigned int flags;
+// } REGPACKX;
 
-typedef struct REGPACK {
-    REGPACKB h;
-    REGPACKW w;
-    REGPACKX x;
-} REGPACK;
+// typedef struct REGPACK {
+//     REGPACKB h;
+//     REGPACKW w;
+//     REGPACKX x;
+// } REGPACK;
 
-typedef struct INTPACKX {
-    unsigned int gs;
-    unsigned int fs;
-    unsigned int es;
-    unsigned int ds;
-    unsigned int edi;
-    unsigned int esi;
-    unsigned int ebp;
-    unsigned int esp;
-    unsigned int ebx;
-    unsigned int edx;
-    unsigned int ecx;
-    unsigned int eax;
-    unsigned int eip;
-    unsigned int cs;
-    unsigned int flags;
-} INTPACKX;
+// typedef struct INTPACKX {
+//     unsigned int gs;
+//     unsigned int fs;
+//     unsigned int es;
+//     unsigned int ds;
+//     unsigned int edi;
+//     unsigned int esi;
+//     unsigned int ebp;
+//     unsigned int esp;
+//     unsigned int ebx;
+//     unsigned int edx;
+//     unsigned int ecx;
+//     unsigned int eax;
+//     unsigned int eip;
+//     unsigned int cs;
+//     unsigned int flags;
+// } INTPACKX;
 
-typedef struct INTPACKW {
-    unsigned short gs;
-    unsigned short _1;
-    unsigned short fs;
-    unsigned short _2;
-    unsigned short es;
-    unsigned short _3;
-    unsigned short ds;
-    unsigned short _4;
-    unsigned short di;
-    unsigned short _5;
-    unsigned short si;
-    unsigned short _6;
-    unsigned short bp;
-    unsigned short _7;
-    unsigned short sp;
-    unsigned short _8;
-    unsigned short bx;
-    unsigned short _9;
-    unsigned short dx;
-    unsigned short _a;
-    unsigned short cx;
-    unsigned short _b;
-    unsigned short ax;
-    unsigned short _c;
-    unsigned short ip;
-    unsigned short _d;
-    unsigned short cs;
-    unsigned short _e;
-    unsigned int flags;
-} INTPACKW;
+// typedef struct INTPACKW {
+//     unsigned short gs;
+//     unsigned short _1;
+//     unsigned short fs;
+//     unsigned short _2;
+//     unsigned short es;
+//     unsigned short _3;
+//     unsigned short ds;
+//     unsigned short _4;
+//     unsigned short di;
+//     unsigned short _5;
+//     unsigned short si;
+//     unsigned short _6;
+//     unsigned short bp;
+//     unsigned short _7;
+//     unsigned short sp;
+//     unsigned short _8;
+//     unsigned short bx;
+//     unsigned short _9;
+//     unsigned short dx;
+//     unsigned short _a;
+//     unsigned short cx;
+//     unsigned short _b;
+//     unsigned short ax;
+//     unsigned short _c;
+//     unsigned short ip;
+//     unsigned short _d;
+//     unsigned short cs;
+//     unsigned short _e;
+//     unsigned int flags;
+// } INTPACKW;
 
-typedef struct INTPACKB {
-    unsigned char bl;
-    unsigned char bh;
-    unsigned short _1;
-    unsigned char dl;
-    unsigned char dh;
-    unsigned short _2;
-    unsigned char cl;
-    unsigned char ch;
-    unsigned short _3;
-    unsigned char al;
-    unsigned char ah;
-    unsigned short _4;
-} INTPACKB;
+// typedef struct INTPACKB {
+//     unsigned char bl;
+//     unsigned char bh;
+//     unsigned short _1;
+//     unsigned char dl;
+//     unsigned char dh;
+//     unsigned short _2;
+//     unsigned char cl;
+//     unsigned char ch;
+//     unsigned short _3;
+//     unsigned char al;
+//     unsigned char ah;
+//     unsigned short _4;
+// } INTPACKB;
 
-typedef struct INTPACK {
-    INTPACKB h;
-    INTPACKW w;
-    INTPACKX x;
-} INTPACK;
+// typedef struct INTPACK {
+//     INTPACKB h;
+//     INTPACKW w;
+//     INTPACKX x;
+// } INTPACK;
 
-typedef struct _DOSERROR {
-    int exterror;
-    char errclass;
-    char action;
-    char locus;
-} _DOSERROR;
+// typedef struct _DOSERROR {
+//     int exterror;
+//     char errclass;
+//     char action;
+//     char locus;
+// } _DOSERROR;
 
-typedef struct DOSERROR {
-    int exterror;
-    char class;
-    char action;
-    char locus;
-} DOSERROR;
+// typedef struct DOSERROR {
+//     int exterror;
+//     char class;
+//     char action;
+//     char locus;
+// } DOSERROR;
 
-typedef struct dosdate_t {
-    unsigned char day;
-    unsigned char month;
-    unsigned short year;
-    unsigned char dayofweek;
-} dosdate_t;
+// typedef struct dosdate_t {
+//     unsigned char day;
+//     unsigned char month;
+//     unsigned short year;
+//     unsigned char dayofweek;
+// } dosdate_t;
 
-typedef struct dostime_t {
-    unsigned char hour;
-    unsigned char minute;
-    unsigned char second;
-    unsigned char hsecond;
-} dostime_t;
+// typedef struct dostime_t {
+//     unsigned char hour;
+//     unsigned char minute;
+//     unsigned char second;
+//     unsigned char hsecond;
+// } dostime_t;
 
-typedef struct find_t {
-    char reserved[21];
-    char attrib;
-    unsigned short wr_time;
-    unsigned short wr_date;
-    unsigned long size;
-    char name[13];
-} find_t;
+// typedef struct find_t {
+//     char reserved[21];
+//     char attrib;
+//     unsigned short wr_time;
+//     unsigned short wr_date;
+//     unsigned long size;
+//     char name[13];
+// } find_t;
 
-#ifndef _WIN32
-typedef struct _diskfree_t {
-    unsigned short total_clusters;
-    unsigned short avail_clusters;
-    unsigned short sectors_per_cluster;
-    unsigned short bytes_per_sector;
-} _diskfree_t;
-#endif
+// #ifndef _WIN32
+// typedef struct _diskfree_t {
+//     unsigned short total_clusters;
+//     unsigned short avail_clusters;
+//     unsigned short sectors_per_cluster;
+//     unsigned short bytes_per_sector;
+// } _diskfree_t;
+// #endif
 
-typedef struct tPD_net_game_info {
-    _IPX_LOCAL_TARGET addr_ipx;
-    tU32 last_response;
-} tPD_net_game_info;
-
-typedef struct tIPX_netnum {
-    unsigned char bNetwork[4];
-} tIPX_netnum;
-
-typedef struct tRM_info {
-    unsigned long EDI;
-    unsigned long ESI;
-    unsigned long EBP;
-    unsigned long reserved;
-    unsigned long EBX;
-    unsigned long EDX;
-    unsigned long ECX;
-    unsigned long EAX;
-    unsigned short flags;
-    unsigned short ES;
-    unsigned short DS;
-    unsigned short FS;
-    unsigned short GS;
-    unsigned short IP;
-    unsigned short CS;
-    unsigned short SP;
-    unsigned short SS;
-} tRM_info;
+// typedef struct tRM_info {
+//     unsigned long EDI;
+//     unsigned long ESI;
+//     unsigned long EBP;
+//     unsigned long reserved;
+//     unsigned long EBX;
+//     unsigned long EDX;
+//     unsigned long ECX;
+//     unsigned long EAX;
+//     unsigned short flags;
+//     unsigned short ES;
+//     unsigned short DS;
+//     unsigned short FS;
+//     unsigned short GS;
+//     unsigned short IP;
+//     unsigned short CS;
+//     unsigned short SP;
+//     unsigned short SS;
+// } tRM_info;
 
 typedef struct tMem_info {
     unsigned int largest_block_avail;
@@ -4113,5 +3613,9 @@ typedef struct tMem_info {
     unsigned int size_of_page_file;
     unsigned int reserved[3];
 } tMem_info;
+
+typedef struct tIPX_netnum {
+    unsigned char bNetwork[4];
+} tIPX_netnum;
 
 #endif

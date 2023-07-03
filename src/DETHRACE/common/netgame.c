@@ -1,21 +1,22 @@
 #include "netgame.h"
+#include "brender/brender.h"
 #include "car.h"
 #include "displays.h"
 #include "errors.h"
 #include "globvars.h"
 #include "globvrpb.h"
 #include "graphics.h"
+#include "harness/trace.h"
 #include "loading.h"
 #include "network.h"
 #include "newgame.h"
 #include "opponent.h"
+#include "pd/sys.h"
+#include "pedestrn.h"
 #include "powerup.h"
-#include "utility.h"
 #include "racestrt.h"
 #include "structur.h"
-#include "pd/sys.h"
-#include "brender/brender.h"
-#include "harness/trace.h"
+#include "utility.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -83,7 +84,20 @@ void SendAllNonCarPositions(void) {
     tNon_car_spec* non_car;
     tNet_contents* contents;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    list = gProgram_state.track_spec.non_car_list;
+    for (i = 0; gProgram_state.track_spec.ampersand_digits > i; ++i) {
+        if (list[i]->type_data) {
+            non_car = (tNon_car_spec*)list[i]->type_data;
+            if (non_car->collision_info.driver == eDriver_non_car_unused_slot || non_car->collision_info.car_ID != i) {
+                contents = NetGetBroadcastContents(NETMSGID_NONCARPOSITION, 0);
+                BrMatrix34Copy(&contents->data.non_car_position.mat, &list[i]->t.t.mat);
+                contents->data.player_list.number_of_players = i;
+                contents->data.non_car_position.flags = list[i]->identifier[3] == '!';
+            }
+        }
+    }
+    NetSendMessageStacks();
 }
 
 // IDA: void __usercall ReceivedNonCarPosition(tNet_contents *pContents@<EAX>)
@@ -118,7 +132,7 @@ void SignalToStartRace2(int pIndex) {
         dr_dprintf("AAAARRRGGGHHH!!!! More than 6 racers!!!!");
         PDFatalError("AAAARRRGGGHHH!!!! More than 6 racers!!!!");
     }
-    gSynch_race_start = 0;
+    gNeed_to_send_start_race = 0;
     gStart_race_sent = 1;
     the_message = NetBuildMessage(NETMSGID_STARTRACE, 0);
     the_message->contents.data.start_race.racing = gProgram_state.racing;
@@ -201,15 +215,15 @@ void SetUpNetCarPositions(void) {
     }
     for (i = 0; i < gNumber_of_net_players; i++) {
         if ((gCurrent_race.opponent_list[i].car_spec->driver == eDriver_oppo && !gInitialised_grid)
-                || (gCurrent_race.opponent_list[i].car_spec->driver >= eDriver_net_human && !gNet_players[gCurrent_race.opponent_list[i].net_player_index].grid_position_set)) {
+            || (gCurrent_race.opponent_list[i].car_spec->driver >= eDriver_net_human && !gNet_players[gCurrent_race.opponent_list[i].net_player_index].grid_position_set)) {
             grid_index = -1;
             racer_count = 0;
             while (racer_count < 6 && grid_index < 0) {
                 grid_index = racer_count;
                 for (k = 0; k < gNumber_of_net_players; k++) {
-                    if (k != i 
-                            && gNet_players[gCurrent_race.opponent_list[k].net_player_index].grid_position_set
-                            && gNet_players[gCurrent_race.opponent_list[k].net_player_index].grid_index == racer_count) {
+                    if (k != i
+                        && gNet_players[gCurrent_race.opponent_list[k].net_player_index].grid_position_set
+                        && gNet_players[gCurrent_race.opponent_list[k].net_player_index].grid_index == racer_count) {
                         grid_index = -1;
                         break;
                     }
@@ -631,14 +645,24 @@ void UseGeneralScore(int pScore) {
 // IDA: void __usercall NetSendEnvironmentChanges(tNet_game_player_info *pPlayer@<EAX>)
 void NetSendEnvironmentChanges(tNet_game_player_info* pPlayer) {
     LOG_TRACE("(%p)", pPlayer);
-    NOT_IMPLEMENTED();
+
+    SendAllPedestrianPositions(pPlayer->ID);
+    SendAllNonCarPositions();
 }
 
 // IDA: void __cdecl UpdateEnvironments()
 void UpdateEnvironments(void) {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 1; i < gNumber_of_net_players; i++) {
+        if (gNet_players[i].race_stuff_initialised == 0) {
+            NetSendEnvironmentChanges(&gNet_players[i]);
+            gNet_players[i].race_stuff_initialised = 1;
+        }
+        NetSendMessageStacks();
+        SendGameplay(gNet_players[i].ID, eNet_gameplay_go_for_it, 0, 0, 0, 0);
+    }
 }
 
 // IDA: void __usercall ReceivedGameplay(tNet_contents *pContents@<EAX>, tNet_message *pMessage@<EDX>, tU32 pReceive_time@<EBX>)
@@ -656,7 +680,14 @@ void ReceivedGameplay(tNet_contents* pContents, tNet_message* pMessage, tU32 pRe
 void SendGameplay(tPlayer_ID pPlayer, tNet_gameplay_mess pMess, int pParam_1, int pParam_2, int pParam_3, int pParam_4) {
     tNet_message* the_message;
     LOG_TRACE("(%d, %d, %d, %d, %d, %d)", pPlayer, pMess, pParam_1, pParam_2, pParam_3, pParam_4);
-    NOT_IMPLEMENTED();
+
+    the_message = NetBuildMessage(NETMSGID_GAMEPLAY, 0);
+    the_message->contents.data.gameplay.mess = pMess;
+    the_message->contents.data.gameplay.param_1 = pParam_1;
+    the_message->contents.data.gameplay.param_2 = pParam_2;
+    the_message->contents.data.gameplay.param_3 = pParam_3;
+    the_message->contents.data.gameplay.param_4 = pParam_4;
+    NetGuaranteedSendMessageToPlayer(gCurrent_net_game, the_message, pPlayer, 0);
 }
 
 // IDA: void __usercall SendGameplayToAllPlayers(tNet_gameplay_mess pMess@<EAX>, int pParam_1@<EDX>, int pParam_2@<EBX>, int pParam_3@<ECX>, int pParam_4)
@@ -686,13 +717,8 @@ void InitNetGameplayStuff(void) {
 }
 
 // IDA: void __cdecl DefaultNetName()
-<<<<<<< HEAD
-void DefaultNetName() {
-    NetObtainSystemUserName(gNet_player_name, COUNT_OF(gNet_player_name));
-=======
 void DefaultNetName(void) {
     NetObtainSystemUserName(gNet_player_name, 32);
->>>>>>> 3f61e9b479f4bfef8bd9086935bd10a9e3429770
 }
 
 // IDA: void __usercall NetSendPointCrush(tCar_spec *pCar@<EAX>, tU16 pCrush_point_index@<EDX>, br_vector3 *pEnergy_vector@<EBX>)

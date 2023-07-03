@@ -472,7 +472,6 @@ int NewNetGameDown(int* pCurrent_choice, int* pCurrent_mode) {
 void DisposeJoinableGame(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
-    LOG_WARN("DisposeJoinableGame(%d)", pIndex);
     NetDisposeGameDetails(gGames_to_join[pIndex].game);
     gGames_to_join[pIndex].game = NULL;
 }
@@ -561,7 +560,7 @@ void DrawGames(int pCurrent_choice, int pCurrent_mode) {
         } else {
             font_index = 9;
         }
-        sprintf(s, "%s", Harness_Hook_NetFormatAddress(gGames_to_join[i].game->pd_net_info.pd_addr));
+        sprintf(s, "%s", gGames_to_join[i].game->host_name);
         DrawAnItem__newgame(gCurrent_graf_data->joinable_games_x_1, current_index, font_index, s);
         sprintf(s, "%s", GetMiscString(59 + gGames_to_join[i].game->type));
         DrawAnItem__newgame(gCurrent_graf_data->joinable_games_x_2, current_index, font_index, s);
@@ -1597,7 +1596,7 @@ void RequestCarDetails(tNet_game_details* pNet_game) {
         gNet_mode = eNet_mode_thinking_about_it;
     }
     message = NetBuildMessage(NETMSGID_CARDETAILSREQ, 0);
-    NetGuaranteedSendMessageToAddress(pNet_game, message, pNet_game->pd_net_info.pd_addr, NULL);
+    NetGuaranteedSendMessageToAddress(pNet_game, message, &pNet_game->pd_net_info.addr_in, NULL);
 }
 
 // IDA: int __cdecl PickARandomCar()
@@ -1751,6 +1750,7 @@ int DoMultiPlayerStart(void) {
     tNet_game_options new_game_options;
     int start_rank;
     int car_index;
+    int race_index; // added by dethrace
     LOG_TRACE("()");
 
     if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {

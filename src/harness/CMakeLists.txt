@@ -29,8 +29,8 @@ endif()
 if(NOT MSVC)
     target_compile_options(harness PRIVATE
         -Wall
-        -Wextra
         -Wno-unused-parameter
+        -Wno-unused-function
     )
     add_compile_flags_if_supported(harness
         -Wstrict-prototypes
@@ -64,8 +64,10 @@ target_sources(harness PRIVATE
     sound/sound.c
     sound/sound.h
     win95/polyfill.c
+    win95/winsock.c
     platforms/null.c
     platforms/null.h
+    
 
     "${CMAKE_CURRENT_BINARY_DIR}/version.h"
 )
@@ -92,9 +94,6 @@ if (IO_PLATFORM STREQUAL "SDL_OpenGL")
         resources/framebuffer_frag.glsl.h
         resources/3d_vert.glsl.h
         resources/3d_frag.glsl.h
-
-        io_platforms/sdl_network.c
-        io_platforms/sdl_network.h
     )
     target_include_directories(harness PRIVATE "${dethrace_SOURCE_DIR}/src/DETHRACE/common")
     target_link_libraries(harness PRIVATE SDL2::SDL2 glad)

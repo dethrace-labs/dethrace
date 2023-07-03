@@ -238,6 +238,11 @@ void dr_dprintf(char* fmt_string, ...) {
     va_list args;
     tU32 the_time;
 
+    va_start(args, fmt_string);
+    vprintf(fmt_string, args);
+    va_end(args);
+    printf("\n");
+
     if (harness_game_config.enable_diagnostics == 0) {
         return;
     }

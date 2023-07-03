@@ -66,7 +66,6 @@ typedef struct tHarness_platform {
 extern tHarness_platform gHarness_platform;
 
 void Harness_Init(int* argc, char* argv[]);
-void Harness_Hook_PDShutdownSystem(void);
 
 // Hooks are called from original game code.
 

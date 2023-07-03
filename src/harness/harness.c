@@ -1,11 +1,11 @@
 #include "harness.h"
+#include "ascii_tables.h"
 #include "brender_emu/renderer_impl.h"
 #include "include/harness/config.h"
 #include "include/harness/hooks.h"
 #include "include/harness/os.h"
 #include "platforms/null.h"
 #include "sound/sound.h"
-#include "ascii_tables.h"
 #include "version.h"
 
 #include <errno.h>
@@ -162,6 +162,8 @@ void Harness_Init(int* argc, char* argv[]) {
     // Emulate DOS behavior
     harness_game_config.dos_mode = 0;
 
+    harness_game_config.no_bind = 0;
+
     // install signal handler by default
     harness_game_config.install_signalhandler = 1;
 
@@ -195,10 +197,6 @@ void Harness_Init(int* argc, char* argv[]) {
 // used by unit tests
 void Harness_ForceNullPlatform(void) {
     force_null_platform = 1;
-}
-
-void Harness_Hook_PDShutdownSystem() {
-    renderer->Shutdown();
 }
 
 int Harness_ProcessCommandLine(int* argc, char* argv[]) {
@@ -252,6 +250,9 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
             handled = 1;
         } else if (strcasecmp(argv[i], "--dos-mode") == 0) {
             harness_game_config.dos_mode = 1;
+            handled = 1;
+        } else if (strcasecmp(argv[i], "--no-bind") == 0) {
+            harness_game_config.no_bind = 1;
             handled = 1;
         }
 
@@ -331,64 +332,4 @@ void Harness_RenderLastScreen(void) {
 // Filesystem hooks
 FILE* Harness_Hook_fopen(const char* pathname, const char* mode) {
     return OS_fopen(pathname, mode);
-}
-
-int Harness_Hook_PDNetInitialise() {
-    return renderer->NetInit();
-}
-
-int Harness_Hook_PDNetShutdown() {
-    return renderer->NetShutdown();
-}
-
-void Harness_Hook_PDNetStartProducingJoinList() {
-    renderer->NetStartProducingJoinList();
-}
-
-void Harness_Hook_PDNetEndJoinList() {
-    renderer->NetEndJoinList();
-}
-
-void Harness_Hook_PDNetGetNextJoinGame(tNet_game_details* pDetails, int pIndex) {
-    renderer->NetGetNextJoinGame(pDetails, pIndex);
-}
-
-int Harness_Hook_PDNetSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessage, void* pAddress) {
-    return renderer->NetSendMessageToAddress(pDetails, pMessage, pAddress);
-}
-
-// void Harness_Hook_PDNetDisposeGameDetails(tNet_game_details* pDetails) {
-//     renderer->NetDisposeGameDetails(pDetails);
-// }
-
-char* Harness_Hook_NetFormatAddress(void* pAddress) {
-    return renderer->NetFormatAddress(pAddress);
-}
-
-int Harness_Hook_NetBroadcastMessage() {
-    return renderer->NetBroadcastMessage();
-}
-
-int Harness_Hook_NetReceiveHostResponses() {
-    return renderer->NetReceiveHostresponses();
-}
-
-tNet_message* Harness_Hook_PDNetGetNextMessage(tNet_game_details* pDetails, void** pSender_address) {
-    return renderer->PDNetGetNextMessage(pDetails, pSender_address);
-}
-
-int Harness_Hook_PDNetHostGame(tNet_game_details* pDetails, char* pHost_name, void** pHost_address) {
-    return renderer->PDNetHostGame(pDetails, pHost_name, pHost_address);
-}
-
-tPlayer_ID Harness_Hook_PDNetExtractPlayerID(tNet_game_details* pDetails) {
-    return renderer->PDNetExtractPlayerID(pDetails);
-}
-
-int Harness_Hook_NetSendto(char* message, int size, void* pAddress) {
-    return renderer->NetSendto(message, size, pAddress);
-}
-
-void Harness_Hook_CopyAddress(void* pDest, const void* pSrc) {
-    renderer->NetCopyAddress(pDest, pSrc);
 }

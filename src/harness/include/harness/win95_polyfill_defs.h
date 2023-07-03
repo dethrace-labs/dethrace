@@ -71,4 +71,16 @@ typedef struct tagMSG_ {
     uint32_t lPrivate;
 } MSG_;
 
+typedef struct sockaddr_ {
+    char sa_data[14];
+    void* user; // used to translate to the 'real' IP sockaddr
+} SOCKADDR_;
+
+typedef struct sockaddr_ipx_ {
+    uint16_t sa_family;
+    char sa_netnum[4];
+    char sa_nodenum[6];
+    uint16_t sa_socket;
+} SOCKADDR_IPX_;
+
 #endif
