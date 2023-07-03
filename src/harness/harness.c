@@ -1,11 +1,11 @@
 #include "harness.h"
+#include "ascii_tables.h"
 #include "brender_emu/renderer_impl.h"
 #include "include/harness/config.h"
 #include "include/harness/hooks.h"
 #include "include/harness/os.h"
 #include "platforms/null.h"
 #include "sound/sound.h"
-#include "ascii_tables.h"
 #include "version.h"
 
 #include <errno.h>

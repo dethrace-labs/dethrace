@@ -1,7 +1,7 @@
 #include "s3sound.h"
 #include "audio.h"
+#include "backends/backend.h"
 #include "harness/trace.h"
-#include "miniaudio/miniaudio.h"
 #include "resource.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,9 +14,6 @@ int gS3_sample_filter_funcs_registered;
 long gS3_last_file_length;
 tS3_sample_filter* gS3_sample_filter_func;
 tS3_sample_filter* gS3_sample_filter_disable_func;
-
-// dethrace
-extern ma_engine miniaudio_engine;
 
 int S3LoadSample(tS3_sound_id id) {
     // changed by dethrace for compatibility
@@ -80,7 +77,7 @@ int S3LoadSample(tS3_sound_id id) {
     return eS3_error_none;
 }
 
-int S3ReadWavHeader(char* buf, tWAVEFORMATEX_** pWav_format, char** data_ptr, int* pData_size) {
+int S3ReadWavHeader_Win95(char* buf, tWAVEFORMATEX_** pWav_format, char** data_ptr, int* pData_size) {
     int riff_len;
     char* file_eof;         // [esp+10h] [ebp-14h]
     unsigned int chunk_len; // [esp+18h] [ebp-Ch]
@@ -209,7 +206,7 @@ void* S3LoadWavFile_Win95(char* pFile_name, tS3_sample* pSample) {
     data_size = 0;
     wav_format = 0;
     data_ptr = 0;
-    if (S3ReadWavHeader(buf, &wav_format, &data_ptr, &data_size) == 0) {
+    if (S3ReadWavHeader_Win95(buf, &wav_format, &data_ptr, &data_size) == 0) {
         gS3_last_error = eS3_error_readfile;
         dr_dprintf("ERROR: .WAV file '%s' is crap", pFile_name);
         return 0;
@@ -253,25 +250,18 @@ void* S3LoadWavFile_Win95(char* pFile_name, tS3_sample* pSample) {
 }
 
 int S3StopSample(tS3_channel* chan) {
-    tS3_sample_struct_miniaudio* miniaudio;
-
     if (chan->tag == 0) {
         return 1;
     }
 
-    miniaudio = (tS3_sample_struct_miniaudio*)chan->type_struct_sample;
-    if (miniaudio == NULL) {
+    if (chan->type_struct_sample == NULL) {
         return 0;
     }
-    if (miniaudio->initialized) {
-        ma_sound_stop(&miniaudio->sound);
-        ma_sound_uninit(&miniaudio->sound);
-        ma_audio_buffer_ref_uninit(&miniaudio->buffer_ref);
-        miniaudio->initialized = 0;
 
-        if (chan->active) {
-            chan->needs_service = 1;
-        }
+    AudioBackend_StopSample(chan);
+
+    if (chan->active) {
+        chan->needs_service = 1;
     }
 
     return 1;
@@ -290,60 +280,47 @@ int S3ExecuteSampleFilterFuncs(tS3_channel* chan) {
 
 int S3PlaySample(tS3_channel* chan) {
 
-    tS3_sample_struct_miniaudio* miniaudio;
-    tS3_sample* sample_data;
-    ma_result result;
-
-    S3SyncSampleVolume(chan);
-    S3SyncSampleRate(chan);
-    if (chan->descriptor && chan->descriptor->type == chan->type) {
-        miniaudio = (tS3_sample_struct_miniaudio*)chan->type_struct_sample;
-        sample_data = (tS3_sample*)chan->descriptor->sound_data;
-
-        result = ma_audio_buffer_ref_init(ma_format_u8, sample_data->channels, sample_data->dataptr, sample_data->size / sample_data->channels, &miniaudio->buffer_ref);
-        miniaudio->buffer_ref.sampleRate = sample_data->rate;
-        if (result != MA_SUCCESS) {
-            return 0;
-        }
-        result = ma_sound_init_from_data_source(&miniaudio_engine, &miniaudio->buffer_ref, MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_NO_SPATIALIZATION, NULL, &miniaudio->sound);
-        if (result != MA_SUCCESS) {
-            return 0;
-        }
-        miniaudio->initialized = 1;
-
-        ma_sound_set_looping(&miniaudio->sound, chan->repetitions == 0);
-        ma_sound_start(&miniaudio->sound);
-
-        //     dsound_buffer = chan->descriptor->dsound_buffer;
-        //     if (dsound_buffer) {
-        //         dsound_buffer->lpVtbl->SetCurrentPosition(dsound_buffer, 0);
-        //         play_flags = chan->repetitions == 0; // 1 = DSBPLAY_LOOPING
-        //         dsound_buffer->lpVtbl->Play(dsound_buffer, 0, 0, play_flags);
-        //         if (!dsound_buffer->lpVtbl->GetStatus(dsound_buffer, (LPDWORD)&status)) {
-        //             if ((status & 1) != 0) // DSBSTATUS_PLAYING
-        //             {
-        //                 dsound_buffer->lpVtbl->SetCurrentPosition(dsound_buffer, 0);
-        //             } else {
-        //                 dsound_buffer->lpVtbl->Play(dsound_buffer, 0, 0, play_flags);
-        //             }
-        //         }
-        //     }
+    if (chan->type_struct_sample == NULL) {
+        return 0;
     }
+
+    S3SyncSampleVolumeAndPan(chan);
+    S3SyncSampleRate(chan);
+
+    if (AudioBackend_PlaySample(chan) != eAB_success) {
+        return 0;
+    }
+    // if (chan->descriptor && chan->descriptor->type == chan->type) {
+    //     dsound_buffer = chan->descriptor->dsound_buffer;
+    //     if (dsound_buffer) {
+    //         dsound_buffer->lpVtbl->SetCurrentPosition(dsound_buffer, 0);
+    //         play_flags = chan->repetitions == 0; // 1 = DSBPLAY_LOOPING
+    //         dsound_buffer->lpVtbl->Play(dsound_buffer, 0, 0, play_flags);
+    //         if (!dsound_buffer->lpVtbl->GetStatus(dsound_buffer, (LPDWORD)&status)) {
+    //             if ((status & 1) != 0) // DSBSTATUS_PLAYING
+    //             {
+    //                 dsound_buffer->lpVtbl->SetCurrentPosition(dsound_buffer, 0);
+    //             } else {
+    //                 dsound_buffer->lpVtbl->Play(dsound_buffer, 0, 0, play_flags);
+    //             }
+    //         }
+    //     }
+    //   }
 
     return 1;
 }
 
 // this function was only called in DOS build
 int S3CreateTypeStructs(tS3_channel* chan) {
-    tS3_sample_struct_miniaudio* sample_struct;
-    sample_struct = S3MemAllocate(sizeof(tS3_sample_struct_miniaudio), kMem_S3_DOS_SOS_channel);
-    if (sample_struct == NULL) {
+    void* result;
+
+    result = AudioBackend_AllocateSampleTypeStruct();
+    if (result == NULL) {
         return 0;
     }
-    memset(sample_struct, 0, sizeof(tS3_sample_struct_miniaudio));
     chan->type_struct_midi = NULL;
     chan->type_struct_cda = NULL;
-    chan->type_struct_sample = (char*)sample_struct;
+    chan->type_struct_sample = (char*)result;
     return 1;
 }
 
@@ -359,7 +336,7 @@ int S3ReleaseTypeStructs(tS3_channel* chan) {
     return 1;
 }
 
-int S3SyncSampleVolume(tS3_channel* chan) {
+int S3SyncSampleVolumeAndPan(tS3_channel* chan) {
 
     float pan_ratio; // [esp+38h] [ebp-8h]
     float total_vol; // [esp+3Ch] [ebp-4h]
@@ -367,7 +344,6 @@ int S3SyncSampleVolume(tS3_channel* chan) {
     int volume_db;
     int pan;
     float linear_volume;
-    tS3_sample_struct_miniaudio* miniaudio;
 
     if (chan->type != eS3_ST_sample) {
         return 1;
@@ -382,12 +358,8 @@ int S3SyncSampleVolume(tS3_channel* chan) {
             volume_db = 0;
         }
 
-        // convert from directsound -10000-0 volume scale
-        miniaudio = (tS3_sample_struct_miniaudio*)chan->type_struct_sample;
-        linear_volume = ma_volume_db_to_linear(volume_db / 100.0f);
-        ma_sound_set_volume(&miniaudio->sound, linear_volume);
+        if (AudioBackend_SetVolume(chan, volume_db) == eAB_success && chan->spatial_sound) {
 
-        if (chan->spatial_sound) {
             if (chan->left_volume != 0 && chan->right_volume > chan->left_volume) {
                 pan_ratio = chan->right_volume / (float)chan->left_volume;
             } else if (chan->right_volume != 0) {
@@ -402,31 +374,25 @@ int S3SyncSampleVolume(tS3_channel* chan) {
             } else {
                 pan = 10000;
             }
-            ma_sound_set_pan(&miniaudio->sound, pan / 10000.0f);
+            AudioBackend_SetPan(chan, pan);
         }
     }
     return 1;
 }
 
 int S3SyncSampleRate(tS3_channel* chan) {
-    tS3_sample_struct_miniaudio* miniaudio;
-
     if (chan->type != eS3_ST_sample) {
         return 1;
     }
-    if (chan->descriptor && chan->descriptor->type == chan->type) {
-        miniaudio = (tS3_sample_struct_miniaudio*)chan->type_struct_sample;
-        if (miniaudio != NULL) {
-            int rate = chan->rate;
-            if (rate >= 100000) {
-                rate = 100000;
-            }
 
-            //  sound_buffer->lpVtbl->SetFrequency(sound_buffer, rate);
-            // miniaudio uses a linear pitch scale instead of sample rate, so scale it down
-            ma_sound_set_pitch(&miniaudio->sound, (rate / (float)((tS3_sample*)chan->descriptor->sound_data)->rate));
-        }
+    int rate = chan->rate;
+    if (rate >= 100000) {
+        rate = 100000;
     }
+
+    // sound_buffer->lpVtbl->SetFrequency(sound_buffer, rate);
+    AudioBackend_SetFrequency(chan, rate);
+
     return 1;
 }
 

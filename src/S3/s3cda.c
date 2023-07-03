@@ -3,6 +3,10 @@
 
 int gS3_cda_enabled;
 
+void S3EnableCDA(void) {
+    gS3_cda_enabled = 1;
+}
+
 void S3DisableCDA(void) {
     S3StopCDAOutlets();
     gS3_cda_enabled = 0;

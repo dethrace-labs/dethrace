@@ -3,6 +3,7 @@
 
 #include "s3_defs.h"
 
+void S3EnableCDA(void);
 void S3DisableCDA(void);
 void S3StopCDAOutlets(void);
 
