@@ -107,10 +107,9 @@ void ServiceGameInRace(void) {
 void GameMain(int pArgc, char** pArgv) {
     tPath_name CD_dir;
 
-    OpenDiagnostics();
-
     PDSetFileVariables();
     PDBuildAppPath(gApplication_path);
+    OpenDiagnostics();
 
     strcat(gApplication_path, "DATA");
 

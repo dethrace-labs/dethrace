@@ -242,6 +242,10 @@ void dr_dprintf(char* fmt_string, ...) {
         return;
     }
 
+    if (gDiagnostic_file == NULL) {
+        return;
+    }
+
     if (first_time == 0) {
         first_time = GetTotalTime();
     }
