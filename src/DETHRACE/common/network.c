@@ -45,7 +45,7 @@ int gRace_only_flags[33] = {
 };
 int gJoin_list_mode;
 tNet_game_player_info gNew_net_players[6];
-tGuaranteed_message gGuarantee_list[150];
+tGuaranteed_message gGuarantee_list[100]; // DOS debug symbols has this as [150]
 tMid_message* gMid_messages;
 tU32 gLast_player_list_received;
 tMin_message* gMin_messages;
@@ -1829,7 +1829,7 @@ int NetGuaranteedSendMessageToAddress(tNet_game_details* pDetails, tNet_message*
     }
     pMessage->sender = gLocal_net_ID;
     pMessage->senders_time_stamp = PDGetTotalTime();
-    if (gNext_guarantee >= 100) {
+    if (gNext_guarantee >= COUNT_OF(gGuarantee_list)) {
         sprintf(buffer, "Guarantee list full %d", pMessage->contents.header.type);
         NewTextHeadupSlot(4, 0, 500, -1, buffer);
         pMessage->guarantee_number = 0;
