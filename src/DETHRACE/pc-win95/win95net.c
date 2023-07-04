@@ -306,7 +306,7 @@ int PDNetInitialise(void) {
         WSACleanup();
         return -1;
     }
-    char broadcast = '1';
+    int broadcast = 1;
     setsockopt(gSocket, SOL_SOCKET, SO_BROADCAST, &broadcast, sizeof(broadcast));
     so_linger.l_onoff = 1;
     so_linger.l_linger = 0;
@@ -506,32 +506,21 @@ tPlayer_ID PDNetExtractPlayerID(tNet_game_details* pDetails) {
 
 // IDA: void __usercall PDNetObtainSystemUserName(char *pName@<EAX>, int pMax_length@<EDX>)
 void PDNetObtainSystemUserName(char* pName, int pMax_length) {
-#ifdef _WIN32
-    int size;
-    char buffer[16];
-    BOOL result;
+    int result;
+    char* found;
+    dr_dprintf("PDNetObtainSystemUserName()");
 
-#endif
-
-    dr_dprintf("PDNetObtainSystemUserName()\n");
-    // todo
-#if 0
-    size = COUNT_OF(buffer);
-    result = GetComputerNameA(buffer, &size);
-    if (result && size != 0) {
-        strncpy(pName, buffer, pMax_length - 1);
-        pName[pMax_length - 1] = '\0';
+    result = gethostname(pName, pMax_length);
+    if (result == 0) {
     }
+
     while (1) {
-        pName = strpbrk(pName, "_=(){}[]<>!$%^&*/:@~;'#,?\\|`\"");
-        if (*pName == '\0') {
+        found = strpbrk(pName, "_=(){}[]<>!$%^&*/:@~;'#,?\\|`\"");
+        if (found == NULL) {
             break;
         }
-        *pName = '-';
+        *found = '-';
     }
-#else
-    strcpy(pName, "Ron Turn");
-#endif
 }
 
 // IDA: int __usercall PDNetSendMessageToPlayer@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>, tPlayer_ID pPlayer@<EBX>)
