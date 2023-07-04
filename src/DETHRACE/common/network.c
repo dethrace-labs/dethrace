@@ -1074,21 +1074,23 @@ void ReceivedJoin(tNet_contents* pContents, void* pSender_address) {
     tNet_game_player_info* new_players;
     LOG_TRACE("(%p, %p)", pContents, pSender_address);
 
-    new_player_count = gNumber_of_net_players + 1;
-    new_players = BrMemAllocate(new_player_count * sizeof(tNet_game_player_info), kMem_player_list_join);
+    new_player_count = gNumber_of_net_players;
+    new_players = BrMemAllocate(new_player_count + 1 * sizeof(tNet_game_player_info), kMem_player_list_join);
     memcpy(new_players, gNet_players, gNumber_of_net_players * sizeof(tNet_game_player_info));
+
     if ((!gCurrent_net_game->options.open_game && gProgram_state.racing) || gCurrent_net_game->num_players > 5 || gDont_allow_joiners) {
         message = NetBuildMessage(NETMSGID_NEWPLAYERLIST, 0);
         // Send player count = 0 when race has already begun or is full
         message->contents.data.player_list.number_of_players = 0;
         NetSendMessageToAddress(gCurrent_net_game, message, pSender_address);
     } else {
-        slot_index = -1;
-        for (i = 0; i < gNumber_of_net_players; i++) {
+        for (i = 0; i < new_player_count; i++) {
             if (new_players[i].ID == pContents->data.join.player_info.ID) {
                 return;
             }
         }
+        slot_index = new_player_count;
+        new_player_count++;
         if (pContents->data.join.player_info.car_index < 0) {
             pContents->data.join.player_info.car_index = PickARandomCar();
         } else {
@@ -1105,15 +1107,14 @@ void ReceivedJoin(tNet_contents* pContents, void* pSender_address) {
         if (pContents->data.join.player_info.car_index >= 0) {
             gCar_details[pContents->data.join.player_info.car_index].ownership = eCar_owner_someone;
         }
-        // FIXME: tNet_game_player_info contains arch dependent data types (pointers)
-        memcpy(&new_players[gNumber_of_net_players], &pContents->data.join.player_info, sizeof(tNet_game_player_info));
-        new_players[gNumber_of_net_players].player_status = ePlayer_status_loading;
-        new_players[gNumber_of_net_players].last_heard_from_him = PDGetTotalTime();
-        new_players[gNumber_of_net_players].grid_position_set = 0;
-        if (new_players[gNumber_of_net_players].player_name[0] == '\0') {
-            sprintf(new_players[gNumber_of_net_players].player_name, "%s %d", "PLAYER", gNumber_of_net_players);
+        memcpy(&new_players[slot_index], &pContents->data.join.player_info, sizeof(tNet_game_player_info));
+        new_players[slot_index].player_status = ePlayer_status_loading;
+        new_players[slot_index].last_heard_from_him = PDGetTotalTime();
+        new_players[slot_index].grid_position_set = 0;
+        if (new_players[slot_index].player_name[0] == '\0') {
+            sprintf(new_players[slot_index].player_name, "%s %d", "PLAYER", slot_index);
         }
-        NetSetPlayerSystemInfo(&new_players[gNumber_of_net_players], pSender_address);
+        NetSetPlayerSystemInfo(&new_players[slot_index], pSender_address);
         NetPlayersChanged(new_player_count, new_players);
         BrMemFree(new_players);
         SendOutPlayerList();
