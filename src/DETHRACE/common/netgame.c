@@ -86,8 +86,8 @@ void SendAllNonCarPositions(void) {
     LOG_TRACE("()");
 
     list = gProgram_state.track_spec.non_car_list;
-    for (i = 0; gProgram_state.track_spec.ampersand_digits > i; ++i) {
-        if (list[i]->type_data) {
+    for (i = 0; i < gProgram_state.track_spec.ampersand_digits; ++i) {
+        if (list[i]->type_data != NULL) {
             non_car = (tNon_car_spec*)list[i]->type_data;
             if (non_car->collision_info.driver == eDriver_non_car_unused_slot || non_car->collision_info.car_ID != i) {
                 contents = NetGetBroadcastContents(NETMSGID_NONCARPOSITION, 0);
@@ -656,7 +656,7 @@ void UpdateEnvironments(void) {
     LOG_TRACE("()");
 
     for (i = 1; i < gNumber_of_net_players; i++) {
-        if (gNet_players[i].race_stuff_initialised == 0) {
+        if (!gNet_players[i].race_stuff_initialised) {
             NetSendEnvironmentChanges(&gNet_players[i]);
             gNet_players[i].race_stuff_initialised = 1;
         }

@@ -113,7 +113,7 @@ int GetMessageTypeFromMessage(char* pMessage_str) {
     msg_type_int = 0;
 
     // FIXME: "CW95MSG" value is used in and depends on platform
-    if (strncmp(real_msg, "CW95MSG", gMsg_header_strlen) == 0) {
+    if (strncmp(real_msg, MESSAGE_HEADER_STR, gMsg_header_strlen) == 0) {
         if (isdigit(real_msg[gMsg_header_strlen])) {
             msg_type_int = real_msg[gMsg_header_strlen] - '0';
         }
@@ -130,7 +130,7 @@ int SameEthernetAddress(struct sockaddr_in* pAddr_ipx1, struct sockaddr_in* pAdd
     return memcmp(pAddr_ipx1, pAddr_ipx2, sizeof(struct sockaddr_in)) == 0;
 }
 
-/*SOCKADDR_IPX_* */ void GetIPXAddrFromPlayerID(tPlayer_ID pPlayer_id) {
+/*SOCKADDR_IPX_* */ void* GetIPXAddrFromPlayerID(tPlayer_ID pPlayer_id) {
     int i;
     tU8* nodenum;
     NOT_IMPLEMENTED();
@@ -160,7 +160,7 @@ int ReceiveHostResponses(void) {
 
     sa_len = sizeof(gRemote_addr);
     while (1) {
-        if (recvfrom(gSocket, gReceive_buffer, 512, 0, (struct sockaddr*)&gRemote_addr, &sa_len) == -1) {
+        if (recvfrom(gSocket, gReceive_buffer, sizeof(gReceive_buffer), 0, (struct sockaddr*)&gRemote_addr, &sa_len) == -1) {
             break;
         }
         NetNowIPXLocalTarget2String(addr_string, gRemote_addr_ipx);
@@ -393,7 +393,7 @@ void PDNetStartProducingJoinList(void) {
     dr_dprintf("PDNetStartProducingJoinList()");
     gNumber_of_hosts = 0;
     gJoinable_games = BrMemAllocate(sizeof(tPD_net_game_info) * JOINABLE_GAMES_CAPACITY, 0x80u);
-    if (!gJoinable_games) {
+    if (gJoinable_games == NULL) {
         PDFatalError("Can't allocate memory for joinable games");
     }
 }
@@ -406,7 +406,7 @@ void PDNetEndJoinList(void) {
     if (gJoinable_games) {
         BrMemFree(gJoinable_games);
     }
-    gJoinable_games = 0;
+    gJoinable_games = NULL;
 }
 
 // IDA: int __usercall PDNetGetNextJoinGame@<EAX>(tNet_game_details *pGame@<EAX>, int pIndex@<EDX>)
@@ -492,6 +492,7 @@ void PDNetHostFinishGame(tNet_game_details* pDetails) {
 tU32 PDNetExtractGameID(tNet_game_details* pDetails) {
     LOG_TRACE("(%p)", pDetails);
 
+    dr_dprintf("PDNetExtractGameID()");
     return ntohs(pDetails->pd_net_info.addr_in.sin_port); // PDGetTotalTime();
 }
 
@@ -499,6 +500,7 @@ tU32 PDNetExtractGameID(tNet_game_details* pDetails) {
 tPlayer_ID PDNetExtractPlayerID(tNet_game_details* pDetails) {
     LOG_TRACE("(%p)", pDetails);
 
+    dr_dprintf("PDNetExtractPlayerID()");
     return ntohs(gLocal_addr_ipx->sin_port);
 }
 

@@ -671,9 +671,9 @@ int NetJoinGame(tNet_game_details* pDetails, char* pPlayer_name, int pCar_index)
 #endif
             gCurrent_net_game = NULL;
             if (gJoin_request_denied) {
-                result = -1;
-            } else {
                 result = -2;
+            } else {
+                result = -1;
             }
         }
     }
@@ -1260,7 +1260,7 @@ void ReceivedNewPlayerList(tNet_contents* pContents, tNet_message* pM) {
                 }
             }
             if (gThis_net_player_index < 0) {
-                FatalError(105);
+                FatalError(kFatalError_NonInReceivedPlayerList);
             }
             gNet_players[0].last_heard_from_him = PDGetTotalTime();
             gCurrent_race.number_of_racers = gNumber_of_net_players;
