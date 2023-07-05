@@ -2500,7 +2500,34 @@ void InitAbuseomatic(void) {
     int i;
     int len;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gString[20] = '\0';
+    PDBuildAppPath(path);
+    strcat(path, "ABUSE.TXT");
+    for (i = 0; i < COUNT_OF(gAbuse_text); i++) {
+        gAbuse_text[i] = NULL;
+    }
+    f = fopen(path, "rt");
+    if (f == NULL) {
+        return;
+    }
+    for (i = 0; i < COUNT_OF(gAbuse_text); i++) {
+        if (fgets(s, COUNT_OF(s) - 1, f) == NULL) {
+            break;
+        }
+        len = strlen(s);
+        if (len > 63) {
+            s[63] = '\0';
+        }
+        len = strlen(s);
+        while (len != 0 && s[len - 1] < ' ') {
+            s[len - 1] = '\0';
+            len--;
+        }
+        gAbuse_text[i] = BrMemAllocate(strlen(s) + 1, kMem_abuse_text);
+        strcpy(gAbuse_text[i], s);
+    }
+    fclose(f);
 }
 
 // IDA: void __cdecl DisposeAbuseomatic()

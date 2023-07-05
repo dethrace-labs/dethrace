@@ -294,6 +294,12 @@ void PratcamEvent(int pIndex) {
     if (gInterface_within_race_mode) {
         return;
     }
+#if defined(DETHRACE_FIX_BUGS)
+    // In low memory mode, `gPratcam_sequences`is not allocated and thus unsafe to access
+    if (gAusterity_mode) {
+        return;
+    }
+#endif
     if (gPratcam_sequences[pIndex].precedence <= gCurrent_pratcam_precedence) {
         return;
     }

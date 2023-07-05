@@ -1,11 +1,21 @@
 #include "netgame.h"
+#include "brender/brender.h"
+#include "car.h"
 #include "displays.h"
+#include "errors.h"
 #include "globvars.h"
 #include "globvrpb.h"
+#include "graphics.h"
 #include "harness/trace.h"
+#include "loading.h"
 #include "network.h"
+#include "newgame.h"
 #include "opponent.h"
+#include "pd/sys.h"
+#include "pedestrn.h"
 #include "powerup.h"
+#include "racestrt.h"
+#include "structur.h"
 #include "utility.h"
 #include <stdlib.h>
 #include <string.h>
@@ -74,7 +84,20 @@ void SendAllNonCarPositions(void) {
     tNon_car_spec* non_car;
     tNet_contents* contents;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    list = gProgram_state.track_spec.non_car_list;
+    for (i = 0; i < gProgram_state.track_spec.ampersand_digits; ++i) {
+        if (list[i]->type_data != NULL) {
+            non_car = (tNon_car_spec*)list[i]->type_data;
+            if (non_car->collision_info.driver == eDriver_non_car_unused_slot || non_car->collision_info.car_ID != i) {
+                contents = NetGetBroadcastContents(NETMSGID_NONCARPOSITION, 0);
+                BrMatrix34Copy(&contents->data.non_car_position.mat, &list[i]->t.t.mat);
+                contents->data.non_car_position.ID = i;
+                contents->data.non_car_position.flags = list[i]->identifier[3] == '!';
+            }
+        }
+    }
+    NetSendMessageStacks();
 }
 
 // IDA: void __usercall ReceivedNonCarPosition(tNet_contents *pContents@<EAX>)
@@ -103,13 +126,60 @@ void SignalToStartRace2(int pIndex) {
     int i;
     int j;
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+
+    if (gCurrent_race.number_of_racers > 6) {
+        FadePaletteUp();
+        dr_dprintf("AAAARRRGGGHHH!!!! More than 6 racers!!!!");
+        PDFatalError("AAAARRRGGGHHH!!!! More than 6 racers!!!!");
+    }
+    gNeed_to_send_start_race = 0;
+    gStart_race_sent = 1;
+    the_message = NetBuildMessage(NETMSGID_STARTRACE, 0);
+    the_message->contents.data.start_race.racing = gProgram_state.racing;
+    if (pIndex >= 0) {
+        gNet_players[pIndex].last_waste_message = 0;
+        gNet_players[pIndex].wasteage_attributed = 0;
+        the_message->contents.data.start_race.car_count = -1;
+        the_message->contents.data.start_race.car_list[0].index = pIndex;
+        BrMatrix34Copy(&the_message->contents.data.start_race.car_list[0].mat,
+            &gCurrent_race.opponent_list[gNet_players[pIndex].opponent_list_index].car_spec->car_master_actor->t.t.mat);
+    } else {
+        the_message->contents.data.start_race.car_count = gCurrent_race.number_of_racers;
+        for (i = 0; i < gCurrent_race.number_of_racers; i++) {
+            BrMatrix34Copy(&the_message->contents.data.start_race.car_list[i].mat,
+                &gCurrent_race.opponent_list[i].car_spec->car_master_actor->t.t.mat);
+            for (j = 0; j < gNumber_of_net_players; j++) {
+                if (gCurrent_race.opponent_list[i].car_spec == gNet_players[j].car) {
+                    the_message->contents.data.start_race.car_list[i].index = j;
+                    break;
+                }
+            }
+            if (gCurrent_net_game->options.random_car_choice && (gCurrent_net_game->options.car_choice == eNet_car_all || gCurrent_net_game->options.car_choice == eNet_car_both)) {
+                if (gNet_players[the_message->contents.data.start_race.car_list[i].index].next_car_index < 0) {
+                    gNet_players[the_message->contents.data.start_race.car_list[i].index].next_car_index = PickARandomCar();
+                    gCar_details[gNet_players[the_message->contents.data.start_race.car_list[i].index].next_car_index].ownership = eCar_owner_someone;
+                }
+                the_message->contents.data.start_race.car_list[i].next_car_index = gNet_players[the_message->contents.data.start_race.car_list[i].index].next_car_index;
+            }
+        }
+        if (gPending_race < 0) {
+            gPending_race = PickNetRace(gProgram_state.current_race_index,
+                gCurrent_net_game->options.race_sequence_type);
+        }
+        the_message->contents.data.start_race.next_race = gPending_race;
+    }
+    NetGuaranteedSendMessageToAllPlayers(gCurrent_net_game, the_message, NULL);
+    if (gProgram_state.racing) {
+        SendCurrentPowerups();
+    }
 }
 
 // IDA: void __cdecl SignalToStartRace()
 void SignalToStartRace(void) {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gCurrent_net_game->no_races_yet = 0;
+    SignalToStartRace2(-1);
 }
 
 // IDA: void __cdecl SetUpNetCarPositions()
@@ -120,7 +190,62 @@ void SetUpNetCarPositions(void) {
     int grid_index;
     int racer_count;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DisableNetService();
+    if (!gInitialised_grid) {
+        for (i = 0; i < gNumber_of_net_players; i++) {
+            gNet_players[i].grid_position_set = 0;
+            gNet_players[i].last_waste_message = 0;
+            gNet_players[i].wasteage_attributed = 0;
+        }
+    }
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        gCurrent_race.opponent_list[i].index = -1;
+        gCurrent_race.opponent_list[i].ranking = IRandomBetween(0, 99);
+        gCurrent_race.opponent_list[i].car_spec = gNet_players[i].car;
+        gCurrent_race.opponent_list[i].net_player_index = i;
+        gNet_players[i].opponent_list_index = i;
+    }
+    if (!gInitialised_grid && gCurrent_net_game->options.grid_start) {
+        qsort(gCurrent_race.opponent_list, gNumber_of_net_players, sizeof(tOpp_spec), SortGridFunction);
+    }
+    gCurrent_race.number_of_racers = 0;
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        gNet_players[gCurrent_race.opponent_list[i].net_player_index].opponent_list_index = i;
+    }
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if ((gCurrent_race.opponent_list[i].car_spec->driver == eDriver_oppo && !gInitialised_grid)
+            || (gCurrent_race.opponent_list[i].car_spec->driver >= eDriver_net_human && !gNet_players[gCurrent_race.opponent_list[i].net_player_index].grid_position_set)) {
+            grid_index = -1;
+            racer_count = 0;
+            while (racer_count < 6 && grid_index < 0) {
+                grid_index = racer_count;
+                for (k = 0; k < gNumber_of_net_players; k++) {
+                    if (k != i
+                        && gNet_players[gCurrent_race.opponent_list[k].net_player_index].grid_position_set
+                        && gNet_players[gCurrent_race.opponent_list[k].net_player_index].grid_index == racer_count) {
+                        grid_index = -1;
+                        break;
+                    }
+                }
+                racer_count++;
+            }
+            if (grid_index < 0) {
+                FatalError(kFatalError_NetworkCodeSelfCheck);
+            }
+            SetInitialPosition(&gCurrent_race, i, grid_index);
+            gNet_players[gCurrent_race.opponent_list[i].net_player_index].grid_index = grid_index;
+            if (gInitialised_grid) {
+                InitialiseCar2(gCurrent_race.opponent_list[i].car_spec, 0);
+            } else {
+                gCurrent_race.number_of_racers = i + 1;
+            }
+            gNet_players[gCurrent_race.opponent_list[i].net_player_index].grid_position_set = 1;
+        }
+    }
+    gCurrent_race.number_of_racers = gNumber_of_net_players;
+    gInitialised_grid = 1;
+    ReenableNetService();
 }
 
 // IDA: void __usercall ReinitialiseCar(tCar_spec *pCar@<EAX>)
@@ -185,7 +310,56 @@ void DoNetworkHeadups(int pCredits) {
     static tU32 last_flash;
     static int flash_state;
     LOG_TRACE("(%d)", pCredits);
-    STUB_ONCE();
+
+    if (gNot_shown_race_type_headup) {
+        gNot_shown_race_type_headup = 0;
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(59 + gCurrent_net_game->type));
+    }
+    if (gTime_for_punishment && gTime_for_punishment <= PDGetTotalTime()) {
+        gTime_for_punishment = 0;
+        switch (gCurrent_net_game->type) {
+        case eNet_game_type_carnage:
+            NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(219));
+            break;
+        case eNet_game_type_checkpoint:
+            NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(220));
+            break;
+        case eNet_game_type_sudden_death:
+            NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(221));
+            break;
+        case eNet_game_type_foxy:
+            NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(222));
+            break;
+        default:
+            break;
+        }
+    }
+    if (gNet_mode == eNet_mode_none || gNet_recovery_cost[gCurrent_net_game->type] <= gProgram_state.credits_earned - gProgram_state.credits_lost || Flash(200, &last_flash, &flash_state)) {
+        sprintf(s, "\xf8%d\xfa %s", pCredits, GetMiscString(94));
+        ChangeHeadupText(gNet_cash_headup, s);
+    } else {
+        ChangeHeadupText(gNet_cash_headup, "");
+    }
+    switch (gCurrent_net_game->type) {
+    case eNet_game_type_carnage:
+        sprintf(s, "%s \xf8%d\xfa", GetMiscString(180), gPed_target);
+        break;
+    case eNet_game_type_car_crusher:
+        sprintf(s, "%s \xf8%d\xfa", GetMiscString(181), gCurrent_net_game->options.race_end_target);
+        break;
+    case eNet_game_type_foxy:
+        TimerString(gCurrent_net_game->options.race_end_target, s2, 1, 1);
+        sprintf(s, "%s \xf8%s\xfa", GetMiscString(182), s2);
+        break;
+    case eNet_game_type_tag:
+        TimerString(gCurrent_net_game->options.race_end_target, s2, 1, 1);
+        sprintf(s, "%s \xf8%s\xfa", GetMiscString(183), s2);
+        break;
+    default:
+        s[0] = '\0';
+        break;
+    }
+    ChangeHeadupText(gNet_ped_headup, s);
 }
 
 // IDA: int __usercall SortNetHeadAscending@<EAX>(void *pFirst_one@<EAX>, void *pSecond_one@<EDX>)
@@ -234,13 +408,29 @@ void DoNetScores(void) {
 // IDA: void __cdecl InitNetHeadups()
 void InitNetHeadups(void) {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gIcons_pix = LoadPixelmap("CARICONS.PIX");
+    if (gIcons_pix != NULL) {
+        BrMapAdd(gIcons_pix);
+    }
+    gDigits_pix = LoadPixelmap("HDIGITS.PIX");
+    if (gDigits_pix != NULL) {
+        BrMapAdd(gDigits_pix);
+    }
 }
 
 // IDA: void __cdecl DisposeNetHeadups()
 void DisposeNetHeadups(void) {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gIcons_pix != NULL) {
+        BrMapRemove(gIcons_pix);
+        BrPixelmapFree(gIcons_pix);
+    }
+    if (gDigits_pix != NULL) {
+        BrMapRemove(gDigits_pix);
+        BrPixelmapFree(gDigits_pix);
+    }
 }
 
 // IDA: void __cdecl EverybodysLost()
@@ -323,13 +513,26 @@ void SendPlayerScores(void) {
     tNet_contents* the_contents;
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    the_contents = NetGetBroadcastContents(NETMSGID_SCORES, 0);
+    if (gCurrent_net_game->type == eNet_game_type_carnage) {
+        the_contents->data.scores.general_score = gPed_target;
+    } else if (gCurrent_net_game->type == eNet_game_type_tag || gCurrent_net_game->type == eNet_game_type_foxy) {
+        the_contents->data.scores.general_score = gNet_players[gIt_or_fox].ID;
+    }
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        the_contents->data.scores.scores[i] = gNet_players[i].score;
+    }
 }
 
 // IDA: void __cdecl DoNetGameManagement()
 void DoNetGameManagement(void) {
     LOG_TRACE("()");
-    STUB_ONCE();
+
+    if (gNet_mode == eNet_mode_host) {
+        CalcPlayerScores();
+        SendPlayerScores();
+    }
 }
 
 // IDA: void __usercall InitialisePlayerScore(tNet_game_player_info *pPlayer@<EAX>)
@@ -442,14 +645,24 @@ void UseGeneralScore(int pScore) {
 // IDA: void __usercall NetSendEnvironmentChanges(tNet_game_player_info *pPlayer@<EAX>)
 void NetSendEnvironmentChanges(tNet_game_player_info* pPlayer) {
     LOG_TRACE("(%p)", pPlayer);
-    NOT_IMPLEMENTED();
+
+    SendAllPedestrianPositions(pPlayer->ID);
+    SendAllNonCarPositions();
 }
 
 // IDA: void __cdecl UpdateEnvironments()
 void UpdateEnvironments(void) {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 1; i < gNumber_of_net_players; i++) {
+        if (!gNet_players[i].race_stuff_initialised) {
+            NetSendEnvironmentChanges(&gNet_players[i]);
+            gNet_players[i].race_stuff_initialised = 1;
+        }
+        NetSendMessageStacks();
+        SendGameplay(gNet_players[i].ID, eNet_gameplay_go_for_it, 0, 0, 0, 0);
+    }
 }
 
 // IDA: void __usercall ReceivedGameplay(tNet_contents *pContents@<EAX>, tNet_message *pMessage@<EDX>, tU32 pReceive_time@<EBX>)
@@ -467,7 +680,14 @@ void ReceivedGameplay(tNet_contents* pContents, tNet_message* pMessage, tU32 pRe
 void SendGameplay(tPlayer_ID pPlayer, tNet_gameplay_mess pMess, int pParam_1, int pParam_2, int pParam_3, int pParam_4) {
     tNet_message* the_message;
     LOG_TRACE("(%d, %d, %d, %d, %d, %d)", pPlayer, pMess, pParam_1, pParam_2, pParam_3, pParam_4);
-    NOT_IMPLEMENTED();
+
+    the_message = NetBuildMessage(NETMSGID_GAMEPLAY, 0);
+    the_message->contents.data.gameplay.mess = pMess;
+    the_message->contents.data.gameplay.param_1 = pParam_1;
+    the_message->contents.data.gameplay.param_2 = pParam_2;
+    the_message->contents.data.gameplay.param_3 = pParam_3;
+    the_message->contents.data.gameplay.param_4 = pParam_4;
+    NetGuaranteedSendMessageToPlayer(gCurrent_net_game, the_message, pPlayer, 0);
 }
 
 // IDA: void __usercall SendGameplayToAllPlayers(tNet_gameplay_mess pMess@<EAX>, int pParam_1@<EDX>, int pParam_2@<EBX>, int pParam_3@<ECX>, int pParam_4)
@@ -475,7 +695,13 @@ void SendGameplayToAllPlayers(tNet_gameplay_mess pMess, int pParam_1, int pParam
     tNet_message* the_message;
     LOG_TRACE("(%d, %d, %d, %d, %d)", pMess, pParam_1, pParam_2, pParam_3, pParam_4);
 
-    STUB_ONCE();
+    the_message = NetBuildMessage(NETMSGID_GAMEPLAY, 0);
+    the_message->contents.data.gameplay.mess = pMess;
+    the_message->contents.data.gameplay.param_1 = pParam_1;
+    the_message->contents.data.gameplay.param_2 = pParam_2;
+    the_message->contents.data.gameplay.param_3 = pParam_3;
+    the_message->contents.data.gameplay.param_4 = pParam_4;
+    NetGuaranteedSendMessageToAllPlayers(gCurrent_net_game, the_message, NULL);
 }
 
 // IDA: void __usercall SendGameplayToHost(tNet_gameplay_mess pMess@<EAX>, int pParam_1@<EDX>, int pParam_2@<EBX>, int pParam_3@<ECX>, int pParam_4)

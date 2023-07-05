@@ -1989,13 +1989,13 @@ void SendPedestrian(tPedestrian_data* pPedestrian, int pIndex) {
             size_decider = 1;
         }
         the_message = NULL;
-        the_contents = NetGetBroadcastContents(0x19, size_decider);
+        the_contents = NetGetBroadcastContents(NETMSGID_PEDESTRIAN, size_decider);
     } else {
         size_decider = 2;
         if (pPedestrian->current_frame == pPedestrian->sequences[pPedestrian->current_sequence].number_of_frames - 1) {
             pPedestrian->sent_dead_message++;
         }
-        the_message = NetBuildMessage(0x19, size_decider);
+        the_message = NetBuildMessage(NETMSGID_PEDESTRIAN, size_decider);
         the_contents = &the_message->contents;
     }
     the_contents->data.pedestrian.index = pIndex;

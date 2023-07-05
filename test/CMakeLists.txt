@@ -28,7 +28,7 @@ if(NOT MSVC)
         endif()
     endif()
 else()
-    target_compile_definitions(dethrace_test PRIVATE -D_CRT_SECURE_NO_WARNINGS -DSDL_MAIN_HANDLED)
+    target_compile_definitions(dethrace_test PRIVATE -D_CRT_SECURE_NO_WARNINGS -DSDL_MAIN_HANDLED -DWIN32_LEAN_AND_MEAN)
     target_link_libraries(dethrace_test PRIVATE dbghelp)
 endif()
 

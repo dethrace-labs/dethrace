@@ -3411,7 +3411,12 @@ int OriginalCarmaCDinDrive(void) {
 // IDA: int __cdecl CarmaCDinDriveOrFullGameInstalled()
 int CarmaCDinDriveOrFullGameInstalled(void) {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gCD_fully_installed) {
+        return 1;
+    } else {
+        return OriginalCarmaCDinDrive();
+    }
 }
 
 // IDA: void __usercall ReadNetworkSettings(FILE *pF@<EAX>, tNet_game_options *pOptions@<EDX>)

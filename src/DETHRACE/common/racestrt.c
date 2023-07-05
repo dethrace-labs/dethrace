@@ -14,9 +14,12 @@
 #include "input.h"
 #include "intrface.h"
 #include "loading.h"
+#include "netgame.h"
+#include "network.h"
 #include "newgame.h"
 #include "opponent.h"
 #include "pd/sys.h"
+#include "racestrt.h"
 #include "sound.h"
 #include "structur.h"
 #include "utility.h"
@@ -37,7 +40,7 @@ tParts_category gPart_category;
 tU32 gNet_synch_start;
 tNet_game_details* gChoose_car_net_game;
 int gPart_index;
-int gChallenger_index__racestrt; // suffix added to avoid duplicate symbol
+int gChallenger_index__racestrt;                 // suffix added to avoid duplicate symbol
 tGrid_draw gDraw_grid_status;
 tNet_sequence_type gNet_race_sequence__racestrt; // suffix added to avoid duplicate symbol
 br_pixelmap* gTaken_image;
@@ -2495,20 +2498,38 @@ void CheckPlayersAreResponding(void) {
     tU32 time;
     tNet_message* message;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    time = PDGetTotalTime();
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (i != gThis_net_player_index && time - gNet_players[i].last_heard_from_him > 20000) {
+            gNet_players[i].player_status = ePlayer_status_not_responding;
+        }
+    }
+    if (gNet_mode == eNet_mode_client && gLast_host_query == 0) {
+        message = NetBuildMessage(NETMSGID_HOSTQUERY, 0);
+        NetGuaranteedSendMessageToHost(gCurrent_net_game, message, NULL);
+        gLast_host_query = time;
+    }
 }
 
 // IDA: void __cdecl NetSynchStartStart()
 void NetSynchStartStart(void) {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    CheckPlayersAreResponding();
 }
 
 // IDA: void __usercall DrawAnItem(int pX@<EAX>, int pY_index@<EDX>, int pFont_index@<EBX>, char *pText@<ECX>)
 //  Suffix added to avoid duplicate symbol
 void DrawAnItem__racestrt(int pX, int pY_index, int pFont_index, char* pText) {
     LOG_TRACE("(%d, %d, %d, \"%s\")", pX, pY_index, pFont_index, pText);
-    NOT_IMPLEMENTED();
+
+    TransBrPixelmapText(gBack_screen,
+        pX,
+        gCurrent_graf_data->start_synch_top + gCurrent_graf_data->start_synch_y_pitch * pY_index,
+        pFont_index,
+        gFont_7,
+        pText);
 }
 
 // IDA: void __usercall NetSynchStartDraw(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
@@ -2517,51 +2538,272 @@ void NetSynchStartDraw(int pCurrent_choice, int pCurrent_mode) {
     int number_ready;
     char s[256];
     LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    number_ready = 0;
+    CheckPlayersAreResponding();
+    NetPlayerStatusChanged(ePlayer_status_ready);
+    for (i = 0; i < COUNT_OF(gNet_players); i++) {
+        BrPixelmapRectangleFill(gBack_screen,
+            gCurrent_graf_data->start_synch_x_0,
+            gCurrent_graf_data->start_synch_y_pitch * i + gCurrent_graf_data->start_synch_top,
+            gCurrent_graf_data->start_synch_x_r - gCurrent_graf_data->start_synch_x_1,
+            gFont_7->glyph_y,
+            0);
+    }
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        strcpy(s, gNet_players[i].player_name);
+        if (gNet_players[i].host) {
+            strcat(s, " -");
+            strcat(s, GetMiscString(88));
+            strcat(s, "-");
+        }
+        TurnOffPaletteConversion();
+        DRPixelmapRectangleMaskedCopy(gBack_screen,
+            gCurrent_graf_data->start_synch_x_0,
+            gCurrent_graf_data->start_synch_top + 1 + gCurrent_graf_data->start_synch_y_pitch * i,
+            gIcons_pix,
+            0,
+            gNet_players[i].car_index * gCurrent_graf_data->net_head_icon_height,
+            gIcons_pix->width,
+            gCurrent_graf_data->net_head_icon_height);
+        TurnOnPaletteConversion();
+        DrawAnItem__racestrt(
+            gCurrent_graf_data->start_synch_x_1,
+            i,
+            (gNet_players[i].player_status == ePlayer_status_ready) ? 66 : 4,
+            s);
+        DrawAnItem__racestrt(gCurrent_graf_data->start_synch_x_2,
+            i,
+            (gNet_players[i].player_status == ePlayer_status_ready) ? 83 : ((gNet_players[i].player_status == ePlayer_status_not_responding) ? 247 : 4),
+            GetMiscString(77 + gNet_players[i].player_status));
+        if (gNet_players[i].player_status == ePlayer_status_ready) {
+            number_ready++;
+        }
+    }
+    if (gNet_mode == eNet_mode_host && gNumber_of_net_players == number_ready && gNumber_of_net_players > 1 && (!gNo_races_yet || gNumber_of_net_players == 6)) {
+        SignalToStartRace();
+        gSynch_race_start = 1;
+    }
 }
 
 // IDA: int __usercall NetSynchStartDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
 int NetSynchStartDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
-    NOT_IMPLEMENTED();
+
+    if (pEscaped) {
+        pCurrent_choice = -1;
+    } else if (pCurrent_choice == 0) {
+        gProgram_state.prog_status = eProg_idling;
+    }
+    return pCurrent_choice;
 }
 
 // IDA: int __usercall NetSynchStartGoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int NetSynchStartGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    if (*pCurrent_choice == 0 || (gNet_mode == eNet_mode_host && *pCurrent_choice >= 0)) {
+        if (*pCurrent_choice == 0) {
+            gProgram_state.prog_status = eProg_idling;
+            return 1;
+        } else if (gNet_mode == eNet_mode_host && *pCurrent_choice == 1) {
+            if (gNumber_of_net_players <= 1) {
+                DRS3StartSound(gEffects_outlet, 3100);
+                return 0;
+            } else {
+                SignalToStartRace();
+                gSynch_race_start = 1;
+                gNo_races_yet = 0;
+                return 1;
+            }
+        } else {
+            return 1;
+        }
+    } else {
+        DRS3StartSound(gEffects_outlet, 3100);
+        return 0;
+    }
 }
 
 // IDA: int __usercall ExitWhenReady@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 int ExitWhenReady(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    if (!gSynch_race_start && gProgram_state.prog_status != eProg_game_starting) {
+        if (gProgram_state.prog_status == eProg_idling) {
+            *pCurrent_choice = 0;
+            return 1;
+        } else {
+            return 0;
+        }
+    } else {
+        *pCurrent_choice = 1;
+        return 1;
+    }
 }
 
 // IDA: tSO_result __usercall NetSynchRaceStart2@<EAX>(tNet_synch_mode pMode@<EAX>)
 tSO_result NetSynchRaceStart2(tNet_synch_mode pMode) {
-    static tFlicette flicker_on_hf[2];
-    static tFlicette flicker_off_hf[2];
-    static tFlicette push_hf[2];
-    static tMouse_area mouse_areas_hf[2];
-    static tInterface_spec interface_spec_hf;
-    static tFlicette flicker_on_hs[1];
-    static tFlicette flicker_off_hs[1];
-    static tFlicette push_hs[1];
-    static tMouse_area mouse_areas_hs[1];
-    static tInterface_spec interface_spec_hs;
-    static tFlicette flicker_on_c[1];
-    static tFlicette flicker_off_c[1];
-    static tFlicette push_c[1];
-    static tMouse_area mouse_areas_c[1];
-    static tInterface_spec interface_spec_c;
+    static tFlicette flicker_on_hf[2] = {
+        { 321, { 219, 112 }, { 172, 362 } },
+        { 321, { 39, 480 }, { 172, 379 } },
+    };
+    static tFlicette flicker_off_hf[2] = {
+        { 322, { 219, 112 }, { 172, 362 } },
+        { 322, { 39, 480 }, { 172, 379 } },
+    };
+    static tFlicette push_hf[2] = {
+        { 206, { 219, 112 }, { 172, 362 } },
+        { 205, { 39, 480 }, { 172, 379 } },
+    };
+    static tMouse_area mouse_areas_hf[2] = {
+        { { 219, 480 }, { 172, 379 }, { 282, 182 }, { 192, 427 }, 0, 0, 0, NULL },
+        { { 39, 112 }, { 172, 362 }, { 102, 182 }, { 192, 379 }, 1, 0, 0, NULL },
+    };
+    static tInterface_spec interface_spec_hf = {
+        0,
+        203,
+        0,
+        0,
+        0,
+        0,
+        8,
+        { -1, 0 },
+        { 1, 0 },
+        { 0, 0 },
+        { 1, 0 },
+        { NULL, NULL },
+        { -1, 0 },
+        { 1, 0 },
+        { 0, 0 },
+        { 1, 0 },
+        { NULL, NULL },
+        { -1, 0 },
+        { 1, 0 },
+        { 0, 0 },
+        { 1, 0 },
+        { NULL, NULL },
+        { -1, 0 },
+        { 1, 0 },
+        { 0, 0 },
+        { 1, 0 },
+        { NULL, NULL },
+        { 1, 1 },
+        { NetSynchStartGoAhead, NetSynchStartGoAhead },
+        { 1, 1 },
+        { NULL, NULL },
+        ExitWhenReady,
+        NetSynchStartDraw,
+        0,
+        NULL,
+        NetSynchStartStart,
+        NetSynchStartDone,
+        0,
+        { 0, 0 },
+        NULL,
+        -1,
+        1,
+        COUNT_OF(flicker_on_hf),
+        flicker_on_hf,
+        flicker_off_hf,
+        push_hf,
+        COUNT_OF(mouse_areas_hf),
+        mouse_areas_hf,
+        0,
+        NULL,
+    };
+    static tFlicette flicker_on_hs[1] = {
+        { 321, { 219, 112 }, { 172, 362 } },
+    };
+    static tFlicette flicker_off_hs[1] = {
+        { 322, { 219, 112 }, { 172, 362 } },
+    };
+    static tFlicette push_hs[1] = {
+        { 206, { 219, 112 }, { 172, 362 } },
+    };
+    static tMouse_area mouse_areas_hs[1] = {
+        { { 219, 480 }, { 172, 379 }, { 282, 182 }, { 192, 427 }, 0, 0, 0, NULL },
+    };
+    static tInterface_spec interface_spec_hs = {
+        0, 209, 0, 0, 0, 0, 8,
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { 1, 1 }, { NetSynchStartGoAhead, NetSynchStartGoAhead }, { 1, 1 }, { NULL, NULL },
+        ExitWhenReady, NetSynchStartDraw, 0, NULL, NetSynchStartStart, NetSynchStartDone, 0, { 0, 0 },
+        NULL, -1, 1,
+        COUNT_OF(flicker_on_hs), flicker_on_hs, flicker_off_hs, push_hs,
+        COUNT_OF(mouse_areas_hs), mouse_areas_hs, 0, NULL
+    };
+    static tFlicette flicker_on_c[1] = {
+        { 321, { 219, 112 }, { 172, 362 } },
+    };
+    static tFlicette flicker_off_c[1] = {
+        { 322, { 219, 112 }, { 172, 362 } },
+    };
+    static tFlicette push_c[1] = {
+        { 207, { 219, 112 }, { 172, 362 } },
+    };
+    static tMouse_area mouse_areas_c[1] = {
+        { { 219, 112 }, { 172, 362 }, { 282, 182 }, { 192, 379 }, 0, 0, 0, NULL },
+    };
+    static tInterface_spec interface_spec_c = {
+        0, 204, 0, 0, 0, 0, 8,
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
+        { 1, 1 }, { NetSynchStartGoAhead, NetSynchStartGoAhead }, { 1, 1 }, { NULL, NULL },
+        ExitWhenReady, NetSynchStartDraw, 0, NULL, NetSynchStartStart, NetSynchStartDone, 0, { 0, 0 },
+        NULL, -1, 1,
+        COUNT_OF(flicker_on_c), flicker_on_c, flicker_off_c, push_c,
+        COUNT_OF(mouse_areas_c), mouse_areas_c, 0, NULL
+    };
     int result;
     LOG_TRACE("(%d)", pMode);
-    NOT_IMPLEMENTED();
+
+    if (pMode != eNet_synch_client) {
+        if (gCurrent_net_game->status.stage == eNet_game_starting) {
+            gCurrent_net_game->status.stage = eNet_game_ready;
+        }
+        SetUpNetCarPositions();
+        // gNet_synch_start = PDGetTotalTime();
+    }
+    TurnOnPaletteConversion();
+    switch (pMode) {
+    case eNet_synch_host_first:
+        result = DoInterfaceScreen(&interface_spec_hf, 0, 1);
+        break;
+    case eNet_synch_host_subsequent:
+        result = DoInterfaceScreen(&interface_spec_hs, 0, -1);
+        break;
+    case eNet_synch_client:
+        result = DoInterfaceScreen(&interface_spec_c, 0, -1);
+        break;
+    default:
+        break;
+    }
+    TurnOffPaletteConversion();
+    FadePaletteDown();
+    if (result > -2 && result < 1) {
+        NetLeaveGame(gCurrent_net_game);
+    }
+    return eSO_continue;
 }
 
 // IDA: tSO_result __cdecl NetSynchRaceStart()
 tSO_result NetSynchRaceStart(void) {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    SuspendPendingFlic();
+    if (gNet_mode == eNet_mode_host) {
+        if (gNo_races_yet) {
+            return NetSynchRaceStart2(eNet_synch_host_first);
+        } else {
+            return NetSynchRaceStart2(eNet_synch_host_subsequent);
+        }
+    } else {
+        return NetSynchRaceStart2(eNet_synch_client);
+    }
 }

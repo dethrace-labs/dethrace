@@ -17,7 +17,7 @@ extern tU32 gLast_flush_message;
 extern int gRace_only_flags[33];
 extern int gJoin_list_mode;
 extern tNet_game_player_info gNew_net_players[6];
-extern tGuaranteed_message gGuarantee_list[150];
+extern tGuaranteed_message gGuarantee_list[100];
 extern tMid_message* gMid_messages;
 extern tU32 gLast_player_list_received;
 extern tMin_message* gMin_messages;

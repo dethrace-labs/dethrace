@@ -10,6 +10,9 @@ target_include_directories(dethrace_obj
         pd
 )
 
+# add_compile_options(-fsanitize=address)
+# add_link_options(-fsanitize=address)
+
 target_link_libraries(dethrace_obj PUBLIC SDL2::SDL2 smackw32 harness brender s3)
 
 
@@ -35,6 +38,7 @@ else()
         -Wstrict-prototypes
     )
 endif()
+target_compile_definitions(dethrace_obj PRIVATE INSIDE_DETHRACE)
 if(DETHRACE_FIX_BUGS)
     target_compile_definitions(dethrace_obj PRIVATE DETHRACE_FIX_BUGS)
 endif()
@@ -154,14 +158,15 @@ target_sources(dethrace_obj PRIVATE
     common/world.h
     constants.h
     dr_types.h
-    pc-dos/dosnet.c
     pd/net.h
-    pc-dos/dossys.c
     pd/sys.h
     pc-win95/win95sys.c
     pc-win95/dinput.h
     pc-win95/ssdx.c
     pc-win95/ssdx.h
+    pc-win95/win95net.c
+    pc-dos/dosnet.c
+    pc-dos/dossys.c
 )
 
 # Create our main game binary.
@@ -184,7 +189,7 @@ if(NOT MSVC)
 else()
     target_link_libraries(dethrace PRIVATE dbghelp)
     target_link_options(dethrace PRIVATE /subsystem:windows /ENTRY:mainCRTStartup)
-    target_compile_definitions(dethrace PRIVATE -D_CRT_SECURE_NO_WARNINGS -DSDL_MAIN_HANDLED)
+    target_compile_definitions(dethrace PRIVATE -D_CRT_SECURE_NO_WARNINGS -DSDL_MAIN_HANDLED -DWIN32_LEAN_AND_MEAN)
 endif()
 
 if(DETHRACE_IDE_ROOT_DIR)

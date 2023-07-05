@@ -161,6 +161,8 @@ void Harness_Init(int* argc, char* argv[]) {
     harness_game_config.start_full_screen = 0;
     // Emulate DOS behavior
     harness_game_config.dos_mode = 0;
+    // Skip binding socket to allow local network testing
+    harness_game_config.no_bind = 0;
 
     // install signal handler by default
     harness_game_config.install_signalhandler = 1;
@@ -248,6 +250,9 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
             handled = 1;
         } else if (strcasecmp(argv[i], "--dos-mode") == 0) {
             harness_game_config.dos_mode = 1;
+            handled = 1;
+        } else if (strcasecmp(argv[i], "--no-bind") == 0) {
+            harness_game_config.no_bind = 1;
             handled = 1;
         }
 
