@@ -6,8 +6,10 @@
 #include <err.h>
 #include <errno.h>
 #include <execinfo.h>
+#include <inttypes.h>
 #include <libgen.h>
 #include <limits.h>
+#include <mach-o/dyld.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -27,11 +29,13 @@ static char _program_name[1024];
 static void* stack_traces[MAX_STACK_FRAMES];
 
 // Resolve symbol name and source location given the path to the executable and an address
-int addr2line(char const* const program_name, void const* const addr) {
+int addr2line(char const* const program_name, intptr_t slide, void const* const addr) {
     char addr2line_cmd[512] = { 0 };
 
     /* have addr2line map the address to the related line in the code */
-    sprintf(addr2line_cmd, "atos -o %.256s %p", program_name, addr);
+    sprintf(addr2line_cmd, "atos -s %" PRIxPTR " -o %.256s %p", slide, program_name, addr);
+
+    // printf("addr2line command: %s\n", addr2line_cmd);
 
     fprintf(stderr, "%d: ", stack_nbr++);
     return system(addr2line_cmd);
@@ -40,16 +44,23 @@ int addr2line(char const* const program_name, void const* const addr) {
 static void print_stack_trace(void) {
     int i, trace_size = 0;
     char** messages = (char**)NULL;
-
-    fputs("\nStack trace:\n", stderr);
+    intptr_t slide;
 
     trace_size = backtrace(stack_traces, MAX_STACK_FRAMES);
     messages = backtrace_symbols(stack_traces, trace_size);
+    slide = _dyld_get_image_vmaddr_slide(0);
+
+    fputs("\nStack trace:\n", stderr);
 
     /* skip the first couple stack frames (as they are this function and
      our handler) and also skip the last frame as it's (always?) junk. */
-    for (i = 3; i < (trace_size - 1); ++i) {
-        if (addr2line(_program_name, stack_traces[i]) != 0) {
+    for (i = 3; i < (trace_size - 1); i++) {
+
+        // seem to get a duplicate frame right where the error happens
+        if (stack_traces[i] == stack_traces[i - 1]) {
+            continue;
+        }
+        if (addr2line(_program_name, slide, stack_traces[i]) != 0) {
             printf("  error determining line # for: %s\n", messages[i]);
         }
     }
@@ -150,7 +161,7 @@ static uint8_t alternate_stack[SIGSTKSZ];
 void resolve_full_path(char* path, const char* argv0) {
     if (argv0[0] == '/') { // run with absolute path
         strcpy(path, argv0);
-    } else { // run with relative path
+    } else {               // run with relative path
         if (NULL == getcwd(path, PATH_MAX)) {
             perror("getcwd error");
             return;
