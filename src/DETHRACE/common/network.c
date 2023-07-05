@@ -421,7 +421,7 @@ void LoadCarN(int pIndex, tNet_game_player_info* pPlayer) {
         SwitchToLoresMode();
     }
     InitialiseCar(pPlayer->car);
-    if (pPlayer->player_status < 6) {
+    if (pPlayer->player_status < ePlayer_status_racing) {
         pPlayer->car->disabled = 1;
     }
     SetCarStorageTexturingLevel(&gNet_cars_storage_space, GetCarTexturingLevel(), eCTL_full);
@@ -507,7 +507,7 @@ void NetPlayersChanged(int pNew_count, tNet_game_player_info* pNew_players) {
                     SwitchToLoresMode();
                 }
                 pNew_players[i].car = &gProgram_state.current_car;
-                if (pNew_players[i].player_status < 0) {
+                if (pNew_players[i].player_status < ePlayer_status_racing) {
                     pNew_players[i].car->disabled = 1;
                 }
                 SetCarStorageTexturingLevel(&gNet_cars_storage_space, GetCarTexturingLevel(), eCTL_full);
