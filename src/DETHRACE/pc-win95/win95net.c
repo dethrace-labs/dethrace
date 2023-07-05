@@ -165,36 +165,40 @@ int ReceiveHostResponses(void) {
         }
         NetNowIPXLocalTarget2String(addr_string, gRemote_addr_ipx);
         dr_dprintf("ReceiveHostResponses(): Received string '%s' from %s", gReceive_buffer, addr_string);
+
         if (SameEthernetAddress(gLocal_addr_ipx, gRemote_addr_ipx)) {
             dr_dprintf("*** Discounting the above 'cos we sent it ***");
-        } else if (GetMessageTypeFromMessage(gReceive_buffer) == 2) {
-            dr_dprintf("*** It's a host reply! ***");
-            already_registered = 0;
-            for (i = 0; i < gNumber_of_hosts; i++) {
-                if (SameEthernetAddress(&gJoinable_games[i].addr_in, gRemote_addr_ipx)) {
-                    already_registered = 1;
-                    break;
-                }
-            }
-            if (already_registered) {
-                dr_dprintf("That game already registered");
-                gJoinable_games[i].last_response = PDGetTotalTime();
-            } else {
-                dr_dprintf("Adding joinable game to slot #%d", gNumber_of_hosts);
-                gJoinable_games[gNumber_of_hosts].addr_in = *gRemote_addr_ipx;
-                gJoinable_games[gNumber_of_hosts].last_response = PDGetTotalTime();
-                gNumber_of_hosts++;
-                dr_dprintf("Number of games found so far: %d", gNumber_of_hosts);
-            }
-            if (gNumber_of_hosts) {
-                dr_dprintf("Currently registered net games:");
-                for (i = 0; i < gNumber_of_hosts; i++) {
-                    NetNowIPXLocalTarget2String(str, &gJoinable_games[i].addr_in);
-                    dr_dprintf("%d: Host addr %s", i, str);
-                }
-            }
-        } else {
+            continue;
+        }
+        if (GetMessageTypeFromMessage(gReceive_buffer) != 2) {
             dr_dprintf("*** Discounting the above 'cos it's not a host reply ***");
+            continue;
+        }
+
+        dr_dprintf("*** It's a host reply! ***");
+        already_registered = 0;
+        for (i = 0; i < gNumber_of_hosts; i++) {
+            if (SameEthernetAddress(&gJoinable_games[i].addr_in, gRemote_addr_ipx)) {
+                already_registered = 1;
+                break;
+            }
+        }
+        if (already_registered) {
+            dr_dprintf("That game already registered");
+            gJoinable_games[i].last_response = PDGetTotalTime();
+        } else {
+            dr_dprintf("Adding joinable game to slot #%d", gNumber_of_hosts);
+            gJoinable_games[gNumber_of_hosts].addr_in = *gRemote_addr_ipx;
+            gJoinable_games[gNumber_of_hosts].last_response = PDGetTotalTime();
+            gNumber_of_hosts++;
+            dr_dprintf("Number of games found so far: %d", gNumber_of_hosts);
+        }
+        if (gNumber_of_hosts) {
+            dr_dprintf("Currently registered net games:");
+            for (i = 0; i < gNumber_of_hosts; i++) {
+                NetNowIPXLocalTarget2String(str, &gJoinable_games[i].addr_in);
+                dr_dprintf("%d: Host addr %s", i, str);
+            }
         }
     }
     wsa_error = WSAGetLastError() != WSAEWOULDBLOCK;
