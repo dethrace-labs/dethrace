@@ -5,6 +5,7 @@
 #include "errors.h"
 #include "globvars.h"
 #include "globvrpb.h"
+#include "grafdata.h"
 #include "graphics.h"
 #include "harness/trace.h"
 #include "loading.h"
@@ -417,11 +418,23 @@ void InitNetHeadups(void) {
     if (gDigits_pix != NULL) {
         BrMapAdd(gDigits_pix);
     }
+    /* The Windows version does not use gIcons_pix_low_res. */
+    if (gGraf_data_index != 0) {
+        SwitchToLoresMode();
+        gIcons_pix_low_res = LoadPixelmap("CARICONS.PIX");
+        SwitchToRealResolution();
+    } else {
+        gIcons_pix_low_res = gIcons_pix;
+    }
 }
 
 // IDA: void __cdecl DisposeNetHeadups()
 void DisposeNetHeadups(void) {
     LOG_TRACE("()");
+
+    if (gIcons_pix_low_res != NULL && gIcons_pix_low_res != gIcons_pix) {
+        BrPixelmapFree(gIcons_pix_low_res);
+    }
 
     if (gIcons_pix != NULL) {
         BrMapRemove(gIcons_pix);
