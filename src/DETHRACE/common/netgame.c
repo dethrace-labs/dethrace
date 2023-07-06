@@ -6,6 +6,7 @@
 #include "errors.h"
 #include "globvars.h"
 #include "globvrpb.h"
+#include "grafdata.h"
 #include "graphics.h"
 #include "harness/trace.h"
 #include "loading.h"
@@ -19,6 +20,7 @@
 #include "spark.h"
 #include "structur.h"
 #include "utility.h"
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -496,13 +498,30 @@ int SortNetHeadAscending(void* pFirst_one, void* pSecond_one) {
 // IDA: int __usercall SortNetHeadDescending@<EAX>(void *pFirst_one@<EAX>, void *pSecond_one@<EDX>)
 int SortNetHeadDescending(void* pFirst_one, void* pSecond_one) {
     LOG_TRACE("(%p, %p)", pFirst_one, pSecond_one);
-    NOT_IMPLEMENTED();
+
+    if (((tHeadup_pair*)pFirst_one)->out_of_game) {
+        if (((tHeadup_pair*)pSecond_one)->out_of_game) {
+            return ((tHeadup_pair*)pFirst_one)->out_of_game - ((tHeadup_pair*)pSecond_one)->out_of_game;
+        } else {
+            return INT_MAX;
+        }
+    } else if (((tHeadup_pair*)pSecond_one)->out_of_game) {
+        return -INT_MAX;
+    } else if (((tHeadup_pair*)pSecond_one)->score == ((tHeadup_pair*)pFirst_one)->score) {
+        return gNet_players[((tHeadup_pair*)pFirst_one)->player_index].last_score_index
+            - gNet_players[((tHeadup_pair*)pSecond_one)->player_index].last_score_index;
+    } else {
+        return ((tHeadup_pair*)pSecond_one)->score - ((tHeadup_pair*)pFirst_one)->score;
+    }
 }
 
 // IDA: void __usercall ClipName(char *pName@<EAX>, tDR_font *pFont@<EDX>, int pMax_width@<EBX>)
 void ClipName(char* pName, tDR_font* pFont, int pMax_width) {
     LOG_TRACE("(\"%s\", %p, %d)", pName, pFont, pMax_width);
-    NOT_IMPLEMENTED();
+
+    while (DRTextWidth(pFont, pName) > pMax_width) {
+        pName[strlen(pName) - 1] = 0;
+    }
 }
 
 // IDA: void __usercall DoNetScores2(int pOnly_sort_scores@<EAX>)
@@ -521,7 +540,124 @@ void DoNetScores2(int pOnly_sort_scores) {
     static int flash_state;
     tHeadup_pair headup_pairs[6];
     LOG_TRACE("(%d)", pOnly_sort_scores);
-    NOT_IMPLEMENTED();
+
+    ascending_order = gCurrent_net_game->type == eNet_game_type_checkpoint || gCurrent_net_game->type == eNet_game_type_tag;
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (gNet_players[i].player_status < ePlayer_status_racing) {
+            headup_pairs[i].player_index = -1;
+            if (ascending_order) {
+                headup_pairs[i].score = 1000001;
+            } else {
+                headup_pairs[i].score = -1000001;
+            }
+            headup_pairs[i].out_of_game = 1000;
+        } else {
+            headup_pairs[i].player_index = i;
+            headup_pairs[i].score = gNet_players[i].score;
+            if (abs(gNet_players[i].score) != 1000000 && (gNet_players[i].score >= 0 || gCurrent_net_game->type == eNet_game_type_car_crusher)) {
+                headup_pairs[i].out_of_game = 0;
+            } else {
+                headup_pairs[i].out_of_game = gNet_players[i].last_score_index + 1;
+            }
+        }
+    }
+    for (i = gNumber_of_net_players; i < COUNT_OF(headup_pairs); i++) {
+        headup_pairs[i].player_index = -1;
+        if (ascending_order) {
+            headup_pairs[i].score = 1000001;
+        } else {
+            headup_pairs[i].score = -1000001;
+        }
+        headup_pairs[i].out_of_game = 1000;
+    }
+    qsort(headup_pairs, COUNT_OF(headup_pairs), sizeof(tHeadup_pair), ascending_order ? SortNetHeadAscending : SortNetHeadDescending);
+
+    right_edge = gCurrent_graf_data->net_head_box_x + gCurrent_graf_data->net_head_box_width + 5 * gCurrent_graf_data->net_head_box_pitch;
+    for (i = 0; i < COUNT_OF(headup_pairs); i++) {
+        index = headup_pairs[i].player_index;
+        if (index >= 0) {
+            gNet_players[index].last_score_index = i;
+        }
+        if (pOnly_sort_scores) {
+            continue;
+        }
+        x = gCurrent_graf_data->net_head_box_x + i * gCurrent_graf_data->net_head_box_pitch;
+        if (gCurrent_graf_data->net_head_box_bot > gProgram_state.current_render_top) {
+            DimRectangle(gBack_screen, x, gCurrent_graf_data->net_head_box_top, x + gCurrent_graf_data->net_head_box_width, gCurrent_graf_data->net_head_box_bot, 1);
+        }
+        if (index >= 0) {
+            Flash(200, &last_flash, &flash_state);
+            if (flash_state
+                || (gCurrent_net_game->type != eNet_game_type_tag && gCurrent_net_game->type != eNet_game_type_foxy)
+                || index != gIt_or_fox) {
+                if (gNet_players[index].name_not_clipped) {
+                    ClipName(gNet_players[index].player_name, &gFonts[6], gCurrent_graf_data->net_head_box_width - gCurrent_graf_data->net_head_name_x_marg - 2);
+                    gNet_players[index].name_not_clipped = 0;
+                }
+                TransDRPixelmapText(gBack_screen, x + gCurrent_graf_data->net_head_name_x_marg, gCurrent_graf_data->net_head_name_y, &gFonts[6], gNet_players[index].player_name, right_edge);
+            }
+            if (abs(gNet_players[index].score) == 1000000) {
+                if (flash_state) {
+                    strcpy(s, GetMiscString(173));
+                } else {
+                    s[0] = '\0';
+                }
+            } else {
+                switch (gCurrent_net_game->type) {
+                case eNet_game_type_fight_to_death:
+                    sprintf(s, "%d%%", gNet_players[index].score);
+                    break;
+                case eNet_game_type_car_crusher:
+                case eNet_game_type_carnage:
+                    sprintf(s, "%d", gNet_players[index].score);
+                    break;
+                case eNet_game_type_checkpoint:
+                    sprintf(s, "%d left", gNet_players[index].score >> 16);
+                    break;
+                case eNet_game_type_sudden_death:
+                    if (gNet_players[index].score < 0) {
+                        if (flash_state) {
+                            sprintf(s, "%s", GetMiscString(93));
+                        } else {
+                            s[0] = '\0';
+                        }
+                    } else {
+                        score = gNet_players[index].score;
+                        sprintf(s, "%s -%d-", GetMiscString(92), score);
+                    }
+                    break;
+                case eNet_game_type_tag:
+                case eNet_game_type_foxy:
+                    if (gNet_players[index].score >= 0) {
+                        if (index == gIt_or_fox && !flash_state) {
+                            s[0] = '\0';
+                        } else {
+                            TimerString(gNet_players[index].score, s, 0, 1);
+                        }
+                    } else {
+                        sprintf(s, "%s", GetMiscString(93));
+                    }
+                    break;
+                default:
+                    break;
+                }
+            }
+            len = DRTextWidth(&gFonts[6], s);
+            TransDRPixelmapText(gBack_screen, x + gCurrent_graf_data->net_head_score_x - len, gCurrent_graf_data->net_head_score_y, &gFonts[6], s, right_edge);
+            DRPixelmapRectangleMaskedCopy(gBack_screen, x + gCurrent_graf_data->net_head_num_x, gCurrent_graf_data->net_head_num_y, gDigits_pix, 0, i * gCurrent_graf_data->net_head_num_height, gDigits_pix->width, gCurrent_graf_data->net_head_num_height);
+            DRPixelmapRectangleMaskedCopy(gBack_screen, x + gCurrent_graf_data->net_head_icon_x, gCurrent_graf_data->net_head_icon_y, gIcons_pix, 0, gCurrent_graf_data->net_head_icon_height * gNet_players[index].car_index, gIcons_pix->width, gCurrent_graf_data->net_head_icon_height);
+            if (gNet_players[index].ID == gLocal_net_ID) {
+                BrPixelmapLine(gBack_screen, x, gCurrent_graf_data->net_head_box_top, x, gCurrent_graf_data->net_head_box_bot - 1, 0);
+                BrPixelmapLine(gBack_screen, x + gCurrent_graf_data->net_head_box_width - 1, gCurrent_graf_data->net_head_box_top, x + gCurrent_graf_data->net_head_box_width - 1, gCurrent_graf_data->net_head_box_bot - 1, 0);
+                BrPixelmapLine(gBack_screen, x + 1, gCurrent_graf_data->net_head_box_bot, x + gCurrent_graf_data->net_head_box_width - 2, gCurrent_graf_data->net_head_box_bot, 0);
+                BrPixelmapLine(gBack_screen, x - 1, gCurrent_graf_data->net_head_box_top, x - 1, gCurrent_graf_data->net_head_box_bot - 1, 255);
+                BrPixelmapLine(gBack_screen, x + gCurrent_graf_data->net_head_box_width, gCurrent_graf_data->net_head_box_top, x + gCurrent_graf_data->net_head_box_width, gCurrent_graf_data->net_head_box_bot - 1, 255);
+                BrPixelmapLine(gBack_screen, x + 1, gCurrent_graf_data->net_head_box_bot + 1, x + gCurrent_graf_data->net_head_box_width - 2, gCurrent_graf_data->net_head_box_bot + 1, 255);
+                BrPixelmapPixelSet(gBack_screen, x, gCurrent_graf_data->net_head_box_bot, 255);
+                BrPixelmapPixelSet(gBack_screen, x + gCurrent_graf_data->net_head_box_width - 1, gCurrent_graf_data->net_head_box_bot, 255);
+            }
+        }
+    }
 }
 
 // IDA: void __cdecl DoNetScores()
