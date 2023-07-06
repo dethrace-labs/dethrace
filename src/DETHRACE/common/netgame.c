@@ -527,7 +527,8 @@ void DoNetScores2(int pOnly_sort_scores) {
 // IDA: void __cdecl DoNetScores()
 void DoNetScores(void) {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoNetScores2(0);
 }
 
 // IDA: void __cdecl InitNetHeadups()

@@ -640,9 +640,6 @@ int PDNetSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessag
     LOG_TRACE("(%p, %p, %p)", pDetails, pMessage, pAddress);
 
     NetNowIPXLocalTarget2String(str, (struct sockaddr_in*)pAddress);
-    if (pDetails->pd_net_info.addr_in.sin_port == 0) {
-        int i = 0;
-    }
 
     if (sendto(gSocket, (const char*)pMessage, pMessage->overall_size, 0, (const struct sockaddr*)pAddress, sizeof(struct sockaddr)) == -1) {
         dr_dprintf("PDNetSendMessageToAddress(): Error on sendto() - WSAGetLastError=%d", WSAGetLastError());
