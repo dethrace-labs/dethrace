@@ -1261,7 +1261,7 @@ void ReceivedNewPlayerList(tNet_contents* pContents, tNet_message* pM) {
                 }
             }
             if (gThis_net_player_index < 0) {
-                FatalError(kFatalError_NonInReceivedPlayerList);
+                FatalError(kFatalError_NotInReceivedPlayerList);
             }
             gNet_players[0].last_heard_from_him = PDGetTotalTime();
             gCurrent_race.number_of_racers = gNumber_of_net_players;

@@ -439,7 +439,7 @@ enum {
     kFatalError_OpenHeadupsFile = 102,
     kFatalError_OpenPartsshopFile = 103,
     kFatalError_OpenResolutionDependentFile = 104,
-    kFatalError_NonInReceivedPlayerList = 105,
+    kFatalError_NotInReceivedPlayerList = 105,
     kFatalError_OpenKeyNamesFile = 106,
     kFatalError_Open_S = 107,
     kFatalError_SpecialVolumeTooManyPlanes_S = 108,
