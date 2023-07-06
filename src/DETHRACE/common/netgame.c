@@ -570,7 +570,7 @@ void DoNetScores2(int pOnly_sort_scores) {
         }
         headup_pairs[i].out_of_game = 1000;
     }
-    qsort(headup_pairs, COUNT_OF(headup_pairs), sizeof(tHeadup_pair), ascending_order ? SortNetHeadAscending : SortNetHeadDescending);
+    qsort(headup_pairs, COUNT_OF(headup_pairs), sizeof(tHeadup_pair), (int(*)(const void*,const void*))(ascending_order ? SortNetHeadAscending : SortNetHeadDescending));
 
     right_edge = gCurrent_graf_data->net_head_box_x + gCurrent_graf_data->net_head_box_width + 5 * gCurrent_graf_data->net_head_box_pitch;
     for (i = 0; i < COUNT_OF(headup_pairs); i++) {
