@@ -2489,7 +2489,36 @@ void DisplayUserMessage(void) {
     int len;
     tDR_font* font;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    font = &gFonts[FONT_NEWHITE];
+    the_message = &gString[20];
+    if (!gEntering_message || gNet_mode == eNet_mode_none) {
+        return;
+    }
+
+    len = strlen(the_message);
+    if (len < 63 && (PDGetTotalTime() & 512) != 0) {
+        the_message[len] = '_';
+        the_message[len + 1] = '\0';
+    }
+    DimRectangle(gBack_screen,
+        15 * gBack_screen->width / 100,
+        gCurrent_graf_data->net_message_enter_y - font->height,
+        85 * gBack_screen->width / 100,
+        gCurrent_graf_data->net_message_enter_y + 6 * font->height,
+        1);
+
+    TransDRPixelmapText(gBack_screen, 20 * gBack_screen->width / 100, gCurrent_graf_data->net_message_enter_y, font, GetMiscString(227), 100);
+    OoerrIveGotTextInMeBoxMissus(
+        FONT_NEWHITE,
+        the_message,
+        gBack_screen,
+        20 * gBack_screen->width / 100,
+        gCurrent_graf_data->net_message_enter_y + 2 * font->height,
+        80 * gBack_screen->width / 100,
+        gCurrent_graf_data->net_message_enter_y + 6 * font->height,
+        0);
+    the_message[len] = 0;
 }
 
 // IDA: void __cdecl InitAbuseomatic()
