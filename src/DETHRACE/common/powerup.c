@@ -213,7 +213,7 @@ int GotPowerupX(tCar_spec* pCar, int pIndex, int pTell_net_players, int pDisplay
         return -1;
     }
     if (the_powerup->got_proc == NULL) {
-        NewTextHeadupSlot(4, 0, 3000, -4, GetMiscString(190));
+        NewTextHeadupSlot(4, 0, 3000, -4, GetMiscString(kMiscString_UNAVAILABLE_IN_DEMO));
         return -1;
     }
     original_index = pIndex;
@@ -589,7 +589,7 @@ void ImprovePSPowerup(tCar_spec* pCar, int pIndex) {
     LOG_TRACE("(%p, %d)", pCar, pIndex);
 
     pCar->power_up_levels[pIndex]++;
-    NewTextHeadupSlot(4, 0, 3000, -4, GetMiscString(175 + pIndex));
+    NewTextHeadupSlot(4, 0, 3000, -4, GetMiscString(kMiscString_APOGained_START + pIndex));
 }
 
 // IDA: int __usercall GotTimeOrPower@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
@@ -622,7 +622,7 @@ int GotTimeOrPower(tPowerup* pPowerup, tCar_spec* pCar) {
                 }
             }
         } else {
-            NewTextHeadupSlot(4, 0, 3000, -4, GetMiscString(174));
+            NewTextHeadupSlot(4, 0, 3000, -4, GetMiscString(kMiscString_YOU_ARE_ALREADY_AT_MAX));
         }
     }
     return GET_POWERUP_INDEX(pPowerup);

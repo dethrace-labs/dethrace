@@ -294,10 +294,10 @@ void AustereWarning(void) {
     if (gAusterity_mode) {
         LoadFont(FONT_GRNLIT);
         TransDRPixelmapText(gBack_screen,
-            (gBack_screen->width - DRTextWidth(&gFonts[FONT_GRNLIT], GetMiscString(193))) / 2,
+            (gBack_screen->width - DRTextWidth(&gFonts[FONT_GRNLIT], GetMiscString(kMiscString_LOW_MEMORY_MODE_INVOKED))) / 2,
             0,
             &gFonts[FONT_GRNLIT],
-            GetMiscString(193),
+            GetMiscString(kMiscString_LOW_MEMORY_MODE_INVOKED),
             gBack_screen->width);
         PDScreenBufferSwap(0);
         gAustere_time = PDGetTotalTime();

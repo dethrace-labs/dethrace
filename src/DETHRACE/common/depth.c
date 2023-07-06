@@ -762,7 +762,7 @@ void IncreaseYon(void) {
     AssertYons();
     camera_ptr = gCamera_list[1]->type_data;
     i = (int)camera_ptr->yon_z;
-    sprintf(s, GetMiscString(114), i);
+    sprintf(s, GetMiscString(kMiscString_YonIncreasedTo_D), i);
     NewTextHeadupSlot(4, 0, 2000, -4, s);
 }
 
@@ -780,7 +780,7 @@ void DecreaseYon(void) {
     AssertYons();
     camera_ptr = gCamera_list[1]->type_data;
     i = (int)camera_ptr->yon_z;
-    sprintf(s, GetMiscString(115), i);
+    sprintf(s, GetMiscString(kMiscString_YonDecreasedTo_D), i);
     NewTextHeadupSlot(4, 0, 2000, -4, s);
 }
 

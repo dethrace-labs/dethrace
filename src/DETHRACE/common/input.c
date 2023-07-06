@@ -707,7 +707,7 @@ void DoRLTypeLetter(int pChar, int pSlot_index) {
             new_len = strlen(gCurrent_typing) + 1;
             if (new_len > 100) {
                 new_len = 100;
-                DoErrorInterface(-1);
+                DoErrorInterface(kMiscString_FIXED_THAT_YOU_TWISTED_BASTARD);
             }
             for (i = new_len - 1; i > gCurrent_position; i--) {
                 gCurrent_typing[i] = gCurrent_typing[i - 1];
@@ -720,7 +720,7 @@ void DoRLTypeLetter(int pChar, int pSlot_index) {
         }
         if (new_len > 100) {
             new_len = 100;
-            DoErrorInterface(-1);
+            DoErrorInterface(kMiscString_FIXED_THAT_YOU_TWISTED_BASTARD);
         }
 
         gCurrent_typing[new_len] = 0;

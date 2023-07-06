@@ -125,7 +125,7 @@ void DrawRaceList(int pOffset) {
         }
     }
     if (gChange_race_net_mode) {
-        strcpy(rank_str, GetMiscString(202 + (gNet_race_sequence__racestrt == 1 ? 1 : 0)));
+        strcpy(rank_str, GetMiscString(gNet_race_sequence__racestrt == 1 ? kMiscString_SUBSEQUENT_RACES_WILL_BE_RANDOM : kMiscString_RACES_WILL_CONTINUE_DOWN_THIS_LIST));
         TransBrPixelmapText(gBack_screen,
             (right_most + left_most - BrPixelmapTextWidth(gBack_screen, gBig_font, rank_str)) / 2,
             gCurrent_graf_data->choose_race_current_text_y,
@@ -133,17 +133,17 @@ void DrawRaceList(int pOffset) {
             gBig_font,
             rank_str);
     } else {
-        sprintf(rank_str, "%s%d", GetMiscString(27), gProgram_state.rank);
+        sprintf(rank_str, "%s%d", GetMiscString(kMiscString_YourCurrentRankIs), gProgram_state.rank);
         text_x = (gCurrent_graf_data->choose_race_left + gCurrent_graf_data->choose_race_right) / 2 - BrPixelmapTextWidth(gBack_screen, gBig_font, rank_str) / 2;
         TransBrPixelmapText(gBack_screen,
             text_x,
             gCurrent_graf_data->choose_race_current_text_y,
             3,
             gBig_font,
-            GetMiscString(27));
+            GetMiscString(kMiscString_YourCurrentRankIs));
         sprintf(rank_str, "%d", gProgram_state.rank);
         TransBrPixelmapText(gBack_screen,
-            text_x + BrPixelmapTextWidth(gBack_screen, gBig_font, GetMiscString(27)),
+            text_x + BrPixelmapTextWidth(gBack_screen, gBig_font, GetMiscString(kMiscString_YourCurrentRankIs)),
             gCurrent_graf_data->choose_race_current_text_y,
             5,
             gBig_font,
@@ -346,16 +346,16 @@ void DrawCar(int pCurrent_choice, int pCurrent_mode) {
     PollCarDetails(gChoose_car_net_game);
     if (gChange_race_net_mode == 0) {
         if (gProgram_state.number_of_cars == 1) {
-            sprintf(s, GetMiscString(34));
+            sprintf(s, GetMiscString(kMiscString_NoOtherCarsToChooseFromYet));
         } else if (gProgram_state.cars_available[gCurrent_car_index] == gProgram_state.frank_or_anniness) {
-            sprintf(s, GetMiscString(36));
+            sprintf(s, GetMiscString(kMiscString_YourOriginalCar));
         } else {
-            sprintf(s, "%s %s", GetMiscString(35), gOpponents[gProgram_state.cars_available[gCurrent_car_index]].name);
+            sprintf(s, "%s %s", GetMiscString(kMiscString_OriginalDriverWas), gOpponents[gProgram_state.cars_available[gCurrent_car_index]].name);
         }
     } else if (gCar_details[gProgram_state.cars_available[gCurrent_car_index]].ownership == eCar_owner_someone) {
-        sprintf(s, "%s %s", GetMiscString(204), gCar_details[gProgram_state.cars_available[gCurrent_car_index]].name);
+        sprintf(s, "%s %s", GetMiscString(kMiscString_THIS_CAR_ALREADY_TAKEN_BY), gCar_details[gProgram_state.cars_available[gCurrent_car_index]].name);
     } else {
-        sprintf(s, GetMiscString(205));
+        sprintf(s, GetMiscString(kMiscString_AVAILABLE));
     }
 
 #pragma GCC diagnostic pop
@@ -784,20 +784,20 @@ void DrawPartsText(void) {
     LOG_TRACE("()");
 
     CalcPartPrice(gPart_category, gPart_index, &price, &cost);
-    TransBrPixelmapText(gBack_screen, gCurrent_graf_data->parts_cost_x, gCurrent_graf_data->parts_cost_y, 5, gFont_7, GetMiscString(28));
+    TransBrPixelmapText(gBack_screen, gCurrent_graf_data->parts_cost_x, gCurrent_graf_data->parts_cost_y, 5, gFont_7, GetMiscString(kMiscString_RetailColon));
     BrPixelmapTextF(gBack_screen, gCurrent_graf_data->parts_numbers_x, gCurrent_graf_data->parts_cost_y - (TranslationMode() ? 2 : 0), 5, gFont_7, "%d", price);
     if (cost > 0) {
-        TransBrPixelmapText(gBack_screen, gCurrent_graf_data->parts_net_x, gCurrent_graf_data->parts_net_y, 45, gFont_7, GetMiscString(29));
+        TransBrPixelmapText(gBack_screen, gCurrent_graf_data->parts_net_x, gCurrent_graf_data->parts_net_y, 45, gFont_7, GetMiscString(kMiscString_YouPayColon));
         BrPixelmapTextF(gBack_screen, gCurrent_graf_data->parts_numbers_x, gCurrent_graf_data->parts_net_y - (TranslationMode() ? 2 : 0), 45, gFont_7, "%d", cost);
     } else if (cost < 0) {
-        TransBrPixelmapText(gBack_screen, gCurrent_graf_data->parts_net_x, gCurrent_graf_data->parts_net_y, 201, gFont_7, GetMiscString(30));
+        TransBrPixelmapText(gBack_screen, gCurrent_graf_data->parts_net_x, gCurrent_graf_data->parts_net_y, 201, gFont_7, GetMiscString(kMiscString_RefundColon));
         BrPixelmapTextF(gBack_screen, gCurrent_graf_data->parts_numbers_x, gCurrent_graf_data->parts_net_y - (TranslationMode() ? 2 : 0), 201, gFont_7, "%d", -cost);
     } else if (gJust_bought_part) {
-        TransBrPixelmapText(gBack_screen, gCurrent_graf_data->parts_net_x, gCurrent_graf_data->parts_net_y, 134, gFont_7, GetMiscString(33));
+        TransBrPixelmapText(gBack_screen, gCurrent_graf_data->parts_net_x, gCurrent_graf_data->parts_net_y, 134, gFont_7, GetMiscString(kMiscString_YouGotIt));
     } else {
-        TransBrPixelmapText(gBack_screen, gCurrent_graf_data->parts_net_x, gCurrent_graf_data->parts_net_y, 134, gFont_7, GetMiscString(32));
+        TransBrPixelmapText(gBack_screen, gCurrent_graf_data->parts_net_x, gCurrent_graf_data->parts_net_y, 134, gFont_7, GetMiscString(kMiscString_YoursAlready));
     }
-    TransBrPixelmapText(gBack_screen, gCurrent_graf_data->parts_total_x, gCurrent_graf_data->parts_total_y, 2, gFont_7, GetMiscString(31));
+    TransBrPixelmapText(gBack_screen, gCurrent_graf_data->parts_total_x, gCurrent_graf_data->parts_total_y, 2, gFont_7, GetMiscString(kMiscString_CreditsColon));
     BrPixelmapTextF(gBack_screen, gCurrent_graf_data->parts_numbers_x, gCurrent_graf_data->parts_total_y - (TranslationMode() ? 2 : 0), 2, gFont_7, "%d", gProgram_state.credits);
 }
 
@@ -2554,7 +2554,7 @@ void NetSynchStartDraw(int pCurrent_choice, int pCurrent_mode) {
         strcpy(s, gNet_players[i].player_name);
         if (gNet_players[i].host) {
             strcat(s, " -");
-            strcat(s, GetMiscString(88));
+            strcat(s, GetMiscString(kMiscString_HOST));
             strcat(s, "-");
         }
         TurnOffPaletteConversion();
@@ -2575,7 +2575,7 @@ void NetSynchStartDraw(int pCurrent_choice, int pCurrent_mode) {
         DrawAnItem__racestrt(gCurrent_graf_data->start_synch_x_2,
             i,
             (gNet_players[i].player_status == ePlayer_status_ready) ? 83 : ((gNet_players[i].player_status == ePlayer_status_not_responding) ? 247 : 4),
-            GetMiscString(77 + gNet_players[i].player_status));
+            GetMiscString(kMiscString_NetworkPlayerStatus_START + gNet_players[i].player_status));
         if (gNet_players[i].player_status == ePlayer_status_ready) {
             number_ready++;
         }
