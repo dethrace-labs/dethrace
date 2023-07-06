@@ -2561,10 +2561,10 @@ void NetSynchStartDraw(int pCurrent_choice, int pCurrent_mode) {
         DRPixelmapRectangleMaskedCopy(gBack_screen,
             gCurrent_graf_data->start_synch_x_0,
             gCurrent_graf_data->start_synch_top + 1 + gCurrent_graf_data->start_synch_y_pitch * i,
-            gIcons_pix,
+            gIcons_pix_low_res, /* DOS version uses low res, Windows version uses normal res */
             0,
             gNet_players[i].car_index * gCurrent_graf_data->net_head_icon_height,
-            gIcons_pix->width,
+            gIcons_pix_low_res->width, /* DOS version uses low res, Windows version uses normal res */
             gCurrent_graf_data->net_head_icon_height);
         TurnOnPaletteConversion();
         DrawAnItem__racestrt(
