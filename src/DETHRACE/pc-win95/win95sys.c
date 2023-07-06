@@ -308,6 +308,7 @@ void Win32ReleaseInputDevice(void) {
 int PDGetASCIIFromKey(int pKey) {
     LOG_TRACE("(%d)", pKey);
 
+    /* The Windows Carmageddon executable uses PDKeyDown here. The German DOS executable uses PDKeyDown3. */
     if (PDKeyDown3(KEY_SHIFT_ANY)) {
         return gASCII_shift_table[pKey];
     } else {
