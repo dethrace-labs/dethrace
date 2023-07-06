@@ -1075,7 +1075,7 @@ void ReceivedJoin(tNet_contents* pContents, void* pSender_address) {
     LOG_TRACE("(%p, %p)", pContents, pSender_address);
 
     new_player_count = gNumber_of_net_players;
-    new_players = BrMemAllocate(new_player_count + 1 * sizeof(tNet_game_player_info), kMem_player_list_join);
+    new_players = BrMemAllocate((new_player_count + 1) * sizeof(tNet_game_player_info), kMem_player_list_join);
     memcpy(new_players, gNet_players, gNumber_of_net_players * sizeof(tNet_game_player_info));
 
     if ((!gCurrent_net_game->options.open_game && gProgram_state.racing) || gCurrent_net_game->num_players > 5 || gDont_allow_joiners) {
