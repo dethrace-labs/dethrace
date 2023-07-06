@@ -1,6 +1,7 @@
 #include "netgame.h"
 #include "brender/brender.h"
 #include "car.h"
+#include "crush.h"
 #include "displays.h"
 #include "errors.h"
 #include "globvars.h"
@@ -15,6 +16,7 @@
 #include "pedestrn.h"
 #include "powerup.h"
 #include "racestrt.h"
+#include "spark.h"
 #include "structur.h"
 #include "utility.h"
 #include <stdlib.h>
@@ -30,6 +32,8 @@ tNet_game_player_info* gLast_lepper;
 int gInitialised_grid;
 int gIt_or_fox;
 
+#define PACK_POWERUPS(car) (car->power_up_levels[0] & 0xff) + ((car->power_up_levels[2] & 0xff) << 6) + ((car->power_up_levels[1] & 0xff) << 3);
+
 // IDA: void __usercall SendCarData(tU32 pNext_frame_time@<EAX>)
 void SendCarData(tU32 pNext_frame_time) {
     tNet_contents* contents;
@@ -42,8 +46,122 @@ void SendCarData(tU32 pNext_frame_time) {
     int damaged_wheels;
     LOG_TRACE("(%d)", pNext_frame_time);
 
-    if (gNet_mode) {
-        TELL_ME_IF_WE_PASS_THIS_WAY();
+    time = GetRaceTime();
+    if (gNet_mode == eNet_mode_none || (time > last_time && last_time + 80 > time)) {
+        return;
+    }
+    last_time = time;
+    contents = NetGetBroadcastContents(NETMSGID_TIMESYNC, 0);
+    contents->data.time_sync.race_start_time = gRace_start;
+
+    if (gNet_mode == eNet_mode_host) {
+        for (i = 0; i < gNumber_of_net_players; i++) {
+            car = gNet_players[i].car;
+            if (car->disabled) {
+                continue;
+            }
+            damaged_wheels = car->damage_units[eDamage_lf_wheel].damage_level > 30 || car->damage_units[eDamage_rf_wheel].damage_level > 30 || car->damage_units[eDamage_lr_wheel].damage_level > 30 || car->damage_units[eDamage_rr_wheel].damage_level > 30;
+            contents = NetGetBroadcastContents(0xFu, damaged_wheels);
+            GetReducedMatrix(&contents->data.mech.mat, &car->car_master_actor->t.t.mat);
+            contents->data.mech.ID = gNet_players[i].ID;
+            contents->data.mech.time = pNext_frame_time;
+            BrVector3Copy(&contents->data.mech.omega, &car->omega);
+            BrVector3Copy(&contents->data.mech.v, &car->v);
+            contents->data.mech.curvature = (car->curvature / car->maxcurve * 32767.0f);
+            contents->data.mech.keys = car->keys;
+            contents->data.mech.keys.joystick_acc = (tU8)(car->joystick.acc >> 9);
+            contents->data.mech.keys.joystick_dec = (tU8)(car->joystick.dec >> 9);
+            contents->data.mech.revs = car->revs;
+            for (j = 0; j < COUNT_OF(contents->data.mech.d); j++) {
+                contents->data.mech.d[j] = car->oldd[j] / car->susp_height[j >> 1] * 255.0f;
+            }
+            for (j = 0; j < COUNT_OF(contents->data.mech.damage); j++) {
+                contents->data.mech.damage[j] = car->damage_units[j].damage_level;
+            }
+            contents->data.mech.front = car->bounds[1].min.v[2];
+            contents->data.mech.back = car->bounds[1].max.v[2];
+            contents->data.mech.powerups = PACK_POWERUPS(car);
+            contents->data.mech.repair_time = car->repair_time;
+            contents->data.mech.cc_coll_time = car->last_car_car_collision;
+            if (damaged_wheels) {
+                for (j = 0; j < COUNT_OF(contents->data.mech.wheel_dam_offset); j++) {
+                    contents->data.mech.wheel_dam_offset[j] = car->wheel_dam_offset[j];
+                }
+            }
+            if (car->time_to_recover != 0) {
+                if (car->time_to_recover - 500 < pNext_frame_time) {
+                    contents = NetGetBroadcastContents(NETMSGID_RECOVER, 0);
+                    contents->data.recover.ID = gNet_players[i].ID;
+                    contents->data.recover.time_to_recover = car->time_to_recover;
+                }
+            }
+        }
+        for (i = 0; i < gNum_active_non_cars; i++) {
+            contents = NetGetBroadcastContents(NETMSGID_NONCAR_INFO, 0);
+            ncar = (tCollision_info*)gActive_non_car_list[i];
+            GetReducedMatrix(&contents->data.mech.mat, &ncar->car_master_actor->t.t.mat);
+            contents->data.non_car.ID = ncar->car_ID;
+            contents->data.non_car.time = pNext_frame_time;
+            BrVector3Copy(&contents->data.non_car.omega, &ncar->omega);
+            BrVector3Copy(&contents->data.non_car.v, &ncar->v);
+            contents->data.non_car.flags = ncar->car_master_actor->identifier[3] == 2 * ncar->doing_nothing_flag + '!';
+        }
+        for (i = 0; i < gProgram_state.AI_vehicles.number_of_cops; i++) {
+            if (!gProgram_state.AI_vehicles.cops[i].finished_for_this_race) {
+                contents = NetGetBroadcastContents(NETMSGID_COPINFO, 0);
+                car = gProgram_state.AI_vehicles.cops[i].car_spec;
+                GetReducedMatrix(&contents->data.mech.mat, &car->car_master_actor->t.t.mat);
+                contents->data.cop_info.ID = car->car_ID;
+                contents->data.cop_info.time = pNext_frame_time;
+                BrVector3Copy(&contents->data.cop_info.omega, &car->omega);
+                BrVector3Copy(&contents->data.cop_info.v, &car->v);
+                for (j = 0; j < COUNT_OF(contents->data.cop_info.damage); ++j) {
+                    contents->data.cop_info.damage[j] = car->damage_units[j].damage_level;
+                }
+                for (j = 0; j < COUNT_OF(contents->data.cop_info.d); j++) {
+                    contents->data.cop_info.d[j] = car->oldd[j];
+                }
+            }
+        }
+    } else if (gNet_mode == eNet_mode_client) {
+        car = &gProgram_state.current_car;
+        if (car->disabled) {
+            return;
+        }
+        damaged_wheels = car->damage_units[eDamage_lf_wheel].damage_level > 30 || car->damage_units[eDamage_rf_wheel].damage_level > 30 || car->damage_units[eDamage_lr_wheel].damage_level > 30 || car->damage_units[eDamage_rr_wheel].damage_level > 30;
+        contents = NetGetToHostContents(NETMSGID_MECHANICS, damaged_wheels);
+        GetReducedMatrix(&contents->data.mech.mat, &gProgram_state.current_car.car_master_actor->t.t.mat);
+        contents->data.mech.ID = gNet_players[gThis_net_player_index].ID;
+        contents->data.mech.time = pNext_frame_time;
+        BrVector3Copy(&contents->data.mech.omega, &car->omega);
+        BrVector3Copy(&contents->data.mech.v, &car->v);
+
+        contents->data.mech.curvature = car->curvature / car->maxcurve * 32767.0f;
+        contents->data.mech.keys = car->keys;
+        contents->data.mech.keys.joystick_acc = (tU8)(car->joystick.acc >> 9);
+        contents->data.mech.keys.joystick_dec = (tU8)(car->joystick.dec >> 9);
+        contents->data.mech.revs = car->revs;
+        contents->data.mech.cc_coll_time = car->last_car_car_collision;
+        for (j = 0; j < COUNT_OF(contents->data.mech.d); j++) {
+            contents->data.mech.d[j] = car->oldd[j] / car->susp_height[j >> 1] * 255.f;
+        }
+        for (j = 0; j < COUNT_OF(contents->data.mech.damage); j++) {
+            contents->data.mech.damage[j] = car->damage_units[j].damage_level;
+        }
+        contents->data.mech.front = car->bounds[1].min.v[2];
+        contents->data.mech.back = car->bounds[1].max.v[2];
+        contents->data.mech.powerups = PACK_POWERUPS(car);
+        contents->data.mech.repair_time = car->repair_time;
+        if (damaged_wheels) {
+            for (j = 0; j < COUNT_OF(contents->data.mech.wheel_dam_offset); j++) {
+                contents->data.mech.wheel_dam_offset[j] = car->wheel_dam_offset[j];
+            }
+        }
+        if (car->time_to_recover > 0 && car->time_to_recover - 500 < pNext_frame_time) {
+            contents = NetGetToHostContents(NETMSGID_RECOVER, 0);
+            contents->data.recover.ID = gNet_players[gThis_net_player_index].ID;
+            contents->data.recover.time_to_recover = gProgram_state.current_car.time_to_recover;
+        }
     }
 }
 
@@ -252,7 +370,14 @@ void SetUpNetCarPositions(void) {
 void ReinitialiseCar(tCar_spec* pCar) {
     int i;
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    StopCarSmokingInstantly(pCar);
+    LoseAllLocalPowerups(pCar);
+    InitialiseCar(pCar);
+    TotallyRepairACar(pCar);
+    if (pCar->driver == eDriver_local_human) {
+        gLast_it_change = PDGetTotalTime() + 2000;
+    }
 }
 
 // IDA: void __usercall RepositionPlayer(int pIndex@<EAX>)
@@ -739,7 +864,16 @@ void RecievedCrushPoint(tNet_contents* pContents) {
 // IDA: void __usercall GetReducedMatrix(tReduced_matrix *m1@<EAX>, br_matrix34 *m2@<EDX>)
 void GetReducedMatrix(tReduced_matrix* m1, br_matrix34* m2) {
     LOG_TRACE("(%p, %p)", m1, m2);
-    NOT_IMPLEMENTED();
+
+    m1->row1.v[0] = m2->m[0][0];
+    m1->row1.v[1] = m2->m[0][1];
+    m1->row1.v[2] = m2->m[0][2];
+    m1->row2.v[0] = m2->m[1][0];
+    m1->row2.v[1] = m2->m[1][1];
+    m1->row2.v[2] = m2->m[1][2];
+    m1->translation.v[0] = m2->m[2][0];
+    m1->translation.v[1] = m2->m[2][1];
+    m1->translation.v[2] = m2->m[2][2];
 }
 
 // IDA: void __usercall GetExpandedMatrix(br_matrix34 *m1@<EAX>, tReduced_matrix *m2@<EDX>)

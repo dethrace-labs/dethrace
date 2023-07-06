@@ -1316,7 +1316,50 @@ void ReceivedStartRace(tNet_contents* pContents) {
     int i;
     int index;
     LOG_TRACE("(%p)", pContents);
-    NOT_IMPLEMENTED();
+
+    if (pContents->data.player_list.number_of_players == -1) {
+        if (gProgram_state.racing) {
+            index = pContents->data.start_race.car_list[0].index;
+            BrMatrix34Copy(&gNet_players[index].car->car_master_actor->t.t.mat, &pContents->data.start_race.car_list[0].mat);
+            ReinitialiseCar(gNet_players[index].car);
+            if (gThis_net_player_index == index) {
+                if (!gInterface_within_race_mode) {
+                    FadePaletteDown();
+                }
+                CancelPendingCunningStunt();
+                gProgram_state.credits_earned = gInitial_net_credits[gCurrent_net_game->options.starting_money_index];
+                gProgram_state.credits_lost = 0;
+                InitialiseExternalCamera();
+            }
+            gNet_players[index].last_waste_message = 0;
+            gNet_players[index].wasteage_attributed = 0;
+        }
+    } else if (gSynch_race_start) {
+        for (i = 0; i < pContents->data.start_race.car_count; i++) {
+            gNet_players[pContents->data.start_race.car_list[i].index].next_car_index = pContents->data.start_race.car_list[i].next_car_index;
+        }
+    } else {
+        for (i = 0; i < pContents->data.player_list.number_of_players; i++) {
+            gCurrent_race.number_of_racers = i + 1;
+            gCurrent_race.opponent_list[i].index = -1;
+            gCurrent_race.opponent_list[i].ranking = -1;
+            gCurrent_race.opponent_list[i].car_spec = gNet_players[pContents->data.start_race.car_list[i].index].car;
+            gCurrent_race.opponent_list[i].net_player_index = pContents->data.start_race.car_list[i].index;
+            gNet_players[gCurrent_race.opponent_list[i].net_player_index].last_waste_message = 0;
+            gNet_players[gCurrent_race.opponent_list[i].net_player_index].wasteage_attributed = 0;
+            if (!gProgram_state.racing || gCurrent_race.opponent_list[i].car_spec->driver != eDriver_local_human) {
+                BrMatrix34Copy(&gCurrent_race.opponent_list[i].car_spec->car_master_actor->t.t.mat, &pContents->data.start_race.car_list[i].mat);
+                InitialiseCar(gCurrent_race.opponent_list[i].car_spec);
+            }
+            gNet_players[pContents->data.start_race.car_list[i].index].next_car_index = pContents->data.start_race.car_list[i].next_car_index;
+        }
+        gPending_race = pContents->data.player_list.batch_number;
+        gCurrent_race.number_of_racers = pContents->data.player_list.number_of_players;
+        gSynch_race_start = 1;
+        if (!pContents->data.player_list.this_index || gProgram_state.racing) {
+            gWait_for_it = 0;
+        }
+    }
 }
 
 // IDA: void __usercall ReceivedGuaranteeReply(tNet_contents *pContents@<EAX>)

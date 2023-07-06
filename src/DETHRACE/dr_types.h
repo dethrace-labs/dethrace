@@ -473,7 +473,7 @@ typedef struct tReduced_matrix {
     br_vector3 translation;
 } tReduced_matrix;
 
-typedef struct tCar_controls {
+typedef struct tCar_controls { // size: 0x4
     int joystick_acc : 8;
     int joystick_dec : 8;
     unsigned int left : 1;        // 0x10000   bit 17
