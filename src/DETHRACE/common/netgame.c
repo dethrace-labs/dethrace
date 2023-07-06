@@ -432,6 +432,7 @@ void InitNetHeadups(void) {
 void DisposeNetHeadups(void) {
     LOG_TRACE("()");
 
+    /* Windows version does not use gIcons_pix_low_res. */
     if (gIcons_pix_low_res != NULL && gIcons_pix_low_res != gIcons_pix) {
         BrPixelmapFree(gIcons_pix_low_res);
     }
