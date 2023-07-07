@@ -1,12 +1,12 @@
--- Bisic Dethrace Wireshark dissector
+-- Basic Dethrace Wireshark dissector
 --
 -- Installation instructions:
 -- 1. Open Wireshark GUI
 -- 2. Navigate to "Help -> About Wireshark" menu
--- 3. Clock on "Folder" tab andclick in the list of paths on "Personal Lua Plugins".
---    If the folder does not yet exist, a dialog will ask you to.
+-- 3. Click on "Folder" tab and click in the list of paths on "Personal Lua Plugins".
+--    If the folder does not yet exist, a dialog will ask you to create it.
 -- 4. Paste this lua script in the "Personal Lua Plugins" directory, or create a symlink.
--- 5. When modifying this script, reload all plug-ins with CTRL+SHIRT+L
+-- 5. When modifying this script, reload all plug-ins with CTRL+SHIFT+L
 
 dethrace_protocol = Proto("dethrace",  "Dethrace Protocol")
 DETHRACE_PORT = 12286
