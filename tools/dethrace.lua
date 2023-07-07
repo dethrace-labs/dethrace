@@ -52,6 +52,8 @@ content_types = {
     [0x20] = "None",
 }
 
+-- FIXME: missing table: index -> car name
+
 f_checksum = ProtoField.uint32("dethrace.checksum", "Checksum")
 f_broadcast_magic = ProtoField.string("dethrace.broadcast_magic", "Broadcast Magic", base.ASCII)
 f_broadcast_type = ProtoField.char("dethrace.broadcast_type", "Broadcast Type", base.NONE, broadcast_types)
@@ -69,6 +71,21 @@ f_message_size = ProtoField.uint16("dethrace.size", "Overall Size")
 f_contents_size = ProtoField.uint8("dethrace.content_size", "Content Size")
 f_contents_type = ProtoField.uint8("dethrace.content_type", "Content Type", base.DEC, content_types)
 
+player_statuses = {
+    [0] = "Unknown",
+    [1] = "Ready",
+    [2] = "Loading",
+    [3] = "Wrecks Gallery",
+    [4] = "Summary",
+    [5] = "Not Responding",
+    [6] = "Racing",
+    [7] = "Main Menu",
+    [8] = "Recovering",
+    [9] = "Action Replay",
+}
+
+f_player_status = ProtoField.uint32("dethrace.player_status", "Player Status", base.DEC, player_statuses)
+
 function create_message_size_type(parent, message, name)
     local message_type = message(1, 1):uint()
     local tree = parent:add(dethrace_protocol, message(), string.format("%s (%d)", name, message_type))
@@ -80,7 +97,25 @@ end
 f_pd_player_info = ProtoField.bytes("dethrace.pd_info", "PD Net Info")
 
 function dissect_pd_player_info(tree, data)
-    tree:add_le(f_pd_player_info, data(0, 18))
+    tree:add_le(f_pd_player_info, data(0, 16))
+    return 16
+end
+
+f_float = ProtoField.float("dethrace.float", "Floating value")
+
+function dissect_br_matrix34(parent, data, name)
+    local matrix_tree = parent:add(name, data(0, 48))
+    local offset = 0
+    for row_i = 0, 3 do
+        local row_tree = matrix_tree:add(string.format("m[%d]", row_i), data(offset, 12))
+
+        for col_i = 0, 2 do
+            local f = data(offset, 4):float()
+            row_tree:add_le(f_float, data(offset, 4)):set_text(string.format("m[%d][%d] = %f", row_i, col_i, f))
+            offset = offset + 4
+        end
+    end
+    return offset
 end
 
 function dissect_message_sendmedetails(tree, message)
@@ -161,8 +196,9 @@ f_details_option_random_car_choice = ProtoField.bool("dethrace.details.options.r
 f_details_option_race_sequence_type = ProtoField.uint32("dethrace.details.options.race_sequence_type", "Race Sequence Type")
 f_details_option_car_choice = ProtoField.uint32("dethrace.details.options.car_choice", "Car Choice", base.DEC, details_options_car_choices)
 
-function dissect_game_details(tree, data)
+function dissect_game_details(parent, data)
     -- tNet_game_options
+    local tree = parent:add("Options", data(48))
     tree:add_le(f_details_option_show_players_on_map, data(0, 4))
     tree:add_le(f_details_option_show_peds_on_map, data(4, 4))
     tree:add_le(f_details_option_enable_text_messages, data(8, 4))
@@ -175,40 +211,189 @@ function dissect_game_details(tree, data)
     tree:add_le(f_details_option_random_car_choice, data(36, 4))
     tree:add_le(f_details_option_race_sequence_type, data(40, 4))
     tree:add_le(f_details_option_car_choice, data(44, 4))
+    return 48
 end
 
 function dissect_message_details(tree, message)
     -- tNet_message_my_details (1)
     local t = create_message_size_type(tree, message, "Details")
-    dissect_pd_player_info(t, message(2))
-    t:add(f_details_host_name, message(20, 32))
-    t:add_le(f_details_host_id, message(52, 4))
-    t:add_le(f_details_num_players, message(56, 4))
-    t:add_le(f_details_start_race, message(60, 4))
-    t:add_le(f_details_no_races_yet, message(64, 4))
-    t:add_le(f_details_status, message(68, 4))
-    do
-        local option_data = message(72, 48)
-        dissect_game_details(t:add(option_data, "Options"), option_data)
-    end
-    t:add_le(f_details_type, message(120, 4))
+    local offset = 2
+
+    offset = offset + dissect_pd_player_info(t, message(offset))
+
+    t:add(f_details_host_name, message(offset, 32))
+    offset = offset + 4
+
+    t:add_le(f_details_host_id, message(offset, 4))
+    offset = offset +  4
+
+    t:add_le(f_details_num_players, message(offset, 4))
+    offset = offset +  4
+
+    t:add_le(f_details_start_race, message(offset, 4))
+    offset = offset +  4
+
+    t:add_le(f_details_no_races_yet, message(offset, 4))
+    offset = offset +  4
+
+    t:add_le(f_details_status, message(offset, 4))
+    offset = offset +  4
+
+    offset = offset +  dissect_game_details(t, message(offset))
+
+    t:add_le(f_details_type, message(offset, 4))
+    offset = offset +  4
 end
 
-function dissect_game_player_info(tree, message)
+f_join_timestamp = ProtoField.uint32("dethrace.join.timestamp", "Timestamp")
+f_join_last_heard = ProtoField.uint32("dethrace.join.time_last_heard", "Last heard timestamp")
+f_join_reposition_time = ProtoField.uint32("dethrace.join.time_reposition", "Reposition timestamp")
+f_join_last_waste_time = ProtoField.uint32("dethrace.join.time_waste", "Last waste message timestamp")
+f_join_host = ProtoField.bool("dethrace.join.host", "Host")
+f_join_playerid = ProtoField.uint32("dethrace.join.playerid", "Player ID")
+f_join_player_name = ProtoField.stringz("dethrace.join.player_name", "Player Name")
+f_join_car = ProtoField.uint32("dethrace.join.car", "Car") -- FIXME: use table index -> car name
+f_join_grid = ProtoField.uint32("dethrace.join.grid", "Grid Index")
+f_join_grid_set = ProtoField.bool("dethrace.join.grid_set", "Grid Position Set")
+f_join_opponent_index = ProtoField.uint32("dethrace.join.opponent_index", "Opponent List Index")
+f_join_wait_confirm = ProtoField.uint32("dethrace.join.wait_confirm", "Awaiting Confirmation") -- FIXME: find out values
+f_join_score = ProtoField.uint32("dethrace.join.score", "Score")
+f_join_credits = ProtoField.uint32("dethrace.join.credits", "Credits")
+f_join_wasted = ProtoField.bool("dethrace.join.wasted", "Wasted")
+f_join_wasteage_attributed = ProtoField.bool("dethrace.join.wasteage_attributed", "Wasteage Attributed") -- FIXME: find out what this is
+f_join_name_not_clipped = ProtoField.bool("dethrace.join.name_not_clipped", "Name Not Clipped") -- FIXME: find out what this is
+f_join_race_stuff_initialized = ProtoField.bool("dethrace.join.race_stuff_initialized", "Race Stuff Initialized")
+f_join_played = ProtoField.bool("dethrace.join.played", "Played")
+f_join_won = ProtoField.bool("dethrace.join.won", "Won")
+f_join_next_car_index = ProtoField.uint32("dethrace.join.next_car_index", "Next Car Index") -- FIXME: find out what this is
+f_join_games_score = ProtoField.uint32("dethrace.join.games_score", "Games Score")
+f_join_last_score_index = ProtoField.uint32("dethrace.join.last_score_index", "Last Score Index")
+f_join_last_score_index = ProtoField.uint32("dethrace.join.last_score_index", "Last Score Index")
+f_join_car_ptr = ProtoField.uint64("dethrace.join.car_ptr", "Car Spec (pointer)")
+
+function dissect_game_player_info(tree, data)
     -- tNet_game_player_info
+    local offset = dissect_pd_player_info(tree, data)
+
+    tree:add_le(f_join_timestamp, data(offset, 4))
+    offset = offset + 4
+
+    tree:add_le(f_join_last_heard, data(offset, 4))
+    offset = offset + 4
+
+    tree:add_le(f_join_reposition_time, data(offset, 4))
+    offset = offset + 4
+
+    tree:add_le(f_join_last_waste_time, data(offset, 4))
+    offset = offset + 4
+
+    tree:add_le(f_join_host, data(offset, 4))
+    offset = offset + 4
+
+    tree:add_le(f_join_playerid, data(offset, 4))
+    offset = offset + 4
+
+    tree:add(f_join_player_name, data(offset, 32))
+    offset = offset + 32
+
+    tree:add_le(f_player_status, data(offset, 4))
+    offset = offset + 4
+
+    tree:add_le(f_join_car, data(offset, 4))
+    offset = offset + 4
+
+    tree:add_le(f_join_grid, data(offset, 4))
+    offset = offset + 4
+
+    tree:add_le(f_join_grid_set, data(offset, 4))
+    offset = offset + 4
+
+    tree:add_le(f_join_opponent_index, data(offset, 4))
+    offset = offset + 4
+
+    tree:add_le(f_join_wait_confirm, data(offset, 4))
+    offset = offset + 4
+
+    tree:add_le(f_join_score, data(offset, 4))
+    offset = offset + 4
+
+    tree:add_le(f_join_credits, data(offset, 4))
+    offset = offset + 4
+
+    tree:add_le(f_join_wasted, data(offset, 4))
+    offset = offset + 4
+
+    tree:add_le(f_join_wasteage_attributed, data(offset, 4))
+    offset = offset + 4
+
+    tree:add_le(f_join_name_not_clipped, data(offset, 4))
+    offset = offset + 4
+
+    tree:add_le(f_join_race_stuff_initialized, data(offset, 4))
+    offset = offset + 4
+
+    tree:add_le(f_join_played, data(offset, 4))
+    offset = offset + 4
+
+    tree:add_le(f_join_won, data(offset, 4))
+    offset = offset + 4
+
+    tree:add_le(f_join_next_car_index, data(offset, 4))
+    offset = offset + 4
+
+    tree:add_le(f_join_games_score, data(offset, 4))
+    offset = offset + 4
+
+    tree:add_le(f_join_last_score_index, data(offset, 4))
+    offset = offset + 4
+
+    offset = offset + dissect_br_matrix34(tree, data(offset), "Initial Position")
+
+    assert(offset == 0xbc, "offset of car spec ptr")
+
+    tree:add_le(f_join_car_ptr, data(offset, 4))
+
+    tree:set_len(offset)
 end
 
 function dissect_message_join(tree, message)
     -- tNet_message_join (2)
-    local t = create_message_size_type(tree, message, "Join (INCOMPLETE)")
-    local game_player_info_data = message(4)
-    dissect_game_player_info(t, game_player_info_data)
+    local t = create_message_size_type(tree, message, "Join")
+    local offset = 4
+
+    dissect_game_player_info(t:add("Player Info", message(offset)), message(offset))
 end
+
+newerplayerlist_count_magics = {
+    [-1] = "-1 (Selected Car Unavailable)",
+    [0] = "0 (Game Already Started)",
+}
+
+f_newplayerlist_count = ProtoField.int32("dethrace.newplayerlist.count", "Number Of Players")--, base.DEC, newerplayerlist_count_magics)
+f_newplayerlist_index = ProtoField.int32("dethrace.newplayerlist.index", "This Index")
+f_newplayerlist_batch_number = ProtoField.int32("dethrace.newplayerlist.batch_number", "Batch Number")
 
 function dissect_message_newplayerlist(tree, message)
     -- tNet_message_new_player_list (3)
     local t = create_message_size_type(tree, message, "New Player List")
-    -- FIXME
+    local offset = 4
+
+    local t_count = t:add_le(f_newplayerlist_count, message(offset, 4))
+    if message(offset, 4):int() == 0 then
+        t_count:set_text("Number Of Players: Game Already Started (0)")
+    elseif message(offset, 4):int() == -1 then
+        t_count:set_text("Number Of Players: Car Unavailable (-1)")
+    end
+    offset = offset + 4
+
+    t:add_le(f_newplayerlist_index, message(offset, 4))
+    offset = offset + 4
+
+    t:add_le(f_newplayerlist_batch_number, message(offset, 4))
+    offset = offset + 4
+
+    dissect_game_player_info(t:add("Player", message(offset)), message(offset))
+    -- finished
 end
 
 f_guaranteereply_number = ProtoField.uint32("dethrace.guaranteereply.number", "Guarantee Number")
@@ -228,18 +413,24 @@ function dissect_message_cardetailsreq(tree, message)
 end
 
 f_cardetails_count = ProtoField.uint32("dethrace.cardetails.count", "Car Count")
-f_cardetails_car = ProtoField.uint32("dethrace.cardetails.car_index", "Car")
+f_cardetails_car = ProtoField.uint32("dethrace.cardetails.car_index", "Car") -- FIXME: use table index -> car name
 f_cardetails_owner = ProtoField.stringz("dethrace.cardetails.owner", "Owner")
 
 function dissect_message_cardetails(tree, message)
     -- tNet_message_car_details (6)
     local t = create_message_size_type(tree, message, "Car Details")
+    local offset = 4
+
     t:add_le(f_cardetails_count, message(4, 4))
+    offset = offset + 4
+
     for i = 0, 5 do
-        local car_detail = message(8 + 20 * i, 20)
-        local subtree = t:add(car_detail, string.format("Car %d", i))
+        local car_detail = message(offset, 20)
+        local subtree = t:add(car_detail, string.format("Car[%d]", i))
         subtree:add_le(f_cardetails_car, car_detail(0, 4))
         subtree:add(f_cardetails_owner, car_detail(4, 16))
+
+        offset = offset + 20
     end
     -- finished
 end
@@ -277,25 +468,10 @@ function dissect_message_raceover(tree, message)
     -- finished
 end
 
-player_statuses = {
-    [0] = "Unknown",
-    [1] = "Ready",
-    [2] = "Loading",
-    [3] = "Wrecks Gallery",
-    [4] = "Summary",
-    [5] = "Not Responding",
-    [6] = "Racing",
-    [7] = "Main Menu",
-    [8] = "Recovering",
-    [9] = "Action Replay",
-}
-
-f_statusreport_status = ProtoField.uint32("dethrace.statusreport.status", "Player Status", base.DEC, player_statuses)
-
 function dissect_message_statusreport(tree, message)
     -- tNet_message_status_report (10)
     local t = create_message_size_type(tree, message, "Status Report (UNTESTED)")
-    t:add_le(f_statusReport_status, message(4, 4))
+    t:add_le(f_player_status, message(4, 4))
     -- finished
 end
 
@@ -456,11 +632,22 @@ end
 
 dethrace_protocol.fields = {
     f_checksum, f_broadcast_magic, f_broadcast_type, f_terminator,
+    f_float,
 
     f_pd_player_info,
 
     f_message_magic, f_message_guarantee, f_message_sender, f_message_version, f_message_timestamp, f_message_count, f_message_size,
     f_contents_size, f_contents_type,
+
+    -- 2 (join)
+    f_join_timestamp, f_join_last_heard, f_join_reposition_time, f_join_last_waste_time,
+    f_join_host, f_join_playerid, f_join_player_name, f_join_car, f_join_grid, f_join_grid_set,
+    f_join_opponent_index, f_join_wait_confirm, f_join_score, f_join_credits, f_join_wasted,
+    f_join_wasteage_attributed, f_join_name_not_clipped, f_join_race_stuff_initialized, f_join_played,
+    f_join_won, f_join_next_car_index, f_join_games_score,  f_join_last_score_index, f_join_car_ptr,
+
+    -- 3 (newplayerlist)
+    f_newplayerlist_count, f_newplayerlist_index, f_newplayerlist_batch_number,
 
     f_details_host_name, f_details_host_id, f_details_num_players, f_details_start_race, f_details_no_races_yet, f_details_status,
     f_details_option_show_players_on_map, f_details_option_show_peds_on_map, f_details_option_enable_text_messages, f_details_option_show_powerups_on_map, f_details_option_powerup_respawn, f_details_option_open_game, f_details_option_starting_money_index, f_details_option_start_type, f_details_option_race_end_target, f_details_option_random_car_choice, f_details_option_race_sequence_type, f_details_option_car_choice,
@@ -479,6 +666,7 @@ dethrace_protocol.fields = {
     f_headup_text,
 
     f_hostreply_started, f_hostreply_race, f_hostreply_pending,
+    f_player_status,
 }
 
 dethrace_message_dissectors = {

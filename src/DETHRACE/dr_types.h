@@ -1033,6 +1033,7 @@ typedef struct tFace_ref {
     br_scalar d;
 } tFace_ref;
 
+#pragma pack(push, 4)
 typedef struct tNet_game_player_info { // size: 0xc0
     tPD_net_player_info pd_net_info;   // @0x0
     tU32 this_players_time_stamp;      // @0x10
@@ -1062,6 +1063,7 @@ typedef struct tNet_game_player_info { // size: 0xc0
     br_matrix34 initial_position;      // @0x8c
     tCar_spec* car;                    // @0xbc
 } tNet_game_player_info;
+#pragma pack(pop)
 
 typedef struct tNet_game_options {         // size: 0x30
     int show_players_on_map;               // @0x0
@@ -1340,7 +1342,6 @@ typedef struct tNet_message_crush_point {
     br_vector3 energy_vector;
 } tNet_message_crush_point;
 
-#pragma pack(push, 4)
 typedef union tNet_contents {                           // size: 0x160
     struct {                                            // size: 0x2
         tU8 contents_size;                              // @0x0
@@ -1381,7 +1382,6 @@ typedef union tNet_contents {                           // size: 0x160
         tNet_message_crush_point crush;                 // @0x0
     } data;                                             // @0x0
 } tNet_contents;
-#pragma pack(pop)
 
 typedef struct tNet_message {    // size: 0x17c
     tU32 pd_stuff_so_DO_NOT_USE; // @0x0
