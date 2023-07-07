@@ -519,8 +519,9 @@ dethrace_message_dissectors = {
 
 function dethrace_protocol.dissector(buffer, pinfo, tree)
     if buffer:bytes(4, 7) == ByteArray.new("43 57 39 35 4d 53 47") then -- "CW95MSG"
-        pinfo.cols.protocol = "DRBC"
         local t = tree:add(dethrace_protocol, buffer(), "DethRace Broadcast Protocol")
+        pinfo.cols.protocol = "DRBC"
+        pinfo.cols.info = string.format("Broadcast: %s", broadcast_types[buffer(11, 1):uint()])
         t:add(f_checksum, buffer(0, 4))
         t:add(f_broadcast_magic, buffer(4, 7))
         t:add(f_broadcast_type, buffer(11, 1))
@@ -541,6 +542,7 @@ function dethrace_protocol.dissector(buffer, pinfo, tree)
         end
         local message = buffer(28)
         local message_type = message(1, 1):uint()
+        pinfo.cols.info = string.format("%s (%d)", content_types[message_type], message_type)
         dethrace_message_dissectors[message_type](tree, message)
     end
 end
