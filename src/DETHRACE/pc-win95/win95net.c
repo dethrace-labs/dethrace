@@ -56,6 +56,16 @@ int gSocket;
 #define MESSAGE_HEADER_STR "CW95MSG"
 #define JOINABLE_GAMES_CAPACITY 16
 
+DR_STATIC_ASSERT(offsetof(tNet_message, pd_stuff_so_DO_NOT_USE) == 0);
+DR_STATIC_ASSERT(offsetof(tNet_message, magic_number) == 4);
+DR_STATIC_ASSERT(offsetof(tNet_message, guarantee_number) == 8);
+DR_STATIC_ASSERT(offsetof(tNet_message, sender) == 12);
+DR_STATIC_ASSERT(offsetof(tNet_message, version) == 16);
+DR_STATIC_ASSERT(offsetof(tNet_message, senders_time_stamp) == 20);
+DR_STATIC_ASSERT(offsetof(tNet_message, num_contents) == 24);
+DR_STATIC_ASSERT(offsetof(tNet_message, overall_size) == 26);
+DR_STATIC_ASSERT(offsetof(tNet_message, contents) == 28);
+
 // IDA: void __cdecl ClearupPDNetworkStuff()
 void ClearupPDNetworkStuff(void) {
     LOG_TRACE("()");
