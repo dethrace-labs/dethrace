@@ -615,7 +615,7 @@ int ChangeCar(int pNet_mode, int* pCar_index, tNet_game_details* pNet_game) {
     }
     if (result == 0) {
         if (pNet_mode) {
-            *pCar_index = gProgram_state.cars_available[gCurrent_race_index];
+            *pCar_index = gProgram_state.cars_available[gCurrent_car_index];
         } else {
             AboutToLoadFirstCar();
             SwitchToRealResolution();

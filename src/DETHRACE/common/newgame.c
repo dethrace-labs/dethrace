@@ -1699,7 +1699,7 @@ int ChooseNetCar(tNet_game_details* pNet_game, tNet_game_options* pOptions, int*
                 *pCar_index = PickARandomCar();
                 car_index = 0;
                 for (i = 0; i < gNumber_of_racers; i++) {
-                    if (gCar_details[i].ownership != eCar_owner_not_allowed) {
+                    if (gCar_details[i].ownership < eCar_owner_not_allowed) {
                         gProgram_state.cars_available[car_index] = i;
                         car_index++;
                     }
