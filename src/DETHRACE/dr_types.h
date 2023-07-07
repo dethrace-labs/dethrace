@@ -1340,6 +1340,7 @@ typedef struct tNet_message_crush_point {
     br_vector3 energy_vector;
 } tNet_message_crush_point;
 
+#pragma pack(push, 4)
 typedef union tNet_contents {                           // size: 0x160
     struct {                                            // size: 0x2
         tU8 contents_size;                              // @0x0
@@ -1380,6 +1381,7 @@ typedef union tNet_contents {                           // size: 0x160
         tNet_message_crush_point crush;                 // @0x0
     } data;                                             // @0x0
 } tNet_contents;
+#pragma pack(pop)
 
 typedef struct tNet_message {    // size: 0x17c
     tU32 pd_stuff_so_DO_NOT_USE; // @0x0
