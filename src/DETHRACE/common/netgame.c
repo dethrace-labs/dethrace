@@ -601,31 +601,51 @@ void DoNetworkHeadups(int pCredits) {
     ChangeHeadupText(gNet_ped_headup, s);
 }
 
+#define HEADUP1 ((tHeadup_pair*)pFirst_one)
+#define HEADUP2 ((tHeadup_pair*)pSecond_one)
+
 // IDA: int __usercall SortNetHeadAscending@<EAX>(void *pFirst_one@<EAX>, void *pSecond_one@<EDX>)
 int SortNetHeadAscending(void* pFirst_one, void* pSecond_one) {
     LOG_TRACE("(%p, %p)", pFirst_one, pSecond_one);
-    NOT_IMPLEMENTED();
+
+    if (HEADUP1->out_of_game) {
+        if (HEADUP2->out_of_game) {
+            return HEADUP1->out_of_game - HEADUP2->out_of_game;
+        } else {
+            return INT_MAX;
+        }
+    } else if (HEADUP2->out_of_game) {
+        return -INT_MAX;
+    } else if (HEADUP2->score == HEADUP1->score) {
+        return gNet_players[HEADUP1->player_index].last_score_index
+            - gNet_players[HEADUP2->player_index].last_score_index;
+    } else {
+        return HEADUP1->score - HEADUP2->score;
+    }
 }
 
 // IDA: int __usercall SortNetHeadDescending@<EAX>(void *pFirst_one@<EAX>, void *pSecond_one@<EDX>)
 int SortNetHeadDescending(void* pFirst_one, void* pSecond_one) {
     LOG_TRACE("(%p, %p)", pFirst_one, pSecond_one);
 
-    if (((tHeadup_pair*)pFirst_one)->out_of_game) {
-        if (((tHeadup_pair*)pSecond_one)->out_of_game) {
-            return ((tHeadup_pair*)pFirst_one)->out_of_game - ((tHeadup_pair*)pSecond_one)->out_of_game;
+    if (HEADUP1->out_of_game) {
+        if (HEADUP2->out_of_game) {
+            return HEADUP1->out_of_game - HEADUP2->out_of_game;
         } else {
             return INT_MAX;
         }
-    } else if (((tHeadup_pair*)pSecond_one)->out_of_game) {
+    } else if (HEADUP2->out_of_game) {
         return -INT_MAX;
-    } else if (((tHeadup_pair*)pSecond_one)->score == ((tHeadup_pair*)pFirst_one)->score) {
-        return gNet_players[((tHeadup_pair*)pFirst_one)->player_index].last_score_index
-            - gNet_players[((tHeadup_pair*)pSecond_one)->player_index].last_score_index;
+    } else if (HEADUP2->score == HEADUP1->score) {
+        return gNet_players[HEADUP1->player_index].last_score_index
+            - gNet_players[HEADUP2->player_index].last_score_index;
     } else {
-        return ((tHeadup_pair*)pSecond_one)->score - ((tHeadup_pair*)pFirst_one)->score;
+        return HEADUP2->score - HEADUP1->score;
     }
 }
+
+#undef HEADUP2
+#undef HEADUP1
 
 // IDA: void __usercall ClipName(char *pName@<EAX>, tDR_font *pFont@<EDX>, int pMax_width@<EBX>)
 void ClipName(char* pName, tDR_font* pFont, int pMax_width) {
