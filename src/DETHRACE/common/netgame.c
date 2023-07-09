@@ -179,7 +179,14 @@ void ReceivedRecover(tNet_contents* pContents) {
 void CopyMechanics(tCar_spec* pCar, tNet_contents* pContents) {
     int j;
     LOG_TRACE("(%p, %p)", pCar, pContents);
-    NOT_IMPLEMENTED();
+
+    memcpy(&pCar->message, pContents, pContents->header.contents_size);
+    // if it is not a full mechanics message...
+    if (pContents->header.contents_size != sizeof(tNet_message_mechanics_info)) {
+        for (j = 0; j < COUNT_OF(pCar->message.wheel_dam_offset); j++) {
+            pCar->message.wheel_dam_offset[j] = 0.0f;
+        }
+    }
 }
 
 // IDA: void __usercall ReceivedMechanics(tNet_contents *pContents@<EAX>)
@@ -187,7 +194,92 @@ void ReceivedMechanics(tNet_contents* pContents) {
     int i;
     tCar_spec* car;
     LOG_TRACE("(%p)", pContents);
-    NOT_IMPLEMENTED();
+
+    car = NULL;
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (gNet_players[i].ID == pContents->data.mech.ID) {
+            car = gNet_players[i].car;
+            break;
+        }
+    }
+    if (car == NULL || car->message.time >= pContents->data.mech.time) {
+        return;
+    }
+    if (car->disabled) {
+        EnableCar(car);
+        GetExpandedMatrix(&car->car_master_actor->t.t.mat, &pContents->data.mech.mat);
+        BrMatrix34Copy(&car->oldmat, &car->car_master_actor->t.t.mat);
+        BrVector3InvScale(&car->car_master_actor->t.t.translate.t, &car->car_master_actor->t.t.translate.t, WORLD_SCALE);
+        // car->car_master_actor->t.t.mat.m[3][0] = car->car_master_actor->t.t.mat.m[3][0] * 0.14492753;
+        // car->car_master_actor->t.t.mat.m[3][1] = car->car_master_actor->t.t.mat.m[3][1] * 0.14492753;
+        // car->car_master_actor->t.t.mat.m[3][2] = car->car_master_actor->t.t.mat.m[3][2] * 0.14492753;
+        car->box_face_ref = gFace_num__car - 2;
+        car->message.time = pContents->data.mech.time;
+        car->message.type = NETMSGID_NONE;
+        BrVector3Copy(&car->v, &pContents->data.mech.v);
+        BrVector3Copy(&car->omega, &pContents->data.mech.omega);
+
+        for (i = 0; i < COUNT_OF(car->message.d); i++) {
+            car->message.d[i] = pContents->data.mech.d[i];
+        }
+        for (i = 0; i < COUNT_OF(car->message.damage); i++) {
+            car->message.damage[i] = pContents->data.mech.damage[i];
+        }
+        DisableCar(car);
+        return;
+    }
+    if (gNet_mode == eNet_mode_host) {
+        if (gThis_net_player_index == i) {
+            return;
+        }
+        if (car->last_car_car_collision <= pContents->data.mech.cc_coll_time) {
+            CopyMechanics(car, pContents);
+        }
+        car->power_up_levels[0] = pContents->data.mech.powerups & 7;
+        car->power_up_levels[1] = (pContents->data.mech.powerups >> 3) & 7;
+        car->power_up_levels[2] = (pContents->data.mech.powerups >> 6) & 7;
+        car->keys = car->message.keys;
+        if (car->message.keys.joystick_acc < 0) {
+            car->joystick.acc = -1;
+        } else {
+            car->joystick.acc = car->message.keys.joystick_acc << 9;
+        }
+        if (car->message.keys.joystick_dec < 0) {
+            car->joystick.dec = -1;
+        } else {
+            car->joystick.dec = car->message.keys.joystick_dec << 9;
+        }
+    } else if (gNet_mode == eNet_mode_client) {
+        if (gThis_net_player_index == i) {
+            if (car->last_car_car_collision < pContents->data.mech.cc_coll_time) {
+                CopyMechanics(car, pContents);
+            }
+        } else {
+            CopyMechanics(car, pContents);
+            car->power_up_levels[0] = pContents->data.mech.powerups & 7;
+            car->power_up_levels[1] = (pContents->data.mech.powerups >> 3) & 7;
+            car->power_up_levels[2] = (pContents->data.mech.powerups >> 6) & 7;
+            car->keys = car->message.keys;
+            if (car->message.keys.joystick_acc < 0) {
+                car->joystick.acc = -1;
+            } else {
+                car->joystick.acc = car->message.keys.joystick_acc << 9;
+            }
+            if (car->message.keys.joystick_dec < 0) {
+                car->joystick.dec = -1;
+            } else {
+                car->joystick.dec = car->message.keys.joystick_dec << 9;
+            }
+            if (!car->active) {
+                GetExpandedMatrix(&car->car_master_actor->t.t.mat, &pContents->data.mech.mat);
+                BrMatrix34Copy(&car->oldmat, &car->car_master_actor->t.t.mat);
+                BrMatrix34ApplyP(&car->pos, &car->cmpos, &car->car_master_actor->t.t.mat);
+                BrVector3InvScale(&car->car_master_actor->t.t.translate.t, &car->car_master_actor->t.t.translate.t, WORLD_SCALE);
+                BrVector3InvScale(&car->pos, &car->pos, WORLD_SCALE);
+                car->box_face_ref = gFace_num__car - 2;
+            }
+        }
+    }
 }
 
 // IDA: void __usercall ReceivedCopInfo(tNet_contents *pContents@<EAX>)
@@ -1311,7 +1403,22 @@ void GetReducedMatrix(tReduced_matrix* m1, br_matrix34* m2) {
 // IDA: void __usercall GetExpandedMatrix(br_matrix34 *m1@<EAX>, tReduced_matrix *m2@<EDX>)
 void GetExpandedMatrix(br_matrix34* m1, tReduced_matrix* m2) {
     LOG_TRACE("(%p, %p)", m1, m2);
-    NOT_IMPLEMENTED();
+
+    m1->m[0][0] = m2->row1.v[0];
+    m1->m[0][1] = m2->row1.v[1];
+    m1->m[0][2] = m2->row1.v[2];
+
+    m1->m[1][0] = m2->row2.v[0];
+    m1->m[1][1] = m2->row2.v[1];
+    m1->m[1][2] = m2->row2.v[2];
+
+    m1->m[3][0] = m2->translation.v[0];
+    m1->m[3][1] = m2->translation.v[1];
+    m1->m[3][2] = m2->translation.v[2];
+
+    m1->m[2][0] = m2->row2.v[2] * m2->row1.v[1] - m2->row2.v[1] * m2->row1.v[2];
+    m1->m[2][1] = m2->row1.v[2] * m2->row2.v[0] - m2->row2.v[2] * m2->row1.v[0];
+    m1->m[2][2] = m2->row2.v[1] * m2->row1.v[0] - m2->row1.v[1] * m2->row2.v[0];
 }
 
 // IDA: void __usercall NetEarnCredits(tNet_game_player_info *pPlayer@<EAX>, tS32 pCredits@<EDX>)

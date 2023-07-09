@@ -24,11 +24,11 @@ float dword_531D9C;
 float flt_531D7C;
 float flt_531D98;
 
-void S3Set3DSoundEnvironment(float a1, float a2, float a3) {
+void S3Set3DSoundEnvironment(float pInverse_world_scale, float a2, float a3) {
     float tmp;
 
-    if (a1 == -1.0f) {
-        a1 = 0.25f;
+    if (pInverse_world_scale == -1.0f) {
+        pInverse_world_scale = 0.25f;
     }
     if (a2 == -1.0f) {
         a2 = 1.2f;
@@ -36,7 +36,7 @@ void S3Set3DSoundEnvironment(float a1, float a2, float a3) {
     if (a3 == -1.0f) {
         a3 = 130000.0f;
     }
-    dword_531D9C = a1;
+    dword_531D9C = pInverse_world_scale;
     tmp = sqrtf(a3 / a2);
     flt_531D7C = tmp;
     flt_531D98 = tmp * dword_531D9C;
