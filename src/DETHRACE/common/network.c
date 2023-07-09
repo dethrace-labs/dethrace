@@ -185,7 +185,19 @@ void NetSendHeadupToEverybody(char* pMessage) {
 void NetSendHeadupToPlayer(char* pMessage, tPlayer_ID pPlayer) {
     tNet_message* message;
     LOG_TRACE("(\"%s\", %d)", pMessage, pPlayer);
-    NOT_IMPLEMENTED();
+
+    if (gNet_mode == eNet_mode_none) {
+        return;
+    }
+    if (gLocal_net_ID == pPlayer) {
+        if (gProgram_state.racing) {
+            NewTextHeadupSlot(4, 0, 3000, -4, pMessage);
+        }
+    } else {
+        message = NetBuildMessage(NETMSGID_HEADUP, 0);
+        strcpy(message->contents.data.headup.text, pMessage);
+        NetGuaranteedSendMessageToPlayer(gCurrent_net_game, message, pPlayer, 0);
+    }
 }
 
 // IDA: void __cdecl InitialisePlayerStati()
@@ -730,7 +742,14 @@ int NetSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage, 
 // IDA: int __usercall NetSendMessageToHost@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>)
 int NetSendMessageToHost(tNet_game_details* pDetails, tNet_message* pMessage) {
     LOG_TRACE("(%p, %p)", pDetails, pMessage);
-    NOT_IMPLEMENTED();
+
+    if (gNet_mode == eNet_mode_none) {
+        return -3;
+    }
+    pMessage->sender = gLocal_net_ID;
+    pMessage->senders_time_stamp = PDGetTotalTime();
+    DoCheckSum(pMessage);
+    return PDNetSendMessageToAddress(pDetails, pMessage, &pDetails->pd_net_info);
 }
 
 // IDA: int __usercall NetReplyToMessage@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pIncoming_message@<EDX>, tNet_message *pReply_message@<EBX>)
@@ -873,7 +892,23 @@ tNet_contents* NetGetToHostContents(tNet_message_type pType, tS32 pSize_decider)
     tU32 the_size;
     tNet_contents* contents;
     LOG_TRACE("(%d, %d)", pType, pSize_decider);
-    NOT_IMPLEMENTED();
+
+    the_size = NetGetContentsSize(pType, pSize_decider);
+    if (gTo_host_stack && the_size + gTo_host_stack->overall_size > MAX_MESAGE_STACK_SIZE) {
+        NetSendMessageToHost(gCurrent_net_game, gTo_host_stack);
+        gTo_host_stack = 0;
+    }
+    if (!gTo_host_stack) {
+        gTo_host_stack = NetAllocateMessage(MAX_MESAGE_STACK_SIZE);
+        gTo_host_stack->overall_size = offsetof(tNet_message, contents);
+        gTo_host_stack->num_contents = 0;
+    }
+    contents = (tNet_contents*)((char*)gTo_host_stack + gTo_host_stack->overall_size);
+    gTo_host_stack->overall_size += the_size;
+    contents->header.type = pType;
+    contents->header.contents_size = the_size;
+    gTo_host_stack->num_contents++;
+    return contents;
 }
 
 // IDA: tNet_contents* __usercall NetGetBroadcastContents@<EAX>(tNet_message_type pType@<EAX>, tS32 pSize_decider@<EDX>)
@@ -1453,7 +1488,10 @@ int PlayerIsInList(tPlayer_ID pID) {
 // IDA: void __usercall ReceivedTimeSync(tNet_contents *pContents@<EAX>, tNet_message *pMessage@<EDX>, tU32 pReceive_time@<EBX>)
 void ReceivedTimeSync(tNet_contents* pContents, tNet_message* pMessage, tU32 pReceive_time) {
     LOG_TRACE("(%p, %p, %d)", pContents, pMessage, pReceive_time);
-    NOT_IMPLEMENTED();
+
+    if (pMessage->senders_time_stamp - pContents->data.time_sync.race_start_time > pReceive_time + 10) {
+        gRace_start -= pMessage->senders_time_stamp - pContents->data.time_sync.race_start_time - pReceive_time;
+    }
 }
 
 // IDA: void __usercall ReceivedConfirm(tNet_contents *pContents@<EAX>)
@@ -1479,7 +1517,11 @@ void ReceivedEnableCar(tNet_contents* pContents) {
 void ReceivedScores(tNet_contents* pContents) {
     int i;
     LOG_TRACE("(%p)", pContents);
-    NOT_IMPLEMENTED();
+
+    UseGeneralScore(pContents->data.scores.general_score);
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        gNet_players[i].score = pContents->data.scores.scores[i];
+    }
 }
 
 // IDA: void __usercall ReceivedWasted(tNet_contents *pContents@<EAX>)
@@ -1978,7 +2020,13 @@ tCar_spec* NetCarFromPlayerID(tPlayer_ID pPlayer) {
 tNet_game_player_info* NetPlayerFromCar(tCar_spec* pCar) {
     int i;
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (gNet_players[i].car == pCar) {
+            return &gNet_players[i];
+        }
+    }
+    return 0;
 }
 
 // IDA: tU32 __usercall DoCheckSum@<EAX>(tNet_message *pMessage@<EAX>)
