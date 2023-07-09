@@ -768,9 +768,7 @@ int FarEnoughAway(tNet_game_player_info* pPlayer_1, tNet_game_player_info* pPlay
     br_vector3 difference;
     LOG_TRACE("(%p, %p)", pPlayer_1, pPlayer_2);
 
-    difference.v[0] = pPlayer_1->car->pos.v[0] - pPlayer_2->car->pos.v[0];
-    difference.v[1] = pPlayer_1->car->pos.v[1] - pPlayer_2->car->pos.v[1];
-    difference.v[2] = pPlayer_1->car->pos.v[2] - pPlayer_2->car->pos.v[2];
+    BrVector3Sub(&difference, &pPlayer_1->car->pos, &pPlayer_2->car->pos);
     return BrVector3LengthSquared(&difference) >= 4.0f;
 }
 
