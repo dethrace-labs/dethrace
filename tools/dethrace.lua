@@ -91,7 +91,11 @@ function create_message_size_type(parent, message, name)
     local tree = parent:add(dethrace_protocol, message(), string.format("%s (%d)", name, message_type))
     tree:add_le(f_contents_size, message(0, 1))
     tree:add_le(f_contents_type, message(1, 1))
-    return tree
+    result = {}
+    result["tree"] = tree
+    result["size"] = message(0, 1):le_uint()
+    result["type"] = message(1, 1):le_uint()
+    return result
 end
 
 f_pd_player_info = ProtoField.bytes("dethrace.pd_info", "PD Net Info")
@@ -147,7 +151,7 @@ end
 
 function dissect_message_sendmedetails(tree, message)
     -- tNet_message_send_me_details (0)
-    create_message_size_type(tree, message, "Send Me Details")
+    local t = create_message_size_type(tree, message, "Send Me Details")["tree"]
     -- finished
 end
 
@@ -243,7 +247,7 @@ end
 
 function dissect_message_details(tree, message)
     -- tNet_message_my_details (1)
-    local t = create_message_size_type(tree, message, "Details")
+    local t = create_message_size_type(tree, message, "Details")["tree"]
     local offset = 2
 
     offset = offset + dissect_pd_player_info(t, message(offset))
@@ -385,7 +389,7 @@ end
 
 function dissect_message_join(tree, message)
     -- tNet_message_join (2)
-    local t = create_message_size_type(tree, message, "Join")
+    local t = create_message_size_type(tree, message, "Join")["tree"]
     local offset = 4
 
     dissect_game_player_info(t:add("Player Info", message(offset)), message(offset))
@@ -402,7 +406,7 @@ f_newplayerlist_batch_number = ProtoField.int32("dethrace.newplayerlist.batch_nu
 
 function dissect_message_newplayerlist(tree, message)
     -- tNet_message_new_player_list (3)
-    local t = create_message_size_type(tree, message, "New Player List")
+    local t = create_message_size_type(tree, message, "New Player List")["tree"]
     local offset = 4
 
     local t_count = t:add_le(f_newplayerlist_count, message(offset, 4))
@@ -427,7 +431,7 @@ f_guaranteereply_number = ProtoField.uint32("dethrace.guaranteereply.number", "G
 
 function dissect_message_guaranteereply(tree, message)
     -- tNet_message_guarantee_reply (4)
-    local t = create_message_size_type(tree, message, "Guarantee Reply")
+    local t = create_message_size_type(tree, message, "Guarantee Reply")["tree"]
     t:add_le(f_guaranteereply_number, message(4, 4))
     -- FIXME: add reference to packet with this reply number
     -- finished
@@ -435,7 +439,7 @@ end
 
 function dissect_message_cardetailsreq(tree, message)
     -- tNet_message_car_details_req (5)
-    create_message_size_type(tree, message, "Car Details Req")
+    local t = create_message_size_type(tree, message, "Car Details Req")["tree"]
     -- finished
 end
 
@@ -445,7 +449,7 @@ f_cardetails_owner = ProtoField.stringz("dethrace.cardetails.owner", "Owner")
 
 function dissect_message_cardetails(tree, message)
     -- tNet_message_car_details (6)
-    local t = create_message_size_type(tree, message, "Car Details")
+    local t = create_message_size_type(tree, message, "Car Details")["tree"]
     local offset = 4
 
     t:add_le(f_cardetails_count, message(4, 4))
@@ -464,13 +468,13 @@ end
 
 function dissect_message_leave(tree, message)
     -- tNet_message_leave (7)
-    create_message_size_type(tree, message, "Leave")
+    local t = create_message_size_type(tree, message, "Leave")["tree"]
     -- finished
 end
 
 function dissect_message_hosticide(tree, message)
     -- tNet_message_host_pissing_off (8)
-    create_message_size_type(tree, message, "Hosticide")
+    local t = create_message_size_type(tree, message, "Hosticide")["tree"]
     -- finished
 end
 
@@ -490,14 +494,14 @@ f_raceover_reason = ProtoField.uint32("dethrace.raceover.reason", "Reason", base
 
 function dissect_message_raceover(tree, message)
     -- tNet_message_race_over (9)
-    local t = create_message_size_type(tree, message, "Race Over (UNTESTED)")
+    local t = create_message_size_type(tree, message, "Race Over (UNTESTED)")["tree"]
     t:add_le(f_raceover_reason, message(4, 4))
     -- finished
 end
 
 function dissect_message_statusreport(tree, message)
     -- tNet_message_status_report (10)
-    local t = create_message_size_type(tree, message, "Status Report")
+    local t = create_message_size_type(tree, message, "Status Report")["tree"]
     t:add_le(f_player_status, message(4, 4))
     -- finished
 end
@@ -510,7 +514,7 @@ f_startrace_grid_next_car_index = ProtoField.uint32("dethrace.startrace.grid.nex
 
 function dissect_message_startrace(tree, message)
     -- tNet_message_start_race (11)
-    local t = create_message_size_type(tree, message, "Start Race")
+    local t = create_message_size_type(tree, message, "Start Race")["tree"]
     local offset = 4
 
     t:add_le(f_startrace_count, message(offset, 4))
@@ -541,14 +545,14 @@ f_headup_text = ProtoField.stringz("dethrace.headup.message", "Message")
 
 function dissect_message_headup(tree, message)
     -- tNet_message_headup (12)
-    local t = create_message_size_type(tree, message, "Head-Up (UNTESTED)")
+    local t = create_message_size_type(tree, message, "Head-Up (UNTESTED)")["tree"]
     t:add(f_headup_text, message(4, 128))
     -- finished
 end
 
 function dissect_message_hostquery(tree, message)
     -- tNet_message_host_query (13)
-    create_message_size_type(tree, message, "Host Query")
+    local t = create_message_size_type(tree, message, "Host Query")["tree"]
     -- finished
 end
 
@@ -558,7 +562,7 @@ f_hostreply_pending = ProtoField.uint32("dethrace.hostreply.pending", "Pending R
 
 function dissect_message_hostreply(tree, message)
     -- tNet_message_host_reply (14)
-    local t = create_message_size_type(tree, message, "Host Reply (UNTESTED)")
+    local t = create_message_size_type(tree, message, "Host Reply (UNTESTED)")["tree"]
     t:add(f_hostreply_started, message(4, 4))
     t:add(f_hostreply_race, message(8, 4))
     t:add(f_hostreply_pending, message(12, 4))
@@ -580,7 +584,7 @@ f_mechanics_damage = ProtoField.uint8("dethrace.mechanics.damage", "Damage")
 
 function dissect_message_mechanics(tree, message)
     -- tNet_message_mechanics_info (15)
-    local t = create_message_size_type(tree, message, "Mechanics")
+    local t = create_message_size_type(tree, message, "Mechanics")["tree"]
     local offset = 4
 
     t:add_le(f_mechanics_id, message(offset, 4))
@@ -630,6 +634,7 @@ function dissect_message_mechanics(tree, message)
 
     do
         local sub = t:add("Damage", message(offset, 4))
+        -- FIXME: use names of damage system (in addition to index)
         for i = 0, 11 do
             local item = sub:add_le(f_mechanics_damage, message(offset, 1))
             item:set_text(string.format("damage[%d] = %d", i, message(offset, 1):le_uint()))
@@ -657,7 +662,7 @@ end
 
 function dissect_message_noncar_info(tree, message)
     -- tNet_message_non_car_info (16)
-    local t = create_message_size_type(tree, message, "Non-Car Info (INCOMPLETE)")
+    local t = create_message_size_type(tree, message, "Non-Car Info (INCOMPLETE)")["tree"]
     -- FIXME
 end
 
@@ -665,7 +670,7 @@ f_timesync_time = ProtoField.uint32("dethrace.timesync.start_time", "Race Start 
 
 function dissect_message_timesync(tree, message)
     -- tNet_message_time_sync (17)
-    local t = create_message_size_type(tree, message, "Time Sync")
+    local t = create_message_size_type(tree, message, "Time Sync")["tree"]
     local offset = 4
 
     t:add_le(f_timesync_time, message(offset, 4))
@@ -674,31 +679,31 @@ end
 
 function dissect_message_confirm(tree, message)
     -- tNet_message_players_confirm (18)
-    local t = create_message_size_type(tree, message, "Confirm (INCOMPLETE)")
+    local t = create_message_size_type(tree, message, "Confirm (INCOMPLETE)")["tree"]
     -- FIXME
 end
 
 function dissect_message_disablecar(tree, message)
     -- tNet_message_disable_car (19)
-    local t = create_message_size_type(tree, message, "Disable Car (INCOMPLETE)")
+    local t = create_message_size_type(tree, message, "Disable Car (INCOMPLETE)")["tree"]
     -- FIXME
 end
 
 function dissect_message_enablecar(tree, message)
     -- tNet_message_enable_car (20)
-    local t = create_message_size_type(tree, message, "Enable Car (INCOMPLETE)")
+    local t = create_message_size_type(tree, message, "Enable Car (INCOMPLETE)")["tree"]
     -- FIXME
 end
 
 function dissect_message_powerup(tree, message)
     -- tNet_message_powerup (21)
-    local t = create_message_size_type(tree, message, "Power-Up (INCOMPLETE)")
+    local t = create_message_size_type(tree, message, "Power-Up (INCOMPLETE)")["tree"]
     -- FIXME
 end
 
 function dissect_message_recover(tree, message)
     -- tNet_message_recover (22)
-    local t = create_message_size_type(tree, message, "Recover (INCOMPLETE)")
+    local t = create_message_size_type(tree, message, "Recover (INCOMPLETE)")["tree"]
     -- FIXME
 end
 
@@ -708,7 +713,8 @@ f_scores_score = ProtoField.int32("dethrace.scored.score", "Score")
 
 function dissect_message_scores(tree, message)
     -- tNet_message_game_scores (23)
-    local t = create_message_size_type(tree, message, "Scores")
+    local header = create_message_size_type(tree, message, "Scores")
+    local t = header["tree"]
     local offset = 4
 
     for i = 0, 5 do
@@ -727,55 +733,79 @@ end
 
 function dissect_message_wasted(tree, message)
     -- tNet_message_wasted (24)
-    local t = create_message_size_type(tree, message, "Wasted (INCOMPLETE)")
+    local t = create_message_size_type(tree, message, "Wasted (INCOMPLETE)")["tree"]
     -- FIXME
 end
 
+f_ped_instruction = ProtoField.int8("dethrace.ped.instruction", "Action Instruction")
+f_ped_flags = ProtoField.int8("dethrace.ped.flags", "Flags")
+f_ped_index = ProtoField.int16("dethrace.ped.index", "Index")
+
 function dissect_message_pedestrian(tree, message)
     -- tNet_message_pedestrian (25)
-    local t = create_message_size_type(tree, message, "Pedestrian (INCOMPLETE)")
+    local t = create_message_size_type(tree, message, "Pedestrian (INCOMPLETE)")["tree"]
+    local offset = 2
+
+    t:add_le(f_ped_instruction, message(offset, 1))
+    offset = offset + 1
+
+    t:add_le(f_ped_flags, message(offset, 1))
+    offset = offset + 1
+
+    t:add_le(f_ped_index, message(offset, 2))
+    offset = offset + 2
+
+    -- padding
+    offset = offset + 2
+
+    offset = offset + dissect_br_vector3(t, message(offset, 12), "Position")
+
+    t:add_le(f_float, message(offset, 4)):set_text(string.format("Speed: %f", message(offset, 4):le_float()))
+    offset = offset + 4
+
+    --offset = offset + dissect_br_vector3(t, message(offset, 12), "to_pos")
     -- FIXME
 end
 
 function dissect_message_gameplay(tree, message)
     -- tNet_message_gameplay (26)
-    local t = create_message_size_type(tree, message, "Gameplay (INCOMPLETE)")
+    local t = create_message_size_type(tree, message, "Gameplay (INCOMPLETE)")["tree"]
     -- FIXME
 end
 
 function dissect_message_noncarposition(tree, message)
     -- tNet_message_non_car_position (27)
-    local t = create_message_size_type(tree, message, "Non-Car Position (INCOMPLETE)")
+    local t = create_message_size_type(tree, message, "Non-Car Position (INCOMPLETE)")["tree"]
     -- FIXME
 end
 
 function dissect_message_copinfo(tree, message)
     -- tNet_message_cop_info (28)
-    local t = create_message_size_type(tree, message, "Cop Info (INCOMPLETE)")
+    local t = create_message_size_type(tree, message, "Cop Info (INCOMPLETE)")["tree"]
     -- FIXME
 end
 
 function dissect_message_gamescores(tree, message)
     -- tNet_message_oil_spill (29)
-    local t = create_message_size_type(tree, message, "Game Scores (INCOMPLETE)")
+    local t = create_message_size_type(tree, message, "Game Scores (INCOMPLETE)")["tree"]
     -- FIXME
 end
 
 function dissect_message_oilspill(tree, message)
     -- tNet_message_oil_spill (30)
-    local t = create_message_size_type(tree, message, "Oil Spill (INCOMPLETE)")
+    local t = create_message_size_type(tree, message, "Oil Spill (INCOMPLETE)")["tree"]
     -- FIXME
 end
 
 function dissect_message_crushpoint(tree, message)
     -- tNet_message_crush_point (31)
-    local t = create_message_size_type(tree, message, "Crush Point (INCOMPLETE)")
+    local t = create_message_size_type(tree, message, "Crush Point (INCOMPLETE)")["tree"]
     -- FIXME
 end
 
 function dissect_message_none(tree, message)
     -- none (32)
-    create_message_size_type(tree, message, "None")
+    local t = create_message_size_type(tree, message, "None")["tree"]
     -- finished
 end
 
@@ -824,6 +854,8 @@ dethrace_protocol.fields = {
     f_timesync_time,
 
     f_scores_played, f_scores_won, f_scores_score,
+
+    f_ped_instruction, f_ped_flags, f_ped_index,
 }
 
 dethrace_message_dissectors = {
