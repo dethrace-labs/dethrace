@@ -886,8 +886,7 @@ void CalcEngineForce(tCar_spec* c, br_scalar dt) {
         } else if (c->joystick.acc < 0) {
             ts = 1.2;
         } else {
-            ts = c->joystick.acc / 54613.0;
-            LOG_PANIC("ooo");
+            ts = c->joystick.acc / 54613.0f;
         }
 
         torque = c->engine_power_multiplier * ts * gEngine_powerup_factor[c->power_up_levels[1]];
@@ -1085,7 +1084,68 @@ void GetNetPos(tCar_spec* pCar) {
     float amount;
     br_scalar total_deflection;
     LOG_TRACE("(%p)", pCar);
-    NOT_IMPLEMENTED();
+
+    if (gNet_mode == eNet_mode_host && pCar->last_car_car_collision > pCar->message.cc_coll_time) {
+        pCar->message.type = 0;
+        pCar->dt = -1.0f;
+        return;
+    }
+    if (fabsf(pCar->message.omega.v[0]) > 10000.0
+        || fabsf(pCar->message.omega.v[1]) > 10000.0
+        || fabsf(pCar->message.omega.v[2]) > 10000.0
+        || fabsf(pCar->message.omega.v[0]) > 10000.0
+        || fabsf(pCar->message.omega.v[1]) > 10000.0
+        || fabsf(pCar->message.omega.v[2]) > 10000.0) {
+        BrVector3SetFloat(&pCar->message.omega, 0.0, 0.0, 0.0);
+        BrVector3SetFloat(&pCar->message.v, 0.0, 0.0, 0.0);
+    }
+    GetExpandedMatrix(&pCar->car_master_actor->t.t.mat, &pCar->message.mat);
+    if (gNet_mode == eNet_mode_client) {
+        BrMatrix34Copy(&pCar->oldmat, &pCar->car_master_actor->t.t.mat);
+    }
+
+    BrVector3Copy(&pCar->v, &pCar->message.v);
+    BrVector3Copy(&pCar->omega, &pCar->message.omega);
+
+    if (pCar->driver > eDriver_non_car) {
+        pCar->curvature = pCar->message.curvature * pCar->maxcurve / 32767.0f;
+        for (j = 0; j < sizeof(pCar->oldd); j++) {
+            pCar->oldd[j] = (pCar->message.d[j] * pCar->susp_height[j >> 1]) / 255.0f;
+        }
+        if (pCar->driver == eDriver_oppo || pCar->repair_time >= pCar->message.repair_time) {
+            for (j = 0; j < COUNT_OF(pCar->damage_units); j++) {
+                pCar->damage_units[j].damage_level = pCar->message.damage[j];
+            }
+            SortOutSmoke(pCar);
+        } else {
+            if (pCar->message.repair_time - pCar->repair_time < 100000) {
+                amount = RepairCar2(pCar, pCar->message.repair_time - pCar->repair_time, &total_deflection);
+            } else {
+                TotallyRepairACar(pCar);
+                pCar->repair_time = pCar->message.repair_time;
+            }
+            for (j = 0; j < COUNT_OF(pCar->damage_units); j++) {
+                pCar->damage_units[j].damage_level = pCar->message.damage[j];
+            }
+            SetSmokeLastDamageLevel(pCar);
+            StopCarSmoking(pCar);
+        }
+        if (pCar->driver == eDriver_net_human) {
+            pCar->revs = pCar->message.revs;
+        }
+        if (pCar->driver >= eDriver_net_human) {
+            pCar->bounds[1].min.v[2] = pCar->message.front;
+            pCar->bounds[1].max.v[2] = pCar->message.back;
+        }
+        if (pCar->driver != eDriver_local_human) {
+            for (j = 0; j < COUNT_OF(pCar->wheel_dam_offset); j++) {
+                pCar->wheel_dam_offset[j] = pCar->message.wheel_dam_offset[j];
+            }
+        }
+        GetFacesInBox((tCollision_info*)pCar);
+    }
+    pCar->message.type = 0;
+    pCar->last_car_car_collision = pCar->message.cc_coll_time;
 }
 
 // IDA: void __usercall ApplyPhysicsToCars(tU32 last_frame_time@<EAX>, tU32 pTime_difference@<EDX>)

@@ -1,5 +1,6 @@
 #include "netgame.h"
 #include "brender/brender.h"
+#include "brucetrk.h"
 #include "car.h"
 #include "controls.h"
 #include "crush.h"
@@ -64,7 +65,7 @@ void SendCarData(tU32 pNext_frame_time) {
                 continue;
             }
             damaged_wheels = car->damage_units[eDamage_lf_wheel].damage_level > 30 || car->damage_units[eDamage_rf_wheel].damage_level > 30 || car->damage_units[eDamage_lr_wheel].damage_level > 30 || car->damage_units[eDamage_rr_wheel].damage_level > 30;
-            contents = NetGetBroadcastContents(0xFu, damaged_wheels);
+            contents = NetGetBroadcastContents(NETMSGID_MECHANICS, damaged_wheels);
             GetReducedMatrix(&contents->data.mech.mat, &car->car_master_actor->t.t.mat);
             contents->data.mech.ID = gNet_players[i].ID;
             contents->data.mech.time = pNext_frame_time;
@@ -330,7 +331,57 @@ void ReceivedNonCar(tNet_contents* pContents) {
     tNon_car_spec* ncar;
     tCollision_info* c;
     LOG_TRACE("(%p)", pContents);
-    NOT_IMPLEMENTED();
+
+    track_spec = &gProgram_state.track_spec;
+    if (pContents->data.non_car.ID >= track_spec->ampersand_digits) {
+        return;
+    }
+    actor = track_spec->non_car_list[pContents->data.non_car.ID];
+    if (actor == NULL) {
+        return;
+    }
+    ncar = (tNon_car_spec*)actor->type_data;
+    if (ncar && (ncar->collision_info.driver != eDriver_non_car || ncar->collision_info.car_ID != pContents->data.non_car.ID)) {
+        ncar = NULL;
+    }
+    if ((pContents->data.non_car.flags & 1) != 0) {
+        actor->identifier[3] = '!';
+    } else {
+        actor->identifier[3] = 'x';
+    }
+    if (!ncar && actor->identifier[1] >= '0' && actor->identifier[1] <= '9') {
+        BrVector3Sub(&tv, &gProgram_state.current_car.car_master_actor->t.t.translate.t, &actor->t.t.translate.t);
+        if (BrVector3LengthSquared(&tv) < 900.0f) {
+            DoPullActorFromWorld(actor);
+            ncar = (tNon_car_spec*)actor->type_data;
+        }
+    }
+    if (ncar) {
+        c = &ncar->collision_info;
+        if ((pContents->data.non_car.flags & 2) != 0) {
+            GetExpandedMatrix(&c->car_master_actor->t.t.mat, &pContents->data.non_car.mat);
+            BrVector3Copy(&c->v, &pContents->data.non_car.v);
+            BrVector3Copy(&c->omega, &pContents->data.non_car.omega);
+            c->doing_nothing_flag = 1;
+        } else {
+            BrVector3Copy(&c->message.v, &pContents->data.non_car.v);
+            BrVector3Copy(&c->message.omega, &pContents->data.non_car.omega);
+            memcpy(&c->message.mat, &pContents->data.non_car.mat, sizeof(c->message.mat));
+            c->message.time = pContents->data.non_car.time;
+            c->message.type = NETMSGID_NONCAR_INFO;
+            c->doing_nothing_flag = 0;
+        }
+    } else {
+        GetExpandedMatrix(&actor->t.t.mat, &pContents->data.mech.mat);
+        BrVector3InvScale(&actor->t.t.translate.t, &actor->t.t.translate.t, WORLD_SCALE);
+        XZToColumnXZ(&cx, &cz, actor->t.t.translate.t.v[0], actor->t.t.translate.t.v[2], track_spec);
+        if (track_spec->columns[cz][cx] != actor->parent) {
+            if (track_spec->columns[cz][cx]) {
+                BrActorRemove(actor);
+                BrActorAdd(track_spec->columns[cz][cx], actor);
+            }
+        }
+    }
 }
 
 // IDA: void __usercall SignalToStartRace2(int pIndex@<EAX>)
@@ -1415,9 +1466,9 @@ void GetReducedMatrix(tReduced_matrix* m1, br_matrix34* m2) {
     m1->row2.v[0] = m2->m[1][0];
     m1->row2.v[1] = m2->m[1][1];
     m1->row2.v[2] = m2->m[1][2];
-    m1->translation.v[0] = m2->m[2][0];
-    m1->translation.v[1] = m2->m[2][1];
-    m1->translation.v[2] = m2->m[2][2];
+    m1->translation.v[0] = m2->m[3][0];
+    m1->translation.v[1] = m2->m[3][1];
+    m1->translation.v[2] = m2->m[3][2];
 }
 
 // IDA: void __usercall GetExpandedMatrix(br_matrix34 *m1@<EAX>, tReduced_matrix *m2@<EDX>)

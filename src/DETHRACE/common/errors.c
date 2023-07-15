@@ -260,10 +260,10 @@ void dr_dprintf(char* fmt_string, ...) {
     fflush(gDiagnostic_file);
 
     // Added by dethrace for debugging
-    // va_start(args, fmt_string);
-    // vprintf(fmt_string, args);
-    // va_end(args);
-    // printf("\n");
+    va_start(args, fmt_string);
+    vprintf(fmt_string, args);
+    va_end(args);
+    printf("\n");
 }
 
 // IDA: int __usercall DoErrorInterface@<EAX>(int pMisc_text_index@<EAX>)

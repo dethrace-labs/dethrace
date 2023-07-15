@@ -1010,7 +1010,7 @@ tNet_message* NetAllocateMessage(int pSize) {
             } else {
                 gMessage_to_free = pointer;
             }
-            pointer = ((void**)pointer)[1];
+            pointer = (char*)pointer + sizeof(void*);
         }
     }
     if (pointer == NULL) {
@@ -2005,7 +2005,13 @@ void NetWaitForGuaranteeReplies(void) {
 tNet_game_player_info* NetPlayerFromID(tPlayer_ID pPlayer) {
     int i;
     LOG_TRACE("(%d)", pPlayer);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (gNet_players[i].ID == pPlayer) {
+            return &gNet_players[i];
+        }
+    }
+    return 0;
 }
 
 // IDA: tCar_spec* __usercall NetCarFromPlayerID@<EAX>(tPlayer_ID pPlayer@<EAX>)
@@ -2013,7 +2019,12 @@ tCar_spec* NetCarFromPlayerID(tPlayer_ID pPlayer) {
     int i;
     tNet_game_player_info* player;
     LOG_TRACE("(%d)", pPlayer);
-    NOT_IMPLEMENTED();
+
+    player = NetPlayerFromID(pPlayer);
+    if (player) {
+        return player->car;
+    }
+    return NULL;
 }
 
 // IDA: tNet_game_player_info* __usercall NetPlayerFromCar@<EAX>(tCar_spec *pCar@<EAX>)
