@@ -1196,7 +1196,7 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
         for (i = 0; i < gNum_active_cars; i++) {
             car = gActive_car_list[i];
             car->dt = -1.f;
-            if (car->message.type == 15 && car->message.time >= gLast_mechanics_time && gLast_mechanics_time + harness_game_config.physics_step_time >= car->message.time) {
+            if (car->message.type == NETMSGID_MECHANICS && car->message.time >= gLast_mechanics_time && gLast_mechanics_time + harness_game_config.physics_step_time >= car->message.time) {
                 car->dt = (double)(gLast_mechanics_time + harness_game_config.physics_step_time - car->message.time) / 1000.0;
                 if (gDt - 0.0001f <= car->dt) {
                     GetNetPos(car);
@@ -1230,7 +1230,7 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
             non_car = gActive_non_car_list[i];
             if (!non_car->collision_info.doing_nothing_flag) {
                 non_car->collision_info.dt = -1.f;
-                if (non_car->collision_info.message.type == 16 && non_car->collision_info.message.time >= gLast_mechanics_time && gLast_mechanics_time + harness_game_config.physics_step_time >= non_car->collision_info.message.time) {
+                if (non_car->collision_info.message.type == NETMSGID_NONCAR_INFO && non_car->collision_info.message.time >= gLast_mechanics_time && gLast_mechanics_time + harness_game_config.physics_step_time >= non_car->collision_info.message.time) {
                     non_car->collision_info.dt = (gLast_mechanics_time + harness_game_config.physics_step_time - non_car->collision_info.message.time) / 1000.0f;
                     GetNetPos((tCar_spec*)non_car);
                 }
