@@ -569,7 +569,7 @@ function dissect_message_hostreply(tree, message)
     -- finished
 end
 
-f_mechanics_id = ProtoField.bool("dethrace.mechanics.id", "ID")
+f_mechanics_id = ProtoField.uint32("dethrace.mechanics.id", "ID")
 f_mechanics_time = ProtoField.uint32("dethrace.mechanics.time", "Time")
 f_mechanics_d = ProtoField.uint8("dethrace.mechanics.d", "D")
 f_mechanics_carcontrols = ProtoField.uint32("dethrace.mechanics.carcontrols", "Car Controls") -- FIXME: bitmask
@@ -917,9 +917,15 @@ function dethrace_protocol.dissector(buffer, pinfo, tree)
             t:add_le(f_message_count, buffer(24, 2))
             t:add_le(f_message_size, buffer(26, 2))
         end
+        local sender_type_str
+        if (pinfo.src_port == DETHRACE_PORT) then
+            sender_type_str = "HOST"
+        else
+            sender_type_str = "CLIENT"
+        end
         local message = buffer(28)
         local message_type = message(1, 1):uint()
-        pinfo.cols.info = string.format("%s (%d)", content_types[message_type], message_type)
+        pinfo.cols.info = string.format("[%s] %s (%d)", sender_type_str, content_types[message_type], message_type)
         dethrace_message_dissectors[message_type](tree, message)
     end
 end
