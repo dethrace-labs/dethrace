@@ -7,7 +7,7 @@ target_include_directories(s3
         ${CMAKE_CURRENT_SOURCE_DIR}      
 )
 
-target_link_libraries(s3 PRIVATE brender SDL2::SDL2 harness miniaudio compile_with_werror)
+target_link_libraries(s3 PRIVATE brender harness miniaudio compile_with_werror)
 
 if(NOT MSVC)
     target_link_libraries(s3 PUBLIC pthread m)

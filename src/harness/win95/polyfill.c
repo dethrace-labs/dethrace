@@ -178,8 +178,7 @@ int SetWindowPos_(void* hWnd, void* hWndInsertAfter, int X, int Y, int cx, int c
 }
 
 int ShowCursor_(int bShow) {
-    gHarness_platform.ShowCursor(bShow);
-    return 0;
+    return gHarness_platform.ShowCursor(bShow);
 }
 
 int SendMessageA_(void* hWnd, unsigned int Msg, unsigned int wParam, long lParam) {

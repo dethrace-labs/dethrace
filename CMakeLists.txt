@@ -48,11 +48,6 @@ endfunction()
 
 test_big_endian(IS_BIGENDIAN)
 
-find_package(SDL2 CONFIG)
-if(NOT SDL2_FOUND)
-    find_package(SDL2 MODULE REQUIRED)
-endif()
-
 add_subdirectory(lib/libsmacker)
 add_subdirectory(lib/glad)
 add_subdirectory(lib/miniaudio)
@@ -66,8 +61,6 @@ if(DETHRACE_WERROR)
         target_compile_options(compile_with_werror INTERFACE -Werror)
     endif()
 endif()
-
-
 
 add_subdirectory(src/harness)
 add_subdirectory(src/S3)

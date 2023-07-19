@@ -13,7 +13,7 @@ target_include_directories(dethrace_obj
 # add_compile_options(-fsanitize=address)
 # add_link_options(-fsanitize=address)
 
-target_link_libraries(dethrace_obj PUBLIC SDL2::SDL2 smackw32 harness brender s3)
+target_link_libraries(dethrace_obj PUBLIC smackw32 harness brender s3)
 
 
 if (CMAKE_C_COMPILER_ID MATCHES "MSVC")

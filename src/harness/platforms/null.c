@@ -69,11 +69,19 @@ static void NullRenderer_FlushBuffers(void) {
 static void NullRenderer_SetViewport(int x, int y, int width, int height) {
 }
 
+static uint32_t NullRenderer_GetTicks(void) {
+// todo: shouldnt depend on sdl...
+#if defined(DETHRACE_SDL2)
+    return SDL_GetTicks();
+#elif defined(DETHRACE_SDL3)
+    return (uint32_t)SDL_GetTicks();
+#endif
+}
+
 void Null_Platform_Init(tHarness_platform* platform) {
     platform->ProcessWindowMessages = null_get_and_handle_message;
-    // todo: shouldnt depend on sdl...
     platform->Sleep = SDL_Delay;
-    platform->GetTicks = SDL_GetTicks;
+    platform->GetTicks = NullRenderer_GetTicks;
     platform->CreateWindowAndRenderer = null_create_window_and_renderer;
     platform->ShowCursor = null_show_cursor;
     platform->SetWindowPos = null_set_window_pos;

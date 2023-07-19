@@ -95,7 +95,27 @@ if (IO_PLATFORM STREQUAL "SDL_OpenGL")
         resources/3d_frag.glsl.h
     )
     target_include_directories(harness PRIVATE "${dethrace_SOURCE_DIR}/src/DETHRACE/common")
-    target_link_libraries(harness PRIVATE SDL2::SDL2 glad)
+
+
+    set(DETHRACE_SDL "2" CACHE STRING "SDL Major version")
+    set_property(CACHE DETHRACE_SDL PROPERTY STRINGS "2;3")
+    message(STATUS "Configuring Dethrace with SDL_OpenGL backend (SDL ${DETHRACE_SDL})")
+
+    if(DETHRACE_SDL EQUAL 2)
+        find_package(SDL2 CONFIG)
+        if(NOT SDL2_FOUND)
+            find_package(SDL2 MODULE REQUIRED)
+        endif()
+        target_compile_definitions(harness PUBLIC DETHRACE_SDL2)
+        target_link_libraries(harness PRIVATE SDL2::SDL2)
+    elseif(DETHRACE_SDL EQUAL 3)
+        find_package(SDL3 CONFIG REQUIRED)
+        target_compile_definitions(harness PUBLIC DETHRACE_SDL3 SDL_ENABLE_OLD_NAMES)
+        target_link_libraries(harness PRIVATE SDL3::SDL3)
+    else()
+        message(FATAL_ERROR "Invalid DETHRACE_SDL value")
+    endif()
+    target_link_libraries(harness PRIVATE glad)
 endif()
 
 if(WIN32)
