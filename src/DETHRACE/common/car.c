@@ -3264,7 +3264,7 @@ int ExpandBoundingBox(tCar_spec* c) {
     c->bounds[1].min.v[2] = min_z;
     c->bounds[1].max.v[2] = max_z;
     if (c->driver == eDriver_local_human) {
-        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(6));
+        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(kMiscString_RepairObstructed));
     }
     return 0;
 }

@@ -187,7 +187,7 @@ void StartRollingSaveNamesIn(void) {
             AddRollingNumber(gSaved_games[i]->rank, 2, gCurrent_graf_data->save_slot_rank_x_offset, save_slot_height);
             AddRollingNumber(gSaved_games[i]->credits, 6, gCurrent_graf_data->save_slot_credits_x_offset, save_slot_height);
         } else {
-            AddRollingString(GetMiscString(15), gCurrent_graf_data->save_slot_x_offset, save_slot_height, eRT_alpha);
+            AddRollingString(GetMiscString(kMiscString_Empty), gCurrent_graf_data->save_slot_x_offset, save_slot_height, eRT_alpha);
         }
     }
 }
@@ -453,7 +453,7 @@ int DoLoadGame(void) {
 
     if (gNet_mode == eNet_mode_none) {
         if (!OriginalCarmaCDinDrive()) {
-            DoErrorInterface(223);
+            DoErrorInterface(kMiscString_PLEASE_INSERT_THE_CARMAGEDDON_CD);
             return 0;
         }
         gProgram_state.loading = 1;
@@ -496,7 +496,7 @@ int DoLoadGame(void) {
         }
     } else {
         SuspendPendingFlic();
-        DoErrorInterface(75);
+        DoErrorInterface(kMiscString_CannotSaveGameInNetworkPlay);
         return 0;
     }
 }
@@ -631,10 +631,10 @@ void GetSaveName(int pStarting_to_type, int pCurrent_choice, char* pString, int*
         strcpy(pString, gSaved_games[pCurrent_choice]->slot_name);
     } else {
         if (pStarting_to_type) {
-            BlankSlot(pCurrent_choice, strlen(GetMiscString(15)), 12);
+            BlankSlot(pCurrent_choice, strlen(GetMiscString(kMiscString_Empty)), 12);
             *pString = '\0';
         } else {
-            strcpy(pString, GetMiscString(15));
+            strcpy(pString, GetMiscString(kMiscString_Empty));
         }
     }
     *pMax_length = 12;
@@ -958,6 +958,6 @@ void DoSaveGame(int pSave_allowed) {
         gProgram_state.saving = 0;
     } else {
         SuspendPendingFlic();
-        DoErrorInterface(75);
+        DoErrorInterface(kMiscString_CannotSaveGameInNetworkPlay);
     }
 }

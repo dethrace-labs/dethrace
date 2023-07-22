@@ -3305,7 +3305,7 @@ FILE* DRfopen(char* pFilename, char* pMode) {
     if (result == NULL && !gAllow_open_to_fail) {
         if (GetCDPathFromPathsTxtFile(CD_dir) && !PDCheckDriveExists(CD_dir)) {
             if (gMisc_strings[0]) {
-                PDFatalError(GetMiscString(243));
+                PDFatalError(GetMiscString(kMiscString_CouldNotFindTheCarmageddonCD));
             } else {
                 PDFatalError("Could not find the Carmageddon CD");
             }

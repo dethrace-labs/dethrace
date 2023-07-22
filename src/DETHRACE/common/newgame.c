@@ -154,7 +154,7 @@ void FrankAnneDraw(int pCurrent_choice, int pCurrent_mode) {
                     gCurrent_graf_data->enter_name_x[pCurrent_choice],
                     gCurrent_graf_data->enter_name_y,
                     &gFonts[FONT_GRNLIT],
-                    GetMiscString(191),
+                    GetMiscString(kMiscString_ENTER_NAME),
                     gBack_screen->width);
             }
         }
@@ -388,7 +388,7 @@ int DoOnePlayerStart(void) {
         UnlockBunchOfFlics(4);
         return 1;
     } else {
-        DoErrorInterface(223);
+        DoErrorInterface(kMiscString_PLEASE_INSERT_THE_CARMAGEDDON_CD);
         return 0;
     }
 }
@@ -523,10 +523,10 @@ void DrawGames(int pCurrent_choice, int pCurrent_mode) {
         GetMousePosition(&x_coord, &y_coord);
         gLast_graph_sel__newgame = -1;
     }
-    DrawColumnHeading__newgame(206, gCurrent_graf_data->joinable_games_x_1);
-    DrawColumnHeading__newgame(207, gCurrent_graf_data->joinable_games_x_2);
-    DrawColumnHeading__newgame(208, gCurrent_graf_data->joinable_games_x_3);
-    DrawColumnHeading__newgame(209, gCurrent_graf_data->joinable_games_x_4);
+    DrawColumnHeading__newgame(kMiscString_NetworkGamesTableHeading_HOST, gCurrent_graf_data->joinable_games_x_1);
+    DrawColumnHeading__newgame(kMiscString_NetworkGamesTableHeading_GAME_TYPE, gCurrent_graf_data->joinable_games_x_2);
+    DrawColumnHeading__newgame(kMiscString_NetworkGamesTableHeading_PLAYERS, gCurrent_graf_data->joinable_games_x_3);
+    DrawColumnHeading__newgame(kMiscString_NetworkGamesTableHeading_STATUS, gCurrent_graf_data->joinable_games_x_4);
     BrPixelmapLine(gBack_screen,
         gCurrent_graf_data->joinable_games_sel_left,
         gCurrent_graf_data->joinable_games_y + gFonts[12].height + 1 - (TranslationMode() ? 2 : 0) - gCurrent_graf_data->joinable_games_y_pitch,
@@ -562,13 +562,13 @@ void DrawGames(int pCurrent_choice, int pCurrent_mode) {
         }
         sprintf(s, "%s", gGames_to_join[i].game->host_name);
         DrawAnItem__newgame(gCurrent_graf_data->joinable_games_x_1, current_index, font_index, s);
-        sprintf(s, "%s", GetMiscString(59 + gGames_to_join[i].game->type));
+        sprintf(s, "%s", GetMiscString(kMiscString_NetworkGameTypeNames_START + gGames_to_join[i].game->type));
         DrawAnItem__newgame(gCurrent_graf_data->joinable_games_x_2, current_index, font_index, s);
         sprintf(s, "%d", gGames_to_join[i].game->num_players);
         DrawAnItem__newgame(gCurrent_graf_data->joinable_games_x_3, current_index, font_index, s);
         sprintf(s, "%s, %s",
-            GetMiscString(68 + gGames_to_join[i].game->status.stage),
-            GetMiscString(71 + gGames_to_join[i].game->options.open_game));
+            GetMiscString(kMiscString_NetworkGameStage_START + gGames_to_join[i].game->status.stage),
+            GetMiscString(kMiscString_NetworkGameOpenGame_START + gGames_to_join[i].game->options.open_game));
         DrawAnItem__newgame(gCurrent_graf_data->joinable_games_x_4, current_index, font_index, s);
         if (i == gLast_graph_sel__newgame) {
             DrawRectangle(gBack_screen,
@@ -1392,7 +1392,7 @@ void DrawNetChoose(int pCurrent_choice, int pCurrent_mode) {
         gCurrent_graf_data->net_choose_race_y,
         gCurrent_graf_data->net_descr_race_r - gCurrent_graf_data->net_descr_race_l,
         gFonts[10].height + 1 - (TranslationMode() ? 2 : 0), 0);
-    sprintf(s, "%s %s", GetMiscString(201), gRace_list[gRace_index].name);
+    sprintf(s, "%s %s", GetMiscString(kMiscString_FIRST_RACE), gRace_list[gRace_index].name);
     DRPixelmapCentredText(gBack_screen,
         gCurrent_graf_data->net_choose_race_x,
         gCurrent_graf_data->net_choose_race_y,
@@ -1404,7 +1404,7 @@ void DrawNetChoose(int pCurrent_choice, int pCurrent_mode) {
         gCurrent_graf_data->net_descr_race_bot - gCurrent_graf_data->net_descr_race_top,
         0);
     OoerrIveGotTextInMeBoxMissus(9,
-        GetMiscString(194 + (pCurrent_mode ? pCurrent_choice - 4 : gLast_game_type)),
+        GetMiscString(kMiscString_NetworkGameTypeDescriptions_START + (pCurrent_mode ? pCurrent_choice - 4 : gLast_game_type)),
         gBack_screen,
         gCurrent_graf_data->net_descr_race_l,
         gCurrent_graf_data->net_descr_race_top,
@@ -1765,7 +1765,7 @@ int DoMultiPlayerStart(void) {
     }
     if (NetInitialise()) {
         SuspendPendingFlic();
-        DoErrorInterface(76);
+        DoErrorInterface(kMiscString_NetworkPlayIsNotAvailable);
         return 0;
     }
     gSynch_race_start = 0;
@@ -1780,7 +1780,7 @@ int DoMultiPlayerStart(void) {
     case eJoin_or_host_join:
         gProgram_state.frank_or_anniness = eFrankie;
         if (!CarmaCDinDriveOrFullGameInstalled()) {
-            DoErrorInterface(223);
+            DoErrorInterface(kMiscString_PLEASE_INSERT_THE_CARMAGEDDON_CD);
             return 0;
         }
         car_index = -1;
@@ -1800,7 +1800,7 @@ int DoMultiPlayerStart(void) {
                 ReenableNetService();
                 strcpy(s, gProgram_state.player_name[0]);
                 strcat(s, " ");
-                strcat(s, GetMiscString(58));
+                strcat(s, GetMiscString(kMiscString_HasJoinedTheGame));
                 NetSendHeadupToAllPlayers(s);
                 start_rank = 1;
             } else {
@@ -1816,7 +1816,7 @@ int DoMultiPlayerStart(void) {
     case eJoin_or_host_host:
         gProgram_state.frank_or_anniness = eFrankie;
         if (!OriginalCarmaCDinDrive()) {
-            DoErrorInterface(223);
+            DoErrorInterface(kMiscString_PLEASE_INSERT_THE_CARMAGEDDON_CD);
             return 0;
         }
         car_index = -1;

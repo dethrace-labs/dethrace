@@ -3010,16 +3010,16 @@ void ToggleShadow(void) {
     }
     switch (gShadow_level) {
     case eShadow_none:
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(104));
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_NoShadows));
         break;
     case eShadow_us_only:
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(105));
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_ShadowUnderOwnCar));
         break;
     case eShadow_us_and_opponents:
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(106));
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_ShadowUnderMainCars));
         break;
     case eShadow_everyone:
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(107));
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_ShadowUnderAllCars));
         break;
     default:
         return;

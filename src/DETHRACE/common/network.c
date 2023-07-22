@@ -346,7 +346,7 @@ void NetLeaveGame(tNet_game_details* pNet_game) {
         NetGuaranteedSendMessageToHost(pNet_game, the_message, NULL);
         strcpy(s, gProgram_state.player_name[0]);
         strcat(s, " ");
-        strcat(s, GetMiscString(74));
+        strcat(s, GetMiscString(kMiscString_HasLeftTheGame));
         NetSendHeadupToAllPlayers(s);
     }
     for (i = 0; i < gNumber_of_net_players; i++) {
@@ -1261,7 +1261,7 @@ void ReceivedNewPlayerList(tNet_contents* pContents, tNet_message* pM) {
                 }
             }
             if (gThis_net_player_index < 0) {
-                FatalError(kFatalError_NonInReceivedPlayerList);
+                FatalError(kFatalError_NotInReceivedPlayerList);
             }
             gNet_players[0].last_heard_from_him = PDGetTotalTime();
             gCurrent_race.number_of_racers = gNumber_of_net_players;
@@ -1662,7 +1662,7 @@ void CheckForDisappearees(void) {
             if (!gNet_players[i].host && gNet_players[i].last_heard_from_him != 0 && the_time - gNet_players[i].last_heard_from_him >= 20000) {
                 strcpy(s, gNet_players[i].player_name);
                 strcat(s, " ");
-                strcat(s, GetMiscString(90));
+                strcat(s, GetMiscString(kMiscString_IS_NO_LONGER_RESPONDING));
                 NetSendHeadupToAllPlayers(s);
                 KickPlayerOut(gNet_players[i].ID);
                 if (gProgram_state.racing) {

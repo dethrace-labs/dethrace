@@ -314,47 +314,47 @@ void DoNetworkHeadups(int pCredits) {
 
     if (gNot_shown_race_type_headup) {
         gNot_shown_race_type_headup = 0;
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(59 + gCurrent_net_game->type));
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_NetworkGameTypeNames_START + gCurrent_net_game->type));
     }
     if (gTime_for_punishment && gTime_for_punishment <= PDGetTotalTime()) {
         gTime_for_punishment = 0;
         switch (gCurrent_net_game->type) {
         case eNet_game_type_carnage:
-            NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(219));
+            NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_THAT_HALVED_YOUR_KILL_COUNT));
             break;
         case eNet_game_type_checkpoint:
-            NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(220));
+            NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_THAT_LOST_YOU_A_CHECKPOINT));
             break;
         case eNet_game_type_sudden_death:
-            NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(221));
+            NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_BACK_TO_THE_START));
             break;
         case eNet_game_type_foxy:
-            NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(222));
+            NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_THAT_HALVED_YOUR_TIME));
             break;
         default:
             break;
         }
     }
     if (gNet_mode == eNet_mode_none || gNet_recovery_cost[gCurrent_net_game->type] <= gProgram_state.credits_earned - gProgram_state.credits_lost || Flash(200, &last_flash, &flash_state)) {
-        sprintf(s, "\xf8%d\xfa %s", pCredits, GetMiscString(94));
+        sprintf(s, "\xf8%d\xfa %s", pCredits, GetMiscString(kMiscString_CREDITS));
         ChangeHeadupText(gNet_cash_headup, s);
     } else {
         ChangeHeadupText(gNet_cash_headup, "");
     }
     switch (gCurrent_net_game->type) {
     case eNet_game_type_carnage:
-        sprintf(s, "%s \xf8%d\xfa", GetMiscString(180), gPed_target);
+        sprintf(s, "%s \xf8%d\xfa", GetMiscString(kMiscString_TARGET_180), gPed_target);
         break;
     case eNet_game_type_car_crusher:
-        sprintf(s, "%s \xf8%d\xfa", GetMiscString(181), gCurrent_net_game->options.race_end_target);
+        sprintf(s, "%s \xf8%d\xfa", GetMiscString(kMiscString_TARGET_181), gCurrent_net_game->options.race_end_target);
         break;
     case eNet_game_type_foxy:
         TimerString(gCurrent_net_game->options.race_end_target, s2, 1, 1);
-        sprintf(s, "%s \xf8%s\xfa", GetMiscString(182), s2);
+        sprintf(s, "%s \xf8%s\xfa", GetMiscString(kMiscString_TARGET_182), s2);
         break;
     case eNet_game_type_tag:
         TimerString(gCurrent_net_game->options.race_end_target, s2, 1, 1);
-        sprintf(s, "%s \xf8%s\xfa", GetMiscString(183), s2);
+        sprintf(s, "%s \xf8%s\xfa", GetMiscString(kMiscString_LIMIT), s2);
         break;
     default:
         s[0] = '\0';
@@ -606,19 +606,19 @@ void BuyPSPowerup(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
     if (gNet_mode == eNet_mode_none) {
-        NewTextHeadupSlot(4, 0, 3000, -4, GetMiscString(178));
+        NewTextHeadupSlot(4, 0, 3000, -4, GetMiscString(kMiscString_ONLY_AVAILABLE_IN_NET_GAMES));
     } else if (gProgram_state.current_car.power_up_levels[pIndex] < 4) {
         if (gNet_mode == eNet_mode_none || gPowerup_cost[gProgram_state.current_car.power_up_levels[pIndex]] <= (gProgram_state.credits_earned - gProgram_state.credits_lost)) {
             SpendCredits(gPowerup_cost[gProgram_state.current_car.power_up_levels[pIndex]]);
             ImprovePSPowerup(&gProgram_state.current_car, pIndex);
         } else {
-            strcpy(s, GetMiscString(179));
+            strcpy(s, GetMiscString(kMiscString_CANNOT_AFFORD_IT));
             sprintf(s2, "%d", gPowerup_cost[gProgram_state.current_car.power_up_levels[pIndex]]);
             SubsStringJob(s, s2);
             NewTextHeadupSlot(4, 0, 3008, -4, s);
         }
     } else {
-        NewTextHeadupSlot(4, 0, 3000, -4, GetMiscString(174));
+        NewTextHeadupSlot(4, 0, 3000, -4, GetMiscString(kMiscString_YOU_ARE_ALREADY_AT_MAX));
     }
 }
 
@@ -634,9 +634,9 @@ void BuyPower(void) {
     LOG_TRACE("()");
 
     if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_foxy && gThis_net_player_index == gIt_or_fox) {
-        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(214));
+        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(kMiscString_THE_FOX_CANNOT_DO_THAT));
     } else if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_tag && gThis_net_player_index != gIt_or_fox) {
-        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(215));
+        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(kMiscString_ONLY_IT_CAN_DO_THAT));
     } else {
         BuyPSPowerup(1);
     }
