@@ -213,8 +213,8 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
             handled = 1;
         } else if (strstr(argv[i], "--physics-step-time=") != NULL) {
             char* s = strstr(argv[i], "=");
-            harness_game_config.physics_step_time = atof(s + 1);
-            LOG_INFO("Physics step time set to %f", harness_game_config.physics_step_time);
+            harness_game_config.physics_step_time = atoi(s + 1);
+            LOG_INFO("Physics step time set to %d", harness_game_config.physics_step_time);
             handled = 1;
         } else if (strstr(argv[i], "--fps=") != NULL) {
             char* s = strstr(argv[i], "=");

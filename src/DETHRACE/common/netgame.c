@@ -140,7 +140,7 @@ void SendCarData(tU32 pNext_frame_time) {
         BrVector3Copy(&contents->data.mech.omega, &car->omega);
         BrVector3Copy(&contents->data.mech.v, &car->v);
 
-        contents->data.mech.curvature = car->curvature / car->maxcurve * 32767.0f;
+        contents->data.mech.curvature = (car->curvature / car->maxcurve * 32767.0f);
         contents->data.mech.keys = car->keys;
         contents->data.mech.keys.joystick_acc = (tU8)(car->joystick.acc >> 9);
         contents->data.mech.keys.joystick_dec = (tU8)(car->joystick.dec >> 9);
@@ -173,7 +173,14 @@ void SendCarData(tU32 pNext_frame_time) {
 void ReceivedRecover(tNet_contents* pContents) {
     int i;
     LOG_TRACE("(%p)", pContents);
-    NOT_IMPLEMENTED();
+
+    if (gNet_players[gThis_net_player_index].ID != pContents->data.player_list.number_of_players) {
+        for (i = 0; i < gNumber_of_net_players; i++) {
+            if (gNet_players[i].ID == pContents->data.player_list.number_of_players) {
+                gNet_players[i].car->time_to_recover = pContents->data.mech.time;
+            }
+        }
+    }
 }
 
 // IDA: void __usercall CopyMechanics(tCar_spec *pCar@<EAX>, tNet_contents *pContents@<EDX>)
