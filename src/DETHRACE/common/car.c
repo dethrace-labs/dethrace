@@ -1103,13 +1103,12 @@ void GetNetPos(tCar_spec* pCar) {
     if (gNet_mode == eNet_mode_client) {
         BrMatrix34Copy(&pCar->oldmat, &pCar->car_master_actor->t.t.mat);
     }
-
     BrVector3Copy(&pCar->v, &pCar->message.v);
     BrVector3Copy(&pCar->omega, &pCar->message.omega);
 
     if (pCar->driver > eDriver_non_car) {
         pCar->curvature = pCar->message.curvature * pCar->maxcurve / 32767.0f;
-        for (j = 0; j < sizeof(pCar->oldd); j++) {
+        for (j = 0; j < COUNT_OF(pCar->oldd); j++) {
             pCar->oldd[j] = (pCar->message.d[j] * pCar->susp_height[j >> 1]) / 255.0f;
         }
         if (pCar->driver == eDriver_oppo || pCar->repair_time >= pCar->message.repair_time) {
@@ -1144,6 +1143,7 @@ void GetNetPos(tCar_spec* pCar) {
         }
         GetFacesInBox((tCollision_info*)pCar);
     }
+
     pCar->message.type = 0;
     pCar->last_car_car_collision = pCar->message.cc_coll_time;
 }

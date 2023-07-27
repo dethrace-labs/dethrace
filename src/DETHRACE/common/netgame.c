@@ -77,7 +77,7 @@ void SendCarData(tU32 pNext_frame_time) {
             contents->data.mech.keys.joystick_dec = (tU8)(car->joystick.dec >> 9);
             contents->data.mech.revs = car->revs;
             for (j = 0; j < COUNT_OF(contents->data.mech.d); j++) {
-                contents->data.mech.d[j] = car->oldd[j] / car->susp_height[j >> 1] * 255.0f;
+                contents->data.mech.d[j] = (int)(car->oldd[j] / car->susp_height[j >> 1] * 255.0f);
             }
             for (j = 0; j < COUNT_OF(contents->data.mech.damage); j++) {
                 contents->data.mech.damage[j] = car->damage_units[j].damage_level;
@@ -147,7 +147,7 @@ void SendCarData(tU32 pNext_frame_time) {
         contents->data.mech.revs = car->revs;
         contents->data.mech.cc_coll_time = car->last_car_car_collision;
         for (j = 0; j < COUNT_OF(contents->data.mech.d); j++) {
-            contents->data.mech.d[j] = car->oldd[j] / car->susp_height[j >> 1] * 255.f;
+            contents->data.mech.d[j] = (int)(car->oldd[j] / car->susp_height[j >> 1] * 255.f);
         }
         for (j = 0; j < COUNT_OF(contents->data.mech.damage); j++) {
             contents->data.mech.damage[j] = car->damage_units[j].damage_level;

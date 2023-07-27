@@ -1875,7 +1875,13 @@ int NetGuaranteedSendMessageToAllPlayers(tNet_game_details* pDetails, tNet_messa
 // IDA: int __usercall NetGuaranteedSendMessageToEverybody@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>, int (*pNotifyFail)(tU32, tNet_message*)@<EBX>)
 int NetGuaranteedSendMessageToEverybody(tNet_game_details* pDetails, tNet_message* pMessage, int (*pNotifyFail)(tU32, tNet_message*)) {
     LOG_TRACE("(%p, %p, %p)", pDetails, pMessage, pNotifyFail);
-    NOT_IMPLEMENTED();
+
+    pMessage->sender = gLocal_net_ID;
+    pMessage->senders_time_stamp = PDGetTotalTime();
+    pMessage->num_contents = 1;
+    pMessage->guarantee_number = 0;
+    ReceivedMessage(pMessage, &gNet_players[gThis_net_player_index], GetRaceTime());
+    return NetGuaranteedSendMessageToAllPlayers(pDetails, pMessage, pNotifyFail);
 }
 
 // IDA: int __usercall NetGuaranteedSendMessageToHost@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>, int (*pNotifyFail)(tU32, tNet_message*)@<EBX>)
