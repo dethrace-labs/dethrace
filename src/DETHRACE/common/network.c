@@ -19,6 +19,7 @@
 #include "pedestrn.h"
 #include "piping.h"
 #include "powerup.h"
+#include "pratcam.h"
 #include "replay.h"
 #include "spark.h"
 #include "structur.h"
@@ -160,7 +161,8 @@ int PermitNetServiceReentrancy(void) {
 // IDA: void __cdecl HaltNetServiceReentrancy()
 void HaltNetServiceReentrancy(void) {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gIn_net_service = 1;
 }
 
 // IDA: void __usercall NetSendHeadupToAllPlayers(char *pMessage@<EAX>)
@@ -1169,7 +1171,32 @@ void KickPlayerOut(tPlayer_ID pID) {
     int new_player_count;
     tNet_game_player_info* new_players;
     LOG_TRACE("(%d)", pID);
-    NOT_IMPLEMENTED();
+
+    new_player_count = gNumber_of_net_players;
+    new_players = (tNet_game_player_info*)BrMemAllocate(sizeof(tNet_game_player_info) * gNumber_of_net_players, kMem_player_list_leave);
+    memcpy(new_players, gNet_players, sizeof(tNet_game_player_info) * new_player_count);
+    for (i = 0; i < new_player_count; i++) {
+        if (new_players[i].ID == pID) {
+            if (new_players[i].car_index >= 0) {
+                gCar_details[new_players[i].car_index].ownership = eCar_owner_none;
+            }
+            if (new_players[i].next_car_index >= 0 && gCurrent_net_game->options.random_car_choice && (gCurrent_net_game->options.car_choice == eNet_car_all || gCurrent_net_game->options.car_choice == eNet_car_both)) {
+                gCar_details[new_players[i].next_car_index].ownership = eCar_owner_none;
+            }
+#ifdef DETHRACE_FIX_BUGS
+            for (j = i; j < new_player_count - 1; j++) {
+#else
+            for (j = i; j < new_player_count; j++) {
+#endif
+                memcpy(&new_players[j], &new_players[j + 1], sizeof(tNet_game_player_info));
+            }
+            new_player_count--;
+            break;
+        }
+    }
+    NetPlayersChanged(new_player_count, new_players);
+    BrMemFree(new_players);
+    SendOutPlayerList();
 }
 
 // IDA: void __usercall ReceivedLeave(tNet_contents *pContents@<EAX>, tNet_message *pMessage@<EDX>)
@@ -1536,7 +1563,64 @@ void ReceivedWasted(tNet_contents* pContents) {
     static tNet_game_player_info* last_culprit;
     static tNet_game_player_info* last_victim;
     LOG_TRACE("(%p)", pContents);
-    NOT_IMPLEMENTED();
+
+    victim = NetPlayerFromID(pContents->data.wasted.victim);
+    if (victim == NULL) {
+        return;
+    }
+    victim->car->knackered = 1;
+    if (pContents->data.wasted.victim == gLocal_net_ID) {
+        if (gCurrent_net_game->type == eNet_game_type_fight_to_death) {
+            DoFancyHeadup(19);
+            gRace_finished = 1;
+        } else {
+            last_got_wasted_time = PDGetTotalTime();
+            if (last_got_wasted_time - last_wasted_em_time > 1000) {
+                DoFancyHeadup(15);
+            } else {
+                DoFancyHeadup(16);
+            }
+        }
+    }
+    if (pContents->data.wasted.culprit == -1) {
+        if (victim->last_waste_message == 0) {
+            victim->last_waste_message = GetTotalTime();
+        }
+    } else if (!victim->wasteage_attributed) {
+        if (pContents->data.wasted.culprit == -2) {
+            culprit = NULL;
+        } else {
+            culprit = NetPlayerFromID(pContents->data.wasted.culprit);
+        }
+        if (culprit != NULL) {
+            if (gNet_mode == eNet_mode_host && gCurrent_net_game->type == eNet_game_type_car_crusher) {
+                culprit->score++;
+            }
+            if (culprit->score >= gCurrent_net_game->options.race_end_target) {
+                DeclareWinner(culprit - gNet_players);
+            }
+        }
+        victim->last_waste_message = GetTotalTime();
+        victim->wasteage_attributed = 1;
+        if (culprit != NULL && victim == last_culprit && culprit == last_victim && PDGetTotalTime() - last_wasty_message_time < 1000) {
+            sprintf(s, "%s %s %s %s", victim->player_name, GetMiscString(126), culprit->player_name, GetMiscString(127));
+        } else {
+            sprintf(s, "%s %s %s", victim->player_name, GetMiscString(171), culprit ? culprit->player_name : GetMiscString(216));
+        }
+        NewTextHeadupSlot2(4, 0, 3000, -4, s, 0);
+        last_wasty_message_time = PDGetTotalTime();
+        last_culprit = culprit;
+        last_victim = victim;
+        if (pContents->data.wasted.culprit == gLocal_net_ID) {
+            PratcamEvent(32);
+            last_wasted_em_time = PDGetTotalTime();
+            if (last_wasted_em_time - last_got_wasted_time > 1000) {
+                DoFancyHeadup(11);
+            } else {
+                DoFancyHeadup(16);
+            }
+        }
+    }
 }
 
 // IDA: void __usercall ReceivedCarDetailsReq(tNet_contents *pContents@<EAX>, void *pSender_address@<EDX>)

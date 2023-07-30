@@ -2692,14 +2692,14 @@ void MakeCarIt(tCar_spec* pCar) {
 
     actor = pCar->car_model_actors[pCar->principal_car_actor].actor;
     bonny = pCar->car_model_actors[pCar->car_actor_count - 1].actor;
-    if (((actor->model->flags & BR_MODF_CUSTOM) == 0) || actor->model->custom != DoTrueColModelThing) {
+    if (((actor->model->flags & BR_MODF_CUSTOM) == 0) || actor->model->custom != DoModelThing) {
         SetModelShade(actor, shade[shade_num]);
-        actor->model->user = DoTrueColModelThing;
-        actor->model->custom = DoTrueColModelThing;
+        actor->model->user = DoModelThing;
+        actor->model->custom = DoModelThing;
         actor->model->flags |= BR_MODF_CUSTOM;
         if (bonny != actor) {
-            bonny->model->user = DoTrueColModelThing;
-            bonny->model->custom = DoTrueColModelThing;
+            bonny->model->user = DoModelThing;
+            bonny->model->custom = DoModelThing;
             bonny->model->flags |= BR_MODF_CUSTOM;
             SetModelShade(bonny, shade[shade_num]);
         }

@@ -18,6 +18,7 @@
 #include "pd/sys.h"
 #include "pedestrn.h"
 #include "powerup.h"
+#include "pratcam.h"
 #include "racestrt.h"
 #include "spark.h"
 #include "structur.h"
@@ -1400,7 +1401,72 @@ void ReceivedGameplay(tNet_contents* pContents, tNet_message* pMessage, tU32 pRe
     char* gPalette_copy;
     static int pause_semaphore;
     LOG_TRACE("(%p, %p, %d)", pContents, pMessage, pReceive_time);
-    NOT_IMPLEMENTED();
+
+    switch (pContents->data.gameplay.mess) {
+    case eNet_gameplay_host_paused:
+        if (!pause_semaphore) {
+            gPixel_buffer_size = gBack_screen->row_bytes * gBack_screen->height;
+            gPixels_copy = BrMemAllocate(gPixel_buffer_size, kMem_quit_vfy_pixels);
+            gPalette_copy = BrMemAllocate(1024, kMem_quit_vfy_pal);
+            memcpy(gPixels_copy, gBack_screen->pixels, gPixel_buffer_size);
+            memcpy(gPalette_copy, gCurrent_palette_pixels, 1024);
+            pause_semaphore = 1;
+            NetFullScreenMessage(228, 1);
+            must_revert_reentrancy = PermitNetServiceReentrancy();
+            do {
+                NetService(0);
+                if (CheckQuit()) {
+                    NetFullScreenMessage(228, 1);
+                }
+            } while (gWaiting_for_unpause
+                && gProgram_state.prog_status != eProg_idling
+                && (!gRace_finished || gRace_over_reason != eRace_over_abandoned));
+            if (must_revert_reentrancy) {
+                HaltNetServiceReentrancy();
+            }
+            gWaiting_for_unpause = 1;
+            FadePaletteDown();
+            memcpy(gBack_screen->pixels, gPixels_copy, gPixel_buffer_size);
+            memcpy(gCurrent_palette_pixels, gPalette_copy, 1024);
+            BrMemFree(gPixels_copy);
+            BrMemFree(gPalette_copy);
+            PDScreenBufferSwap(0);
+            FadePaletteUp();
+            pause_semaphore = 0;
+        }
+        break;
+    case eNet_gameplay_earn_credits:
+        EarnCredits(pContents->data.gameplay.param_1);
+        break;
+    case eNet_gameplay_host_unpaused:
+        gWaiting_for_unpause = 0;
+        break;
+    case eNet_gameplay_suicide:
+        KnackerThisCar(NetCarFromPlayerID(pMessage->sender));
+        break;
+    case eNet_gameplay_go_for_it:
+        gWait_for_it = 0;
+        break;
+    default:
+        if (gCurrent_net_game->type == eNet_game_type_checkpoint || gCurrent_net_game->type == eNet_game_type_sudden_death || gCurrent_net_game->type == eNet_game_type_tag) {
+            switch (pContents->data.gameplay.mess) {
+            case eNet_gameplay_checkpoint:
+                Checkpoint(pContents->data.gameplay.param_1, 1);
+                break;
+            case eNet_gameplay_wrong_checkpoint:
+                WrongCheckpoint(pContents->data.gameplay.param_1);
+                break;
+            case eNet_gameplay_suddenly_death:
+                DoFancyHeadup(17);
+                ChangeAmbientPratcam(36);
+                gRace_finished = 1;
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+    }
 }
 
 // IDA: void __usercall SendGameplay(tPlayer_ID pPlayer@<EAX>, tNet_gameplay_mess pMess@<EDX>, int pParam_1@<EBX>, int pParam_2@<ECX>, int pParam_3, int pParam_4)
@@ -1502,5 +1568,6 @@ void GetExpandedMatrix(br_matrix34* m1, tReduced_matrix* m2) {
 // IDA: void __usercall NetEarnCredits(tNet_game_player_info *pPlayer@<EAX>, tS32 pCredits@<EDX>)
 void NetEarnCredits(tNet_game_player_info* pPlayer, tS32 pCredits) {
     LOG_TRACE("(%p, %d)", pPlayer, pCredits);
-    NOT_IMPLEMENTED();
+
+    // empty function
 }
