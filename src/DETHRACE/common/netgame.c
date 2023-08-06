@@ -1519,7 +1519,10 @@ void NetSendPointCrush(tCar_spec* pCar, tU16 pCrush_point_index, br_vector3* pEn
     tNet_contents* contents;
     LOG_TRACE("(%p, %d, %p)", pCar, pCrush_point_index, pEnergy_vector);
 
-    STUB_ONCE();
+    contents = NetGetBroadcastContents(NETMSGID_CRUSHPOINT, 0);
+    contents->data.crush.id = NetPlayerFromCar(pCar)->ID;
+    contents->data.crush.vertex = pCrush_point_index;
+    BrVector3Copy(&contents->data.crush.energy_vector, pEnergy_vector);
 }
 
 // IDA: void __usercall RecievedCrushPoint(tNet_contents *pContents@<EAX>)
