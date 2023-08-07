@@ -176,7 +176,7 @@ static void signal_handler(int sig, siginfo_t* siginfo, void* context) {
 void resolve_full_path(char* path, const char* argv0) {
     if (argv0[0] == '/') { // run with absolute path
         strcpy(path, argv0);
-    } else { // run with relative path
+    } else {               // run with relative path
         if (NULL == getcwd(path, PATH_MAX)) {
             perror("getcwd error");
             return;
@@ -300,4 +300,12 @@ size_t OS_ConsoleReadPassword(char* pBuffer, size_t pBufferLen) {
 
     tcsetattr(STDIN_FILENO, TCSANOW, &old);
     return len;
+}
+
+char* OS_Dirname(char* path) {
+    return dirname(path);
+}
+
+char* OS_Basename(char* path) {
+    return basename(path);
 }

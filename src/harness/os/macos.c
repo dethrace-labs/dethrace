@@ -150,7 +150,7 @@ static uint8_t alternate_stack[SIGSTKSZ];
 void resolve_full_path(char* path, const char* argv0) {
     if (argv0[0] == '/') { // run with absolute path
         strcpy(path, argv0);
-    } else { // run with relative path
+    } else {               // run with relative path
         if (NULL == getcwd(path, PATH_MAX)) {
             perror("getcwd error");
             return;
@@ -216,4 +216,12 @@ size_t OS_ConsoleReadPassword(char* pBuffer, size_t pBufferLen) {
     pBuffer[0] = '\0';
     fgets(pBuffer, pBufferLen, stdin);
     return strlen(pBuffer);
+}
+
+char* OS_Dirname(char* path) {
+    return dirname(path);
+}
+
+char* OS_Basename(char* path) {
+    return basename(path);
 }

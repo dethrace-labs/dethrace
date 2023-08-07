@@ -178,7 +178,7 @@ void Harness_Init(int* argc, char* argv[]) {
     if (root_dir != NULL) {
         LOG_INFO("DETHRACE_ROOT_DIR is set to '%s'", root_dir);
     } else {
-        root_dir = dirname(argv[0]);
+        root_dir = OS_Dirname(argv[0]);
     }
     printf("Using root directory: %s\n", root_dir);
     result = chdir(root_dir);

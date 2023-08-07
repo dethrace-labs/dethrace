@@ -30,4 +30,8 @@ FILE* OS_fopen(const char* pathname, const char* mode);
 
 size_t OS_ConsoleReadPassword(char* pBuffer, size_t pBufferLen);
 
+char* OS_Dirname(char* path);
+
+char* OS_Basename(char* path);
+
 #endif

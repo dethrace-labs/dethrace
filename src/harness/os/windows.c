@@ -169,3 +169,15 @@ size_t OS_ConsoleReadPassword(char* pBuffer, size_t pBufferLen) {
     fgets(pBuffer, pBufferLen, stdin);
     return strlen(pBuffer);
 }
+
+char* dir[_MAX_DIR];
+char* fname[_MAX_FNAME];
+char* OS_Dirname(char* path) {
+    _splitpath(path, NULL, dir, NULL, NULL);
+    return dir;
+}
+
+char* OS_Basename(char* path) {
+    _splitpath(path, NULL, NULL, fname, NULL);
+    return fname;
+}
