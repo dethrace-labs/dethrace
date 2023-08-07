@@ -220,12 +220,6 @@ void GLRenderer_Init(int pRender_width, int pRender_height) {
     LOG_INFO("OpenGL version string: %s", glGetString(GL_VERSION));
     LOG_INFO("OpenGL shading language version string: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
-    int maxTextureImageUnits;
-    glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxTextureImageUnits);
-    if (maxTextureImageUnits < 3) {
-        LOG_PANIC("GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS is %d. Need at least 3", maxTextureImageUnits);
-    }
-
     LoadShaders();
     SetupFullScreenRectGeometry();
 
