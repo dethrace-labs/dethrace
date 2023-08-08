@@ -29,8 +29,8 @@ void dr_dprintf(char* fmt_string, ...);
 static int stack_nbr = 0;
 static char _program_name[1024];
 
-static char dirnane_buf[_MAX_DIR];
-static char basename_buf[_MAX_FNAME];
+static char dirname_buf[_MAX_DIR];
+static char fname_buf[_MAX_FNAME];
 
 int addr2line(char const* const program_name, void const* const addr) {
     char addr2line_cmd[512] = { 0 };
@@ -179,6 +179,6 @@ char* OS_Dirname(const char* path) {
 }
 
 char* OS_Basename(const char* path) {
-    _splitpath(path, NULL, NULL, basename_buf, NULL);
-    return basename_buf;
+    _splitpath(path, NULL, NULL, fname_buf, NULL);
+    return fname_buf;
 }
