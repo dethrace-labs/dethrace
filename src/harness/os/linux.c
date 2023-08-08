@@ -311,5 +311,5 @@ char* OS_Dirname(const char* path) {
 
 char* OS_Basename(const char* path) {
     strcpy(name_buf, path);
-    return dirname(name_buf);
+    return basename(name_buf);
 }
