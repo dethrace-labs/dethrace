@@ -25,7 +25,7 @@ static int stack_nbr = 0;
 static char _program_name[1024];
 #define MAX_STACK_FRAMES 64
 static void* stack_traces[MAX_STACK_FRAMES];
-static char name_buf[MAXPATHLEN];
+static char name_buf[PATH_MAX];
 
 // Resolve symbol name and source location given the path to the executable and an address
 int addr2line(char const* const program_name, void const* const addr) {

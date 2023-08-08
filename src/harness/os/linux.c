@@ -32,7 +32,7 @@ static int stack_nbr = 0;
 static char _program_name[1024];
 
 static void* stack_traces[MAX_STACK_FRAMES];
-static char name_buf[MAXPATHLEN];
+static char name_buf[PATH_MAX];
 
 struct dl_iterate_callback_data {
     int initialized;
