@@ -25,12 +25,14 @@
 #include <unistd.h>
 
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof(A[0]))
+#define MAX_STACK_FRAMES 64
+#define TRACER_PID_STRING "TracerPid:"
 
 static int stack_nbr = 0;
 static char _program_name[1024];
-#define MAX_STACK_FRAMES 64
+
 static void* stack_traces[MAX_STACK_FRAMES];
-#define TRACER_PID_STRING "TracerPid:"
+static char name_buf[MAXPATHLEN];
 
 struct dl_iterate_callback_data {
     int initialized;
@@ -302,10 +304,12 @@ size_t OS_ConsoleReadPassword(char* pBuffer, size_t pBufferLen) {
     return len;
 }
 
-char* OS_Dirname(char* path) {
-    return dirname(path);
+char* OS_Dirname(const char* path) {
+    strcpy(name_buf, path);
+    return dirname(name_buf);
 }
 
-char* OS_Basename(char* path) {
-    return basename(path);
+char* OS_Basename(const char* path) {
+    strcpy(name_buf, path);
+    return dirname(name_buf);
 }
