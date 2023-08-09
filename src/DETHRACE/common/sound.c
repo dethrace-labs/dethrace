@@ -18,7 +18,7 @@
 
 int gSound_detail_level;
 int gVirgin_pass = 1;
-int gOld_sound_detail_level;
+int gOld_sound_detail_level = -1;
 int gLast_tune;
 int gRandom_MIDI_tunes[3];
 int gRandom_Rockin_MIDI_tunes[3];

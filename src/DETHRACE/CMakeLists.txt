@@ -31,10 +31,7 @@ else()
         -Wno-unused-but-set-variable
         -Wno-unused-variable
         -Wno-unused-result
-        -Wno-error=sign-compare
-        -Wno-error=format-overflow
-        -Wno-error=unused-but-set-variable  # (SelectRaceDraw::test2), etc
-        -Wno-format-overflow
+        -Wno-absolute-value
         -Wstrict-prototypes
     )
 endif()

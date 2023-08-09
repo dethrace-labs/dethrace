@@ -1400,16 +1400,16 @@ void EarnCredits2(int pAmount, char* pPrefix_text) {
     }
     gLast_credit_amount = pAmount;
     if (pAmount >= 2) {
-        sprintf(s, "%s%d %s", pPrefix_text, pAmount, GetMiscString(12));
+        sprintf(s, "%s%d %s", pPrefix_text, pAmount, GetMiscString(kMiscString_Credits));
         gProgram_state.credits_earned += original_amount;
     } else if (pAmount >= 1) {
-        sprintf(s, "%s1 %s", pPrefix_text, GetMiscString(13));
+        sprintf(s, "%s1 %s", pPrefix_text, GetMiscString(kMiscString_Credit));
         gProgram_state.credits_earned += original_amount;
     } else if (pAmount >= -1) {
-        sprintf(s, "%s%s 1 %s", pPrefix_text, GetMiscString(14), GetMiscString(13));
+        sprintf(s, "%s%s 1 %s", pPrefix_text, GetMiscString(kMiscString_Lost), GetMiscString(kMiscString_Credit));
         gProgram_state.credits_lost -= original_amount;
     } else {
-        sprintf(s, "%s%s %d %s", GetMiscString(14), pPrefix_text, -pAmount, GetMiscString(12));
+        sprintf(s, "%s%s %d %s", GetMiscString(kMiscString_Lost), pPrefix_text, -pAmount, GetMiscString(kMiscString_Credits));
         gProgram_state.credits_lost -= original_amount;
     }
     gLast_credit_headup__displays = NewTextHeadupSlot(4, 0, 2000, -4, s);

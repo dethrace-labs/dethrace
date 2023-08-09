@@ -505,18 +505,20 @@ br_pixelmap* LoadPixelmap(char* pName) {
         end = &pName[strlen(pName)];
     }
 
-    if ((end - pName) != 4 || memcmp(pName, "none", end - pName) != 0) {
-        PossibleService();
-        PathCat(the_path, gApplication_path, gGraf_specs[gGraf_spec_index].data_dir_name);
-        PathCat(the_path, the_path, "PIXELMAP");
+    if (end - pName == 4 && memcmp(pName, "none", end - pName) == 0) {
+        return NULL;
+    }
+
+    PossibleService();
+    PathCat(the_path, gApplication_path, gGraf_specs[gGraf_spec_index].data_dir_name);
+    PathCat(the_path, the_path, "PIXELMAP");
+    PathCat(the_path, the_path, pName);
+    AllowOpenToFail();
+    pm = DRPixelmapLoad(the_path);
+    if (pm == NULL) {
+        PathCat(the_path, gApplication_path, "PIXELMAP");
         PathCat(the_path, the_path, pName);
-        AllowOpenToFail();
         pm = DRPixelmapLoad(the_path);
-        if (pm == NULL) {
-            PathCat(the_path, gApplication_path, "PIXELMAP");
-            PathCat(the_path, the_path, pName);
-            pm = DRPixelmapLoad(the_path);
-        }
     }
     return pm;
 }
@@ -3303,7 +3305,7 @@ FILE* DRfopen(char* pFilename, char* pMode) {
     if (result == NULL && !gAllow_open_to_fail) {
         if (GetCDPathFromPathsTxtFile(CD_dir) && !PDCheckDriveExists(CD_dir)) {
             if (gMisc_strings[0]) {
-                PDFatalError(GetMiscString(243));
+                PDFatalError(GetMiscString(kMiscString_CouldNotFindTheCarmageddonCD));
             } else {
                 PDFatalError("Could not find the Carmageddon CD");
             }

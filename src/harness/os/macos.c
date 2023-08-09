@@ -27,6 +27,7 @@ static int stack_nbr = 0;
 static char _program_name[1024];
 #define MAX_STACK_FRAMES 64
 static void* stack_traces[MAX_STACK_FRAMES];
+static char name_buf[4096];
 
 // Resolve symbol name and source location given the path to the executable and an address
 int addr2line(char const* const program_name, intptr_t slide, void const* const addr) {
@@ -227,4 +228,14 @@ size_t OS_ConsoleReadPassword(char* pBuffer, size_t pBufferLen) {
     pBuffer[0] = '\0';
     fgets(pBuffer, pBufferLen, stdin);
     return strlen(pBuffer);
+}
+
+char* OS_Dirname(const char* path) {
+    strcpy(name_buf, path);
+    return dirname(name_buf);
+}
+
+char* OS_Basename(const char* path) {
+    strcpy(name_buf, path);
+    return basename(name_buf);
 }
