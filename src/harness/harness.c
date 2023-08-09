@@ -174,15 +174,17 @@ void Harness_Init(int* argc, char* argv[]) {
     }
 
     char* root_dir = getenv("DETHRACE_ROOT_DIR");
-    if (root_dir == NULL) {
-        LOG_INFO("DETHRACE_ROOT_DIR is not set, assuming '.'");
+    if (root_dir != NULL) {
+        LOG_INFO("DETHRACE_ROOT_DIR is set to '%s'", root_dir);
     } else {
-        printf("Data directory: %s\n", root_dir);
-        result = chdir(root_dir);
-        if (result != 0) {
-            LOG_PANIC("Failed to chdir. Error is %s", strerror(errno));
-        }
+        root_dir = OS_Dirname(argv[0]);
     }
+    printf("Using root directory: %s\n", root_dir);
+    result = chdir(root_dir);
+    if (result != 0) {
+        LOG_PANIC("Failed to chdir. Error is %s", strerror(errno));
+    }
+
     if (harness_game_info.mode == eGame_none) {
         Harness_DetectGameMode();
     }

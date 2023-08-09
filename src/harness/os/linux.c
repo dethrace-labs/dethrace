@@ -25,12 +25,14 @@
 #include <unistd.h>
 
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof(A[0]))
+#define MAX_STACK_FRAMES 64
+#define TRACER_PID_STRING "TracerPid:"
 
 static int stack_nbr = 0;
 static char _program_name[1024];
-#define MAX_STACK_FRAMES 64
+
 static void* stack_traces[MAX_STACK_FRAMES];
-#define TRACER_PID_STRING "TracerPid:"
+static char name_buf[4096];
 
 struct dl_iterate_callback_data {
     int initialized;
@@ -176,7 +178,7 @@ static void signal_handler(int sig, siginfo_t* siginfo, void* context) {
 void resolve_full_path(char* path, const char* argv0) {
     if (argv0[0] == '/') { // run with absolute path
         strcpy(path, argv0);
-    } else { // run with relative path
+    } else {               // run with relative path
         if (NULL == getcwd(path, PATH_MAX)) {
             perror("getcwd error");
             return;
@@ -300,4 +302,14 @@ size_t OS_ConsoleReadPassword(char* pBuffer, size_t pBufferLen) {
 
     tcsetattr(STDIN_FILENO, TCSANOW, &old);
     return len;
+}
+
+char* OS_Dirname(const char* path) {
+    strcpy(name_buf, path);
+    return dirname(name_buf);
+}
+
+char* OS_Basename(const char* path) {
+    strcpy(name_buf, path);
+    return basename(name_buf);
 }
