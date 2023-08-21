@@ -915,7 +915,44 @@ void DeclareWinner(int pWinner_index) {
     int best_score_index;
     char s[256];
     LOG_TRACE("(%d)", pWinner_index);
-    NOT_IMPLEMENTED();
+
+    DoNetScores2(1);
+    the_message = NetBuildMessage(NETMSGID_RACEOVER, 0);
+    the_message->contents.data.race_over.reason = eRace_over_network_victory;
+    NetGuaranteedSendMessageToPlayer(gCurrent_net_game, the_message, gNet_players[pWinner_index].ID, NULL);
+    gNet_players[pWinner_index].won++;
+    if (gCurrent_net_game->type == eNet_game_type_sudden_death
+        || gCurrent_net_game->type == eNet_game_type_tag
+        || gCurrent_net_game->type == eNet_game_type_fight_to_death) {
+        gNet_players[pWinner_index].games_score += gGame_scores[5];
+    }
+    sprintf(s, "%s %s", gNet_players[pWinner_index].player_name, GetMiscString(kMiscString_IS_THE_WINNER));
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (gCurrent_net_game->type != eNet_game_type_sudden_death && gCurrent_net_game->type != eNet_game_type_tag && gCurrent_net_game->type != eNet_game_type_fight_to_death) {
+            best_score_index = gNet_players[i].last_score_index;
+            for (j = 0; j < gNumber_of_net_players; j++) {
+                if (gNet_players[j].score == gNet_players[i].score && gNet_players[j].last_score_index < best_score_index) {
+                    best_score_index = gNet_players[j].last_score_index;
+                }
+            }
+            gNet_players[i].games_score += gGame_scores[5 - best_score_index];
+        }
+        gNet_players[i].played++;
+        if (i != pWinner_index) {
+            the_message = NetBuildMessage(NETMSGID_RACEOVER, 0);
+            the_message->contents.data.race_over.reason = eRace_over_network_loss;
+            NetGuaranteedSendMessageToPlayer(gCurrent_net_game, the_message, gNet_players[i].ID, NULL);
+            NetSendHeadupToPlayer(s, gNet_players[i].ID);
+        }
+    }
+    gReceived_game_scores = 1;
+    the_message = NetBuildMessage(NETMSGID_GAMESCORES, 0);
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        the_message->contents.data.game_scores.scores[i].played = gNet_players[i].played;
+        the_message->contents.data.game_scores.scores[i].won = gNet_players[i].won;
+        the_message->contents.data.game_scores.scores[i].score = gNet_players[i].games_score;
+    }
+    NetGuaranteedSendMessageToAllPlayers(gCurrent_net_game, the_message, NULL);
 }
 
 // IDA: void __usercall PlayerIsIt(tNet_game_player_info *pPlayer@<EAX>)
@@ -1542,7 +1579,24 @@ void NetSendPointCrush(tCar_spec* pCar, tU16 pCrush_point_index, br_vector3* pEn
 void RecievedCrushPoint(tNet_contents* pContents) {
     tCar_spec* car;
     LOG_TRACE("(%p)", pContents);
-    NOT_IMPLEMENTED();
+
+    car = NetCarFromPlayerID(pContents->data.crush.id);
+    if (car == NULL || gNet_mode == eNet_mode_host || car->active || gArrow_mode) {
+        return;
+    }
+    if (car->car_model_actors[car->principal_car_actor].crush_data.number_of_crush_points == 0) {
+        return;
+    }
+
+    CrushModelPoint(
+        car,
+        car->principal_car_actor,
+        car->car_model_actors[car->principal_car_actor].actor->model,
+        pContents->data.crush.vertex,
+        &pContents->data.crush.energy_vector,
+        BrVector3Length(&pContents->data.crush.energy_vector) + 0.06f,
+        &car->car_model_actors[car->principal_car_actor].crush_data);
+    SetModelForUpdate(car->car_model_actors[car->principal_car_actor].actor->model, car, 0);
 }
 
 // IDA: void __usercall GetReducedMatrix(tReduced_matrix *m1@<EAX>, br_matrix34 *m2@<EDX>)
