@@ -474,7 +474,15 @@ void DisposeCarN(int pIndex) {
 // IDA: void __usercall PlayerHasLeft(int pIndex@<EAX>)
 void PlayerHasLeft(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
-    NOT_IMPLEMENTED();
+
+    if (gCurrent_net_game->options.random_car_choice && (gCurrent_net_game->options.car_choice == eNet_car_all || gCurrent_net_game->options.car_choice == eNet_car_both)) {
+        if (gNet_players[pIndex].car_index >= 0) {
+            gCar_details[gNet_players[pIndex].car_index].ownership = eCar_owner_none;
+        }
+        if (gNet_players[pIndex].next_car_index >= 0) {
+            gCar_details[gNet_players[pIndex].next_car_index].ownership = eCar_owner_none;
+        }
+    }
 }
 
 // IDA: void __usercall NetPlayersChanged(int pNew_count@<EAX>, tNet_game_player_info *pNew_players@<EDX>)
@@ -1662,7 +1670,13 @@ void ReceivedCarDetails(tNet_contents* pContents) {
 void ReceivedGameScores(tNet_contents* pContents) {
     int i;
     LOG_TRACE("(%p)", pContents);
-    NOT_IMPLEMENTED();
+
+    gReceived_game_scores = 1;
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        gNet_players[i].played = pContents->data.game_scores.scores[i].played;
+        gNet_players[i].won = pContents->data.game_scores.scores[i].won;
+        gNet_players[i].games_score = pContents->data.game_scores.scores[i].score;
+    }
 }
 
 // IDA: void __usercall ReceivedMessage(tNet_message *pMessage@<EAX>, void *pSender_address@<EDX>, tU32 pReceive_time@<EBX>)
