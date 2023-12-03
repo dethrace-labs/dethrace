@@ -28,12 +28,6 @@
             case GL_OUT_OF_MEMORY:                         \
                 err = "GL_OUT_OF_MEMORY";                  \
                 break;                                     \
-            case GL_STACK_UNDERFLOW:                       \
-                err = "GL_STACK_UNDERFLOW";                \
-                break;                                     \
-            case GL_STACK_OVERFLOW:                        \
-                err = "GL_STACK_OVERFLOW";                 \
-                break;                                     \
             default:                                       \
                 err = "unknown";                           \
                 break;                                     \

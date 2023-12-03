@@ -12,3 +12,7 @@ target_sources(miniaudio PRIVATE
     miniaudio.c
     
 )
+
+if (NOT MSVC)
+    target_link_libraries(miniaudio PUBLIC m dl pthread)
+endif()

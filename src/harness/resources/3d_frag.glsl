@@ -1,5 +1,8 @@
-#version 140
-#extension GL_ARB_explicit_attrib_location : require
+#version 300 es
+
+precision mediump float;
+precision mediump int;
+precision lowp usampler2D;
 
 // Input, output variables
 // =======================
@@ -23,7 +26,7 @@ uniform usampler2D u_colour_buffer;
 uniform uint u_viewport_height;
 
 uniform vec4 u_clip_planes[6];
-uniform int u_clip_plane_count = 0;
+uniform int u_clip_plane_count;
 
 uniform uint u_material_flags;
 uniform mat2x3 u_material_uv_transform;
@@ -31,7 +34,7 @@ uniform usampler2D u_material_texture_pixelmap;
 uniform uint u_material_texture_enabled;
 
 // material_blend_table is a 256x256 image which encodes 256 values of blending between new color and current color in framebuffer
-uniform uint u_material_blend_enabled = 0u;
+uniform uint u_material_blend_enabled;
 uniform usampler2D u_material_blend_table;
 
 // material_shade_table is a 256px-wide image which encodes material_shade_table_height lit shades for each color
@@ -55,7 +58,7 @@ void main(void) {
         // calculate signed plane-vertex distance
         vec4 v4 = vec4(v_frag_pos.xyz, 1);
         float d = dot(u_clip_planes[i], v4);
-        if (d < 0) {
+        if (d < 0.0) {
             discard;
         }
     }
@@ -96,7 +99,10 @@ void main(void) {
 
     if (u_material_blend_enabled == 1u) {
         // u_colour_buffer is upside down from opengl perspective. We need to sample it upside down.
-        uint current_framebuffer_color = texelFetch(u_colour_buffer, ivec2(gl_FragCoord.x, u_viewport_height - gl_FragCoord.y), 0).r;
+        int i = int(gl_FragCoord.x);
+        int i2 = int(u_viewport_height) - int(gl_FragCoord.y);
+        ivec2 coords = ivec2(gl_FragCoord.x, i2);
+        uint current_framebuffer_color = texelFetch(u_colour_buffer, coords, 0).r;
         out_palette_index = texelFetch(u_material_blend_table, ivec2(out_palette_index, current_framebuffer_color), 0).r;
     }
 

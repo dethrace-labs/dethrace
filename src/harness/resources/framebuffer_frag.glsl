@@ -1,10 +1,15 @@
-#version 140
-#extension GL_ARB_explicit_attrib_location : require
+#version 300 es
+
+precision mediump float;
+precision mediump int;
+precision lowp usampler2D;
+
 
 in vec2 v_tex_coord;
 
 uniform usampler2D u_pixels;
 uniform sampler2D u_palette;
+
 
 layout (location = 0) out vec4 out_frag_color;
 

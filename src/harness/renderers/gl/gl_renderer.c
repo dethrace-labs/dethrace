@@ -111,7 +111,7 @@ static GLuint CreateShaderProgram(char* name, const char* vertex_shader, const i
     GLint link_ok = GL_FALSE;
     glGetProgramiv(program, GL_LINK_STATUS, &link_ok);
     if (!link_ok) {
-        glGetShaderInfoLog(program, 1024, NULL, log_buffer);
+        glGetProgramInfoLog(program, 1024, NULL, log_buffer);
         LOG_PANIC("shader program %s failed to link: %s", name, log_buffer);
     }
     return program;
@@ -380,10 +380,12 @@ void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer, br_pixe
     glUniformMatrix4fv(uniforms_3d.projection, 1, GL_FALSE, &projection.m[0][0]);
 
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
+    CHECK_GL_ERROR("GLRenderer_BeginScene");
 }
 
 void GLRenderer_EndScene(void) {
     //  switch back to default fb and reset state
+    CHECK_GL_ERROR("GLRenderer_EndScene2");
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDepthMask(GL_TRUE);
     glDepthMask(GL_TRUE);
@@ -392,12 +394,17 @@ void GLRenderer_EndScene(void) {
 
 void GLRenderer_FullScreenQuad(uint8_t* screen_buffer) {
 
-    glViewport(vp_x, vp_y, vp_width, vp_height);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glDisable(GL_DEPTH_TEST);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+    glViewport(vp_x, vp_y, vp_width, vp_height);
+    
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    
+    glDisable(GL_DEPTH_TEST);
+    
+   // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+//CHECK_GL_ERROR("GLRenderer_RenderFullScreenQuad2");
     glBindTexture(GL_TEXTURE_2D, fullscreen_quad_texture);
+    
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R8UI, render_width, render_height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, screen_buffer);
 
     glBindVertexArray(screen_buffer_vao);
@@ -620,10 +627,10 @@ void GLRenderer_Model(br_actor* actor, br_model* model, br_material* material, b
 
     switch (render_type) {
     case BRT_TRIANGLE:
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         break;
     case BRT_LINE:
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glUniform1ui(uniforms_3d.material_index_base, 255);
         glUniform1ui(uniforms_3d.material_flags, 0);
         break;
@@ -691,18 +698,23 @@ void GLRenderer_BufferTexture(br_pixelmap* pm) {
 }
 
 void GLRenderer_FlushBuffer(tRenderer_flush_type flush_type) {
-
+    uint8_t* pm_pixels = last_colour_buffer->pixels;
+    
     if (!dirty_buffers) {
         return;
     }
 
-    // pull framebuffer into cpu memory to emulate BRender behavior
-    glBindTexture(GL_TEXTURE_2D, framebuffer_texture);
-    glGetTexImage(GL_TEXTURE_2D, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, screen_buffer_flip_pixels);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
+    glReadPixels(0, 0, render_width, render_height, GL_RED_INTEGER, GL_UNSIGNED_BYTE, screen_buffer_flip_pixels);
 
+    // pull framebuffer into cpu memory to emulate BRender behavior
+    //glBindTexture(GL_TEXTURE_2D, framebuffer_texture);
+    //glGetTexImage(GL_TEXTURE_2D, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, screen_buffer_flip_pixels);
+    CHECK_GL_ERROR("GLRenderer_FlushBuffer3");
+    
     // flip texture to match the expected orientation
     int dest_y = render_height;
-    uint8_t* pm_pixels = last_colour_buffer->pixels;
+    
     uint8_t new_pixel;
     for (int y = 0; y < render_height; y++) {
         dest_y--;
@@ -714,11 +726,15 @@ void GLRenderer_FlushBuffer(tRenderer_flush_type flush_type) {
         }
     }
 
+    CHECK_GL_ERROR("GLRenderer_FlushBuffer2");
+
     if (flush_type == eFlush_all) {
 
         // pull depthbuffer into cpu memory to emulate BRender behavior
-        glBindTexture(GL_TEXTURE_2D, depth_texture);
-        glGetTexImage(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, depth_buffer_flip_pixels);
+        //glBindTexture(GL_TEXTURE_2D, depth_texture);
+        //glGetTexImage(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, depth_buffer_flip_pixels);
+
+        glReadPixels(0, 0, render_width, render_height, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, depth_buffer_flip_pixels);
 
         dest_y = last_colour_buffer->height;
         int src_y = render_height - last_colour_buffer->base_y - last_colour_buffer->height;
@@ -736,6 +752,7 @@ void GLRenderer_FlushBuffer(tRenderer_flush_type flush_type) {
     glClear(GL_COLOR_BUFFER_BIT);
     flush_counter++;
     dirty_buffers = 0;
+    CHECK_GL_ERROR("GLRenderer_FlushBuffer");
 }
 
 void GLRenderer_FlushBuffers(void) {

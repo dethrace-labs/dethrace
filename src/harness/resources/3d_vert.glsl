@@ -1,5 +1,7 @@
-#version 140
-#extension GL_ARB_explicit_attrib_location : require
+#version 300 es
+
+precision mediump float;
+precision mediump int;
 
 layout (location = 0) in vec3 a_pos;
 layout (location = 1) in vec3 a_normal;
