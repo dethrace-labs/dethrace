@@ -63,8 +63,9 @@ static void* create_window_and_renderer(char* title, int x, int y, int width, in
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
     opengl_profile = eOpenGL_profile_core;
     window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    context = SDL_GL_CreateContext(window);
 
-    if (window == NULL) {
+    if (window == NULL || context == NULL) {
         LOG_WARN("Failed to create OpenGL core profile: %s. Trying OpenGLES...", SDL_GetError());
         // fallback to OpenGL ES 3
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
@@ -72,8 +73,9 @@ static void* create_window_and_renderer(char* title, int x, int y, int width, in
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
         opengl_profile = eOpenGL_profile_es;
         window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+        context = SDL_GL_CreateContext(window);
     }
-    if (window == NULL) {
+    if (window == NULL || context == NULL) {
         LOG_PANIC("Failed to create window. %s", SDL_GetError());
     }
 
@@ -82,11 +84,6 @@ static void* create_window_and_renderer(char* title, int x, int y, int width, in
 
     if (harness_game_config.start_full_screen) {
         SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
-    }
-
-    context = SDL_GL_CreateContext(window);
-    if (!context) {
-        LOG_PANIC("Failed to call SDL_GL_CreateContext. %s", SDL_GetError());
     }
 
     // Load GL extensions using glad
