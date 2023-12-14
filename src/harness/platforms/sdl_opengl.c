@@ -44,6 +44,24 @@ static void update_viewport(void) {
     GLRenderer_SetViewport(vp_x, vp_y, vp_width, vp_height);
 }
 
+static void create_glcore_context(char* title) {
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+
+    window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window_width, window_height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    context = SDL_GL_CreateContext(window);
+}
+
+static void create_gles_context(char* title) {
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+
+    window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window_width, window_height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    context = SDL_GL_CreateContext(window);
+}
+
 static void* create_window_and_renderer(char* title, int x, int y, int width, int height) {
     window_width = width;
     window_height = height;
@@ -55,28 +73,22 @@ static void* create_window_and_renderer(char* title, int x, int y, int width, in
         LOG_PANIC("SDL_INIT_VIDEO error: %s", SDL_GetError());
     }
 
-    SDL_GL_SetSwapInterval(1);
-
     // prefer OpenGL core profile
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+    create_glcore_context(title);
     opengl_profile = eOpenGL_profile_core;
-    window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
-    context = SDL_GL_CreateContext(window);
-
     if (window == NULL || context == NULL) {
+        if (window != NULL) {
+            SDL_DestroyWindow(window);
+        }
+
         LOG_WARN("Failed to create OpenGL core profile: %s. Trying OpenGLES...", SDL_GetError());
         // fallback to OpenGL ES 3
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+        create_gles_context(title);
         opengl_profile = eOpenGL_profile_es;
-        window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
-        context = SDL_GL_CreateContext(window);
     }
+
     if (window == NULL || context == NULL) {
-        LOG_PANIC("Failed to create window. %s", SDL_GetError());
+        LOG_PANIC("Failed to create OpenGL context: %s", SDL_GetError());
     }
 
     sdl_window_scale.x = ((float)render_width) / width;
@@ -91,6 +103,8 @@ static void* create_window_and_renderer(char* title, int x, int y, int width, in
         LOG_PANIC("Failed to initialize the OpenGL context with GLAD.");
         exit(1);
     }
+
+    SDL_GL_SetSwapInterval(1);
 
     GLRenderer_Init(opengl_profile, render_width, render_height);
     update_viewport();
