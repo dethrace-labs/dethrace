@@ -49,25 +49,30 @@ static void* create_window_and_renderer(char* title, int x, int y, int width, in
     window_height = height;
     render_width = width;
     render_height = height;
+    tOpenGL_profile opengl_profile;
 
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         LOG_PANIC("SDL_INIT_VIDEO error: %s", SDL_GetError());
     }
 
-    if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES) != 0) {
-        LOG_PANIC("Failed to set SDL_GL_CONTEXT_PROFILE_MASK attribute. %s", SDL_GetError());
-    };
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-
     SDL_GL_SetSwapInterval(1);
 
-    window = SDL_CreateWindow(title,
-        SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED,
-        width, height,
-        SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    // prefer OpenGL core profile
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+    opengl_profile = eOpenGL_profile_core;
+    window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
+    if (window == NULL) {
+        LOG_WARN("Failed to create OpenGL core profile: %s. Trying OpenGLES...", SDL_GetError());
+        // fallback to OpenGL ES 3
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+        opengl_profile = eOpenGL_profile_es;
+        window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    }
     if (window == NULL) {
         LOG_PANIC("Failed to create window. %s", SDL_GetError());
     }
@@ -90,7 +95,7 @@ static void* create_window_and_renderer(char* title, int x, int y, int width, in
         exit(1);
     }
 
-    GLRenderer_Init(render_width, render_height);
+    GLRenderer_Init(opengl_profile, render_width, render_height);
     update_viewport();
 
     return window;

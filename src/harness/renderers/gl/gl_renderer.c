@@ -1,17 +1,15 @@
 #include "gl_renderer.h"
 #include "brender/brender.h"
+#include "embedded_resources.h"
 #include "harness.h"
 #include "harness/trace.h"
-#include "resources/3d_frag.glsl.h"
-#include "resources/3d_vert.glsl.h"
-#include "resources/framebuffer_frag.glsl.h"
-#include "resources/framebuffer_vert.glsl.h"
 #include "stored_context.h"
 
 #include <glad/glad.h>
 #include <stdio.h>
 #include <string.h>
 
+static tOpenGL_profile opengl_profile;
 static GLuint screen_buffer_vao, screen_buffer_ebo;
 static GLuint fullscreen_quad_texture, palette_texture, depth_texture;
 
@@ -80,10 +78,22 @@ static GLuint CreateShaderProgram(char* name, const char* vertex_shader, const i
     GLuint program;
     GLuint v_shader, f_shader;
 
+    embedded_resource_t* header;
+
+    if (opengl_profile == eOpenGL_profile_es) {
+        header = get_embedded_resource_by_name("resources/gles_header.glsl");
+    } else {
+        header = get_embedded_resource_by_name("resources/glcore_header.glsl");
+    }
+    if (header == NULL) {
+        LOG_PANIC("Failed to get glsl header resource");
+    }
+
     program = glCreateProgram();
     v_shader = glCreateShader(GL_VERTEX_SHADER);
-    const GLchar* vertex_sources[] = { vertex_shader };
-    glShaderSource(v_shader, 1, vertex_sources, &vertex_shader_len);
+    const GLchar* vertex_sources[] = { header->content, vertex_shader };
+    const GLint vertex_source_lengths[] = { header->len, vertex_shader_len };
+    glShaderSource(v_shader, 2, vertex_sources, vertex_source_lengths);
     glCompileShader(v_shader);
     glGetShaderiv(v_shader, GL_COMPILE_STATUS, &success);
     if (!success) {
@@ -92,8 +102,9 @@ static GLuint CreateShaderProgram(char* name, const char* vertex_shader, const i
     }
 
     f_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    const GLchar* fragment_sources[] = { fragment_shader };
-    glShaderSource(f_shader, 1, fragment_sources, &fragment_shader_len);
+    const GLchar* fragment_sources[] = { header->content, fragment_shader };
+    const GLint fragment_source_lengths[] = { header->len, fragment_shader_len };
+    glShaderSource(f_shader, 2, fragment_sources, fragment_source_lengths);
     glCompileShader(f_shader);
     glGetShaderiv(f_shader, GL_COMPILE_STATUS, &success);
     if (!success) {
@@ -127,7 +138,15 @@ static GLint GetValidatedUniformLocation(GLuint program, char* uniform_name) {
 }
 
 static void LoadShaders(void) {
-    shader_program_2d = CreateShaderProgram("framebuffer", RESOURCES_FRAMEBUFFER_VERT_GLSL, sizeof(RESOURCES_FRAMEBUFFER_VERT_GLSL), RESOURCES_FRAMEBUFFER_FRAG_GLSL, sizeof(RESOURCES_FRAMEBUFFER_FRAG_GLSL));
+    embedded_resource_t* frag = get_embedded_resource_by_name("resources/framebuffer_frag.glsl");
+    if (frag == NULL) {
+        LOG_PANIC("Failed to get embedded resource");
+    }
+    embedded_resource_t* vert = get_embedded_resource_by_name("resources/framebuffer_vert.glsl");
+    if (vert == NULL) {
+        LOG_PANIC("Failed to get embedded resource");
+    }
+    shader_program_2d = CreateShaderProgram("framebuffer", vert->content, vert->len, frag->content, frag->len);
     glUseProgram(shader_program_2d);
     uniforms_2d.pixels = GetValidatedUniformLocation(shader_program_2d, "u_pixels");
     uniforms_2d.palette = GetValidatedUniformLocation(shader_program_2d, "u_palette");
@@ -136,7 +155,16 @@ static void LoadShaders(void) {
     glUniform1i(uniforms_2d.pixels, 0);
     glUniform1i(uniforms_2d.palette, 1);
 
-    shader_program_3d = CreateShaderProgram("3d", RESOURCES_3D_VERT_GLSL, sizeof(RESOURCES_3D_VERT_GLSL), RESOURCES_3D_FRAG_GLSL, sizeof(RESOURCES_3D_FRAG_GLSL));
+    frag = get_embedded_resource_by_name("resources/3d_frag.glsl");
+    if (frag == NULL) {
+        LOG_PANIC("Failed to get embedded resource");
+    }
+    vert = get_embedded_resource_by_name("resources/3d_vert.glsl");
+    if (vert == NULL) {
+        LOG_PANIC("Failed to get embedded resource");
+    }
+
+    shader_program_3d = CreateShaderProgram("3d", vert->content, vert->len, frag->content, frag->len);
     glUseProgram(shader_program_3d);
     uniforms_3d.clip_plane_count = GetValidatedUniformLocation(shader_program_3d, "u_clip_plane_count");
     for (int i = 0; i < 6; i++) {
@@ -211,7 +239,8 @@ static void SetupFullScreenRectGeometry(void) {
     glBindVertexArray(0);
 }
 
-void GLRenderer_Init(int pRender_width, int pRender_height) {
+void GLRenderer_Init(tOpenGL_profile profile, int pRender_width, int pRender_height) {
+    opengl_profile = profile;
     render_width = pRender_width;
     render_height = pRender_height;
 
@@ -394,17 +423,16 @@ void GLRenderer_EndScene(void) {
 
 void GLRenderer_FullScreenQuad(uint8_t* screen_buffer) {
 
-
     glViewport(vp_x, vp_y, vp_width, vp_height);
-    
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    
+
     glDisable(GL_DEPTH_TEST);
-    
-   // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-//CHECK_GL_ERROR("GLRenderer_RenderFullScreenQuad2");
+
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    // CHECK_GL_ERROR("GLRenderer_RenderFullScreenQuad2");
     glBindTexture(GL_TEXTURE_2D, fullscreen_quad_texture);
-    
+
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R8UI, render_width, render_height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, screen_buffer);
 
     glBindVertexArray(screen_buffer_vao);
@@ -627,10 +655,10 @@ void GLRenderer_Model(br_actor* actor, br_model* model, br_material* material, b
 
     switch (render_type) {
     case BRT_TRIANGLE:
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         break;
     case BRT_LINE:
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glUniform1ui(uniforms_3d.material_index_base, 255);
         glUniform1ui(uniforms_3d.material_flags, 0);
         break;
@@ -699,22 +727,26 @@ void GLRenderer_BufferTexture(br_pixelmap* pm) {
 
 void GLRenderer_FlushBuffer(tRenderer_flush_type flush_type) {
     uint8_t* pm_pixels = last_colour_buffer->pixels;
-    
+    uint16_t* depth_pixels = last_depth_buffer->pixels;
+
     if (!dirty_buffers) {
         return;
     }
 
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
-    glReadPixels(0, 0, render_width, render_height, GL_RED_INTEGER, GL_UNSIGNED_BYTE, screen_buffer_flip_pixels);
-
     // pull framebuffer into cpu memory to emulate BRender behavior
-    //glBindTexture(GL_TEXTURE_2D, framebuffer_texture);
-    //glGetTexImage(GL_TEXTURE_2D, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, screen_buffer_flip_pixels);
+    if (opengl_profile == eOpenGL_profile_es) {
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
+        glReadPixels(0, 0, render_width, render_height, GL_RED_INTEGER, GL_UNSIGNED_BYTE, screen_buffer_flip_pixels);
+    } else {
+        glBindTexture(GL_TEXTURE_2D, framebuffer_texture);
+        glGetTexImage(GL_TEXTURE_2D, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, screen_buffer_flip_pixels);
+    }
+
     CHECK_GL_ERROR("GLRenderer_FlushBuffer3");
-    
+
     // flip texture to match the expected orientation
     int dest_y = render_height;
-    
+
     uint8_t new_pixel;
     for (int y = 0; y < render_height; y++) {
         dest_y--;
@@ -731,14 +763,16 @@ void GLRenderer_FlushBuffer(tRenderer_flush_type flush_type) {
     if (flush_type == eFlush_all) {
 
         // pull depthbuffer into cpu memory to emulate BRender behavior
-        //glBindTexture(GL_TEXTURE_2D, depth_texture);
-        //glGetTexImage(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, depth_buffer_flip_pixels);
-
-        glReadPixels(0, 0, render_width, render_height, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, depth_buffer_flip_pixels);
+        if (opengl_profile == eOpenGL_profile_es) {
+            glReadPixels(0, 0, render_width, render_height, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, depth_buffer_flip_pixels);
+        } else {
+            glBindTexture(GL_TEXTURE_2D, depth_texture);
+            glGetTexImage(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, depth_buffer_flip_pixels);
+        }
 
         dest_y = last_colour_buffer->height;
         int src_y = render_height - last_colour_buffer->base_y - last_colour_buffer->height;
-        uint16_t* depth_pixels = last_depth_buffer->pixels;
+
         for (int y = 0; y < last_colour_buffer->height; y++) {
             dest_y--;
             for (int x = 0; x < last_colour_buffer->width; x++) {

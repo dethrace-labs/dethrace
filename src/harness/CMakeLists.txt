@@ -72,13 +72,26 @@ target_sources(harness PRIVATE
 
 if (IO_PLATFORM STREQUAL "SDL_OpenGL")
     # generate embedded glsl resources
-    foreach(elem resources/framebuffer_vert.glsl resources/framebuffer_frag.glsl resources/3d_vert.glsl resources/3d_frag.glsl)
-        add_custom_command(
-            OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${elem}.h"
-            COMMAND "${CMAKE_COMMAND}" "-DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}" "-DFILE=${elem}" -P "${dethrace_SOURCE_DIR}/cmake/EmbedResource.cmake"
-            DEPENDS "${elem}"
-        )
-    endforeach()
+
+    file(GLOB glsl_resource_files "resources/*.glsl")
+    message(${glsl_resource_files})
+    add_custom_command(
+        OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/embedded_resources.h"
+        COMMAND "${CMAKE_COMMAND}" "-DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}" "-DRESOURCES_GLOB=resources/*.glsl" -P "${CMAKE_SOURCE_DIR}/cmake/EmbedResources.cmake"
+        DEPENDS ${glsl_resource_files}
+    )
+    # cd /Users/j.harris/code/dethrace/build/src/harness &&
+    # /opt/homebrew/Cellar/cmake/3.26.3/bin/cmake -DSOURCE_DIR=/Users/j.harris/code/dethrace -DRESOURCES_GLOB=resources/*.glsl -P /Users/j.harris/code/dethrace/src/harness/cmake/EmbedResources.cmake
+
+    # foreach(elem resources/framebuffer_vert.glsl resources/framebuffer_frag.glsl resources/3d_vert.glsl resources/3d_frag.glsl)
+    #     add_custom_command(
+    #         OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${elem}.h"
+    #         COMMAND "${CMAKE_COMMAND}" "-DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}" "-DFILE=${elem}" -P "${dethrace_SOURCE_DIR}/cmake/EmbedResource.cmake"
+    #         DEPENDS "${elem}"
+    #     )
+    # endforeach()
+    # cd /Users/j.harris/code/dethrace/build/src/harness &&
+    # /opt/homebrew/Cellar/cmake/3.26.3/bin/cmake -DSOURCE_DIR=/Users/j.harris/code/dethrace/src/harness -DFILE=resources/3d_frag.glsl -P /Users/j.harris/code/dethrace/cmake/EmbedResource.cmake
 
     target_sources(harness PRIVATE
         platforms/sdl_opengl.c
@@ -88,10 +101,11 @@ if (IO_PLATFORM STREQUAL "SDL_OpenGL")
         renderers/gl/stored_context.c
         renderers/gl/stored_context.h
 
-        resources/framebuffer_vert.glsl.h
-        resources/framebuffer_frag.glsl.h
-        resources/3d_vert.glsl.h
-        resources/3d_frag.glsl.h
+        # resources/framebuffer_vert.glsl.h
+        # resources/framebuffer_frag.glsl.h
+        # resources/3d_vert.glsl.h
+        # resources/3d_frag.glsl.h
+        embedded_resources.h
     )
     target_include_directories(harness PRIVATE "${dethrace_SOURCE_DIR}/src/DETHRACE/common")
     target_link_libraries(harness PRIVATE SDL2::SDL2 glad)

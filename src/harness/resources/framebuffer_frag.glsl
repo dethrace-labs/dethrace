@@ -1,10 +1,3 @@
-#version 300 es
-
-precision mediump float;
-precision mediump int;
-precision lowp usampler2D;
-
-
 in vec2 v_tex_coord;
 
 uniform usampler2D u_pixels;

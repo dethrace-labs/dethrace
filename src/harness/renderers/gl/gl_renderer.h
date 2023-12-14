@@ -4,6 +4,11 @@
 #include "harness.h"
 #include "harness/hooks.h"
 
+typedef enum tOpenGL_profile {
+    eOpenGL_profile_core,
+    eOpenGL_profile_es,
+} tOpenGL_profile;
+
 #define CHECK_GL_ERROR(msg)                                \
     {                                                      \
         GLenum e = glGetError();                           \
@@ -36,7 +41,7 @@
         }                                                  \
     }
 
-void GLRenderer_Init(int render_width, int render_height);
+void GLRenderer_Init(tOpenGL_profile profile, int render_width, int render_height);
 void GLRenderer_SetPalette(uint8_t* rgba_colors);
 void GLRenderer_BeginScene(br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer);
 void GLRenderer_EndScene(void);

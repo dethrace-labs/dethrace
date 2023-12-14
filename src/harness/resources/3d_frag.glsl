@@ -1,9 +1,3 @@
-#version 300 es
-
-precision mediump float;
-precision mediump int;
-precision lowp usampler2D;
-
 // Input, output variables
 // =======================
 
@@ -80,7 +74,7 @@ void main(void) {
         if (texel == 0u) {
             discard;
         }
-        
+
         if ((u_material_flags & BR_MATF_LIGHT) != 0u) {
             if ((u_material_flags & BR_MATF_PRELIT) != 0u) {
                 // BR_MATF_PRELIT means the light value comes from the vertex color attribute
@@ -101,8 +95,10 @@ void main(void) {
         // u_colour_buffer is upside down from opengl perspective. We need to sample it upside down.
         int i = int(gl_FragCoord.x);
         int i2 = int(u_viewport_height) - int(gl_FragCoord.y);
-        ivec2 coords = ivec2(gl_FragCoord.x, i2);
+        ivec2 coords = ivec2(int(gl_FragCoord.x), i2);
         uint current_framebuffer_color = texelFetch(u_colour_buffer, coords, 0).r;
+
+        // uint current_framebuffer_color = texelFetch(u_colour_buffer, ivec2(gl_FragCoord.x, int(u_viewport_height - gl_FragCoord.y)), 0).r;
         out_palette_index = texelFetch(u_material_blend_table, ivec2(out_palette_index, current_framebuffer_color), 0).r;
     }
 
