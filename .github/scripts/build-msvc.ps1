@@ -1,3 +1,5 @@
+$ErrorActionPreference = "Stop"
+
 if ($($Env:PLATFORM_ARCH) -eq "x86") {
     $sdl_path = "x86"
 } else {
@@ -18,7 +20,13 @@ Expand-Archive $Env:TEMP\SDL2-devel.zip -DestinationPath $Env:TEMP
 
 # build
 cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON "-DSDL2_ROOT_DIR=$($Env:TEMP)\SDL2-$sdl2_version" -B build
+if ($LASTEXITCODE -ne 0) {
+    Exit $LASTEXITCODE
+}
 cmake --build build --config RelWithDebInfo
+if ($LASTEXITCODE -ne 0) {
+    Exit $LASTEXITCODE
+}
 
 # copy SDL2.dll to build folder, so tests can run
 cp $Env:TEMP\SDL2-$sdl2_version\lib\$sdl_path\SDL2.dll build

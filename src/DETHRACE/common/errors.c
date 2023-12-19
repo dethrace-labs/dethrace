@@ -242,6 +242,10 @@ void dr_dprintf(char* fmt_string, ...) {
         return;
     }
 
+    if (gDiagnostic_file == NULL) {
+        return;
+    }
+
     if (first_time == 0) {
         first_time = GetTotalTime();
     }
@@ -254,6 +258,12 @@ void dr_dprintf(char* fmt_string, ...) {
     va_end(args);
     fputs("\n", gDiagnostic_file);
     fflush(gDiagnostic_file);
+
+    // Added by dethrace for debugging
+    // va_start(args, fmt_string);
+    // vprintf(fmt_string, args);
+    // va_end(args);
+    // printf("\n");
 }
 
 // IDA: int __usercall DoErrorInterface@<EAX>(int pMisc_text_index@<EAX>)

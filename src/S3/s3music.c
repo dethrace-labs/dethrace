@@ -12,7 +12,7 @@ void S3StopMIDIOutlets(void) {
     STUB();
 }
 
-void S3DisposeMIDIChannel(tS3_sound_tag tag) {
+void S3ReleaseMIDI(tS3_sound_tag tag) {
 }
 
 int S3PlayMIDI(tS3_channel* chan) {

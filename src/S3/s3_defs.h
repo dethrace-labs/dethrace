@@ -3,6 +3,7 @@
 
 #include "s3/s3.h"
 
+#include <miniaudio/miniaudio.h>
 #include <stdint.h>
 
 // extern int PDGetTotalTime();
@@ -131,8 +132,8 @@ typedef struct tS3_descriptor {
     int memory_proxy;
     char* sound_data;
     char* filename;
-    // LPDIRECTSOUNDBUFFER for example
-    void* sound_buffer;
+    // win95 only
+    // LPDIRECTSOUNDBUFFER sound_buffer;
 } tS3_descriptor;
 
 typedef struct tS3_sound_source {
@@ -175,7 +176,7 @@ typedef struct tS3_hardware_info {
     int independent_pitch;
 } tS3_hardware_info;
 
-// Added by dethrace
+// Everything below added by dethrace
 typedef struct tS3_soundbank_read_ctx {
     int data_len;
     int unk1;
@@ -183,7 +184,6 @@ typedef struct tS3_soundbank_read_ctx {
     char* data;
 } tS3_soundbank_read_ctx;
 
-// Everything below added by dethrace
 #pragma pack(push, 1)
 typedef struct tWAVEFORMATEX_ {
     int16_t wFormatTag;
@@ -194,6 +194,29 @@ typedef struct tWAVEFORMATEX_ {
     int16_t wBitsPerSample;
     int16_t cbSize;
 } tWAVEFORMATEX_;
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+typedef struct wav_header {
+    // RIFF Header
+    char riff_header[4]; // Contains "RIFF"
+    int32_t wav_size;    // Size of the wav portion of the file, which follows the first 8 bytes. File size - 8
+    char wave_header[4]; // Contains "WAVE"
+
+    // Format Header
+    char fmt_header[4];     // Contains "fmt " (includes trailing space)
+    int32_t fmt_chunk_size; // Should be 16 for PCM
+    int16_t audio_format;   // Should be 1 for PCM. 3 for IEEE Float
+    int16_t num_channels;
+    int32_t sample_rate;
+    int32_t byte_rate;        // Number of bytes per second. sample_rate * num_channels * Bytes Per Sample
+    int16_t sample_alignment; // num_channels * Bytes Per Sample
+    int16_t bit_depth;        // Number of bits per sample
+
+    // Data
+    char data_header[4]; // Contains "data"
+    int32_t data_bytes;  // Number of bytes in data. Number of samples * num_channels * sample byte size
+} wav_header;
 #pragma pack(pop)
 
 #endif

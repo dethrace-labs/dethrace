@@ -18,7 +18,7 @@
 
 int gSound_detail_level;
 int gVirgin_pass = 1;
-int gOld_sound_detail_level;
+int gOld_sound_detail_level = -1;
 int gLast_tune;
 int gRandom_MIDI_tunes[3];
 int gRandom_Rockin_MIDI_tunes[3];
@@ -145,15 +145,15 @@ void InitSound(void) {
     }
     if (gSound_detail_level != gOld_sound_detail_level) {
         if (gCar_outlet) {
-            S3DisposeOutlet(gCar_outlet);
+            S3ReleaseOutlet(gCar_outlet);
             gCar_outlet = 0;
         }
         if (gPedestrians_outlet) {
-            S3DisposeOutlet(gPedestrians_outlet);
+            S3ReleaseOutlet(gPedestrians_outlet);
             gPedestrians_outlet = 0;
         }
         if (gEngine_outlet) {
-            S3DisposeOutlet(gEngine_outlet);
+            S3ReleaseOutlet(gEngine_outlet);
             gEngine_outlet = 0;
         }
         if (gEngine_outlet == NULL) {
@@ -240,7 +240,7 @@ int DRS3ChangeVolume(tS3_sound_tag pSound_tag, tS3_volume pNew_volume) {
     if (gSound_enabled == 0) {
         return 0;
     }
-    return S3SetTagVolume(pSound_tag, pNew_volume);
+    return S3ChangeVolume(pSound_tag, pNew_volume);
 }
 
 // IDA: int __usercall DRS3ChangeLRVolume@<EAX>(tS3_sound_tag pSound_tag@<EAX>, tS3_volume pNew_Lvolume@<EDX>, tS3_volume pNew_Rvolume@<EBX>)
@@ -265,8 +265,11 @@ int DRS3ChangeSpeed(tS3_sound_tag pTag, tS3_pitch pNew_speed) {
 // IDA: int __usercall DRS3ChangePitchSpeed@<EAX>(tS3_sound_tag pTag@<EAX>, tS3_pitch pNew_pitch@<EDX>)
 int DRS3ChangePitchSpeed(tS3_sound_tag pTag, tS3_pitch pNew_pitch) {
     LOG_TRACE("(%d, %d)", pTag, pNew_pitch);
-    STUB_ONCE();
-    return 0;
+
+    if (!gSound_enabled) {
+        return 0;
+    }
+    return S3ChangePitchSpeed(pTag, pNew_pitch);
 }
 
 // IDA: int __usercall DRS3StopSound@<EAX>(tS3_sound_tag pSound_tag@<EAX>)
@@ -296,7 +299,7 @@ int DRS3ReleaseSound(tS3_sound_id pThe_sound) {
     if (gSound_enabled == 0) {
         return 0;
     }
-    return S3DisposeDescriptor(pThe_sound);
+    return S3ReleaseSound(pThe_sound);
 }
 
 // IDA: void __cdecl DRS3Service()
@@ -497,7 +500,7 @@ void DisposeSoundSources(void) {
                 if (the_car->driver == eDriver_local_human || gSound_detail_level == 2 || cat == eVehicle_rozzer) {
                     if (the_car->sound_source) {
                         S3UpdateSoundSource(gEngine_outlet, -1, the_car->sound_source, 0.0f, 0, 0, 0, 0x10000, 0x10000);
-                        S3DisposeSoundSource(the_car->sound_source);
+                        S3ReleaseSoundSource(the_car->sound_source);
                     }
                     the_car->sound_source = NULL;
                 }
@@ -550,27 +553,38 @@ void MungeEngineNoise(void) {
     int type_of_engine_noise;
     tS3_sound_id engine_noise;
 
+    // added by dethrace
+    tU32 frame_period;
+    frame_period = gFrame_period;
+
+#ifdef DETHRACE_FIX_BUGS
+    // At framerates higher than 30, `gCamera_velocity` is not stable enough and causes the player car audio to stumble
+    // as the pitch shifts up and down while applying doppler effect in `S3Calculate3D`.
+    // We avoid the issue by only updating the engine sounds every MUNGE_ENGINE_INTERVAL ms
+    static tU32 dethrace_last_executed = 0;
+
+    tU32 now = GetTotalTime();
+    if (now - dethrace_last_executed < MUNGE_ENGINE_INTERVAL) {
+        return;
+    }
+    frame_period = now - dethrace_last_executed;
+    dethrace_last_executed = now;
+#endif
+
     type_of_engine_noise = 0;
     if (gSound_available == 0 || gProgram_state.racing == 0) {
         return;
     }
-    gCamera_position = *(br_vector3*)&gCamera_to_world.m[3][0];
-    gCamera_left.v[0] = gCamera_to_world.m[0][0] * -1.0;
-    gCamera_left.v[1] = gCamera_to_world.m[0][1] * -1.0;
-    gCamera_left.v[2] = gCamera_to_world.m[0][2] * -1.0;
-    gCamera_velocity.v[0] = gCamera_to_world.m[3][0] - gOld_camera_position.v[0];
-    gCamera_velocity.v[1] = gCamera_to_world.m[3][1] - gOld_camera_position.v[1];
-    gCamera_velocity.v[2] = gCamera_to_world.m[3][2] - gOld_camera_position.v[2];
-    if (gFrame_period) {
-        gCamera_velocity.v[0] = gCamera_velocity.v[0] / (gFrame_period / 1000.0f);
-        gCamera_velocity.v[1] = gCamera_velocity.v[1] / (gFrame_period / 1000.0f);
-        gCamera_velocity.v[2] = gCamera_velocity.v[2] / (gFrame_period / 1000.0f);
+
+    BrVector3Copy(&gCamera_position, (br_vector3*)&gCamera_to_world.m[3][0]);
+    BrVector3Negate(&gCamera_left, (br_vector3*)&gCamera_to_world.m[0][0]);
+    BrVector3Sub(&gCamera_velocity, &gCamera_position, &gOld_camera_position);
+    if (frame_period) {
+        BrVector3InvScale(&gCamera_velocity, &gCamera_velocity, ((float)frame_period / 1000.0f));
     } else {
-        gCamera_velocity.v[0] = 0.0f;
-        gCamera_velocity.v[1] = 0.0f;
-        gCamera_velocity.v[2] = 0.0f;
+        BrVector3Set(&gCamera_velocity, 0.0f, 0.0f, 0.0f);
     }
-    gOld_camera_position = gCamera_position;
+    BrVector3Copy(&gOld_camera_position, &gCamera_position);
     stop_all = (gAction_replay_mode && (fabsf(GetReplayRate()) > 1.0f || GetReplayRate() == 0.0f)) || gFaded_palette || gPalette_fade_time;
     for (cat = eVehicle_self; cat <= eVehicle_rozzer; cat++) {
         if (cat) {

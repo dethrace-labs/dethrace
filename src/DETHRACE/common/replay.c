@@ -187,10 +187,10 @@ void ActualActionReplayHeadups(int pSpecial_zappy_bastard) {
     }
     if (the_time - gCam_change_time < 2000) {
         TransDRPixelmapText(gBack_screen,
-            gCurrent_graf_data->action_replay_cam_text_x - DRTextWidth(&gFonts[1], GetMiscString(gAction_replay_camera_mode ? 39 : 38)),
+            gCurrent_graf_data->action_replay_cam_text_x - DRTextWidth(&gFonts[1], GetMiscString(gAction_replay_camera_mode ? kMiscString_PanningCamera : kMiscString_StandardCamera)),
             gCurrent_graf_data->action_replay_cam_text_y,
             &gFonts[1],
-            GetMiscString(gAction_replay_camera_mode ? 39 : 38),
+            GetMiscString(gAction_replay_camera_mode ? kMiscString_PanningCamera : kMiscString_StandardCamera),
             2 * gCurrent_graf_data->action_replay_cam_text_x);
     }
     TurnOnPaletteConversion();
@@ -306,13 +306,8 @@ void MoveToStartOfReplay(void) {
 void ToggleReplay(void) {
     LOG_TRACE("()");
 
-    if (!harness_game_config.enable_replay) {
-        NewTextHeadupSlot(4, 0, 1000, -4, "Action replay disabled (start dethrace with --enable-replay)");
-        return;
-    }
-
     if (!IsActionReplayAvailable()) {
-        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(37));
+        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(kMiscString_ACTION_REPLAY_UNAVAILABLE));
         return;
     }
     if (!gAction_replay_mode) {

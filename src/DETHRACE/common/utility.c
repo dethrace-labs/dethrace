@@ -479,7 +479,6 @@ br_uint_32 DRPixelmapLoadMany(char* pFile_name, br_pixelmap** pPixelmaps, br_uin
     int i;
     br_uint_8 lobyte;
     LOG_TRACE("(\"%s\", %p, %d)", pFile_name, pPixelmaps, pNum);
-
     number_loaded = BrPixelmapLoadMany(pFile_name, pPixelmaps, pNum);
     for (i = 0; i < number_loaded; i++) {
         the_map = pPixelmaps[i];

@@ -1,6 +1,6 @@
 #define SDL_MAIN_HANDLED
 #include "SDL.h"
-#include <miniaudio.h>
+#include <miniaudio/miniaudio.h>
 #include <smacker.h>
 
 #include <stdio.h>

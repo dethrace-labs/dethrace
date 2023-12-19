@@ -58,7 +58,7 @@ void TogglePratcam(void) {
     LOG_TRACE("()");
 
     if (gAusterity_mode) {
-        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(192));
+        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(kMiscString_NOT_ENOUGH_MEMORY));
     } else {
         if (gWhirr_noise == 0 || !DRS3SoundStillPlaying(gWhirr_noise)) {
             DRS3StopSound(gWhirr_noise);
@@ -294,6 +294,12 @@ void PratcamEvent(int pIndex) {
     if (gInterface_within_race_mode) {
         return;
     }
+#if defined(DETHRACE_FIX_BUGS)
+    // In low memory mode, `gPratcam_sequences`is not allocated and thus unsafe to access
+    if (gAusterity_mode) {
+        return;
+    }
+#endif
     if (gPratcam_sequences[pIndex].precedence <= gCurrent_pratcam_precedence) {
         return;
     }

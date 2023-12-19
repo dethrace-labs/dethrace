@@ -323,10 +323,10 @@ int DoMainMenuInterface(tU32 pTime_out, int pContinue_allowed) {
     if (pContinue_allowed) {
         gMain_menu_spec = &interface_spec1;
         result = DoInterfaceScreen(&interface_spec1, gFaded_palette | 2, 0);
-        if (result != 7 && result && result != 1 && result != 2) {
-            RunFlic(12);
-        } else {
+        if (result == 0 || result == 1 || result == 2 || result == 7) {
             FadePaletteDown();
+        } else {
+            RunFlic(12);
         }
         switch (result) {
         case 0:
@@ -352,10 +352,10 @@ int DoMainMenuInterface(tU32 pTime_out, int pContinue_allowed) {
     } else {
         interface_spec2.time_out = pTime_out;
         result = DoInterfaceScreen(&interface_spec2, gFaded_palette, 0);
-        if (result != 4 && result != -1) {
-            RunFlic(32);
-        } else {
+        if (result == -1 || result == 4) {
             FadePaletteDown();
+        } else {
+            RunFlic(32);
         }
         switch (result) {
         case 0:

@@ -10,59 +10,17 @@
 #include "brender/br_types.h"
 #include "dr_types.h"
 
-// void ClearupPDNetworkStuff(void);
+void ClearupPDNetworkStuff(void);
 
-// void MATTMessageCheck(char* pFunction_name, tNet_message* pMessage, int pAlleged_size);
+void MATTMessageCheck(char* pFunction_name, tNet_message* pMessage, int pAlleged_size);
 
-// int GetProfileText(char* pDest, int pDest_len, char* pFname, char* pKeyname);
+int GetMessageTypeFromMessage(char* pMessage_str);
 
-// int GetSocketNumberFromProfileFile(void);
+void MakeMessageToSend(int pMessage_type);
 
-// tU32 EthernetAddressToU32(_IPX_LOCAL_TARGET* pAddr_ipx);
+int ReceiveHostResponses(void);
 
-// void NetNowIPXLocalTarget2String(char* pString, _IPX_LOCAL_TARGET* pSock_addr_ipx);
-
-// int GetMessageTypeFromMessage(char* pMessage_str);
-
-// int SameEthernetAddress(_IPX_LOCAL_TARGET* pAddr_ipx1, _IPX_LOCAL_TARGET* pAddr_ipx2);
-
-// _IPX_LOCAL_TARGET* GetIPXAddrFromPlayerID(tPlayer_ID pPlayer_id);
-
-// void MakeMessageToSend(int pMessage_type);
-
-// int ReceiveHostResponses(void);
-
-// int BroadcastMessage(void);
-
-// int hmiIPXCloseSocket(W32 wSocket);
-
-// void hmiIPXListenForPacket(_IPX_ECB* pECB_ptr, tU32 pOffset);
-
-// int hmiIPXPostListen(_IPX_ECB* pECB_ptr, tU32 pOffset);
-
-// int hmiIPXGetData(PSTR pData, tU32 wDSize);
-
-// void hmiIPXSendPacket(_IPX_ECB* sECB, _IPX_ECB** pPacket, PSTR pHeader, W32 wSize);
-
-// int hmiIPXSendDataDirect(PSTR pHeader, W32 wHSize, PSTR pData, W32 wDSize, _NETNOW_NODE_ADDR* sNode);
-
-// void hmiIPXGetInternetworkAddr(_IPX_INTERNET_ADDR* sInterworkAddr);
-
-// void hmiIPXGetLocalTarget(_IPX_LOCAL_TARGET* sNetworkAddr);
-
-// int AllocateRealMem(W32 wSize, PSTR* pPtr, W32* pSegment, tU16* pSelector);
-
-// int FreeRealMem(tU16 pSelector);
-
-// int hmiIPXInstalled(void);
-
-// int hmiIPXOpenSocket(W32 wSocket);
-
-// void GetLargestPacketSizeOoErBetterInsertLinfordChristieJokeHere(void);
-
-// int hmiIPXInitSystem(W32 wSocket);
-
-// void GetIPXToStickItsEarToTheGround(void);
+int BroadcastMessage(void);
 
 int PDNetInitialise(void);
 

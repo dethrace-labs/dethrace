@@ -494,36 +494,60 @@ void SetInitialPosition(tRace_info* pThe_race, int pCar_index, int pGrid_index) 
     car = pThe_race->opponent_list[pCar_index].car_spec;
     BrMatrix34Identity(&car_actor->t.t.mat);
     place_on_grid = 1;
-    if (gNet_mode && !gCurrent_net_game->options.grid_start && pThe_race->number_of_net_start_points) {
-        TELL_ME_IF_WE_PASS_THIS_WAY();
+    if (gNet_mode != eNet_mode_none && !gCurrent_net_game->options.grid_start && pThe_race->number_of_net_start_points != 0) {
+        start_i = i = IRandomBetween(0, pThe_race->number_of_net_start_points - 1);
+        do {
+            PossibleService();
+            for (j = 0; j < gNumber_of_net_players; j++) {
+                if (j != pCar_index) {
+                    BrVector3Copy(&real_pos, &pThe_race->opponent_list[j].car_spec->car_master_actor->t.t.translate.t);
+                    if (real_pos.v[0] > 500.f) {
+                        real_pos.v[0] -= 1000.f;
+                        real_pos.v[1] -= 1000.f;
+                        real_pos.v[2] -= 1000.f;
+                    }
+                    BrVector3Sub(&dist, &real_pos, &pThe_race->net_starts[i].pos);
+                    if (BrVector3LengthSquared(&dist) < 16.f) {
+                        break;
+                    }
+                }
+            }
+            if (j == gNumber_of_net_players) {
+                BrVector3Copy(&car_actor->t.t.translate.t, &pThe_race->net_starts[i].pos);
+                initial_yaw = BrDegreeToAngle(pThe_race->net_starts[i].yaw);
+                place_on_grid = 0;
+            }
+            i++;
+            if (i == pThe_race->number_of_net_start_points) {
+                i = 0;
+            }
+        } while (start_i != i);
     }
     if (place_on_grid) {
-        initial_yaw = (pThe_race->initial_yaw * 182.0444444444445);
+        initial_yaw = BrDegreeToAngle(pThe_race->initial_yaw);
         BrMatrix34RotateY(&initial_yaw_matrix, initial_yaw);
-        grid_offset.v[0] = 0.0 - pGrid_index % 2;
-        grid_offset.v[1] = 0.0;
-        grid_offset.v[2] = (double)(pGrid_index / 2) * 2.0 + (double)(pGrid_index % 2) * 0.40000001;
+        grid_offset.v[0] = 0.0f - pGrid_index % 2;
+        grid_offset.v[1] = 0.0f;
+        grid_offset.v[2] = (br_scalar)(pGrid_index / 2) * 2.0f + (br_scalar)(pGrid_index % 2) * 0.4f;
         BrMatrix34ApplyV(&car_actor->t.t.translate.t, &grid_offset, &initial_yaw_matrix);
         BrVector3Accumulate(&car_actor->t.t.translate.t, &pThe_race->initial_position);
     }
     FindBestY(
         &car_actor->t.t.translate.t,
         gTrack_actor,
-        10.0,
+        10.0f,
         &nearest_y_above,
         &nearest_y_below,
         &above_model,
         &below_model,
         &above_face_index,
         &below_face_index);
-    if (nearest_y_above == 30000.0) {
-        if (nearest_y_below == -30000.0) {
-            car_actor->t.t.translate.t.v[1] = 0.0;
-        } else {
-            car_actor->t.t.translate.t.v[1] = nearest_y_below;
-        }
-    } else {
+    if (nearest_y_above != 30000.0f) {
         car_actor->t.t.translate.t.v[1] = nearest_y_above;
+    } else if (nearest_y_below != -30000.0f) {
+        car_actor->t.t.translate.t.v[1] = nearest_y_below;
+    } else {
+        car_actor->t.t.translate.t.v[1] = 0.0f;
     }
     BrMatrix34PreRotateY(&car_actor->t.t.mat, initial_yaw);
     if (gNet_mode) {
@@ -531,7 +555,7 @@ void SetInitialPosition(tRace_info* pThe_race, int pCar_index, int pGrid_index) 
             &gNet_players[pThe_race->opponent_list[pCar_index].net_player_index].initial_position,
             &car->car_master_actor->t.t.mat);
     }
-    if (gNet_mode && car->disabled && car_actor->t.t.translate.t.v[0] < 500.0) {
+    if (gNet_mode != eNet_mode_none && car->disabled && car_actor->t.t.translate.t.v[0] < 500.0f) {
         DisableCar(car);
     }
     // Enable to start all opponent cars upside down ;)
@@ -3240,7 +3264,7 @@ int ExpandBoundingBox(tCar_spec* c) {
     c->bounds[1].min.v[2] = min_z;
     c->bounds[1].max.v[2] = max_z;
     if (c->driver == eDriver_local_human) {
-        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(6));
+        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(kMiscString_RepairObstructed));
     }
     return 0;
 }

@@ -137,13 +137,16 @@ void PDInitialiseSystem(void) {
 }
 
 // IDA: void __cdecl PDShutdownSystem()
-void PDShutdownSystem(void) {
+void PDShutdownSystem() {
+    static int been_here = 0; // Added by dethrace
     LOG_TRACE("()");
 
-    Harness_Hook_PDShutdownSystem();
-
-    CloseDiagnostics();
-    exit(0);
+    if (!been_here) {
+        Harness_Hook_PDShutdownSystem();
+    } else {
+        LOG_WARN("recursion detected => force exit");
+        exit(8);
+    }
 }
 
 // IDA: void __cdecl PDSaveOriginalPalette()

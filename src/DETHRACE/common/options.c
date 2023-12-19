@@ -848,7 +848,7 @@ void DrawKeyAssignments(int pCurrent_choice, int pCurrent_mode) {
             font_n = &gFonts[9];
             font_k = &gFonts[11];
         }
-        TransDRPixelmapText(gBack_screen, name_x, y, font_n, GetMiscString(150 + i), 640);
+        TransDRPixelmapText(gBack_screen, name_x, y, font_n, GetMiscString(kMiscString_InputOptions_START + i), 640);
         TransDRPixelmapText(gBack_screen, key_x, y, font_k, gKey_names[gKey_mapping[gKey_defns[i]] + 2], 640);
         if (i == gCurrent_key && pCurrent_mode != 0) {
             DrawRRectangle(gBack_screen, name_x - 3, y - 3, end_box, font_k->height + y + 2 - (TranslationMode() ? 2 : 0), 45);

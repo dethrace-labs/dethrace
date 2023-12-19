@@ -1236,7 +1236,7 @@ void ProcessLevitate(tOpponent_spec* pOpponent_spec, tProcess_objective_command 
                 pOpponent_spec->levitate_data.time_started = gTime_stamp_for_this_munging;
                 pOpponent_spec->levitate_data.initial_y = pOpponent_spec->car_spec->car_master_actor->t.t.translate.t.v[1];
                 if (pOpponent_spec->car_spec->has_been_stolen) {
-                    NewTextHeadupSlot(4, 250, 2500, -4, GetMiscString(170));
+                    NewTextHeadupSlot(4, 250, 2500, -4, GetMiscString(kMiscString_CarAddedToChangeCarList));
                 }
             } else {
                 pOpponent_spec->car_spec->brake_force = 15.f * pOpponent_spec->car_spec->M;

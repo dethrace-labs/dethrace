@@ -8,7 +8,9 @@ add_library(miniaudio STATIC
 target_include_directories(miniaudio 
     PUBLIC
         include
+    PRIVATE
         include/miniaudio
+        
 )
 
 cmake_push_check_state(RESET)
@@ -21,3 +23,9 @@ if(NOT HAVE_EXP)
     endif()
 endif()
 cmake_pop_check_state()
+
+if (CMAKE_C_COMPILER_ID MATCHES "Clang")
+    target_compile_options(miniaudio PRIVATE
+        -Wno-deprecated-declarations
+    )
+endif()

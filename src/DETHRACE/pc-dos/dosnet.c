@@ -1,9 +1,15 @@
 #include "pd/net.h"
 
 #include "errors.h"
+#include "globvrpb.h"
+#include "harness/hooks.h"
 #include "harness/trace.h"
+#include "network.h"
+#include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifdef __DOS__
 
 tU32 gNetwork_init_flags;
 tPD_net_game_info* gJoinable_games;
@@ -26,9 +32,11 @@ tU8* gSend_packet_ptr;
 W32 gSend_segment;
 tU8* gListen_packet;
 tU8* gListen_packet_ptr;
+
 size_t gMsg_header_strlen;
 int gNumber_of_networks;
 int gNumber_of_hosts;
+
 tRM_info RMI;
 _IPX_HEADER gLast_received_IPX_header;
 tU16 gSocket_number_network_order;
@@ -42,7 +50,7 @@ tU16 gSend_selector;
 /*static*/ int GetSocketNumberFromProfileFile(void);
 /*static*/ tU32 EthernetAddressToU32(_IPX_LOCAL_TARGET* pAddr_ipx);
 /*static*/ void NetNowIPXLocalTarget2String(char* pString, _IPX_LOCAL_TARGET* pSock_addr_ipx);
-/*static*/ int GetMessageTypeFromMessage(char* pMessage_str)  ;
+/*static*/ int GetMessageTypeFromMessage(char* pMessage_str);
 /*static*/ int SameEthernetAddress(_IPX_LOCAL_TARGET* pAddr_ipx1, _IPX_LOCAL_TARGET* pAddr_ipx2);
 /*static*/ _IPX_LOCAL_TARGET* GetIPXAddrFromPlayerID(tPlayer_ID pPlayer_id);
 /*static*/ void MakeMessageToSend(int pMessage_type);
@@ -297,6 +305,7 @@ int PDNetInitialise(void) {
     tU32 netnum;
     char str[256];
     int mess_num;
+
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
@@ -326,7 +335,7 @@ int PDNetGetNextJoinGame(tNet_game_details* pGame, int pIndex) {
     int j;
     int number_of_hosts_has_changed;
     char str[256];
-    LOG_TRACE("(%p, %d)", pGame, pIndex);
+    LOG_TRACE9("(%p, %d)", pGame, pIndex);
     NOT_IMPLEMENTED();
 }
 
@@ -374,35 +383,7 @@ tPlayer_ID PDNetExtractPlayerID(tNet_game_details* pDetails) {
 
 // IDA: void __usercall PDNetObtainSystemUserName(char *pName@<EAX>, int pMax_length@<EDX>)
 void PDNetObtainSystemUserName(char* pName, int pMax_length) {
-#ifdef _WIN32
-    uint32_t size;
-    char buffer[16];
-    int result;
-
-#endif
-
-    dr_dprintf("PDNetObtainSystemUserName()\n");
-    // todo
-#if 0
-    size = COUNT_OF(buffer);
-    result = GetComputerNameA(buffer, &size);
-    if (result == 0) {
-        LOG_WARN("GetComputerNameA failed with code=%u", GetLastError());
-        buffer[0] = '\0';
-        size = 0;
-    }
-    strncpy(pName, buffer, pMax_length - 1);
-    pName[pMax_length - 1] = '\0';
-    while (1) {
-        pName = strpbrk(pName, "_=(){}[]<>!$%^&*/:@~;'#,?\\|`\"");
-        if (pName == NULL || *pName == '\0') {
-            break;
-        }
-        *pName = '-';
-    }
-#else
     strcpy(pName, "Ron Turn");
-#endif
 }
 
 // IDA: int __usercall PDNetSendMessageToPlayer@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>, tPlayer_ID pPlayer@<EBX>)
@@ -417,6 +398,7 @@ int PDNetSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage
 int PDNetSendMessageToAllPlayers(tNet_game_details* pDetails, tNet_message* pMessage) {
     char str[256];
     int i;
+    int r; // Added by dethrace
     LOG_TRACE("(%p, %p)", pDetails, pMessage);
     NOT_IMPLEMENTED();
 }
@@ -472,3 +454,5 @@ int PDNetGetHeaderSize(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
+
+#endif
