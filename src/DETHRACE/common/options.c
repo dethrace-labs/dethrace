@@ -468,7 +468,7 @@ void PlotAGraphBox__options(int pIndex, int pColour_value) {
         gThe_interface_spec__options->mouse_areas[2].left[gGraf_data_index] - 6,
         gRadio_bastards__options[pIndex].top - 3,
         gThe_interface_spec__options->mouse_areas[2].right[gGraf_data_index] + 3,
-        gRadio_bastards__options[pIndex].top + gFonts[12].height + (TranslationMode() ? 2 : 0), pColour_value);
+        gRadio_bastards__options[pIndex].top + gFonts[12].height + 2 - (TranslationMode() ? 2 : 0), pColour_value);
 }
 
 // IDA: void __usercall DrawAGraphBox(int pIndex@<EAX>)
@@ -672,6 +672,9 @@ void StripControls(unsigned char* pStr) {
         if (pStr[i] < ' ') {
             memmove(&pStr[i], &pStr[i + 1], (len - i) * sizeof(char));
             len--;
+#ifdef DETHRACE_FIX_BUGS
+            i--;
+#endif
         }
     }
 }

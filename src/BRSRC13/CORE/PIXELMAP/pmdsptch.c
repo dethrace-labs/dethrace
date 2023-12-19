@@ -362,7 +362,7 @@ br_uint_16 BrPixelmapTextWidth(br_pixelmap* dst, br_font* font, char* text) {
 
     if (font->flags & BR_FONTF_PROPORTIONAL) {
         for (i = 0, w = 0, j = BrStrLen(text); i < j; i++, text++)
-            w += font->width[(int)*text] + 1;
+            w += font->width[*(br_uint_8*)text] + 1;
         w -= 1;
         return w;
     } else
