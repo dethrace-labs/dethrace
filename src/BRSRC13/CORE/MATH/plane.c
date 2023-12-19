@@ -30,7 +30,7 @@ br_int_32 BrPlaneEquation(br_vector4* eqn, br_vector3* v0, br_vector3* v1, br_ve
     nz = ax * by - ay * bx;
     l = nx * nx + ny * ny + nz * nz;
     l = BrFloatSqrt(l);
-    if (isnan(l)) {
+    if (isnanf(l)) {
         nx = 0.f;
         ny = 0.f;
         nz = 1.f;
