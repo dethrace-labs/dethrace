@@ -43,7 +43,15 @@ typedef struct SmackTag {
     unsigned long addr32;
 
     // added by dethrace
-    void* user;
+    void* smk_handle; // opaque pointer to the libsmacker instance
+    int audio_sample_rate;
+    int audio_frame_size_in_bytes; // TODO: consider using SndSize for storage instead?
+    void* audio_paged_buffer; // opaque pointer to a miniaudio ma_paged_audio_buffer struct
+    int audio_pages_accumulated_cnt;
+    int audio_pages_accumulated_max;
+    void* audio_paged_buffer_data; // opaque pointer to a miniaudio ma_paged_audio_buffer_data struct
+    void* audio_converter; // opaque pointerto a miniaudio ma_data_converter struct
+    void* audio_track; // opaque pointer to a miniaudio ma_sound struct
 } Smack;
 
 Smack* SmackOpen(const char* name, uint32_t flags, uint32_t extrabuf);
