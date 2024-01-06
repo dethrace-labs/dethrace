@@ -468,7 +468,7 @@ void PlotAGraphBox__options(int pIndex, int pColour_value) {
         gThe_interface_spec__options->mouse_areas[2].left[gGraf_data_index] - 6,
         gRadio_bastards__options[pIndex].top - 3,
         gThe_interface_spec__options->mouse_areas[2].right[gGraf_data_index] + 3,
-        gRadio_bastards__options[pIndex].top + gFonts[12].height + 2 - (TranslationMode() ? 2 : 0), pColour_value);
+        gRadio_bastards__options[pIndex].top + gFonts[kFont_GRYLIT].height + 2 - (TranslationMode() ? 2 : 0), pColour_value);
 }
 
 // IDA: void __usercall DrawAGraphBox(int pIndex@<EAX>)
@@ -620,7 +620,7 @@ void DoGraphicsOptions(void) {
 
     gThe_interface_spec__options = &interface_spec;
     gCurrent_key = -1;
-    LoadFont(12);
+    LoadFont(kFont_GRYLIT);
     GetGraphicsOptions();
     if (DoInterfaceScreen(&interface_spec, 0, 0) == 0) {
         SetGraphicsOptions();
@@ -810,12 +810,12 @@ void DrawKeyAssignments(int pCurrent_choice, int pCurrent_mode) {
     LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
 
 #if defined(DETHRACE_FIX_BUGS)
-    font_k = &gFonts[11];
+    font_k = &gFonts[kFont_GRYDK];
 #endif
     if (gMouse_in_use && pCurrent_choice == 4) {
         GetMousePosition(&x_coord, &y_coord);
         if (y_coord >= gCurrent_graf_data->key_assign_key_map_y
-            && y_coord <= gCurrent_graf_data->key_assign_key_map_y + gFonts[12].height + 5
+            && y_coord <= gCurrent_graf_data->key_assign_key_map_y + gFonts[kFont_GRYLIT].height + 5
             && x_coord > gCurrent_graf_data->key_assign_col_1
             && x_coord < gCurrent_graf_data->key_assign_col_2 + gCurrent_graf_data->key_assign_col_2 - gCurrent_graf_data->key_assign_col_1 - 7) {
             gCurrent_key = -1;
@@ -841,15 +841,15 @@ void DrawKeyAssignments(int pCurrent_choice, int pCurrent_mode) {
         gCurrent_graf_data->key_assign_y_pitch * gKey_count / 2 + 4,
         0);
     GetKeyCoords(-1, &y, &name_x, &key_x, &end_box);
-    DrawRRectangle(gBack_screen, name_x - 3, y - 3, end_box, gFonts[12].height + y + 2 - (TranslationMode() ? 2 : 0), 0);
+    DrawRRectangle(gBack_screen, name_x - 3, y - 3, end_box, gFonts[kFont_GRYLIT].height + y + 2 - (TranslationMode() ? 2 : 0), 0);
     for (i = 0; i < gKey_count; i++) {
         GetKeyCoords(i, &y, &name_x, &key_x, &end_box);
         if (i == gCurrent_key && pCurrent_mode != 0) {
-            font_n = &gFonts[10];
-            font_k = &gFonts[12];
+            font_n = &gFonts[kFont_GRNLIT];
+            font_k = &gFonts[kFont_GRYLIT];
         } else {
-            font_n = &gFonts[9];
-            font_k = &gFonts[11];
+            font_n = &gFonts[kFont_GRNDK];
+            font_k = &gFonts[kFont_GRYDK];
         }
         TransDRPixelmapText(gBack_screen, name_x, y, font_n, GetMiscString(kMiscString_InputOptions_START + i), 640);
         TransDRPixelmapText(gBack_screen, key_x, y, font_k, gKey_names[gKey_mapping[gKey_defns[i]] + 2], 640);
@@ -1071,7 +1071,7 @@ int KeyAssignGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
             PollKeys();
             WaitForNoKeys();
             GetKeyCoords(gCurrent_key, &y, &name_x, &key_x, &end_box);
-            font = &gFonts[12];
+            font = &gFonts[kFont_GRYLIT];
             gPending_entry = -1;
             while (1) {
                 key = PDAnyKeyDown();
@@ -1210,10 +1210,10 @@ void DoControlOptions(void) {
     gThe_interface_spec__options = &interface_spec;
     SaveOrigKeyMapping();
     LoadKeyNames();
-    LoadFont(9);
-    LoadFont(11);
-    LoadFont(10);
-    LoadFont(12);
+    LoadFont(kFont_GRNDK);
+    LoadFont(kFont_GRYDK);
+    LoadFont(kFont_GRNLIT);
+    LoadFont(kFont_GRYLIT);
     gPending_entry = -1;
     gKey_count = 18;
     gCurrent_key = 8;
