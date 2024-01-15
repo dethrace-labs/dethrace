@@ -8,7 +8,7 @@ extern float gWobble_spam_y[8];
 extern float gWobble_spam_z[8];
 extern br_scalar gWheel_circ_to_width;
 extern tU8 gSmoke_damage_step[12];
-extern int gSteal_ranks[5];
+extern int gSteal_ranks[6];
 
 int ReadCrushData(FILE* pF, tCrush_data* pCrush_data);
 
