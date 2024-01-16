@@ -27,12 +27,12 @@
 void dr_dprintf(char* fmt_string, ...);
 
 static int stack_nbr = 0;
-static char windows_program_name[1024];
+static char _program_name[1024];
 
 static char dirname_buf[_MAX_DIR];
 static char fname_buf[_MAX_FNAME];
 
-static int addr2line(char const* const program_name, void const* const addr) {
+int addr2line(char const* const program_name, void const* const addr) {
     char addr2line_cmd[512] = { 0 };
 
     sprintf(addr2line_cmd, "addr2line -f -p -e %.256s %p", program_name, addr);
@@ -41,7 +41,7 @@ static int addr2line(char const* const program_name, void const* const addr) {
     return system(addr2line_cmd);
 }
 
-static void print_stacktrace(CONTEXT* context) {
+void print_stacktrace(CONTEXT* context) {
 
     SymInitialize(GetCurrentProcess(), 0, true);
 
@@ -64,13 +64,13 @@ static void print_stacktrace(CONTEXT* context) {
         SymFunctionTableAccess,
         SymGetModuleBase,
         0)) {
-        addr2line(windows_program_name, (void*)frame.AddrPC.Offset);
+        addr2line(_program_name, (void*)frame.AddrPC.Offset);
     }
 
     SymCleanup(GetCurrentProcess());
 }
 
-static LONG WINAPI windows_exception_handler(EXCEPTION_POINTERS* ExceptionInfo) {
+LONG WINAPI windows_exception_handler(EXCEPTION_POINTERS* ExceptionInfo) {
     switch (ExceptionInfo->ExceptionRecord->ExceptionCode) {
     case EXCEPTION_ACCESS_VIOLATION:
         fputs("Error: EXCEPTION_ACCESS_VIOLATION\n", stderr);
@@ -142,14 +142,14 @@ static LONG WINAPI windows_exception_handler(EXCEPTION_POINTERS* ExceptionInfo) 
     if (EXCEPTION_STACK_OVERFLOW != ExceptionInfo->ExceptionRecord->ExceptionCode) {
         print_stacktrace(ExceptionInfo->ContextRecord);
     } else {
-        addr2line(windows_program_name, (void*)ExceptionInfo->ContextRecord->Eip);
+        addr2line(_program_name, (void*)ExceptionInfo->ContextRecord->Eip);
     }
 
     return EXCEPTION_EXECUTE_HANDLER;
 }
 
 void OS_InstallSignalHandler(char* program_name) {
-    strcpy(windows_program_name, program_name);
+    strcpy(_program_name, program_name);
     SetUnhandledExceptionFilter(windows_exception_handler);
 }
 
@@ -160,7 +160,7 @@ FILE* OS_fopen(const char* pathname, const char* mode) {
     f = NULL;
     err = fopen_s(&f, pathname, mode);
     if (err != 0) {
-        fprintf(stderr, "Failed to open \"%s\" (%s)\n", pathname, strerror(err));
+        fprintf(stderr, "Failed to open \"%s\"", pathname);
     }
 
     return f;

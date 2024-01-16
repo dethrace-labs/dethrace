@@ -29,9 +29,6 @@ void dr_dprintf(char* fmt_string, ...);
 static int stack_nbr = 0;
 static char windows_program_name[1024];
 
-static char dirname_buf[_MAX_DIR];
-static char fname_buf[_MAX_FNAME];
-
 static int addr2line(char const* const program_name, void const* const addr) {
     char addr2line_cmd[512] = { 0 };
 
@@ -171,14 +168,4 @@ size_t OS_ConsoleReadPassword(char* pBuffer, size_t pBufferLen) {
     pBuffer[0] = '\0';
     fgets(pBuffer, pBufferLen, stdin);
     return strlen(pBuffer);
-}
-
-char* OS_Dirname(const char* path) {
-    _splitpath(path, NULL, dirname_buf, NULL, NULL);
-    return dirname_buf;
-}
-
-char* OS_Basename(const char* path) {
-    _splitpath(path, NULL, NULL, fname_buf, NULL);
-    return fname_buf;
 }

@@ -202,9 +202,9 @@ void TogglePedestrians(void) {
     if (!gProgram_state.sausage_eater_mode) {
         gPedestrians_on = !gPedestrians_on;
         if (gPedestrians_on) {
-            NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(24));
+            NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(kMiscString_LetTheCarnageContinue));
         } else {
-            NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(25));
+            NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(kMiscString_NiceAndFluffyMode));
         }
     }
 }
@@ -1525,7 +1525,7 @@ void CheckLastPed(void) {
     LOG_TRACE("()");
 
     if (gNet_mode == eNet_mode_none && gProgram_state.peds_killed >= gTotal_peds) {
-        NewTextHeadupSlot(4, 0, 5000, -4, GetMiscString(26));
+        NewTextHeadupSlot(4, 0, 5000, -4, GetMiscString(kMiscString_EveryPedestrianWasted));
         RaceCompleted(eRace_over_peds);
     }
 }
@@ -1989,13 +1989,13 @@ void SendPedestrian(tPedestrian_data* pPedestrian, int pIndex) {
             size_decider = 1;
         }
         the_message = NULL;
-        the_contents = NetGetBroadcastContents(0x19, size_decider);
+        the_contents = NetGetBroadcastContents(NETMSGID_PEDESTRIAN, size_decider);
     } else {
         size_decider = 2;
         if (pPedestrian->current_frame == pPedestrian->sequences[pPedestrian->current_sequence].number_of_frames - 1) {
             pPedestrian->sent_dead_message++;
         }
-        the_message = NetBuildMessage(0x19, size_decider);
+        the_message = NetBuildMessage(NETMSGID_PEDESTRIAN, size_decider);
         the_contents = &the_message->contents;
     }
     the_contents->data.pedestrian.index = pIndex;

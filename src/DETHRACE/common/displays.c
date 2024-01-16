@@ -995,7 +995,7 @@ void DoDamageScreen(tU32 pThe_time) {
     } else {
         the_wobble_x = gProgram_state.current_car.damage_x_offset;
         the_wobble_y = gProgram_state.current_car.damage_y_offset;
-        if (gProgram_state.current_car.damage_background) {
+        if (gProgram_state.current_car.damage_background != NULL) {
             DRPixelmapRectangleMaskedCopy(
                 gBack_screen,
                 gProgram_state.current_car.damage_background_x,
@@ -1019,7 +1019,7 @@ void DoDamageScreen(tU32 pThe_time) {
                 the_wobble_y + gProgram_state.current_car.damage_units[i].y_coord,
                 the_image,
                 0,
-                y_pitch * (2 * the_step + ((pThe_time / the_damage->periods[5 * the_damage->damage_level / 100]) & 1)),
+                y_pitch * (2 * the_step + ((pThe_time / the_damage->periods[the_step]) & 1)),
                 the_image->width,
                 y_pitch);
         }
@@ -1101,7 +1101,11 @@ void DoInstruments(tU32 pThe_time) {
                 cos_angle = gCosine_array[(unsigned int)((TAU - the_angle2) / DR_PI * 128.0)];
             } else if (the_angle2 > DR_PI) {
                 cos_angle = -gCosine_array[(unsigned int)((the_angle2 - DR_PI) / DR_PI * 128.0)];
+#if defined(DETHRACE_FIX_BUGS)
+            } else if (the_angle2 >= DR_PI_OVER_2) {
+#else
             } else if (the_angle2 > DR_PI_OVER_2) {
+#endif
                 cos_angle = -gCosine_array[(unsigned int)((DR_PI - the_angle2) / DR_PI * 128.0)];
             } else {
                 cos_angle = gCosine_array[(unsigned int)(the_angle2 / DR_PI * 128.0)];
@@ -1110,7 +1114,11 @@ void DoInstruments(tU32 pThe_time) {
                 sin_angle = gCosine_array[(unsigned int)((TAU - the_angle) / DR_PI * 128.0)];
             } else if (the_angle > DR_PI) {
                 sin_angle = -gCosine_array[(unsigned int)((the_angle - DR_PI) / DR_PI * 128.0)];
+#if defined(DETHRACE_FIX_BUGS)
+            } else if (the_angle >= DR_PI_OVER_2) {
+#else
             } else if (the_angle > DR_PI_OVER_2) {
+#endif
                 sin_angle = -gCosine_array[(unsigned int)((DR_PI - the_angle) / DR_PI * 128.0)];
             } else {
                 sin_angle = gCosine_array[(unsigned int)(the_angle / DR_PI * 128.0)];
@@ -1392,16 +1400,16 @@ void EarnCredits2(int pAmount, char* pPrefix_text) {
     }
     gLast_credit_amount = pAmount;
     if (pAmount >= 2) {
-        sprintf(s, "%s%d %s", pPrefix_text, pAmount, GetMiscString(12));
+        sprintf(s, "%s%d %s", pPrefix_text, pAmount, GetMiscString(kMiscString_Credits));
         gProgram_state.credits_earned += original_amount;
     } else if (pAmount >= 1) {
-        sprintf(s, "%s1 %s", pPrefix_text, GetMiscString(13));
+        sprintf(s, "%s1 %s", pPrefix_text, GetMiscString(kMiscString_Credit));
         gProgram_state.credits_earned += original_amount;
     } else if (pAmount >= -1) {
-        sprintf(s, "%s%s 1 %s", pPrefix_text, GetMiscString(14), GetMiscString(13));
+        sprintf(s, "%s%s 1 %s", pPrefix_text, GetMiscString(kMiscString_Lost), GetMiscString(kMiscString_Credit));
         gProgram_state.credits_lost -= original_amount;
     } else {
-        sprintf(s, "%s%s %d %s", GetMiscString(14), pPrefix_text, -pAmount, GetMiscString(12));
+        sprintf(s, "%s%s %d %s", GetMiscString(kMiscString_Lost), pPrefix_text, -pAmount, GetMiscString(kMiscString_Credits));
         gProgram_state.credits_lost -= original_amount;
     }
     gLast_credit_headup__displays = NewTextHeadupSlot(4, 0, 2000, -4, s);

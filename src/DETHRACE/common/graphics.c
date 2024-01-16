@@ -375,8 +375,8 @@ void BuildColourTable(br_pixelmap* pPalette) {
 
 #define SQR(i) i* i
 
-    for (i = 0; i < COUNT_OF(gRGB_colours); ++i) {
-        nearest_distance = 0x48400000;
+    for (i = 0; i < COUNT_OF(gRGB_colours); i++) {
+        nearest_distance = 196608.f;
         red = (gRGB_colours[i] >> 16) & 0xFF;
         green = (gRGB_colours[i] >> 8) & 0xFF;
         blue = gRGB_colours[i] & 0xFF;
@@ -1088,7 +1088,7 @@ br_scalar DistanceFromPlane(br_vector3* pPos, br_scalar pA, br_scalar pB, br_sca
     br_vector3 normal;
     LOG_TRACE("(%p, %f, %f, %f, %f)", pPos, pA, pB, pC, pD);
 
-    return fabs((pPos->v[1] * pB + pPos->v[0] * pA + pPos->v[2] * pC + pD) / (pA * pA + pC * pC + pB * pB));
+    return fabsf((pPos->v[1] * pB + pPos->v[0] * pA + pPos->v[2] * pC + pD) / (pA * pA + pC * pC + pB * pB));
 }
 
 // IDA: void __cdecl DisableLights()
@@ -3010,16 +3010,16 @@ void ToggleShadow(void) {
     }
     switch (gShadow_level) {
     case eShadow_none:
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(104));
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_NoShadows));
         break;
     case eShadow_us_only:
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(105));
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_ShadowUnderOwnCar));
         break;
     case eShadow_us_and_opponents:
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(106));
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_ShadowUnderMainCars));
         break;
     case eShadow_everyone:
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(107));
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_ShadowUnderAllCars));
         break;
     default:
         return;

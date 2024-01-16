@@ -64,6 +64,7 @@ target_sources(harness PRIVATE
     sound/sound.c
     sound/sound.h
     win95/polyfill.c
+    win95/winsock.c
     platforms/null.c
     platforms/null.h
 
@@ -101,6 +102,7 @@ if(WIN32)
     target_sources(harness PRIVATE
         os/windows.c
     )
+    target_link_libraries(harness PRIVATE ws2_32)
 elseif(APPLE)
     target_sources(harness PRIVATE
         os/macos.c

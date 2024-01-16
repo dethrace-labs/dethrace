@@ -1,5 +1,6 @@
 
 #include "harness/hooks.h"
+#include "harness/os.h"
 #include "harness/win95_polyfill.h"
 
 #include <assert.h>
@@ -237,12 +238,11 @@ void DirectDrawDevice_SetPaletteEntries(PALETTEENTRY_* palette, int pFirst_colou
 }
 
 void _splitpath_(char* path, char* drive, char* dir, char* fname, char* ext) {
-#ifdef _WIN32
-    _splitpath(path, NULL, NULL, fname, NULL);
-#else
-    char* base = basename(path);
-    strcpy(fname, base);
-#endif
+    assert(dir == NULL);
+    assert(fname != NULL);
+
+    char* result = OS_Basename(path);
+    strcpy(fname, result);
 }
 
 int _CrtDbgReport_(int reportType, const char* filename, int linenumber, const char* moduleName, const char* format, ...) {

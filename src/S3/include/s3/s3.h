@@ -51,6 +51,7 @@ tS3_sound_tag S3StartSound(tS3_outlet_ptr pOutlet, tS3_sound_id pSound);
 tS3_sound_tag S3StartSound2(tS3_outlet_ptr pOutlet, tS3_sound_id pSound, tS3_repeats pRepeats, tS3_volume pLVolume, tS3_volume pRVolume, tS3_pitch pPitch, tS3_speed pSpeed);
 void S3StopAllOutletSounds(void);
 int S3SoundStillPlaying(tS3_sound_tag pSound);
+int S3ChangePitchSpeed(tS3_sound_tag pTag, tS3_pitch pNew_pitch);
 int S3StopSound(tS3_sound_tag pSound_tag);
 int S3StopOutletSound(tS3_outlet_ptr pOutlet);
 int S3SetOutletVolume(tS3_outlet_ptr pOutlet, tS3_volume pVolume);

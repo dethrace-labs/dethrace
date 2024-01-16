@@ -29,10 +29,14 @@ void dr_dprintf(char* fmt_string, ...);
 static int stack_nbr = 0;
 static char windows_program_name[1024];
 
+<<<<<<< HEAD
+static int addr2line(char const* const program_name, void const* const addr) {
+=======
 static char dirname_buf[_MAX_DIR];
 static char fname_buf[_MAX_FNAME];
 
-static int addr2line(char const* const program_name, void const* const addr) {
+int addr2line(char const* const program_name, void const* const addr) {
+>>>>>>> origin/main
     char addr2line_cmd[512] = { 0 };
 
     sprintf(addr2line_cmd, "addr2line -f -p -e %.256s %p", program_name, addr);

@@ -129,7 +129,7 @@ void InstantDepthChange(tDepth_effect_type pType, br_pixelmap* pSky_texture, int
 
     gProgram_state.current_depth_effect.sky_texture = pSky_texture;
     gHorizon_material->colour_map = pSky_texture;
-    BrMaterialUpdate(gHorizon_material, 0x7FFFu);
+    BrMaterialUpdate(gHorizon_material, BR_MATU_ALL);
     gProgram_state.current_depth_effect.type = pType;
     gProgram_state.current_depth_effect.start = pStart;
     gProgram_state.current_depth_effect.end = pEnd;
@@ -762,7 +762,7 @@ void IncreaseYon(void) {
     AssertYons();
     camera_ptr = gCamera_list[1]->type_data;
     i = (int)camera_ptr->yon_z;
-    sprintf(s, GetMiscString(114), i);
+    sprintf(s, GetMiscString(kMiscString_YonIncreasedTo_D), i);
     NewTextHeadupSlot(4, 0, 2000, -4, s);
 }
 
@@ -780,7 +780,7 @@ void DecreaseYon(void) {
     AssertYons();
     camera_ptr = gCamera_list[1]->type_data;
     i = (int)camera_ptr->yon_z;
-    sprintf(s, GetMiscString(115), i);
+    sprintf(s, GetMiscString(kMiscString_YonDecreasedTo_D), i);
     NewTextHeadupSlot(4, 0, 2000, -4, s);
 }
 

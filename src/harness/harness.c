@@ -1,11 +1,11 @@
 #include "harness.h"
+#include "ascii_tables.h"
 #include "brender_emu/renderer_impl.h"
 #include "include/harness/config.h"
 #include "include/harness/hooks.h"
 #include "include/harness/os.h"
 #include "platforms/null.h"
 #include "sound/sound.h"
-#include "ascii_tables.h"
 #include "version.h"
 
 #include <errno.h>
@@ -159,10 +159,10 @@ void Harness_Init(int* argc, char* argv[]) {
     harness_game_config.volume_multiplier = 1.0f;
     // start window in windowed mode
     harness_game_config.start_full_screen = 0;
-    // disable replay by default
-    harness_game_config.enable_replay = 0;
     // Emulate DOS behavior
     harness_game_config.dos_mode = 0;
+    // Skip binding socket to allow local network testing
+    harness_game_config.no_bind = 0;
 
     // install signal handler by default
     harness_game_config.install_signalhandler = 1;
@@ -174,15 +174,17 @@ void Harness_Init(int* argc, char* argv[]) {
     }
 
     char* root_dir = getenv("DETHRACE_ROOT_DIR");
-    if (root_dir == NULL) {
-        LOG_INFO("DETHRACE_ROOT_DIR is not set, assuming '.'");
+    if (root_dir != NULL) {
+        LOG_INFO("DETHRACE_ROOT_DIR is set to '%s'", root_dir);
     } else {
-        printf("Data directory: %s\n", root_dir);
-        result = chdir(root_dir);
-        if (result != 0) {
-            LOG_PANIC("Failed to chdir. Error is %s", strerror(errno));
-        }
+        root_dir = OS_Dirname(argv[0]);
     }
+    printf("Using root directory: %s\n", root_dir);
+    result = chdir(root_dir);
+    if (result != 0) {
+        LOG_PANIC("Failed to chdir. Error is %s", strerror(errno));
+    }
+
     if (harness_game_info.mode == eGame_none) {
         Harness_DetectGameMode();
     }
@@ -248,11 +250,11 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
         } else if (strcasecmp(argv[i], "--full-screen") == 0) {
             harness_game_config.start_full_screen = 1;
             handled = 1;
-        } else if (strcasecmp(argv[i], "--enable-replay") == 0) {
-            harness_game_config.enable_replay = 1;
-            handled = 1;
         } else if (strcasecmp(argv[i], "--dos-mode") == 0) {
             harness_game_config.dos_mode = 1;
+            handled = 1;
+        } else if (strcasecmp(argv[i], "--no-bind") == 0) {
+            harness_game_config.no_bind = 1;
             handled = 1;
         }
 
