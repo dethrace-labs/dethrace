@@ -179,17 +179,17 @@ int SoundClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_o
     int* the_value;
     LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
 
-#define ANGLE_RANGE_START (20 * M_PI / 360)
-#define ANGLE_RANGE_END (340 * M_PI / 360)
+#define ANGLE_RANGE_START (20 * PI / 360)
+#define ANGLE_RANGE_END (340 * PI / 360)
 
     x_delta = pX_offset - gCurrent_graf_data->dial__x_centre;
     y_delta = gCurrent_graf_data->dial__y_centre - pY_offset;
     if (y_delta <= 0.f) {
         return 0;
     }
-    angle = x_delta == 0.f ? M_PI_2 : atanf(y_delta / x_delta);
+    angle = x_delta == 0.f ? PI / 2 : atanf(y_delta / x_delta);
     if (angle < 0.f) {
-        angle += M_PI;
+        angle += PI;
     }
     if (angle > ANGLE_RANGE_START && angle < ANGLE_RANGE_END) {
         the_value = (*pCurrent_choice == 0) ? &gProgram_state.music_volume : &gProgram_state.effects_volume;
