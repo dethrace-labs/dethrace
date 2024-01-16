@@ -673,6 +673,7 @@ void StripControls(unsigned char* pStr) {
             memmove(&pStr[i], &pStr[i + 1], (len - i) * sizeof(char));
             len--;
 #ifdef DETHRACE_FIX_BUGS
+            // correctly handle stripping multiple control characters
             i--;
 #endif
         }
