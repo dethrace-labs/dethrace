@@ -29,7 +29,10 @@ float gWobble_spam_y[8] = { 0.0f, -0.15f, 0.4f, 0.15f, -0.4f, 0.25f, 0.0f, -0.25
 float gWobble_spam_z[8] = { 0.4f, -0.25f, 0.0f, 0.25f, 0.0f, 0.15f, -0.4f, -0.15f };
 br_scalar gWheel_circ_to_width = 0.16f;
 tU8 gSmoke_damage_step[12] = { 20u, 20u, 0u, 10u, 10u, 10u, 10u, 10u, 10u, 10u, 10u, 10u };
-int gSteal_ranks[6] = { 0, 89, 72, 55, 38, 21 };
+int gSteal_ranks[5] = { 89, 72, 55, 38, 21 };
+
+#define BIGAPC_OPPONENT_INDEX 4
+
 // IDA: int __usercall ReadCrushData@<EAX>(FILE *pF@<EAX>, tCrush_data *pCrush_data@<EDX>)
 int ReadCrushData(FILE* pF, tCrush_data* pCrush_data) {
     char s[256];
@@ -1157,7 +1160,9 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
                     credits = 100 * (int)(credits_squared / 100.0);
                     AwardTime(gWasted_time[gProgram_state.skill_level]);
                     EarnCredits(credits);
-                    if (victim->can_be_stolen && !gOpponents[victim->index].dead && ((PercentageChance(50) && gSteal_ranks[gOpponents[victim->index].strength_rating] >= gProgram_state.rank) || victim->index == 4)) {
+                    if (victim->can_be_stolen && !gOpponents[victim->index].dead
+                        // strength_rating is between 1 and 5
+                        && ((PercentageChance(50) && gProgram_state.rank <= gSteal_ranks[gOpponents[victim->index].strength_rating - 1]) || victim->index == BIGAPC_OPPONENT_INDEX)) {
                         StealCar(victim);
                     }
                 }
