@@ -1,6 +1,7 @@
 #include "s3sound.h"
 #include "audio.h"
 #include "backends/backend.h"
+#include "harness/hooks.h"
 #include "harness/trace.h"
 #include "resource.h"
 #include <stdio.h>
@@ -144,7 +145,7 @@ void* S3LoadWavFile_DOS(char* pFile_name) {
     size_t bytes_read;
     char* buf;
 
-    f = fopen(pFile_name, "rb");
+    f = Harness_Hook_fopen(pFile_name, "rb");
     if (f == NULL) {
         gS3_last_error = eS3_error_readfile;
         return 0;
@@ -185,7 +186,7 @@ void* S3LoadWavFile_Win95(char* pFile_name, tS3_sample* pSample) {
     // char* locked_buffer_data;   // [esp+CCh] [ebp-8h] BYREF
     size_t file_len; // [esp+D0h] [ebp-4h]
 
-    f = fopen(pFile_name, "rb");
+    f = Harness_Hook_fopen(pFile_name, "rb");
     if (f == NULL) {
         gS3_last_error = eS3_error_readfile;
         return 0;

@@ -114,7 +114,7 @@ br_scalar BrMatrix4Inverse(br_matrix4* A, br_matrix4* B) {
     if (fabs(det) < BR_SCALAR_EPSILON * 2)
         return 0;
 
-    idet = 1.0 / det;
+    idet = 1.0f / det;
     for (i = 0; i < 4; i++) {
         for (j = 0; j < 4; j++) {
             A(i, j) = A(i, j) * idet;

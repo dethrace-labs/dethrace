@@ -495,9 +495,9 @@ void DrawColumnHeading__newgame(int pStr_index, int pX) {
     TransDRPixelmapText(gBack_screen,
         pX,
         gCurrent_graf_data->joinable_games_y - gCurrent_graf_data->joinable_games_y_pitch,
-        &gFonts[12],
+        &gFonts[kFont_GRYLIT],
         GetMiscString(pStr_index),
-        pX + DRTextWidth(&gFonts[12], GetMiscString(pStr_index)));
+        pX + DRTextWidth(&gFonts[kFont_GRYLIT], GetMiscString(pStr_index)));
 }
 
 // IDA: void __usercall DrawGames(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
@@ -529,9 +529,9 @@ void DrawGames(int pCurrent_choice, int pCurrent_mode) {
     DrawColumnHeading__newgame(kMiscString_NetworkGamesTableHeading_STATUS, gCurrent_graf_data->joinable_games_x_4);
     BrPixelmapLine(gBack_screen,
         gCurrent_graf_data->joinable_games_sel_left,
-        gCurrent_graf_data->joinable_games_y + gFonts[12].height + 1 - (TranslationMode() ? 2 : 0) - gCurrent_graf_data->joinable_games_y_pitch,
+        gCurrent_graf_data->joinable_games_y + gFonts[kFont_GRYLIT].height + 1 - (TranslationMode() ? 2 : 0) - gCurrent_graf_data->joinable_games_y_pitch,
         gCurrent_graf_data->joinable_games_sel_right - 1,
-        gCurrent_graf_data->joinable_games_y + gFonts[12].height + 1 - (TranslationMode() ? 2 : 0) - gCurrent_graf_data->joinable_games_y_pitch,
+        gCurrent_graf_data->joinable_games_y + gFonts[kFont_GRYLIT].height + 1 - (TranslationMode() ? 2 : 0) - gCurrent_graf_data->joinable_games_y_pitch,
         6);
     for (i = 0; i < COUNT_OF(gGames_to_join); i++) {
         if (gGames_to_join[i].game == NULL) {
@@ -788,10 +788,10 @@ tJoin_or_host_result JoinOrHostGame(tNet_game_details** pGame_to_join) {
     LOG_TRACE("(%p)", pGame_to_join);
 
     gCurrent_game_selection = 0;
-    LoadFont(9);
-    LoadFont(10);
-    LoadFont(3);
-    LoadFont(12);
+    LoadFont(kFont_GRNDK);
+    LoadFont(kFont_GRNLIT);
+    LoadFont(kFont_GREENHED);
+    LoadFont(kFont_GRYLIT);
     SetAlwaysTyping();
     InitGamesToJoin();
     NetStartProducingJoinList(AddToJoinList);
@@ -1258,7 +1258,7 @@ void DoNetOptions(tNet_game_options* pGame_options) {
 
     gThe_interface_spec__newgame = &interface_spec;
     gRadio_selected = -1;
-    LoadFont(12);
+    LoadFont(kFont_GRYLIT);
     SetNetOptions(pGame_options);
     if (DoInterfaceScreen(&interface_spec, 0, 0) == 0) {
         GetNetOptions(pGame_options);
@@ -1391,12 +1391,12 @@ void DrawNetChoose(int pCurrent_choice, int pCurrent_mode) {
         gCurrent_graf_data->net_descr_race_l,
         gCurrent_graf_data->net_choose_race_y,
         gCurrent_graf_data->net_descr_race_r - gCurrent_graf_data->net_descr_race_l,
-        gFonts[10].height + 1 - (TranslationMode() ? 2 : 0), 0);
+        gFonts[kFont_GRNLIT].height + 1 - (TranslationMode() ? 2 : 0), 0);
     sprintf(s, "%s %s", GetMiscString(kMiscString_FIRST_RACE), gRace_list[gRace_index].name);
     DRPixelmapCentredText(gBack_screen,
         gCurrent_graf_data->net_choose_race_x,
         gCurrent_graf_data->net_choose_race_y,
-        &gFonts[10], s);
+        &gFonts[kFont_GRNLIT], s);
     BrPixelmapRectangleFill(gBack_screen,
         gCurrent_graf_data->net_descr_race_l,
         gCurrent_graf_data->net_descr_race_top - (TranslationMode() ? 2 : 0),
@@ -1526,8 +1526,8 @@ int NetGameChoices(tNet_game_type* pGame_type, tNet_game_options* pGame_options,
     gRace_index = *pRace_index;
     gLast_game_type = *pGame_type;
     do {
-        LoadFont(10);
-        LoadFont(9);
+        LoadFont(kFont_GRNLIT);
+        LoadFont(kFont_GRNDK);
         gThe_interface_spec__newgame = &interface_spec;
         gLast_net_choose_box = -1;
         gOptions = pGame_options;

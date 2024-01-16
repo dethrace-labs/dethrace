@@ -308,15 +308,17 @@ int TextReadLine(br_datafile* df, char** ident, char** data) {
     LOG_TRACE9("(%p, %p, %p)", df, ident, data);
 
     while (1) {
+        int a;
         cp = BrScratchString();
-        int a = BrFileGetLine(cp, 256, df->h);
+        BrFileGetLine(cp, 256, df->h);
         if (BrFileEof(df->h) != 0) {
             return 0;
         }
         for (; (*cp == ' ') || (*cp == '\t'); cp++) {
         }
-        if (*cp != '\0')
+        if (*cp != '\0') {
             break;
+        }
     }
     *ident = cp;
     while ((*cp != ' ') && (*cp != '\t') && (*cp != '\0')) {

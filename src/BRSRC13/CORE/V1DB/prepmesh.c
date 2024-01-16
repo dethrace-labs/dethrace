@@ -245,9 +245,7 @@ void CopyVertex(v11group* group, int v, prep_vertex* src, br_model* model) {
 
     srcv = model->vertices + src->v;
 
-    group->vertices[v].p.v[0] = srcv->p.v[0] - model->pivot.v[0];
-    group->vertices[v].p.v[1] = srcv->p.v[1] - model->pivot.v[1];
-    group->vertices[v].p.v[2] = srcv->p.v[2] - model->pivot.v[2];
+    BrVector3Sub(&group->vertices[v].p, &srcv->p, &model->pivot);
 
     group->vertices[v].map = srcv->map;
 

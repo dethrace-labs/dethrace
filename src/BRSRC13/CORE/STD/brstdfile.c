@@ -89,7 +89,7 @@ void BrStdioClose(void* f) {
 }
 
 int BrStdioEof(void* f) {
-    return feof(f);
+    return feof((FILE*)f);
 }
 
 int BrStdioGetChar(void* f) {

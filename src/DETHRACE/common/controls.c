@@ -2445,13 +2445,13 @@ void DrawSomeText2(tDR_font* pFont) {
 
 // IDA: void __cdecl DrawSomeText()
 void DrawSomeText(void) {
-    DrawSomeText2(&gFonts[1]);
-    DrawSomeText2(&gFonts[2]);
-    DrawSomeText2(&gFonts[3]);
-    DrawSomeText2(&gFonts[4]);
-    DrawSomeText2(&gFonts[6]);
-    DrawSomeText2(&gFonts[7]);
-    DrawSomeText2(&gFonts[8]);
+    DrawSomeText2(&gFonts[kFont_ORANGHED]);
+    DrawSomeText2(&gFonts[kFont_BLUEHEAD]);
+    DrawSomeText2(&gFonts[kFont_GREENHED]);
+    DrawSomeText2(&gFonts[kFont_MEDIUMHD]);
+    DrawSomeText2(&gFonts[kFont_NEWHITE]);
+    DrawSomeText2(&gFonts[kFont_NEWRED]);
+    DrawSomeText2(&gFonts[kFont_NEWBIGGR]);
 }
 
 // IDA: void __cdecl SaySorryYouLittleBastard()

@@ -173,10 +173,10 @@ br_error _M_br_device_pixelmap_gen_text(br_device_pixelmap* self, br_point* poin
         }
     } else {
         while (*text != '\0') {
-            r.w = font->width[(int)*text];
+            r.w = font->width[*(br_uint_8*)text];
             s_stride = (r.w + 7) / 8;
             if (x + r.w > 0) {
-                self->dispatch->_copyBits(self, &p, &font->glyphs[font->encoding[(unsigned)*text]], s_stride, &r, colour);
+                self->dispatch->_copyBits(self, &p, &font->glyphs[font->encoding[*(br_uint_8*)text]], s_stride, &r, colour);
             }
             x += r.w + 1;
             p.x += r.w + 1;

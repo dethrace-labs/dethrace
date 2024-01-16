@@ -355,6 +355,7 @@ int FopWrite_VERTICES(br_datafile* df, br_vertex* vertices, int nvertices) {
     df->prims->chunk_write(df, CHUNKID_MODEL_VERTICES, df->prims->struct_size(df, &br_vertex_F, NULL) * nvertices + df->prims->count_size(df));
     df->prims->count_write(df, nvertices);
     DfStructWriteArray(df, &br_vertex_F, vertices, nvertices);
+    return 0;
 }
 
 // IDA: int __usercall FopRead_VERTICES@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
@@ -389,6 +390,7 @@ int FopWrite_VERTEX_UV(br_datafile* df, br_vertex* vertices, int nvertices) {
     df->prims->chunk_write(df, CHUNKID_MODEL_VERTEX_UV, df->prims->struct_size(df, &br_vertex_uv_F, NULL) * nvertices + df->prims->count_size(df));
     df->prims->count_write(df, nvertices);
     DfStructWriteArray(df, &br_vertex_uv_F, vertices, nvertices);
+    return 0;
 }
 
 // IDA: int __usercall FopRead_VERTEX_UV@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
@@ -413,6 +415,7 @@ int FopRead_OLD_VERTICES_UV(br_datafile* df, br_uint_32 id, br_uint_32 length, b
     ptr = BrResAllocate(v1db.res, count * sizeof(br_vertex), BR_MEMORY_VERTICES);
     DfStructReadArray(df, &br_old_vertex_uv_F, ptr, count);
     DfPush(DF_VERTEX, ptr, count);
+    return 0;
 }
 
 // IDA: int __usercall FopRead_MATERIAL_INDEX@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)
@@ -447,6 +450,7 @@ int FopWrite_MATERIAL_INDEX(br_datafile* df, br_material** materials, int nmater
     for (i = 0; i < nmaterials; i++) {
         df->prims->name_write(df, materials[i]->identifier);
     }
+    return 0;
 }
 
 // IDA: int __usercall FopRead_OLD_MATERIAL_INDEX@<EAX>(br_datafile *df@<EAX>, br_uint_32 id@<EDX>, br_uint_32 length@<EBX>, br_uint_32 count@<ECX>)

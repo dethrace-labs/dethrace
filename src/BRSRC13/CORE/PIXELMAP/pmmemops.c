@@ -275,10 +275,11 @@ void pm_mem_copy_bits(br_uint_8* dst, br_uint_32 dst_qual, br_uint_32 dst_stride
         colour_byte1 = colour;
 
         for (; height != 0; height--, src += src_stride, dst += dst_stride) {
+            br_uint_8 row_end_bit_byte;
             mask = *src & start_mask;
             tmp_dst = dst;
             tmp_src = src;
-            br_uint_8 row_end_bit_byte = end_bit_byte;
+            row_end_bit_byte = end_bit_byte;
             while (row_end_bit_byte != 0) {
                 if (mask & 0x80) {
                     tmp_dst[0] = colour_byte1;
