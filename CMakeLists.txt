@@ -74,6 +74,7 @@ add_subdirectory(src/S3)
 add_subdirectory(src/smackw32)
 add_subdirectory(src/BRSRC13)
 add_subdirectory(src/DETHRACE)
+add_subdirectory(tools)
 
 if(BUILD_TESTS)
     enable_testing()

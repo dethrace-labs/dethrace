@@ -7,7 +7,7 @@ target_include_directories(smackw32
         ${CMAKE_SOURCE_DIR}      
 )
 
-target_link_libraries(smackw32 PRIVATE harness brender libsmacker compile_with_werror)
+target_link_libraries(smackw32 PRIVATE harness brender libsmacker miniaudio compile_with_werror)
 
 if(NOT MSVC)
     add_compile_flags_if_supported(smackw32
