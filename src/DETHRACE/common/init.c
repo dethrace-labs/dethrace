@@ -335,7 +335,7 @@ void Init2DStuff(void) {
 // IDA: void __usercall InitialiseApplication(int pArgc@<EAX>, char **pArgv@<EDX>)
 void InitialiseApplication(int pArgc, char** pArgv) {
 
-    if (harness_game_config.dos_mode) {
+    if (harness_game_config.gore_check) {
         gProgram_state.sausage_eater_mode = gSausage_override ? 1 : (PDGetGorePassword() ? 0 : 1);
         PDDisplayGoreworthiness(!gProgram_state.sausage_eater_mode);
     } else {

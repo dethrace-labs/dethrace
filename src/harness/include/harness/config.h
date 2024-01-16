@@ -41,7 +41,8 @@ typedef struct tHarness_game_config {
     int enable_diagnostics;
     float volume_multiplier;
     int start_full_screen;
-    int dos_mode;
+    int gore_check;
+    int sound_options;
     int no_bind;
 
     int install_signalhandler;
