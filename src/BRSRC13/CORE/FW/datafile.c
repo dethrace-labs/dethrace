@@ -310,8 +310,7 @@ int TextReadLine(br_datafile* df, char** ident, char** data) {
     while (1) {
         int a;
         cp = BrScratchString();
-        a = BrFileGetLine(cp, 256, df->h);
-        (void)a;
+        BrFileGetLine(cp, 256, df->h);
         if (BrFileEof(df->h) != 0) {
             return 0;
         }
