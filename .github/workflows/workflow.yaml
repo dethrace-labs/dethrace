@@ -28,7 +28,7 @@ jobs:
         uses: ashutoshvarma/setup-ninja@master
         with:
           version: 1.10.2
-      - uses: ilammy/msvc-dev-cmd@v1.4.1
+      - uses: ilammy/msvc-dev-cmd@v1.12.1
         if: runner.os == 'Windows'
         with:
           arch: ${{ matrix.platform.arch }}
@@ -64,7 +64,7 @@ jobs:
           echo "ref_name_without_v=$(echo ${GITHUB_REF_NAME} | cut -c2-)" >>$GITHUB_OUTPUT
       - name: Create Release
         id: create_release
-        uses: softprops/action-gh-release@v0.1.14
+        uses: softprops/action-gh-release@v0.1.15
         with:
           draft: false
           prerelease: false

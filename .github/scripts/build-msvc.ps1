@@ -12,7 +12,7 @@ if ($($Env:GITHUB_REF_TYPE) -eq "tag") {
     $build_tag=$(git rev-parse --short HEAD)
 }
 
-$sdl2_version = "2.24.0"
+$sdl2_version = "2.28.1"
 
 # install deps
 Invoke-WebRequest -Uri https://www.libsdl.org/release/SDL2-devel-$sdl2_version-VC.zip -OutFile $Env:TEMP\SDL2-devel.zip

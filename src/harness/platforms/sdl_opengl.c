@@ -1,8 +1,13 @@
 #include <glad/glad.h>
 
 // this needs to be included after glad.h
+#if defined(DETHRACE_SDL2)
 #include <SDL.h>
 #include <SDL_opengl.h>
+#elif defined(DETHRACE_SDL3)
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_opengl.h>
+#endif
 
 #include "../renderers/gl/gl_renderer.h"
 #include "harness/config.h"
@@ -62,11 +67,18 @@ static void* create_window_and_renderer(char* title, int x, int y, int width, in
 
     SDL_GL_SetSwapInterval(1);
 
+#if defined(DETHRACE_SDL2)
     window = SDL_CreateWindow(title,
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
         width, height,
         SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+#elif defined(DETHRACE_SDL3)
+    window = SDL_CreateWindow(title,
+        width, height,
+        SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+#elif defined(DETHRACE_SDL3)
+#endif
 
     if (window == NULL) {
         LOG_PANIC("Failed to create window. %s", SDL_GetError());
@@ -76,7 +88,7 @@ static void* create_window_and_renderer(char* title, int x, int y, int width, in
     sdl_window_scale.y = ((float)render_height) / height;
 
     if (harness_game_config.start_full_screen) {
-        SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+        SDL_SetWindowFullscreen(window, SDL_TRUE);
     }
 
     context = SDL_GL_CreateContext(window);
@@ -135,7 +147,11 @@ static int get_and_handle_message(MSG_* msg) {
                     }
                 } else if (event.key.type == SDL_KEYUP) {
                     if (is_only_key_modifier(event.key.keysym.mod, KMOD_ALT)) {
+#if defined(DETHRACE_SDL2)
                         SDL_SetWindowFullscreen(window, (SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN_DESKTOP) ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP);
+#elif defined(DETHRACE_SDL3)
+                        SDL_SetWindowFullscreen(window, (SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN) ? SDL_FALSE : SDL_TRUE);
+#endif
                     }
                 }
             }
@@ -152,16 +168,23 @@ static int get_and_handle_message(MSG_* msg) {
             directinput_key_state[dinput_key] = (event.type == SDL_KEYDOWN ? 0x80 : 0);
             break;
 
+#if defined(DETHRACE_SDL2)
         case SDL_WINDOWEVENT:
             switch (event.window.event) {
-            case SDL_WINDOWEVENT_SIZE_CHANGED:
-                SDL_GetWindowSize(window, &window_width, &window_height);
+            case SDL_WINDOWEVENT_RESIZED:
+#elif defined(DETHRACE_SDL3)
+        case SDL_EVENT_WINDOW_RESIZED:
+#endif
+                window_width = event.window.data1;
+                window_height = event.window.data2;
                 update_viewport();
                 sdl_window_scale.x = (float)render_width / vp_width;
                 sdl_window_scale.y = (float)render_height / vp_height;
                 break;
+#if defined(DETHRACE_SDL2)
             }
             break;
+#endif
 
         case SDL_QUIT:
             msg->message = WM_QUIT;
@@ -187,7 +210,14 @@ static int get_mouse_buttons(int* pButton1, int* pButton2) {
 }
 
 static int get_mouse_position(int* pX, int* pY) {
+#if defined(DETHRACE_SDL2)
     SDL_GetMouseState(pX, pY);
+#elif defined(DETHRACE_SDL3)
+    float fX, fY;
+    SDL_GetMouseState(&fX, &fY);
+    *pX = (int)fX;
+    *pY = (int)fY;
+#endif
 
     if (*pX < vp_x) {
         *pX = vp_x;
@@ -219,18 +249,44 @@ static void set_palette(PALETTEENTRY_* pal) {
     GLRenderer_SetPalette((uint8_t*)pal);
 }
 
-int show_error_message(void* window, char* text, char* caption) {
+static int show_error_message(void* window, char* text, char* caption) {
     fprintf(stderr, "%s", text);
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, caption, text, window);
     return 0;
 }
 
+static int show_cursor(int show) {
+#if defined(DETHRACE_SDL2)
+    return SDL_ShowCursor(show ? SDL_ENABLE : SDL_DISABLE);
+#elif defined(DETHRACE_SDL3)
+    if (show) {
+        return SDL_ShowCursor() == 0 ? 1 : 0;
+    } else {
+        return SDL_HideCursor() == 0 ? 0 : 1;
+    }
+#endif
+}
+
+static uint32_t get_ticks(void) {
+// todo: shouldnt depend on sdl...
+#if defined(DETHRACE_SDL2)
+    return SDL_GetTicks();
+#elif defined(DETHRACE_SDL3)
+    return (uint32_t)SDL_GetTicks();
+#endif
+}
+
 void Harness_Platform_Init(tHarness_platform* platform) {
+    SDL_version version;
+
+    SDL_GetVersion(&version);
+    LOG_INFO("SDL version: %d.%d.%d", version.major, version.minor, version.patch);
+
     platform->ProcessWindowMessages = get_and_handle_message;
     platform->Sleep = SDL_Delay;
-    platform->GetTicks = SDL_GetTicks;
+    platform->GetTicks = get_ticks;
     platform->CreateWindowAndRenderer = create_window_and_renderer;
-    platform->ShowCursor = SDL_ShowCursor;
+    platform->ShowCursor = show_cursor;
     platform->SetWindowPos = set_window_pos;
     platform->SwapWindow = swap_window;
     platform->DestroyWindow = destroy_window;
