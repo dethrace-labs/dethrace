@@ -20,7 +20,7 @@
 #include "spark.h"
 #include "utility.h"
 #include "world.h"
-#include <brender/brender.h>
+#include "brender.h"
 #include <stdlib.h>
 #include <string.h>
 

@@ -4,7 +4,7 @@
 #include "harness/trace.h"
 #include "opponent.h"
 #include "pd/sys.h"
-#include <brender/brender.h>
+#include "brender.h"
 #include <math.h>
 #include <stdlib.h>
 

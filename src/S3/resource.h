@@ -1,8 +1,8 @@
 #ifndef _RESOURCE_H_
 #define _RESOURCE_H_
 
-#include "brender/brender.h"
 #include "s3_defs.h"
+#include <brender.h>
 
 typedef enum s3_memory_classes {
     kMem_S3_scan_name = 223,                                             //  0xdf

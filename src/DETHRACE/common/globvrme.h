@@ -1,7 +1,6 @@
 #ifndef _GLOBVRME_H_
 #define _GLOBVRME_H_
 
-#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern tCar_spec* gViewable_car_list[50];

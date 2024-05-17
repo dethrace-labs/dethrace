@@ -1,5 +1,4 @@
 #include "racesumm.h"
-#include "brender/brender.h"
 #include "crush.h"
 #include "cutscene.h"
 #include "displays.h"
@@ -22,6 +21,7 @@
 #include "s3/s3.h"
 #include "sound.h"
 #include "utility.h"
+#include <brender.h>
 #include <stdlib.h>
 
 int gPlayer_lookup[6];

@@ -1,5 +1,4 @@
 #include "mainloop.h"
-#include "brender/brender.h"
 #include "car.h"
 #include "controls.h"
 #include "crush.h"
@@ -35,6 +34,7 @@
 #include "trig.h"
 #include "utility.h"
 #include "world.h"
+#include <brender.h>
 #include <stdlib.h>
 
 int gNasty_kludgey_cockpit_variable;

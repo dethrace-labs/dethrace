@@ -1,8 +1,8 @@
 #ifndef HARNESS_HOOKS_H
 #define HARNESS_HOOKS_H
 
-#include "brender/br_types.h"
 #include "harness/win95_polyfill_defs.h"
+#include <brender.h>
 #include <stdio.h>
 
 typedef enum {
@@ -12,30 +12,10 @@ typedef enum {
 
 // Platform implementation functions
 typedef struct tHarness_platform {
-    // Initialize the renderer
-    void (*Renderer_Init)(int width, int height, int pRender_width, int pRender_height);
-    // Called when beginning a 3D scene
-    void (*Renderer_BeginScene)(br_actor* camera, br_pixelmap* colour_buffer, br_pixelmap* depth_buffer);
-    // Called at the end of a 3D scene
-    void (*Renderer_EndScene)(void);
     // Render a fullscreen quad using the specified pixel data
-    void (*Renderer_FullScreenQuad)(uint8_t* src);
-    // Render a model
-    void (*Renderer_Model)(br_actor* actor, br_model* model, br_material* material, br_token render_type, br_matrix34 model_matrix);
-    // Clear frame and depth buffers
-    void (*Renderer_ClearBuffers)(void);
-    // Load pixelmap into video memory
-    void (*Renderer_BufferTexture)(br_pixelmap* pm);
-    // Load material
-    void (*Renderer_BufferMaterial)(br_material* mat);
-    // Load model into video memory
-    void (*Renderer_BufferModel)(br_model* model);
-    // Pull contents of frame and depth buffers from video into main memory for software effects
-    void (*Renderer_FlushBuffers)(void);
+    void (*Renderer_Present)(br_pixelmap* src);
     // Set the 256 color palette to use (BGRA format)
     void (*Renderer_SetPalette)(PALETTEENTRY_* palette);
-    // Set the viewport for 3d rendering
-    void (*Renderer_SetViewport)(int x, int y, int width, int height);
     // Create a window. Return a handle to the window
     void* (*CreateWindowAndRenderer)(char* title, int x, int y, int nWidth, int nHeight);
     // Get mouse button state
@@ -71,8 +51,6 @@ void Harness_Init(int* argc, char* argv[]);
 
 // BRender hooks
 void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src);
-void Harness_Hook_BrV1dbRendererBegin(br_v1db_state* v1db);
-void Harness_Hook_renderActor(br_actor* actor, br_model* model, br_material* material, br_token type);
 
 // Sound hooks
 void Harness_Hook_S3Service(int unk1, int unk2);

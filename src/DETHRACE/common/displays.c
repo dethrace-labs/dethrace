@@ -1,5 +1,4 @@
 #include "displays.h"
-#include "brender/brender.h"
 #include "constants.h"
 #include "controls.h"
 #include "depth.h"
@@ -13,6 +12,7 @@
 #include "netgame.h"
 #include "pd/sys.h"
 #include "utility.h"
+#include <brender.h>
 #include <stdlib.h>
 
 int gLast_fancy_index;

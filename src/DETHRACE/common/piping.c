@@ -1,5 +1,4 @@
 #include "piping.h"
-#include "brender/brender.h"
 #include "car.h"
 #include "crush.h"
 #include "errors.h"
@@ -17,6 +16,8 @@
 #include "sys.h"
 #include "utility.h"
 #include "world.h"
+#include <brender.h>
+#include "formats.h"
 #include <stdlib.h>
 #include <string.h>
 

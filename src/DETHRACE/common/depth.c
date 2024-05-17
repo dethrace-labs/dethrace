@@ -1,6 +1,5 @@
 #include "depth.h"
 
-#include "brender/brender.h"
 #include "displays.h"
 #include "errors.h"
 #include "globvars.h"
@@ -14,6 +13,7 @@
 #include "trig.h"
 #include "utility.h"
 #include "world.h"
+#include <brender.h>
 #include <math.h>
 #include <stdlib.h>
 
@@ -824,7 +824,7 @@ void IncreaseAngle(void) {
             camera_ptr->field_of_view = 0x78e3;
         }
 #ifdef DETHRACE_FIX_BUGS
-        sprintf(s, "Camera angle increased to %f", (float)BrAngleToDegrees(camera_ptr->field_of_view));
+        sprintf(s, "Camera angle increased to %f", (float)BrAngleToDegree(camera_ptr->field_of_view));
 #else
         sprintf(s, "Camera angle increased to %d", gProgram_state.current_depth_effect.end);
 #endif
@@ -846,7 +846,7 @@ void DecreaseAngle(void) {
             camera_ptr->field_of_view = 0x71c;
         }
 #ifdef DETHRACE_FIX_BUGS
-        sprintf(s, "Camera angle decreased to %f", (float)BrAngleToDegrees(camera_ptr->field_of_view));
+        sprintf(s, "Camera angle decreased to %f", (float)BrAngleToDegree(camera_ptr->field_of_view));
 #else
         sprintf(s, "Camera angle decreased to %d", gProgram_state.current_depth_effect.end);
 #endif

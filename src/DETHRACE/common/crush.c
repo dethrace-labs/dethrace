@@ -1,5 +1,4 @@
 #include "crush.h"
-#include "brender/brender.h"
 #include "car.h"
 #include "displays.h"
 #include "globvars.h"
@@ -23,6 +22,7 @@
 #include "structur.h"
 #include "utility.h"
 #include "world.h"
+#include <brender.h>
 #include <stdlib.h>
 
 float gWobble_spam_y[8] = { 0.0f, -0.15f, 0.4f, 0.15f, -0.4f, 0.25f, 0.0f, -0.25f };
@@ -484,7 +484,7 @@ void TotallyRepairACar(tCar_spec* pCar) {
                     the_car_actor->undamaged_vertices,
                     the_car_actor->actor->model->nvertices * sizeof(br_vertex));
                 // FIXME: BrModelUpdate(..., BR_MODU_VERTEX_COLOURS | BR_MODU_VERTEX_POSITIONS) fails on TELL_ME_IF_WE_PASS_THIS_WAY
-//                BrModelUpdate(the_car_actor->actor->model, BR_MODU_VERTEX_COLOURS | BR_MODU_VERTEX_POSITIONS);
+                //                BrModelUpdate(the_car_actor->actor->model, BR_MODU_VERTEX_COLOURS | BR_MODU_VERTEX_POSITIONS);
                 BrModelUpdate(the_car_actor->actor->model, BR_MODU_ALL);
                 if (pipe_vertex_count != 0 && IsActionReplayAvailable()) {
                     PipeSingleModelGeometry(pCar->car_ID, j, pipe_vertex_count, pipe_array);

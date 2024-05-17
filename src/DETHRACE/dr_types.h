@@ -1,10 +1,10 @@
 #ifndef DR_TYPES_H
 #define DR_TYPES_H
 
-#include "brender/br_types.h"
 #include "constants.h"
 #include "macros.h"
 
+#include "brender.h"
 #include "s3/s3.h"
 #include <assert.h>
 #include <stdarg.h>

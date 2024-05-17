@@ -1,11 +1,11 @@
 #include "skidmark.h"
-#include "brender/brender.h"
 #include "globvars.h"
 #include "globvrbm.h"
 #include "harness/trace.h"
 #include "loading.h"
 #include "oil.h"
 #include "piping.h"
+#include <brender.h>
 #include <float.h>
 #include <math.h>
 #include <stdlib.h>

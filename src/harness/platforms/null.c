@@ -84,15 +84,6 @@ void Null_Platform_Init(tHarness_platform* platform) {
     platform->GetMouseButtons = null_get_mouse_buttons;
     platform->DestroyWindow = null_destroy_window;
 
-    platform->Renderer_BufferModel = NullRenderer_BufferModel;
-    platform->Renderer_BufferMaterial = NullRenderer_BufferMaterial;
-    platform->Renderer_BufferTexture = NullRenderer_BufferTexture;
     platform->Renderer_SetPalette = NullRenderer_SetPalette;
-    platform->Renderer_FullScreenQuad = NullRenderer_FullScreenQuad;
-    platform->Renderer_Model = NullRenderer_Model;
-    platform->Renderer_ClearBuffers = NullRenderer_ClearBuffers;
-    platform->Renderer_FlushBuffers = NullRenderer_FlushBuffers;
-    platform->Renderer_BeginScene = NullRenderer_BeginScene;
-    platform->Renderer_EndScene = NullRenderer_EndScene;
-    platform->Renderer_SetViewport = NullRenderer_SetViewport;
+    // platform->Renderer_FullScreenQuad = NullRenderer_FullScreenQuad;
 }

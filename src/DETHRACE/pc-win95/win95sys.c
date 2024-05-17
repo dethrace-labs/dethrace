@@ -1,4 +1,3 @@
-#include "brender/brender.h"
 #include "car.h"
 #include "dinput.h"
 #include "errors.h"
@@ -16,6 +15,7 @@
 #include "sound.h"
 #include "ssdx.h"
 #include "utility.h"
+#include <brender.h>
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
@@ -635,7 +635,8 @@ void PDScreenBufferSwap(int pRendering_area_only) {
         BrPixelmapRectangleCopy(gScreen, gY_offset, gX_offset, gRender_screen, 0, 0, gWidth, gHeight);
     } else {
         if (gReal_graf_data_index == gGraf_data_index) {
-            BrPixelmapDoubleBuffer(gScreen, gBack_screen);
+            //BrPixelmapDoubleBuffer(gScreen, gBack_screen);
+            gHarness_platform.Renderer_Present(gBack_screen);
         } else {
             DRPixelmapDoubledCopy(gTemp_screen, gBack_screen, 320, 200, 0, 40);
             BrPixelmapDoubleBuffer(gScreen, gTemp_screen);

@@ -72,7 +72,7 @@ endif()
 add_subdirectory(src/harness)
 add_subdirectory(src/S3)
 add_subdirectory(src/smackw32)
-add_subdirectory(src/BRSRC13)
+add_subdirectory(src/BRender-v1.3.2)
 add_subdirectory(src/DETHRACE)
 
 if(BUILD_TESTS)

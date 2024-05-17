@@ -17,7 +17,8 @@
 #include "structur.h"
 #include "utility.h"
 #include "world.h"
-#include <brender/brender.h>
+#include "brender.h"
+#include "brhton.h"
 #include <stdlib.h>
 #include <string.h>
 

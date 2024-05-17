@@ -1,7 +1,6 @@
 #include "utility.h"
 #include <stdlib.h>
 
-#include "brender/brender.h"
 #include "constants.h"
 #include "errors.h"
 #include "globvars.h"
@@ -17,6 +16,7 @@
 #include "pd/sys.h"
 #include "sound.h"
 #include "world.h"
+#include <brender.h>
 
 #include <ctype.h>
 #include <stdio.h>
@@ -503,8 +503,8 @@ void WaitFor(tU32 pDelay) {
 }
 
 // IDA: br_uint_32 __usercall DRActorEnumRecurse@<EAX>(br_actor *pActor@<EAX>, br_actor_enum_cbfn *callback@<EDX>, void *arg@<EBX>)
-intptr_t DRActorEnumRecurse(br_actor* pActor, br_actor_enum_cbfn* callback, void* arg) {
-    intptr_t result;
+br_uintptr_t DRActorEnumRecurse(br_actor* pActor, br_actor_enum_cbfn* callback, void* arg) {
+    br_uintptr_t result;
 
     result = callback(pActor, arg);
     if (result != 0) {
@@ -520,7 +520,7 @@ intptr_t DRActorEnumRecurse(br_actor* pActor, br_actor_enum_cbfn* callback, void
 }
 
 // IDA: br_uint_32 __cdecl CompareActorID(br_actor *pActor, void *pArg)
-intptr_t CompareActorID(br_actor* pActor, void* pArg) {
+br_uintptr_t CompareActorID(br_actor* pActor, void* pArg) {
     LOG_TRACE("(%p, %p)", pActor, pArg);
 
     if (pActor->identifier && !strcmp(pActor->identifier, (const char*)pArg)) {

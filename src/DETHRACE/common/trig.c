@@ -1,6 +1,6 @@
 #include "trig.h"
-#include "brender/brender.h"
 #include "harness/trace.h"
+#include <brender.h>
 #include <math.h>
 #include <stdlib.h>
 
@@ -178,14 +178,14 @@ br_scalar FastScalarTan(int pAngle_in_degrees) {
 br_scalar FastScalarSinAngle(br_angle pBR_angle) {
     LOG_TRACE("(%d)", pBR_angle);
 
-    return FastScalarSin(BrAngleToDegrees(pBR_angle));
+    return FastScalarSin(BrAngleToDegree(pBR_angle));
 }
 
 // IDA: br_scalar __usercall FastScalarCosAngle@<ST0>(br_angle pBR_angle@<EAX>)
 br_scalar FastScalarCosAngle(br_angle pBR_angle) {
     LOG_TRACE("(%d)", pBR_angle);
 
-    return FastScalarCos(BrAngleToDegrees(pBR_angle));
+    return FastScalarCos(BrAngleToDegree(pBR_angle));
 }
 
 // IDA: br_scalar __usercall FastScalarTanAngle@<ST0>(br_angle pBR_angle@<EAX>)
@@ -193,7 +193,7 @@ br_scalar FastScalarTanAngle(br_angle pBR_angle) {
     int angle_in_degrees;
     LOG_TRACE("(%d)", pBR_angle);
 
-    angle_in_degrees = BrAngleToDegrees(pBR_angle);
+    angle_in_degrees = BrAngleToDegree(pBR_angle);
     return FastScalarSin(angle_in_degrees) / FastScalarCos(angle_in_degrees);
 }
 
@@ -203,7 +203,7 @@ float FastFloatArcSin(float pValue) {
     float high_limit;
     float mid_point;
     LOG_TRACE("(%f)", pValue);
-    
+
     if (pValue < 0.f) {
         return -FastFloatArcSin(-pValue);
     }

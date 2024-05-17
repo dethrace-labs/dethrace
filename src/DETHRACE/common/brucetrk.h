@@ -1,8 +1,8 @@
 #ifndef _BRUCETRK_H_
 #define _BRUCETRK_H_
 
-#include "brender/br_types.h"
 #include "dr_types.h"
+#include <brender.h>
 
 extern br_actor* gMr_blendy;
 extern int gDefault_blend_pc;
@@ -17,9 +17,9 @@ void XZToColumnXZ(tU8* pColumn_x, tU8* pColumn_z, br_scalar pX, br_scalar pZ, tT
 
 void StripBlendedFaces(br_actor* pActor, br_model* pModel);
 
-/*br_uint_32*/ intptr_t FindNonCarsCB(br_actor* pActor, tTrack_spec* pTrack_spec);
+/*br_uint_32*/ br_uintptr_t FindNonCarsCB(br_actor* pActor, tTrack_spec* pTrack_spec);
 
-/*br_uint_32*/ intptr_t ProcessModelsCB(br_actor* pActor, tTrack_spec* pTrack_spec);
+/*br_uint_32*/ br_uintptr_t ProcessModelsCB(br_actor* pActor, tTrack_spec* pTrack_spec);
 
 void ProcessModels(tTrack_spec* pTrack_spec);
 
@@ -27,7 +27,7 @@ void ExtractColumns(tTrack_spec* pTrack_spec);
 
 void LollipopizeActor4(br_actor* pActor, br_matrix34* pRef_to_world, br_actor* pCamera);
 
-/*br_uint_32*/ intptr_t LollipopizeChildren(br_actor* pActor, void* pArg);
+/*br_uint_32*/ br_uintptr_t LollipopizeChildren(br_actor* pActor, void* pArg);
 
 void DrawColumns(int pDraw_blends, tTrack_spec* pTrack_spec, int pMin_x, int pMax_x, int pMin_z, int pMax_z, br_matrix34* pCamera_to_world);
 

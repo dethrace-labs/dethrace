@@ -1,7 +1,6 @@
 #ifndef _UTILITY_H_
 #define _UTILITY_H_
 
-#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern int gIn_check_quit;
@@ -71,9 +70,9 @@ br_uint_32 DRPixelmapLoadMany(char* pFile_name, br_pixelmap** pPixelmaps, br_uin
 
 void WaitFor(tU32 pDelay);
 
-intptr_t DRActorEnumRecurse(br_actor* pActor, br_actor_enum_cbfn* callback, void* arg);
+br_uintptr_t DRActorEnumRecurse(br_actor* pActor, br_actor_enum_cbfn* callback, void* arg);
 
-intptr_t CompareActorID(br_actor* pActor, void* pArg);
+br_uintptr_t CompareActorID(br_actor* pActor, void* pArg);
 
 br_actor* DRActorFindRecurse(br_actor* pSearch_root, char* pName);
 

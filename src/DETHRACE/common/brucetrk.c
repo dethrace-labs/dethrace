@@ -1,7 +1,7 @@
 #include "brucetrk.h"
 
-#include "brender/brender.h"
 #include "errors.h"
+#include "formats.h"
 #include "globvars.h"
 #include "globvrbm.h"
 #include "harness/trace.h"
@@ -9,6 +9,7 @@
 #include "pd/sys.h"
 #include "utility.h"
 #include "world.h"
+#include <brender.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -149,7 +150,7 @@ void StripBlendedFaces(br_actor* pActor, br_model* pModel) {
 }
 
 // IDA: br_uint_32 __cdecl FindNonCarsCB(br_actor *pActor, tTrack_spec *pTrack_spec)
-intptr_t FindNonCarsCB(br_actor* pActor, tTrack_spec* pTrack_spec) {
+br_uintptr_t FindNonCarsCB(br_actor* pActor, tTrack_spec* pTrack_spec) {
     int i;
     br_scalar r1;
     br_scalar r2;
@@ -195,7 +196,7 @@ intptr_t FindNonCarsCB(br_actor* pActor, tTrack_spec* pTrack_spec) {
 }
 
 // IDA: br_uint_32 __cdecl ProcessModelsCB(br_actor *pActor, tTrack_spec *pTrack_spec)
-intptr_t ProcessModelsCB(br_actor* pActor, tTrack_spec* pTrack_spec) {
+br_uintptr_t ProcessModelsCB(br_actor* pActor, tTrack_spec* pTrack_spec) {
     unsigned int x;
     unsigned int z;
     int group;
@@ -212,9 +213,10 @@ intptr_t ProcessModelsCB(br_actor* pActor, tTrack_spec* pTrack_spec) {
         if (gMr_blendy) {
             BrActorAdd(pActor, gMr_blendy);
             BrModelAdd(gMr_blendy->model);
-            for (group = 0; V11MODEL(gMr_blendy->model)->ngroups > group; ++group) {
-                V11MODEL(gMr_blendy->model)->groups[group].face_colours_material = gMr_blendy->model->faces[*V11MODEL(gMr_blendy->model)->groups[group].face_user].material;
-            }
+            // FIXME!
+            // for (group = 0; V11MODEL(gMr_blendy->model)->ngroups > group; ++group) {
+            //     V11MODEL(gMr_blendy->model)->groups[group].face_colours_material = gMr_blendy->model->faces[*V11MODEL(gMr_blendy->model)->groups[group].face_user].material;
+            // }
             gMr_blendy->model->flags &= ~BR_MODF_UPDATEABLE;
             DodgyModelUpdate(gMr_blendy->model);
             pTrack_spec->blends[z][x] = gMr_blendy;
@@ -307,7 +309,7 @@ void LollipopizeActor4(br_actor* pActor, br_matrix34* pRef_to_world, br_actor* p
 }
 
 // IDA: br_uint_32 __cdecl LollipopizeChildren(br_actor *pActor, void *pArg)
-intptr_t LollipopizeChildren(br_actor* pActor, void* pArg) {
+br_uintptr_t LollipopizeChildren(br_actor* pActor, void* pArg) {
     tMatrix_and_actor* maa;
     LOG_TRACE("(%p, %p)", pActor, pArg);
 
@@ -349,7 +351,9 @@ void DrawColumns(int pDraw_blends, tTrack_spec* pTrack_spec, int pMin_x, int pMa
                     }
                 } else {
                     if (pTrack_spec->columns[column_z2][column_x2]) {
-                        BrZbSceneRenderAdd(pTrack_spec->columns[column_z2][column_x2]);
+                        if (gSound_enabled) {
+                            BrZbSceneRenderAdd(pTrack_spec->columns[column_z2][column_x2]);
+                        }
                     }
                     if (pTrack_spec->lollipops[column_z2][column_x2]) {
                         maa.a = pTrack_spec->lollipops[column_z2][column_x2];
@@ -381,7 +385,9 @@ void DrawColumns(int pDraw_blends, tTrack_spec* pTrack_spec, int pMin_x, int pMa
                     }
                 } else {
                     if (pTrack_spec->columns[column_z2][column_x2]) {
-                        BrZbSceneRenderAdd(pTrack_spec->columns[column_z2][column_x2]);
+                        if (gSound_enabled) {
+                            BrZbSceneRenderAdd(pTrack_spec->columns[column_z2][column_x2]);
+                        }
                     }
                     if (pTrack_spec->lollipops[column_z2][column_x2]) {
                         maa.a = pTrack_spec->lollipops[column_z2][column_x2];

@@ -1,7 +1,7 @@
-#include "brender/brender.h"
 #include "CORE/FW/lexer.h"
 #include "CORE/MATH/fixed.h"
 #include "tests.h"
+#include <brender.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -20,7 +20,7 @@ static void lexer_error_cbfn(br_lexer* l, char* msg) {
 }
 
 static void test_lexer_BrLexerAllocate_BrLexerFree() {
-    br_lexer *l;
+    br_lexer* l;
 
     l = BrLexerAllocate(NULL, 0);
     TEST_ASSERT_NOT_NULL(l);
@@ -28,13 +28,13 @@ static void test_lexer_BrLexerAllocate_BrLexerFree() {
 }
 
 static void test_lexer_BrLexer_BrLexerPushString() {
-    br_lexer *l;
+    br_lexer* l;
     br_int_32 v;
     char buf[256];
 
     l = BrLexerAllocate(NULL, 0);
     TEST_ASSERT_NOT_NULL(l);
-    
+
     BrLexerPushString(l, "a=4\nb=\"something\"\nc=2.5\n", "BrLexerPushString_test_function");
 
     BrLexerPosition(l, buf, sizeof(buf));
@@ -89,7 +89,7 @@ static void test_lexer_BrLexer_BrLexerPushString() {
 }
 
 static void test_lexer_comments() {
-    br_lexer *l;
+    br_lexer* l;
     char prev;
 
     l = BrLexerAllocate(NULL, 0);
@@ -130,17 +130,17 @@ struct {
     { "-1337", -1337 },
     { "0x12345678", 0x12345678 },
     { "-0x1337", -0x1337 },
-    { "0777", 0777},
+    { "0777", 0777 },
 };
 
 static void test_lexer_BrParseInteger() {
-    br_lexer *l;
+    br_lexer* l;
     int i;
     br_int_32 v;
 
     l = BrLexerAllocate(NULL, 0);
     TEST_ASSERT_NOT_NULL(l);
-    
+
     for (i = 0; i < BR_ASIZE(integer_test_values); i++) {
         LOG_DEBUG("Testing input \"%s\", expecting %d", integer_test_values[i].str, integer_test_values[i].val);
 
@@ -179,13 +179,13 @@ struct {
 };
 
 static void test_lexer_BrParseFloat() {
-    br_lexer *l;
+    br_lexer* l;
     br_float v;
     int i;
 
     l = BrLexerAllocate(NULL, 0);
     TEST_ASSERT_NOT_NULL(l);
-    
+
     for (i = 0; i < BR_ASIZE(float_test_values); i++) {
         LOG_DEBUG("Testing input \"%s\", expecting %f", float_test_values[i].str, float_test_values[i].val);
 
@@ -196,10 +196,10 @@ static void test_lexer_BrParseFloat() {
         TEST_ASSERT_EQUAL_FLOAT(float_test_values[i].val, v);
         TEST_ASSERT_NULL(l->source);
     }
-    
+
     BrLexerPushString(l, "0 4.25 6.25 -7.5 4.125 -7.375 63.4375", (char*)__func__);
     l->advance(l);
-    
+
     TEST_ASSERT_EQUAL_FLOAT(0.f, BrParseFloat(l));
     TEST_ASSERT_EQUAL_FLOAT(4.25f, BrParseFloat(l));
     TEST_ASSERT_EQUAL_FLOAT(6.25f, BrParseFloat(l));
@@ -216,25 +216,25 @@ struct {
     char* str;
     br_fixed_ls val;
 } fixed_test_values[] = {
-    { "0.",         BrFloatToFixed(0.f) },
-    { "-0.",        BrFloatToFixed(-0.f) },
-    { "  4.5",      BrFloatToFixed(4.5f) },
-    { "  9",        BrIntToFixed(9) },
-    { "-4.5",       BrFloatToFixed(-4.5f) },
-    { "0.0625",     BrFloatToFixed(0.0625f) },
-    { "-4.0625",    BrFloatToFixed(-4.0625f) },
-    { "1337.125",   BrFloatToFixed(1337.125f) },
-    { "-1337.125",  BrFloatToFixed(-1337.125f) },
+    { "0.", BrFloatToFixed(0.f) },
+    { "-0.", BrFloatToFixed(-0.f) },
+    { "  4.5", BrFloatToFixed(4.5f) },
+    { "  9", BrIntToFixed(9) },
+    { "-4.5", BrFloatToFixed(-4.5f) },
+    { "0.0625", BrFloatToFixed(0.0625f) },
+    { "-4.0625", BrFloatToFixed(-4.0625f) },
+    { "1337.125", BrFloatToFixed(1337.125f) },
+    { "-1337.125", BrFloatToFixed(-1337.125f) },
 };
 
 static void test_lexer_BrParseFixed() {
-    br_lexer *l;
+    br_lexer* l;
     br_fixed_ls v;
     int i;
 
     l = BrLexerAllocate(NULL, 0);
     TEST_ASSERT_NOT_NULL(l);
-    
+
     for (i = 0; i < BR_ASIZE(float_test_values); i++) {
         LOG_DEBUG("Testing input \"%s\", expecting 0x%08x", fixed_test_values[i].str, fixed_test_values[i].val);
 
@@ -245,11 +245,11 @@ static void test_lexer_BrParseFixed() {
         TEST_ASSERT_EQUAL_INT32(fixed_test_values[i].val, v);
         TEST_ASSERT_NULL(l->source);
     }
-    
+
     BrLexerPushString(l, "0 4.25 6.25 -7.5 4.125 -7.375 63.4375", (char*)__func__);
     l->advance(l);
-    
-    TEST_ASSERT_EQUAL_INT32(BrFloatToFixed(0.f),    BrParseFixed(l));
+
+    TEST_ASSERT_EQUAL_INT32(BrFloatToFixed(0.f), BrParseFixed(l));
     TEST_ASSERT_EQUAL_INT32(BrFloatToFixed(4.25f), BrParseFixed(l));
     TEST_ASSERT_EQUAL_INT32(BrFloatToFixed(6.25f), BrParseFixed(l));
     TEST_ASSERT_EQUAL_INT32(BrFloatToFixed(-7.5f), BrParseFixed(l));
@@ -274,12 +274,12 @@ struct {
 };
 
 static void test_lexer_string() {
-    br_lexer *l;
+    br_lexer* l;
     int i;
 
     l = BrLexerAllocate(NULL, 0);
     TEST_ASSERT_NOT_NULL(l);
-    
+
     BrLexerPushString(l, "\"a string\"", (char*)__func__);
     l->advance(l);
 
@@ -289,7 +289,7 @@ static void test_lexer_string() {
     BrLexerFree(l);
 
     l = BrLexerAllocate(NULL, 0);
-    
+
     for (i = 0; i < BR_ASIZE(string_test_values); i++) {
         LOG_DEBUG("Testing input \"%s\", expecting \"%s\"", string_test_values[i].str, string_test_values[i].val);
 
@@ -302,7 +302,7 @@ static void test_lexer_string() {
         l->advance(l);
         TEST_ASSERT_NULL(l->source);
     }
-    
+
     BrLexerPushString(l, "\"\" \"abc\" \"def\" \"super nice\" \"another long string\"", (char*)__func__);
 
     l->advance(l);
@@ -345,12 +345,12 @@ struct {
 };
 
 static void test_lexer_ident() {
-    br_lexer *l;
+    br_lexer* l;
     int i;
 
     l = BrLexerAllocate(NULL, 0);
     TEST_ASSERT_NOT_NULL(l);
-    
+
     BrLexerPushString(l, "abc", (char*)__func__);
     l->advance(l);
 
@@ -360,7 +360,7 @@ static void test_lexer_ident() {
     BrLexerFree(l);
 
     l = BrLexerAllocate(NULL, 0);
-    
+
     for (i = 0; i < BR_ASIZE(ident_test_values); i++) {
         LOG_DEBUG("Testing input \"%s\", expecting \"%s\"", ident_test_values[i].str, ident_test_values[i].str);
 
@@ -373,7 +373,7 @@ static void test_lexer_ident() {
         l->advance(l);
         TEST_ASSERT_NULL(l->source);
     }
-    
+
     BrLexerPushString(l, "_ abc _something ___dd", (char*)__func__);
 
     l->advance(l);
@@ -398,7 +398,6 @@ static void test_lexer_ident() {
     BrLexerFree(l);
 }
 
-
 enum {
     T_TEST_CUSTOM_UINT8_T = 0x200,
     T_TEST_CUSTOM_UINT16_T = 0x201,
@@ -409,40 +408,40 @@ enum {
     T_TEST_CUSTOM_INT32_TT = 0x206,
 };
 br_lexer_keyword lexer_ident_custom_keywords[] = {
-    {"uint8_t", T_TEST_CUSTOM_UINT8_T },
-    {"uint16_t", T_TEST_CUSTOM_UINT16_T },
-    {"uint32_t", T_TEST_CUSTOM_UINT32_T },
-    {"int8_t", T_TEST_CUSTOM_INT8_T },
-    {"int16_t", T_TEST_CUSTOM_INT16_T },
-    {"int32_tt", T_TEST_CUSTOM_INT32_TT },
-    {"int32_t", T_TEST_CUSTOM_INT32_T },
+    { "uint8_t", T_TEST_CUSTOM_UINT8_T },
+    { "uint16_t", T_TEST_CUSTOM_UINT16_T },
+    { "uint32_t", T_TEST_CUSTOM_UINT32_T },
+    { "int8_t", T_TEST_CUSTOM_INT8_T },
+    { "int16_t", T_TEST_CUSTOM_INT16_T },
+    { "int32_tt", T_TEST_CUSTOM_INT32_TT },
+    { "int32_t", T_TEST_CUSTOM_INT32_T },
 };
 struct {
     char* str;
     int token;
 } ident_custom_test_values[] = {
-    { "_" , T_IDENT},
+    { "_", T_IDENT },
     { "uint32_t", T_TEST_CUSTOM_UINT32_T },
     { "int32_t", T_TEST_CUSTOM_INT32_T },
     { "int32_t_", T_IDENT },
     { "int32_t", T_TEST_CUSTOM_INT32_T },
     { "int32_tt", T_TEST_CUSTOM_INT32_TT },
-    { "int8_t", T_TEST_CUSTOM_INT8_T  },
+    { "int8_t", T_TEST_CUSTOM_INT8_T },
     { "_int8_t", T_IDENT },
 };
 
 static void test_lexer_ident_custom() {
-    br_lexer *l;
+    br_lexer* l;
     int i;
 
     l = BrLexerAllocate(lexer_ident_custom_keywords, BR_ASIZE(lexer_ident_custom_keywords));
     TEST_ASSERT_NOT_NULL(l);
-    
+
     BrLexerPushString(l, "abc", (char*)__func__);
     l->advance(l);
     TEST_ASSERT_EQUAL(T_IDENT, l->current.id);
     TEST_ASSERT_EQUAL_STRING("abc", l->current.v.string);
-    
+
     BrLexerPushString(l, "uint8_t", (char*)__func__);
     l->advance(l);
     TEST_ASSERT_EQUAL(T_TEST_CUSTOM_UINT8_T, l->current.id);
@@ -451,7 +450,7 @@ static void test_lexer_ident_custom() {
     BrLexerFree(l);
 
     l = BrLexerAllocate(lexer_ident_custom_keywords, BR_ASIZE(lexer_ident_custom_keywords));
-    
+
     for (i = 0; i < BR_ASIZE(ident_custom_test_values); i++) {
         LOG_DEBUG("Testing input \"%s\", expecting \"%s\"", ident_custom_test_values[i].str, ident_custom_test_values[i].str);
 
@@ -464,7 +463,7 @@ static void test_lexer_ident_custom() {
         l->advance(l);
         TEST_ASSERT_NULL(l->source);
     }
-    
+
     BrLexerPushString(l, "_ uint8_t _something int8_t int32_t int32_tt", (char*)__func__);
 
     l->advance(l);
@@ -498,11 +497,11 @@ static void test_lexer_ident_custom() {
 }
 
 static void test_lexer_unterminated_string() {
-    br_lexer *l;
+    br_lexer* l;
 
     l = BrLexerAllocate(NULL, 0);
     TEST_ASSERT_NOT_NULL(l);
-    
+
     BrLexerPushString(l, "\"unterminated", (char*)__func__);
     l->advance(l);
 
@@ -513,14 +512,14 @@ static void test_lexer_unterminated_string() {
 }
 
 static void test_lexer_BrLexerParseVectorFloat() {
-    br_lexer *l;
+    br_lexer* l;
     float values[16];
     int n;
 
     l = BrLexerAllocate(NULL, 0);
     TEST_ASSERT_NOT_NULL(l);
     BrLexerErrorSet(l, lexer_error_cbfn);
-    
+
     BrLexerPushString(l, "[5.25]", (char*)__func__);
     l->advance(l);
     n = BrParseVectorFloat(l, values, BR_ASIZE(values));
@@ -528,7 +527,7 @@ static void test_lexer_BrLexerParseVectorFloat() {
     TEST_ASSERT_EQUAL_INT(1, n);
     TEST_ASSERT_EQUAL_FLOAT(5.25f, values[0]);
     TEST_ASSERT_NULL(l->source);
-    
+
     BrLexerPushString(l, "[1.5,      2,\t-4.5]", (char*)__func__);
     l->advance(l);
     n = BrParseVectorFloat(l, values, BR_ASIZE(values));
@@ -538,14 +537,14 @@ static void test_lexer_BrLexerParseVectorFloat() {
     TEST_ASSERT_EQUAL_FLOAT(2.f, values[1]);
     TEST_ASSERT_EQUAL_FLOAT(-4.5f, values[2]);
     TEST_ASSERT_NULL(l->source);
-    
+
     BrLexerPushString(l, "[\t  ]", (char*)__func__);
     l->advance(l);
     n = BrParseVectorFloat(l, values, BR_ASIZE(values));
     TEST_ASSERT_EQUAL(T_EOF, l->current.id);
     TEST_ASSERT_EQUAL_INT(0, n);
     TEST_ASSERT_NULL(l->source);
-    
+
     lexer_error_stack_reset();
     BrLexerPushString(l, "[1.5,1.25,1.125]", (char*)__func__);
     l->advance(l);
@@ -556,7 +555,7 @@ static void test_lexer_BrLexerParseVectorFloat() {
         l->advance(l);
     }
     TEST_ASSERT_NULL(l->source);
-    
+
     lexer_error_stack_reset();
     BrLexerPushString(l, "1.5", (char*)__func__);
     l->advance(l);
@@ -567,7 +566,7 @@ static void test_lexer_BrLexerParseVectorFloat() {
         l->advance(l);
     }
     TEST_ASSERT_NULL(l->source);
-    
+
     lexer_error_stack_reset();
     BrLexerPushString(l, "[1.5,1.25", (char*)__func__);
     l->advance(l);
@@ -578,7 +577,7 @@ static void test_lexer_BrLexerParseVectorFloat() {
         l->advance(l);
     }
     TEST_ASSERT_NULL(l->source);
-    
+
     lexer_error_stack_reset();
     BrLexerPushString(l, "[1.5 1.25", (char*)__func__);
     l->advance(l);
@@ -593,14 +592,14 @@ static void test_lexer_BrLexerParseVectorFloat() {
 }
 
 static void test_lexer_BrLexerParseVectorFixed() {
-    br_lexer *l;
+    br_lexer* l;
     br_fixed_ls values[16];
     int n;
 
     l = BrLexerAllocate(NULL, 0);
     TEST_ASSERT_NOT_NULL(l);
     BrLexerErrorSet(l, lexer_error_cbfn);
-    
+
     BrLexerPushString(l, "[5.25]", (char*)__func__);
     l->advance(l);
     n = BrParseVectorFixed(l, values, BR_ASIZE(values));
@@ -608,7 +607,7 @@ static void test_lexer_BrLexerParseVectorFixed() {
     TEST_ASSERT_EQUAL_INT(1, n);
     TEST_ASSERT_EQUAL_INT32(BrFloatToFixed(5.25f), values[0]);
     TEST_ASSERT_NULL(l->source);
-    
+
     BrLexerPushString(l, "[1.5,      2,\t-4.5]", (char*)__func__);
     l->advance(l);
     n = BrParseVectorFixed(l, values, BR_ASIZE(values));
@@ -618,14 +617,14 @@ static void test_lexer_BrLexerParseVectorFixed() {
     TEST_ASSERT_EQUAL_INT32(BrIntToFixed(2), values[1]);
     TEST_ASSERT_EQUAL_INT32(BrFloatToFixed(-4.5f), values[2]);
     TEST_ASSERT_NULL(l->source);
-    
+
     BrLexerPushString(l, "[\t  ]", (char*)__func__);
     l->advance(l);
     n = BrParseVectorFixed(l, values, BR_ASIZE(values));
     TEST_ASSERT_EQUAL(T_EOF, l->current.id);
     TEST_ASSERT_EQUAL_INT(0, n);
     TEST_ASSERT_NULL(l->source);
-    
+
     lexer_error_stack_reset();
     BrLexerPushString(l, "[1.5,1.25,1.125]", (char*)__func__);
     l->advance(l);
@@ -636,7 +635,7 @@ static void test_lexer_BrLexerParseVectorFixed() {
         l->advance(l);
     }
     TEST_ASSERT_NULL(l->source);
-    
+
     lexer_error_stack_reset();
     BrLexerPushString(l, "1.5", (char*)__func__);
     l->advance(l);
@@ -647,7 +646,7 @@ static void test_lexer_BrLexerParseVectorFixed() {
         l->advance(l);
     }
     TEST_ASSERT_NULL(l->source);
-    
+
     lexer_error_stack_reset();
     BrLexerPushString(l, "[1.5,1.25", (char*)__func__);
     l->advance(l);
@@ -658,7 +657,7 @@ static void test_lexer_BrLexerParseVectorFixed() {
         l->advance(l);
     }
     TEST_ASSERT_NULL(l->source);
-    
+
     lexer_error_stack_reset();
     BrLexerPushString(l, "[1.5 1.25", (char*)__func__);
     l->advance(l);
@@ -673,14 +672,14 @@ static void test_lexer_BrLexerParseVectorFixed() {
 }
 
 static void test_lexer_BrLexerParseMatrixFloat() {
-    br_lexer *l;
+    br_lexer* l;
     float values[16];
     int n;
 
     l = BrLexerAllocate(NULL, 0);
     TEST_ASSERT_NOT_NULL(l);
     BrLexerErrorSet(l, lexer_error_cbfn);
-    
+
     BrLexerPushString(l, "[[5.25]]", (char*)__func__);
     l->advance(l);
     n = BrParseMatrixFloat(l, values, 4, 4);
@@ -688,7 +687,7 @@ static void test_lexer_BrLexerParseMatrixFloat() {
     TEST_ASSERT_EQUAL_INT(1, n);
     TEST_ASSERT_EQUAL_FLOAT(5.25f, values[0]);
     TEST_ASSERT_NULL(l->source);
-    
+
     BrLexerPushString(l, "[[1.5,      2,\t-4.5]]", (char*)__func__);
     l->advance(l);
     n = BrParseMatrixFloat(l, values, 3, 1);
@@ -698,7 +697,7 @@ static void test_lexer_BrLexerParseMatrixFloat() {
     TEST_ASSERT_EQUAL_FLOAT(2.f, values[1]);
     TEST_ASSERT_EQUAL_FLOAT(-4.5f, values[2]);
     TEST_ASSERT_NULL(l->source);
-    
+
     BrLexerPushString(l, "[[1.5,      2,\t-4.5],[1, 3, 5.5]]", (char*)__func__);
     l->advance(l);
     n = BrParseMatrixFloat(l, values, 4, 2);
@@ -711,7 +710,7 @@ static void test_lexer_BrLexerParseMatrixFloat() {
     TEST_ASSERT_EQUAL_FLOAT(3.f, values[5]);
     TEST_ASSERT_EQUAL_FLOAT(5.5f, values[6]);
     TEST_ASSERT_NULL(l->source);
-    
+
     BrLexerPushString(l, "[[1.5,      2,\t-4.5],]", (char*)__func__);
     l->advance(l);
     n = BrParseMatrixFloat(l, values, 3, 2);
@@ -721,7 +720,7 @@ static void test_lexer_BrLexerParseMatrixFloat() {
     TEST_ASSERT_EQUAL_FLOAT(2.f, values[1]);
     TEST_ASSERT_EQUAL_FLOAT(-4.5f, values[2]);
     TEST_ASSERT_NULL(l->source);
-    
+
     BrLexerPushString(l, "[[1.25, 2.5, 3.75, 5.],[6.25,7.5,8.75,10],[11.25,12.5,13.75,15],[16.25,17.5,18.75,20]]", (char*)__func__);
     l->advance(l);
     n = BrParseMatrixFloat(l, values, 4, 4);
@@ -744,14 +743,14 @@ static void test_lexer_BrLexerParseMatrixFloat() {
     TEST_ASSERT_EQUAL_FLOAT(18.75f, values[14]);
     TEST_ASSERT_EQUAL_FLOAT(20.f, values[15]);
     TEST_ASSERT_NULL(l->source);
-    
+
     BrLexerPushString(l, "[\t  ]", (char*)__func__);
     l->advance(l);
     n = BrParseMatrixFloat(l, values, 3, 1);
     TEST_ASSERT_EQUAL(T_EOF, l->current.id);
     TEST_ASSERT_EQUAL_INT(0, n);
     TEST_ASSERT_NULL(l->source);
-    
+
     lexer_error_stack_reset();
     BrLexerPushString(l, "[1.5,1.25,1.125]", (char*)__func__);
     l->advance(l);
@@ -761,7 +760,7 @@ static void test_lexer_BrLexerParseMatrixFloat() {
         l->advance(l);
     }
     TEST_ASSERT_NULL(l->source);
-    
+
     lexer_error_stack_reset();
     BrLexerPushString(l, "[[1.5,1.25,1.125]", (char*)__func__);
     l->advance(l);
@@ -771,7 +770,7 @@ static void test_lexer_BrLexerParseMatrixFloat() {
         l->advance(l);
     }
     TEST_ASSERT_NULL(l->source);
-    
+
     lexer_error_stack_reset();
     BrLexerPushString(l, "1.5", (char*)__func__);
     l->advance(l);
@@ -781,7 +780,7 @@ static void test_lexer_BrLexerParseMatrixFloat() {
         l->advance(l);
     }
     TEST_ASSERT_NULL(l->source);
-    
+
     lexer_error_stack_reset();
     BrLexerPushString(l, "[1.5,1.25", (char*)__func__);
     l->advance(l);
@@ -791,7 +790,7 @@ static void test_lexer_BrLexerParseMatrixFloat() {
         l->advance(l);
     }
     TEST_ASSERT_NULL(l->source);
-    
+
     lexer_error_stack_reset();
     BrLexerPushString(l, "[[1.5 1.25],[1.5,1.4]]", (char*)__func__);
     l->advance(l);
@@ -801,7 +800,7 @@ static void test_lexer_BrLexerParseMatrixFloat() {
         l->advance(l);
     }
     TEST_ASSERT_NULL(l->source);
-    
+
     lexer_error_stack_reset();
     BrLexerPushString(l, "[[1.5,1.25] [1.5,1.4]]", (char*)__func__);
     l->advance(l);
@@ -816,14 +815,14 @@ static void test_lexer_BrLexerParseMatrixFloat() {
 }
 
 static void test_lexer_BrLexerParseMatrixFixed() {
-    br_lexer *l;
+    br_lexer* l;
     br_fixed_ls values[16];
     int n;
 
     l = BrLexerAllocate(NULL, 0);
     TEST_ASSERT_NOT_NULL(l);
     BrLexerErrorSet(l, lexer_error_cbfn);
-    
+
     BrLexerPushString(l, "[[5.25]]", (char*)__func__);
     l->advance(l);
     n = BrParseMatrixFixed(l, values, 4, 4);
@@ -831,7 +830,7 @@ static void test_lexer_BrLexerParseMatrixFixed() {
     TEST_ASSERT_EQUAL_INT(1, n);
     TEST_ASSERT_EQUAL_INT32(BrFloatToFixed(5.25f), values[0]);
     TEST_ASSERT_NULL(l->source);
-    
+
     BrLexerPushString(l, "[[1.5,      2,\t-4.5]]", (char*)__func__);
     l->advance(l);
     n = BrParseMatrixFixed(l, values, 3, 1);
@@ -841,7 +840,7 @@ static void test_lexer_BrLexerParseMatrixFixed() {
     TEST_ASSERT_EQUAL_INT32(BrIntToFixed(2), values[1]);
     TEST_ASSERT_EQUAL_INT32(BrFloatToFixed(-4.5f), values[2]);
     TEST_ASSERT_NULL(l->source);
-    
+
     BrLexerPushString(l, "[[1.5,      2,\t-4.5],[1, 3, 5.5]]", (char*)__func__);
     l->advance(l);
     n = BrParseMatrixFixed(l, values, 4, 2);
@@ -854,7 +853,7 @@ static void test_lexer_BrLexerParseMatrixFixed() {
     TEST_ASSERT_EQUAL_INT32(BrIntToFixed(3), values[5]);
     TEST_ASSERT_EQUAL_INT32(BrFloatToFixed(5.5f), values[6]);
     TEST_ASSERT_NULL(l->source);
-    
+
     BrLexerPushString(l, "[[1.5,      2,\t-4.5],]", (char*)__func__);
     l->advance(l);
     n = BrParseMatrixFixed(l, values, 3, 2);
@@ -864,7 +863,7 @@ static void test_lexer_BrLexerParseMatrixFixed() {
     TEST_ASSERT_EQUAL_INT32(BrIntToFixed(2), values[1]);
     TEST_ASSERT_EQUAL_INT32(BrFloatToFixed(-4.5f), values[2]);
     TEST_ASSERT_NULL(l->source);
-    
+
     BrLexerPushString(l, "[[1.25, 2.5, 3.75, 5.],[6.25,7.5,8.75,10],[11.25,12.5,13.75,15],[16.25,17.5,18.75,20]]", (char*)__func__);
     l->advance(l);
     n = BrParseMatrixFixed(l, values, 4, 4);
@@ -887,14 +886,14 @@ static void test_lexer_BrLexerParseMatrixFixed() {
     TEST_ASSERT_EQUAL_INT32(BrFloatToFixed(18.75f), values[14]);
     TEST_ASSERT_EQUAL_INT32(BrIntToFixed(20), values[15]);
     TEST_ASSERT_NULL(l->source);
-    
+
     BrLexerPushString(l, "[\t  ]", (char*)__func__);
     l->advance(l);
     n = BrParseMatrixFixed(l, values, 3, 1);
     TEST_ASSERT_EQUAL(T_EOF, l->current.id);
     TEST_ASSERT_EQUAL_INT(0, n);
     TEST_ASSERT_NULL(l->source);
-    
+
     lexer_error_stack_reset();
     BrLexerPushString(l, "[1.5,1.25,1.125]", (char*)__func__);
     l->advance(l);
@@ -904,7 +903,7 @@ static void test_lexer_BrLexerParseMatrixFixed() {
         l->advance(l);
     }
     TEST_ASSERT_NULL(l->source);
-    
+
     lexer_error_stack_reset();
     BrLexerPushString(l, "[[1.5,1.25,1.125]", (char*)__func__);
     l->advance(l);
@@ -914,7 +913,7 @@ static void test_lexer_BrLexerParseMatrixFixed() {
         l->advance(l);
     }
     TEST_ASSERT_NULL(l->source);
-    
+
     lexer_error_stack_reset();
     BrLexerPushString(l, "1.5", (char*)__func__);
     l->advance(l);
@@ -924,7 +923,7 @@ static void test_lexer_BrLexerParseMatrixFixed() {
         l->advance(l);
     }
     TEST_ASSERT_NULL(l->source);
-    
+
     lexer_error_stack_reset();
     BrLexerPushString(l, "[1.5,1.25", (char*)__func__);
     l->advance(l);
@@ -934,7 +933,7 @@ static void test_lexer_BrLexerParseMatrixFixed() {
         l->advance(l);
     }
     TEST_ASSERT_NULL(l->source);
-    
+
     lexer_error_stack_reset();
     BrLexerPushString(l, "[[1.5 1.25],[1.5,1.4]]", (char*)__func__);
     l->advance(l);
@@ -944,7 +943,7 @@ static void test_lexer_BrLexerParseMatrixFixed() {
         l->advance(l);
     }
     TEST_ASSERT_NULL(l->source);
-    
+
     lexer_error_stack_reset();
     BrLexerPushString(l, "[[1.5,1.25] [1.5,1.4]]", (char*)__func__);
     l->advance(l);

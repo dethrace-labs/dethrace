@@ -1,7 +1,6 @@
 #include "world.h"
 #include <stdlib.h>
 
-#include "brender/brender.h"
 #include "brucetrk.h"
 #include "car.h"
 #include "depth.h"
@@ -24,6 +23,8 @@
 #include "spark.h"
 #include "trig.h"
 #include "utility.h"
+#include "brender.h"
+#include "formats.h"
 
 #include <float.h>
 #include <string.h>
@@ -514,7 +515,7 @@ int LoadNModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     char s[256];
     char* str;
     br_model* temp_array[2000];
-    v11model* prepared;
+    struct v11model* prepared;
     int group;
     LOG_TRACE("(%p, %p, %d)", pStorage_space, pF, pCount);
 
@@ -697,7 +698,7 @@ int LoadNTrackModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     char s[256];
     char* str;
     br_model* temp_array[2000];
-    v11model* prepared;
+    struct v11model* prepared;
     LOG_TRACE("(%p, %p, %d)", pStorage_space, pF, pCount);
 
     new_ones = 0;
@@ -1859,7 +1860,7 @@ void ChangeSubdivToPersp(void) {
 }
 
 // IDA: br_uint_32 __cdecl ProcessFaceMaterials(br_actor *pActor, tPMFMCB pCallback)
-intptr_t ProcessFaceMaterials(br_actor* pActor, tPMFMCB pCallback) {
+br_uintptr_t ProcessFaceMaterials(br_actor* pActor, tPMFMCB pCallback) {
     LOG_TRACE("(%p, %d)", pActor, pCallback);
 
     if (pActor->identifier == NULL || pActor->identifier[0] != '&') {
@@ -2269,7 +2270,7 @@ void DisposeTexturingMaterials(void) {
 }
 
 // IDA: br_uint_32 __cdecl SetAccessoryRenderingCB(br_actor *pActor, void *pFlag)
-intptr_t SetAccessoryRenderingCB(br_actor* pActor, void* pFlag) {
+br_uintptr_t SetAccessoryRenderingCB(br_actor* pActor, void* pFlag) {
     if (pActor->identifier && *pActor->identifier == '&') {
         pActor->render_style = *(br_uint_8*)pFlag;
     }
@@ -2581,7 +2582,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
             for (group = 0; group < V11MODEL(gTrack_storage_space.models[i])->ngroups; group++) {
                 int f = V11MODEL(gTrack_storage_space.models[i])->groups[group].face_user[0];
                 material = gTrack_storage_space.models[i]->faces[f].material;
-                V11MODEL(gTrack_storage_space.models[i])->groups[group].face_colours_material = material;
+                V11MODEL(gTrack_storage_space.models[i])->groups[group].face_colours_ptr = material;
                 if (material && !material->index_shade) {
                     material->index_shade = BrTableFind("DRRENDER.TAB");
                     BrMaterialUpdate(material, 0x7FFFu);
@@ -2907,7 +2908,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
 }
 
 // IDA: br_uint_32 __cdecl RemoveBounds(br_actor *pActor, void *pArg)
-intptr_t RemoveBounds(br_actor* pActor, void* pArg) {
+br_uintptr_t RemoveBounds(br_actor* pActor, void* pArg) {
     LOG_TRACE("(%p, %p)", pActor, pArg);
 
     if (pActor->type == BR_ACTOR_BOUNDS || pActor->type == BR_ACTOR_BOUNDS_CORRECT) {
@@ -2999,46 +3000,46 @@ br_scalar NormaliseDegreeAngle(br_scalar pAngle) {
 
 #define SAW(T, PERIOD) (fmodf((T), (PERIOD)) / (PERIOD))
 
-#define MOVE_FUNK_PARAMETER(DEST, MODE, PERIOD, AMPLITUDE, FLASH_VALUE)                   \
-    do {                                                                                  \
-        switch (MODE) {                                                                   \
-        case eMove_continuous:                                                            \
-            if ((PERIOD) == 0.f) {                                                        \
-                DEST = 0.f;                                                               \
-            } else {                                                                      \
-                DEST = (AMPLITUDE)*SAW(f_the_time, (PERIOD));                             \
-            }                                                                             \
-            break;                                                                        \
-        case eMove_controlled:                                                            \
-            DEST = (PERIOD) * (AMPLITUDE);                                                \
-            break;                                                                        \
-        case eMove_absolute:                                                              \
-            DEST = (PERIOD);                                                              \
-            break;                                                                        \
-        case eMove_linear:                                                                \
-            if ((PERIOD) == 0.f) {                                                        \
-                DEST = 0.f;                                                               \
-            } else {                                                                      \
-                DEST = (AMPLITUDE)*MapSawToTriangle(SAW(f_the_time, (PERIOD)));           \
-            }                                                                             \
-            break;                                                                        \
-        case eMove_flash:                                                                 \
-            if (2 * fmodf(f_the_time, (PERIOD)) > (PERIOD)) {                             \
-                DEST = (FLASH_VALUE);                                                     \
-            } else {                                                                      \
-                DEST = -(FLASH_VALUE);                                                    \
-            }                                                                             \
-            break;                                                                        \
-        case eMove_harmonic:                                                              \
-            if ((PERIOD) == 0.f) {                                                        \
-                DEST = 0.f;                                                               \
-            } else {                                                                      \
-                DEST = (AMPLITUDE)*BR_SIN(BR_ANGLE_DEG(SAW(f_the_time, (PERIOD)) * 360)); \
-            }                                                                             \
-            break;                                                                        \
-        default:                                                                          \
-            TELL_ME_IF_WE_PASS_THIS_WAY();                                                \
-        }                                                                                 \
+#define MOVE_FUNK_PARAMETER(DEST, MODE, PERIOD, AMPLITUDE, FLASH_VALUE)                     \
+    do {                                                                                    \
+        switch (MODE) {                                                                     \
+        case eMove_continuous:                                                              \
+            if ((PERIOD) == 0.f) {                                                          \
+                DEST = 0.f;                                                                 \
+            } else {                                                                        \
+                DEST = (AMPLITUDE) * SAW(f_the_time, (PERIOD));                             \
+            }                                                                               \
+            break;                                                                          \
+        case eMove_controlled:                                                              \
+            DEST = (PERIOD) * (AMPLITUDE);                                                  \
+            break;                                                                          \
+        case eMove_absolute:                                                                \
+            DEST = (PERIOD);                                                                \
+            break;                                                                          \
+        case eMove_linear:                                                                  \
+            if ((PERIOD) == 0.f) {                                                          \
+                DEST = 0.f;                                                                 \
+            } else {                                                                        \
+                DEST = (AMPLITUDE) * MapSawToTriangle(SAW(f_the_time, (PERIOD)));           \
+            }                                                                               \
+            break;                                                                          \
+        case eMove_flash:                                                                   \
+            if (2 * fmodf(f_the_time, (PERIOD)) > (PERIOD)) {                               \
+                DEST = (FLASH_VALUE);                                                       \
+            } else {                                                                        \
+                DEST = -(FLASH_VALUE);                                                      \
+            }                                                                               \
+            break;                                                                          \
+        case eMove_harmonic:                                                                \
+            if ((PERIOD) == 0.f) {                                                          \
+                DEST = 0.f;                                                                 \
+            } else {                                                                        \
+                DEST = (AMPLITUDE) * BR_SIN(BR_ANGLE_DEG(SAW(f_the_time, (PERIOD)) * 360)); \
+            }                                                                               \
+            break;                                                                          \
+        default:                                                                            \
+            TELL_ME_IF_WE_PASS_THIS_WAY();                                                  \
+        }                                                                                   \
     } while (0)
 
 // IDA: void __cdecl FunkThoseTronics()

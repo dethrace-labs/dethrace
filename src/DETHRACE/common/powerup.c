@@ -1,5 +1,4 @@
 #include "powerup.h"
-#include "brender/brender.h"
 #include "car.h"
 #include "controls.h"
 #include "crush.h"
@@ -20,6 +19,7 @@
 #include "pratcam.h"
 #include "sound.h"
 #include "utility.h"
+#include <brender.h>
 #include <stdlib.h>
 #include <string.h>
 

@@ -1,7 +1,6 @@
 // car.c + stuff.c
 
 #include "car.h"
-#include "brender/brender.h"
 #include "brucetrk.h"
 #include "car.h"
 #include "constants.h"
@@ -32,6 +31,7 @@
 #include "trig.h"
 #include "utility.h"
 #include "world.h"
+#include <brender.h>
 #include <math.h>
 #include <stdlib.h>
 

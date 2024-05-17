@@ -1,7 +1,6 @@
 #ifndef _RAYCAST_H_
 #define _RAYCAST_H_
 
-#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern br_matrix34 gPick_model_to_view__raycast; // suffix added to avoid duplicate symbol

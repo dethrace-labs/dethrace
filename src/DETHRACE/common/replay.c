@@ -1,5 +1,5 @@
 #include "replay.h"
-#include <brender/brender.h>
+#include "brender.h"
 #include "car.h"
 #include "controls.h"
 #include "displays.h"
@@ -7,6 +7,7 @@
 #include "globvrpb.h"
 #include "grafdata.h"
 #include "graphics.h"
+#include "brhton.h"
 #include "input.h"
 #include "loading.h"
 #include "main.h"

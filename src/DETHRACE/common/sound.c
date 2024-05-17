@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "brender/brender.h"
 #include "controls.h"
 #include "globvars.h"
 #include "graphics.h"
@@ -15,6 +14,7 @@
 #include "s3/s3.h"
 #include "s3/s3_brender.h"
 #include "utility.h"
+#include <brender.h>
 
 int gSound_detail_level;
 int gVirgin_pass = 1;

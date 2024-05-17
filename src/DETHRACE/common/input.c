@@ -1,6 +1,5 @@
 #include "input.h"
 
-#include "brender/brender.h"
 #include "errors.h"
 #include "globvars.h"
 #include "grafdata.h"
@@ -9,6 +8,7 @@
 #include "harness/trace.h"
 #include "pd/sys.h"
 #include "utility.h"
+#include <brender.h>
 #include <stdlib.h>
 
 int gEdge_trigger_mode;

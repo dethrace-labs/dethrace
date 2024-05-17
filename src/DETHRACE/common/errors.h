@@ -1,7 +1,6 @@
 #ifndef _ERRORS_H_
 #define _ERRORS_H_
 
-#include "brender/br_types.h"
 #include "dr_types.h"
 #include "harness/compiler.h"
 
