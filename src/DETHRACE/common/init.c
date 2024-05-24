@@ -240,7 +240,17 @@ void InstallFindFailedHooks(void) {
 void AllocateStandardLamp(void) {
     br_actor* lamp;
     int i;
-    STUB();
+
+    for (i = 0; i < gNumber_of_lights; i++) {
+        BrActorAdd(gUniverse_actor, gLight_array[i]);
+        lamp = gLight_array[i]->children;
+        if (lamp) {
+            BrActorRemove(lamp);
+            gLight_array[i]->children = NULL;
+            BrActorFree(lamp);
+        }
+        BrLightEnable(gLight_array[i]);
+    }
 }
 
 // IDA: void __cdecl InitializeBRenderEnvironment()

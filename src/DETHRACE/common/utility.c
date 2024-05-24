@@ -465,9 +465,7 @@ br_pixelmap* DRPixelmapLoad(char* pFile_name) {
     if (the_map != NULL) {
         the_map->origin_x = 0;
         the_map->origin_y = 0;
-#if !defined(DETHRACE_FIX_BUGS)
         the_map->row_bytes = (the_map->row_bytes + sizeof(int32_t) - 1) & ~(sizeof(int32_t) - 1);
-#endif
     }
     return the_map;
 }
@@ -482,9 +480,7 @@ br_uint_32 DRPixelmapLoadMany(char* pFile_name, br_pixelmap** pPixelmaps, br_uin
     number_loaded = BrPixelmapLoadMany(pFile_name, pPixelmaps, pNum);
     for (i = 0; i < number_loaded; i++) {
         the_map = pPixelmaps[i];
-#if !defined(DETHRACE_FIX_BUGS)
         the_map->row_bytes = (the_map->row_bytes + sizeof(int32_t) - 1) & ~(sizeof(int32_t) - 1);
-#endif
         the_map->base_x = 0;
         the_map->base_y = 0;
     }
