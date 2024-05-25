@@ -769,7 +769,6 @@ void DamageScrnDraw(int pCurrent_choice, int pCurrent_mode) {
     if (((pCurrent_choice == 0 && pCurrent_mode == 0) || !gDone_initial) && (gWreck_zoomed_in < 0 && gWreck_selected >= 0)) {
         sel_actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
         sel_actor->render_style = BR_RSTYLE_BOUNDING_EDGES;
-        sel_actor->render_style = BR_RSTYLE_NONE; // FIXME: remove this line once BR_RSTYLE_BOUNDING_EDGES rener style has been implemente
         sel_actor->model = gWreck_array[gWreck_selected].actor->model;
         BrActorAdd(gWreck_array[gWreck_selected].actor, sel_actor);
     } else {
