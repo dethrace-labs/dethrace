@@ -4322,7 +4322,7 @@ br_uint_32 SetIDAndDupModel(br_actor* pActor, void* pArg) {
         new_model = BrModelAllocate(s2, pActor->model->nvertices, pActor->model->nfaces);
         memcpy(new_model->vertices, pActor->model->vertices, pActor->model->nvertices * sizeof(br_vertex));
         memcpy(new_model->faces, pActor->model->faces, pActor->model->nfaces * sizeof(br_face));
-        new_model->flags |= 0x80; // FIXME: unknown model flag
+        new_model->flags |= BR_MODF_UPDATEABLE;
         BrModelAdd(new_model);
         BrModelUpdate(new_model, BR_MODU_ALL);
         pActor->model = new_model;
@@ -4425,7 +4425,7 @@ void DropActor(int pIndex) {
                 BrVector3Copy(&gActor_centre, &gLast_actor->t.t.translate.t);
                 DuplicateIfNotAmpersand(gLast_actor);
                 UniquificateActorsName(gUniverse_actor, gLast_actor);
-                gLast_actor->model->flags |= 0x80; // FIXME: unknown flag
+                gLast_actor->model->flags |= BR_MODF_UPDATEABLE;
                 if (gLast_actor->identifier == NULL || gLast_actor->identifier[0] == '&') {
                     last_non_ampersand = gAdditional_actors;
                     for (a = gAdditional_actors->children; a != NULL; a = a->next) {

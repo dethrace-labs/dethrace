@@ -213,10 +213,9 @@ br_uintptr_t ProcessModelsCB(br_actor* pActor, tTrack_spec* pTrack_spec) {
         if (gMr_blendy) {
             BrActorAdd(pActor, gMr_blendy);
             BrModelAdd(gMr_blendy->model);
-            // FIXME!
-            // for (group = 0; V11MODEL(gMr_blendy->model)->ngroups > group; ++group) {
-            //     V11MODEL(gMr_blendy->model)->groups[group].face_colours_material = gMr_blendy->model->faces[*V11MODEL(gMr_blendy->model)->groups[group].face_user].material;
-            // }
+            for (group = 0; group < V11MODEL(gMr_blendy->model)->ngroups; group++) {
+                V11MODEL(gMr_blendy->model)->groups[group].face_colours_ptr = gMr_blendy->model->faces[*V11MODEL(gMr_blendy->model)->groups[group].face_user].material;
+            }
             gMr_blendy->model->flags &= ~BR_MODF_UPDATEABLE;
             DodgyModelUpdate(gMr_blendy->model);
             pTrack_spec->blends[z][x] = gMr_blendy;
