@@ -339,18 +339,12 @@ void InitDepthEffects(void) {
         FatalError(kFatalError_FindSkyMaterial_S, "HORIZON.MAT"); // 2nd argument added
     }
     gHorizon_material->index_blend = BrPixelmapAllocate(BR_PMT_INDEX_8, 256, 256, NULL, 0);
-
-    // HACK: moved below loop
-    // BrTableAdd(gHorizon_material->index_blend);
+    BrTableAdd(gHorizon_material->index_blend);
     for (i = 0; i < 256; i++) {
         for (j = 0; j < 256; j++) {
             *((tU8*)gHorizon_material->index_blend->pixels + 256 * i + j) = j;
         }
     }
-    // HACK: this should be above the for loop. Haven't been able to figure out how this is working in OG, as changes made to the pixelmap
-    // don't update the stored copy without calling `BrTableUpdate`.
-    BrTableAdd(gHorizon_material->index_blend);
-
     gHorizon_material->flags |= BR_MATF_PERSPECTIVE;
     BrMaterialAdd(gHorizon_material);
     gForward_sky_model = CreateHorizonModel(gCamera);
