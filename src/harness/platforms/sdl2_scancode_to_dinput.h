@@ -20,8 +20,6 @@
  *
  */
 
-#include <glad/glad.h>
-
 #include <SDL.h>
 
 #if 0 // Usage Example:

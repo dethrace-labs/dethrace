@@ -350,9 +350,7 @@ void DrawColumns(int pDraw_blends, tTrack_spec* pTrack_spec, int pMin_x, int pMa
                     }
                 } else {
                     if (pTrack_spec->columns[column_z2][column_x2]) {
-                        if (gSound_enabled) {
-                            BrZbSceneRenderAdd(pTrack_spec->columns[column_z2][column_x2]);
-                        }
+                        BrZbSceneRenderAdd(pTrack_spec->columns[column_z2][column_x2]);
                     }
                     if (pTrack_spec->lollipops[column_z2][column_x2]) {
                         maa.a = pTrack_spec->lollipops[column_z2][column_x2];
@@ -378,15 +376,13 @@ void DrawColumns(int pDraw_blends, tTrack_spec* pTrack_spec, int pMin_x, int pMa
                 if (pDraw_blends) {
                     blended_polys = pTrack_spec->blends[column_z2][column_x2];
                     if (blended_polys) {
-                        blended_polys->render_style = 4;
+                        blended_polys->render_style = BR_RSTYLE_FACES;
                         BrZbSceneRenderAdd(blended_polys);
-                        blended_polys->render_style = 1;
+                        blended_polys->render_style = BR_RSTYLE_NONE;
                     }
                 } else {
                     if (pTrack_spec->columns[column_z2][column_x2]) {
-                        if (gSound_enabled) {
-                            BrZbSceneRenderAdd(pTrack_spec->columns[column_z2][column_x2]);
-                        }
+                        BrZbSceneRenderAdd(pTrack_spec->columns[column_z2][column_x2]);
                     }
                     if (pTrack_spec->lollipops[column_z2][column_x2]) {
                         maa.a = pTrack_spec->lollipops[column_z2][column_x2];

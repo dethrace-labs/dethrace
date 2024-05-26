@@ -1,9 +1,9 @@
 add_executable(dethrace_test)
 add_test(NAME test_dethrace COMMAND dethrace_test)
 
-set(IO_PLATFORM "SDL_OpenGL")
+set(IO_PLATFORM "SDL2")
 
-target_link_libraries(dethrace_test PRIVATE glad dethrace_obj)
+target_link_libraries(dethrace_test PRIVATE dethrace_obj)
 
 target_include_directories(dethrace_test PRIVATE
     .
@@ -16,17 +16,6 @@ target_include_directories(dethrace_test PRIVATE
 )
 
 if(NOT MSVC)
-    if(APPLE)
-        target_link_libraries(dethrace_test PRIVATE "-framework OpenGL")
-    else()
-        set(OpenGL_GL_PREFERENCE GLVND)
-        find_package(OpenGL REQUIRED)
-        if(TARGET OpenGL::OpenGL)
-            target_link_libraries(dethrace_test PRIVATE OpenGL::OpenGL)
-        else()
-            target_link_libraries(dethrace_test PRIVATE OpenGL::GL)
-        endif()
-    endif()
 else()
     target_compile_definitions(dethrace_test PRIVATE -D_CRT_SECURE_NO_WARNINGS -DSDL_MAIN_HANDLED -DWIN32_LEAN_AND_MEAN)
     target_link_libraries(dethrace_test PRIVATE dbghelp)

@@ -168,21 +168,11 @@ target_sources(dethrace_obj PRIVATE
 
 # Create our main game binary.
 add_executable(dethrace)
-target_link_libraries(dethrace PRIVATE glad dethrace_obj compile_with_werror)
+target_link_libraries(dethrace PRIVATE dethrace_obj compile_with_werror)
 target_sources(dethrace PRIVATE main.c)
 
 if(NOT MSVC)
-    if(APPLE)
-        target_link_libraries(dethrace PRIVATE "-framework OpenGL")
-    else()
-        set(OpenGL_GL_PREFERENCE GLVND)
-        find_package(OpenGL REQUIRED)
-        if(TARGET OpenGL::OpenGL)
-            target_link_libraries(dethrace PRIVATE OpenGL::OpenGL)
-        else()
-            target_link_libraries(dethrace PRIVATE OpenGL::GL)
-        endif()
-    endif()
+
 else()
     target_link_libraries(dethrace PRIVATE dbghelp)
     target_link_options(dethrace PRIVATE /subsystem:windows /ENTRY:mainCRTStartup)

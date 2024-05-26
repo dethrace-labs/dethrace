@@ -3,7 +3,7 @@ configure_file(version.h.in version.h @ONLY)
 add_library(harness STATIC)
 
 if (NOT DEFINED IO_PLATFORM)
-    set(IO_PLATFORM "SDL_OpenGL")
+    set(IO_PLATFORM "SDL2")
 endif()
 
 target_include_directories(harness
@@ -69,16 +69,15 @@ target_sources(harness PRIVATE
     "${CMAKE_CURRENT_BINARY_DIR}/version.h"
 )
 
-if (IO_PLATFORM STREQUAL "SDL_OpenGL")
-    # generate embedded glsl resources
+if (IO_PLATFORM STREQUAL "SDL2")
 
     target_sources(harness PRIVATE
-        platforms/sdl_opengl.c
+        platforms/sdl2.c
         platforms/sdl2_scancode_to_dinput.h
 
     )
     target_include_directories(harness PRIVATE "${dethrace_SOURCE_DIR}/src/DETHRACE/common")
-    target_link_libraries(harness PRIVATE SDL2::SDL2 glad)
+    target_link_libraries(harness PRIVATE SDL2::SDL2)
 endif()
 
 if(WIN32)

@@ -1,8 +1,4 @@
-#include <glad/glad.h>
-
-// this needs to be included after glad.h
 #include <SDL.h>
-#include <SDL_opengl.h>
 
 #include "harness/config.h"
 #include "harness/hooks.h"
@@ -53,8 +49,6 @@ static void* create_window_and_renderer(char* title, int x, int y, int width, in
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         LOG_PANIC("SDL_INIT_VIDEO error: %s", SDL_GetError());
     }
-
-    SDL_GL_SetSwapInterval(1);
 
     window = SDL_CreateWindow(title,
         SDL_WINDOWPOS_CENTERED,
