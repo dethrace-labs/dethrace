@@ -11,11 +11,14 @@
 
 SDL_Window* window;
 SDL_Renderer *renderer;
-SDL_GLContext context;
-uint8_t directinput_key_state[SDL_NUM_SCANCODES];
+SDL_Texture *screen_texture;
+uint32_t converted_palette[256];
+br_pixelmap *last_screen_src;
 int render_width, render_height;
 int window_width, window_height;
 int vp_x, vp_y, vp_width, vp_height;
+
+uint8_t directinput_key_state[SDL_NUM_SCANCODES];
 
 struct {
     float x;
@@ -57,7 +60,7 @@ static void* create_window_and_renderer(char* title, int x, int y, int width, in
         SDL_WINDOW_RESIZABLE);
 
     if (window == NULL) {
-        LOG_PANIC("Failed to create window. %s", SDL_GetError());
+        LOG_PANIC("Failed to create window: %s", SDL_GetError());
     }
 
     sdl_window_scale.x = ((float)render_width) / width;
@@ -68,9 +71,23 @@ static void* create_window_and_renderer(char* title, int x, int y, int width, in
     }
 
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    if (renderer == NULL) {
+        LOG_PANIC("Failed to create renderer: %s", SDL_GetError());
+    }
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+
+    if (screen_texture == NULL) {
+        screen_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width, height);
+    }
+
+    // SDL_RendererInfo info;
+    // SDL_GetRendererInfo( renderer, &info );
+    // for( Uint32 i = 0; i < info.num_texture_formats; i++ )
+    // {
+    //     printf("%s\n", SDL_GetPixelFormatName( info.texture_formats[i] ));
+    // }
 
     update_viewport();
-
     return window;
 }
 
@@ -193,26 +210,30 @@ static int get_mouse_position(int* pX, int* pY) {
     return 0;
 }
 
-PALETTEENTRY_* pal_;
-SDL_Surface *surface = NULL;
-
-static void set_palette(PALETTEENTRY_* pal) {
-    pal_ = pal;
-    // GLRenderer_SetPalette((uint8_t*)pal);
+static void present_screen(br_pixelmap *src) {
+    // fastest way to convert 8 bit indexed to 32 bit
+    uint8_t *src_pixels = src->pixels;
+    uint32_t *dest_pixels;
+    int dest_pitch;
+    SDL_LockTexture(screen_texture, NULL, &dest_pixels, &dest_pitch);
+    for (int i = 0; i < src->height * src->width; i++) {
+        *dest_pixels = converted_palette[*src_pixels];
+        dest_pixels++;
+        src_pixels++;
+    }
+    SDL_UnlockTexture(screen_texture);
+    SDL_RenderCopy(renderer, screen_texture, NULL, NULL);
+    SDL_RenderPresent(renderer);
+    last_screen_src = src;
 }
 
-
-static void present_screen(br_pixelmap *src) {
-    if (surface == NULL) {
-        surface = SDL_CreateRGBSurfaceFrom(src->pixels, 320, 200, 8, 320, 0, 0, 0, 0);
+static void set_palette(PALETTEENTRY_* pal) {
+    for (int i = 0; i < 256; i++) {
+        converted_palette[i] = (0xff << 24 | pal[i].peRed << 16 | pal[i].peGreen << 8 | pal[i].peBlue);
     }
-    SDL_SetPaletteColors(surface->format->palette, pal_, 0, 256);
-
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_RenderCopy(renderer, texture, NULL, NULL);
-    SDL_RenderPresent(renderer);
-    SDL_DestroyTexture(texture);
-
+    if (last_screen_src != NULL) {
+        present_screen(last_screen_src);
+    }
 }
 
 int show_error_message(void* window, char* text, char* caption) {

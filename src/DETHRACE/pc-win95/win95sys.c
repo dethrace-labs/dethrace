@@ -639,7 +639,8 @@ void PDScreenBufferSwap(int pRendering_area_only) {
             gHarness_platform.Renderer_Present(gBack_screen);
         } else {
             DRPixelmapDoubledCopy(gTemp_screen, gBack_screen, 320, 200, 0, 40);
-            BrPixelmapDoubleBuffer(gScreen, gTemp_screen);
+            // BrPixelmapDoubleBuffer(gScreen, gTemp_screen);
+            gHarness_platform.Renderer_Present(gTemp_screen);
         }
     }
 }
