@@ -53,6 +53,8 @@ if(NOT SDL2_FOUND)
     find_package(SDL2 MODULE REQUIRED)
 endif()
 
+
+add_subdirectory(lib/BRender-v1.3.2)
 add_subdirectory(lib/libsmacker)
 add_subdirectory(lib/miniaudio)
 
@@ -69,7 +71,6 @@ endif()
 add_subdirectory(src/harness)
 add_subdirectory(src/S3)
 add_subdirectory(src/smackw32)
-add_subdirectory(src/BRender-v1.3.2)
 add_subdirectory(src/DETHRACE)
 
 if(BUILD_TESTS)
