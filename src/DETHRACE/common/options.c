@@ -10,6 +10,7 @@
 #include "globvars.h"
 #include "grafdata.h"
 #include "graphics.h"
+#include "harness/config.h"
 #include "harness/trace.h"
 #include "input.h"
 #include "intrface.h"
@@ -53,7 +54,19 @@ int gCurrent_key;
 // IDA: void __usercall DrawDial(int pWhich_one@<EAX>, int pWhich_stage@<EDX>)
 void DrawDial(int pWhich_one, int pWhich_stage) {
     LOG_TRACE("(%d, %d)", pWhich_one, pWhich_stage);
-    NOT_IMPLEMENTED();
+
+    RemoveTransientBitmaps(1);
+    DRPixelmapRectangleMaskedCopy(gBack_screen,
+        gCurrent_graf_data->dial__x[pWhich_one],
+        gCurrent_graf_data->dial__y[pWhich_one],
+        gDials_pix,
+        0,
+        pWhich_stage * 64,
+        gDials_pix->width,
+        64);
+    ProcessFlicQueue(gFrame_period);
+    DoMouseCursor();
+    PDScreenBufferSwap(0);
 }
 
 // IDA: void __usercall MoveDialFromTo(int pWhich_one@<EAX>, int pOld_stage@<EDX>, int pNew_stage@<EBX>)
@@ -61,19 +74,58 @@ void MoveDialFromTo(int pWhich_one, int pOld_stage, int pNew_stage) {
     tS32 time_diff;
     tU32 start_time;
     LOG_TRACE("(%d, %d, %d)", pWhich_one, pOld_stage, pNew_stage);
-    NOT_IMPLEMENTED();
+
+    DrawDial(pWhich_one, pOld_stage);
+    start_time = PDGetTotalTime();
+    while ((time_diff = PDGetTotalTime() - start_time) < 100) {
+         DrawDial(pWhich_one, pOld_stage + (pNew_stage - pOld_stage) * time_diff / 100);
+    }
+    DrawDial(pWhich_one, pNew_stage);
+
+    start_time = PDGetTotalTime();
+    DrawDial(pWhich_one, pNew_stage < 24 ? pNew_stage + 1 : 22);
+    while ((time_diff = PDGetTotalTime() - start_time) < 20) {
+    }
+
+    start_time = PDGetTotalTime();
+    DrawDial(pWhich_one, pNew_stage == 0 ? 2 : pNew_stage - 1);
+    while ((time_diff = PDGetTotalTime() - start_time) < 20) {
+    }
+
+    start_time = PDGetTotalTime();
+    DrawDial(pWhich_one, pNew_stage < 24 ? pNew_stage + 1 : 22);
+    while ((time_diff = PDGetTotalTime() - start_time) < 20) {
+    }
+
+    start_time = PDGetTotalTime();
+    DrawDial(pWhich_one, pNew_stage);
+    while ((time_diff = PDGetTotalTime() - start_time) < 20) {
+    }
+
+    start_time = PDGetTotalTime();
+    DrawDial(pWhich_one, pNew_stage == 0 ? 2 : pNew_stage - 1);
+    while ((time_diff = PDGetTotalTime() - start_time) < 20) {
+    }
+    DrawDial(pWhich_one, pNew_stage);
 }
 
 // IDA: void __cdecl SoundOptionsStart()
 void SoundOptionsStart(void) {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DrawDial(0, 0);
+    DrawDial(1, 0);
+    MoveDialFromTo(0, 0, 4 * gProgram_state.music_volume);
+    MoveDialFromTo(1, 0, 4 * gProgram_state.music_volume);
 }
 
 // IDA: int __usercall SoundOptionsDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
 int SoundOptionsDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
-    NOT_IMPLEMENTED();
+
+    MoveDialFromTo(0, 4 * gProgram_state.music_volume, 0);
+    MoveDialFromTo(0, 4 * gProgram_state.effects_volume, 0);
+    return pCurrent_choice;
 }
 
 // IDA: int __usercall SoundOptionsLeft@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
@@ -81,7 +133,20 @@ int SoundOptionsLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int old_value;
     int* the_value;
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    if (*pCurrent_choice == 2) {
+        return 0;
+    }
+    the_value = (*pCurrent_choice == 0) ? &gProgram_state.music_volume : &gProgram_state.effects_volume;
+    old_value = *the_value;
+    *the_value -= 1;
+    if (*the_value < 0) {
+        *the_value = 0;
+    }
+    SetSoundVolumes();
+    DRS3StartSound(gEffects_outlet, 3000);
+    MoveDialFromTo(*pCurrent_choice, 4 * old_value, 4 * *the_value);
+    return 0;
 }
 
 // IDA: int __usercall SoundOptionsRight@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
@@ -89,7 +154,20 @@ int SoundOptionsRight(int* pCurrent_choice, int* pCurrent_mode) {
     int old_value;
     int* the_value;
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    if (*pCurrent_choice == 2) {
+        return 0;
+    }
+    the_value = (*pCurrent_choice == 0) ? &gProgram_state.music_volume : &gProgram_state.effects_volume;
+    old_value = *the_value;
+    *the_value += 1;
+    if (*the_value >= 6) {
+        *the_value = 6;
+    }
+    SetSoundVolumes();
+    DRS3StartSound(gEffects_outlet, 3000);
+    MoveDialFromTo(*pCurrent_choice, 4 * old_value, 4 * *the_value);
+    return 0;
 }
 
 // IDA: int __usercall SoundClick@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
@@ -100,19 +178,124 @@ int SoundClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_o
     int old_value;
     int* the_value;
     LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
-    NOT_IMPLEMENTED();
+
+#define ANGLE_RANGE_START (20 * PI / 360)
+#define ANGLE_RANGE_END (340 * PI / 360)
+
+    x_delta = pX_offset - gCurrent_graf_data->dial__x_centre;
+    y_delta = gCurrent_graf_data->dial__y_centre - pY_offset;
+    if (y_delta <= 0.f) {
+        return 0;
+    }
+    angle = x_delta == 0.f ? PI / 2 : atanf(y_delta / x_delta);
+    if (angle < 0.f) {
+        angle += PI;
+    }
+    if (angle > ANGLE_RANGE_START && angle < ANGLE_RANGE_END) {
+        the_value = (*pCurrent_choice == 0) ? &gProgram_state.music_volume : &gProgram_state.effects_volume;
+        old_value = *the_value;
+        *the_value = (ANGLE_RANGE_END - angle + 0.233001455141243) / 0.4660029102824859;
+        if (*the_value > 6) {
+            *the_value = 6;
+        } else if (*the_value < 0) {
+            *the_value = 0;
+        }
+        if (*the_value != old_value) {
+            SetSoundVolumes();
+            if (old_value < *the_value) {
+                DRS3StartSound(gEffects_outlet, 3000);
+            } else {
+                DRS3StartSound(gEffects_outlet, 3000);
+            }
+            MoveDialFromTo(*pCurrent_choice, 4 * old_value, 4 * *the_value);
+        }
+    }
+    return 0;
 }
 
 // IDA: void __cdecl DoSoundOptions()
 void DoSoundOptions(void) {
-    static tFlicette flicker_on[3];
-    static tFlicette flicker_off[3];
-    static tFlicette push[3];
-    static tMouse_area mouse_areas[3];
-    static tInterface_spec interface_spec;
+    static tFlicette flicker_on[3] = {
+        { 156, {  26,  52 }, {  21,  50 } },
+        { 156, { 155, 310 }, {  88, 211 } },
+        {  43, {  38,  76 }, { 153, 367 } },
+    };
+    static tFlicette flicker_off[3] = {
+        { 155, {  26,  52 }, {  21,  50 } },
+        { 155, { 155, 310 }, {  88, 211 } },
+        {  42, {  38,  76 }, { 153, 367 } },
+    };
+    static tFlicette push[3] = {
+        { 156, {  26,  52 }, {  21,  50 } },
+        { 156, { 155, 310 }, {  88, 211 } },
+        {  43, {  38,  76 }, { 153, 367 } },
+    };
+    static tMouse_area mouse_areas[3] = {
+        { {  26,  52 }, {  21,  50 }, { 144, 288 }, {  97, 233 },   0,   0,   0, SoundClick },
+        { { 155, 310 }, {  88, 211 }, { 273, 546 }, { 164, 394 },   1,   0,   0, SoundClick },
+        { {  38,  76 }, { 153, 367 }, { 101, 202 }, { 173, 415 },   2,   0,   0, NULL },
+    };
+    static tInterface_spec interface_spec = {
+        0,
+        150,
+        0,
+        0,
+        0,
+        0,
+        1,
+        { -1, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { SoundOptionsLeft, NULL },
+        { -1, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { 0, 0 },
+        { SoundOptionsRight, NULL },
+        { -1, 0 },
+        { -1, 0 },
+        { 0, 0 },
+        { 2, 0 },
+        { NULL, NULL },
+        { -1, 0 },
+        { 1, 0 },
+        { 0, 0 },
+        { 2, 0 },
+        { NULL, NULL },
+        { 1, 1 },
+        { NULL, NULL },
+        { 1, 1 },
+        { NULL, NULL },
+        NULL,
+        NULL,
+        0,
+        NULL,
+        SoundOptionsStart,
+        SoundOptionsDone,
+        0,
+        { 0, 0 },
+        NULL,
+        2,
+        1,
+        COUNT_OF(flicker_on),
+        flicker_on,
+        flicker_off,
+        push,
+        COUNT_OF(mouse_areas),
+        mouse_areas,
+        0,
+        NULL,
+    };
     int result;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DoInterfaceScreen(&interface_spec, 0, 0);
+    if (!gProgram_state.racing) {
+        RunFlic(151);
+    } else {
+        FadePaletteDown();
+    }
 }
 
 // IDA: void __cdecl GetGraphicsOptions()
@@ -1262,13 +1445,15 @@ void DrawDisabledOptions(void) {
 
     PrintMemoryDump(0, "INSIDE OPTIONS");
 
-    // Disable sound options menu
-    image = LoadPixelmap("NOSNDOPT.PIX");
-    DisableChoice(0);
-    if (image != NULL) {
-        DRPixelmapRectangleMaskedCopy(gBack_screen, gCurrent_graf_data->sound_opt_disable_x,
-            gCurrent_graf_data->sound_opt_disable_y, image, 0, 0, image->width, image->height);
-        BrPixelmapFree(image);
+    if (!harness_game_config.sound_options) {
+        // Disable sound options menu
+        image = LoadPixelmap("NOSNDOPT.PIX");
+        DisableChoice(0);
+        if (image != NULL) {
+            DRPixelmapRectangleMaskedCopy(gBack_screen, gCurrent_graf_data->sound_opt_disable_x,
+                gCurrent_graf_data->sound_opt_disable_y, image, 0, 0, image->width, image->height);
+            BrPixelmapFree(image);
+        }
     }
 
     // Disable graphics options menu when in-game
