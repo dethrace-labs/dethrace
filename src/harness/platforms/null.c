@@ -14,6 +14,10 @@ static int null_set_window_pos(void* hWnd, int x, int y, int nWidth, int nHeight
 static void null_destroy_window(void* hWnd) {
 }
 
+static int null_show_error_message(void* window, char* text, char* caption) {
+    return 0;
+}
+
 static int null_get_and_handle_message(MSG_* msg) {
     return 0;
 }
@@ -83,6 +87,7 @@ void Null_Platform_Init(tHarness_platform* platform) {
     platform->GetMousePosition = null_get_mouse_position;
     platform->GetMouseButtons = null_get_mouse_buttons;
     platform->DestroyWindow = null_destroy_window;
+    platform->ShowErrorMessage = null_show_error_message;
 
     platform->Renderer_BufferModel = NullRenderer_BufferModel;
     platform->Renderer_BufferMaterial = NullRenderer_BufferMaterial;

@@ -74,7 +74,8 @@ static void test_resource_BrResFree_Child() {
     header = UserToRes(r);
     BrResFree(r);
 
-#ifndef _DEBUG
+    /* Accessing freed memory is undefined behavior. So only do this on platforms that don't use an MMU. */
+#if defined(__DOS__)
     // when the res is free'd, magic_num is set to 1. We make sure the child was free'd when the parent was
     TEST_ASSERT_EQUAL_INT(1, header->magic_num);
 
