@@ -14,7 +14,6 @@ if(MSVC)
 endif()
 
 include(CheckCCompilerFlag)
-include(GNUInstallDirs)
 include(TestBigEndian)
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/VERSION")
@@ -90,7 +89,7 @@ endif()
 
 if(DETHRACE_INSTALL)
     install(FILES LICENSE
-        DESTINATION "${CMAKE_INSTALL_DOCDIR}"
+        DESTINATION "."
     )
 
     set(DETHRACE_PACKAGE_PLATFORM "" CACHE STRING "Dethrace binary package platform")
