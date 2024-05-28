@@ -8,8 +8,12 @@ project(dethrace C)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
 
+if(MSVC)
+    set(CMAKE_INSTALL_BINDIR "." CACHE PATH "User executables")
+    set(CMAKE_INSTALL_DOCDIR "." CACHE PATH "Documentation root")
+endif()
+
 include(CheckCCompilerFlag)
-include(GNUInstallDirs)
 include(TestBigEndian)
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/VERSION")
@@ -18,6 +22,9 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/VERSION")
 else()
     include(GetGitRevisionDescription)
     git_describe(DETHRACE_VERSION)
+    if(NOT DETHRACE_VERSION)
+        set(DETHRACE_VERSION "unknown")
+    endif()
 endif()
 
 message(STATUS "dethrace version ${DETHRACE_VERSION}")
@@ -82,39 +89,39 @@ endif()
 
 if(DETHRACE_INSTALL)
     install(FILES LICENSE
-        DESTINATION "${CMAKE_INSTALL_DOCDIR}"
+        DESTINATION "."
     )
 
-    if(CMAKE_SYSTEM_PROCESSOR MATCHES "^([xX]86|[xX]86_64|[iI].86|AMD64)$")
-        if(CMAKE_SIZEOF_VOID_P EQUAL 4)
-            set(DETHRACE_ARCH x86)
-        elseif(CMAKE_SIZEOF_VOID_P EQUAL 8)
-            set(DETHRACE_ARCH amd64)
-        else()
-            message(SEND_ERROR "Unknown CMAKE_SIZEOF_VOID_P (${CMAKE_SIZEOF_VOID_P})")
-        endif()
-    elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(ARM|arm|ARM64|aarch64)$")
-        if(CMAKE_SIZEOF_VOID_P EQUAL 4)
-            set(DETHRACE_ARCH arm)
-        elseif(CMAKE_SIZEOF_VOID_P EQUAL 8)
-            set(DETHRACE_ARCH aarch64)
-        else()
-            message(SEND_ERROR "Unknown CMAKE_SIZEOF_VOID_P (${CMAKE_SIZEOF_VOID_P})")
-        endif()
-    else()
-        message(SEND_ERROR "Unknown CMAKE_SYSTEM_PROCESSOR (${CMAKE_SYSTEM_PROCESSOR})")
+    set(DETHRACE_PACKAGE_PLATFORM "" CACHE STRING "Dethrace binary package platform")
+    set(DETHRACE_PACKAGE_ARCH "" CACHE STRING "Dethrace binary package architecture")
+
+    if(NOT DETHRACE_PACKAGE_PLATFORM)
+        set(DETHRACE_PACKAGE_PLATFORM "${CMAKE_SYSTEM_NAME}")
     endif()
 
-    set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
-    set(CPACK_PACKAGE_VERSION "${DETHRACE_VERSION}")
-    string(TOLOWER "${CMAKE_SYSTEM_NAME}-${DETHRACE_ARCH}" CPACK_SYSTEM_NAME)
+    string(TOLOWER "${DETHRACE_PACKAGE_PLATFORM}" DETHRACE_PACKAGE_PLATFORM)
+    string(TOLOWER "${DETHRACE_PACKAGE_ARCH}" DETHRACE_PACKAGE_ARCH)
+
+    set(CPACK_PACKAGE_NAME "dethrace")
+    set(CPACK_SYSTEM_NAME "${DETHRACE_PACKAGE_PLATFORM}")
+
+    set(CPACK_PACKAGE_FILE_NAME "dethrace-${DETHRACE_VERSION}-${DETHRACE_PACKAGE_PLATFORM}")
+    if(DETHRACE_PACKAGE_ARCH)
+        string(APPEND CPACK_PACKAGE_FILE_NAME "-${DETHRACE_PACKAGE_ARCH}")
+    endif()
 
     set(CPACK_PACKAGE_DIRECTORY dist)
 
     if(MSVC)
         set(CPACK_GENERATOR ZIP)
+        set(ext ".zip")
     else()
         set(CPACK_GENERATOR TGZ)
+        set(ext ".tar.gz")
+    endif()
+
+    if(EXISTS "$ENV{GITHUB_OUTPUT}")
+        file(APPEND "$ENV{GITHUB_OUTPUT}" "filename=${CPACK_PACKAGE_FILE_NAME}${ext}")
     endif()
 
     include(CPack)
