@@ -443,13 +443,13 @@ void DrawPowerups(tU32 pTime) {
                 TransDRPixelmapText(gBack_screen,
                     gCurrent_graf_data->power_up_icon_countdown_x,
                     y + gCurrent_graf_data->power_up_icon_countdown_y_offset,
-                    &gFonts[1], s, gCurrent_graf_data->power_up_icon_countdown_x + 30);
+                    &gFonts[kFont_ORANGHED], s, gCurrent_graf_data->power_up_icon_countdown_x + 30);
             } else if (the_powerup->current_value > 0) {
                 sprintf(s, "%d", the_powerup->current_value);
                 TransDRPixelmapText(gBack_screen,
                     gCurrent_graf_data->power_up_icon_countdown_x,
                     y + gCurrent_graf_data->power_up_icon_countdown_y_offset,
-                    &gFonts[2], s, gCurrent_graf_data->power_up_icon_countdown_x + 30);
+                    &gFonts[kFont_BLUEHEAD], s, gCurrent_graf_data->power_up_icon_countdown_x + 30);
             }
         } else {
             fizzle_pix = gFizzle_in[the_powerup->fizzle_type];

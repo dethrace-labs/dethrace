@@ -530,16 +530,16 @@ void InitRace(void) {
             FlushInterfaceFonts();
         }
     } else {
-        LoadFont(1);
-        LoadFont(2);
-        LoadFont(3);
+        LoadFont(kFont_ORANGHED);
+        LoadFont(kFont_BLUEHEAD);
+        LoadFont(kFont_GREENHED);
     }
-    LoadFont(4);
-    LoadFont(5);
+    LoadFont(kFont_MEDIUMHD);
+    LoadFont(kFont_TIMER);
     PossibleService();
-    LoadFont(6);
-    LoadFont(7);
-    LoadFont(8);
+    LoadFont(kFont_NEWHITE);
+    LoadFont(kFont_NEWRED);
+    LoadFont(kFont_NEWBIGGR);
     PossibleService();
     ResetRecoveryVouchers();
     gMap_mode = 0;
