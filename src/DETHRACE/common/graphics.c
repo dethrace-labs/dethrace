@@ -1687,29 +1687,28 @@ void RenderAFrame(int pDepth_mask_on) {
     }
     BrMatrix34Copy(&gCamera->t.t.mat, &old_camera_matrix);
     if (gMirror_on__graphics) {
-        LOG_WARN_ONCE("rearview mirror not implemented");
-        // BrPixelmapFill(gRearview_depth_buffer, 0xFFFFFFFF);
-        // gRendering_mirror = 1;
-        // DoSpecialCameraEffect(gRearview_camera, &gRearview_camera_to_world);
-        // ConditionallyFillWithSky(gRearview_screen);
-        // BrZbSceneRenderBegin(gUniverse_actor, gRearview_camera, gRearview_screen, gRearview_depth_buffer);
-        // ProcessNonTrackActors(
-        //     gRearview_screen,
-        //     gRearview_depth_buffer,
-        //     gRearview_camera,
-        //     &gRearview_camera_to_world,
-        //     &old_mirror_cam_matrix);
-        // ProcessTrack(gUniverse_actor, &gProgram_state.track_spec, gRearview_camera, &gRearview_camera_to_world, 0);
-        // RenderLollipops();
-        // DepthEffectSky(gRearview_screen, gRearview_depth_buffer, gRearview_camera, &gRearview_camera_to_world);
-        // DepthEffect(gRearview_screen, gRearview_depth_buffer, gRearview_camera, &gRearview_camera_to_world);
-        // if (!gAusterity_mode) {
-        //     ProcessTrack(gUniverse_actor, &gProgram_state.track_spec, gRearview_camera, &gRearview_camera_to_world, 1);
-        // }
-        // RenderSplashes();
-        // BrZbSceneRenderEnd();
-        // BrMatrix34Copy(&gRearview_camera->t.t.mat, &old_mirror_cam_matrix);
-        // gRendering_mirror = 0;
+        BrPixelmapFill(gRearview_depth_buffer, 0xFFFFFFFF);
+        gRendering_mirror = 1;
+        DoSpecialCameraEffect(gRearview_camera, &gRearview_camera_to_world);
+        ConditionallyFillWithSky(gRearview_screen);
+        BrZbSceneRenderBegin(gUniverse_actor, gRearview_camera, gRearview_screen, gRearview_depth_buffer);
+        ProcessNonTrackActors(
+            gRearview_screen,
+            gRearview_depth_buffer,
+            gRearview_camera,
+            &gRearview_camera_to_world,
+            &old_mirror_cam_matrix);
+        ProcessTrack(gUniverse_actor, &gProgram_state.track_spec, gRearview_camera, &gRearview_camera_to_world, 0);
+        RenderLollipops();
+        DepthEffectSky(gRearview_screen, gRearview_depth_buffer, gRearview_camera, &gRearview_camera_to_world);
+        DepthEffect(gRearview_screen, gRearview_depth_buffer, gRearview_camera, &gRearview_camera_to_world);
+        if (!gAusterity_mode) {
+            ProcessTrack(gUniverse_actor, &gProgram_state.track_spec, gRearview_camera, &gRearview_camera_to_world, 1);
+        }
+        RenderSplashes();
+        BrZbSceneRenderEnd();
+        BrMatrix34Copy(&gRearview_camera->t.t.mat, &old_mirror_cam_matrix);
+        gRendering_mirror = 0;
     }
     if (gMap_mode) {
         if (gNet_mode == eNet_mode_none) {
