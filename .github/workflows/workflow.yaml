@@ -15,38 +15,69 @@ jobs:
     strategy:
       matrix:
         platform:
-          - { name: Linux,    os: ubuntu-latest,  arch: amd64,  script: build-linux.sh }
-          - { name: MacOS,    os: macos-latest,   arch: amd64,  script: build-macos.sh }
-          - { name: Windows,  os: windows-latest, arch: amd64,  script: build-msvc.ps1 }
-          - { name: Windows,  os: windows-latest, arch: x86,    script: build-msvc.ps1 }
-    
-    runs-on: ${{ matrix.platform.os }}  
-    name: CI (${{ matrix.platform.name }} ${{ matrix.platform.arch }})
+          - { name: 'Linux',    arch: 'x64',        os: ubuntu-latest, werror: true }
+          - { name: 'MacOS',    arch: 'arm64-x64',  os: macos-latest,  werror: true, cmake-args: '-DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"' }
+          - { name: 'Windows',  arch: 'Win32',      os: windows-latest }
+          - { name: 'Windows',  arch: 'x64',        os: windows-latest }
+
+    defaults:
+      run:
+        shell: sh
+    runs-on: '${{ matrix.platform.os }}'
+    name: 'CI ${{ matrix.platform.name }} ${{ matrix.platform.arch }}'
     steps:
-      - uses: actions/checkout@v3
-      - name: Setup Ninja
-        uses: ashutoshvarma/setup-ninja@master
-        with:
-          version: 1.10.2
-      - uses: ilammy/msvc-dev-cmd@v1.4.1
+      - uses: actions/checkout@v4
+      - name: Set up Ninja
+        uses: aseprite/get-ninja@main
+      - uses: ilammy/msvc-dev-cmd@v1.13.0
         if: runner.os == 'Windows'
         with:
           arch: ${{ matrix.platform.arch }}
-      - name: Build
-        id: build
-        run: .github/scripts/${{ matrix.platform.script }}
-        env:
-          PLATFORM_ARCH: ${{ matrix.platform.arch }}
-      - name: Test
+      - name: Install Linux dependencies
+        if: ${{ runner.os == 'Linux' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgl-dev
+      - name: Set up SDL
+        uses: libsdl-org/setup-sdl@main
+        with:
+          cmake-arguments: ${{ matrix.platform.cmake-args }}
+          cmake-generator: Ninja
+          version: 2-latest
+          add-to-environment: true
+
+      - name: 'Prepare sources for release'
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+        run: |
+          echo "${{ github.ref_name }}" >VERSION
+      - name: 'Configure (CMake)'
+        id: configure
+        run: |
+          cmake -B build -GNinja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DBUILD_TESTS=ON \
+            -DDETHRACE_WERROR=${{ !!matrix.platform.werror }} \
+            -DCMAKE_POLICY_DEFAULT_CMP0074=NEW \
+            -DDETHRACE_INSTALL=ON \
+            -DDETHRACE_PACKAGE_PLATFORM=${{ matrix.platform.name }} \
+            -DDETHRACE_PACKAGE_ARCH=${{ matrix.platform.arch }} \
+            ${{ matrix.platform.cmake-args }}
+      - name: 'Build (CMake)'
+        run: |
+          cmake --build build
+      - name: 'Test (CTest)'
+        run: |
+          ctest --test-dir build --verbose
+      - name: 'Package (CPack)'
         run: |
           cd build
-          ctest --verbose
+          cpack .
       - name: Upload Artifact
-        if: startsWith(github.ref, 'refs/tags/') || github.ref_name == 'main'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.build.outputs.filename }}
-          path: ${{ steps.build.outputs.filename }}
+          name: '${{ steps.configure.outputs.filename }}'
+          path: 'build/dist/${{ steps.configure.outputs.filename }}'
+          if-no-files-found: error
 
   create-release:
     name: Create Release
@@ -55,7 +86,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Fetch Build Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: artifacts
       - name: Calculate Variables
@@ -64,7 +95,7 @@ jobs:
           echo "ref_name_without_v=$(echo ${GITHUB_REF_NAME} | cut -c2-)" >>$GITHUB_OUTPUT
       - name: Create Release
         id: create_release
-        uses: softprops/action-gh-release@v0.1.14
+        uses: softprops/action-gh-release@v2
         with:
           draft: false
           prerelease: false

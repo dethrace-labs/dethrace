@@ -205,11 +205,17 @@ endif()
 
 if (DETHRACE_INSTALL)
     install(TARGETS dethrace
-        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+        RUNTIME DESTINATION "."
     )
     if(MSVC)
         INSTALL(FILES $<TARGET_PDB_FILE:dethrace>
-            DESTINATION "${CMAKE_INSTALL_BINDIR}"
+            DESTINATION "."
+            OPTIONAL
+        )
+    endif()
+    if(WIN32)
+        INSTALL(FILES  $<TARGET_RUNTIME_DLLS:dethrace>
+            DESTINATION "."
             OPTIONAL
         )
     endif()

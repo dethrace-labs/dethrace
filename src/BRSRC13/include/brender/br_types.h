@@ -1911,7 +1911,7 @@ typedef struct br_renderer_dispatch {
     br_error (*_stateStoredAvail)(br_renderer*, br_int_32*, br_uint_32, br_token_value*);
     br_error (*_bufferStoredNew)(br_renderer*, br_buffer_stored**, br_token, br_device_pixelmap*, br_token_value*);
     br_error (*_bufferStoredAvail)(br_renderer*, br_int_32*, br_token, br_token_value*);
-    br_error (*_partSet)(br_renderer*, br_token, br_int_32, br_token, br_uint_32);
+    br_error (*_partSet)(br_renderer*, br_token, br_int_32, br_token, uintptr_t);
     br_error (*_partSetMany)(br_renderer*, br_token, br_int_32, br_token_value*, br_int_32*);
     br_error (*_partQuery)(br_renderer*, br_token, br_int_32, br_uint_32*, br_token);
     br_error (*_partQueryBuffer)(br_renderer*, br_token, br_int_32, br_uint_32*, br_uint_32*, br_size_t, br_token);
@@ -2261,7 +2261,7 @@ typedef struct br_primitive_state_dispatch {
     br_error (*_queryManySize)(br_object*, br_size_t*, br_token_value*);
     br_error (*_queryAll)(br_object*, br_token_value*, br_size_t);
     br_error (*_queryAllSize)(br_object*, br_size_t*);
-    br_error (*_partSet)(br_primitive_state*, br_token, br_int_32, br_token, br_uint_32);
+    br_error (*_partSet)(br_primitive_state*, br_token, br_int_32, br_token, uintptr_t);
     br_error (*_partSetMany)(br_primitive_state*, br_token, br_int_32, br_token_value*, br_int_32*);
     br_error (*_partQuery)(br_primitive_state*, br_token, br_int_32, br_uint_32*, br_token);
     br_error (*_partQueryBuffer)(br_primitive_state*, br_token, br_int_32, br_uint_32*, br_uint_32*, br_size_t, br_token);

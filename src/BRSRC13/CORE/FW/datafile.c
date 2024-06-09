@@ -308,15 +308,17 @@ int TextReadLine(br_datafile* df, char** ident, char** data) {
     LOG_TRACE9("(%p, %p, %p)", df, ident, data);
 
     while (1) {
+        int a;
         cp = BrScratchString();
-        int a = BrFileGetLine(cp, 256, df->h);
+        BrFileGetLine(cp, 256, df->h);
         if (BrFileEof(df->h) != 0) {
             return 0;
         }
         for (; (*cp == ' ') || (*cp == '\t'); cp++) {
         }
-        if (*cp != '\0')
+        if (*cp != '\0') {
             break;
+        }
     }
     *ident = cp;
     while ((*cp != ' ') && (*cp != '\t') && (*cp != '\0')) {
@@ -657,7 +659,7 @@ br_uint_32 DfStructReadBinary(br_datafile* df, br_file_struct* str, void* base) 
 
     return 1;
 }
-#include <stdio.h>
+
 // IDA: int __usercall DfStructSizeBinary@<EAX>(br_datafile *df@<EAX>, br_file_struct *str@<EDX>, void *base@<EBX>)
 int DfStructSizeBinary(br_datafile* df, br_file_struct* str, void* base) {
     unsigned char* mp;

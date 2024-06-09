@@ -1248,7 +1248,7 @@ void NetFullScreenMessage(int pStr_index, int pLeave_it_up_there) {
         s,
         gBack_screen,
         0,
-        gGraf_specs[gGraf_spec_index].total_height / 2 - gFonts[4].height,
+        gGraf_specs[gGraf_spec_index].total_height / 2 - gFonts[kFont_MEDIUMHD].height,
         gGraf_specs[gGraf_spec_index].total_width,
         gGraf_specs[gGraf_spec_index].total_height,
         1);

@@ -1725,13 +1725,13 @@ void RenderAFrame(int pDepth_mask_on) {
                 map_timer_x - gCurrent_graf_data->map_timer_border_x,
                 gCurrent_graf_data->map_timer_text_y - gCurrent_graf_data->map_timer_border_y,
                 map_timer_width + 2 * gCurrent_graf_data->map_timer_border_x,
-                gFonts[2].height + 2 * gCurrent_graf_data->map_timer_border_y,
+                gFonts[kFont_BLUEHEAD].height + 2 * gCurrent_graf_data->map_timer_border_y,
                 0);
             TransDRPixelmapText(
                 gBack_screen,
                 map_timer_x,
                 gCurrent_graf_data->map_timer_text_y,
-                &gFonts[2],
+                &gFonts[kFont_BLUEHEAD],
                 the_text,
                 gBack_screen->width);
         }
