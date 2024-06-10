@@ -296,7 +296,38 @@ void ReceivedCopInfo(tNet_contents* pContents) {
     tCar_spec* c;
     int i;
     LOG_TRACE("(%p)", pContents);
-    NOT_IMPLEMENTED();
+
+    if (gNet_mode != eNet_mode_client) {
+        return;
+    }
+    if (NetCalcSizeDecider(pContents) & 0xffffff00) {
+        c = GetCarSpec(pContents->data.cop_info.ID >> 8, pContents->data.cop_info.ID & 0xff);
+    } else {
+        c = &gProgram_state.current_car;
+    }
+    if (c == NULL || c->message.time > pContents->data.cop_info.time) {
+        return;
+    }
+    c->message.time = pContents->data.cop_info.time;
+    if (c->active) {
+        c->message.type = NETMSGID_MECHANICS;
+        c->message.mat = pContents->data.cop_info.mat;
+        BrVector3Copy(&c->message.v, &pContents->data.cop_info.v);
+        BrVector3Copy(&c->message.omega, &pContents->data.cop_info.omega);
+        c->message.curvature = (tS16)pContents->data.cop_info.curvature;
+        for (i = 0; i < COUNT_OF(c->message.d); i++) {
+            c->message.d[i] = pContents->data.cop_info.d[i];
+        }
+        for (i = 0; i < COUNT_OF(c->message.damage); i++) {
+            c->message.damage[i] = pContents->data.cop_info.damage[i];
+        }
+    } else {
+        GetExpandedMatrix(&c->car_master_actor->t.t.mat, &pContents->data.cop_info.mat);
+        BrVector3InvScale(&c->car_master_actor->t.t.translate.t, &c->car_master_actor->t.t.translate.t, WORLD_SCALE);
+        for (i = 0; i < COUNT_OF(c->damage_units); i++) {
+            c->damage_units[i].damage_level = pContents->data.cop_info.damage[i];
+        }
+    }
 }
 
 // IDA: void __cdecl SendAllNonCarPositions()
@@ -326,7 +357,14 @@ void SendAllNonCarPositions(void) {
 void ReceivedNonCarPosition(tNet_contents* pContents) {
     br_actor* actor;
     LOG_TRACE("(%p)", pContents);
-    NOT_IMPLEMENTED();
+
+    actor = gProgram_state.track_spec.non_car_list[pContents->data.non_car_position.ID];
+    if (actor != NULL && gNet_mode != eNet_mode_none) {
+        BrMatrix34Copy(&actor->t.t.mat, &pContents->data.non_car_position.mat);
+        if (pContents->data.non_car_position.flags) {
+            actor->identifier[3] = '!';
+        }
+    }
 }
 
 // IDA: void __usercall ReceivedNonCar(tNet_contents *pContents@<EAX>)
@@ -904,7 +942,12 @@ void EverybodysLost(void) {
     tNet_message* the_message;
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        gNet_players[i].played += 1;
+        the_message = NetBuildMessage(NETMSGID_RACEOVER, 0);
+        the_message->contents.data.race_over.reason = eRace_over_network_loss;
+    }
 }
 
 // IDA: void __usercall DeclareWinner(int pWinner_index@<EAX>)
@@ -996,7 +1039,16 @@ int FarEnoughAway(tNet_game_player_info* pPlayer_1, tNet_game_player_info* pPlay
 // IDA: void __usercall CarInContactWithItOrFox(tNet_game_player_info *pPlayer@<EAX>)
 void CarInContactWithItOrFox(tNet_game_player_info* pPlayer) {
     LOG_TRACE("(%p)", pPlayer);
-    NOT_IMPLEMENTED();
+
+    if (gCurrent_net_game->type == eNet_game_type_tag || gCurrent_net_game->type == eNet_game_type_foxy) {
+        if (PDGetTotalTime() - gLast_it_change > 500) {
+            gLast_it_change = PDGetTotalTime();
+            if (gIt_or_fox >= 0) {
+                gLast_lepper = &gNet_players[gIt_or_fox];
+            }
+            PlayerIsIt(pPlayer);
+        }
+    }
 }
 
 // IDA: void __usercall SelectRandomItOrFox(int pNot_this_one@<EAX>)
@@ -1461,12 +1513,12 @@ void ReceivedGameplay(tNet_contents* pContents, tNet_message* pMessage, tU32 pRe
             memcpy(gPixels_copy, gBack_screen->pixels, gPixel_buffer_size);
             memcpy(gPalette_copy, gCurrent_palette_pixels, 1024);
             pause_semaphore = 1;
-            NetFullScreenMessage(228, 1);
+            NetFullScreenMessage(kMiscString_PLEASE_WAIT_HOST_HAS_PAUSED, 1);
             must_revert_reentrancy = PermitNetServiceReentrancy();
             do {
                 NetService(0);
                 if (CheckQuit()) {
-                    NetFullScreenMessage(228, 1);
+                    NetFullScreenMessage(kMiscString_PLEASE_WAIT_HOST_HAS_PAUSED, 1);
                 }
             } while (gWaiting_for_unpause
                 && gProgram_state.prog_status != eProg_idling
@@ -1551,7 +1603,16 @@ void SendGameplayToAllPlayers(tNet_gameplay_mess pMess, int pParam_1, int pParam
 void SendGameplayToHost(tNet_gameplay_mess pMess, int pParam_1, int pParam_2, int pParam_3, int pParam_4) {
     tNet_message* the_message;
     LOG_TRACE("(%d, %d, %d, %d, %d)", pMess, pParam_1, pParam_2, pParam_3, pParam_4);
-    NOT_IMPLEMENTED();
+
+    if (gNet_mode == eNet_mode_client) {
+        the_message = NetBuildMessage(NETMSGID_GAMEPLAY, 0);
+        the_message->contents.data.gameplay.mess = pMess;
+        the_message->contents.data.gameplay.param_1 = pParam_1;
+        the_message->contents.data.gameplay.param_2 = pParam_2;
+        the_message->contents.data.gameplay.param_3 = pParam_3;
+        the_message->contents.data.gameplay.param_4 = pParam_4;
+        NetGuaranteedSendMessageToHost(gCurrent_net_game, the_message, NULL);
+    }
 }
 
 // IDA: void __cdecl InitNetGameplayStuff()

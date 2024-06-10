@@ -1158,13 +1158,26 @@ tSO_result DoEndRaceSummary2(void) {
 //  Suffix added to avoid duplicate symbol
 void DrawAnItem__racesumm(int pX, int pY_index, int pFont_index, char* pText) {
     LOG_TRACE("(%d, %d, %d, \"%s\")", pX, pY_index, pFont_index, pText);
-    NOT_IMPLEMENTED();
+
+    TransBrPixelmapText(gBack_screen,
+        pX,
+        gCurrent_graf_data->net_sum_headings_y + gCurrent_graf_data->net_sum_y_pitch * pY_index,
+        pFont_index,
+        gFont_7,
+        pText);
 }
 
 // IDA: void __usercall DrawColumnHeading(int pStr_index@<EAX>, int pX@<EDX>)
 //  Suffix added to avoid duplicate symbol
 void DrawColumnHeading__racesumm(int pStr_index, int pX) {
     LOG_TRACE("(%d, %d)", pStr_index, pX);
+
+    TransBrPixelmapText(gBack_screen,
+        pX,
+        gCurrent_graf_data->net_sum_headings_y - gCurrent_graf_data->net_sum_y_pitch,
+        250,
+        gFont_7,
+        GetMiscString(pStr_index));
 }
 
 // IDA: int __usercall SortScores@<EAX>(void *pFirst_one@<EAX>, void *pSecond_one@<EDX>)
@@ -1186,7 +1199,44 @@ void NetSumDraw(int pCurrent_choice, int pCurrent_mode) {
     char s[256];
     tNet_game_player_info* player;
     LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    DrawColumnHeading__racesumm(kMiscString_PLAYED, gCurrent_graf_data->net_sum_x_3);
+    DrawColumnHeading__racesumm(kMiscString_WON, gCurrent_graf_data->net_sum_x_4);
+    DrawColumnHeading__racesumm(kMiscString_SCORE, gCurrent_graf_data->net_sum_x_5);
+    BrPixelmapLine(gBack_screen,
+        gCurrent_graf_data->net_sum_x_1,
+        gCurrent_graf_data->net_sum_headings_y + 1 + gFont_7->glyph_y - gCurrent_graf_data->net_sum_y_pitch,
+        gBack_screen->width - gCurrent_graf_data->net_sum_x_1,
+        gCurrent_graf_data->net_sum_headings_y + 1 + gFont_7->glyph_y - gCurrent_graf_data->net_sum_y_pitch,
+        252);
+    for (i = 0; i < gNumber_of_net_players; i++) {
+
+        player = &gNet_players[gPlayer_lookup[i]];
+
+        strcpy(s, player->player_name);
+        if (player->host) {
+            strcat(s, " -");
+            strcat(s, GetMiscString(kMiscString_HOST));
+            strcat(s, "-");
+        }
+        TurnOffPaletteConversion();
+        DRPixelmapRectangleMaskedCopy(gBack_screen,
+            gCurrent_graf_data->net_sum_x_1,
+            gCurrent_graf_data->net_sum_headings_y + 1 + i * gCurrent_graf_data->net_sum_y_pitch,
+            gIcons_pix,
+            0,
+            gCurrent_graf_data->net_head_icon_height * player->car_index,
+            gIcons_pix->width,
+            gCurrent_graf_data->net_head_icon_height);
+        TurnOnPaletteConversion();
+        DrawAnItem__racesumm(gCurrent_graf_data->net_sum_x_2, i, 83, s);
+        sprintf(s, "%d", player->played);
+        DrawAnItem__racesumm(gCurrent_graf_data->net_sum_x_3, i, 83, s);
+        sprintf(s, "%d", player->won);
+        DrawAnItem__racesumm(gCurrent_graf_data->net_sum_x_4, i, 83, s);
+        sprintf(s, "%d", player->games_score);
+        DrawAnItem__racesumm(gCurrent_graf_data->net_sum_x_5, i, 83, s);
+    }
 }
 
 // IDA: void __cdecl DoNetRaceSummary()

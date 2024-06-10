@@ -8,6 +8,7 @@
 #define PI 3.14159265358979323846
 #define TAU 6.283185307179586
 
+#define BR_SQR2(a, b) ((a) * (a) + (b) * (b))
 #define BR_MAC3(a, b, c, d, e, f) ((a) * (b) + (c) * (d) + (e) * (f))
 #define BR_SQR3(a, b, c) ((a) * (a) + (b) * (b) + (c) * (c))
 

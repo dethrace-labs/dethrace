@@ -1607,7 +1607,14 @@ void ReadShrapnelMaterials(FILE* pF, tCollision_info* pCar_spec) {
 void CloneCar(tCar_spec** pOutput_car, tCar_spec* pInput_car) {
     int i;
     LOG_TRACE("(%p, %p)", pOutput_car, pInput_car);
-    NOT_IMPLEMENTED();
+
+    *pOutput_car = BrMemAllocate(sizeof(tCar_spec), kMem_cop_car_spec);
+    *pOutput_car = pInput_car;
+    (*pOutput_car)->car_master_actor = CloneActor(pInput_car->car_master_actor);
+    BrActorAdd(gNon_track_actor, (*pOutput_car)->car_master_actor);
+    for (i = 0; i < pInput_car->car_actor_count; i++) {
+        (*pOutput_car)->car_model_actors[i].actor = DRActorFindRecurse((*pOutput_car)->car_master_actor, pInput_car->car_model_actors[i].actor->identifier);
+    }
 }
 
 // IDA: void __usercall DisposeClonedCar(tCar_spec *pCar@<EAX>)
@@ -2897,7 +2904,11 @@ float GetAFloatPercent(FILE* pF) {
     char* str;
     float result;
     LOG_TRACE("(%p)", pF);
-    NOT_IMPLEMENTED();
+
+    GetALineAndDontArgue(pF, s);
+    str = strtok(s, "\t ,/");
+    sscanf(str, "%f", &result);
+    return result / 100.f;
 }
 
 // IDA: void __usercall GetPairOfFloats(FILE *pF@<EAX>, float *pF1@<EDX>, float *pF2@<EBX>)
@@ -2957,7 +2968,16 @@ void GetThreeIntsAndAString(FILE* pF, int* pF1, int* pF2, int* pF3, char* pS) {
     char s[256];
     char* str;
     LOG_TRACE("(%p, %p, %p, %p, \"%s\")", pF, pF1, pF2, pF3, pS);
-    NOT_IMPLEMENTED();
+
+    GetALineAndDontArgue(pF, s);
+    str = strtok(s, "\t ,/");
+    sscanf(str, "%d", pF1);
+    str = strtok(NULL, "\t ,/");
+    sscanf(str, "%d", pF2);
+    str = strtok(NULL, "\t ,/");
+    sscanf(str, "%d", pF3);
+    str = strtok(NULL, "\t ,/");
+    strcpy(pS, str);
 }
 
 // IDA: void __usercall GetFourInts(FILE *pF@<EAX>, int *pF1@<EDX>, int *pF2@<EBX>, int *pF3@<ECX>, int *pF4)
@@ -2986,7 +3006,8 @@ br_scalar GetAScalar(FILE* pF) {
 // IDA: void __usercall GetPairOfScalars(FILE *pF@<EAX>, br_scalar *pS1@<EDX>, br_scalar *pS2@<EBX>)
 void GetPairOfScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2) {
     LOG_TRACE("(%p, %p, %p)", pF, pS1, pS2);
-    NOT_IMPLEMENTED();
+
+    GetPairOfFloats(pF, pS1, pS2);
 }
 
 // IDA: void __usercall GetThreeScalars(FILE *pF@<EAX>, br_scalar *pS1@<EDX>, br_scalar *pS2@<EBX>, br_scalar *pS3@<ECX>)

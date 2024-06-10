@@ -1105,7 +1105,6 @@ void ConcussMe(void) {
 // IDA: void __cdecl CheckHelp()
 void CheckHelp(void) {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl CheckLoadSave()

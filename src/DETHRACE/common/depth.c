@@ -924,7 +924,15 @@ void ToggleSkyQuietly(void) {
 // IDA: void __cdecl ToggleSky()
 void ToggleSky(void) {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    SetSkyTextureOn(!GetSkyTextureOn());
+    if (gProgram_state.current_depth_effect.sky_texture != NULL) {
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_SkyTextureOn));
+    } else if (gSwap_sky_texture != NULL) {
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_SkyTextureOff));
+    } else {
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_ThereIsNoSkyTextureForThisRace));
+    }
 }
 
 // IDA: int __cdecl GetDepthCueingOn()
@@ -968,7 +976,15 @@ void ToggleDepthCueingQuietly(void) {
 // IDA: void __cdecl ToggleDepthCueing()
 void ToggleDepthCueing(void) {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    SetDepthCueingOn(!GetDepthCueingOn());
+    if (gProgram_state.current_depth_effect.type != eDepth_effect_none) {
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_DepthCueingOn));
+    } else if (gSwap_depth_effect_type != eDepth_effect_none) {
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_DepthCueingOff));
+    } else {
+        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_ThereIsNoDepthCueingForThisRace));
+    }
 }
 
 // IDA: void __cdecl ChangeDepthEffect()

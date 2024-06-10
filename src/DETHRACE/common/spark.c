@@ -1,7 +1,9 @@
 #include "spark.h"
 #include "brender/brender.h"
 #include "car.h"
+#include "crush.h"
 #include "depth.h"
+#include "displays.h"
 #include "errors.h"
 #include "globvars.h"
 #include "globvrkm.h"
@@ -1206,7 +1208,12 @@ void GenerateContinuousSmoke(tCar_spec* pCar, int wheel, tU32 pTime) {
 // IDA: void __cdecl DustRotate()
 void DustRotate(void) {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gDust_rotate += 1;
+    if (gDust_rotate >= gNum_dust_tables) {
+        gDust_rotate = 0;
+    }
+    NewTextHeadupSlot(4, 0, 1000, -4, "Dust colour rotated");
 }
 
 // IDA: void __usercall RenderSmoke(br_pixelmap *pRender_screen@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>, tU32 pTime)
@@ -2160,7 +2167,9 @@ void SetSmokeOn(int pSmoke_on) {
 // IDA: void __usercall ReallySetSmokeOn(int pSmoke_on@<EAX>)
 void ReallySetSmokeOn(int pSmoke_on) {
     LOG_TRACE("(%d)", pSmoke_on);
-    NOT_IMPLEMENTED();
+
+    ResetSmoke();
+    ResetSmokeColumns();
 }
 
 // IDA: void __usercall SetSmoke(int pSmoke_on@<EAX>)
@@ -2647,7 +2656,42 @@ void DoModelThing(br_actor* actor, br_model* pModel, br_material* material, void
     tU32 t;
     int val;
     LOG_TRACE("(%p, %p, %p, %p, %d, %d)", actor, pModel, material, render_data, style, on_screen);
-    NOT_IMPLEMENTED();
+
+    GetRaceTime();
+    for (group = 0; group < V11MODEL(pModel)->ngroups; group++) {
+        for (j = 0; j < V11MODEL(pModel)->groups[group].nvertices; j++) {
+            if (!((V11MODEL(pModel)->groups[group].vertex_colours[j] >> 24) & 1)) {
+                if ((V11MODEL(pModel)->groups[group].vertex_colours[j] >> 24) < 0xc9) {
+                    val = ((V11MODEL(pModel)->groups[group].vertex_colours[j] >> 24) + 2 * IRandomBetween(5, 10)) << 24;
+                    V11MODEL(pModel)->groups[group].vertex_colours[j] = BR_COLOUR_RGBA(0, 0, 0, val);
+                    if (pModel->flags & BR_MODF_UPDATEABLE) {
+                        pModel->vertices[V11MODEL(pModel)->groups[group].vertex_user[j]].index = val;
+                    }
+                } else {
+                    V11MODEL(pModel)->groups[group].vertex_colours[j] = BR_COLOUR_RGBA(0, 0, 0, 0xc9);
+                    if (pModel->flags & BR_MODF_UPDATEABLE) {
+                        pModel->vertices[V11MODEL(pModel)->groups[group].vertex_user[j]].index = val;
+                    }
+                }
+            } else if ((V11MODEL(pModel)->groups[group].vertex_colours[j] >> 24) < 20) {
+                V11MODEL(pModel)->groups[group].vertex_colours[j] = 0;
+                if (pModel->flags & BR_MODF_UPDATEABLE) {
+                    pModel->vertices[V11MODEL(pModel)->groups[group].vertex_user[j]].index = 0;
+                }
+            } else {
+                val = ((V11MODEL(pModel)->groups[group].vertex_colours[j] >> 24) - 2 * IRandomBetween(5, 10)) << 24;
+                V11MODEL(pModel)->groups[group].vertex_colours[j] = BR_COLOUR_RGBA(0, 0, 0, val);
+                if (pModel->flags & BR_MODF_UPDATEABLE) {
+                    pModel->vertices[V11MODEL(pModel)->groups[group].vertex_user[j]].index = val;
+                }
+            }
+        }
+    }
+    if ((pModel->flags & BR_MODF_UPDATEABLE) && pModel->user != NULL) {
+        BrModelUpdate(pModel, BR_MODU_VERTEX_POSITIONS);
+    }
+    pModel->user = NULL;
+    BrZbModelRender(actor, pModel, material, style, BrOnScreenCheck(&pModel->bounds), 0);
 }
 
 // IDA: void __usercall SetModelShade(br_actor *pActor@<EAX>, br_pixelmap *pShade@<EDX>)
@@ -2680,9 +2724,6 @@ void MakeCarIt(tCar_spec* pCar) {
     int i;
     LOG_TRACE("(%p)", pCar);
 
-    STUB();
-    return;
-
     shade[0] = gIt_shade_table;
     shade[1] = gFog_shade_table;
     shade[2] = gShade_list[0];
@@ -2713,5 +2754,33 @@ void StopCarBeingIt(tCar_spec* pCar) {
     br_actor* actor;
     br_actor* bonny;
     LOG_TRACE("(%p)", pCar);
-    STUB();
+
+    actor = pCar->car_model_actors[pCar->principal_car_actor].actor;
+    bonny = pCar->car_model_actors[pCar->car_actor_count - 1].actor;
+    if (actor->model->custom == DoModelThing) {
+        actor->model->flags &= BR_MODF_CUSTOM;
+        SetModelShade(actor, gShade_list[0]);
+        for (group = 0; group < V11MODEL(actor->model)->ngroups; group++) {
+            for (i = 0; i < V11MODEL(actor->model)->groups[group].nvertices; i++) {
+                V11MODEL(actor->model)->groups[group].vertex_colours[i] = 0;
+                if (actor->model->flags & BR_MODF_UPDATEABLE) {
+                    actor->model->vertices[V11MODEL(actor->model)->groups[group].vertex_user[i]].index = 0;
+                }
+            }
+        }
+        SetModelForUpdate(actor->model, pCar, 0);
+        if (bonny != actor) {
+            bonny->model->flags &= BR_MODF_CUSTOM;
+            SetModelShade(bonny, gShade_list[0]);
+            for (group = 0; group < V11MODEL(bonny->model)->ngroups; group++) {
+                for (i = 0; i < V11MODEL(bonny->model)->groups[group].nvertices; i++) {
+                    V11MODEL(bonny->model)->groups[group].vertex_colours[i] = 0;
+                    if (bonny->model->flags & BR_MODF_UPDATEABLE) {
+                        bonny->model->vertices[V11MODEL(bonny->model)->groups[group].vertex_user[i]].index = 0;
+                    }
+                }
+            }
+            SetModelForUpdate(bonny->model, pCar, 0);
+        }
+    }
 }

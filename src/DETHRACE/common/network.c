@@ -180,7 +180,15 @@ void NetSendHeadupToAllPlayers(char* pMessage) {
 void NetSendHeadupToEverybody(char* pMessage) {
     tNet_contents* the_contents;
     LOG_TRACE("(\"%s\")", pMessage);
-    NOT_IMPLEMENTED();
+
+    if (gNet_mode == eNet_mode_none) {
+        return;
+    }
+    if (gProgram_state.racing) {
+        NewTextHeadupSlot(4, 0, 3000, -4, pMessage);
+    }
+    the_contents = NetGetBroadcastContents(NETMSGID_HEADUP, 0);
+    strcpy(the_contents->data.headup.text, pMessage);
 }
 
 // IDA: void __usercall NetSendHeadupToPlayer(char *pMessage@<EAX>, tPlayer_ID pPlayer@<EDX>)
@@ -392,7 +400,8 @@ void NetSetPlayerSystemInfo(tNet_game_player_info* pPlayer, void* pSender_addres
 // IDA: void __usercall NetDisposePlayer(tNet_game_player_info *pPlayer@<EAX>)
 void NetDisposePlayer(tNet_game_player_info* pPlayer) {
     LOG_TRACE("(%p)", pPlayer);
-    NOT_IMPLEMENTED();
+
+    PDNetDisposePlayer(pPlayer);
 }
 
 // IDA: void __usercall FillInThisPlayer(tNet_game_details *pGame@<EAX>, tNet_game_player_info *pPlayer@<EDX>, int pCar_index@<EBX>, int pHost@<ECX>)
@@ -634,7 +643,8 @@ tNet_game_details* NetHostGame(tNet_game_type pGame_type, tNet_game_options* pOp
 // IDA: int __usercall NetInitClient@<EAX>(tNet_game_details *pDetails@<EAX>)
 int NetInitClient(tNet_game_details* pDetails) {
     LOG_TRACE("(%p)", pDetails);
-    NOT_IMPLEMENTED();
+
+    return PDNetInitClient(pDetails);
 }
 
 // IDA: int __usercall NetJoinGameLowLevel@<EAX>(tNet_game_details *pDetails@<EAX>, char *pPlayer_name@<EDX>)
@@ -746,7 +756,19 @@ int NetSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessage,
 int NetSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage, tPlayer_ID pPlayer) {
     int i;
     LOG_TRACE("(%p, %p, %d)", pDetails, pMessage, pPlayer);
-    NOT_IMPLEMENTED();
+
+    if (gNet_mode == eNet_mode_none) {
+        return -1;
+    }
+    pMessage->sender = gLocal_net_ID;
+    pMessage->senders_time_stamp = PDGetTotalTime();
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (gNet_players[i].ID == pPlayer) {
+            GetCheckSum(pMessage);
+            return PDNetSendMessageToAddress(pDetails, pMessage, &gNet_players[i]);
+        }
+    }
+    return -1;
 }
 
 // IDA: int __usercall NetSendMessageToHost@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>)
@@ -765,7 +787,8 @@ int NetSendMessageToHost(tNet_game_details* pDetails, tNet_message* pMessage) {
 // IDA: int __usercall NetReplyToMessage@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pIncoming_message@<EDX>, tNet_message *pReply_message@<EBX>)
 int NetReplyToMessage(tNet_game_details* pDetails, tNet_message* pIncoming_message, tNet_message* pReply_message) {
     LOG_TRACE("(%p, %p, %p)", pDetails, pIncoming_message, pReply_message);
-    NOT_IMPLEMENTED();
+
+    return NetSendMessageToPlayer(pDetails, pReply_message, pIncoming_message->sender);
 }
 
 // IDA: int __usercall NetSendMessageToAllPlayers@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>)
@@ -878,7 +901,8 @@ tU32 NetGetMessageSize(tNet_message_type pType, tS32 pSize_decider) {
 tS32 NetCalcSizeDecider(tNet_contents* pContents) {
     tS32 the_decider;
     LOG_TRACE("(%p)", pContents);
-    NOT_IMPLEMENTED();
+
+    return 0;
 }
 
 // IDA: tNet_message* __usercall NetBuildMessage@<EAX>(tNet_message_type pType@<EAX>, tS32 pSize_decider@<EDX>)
@@ -1210,7 +1234,8 @@ void KickPlayerOut(tPlayer_ID pID) {
 // IDA: void __usercall ReceivedLeave(tNet_contents *pContents@<EAX>, tNet_message *pMessage@<EDX>)
 void ReceivedLeave(tNet_contents* pContents, tNet_message* pMessage) {
     LOG_TRACE("(%p, %p)", pContents, pMessage);
-    NOT_IMPLEMENTED();
+
+    KickPlayerOut(pMessage->sender);
 }
 
 // IDA: void __usercall NetFullScreenMessage(int pStr_index@<EAX>, int pLeave_it_up_there@<EDX>)
@@ -1289,7 +1314,7 @@ void HostHasBittenTheDust(int pMessage_index) {
 void ReceivedHosticide(tNet_contents* pContents) {
     LOG_TRACE("(%p)", pContents);
 
-    HostHasBittenTheDust(73);
+    HostHasBittenTheDust(kMiscString_GAME_TERMINATED_BY_HOST);
 }
 
 // IDA: void __cdecl ConfirmReceipt()
@@ -1482,14 +1507,14 @@ void ReceivedHostReply(tNet_contents* pContents) {
 
     if (pContents->data.heres_where_we_at.race_index != gProgram_state.current_race_index) {
         NetLeaveGame(gCurrent_net_game);
-        NetFullScreenMessage(128, 0);
+        NetFullScreenMessage(kMiscString_RACE_CHANGED_DURING_LOADING, 0);
         gProgram_state.prog_status = eProg_idling;
     }
     if (pContents->data.heres_where_we_at.race_has_started) {
         if (gCurrent_net_game->options.open_game) {
             gPending_race = pContents->data.heres_where_we_at.pending_race;
         } else {
-            NetFullScreenMessage(89, 0);
+            NetFullScreenMessage(kMiscString_SORRY_YOU_RE_TOO_LATE, 0);
             gProgram_state.prog_status = eProg_idling;
         }
     }
@@ -1533,19 +1558,25 @@ void ReceivedTimeSync(tNet_contents* pContents, tNet_message* pMessage, tU32 pRe
 void ReceivedConfirm(tNet_contents* pContents) {
     int i;
     LOG_TRACE("(%p)", pContents);
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (gNet_players[i].ID == pContents->data.confirm.player) {
+            gNet_players[i].awaiting_confirmation = 0;
+            return;
+        }
+    }
 }
 
 // IDA: void __usercall ReceivedDisableCar(tNet_contents *pContents@<EAX>)
 void ReceivedDisableCar(tNet_contents* pContents) {
     LOG_TRACE("(%p)", pContents);
-    NOT_IMPLEMENTED();
+
 }
 
 // IDA: void __usercall ReceivedEnableCar(tNet_contents *pContents@<EAX>)
 void ReceivedEnableCar(tNet_contents* pContents) {
     LOG_TRACE("(%p)", pContents);
-    NOT_IMPLEMENTED();
+
 }
 
 // IDA: void __usercall ReceivedScores(tNet_contents *pContents@<EAX>)
@@ -1860,7 +1891,7 @@ void CheckForDisappearees(void) {
             }
         }
     } else if (!gHost_died && gNumber_of_net_players != 0 && gNet_players[0].last_heard_from_him != 0 && the_time - gNet_players[0].last_heard_from_him >= 20000) {
-        HostHasBittenTheDust(91);
+        HostHasBittenTheDust(kMiscString_PANIC_HOST_HAS_DISAPPEARED);
     }
 }
 
@@ -2088,7 +2119,8 @@ void ResendGuaranteedMessages(void) {
 // IDA: int __usercall SampleFailNotifier@<EAX>(tU32 pAge@<EAX>, tNet_message *pMessage@<EDX>)
 int SampleFailNotifier(tU32 pAge, tNet_message* pMessage) {
     LOG_TRACE("(%d, %p)", pAge, pMessage);
-    NOT_IMPLEMENTED();
+
+    return pAge > 9999;
 }
 
 // IDA: void __cdecl NetWaitForGuaranteeReplies()

@@ -1574,7 +1574,9 @@ void ReadNetGameChoices(tNet_game_type* pGame_type, tNet_game_options* pGame_opt
 // IDA: int __usercall ChooseStartRace@<EAX>(int *pRank@<EAX>)
 int ChooseStartRace(int* pRank) {
     LOG_TRACE("(%p)", pRank);
-    NOT_IMPLEMENTED();
+
+    *pRank = 0;
+    return 1;
 }
 
 // IDA: void __usercall SetUpOtherNetThings(tNet_game_details *pNet_game@<EAX>)
@@ -1760,7 +1762,7 @@ int DoMultiPlayerStart(void) {
     }
 
     if (gAusterity_mode) {
-        NetFullScreenMessage(192, 0);
+        NetFullScreenMessage(kMiscString_NOT_ENOUGH_MEMORY, 0);
         return 0;
     }
     if (NetInitialise()) {

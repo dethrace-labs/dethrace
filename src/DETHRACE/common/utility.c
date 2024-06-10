@@ -1147,7 +1147,20 @@ void SubsStringJob(char* pStr, ...) {
     char* sub_pt;
     va_list ap;
     LOG_TRACE("(\"%s\")", pStr);
-    NOT_IMPLEMENTED();
+
+    va_start(ap, pStr);
+    for (;;) {
+        sub_pt = strchr(pStr, '%');
+        if (sub_pt == NULL) {
+            va_end(ap);
+            return;
+        }
+        sub_str = va_arg(ap, char *);
+        StripCR(sub_str);
+        strcpy(temp_str, &sub_pt[1]);
+        strcpy(sub_pt, sub_str);
+        strcat(pStr, temp_str);
+    }
 }
 
 // IDA: void __usercall DecodeLine2(char *pS@<EAX>)

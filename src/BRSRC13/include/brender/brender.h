@@ -149,6 +149,10 @@ void BrPixelmapText(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_uint_32 colou
 void BrPixelmapTextF(br_pixelmap* dst, br_int_32 x, br_int_32 y, br_uint_32 colour, br_font* font, char* fmt, ...);
 br_uint_16 BrPixelmapTextWidth(br_pixelmap* dst, br_font* font, char* text);
 
+// BrEuler
+br_matrix34* BrEulerToMatrix34(br_matrix34* mat, br_euler* euler);
+br_euler* BrMatrix34ToEuler(br_euler* euler, br_matrix34* mat);
+
 // BrRes
 void* BrResAllocate(void* vparent, br_size_t size, br_uint_8 res_class);
 br_resource_class* BrResClassAdd(br_resource_class* rclass);
