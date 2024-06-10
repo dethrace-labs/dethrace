@@ -667,7 +667,29 @@ void DoPratcamHit(br_vector3* pHit_vector) {
     br_scalar strength;
     LOG_TRACE("(%p)", pHit_vector);
 
-    STUB_ONCE();
+    strength = BrVector3LengthSquared(pHit_vector);
+    if (strength > 0.2f) {
+        strength_modifier = 8;
+    } else if (strength > 0.015f) {
+        strength_modifier = 4;
+    } else if (strength >= 0.001f) {
+        strength_modifier = 0;
+    } else {
+        return;
+    }
+    if (fabsf(pHit_vector->v[2]) >= fabsf(pHit_vector->v[0])) {
+        if (pHit_vector->v[2] >= 0.f) {
+            PratcamEvent(14 + strength_modifier);
+        } else {
+            PratcamEvent(13 + strength_modifier);
+        }
+    } else {
+        if (pHit_vector->v[0] >= 0.f) {
+            PratcamEvent(15 + strength_modifier);
+        } else {
+            PratcamEvent(16 + strength_modifier);
+        }
+    }
 }
 
 // IDA: void __usercall DamageSystems(tCar_spec *pCar@<EAX>, br_vector3 *pImpact_point@<EDX>, br_vector3 *pEnergy_vector@<EBX>, int pWas_hitting_a_car@<ECX>)

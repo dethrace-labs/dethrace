@@ -709,7 +709,11 @@ void InitializePalettes(void) {
 void SwitchToPalette(char* pPal_name) {
     br_pixelmap* the_palette;
     LOG_TRACE("(\"%s\")", pPal_name);
-    NOT_IMPLEMENTED();
+
+    the_palette = BrTableFind(pPal_name);
+    if (the_palette != NULL) {
+        DRSetPalette(the_palette);
+    }
 }
 
 // IDA: void __cdecl ClearEntireScreen()

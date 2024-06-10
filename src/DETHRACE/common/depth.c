@@ -998,7 +998,11 @@ void ChangeDepthEffect(void) {
     br_scalar distance;
     tSpecial_volume* special_volume;
     LOG_TRACE("()");
-    STUB_ONCE();
+
+    gProgram_state.current_depth_effect.type = gProgram_state.default_depth_effect.type;
+    gProgram_state.current_depth_effect.sky_texture = gProgram_state.default_depth_effect.sky_texture;
+    gProgram_state.current_depth_effect.start = gProgram_state.default_depth_effect.start;
+    gProgram_state.current_depth_effect.end = gProgram_state.default_depth_effect.end;
 }
 
 // IDA: void __cdecl MungeForwardSky()
