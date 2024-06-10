@@ -1209,8 +1209,8 @@ void NetSumDraw(int pCurrent_choice, int pCurrent_mode) {
         gBack_screen->width - gCurrent_graf_data->net_sum_x_1,
         gCurrent_graf_data->net_sum_headings_y + 1 + gFont_7->glyph_y - gCurrent_graf_data->net_sum_y_pitch,
         252);
-    for (i = 0; i < gNumber_of_net_players; i++) {
 
+    for (i = 0; i < gNumber_of_net_players; i++) {
         player = &gNet_players[gPlayer_lookup[i]];
 
         strcpy(s, player->player_name);

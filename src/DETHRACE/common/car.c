@@ -1538,7 +1538,7 @@ void ControlCar2(tCar_spec* c, br_scalar dt) {
             c->turn_speed -= 0.01f * dt / 0.04f / 2.f;
         }
     }
-    if (c->keys.left && c->keys.right) {
+    if (!c->keys.left && !c->keys.right) {
         c->turn_speed = 0.f;
     }
     c->curvature += c->turn_speed;
@@ -1569,13 +1569,13 @@ void ControlCar3(tCar_spec* c, br_scalar dt) {
         if (c->turn_speed > 0.f) {
             c->turn_speed = 0.f;
         }
-        if (c->curvature >= 0.f && c->omega.v[1] <= 0.f) {
+        if (c->curvature <= 0.f && c->omega.v[1] <= 0.f) {
             c->turn_speed -= dt / 0.04f * (0.05f / (5.f + BrVector3Length(&c->v)) / 2.f) * 0.75f;
         } else {
             c->turn_speed -= 0.01f * dt / 0.04f / 2.f * 3.f;
         }
     }
-    if (c->keys.left && c->keys.right) {
+    if (!c->keys.left && !c->keys.right) {
         c->turn_speed = 0.f;
     }
     c->curvature += c->turn_speed;
@@ -1650,7 +1650,7 @@ void ControlCar5(tCar_spec* c, br_scalar dt) {
         c->acc_force = 7.f * c->M;
     }
     if (c->keys.dec) {
-        c->acc_force = - 7.f * c->M;
+        c->acc_force = -7.f * c->M;
     }
     if (c->keys.left) {
         if (c->turn_speed < 0.f) {
@@ -1711,14 +1711,14 @@ void ControlCar1(tCar_spec* c, br_scalar dt) {
         if (c->curvature >= 0.f) {
             c->curvature += dt / 0.04f * 0.05f / (5.f + BrVector3Length(&c->v));
         } else {
-            c->curvature += dt / 0.04f * 0.05f;
+            c->curvature += 0.01f * dt / 0.04f;
         }
     }
     if (c->keys.right) {
         if (c->curvature <= 0.f) {
             c->curvature -= dt / 0.04f * 0.05f / (5.f + BrVector3Length(&c->v));
         } else {
-            c->curvature -= dt / 0.04f * 0.05f;
+            c->curvature -= 0.01f * dt / 0.04f;
         }
     }
     if (c->curvature > c->maxcurve) {
@@ -4556,7 +4556,7 @@ tCar_spec* GetRaceLeader(void) {
     tCar_spec* car;
     LOG_TRACE("()");
 
-    if ((gCurrent_net_game->type == eNet_game_type_foxy || gCurrent_net_game->type == eNet_game_type_tag) && gIt_or_fox > -1 && gIt_or_fox > gNumber_of_net_players) {
+    if ((gCurrent_net_game->type == eNet_game_type_foxy || gCurrent_net_game->type == eNet_game_type_tag) && gIt_or_fox >= 0 && gIt_or_fox < gNumber_of_net_players) {
         car = gNet_players[gIt_or_fox].car;
     } else {
         car = gNet_players[0].car;
@@ -5679,7 +5679,7 @@ int CollideCameraWithOtherCars(br_vector3* car_pos, br_vector3* cam_pos) {
                 BrVector3Add(&pos_car_space, &p, &dir);
                 BrVector3SetFloat(&tv, 0.03f, 0.03f, 0.03f);
                 BrVector3Sub(&bnds.min, &c->bounds[0].min, &tv);
-                BrVector3Add(&bnds.max, &c->bounds[0].min, &tv);
+                BrVector3Add(&bnds.max, &c->bounds[0].max, &tv);
                 plane = LineBoxColl(&pos_car_space, &p, &bnds, &tv);
                 BrMatrix34ApplyP(cam_pos, &tv, &c->car_master_actor->t.t.mat);
                 return 1;

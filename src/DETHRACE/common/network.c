@@ -758,7 +758,7 @@ int NetSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage, 
     LOG_TRACE("(%p, %p, %d)", pDetails, pMessage, pPlayer);
 
     if (gNet_mode == eNet_mode_none) {
-        return -1;
+        return -3;
     }
     pMessage->sender = gLocal_net_ID;
     pMessage->senders_time_stamp = PDGetTotalTime();
@@ -768,7 +768,7 @@ int NetSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage, 
             return PDNetSendMessageToAddress(pDetails, pMessage, &gNet_players[i]);
         }
     }
-    return -1;
+    return -3;
 }
 
 // IDA: int __usercall NetSendMessageToHost@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>)

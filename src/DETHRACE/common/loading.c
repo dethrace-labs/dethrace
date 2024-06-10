@@ -1609,7 +1609,7 @@ void CloneCar(tCar_spec** pOutput_car, tCar_spec* pInput_car) {
     LOG_TRACE("(%p, %p)", pOutput_car, pInput_car);
 
     *pOutput_car = BrMemAllocate(sizeof(tCar_spec), kMem_cop_car_spec);
-    *pOutput_car = pInput_car;
+    **pOutput_car = *pInput_car;
     (*pOutput_car)->car_master_actor = CloneActor(pInput_car->car_master_actor);
     BrActorAdd(gNon_track_actor, (*pOutput_car)->car_master_actor);
     for (i = 0; i < pInput_car->car_actor_count; i++) {

@@ -2154,7 +2154,13 @@ void SmudgeCar(tCar_spec* pCar, int fire_point) {
 void ResetSmokeColumns(void) {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
+        if (gColumn_flags & (1 << i)) {
+            BrActorRemove(gSmoke_column[i].flame_actor);
+        }
+    }
+    gColumn_flags = 0;
 }
 
 // IDA: void __usercall SetSmokeOn(int pSmoke_on@<EAX>)
@@ -2670,7 +2676,7 @@ void DoModelThing(br_actor* actor, br_model* pModel, br_material* material, void
                 } else {
                     V11MODEL(pModel)->groups[group].vertex_colours[j] = BR_COLOUR_RGBA(0, 0, 0, 0xc9);
                     if (pModel->flags & BR_MODF_UPDATEABLE) {
-                        pModel->vertices[V11MODEL(pModel)->groups[group].vertex_user[j]].index = val;
+                        pModel->vertices[V11MODEL(pModel)->groups[group].vertex_user[j]].index = 0xc9;
                     }
                 }
             } else if ((V11MODEL(pModel)->groups[group].vertex_colours[j] >> 24) < 20) {
@@ -2733,7 +2739,7 @@ void MakeCarIt(tCar_spec* pCar) {
 
     actor = pCar->car_model_actors[pCar->principal_car_actor].actor;
     bonny = pCar->car_model_actors[pCar->car_actor_count - 1].actor;
-    if (((actor->model->flags & BR_MODF_CUSTOM) == 0) || actor->model->custom != DoModelThing) {
+    if (!(actor->model->flags & BR_MODF_CUSTOM) || actor->model->custom != DoModelThing) {
         SetModelShade(actor, shade[shade_num]);
         actor->model->user = DoModelThing;
         actor->model->custom = DoModelThing;
@@ -2758,7 +2764,7 @@ void StopCarBeingIt(tCar_spec* pCar) {
     actor = pCar->car_model_actors[pCar->principal_car_actor].actor;
     bonny = pCar->car_model_actors[pCar->car_actor_count - 1].actor;
     if (actor->model->custom == DoModelThing) {
-        actor->model->flags &= BR_MODF_CUSTOM;
+        actor->model->flags &= ~BR_MODF_CUSTOM;
         SetModelShade(actor, gShade_list[0]);
         for (group = 0; group < V11MODEL(actor->model)->ngroups; group++) {
             for (i = 0; i < V11MODEL(actor->model)->groups[group].nvertices; i++) {
@@ -2770,7 +2776,7 @@ void StopCarBeingIt(tCar_spec* pCar) {
         }
         SetModelForUpdate(actor->model, pCar, 0);
         if (bonny != actor) {
-            bonny->model->flags &= BR_MODF_CUSTOM;
+            bonny->model->flags &= ~BR_MODF_CUSTOM;
             SetModelShade(bonny, gShade_list[0]);
             for (group = 0; group < V11MODEL(bonny->model)->ngroups; group++) {
                 for (i = 0; i < V11MODEL(bonny->model)->groups[group].nvertices; i++) {

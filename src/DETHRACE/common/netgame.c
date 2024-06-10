@@ -300,7 +300,7 @@ void ReceivedCopInfo(tNet_contents* pContents) {
     if (gNet_mode != eNet_mode_client) {
         return;
     }
-    if (NetCalcSizeDecider(pContents) & 0xffffff00) {
+    if (pContents->data.cop_info.ID & 0xffffff00) {
         c = GetCarSpec(pContents->data.cop_info.ID >> 8, pContents->data.cop_info.ID & 0xff);
     } else {
         c = &gProgram_state.current_car;
@@ -387,7 +387,7 @@ void ReceivedNonCar(tNet_contents* pContents) {
         return;
     }
     ncar = (tNon_car_spec*)actor->type_data;
-    if (ncar && (ncar->collision_info.driver != eDriver_non_car || ncar->collision_info.car_ID != pContents->data.non_car.ID)) {
+    if (ncar != NULL && (ncar->collision_info.driver != eDriver_non_car || ncar->collision_info.car_ID != pContents->data.non_car.ID)) {
         ncar = NULL;
     }
     if ((pContents->data.non_car.flags & 1) != 0) {
@@ -395,14 +395,14 @@ void ReceivedNonCar(tNet_contents* pContents) {
     } else {
         actor->identifier[3] = 'x';
     }
-    if (!ncar && actor->identifier[1] >= '0' && actor->identifier[1] <= '9') {
+    if (ncar == NULL && actor->identifier[1] >= '0' && actor->identifier[1] <= '9') {
         BrVector3Sub(&tv, &gProgram_state.current_car.car_master_actor->t.t.translate.t, &actor->t.t.translate.t);
         if (BrVector3LengthSquared(&tv) < 900.0f) {
             DoPullActorFromWorld(actor);
             ncar = (tNon_car_spec*)actor->type_data;
         }
     }
-    if (ncar) {
+    if (ncar != NULL) {
         c = &ncar->collision_info;
         if ((pContents->data.non_car.flags & 2) != 0) {
             GetExpandedMatrix(&c->car_master_actor->t.t.mat, &pContents->data.non_car.mat);
@@ -422,7 +422,7 @@ void ReceivedNonCar(tNet_contents* pContents) {
         BrVector3InvScale(&actor->t.t.translate.t, &actor->t.t.translate.t, WORLD_SCALE);
         XZToColumnXZ(&cx, &cz, actor->t.t.translate.t.v[0], actor->t.t.translate.t.v[2], track_spec);
         if (track_spec->columns[cz][cx] != actor->parent) {
-            if (track_spec->columns[cz][cx]) {
+            if (track_spec->columns[cz][cx] != NULL) {
                 BrActorRemove(actor);
                 BrActorAdd(track_spec->columns[cz][cx], actor);
             }
@@ -947,6 +947,7 @@ void EverybodysLost(void) {
         gNet_players[i].played += 1;
         the_message = NetBuildMessage(NETMSGID_RACEOVER, 0);
         the_message->contents.data.race_over.reason = eRace_over_network_loss;
+        NetGuaranteedSendMessageToPlayer(gCurrent_net_game, the_message, gNet_players[i].ID, NULL);
     }
 }
 

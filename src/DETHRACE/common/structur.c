@@ -462,6 +462,7 @@ void SwapNetCarsDispose(void) {
     }
     ClearOutStorageSpace(&gOur_car_storage_space);
     ClearOutStorageSpace(&gNet_cars_storage_space);
+    ReenableNetService();
 }
 
 // IDA: void __cdecl DoGame()
