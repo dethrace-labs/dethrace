@@ -41,8 +41,6 @@ void InitOilSpills(void) {
         the_material->flags |= BR_MATF_LIGHT;
         the_material->flags |= BR_MATF_PERSPECTIVE;
         the_material->flags |= BR_MATF_SMOOTH;
-        // TODO: added by dethrace, investigate why oil spills in OG do not need this flag set to render correctly
-        the_material->flags |= BR_MATF_TWO_SIDED;
         the_material->index_range = 0;
         the_material->colour_map = NULL;
         BrMatrix23Identity(&the_material->map_transform);

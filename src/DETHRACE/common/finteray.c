@@ -224,10 +224,9 @@ int DRModelPick2D__finteray(br_model* model, br_material* material, br_vector3* 
     for (group = 0; group < V11MODEL(model)->ngroups; group++) {
         grp_ptr = &V11MODEL(model)->groups[group];
         for (f = 0; f < V11MODEL(model)->groups[group].nfaces; f++) {
-            // fp = &V11MODEL(model)->groups[group].faces[f];
             eqn = &V11MODEL(model)->groups[group].eqn[f];
-            if (V11MODEL(model)->groups[group].face_colours_ptr) {
-                this_material = V11MODEL(model)->groups[group].face_colours_ptr;
+            if (V11MODEL(model)->groups[group].user) {
+                this_material = V11MODEL(model)->groups[group].user;
             } else {
                 this_material = material;
             }
@@ -259,17 +258,7 @@ int DRModelPick2D__finteray(br_model* model, br_material* material, br_vector3* 
                             axis_1 = 2;
                         }
 
-                        // v0 = V11MODEL(model)->groups[group].vertices[fp->vertices[0]].p.v[axis_0];
-                        // u0 = V11MODEL(model)->groups[group].vertices[fp->vertices[0]].p.v[axis_1];
                         v0 = grp_ptr->position[grp_ptr->vertex_numbers[f].v[0]].v[axis_0];
-                        u0 = grp_ptr->position[grp_ptr->vertex_numbers[f].v[0]].v[axis_1];
-
-                        // u0 = V11MODEL(model)->groups[group].vertices[fp->vertices[0]].p.v[axis_1];
-                        // v1 = V11MODEL(model)->groups[group].vertices[fp->vertices[1]].p.v[axis_0] - v0;
-                        // u1 = V11MODEL(model)->groups[group].vertices[fp->vertices[1]].p.v[axis_1] - u0;
-                        // v2 = V11MODEL(model)->groups[group].vertices[fp->vertices[2]].p.v[axis_0] - v0;
-                        // u2 = V11MODEL(model)->groups[group].vertices[fp->vertices[2]].p.v[axis_1] - u0;
-
                         u0 = grp_ptr->position[grp_ptr->vertex_numbers[f].v[0]].v[axis_1];
                         v1 = grp_ptr->position[grp_ptr->vertex_numbers[f].v[1]].v[axis_0] - v0;
                         u1 = grp_ptr->position[grp_ptr->vertex_numbers[f].v[1]].v[axis_1] - u0;
@@ -310,17 +299,13 @@ int DRModelPick2D__finteray(br_model* model, br_material* material, br_vector3* 
                         if (alpha >= 0.0 && beta + alpha <= 1.0) {
                             s_alpha = alpha;
                             s_beta = beta;
-                            // map.v[0] = V11MODEL(model)->groups[group].vertices[fp->vertices[1]].map.v[0] * s_alpha;
-                            // map.v[1] = V11MODEL(model)->groups[group].vertices[fp->vertices[1]].map.v[1] * s_alpha;
                             BrVector2Scale(&map, &grp_ptr->map[grp_ptr->vertex_numbers[f].v[1]], s_alpha);
                             DRVector2AccumulateScale__finteray(
                                 &map,
-                                //&V11MODEL(model)->groups[group].vertices[fp->vertices[2]].map,
                                 &grp_ptr->map[grp_ptr->vertex_numbers[f].v[2]],
                                 s_beta);
                             DRVector2AccumulateScale__finteray(
                                 &map,
-                                //&V11MODEL(model)->groups[group].vertices[fp->vertices[0]].map,
                                 &grp_ptr->map[grp_ptr->vertex_numbers[f].v[0]],
                                 1.0 - (s_alpha + s_beta));
                             v = 0;
@@ -396,10 +381,7 @@ void FindFace(br_vector3* pPosition, br_vector3* pDir, br_vector3* nor, br_scala
         nor->v[0] = eqn->v[0];
         nor->v[1] = eqn->v[1];
         nor->v[2] = eqn->v[2];
-        // nor->v[0] = V11MODEL(gNearest_model)->groups[group].faces[gNearest_face].eqn.v[0];
-        // nor->v[1] = V11MODEL(gNearest_model)->groups[group].faces[gNearest_face].eqn.v[1];
-        // nor->v[2] = V11MODEL(gNearest_model)->groups[group].faces[gNearest_face].eqn.v[2];
-        *material = V11MODEL(gNearest_model)->groups[group].face_colours_ptr;
+        *material = V11MODEL(gNearest_model)->groups[group].user;
     }
 }
 
@@ -942,8 +924,8 @@ int ModelPickBox(br_actor* actor, tBounds* bnds, br_model* model, br_material* m
                     BrVector3Copy(&face_list->v[2], &grp_ptr->position[v3]);
                     BrVector3Copy(&face_list->normal, (br_vector3*)&grp_ptr->eqn[f]);
                 }
-                if (prepared->groups[group].face_colours_ptr != NULL) {
-                    face_list->material = prepared->groups[group].face_colours_ptr;
+                if (prepared->groups[group].user != NULL) {
+                    face_list->material = prepared->groups[group].user;
                 } else {
                     face_list->material = model_material;
                 }

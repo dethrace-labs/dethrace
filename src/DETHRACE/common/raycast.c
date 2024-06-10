@@ -304,10 +304,9 @@ int DRModelPick2D__raycast(br_model* model, br_material* material, br_vector3* r
     for (group = 0; group < V11MODEL(model)->ngroups; group++) {
         grp_ptr = &V11MODEL(model)->groups[group];
         for (f = 0; f < V11MODEL(model)->groups[group].nfaces; f++) {
-            //fp = &V11MODEL(model)->groups[group].faces[f];
             eqn = &V11MODEL(model)->groups[group].eqn[f];
-            if (V11MODEL(model)->groups[group].face_colours_ptr != NULL) {
-                this_material = V11MODEL(model)->groups[group].face_colours_ptr;
+            if (V11MODEL(model)->groups[group].user != NULL) {
+                this_material = V11MODEL(model)->groups[group].user;
             } else {
                 this_material = material;
             }
@@ -335,13 +334,6 @@ int DRModelPick2D__raycast(br_model* model, br_material* material, br_vector3* r
                             axis_1 = 1;
                         }
 
-                        // v0 = V11MODEL(model)->groups[group].vertices[fp->vertices[0]].p.v[axis_0];
-                        // u0 = V11MODEL(model)->groups[group].vertices[fp->vertices[0]].p.v[axis_1];
-                        // v1 = V11MODEL(model)->groups[group].vertices[fp->vertices[1]].p.v[axis_0] - v0;
-                        // u1 = V11MODEL(model)->groups[group].vertices[fp->vertices[1]].p.v[axis_1] - u0;
-                        // v2 = V11MODEL(model)->groups[group].vertices[fp->vertices[2]].p.v[axis_0] - v0;
-                        // u2 = V11MODEL(model)->groups[group].vertices[fp->vertices[2]].p.v[axis_1] - u0;
-
                         v0 = grp_ptr->position[grp_ptr->vertex_numbers[f].v[0]].v[axis_0];
                         u0 = grp_ptr->position[grp_ptr->vertex_numbers[f].v[0]].v[axis_1];
 
@@ -368,8 +360,6 @@ int DRModelPick2D__raycast(br_model* model, br_material* material, br_vector3* r
                         if (alpha >= 0.0 && beta >= 0.0 && beta + alpha <= 1.0) {
                             s_alpha = alpha;
                             s_beta = beta;
-                            // map.v[0] = V11MODEL(model)->groups[group].vertices[fp->vertices[1]].map.v[0] * s_alpha;
-                            // map.v[1] = V11MODEL(model)->groups[group].vertices[fp->vertices[1]].map.v[1] * s_alpha;
                             BrVector2Scale(&map, &grp_ptr->map[grp_ptr->vertex_numbers[f].v[1]], s_alpha);
                             DRVector2AccumulateScale__raycast(
                                 &map,
@@ -457,7 +447,6 @@ void FindBestY(br_vector3* pPosition, br_actor* gWorld, br_scalar pStarting_heig
     *pNearest_below_model = gBelow_model;
     *pNearest_above_face_index = gAbove_face_index;
     *pNearest_below_face_index = gBelow_face_index;
-    // LOG_DEBUG("FindBestY %f %f '%s' '%s' %d %d", gLowest_y_above, gHighest_y_below, gAbove_model->identifier, gBelow_model->identifier, gAbove_face_index, gBelow_face_index);
 }
 
 // IDA: int __cdecl FindYVerticallyBelowPolyCallBack(br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3 *pPoint, br_vector2 *pMap, void *pArg)

@@ -2582,7 +2582,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
             for (group = 0; group < V11MODEL(gTrack_storage_space.models[i])->ngroups; group++) {
                 int f = V11MODEL(gTrack_storage_space.models[i])->groups[group].face_user[0];
                 material = gTrack_storage_space.models[i]->faces[f].material;
-                V11MODEL(gTrack_storage_space.models[i])->groups[group].face_colours_ptr = material;
+                V11MODEL(gTrack_storage_space.models[i])->groups[group].user = material;
                 if (material && !material->index_shade) {
                     material->index_shade = BrTableFind("DRRENDER.TAB");
                     BrMaterialUpdate(material, 0x7FFFu);
