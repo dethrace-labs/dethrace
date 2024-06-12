@@ -9,7 +9,7 @@ target_include_directories(dethrace_test PRIVATE
     .
     ${CMAKE_SOURCE_DIR}/lib
     ${CMAKE_SOURCE_DIR}/src/harness
-    ${CMAKE_SOURCE_DIR}/src/BRSRC13
+    ${CMAKE_SOURCE_DIR}/lib/BRender-v1.3.2
     ${CMAKE_SOURCE_DIR}/src/DETHRACE
     ${CMAKE_SOURCE_DIR}/src/DETHRACE/common
     ${CMAKE_SOURCE_DIR}/src/DETHRACE/pd
@@ -22,31 +22,6 @@ else()
 endif()
 
 target_sources(dethrace_test PRIVATE
-    BRSRC13/test_assocarr.c
-    BRSRC13/test_actsupt.c
-    BRSRC13/test_brlists.c
-    BRSRC13/test_brprintf.c
-    BRSRC13/test_bswap.c
-    BRSRC13/test_datafile.c
-    BRSRC13/test_fixed.c
-    BRSRC13/test_fwsetup.c
-    BRSRC13/test_genclip.c
-    BRSRC13/test_pattern.c
-    BRSRC13/test_pmfile.c
-    BRSRC13/test_quat.c
-    BRSRC13/test_lexer.c
-    BRSRC13/test_logwrite.c
-    BRSRC13/test_matrix23.c
-    BRSRC13/test_matrix34.c
-    BRSRC13/test_matrix4.c
-    BRSRC13/test_register.c
-    BRSRC13/test_regsupt.c
-    BRSRC13/test_resource.c
-    BRSRC13/test_resreg.c
-    BRSRC13/test_scratch.c
-    BRSRC13/test_token.c
-    BRSRC13/test_vector.c
-    BRSRC13/test_v1dbfile.c
     DETHRACE/test_controls.c
     DETHRACE/test_dossys.c
     DETHRACE/test_flicplay.c
