@@ -1,4 +1,5 @@
 #include "pedestrn.h"
+#include "brender.h"
 #include "car.h"
 #include "constants.h"
 #include "displays.h"
@@ -18,14 +19,13 @@
 #include "pratcam.h"
 #include "raycast.h"
 #include "replay.h"
+#include "shortcut.h"
 #include "sound.h"
 #include "spark.h"
 #include "structur.h"
 #include "trig.h"
 #include "utility.h"
 #include "world.h"
-#include <brender.h>
-#include "shortcut.h"
 #include <stdlib.h>
 #include <time.h>
 
@@ -36,7 +36,7 @@
 #define PEDESTRIAN_MAGIC FOURCC('P', 'e', 'd', '!')
 #define ActorToPedestrianData(ACTOR) ((tPedestrian_data*)((ACTOR)->type_data))
 
-#define GET_PEDESTRIAN_INDEX(P) ((P)-gPedestrian_array)
+#define GET_PEDESTRIAN_INDEX(P) ((P) - gPedestrian_array)
 
 int gDetect_peds = 1;
 int gReally_stupid_ped_bug_enable = 0;

@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "brender.h"
 #include "brucetrk.h"
 #include "car.h"
 #include "constants.h"
@@ -12,9 +13,9 @@
 #include "depth.h"
 #include "displays.h"
 #include "drmem.h"
-#include "formats.h"
 #include "errors.h"
 #include "flicplay.h"
+#include "formats.h"
 #include "globvars.h"
 #include "globvrkm.h"
 #include "globvrpb.h"
@@ -34,7 +35,6 @@
 #include "spark.h"
 #include "utility.h"
 #include "world.h"
-#include <brender.h>
 #include <errno.h>
 
 #define HITHER_MULTIPLIER 2.0f

@@ -1,5 +1,6 @@
 #include "graphics.h"
 
+#include "brender.h"
 #include "car.h"
 #include "constants.h"
 #include "controls.h"
@@ -32,7 +33,6 @@
 #include "trig.h"
 #include "utility.h"
 #include "world.h"
-#include <brender.h>
 #include <limits.h>
 #include <stdlib.h>
 

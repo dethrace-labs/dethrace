@@ -1,5 +1,6 @@
 #include "pd/net.h"
 
+#include "brender.h"
 #include "dr_types.h"
 #include "errors.h"
 #include "globvrpb.h"
@@ -10,7 +11,6 @@
 #include "network.h"
 #include "pd/net.h"
 #include "pd/sys.h"
-#include <brender.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>

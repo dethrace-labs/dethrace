@@ -1,7 +1,7 @@
+#include "brender.h"
 #include "common/flicplay.h"
 #include "common/graphics.h"
 #include "tests.h"
-#include <brender.h>
 
 int nbr_frames_rendered;
 

@@ -1,8 +1,8 @@
 #ifndef HARNESS_HOOKS_H
 #define HARNESS_HOOKS_H
 
+#include "brender.h"
 #include "harness/win95_polyfill_defs.h"
-#include <brender.h>
 #include <stdio.h>
 
 typedef enum {

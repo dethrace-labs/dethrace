@@ -1,11 +1,11 @@
 #include "raycast.h"
+#include "brender.h"
 #include "brucetrk.h"
+#include "formats.h"
 #include "globvars.h"
 #include "harness/trace.h"
-#include <brender.h>
-#include "formats.h"
-#include <float.h>
 #include "shortcut.h"
+#include <float.h>
 #include <math.h>
 #include <stdlib.h>
 
@@ -263,7 +263,7 @@ int DRScenePick2D(br_actor* world, br_actor* camera, dr_pick2d_cbfn* callback, v
 // IDA: int __usercall DRModelPick2D@<EAX>(br_model *model@<EAX>, br_material *material@<EDX>, br_vector3 *ray_pos@<EBX>, br_vector3 *ray_dir@<ECX>, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn *callback, void *arg)
 // Suffix added to avoid duplicate symbol
 int DRModelPick2D__raycast(br_model* model, br_material* material, br_vector3* ray_pos, br_vector3* ray_dir, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn* callback, void* arg) {
-    //DR_FACE* fp;
+    // DR_FACE* fp;
     int f;
     int axis_m;
     int axis_0;

@@ -1,4 +1,5 @@
 #include "powerup.h"
+#include "brender.h"
 #include "car.h"
 #include "controls.h"
 #include "crush.h"
@@ -19,7 +20,6 @@
 #include "pratcam.h"
 #include "sound.h"
 #include "utility.h"
-#include <brender.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -142,7 +142,7 @@ int gFizzle_height;
 int gNumber_of_icons;
 tPowerup* gPowerup_array;
 
-#define GET_POWERUP_INDEX(POWERUP) (((POWERUP)-gPowerup_array) / sizeof(tPowerup))
+#define GET_POWERUP_INDEX(POWERUP) (((POWERUP) - gPowerup_array) / sizeof(tPowerup))
 
 // IDA: void __usercall LosePowerupX(tPowerup *pThe_powerup@<EAX>, int pTell_net_players@<EDX>)
 void LosePowerupX(tPowerup* pThe_powerup, int pTell_net_players) {

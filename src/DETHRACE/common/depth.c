@@ -1,5 +1,6 @@
 #include "depth.h"
 
+#include "brender.h"
 #include "displays.h"
 #include "errors.h"
 #include "globvars.h"
@@ -13,7 +14,6 @@
 #include "trig.h"
 #include "utility.h"
 #include "world.h"
-#include <brender.h>
 #include <math.h>
 #include <stdlib.h>
 

@@ -1,4 +1,5 @@
 #include "opponent.h"
+#include "brender.h"
 #include "car.h"
 #include "controls.h"
 #include "crush.h"
@@ -16,7 +17,6 @@
 #include "skidmark.h"
 #include "trig.h"
 #include "utility.h"
-#include <brender.h>
 
 #include <float.h>
 #include <stdlib.h>

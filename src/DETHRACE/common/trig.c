@@ -1,6 +1,6 @@
 #include "trig.h"
+#include "brender.h"
 #include "harness/trace.h"
-#include <brender.h>
 #include <math.h>
 #include <stdlib.h>
 

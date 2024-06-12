@@ -1,8 +1,8 @@
 #ifndef _BRUCETRK_H_
 #define _BRUCETRK_H_
 
+#include "brender.h"
 #include "dr_types.h"
-#include <brender.h>
 
 extern br_actor* gMr_blendy;
 extern int gDefault_blend_pc;

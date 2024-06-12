@@ -1,3 +1,4 @@
+#include "brender.h"
 #include "car.h"
 #include "errors.h"
 #include "globvars.h"
@@ -13,7 +14,6 @@
 #include "pd/sys.h"
 #include "sound.h"
 #include "utility.h"
-#include <brender.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>

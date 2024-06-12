@@ -1,4 +1,5 @@
 #include "network.h"
+#include "brender.h"
 #include "car.h"
 #include "controls.h"
 #include "displays.h"
@@ -23,7 +24,6 @@
 #include "structur.h"
 #include "utility.h"
 #include "world.h"
-#include <brender.h>
 #include <stdlib.h>
 
 tU32 gMess_max_flags;

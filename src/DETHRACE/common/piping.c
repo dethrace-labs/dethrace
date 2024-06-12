@@ -1,7 +1,9 @@
 #include "piping.h"
+#include "brender.h"
 #include "car.h"
 #include "crush.h"
 #include "errors.h"
+#include "formats.h"
 #include "globvars.h"
 #include "globvrpb.h"
 #include "graphics.h"
@@ -16,8 +18,6 @@
 #include "sys.h"
 #include "utility.h"
 #include "world.h"
-#include <brender.h>
-#include "formats.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -180,7 +180,7 @@ tU32 LengthOfSession(tPipe_session* pSession) {
     LOG_TRACE("(%p)", pSession);
 
 #define SIZEOF_CHUNK(MEMBER) (offsetof(tPipe_chunk, chunk_data) + sizeof(pSession->chunks.chunk_data.MEMBER))
-#define ROUND_UP(V, M) (((V) + (M)-1) & (~((M)-1)))
+#define ROUND_UP(V, M) (((V) + (M) - 1) & (~((M) - 1)))
 
     REPLAY_DEBUG_ASSERT(pSession->pipe_magic1 == REPLAY_DEBUG_SESSION_MAGIC1);
 

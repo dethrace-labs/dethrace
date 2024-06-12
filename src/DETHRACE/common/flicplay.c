@@ -1,4 +1,5 @@
 #include "flicplay.h"
+#include "brender.h"
 #include "displays.h"
 #include "drmem.h"
 #include "errors.h"
@@ -11,7 +12,6 @@
 #include "pd/sys.h"
 #include "sound.h"
 #include "utility.h"
-#include <brender.h>
 #include <stdlib.h>
 #include <string.h>
 

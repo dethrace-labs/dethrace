@@ -1,7 +1,7 @@
 #ifndef _CUTSCENE_H_
 #define _CUTSCENE_H_
 
-#include <brender.h>
+#include "brender.h"
 
 #include "dr_types.h"
 

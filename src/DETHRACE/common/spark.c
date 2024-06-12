@@ -1,7 +1,9 @@
 #include "spark.h"
+#include "brender.h"
 #include "car.h"
 #include "depth.h"
 #include "errors.h"
+#include "formats.h"
 #include "globvars.h"
 #include "globvrkm.h"
 #include "graphics.h"
@@ -14,8 +16,6 @@
 #include "trig.h"
 #include "utility.h"
 #include "world.h"
-#include <brender.h>
-#include "formats.h"
 #include <math.h>
 #include <stdlib.h>
 
@@ -2095,7 +2095,7 @@ void SmudgeCar(tCar_spec* pCar, int fire_point) {
             AddSmudgeToPipingSession(pCar->car_ID, pCar->principal_car_actor, n, data);
             // FIXME?
             // Added by dethrace to update gpu-buffered vertices
-            //model->flags |= BR_MODF_DETHRACE_FORCE_BUFFER_UPDATE;
+            // model->flags |= BR_MODF_DETHRACE_FORCE_BUFFER_UPDATE;
         }
 
         n = 0;
@@ -2138,7 +2138,7 @@ void SmudgeCar(tCar_spec* pCar, int fire_point) {
                 AddSmudgeToPipingSession(pCar->car_ID, pCar->car_actor_count - 1, n, data);
                 // FIXME?
                 // Added by dethrace to update gpu-buffered vertices
-                //b_model->flags |= BR_MODF_DETHRACE_FORCE_BUFFER_UPDATE;
+                // b_model->flags |= BR_MODF_DETHRACE_FORCE_BUFFER_UPDATE;
             }
         }
         EndPipingSession();

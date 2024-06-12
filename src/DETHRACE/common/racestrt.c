@@ -1,4 +1,5 @@
 #include "racestrt.h"
+#include "brender.h"
 #include "cutscene.h"
 #include "displays.h"
 #include "drmem.h"
@@ -23,7 +24,6 @@
 #include "structur.h"
 #include "utility.h"
 #include "world.h"
-#include <brender.h>
 #include <stdlib.h>
 
 int gGrid_number_colour[4] = { 49u, 201u, 1u, 201u };

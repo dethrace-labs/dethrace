@@ -1,4 +1,5 @@
 #include "finteray.h"
+#include "brender.h"
 #include "brucetrk.h"
 #include "car.h"
 #include "formats.h"
@@ -6,7 +7,6 @@
 #include "harness/trace.h"
 #include "raycast.h"
 #include "world.h"
-#include <brender.h>
 #include <math.h>
 #include <stdlib.h>
 

@@ -1,6 +1,7 @@
 #include "utility.h"
 #include <stdlib.h>
 
+#include "brender.h"
 #include "constants.h"
 #include "errors.h"
 #include "globvars.h"
@@ -16,7 +17,6 @@
 #include "pd/sys.h"
 #include "sound.h"
 #include "world.h"
-#include <brender.h>
 
 #include <ctype.h>
 #include <stdio.h>

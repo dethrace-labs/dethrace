@@ -38,7 +38,7 @@
 #include "utility.h"
 #include "world.h"
 
-#include <brender.h>
+#include "brender.h"
 
 int gGame_initialized;
 int gBr_initialized;

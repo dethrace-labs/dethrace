@@ -1,5 +1,6 @@
 #include "controls.h"
 
+#include "brender.h"
 #include "brucetrk.h"
 #include "car.h"
 #include "constants.h"
@@ -34,7 +35,6 @@
 #include "structur.h"
 #include "utility.h"
 #include "world.h"
-#include <brender.h>
 #include <stdlib.h>
 
 tToggle_element gToggle_array[] = {

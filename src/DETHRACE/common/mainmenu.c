@@ -1,4 +1,5 @@
 #include "mainmenu.h"
+#include "brender.h"
 #include "controls.h"
 #include "flicplay.h"
 #include "globvars.h"
@@ -17,7 +18,6 @@
 #include "sound.h"
 #include "structur.h"
 #include "utility.h"
-#include <brender.h>
 #include <stdlib.h>
 
 char* gPalette_copy__mainmenu;    // suffix added to avoid duplicate symbol

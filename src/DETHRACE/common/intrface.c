@@ -1,4 +1,5 @@
 #include "intrface.h"
+#include "brender.h"
 #include "flicplay.h"
 #include "globvars.h"
 #include "grafdata.h"
@@ -9,7 +10,6 @@
 #include "main.h"
 #include "pd/sys.h"
 #include "sound.h"
-#include <brender.h>
 #include <stdlib.h>
 
 int gDisabled_choices[10];

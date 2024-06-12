@@ -1,5 +1,6 @@
 #include "brucetrk.h"
 
+#include "brender.h"
 #include "errors.h"
 #include "formats.h"
 #include "globvars.h"
@@ -9,7 +10,6 @@
 #include "pd/sys.h"
 #include "utility.h"
 #include "world.h"
-#include <brender.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>

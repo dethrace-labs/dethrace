@@ -1,4 +1,5 @@
 #include "oil.h"
+#include "brender.h"
 #include "finteray.h"
 #include "globvars.h"
 #include "globvrpb.h"
@@ -7,7 +8,6 @@
 #include "network.h"
 #include "piping.h"
 #include "utility.h"
-#include <brender.h>
 #include <math.h>
 #include <stdlib.h>
 
