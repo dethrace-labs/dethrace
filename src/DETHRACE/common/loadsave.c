@@ -944,7 +944,7 @@ void DoSaveGame(int pSave_allowed) {
         gProgram_state.saving = 1;
         gSave_allowed = pSave_allowed;
         LoadSavedGames();
-        LoadFont(0);
+        LoadFont(kFont_TYPEABLE);
         if (!pSave_allowed && !ConfirmMidGameSave()) {
             gProgram_state.saving = 0;
             return;

@@ -188,9 +188,9 @@ void ActualActionReplayHeadups(int pSpecial_zappy_bastard) {
     }
     if (the_time - gCam_change_time < 2000) {
         TransDRPixelmapText(gBack_screen,
-            gCurrent_graf_data->action_replay_cam_text_x - DRTextWidth(&gFonts[1], GetMiscString(gAction_replay_camera_mode ? kMiscString_PanningCamera : kMiscString_StandardCamera)),
+            gCurrent_graf_data->action_replay_cam_text_x - DRTextWidth(&gFonts[kFont_ORANGHED], GetMiscString(gAction_replay_camera_mode ? kMiscString_PanningCamera : kMiscString_StandardCamera)),
             gCurrent_graf_data->action_replay_cam_text_y,
-            &gFonts[1],
+            &gFonts[kFont_ORANGHED],
             GetMiscString(gAction_replay_camera_mode ? kMiscString_PanningCamera : kMiscString_StandardCamera),
             2 * gCurrent_graf_data->action_replay_cam_text_x);
     }

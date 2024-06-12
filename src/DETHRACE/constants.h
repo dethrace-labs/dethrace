@@ -706,6 +706,32 @@ enum {
     kMiscString_QUOTE_IT_QUOTE = 241,
     kMiscString_TOO_LATE_TO_CANCEL = 242,
     kMiscString_CouldNotFindTheCarmageddonCD = 243,
+    kMiscString_NotAvailableInEvaluationCopy = 244,
+    kMiscString_EvaluationCopy = 245,
+};
+
+enum {
+    kFont_TYPEABLE = 0,
+    kFont_ORANGHED = 1,
+    kFont_BLUEHEAD = 2,
+    kFont_GREENHED = 3,
+    kFont_MEDIUMHD = 4,
+    kFont_TIMER = 5,
+    kFont_NEWHITE = 6,
+    kFont_NEWRED = 7,
+    kFont_NEWBIGGR = 8,
+    kFont_GRNDK = 9,
+    kFont_GRNLIT = 10,
+    kFont_GRYDK = 11,
+    kFont_GRYLIT = 12,
+    kFont_BUTTIN = 13,
+    kFont_BUTTOUT = 14,
+    kFont_LITPLAQ = 15,
+    kFont_DRKPLAQ = 16,
+    kFont_BUTTIN1 = 17,
+    kFont_BUTTOUT1 = 18,
+    kFont_LITPLAQ1 = 19,
+    kFont_DRKPLAQ1 = 20,
 };
 
 enum {

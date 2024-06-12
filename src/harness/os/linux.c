@@ -58,10 +58,10 @@ static intptr_t get_dethrace_offset(void) {
 
 // Resolve symbol name and source location given the path to the executable and an address
 int addr2line(char const* const program_name, void const* const addr) {
-    char addr2line_cmd[512] = { 0 };
+    char addr2line_cmd[512];
 
     /* have addr2line map the address to the related line in the code */
-    sprintf(addr2line_cmd, "addr2line -f -p -e %.256s %p", program_name, addr - get_dethrace_offset());
+    sprintf(addr2line_cmd, "addr2line -f -p -e %.480s %p", program_name, addr - get_dethrace_offset());
 
     fprintf(stderr, "%d: ", stack_nbr++);
     return system(addr2line_cmd);
@@ -259,6 +259,9 @@ FILE* OS_fopen(const char* pathname, const char* mode) {
         }
     }
     closedir(pDir);
+    if (f == NULL) {
+        fprintf(stderr, "Failed to open \"%s\" (%s)\n", pathname, strerror(errno));
+    }
     return f;
 }
 

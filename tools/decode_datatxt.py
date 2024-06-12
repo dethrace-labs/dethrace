@@ -59,11 +59,14 @@ class Byte:
             return self.v == (other & 0xff)
         raise ValueError(f"Object {other:r} of invalid type {type(other)}")
 
+    def __repr__(self):
+        return f"(byte 0x{self.v:02x})"
 
-def decode_line(line: bytes, method: int) -> str:
+
+def decode_line(line: bytes, method: int) -> bytes:
     line = line.rstrip(b"\r\n")
     key = LONG_KEY
-    seed = len(line) % len(LONG_KEY)
+    seed = len(line) % len(key)
     dline = bytearray(len(line))
     for i, c in enumerate(line):
         b = Byte(c)
@@ -98,13 +101,58 @@ def decode_line(line: bytes, method: int) -> str:
             if b == 0x80:
                 b = Byte(ord(b'\t'))
         dline[i] = b.v
-    return dline.decode(errors="replace")
+    return dline
+
+
+def encode_line(line: bytes, method: int) -> bytes:
+    line = line.rstrip(b"\r\n")
+    key = LONG_KEY
+    seed = len(line) % len(key)
+    count = 0
+    eline = bytearray(len(line))
+    for i, c in enumerate(line):
+        if count == 2:
+            key = OTHER_LONG_KEY
+        if c == ord('/'):
+            count += 1
+        else:
+            count = 0
+        if method == 1:
+            if c == ord('\t'):
+                c = 0x9f
+
+            b = Byte(c)
+            b -= 0x20
+            b ^= key[seed]
+            b &= 0x7f
+            b += 0x20
+
+            seed += 7
+            seed %= len(key)
+
+            if b == 0x9f:
+                b = Byte(ord('\t'))
+        else:
+            if c == ord('\t'):
+                c = 0x80
+            b = Byte(c - 0x20)
+            if (b & 0x80) == 0:
+                b ^= key[seed] & 0x7f
+            b += 0x20
+
+            seed += 7
+            seed %= len(key)
+
+            if b == 0x80:
+                b = Byte(ord('\t'))
+        eline[i] = b.v
+    return bytes(eline)
 
 
 def main():
-    parser = argparse.ArgumentParser(allow_abbrev=False, description="Decode a Carmageddon encoded file")
+    parser = argparse.ArgumentParser(allow_abbrev=False, description="Decode/encode a Carmageddon text file")
     parser.add_argument("file", metavar="FILE", nargs="?", help="input file (default=stdin)")
-    parser.add_argument("--method", choices=[1, 2], type=int, default=2, help="decryption method to use")
+    parser.add_argument("--method", choices=[1, 2], type=int, default=2, help="encryption method to use (default=2)")
     args = parser.parse_args()
 
     istream = open(args.file, "rb") if args.file else sys.stdin.buffer
@@ -112,9 +160,11 @@ def main():
     for line in istream.readlines():
         if line[0] == ord(b'@'):
             dline = decode_line(line[1:], args.method)
-            print(dline)
+            sys.stdout.buffer.write(dline)
         else:
-            print(line.decode())
+            eline = b"@" + encode_line(line, args.method)
+            sys.stdout.buffer.write(eline)
+        sys.stdout.buffer.write(b'\n')
 
 
 if __name__ == "__main__":

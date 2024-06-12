@@ -866,6 +866,11 @@ void Win32AllocateActionReplayBuffer(void) {
 void PDAllocateActionReplayBuffer(char** pBuffer, tU32* pBuffer_size) {
     LOG_TRACE("(%p, %p)", pBuffer, pBuffer_size);
 
+    if (gReplay_override) {
+        *pBuffer = NULL;
+        *pBuffer_size = 0;
+        return;
+    }
     Win32AllocateActionReplayBuffer();
     *pBuffer = gWin32_action_replay_buffer;
     *pBuffer_size = gWin32_action_replay_buffer_size;

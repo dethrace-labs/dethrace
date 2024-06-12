@@ -153,8 +153,10 @@ void Harness_Init(int* argc, char* argv[]) {
     harness_game_config.volume_multiplier = 1.0f;
     // start window in windowed mode
     harness_game_config.start_full_screen = 0;
-    // Emulate DOS behavior
-    harness_game_config.dos_mode = 0;
+    // Emulate gore check
+    harness_game_config.gore_check = 0;
+    // Enable Sound Options menu
+    harness_game_config.sound_options = 0;
     // Skip binding socket to allow local network testing
     harness_game_config.no_bind = 0;
 
@@ -244,8 +246,11 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
         } else if (strcasecmp(argv[i], "--full-screen") == 0) {
             harness_game_config.start_full_screen = 1;
             handled = 1;
-        } else if (strcasecmp(argv[i], "--dos-mode") == 0) {
-            harness_game_config.dos_mode = 1;
+        } else if (strcasecmp(argv[i], "--gore-check") == 0) {
+            harness_game_config.gore_check = 1;
+            handled = 1;
+        } else if (strcasecmp(argv[i], "--sound-options") == 0) {
+            harness_game_config.sound_options = 1;
             handled = 1;
         } else if (strcasecmp(argv[i], "--no-bind") == 0) {
             harness_game_config.no_bind = 1;

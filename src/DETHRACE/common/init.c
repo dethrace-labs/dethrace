@@ -345,7 +345,7 @@ void Init2DStuff(void) {
 // IDA: void __usercall InitialiseApplication(int pArgc@<EAX>, char **pArgv@<EDX>)
 void InitialiseApplication(int pArgc, char** pArgv) {
 
-    if (harness_game_config.dos_mode) {
+    if (harness_game_config.gore_check) {
         gProgram_state.sausage_eater_mode = gSausage_override ? 1 : (PDGetGorePassword() ? 0 : 1);
         PDDisplayGoreworthiness(!gProgram_state.sausage_eater_mode);
     } else {
@@ -540,16 +540,16 @@ void InitRace(void) {
             FlushInterfaceFonts();
         }
     } else {
-        LoadFont(1);
-        LoadFont(2);
-        LoadFont(3);
+        LoadFont(kFont_ORANGHED);
+        LoadFont(kFont_BLUEHEAD);
+        LoadFont(kFont_GREENHED);
     }
-    LoadFont(4);
-    LoadFont(5);
+    LoadFont(kFont_MEDIUMHD);
+    LoadFont(kFont_TIMER);
     PossibleService();
-    LoadFont(6);
-    LoadFont(7);
-    LoadFont(8);
+    LoadFont(kFont_NEWHITE);
+    LoadFont(kFont_NEWRED);
+    LoadFont(kFont_NEWBIGGR);
     PossibleService();
     ResetRecoveryVouchers();
     gMap_mode = 0;
