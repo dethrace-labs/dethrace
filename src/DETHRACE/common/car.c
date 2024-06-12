@@ -1486,7 +1486,7 @@ void ToggleControls(void) {
     LOG_TRACE("()");
 
     gControl__car++;
-    if (ControlCar[gControl__car] == 0) {
+    if (ControlCar[gControl__car] == NULL) {
         gControl__car = 0;
     }
     switch (gControl__car) {
