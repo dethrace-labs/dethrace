@@ -28,6 +28,8 @@ jobs:
     name: 'CI ${{ matrix.platform.name }} ${{ matrix.platform.arch }}'
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Set up Ninja
         uses: aseprite/get-ninja@main
       - uses: ilammy/msvc-dev-cmd@v1.13.0
