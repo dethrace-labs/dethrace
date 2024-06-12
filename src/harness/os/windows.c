@@ -6,6 +6,7 @@
 #include <imagehlp.h>
 
 #include "harness/os.h"
+#include "harness/trace.h"
 
 #include <assert.h>
 #include <direct.h>
@@ -18,7 +19,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef _WIN64
+#if defined(_WIN64) || defined(_M_ARM64)
 #define Esp Rsp
 #define Eip Rip
 #define Ebp Rbp
@@ -32,6 +33,21 @@ static char windows_program_name[1024];
 static char dirname_buf[_MAX_DIR];
 static char fname_buf[_MAX_FNAME];
 
+#if defined(__i386__) || defined(__i486__) || defined(__i586__) || defined(__i686__) ||defined( __i386) || defined(_M_IX86)
+#define DETHRACE_CPU_X86 1
+#elif defined(__amd64__) || defined(__amd64) || defined(__x86_64__) || defined(__x86_64) || defined(_M_X64) || defined(_M_AMD64)
+#define DETHRACE_CPU_X64 1
+#elif defined(__aarch64__) || defined(_M_ARM64)
+#define DETHRACE_CPU_ARM64 1
+#endif
+
+#if defined(DETHRACE_CPU_X86) || defined(DETHRACE_CPU_X64) || defined(DETHRACE_CPU_ARM64)
+#define DETHRACE_STACKWALK 1
+#else
+#pragma message("Unsupported architecture: don't know how to StackWalk")
+#endif
+
+#ifdef DETHRACE_STACKWALK
 static int addr2line(char const* const program_name, void const* const addr) {
     char addr2line_cmd[512] = { 0 };
 
@@ -48,14 +64,26 @@ static void print_stacktrace(CONTEXT* context) {
     STACKFRAME frame = { 0 };
 
     /* setup initial stack frame */
-    frame.AddrPC.Offset = context->Eip;
     frame.AddrPC.Mode = AddrModeFlat;
-    frame.AddrStack.Offset = context->Esp;
     frame.AddrStack.Mode = AddrModeFlat;
-    frame.AddrFrame.Offset = context->Ebp;
     frame.AddrFrame.Mode = AddrModeFlat;
+#if defined(DETHRACE_CPU_X86) || defined(DETHRACE_CPU_X64)
+#if defined(DETHRACE_CPU_X86)
+    DWORD machine_type = IMAGE_FILE_MACHINE_I386;
+#else
+    DWORD machine_type = IMAGE_FILE_MACHINE_AMD64;
+#endif
+    frame.AddrFrame.Offset = context->Ebp;
+    frame.AddrStack.Offset = context->Esp;
+    frame.AddrPC.Offset = context->Eip;
+#elif defined(DETHRACE_CPU_ARM64)
+    DWORD machine_type = IMAGE_FILE_MACHINE_ARM64;
+    frame.AddrFrame.Offset = context->Fp;
+    frame.AddrStack.Offset = context->Sp;
+    frame.AddrPC.Offset = context->Pc;
+#endif
 
-    while (StackWalk(IMAGE_FILE_MACHINE_I386,
+    while (StackWalk(machine_type,
         GetCurrentProcess(),
         GetCurrentThread(),
         &frame,
@@ -142,15 +170,25 @@ static LONG WINAPI windows_exception_handler(EXCEPTION_POINTERS* ExceptionInfo) 
     if (EXCEPTION_STACK_OVERFLOW != ExceptionInfo->ExceptionRecord->ExceptionCode) {
         print_stacktrace(ExceptionInfo->ContextRecord);
     } else {
-        addr2line(windows_program_name, (void*)ExceptionInfo->ContextRecord->Eip);
+#if defined(DETHRACE_CPU_X86) || defined(DETHRACE_CPU_X64)
+        void *addr = (void*)ExceptionInfo->ContextRecord->Eip;
+#elif defined(DETHRACE_CPU_ARM64)
+        void *addr = (void*)ExceptionInfo->ContextRecord->Pc;
+#endif
+        addr2line(windows_program_name, addr);
     }
 
     return EXCEPTION_EXECUTE_HANDLER;
 }
+#endif
 
 void OS_InstallSignalHandler(char* program_name) {
+#ifdef DETHRACE_STACKWALK
     strcpy(windows_program_name, program_name);
     SetUnhandledExceptionFilter(windows_exception_handler);
+#else
+    LOG_WARN("Unsupported architecture. No signal handlers installed");
+#endif
 }
 
 FILE* OS_fopen(const char* pathname, const char* mode) {
