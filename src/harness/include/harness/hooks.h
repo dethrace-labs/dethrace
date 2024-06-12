@@ -36,8 +36,6 @@ typedef struct tHarness_platform {
     void (*Sleep)(uint32_t dwMilliseconds);
     // Get ticks
     uint32_t (*GetTicks)(void);
-    // Swap window
-    void (*SwapWindow)(void);
     // Show error message
     int (*ShowErrorMessage)(void* window, char* text, char* caption);
 
@@ -49,16 +47,7 @@ void Harness_Init(int* argc, char* argv[]);
 
 // Hooks are called from original game code.
 
-// BRender hooks
-void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src);
-
-// Sound hooks
-void Harness_Hook_S3Service(int unk1, int unk2);
-void Harness_Hook_S3StopAllOutletSounds(void);
-
 // Filesystem hooks
 FILE* Harness_Hook_fopen(const char* pathname, const char* mode);
-
-void Harness_RenderLastScreen(void);
 
 #endif

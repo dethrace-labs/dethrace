@@ -1,5 +1,6 @@
 #include <SDL.h>
 
+#include "harness.h"
 #include "harness/config.h"
 #include "harness/hooks.h"
 #include "harness/trace.h"
@@ -10,38 +11,16 @@
 #include "pd/sys.h"
 
 SDL_Window* window;
-SDL_Renderer *renderer;
-SDL_Texture *screen_texture;
+SDL_Renderer* renderer;
+SDL_Texture* screen_texture;
 uint32_t converted_palette[256];
-br_pixelmap *last_screen_src;
+br_pixelmap* last_screen_src;
 int render_width, render_height;
 int window_width, window_height;
-int vp_x, vp_y, vp_width, vp_height;
+
+Uint32 last_frame_time;
 
 uint8_t directinput_key_state[SDL_NUM_SCANCODES];
-
-struct {
-    float x;
-    float y;
-} sdl_window_scale;
-
-static void update_viewport(void) {
-    const float target_aspect_ratio = (float)render_width / render_height;
-    const float aspect_ratio = (float)window_width / window_height;
-
-    vp_width = window_width;
-    vp_height = window_height;
-    if (aspect_ratio != target_aspect_ratio) {
-        if (aspect_ratio > target_aspect_ratio) {
-            vp_width = window_height * target_aspect_ratio + .5f;
-        } else {
-            vp_height = window_width / target_aspect_ratio + .5f;
-        }
-    }
-    vp_x = (window_width - vp_width) / 2;
-    vp_y = (window_height - vp_height) / 2;
-    // GLRenderer_SetViewport(vp_x, vp_y, vp_width, vp_height);
-}
 
 static void* create_window_and_renderer(char* title, int x, int y, int width, int height) {
     window_width = width;
@@ -63,9 +42,6 @@ static void* create_window_and_renderer(char* title, int x, int y, int width, in
         LOG_PANIC("Failed to create window: %s", SDL_GetError());
     }
 
-    sdl_window_scale.x = ((float)render_width) / width;
-    sdl_window_scale.y = ((float)render_height) / height;
-
     if (harness_game_config.start_full_screen) {
         SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
     }
@@ -75,19 +51,18 @@ static void* create_window_and_renderer(char* title, int x, int y, int width, in
         LOG_PANIC("Failed to create renderer: %s", SDL_GetError());
     }
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+    SDL_RenderSetLogicalSize(renderer, render_width, render_height);
 
+    screen_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width, height);
     if (screen_texture == NULL) {
-        screen_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width, height);
+        SDL_RendererInfo info;
+        SDL_GetRendererInfo(renderer, &info);
+        for (Uint32 i = 0; i < info.num_texture_formats; i++) {
+            LOG_INFO("%s\n", SDL_GetPixelFormatName(info.texture_formats[i]));
+        }
+        LOG_PANIC("Failed to create screen_texture: %s", SDL_GetError());
     }
 
-    // SDL_RendererInfo info;
-    // SDL_GetRendererInfo( renderer, &info );
-    // for( Uint32 i = 0; i < info.num_texture_formats; i++ )
-    // {
-    //     printf("%s\n", SDL_GetPixelFormatName( info.texture_formats[i] ));
-    // }
-
-    update_viewport();
     return window;
 }
 
@@ -147,27 +122,12 @@ static int get_and_handle_message(MSG_* msg) {
             directinput_key_state[dinput_key] = (event.type == SDL_KEYDOWN ? 0x80 : 0);
             break;
 
-        case SDL_WINDOWEVENT:
-            switch (event.window.event) {
-            case SDL_WINDOWEVENT_SIZE_CHANGED:
-                SDL_GetWindowSize(window, &window_width, &window_height);
-                update_viewport();
-                sdl_window_scale.x = (float)render_width / vp_width;
-                sdl_window_scale.y = (float)render_height / vp_height;
-                break;
-            }
-            break;
-
         case SDL_QUIT:
             msg->message = WM_QUIT;
             return 1;
         }
     }
     return 0;
-}
-
-static void swap_window(void) {
-    SDL_GL_SwapWindow(window);
 }
 
 static void get_keyboard_state(unsigned int count, uint8_t* buffer) {
@@ -184,21 +144,6 @@ static int get_mouse_buttons(int* pButton1, int* pButton2) {
 static int get_mouse_position(int* pX, int* pY) {
     SDL_GetMouseState(pX, pY);
 
-    if (*pX < vp_x) {
-        *pX = vp_x;
-    } else if (*pX >= vp_x + vp_width) {
-        *pX = vp_x + vp_width - 1;
-    }
-    if (*pY < vp_y) {
-        *pY = vp_y;
-    } else if (*pY >= vp_y + vp_height) {
-        *pY = vp_y + vp_height - 1;
-    }
-    *pX -= vp_x;
-    *pY -= vp_y;
-    *pX *= sdl_window_scale.x;
-    *pY *= sdl_window_scale.y;
-
 #if defined(DETHRACE_FIX_BUGS)
     // In hires mode (640x480), the menus are still rendered at (320x240),
     // so prescale the cursor coordinates accordingly.
@@ -210,21 +155,43 @@ static int get_mouse_position(int* pX, int* pY) {
     return 0;
 }
 
-static void present_screen(br_pixelmap *src) {
+static void limit_fps(void) {
+    Uint32 now = SDL_GetTicks();
+    if (last_frame_time != 0) {
+        unsigned int frame_time = now - last_frame_time;
+        last_frame_time = now;
+        if (frame_time < 100) {
+            int sleep_time = (1000 / harness_game_config.fps) - frame_time;
+            if (sleep_time > 5) {
+                gHarness_platform.Sleep(sleep_time);
+            }
+        }
+    }
+    last_frame_time = SDL_GetTicks();
+}
+
+static void present_screen(br_pixelmap* src) {
     // fastest way to convert 8 bit indexed to 32 bit
-    uint8_t *src_pixels = src->pixels;
-    uint32_t *dest_pixels;
+    uint8_t* src_pixels = src->pixels;
+    uint32_t* dest_pixels;
     int dest_pitch;
-    SDL_LockTexture(screen_texture, NULL, &dest_pixels, &dest_pitch);
+
+    SDL_LockTexture(screen_texture, NULL, (void**)&dest_pixels, &dest_pitch);
     for (int i = 0; i < src->height * src->width; i++) {
         *dest_pixels = converted_palette[*src_pixels];
         dest_pixels++;
         src_pixels++;
     }
     SDL_UnlockTexture(screen_texture);
+    SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer, screen_texture, NULL, NULL);
     SDL_RenderPresent(renderer);
+
     last_screen_src = src;
+
+    if (harness_game_config.fps != 0) {
+        limit_fps();
+    }
 }
 
 static void set_palette(PALETTEENTRY_* pal) {
@@ -249,7 +216,6 @@ void Harness_Platform_Init(tHarness_platform* platform) {
     platform->CreateWindowAndRenderer = create_window_and_renderer;
     platform->ShowCursor = SDL_ShowCursor;
     platform->SetWindowPos = set_window_pos;
-    platform->SwapWindow = swap_window;
     platform->DestroyWindow = destroy_window;
     platform->GetKeyboardState = get_keyboard_state;
     platform->GetMousePosition = get_mouse_position;
