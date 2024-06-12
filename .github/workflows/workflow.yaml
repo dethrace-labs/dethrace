@@ -1,6 +1,6 @@
 name: Workflow
 
-on: 
+on:
   push:
     branches:
       - 'main'
@@ -16,6 +16,7 @@ jobs:
       matrix:
         platform:
           - { name: 'Linux',    arch: 'x64',        os: ubuntu-latest, werror: true }
+          - { name: 'Linux',    arch: 'arm64',      os: ubuntu-latest, werror: true }
           - { name: 'MacOS',    arch: 'arm64-x64',  os: macos-latest,  werror: true, cmake-args: '-DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"' }
           - { name: 'Windows',  arch: 'Win32',      os: windows-latest }
           - { name: 'Windows',  arch: 'x64',        os: windows-latest }
