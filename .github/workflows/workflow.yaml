@@ -16,8 +16,8 @@ jobs:
       matrix:
         platform:
           - { name: 'Linux',    arch: 'x64',        os: ubuntu-latest, werror: true }
-          - { name: 'Linux',    arch: 'arm64',      os: ubuntu-latest, werror: true }
-          - { name: 'MacOS',    arch: 'arm64-x64',  os: macos-latest,  werror: true, cmake-args: '-DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"' }
+          - { name: 'Linux',    arch: 'arm64',      os: ubuntu-latest, werror: true, cmake-toolchain-file: 'cmake/toolchains/linux-aarch64.cmake' }
+          - { name: 'MacOS',    arch: 'arm64-x64',  os: macos-latest,  werror: true, cmake-args: '-DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"', apt-packages: 'gcc-aarch64-linux-gnu', cross: true }
           - { name: 'Windows',  arch: 'Win32',      os: windows-latest }
           - { name: 'Windows',  arch: 'x64',        os: windows-latest }
 
@@ -40,12 +40,13 @@ jobs:
         if: ${{ runner.os == 'Linux' }}
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgl-dev
+          sudo apt-get install -y libgl-dev ${{ matrix.platform.apt-packages }}
       - name: Set up SDL
         uses: libsdl-org/setup-sdl@main
         with:
           cmake-arguments: ${{ matrix.platform.cmake-args }}
           cmake-generator: Ninja
+          cmake-toolchain-file: ${{ matrix.platform.cmake-toolchain-file }}
           version: 2-latest
           add-to-environment: true
 
@@ -64,11 +65,13 @@ jobs:
             -DDETHRACE_INSTALL=ON \
             -DDETHRACE_PACKAGE_PLATFORM=${{ matrix.platform.name }} \
             -DDETHRACE_PACKAGE_ARCH=${{ matrix.platform.arch }} \
+            -DCMAKE_TOOLCHAIN_FILE=${{ matrix.platform.cmake-toolchain-file }} \
             ${{ matrix.platform.cmake-args }}
       - name: 'Build (CMake)'
         run: |
           cmake --build build
       - name: 'Test (CTest)'
+        if: ${{ !matrix.platform.cross }}
         run: |
           ctest --test-dir build --verbose
       - name: 'Package (CPack)'
