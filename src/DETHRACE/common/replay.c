@@ -1,5 +1,6 @@
 #include "replay.h"
 #include "brender.h"
+#include "brhton.h"
 #include "car.h"
 #include "controls.h"
 #include "displays.h"
@@ -7,7 +8,6 @@
 #include "globvrpb.h"
 #include "grafdata.h"
 #include "graphics.h"
-#include "brhton.h"
 #include "input.h"
 #include "loading.h"
 #include "main.h"
@@ -399,24 +399,104 @@ void PollActionReplayControls(tU32 pFrame_period) {
     };
     static tRectangle mouse_areas[2][8] = {
         {
-            {  63, 182,  92, 198, },
-            {  93, 182, 118, 198, },
-            { 119, 182, 144, 198, },
-            { 145, 182, 166, 198, },
-            { 167, 182, 192, 198, },
-            { 193, 182, 218, 198, },
-            { 219, 182, 244, 198, },
-            { 245, 182, 272, 198, },
+            {
+                63,
+                182,
+                92,
+                198,
+            },
+            {
+                93,
+                182,
+                118,
+                198,
+            },
+            {
+                119,
+                182,
+                144,
+                198,
+            },
+            {
+                145,
+                182,
+                166,
+                198,
+            },
+            {
+                167,
+                182,
+                192,
+                198,
+            },
+            {
+                193,
+                182,
+                218,
+                198,
+            },
+            {
+                219,
+                182,
+                244,
+                198,
+            },
+            {
+                245,
+                182,
+                272,
+                198,
+            },
         },
         {
-            { 126, 436, 184, 475, },
-            { 186, 436, 236, 475, },
-            { 238, 436, 288, 475, },
-            { 290, 436, 332, 475, },
-            { 334, 436, 384, 475, },
-            { 386, 436, 436, 475, },
-            { 438, 436, 488, 475, },
-            { 490, 436, 544, 475, },
+            {
+                126,
+                436,
+                184,
+                475,
+            },
+            {
+                186,
+                436,
+                236,
+                475,
+            },
+            {
+                238,
+                436,
+                288,
+                475,
+            },
+            {
+                290,
+                436,
+                332,
+                475,
+            },
+            {
+                334,
+                436,
+                384,
+                475,
+            },
+            {
+                386,
+                436,
+                436,
+                475,
+            },
+            {
+                438,
+                436,
+                488,
+                475,
+            },
+            {
+                490,
+                436,
+                544,
+                475,
+            },
         },
     };
     LOG_TRACE("(%d)", pFrame_period);
@@ -434,8 +514,7 @@ void PollActionReplayControls(tU32 pFrame_period) {
         if ((old_key_down == -1 || old_key_down == KEY_KP_4 || old_key_down == KEY_KP_6 || old_key_down == KEY_KP_MULTIPLY) && EitherMouseButtonDown()) {
             GetMousePosition(&x_coord, &y_coord);
             for (i = 0; i < COUNT_OF(mouse_areas[0]); i++) {
-                if (mouse_areas[gGraf_data_index][i].left <= x_coord && mouse_areas[gGraf_data_index][i].top <= y_coord &&
-                    mouse_areas[gGraf_data_index][i].right >= x_coord && mouse_areas[gGraf_data_index][i].bottom >= y_coord) {
+                if (mouse_areas[gGraf_data_index][i].left <= x_coord && mouse_areas[gGraf_data_index][i].top <= y_coord && mouse_areas[gGraf_data_index][i].right >= x_coord && mouse_areas[gGraf_data_index][i].bottom >= y_coord) {
                     gKey_down = psuedo_mouse_keys[i];
                     break;
                 }

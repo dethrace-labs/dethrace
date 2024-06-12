@@ -12,18 +12,16 @@
 extern void Harness_Init(int* argc, char* argv[]);
 extern int original_main(int pArgc, char* pArgv[]);
 
-void BR_CALLBACK _BrBeginHook(void)
-{
-    struct br_device *BR_EXPORT BrDrv1SoftPrimBegin(char *arguments);
-    struct br_device *BR_EXPORT BrDrv1SoftRendBegin(char *arguments);
+void BR_CALLBACK _BrBeginHook(void) {
+    struct br_device* BR_EXPORT BrDrv1SoftPrimBegin(char* arguments);
+    struct br_device* BR_EXPORT BrDrv1SoftRendBegin(char* arguments);
 
     BrDevAddStatic(NULL, BrDrv1SoftPrimBegin, NULL);
     BrDevAddStatic(NULL, BrDrv1SoftRendBegin, NULL);
-    //BrDevAddStatic(NULL, BrDrv1SDL2Begin, NULL);
+    // BrDevAddStatic(NULL, BrDrv1SDL2Begin, NULL);
 }
 
-void BR_CALLBACK _BrEndHook(void)
-{
+void BR_CALLBACK _BrEndHook(void) {
 }
 
 int main(int argc, char* argv[]) {

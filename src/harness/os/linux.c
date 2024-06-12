@@ -178,7 +178,7 @@ static void signal_handler(int sig, siginfo_t* siginfo, void* context) {
 void resolve_full_path(char* path, const char* argv0) {
     if (argv0[0] == '/') { // run with absolute path
         strcpy(path, argv0);
-    } else {               // run with relative path
+    } else { // run with relative path
         if (NULL == getcwd(path, PATH_MAX)) {
             perror("getcwd error");
             return;

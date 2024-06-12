@@ -1,10 +1,10 @@
 #include "oppoproc.h"
+#include "brender.h"
 #include "errors.h"
 #include "globvars.h"
 #include "harness/trace.h"
 #include "opponent.h"
 #include "pd/sys.h"
-#include "brender.h"
 #include <math.h>
 #include <stdlib.h>
 

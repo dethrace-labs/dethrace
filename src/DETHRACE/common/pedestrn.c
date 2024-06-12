@@ -36,7 +36,7 @@
 #define PEDESTRIAN_MAGIC FOURCC('P', 'e', 'd', '!')
 #define ActorToPedestrianData(ACTOR) ((tPedestrian_data*)((ACTOR)->type_data))
 
-#define GET_PEDESTRIAN_INDEX(P) ((P) - gPedestrian_array)
+#define GET_PEDESTRIAN_INDEX(P) ((P)-gPedestrian_array)
 
 int gDetect_peds = 1;
 int gReally_stupid_ped_bug_enable = 0;

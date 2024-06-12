@@ -1,6 +1,7 @@
 #include "world.h"
 #include <stdlib.h>
 
+#include "brender.h"
 #include "brucetrk.h"
 #include "car.h"
 #include "depth.h"
@@ -9,6 +10,7 @@
 #include "errors.h"
 #include "finteray.h"
 #include "flicplay.h"
+#include "formats.h"
 #include "globvars.h"
 #include "globvrpb.h"
 #include "graphics.h"
@@ -23,8 +25,6 @@
 #include "spark.h"
 #include "trig.h"
 #include "utility.h"
-#include "brender.h"
-#include "formats.h"
 
 #include <float.h>
 #include <string.h>
@@ -3000,46 +3000,46 @@ br_scalar NormaliseDegreeAngle(br_scalar pAngle) {
 
 #define SAW(T, PERIOD) (fmodf((T), (PERIOD)) / (PERIOD))
 
-#define MOVE_FUNK_PARAMETER(DEST, MODE, PERIOD, AMPLITUDE, FLASH_VALUE)                     \
-    do {                                                                                    \
-        switch (MODE) {                                                                     \
-        case eMove_continuous:                                                              \
-            if ((PERIOD) == 0.f) {                                                          \
-                DEST = 0.f;                                                                 \
-            } else {                                                                        \
-                DEST = (AMPLITUDE) * SAW(f_the_time, (PERIOD));                             \
-            }                                                                               \
-            break;                                                                          \
-        case eMove_controlled:                                                              \
-            DEST = (PERIOD) * (AMPLITUDE);                                                  \
-            break;                                                                          \
-        case eMove_absolute:                                                                \
-            DEST = (PERIOD);                                                                \
-            break;                                                                          \
-        case eMove_linear:                                                                  \
-            if ((PERIOD) == 0.f) {                                                          \
-                DEST = 0.f;                                                                 \
-            } else {                                                                        \
-                DEST = (AMPLITUDE) * MapSawToTriangle(SAW(f_the_time, (PERIOD)));           \
-            }                                                                               \
-            break;                                                                          \
-        case eMove_flash:                                                                   \
-            if (2 * fmodf(f_the_time, (PERIOD)) > (PERIOD)) {                               \
-                DEST = (FLASH_VALUE);                                                       \
-            } else {                                                                        \
-                DEST = -(FLASH_VALUE);                                                      \
-            }                                                                               \
-            break;                                                                          \
-        case eMove_harmonic:                                                                \
-            if ((PERIOD) == 0.f) {                                                          \
-                DEST = 0.f;                                                                 \
-            } else {                                                                        \
-                DEST = (AMPLITUDE) * BR_SIN(BR_ANGLE_DEG(SAW(f_the_time, (PERIOD)) * 360)); \
-            }                                                                               \
-            break;                                                                          \
-        default:                                                                            \
-            TELL_ME_IF_WE_PASS_THIS_WAY();                                                  \
-        }                                                                                   \
+#define MOVE_FUNK_PARAMETER(DEST, MODE, PERIOD, AMPLITUDE, FLASH_VALUE)                   \
+    do {                                                                                  \
+        switch (MODE) {                                                                   \
+        case eMove_continuous:                                                            \
+            if ((PERIOD) == 0.f) {                                                        \
+                DEST = 0.f;                                                               \
+            } else {                                                                      \
+                DEST = (AMPLITUDE)*SAW(f_the_time, (PERIOD));                             \
+            }                                                                             \
+            break;                                                                        \
+        case eMove_controlled:                                                            \
+            DEST = (PERIOD) * (AMPLITUDE);                                                \
+            break;                                                                        \
+        case eMove_absolute:                                                              \
+            DEST = (PERIOD);                                                              \
+            break;                                                                        \
+        case eMove_linear:                                                                \
+            if ((PERIOD) == 0.f) {                                                        \
+                DEST = 0.f;                                                               \
+            } else {                                                                      \
+                DEST = (AMPLITUDE)*MapSawToTriangle(SAW(f_the_time, (PERIOD)));           \
+            }                                                                             \
+            break;                                                                        \
+        case eMove_flash:                                                                 \
+            if (2 * fmodf(f_the_time, (PERIOD)) > (PERIOD)) {                             \
+                DEST = (FLASH_VALUE);                                                     \
+            } else {                                                                      \
+                DEST = -(FLASH_VALUE);                                                    \
+            }                                                                             \
+            break;                                                                        \
+        case eMove_harmonic:                                                              \
+            if ((PERIOD) == 0.f) {                                                        \
+                DEST = 0.f;                                                               \
+            } else {                                                                      \
+                DEST = (AMPLITUDE)*BR_SIN(BR_ANGLE_DEG(SAW(f_the_time, (PERIOD)) * 360)); \
+            }                                                                             \
+            break;                                                                        \
+        default:                                                                          \
+            TELL_ME_IF_WE_PASS_THIS_WAY();                                                \
+        }                                                                                 \
     } while (0)
 
 // IDA: void __cdecl FunkThoseTronics()
