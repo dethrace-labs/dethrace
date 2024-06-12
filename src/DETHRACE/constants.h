@@ -324,11 +324,11 @@ enum {
     kFancyHeadupCheckpoint = 12,
     kFancyHeadupOutOfTime = 13,
     kFancyHeadupRaceCompleted = 14,
-
-    // FIXME: missing network fancy head-ups
-
+    kFancyHeadupYouAreWasted = 15,
+    kFancyHeadupYouAreBothWasted = 16,
     kFancyHeadupNetworkRaceOverNetworkLoss = 17,
     kFancyHeadupNetworkRaceNoMoreMoney = 18,
+    kFancyHeadupYouLost = 19,
     kFancyHeadupNetworkVictory = 20,
     kFancyHeadupDemoTimeout = 21,
 };

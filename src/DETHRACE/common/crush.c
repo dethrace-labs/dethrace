@@ -1177,7 +1177,7 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
                     NetEarnCredits(NetPlayerFromCar(culprit), credits);
                 } else {
                     PratcamEvent(32);
-                    DoFancyHeadup(11);
+                    DoFancyHeadup(kFancyHeadupYouWastedEm);
                     credits_squared = sqr(0.7f / victim->car_model_actors[victim->principal_car_actor].crush_data.softness_factor) * gWasted_creds[gProgram_state.skill_level] + 50.0f;
                     credits = 100 * (int)(credits_squared / 100.0);
                     AwardTime(gWasted_time[gProgram_state.skill_level]);
@@ -1242,13 +1242,13 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
                             AwardTime(MIN(time, 90));
                             if (pCar2) {
                                 if (head_on) {
-                                    DoFancyHeadup(10);
+                                    DoFancyHeadup(kFancyHeadupHeadOnBonus);
                                 } else if (bonus_level <= 2) {
                                     if (bonus_level > 1) {
-                                        DoFancyHeadup(2);
+                                        DoFancyHeadup(kFancyHeadupExtraStyleBonus);
                                     }
                                 } else {
-                                    DoFancyHeadup(3);
+                                    DoFancyHeadup(kFancyHeadupBonusForArtisticImpression);
                                 }
                             }
                         }

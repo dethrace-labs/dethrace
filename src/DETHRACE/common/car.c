@@ -1761,7 +1761,7 @@ void RotateCar2(tCollision_info* c, br_scalar dt) {
     BrMatrix34PostTranslate(&m, c->cmpos.v[0], c->cmpos.v[1], c->cmpos.v[2]);
     BrMatrix34Pre(&c->car_master_actor->t.t.mat, &m);
     BrVector3Copy(&c->oldomega, &c->omega);
-    BrVector3Div(&c->omega, &L2, &c->I);
+    Vector3Div(&c->omega, &L2, &c->I);
 }
 
 // IDA: void __usercall RotateCarSecondOrder(tCollision_info *c@<EAX>, br_scalar dt)

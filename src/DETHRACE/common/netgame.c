@@ -827,7 +827,7 @@ void DoNetScores2(int pOnly_sort_scores) {
             }
             if (abs(gNet_players[index].score) == 1000000) {
                 if (flash_state) {
-                    strcpy(s, GetMiscString(173));
+                    strcpy(s, GetMiscString(kMiscString_WASTED_173));
                 } else {
                     s[0] = '\0';
                 }
@@ -846,13 +846,13 @@ void DoNetScores2(int pOnly_sort_scores) {
                 case eNet_game_type_sudden_death:
                     if (gNet_players[index].score < 0) {
                         if (flash_state) {
-                            sprintf(s, "%s", GetMiscString(93));
+                            sprintf(s, "%s", GetMiscString(kMiscString_OUT));
                         } else {
                             s[0] = '\0';
                         }
                     } else {
                         score = gNet_players[index].score;
-                        sprintf(s, "%s -%d-", GetMiscString(92), score);
+                        sprintf(s, "%s -%d-", GetMiscString(kMiscString_IN), score);
                     }
                     break;
                 case eNet_game_type_tag:
@@ -864,7 +864,7 @@ void DoNetScores2(int pOnly_sort_scores) {
                             TimerString(gNet_players[index].score, s, 0, 1);
                         }
                     } else {
-                        sprintf(s, "%s", GetMiscString(93));
+                        sprintf(s, "%s", GetMiscString(kMiscString_OUT));
                     }
                     break;
                 default:
@@ -1141,7 +1141,7 @@ void CalcPlayerScores(void) {
         if (gNet_players[i].last_waste_message != 0
             && !gNet_players[i].wasteage_attributed
             && time - gNet_players[i].last_waste_message > 500) {
-            sprintf(s, "%s %s", gNet_players[i].player_name, GetMiscString(172));
+            sprintf(s, "%s %s", gNet_players[i].player_name, GetMiscString(kMiscString_COMMITTED_SUICIDE));
             gNet_players[i].last_waste_message = 0;
             gNet_players[i].wasteage_attributed = 0;
             if (gCurrent_net_game->type == eNet_game_type_car_crusher) {
@@ -1308,7 +1308,7 @@ void CalcPlayerScores(void) {
         if (cars_left) {
             lowest_score_player->car->knackered = 1;
             lowest_score_player->wasted = 1;
-            lowest_score_player->games_score += gGame_scores[6 - cars_left];
+            lowest_score_player->games_score += gGame_scores[5 - cars_left];
             lowest_score_player->score = -1;
             if (player_left == -1) {
                 EverybodysLost();
@@ -1317,7 +1317,7 @@ void CalcPlayerScores(void) {
                     SelectRandomItOrFox(i);
                 }
                 SendGameplay(lowest_score_player->ID, eNet_gameplay_suddenly_death, 0, 0, 0, 0);
-                sprintf(s, "%s %s", lowest_score_player->player_name, GetMiscString(184));
+                sprintf(s, "%s %s", lowest_score_player->player_name, GetMiscString(kMiscString_IS_OUT));
                 NetSendHeadupToEverybody(s);
             } else {
                 DeclareWinner(player_left);
@@ -1560,7 +1560,7 @@ void ReceivedGameplay(tNet_contents* pContents, tNet_message* pMessage, tU32 pRe
                 WrongCheckpoint(pContents->data.gameplay.param_1);
                 break;
             case eNet_gameplay_suddenly_death:
-                DoFancyHeadup(17);
+                DoFancyHeadup(kFancyHeadupNetworkRaceOverNetworkLoss);
                 ChangeAmbientPratcam(36);
                 gRace_finished = 1;
                 break;

@@ -1610,14 +1610,14 @@ void ReceivedWasted(tNet_contents* pContents) {
     victim->car->knackered = 1;
     if (pContents->data.wasted.victim == gLocal_net_ID) {
         if (gCurrent_net_game->type == eNet_game_type_fight_to_death) {
-            DoFancyHeadup(19);
+            DoFancyHeadup(kFancyHeadupYouLost);
             gRace_finished = 1;
         } else {
             last_got_wasted_time = PDGetTotalTime();
             if (last_got_wasted_time - last_wasted_em_time > 1000) {
-                DoFancyHeadup(15);
+                DoFancyHeadup(kFancyHeadupYouAreWasted);
             } else {
-                DoFancyHeadup(16);
+                DoFancyHeadup(kFancyHeadupYouAreBothWasted);
             }
         }
     }
@@ -1631,20 +1631,18 @@ void ReceivedWasted(tNet_contents* pContents) {
         } else {
             culprit = NetPlayerFromID(pContents->data.wasted.culprit);
         }
-        if (culprit != NULL) {
-            if (gNet_mode == eNet_mode_host && gCurrent_net_game->type == eNet_game_type_car_crusher) {
-                culprit->score++;
-            }
+        if (culprit != NULL && gNet_mode == eNet_mode_host && gCurrent_net_game->type == eNet_game_type_car_crusher) {
+            culprit->score++;
             if (culprit->score >= gCurrent_net_game->options.race_end_target) {
                 DeclareWinner(culprit - gNet_players);
             }
         }
         victim->last_waste_message = GetTotalTime();
         victim->wasteage_attributed = 1;
-        if (culprit != NULL && victim == last_culprit && culprit == last_victim && PDGetTotalTime() - last_wasty_message_time < 1000) {
-            sprintf(s, "%s %s %s %s", victim->player_name, GetMiscString(126), culprit->player_name, GetMiscString(127));
+        if (victim == last_culprit && culprit == last_victim && victim != NULL && culprit != NULL && PDGetTotalTime() - last_wasty_message_time < 1000) {
+            sprintf(s, "%s %s %s %s", victim->player_name, GetMiscString(kMiscString_AND), culprit->player_name, GetMiscString(kMiscString_WASTED_EACH_OTHER));
         } else {
-            sprintf(s, "%s %s %s", victim->player_name, GetMiscString(171), culprit ? culprit->player_name : GetMiscString(216));
+            sprintf(s, "%s %s %s", victim->player_name, GetMiscString(kMiscString_WastedBy), culprit ? culprit->player_name : GetMiscString(kMiscString_COP));
         }
         NewTextHeadupSlot2(4, 0, 3000, -4, s, 0);
         last_wasty_message_time = PDGetTotalTime();
@@ -1654,9 +1652,9 @@ void ReceivedWasted(tNet_contents* pContents) {
             PratcamEvent(32);
             last_wasted_em_time = PDGetTotalTime();
             if (last_wasted_em_time - last_got_wasted_time > 1000) {
-                DoFancyHeadup(11);
+                DoFancyHeadup(kFancyHeadupYouWastedEm);
             } else {
-                DoFancyHeadup(16);
+                DoFancyHeadup(kFancyHeadupYouAreBothWasted);
             }
         }
     }

@@ -1223,10 +1223,10 @@ void NetSumDraw(int pCurrent_choice, int pCurrent_mode) {
         DRPixelmapRectangleMaskedCopy(gBack_screen,
             gCurrent_graf_data->net_sum_x_1,
             gCurrent_graf_data->net_sum_headings_y + 1 + i * gCurrent_graf_data->net_sum_y_pitch,
-            gIcons_pix,
+            gIcons_pix_low_res,  /* DOS version uses low res, Windows version uses normal res */
             0,
             gCurrent_graf_data->net_head_icon_height * player->car_index,
-            gIcons_pix->width,
+            gIcons_pix_low_res->width,  /* DOS version uses low res, Windows version uses normal res */
             gCurrent_graf_data->net_head_icon_height);
         TurnOnPaletteConversion();
         DrawAnItem__racesumm(gCurrent_graf_data->net_sum_x_2, i, 83, s);
