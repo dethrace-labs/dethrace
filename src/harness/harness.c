@@ -181,7 +181,7 @@ void Harness_Init(int* argc, char* argv[]) {
     } else {
         root_dir = OS_Dirname(argv[0]);
     }
-    // if root_dir is empty or ".", no need to chdir
+    // if root_dir is null or empty, no need to chdir
     if (root_dir != NULL && root_dir[0] != '\0') {
         printf("Using root directory: %s\n", root_dir);
         result = chdir(root_dir);
