@@ -181,10 +181,13 @@ void Harness_Init(int* argc, char* argv[]) {
     } else {
         root_dir = OS_Dirname(argv[0]);
     }
-    printf("Using root directory: %s\n", root_dir);
-    result = chdir(root_dir);
-    if (result != 0) {
-        LOG_PANIC("Failed to chdir. Error is %s", strerror(errno));
+    // if root_dir is null or empty, no need to chdir
+    if (root_dir != NULL && root_dir[0] != '\0') {
+        printf("Using root directory: %s\n", root_dir);
+        result = chdir(root_dir);
+        if (result != 0) {
+            LOG_PANIC("Failed to chdir. Error is %s", strerror(errno));
+        }
     }
 
     if (harness_game_info.mode == eGame_none) {

@@ -220,6 +220,10 @@ void GLRenderer_Init(int pRender_width, int pRender_height) {
     LOG_INFO("OpenGL version string: %s", glGetString(GL_VERSION));
     LOG_INFO("OpenGL shading language version string: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
+    if (glGetString(GL_SHADING_LANGUAGE_VERSION) == NULL) {
+        LOG_PANIC("GL_SHADING_LANGUAGE_VERSION is null");
+    }
+
     LoadShaders();
     SetupFullScreenRectGeometry();
 
