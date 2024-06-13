@@ -2668,9 +2668,9 @@ void DoModelThing(br_actor* actor, br_model* pModel, br_material* material, void
     GetRaceTime();
     for (group = 0; group < V11MODEL(pModel)->ngroups; group++) {
         for (j = 0; j < V11MODEL(pModel)->groups[group].nvertices; j++) {
-            if (!((V11MODEL(pModel)->groups[group].vertex_colours[j] >> 24) & 1)) {
-                if ((V11MODEL(pModel)->groups[group].vertex_colours[j] >> 24) < 0xc9) {
-                    val = ((V11MODEL(pModel)->groups[group].vertex_colours[j] >> 24) + 2 * IRandomBetween(5, 10)) << 24;
+            if (!(((V11MODEL(pModel)->groups[group].vertex_colours[j]) >> 24) & 1)) {
+                if (((V11MODEL(pModel)->groups[group].vertex_colours[j]) >> 24) < 0xc9) {
+                    val = ((V11MODEL(pModel)->groups[group].vertex_colours[j]) >> 24) + 2 * IRandomBetween(5, 10);
                     V11MODEL(pModel)->groups[group].vertex_colours[j] = BR_COLOUR_RGBA(0, 0, 0, val);
                     if (pModel->flags & BR_MODF_UPDATEABLE) {
                         pModel->vertices[V11MODEL(pModel)->groups[group].vertex_user[j]].index = val;
