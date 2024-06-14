@@ -1,7 +1,7 @@
 #ifndef _DOSAUDIO_H_
 #define _DOSAUDIO_H_
 
-#include "brender/brender.h"
+#include "brender.h"
 #include "s3_defs.h"
 
 extern int gS3_enabled;

@@ -3,7 +3,7 @@ configure_file(version.h.in version.h @ONLY)
 add_library(harness STATIC)
 
 if (NOT DEFINED IO_PLATFORM)
-    set(IO_PLATFORM "SDL_OpenGL")
+    set(IO_PLATFORM "SDL2")
 endif()
 
 target_include_directories(harness
@@ -59,8 +59,6 @@ target_sources(harness PRIVATE
     harness_trace.c
     harness.c
     harness.h
-    brender_emu/renderer_impl.c
-    brender_emu/renderer_impl.h
     sound/sound.c
     sound/sound.h
     win95/polyfill.c
@@ -71,31 +69,15 @@ target_sources(harness PRIVATE
     "${CMAKE_CURRENT_BINARY_DIR}/version.h"
 )
 
-if (IO_PLATFORM STREQUAL "SDL_OpenGL")
-    # generate embedded glsl resources
-    foreach(elem resources/framebuffer_vert.glsl resources/framebuffer_frag.glsl resources/3d_vert.glsl resources/3d_frag.glsl)
-        add_custom_command(
-            OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${elem}.h"
-            COMMAND "${CMAKE_COMMAND}" "-DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}" "-DFILE=${elem}" -P "${dethrace_SOURCE_DIR}/cmake/EmbedResource.cmake"
-            DEPENDS "${elem}"
-        )
-    endforeach()
+if (IO_PLATFORM STREQUAL "SDL2")
 
     target_sources(harness PRIVATE
-        platforms/sdl_opengl.c
+        platforms/sdl2.c
         platforms/sdl2_scancode_to_dinput.h
-        renderers/gl/gl_renderer.c
-        renderers/gl/gl_renderer.h
-        renderers/gl/stored_context.c
-        renderers/gl/stored_context.h
 
-        resources/framebuffer_vert.glsl.h
-        resources/framebuffer_frag.glsl.h
-        resources/3d_vert.glsl.h
-        resources/3d_frag.glsl.h
     )
     target_include_directories(harness PRIVATE "${dethrace_SOURCE_DIR}/src/DETHRACE/common")
-    target_link_libraries(harness PRIVATE SDL2::SDL2 glad)
+    target_link_libraries(harness PRIVATE SDL2::SDL2)
 endif()
 
 if(WIN32)

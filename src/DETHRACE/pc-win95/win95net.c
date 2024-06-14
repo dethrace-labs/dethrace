@@ -1,6 +1,6 @@
 #include "pd/net.h"
 
-#include "brender/brender.h"
+#include "brender.h"
 #include "dr_types.h"
 #include "errors.h"
 #include "globvrpb.h"

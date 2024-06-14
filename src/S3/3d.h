@@ -1,7 +1,7 @@
 #ifndef _3D_H_
 #define _3D_H_
 
-#include "brender/brender.h"
+#include "brender.h"
 #include "s3_defs.h"
 
 void S3Set3DSoundEnvironment(float a1, float a2, float a3);

@@ -1,5 +1,5 @@
 #include "oil.h"
-#include "brender/brender.h"
+#include "brender.h"
 #include "finteray.h"
 #include "globvars.h"
 #include "globvrpb.h"
@@ -41,8 +41,6 @@ void InitOilSpills(void) {
         the_material->flags |= BR_MATF_LIGHT;
         the_material->flags |= BR_MATF_PERSPECTIVE;
         the_material->flags |= BR_MATF_SMOOTH;
-	// TODO: added by dethrace, investigate why oil spills in OG do not need this flag set to render correctly
-        the_material->flags |= BR_MATF_TWO_SIDED;
         the_material->index_range = 0;
         the_material->colour_map = NULL;
         BrMatrix23Identity(&the_material->map_transform);
@@ -167,7 +165,7 @@ int OKToSpillOil(tOil_spill_info* pOil) {
     face_count = FindFacesInBox(&kev_bounds, the_list, COUNT_OF(the_list));
     BrVector3Set(&v, .0f, .2f, .0f);
     BrMatrix34ApplyP(&ray_pos, &v, &car->car_master_actor->t.t.mat);
-    BrVector3Set(&ray_dir, 0.f, kev_bounds.original_bounds.min.v[1] - kev_bounds.original_bounds.max.v[1], 0.f);\
+    BrVector3Set(&ray_dir, 0.f, kev_bounds.original_bounds.min.v[1] - kev_bounds.original_bounds.max.v[1], 0.f);
     if (face_count == 0) {
         return 0;
     }
@@ -257,12 +255,12 @@ void SetInitialOilStuff(tOil_spill_info* pOil, br_model* pModel) {
 
     pModel->vertices[0].p.v[0] = -0.1f;
     pModel->vertices[0].p.v[2] = -0.1f;
-    pModel->vertices[1].p.v[0] =  0.1f;
+    pModel->vertices[1].p.v[0] = 0.1f;
     pModel->vertices[1].p.v[2] = -0.1f;
-    pModel->vertices[2].p.v[0] =  0.1f;
-    pModel->vertices[2].p.v[2] =  0.1f;
+    pModel->vertices[2].p.v[0] = 0.1f;
+    pModel->vertices[2].p.v[2] = 0.1f;
     pModel->vertices[3].p.v[0] = -0.1f;
-    pModel->vertices[3].p.v[2] =  0.1f;
+    pModel->vertices[3].p.v[2] = 0.1f;
     pOil->actor->render_style = BR_RSTYLE_FACES;
     BrMaterialUpdate(pOil->actor->material, BR_MATU_ALL);
     BrModelUpdate(pModel, BR_MODU_ALL);
@@ -286,11 +284,7 @@ void ProcessOilSpills(tU32 pFrame_period) {
             gOily_spills[i].actor->render_style = BR_RSTYLE_NONE;
         } else {
             the_model = gOily_spills[i].actor->model;
-            if (gOily_spills[i].actor->render_style == BR_RSTYLE_NONE &&
-                gOily_spills[i].spill_time <= time &&
-                fabsf(gOily_spills[i].car->v.v[0]) < .01f &&
-                fabsf(gOily_spills[i].car->v.v[1]) < .01f &&
-                fabsf(gOily_spills[i].car->v.v[2]) < .01f) {
+            if (gOily_spills[i].actor->render_style == BR_RSTYLE_NONE && gOily_spills[i].spill_time <= time && fabsf(gOily_spills[i].car->v.v[0]) < .01f && fabsf(gOily_spills[i].car->v.v[1]) < .01f && fabsf(gOily_spills[i].car->v.v[2]) < .01f) {
                 if (gAction_replay_mode) {
                     SetInitialOilStuff(&gOily_spills[i], the_model);
                 } else {
@@ -326,8 +320,7 @@ void ProcessOilSpills(tU32 pFrame_period) {
                     }
                 }
             } else {
-                if (gOily_spills[i].actor->render_style == BR_RSTYLE_FACES &&
-                    (gOily_spills[i].stop_time == 0 || time < gOily_spills[i].stop_time)) {
+                if (gOily_spills[i].actor->render_style == BR_RSTYLE_FACES && (gOily_spills[i].stop_time == 0 || time < gOily_spills[i].stop_time)) {
                     BrVector3Sub(&v, &gOily_spills[i].original_pos, &gOily_spills[i].car->pos);
                     grow_amount = BrVector3LengthSquared(&v);
                     if (gOily_spills[i].stop_time != 0 || grow_amount <= 0.2f) {
@@ -374,7 +367,7 @@ void ProcessOilSpills(tU32 pFrame_period) {
 
 // IDA: int __cdecl GetOilSpillCount()
 int GetOilSpillCount(void) {
-    //LOG_TRACE("()");
+    // LOG_TRACE("()");
 
     return COUNT_OF(gOily_spills);
 }
@@ -391,7 +384,7 @@ void GetOilSpillDetails(int pIndex, br_actor** pActor, br_scalar* pSize) {
     }
 }
 
-#define SQR(V) ((V)*(V))
+#define SQR(V) ((V) * (V))
 
 // IDA: int __usercall PointInSpill@<EAX>(br_vector3 *pV@<EAX>, int pSpill@<EDX>)
 int PointInSpill(br_vector3* pV, int pSpill) {

@@ -1,7 +1,7 @@
 #include "world.h"
 #include <stdlib.h>
 
-#include "brender/brender.h"
+#include "brender.h"
 #include "brucetrk.h"
 #include "car.h"
 #include "depth.h"
@@ -10,6 +10,7 @@
 #include "errors.h"
 #include "finteray.h"
 #include "flicplay.h"
+#include "formats.h"
 #include "globvars.h"
 #include "globvrpb.h"
 #include "graphics.h"
@@ -514,7 +515,7 @@ int LoadNModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     char s[256];
     char* str;
     br_model* temp_array[2000];
-    v11model* prepared;
+    struct v11model* prepared;
     int group;
     LOG_TRACE("(%p, %p, %d)", pStorage_space, pF, pCount);
 
@@ -697,7 +698,7 @@ int LoadNTrackModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     char s[256];
     char* str;
     br_model* temp_array[2000];
-    v11model* prepared;
+    struct v11model* prepared;
     LOG_TRACE("(%p, %p, %d)", pStorage_space, pF, pCount);
 
     new_ones = 0;
@@ -1859,7 +1860,7 @@ void ChangeSubdivToPersp(void) {
 }
 
 // IDA: br_uint_32 __cdecl ProcessFaceMaterials(br_actor *pActor, tPMFMCB pCallback)
-intptr_t ProcessFaceMaterials(br_actor* pActor, tPMFMCB pCallback) {
+br_uintptr_t ProcessFaceMaterials(br_actor* pActor, tPMFMCB pCallback) {
     LOG_TRACE("(%p, %d)", pActor, pCallback);
 
     if (pActor->identifier == NULL || pActor->identifier[0] != '&') {
@@ -2269,7 +2270,7 @@ void DisposeTexturingMaterials(void) {
 }
 
 // IDA: br_uint_32 __cdecl SetAccessoryRenderingCB(br_actor *pActor, void *pFlag)
-intptr_t SetAccessoryRenderingCB(br_actor* pActor, void* pFlag) {
+br_uintptr_t SetAccessoryRenderingCB(br_actor* pActor, void* pFlag) {
     if (pActor->identifier && *pActor->identifier == '&') {
         pActor->render_style = *(br_uint_8*)pFlag;
     }
@@ -2581,7 +2582,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
             for (group = 0; group < V11MODEL(gTrack_storage_space.models[i])->ngroups; group++) {
                 int f = V11MODEL(gTrack_storage_space.models[i])->groups[group].face_user[0];
                 material = gTrack_storage_space.models[i]->faces[f].material;
-                V11MODEL(gTrack_storage_space.models[i])->groups[group].face_colours_material = material;
+                V11MODEL(gTrack_storage_space.models[i])->groups[group].user = material;
                 if (material && !material->index_shade) {
                     material->index_shade = BrTableFind("DRRENDER.TAB");
                     BrMaterialUpdate(material, 0x7FFFu);
@@ -2907,7 +2908,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
 }
 
 // IDA: br_uint_32 __cdecl RemoveBounds(br_actor *pActor, void *pArg)
-intptr_t RemoveBounds(br_actor* pActor, void* pArg) {
+br_uintptr_t RemoveBounds(br_actor* pActor, void* pArg) {
     LOG_TRACE("(%p, %p)", pActor, pArg);
 
     if (pActor->type == BR_ACTOR_BOUNDS || pActor->type == BR_ACTOR_BOUNDS_CORRECT) {
@@ -4321,7 +4322,7 @@ br_uint_32 SetIDAndDupModel(br_actor* pActor, void* pArg) {
         new_model = BrModelAllocate(s2, pActor->model->nvertices, pActor->model->nfaces);
         memcpy(new_model->vertices, pActor->model->vertices, pActor->model->nvertices * sizeof(br_vertex));
         memcpy(new_model->faces, pActor->model->faces, pActor->model->nfaces * sizeof(br_face));
-        new_model->flags |= 0x80; // FIXME: unknown model flag
+        new_model->flags |= BR_MODF_UPDATEABLE;
         BrModelAdd(new_model);
         BrModelUpdate(new_model, BR_MODU_ALL);
         pActor->model = new_model;
@@ -4424,7 +4425,7 @@ void DropActor(int pIndex) {
                 BrVector3Copy(&gActor_centre, &gLast_actor->t.t.translate.t);
                 DuplicateIfNotAmpersand(gLast_actor);
                 UniquificateActorsName(gUniverse_actor, gLast_actor);
-                gLast_actor->model->flags |= 0x80; // FIXME: unknown flag
+                gLast_actor->model->flags |= BR_MODF_UPDATEABLE;
                 if (gLast_actor->identifier == NULL || gLast_actor->identifier[0] == '&') {
                     last_non_ampersand = gAdditional_actors;
                     for (a = gAdditional_actors->children; a != NULL; a = a->next) {

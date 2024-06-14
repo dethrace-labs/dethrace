@@ -1,7 +1,6 @@
 #ifndef _MAINLOOP_H_
 #define _MAINLOOP_H_
 
-#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern int gNasty_kludgey_cockpit_variable;

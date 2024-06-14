@@ -1,7 +1,6 @@
 #ifndef _SPARK_H_
 #define _SPARK_H_
 
-#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern int gNext_spark;

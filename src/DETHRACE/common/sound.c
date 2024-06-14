@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "brender/brender.h"
+#include "brender.h"
 #include "controls.h"
 #include "globvars.h"
 #include "graphics.h"

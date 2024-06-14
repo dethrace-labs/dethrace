@@ -1,7 +1,6 @@
 #ifndef _DRFILE_H_
 #define _DRFILE_H_
 
-#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern br_filesystem gFilesystem;

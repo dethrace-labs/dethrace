@@ -1,7 +1,6 @@
 #ifndef _NEWGAME_H_
 #define _NEWGAME_H_
 
-#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern tU8* gFrank_flic_data;
@@ -13,8 +12,8 @@ extern tNet_game_options gNet_settings[8];
 extern tJoinable_game gGames_to_join[6];
 extern tNet_game_options* gOptions;
 extern int gNet_target[7];
-extern int gLast_graph_sel__newgame; // suffix added to avoid duplicate symbol
-extern tInterface_spec* gThe_interface_spec__newgame; // suffix added to avoid duplicate symbol
+extern int gLast_graph_sel__newgame;                   // suffix added to avoid duplicate symbol
+extern tInterface_spec* gThe_interface_spec__newgame;  // suffix added to avoid duplicate symbol
 extern tNet_sequence_type gNet_race_sequence__newgame; // suffix added to avoid duplicate symbol
 extern tNet_game_type gLast_game_type;
 extern int gCurrent_net_game_count;

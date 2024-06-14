@@ -1,7 +1,6 @@
 #ifndef _OPPONENT_H_
 #define _OPPONENT_H_
 
-#include "brender/br_types.h"
 #include "dr_types.h"
 
 #define CAR_SPEC_IS_OPPONENT(CAR_SPEC) (VEHICLE_TYPE_FROM_ID((CAR_SPEC)->car_ID) == eVehicle_opponent)

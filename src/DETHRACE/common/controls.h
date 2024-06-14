@@ -1,7 +1,6 @@
 #ifndef _CONTROLS_H_
 #define _CONTROLS_H_
 
-#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern tToggle_element gToggle_array[43];

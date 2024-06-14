@@ -1,5 +1,5 @@
 #include "netgame.h"
-#include "brender/brender.h"
+#include "brender.h"
 #include "brucetrk.h"
 #include "car.h"
 #include "controls.h"

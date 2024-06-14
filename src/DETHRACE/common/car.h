@@ -1,19 +1,18 @@
 #ifndef _CAR_H_
 #define _CAR_H_
 
-#include "brender/br_types.h"
 #include "dr_types.h"
 
 #define CAR_MAX_SIMPLIFICATION_LEVEL 4
 
 extern int gDoing_physics;
 extern br_scalar gDt;
-extern int gCollision_detection_on__car; // suffix added to avoid duplicate symbol
-extern br_vector3 gGround_normal__car; // suffix added to avoid duplicate symbol
+extern int gCollision_detection_on__car;                  // suffix added to avoid duplicate symbol
+extern br_vector3 gGround_normal__car;                    // suffix added to avoid duplicate symbol
 extern void (*ControlCar__car[6])(tCar_spec*, br_scalar); // suffix added to avoid duplicate symbol
-extern int gControl__car; // suffix added to avoid duplicate symbol
-extern int gFace_num__car; // suffix added to avoid duplicate symbol
-extern br_angle gOld_yaw__car; // suffix added to avoid duplicate symbol
+extern int gControl__car;                                 // suffix added to avoid duplicate symbol
+extern int gFace_num__car;                                // suffix added to avoid duplicate symbol
+extern br_angle gOld_yaw__car;                            // suffix added to avoid duplicate symbol
 extern br_angle gOld_zoom;
 extern br_vector3 gCamera_pos_before_collide;
 extern int gMetal_crunch_sound_id__car[5]; // suffix added to avoid duplicate symbol
@@ -59,8 +58,8 @@ extern int gCamera_frozen;
 extern int gMaterial_index;
 extern int gInTheSea;
 extern int gCamera_mode;
-extern br_scalar gOur_yaw__car; // suffix added to avoid duplicate symbol
-extern br_scalar gGravity__car; // suffix added to avoid duplicate symbol
+extern br_scalar gOur_yaw__car;            // suffix added to avoid duplicate symbol
+extern br_scalar gGravity__car;            // suffix added to avoid duplicate symbol
 extern br_vector3 gNew_ground_normal__car; // suffix added to avoid duplicate symbol
 extern char gNon_car_spec_list[100];
 extern tU32 gMechanics_time_sync;

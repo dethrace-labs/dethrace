@@ -19,6 +19,30 @@ void debug_printf(const char* fmt, const char* fn, const char* fmt2, ...) {
     puts("\033[0m");
 }
 
+void panic_printf(const char* fmt, const char* fn, const char* fmt2, ...) {
+    va_list ap;
+
+    FILE* fp = fopen("dethrace.log", "w");
+
+    puts("\033[0;31m");
+    printf(fmt, fn);
+
+    if (fp != NULL) {
+        fprintf(fp, fmt, fn);
+    }
+
+    va_start(ap, fmt2);
+    vprintf(fmt2, ap);
+    if (fp != NULL) {
+        vfprintf(fp, fmt2, ap);
+    }
+    va_end(ap);
+    if (fp != NULL) {
+        fclose(fp);
+    }
+    puts("\033[0m");
+}
+
 void debug_print_vector3(const char* fmt, const char* fn, char* msg, br_vector3* v) {
     printf(fmt, fn);
     printf("%s %f, %f, %f\n", msg, v->v[0], v->v[1], v->v[2]);

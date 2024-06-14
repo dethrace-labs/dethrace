@@ -1,7 +1,6 @@
 #ifndef _INTRFACE_H_
 #define _INTRFACE_H_
 
-#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern int gDisabled_choices[10];

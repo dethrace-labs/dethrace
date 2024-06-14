@@ -1,7 +1,6 @@
 #ifndef _GLOBVARS_H_
 #define _GLOBVARS_H_
 
-#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern int gTyping;
@@ -140,5 +139,8 @@ extern int gGraf_spec_index;
 extern int gSound_available;
 extern int gNumber_of_races;
 extern char gDir_separator[3];
+
+// FIXME!
+#define TAU 6.283185307179586
 
 #endif

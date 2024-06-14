@@ -1,7 +1,6 @@
 #ifndef _FLICPLAY_H_
 #define _FLICPLAY_H_
 
-#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern int gPalette_allocate_count;

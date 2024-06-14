@@ -1,7 +1,6 @@
 #ifndef _DISPLAYS_H_
 #define _DISPLAYS_H_
 
-#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern int gLast_fancy_index;

@@ -235,7 +235,7 @@ typedef enum keycodes {
 } keycodes;
 
 typedef enum keymapcodes {
-    KEYMAP_ESCAPE = 0,      // default: ESC
+    KEYMAP_ESCAPE = 0, // default: ESC
 
     KEYMAP_CONTROL_ANY = 7, // default: LCTRL or RCTRL (any)
     KEYMAP_SHIFT_ANY = 8,   // default: LSHIFT or RSHIFT (any)

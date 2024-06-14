@@ -1,5 +1,5 @@
 #include "intrface.h"
-#include "brender/brender.h"
+#include "brender.h"
 #include "flicplay.h"
 #include "globvars.h"
 #include "grafdata.h"

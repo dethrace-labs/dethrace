@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "brender/brender.h"
+#include "brender.h"
 #include "brucetrk.h"
 #include "car.h"
 #include "constants.h"
@@ -15,6 +15,7 @@
 #include "drmem.h"
 #include "errors.h"
 #include "flicplay.h"
+#include "formats.h"
 #include "globvars.h"
 #include "globvrkm.h"
 #include "globvrpb.h"
@@ -2087,6 +2088,8 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
     for (i = old_material_count; i < pStorage_space->materials_count; i++) {
         if (pStorage_space->materials[i] != NULL && pStorage_space->materials[i]->colour_map != NULL) {
             pStorage_space->materials[i]->flags |= BR_MATF_LIGHT | BR_MATF_PRELIT | BR_MATF_SMOOTH;
+            // Added by jeff. This seems to be required with BRender 1.3.2
+            pStorage_space->materials[i]->flags &= ~BR_MATF_LIGHT;
             if (pStorage_space->materials[i]->flags & BR_MATF_TWO_SIDED) {
                 its_a_floorpan = 0;
                 for (j = 0; j < number_of_floorpans; j++) {

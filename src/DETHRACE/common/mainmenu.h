@@ -1,10 +1,9 @@
 #ifndef _MAINMENU_H_
 #define _MAINMENU_H_
 
-#include "brender/br_types.h"
 #include "dr_types.h"
 
-extern char* gPalette_copy__mainmenu; // suffix added to avoid duplicate symbol
+extern char* gPalette_copy__mainmenu;    // suffix added to avoid duplicate symbol
 extern int gPixel_buffer_size__mainmenu; // suffix added to avoid duplicate symbol
 extern tInterface_spec* gMain_menu_spec;
 extern int gMouse_was_started__mainmenu; // suffix added to avoid duplicate symbol

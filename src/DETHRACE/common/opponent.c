@@ -1,5 +1,5 @@
 #include "opponent.h"
-#include "brender/brender.h"
+#include "brender.h"
 #include "car.h"
 #include "controls.h"
 #include "crush.h"
@@ -2781,13 +2781,13 @@ tS16 GetOpponentsSectionStartNode(tOpponent_spec* pOpponent_spec, tS16 pSection)
     LOG_TRACE("(%p, %d)", pOpponent_spec, pSection);
 
     if (pSection >= 20000 && pSection - 20000 < pOpponent_spec->nnext_sections) {
-      node_index_index = pOpponent_spec->next_sections[pSection - 20000].direction == 0;
-      if (pSection - 20000 > pOpponent_spec->nnext_sections) {
-          section_no = -1;
-      } else {
-          section_no = gProgram_state.AI_vehicles.path_sections[pOpponent_spec->next_sections[pSection - 20000].section_no].node_indices[node_index_index];
-          return section_no;
-      }
+        node_index_index = pOpponent_spec->next_sections[pSection - 20000].direction == 0;
+        if (pSection - 20000 > pOpponent_spec->nnext_sections) {
+            section_no = -1;
+        } else {
+            section_no = gProgram_state.AI_vehicles.path_sections[pOpponent_spec->next_sections[pSection - 20000].section_no].node_indices[node_index_index];
+            return section_no;
+        }
     }
     dr_dprintf("BIG ERROR - GetOpponentsSectionStartNode() - section not found in next_section array for opponent %s",
         pOpponent_spec->car_spec->driver_name);
@@ -2801,13 +2801,13 @@ tS16 GetOpponentsSectionFinishNode(tOpponent_spec* pOpponent_spec, tS16 pSection
     int node_index_index;
     LOG_TRACE("(%p, %d)", pOpponent_spec, pSection);
 
-   if (pSection >= 20000 && pSection - 20000 < pOpponent_spec->nnext_sections) {
-       return gProgram_state.AI_vehicles.path_sections[pOpponent_spec->next_sections[pSection - 20000].section_no].node_indices[pOpponent_spec->next_sections[pSection - 20000].direction];
-   }
-   dr_dprintf("BIG ERROR - GetOpponentsSectionFinishNode() - section not found in next_section array for opponent %s",
-       pOpponent_spec->car_spec->driver_name);
-   PDEnterDebugger("BIG ERROR - GetOpponentsSectionFinishNode()");
-   return 0;
+    if (pSection >= 20000 && pSection - 20000 < pOpponent_spec->nnext_sections) {
+        return gProgram_state.AI_vehicles.path_sections[pOpponent_spec->next_sections[pSection - 20000].section_no].node_indices[pOpponent_spec->next_sections[pSection - 20000].direction];
+    }
+    dr_dprintf("BIG ERROR - GetOpponentsSectionFinishNode() - section not found in next_section array for opponent %s",
+        pOpponent_spec->car_spec->driver_name);
+    PDEnterDebugger("BIG ERROR - GetOpponentsSectionFinishNode()");
+    return 0;
 }
 
 // IDA: br_vector3* __usercall GetOpponentsSectionStartNodePoint@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, tS16 pSection@<EDX>)
@@ -3251,28 +3251,23 @@ void InsertThisNodeInThisSectionHere(tS16 pInserted_node, tS16 pSection_no, br_v
     gProgram_state.AI_vehicles.path_sections[new_section].node_indices[1] = section_no_index;
     gProgram_state.AI_vehicles.path_sections[new_section].min_speed[0] = 0;
     gProgram_state.AI_vehicles.path_sections[new_section].max_speed[0] = 255;
-    gProgram_state.AI_vehicles.path_sections[new_section].min_speed[1] =
-        gProgram_state.AI_vehicles.path_sections[pSection_no].min_speed[1];
-    gProgram_state.AI_vehicles.path_sections[new_section].max_speed[1] =
-        gProgram_state.AI_vehicles.path_sections[pSection_no].max_speed[1];
-    gProgram_state.AI_vehicles.path_sections[new_section].width =
-        gProgram_state.AI_vehicles.path_sections[pSection_no].width;
-    gProgram_state.AI_vehicles.path_sections[new_section].type =
-        gProgram_state.AI_vehicles.path_sections[pSection_no].type;
-    gProgram_state.AI_vehicles.path_sections[new_section].one_way =
-        gProgram_state.AI_vehicles.path_sections[pSection_no].one_way;
+    gProgram_state.AI_vehicles.path_sections[new_section].min_speed[1] = gProgram_state.AI_vehicles.path_sections[pSection_no].min_speed[1];
+    gProgram_state.AI_vehicles.path_sections[new_section].max_speed[1] = gProgram_state.AI_vehicles.path_sections[pSection_no].max_speed[1];
+    gProgram_state.AI_vehicles.path_sections[new_section].width = gProgram_state.AI_vehicles.path_sections[pSection_no].width;
+    gProgram_state.AI_vehicles.path_sections[new_section].type = gProgram_state.AI_vehicles.path_sections[pSection_no].type;
+    gProgram_state.AI_vehicles.path_sections[new_section].one_way = gProgram_state.AI_vehicles.path_sections[pSection_no].one_way;
     gProgram_state.AI_vehicles.path_sections[pSection_no].node_indices[1] = pInserted_node;
     gProgram_state.AI_vehicles.path_sections[pSection_no].min_speed[1] = 0;
     gProgram_state.AI_vehicles.path_sections[pSection_no].max_speed[1] = 255;
     BrVector3Copy(&gProgram_state.AI_vehicles.path_nodes[pInserted_node].p, pWhere);
     gProgram_state.AI_vehicles.path_nodes[pInserted_node].sections
-        [gProgram_state.AI_vehicles.path_nodes[pInserted_node].number_of_sections] = pSection_no;
-    gProgram_state.AI_vehicles.path_nodes[pInserted_node].number_of_sections =
-        gProgram_state.AI_vehicles.path_nodes[pInserted_node].number_of_sections + 1;
+        [gProgram_state.AI_vehicles.path_nodes[pInserted_node].number_of_sections]
+        = pSection_no;
+    gProgram_state.AI_vehicles.path_nodes[pInserted_node].number_of_sections = gProgram_state.AI_vehicles.path_nodes[pInserted_node].number_of_sections + 1;
     gProgram_state.AI_vehicles.path_nodes[pInserted_node].sections
-        [gProgram_state.AI_vehicles.path_nodes[pInserted_node].number_of_sections] = new_section;
-    gProgram_state.AI_vehicles.path_nodes[pInserted_node].number_of_sections =
-        gProgram_state.AI_vehicles.path_nodes[pInserted_node].number_of_sections + 1;
+        [gProgram_state.AI_vehicles.path_nodes[pInserted_node].number_of_sections]
+        = new_section;
+    gProgram_state.AI_vehicles.path_nodes[pInserted_node].number_of_sections = gProgram_state.AI_vehicles.path_nodes[pInserted_node].number_of_sections + 1;
     for (node1 = 0; node1 < gProgram_state.AI_vehicles.path_nodes[section_no_index].number_of_sections; node1++) {
         if (gProgram_state.AI_vehicles.path_nodes[section_no_index].sections[node1] == pSection_no) {
             gProgram_state.AI_vehicles.path_nodes[section_no_index].sections[node1] = new_section;
@@ -3655,13 +3650,11 @@ void RebuildOppoPathModel(void) {
             if (gProgram_state.AI_vehicles.path_sections[i].one_way) {
                 centre_mat_lt = gMat_lt_yel;
             }
-            if ((gProgram_state.AI_vehicles.path_sections[i].min_speed[0] != 0) ||
-                (gProgram_state.AI_vehicles.path_sections[i].max_speed[0] != 255)) {
+            if ((gProgram_state.AI_vehicles.path_sections[i].min_speed[0] != 0) || (gProgram_state.AI_vehicles.path_sections[i].max_speed[0] != 255)) {
                 edge_mat_start_lt = gMat_lt_turq;
                 edge_mat_start_dk = gMat_dk_turq;
             }
-            if ((gProgram_state.AI_vehicles.path_sections[i].min_speed[1] != 0) ||
-                (gProgram_state.AI_vehicles.path_sections[i].max_speed[1] != 255)) {
+            if ((gProgram_state.AI_vehicles.path_sections[i].min_speed[1] != 0) || (gProgram_state.AI_vehicles.path_sections[i].max_speed[1] != 255)) {
                 edge_mat_finish_lt = gMat_lt_turq;
                 edge_mat_finish_dk = gMat_dk_turq;
             }
@@ -3673,9 +3666,9 @@ void RebuildOppoPathModel(void) {
                 &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[i].node_indices[0]].p,
                 &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[i].node_indices[1]].p,
                 gProgram_state.AI_vehicles.path_sections[i].width,
-                centre_mat_lt,centre_mat_dk,
-                edge_mat_start_lt,edge_mat_start_dk,
-                edge_mat_finish_lt,edge_mat_finish_dk);
+                centre_mat_lt, centre_mat_dk,
+                edge_mat_start_lt, edge_mat_start_dk,
+                edge_mat_finish_lt, edge_mat_finish_dk);
         }
         for (i = 0; i < gProgram_state.AI_vehicles.number_of_cops; i++) {
             MakeCube(18 * gProgram_state.AI_vehicles.number_of_path_sections + 8 * i,
@@ -3891,7 +3884,9 @@ void WriteOutOppoPaths(void) {
 #else
     f = DRfopen(gOppo_path_filename, "wt");
 #endif
-    if (f == NULL) { printf("f is NULL, errno=%d, msg=\"%s\"\n", errno, strerror(errno));}
+    if (f == NULL) {
+        printf("f is NULL, errno=%d, msg=\"%s\"\n", errno, strerror(errno));
+    }
     fprintf(f, "%s\n", "START OF OPPONENT PATHS");
     fprintf(f, "\n%-3d                             // Number of path nodes\n",
         gProgram_state.AI_vehicles.number_of_path_nodes);
@@ -3995,13 +3990,12 @@ void DropElasticateyNode(void) {
         original_type = 0;
         if (gProgram_state.AI_vehicles.path_nodes[old_node].number_of_sections != 0) {
             for (section_no_index = 1; section_no_index < gProgram_state.AI_vehicles.path_nodes[old_node].number_of_sections; section_no_index++) {
-                if (gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[old_node].sections[section_no_index]].type !=
-                        gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[old_node].sections[0]].type) {
+                if (gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[old_node].sections[section_no_index]].type != gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[old_node].sections[0]].type) {
                     all_the_same_type = 0;
                 }
             }
             if (all_the_same_type) {
-                original_type = gProgram_state.AI_vehicles.path_sections [gProgram_state.AI_vehicles.path_nodes[old_node].sections[0]].type;
+                original_type = gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[old_node].sections[0]].type;
             }
         }
         gAlready_elasticating = 1;
@@ -4020,8 +4014,7 @@ void DropElasticateyNode(void) {
     if (gProgram_state.AI_vehicles.path_nodes[old_node].number_of_sections == 0) {
         gProgram_state.AI_vehicles.path_sections[gMobile_section].width = 1.f;
     } else {
-        gProgram_state.AI_vehicles.path_sections[gMobile_section].width =
-            gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[old_node].sections[0]].width;
+        gProgram_state.AI_vehicles.path_sections[gMobile_section].width = gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[old_node].sections[0]].width;
     }
     gProgram_state.AI_vehicles.path_nodes[new_node].number_of_sections = 0;
     gProgram_state.AI_vehicles.path_nodes[new_node].sections[gProgram_state.AI_vehicles.path_nodes[new_node].number_of_sections] = gMobile_section;
@@ -4199,10 +4192,9 @@ void DropNodeOnNodeAndStopElasticating(void) {
 void WidenOppoPathSection(void) {
     LOG_TRACE("()");
 
-
-   if (gOppo_paths_shown) {
-       RecalcNearestPathSectionWidth(.05f);
-   }
+    if (gOppo_paths_shown) {
+        RecalcNearestPathSectionWidth(.05f);
+    }
 }
 
 // IDA: void __cdecl NarrowOppoPathSection()
@@ -4236,9 +4228,9 @@ void DecreaseSectionMinSpeed(void) {
 void IncreaseSectionMaxSpeed(void) {
     LOG_TRACE("()");
 
-   if (gOppo_paths_shown) {
-       RecalcNearestPathSectionSpeed(1, 1);
-   }
+    if (gOppo_paths_shown) {
+        RecalcNearestPathSectionSpeed(1, 1);
+    }
 }
 
 // IDA: void __cdecl DecreaseSectionMaxSpeed()
@@ -4308,7 +4300,7 @@ void ShowSectionInfo1(void) {
     LOG_TRACE("()");
 
     if (!gOppo_paths_shown) {
-      NewTextHeadupSlot(4, 0, 2000, -1, "Show paths first (F5)");
+        NewTextHeadupSlot(4, 0, 2000, -1, "Show paths first (F5)");
     } else if (gAlready_elasticating) {
         sprintf(str, "This section will be #%d attached to nodes #%d and #%d",
             gMobile_section,
@@ -4395,8 +4387,7 @@ void DeleteOppoPathNodeAndSections(void) {
 
     if (!gOppo_paths_shown) {
         NewTextHeadupSlot(4, 0, 2000, -1, "Show paths first (F5)");
-    }
-    else if (gAlready_elasticating) {
+    } else if (gAlready_elasticating) {
         NewTextHeadupSlot(4, 0, 2000, -1, "Not while you're creating a new section");
     } else {
         node_no = FindNearestPathNode(&gSelf->t.t.translate.t, &distance);
@@ -4428,18 +4419,17 @@ void DeleteOppoPathNodeAndJoin(void) {
         } else if (gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections != 2) {
             NewTextHeadupSlot(4, 0, 2000, -1, "Node must have exactly 2 sections attached");
         } else if ((gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[node_no].sections[0]].node_indices[0] == node_no
-                    && gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[node_no].sections[1]].node_indices[1] == node_no) ||
-                (gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[node_no].sections[1]].node_indices[0] == node_no
-                    && gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[node_no].sections[0]].node_indices[1] == node_no)) {
+                       && gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[node_no].sections[1]].node_indices[1] == node_no)
+            || (gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[node_no].sections[1]].node_indices[0] == node_no
+                && gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[node_no].sections[0]].node_indices[1] == node_no)) {
             ConsistencyCheck();
-            DeleteNode(node_no,0);
+            DeleteNode(node_no, 0);
             ConsistencyCheck();
             DeleteOrphanNodes();
             ConsistencyCheck();
             ShowOppoPaths();
             NewTextHeadupSlot(4, 0, 2000, -1, "Blam!");
-        }
-        else {
+        } else {
             NewTextHeadupSlot(4, 0, 2000, -1, "Sections must point in same direction");
         }
     }
@@ -4460,23 +4450,20 @@ void ReverseSectionDirection(void) {
     } else if (gAlready_elasticating) {
         NewTextHeadupSlot(4, 0, 2000, -1, "Not while you're creating a new section");
     } else {
-        section_no = FindNearestPathSection(&gSelf->t.t.translate.t,  &direction_v, &intersect, &distance);
+        section_no = FindNearestPathSection(&gSelf->t.t.translate.t, &direction_v, &intersect, &distance);
         if (distance > 10.f) {
             NewTextHeadupSlot(4, 0, 2000, -1, "Can't find any sections close enough");
         } else {
             temp = gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0];
-            gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0] =
-                gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1];
+            gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0] = gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1];
             gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1] = temp;
 
             speed_temp = gProgram_state.AI_vehicles.path_sections[section_no].min_speed[0];
-            gProgram_state.AI_vehicles.path_sections[section_no].min_speed[0] =
-                gProgram_state.AI_vehicles.path_sections[section_no].min_speed[1];
+            gProgram_state.AI_vehicles.path_sections[section_no].min_speed[0] = gProgram_state.AI_vehicles.path_sections[section_no].min_speed[1];
             gProgram_state.AI_vehicles.path_sections[section_no].min_speed[1] = speed_temp;
 
             speed_temp = gProgram_state.AI_vehicles.path_sections[section_no].max_speed[0];
-            gProgram_state.AI_vehicles.path_sections[section_no].max_speed[0] =
-                gProgram_state.AI_vehicles.path_sections[section_no].max_speed[1];
+            gProgram_state.AI_vehicles.path_sections[section_no].max_speed[0] = gProgram_state.AI_vehicles.path_sections[section_no].max_speed[1];
             gProgram_state.AI_vehicles.path_sections[section_no].max_speed[1] = speed_temp;
 
             ShowOppoPaths();
@@ -4502,9 +4489,8 @@ void CycleSectionType(void) {
         if (distance > 10.f) {
             NewTextHeadupSlot(4, 0, 2000, -1, "Can't find any sections close enough");
         } else {
-            gProgram_state.AI_vehicles.path_sections[section_no].type =
-                (gProgram_state.AI_vehicles.path_sections[section_no].type + 1) % 3;
-            sprintf(str, "%s section",  gPath_section_type_names[gProgram_state.AI_vehicles.path_sections[section_no].type]);
+            gProgram_state.AI_vehicles.path_sections[section_no].type = (gProgram_state.AI_vehicles.path_sections[section_no].type + 1) % 3;
+            sprintf(str, "%s section", gPath_section_type_names[gProgram_state.AI_vehicles.path_sections[section_no].type]);
             ShowOppoPaths();
             NewTextHeadupSlot(4, 0, 2000, -1, str);
         }
@@ -4530,8 +4516,7 @@ void ToggleOneWayNess(void) {
         } else {
             if (gProgram_state.AI_vehicles.path_sections[section_no].one_way) {
                 gProgram_state.AI_vehicles.path_sections[section_no].one_way = 0;
-            }
-            else {
+            } else {
                 gProgram_state.AI_vehicles.path_sections[section_no].one_way = 1;
             }
             ShowOppoPaths();
@@ -4557,7 +4542,7 @@ void CopStartPointInfo(void) {
     closest = -1;
     closest_distance = FLT_MAX;
     if (!gOppo_paths_shown) {
-      NewTextHeadupSlot(4, 0, 2000, -1, "Show paths first (F5)");
+        NewTextHeadupSlot(4, 0, 2000, -1, "Show paths first (F5)");
     } else {
         for (i = 0; i < gProgram_state.AI_vehicles.number_of_cops; i++) {
             BrVector3Sub(&car_to_point, &gSelf->t.t.translate.t, &gProgram_state.AI_vehicles.cop_start_points[i]);
@@ -4642,5 +4627,4 @@ void DeleteCopStartPoint(void) {
 // IDA: void __cdecl CycleCopStartPointType()
 void CycleCopStartPointType(void) {
     LOG_TRACE("()");
-
 }

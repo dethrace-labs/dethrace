@@ -1,7 +1,6 @@
 #ifndef _MAIN_H_
 #define _MAIN_H_
 
-#include "brender/br_types.h"
 #include "dr_types.h"
 
 void QuitGame(void);

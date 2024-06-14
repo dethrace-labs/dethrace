@@ -234,7 +234,6 @@ void DirectDrawDevice_SetPaletteEntries(PALETTEENTRY_* palette, int pFirst_colou
     assert(pFirst_colour == 0);
     assert(pCount == 256);
     gHarness_platform.Renderer_SetPalette(palette);
-    Harness_RenderLastScreen();
 }
 
 void _splitpath_(char* path, char* drive, char* dir, char* fname, char* ext) {

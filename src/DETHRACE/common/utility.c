@@ -1,7 +1,7 @@
 #include "utility.h"
 #include <stdlib.h>
 
-#include "brender/brender.h"
+#include "brender.h"
 #include "constants.h"
 #include "errors.h"
 #include "globvars.h"
@@ -465,9 +465,7 @@ br_pixelmap* DRPixelmapLoad(char* pFile_name) {
     if (the_map != NULL) {
         the_map->origin_x = 0;
         the_map->origin_y = 0;
-#if !defined(DETHRACE_FIX_BUGS)
         the_map->row_bytes = (the_map->row_bytes + sizeof(int32_t) - 1) & ~(sizeof(int32_t) - 1);
-#endif
     }
     return the_map;
 }
@@ -482,9 +480,7 @@ br_uint_32 DRPixelmapLoadMany(char* pFile_name, br_pixelmap** pPixelmaps, br_uin
     number_loaded = BrPixelmapLoadMany(pFile_name, pPixelmaps, pNum);
     for (i = 0; i < number_loaded; i++) {
         the_map = pPixelmaps[i];
-#if !defined(DETHRACE_FIX_BUGS)
         the_map->row_bytes = (the_map->row_bytes + sizeof(int32_t) - 1) & ~(sizeof(int32_t) - 1);
-#endif
         the_map->base_x = 0;
         the_map->base_y = 0;
     }
@@ -503,8 +499,8 @@ void WaitFor(tU32 pDelay) {
 }
 
 // IDA: br_uint_32 __usercall DRActorEnumRecurse@<EAX>(br_actor *pActor@<EAX>, br_actor_enum_cbfn *callback@<EDX>, void *arg@<EBX>)
-intptr_t DRActorEnumRecurse(br_actor* pActor, br_actor_enum_cbfn* callback, void* arg) {
-    intptr_t result;
+br_uintptr_t DRActorEnumRecurse(br_actor* pActor, br_actor_enum_cbfn* callback, void* arg) {
+    br_uintptr_t result;
 
     result = callback(pActor, arg);
     if (result != 0) {
@@ -520,7 +516,7 @@ intptr_t DRActorEnumRecurse(br_actor* pActor, br_actor_enum_cbfn* callback, void
 }
 
 // IDA: br_uint_32 __cdecl CompareActorID(br_actor *pActor, void *pArg)
-intptr_t CompareActorID(br_actor* pActor, void* pArg) {
+br_uintptr_t CompareActorID(br_actor* pActor, void* pArg) {
     LOG_TRACE("(%p, %p)", pActor, pArg);
 
     if (pActor->identifier && !strcmp(pActor->identifier, (const char*)pArg)) {

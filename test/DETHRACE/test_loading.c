@@ -2,7 +2,7 @@
 
 #include <string.h>
 
-#include "CORE/PIXELMAP/pixelmap.h"
+#include "brender.h"
 #include "common/globvars.h"
 #include "common/graphics.h"
 #include "common/init.h"
@@ -10,6 +10,7 @@
 #include "common/newgame.h"
 #include "common/utility.h"
 #include "common/world.h"
+#include "formats.h" // required for v11model
 
 void test_loading_GetCDPathFromPathsTxtFile() {
     REQUIRES_DATA_DIRECTORY();
@@ -187,16 +188,16 @@ void test_loading_LoadCar() {
         if (V11MODEL(model)->groups[i].nfaces == 47) {
             found_test_prep_group = 1;
             TEST_ASSERT_EQUAL_INT(99, V11MODEL(model)->groups[i].nvertices);
-            TEST_ASSERT_EQUAL_FLOAT(-0.0844900012, V11MODEL(model)->groups[i].vertices[0].p.v[0]);
-            TEST_ASSERT_EQUAL_FLOAT(0.0440330058, V11MODEL(model)->groups[i].vertices[0].p.v[1]);
-            TEST_ASSERT_EQUAL_FLOAT(0.1230980009, V11MODEL(model)->groups[i].vertices[0].p.v[2]);
+            TEST_ASSERT_EQUAL_FLOAT(-0.0844900012, V11MODEL(model)->groups[i].position[0].v[0]);
+            TEST_ASSERT_EQUAL_FLOAT(0.0440330058, V11MODEL(model)->groups[i].position[0].v[1]);
+            TEST_ASSERT_EQUAL_FLOAT(0.1230980009, V11MODEL(model)->groups[i].position[0].v[2]);
 
-            TEST_ASSERT_EQUAL_FLOAT(1.0, V11MODEL(model)->groups[i].vertices[0].map.v[0]);
-            TEST_ASSERT_EQUAL_FLOAT(0.664765000, V11MODEL(model)->groups[i].vertices[0].map.v[1]);
+            TEST_ASSERT_EQUAL_FLOAT(1.0, V11MODEL(model)->groups[i].map[0].v[0]);
+            TEST_ASSERT_EQUAL_FLOAT(0.664765000, V11MODEL(model)->groups[i].map[0].v[1]);
 
-            TEST_ASSERT_EQUAL_FLOAT(-0.0071384655, V11MODEL(model)->groups[i].vertices[0].n.v[0]);
-            TEST_ASSERT_EQUAL_FLOAT(0.9597771764, V11MODEL(model)->groups[i].vertices[0].n.v[1]);
-            TEST_ASSERT_EQUAL_FLOAT(-0.2806721628, V11MODEL(model)->groups[i].vertices[0].n.v[2]);
+            TEST_ASSERT_EQUAL_FLOAT(-0.0071384655, V11MODEL(model)->groups[i].normal[0].v[0]);
+            TEST_ASSERT_EQUAL_FLOAT(0.9597771764, V11MODEL(model)->groups[i].normal[0].v[1]);
+            TEST_ASSERT_EQUAL_FLOAT(-0.2806721628, V11MODEL(model)->groups[i].normal[0].v[2]);
             break;
         }
     }

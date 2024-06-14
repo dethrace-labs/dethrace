@@ -1,5 +1,6 @@
 #include "replay.h"
-#include <brender/brender.h>
+#include "brender.h"
+#include "brhton.h"
 #include "car.h"
 #include "controls.h"
 #include "displays.h"
@@ -396,6 +397,7 @@ void PollActionReplayControls(tU32 pFrame_period) {
         KEY_KP_9,
         KEY_KP_MULTIPLY,
     };
+    /* clang-format off */
     static tRectangle mouse_areas[2][8] = {
         {
             {  63, 182,  92, 198, },
@@ -418,6 +420,7 @@ void PollActionReplayControls(tU32 pFrame_period) {
             { 490, 436, 544, 475, },
         },
     };
+    /* clang-format on */
     LOG_TRACE("(%d)", pFrame_period);
 
     real_time = PDGetTotalTime();
@@ -433,8 +436,7 @@ void PollActionReplayControls(tU32 pFrame_period) {
         if ((old_key_down == -1 || old_key_down == KEY_KP_4 || old_key_down == KEY_KP_6 || old_key_down == KEY_KP_MULTIPLY) && EitherMouseButtonDown()) {
             GetMousePosition(&x_coord, &y_coord);
             for (i = 0; i < COUNT_OF(mouse_areas[0]); i++) {
-                if (mouse_areas[gGraf_data_index][i].left <= x_coord && mouse_areas[gGraf_data_index][i].top <= y_coord &&
-                    mouse_areas[gGraf_data_index][i].right >= x_coord && mouse_areas[gGraf_data_index][i].bottom >= y_coord) {
+                if (mouse_areas[gGraf_data_index][i].left <= x_coord && mouse_areas[gGraf_data_index][i].top <= y_coord && mouse_areas[gGraf_data_index][i].right >= x_coord && mouse_areas[gGraf_data_index][i].bottom >= y_coord) {
                     gKey_down = psuedo_mouse_keys[i];
                     break;
                 }

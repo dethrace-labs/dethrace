@@ -1,7 +1,6 @@
 #ifndef _LOADING_H_
 #define _LOADING_H_
 
-#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern tHeadup_info gHeadup_image_info[32];
