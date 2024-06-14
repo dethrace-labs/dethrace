@@ -1018,7 +1018,7 @@ void PlayerIsIt(tNet_game_player_info* pPlayer) {
     }
     MakeCarIt(pPlayer->car);
     gIt_or_fox = pPlayer - gNet_players;
-    sprintf(s, "%s", GetMiscString(gCurrent_net_game->type == eNet_game_type_tag ? 186 : 188));
+    sprintf(s, "%s", GetMiscString(gCurrent_net_game->type == eNet_game_type_tag ? kMiscString_HA_HA_YOU_ARE_IT : kMiscString_YOU_ARE_THE_FOX));
     NetSendHeadupToPlayer(s, pPlayer->ID);
     for (i = 0; i < gNumber_of_net_players; i++) {
         if (&gNet_players[i] != pPlayer) {
@@ -1059,7 +1059,7 @@ void SelectRandomItOrFox(int pNot_this_one) {
     LOG_TRACE("(%d)", pNot_this_one);
 
     new_choice = 0;
-    gLast_lepper = 0;
+    gLast_lepper = NULL;
     if (gCurrent_net_game->type == eNet_game_type_tag) {
         for (i = 0; i < gNumber_of_net_players; i++) {
             if (gNet_players[i].last_score_index == 0) {

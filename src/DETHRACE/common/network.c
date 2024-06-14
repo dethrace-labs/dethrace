@@ -506,7 +506,14 @@ void NetPlayersChanged(int pNew_count, tNet_game_player_info* pNew_players) {
     LOG_TRACE("(%d, %p)", pNew_count, pNew_players);
 
     if (gCurrent_net_game->type == eNet_game_type_tag || gCurrent_net_game->type == eNet_game_type_foxy) {
-        old_fox_it = gNet_players[gIt_or_fox].ID;
+#ifdef DETHRACE_FIX_BUGS
+        old_fox_it = -1;
+        if (gIt_or_fox >= 0) {
+#endif
+            old_fox_it = gNet_players[gIt_or_fox].ID;
+#ifdef DETHRACE_FIX_BUGS
+        }
+#endif
     }
     for (i = 0; i < pNew_count; i++) {
         new_player = 1;
