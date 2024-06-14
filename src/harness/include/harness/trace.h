@@ -1,7 +1,7 @@
 #ifndef HARNESS_TRACE_H
 #define HARNESS_TRACE_H
 
-#include "brender/br_types.h"
+#include "brender.h"
 #include <stdlib.h>
 
 extern int harness_debug_level;

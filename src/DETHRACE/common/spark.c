@@ -1,8 +1,9 @@
 #include "spark.h"
-#include "brender/brender.h"
+#include "brender.h"
 #include "car.h"
 #include "depth.h"
 #include "errors.h"
+#include "formats.h"
 #include "globvars.h"
 #include "globvrkm.h"
 #include "graphics.h"
@@ -15,7 +16,7 @@
 #include "trig.h"
 #include "utility.h"
 #include "world.h"
-
+#include <math.h>
 #include <stdlib.h>
 
 int gNext_spark;
@@ -1618,12 +1619,12 @@ void DoSmokeColumn(int i, tU32 pTime, br_vector3* pRet_car_pos) {
     actor = c->car_model_actors[c->principal_car_actor].actor;
     bonny = c->car_model_actors[c->car_actor_count - 1].actor;
 
-    BrVector3Add(pRet_car_pos, &V11MODEL(actor->model)->groups->vertices[gSmoke_column[i].vertex_index].p, &actor->t.t.translate.t);
+    BrVector3Add(pRet_car_pos, &V11MODEL(actor->model)->groups[0].position[gSmoke_column[i].vertex_index], &actor->t.t.translate.t);
     if (gProgram_state.cockpit_on && c->driver == eDriver_local_human) {
         if (c->driver_z_offset + 0.2f <= pRet_car_pos->v[2]) {
             pRet_car_pos->v[1] -= -0.07f;
         } else {
-            BrMatrix34ApplyP(pRet_car_pos, &V11MODEL(actor->model)->groups->vertices[gSmoke_column[i].vertex_index].p, &bonny->t.t.mat);
+            BrMatrix34ApplyP(pRet_car_pos, &V11MODEL(actor->model)->groups[0].position[gSmoke_column[i].vertex_index], &bonny->t.t.mat);
         }
     }
     if (!gSmoke_column[i].upright) {
@@ -2060,11 +2061,11 @@ void SmudgeCar(tCar_spec* pCar, int fire_point) {
     n = 0;
     real_vertex_number = 0;
     if ((model->flags & BR_MODF_KEEP_ORIGINAL) != 0 || (model->flags & BR_MODF_UPDATEABLE) != 0) {
-        point = V11MODEL(model)->groups[group].vertices[fire_point].p;
+        point = V11MODEL(model)->groups[group].position[fire_point];
         StartPipingSession(ePipe_chunk_smudge);
         for (group = 0; group < V11MODEL(model)->ngroups; group++) {
             for (j = 0; j < V11MODEL(model)->groups[group].nvertices; j++) {
-                BrVector3Sub(&tv, &V11MODEL(model)->groups[group].vertices[j].p, &point);
+                BrVector3Sub(&tv, &V11MODEL(model)->groups[group].position[j], &point);
                 ts = (.0144f - BrVector3LengthSquared(&tv) / SRandomBetween(.5f, 1.f)) / .0144f * 127.f;
                 if (ts > 0.f) {
                     ts += BR_ALPHA(V11MODEL(model)->groups[group].vertex_colours[j]);
@@ -2092,8 +2093,9 @@ void SmudgeCar(tCar_spec* pCar, int fire_point) {
         }
         if (n > 0) {
             AddSmudgeToPipingSession(pCar->car_ID, pCar->principal_car_actor, n, data);
+            // FIXME?
             // Added by dethrace to update gpu-buffered vertices
-            model->flags |= BR_MODF_DETHRACE_FORCE_BUFFER_UPDATE;
+            // model->flags |= BR_MODF_DETHRACE_FORCE_BUFFER_UPDATE;
         }
 
         n = 0;
@@ -2106,7 +2108,7 @@ void SmudgeCar(tCar_spec* pCar, int fire_point) {
             for (group = 0; group < V11MODEL(b_model)->ngroups; group++) {
                 j = 0;
                 for (j = 0; j < V11MODEL(b_model)->groups[group].nvertices; j++) {
-                    BrVector3Sub(&tv, &V11MODEL(b_model)->groups[group].vertices[j].p, &bonny_pos);
+                    BrVector3Sub(&tv, &V11MODEL(b_model)->groups[group].position[j], &bonny_pos);
                     ts = (.0144f - BrVector3LengthSquared(&tv) / SRandomBetween(.5f, 1.f)) / .0144f * 127.f;
                     if (ts > 0.f) {
                         ts += BR_ALPHA(V11MODEL(b_model)->groups[group].vertex_colours[j]);
@@ -2134,9 +2136,9 @@ void SmudgeCar(tCar_spec* pCar, int fire_point) {
             }
             if (n > 0) {
                 AddSmudgeToPipingSession(pCar->car_ID, pCar->car_actor_count - 1, n, data);
-
+                // FIXME?
                 // Added by dethrace to update gpu-buffered vertices
-                b_model->flags |= BR_MODF_DETHRACE_FORCE_BUFFER_UPDATE;
+                // b_model->flags |= BR_MODF_DETHRACE_FORCE_BUFFER_UPDATE;
             }
         }
         EndPipingSession();

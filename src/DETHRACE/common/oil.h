@@ -1,7 +1,6 @@
 #ifndef _OIL_H_
 #define _OIL_H_
 
-#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern char* gOil_pixie_names[1];

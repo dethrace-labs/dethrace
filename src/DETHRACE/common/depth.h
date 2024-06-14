@@ -1,7 +1,6 @@
 #ifndef _DEPTH_H_
 #define _DEPTH_H_
 
-#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern tDepth_effect gDistance_depth_effects[4];

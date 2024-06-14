@@ -3,7 +3,7 @@
 
 #include "s3.h"
 
-#include "brender/brender.h"
+#include "brender.h"
 
 tS3_sound_source_ptr S3CreateSoundSourceBR(br_vector3* pPosition, br_vector3* pVelocity, tS3_outlet_ptr pBound_outlet);
 

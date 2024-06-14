@@ -1,5 +1,5 @@
 #include "drfile.h"
-#include "brender/brender.h"
+#include "brender.h"
 #include "harness/trace.h"
 #include "loading.h"
 #include <stdlib.h>

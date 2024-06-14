@@ -1,4 +1,4 @@
-#include "brender/brender.h"
+#include "brender.h"
 #include "car.h"
 #include "dinput.h"
 #include "errors.h"
@@ -635,10 +635,12 @@ void PDScreenBufferSwap(int pRendering_area_only) {
         BrPixelmapRectangleCopy(gScreen, gY_offset, gX_offset, gRender_screen, 0, 0, gWidth, gHeight);
     } else {
         if (gReal_graf_data_index == gGraf_data_index) {
-            BrPixelmapDoubleBuffer(gScreen, gBack_screen);
+            // BrPixelmapDoubleBuffer(gScreen, gBack_screen);
+            gHarness_platform.Renderer_Present(gBack_screen);
         } else {
             DRPixelmapDoubledCopy(gTemp_screen, gBack_screen, 320, 200, 0, 40);
-            BrPixelmapDoubleBuffer(gScreen, gTemp_screen);
+            // BrPixelmapDoubleBuffer(gScreen, gTemp_screen);
+            gHarness_platform.Renderer_Present(gTemp_screen);
         }
     }
 }

@@ -1,5 +1,5 @@
 #include "pedestrn.h"
-#include "brender/brender.h"
+#include "brender.h"
 #include "car.h"
 #include "constants.h"
 #include "displays.h"
@@ -19,6 +19,7 @@
 #include "pratcam.h"
 #include "raycast.h"
 #include "replay.h"
+#include "shortcut.h"
 #include "sound.h"
 #include "spark.h"
 #include "structur.h"
@@ -437,8 +438,8 @@ int BurstPedestrian(tPedestrian_data* pPedestrian, float pSplattitudinalitude, i
         BrActorAdd(pPedestrian->actor, the_ped_gib->actor);
         the_ped_gib->actor->render_style = BR_RSTYLE_FACES;
         BrMatrix34Identity(&the_ped_gib->actor->t.t.mat);
-        the_ped_gib->actor->t.t.translate.t.v[V_Y] += pPedestrian->actor->t.t.mat.m[1][1] * 2.f / (pPedestrian->height2 * 3.f);
-        the_ped_gib->actor->t.t.translate.t.v[V_Z] = 0.01f;
+        the_ped_gib->actor->t.t.translate.t.v[Y] += pPedestrian->actor->t.t.mat.m[1][1] * 2.f / (pPedestrian->height2 * 3.f);
+        the_ped_gib->actor->t.t.translate.t.v[Z] = 0.01f;
         the_ped_gib->actor->material = gPed_gib_materials[0].materials[0];
         the_ped_gib->gib_index = 0;
         the_ped_gib->parent_index = GET_PEDESTRIAN_INDEX(pPedestrian);
@@ -479,7 +480,7 @@ int BurstPedestrian(tPedestrian_data* pPedestrian, float pSplattitudinalitude, i
         BrActorAdd(pPedestrian->actor, the_ped_gib->actor);
         the_ped_gib->actor->render_style = BR_RSTYLE_FACES;
         BrMatrix34Identity(&the_ped_gib->actor->t.t.mat);
-        the_ped_gib->actor->t.t.translate.t.v[V_Y] += pPedestrian->actor->t.t.mat.m[1][1] / (pPedestrian->height2 * 2.f);
+        the_ped_gib->actor->t.t.translate.t.v[Y] += pPedestrian->actor->t.t.mat.m[1][1] / (pPedestrian->height2 * 2.f);
         do {
             next_gib_index = IRandomBetween(0, gPed_gib_materials[the_ped_gib->size].count - 1);
         } while (gPed_gib_maxes[the_ped_gib->size][next_gib_index] <= gPed_gib_counts[the_ped_gib->size][next_gib_index]);
@@ -571,8 +572,8 @@ void MungePedGibs(tU32 pFrame_period) {
                     the_ped_gib->actor->t.t.mat.m[1][1] = -1.f / pedestrian->height2;
                 }
 
-                the_ped_gib->actor->t.t.translate.t.v[V_X] += the_ped_gib->x_speed * pFrame_period / pedestrian->width;
-                the_ped_gib->actor->t.t.translate.t.v[V_Y] += the_ped_gib->y_speed * pFrame_period / pedestrian->height2;
+                the_ped_gib->actor->t.t.translate.t.v[X] += the_ped_gib->x_speed * pFrame_period / pedestrian->width;
+                the_ped_gib->actor->t.t.translate.t.v[Y] += the_ped_gib->y_speed * pFrame_period / pedestrian->height2;
                 the_ped_gib->y_speed -= gFrame_period * gGravity_multiplier * 1.420289855072464e-6;
                 AddPedGibToPipingSession(i, &the_ped_gib->actor->t.t.mat, the_ped_gib->size, the_ped_gib->gib_index, the_ped_gib->parent_index);
             }
@@ -589,8 +590,8 @@ void MungePedGibs(tU32 pFrame_period) {
                 the_ped_gib->actor->t.t.mat.m[1][1] = 1.f / gPedestrian_array[the_ped_gib->parent_index].height2;
                 the_ped_gib->actor->material = gPed_gib_materials[0].materials[frame];
                 MungeModelSize(the_ped_gib->actor, gExploding_ped_scale[frame]);
-                if (frame == 1 && the_ped_gib->actor->t.t.translate.t.v[V_Z] == 0.01f) {
-                    the_ped_gib->actor->t.t.translate.t.v[V_Z] = -0.01f;
+                if (frame == 1 && the_ped_gib->actor->t.t.translate.t.v[Z] == 0.01f) {
+                    the_ped_gib->actor->t.t.translate.t.v[Z] = -0.01f;
                 }
                 AddPedGibToPipingSession(i, &the_ped_gib->actor->t.t.mat, the_ped_gib->size, frame, the_ped_gib->parent_index);
             } else {
@@ -701,8 +702,8 @@ int PedestrianNextInstruction(tPedestrian_data* pPedestrian, float pDanger_level
     case ePed_instruc_point:
         BrVector3Copy(&pPedestrian->to_pos, &instruction->data.point_data.position);
         BrVector3Sub(&pPedestrian->direction, &pPedestrian->to_pos, &pPedestrian->actor->t.t.translate.t);
-        if (pPedestrian->to_pos.v[V_Y] >= 500.f) {
-            pPedestrian->direction.v[V_Y] = 0.f;
+        if (pPedestrian->to_pos.v[Y] >= 500.f) {
+            pPedestrian->direction.v[Y] = 0.f;
         }
         if (Vector3IsZero(&pPedestrian->direction) && instruction != gInitial_instruction) {
             if (gInitial_instruction == NULL) {
@@ -825,7 +826,7 @@ void MungePedestrianSequence(tPedestrian_data* pPedestrian, int pAction_changed)
     LOG_TRACE("(%p, %d)", pPedestrian, pAction_changed);
 
     if (pPedestrian->ref_number < 100) {
-        ped_movement_angle = FastScalarArcTan2(pPedestrian->direction.v[V_X], pPedestrian->direction.v[V_Z]);
+        ped_movement_angle = FastScalarArcTan2(pPedestrian->direction.v[X], pPedestrian->direction.v[Z]);
         if (ped_movement_angle < pPedestrian->car_to_ped) {
             ped_movement_angle += 360.f;
         }
@@ -867,8 +868,8 @@ void DetachPedFromCar(tPedestrian_data* pPedestrian) {
         BrActorRelink(gDont_render_actor, pPedestrian->actor);
         pPedestrian->actor->render_style = BR_RSTYLE_NONE;
         pPedestrian->mid_air = 1;
-        if (pPedestrian->to_pos.v[V_Y] < 500.f) {
-            pPedestrian->to_pos.v[V_Y] += 1000.4f;
+        if (pPedestrian->to_pos.v[Y] < 500.f) {
+            pPedestrian->to_pos.v[Y] += 1000.4f;
         }
         BrVector3Set(&pPedestrian->offset, 0.f, 0.f, 0.f);
     }
@@ -1045,13 +1046,13 @@ void MungePedModel(tPedestrian_data* pPedestrian) {
     CalcPedWidthNHeight(pPedestrian, pPedestrian->colour_map, &pPedestrian->height2, &pPedestrian->width);
     the_frame = &pPedestrian->sequences[pPedestrian->current_sequence].frames[MAX(pPedestrian->current_frame, 0)];
     if (pPedestrian->ref_number >= 100 && pPedestrian->current_action == pPedestrian->fatal_car_impact_action) {
-        x_offset = the_frame->offset.v[V_X] * 2.0f;
-        y_offset = the_frame->offset.v[V_Y];
+        x_offset = the_frame->offset.v[X] * 2.0f;
+        y_offset = the_frame->offset.v[Y];
         pPedestrian->height2 *= 2.0f;
         pPedestrian->width *= 2.0f;
     } else {
-        x_offset = the_frame->offset.v[V_X];
-        y_offset = the_frame->offset.v[V_Y];
+        x_offset = the_frame->offset.v[X];
+        y_offset = the_frame->offset.v[Y];
     }
     pPedestrian->flipped = the_frame->flipped;
     if (pPedestrian->actor->parent != gDont_render_actor) {
@@ -1083,22 +1084,22 @@ void MungePedModel(tPedestrian_data* pPedestrian) {
     }
     if (old_parent != NULL) {
         BrMatrix34PostTranslate(&pPedestrian->actor->t.t.mat,
-            old_parent->t.t.translate.t.v[V_X] + x_offset,
-            old_parent->t.t.translate.t.v[V_Y] + y_offset,
-            old_parent->t.t.translate.t.v[V_Z]);
+            old_parent->t.t.translate.t.v[X] + x_offset,
+            old_parent->t.t.translate.t.v[Y] + y_offset,
+            old_parent->t.t.translate.t.v[Z]);
         BrActorRelink(old_parent, pPedestrian->actor);
         BrVector3Accumulate(&pPedestrian->actor->t.t.translate.t, &pPedestrian->offset);
     } else if (pPedestrian->spin_period == 0.0f) {
         BrMatrix34PostTranslate(&pPedestrian->actor->t.t.mat,
-            pPedestrian->pos.v[V_X] + x_offset - pPedestrian->offset.v[V_X],
-            pPedestrian->pos.v[V_Y] + y_offset - pPedestrian->offset.v[V_Y],
-            pPedestrian->pos.v[V_Z]);
+            pPedestrian->pos.v[X] + x_offset - pPedestrian->offset.v[X],
+            pPedestrian->pos.v[Y] + y_offset - pPedestrian->offset.v[Y],
+            pPedestrian->pos.v[Z]);
         BrVector3Set(&pPedestrian->offset, x_offset, y_offset, 0.0f);
     } else {
         BrMatrix34PostTranslate(&pPedestrian->actor->t.t.mat,
-            pPedestrian->offset.v[V_X] + x_offset,
-            pPedestrian->offset.v[V_Y] + y_offset,
-            pPedestrian->offset.v[V_Z]);
+            pPedestrian->offset.v[X] + x_offset,
+            pPedestrian->offset.v[Y] + y_offset,
+            pPedestrian->offset.v[Z]);
     }
     gCurrent_lollipop_index = AddToLollipopQueue(pPedestrian->actor, gCurrent_lollipop_index);
 }
@@ -1228,7 +1229,7 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
     if (gAttracted_pedestrians) {
         BrVector3Scale(pDanger_direction, pDanger_direction, -1.f);
     }
-    old_y = pPedestrian->actor->t.t.translate.t.v[V_Y];
+    old_y = pPedestrian->actor->t.t.translate.t.v[Y];
     if (pPedestrian->current_action != pPedestrian->fatal_car_impact_action
         && pPedestrian->current_action != pPedestrian->fatal_ground_impact_action
         && pPedestrian->current_action != pPedestrian->giblets_action) {
@@ -1281,14 +1282,14 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
         }
         gVesuvians_this_time++;
     }
-    if (pPedestrian->to_pos.v[V_Y] < 500.f) {
+    if (pPedestrian->to_pos.v[Y] < 500.f) {
         pPedestrian->falling_speed = 0.f;
         pPedestrian->mid_air = 0;
     } else {
         BrVector3Copy(&cast_point, &pPedestrian->actor->t.t.translate.t);
-        if (cast_point.v[V_Y] >= 500.f) {
-            cast_point.v[V_Y] -= 999.6f;
-            pPedestrian->pos.v[V_Y] = pPedestrian->actor->t.t.translate.t.v[V_Y] = FindYVerticallyBelow2(&cast_point);
+        if (cast_point.v[Y] >= 500.f) {
+            cast_point.v[Y] -= 999.6f;
+            pPedestrian->pos.v[Y] = pPedestrian->actor->t.t.translate.t.v[Y] = FindYVerticallyBelow2(&cast_point);
             pPedestrian->falling_speed = 0.f;
             pPedestrian->mid_air = 0;
             pPedestrian->spin_period = 0;
@@ -1297,21 +1298,21 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
             if (pPedestrian->current_speed == 0.f && !pPedestrian->mid_air) {
                 pPedestrian->mid_air = 0;
             } else {
-                cast_point.v[V_Y] = old_y + .4f;
+                cast_point.v[Y] = old_y + .4f;
                 new_y = FindYVerticallyBelow2(&cast_point);
                 if (new_y > old_y) {
                     pPedestrian->spin_period = 0.f;
                     BrVector3Set(&pPedestrian->offset, 0.f, 0.f, 0.f);
                     pPedestrian->mid_air = 0;
                     pPedestrian->falling_speed = 0.f;
-                    pPedestrian->pos.v[V_Y] = pPedestrian->actor->t.t.translate.t.v[V_Y] = new_y;
+                    pPedestrian->pos.v[Y] = pPedestrian->actor->t.t.translate.t.v[Y] = new_y;
                 } else {
                     grav_times_period = ped_gravity * gFrame_period;
                     pPedestrian->falling_speed += grav_times_period;
-                    pPedestrian->actor->t.t.translate.t.v[V_Y] -= gFrame_period * pPedestrian->falling_speed;
-                    pPedestrian->pos.v[V_Y] = pPedestrian->actor->t.t.translate.t.v[V_Y];
+                    pPedestrian->actor->t.t.translate.t.v[Y] -= gFrame_period * pPedestrian->falling_speed;
+                    pPedestrian->pos.v[Y] = pPedestrian->actor->t.t.translate.t.v[Y];
                     if (pPedestrian->spin_period != 0.f) {
-                        pPedestrian->offset.v[V_Y] -= gFrame_period * pPedestrian->falling_speed;
+                        pPedestrian->offset.v[Y] -= gFrame_period * pPedestrian->falling_speed;
                     }
                     if (pPedestrian->hit_points > 0
                         && pPedestrian->falling_sound >= 0
@@ -1334,12 +1335,12 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
                             &pPedestrian->pos);
                         pPedestrian->falling_sound = -1;
                     }
-                    if (new_y <= pPedestrian->actor->t.t.translate.t.v[V_Y]) {
+                    if (new_y <= pPedestrian->actor->t.t.translate.t.v[Y]) {
                         pPedestrian->mid_air = 1;
                     } else {
-                        pPedestrian->pos.v[V_Y] = pPedestrian->actor->t.t.translate.t.v[V_Y] = new_y;
+                        pPedestrian->pos.v[Y] = pPedestrian->actor->t.t.translate.t.v[Y] = new_y;
                         if (pPedestrian->spin_period != 0.f) {
-                            pPedestrian->offset.v[V_Y] = pPedestrian->pos.v[V_Y];
+                            pPedestrian->offset.v[Y] = pPedestrian->pos.v[Y];
                         }
                         if (pPedestrian->hit_points < 0) {
                             BrVector3Copy(&pPedestrian->to_pos, &pPedestrian->pos);
@@ -1396,18 +1397,18 @@ float CalcPedestrianDangerLevel(tPedestrian_data* pPedestrian, br_vector3* pDang
     for (i = 0; i < gNum_active_cars; i++) {
         car = gActive_car_list[i];
         if (car->driver == eDriver_local_human) {
-            camera_view_angle = FastScalarArcTan2(ped_pos->v[V_X] - gCamera_to_world.m[3][V_X], ped_pos->v[V_Z] - gCamera_to_world.m[3][V_Z]);
+            camera_view_angle = FastScalarArcTan2(ped_pos->v[X] - gCamera_to_world.m[3][X], ped_pos->v[Z] - gCamera_to_world.m[3][Z]);
             pPedestrian->car_to_ped = camera_view_angle;
         }
         if (gBlind_pedestrians) {
             return car->keys.horn ? 100.f : 0.f;
         }
-        distance_squared = (ped_pos->v[V_X] - car->pos.v[V_X]) * (ped_pos->v[V_X] - car->pos.v[V_X])
-            + 10.f * (ped_pos->v[V_Y] - car->pos.v[V_Y]) * 10.f * (ped_pos->v[V_Y] - car->pos.v[V_Y])
-            + (ped_pos->v[V_Z] - car->pos.v[V_Z]) * (ped_pos->v[V_Z] - car->pos.v[V_Z]);
+        distance_squared = (ped_pos->v[X] - car->pos.v[X]) * (ped_pos->v[X] - car->pos.v[X])
+            + 10.f * (ped_pos->v[Y] - car->pos.v[Y]) * 10.f * (ped_pos->v[Y] - car->pos.v[Y])
+            + (ped_pos->v[Z] - car->pos.v[Z]) * (ped_pos->v[Z] - car->pos.v[Z]);
         if (distance_squared < gMax_distance_squared) {
-            car_movement_angle = FastScalarArcTan2(car->direction.v[V_X], car->direction.v[V_Z]);
-            car_to_pedestrian_angle = FastScalarArcTan2(ped_pos->v[V_X] - car->pos.v[V_X], ped_pos->v[V_Z] - car->pos.v[V_Z]);
+            car_movement_angle = FastScalarArcTan2(car->direction.v[X], car->direction.v[Z]);
+            car_to_pedestrian_angle = FastScalarArcTan2(ped_pos->v[X] - car->pos.v[X], ped_pos->v[Z] - car->pos.v[Z]);
             if (car_to_pedestrian_angle > car_movement_angle) {
                 car_movement_angle += 360.f;
             }
@@ -1468,43 +1469,43 @@ tPed_hit_position MoveToEdgeOfCar(tPedestrian_data* pPedestrian, tCollision_info
     } else {
         BrVector3Scale(&ped_move_in_global, &pCar->direction, fabsf(pCar->speed));
     }
-    if (fabsf(ped_move_in_global.v[V_X]) < 5e-5f || fabsf(ped_move_in_global.v[V_Z]) < 5e-5f) {
+    if (fabsf(ped_move_in_global.v[X]) < 5e-5f || fabsf(ped_move_in_global.v[Z]) < 5e-5f) {
         return ePed_hit_unknown;
     }
     BrActorToActorMatrix34(&global_to_car, gDont_render_actor, pCar_actor);
     BrMatrix34ApplyV(&ped_move_in_car, &ped_move_in_global, &global_to_car);
-    if (ped_move_in_car.v[V_X] >= 0.f) {
-        x = pCar_bounds_max_x - pMin_ped_bounds_car->v[V_X];
+    if (ped_move_in_car.v[X] >= 0.f) {
+        x = pCar_bounds_max_x - pMin_ped_bounds_car->v[X];
     } else {
-        x = pCar_bounds_min_x - pMax_ped_bounds_car->v[V_X];
+        x = pCar_bounds_min_x - pMax_ped_bounds_car->v[X];
     }
-    if (ped_move_in_car.v[V_Z] >= 0.f) {
-        z = pCar_bounds_max_z - pMin_ped_bounds_car->v[V_Z];
+    if (ped_move_in_car.v[Z] >= 0.f) {
+        z = pCar_bounds_max_z - pMin_ped_bounds_car->v[Z];
     } else {
-        z = pCar_bounds_min_z - pMax_ped_bounds_car->v[V_Z];
+        z = pCar_bounds_min_z - pMax_ped_bounds_car->v[Z];
     }
 
-    if (ped_move_in_car.v[V_Z] != 0.f) {
-        t = z / ped_move_in_car.v[V_Z] * ped_move_in_car.v[V_X];
+    if (ped_move_in_car.v[Z] != 0.f) {
+        t = z / ped_move_in_car.v[Z] * ped_move_in_car.v[X];
     }
-    if (ped_move_in_car.v[V_Z] == 0.f || t + pPed_x < pCar_bounds_min_x || t + pPed_x > pCar_bounds_max_x) {
-        if (ped_move_in_car.v[V_X] == 0.f) {
+    if (ped_move_in_car.v[Z] == 0.f || t + pPed_x < pCar_bounds_min_x || t + pPed_x > pCar_bounds_max_x) {
+        if (ped_move_in_car.v[X] == 0.f) {
             return ePed_hit_unknown;
         }
-        t = x / ped_move_in_car.v[V_X];
-        z_to_use = t * ped_move_in_car.v[V_Z];
+        t = x / ped_move_in_car.v[X];
+        z_to_use = t * ped_move_in_car.v[Z];
         if (z_to_use + pPed_z < pCar_bounds_min_z || z_to_use + pPed_z > pCar_bounds_max_z) {
             return ePed_hit_unknown;
         }
         x_to_use = x;
-        if (ped_move_in_car.v[V_X] >= 0.f) {
+        if (ped_move_in_car.v[X] >= 0.f) {
             result = ePed_hit_rside;
         } else {
             result = ePed_hit_lside;
         }
     } else {
         z_to_use = z;
-        if (ped_move_in_car.v[V_Z] >= 0.f) {
+        if (ped_move_in_car.v[Z] >= 0.f) {
             result = ePed_hit_back;
         } else {
             result = ePed_hit_front;
@@ -1512,7 +1513,7 @@ tPed_hit_position MoveToEdgeOfCar(tPedestrian_data* pPedestrian, tCollision_info
     }
     BrVector3Set(&scaled_car_direction, 1.01f * x_to_use, 0.f, 1.01f * z_to_use);
     BrMatrix34TApplyV(&scaled_ped_direction, &scaled_car_direction, &global_to_car);
-    scaled_ped_direction.v[V_Y] = 0.f;
+    scaled_ped_direction.v[Y] = 0.f;
     if (pCar->speed == 0.f || gFrame_period * fabsf(pCar->speed) > BrVector3Length(&scaled_ped_direction) / 10.f) {
         BrVector3Accumulate(&pPedestrian->actor->t.t.translate.t, &scaled_ped_direction);
         BrVector3Accumulate(&pPedestrian->pos, &scaled_ped_direction);
@@ -1544,8 +1545,8 @@ int BloodyWheels(tCar_spec* pCar, br_vector3* pPed_car, br_scalar pSize, br_vect
     dist_sqr = size_sqr * WORLD_SCALE * size_sqr * WORLD_SCALE;
     squish = 0;
     for (wheel = 0; wheel < COUNT_OF(pCar->blood_remaining); wheel++) {
-        ped_m_x = pCar->wpos[wheel].v[V_X] - pPed_car->v[V_X] * WORLD_SCALE;
-        ped_m_z = pCar->wpos[wheel].v[V_Z] - pPed_car->v[V_Z] * WORLD_SCALE;
+        ped_m_x = pCar->wpos[wheel].v[X] - pPed_car->v[X] * WORLD_SCALE;
+        ped_m_z = pCar->wpos[wheel].v[Z] - pPed_car->v[Z] * WORLD_SCALE;
         if (pCar->blood_remaining[wheel] == 0.f && ped_m_x * ped_m_x + ped_m_z * ped_m_z < dist_sqr) {
             pCar->blood_remaining[wheel] = SRandomBetween(2.f, 8.f);
             pCar->special_start[wheel] = *pPed_glob;
@@ -1675,82 +1676,82 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
         BrMatrix34ApplyP(&min_ped_bounds_car, &min_ped_bounds, &ped_to_car);
         BrMatrix34ApplyP(&max_ped_bounds_car, &max_ped_bounds, &ped_to_car);
         // use gross_dismiss as temporary
-        if (max_ped_bounds_car.v[V_X] < min_ped_bounds_car.v[V_X]) {
-            SwapValuesUsingTemporary(max_ped_bounds_car.v[V_X], min_ped_bounds_car.v[V_X], gross_dismiss);
+        if (max_ped_bounds_car.v[X] < min_ped_bounds_car.v[X]) {
+            SwapValuesUsingTemporary(max_ped_bounds_car.v[X], min_ped_bounds_car.v[X], gross_dismiss);
         }
-        if (max_ped_bounds_car.v[V_Y] < min_ped_bounds_car.v[V_Y]) {
-            SwapValuesUsingTemporary(max_ped_bounds_car.v[V_Y], min_ped_bounds_car.v[V_Y], gross_dismiss);
+        if (max_ped_bounds_car.v[Y] < min_ped_bounds_car.v[Y]) {
+            SwapValuesUsingTemporary(max_ped_bounds_car.v[Y], min_ped_bounds_car.v[Y], gross_dismiss);
         }
-        if (max_ped_bounds_car.v[V_Z] < min_ped_bounds_car.v[V_Z]) {
-            SwapValuesUsingTemporary(max_ped_bounds_car.v[V_Z], min_ped_bounds_car.v[V_Z], gross_dismiss);
+        if (max_ped_bounds_car.v[Z] < min_ped_bounds_car.v[Z]) {
+            SwapValuesUsingTemporary(max_ped_bounds_car.v[Z], min_ped_bounds_car.v[Z], gross_dismiss);
         }
-        car_bounds_min_x = the_car->bounds[0].min.v[V_X];
-        car_bounds_max_x = the_car->bounds[0].max.v[V_X];
-        car_bounds_min_z = the_car->bounds[0].min.v[V_Z];
-        car_bounds_max_z = the_car->bounds[0].max.v[V_Z];
-        prev_car_bounds_min_x = car_bounds_min_x - the_car->velocity_car_space.v[V_X] * scalar_frame_time;
-        prev_car_bounds_max_x = car_bounds_max_x - the_car->velocity_car_space.v[V_X] * scalar_frame_time;
-        prev_car_bounds_min_z = car_bounds_min_z - the_car->velocity_car_space.v[V_Z] * scalar_frame_time;
-        prev_car_bounds_max_z = car_bounds_max_z - the_car->velocity_car_space.v[V_Z] * scalar_frame_time;
+        car_bounds_min_x = the_car->bounds[0].min.v[X];
+        car_bounds_max_x = the_car->bounds[0].max.v[X];
+        car_bounds_min_z = the_car->bounds[0].min.v[Z];
+        car_bounds_max_z = the_car->bounds[0].max.v[Z];
+        prev_car_bounds_min_x = car_bounds_min_x - the_car->velocity_car_space.v[X] * scalar_frame_time;
+        prev_car_bounds_max_x = car_bounds_max_x - the_car->velocity_car_space.v[X] * scalar_frame_time;
+        prev_car_bounds_min_z = car_bounds_min_z - the_car->velocity_car_space.v[Z] * scalar_frame_time;
+        prev_car_bounds_max_z = car_bounds_max_z - the_car->velocity_car_space.v[Z] * scalar_frame_time;
         if (!proximity_rayed) {
             if (!fated) {
-                if (the_car->velocity_car_space.v[V_X] <= 0.0f) {
-                    if (the_car->velocity_car_space.v[V_Z] <= 0.0f) {
-                        if (max_ped_bounds_car.v[V_X] <= car_bounds_min_x
-                            || min_ped_bounds_car.v[V_X] >= prev_car_bounds_max_x
-                            || max_ped_bounds_car.v[V_Z] <= car_bounds_min_z
-                            || min_ped_bounds_car.v[V_Z] >= prev_car_bounds_max_z
-                            || (min_ped_bounds_car.v[V_X] > car_bounds_max_x
-                                && max_ped_bounds_car.v[V_Z] < prev_car_bounds_min_z
+                if (the_car->velocity_car_space.v[X] <= 0.0f) {
+                    if (the_car->velocity_car_space.v[Z] <= 0.0f) {
+                        if (max_ped_bounds_car.v[X] <= car_bounds_min_x
+                            || min_ped_bounds_car.v[X] >= prev_car_bounds_max_x
+                            || max_ped_bounds_car.v[Z] <= car_bounds_min_z
+                            || min_ped_bounds_car.v[Z] >= prev_car_bounds_max_z
+                            || (min_ped_bounds_car.v[X] > car_bounds_max_x
+                                && max_ped_bounds_car.v[Z] < prev_car_bounds_min_z
                                 && prev_car_bounds_max_x - car_bounds_max_x != 0.0f
-                                && (prev_car_bounds_min_z - car_bounds_min_z) / (prev_car_bounds_max_x - car_bounds_max_x) > (max_ped_bounds_car.v[V_Z] - car_bounds_min_z) / (min_ped_bounds_car.v[V_X] - car_bounds_max_x))
-                            || (max_ped_bounds_car.v[V_X] < prev_car_bounds_min_x
-                                && min_ped_bounds_car.v[V_Z] > car_bounds_max_z
+                                && (prev_car_bounds_min_z - car_bounds_min_z) / (prev_car_bounds_max_x - car_bounds_max_x) > (max_ped_bounds_car.v[Z] - car_bounds_min_z) / (min_ped_bounds_car.v[X] - car_bounds_max_x))
+                            || (max_ped_bounds_car.v[X] < prev_car_bounds_min_x
+                                && min_ped_bounds_car.v[Z] > car_bounds_max_z
                                 && car_bounds_min_x - prev_car_bounds_min_x != 0.0f
-                                && (car_bounds_max_z - prev_car_bounds_max_z) / (car_bounds_min_x - prev_car_bounds_min_x) > (min_ped_bounds_car.v[V_Z] - prev_car_bounds_max_z) / (max_ped_bounds_car.v[V_X] - prev_car_bounds_min_x))) {
+                                && (car_bounds_max_z - prev_car_bounds_max_z) / (car_bounds_min_x - prev_car_bounds_min_x) > (min_ped_bounds_car.v[Z] - prev_car_bounds_max_z) / (max_ped_bounds_car.v[X] - prev_car_bounds_min_x))) {
                             continue;
                         }
-                    } else if (max_ped_bounds_car.v[V_X] <= car_bounds_min_x
-                        || min_ped_bounds_car.v[V_X] >= prev_car_bounds_max_x
-                        || max_ped_bounds_car.v[V_Z] <= prev_car_bounds_min_z
-                        || min_ped_bounds_car.v[V_Z] >= car_bounds_max_z
-                        || (max_ped_bounds_car.v[V_X] < prev_car_bounds_min_x
-                            && max_ped_bounds_car.v[V_Z] < car_bounds_min_z
+                    } else if (max_ped_bounds_car.v[X] <= car_bounds_min_x
+                        || min_ped_bounds_car.v[X] >= prev_car_bounds_max_x
+                        || max_ped_bounds_car.v[Z] <= prev_car_bounds_min_z
+                        || min_ped_bounds_car.v[Z] >= car_bounds_max_z
+                        || (max_ped_bounds_car.v[X] < prev_car_bounds_min_x
+                            && max_ped_bounds_car.v[Z] < car_bounds_min_z
                             && car_bounds_min_x - prev_car_bounds_min_x != 0.0f
-                            && ((car_bounds_min_z - prev_car_bounds_min_z) / (car_bounds_min_x - prev_car_bounds_min_x) < (max_ped_bounds_car.v[V_Z] - prev_car_bounds_min_z) / (max_ped_bounds_car.v[V_X] - prev_car_bounds_min_x)))
-                        || (min_ped_bounds_car.v[V_X] > car_bounds_max_x
-                            && min_ped_bounds_car.v[V_Z] > prev_car_bounds_max_z
+                            && ((car_bounds_min_z - prev_car_bounds_min_z) / (car_bounds_min_x - prev_car_bounds_min_x) < (max_ped_bounds_car.v[Z] - prev_car_bounds_min_z) / (max_ped_bounds_car.v[X] - prev_car_bounds_min_x)))
+                        || (min_ped_bounds_car.v[X] > car_bounds_max_x
+                            && min_ped_bounds_car.v[Z] > prev_car_bounds_max_z
                             && prev_car_bounds_max_x - car_bounds_max_x != 0.0f
-                            && (prev_car_bounds_max_z - car_bounds_max_z) / (prev_car_bounds_max_x - car_bounds_max_x) < (min_ped_bounds_car.v[V_Z] - car_bounds_max_z) / (min_ped_bounds_car.v[V_X] - car_bounds_max_x))) {
+                            && (prev_car_bounds_max_z - car_bounds_max_z) / (prev_car_bounds_max_x - car_bounds_max_x) < (min_ped_bounds_car.v[Z] - car_bounds_max_z) / (min_ped_bounds_car.v[X] - car_bounds_max_x))) {
                         continue;
                     }
-                } else if (the_car->velocity_car_space.v[V_Z] <= 0.0f) {
-                    if (max_ped_bounds_car.v[V_X] <= prev_car_bounds_min_x
-                        || min_ped_bounds_car.v[V_X] >= car_bounds_max_x
-                        || max_ped_bounds_car.v[V_Z] <= car_bounds_min_z
-                        || min_ped_bounds_car.v[V_Z] >= prev_car_bounds_max_z
-                        || (max_ped_bounds_car.v[V_X] < car_bounds_min_x
-                            && max_ped_bounds_car.v[V_Z] < prev_car_bounds_min_z
+                } else if (the_car->velocity_car_space.v[Z] <= 0.0f) {
+                    if (max_ped_bounds_car.v[X] <= prev_car_bounds_min_x
+                        || min_ped_bounds_car.v[X] >= car_bounds_max_x
+                        || max_ped_bounds_car.v[Z] <= car_bounds_min_z
+                        || min_ped_bounds_car.v[Z] >= prev_car_bounds_max_z
+                        || (max_ped_bounds_car.v[X] < car_bounds_min_x
+                            && max_ped_bounds_car.v[Z] < prev_car_bounds_min_z
                             && prev_car_bounds_min_x - car_bounds_min_x != 0.0f
-                            && (prev_car_bounds_min_z - car_bounds_min_z) / (prev_car_bounds_min_x - car_bounds_min_x) < (max_ped_bounds_car.v[V_Z] - car_bounds_min_z) / (max_ped_bounds_car.v[V_X] - car_bounds_min_x))
-                        || (min_ped_bounds_car.v[V_X] > prev_car_bounds_max_x
-                            && min_ped_bounds_car.v[V_Z] > car_bounds_max_z
+                            && (prev_car_bounds_min_z - car_bounds_min_z) / (prev_car_bounds_min_x - car_bounds_min_x) < (max_ped_bounds_car.v[Z] - car_bounds_min_z) / (max_ped_bounds_car.v[X] - car_bounds_min_x))
+                        || (min_ped_bounds_car.v[X] > prev_car_bounds_max_x
+                            && min_ped_bounds_car.v[Z] > car_bounds_max_z
                             && car_bounds_max_x - prev_car_bounds_max_x != 0.0f
-                            && (car_bounds_max_z - prev_car_bounds_max_z) / (car_bounds_max_x - prev_car_bounds_max_x) < (min_ped_bounds_car.v[V_Z] - prev_car_bounds_max_z) / (min_ped_bounds_car.v[V_X] - prev_car_bounds_max_x))) {
+                            && (car_bounds_max_z - prev_car_bounds_max_z) / (car_bounds_max_x - prev_car_bounds_max_x) < (min_ped_bounds_car.v[Z] - prev_car_bounds_max_z) / (min_ped_bounds_car.v[X] - prev_car_bounds_max_x))) {
                         continue;
                     }
-                } else if (max_ped_bounds_car.v[V_X] <= prev_car_bounds_min_x
-                    || min_ped_bounds_car.v[V_X] >= car_bounds_max_x
-                    || max_ped_bounds_car.v[V_Z] <= prev_car_bounds_min_z
-                    || min_ped_bounds_car.v[V_Z] >= car_bounds_max_z
-                    || (min_ped_bounds_car.v[V_X] > prev_car_bounds_max_x
-                        && max_ped_bounds_car.v[V_Z] < car_bounds_min_z
+                } else if (max_ped_bounds_car.v[X] <= prev_car_bounds_min_x
+                    || min_ped_bounds_car.v[X] >= car_bounds_max_x
+                    || max_ped_bounds_car.v[Z] <= prev_car_bounds_min_z
+                    || min_ped_bounds_car.v[Z] >= car_bounds_max_z
+                    || (min_ped_bounds_car.v[X] > prev_car_bounds_max_x
+                        && max_ped_bounds_car.v[Z] < car_bounds_min_z
                         && car_bounds_max_x - prev_car_bounds_max_x != 0.0f
-                        && (car_bounds_min_z - prev_car_bounds_min_z) / (car_bounds_max_x - prev_car_bounds_max_x) > (max_ped_bounds_car.v[V_Z] - prev_car_bounds_min_z) / (min_ped_bounds_car.v[V_X] - prev_car_bounds_max_x))
-                    || (max_ped_bounds_car.v[V_X] < car_bounds_min_x
-                        && min_ped_bounds_car.v[V_Z] > prev_car_bounds_max_z
+                        && (car_bounds_min_z - prev_car_bounds_min_z) / (car_bounds_max_x - prev_car_bounds_max_x) > (max_ped_bounds_car.v[Z] - prev_car_bounds_min_z) / (min_ped_bounds_car.v[X] - prev_car_bounds_max_x))
+                    || (max_ped_bounds_car.v[X] < car_bounds_min_x
+                        && min_ped_bounds_car.v[Z] > prev_car_bounds_max_z
                         && prev_car_bounds_min_x - car_bounds_min_x != 0.0f
-                        && (prev_car_bounds_max_z - car_bounds_max_z) / (prev_car_bounds_min_x - car_bounds_min_x) > (min_ped_bounds_car.v[V_Z] - car_bounds_max_z) / (max_ped_bounds_car.v[V_X] - car_bounds_min_x))) {
+                        && (prev_car_bounds_max_z - car_bounds_max_z) / (prev_car_bounds_min_x - car_bounds_min_x) > (min_ped_bounds_car.v[Z] - car_bounds_max_z) / (max_ped_bounds_car.v[X] - car_bounds_min_x))) {
                     continue;
                 }
             }
@@ -1758,8 +1759,8 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
         }
         if (pPedestrian->fate != (tCar_spec*)the_car
             && !proximity_rayed
-            && (the_car->bounds[0].max.v[V_Y] < min_ped_bounds_car.v[V_Y]
-                || the_car->bounds[0].min.v[V_Y] > max_ped_bounds_car.v[V_Y])) {
+            && (the_car->bounds[0].max.v[Y] < min_ped_bounds_car.v[Y]
+                || the_car->bounds[0].min.v[Y] > max_ped_bounds_car.v[Y])) {
             continue;
         }
         pPedestrian->fate = NULL;
@@ -1778,8 +1779,8 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
         break;
     }
     pPedestrian->killers_ID = the_car->car_ID;
-    ped_centre_x = (max_ped_bounds_car.v[V_X] + min_ped_bounds_car.v[V_X]) / 2.0f;
-    ped_centre_y = (max_ped_bounds_car.v[V_Z] + min_ped_bounds_car.v[V_Z]) / 2.0f;
+    ped_centre_x = (max_ped_bounds_car.v[X] + min_ped_bounds_car.v[X]) / 2.0f;
+    ped_centre_y = (max_ped_bounds_car.v[Z] + min_ped_bounds_car.v[Z]) / 2.0f;
     if (proximity_rayed) {
         hit_pos = ePed_hit_unknown;
     } else {
@@ -1852,15 +1853,15 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
     } else {
         if (FancyATossOffMate(pPedestrian, the_car, impact_speed)) {
             pPedestrian->mid_air = 1;
-            if (pPedestrian->to_pos.v[V_Y] < 500.0f) {
-                pPedestrian->to_pos.v[V_Y] += 1000.4f;
+            if (pPedestrian->to_pos.v[Y] < 500.0f) {
+                pPedestrian->to_pos.v[Y] += 1000.4f;
             }
             pPedestrian->falling_speed -= impact_speed * 0.02f;
             if (pPedestrian->falling_speed > -0.001f) {
                 pPedestrian->falling_speed = -0.001f;
             }
             tossing = 1;
-            pPedestrian->actor->t.t.translate.t.v[V_Y] += impact_speed * 15.0f;
+            pPedestrian->actor->t.t.translate.t.v[Y] += impact_speed * 15.0f;
             pPedestrian->pos = pPedestrian->actor->t.t.translate.t;
         } else {
             pPedestrian->actor->render_style = BR_RSTYLE_NONE;
@@ -1926,14 +1927,14 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
             credits_value *= 4;
             PratcamEvent(30);
             DoFancyHeadup(8);
-        } else if (fabsf(the_car->omega.v[V_X]) <= 5.0f
-            && fabsf(the_car->omega.v[V_Z]) <= 5.0f
+        } else if (fabsf(the_car->omega.v[X]) <= 5.0f
+            && fabsf(the_car->omega.v[Z]) <= 5.0f
             && BrVector3Dot(&the_car->car_master_actor->t.t.look_up.up, &up) >= 0.1f
             && pPedestrian->offset.v[1] >= -0.1f) {
             if (((hit_pos != ePed_hit_lside && hit_pos != ePed_hit_rside)
-                    || (fabsf(the_car->velocity_car_space.v[V_X]) <= fabsf(the_car->velocity_car_space.v[V_Z])
-                        && fabsf(the_car->omega.v[V_Y] / the_car->velocity_car_space.v[V_Z]) <= 600.0f))
-                && (hit_pos != ePed_hit_back || the_car->velocity_car_space.v[V_Z] <= 0.0f)) {
+                    || (fabsf(the_car->velocity_car_space.v[X]) <= fabsf(the_car->velocity_car_space.v[Z])
+                        && fabsf(the_car->omega.v[Y] / the_car->velocity_car_space.v[Z]) <= 600.0f))
+                && (hit_pos != ePed_hit_back || the_car->velocity_car_space.v[Z] <= 0.0f)) {
                 if (gCurrent_ped_multiplier >= 2) {
                     DoFancyHeadup(gCurrent_ped_multiplier + kFancyHeadup2xComboBonus - 2);
                 } else {
@@ -2065,8 +2066,8 @@ void DoPedestrian(tPedestrian_data* pPedestrian, int pIndex) {
     if (gAction_replay_mode) {
         old_frame = pPedestrian->current_frame;
         pPedestrian->car_to_ped = FastScalarArcTan2(
-            pPedestrian->pos.v[V_X] - gCamera_to_world.m[3][V_X],
-            pPedestrian->pos.v[V_Z] - gCamera_to_world.m[3][V_Z]);
+            pPedestrian->pos.v[X] - gCamera_to_world.m[3][X],
+            pPedestrian->pos.v[Z] - gCamera_to_world.m[3][Z]);
         MungePedestrianSequence(pPedestrian, 0);
         if (old_frame <= pPedestrian->sequences[pPedestrian->current_sequence].number_of_frames) {
             pPedestrian->current_frame = old_frame;
@@ -2189,15 +2190,15 @@ void SquirtPathVertex(br_vertex* pFirst_vertex, br_vector3* pPoint) {
 
     pFirst_vertex[0].p = *pPoint;
     pFirst_vertex[1].p = *pPoint;
-    pFirst_vertex[1].p.v[V_Y] += .1f;
+    pFirst_vertex[1].p.v[Y] += .1f;
     pFirst_vertex[2].p = *pPoint;
-    pFirst_vertex[2].p.v[V_X] += -.05f;
-    pFirst_vertex[2].p.v[V_Y] += .05f;
-    pFirst_vertex[2].p.v[V_Z] += -.05f;
+    pFirst_vertex[2].p.v[X] += -.05f;
+    pFirst_vertex[2].p.v[Y] += .05f;
+    pFirst_vertex[2].p.v[Z] += -.05f;
     pFirst_vertex[3].p = *pPoint;
-    pFirst_vertex[3].p.v[V_X] += .05f;
-    pFirst_vertex[3].p.v[V_Y] += .05f;
-    pFirst_vertex[3].p.v[V_Z] += .05f;
+    pFirst_vertex[3].p.v[X] += .05f;
+    pFirst_vertex[3].p.v[Y] += .05f;
+    pFirst_vertex[3].p.v[Z] += .05f;
 }
 
 // IDA: void __cdecl ResetAllPedestrians()
@@ -2225,11 +2226,11 @@ void GroundPedestrian(tPedestrian_data* pPedestrian) {
     }
     pPedestrian->mid_air = 0;
     BrVector3Set(&cast_point,
-        pPedestrian->pos.v[V_X],
-        pPedestrian->pos.v[V_Y] + 0.4f,
-        pPedestrian->pos.v[V_Z]);
+        pPedestrian->pos.v[X],
+        pPedestrian->pos.v[Y] + 0.4f,
+        pPedestrian->pos.v[Z]);
     new_y = FindYVerticallyBelow2(&cast_point);
-    pPedestrian->actor->t.t.translate.t.v[V_Y] = pPedestrian->pos.v[V_Y] = new_y;
+    pPedestrian->actor->t.t.translate.t.v[Y] = pPedestrian->pos.v[Y] = new_y;
     pPedestrian->spin_period = 0.f;
     sequence = &pPedestrian->sequences[pPedestrian->current_sequence];
     if (sequence->number_of_frames == sequence->looping_frame_start) {
@@ -2297,7 +2298,7 @@ void RevivePedestrian(tPedestrian_data* pPedestrian, int pAnimate) {
     PedestrianNextInstruction(pPedestrian, 0.f, 1, 0);
     BrVector3Copy(&pPedestrian->from_pos, &pPedestrian->actor->t.t.translate.t);
     MungePedModel(pPedestrian);
-    pPedestrian->pos.v[V_Y] += pPedestrian->sequences[pPedestrian->current_sequence].frames[0].offset.v[V_Y];
+    pPedestrian->pos.v[Y] += pPedestrian->sequences[pPedestrian->current_sequence].frames[0].offset.v[Y];
 }
 
 // IDA: void __usercall MungePedestrians(tU32 pFrame_period@<EAX>)
@@ -2335,8 +2336,8 @@ void MungePedestrians(tU32 pFrame_period) {
     if (gAction_replay_mode) {
         for (i = 0; i < gPed_count; i++) {
             the_pedestrian = &gPedestrian_array[i];
-            x_delta = fabsf(the_pedestrian->pos.v[V_X] - gCamera_to_world.m[3][V_X]);
-            z_delta = fabsf(the_pedestrian->pos.v[V_Z] - gCamera_to_world.m[3][V_Z]);
+            x_delta = fabsf(the_pedestrian->pos.v[X] - gCamera_to_world.m[3][X]);
+            z_delta = fabsf(the_pedestrian->pos.v[Z] - gCamera_to_world.m[3][Z]);
             if ((the_pedestrian->actor->parent != gDont_render_actor || (x_delta <= ACTIVE_PED_DXDZ && z_delta <= ACTIVE_PED_DXDZ))
                 && (gPedestrians_on || the_pedestrian->ref_number >= 100)
                 && the_pedestrian->hit_points != -100) {
@@ -2347,8 +2348,8 @@ void MungePedestrians(tU32 pFrame_period) {
     } else {
         for (i = 0; i < gPed_count; i++) {
             the_pedestrian = &gPedestrian_array[i];
-            x_delta = fabsf(the_pedestrian->pos.v[V_X] - gCamera_to_world.m[3][V_X]);
-            z_delta = fabsf(the_pedestrian->pos.v[V_Z] - gCamera_to_world.m[3][V_Z]);
+            x_delta = fabsf(the_pedestrian->pos.v[X] - gCamera_to_world.m[3][X]);
+            z_delta = fabsf(the_pedestrian->pos.v[Z] - gCamera_to_world.m[3][Z]);
             if (the_pedestrian->actor->parent == gDont_render_actor
                 && (x_delta > ACTIVE_PED_DXDZ || z_delta > ACTIVE_PED_DXDZ)) {
                 the_pedestrian->active = 0;
@@ -2409,8 +2410,8 @@ void RespawnPedestrians(void) {
             br_scalar x_delta;
             br_scalar z_delta;
             int ped_respawn_animate;
-            x_delta = fabsf(the_pedestrian->pos.v[V_X] - gCamera_to_world.m[3][V_X]);
-            z_delta = fabsf(the_pedestrian->pos.v[V_Z] - gCamera_to_world.m[3][V_Z]);
+            x_delta = fabsf(the_pedestrian->pos.v[X] - gCamera_to_world.m[3][X]);
+            z_delta = fabsf(the_pedestrian->pos.v[Z] - gCamera_to_world.m[3][Z]);
             ped_respawn_animate = x_delta <= ACTIVE_PED_DXDZ && z_delta <= ACTIVE_PED_DXDZ;
 #else
 #define ped_respawn_animate 1
@@ -2955,16 +2956,16 @@ br_actor* BuildPedPaths(tPedestrian_instruction* pInstructions, int pInstruc_cou
     for (j = 0; j < pInstruc_count; j++) {
         if (pInstructions[j].type == ePed_instruc_point || pInstructions[j].type == ePed_instruc_xpoint) {
             the_point = pInstructions[j].data.point_data.position;
-            if (the_point.v[V_Y] < 500.f) {
+            if (the_point.v[Y] < 500.f) {
                 the_mat = gPath_mat_normal;
             } else {
-                the_point.v[V_Y] -= 999.6f;
-                the_point.v[V_Y] = FindYVerticallyBelow2(&the_point);
-                if (the_point.v[V_Y] < -100.f) {
-                    the_point.v[V_Y] = 1000.f;
-                    the_point.v[V_Y] = FindYVerticallyBelow2(&the_point);
+                the_point.v[Y] -= 999.6f;
+                the_point.v[Y] = FindYVerticallyBelow2(&the_point);
+                if (the_point.v[Y] < -100.f) {
+                    the_point.v[Y] = 1000.f;
+                    the_point.v[Y] = FindYVerticallyBelow2(&the_point);
                 }
-                if (point_count == 0 || pInstructions[j - 1].data.point_data.position.v[V_Y] < 500.f) {
+                if (point_count == 0 || pInstructions[j - 1].data.point_data.position.v[Y] < 500.f) {
                     the_mat = gPath_mat_normal;
                 } else {
                     the_mat = gPath_mat_calc;
@@ -3002,17 +3003,17 @@ br_actor* BuildPedPaths(tPedestrian_instruction* pInstructions, int pInstruc_cou
             last_vertex_count = vertex_count;
             if (j == pInit_instruc) {
                 the_model->vertices[vertex_count].p = the_point;
-                the_model->vertices[vertex_count].p.v[V_Y] += .3f;
-                the_model->vertices[vertex_count].p.v[V_Z] += .05f;
+                the_model->vertices[vertex_count].p.v[Y] += .3f;
+                the_model->vertices[vertex_count].p.v[Z] += .05f;
                 the_model->vertices[vertex_count + 1].p = the_point;
-                the_model->vertices[vertex_count + 1].p.v[V_Y] += .3f;
-                the_model->vertices[vertex_count + 1].p.v[V_Z] += -.05f;
+                the_model->vertices[vertex_count + 1].p.v[Y] += .3f;
+                the_model->vertices[vertex_count + 1].p.v[Z] += -.05f;
                 the_model->vertices[vertex_count + 2].p = the_point;
-                the_model->vertices[vertex_count + 2].p.v[V_Y] += .3f;
-                the_model->vertices[vertex_count + 2].p.v[V_X] += .05f;
+                the_model->vertices[vertex_count + 2].p.v[Y] += .3f;
+                the_model->vertices[vertex_count + 2].p.v[X] += .05f;
                 the_model->vertices[vertex_count + 3].p = the_point;
-                the_model->vertices[vertex_count + 3].p.v[V_Y] += .3f;
-                the_model->vertices[vertex_count + 3].p.v[V_X] += -.05f;
+                the_model->vertices[vertex_count + 3].p.v[Y] += .3f;
+                the_model->vertices[vertex_count + 3].p.v[X] += -.05f;
                 vertex_count += 4;
                 the_model->faces[face_count].vertices[0] = vertex_count - 8;
                 the_model->faces[face_count].vertices[1] = vertex_count - 4;
@@ -3070,16 +3071,16 @@ void WriteOutPeds(void) {
             case ePed_instruc_point:
                 fprintf(f, "\tpoint\n");
                 fprintf(f, "\t%.3f,%.3f,%.3f\n",
-                    the_instruction->data.point_data.position.v[V_X],
-                    the_instruction->data.point_data.position.v[V_Y],
-                    the_instruction->data.point_data.position.v[V_Z]);
+                    the_instruction->data.point_data.position.v[X],
+                    the_instruction->data.point_data.position.v[Y],
+                    the_instruction->data.point_data.position.v[Z]);
                 break;
             case ePed_instruc_xpoint:
                 fprintf(f, "\txpoint\n");
                 fprintf(f, "\t%.3f,%.3f,%.3f\n",
-                    the_instruction->data.point_data.position.v[V_X],
-                    the_instruction->data.point_data.position.v[V_Y],
-                    the_instruction->data.point_data.position.v[V_Z]);
+                    the_instruction->data.point_data.position.v[X],
+                    the_instruction->data.point_data.position.v[Y],
+                    the_instruction->data.point_data.position.v[Z]);
                 break;
             case ePed_instruc_bchoice:
                 fprintf(f, "\tbchoice\n");
@@ -3417,7 +3418,7 @@ void DropPedPointAir2(void) {
     gPed_instrucs[gPed_instruc_count].type = ePed_instruc_point;
     gPed_instrucs[gPed_instruc_count].data.point_data.irreversable = 0;
     gPed_instrucs[gPed_instruc_count].data.point_data.position = *gOur_pos;
-    gPed_instrucs[gPed_instruc_count].data.point_data.position.v[V_Y] += 1000.4f;
+    gPed_instrucs[gPed_instruc_count].data.point_data.position.v[Y] += 1000.4f;
     gPed_instruc_count++;
     MungeShowPedPath();
 }
@@ -3450,7 +3451,7 @@ void DropInitPedPointAir(void) {
 }
 
 // IDA: br_uint_32 __cdecl KillActorsModel(br_actor *pActor, void *pArg)
-intptr_t KillActorsModel(br_actor* pActor, void* pArg) {
+br_uintptr_t KillActorsModel(br_actor* pActor, void* pArg) {
     LOG_TRACE("(%p, %p)", pActor, pArg);
 
     if (pActor->model != NULL) {
@@ -3492,12 +3493,12 @@ void GetPedPos(int* pPed_index, int* pPoint_index) {
         for (j = 0; j < gPedestrian_array[i].number_of_instructions; j++) {
             if (gPedestrian_array[i].instruction_list[j].type == ePed_instruc_point || gPedestrian_array[i].instruction_list[j].type == ePed_instruc_xpoint) {
                 the_point = gPedestrian_array[i].instruction_list[j].data.point_data.position;
-                if (the_point.v[V_Y] >= 500.f) {
-                    the_point.v[V_Y] -= 999.6f;
-                    the_point.v[V_Y] = FindYVerticallyBelow2(&the_point);
-                    if (the_point.v[V_Y] < -100.f) {
-                        the_point.v[V_Y] = 1000.f;
-                        the_point.v[V_Y] = FindYVerticallyBelow2(&the_point);
+                if (the_point.v[Y] >= 500.f) {
+                    the_point.v[Y] -= 999.6f;
+                    the_point.v[Y] = FindYVerticallyBelow2(&the_point);
+                    if (the_point.v[Y] < -100.f) {
+                        the_point.v[Y] = 1000.f;
+                        the_point.v[Y] = FindYVerticallyBelow2(&the_point);
                     }
                 }
                 the_distance = Vector3DistanceSquared(&the_point, gOur_pos);
@@ -3589,7 +3590,7 @@ void PullPedPointAir(void) {
     if (gPed_instruc_count == 0) {
         GetPedPos(&the_ped, &the_point);
         gPedestrian_array[the_ped].instruction_list[the_point].data.point_data.position = *gOur_pos;
-        gPedestrian_array[the_ped].instruction_list[the_point].data.point_data.position.v[V_Y] += 1000.4f;
+        gPedestrian_array[the_ped].instruction_list[the_point].data.point_data.position.v[Y] += 1000.4f;
         WriteOutPeds();
         DisposePedPaths();
         ShowPedPaths();
@@ -3770,7 +3771,7 @@ void RenderProximityRays(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer
                 gProximity_rays[i].start_time);
             car_model = gProximity_rays[i].car->car_model_actors[gProximity_rays[i].car->principal_car_actor].actor->model;
 
-            BrVector3Set(&car_add_c, 0.f, (car_model->bounds.max.v[V_Y] - car_model->bounds.min.v[V_Y]) / -5.f, 0.f);
+            BrVector3Set(&car_add_c, 0.f, (car_model->bounds.max.v[Y] - car_model->bounds.min.v[Y]) / -5.f, 0.f);
             BrMatrix34ApplyV(&car_add, &car_add_c, &gProximity_rays[i].car->car_master_actor->t.t.mat);
             BrVector3Add(&car_pos, &gProximity_rays[i].car->pos, &car_add);
             DRMatrix34TApplyP(&car_pos_cam, &car_pos, &gCamera_to_world);
@@ -3785,16 +3786,16 @@ void RenderProximityRays(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer
 
             from_pos = car_pos_cam;
 
-            seed = the_time + ped_pos.v[V_X] + ped_pos.v[V_Y] + ped_pos.v[V_Z] + car_pos.v[V_X] + car_pos.v[V_Y] + car_pos.v[V_Z];
+            seed = the_time + ped_pos.v[X] + ped_pos.v[Y] + ped_pos.v[Z] + car_pos.v[X] + car_pos.v[Y] + car_pos.v[Z];
             srand(seed);
 
             t = 0.f;
             do {
                 BrVector3Scale(&ray, &r1, t);
                 BrVector3Add(&to_pos, &ray, &car_pos_cam);
-                to_pos.v[V_X] += SRandomPosNeg(0.1f);
-                to_pos.v[V_Y] += SRandomPosNeg(0.1f);
-                to_pos.v[V_Z] += SRandomPosNeg(0.1f);
+                to_pos.v[X] += SRandomPosNeg(0.1f);
+                to_pos.v[Y] += SRandomPosNeg(0.1f);
+                to_pos.v[Z] += SRandomPosNeg(0.1f);
                 DrawLine3D(&to_pos, &from_pos, pRender_screen, pDepth_buffer, gProx_ray_shade_table);
                 from_pos = to_pos;
                 t += 0.05f;

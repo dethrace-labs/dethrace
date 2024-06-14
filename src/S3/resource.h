@@ -1,7 +1,7 @@
 #ifndef _RESOURCE_H_
 #define _RESOURCE_H_
 
-#include "brender/brender.h"
+#include "brender.h"
 #include "s3_defs.h"
 
 typedef enum s3_memory_classes {

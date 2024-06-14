@@ -1,4 +1,6 @@
 #include "loadsave.h"
+#include "brender.h"
+#include "brhton.h"
 #include "cutscene.h"
 #include "errors.h"
 #include "flicplay.h"
@@ -17,7 +19,6 @@
 #include "structur.h"
 #include "utility.h"
 #include "world.h"
-#include <brender/brender.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -27,8 +28,8 @@ int gSave_allowed;
 
 #define SAVEGAME_VERSION 6
 
-#define SWAP32_BE(V)       \
-    do {                   \
+#define SWAP32_BE(V)      \
+    do {                  \
         (V) = BrHtoNL(V); \
     } while (0)
 

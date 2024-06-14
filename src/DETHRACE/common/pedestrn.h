@@ -1,7 +1,6 @@
 #ifndef _PEDESTRN_H_
 #define _PEDESTRN_H_
 
-#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern int gDetect_peds;
@@ -239,7 +238,7 @@ void DropPedPointAir(void);
 
 void DropInitPedPointAir(void);
 
-intptr_t KillActorsModel(br_actor* pActor, void* pArg);
+br_uintptr_t KillActorsModel(br_actor* pActor, void* pArg);
 
 void DisposePedPaths(void);
 

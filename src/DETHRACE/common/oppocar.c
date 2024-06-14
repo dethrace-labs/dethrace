@@ -2,18 +2,18 @@
 #include "harness/trace.h"
 #include <stdlib.h>
 
-int gCollision_detection_on__oppocar; // suffix added to avoid duplicate symbol
-br_vector3 gGround_normal__oppocar; // suffix added to avoid duplicate symbol
+int gCollision_detection_on__oppocar;                  // suffix added to avoid duplicate symbol
+br_vector3 gGround_normal__oppocar;                    // suffix added to avoid duplicate symbol
 void (*ControlCar__oppocar[6])(tCar_spec*, br_scalar); // suffix added to avoid duplicate symbol
-int gControl__oppocar; // suffix added to avoid duplicate symbol
-int gFace_num__oppocar; // suffix added to avoid duplicate symbol
-br_angle gOld_yaw__oppocar; // suffix added to avoid duplicate symbol
-int gMetal_crunch_sound_id__oppocar[5]; // suffix added to avoid duplicate symbol
-int gMetal_scrape_sound_id__oppocar[3]; // suffix added to avoid duplicate symbol
-tFace_ref gFace_list__oppocar[32]; // suffix added to avoid duplicate symbol
-br_scalar gOur_yaw__oppocar; // suffix added to avoid duplicate symbol
-br_scalar gGravity__oppocar; // suffix added to avoid duplicate symbol
-br_vector3 gNew_ground_normal__oppocar; // suffix added to avoid duplicate symbol
+int gControl__oppocar;                                 // suffix added to avoid duplicate symbol
+int gFace_num__oppocar;                                // suffix added to avoid duplicate symbol
+br_angle gOld_yaw__oppocar;                            // suffix added to avoid duplicate symbol
+int gMetal_crunch_sound_id__oppocar[5];                // suffix added to avoid duplicate symbol
+int gMetal_scrape_sound_id__oppocar[3];                // suffix added to avoid duplicate symbol
+tFace_ref gFace_list__oppocar[32];                     // suffix added to avoid duplicate symbol
+br_scalar gOur_yaw__oppocar;                           // suffix added to avoid duplicate symbol
+br_scalar gGravity__oppocar;                           // suffix added to avoid duplicate symbol
+br_vector3 gNew_ground_normal__oppocar;                // suffix added to avoid duplicate symbol
 
 // IDA: void __usercall MakeCarStationary(tCar_spec *pCar_spec@<EAX>)
 void MakeCarStationary(tCar_spec* pCar_spec) {

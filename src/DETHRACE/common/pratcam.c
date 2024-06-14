@@ -1,5 +1,5 @@
 #include "pratcam.h"
-#include "brender/brender.h"
+#include "brender.h"
 #include "displays.h"
 #include "errors.h"
 #include "flicplay.h"

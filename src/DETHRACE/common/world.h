@@ -1,7 +1,6 @@
 #ifndef _WORLD_H_
 #define _WORLD_H_
 
-#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern int gFunkotronics_array_size;
@@ -183,7 +182,7 @@ void ChangeSubdivToPerspCB(br_material* pMaterial);
 
 void ChangeSubdivToPersp(void);
 
-intptr_t ProcessFaceMaterials(br_actor* pActor, tPMFMCB pCallback);
+br_uintptr_t ProcessFaceMaterials(br_actor* pActor, tPMFMCB pCallback);
 
 int DRPixelmapHasZeros(br_pixelmap* pm);
 
@@ -233,7 +232,7 @@ br_material* DisposeSuffixedMaterials(br_model* pModel, tU16 pFace);
 
 void DisposeTexturingMaterials(void);
 
-/*br_uint_32*/ intptr_t SetAccessoryRenderingCB(br_actor* pActor, void* pFlag);
+/*br_uint_32*/ br_uintptr_t SetAccessoryRenderingCB(br_actor* pActor, void* pFlag);
 
 void SetAccessoryRendering(int pOn);
 
@@ -255,7 +254,7 @@ void FreeExceptions(void);
 
 void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_info);
 
-intptr_t RemoveBounds(br_actor* pActor, void* pArg);
+/*br_uint_32*/ br_uintptr_t RemoveBounds(br_actor* pActor, void* pArg);
 
 void RemoveBoundsStructures(br_actor* pActor);
 

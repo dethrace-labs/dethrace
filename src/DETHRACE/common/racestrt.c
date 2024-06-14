@@ -1,5 +1,5 @@
 #include "racestrt.h"
-#include "brender/brender.h"
+#include "brender.h"
 #include "cutscene.h"
 #include "displays.h"
 #include "drmem.h"
@@ -40,7 +40,7 @@ tParts_category gPart_category;
 tU32 gNet_synch_start;
 tNet_game_details* gChoose_car_net_game;
 int gPart_index;
-int gChallenger_index__racestrt;                 // suffix added to avoid duplicate symbol
+int gChallenger_index__racestrt; // suffix added to avoid duplicate symbol
 tGrid_draw gDraw_grid_status;
 tNet_sequence_type gNet_race_sequence__racestrt; // suffix added to avoid duplicate symbol
 br_pixelmap* gTaken_image;

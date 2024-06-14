@@ -1,7 +1,6 @@
 #ifndef _RACESTRT_H_
 #define _RACESTRT_H_
 
-#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern int gGrid_number_colour[4];

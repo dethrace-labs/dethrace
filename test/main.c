@@ -12,9 +12,6 @@
 
 #include "framework/unity.h"
 
-#include "CORE/PIXELMAP/pixelmap.h"
-#include "CORE/V1DB/actsupt.h"
-#include "CORE/V1DB/dbsetup.h"
 #include "common/errors.h"
 #include "common/newgame.h"
 #include "common/utility.h"
@@ -30,37 +27,13 @@
 
 #define debug(format_, ...) fprintf(stderr, format_, __VA_ARGS__)
 
-extern void test_assocarr_suite();
-extern void test_brprintf_suite();
-extern void test_bswap_suite();
 extern void test_utility_suite();
 extern void test_loading_suite();
 extern void test_controls_suite();
 extern void test_input_suite();
 extern void test_dossys_suite();
 extern void test_init_suite();
-extern void test_brlists_suite();
-extern void test_fwsetup_suite();
-extern void test_resource_suite();
-extern void test_actsupt_suite();
-extern void test_genclip_suite();
-extern void test_datafile_suite();
-extern void test_v1dbfile_suite();
-extern void test_register_suite();
-extern void test_scratch_suite();
-extern void test_token_suite();
-extern void test_pattern_suite();
-extern void test_pmfile_suite();
-extern void test_fixed_suite();
-extern void test_lexer_suite();
-extern void test_logwrite_suite();
-extern void test_matrix23_suite();
-extern void test_matrix34_suite();
-extern void test_matrix4_suite();
-extern void test_quat_suite();
 extern void test_graphics_suite();
-extern void test_regsupt_suite();
-extern void test_vector_suite();
 extern void test_powerup_suite();
 extern void test_flicplay_suite();
 
@@ -249,35 +222,6 @@ int main(int argc, char** argv) {
     setup_global_vars(argc, argv);
 
     printf("Completed setup\n");
-
-    // BRSRC13
-    test_bswap_suite();
-    test_matrix23_suite();
-    test_matrix34_suite();
-    test_matrix4_suite();
-    test_vector_suite();
-    test_quat_suite();
-    test_fixed_suite();
-    test_logwrite_suite();
-    test_brprintf_suite();
-
-    test_assocarr_suite();
-    test_brlists_suite();
-    test_pattern_suite();
-    test_register_suite();
-
-    test_fwsetup_suite();
-    test_scratch_suite();
-    test_token_suite();
-    test_resource_suite();
-    test_actsupt_suite();
-    test_genclip_suite();
-    test_datafile_suite();
-    test_lexer_suite();
-
-    test_pmfile_suite();
-    test_v1dbfile_suite();
-    test_regsupt_suite();
 
     // DETHRACE
     test_utility_suite();

@@ -1,5 +1,5 @@
 #include "skidmark.h"
-#include "brender/brender.h"
+#include "brender.h"
 #include "globvars.h"
 #include "globvrbm.h"
 #include "harness/trace.h"

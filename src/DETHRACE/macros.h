@@ -4,7 +4,7 @@
 #define VEHICLE_TYPE_FROM_ID(id) ((tVehicle_type)(id >> 8))
 #define VEHICLE_INDEX_FROM_ID(id) ((id)&0x00ff)
 
-//#define VEC3_TRANSLATE(mat) (*(br_vector3*)(&mat->m[3][0]))
+// #define VEC3_TRANSLATE(mat) (*(br_vector3*)(&mat->m[3][0]))
 
 #define SLOBYTE(x) (*((signed char*)&(x)))
 
@@ -20,7 +20,7 @@
 
 #define DEG_TO_RAD(degrees) ((degrees)*3.141592653589793 / 180.0)
 
-#define V11MODEL(model) (((v11model*)model->prepared))
+#define V11MODEL(model) (((struct v11model*)model->prepared))
 #define CAR(c) ((tCar_spec*)c)
 
 #define Vector3Div(v1, v2, v3)                \
@@ -40,7 +40,11 @@
     ((V)->v[0] == (A) && (V)->v[1] == (B) && (V)->v[2] == (C))
 #define Vector3IsZero(V) Vector3EqualElements((V), 0.f, 0.f, 0.f)
 #define Vector3AddFloats(V1, V2, X, Y, Z) \
-    do { (V1)->v[0] = (V2)->v[0] + (X); (V1)->v[1] = (V2)->v[1] + (Y);  (V1)->v[2] = (V2)->v[2] + (Z); } while (0)
+    do {                                  \
+        (V1)->v[0] = (V2)->v[0] + (X);    \
+        (V1)->v[1] = (V2)->v[1] + (Y);    \
+        (V1)->v[2] = (V2)->v[2] + (Z);    \
+    } while (0)
 #define SwapValuesUsingTemporary(V1, V2, T) \
     do {                                    \
         (T) = (V1);                         \

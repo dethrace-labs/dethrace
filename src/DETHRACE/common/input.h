@@ -1,7 +1,6 @@
 #ifndef _INPUT_H_
 #define _INPUT_H_
 
-#include "brender/br_types.h"
 #include "dr_types.h"
 
 // Variable leading zero

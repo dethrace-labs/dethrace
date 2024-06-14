@@ -13,7 +13,7 @@ target_include_directories(dethrace_obj
 # add_compile_options(-fsanitize=address)
 # add_link_options(-fsanitize=address)
 
-target_link_libraries(dethrace_obj PUBLIC SDL2::SDL2 smackw32 harness brender s3)
+target_link_libraries(dethrace_obj PUBLIC SDL2::SDL2 smackw32 harness BRender::Full BRender::DDI s3)
 
 
 if (CMAKE_C_COMPILER_ID MATCHES "MSVC")
@@ -168,21 +168,11 @@ target_sources(dethrace_obj PRIVATE
 
 # Create our main game binary.
 add_executable(dethrace)
-target_link_libraries(dethrace PRIVATE glad dethrace_obj compile_with_werror)
+target_link_libraries(dethrace PRIVATE dethrace_obj compile_with_werror)
 target_sources(dethrace PRIVATE main.c)
 
 if(NOT MSVC)
-    if(APPLE)
-        target_link_libraries(dethrace PRIVATE "-framework OpenGL")
-    else()
-        set(OpenGL_GL_PREFERENCE GLVND)
-        find_package(OpenGL REQUIRED)
-        if(TARGET OpenGL::OpenGL)
-            target_link_libraries(dethrace PRIVATE OpenGL::OpenGL)
-        else()
-            target_link_libraries(dethrace PRIVATE OpenGL::GL)
-        endif()
-    endif()
+
 else()
     target_link_libraries(dethrace PRIVATE dbghelp)
     target_link_options(dethrace PRIVATE /subsystem:windows /ENTRY:mainCRTStartup)

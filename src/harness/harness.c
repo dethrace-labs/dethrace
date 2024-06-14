@@ -1,6 +1,5 @@
 #include "harness.h"
 #include "ascii_tables.h"
-#include "brender_emu/renderer_impl.h"
 #include "include/harness/config.h"
 #include "include/harness/hooks.h"
 #include "include/harness/os.h"
@@ -15,17 +14,12 @@
 
 br_pixelmap* palette;
 uint32_t* screen_buffer;
-harness_br_renderer* renderer_state;
 
 br_pixelmap* last_dst = NULL;
 br_pixelmap* last_src = NULL;
 
-unsigned int last_frame_time = 0;
 int force_null_platform = 0;
 
-extern unsigned int GetTotalTime(void);
-
-extern br_v1db_state v1db;
 extern uint32_t gI_am_cheating;
 
 // SplatPack or Carmageddon. This is where we represent the code differences between the two. For example, the intro smack file.
@@ -277,66 +271,6 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
     }
 
     return 0;
-}
-
-// Render 2d back buffer
-void Harness_RenderScreen(br_pixelmap* dst, br_pixelmap* src) {
-    gHarness_platform.Renderer_FullScreenQuad((uint8_t*)src->pixels);
-
-    last_dst = dst;
-    last_src = src;
-}
-
-void Harness_Hook_BrV1dbRendererBegin(br_v1db_state* v1db) {
-    renderer_state = NewHarnessBrRenderer();
-    v1db->renderer = (br_renderer*)renderer_state;
-}
-
-static int Harness_CalculateFrameDelay(void) {
-    if (harness_game_config.fps == 0) {
-        return 0;
-    }
-
-    unsigned int now = GetTotalTime();
-
-    if (last_frame_time != 0) {
-        unsigned int frame_time = now - last_frame_time;
-        last_frame_time = now;
-        if (frame_time < 100) {
-            int sleep_time = (1000 / harness_game_config.fps) - frame_time;
-            if (sleep_time > 5) {
-                return sleep_time;
-            }
-        }
-    }
-    return 0;
-}
-
-void Harness_Hook_renderActor(br_actor* actor, br_model* model, br_material* material, br_token type) {
-    gHarness_platform.Renderer_Model(actor, model, material, type, renderer_state->state.matrix.model_to_view);
-}
-
-// Called by game to swap buffers at end of frame rendering
-void Harness_Hook_BrPixelmapDoubleBuffer(br_pixelmap* dst, br_pixelmap* src) {
-
-    // draw the current colour_buffer (2d screen) contents
-    Harness_RenderScreen(dst, src);
-
-    int delay_ms = Harness_CalculateFrameDelay();
-    gHarness_platform.SwapWindow();
-    if (delay_ms > 0) {
-        gHarness_platform.Sleep(delay_ms);
-    }
-
-    gHarness_platform.Renderer_ClearBuffers();
-    last_frame_time = GetTotalTime();
-}
-
-void Harness_RenderLastScreen(void) {
-    if (last_dst) {
-        Harness_RenderScreen(last_dst, last_src);
-        gHarness_platform.SwapWindow();
-    }
 }
 
 // Filesystem hooks

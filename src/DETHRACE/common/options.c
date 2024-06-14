@@ -1,4 +1,5 @@
 #include "options.h"
+#include "brender.h"
 #include "brucetrk.h"
 #include "controls.h"
 #include "depth.h"
@@ -21,7 +22,6 @@
 #include "spark.h"
 #include "utility.h"
 #include "world.h"
-#include <brender/brender.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -78,7 +78,7 @@ void MoveDialFromTo(int pWhich_one, int pOld_stage, int pNew_stage) {
     DrawDial(pWhich_one, pOld_stage);
     start_time = PDGetTotalTime();
     while ((time_diff = PDGetTotalTime() - start_time) < 100) {
-         DrawDial(pWhich_one, pOld_stage + (pNew_stage - pOld_stage) * time_diff / 100);
+        DrawDial(pWhich_one, pOld_stage + (pNew_stage - pOld_stage) * time_diff / 100);
     }
     DrawDial(pWhich_one, pNew_stage);
 
@@ -216,24 +216,24 @@ int SoundClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_o
 // IDA: void __cdecl DoSoundOptions()
 void DoSoundOptions(void) {
     static tFlicette flicker_on[3] = {
-        { 156, {  26,  52 }, {  21,  50 } },
-        { 156, { 155, 310 }, {  88, 211 } },
-        {  43, {  38,  76 }, { 153, 367 } },
+        { 156, { 26, 52 }, { 21, 50 } },
+        { 156, { 155, 310 }, { 88, 211 } },
+        { 43, { 38, 76 }, { 153, 367 } },
     };
     static tFlicette flicker_off[3] = {
-        { 155, {  26,  52 }, {  21,  50 } },
-        { 155, { 155, 310 }, {  88, 211 } },
-        {  42, {  38,  76 }, { 153, 367 } },
+        { 155, { 26, 52 }, { 21, 50 } },
+        { 155, { 155, 310 }, { 88, 211 } },
+        { 42, { 38, 76 }, { 153, 367 } },
     };
     static tFlicette push[3] = {
-        { 156, {  26,  52 }, {  21,  50 } },
-        { 156, { 155, 310 }, {  88, 211 } },
-        {  43, {  38,  76 }, { 153, 367 } },
+        { 156, { 26, 52 }, { 21, 50 } },
+        { 156, { 155, 310 }, { 88, 211 } },
+        { 43, { 38, 76 }, { 153, 367 } },
     };
     static tMouse_area mouse_areas[3] = {
-        { {  26,  52 }, {  21,  50 }, { 144, 288 }, {  97, 233 },   0,   0,   0, SoundClick },
-        { { 155, 310 }, {  88, 211 }, { 273, 546 }, { 164, 394 },   1,   0,   0, SoundClick },
-        { {  38,  76 }, { 153, 367 }, { 101, 202 }, { 173, 415 },   2,   0,   0, NULL },
+        { { 26, 52 }, { 21, 50 }, { 144, 288 }, { 97, 233 }, 0, 0, 0, SoundClick },
+        { { 155, 310 }, { 88, 211 }, { 273, 546 }, { 164, 394 }, 1, 0, 0, SoundClick },
+        { { 38, 76 }, { 153, 367 }, { 101, 202 }, { 173, 415 }, 2, 0, 0, NULL },
     };
     static tInterface_spec interface_spec = {
         0,

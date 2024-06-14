@@ -1,10 +1,10 @@
 #ifndef DR_TYPES_H
 #define DR_TYPES_H
 
-#include "brender/br_types.h"
 #include "constants.h"
 #include "macros.h"
 
+#include "brender.h"
 #include "s3/s3.h"
 #include <assert.h>
 #include <stdarg.h>
@@ -1498,76 +1498,76 @@ typedef struct tGraf_spec {
     void* base_addr;
 } tGraf_spec;
 
-typedef struct tCollision_info {
-    int index;
-    int disabled;
-    tDriver driver;
-    br_actor* car_master_actor;
-    br_scalar min_torque_squared;
-    br_scalar break_off_radians_squared;
-    br_vector3 v;
-    br_vector3 old_v;
-    br_vector3 velocity_car_space;
-    br_matrix34 oldmat;
-    br_matrix34 old_frame_mat;
-    br_vector3 pos;
-    br_vector3 omega;
-    br_vector3 oldomega;
-    br_scalar M;
-    int infinite_mass;
-    br_vector3 I;
-    br_vector3 cmpos;
-    int extra_point_num;
-    br_bounds bounds[3];
-    br_bounds max_bounds[2];
-    br_vector3 extra_points[6];
-    br_scalar original_extra_points_z[6];
-    br_vector3 old_point;
-    br_vector3 old_norm;
-    int box_face_start;
-    int box_face_end;
-    int box_face_ref;
-    br_matrix34 last_box_inv_mat;
-    br_bounds last_box;
-    int doing_nothing_flag;
-    tSpecial_volume* last_special_volume;
-    tSpecial_volume* auto_special_volume;
-    int frame_collision_flag;
-    int collision_flag;
-    int max_shrapnel_material;
-    br_vector3 direction;
-    float speed;
-    tU16 car_ID;
-    br_material* shrapnel_material[3];
-    br_bounds bounds_world_space;
-    tBounds_type bounds_ws_type;
-    tU16 fire_vertex[12];
-    tU16 num_smoke_columns;
-    br_vector3 water_normal;
-    br_scalar water_d;
-    br_scalar water_depth_factor;
-    tNet_message_mechanics_info message;
-    tU32 last_car_car_collision;
-    br_scalar dt;
-    tCar_spec* who_last_hit_me;
+typedef struct tCollision_info {          // size: 0x33c
+    int index;                            // @0x0
+    int disabled;                         // @0x4
+    tDriver driver;                       // @0x8
+    br_actor* car_master_actor;           // @0xc
+    br_scalar min_torque_squared;         // @0x10
+    br_scalar break_off_radians_squared;  // @0x14
+    br_vector3 v;                         // @0x18
+    br_vector3 old_v;                     // @0x24
+    br_vector3 velocity_car_space;        // @0x30
+    br_matrix34 oldmat;                   // @0x3c
+    br_matrix34 old_frame_mat;            // @0x6c
+    br_vector3 pos;                       // @0x9c
+    br_vector3 omega;                     // @0xa8
+    br_vector3 oldomega;                  // @0xb4
+    br_scalar M;                          // @0xc0
+    int infinite_mass;                    // @0xc4
+    br_vector3 I;                         // @0xc8
+    br_vector3 cmpos;                     // @0xd4
+    int extra_point_num;                  // @0xe0
+    br_bounds bounds[3];                  // @0xe4
+    br_bounds max_bounds[2];              // @0x12c
+    br_vector3 extra_points[6];           // @0x15c
+    br_scalar original_extra_points_z[6]; // @0x1a4
+    br_vector3 old_point;                 // @0x1bc
+    br_vector3 old_norm;                  // @0x1c8
+    int box_face_start;                   // @0x1d4
+    int box_face_end;                     // @0x1d8
+    int box_face_ref;                     // @0x1dc
+    br_matrix34 last_box_inv_mat;         // @0x1e0
+    br_bounds last_box;                   // @0x210
+    int doing_nothing_flag;               // @0x228
+    tSpecial_volume* last_special_volume; // @0x22c
+    tSpecial_volume* auto_special_volume; // @0x230
+    int frame_collision_flag;             // @0x234
+    int collision_flag;                   // @0x238
+    int max_shrapnel_material;            // @0x23c
+    br_vector3 direction;                 // @0x240
+    float speed;                          // @0x24c
+    tU16 car_ID;                          // @0x250
+    br_material* shrapnel_material[3];    // @0x254
+    br_bounds bounds_world_space;         // @0x260
+    tBounds_type bounds_ws_type;          // @0x278
+    tU16 fire_vertex[12];                 // @0x27c
+    tU16 num_smoke_columns;               // @0x294
+    br_vector3 water_normal;              // @0x298
+    br_scalar water_d;                    // @0x2a4
+    br_scalar water_depth_factor;         // @0x2a8
+    tNet_message_mechanics_info message;  // @0x2ac
+    tU32 last_car_car_collision;          // @0x330
+    br_scalar dt;                         // @0x334
+    tCar_spec* who_last_hit_me;           // @0x338
 } tCollision_info;
 
-typedef struct tNon_car_spec {
-    tCollision_info collision_info;
-    br_scalar free_mass;
-    br_scalar attached_mass;
-    br_vector3 free_cmpos;
-    br_vector3 attached_cmpos;
-    br_scalar min_torque_squared;
-    br_scalar snap_off_cosine;
-    br_vector3 I_over_M;
+typedef struct tNon_car_spec {      // size: 0x370
+    tCollision_info collision_info; // @0x0
+    br_scalar free_mass;            // @0x33c
+    br_scalar attached_mass;        // @0x340
+    br_vector3 free_cmpos;          // @0x344
+    br_vector3 attached_cmpos;      // @0x350
+    br_scalar min_torque_squared;   // @0x35c
+    br_scalar snap_off_cosine;      // @0x360
+    br_vector3 I_over_M;            // @0x364
 } tNon_car_spec;
 
-typedef struct tOpp_spec {
-    int index;
-    int ranking;
-    int net_player_index;
-    tCar_spec* car_spec;
+typedef struct tOpp_spec { // size: 0x10
+    int index;             // @0x0
+    int ranking;           // @0x4
+    int net_player_index;  // @0x8
+    tCar_spec* car_spec;   // @0xc
 } tOpp_spec;
 
 typedef struct tCheckpoint {

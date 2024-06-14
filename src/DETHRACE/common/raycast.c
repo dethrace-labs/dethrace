@@ -1,8 +1,10 @@
 #include "raycast.h"
-#include "brender/brender.h"
+#include "brender.h"
 #include "brucetrk.h"
+#include "formats.h"
 #include "globvars.h"
 #include "harness/trace.h"
+#include "shortcut.h"
 #include <float.h>
 #include <math.h>
 #include <stdlib.h>
@@ -261,7 +263,7 @@ int DRScenePick2D(br_actor* world, br_actor* camera, dr_pick2d_cbfn* callback, v
 // IDA: int __usercall DRModelPick2D@<EAX>(br_model *model@<EAX>, br_material *material@<EDX>, br_vector3 *ray_pos@<EBX>, br_vector3 *ray_dir@<ECX>, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn *callback, void *arg)
 // Suffix added to avoid duplicate symbol
 int DRModelPick2D__raycast(br_model* model, br_material* material, br_vector3* ray_pos, br_vector3* ray_dir, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn* callback, void* arg) {
-    DR_FACE* fp;
+    // DR_FACE* fp;
     int f;
     int axis_m;
     int axis_0;
@@ -294,27 +296,31 @@ int DRModelPick2D__raycast(br_model* model, br_material* material, br_vector3* r
     double f_numerator;
     LOG_TRACE("(%p, %p, %p, %p, %f, %f, %p, %p)", model, material, ray_pos, ray_dir, t_near, t_far, callback, arg);
 
+    struct v11group* grp_ptr;
+    br_vector4* eqn;
+
     t_near -= 0.001f;
     t_far += 0.001f;
     for (group = 0; group < V11MODEL(model)->ngroups; group++) {
+        grp_ptr = &V11MODEL(model)->groups[group];
         for (f = 0; f < V11MODEL(model)->groups[group].nfaces; f++) {
-            fp = &V11MODEL(model)->groups[group].faces[f];
-            if (V11MODEL(model)->groups[group].face_colours_material != NULL) {
-                this_material = V11MODEL(model)->groups[group].face_colours_material;
+            eqn = &V11MODEL(model)->groups[group].eqn[f];
+            if (V11MODEL(model)->groups[group].user != NULL) {
+                this_material = V11MODEL(model)->groups[group].user;
             } else {
                 this_material = material;
             }
-            d = BrVector3Dot(&fp->eqn, ray_dir);
+            d = BrVector3Dot(eqn, ray_dir);
             if (fabsf(d) >= 0.00000023841858f && ((this_material->flags & (BR_MATF_TWO_SIDED | BR_MATF_ALWAYS_VISIBLE)) != 0 || d <= 0.0)) //
             {
-                numerator = BrVector3Dot(&fp->eqn, ray_pos) - fp->eqn.v[3];
+                numerator = BrVector3Dot(eqn, ray_pos) - eqn->v[3];
                 if (!BadDiv__raycast(numerator, d)) {
                     t = -(numerator / d);
                     if (t >= t_near && t <= t_far) {
                         BrVector3Scale(&p, ray_dir, t);
                         BrVector3Accumulate(&p, ray_pos);
-                        axis_m = (fabsf(fp->eqn.v[1]) > fabsf(fp->eqn.v[0])) ? 1 : 0;
-                        if (fabsf(fp->eqn.v[2]) > fabsf(fp->eqn.v[axis_m])) {
+                        axis_m = (fabsf(eqn->v[1]) > fabsf(eqn->v[0])) ? 1 : 0;
+                        if (fabsf(eqn->v[2]) > fabsf(eqn->v[axis_m])) {
                             axis_m = 2;
                         }
                         if (axis_m == 0) {
@@ -328,12 +334,13 @@ int DRModelPick2D__raycast(br_model* model, br_material* material, br_vector3* r
                             axis_1 = 1;
                         }
 
-                        v0 = V11MODEL(model)->groups[group].vertices[fp->vertices[0]].p.v[axis_0];
-                        u0 = V11MODEL(model)->groups[group].vertices[fp->vertices[0]].p.v[axis_1];
-                        v1 = V11MODEL(model)->groups[group].vertices[fp->vertices[1]].p.v[axis_0] - v0;
-                        u1 = V11MODEL(model)->groups[group].vertices[fp->vertices[1]].p.v[axis_1] - u0;
-                        v2 = V11MODEL(model)->groups[group].vertices[fp->vertices[2]].p.v[axis_0] - v0;
-                        u2 = V11MODEL(model)->groups[group].vertices[fp->vertices[2]].p.v[axis_1] - u0;
+                        v0 = grp_ptr->position[grp_ptr->vertex_numbers[f].v[0]].v[axis_0];
+                        u0 = grp_ptr->position[grp_ptr->vertex_numbers[f].v[0]].v[axis_1];
+
+                        v1 = grp_ptr->position[grp_ptr->vertex_numbers[f].v[1]].v[axis_0] - v0;
+                        u1 = grp_ptr->position[grp_ptr->vertex_numbers[f].v[1]].v[axis_1] - u0;
+                        v2 = grp_ptr->position[grp_ptr->vertex_numbers[f].v[2]].v[axis_0] - v0;
+                        u2 = grp_ptr->position[grp_ptr->vertex_numbers[f].v[2]].v[axis_1] - u0;
 
                         v0i1 = p.v[axis_0] - v0;
                         v0i2 = p.v[axis_1] - u0;
@@ -353,15 +360,14 @@ int DRModelPick2D__raycast(br_model* model, br_material* material, br_vector3* r
                         if (alpha >= 0.0 && beta >= 0.0 && beta + alpha <= 1.0) {
                             s_alpha = alpha;
                             s_beta = beta;
-                            map.v[0] = V11MODEL(model)->groups[group].vertices[fp->vertices[1]].map.v[0] * s_alpha;
-                            map.v[1] = V11MODEL(model)->groups[group].vertices[fp->vertices[1]].map.v[1] * s_alpha;
+                            BrVector2Scale(&map, &grp_ptr->map[grp_ptr->vertex_numbers[f].v[1]], s_alpha);
                             DRVector2AccumulateScale__raycast(
                                 &map,
-                                &V11MODEL(model)->groups[group].vertices[fp->vertices[2]].map,
+                                &grp_ptr->map[grp_ptr->vertex_numbers[f].v[2]],
                                 s_beta);
                             DRVector2AccumulateScale__raycast(
                                 &map,
-                                &V11MODEL(model)->groups[group].vertices[fp->vertices[0]].map,
+                                &grp_ptr->map[grp_ptr->vertex_numbers[f].v[0]],
                                 1.0f - (s_alpha + s_beta));
                             v = 0;
                             e = 1;
@@ -441,7 +447,6 @@ void FindBestY(br_vector3* pPosition, br_actor* gWorld, br_scalar pStarting_heig
     *pNearest_below_model = gBelow_model;
     *pNearest_above_face_index = gAbove_face_index;
     *pNearest_below_face_index = gBelow_face_index;
-    // LOG_DEBUG("FindBestY %f %f '%s' '%s' %d %d", gLowest_y_above, gHighest_y_below, gAbove_model->identifier, gBelow_model->identifier, gAbove_face_index, gBelow_face_index);
 }
 
 // IDA: int __cdecl FindYVerticallyBelowPolyCallBack(br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3 *pPoint, br_vector2 *pMap, void *pArg)
@@ -450,7 +455,7 @@ int FindYVerticallyBelowPolyCallBack(br_model* pModel, br_material* pMaterial, b
     LOG_TRACE("(%p, %p, %p, %p, %f, %d, %d, %d, %p, %p, %p)", pModel, pMaterial, pRay_pos, pRay_dir, pT, pF, pE, pV, pPoint, pMap, pArg);
 
     if (pMaterial->identifier == NULL || pMaterial->identifier[0] != '!') {
-        the_y = pPoint->v[V_Y];
+        the_y = pPoint->v[Y];
         if (the_y > gHighest_y_below) {
             gHighest_y_below = the_y;
         }
@@ -479,7 +484,7 @@ br_scalar FindYVerticallyBelow(br_vector3* pPosition) {
     LOG_TRACE("(%p)", pPosition);
 
     track_spec = &gProgram_state.track_spec;
-    XZToColumnXZ(&cx, &cz, pPosition->v[V_X], pPosition->v[V_Z], track_spec);
+    XZToColumnXZ(&cx, &cz, pPosition->v[X], pPosition->v[Z], track_spec);
     gHighest_y_below = BR_SCALAR_MIN;
     BrVector3Copy(&gY_picking_camera->t.t.translate.t, pPosition);
     for (x = MAX(cx - 1, 0); x < MIN(cx + 2, track_spec->ncolumns_x); x++) {
@@ -508,7 +513,7 @@ br_scalar FindYVerticallyBelow2(br_vector3* pCast_point) {
     BrVector3Copy(&cast_point, pCast_point);
     for (number_of_attempts = 0; number_of_attempts <= 10; number_of_attempts++) {
         result = FindYVerticallyBelow(&cast_point);
-        cast_point.v[V_Y] += .2f;
+        cast_point.v[Y] += .2f;
         if (result >= -100.f) {
             return result;
         }

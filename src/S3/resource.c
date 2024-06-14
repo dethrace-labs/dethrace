@@ -7,4 +7,3 @@ void* S3MemAllocate(br_size_t size, br_uint_8 type) {
 void S3MemFree(void* p) {
     BrMemFree(p);
 }
-

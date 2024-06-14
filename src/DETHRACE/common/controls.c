@@ -1,6 +1,6 @@
 #include "controls.h"
 
-#include "brender/brender.h"
+#include "brender.h"
 #include "brucetrk.h"
 #include "car.h"
 #include "constants.h"

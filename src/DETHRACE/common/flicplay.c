@@ -1,5 +1,5 @@
 #include "flicplay.h"
-#include "brender/brender.h"
+#include "brender.h"
 #include "displays.h"
 #include "drmem.h"
 #include "errors.h"

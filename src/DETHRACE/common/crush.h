@@ -1,7 +1,6 @@
 #ifndef _CRUSH_H_
 #define _CRUSH_H_
 
-#include "brender/br_types.h"
 #include "dr_types.h"
 
 extern float gWobble_spam_y[8];
