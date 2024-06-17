@@ -1,5 +1,6 @@
 // Based on https://gist.github.com/jvranish/4441299
 
+#include "harness/config.h"
 #include "harness/os.h"
 #include <assert.h>
 #include <dirent.h>
@@ -223,8 +224,10 @@ FILE* OS_fopen(const char* pathname, const char* mode) {
     FILE* f;
 
     f = fopen(pathname, mode);
-    if (f == NULL) {
-        fprintf(stderr, "Failed to open \"%s\" (%s)\n", pathname, strerror(errno));
+    if (harness_game_config.verbose) {
+        if (f == NULL) {
+            fprintf(stderr, "Failed to open \"%s\" (%s)\n", pathname, strerror(errno));
+        }
     }
 
     return f;

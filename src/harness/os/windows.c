@@ -5,6 +5,7 @@
 
 #include <imagehlp.h>
 
+#include "harness/config.h"
 #include "harness/os.h"
 
 #include <assert.h>
@@ -159,8 +160,10 @@ FILE* OS_fopen(const char* pathname, const char* mode) {
 
     f = NULL;
     err = fopen_s(&f, pathname, mode);
-    if (err != 0) {
-        fprintf(stderr, "Failed to open \"%s\" (%s)\n", pathname, strerror(err));
+    if (harness_game_config.verbose) {
+        if (err != 0) {
+            fprintf(stderr, "Failed to open \"%s\" (%s)\r\n", pathname, strerror(err));
+        }
     }
 
     return f;
