@@ -1397,14 +1397,14 @@ void CheckMapRenderMove(void) {
     old_x = gMap_render_x;
     if (gMap_mode) {
         amount = gFrame_period * .1f;
-        if (KeyIsDown(30)) {
+        if (KeyIsDown(KEYMAP_MOVE_UP)) {
             gMap_render_y -= amount;
-        } else if (KeyIsDown(31)) {
+        } else if (KeyIsDown(KEYMAP_MOVE_DOWN)) {
             gMap_render_y += amount;
         }
-        if (KeyIsDown(32)) {
+        if (KeyIsDown(KEYMAP_MOVE_LEFT)) {
             gMap_render_x -= amount;
-        } else if (KeyIsDown(33)) {
+        } else if (KeyIsDown(KEYMAP_MOVE_RIGHT)) {
             gMap_render_x += amount;
         }
         if (gMap_render_x != old_x || gMap_render_y != old_y) {
@@ -1750,7 +1750,7 @@ void FlipUpCar(tCar_spec* car) {
     count = 0;
     if (car->driver == eDriver_local_human && gNet_mode == eNet_mode_none) {
         FadePaletteDown();
-        while (KeyIsDown(44)) {
+        while (KeyIsDown(KEYMAP_REPAIR)) {
             ;
         }
     }
@@ -2568,7 +2568,7 @@ void EnterUserMessage(void) {
         }
         break;
     default:
-        if (gKey_mapping[66] == the_key) {
+        if (gKey_mapping[KEYMAP_SEND_MESSAGE] == the_key) {
             about_to_die = 1;
         } else if (the_key <= KEY_KP_NUMLOCK || the_key >= KEY_SPACE) {
             len = strlen(&gString[20]);
