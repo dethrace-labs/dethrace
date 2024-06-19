@@ -153,12 +153,14 @@ void Harness_Init(int* argc, char* argv[]) {
     harness_game_config.volume_multiplier = 1.0f;
     // start window in windowed mode
     harness_game_config.start_full_screen = 0;
-    // Emulate gore check
+    // Disable gore check emulation
     harness_game_config.gore_check = 0;
-    // Enable Sound Options menu
+    // Disable "Sound Options" menu
     harness_game_config.sound_options = 0;
     // Skip binding socket to allow local network testing
     harness_game_config.no_bind = 0;
+    // Disable verbose logging
+    harness_game_config.verbose = 0;
 
     // install signal handler by default
     harness_game_config.install_signalhandler = 1;
