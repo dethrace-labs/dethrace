@@ -926,7 +926,13 @@ void MoveHeadupTo(int pHeadup_index, int pNew_x, int pNew_y) {
     int delta_x;
     tHeadup* the_headup;
     LOG_TRACE("(%d, %d, %d)", pHeadup_index, pNew_x, pNew_y);
-    NOT_IMPLEMENTED();
+
+    if (pHeadup_index >= 0) {
+        delta_x = gHeadups[pHeadup_index].x - gHeadups[pHeadup_index].original_x;
+        gHeadups[pHeadup_index].original_x = pNew_x;
+        gHeadups[pHeadup_index].x = pNew_x + delta_x;
+        gHeadups[pHeadup_index].y = pNew_y;
+    }
 }
 
 // IDA: void __usercall ChangeHeadupText(int pHeadup_index@<EAX>, char *pNew_text@<EDX>)

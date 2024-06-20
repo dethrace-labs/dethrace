@@ -1105,7 +1105,6 @@ void ConcussMe(void) {
 // IDA: void __cdecl CheckHelp()
 void CheckHelp(void) {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl CheckLoadSave()
@@ -1283,7 +1282,27 @@ void CheckHornLocal(tCar_spec* pCar) {
 // IDA: void __usercall CheckHorn3D(tCar_spec *pCar@<EAX>)
 void CheckHorn3D(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
-    STUB_ONCE();
+
+    if (pCar->keys.horn && pCar->horn_sound_tag == 0) {
+        pCar->horn_sound_tag = DRS3StartSound3D(gEffects_outlet,
+            5209,
+            &pCar->car_master_actor->t.t.translate.t,
+            &pCar->velocity_bu_per_sec,
+            0,
+            255,
+            ((pCar->car_ID & 7) << 12) + 0xc000,
+            0x10000);
+    } else {
+        if (!pCar->keys.horn && pCar->horn_sound_tag != 0) {
+            while (S3SoundStillPlaying(pCar->horn_sound_tag)) {
+                DRS3StopSound(pCar->horn_sound_tag);
+                DRS3StopOutletSound(gEffects_outlet);
+            }
+            if (!S3SoundStillPlaying(pCar->horn_sound_tag)) {
+                pCar->horn_sound_tag = 0;
+            }
+        }
+    }
 }
 
 // IDA: void __cdecl CheckHorns()
@@ -1378,14 +1397,14 @@ void CheckMapRenderMove(void) {
     old_x = gMap_render_x;
     if (gMap_mode) {
         amount = gFrame_period * .1f;
-        if (KeyIsDown(30)) {
+        if (KeyIsDown(KEYMAP_MOVE_UP)) {
             gMap_render_y -= amount;
-        } else if (KeyIsDown(31)) {
+        } else if (KeyIsDown(KEYMAP_MOVE_DOWN)) {
             gMap_render_y += amount;
         }
-        if (KeyIsDown(32)) {
+        if (KeyIsDown(KEYMAP_MOVE_LEFT)) {
             gMap_render_x -= amount;
-        } else if (KeyIsDown(33)) {
+        } else if (KeyIsDown(KEYMAP_MOVE_RIGHT)) {
             gMap_render_x += amount;
         }
         if (gMap_render_x != old_x || gMap_render_y != old_y) {
@@ -1731,7 +1750,7 @@ void FlipUpCar(tCar_spec* car) {
     count = 0;
     if (car->driver == eDriver_local_human && gNet_mode == eNet_mode_none) {
         FadePaletteDown();
-        while (KeyIsDown(44)) {
+        while (KeyIsDown(KEYMAP_REPAIR)) {
             ;
         }
     }
@@ -2480,7 +2499,99 @@ void EnterUserMessage(void) {
     int the_key;
     int abuse_num;
     LOG_TRACE("()");
-    STUB_ONCE();
+
+    if (!gEntering_message) {
+        return;
+    }
+    if (gNet_mode == eNet_mode_none) {
+        return;
+    }
+    if (!gCurrent_net_game->options.enable_text_messages) {
+        return;
+    }
+    the_key = PDAnyKeyDown();
+    if (gEntering_message == 1) {
+        if (the_key != -1) {
+            return;
+        }
+        gEntering_message = 2;
+    }
+    if (about_to_die) {
+        if (the_key != -1) {
+            return;
+        }
+        gEntering_message = 0;
+        about_to_die = 0;
+        return;
+    }
+    if (the_key == last_key) {
+        if (next_time < PDGetTotalTime()) {
+            next_time += 100;
+        } else {
+            the_key = -1;
+        }
+    } else {
+        last_key = the_key;
+        next_time = PDGetTotalTime() + 500;
+    }
+    switch (the_key) {
+    case -1:
+    case KEY_SHIFT_ANY:
+        break;
+    case KEY_CTRL_ANY:
+    case KEY_CTRL_ANY_2:
+    case KEY_TAB:
+    case KEY_ESCAPE:
+        about_to_die = 1;
+        break;
+    case KEY_BACKSPACE:
+    case KEY_DELETE:
+    case KEY_LEFT:
+        len = strlen(&gString[20]);
+        if (len > 0) {
+            gString[20 + len - 1] = '\0';
+        }
+        break;
+    case KEY_RETURN:
+    case KEY_KP_ENTER:
+        len = strlen(gNet_players[gThis_net_player_index].player_name);
+        if (len <= 18) {
+            the_message = gString + 18 - len;
+            strcpy(the_message, gNet_players[gThis_net_player_index].player_name);
+            the_message[len + 0] = ':';
+            the_message[len + 1] = ' ';
+            gString[COUNT_OF(gString) - 1] = '\0';
+            NetSendHeadupToAllPlayers(the_message);
+            gString[20] = '\0';
+            NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(kMiscString_MESSAGE_SENT));
+            about_to_die = 1;
+        }
+        break;
+    default:
+        if (gKey_mapping[KEYMAP_SEND_MESSAGE] == the_key) {
+            about_to_die = 1;
+        } else if (the_key <= KEY_KP_NUMLOCK || the_key >= KEY_SPACE) {
+            len = strlen(&gString[20]);
+            if (len < 64 - 1) {
+                gString[20 + len] = PDGetASCIIFromKey(the_key);
+                if (gString[20 + len] < gFonts[4].offset || gString[20 + len] >= gFonts[4].offset + gFonts[4].num_entries) {
+                    gString[20 + len] = '\0';
+                }
+                gString[20 + len + 1] = '\0';
+            }
+        } else if (the_key < KEY_KP_0 || the_key >  KEY_KP_9) {
+            gEntering_message = 0;
+        } else {
+            if (the_key == KEY_KP_0) {
+                abuse_num = 9;
+            } else {
+                abuse_num = the_key - KEY_KP_1;
+            }
+            if (gAbuse_text[abuse_num] != NULL) {
+                strcpy(&gString[20], gAbuse_text[abuse_num]);
+            }
+        }
+    }
 }
 
 // IDA: void __cdecl DisplayUserMessage()
@@ -2489,7 +2600,36 @@ void DisplayUserMessage(void) {
     int len;
     tDR_font* font;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    font = &gFonts[FONT_NEWHITE];
+    the_message = &gString[20];
+    if (!gEntering_message || gNet_mode == eNet_mode_none) {
+        return;
+    }
+
+    len = strlen(the_message);
+    if (len < 63 && (PDGetTotalTime() & 512) != 0) {
+        the_message[len] = '_';
+        the_message[len + 1] = '\0';
+    }
+    DimRectangle(gBack_screen,
+        15 * gBack_screen->width / 100,
+        gCurrent_graf_data->net_message_enter_y - font->height,
+        85 * gBack_screen->width / 100,
+        gCurrent_graf_data->net_message_enter_y + 6 * font->height,
+        1);
+
+    TransDRPixelmapText(gBack_screen, 20 * gBack_screen->width / 100, gCurrent_graf_data->net_message_enter_y, font, GetMiscString(kMiscString_ENTER_MESSAGE), 100);
+    OoerrIveGotTextInMeBoxMissus(
+        FONT_NEWHITE,
+        the_message,
+        gBack_screen,
+        20 * gBack_screen->width / 100,
+        gCurrent_graf_data->net_message_enter_y + 2 * font->height,
+        80 * gBack_screen->width / 100,
+        gCurrent_graf_data->net_message_enter_y + 6 * font->height,
+        0);
+    the_message[len] = 0;
 }
 
 // IDA: void __cdecl InitAbuseomatic()

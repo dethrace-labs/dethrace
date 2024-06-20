@@ -27,6 +27,7 @@
 #include "racesumm.h"
 #include "sound.h"
 #include "utility.h"
+#include "world.h"
 #include <stdlib.h>
 
 int gLast_wrong_checkpoint;
@@ -95,7 +96,7 @@ void RaceCompleted(tRace_over_reason pReason) {
         case eRace_over_abandoned:
             if (gNet_mode == eNet_mode_client) {
                 gHost_abandon_game = 1;
-                NetFullScreenMessage(87, 0);
+                NetFullScreenMessage(kMiscString_HOST_ABANDONED_RACE, 0);
             }
             break;
         case eRace_over_out_of_time:
@@ -451,7 +452,17 @@ void SwapNetCarsLoad(void) {
 void SwapNetCarsDispose(void) {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    DisableNetService();
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        DisposeCar(gNet_players[i].car, gNet_players[i].car_index);
+        if (gNet_players[i].car_index >= 0) {
+            gCar_details[gNet_players[i].car_index].ownership = eCar_owner_none;
+        }
+    }
+    ClearOutStorageSpace(&gOur_car_storage_space);
+    ClearOutStorageSpace(&gNet_cars_storage_space);
+    ReenableNetService();
 }
 
 // IDA: void __cdecl DoGame()

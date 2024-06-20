@@ -473,7 +473,7 @@ typedef struct tReduced_matrix {
     br_vector3 translation;
 } tReduced_matrix;
 
-typedef struct tCar_controls {
+typedef struct tCar_controls { // size: 0x4
     int joystick_acc : 8;
     int joystick_dec : 8;
     unsigned int left : 1;        // 0x10000   bit 17
@@ -490,25 +490,25 @@ typedef struct tCar_controls {
     unsigned int horn : 1;        // 0x8000000   bit 28
 } tCar_controls;
 
-typedef struct tNet_message_mechanics_info {
-    tU8 contents_size;
-    tNet_message_type type;
-    tU32 ID;
-    tU32 time;
-    tReduced_matrix mat;
-    br_vector3 v;
-    br_vector3 omega;
-    tU8 d[4];
-    tCar_controls keys;
-    tU32 cc_coll_time;
-    tS16 curvature;
-    tU16 revs;
-    br_scalar front;
-    br_scalar back;
-    tU32 repair_time;
-    tU8 damage[12];
-    tU16 powerups;
-    br_scalar wheel_dam_offset[4];
+typedef struct tNet_message_mechanics_info { // size: 0x84
+    tU8 contents_size;                       // @0x0
+    tNet_message_type type;                  // @0x1
+    tU32 ID;                                 // @0x4
+    tU32 time;                               // @0x8
+    tReduced_matrix mat;                     // @0xc
+    br_vector3 v;                            // @0x30
+    br_vector3 omega;                        // @0x3c
+    tU8 d[4];                                // @0x48
+    tCar_controls keys;                      // @0x4c
+    tU32 cc_coll_time;                       // @0x50
+    tS16 curvature;                          // @0x54
+    tU16 revs;                               // @0x56
+    br_scalar front;                         // @0x58
+    br_scalar back;                          // @0x5c
+    tU32 repair_time;                        // @0x60
+    tU8 damage[12];                          // @0x64
+    tU16 powerups;                           // @0x70
+    br_scalar wheel_dam_offset[4];           // @0x74
 } tNet_message_mechanics_info;
 
 typedef struct tDamage_unit {
@@ -1033,6 +1033,7 @@ typedef struct tFace_ref {
     br_scalar d;
 } tFace_ref;
 
+#pragma pack(push, 4)
 typedef struct tNet_game_player_info { // size: 0xc0
     tPD_net_player_info pd_net_info;   // @0x0
     tU32 this_players_time_stamp;      // @0x10
@@ -1062,6 +1063,7 @@ typedef struct tNet_game_player_info { // size: 0xc0
     br_matrix34 initial_position;      // @0x8c
     tCar_spec* car;                    // @0xbc
 } tNet_game_player_info;
+#pragma pack(pop)
 
 typedef struct tNet_game_options {         // size: 0x30
     int show_players_on_map;               // @0x0

@@ -102,7 +102,7 @@ void InitSound(void) {
             gSound_enabled = S3Init(the_path, gAusterity_mode) == 0;
             gSound_available = gSound_enabled;
         }
-        S3Set3DSoundEnvironment(0.14492753, -1.0, -1.0);
+        S3Set3DSoundEnvironment(1.0f / WORLD_SCALE, -1.0, -1.0);
         gVirgin_pass = 0;
         gCD_is_disabled = 0;
         UsePathFileToDetermineIfFullInstallation();
