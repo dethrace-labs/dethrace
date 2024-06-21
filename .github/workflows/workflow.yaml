@@ -15,11 +15,12 @@ jobs:
     strategy:
       matrix:
         platform:
-          - { name: 'Linux',    arch: 'x64',        os: ubuntu-latest, werror: true }
-          - { name: 'Linux',    arch: 'arm64',      os: ubuntu-latest, werror: true, cmake-toolchain-file: 'cmake/toolchains/linux-aarch64.cmake', apt-packages: 'gcc-aarch64-linux-gnu g++-aarch64-linux-gnu', cross: true }
-          - { name: 'MacOS',    arch: 'arm64-x64',  os: macos-latest,  werror: true, cmake-args: '-DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"' }
-          - { name: 'Windows',  arch: 'Win32',      os: windows-latest }
-          - { name: 'Windows',  arch: 'x64',        os: windows-latest }
+          - { name: 'Linux',    arch: 'x64',          os: ubuntu-latest,  werror: true }
+          - { name: 'Linux',    arch: 'arm64',        os: ubuntu-latest,  werror: true, cmake-toolchain-file: 'cmake/toolchains/linux-aarch64.cmake', apt-packages: 'gcc-aarch64-linux-gnu g++-aarch64-linux-gnu', cross: true }
+          - { name: 'MacOS',    arch: 'arm64-x64',    os: macos-latest,   werror: true, cmake-args: '-DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"' }
+          - { name: 'Windows',  arch: 'x86',          os: windows-latest, msvc-arch: 'Win32' }
+          - { name: 'Windows',  arch: 'x64',          os: windows-latest, msvc-arch: 'x64' }
+#          - { name: 'Windows',  arch: 'arm64',        os: windows-latest, msvc-arch: 'amd64_arm64', cross: true }
 
     defaults:
       run:
@@ -33,9 +34,9 @@ jobs:
       - name: Set up Ninja
         uses: aseprite/get-ninja@main
       - uses: ilammy/msvc-dev-cmd@v1.13.0
-        if: runner.os == 'Windows'
+        if: ${{ !!matrix.platform.msvc-arch }}
         with:
-          arch: ${{ matrix.platform.arch }}
+          arch: ${{ matrix.platform.msvc-arch }}
       - name: Install Linux dependencies
         if: ${{ runner.os == 'Linux' }}
         run: |
