@@ -250,7 +250,7 @@ void MungeHeadups(void) {
         case eTime_bonus_initial_pause:
             if (the_time >= 500) {
                 bonus = gCurrent_race.bonus_score[gRace_over_reason][gProgram_state.skill_level];
-                sprintf(the_text, "%s %d", GetMiscString(kMiscString_TimeBonus), bonus);
+                sprintf(the_text, "%s %d", GetMiscString(kMiscString_CompletionBonusColon), bonus);
                 DRS3StartSound(gPedestrians_outlet, 8015);
                 ChangeHeadupText(gRace_bonus_headup, the_text);
                 gProgram_state.credits_earned += bonus;
