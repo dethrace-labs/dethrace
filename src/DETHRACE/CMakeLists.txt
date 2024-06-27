@@ -170,20 +170,24 @@ target_sources(dethrace_obj PRIVATE
 add_executable(dethrace
     WIN32
     MACOSX_BUNDLE
-    dethrace.icns
+    ${CMAKE_SOURCE_DIR}/packaging/macos/dethrace.icns
     ${CMAKE_SOURCE_DIR}/packaging/windows/dethrace.rc
 )
 
 if (APPLE)
-
     set_target_properties(dethrace PROPERTIES
         BUNDLE True
-        # MACOSX_BUNDLE_GUI_IDENTIFIER "com.dethracelabs.dethrace"
         MACOSX_BUNDLE_DISPLAY_NAME "Deth Race"
         OUTPUT_NAME "Deth Race"
         MACOSX_BUNDLE_BUNDLE_VERSION ${DETHRACE_VERSION}
         MACOSX_BUNDLE_SHORT_VERSION_STRING ${DETHRACE_VERSION}
         MACOSX_BUNDLE_ICON_FILE dethrace.icns
+    )
+    set_source_files_properties(dethrace.icns PROPERTIES
+        MACOSX_PACKAGE_LOCATION "Resources"
+    )
+    target_sources(dethrace_obj PRIVATE
+        dethrace.icns
     )
 
 endif()
@@ -214,37 +218,20 @@ if(DETHRACE_IDE_ARGUMENTS)
 endif()
 
 if (DETHRACE_INSTALL)
-
     install(TARGETS dethrace
         BUNDLE DESTINATION . COMPONENT Runtime
         RUNTIME DESTINATION bin COMPONENT Runtime
     )
-    if (APPLE)
-        # generate icns file from png
-        add_custom_command(
-            OUTPUT dethrace.icns
-            COMMAND ${CMAKE_SOURCE_DIR}/packaging/macos/generate_icns.sh ${CMAKE_SOURCE_DIR}/packaging/macos/dethrace_icon.png
-            DEPENDS ${CMAKE_SOURCE_DIR}/packaging/macos/dethrace_icon.png
+    if(MSVC)
+        INSTALL(FILES $<TARGET_PDB_FILE:dethrace>
+            DESTINATION "."
+            OPTIONAL
         )
-
-        set_source_files_properties(dethrace.icns PROPERTIES
-            MACOSX_PACKAGE_LOCATION "Resources"
+    endif()
+    if(WIN32)
+        INSTALL(FILES  $<TARGET_RUNTIME_DLLS:dethrace>
+            DESTINATION "."
+            OPTIONAL
         )
-        target_sources(dethrace_obj PRIVATE
-            dethrace.icns
-        )
-    else()
-        if(MSVC)
-            INSTALL(FILES $<TARGET_PDB_FILE:dethrace>
-                DESTINATION "."
-                OPTIONAL
-            )
-        endif()
-        if(WIN32)
-            INSTALL(FILES  $<TARGET_RUNTIME_DLLS:dethrace>
-                DESTINATION "."
-                OPTIONAL
-            )
-        endif()
     endif()
 endif()

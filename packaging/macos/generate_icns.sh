@@ -1,6 +1,6 @@
 #!/bin/sh
 
-ICON_PATH=$1
+ICON_PATH=source.png
 rm -r dethrace.iconset || true
 mkdir -p dethrace.iconset
 sips -z 16 16     $ICON_PATH --out dethrace.iconset/icon_16x16.png
