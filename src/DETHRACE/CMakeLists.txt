@@ -183,11 +183,11 @@ if (APPLE)
         MACOSX_BUNDLE_SHORT_VERSION_STRING ${DETHRACE_VERSION}
         MACOSX_BUNDLE_ICON_FILE dethrace.icns
     )
-    set_source_files_properties(dethrace.icns PROPERTIES
+    set_source_files_properties(${CMAKE_SOURCE_DIR}/packaging/macos/dethrace.icns PROPERTIES
         MACOSX_PACKAGE_LOCATION "Resources"
     )
     target_sources(dethrace_obj PRIVATE
-        dethrace.icns
+        ${CMAKE_SOURCE_DIR}/packaging/macos/dethrace.icns
     )
 
 endif()
@@ -222,6 +222,13 @@ if (DETHRACE_INSTALL)
         BUNDLE DESTINATION . COMPONENT Runtime
         RUNTIME DESTINATION bin COMPONENT Runtime
     )
+
+    INSTALL(CODE "
+        include(BundleUtilities)
+        fixup_bundle(\"${CMAKE_BINARY_DIR}/Deth Race.app\" \"\" \"/Library/Frameworks\")
+        "
+        COMPONENT RUNTIME)
+
     if(MSVC)
         INSTALL(FILES $<TARGET_PDB_FILE:dethrace>
             DESTINATION "."
