@@ -105,7 +105,7 @@ void DrawAnItem__racesumm(int pX, int pY_index, int pFont_index, char* pText);
 // Suffix added to avoid duplicate symbol
 void DrawColumnHeading__racesumm(int pStr_index, int pX);
 
-int SortScores(void* pFirst_one, void* pSecond_one);
+int SortScores(const void* pFirst_one, const void* pSecond_one);
 
 void SortGameScores(void);
 

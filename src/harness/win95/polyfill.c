@@ -26,9 +26,10 @@
 uint32_t GetFileAttributesA_(char* lpFileName) {
 
     FILE* f = fopen(lpFileName, "r");
-    if (!f) {
+    if (f == NULL) {
         return INVALID_FILE_ATTRIBUTES;
     }
+    fclose(f);
     return FILE_ATTRIBUTE_NORMAL;
 }
 

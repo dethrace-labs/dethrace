@@ -1574,7 +1574,9 @@ void ReadNetGameChoices(tNet_game_type* pGame_type, tNet_game_options* pGame_opt
 // IDA: int __usercall ChooseStartRace@<EAX>(int *pRank@<EAX>)
 int ChooseStartRace(int* pRank) {
     LOG_TRACE("(%p)", pRank);
-    NOT_IMPLEMENTED();
+
+    *pRank = 0;
+    return 1;
 }
 
 // IDA: void __usercall SetUpOtherNetThings(tNet_game_details *pNet_game@<EAX>)
@@ -1699,7 +1701,7 @@ int ChooseNetCar(tNet_game_details* pNet_game, tNet_game_options* pOptions, int*
                 *pCar_index = PickARandomCar();
                 car_index = 0;
                 for (i = 0; i < gNumber_of_racers; i++) {
-                    if (gCar_details[i].ownership != eCar_owner_not_allowed) {
+                    if (gCar_details[i].ownership < eCar_owner_not_allowed) {
                         gProgram_state.cars_available[car_index] = i;
                         car_index++;
                     }
@@ -1760,7 +1762,7 @@ int DoMultiPlayerStart(void) {
     }
 
     if (gAusterity_mode) {
-        NetFullScreenMessage(192, 0);
+        NetFullScreenMessage(kMiscString_NOT_ENOUGH_MEMORY, 0);
         return 0;
     }
     if (NetInitialise()) {
@@ -1814,6 +1816,13 @@ int DoMultiPlayerStart(void) {
             return 1;
         }
     case eJoin_or_host_host:
+#if defined(DETHRACE_FIX_BUGS)
+        /* Don't allow hosting a game when the game is launched with --no-bind */
+        if (harness_game_config.no_bind) {
+            DoErrorInterface(76);
+            return 0;
+        }
+#endif
         gProgram_state.frank_or_anniness = eFrankie;
         if (!OriginalCarmaCDinDrive()) {
             DoErrorInterface(kMiscString_PLEASE_INSERT_THE_CARMAGEDDON_CD);

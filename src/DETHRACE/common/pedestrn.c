@@ -1926,7 +1926,7 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
         if (billiards_shot) {
             credits_value *= 4;
             PratcamEvent(30);
-            DoFancyHeadup(8);
+            DoFancyHeadup(kFancyHeadupNiceShotSir);
         } else if (fabsf(the_car->omega.v[X]) <= 5.0f
             && fabsf(the_car->omega.v[Z]) <= 5.0f
             && BrVector3Dot(&the_car->car_master_actor->t.t.look_up.up, &up) >= 0.1f

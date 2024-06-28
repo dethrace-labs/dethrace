@@ -1157,25 +1157,39 @@ tSO_result DoEndRaceSummary2(void) {
 //  Suffix added to avoid duplicate symbol
 void DrawAnItem__racesumm(int pX, int pY_index, int pFont_index, char* pText) {
     LOG_TRACE("(%d, %d, %d, \"%s\")", pX, pY_index, pFont_index, pText);
-    NOT_IMPLEMENTED();
+
+    TransBrPixelmapText(gBack_screen,
+        pX,
+        gCurrent_graf_data->net_sum_headings_y + gCurrent_graf_data->net_sum_y_pitch * pY_index,
+        pFont_index,
+        gFont_7,
+        pText);
 }
 
 // IDA: void __usercall DrawColumnHeading(int pStr_index@<EAX>, int pX@<EDX>)
 //  Suffix added to avoid duplicate symbol
 void DrawColumnHeading__racesumm(int pStr_index, int pX) {
     LOG_TRACE("(%d, %d)", pStr_index, pX);
+
+    TransBrPixelmapText(gBack_screen,
+        pX,
+        gCurrent_graf_data->net_sum_headings_y - gCurrent_graf_data->net_sum_y_pitch,
+        250,
+        gFont_7,
+        GetMiscString(pStr_index));
 }
 
 // IDA: int __usercall SortScores@<EAX>(void *pFirst_one@<EAX>, void *pSecond_one@<EDX>)
-int SortScores(void* pFirst_one, void* pSecond_one) {
+int SortScores(const void* pFirst_one, const void* pSecond_one) {
     LOG_TRACE("(%p, %p)", pFirst_one, pSecond_one);
-    NOT_IMPLEMENTED();
+
+    return gNet_players[*(int*)pSecond_one].games_score - gNet_players[*(int*)pFirst_one].games_score;
 }
 
 // IDA: void __cdecl SortGameScores()
 void SortGameScores(void) {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+    qsort(gPlayer_lookup, gNumber_of_net_players, sizeof(gPlayer_lookup[0]), SortScores);
 }
 
 // IDA: void __usercall NetSumDraw(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
@@ -1184,21 +1198,125 @@ void NetSumDraw(int pCurrent_choice, int pCurrent_mode) {
     char s[256];
     tNet_game_player_info* player;
     LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
-    NOT_IMPLEMENTED();
+
+    DrawColumnHeading__racesumm(kMiscString_PLAYED, gCurrent_graf_data->net_sum_x_3);
+    DrawColumnHeading__racesumm(kMiscString_WON, gCurrent_graf_data->net_sum_x_4);
+    DrawColumnHeading__racesumm(kMiscString_SCORE, gCurrent_graf_data->net_sum_x_5);
+    BrPixelmapLine(gBack_screen,
+        gCurrent_graf_data->net_sum_x_1,
+        gCurrent_graf_data->net_sum_headings_y + 1 + gFont_7->glyph_y - gCurrent_graf_data->net_sum_y_pitch,
+        gBack_screen->width - gCurrent_graf_data->net_sum_x_1,
+        gCurrent_graf_data->net_sum_headings_y + 1 + gFont_7->glyph_y - gCurrent_graf_data->net_sum_y_pitch,
+        252);
+
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        player = &gNet_players[gPlayer_lookup[i]];
+
+        strcpy(s, player->player_name);
+        if (player->host) {
+            strcat(s, " -");
+            strcat(s, GetMiscString(kMiscString_HOST));
+            strcat(s, "-");
+        }
+        TurnOffPaletteConversion();
+        DRPixelmapRectangleMaskedCopy(gBack_screen,
+            gCurrent_graf_data->net_sum_x_1,
+            gCurrent_graf_data->net_sum_headings_y + 1 + i * gCurrent_graf_data->net_sum_y_pitch,
+            gIcons_pix_low_res,  /* DOS version uses low res, Windows version uses normal res */
+            0,
+            gCurrent_graf_data->net_head_icon_height * player->car_index,
+            gIcons_pix_low_res->width,  /* DOS version uses low res, Windows version uses normal res */
+            gCurrent_graf_data->net_head_icon_height);
+        TurnOnPaletteConversion();
+        DrawAnItem__racesumm(gCurrent_graf_data->net_sum_x_2, i, 83, s);
+        sprintf(s, "%d", player->played);
+        DrawAnItem__racesumm(gCurrent_graf_data->net_sum_x_3, i, 83, s);
+        sprintf(s, "%d", player->won);
+        DrawAnItem__racesumm(gCurrent_graf_data->net_sum_x_4, i, 83, s);
+        sprintf(s, "%d", player->games_score);
+        DrawAnItem__racesumm(gCurrent_graf_data->net_sum_x_5, i, 83, s);
+    }
 }
 
 // IDA: void __cdecl DoNetRaceSummary()
 void DoNetRaceSummary(void) {
-    static tFlicette flicker_on[1];
-    static tFlicette flicker_off[1];
-    static tFlicette push[1];
-    static tMouse_area mouse_areas[1];
-    static tInterface_spec interface_spec;
+    static tFlicette flicker_on[1] = { { 321, { 219, 112 }, { 172, 362 } } };
+    static tFlicette flicker_off[1] = { { 322, { 219, 112 }, { 172, 362 } } };
+    static tFlicette push[1] = { { 323, { 219, 112 }, { 172, 362 } } };
+    static tMouse_area mouse_areas[1] = { { { 219, 112 }, { 172, 362 }, { 282, 182 }, { 192, 379 }, 0, 0, 0, NULL } };
+    static tInterface_spec interface_spec = {
+        0,              // initial_imode
+        63,             // first_opening_flic
+        0,              // second_opening_flic
+        -1,             // end_flic_go_ahead
+        -1,             // end_flic_escaped
+        -1,             // end_flic_otherwise
+        8,              // flic_bunch_to_load
+        { -1, 0 },      // move_left_new_mode
+        { 0, 0 },       // move_left_delta
+        { 0, 0 },       // move_left_min
+        { 0, 0 },       // move_left_max
+        { NULL, NULL }, // move_left_proc
+        { -1, 0 },      // move_right_new_mode
+        { 0, 0 },       // move_right_delta
+        { 0, 0 },       // move_right_min
+        { 0, 0 },       // move_right_max
+        { NULL, NULL }, // move_right_proc
+        { -1, 0 },      // move_up_new_mode
+        { 0, 0 },       // move_up_delta
+        { 0, 0 },       // move_up_min
+        { 0, 0 },       // move_up_max
+        { NULL, NULL }, // move_up_proc
+        { -1, 0 },      // move_down_new_mode
+        { 0, 0 },       // move_down_delta
+        { 0, 0 },       // move_down_min
+        { 0, 0 },       // move_down_max
+        { NULL, NULL }, // move_down_proc
+        { 1, 1 },       // go_ahead_allowed
+        { NULL, NULL }, // go_ahead_proc
+        { 1, 1 },       // escape_allowed
+        { NULL, NULL }, // escape_proc
+        NULL,           // exit_proc
+        &NetSumDraw,    // draw_proc
+        10000,          // time_out
+        NULL,           // start_proc1
+        NULL,           // start_proc2
+        NULL,           // done_proc
+        0,              // font_needed
+        { 0, 0 },       // typeable
+        NULL,           // get_original_string
+        0,              // escape_code
+        1,              // dont_save_or_load
+        1,              // number_of_button_flics
+        flicker_on,     // flicker_on_flics
+        flicker_off,    // flicker_off_flics
+        push,           // pushed_flics
+        1,              // number_of_mouse_areas
+        mouse_areas,    // mouse_areas
+        0,              // number_of_recopy_areas
+        NULL            // recopy_areas
+    };
     int i;
     int result;
     tS32 start_time;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    NetPlayerStatusChanged(ePlayer_status_summary);
+    start_time = PDGetTotalTime();
+    while (!gReceived_game_scores && PDGetTotalTime() - start_time < 20000) {
+        NetService(0);
+    }
+    if (gReceived_game_scores) {
+        for (i = 0; i < gNumber_of_net_players; i++) {
+            gPlayer_lookup[i] = i;
+        }
+        SortGameScores();
+        TurnOnPaletteConversion();
+        DoInterfaceScreen(&interface_spec, 0, 0);
+        NetPlayerStatusChanged(ePlayer_status_loading);
+        TurnOffPaletteConversion();
+        FadePaletteDown();
+    }
 }
 
 // IDA: tSO_result __usercall DoEndRaceSummary@<EAX>(int *pFirst_summary_done@<EAX>, tRace_result pRace_result@<EDX>)

@@ -1,6 +1,10 @@
 #ifndef MACROS_H
 #define MACROS_H
 
+#define DR_JOIN2(A,B) A##B
+#define DR_JOIN(A,B) DR_JOIN2(A, B)
+#define DR_STATIC_ASSERT(V) typedef int DR_JOIN(dr_static_assert_, __COUNTER__)[(V)?1:-1]
+
 #define VEHICLE_TYPE_FROM_ID(id) ((tVehicle_type)(id >> 8))
 #define VEHICLE_INDEX_FROM_ID(id) ((id)&0x00ff)
 

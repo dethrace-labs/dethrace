@@ -665,7 +665,29 @@ void DoPratcamHit(br_vector3* pHit_vector) {
     br_scalar strength;
     LOG_TRACE("(%p)", pHit_vector);
 
-    STUB_ONCE();
+    strength = BrVector3LengthSquared(pHit_vector);
+    if (strength > 0.2f) {
+        strength_modifier = 8;
+    } else if (strength > 0.015f) {
+        strength_modifier = 4;
+    } else if (strength >= 0.001f) {
+        strength_modifier = 0;
+    } else {
+        return;
+    }
+    if (fabsf(pHit_vector->v[2]) >= fabsf(pHit_vector->v[0])) {
+        if (pHit_vector->v[2] >= 0.f) {
+            PratcamEvent(14 + strength_modifier);
+        } else {
+            PratcamEvent(13 + strength_modifier);
+        }
+    } else {
+        if (pHit_vector->v[0] >= 0.f) {
+            PratcamEvent(15 + strength_modifier);
+        } else {
+            PratcamEvent(16 + strength_modifier);
+        }
+    }
 }
 
 // IDA: void __usercall DamageSystems(tCar_spec *pCar@<EAX>, br_vector3 *pImpact_point@<EDX>, br_vector3 *pEnergy_vector@<EBX>, int pWas_hitting_a_car@<ECX>)
@@ -1153,7 +1175,7 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
                     NetEarnCredits(NetPlayerFromCar(culprit), credits);
                 } else {
                     PratcamEvent(32);
-                    DoFancyHeadup(11);
+                    DoFancyHeadup(kFancyHeadupYouWastedEm);
                     credits_squared = sqr(0.7f / victim->car_model_actors[victim->principal_car_actor].crush_data.softness_factor) * gWasted_creds[gProgram_state.skill_level] + 50.0f;
                     credits = 100 * (int)(credits_squared / 100.0);
                     AwardTime(gWasted_time[gProgram_state.skill_level]);
@@ -1218,13 +1240,13 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
                             AwardTime(MIN(time, 90));
                             if (pCar2) {
                                 if (head_on) {
-                                    DoFancyHeadup(10);
+                                    DoFancyHeadup(kFancyHeadupHeadOnBonus);
                                 } else if (bonus_level <= 2) {
                                     if (bonus_level > 1) {
-                                        DoFancyHeadup(2);
+                                        DoFancyHeadup(kFancyHeadupExtraStyleBonus);
                                     }
                                 } else {
-                                    DoFancyHeadup(3);
+                                    DoFancyHeadup(kFancyHeadupBonusForArtisticImpression);
                                 }
                             }
                         }

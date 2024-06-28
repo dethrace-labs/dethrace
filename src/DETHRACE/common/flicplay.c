@@ -736,23 +736,19 @@ int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU3
     MemSkipBytes(&pFlic_info->data, 0x6e);
     pFlic_info->the_pixelmap = pDest_pixelmap;
 
-    if (pX_offset == -1) {
-        if (pDest_pixelmap != NULL) {
-            pFlic_info->x_offset = (pDest_pixelmap->width - pFlic_info->width) / 2;
-        } else {
-            pFlic_info->x_offset = 0;
-        }
-    } else {
+    if (pX_offset != -1) {
         pFlic_info->x_offset = pX_offset;
-    }
-    if (pY_offset == -1) {
-        if (pDest_pixelmap != NULL) {
-            pFlic_info->y_offset = (pDest_pixelmap->height - pFlic_info->height) / 2;
-        } else {
-            pFlic_info->y_offset = 0;
-        }
+    } else if (pDest_pixelmap != NULL) {
+        pFlic_info->x_offset = (pDest_pixelmap->width - pFlic_info->width) / 2;
     } else {
+        pFlic_info->x_offset = 0;
+    }
+    if (pY_offset != -1) {
         pFlic_info->y_offset = pY_offset;
+    } else if (pDest_pixelmap != NULL) {
+        pFlic_info->y_offset = (pDest_pixelmap->height - pFlic_info->height) / 2;
+    } else {
+        pFlic_info->y_offset = 0;
     }
 
     if (pFrame_rate != 0) {

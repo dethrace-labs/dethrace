@@ -142,7 +142,7 @@ int gFizzle_height;
 int gNumber_of_icons;
 tPowerup* gPowerup_array;
 
-#define GET_POWERUP_INDEX(POWERUP) (((POWERUP)-gPowerup_array) / sizeof(tPowerup))
+#define GET_POWERUP_INDEX(POWERUP) ((POWERUP)-gPowerup_array)
 
 // IDA: void __usercall LosePowerupX(tPowerup *pThe_powerup@<EAX>, int pTell_net_players@<EDX>)
 void LosePowerupX(tPowerup* pThe_powerup, int pTell_net_players) {
