@@ -169,28 +169,11 @@ target_sources(dethrace_obj PRIVATE
 # Create our main game binary.
 add_executable(dethrace
     WIN32
-    MACOSX_BUNDLE
     ${CMAKE_SOURCE_DIR}/packaging/macos/dethrace.icns
     ${CMAKE_SOURCE_DIR}/packaging/windows/dethrace.rc
 )
 
-if (APPLE)
-    set_target_properties(dethrace PROPERTIES
-        BUNDLE True
-        MACOSX_BUNDLE_DISPLAY_NAME "Deth Race"
-        OUTPUT_NAME "Deth Race"
-        MACOSX_BUNDLE_BUNDLE_VERSION ${DETHRACE_VERSION}
-        MACOSX_BUNDLE_SHORT_VERSION_STRING ${DETHRACE_VERSION}
-        MACOSX_BUNDLE_ICON_FILE dethrace.icns
-    )
-    set_source_files_properties(${CMAKE_SOURCE_DIR}/packaging/macos/dethrace.icns PROPERTIES
-        MACOSX_PACKAGE_LOCATION "Resources"
-    )
-    target_sources(dethrace_obj PRIVATE
-        ${CMAKE_SOURCE_DIR}/packaging/macos/dethrace.icns
-    )
 
-endif()
 
 target_link_libraries(dethrace PRIVATE dethrace_obj compile_with_werror)
 target_sources(dethrace PRIVATE main.c)
@@ -220,14 +203,38 @@ endif()
 if (DETHRACE_INSTALL)
     install(TARGETS dethrace
         BUNDLE DESTINATION . COMPONENT Runtime
-        RUNTIME DESTINATION bin COMPONENT Runtime
+        RUNTIME DESTINATION . COMPONENT Runtime
     )
 
-    INSTALL(CODE "
+    if (APPLE)
+        set_target_properties(dethrace PROPERTIES
+            BUNDLE True
+            MACOSX_BUNDLE True
+            MACOSX_BUNDLE_DISPLAY_NAME "Deth Race"
+            OUTPUT_NAME "Deth Race"
+            MACOSX_BUNDLE_BUNDLE_VERSION ${DETHRACE_VERSION}
+            MACOSX_BUNDLE_SHORT_VERSION_STRING ${DETHRACE_VERSION}
+            MACOSX_BUNDLE_ICON_FILE dethrace.icns
+        )
+        set_source_files_properties(${CMAKE_SOURCE_DIR}/packaging/macos/dethrace.icns PROPERTIES
+            MACOSX_PACKAGE_LOCATION "Resources"
+        )
+        target_sources(dethrace_obj PRIVATE
+            ${CMAKE_SOURCE_DIR}/packaging/macos/dethrace.icns
+        )
+
+        INSTALL(CODE "
         include(BundleUtilities)
         fixup_bundle(\"${CMAKE_BINARY_DIR}/Deth Race.app\" \"\" \"/Library/Frameworks\")
         "
         COMPONENT RUNTIME)
+    INSTALL(CODE "
+        execute_process(COMMAND
+        codesign -s - -f \"${CMAKE_BINARY_DIR}/Deth Race.app/Contents/Frameworks/SDL2.framework\"
+        )"
+        COMPONENT RUNTIME)
+
+    endif()
 
     if(MSVC)
         INSTALL(FILES $<TARGET_PDB_FILE:dethrace>
