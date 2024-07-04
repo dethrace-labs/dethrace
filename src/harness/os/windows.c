@@ -185,3 +185,7 @@ char* OS_Basename(const char* path) {
     _splitpath(path, NULL, NULL, fname_buf, NULL);
     return fname_buf;
 }
+
+char* OS_GetWorkingDirectory(char* argv0) {
+    return OS_Dirname(argv0);
+}

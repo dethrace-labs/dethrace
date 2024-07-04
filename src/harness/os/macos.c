@@ -249,3 +249,13 @@ char* OS_Basename(const char* path) {
     strcpy(name_buf, path);
     return basename(name_buf);
 }
+
+char* OS_GetWorkingDirectory(char* argv0) {
+    // The application executable in a MacOS bundle is in <bundle.app>/Contents/MacOS/executable
+    // We strip off the bundle paths to get the path that the <bundle.app> is located in
+    char* bundlePath = strstr(argv0, ".app/Contents/MacOS");
+    if (bundlePath != NULL) {
+        *bundlePath = '\0';
+    }
+    return OS_Dirname(argv0);
+}

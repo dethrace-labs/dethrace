@@ -319,3 +319,7 @@ char* OS_Basename(const char* path) {
     strcpy(name_buf, path);
     return basename(name_buf);
 }
+
+char* OS_GetWorkingDirectory(char* argv0) {
+    return OS_Dirname(argv0);
+}

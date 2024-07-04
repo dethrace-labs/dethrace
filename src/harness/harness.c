@@ -175,7 +175,7 @@ void Harness_Init(int* argc, char* argv[]) {
     if (root_dir != NULL) {
         LOG_INFO("DETHRACE_ROOT_DIR is set to '%s'", root_dir);
     } else {
-        root_dir = OS_Dirname(argv[0]);
+        root_dir = OS_GetWorkingDirectory(argv[0]);
     }
     // if root_dir is null or empty, no need to chdir
     if (root_dir != NULL && root_dir[0] != '\0') {

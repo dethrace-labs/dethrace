@@ -16,7 +16,7 @@ target_include_directories(dethrace_obj
 target_link_libraries(dethrace_obj PUBLIC SDL2::SDL2 smackw32 harness BRender::Full BRender::DDI s3)
 
 
-if (CMAKE_C_COMPILER_ID MATCHES "MSVC")
+if(MSVC)
     target_compile_definitions(dethrace_obj PRIVATE -D_CRT_SECURE_NO_WARNINGS)
     target_compile_options(dethrace_obj PRIVATE
         /wd4101
@@ -167,13 +167,16 @@ target_sources(dethrace_obj PRIVATE
 )
 
 # Create our main game binary.
-add_executable(dethrace)
+add_executable(dethrace
+    WIN32
+    ${CMAKE_SOURCE_DIR}/packaging/macos/dethrace.icns
+    ${CMAKE_SOURCE_DIR}/packaging/windows/dethrace.rc
+)
+
 target_link_libraries(dethrace PRIVATE dethrace_obj compile_with_werror)
 target_sources(dethrace PRIVATE main.c)
 
-if(NOT MSVC)
-
-else()
+if(MSVC)
     target_link_libraries(dethrace PRIVATE dbghelp)
     target_link_options(dethrace PRIVATE /subsystem:windows /ENTRY:mainCRTStartup)
     target_compile_definitions(dethrace PRIVATE -D_CRT_SECURE_NO_WARNINGS -DSDL_MAIN_HANDLED -DWIN32_LEAN_AND_MEAN)
@@ -193,18 +196,49 @@ if(DETHRACE_IDE_ARGUMENTS)
     )
 endif()
 
-if (DETHRACE_INSTALL)
+if(DETHRACE_INSTALL)
     install(TARGETS dethrace
-        RUNTIME DESTINATION "."
+        BUNDLE DESTINATION . COMPONENT Runtime
+        RUNTIME DESTINATION . COMPONENT Runtime
     )
+
+    if(APPLE)
+        set_target_properties(dethrace PROPERTIES
+            BUNDLE True
+            MACOSX_BUNDLE True
+            MACOSX_BUNDLE_DISPLAY_NAME "Deth Race"
+            OUTPUT_NAME "Deth Race"
+            MACOSX_BUNDLE_BUNDLE_VERSION ${DETHRACE_VERSION}
+            MACOSX_BUNDLE_SHORT_VERSION_STRING ${DETHRACE_VERSION}
+            MACOSX_BUNDLE_ICON_FILE dethrace.icns
+        )
+        set_source_files_properties(${CMAKE_SOURCE_DIR}/packaging/macos/dethrace.icns PROPERTIES
+            MACOSX_PACKAGE_LOCATION "Resources"
+        )
+        target_sources(dethrace_obj PRIVATE
+            ${CMAKE_SOURCE_DIR}/packaging/macos/dethrace.icns
+        )
+
+        install(CODE "
+            include(BundleUtilities)
+            fixup_bundle(\"${CMAKE_BINARY_DIR}/Deth Race.app\" \"\" \"/Library/Frameworks\")
+            execute_process(COMMAND
+                codesign -s - -f \"${CMAKE_BINARY_DIR}/Deth Race.app/Contents/Frameworks/SDL2.framework\"
+            )
+            "
+            COMPONENT RUNTIME
+        )
+
+    endif()
+
     if(MSVC)
-        INSTALL(FILES $<TARGET_PDB_FILE:dethrace>
+        install(FILES $<TARGET_PDB_FILE:dethrace>
             DESTINATION "."
             OPTIONAL
         )
     endif()
     if(WIN32)
-        INSTALL(FILES  $<TARGET_RUNTIME_DLLS:dethrace>
+        install(FILES  $<TARGET_RUNTIME_DLLS:dethrace>
             DESTINATION "."
             OPTIONAL
         )
