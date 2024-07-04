@@ -173,8 +173,6 @@ add_executable(dethrace
     ${CMAKE_SOURCE_DIR}/packaging/windows/dethrace.rc
 )
 
-
-
 target_link_libraries(dethrace PRIVATE dethrace_obj compile_with_werror)
 target_sources(dethrace PRIVATE main.c)
 
@@ -223,15 +221,13 @@ if (DETHRACE_INSTALL)
             ${CMAKE_SOURCE_DIR}/packaging/macos/dethrace.icns
         )
 
-        INSTALL(CODE "
-        include(BundleUtilities)
-        fixup_bundle(\"${CMAKE_BINARY_DIR}/Deth Race.app\" \"\" \"/Library/Frameworks\")
+        install(CODE "
+            include(BundleUtilities)
+            fixup_bundle(\"${CMAKE_BINARY_DIR}/Deth Race.app\" \"\" \"/Library/Frameworks\")
+            execute_process(COMMAND
+                codesign -s - -f \"${CMAKE_BINARY_DIR}/Deth Race.app/Contents/Frameworks/SDL2.framework\"
+            )
         "
-        COMPONENT RUNTIME)
-    INSTALL(CODE "
-        execute_process(COMMAND
-        codesign -s - -f \"${CMAKE_BINARY_DIR}/Deth Race.app/Contents/Frameworks/SDL2.framework\"
-        )"
         COMPONENT RUNTIME)
 
     endif()
