@@ -110,7 +110,7 @@ if(DETHRACE_INSTALL)
 
     set(CPACK_PACKAGE_DIRECTORY dist)
 
-    if (APPLE)
+    if(APPLE)
         set(CPACK_DMG_DISABLE_APPLICATIONS_SYMLINK "ON")
         set(CPACK_GENERATOR "DragNDrop")
         set(ext ".dmg")

@@ -16,7 +16,7 @@ target_include_directories(dethrace_obj
 target_link_libraries(dethrace_obj PUBLIC SDL2::SDL2 smackw32 harness BRender::Full BRender::DDI s3)
 
 
-if (CMAKE_C_COMPILER_ID MATCHES "MSVC")
+if(MSVC)
     target_compile_definitions(dethrace_obj PRIVATE -D_CRT_SECURE_NO_WARNINGS)
     target_compile_options(dethrace_obj PRIVATE
         /wd4101
@@ -176,9 +176,7 @@ add_executable(dethrace
 target_link_libraries(dethrace PRIVATE dethrace_obj compile_with_werror)
 target_sources(dethrace PRIVATE main.c)
 
-if(NOT MSVC)
-
-else()
+if(MSVC)
     target_link_libraries(dethrace PRIVATE dbghelp)
     target_link_options(dethrace PRIVATE /subsystem:windows /ENTRY:mainCRTStartup)
     target_compile_definitions(dethrace PRIVATE -D_CRT_SECURE_NO_WARNINGS -DSDL_MAIN_HANDLED -DWIN32_LEAN_AND_MEAN)
@@ -198,13 +196,13 @@ if(DETHRACE_IDE_ARGUMENTS)
     )
 endif()
 
-if (DETHRACE_INSTALL)
+if(DETHRACE_INSTALL)
     install(TARGETS dethrace
         BUNDLE DESTINATION . COMPONENT Runtime
         RUNTIME DESTINATION . COMPONENT Runtime
     )
 
-    if (APPLE)
+    if(APPLE)
         set_target_properties(dethrace PROPERTIES
             BUNDLE True
             MACOSX_BUNDLE True
@@ -227,19 +225,20 @@ if (DETHRACE_INSTALL)
             execute_process(COMMAND
                 codesign -s - -f \"${CMAKE_BINARY_DIR}/Deth Race.app/Contents/Frameworks/SDL2.framework\"
             )
-        "
-        COMPONENT RUNTIME)
+            "
+            COMPONENT RUNTIME
+        )
 
     endif()
 
     if(MSVC)
-        INSTALL(FILES $<TARGET_PDB_FILE:dethrace>
+        install(FILES $<TARGET_PDB_FILE:dethrace>
             DESTINATION "."
             OPTIONAL
         )
     endif()
     if(WIN32)
-        INSTALL(FILES  $<TARGET_RUNTIME_DLLS:dethrace>
+        install(FILES  $<TARGET_RUNTIME_DLLS:dethrace>
             DESTINATION "."
             OPTIONAL
         )
