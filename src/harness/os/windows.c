@@ -2,8 +2,7 @@
 
 // this has to be first
 #include <windows.h>
-
-#include <imagehlp.h>
+#include <dbghelp.h>
 
 #include "harness/config.h"
 #include "harness/os.h"
@@ -20,16 +19,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if defined(_WIN64) || defined(_M_ARM64)
-#define Esp Rsp
-#define Eip Rip
-#define Ebp Rbp
-#endif
-
 void dr_dprintf(char* fmt_string, ...);
 
 static int stack_nbr = 0;
 static char windows_program_name[1024];
+static char path_addr2line[1024];
 
 static char dirname_buf[_MAX_DIR];
 static char fname_buf[_MAX_FNAME];
@@ -40,27 +34,146 @@ static char fname_buf[_MAX_FNAME];
 #define DETHRACE_CPU_X64 1
 #elif defined(__aarch64__) || defined(_M_ARM64)
 #define DETHRACE_CPU_ARM64 1
+#elif defined(__arm__) || defined(_M_ARM)
+#define DETHRACE_CPU_ARM32 1
 #endif
 
-#if defined(DETHRACE_CPU_X86) || defined(DETHRACE_CPU_X64) || defined(DETHRACE_CPU_ARM64)
-#define DETHRACE_STACKWALK 1
-#else
+#if !(defined(DETHRACE_CPU_X86) || defined(DETHRACE_CPU_X64) || defined(DETHRACE_CPU_ARM32) || defined(DETHRACE_CPU_ARM64))
 #pragma message("Unsupported architecture: don't know how to StackWalk")
 #endif
 
-#ifdef DETHRACE_STACKWALK
-static int addr2line(char const* const program_name, void const* const addr) {
-    char addr2line_cmd[512] = { 0 };
+static BOOL print_addr2line_address_location(HANDLE const hProcess, const DWORD64 address) {
+    char addr2line_cmd[1024] = { 0 };
+    const char *program_name = windows_program_name;
+    IMAGEHLP_MODULE64 module_info;
 
-    sprintf(addr2line_cmd, "addr2line -f -p -e %.256s %p", program_name, addr);
+    if (path_addr2line[0] == '\0') {
+        return FALSE;
+    }
+
+    memset(&module_info, 0, sizeof(module_info));
+    module_info.SizeOfStruct = sizeof(module_info);
+    if (SymGetModuleInfo64(hProcess, address, &module_info)) {
+        program_name = module_info.ImageName;
+    }
+
+    sprintf(addr2line_cmd, "%.256s -f -p -e %.256s %lx", path_addr2line, program_name, (long int)address);
 
     fprintf(stderr, "%d: ", stack_nbr++);
-    return system(addr2line_cmd);
+    system(addr2line_cmd);
+    return TRUE;
+}
+
+static void printf_windows_message(const char *format, ...) {
+    va_list ap;
+    char win_msg[512];
+    FormatMessageA(
+        FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL,
+        GetLastError(),
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        win_msg, sizeof(win_msg)/sizeof(*win_msg),
+        NULL);
+    size_t win_msg_len = strlen(win_msg);
+    while (win_msg[win_msg_len-1] == '\r' || win_msg[win_msg_len-1] == '\n' || win_msg[win_msg_len-1] == ' ') {
+        win_msg[win_msg_len-1] = '\0';
+        win_msg_len--;
+    }
+    va_start(ap, format);
+    vfprintf(stderr, format, ap);
+    va_end(ap);
+    fprintf(stderr, " (%s)\n", win_msg);
+}
+
+static const char *get_simple_basename(const char *path) {
+    const char *pos = strrchr(path, '\\');
+    if (pos) {
+        return pos + 1;
+    }
+    pos = strrchr(path, '/');
+    if (pos) {
+        return pos + 1;
+    }
+    return path;
+}
+
+static void init_dbghelp(HANDLE const hProcess) {
+
+    SymInitialize(hProcess, 0, true);
+
+    if (!SymRefreshModuleList(hProcess)) {
+        printf_windows_message("SymRefreshModuleList failed");
+    }
+}
+
+static void cleanup_dbghelp(HANDLE const hProcess) {
+
+    SymCleanup(hProcess);
+}
+
+static BOOL print_dbghelp_address_location(HANDLE const hProcess, const DWORD64 address) {
+    IMAGEHLP_MODULE64 module_info;
+    union {
+        char buffer[sizeof(SYMBOL_INFO) + MAX_SYM_NAME * sizeof(CHAR)];
+        SYMBOL_INFO symbol_info;
+    } symbol;
+    DWORD64 dwDisplacement;
+    DWORD lineColumn = 0;
+    IMAGEHLP_LINE64 line;
+    const char *image_file_name;
+    const char *symbol_name;
+    const char *file_name;
+    char line_number[16];
+
+    memset(&module_info, 0, sizeof(module_info));
+    module_info.SizeOfStruct = sizeof(module_info);
+    if (!SymGetModuleInfo64(hProcess, address, &module_info)) {
+        return FALSE;
+    }
+    image_file_name = get_simple_basename(module_info.ImageName);
+
+    memset(&symbol, 0, sizeof(symbol));
+    symbol.symbol_info.SizeOfStruct = sizeof(symbol.symbol_info);
+    symbol.symbol_info.MaxNameLen = MAX_SYM_NAME;
+    if (!SymFromAddr(hProcess, address, &dwDisplacement, &symbol.symbol_info)) {
+        return FALSE;
+    }
+    symbol_name = symbol.symbol_info.Name;
+
+    line.SizeOfStruct = sizeof(line);
+    if (!SymGetLineFromAddr64(hProcess, address, &lineColumn, &line)) {
+        return FALSE;
+    }
+    file_name = line.FileName;
+    snprintf(line_number, sizeof(line_number), "Line %u", (unsigned int)line.LineNumber);
+
+    fprintf(stderr, "%s!%s+0x%lx %s %s\n", image_file_name, symbol_name, (long unsigned int)dwDisplacement, file_name, line_number);
+    return TRUE;
+}
+
+static void print_address_location(HANDLE hProcess, DWORD64 address) {
+    IMAGEHLP_MODULE64 module_info;
+
+    if (print_dbghelp_address_location(hProcess, address)) {
+        return;
+    }
+    if (print_addr2line_address_location(hProcess, address)) {
+        return;
+    }
+
+    memset(&module_info, 0, sizeof(module_info));
+    module_info.SizeOfStruct = sizeof(module_info);
+    if (SymGetModuleInfo64(hProcess, address, &module_info)) {
+        fprintf(stderr, "%s 0x%lx\n", module_info.ImageName, (long unsigned int)address);
+        return;
+    }
+    fprintf(stderr, "0x%lx\n", (long unsigned int)address);
 }
 
 static void print_stacktrace(CONTEXT* context) {
+    HANDLE hProcess = GetCurrentProcess();
 
-    SymInitialize(GetCurrentProcess(), 0, true);
+    init_dbghelp(hProcess);
 
     STACKFRAME frame = { 0 };
 
@@ -68,38 +181,53 @@ static void print_stacktrace(CONTEXT* context) {
     frame.AddrPC.Mode = AddrModeFlat;
     frame.AddrStack.Mode = AddrModeFlat;
     frame.AddrFrame.Mode = AddrModeFlat;
-#if defined(DETHRACE_CPU_X86) || defined(DETHRACE_CPU_X64)
 #if defined(DETHRACE_CPU_X86)
     DWORD machine_type = IMAGE_FILE_MACHINE_I386;
-#else
-    DWORD machine_type = IMAGE_FILE_MACHINE_AMD64;
-#endif
     frame.AddrFrame.Offset = context->Ebp;
     frame.AddrStack.Offset = context->Esp;
     frame.AddrPC.Offset = context->Eip;
+#elif defined(DETHRACE_CPU_X64)
+    DWORD machine_type = IMAGE_FILE_MACHINE_AMD64;
+    frame.AddrFrame.Offset = context->Rbp;
+    frame.AddrStack.Offset = context->Rsp;
+    frame.AddrPC.Offset = context->Rip;
+#elif defined(DETHRACE_CPU_ARM32)
+    DWORD machine_type = IMAGE_FILE_MACHINE_ARM;
+    frame.AddrFrame.Offset = context->Lr;
+    frame.AddrStack.Offset = context->Sp;
+    frame.AddrPC.Offset = context->Pc;
 #elif defined(DETHRACE_CPU_ARM64)
     DWORD machine_type = IMAGE_FILE_MACHINE_ARM64;
     frame.AddrFrame.Offset = context->Fp;
     frame.AddrStack.Offset = context->Sp;
     frame.AddrPC.Offset = context->Pc;
+#else
+    fprintf(stderr, "Unsupported architecture: cannot produce a stacktrace\n");
 #endif
 
     while (StackWalk(machine_type,
-        GetCurrentProcess(),
-        GetCurrentThread(),
-        &frame,
-        context,
-        0,
-        SymFunctionTableAccess,
-        SymGetModuleBase,
-        0)) {
-        addr2line(windows_program_name, (void*)frame.AddrPC.Offset);
+                     GetCurrentProcess(),
+                     GetCurrentThread(),
+                     &frame,
+                     context,
+                     0,
+                     SymFunctionTableAccess,
+                     SymGetModuleBase,
+                     0)) {
+
+        if (frame.AddrPC.Offset == frame.AddrReturn.Offset) {
+            fprintf(stderr, "PC == Return Address => Possible endless callstack\n");
+            break;
+        }
+
+        print_address_location(hProcess, frame.AddrPC.Offset);
     }
 
-    SymCleanup(GetCurrentProcess());
+    cleanup_dbghelp(hProcess);
 }
 
 static LONG WINAPI windows_exception_handler(EXCEPTION_POINTERS* ExceptionInfo) {
+    HANDLE hProcess;
     switch (ExceptionInfo->ExceptionRecord->ExceptionCode) {
     case EXCEPTION_ACCESS_VIOLATION:
         fputs("Error: EXCEPTION_ACCESS_VIOLATION\n", stderr);
@@ -166,30 +294,35 @@ static LONG WINAPI windows_exception_handler(EXCEPTION_POINTERS* ExceptionInfo) 
         break;
     }
     fflush(stderr);
+    hProcess = GetCurrentProcess();
+    init_dbghelp(hProcess);
     /* If this is a stack overflow then we can't walk the stack, so just show
       where the error happened */
     if (EXCEPTION_STACK_OVERFLOW != ExceptionInfo->ExceptionRecord->ExceptionCode) {
         print_stacktrace(ExceptionInfo->ContextRecord);
     } else {
-#if defined(DETHRACE_CPU_X86) || defined(DETHRACE_CPU_X64)
-        void *addr = (void*)ExceptionInfo->ContextRecord->Eip;
-#elif defined(DETHRACE_CPU_ARM64)
-        void *addr = (void*)ExceptionInfo->ContextRecord->Pc;
+#if defined(DETHRACE_CPU_X86)
+        DWORD64 addr = (DWORD64)ExceptionInfo->ContextRecord->Eip;
+#elif defined(DETHRACE_CPU_X64)
+        DWORD64 addr = (DWORD64)ExceptionInfo->ContextRecord->Rip;
+#elif defined(DETHRACE_CPU_ARM32) || defined(DETHRACE_CPU_ARM64)
+        DWORD64 addr = (DWORD64)ExceptionInfo->ContextRecord->Pc;
 #endif
-        addr2line(windows_program_name, addr);
+        print_address_location(hProcess, addr);
     }
+    cleanup_dbghelp(hProcess);
 
     return EXCEPTION_EXECUTE_HANDLER;
 }
-#endif
 
 void OS_InstallSignalHandler(char* program_name) {
-#ifdef DETHRACE_STACKWALK
     strcpy(windows_program_name, program_name);
+    const char *env_addr2line = getenv("ADDR2LINE");
+    strcpy(path_addr2line, env_addr2line ? env_addr2line : "addr2line.exe");
+    if (_access(path_addr2line, R_OK | X_OK) != (R_OK | X_OK)) {
+        path_addr2line[0] = '\0';
+    }
     SetUnhandledExceptionFilter(windows_exception_handler);
-#else
-    LOG_WARN("Unsupported architecture. No signal handlers installed");
-#endif
 }
 
 FILE* OS_fopen(const char* pathname, const char* mode) {
