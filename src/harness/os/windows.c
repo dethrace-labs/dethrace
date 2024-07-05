@@ -8,16 +8,19 @@
 #include "harness/os.h"
 #include "harness/trace.h"
 
-#include <assert.h>
-#include <direct.h>
-#include <errno.h>
-#include <limits.h>
-#include <signal.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <io.h> /* _access */
+#include <stddef.h>
+#include <stdio.h> /* errno_t, FILE, fopen_s, fprintf*/
+#include <stdlib.h> /* _splitpath */
+#include <string.h> /* strcpy, strerror, strlen, strrchr */
+
+#ifndef R_OK
+#define R_OK 0
+#endif
+
+#ifndef X_OK
+#define X_OK 1
+#endif
 
 void dr_dprintf(char* fmt_string, ...);
 
@@ -84,21 +87,11 @@ static void printf_windows_message(const char *format, ...) {
     fprintf(stderr, " (%s)\n", win_msg);
 }
 
-static const char *get_simple_basename(const char *path) {
-    const char *pos = strrchr(path, '\\');
-    if (pos) {
-        return pos + 1;
-    }
-    pos = strrchr(path, '/');
-    if (pos) {
-        return pos + 1;
-    }
-    return path;
-}
-
 static void init_dbghelp(HANDLE const hProcess) {
 
-    SymInitialize(hProcess, 0, true);
+    if (!SymInitialize(hProcess, 0, TRUE)) {
+        printf_windows_message("SymInitialize failed");
+    }
 
     if (!SymRefreshModuleList(hProcess)) {
         printf_windows_message("SymRefreshModuleList failed");
@@ -129,7 +122,7 @@ static BOOL print_dbghelp_address_location(HANDLE const hProcess, const DWORD64 
     if (!SymGetModuleInfo64(hProcess, address, &module_info)) {
         return FALSE;
     }
-    image_file_name = get_simple_basename(module_info.ImageName);
+    image_file_name = OS_Basename(module_info.ImageName);
 
     memset(&symbol, 0, sizeof(symbol));
     symbol.symbol_info.SizeOfStruct = sizeof(symbol.symbol_info);
@@ -222,8 +215,6 @@ static void print_stacktrace(CONTEXT* context) {
 
         print_address_location(hProcess, frame.AddrPC.Offset);
     }
-
-    cleanup_dbghelp(hProcess);
 }
 
 static LONG WINAPI windows_exception_handler(EXCEPTION_POINTERS* ExceptionInfo) {
