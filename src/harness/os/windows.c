@@ -59,7 +59,6 @@ static BOOL print_addr2line_address_location(HANDLE const hProcess, const DWORD6
 
     sprintf(addr2line_cmd, "%.256s -f -p -e %.256s %lx", path_addr2line, program_name, (long int)address);
 
-    fprintf(stderr, "%d: ", stack_nbr++);
     system(addr2line_cmd);
     return TRUE;
 }
@@ -154,6 +153,7 @@ static BOOL print_dbghelp_address_location(HANDLE const hProcess, const DWORD64 
 static void print_address_location(HANDLE hProcess, DWORD64 address) {
     IMAGEHLP_MODULE64 module_info;
 
+    fprintf(stderr, "%d: ", stack_nbr++);
     if (print_dbghelp_address_location(hProcess, address)) {
         return;
     }
