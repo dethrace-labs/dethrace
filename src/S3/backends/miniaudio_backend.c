@@ -1,6 +1,9 @@
+// Disable miniaudio's 'null' device fallback. A proper device must be found to enable playback
+#define MA_NO_NULL
 
 #include "backend.h"
 #include "harness/config.h"
+#include "harness/trace.h"
 #include "miniaudio/miniaudio.h"
 #include "resource.h"
 #include "s3_defs.h"
@@ -14,7 +17,6 @@ typedef struct tS3_sample_struct_miniaudio {
     int initialized;
 } tS3_sample_struct_miniaudio;
 
-// dethrace
 ma_engine miniaudio_engine;
 
 tAudioBackend_error_code AudioBackend_Init(void) {
@@ -27,7 +29,7 @@ tAudioBackend_error_code AudioBackend_Init(void) {
         printf("Failed to initialize audio engine.");
         return eAB_error;
     }
-
+    LOG_INFO("Playback device: '%s'", miniaudio_engine.pDevice->playback.name);
     ma_engine_set_volume(&miniaudio_engine, harness_game_config.volume_multiplier);
     return eAB_success;
 }
