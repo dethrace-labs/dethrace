@@ -67,6 +67,13 @@ export DETHRACE_ROOT_DIR=/path/to/carmageddon
 
 ## Build
 
+Dethrace uses git submodules, so we must pull them after the inital clone:
+```sh
+git clone https://github.com/dethrace-labs/dethrace
+cd dethrace
+git submodule update --init --recursive
+```
+
 Dethrace uses [cmake](https://cmake.org/) for generating build files.
 
 To generate the build files (generally only required once):
@@ -76,7 +83,7 @@ cd build
 cmake ..
 ```
 
-On cmake has generated the build files for your platform, run the build. For example:
+Once cmake has generated the build files for your platform, run the build. For example:
 ```sh
 make
 ```
