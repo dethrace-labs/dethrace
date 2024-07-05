@@ -1,5 +1,6 @@
 // Based on https://gist.github.com/jvranish/4441299
 
+#include "harness/config.h"
 #include "harness/os.h"
 #include <assert.h>
 #include <dirent.h>
@@ -223,8 +224,10 @@ FILE* OS_fopen(const char* pathname, const char* mode) {
     FILE* f;
 
     f = fopen(pathname, mode);
-    if (f == NULL) {
-        fprintf(stderr, "Failed to open \"%s\" (%s)\n", pathname, strerror(errno));
+    if (harness_game_config.verbose) {
+        if (f == NULL) {
+            fprintf(stderr, "Failed to open \"%s\" (%s)\n", pathname, strerror(errno));
+        }
     }
 
     return f;
@@ -245,4 +248,14 @@ char* OS_Dirname(const char* path) {
 char* OS_Basename(const char* path) {
     strcpy(name_buf, path);
     return basename(name_buf);
+}
+
+char* OS_GetWorkingDirectory(char* argv0) {
+    // The application executable in a MacOS bundle is in <bundle.app>/Contents/MacOS/executable
+    // We strip off the bundle paths to get the path that the <bundle.app> is located in
+    char* bundlePath = strstr(argv0, ".app/Contents/MacOS");
+    if (bundlePath != NULL) {
+        *bundlePath = '\0';
+    }
+    return OS_Dirname(argv0);
 }

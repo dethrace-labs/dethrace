@@ -5,6 +5,7 @@
 
 #include <imagehlp.h>
 
+#include "harness/config.h"
 #include "harness/os.h"
 #include "harness/trace.h"
 
@@ -197,8 +198,10 @@ FILE* OS_fopen(const char* pathname, const char* mode) {
 
     f = NULL;
     err = fopen_s(&f, pathname, mode);
-    if (err != 0) {
-        fprintf(stderr, "Failed to open \"%s\" (%s)\n", pathname, strerror(err));
+    if (harness_game_config.verbose) {
+        if (err != 0) {
+            fprintf(stderr, "Failed to open \"%s\" (%s)\r\n", pathname, strerror(err));
+        }
     }
 
     return f;
@@ -219,4 +222,8 @@ char* OS_Dirname(const char* path) {
 char* OS_Basename(const char* path) {
     _splitpath(path, NULL, NULL, fname_buf, NULL);
     return fname_buf;
+}
+
+char* OS_GetWorkingDirectory(char* argv0) {
+    return OS_Dirname(argv0);
 }

@@ -721,7 +721,23 @@ int FindFacesInBox2(tBounds* bnds, tFace_ref* face_list, int max_face) {
     int i;
     int j;
     LOG_TRACE("(%p, %p, %d)", bnds, face_list, max_face);
-    NOT_IMPLEMENTED();
+
+    a.v[0] = (bnds->original_bounds.min.v[0] + bnds->original_bounds.max.v[0]) * .5f;
+    a.v[1] = (bnds->original_bounds.min.v[1] + bnds->original_bounds.max.v[1]) * .5f;
+    a.v[2] = (bnds->original_bounds.min.v[2] + bnds->original_bounds.max.v[2]) * .5f;
+    BrMatrix34ApplyP(&bnds->box_centre, &a, bnds->mat);
+    BrVector3Sub(&b, &bnds->original_bounds.max, &bnds->original_bounds.min);
+    bnds->radius = BrVector3Length(&b) / 2.f;
+    BrMatrix34ApplyP(&bnds->real_bounds.min, &bnds->original_bounds.min, bnds->mat);
+    BrVector3Copy(&bnds->real_bounds.max, &bnds->real_bounds.min);
+    for (i = 0; i < 3; i++) {
+        BrVector3Scale(&c[i], (br_vector3*)bnds->mat->m[i], b.v[i]);
+    }
+    for (i = 0; i < 3; i++) {
+      bnds->real_bounds.min.v[i] += MIN(0.f, c[0].v[i]) + MIN(0.f, c[1].v[i]) + MIN(0.f, c[2].v[i]);
+      bnds->real_bounds.max.v[i] += MAX(0.f, c[0].v[i]) + MAX(0.f, c[1].v[i]) + MAX(0.f, c[2].v[i]);
+  }
+  return max_face - ActorBoxPick(bnds, gTrack_actor, model_unk1, material_unk1, face_list, max_face, NULL);
 }
 
 // IDA: int __usercall ActorBoxPick@<EAX>(tBounds *bnds@<EAX>, br_actor *ap@<EDX>, br_model *model@<EBX>, br_material *material@<ECX>, tFace_ref *face_list, int max_face, br_matrix34 *pMat)
@@ -1216,7 +1232,20 @@ int CompVert(int v1, int v2) {
     br_vector3 tv;
     br_vector2 tv2;
     LOG_TRACE("(%d, %d)", v1, v2);
-    NOT_IMPLEMENTED();
+
+    if (v1 == v2) {
+        return 1;
+    }
+    vl = gSelected_model->vertices;
+    BrVector3Sub(&tv, &vl[v1].p, &vl[v2].p);
+    if (BrVector3LengthSquared(&tv) > 1e-5f) {
+        return 0;
+    }
+    BrVector2Sub(&tv2, &vl[v1].map, &vl[v2].map);
+    if (BrVector2LengthSquared(&tv2) > 1e-5f) {
+        return 0;
+    }
+    return 1;
 }
 
 // IDA: void __usercall SetFacesGroup(int pFace@<EAX>)
@@ -1248,7 +1277,25 @@ void GetTilingLimits(br_vector2* min, br_vector2* max) {
     br_vertex* verts;
     br_face* faces;
     LOG_TRACE("(%p, %p)", min, max);
-    NOT_IMPLEMENTED();
+
+    verts = gSelected_model->vertices;
+    faces = gSelected_model->faces;
+    BrVector2Set(min, 32000.f, 32000.f);
+    BrVector2Set(max, -32000.f, -32000.f);
+    for (f = 0; f < gSelected_model->nfaces; f++) {
+        if (faces[f].material == gSub_material) {
+            for (i = 0; i < 3; i++) {
+                for (j = 0; j < 3; j++) {
+                    if (verts[faces[f].vertices[i]].map.v[j] < min->v[j]) {
+                        min->v[j] = verts[faces[f].vertices[i]].map.v[j];
+                    }
+                    if (verts[faces[f].vertices[i]].map.v[j] > max->v[j]) {
+                        max->v[j] = verts[faces[f].vertices[i]].map.v[j];
+                    }
+                }
+            }
+        }
+    }
 }
 
 // IDA: void __usercall Scale(int pD@<EAX>, int factor@<EDX>)
@@ -1261,43 +1308,74 @@ void Scale(int pD, int factor) {
     br_vertex* verts;
     br_face* faces;
     LOG_TRACE("(%d, %d)", pD, factor);
-    NOT_IMPLEMENTED();
+
+    if (gSelected_model == NULL) {
+        return;
+    }
+    if (gSelected_model->nfaces != gNfaces) {
+        return;
+    }
+    verts = gSelected_model->vertices;
+    faces = gSelected_model->faces;
+    GetTilingLimits(&min, &max);
+    d = max.v[pD] - min.v[pD];
+    if (d <= 0.f || factor + d <= 0.f) {
+        return;
+    }
+    for (v = 0; v < gSelected_model->nvertices; v++) {
+        for (f = 0; f < gSelected_model->nfaces; f++) {
+            if (faces[f].material == gSub_material
+                    && (faces[f].vertices[0] == v || faces[f].vertices[1] == v || faces[f].vertices[2] == v)) {
+                verts[v].map.v[pD] = (factor + d) / d * verts[v].map.v[pD];
+                break;
+            }
+        }
+    }
+    BrModelUpdate(gSelected_model, BR_MODU_ALL);
 }
 
 // IDA: void __cdecl ScaleUpX()
 void ScaleUpX(void) {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    Scale(0, 1);
 }
 
 // IDA: void __cdecl ScaleDnX()
 void ScaleDnX(void) {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    Scale(0, -1);
 }
 
 // IDA: void __cdecl ScaleUpY()
 void ScaleUpY(void) {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    Scale(1, 1);
 }
 
 // IDA: void __cdecl ScaleDnY()
 void ScaleDnY(void) {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    Scale(1, -1);
 }
 
 // IDA: void __cdecl SelectFaceForward()
 void SelectFaceForward(void) {
     br_vector3 dir;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    BrVector3Scale(&dir, (br_vector3*)&gProgram_state.current_car.car_master_actor->t.t.mat.m[2], -2.f);
+    SelectFace(&dir);
 }
 
 // IDA: void __cdecl SelectFaceDown()
 void SelectFaceDown(void) {
     br_vector3 dir;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    BrVector3Scale(&dir, (br_vector3*)&gProgram_state.current_car.car_master_actor->t.t.look_up.up, -2.f);
+    SelectFace(&dir);
 }

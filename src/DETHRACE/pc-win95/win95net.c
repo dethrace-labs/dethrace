@@ -56,6 +56,16 @@ int gSocket;
 #define MESSAGE_HEADER_STR "CW95MSG"
 #define JOINABLE_GAMES_CAPACITY 16
 
+DR_STATIC_ASSERT(offsetof(tNet_message, pd_stuff_so_DO_NOT_USE) == 0);
+DR_STATIC_ASSERT(offsetof(tNet_message, magic_number) == 4);
+DR_STATIC_ASSERT(offsetof(tNet_message, guarantee_number) == 8);
+DR_STATIC_ASSERT(offsetof(tNet_message, sender) == 12);
+DR_STATIC_ASSERT(offsetof(tNet_message, version) == 16);
+DR_STATIC_ASSERT(offsetof(tNet_message, senders_time_stamp) == 20);
+DR_STATIC_ASSERT(offsetof(tNet_message, num_contents) == 24);
+DR_STATIC_ASSERT(offsetof(tNet_message, overall_size) == 26);
+DR_STATIC_ASSERT(offsetof(tNet_message, contents) == 28);
+
 // IDA: void __cdecl ClearupPDNetworkStuff()
 void ClearupPDNetworkStuff(void) {
     LOG_TRACE("()");
@@ -640,9 +650,6 @@ int PDNetSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessag
     LOG_TRACE("(%p, %p, %p)", pDetails, pMessage, pAddress);
 
     NetNowIPXLocalTarget2String(str, (struct sockaddr_in*)pAddress);
-    if (pDetails->pd_net_info.addr_in.sin_port == 0) {
-        int i = 0;
-    }
 
     if (sendto(gSocket, (const char*)pMessage, pMessage->overall_size, 0, (const struct sockaddr*)pAddress, sizeof(struct sockaddr)) == -1) {
         dr_dprintf("PDNetSendMessageToAddress(): Error on sendto() - WSAGetLastError=%d", WSAGetLastError());

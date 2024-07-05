@@ -153,12 +153,14 @@ void Harness_Init(int* argc, char* argv[]) {
     harness_game_config.volume_multiplier = 1.0f;
     // start window in windowed mode
     harness_game_config.start_full_screen = 0;
-    // Emulate gore check
+    // Disable gore check emulation
     harness_game_config.gore_check = 0;
-    // Enable Sound Options menu
+    // Disable "Sound Options" menu
     harness_game_config.sound_options = 0;
     // Skip binding socket to allow local network testing
     harness_game_config.no_bind = 0;
+    // Disable verbose logging
+    harness_game_config.verbose = 0;
 
     // install signal handler by default
     harness_game_config.install_signalhandler = 1;
@@ -173,7 +175,7 @@ void Harness_Init(int* argc, char* argv[]) {
     if (root_dir != NULL) {
         LOG_INFO("DETHRACE_ROOT_DIR is set to '%s'", root_dir);
     } else {
-        root_dir = OS_Dirname(argv[0]);
+        root_dir = OS_GetWorkingDirectory(argv[0]);
     }
     // if root_dir is null or empty, no need to chdir
     if (root_dir != NULL && root_dir[0] != '\0') {
@@ -214,8 +216,8 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
             handled = 1;
         } else if (strstr(argv[i], "--physics-step-time=") != NULL) {
             char* s = strstr(argv[i], "=");
-            harness_game_config.physics_step_time = atof(s + 1);
-            LOG_INFO("Physics step time set to %f", harness_game_config.physics_step_time);
+            harness_game_config.physics_step_time = atoi(s + 1);
+            LOG_INFO("Physics step time set to %d", harness_game_config.physics_step_time);
             handled = 1;
         } else if (strstr(argv[i], "--fps=") != NULL) {
             char* s = strstr(argv[i], "=");

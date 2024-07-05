@@ -110,7 +110,11 @@ if(DETHRACE_INSTALL)
 
     set(CPACK_PACKAGE_DIRECTORY dist)
 
-    if(MSVC)
+    if(APPLE)
+        set(CPACK_DMG_DISABLE_APPLICATIONS_SYMLINK "ON")
+        set(CPACK_GENERATOR "DragNDrop")
+        set(ext ".dmg")
+    elseif(MSVC)
         set(CPACK_GENERATOR ZIP)
         set(ext ".zip")
     else()

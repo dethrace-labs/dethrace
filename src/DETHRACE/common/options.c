@@ -840,7 +840,7 @@ void CalibrateJoysticks(void) {
 #ifdef __DOS__
     NOT_IMPLEMENTED();
 #else
-    NetFullScreenMessage(229, 0);
+    NetFullScreenMessage(kMiscString_USE_SYSTEM_CONTROL_PANEL_FOR_JOYSTICKS, 0);
 #endif
 }
 
