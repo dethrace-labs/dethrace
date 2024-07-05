@@ -18,10 +18,6 @@
 #define R_OK 0
 #endif
 
-#ifndef X_OK
-#define X_OK 1
-#endif
-
 void dr_dprintf(char* fmt_string, ...);
 
 static int stack_nbr = 0;
@@ -310,7 +306,7 @@ void OS_InstallSignalHandler(char* program_name) {
     strcpy(windows_program_name, program_name);
     const char *env_addr2line = getenv("ADDR2LINE");
     strcpy(path_addr2line, env_addr2line ? env_addr2line : "addr2line.exe");
-    if (_access(path_addr2line, R_OK | X_OK) != (R_OK | X_OK)) {
+    if (_access(path_addr2line, R_OK) != (R_OK)) {
         path_addr2line[0] = '\0';
     }
     SetUnhandledExceptionFilter(windows_exception_handler);
