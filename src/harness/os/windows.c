@@ -85,7 +85,7 @@ static void printf_windows_message(const char *format, ...) {
 
 static void init_dbghelp(HANDLE const hProcess) {
 
-    if (!SymInitialize(hProcess, 0, TRUE)) {
+    if (!SymInitialize(hProcess, NULL, FALSE)) {
         printf_windows_message("SymInitialize failed");
     }
 
