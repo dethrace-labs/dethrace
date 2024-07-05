@@ -8,14 +8,15 @@
 #include "harness/os.h"
 #include "harness/trace.h"
 
-#include <io.h> /* _access */
+#include <errno.h> /* errno, strerror */
+#include <io.h> /* _access_s, F_OK */
 #include <stddef.h>
-#include <stdio.h> /* errno_t, FILE, fopen_s, fprintf*/
+#include <stdio.h> /* errno_t, FILE, fgets, fopen_s, fprintf*/
 #include <stdlib.h> /* _splitpath */
 #include <string.h> /* strcpy, strerror, strlen, strrchr */
 
-#ifndef R_OK
-#define R_OK 0
+#ifndef F_OK
+#define F_OK 0
 #endif
 
 void dr_dprintf(char* fmt_string, ...);
@@ -56,7 +57,7 @@ static BOOL print_addr2line_address_location(HANDLE const hProcess, const DWORD6
         program_name = module_info.ImageName;
     }
 
-    sprintf(addr2line_cmd, "%.256s -f -p -e %.256s %lx", path_addr2line, program_name, (long int)address);
+    sprintf(addr2line_cmd, "\"%.256s\" -f -p -e %.256s %lx", path_addr2line, program_name, (long int)address);
 
     system(addr2line_cmd);
     return TRUE;
@@ -306,7 +307,9 @@ void OS_InstallSignalHandler(char* program_name) {
     strcpy(windows_program_name, program_name);
     const char *env_addr2line = getenv("ADDR2LINE");
     strcpy(path_addr2line, env_addr2line ? env_addr2line : "addr2line.exe");
-    if (_access(path_addr2line, R_OK) != (R_OK)) {
+    errno_t e = _access_s(path_addr2line, F_OK);
+    if (e != 0) {
+        fprintf(stderr, "ADDR2LINE does not exist (%s)\n", path_addr2line);
         path_addr2line[0] = '\0';
     }
     SetUnhandledExceptionFilter(windows_exception_handler);
