@@ -306,14 +306,19 @@ static LONG WINAPI windows_exception_handler(EXCEPTION_POINTERS* ExceptionInfo) 
 }
 
 void OS_InstallSignalHandler(char* program_name) {
-    strcpy(windows_program_name, program_name);
-    const char *env_addr2line = getenv("ADDR2LINE");
-    strcpy(path_addr2line, env_addr2line ? env_addr2line : "addr2line.exe");
-    errno_t e = _access_s(path_addr2line, F_OK);
-    if (e != 0) {
-        fprintf(stderr, "ADDR2LINE does not exist (%s)\n", path_addr2line);
-        path_addr2line[0] = '\0';
+    const char *env_addr2line;
+
+    path_addr2line[0] = '\0';
+    env_addr2line = getenv("ADDR2LINE");
+    if (env_addr2line != NULL) {
+        errno_t e = _access_s(env_addr2line, F_OK);
+        if (e == 0) {
+            strcpy(path_addr2line, env_addr2line);
+        } else {
+            fprintf(stderr, "ADDR2LINE does not exist (%s)\n", path_addr2line);
+        }
     }
+    strcpy(windows_program_name, program_name);
     SetUnhandledExceptionFilter(windows_exception_handler);
 }
 
