@@ -130,13 +130,15 @@ static BOOL print_dbghelp_address_location(HANDLE const hProcess, const DWORD64 
     symbol_name = symbol.symbol_info.Name;
 
     line.SizeOfStruct = sizeof(line);
-    if (!SymGetLineFromAddr64(hProcess, address, &lineColumn, &line)) {
-        return FALSE;
+    if (SymGetLineFromAddr64(hProcess, address, &lineColumn, &line)) {
+        file_name = line.FileName;
+        snprintf(line_number, sizeof(line_number), "Line %u", (unsigned int)line.LineNumber);
+    } else {
+        file_name = "";
+        line_number[0] = '\0';
     }
-    file_name = line.FileName;
-    snprintf(line_number, sizeof(line_number), "Line %u", (unsigned int)line.LineNumber);
 
-    fprintf(stderr, "%s!%s+0x%lx %s %s\n", image_file_name, symbol_name, (long unsigned int)dwDisplacement, file_name, line_number);
+    fprintf(stderr, "0x%lx %s!%s+0x%lx %s %s\n", (long unsigned int)address, image_file_name, symbol_name, (long unsigned int)dwDisplacement, file_name, line_number);
     return TRUE;
 }
 
