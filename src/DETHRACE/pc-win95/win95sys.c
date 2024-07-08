@@ -415,14 +415,22 @@ void Win32CreateWindow(void) {
 
     int width = gGraf_specs[gGraf_spec_index].total_width;
     int height = gGraf_specs[gGraf_spec_index].total_height;
-    // WS_VISIBLE | WS_POPUP
-    gWin32_hwnd = CreateWindowExA_(0, "CarmageddonClass", "Carmageddon", 0x90000000, 0, 0, width, height, 0, NULL, NULL, NULL);
+
+    int dwStyle = 0x90000000; // WS_VISIBLE | WS_POPUP
+    gWin32_hwnd = CreateWindowExA_(0, "CarmageddonClass", "Carmageddon", dwStyle, 0, 0, width, height, 0, NULL, NULL, NULL);
     SSDXGetWindowRect(gWin32_hwnd);
     // hdc = GetDC(gWin32_hwnd);
     // GetSystemPaletteEntries(hdc, 0, 256u, &gWin32_palette);
     // ReleaseDC(gWin32_hwnd, hdc);
     // UpdateWindow(gWin32_hwnd);
     // SetFocus(gWin32_hwnd);
+
+    // Added by dethrace
+    gHarness_platform.SetWindowGeometry(
+        gGraf_specs[gGraf_data_index].total_width,
+        gGraf_specs[gGraf_data_index].total_height,
+        gGraf_specs[gReal_graf_data_index].total_width,
+        gGraf_specs[gReal_graf_data_index].total_height);
 }
 
 void PDShutdownSystem(void) {

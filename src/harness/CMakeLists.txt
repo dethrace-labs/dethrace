@@ -10,7 +10,6 @@ target_include_directories(harness
     PRIVATE
         .
         ${CMAKE_SOURCE_DIR}
-        ${CMAKE_SOURCE_DIR}/src/DETHRACE
         "${CMAKE_CURRENT_BINARY_DIR}"
     PUBLIC
         include
@@ -20,11 +19,7 @@ if(DETHRACE_FIX_BUGS)
     target_compile_definitions(harness PRIVATE DETHRACE_FIX_BUGS)
 endif()
 
-target_link_libraries(harness PRIVATE brender s3 compile_with_werror)
-
-if(WIN32)
-    target_link_libraries(harness PRIVATE dbghelp)
-endif()
+target_link_libraries(harness PRIVATE brender miniaudio compile_with_werror)
 
 if(NOT MSVC)
     target_compile_options(harness PRIVATE
@@ -53,14 +48,14 @@ target_sources(harness PRIVATE
     include/harness/os.h
     include/harness/win95_polyfill.h
     include/harness/win95_polyfill_defs.h
+    include/harness/audio.h
     # cameras/debug_camera.c
     # cameras/debug_camera.h
     ascii_tables.h
     harness_trace.c
     harness.c
     harness.h
-    sound/sound.c
-    sound/sound.h
+    audio/miniaudio.c
     win95/polyfill.c
     win95/winsock.c
     platforms/null.c
@@ -70,13 +65,10 @@ target_sources(harness PRIVATE
 )
 
 if (IO_PLATFORM STREQUAL "SDL2")
-
     target_sources(harness PRIVATE
         platforms/sdl2.c
         platforms/sdl2_scancode_to_dinput.h
-
     )
-    target_include_directories(harness PRIVATE "${dethrace_SOURCE_DIR}/src/DETHRACE/common")
     target_link_libraries(harness PRIVATE SDL2::SDL2)
 endif()
 
@@ -84,7 +76,7 @@ if(WIN32)
     target_sources(harness PRIVATE
         os/windows.c
     )
-    target_link_libraries(harness PRIVATE ws2_32)
+    target_link_libraries(harness PRIVATE dbghelp ws2_32)
 elseif(APPLE)
     target_sources(harness PRIVATE
         os/macos.c

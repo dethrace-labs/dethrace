@@ -5,11 +5,6 @@
 #include "harness/win95_polyfill_defs.h"
 #include <stdio.h>
 
-typedef enum {
-    eFlush_all,
-    eFlush_color_buffer
-} tRenderer_flush_type;
-
 // Platform implementation functions
 typedef struct tHarness_platform {
     // Render a fullscreen quad using the specified pixel data
@@ -38,6 +33,8 @@ typedef struct tHarness_platform {
     uint32_t (*GetTicks)(void);
     // Show error message
     int (*ShowErrorMessage)(void* window, char* text, char* caption);
+
+    void (*SetWindowGeometry)(int width, int height, int real_width, int real_height);
 
 } tHarness_platform;
 

@@ -6,9 +6,9 @@
 #include "harness/trace.h"
 #include "sdl2_scancode_to_dinput.h"
 
-#include "globvars.h"
-#include "grafdata.h"
-#include "pd/sys.h"
+// #include "globvars.h"
+// #include "grafdata.h"
+// #include "pd/sys.h"
 
 SDL_Window* window;
 SDL_Renderer* renderer;
@@ -17,6 +17,8 @@ uint32_t converted_palette[256];
 br_pixelmap* last_screen_src;
 int render_width, render_height;
 int window_width, window_height;
+
+int w, h, real_w, real_h;
 
 Uint32 last_frame_time;
 
@@ -147,10 +149,11 @@ static int get_mouse_position(int* pX, int* pY) {
 #if defined(DETHRACE_FIX_BUGS)
     // In hires mode (640x480), the menus are still rendered at (320x240),
     // so prescale the cursor coordinates accordingly.
-    *pX *= gGraf_specs[gGraf_data_index].phys_width;
-    *pX /= gGraf_specs[gReal_graf_data_index].phys_width;
-    *pY *= gGraf_specs[gGraf_data_index].phys_height;
-    *pY /= gGraf_specs[gReal_graf_data_index].phys_height;
+    // todo:
+    *pX *= w;
+    *pX /= render_width;
+    *pY *= h;
+    *pY /= render_height;
 #endif
     return 0;
 }
@@ -209,6 +212,13 @@ int show_error_message(void* window, char* text, char* caption) {
     return 0;
 }
 
+void set_window_geometry(int width, int height, int real_width, int real_height) {
+    w = width;
+    h = height;
+    real_w = real_width;
+    real_h = real_height;
+}
+
 void Harness_Platform_Init(tHarness_platform* platform) {
     platform->ProcessWindowMessages = get_and_handle_message;
     platform->Sleep = SDL_Delay;
@@ -224,4 +234,5 @@ void Harness_Platform_Init(tHarness_platform* platform) {
     platform->ShowErrorMessage = show_error_message;
     platform->Renderer_SetPalette = set_palette;
     platform->Renderer_Present = present_screen;
+    platform->SetWindowGeometry = set_window_geometry;
 }

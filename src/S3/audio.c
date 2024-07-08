@@ -2,7 +2,7 @@
 #include "resource.h"
 
 #include "3d.h"
-#include "backends/backend.h"
+#include "harness/audio.h"
 #include "harness/config.h"
 #include "harness/os.h"
 #include "harness/trace.h"
@@ -835,7 +835,7 @@ void S3ServiceOutlets(void) {
 
 int S3ServiceChannel(tS3_channel* chan) {
     if (chan->type == eS3_ST_sample) {
-        if (AudioBackend_SoundIsPlaying(chan)) {
+        if (AudioBackend_SoundIsPlaying(chan->type_struct_sample)) {
             return 1;
         }
         S3StopSample(chan);
