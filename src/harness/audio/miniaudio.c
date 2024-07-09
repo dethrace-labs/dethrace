@@ -9,15 +9,16 @@
 #include <stdio.h>
 #include <string.h>
 
+// duplicates DETHRACE/constants.h but is a necessary evil(?)
 static int kMem_S3_DOS_SOS_channel = 234;
 
-typedef struct tS3_sample_struct_miniaudio {
+typedef struct tMiniaudio_sample {
     ma_audio_buffer_ref buffer_ref;
     ma_sound sound;
     int initialized;
-} tS3_sample_struct_miniaudio;
+} tMiniaudio_sample;
 
-typedef struct tAudioBackend_stream_miniaudio {
+typedef struct tMiniaudio_stream {
     int frame_size_in_bytes;
     int sample_rate;
     int needs_converting;
@@ -25,23 +26,22 @@ typedef struct tAudioBackend_stream_miniaudio {
     ma_paged_audio_buffer paged_audio_buffer;
     ma_data_converter data_converter;
     ma_sound sound;
+} tMiniaudio_stream;
 
-} tAudioBackend_stream_miniaudio;
-
-ma_engine miniaudio_engine;
+ma_engine engine;
 
 tAudioBackend_error_code AudioBackend_Init(void) {
     ma_result result;
+    ma_engine_config config;
 
-    ma_engine_config engineConfig;
-    engineConfig = ma_engine_config_init();
-    result = ma_engine_init(&engineConfig, &miniaudio_engine);
+    config = ma_engine_config_init();
+    result = ma_engine_init(&config, &engine);
     if (result != MA_SUCCESS) {
         printf("Failed to initialize audio engine.");
         return eAB_error;
     }
-    LOG_INFO("Playback device: '%s'", miniaudio_engine.pDevice->playback.name);
-    ma_engine_set_volume(&miniaudio_engine, harness_game_config.volume_multiplier);
+    LOG_INFO("Playback device: '%s'", engine.pDevice->playback.name);
+    ma_engine_set_volume(&engine, harness_game_config.volume_multiplier);
     return eAB_success;
 }
 
@@ -50,32 +50,29 @@ tAudioBackend_error_code AudioBackend_InitCDA(void) {
 }
 
 void AudioBackend_UnInit(void) {
-    ma_engine_uninit(&miniaudio_engine);
+    ma_engine_uninit(&engine);
 }
 
 void AudioBackend_UnInitCDA(void) {
 }
 
 void* AudioBackend_AllocateSampleTypeStruct(void) {
-    tS3_sample_struct_miniaudio* sample_struct;
-    sample_struct = BrMemAllocate(sizeof(tS3_sample_struct_miniaudio), kMem_S3_DOS_SOS_channel);
+    tMiniaudio_sample* sample_struct;
+    sample_struct = BrMemAllocate(sizeof(tMiniaudio_sample), kMem_S3_DOS_SOS_channel);
     if (sample_struct == NULL) {
         return 0;
     }
-    memset(sample_struct, 0, sizeof(tS3_sample_struct_miniaudio));
+    memset(sample_struct, 0, sizeof(tMiniaudio_sample));
     return sample_struct;
 }
 
 tAudioBackend_error_code AudioBackend_PlaySample(void* type_struct_sample, int channels, void* data, int size, int rate, int loop) {
-    tS3_sample_struct_miniaudio* miniaudio;
-    // tS3_sample* sample_data;
+    tMiniaudio_sample* miniaudio;
     ma_result result;
     ma_int32 flags;
 
-    miniaudio = (tS3_sample_struct_miniaudio*)type_struct_sample;
+    miniaudio = (tMiniaudio_sample*)type_struct_sample;
     assert(miniaudio != NULL);
-    // sample_data = (tS3_sample*)chan->descriptor->sound_data;
-    // assert(sample_data != NULL);
 
     result = ma_audio_buffer_ref_init(ma_format_u8, channels, data, size / channels, &miniaudio->buffer_ref);
     miniaudio->buffer_ref.sampleRate = rate;
@@ -84,7 +81,7 @@ tAudioBackend_error_code AudioBackend_PlaySample(void* type_struct_sample, int c
     }
 
     flags = MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_NO_SPATIALIZATION;
-    result = ma_sound_init_from_data_source(&miniaudio_engine, &miniaudio->buffer_ref, flags, NULL, &miniaudio->sound);
+    result = ma_sound_init_from_data_source(&engine, &miniaudio->buffer_ref, flags, NULL, &miniaudio->sound);
     if (result != MA_SUCCESS) {
         return eAB_error;
     }
@@ -96,9 +93,9 @@ tAudioBackend_error_code AudioBackend_PlaySample(void* type_struct_sample, int c
 }
 
 int AudioBackend_SoundIsPlaying(void* type_struct_sample) {
-    tS3_sample_struct_miniaudio* miniaudio;
+    tMiniaudio_sample* miniaudio;
 
-    miniaudio = (tS3_sample_struct_miniaudio*)type_struct_sample;
+    miniaudio = (tMiniaudio_sample*)type_struct_sample;
     assert(miniaudio != NULL);
 
     if (ma_sound_is_playing(&miniaudio->sound)) {
@@ -108,10 +105,10 @@ int AudioBackend_SoundIsPlaying(void* type_struct_sample) {
 }
 
 tAudioBackend_error_code AudioBackend_SetVolume(void* type_struct_sample, int volume_db) {
-    tS3_sample_struct_miniaudio* miniaudio;
+    tMiniaudio_sample* miniaudio;
     float linear_volume;
 
-    miniaudio = (tS3_sample_struct_miniaudio*)type_struct_sample;
+    miniaudio = (tMiniaudio_sample*)type_struct_sample;
     assert(miniaudio != NULL);
 
     // convert from directsound -10000 - 0 decibel volume scale
@@ -121,9 +118,9 @@ tAudioBackend_error_code AudioBackend_SetVolume(void* type_struct_sample, int vo
 }
 
 tAudioBackend_error_code AudioBackend_SetPan(void* type_struct_sample, int pan) {
-    tS3_sample_struct_miniaudio* miniaudio;
+    tMiniaudio_sample* miniaudio;
 
-    miniaudio = (tS3_sample_struct_miniaudio*)type_struct_sample;
+    miniaudio = (tMiniaudio_sample*)type_struct_sample;
     assert(miniaudio != NULL);
 
     // convert from directsound -10000 - 10000 pan scale
@@ -132,9 +129,9 @@ tAudioBackend_error_code AudioBackend_SetPan(void* type_struct_sample, int pan) 
 }
 
 tAudioBackend_error_code AudioBackend_SetFrequency(void* type_struct_sample, int original_rate, int new_rate) {
-    tS3_sample_struct_miniaudio* miniaudio;
+    tMiniaudio_sample* miniaudio;
 
-    miniaudio = (tS3_sample_struct_miniaudio*)type_struct_sample;
+    miniaudio = (tMiniaudio_sample*)type_struct_sample;
     assert(miniaudio != NULL);
 
     // convert from directsound frequency to linear pitch scale
@@ -143,9 +140,9 @@ tAudioBackend_error_code AudioBackend_SetFrequency(void* type_struct_sample, int
 }
 
 tAudioBackend_error_code AudioBackend_StopSample(void* type_struct_sample) {
-    tS3_sample_struct_miniaudio* miniaudio;
+    tMiniaudio_sample* miniaudio;
 
-    miniaudio = (tS3_sample_struct_miniaudio*)type_struct_sample;
+    miniaudio = (tMiniaudio_sample*)type_struct_sample;
     assert(miniaudio != NULL);
 
     if (miniaudio->initialized) {
@@ -158,10 +155,10 @@ tAudioBackend_error_code AudioBackend_StopSample(void* type_struct_sample) {
 }
 
 tAudioBackend_stream* AudioBackend_StreamOpen(int bit_depth, int channels, unsigned int sample_rate) {
-    tAudioBackend_stream_miniaudio* new;
+    tMiniaudio_stream* new;
     ma_data_converter_config data_converter_config;
 
-    new = malloc(sizeof(tAudioBackend_stream_miniaudio));
+    new = malloc(sizeof(tMiniaudio_stream));
     new->sample_rate = sample_rate;
     ma_format format;
     switch (bit_depth) {
@@ -196,15 +193,15 @@ tAudioBackend_stream* AudioBackend_StreamOpen(int bit_depth, int channels, unsig
         goto failed;
     }
 
-    if (ma_sound_init_from_data_source(&miniaudio_engine, &new->paged_audio_buffer, MA_SOUND_FLAG_NO_PITCH | MA_SOUND_FLAG_NO_SPATIALIZATION, NULL, &new->sound) != MA_SUCCESS) {
+    if (ma_sound_init_from_data_source(&engine, &new->paged_audio_buffer, MA_SOUND_FLAG_NO_PITCH | MA_SOUND_FLAG_NO_SPATIALIZATION, NULL, &new->sound) != MA_SUCCESS) {
         LOG_WARN("Failed to create sound from data source");
         goto failed;
     }
 
     // allocate and initialize data converter if miniaudio engine and Smack file soundtrack sample rates differ
-    if (ma_engine_get_sample_rate(&miniaudio_engine) != sample_rate) {
+    if (ma_engine_get_sample_rate(&engine) != sample_rate) {
         new->needs_converting = 1;
-        data_converter_config = ma_data_converter_config_init(format, format, channels, channels, sample_rate, ma_engine_get_sample_rate(&miniaudio_engine));
+        data_converter_config = ma_data_converter_config_init(format, format, channels, channels, sample_rate, ma_engine_get_sample_rate(&engine));
         if (ma_data_converter_init(&data_converter_config, NULL, &new->data_converter) != MA_SUCCESS) {
             LOG_WARN("Failed to create sound data converter");
             goto failed;
@@ -218,7 +215,7 @@ failed:
 }
 
 tAudioBackend_error_code AudioBackend_StreamWrite(void* stream_handle, const unsigned char* data, unsigned long size) {
-    tAudioBackend_stream_miniaudio* stream = stream_handle;
+    tMiniaudio_stream* stream = stream_handle;
     ma_uint64 nb_frames_in;
     ma_uint64 nb_frames_out;
     ma_uint64 current_pos;
@@ -232,7 +229,7 @@ tAudioBackend_error_code AudioBackend_StreamWrite(void* stream_handle, const uns
     // do we need to convert the sample frequency?
     if (stream->needs_converting) {
         nb_frames_in = size / stream->frame_size_in_bytes;
-        nb_frames_out = nb_frames_in * ma_engine_get_sample_rate(&miniaudio_engine) / stream->sample_rate;
+        nb_frames_out = nb_frames_in * ma_engine_get_sample_rate(&engine) / stream->sample_rate;
 
         if (ma_paged_audio_buffer_data_allocate_page(&stream->paged_audio_buffer_data, nb_frames_out, NULL, NULL, &new_page) != MA_SUCCESS) {
             LOG_WARN("ma_paged_audio_buffer_data_allocate_page failed");
@@ -269,7 +266,7 @@ tAudioBackend_error_code AudioBackend_StreamWrite(void* stream_handle, const uns
 }
 
 tAudioBackend_error_code AudioBackend_StreamClose(tAudioBackend_stream* stream_handle) {
-    tAudioBackend_stream_miniaudio* stream = stream_handle;
+    tMiniaudio_stream* stream = stream_handle;
     if (stream->needs_converting) {
         ma_data_converter_uninit(&stream->data_converter, NULL);
     }

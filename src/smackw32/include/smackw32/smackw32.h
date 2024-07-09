@@ -1,3 +1,4 @@
+#include "harness/audio.h"
 #include <stddef.h>
 #include <stdint.h>
 
@@ -44,14 +45,7 @@ typedef struct SmackTag {
 
     // added by dethrace
     void* smk_handle; // opaque pointer to the libsmacker instance
-    int audio_sample_rate;
-    int audio_frame_size_in_bytes; // TODO: consider using SndSize for storage instead?
-    void* audio_paged_buffer;      // opaque pointer to a miniaudio ma_paged_audio_buffer struct
-    void* audio_paged_buffer_data; // opaque pointer to a miniaudio ma_paged_audio_buffer_data struct
-    void* audio_converter;         // opaque pointerto a miniaudio ma_data_converter struct
-    void* audio_track;             // opaque pointer to a miniaudio ma_sound struct
-
-    void* audio_stream;
+    tAudioBackend_stream* audio_stream;
 } Smack;
 
 Smack* SmackOpen(const char* name, uint32_t flags, uint32_t extrabuf);

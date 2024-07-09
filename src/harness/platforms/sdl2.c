@@ -6,10 +6,6 @@
 #include "harness/trace.h"
 #include "sdl2_scancode_to_dinput.h"
 
-// #include "globvars.h"
-// #include "grafdata.h"
-// #include "pd/sys.h"
-
 SDL_Window* window;
 SDL_Renderer* renderer;
 SDL_Texture* screen_texture;

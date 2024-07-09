@@ -1,4 +1,4 @@
-#include "include/smackw32/smackw32.h"
+#include "smackw32/smackw32.h"
 
 #include <assert.h>
 #include <stddef.h>
@@ -6,7 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "harness/audio.h"
 #include "harness/hooks.h"
 #include "harness/trace.h"
 
@@ -50,68 +49,7 @@ Smack* SmackOpen(const char* name, uint32_t flags, uint32_t extrabuf) {
 
     // get info about the audio tracks in this video
     smk_info_audio(smk_handle, &track_mask_smk, channels_smk, bitdepth_smk, sample_rate_smk);
-    // if (!(track_mask_smk & SMK_AUDIO_TRACK_0)) {
-    //     LOG_INFO("Smacker file does not contain audio");
-    //     goto no_audio;
-    // }
-    // smack->audio_sample_rate = sample_rate_smk[0];
-    // switch (bitdepth_smk[0]) {
-    // case 8:
-    //     audioformat_ma = ma_format_u8;
-    //     smack->audio_frame_size_in_bytes = 1 * channels_smk[0];
-    //     break;
-    // case 16:
-    //     audioformat_ma = ma_format_s16;
-    //     smack->audio_frame_size_in_bytes = 2 * channels_smk[0];
-    //     break;
-    // case 24:
-    //     audioformat_ma = ma_format_s24;
-    //     smack->audio_frame_size_in_bytes = 3 * channels_smk[0];
-    //     break;
-    // case 32:
-    //     audioformat_ma = ma_format_s32;
-    //     smack->audio_frame_size_in_bytes = 4 * channels_smk[0];
-    //     break;
-    // default:
-    //     LOG_WARN("Smacker audio stream has invalid bit depth: %d", bitdepth_smk[0]);
-    //     goto no_audio;
-    // }
 
-    // // allocate and initialize paged buffer data
-    // smack->audio_paged_buffer_data = malloc(sizeof(ma_paged_audio_buffer_data));
-
-    // if ((smack->audio_frame_size_in_bytes == 0) || (ma_paged_audio_buffer_data_init(audioformat_ma, channels_smk[0], smack->audio_paged_buffer_data) != MA_SUCCESS)) {
-    //     LOG_WARN("Failed to create paged audio buffer data");
-    //     goto no_audio;
-    // }
-
-    // // allocate and initialize paged buffer
-    // smack->audio_paged_buffer = malloc(sizeof(ma_paged_audio_buffer));
-
-    // paged_audio_buffer_config = ma_paged_audio_buffer_config_init(smack->audio_paged_buffer_data);
-    // if (ma_paged_audio_buffer_init(&paged_audio_buffer_config, smack->audio_paged_buffer) != MA_SUCCESS) {
-    //     LOG_WARN("Failed to create paged audio buffer for smacker audio stream");
-    //     goto no_audio;
-    // }
-
-    // // allocate and initialize sound
-    // smack->audio_track = malloc(sizeof(ma_sound));
-
-    // if (ma_sound_init_from_data_source(&miniaudio_engine, smack->audio_paged_buffer, MA_SOUND_FLAG_NO_PITCH | MA_SOUND_FLAG_NO_SPATIALIZATION, NULL, smack->audio_track) != MA_SUCCESS) {
-    //     LOG_WARN("Failed to create sound from data source");
-    //     goto no_audio;
-    // }
-
-    // // allocate and initialize data converter if miniaudio engine and Smack file soundtrack sample rates differ
-    // if (ma_engine_get_sample_rate(&miniaudio_engine) != sample_rate_smk[0]) {
-    //     smack->audio_converter = malloc(sizeof(ma_data_converter));
-
-    //     data_converter_config = ma_data_converter_config_init(audioformat_ma, audioformat_ma, channels_smk[0], channels_smk[0], smack->audio_sample_rate, ma_engine_get_sample_rate(&miniaudio_engine));
-    //     if (ma_data_converter_init(&data_converter_config, NULL, smack->audio_converter) != MA_SUCCESS) {
-    //         LOG_WARN("Failed to create sound data converter");
-    //         goto no_audio;
-    //     }
-    // }
     if ((track_mask_smk & SMK_AUDIO_TRACK_0)) {
         smack->audio_stream = AudioBackend_StreamOpen(bitdepth_smk[0], channels_smk[0], sample_rate_smk[0]);
         if (smack->audio_stream != NULL) {
@@ -131,14 +69,6 @@ Smack* SmackOpen(const char* name, uint32_t flags, uint32_t extrabuf) {
 }
 
 int SmackSoundUseDirectSound(void* dd) {
-    // ma_result result;
-    // ma_engine_config engineConfig;
-    // engineConfig = ma_engine_config_init();
-    // // engineConfig.sampleRate = 22050;
-    // result = ma_engine_init(&engineConfig, &miniaudio_engine);
-    // if (result != MA_SUCCESS) {
-    //     LOG_PANIC("Failed to initialize miniaudio");
-    // }
     return 0;
 }
 

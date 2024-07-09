@@ -1,6 +1,6 @@
 
-#ifndef BACKEND_H
-#define BACKEND_H
+#ifndef HARNESS_AUDIO_H
+#define HARNESS_AUDIO_H
 
 typedef enum tAudioBackend_error_code {
     eAB_success = 0,
