@@ -34,8 +34,6 @@ typedef struct tHarness_platform {
     // Show error message
     int (*ShowErrorMessage)(void* window, char* text, char* caption);
 
-    void (*SetWindowGeometry)(int width, int height, int real_width, int real_height);
-
 } tHarness_platform;
 
 extern tHarness_platform gHarness_platform;

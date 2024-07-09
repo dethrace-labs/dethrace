@@ -23,8 +23,8 @@ tAudioBackend_error_code AudioBackend_SetPan(void* type_struct_sample, int pan);
 tAudioBackend_error_code AudioBackend_SetFrequency(void* type_struct_sample, int original_rate, int new_rate);
 
 // Used by smackw32
-tAudioBackend_stream* AudioBackend_StreamOpen(int bitdepth, int channels, int sample_rate);
-tAudioBackend_error_code AudioBackend_StreamWrite(tAudioBackend_stream* stream_handle, unsigned char* data, unsigned long size);
+tAudioBackend_stream* AudioBackend_StreamOpen(int bitdepth, int channels, unsigned int sample_rate);
+tAudioBackend_error_code AudioBackend_StreamWrite(tAudioBackend_stream* stream_handle, const unsigned char* data, unsigned long size);
 tAudioBackend_error_code AudioBackend_StreamClose(tAudioBackend_stream* stream_handle);
 
 #endif

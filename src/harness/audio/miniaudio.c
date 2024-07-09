@@ -157,7 +157,7 @@ tAudioBackend_error_code AudioBackend_StopSample(void* type_struct_sample) {
     return eAB_success;
 }
 
-tAudioBackend_stream* AudioBackend_StreamOpen(int bit_depth, int channels, int sample_rate) {
+tAudioBackend_stream* AudioBackend_StreamOpen(int bit_depth, int channels, unsigned int sample_rate) {
     tAudioBackend_stream_miniaudio* new;
     ma_data_converter_config data_converter_config;
 
@@ -217,7 +217,7 @@ failed:
     return NULL;
 }
 
-tAudioBackend_error_code AudioBackend_StreamWrite(void* stream_handle, unsigned char* data, unsigned long size) {
+tAudioBackend_error_code AudioBackend_StreamWrite(void* stream_handle, const unsigned char* data, unsigned long size) {
     tAudioBackend_stream_miniaudio* stream = stream_handle;
     ma_uint64 nb_frames_in;
     ma_uint64 nb_frames_out;
