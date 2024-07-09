@@ -12,6 +12,7 @@
 #include "input.h"
 #include "loading.h"
 #include "loadsave.h"
+#include "main.h"
 #include "mainmenu.h"
 #include "network.h"
 #include "pd/sys.h"
@@ -44,18 +45,22 @@ br_pixelmap* gSource_for_16bit_palette;
 int CheckQuit(void) {
     LOG_TRACE8("()");
 
-    if (!gIn_check_quit && KeyIsDown(KEYMAP_CTRL_QUIT) && KeyIsDown(KEYMAP_CONTROL_ANY)) {
-        gIn_check_quit = 1;
-        while (AnyKeyDown()) {
-            ;
-        }
-
-        if (DoVerifyQuit(1)) {
-            DoSaveGame(1);
-        }
-        gIn_check_quit = 0;
+    if (gIn_check_quit) {
+        return 0;
     }
-    return 0;
+    if (!KeyIsDown(KEYMAP_CTRL_QUIT) || !KeyIsDown(KEYMAP_CONTROL_ANY)) {
+        return 0;
+    }
+    gIn_check_quit = 1;
+    while (AnyKeyDown()) {
+        ;
+    }
+
+    if (DoVerifyQuit(1)) {
+        QuitGame();
+    }
+    gIn_check_quit = 0;
+    return 1;
 }
 
 // IDA: double __cdecl sqr(double pN)
