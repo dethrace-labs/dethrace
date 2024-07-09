@@ -4,7 +4,6 @@
 #include "include/harness/hooks.h"
 #include "include/harness/os.h"
 #include "platforms/null.h"
-#include "sound/sound.h"
 #include "version.h"
 
 #include <errno.h>

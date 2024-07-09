@@ -1,3 +1,4 @@
+#include "harness/audio.h"
 #include <stddef.h>
 #include <stdint.h>
 
@@ -43,7 +44,8 @@ typedef struct SmackTag {
     unsigned long addr32;
 
     // added by dethrace
-    void* smk_handle;
+    void* smk_handle; // opaque pointer to the libsmacker instance
+    tAudioBackend_stream* audio_stream;
 } Smack;
 
 Smack* SmackOpen(const char* name, uint32_t flags, uint32_t extrabuf);

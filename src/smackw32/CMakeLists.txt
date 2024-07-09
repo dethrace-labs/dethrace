@@ -1,10 +1,10 @@
 add_library(smackw32 STATIC)
 
-target_include_directories(smackw32 
+target_include_directories(smackw32
     PUBLIC
         include
     PRIVATE
-        ${CMAKE_SOURCE_DIR}      
+        ${CMAKE_SOURCE_DIR}
 )
 
 target_link_libraries(smackw32 PRIVATE harness brender libsmacker compile_with_werror)

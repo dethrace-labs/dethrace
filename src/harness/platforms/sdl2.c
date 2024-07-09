@@ -6,25 +6,18 @@
 #include "harness/trace.h"
 #include "sdl2_scancode_to_dinput.h"
 
-#include "globvars.h"
-#include "grafdata.h"
-#include "pd/sys.h"
-
 SDL_Window* window;
 SDL_Renderer* renderer;
 SDL_Texture* screen_texture;
 uint32_t converted_palette[256];
 br_pixelmap* last_screen_src;
 int render_width, render_height;
-int window_width, window_height;
 
 Uint32 last_frame_time;
 
 uint8_t directinput_key_state[SDL_NUM_SCANCODES];
 
 static void* create_window_and_renderer(char* title, int x, int y, int width, int height) {
-    window_width = width;
-    window_height = height;
     render_width = width;
     render_height = height;
 
@@ -142,16 +135,20 @@ static int get_mouse_buttons(int* pButton1, int* pButton2) {
 }
 
 static int get_mouse_position(int* pX, int* pY) {
+    float lX, lY;
     SDL_GetMouseState(pX, pY);
+    SDL_RenderWindowToLogical(renderer, *pX, *pY, &lX, &lY);
 
 #if defined(DETHRACE_FIX_BUGS)
     // In hires mode (640x480), the menus are still rendered at (320x240),
     // so prescale the cursor coordinates accordingly.
-    *pX *= gGraf_specs[gGraf_data_index].phys_width;
-    *pX /= gGraf_specs[gReal_graf_data_index].phys_width;
-    *pY *= gGraf_specs[gGraf_data_index].phys_height;
-    *pY /= gGraf_specs[gReal_graf_data_index].phys_height;
+    lX *= 320;
+    lX /= render_width;
+    lY *= 200;
+    lY /= render_height;
 #endif
+    *pX = (int)lX;
+    *pY = (int)lY;
     return 0;
 }
 

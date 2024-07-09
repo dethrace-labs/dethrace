@@ -1,6 +1,6 @@
 #include "s3sound.h"
 #include "audio.h"
-#include "backends/backend.h"
+#include "harness/audio.h"
 #include "harness/hooks.h"
 #include "harness/trace.h"
 #include "resource.h"
@@ -259,7 +259,7 @@ int S3StopSample(tS3_channel* chan) {
         return 0;
     }
 
-    AudioBackend_StopSample(chan);
+    AudioBackend_StopSample(chan->type_struct_sample);
 
     if (chan->active) {
         chan->needs_service = 1;
@@ -280,6 +280,7 @@ int S3ExecuteSampleFilterFuncs(tS3_channel* chan) {
 }
 
 int S3PlaySample(tS3_channel* chan) {
+    tS3_sample* sound_data;
 
     if (chan->type_struct_sample == NULL) {
         return 0;
@@ -288,7 +289,14 @@ int S3PlaySample(tS3_channel* chan) {
     S3SyncSampleVolumeAndPan(chan);
     S3SyncSampleRate(chan);
 
-    if (AudioBackend_PlaySample(chan) != eAB_success) {
+    sound_data = (tS3_sample*)chan->descriptor->sound_data;
+    if (AudioBackend_PlaySample(chan->type_struct_sample,
+            sound_data->channels,
+            sound_data->dataptr,
+            sound_data->size,
+            sound_data->rate,
+            chan->repetitions == 0)
+        != eAB_success) {
         return 0;
     }
     // if (chan->descriptor && chan->descriptor->type == chan->type) {
@@ -359,7 +367,7 @@ int S3SyncSampleVolumeAndPan(tS3_channel* chan) {
             volume_db = 0;
         }
 
-        if (AudioBackend_SetVolume(chan, volume_db) == eAB_success && chan->spatial_sound) {
+        if (AudioBackend_SetVolume(chan->type_struct_sample, volume_db) == eAB_success && chan->spatial_sound) {
 
             if (chan->left_volume != 0 && chan->right_volume > chan->left_volume) {
                 pan_ratio = chan->right_volume / (float)chan->left_volume;
@@ -375,24 +383,29 @@ int S3SyncSampleVolumeAndPan(tS3_channel* chan) {
             } else {
                 pan = 10000;
             }
-            AudioBackend_SetPan(chan, pan);
+            AudioBackend_SetPan(chan->type_struct_sample, pan);
         }
     }
     return 1;
 }
 
 int S3SyncSampleRate(tS3_channel* chan) {
+    int new_rate;
+    tS3_sample* sound_data;
+
     if (chan->type != eS3_ST_sample) {
         return 1;
     }
 
-    int rate = chan->rate;
-    if (rate >= 100000) {
-        rate = 100000;
+    new_rate = chan->rate;
+    if (new_rate >= 100000) {
+        new_rate = 100000;
     }
 
+    sound_data = (tS3_sample*)chan->descriptor->sound_data;
+
     // sound_buffer->lpVtbl->SetFrequency(sound_buffer, rate);
-    AudioBackend_SetFrequency(chan, rate);
+    AudioBackend_SetFrequency(chan->type_struct_sample, sound_data->rate, new_rate);
 
     return 1;
 }
