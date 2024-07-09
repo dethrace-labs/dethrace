@@ -10,11 +10,12 @@ target_include_directories(dethrace_obj
         pd
 )
 
-# add_compile_options(-fsanitize=address)
-# add_link_options(-fsanitize=address)
+if (DETHRACE_ASAN)
+    target_compile_options(dethrace_obj PUBLIC -fsanitize=address)
+    target_link_options(dethrace_obj PUBLIC -fsanitize=address)
+endif()
 
 target_link_libraries(dethrace_obj PUBLIC SDL2::SDL2 smackw32 harness BRender::Full BRender::DDI s3)
-
 
 if(MSVC)
     target_compile_definitions(dethrace_obj PRIVATE -D_CRT_SECURE_NO_WARNINGS)

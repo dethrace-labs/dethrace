@@ -2769,13 +2769,10 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
     br_matrix34 message_mat;
     LOG_TRACE("(%p, %f)", c, dt);
 
-    tCar_spec* car_spec; // added for readability
-
     // v34 = 0;
     // v35 = 0;
     // v36 = 0x3F800000;
     // v48 = 0x3F800347;
-    car_spec = (tCar_spec*)c;
     mat = &c->car_master_actor->t.t.mat;
     oldmat = &c->oldmat;
     k = 0;
@@ -3040,7 +3037,7 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
                     BrVector3Set(&normal_force, 0.f, 0.f, 0.f);
                     BrVector3Set(&c->omega, 0.f, 0.f, 0.f);
                     BrVector3Set(&c->oldomega, 0.f, 0.f, 0.f);
-                    if (c->driver <= eDriver_non_car || car_spec->max_force_rear == 0.0f) {
+                    if (c->driver <= eDriver_non_car || CAR(c)->max_force_rear == 0.0f) {
                         if (c->driver <= eDriver_non_car) {
                             PipeSingleNonCar(c);
                         }
@@ -3060,17 +3057,23 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
             }
             BrVector3Accumulate(&c->v, &norm);
             if (c->driver >= eDriver_net_human) {
-                BrVector3Scale(&normal_force, &normal_force, gDefensive_powerup_factor[car_spec->power_up_levels[0]]);
+                BrVector3Scale(&normal_force, &normal_force, gDefensive_powerup_factor[CAR(c)->power_up_levels[0]]);
             }
             if (c->driver < eDriver_net_human) {
                 BrVector3Scale(&normal_force, &normal_force, 0.01f);
             } else {
                 BrVector3Scale(&normal_force, &normal_force, 0.75f);
             }
-            if (CAR(c)->invulnerable
-                || (c->driver < eDriver_net_human && (c->driver != eDriver_oppo || PointOutOfSight(&c->pos, 150.0f)))
-                || ((v_diff = (car_spec->pre_car_col_velocity.v[1] - c->v.v[1]) * gDefensive_powerup_factor[car_spec->power_up_levels[0]]) >= -20.0f)
-                || CAR(c)->number_of_wheels_on_ground >= 3) {
+            if (
+#if defined(DETHRACE_FIX_BUGS)
+                // `c` is only a `tCar_spec*` if the driver is an opponent or human, otherwise, it will be a `tNon_car_spec*`. The following code
+                // assumes `c` is a `tCar_spec*`, causing invalid memory accesses
+                c->driver >= eDriver_oppo &&
+#endif
+                (CAR(c)->invulnerable
+                    || (c->driver < eDriver_net_human && (c->driver != eDriver_oppo || PointOutOfSight(&c->pos, 150.0f)))
+                    || ((v_diff = (CAR(c)->pre_car_col_velocity.v[1] - c->v.v[1]) * gDefensive_powerup_factor[CAR(c)->power_up_levels[0]]) >= -20.0f)
+                    || CAR(c)->number_of_wheels_on_ground >= 3)) {
                 CrushAndDamageCar(CAR(c), &dir, &normal_force, NULL);
             } else {
                 // Cops Special Forces is always stolen if destroyed!
@@ -3079,12 +3082,19 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
                     StealCar(CAR(c));
                     v_diff = v_diff * 5.0f;
                 }
-                for (i = 0; i < CAR(c)->car_actor_count; i++) {
-                    ts2 = (v_diff + 20.0f) * -0.01f;
-                    TotallySpamTheModel(CAR(c), i, CAR(c)->car_model_actors[i].actor, &CAR(c)->car_model_actors[i].crush_data, ts2);
-                }
-                for (i = 0; i < COUNT_OF(CAR(c)->damage_units); i++) {
-                    DamageUnit(CAR(c), i, IRandomPosNeg(5) + (v_diff + 20.0f) * -1.5f);
+#if defined(DETHRACE_FIX_BUGS)
+                // `c` is only a `tCar_spec*` if the driver is an opponent or human, otherwise, it will be a `tNon_car_spec*`. The following code
+                // assumes `c` is a `tCar_spec*`, causing invalid memory accesses
+                if (c->driver >= eDriver_oppo)
+#endif
+                {
+                    for (i = 0; i < CAR(c)->car_actor_count; i++) {
+                        ts2 = (v_diff + 20.0f) * -0.01f;
+                        TotallySpamTheModel(CAR(c), i, CAR(c)->car_model_actors[i].actor, &CAR(c)->car_model_actors[i].crush_data, ts2);
+                    }
+                    for (i = 0; i < COUNT_OF(CAR(c)->damage_units); i++) {
+                        DamageUnit(CAR(c), i, IRandomPosNeg(5) + (v_diff + 20.0f) * -1.5f);
+                    }
                 }
             }
             if (!noise_defeat) {
@@ -3094,7 +3104,7 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
             BrVector3InvScale(&tv, &tv, WORLD_SCALE);
             BrMatrix34ApplyV(&bb, &tv, &c->car_master_actor->t.t.mat);
             BrMatrix34ApplyV(&norm, &p_vel, &c->car_master_actor->t.t.mat);
-            CreateSparks(&pos, &bb, &norm, gCurrent_race.material_modifiers[gMaterial_index].sparkiness, car_spec);
+            CreateSparks(&pos, &bb, &norm, gCurrent_race.material_modifiers[gMaterial_index].sparkiness, CAR(c));
         }
         return k;
     } else {

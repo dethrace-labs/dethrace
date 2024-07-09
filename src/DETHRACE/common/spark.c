@@ -2491,6 +2491,13 @@ void MungeSplash(tU32 pTime) {
     if (!gAction_replay_mode || GetReplayRate() == 0.0) {
         if (!gAction_replay_mode) {
             for (i = 0; i < gNum_cars_and_non_cars; i++) {
+#if defined(DETHRACE_FIX_BUGS)
+                // CreateSpash assumes a `tCar_spec*` argument. In the case a non-car is pushed into the water, a `tNon_car_spec*` is passed,
+                // causing invalid memory accesses
+                if (gActive_car_list[i]->driver < eDriver_oppo) {
+                    continue;
+                }
+#endif
                 if (gActive_car_list[i]->water_d != 10000.0 && gActive_car_list[i]->driver != eDriver_local_human) {
                     CreateSplash(gActive_car_list[i], pTime);
                 }
@@ -2516,7 +2523,7 @@ void MungeSplash(tU32 pTime) {
             }
         }
         if (gProgram_state.current_car.water_d != 10000.0) {
-            CreateSplash(&gProgram_state.current_car, 0x64u);
+            CreateSplash(&gProgram_state.current_car, 100);
         }
     }
     if (!gSplash_flags) {
