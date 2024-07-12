@@ -4,6 +4,7 @@
 #include "brender.h"
 #include "s3_defs.h"
 
+extern tS3_outlet* gS3_outlets;
 extern int gS3_enabled;
 extern int gS3_last_error;
 extern tS3_channel gS3_channel_template;

@@ -1,4 +1,4 @@
-#include "audio.h"
+#include "s3.h"
 #include "resource.h"
 
 #include "3d.h"

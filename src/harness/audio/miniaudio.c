@@ -1,10 +1,22 @@
 // Disable miniaudio's 'null' device fallback. A proper device must be found to enable playback
 #define MA_NO_NULL
 
-#include "miniaudio/miniaudio.h"
 #include "harness/audio.h"
 #include "harness/config.h"
+#include "harness/os.h"
 #include "harness/trace.h"
+
+// Must come before miniaudio.h
+#define STB_VORBIS_HEADER_ONLY
+#include "stb/stb_vorbis.c"
+
+#define MINIAUDIO_IMPLEMENTATION
+#include "miniaudio/miniaudio.h"
+
+// Must come after miniaudio.h
+#undef STB_VORBIS_HEADER_ONLY
+#include "stb/stb_vorbis.c"
+
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
@@ -29,6 +41,7 @@ typedef struct tMiniaudio_stream {
 } tMiniaudio_stream;
 
 ma_engine engine;
+ma_sound cda_sound;
 
 tAudioBackend_error_code AudioBackend_Init(void) {
     ma_result result;
@@ -42,11 +55,16 @@ tAudioBackend_error_code AudioBackend_Init(void) {
     }
     LOG_INFO("Playback device: '%s'", engine.pDevice->playback.name);
     ma_engine_set_volume(&engine, harness_game_config.volume_multiplier);
+
     return eAB_success;
 }
 
 tAudioBackend_error_code AudioBackend_InitCDA(void) {
-    return eAB_error;
+    // check if music files are present or not
+    if (access("MUSIC/Track02.ogg", F_OK) == -1) {
+        return eAB_error;
+    }
+    return eAB_success;
 }
 
 void AudioBackend_UnInit(void) {
@@ -54,6 +72,43 @@ void AudioBackend_UnInit(void) {
 }
 
 void AudioBackend_UnInitCDA(void) {
+}
+
+tAudioBackend_error_code AudioBackend_StopCDA(void) {
+    if (ma_sound_is_playing(&cda_sound)) {
+        ma_sound_stop(&cda_sound);
+        ma_sound_uninit(&cda_sound);
+    }
+    return eAB_success;
+}
+
+tAudioBackend_error_code AudioBackend_PlayCDA(int track) {
+    char path[256];
+    ma_result result;
+
+    sprintf(path, "MUSIC/Track0%d.ogg", track);
+
+    if (access(path, F_OK) == -1) {
+        return eAB_error;
+    }
+    result = ma_sound_init_from_file(&engine, path, 0, NULL, NULL, &cda_sound);
+    if (result != MA_SUCCESS) {
+        return eAB_error;
+    }
+    result = ma_sound_start(&cda_sound);
+    if (result != MA_SUCCESS) {
+        return eAB_error;
+    }
+    return eAB_success;
+}
+
+int AudioBackend_CDAIsPlaying(void) {
+    return ma_sound_is_playing(&cda_sound);
+}
+
+tAudioBackend_error_code AudioBackend_SetCDAVolume(int volume) {
+    ma_sound_set_volume(&cda_sound, volume / 255.0f);
+    return eAB_success;
 }
 
 void* AudioBackend_AllocateSampleTypeStruct(void) {

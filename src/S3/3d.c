@@ -1,7 +1,7 @@
 #include "3d.h"
-#include "audio.h"
 #include "harness/trace.h"
 #include "resource.h"
+#include "s3.h"
 #include "s3sound.h"
 #include <math.h>
 #include <stdio.h>

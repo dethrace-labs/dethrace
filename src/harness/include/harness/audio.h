@@ -22,6 +22,11 @@ tAudioBackend_error_code AudioBackend_SetVolume(void* type_struct_sample, int vo
 tAudioBackend_error_code AudioBackend_SetPan(void* type_struct_sample, int pan);
 tAudioBackend_error_code AudioBackend_SetFrequency(void* type_struct_sample, int original_rate, int new_rate);
 
+tAudioBackend_error_code AudioBackend_PlayCDA(int track);
+tAudioBackend_error_code AudioBackend_StopCDA(void);
+int AudioBackend_CDAIsPlaying(void);
+tAudioBackend_error_code AudioBackend_SetCDAVolume(int volume);
+
 // Used by smackw32
 tAudioBackend_stream* AudioBackend_StreamOpen(int bitdepth, int channels, unsigned int sample_rate);
 tAudioBackend_error_code AudioBackend_StreamWrite(tAudioBackend_stream* stream_handle, const unsigned char* data, unsigned long size);

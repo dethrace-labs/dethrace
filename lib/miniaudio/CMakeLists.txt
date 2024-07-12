@@ -1,20 +1,6 @@
-add_library(miniaudio STATIC)
+add_library(miniaudio INTERFACE)
 
-target_include_directories(miniaudio 
-    PUBLIC
+target_include_directories(miniaudio
+    INTERFACE
         include
-    PRIVATE
-        include/miniaudio
-        
 )
-
-target_sources(miniaudio PRIVATE
-    miniaudio.c
-    
-)
-
-if (CMAKE_C_COMPILER_ID MATCHES "Clang")
-    target_compile_options(miniaudio PRIVATE
-        -Wno-deprecated-declarations
-    )
-endif()

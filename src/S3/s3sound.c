@@ -1,9 +1,9 @@
 #include "s3sound.h"
-#include "audio.h"
 #include "harness/audio.h"
 #include "harness/hooks.h"
 #include "harness/trace.h"
 #include "resource.h"
+#include "s3.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
