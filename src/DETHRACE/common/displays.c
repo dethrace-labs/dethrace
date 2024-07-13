@@ -476,7 +476,7 @@ void DoHeadups(tU32 pThe_time) {
                                 0,
                                 the_headup->data.fancy_info.image->width,
                                 the_headup->data.fancy_info.image->height,
-                                -65536);
+                                -BrIntToFixed(1));
                             break;
                         case eFancy_stage_halting:
                             time_factor = 1000 * (pThe_time - the_headup->data.fancy_info.start_time) / 100;
@@ -495,7 +495,7 @@ void DoHeadups(tU32 pThe_time) {
                                     0,
                                     the_headup->data.image_info.image->width,
                                     the_headup->data.image_info.image->height,
-                                    (((1500 - time_factor) * the_headup->data.fancy_info.shear_amount / 500) << 16)
+                                    BrIntToFixed((1500 - time_factor) * the_headup->data.fancy_info.shear_amount / 500)
                                         / the_headup->data.image_info.image->height);
                             } else {
 #if DETHRACE_FIX_BUGS
@@ -510,7 +510,7 @@ void DoHeadups(tU32 pThe_time) {
                                     0,
                                     the_headup->data.image_info.image->width,
                                     the_headup->data.image_info.image->height,
-                                    ((the_headup->data.fancy_info.shear_amount * (time_factor - 500) / 500) << 16)
+                                    BrIntToFixed(the_headup->data.fancy_info.shear_amount * (time_factor - 500) / 500)
                                         / the_headup->data.image_info.image->height);
                             }
                             break;
@@ -546,8 +546,8 @@ void DoHeadups(tU32 pThe_time) {
                                 0,
                                 the_headup->data.image_info.image->width,
                                 the_headup->data.image_info.image->height,
-                                -(((time_factor * the_headup->data.fancy_info.shear_amount / 1000) << 16)
-                                    / the_headup->data.image_info.image->height));
+                                -BrIntToFixed(time_factor * the_headup->data.fancy_info.shear_amount / 1000)
+                                    / the_headup->data.image_info.image->height);
                             break;
                         case eFancy_stage_leaving:
                             the_headup->data.fancy_info.offset -= 500 * gFrame_period / 1000;
@@ -563,7 +563,7 @@ void DoHeadups(tU32 pThe_time) {
                                     0,
                                     the_headup->data.image_info.image->width,
                                     the_headup->data.image_info.image->height,
-                                    -65536);
+                                    -BrIntToFixed(1));
                             }
                             break;
                         default:
