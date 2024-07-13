@@ -23,7 +23,6 @@ target_link_libraries(harness PRIVATE brender miniaudio stb compile_with_werror)
 
 if(NOT MSVC)
     target_compile_options(harness PRIVATE
-        -Wall
         -Wextra
         -Wno-unused-parameter
     )
@@ -33,6 +32,7 @@ if(NOT MSVC)
 else()
     target_compile_definitions(harness PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
+
 
 if(IS_BIGENDIAN)
     target_compile_definitions(harness PRIVATE BR_ENDIAN_BIG=1)
