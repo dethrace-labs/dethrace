@@ -151,7 +151,7 @@ void Harness_Init(int* argc, char* argv[]) {
     // no volume multiplier
     harness_game_config.volume_multiplier = 1.0f;
     // start window in windowed mode
-    harness_game_config.start_full_screen = 0;
+    harness_game_config.start_full_screen = 1;
     // Disable gore check emulation
     harness_game_config.gore_check = 0;
     // Disable "Sound Options" menu
@@ -248,7 +248,11 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
             LOG_INFO("Volume multiplier set to %f", harness_game_config.volume_multiplier);
             handled = 1;
         } else if (strcasecmp(argv[i], "--full-screen") == 0) {
+            // option left for backwards compatibility
             harness_game_config.start_full_screen = 1;
+            handled = 1;
+        } else if (strcasecmp(argv[i], "--window") == 0) {
+            harness_game_config.start_full_screen = 0;
             handled = 1;
         } else if (strcasecmp(argv[i], "--gore-check") == 0) {
             harness_game_config.gore_check = 1;
