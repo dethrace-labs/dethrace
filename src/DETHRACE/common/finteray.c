@@ -1285,7 +1285,7 @@ void GetTilingLimits(br_vector2* min, br_vector2* max) {
     for (f = 0; f < gSelected_model->nfaces; f++) {
         if (faces[f].material == gSub_material) {
             for (i = 0; i < 3; i++) {
-                for (j = 0; j < 3; j++) {
+                for (j = 0; j < 2; j++) {
                     if (verts[faces[f].vertices[i]].map.v[j] < min->v[j]) {
                         min->v[j] = verts[faces[f].vertices[i]].map.v[j];
                     }
