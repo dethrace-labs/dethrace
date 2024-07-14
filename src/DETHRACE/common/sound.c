@@ -22,7 +22,7 @@ int gOld_sound_detail_level = -1;
 int gLast_tune = -1;
 int gRandom_MIDI_tunes[3] = { 9500, 9501, 9502 };
 int gRandom_Rockin_MIDI_tunes[3] = { 9500, 9501, 9502 };
-int gRandom_CDA_tunes[7] = { 9600, 9601, 9602, 9603, 9604, 9605, 9606 };
+int gRandom_CDA_tunes[8] = { 9600, 9601, 9602, 9603, 9604, 9605, 9606, 9607 }; /* dethrace: Changed to size 8 */
 int gCDA_is_playing;
 int gServicing_sound;
 int gSong_repeat_count;
