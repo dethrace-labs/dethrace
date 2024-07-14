@@ -10,6 +10,7 @@
 #include "s3cda.h"
 #include "s3music.h"
 #include "s3sound.h"
+#include <assert.h>
 #include <ctype.h>
 #include <errno.h>
 #include <math.h>
@@ -1203,6 +1204,8 @@ char* S3GetCurrentDir(void) {
 
 tS3_descriptor* S3GetDescriptorByID(tS3_sound_tag id) {
     tS3_descriptor* d; // [esp+Ch] [ebp-4h]
+
+    assert(id != 0);
 
     for (d = gS3_descriptors;; d = d->next) {
         if (!d) {
