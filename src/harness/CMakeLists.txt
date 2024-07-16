@@ -19,7 +19,7 @@ if(DETHRACE_FIX_BUGS)
     target_compile_definitions(harness PRIVATE DETHRACE_FIX_BUGS)
 endif()
 
-target_link_libraries(harness PRIVATE brender miniaudio stb)
+target_link_libraries(harness PRIVATE brender miniaudio stb compile_with_werror)
 
 if(NOT MSVC)
     target_compile_options(harness PRIVATE
@@ -33,7 +33,6 @@ if(NOT MSVC)
 else()
     target_compile_definitions(harness PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
-
 
 if(IS_BIGENDIAN)
     target_compile_definitions(harness PRIVATE BR_ENDIAN_BIG=1)

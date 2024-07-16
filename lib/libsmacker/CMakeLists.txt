@@ -10,8 +10,9 @@ project(libsmacker C)
 
 add_library(libsmacker STATIC)
 
-target_include_directories(libsmacker PUBLIC
-    .
+target_include_directories(libsmacker
+    SYSTEM PUBLIC
+        .
 )
 
 if(NOT MSVC)
