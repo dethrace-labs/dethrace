@@ -116,7 +116,7 @@ void SoundOptionsStart(void) {
     DrawDial(0, 0);
     DrawDial(1, 0);
     MoveDialFromTo(0, 0, 4 * gProgram_state.music_volume);
-    MoveDialFromTo(1, 0, 4 * gProgram_state.music_volume);
+    MoveDialFromTo(1, 0, 4 * gProgram_state.effects_volume);
 }
 
 // IDA: int __usercall SoundOptionsDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)

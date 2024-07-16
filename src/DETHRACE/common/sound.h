@@ -9,7 +9,7 @@ extern int gOld_sound_detail_level;
 extern int gLast_tune;
 extern int gRandom_MIDI_tunes[3];
 extern int gRandom_Rockin_MIDI_tunes[3];
-extern int gRandom_CDA_tunes[7];
+extern int gRandom_CDA_tunes[8];
 extern int gCDA_is_playing;
 extern int gServicing_sound;
 extern int gSong_repeat_count;

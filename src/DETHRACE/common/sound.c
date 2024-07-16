@@ -16,13 +16,13 @@
 #include "s3/s3_brender.h"
 #include "utility.h"
 
-int gSound_detail_level;
+int gSound_detail_level = 1;
 int gVirgin_pass = 1;
 int gOld_sound_detail_level = -1;
-int gLast_tune;
-int gRandom_MIDI_tunes[3];
-int gRandom_Rockin_MIDI_tunes[3];
-int gRandom_CDA_tunes[7];
+int gLast_tune = -1;
+int gRandom_MIDI_tunes[3] = { 9500, 9501, 9502 };
+int gRandom_Rockin_MIDI_tunes[3] = { 9500, 9501, 9502 };
+int gRandom_CDA_tunes[8] = { 9600, 9601, 9602, 9603, 9604, 9605, 9606, 9607 }; /* dethrace: Changed to size 8 */
 int gCDA_is_playing;
 int gServicing_sound;
 int gSong_repeat_count;
@@ -394,7 +394,7 @@ void SoundService(void) {
         gServicing_sound = 1;
         gLast_sound_service = PDGetTotalTime();
         if (gCDA_tag) {
-            if (!S3IsCDAPlaying2()) {
+            if (!S3IsCDAPlaying()) {
                 StopMusic();
                 StartMusic();
             }
@@ -681,19 +681,59 @@ int GetIndexFromOutlet(tS3_outlet_ptr pOutlet) {
 // IDA: int __usercall DRS3StartCDA@<EAX>(tS3_sound_id pCDA_id@<EAX>)
 int DRS3StartCDA(tS3_sound_id pCDA_id) {
     LOG_TRACE("(%d)", pCDA_id);
-    NOT_IMPLEMENTED();
+
+    if (!gCD_is_disabled && gMusic_available) {
+        if (!gCDA_is_playing && !gCDA_tag) {
+            if (S3CDAEnabled()) {
+                S3StopOutletSound(gMusic_outlet);
+                if (gSound_enabled) {
+                    if (gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0) {
+                        S3Service(1, 0);
+                    } else {
+                        S3Service(0, 0);
+                    }
+                    if (pCDA_id == 9999) {
+                        do {
+                            pCDA_id = gRandom_CDA_tunes[IRandomBetween(0, 7)];
+                        } while (pCDA_id == gLast_tune);
+                    }
+                    gLast_tune = pCDA_id;
+                    gCDA_is_playing = DRS3StartSoundNoPiping(gMusic_outlet, pCDA_id);
+                    gCDA_tag = gCDA_is_playing;
+                    if (!gCDA_is_playing) {
+                        gCD_is_disabled = 1;
+                        S3DisableCDA();
+                    }
+                    gSong_repeat_count = 0;
+                }
+            }
+        }
+    }
+    return gCDA_tag;
 }
 
 // IDA: int __cdecl DRS3StopCDA()
 int DRS3StopCDA(void) {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gMusic_available && gCDA_tag != 0) {
+        S3StopSound(gCDA_tag);
+        gCDA_is_playing = 0;
+        gCDA_tag = 0;
+    }
+    return gCDA_tag;
 }
 
 // IDA: void __cdecl StartMusic()
 void StartMusic(void) {
+    if (gCD_fully_installed) {
+        gCDA_tag = DRS3StartCDA(9999);
+    }
 }
 
 // IDA: void __cdecl StopMusic()
 void StopMusic(void) {
+    if (gCD_fully_installed) {
+        DRS3StopCDA();
+    }
 }

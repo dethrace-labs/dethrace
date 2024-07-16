@@ -2,9 +2,7 @@ add_library(s3 STATIC)
 
 target_include_directories(s3
     PUBLIC
-        "${CMAKE_CURRENT_SOURCE_DIR}/include"
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}
+        include
 )
 
 target_link_libraries(s3 PRIVATE brender SDL2::SDL2 harness compile_with_werror)
@@ -34,8 +32,8 @@ endif()
 target_sources(s3 PRIVATE
     3d.c
     3d.h
-    audio.c
-    audio.h
+    s3.c
+    s3.h
     ioserv.c
     ioserv.h
     profile.c

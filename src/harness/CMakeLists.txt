@@ -19,7 +19,7 @@ if(DETHRACE_FIX_BUGS)
     target_compile_definitions(harness PRIVATE DETHRACE_FIX_BUGS)
 endif()
 
-target_link_libraries(harness PRIVATE brender miniaudio compile_with_werror)
+target_link_libraries(harness PRIVATE brender miniaudio stb compile_with_werror)
 
 if(NOT MSVC)
     target_compile_options(harness PRIVATE
