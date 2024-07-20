@@ -9,7 +9,6 @@ void S3DisableMIDI(void) {
 }
 
 void S3StopMIDIOutlets(void) {
-    STUB();
 }
 
 void S3ReleaseMIDI(tS3_sound_tag tag) {
