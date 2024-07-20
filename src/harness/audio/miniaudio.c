@@ -42,6 +42,7 @@ typedef struct tMiniaudio_stream {
 
 ma_engine engine;
 ma_sound cda_sound;
+int cda_sound_initialized;
 
 tAudioBackend_error_code AudioBackend_Init(void) {
     ma_result result;
@@ -75,10 +76,14 @@ void AudioBackend_UnInitCDA(void) {
 }
 
 tAudioBackend_error_code AudioBackend_StopCDA(void) {
+    if (!cda_sound_initialized) {
+        return eAB_success;
+    }
     if (ma_sound_is_playing(&cda_sound)) {
         ma_sound_stop(&cda_sound);
-        ma_sound_uninit(&cda_sound);
     }
+    ma_sound_uninit(&cda_sound);
+    cda_sound_initialized = 0;
     return eAB_success;
 }
 
@@ -95,6 +100,7 @@ tAudioBackend_error_code AudioBackend_PlayCDA(int track) {
     if (result != MA_SUCCESS) {
         return eAB_error;
     }
+    cda_sound_initialized = 1;
     result = ma_sound_start(&cda_sound);
     if (result != MA_SUCCESS) {
         return eAB_error;
@@ -103,10 +109,16 @@ tAudioBackend_error_code AudioBackend_PlayCDA(int track) {
 }
 
 int AudioBackend_CDAIsPlaying(void) {
+    if (!cda_sound_initialized) {
+        return 0;
+    }
     return ma_sound_is_playing(&cda_sound);
 }
 
 tAudioBackend_error_code AudioBackend_SetCDAVolume(int volume) {
+    if (!cda_sound_initialized) {
+        return eAB_error;
+    }
     ma_sound_set_volume(&cda_sound, volume / 255.0f);
     return eAB_success;
 }
