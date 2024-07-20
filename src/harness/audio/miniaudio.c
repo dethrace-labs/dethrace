@@ -96,6 +96,10 @@ tAudioBackend_error_code AudioBackend_PlayCDA(int track) {
     if (access(path, F_OK) == -1) {
         return eAB_error;
     }
+
+    // ensure we are not still playing a track
+    AudioBackend_StopCDA();
+
     result = ma_sound_init_from_file(&engine, path, 0, NULL, NULL, &cda_sound);
     if (result != MA_SUCCESS) {
         return eAB_error;
