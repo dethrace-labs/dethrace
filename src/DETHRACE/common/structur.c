@@ -308,6 +308,14 @@ void DoLogos(void) {
     DoSCILogo();
     DoOpeningAnimation();
     DoStainlessLogo();
+#ifdef DETHRACE_FIX_BUGS
+    /* StartMusic is only called in PlaySmackerFile when sound and cutscenes are enabled */
+    if (!gSound_override && gCut_scene_override) {
+        if (!harness_game_config.no_music) {
+            StartMusic();
+        }
+    }
+#endif
     gProgram_state.prog_status = eProg_opening;
 }
 
