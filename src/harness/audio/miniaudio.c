@@ -27,6 +27,9 @@ static int kMem_S3_DOS_SOS_channel = 234;
 typedef struct tMiniaudio_sample {
     ma_audio_buffer_ref buffer_ref;
     ma_sound sound;
+    int init_volume;
+    int init_pan;
+    int init_new_rate;
     int initialized;
 } tMiniaudio_sample;
 
@@ -158,6 +161,12 @@ tAudioBackend_error_code AudioBackend_PlaySample(void* type_struct_sample, int c
     }
     miniaudio->initialized = 1;
 
+    if (miniaudio->init_volume > 0) {
+        AudioBackend_SetVolume(type_struct_sample, miniaudio->init_volume);
+        AudioBackend_SetPan(type_struct_sample, miniaudio->init_pan);
+        AudioBackend_SetFrequency(type_struct_sample, rate, miniaudio->init_new_rate);
+    }
+
     ma_sound_set_looping(&miniaudio->sound, loop);
     ma_sound_start(&miniaudio->sound);
     return eAB_success;
@@ -175,15 +184,19 @@ int AudioBackend_SoundIsPlaying(void* type_struct_sample) {
     return 0;
 }
 
-tAudioBackend_error_code AudioBackend_SetVolume(void* type_struct_sample, int volume_db) {
+tAudioBackend_error_code AudioBackend_SetVolume(void* type_struct_sample, int volume) {
     tMiniaudio_sample* miniaudio;
     float linear_volume;
 
     miniaudio = (tMiniaudio_sample*)type_struct_sample;
     assert(miniaudio != NULL);
 
-    // convert from directsound -10000 - 0 decibel volume scale
-    linear_volume = ma_volume_db_to_linear(volume_db / 100.0f);
+    if (!miniaudio->initialized) {
+        miniaudio->init_volume = volume;
+        return eAB_success;
+    }
+
+    linear_volume = volume / 510.0f;
     ma_sound_set_volume(&miniaudio->sound, linear_volume);
     return eAB_success;
 }
@@ -193,6 +206,11 @@ tAudioBackend_error_code AudioBackend_SetPan(void* type_struct_sample, int pan) 
 
     miniaudio = (tMiniaudio_sample*)type_struct_sample;
     assert(miniaudio != NULL);
+
+    if (!miniaudio->initialized) {
+        miniaudio->init_pan = pan;
+        return eAB_success;
+    }
 
     // convert from directsound -10000 - 10000 pan scale
     ma_sound_set_pan(&miniaudio->sound, pan / 10000.0f);
@@ -204,6 +222,11 @@ tAudioBackend_error_code AudioBackend_SetFrequency(void* type_struct_sample, int
 
     miniaudio = (tMiniaudio_sample*)type_struct_sample;
     assert(miniaudio != NULL);
+
+    if (!miniaudio->initialized) {
+        miniaudio->init_new_rate = new_rate;
+        return eAB_success;
+    }
 
     // convert from directsound frequency to linear pitch scale
     ma_sound_set_pitch(&miniaudio->sound, (new_rate / (float)original_rate));
