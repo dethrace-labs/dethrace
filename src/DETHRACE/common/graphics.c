@@ -3009,16 +3009,16 @@ void ToggleShadow(void) {
     }
     switch (gShadow_level) {
     case eShadow_none:
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_NoShadows));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_NoShadows));
         break;
     case eShadow_us_only:
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_ShadowUnderOwnCar));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_ShadowUnderOwnCar));
         break;
     case eShadow_us_and_opponents:
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_ShadowUnderMainCars));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_ShadowUnderMainCars));
         break;
     case eShadow_everyone:
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_ShadowUnderAllCars));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_ShadowUnderAllCars));
         break;
     default:
         return;
@@ -3089,9 +3089,9 @@ void ShadowMode(void) {
 
     gFancy_shadow = !gFancy_shadow;
     if (gFancy_shadow) {
-        NewTextHeadupSlot(4, 0, 2000, -4, "Translucent shadow");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, "Translucent shadow");
     } else {
-        NewTextHeadupSlot(4, 0, 2000, -4, "Solid shadow");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, "Solid shadow");
     }
 }
 
