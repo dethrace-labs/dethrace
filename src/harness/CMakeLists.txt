@@ -27,9 +27,7 @@ if(NOT MSVC)
         -Wextra
         -Wno-unused-parameter
     )
-    add_compile_flags_if_supported(harness
-        -Wstrict-prototypes
-    )
+    add_compile_flag_if_supported(harness -Wstrict-prototypes LANGUAGES C)
 else()
     target_compile_definitions(harness PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
