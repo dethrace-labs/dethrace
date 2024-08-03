@@ -719,9 +719,15 @@ void Win32SetPaletteEntries(uint8_t* entries, int pFirst_colour, int pCount) {
     }
     for (i = pFirst_colour; i <= last_colour; i++) {
         gWin32_palette[i].peFlags = 0;
+#if BR_ENDIAN_BIG
+        gWin32_palette[i].peRed = entries[i * 4 + 1];
+        gWin32_palette[i].peGreen = entries[i * 4 + 2];
+        gWin32_palette[i].peBlue = entries[i * 4 + 3];
+#else
         gWin32_palette[i].peRed = entries[i * 4 + 2];
         gWin32_palette[i].peGreen = entries[i * 4 + 1];
         gWin32_palette[i].peBlue = entries[i * 4];
+#endif
     }
     SSDXSetPaleeteEntries(gWin32_palette, 0, 256);
 }
