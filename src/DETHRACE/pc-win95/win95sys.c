@@ -391,6 +391,12 @@ void PDInitialiseSystem(void) {
         fread(gASCII_table, len, 1u, f);
         fread(gASCII_shift_table, len, 1u, f);
         fclose(f);
+#if BR_ENDIAN_BIG
+        for (int i = 0; i < 128; i++) {
+            gASCII_table[i] = BrSwap32(gASCII_table[i]);
+            gASCII_shift_table[i] = BrSwap32(gASCII_shift_table[i]);
+        }
+#endif
     }
     Win32InitInputDevice();
 }
