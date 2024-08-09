@@ -3147,8 +3147,13 @@ void DRPixelmapDoubledCopy(br_pixelmap* pDestn, br_pixelmap* pSource, int pSourc
         for (j = 0; j < width_over_2; j++) {
             --sptr;
             pixels = *sptr;
+#if BR_ENDIAN_BIG
+            pixel_1 = pixels >> 0;
+            pixel_2 = pixels >> 8;
+#else
             pixel_1 = pixels >> 8;
             pixel_2 = pixels >> 0;
+#endif
             dptr[-1] = pixel_1;
             dptr2[-1] = pixel_1;
             dptr[-2] = pixel_1;
