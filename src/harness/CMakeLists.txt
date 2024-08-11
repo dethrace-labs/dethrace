@@ -81,6 +81,10 @@ elseif(APPLE)
     target_sources(harness PRIVATE
         os/macos.c
     )
+elseif(NINTENDO_3DS)
+    target_sources(harness PRIVATE
+        os/ctr.c
+    )
 else()
     target_sources(harness PRIVATE
         os/linux.c
