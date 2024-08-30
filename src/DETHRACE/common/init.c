@@ -378,6 +378,13 @@ void InitialiseApplication(int pArgc, char** pArgv) {
     InitBRFonts();
     LoadMiscStrings();
     LoadInRegistees();
+
+    // Added in 3dfx patch
+    InitLineStuff();
+    InitSmokeStuff();
+    Init2DStuff();
+    // --
+
     FinishLoadingGeneral();
     InitializePalettes();
     AustereWarning();
@@ -391,6 +398,14 @@ void InitialiseApplication(int pArgc, char** pArgv) {
     gDefault_track_material = BrMaterialAllocate("gDefault_track_material");
     gDefault_track_material->index_base = 227;
     gDefault_track_material->index_range = 1;
+
+    // Added in 3dfx patch
+    gDefault_track_material->ka = 1.0;
+    gDefault_track_material->kd = 0.0;
+    gDefault_track_material->ks = 0.0;
+    gDefault_track_material->colour = ((br_colour*)gRender_palette->pixels)[227];
+    // --
+
     BrMaterialAdd(gDefault_track_material);
     InitShadow();
     InitFlics();

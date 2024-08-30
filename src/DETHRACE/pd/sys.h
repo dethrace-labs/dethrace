@@ -16,10 +16,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+extern int gDOSGfx_initialized;
+extern int gExtra_mem;
+extern int gReplay_override;
+extern tGraf_spec gGraf_specs[2];
 extern int gASCII_table[128];
 extern tU32 gKeyboard_bits[8];
 extern int gASCII_shift_table[128];
-extern tGraf_spec gGraf_specs[2];
 extern char gNetwork_profile_fname[256];
 extern tS32 gJoystick_min1y;
 extern tS32 gJoystick_min2y;
@@ -34,20 +37,18 @@ extern tS32 gJoystick_range1y;
 extern tS32 gJoystick_range1x;
 extern int gNo_voodoo;
 extern int gSwitched_resolution;
-extern int gReplay_override;
 extern br_pixelmap* gReal_back_screen;
 extern tS32 gJoystick_min1x;
 extern br_pixelmap* gTemp_screen;
-extern int gDOSGfx_initialized;
 extern tU32 gUpper_loop_limit;
-extern int gExtra_mem;
 extern int gReal_back_screen_locked;
 extern void (*gPrev_keyboard_handler)(void);
 
-// DOS
-// extern tU8 gScan_code[123][2];
-// Windows
+#ifdef __DOS__
+extern tU8 gScan_code[123][2];
+#else
 extern tU32 gScan_code[123];
+#endif
 
 extern char* _unittest_last_fatal_error;
 

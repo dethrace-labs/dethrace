@@ -131,6 +131,18 @@ char* gError_messages[126] = {
     "Net contents too big %",
     "File % is corrupted",
     "Random number out of range (%)",
+
+    // Added in 3dfx patch
+    "Couldn't lock pixelmap %",
+    "% should be locked but isn't",
+    "Cannot purify pixelmap %",
+    "File % must start with \"%\"",
+    "Can't cope with version % for %",
+    "Cannot tile pixelmap %",
+    "Mysterious \"%\" in %",
+    "Can only dim rectangles of gBack_screen",
+    "Invalid material alpha"
+    // -
 };
 int gError_code;
 char* gPalette_copy__errors;    // suffix added to avoid duplicate symbol

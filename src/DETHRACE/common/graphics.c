@@ -10,6 +10,7 @@
 #include "finteray.h"
 #include "flicplay.h"
 #include "globvars.h"
+#include "globvrbm.h"
 #include "globvrpb.h"
 #include "grafdata.h"
 #include "harness/hooks.h"
@@ -641,6 +642,8 @@ void DRSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
         ((br_int_32*)pPalette->pixels)[0] = 0;
     }
     memcpy(gCurrent_palette_pixels + 4 * pFirst_colour, (char*)pPalette->pixels + 4 * pFirst_colour, 4 * pCount);
+    // 3dfx
+    g16bit_palette_valid = 0;
     if (!gFaded_palette) {
         PDSetPaletteEntries(pPalette, pFirst_colour, pCount);
     }
@@ -653,6 +656,8 @@ void DRSetPalette3(br_pixelmap* pThe_palette, int pSet_current_palette) {
 
     if (pSet_current_palette) {
         memcpy(gCurrent_palette_pixels, pThe_palette->pixels, 0x400u);
+        // 3dfx
+        g16bit_palette_valid = 0;
     }
     if (!gFaded_palette) {
         PDSetPalette(pThe_palette);
@@ -667,6 +672,8 @@ void DRSetPalette2(br_pixelmap* pThe_palette, int pSet_current_palette) {
     ((br_int_32*)pThe_palette->pixels)[0] = 0;
     if (pSet_current_palette) {
         memcpy(gCurrent_palette_pixels, pThe_palette->pixels, 0x400u);
+        // 3dfx
+        g16bit_palette_valid = 0;
     }
     if (!gFaded_palette) {
         PDSetPalette(pThe_palette);
@@ -685,11 +692,17 @@ void DRSetPalette(br_pixelmap* pThe_palette) {
 void InitializePalettes(void) {
     int j;
     gCurrent_palette_pixels = BrMemAllocate(0x400u, kMem_cur_pal_pixels);
+    // Added in 3dfx patch
+    g16bit_palette_valid = 0;
+
     gCurrent_palette = DRPixelmapAllocate(BR_PMT_RGBX_888, 1u, 256, gCurrent_palette_pixels, 0);
     gRender_palette = BrTableFind("DRRENDER.PAL");
     if (gRender_palette == NULL) {
         FatalError(kFatalError_RequiredPalette);
     }
+    // Added in 3dfx patch
+    NobbleNonzeroBlacks(gRender_palette);
+    // -
     gOrig_render_palette = BrPixelmapAllocateSub(gRender_palette, 0, 0, gRender_palette->width, gRender_palette->height);
     gOrig_render_palette->pixels = BrMemAllocate(0x400u, kMem_render_pal_pixels);
     memcpy(gOrig_render_palette->pixels, gRender_palette->pixels, 0x400u);

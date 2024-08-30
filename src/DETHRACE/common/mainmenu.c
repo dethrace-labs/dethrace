@@ -3,6 +3,7 @@
 #include "controls.h"
 #include "flicplay.h"
 #include "globvars.h"
+#include "globvrbm.h"
 #include "globvrpb.h"
 #include "grafdata.h"
 #include "graphics.h"
@@ -437,6 +438,7 @@ int QuitVerifyDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pE
         if (pCurrent_choice) {
             memcpy(gBack_screen->pixels, gPixels_copy__mainmenu, gPixel_buffer_size__mainmenu);
             memcpy(gCurrent_palette_pixels, gPalette_copy__mainmenu, 0x400u);
+            g16bit_palette_valid = 0;
         } else {
             ClearEntireScreen();
         }
