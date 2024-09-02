@@ -129,3 +129,58 @@ if(DETHRACE_INSTALL)
 
     include(CPack)
 endif()
+
+if (NINTENDO_3DS)
+    set(APP_TITLE "${PROJECT_NAME}")
+    set(APP_DESCRIPTION "${PROJECT_NAME} port for 3DS")
+    set(APP_AUTHOR "dethrace-labs")
+    set(APP_UNIQUE_ID "0xF02F6")
+    set(APP_ICON "${PROJECT_SOURCE_DIR}/packaging/ctr/icon.png")
+    set(APP_BANNER "${PROJECT_SOURCE_DIR}/packaging/ctr/banner.png")
+    set(APP_AUDIO "${PROJECT_SOURCE_DIR}/packaging/ctr/audio_silent.wav")
+    set(APP_ROMFS_DIR "${PROJECT_SOURCE_DIR}/packaging/ctr/romfs")
+    set(APP_RSF "${PROJECT_SOURCE_DIR}/packaging/ctr/template.rsf")
+
+    add_custom_command(
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.3dsx
+        COMMAND 3dsxtool ${PROJECT_NAME}.elf ${PROJECT_NAME}${ROM}.3dsx
+                         --romfs=${APP_ROMFS_DIR}
+                         --smdh=${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.smdh
+        DEPENDS ${PROJECT_NAME} ${PROJECT_NAME}.smdh
+    )
+
+    add_custom_command(
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.cia
+        COMMAND makerom	-f cia
+                        -target t
+                        -exefslogo
+                        -o ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.cia
+                        -elf ${PROJECT_NAME}.elf
+                        -rsf ${APP_RSF}
+                            -DAPP_TITLE=${APP_TITLE}
+                            -DAPP_UNIQUE_ID=${APP_UNIQUE_ID}
+                            -DAPP_ROMFS_DIR=${APP_ROMFS_DIR}
+                        -banner ${PROJECT_NAME}.bnr
+                        -icon ${PROJECT_NAME}.smdh
+        DEPENDS ${PROJECT_NAME} ${APP_RSF} ${PROJECT_NAME}.smdh ${PROJECT_NAME}.bnr
+    )
+
+    add_custom_command(
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.smdh
+        COMMAND bannertool makesmdh	-o ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.smdh
+                                    -s ${APP_TITLE}
+                                    -l ${APP_DESCRIPTION}
+                                    -p ${APP_AUTHOR}
+                                    -i ${APP_ICON}
+
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.bnr
+        COMMAND bannertool makebanner	-o ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.bnr
+                                        -i ${APP_BANNER}
+                                        -a ${APP_AUDIO}
+    )
+
+    add_custom_target( N3DS ALL
+        DEPENDS ${PROJECT_NAME}.3dsx
+                ${PROJECT_NAME}.cia
+    )
+endif ()

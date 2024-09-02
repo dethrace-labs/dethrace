@@ -11,6 +11,10 @@
 #include <string.h>
 #include <sys/stat.h>
 
+#ifdef __3DS__
+#include <3ds.h>
+#endif
+
 br_pixelmap* palette;
 uint32_t* screen_buffer;
 
@@ -166,15 +170,25 @@ void Harness_Init(int* argc, char* argv[]) {
 
     Harness_ProcessCommandLine(argc, argv);
 
+#ifdef __3DS__
+    osSetSpeedupEnable(true);
+    gfxInitDefault();
+    consoleInit(GFX_BOTTOM, NULL);
+    chdir("sdmc:/CARMA/");
+    char* root_dir = NULL;
+#else
     if (harness_game_config.install_signalhandler) {
         OS_InstallSignalHandler(argv[0]);
     }
 
     char* root_dir = getenv("DETHRACE_ROOT_DIR");
+#endif
     if (root_dir != NULL) {
         LOG_INFO("DETHRACE_ROOT_DIR is set to '%s'", root_dir);
     } else {
+#ifndef __3DS__
         root_dir = OS_GetWorkingDirectory(argv[0]);
+#endif
     }
     // if root_dir is null or empty, no need to chdir
     if (root_dir != NULL && root_dir[0] != '\0') {

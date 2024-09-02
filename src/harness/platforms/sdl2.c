@@ -6,6 +6,10 @@
 #include "harness/trace.h"
 #include "sdl2_scancode_to_dinput.h"
 
+#ifdef __3DS__
+#include <3ds.h>
+#endif
+
 SDL_Window* window;
 SDL_Renderer* renderer;
 SDL_Texture* screen_texture;
@@ -17,6 +21,12 @@ Uint32 last_frame_time;
 
 uint8_t directinput_key_state[SDL_NUM_SCANCODES];
 
+#ifdef __3DS__
+extern int sdlScanCodeToDirectInputKeyNum[SDL_NUM_SCANCODES];
+float pos_x, pos_y;
+bool button_1, button_2;
+#endif
+
 static void* create_window_and_renderer(char* title, int x, int y, int width, int height) {
     render_width = width;
     render_height = height;
@@ -24,7 +34,9 @@ static void* create_window_and_renderer(char* title, int x, int y, int width, in
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         LOG_PANIC("SDL_INIT_VIDEO error: %s", SDL_GetError());
     }
-
+#ifdef __3DS__
+    consoleInit(GFX_BOTTOM, NULL);
+#endif
     window = SDL_CreateWindow(title,
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
@@ -61,10 +73,12 @@ static void* create_window_and_renderer(char* title, int x, int y, int width, in
 
 static int set_window_pos(void* hWnd, int x, int y, int nWidth, int nHeight) {
     // SDL_SetWindowPosition(hWnd, x, y);
+#ifndef __3DS__
     if (nWidth == 320 && nHeight == 200) {
         nWidth = 640;
         nHeight = 400;
     }
+#endif
     SDL_SetWindowSize(hWnd, nWidth, nHeight);
     return 0;
 }
@@ -76,6 +90,97 @@ static void destroy_window(void* hWnd) {
     window = NULL;
 }
 
+#ifdef __3DS__
+static int map_3ds_key_to_sdl_scancode(u32 key) {
+    switch (key) {
+        case KEY_A: return SDL_SCANCODE_SPACE;
+        case KEY_B: return SDL_SCANCODE_B;
+        case KEY_X: return SDL_SCANCODE_X;
+        case KEY_Y: return SDL_SCANCODE_Y;
+        case KEY_L: return SDL_SCANCODE_L;
+//        case KEY_R: return SDL_SCANCODE_R; // used for mouse button instead
+        case KEY_ZL: return SDL_SCANCODE_MINUS;
+        case KEY_ZR: return SDL_SCANCODE_EQUALS;
+        case KEY_START: return SDL_SCANCODE_RETURN;
+        case KEY_SELECT: return SDL_SCANCODE_ESCAPE;
+        case KEY_DUP: return SDL_SCANCODE_KP_8;
+        case KEY_DDOWN: return SDL_SCANCODE_KP_2;
+        case KEY_DLEFT: return SDL_SCANCODE_KP_4;
+        case KEY_DRIGHT: return SDL_SCANCODE_KP_6;
+
+        default: return -1;
+    }
+}
+
+static int get_and_handle_message(MSG_* msg) {
+    hidScanInput();
+    u32 kHeld = hidKeysHeld();
+    int dinput_key;
+
+    circlePosition circlePad;
+    hidCircleRead(&circlePad);
+
+    for (u32 key = KEY_A; key <= KEY_ZR; key <<= 1) {
+        if (kHeld & key) {
+            int sdl_scancode = map_3ds_key_to_sdl_scancode(key);
+            if (sdl_scancode >= 0) {
+                dinput_key = sdlScanCodeToDirectInputKeyNum[sdl_scancode];
+                if (dinput_key == 0) {
+                    LOG_WARN("unexpected scan code %s (%d)", SDL_GetScancodeName(sdl_scancode), sdl_scancode);
+                    continue;
+                }
+                directinput_key_state[dinput_key] = 0x80;
+            }
+        } else {
+            int sdl_scancode = map_3ds_key_to_sdl_scancode(key);
+            if (sdl_scancode >= 0) {
+                dinput_key = sdlScanCodeToDirectInputKeyNum[sdl_scancode];
+                if (dinput_key != 0) {
+                    directinput_key_state[dinput_key] = 0x00;
+                }
+            }
+        }
+    }
+
+    if (circlePad.dy > 20) {
+        dinput_key = sdlScanCodeToDirectInputKeyNum[SDL_SCANCODE_UP];
+        directinput_key_state[dinput_key] = 0x80;
+    } else if (circlePad.dy < -20) {
+        dinput_key = sdlScanCodeToDirectInputKeyNum[SDL_SCANCODE_DOWN];
+        directinput_key_state[dinput_key] = 0x80;
+    } else {
+        dinput_key = sdlScanCodeToDirectInputKeyNum[SDL_SCANCODE_UP];
+        directinput_key_state[dinput_key] = 0x00;
+        dinput_key = sdlScanCodeToDirectInputKeyNum[SDL_SCANCODE_DOWN];
+        directinput_key_state[dinput_key] = 0x00;
+    }
+
+    if (circlePad.dx > 20) {
+        dinput_key = sdlScanCodeToDirectInputKeyNum[SDL_SCANCODE_RIGHT];
+        directinput_key_state[dinput_key] = 0x80;
+    } else if (circlePad.dx < -20) {
+        dinput_key = sdlScanCodeToDirectInputKeyNum[SDL_SCANCODE_LEFT];
+        directinput_key_state[dinput_key] = 0x80;
+    } else {
+        dinput_key = sdlScanCodeToDirectInputKeyNum[SDL_SCANCODE_RIGHT];
+        directinput_key_state[dinput_key] = 0x00;
+        dinput_key = sdlScanCodeToDirectInputKeyNum[SDL_SCANCODE_LEFT];
+        directinput_key_state[dinput_key] = 0x00;
+    }
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        switch (event.type) {
+        case SDL_QUIT:
+            msg->message = WM_QUIT;
+            return 1;
+        }
+    }
+
+    button_1 = (kHeld & KEY_R);
+
+    return 0;
+}
+#else
 // Checks whether the `flag_check` is the only modifier applied.
 // e.g. is_only_modifier(event.key.keysym.mod, KMOD_ALT) returns true when only the ALT key was pressed
 static int is_only_key_modifier(int modifier_flags, int flag_check) {
@@ -122,21 +227,41 @@ static int get_and_handle_message(MSG_* msg) {
     }
     return 0;
 }
+#endif
 
 static void get_keyboard_state(unsigned int count, uint8_t* buffer) {
     memcpy(buffer, directinput_key_state, count);
 }
 
 static int get_mouse_buttons(int* pButton1, int* pButton2) {
+#ifdef __3DS__
+    *pButton1 = button_1;
+    *pButton2 = false;
+#else
     int state = SDL_GetMouseState(NULL, NULL);
     *pButton1 = state & SDL_BUTTON_LMASK;
     *pButton2 = state & SDL_BUTTON_RMASK;
+#endif
     return 0;
 }
 
 static int get_mouse_position(int* pX, int* pY) {
     float lX, lY;
+#ifdef __3DS__
+	touchPosition touch;
+	hidTouchRead(&touch);
+if ((touch.px > 0) && (touch.py > 0))
+{
+	pos_x = touch.px;
+	pos_y = touch.py;
+}
+
+	*pX = pos_x;
+	*pY = pos_y;
+
+#else
     SDL_GetMouseState(pX, pY);
+#endif
     SDL_RenderWindowToLogical(renderer, *pX, *pY, &lX, &lY);
 
 #if defined(DETHRACE_FIX_BUGS)
@@ -202,7 +327,17 @@ static void set_palette(PALETTEENTRY_* pal) {
 
 int show_error_message(void* window, char* text, char* caption) {
     fprintf(stderr, "%s", text);
+#ifdef __3DS__
+    if (!gspHasGpuRight())
+        gfxInitDefault();
+
+    errorConf msg;
+    errorInit(&msg, ERROR_TEXT, CFG_LANGUAGE_EN);
+    errorText(&msg, text);
+    errorDisp(&msg);
+#else
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, caption, text, window);
+#endif
     return 0;
 }
 

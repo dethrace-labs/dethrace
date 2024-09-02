@@ -16116,9 +16116,11 @@ static ma_result ma_thread_create__posix(ma_thread* pThread, ma_thread_priority 
             #endif
             } else if (priority == ma_thread_priority_realtime) {
             #ifdef SCHED_FIFO
+#ifndef __3DS__
                 if (pthread_attr_setschedpolicy(&attr, SCHED_FIFO) == 0) {
                     scheduler = SCHED_FIFO;
                 }
+#endif
             #endif
             #ifdef MA_LINUX
             } else {
