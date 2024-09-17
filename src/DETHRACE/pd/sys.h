@@ -16,14 +16,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-extern int gDOSGfx_initialized;
-extern int gExtra_mem;
-extern int gReplay_override;
+// extern int gDOSGfx_initialized;
+// extern int gExtra_mem;
+// extern int gReplay_override;
 extern tGraf_spec gGraf_specs[2];
-extern int gASCII_table[128];
-extern tU32 gKeyboard_bits[8];
-extern int gASCII_shift_table[128];
-extern char gNetwork_profile_fname[256];
+// extern int gASCII_table[128];
+// extern tU32 gKeyboard_bits[8];
+// extern int gASCII_shift_table[128];
+// extern char gNetwork_profile_fname[256];
 extern tS32 gJoystick_min1y;
 extern tS32 gJoystick_min2y;
 extern tS32 gJoystick_min2x;
@@ -35,20 +35,20 @@ extern tS32 gJoystick_range2y;
 extern tS32 gJoystick_range2x;
 extern tS32 gJoystick_range1y;
 extern tS32 gJoystick_range1x;
-extern int gNo_voodoo;
-extern int gSwitched_resolution;
-extern br_pixelmap* gReal_back_screen;
+// extern int gNo_voodoo;
+// extern int gSwitched_resolution;
+// extern br_pixelmap* gReal_back_screen;
 extern tS32 gJoystick_min1x;
-extern br_pixelmap* gTemp_screen;
-extern tU32 gUpper_loop_limit;
-extern int gReal_back_screen_locked;
-extern void (*gPrev_keyboard_handler)(void);
+// extern br_pixelmap* gTemp_screen;
+// extern tU32 gUpper_loop_limit;
+// extern int gReal_back_screen_locked;
+// extern void (*gPrev_keyboard_handler)(void);
 
-#ifdef __DOS__
-extern tU8 gScan_code[123][2];
-#else
-extern tU32 gScan_code[123];
-#endif
+// #ifdef __DOS__
+// extern tU8 gScan_code[123][2];
+// #else
+// extern tU32 gScan_code[123];
+// #endif
 
 extern char* _unittest_last_fatal_error;
 
@@ -84,9 +84,9 @@ int PDInitScreenVars(int pArgc, char** pArgv);
 
 void PDInitScreen(void);
 
-void PDLockRealBackScreen(void);
+void PDLockRealBackScreen(int lock);
 
-void PDUnlockRealBackScreen(void);
+void PDUnlockRealBackScreen(int lock);
 
 void PDAllocateScreenAndBack(void);
 

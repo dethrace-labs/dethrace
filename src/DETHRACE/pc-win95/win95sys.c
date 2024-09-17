@@ -1,3 +1,4 @@
+#if 0
 #include "brender.h"
 #include "car.h"
 #include "dinput.h"
@@ -1190,3 +1191,5 @@ void Win32BRenderFailureFunc(char* msg) {
     dr_dprintf("*******************************************************************************");
     Win32FatalError("BRender error detected:", msg);
 }
+
+#endif

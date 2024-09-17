@@ -26,6 +26,10 @@
 // Optional: install a handler to print stack trace during a crash
 void OS_InstallSignalHandler(char* program_name);
 
+char* OS_GetFirstFileInDirectory(char* path);
+
+char* OS_GetNextFileInDirectory(void);
+
 FILE* OS_fopen(const char* pathname, const char* mode);
 
 size_t OS_ConsoleReadPassword(char* pBuffer, size_t pBufferLen);

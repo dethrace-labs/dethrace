@@ -34,3 +34,7 @@ int gMax_texture_side;
 int gDevious_2d;
 int gMax_texture_aspect_ratio;
 int gMaterial_fogging;
+
+// Added
+int gVoodoo_rush_mode;
+int voodoo_dword_161A8C;

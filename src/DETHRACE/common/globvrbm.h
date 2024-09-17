@@ -37,4 +37,7 @@ extern int gDevious_2d;
 extern int gMax_texture_aspect_ratio;
 extern int gMaterial_fogging;
 
+extern int gVoodoo_rush_mode;
+extern int voodoo_dword_161A8C;
+
 #endif
