@@ -237,7 +237,6 @@ void Harness_Platform_Init(tHarness_platform* platform) {
     platform->GetKeyboardState = get_keyboard_state;
     platform->GetMousePosition = get_mouse_position;
     platform->GetMouseButtons = get_mouse_buttons;
-    platform->DestroyWindow = destroy_window;
     platform->ShowErrorMessage = show_error_message;
     platform->Renderer_SetPalette = set_palette;
     platform->Renderer_Present = present_screen;
