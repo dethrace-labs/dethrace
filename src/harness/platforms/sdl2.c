@@ -90,6 +90,9 @@ static int get_and_handle_message(MSG_* msg) {
         switch (event.type) {
         case SDL_KEYDOWN:
         case SDL_KEYUP:
+            if (event.key.windowID != SDL_GetWindowID(window)) {
+                continue;
+            }
             if (event.key.keysym.sym == SDLK_RETURN) {
                 if (event.key.type == SDL_KEYDOWN) {
                     if ((event.key.keysym.mod & (KMOD_CTRL | KMOD_SHIFT | KMOD_ALT | KMOD_GUI))) {
@@ -115,6 +118,15 @@ static int get_and_handle_message(MSG_* msg) {
             directinput_key_state[dinput_key] = (event.type == SDL_KEYDOWN ? 0x80 : 0);
             break;
 
+        case SDL_WINDOWEVENT:
+            if (event.window.event == SDL_WINDOWEVENT_CLOSE) {
+                if (SDL_GetWindowID(window) == event.window.windowID) {
+                    msg->message = WM_QUIT;
+                    return 1;
+                }
+            }
+            break;
+
         case SDL_QUIT:
             msg->message = WM_QUIT;
             return 1;
@@ -128,6 +140,11 @@ static void get_keyboard_state(unsigned int count, uint8_t* buffer) {
 }
 
 static int get_mouse_buttons(int* pButton1, int* pButton2) {
+    if (SDL_GetMouseFocus() != window) {
+        *pButton1 = 0;
+        *pButton2 = 0;
+        return 0;
+    }
     int state = SDL_GetMouseState(NULL, NULL);
     *pButton1 = state & SDL_BUTTON_LMASK;
     *pButton2 = state & SDL_BUTTON_RMASK;
@@ -136,6 +153,9 @@ static int get_mouse_buttons(int* pButton1, int* pButton2) {
 
 static int get_mouse_position(int* pX, int* pY) {
     float lX, lY;
+    if (SDL_GetMouseFocus() != window) {
+        return 0;
+    }
     SDL_GetMouseState(pX, pY);
     SDL_RenderWindowToLogical(renderer, *pX, *pY, &lX, &lY);
 
@@ -217,7 +237,6 @@ void Harness_Platform_Init(tHarness_platform* platform) {
     platform->GetKeyboardState = get_keyboard_state;
     platform->GetMousePosition = get_mouse_position;
     platform->GetMouseButtons = get_mouse_buttons;
-    platform->DestroyWindow = destroy_window;
     platform->ShowErrorMessage = show_error_message;
     platform->Renderer_SetPalette = set_palette;
     platform->Renderer_Present = present_screen;

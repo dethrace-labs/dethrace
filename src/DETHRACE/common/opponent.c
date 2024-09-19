@@ -2533,11 +2533,12 @@ void InitOpponents(tRace_info* pRace_info) {
         gProgram_state.AI_vehicles.cops[i].pursue_from_start = 0;
         gProgram_state.AI_vehicles.cops[i].cheating = 0;
         gProgram_state.AI_vehicles.cops[i].murder_reported = 0;
-        gProgram_state.AI_vehicles.cops[i].finished_for_this_race = 0;
+        gProgram_state.AI_vehicles.cops[i].knackeredness_detected = 0;
         gProgram_state.AI_vehicles.cops[i].players_section_when_last_calced_full_path = -1;
         gProgram_state.AI_vehicles.cops[i].nnext_sections = 0;
         gProgram_state.AI_vehicles.cops[i].new_objective_required = 1;
         gProgram_state.AI_vehicles.cops[i].current_objective = eOOT_none;
+        gProgram_state.AI_vehicles.cops[i].has_moved_at_some_point = 0;
         gProgram_state.AI_vehicles.cops[i].player_in_view_now = 0;
         gProgram_state.AI_vehicles.cops[i].acknowledged_piv = 0;
         gProgram_state.AI_vehicles.cops[i].nastiness = (gProgram_state.skill_level / 2.f

@@ -350,9 +350,7 @@ int S3SyncSampleVolumeAndPan(tS3_channel* chan) {
     float pan_ratio; // [esp+38h] [ebp-8h]
     float total_vol; // [esp+3Ch] [ebp-4h]
 
-    int volume_db;
     int pan;
-    float linear_volume;
 
     if (chan->type != eS3_ST_sample) {
         return 1;
@@ -362,12 +360,8 @@ int S3SyncSampleVolumeAndPan(tS3_channel* chan) {
         total_vol = 1.0f;
     }
     if (chan->descriptor && chan->descriptor->type == chan->type) {
-        volume_db = 510.0f / total_vol * -5.0f - 350.0f;
-        if (volume_db >= 0) {
-            volume_db = 0;
-        }
 
-        if (AudioBackend_SetVolume(chan->type_struct_sample, volume_db) == eAB_success && chan->spatial_sound) {
+        if (AudioBackend_SetVolume(chan->type_struct_sample, total_vol) == eAB_success && chan->spatial_sound) {
 
             if (chan->left_volume != 0 && chan->right_volume > chan->left_volume) {
                 pan_ratio = chan->right_volume / (float)chan->left_volume;

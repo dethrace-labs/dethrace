@@ -27,6 +27,9 @@ static int kMem_S3_DOS_SOS_channel = 234;
 typedef struct tMiniaudio_sample {
     ma_audio_buffer_ref buffer_ref;
     ma_sound sound;
+    int init_volume;
+    int init_pan;
+    int init_new_rate;
     int initialized;
 } tMiniaudio_sample;
 
@@ -42,6 +45,7 @@ typedef struct tMiniaudio_stream {
 
 ma_engine engine;
 ma_sound cda_sound;
+int cda_sound_initialized;
 
 tAudioBackend_error_code AudioBackend_Init(void) {
     ma_result result;
@@ -75,10 +79,14 @@ void AudioBackend_UnInitCDA(void) {
 }
 
 tAudioBackend_error_code AudioBackend_StopCDA(void) {
+    if (!cda_sound_initialized) {
+        return eAB_success;
+    }
     if (ma_sound_is_playing(&cda_sound)) {
         ma_sound_stop(&cda_sound);
-        ma_sound_uninit(&cda_sound);
     }
+    ma_sound_uninit(&cda_sound);
+    cda_sound_initialized = 0;
     return eAB_success;
 }
 
@@ -91,10 +99,15 @@ tAudioBackend_error_code AudioBackend_PlayCDA(int track) {
     if (access(path, F_OK) == -1) {
         return eAB_error;
     }
+
+    // ensure we are not still playing a track
+    AudioBackend_StopCDA();
+
     result = ma_sound_init_from_file(&engine, path, 0, NULL, NULL, &cda_sound);
     if (result != MA_SUCCESS) {
         return eAB_error;
     }
+    cda_sound_initialized = 1;
     result = ma_sound_start(&cda_sound);
     if (result != MA_SUCCESS) {
         return eAB_error;
@@ -103,10 +116,16 @@ tAudioBackend_error_code AudioBackend_PlayCDA(int track) {
 }
 
 int AudioBackend_CDAIsPlaying(void) {
+    if (!cda_sound_initialized) {
+        return 0;
+    }
     return ma_sound_is_playing(&cda_sound);
 }
 
 tAudioBackend_error_code AudioBackend_SetCDAVolume(int volume) {
+    if (!cda_sound_initialized) {
+        return eAB_error;
+    }
     ma_sound_set_volume(&cda_sound, volume / 255.0f);
     return eAB_success;
 }
@@ -142,6 +161,12 @@ tAudioBackend_error_code AudioBackend_PlaySample(void* type_struct_sample, int c
     }
     miniaudio->initialized = 1;
 
+    if (miniaudio->init_volume > 0) {
+        AudioBackend_SetVolume(type_struct_sample, miniaudio->init_volume);
+        AudioBackend_SetPan(type_struct_sample, miniaudio->init_pan);
+        AudioBackend_SetFrequency(type_struct_sample, rate, miniaudio->init_new_rate);
+    }
+
     ma_sound_set_looping(&miniaudio->sound, loop);
     ma_sound_start(&miniaudio->sound);
     return eAB_success;
@@ -159,15 +184,19 @@ int AudioBackend_SoundIsPlaying(void* type_struct_sample) {
     return 0;
 }
 
-tAudioBackend_error_code AudioBackend_SetVolume(void* type_struct_sample, int volume_db) {
+tAudioBackend_error_code AudioBackend_SetVolume(void* type_struct_sample, int volume) {
     tMiniaudio_sample* miniaudio;
     float linear_volume;
 
     miniaudio = (tMiniaudio_sample*)type_struct_sample;
     assert(miniaudio != NULL);
 
-    // convert from directsound -10000 - 0 decibel volume scale
-    linear_volume = ma_volume_db_to_linear(volume_db / 100.0f);
+    if (!miniaudio->initialized) {
+        miniaudio->init_volume = volume;
+        return eAB_success;
+    }
+
+    linear_volume = volume / 510.0f;
     ma_sound_set_volume(&miniaudio->sound, linear_volume);
     return eAB_success;
 }
@@ -177,6 +206,11 @@ tAudioBackend_error_code AudioBackend_SetPan(void* type_struct_sample, int pan) 
 
     miniaudio = (tMiniaudio_sample*)type_struct_sample;
     assert(miniaudio != NULL);
+
+    if (!miniaudio->initialized) {
+        miniaudio->init_pan = pan;
+        return eAB_success;
+    }
 
     // convert from directsound -10000 - 10000 pan scale
     ma_sound_set_pan(&miniaudio->sound, pan / 10000.0f);
@@ -188,6 +222,11 @@ tAudioBackend_error_code AudioBackend_SetFrequency(void* type_struct_sample, int
 
     miniaudio = (tMiniaudio_sample*)type_struct_sample;
     assert(miniaudio != NULL);
+
+    if (!miniaudio->initialized) {
+        miniaudio->init_new_rate = new_rate;
+        return eAB_success;
+    }
 
     // convert from directsound frequency to linear pitch scale
     ma_sound_set_pitch(&miniaudio->sound, (new_rate / (float)original_rate));
