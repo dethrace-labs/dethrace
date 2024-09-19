@@ -319,6 +319,8 @@ void PDSetKeyArray(int* pKeys, int pMark) {
     tS32 joyY;
     LOG_TRACE10("(%p, %d)", pKeys, pMark);
 
+    // Added by dethrace, required in some cases like a tight loop waiting for a keypress
+    // Win95 code does the same
     gHarness_platform.ProcessWindowMessages(NULL);
 
     gKeys_pressed = 0;
@@ -407,7 +409,6 @@ void PDInitialiseSystem(void) {
 
 // IDA: void __cdecl PDShutdownSystem()
 void PDShutdownSystem(void) {
-    static int been_here = 0; // Added by dethrace
     LOG_TRACE("()");
 
     // dos_setvect(9, gPrev_keyboard_handler);
@@ -415,6 +416,7 @@ void PDShutdownSystem(void) {
         BrDevEndOld();
     }
     // DOSMouseEnd();
+    PDRevertPalette();
 }
 
 // IDA: void __cdecl PDSaveOriginalPalette()
@@ -743,6 +745,7 @@ int PDGetTotalTime(void) {
 
 // IDA: int __usercall PDServiceSystem@<EAX>(tU32 pTime_since_last_call@<EAX>)
 int PDServiceSystem(tU32 pTime_since_last_call) {
+    // Added by dethrace. Win95 code does the same
     gHarness_platform.ProcessWindowMessages(NULL);
     return 0;
 }

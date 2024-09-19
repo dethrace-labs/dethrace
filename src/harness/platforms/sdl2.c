@@ -228,6 +228,8 @@ static void swap(br_pixelmap* back_buffer) {
     SDL_RenderCopy(renderer, screen_texture, NULL, NULL);
     SDL_RenderPresent(renderer);
 
+    get_and_handle_message(NULL);
+
     last_screen_src = back_buffer;
 
     if (harness_game_config.fps != 0) {
