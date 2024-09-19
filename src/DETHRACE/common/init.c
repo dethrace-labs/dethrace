@@ -12,6 +12,7 @@
 #include "errors.h"
 #include "flicplay.h"
 #include "globvars.h"
+#include "globvrbm.h"
 #include "globvrkm.h"
 #include "globvrpb.h"
 #include "grafdata.h"
@@ -320,26 +321,179 @@ void AustereWarning(void) {
 // IDA: void __cdecl InitLineStuff()
 void InitLineStuff(void) {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gLine_model = BrModelAllocate("gLine_model", 2, 1);
+    gLine_material = BrMaterialAllocate("gLine_material");
+    gLine_actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+    if (!gLine_model || !gLine_material || !gLine_actor) {
+        FatalError(94);
+    }
+    gLine_actor->identifier = "gLine_actor";
+    gLine_actor->render_style = BR_RSTYLE_EDGES;
+    gLine_actor->material = gLine_material;
+    gLine_model->flags = BR_MODF_QUICK_UPDATE | BR_MODF_KEEP_ORIGINAL;
+    gLine_model->faces->vertices[0] = 0;
+    gLine_model->faces->vertices[1] = 0;
+    gLine_model->faces->vertices[2] = 1;
+    gLine_material->flags = BR_MATF_TWO_SIDED | BR_MATF_SMOOTH | BR_MATF_PRELIT | BR_MATF_LIGHT;
+    gLine_model->faces[0].flags = BR_FACEF_COPLANAR_0 | BR_FACEF_COPLANAR_2;
+    BrModelAdd(gLine_model);
+    BrMaterialAdd(gLine_material);
+    BrActorAdd(gDont_render_actor, gLine_actor);
 }
 
 // IDA: void __cdecl InitSmokeStuff()
 void InitSmokeStuff(void) {
-    static br_token_value fadealpha[3];
+    static br_token_value fadealpha[3] = { { BRT_BLEND_B, { .u32 = 1 } }, { BRT_OPACITY_X, { .x = 0x4B0000 } }, { 0 } };
     tPath_name path;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gBlend_model = BrModelAllocate("gBlend_model", 4, 2);
+    gBlend_material = BrMaterialAllocate("gBlend_material");
+    gBlend_actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+    if (!gBlend_model || !gBlend_material || !gBlend_actor) {
+        FatalError(94);
+    }
+    gBlend_actor->identifier = "gBlend_actor";
+    gBlend_actor->model = gBlend_model;
+    gBlend_actor->material = gBlend_material;
+    gBlend_model->faces->vertices[0] = 0;
+    gBlend_model->faces->vertices[1] = 1;
+    gBlend_model->faces->vertices[2] = 2;
+    gBlend_model->faces[1].vertices[0] = 2;
+    gBlend_model->faces[1].vertices[1] = 3;
+    gBlend_model->faces[1].vertices[2] = 0;
+    gBlend_model->vertices->p.v[0] = -1.0f;
+    gBlend_model->vertices->p.v[1] = 1.0f;
+    gBlend_model->vertices->p.v[2] = 0.0f;
+    gBlend_model->vertices[1].p.v[0] = -1.0f;
+    gBlend_model->vertices[1].p.v[1] = -1.0f;
+    gBlend_model->vertices[1].p.v[2] = 0.0f;
+    gBlend_model->vertices[2].p.v[0] = 1.0f;
+    gBlend_model->vertices[2].p.v[1] = -1.0f;
+    gBlend_model->vertices[2].p.v[2] = 0.0f;
+    gBlend_model->vertices[3].p.v[0] = 1.0f;
+    gBlend_model->vertices[3].p.v[1] = 1.0f;
+    gBlend_model->vertices[3].p.v[2] = 0.0f;
+    gBlend_material->flags = BR_MATF_PERSPECTIVE | BR_MATF_SMOOTH;
+    gBlend_material->flags |= (BR_MATF_LIGHT | BR_MATF_PRELIT);
+    gBlend_model->flags |= BR_MODF_KEEP_ORIGINAL;
+    gBlend_material->extra_prim = fadealpha;
+    PathCat(path, gApplication_path, "PIXELMAP");
+    PathCat(path, path, "SMOKE.PIX");
+    gBlend_material->colour_map = DRPixelmapLoad(path);
+    if (!gBlend_material->colour_map) {
+        FatalError(79, path);
+    }
+    gBlend_material->colour_map->map = gRender_palette;
+    BrMapAdd(gBlend_material->colour_map);
+    gBlend_model->vertices->map.v[0] = 0.0f;
+    gBlend_model->vertices->map.v[1] = 1.0f - 1.0f / (float)gBlend_material->colour_map->height;
+    gBlend_model->vertices[1].map.v[0] = 0.0f;
+    gBlend_model->vertices[1].map.v[1] = 0.0f;
+    gBlend_model->vertices[2].map.v[0] = 1.0f - 1.0f / (float)gBlend_material->colour_map->width;
+    gBlend_model->vertices[2].map.v[1] = 0.0f;
+    gBlend_model->vertices[3].map.v[0] = 1.0f - 1.0f / (float)gBlend_material->colour_map->width;
+    gBlend_model->vertices[3].map.v[1] = 1.0f - 1.0f / (float)gBlend_material->colour_map->height;
+    BrModelAdd(gBlend_model);
+    BrMaterialAdd(gBlend_material);
+    BrActorAdd(gDont_render_actor, gBlend_actor);
 }
 
 // IDA: void __cdecl Init2DStuff()
 void Init2DStuff(void) {
     br_camera* camera;
-    static br_token_value fadealpha[3];
+    static br_token_value fadealpha[3] = { { BRT_BLEND_B, { .u32 = 1u } }, { BRT_OPACITY_X, { .x = 0x800000 } }, { 0 } };
     tPath_name path;
     br_scalar prat_u;
     br_scalar prat_v;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    g2d_camera = BrActorAllocate(BR_ACTOR_CAMERA, NULL);
+    gDim_model = BrModelAllocate("gDim_model", 4, 2);
+    gDim_material = BrMaterialAllocate("gDim_material");
+    gDim_actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+    gPrat_model = BrModelAllocate("gPrat_model", 4, 2);
+    gPrat_material = BrMaterialAllocate("gPrat_material");
+    gPrat_actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+    if (!gDim_model || !gDim_material || !gDim_actor || !gPrat_model || !gPrat_material || !gPrat_actor || !g2d_camera) {
+        FatalError(94);
+    }
+    g2d_camera->identifier = "g2d_camera";
+    camera = g2d_camera->type_data;
+    camera->type = BR_CAMERA_PARALLEL;
+    camera->hither_z = 1.0f;
+    camera->yon_z = 3.0f;
+    camera->width = gScreen->width;
+    camera->height = gScreen->height;
+    gDim_actor->identifier = "gDim_actor";
+    gDim_actor->model = gDim_model;
+    gDim_actor->material = gDim_material;
+
+    gDim_model->faces->vertices[0] = 0;
+    gDim_model->faces->vertices[1] = 1;
+    gDim_model->faces->vertices[2] = 2;
+    gDim_model->faces[1].vertices[0] = 2;
+    gDim_model->faces[1].vertices[1] = 3;
+    gDim_model->faces[1].vertices[2] = 0;
+    gDim_model->vertices->p.v[0] = 150.0f;
+    gDim_model->vertices->p.v[1] = -20.0f;
+    gDim_model->vertices->p.v[2] = -2.0f;
+    gDim_model->vertices[1].p.v[0] = 150.0f;
+    gDim_model->vertices[1].p.v[1] = -100.0f;
+    gDim_model->vertices[1].p.v[2] = -2.0f;
+    gDim_model->vertices[2].p.v[0] = 200.0f;
+    gDim_model->vertices[2].p.v[1] = -100.0f;
+    gDim_model->vertices[2].p.v[2] = -2.0f;
+    gDim_model->vertices[3].p.v[0] = 200.0f;
+    gDim_model->vertices[3].p.v[1] = -20.0f;
+    gDim_model->vertices[3].p.v[2] = -2.0f;
+    gDim_material->colour = 0;
+    gDim_material->flags = BR_MATF_FORCE_FRONT;
+    gDim_model->flags |= BR_MODF_KEEP_ORIGINAL;
+    gDim_material->extra_prim = fadealpha;
+    BrModelAdd(gDim_model);
+    BrMaterialAdd(gDim_material);
+    BrActorAdd(g2d_camera, gDim_actor);
+    gDim_actor->render_style = BR_RSTYLE_NONE;
+    gPrat_actor->identifier = "gPrat_actor";
+    gPrat_actor->model = gPrat_model;
+    gPrat_actor->material = gPrat_material;
+    gPrat_model->faces->vertices[0] = 0;
+    gPrat_model->faces->vertices[1] = 1;
+    gPrat_model->faces->vertices[2] = 2;
+    gPrat_model->faces[1].vertices[0] = 2;
+    gPrat_model->faces[1].vertices[1] = 3;
+    gPrat_model->faces[1].vertices[2] = 0;
+    gPrat_model->vertices->p.v[0] = 150.0f;
+    gPrat_model->vertices->p.v[1] = -20.0f;
+    gPrat_model->vertices->p.v[2] = -2.0f;
+    gPrat_model->vertices[1].p.v[0] = 150.0f;
+    gPrat_model->vertices[1].p.v[1] = -100.0f;
+    gPrat_model->vertices[1].p.v[2] = -2.0f;
+    gPrat_model->vertices[2].p.v[0] = 200.0f;
+    gPrat_model->vertices[2].p.v[1] = -100.0f;
+    gPrat_model->vertices[2].p.v[2] = -2.0f;
+    gPrat_model->vertices[3].p.v[0] = 200.0f;
+    gPrat_model->vertices[3].p.v[1] = -20.0f;
+    gPrat_model->vertices[3].p.v[2] = -2.0f;
+    gPrat_material->colour = 0xFFFFFF;
+    gPrat_material->flags = BR_MATF_FORCE_FRONT;
+    gPrat_model->flags |= BR_MODF_KEEP_ORIGINAL;
+    prat_u = 104.0f / (float)HighResPratBufferWidth();
+    prat_v = 110.0f / (float)HighResPratBufferHeight();
+    gPrat_model->vertices->map.v[0] = 0.0f;
+    gPrat_model->vertices->map.v[1] = 0.0f;
+    gPrat_model->vertices[1].map.v[0] = 0.0f;
+    gPrat_model->vertices[1].map.v[1] = prat_v;
+    gPrat_model->vertices[2].map.v[0] = prat_u;
+    gPrat_model->vertices[2].map.v[1] = prat_v;
+    gPrat_model->vertices[3].map.v[0] = prat_u;
+    gPrat_model->vertices[3].map.v[1] = 0.0f;
+    BrModelAdd(gPrat_model);
+    BrMaterialAdd(gPrat_material);
+    BrActorAdd(g2d_camera, gPrat_actor);
+    gPrat_actor->render_style = BR_RSTYLE_NONE;
 }
 
 // IDA: void __usercall InitialiseApplication(int pArgc@<EAX>, char **pArgv@<EDX>)

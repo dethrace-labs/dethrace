@@ -319,6 +319,8 @@ void PDSetKeyArray(int* pKeys, int pMark) {
     tS32 joyY;
     LOG_TRACE10("(%p, %d)", pKeys, pMark);
 
+    gHarness_platform.ProcessWindowMessages(NULL);
+
     gKeys_pressed = 0;
     for (i = 0; i < COUNT_OF(gScan_code); i++) {
         if (KeyDown(gScan_code[i][0]) || KeyDown(gScan_code[i][1])) {
@@ -506,7 +508,13 @@ void PDAllocateScreenAndBack(void) {
         gExceptions_file_suffix = ".TXT";
         gInterpolate_textures = 1;
         gExceptions_general_file = "SOFTWARE";
-        gScreen = BrDevBeginOld(gGraf_specs[gGraf_spec_index].gfx_init_string);
+        // gScreen = BrDevBeginOld(gGraf_specs[gGraf_spec_index].gfx_init_string);
+        BrDevBeginVar(&gScreen, "virtualframebuffer",
+            BRT_WIDTH_I32, 320,
+            BRT_HEIGHT_I32, 200,
+            BRT_VIRTUALFB_DOUBLEBUFFER_CALLBACK_P, gHarness_platform.Swap,
+            BRT_VIRTUALFB_PALETTE_CHANGED_CALLBACK_P, gHarness_platform.PaletteChanged,
+            BR_NULL_TOKEN);
         gDOSGfx_initialized = 1;
     }
     gScreen->origin_x = 0;
@@ -735,6 +743,7 @@ int PDGetTotalTime(void) {
 
 // IDA: int __usercall PDServiceSystem@<EAX>(tU32 pTime_since_last_call@<EAX>)
 int PDServiceSystem(tU32 pTime_since_last_call) {
+    gHarness_platform.ProcessWindowMessages(NULL);
     return 0;
 }
 

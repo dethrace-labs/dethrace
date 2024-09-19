@@ -56,6 +56,8 @@ static void* create_window_and_renderer(char* title, int x, int y, int width, in
         LOG_PANIC("Failed to create screen_texture: %s", SDL_GetError());
     }
 
+    SDL_SetWindowSize(window, width, height);
+
     return window;
 }
 
@@ -116,7 +118,7 @@ static int get_and_handle_message(MSG_* msg) {
             break;
 
         case SDL_QUIT:
-            msg->message = WM_QUIT;
+            // msg->message = WM_QUIT;
             return 1;
         }
     }
@@ -206,6 +208,42 @@ int show_error_message(void* window, char* text, char* caption) {
     return 0;
 }
 
+static void swap(br_pixelmap* back_buffer) {
+    uint8_t* src_pixels = back_buffer->pixels;
+    uint32_t* dest_pixels;
+    int dest_pitch;
+
+    if (window == NULL) {
+        create_window_and_renderer("Carmageddon", 0, 0, 320, 200);
+    }
+
+    SDL_LockTexture(screen_texture, NULL, (void**)&dest_pixels, &dest_pitch);
+    for (int i = 0; i < back_buffer->height * back_buffer->width; i++) {
+        *dest_pixels = converted_palette[*src_pixels];
+        dest_pixels++;
+        src_pixels++;
+    }
+    SDL_UnlockTexture(screen_texture);
+    SDL_RenderClear(renderer);
+    SDL_RenderCopy(renderer, screen_texture, NULL, NULL);
+    SDL_RenderPresent(renderer);
+
+    last_screen_src = back_buffer;
+
+    if (harness_game_config.fps != 0) {
+        limit_fps();
+    }
+}
+
+static void palette_changed(br_colour entries[256]) {
+    for (int i = 0; i < 256; i++) {
+        converted_palette[i] = (0xff << 24 | BR_RED(entries[i]) << 16 | BR_GRN(entries[i]) << 8 | BR_BLU(entries[i]));
+    }
+    if (last_screen_src != NULL) {
+        swap(last_screen_src);
+    }
+}
+
 void Harness_Platform_Init(tHarness_platform* platform) {
     platform->ProcessWindowMessages = get_and_handle_message;
     platform->Sleep = SDL_Delay;
@@ -221,4 +259,7 @@ void Harness_Platform_Init(tHarness_platform* platform) {
     platform->ShowErrorMessage = show_error_message;
     platform->Renderer_SetPalette = set_palette;
     platform->Renderer_Present = present_screen;
+
+    platform->Swap = swap;
+    platform->PaletteChanged = palette_changed;
 }

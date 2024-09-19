@@ -4,6 +4,7 @@
 #include "errors.h"
 #include "flicplay.h"
 #include "globvars.h"
+#include "globvrbm.h"
 #include "globvrpb.h"
 #include "grafdata.h"
 #include "graphics.h"
@@ -313,14 +314,28 @@ void PratcamEvent(int pIndex) {
 int HighResPratBufferWidth(void) {
     int prat_width;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (!gDevious_2d || !gTextures_need_powers_of_2) {
+        return 104;
+    }
+    for (prat_width = 1; prat_width < 104; prat_width *= 2) {
+        ;
+    }
+    return prat_width;
 }
 
 // IDA: int __cdecl HighResPratBufferHeight()
 int HighResPratBufferHeight(void) {
     int prat_height;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (!gDevious_2d || !gTextures_need_powers_of_2) {
+        return 110;
+    }
+    for (prat_height = 1; prat_height < 110; prat_height *= 2) {
+        ;
+    }
+    return prat_height;
 }
 
 // IDA: void __cdecl InitPratcam()

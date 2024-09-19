@@ -1156,7 +1156,7 @@ void SubsStringJob(char* pStr, ...) {
             va_end(ap);
             return;
         }
-        sub_str = va_arg(ap, char *);
+        sub_str = va_arg(ap, char*);
         StripCR(sub_str);
         strcpy(temp_str, &sub_pt[1]);
         strcpy(sub_pt, sub_str);
@@ -1476,7 +1476,29 @@ void NobbleNonzeroBlacks(br_pixelmap* pPalette) {
     tU32* palette_entry;
     tU32 frobbed;
     LOG_TRACE("(%p)", pPalette);
-    NOT_IMPLEMENTED();
+
+    int i;
+
+    palette_entry = pPalette->pixels;
+    frobbed = 0;
+    if (*palette_entry != 0) {
+        *palette_entry = 0;
+        frobbed = 1;
+    }
+    palette_entry++;
+    for (i = 1; i < 256; i++) {
+        blue = (*palette_entry >> 16) & 0xff;
+        green = (*palette_entry >> 8) & 0xff;
+        red = (*palette_entry) & 0xff;
+        if (blue == 0 && green == 0 && red == 0) {
+            frobbed = 1;
+            *palette_entry = 0;
+        }
+        palette_entry++;
+        if (frobbed) {
+            BrMapUpdate(pPalette, BR_MAPU_ALL);
+        }
+    }
 }
 
 // IDA: int __usercall PDCheckDriveExists@<EAX>(char *pThe_path@<EAX>)

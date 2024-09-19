@@ -34,6 +34,9 @@ typedef struct tHarness_platform {
     // Show error message
     int (*ShowErrorMessage)(void* window, char* text, char* caption);
 
+    void (*Swap)(br_pixelmap* back_buffer);
+    void (*PaletteChanged)(br_colour entries[256]);
+
 } tHarness_platform;
 
 extern tHarness_platform gHarness_platform;
