@@ -88,13 +88,13 @@ Once cmake has generated the build files for your platform, run the build. For e
 make
 ```
 
-### Run
+### Running the game
 
-After building, `build/dethrace` is created
+Firstly, you need a copy of the [Carmageddon game content](https://github.com/dethrace-labs/dethrace?tab=readme-ov-file#game-content). Extract the zip file if necessary.
 
-```sh
-./dethrace [args]
-```
+Dethrace expects to be placed into the top level Carmageddon folder. You know you have the right folder when you see the original `CARMA.EXE` there. If you are on Windows, you must also place `SDL2.dll` in the same folder.
+
+<img width="638" alt="Screenshot 2024-09-20 at 12 25 05 PM" src="https://github.com/user-attachments/assets/fda77818-9007-44fa-9d8d-c311396fd435">
 
 
 ## Run tests
