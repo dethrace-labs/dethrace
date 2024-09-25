@@ -17,6 +17,10 @@ Uint32 last_frame_time;
 
 uint8_t directinput_key_state[SDL_NUM_SCANCODES];
 
+// Callbacks back into original game code
+extern void QuitGame(void);
+extern uint32_t gKeyboard_bits[8];
+
 static void* create_window_and_renderer(char* title, int x, int y, int width, int height) {
     render_width = width;
     render_height = height;
@@ -115,10 +119,16 @@ static int get_and_handle_message(MSG_* msg) {
             // DInput expects high bit to be set if key is down
             // https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418261(v=vs.85)
             directinput_key_state[dinput_key] = (event.type == SDL_KEYDOWN ? 0x80 : 0);
+            if (event.type == SDL_KEYDOWN) {
+                gKeyboard_bits[dinput_key >> 5] |= (1 << (dinput_key & 0x1F));
+            } else {
+                gKeyboard_bits[dinput_key >> 5] &= ~(1 << (dinput_key & 0x1F));
+            }
             break;
 
         case SDL_QUIT:
             // msg->message = WM_QUIT;
+            QuitGame();
             return 1;
         }
     }
@@ -214,8 +224,11 @@ static void swap(br_pixelmap* back_buffer) {
     int dest_pitch;
 
     if (window == NULL) {
-        create_window_and_renderer("Carmageddon", 0, 0, 320, 200);
+        create_window_and_renderer("Carmageddon", 0, 0, back_buffer->width, back_buffer->height);
+        SDL_SetWindowSize(window, 640, 480);
     }
+
+    get_and_handle_message(NULL);
 
     SDL_LockTexture(screen_texture, NULL, (void**)&dest_pixels, &dest_pitch);
     for (int i = 0; i < back_buffer->height * back_buffer->width; i++) {
@@ -227,8 +240,6 @@ static void swap(br_pixelmap* back_buffer) {
     SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer, screen_texture, NULL, NULL);
     SDL_RenderPresent(renderer);
-
-    get_and_handle_message(NULL);
 
     last_screen_src = back_buffer;
 

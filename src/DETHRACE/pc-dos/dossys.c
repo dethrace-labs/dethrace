@@ -13,6 +13,7 @@
 #include "input.h"
 #include "loadsave.h"
 #include "main.h"
+#include "pc-dos/scancodes.h"
 #include "pd/sys.h"
 #include "sound.h"
 #include "utility.h"
@@ -23,124 +24,18 @@
 #include <sys/stat.h>
 #include <time.h>
 
-#define SCANCODE_ESCAPE 0x01
-#define SCANCODE_1 0x02
-#define SCANCODE_2 0x03
-#define SCANCODE_3 0x04
-#define SCANCODE_4 0x05
-#define SCANCODE_5 0x06
-#define SCANCODE_6 0x07
-#define SCANCODE_7 0x08
-#define SCANCODE_8 0x09
-#define SCANCODE_9 0x0A
-#define SCANCODE_0 0x0B
-#define SCANCODE_MINUS 0x0C /* - on main keyboard */
-#define SCANCODE_EQUALS 0x0D
-#define SCANCODE_BACK 0x0E /* backspace */
-#define SCANCODE_TAB 0x0F
-#define SCANCODE_Q 0x10
-#define SCANCODE_W 0x11
-#define SCANCODE_E 0x12
-#define SCANCODE_R 0x13
-#define SCANCODE_T 0x14
-#define SCANCODE_Y 0x15
-#define SCANCODE_U 0x16
-#define SCANCODE_I 0x17
-#define SCANCODE_O 0x18
-#define SCANCODE_P 0x19
-#define SCANCODE_LBRACKET 0x1A
-#define SCANCODE_RBRACKET 0x1B
-#define SCANCODE_RETURN 0x1C /* Enter on main keyboard */
-#define SCANCODE_LCONTROL 0x1D
-#define SCANCODE_A 0x1E
-#define SCANCODE_S 0x1F
-#define SCANCODE_D 0x20
-#define SCANCODE_F 0x21
-#define SCANCODE_G 0x22
-#define SCANCODE_H 0x23
-#define SCANCODE_J 0x24
-#define SCANCODE_K 0x25
-#define SCANCODE_L 0x26
-#define SCANCODE_SEMICOLON 0x27
-#define SCANCODE_APOSTROPHE 0x28
-#define SCANCODE_GRAVE 0x29 /* accent grave */
-#define SCANCODE_LSHIFT 0x2A
-#define SCANCODE_BACKSLASH 0x2B
-#define SCANCODE_Z 0x2C
-#define SCANCODE_X 0x2D
-#define SCANCODE_C 0x2E
-#define SCANCODE_V 0x2F
-#define SCANCODE_B 0x30
-#define SCANCODE_N 0x31
-#define SCANCODE_M 0x32
-#define SCANCODE_COMMA 0x33
-#define SCANCODE_PERIOD 0x34 /* . on main keyboard */
-#define SCANCODE_SLASH 0x35  /* / on main keyboard */
-#define SCANCODE_RSHIFT 0x36
-#define SCANCODE_MULTIPLY 0x37 /* * on numeric keypad */
-#define SCANCODE_LMENU 0x38    /* left Alt */
-#define SCANCODE_SPACE 0x39
-#define SCANCODE_CAPITAL 0x3A
-#define SCANCODE_F1 0x3B
-#define SCANCODE_F2 0x3C
-#define SCANCODE_F3 0x3D
-#define SCANCODE_F4 0x3E
-#define SCANCODE_F5 0x3F
-#define SCANCODE_F6 0x40
-#define SCANCODE_F7 0x41
-#define SCANCODE_F8 0x42
-#define SCANCODE_F9 0x43
-#define SCANCODE_F10 0x44
-#define SCANCODE_NUMLOCK 0x45
-#define SCANCODE_SCROLL 0x46 /* Scroll Lock */
-#define SCANCODE_NUMPAD7 0x47
-#define SCANCODE_NUMPAD8 0x48
-#define SCANCODE_NUMPAD9 0x49
-#define SCANCODE_SUBTRACT 0x4A /* - on numeric keypad */
-#define SCANCODE_NUMPAD4 0x4B
-#define SCANCODE_NUMPAD5 0x4C
-#define SCANCODE_NUMPAD6 0x4D
-#define SCANCODE_ADD 0x4E /* + on numeric keypad */
-#define SCANCODE_NUMPAD1 0x4F
-#define SCANCODE_NUMPAD2 0x50
-#define SCANCODE_NUMPAD3 0x51
-#define SCANCODE_NUMPAD0 0x52
-#define SCANCODE_DECIMAL 0x53 /* . on numeric keypad */
-#define SCANCODE_OEM_102 0x56 /* <> or \| on RT 102-key keyboard (Non-U.S.) */
-#define SCANCODE_F11 0x57
-#define SCANCODE_F12 0x58
-#define SCANCODE_F13 0x64          /*                     (NEC PC98) */
-#define SCANCODE_F14 0x65          /*                     (NEC PC98) */
-#define SCANCODE_F15 0x66          /*                     (NEC PC98) */
-#define SCANCODE_KANA 0x70         /* (Japanese keyboard)            */
-#define SCANCODE_ABNT_C1 0x73      /* /? on Brazilian keyboard */
-#define SCANCODE_CONVERT 0x79      /* (Japanese keyboard)            */
-#define SCANCODE_NOCONVERT 0x7B    /* (Japanese keyboard)            */
-#define SCANCODE_YEN 0x7D          /* (Japanese keyboard)            */
-#define SCANCODE_ABNT_C2 0x7E      /* Numpad . on Brazilian keyboard */
-#define SCANCODE_NUMPADEQUALS 0x8D /* = on numeric keypad (NEC PC98) */
-#define SCANCODE_PREVTRACK 0x90    /* Previous Track (SCANCODE_CIRCUMFLEX on Japanese keyboard) */
-#define SCANCODE_AT 0x91           /*                     (NEC PC98) */
-#define SCANCODE_COLON 0x92        /*                     (NEC PC98) */
-#define SCANCODE_UNDERLINE 0x93    /*                     (NEC PC98) */
-#define SCANCODE_KANJI 0x94        /* (Japanese keyboard)            */
-#define SCANCODE_STOP 0x95         /*                     (NEC PC98) */
-#define SCANCODE_AX 0x96           /*                     (Japan AX) */
-#define SCANCODE_UNLABELED 0x97    /*                        (J3100) */
-#define SCANCODE_NEXTTRACK 0x99    /* Next Track */
-#define SCANCODE_NUMPADENTER 0x9C  /* Enter on numeric keypad */
-#define SCANCODE_RCONTROL 0x9D
-
 // #ifdef __DOS__
+
+// This code comes from DOS, so small changes need to be made to run correctly on windowed systems.
+// Generally the pc-win95 does the same thing
+#define PLAY_NICE_WITH_GUI 1
 
 int gDOSGfx_initialized;
 int gExtra_mem;
 int gReplay_override;
 tGraf_spec gGraf_specs[2] = {
-    { 8, 1, 0, 320, 200, 0, 0, "32X20X8", "virtualframebuffer,W:320,H:200,B:8", 320, 320, 200, NULL },
-    { 8, 1, 0, 640, 480, 0, 0, "64X48X8", "virtualframebuffer,W:640,H:480,B:8", 640, 640, 480, NULL }
-    // { 8, 1, 0, 320, 200, 0, 0, "32X20X8", "MCGA,W:320,H:200,B:8", 320, 320, 200, NULL },
-    // { 8, 1, 0, 640, 480, 0, 0, "64X48X8", "VESA,W:640,H:480,B:8", 640, 640, 480, NULL }
+    { 8, 1, 0, 320, 200, 0, 0, "32X20X8", "MCGA,W:320,H:200,B:8", 320, 320, 200, NULL },
+    { 8, 1, 0, 640, 480, 0, 0, "64X48X8", "VESA,W:640,H:480,B:8", 640, 640, 480, NULL }
 };
 int gASCII_table[128];
 tU32 gKeyboard_bits[8];
@@ -239,13 +134,16 @@ void KeyBegin(void) {
     gScan_code[KEY_BACKSPACE][0] = SCANCODE_BACK;
     gScan_code[KEY_RETURN][0] = SCANCODE_RETURN;
     gScan_code[KEY_KP_ENTER][0] = SCANCODE_NUMPADENTER;
+
     gScan_code[KEY_SHIFT_ANY][0] = SCANCODE_LSHIFT;
     gScan_code[KEY_SHIFT_ANY][1] = SCANCODE_RSHIFT;
-    gScan_code[KEY_ALT_ANY][0] = SCANCODE_LMENU;
+    gScan_code[KEY_ALT_ANY][0] = SCANCODE_LALT;
+    gScan_code[KEY_ALT_ANY][1] = SCANCODE_RALT;
     gScan_code[KEY_CTRL_ANY][0] = SCANCODE_LCONTROL;
     gScan_code[KEY_CTRL_ANY][1] = SCANCODE_RCONTROL;
     gScan_code[KEY_CTRL_ANY_2][0] = SCANCODE_LCONTROL;
     gScan_code[KEY_CTRL_ANY_2][1] = SCANCODE_RCONTROL;
+
     gScan_code[KEY_CAPSLOCK][0] = SCANCODE_CAPITAL;
     gScan_code[KEY_UNKNOWN_55][0] = SCANCODE_OEM_102;
     gScan_code[KEY_SLASH][0] = SCANCODE_SLASH;
@@ -257,11 +155,23 @@ void KeyBegin(void) {
     gScan_code[KEY_ESCAPE][0] = SCANCODE_ESCAPE;
     gScan_code[KEY_APOSTROPHE][0] = SCANCODE_APOSTROPHE;
     gScan_code[KEY_BACKSLASH][0] = SCANCODE_BACKSLASH;
+    gScan_code[KEY_INSERT][0] = SCANCODE_INSERT;
+    gScan_code[KEY_END][0] = SCANCODE_END;
     gScan_code[KEY_RBRACKET][0] = SCANCODE_RBRACKET;
+    gScan_code[KEY_HOME][0] = SCANCODE_HOME;
+    gScan_code[KEY_PAGEUP][0] = SCANCODE_PGUP;
+    gScan_code[KEY_RIGHT][0] = SCANCODE_RIGHT;
+    gScan_code[KEY_DELETE][0] = SCANCODE_DELETE;
+    gScan_code[KEY_LEFT][0] = SCANCODE_LEFT;
+    gScan_code[KEY_UP][0] = SCANCODE_UP;
+    gScan_code[KEY_PAGEDOWN][0] = SCANCODE_PGDN;
     gScan_code[KEY_KP_NUMLOCK][0] = SCANCODE_NUMLOCK;
+    gScan_code[KEY_DOWN][0] = SCANCODE_DOWN;
+    gScan_code[KEY_KP_DIVIDE][0] = SCANCODE_DIVIDE;
     gScan_code[KEY_KP_MULTIPLY][0] = SCANCODE_MULTIPLY;
     gScan_code[KEY_KP_PLUS][0] = SCANCODE_ADD;
     gScan_code[KEY_KP_MINUS][0] = SCANCODE_SUBTRACT;
+    gScan_code[KEY_KP_EQUALS][0] = 0;
     gScan_code[KEY_KP_PERIOD][0] = SCANCODE_DECIMAL;
     gScan_code[KEY_KP_1][0] = SCANCODE_NUMPAD1;
     gScan_code[KEY_KP_3][0] = SCANCODE_NUMPAD3;
@@ -286,11 +196,14 @@ void KeyBegin(void) {
     gScan_code[KEY_F12][0] = SCANCODE_F12;
     gScan_code[KEY_SCRLK][0] = SCANCODE_SCROLL;
     gScan_code[KEY_F11][0] = SCANCODE_F11;
+    gScan_code[KEY_PRTSCN][0] = 0;
+    gScan_code[KEY_PAUSE][0] = 0;
     gScan_code[KEY_SPACE][0] = SCANCODE_SPACE;
     gScan_code[KEY_RSHIFT][0] = SCANCODE_RSHIFT;
+    gScan_code[KEY_RALT][0] = SCANCODE_RALT;
     gScan_code[KEY_RCTRL][0] = SCANCODE_RCONTROL;
     gScan_code[KEY_LSHIFT][0] = SCANCODE_LSHIFT;
-    gScan_code[KEY_LALT][0] = SCANCODE_LMENU;
+    gScan_code[KEY_LALT][0] = SCANCODE_LALT;
     gScan_code[KEY_LCTRL][0] = SCANCODE_LCONTROL;
 
     // gPrev_keyboard_handler = dos_getvect(9);
@@ -319,16 +232,17 @@ void PDSetKeyArray(int* pKeys, int pMark) {
     tS32 joyY;
     LOG_TRACE10("(%p, %d)", pKeys, pMark);
 
-    // Added by dethrace, required in some cases like a tight loop waiting for a keypress
-    // Win95 code does the same
+#ifdef PLAY_NICE_WITH_GUI
+    // Required in some cases like a tight loop waiting for a keypress
     gHarness_platform.ProcessWindowMessages(NULL);
+#endif
 
     gKeys_pressed = 0;
     for (i = 0; i < COUNT_OF(gScan_code); i++) {
         if (KeyDown(gScan_code[i][0]) || KeyDown(gScan_code[i][1])) {
             gKeys_pressed = i + (gKeys_pressed << 8) + 1;
             pKeys[i] = pMark;
-        } else if (pMark == *pKeys) {
+        } else if (pMark == pKeys[i]) {
             pKeys[i] = 0;
         }
     }
@@ -356,14 +270,21 @@ void PDFatalError(char* pThe_str) {
     }
     printf("FATAL ERROR: %s\n", pThe_str);
     dr_dprintf("FATAL ERROR: %s\n", pThe_str);
+#ifdef PLAY_NICE_WITH_GUI
+    gHarness_platform.ShowErrorMessage(NULL, "Carmageddon Fatal Error", pThe_str);
+#endif
     if (gBrZb_initialized) {
         gBrZb_initialized = 0;
         BrZbEnd();
     }
-    if (gBr_initialized)
+    if (gBr_initialized) {
         gBr_initialized = 0;
+    }
+#ifndef PLAY_NICE_WITH_GUI
+    // There is no window to receive keyboard events from
     while (PDAnyKeyDown() == -1) {
     }
+#endif
     QuitGame();
 }
 
@@ -510,13 +431,18 @@ void PDAllocateScreenAndBack(void) {
         gExceptions_file_suffix = ".TXT";
         gInterpolate_textures = 1;
         gExceptions_general_file = "SOFTWARE";
-        // gScreen = BrDevBeginOld(gGraf_specs[gGraf_spec_index].gfx_init_string);
+
+#ifdef PLAY_NICE_WITH_GUI
+        // Render framebuffer to memory and call hooks when swapping or palette changing
         BrDevBeginVar(&gScreen, "virtualframebuffer",
-            BRT_WIDTH_I32, 320,
-            BRT_HEIGHT_I32, 200,
+            BRT_WIDTH_I32, gGraf_specs[gGraf_spec_index].phys_width,
+            BRT_HEIGHT_I32, gGraf_specs[gGraf_spec_index].phys_height,
             BRT_VIRTUALFB_DOUBLEBUFFER_CALLBACK_P, gHarness_platform.Swap,
             BRT_VIRTUALFB_PALETTE_CHANGED_CALLBACK_P, gHarness_platform.PaletteChanged,
             BR_NULL_TOKEN);
+#else
+        gScreen = BrDevBeginOld(gGraf_specs[gGraf_spec_index].gfx_init_string);
+#endif
         gDOSGfx_initialized = 1;
     }
     gScreen->origin_x = 0;
@@ -721,6 +647,7 @@ void PDMouseButtons(int* pButton_1, int* pButton_2) {
     br_int_32 mouse_y;
     LOG_TRACE("(%p, %p)", pButton_1, pButton_2);
 
+    // DOSMouseRead(...)
     gHarness_platform.GetMouseButtons(pButton_1, pButton_2);
 }
 
@@ -735,6 +662,7 @@ void PDGetMousePosition(int* pX_coord, int* pY_coord) {
     static br_int_32 mouse_y;
     LOG_TRACE("(%p, %p)", pX_coord, pY_coord);
 
+    // DOSMouseRead(...)
     gHarness_platform.GetMousePosition(pX_coord, pY_coord);
 }
 
@@ -745,8 +673,11 @@ int PDGetTotalTime(void) {
 
 // IDA: int __usercall PDServiceSystem@<EAX>(tU32 pTime_since_last_call@<EAX>)
 int PDServiceSystem(tU32 pTime_since_last_call) {
+
+#ifdef PLAY_NICE_WITH_GUI
     // Added by dethrace. Win95 code does the same
     gHarness_platform.ProcessWindowMessages(NULL);
+#endif
     return 0;
 }
 

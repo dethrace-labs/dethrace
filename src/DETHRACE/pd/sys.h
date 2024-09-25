@@ -16,7 +16,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-// extern int gDOSGfx_initialized;
+extern int gDOSGfx_initialized;
+
 // extern int gExtra_mem;
 // extern int gReplay_override;
 extern tGraf_spec gGraf_specs[2];
@@ -74,7 +75,7 @@ void PDNonFatalError(char* pThe_str);
 
 void PDInitialiseSystem(void);
 
-HARNESS_NORETURN void PDShutdownSystem(void);
+void PDShutdownSystem(void);
 
 void PDSaveOriginalPalette(void);
 

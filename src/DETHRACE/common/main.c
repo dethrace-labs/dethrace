@@ -43,6 +43,20 @@ void QuitGame(void) {
     }
     PDRevertPalette();
     StopMusic();
+    if (gBrZb_initialized) {
+        BrZbEnd();
+    }
+
+    if (gBr_initialized) {
+        BrV1dbEndWrapper();
+    }
+
+#ifdef DETHRACE_FIX_BUGS
+    // Hack: not sure if this is a bug in the original code or if its something caused by dethrace.
+    // Avoids the device screen pixelmap being double-freed
+    gDOSGfx_initialized = 0;
+#endif
+
     PDShutdownSystem();
     CloseDiagnostics();
     exit(0);
