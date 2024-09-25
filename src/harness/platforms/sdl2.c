@@ -11,6 +11,9 @@ SDL_Renderer* renderer;
 SDL_Texture* screen_texture;
 uint32_t converted_palette[256];
 br_pixelmap* last_screen_src;
+
+SDL_GLContext* gl_context;
+
 int render_width, render_height;
 
 Uint32 last_frame_time;
@@ -218,15 +221,69 @@ int show_error_message(void* window, char* text, char* caption) {
     return 0;
 }
 
+static void* create_window(char* title, int width, int height, tHarness_window_type window_type) {
+    render_width = width;
+    render_height = height;
+
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+        LOG_PANIC("SDL_INIT_VIDEO error: %s", SDL_GetError());
+    }
+
+    int flags = SDL_WINDOW_RESIZABLE;
+    if (window_type == eWindow_type_opengl) {
+
+        if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE) != 0) {
+            LOG_PANIC("Failed to set SDL_GL_CONTEXT_PROFILE_MASK attribute. %s", SDL_GetError());
+        };
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+
+        flags |= SDL_WINDOW_OPENGL;
+    }
+
+    window = SDL_CreateWindow(title,
+        SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED,
+        width, height,
+        flags);
+
+    if (window == NULL) {
+        LOG_PANIC("Failed to create window: %s", SDL_GetError());
+    }
+
+    if (window_type == eWindow_type_opengl) {
+        gl_context = SDL_GL_CreateContext(window);
+        if (!gl_context) {
+            LOG_PANIC("Failed to call SDL_GL_CreateContext. %s", SDL_GetError());
+        }
+    } else {
+        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
+        if (renderer == NULL) {
+            LOG_PANIC("Failed to create renderer: %s", SDL_GetError());
+        }
+        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+        SDL_RenderSetLogicalSize(renderer, render_width, render_height);
+
+        screen_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width, height);
+        if (screen_texture == NULL) {
+            SDL_RendererInfo info;
+            SDL_GetRendererInfo(renderer, &info);
+            for (Uint32 i = 0; i < info.num_texture_formats; i++) {
+                LOG_INFO("%s\n", SDL_GetPixelFormatName(info.texture_formats[i]));
+            }
+            LOG_PANIC("Failed to create screen_texture: %s", SDL_GetError());
+        }
+    }
+
+    if (harness_game_config.start_full_screen) {
+        SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+    }
+}
+
 static void swap(br_pixelmap* back_buffer) {
     uint8_t* src_pixels = back_buffer->pixels;
     uint32_t* dest_pixels;
     int dest_pitch;
-
-    if (window == NULL) {
-        create_window_and_renderer("Carmageddon", 0, 0, back_buffer->width, back_buffer->height);
-        SDL_SetWindowSize(window, 640, 480);
-    }
 
     get_and_handle_message(NULL);
 
@@ -273,6 +330,7 @@ void Harness_Platform_Init(tHarness_platform* platform) {
     platform->Renderer_SetPalette = set_palette;
     platform->Renderer_Present = present_screen;
 
+    platform->CreateWindow = create_window;
     platform->Swap = swap;
     platform->PaletteChanged = palette_changed;
 }

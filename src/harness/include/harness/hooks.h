@@ -5,6 +5,11 @@
 #include "harness/win95_polyfill_defs.h"
 #include <stdio.h>
 
+typedef enum tHarness_window_type {
+    eWindow_type_software = 0,
+    eWindow_type_opengl = 1,
+} tHarness_window_type;
+
 // Platform implementation functions
 typedef struct tHarness_platform {
     // Render a fullscreen quad using the specified pixel data
@@ -34,6 +39,8 @@ typedef struct tHarness_platform {
     // Show error message
     int (*ShowErrorMessage)(void* window, char* text, char* caption);
 
+    // Create a window. Return a handle to the window
+    void* (*CreateWindow)(char* title, int nWidth, int nHeight, tHarness_window_type window_type);
     void (*Swap)(br_pixelmap* back_buffer);
     void (*PaletteChanged)(br_colour entries[256]);
 

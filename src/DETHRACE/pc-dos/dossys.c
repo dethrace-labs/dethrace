@@ -405,7 +405,7 @@ void PDAllocateScreenAndBack(void) {
         //     BRT_HEIGHT_I32, 480,
         //     BR_NULL_TOKEN);
     }
-    if (gScreen) {
+    if (gScreen != NULL) {
         if ((strcmp(gScreen->identifier, "Voodoo Graphics") == 0 && !gForce_voodoo_rush_mode) || gForce_voodoo_mode) {
             dr_dprintf("Voodoo Graphics mode");
         } else {
@@ -434,6 +434,7 @@ void PDAllocateScreenAndBack(void) {
 
 #ifdef PLAY_NICE_WITH_GUI
         // Render framebuffer to memory and call hooks when swapping or palette changing
+        gHarness_platform.CreateWindow("Carmageddon", 640, 480, eWindow_type_software);
         BrDevBeginVar(&gScreen, "virtualframebuffer",
             BRT_WIDTH_I32, gGraf_specs[gGraf_spec_index].phys_width,
             BRT_HEIGHT_I32, gGraf_specs[gGraf_spec_index].phys_height,
