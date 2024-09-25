@@ -8,6 +8,7 @@
 #include "globvrpb.h"
 #include "graphics.h"
 #include "harness/config.h"
+#include "harness/hooks.h"
 #include "harness/trace.h"
 #include "input.h"
 #include "loading.h"
@@ -292,7 +293,7 @@ char* GetALineWithNoPossibleService(FILE* pF, unsigned char* pS) {
         if (ch != -1) {
             ungetc(ch, pF);
         }
-    } while (!isalnum(s[0])
+    } while (!Harness_Hook_isalnum(s[0])
         && s[0] != '-'
         && s[0] != '.'
         && s[0] != '!'

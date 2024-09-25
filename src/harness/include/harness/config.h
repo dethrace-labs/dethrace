@@ -13,6 +13,7 @@ typedef enum tHarness_game_type {
 typedef enum {
     eGameLocalization_none,
     eGameLocalization_german,
+    eGameLocalization_polish,
 } tHarness_game_localization;
 
 typedef struct tHarness_game_info {

@@ -45,4 +45,7 @@ void Harness_Init(int* argc, char* argv[]);
 // Filesystem hooks
 FILE* Harness_Hook_fopen(const char* pathname, const char* mode);
 
+// Localization
+int Harness_Hook_isalnum(int c);
+
 #endif
