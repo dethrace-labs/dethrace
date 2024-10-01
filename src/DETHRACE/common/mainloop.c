@@ -194,7 +194,7 @@ void MungeHeadups(void) {
         }
         if (gCountdown != new_countdown && new_countdown <= 5) {
             gCountdown = new_countdown;
-            NewImageHeadupSlot(5, 0, 800, new_countdown + 4);
+            NewImageHeadupSlot(eHeadupSlot_countdown, 0, 800, new_countdown + 4);
             DRS3StartSound(gPedestrians_outlet, gCountdown + 8000);
             if (!new_countdown) {
                 MakeFlagWavingBastardWaveHisFlagWhichIsTheProbablyTheLastThingHeWillEverDo();
@@ -468,8 +468,8 @@ int MungeRaceFinished(void) {
             return 1;
         }
         gRace_finished = 15 * gTimer + 4500;
-        gRace_bonus_headup = NewTextHeadupSlot(9, 0, 0, -4, "");
-        gTime_bonus_headup = NewTextHeadupSlot(10, 0, 0, -4, "");
+        gRace_bonus_headup = NewTextHeadupSlot(eHeadupSlot_race_bonus, 0, 0, -4, "");
+        gTime_bonus_headup = NewTextHeadupSlot(eHeadupSlot_time_bonus, 0, 0, -4, "");
         gTime_bonus = 0;
         gTime_bonus_start = GetTotalTime();
         gTime_bonus_state = eTime_bonus_initial_pause;

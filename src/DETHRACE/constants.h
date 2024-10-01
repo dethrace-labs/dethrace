@@ -3,6 +3,25 @@
 
 // These names are not part of the symbol dump, so the names in this file are not original, except as noted.
 
+// Names derived from DATA/64X48X8/HEADUP.TXT (and context)
+typedef enum dr_headup_slot {
+    eHeadupSlot_development = 0,
+    eHeadupSlot_credits = 1,
+    eHeadupSlot_ped_kills = 2,
+    eHeadupSlot_ped_warning = 3,
+    eHeadupSlot_misc = 4,
+    eHeadupSlot_countdown = 5,
+    eHeadupSlot_fancies = 6,
+    eHeadupSlot_timer = 7,
+    eHeadupSlot_lap_count = 8,
+    eHeadupSlot_race_bonus = 9,
+    eHeadupSlot_time_bonus = 10,
+    eHeadupSlot_time_award = 11,
+    eHeadupSlot_cars_out_count = 12,
+    eHeadupSlot_cash_network = 13,
+    eHeadupSlot_ped_network = 14,
+} dr_headup_slot;
+
 // Names from `gMem_names`. See also: `CreateStainlessClasses`
 typedef enum dr_memory_classes {
     kMem_intf_pix_copy = 129,                                            //  0x81

@@ -1214,7 +1214,7 @@ void DustRotate(void) {
     if (gDust_rotate >= gNum_dust_tables) {
         gDust_rotate = 0;
     }
-    NewTextHeadupSlot(4, 0, 1000, -4, "Dust colour rotated");
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, "Dust colour rotated");
 }
 
 // IDA: void __usercall RenderSmoke(br_pixelmap *pRender_screen@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>, tU32 pTime)

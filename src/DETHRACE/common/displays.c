@@ -349,7 +349,7 @@ void DoHeadups(tU32 pThe_time) {
         DoNetScores();
     }
     if (gQueued_headup_count && PDGetTotalTime() - gLast_centre_headup >= 1000) {
-        NewTextHeadupSlot(4, gQueued_headups[0].flash_rate,
+        NewTextHeadupSlot(eHeadupSlot_misc, gQueued_headups[0].flash_rate,
             gQueued_headups[0].lifetime,
             gQueued_headups[0].font_index,
             gQueued_headups[0].text);
@@ -476,7 +476,7 @@ void DoHeadups(tU32 pThe_time) {
                                 0,
                                 the_headup->data.fancy_info.image->width,
                                 the_headup->data.fancy_info.image->height,
-                                -65536);
+                                -BrIntToFixed(1));
                             break;
                         case eFancy_stage_halting:
                             time_factor = 1000 * (pThe_time - the_headup->data.fancy_info.start_time) / 100;
@@ -495,7 +495,7 @@ void DoHeadups(tU32 pThe_time) {
                                     0,
                                     the_headup->data.image_info.image->width,
                                     the_headup->data.image_info.image->height,
-                                    (((1500 - time_factor) * the_headup->data.fancy_info.shear_amount / 500) << 16)
+                                    BrIntToFixed((1500 - time_factor) * the_headup->data.fancy_info.shear_amount / 500)
                                         / the_headup->data.image_info.image->height);
                             } else {
 #if DETHRACE_FIX_BUGS
@@ -510,7 +510,7 @@ void DoHeadups(tU32 pThe_time) {
                                     0,
                                     the_headup->data.image_info.image->width,
                                     the_headup->data.image_info.image->height,
-                                    ((the_headup->data.fancy_info.shear_amount * (time_factor - 500) / 500) << 16)
+                                    BrIntToFixed(the_headup->data.fancy_info.shear_amount * (time_factor - 500) / 500)
                                         / the_headup->data.image_info.image->height);
                             }
                             break;
@@ -546,8 +546,8 @@ void DoHeadups(tU32 pThe_time) {
                                 0,
                                 the_headup->data.image_info.image->width,
                                 the_headup->data.image_info.image->height,
-                                -(((time_factor * the_headup->data.fancy_info.shear_amount / 1000) << 16)
-                                    / the_headup->data.image_info.image->height));
+                                -BrIntToFixed(time_factor * the_headup->data.fancy_info.shear_amount / 1000)
+                                    / the_headup->data.image_info.image->height);
                             break;
                         case eFancy_stage_leaving:
                             the_headup->data.fancy_info.offset -= 500 * gFrame_period / 1000;
@@ -563,7 +563,7 @@ void DoHeadups(tU32 pThe_time) {
                                     0,
                                     the_headup->data.image_info.image->width,
                                     the_headup->data.image_info.image->height,
-                                    -65536);
+                                    -BrIntToFixed(1));
                             }
                             break;
                         default:
@@ -878,7 +878,7 @@ void DoFancyHeadup(int pIndex) {
 
     the_time = GetTotalTime();
     if (!gMap_mode && (gLast_fancy_index < 0 || the_time - gLast_fancy_time > 2000 || gLast_fancy_index <= pIndex)) {
-        temp_ref = NewImageHeadupSlot(6, 0, 2000, pIndex + 10);
+        temp_ref = NewImageHeadupSlot(eHeadupSlot_fancies, 0, 2000, pIndex + 10);
         if (temp_ref >= 0) {
             gLast_fancy_headup = temp_ref;
             gLast_fancy_index = pIndex;
@@ -1418,7 +1418,7 @@ void EarnCredits2(int pAmount, char* pPrefix_text) {
         sprintf(s, "%s%s %d %s", GetMiscString(kMiscString_Lost), pPrefix_text, -pAmount, GetMiscString(kMiscString_Credits));
         gProgram_state.credits_lost -= original_amount;
     }
-    gLast_credit_headup__displays = NewTextHeadupSlot(4, 0, 2000, -4, s);
+    gLast_credit_headup__displays = NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, s);
     gLast_earn_time = the_time;
 }
 
@@ -1471,7 +1471,7 @@ void AwardTime(tU32 pTime) {
     gTimer += original_amount * 1000;
     s[0] = '+';
     TimerString(1000 * pTime, &s[1], 0, 0);
-    gLast_time_credit_headup = NewTextHeadupSlot(11, 0, 2000, -2, s);
+    gLast_time_credit_headup = NewTextHeadupSlot(eHeadupSlot_time_award, 0, 2000, -2, s);
     gLast_time_earn_time = the_time;
 }
 
