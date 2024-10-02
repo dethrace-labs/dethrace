@@ -678,9 +678,15 @@ void PrintScreenFile(FILE* pF) {
     // 3. Color table (=palette)
     for (i = 0; i < 256; i++) {
         // red, green, blue, unused
+#if BR_ENDIAN_BIG
+        WriteU8L(pF, ((tU8*)gCurrent_palette->pixels)[4 * i + 3]);
+        WriteU8L(pF, ((tU8*)gCurrent_palette->pixels)[4 * i + 2]);
+        WriteU8L(pF, ((tU8*)gCurrent_palette->pixels)[4 * i + 1]);
+#else
         WriteU8L(pF, ((tU8*)gCurrent_palette->pixels)[4 * i]);
         WriteU8L(pF, ((tU8*)gCurrent_palette->pixels)[4 * i + 1]);
         WriteU8L(pF, ((tU8*)gCurrent_palette->pixels)[4 * i + 2]);
+#endif
         WriteU8L(pF, 0);
     }
 

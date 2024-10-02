@@ -33,6 +33,11 @@ int gSave_allowed;
         (V) = BrHtoNL(V); \
     } while (0)
 
+#define SWAP32_LE(V)      \
+    do {                  \
+        (V) = BrHtoLL(V); \
+    } while (0)
+
 // IDA: void __usercall CorrectLoadByteOrdering(int pIndex@<EAX>)
 void CorrectLoadByteOrdering(int pIndex) {
     int i;
@@ -56,6 +61,29 @@ void CorrectLoadByteOrdering(int pIndex) {
     }
 }
 
+#if BR_ENDIAN_BIG
+static void CorrectChecksumByteOrdering(tSave_game* pSaved_game) {
+    int i;
+
+    SWAP32_LE(pSaved_game->version);
+    SWAP32_LE(pSaved_game->rank);
+    SWAP32_LE(pSaved_game->credits);
+    SWAP32_LE(pSaved_game->skill_level);
+    SWAP32_LE(pSaved_game->frank_or_annitude);
+    SWAP32_LE(pSaved_game->game_completed);
+    SWAP32_LE(pSaved_game->current_race_index);
+    SWAP32_LE(pSaved_game->number_of_cars);
+    for (i = 0; i < COUNT_OF(pSaved_game->cars_available); i++) {
+        SWAP32_LE(pSaved_game->cars_available[i]);
+    }
+    SWAP32_LE(pSaved_game->current_car_index);
+    SWAP32_LE(pSaved_game->redo_race_index);
+    for (i = 0; i < COUNT_OF(pSaved_game->power_up_levels); i++) {
+        SWAP32_LE(pSaved_game->power_up_levels[i]);
+    }
+}
+#endif
+
 // IDA: tU32 __usercall CalcLSChecksum@<EAX>(tSave_game *pSaved_game@<EAX>)
 tU32 CalcLSChecksum(tSave_game* pSaved_game) {
     tU32 checksum;
@@ -70,12 +98,20 @@ tU32 CalcLSChecksum(tSave_game* pSaved_game) {
     }
 #endif
 
+#if BR_ENDIAN_BIG
+    CorrectChecksumByteOrdering(pSaved_game);
+#endif
     checksum = 0;
     for (i = 0, ptr = (tU8*)pSaved_game; i < (sizeof(tSave_game) - sizeof(tU32)); i++, ptr++) {
         checksum2 = (*ptr ^ 0xbd) + checksum;
         checksum = checksum ^ checksum2 << 25 ^ checksum2 >> 7;
     }
+#if BR_ENDIAN_BIG
+    CorrectChecksumByteOrdering(pSaved_game);
+    return BrHtoLL(checksum);
+#else
     return checksum;
+#endif
 }
 
 // IDA: void __cdecl LoadSavedGames()
