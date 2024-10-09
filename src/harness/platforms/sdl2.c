@@ -244,7 +244,7 @@ static void* create_window(char* title, int width, int height, tHarness_window_t
     window = SDL_CreateWindow(title,
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
-        width, height,
+        640, 480,
         flags);
 
     if (window == NULL) {
@@ -287,18 +287,21 @@ static void swap(br_pixelmap* back_buffer) {
 
     get_and_handle_message(NULL);
 
-    SDL_LockTexture(screen_texture, NULL, (void**)&dest_pixels, &dest_pitch);
-    for (int i = 0; i < back_buffer->height * back_buffer->width; i++) {
-        *dest_pixels = converted_palette[*src_pixels];
-        dest_pixels++;
-        src_pixels++;
+    if (gl_context != NULL) {
+        SDL_GL_SwapWindow(window);
+    } else {
+        SDL_LockTexture(screen_texture, NULL, (void**)&dest_pixels, &dest_pitch);
+        for (int i = 0; i < back_buffer->height * back_buffer->width; i++) {
+            *dest_pixels = converted_palette[*src_pixels];
+            dest_pixels++;
+            src_pixels++;
+        }
+        SDL_UnlockTexture(screen_texture);
+        SDL_RenderClear(renderer);
+        SDL_RenderCopy(renderer, screen_texture, NULL, NULL);
+        SDL_RenderPresent(renderer);
+        last_screen_src = back_buffer;
     }
-    SDL_UnlockTexture(screen_texture);
-    SDL_RenderClear(renderer);
-    SDL_RenderCopy(renderer, screen_texture, NULL, NULL);
-    SDL_RenderPresent(renderer);
-
-    last_screen_src = back_buffer;
 
     if (harness_game_config.fps != 0) {
         limit_fps();
@@ -333,4 +336,5 @@ void Harness_Platform_Init(tHarness_platform* platform) {
     platform->CreateWindow = create_window;
     platform->Swap = swap;
     platform->PaletteChanged = palette_changed;
+    platform->GL_GetProcAddress = SDL_GL_GetProcAddress;
 }

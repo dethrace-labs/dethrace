@@ -517,6 +517,8 @@ void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
     }
 }
 
+extern void BrDevLastBeginSet(br_pixelmap* pm);
+
 // IDA: void __usercall SetBRenderScreenAndBuffers(int pX_offset@<EAX>, int pY_offset@<EDX>, int pWidth@<EBX>, int pHeight@<ECX>)
 void SetBRenderScreenAndBuffers(int pX_offset, int pY_offset, int pWidth, int pHeight) {
     LOG_TRACE("(%d, %d, %d, %d)", pX_offset, pY_offset, pWidth, pHeight);
@@ -550,6 +552,11 @@ void SetBRenderScreenAndBuffers(int pX_offset, int pY_offset, int pWidth, int pH
     if (gDepth_buffer == NULL) {
         FatalError(kFatalError_AllocateZBuffer);
     }
+
+#ifdef DETHRACE_3DFX_PATCH
+    BrDevLastBeginSet(gBack_screen);
+#endif
+
     BrZbBegin(gRender_screen->type, gDepth_buffer->type);
     gBrZb_initialized = 1;
 }
@@ -642,8 +649,9 @@ void DRSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
         ((br_int_32*)pPalette->pixels)[0] = 0;
     }
     memcpy(gCurrent_palette_pixels + 4 * pFirst_colour, (char*)pPalette->pixels + 4 * pFirst_colour, 4 * pCount);
-    // 3dfx
+#ifdef DETHRACE_3DFX_PATCH
     g16bit_palette_valid = 0;
+#endif
     if (!gFaded_palette) {
         PDSetPaletteEntries(pPalette, pFirst_colour, pCount);
     }
@@ -656,8 +664,9 @@ void DRSetPalette3(br_pixelmap* pThe_palette, int pSet_current_palette) {
 
     if (pSet_current_palette) {
         memcpy(gCurrent_palette_pixels, pThe_palette->pixels, 0x400u);
-        // 3dfx
+#ifdef DETHRACE_3DFX_PATCH
         g16bit_palette_valid = 0;
+#endif
     }
     if (!gFaded_palette) {
         PDSetPalette(pThe_palette);
@@ -672,8 +681,9 @@ void DRSetPalette2(br_pixelmap* pThe_palette, int pSet_current_palette) {
     ((br_int_32*)pThe_palette->pixels)[0] = 0;
     if (pSet_current_palette) {
         memcpy(gCurrent_palette_pixels, pThe_palette->pixels, 0x400u);
-        // 3dfx
+#ifdef DETHRACE_3DFX_PATCH
         g16bit_palette_valid = 0;
+#endif
     }
     if (!gFaded_palette) {
         PDSetPalette(pThe_palette);
@@ -692,17 +702,18 @@ void DRSetPalette(br_pixelmap* pThe_palette) {
 void InitializePalettes(void) {
     int j;
     gCurrent_palette_pixels = BrMemAllocate(0x400u, kMem_cur_pal_pixels);
-    // Added in 3dfx patch
+#ifdef DETHRACE_3DFX_PATCH
     g16bit_palette_valid = 0;
+#endif
 
     gCurrent_palette = DRPixelmapAllocate(BR_PMT_RGBX_888, 1u, 256, gCurrent_palette_pixels, 0);
     gRender_palette = BrTableFind("DRRENDER.PAL");
     if (gRender_palette == NULL) {
         FatalError(kFatalError_RequiredPalette);
     }
-    // Added in 3dfx patch
+#ifdef DETHRACE_3DFX_PATCH
     NobbleNonzeroBlacks(gRender_palette);
-    // -
+#endif
     gOrig_render_palette = BrPixelmapAllocateSub(gRender_palette, 0, 0, gRender_palette->width, gRender_palette->height);
     gOrig_render_palette->pixels = BrMemAllocate(0x400u, kMem_render_pal_pixels);
     memcpy(gOrig_render_palette->pixels, gRender_palette->pixels, 0x400u);
@@ -1540,6 +1551,12 @@ int ConditionallyFillWithSky(br_pixelmap* pPixelmap) {
     } else {
         bgnd_col = 0;
     }
+#ifdef DETHRACE_3DFX_PATCH
+    if (pPixelmap->type == BR_PMT_RGB_565) {
+        bgnd_col = PaletteEntry16Bit(gRender_palette, bgnd_col);
+        bgnd_col = (bgnd_col << 16) | bgnd_col;
+    }
+#endif
     BrPixelmapFill(pPixelmap, bgnd_col);
     return 1;
 }
@@ -1570,7 +1587,12 @@ void RenderAFrame(int pDepth_mask_on) {
     tCar_spec* car;
     LOG_TRACE("(%d)", pDepth_mask_on);
 
-    gRender_screen->pixels = gBack_screen->pixels;
+#ifdef DETHRACE_3DFX_PATCH
+    if (gVoodoo_rush_mode >= 1) {
+        gRender_screen->pixels = gBack_screen->pixels;
+    }
+#endif
+
     the_time = GetTotalTime();
     old_pixels = gRender_screen->pixels;
     cockpit_on = gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 && !gMap_mode;
@@ -1678,11 +1700,23 @@ void RenderAFrame(int pDepth_mask_on) {
     if (!ConditionallyFillWithSky(gRender_screen)
         && !gProgram_state.cockpit_on
         && !(gAction_replay_camera_mode && gAction_replay_mode)) {
-        ExternalSky(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world);
+#ifdef DETHRACE_3DFX_PATCH
+        if (gBlitting_is_slow)
+#endif
+        {
+            ExternalSky(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world);
+        }
     }
+
+#ifdef DETHRACE_3DFX_PATCH
+    PDUnlockRealBackScreen(1);
+#endif
+
 #if !defined(DETHRACE_FIX_BUGS)
     // in map mode, the scene is rendered 3 times. We have no idea why.
     for (i = 0; i < (gMap_mode ? 3 : 1); i++)
+#elif defined(DETHRACE_3DFX_PATCH)
+    for (i = 0; i < (gMap_mode && !gSmall_frames_are_slow ? 3 : 1); i++)
 #endif
     {
         RenderShadows(gUniverse_actor, &gProgram_state.track_spec, gCamera, &gCamera_to_world);
@@ -1702,12 +1736,39 @@ void RenderAFrame(int pDepth_mask_on) {
         RenderProximityRays(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, gFrame_period);
         BrZbSceneRenderEnd();
     }
+#ifdef DETHRACE_3DFX_PATCH
+    PDLockRealBackScreen(1);
+#endif
+
     BrMatrix34Copy(&gCamera->t.t.mat, &old_camera_matrix);
+#ifdef DETHRACE_3DFX_PATCH
+    PDUnlockRealBackScreen(1);
+    PDLockRealBackScreen(1);
+    CopyStripImage(
+        gBack_screen,
+        -gCurrent_graf_data->cock_margin_x,
+        gScreen_wobble_x,
+        -gCurrent_graf_data->cock_margin_y,
+        gScreen_wobble_y,
+        gProgram_state.current_car.cockpit_images[gProgram_state.cockpit_image_index],
+        0,
+        0,
+        gCurrent_graf_data->total_cock_width,
+        gCurrent_graf_data->total_cock_height);
+#endif
     if (gMirror_on__graphics) {
+#ifdef DETHRACE_3DFX_PATCH
+        if (gVoodoo_rush_mode >= 1) {
+            gRearview_screen->pixels = gBack_screen->pixels;
+        }
+#endif
         BrPixelmapFill(gRearview_depth_buffer, 0xFFFFFFFF);
         gRendering_mirror = 1;
         DoSpecialCameraEffect(gRearview_camera, &gRearview_camera_to_world);
         ConditionallyFillWithSky(gRearview_screen);
+#ifdef DETHRACE_3DFX_PATCH
+        PDUnlockRealBackScreen(1);
+#endif
         BrZbSceneRenderBegin(gUniverse_actor, gRearview_camera, gRearview_screen, gRearview_depth_buffer);
         ProcessNonTrackActors(
             gRearview_screen,
@@ -1723,7 +1784,14 @@ void RenderAFrame(int pDepth_mask_on) {
             ProcessTrack(gUniverse_actor, &gProgram_state.track_spec, gRearview_camera, &gRearview_camera_to_world, 1);
         }
         RenderSplashes();
+#ifdef DETHRACE_3DFX_PATCH
+        RenderSmoke(gRearview_screen, gRearview_depth_buffer, gRearview_camera, &gRearview_camera_to_world, gFrame_period);
+        RenderSparks(gRearview_screen, gRearview_depth_buffer, gRearview_camera, &gRearview_camera_to_world, gFrame_period);
+#endif
         BrZbSceneRenderEnd();
+#ifdef DETHRACE_3DFX_PATCH
+        PDLockRealBackScreen(1);
+#endif
         BrMatrix34Copy(&gRearview_camera->t.t.mat, &old_mirror_cam_matrix);
         gRendering_mirror = 0;
     }
@@ -1820,6 +1888,7 @@ void RenderAFrame(int pDepth_mask_on) {
         gBack_screen->base_x = real_base_x;
         gBack_screen->base_y = real_base_y;
     } else {
+#if !defined(DETHRACE_3DFX_PATCH)
         if (cockpit_on) {
             CopyStripImage(
                 gBack_screen,
@@ -1844,6 +1913,7 @@ void RenderAFrame(int pDepth_mask_on) {
                     gProgram_state.current_car.mirror_bottom - gProgram_state.current_car.mirror_top);
             }
         }
+#endif
         DimAFewBits();
         DoDamageScreen(the_time);
         if (!gAction_replay_mode || gAR_fudge_headups) {

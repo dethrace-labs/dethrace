@@ -1297,8 +1297,9 @@ void NetFullScreenMessage(int pStr_index, int pLeave_it_up_there) {
         if (restore_screen) {
             memcpy(gBack_screen->pixels, gPixels_copy_, gPixel_buffer_size_);
             memcpy(gCurrent_palette_pixels, gPalette_copy_, 0x400u);
-            // 3dfx
+#ifdef DETHRACE_3DFX_PATCH
             g16bit_palette_valid = 0;
+#endif
             BrMemFree(gPixels_copy_);
             BrMemFree(gPalette_copy_);
             PDScreenBufferSwap(0);

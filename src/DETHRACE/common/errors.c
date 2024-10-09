@@ -132,7 +132,7 @@ char* gError_messages[126] = {
     "File % is corrupted",
     "Random number out of range (%)",
 
-    // Added in 3dfx patch
+#ifdef DETHRACE_3DFX_PATCH
     "Couldn't lock pixelmap %",
     "% should be locked but isn't",
     "Cannot purify pixelmap %",
@@ -142,7 +142,7 @@ char* gError_messages[126] = {
     "Mysterious \"%\" in %",
     "Can only dim rectangles of gBack_screen",
     "Invalid material alpha"
-    // -
+#endif
 };
 int gError_code;
 char* gPalette_copy__errors;    // suffix added to avoid duplicate symbol

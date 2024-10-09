@@ -37,6 +37,7 @@ option(BUILD_TESTS "Build unit tests." OFF)
 option(DETHRACE_INSTALL "Add install target" OFF)
 option(DETHRACE_WERROR "Treat warnings as errors")
 option(DETHRACE_FIX_BUGS "Fix Dethrace bugs" ON)
+option(DETHRACE_3DFX_PATCH "Include changes from VOODOO2C.EXE" ON)
 
 function(add_compile_flag_if_supported TARGET FLAG)
     string(MAKE_C_IDENTIFIER "${FLAG}" FLAG_TO_IDENTIFIER)

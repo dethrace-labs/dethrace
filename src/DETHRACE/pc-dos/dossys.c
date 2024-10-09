@@ -397,14 +397,21 @@ void PDAllocateScreenAndBack(void) {
 
     gScreen = NULL;
     if (gGraf_spec_index != 0 && !gNo_voodoo) {
-        // BrDevBegin(&gScreen, "3dfx_dos,w:640,h:480,b:16");
-        // r = BrDevBeginVar(&gScreen, "glrend",
-        //     BRT_OPENGL_EXT_PROCS_P, &ext_procs,
-        //     BRT_PIXEL_TYPE_U8, BR_PMT_RGB_565,
-        //     BRT_WIDTH_I32, 640,
-        //     BRT_HEIGHT_I32, 480,
-        //     BR_NULL_TOKEN);
+
+#ifdef PLAY_NICE_WITH_GUI
+        gHarness_platform.CreateWindow("Carmageddon", gGraf_specs[gGraf_spec_index].phys_width, gGraf_specs[gGraf_spec_index].phys_height, eWindow_type_opengl);
+        BrDevBeginVar(&gScreen, "glrend",
+            BRT_WIDTH_I32, gGraf_specs[gGraf_spec_index].phys_width,
+            BRT_HEIGHT_I32, gGraf_specs[gGraf_spec_index].phys_height,
+            BRT_OPENGL_GET_PROC_ADDRESS_CALLBACK_P, gHarness_platform.GL_GetProcAddress,
+            BRT_OPENGL_SWAP_CALLBACK_P, gHarness_platform.Swap,
+            BRT_PIXEL_TYPE_U8, BR_PMT_RGB_565,
+            BR_NULL_TOKEN);
+#else
+        BrDevBegin(&gScreen, "3dfx_dos,w:640,h:480,b:16");
+#endif
     }
+
     if (gScreen != NULL) {
         if ((strcmp(gScreen->identifier, "Voodoo Graphics") == 0 && !gForce_voodoo_rush_mode) || gForce_voodoo_mode) {
             dr_dprintf("Voodoo Graphics mode");
@@ -434,7 +441,7 @@ void PDAllocateScreenAndBack(void) {
 
 #ifdef PLAY_NICE_WITH_GUI
         // Render framebuffer to memory and call hooks when swapping or palette changing
-        gHarness_platform.CreateWindow("Carmageddon", 640, 480, eWindow_type_software);
+        gHarness_platform.CreateWindow("Carmageddon", gGraf_specs[gGraf_spec_index].phys_width, gGraf_specs[gGraf_spec_index].phys_height, eWindow_type_software);
         BrDevBeginVar(&gScreen, "virtualframebuffer",
             BRT_WIDTH_I32, gGraf_specs[gGraf_spec_index].phys_width,
             BRT_HEIGHT_I32, gGraf_specs[gGraf_spec_index].phys_height,
@@ -470,7 +477,18 @@ void Copy8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* 
     tU16* dst;
     tU16* palette_entry;
     LOG_TRACE("(%p, %p, %p)", pDst, pSrc, pPalette);
-    NOT_IMPLEMENTED();
+
+    palette_entry = PaletteOf16Bits(pPalette)->pixels;
+    for (y = 0; pSrc->height > y; y++) {
+        src = (tU8*)pSrc->pixels + pSrc->row_bytes * y;
+        dst = pDst->pixels + pDst->row_bytes * y;
+        for (x = 0; x < pSrc->width; x++) {
+            value = *src;
+            *dst = palette_entry[value];
+            src++;
+            dst++;
+        }
+    }
 }
 
 // IDA: void __usercall Double8BitTo16BitPixelmap(br_pixelmap *pDst@<EAX>, br_pixelmap *pSrc@<EDX>, br_pixelmap *pPalette@<EBX>, tU16 pOff@<ECX>, tU16 pSrc_width, tU16 pSrc_height)
@@ -487,7 +505,36 @@ void Double8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap
     tU16 sixteen;
     tU16* palette_entry;
     LOG_TRACE("(%p, %p, %p, %d, %d, %d)", pDst, pSrc, pPalette, pOff, pSrc_width, pSrc_height);
-    NOT_IMPLEMENTED();
+
+    // added by dethrace. Some local symbols seem to be missing
+    int dst_y = 0;
+    int line_buff_x = 0;
+    static tU16 line_buff[640];
+
+    palette_entry = PaletteOf16Bits(pPalette)->pixels;
+    if (pSrc_width > 640) {
+        FatalError(94, "Double8BitTo16BitPixelmap");
+    }
+    dst_y = 0;
+    for (y = 0; y < pSrc_height; y++) {
+        src = (tU8*)pSrc->pixels + pSrc->row_bytes * y;
+        dst0 = (tU8*)pDst->pixels + pDst->row_bytes * (dst_y + pOff);
+        dst1 = (tU8*)pDst->pixels + pDst->row_bytes * (dst_y + pOff + 1);
+        line_buff_x = 0;
+
+        for (x = 0; x < pSrc_width; x++) {
+            sixteen = palette_entry[*src];
+            line_buff[line_buff_x] = sixteen;
+            line_buff[line_buff_x + 1] = sixteen;
+            src++;
+            line_buff_x += 2;
+        }
+
+        // copy 2 full lines into destination
+        memcpy(dst0, line_buff, pSrc_width * 2 * sizeof(tU16));
+        memcpy(dst1, line_buff, pSrc_width * 2 * sizeof(tU16));
+        dst_y += 2;
+    }
 }
 
 // IDA: br_pixelmap* __cdecl PDInterfacePixelmap()
@@ -511,7 +558,7 @@ void ReallyCopyBackScreen(int pRendering_area_only, int pClear_top_and_bottom) {
 
     gAlready_copied = 1;
     if (pRendering_area_only) {
-        BrPixelmapRectangleCopy(gScreen, gY_offset, gX_offset, gRender_screen, 0, 0, gWidth, gHeight);
+        BrPixelmapRectangleCopy(gScreen, gX_offset, gY_offset, gRender_screen, 0, 0, gWidth, gHeight);
     } else if (gReal_graf_data_index != gGraf_data_index) {
         BrPixelmapRectangleFill(gReal_back_screen, 0, 0, 640, 40, 0);
         BrPixelmapRectangleFill(gReal_back_screen, 0, 440, 640, 40, 0);
@@ -742,6 +789,7 @@ void Usage(char* pProgpath) {
 
     basename = OS_Basename(pProgpath);
 
+#ifdef DETHRACE_3DFX_PATCH
     fprintf(stderr, "Usage: %s options\n", basename);
     fprintf(stderr, "E.G. %s %s 0.5 %s 0 %s 2 %s\n", basename, "-yon", "-simple", "-sound", "-spamfritter");
     fprintf(stderr, "Valid options are:\n");
@@ -758,6 +806,22 @@ void Usage(char* pProgpath) {
     fprintf(stderr, "%s\n", "-novoodoo");
     fprintf(stderr, "%s: force Voodoo Graphics mode\n", "-vgraphics");
     fprintf(stderr, "%s: force Voodoo Rush (or Voodoo 2) mode\n", "-vrush");
+#else
+    fprintf(stderr,
+        "Usage: %s [%s] [%s YonFactor] [%s CarSimplificationLevel] [%s SoundDetailLevel] [%s] [%s] [%s] [%s] [%s] [%s]\nWhere YonFactor is between 0 and 1,\nCarSimplificationLevel is a whole number between 0 and %d,\nand SoundDetailLevel is a whole number.\n",
+        basename,
+        "-hires",
+        "-yon",
+        "-simple",
+        "-sound",
+        "-robots",
+        "-lomem",
+        "-nosound",
+        "-spamfritter",
+        "-nocutscenes",
+        "-noreplay",
+        CAR_MAX_SIMPLIFICATION_LEVEL);
+#endif
     exit(1);
 }
 

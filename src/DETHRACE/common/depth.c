@@ -4,6 +4,7 @@
 #include "displays.h"
 #include "errors.h"
 #include "globvars.h"
+#include "globvrbm.h"
 #include "globvrkm.h"
 #include "globvrpb.h"
 #include "harness/hooks.h"
@@ -523,6 +524,11 @@ void DoHorizon(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor
     if (!gProgram_state.cockpit_on && !(gAction_replay_mode && gAction_replay_camera_mode)) {
         return;
     }
+#ifdef DETHRACE_3DFX_PATCH
+    if (!gBlitting_is_slow) {
+        return;
+    }
+#endif
     if (gRendering_mirror) {
         actor = gRearview_sky_actor;
     } else {
@@ -577,6 +583,11 @@ void DoFog(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer) {
 void DepthEffect(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world) {
     LOG_TRACE("(%p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world);
 
+#ifdef DETHRACE_3DFX_PATCH
+    if (gMaterial_fogging) {
+        return;
+    }
+#endif
     if (gProgram_state.current_depth_effect.type == eDepth_effect_darkness) {
         DoDepthCue(pRender_buffer, pDepth_buffer);
     }

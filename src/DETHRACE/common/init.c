@@ -167,6 +167,23 @@ void AllocateRearviewPixelmap(void) {
     char* rear_screen_pixels;
     LOG_TRACE("()");
 
+#ifdef DETHRACE_3DFX_PATCH
+    if (gRearview_screen != NULL) {
+        BrPixelmapFree(gRearview_screen);
+        gRearview_screen = NULL;
+    }
+    if (gProgram_state.mirror_on) {
+        gRearview_screen = BrPixelmapAllocateSub(
+            gBack_screen,
+            gProgram_state.current_car.mirror_left,
+            gProgram_state.current_car.mirror_top,
+            gProgram_state.current_car.mirror_right - gProgram_state.current_car.mirror_left,
+            gProgram_state.current_car.mirror_bottom - gProgram_state.current_car.mirror_top);
+        gRearview_depth_buffer = gDepth_buffer;
+        gRearview_screen->origin_x = gRearview_screen->width / 2;
+        gRearview_screen->origin_y = gRearview_screen->height / 2;
+    }
+#else
     if (gRearview_screen) {
         BrMemFree(gRearview_screen->pixels);
         BrPixelmapFree(gRearview_screen);
@@ -193,6 +210,7 @@ void AllocateRearviewPixelmap(void) {
         gRearview_screen->origin_y = gRearview_screen->height / 2;
         gRearview_depth_buffer = BrPixelmapMatch(gRearview_screen, BR_PMMATCH_DEPTH_16);
     }
+#endif
 }
 
 // IDA: void __cdecl ReinitialiseRearviewCamera()
@@ -533,11 +551,11 @@ void InitialiseApplication(int pArgc, char** pArgv) {
     LoadMiscStrings();
     LoadInRegistees();
 
-    // Added in 3dfx patch
+#ifdef DETHRACE_3DFX_PATCH
     InitLineStuff();
     InitSmokeStuff();
     Init2DStuff();
-    // --
+#endif
 
     FinishLoadingGeneral();
     InitializePalettes();
@@ -553,12 +571,12 @@ void InitialiseApplication(int pArgc, char** pArgv) {
     gDefault_track_material->index_base = 227;
     gDefault_track_material->index_range = 1;
 
-    // Added in 3dfx patch
+#ifdef DETHRACE_3DFX_PATCH
     gDefault_track_material->ka = 1.0;
     gDefault_track_material->kd = 0.0;
     gDefault_track_material->ks = 0.0;
     gDefault_track_material->colour = ((br_colour*)gRender_palette->pixels)[227];
-    // --
+#endif
 
     BrMaterialAdd(gDefault_track_material);
     InitShadow();
@@ -592,9 +610,8 @@ void InitialiseApplication(int pArgc, char** pArgv) {
 // IDA: void __usercall InitialiseDeathRace(int pArgc@<EAX>, char **pArgv@<EDX>)
 void InitialiseDeathRace(int pArgc, char** pArgv) {
     PDInitialiseSystem();
-
     InitialiseApplication(pArgc, pArgv);
-    // dword_112DF8 = 1;  // never checked by game
+    gInitialisation_finished = 1;
 }
 
 // IDA: void __usercall InitGame(int pStart_race@<EAX>)

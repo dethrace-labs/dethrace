@@ -5,6 +5,7 @@
 #include "constants.h"
 #include "errors.h"
 #include "globvars.h"
+#include "globvrbm.h"
 #include "globvrpb.h"
 #include "graphics.h"
 #include "harness/config.h"
@@ -999,7 +1000,9 @@ tU16 PaletteEntry16Bit(br_pixelmap* pPal, int pEntry) {
     int green;
     int blue;
     LOG_TRACE("(%p, %d)", pPal, pEntry);
-    NOT_IMPLEMENTED();
+
+    src_entry = pPal->pixels;
+    return ((tU8)src_entry[pEntry] >> 3) | (((src_entry[pEntry] >> 19) & 0x1F) << 11) | (32 * ((tU16)src_entry[pEntry] >> 10));
 }
 
 // IDA: br_pixelmap* __usercall PaletteOf16Bits@<EAX>(br_pixelmap *pSrc@<EAX>)
@@ -1007,7 +1010,24 @@ br_pixelmap* PaletteOf16Bits(br_pixelmap* pSrc) {
     tU16* dst_entry;
     int value;
     LOG_TRACE("(%p)", pSrc);
-    NOT_IMPLEMENTED();
+
+    if (g16bit_palette == NULL) {
+        g16bit_palette = BrPixelmapAllocate(BR_PMT_RGB_565, 1, 256, g16bit_palette, 0);
+        if (g16bit_palette == NULL) {
+            FatalError(94, "16-bit palette");
+        }
+    }
+    if (!g16bit_palette_valid || pSrc != gSource_for_16bit_palette) {
+        value = 0;
+        dst_entry = g16bit_palette->pixels;
+        for (value = 0; value < 256; value++) {
+            *dst_entry = PaletteEntry16Bit(pSrc, value);
+            dst_entry++;
+        }
+        gSource_for_16bit_palette = pSrc;
+        g16bit_palette_valid = 1;
+    }
+    return g16bit_palette;
 }
 
 // IDA: void __usercall Copy8BitTo16Bit(br_pixelmap *pDst@<EAX>, br_pixelmap *pSrc@<EDX>, br_pixelmap *pPalette@<EBX>)

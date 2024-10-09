@@ -651,7 +651,9 @@ void InitialiseProgramState(void) {
     gProgram_state.cockpit_on = gCockpit_on;
     gProgram_state.car_name[0] = 0;
     SetSoundVolumes();
+#if !defined(DETHRACE_3DFX_PATCH)
     AllocateRearviewPixelmap();
+#endif
 }
 
 // IDA: void __cdecl DoProgram()

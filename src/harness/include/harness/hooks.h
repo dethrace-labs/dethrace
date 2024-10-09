@@ -43,6 +43,8 @@ typedef struct tHarness_platform {
     void* (*CreateWindow)(char* title, int nWidth, int nHeight, tHarness_window_type window_type);
     void (*Swap)(br_pixelmap* back_buffer);
     void (*PaletteChanged)(br_colour entries[256]);
+    // If this platform supports OpenGL
+    void* (*GL_GetProcAddress)(const char* name);
 
 } tHarness_platform;
 
