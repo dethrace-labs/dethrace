@@ -553,9 +553,10 @@ void SetBRenderScreenAndBuffers(int pX_offset, int pY_offset, int pWidth, int pH
         FatalError(kFatalError_AllocateZBuffer);
     }
 
-#ifdef DETHRACE_3DFX_PATCH
-    BrDevLastBeginSet(gBack_screen);
-#endif
+    // dethrace added HACK HACK
+    if (strstr(gScreen->identifier, "OpenGL") != NULL) {
+        BrDevLastBeginSet(gBack_screen);
+    }
 
     BrZbBegin(gRender_screen->type, gDepth_buffer->type);
     gBrZb_initialized = 1;
@@ -1701,7 +1702,7 @@ void RenderAFrame(int pDepth_mask_on) {
         && !gProgram_state.cockpit_on
         && !(gAction_replay_camera_mode && gAction_replay_mode)) {
 #ifdef DETHRACE_3DFX_PATCH
-        if (gBlitting_is_slow)
+        if (!gBlitting_is_slow)
 #endif
         {
             ExternalSky(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world);
@@ -1742,19 +1743,21 @@ void RenderAFrame(int pDepth_mask_on) {
 
     BrMatrix34Copy(&gCamera->t.t.mat, &old_camera_matrix);
 #ifdef DETHRACE_3DFX_PATCH
-    PDUnlockRealBackScreen(1);
-    PDLockRealBackScreen(1);
-    CopyStripImage(
-        gBack_screen,
-        -gCurrent_graf_data->cock_margin_x,
-        gScreen_wobble_x,
-        -gCurrent_graf_data->cock_margin_y,
-        gScreen_wobble_y,
-        gProgram_state.current_car.cockpit_images[gProgram_state.cockpit_image_index],
-        0,
-        0,
-        gCurrent_graf_data->total_cock_width,
-        gCurrent_graf_data->total_cock_height);
+    if (cockpit_on) {
+        PDUnlockRealBackScreen(1);
+        PDLockRealBackScreen(1);
+        CopyStripImage(
+            gBack_screen,
+            -gCurrent_graf_data->cock_margin_x,
+            gScreen_wobble_x,
+            -gCurrent_graf_data->cock_margin_y,
+            gScreen_wobble_y,
+            gProgram_state.current_car.cockpit_images[gProgram_state.cockpit_image_index],
+            0,
+            0,
+            gCurrent_graf_data->total_cock_width,
+            gCurrent_graf_data->total_cock_height);
+    }
 #endif
     if (gMirror_on__graphics) {
 #ifdef DETHRACE_3DFX_PATCH

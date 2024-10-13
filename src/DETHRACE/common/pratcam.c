@@ -354,7 +354,11 @@ void InitPratcam(void) {
         the_pixels = BrMemAllocate(52 * 46, kMem_pratcam_pixelmap);
         break;
     case 1:
+#ifdef DETHRACE_3DFX_PATCH
+        the_pixels = BrMemAllocate(HighResPratBufferWidth() * HighResPratBufferHeight(), kMem_pratcam_pixelmap);
+#else
         the_pixels = BrMemAllocate(104 * 110, kMem_pratcam_pixelmap);
+#endif
         break;
     default:
         TELL_ME_IF_WE_PASS_THIS_WAY();
@@ -367,7 +371,11 @@ void InitPratcam(void) {
         gPrat_buffer = DRPixelmapAllocate(gScreen->type, 52, 46, the_pixels, 0);
         break;
     case 1:
+#ifdef DETHRACE_3DFX_PATCH
+        gPrat_buffer = DRPixelmapAllocate(BR_PMT_INDEX_8, HighResPratBufferWidth(), HighResPratBufferHeight(), the_pixels, 0);
+#else
         gPrat_buffer = DRPixelmapAllocate(gScreen->type, 104, 110, the_pixels, 0);
+#endif
         break;
     default:
         TELL_ME_IF_WE_PASS_THIS_WAY();

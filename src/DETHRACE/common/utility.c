@@ -458,7 +458,9 @@ br_pixelmap* PurifiedPixelmap(br_pixelmap* pSrc) {
     int new_height;
     tException_list e;
     LOG_TRACE("(%p)", pSrc);
-    NOT_IMPLEMENTED();
+
+    LOG_INFO("PurifiedPixelmap not implemented");
+    return pSrc;
 }
 
 // IDA: br_pixelmap* __usercall DRPixelmapLoad@<EAX>(char *pFile_name@<EAX>)

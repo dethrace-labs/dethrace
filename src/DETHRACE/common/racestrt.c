@@ -2022,7 +2022,11 @@ void ChallengeStart(void) {
         BrFatal("C:\\Msdev\\Projects\\DethRace\\Racestrt.c", 2610, "Bruce bug at line %d, file C:\\Msdev\\Projects\\DethRace\\Racestrt.c", 50);
     }
     the_map = DRPixelmapAllocate(
+#ifdef DETHRACE_3DFX_PATCH
+        BR_PMT_INDEX_8,
+#else
         gScreen->type,
+#endif
         gCurrent_graf_data->dare_mugshot_width,
         gCurrent_graf_data->dare_mugshot_height,
         0,
@@ -2032,7 +2036,16 @@ void ChallengeStart(void) {
     DisposeFlicPanel(0);
     TellyInImage(the_map, gCurrent_graf_data->dare_mugshot_left, gCurrent_graf_data->dare_mugshot_top);
     BrPixelmapFree(the_map);
-    the_map = DRPixelmapAllocate(gScreen->type, gCurrent_graf_data->dare_text_width, gCurrent_graf_data->dare_mugshot_height, 0, 0);
+    the_map = DRPixelmapAllocate(
+#ifdef DETHRACE_3DFX_PATCH
+        BR_PMT_INDEX_8,
+#else
+        gScreen->type,
+#endif
+        gCurrent_graf_data->dare_text_width,
+        gCurrent_graf_data->dare_mugshot_height,
+        0,
+        0);
     BrPixelmapFill(the_map, 0);
     TransBrPixelmapText(the_map, 0, 0, 1u, gBig_font, gOpponents[gChallenger_index__racestrt].abbrev_name);
     PathCat(the_path, gApplication_path, "DARES.TXT");

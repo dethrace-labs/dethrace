@@ -7,7 +7,9 @@
 #include "errors.h"
 #include "formats.h"
 #include "globvars.h"
+#include "globvrbm.h"
 #include "globvrkm.h"
+#include "globvrpb.h"
 #include "graphics.h"
 #include "harness/hooks.h"
 #include "harness/trace.h"
@@ -93,7 +95,11 @@ void SetWorldToScreen(br_pixelmap* pScreen) {
 // IDA: void __usercall DrawLine3DThroughBRender(br_vector3 *pStart@<EAX>, br_vector3 *pEnd@<EDX>)
 void DrawLine3DThroughBRender(br_vector3* pStart, br_vector3* pEnd) {
     LOG_TRACE("(%p, %p)", pStart, pEnd);
-    NOT_IMPLEMENTED();
+
+    gLine_model->vertices[0].p = *pStart;
+    gLine_model->vertices[1].p = *pEnd;
+    BrModelUpdate(gLine_model, BR_MODU_VERTEX_POSITIONS);
+    BrZbSceneRenderAdd(gLine_actor);
 }
 
 // IDA: int __usercall DrawLine3D@<EAX>(br_vector3 *start@<EAX>, br_vector3 *end@<EDX>, br_pixelmap *pScreen@<EBX>, br_pixelmap *pDepth_buffer@<ECX>, br_pixelmap *shade_table)
@@ -105,6 +111,13 @@ int DrawLine3D(br_vector3* start, br_vector3* end, br_pixelmap* pScreen, br_pixe
     br_vector4 p2;
     br_scalar ts;
     LOG_TRACE("(%p, %p, %p, %p, %p)", start, end, pScreen, pDepth_buffer, shade_table);
+
+#ifdef DETHRACE_3DFX_PATCH
+    if (gNo_2d_effects) {
+        DrawLine3DThroughBRender(start, end);
+        return 999;
+    }
+#endif
 
     o = *start;
     p = *end;
@@ -304,7 +317,23 @@ int DrawLine2D(br_vector3* o, br_vector3* p, br_pixelmap* pScreen, br_pixelmap* 
 // IDA: void __usercall SetLineModelCols(tU8 pCol@<EAX>)
 void SetLineModelCols(tU8 pCol) {
     LOG_TRACE("(%d)", pCol);
-    NOT_IMPLEMENTED();
+
+    if (pCol != 0) {
+        gLine_model->vertices[0].red = 255;
+        gLine_model->vertices[0].grn = 255;
+        gLine_model->vertices[0].blu = 255;
+        gLine_model->vertices[1].red = 255;
+        gLine_model->vertices[1].grn = 255;
+        gLine_model->vertices[1].blu = 255;
+    } else {
+        gLine_model->vertices[0].red = 255;
+        gLine_model->vertices[0].grn = 0;
+        gLine_model->vertices[0].blu = 0;
+        gLine_model->vertices[1].red = 255;
+        gLine_model->vertices[1].grn = 255;
+        gLine_model->vertices[1].blu = 0;
+    }
+    BrModelUpdate(gLine_model, BR_MODU_ALL);
 }
 
 // IDA: void __usercall ReplaySparks(br_pixelmap *pRender_screen@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, tU32 pTime@<ECX>)
@@ -359,8 +388,21 @@ void RenderSparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_ac
         return;
     }
 
+#ifdef DETHRACE_3DFX_PATCH
+    if (gNo_2d_effects) {
+        BrActorRemove(gLine_actor);
+        BrActorAdd(pCamera, gLine_actor);
+    }
+#endif
+
     if (gAction_replay_mode) {
         ReplaySparks(pRender_screen, pDepth_buffer, pCamera, pTime);
+#ifdef DETHRACE_3DFX_PATCH
+        if (gNo_2d_effects) {
+            BrActorRemove(gLine_actor);
+            BrActorAdd(gDont_render_actor, gLine_actor);
+        }
+#endif
         return;
     }
     StartPipingSession(ePipe_chunk_spark);
@@ -419,6 +461,11 @@ void RenderSparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_ac
             ts = 0.1f;
         }
         BrVector3Scale(&gSparks[i].v, &gSparks[i].v, ts);
+#ifdef DETHRACE_3DFX_PATCH
+        if (gNo_2d_effects) {
+            SetLineModelCols(gSparks[i].colour);
+        }
+#endif
         if (gSparks[i].colour) {
             DrawLine3D(&p, &new_pos, pRender_screen, pDepth_buffer, gFog_shade_table);
         } else {
@@ -1097,7 +1144,21 @@ void RecordSmokeCircle(br_vector3* pCent, br_scalar pR, br_scalar pStrength, br_
     tU8 shade_index;
     br_colour shade_rgb;
     LOG_TRACE("(%p, %f, %f, %p, %f)", pCent, pR, pStrength, pShade, pAspect);
-    NOT_IMPLEMENTED();
+
+    if (gRendering_mirror) {
+        DRMatrix34TApplyP(&gBR_smoke_structs[gN_BR_smoke_structs].pos, pCent, &gRearview_camera_to_world);
+    } else {
+        DRMatrix34TApplyP(&gBR_smoke_structs[gN_BR_smoke_structs].pos, pCent, &gCamera_to_world);
+    }
+
+    gBR_smoke_structs[gN_BR_smoke_structs].r = pR;
+    gBR_smoke_structs[gN_BR_smoke_structs].strength = pStrength;
+    shade_index = ((tU8*)pShade->pixels)[pShade->row_bytes * (pShade->height - 1)];
+    shade_rgb = ((br_colour*)gRender_palette->pixels)[shade_index];
+    gBR_smoke_structs[gN_BR_smoke_structs].col = shade_rgb;
+    gBR_smoke_structs[gN_BR_smoke_structs].aspect = pAspect;
+    gBR_smoke_pointers[gN_BR_smoke_structs] = &gBR_smoke_structs[gN_BR_smoke_structs];
+    gN_BR_smoke_structs++;
 }
 
 // IDA: void __usercall SmokeCircle3D(br_vector3 *o@<EAX>, br_scalar r, br_scalar strength, br_scalar pAspect, br_pixelmap *pRender_screen, br_pixelmap *pDepth_buffer, br_pixelmap *pShade_table, br_actor *pCam)
@@ -1111,6 +1172,12 @@ void SmokeCircle3D(br_vector3* o, br_scalar r, br_scalar strength, br_scalar pAs
     LOG_TRACE("(%p, %f, %f, %f, %p, %p, %p, %p)", o, r, strength, pAspect, pRender_screen, pDepth_buffer, pShade_table, pCam);
 
     cam = pCam->type_data;
+
+    if (gNo_2d_effects) {
+        RecordSmokeCircle(o, r, strength, pShade_table, pAspect);
+        return;
+    }
+
     srand(o->v[2] * 16777216.0f + o->v[1] * 65536.0f + o->v[0] * 256.0f + r);
     BrVector3Sub(&tv, o, (br_vector3*)gCamera_to_world.m[3]);
     BrMatrix34TApplyV(&p, &tv, &gCamera_to_world);
