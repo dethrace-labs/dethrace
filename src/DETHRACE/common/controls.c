@@ -571,7 +571,7 @@ void F4Key(void) {
             }
         }
         sprintf(s, "Edit mode: %s", gEdit_mode_names[gWhich_edit_mode]);
-        NewTextHeadupSlot2(4, 0, 2000, -4, s, 0);
+        NewTextHeadupSlot2(eHeadupSlot_misc, 0, 2000, -4, s, 0);
         if (gWhich_edit_mode == eEdit_mode_spec_vol && old_edit_mode != eEdit_mode_spec_vol) {
             ShowSpecialVolumes();
         } else if (gWhich_edit_mode != eEdit_mode_spec_vol && old_edit_mode == eEdit_mode_spec_vol) {
@@ -587,7 +587,7 @@ void SetFlag(int i) {
     LOG_TRACE("(%d)", i);
 
     if (gNet_mode == eNet_mode_none) {
-        NewTextHeadupSlot(4, 0, 3000, -4, "You Cheat!");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, "You Cheat!");
     }
     gI_am_cheating = i;
     F4Key();
@@ -766,7 +766,7 @@ void LookLeft(void) {
     LOG_TRACE("()");
 
     if (gAusterity_mode) {
-        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(kMiscString_NOT_ENOUGH_MEMORY));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_NOT_ENOUGH_MEMORY));
     } else {
         PratcamEvent(27);
         gProgram_state.old_view = gProgram_state.which_view;
@@ -807,7 +807,7 @@ void LookRight(void) {
     LOG_TRACE("()");
 
     if (gAusterity_mode) {
-        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(kMiscString_NOT_ENOUGH_MEMORY));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_NOT_ENOUGH_MEMORY));
     } else {
         PratcamEvent(28);
         gProgram_state.old_view = gProgram_state.which_view;
@@ -1074,7 +1074,7 @@ void ToggleCockpit(void) {
             AdjustHeadups();
             MungeForwardSky();
         } else {
-            NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(kMiscString_NOT_ENOUGH_MEMORY));
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_NOT_ENOUGH_MEMORY));
         }
     }
 }
@@ -1086,9 +1086,9 @@ void ToggleMirror(void) {
     gProgram_state.mirror_on = !gProgram_state.mirror_on;
     ReinitialiseRearviewCamera();
     if (gProgram_state.mirror_on) {
-        NewTextHeadupSlot(4, 0, 500, -4, GetMiscString(kMiscString_MirrorOn));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -4, GetMiscString(kMiscString_MirrorOn));
     } else {
-        NewTextHeadupSlot(4, 0, 500, -4, GetMiscString(kMiscString_MirrorOff));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -4, GetMiscString(kMiscString_MirrorOff));
     }
 }
 
@@ -1338,11 +1338,11 @@ void SetRecovery(void) {
     }
     if (gProgram_state.current_car.time_to_recover) {
         if (GetRaceTime() + 600 >= gProgram_state.current_car.time_to_recover) {
-            NewTextHeadupSlot2(4, 0, 2000, -4, GetMiscString(kMiscString_TOO_LATE_TO_CANCEL), 1);
+            NewTextHeadupSlot2(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_TOO_LATE_TO_CANCEL), 1);
             gToo_late = 1;
         } else {
             gProgram_state.current_car.time_to_recover = 0;
-            NewTextHeadupSlot2(4, 0, 2000, -4, GetMiscString(kMiscString_RECOVERY_CANCELLED), 0);
+            NewTextHeadupSlot2(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_RECOVERY_CANCELLED), 0);
         }
         return;
     }
@@ -1477,7 +1477,7 @@ void CheckRecoveryOfCars(tU32 pEndFrameTime) {
             time = (gProgram_state.current_car.time_to_recover - pEndFrameTime + 1000) / 1000;
             sprintf(s, "%s %d %s", GetMiscString(kMiscString_RECOVERY_IN), time, time > 1 ? GetMiscString(kMiscString_SECONDS) : GetMiscString(kMiscString_SECOND));
             if (!gToo_late) {
-                NewTextHeadupSlot2(4, 0, 2000, -4, s, 0);
+                NewTextHeadupSlot2(eHeadupSlot_misc, 0, 2000, -4, s, 0);
             }
             if (gProgram_state.current_car.time_to_recover <= pEndFrameTime) {
                 RecoverCar();
@@ -1602,15 +1602,15 @@ void CheckOtherRacingKeys(void) {
                 total_repair_cost += cost;
                 if (total_repair_cost) {
                     if (gFree_repairs) {
-                        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(kMiscString_RepairingForFree));
+                        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_RepairingForFree));
                     } else {
                         sprintf(s, "%s %d", GetMiscString(kMiscString_RepairCostColon), total_repair_cost);
-                        NewTextHeadupSlot(4, 0, 1000, -4, s);
+                        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, s);
                     }
                 }
             } else {
                 if (!stopped_repairing) {
-                    NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(kMiscString_CANNOT_AFFORD_TO_REPAIR));
+                    NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_CANNOT_AFFORD_TO_REPAIR));
                 }
                 gAuto_repair = 0;
                 stopped_repairing = 1;
@@ -1638,12 +1638,12 @@ void CheckOtherRacingKeys(void) {
         gRecover_timer = 0;
         SetFlipUpCar(car);
         if (gNet_mode != eNet_mode_none) {
-            NewTextHeadupSlot(4, 0, 1500, -4, " ");
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1500, -4, " ");
         }
         if (gRecovery_voucher_count != 0) {
             gRecovery_voucher_count--;
             sprintf(s, "%s", GetMiscString(kMiscString_RecoveringForFree));
-            NewTextHeadupSlot(4, 0, 1500, -4, s);
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1500, -4, s);
         } else {
             if (gNet_mode) {
                 cost = gNet_recovery_cost[gCurrent_net_game->type];
@@ -1657,7 +1657,7 @@ void CheckOtherRacingKeys(void) {
                 cost = gRecovery_cost[gProgram_state.skill_level];
             }
             sprintf(s, "%s %d", GetMiscString(kMiscString_RecoveryCostColon), cost);
-            NewTextHeadupSlot(4, 0, 1500, -4, s);
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1500, -4, s);
             LoseSomePSPowerups(2);
         }
         CancelPendingCunningStunt();
@@ -1678,7 +1678,7 @@ int CheckRecoverCost(void) {
     }
     gProgram_state.credits_earned = 0;
     gProgram_state.credits_lost = 0;
-    NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(kMiscString_CANNOT_AFFORD_TO_RECOVER));
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_CANNOT_AFFORD_TO_RECOVER));
     DoFancyHeadup(kFancyHeadupNetworkRaceNoMoreMoney);
     KnackerThisCar(&gProgram_state.current_car);
     SendGameplayToHost(eNet_gameplay_suicide, 0, 0, 0, 0);
@@ -2106,9 +2106,9 @@ void ToggleFlying(void) {
     if (gAllow_car_flying && gNet_mode == eNet_mode_none) {
         gCar_flying = !gCar_flying;
         if (gCar_flying) {
-            NewTextHeadupSlot(4, 0, 500, -4, "We have lift off!!");
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -4, "We have lift off!!");
         } else {
-            NewTextHeadupSlot(4, 0, 500, -4, "Back down to Earth");
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -4, "Back down to Earth");
         }
     } else {
         gCar_flying = 0;
@@ -2121,9 +2121,9 @@ void ToggleInvulnerability(void) {
 
     gProgram_state.current_car.invulnerable = !gProgram_state.current_car.invulnerable;
     if (gProgram_state.current_car.invulnerable) {
-        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(kMiscString_Invulnerable));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_Invulnerable));
     } else {
-        NewTextHeadupSlot(4, 0, 1000, -4, "Vulnerability returns!");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, "Vulnerability returns!");
     }
 }
 
@@ -2147,9 +2147,9 @@ void ToggleTimerFreeze(void) {
 
     gFreeze_timer = !gFreeze_timer;
     if (gFreeze_timer) {
-        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(kMiscString_TimerFrozen));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_TimerFrozen));
     } else {
-        NewTextHeadupSlot(4, 0, 1000, -4, "Timer thawed out");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, "Timer thawed out");
     }
 }
 
@@ -2176,9 +2176,9 @@ void ToggleMap(void) {
     if (gMap_mode == 0) {
         if (!gAction_replay_mode) {
             if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_foxy && gThis_net_player_index == gIt_or_fox) {
-                NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(kMiscString_THE_FOX_CANNOT_DO_THAT));
+                NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_THE_FOX_CANNOT_DO_THAT));
             } else if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_tag && gThis_net_player_index != gIt_or_fox) {
-                NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(kMiscString_ONLY_IT_CAN_DO_THAT));
+                NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_ONLY_IT_CAN_DO_THAT));
             } else {
                 old_indent = gRender_indent;
                 gRender_indent = 0;
@@ -2263,13 +2263,13 @@ void CycleCarTexturingLevel(void) {
     SetCarTexturingLevel(new_level);
     switch (new_level) {
     case eCTL_none:
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_NoCarTextures));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_NoCarTextures));
         break;
     case eCTL_transparent:
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_TransparentCarTexturesOnly));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_TransparentCarTexturesOnly));
         break;
     case eCTL_full:
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_FullCarTextures));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_FullCarTextures));
         break;
     case eCTL_count:
         break;
@@ -2286,13 +2286,13 @@ void CycleWallTexturingLevel(void) {
     SetWallTexturingLevel(new_level);
     switch (new_level) {
     case eWTL_none:
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_NoWallTextures));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_NoWallTextures));
         break;
     case eWTL_linear:
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_LinearWallTextures));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_LinearWallTextures));
         break;
     case eWTL_full:
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_BestWallTextures));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_BestWallTextures));
         break;
     case eWTL_count:
         break;
@@ -2308,9 +2308,9 @@ void CycleRoadTexturingLevel(void) {
     ReallySetRoadTexturingLevel(new_level);
     SetRoadTexturingLevel(new_level);
     if (new_level == eRTL_none) {
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_NoRoadTextures));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_NoRoadTextures));
     } else if (new_level == eRTL_full) {
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_RoadTextures));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_RoadTextures));
     }
 }
 
@@ -2326,13 +2326,13 @@ void CycleYonFactor(void) {
     }
     SetYonFactor(new_factor);
     if (new_factor > .75f) {
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_TrackAppearsVeryQuickly));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_TrackAppearsVeryQuickly));
     } else if (new_factor > .375f) {
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_TrackAppearsQuiteQuickly));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_TrackAppearsQuiteQuickly));
     } else if (new_factor > .187f) {
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_TrackQppearsQuiteLate));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_TrackQppearsQuiteLate));
     } else {
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_TrackAppearsVeryLate));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_TrackAppearsVeryLate));
     }
 }
 
@@ -2371,13 +2371,13 @@ void CycleSoundDetailLevel(void) {
     SetSoundDetailLevel(new_level);
     switch (new_level) {
     case 0:
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_FewestSounds));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_FewestSounds));
         break;
     case 1:
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_PartialSound));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_PartialSound));
         break;
     case 2:
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_AllSounds));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_AllSounds));
         break;
     }
 }
@@ -2392,7 +2392,7 @@ void CycleCarSimplificationLevel(void) {
     src = GetMiscString(kMiscString_CarSimplificationLevel_D);
     dst = BrMemAllocate(strlen(src), kMem_simp_level);
     sprintf(dst, src, gCar_simplification_level);
-    NewTextHeadupSlot(4, 0, 2000, -4, dst);
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, dst);
     BrMemFree(dst);
 }
 
@@ -2405,12 +2405,12 @@ void ToggleAccessoryRendering(void) {
         on = !GetAccessoryRendering();
         SetAccessoryRendering(on);
         if (on) {
-            NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_AccessoriesOn));
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_AccessoriesOn));
         } else {
-            NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_AccessoriesOff));
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_AccessoriesOff));
         }
     } else {
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_NetGamesAlwaysAccessorized));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_NetGamesAlwaysAccessorized));
     }
 }
 
@@ -2423,9 +2423,9 @@ void ToggleSmoke(void) {
     ReallySetSmokeOn(on);
     SetSmokeOn(on);
     if (on) {
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_SmokeOn));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_SmokeOn));
     } else {
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_SmokeOff));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_SmokeOff));
     }
 }
 
@@ -2563,7 +2563,7 @@ void EnterUserMessage(void) {
             gString[COUNT_OF(gString) - 1] = '\0';
             NetSendHeadupToAllPlayers(the_message);
             gString[20] = '\0';
-            NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(kMiscString_MESSAGE_SENT));
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_MESSAGE_SENT));
             about_to_die = 1;
         }
         break;
