@@ -244,6 +244,8 @@ void DimRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int p
     int width;
     LOG_TRACE9("(%p, %d, %d, %d, %d, %d)", pPixelmap, pLeft, pTop, pRight, pBottom, pKnock_out_corners);
 
+    return;
+
     ptr = (tU8*)pPixelmap->pixels + pLeft + pPixelmap->row_bytes * pTop;
     line_skip = pPixelmap->row_bytes - pRight + pLeft;
     depth_table_ptr = gDepth_shade_table->pixels;
@@ -1158,7 +1160,11 @@ void DoInstruments(tU32 pThe_time) {
                     + (double)the_wobble_y),
                 gProgram_state.current_car.tacho_needle_colour[gProgram_state.cockpit_on]);
         } else if (tacho_image != NULL) {
+#ifdef DETHRACE_3DFX_PATCH
+            DRPixelmapRectangleCopy(
+#else
             BrPixelmapRectangleCopy(
+#endif
                 gBack_screen,
                 the_wobble_x + gProgram_state.current_car.tacho_x[gProgram_state.cockpit_on],
                 the_wobble_y + gProgram_state.current_car.tacho_y[gProgram_state.cockpit_on],

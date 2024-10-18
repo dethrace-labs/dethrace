@@ -553,11 +553,6 @@ void SetBRenderScreenAndBuffers(int pX_offset, int pY_offset, int pWidth, int pH
         FatalError(kFatalError_AllocateZBuffer);
     }
 
-    // dethrace added HACK HACK
-    if (strstr(gScreen->identifier, "OpenGL") != NULL) {
-        BrDevLastBeginSet(gBack_screen);
-    }
-
     BrZbBegin(gRender_screen->type, gDepth_buffer->type);
     gBrZb_initialized = 1;
 }
@@ -2176,6 +2171,17 @@ void DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int
     tU8* conv_table;
     LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
 
+#ifdef DETHRACE_3DFX_PATCH
+    if (pDest->type == BR_PMT_RGB_565 && pSource->type == BR_PMT_INDEX_8) {
+        if (gCurrent_conversion_table != NULL) {
+            conv_table = gFlic_palette;
+        } else {
+            conv_table = gCurrent_palette;
+        }
+        Copy8BitTo16BitRectangleWithTransparency(pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight, conv_table);
+        return;
+    }
+#endif
     source_ptr = (tU8*)pSource->pixels + (pSource->row_bytes * pSource_y + pSource_x);
     dest_ptr = (tU8*)pDest->pixels + (pDest->row_bytes * pDest_y + pDest_x);
     source_row_wrap = pSource->row_bytes - pWidth;
@@ -2215,7 +2221,7 @@ void DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int
         dest_row_wrap += pDest_x + pWidth - pDest->width;
         pWidth = pDest->width - pDest_x;
     }
-    // LOG_DEBUG("2 (src->width: %d, src->height: %d, pDest_x: %d, pDest_y: %d, pSource_x: %d, pSource_y: %d, pWidth: %d, pHeight: %d)", pSource->width, pSource->height, pDest_x, pDest_y, pSource_x, pSource_y, pWidth, pHeight);
+
     if (gCurrent_conversion_table != NULL) {
         conv_table = gCurrent_conversion_table->pixels;
         for (y_count = 0; y_count < pHeight; y_count++) {
@@ -2271,7 +2277,14 @@ void DRPixelmapRectangleOnscreenCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_i
     tU8* source_ptr;
     tU8* dest_ptr;
     tU8* conv_table;
-    // LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
+    LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
+
+#ifdef DETHRACE_3DFX_PATCH
+    if (pDest->type == BR_PMT_RGB_565 && pSource->type == BR_PMT_INDEX_8) {
+        Copy8BitToOnscreen16BitRectangleWithTransparency(pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight, gCurrent_palette);
+        return;
+    }
+#endif
 
     source_row_wrap = pSource->row_bytes - pWidth;
     dest_row_wrap = pDest->row_bytes - pWidth;
@@ -3223,6 +3236,12 @@ void DRPixelmapDoubledCopy(br_pixelmap* pDestn, br_pixelmap* pSource, int pSourc
     int width_over_2;
     LOG_TRACE("(%p, %p, %d, %d, %d, %d)", pDestn, pSource, pSource_width, pSource_height, pX_offset, pY_offset);
 
+#ifdef DETHRACE_3DFX_PATCH
+    if (pDestn->type != pSource->type && pDestn->type == BR_PMT_RGB_565 && pSource->type == BR_PMT_INDEX_8) {
+        CopyDoubled8BitTo16BitRectangle(pDestn, pSource, pSource_width, pSource_height, pX_offset, pY_offset, gCurrent_palette);
+        return;
+    }
+#endif
     dst_row_skip = 2 * pDestn->row_bytes - 2 * pSource_width;
     src_row_skip = (pSource->row_bytes - pSource_width) / 2;
     sptr = (tU16*)((tU8*)pSource->pixels - 2 * src_row_skip + 2 * (pSource->row_bytes * pSource_height / 2));

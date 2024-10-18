@@ -113,7 +113,12 @@ void DrawRaceList(int pOffset) {
                 gBig_font,
                 gRace_list[i].name);
             if (gRace_list[i].been_there_done_that && gBullet_image != NULL) {
-                BrPixelmapRectangleCopy(gBack_screen,
+#ifdef DETHRACE_3DFX_PATCH
+                DRPixelmapRectangleCopy(
+#else
+                BrPixelmapRectangleCopy(
+#endif
+                    gBack_screen,
                     gCurrent_graf_data->choose_race_bullet_left,
                     y + (gBig_font->glyph_y - gBullet_image->height) / 2,
                     gBullet_image,

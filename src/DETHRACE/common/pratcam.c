@@ -495,7 +495,12 @@ void DoPratcam(tU32 pThe_time) {
     }
     EnableTranslationText();
     LetFlicFuckWithPalettes();
-    BrPixelmapRectangleCopy(gBack_screen,
+#ifdef DETHRACE_3DFX_PATCH
+    DRPixelmapRectangleCopy(
+#else
+    BrPixelmapRectangleCopy(
+#endif
+        gBack_screen,
         gProgram_state.current_car.prat_left + offset,
         gProgram_state.current_car.prat_top + y_offset,
         gPrat_buffer,
