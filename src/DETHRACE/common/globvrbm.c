@@ -37,4 +37,3 @@ int gMaterial_fogging;
 
 // Added
 int gVoodoo_rush_mode;
-int voodoo_dword_161A8C;

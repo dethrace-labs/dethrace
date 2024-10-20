@@ -486,6 +486,9 @@ int LoadNMaterials(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
         if (total == 0) {
             FatalError(kFatalError_LoadMaterialFile_S, str);
         }
+#ifdef DETHRACE_3DFX_PATCH
+        GlorifyMaterial(temp_array, total);
+#endif
         for (j = 0; j < total; j++) {
             if (temp_array[j]) {
                 switch (AddMaterialToStorage(pStorage_space, temp_array[j])) {
@@ -2817,6 +2820,13 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
             strcat(str, ".MAT");
             material = LoadSingleMaterial(&gTrack_storage_space, str);
             pRace_info->material_modifiers[i].skid_mark_material = material;
+#ifdef DETHRACE_3DFX_PATCH
+            if (material != NULL) {
+                GlorifyMaterial(&material, 1);
+                BrMaterialUpdate(material, BR_MATU_ALL);
+            }
+#endif
+
 #if defined(DETHRACE_FIX_BUGS)
             skid_mark_cnt++;
 #endif

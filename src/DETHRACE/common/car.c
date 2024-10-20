@@ -7517,5 +7517,6 @@ int GetPrecalculatedFacesUnderCar(tCar_spec* pCar, tFace_ref** pFace_refs) {
 // IDA: br_material* __cdecl SomeNearbyMaterial()
 br_material* SomeNearbyMaterial(void) {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    return gFace_list__car[gProgram_state.current_car.box_face_start].material;
 }

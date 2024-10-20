@@ -562,7 +562,13 @@ br_material* LoadMaterial(char* pName) {
     PossibleService();
     PathCat(the_path, gApplication_path, "MATERIAL");
     PathCat(the_path, the_path, pName);
-    return BrMaterialLoad(the_path);
+    result = BrMaterialLoad(the_path);
+#ifdef DETHRACE_3DFX_PATCH
+    if (result != NULL) {
+        GlorifyMaterial(&result, 1);
+    }
+#endif
+    return result;
 }
 
 // IDA: br_model* __usercall LoadModel@<EAX>(char *pName@<EAX>)
@@ -637,6 +643,9 @@ void DRLoadMaterials(char* pPath_name) {
 
     PossibleService();
     number_of_materials = BrMaterialLoadMany(pPath_name, material_array, COUNT_OF(material_array));
+#ifdef DETHRACE_3DFX_PATCH
+    GlorifyMaterial(material_array, number_of_materials);
+#endif
     BrMaterialAddMany(material_array, number_of_materials);
 }
 

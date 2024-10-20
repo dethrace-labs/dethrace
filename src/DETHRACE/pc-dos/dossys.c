@@ -419,8 +419,8 @@ void PDAllocateScreenAndBack(void) {
             dr_dprintf("Voodoo Rush mode");
             gVoodoo_rush_mode = 1;
         }
-        voodoo_dword_161A8C = 1;
         gInterpolate_textures = 1;
+        gUse_mip_maps = 1;
         gTextures_need_powers_of_2 = 1;
         gMax_texture_aspect_ratio = 8;
         gMax_texture_side = 256;
@@ -436,7 +436,7 @@ void PDAllocateScreenAndBack(void) {
         gShade_tables_do_not_work = 1;
     } else {
         gExceptions_file_suffix = ".TXT";
-        gInterpolate_textures = 1;
+        gUse_mip_maps = 1;
         gExceptions_general_file = "SOFTWARE";
 
 #ifdef PLAY_NICE_WITH_GUI

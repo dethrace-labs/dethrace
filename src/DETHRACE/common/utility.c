@@ -467,7 +467,14 @@ br_pixelmap* Tile8BitPixelmap(br_pixelmap* pSrc, int pN) {
 // IDA: tException_list __usercall FindExceptionInList@<EAX>(char *pName@<EAX>, tException_list pList@<EDX>)
 tException_list FindExceptionInList(char* pName, tException_list pList) {
     LOG_TRACE("(\"%s\", %d)", pName, pList);
-    NOT_IMPLEMENTED();
+
+    while (pList) {
+        if (DRStricmp(pName, pList->name) == 0) {
+            return pList;
+        }
+        pList = pList->next;
+    }
+    return NULL;
 }
 
 // IDA: br_pixelmap* __usercall PurifiedPixelmap@<EAX>(br_pixelmap *pSrc@<EAX>)
@@ -1588,6 +1595,42 @@ void GlorifyMaterial(br_material** pArray, int pCount) {
     tException_list e;
     LOG_TRACE("(%p, %d)", pArray, pCount);
     NOT_IMPLEMENTED();
+
+    for (i = 0; i < pCount; i++) {
+
+        if (pArray[i]->colour_map != NULL) {
+            e = FindExceptionInList(pArray[i]->colour_map->identifier, gExceptions);
+
+            if (gInterpolate_textures) {
+                // use linear texture filtering unless we have a "nobilinear" flag or the texture has transparent parts
+                if ((e == NULL || (e->flags & ExceptionFlag_NoBilinear) == 0)
+                    && !DRPixelmapHasZeros(pArray[i]->colour_map)) {
+                    pArray[i]->flags |= BR_MATF_MAP_INTERPOLATION;
+                }
+            }
+            if (gUse_mip_maps) {
+                pArray[i]->flags |= BR_MATF_MAP_ANTIALIASING;
+            }
+            if (gPerspective_is_fast) {
+                pArray[i]->flags |= BR_MATF_PERSPECTIVE;
+            }
+            if (e && (e->flags & ExceptionFlag_Double)) {
+                pArray[i]->map_transform.m[0][0] = 0.5f;
+                pArray[i]->map_transform.m[1][1] = 0.5f;
+            } else if (e && (e->flags & ExceptionFlag_Quadruple)) {
+                pArray[i]->map_transform.m[0][0] = 0.25f;
+                pArray[i]->map_transform.m[1][1] = 0.25f;
+            }
+        } else {
+            c = pArray[i]->index_base + pArray[i]->index_range / 2;
+            pArray[i]->colour = ((br_colour*)gRender_palette->pixels)[c];
+        }
+        pArray[i]->ka = 1.0f;
+        pArray[i]->kd = 0.0f;
+        pArray[i]->ks = 0.0f;
+        pArray[i]->flags &= ~BR_MATF_PRELIT;
+        pArray[i]->flags |= BR_MATF_LIGHT;
+    }
 }
 
 // IDA: void __usercall WhitenVertexRGB(br_model **pArray@<EAX>, int pN@<EDX>)
