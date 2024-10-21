@@ -1594,10 +1594,8 @@ void GlorifyMaterial(br_material** pArray, int pCount) {
     br_pixelmap* big_tile;
     tException_list e;
     LOG_TRACE("(%p, %d)", pArray, pCount);
-    NOT_IMPLEMENTED();
 
     for (i = 0; i < pCount; i++) {
-
         if (pArray[i]->colour_map != NULL) {
             e = FindExceptionInList(pArray[i]->colour_map->identifier, gExceptions);
 

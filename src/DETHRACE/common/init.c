@@ -558,7 +558,10 @@ void InitialiseApplication(int pArgc, char** pArgv) {
 #endif
 
     FinishLoadingGeneral();
+#ifndef DETHRACE_3DFX_PATCH
+    // 3dfx patch calls this earlier
     InitializePalettes();
+#endif
     AustereWarning();
     LoadInterfaceStrings();
     InitializeActionReplay();

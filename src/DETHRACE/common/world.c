@@ -12,6 +12,7 @@
 #include "flicplay.h"
 #include "formats.h"
 #include "globvars.h"
+#include "globvrbm.h"
 #include "globvrpb.h"
 #include "graphics.h"
 #include "harness/trace.h"
@@ -1053,7 +1054,20 @@ br_uint_32 AddProximities(br_actor* pActor, br_material* pMat, tFunkotronic_spec
 void Adjust2FloatsForExceptions(float* pVictim1, float* pVictim2, br_pixelmap* pCulprit) {
     tException_list e;
     LOG_TRACE("(%p, %p, %p)", pVictim1, pVictim2, pCulprit);
-    NOT_IMPLEMENTED();
+
+    if (pCulprit && pCulprit->identifier != NULL) {
+        e = FindExceptionInList(pCulprit->identifier, gExceptions);
+        if (e) {
+            if ((e->flags & ExceptionFlag_Double) != 0) {
+                *pVictim1 = *pVictim1 * 2.0f;
+                *pVictim2 = *pVictim2 * 2.0f;
+            }
+            if ((e->flags & ExceptionFlag_Quadruple) != 0) {
+                *pVictim1 = *pVictim1 * 4.0f;
+                *pVictim2 = *pVictim2 * 4.0f;
+            }
+        }
+    }
 }
 
 // IDA: void __usercall AddFunkotronics(FILE *pF@<EAX>, int pOwner@<EDX>, int pRef_offset@<EBX>)
@@ -1207,6 +1221,10 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
                 the_funk->matrix_mod_data.roll_info.x_period = speed1 == 0.0f ? 0.0f : 1000.0f / speed1;
                 the_funk->matrix_mod_data.roll_info.y_period = speed2 == 0.0f ? 0.0f : 1000.0f / speed2;
             }
+#ifdef DETHRACE_3DFX_PATCH
+            Adjust2FloatsForExceptions(&the_funk->matrix_mod_data.roll_info.x_period, &the_funk->matrix_mod_data.roll_info.y_period, the_funk->material->colour_map);
+
+#endif
             break;
         default:
             break;
@@ -2350,7 +2368,9 @@ void ParseSpecialVolume(FILE* pF, tSpecial_volume* pSpec, char* pScreen_name_str
 // IDA: void __usercall AddExceptionToList(tException_list *pDst@<EAX>, tException_list pNew@<EDX>)
 void AddExceptionToList(tException_list* pDst, tException_list pNew) {
     LOG_TRACE("(%p, %d)", pDst, pNew);
-    NOT_IMPLEMENTED();
+
+    pNew->next = *pDst;
+    *pDst = pNew;
 }
 
 // IDA: void __usercall LoadExceptionsFile(char *pName@<EAX>)
@@ -2362,14 +2382,66 @@ void LoadExceptionsFile(char* pName) {
     tException_list e;
     char delimiters[4];
     LOG_TRACE("(\"%s\")", pName);
-    NOT_IMPLEMENTED();
+
+    strcpy(delimiters, "\t ,");
+    f = DRfopen(pName, "rt");
+    if (f) {
+        GetALineAndDontArgue(f, line);
+        tok = strtok(line, delimiters);
+        if (DRStricmp(tok, "VERSION")) {
+            FatalError(120, pName, "VERSION");
+        }
+        tok = strtok(NULL, delimiters);
+        if (sscanf(tok, "%d", &file_version) == 0 || file_version != 1) {
+            FatalError(121, tok, pName);
+        }
+
+        while (1) {
+            GetALineAndDontArgue(f, line);
+            tok = strtok(line, delimiters);
+            if (DRStricmp(tok, "end") == 0) {
+                break;
+            }
+            e = BrMemAllocate(sizeof(tException_list), kMem_misc);
+            e->name = BrMemAllocate(strlen(tok) + 1, kMem_misc_string);
+            strcpy(e->name, tok);
+            e->flags = 0;
+            while (1) {
+                tok = strtok(NULL, delimiters);
+                if (tok == NULL /*|| (IsTable[(unsigned __int8)(*v11 + 1)] & 0xE0) == 0*/) {
+                    break;
+                }
+                if (DRStricmp(tok, "mipmap") == 0) {
+                    e->flags |= ExceptionFlag_Mipmap;
+                } else if (DRStricmp(tok, "nobilinear") == 0) {
+                    e->flags |= ExceptionFlag_NoBilinear;
+                } else if (DRStricmp(tok, "double") == 0) {
+                    e->flags |= ExceptionFlag_Double;
+                } else if (DRStricmp(tok, "quadruple") == 0) {
+                    e->flags |= ExceptionFlag_Quadruple;
+                } else {
+                    FatalError(123, tok, pName);
+                }
+            }
+        }
+        AddExceptionToList(gExceptions, e);
+    }
+    fclose(f);
 }
 
 // IDA: void __usercall LoadExceptionsFileForTrack(char *pTrack_file_name@<EAX>)
 void LoadExceptionsFileForTrack(char* pTrack_file_name) {
     tPath_name exceptions_file_name;
     LOG_TRACE("(\"%s\")", pTrack_file_name);
-    NOT_IMPLEMENTED();
+
+    sprintf(
+        exceptions_file_name,
+        "%s%s%s%s",
+        pTrack_file_name,
+        gDir_separator,
+        gExceptions_general_file,
+        gExceptions_file_suffix);
+    LoadExceptionsFile(exceptions_file_name);
 }
 
 // IDA: void __cdecl FreeExceptions()
@@ -2377,7 +2449,17 @@ void FreeExceptions(void) {
     tException_list list;
     tException_list next;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    list = gExceptions;
+    if (list) {
+        do {
+            next = list->next;
+            BrMemFree(list->name);
+            BrMemFree(list);
+            list = next;
+        } while (next);
+    }
+    gExceptions = NULL;
 }
 
 // IDA: void __usercall LoadTrack(char *pFile_name@<EAX>, tTrack_spec *pTrack_spec@<EDX>, tRace_info *pRace_info@<EBX>)
@@ -2428,6 +2510,9 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     killed_sky = 0;
     PathCat(the_path, gApplication_path, "RACES");
     PathCat(the_path, the_path, pFile_name);
+#ifdef DETHRACE_3DFX_PATCH
+    LoadExceptionsFileForTrack(the_path);
+#endif
     f = DRfopen(the_path, "rt");
     if (f == NULL) {
         FatalError(kFatalError_OpenRacesFile);
@@ -2922,6 +3007,9 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
         FatalError(kFatalError_FileCorrupt_S, pFile_name);
     }
     fclose(f);
+#ifdef DETHRACE_3DFX_PATCH
+    FreeExceptions();
+#endif
 }
 
 // IDA: br_uint_32 __cdecl RemoveBounds(br_actor *pActor, void *pArg)

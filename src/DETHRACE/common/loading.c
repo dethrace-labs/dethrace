@@ -707,6 +707,9 @@ void LoadInRegisteeDir(char* pThe_dir_path) {
     PathCat(reg_path, pThe_dir_path, "REG");
     LoadInFiles(reg_path, "PALETTES", DRLoadPalette);
     LoadInFiles(reg_path, "SHADETAB", DRLoadShadeTable);
+#ifdef DETHRACE_3DFX_PATCH
+    InitializePalettes();
+#endif
     LoadInFiles(reg_path, "PIXELMAP", DRLoadPixelmaps);
     LoadInFiles(reg_path, "MATERIAL", DRLoadMaterials);
     LoadInFiles(reg_path, "MODELS", DRLoadModels);
