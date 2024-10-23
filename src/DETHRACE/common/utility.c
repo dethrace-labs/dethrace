@@ -1665,7 +1665,7 @@ void NobbleNonzeroBlacks(br_pixelmap* pPalette) {
         red = (*palette_entry) & 0xff;
         if (blue == 0 && green == 0 && red == 0) {
             frobbed = 1;
-            *palette_entry = 0;
+            *palette_entry = 0x010101;
         }
         palette_entry++;
     }
