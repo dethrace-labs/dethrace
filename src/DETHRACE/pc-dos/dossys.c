@@ -36,6 +36,7 @@ int gReplay_override;
 tGraf_spec gGraf_specs[2] = {
     { 8, 1, 0, 320, 200, 0, 0, "32X20X8", "MCGA,W:320,H:200,B:8", 320, 320, 200, NULL },
     { 8, 1, 0, 640, 480, 0, 0, "64X48X8", "VESA,W:640,H:480,B:8", 640, 640, 480, NULL }
+    // { 8, 1, 0, 1920, 1080, 0, 0, "64X48X8", "VESA,W:640,H:480,B:8", 640, 1920, 1080, NULL }
 };
 int gASCII_table[128];
 tU32 gKeyboard_bits[8];
@@ -436,7 +437,7 @@ void PDAllocateScreenAndBack(void) {
         gShade_tables_do_not_work = 1;
     } else {
         gExceptions_file_suffix = ".TXT";
-        gUse_mip_maps = 1;
+        gInterpolate_textures = 1;
         gExceptions_general_file = "SOFTWARE";
 
 #ifdef PLAY_NICE_WITH_GUI

@@ -246,7 +246,7 @@ static void* create_window(char* title, int width, int height, tHarness_window_t
     window = SDL_CreateWindow(title,
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
-        640, 480,
+        width, height,
         flags);
 
     if (window == NULL) {

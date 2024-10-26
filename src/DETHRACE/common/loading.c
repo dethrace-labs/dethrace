@@ -709,6 +709,8 @@ void LoadInRegisteeDir(char* pThe_dir_path) {
     LoadInFiles(reg_path, "SHADETAB", DRLoadShadeTable);
 #ifdef DETHRACE_3DFX_PATCH
     InitializePalettes();
+    // Added by dethrace to force textures to be loaded with correct palette
+    EnsureRenderPalette();
 #endif
     LoadInFiles(reg_path, "PIXELMAP", DRLoadPixelmaps);
     LoadInFiles(reg_path, "MATERIAL", DRLoadMaterials);
