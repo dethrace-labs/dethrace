@@ -744,10 +744,18 @@ void PrintScreen(void) {
     LOG_TRACE("()");
 
     f = OpenUniqueFileB("DUMP", "BMP");
-    if (f != NULL) {
-        PrintScreenFile(f);
-        fclose(f);
+    if (f == NULL) {
+        return;
     }
+#ifdef DETHRACE_3DFX_PATCH
+    if (gBack_screen->type == BR_PMT_RGB_565) {
+        PrintScreenFile16(f);
+    } else
+#endif
+    {
+        PrintScreenFile(f);
+    }
+    fclose(f);
 }
 
 // IDA: tU32 __cdecl GetTotalTime()

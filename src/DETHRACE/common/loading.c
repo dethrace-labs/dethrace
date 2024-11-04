@@ -17,6 +17,7 @@
 #include "flicplay.h"
 #include "formats.h"
 #include "globvars.h"
+#include "globvrbm.h"
 #include "globvrkm.h"
 #include "globvrpb.h"
 #include "grafdata.h"
@@ -826,7 +827,10 @@ tS8* ConvertPixTo16BitStripMap(br_pixelmap* pBr_map) {
     tU8 byte;
     tU16* palette_entry;
     LOG_TRACE("(%p)", pBr_map);
-    NOT_IMPLEMENTED();
+
+    LOG_WARN("not implemented");
+
+    return 0;
 }
 
 // IDA: tS8* __usercall ConvertPixToStripMap@<EAX>(br_pixelmap *pThe_br_map@<EAX>)
@@ -1717,14 +1721,19 @@ void SetModelFlags(br_model* pModel, int pOwner) {
 #else
         if (pOwner == OPPONENT_APC_IDX || gAusterity_mode) {
 #endif
-            if ((pModel->flags & BR_MODF_UPDATEABLE) != 0) {
-                pModel->flags &= ~(BR_MODF_KEEP_ORIGINAL | BR_MODF_UPDATEABLE);
-                BrModelUpdate(pModel, BR_MODU_ALL);
+#ifdef DETHRACE_3DFX_PATCH
+            if (!gMaterial_fogging)
+#endif
+            {
+                if ((pModel->flags & BR_MODF_UPDATEABLE) != 0) {
+                    pModel->flags &= ~(BR_MODF_KEEP_ORIGINAL | BR_MODF_UPDATEABLE);
+                    BrModelUpdate(pModel, BR_MODU_ALL);
+                }
+                return;
             }
-        } else {
-            pModel->flags |= BR_MODF_DONT_WELD | BR_MODF_KEEP_ORIGINAL | BR_MODF_UPDATEABLE;
-            BrModelUpdate(pModel, BR_MODU_ALL);
         }
+        pModel->flags |= BR_MODF_DONT_WELD | BR_MODF_KEEP_ORIGINAL | BR_MODF_UPDATEABLE;
+        BrModelUpdate(pModel, BR_MODU_ALL);
     }
 }
 
@@ -1848,9 +1857,17 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
                 pCar_spec->cockpit_images[j] = NULL;
             } else {
                 the_image = LoadPixelmap(str);
-                if (the_image == NULL)
+                if (the_image == NULL) {
                     FatalError(kFatalError_LoadCockpitImage);
-                pCar_spec->cockpit_images[j] = ConvertPixToStripMap(the_image);
+                }
+#ifdef DETHRACE_3DFX_PATCH
+                if (gBack_screen->type == BR_PMT_RGB_565) {
+                    pCar_spec->cockpit_images[j] = ConvertPixTo16BitStripMap(the_image);
+                } else
+#endif
+                {
+                    pCar_spec->cockpit_images[j] = ConvertPixToStripMap(the_image);
+                }
                 BrPixelmapFree(the_image);
             }
             GetALineAndDontArgue(g, s);

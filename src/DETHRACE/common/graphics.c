@@ -337,6 +337,11 @@ void DRDrawLine(br_pixelmap* pDestn, int pX1, int pY1, int pX2, int pY2, int pCo
     int the_diff;
     LOG_TRACE("(%p, %d, %d, %d, %d, %d)", pDestn, pX1, pY1, pX2, pY2, pColour);
 
+#ifdef DETHRACE_3DFX_PATCH
+    if (gBack_screen->type == BR_PMT_RGB_565) {
+        pColour = PaletteEntry16Bit(gRender_palette, pColour);
+    }
+#endif
     BrPixelmapLine(pDestn, pX1, pY1, pX2, pY2, pColour);
 }
 
@@ -2465,7 +2470,11 @@ int AllocateTransientBitmap(int pWidth, int pHeight, int pUser_data) {
 
     for (bm_index = 0; bm_index < COUNT_OF(gTransient_bitmaps); bm_index++) {
         if (gTransient_bitmaps[bm_index].pixmap == NULL) {
+#ifdef DETHRACE_3DFX_PATCH
+            gTransient_bitmaps[bm_index].pixmap = DRPixelmapAllocate(gBack_screen->type, pWidth + 8, pHeight, NULL, 0);
+#else
             gTransient_bitmaps[bm_index].pixmap = DRPixelmapAllocate(BR_PMT_INDEX_8, pWidth + 8, pHeight, NULL, 0);
+#endif
             gTransient_bitmaps[bm_index].in_use = 0;
             gTransient_bitmaps[bm_index].user_data = pUser_data;
             return bm_index;

@@ -666,7 +666,27 @@ void ProcessModelFaceMaterials2(br_model* pModel, tPMFM2CB pCallback) {
     tU16 group;
     br_material* old_mat;
     LOG_TRACE("(%p, %d)", pModel, pCallback);
-    NOT_IMPLEMENTED();
+
+    if (pModel->faces) {
+        for (f = 0; f < pModel->nfaces; f++) {
+            if (pModel->faces[f].material) {
+                pCallback(pModel->faces[f].material);
+            }
+        }
+    } else {
+        if (pModel->prepared == NULL) {
+            return;
+        }
+        for (group = 0; group < V11MODEL(pModel)->ngroups; group++) {
+            for (f = 0; f < V11MODEL(pModel)->groups[group].nfaces; f++) {
+                // old_mat = V11MODEL(pModel)->groups[group].face_colours[f];
+                old_mat = V11MODEL(pModel)->groups[group].user;
+                if (old_mat) {
+                    pCallback(old_mat);
+                }
+            }
+        }
+    }
 }
 
 // IDA: void __usercall ProcessModelFaceMaterials(br_model *pModel@<EAX>, tPMFMCB pCallback@<EDX>)
@@ -1854,7 +1874,15 @@ void SaveAdditionalStuff(void) {
 // IDA: br_uint_32 __cdecl ProcessMaterials(br_actor *pActor, tPMFM2CB pCallback)
 br_uint_32 ProcessMaterials(br_actor* pActor, tPMFM2CB pCallback) {
     LOG_TRACE("(%p, %d)", pActor, pCallback);
-    NOT_IMPLEMENTED();
+
+    if (pActor->material) {
+        pCallback(pActor->material);
+    }
+    if (pActor->type == BR_ACTOR_MODEL && pActor->model != NULL) {
+        ProcessModelFaceMaterials2(pActor->model, pCallback);
+    }
+
+    return BrActorEnum(pActor, (br_actor_enum_cbfn*)ProcessMaterials, pCallback);
 }
 
 // IDA: br_uint_32 __cdecl ProcessFaceMaterials2(br_actor *pActor, tPMFM2CB pCallback)
