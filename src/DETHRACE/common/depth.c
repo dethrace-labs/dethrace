@@ -577,14 +577,15 @@ void DoHorizon(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor
     LOG_TRACE("(%p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world);
 
     yaw = BrRadianToAngle(atan2f(pCamera_to_world->m[2][0], pCamera_to_world->m[2][2]));
-    if (!gProgram_state.cockpit_on && !(gAction_replay_mode && gAction_replay_camera_mode)) {
-        return;
-    }
+    if (!gProgram_state.cockpit_on && !gAction_replay_mode && gAction_replay_camera_mode != eAction_replay_standard
+
 #ifdef DETHRACE_3DFX_PATCH
-    if (!gBlitting_is_slow) {
+        && !gBlitting_is_slow
+#endif
+    ) {
         return;
     }
-#endif
+
     if (gRendering_mirror) {
         actor = gRearview_sky_actor;
     } else {

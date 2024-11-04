@@ -448,7 +448,7 @@ void Copy8BitStripImageTo16Bit(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 
     char* destn_ptr;
     char* destn_ptr2;
     LOG_TRACE("(%p, %d, %d, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pOffset_x, pDest_y, pOffset_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
-    NOT_IMPLEMENTED();
+    // NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall CopyStripImage(br_pixelmap *pDest@<EAX>, br_int_16 pDest_x@<EDX>, br_int_16 pOffset_x@<EBX>, br_int_16 pDest_y@<ECX>, br_int_16 pOffset_y, tS8 *pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_uint_16 pWidth, br_uint_16 pHeight)
@@ -465,6 +465,21 @@ void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
     char* destn_ptr;
     char* destn_ptr2;
     LOG_TRACE8("(%p, %d, %d, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pOffset_x, pDest_y, pOffset_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
+
+    if (gBack_screen->type == BR_PMT_RGB_565) {
+        Copy8BitStripImageTo16Bit(
+            pDest,
+            pDest_x,
+            pOffset_x,
+            pDest_y,
+            pOffset_y,
+            pSource,
+            pSource_x,
+            pSource_y,
+            pWidth,
+            pHeight);
+        return;
+    }
 
     height = *(uint16_t*)pSource;
     pSource = pSource + 2;

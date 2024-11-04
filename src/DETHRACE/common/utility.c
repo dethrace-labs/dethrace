@@ -1146,6 +1146,13 @@ void Copy8BitTo16BitRectangleWithTransparency(br_pixelmap* pDst, tS16 pDst_x, tS
         pDst_y = 0;
     }
 
+#ifdef DETHRACE_FIX_BUGS
+    // In some cockpit views, instruments might overflow the bottom of the screen
+    if (pDst_y + pHeight > pDst->height) {
+        pHeight = pDst->height - pDst_y;
+    }
+#endif
+
     palette_entry = PaletteOf16Bits(pPalette)->pixels;
     for (y = 0; y < pHeight; y++) {
         src_start = (tU8*)pSrc->pixels + (pSrc->row_bytes * (pSrc_y + y)) + pSrc_x;
