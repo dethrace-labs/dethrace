@@ -1097,10 +1097,11 @@ void Copy8BitTo16BitRectangle(br_pixelmap* pDst, tS16 pDst_x, tS16 pDst_y, br_pi
     tU16* palette_entry;
     LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d, %p)", pDst, pDst_x, pDst_y, pSrc, pSrc_x, pSrc_y, pWidth, pHeight, pPalette);
 
-#ifdef DETHRACE_FIX_BUGS
-    // DoPratcam can generate pDst_x = -1 condition
-    pDst_x = MAX(0, pDst_x);
-#endif
+    if (pDst_x < 0) {
+        pWidth -= abs(pDst_x);
+        pSrc_x += abs(pDst_x);
+        pDst_x = 0;
+    }
 
     palette_entry = PaletteOf16Bits(pPalette)->pixels;
     for (y = 0; y < pHeight; y++) {
@@ -1109,7 +1110,10 @@ void Copy8BitTo16BitRectangle(br_pixelmap* pDst, tS16 pDst_x, tS16 pDst_y, br_pi
         dst_start = (tU8*)pDst->pixels + (pDst->row_bytes * (pDst_y + y));
         dst_start += pDst_x;
         for (x = 0; x < pWidth; x++) {
-            *dst_start = palette_entry[*src_start];
+            // even though we have a specific `WithTransparency` version of this function, this one also handles transparency!
+            if (*src_start != 0) {
+                *dst_start = palette_entry[*src_start];
+            }
             src_start++;
             dst_start++;
         }

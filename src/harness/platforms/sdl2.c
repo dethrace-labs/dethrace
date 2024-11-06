@@ -238,8 +238,6 @@ static void* create_window(char* title, int width, int height, tHarness_window_t
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 
-        SDL_GL_SetSwapInterval(1);
-
         flags |= SDL_WINDOW_OPENGL;
     }
 
@@ -258,6 +256,7 @@ static void* create_window(char* title, int width, int height, tHarness_window_t
         if (!gl_context) {
             LOG_PANIC("Failed to call SDL_GL_CreateContext. %s", SDL_GetError());
         }
+        SDL_GL_SetSwapInterval(1);
     } else {
         renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
         if (renderer == NULL) {
