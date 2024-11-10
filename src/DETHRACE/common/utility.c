@@ -1103,6 +1103,20 @@ void Copy8BitTo16BitRectangle(br_pixelmap* pDst, tS16 pDst_x, tS16 pDst_y, br_pi
         pDst_x = 0;
     }
 
+    if (pSrc_x + pWidth > pSrc->width) {
+        pWidth = pSrc->width - pSrc_x;
+    }
+    if (pSrc_y + pHeight > pSrc->height) {
+        pHeight = pSrc->height - pSrc_y;
+    }
+
+    if (pDst_x + pWidth > pDst->width) {
+        pWidth = pDst->width - pDst_x;
+    }
+    if (pDst_y + pHeight > pDst->height) {
+        pHeight = pDst->height - pDst_y;
+    }
+
     palette_entry = PaletteOf16Bits(pPalette)->pixels;
     for (y = 0; y < pHeight; y++) {
         src_start = (tU8*)pSrc->pixels + (pSrc->row_bytes * (pSrc_y + y));

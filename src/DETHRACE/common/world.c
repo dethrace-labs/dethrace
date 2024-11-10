@@ -2647,15 +2647,20 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
         LoadSomeMaterials(&gTrack_storage_space, f);
         SkipNLines(f);
     }
-    for (i = 0; gTrack_storage_space.materials_count > i; ++i) {
-        PossibleService();
-        if (gTrack_storage_space.materials[i]->flags & (BR_MATF_LIGHT | BR_MATF_PRELIT | BR_MATF_SMOOTH)) {
-            gTrack_storage_space.materials[i]->flags &= ~(BR_MATF_LIGHT | BR_MATF_PRELIT | BR_MATF_SMOOTH);
-            if (gTrack_storage_space.materials[i]->flags & BR_MATF_TWO_SIDED) {
-                gTrack_storage_space.materials[i]->user = DOUBLESIDED_USER_FLAG;
-                gTrack_storage_space.materials[i]->flags &= ~BR_MATF_TWO_SIDED;
+#ifdef DETHRACE_3DFX_PATCH
+    if (!gShade_tables_do_not_work)
+#endif
+    {
+        for (i = 0; i < gTrack_storage_space.materials_count; i++) {
+            PossibleService();
+            if (gTrack_storage_space.materials[i]->flags & (BR_MATF_LIGHT | BR_MATF_PRELIT | BR_MATF_SMOOTH)) {
+                gTrack_storage_space.materials[i]->flags &= ~(BR_MATF_LIGHT | BR_MATF_PRELIT | BR_MATF_SMOOTH);
+                if (gTrack_storage_space.materials[i]->flags & BR_MATF_TWO_SIDED) {
+                    gTrack_storage_space.materials[i]->user = DOUBLESIDED_USER_FLAG;
+                    gTrack_storage_space.materials[i]->flags &= ~BR_MATF_TWO_SIDED;
+                }
+                BrMaterialUpdate(gTrack_storage_space.materials[i], BR_MATU_RENDERING);
             }
-            BrMaterialUpdate(gTrack_storage_space.materials[i], BR_MATU_RENDERING);
         }
     }
     if (gRace_file_version <= 5) {

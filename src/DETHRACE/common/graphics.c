@@ -1139,14 +1139,20 @@ br_scalar DistanceFromPlane(br_vector3* pPos, br_scalar pA, br_scalar pB, br_sca
 void DisableLights(void) {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < gNumber_of_lights; i++) {
+        BrLightDisable(gLight_array[i]);
+    }
 }
 
 // IDA: void __cdecl EnableLights()
 void EnableLights(void) {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < gNumber_of_lights; i++) {
+        BrLightEnable(gLight_array[i]);
+    }
 }
 
 // IDA: void __usercall ProcessShadow(tCar_spec *pCar@<EAX>, br_actor *pWorld@<EDX>, tTrack_spec *pTrack_spec@<EBX>, br_actor *pCamera@<ECX>, br_matrix34 *pCamera_to_world_transform, br_scalar pDistance_factor)
@@ -1347,9 +1353,17 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
                 if (list_ptr->v[0].v[1] >= first_poly_below || list_ptr->v[1].v[1] >= first_poly_below || list_ptr->v[2].v[1] >= first_poly_below) {
                     if (gFancy_shadow) {
                         faces[f_num].material = list_ptr->material;
-                        if (list_ptr->material && list_ptr->material->colour_map && (list_ptr->material->flags & BR_MATF_LIGHT) == 0) {
-                            list_ptr->material->flags |= BR_MATF_SMOOTH | BR_MATF_LIGHT;
-                            BrMaterialUpdate(list_ptr->material, BR_MATU_RENDERING);
+#ifdef DETHRACE_3DFX_PATCH
+                        if (gShade_tables_do_not_work) {
+                            list_ptr->material->ka = 0.75f;
+                            BrMaterialUpdate(list_ptr->material, BR_MATU_LIGHTING);
+                        } else
+#endif
+                        {
+                            if (list_ptr->material && list_ptr->material->colour_map && (list_ptr->material->flags & BR_MATF_LIGHT) == 0) {
+                                list_ptr->material->flags |= BR_MATF_SMOOTH | BR_MATF_LIGHT;
+                                BrMaterialUpdate(list_ptr->material, BR_MATU_RENDERING);
+                            }
                         }
                     } else {
                         faces[f_num].material = gShadow_material;
@@ -1417,7 +1431,13 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
             camera_ptr->hither_z += camera_hither_fudge;
         }
         if (f_num) {
+#ifdef DETHRACE_3DFX_PATCH
+            DisableLights();
+#endif
             BrZbSceneRenderBegin(gUniverse_actor, gCamera, gRender_screen, gDepth_buffer);
+#ifdef DETHRACE_3DFX_PATCH
+            EnableLights();
+#endif
             gShadow_model->vertices = verts;
             gShadow_model->faces = faces;
             gShadow_model->nfaces = f_num;
@@ -1445,6 +1465,13 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
             if (gFancy_shadow) {
                 material = gShadow_model->faces[i].material;
                 if (material) {
+#ifdef DETHRACE_3DFX_PATCH
+                    if (gShade_tables_do_not_work) {
+                        material->ka = 1.0f;
+                        BrMaterialUpdate(material, BR_MATU_LIGHTING);
+                        continue;
+                    }
+#endif
                     if (material->colour_map && (material->flags & BR_MATF_LIGHT) != 0) {
                         material->flags &= ~(BR_MATF_LIGHT | BR_MATF_PRELIT | BR_MATF_SMOOTH);
                         BrMaterialUpdate(material, BR_MATU_RENDERING);
@@ -3154,7 +3181,7 @@ void InitShadow(void) {
     br_vector3 temp_v;
     LOG_TRACE("()");
 
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < COUNT_OF(gShadow_clip_planes); i++) {
         gShadow_clip_planes[i].clip = BrActorAllocate(BR_ACTOR_CLIP_PLANE, NULL);
         BrActorAdd(gUniverse_actor, gShadow_clip_planes[i].clip);
         BrClipPlaneDisable(gShadow_clip_planes[i].clip);
