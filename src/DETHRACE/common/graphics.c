@@ -1121,7 +1121,7 @@ void TryThisEdge(tCar_spec* pCar, br_vector3* pLight, int pIndex_1, br_scalar pS
     dot_2 = pSign_2 * pLight->v[pIndex_2];
     mult = dot_1 * dot_2;
     if (mult < 0 || (mult == 0 && (dot_1 > 0 || dot_2 > 0))) {
-        if (gShadow_clip_plane_count < 6) {
+        if (gShadow_clip_plane_count < BR_MAX_CLIP_PLANES) {
             MungeClipPlane(pLight, pCar, &gShadow_points[pPoint_index_1], &gShadow_points[pPoint_index_2], pY_offset);
         }
     }
@@ -1260,7 +1260,7 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
     TryThisEdge(pCar, &light_ray_car, 0, -1.0, 2, 1.0, 3, 7, y_offset);
     TryThisEdge(pCar, &light_ray_car, 0, -1.0, 2, -1.0, 2, 6, y_offset);
     TryThisEdge(pCar, &light_ray_car, 0, 1.0, 2, -1.0, 5, 1, y_offset);
-    for (i = 0; i < gShadow_clip_plane_count; ++i) {
+    for (i = 0; i < gShadow_clip_plane_count; i++) {
         BrClipPlaneEnable(gShadow_clip_planes[i].clip);
     }
     face_count = GetPrecalculatedFacesUnderCar(pCar, &face_ref);
