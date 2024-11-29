@@ -363,6 +363,11 @@ int PDInitScreenVars(int pArgc, char** pArgv) {
 
 // IDA: void __cdecl PDInitScreen()
 void PDInitScreen(void) {
+    LOG_TRACE("()");
+}
+
+// IDA: void __cdecl sub_B4DB4()
+void sub_B4DB4(void) {
     // if (!gReal_back_screen->pixels_qualifier) {
     //     gReal_back_screen->pixels_qualifier = (unsigned __int16)__DS__;
     // }
@@ -374,7 +379,7 @@ void PDLockRealBackScreen(int lock) {
     LOG_TRACE("()");
 
     if (!gReal_back_screen_locked && !gReal_back_screen->pixels && lock <= gVoodoo_rush_mode) {
-        PDInitScreen();
+        sub_B4DB4();
         BrPixelmapDirectLock(gReal_back_screen, 1);
         if (!gReal_back_screen->pixels)
             FatalError(117, "gReal_back_screen");
@@ -590,9 +595,7 @@ void PDScreenBufferSwap(int pRendering_area_only) {
     }
     gAlready_copied = 0;
     if (!pRendering_area_only) {
-        PDUnlockRealBackScreen(1);
-        BrPixelmapDoubleBuffer(gScreen, gReal_back_screen);
-        PDLockRealBackScreen(1);
+        SwapBackScreen();
     }
 }
 

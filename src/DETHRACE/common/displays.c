@@ -3,8 +3,10 @@
 #include "constants.h"
 #include "controls.h"
 #include "depth.h"
+#include "errors.h"
 #include "flicplay.h"
 #include "globvars.h"
+#include "globvrbm.h"
 #include "globvrkm.h"
 #include "globvrpb.h"
 #include "grafdata.h"
@@ -230,7 +232,25 @@ void DRPixelmapCleverText2(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFo
 // IDA: void __usercall DeviouslyDimRectangle(br_pixelmap *pPixelmap@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pRight@<ECX>, int pBottom, int pKnock_out_corners)
 void DeviouslyDimRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int pBottom, int pKnock_out_corners) {
     LOG_TRACE("(%p, %d, %d, %d, %d, %d)", pPixelmap, pLeft, pTop, pRight, pBottom, pKnock_out_corners);
-    NOT_IMPLEMENTED();
+
+    if (pPixelmap != gBack_screen) {
+        FatalError(124);
+    }
+
+    gDim_model->vertices[1].p.v[0] = pLeft;
+    gDim_model->vertices[0].p.v[0] = pLeft;
+    gDim_model->vertices[3].p.v[0] = pRight;
+    gDim_model->vertices[2].p.v[0] = pRight;
+    gDim_model->vertices[3].p.v[1] = -pTop;
+    gDim_model->vertices[0].p.v[1] = -pTop;
+    gDim_model->vertices[2].p.v[1] = -pBottom;
+    gDim_model->vertices[1].p.v[1] = -pBottom;
+    BrModelUpdate(gDim_model, BR_MODU_VERTEX_POSITIONS);
+    gDim_actor->render_style = BR_RSTYLE_FACES;
+    PDUnlockRealBackScreen(1);
+    BrZbSceneRender(g2d_camera, g2d_camera, gBack_screen, gDepth_buffer);
+    PDLockRealBackScreen(1);
+    gDim_actor->render_style = BR_RSTYLE_NONE;
 }
 
 // IDA: void __cdecl DimRectangle(br_pixelmap *pPixelmap, int pLeft, int pTop, int pRight, int pBottom, int pKnock_out_corners)
@@ -244,7 +264,10 @@ void DimRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int p
     int width;
     LOG_TRACE9("(%p, %d, %d, %d, %d, %d)", pPixelmap, pLeft, pTop, pRight, pBottom, pKnock_out_corners);
 
-    return;
+    if (gDevious_2d) {
+        DeviouslyDimRectangle(pPixelmap, pLeft, pTop, pRight, pBottom, pKnock_out_corners);
+        return;
+    }
 
     ptr = (tU8*)pPixelmap->pixels + pLeft + pPixelmap->row_bytes * pTop;
     line_skip = pPixelmap->row_bytes - pRight + pLeft;
