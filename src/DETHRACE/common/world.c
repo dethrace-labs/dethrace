@@ -531,6 +531,9 @@ int LoadNModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
         PathCat(the_path, gApplication_path, "MODELS");
         PathCat(the_path, the_path, str);
         total = BrModelLoadMany(the_path, temp_array, 2000);
+#ifdef DETHRACE_3DFX_PATCH
+        WhitenVertexRGB(temp_array, total);
+#endif
         if (total == 0) {
             FatalError(kFatalError_LoadModelFile_S, str);
         }
@@ -735,6 +738,9 @@ int LoadNTrackModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
         if (total == 0) {
             FatalError(kFatalError_LoadModelFile_S, str);
         }
+#ifdef DETHRACE_3DFX_PATCH
+        WhitenVertexRGB(temp_array, total);
+#endif
         for (j = 0; j < total; j++) {
             if (temp_array[j]) {
                 switch (AddModelToStorage(pStorage_space, temp_array[j])) {

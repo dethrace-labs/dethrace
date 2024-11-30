@@ -375,15 +375,15 @@ void InitSmokeStuff(void) {
     gBlend_actor->identifier = "gBlend_actor";
     gBlend_actor->model = gBlend_model;
     gBlend_actor->material = gBlend_material;
-    gBlend_model->faces->vertices[0] = 0;
-    gBlend_model->faces->vertices[1] = 1;
-    gBlend_model->faces->vertices[2] = 2;
+    gBlend_model->faces[0].vertices[0] = 0;
+    gBlend_model->faces[0].vertices[1] = 1;
+    gBlend_model->faces[0].vertices[2] = 2;
     gBlend_model->faces[1].vertices[0] = 2;
     gBlend_model->faces[1].vertices[1] = 3;
     gBlend_model->faces[1].vertices[2] = 0;
-    gBlend_model->vertices->p.v[0] = -1.0f;
-    gBlend_model->vertices->p.v[1] = 1.0f;
-    gBlend_model->vertices->p.v[2] = 0.0f;
+    gBlend_model->vertices[0].p.v[0] = -1.0f;
+    gBlend_model->vertices[0].p.v[1] = 1.0f;
+    gBlend_model->vertices[0].p.v[2] = 0.0f;
     gBlend_model->vertices[1].p.v[0] = -1.0f;
     gBlend_model->vertices[1].p.v[1] = -1.0f;
     gBlend_model->vertices[1].p.v[2] = 0.0f;
@@ -405,8 +405,8 @@ void InitSmokeStuff(void) {
     }
     gBlend_material->colour_map->map = gRender_palette;
     BrMapAdd(gBlend_material->colour_map);
-    gBlend_model->vertices->map.v[0] = 0.0f;
-    gBlend_model->vertices->map.v[1] = 1.0f - 1.0f / (float)gBlend_material->colour_map->height;
+    gBlend_model->vertices[0].map.v[0] = 0.0f;
+    gBlend_model->vertices[0].map.v[1] = 1.0f - 1.0f / (float)gBlend_material->colour_map->height;
     gBlend_model->vertices[1].map.v[0] = 0.0f;
     gBlend_model->vertices[1].map.v[1] = 0.0f;
     gBlend_model->vertices[2].map.v[0] = 1.0f - 1.0f / (float)gBlend_material->colour_map->width;

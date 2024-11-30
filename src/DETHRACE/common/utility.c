@@ -1670,7 +1670,17 @@ void WhitenVertexRGB(br_model** pArray, int pN) {
     int v;
     br_vertex* vertex;
     LOG_TRACE("(%p, %d)", pArray, pN);
-    NOT_IMPLEMENTED();
+
+    if (gScreen && gScreen->type != BR_PMT_INDEX_8 && pN > 0) {
+        for (m = 0; m < pN; m++) {
+            vertex = pArray[m]->vertices;
+            for (v = 0; v < pArray[m]->nvertices; v++, vertex++) {
+                vertex->red = 255;
+                vertex->grn = 255;
+                vertex->blu = 255;
+            }
+        }
+    }
 }
 
 // IDA: void __usercall NobbleNonzeroBlacks(br_pixelmap *pPalette@<EAX>)

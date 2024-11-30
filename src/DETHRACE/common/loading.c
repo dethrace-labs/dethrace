@@ -581,7 +581,11 @@ br_model* LoadModel(char* pName) {
     PossibleService();
     PathCat(the_path, gApplication_path, "MODELS");
     PathCat(the_path, the_path, pName);
-    return BrModelLoad(the_path);
+    model = BrModelLoad(the_path);
+#ifdef DETHRACE_3DFX_PATCH
+    WhitenVertexRGB(&model, 1);
+#endif
+    return model;
 }
 
 // IDA: br_actor* __usercall LoadActor@<EAX>(char *pName@<EAX>)
@@ -658,6 +662,9 @@ void DRLoadModels(char* pPath_name) {
 
     PossibleService();
     number_of_models = BrModelLoadMany(pPath_name, model_array, COUNT_OF(model_array));
+#ifdef DETHRACE_3DFX_PATCH
+    WhitenVertexRGB(model_array, number_of_models);
+#endif
     BrModelAddMany(model_array, number_of_models);
 }
 

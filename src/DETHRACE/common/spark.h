@@ -92,7 +92,7 @@ void SmokeLine(int l, int x, br_scalar zbuff, int r_squared, tU8* scr_ptr, tU16*
 
 void SmokeCircle(br_vector3* o, br_scalar r, br_scalar extra_z, br_scalar strength, br_scalar pAspect, br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_pixelmap* pShade_table);
 
-int CmpSmokeZ(void* p1, void* p2);
+int CmpSmokeZ(const void* p1, const void* p2);
 
 void RenderRecordedSmokeCircles(void);
 
