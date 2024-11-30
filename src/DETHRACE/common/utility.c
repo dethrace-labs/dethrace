@@ -1222,7 +1222,69 @@ void Copy8BitRectangleTo16BitRhombusWithTransparency(br_pixelmap* pDst, tS16 pDs
     tS16 clipped_src_x;
     tS16 clipped_width;
     LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d, %d, %p)", pDst, pDst_x, pDst_y, pSrc, pSrc_x, pSrc_y, pWidth, pHeight, pShear, pPalette);
-    NOT_IMPLEMENTED();
+
+    palette_entry = PaletteOf16Bits(pPalette)->pixels;
+    total_shear = 0;
+    // srcY_plus_originY = pSrc_y + pSrc->origin_y;
+    // srcX_plus_originX = pSrc_x + pSrc->origin_x;
+    // destX_plus_originX = pDst_x + pDst->origin_x;
+    // destY_plus_originY = pDst_y + pDst->origin_y;
+    if (pSrc_y + pSrc->origin_y < 0) {
+        pHeight += pSrc_y + pSrc->origin_y;
+        pDst_y -= (pSrc_y + pSrc->origin_y);
+        pSrc_y = 0;
+    }
+    if (pDst_y + pDst->origin_y < 0) {
+        pHeight += pDst_y + pDst->origin_y;
+        pSrc_y -= (pDst_y + pDst->origin_y);
+        pDst_y = 0;
+    }
+
+    if (pSrc_y + pSrc->origin_y + pHeight > pSrc->height) {
+        pHeight = pSrc->height - (pSrc_y + pSrc->origin_y);
+    }
+
+    if (pDst_y + pDst->origin_y + pHeight > pDst->height) {
+        pHeight = pDst->height - pDst_y + pDst->origin_y;
+    }
+    if (pHeight > 0) {
+        if (pSrc_x + pSrc->origin_x < 0) {
+            pWidth += pSrc_x + pSrc->origin_x;
+            pDst_x -= (pSrc_x + pSrc->origin_x);
+            pSrc_x = 0;
+        }
+
+        if (pSrc_x + pSrc->origin_x + pWidth > pSrc->width) {
+            pWidth = pSrc->width - (pSrc_x + pSrc->origin_x);
+        }
+        for (y = 0; y < pHeight; y++) {
+            clipped_src_x = pSrc_x + pSrc->origin_x;
+            sheared_x = pDst_x + pDst->origin_x + (total_shear >> 16);
+            clipped_width = pWidth;
+            if ((sheared_x & 0x8000u) != 0) {
+                clipped_width = pWidth + sheared_x;
+                clipped_src_x = (pSrc_x + pSrc->origin_x) - sheared_x;
+                sheared_x = 0;
+            }
+
+            if (sheared_x + clipped_width > pDst->width) {
+                clipped_width = pDst->width - sheared_x;
+            }
+            if (clipped_width > 0) {
+                src_start = ((tU8*)pSrc->pixels) + (y + pSrc_y + pSrc->origin_y) * pSrc->row_bytes + clipped_src_x;
+                dst_start = (tU8*)pDst->pixels + 2 * sheared_x + (y + pDst_y + pDst->origin_y) * pDst->row_bytes;
+
+                for (x = clipped_width; x > 0; x--) {
+                    if (*src_start) {
+                        *dst_start = palette_entry[*src_start];
+                    }
+                    src_start++;
+                    dst_start++;
+                }
+            }
+            total_shear += pShear;
+        }
+    }
 }
 
 // IDA: void __usercall DRPixelmapRectangleCopy(br_pixelmap *dst@<EAX>, br_int_16 dx@<EDX>, br_int_16 dy@<EBX>, br_pixelmap *src@<ECX>, br_int_16 sx, br_int_16 sy, br_uint_16 w, br_uint_16 h)

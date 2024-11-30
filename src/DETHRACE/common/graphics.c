@@ -2370,6 +2370,12 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
     tX1616 current_shear;
     LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d, %d)", pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight, pShear);
 
+#ifdef DETHRACE_3DFX_PATCH
+    if (pDest->type == BR_PMT_RGB_565 && pSource->type == BR_PMT_INDEX_8) {
+        Copy8BitRectangleTo16BitRhombusWithTransparency(pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight, pShear, gCurrent_palette);
+        return;
+    }
+#endif
     current_shear = 0;
     last_shear_x = 0;
     source_ptr = (tU8*)pSource->pixels + pSource_x + pSource_y * pSource->row_bytes;
