@@ -431,7 +431,10 @@ void CopyWords(char* pDst, char* pSrc, int pN) {
     tU16* dst;
     tU16* src;
     LOG_TRACE("(\"%s\", \"%s\", %d)", pDst, pSrc, pN);
-    NOT_IMPLEMENTED();
+
+    dst = (tU16*)pDst;
+    src = (tU16*)pSrc;
+    BrMemCpy(dst, src, pN);
 }
 
 // IDA: void __usercall Copy8BitStripImageTo16Bit(br_pixelmap *pDest@<EAX>, br_int_16 pDest_x@<EDX>, br_int_16 pOffset_x@<EBX>, br_int_16 pDest_y@<ECX>, br_int_16 pOffset_y, tS8 *pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_uint_16 pWidth, br_uint_16 pHeight)
@@ -448,7 +451,66 @@ void Copy8BitStripImageTo16Bit(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 
     char* destn_ptr;
     char* destn_ptr2;
     LOG_TRACE("(%p, %d, %d, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pOffset_x, pDest_y, pOffset_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
-    // NOT_IMPLEMENTED();
+
+    height = *(uint16_t*)pSource;
+    pSource = pSource + 2;
+    if (pDest_y + pOffset_y >= 0) {
+        destn_ptr = (char*)pDest->pixels + pDest->row_bytes * (pDest_y + pOffset_y);
+    } else {
+        pSource = SkipLines(pSource, -pDest_y - pOffset_y);
+        destn_ptr = (char*)pDest->pixels;
+        height += pDest_y + pOffset_y;
+        pOffset_y = 0;
+        pDest_y = 0;
+    }
+
+    if (height + pDest_y + pOffset_y > pDest->height) {
+        height = pDest->height - pDest_y - pOffset_y;
+    }
+    if (gBack_screen->type == BR_PMT_RGB_565) {
+        pDest_x *= 2;
+        pOffset_x *= 2;
+        if (pDest_x + pOffset_x > 0) {
+            destn_ptr += 2 * pDest_x + 2 * pOffset_x;
+        }
+        destn_width = 2 * pDest->width;
+    }
+    for (i = 0; i < height; i++) {
+        number_of_chunks = *pSource;
+        pSource++;
+        destn_ptr2 = destn_ptr;
+
+        x_byte = pOffset_x + pDest_x;
+        for (j = 0; j < number_of_chunks; j++) {
+            chunk_length = *pSource;
+            pSource++;
+            if (chunk_length >= 0) {
+                old_x_byte = x_byte;
+                x_byte += chunk_length;
+                if (old_x_byte >= 0) {
+                    destn_ptr2 += chunk_length;
+                } else if (x_byte > 0) {
+                    destn_ptr2 += chunk_length + old_x_byte;
+                }
+            } else {
+                old_x_byte = x_byte;
+                x_byte += -chunk_length;
+                if (old_x_byte >= 0) {
+                    if (destn_width >= x_byte) {
+                        CopyWords(destn_ptr2, (char*)pSource, -chunk_length);
+                        destn_ptr2 += -chunk_length;
+                    } else if (old_x_byte < destn_width) {
+                        CopyWords(destn_ptr2, (char*)pSource, destn_width - old_x_byte);
+                    }
+                } else if (x_byte > 0) {
+                    CopyWords(destn_ptr2, (char*)&pSource[-old_x_byte], -chunk_length + old_x_byte);
+                    destn_ptr2 += -chunk_length + old_x_byte;
+                }
+                pSource += -chunk_length;
+            }
+        }
+        destn_ptr += pDest->row_bytes;
+    }
 }
 
 // IDA: void __usercall CopyStripImage(br_pixelmap *pDest@<EAX>, br_int_16 pDest_x@<EDX>, br_int_16 pOffset_x@<EBX>, br_int_16 pDest_y@<ECX>, br_int_16 pOffset_y, tS8 *pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_uint_16 pWidth, br_uint_16 pHeight)
@@ -1801,11 +1863,14 @@ void RenderAFrame(int pDepth_mask_on) {
             gCurrent_graf_data->total_cock_height);
     }
 #endif
+
     if (gMirror_on__graphics) {
 #ifdef DETHRACE_3DFX_PATCH
         if (gVoodoo_rush_mode >= 1) {
             gRearview_screen->pixels = gBack_screen->pixels;
         }
+        gRearview_screen->base_x = gScreen_wobble_x + gProgram_state.current_car.mirror_left;
+        gRearview_screen->base_y = gScreen_wobble_y + gProgram_state.current_car.mirror_top;
 #endif
         BrPixelmapFill(gRearview_depth_buffer, 0xFFFFFFFF);
         gRendering_mirror = 1;
@@ -2220,12 +2285,8 @@ void DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int
 
 #ifdef DETHRACE_3DFX_PATCH
     if (pDest->type == BR_PMT_RGB_565 && pSource->type == BR_PMT_INDEX_8) {
-        if (gCurrent_conversion_table != NULL) {
-            conv_table = gFlic_palette;
-        } else {
-            conv_table = gCurrent_palette;
-        }
-        Copy8BitTo16BitRectangleWithTransparency(pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight, conv_table);
+        Copy8BitTo16BitRectangleWithTransparency(pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight,
+            gCurrent_conversion_table == NULL ? gCurrent_palette : gFlic_palette);
         return;
     }
 #endif

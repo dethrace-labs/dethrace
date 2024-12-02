@@ -240,6 +240,15 @@ void ReinitialiseRenderStuff(void) {
         gProgram_state.current_render_right = gProgram_state.current_car.render_right[gProgram_state.cockpit_image_index];
         gProgram_state.current_render_bottom = gProgram_state.current_car.render_bottom[gProgram_state.cockpit_image_index];
     } else {
+#ifdef DETHRACE_3DFX_PATCH
+        if (gSmall_frames_are_slow) {
+            gProgram_state.current_render_top = 0;
+            gProgram_state.current_render_right = gGraf_specs[gGraf_spec_index].total_width;
+            gProgram_state.current_render_left = 0;
+            gProgram_state.current_render_bottom = gGraf_specs[gGraf_spec_index].total_height;
+            return;
+        }
+#endif
         gProgram_state.current_render_top = (gGraf_specs[gGraf_spec_index].total_height / 18 & ~1) * gRender_indent;
         gProgram_state.current_render_left = (gGraf_specs[gGraf_spec_index].total_width / 18 & ~3) * gRender_indent;
         x_diff = gGraf_specs[gGraf_spec_index].total_width - gProgram_state.current_render_left;

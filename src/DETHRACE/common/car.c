@@ -994,6 +994,7 @@ void FinishCars(tU32 pLast_frame_time, tU32 pTime) {
                 BrVector3SetFloat(&minus_k, 0.f, 0.f, -1.f);
             }
             BrMatrix34ApplyV(&car->direction, &minus_k, &car->car_master_actor->t.t.mat);
+
         } else if (gLast_mechanics_time > pLast_frame_time && gCar_to_view == car) {
             BrVector3Sub(&car->old_v, &car->old_v, &car->v);
             BrVector3Scale(&car->old_v, &car->old_v, (gLast_mechanics_time - pLast_frame_time) / harness_game_config.physics_step_time);
@@ -2591,7 +2592,7 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
     ApplyTorque(c, &rightplane);
     BrVector3Scale(&rightplane, &b, dt / c->M);
     BrVector3Accumulate(&c->v, &rightplane);
-    if (c->speed < 0.000099999997
+    if (c->speed < 0.0001f
         && ((!c->keys.acc && c->joystick.acc <= 0) || !c->gear)
         && !c->keys.dec
         && c->joystick.dec <= 0
@@ -5243,6 +5244,7 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
     manual_swing = gOld_yaw__car != gCamera_yaw || swoop;
     manual_zoom = (double)gOld_zoom != gCamera_zoom;
     BrVector3Copy(&old_camera_pos, &gCamera->t.t.translate.t);
+
     if (!gProgram_state.cockpit_on) {
         if (swoop) {
             gCamera_yaw = 0;

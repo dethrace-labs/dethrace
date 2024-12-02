@@ -835,9 +835,59 @@ tS8* ConvertPixTo16BitStripMap(br_pixelmap* pBr_map) {
     tU16* palette_entry;
     LOG_TRACE("(%p)", pBr_map);
 
-    LOG_WARN("not implemented");
-
-    return 0;
+    palette_entry = PaletteOf16Bits(gRender_palette)->pixels;
+    max_line_bytes = 125 * ((pBr_map->width + 61) / 62) + 2;
+    new_line = BrMemAllocate(max_line_bytes, kMem_strip_image);
+    temp_strip_image = BrMemAllocate(max_line_bytes * pBr_map->height, kMem_strip_image);
+    current_size = 2;
+    i = 0;
+    *(tU16*)temp_strip_image = pBr_map->height;
+    for (i = 0; i < pBr_map->height; i++) {
+        new_line_length = 2;
+        counting_blanks = 0;
+        next_byte = (tU8*)pBr_map->pixels + i * pBr_map->row_bytes;
+        if (*next_byte == 0) {
+            counting_blanks = 1;
+        }
+        counter = 0;
+        chunk_counter = 0;
+        j = 0;
+        while (1) {
+            while (counter < 62) {
+                if (j == pBr_map->width)
+                    break;
+                byte = *next_byte;
+                if (counting_blanks != (*next_byte == 0))
+                    break;
+                if (!counting_blanks) {
+                    *(tU16*)&new_line[new_line_length] = palette_entry[byte];
+                    new_line_length += 2;
+                }
+                next_byte++;
+                counter++;
+                j++;
+            }
+            if (counting_blanks) {
+                new_line[new_line_length - 1] = 2 * counter;
+            } else {
+                new_line[new_line_length - 2 * counter - 1] = -2 * counter;
+            }
+            counting_blanks = byte == 0;
+            ++chunk_counter;
+            counter = 0;
+            if (j == pBr_map->width) {
+                break;
+            }
+            new_line_length++;
+        }
+        *new_line = chunk_counter;
+        memcpy(temp_strip_image + current_size, new_line, new_line_length);
+        current_size += new_line_length;
+    }
+    strip_image = BrMemAllocate(current_size, kMem_strip_image_perm);
+    memcpy(strip_image, temp_strip_image, current_size);
+    BrMemFree(temp_strip_image);
+    return strip_image;
 }
 
 // IDA: tS8* __usercall ConvertPixToStripMap@<EAX>(br_pixelmap *pThe_br_map@<EAX>)
@@ -870,7 +920,7 @@ tS8* ConvertPixToStripMap(br_pixelmap* pThe_br_map) {
     temp_strip_image = BrMemAllocate(pThe_br_map->row_bytes * pThe_br_map->height, kMem_strip_image);
     current_size = 2;
 
-    *(br_uint_16*)temp_strip_image = pThe_br_map->height;
+    *(tU16*)temp_strip_image = pThe_br_map->height;
     current_strip_pointer = temp_strip_image;
 
     for (i = 0; i < pThe_br_map->height; i++) {

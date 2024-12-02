@@ -1225,10 +1225,6 @@ void Copy8BitRectangleTo16BitRhombusWithTransparency(br_pixelmap* pDst, tS16 pDs
 
     palette_entry = PaletteOf16Bits(pPalette)->pixels;
     total_shear = 0;
-    // srcY_plus_originY = pSrc_y + pSrc->origin_y;
-    // srcX_plus_originX = pSrc_x + pSrc->origin_x;
-    // destX_plus_originX = pDst_x + pDst->origin_x;
-    // destY_plus_originY = pDst_y + pDst->origin_y;
     if (pSrc_y + pSrc->origin_y < 0) {
         pHeight += pSrc_y + pSrc->origin_y;
         pDst_y -= (pSrc_y + pSrc->origin_y);
