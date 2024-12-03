@@ -98,6 +98,17 @@ void DrawLine3DThroughBRender(br_vector3* pStart, br_vector3* pEnd) {
 
     gLine_model->vertices[0].p = *pStart;
     gLine_model->vertices[1].p = *pEnd;
+
+    // HACK: third vertex added by dethrace to work around BR_RSTYLE_EDGES (see `InitLineStuff`)
+    gLine_model->vertices[2].p = *pEnd;
+    gLine_model->vertices[2].p.v[0] += 0.001f;
+    gLine_model->vertices[2].p.v[1] += 0.001f;
+    gLine_model->vertices[2].p.v[2] += 0.001f;
+    gLine_model->vertices[2].red = gLine_model->vertices[1].red;
+    gLine_model->vertices[2].grn = gLine_model->vertices[1].grn;
+    gLine_model->vertices[2].blu = gLine_model->vertices[1].blu;
+    // HACK end
+
     BrModelUpdate(gLine_model, BR_MODU_VERTEX_POSITIONS);
     BrZbSceneRenderAdd(gLine_actor);
 }
@@ -473,6 +484,12 @@ void RenderSparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_ac
         }
     }
     EndPipingSession();
+#ifdef DETHRACE_3DFX_PATCH
+    if (gNo_2d_effects) {
+        BrActorRemove(gLine_actor);
+        BrActorAdd(gDont_render_actor, gLine_actor);
+    }
+#endif
 }
 
 // IDA: void __usercall CreateSingleSpark(tCar_spec *pCar@<EAX>, br_vector3 *pPos@<EDX>, br_vector3 *pVel@<EBX>)

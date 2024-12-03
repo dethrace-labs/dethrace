@@ -349,7 +349,8 @@ void AustereWarning(void) {
 void InitLineStuff(void) {
     LOG_TRACE("()");
 
-    gLine_model = BrModelAllocate("gLine_model", 2, 1);
+    // HACK: originally 2 vertices
+    gLine_model = BrModelAllocate("gLine_model", 3 /*2*/, 1);
     gLine_material = BrMaterialAllocate("gLine_material");
     gLine_actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
     if (!gLine_model || !gLine_material || !gLine_actor) {
@@ -357,11 +358,18 @@ void InitLineStuff(void) {
     }
     gLine_actor->identifier = "gLine_actor";
     gLine_actor->render_style = BR_RSTYLE_EDGES;
+    gLine_actor->model = gLine_model;
     gLine_actor->material = gLine_material;
     gLine_model->flags = BR_MODF_QUICK_UPDATE | BR_MODF_KEEP_ORIGINAL;
     gLine_model->faces->vertices[0] = 0;
     gLine_model->faces->vertices[1] = 0;
     gLine_model->faces->vertices[2] = 1;
+
+    // HACK: override the 2 vertices + EDGES with 3 vertices + FACES
+    gLine_model->faces->vertices[1] = 2;
+    gLine_actor->render_style = BR_RSTYLE_FACES;
+    // HACK end
+
     gLine_material->flags = BR_MATF_TWO_SIDED | BR_MATF_SMOOTH | BR_MATF_PRELIT | BR_MATF_LIGHT;
     gLine_model->faces[0].flags = BR_FACEF_COPLANAR_0 | BR_FACEF_COPLANAR_2;
     BrModelAdd(gLine_model);
