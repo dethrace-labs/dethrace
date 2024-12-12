@@ -1045,7 +1045,7 @@ int ClickDamage(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_
     old_mouse_x = 0; // Fixes warning caused by -Wsometimes-uninitialized
     old_mouse_y = 0; // Fixes warning caused by -Wsometimes-uninitialized
 #endif
-    GetMousePosition(&old_mouse_y, &old_mouse_y);
+    GetMousePosition(&old_mouse_x, &old_mouse_y);
     if (gWreck_zoomed_in < 0) {
         if (CastSelectionRay(pCurrent_choice, pCurrent_mode)) {
             gUser_interacted = 1;
