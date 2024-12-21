@@ -1713,15 +1713,16 @@ void RenderAFrame(int pDepth_mask_on) {
         gBack_screen->base_y = 0;
         if (gCurrent_race.map_image != NULL) {
             if (gReal_graf_data_index) {
-                BrPixelmapRectangleFill(gBack_screen, 0, 0, 640, 40, 0);
-                BrPixelmapRectangleFill(gBack_screen, 0, 440, 640, 40, 0);
-                DRPixelmapDoubledCopy(
-                    gBack_screen,
-                    gCurrent_race.map_image,
-                    gCurrent_race.map_image->width,
-                    gCurrent_race.map_image->height,
-                    0,
-                    40);
+                BrPixelmapRectangleFill(gBack_screen, 0, 0, 640, 40, 0xffffffff);
+                BrPixelmapRectangleFill(gBack_screen, 0, 440, 640, 40, 0xffffffff);
+                DRPixelmapCopy(gBack_screen, gCurrent_race.map_image);
+                // DRPixelmapDoubledCopy(
+                //     gBack_screen,
+                //     gCurrent_race.map_image,
+                //     gCurrent_race.map_image->width,
+                //     gCurrent_race.map_image->height,
+                //     0,
+                //     40);
             } else {
                 DRPixelmapCopy(gBack_screen, gCurrent_race.map_image);
             }
