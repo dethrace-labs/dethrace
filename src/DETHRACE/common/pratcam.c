@@ -496,20 +496,49 @@ void DoPratcam(tU32 pThe_time) {
     }
     EnableTranslationText();
     LetFlicFuckWithPalettes();
+
 #ifdef DETHRACE_3DFX_PATCH
-    DRPixelmapRectangleCopy(
+    PDUnlockRealBackScreen(1);
+    if (gDevious_2d) {
+        gPrat_model->vertices[1].p.v[0] = gProgram_state.current_car.prat_left + offset;
+        gPrat_model->vertices[0].p.v[0] = gProgram_state.current_car.prat_left + offset;
+        gPrat_model->vertices[3].p.v[1] = -(y_offset + gProgram_state.current_car.prat_top);
+        gPrat_model->vertices[0].p.v[1] = -(y_offset + gProgram_state.current_car.prat_top);
+
+        gPrat_model->vertices[3].p.v[0] = gPrat_model->vertices[1].p.v[0] + 104.0f;
+        gPrat_model->vertices[2].p.v[0] = gPrat_model->vertices[1].p.v[0] + 104.0f;
+
+        gPrat_model->vertices[2].p.v[1] = gPrat_model->vertices[3].p.v[1] - 110.0f;
+        gPrat_model->vertices[1].p.v[1] = gPrat_model->vertices[3].p.v[1] - 110.0f;
+        BrModelUpdate(gPrat_model, BR_MODU_VERTEX_POSITIONS);
+        gPrat_actor->render_style = BR_RSTYLE_FACES;
+        gPrat_material->colour_map = gPrat_buffer;
+        gPrat_buffer->map = gRender_palette;
+        BrMapAdd(gPrat_buffer);
+        BrMaterialUpdate(gPrat_material, BR_MATU_ALL);
+        BrZbSceneRender(g2d_camera, g2d_camera, gBack_screen, gDepth_buffer);
+        BrMapRemove(gPrat_buffer);
+        gPrat_actor->render_style = BR_RSTYLE_NONE;
+    } else {
+        DRPixelmapRectangleCopy(
+            gBack_screen,
+            gProgram_state.current_car.prat_left + offset,
+            gProgram_state.current_car.prat_top + y_offset,
+            gPrat_buffer,
+            0, 0,
+            gPrat_buffer->width, gPrat_buffer->height);
+    }
+    PDLockRealBackScreen(1);
 #else
     BrPixelmapRectangleCopy(
-#endif
         gBack_screen,
         gProgram_state.current_car.prat_left + offset,
         gProgram_state.current_car.prat_top + y_offset,
         gPrat_buffer,
         0, 0,
         gPrat_buffer->width, gPrat_buffer->height);
-#ifdef DETHRACE_3DFX_PATCH
-    PDLockRealBackScreen(1);
 #endif
+
     if (gProgram_state.current_car.prat_cam_top != NULL) {
         top_border_height = gProgram_state.current_car.prat_cam_top->height;
         DRPixelmapRectangleMaskedCopy(

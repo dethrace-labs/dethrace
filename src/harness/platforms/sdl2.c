@@ -152,7 +152,12 @@ static int get_mouse_buttons(int* pButton1, int* pButton2) {
 static int get_mouse_position(int* pX, int* pY) {
     float lX, lY;
     SDL_GetMouseState(pX, pY);
-    SDL_RenderWindowToLogical(renderer, *pX, *pY, &lX, &lY);
+    if (renderer != NULL) {
+        SDL_RenderWindowToLogical(renderer, *pX, *pY, &lX, &lY);
+    } else {
+        lX = *pX;
+        lY = *pY;
+    }
 
 #if defined(DETHRACE_FIX_BUGS)
     // In hires mode (640x480), the menus are still rendered at (320x240),
@@ -244,7 +249,7 @@ static void* create_window(char* title, int width, int height, tHarness_window_t
     window = SDL_CreateWindow(title,
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
-        width == 320 ? 640 : width, height == 200 ? 400 : height,
+        width == 320 ? 640 : 800, height == 200 ? 400 : 600,
         flags);
 
     if (window == NULL) {
