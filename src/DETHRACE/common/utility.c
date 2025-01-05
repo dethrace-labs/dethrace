@@ -8,6 +8,7 @@
 #include "globvrpb.h"
 #include "graphics.h"
 #include "harness/config.h"
+#include "harness/hooks.h"
 #include "harness/trace.h"
 #include "input.h"
 #include "loading.h"
@@ -292,7 +293,7 @@ char* GetALineWithNoPossibleService(FILE* pF, unsigned char* pS) {
         if (ch != -1) {
             ungetc(ch, pF);
         }
-    } while (!isalnum(s[0])
+    } while (!Harness_Hook_isalnum(s[0])
         && s[0] != '-'
         && s[0] != '.'
         && s[0] != '!'
@@ -678,9 +679,15 @@ void PrintScreenFile(FILE* pF) {
     // 3. Color table (=palette)
     for (i = 0; i < 256; i++) {
         // red, green, blue, unused
+#if BR_ENDIAN_BIG
+        WriteU8L(pF, ((tU8*)gCurrent_palette->pixels)[4 * i + 3]);
+        WriteU8L(pF, ((tU8*)gCurrent_palette->pixels)[4 * i + 2]);
+        WriteU8L(pF, ((tU8*)gCurrent_palette->pixels)[4 * i + 1]);
+#else
         WriteU8L(pF, ((tU8*)gCurrent_palette->pixels)[4 * i]);
         WriteU8L(pF, ((tU8*)gCurrent_palette->pixels)[4 * i + 1]);
         WriteU8L(pF, ((tU8*)gCurrent_palette->pixels)[4 * i + 2]);
+#endif
         WriteU8L(pF, 0);
     }
 

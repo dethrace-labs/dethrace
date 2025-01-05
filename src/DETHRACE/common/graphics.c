@@ -3009,16 +3009,16 @@ void ToggleShadow(void) {
     }
     switch (gShadow_level) {
     case eShadow_none:
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_NoShadows));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_NoShadows));
         break;
     case eShadow_us_only:
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_ShadowUnderOwnCar));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_ShadowUnderOwnCar));
         break;
     case eShadow_us_and_opponents:
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_ShadowUnderMainCars));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_ShadowUnderMainCars));
         break;
     case eShadow_everyone:
-        NewTextHeadupSlot(4, 0, 2000, -4, GetMiscString(kMiscString_ShadowUnderAllCars));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_ShadowUnderAllCars));
         break;
     default:
         return;
@@ -3089,9 +3089,9 @@ void ShadowMode(void) {
 
     gFancy_shadow = !gFancy_shadow;
     if (gFancy_shadow) {
-        NewTextHeadupSlot(4, 0, 2000, -4, "Translucent shadow");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, "Translucent shadow");
     } else {
-        NewTextHeadupSlot(4, 0, 2000, -4, "Solid shadow");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, "Solid shadow");
     }
 }
 
@@ -3147,8 +3147,13 @@ void DRPixelmapDoubledCopy(br_pixelmap* pDestn, br_pixelmap* pSource, int pSourc
         for (j = 0; j < width_over_2; j++) {
             --sptr;
             pixels = *sptr;
+#if BR_ENDIAN_BIG
+            pixel_1 = pixels >> 0;
+            pixel_2 = pixels >> 8;
+#else
             pixel_1 = pixels >> 8;
             pixel_2 = pixels >> 0;
+#endif
             dptr[-1] = pixel_1;
             dptr2[-1] = pixel_1;
             dptr[-2] = pixel_1;

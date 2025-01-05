@@ -130,6 +130,12 @@ void PDInitialiseSystem(void) {
         fread(gASCII_table, len / 2, 1, f);
         fread(gASCII_shift_table, len / 2, 1, f);
         fclose(f);
+#if BR_ENDIAN_BIG
+        for (int i = 0; i < 128; i++) {
+            gASCII_table[i] = BrSwap32(gASCII_table[i]);
+            gASCII_shift_table[i] = BrSwap32(gASCII_shift_table[i]);
+        }
+#endif
     } else {
         memcpy(gASCII_table, harness_game_info.defines.ascii_table, sizeof(gASCII_table));
         memcpy(gASCII_shift_table, harness_game_info.defines.ascii_shift_table, sizeof(gASCII_shift_table));

@@ -308,7 +308,7 @@ void ToggleReplay(void) {
     LOG_TRACE("()");
 
     if (!IsActionReplayAvailable()) {
-        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(kMiscString_ACTION_REPLAY_UNAVAILABLE));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_ACTION_REPLAY_UNAVAILABLE));
         return;
     }
     if (!gAction_replay_mode) {
