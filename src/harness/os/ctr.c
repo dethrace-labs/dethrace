@@ -19,9 +19,9 @@ size_t OS_ConsoleReadPassword(char* pBuffer, size_t pBufferLen) {
 }
 
 char* OS_Basename(const char* path) {
-	return "";
+	return "sdmc:/3ds/dethrace";
 }
 
 char* OS_GetWorkingDirectory(char* argv0) {
-	return "";
+	return "sdmc:/3ds/dethrace";
 }

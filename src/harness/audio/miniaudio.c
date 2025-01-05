@@ -9,6 +9,7 @@
 #ifdef __3DS__
 #define MA_NO_PTHREAD_IN_HEADER
 #define MA_NO_RUNTIME_LINKING
+#include <3ds.h>
 #endif
 
 // Must come before miniaudio.h
@@ -52,17 +53,106 @@ ma_engine engine;
 ma_sound cda_sound;
 int cda_sound_initialized;
 
+#ifdef __3DS__
+#define NUM_SAMPLES (1024)
+#define NUM_CHANNELS (2)
+#define SAMPLERATE (48000)
+
+static volatile bool dsp_active = true;
+Thread audioThread;
+
+static void fill_buffer_from_engine(const void* audioBuffer, ma_engine* engine, float* bufferF32, size_t nsamples) {
+    ma_uint32 bufferSizeInFrames = (ma_uint32)(NUM_SAMPLES * NUM_CHANNELS * 4) / ma_get_bytes_per_frame(ma_format_f32, ma_engine_get_channels(engine));
+    ma_engine_read_pcm_frames(engine, bufferF32, bufferSizeInFrames, NULL);
+
+    int16_t* dest = (int16_t*)audioBuffer;
+    for (size_t i = 0; i < NUM_SAMPLES * NUM_CHANNELS; i++) {
+        dest[i] = (int16_t)(bufferF32[i] * 32767.0f - 1.0f);
+    }
+    DSP_FlushDataCache(audioBuffer, NUM_SAMPLES * NUM_CHANNELS * sizeof(int16_t));
+}
+
+static void audio_thread(void* arg) {
+    float* bufferF32 = (float*)malloc(NUM_SAMPLES * NUM_CHANNELS * sizeof(float));
+    int16_t* bufferS16[2];
+    bufferS16[0] = (int16_t*)linearAlloc(NUM_SAMPLES * NUM_CHANNELS * sizeof(int16_t));
+    bufferS16[1] = (int16_t*)linearAlloc(NUM_SAMPLES * NUM_CHANNELS * sizeof(int16_t));
+
+    if (!bufferF32 || !bufferS16[0] || !bufferS16[1]) {
+        printf("Failed to allocate linear memory for buffers\n");
+        dsp_active = false;
+        return;
+    }
+
+    if (R_FAILED(ndspInit())) {
+        printf("Failed to initialize DSP\n");
+        dsp_active = false;
+        return;
+    }
+
+    ndspChnReset(0);
+    ndspChnSetInterp(0, NDSP_INTERP_LINEAR);
+    ndspChnSetRate(0, SAMPLERATE);
+    ndspChnSetFormat(0, (NUM_CHANNELS == 1) ? NDSP_FORMAT_MONO_PCM16 : NDSP_FORMAT_STEREO_PCM16);
+
+    ndspWaveBuf waveBuf[2] = {0};
+    waveBuf[0].data_vaddr = bufferS16[0];
+    waveBuf[0].nsamples = NUM_SAMPLES;
+    waveBuf[1].data_vaddr = bufferS16[1];
+    waveBuf[1].nsamples = NUM_SAMPLES;
+
+    int buf_idx = 0;
+
+    fill_buffer_from_engine(bufferS16[0], &engine, bufferF32, NUM_SAMPLES);
+    fill_buffer_from_engine(bufferS16[1], &engine, bufferF32, NUM_SAMPLES);
+
+    ndspChnWaveBufAdd(0, &waveBuf[0]);
+    ndspChnWaveBufAdd(0, &waveBuf[1]);
+
+    while (dsp_active) {
+        while (waveBuf[buf_idx].status != NDSP_WBUF_DONE) {
+            svcSleepThread(1000000);
+        }
+        if (!dsp_active)
+            break;
+
+        fill_buffer_from_engine(waveBuf[buf_idx].data_vaddr, &engine, bufferF32, NUM_SAMPLES);
+        ndspChnWaveBufAdd(0, &waveBuf[buf_idx]);
+
+        buf_idx = (buf_idx + 1) % 2;
+    }
+
+    ndspChnReset(0);
+    ndspExit();
+
+    free(bufferF32);
+    linearFree(bufferS16[0]);
+    linearFree(bufferS16[1]);
+}
+#endif
+
 tAudioBackend_error_code AudioBackend_Init(void) {
     ma_result result;
     ma_engine_config config;
 
     config = ma_engine_config_init();
+#ifdef __3DS__
+    config.noDevice = MA_TRUE;
+    config.channels = NUM_CHANNELS;
+    config.sampleRate = SAMPLERATE;
+#endif
     result = ma_engine_init(&config, &engine);
     if (result != MA_SUCCESS) {
         printf("Failed to initialize audio engine.");
         return eAB_error;
     }
+#ifdef __3DS__
+    audioThread = threadCreate(audio_thread, NULL, 64 * 1024, 0x20, 2, true);
+    if (audioThread == NULL)
+        LOG_INFO("Audio thread failed to start\n");
+#else
     LOG_INFO("Playback device: '%s'", engine.pDevice->playback.name);
+#endif
     ma_engine_set_volume(&engine, harness_game_config.volume_multiplier);
 
     return eAB_success;
@@ -77,6 +167,11 @@ tAudioBackend_error_code AudioBackend_InitCDA(void) {
 }
 
 void AudioBackend_UnInit(void) {
+#ifdef __3DS__
+    dsp_active = false;
+    threadJoin(audioThread, U64_MAX);
+    threadFree(audioThread);
+#endif
     ma_engine_uninit(&engine);
 }
 

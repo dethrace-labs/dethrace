@@ -2,6 +2,10 @@ configure_file(version.h.in version.h @ONLY)
 
 add_library(harness STATIC)
 
+if (NINTENDO_3DS)
+    set(IO_PLATFORM "N3DS")
+endif()
+
 if (NOT DEFINED IO_PLATFORM)
     set(IO_PLATFORM "SDL2")
 endif()
@@ -82,9 +86,18 @@ elseif(APPLE)
         os/macos.c
     )
 elseif(NINTENDO_3DS)
+    set(CITRO3D_LIBRARY "${DEVKITPRO}/libctru/lib/libcitro3d.a")
+    set(CITRO3D_INCLUDE_DIR "${DEVKITPRO}/libctru/include")
+    target_include_directories(harness PRIVATE "${CITRO3D_INCLUDE_DIR}" "platforms/ctr")
     target_sources(harness PRIVATE
         os/ctr.c
+        platforms/ctr.c
+        platforms/ctr/ctr_gfx.c
+        platforms/ctr/vshader.shbin.o
     )
+    target_link_libraries(harness PRIVATE "${CITRO3D_LIBRARY}")
+# dethrace still depends on SDL2
+    target_link_libraries(harness PRIVATE SDL2::SDL2)
 else()
     target_sources(harness PRIVATE
         os/linux.c

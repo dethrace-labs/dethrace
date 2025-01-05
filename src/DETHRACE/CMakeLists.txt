@@ -36,6 +36,13 @@ else()
         -Wstrict-prototypes
     )
 endif()
+
+if (NINTENDO_3DS)
+    target_compile_options(dethrace_obj PRIVATE
+        -O3 -funroll-loops -fno-math-errno -ffast-math
+    )
+endif()
+
 target_compile_definitions(dethrace_obj PRIVATE INSIDE_DETHRACE)
 if(DETHRACE_FIX_BUGS)
     target_compile_definitions(dethrace_obj PRIVATE DETHRACE_FIX_BUGS)
@@ -181,6 +188,10 @@ if(MSVC)
     target_link_libraries(dethrace PRIVATE dbghelp)
     target_link_options(dethrace PRIVATE /subsystem:windows /ENTRY:mainCRTStartup)
     target_compile_definitions(dethrace PRIVATE -D_CRT_SECURE_NO_WARNINGS -DSDL_MAIN_HANDLED -DWIN32_LEAN_AND_MEAN)
+endif()
+
+if (NINTENDO_3DS)
+    target_compile_definitions(dethrace PRIVATE -DSDL_MAIN_HANDLED)
 endif()
 
 if(DETHRACE_IDE_ROOT_DIR)

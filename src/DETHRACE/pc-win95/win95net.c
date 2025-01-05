@@ -165,7 +165,11 @@ int ReceiveHostResponses(void) {
     LOG_TRACE("()");
 
     char addr_string[32];
+#ifdef __3DS__
+    long unsigned int sa_len;
+#else
     unsigned int sa_len;
+#endif
     int wsa_error;
 
     sa_len = sizeof(gRemote_addr);
@@ -252,7 +256,11 @@ int PDNetInitialise(void) {
     int mess_num;
 
     struct linger so_linger;
+#ifdef __3DS__
+    long unsigned int sa_len;
+#else
     unsigned int sa_len;
+#endif
     WSADATA wsadata;
     LOG_TRACE("()");
 
@@ -573,7 +581,11 @@ tNet_message* PDNetGetNextMessage(tNet_game_details* pDetails, void** pSender_ad
     LOG_TRACE("(%p, %p)", pDetails, pSender_address);
 
     char addr_str[32];
+#ifdef __3DS__
+    long unsigned int sa_len;
+#else
     unsigned int sa_len;
+#endif
     int res;
     tNet_message* msg;
 
