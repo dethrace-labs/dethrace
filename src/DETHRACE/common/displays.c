@@ -341,6 +341,12 @@ void DoPSPowerHeadup(int pY, int pLevel, char* pName, int pBar_colour) {
     int i;
     LOG_TRACE("(%d, %d, \"%s\", %d)", pY, pLevel, pName, pBar_colour);
 
+#ifdef DETHRACE_3DFX_PATCH
+    if (gBack_screen->type == BR_PMT_RGB_565) {
+        pBar_colour = PaletteEntry16Bit(gRender_palette, pBar_colour);
+    }
+#endif
+
     DimRectangle(gBack_screen, gCurrent_graf_data->ps_dim_left, pY, gCurrent_graf_data->ps_dim_right, gCurrent_graf_data->ps_dim_height + pY, 1);
     TransDRPixelmapText(gBack_screen, gCurrent_graf_data->ps_name_left, gCurrent_graf_data->ps_name_top_border + pY, gFonts + 6, pName, gBack_screen->width);
 

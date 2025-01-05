@@ -2458,7 +2458,7 @@ void LoadExceptionsFile(char* pName) {
                 }
             }
         }
-        AddExceptionToList(gExceptions, e);
+        AddExceptionToList(&gExceptions, e);
     }
     fclose(f);
 }

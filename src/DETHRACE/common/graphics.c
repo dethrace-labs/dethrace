@@ -1064,6 +1064,13 @@ void DrawMapBlip(tCar_spec* pCar, tU32 pTime, br_matrix34* pTrans, br_vector3* p
     period = 256; // Must be power of 2
     colours[0] = pColour;
     colours[1] = OppositeColour(pColour);
+
+#ifdef DETHRACE_3DFX_PATCH
+    if (gBack_screen->type != BR_PMT_INDEX_8) {
+        colours[0] = PaletteEntry16Bit(gRender_palette, colours[0]);
+        colours[1] = PaletteEntry16Bit(gRender_palette, colours[1]);
+    }
+#endif
     BrMatrix34Mul(&car_in_map_space, pTrans, &gCurrent_race.map_transformation);
     bearing = FastScalarArcTan2(car_in_map_space.m[2][0], car_in_map_space.m[2][1]);
 
@@ -1713,16 +1720,16 @@ void RenderAFrame(int pDepth_mask_on) {
         gBack_screen->base_y = 0;
         if (gCurrent_race.map_image != NULL) {
             if (gReal_graf_data_index) {
-                BrPixelmapRectangleFill(gBack_screen, 0, 0, 640, 40, 0xffffffff);
-                BrPixelmapRectangleFill(gBack_screen, 0, 440, 640, 40, 0xffffffff);
-                DRPixelmapCopy(gBack_screen, gCurrent_race.map_image);
-                // DRPixelmapDoubledCopy(
-                //     gBack_screen,
-                //     gCurrent_race.map_image,
-                //     gCurrent_race.map_image->width,
-                //     gCurrent_race.map_image->height,
-                //     0,
-                //     40);
+                BrPixelmapRectangleFill(gBack_screen, 0, 0, 640, 40, 0);
+                BrPixelmapRectangleFill(gBack_screen, 0, 440, 640, 40, 0);
+
+                DRPixelmapDoubledCopy(
+                    gBack_screen,
+                    gCurrent_race.map_image,
+                    gCurrent_race.map_image->width,
+                    gCurrent_race.map_image->height,
+                    0,
+                    40);
             } else {
                 DRPixelmapCopy(gBack_screen, gCurrent_race.map_image);
             }

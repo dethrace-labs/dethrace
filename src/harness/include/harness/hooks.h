@@ -39,8 +39,8 @@ typedef struct tHarness_platform {
     // Show error message
     int (*ShowErrorMessage)(void* window, char* text, char* caption);
 
-    // Create a window. Return a handle to the window
-    void* (*CreateWindow)(char* title, int nWidth, int nHeight, tHarness_window_type window_type);
+    // Create a window
+    void (*CreateWindow)(char* title, int nWidth, int nHeight, tHarness_window_type window_type);
     void (*Swap)(br_pixelmap* back_buffer);
     void (*PaletteChanged)(br_colour entries[256]);
     // If this platform supports OpenGL

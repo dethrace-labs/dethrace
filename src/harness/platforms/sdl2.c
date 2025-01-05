@@ -226,7 +226,7 @@ int show_error_message(void* window, char* text, char* caption) {
     return 0;
 }
 
-static void* create_window(char* title, int width, int height, tHarness_window_type window_type) {
+static void create_window(char* title, int width, int height, tHarness_window_type window_type) {
     render_width = width;
     render_height = height;
 
@@ -249,7 +249,7 @@ static void* create_window(char* title, int width, int height, tHarness_window_t
     window = SDL_CreateWindow(title,
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
-        width == 320 ? 640 : 800, height == 200 ? 400 : 600,
+        width == 320 ? 640 : width, height == 200 ? 480 : 480,
         flags);
 
     if (window == NULL) {

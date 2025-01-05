@@ -1143,8 +1143,8 @@ int CmpSmokeZ(const void* p1, const void* p2) {
     tBRender_smoke** b;
     LOG_TRACE("(%p, %p)", p1, p2);
 
-    a = p1;
-    b = p2;
+    a = (tBRender_smoke**)p1;
+    b = (tBRender_smoke**)p2;
     if ((*a)->pos.v[2] == (*b)->pos.v[2]) {
         return 0;
     } else if ((*a)->pos.v[2] > (*b)->pos.v[2]) {
