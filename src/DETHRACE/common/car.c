@@ -6295,8 +6295,8 @@ int CollideTwoCarsRepeatedly(tCollision_info* car1, tCollision_info* car2, br_sc
         car1->frame_collision_flag += 256;
         car2->frame_collision_flag += 256;
         if (gNet_mode == eNet_mode_host) {
-            car1->last_car_car_collision = gLast_mechanics_time + 40;
-            car2->last_car_car_collision = gLast_mechanics_time + 40;
+            car1->last_car_car_collision = gLast_mechanics_time + harness_game_config.physics_step_time;
+            car2->last_car_car_collision = gLast_mechanics_time + harness_game_config.physics_step_time;
         }
     }
     ResetCarsMass(car1, car2);
