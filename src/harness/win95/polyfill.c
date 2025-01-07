@@ -152,6 +152,19 @@ int FindNextFileA_(HANDLE_ hFindFile, WIN32_FIND_DATAA_* lpFindFileData) {
     if (hFindFile == NULL) {
         return 0;
     }
+#ifdef __3DS_
+    while ((entry = readdir(hFindFile)) != NULL) {
+        char fullPath[256];
+        snprintf(fullPath, sizeof(fullPath), "%s/%s", ".", entry->d_name);
+
+        int fd = open(fullPath, O_RDONLY);
+        if (fd != -1) {
+            close(fd);
+            strcpy(lpFindFileData, entry->d_name);
+            return 1;
+        }
+    }
+#else
     while ((entry = readdir(hFindFile)) != NULL) {
         if (entry->d_type == DT_REG) {
             strcpy(lpFindFileData->cFileName, entry->d_name);
@@ -159,6 +172,7 @@ int FindNextFileA_(HANDLE_ hFindFile, WIN32_FIND_DATAA_* lpFindFileData) {
         }
     }
     return 0;
+#endif
 #endif
 }
 

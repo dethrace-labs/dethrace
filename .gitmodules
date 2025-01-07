@@ -1,3 +1,4 @@
 [submodule "lib/BRender-v1.3.2"]
 	path = lib/BRender-v1.3.2
-	url = https://github.com/dethrace-labs/BRender-v1.3.2.git
+	url = https://github.com/MrHuu/BRender-v1.3.2.git
+	branch = 3DS

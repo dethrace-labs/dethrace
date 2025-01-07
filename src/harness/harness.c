@@ -12,6 +12,10 @@
 #include <string.h>
 #include <sys/stat.h>
 
+#ifdef __3DS__
+#include <3ds.h>
+#endif
+
 br_pixelmap* palette;
 uint32_t* screen_buffer;
 
@@ -170,11 +174,13 @@ void Harness_Init(int* argc, char* argv[]) {
 
     Harness_ProcessCommandLine(argc, argv);
 
+#ifndef __3DS__
     if (harness_game_config.install_signalhandler) {
         OS_InstallSignalHandler(argv[0]);
     }
-
+#endif
     char* root_dir = getenv("DETHRACE_ROOT_DIR");
+
     if (root_dir != NULL) {
         LOG_INFO("DETHRACE_ROOT_DIR is set to '%s'", root_dir);
     } else {
