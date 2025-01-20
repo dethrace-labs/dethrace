@@ -1686,6 +1686,14 @@ void GlorifyMaterial(br_material** pArray, int pCount) {
     tException_list e;
     LOG_TRACE("(%p, %d)", pArray, pCount);
 
+    // Added by dethrace.
+    // `GlorifyMaterial` is only present in the 3dfx patch.
+    // If the back screen is paletted (eg software renderer), don't glorify, otherwise it puts the software renderer into lit mode
+    // See `WhitenVertexRGB` for a similar check that is present in the original code
+    if (gScreen && gBack_screen == BR_PMT_INDEX_8) {
+        return;
+    }
+    // <<<
     for (i = 0; i < pCount; i++) {
         if (pArray[i]->colour_map != NULL) {
             e = FindExceptionInList(pArray[i]->colour_map->identifier, gExceptions);
