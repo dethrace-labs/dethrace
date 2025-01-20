@@ -649,7 +649,7 @@ void SetIntegerMapRenders(void) {
     gMap_render_height_i = ((int)gMap_render_height) & ~1;
     if (gReal_graf_data_index != 0) {
         gMap_render_x_i = 2 * gMap_render_x_i;
-        gMap_render_y_i = 2 * gMap_render_y_i + 40;
+        gMap_render_y_i = 2 * gMap_render_y_i + HIRES_Y_OFFSET;
         gMap_render_width_i = 2 * gMap_render_width_i;
         gMap_render_height_i = 2 * gMap_render_height_i;
     }
@@ -1056,7 +1056,7 @@ void DrawMapBlip(tCar_spec* pCar, tU32 pTime, br_matrix34* pTrans, br_vector3* p
         break;
     case 1:
         map_pos.v[0] = map_pos.v[0] * 2.f;
-        map_pos.v[1] = map_pos.v[1] * 2.f + 40.f;
+        map_pos.v[1] = map_pos.v[1] * 2.f + HIRES_Y_OFFSET;
         break;
     default:
         TELL_ME_IF_WE_PASS_THIS_WAY();
@@ -1138,7 +1138,7 @@ void DrawMapSmallBlip(tU32 pTime, br_vector3* pPos, int pColour) {
         BrMatrix34ApplyP(&map_pos, pPos, &gCurrent_race.map_transformation);
         if (gReal_graf_data_index != 0) {
             map_pos.v[0] = 2.f * map_pos.v[0];
-            map_pos.v[1] = 2.f * map_pos.v[1] + 40.f;
+            map_pos.v[1] = 2.f * map_pos.v[1] + HIRES_Y_OFFSET;
         }
         offset = (int)map_pos.v[0] + gBack_screen->row_bytes * (int)map_pos.v[1];
         ((br_uint_8*)gBack_screen->pixels)[offset] = pColour;
@@ -1631,9 +1631,9 @@ void FlashyMapCheckpoint(int pIndex, tU32 pTime) {
             case 1:
                 DimRectangle(gBack_screen,
                     2 * gCurrent_race.checkpoints[pIndex].map_left[0],
-                    2 * gCurrent_race.checkpoints[pIndex].map_top[0] + 40,
+                    2 * gCurrent_race.checkpoints[pIndex].map_top[0] + HIRES_Y_OFFSET,
                     2 * gCurrent_race.checkpoints[pIndex].map_right[0],
-                    2 * gCurrent_race.checkpoints[pIndex].map_bottom[0] + 40,
+                    2 * gCurrent_race.checkpoints[pIndex].map_bottom[0] + HIRES_Y_OFFSET,
                     0);
                 break;
             default:

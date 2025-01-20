@@ -38,7 +38,7 @@ extern tS32 gJoystick_range1y;
 extern tS32 gJoystick_range1x;
 // extern int gNo_voodoo;
 // extern int gSwitched_resolution;
-// extern br_pixelmap* gReal_back_screen;
+extern br_pixelmap* gReal_back_screen;
 extern tS32 gJoystick_min1x;
 // extern br_pixelmap* gTemp_screen;
 // extern tU32 gUpper_loop_limit;
@@ -101,7 +101,7 @@ br_pixelmap* PDInterfacePixelmap(void);
 
 // void ReallyCopyBackScreen(int pRendering_area_only, int pClear_top_and_bottom);
 
-// void CopyBackScreen(int pRendering_area_only);
+void CopyBackScreen(int pRendering_area_only);
 
 void PDScreenBufferSwap(int pRendering_area_only);
 

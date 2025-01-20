@@ -816,7 +816,7 @@ enum ExceptionFlags {
 
 #define TIME_CONV_THING 0.0005f
 
-#define OPPONENT_COUNT 0
+#define OPPONENT_COUNT 5
 
 #define WORLD_SCALE 6.9f
 
@@ -826,5 +826,7 @@ enum ExceptionFlags {
 
 // average frame time in carm95
 #define MUNGE_ENGINE_INTERVAL 50
+
+#define HIRES_Y_OFFSET 40
 
 #endif
