@@ -21,6 +21,7 @@ tAudioBackend_error_code AudioBackend_StopSample(void* type_struct_sample);
 tAudioBackend_error_code AudioBackend_SetVolume(void* type_struct_sample, int volume);
 tAudioBackend_error_code AudioBackend_SetPan(void* type_struct_sample, int pan);
 tAudioBackend_error_code AudioBackend_SetFrequency(void* type_struct_sample, int original_rate, int new_rate);
+tAudioBackend_error_code AudioBackend_SetVolumeSeparate(void* type_struct_sample, int left_volume, int right_volume);
 
 tAudioBackend_error_code AudioBackend_PlayCDA(int track);
 tAudioBackend_error_code AudioBackend_StopCDA(void);

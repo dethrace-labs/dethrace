@@ -233,6 +233,10 @@ tAudioBackend_error_code AudioBackend_SetFrequency(void* type_struct_sample, int
     return eAB_success;
 }
 
+tAudioBackend_error_code AudioBackend_SetVolumeSeparate(void* type_struct_sample, int left_volume, int right_volume) {
+    return eAB_error;
+}
+
 tAudioBackend_error_code AudioBackend_StopSample(void* type_struct_sample) {
     tMiniaudio_sample* miniaudio;
 
