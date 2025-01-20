@@ -1690,7 +1690,7 @@ void GlorifyMaterial(br_material** pArray, int pCount) {
     // `GlorifyMaterial` is only present in the 3dfx patch.
     // If the back screen is paletted (eg software renderer), don't glorify, otherwise it puts the software renderer into lit mode
     // See `WhitenVertexRGB` for a similar check that is present in the original code
-    if (gScreen && gBack_screen == BR_PMT_INDEX_8) {
+    if (gScreen && gScreen->type == BR_PMT_INDEX_8) {
         return;
     }
     // <<<
