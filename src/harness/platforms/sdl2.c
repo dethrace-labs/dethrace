@@ -24,50 +24,6 @@ uint8_t directinput_key_state[SDL_NUM_SCANCODES];
 extern void QuitGame(void);
 extern uint32_t gKeyboard_bits[8];
 
-static void* create_window_and_renderer(char* title, int x, int y, int width, int height) {
-    render_width = width;
-    render_height = height;
-
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        LOG_PANIC("SDL_INIT_VIDEO error: %s", SDL_GetError());
-    }
-
-    window = SDL_CreateWindow(title,
-        SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED,
-        width, height,
-        SDL_WINDOW_RESIZABLE);
-
-    if (window == NULL) {
-        LOG_PANIC("Failed to create window: %s", SDL_GetError());
-    }
-
-    if (harness_game_config.start_full_screen) {
-        SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
-    }
-
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
-    if (renderer == NULL) {
-        LOG_PANIC("Failed to create renderer: %s", SDL_GetError());
-    }
-    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
-    SDL_RenderSetLogicalSize(renderer, render_width, render_height);
-
-    screen_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width, height);
-    if (screen_texture == NULL) {
-        SDL_RendererInfo info;
-        SDL_GetRendererInfo(renderer, &info);
-        for (Uint32 i = 0; i < info.num_texture_formats; i++) {
-            LOG_INFO("%s\n", SDL_GetPixelFormatName(info.texture_formats[i]));
-        }
-        LOG_PANIC("Failed to create screen_texture: %s", SDL_GetError());
-    }
-
-    SDL_SetWindowSize(window, width, height);
-
-    return window;
-}
-
 static int set_window_pos(void* hWnd, int x, int y, int nWidth, int nHeight) {
     // SDL_SetWindowPosition(hWnd, x, y);
     if (nWidth == 320 && nHeight == 200) {
@@ -187,39 +143,6 @@ static void limit_fps(void) {
     last_frame_time = SDL_GetTicks();
 }
 
-static void present_screen(br_pixelmap* src) {
-    // fastest way to convert 8 bit indexed to 32 bit
-    uint8_t* src_pixels = src->pixels;
-    uint32_t* dest_pixels;
-    int dest_pitch;
-
-    SDL_LockTexture(screen_texture, NULL, (void**)&dest_pixels, &dest_pitch);
-    for (int i = 0; i < src->height * src->width; i++) {
-        *dest_pixels = converted_palette[*src_pixels];
-        dest_pixels++;
-        src_pixels++;
-    }
-    SDL_UnlockTexture(screen_texture);
-    SDL_RenderClear(renderer);
-    SDL_RenderCopy(renderer, screen_texture, NULL, NULL);
-    SDL_RenderPresent(renderer);
-
-    last_screen_src = src;
-
-    if (harness_game_config.fps != 0) {
-        limit_fps();
-    }
-}
-
-static void set_palette(PALETTEENTRY_* pal) {
-    for (int i = 0; i < 256; i++) {
-        converted_palette[i] = (0xff << 24 | pal[i].peRed << 16 | pal[i].peGreen << 8 | pal[i].peBlue);
-    }
-    if (last_screen_src != NULL) {
-        present_screen(last_screen_src);
-    }
-}
-
 int show_error_message(void* window, char* text, char* caption) {
     fprintf(stderr, "%s", text);
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, caption, text, window);
@@ -323,11 +246,33 @@ static void palette_changed(br_colour entries[256]) {
     }
 }
 
+static void get_viewport(int* x, int* y, int* width, int* height) {
+    int window_width, window_height;
+    int vp_width, vp_height;
+    SDL_GetWindowSize(window, &window_width, &window_height);
+
+    const float target_aspect_ratio = 4.0f / 3.0f;
+    const float aspect_ratio = (float)window_width / (float)window_height;
+
+    vp_width = window_width;
+    vp_height = window_height;
+    if (aspect_ratio != target_aspect_ratio) {
+        if (aspect_ratio > target_aspect_ratio) {
+            vp_width = window_height * target_aspect_ratio + .5f;
+        } else {
+            vp_height = window_width / target_aspect_ratio + .5f;
+        }
+    }
+    *x = (window_width - vp_width) / 2;
+    *y = (window_height - vp_height) / 2;
+    *width = vp_width;
+    *height = vp_height;
+}
+
 void Harness_Platform_Init(tHarness_platform* platform) {
     platform->ProcessWindowMessages = get_and_handle_message;
     platform->Sleep = SDL_Delay;
     platform->GetTicks = SDL_GetTicks;
-    platform->CreateWindowAndRenderer = create_window_and_renderer;
     platform->ShowCursor = SDL_ShowCursor;
     platform->SetWindowPos = set_window_pos;
     platform->DestroyWindow = destroy_window;
@@ -336,11 +281,10 @@ void Harness_Platform_Init(tHarness_platform* platform) {
     platform->GetMouseButtons = get_mouse_buttons;
     platform->DestroyWindow = destroy_window;
     platform->ShowErrorMessage = show_error_message;
-    platform->Renderer_SetPalette = set_palette;
-    platform->Renderer_Present = present_screen;
 
     platform->CreateWindow = create_window;
     platform->Swap = swap;
     platform->PaletteChanged = palette_changed;
     platform->GL_GetProcAddress = SDL_GL_GetProcAddress;
+    platform->GetViewport = get_viewport;
 }

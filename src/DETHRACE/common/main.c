@@ -22,7 +22,7 @@
 #include "utility.h"
 
 // IDA: void __cdecl QuitGame()
-void HARNESS_NORETURN QuitGame(void) {
+void QuitGame(void) {
     LOG_TRACE("()");
 
     if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {

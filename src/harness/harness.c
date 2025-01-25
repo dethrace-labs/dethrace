@@ -140,7 +140,7 @@ void Harness_Init(int* argc, char* argv[]) {
     harness_game_config.enable_cd_check = 0;
     // original physics time step. Lower values seem to work better at 30+ fps
     harness_game_config.physics_step_time = 40;
-    // limit to fps by default
+    // limit to 60 fps by default
     harness_game_config.fps = 60;
     // do not freeze timer
     harness_game_config.freeze_timer = 0;

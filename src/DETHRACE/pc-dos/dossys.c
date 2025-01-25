@@ -67,6 +67,16 @@ tU8 gScan_code[123][2];
 int gForce_voodoo_rush_mode;
 int gForce_voodoo_mode;
 
+// See br_device_gl_callback_procs in `brglrend.h`
+typedef struct br_device_gl_callback_procs {
+    void* get_proc_address;
+    void* get_viewport;
+    void* swap_buffers;
+    void* free;
+} br_device_gl_callback_procs;
+
+br_device_gl_callback_procs callbacks;
+
 // forward declare for `PDInitialiseSystem`
 int InitJoysticks(void);
 
@@ -405,12 +415,15 @@ void PDAllocateScreenAndBack(void) {
     if (gGraf_spec_index != 0 && !gNo_voodoo) {
 
 #ifdef PLAY_NICE_WITH_GUI
+        callbacks.get_proc_address = gHarness_platform.GL_GetProcAddress;
+        callbacks.swap_buffers = gHarness_platform.Swap;
+        callbacks.get_viewport = gHarness_platform.GetViewport;
         gHarness_platform.CreateWindow("Carmageddon", gGraf_specs[gGraf_spec_index].phys_width, gGraf_specs[gGraf_spec_index].phys_height, eWindow_type_opengl);
+
         BrDevBeginVar(&gScreen, "glrend",
             BRT_WIDTH_I32, gGraf_specs[gGraf_spec_index].phys_width,
             BRT_HEIGHT_I32, gGraf_specs[gGraf_spec_index].phys_height,
-            BRT_OPENGL_GET_PROC_ADDRESS_CALLBACK_P, gHarness_platform.GL_GetProcAddress,
-            BRT_OPENGL_SWAP_CALLBACK_P, gHarness_platform.Swap,
+            BRT_OPENGL_CALLBACKS_P, &callbacks,
             BRT_PIXEL_TYPE_U8, BR_PMT_RGB_565,
             BR_NULL_TOKEN);
 #else
