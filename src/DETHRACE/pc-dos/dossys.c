@@ -75,7 +75,17 @@ typedef struct br_device_gl_callback_procs {
     void* free;
 } br_device_gl_callback_procs;
 
-br_device_gl_callback_procs callbacks;
+br_device_gl_callback_procs gl_callbacks;
+
+typedef void BR_CALLBACK br_device_virtualfb_swapbuffers_cbfn(br_pixelmap* pm);
+typedef void BR_CALLBACK br_device_virtualfb_palette_changed_cbfn(br_uint_32* palette_entries);
+
+typedef struct br_device_virtualfb_callback_procs {
+    br_device_virtualfb_palette_changed_cbfn* palette_changed;
+    br_device_virtualfb_swapbuffers_cbfn* swap_buffers;
+} br_device_virtualfb_callback_procs;
+
+br_device_virtualfb_callback_procs virtualfb_callbacks;
 
 // forward declare for `PDInitialiseSystem`
 int InitJoysticks(void);
@@ -412,23 +422,28 @@ void PDUnlockRealBackScreen(int lock) {
 void PDAllocateScreenAndBack(void) {
 
     gScreen = NULL;
-    if (gGraf_spec_index != 0 && !gNo_voodoo) {
+
+    // added by dethrace. We default to software mode unless we explicitly ask for 3dfx opengl mode
+    if (harness_game_config.opengl_3dfx_mode) {
+
+        if (gGraf_spec_index != 0 && !gNo_voodoo) {
 
 #ifdef PLAY_NICE_WITH_GUI
-        callbacks.get_proc_address = gHarness_platform.GL_GetProcAddress;
-        callbacks.swap_buffers = gHarness_platform.Swap;
-        callbacks.get_viewport = gHarness_platform.GetViewport;
-        gHarness_platform.CreateWindow("Carmageddon", gGraf_specs[gGraf_spec_index].phys_width, gGraf_specs[gGraf_spec_index].phys_height, eWindow_type_opengl);
+            gl_callbacks.get_proc_address = gHarness_platform.GL_GetProcAddress;
+            gl_callbacks.swap_buffers = gHarness_platform.Swap;
+            gl_callbacks.get_viewport = gHarness_platform.GetViewport;
+            gHarness_platform.CreateWindow("Carmageddon", gGraf_specs[gGraf_spec_index].phys_width, gGraf_specs[gGraf_spec_index].phys_height, eWindow_type_opengl);
 
-        BrDevBeginVar(&gScreen, "glrend",
-            BRT_WIDTH_I32, gGraf_specs[gGraf_spec_index].phys_width,
-            BRT_HEIGHT_I32, gGraf_specs[gGraf_spec_index].phys_height,
-            BRT_OPENGL_CALLBACKS_P, &callbacks,
-            BRT_PIXEL_TYPE_U8, BR_PMT_RGB_565,
-            BR_NULL_TOKEN);
+            BrDevBeginVar(&gScreen, "glrend",
+                BRT_WIDTH_I32, gGraf_specs[gGraf_spec_index].phys_width,
+                BRT_HEIGHT_I32, gGraf_specs[gGraf_spec_index].phys_height,
+                BRT_OPENGL_CALLBACKS_P, &gl_callbacks,
+                BRT_PIXEL_TYPE_U8, BR_PMT_RGB_565,
+                BR_NULL_TOKEN);
 #else
-        BrDevBegin(&gScreen, "3dfx_dos,w:640,h:480,b:16");
+            BrDevBegin(&gScreen, "3dfx_dos,w:640,h:480,b:16");
 #endif
+        }
     }
 
     if (gScreen != NULL) {
@@ -460,12 +475,13 @@ void PDAllocateScreenAndBack(void) {
 
 #ifdef PLAY_NICE_WITH_GUI
         // Render framebuffer to memory and call hooks when swapping or palette changing
+        virtualfb_callbacks.palette_changed = gHarness_platform.PaletteChanged;
+        virtualfb_callbacks.swap_buffers = gHarness_platform.Swap;
         gHarness_platform.CreateWindow("Carmageddon", gGraf_specs[gGraf_spec_index].phys_width, gGraf_specs[gGraf_spec_index].phys_height, eWindow_type_software);
         BrDevBeginVar(&gScreen, "virtualframebuffer",
             BRT_WIDTH_I32, gGraf_specs[gGraf_spec_index].phys_width,
             BRT_HEIGHT_I32, gGraf_specs[gGraf_spec_index].phys_height,
-            BRT_VIRTUALFB_DOUBLEBUFFER_CALLBACK_P, gHarness_platform.Swap,
-            BRT_VIRTUALFB_PALETTE_CHANGED_CALLBACK_P, gHarness_platform.PaletteChanged,
+            BRT_VIRTUALFB_CALLBACKS_P, &virtualfb_callbacks,
             BR_NULL_TOKEN);
 #else
         gScreen = BrDevBeginOld(gGraf_specs[gGraf_spec_index].gfx_init_string);
@@ -537,8 +553,8 @@ void Double8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap
     dst_y = 0;
     for (y = 0; y < pSrc_height; y++) {
         src = (tU8*)pSrc->pixels + pSrc->row_bytes * y;
-        dst0 = (tU8*)pDst->pixels + pDst->row_bytes * (dst_y + pOff);
-        dst1 = (tU8*)pDst->pixels + pDst->row_bytes * (dst_y + pOff + 1);
+        dst0 = (tU16*)((tU8*)pDst->pixels + pDst->row_bytes * (dst_y + pOff));
+        dst1 = (tU16*)((tU8*)pDst->pixels + pDst->row_bytes * (dst_y + pOff + 1));
         line_buff_x = 0;
 
         for (x = 0; x < pSrc_width; x++) {

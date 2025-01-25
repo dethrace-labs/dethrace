@@ -157,35 +157,45 @@ static void create_window(char* title, int width, int height, tHarness_window_ty
         LOG_PANIC("SDL_INIT_VIDEO error: %s", SDL_GetError());
     }
 
-    int flags = SDL_WINDOW_RESIZABLE;
     if (window_type == eWindow_type_opengl) {
 
-        if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE) != 0) {
-            LOG_PANIC("Failed to set SDL_GL_CONTEXT_PROFILE_MASK attribute. %s", SDL_GetError());
-        };
+        window = SDL_CreateWindow(title,
+            SDL_WINDOWPOS_CENTERED,
+            SDL_WINDOWPOS_CENTERED,
+            width == 320 ? 640 : width, height == 200 ? 480 : 480,
+            SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+
+        if (window == NULL) {
+            LOG_PANIC("Failed to create window: %s", SDL_GetError());
+        }
+
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-
-        flags |= SDL_WINDOW_OPENGL;
-    }
-
-    window = SDL_CreateWindow(title,
-        SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED,
-        width == 320 ? 640 : width, height == 200 ? 480 : 480,
-        flags);
-
-    if (window == NULL) {
-        LOG_PANIC("Failed to create window: %s", SDL_GetError());
-    }
-
-    if (window_type == eWindow_type_opengl) {
         gl_context = SDL_GL_CreateContext(window);
-        if (!gl_context) {
-            LOG_PANIC("Failed to call SDL_GL_CreateContext. %s", SDL_GetError());
+
+        if (gl_context == NULL) {
+            LOG_WARN("Failed to create OpenGL core profile: %s. Trying OpenGLES...", SDL_GetError());
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+            gl_context = SDL_GL_CreateContext(window);
+        }
+        if (gl_context == NULL) {
+            LOG_PANIC("Failed to create OpenGL context: %s", SDL_GetError());
         }
         SDL_GL_SetSwapInterval(1);
+
     } else {
+        window = SDL_CreateWindow(title,
+            SDL_WINDOWPOS_CENTERED,
+            SDL_WINDOWPOS_CENTERED,
+            width == 320 ? 640 : width, height == 200 ? 480 : 480,
+            SDL_WINDOW_RESIZABLE);
+        if (window == NULL) {
+            LOG_PANIC("Failed to create window: %s", SDL_GetError());
+        }
+
         renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
         if (renderer == NULL) {
             LOG_PANIC("Failed to create renderer: %s", SDL_GetError());
