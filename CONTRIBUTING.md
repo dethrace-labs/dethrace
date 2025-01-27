@@ -104,3 +104,28 @@ Why is it called `harness`? Good question! It contains the _real_ `main` functio
 
 ## Language
 This is a C project. No C++ please.
+
+## Unit tests
+
+Tests were written to cover some basic functionality at the start of the project. There is very little coverage, but tests must pass before we allow code to be merged.
+
+A subset of tests do not require `DETHRACE_ROOT_DIR`. They run via Github actions when code is committed to this repo. This allows us to keep nice and clean and avoid storing any potentially legally problematic resouces in our repo.
+
+The majority of tests _do_ require `DETHRACE_ROOT_DIR`. 
+
+To run the full test suite, you must have a copy of the original *Splat Pack* data.
+
+```sh
+export DETHRACE_ROOT_DIR=/path/to/carmageddon_splat_pack
+```
+
+To run 
+
+```sh
+./dethrace_test
+```
+
+To run a single test
+```sh
+DETHRACE_TEST_ARGS="-n test_name" make test
+```

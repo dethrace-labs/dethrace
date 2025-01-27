@@ -421,6 +421,12 @@ void PDInitialiseSystem(void) {
         fread(gASCII_table, len, 1u, f);
         fread(gASCII_shift_table, len, 1u, f);
         fclose(f);
+#if BR_ENDIAN_BIG
+        for (int i = 0; i < 128; i++) {
+            gASCII_table[i] = BrSwap32(gASCII_table[i]);
+            gASCII_shift_table[i] = BrSwap32(gASCII_shift_table[i]);
+        }
+#endif
     }
     Win32InitInputDevice();
 }
@@ -749,9 +755,15 @@ void Win32SetPaletteEntries(uint8_t* entries, int pFirst_colour, int pCount) {
     }
     for (i = pFirst_colour; i <= last_colour; i++) {
         gWin32_palette[i].peFlags = 0;
+#if BR_ENDIAN_BIG
+        gWin32_palette[i].peRed = entries[i * 4 + 1];
+        gWin32_palette[i].peGreen = entries[i * 4 + 2];
+        gWin32_palette[i].peBlue = entries[i * 4 + 3];
+#else
         gWin32_palette[i].peRed = entries[i * 4 + 2];
         gWin32_palette[i].peGreen = entries[i * 4 + 1];
         gWin32_palette[i].peBlue = entries[i * 4];
+#endif
     }
     SSDXSetPaleeteEntries(gWin32_palette, 0, 256);
 }

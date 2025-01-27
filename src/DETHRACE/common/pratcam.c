@@ -59,7 +59,7 @@ void TogglePratcam(void) {
     LOG_TRACE("()");
 
     if (gAusterity_mode) {
-        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(kMiscString_NOT_ENOUGH_MEMORY));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_NOT_ENOUGH_MEMORY));
     } else {
         if (gWhirr_noise == 0 || !DRS3SoundStillPlaying(gWhirr_noise)) {
             DRS3StopSound(gWhirr_noise);

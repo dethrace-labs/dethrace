@@ -740,7 +740,7 @@ void InitRace(void) {
     PossibleService();
     // TODO: dword_55142C = 0;
     gStart_race_sent = 0;
-    gProgram_state.frame_rate_headup = NewTextHeadupSlot(0, 0, 0, -1, "");
+    gProgram_state.frame_rate_headup = NewTextHeadupSlot(eHeadupSlot_development, 0, 0, -1, "");
     if (TranslationMode()) {
         if (gAusterity_mode) {
             FlushInterfaceFonts();
@@ -761,15 +761,15 @@ void InitRace(void) {
     gMap_mode = 0;
     gProgram_state.cockpit_image_index = 0;
     if (gNet_mode != eNet_mode_none) {
-        gNet_cash_headup = NewTextHeadupSlot(13, 0, 0, -6, "");
-        gNet_ped_headup = NewTextHeadupSlot(14, 0, 0, -6, "");
+        gNet_cash_headup = NewTextHeadupSlot(eHeadupSlot_cash_network, 0, 0, -6, "");
+        gNet_ped_headup = NewTextHeadupSlot(eHeadupSlot_ped_network, 0, 0, -6, "");
     } else {
-        gCredits_won_headup = NewTextHeadupSlot(1, 0, 0, -6, "");
-        gPed_kill_count_headup = NewTextHeadupSlot(2, 0, 0, -6, "");
-        gCar_kill_count_headup = NewTextHeadupSlot(12, 0, 0, -6, "");
-        gTimer_headup = NewTextHeadupSlot(7, 0, 0, -5, "");
-        gTime_awarded_headup = NewTextHeadupSlot(11, 0, 0, -2, "");
-        gLaps_headup = NewTextHeadupSlot(8, 0, 0, -6, "");
+        gCredits_won_headup = NewTextHeadupSlot(eHeadupSlot_credits, 0, 0, -6, "");
+        gPed_kill_count_headup = NewTextHeadupSlot(eHeadupSlot_ped_kills, 0, 0, -6, "");
+        gCar_kill_count_headup = NewTextHeadupSlot(eHeadupSlot_cars_out_count, 0, 0, -6, "");
+        gTimer_headup = NewTextHeadupSlot(eHeadupSlot_timer, 0, 0, -5, "");
+        gTime_awarded_headup = NewTextHeadupSlot(eHeadupSlot_time_award, 0, 0, -2, "");
+        gLaps_headup = NewTextHeadupSlot(eHeadupSlot_lap_count, 0, 0, -6, "");
     }
     PossibleService();
     gProgram_state.which_view = eView_forward;

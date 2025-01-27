@@ -6,6 +6,7 @@
 #include "platforms/null.h"
 #include "version.h"
 
+#include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
@@ -95,6 +96,9 @@ static void Harness_DetectGameMode(void) {
         if (strstr(buffer, "NEUES SPIEL") != NULL) {
             harness_game_info.localization = eGameLocalization_german;
             LOG_INFO("Language: \"%s\"", "German");
+        } else if (strstr(buffer, "NOWA GRA") != NULL) {
+            harness_game_info.localization = eGameLocalization_polish;
+            LOG_INFO("Language: \"%s\"", "Polish");
         } else {
             LOG_INFO("Language: unrecognized");
         }
@@ -266,6 +270,9 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
         } else if (strcasecmp(argv[i], "--opengl") == 0) {
             harness_game_config.opengl_3dfx_mode = 1;
             handled = 1;
+        } else if (strcasecmp(argv[i], "--no-music") == 0) {
+            harness_game_config.no_music = 1;
+            handled = 1;
         }
 
         if (handled) {
@@ -284,4 +291,20 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
 // Filesystem hooks
 FILE* Harness_Hook_fopen(const char* pathname, const char* mode) {
     return OS_fopen(pathname, mode);
+}
+
+// Localization
+int Harness_Hook_isalnum(int c)
+{
+    if (harness_game_info.localization == eGameLocalization_polish) {
+        // Polish diacritic letters in Windows-1250
+        unsigned char letters[] = { 140, 143, 156, 159, 163, 165, 175, 179, 185, 191, 198, 202, 209, 211, 230, 234, 241, 243 };
+        for (int i = 0; i < (int)sizeof(letters); i++) {
+            if ((unsigned char)c == letters[i]) {
+                return 1;
+            }
+        }
+    }
+
+    return isalnum(c);
 }

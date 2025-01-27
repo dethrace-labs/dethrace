@@ -50,6 +50,7 @@ Smack* SmackOpen(const char* name, uint32_t flags, uint32_t extrabuf) {
     // get info about the audio tracks in this video
     smk_info_audio(smk_handle, &track_mask_smk, channels_smk, bitdepth_smk, sample_rate_smk);
 
+    smack->audio_stream = NULL;
     if ((track_mask_smk & SMK_AUDIO_TRACK_0)) {
         smack->audio_stream = AudioBackend_StreamOpen(bitdepth_smk[0], channels_smk[0], sample_rate_smk[0]);
         if (smack->audio_stream != NULL) {

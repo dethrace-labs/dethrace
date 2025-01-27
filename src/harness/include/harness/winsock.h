@@ -23,7 +23,6 @@
 #include <sys/types.h>
 #include <unistd.h> // for close()
 
-#define closesocket(x) close(x)
 #define WSAEISCONN EISCONN
 #define WSAEINPROGRESS EINPROGRESS
 #define WSAEALREADY EALREADY
@@ -46,6 +45,7 @@ int WSAStartup(int version, WSADATA* data);
 int WSAGetLastError(void);
 int WSACleanup(void);
 int ioctlsocket(int handle, long cmd, unsigned long* argp);
+int closesocket(int handle);
 
 #endif /* _WIN32 */
 

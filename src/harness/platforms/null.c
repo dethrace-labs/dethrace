@@ -52,7 +52,6 @@ void Null_Platform_Init(tHarness_platform* platform) {
     platform->GetKeyboardState = null_get_keyboard_state;
     platform->GetMousePosition = null_get_mouse_position;
     platform->GetMouseButtons = null_get_mouse_buttons;
-    platform->DestroyWindow = null_destroy_window;
     platform->ShowErrorMessage = null_show_error_message;
 
     platform->Renderer_SetPalette = null_set_palette;

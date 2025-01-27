@@ -41,7 +41,7 @@ jobs:
         if: ${{ runner.os == 'Linux' }}
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgl-dev ${{ matrix.platform.apt-packages }}
+          sudo apt-get install -y libgl-dev libxext-dev ${{ matrix.platform.apt-packages }}
       - name: Set up SDL
         uses: libsdl-org/setup-sdl@main
         with:
