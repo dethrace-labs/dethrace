@@ -67,24 +67,7 @@ tU8 gScan_code[123][2];
 int gForce_voodoo_rush_mode;
 int gForce_voodoo_mode;
 
-// See br_device_gl_callback_procs in `brglrend.h`
-typedef struct br_device_gl_callback_procs {
-    void* get_proc_address;
-    void* get_viewport;
-    void* swap_buffers;
-    void* free;
-} br_device_gl_callback_procs;
-
 br_device_gl_callback_procs gl_callbacks;
-
-typedef void BR_CALLBACK br_device_virtualfb_swapbuffers_cbfn(br_pixelmap* pm);
-typedef void BR_CALLBACK br_device_virtualfb_palette_changed_cbfn(br_uint_32* palette_entries);
-
-typedef struct br_device_virtualfb_callback_procs {
-    br_device_virtualfb_palette_changed_cbfn* palette_changed;
-    br_device_virtualfb_swapbuffers_cbfn* swap_buffers;
-} br_device_virtualfb_callback_procs;
-
 br_device_virtualfb_callback_procs virtualfb_callbacks;
 
 // forward declare for `PDInitialiseSystem`

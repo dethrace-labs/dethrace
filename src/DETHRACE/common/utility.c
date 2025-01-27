@@ -421,9 +421,9 @@ void CopyDoubled8BitTo16BitRectangle(br_pixelmap* pDst, br_pixelmap* pSrc, int p
 
     for (y = 0; y < pSrc_height; y++) {
         src_start = ((tU8*)pSrc->pixels) + pSrc->row_bytes * y;
-        dst_start0 = ((tU8*)pDst->pixels) + pDst->row_bytes * pDst_y;
+        dst_start0 = (tU16*)(((tU8*)pDst->pixels) + pDst->row_bytes * pDst_y);
         dst_start0 += pDst_x;
-        dst_start1 = ((tU8*)pDst->pixels) + pDst->row_bytes * (pDst_y + 1);
+        dst_start1 = (tU16*)(((tU8*)pDst->pixels) + pDst->row_bytes * (pDst_y + 1));
         dst_start1 += pDst_x;
 
         for (x = 0; x < pSrc_width; x++) {
@@ -1077,10 +1077,10 @@ void Copy8BitTo16Bit(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette
     LOG_TRACE("(%p, %p, %p)", pDst, pSrc, pPalette);
 
     palette_entry = PaletteOf16Bits(pPalette)->pixels;
-    for (y = 0; y < pSrc->height; y++) {
+    for (y = 0; y < pDst->height; y++) {
         src_start = (tU8*)pSrc->pixels + pSrc->row_bytes * y;
-        dst_start = (tU8*)pDst->pixels + pDst->row_bytes * y;
-        for (x = 0; x < pSrc->width; x++) {
+        dst_start = (tU16*)((tU8*)pDst->pixels + pDst->row_bytes * y);
+        for (x = 0; x < pDst->width; x++) {
             *dst_start = palette_entry[*src_start];
             src_start++;
             dst_start++;
@@ -1097,10 +1097,25 @@ void Copy8BitTo16BitRectangle(br_pixelmap* pDst, tS16 pDst_x, tS16 pDst_y, br_pi
     tU16* palette_entry;
     LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d, %p)", pDst, pDst_x, pDst_y, pSrc, pSrc_x, pSrc_y, pWidth, pHeight, pPalette);
 
+    if (pSrc_x < 0) {
+        pWidth = pSrc_x + pWidth;
+        pDst_x = pDst_x - pSrc_x;
+        pSrc_x = 0;
+    }
     if (pDst_x < 0) {
-        pWidth -= abs(pDst_x);
-        pSrc_x += abs(pDst_x);
+        pWidth += pDst_x;
+        pSrc_x -= pDst_x;
         pDst_x = 0;
+    }
+    if (pSrc_y < 0) {
+        pHeight = pSrc_y + pHeight;
+        pDst_y = pDst_y - pSrc_y;
+        pSrc_y = 0;
+    }
+    if (pDst_y < 0) {
+        pHeight += pDst_y;
+        pSrc_y -= pDst_y;
+        pDst_y = 0;
     }
 
     if (pSrc_x + pWidth > pSrc->width) {
@@ -1121,7 +1136,7 @@ void Copy8BitTo16BitRectangle(br_pixelmap* pDst, tS16 pDst_x, tS16 pDst_y, br_pi
     for (y = 0; y < pHeight; y++) {
         src_start = (tU8*)pSrc->pixels + (pSrc->row_bytes * (pSrc_y + y));
         src_start += pSrc_x;
-        dst_start = (tU8*)pDst->pixels + (pDst->row_bytes * (pDst_y + y));
+        dst_start = (tU16*)((tU8*)pDst->pixels + (pDst->row_bytes * (pDst_y + y)));
         dst_start += pDst_x;
         for (x = 0; x < pWidth; x++) {
             // even though we have a specific `WithTransparency` version of this function, this one also handles transparency!
@@ -1164,17 +1179,24 @@ void Copy8BitTo16BitRectangleWithTransparency(br_pixelmap* pDst, tS16 pDst_x, tS
         pDst_y = 0;
     }
 
-#ifdef DETHRACE_FIX_BUGS
-    // In some cockpit views, instruments might overflow the bottom of the screen
+    if (pSrc_x + pWidth > pSrc->width) {
+        pWidth = pSrc->width - pSrc_x;
+    }
+    if (pSrc_y + pHeight > pSrc->height) {
+        pHeight = pSrc->height - pSrc_y;
+    }
+
+    if (pDst_x + pWidth > pDst->width) {
+        pWidth = pDst->width - pDst_x;
+    }
     if (pDst_y + pHeight > pDst->height) {
         pHeight = pDst->height - pDst_y;
     }
-#endif
 
     palette_entry = PaletteOf16Bits(pPalette)->pixels;
     for (y = 0; y < pHeight; y++) {
         src_start = (tU8*)pSrc->pixels + (pSrc->row_bytes * (pSrc_y + y)) + pSrc_x;
-        dst_start = (tU8*)pDst->pixels + (pDst->row_bytes * (pDst_y + y));
+        dst_start = (tU16*)((tU8*)pDst->pixels + (pDst->row_bytes * (pDst_y + y)));
         dst_start += pDst_x;
         for (x = 0; x < pWidth; x++) {
             if (*src_start != 0) {
@@ -1198,7 +1220,7 @@ void Copy8BitToOnscreen16BitRectangleWithTransparency(br_pixelmap* pDst, tS16 pD
     palette_entry = PaletteOf16Bits(pPalette)->pixels;
     for (y = 0; y < pHeight; y++) {
         src_start = (tU8*)pSrc->pixels + (pSrc->row_bytes * (pSrc_y + y)) + pSrc_x;
-        dst_start = (tU8*)pDst->pixels + (pDst->row_bytes * (pDst_y + y));
+        dst_start = (tU16*)((tU8*)pDst->pixels + (pDst->row_bytes * (pDst_y + y)));
         dst_start += pDst_x;
         for (x = 0; x < pWidth; x++) {
             if (*src_start != 0) {
@@ -1268,7 +1290,7 @@ void Copy8BitRectangleTo16BitRhombusWithTransparency(br_pixelmap* pDst, tS16 pDs
             }
             if (clipped_width > 0) {
                 src_start = ((tU8*)pSrc->pixels) + (y + pSrc_y + pSrc->origin_y) * pSrc->row_bytes + clipped_src_x;
-                dst_start = (tU8*)pDst->pixels + 2 * sheared_x + (y + pDst_y + pDst->origin_y) * pDst->row_bytes;
+                dst_start = (tU16*)((tU8*)pDst->pixels + 2 * sheared_x + (y + pDst_y + pDst->origin_y) * pDst->row_bytes);
 
                 for (x = clipped_width; x > 0; x--) {
                     if (*src_start) {
