@@ -1,8 +1,10 @@
 // Based on https://gist.github.com/jvranish/4441299
 
 // this has to be first
-#include <dbghelp.h>
 #include <windows.h>
+//
+
+#include <dbghelp.h>
 
 #include "harness/config.h"
 #include "harness/os.h"
