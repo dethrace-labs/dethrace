@@ -16,8 +16,6 @@ typedef struct tHarness_platform {
     void (*Renderer_Present)(br_pixelmap* src);
     // Set the 256 color palette to use (BGRA format)
     void (*Renderer_SetPalette)(PALETTEENTRY_* palette);
-    // Create a window. Return a handle to the window
-    void* (*CreateWindowAndRenderer)(char* title, int x, int y, int nWidth, int nHeight);
     // Get mouse button state
     int (*GetMouseButtons)(int* button_1, int* button_2);
     // Get mouse position
@@ -39,8 +37,8 @@ typedef struct tHarness_platform {
     // Show error message
     int (*ShowErrorMessage)(void* window, char* text, char* caption);
 
-    // Create a window
-    void (*CreateWindow)(char* title, int nWidth, int nHeight, tHarness_window_type window_type);
+    // Create a window. Uses an underscore to avoid name collisions with windows.h `CreateWindow` macro
+    void (*CreateWindow_)(char* title, int nWidth, int nHeight, tHarness_window_type window_type);
     void (*Swap)(br_pixelmap* back_buffer);
     void (*PaletteChanged)(br_colour entries[256]);
     // If this platform supports OpenGL

@@ -3,10 +3,6 @@
 // todo: shouldnt depend on sdl...
 #include <SDL.h>
 
-static void* null_create_window_and_renderer(char* title, int x, int y, int width, int height) {
-    return 0;
-}
-
 static int null_set_window_pos(void* hWnd, int x, int y, int nWidth, int nHeight) {
     return 0;
 }
@@ -45,7 +41,6 @@ void Null_Platform_Init(tHarness_platform* platform) {
     // todo: shouldnt depend on sdl...
     platform->Sleep = SDL_Delay;
     platform->GetTicks = SDL_GetTicks;
-    platform->CreateWindowAndRenderer = null_create_window_and_renderer;
     platform->ShowCursor = null_show_cursor;
     platform->SetWindowPos = null_set_window_pos;
     platform->DestroyWindow = null_destroy_window;

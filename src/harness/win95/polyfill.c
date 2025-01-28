@@ -172,7 +172,8 @@ int FindClose_(HANDLE_ hFindFile) {
 }
 
 void* CreateWindowExA_(uint32_t dwExStyle, char* lpClassName, char* lpWindowName, uint32_t dwStyle, int X, int Y, int nWidth, int nHeight, void* hWndParent, void* hMenu, void* hInstance, void* lpParam) {
-    return gHarness_platform.CreateWindowAndRenderer(lpWindowName, X, Y, nWidth, nHeight);
+    gHarness_platform.CreateWindow_(lpWindowName, nWidth, nHeight, eWindow_type_software);
+    return NULL;
 }
 
 int SetWindowPos_(void* hWnd, void* hWndInsertAfter, int X, int Y, int cx, int cy, unsigned int uFlags) {

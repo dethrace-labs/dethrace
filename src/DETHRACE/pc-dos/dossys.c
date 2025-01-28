@@ -421,7 +421,7 @@ void PDAllocateScreenAndBack(void) {
             gl_callbacks.get_proc_address = gHarness_platform.GL_GetProcAddress;
             gl_callbacks.swap_buffers = gHarness_platform.Swap;
             gl_callbacks.get_viewport = gHarness_platform.GetViewport;
-            gHarness_platform.CreateWindow("Carmageddon", gGraf_specs[gGraf_spec_index].phys_width, gGraf_specs[gGraf_spec_index].phys_height, eWindow_type_opengl);
+            gHarness_platform.CreateWindow_("Carmageddon", gGraf_specs[gGraf_spec_index].phys_width, gGraf_specs[gGraf_spec_index].phys_height, eWindow_type_opengl);
 
             BrDevBeginVar(&gScreen, "glrend",
                 BRT_WIDTH_I32, gGraf_specs[gGraf_spec_index].phys_width,
@@ -466,7 +466,7 @@ void PDAllocateScreenAndBack(void) {
         // Render framebuffer to memory and call hooks when swapping or palette changing
         virtualfb_callbacks.palette_changed = gHarness_platform.PaletteChanged;
         virtualfb_callbacks.swap_buffers = gHarness_platform.Swap;
-        gHarness_platform.CreateWindow("Carmageddon", gGraf_specs[gGraf_spec_index].phys_width, gGraf_specs[gGraf_spec_index].phys_height, eWindow_type_software);
+        gHarness_platform.CreateWindow_("Carmageddon", gGraf_specs[gGraf_spec_index].phys_width, gGraf_specs[gGraf_spec_index].phys_height, eWindow_type_software);
         BrDevBeginVar(&gScreen, "virtualframebuffer",
             BRT_WIDTH_I32, gGraf_specs[gGraf_spec_index].phys_width,
             BRT_HEIGHT_I32, gGraf_specs[gGraf_spec_index].phys_height,

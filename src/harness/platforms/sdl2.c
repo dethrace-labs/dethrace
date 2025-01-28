@@ -311,7 +311,7 @@ void Harness_Platform_Init(tHarness_platform* platform) {
     platform->GetMouseButtons = get_mouse_buttons;
     platform->ShowErrorMessage = show_error_message;
 
-    platform->CreateWindow = create_window;
+    platform->CreateWindow_ = create_window;
     platform->Swap = swap;
     platform->PaletteChanged = palette_changed;
     platform->GL_GetProcAddress = SDL_GL_GetProcAddress;
