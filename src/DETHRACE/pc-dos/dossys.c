@@ -505,7 +505,7 @@ void Copy8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* 
     palette_entry = PaletteOf16Bits(pPalette)->pixels;
     for (y = 0; pSrc->height > y; y++) {
         src = (tU8*)pSrc->pixels + pSrc->row_bytes * y;
-        dst = pDst->pixels + pDst->row_bytes * y;
+        dst = (tU8*)pDst->pixels + pDst->row_bytes * y;
         for (x = 0; x < pSrc->width; x++) {
             value = *src;
             *dst = palette_entry[value];
