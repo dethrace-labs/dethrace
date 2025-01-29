@@ -2457,10 +2457,10 @@ void LoadExceptionsFile(char* pName) {
                     FatalError(123, tok, pName);
                 }
             }
+            AddExceptionToList(&gExceptions, e);
         }
-        AddExceptionToList(&gExceptions, e);
+        fclose(f);
     }
-    fclose(f);
 }
 
 // IDA: void __usercall LoadExceptionsFileForTrack(char *pTrack_file_name@<EAX>)
