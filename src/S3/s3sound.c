@@ -362,6 +362,11 @@ int S3SyncSampleVolumeAndPan(tS3_channel* chan) {
     if (chan->type != eS3_ST_sample) {
         return 1;
     }
+
+    if (AudioBackend_SetVolumeSeparate(chan->type_struct_sample, chan->left_volume, chan->right_volume) == eAB_success) {
+        return 1;
+    }
+
     total_vol = chan->left_volume + chan->right_volume;
     if (total_vol == 0.0f) {
         total_vol = 1.0f;
