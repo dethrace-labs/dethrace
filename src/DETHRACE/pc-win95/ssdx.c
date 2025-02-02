@@ -1,4 +1,4 @@
-
+#if 0
 #include "ssdx.h"
 #include "errors.h"
 #include "harness/hooks.h"
@@ -63,3 +63,5 @@ void SSDXHandleError(int error) {
 void SSDXSetPaleeteEntries(PALETTEENTRY_* palette, int pFirst_color, int pCount) {
     DirectDrawDevice_SetPaletteEntries(palette, pFirst_color, pCount);
 }
+
+#endif

@@ -23,7 +23,7 @@ typedef struct tHarness_platform {
     // Close specified window
     void (*DestroyWindow)(void* window);
     // Process window messages, return any WM_QUIT message
-    int (*ProcessWindowMessages)(MSG_* msg);
+    void (*ProcessWindowMessages)(MSG_* msg);
     // Set position of a window
     int (*SetWindowPos)(void* hWnd, int x, int y, int nWidth, int nHeight);
     // Show/hide the cursor

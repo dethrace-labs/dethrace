@@ -47,7 +47,7 @@ static int is_only_key_modifier(int modifier_flags, int flag_check) {
     return (modifier_flags & flag_check) && (modifier_flags & (KMOD_CTRL | KMOD_SHIFT | KMOD_ALT | KMOD_GUI)) == (modifier_flags & flag_check);
 }
 
-static int get_and_handle_message(MSG_* msg) {
+static void get_and_handle_message(MSG_* msg) {
     SDL_Event event;
     int dinput_key;
 
@@ -62,7 +62,7 @@ static int get_and_handle_message(MSG_* msg) {
                 if (event.key.type == SDL_KEYDOWN) {
                     if ((event.key.keysym.mod & (KMOD_CTRL | KMOD_SHIFT | KMOD_ALT | KMOD_GUI))) {
                         // Ignore keydown of RETURN when used together with some modifier
-                        return 0;
+                        return;
                     }
                 } else if (event.key.type == SDL_KEYUP) {
                     if (is_only_key_modifier(event.key.keysym.mod, KMOD_ALT)) {
@@ -76,7 +76,7 @@ static int get_and_handle_message(MSG_* msg) {
             dinput_key = sdlScanCodeToDirectInputKeyNum[event.key.keysym.scancode];
             if (dinput_key == 0) {
                 LOG_WARN("unexpected scan code %s (%d)", SDL_GetScancodeName(event.key.keysym.scancode), event.key.keysym.scancode);
-                return 0;
+                return;
             }
             // DInput expects high bit to be set if key is down
             // https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418261(v=vs.85)
@@ -88,22 +88,10 @@ static int get_and_handle_message(MSG_* msg) {
             }
             break;
 
-        case SDL_WINDOWEVENT:
-            if (event.window.event == SDL_WINDOWEVENT_CLOSE) {
-                if (SDL_GetWindowID(window) == event.window.windowID) {
-                    msg->message = WM_QUIT;
-                    return 1;
-                }
-            }
-            break;
-
         case SDL_QUIT:
-            // msg->message = WM_QUIT;
             QuitGame();
-            return 1;
         }
     }
-    return 0;
 }
 
 static void get_keyboard_state(unsigned int count, uint8_t* buffer) {
