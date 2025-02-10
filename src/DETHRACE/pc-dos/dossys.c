@@ -24,7 +24,7 @@
 #include <sys/stat.h>
 #include <time.h>
 
-// #ifdef __DOS__
+#define MOUSE_SPEED_MULTIPLIER 0.25f
 
 // This code comes from DOS, so small changes need to be made to run correctly on windowed systems.
 // Generally the pc-win95 does the same thing
@@ -732,8 +732,29 @@ void PDGetMousePosition(int* pX_coord, int* pY_coord) {
     static br_int_32 mouse_y;
     LOG_TRACE("(%p, %p)", pX_coord, pY_coord);
 
-    // DOSMouseRead(...)
-    gHarness_platform.GetMousePosition(pX_coord, pY_coord);
+    if (gReal_graf_data_index) {
+        // DOSMouseRead(&mouse_x, &mouse_y, &mouse_buttons);
+        gHarness_platform.GetMousePosition(&mouse_x, &mouse_y);
+
+        delta_x = gGraf_data[gGraf_data_index].width * mouse_x / gGraf_data[gReal_graf_data_index].width - gMouse_last_x_coord;
+        delta_y = gGraf_data[gGraf_data_index].height * mouse_y / gGraf_data[gReal_graf_data_index].height - gMouse_last_y_coord;
+
+        mouse_x2 = (double)delta_x * MOUSE_SPEED_MULTIPLIER;
+        mouse_y2 = (double)delta_y * MOUSE_SPEED_MULTIPLIER;
+
+        *pX_coord = gMouse_last_x_coord + mouse_x2;
+        *pY_coord = gMouse_last_y_coord + mouse_y2;
+    } else {
+        mouse_x = gMouse_last_x_coord;
+        mouse_y = gMouse_last_y_coord;
+        // DOSMouseRead(&mouse_x, &mouse_y, &mouse_buttons);
+        gHarness_platform.GetMousePosition(&mouse_x, &mouse_y);
+
+        delta_x = mouse_x - gMouse_last_x_coord;
+        delta_y = mouse_y - gMouse_last_y_coord;
+        *pX_coord = gMouse_last_x_coord + (MOUSE_SPEED_MULTIPLIER * delta_x);
+        *pY_coord = gMouse_last_y_coord + (MOUSE_SPEED_MULTIPLIER * delta_y);
+    }
 }
 
 // IDA: int __cdecl PDGetTotalTime()

@@ -516,6 +516,13 @@ void DoPratcam(tU32 pThe_time) {
         gPrat_buffer->map = gRender_palette;
         BrMapAdd(gPrat_buffer);
         BrMaterialUpdate(gPrat_material, BR_MATU_ALL);
+
+        // Added by dethrace
+        // Pratcam is drawn on top of the 2d cockpit, so we must ensure that all the 2d pixel
+        // writes have been flushed to the framebuffer first
+        BrPixelmapFlush(gBack_screen);
+        // ---
+
         BrZbSceneRender(g2d_camera, g2d_camera, gBack_screen, gDepth_buffer);
         BrMapRemove(gPrat_buffer);
         gPrat_actor->render_style = BR_RSTYLE_NONE;

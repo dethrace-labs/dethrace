@@ -111,26 +111,24 @@ static int get_mouse_buttons(int* pButton1, int* pButton2) {
 }
 
 static int get_mouse_position(int* pX, int* pY) {
+    int window_width, window_height;
     float lX, lY;
+
     if (SDL_GetMouseFocus() != window) {
         return 0;
     }
+    SDL_GetWindowSize(window, &window_width, &window_height);
+
     SDL_GetMouseState(pX, pY);
     if (renderer != NULL) {
+        // software renderer
         SDL_RenderWindowToLogical(renderer, *pX, *pY, &lX, &lY);
     } else {
-        lX = *pX;
-        lY = *pY;
+        // hardware renderer
+        // handle case where window is stretched larger than the pixel size
+        lX = *pX * (640.0f / window_width);
+        lY = *pY * (480.0f / window_height);
     }
-
-#if defined(DETHRACE_FIX_BUGS)
-    // In hires mode (640x480), the menus are still rendered at (320x240),
-    // so prescale the cursor coordinates accordingly.
-    lX *= 320;
-    lX /= render_width;
-    lY *= 200;
-    lY /= render_height;
-#endif
     *pX = (int)lX;
     *pY = (int)lY;
     return 0;
@@ -221,6 +219,8 @@ static void create_window(char* title, int width, int height, tHarness_window_ty
             LOG_PANIC("Failed to create screen_texture: %s", SDL_GetError());
         }
     }
+
+    SDL_ShowCursor(SDL_DISABLE);
 
     if (harness_game_config.start_full_screen) {
         SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);

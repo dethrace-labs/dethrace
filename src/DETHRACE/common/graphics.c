@@ -1138,8 +1138,18 @@ void DrawMapSmallBlip(tU32 pTime, br_vector3* pPos, int pColour) {
             map_pos.v[0] = 2.f * map_pos.v[0];
             map_pos.v[1] = 2.f * map_pos.v[1] + HIRES_Y_OFFSET;
         }
-        offset = (int)map_pos.v[0] + gBack_screen->row_bytes * (int)map_pos.v[1];
-        ((br_uint_8*)gBack_screen->pixels)[offset] = pColour;
+#ifdef DETHRACE_3DFX_PATCH
+        if (gBack_screen->type == BR_PMT_RGB_565) {
+            offset = ((int)map_pos.v[0] * 2) + gBack_screen->row_bytes * (int)map_pos.v[1];
+            pColour = PaletteEntry16Bit(gRender_palette, pColour);
+            br_uint_8* p1 = &(((br_uint_8*)gBack_screen->pixels)[offset]);
+            *((br_uint_16*)(p1)) = pColour;
+        } else
+#endif
+        {
+            offset = (int)map_pos.v[0] + gBack_screen->row_bytes * (int)map_pos.v[1];
+            ((br_uint_8*)gBack_screen->pixels)[offset] = pColour;
+        }
     }
 }
 
@@ -1732,6 +1742,14 @@ void RenderAFrame(int pDepth_mask_on) {
                 DRPixelmapCopy(gBack_screen, gCurrent_race.map_image);
             }
         }
+
+#ifdef DETHRACE_3DFX_PATCH
+        // Added by dethrace
+        // 3d scene is drawn on top of the 2d map, so we must ensure that all the 2d pixel
+        // writes have been flushed to the framebuffer first
+        BrPixelmapFlush(gBack_screen);
+#endif
+
         DimRectangle(
             gBack_screen,
             gMap_render_x_i - gCurrent_graf_data->map_render_x_marg,
@@ -1884,6 +1902,12 @@ void RenderAFrame(int pDepth_mask_on) {
         ConditionallyFillWithSky(gRearview_screen);
 #ifdef DETHRACE_3DFX_PATCH
         PDUnlockRealBackScreen(1);
+
+        // Added by dethrace
+        // Rearview mirror is drawn on top of the 2d cockpit, so we must ensure that all the 2d pixel
+        // writes have been flushed to the framebuffer first
+        BrPixelmapFlush(gBack_screen);
+        // ---
 #endif
         BrZbSceneRenderBegin(gUniverse_actor, gRearview_camera, gRearview_screen, gRearview_depth_buffer);
         ProcessNonTrackActors(
