@@ -2,8 +2,9 @@
 #define _MAIN_H_
 
 #include "dr_types.h"
+#include "harness/compiler.h"
 
-void QuitGame(void);
+void HARNESS_NORETURN QuitGame(void);
 
 tU32 TrackCount(br_actor* pActor, tU32* pCount);
 

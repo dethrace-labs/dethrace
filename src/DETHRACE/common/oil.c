@@ -45,6 +45,9 @@ void InitOilSpills(void) {
         the_material->colour_map = NULL;
         BrMatrix23Identity(&the_material->map_transform);
         the_material->index_shade = BrTableFind("IDENTITY.TAB");
+#ifdef DETHRACE_3DFX_PATCH
+        GlorifyMaterial(&the_material, 1);
+#endif
         BrMaterialUpdate(the_material, BR_MATU_ALL);
         the_model = BrModelAllocate(NULL, 4, 2);
         the_model->flags |= BR_MODF_KEEP_ORIGINAL;

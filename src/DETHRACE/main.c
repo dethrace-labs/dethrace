@@ -15,10 +15,13 @@ extern int original_main(int pArgc, char* pArgv[]);
 void BR_CALLBACK _BrBeginHook(void) {
     struct br_device* BR_EXPORT BrDrv1SoftPrimBegin(char* arguments);
     struct br_device* BR_EXPORT BrDrv1SoftRendBegin(char* arguments);
+    struct br_device* BR_EXPORT BrDrv1VirtualFramebufferBegin(char* arguments);
+    struct br_device* BR_EXPORT BrDrv1GLBegin(char* arguments);
 
     BrDevAddStatic(NULL, BrDrv1SoftPrimBegin, NULL);
     BrDevAddStatic(NULL, BrDrv1SoftRendBegin, NULL);
-    // BrDevAddStatic(NULL, BrDrv1SDL2Begin, NULL);
+    BrDevAddStatic(NULL, BrDrv1VirtualFramebufferBegin, NULL);
+    BrDevAddStatic(NULL, BrDrv1GLBegin, NULL);
 }
 
 void BR_CALLBACK _BrEndHook(void) {

@@ -6,6 +6,7 @@
 #include "loading.h"
 #include "oil.h"
 #include "piping.h"
+#include "utility.h"
 #include <float.h>
 #include <math.h>
 #include <stdlib.h>
@@ -139,12 +140,24 @@ void InitSkids(void) {
             BrMapAdd(LoadPixelmap(str));
             strcpy(str + sl, ".MAT");
             gMaterial[mat] = LoadMaterial(str);
-            if (gMaterial[mat]) {
-                BrMaterialAdd(gMaterial[mat]);
-            } else {
+            if (gMaterial[mat] == NULL) {
                 BrFatal("..\\..\\source\\common\\skidmark.c", 207, "Couldn't find %s", gMaterial_names[mat]);
             }
+#ifdef DETHRACE_3DFX_PATCH
+            GlorifyMaterial(&gMaterial[mat], 1);
+#endif
+            BrMaterialAdd(gMaterial[mat]);
         }
+#ifdef DETHRACE_3DFX_PATCH
+        else {
+
+            BrMapRemove(gMaterial[mat]->colour_map);
+            gMaterial[mat]->colour_map = PurifiedPixelmap(gMaterial[mat]->colour_map);
+            BrMapAdd(gMaterial[mat]->colour_map);
+            GlorifyMaterial(&gMaterial[mat], 1);
+            BrMaterialUpdate(gMaterial[mat], BR_MATU_ALL);
+        }
+#endif
     }
 
     for (skid = 0; skid < COUNT_OF(gSkids); skid++) {

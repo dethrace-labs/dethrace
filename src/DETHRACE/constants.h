@@ -789,6 +789,14 @@ enum {
     NETMSGID_NONE = 0x20,
 };
 
+// Introduced with 3DFX patch
+enum ExceptionFlags {
+    ExceptionFlag_NoBilinear = 1,
+    ExceptionFlag_Double = 2,
+    ExceptionFlag_Quadruple = 4,
+    ExceptionFlag_Mipmap = 4,
+};
+
 #define FONT_TYPEABLE 0
 #define FONT_ORANGHED 1
 #define FONT_BLUEHEAD 2
@@ -837,5 +845,7 @@ enum {
 
 // average frame time in carm95
 #define MUNGE_ENGINE_INTERVAL 50
+
+#define HIRES_Y_OFFSET 40
 
 #endif

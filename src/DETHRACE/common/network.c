@@ -5,6 +5,7 @@
 #include "displays.h"
 #include "errors.h"
 #include "globvars.h"
+#include "globvrbm.h"
 #include "globvrpb.h"
 #include "graphics.h"
 #include "harness/hooks.h"
@@ -1296,6 +1297,9 @@ void NetFullScreenMessage(int pStr_index, int pLeave_it_up_there) {
         if (restore_screen) {
             memcpy(gBack_screen->pixels, gPixels_copy_, gPixel_buffer_size_);
             memcpy(gCurrent_palette_pixels, gPalette_copy_, 0x400u);
+#ifdef DETHRACE_3DFX_PATCH
+            g16bit_palette_valid = 0;
+#endif
             BrMemFree(gPixels_copy_);
             BrMemFree(gPalette_copy_);
             PDScreenBufferSwap(0);
@@ -1577,13 +1581,11 @@ void ReceivedConfirm(tNet_contents* pContents) {
 // IDA: void __usercall ReceivedDisableCar(tNet_contents *pContents@<EAX>)
 void ReceivedDisableCar(tNet_contents* pContents) {
     LOG_TRACE("(%p)", pContents);
-
 }
 
 // IDA: void __usercall ReceivedEnableCar(tNet_contents *pContents@<EAX>)
 void ReceivedEnableCar(tNet_contents* pContents) {
     LOG_TRACE("(%p)", pContents);
-
 }
 
 // IDA: void __usercall ReceivedScores(tNet_contents *pContents@<EAX>)

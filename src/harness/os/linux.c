@@ -34,6 +34,7 @@ static char _program_name[1024];
 
 static void* stack_traces[MAX_STACK_FRAMES];
 static char name_buf[4096];
+static DIR* directory_iterator;
 
 struct dl_iterate_callback_data {
     int initialized;
@@ -234,6 +235,30 @@ void OS_InstallSignalHandler(char* program_name) {
             err(1, "sigaction");
         }
     }
+}
+
+char* OS_GetFirstFileInDirectory(char* path) {
+    directory_iterator = opendir(path);
+    if (directory_iterator == NULL) {
+        return NULL;
+    }
+    return OS_GetNextFileInDirectory();
+}
+
+char* OS_GetNextFileInDirectory(void) {
+    struct dirent* entry;
+
+    if (directory_iterator == NULL) {
+        return NULL;
+    }
+    while ((entry = readdir(directory_iterator)) != NULL) {
+        if (entry->d_type == DT_REG) {
+            return entry->d_name;
+        }
+    }
+    closedir(directory_iterator);
+    directory_iterator = NULL;
+    return NULL;
 }
 
 FILE* OS_fopen(const char* pathname, const char* mode) {

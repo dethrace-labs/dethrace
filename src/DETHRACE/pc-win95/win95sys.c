@@ -1,3 +1,4 @@
+#if 0
 #include "brender.h"
 #include "car.h"
 #include "dinput.h"
@@ -29,6 +30,34 @@
 
 #define KEYDOWN(var, key) (var[key] & 0x80)
 
+// int gExtra_mem;
+// int gReplay_override;
+// tGraf_spec gGraf_specs[2] int gASCII_table[128];
+// tU32 gKeyboard_bits[8];
+// int gASCII_shift_table[128];
+// char gNetwork_profile_fname[256];
+// tS32 gJoystick_min1y;
+// tS32 gJoystick_min2y;
+// tS32 gJoystick_min2x;
+// tS32 gRaw_joystick2y;
+// tS32 gRaw_joystick2x;
+// tS32 gRaw_joystick1y;
+// tS32 gRaw_joystick1x;
+// tS32 gJoystick_range2y;
+// tS32 gJoystick_range2x;
+// tS32 gJoystick_range1y;
+// tS32 gJoystick_range1x;
+// int gNo_voodoo;
+// int gSwitched_resolution;
+// br_pixelmap* gReal_back_screen;
+// tS32 gJoystick_min1x;
+// br_pixelmap* gTemp_screen;
+
+// tU32 gUpper_loop_limit;
+// int gReal_back_screen_locked;
+// tU32 gScan_code[123]; // was tU8 [123][2] in symbol dump
+
+int gDOSGfx_initialized;
 int gExtra_mem;
 int gReplay_override;
 tGraf_spec gGraf_specs[2] = {
@@ -55,9 +84,9 @@ int gSwitched_resolution;
 br_pixelmap* gReal_back_screen;
 tS32 gJoystick_min1x;
 br_pixelmap* gTemp_screen;
-int gGfx_initialized; // maybe renamed here
 tU32 gUpper_loop_limit;
 int gReal_back_screen_locked;
+void (*gPrev_keyboard_handler)(void);
 tU32 gScan_code[123]; // was tU8 [123][2] in symbol dump
 
 // Added by dethrace. Windows-specific. Original variable names unknown.
@@ -68,6 +97,7 @@ int gWin32_action_replay_buffer_allocated;
 void* gWin32_action_replay_buffer;
 int gWin32_action_replay_buffer_size;
 void* gWin32_hwnd;
+int gWin32_gfx_initialized;
 int gWin32_lbutton_down;
 int gWin32_rbutton_down;
 PALETTEENTRY_ gWin32_palette[256];
@@ -520,7 +550,7 @@ void PDAllocateScreenAndBack(void) {
     gScreen = BrPixelmapAllocate(BR_PMT_INDEX_8, gGraf_specs[gGraf_spec_index].total_width, gGraf_specs[gGraf_spec_index].total_height, NULL, BR_PMAF_NORMAL);
 
     gScreen->origin_x = 0;
-    gGfx_initialized = 1;
+    gWin32_gfx_initialized = 1;
     gScreen->origin_y = 0;
     gBack_screen = BrPixelmapMatch(gScreen, BR_PMMATCH_OFFSCREEN);
     gBack_screen->origin_x = 0;
@@ -1173,3 +1203,5 @@ void Win32BRenderFailureFunc(char* msg) {
     dr_dprintf("*******************************************************************************");
     Win32FatalError("BRender error detected:", msg);
 }
+
+#endif

@@ -1838,7 +1838,16 @@ void InitialiseFlicPanel(int pIndex, int pLeft, int pTop, int pWidth, int pHeigh
             "Bruce bug at line %d, file ..\\..\\source\\common\\flicplay.c",
             68);
     }
-    gPanel_buffer[pIndex] = DRPixelmapAllocate(gScreen->type, pWidth, pHeight, the_pixels, 0);
+    gPanel_buffer[pIndex] = DRPixelmapAllocate(
+#ifdef DETHRACE_3DFX_PATCH
+        gBack_screen->type,
+#else
+        gScreen->type,
+#endif
+        pWidth,
+        pHeight,
+        the_pixels,
+        0);
 }
 
 // IDA: void __usercall DisposeFlicPanel(int pIndex@<EAX>)

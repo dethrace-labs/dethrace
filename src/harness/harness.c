@@ -144,8 +144,8 @@ void Harness_Init(int* argc, char* argv[]) {
     harness_game_config.enable_cd_check = 0;
     // original physics time step. Lower values seem to work better at 30+ fps
     harness_game_config.physics_step_time = 40;
-    // do not limit fps by default
-    harness_game_config.fps = 0;
+    // limit to 60 fps by default
+    harness_game_config.fps = 60;
     // do not freeze timer
     harness_game_config.freeze_timer = 0;
     // default demo time out is 240s
@@ -266,6 +266,9 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
             handled = 1;
         } else if (strcasecmp(argv[i], "--no-bind") == 0) {
             harness_game_config.no_bind = 1;
+            handled = 1;
+        } else if (strcasecmp(argv[i], "--opengl") == 0) {
+            harness_game_config.opengl_3dfx_mode = 1;
             handled = 1;
         } else if (strcasecmp(argv[i], "--no-music") == 0) {
             harness_game_config.no_music = 1;
