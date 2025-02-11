@@ -931,6 +931,13 @@ void DamageScrnDraw(int pCurrent_choice, int pCurrent_mode) {
         CopyBackScreen(0);
         BrPixelmapFill(gWreck_z_buffer, 0xFFFFFFFF);
         PDUnlockRealBackScreen(1);
+
+        // Added by dethrace
+        // 3d scene is drawn on top of the 2d hud, so we must ensure that all the 2d pixel
+        // writes have been flushed to the framebuffer first
+        BrPixelmapFlush(gReal_back_screen);
+        // -
+
         BrZbSceneRenderBegin(gUniverse_actor, gWreck_camera, gWreck_render_area, gWreck_z_buffer);
         BrZbSceneRenderAdd(gWreck_root);
         BrZbSceneRenderEnd();
