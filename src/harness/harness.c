@@ -131,6 +131,11 @@ static void Harness_DetectGameMode(void) {
     default:
         break;
     }
+
+    // 3dfx code paths require at least smoke.pix which is used instead of writing smoke directly to framebuffer
+    if (access("DATA/PIXELMAP/SMOKE.PIX", F_OK) != -1) {
+        harness_game_info.data_dir_has_3dfx_assets = 1;
+    }
 }
 
 void Harness_Init(int* argc, char* argv[]) {
@@ -191,6 +196,11 @@ void Harness_Init(int* argc, char* argv[]) {
 
     if (harness_game_info.mode == eGame_none) {
         Harness_DetectGameMode();
+    }
+
+    if (harness_game_config.opengl_3dfx_mode && !harness_game_info.data_dir_has_3dfx_assets) {
+        printf("Error: data directory does not contain 3dfx assets so opengl mode cannot be used\n");
+        exit(1);
     }
 
     if (force_null_platform) {
@@ -294,8 +304,7 @@ FILE* Harness_Hook_fopen(const char* pathname, const char* mode) {
 }
 
 // Localization
-int Harness_Hook_isalnum(int c)
-{
+int Harness_Hook_isalnum(int c) {
     if (harness_game_info.localization == eGameLocalization_polish) {
         // Polish diacritic letters in Windows-1250
         unsigned char letters[] = { 140, 143, 156, 159, 163, 165, 175, 179, 185, 191, 198, 202, 209, 211, 230, 234, 241, 243 };

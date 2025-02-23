@@ -487,6 +487,11 @@ br_pixelmap* PurifiedPixelmap(br_pixelmap* pSrc) {
     tException_list e;
     LOG_TRACE("(%p)", pSrc);
 
+    // dethrace: added conditional to allow both software and 3dfx modes
+    if (!harness_game_config.opengl_3dfx_mode) {
+        return pSrc;
+    }
+
     LOG_INFO("PurifiedPixelmap not implemented");
     return pSrc;
 }
@@ -1717,12 +1722,13 @@ void GlorifyMaterial(br_material** pArray, int pCount) {
 
     // Added by dethrace.
     // `GlorifyMaterial` is only present in the 3dfx patch.
-    // If the back screen is paletted (eg software renderer), don't glorify, otherwise it puts the software renderer into lit mode
+    // If software mode, don't glorify, otherwise it puts the software renderer into lit mode
     // See `WhitenVertexRGB` for a similar check that is present in the original code
-    if (gScreen && gScreen->type == BR_PMT_INDEX_8) {
+    if (!harness_game_config.opengl_3dfx_mode) {
         return;
     }
     // <<<
+
     for (i = 0; i < pCount; i++) {
         if (pArray[i]->colour_map != NULL) {
             e = FindExceptionInList(pArray[i]->colour_map->identifier, gExceptions);

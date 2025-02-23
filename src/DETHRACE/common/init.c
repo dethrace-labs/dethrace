@@ -569,9 +569,13 @@ void InitialiseApplication(int pArgc, char** pArgv) {
     LoadInRegistees();
 
 #ifdef DETHRACE_3DFX_PATCH
-    InitLineStuff();
-    InitSmokeStuff();
-    Init2DStuff();
+
+    // dethrace: if statement added to support all types of games
+    if (harness_game_config.opengl_3dfx_mode) {
+        InitLineStuff();
+        InitSmokeStuff();
+        Init2DStuff();
+    }
 #endif
 
     FinishLoadingGeneral();

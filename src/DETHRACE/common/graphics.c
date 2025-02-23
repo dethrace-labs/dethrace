@@ -2057,6 +2057,10 @@ void RenderAFrame(int pDepth_mask_on) {
         DimAFewBits();
         DoDamageScreen(the_time);
         if (!gAction_replay_mode || gAR_fudge_headups) {
+            // Added by dethrace
+            // Pratcam is drawn on top of the 2d cockpit, so we must ensure that all the 2d pixel
+            // writes have been flushed to the framebuffer first
+            BrPixelmapFlush(gBack_screen);
             DoPratcam(the_time);
             DoHeadups(the_time);
         }

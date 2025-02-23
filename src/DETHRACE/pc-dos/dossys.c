@@ -24,11 +24,15 @@
 #include <sys/stat.h>
 #include <time.h>
 
-#define MOUSE_SPEED_MULTIPLIER 0.25f
-
 // This code comes from DOS, so small changes need to be made to run correctly on windowed systems.
 // Generally the pc-win95 does the same thing
 #define PLAY_NICE_WITH_GUI 1
+
+#ifdef PLAY_NICE_WITH_GUI
+#define MOUSE_SPEED_MULTIPLIER 1
+#else
+#define MOUSE_SPEED_MULTIPLIER 0.25f
+#endif
 
 int gDOSGfx_initialized;
 int gExtra_mem;
@@ -874,6 +878,12 @@ int original_main(int pArgc, char** pArgv) {
     int i;
     float f;
 
+    // dethrace: added to default the software rendering mode
+    if (!harness_game_config.opengl_3dfx_mode) {
+        gNo_voodoo = 1;
+    }
+    //-
+
     for (i = 1; i < pArgc; i++) {
         if (strcasecmp(pArgv[i], "-hires") == 0) {
             gGraf_spec_index = 1;
@@ -919,9 +929,11 @@ int original_main(int pArgc, char** pArgv) {
         }
     }
 
+#ifdef DETHRACE_3DFX_PATCH
     if (!gNo_voodoo) {
         gGraf_spec_index = 1;
     }
+#endif
 
     GameMain(pArgc, pArgv);
     return 0;

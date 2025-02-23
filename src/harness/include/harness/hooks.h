@@ -43,7 +43,7 @@ typedef struct tHarness_platform {
     void (*PaletteChanged)(br_colour entries[256]);
     // If this platform supports OpenGL
     void* (*GL_GetProcAddress)(const char* name);
-    void (*GetViewport)(int* x, int* y, int* width, int* height);
+    void (*GetViewport)(int* x, int* y, float* width_multiplier, float* height_multiplier);
 
 } tHarness_platform;
 

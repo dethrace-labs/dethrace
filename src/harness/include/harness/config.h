@@ -31,6 +31,7 @@ typedef struct tHarness_game_info {
         // built-in shifted keyboard look-up table for certain localized Carmageddon releases
         int* ascii_shift_table;
     } defines;
+    int data_dir_has_3dfx_assets;
 } tHarness_game_info;
 
 typedef struct tHarness_game_config {
