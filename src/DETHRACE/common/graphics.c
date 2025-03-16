@@ -1678,6 +1678,11 @@ int ConditionallyFillWithSky(br_pixelmap* pPixelmap) {
     }
 #endif
     BrPixelmapFill(pPixelmap, bgnd_col);
+
+#ifdef DETHRACE_3DFX_PATCH
+    // Added by dethrace to ensure the pixel writes are flushed before 3d geometry
+    BrPixelmapFlush(pPixelmap);
+#endif
     return 1;
 }
 
@@ -1826,7 +1831,12 @@ void RenderAFrame(int pDepth_mask_on) {
     }
     gRendering_mirror = 0;
     DoSpecialCameraEffect(gCamera, &gCamera_to_world);
+
+#ifdef DETHRACE_3DFX_PATCH
+    if (!ConditionallyFillWithSky(gRender_screen->width == gBack_screen->width ? gBack_screen : gRender_screen)
+#else
     if (!ConditionallyFillWithSky(gRender_screen)
+#endif
         && !gProgram_state.cockpit_on
         && !(gAction_replay_camera_mode && gAction_replay_mode)) {
 #ifdef DETHRACE_3DFX_PATCH

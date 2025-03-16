@@ -2787,6 +2787,8 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
         gProgram_state.default_depth_effect.start = 7;
         gProgram_state.default_depth_effect.end = 0;
     }
+#ifndef DETHRACE_3DFX_PATCH
+    // In the 3dfx patch this code was moved into `InitRace`
     InstantDepthChange(
         gProgram_state.default_depth_effect.type,
         gProgram_state.default_depth_effect.sky_texture,
@@ -2800,6 +2802,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     if (!GetDepthCueingOn()) {
         ToggleDepthCueingQuietly();
     }
+#endif
     PossibleService();
     gDefault_engine_noise_index = GetAnInt(f);
     gDefault_water_spec_vol = &gDefault_default_water_spec_vol;

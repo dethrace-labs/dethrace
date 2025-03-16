@@ -169,7 +169,6 @@ void Harness_Init(int* argc, char* argv[]) {
     harness_game_config.no_bind = 0;
     // Disable verbose logging
     harness_game_config.verbose = 0;
-
     // install signal handler by default
     harness_game_config.install_signalhandler = 1;
 
@@ -282,6 +281,9 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
             handled = 1;
         } else if (strcasecmp(argv[i], "--no-music") == 0) {
             harness_game_config.no_music = 1;
+            handled = 1;
+        } else if (strcasecmp(argv[i], "--game-completed") == 0) {
+            harness_game_config.game_completed = 1;
             handled = 1;
         }
 

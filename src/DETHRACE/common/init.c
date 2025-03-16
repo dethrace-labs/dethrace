@@ -683,6 +683,10 @@ void InitGame(int pStart_race) {
     gProgram_state.redo_race_index = -1;
     gWait_for_it = 0;
     SwitchToLoresMode();
+
+    // added by dethrace to support --game-completed arg
+    gProgram_state.game_completed = harness_game_config.game_completed;
+    // -
 }
 
 // IDA: void __cdecl DisposeGameIfNecessary()
@@ -804,6 +808,23 @@ void InitRace(void) {
     }
     PrintMemoryDump(0, "DIRECTLY AFTER LOADING IN TRACK");
     LoadCopCars();
+#ifdef DETHRACE_3DFX_PATCH
+    // In the 3dfx patch this code was moved from `LoadTrack` so that the pedestrian material would be
+    // fogged correctly
+    InstantDepthChange(
+        gProgram_state.default_depth_effect.type,
+        gProgram_state.default_depth_effect.sky_texture,
+        gProgram_state.default_depth_effect.start,
+        gProgram_state.default_depth_effect.end);
+    gSwap_sky_texture = 0;
+    if (!GetSkyTextureOn()) {
+        ToggleSkyQuietly();
+    }
+    gSwap_depth_effect_type = -1;
+    if (!GetDepthCueingOn()) {
+        ToggleDepthCueingQuietly();
+    }
+#endif
     PrintMemoryDump(0, "AFTER LOADING IN COPS");
     SaveShadeTables();
     gCountdown = 7;
