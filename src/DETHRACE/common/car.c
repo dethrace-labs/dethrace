@@ -6340,11 +6340,6 @@ int CollideTwoCars(tCollision_info* car1, tCollision_info* car2, int pPass) {
     static int is_old_point_available;
     LOG_TRACE("(%p, %p, %d)", car1, car2, pPass);
 
-#ifdef DETHRACE_FIX_BUGS
-    // this variable is used uninitialized
-    add_point = 0;
-#endif
-
     if (!gCar_car_collisions) {
         return 0;
     }
@@ -6352,6 +6347,7 @@ int CollideTwoCars(tCollision_info* car1, tCollision_info* car2, int pPass) {
         return 0;
     }
 
+    add_point = pPass;
     mat1 = &car1->car_master_actor->t.t.mat;
     mat2 = &car2->car_master_actor->t.t.mat;
     oldmat1 = &car1->oldmat;
