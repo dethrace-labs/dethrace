@@ -885,7 +885,7 @@ tS8* ConvertPixTo16BitStripMap(br_pixelmap* pBr_map) {
     strip_image = BrMemAllocate(current_size, kMem_strip_image_perm);
     memcpy(strip_image, temp_strip_image, current_size);
     BrMemFree(temp_strip_image);
-    return strip_image;
+    return (tS8*)strip_image;
 }
 
 // IDA: tS8* __usercall ConvertPixToStripMap@<EAX>(br_pixelmap *pThe_br_map@<EAX>)
