@@ -1,4 +1,4 @@
-# Dethrace  
+# Dethrace
 
 [![Workflow](https://github.com/dethrace-labs/dethrace/actions/workflows/workflow.yaml/badge.svg)](https://github.com/dethrace-labs/dethrace/actions/workflows/workflow.yml)
 [![Twitter](https://badgen.net/badge/icon/twitter?icon=twitter&label)](https://twitter.com/dethrace_labs)
@@ -9,8 +9,8 @@ Dethrace is an attempt to learn how the 1997 driving/mayhem game [Carmageddon](h
 ## Progress
 (Follow us on Discord or Twitter to get notified of updates!)
 
-#### Last updated June 17 2024
-- 92% of functions implemented
+#### Last updated March 2025
+- 94% of functions implemented
 - Latest screenshot:
 
 <img width="752" alt="Screenshot 2024-05-27 at 8 44 10 AM" src="https://github.com/dethrace-labs/dethrace/assets/1063652/10b3b579-1eb1-4242-8b56-ff062cfff810">
