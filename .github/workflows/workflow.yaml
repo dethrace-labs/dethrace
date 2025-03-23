@@ -16,7 +16,7 @@ jobs:
       matrix:
         platform:
           - { name: 'Linux',    arch: 'x64',          os: ubuntu-latest,  werror: true }
-          - { name: 'Linux',    arch: 'arm64',        os: ubuntu-24.04-arm,  werror: true }
+          - { name: 'Linux',    arch: 'arm64',        os: ubuntu-22.04-arm,  werror: true }
           - { name: 'MacOS',    arch: 'arm64-x64',    os: macos-latest,   werror: true, cmake-args: '-DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"' }
           - { name: 'Windows',  arch: 'x86',          os: windows-latest, msvc-arch: 'Win32' }
           - { name: 'Windows',  arch: 'x64',          os: windows-latest, msvc-arch: 'x64' }
