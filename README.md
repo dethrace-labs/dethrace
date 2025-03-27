@@ -44,16 +44,16 @@ Dethrace does not ship with any content. You'll need access to the data from the
 
 ### Dependencies
 
-Dethrace has a dependency on SDL2. The easiest way to install SDL is via your favorite package manager.
+Dethrace has a dependency on SDL3. The easiest way to install SDL is via your favorite package manager.
 
 OSX:
 ```sh
-brew install SDL2
+brew install SDL3
 ```
 
 Linux:
 ```sh
-apt-get install libsdl2-dev
+apt-get install libsdl3-dev
 ```
 
 
@@ -89,7 +89,7 @@ make
 
 Firstly, you need a copy of the [Carmageddon game content](https://github.com/dethrace-labs/dethrace?tab=readme-ov-file#game-content). Extract the zip file if necessary.
 
-Dethrace expects to be placed into the top level Carmageddon folder. You know you have the right folder when you see the original `CARMA.EXE` there. If you are on Windows, you must also place `SDL2.dll` in the same folder.
+Dethrace expects to be placed into the top level Carmageddon folder. You know you have the right folder when you see the original `CARMA.EXE` there. If you are on Windows, you must also place `SDL3.dll` in the same folder.
 
 <img width="638" alt="Screenshot 2024-09-20 at 12 25 05 PM" src="https://github.com/user-attachments/assets/fda77818-9007-44fa-9d8d-c311396fd435">
 
