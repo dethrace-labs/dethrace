@@ -47,8 +47,6 @@ static void* create_window_and_renderer(char* title, int x, int y, int width, in
 
     screen_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width, height);
     if (!screen_texture) {
-      SDL_Renderer info;
-      SDL_GetRendererName(renderer &info);
         SDL_Log("Available renderer drivers:");
         for (int i = 0; i < SDL_GetNumRenderDrivers(); i++) {
             SDL_Log("%d. %s", i + 1, SDL_GetRenderDriver(i));
