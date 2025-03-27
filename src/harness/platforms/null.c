@@ -1,7 +1,8 @@
 #include "null.h"
 
 // todo: shouldnt depend on sdl...
-#include <SDL.h>
+//#include <SDL.h>
+#include <SDL3/SDL.h>
 
 static void* null_create_window_and_renderer(char* title, int x, int y, int width, int height) {
     return 0;
