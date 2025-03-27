@@ -3,7 +3,7 @@ configure_file(version.h.in version.h @ONLY)
 add_library(harness STATIC)
 
 if (NOT DEFINED IO_PLATFORM)
-    set(IO_PLATFORM "SDL2")
+    set(IO_PLATFORM "SDL3")
 endif()
 
 target_include_directories(harness
@@ -61,6 +61,14 @@ target_sources(harness PRIVATE
 
     "${CMAKE_CURRENT_BINARY_DIR}/version.h"
 )
+
+if (IO_PLATFORM STREQUAL "SDL3")
+    target_sources(harness PRIVATE
+        platforms/sdl3.c
+        platforms/sdl3_scancode_to_dinput.h
+    )
+    target_link_libraries(harness PRIVATE SDL3::SDL3)
+endif()
 
 if (IO_PLATFORM STREQUAL "SDL2")
     target_sources(harness PRIVATE
