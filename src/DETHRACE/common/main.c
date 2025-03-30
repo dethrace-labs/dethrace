@@ -39,6 +39,12 @@ void QuitGame(void) {
         DRS3ShutDown();
     }
     if (gBr_initialized) {
+#ifdef DETHRACE_FIX_BUGS
+        // In 3dfx mode, we need direct pixel access before calling `ClearEntireScreen`
+        if (harness_game_config.opengl_3dfx_mode) {
+            PDLockRealBackScreen(1);
+        }
+#endif
         ClearEntireScreen();
     }
     PDRevertPalette();
