@@ -6,21 +6,21 @@
 #include "harness/trace.h"
 #include "sdl2_scancode_to_dinput.h"
 
-SDL_Window* window;
-SDL_Renderer* renderer;
-SDL_Texture* screen_texture;
-uint32_t converted_palette[256];
-br_pixelmap* last_screen_src;
+static SDL_Window* window;
+static SDL_Renderer* renderer;
+static SDL_Texture* screen_texture;
+static uint32_t converted_palette[256];
+static br_pixelmap* last_screen_src;
 
-SDL_GLContext* gl_context;
+static SDL_GLContext* gl_context;
 
-int render_width, render_height;
+static int render_width, render_height;
 
-Uint32 last_frame_time;
+static Uint32 last_frame_time;
 
-uint8_t directinput_key_state[SDL_NUM_SCANCODES];
+static uint8_t directinput_key_state[SDL_NUM_SCANCODES];
 
-struct {
+static struct {
     int x, y;
     float scale_x, scale_y;
 } viewport;
@@ -53,7 +53,7 @@ static void calculate_viewport(int window_width, int window_height) {
     viewport.scale_y = (float)vp_height / gBack_screen->height;
 }
 
-static int set_window_pos(void* hWnd, int x, int y, int nWidth, int nHeight) {
+static int SDL2_SetWindowPos(void* hWnd, int x, int y, int nWidth, int nHeight) {
     // SDL_SetWindowPosition(hWnd, x, y);
     if (nWidth == 320 && nHeight == 200) {
         nWidth = 640;
@@ -63,7 +63,7 @@ static int set_window_pos(void* hWnd, int x, int y, int nWidth, int nHeight) {
     return 0;
 }
 
-static void destroy_window(void* hWnd) {
+static void SDL2_DestroyWindow(void* hWnd) {
     // SDL_GL_DeleteContext(context);
     SDL_DestroyWindow(window);
     SDL_Quit();
@@ -76,7 +76,7 @@ static int is_only_key_modifier(int modifier_flags, int flag_check) {
     return (modifier_flags & flag_check) && (modifier_flags & (KMOD_CTRL | KMOD_SHIFT | KMOD_ALT | KMOD_GUI)) == (modifier_flags & flag_check);
 }
 
-static void get_and_handle_message(MSG_* msg) {
+static void SDL2_ProcessWindowMessages(MSG_* msg) {
     SDL_Event event;
     int dinput_key;
 
@@ -129,11 +129,11 @@ static void get_and_handle_message(MSG_* msg) {
     }
 }
 
-static void get_keyboard_state(unsigned int count, uint8_t* buffer) {
+static void SDL2_GetKeyboardState(unsigned int count, uint8_t* buffer) {
     memcpy(buffer, directinput_key_state, count);
 }
 
-static int get_mouse_buttons(int* pButton1, int* pButton2) {
+static int SDL2_GetMouseButtons(int* pButton1, int* pButton2) {
     if (SDL_GetMouseFocus() != window) {
         *pButton1 = 0;
         *pButton2 = 0;
@@ -145,7 +145,7 @@ static int get_mouse_buttons(int* pButton1, int* pButton2) {
     return 0;
 }
 
-static int get_mouse_position(int* pX, int* pY) {
+static int SDL2_GetMousePosition(int* pX, int* pY) {
     int window_width, window_height;
     float lX, lY;
 
@@ -184,13 +184,13 @@ static void limit_fps(void) {
     last_frame_time = SDL_GetTicks();
 }
 
-int show_error_message(void* window, char* text, char* caption) {
+static int SDL2_ShowErrorMessage(void* window, char* text, char* caption) {
     fprintf(stderr, "%s", text);
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, caption, text, window);
     return 0;
 }
 
-static void create_window(char* title, int width, int height, tHarness_window_type window_type) {
+static void SDL2_CreateWindow(char* title, int width, int height, tHarness_window_type window_type) {
     int window_width, window_height;
 
     render_width = width;
@@ -278,12 +278,12 @@ static void create_window(char* title, int width, int height, tHarness_window_ty
     }
 }
 
-static void swap(br_pixelmap* back_buffer) {
+static void SDL2_Swap(br_pixelmap* back_buffer) {
     uint8_t* src_pixels = back_buffer->pixels;
     uint32_t* dest_pixels;
     int dest_pitch;
 
-    get_and_handle_message(NULL);
+    SDL2_ProcessWindowMessages(NULL);
 
     if (gl_context != NULL) {
         SDL_GL_SwapWindow(window);
@@ -306,37 +306,45 @@ static void swap(br_pixelmap* back_buffer) {
     }
 }
 
-static void palette_changed(br_colour entries[256]) {
+static void SDL2_PaletteChanged(br_colour entries[256]) {
     for (int i = 0; i < 256; i++) {
         converted_palette[i] = (0xff << 24 | BR_RED(entries[i]) << 16 | BR_GRN(entries[i]) << 8 | BR_BLU(entries[i]));
     }
     if (last_screen_src != NULL) {
-        swap(last_screen_src);
+        SDL2_Swap(last_screen_src);
     }
 }
 
-static void get_viewport(int* x, int* y, float* width_multipler, float* height_multiplier) {
+static void SDL2_GetViewport(int* x, int* y, float* width_multipler, float* height_multiplier) {
     *x = viewport.x;
     *y = viewport.y;
     *width_multipler = viewport.scale_x;
     *height_multiplier = viewport.scale_y;
 }
 
-void Harness_Platform_Init(tHarness_platform* platform) {
-    platform->ProcessWindowMessages = get_and_handle_message;
+static int SDL2_Harness_Platform_Init(tHarness_platform* platform) {
+    platform->ProcessWindowMessages = SDL2_ProcessWindowMessages;
     platform->Sleep = SDL_Delay;
     platform->GetTicks = SDL_GetTicks;
     platform->ShowCursor = SDL_ShowCursor;
-    platform->SetWindowPos = set_window_pos;
-    platform->DestroyWindow = destroy_window;
-    platform->GetKeyboardState = get_keyboard_state;
-    platform->GetMousePosition = get_mouse_position;
-    platform->GetMouseButtons = get_mouse_buttons;
-    platform->ShowErrorMessage = show_error_message;
+    platform->SetWindowPos = SDL2_SetWindowPos;
+    platform->DestroyWindow = SDL2_DestroyWindow;
+    platform->GetKeyboardState = SDL2_GetKeyboardState;
+    platform->GetMousePosition = SDL2_GetMousePosition;
+    platform->GetMouseButtons = SDL2_GetMouseButtons;
+    platform->ShowErrorMessage = SDL2_ShowErrorMessage;
 
-    platform->CreateWindow_ = create_window;
-    platform->Swap = swap;
-    platform->PaletteChanged = palette_changed;
+    platform->CreateWindow_ = SDL2_CreateWindow;
+    platform->Swap = SDL2_Swap;
+    platform->PaletteChanged = SDL2_PaletteChanged;
     platform->GL_GetProcAddress = SDL_GL_GetProcAddress;
-    platform->GetViewport = get_viewport;
-}
+    platform->GetViewport = SDL2_GetViewport;
+    return 0;
+};
+
+const tPlatform_bootstrap SDL2_bootstrap = {
+    "sdl2",
+    "SDL2 video backend (libsdl.org)",
+    ePlatform_cap_software | ePlatform_cap_opengl,
+    SDL2_Harness_Platform_Init,
+};

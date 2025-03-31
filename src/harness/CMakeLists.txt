@@ -1,10 +1,21 @@
 configure_file(version.h.in version.h @ONLY)
 
-add_library(harness STATIC)
+option(DETHRACE_PLATFORM_SDL2 "Support SDL2 platform driver" ON)
 
-if (NOT DEFINED IO_PLATFORM)
-    set(IO_PLATFORM "SDL2")
+set(DETHRACE_PLATFORMS )
+if(DETHRACE_PLATFORM_SDL2)
+    find_package(SDL2 CONFIG)
+    if(NOT SDL2_FOUND)
+        find_package(SDL2 MODULE REQUIRED)
+    endif()
+    list(APPEND DETHRACE_PLATFORMS SDL2)
 endif()
+
+if(NOT DETHRACE_PLATFORMS)
+    message(FATAL_ERROR "No platform drivers enabled")
+endif()
+
+add_library(harness STATIC)
 
 target_include_directories(harness
     PRIVATE
@@ -62,11 +73,12 @@ target_sources(harness PRIVATE
     "${CMAKE_CURRENT_BINARY_DIR}/version.h"
 )
 
-if (IO_PLATFORM STREQUAL "SDL2")
+if(DETHRACE_PLATFORM_SDL2)
     target_sources(harness PRIVATE
         platforms/sdl2.c
         platforms/sdl2_scancode_to_dinput.h
     )
+    target_compile_definitions(harness PRIVATE DETHRACE_PLATFORM_SDL2)
     target_link_libraries(harness PRIVATE SDL2::SDL2)
 endif()
 

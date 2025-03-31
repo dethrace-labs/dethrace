@@ -12,6 +12,7 @@ typedef enum tHarness_window_type {
 
 // Platform implementation functions
 typedef struct tHarness_platform {
+    const char *name;
     // Render a fullscreen quad using the specified pixel data
     void (*Renderer_Present)(br_pixelmap* src);
     // Set the 256 color palette to use (BGRA format)
@@ -47,9 +48,22 @@ typedef struct tHarness_platform {
 
 } tHarness_platform;
 
+enum {
+    ePlatform_cap_software = 0x1,
+    ePlatform_cap_opengl = 0x2,
+    ePlatform_cap_video_mask = ePlatform_cap_software | ePlatform_cap_opengl,
+};
+
+typedef struct tPlatform_bootstrap {
+    const char *name;
+    const char *description;
+    uint32_t capabilities;
+    int (*init)(tHarness_platform* platform);
+} tPlatform_bootstrap;
+
 extern tHarness_platform gHarness_platform;
 
-void Harness_Init(int* argc, char* argv[]);
+int Harness_Init(int* argc, char* argv[]);
 
 // Hooks are called from original game code.
 
