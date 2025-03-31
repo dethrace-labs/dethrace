@@ -1,5 +1,34 @@
-#ifndef _sdl_dyn_common_h
-#define _sdl_dyn_common_h
+#ifndef sdl_dyn_common_h
+#define sdl_dyn_common_h
+
+#ifdef DETHRACE_SDL_DYNAMIC
+#ifdef _WIN32
+#include <windows.h>
+#ifdef CreateWindow
+#undef CreateWindow
+#endif
+static void *Harness_LoadObject(const char *name) {
+    return LoadLibraryA(name);
+}
+static void Harness_UnloadObject(void *obj) {
+    FreeLibrary(obj);
+}
+static void *Harness_LoadFunction(void *obj, const char *name) {
+    return GetProcAddress(obj, name);
+}
+#else
+#include <dlfcn.h>
+static void *Harness_LoadObject(const char *name) {
+    return dlopen(name, RTLD_NOW | RTLD_LOCAL);
+}
+static void Harness_UnloadObject(void *obj) {
+    dlclose(obj);
+}
+static void *Harness_LoadFunction(void *obj, const char *name) {
+    return dlsym(obj, name);
+}
+#endif
+#endif
 
 #define STR2_JOIN(A,B) A##B
 #define STR_JOIN(A,B) STR2_JOIN(A, B)
@@ -40,4 +69,4 @@ failure:
 #endif
 }
 
-#endif /* _sdl_dyn_common_h */
+#endif /* sdl_dyn_common_h */

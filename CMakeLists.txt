@@ -62,10 +62,16 @@ endfunction()
 
 test_big_endian(IS_BIGENDIAN)
 
-option(DETHRACE_PLATFORM_SDL2 "Support SDL2 platform driver" ON)
+option(DETHRACE_PLATFORM_SDL1 "Support SDL 1.2 platform driver" OFF)
+option(DETHRACE_PLATFORM_SDL2 "Support SDL 2 platform driver"   ON)
 set(count_sdl_platforms 0)
 
 set(DETHRACE_PLATFORMS )
+if(DETHRACE_PLATFORM_SDL1)
+    find_package(SDL REQUIRED)
+    list(APPEND DETHRACE_PLATFORMS SDL1)
+    math(EXPR count_sdl_platforms "${count_sdl_platforms} + 1")
+endif()
 if(DETHRACE_PLATFORM_SDL2)
     find_package(SDL2 CONFIG)
     if(NOT SDL2_FOUND)

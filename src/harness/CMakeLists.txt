@@ -58,10 +58,28 @@ target_sources(harness PRIVATE
     "${CMAKE_CURRENT_BINARY_DIR}/version.h"
 )
 
+if(DETHRACE_PLATFORM_SDL1)
+    target_sources(harness PRIVATE
+        platforms/sdl1.c
+        platforms/sdl1_scancode_to_dinput.h
+        platforms/sdl1_syms.h
+    )
+    target_compile_definitions(harness PRIVATE DETHRACE_PLATFORM_SDL1)
+    if(DETHRACE_PLATFORM_SDL_DYNAMIC)
+        set_property(SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/platforms/sdl1.c" APPEND PROPERTY INCLUDE_DIRECTORIES "$<TARGET_PROPERTY:SDL::SDL,INTERFACE_INCLUDE_DIRECTORIES>")
+        get_filename_component(sdl_library_directory "${SDL_LIBRARY}" DIRECTORY)
+        set_property(GLOBAL APPEND PROPERTY DETHRACE_BUILD_RPATHS "${sdl_library_directory}")
+    else()
+        target_include_directories(harness PRIVATE ${SDL_INCLUDE_DIR})
+        target_link_libraries(harness PRIVATE ${SDL_LIBRARIES})
+    endif()
+endif()
+
 if(DETHRACE_PLATFORM_SDL2)
     target_sources(harness PRIVATE
         platforms/sdl2.c
         platforms/sdl2_scancode_to_dinput.h
+        platforms/sdl2_syms.h
     )
     target_compile_definitions(harness PRIVATE DETHRACE_PLATFORM_SDL2)
     if(DETHRACE_PLATFORM_SDL_DYNAMIC)

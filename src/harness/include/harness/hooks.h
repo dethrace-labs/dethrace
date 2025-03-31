@@ -39,7 +39,7 @@ typedef struct tHarness_platform {
     int (*ShowErrorMessage)(void* window, char* text, char* caption);
 
     // Create a window. Uses an underscore to avoid name collisions with windows.h `CreateWindow` macro
-    void (*CreateWindow_)(char* title, int nWidth, int nHeight, tHarness_window_type window_type);
+    void (*CreateWindow_)(const char* title, int nWidth, int nHeight, tHarness_window_type window_type);
     void (*Swap)(br_pixelmap* back_buffer);
     void (*PaletteChanged)(br_colour entries[256]);
     // If this platform supports OpenGL

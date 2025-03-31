@@ -5,6 +5,7 @@
 #include "harness/hooks.h"
 #include "harness/trace.h"
 #include "sdl2_scancode_to_dinput.h"
+#include "sdl2_syms.h"
 
 SDL_COMPILE_TIME_ASSERT(sdl2_platform_requires_SDL2, SDL_MAJOR_VERSION == 2);
 
@@ -32,41 +33,15 @@ extern void QuitGame(void);
 extern uint32_t gKeyboard_bits[8];
 extern br_pixelmap* gBack_screen;
 
-#include "sdl2_syms.h"
-
-#ifdef _WIN32
-#include <windows.h>
-void *Harness_LoadObject(const char *name) {
-    return LoadLibraryA(name);
-}
-void Harness_UnloadObject(void *obj) {
-    FreeLibrary(obj);
-}
-void *Harness_LoadFunction(void *obj, const char *name) {
-    return GetProcAddress(obj, name);
-}
-#else
-#include <dlfcn.h>
-void *Harness_LoadObject(const char *name) {
-    return dlopen(name, RTLD_NOW | RTLD_LOCAL);
-}
-void Harness_UnloadObject(void *obj) {
-    dlclose(obj);
-}
-void *Harness_LoadFunction(void *obj, const char *name) {
-    return dlsym(obj, name);
-}
-#endif
-
 #ifdef DETHRACE_SDL_DYNAMIC
 #ifdef _WIN32
 static const char * const possible_locations[] = {
-    "SDL2_dll",
+    "SDL2.dll",
 };
 #elif defined(__APPLE__)
 #define SHARED_OBJECT_NAME "libSDL2"
-#define SDL2_LIBNAME "libSDL2_dylib",
-#define SDL2_FRAMEWORK "SDL2_framework/Versions/A/SDL2",
+#define SDL2_LIBNAME "libSDL2.dylib"
+#define SDL2_FRAMEWORK "SDL2.framework/Versions/A/SDL2"
 static const char * const possible_locations[] = {
     "@loader_path/" SDL2_LIBNAME, /* MyApp.app/Contents/MacOS/libSDL2_dylib */
     "@loader_path/../Frameworks/" SDL2_FRAMEWORK, /* MyApp.app/Contents/Frameworks/SDL2_framework */
@@ -85,7 +60,7 @@ static const char * const possible_locations[] = {
 #endif
 
 #ifdef DETHRACE_SDL_DYNAMIC
-void *sdl2_so;
+static void *sdl2_so;
 #endif
 
 #define OBJECT_NAME sdl2_so
@@ -254,7 +229,7 @@ static int SDL2_Harness_ShowErrorMessage(void* window, char* text, char* caption
     return 0;
 }
 
-static void SDL2_Harness_CreateWindow(char* title, int width, int height, tHarness_window_type window_type) {
+static void SDL2_Harness_CreateWindow(const char* title, int width, int height, tHarness_window_type window_type) {
     int window_width, window_height;
 
     render_width = width;
@@ -343,15 +318,16 @@ static void SDL2_Harness_CreateWindow(char* title, int width, int height, tHarne
 }
 
 static void SDL2_Harness_Swap(br_pixelmap* back_buffer) {
-    uint8_t* src_pixels = back_buffer->pixels;
-    uint32_t* dest_pixels;
-    int dest_pitch;
 
     SDL2_Harness_ProcessWindowMessages(NULL);
 
     if (gl_context != NULL) {
         SDL2_GL_SwapWindow(window);
     } else {
+        uint8_t* src_pixels = back_buffer->pixels;
+        uint32_t* dest_pixels;
+        int dest_pitch;
+
         SDL2_LockTexture(screen_texture, NULL, (void**)&dest_pixels, &dest_pitch);
         for (int i = 0; i < back_buffer->height * back_buffer->width; i++) {
             *dest_pixels = converted_palette[*src_pixels];
