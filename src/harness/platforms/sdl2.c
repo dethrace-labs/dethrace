@@ -84,47 +84,15 @@ static const char * const possible_locations[] = {
 #endif
 #endif
 
-#define X_SDL2_TYPEDEF(name, ret, args) typedef ret SDLCALL t##SDL_##name##_fn args;
-#define X_SDL2_STATIC_SYMBOL(name, ret, args) static t##SDL_##name##_fn* SDL2_##name;
-#ifdef DETHRACE_SDL_DYNAMIC
-#define X_SDL2_LOAD_FUNCTION(name, ret, args) \
-    SDL2_##name = Harness_LoadFunction(OBJECT_NAME, "SDL_" #name); \
-    if (SDL2_##name == NULL) { \
-        goto failure; \
-    }
-#else
-#define X_SDL2_LOAD_FUNCTION(name, ret, args) SDL2_##name = SDL_##name;
-#endif
-#define OBJECT_NAME sdl2_so
-
-FOREACH_SDL2_SYM(X_SDL2_TYPEDEF)
-FOREACH_SDL2_SYM(X_SDL2_STATIC_SYMBOL)
-
 #ifdef DETHRACE_SDL_DYNAMIC
 void *sdl2_so;
 #endif
 
-static int SDL2_LoadSymbols(void) {
+#define OBJECT_NAME sdl2_so
+#define SYMBOL_PREFIX SDL2_
+#define FOREACH_SDLX_SYM FOREACH_SDL2_SYM
 
-#ifdef DETHRACE_SDL_DYNAMIC
-    for (size_t i = 0; i < BR_ASIZE(possible_locations); i++) {
-        OBJECT_NAME = Harness_LoadObject(possible_locations[i]);
-        if (OBJECT_NAME != NULL) {
-            break;
-        }
-    }
-    if (OBJECT_NAME == NULL) {
-        return 1;
-    }
-#endif
-    FOREACH_SDL2_SYM(X_SDL2_LOAD_FUNCTION)
-    return 0;
-#ifdef DETHRACE_SDL_DYNAMIC
-failure:
-    Harness_UnloadObject(OBJECT_NAME);
-    return 1;
-#endif
-}
+#include "sdl_dyn_common.h"
 
 static void calculate_viewport(int window_width, int window_height) {
     int vp_width, vp_height;
