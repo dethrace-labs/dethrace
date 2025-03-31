@@ -11,52 +11,46 @@ SDL_Renderer* renderer;
 SDL_Texture* screen_texture;
 uint32_t converted_palette[256];
 br_pixelmap* last_screen_src;
+
+SDL_GLContext* gl_context;
+
 int render_width, render_height;
 
 Uint32 last_frame_time;
 
 uint8_t directinput_key_state[SDL_NUM_SCANCODES];
 
-static void* create_window_and_renderer(char* title, int x, int y, int width, int height) {
-    render_width = width;
-    render_height = height;
+struct {
+    int x, y;
+    float scale_x, scale_y;
+} viewport;
 
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        LOG_PANIC("SDL_INIT_VIDEO error: %s", SDL_GetError());
-    }
+// Callbacks back into original game code
+extern void QuitGame(void);
+extern uint32_t gKeyboard_bits[8];
+extern br_pixelmap* gBack_screen;
 
-    window = SDL_CreateWindow(title,
-        SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED,
-        width, height,
-        SDL_WINDOW_RESIZABLE);
+static void calculate_viewport(int window_width, int window_height) {
+    int vp_width, vp_height;
+    float target_aspect_ratio;
+    float aspect_ratio;
 
-    if (window == NULL) {
-        LOG_PANIC("Failed to create window: %s", SDL_GetError());
-    }
+    aspect_ratio = (float)window_width / window_height;
+    target_aspect_ratio = (float)gBack_screen->width / gBack_screen->height;
 
-    if (harness_game_config.start_full_screen) {
-        SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
-    }
-
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
-    if (renderer == NULL) {
-        LOG_PANIC("Failed to create renderer: %s", SDL_GetError());
-    }
-    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
-    SDL_RenderSetLogicalSize(renderer, render_width, render_height);
-
-    screen_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width, height);
-    if (screen_texture == NULL) {
-        SDL_RendererInfo info;
-        SDL_GetRendererInfo(renderer, &info);
-        for (Uint32 i = 0; i < info.num_texture_formats; i++) {
-            LOG_INFO("%s\n", SDL_GetPixelFormatName(info.texture_formats[i]));
+    vp_width = window_width;
+    vp_height = window_height;
+    if (aspect_ratio != target_aspect_ratio) {
+        if (aspect_ratio > target_aspect_ratio) {
+            vp_width = window_height * target_aspect_ratio + .5f;
+        } else {
+            vp_height = window_width / target_aspect_ratio + .5f;
         }
-        LOG_PANIC("Failed to create screen_texture: %s", SDL_GetError());
     }
-
-    return window;
+    viewport.x = (window_width - vp_width) / 2;
+    viewport.y = (window_height - vp_height) / 2;
+    viewport.scale_x = (float)vp_width / gBack_screen->width;
+    viewport.scale_y = (float)vp_height / gBack_screen->height;
 }
 
 static int set_window_pos(void* hWnd, int x, int y, int nWidth, int nHeight) {
@@ -82,7 +76,7 @@ static int is_only_key_modifier(int modifier_flags, int flag_check) {
     return (modifier_flags & flag_check) && (modifier_flags & (KMOD_CTRL | KMOD_SHIFT | KMOD_ALT | KMOD_GUI)) == (modifier_flags & flag_check);
 }
 
-static int get_and_handle_message(MSG_* msg) {
+static void get_and_handle_message(MSG_* msg) {
     SDL_Event event;
     int dinput_key;
 
@@ -97,7 +91,7 @@ static int get_and_handle_message(MSG_* msg) {
                 if (event.key.type == SDL_KEYDOWN) {
                     if ((event.key.keysym.mod & (KMOD_CTRL | KMOD_SHIFT | KMOD_ALT | KMOD_GUI))) {
                         // Ignore keydown of RETURN when used together with some modifier
-                        return 0;
+                        return;
                     }
                 } else if (event.key.type == SDL_KEYUP) {
                     if (is_only_key_modifier(event.key.keysym.mod, KMOD_ALT)) {
@@ -111,28 +105,28 @@ static int get_and_handle_message(MSG_* msg) {
             dinput_key = sdlScanCodeToDirectInputKeyNum[event.key.keysym.scancode];
             if (dinput_key == 0) {
                 LOG_WARN("unexpected scan code %s (%d)", SDL_GetScancodeName(event.key.keysym.scancode), event.key.keysym.scancode);
-                return 0;
+                return;
             }
             // DInput expects high bit to be set if key is down
             // https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418261(v=vs.85)
             directinput_key_state[dinput_key] = (event.type == SDL_KEYDOWN ? 0x80 : 0);
+            if (event.type == SDL_KEYDOWN) {
+                gKeyboard_bits[dinput_key >> 5] |= (1 << (dinput_key & 0x1F));
+            } else {
+                gKeyboard_bits[dinput_key >> 5] &= ~(1 << (dinput_key & 0x1F));
+            }
             break;
 
         case SDL_WINDOWEVENT:
-            if (event.window.event == SDL_WINDOWEVENT_CLOSE) {
-                if (SDL_GetWindowID(window) == event.window.windowID) {
-                    msg->message = WM_QUIT;
-                    return 1;
-                }
+            if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
+                calculate_viewport(event.window.data1, event.window.data2);
             }
             break;
 
         case SDL_QUIT:
-            msg->message = WM_QUIT;
-            return 1;
+            QuitGame();
         }
     }
-    return 0;
 }
 
 static void get_keyboard_state(unsigned int count, uint8_t* buffer) {
@@ -152,21 +146,24 @@ static int get_mouse_buttons(int* pButton1, int* pButton2) {
 }
 
 static int get_mouse_position(int* pX, int* pY) {
+    int window_width, window_height;
     float lX, lY;
+
     if (SDL_GetMouseFocus() != window) {
         return 0;
     }
-    SDL_GetMouseState(pX, pY);
-    SDL_RenderWindowToLogical(renderer, *pX, *pY, &lX, &lY);
+    SDL_GetWindowSize(window, &window_width, &window_height);
 
-#if defined(DETHRACE_FIX_BUGS)
-    // In hires mode (640x480), the menus are still rendered at (320x240),
-    // so prescale the cursor coordinates accordingly.
-    lX *= 320;
-    lX /= render_width;
-    lY *= 200;
-    lY /= render_height;
-#endif
+    SDL_GetMouseState(pX, pY);
+    if (renderer != NULL) {
+        // software renderer
+        SDL_RenderWindowToLogical(renderer, *pX, *pY, &lX, &lY);
+    } else {
+        // hardware renderer
+        // handle case where window is stretched larger than the pixel size
+        lX = *pX * (640.0f / window_width);
+        lY = *pY * (480.0f / window_height);
+    }
     *pX = (int)lX;
     *pY = (int)lY;
     return 0;
@@ -187,50 +184,148 @@ static void limit_fps(void) {
     last_frame_time = SDL_GetTicks();
 }
 
-static void present_screen(br_pixelmap* src) {
-    // fastest way to convert 8 bit indexed to 32 bit
-    uint8_t* src_pixels = src->pixels;
-    uint32_t* dest_pixels;
-    int dest_pitch;
-
-    SDL_LockTexture(screen_texture, NULL, (void**)&dest_pixels, &dest_pitch);
-    for (int i = 0; i < src->height * src->width; i++) {
-        *dest_pixels = converted_palette[*src_pixels];
-        dest_pixels++;
-        src_pixels++;
-    }
-    SDL_UnlockTexture(screen_texture);
-    SDL_RenderClear(renderer);
-    SDL_RenderCopy(renderer, screen_texture, NULL, NULL);
-    SDL_RenderPresent(renderer);
-
-    last_screen_src = src;
-
-    if (harness_game_config.fps != 0) {
-        limit_fps();
-    }
-}
-
-static void set_palette(PALETTEENTRY_* pal) {
-    for (int i = 0; i < 256; i++) {
-        converted_palette[i] = (0xff << 24 | pal[i].peRed << 16 | pal[i].peGreen << 8 | pal[i].peBlue);
-    }
-    if (last_screen_src != NULL) {
-        present_screen(last_screen_src);
-    }
-}
-
 int show_error_message(void* window, char* text, char* caption) {
     fprintf(stderr, "%s", text);
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, caption, text, window);
     return 0;
 }
 
+static void create_window(char* title, int width, int height, tHarness_window_type window_type) {
+    int window_width, window_height;
+
+    render_width = width;
+    render_height = height;
+
+    window_width = width;
+    window_height = height;
+
+    // special case lores and make a bigger window
+    if (width == 320 && height == 200) {
+        window_width = 640;
+        window_height = 480;
+    }
+
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+        LOG_PANIC("SDL_INIT_VIDEO error: %s", SDL_GetError());
+    }
+
+    if (window_type == eWindow_type_opengl) {
+
+        window = SDL_CreateWindow(title,
+            SDL_WINDOWPOS_CENTERED,
+            SDL_WINDOWPOS_CENTERED,
+            window_width, window_height,
+            SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+
+        if (window == NULL) {
+            LOG_PANIC("Failed to create window: %s", SDL_GetError());
+        }
+
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+        gl_context = SDL_GL_CreateContext(window);
+
+        if (gl_context == NULL) {
+            LOG_WARN("Failed to create OpenGL core profile: %s. Trying OpenGLES...", SDL_GetError());
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+            gl_context = SDL_GL_CreateContext(window);
+        }
+        if (gl_context == NULL) {
+            LOG_PANIC("Failed to create OpenGL context: %s", SDL_GetError());
+        }
+        SDL_GL_SetSwapInterval(1);
+
+    } else {
+        window = SDL_CreateWindow(title,
+            SDL_WINDOWPOS_CENTERED,
+            SDL_WINDOWPOS_CENTERED,
+            window_width, window_height,
+            SDL_WINDOW_RESIZABLE);
+        if (window == NULL) {
+            LOG_PANIC("Failed to create window: %s", SDL_GetError());
+        }
+
+        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
+        if (renderer == NULL) {
+            LOG_PANIC("Failed to create renderer: %s", SDL_GetError());
+        }
+        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+        SDL_RenderSetLogicalSize(renderer, render_width, render_height);
+
+        screen_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width, height);
+        if (screen_texture == NULL) {
+            SDL_RendererInfo info;
+            SDL_GetRendererInfo(renderer, &info);
+            for (Uint32 i = 0; i < info.num_texture_formats; i++) {
+                LOG_INFO("%s\n", SDL_GetPixelFormatName(info.texture_formats[i]));
+            }
+            LOG_PANIC("Failed to create screen_texture: %s", SDL_GetError());
+        }
+    }
+
+    SDL_ShowCursor(SDL_DISABLE);
+
+    viewport.x = 0;
+    viewport.y = 0;
+    viewport.scale_x = 1;
+    viewport.scale_y = 1;
+
+    if (harness_game_config.start_full_screen) {
+        SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+    }
+}
+
+static void swap(br_pixelmap* back_buffer) {
+    uint8_t* src_pixels = back_buffer->pixels;
+    uint32_t* dest_pixels;
+    int dest_pitch;
+
+    get_and_handle_message(NULL);
+
+    if (gl_context != NULL) {
+        SDL_GL_SwapWindow(window);
+    } else {
+        SDL_LockTexture(screen_texture, NULL, (void**)&dest_pixels, &dest_pitch);
+        for (int i = 0; i < back_buffer->height * back_buffer->width; i++) {
+            *dest_pixels = converted_palette[*src_pixels];
+            dest_pixels++;
+            src_pixels++;
+        }
+        SDL_UnlockTexture(screen_texture);
+        SDL_RenderClear(renderer);
+        SDL_RenderCopy(renderer, screen_texture, NULL, NULL);
+        SDL_RenderPresent(renderer);
+        last_screen_src = back_buffer;
+    }
+
+    if (harness_game_config.fps != 0) {
+        limit_fps();
+    }
+}
+
+static void palette_changed(br_colour entries[256]) {
+    for (int i = 0; i < 256; i++) {
+        converted_palette[i] = (0xff << 24 | BR_RED(entries[i]) << 16 | BR_GRN(entries[i]) << 8 | BR_BLU(entries[i]));
+    }
+    if (last_screen_src != NULL) {
+        swap(last_screen_src);
+    }
+}
+
+static void get_viewport(int* x, int* y, float* width_multipler, float* height_multiplier) {
+    *x = viewport.x;
+    *y = viewport.y;
+    *width_multipler = viewport.scale_x;
+    *height_multiplier = viewport.scale_y;
+}
+
 void Harness_Platform_Init(tHarness_platform* platform) {
     platform->ProcessWindowMessages = get_and_handle_message;
     platform->Sleep = SDL_Delay;
     platform->GetTicks = SDL_GetTicks;
-    platform->CreateWindowAndRenderer = create_window_and_renderer;
     platform->ShowCursor = SDL_ShowCursor;
     platform->SetWindowPos = set_window_pos;
     platform->DestroyWindow = destroy_window;
@@ -238,6 +333,10 @@ void Harness_Platform_Init(tHarness_platform* platform) {
     platform->GetMousePosition = get_mouse_position;
     platform->GetMouseButtons = get_mouse_buttons;
     platform->ShowErrorMessage = show_error_message;
-    platform->Renderer_SetPalette = set_palette;
-    platform->Renderer_Present = present_screen;
+
+    platform->CreateWindow_ = create_window;
+    platform->Swap = swap;
+    platform->PaletteChanged = palette_changed;
+    platform->GL_GetProcAddress = SDL_GL_GetProcAddress;
+    platform->GetViewport = get_viewport;
 }

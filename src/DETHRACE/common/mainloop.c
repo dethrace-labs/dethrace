@@ -590,6 +590,14 @@ tRace_result MainGameLoop(void) {
         EnterUserMessage();
         SkidsPerFrame();
         if (!gWait_for_it) {
+#if defined(DETHRACE_3DFX_PATCH) && defined(DETHRACE_FIX_BUGS)
+            // Fixes issue where returning to race mode from the UI shows 2d elements in the wrong colors for half a second.
+            // In 3dfx mode, 2d elements are rendered using `Copy8BitTo16BitRectangleWithTransparency` which uses
+            // `gCurrent_palette` to convert 8 bit to 16 bit pixels. `gCurrent_palette` is still set to the interface palette here
+            // I couldn't confirm why this does not happen in the original 3dfx executable (or does it?)
+            EnsureRenderPalette();
+            EnsurePaletteUp();
+#endif
             RenderAFrame(1);
         }
         CheckReplayTurnOn();

@@ -12,6 +12,7 @@
 #include "flicplay.h"
 #include "formats.h"
 #include "globvars.h"
+#include "globvrbm.h"
 #include "globvrpb.h"
 #include "graphics.h"
 #include "harness/trace.h"
@@ -486,6 +487,9 @@ int LoadNMaterials(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
         if (total == 0) {
             FatalError(kFatalError_LoadMaterialFile_S, str);
         }
+#ifdef DETHRACE_3DFX_PATCH
+        GlorifyMaterial(temp_array, total);
+#endif
         for (j = 0; j < total; j++) {
             if (temp_array[j]) {
                 switch (AddMaterialToStorage(pStorage_space, temp_array[j])) {
@@ -527,6 +531,9 @@ int LoadNModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
         PathCat(the_path, gApplication_path, "MODELS");
         PathCat(the_path, the_path, str);
         total = BrModelLoadMany(the_path, temp_array, 2000);
+#ifdef DETHRACE_3DFX_PATCH
+        WhitenVertexRGB(temp_array, total);
+#endif
         if (total == 0) {
             FatalError(kFatalError_LoadModelFile_S, str);
         }
@@ -662,7 +669,27 @@ void ProcessModelFaceMaterials2(br_model* pModel, tPMFM2CB pCallback) {
     tU16 group;
     br_material* old_mat;
     LOG_TRACE("(%p, %d)", pModel, pCallback);
-    NOT_IMPLEMENTED();
+
+    if (pModel->faces) {
+        for (f = 0; f < pModel->nfaces; f++) {
+            if (pModel->faces[f].material) {
+                pCallback(pModel->faces[f].material);
+            }
+        }
+    } else {
+        if (pModel->prepared == NULL) {
+            return;
+        }
+        for (group = 0; group < V11MODEL(pModel)->ngroups; group++) {
+            for (f = 0; f < V11MODEL(pModel)->groups[group].nfaces; f++) {
+                // old_mat = V11MODEL(pModel)->groups[group].face_colours[f];
+                old_mat = V11MODEL(pModel)->groups[group].user;
+                if (old_mat) {
+                    pCallback(old_mat);
+                }
+            }
+        }
+    }
 }
 
 // IDA: void __usercall ProcessModelFaceMaterials(br_model *pModel@<EAX>, tPMFMCB pCallback@<EDX>)
@@ -711,6 +738,9 @@ int LoadNTrackModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
         if (total == 0) {
             FatalError(kFatalError_LoadModelFile_S, str);
         }
+#ifdef DETHRACE_3DFX_PATCH
+        WhitenVertexRGB(temp_array, total);
+#endif
         for (j = 0; j < total; j++) {
             if (temp_array[j]) {
                 switch (AddModelToStorage(pStorage_space, temp_array[j])) {
@@ -1050,7 +1080,20 @@ br_uint_32 AddProximities(br_actor* pActor, br_material* pMat, tFunkotronic_spec
 void Adjust2FloatsForExceptions(float* pVictim1, float* pVictim2, br_pixelmap* pCulprit) {
     tException_list e;
     LOG_TRACE("(%p, %p, %p)", pVictim1, pVictim2, pCulprit);
-    NOT_IMPLEMENTED();
+
+    if (pCulprit && pCulprit->identifier != NULL) {
+        e = FindExceptionInList(pCulprit->identifier, gExceptions);
+        if (e) {
+            if ((e->flags & ExceptionFlag_Double) != 0) {
+                *pVictim1 = *pVictim1 * 2.0f;
+                *pVictim2 = *pVictim2 * 2.0f;
+            }
+            if ((e->flags & ExceptionFlag_Quadruple) != 0) {
+                *pVictim1 = *pVictim1 * 4.0f;
+                *pVictim2 = *pVictim2 * 4.0f;
+            }
+        }
+    }
 }
 
 // IDA: void __usercall AddFunkotronics(FILE *pF@<EAX>, int pOwner@<EDX>, int pRef_offset@<EBX>)
@@ -1204,6 +1247,10 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
                 the_funk->matrix_mod_data.roll_info.x_period = speed1 == 0.0f ? 0.0f : 1000.0f / speed1;
                 the_funk->matrix_mod_data.roll_info.y_period = speed2 == 0.0f ? 0.0f : 1000.0f / speed2;
             }
+#ifdef DETHRACE_3DFX_PATCH
+            Adjust2FloatsForExceptions(&the_funk->matrix_mod_data.roll_info.x_period, &the_funk->matrix_mod_data.roll_info.y_period, the_funk->material->colour_map);
+
+#endif
             break;
         default:
             break;
@@ -1267,11 +1314,18 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
                         193);
                 }
                 the_pixelmap = DRPixelmapAllocate(
+#ifdef DETHRACE_3DFX_PATCH
+                    BR_PMT_INDEX_8,
+#else
                     gScreen->type,
+#endif
                     the_funk->texture_animation_data.flic_info.flic_descriptor.width,
                     the_funk->texture_animation_data.flic_info.flic_descriptor.height,
                     the_pixels,
                     0);
+#ifdef DETHRACE_3DFX_PATCH
+                the_pixelmap = PurifiedPixelmap(the_pixelmap);
+#endif
                 AssertFlicPixelmap(&the_funk->texture_animation_data.flic_info.flic_descriptor, the_pixelmap);
                 the_funk->material->colour_map = the_pixelmap;
                 BrMaterialUpdate(the_funk->material, BR_MATU_ALL);
@@ -1826,7 +1880,15 @@ void SaveAdditionalStuff(void) {
 // IDA: br_uint_32 __cdecl ProcessMaterials(br_actor *pActor, tPMFM2CB pCallback)
 br_uint_32 ProcessMaterials(br_actor* pActor, tPMFM2CB pCallback) {
     LOG_TRACE("(%p, %d)", pActor, pCallback);
-    NOT_IMPLEMENTED();
+
+    if (pActor->material) {
+        pCallback(pActor->material);
+    }
+    if (pActor->type == BR_ACTOR_MODEL && pActor->model != NULL) {
+        ProcessModelFaceMaterials2(pActor->model, pCallback);
+    }
+
+    return BrActorEnum(pActor, (br_actor_enum_cbfn*)ProcessMaterials, pCallback);
 }
 
 // IDA: br_uint_32 __cdecl ProcessFaceMaterials2(br_actor *pActor, tPMFM2CB pCallback)
@@ -2340,7 +2402,9 @@ void ParseSpecialVolume(FILE* pF, tSpecial_volume* pSpec, char* pScreen_name_str
 // IDA: void __usercall AddExceptionToList(tException_list *pDst@<EAX>, tException_list pNew@<EDX>)
 void AddExceptionToList(tException_list* pDst, tException_list pNew) {
     LOG_TRACE("(%p, %d)", pDst, pNew);
-    NOT_IMPLEMENTED();
+
+    pNew->next = *pDst;
+    *pDst = pNew;
 }
 
 // IDA: void __usercall LoadExceptionsFile(char *pName@<EAX>)
@@ -2352,14 +2416,66 @@ void LoadExceptionsFile(char* pName) {
     tException_list e;
     char delimiters[4];
     LOG_TRACE("(\"%s\")", pName);
-    NOT_IMPLEMENTED();
+
+    strcpy(delimiters, "\t ,");
+    f = DRfopen(pName, "rt");
+    if (f) {
+        GetALineAndDontArgue(f, line);
+        tok = strtok(line, delimiters);
+        if (DRStricmp(tok, "VERSION")) {
+            FatalError(120, pName, "VERSION");
+        }
+        tok = strtok(NULL, delimiters);
+        if (sscanf(tok, "%d", &file_version) == 0 || file_version != 1) {
+            FatalError(121, tok, pName);
+        }
+
+        while (1) {
+            GetALineAndDontArgue(f, line);
+            tok = strtok(line, delimiters);
+            if (DRStricmp(tok, "end") == 0) {
+                break;
+            }
+            e = BrMemAllocate(sizeof(tException_list), kMem_misc);
+            e->name = BrMemAllocate(strlen(tok) + 1, kMem_misc_string);
+            strcpy(e->name, tok);
+            e->flags = 0;
+            while (1) {
+                tok = strtok(NULL, delimiters);
+                if (tok == NULL /*|| (IsTable[(unsigned __int8)(*v11 + 1)] & 0xE0) == 0*/) {
+                    break;
+                }
+                if (DRStricmp(tok, "mipmap") == 0) {
+                    e->flags |= ExceptionFlag_Mipmap;
+                } else if (DRStricmp(tok, "nobilinear") == 0) {
+                    e->flags |= ExceptionFlag_NoBilinear;
+                } else if (DRStricmp(tok, "double") == 0) {
+                    e->flags |= ExceptionFlag_Double;
+                } else if (DRStricmp(tok, "quadruple") == 0) {
+                    e->flags |= ExceptionFlag_Quadruple;
+                } else {
+                    FatalError(123, tok, pName);
+                }
+            }
+            AddExceptionToList(&gExceptions, e);
+        }
+        fclose(f);
+    }
 }
 
 // IDA: void __usercall LoadExceptionsFileForTrack(char *pTrack_file_name@<EAX>)
 void LoadExceptionsFileForTrack(char* pTrack_file_name) {
     tPath_name exceptions_file_name;
     LOG_TRACE("(\"%s\")", pTrack_file_name);
-    NOT_IMPLEMENTED();
+
+    sprintf(
+        exceptions_file_name,
+        "%s%s%s%s",
+        pTrack_file_name,
+        gDir_separator,
+        gExceptions_general_file,
+        gExceptions_file_suffix);
+    LoadExceptionsFile(exceptions_file_name);
 }
 
 // IDA: void __cdecl FreeExceptions()
@@ -2367,7 +2483,17 @@ void FreeExceptions(void) {
     tException_list list;
     tException_list next;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    list = gExceptions;
+    if (list) {
+        do {
+            next = list->next;
+            BrMemFree(list->name);
+            BrMemFree(list);
+            list = next;
+        } while (next);
+    }
+    gExceptions = NULL;
 }
 
 // IDA: void __usercall LoadTrack(char *pFile_name@<EAX>, tTrack_spec *pTrack_spec@<EDX>, tRace_info *pRace_info@<EBX>)
@@ -2418,6 +2544,9 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     killed_sky = 0;
     PathCat(the_path, gApplication_path, "RACES");
     PathCat(the_path, the_path, pFile_name);
+#ifdef DETHRACE_3DFX_PATCH
+    LoadExceptionsFileForTrack(the_path);
+#endif
     f = DRfopen(the_path, "rt");
     if (f == NULL) {
         FatalError(kFatalError_OpenRacesFile);
@@ -2524,15 +2653,20 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
         LoadSomeMaterials(&gTrack_storage_space, f);
         SkipNLines(f);
     }
-    for (i = 0; gTrack_storage_space.materials_count > i; ++i) {
-        PossibleService();
-        if (gTrack_storage_space.materials[i]->flags & (BR_MATF_LIGHT | BR_MATF_PRELIT | BR_MATF_SMOOTH)) {
-            gTrack_storage_space.materials[i]->flags &= ~(BR_MATF_LIGHT | BR_MATF_PRELIT | BR_MATF_SMOOTH);
-            if (gTrack_storage_space.materials[i]->flags & BR_MATF_TWO_SIDED) {
-                gTrack_storage_space.materials[i]->user = DOUBLESIDED_USER_FLAG;
-                gTrack_storage_space.materials[i]->flags &= ~BR_MATF_TWO_SIDED;
+#ifdef DETHRACE_3DFX_PATCH
+    if (!gShade_tables_do_not_work)
+#endif
+    {
+        for (i = 0; i < gTrack_storage_space.materials_count; i++) {
+            PossibleService();
+            if (gTrack_storage_space.materials[i]->flags & (BR_MATF_LIGHT | BR_MATF_PRELIT | BR_MATF_SMOOTH)) {
+                gTrack_storage_space.materials[i]->flags &= ~(BR_MATF_LIGHT | BR_MATF_PRELIT | BR_MATF_SMOOTH);
+                if (gTrack_storage_space.materials[i]->flags & BR_MATF_TWO_SIDED) {
+                    gTrack_storage_space.materials[i]->user = DOUBLESIDED_USER_FLAG;
+                    gTrack_storage_space.materials[i]->flags &= ~BR_MATF_TWO_SIDED;
+                }
+                BrMaterialUpdate(gTrack_storage_space.materials[i], BR_MATU_RENDERING);
             }
-            BrMaterialUpdate(gTrack_storage_space.materials[i], BR_MATU_RENDERING);
         }
     }
     if (gRace_file_version <= 5) {
@@ -2653,6 +2787,8 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
         gProgram_state.default_depth_effect.start = 7;
         gProgram_state.default_depth_effect.end = 0;
     }
+#ifndef DETHRACE_3DFX_PATCH
+    // In the 3dfx patch this code was moved into `InitRace`
     InstantDepthChange(
         gProgram_state.default_depth_effect.type,
         gProgram_state.default_depth_effect.sky_texture,
@@ -2666,6 +2802,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     if (!GetDepthCueingOn()) {
         ToggleDepthCueingQuietly();
     }
+#endif
     PossibleService();
     gDefault_engine_noise_index = GetAnInt(f);
     gDefault_water_spec_vol = &gDefault_default_water_spec_vol;
@@ -2810,6 +2947,13 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
             strcat(str, ".MAT");
             material = LoadSingleMaterial(&gTrack_storage_space, str);
             pRace_info->material_modifiers[i].skid_mark_material = material;
+#ifdef DETHRACE_3DFX_PATCH
+            if (material != NULL) {
+                GlorifyMaterial(&material, 1);
+                BrMaterialUpdate(material, BR_MATU_ALL);
+            }
+#endif
+
 #if defined(DETHRACE_FIX_BUGS)
             skid_mark_cnt++;
 #endif
@@ -2905,6 +3049,9 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
         FatalError(kFatalError_FileCorrupt_S, pFile_name);
     }
     fclose(f);
+#ifdef DETHRACE_3DFX_PATCH
+    FreeExceptions();
+#endif
 }
 
 // IDA: br_uint_32 __cdecl RemoveBounds(br_actor *pActor, void *pArg)
@@ -3000,46 +3147,46 @@ br_scalar NormaliseDegreeAngle(br_scalar pAngle) {
 
 #define SAW(T, PERIOD) (fmodf((T), (PERIOD)) / (PERIOD))
 
-#define MOVE_FUNK_PARAMETER(DEST, MODE, PERIOD, AMPLITUDE, FLASH_VALUE)                   \
-    do {                                                                                  \
-        switch (MODE) {                                                                   \
-        case eMove_continuous:                                                            \
-            if ((PERIOD) == 0.f) {                                                        \
-                DEST = 0.f;                                                               \
-            } else {                                                                      \
-                DEST = (AMPLITUDE)*SAW(f_the_time, (PERIOD));                             \
-            }                                                                             \
-            break;                                                                        \
-        case eMove_controlled:                                                            \
-            DEST = (PERIOD) * (AMPLITUDE);                                                \
-            break;                                                                        \
-        case eMove_absolute:                                                              \
-            DEST = (PERIOD);                                                              \
-            break;                                                                        \
-        case eMove_linear:                                                                \
-            if ((PERIOD) == 0.f) {                                                        \
-                DEST = 0.f;                                                               \
-            } else {                                                                      \
-                DEST = (AMPLITUDE)*MapSawToTriangle(SAW(f_the_time, (PERIOD)));           \
-            }                                                                             \
-            break;                                                                        \
-        case eMove_flash:                                                                 \
-            if (2 * fmodf(f_the_time, (PERIOD)) > (PERIOD)) {                             \
-                DEST = (FLASH_VALUE);                                                     \
-            } else {                                                                      \
-                DEST = -(FLASH_VALUE);                                                    \
-            }                                                                             \
-            break;                                                                        \
-        case eMove_harmonic:                                                              \
-            if ((PERIOD) == 0.f) {                                                        \
-                DEST = 0.f;                                                               \
-            } else {                                                                      \
-                DEST = (AMPLITUDE)*BR_SIN(BR_ANGLE_DEG(SAW(f_the_time, (PERIOD)) * 360)); \
-            }                                                                             \
-            break;                                                                        \
-        default:                                                                          \
-            TELL_ME_IF_WE_PASS_THIS_WAY();                                                \
-        }                                                                                 \
+#define MOVE_FUNK_PARAMETER(DEST, MODE, PERIOD, AMPLITUDE, FLASH_VALUE)                     \
+    do {                                                                                    \
+        switch (MODE) {                                                                     \
+        case eMove_continuous:                                                              \
+            if ((PERIOD) == 0.f) {                                                          \
+                DEST = 0.f;                                                                 \
+            } else {                                                                        \
+                DEST = (AMPLITUDE) * SAW(f_the_time, (PERIOD));                             \
+            }                                                                               \
+            break;                                                                          \
+        case eMove_controlled:                                                              \
+            DEST = (PERIOD) * (AMPLITUDE);                                                  \
+            break;                                                                          \
+        case eMove_absolute:                                                                \
+            DEST = (PERIOD);                                                                \
+            break;                                                                          \
+        case eMove_linear:                                                                  \
+            if ((PERIOD) == 0.f) {                                                          \
+                DEST = 0.f;                                                                 \
+            } else {                                                                        \
+                DEST = (AMPLITUDE) * MapSawToTriangle(SAW(f_the_time, (PERIOD)));           \
+            }                                                                               \
+            break;                                                                          \
+        case eMove_flash:                                                                   \
+            if (2 * fmodf(f_the_time, (PERIOD)) > (PERIOD)) {                               \
+                DEST = (FLASH_VALUE);                                                       \
+            } else {                                                                        \
+                DEST = -(FLASH_VALUE);                                                      \
+            }                                                                               \
+            break;                                                                          \
+        case eMove_harmonic:                                                                \
+            if ((PERIOD) == 0.f) {                                                          \
+                DEST = 0.f;                                                                 \
+            } else {                                                                        \
+                DEST = (AMPLITUDE) * BR_SIN(BR_ANGLE_DEG(SAW(f_the_time, (PERIOD)) * 360)); \
+            }                                                                               \
+            break;                                                                          \
+        default:                                                                            \
+            TELL_ME_IF_WE_PASS_THIS_WAY();                                                  \
+        }                                                                                   \
     } while (0)
 
 // IDA: void __cdecl FunkThoseTronics()

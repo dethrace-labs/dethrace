@@ -4,6 +4,7 @@
 #include "errors.h"
 #include "flicplay.h"
 #include "globvars.h"
+#include "globvrbm.h"
 #include "globvrpb.h"
 #include "grafdata.h"
 #include "graphics.h"
@@ -313,14 +314,28 @@ void PratcamEvent(int pIndex) {
 int HighResPratBufferWidth(void) {
     int prat_width;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (!gDevious_2d || !gTextures_need_powers_of_2) {
+        return 104;
+    }
+    for (prat_width = 1; prat_width < 104; prat_width *= 2) {
+        ;
+    }
+    return prat_width;
 }
 
 // IDA: int __cdecl HighResPratBufferHeight()
 int HighResPratBufferHeight(void) {
     int prat_height;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (!gDevious_2d || !gTextures_need_powers_of_2) {
+        return 110;
+    }
+    for (prat_height = 1; prat_height < 110; prat_height *= 2) {
+        ;
+    }
+    return prat_height;
 }
 
 // IDA: void __cdecl InitPratcam()
@@ -339,7 +354,11 @@ void InitPratcam(void) {
         the_pixels = BrMemAllocate(52 * 46, kMem_pratcam_pixelmap);
         break;
     case 1:
+#ifdef DETHRACE_3DFX_PATCH
+        the_pixels = BrMemAllocate(HighResPratBufferWidth() * HighResPratBufferHeight(), kMem_pratcam_pixelmap);
+#else
         the_pixels = BrMemAllocate(104 * 110, kMem_pratcam_pixelmap);
+#endif
         break;
     default:
         TELL_ME_IF_WE_PASS_THIS_WAY();
@@ -352,7 +371,11 @@ void InitPratcam(void) {
         gPrat_buffer = DRPixelmapAllocate(gScreen->type, 52, 46, the_pixels, 0);
         break;
     case 1:
+#ifdef DETHRACE_3DFX_PATCH
+        gPrat_buffer = DRPixelmapAllocate(BR_PMT_INDEX_8, HighResPratBufferWidth(), HighResPratBufferHeight(), the_pixels, 0);
+#else
         gPrat_buffer = DRPixelmapAllocate(gScreen->type, 104, 110, the_pixels, 0);
+#endif
         break;
     default:
         TELL_ME_IF_WE_PASS_THIS_WAY();
@@ -420,15 +443,15 @@ void DoPratcam(tU32 pThe_time) {
     tU32 time_diff;
     tU32 old_last_time;
     br_pixelmap* the_image;
-    br_pixelmap* left_image;
     br_pixelmap* right_image;
+    br_pixelmap* left_image;
     LOG_TRACE("(%d)", pThe_time);
 
     if (gAusterity_mode) {
         return;
     }
-    left_image = gProgram_state.current_car.prat_cam_right;
-    right_image = gProgram_state.current_car.prat_cam_left;
+    right_image = gProgram_state.current_car.prat_cam_right;
+    left_image = gProgram_state.current_car.prat_cam_left;
     y_offset = (gNet_mode == eNet_mode_none) ? 0 : gCurrent_graf_data->net_head_box_bot + 1;
 
     right_hand = gProgram_state.current_car.prat_left <= gBack_screen->width / 2;
@@ -461,6 +484,7 @@ void DoPratcam(tU32 pThe_time) {
     if (right_hand) {
         offset = -offset;
     }
+
     DontLetFlicFuckWithPalettes();
     DisableTranslationText();
     for (i = 0; i < (old_last_time != 0 ? ((pThe_time - old_last_time) / gPrat_flic.frame_period) : 1); i++) {
@@ -472,12 +496,49 @@ void DoPratcam(tU32 pThe_time) {
     }
     EnableTranslationText();
     LetFlicFuckWithPalettes();
-    BrPixelmapRectangleCopy(gBack_screen,
+
+#ifdef DETHRACE_3DFX_PATCH
+    PDUnlockRealBackScreen(1);
+    if (gDevious_2d) {
+        gPrat_model->vertices[1].p.v[0] = gProgram_state.current_car.prat_left + offset;
+        gPrat_model->vertices[0].p.v[0] = gProgram_state.current_car.prat_left + offset;
+        gPrat_model->vertices[3].p.v[1] = -(y_offset + gProgram_state.current_car.prat_top);
+        gPrat_model->vertices[0].p.v[1] = -(y_offset + gProgram_state.current_car.prat_top);
+
+        gPrat_model->vertices[3].p.v[0] = gPrat_model->vertices[1].p.v[0] + 104.0f;
+        gPrat_model->vertices[2].p.v[0] = gPrat_model->vertices[1].p.v[0] + 104.0f;
+
+        gPrat_model->vertices[2].p.v[1] = gPrat_model->vertices[3].p.v[1] - 110.0f;
+        gPrat_model->vertices[1].p.v[1] = gPrat_model->vertices[3].p.v[1] - 110.0f;
+        BrModelUpdate(gPrat_model, BR_MODU_VERTEX_POSITIONS);
+        gPrat_actor->render_style = BR_RSTYLE_FACES;
+        gPrat_material->colour_map = gPrat_buffer;
+        gPrat_buffer->map = gRender_palette;
+        BrMapAdd(gPrat_buffer);
+        BrMaterialUpdate(gPrat_material, BR_MATU_ALL);
+        BrZbSceneRender(g2d_camera, g2d_camera, gBack_screen, gDepth_buffer);
+        BrMapRemove(gPrat_buffer);
+        gPrat_actor->render_style = BR_RSTYLE_NONE;
+    } else {
+        DRPixelmapRectangleCopy(
+            gBack_screen,
+            gProgram_state.current_car.prat_left + offset,
+            gProgram_state.current_car.prat_top + y_offset,
+            gPrat_buffer,
+            0, 0,
+            gPrat_buffer->width, gPrat_buffer->height);
+    }
+    PDLockRealBackScreen(1);
+#else
+    BrPixelmapRectangleCopy(
+        gBack_screen,
         gProgram_state.current_car.prat_left + offset,
         gProgram_state.current_car.prat_top + y_offset,
         gPrat_buffer,
         0, 0,
         gPrat_buffer->width, gPrat_buffer->height);
+#endif
+
     if (gProgram_state.current_car.prat_cam_top != NULL) {
         top_border_height = gProgram_state.current_car.prat_cam_top->height;
         DRPixelmapRectangleMaskedCopy(
@@ -491,22 +552,22 @@ void DoPratcam(tU32 pThe_time) {
     } else {
         top_border_height = 0;
     }
-    if (right_image != NULL) {
-        DRPixelmapRectangleMaskedCopy(gBack_screen,
-            gProgram_state.current_car.prat_left - right_image->width + offset,
-            gProgram_state.current_car.prat_top - top_border_height + y_offset,
-            right_image,
-            0, 0,
-            right_image->width, right_image->height);
-    }
     if (left_image != NULL) {
+        DRPixelmapRectangleMaskedCopy(gBack_screen,
+            gProgram_state.current_car.prat_left - left_image->width + offset,
+            gProgram_state.current_car.prat_top - top_border_height + y_offset,
+            left_image,
+            0, 0,
+            left_image->width, left_image->height);
+    }
+    if (right_image != NULL) {
         DRPixelmapRectangleMaskedCopy(
             gBack_screen,
             gProgram_state.current_car.prat_right + offset - 1,
             gProgram_state.current_car.prat_top - top_border_height - 1 + y_offset,
-            left_image,
+            right_image,
             0, 0,
-            left_image->width, left_image->height);
+            right_image->width, right_image->height);
     }
     if (gProgram_state.current_car.prat_cam_bottom != NULL) {
         DRPixelmapRectangleMaskedCopy(

@@ -4,11 +4,14 @@
 #include "displays.h"
 #include "errors.h"
 #include "globvars.h"
+#include "globvrbm.h"
 #include "globvrkm.h"
 #include "globvrpb.h"
 #include "harness/hooks.h"
 #include "harness/trace.h"
+#include "init.h"
 #include "pd/sys.h"
+#include "pedestrn.h"
 #include "replay.h"
 #include "spark.h"
 #include "trig.h"
@@ -99,7 +102,8 @@ br_scalar CalculateWrappingMultiplier(br_scalar pValue, br_scalar pYon) {
 // IDA: br_scalar __usercall DepthCueingShiftToDistance@<ST0>(int pShift@<EAX>)
 br_scalar DepthCueingShiftToDistance(int pShift) {
     LOG_TRACE("(%d)", pShift);
-    NOT_IMPLEMENTED();
+
+    return powf(10.0f, pShift * 0.1f) * gCamera_yon;
 }
 
 // IDA: void __usercall FogAccordingToGPSCDE(br_material *pMaterial@<EAX>)
@@ -107,7 +111,29 @@ void FogAccordingToGPSCDE(br_material* pMaterial) {
     int start;
     int end;
     LOG_TRACE("(%p)", pMaterial);
-    NOT_IMPLEMENTED();
+
+    start = gProgram_state.current_depth_effect.start;
+    end = gProgram_state.current_depth_effect.end;
+
+    switch (gProgram_state.current_depth_effect.type) {
+    case eDepth_effect_darkness:
+        pMaterial->fog_min = DepthCueingShiftToDistance(-start);
+        pMaterial->fog_colour = BR_COLOUR_RGB(0, 0, 0);
+        pMaterial->flags |= BR_MATF_FOG_LOCAL;
+        pMaterial->fog_max = DepthCueingShiftToDistance(end);
+        break;
+    case eDepth_effect_fog:
+        pMaterial->fog_min = DepthCueingShiftToDistance(-start);
+        pMaterial->fog_colour = BR_COLOUR_RGB(248, 248, 248);
+        pMaterial->flags |= BR_MATF_FOG_LOCAL;
+        pMaterial->fog_max = DepthCueingShiftToDistance(end);
+        break;
+    case eDepth_effect_none:
+        pMaterial->flags &= ~BR_MATF_FOG_LOCAL;
+        break;
+    }
+
+    BrMaterialUpdate(pMaterial, BR_MATU_ALL);
 }
 
 // IDA: void __cdecl FrobFog()
@@ -115,7 +141,27 @@ void FrobFog(void) {
     int i;
     br_material* mat;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    if (gTrack_actor) {
+        ProcessMaterials(gTrack_actor, (tPMFM2CB*)FogAccordingToGPSCDE);
+    }
+    if (gNon_track_actor) {
+        ProcessMaterials(gNon_track_actor, (tPMFM2CB*)FogAccordingToGPSCDE);
+    }
+    for (i = 0; i < COUNT_OF(gMaterial); i++) {
+        mat = gMaterial[i];
+        FogAccordingToGPSCDE(mat);
+    }
+    for (i = 0; i < COUNT_OF(gCurrent_race.material_modifiers); i++) {
+        mat = gCurrent_race.material_modifiers[i].skid_mark_material;
+        if (mat) {
+            FogAccordingToGPSCDE(mat);
+        }
+    }
+    FogAccordingToGPSCDE(gDefault_track_material);
+    if (gPed_material) {
+        FogAccordingToGPSCDE(gPed_material);
+    }
 }
 
 // IDA: void __usercall InstantDepthChange(tDepth_effect_type pType@<EAX>, br_pixelmap *pSky_texture@<EDX>, int pStart@<EBX>, int pEnd@<ECX>)
@@ -136,6 +182,12 @@ void InstantDepthChange(tDepth_effect_type pType, br_pixelmap* pSky_texture, int
     gProgram_state.default_depth_effect.type = pType;
     gProgram_state.default_depth_effect.start = pStart;
     gProgram_state.default_depth_effect.end = pEnd;
+
+#ifdef DETHRACE_3DFX_PATCH
+    if (gMaterial_fogging) {
+        FrobFog();
+    }
+#endif
 }
 
 // IDA: br_scalar __cdecl Tan(br_scalar pAngle)
@@ -338,14 +390,19 @@ void InitDepthEffects(void) {
     if (gHorizon_material == NULL) {
         FatalError(kFatalError_FindSkyMaterial_S, "HORIZON.MAT"); // 2nd argument added
     }
-    gHorizon_material->index_blend = BrPixelmapAllocate(BR_PMT_INDEX_8, 256, 256, NULL, 0);
-    BrTableAdd(gHorizon_material->index_blend);
-    for (i = 0; i < 256; i++) {
-        for (j = 0; j < 256; j++) {
-            *((tU8*)gHorizon_material->index_blend->pixels + 256 * i + j) = j;
+#ifdef DETHRACE_3DFX_PATCH
+    if (gScreen->type == BR_PMT_INDEX_8 && !gMaterial_fogging)
+#endif
+    {
+        gHorizon_material->index_blend = BrPixelmapAllocate(BR_PMT_INDEX_8, 256, 256, NULL, 0);
+        BrTableAdd(gHorizon_material->index_blend);
+        for (i = 0; i < 256; i++) {
+            for (j = 0; j < 256; j++) {
+                *((tU8*)gHorizon_material->index_blend->pixels + 256 * i + j) = j;
+            }
         }
+        gHorizon_material->flags |= BR_MATF_PERSPECTIVE;
     }
-    gHorizon_material->flags |= BR_MATF_PERSPECTIVE;
     BrMaterialAdd(gHorizon_material);
     gForward_sky_model = CreateHorizonModel(gCamera);
     gRearview_sky_model = CreateHorizonModel(gRearview_camera);
@@ -520,9 +577,15 @@ void DoHorizon(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor
     LOG_TRACE("(%p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world);
 
     yaw = BrRadianToAngle(atan2f(pCamera_to_world->m[2][0], pCamera_to_world->m[2][2]));
-    if (!gProgram_state.cockpit_on && !(gAction_replay_mode && gAction_replay_camera_mode)) {
+    if (!gProgram_state.cockpit_on && !gAction_replay_mode && gAction_replay_camera_mode != eAction_replay_standard
+
+#ifdef DETHRACE_3DFX_PATCH
+        && !gBlitting_is_slow
+#endif
+    ) {
         return;
     }
+
     if (gRendering_mirror) {
         actor = gRearview_sky_actor;
     } else {
@@ -577,6 +640,11 @@ void DoFog(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer) {
 void DepthEffect(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world) {
     LOG_TRACE("(%p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world);
 
+#ifdef DETHRACE_3DFX_PATCH
+    if (gMaterial_fogging) {
+        return;
+    }
+#endif
     if (gProgram_state.current_depth_effect.type == eDepth_effect_darkness) {
         DoDepthCue(pRender_buffer, pDepth_buffer);
     }

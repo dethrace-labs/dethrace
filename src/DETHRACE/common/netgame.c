@@ -7,6 +7,7 @@
 #include "displays.h"
 #include "errors.h"
 #include "globvars.h"
+#include "globvrbm.h"
 #include "globvrpb.h"
 #include "grafdata.h"
 #include "graphics.h"
@@ -1531,6 +1532,7 @@ void ReceivedGameplay(tNet_contents* pContents, tNet_message* pMessage, tU32 pRe
             FadePaletteDown();
             memcpy(gBack_screen->pixels, gPixels_copy, gPixel_buffer_size);
             memcpy(gCurrent_palette_pixels, gPalette_copy, 1024);
+            g16bit_palette_valid = 0;
             BrMemFree(gPixels_copy);
             BrMemFree(gPalette_copy);
             PDScreenBufferSwap(0);

@@ -10,6 +10,7 @@
 #include "finteray.h"
 #include "flicplay.h"
 #include "globvars.h"
+#include "globvrbm.h"
 #include "globvrpb.h"
 #include "grafdata.h"
 #include "harness/hooks.h"
@@ -336,6 +337,11 @@ void DRDrawLine(br_pixelmap* pDestn, int pX1, int pY1, int pX2, int pY2, int pCo
     int the_diff;
     LOG_TRACE("(%p, %d, %d, %d, %d, %d)", pDestn, pX1, pY1, pX2, pY2, pColour);
 
+#ifdef DETHRACE_3DFX_PATCH
+    if (gBack_screen->type == BR_PMT_RGB_565) {
+        pColour = PaletteEntry16Bit(gRender_palette, pColour);
+    }
+#endif
     BrPixelmapLine(pDestn, pX1, pY1, pX2, pY2, pColour);
 }
 
@@ -425,7 +431,10 @@ void CopyWords(char* pDst, char* pSrc, int pN) {
     tU16* dst;
     tU16* src;
     LOG_TRACE("(\"%s\", \"%s\", %d)", pDst, pSrc, pN);
-    NOT_IMPLEMENTED();
+
+    dst = (tU16*)pDst;
+    src = (tU16*)pSrc;
+    BrMemCpy(dst, src, pN);
 }
 
 // IDA: void __usercall Copy8BitStripImageTo16Bit(br_pixelmap *pDest@<EAX>, br_int_16 pDest_x@<EDX>, br_int_16 pOffset_x@<EBX>, br_int_16 pDest_y@<ECX>, br_int_16 pOffset_y, tS8 *pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_uint_16 pWidth, br_uint_16 pHeight)
@@ -442,7 +451,66 @@ void Copy8BitStripImageTo16Bit(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 
     char* destn_ptr;
     char* destn_ptr2;
     LOG_TRACE("(%p, %d, %d, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pOffset_x, pDest_y, pOffset_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
-    NOT_IMPLEMENTED();
+
+    height = *(uint16_t*)pSource;
+    pSource = pSource + 2;
+    if (pDest_y + pOffset_y >= 0) {
+        destn_ptr = (char*)pDest->pixels + pDest->row_bytes * (pDest_y + pOffset_y);
+    } else {
+        pSource = SkipLines(pSource, -pDest_y - pOffset_y);
+        destn_ptr = (char*)pDest->pixels;
+        height += pDest_y + pOffset_y;
+        pOffset_y = 0;
+        pDest_y = 0;
+    }
+
+    if (height + pDest_y + pOffset_y > pDest->height) {
+        height = pDest->height - pDest_y - pOffset_y;
+    }
+    if (gBack_screen->type == BR_PMT_RGB_565) {
+        pDest_x *= 2;
+        pOffset_x *= 2;
+        if (pDest_x + pOffset_x > 0) {
+            destn_ptr += 2 * pDest_x + 2 * pOffset_x;
+        }
+        destn_width = 2 * pDest->width;
+    }
+    for (i = 0; i < height; i++) {
+        number_of_chunks = *pSource;
+        pSource++;
+        destn_ptr2 = destn_ptr;
+
+        x_byte = pOffset_x + pDest_x;
+        for (j = 0; j < number_of_chunks; j++) {
+            chunk_length = *pSource;
+            pSource++;
+            if (chunk_length >= 0) {
+                old_x_byte = x_byte;
+                x_byte += chunk_length;
+                if (old_x_byte >= 0) {
+                    destn_ptr2 += chunk_length;
+                } else if (x_byte > 0) {
+                    destn_ptr2 += chunk_length + old_x_byte;
+                }
+            } else {
+                old_x_byte = x_byte;
+                x_byte += -chunk_length;
+                if (old_x_byte >= 0) {
+                    if (destn_width >= x_byte) {
+                        CopyWords(destn_ptr2, (char*)pSource, -chunk_length);
+                        destn_ptr2 += -chunk_length;
+                    } else if (old_x_byte < destn_width) {
+                        CopyWords(destn_ptr2, (char*)pSource, destn_width - old_x_byte);
+                    }
+                } else if (x_byte > 0) {
+                    CopyWords(destn_ptr2, (char*)&pSource[-old_x_byte], -chunk_length + old_x_byte);
+                    destn_ptr2 += -chunk_length + old_x_byte;
+                }
+                pSource += -chunk_length;
+            }
+        }
+        destn_ptr += pDest->row_bytes;
+    }
 }
 
 // IDA: void __usercall CopyStripImage(br_pixelmap *pDest@<EAX>, br_int_16 pDest_x@<EDX>, br_int_16 pOffset_x@<EBX>, br_int_16 pDest_y@<ECX>, br_int_16 pOffset_y, tS8 *pSource, br_int_16 pSource_x, br_int_16 pSource_y, br_uint_16 pWidth, br_uint_16 pHeight)
@@ -459,6 +527,21 @@ void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
     char* destn_ptr;
     char* destn_ptr2;
     LOG_TRACE8("(%p, %d, %d, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pOffset_x, pDest_y, pOffset_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
+
+    if (gBack_screen->type == BR_PMT_RGB_565) {
+        Copy8BitStripImageTo16Bit(
+            pDest,
+            pDest_x,
+            pOffset_x,
+            pDest_y,
+            pOffset_y,
+            pSource,
+            pSource_x,
+            pSource_y,
+            pWidth,
+            pHeight);
+        return;
+    }
 
     height = *(uint16_t*)pSource;
     pSource = pSource + 2;
@@ -549,6 +632,7 @@ void SetBRenderScreenAndBuffers(int pX_offset, int pY_offset, int pWidth, int pH
     if (gDepth_buffer == NULL) {
         FatalError(kFatalError_AllocateZBuffer);
     }
+
     BrZbBegin(gRender_screen->type, gDepth_buffer->type);
     gBrZb_initialized = 1;
 }
@@ -563,7 +647,7 @@ void SetIntegerMapRenders(void) {
     gMap_render_height_i = ((int)gMap_render_height) & ~1;
     if (gReal_graf_data_index != 0) {
         gMap_render_x_i = 2 * gMap_render_x_i;
-        gMap_render_y_i = 2 * gMap_render_y_i + 40;
+        gMap_render_y_i = 2 * gMap_render_y_i + HIRES_Y_OFFSET;
         gMap_render_width_i = 2 * gMap_render_width_i;
         gMap_render_height_i = 2 * gMap_render_height_i;
     }
@@ -641,6 +725,9 @@ void DRSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
         ((br_int_32*)pPalette->pixels)[0] = 0;
     }
     memcpy(gCurrent_palette_pixels + 4 * pFirst_colour, (char*)pPalette->pixels + 4 * pFirst_colour, 4 * pCount);
+#ifdef DETHRACE_3DFX_PATCH
+    g16bit_palette_valid = 0;
+#endif
     if (!gFaded_palette) {
         PDSetPaletteEntries(pPalette, pFirst_colour, pCount);
     }
@@ -653,6 +740,9 @@ void DRSetPalette3(br_pixelmap* pThe_palette, int pSet_current_palette) {
 
     if (pSet_current_palette) {
         memcpy(gCurrent_palette_pixels, pThe_palette->pixels, 0x400u);
+#ifdef DETHRACE_3DFX_PATCH
+        g16bit_palette_valid = 0;
+#endif
     }
     if (!gFaded_palette) {
         PDSetPalette(pThe_palette);
@@ -667,6 +757,9 @@ void DRSetPalette2(br_pixelmap* pThe_palette, int pSet_current_palette) {
     ((br_int_32*)pThe_palette->pixels)[0] = 0;
     if (pSet_current_palette) {
         memcpy(gCurrent_palette_pixels, pThe_palette->pixels, 0x400u);
+#ifdef DETHRACE_3DFX_PATCH
+        g16bit_palette_valid = 0;
+#endif
     }
     if (!gFaded_palette) {
         PDSetPalette(pThe_palette);
@@ -685,11 +778,18 @@ void DRSetPalette(br_pixelmap* pThe_palette) {
 void InitializePalettes(void) {
     int j;
     gCurrent_palette_pixels = BrMemAllocate(0x400u, kMem_cur_pal_pixels);
+#ifdef DETHRACE_3DFX_PATCH
+    g16bit_palette_valid = 0;
+#endif
+
     gCurrent_palette = DRPixelmapAllocate(BR_PMT_RGBX_888, 1u, 256, gCurrent_palette_pixels, 0);
     gRender_palette = BrTableFind("DRRENDER.PAL");
     if (gRender_palette == NULL) {
         FatalError(kFatalError_RequiredPalette);
     }
+#ifdef DETHRACE_3DFX_PATCH
+    NobbleNonzeroBlacks(gRender_palette);
+#endif
     gOrig_render_palette = BrPixelmapAllocateSub(gRender_palette, 0, 0, gRender_palette->width, gRender_palette->height);
     gOrig_render_palette->pixels = BrMemAllocate(0x400u, kMem_render_pal_pixels);
     memcpy(gOrig_render_palette->pixels, gRender_palette->pixels, 0x400u);
@@ -954,7 +1054,7 @@ void DrawMapBlip(tCar_spec* pCar, tU32 pTime, br_matrix34* pTrans, br_vector3* p
         break;
     case 1:
         map_pos.v[0] = map_pos.v[0] * 2.f;
-        map_pos.v[1] = map_pos.v[1] * 2.f + 40.f;
+        map_pos.v[1] = map_pos.v[1] * 2.f + HIRES_Y_OFFSET;
         break;
     default:
         TELL_ME_IF_WE_PASS_THIS_WAY();
@@ -962,6 +1062,13 @@ void DrawMapBlip(tCar_spec* pCar, tU32 pTime, br_matrix34* pTrans, br_vector3* p
     period = 256; // Must be power of 2
     colours[0] = pColour;
     colours[1] = OppositeColour(pColour);
+
+#ifdef DETHRACE_3DFX_PATCH
+    if (gBack_screen->type != BR_PMT_INDEX_8) {
+        colours[0] = PaletteEntry16Bit(gRender_palette, colours[0]);
+        colours[1] = PaletteEntry16Bit(gRender_palette, colours[1]);
+    }
+#endif
     BrMatrix34Mul(&car_in_map_space, pTrans, &gCurrent_race.map_transformation);
     bearing = FastScalarArcTan2(car_in_map_space.m[2][0], car_in_map_space.m[2][1]);
 
@@ -1029,10 +1136,20 @@ void DrawMapSmallBlip(tU32 pTime, br_vector3* pPos, int pColour) {
         BrMatrix34ApplyP(&map_pos, pPos, &gCurrent_race.map_transformation);
         if (gReal_graf_data_index != 0) {
             map_pos.v[0] = 2.f * map_pos.v[0];
-            map_pos.v[1] = 2.f * map_pos.v[1] + 40.f;
+            map_pos.v[1] = 2.f * map_pos.v[1] + HIRES_Y_OFFSET;
         }
-        offset = (int)map_pos.v[0] + gBack_screen->row_bytes * (int)map_pos.v[1];
-        ((br_uint_8*)gBack_screen->pixels)[offset] = pColour;
+#ifdef DETHRACE_3DFX_PATCH
+        if (gBack_screen->type == BR_PMT_RGB_565) {
+            offset = ((int)map_pos.v[0] * 2) + gBack_screen->row_bytes * (int)map_pos.v[1];
+            pColour = PaletteEntry16Bit(gRender_palette, pColour);
+            br_uint_8* p1 = &(((br_uint_8*)gBack_screen->pixels)[offset]);
+            *((br_uint_16*)(p1)) = pColour;
+        } else
+#endif
+        {
+            offset = (int)map_pos.v[0] + gBack_screen->row_bytes * (int)map_pos.v[1];
+            ((br_uint_8*)gBack_screen->pixels)[offset] = pColour;
+        }
     }
 }
 
@@ -1081,7 +1198,7 @@ void TryThisEdge(tCar_spec* pCar, br_vector3* pLight, int pIndex_1, br_scalar pS
     dot_2 = pSign_2 * pLight->v[pIndex_2];
     mult = dot_1 * dot_2;
     if (mult < 0 || (mult == 0 && (dot_1 > 0 || dot_2 > 0))) {
-        if (gShadow_clip_plane_count < 6) {
+        if (gShadow_clip_plane_count < BR_MAX_CLIP_PLANES) {
             MungeClipPlane(pLight, pCar, &gShadow_points[pPoint_index_1], &gShadow_points[pPoint_index_2], pY_offset);
         }
     }
@@ -1099,14 +1216,20 @@ br_scalar DistanceFromPlane(br_vector3* pPos, br_scalar pA, br_scalar pB, br_sca
 void DisableLights(void) {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < gNumber_of_lights; i++) {
+        BrLightDisable(gLight_array[i]);
+    }
 }
 
 // IDA: void __cdecl EnableLights()
 void EnableLights(void) {
     int i;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    for (i = 0; i < gNumber_of_lights; i++) {
+        BrLightEnable(gLight_array[i]);
+    }
 }
 
 // IDA: void __usercall ProcessShadow(tCar_spec *pCar@<EAX>, br_actor *pWorld@<EDX>, tTrack_spec *pTrack_spec@<EBX>, br_actor *pCamera@<ECX>, br_matrix34 *pCamera_to_world_transform, br_scalar pDistance_factor)
@@ -1214,7 +1337,7 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
     TryThisEdge(pCar, &light_ray_car, 0, -1.0, 2, 1.0, 3, 7, y_offset);
     TryThisEdge(pCar, &light_ray_car, 0, -1.0, 2, -1.0, 2, 6, y_offset);
     TryThisEdge(pCar, &light_ray_car, 0, 1.0, 2, -1.0, 5, 1, y_offset);
-    for (i = 0; i < gShadow_clip_plane_count; ++i) {
+    for (i = 0; i < gShadow_clip_plane_count; i++) {
         BrClipPlaneEnable(gShadow_clip_planes[i].clip);
     }
     face_count = GetPrecalculatedFacesUnderCar(pCar, &face_ref);
@@ -1307,9 +1430,17 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
                 if (list_ptr->v[0].v[1] >= first_poly_below || list_ptr->v[1].v[1] >= first_poly_below || list_ptr->v[2].v[1] >= first_poly_below) {
                     if (gFancy_shadow) {
                         faces[f_num].material = list_ptr->material;
-                        if (list_ptr->material && list_ptr->material->colour_map && (list_ptr->material->flags & BR_MATF_LIGHT) == 0) {
-                            list_ptr->material->flags |= BR_MATF_SMOOTH | BR_MATF_LIGHT;
-                            BrMaterialUpdate(list_ptr->material, BR_MATU_RENDERING);
+#ifdef DETHRACE_3DFX_PATCH
+                        if (gShade_tables_do_not_work) {
+                            list_ptr->material->ka = 0.75f;
+                            BrMaterialUpdate(list_ptr->material, BR_MATU_LIGHTING);
+                        } else
+#endif
+                        {
+                            if (list_ptr->material && list_ptr->material->colour_map && (list_ptr->material->flags & BR_MATF_LIGHT) == 0) {
+                                list_ptr->material->flags |= BR_MATF_SMOOTH | BR_MATF_LIGHT;
+                                BrMaterialUpdate(list_ptr->material, BR_MATU_RENDERING);
+                            }
                         }
                     } else {
                         faces[f_num].material = gShadow_material;
@@ -1377,7 +1508,13 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
             camera_ptr->hither_z += camera_hither_fudge;
         }
         if (f_num) {
+#ifdef DETHRACE_3DFX_PATCH
+            DisableLights();
+#endif
             BrZbSceneRenderBegin(gUniverse_actor, gCamera, gRender_screen, gDepth_buffer);
+#ifdef DETHRACE_3DFX_PATCH
+            EnableLights();
+#endif
             gShadow_model->vertices = verts;
             gShadow_model->faces = faces;
             gShadow_model->nfaces = f_num;
@@ -1405,6 +1542,13 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
             if (gFancy_shadow) {
                 material = gShadow_model->faces[i].material;
                 if (material) {
+#ifdef DETHRACE_3DFX_PATCH
+                    if (gShade_tables_do_not_work) {
+                        material->ka = 1.0f;
+                        BrMaterialUpdate(material, BR_MATU_LIGHTING);
+                        continue;
+                    }
+#endif
                     if (material->colour_map && (material->flags & BR_MATF_LIGHT) != 0) {
                         material->flags &= ~(BR_MATF_LIGHT | BR_MATF_PRELIT | BR_MATF_SMOOTH);
                         BrMaterialUpdate(material, BR_MATU_RENDERING);
@@ -1495,9 +1639,9 @@ void FlashyMapCheckpoint(int pIndex, tU32 pTime) {
             case 1:
                 DimRectangle(gBack_screen,
                     2 * gCurrent_race.checkpoints[pIndex].map_left[0],
-                    2 * gCurrent_race.checkpoints[pIndex].map_top[0] + 40,
+                    2 * gCurrent_race.checkpoints[pIndex].map_top[0] + HIRES_Y_OFFSET,
                     2 * gCurrent_race.checkpoints[pIndex].map_right[0],
-                    2 * gCurrent_race.checkpoints[pIndex].map_bottom[0] + 40,
+                    2 * gCurrent_race.checkpoints[pIndex].map_bottom[0] + HIRES_Y_OFFSET,
                     0);
                 break;
             default:
@@ -1527,7 +1671,18 @@ int ConditionallyFillWithSky(br_pixelmap* pPixelmap) {
     } else {
         bgnd_col = 0;
     }
+#ifdef DETHRACE_3DFX_PATCH
+    if (pPixelmap->type == BR_PMT_RGB_565) {
+        bgnd_col = PaletteEntry16Bit(gRender_palette, bgnd_col);
+        bgnd_col = (bgnd_col << 16) | bgnd_col;
+    }
+#endif
     BrPixelmapFill(pPixelmap, bgnd_col);
+
+#ifdef DETHRACE_3DFX_PATCH
+    // Added by dethrace to ensure the pixel writes are flushed before 3d geometry
+    BrPixelmapFlush(pPixelmap);
+#endif
     return 1;
 }
 
@@ -1557,7 +1712,12 @@ void RenderAFrame(int pDepth_mask_on) {
     tCar_spec* car;
     LOG_TRACE("(%d)", pDepth_mask_on);
 
-    gRender_screen->pixels = gBack_screen->pixels;
+#ifdef DETHRACE_3DFX_PATCH
+    if (gVoodoo_rush_mode >= 1) {
+        gRender_screen->pixels = gBack_screen->pixels;
+    }
+#endif
+
     the_time = GetTotalTime();
     old_pixels = gRender_screen->pixels;
     cockpit_on = gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 && !gMap_mode;
@@ -1575,6 +1735,7 @@ void RenderAFrame(int pDepth_mask_on) {
             if (gReal_graf_data_index) {
                 BrPixelmapRectangleFill(gBack_screen, 0, 0, 640, 40, 0);
                 BrPixelmapRectangleFill(gBack_screen, 0, 440, 640, 40, 0);
+
                 DRPixelmapDoubledCopy(
                     gBack_screen,
                     gCurrent_race.map_image,
@@ -1586,6 +1747,14 @@ void RenderAFrame(int pDepth_mask_on) {
                 DRPixelmapCopy(gBack_screen, gCurrent_race.map_image);
             }
         }
+
+#ifdef DETHRACE_3DFX_PATCH
+        // Added by dethrace
+        // 3d scene is drawn on top of the 2d map, so we must ensure that all the 2d pixel
+        // writes have been flushed to the framebuffer first
+        BrPixelmapFlush(gBack_screen);
+#endif
+
         DimRectangle(
             gBack_screen,
             gMap_render_x_i - gCurrent_graf_data->map_render_x_marg,
@@ -1662,14 +1831,31 @@ void RenderAFrame(int pDepth_mask_on) {
     }
     gRendering_mirror = 0;
     DoSpecialCameraEffect(gCamera, &gCamera_to_world);
+
+#ifdef DETHRACE_3DFX_PATCH
+    if (!ConditionallyFillWithSky(gRender_screen->width == gBack_screen->width ? gBack_screen : gRender_screen)
+#else
     if (!ConditionallyFillWithSky(gRender_screen)
+#endif
         && !gProgram_state.cockpit_on
         && !(gAction_replay_camera_mode && gAction_replay_mode)) {
-        ExternalSky(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world);
+#ifdef DETHRACE_3DFX_PATCH
+        if (!gBlitting_is_slow)
+#endif
+        {
+            ExternalSky(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world);
+        }
     }
+
+#ifdef DETHRACE_3DFX_PATCH
+    PDUnlockRealBackScreen(1);
+#endif
+
 #if !defined(DETHRACE_FIX_BUGS)
     // in map mode, the scene is rendered 3 times. We have no idea why.
     for (i = 0; i < (gMap_mode ? 3 : 1); i++)
+#elif defined(DETHRACE_3DFX_PATCH)
+    for (i = 0; i < (gMap_mode && !gSmall_frames_are_slow ? 3 : 1); i++)
 #endif
     {
         RenderShadows(gUniverse_actor, &gProgram_state.track_spec, gCamera, &gCamera_to_world);
@@ -1689,12 +1875,50 @@ void RenderAFrame(int pDepth_mask_on) {
         RenderProximityRays(gRender_screen, gDepth_buffer, gCamera, &gCamera_to_world, gFrame_period);
         BrZbSceneRenderEnd();
     }
+#ifdef DETHRACE_3DFX_PATCH
+    PDLockRealBackScreen(1);
+#endif
+
     BrMatrix34Copy(&gCamera->t.t.mat, &old_camera_matrix);
+#ifdef DETHRACE_3DFX_PATCH
+    if (cockpit_on) {
+        PDUnlockRealBackScreen(1);
+        PDLockRealBackScreen(1);
+        CopyStripImage(
+            gBack_screen,
+            -gCurrent_graf_data->cock_margin_x,
+            gScreen_wobble_x,
+            -gCurrent_graf_data->cock_margin_y,
+            gScreen_wobble_y,
+            gProgram_state.current_car.cockpit_images[gProgram_state.cockpit_image_index],
+            0,
+            0,
+            gCurrent_graf_data->total_cock_width,
+            gCurrent_graf_data->total_cock_height);
+    }
+#endif
+
     if (gMirror_on__graphics) {
+#ifdef DETHRACE_3DFX_PATCH
+        if (gVoodoo_rush_mode >= 1) {
+            gRearview_screen->pixels = gBack_screen->pixels;
+        }
+        gRearview_screen->base_x = gScreen_wobble_x + gProgram_state.current_car.mirror_left;
+        gRearview_screen->base_y = gScreen_wobble_y + gProgram_state.current_car.mirror_top;
+#endif
         BrPixelmapFill(gRearview_depth_buffer, 0xFFFFFFFF);
         gRendering_mirror = 1;
         DoSpecialCameraEffect(gRearview_camera, &gRearview_camera_to_world);
         ConditionallyFillWithSky(gRearview_screen);
+#ifdef DETHRACE_3DFX_PATCH
+        PDUnlockRealBackScreen(1);
+
+        // Added by dethrace
+        // Rearview mirror is drawn on top of the 2d cockpit, so we must ensure that all the 2d pixel
+        // writes have been flushed to the framebuffer first
+        BrPixelmapFlush(gBack_screen);
+        // ---
+#endif
         BrZbSceneRenderBegin(gUniverse_actor, gRearview_camera, gRearview_screen, gRearview_depth_buffer);
         ProcessNonTrackActors(
             gRearview_screen,
@@ -1710,7 +1934,14 @@ void RenderAFrame(int pDepth_mask_on) {
             ProcessTrack(gUniverse_actor, &gProgram_state.track_spec, gRearview_camera, &gRearview_camera_to_world, 1);
         }
         RenderSplashes();
+#ifdef DETHRACE_3DFX_PATCH
+        RenderSmoke(gRearview_screen, gRearview_depth_buffer, gRearview_camera, &gRearview_camera_to_world, gFrame_period);
+        RenderSparks(gRearview_screen, gRearview_depth_buffer, gRearview_camera, &gRearview_camera_to_world, gFrame_period);
+#endif
         BrZbSceneRenderEnd();
+#ifdef DETHRACE_3DFX_PATCH
+        PDLockRealBackScreen(1);
+#endif
         BrMatrix34Copy(&gRearview_camera->t.t.mat, &old_mirror_cam_matrix);
         gRendering_mirror = 0;
     }
@@ -1807,6 +2038,7 @@ void RenderAFrame(int pDepth_mask_on) {
         gBack_screen->base_x = real_base_x;
         gBack_screen->base_y = real_base_y;
     } else {
+#if !defined(DETHRACE_3DFX_PATCH)
         if (cockpit_on) {
             CopyStripImage(
                 gBack_screen,
@@ -1831,9 +2063,14 @@ void RenderAFrame(int pDepth_mask_on) {
                     gProgram_state.current_car.mirror_bottom - gProgram_state.current_car.mirror_top);
             }
         }
+#endif
         DimAFewBits();
         DoDamageScreen(the_time);
         if (!gAction_replay_mode || gAR_fudge_headups) {
+            // Added by dethrace
+            // Pratcam is drawn on top of the 2d cockpit, so we must ensure that all the 2d pixel
+            // writes have been flushed to the framebuffer first
+            BrPixelmapFlush(gBack_screen);
             DoPratcam(the_time);
             DoHeadups(the_time);
         }
@@ -2090,6 +2327,13 @@ void DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int
     tU8* conv_table;
     LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
 
+#ifdef DETHRACE_3DFX_PATCH
+    if (pDest->type == BR_PMT_RGB_565 && pSource->type == BR_PMT_INDEX_8) {
+        Copy8BitTo16BitRectangleWithTransparency(pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight,
+            gCurrent_conversion_table == NULL ? gCurrent_palette : gFlic_palette);
+        return;
+    }
+#endif
     source_ptr = (tU8*)pSource->pixels + (pSource->row_bytes * pSource_y + pSource_x);
     dest_ptr = (tU8*)pDest->pixels + (pDest->row_bytes * pDest_y + pDest_x);
     source_row_wrap = pSource->row_bytes - pWidth;
@@ -2129,7 +2373,7 @@ void DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int
         dest_row_wrap += pDest_x + pWidth - pDest->width;
         pWidth = pDest->width - pDest_x;
     }
-    // LOG_DEBUG("2 (src->width: %d, src->height: %d, pDest_x: %d, pDest_y: %d, pSource_x: %d, pSource_y: %d, pWidth: %d, pHeight: %d)", pSource->width, pSource->height, pDest_x, pDest_y, pSource_x, pSource_y, pWidth, pHeight);
+
     if (gCurrent_conversion_table != NULL) {
         conv_table = gCurrent_conversion_table->pixels;
         for (y_count = 0; y_count < pHeight; y_count++) {
@@ -2185,7 +2429,14 @@ void DRPixelmapRectangleOnscreenCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_i
     tU8* source_ptr;
     tU8* dest_ptr;
     tU8* conv_table;
-    // LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
+    LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
+
+#ifdef DETHRACE_3DFX_PATCH
+    if (pDest->type == BR_PMT_RGB_565 && pSource->type == BR_PMT_INDEX_8) {
+        Copy8BitToOnscreen16BitRectangleWithTransparency(pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight, gCurrent_palette);
+        return;
+    }
+#endif
 
     source_row_wrap = pSource->row_bytes - pWidth;
     dest_row_wrap = pDest->row_bytes - pWidth;
@@ -2224,6 +2475,12 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
     tX1616 current_shear;
     LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d, %d)", pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight, pShear);
 
+#ifdef DETHRACE_3DFX_PATCH
+    if (pDest->type == BR_PMT_RGB_565 && pSource->type == BR_PMT_INDEX_8) {
+        Copy8BitRectangleTo16BitRhombusWithTransparency(pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight, pShear, gCurrent_palette);
+        return;
+    }
+#endif
     current_shear = 0;
     last_shear_x = 0;
     source_ptr = (tU8*)pSource->pixels + pSource_x + pSource_y * pSource->row_bytes;
@@ -2366,7 +2623,11 @@ int AllocateTransientBitmap(int pWidth, int pHeight, int pUser_data) {
 
     for (bm_index = 0; bm_index < COUNT_OF(gTransient_bitmaps); bm_index++) {
         if (gTransient_bitmaps[bm_index].pixmap == NULL) {
+#ifdef DETHRACE_3DFX_PATCH
+            gTransient_bitmaps[bm_index].pixmap = DRPixelmapAllocate(gBack_screen->type, pWidth + 8, pHeight, NULL, 0);
+#else
             gTransient_bitmaps[bm_index].pixmap = DRPixelmapAllocate(BR_PMT_INDEX_8, pWidth + 8, pHeight, NULL, 0);
+#endif
             gTransient_bitmaps[bm_index].in_use = 0;
             gTransient_bitmaps[bm_index].user_data = pUser_data;
             return bm_index;
@@ -3031,7 +3292,7 @@ void InitShadow(void) {
     br_vector3 temp_v;
     LOG_TRACE("()");
 
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < COUNT_OF(gShadow_clip_planes); i++) {
         gShadow_clip_planes[i].clip = BrActorAllocate(BR_ACTOR_CLIP_PLANE, NULL);
         BrActorAdd(gUniverse_actor, gShadow_clip_planes[i].clip);
         BrClipPlaneDisable(gShadow_clip_planes[i].clip);
@@ -3137,6 +3398,12 @@ void DRPixelmapDoubledCopy(br_pixelmap* pDestn, br_pixelmap* pSource, int pSourc
     int width_over_2;
     LOG_TRACE("(%p, %p, %d, %d, %d, %d)", pDestn, pSource, pSource_width, pSource_height, pX_offset, pY_offset);
 
+#ifdef DETHRACE_3DFX_PATCH
+    if (pDestn->type != pSource->type && pDestn->type == BR_PMT_RGB_565 && pSource->type == BR_PMT_INDEX_8) {
+        CopyDoubled8BitTo16BitRectangle(pDestn, pSource, pSource_width, pSource_height, pX_offset, pY_offset, gCurrent_palette);
+        return;
+    }
+#endif
     dst_row_skip = 2 * pDestn->row_bytes - 2 * pSource_width;
     src_row_skip = (pSource->row_bytes - pSource_width) / 2;
     sptr = (tU16*)((tU8*)pSource->pixels - 2 * src_row_skip + 2 * (pSource->row_bytes * pSource_height / 2));

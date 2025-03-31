@@ -16,7 +16,7 @@ jobs:
       matrix:
         platform:
           - { name: 'Linux',    arch: 'x64',          os: ubuntu-latest,  werror: true }
-          - { name: 'Linux',    arch: 'arm64',        os: ubuntu-latest,  werror: true, cmake-toolchain-file: 'cmake/toolchains/linux-aarch64.cmake', apt-packages: 'gcc-aarch64-linux-gnu g++-aarch64-linux-gnu', cross: true }
+          - { name: 'Linux',    arch: 'arm64',        os: ubuntu-24.04-arm,  werror: true }
           - { name: 'MacOS',    arch: 'arm64-x64',    os: macos-latest,   werror: true, cmake-args: '-DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"' }
           - { name: 'Windows',  arch: 'x86',          os: windows-latest, msvc-arch: 'Win32' }
           - { name: 'Windows',  arch: 'x64',          os: windows-latest, msvc-arch: 'x64' }
@@ -45,12 +45,13 @@ jobs:
       - name: Set up SDL
         uses: libsdl-org/setup-sdl@main
         with:
+          add-to-environment: true
+          build-type: Release
           cmake-arguments: ${{ matrix.platform.cmake-args }}
           cmake-generator: Ninja
           cmake-toolchain-file: ${{ matrix.platform.cmake-toolchain-file }}
+          discriminator: ${{ matrix.platform.arch }}
           version: 2-latest
-          add-to-environment: true
-
       - name: 'Prepare sources for release'
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
         run: |

@@ -131,6 +131,11 @@ static void Harness_DetectGameMode(void) {
     default:
         break;
     }
+
+    // 3dfx code paths require at least smoke.pix which is used instead of writing smoke directly to framebuffer
+    if (access("DATA/PIXELMAP/SMOKE.PIX", F_OK) != -1) {
+        harness_game_info.data_dir_has_3dfx_assets = 1;
+    }
 }
 
 void Harness_Init(int* argc, char* argv[]) {
@@ -144,8 +149,8 @@ void Harness_Init(int* argc, char* argv[]) {
     harness_game_config.enable_cd_check = 0;
     // original physics time step. Lower values seem to work better at 30+ fps
     harness_game_config.physics_step_time = 40;
-    // do not limit fps by default
-    harness_game_config.fps = 0;
+    // limit to 60 fps by default
+    harness_game_config.fps = 60;
     // do not freeze timer
     harness_game_config.freeze_timer = 0;
     // default demo time out is 240s
@@ -164,7 +169,6 @@ void Harness_Init(int* argc, char* argv[]) {
     harness_game_config.no_bind = 0;
     // Disable verbose logging
     harness_game_config.verbose = 0;
-
     // install signal handler by default
     harness_game_config.install_signalhandler = 1;
 
@@ -191,6 +195,11 @@ void Harness_Init(int* argc, char* argv[]) {
 
     if (harness_game_info.mode == eGame_none) {
         Harness_DetectGameMode();
+    }
+
+    if (harness_game_config.opengl_3dfx_mode && !harness_game_info.data_dir_has_3dfx_assets) {
+        printf("Error: data directory does not contain 3dfx assets so opengl mode cannot be used\n");
+        exit(1);
     }
 
     if (force_null_platform) {
@@ -267,8 +276,14 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
         } else if (strcasecmp(argv[i], "--no-bind") == 0) {
             harness_game_config.no_bind = 1;
             handled = 1;
+        } else if (strcasecmp(argv[i], "--opengl") == 0) {
+            harness_game_config.opengl_3dfx_mode = 1;
+            handled = 1;
         } else if (strcasecmp(argv[i], "--no-music") == 0) {
             harness_game_config.no_music = 1;
+            handled = 1;
+        } else if (strcasecmp(argv[i], "--game-completed") == 0) {
+            harness_game_config.game_completed = 1;
             handled = 1;
         }
 
@@ -291,8 +306,7 @@ FILE* Harness_Hook_fopen(const char* pathname, const char* mode) {
 }
 
 // Localization
-int Harness_Hook_isalnum(int c)
-{
+int Harness_Hook_isalnum(int c) {
     if (harness_game_info.localization == eGameLocalization_polish) {
         // Polish diacritic letters in Windows-1250
         unsigned char letters[] = { 140, 143, 156, 159, 163, 165, 175, 179, 185, 191, 198, 202, 209, 211, 230, 234, 241, 243 };
