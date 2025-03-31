@@ -177,6 +177,9 @@ add_executable(dethrace
     ${CMAKE_SOURCE_DIR}/packaging/windows/dethrace.rc
 )
 
+get_property(build_rpaths GLOBAL PROPERTY DETHRACE_BUILD_RPATHS)
+set_property(TARGET dethrace APPEND PROPERTY BUILD_RPATH "${build_rpaths}")
+
 target_link_libraries(dethrace PRIVATE dethrace_obj compile_with_werror)
 target_sources(dethrace PRIVATE main.c)
 
