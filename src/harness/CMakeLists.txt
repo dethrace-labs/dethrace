@@ -1,6 +1,7 @@
 configure_file(version.h.in version.h @ONLY)
 
 option(DETHRACE_PLATFORM_SDL2 "Support SDL2 platform driver" ON)
+set(count_sdl_platforms 0)
 
 set(DETHRACE_PLATFORMS )
 if(DETHRACE_PLATFORM_SDL2)
@@ -9,7 +10,19 @@ if(DETHRACE_PLATFORM_SDL2)
         find_package(SDL2 MODULE REQUIRED)
     endif()
     list(APPEND DETHRACE_PLATFORMS SDL2)
+    math(EXPR count_sdl_platforms "${count_sdl_platforms} + 1")
 endif()
+
+if(count_sdl_platforms GREATER 1)
+    # Force dynamic SDL when enabling 2 (or more) SDL platform backends
+    set(dynamic_sdl_force TRUE)
+else()
+    # When no SDL backend is selected, disable dynamic SDL backend
+    # Enabling one SDL backend is a don-t-care
+    set(dynamic_sdl_force FALSE)
+endif()
+
+cmake_dependent_option(DETHRACE_PLATFORM_SDL_DYNAMIC "Load SDL dynamically" FALSE "count_sdl_platforms EQUAL 1" "${dynamic_sdl_force}")
 
 if(NOT DETHRACE_PLATFORMS)
     message(FATAL_ERROR "No platform drivers enabled")
@@ -79,7 +92,17 @@ if(DETHRACE_PLATFORM_SDL2)
         platforms/sdl2_scancode_to_dinput.h
     )
     target_compile_definitions(harness PRIVATE DETHRACE_PLATFORM_SDL2)
-    target_link_libraries(harness PRIVATE SDL2::SDL2)
+    if(DETHRACE_PLATFORM_SDL_DYNAMIC)
+        set_property(SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/platforms/sdl2.c" APPEND PROPERTY INCLUDE_DIRECTORIES "$<TARGET_PROPERTY:SDL2::SDL2,INTERFACE_INCLUDE_DIRECTORIES>")
+        set_property(GLOBAL APPEND PROPERTY DETHRACE_BUILD_RPATHS "$<TARGET_FILE_DIR:SDL2::SDL2>")
+    else()
+        target_link_libraries(harness PRIVATE SDL2::SDL2)
+    endif()
+endif()
+
+if(DETHRACE_PLATFORM_SDL_DYNAMIC)
+    target_compile_definitions(harness PRIVATE DETHRACE_SDL_DYNAMIC)
+    target_link_libraries(harness PRIVATE ${CMAKE_DL_LIBS})
 endif()
 
 if(WIN32)

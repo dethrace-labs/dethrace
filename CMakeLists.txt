@@ -14,6 +14,7 @@ if(MSVC)
 endif()
 
 include(CheckCCompilerFlag)
+include(CMakeDependentOption)
 include(TestBigEndian)
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/VERSION")
