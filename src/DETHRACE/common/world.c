@@ -1946,11 +1946,13 @@ int DRPixelmapHasZeros(br_pixelmap* pm) {
     if (pm->flags & BR_PMF_NO_ACCESS) {
         return 1;
     }
+
     row_ptr = (char*)pm->pixels + (pm->row_bytes * pm->base_y) + pm->base_x;
     for (y = 0; y < pm->height; y++) {
         pp = row_ptr;
         for (x = 0; x < pm->width; x++) {
-            if (!pp)
+            // found a zero (transparent) pixel?
+            if (*pp == 0)
                 return 1;
             pp++;
         }

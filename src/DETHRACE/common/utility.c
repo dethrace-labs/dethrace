@@ -1735,8 +1735,7 @@ void GlorifyMaterial(br_material** pArray, int pCount) {
 
             if (gInterpolate_textures) {
                 // use linear texture filtering unless we have a "nobilinear" flag or the texture has transparent parts
-                if ((e == NULL || (e->flags & ExceptionFlag_NoBilinear) == 0)
-                    && !DRPixelmapHasZeros(pArray[i]->colour_map)) {
+                if ((e == NULL || (e->flags & ExceptionFlag_NoBilinear) == 0) && !DRPixelmapHasZeros(pArray[i]->colour_map)) {
                     pArray[i]->flags |= BR_MATF_MAP_INTERPOLATION;
                 }
             }
