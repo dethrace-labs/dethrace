@@ -2443,9 +2443,8 @@ void InitOpponents(tRace_info* pRace_info) {
     gHead_on_cos_value = cosf(.5235668f);
     gAcme_frame_count = 0;
     gProgram_state.current_car.no_of_processes_recording_my_trail = 0;
-    rank_dependent_difficulty = (101.f - (gCurrent_race.suggested_rank < 10 ? .5f : (float)gCurrent_race.suggested_rank));
-    // FIXME: unsure about gBig_bang
-    gBig_bang = 70.f - (float)(3 * rank_dependent_difficulty + 10 * gProgram_state.skill_level) * gOpponent_nastyness_frigger;
+    rank_dependent_difficulty = (101.f - (gCurrent_race.suggested_rank < 10 ? .5f : gCurrent_race.suggested_rank)) / 10.0f;
+    gBig_bang = 70.f - (3 * rank_dependent_difficulty + 10 * gProgram_state.skill_level) * gOpponent_nastyness_frigger;
     gIn_view_distance = gCamera_yon + 10.f;
     if (gCamera_yon + 10.f <= 45.f) {
         gIn_view_distance = 45.f;
