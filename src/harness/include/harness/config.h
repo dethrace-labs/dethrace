@@ -50,8 +50,6 @@ typedef struct tHarness_game_config {
     int verbose;
     int opengl_3dfx_mode;
     int game_completed;
-
-    int install_signalhandler;
 } tHarness_game_config;
 
 extern tHarness_game_info harness_game_info;
