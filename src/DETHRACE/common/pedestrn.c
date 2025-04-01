@@ -2948,14 +2948,17 @@ br_actor* BuildPedPaths(tPedestrian_instruction* pInstructions, int pInstruc_cou
     }
     face_count -= 4;
     the_model = BrModelAllocate(NULL, vertex_count, face_count);
-    the_model->flags |= BR_MODU_VERTEX_COLOURS | BR_MODU_VERTEX_POSITIONS;
+    the_model->flags |= BR_MODF_DONT_WELD | BR_MODF_KEEP_ORIGINAL;
 
+#if defined(DETHRACE_FIX_BUGS)
+    last_vertex_count = 0;
+#endif
     vertex_count = 0;
     face_count = 0;
     point_count = 0;
     for (j = 0; j < pInstruc_count; j++) {
         if (pInstructions[j].type == ePed_instruc_point || pInstructions[j].type == ePed_instruc_xpoint) {
-            the_point = pInstructions[j].data.point_data.position;
+            BrVector3Copy(&the_point, &pInstructions[j].data.point_data.position);
             if (the_point.v[Y] < 500.f) {
                 the_mat = gPath_mat_normal;
             } else {
@@ -2973,9 +2976,6 @@ br_actor* BuildPedPaths(tPedestrian_instruction* pInstructions, int pInstruc_cou
             }
             SquirtPathVertex(&the_model->vertices[vertex_count], &the_point);
             vertex_count += 4;
-#if defined(DETHRACE_FIX_BUGS)
-            last_vertex_count = vertex_count;
-#endif
             if (point_count != 0) {
                 // Connect previous path vertex cross with current path vertex cross
                 the_model->faces[face_count].vertices[0] = vertex_count - 4;

@@ -2163,18 +2163,18 @@ void PipeInstantUnSmudge(tCar_spec* pCar) {
             b_model = bonny->model;
             n = 0;
             j = 0;
-            for (group = 0; group < V11MODEL(model)->ngroups; group++) {
-                for (v = 0; v < V11MODEL(model)->groups[group].nvertices; v++) {
-                    if ((V11MODEL(model)->groups[group].vertex_colours[v] >> 24) != 0) {
+            for (group = 0; group < V11MODEL(b_model)->ngroups; group++) {
+                for (v = 0; v < V11MODEL(b_model)->groups[group].nvertices; v++) {
+                    if ((V11MODEL(b_model)->groups[group].vertex_colours[v] >> 24) != 0) {
                         data[n].vertex_index = j;
-                        data[n].light_index = -V11MODEL(model)->groups[group].nvertices;
+                        data[n].light_index = -V11MODEL(b_model)->groups[group].nvertices;
                         n += 1;
-                        V11MODEL(model)->groups[group].vertex_colours[v] = 0;
+                        V11MODEL(b_model)->groups[group].vertex_colours[v] = 0;
                         if ((b_model->flags & BR_MODF_UPDATEABLE) != 0) {
-                            b_model->vertices[V11MODEL(model)->groups[group].vertex_user[v]].index = 0;
+                            b_model->vertices[V11MODEL(b_model)->groups[group].vertex_user[v]].index = 0;
                         }
                         if (n >= COUNT_OF(data)) {
-                            group = V11MODEL(model)->groups[group].nvertices;
+                            group = V11MODEL(b_model)->groups[group].nvertices;
                             break;
                         }
                     }
