@@ -226,28 +226,52 @@ int Harness_Init(int* argc, char* argv[]) {
     if (force_null_platform) {
         Null_Platform_Init(&gHarness_platform);
     } else {
-        size_t i;
         const tPlatform_bootstrap* selected_bootstrap = NULL;
 
-        for (i = 0; i < BR_ASIZE(platform_bootstraps); i++) {
-            if (argument_config.platform_name != NULL && strcasecmp(platform_bootstraps[i]->name, argument_config.platform_name) != 0) {
-                continue;
+        if (argument_config.platform_name != NULL) {
+            size_t i;
+            for (i = 0; i < BR_ASIZE(platform_bootstraps); i++) {
+                if (strcasecmp(platform_bootstraps[i]->name, argument_config.platform_name) == 0) {
+                    if ((platform_bootstraps[i]->capabilities & argument_config.platform_capabilityies) != argument_config.platform_capabilityies) {
+                        fprintf(stderr, "Platform \"%s\" does not support requested capabilities. Try another video driver and/or add/remove --opengl\n", selected_bootstrap->name);
+                        return 1;
+                    }
+                    selected_bootstrap = platform_bootstraps[i];
+                    break;
+                }
             }
-            if ((platform_bootstraps[i]->capabilities & argument_config.platform_capabilityies) != argument_config.platform_capabilityies) {
-                continue;
+            if (selected_bootstrap == NULL) {
+                fprintf(stderr, "Could not find a platform named \"%s\"\n", argument_config.platform_name);
+                return 1;
             }
-            selected_bootstrap = platform_bootstraps[i];
-            break;
+            if (selected_bootstrap->init(&gHarness_platform) != 0) {
+                fprintf(stderr, "%s initialization failed\n", selected_bootstrap->name);
+                return 1;
+            }
+        } else {
+            size_t i;
+            for (i = 0; i < BR_ASIZE(platform_bootstraps); i++) {
+                LOG_TRACE10("Attempting video driver \"%s\"", platform_bootstraps[i]->name);
+                if ((platform_bootstraps[i]->capabilities & argument_config.platform_capabilityies) != argument_config.platform_capabilityies) {
+                    fprintf(stderr, "Skipping platform \"%s\". Does not support required capabilities.\n", platform_bootstraps[i]->name);
+                    continue;
+                }
+                LOG_TRACE10("Try platform \"%s\"...");
+                if (platform_bootstraps[i]->init(&gHarness_platform) == 0) {
+                    selected_bootstrap = platform_bootstraps[i];
+                    break;
+                }
+            }
+            if (selected_bootstrap == NULL) {
+                fprintf(stderr, "Could not find a supported platform\n");
+                return 1;
+            }
         }
         if (selected_bootstrap == NULL) {
             fprintf(stderr, "Could not find a supported platform\n");
             return 1;
         }
-        printf("Platform: %s (%s)\n", selected_bootstrap->name, selected_bootstrap->description);
-        if (selected_bootstrap->init(&gHarness_platform) != 0) {
-            fprintf(stderr, "Platform initialization failed\n");
-            return 1;
-        }
+        LOG_INFO("Platform: %s (%s)", selected_bootstrap->name, selected_bootstrap->description);
     }
     return 0;
 }
