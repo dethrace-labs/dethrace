@@ -12,7 +12,6 @@ typedef enum tHarness_window_type {
 
 // Platform implementation functions
 typedef struct tHarness_platform {
-    const char *name;
     // Render a fullscreen quad using the specified pixel data
     void (*Renderer_Present)(br_pixelmap* src);
     // Set the 256 color palette to use (BGRA format)
