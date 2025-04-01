@@ -67,7 +67,13 @@ void ToggleInfo(void) {
         } else {
             gInfo_on = !gInfo_on;
             if (gInfo_on) {
+#ifdef DETHRACE_3DFX_PATCH
+                if (PDKeyDown(KEY_SHIFT_ANY)) {
+                    gInfo_mode = (gInfo_mode + 1) % 3;
+                }
+#else
                 gInfo_mode = PDKeyDown(KEY_SHIFT_ANY);
+#endif
             }
         }
     }
@@ -146,17 +152,8 @@ void MungeHeadups(void) {
     gMr_odo = (double)gFrame_period * gProgram_state.current_car.speedo_speed * WORLD_SCALE / 1600.0 + gMr_odo;
     if (gInfo_on) {
         bearing = 360.0 - FastScalarArcTan2(gCamera_to_world.m[0][2], gCamera_to_world.m[2][2]);
-        if (gInfo_mode) {
-            sprintf(
-                the_text,
-                "P'cam: curr=%d, ambi=%d, pend=%d Car: c=%+.3f, a=%+.3f, b=%+.3f",
-                PratcamGetCurrent(),
-                PratcamGetAmbient(),
-                PratcamGetPending(),
-                gCar_to_view->curvature,
-                gCar_to_view->acc_force,
-                gCar_to_view->brake_force);
-        } else {
+        switch (gInfo_mode) {
+        case 0:
             sprintf(
                 the_text,
                 "%d.%d (%.3f, %.3f, %.3f) %.0f, %.0f, MILES=%.2f",
@@ -168,6 +165,45 @@ void MungeHeadups(void) {
                 gCamera_to_horiz_angle,
                 bearing,
                 gMr_odo);
+            break;
+        case 1:
+            sprintf(
+                the_text,
+                "P'cam: curr=%d, ambi=%d, pend=%d Car: c=%+.3f, a=%+.3f, b=%+.3f",
+                PratcamGetCurrent(),
+                PratcamGetAmbient(),
+                PratcamGetPending(),
+                gCar_to_view->curvature,
+                gCar_to_view->acc_force,
+                gCar_to_view->brake_force);
+            break;
+#ifdef DETHRACE_3DFX_PATCH
+        case 2:
+            nearby = SomeNearbyMaterial();
+            strcpy(the_text, nearby->identifier);
+            if (nearby->colour_map != NULL) {
+                sprintf(&the_text[strlen(the_text)], " %s", nearby->colour_map->identifier);
+                user = (tPixelmap_user_data*)nearby->colour_map->user;
+                if (user != NULL) {
+                    sprintf(&the_text[strlen(the_text)], " %dx%d to", user->orig_width, user->orig_height);
+                } else {
+                    sprintf(&the_text[strlen(the_text)], " %dx%d", nearby->colour_map->width, nearby->colour_map->height);
+                }
+                if ((nearby->flags & BR_MATF_MAP_INTERPOLATION)) {
+                    strcat(the_text, " bilinear");
+                } else {
+                    strcat(the_text, " nobilinear");
+                }
+                if ((nearby->flags & BR_MATF_MAP_ANTIALIASING) && nearby->colour_map != NULL && nearby->colour_map->mip_offset != 0) {
+                    strcat(the_text, " mipmap");
+                } else {
+                    strcat(the_text, " nomipmap");
+                }
+                break;
+            }
+#endif
+        default:
+            break;
         }
         ChangeHeadupText(gProgram_state.frame_rate_headup, the_text);
     } else {
