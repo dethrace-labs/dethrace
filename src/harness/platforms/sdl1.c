@@ -205,20 +205,6 @@ static int get_mouse_position(int* pX, int* pY) {
     int lX, lY;
 
     SDL1_GetMouseState(pX, pY);
-    lX = *pX;
-    lY = *pY;
-//    SDL_RenderWindowToLogical(renderer, *pX, *pY, &lX, &lY);
-
-#if defined(DETHRACE_FIX_BUGS)
-    // In hires mode (640x480), the menus are still rendered at (320x240),
-    // so prescale the cursor coordinates accordingly.
-    lX *= 320;
-    lX /= window_width;
-    lY *= 200;
-    lY /= window_height;
-#endif
-    *pX = (int)lX;
-    *pY = (int)lY;
     return 0;
 }
 
