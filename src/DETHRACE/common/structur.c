@@ -29,6 +29,7 @@
 #include "utility.h"
 #include "world.h"
 #include <stdlib.h>
+#include <string.h>
 
 int gLast_wrong_checkpoint;
 int gMirror_on__structur = 1; // suffix added to avoid duplicate symbol
@@ -480,6 +481,10 @@ void DoGame(void) {
     int second_select_race;
     int first_summary_done;
     int i;
+#if defined(DETHRACE_FIX_BUGS)
+    // Player's APC/BIGAPC wheels got stuck if the equivalent cop car was wasted in previous race
+    int power_up_levels[3];
+#endif
     LOG_TRACE("()");
 
     gAbandon_game = 0;
@@ -523,6 +528,28 @@ void DoGame(void) {
                     SwapNetCarsLoad();
                 }
             } else {
+#if defined(DETHRACE_FIX_BUGS)
+                // Player's APC/BIGAPC wheels got stuck if the equivalent cop car was wasted in previous race
+                if(strcmp(gProgram_state.car_name, "APC.TXT") == 0 ||
+                   strcmp(gProgram_state.car_name, "BIGAPC.TXT") == 0) {
+                    AboutToLoadFirstCar();
+                    SwitchToRealResolution();
+                    for (i = 0; i < COUNT_OF(power_up_levels); i++) {
+                        power_up_levels[i] = gProgram_state.current_car.power_up_levels[i];
+                    }
+                    LoadCar(gOpponents[gProgram_state.cars_available[gCurrent_car_index]].car_file_name,
+                        eDriver_local_human,
+                        &gProgram_state.current_car,
+                        gProgram_state.cars_available[gCurrent_car_index],
+                        gProgram_state.player_name[gProgram_state.frank_or_anniness],
+                        &gOur_car_storage_space);
+                    for (i = 0; i < COUNT_OF(power_up_levels); i++) {
+                        gProgram_state.current_car.power_up_levels[i] = power_up_levels[i];
+                    }
+                    SwitchToLoresMode();
+                    SetCarStorageTexturingLevel(&gOur_car_storage_space, GetCarTexturingLevel(), eCTL_full);
+                }
+#endif                    
                 LoadOpponentsCars(&gCurrent_race);
             }
             PrintMemoryDump(0, "AFTER LOADING OPPONENTS IN");
