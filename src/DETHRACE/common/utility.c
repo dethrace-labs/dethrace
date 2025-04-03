@@ -673,19 +673,20 @@ void PrintScreenFile(FILE* pF) {
     LOG_TRACE("(%p)", pF);
 
     bit_map_size = gBack_screen->height * gBack_screen->row_bytes;
+    offset = 0x436;
 
     // 1. BMP Header
     //    1. 'BM' Signature
     WriteU8L(pF, 'B');
     WriteU8L(pF, 'M');
     //    2. File size in bytes (header = 0xe bytes; infoHeader = 0x28 bytes; colorTable = 0x400 bytes; pixelData = xxx)
-    WriteU32L(pF, bit_map_size + 0x436);
+    WriteU32L(pF, bit_map_size + offset);
     //    3. unused
     WriteU16L(pF, 0);
     //    4. unused
     WriteU16L(pF, 0);
     //    5. pixelData offset (from beginning of file)
-    WriteU32L(pF, 0x436);
+    WriteU32L(pF, offset);
 
     // 2. Info Header
     //    1. InfoHeader Size
@@ -727,13 +728,13 @@ void PrintScreenFile(FILE* pF) {
     }
 
     // 4. Pixel Data (=LUT)
-    offset = bit_map_size - gBack_screen->row_bytes;
+    pixel_ptr = (tU8*)gBack_screen->pixels + bit_map_size - gBack_screen->row_bytes;
     for (i = 0; i < gBack_screen->height; i++) {
         for (j = 0; j < gBack_screen->row_bytes; j++) {
-            WriteU8L(pF, ((tU8*)gBack_screen->pixels)[offset]);
-            offset++;
+            WriteU8L(pF, *pixel_ptr);
+            pixel_ptr++;
         }
-        offset -= 2 * gBack_screen->row_bytes;
+        pixel_ptr -= 2 * gBack_screen->row_bytes;
     }
     WriteU16L(pF, 0);
 }
@@ -747,7 +748,48 @@ void PrintScreenFile16(FILE* pF) {
     tU8* pixel_ptr;
     tU16 pixel;
     LOG_TRACE("(%p)", pF);
-    NOT_IMPLEMENTED();
+
+    bit_map_size = 3 * gBack_screen->height * gBack_screen->width;
+    offset = 54;
+    //    1. 'BM' Signature
+    WriteU8L(pF, 'B');
+    WriteU8L(pF, 'M');
+    //    2. File size in bytes (header = 0xe bytes; infoHeader = 0x28 bytes; pixelData = xxx)
+    WriteU32L(pF, bit_map_size + offset);
+    WriteU16L(pF, 0);
+    WriteU16L(pF, 0);
+    //    5. pixelData offset (from beginning of file)
+    WriteU32L(pF, offset);
+    // 2. Info Header
+    //    1. InfoHeader Size
+    WriteU32L(pF, 0x28);
+    // width
+    WriteU32L(pF, gBack_screen->width);
+    // height
+    WriteU32L(pF, gBack_screen->height);
+    //    4. Number of planes
+    WriteU16L(pF, 1);
+    //    5. Bits per pixels / palletization (24 = 3 bytes per pixel)
+    WriteU16L(pF, 24);
+    WriteU32L(pF, 0);
+    WriteU32L(pF, 0);
+    WriteU32L(pF, 0);
+    WriteU32L(pF, 0);
+    WriteU32L(pF, 0);
+    WriteU32L(pF, 256);
+
+    pixel_ptr = (tU8*)gBack_screen->pixels + (gBack_screen->height - 1) * gBack_screen->row_bytes;
+    for (i = 0; i < gBack_screen->height; i++) {
+        for (j = 0; j < gBack_screen->width; j++) {
+            pixel = *(tU16*)pixel_ptr;
+            WriteU8L(pF, 8 * pixel);
+            WriteU8L(pF, (pixel >> 3) & 0xF8);
+            WriteU8L(pF, (pixel >> 8) & 0xF8);
+            pixel_ptr += 2;
+        }
+        pixel_ptr -= (gBack_screen->row_bytes + 2 * gBack_screen->width);
+    }
+    WriteU16L(pF, 0);
 }
 
 // IDA: void __cdecl PrintScreen()
