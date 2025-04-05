@@ -636,6 +636,7 @@ tNet_message* PDNetGetNextMessage(tNet_game_details* pDetails, void** pSender_ad
             default:
                 dr_dprintf("PDNetGetNextMessage(): res is %d, received message type %d from '%s', passing up", res, msg->contents.header.type, addr_str);
                 memcpy(&gLast_received_addr, gRemote_addr_ipx, sizeof(gLast_received_addr));
+                LOG_DEBUG("new remote fam %d", gLast_received_addr.sin_family);
                 *pSender_address = &gLast_received_addr;
                 return msg;
             }
@@ -664,6 +665,7 @@ void PDNetSetPlayerSystemInfo(tNet_game_player_info* pPlayer, void* pSender_addr
 
     dr_dprintf("PDNetSetPlayerSystemInfo()");
     memcpy(&pPlayer->pd_net_info, pSender_address, sizeof(pPlayer->pd_net_info));
+    LOG_DEBUG("new player set fam %d", pPlayer->pd_net_info.addr_in.sin_family);
 }
 
 // IDA: void __usercall PDNetDisposePlayer(tNet_game_player_info *pPlayer@<EAX>)
