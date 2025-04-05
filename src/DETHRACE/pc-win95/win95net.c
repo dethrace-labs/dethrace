@@ -261,6 +261,7 @@ int PDNetInitialise(void) {
     WSADATA wsadata;
     LOG_TRACE("()");
 
+    gPlayer_id = PDGetTotalTime();
     sa_len = sizeof(struct sockaddr_in);
     dr_dprintf("PDNetInitialise()");
     int ipx_socket_num = 12286;
