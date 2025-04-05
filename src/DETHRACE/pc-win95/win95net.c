@@ -581,7 +581,7 @@ int PDNetSendMessageToAllPlayers(tNet_game_details* pDetails, tNet_message* pMes
             continue;
         }
         NetNowIPXLocalTarget2String(str, &gNet_players[i].pd_net_info.addr_in);
-        LOG_DEBUG("sending to player %d, %s", i, str);
+        LOG_DEBUG("sending to player %d, %s, fam: %d", i, str, gNet_players[i].pd_net_info.addr_in.sin_family);
         if (sendto(gSocket, (const char*)pMessage, pMessage->overall_size, 0, (struct sockaddr*)&gNet_players[i].pd_net_info.addr_in, sizeof(gNet_players[i].pd_net_info.addr_in)) == -1) {
             dr_dprintf("PDNetSendMessageToAllPlayers(): Error on sendto() - WSAGetLastError=%d", WSAGetLastError());
             NetDisposeMessage(pDetails, pMessage);
@@ -678,7 +678,7 @@ int PDNetSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessag
 
     NetNowIPXLocalTarget2String(str, (struct sockaddr_in*)pAddress);
 
-    if (sendto(gSocket, (const char*)pMessage, pMessage->overall_size, 0, (const struct sockaddr*)pAddress, sizeof(struct sockaddr)) == -1) {
+    if (sendto(gSocket, (const char*)pMessage, pMessage->overall_size, 0, (const struct sockaddr*)pAddress, sizeof(struct sockaddr_in)) == -1) {
         dr_dprintf("PDNetSendMessageToAddress(): Error on sendto() - WSAGetLastError=%d", WSAGetLastError());
         NetDisposeMessage(pDetails, pMessage);
         return 1;
