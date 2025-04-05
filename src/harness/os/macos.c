@@ -2,21 +2,25 @@
 
 #include "harness/config.h"
 #include "harness/os.h"
+#include <arpa/inet.h>
 #include <assert.h>
 #include <dirent.h>
 #include <err.h>
 #include <errno.h>
 #include <execinfo.h>
+#include <ifaddrs.h>
 #include <inttypes.h>
 #include <libgen.h>
 #include <limits.h>
 #include <mach-o/dyld.h>
+#include <netinet/in.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/socket.h>
 #include <sys/sysctl.h>
 #include <sys/types.h>
 #include <time.h>
@@ -283,4 +287,33 @@ char* OS_GetWorkingDirectory(char* argv0) {
         *bundlePath = '\0';
     }
     return OS_Dirname(argv0);
+}
+
+int OS_GetAdapaterAddress(char* name, void* pSockaddr_in) {
+    struct ifaddrs *ifaddr, *ifa;
+    int found = 0;
+
+    // Get the list of network interfaces
+    if (getifaddrs(&ifaddr) == -1) {
+        perror("getifaddrs");
+        return 0;
+    }
+
+    // Loop through all interfaces
+    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+        if (ifa->ifa_addr == NULL)
+            continue;
+
+        if (strlen(name) == 0 || strcmp(name, ifa->ifa_name) == 0) {
+            if (ifa->ifa_addr->sa_family == AF_INET) {
+                *((struct sockaddr_in*)pSockaddr_in) = *(struct sockaddr_in*)ifa->ifa_addr;
+                found = 1;
+                break;
+            }
+        }
+    }
+
+    // Free the memory allocated by getifaddrs
+    freeifaddrs(ifaddr);
+    return found;
 }

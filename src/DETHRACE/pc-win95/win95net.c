@@ -6,6 +6,7 @@
 #include "globvrpb.h"
 #include "harness/config.h"
 #include "harness/hooks.h"
+#include "harness/os.h"
 #include "harness/trace.h"
 #include "harness/winsock.h"
 #include "network.h"
@@ -21,7 +22,7 @@ tU32 gNetwork_init_flags;
 tPD_net_game_info* gJoinable_games;
 int gMatts_PC;
 tU16 gSocket_number_pd_format;
-//_IPX_ELEMENT gListen_elements[16];
+// _IPX_ELEMENT gListen_elements[16];
 char gLocal_ipx_addr_string[32];
 //_IPX_ELEMENT gSend_elements[16];
 struct sockaddr_in* gLocal_addr_ipx;
@@ -47,11 +48,15 @@ tU16 gSocket_number_network_order;
 tU16 gListen_selector;
 tU16 gSend_selector;
 
+// Added by dethrace
+struct sockaddr_in gAll_addr;
 struct sockaddr_in gLocal_addr;
 struct sockaddr_in gRemote_addr;
 struct sockaddr_in gBroadcast_addr;
 struct sockaddr_in gLast_received_addr;
+
 int gSocket;
+int gPlayer_id;
 
 #define MESSAGE_HEADER_STR "CW95MSG"
 #define JOINABLE_GAMES_CAPACITY 16
@@ -280,6 +285,7 @@ int PDNetInitialise(void) {
     gLocal_addr_ipx = &gLocal_addr;
     gRemote_addr_ipx = &gRemote_addr;
     gBroadcast_addr_ipx = &gBroadcast_addr;
+    memset(&gAll_addr, 0, sizeof(struct sockaddr_in));
     memset(&gLocal_addr, 0, sizeof(struct sockaddr_in));
     memset(&gRemote_addr, 0, sizeof(struct sockaddr_in));
     memset(&gBroadcast_addr, 0, sizeof(struct sockaddr_in));
@@ -299,13 +305,23 @@ int PDNetInitialise(void) {
     // gBroadcast_addr_ipx->sa_nodenum[4] = -1;
     // gBroadcast_addr_ipx->sa_nodenum[5] = -1;
 
-    gLocal_addr.sin_family = AF_INET;
+    gAll_addr.sin_family = AF_INET;
+    gAll_addr.sin_addr.s_addr = INADDR_ANY;
+    gAll_addr.sin_port = htons(12286);
+
+    int found = OS_GetAdapaterAddress(harness_game_config.network_adapter_name, &gLocal_addr);
+    if (!found) {
+        gLocal_addr.sin_addr.s_addr = INADDR_LOOPBACK;
+    }
     gLocal_addr.sin_port = htons(12286);
-    gLocal_addr.sin_addr.s_addr = INADDR_ANY;
+    NetNowIPXLocalTarget2String(str, &gLocal_addr);
+    LOG_INFO("Listening on %s", str);
+
     gRemote_addr.sin_family = AF_INET;
     gRemote_addr.sin_port = htons(12286);
     gBroadcast_addr.sin_family = AF_INET;
     gBroadcast_addr.sin_port = htons(12286);
+    gBroadcast_addr.sin_addr.s_addr = INADDR_BROADCAST; // inet_addr("255.255.255.255");
 
     // original code was using MAKEWORD(1, 1)
     if (WSAStartup(MAKEWORD(2, 2), &wsadata) == -1) {
@@ -335,7 +351,7 @@ int PDNetInitialise(void) {
     }
 
     if (harness_game_config.no_bind == 0) {
-        if (bind(gSocket, (struct sockaddr*)&gLocal_addr, sizeof(gLocal_addr)) == -1) {
+        if (bind(gSocket, (struct sockaddr*)&gAll_addr, sizeof(gAll_addr)) == -1) {
             dr_dprintf("Error on bind() - WSAGetLastError=%d", WSAGetLastError());
             closesocket(gSocket);
             WSACleanup();
@@ -343,7 +359,7 @@ int PDNetInitialise(void) {
         }
     }
 
-    int res = getsockname(gSocket, (struct sockaddr*)&gLocal_addr, &sa_len);
+    int res = getsockname(gSocket, (struct sockaddr*)&gAll_addr, &sa_len);
     NetNowIPXLocalTarget2String(gLocal_ipx_addr_string, gLocal_addr_ipx);
     // gNetworks[0] = *(tIPX_netnum*)gLocal_addr_ipx->sa_netnum;
     gNumber_of_networks = 1;
@@ -474,6 +490,14 @@ void PDNetDisposeGameDetails(tNet_game_details* pDetails) {
 // IDA: int __usercall PDNetHostGame@<EAX>(tNet_game_details *pDetails@<EAX>, char *pHost_name@<EDX>, void **pHost_address@<EBX>)
 int PDNetHostGame(tNet_game_details* pDetails, char* pHost_name, void** pHost_address) {
     LOG_TRACE("(%p, \"%s\", %p)", pDetails, pHost_name, pHost_address);
+    // static struct sockaddr_in gLocal_addr2;
+
+    // int found = OS_GetAdapaterAddress("bridge100", &gLocal_addr2);
+
+    // // if (gLocal_addr.sin_addr.s_addr)
+    // //     gLocal_addr2.sin_family = AF_INET;
+    // gLocal_addr2.sin_port = htons(12286);
+    // // gLocal_addr2.sin_addr.s_addr = inet_addr("127.0.0.1");
 
     dr_dprintf("PDNetHostGame()");
     *pHost_address = &gLocal_addr;
@@ -515,7 +539,8 @@ tPlayer_ID PDNetExtractPlayerID(tNet_game_details* pDetails) {
     LOG_TRACE("(%p)", pDetails);
 
     dr_dprintf("PDNetExtractPlayerID()");
-    return ntohs(gLocal_addr_ipx->sin_port);
+    return gPlayer_id;
+    // return ntohs(gLocal_addr_ipx->sin_port);
 }
 
 // IDA: void __usercall PDNetObtainSystemUserName(char *pName@<EAX>, int pMax_length@<EDX>)
@@ -555,6 +580,8 @@ int PDNetSendMessageToAllPlayers(tNet_game_details* pDetails, tNet_message* pMes
         if (i == gThis_net_player_index) {
             continue;
         }
+        NetNowIPXLocalTarget2String(str, &gNet_players[i].pd_net_info.addr_in);
+        LOG_DEBUG("sending to player %d, %s", i, str);
         if (sendto(gSocket, (const char*)pMessage, pMessage->overall_size, 0, (struct sockaddr*)&gNet_players[i].pd_net_info.addr_in, sizeof(gNet_players[i].pd_net_info.addr_in)) == -1) {
             dr_dprintf("PDNetSendMessageToAllPlayers(): Error on sendto() - WSAGetLastError=%d", WSAGetLastError());
             NetDisposeMessage(pDetails, pMessage);
