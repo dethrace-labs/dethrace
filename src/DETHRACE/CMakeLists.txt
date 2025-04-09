@@ -243,11 +243,25 @@ if(DETHRACE_INSTALL)
             DESTINATION "."
             OPTIONAL
         )
-    endif()
-    if(WIN32)
-        install(FILES  $<TARGET_RUNTIME_DLLS:dethrace>
-            DESTINATION "."
-            OPTIONAL
-        )
+        if(DETHRACE_PLATFORM_SDL_DYNAMIC)
+            if(DETHRACE_PLATFORM_SDL1)
+                get_filename_component(sdl1_lib_dir "${SDL_LIBRARY}" DIRECTORY)
+                get_filename_component(sdl1_root_dir "${SDL_LIBRARY}" PATH)
+                set(sdl1_bin_dir "${sdl1_root_dir}/bin" PATH)
+                find_file(SDL1DLL_PATH NAMES "SDL.dll" PATHS ${sdl1_lib_dir} ${sdl1_root_dir} PATH_SUFFIXES "bin" REQUIRED)
+                if(SDL1DLL_PATH)
+                    install(FILES "${SDL1DLL_PATH}"
+                        DESTINATION "."
+                        OPTIONAL
+                    )
+                endif()
+            endif()
+            if(DETHRACE_PLATFORM_SDL2)
+                install(FILES "$<TARGET_FILE:SDL2::SDL2>"
+                    DESTINATION "."
+                    OPTIONAL
+                )
+            endif()
+        endif()
     endif()
 endif()

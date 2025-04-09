@@ -202,8 +202,6 @@ static int get_mouse_buttons(int* pButton1, int* pButton2) {
 }
 
 static int get_mouse_position(int* pX, int* pY) {
-    int lX, lY;
-
     SDL1_GetMouseState(pX, pY);
     return 0;
 }
