@@ -15,7 +15,7 @@ if (DETHRACE_ASAN)
     target_link_options(dethrace_obj PUBLIC -fsanitize=address)
 endif()
 
-target_link_libraries(dethrace_obj PUBLIC SDL2::SDL2 smackw32 harness BRender::Full BRender::DDI s3)
+target_link_libraries(dethrace_obj PUBLIC smackw32 harness BRender::Full BRender::DDI s3)
 
 if(MSVC)
     target_compile_definitions(dethrace_obj PRIVATE -D_CRT_SECURE_NO_WARNINGS)
@@ -177,6 +177,9 @@ add_executable(dethrace
     ${CMAKE_SOURCE_DIR}/packaging/windows/dethrace.rc
 )
 
+get_property(build_rpaths GLOBAL PROPERTY DETHRACE_BUILD_RPATHS)
+set_property(TARGET dethrace APPEND PROPERTY BUILD_RPATH "${build_rpaths}")
+
 target_link_libraries(dethrace PRIVATE dethrace_obj compile_with_werror)
 target_sources(dethrace PRIVATE main.c)
 
@@ -240,11 +243,25 @@ if(DETHRACE_INSTALL)
             DESTINATION "."
             OPTIONAL
         )
-    endif()
-    if(WIN32)
-        install(FILES  $<TARGET_RUNTIME_DLLS:dethrace>
-            DESTINATION "."
-            OPTIONAL
-        )
+        if(DETHRACE_PLATFORM_SDL_DYNAMIC)
+            if(DETHRACE_PLATFORM_SDL1)
+                get_filename_component(sdl1_lib_dir "${SDL_LIBRARY}" DIRECTORY)
+                get_filename_component(sdl1_root_dir "${SDL_LIBRARY}" PATH)
+                set(sdl1_bin_dir "${sdl1_root_dir}/bin" PATH)
+                find_file(SDL1DLL_PATH NAMES "SDL.dll" PATHS ${sdl1_lib_dir} ${sdl1_root_dir} PATH_SUFFIXES "bin" REQUIRED)
+                if(SDL1DLL_PATH)
+                    install(FILES "${SDL1DLL_PATH}"
+                        DESTINATION "."
+                        OPTIONAL
+                    )
+                endif()
+            endif()
+            if(DETHRACE_PLATFORM_SDL2)
+                install(FILES "$<TARGET_FILE:SDL2::SDL2>"
+                    DESTINATION "."
+                    OPTIONAL
+                )
+            endif()
+        endif()
     endif()
 endif()

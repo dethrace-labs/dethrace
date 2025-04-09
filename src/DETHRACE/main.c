@@ -9,7 +9,7 @@
 
 #include "brender.h"
 
-extern void Harness_Init(int* argc, char* argv[]);
+extern int Harness_Init(int* argc, char* argv[]);
 extern int original_main(int pArgc, char* pArgv[]);
 
 void BR_CALLBACK _BrBeginHook(void) {
@@ -28,6 +28,8 @@ void BR_CALLBACK _BrEndHook(void) {
 }
 
 int main(int argc, char* argv[]) {
+    int result;
+
 #ifdef _WIN32
     /* Attach to the console that started us if any */
     if (AttachConsole(ATTACH_PARENT_PROCESS)) {
@@ -46,7 +48,10 @@ int main(int argc, char* argv[]) {
     }
 #endif
 
-    Harness_Init(&argc, argv);
+    result = Harness_Init(&argc, argv);
+    if (result != 0) {
+        return result;
+    }
 
     return original_main(argc, argv);
 }
