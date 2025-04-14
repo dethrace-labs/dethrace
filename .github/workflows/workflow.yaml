@@ -41,7 +41,7 @@ jobs:
         if: ${{ runner.os == 'Linux' }}
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgl-dev libxext-dev ${{ matrix.platform.apt-packages }}
+          sudo apt-get install -y libgl-dev libgl1-mesa-dev libglu1-mesa-dev libxext-dev
       - name: Set up SDL
         uses: libsdl-org/setup-sdl@main
         with:
@@ -52,6 +52,7 @@ jobs:
           cmake-toolchain-file: ${{ matrix.platform.cmake-toolchain-file }}
           discriminator: ${{ matrix.platform.arch }}
           version: 2-latest
+          version-sdl12-compat: 1-head
       - name: 'Prepare sources for release'
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
         run: |
@@ -68,6 +69,9 @@ jobs:
             -DDETHRACE_PACKAGE_PLATFORM=${{ matrix.platform.name }} \
             -DDETHRACE_PACKAGE_ARCH=${{ matrix.platform.arch }} \
             -DCMAKE_TOOLCHAIN_FILE=${{ matrix.platform.cmake-toolchain-file }} \
+            -DDETHRACE_PLATFORM_SDL1=ON \
+            -DDETHRACE_PLATFORM_SDL2=ON \
+            -DDETHRACE_PLATFORM_SDL_DYNAMIC=ON \
             ${{ matrix.platform.cmake-args }}
       - name: 'Build (CMake)'
         run: |
