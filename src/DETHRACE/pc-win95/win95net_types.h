@@ -9,12 +9,19 @@
 
 typedef struct tPD_net_player_info {
     // struct sockaddr_ipx addr_ipx;
-    struct sockaddr_in addr_in;
+    // struct sockaddr_in addr_in;
+    uint64_t address;
+    uint32_t port;
 } tPD_net_player_info;
 
 typedef struct tPD_net_game_info {
     // struct sockaddr_ipx addr_ipx;
-    struct sockaddr_in addr_in;
+    // struct sockaddr_in addr_in;
+
+    // has to match `tPD_net_player_info`
+    uint64_t address;
+    uint32_t port;
+
     tU32 last_response;
 } tPD_net_game_info;
 

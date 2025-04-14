@@ -478,7 +478,7 @@ int PDNetGetNextJoinGame(tNet_game_details* pGame, int pIndex) {
         return 0;
     }
     dr_dprintf("PDNetGetNextJoinGame(): Adding game.");
-    memcpy(&pGame->pd_net_info.addr_in, &gJoinable_games[pIndex].addr_in, sizeof(pGame->pd_net_info.addr_in));
+    memcpy(&pGame->pd_net_info, &gJoinable_games[pIndex], sizeof(pGame->pd_net_info));
     return 1;
 }
 
@@ -532,7 +532,7 @@ tU32 PDNetExtractGameID(tNet_game_details* pDetails) {
     LOG_TRACE("(%p)", pDetails);
 
     dr_dprintf("PDNetExtractGameID()");
-    return ntohs(pDetails->pd_net_info.addr_in.sin_port); // PDGetTotalTime();
+    return ntohs(pDetails->pd_net_info.port); // PDGetTotalTime();
 }
 
 // IDA: tPlayer_ID __usercall PDNetExtractPlayerID@<EAX>(tNet_game_details *pDetails@<EAX>)
@@ -577,13 +577,19 @@ int PDNetSendMessageToAllPlayers(tNet_game_details* pDetails, tNet_message* pMes
     int i;
     LOG_TRACE("(%p, %p)", pDetails, pMessage);
 
+    struct sockaddr_in someaddr;
+
     for (i = 0; i < gNumber_of_net_players; ++i) {
         if (i == gThis_net_player_index) {
             continue;
         }
-        NetNowIPXLocalTarget2String(str, &gNet_players[i].pd_net_info.addr_in);
-        LOG_DEBUG("sending to player %d, %s, fam: %d", i, str, gNet_players[i].pd_net_info.addr_in.sin_family);
-        if (sendto(gSocket, (const char*)pMessage, pMessage->overall_size, 0, (struct sockaddr*)&gNet_players[i].pd_net_info.addr_in, sizeof(gNet_players[i].pd_net_info.addr_in)) == -1) {
+        // NetNowIPXLocalTarget2String(str, &gNet_players[i].pd_net_info.address);
+        //  LOG_DEBUG("sending to player %d, %s, fam: %d", i, str, gNet_players[i].pd_net_info.addr_in.sin_family);
+
+        someaddr.sin_addr.s_addr = gNet_players[i].pd_net_info.address;
+        someaddr.sin_family = AF_INET;
+        someaddr.sin_port = gNet_players[i].pd_net_info.port;
+        if (sendto(gSocket, (const char*)pMessage, pMessage->overall_size, 0, &someaddr, sizeof(someaddr)) == -1) {
             dr_dprintf("PDNetSendMessageToAllPlayers(): Error on sendto() - WSAGetLastError=%d", WSAGetLastError());
             NetDisposeMessage(pDetails, pMessage);
             return 1;
@@ -591,6 +597,15 @@ int PDNetSendMessageToAllPlayers(tNet_game_details* pDetails, tNet_message* pMes
     }
     NetDisposeMessage(pDetails, pMessage);
     return 0;
+}
+
+void PrintNet(struct sockaddr_in* p) {
+    char portbuf[100];
+
+    inet_ntop(AF_INET, &p->sin_addr, portbuf, 32);
+    LOG_DEBUG(portbuf);
+    sprintf(portbuf, "portbuf :%d %d", ntohs(p->sin_port), p->sin_family);
+    LOG_DEBUG(portbuf);
 }
 
 // IDA: tNet_message* __usercall PDNetGetNextMessage@<EAX>(tNet_game_details *pDetails@<EAX>, void **pSender_address@<EDX>)

@@ -67,4 +67,6 @@ int PDNetInitClient(tNet_game_details* pDetails);
 
 int PDNetGetHeaderSize(void);
 
+void PrintNet(struct sockaddr_in* p);
+
 #endif

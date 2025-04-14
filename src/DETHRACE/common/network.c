@@ -1134,6 +1134,7 @@ void SendOutPlayerList(void) {
         message->contents.data.player_list.this_index = i;
         message->contents.data.player_list.batch_number = gPlayer_list_batch_number;
         memcpy(&message->contents.data.player_list.player, &gNet_players[i], sizeof(gNet_players[i]));
+        PrintNet(&gNet_players[i].pd_net_info);
         NetGuaranteedSendMessageToAllPlayers(gCurrent_net_game, message, 0);
     }
     gPlayer_list_batch_number++;
