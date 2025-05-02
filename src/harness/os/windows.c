@@ -1,5 +1,10 @@
 // Based on https://gist.github.com/jvranish/4441299
 
+
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <iphlpapi.h>
+
 // this has to be first
 #include <windows.h>
 //
@@ -16,6 +21,11 @@
 #include <stdio.h>  /* errno_t, FILE, fgets, fopen_s, fprintf*/
 #include <stdlib.h> /* _splitpath */
 #include <string.h> /* strcpy, strerror, strlen, strrchr */
+#include <wchar.h>
+#include <locale.h>
+
+#pragma comment(lib, "iphlpapi.lib")
+#pragma comment(lib, "ws2_32.lib")
 
 #ifndef F_OK
 #define F_OK 0
@@ -390,4 +400,55 @@ char* OS_Basename(const char* path) {
 
 char* OS_GetWorkingDirectory(char* argv0) {
     return OS_Dirname(argv0);
+}
+
+int OS_GetAdapaterAddress(char* name, void* pSockaddr_in) {
+    DWORD ret, bufLen = 15000;
+    IP_ADAPTER_ADDRESSES* adapter_addrs = (IP_ADAPTER_ADDRESSES*)malloc(bufLen);
+    int found = 0;
+
+    if (!adapter_addrs) {
+        fprintf(stderr, "Memory allocation failed.\n");
+        return 0;
+    }
+
+    // Convert input name to wide char
+    wchar_t wideName[256] = { 0 };
+    if (name && strlen(name) > 0) {
+        mbstowcs(wideName, name, sizeof(wideName) / sizeof(wideName[0]) - 1);
+    }
+
+    ret = GetAdaptersAddresses(AF_INET, GAA_FLAG_INCLUDE_PREFIX, NULL, adapter_addrs, &bufLen);
+    if (ret == ERROR_BUFFER_OVERFLOW) {
+        free(adapter_addrs);
+        adapter_addrs = (IP_ADAPTER_ADDRESSES*)malloc(bufLen);
+        if (!adapter_addrs)
+            return 0;
+        ret = GetAdaptersAddresses(AF_INET, GAA_FLAG_INCLUDE_PREFIX, NULL, adapter_addrs, &bufLen);
+    }
+
+    if (ret != NO_ERROR) {
+        free(adapter_addrs);
+        return 0;
+    }
+
+    for (IP_ADAPTER_ADDRESSES* aa = adapter_addrs; aa != NULL; aa = aa->Next) {
+        LOG_DEBUG("name: %s", aa->FriendlyName);    // Skip if name is provided and doesn't match FriendlyName
+        if (wcslen(wideName) > 0 && wcscmp(aa->FriendlyName, wideName) != 0)
+            continue;
+        
+
+        for (IP_ADAPTER_UNICAST_ADDRESS* ua = aa->FirstUnicastAddress; ua != NULL; ua = ua->Next) {
+            if (ua->Address.lpSockaddr->sa_family == AF_INET) {
+                struct sockaddr_in* sa_in = (struct sockaddr_in*)ua->Address.lpSockaddr;
+                *((struct sockaddr_in*)pSockaddr_in) = *sa_in;
+                found = 1;
+                goto cleanup;
+            }
+        }
+    }
+
+cleanup:
+    free(adapter_addrs);
+    return found;
 }
