@@ -7,20 +7,29 @@
 
 // dethrace: have switched out IPX implementation for IP
 
-typedef struct tPD_net_player_info {
-    // struct sockaddr_ipx addr_ipx;
-    // struct sockaddr_in addr_in;
+typedef struct tSockaddr_in {
     uint64_t address;
     uint32_t port;
+} tSockaddr_in;
+
+typedef struct tPD_net_player_info {
+    // struct sockaddr_ipx addr_ipx;
+
+    // struct sockaddr_in addr_in;
+    //  these fields used only for sending between peers to avoid sending platform-specific sockaddr_in
+    // uint64_t address_tx;
+    // uint32_t port_tx;
+
+    // cannot be a regular sockaddr_in because it is transmitted between machines
+    tSockaddr_in addr_in;
+
 } tPD_net_player_info;
 
 typedef struct tPD_net_game_info {
-    // struct sockaddr_ipx addr_ipx;
-    // struct sockaddr_in addr_in;
-
-    // has to match `tPD_net_player_info`
-    uint64_t address;
-    uint32_t port;
+    struct sockaddr_in addr_in;
+    // uint64_t address_tx;
+    // uint32_t port_tx;
+    // tSockaddr_in addr_in;
 
     tU32 last_response;
 } tPD_net_game_info;

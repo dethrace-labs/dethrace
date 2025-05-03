@@ -1383,6 +1383,7 @@ typedef union tNet_contents {                           // size: 0x160
     } data;                                             // @0x0
 } tNet_contents;
 
+#pragma pack(push, 4)
 typedef struct tNet_message {    // size: 0x17c
     tU32 pd_stuff_so_DO_NOT_USE; // @0x0
     tU32 magic_number;           // @0x4
@@ -1394,6 +1395,7 @@ typedef struct tNet_message {    // size: 0x17c
     tU16 overall_size;           // @0x1a
     tNet_contents contents;      // @0x1c
 } tNet_message;
+#pragma pack(pop)
 
 typedef struct tCar_detail_info {
     tCar_detail_ownership ownership;

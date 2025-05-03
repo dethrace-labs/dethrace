@@ -25,14 +25,14 @@ tU16 gSocket_number_pd_format;
 // _IPX_ELEMENT gListen_elements[16];
 char gLocal_ipx_addr_string[32];
 //_IPX_ELEMENT gSend_elements[16];
-struct sockaddr_in* gLocal_addr_ipx;
+// struct sockaddr_in* gLocal_addr_ipx;
 char gReceive_buffer[512];
 tPD_net_player_info gRemote_net_player_info;
-struct sockaddr_in* gBroadcast_addr_ipx;
+// struct sockaddr_in* gBroadcast_addr_ipx;
 tPD_net_player_info gLocal_net_player_info;
 char gSend_buffer[512];
 tIPX_netnum gNetworks[16];
-struct sockaddr_in* gRemote_addr_ipx;
+// struct sockaddr_in* gRemote_addr_ipx;
 tU8* gSend_packet;
 // W32 gListen_segment;
 tU8* gSend_packet_ptr;
@@ -54,6 +54,8 @@ struct sockaddr_in gLocal_addr;
 struct sockaddr_in gRemote_addr;
 struct sockaddr_in gBroadcast_addr;
 struct sockaddr_in gLast_received_addr;
+
+tSockaddr_in gLocal_addr_tx;
 
 int gSocket;
 int gPlayer_id;
@@ -178,10 +180,10 @@ int ReceiveHostResponses(void) {
         if (recvfrom(gSocket, gReceive_buffer, sizeof(gReceive_buffer), 0, (struct sockaddr*)&gRemote_addr, &sa_len) == -1) {
             break;
         }
-        NetNowIPXLocalTarget2String(addr_string, gRemote_addr_ipx);
+        NetNowIPXLocalTarget2String(addr_string, &gRemote_addr);
         dr_dprintf("ReceiveHostResponses(): Received string '%s' from %s", gReceive_buffer, addr_string);
 
-        if (SameEthernetAddress(gLocal_addr_ipx, gRemote_addr_ipx)) {
+        if (SameEthernetAddress(&gLocal_addr, &gRemote_addr)) {
             dr_dprintf("*** Discounting the above 'cos we sent it ***");
             continue;
         }
@@ -193,7 +195,7 @@ int ReceiveHostResponses(void) {
         dr_dprintf("*** It's a host reply! ***");
         already_registered = 0;
         for (i = 0; i < gNumber_of_hosts; i++) {
-            if (SameEthernetAddress(&gJoinable_games[i].addr_in, gRemote_addr_ipx)) {
+            if (SameEthernetAddress(&gJoinable_games[i].addr_in, &gRemote_addr)) {
                 already_registered = 1;
                 break;
             }
@@ -203,7 +205,7 @@ int ReceiveHostResponses(void) {
             gJoinable_games[i].last_response = PDGetTotalTime();
         } else {
             dr_dprintf("Adding joinable game to slot #%d", gNumber_of_hosts);
-            gJoinable_games[gNumber_of_hosts].addr_in = *gRemote_addr_ipx;
+            gJoinable_games[gNumber_of_hosts].addr_in = gRemote_addr;
             gJoinable_games[gNumber_of_hosts].last_response = PDGetTotalTime();
             gNumber_of_hosts++;
             dr_dprintf("Number of games found so far: %d", gNumber_of_hosts);
@@ -235,7 +237,7 @@ int BroadcastMessage(void) {
     errors = 0;
     for (i = 0; i < gNumber_of_networks; i++) {
         //*(_DWORD*)gBroadcast_addr_ipx->sa_netnum = gNetworks[i];
-        NetNowIPXLocalTarget2String(broadcast_addr_string, gBroadcast_addr_ipx);
+        NetNowIPXLocalTarget2String(broadcast_addr_string, &gBroadcast_addr);
         dr_dprintf("Broadcasting on address '%s'", broadcast_addr_string);
         if (sendto(gSocket, gSend_buffer, strlen(gSend_buffer) + 1, 0, (struct sockaddr*)&gBroadcast_addr, sizeof(gBroadcast_addr)) == -1) {
             dr_dprintf("BroadcastMessage(): Error on sendto() - WSAGetLastError=%d", WSAGetLastError());
@@ -283,13 +285,10 @@ int PDNetInitialise(void) {
     //         }
     //     }
     // }
-    gLocal_addr_ipx = &gLocal_addr;
-    gRemote_addr_ipx = &gRemote_addr;
-    gBroadcast_addr_ipx = &gBroadcast_addr;
-    memset(&gAll_addr, 0, sizeof(struct sockaddr_in));
-    memset(&gLocal_addr, 0, sizeof(struct sockaddr_in));
-    memset(&gRemote_addr, 0, sizeof(struct sockaddr_in));
-    memset(&gBroadcast_addr, 0, sizeof(struct sockaddr_in));
+    memset(&gAll_addr, 0, sizeof(gAll_addr));
+    memset(&gLocal_addr, 0, sizeof(gLocal_addr));
+    memset(&gRemote_addr, 0, sizeof(gRemote_addr));
+    memset(&gBroadcast_addr, 0, sizeof(gBroadcast_addr));
 
     // gLocal_addr_ipx->sa_family = AF_IPX;
     // gRemote_addr_ipx->sa_family = AF_IPX;
@@ -315,6 +314,10 @@ int PDNetInitialise(void) {
         gLocal_addr.sin_addr.s_addr = INADDR_LOOPBACK;
     }
     gLocal_addr.sin_port = htons(12286);
+
+    gLocal_addr_tx.address = gLocal_addr.sin_addr.s_addr;
+    gLocal_addr_tx.port = gLocal_addr.sin_port;
+
     NetNowIPXLocalTarget2String(str, &gLocal_addr);
     LOG_INFO("Listening on %s", str);
 
@@ -322,7 +325,7 @@ int PDNetInitialise(void) {
     gRemote_addr.sin_port = htons(12286);
     gBroadcast_addr.sin_family = AF_INET;
     gBroadcast_addr.sin_port = htons(12286);
-    gBroadcast_addr.sin_addr.s_addr = INADDR_BROADCAST; // inet_addr("255.255.255.255");
+    gBroadcast_addr.sin_addr.s_addr = inet_addr("255.0.0.0");
 
     // original code was using MAKEWORD(1, 1)
     if (WSAStartup(MAKEWORD(2, 2), &wsadata) == -1) {
@@ -361,7 +364,7 @@ int PDNetInitialise(void) {
     }
 
     int res = getsockname(gSocket, (struct sockaddr*)&gAll_addr, &sa_len);
-    NetNowIPXLocalTarget2String(gLocal_ipx_addr_string, gLocal_addr_ipx);
+    NetNowIPXLocalTarget2String(gLocal_ipx_addr_string, &gLocal_addr);
     // gNetworks[0] = *(tIPX_netnum*)gLocal_addr_ipx->sa_netnum;
     gNumber_of_networks = 1;
 
@@ -478,7 +481,9 @@ int PDNetGetNextJoinGame(tNet_game_details* pGame, int pIndex) {
         return 0;
     }
     dr_dprintf("PDNetGetNextJoinGame(): Adding game.");
-    memcpy(&pGame->pd_net_info, &gJoinable_games[pIndex], sizeof(pGame->pd_net_info));
+    // danger: copying a tPD_net_game_info into a tPD_net_player_info
+    // memcpy(&pGame->pd_net_info, &gJoinable_games[pIndex], sizeof(pGame->pd_net_info));
+    pGame->pd_net_info = *(tPD_net_player_info*)&gJoinable_games[pIndex];
     return 1;
 }
 
@@ -501,7 +506,7 @@ int PDNetHostGame(tNet_game_details* pDetails, char* pHost_name, void** pHost_ad
     // // gLocal_addr2.sin_addr.s_addr = inet_addr("127.0.0.1");
 
     dr_dprintf("PDNetHostGame()");
-    *pHost_address = &gLocal_addr;
+    *pHost_address = &gLocal_addr_tx;
     return 1;
 }
 
@@ -532,7 +537,7 @@ tU32 PDNetExtractGameID(tNet_game_details* pDetails) {
     LOG_TRACE("(%p)", pDetails);
 
     dr_dprintf("PDNetExtractGameID()");
-    return ntohs(pDetails->pd_net_info.port); // PDGetTotalTime();
+    return pDetails->pd_net_info.addr_in.port; // PDGetTotalTime();
 }
 
 // IDA: tPlayer_ID __usercall PDNetExtractPlayerID@<EAX>(tNet_game_details *pDetails@<EAX>)
@@ -583,13 +588,13 @@ int PDNetSendMessageToAllPlayers(tNet_game_details* pDetails, tNet_message* pMes
         if (i == gThis_net_player_index) {
             continue;
         }
-        // NetNowIPXLocalTarget2String(str, &gNet_players[i].pd_net_info.address);
-        //  LOG_DEBUG("sending to player %d, %s, fam: %d", i, str, gNet_players[i].pd_net_info.addr_in.sin_family);
+        // NetNowIPXLocalTarget2String(str, &gNet_players[i].pd_net_info.addr_in);
+        // LOG_DEBUG("sending to player %d, %s, fam: %d", i, str, gNet_players[i].pd_net_info.addr_in.sin_family);
 
-        someaddr.sin_addr.s_addr = gNet_players[i].pd_net_info.address;
+        someaddr.sin_addr.s_addr = gNet_players[i].pd_net_info.addr_in.address;
         someaddr.sin_family = AF_INET;
-        someaddr.sin_port = gNet_players[i].pd_net_info.port;
-        if (sendto(gSocket, (const char*)pMessage, pMessage->overall_size, 0, &someaddr, sizeof(someaddr)) == -1) {
+        someaddr.sin_port = gNet_players[i].pd_net_info.addr_in.port;
+        if (sendto(gSocket, (const char*)pMessage, pMessage->overall_size, 0, (struct sockaddr*)&someaddr, sizeof(someaddr)) == -1) {
             dr_dprintf("PDNetSendMessageToAllPlayers(): Error on sendto() - WSAGetLastError=%d", WSAGetLastError());
             NetDisposeMessage(pDetails, pMessage);
             return 1;
@@ -632,8 +637,8 @@ tNet_message* PDNetGetNextMessage(tNet_game_details* pDetails, void** pSender_ad
             PDFatalError(str);
         }
     } else {
-        NetNowIPXLocalTarget2String(addr_str, gRemote_addr_ipx);
-        if (!SameEthernetAddress(gLocal_addr_ipx, gRemote_addr_ipx)) {
+        NetNowIPXLocalTarget2String(addr_str, &gRemote_addr);
+        if (!SameEthernetAddress(&gLocal_addr, &gRemote_addr)) {
             msg_type = GetMessageTypeFromMessage(receive_buffer);
             switch (msg_type) {
             case 1:
@@ -650,7 +655,7 @@ tNet_message* PDNetGetNextMessage(tNet_game_details* pDetails, void** pSender_ad
                 break;
             default:
                 dr_dprintf("PDNetGetNextMessage(): res is %d, received message type %d from '%s', passing up", res, msg->contents.header.type, addr_str);
-                memcpy(&gLast_received_addr, gRemote_addr_ipx, sizeof(gLast_received_addr));
+                memcpy(&gLast_received_addr, &gRemote_addr, sizeof(gLast_received_addr));
                 LOG_DEBUG("new remote fam %d", gLast_received_addr.sin_family);
                 *pSender_address = &gLast_received_addr;
                 return msg;
@@ -680,7 +685,7 @@ void PDNetSetPlayerSystemInfo(tNet_game_player_info* pPlayer, void* pSender_addr
 
     dr_dprintf("PDNetSetPlayerSystemInfo()");
     memcpy(&pPlayer->pd_net_info, pSender_address, sizeof(pPlayer->pd_net_info));
-    LOG_DEBUG("new player set fam %d", pPlayer->pd_net_info.addr_in.sin_family);
+    // LOG_DEBUG("new player set fam %d", pPlayer->pd_net_info.addr_in.sin_family);
 }
 
 // IDA: void __usercall PDNetDisposePlayer(tNet_game_player_info *pPlayer@<EAX>)
