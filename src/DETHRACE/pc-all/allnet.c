@@ -1,5 +1,3 @@
-#ifdef 0
-
 #include "pd/net.h"
 
 #include "brender.h"
@@ -10,7 +8,7 @@
 #include "harness/hooks.h"
 #include "harness/os.h"
 #include "harness/trace.h"
-#include "harness/winsock.h"
+#include "net_types.h"
 #include "network.h"
 #include "pd/net.h"
 #include "pd/sys.h"
@@ -18,39 +16,38 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef _WIN32
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+#include <winsock2.h>
+#include <ws2tcpip.h>
+
+#define EWOULDBLOCK WSAEWOULDBLOCK
+
+#else /* Assume posix style sockets on non-windows */
+
+#include <arpa/inet.h>
+#include <errno.h>
+#include <sys/socket.h>
+#endif
+
 // dethrace: have switched out IPX implementation for IP
 
-tU32 gNetwork_init_flags;
 tPD_net_game_info* gJoinable_games;
 int gMatts_PC;
 tU16 gSocket_number_pd_format;
-// _IPX_ELEMENT gListen_elements[16];
-char gLocal_ipx_addr_string[32];
-//_IPX_ELEMENT gSend_elements[16];
-// struct sockaddr_in* gLocal_addr_ipx;
+char gLocal_addr_string[32];
 char gReceive_buffer[512];
 tPD_net_player_info gRemote_net_player_info;
-// struct sockaddr_in* gBroadcast_addr_ipx;
 tPD_net_player_info gLocal_net_player_info;
 char gSend_buffer[512];
-tIPX_netnum gNetworks[16];
-// struct sockaddr_in* gRemote_addr_ipx;
 tU8* gSend_packet;
-// W32 gListen_segment;
 tU8* gSend_packet_ptr;
-// W32 gSend_segment;
 tU8* gListen_packet;
 tU8* gListen_packet_ptr;
 size_t gMsg_header_strlen;
 int gNumber_of_networks;
 int gNumber_of_hosts;
-//_IPX_HEADER gLast_received_IPX_header;
-tU16 gSocket_number_network_order;
-// unsigned short gECB_offset;
-tU16 gListen_selector;
-tU16 gSend_selector;
 
-// Added by dethrace
 struct sockaddr_in gAny_addr;
 struct sockaddr_in gLocal_addr;
 struct sockaddr_in gRemote_addr;
@@ -76,6 +73,10 @@ DR_STATIC_ASSERT(offsetof(tNet_message, senders_time_stamp) == 20);
 DR_STATIC_ASSERT(offsetof(tNet_message, num_contents) == 24);
 DR_STATIC_ASSERT(offsetof(tNet_message, overall_size) == 26);
 DR_STATIC_ASSERT(offsetof(tNet_message, contents) == 28);
+
+// dethrace added
+void PDNetCopyFromNative(tCopyable_sockaddr_in* pAddress, struct sockaddr_in* sock);
+void PDNetCopyToNative(struct sockaddr_in* sock, tCopyable_sockaddr_in* pAddress);
 
 // IDA: void __cdecl ClearupPDNetworkStuff()
 void ClearupPDNetworkStuff(void) {
@@ -109,29 +110,25 @@ int GetSocketNumberFromProfileFile(void) {
     NOT_IMPLEMENTED();
 }
 
-// tU32 EthernetAddressToU32(SOCKADDR_IPX_* pAddr_ipx) {
-//     LOG_TRACE("(%p)", pAddr_ipx);
-//     NOT_IMPLEMENTED();
-// }
-
-void NetNowIPXLocalTarget2String(char* pString, struct sockaddr_in* pSock_addr_ipx) {
-    LOG_TRACE("(\"%s\", %p)", pString, pSock_addr_ipx);
+// in dossys, this is called `NetNowIPXLocalTarget2String`
+void SockAddrToString(char* pString, struct sockaddr_in* pSock_addr) {
+    LOG_TRACE("(\"%s\", %p)", pString, pSock_addr);
 
     char portbuf[10];
 
-    inet_ntop(AF_INET, &pSock_addr_ipx->sin_addr, pString, 32);
-    sprintf(portbuf, ":%d", ntohs(pSock_addr_ipx->sin_port));
+    inet_ntop(AF_INET, &pSock_addr->sin_addr, pString, 32);
+    sprintf(portbuf, ":%d", ntohs(pSock_addr->sin_port));
     strcat(pString, portbuf);
 }
 
 // added by dethrace
-void NetNowIPXLocalTarget2String2(char* pString, tCopyable_sockaddr_in* pSock_addr_ipx) {
-    LOG_TRACE("(\"%s\", %p)", pString, pSock_addr_ipx);
+void CopyableSockAddrToString(char* pString, tCopyable_sockaddr_in* pSock_addr) {
+    LOG_TRACE("(\"%s\", %p)", pString, pSock_addr);
 
     char portbuf[10];
 
-    inet_ntop(AF_INET, &pSock_addr_ipx->address, pString, 32);
-    sprintf(portbuf, ":%d", ntohs(pSock_addr_ipx->port));
+    inet_ntop(AF_INET, &pSock_addr->address, pString, 32);
+    sprintf(portbuf, ":%d", ntohs(pSock_addr->port));
     strcat(pString, portbuf);
 }
 
@@ -156,20 +153,20 @@ int GetMessageTypeFromMessage(char* pMessage_str) {
     return 999;
 }
 
-int SameEthernetAddress(struct sockaddr_in* pAddr_ipx1, struct sockaddr_in* pAddr_ipx2) {
-    LOG_TRACE("(%p, %p)", pAddr_ipx1, pAddr_ipx2);
+int SameEthernetAddress(struct sockaddr_in* pAddr_1, struct sockaddr_in* pAddr_2) {
+    LOG_TRACE("(%p, %p)", pAddr_1, pAddr_2);
 
-    return memcmp(pAddr_ipx1, pAddr_ipx2, sizeof(struct sockaddr_in)) == 0;
+    return memcmp(pAddr_1, pAddr_2, sizeof(struct sockaddr_in)) == 0;
 }
 
 // added by dethrace
-int SameEthernetAddress2(tCopyable_sockaddr_in* pAddr_ipx1, struct sockaddr_in* pAddr_ipx2) {
-    LOG_TRACE("(%p, %p)", pAddr_ipx1, pAddr_ipx2);
+int SameEthernetAddress2(tCopyable_sockaddr_in* pAddr_1, struct sockaddr_in* pAddr_2) {
+    LOG_TRACE("(%p, %p)", pAddr_1, pAddr_2);
 
-    return pAddr_ipx1->port == pAddr_ipx2->sin_port && pAddr_ipx1->address == pAddr_ipx2->sin_addr.s_addr;
+    return pAddr_1->port == pAddr_2->sin_port && pAddr_1->address == pAddr_2->sin_addr.s_addr;
 }
 
-/*SOCKADDR_IPX_* */ void* GetIPXAddrFromPlayerID(tPlayer_ID pPlayer_id) {
+/*SOCKADDR_IPX_* */ void GetIPXAddrFromPlayerID(tPlayer_ID pPlayer_id) {
     int i;
     tU8* nodenum;
     NOT_IMPLEMENTED();
@@ -195,14 +192,14 @@ int ReceiveHostResponses(void) {
 
     char addr_string[32];
     unsigned int sa_len;
-    int wsa_error;
+    int error;
 
     sa_len = sizeof(gRemote_addr);
     while (1) {
         if (recvfrom(gSocket, gReceive_buffer, sizeof(gReceive_buffer), 0, (struct sockaddr*)&gRemote_addr, &sa_len) == -1) {
             break;
         }
-        NetNowIPXLocalTarget2String(addr_string, &gRemote_addr);
+        SockAddrToString(addr_string, &gRemote_addr);
         dr_dprintf("ReceiveHostResponses(): Received string '%s' from %s", gReceive_buffer, addr_string);
 
         if (SameEthernetAddress(&gLocal_addr, &gRemote_addr)) {
@@ -235,16 +232,16 @@ int ReceiveHostResponses(void) {
         if (gNumber_of_hosts) {
             dr_dprintf("Currently registered net games:");
             for (i = 0; i < gNumber_of_hosts; i++) {
-                NetNowIPXLocalTarget2String2(str, &gJoinable_games[i].addr_in);
+                CopyableSockAddrToString(str, &gJoinable_games[i].addr_in);
                 dr_dprintf("%d: Host addr %s", i, str);
             }
         }
     }
-    wsa_error = WSAGetLastError() != WSAEWOULDBLOCK;
-    if (wsa_error == 0) {
+    error = OS_GetLastSocketError() != EWOULDBLOCK;
+    if (error == 0) {
         return 1;
     }
-    dr_dprintf("ReceiveHostResponses(): Error on recvfrom() - WSAGetLastError=%d", wsa_error);
+    dr_dprintf("ReceiveHostResponses(): Error on recvfrom() - WSAGetLastError=%d", error);
     return 0;
 }
 
@@ -258,11 +255,10 @@ int BroadcastMessage(void) {
 
     errors = 0;
     for (i = 0; i < gNumber_of_networks; i++) {
-        //*(_DWORD*)gBroadcast_addr_ipx->sa_netnum = gNetworks[i];
-        NetNowIPXLocalTarget2String(broadcast_addr_string, &gBroadcast_addr);
+        SockAddrToString(broadcast_addr_string, &gBroadcast_addr);
         dr_dprintf("Broadcasting on address '%s'", broadcast_addr_string);
         if (sendto(gSocket, gSend_buffer, strlen(gSend_buffer) + 1, 0, (struct sockaddr*)&gBroadcast_addr, sizeof(gBroadcast_addr)) == -1) {
-            dr_dprintf("BroadcastMessage(): Error on sendto() - WSAGetLastError=%d", WSAGetLastError());
+            dr_dprintf("BroadcastMessage(): Error on sendto() - WSAGetLastError=%d", OS_GetLastSocketError());
             errors = 1;
         }
     }
@@ -282,50 +278,17 @@ int PDNetInitialise(void) {
 
     struct linger so_linger;
     unsigned int sa_len;
-    WSADATA wsadata;
+
     LOG_TRACE("()");
 
     gPlayer_id = PDGetTotalTime();
     sa_len = sizeof(struct sockaddr_in);
     dr_dprintf("PDNetInitialise()");
-    int ipx_socket_num = PORT;
-    // Dont bother to handle network.ini
-    // if (gWin32_should_load_network_ini) {
-    //     if (GetPrivateProfileStringA(
-    //             "Network",
-    //             "IPXSocket",
-    //             Default,
-    //             (LPSTR)ReturnedString,
-    //             0x20u,
-    //             gNetwork_profile_fname)) {
-    //         v11 = sscanf(ReturnedString, "%x", &v9);
-    //         if (v11) {
-    //             if (v11 != -1) {
-    //                 dr_dprintf("New IPX socket %4.4x", v9);
-    //                 ipx_socket_num = sub_454930(v9);
-    //             }
-    //         }
-    //     }
-    // }
+
     memset(&gAny_addr, 0, sizeof(gAny_addr));
     memset(&gLocal_addr, 0, sizeof(gLocal_addr));
     memset(&gRemote_addr, 0, sizeof(gRemote_addr));
     memset(&gBroadcast_addr, 0, sizeof(gBroadcast_addr));
-
-    // gLocal_addr_ipx->sa_family = AF_IPX;
-    // gRemote_addr_ipx->sa_family = AF_IPX;
-    // gBroadcast_addr_ipx->sa_family = AF_IPX;
-    // gLocal_addr_ipx->sa_socket = ipx_socket_num;
-    // gRemote_addr_ipx->sa_socket = ipx_socket_num;
-    // gBroadcast_addr_ipx->sa_socket = ipx_socket_num;
-
-    // // IPX broadcast
-    // gBroadcast_addr_ipx->sa_nodenum[0] = -1;
-    // gBroadcast_addr_ipx->sa_nodenum[1] = -1;
-    // gBroadcast_addr_ipx->sa_nodenum[2] = -1;
-    // gBroadcast_addr_ipx->sa_nodenum[3] = -1;
-    // gBroadcast_addr_ipx->sa_nodenum[4] = -1;
-    // gBroadcast_addr_ipx->sa_nodenum[5] = -1;
 
     gAny_addr.sin_family = AF_INET;
     gAny_addr.sin_addr.s_addr = INADDR_ANY;
@@ -341,13 +304,13 @@ int PDNetInitialise(void) {
     // advertise that we are connectable on this address
     PDNetCopyFromNative(&gLocal_addr_copyable, &gLocal_addr);
 
-    NetNowIPXLocalTarget2String(str, &gLocal_addr);
+    SockAddrToString(str, &gLocal_addr);
     LOG_INFO("Advertising on %s", str);
 
     // actually listen on any address
     gLocal_addr.sin_addr.s_addr = INADDR_ANY;
 
-    NetNowIPXLocalTarget2String(str, &gLocal_addr);
+    SockAddrToString(str, &gLocal_addr);
     LOG_INFO("Listening on %s", str);
 
     gRemote_addr.sin_family = AF_INET;
@@ -356,16 +319,15 @@ int PDNetInitialise(void) {
     gBroadcast_addr.sin_port = htons(PORT);
     gBroadcast_addr.sin_addr.s_addr = INADDR_BROADCAST;
 
-    // original code was using MAKEWORD(1, 1)
-    if (WSAStartup(MAKEWORD(2, 2), &wsadata) == -1) {
+    if (OS_InitSockets() == -1) {
         dr_dprintf("PDNetInitialise(): WSAStartup() failed");
         return -1;
     }
 
     gSocket = socket(AF_INET, SOCK_DGRAM, 0);
     if (gSocket == -1) {
-        dr_dprintf("PDNetInitialise(): Failed to create socket - WSAGetLastError=%d", WSAGetLastError());
-        WSACleanup();
+        dr_dprintf("PDNetInitialise(): Failed to create socket - WSAGetLastError=%d", OS_GetLastSocketError());
+        OS_CleanupSockets();
         return -1;
     }
     int broadcast = 1;
@@ -375,63 +337,27 @@ int PDNetInitialise(void) {
     setsockopt(gSocket, SOL_SOCKET, SO_LINGER, &so_linger, sizeof(so_linger));
 
     unsigned long nobio = 1;
-    if (ioctlsocket(gSocket, FIONBIO, &nobio) == -1) {
-        dr_dprintf("Error on ioctlsocket() - WSAGetLastError=%d", WSAGetLastError());
-        closesocket(gSocket);
-        WSACleanup();
+    if (OS_SetSocketNonBlocking(gSocket) == -1) {
+        dr_dprintf("Error on ioctlsocket() - WSAGetLastError=%d", OS_GetLastSocketError());
+        OS_CloseSocket(gSocket);
+        OS_CleanupSockets();
         return -1;
     }
 
     if (harness_game_config.no_bind == 0) {
         if (bind(gSocket, (struct sockaddr*)&gAny_addr, sizeof(gAny_addr)) == -1) {
-            dr_dprintf("Error on bind() - WSAGetLastError=%d", WSAGetLastError());
-            closesocket(gSocket);
-            WSACleanup();
+            dr_dprintf("Error on bind() - WSAGetLastError=%d", OS_GetLastSocketError());
+            OS_CloseSocket(gSocket);
+            OS_CleanupSockets();
             return -1;
         }
     }
 
-    // int res = getsockname(gSocket, (struct sockaddr*)&gLocal_addr, &sa_len);
-    NetNowIPXLocalTarget2String(gLocal_ipx_addr_string, &gLocal_addr);
+    SockAddrToString(gLocal_addr_string, &gLocal_addr);
 
-    // gNetworks[0] = *(tIPX_netnum*)gLocal_addr_ipx->sa_netnum;
-    gNumber_of_networks = 1;
-
-    // if (gWin32_should_load_network_ini) {
-    //     for (i = 1; i <= 15; ++i) {
-    //         sprintf(KeyName, "%s%d", "Network", i);
-    //         if (GetPrivateProfileStringA(
-    //                 "Network",
-    //                 KeyName,
-    //                 Default,
-    //                 (LPSTR)ReturnedString,
-    //                 0x20u,
-    //                 gNetwork_profile_fname)) {
-    //             v11 = sscanf(ReturnedString, "%x", &network_nbr);
-    //             if (v11) {
-    //                 if (v11 != -1) {
-    //                     dr_dprintf("Found network number '%x' in INI file", network_nbr);
-    //                     gNetworks[gNumber_of_networks].bNetwork[0] = HIBYTE(network_nbr);
-    //                     gNetworks[gNumber_of_networks].bNetwork[1] = (network_nbr & 0xFF0000u) >> 16;
-    //                     gNetworks[gNumber_of_networks].bNetwork[2] = BYTE1(network_nbr);
-    //                     gNetworks[gNumber_of_networks].bNetwork[3] = network_nbr;
-    //                     if (gNetworks[gNumber_of_networks].bNetwork[0] != gLocal_addr_ipx->sa_netnum[0]
-    //                         || gNetworks[gNumber_of_networks].bNetwork[1] != gLocal_addr_ipx->sa_netnum[1]
-    //                         || gNetworks[gNumber_of_networks].bNetwork[2] != gLocal_addr_ipx->sa_netnum[2]
-    //                         || gNetworks[gNumber_of_networks].bNetwork[3] != gLocal_addr_ipx->sa_netnum[3]) {
-    //                         ++gNumber_of_networks;
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     dr_dprintf("Total networks = %d", gNumber_of_networks);
-    // }
-    // byte_536440 = *gLocal_addr_ipx;
-
-    dr_dprintf("Socket bound OK; local address is '%s'", gLocal_ipx_addr_string);
+    dr_dprintf("Socket bound OK; local address is '%s'", gLocal_addr_string);
     gMsg_header_strlen = 7;
-    if (strstr(gLocal_ipx_addr_string, "00a0240f9fac")) {
+    if (strstr(gLocal_addr_string, "00a0240f9fac")) {
         gMatts_PC = 1;
     }
     return 0;
@@ -443,7 +369,7 @@ int PDNetShutdown(void) {
 
     dr_dprintf("PDNetShutdown()");
     if (gSocket != -1) {
-        closesocket(gSocket);
+        OS_CloseSocket(gSocket);
     }
     gSocket = -1;
     return 0;
@@ -595,7 +521,6 @@ void PDNetObtainSystemUserName(char* pName, int pMax_length) {
 // IDA: int __usercall PDNetSendMessageToPlayer@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>, tPlayer_ID pPlayer@<EBX>)
 int PDNetSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage, tPlayer_ID pPlayer) {
     char str[256];
-    // SOCKADDR_IPX_* remote_addr_ipx;
     LOG_TRACE("(%p, %p, %d)", pDetails, pMessage, pPlayer);
     NOT_IMPLEMENTED();
 }
@@ -614,10 +539,10 @@ int PDNetSendMessageToAllPlayers(tNet_game_details* pDetails, tNet_message* pMes
         }
 
         PDNetCopyToNative(&someaddr, &gNet_players[i].pd_net_info.addr_in);
-        NetNowIPXLocalTarget2String(str, &someaddr);
+        SockAddrToString(str, &someaddr);
         LOG_DEBUG(str);
         if (sendto(gSocket, (const char*)pMessage, pMessage->overall_size, 0, (struct sockaddr*)&someaddr, sizeof(someaddr)) == -1) {
-            dr_dprintf("PDNetSendMessageToAllPlayers(): Error on sendto() - WSAGetLastError=%d", WSAGetLastError());
+            dr_dprintf("PDNetSendMessageToAllPlayers(): Error on sendto() - WSAGetLastError=%d", OS_GetLastSocketError());
             NetDisposeMessage(pDetails, pMessage);
             return 1;
         }
@@ -644,13 +569,13 @@ tNet_message* PDNetGetNextMessage(tNet_game_details* pDetails, void** pSender_ad
     res = recvfrom(gSocket, receive_buffer, 512, 0, (struct sockaddr*)&gRemote_addr, &sa_len);
     res = res != -1;
     if (res == 0) {
-        res = WSAGetLastError() != WSAEWOULDBLOCK;
+        res = OS_GetLastSocketError() != EWOULDBLOCK;
         if (res) {
             sprintf(str, "PDNetGetNextMessage(): Error on recvfrom() - WSAGetLastError=%d", res);
             PDFatalError(str);
         }
     } else {
-        NetNowIPXLocalTarget2String(addr_str, &gRemote_addr);
+        SockAddrToString(addr_str, &gRemote_addr);
         if (!SameEthernetAddress(&gLocal_addr, &gRemote_addr)) {
             msg_type = GetMessageTypeFromMessage(receive_buffer);
             switch (msg_type) {
@@ -659,7 +584,7 @@ tNet_message* PDNetGetNextMessage(tNet_game_details* pDetails, void** pSender_ad
                     dr_dprintf("PDNetGetNextMessage(): Received '%s' from '%s', replying to joiner", receive_buffer, addr_str);
                     MakeMessageToSend(2);
                     if (sendto(gSocket, gSend_buffer, strlen(gSend_buffer) + 1, 0, (struct sockaddr*)&gRemote_addr, sizeof(gRemote_addr)) == -1) {
-                        dr_dprintf("PDNetGetNextMessage(): Error on sendto() - WSAGetLastError=%d", WSAGetLastError());
+                        dr_dprintf("PDNetGetNextMessage(): Error on sendto() - WSAGetLastError=%d", OS_GetLastSocketError());
                     }
                 }
                 break;
@@ -717,10 +642,10 @@ int PDNetSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessag
 
     PDNetCopyToNative(&someaddr, pAddress);
 
-    NetNowIPXLocalTarget2String(str, &someaddr);
+    SockAddrToString(str, &someaddr);
 
     if (sendto(gSocket, (const char*)pMessage, pMessage->overall_size, 0, (struct sockaddr*)&someaddr, sizeof(someaddr)) == -1) {
-        dr_dprintf("PDNetSendMessageToAddress(): Error on sendto() - WSAGetLastError=%d", WSAGetLastError());
+        dr_dprintf("PDNetSendMessageToAddress(): Error on sendto() - WSAGetLastError=%d", OS_GetLastSocketError());
         NetDisposeMessage(pDetails, pMessage);
         return 1;
     }
@@ -752,5 +677,3 @@ void PDNetCopyToNative(struct sockaddr_in* sock, tCopyable_sockaddr_in* pAddress
     sock->sin_port = pAddress->port;
     sock->sin_family = AF_INET;
 }
-
-#endif

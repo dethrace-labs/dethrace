@@ -8,11 +8,13 @@
 #include <err.h>
 #include <errno.h>
 #include <execinfo.h>
+#include <fcntl.h>
 #include <ifaddrs.h>
 #include <inttypes.h>
 #include <libgen.h>
 #include <limits.h>
 #include <mach-o/dyld.h>
+#include <netdb.h> // for getaddrinfo() and freeaddrinfo()
 #include <netinet/in.h>
 #include <signal.h>
 #include <stdbool.h>
@@ -20,10 +22,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <sys/sysctl.h>
 #include <sys/types.h>
 #include <time.h>
+#include <unistd.h> // for close()
 #include <unistd.h>
 
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof(A[0]))
@@ -316,4 +320,26 @@ int OS_GetAdapterAddress(char* name, void* pSockaddr_in) {
     // Free the memory allocated by getifaddrs
     freeifaddrs(ifaddr);
     return found;
+}
+
+int OS_InitSockets(void) {
+    return 0;
+}
+
+int OS_GetLastSocketError(void) {
+    return errno;
+}
+
+void OS_CleanupSockets(void) {
+    // no-op
+}
+
+int OS_SetSocketNonBlocking(int socket) {
+    int flags = fcntl(socket, F_GETFL);
+    flags |= O_NONBLOCK;
+    return fcntl(socket, F_SETFL, flags);
+}
+
+int OS_CloseSocket(int socket) {
+    return close(socket);
 }

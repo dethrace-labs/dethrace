@@ -1,9 +1,8 @@
 // Based on https://gist.github.com/jvranish/4441299
 
-
+#include <iphlpapi.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
-#include <iphlpapi.h>
 
 // this has to be first
 #include <windows.h>
@@ -17,12 +16,12 @@
 
 #include <errno.h> /* errno, strerror */
 #include <io.h>    /* _access_s, F_OK */
+#include <locale.h>
 #include <stddef.h>
 #include <stdio.h>  /* errno_t, FILE, fgets, fopen_s, fprintf*/
 #include <stdlib.h> /* _splitpath */
 #include <string.h> /* strcpy, strerror, strlen, strrchr */
 #include <wchar.h>
-#include <locale.h>
 
 #pragma comment(lib, "iphlpapi.lib")
 #pragma comment(lib, "ws2_32.lib")
@@ -433,10 +432,9 @@ int OS_GetAdapaterAddress(char* name, void* pSockaddr_in) {
     }
 
     for (IP_ADAPTER_ADDRESSES* aa = adapter_addrs; aa != NULL; aa = aa->Next) {
-        LOG_DEBUG("name: %s", aa->FriendlyName);    // Skip if name is provided and doesn't match FriendlyName
+        LOG_DEBUG("name: %s", aa->FriendlyName); // Skip if name is provided and doesn't match FriendlyName
         if (wcslen(wideName) > 0 && wcscmp(aa->FriendlyName, wideName) != 0)
             continue;
-        
 
         for (IP_ADAPTER_UNICAST_ADDRESS* ua = aa->FirstUnicastAddress; ua != NULL; ua = ua->Next) {
             if (ua->Address.lpSockaddr->sa_family == AF_INET) {
@@ -451,4 +449,26 @@ int OS_GetAdapaterAddress(char* name, void* pSockaddr_in) {
 cleanup:
     free(adapter_addrs);
     return found;
+}
+
+int OS_InitSockets(void) {
+    WSADATA wsadata;
+    return WSAStartup(MAKEWORD(2, 2), &wsadata);
+}
+
+int OS_GetLastSocketError(void) {
+    return WSAGetLastError();
+}
+
+void OS_CleanupSockets(void) {
+    WSACleanup();
+}
+
+int OS_SetSocketNonBlocking(int socket) {
+    unsigned long nobio = 1;
+    return ioctlsocket(gSocket, FIONBIO, &nobio);
+}
+
+int OS_CloseSocket(int socket) {
+    return closesocket(socket);
 }

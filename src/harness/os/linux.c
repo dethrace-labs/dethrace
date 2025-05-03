@@ -377,3 +377,25 @@ int OS_GetAdapterAddress(char* name, void* pSockaddr_in) {
     freeifaddrs(ifaddr);
     return found;
 }
+
+int OS_InitSockets(void) {
+    return 0;
+}
+
+int OS_GetLastSocketError(void) {
+    return errno;
+}
+
+void OS_CleanupSockets(void) {
+    // no-op
+}
+
+int OS_SetSocketNonBlocking(int socket) {
+    int flags = fcntl(socket, F_GETFL);
+    flags |= O_NONBLOCK;
+    return fcntl(socket, F_SETFL, flags);
+}
+
+int OS_CloseSocket(int socket) {
+    return close(socket);
+}

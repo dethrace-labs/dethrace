@@ -161,12 +161,12 @@ target_sources(dethrace_obj PRIVATE
     dr_types.h
     pd/net.h
     pd/sys.h
-    pc-win95/win95sys.c
+    # pc-win95/win95sys.c
     pc-win95/dinput.h
     pc-win95/ssdx.c
     pc-win95/ssdx.h
-    pc-win95/win95net.c
-    pc-dos/dosnet.c
+    pc-all/allnet.c
+    #pc-dos/dosnet.c
     pc-dos/dossys.c
 )
 

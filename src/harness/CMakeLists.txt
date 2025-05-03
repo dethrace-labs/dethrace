@@ -54,8 +54,8 @@ target_sources(harness PRIVATE
     harness.c
     harness.h
     audio/miniaudio.c
-    win95/polyfill.c
-    win95/winsock.c
+    #win95/polyfill.c
+    #win95/winsock.c
     platforms/null.c
     platforms/null.h
 

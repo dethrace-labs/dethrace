@@ -1,13 +1,9 @@
-#ifndef WIN95_NET_TYPES_H
-#define WIN95_NET_TYPES_H
-
-// #include "dr_types.h"
-#include "harness/win95_polyfill.h"
-#include "harness/winsock.h"
+#ifndef PC_ALL_NET_TYPES_H
+#define PC_ALL_NET_TYPES_H
 
 // dethrace: have switched out IPX implementation for IP
 
-// cannot be a regular sockaddr_in because it is transmitted between machines
+// cannot be a regular sockaddr_in because it is transmitted between OS's
 typedef struct tCopyable_sockaddr_in {
     uint64_t address;
     uint32_t port;
@@ -28,7 +24,7 @@ typedef struct tPD_net_game_info {
     // cannot be a regular sockaddr_in because it is transmitted between machines
     tCopyable_sockaddr_in addr_in;
 
-    tU32 last_response;
+    uint32_t last_response;
 } tPD_net_game_info;
 
 // typedef struct tIPX_netnum {
