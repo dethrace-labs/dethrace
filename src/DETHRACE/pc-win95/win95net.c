@@ -55,14 +55,15 @@ struct sockaddr_in gRemote_addr;
 struct sockaddr_in gBroadcast_addr;
 struct sockaddr_in gLast_received_addr;
 
-tSockaddr_in gLocal_addr_tx;
-tSockaddr_in gLast_received_addr_tx;
+tCopyable_sockaddr_in gLocal_addr_copyable;
+tCopyable_sockaddr_in gLast_received_addr_copyable;
 
 int gSocket;
 int gPlayer_id;
 
 #define MESSAGE_HEADER_STR "CW95MSG"
 #define JOINABLE_GAMES_CAPACITY 16
+#define PORT 12286
 
 DR_STATIC_ASSERT(offsetof(tNet_message, pd_stuff_so_DO_NOT_USE) == 0);
 DR_STATIC_ASSERT(offsetof(tNet_message, magic_number) == 4);
@@ -122,7 +123,7 @@ void NetNowIPXLocalTarget2String(char* pString, struct sockaddr_in* pSock_addr_i
 }
 
 // added by dethrace
-void NetNowIPXLocalTarget2String2(char* pString, tSockaddr_in* pSock_addr_ipx) {
+void NetNowIPXLocalTarget2String2(char* pString, tCopyable_sockaddr_in* pSock_addr_ipx) {
     LOG_TRACE("(\"%s\", %p)", pString, pSock_addr_ipx);
 
     char portbuf[10];
@@ -160,7 +161,7 @@ int SameEthernetAddress(struct sockaddr_in* pAddr_ipx1, struct sockaddr_in* pAdd
 }
 
 // added by dethrace
-int SameEthernetAddress2(tSockaddr_in* pAddr_ipx1, struct sockaddr_in* pAddr_ipx2) {
+int SameEthernetAddress2(tCopyable_sockaddr_in* pAddr_ipx1, struct sockaddr_in* pAddr_ipx2) {
     LOG_TRACE("(%p, %p)", pAddr_ipx1, pAddr_ipx2);
 
     return pAddr_ipx1->port == pAddr_ipx2->sin_port && pAddr_ipx1->address == pAddr_ipx2->sin_addr.s_addr;
@@ -224,8 +225,7 @@ int ReceiveHostResponses(void) {
             gJoinable_games[i].last_response = PDGetTotalTime();
         } else {
             dr_dprintf("Adding joinable game to slot #%d", gNumber_of_hosts);
-            gJoinable_games[gNumber_of_hosts].addr_in.port = gRemote_addr.sin_port;
-            gJoinable_games[gNumber_of_hosts].addr_in.address = gRemote_addr.sin_addr.s_addr;
+            PDNetCopyFromNative(&gJoinable_games[gNumber_of_hosts].addr_in, &gRemote_addr);
             gJoinable_games[gNumber_of_hosts].last_response = PDGetTotalTime();
             gNumber_of_hosts++;
             dr_dprintf("Number of games found so far: %d", gNumber_of_hosts);
@@ -286,7 +286,7 @@ int PDNetInitialise(void) {
     gPlayer_id = PDGetTotalTime();
     sa_len = sizeof(struct sockaddr_in);
     dr_dprintf("PDNetInitialise()");
-    int ipx_socket_num = 12286;
+    int ipx_socket_num = PORT;
     // Dont bother to handle network.ini
     // if (gWin32_should_load_network_ini) {
     //     if (GetPrivateProfileStringA(
@@ -327,17 +327,17 @@ int PDNetInitialise(void) {
 
     gAny_addr.sin_family = AF_INET;
     gAny_addr.sin_addr.s_addr = INADDR_ANY;
-    gAny_addr.sin_port = htons(12286);
+    gAny_addr.sin_port = htons(PORT);
 
     int found = OS_GetAdapterAddress(harness_game_config.network_adapter_name, &gLocal_addr);
     if (!found) {
         gLocal_addr.sin_addr.s_addr = INADDR_LOOPBACK;
     }
 
-    gLocal_addr.sin_port = htons(12286);
+    gLocal_addr.sin_port = htons(PORT);
 
     // advertise that we are connectable on this address
-    PDNetCopyFromNative(&gLocal_addr_tx, &gLocal_addr);
+    PDNetCopyFromNative(&gLocal_addr_copyable, &gLocal_addr);
 
     NetNowIPXLocalTarget2String(str, &gLocal_addr);
     LOG_INFO("Advertising on %s", str);
@@ -349,9 +349,9 @@ int PDNetInitialise(void) {
     LOG_INFO("Listening on %s", str);
 
     gRemote_addr.sin_family = AF_INET;
-    gRemote_addr.sin_port = htons(12286);
+    gRemote_addr.sin_port = htons(PORT);
     gBroadcast_addr.sin_family = AF_INET;
-    gBroadcast_addr.sin_port = htons(12286);
+    gBroadcast_addr.sin_port = htons(PORT);
     gBroadcast_addr.sin_addr.s_addr = INADDR_BROADCAST;
 
     // original code was using MAKEWORD(1, 1)
@@ -524,7 +524,8 @@ int PDNetHostGame(tNet_game_details* pDetails, char* pHost_name, void** pHost_ad
     LOG_TRACE("(%p, \"%s\", %p)", pDetails, pHost_name, pHost_address);
 
     dr_dprintf("PDNetHostGame()");
-    *pHost_address = &gLocal_addr_tx;
+    //*pHost_address = &gLocal_addr;
+    *pHost_address = &gLocal_addr_copyable;
     return 1;
 }
 
@@ -669,8 +670,8 @@ tNet_message* PDNetGetNextMessage(tNet_game_details* pDetails, void** pSender_ad
 
                 // Changed by dethrace
                 // *pSender_address = &gLast_received_addr;
-                PDNetCopyFromNative(&gLast_received_addr_tx, &gLast_received_addr);
-                *pSender_address = &gLast_received_addr_tx;
+                PDNetCopyFromNative(&gLast_received_addr_copyable, &gLast_received_addr);
+                *pSender_address = &gLast_received_addr_copyable;
                 return msg;
             }
         }
@@ -739,12 +740,12 @@ int PDNetGetHeaderSize(void) {
     return 0;
 }
 
-void PDNetCopyFromNative(tSockaddr_in* pAddress, struct sockaddr_in* sock) {
+void PDNetCopyFromNative(tCopyable_sockaddr_in* pAddress, struct sockaddr_in* sock) {
     pAddress->port = sock->sin_port;
     pAddress->address = sock->sin_addr.s_addr;
 }
 
-void PDNetCopyToNative(struct sockaddr_in* sock, tSockaddr_in* pAddress) {
+void PDNetCopyToNative(struct sockaddr_in* sock, tCopyable_sockaddr_in* pAddress) {
     sock->sin_addr.s_addr = pAddress->address;
     sock->sin_port = pAddress->port;
     sock->sin_family = AF_INET;
