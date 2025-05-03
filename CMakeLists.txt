@@ -14,6 +14,7 @@ if(MSVC)
 endif()
 
 include(CheckCCompilerFlag)
+include(CMakeDependentOption)
 include(TestBigEndian)
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/VERSION")
@@ -61,11 +62,39 @@ endfunction()
 
 test_big_endian(IS_BIGENDIAN)
 
-find_package(SDL2 CONFIG)
-if(NOT SDL2_FOUND)
-    find_package(SDL2 MODULE REQUIRED)
+option(DETHRACE_PLATFORM_SDL1 "Support SDL 1.2 platform driver" OFF)
+option(DETHRACE_PLATFORM_SDL2 "Support SDL 2 platform driver"   ON)
+set(count_sdl_platforms 0)
+
+set(DETHRACE_PLATFORMS )
+if(DETHRACE_PLATFORM_SDL1)
+    find_package(SDL REQUIRED)
+    list(APPEND DETHRACE_PLATFORMS SDL1)
+    math(EXPR count_sdl_platforms "${count_sdl_platforms} + 1")
+endif()
+if(DETHRACE_PLATFORM_SDL2)
+    find_package(SDL2 CONFIG)
+    if(NOT SDL2_FOUND)
+        find_package(SDL2 MODULE REQUIRED)
+    endif()
+    list(APPEND DETHRACE_PLATFORMS SDL2)
+    math(EXPR count_sdl_platforms "${count_sdl_platforms} + 1")
 endif()
 
+if(count_sdl_platforms GREATER 1)
+    # Force dynamic SDL when enabling 2 (or more) SDL platform backends
+    set(dynamic_sdl_force TRUE)
+else()
+    # When no SDL backend is selected, disable dynamic SDL backend
+    # Enabling one SDL backend is a don-t-care
+    set(dynamic_sdl_force FALSE)
+endif()
+
+cmake_dependent_option(DETHRACE_PLATFORM_SDL_DYNAMIC "Load SDL dynamically" FALSE "count_sdl_platforms EQUAL 1" "${dynamic_sdl_force}")
+
+if(NOT DETHRACE_PLATFORMS)
+    message(FATAL_ERROR "No platform drivers enabled")
+endif()
 
 add_subdirectory(lib/BRender-v1.3.2)
 add_subdirectory(lib/libsmacker)

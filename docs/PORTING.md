@@ -22,34 +22,58 @@ target_sources(harness PRIVATE
 ...
 ```
 
-## IO Platform (windowing / input / rendering)
+## Platform (windowing / input)
 
-A `Platform` in _dethrace_ implements windowing, rendering and input handling.
+A `Platform` in _dethrace_ implements windowing and input handling.
 
-The default platform is `SDL_OpenGL`, which uses SDL for windowing and input, and OpenGL for rendering. See [platforms/sdl_opengl.c](https://github.com/dethrace-labs/dethrace/blob/main/src/harness/platforms/sdl_opengl.c).
+The default platform is `SDL2`, which uses SDL2 for windowing and input. See [platforms/sdl_opengl.c](https://github.com/dethrace-labs/dethrace/blob/main/src/harness/platforms/sdl2.c).
 
 To add a new `Platform`:
 
-1. Create `platforms/my_platform.c` file and add a `Harness_Platform_Init` function. Hook up all the function pointers using the `sdl_opengl` [implementation](https://github.com/dethrace-labs/dethrace/blob/main/src/harness/platforms/sdl_opengl.h) as a guide.
+1. Create a `src/harness/my_platform.c` file where you'll implement your platform-specific callbacks.
+   Define a public fully-initialized `const tPlatform_bootstrap MYPLATFORM_bootstrap ` variable in this file.
 
-2. Add a new conditional section in `src/harness/CMakeLists.txt` for your new platform
+2. Add the the following code fragments to appropriate locations in `src/harness/harness.c`:
+    ```c
+   extern const tPlatform_bootstrap MYPLATFORM_bootstrap;
+   ```
+   ```c
+   #ifdef DETHRACE_PLATFORM_MYPLATFORM
+       &MYPLATFORM_bootstrap,
+   #endif
+   ```
 
-For example:
-```
-if (IO_PLATFORM STREQUAL "My_Platform")
-    target_sources(harness PRIVATE
-        io_platforms/my_platform.c
-    )
-endif()
-```
+3. Add new conditionals  to `CMakeLists.txt` and `src/harness/CMakeLists.txt` for your new platform
 
-3. Run cmake to update your build with the new platform
-```sh
-cd build
-cmake -DIO_PLATFORM=My_Platform ..
-```
+   For example:
+   ```cmake
+   # CMakeLists.txt
+   option(DETHRACE_PLATFORM_MYPLATFORM "Enable my platform" OFF)
+   if(DETHRACE_PLATFORM_MYPLATFORM)
+       find_package(MyPlatform REQUIRED)
+   endif()
+   ```
+   ```cmake
+   # src/harness/CMakeLists.txt
+      if(DETHRACE_PLATFORM_MYPLATFORM)
+       target_sources(harness PRIVATE
+           my_platform.c
+       )
+       target_compile_definitions(harness PRIVATE DETHRACE_PLATFORM_MYPLATFORM)
+       target_link_libraries(harness PRIVATE MyPlatform::MyPlatform)
+   endif()
+   ```
 
-4. Build
-```
-cmake --build .
-```
+4. Hook up all the function pointers using the [sdl2 platform](https://github.com/dethrace-labs/dethrace/blob/main/src/harness/platforms/sdl2.c) as a guide.
+
+5. Run cmake to update your build with the new platform
+   ```sh
+   cd build
+   cmake -DDETHRACE_PLATFORM_MYPLATFORM=ON ..
+   cmake --build .
+   ```
+
+6. Build
+   ```
+   -cmake --build .
+   ```
