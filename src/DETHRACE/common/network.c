@@ -1134,7 +1134,6 @@ void SendOutPlayerList(void) {
         message->contents.data.player_list.this_index = i;
         message->contents.data.player_list.batch_number = gPlayer_list_batch_number;
         memcpy(&message->contents.data.player_list.player, &gNet_players[i], sizeof(gNet_players[i]));
-        // PrintNet(&gNet_players[i].pd_net_info);
         NetGuaranteedSendMessageToAllPlayers(gCurrent_net_game, message, 0);
     }
     gPlayer_list_batch_number++;
@@ -1405,11 +1404,8 @@ void ReceivedStatusReport(tNet_contents* pContents, tNet_message* pMessage) {
     int i;
     LOG_TRACE("(%p, %p)", pContents, pMessage);
 
-    LOG_DEBUG("got status update (1) for %d, %d", pMessage->sender, pContents->data.report.status);
-
     for (i = 0; i < gNumber_of_net_players; i++) {
         if (gNet_players[i].ID == pMessage->sender) {
-            LOG_DEBUG("got status update for %d, %d", pMessage->sender, pContents->data.report.status);
             gNet_players[i].player_status = pContents->data.report.status;
             gNet_players[i].last_heard_from_him = PDGetTotalTime();
             if (gNet_players[i].player_status < ePlayer_status_racing || gNet_players[i].player_status == ePlayer_status_recovering) {

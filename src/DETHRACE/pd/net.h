@@ -67,6 +67,8 @@ int PDNetInitClient(tNet_game_details* pDetails);
 
 int PDNetGetHeaderSize(void);
 
-void PrintNet(struct sockaddr_in* p);
+// dethrace added
+void PDNetCopyFromNative(tSockaddr_in* pAddress, struct sockaddr_in* sock);
+void PDNetCopyToNative(struct sockaddr_in* sock, tSockaddr_in* pAddress);
 
 #endif
