@@ -289,7 +289,7 @@ char* OS_GetWorkingDirectory(char* argv0) {
     return OS_Dirname(argv0);
 }
 
-int OS_GetAdapaterAddress(char* name, void* pSockaddr_in) {
+int OS_GetAdapterAddress(char* name, void* pSockaddr_in) {
     struct ifaddrs *ifaddr, *ifa;
     int found = 0;
 

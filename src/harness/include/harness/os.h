@@ -40,6 +40,6 @@ char* OS_Basename(const char* path);
 
 char* OS_GetWorkingDirectory(char* argv0);
 
-int OS_GetAdapaterAddress(char* name, void* pSockaddr_in);
+int OS_GetAdapterAddress(char* name, void* pSockaddr_in);
 
 #endif

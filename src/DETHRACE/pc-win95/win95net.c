@@ -329,7 +329,7 @@ int PDNetInitialise(void) {
     gAny_addr.sin_addr.s_addr = INADDR_ANY;
     gAny_addr.sin_port = htons(12286);
 
-    int found = OS_GetAdapaterAddress(harness_game_config.network_adapter_name, &gLocal_addr);
+    int found = OS_GetAdapterAddress(harness_game_config.network_adapter_name, &gLocal_addr);
     if (!found) {
         gLocal_addr.sin_addr.s_addr = INADDR_LOOPBACK;
     }
