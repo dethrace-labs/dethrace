@@ -22,14 +22,19 @@ typedef struct tPD_net_player_info {
 
     // cannot be a regular sockaddr_in because it is transmitted between machines
     tSockaddr_in addr_in;
+    // added by dethrace
+    // tU32 pad0;
 
 } tPD_net_player_info;
 
 typedef struct tPD_net_game_info {
-    struct sockaddr_in addr_in;
+    // has to match `tPD_net_player_info`
+    // struct sockaddr_ipx addr_ipx;
+
+    // struct sockaddr_in addr_in;
     // uint64_t address_tx;
     // uint32_t port_tx;
-    // tSockaddr_in addr_in;
+    tSockaddr_in addr_in;
 
     tU32 last_response;
 } tPD_net_game_info;
