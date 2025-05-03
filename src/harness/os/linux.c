@@ -11,6 +11,7 @@
 #include <errno.h>
 #include <execinfo.h>
 #include <fcntl.h>
+#include <ifaddrs.h>
 #include <libgen.h>
 #include <limits.h>
 #include <link.h>
