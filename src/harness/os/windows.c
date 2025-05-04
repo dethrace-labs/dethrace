@@ -2,9 +2,14 @@
 
 #define _WIN32_WINNT 0x0600 // or higher (e.g., 0x0A00 for Windows 10)
 
-#include <iphlpapi.h> // for GetAdaptersAddresses
 #include <winsock2.h>
+
 #include <ws2tcpip.h> // for getaddrinfo, inet_pton, etc.
+
+#include <iphlpapi.h> // for GetAdaptersAddresses
+
+#include <ipifcons.h>
+
 //
 #include <windows.h> // only after winsock2.h
 
