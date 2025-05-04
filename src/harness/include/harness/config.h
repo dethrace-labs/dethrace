@@ -52,7 +52,6 @@ typedef struct tHarness_game_config {
     int game_completed;
 
     int install_signalhandler;
-
     int no_bind;
     char network_adapter_name[256];
 } tHarness_game_config;

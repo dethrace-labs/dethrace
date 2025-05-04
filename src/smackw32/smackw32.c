@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "harness/hooks.h"
+#include "harness/os.h"
 #include "harness/trace.h"
 
 // lib/libsmacker
@@ -27,9 +28,15 @@ Smack* SmackOpen(const char* name, uint32_t flags, uint32_t extrabuf) {
     double microsecs_per_frame;
     Smack* smack;
     double fps;
+    FILE *f = NULL;
 
-    smk smk_handle = smk_open_file(name, SMK_MODE_MEMORY);
+    f = OS_fopen(name, "rb");
+    if (f == NULL) {
+        return NULL;
+    }
+    smk smk_handle = smk_open_filepointer(f, SMK_MODE_MEMORY);
     if (smk_handle == NULL) {
+        fclose(f);
         return NULL;
     }
 
@@ -40,6 +47,8 @@ Smack* SmackOpen(const char* name, uint32_t flags, uint32_t extrabuf) {
 
     // smk_handle is added to hold a pointer to the underlying libsmacker instance
     smack->smk_handle = smk_handle;
+
+    smack->f = f;
 
     smk_info_all(smk_handle, NULL, &smack->Frames, &microsecs_per_frame);
     fps = 1000000.0 / microsecs_per_frame;
@@ -128,5 +137,6 @@ void SmackClose(Smack* smack) {
     }
 
     smk_close(smack->smk_handle);
+    // libsmacker closes file, no need to do `fclose(smack->f)`
     free(smack);
 }

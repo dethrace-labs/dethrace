@@ -45,6 +45,7 @@ typedef struct SmackTag {
 
     // added by dethrace
     void* smk_handle; // opaque pointer to the libsmacker instance
+    void *f; // opaque file pointer
     tAudioBackend_stream* audio_stream;
 } Smack;
 

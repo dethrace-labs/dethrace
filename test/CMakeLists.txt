@@ -1,8 +1,6 @@
 add_executable(dethrace_test)
 add_test(NAME test_dethrace COMMAND dethrace_test)
 
-set(IO_PLATFORM "SDL2")
-
 target_link_libraries(dethrace_test PRIVATE dethrace_obj)
 
 target_include_directories(dethrace_test PRIVATE
