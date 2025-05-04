@@ -1,7 +1,11 @@
 #ifndef PC_ALL_NET_TYPES_H
 #define PC_ALL_NET_TYPES_H
 
-// dethrace: have switched out IPX implementation for IP
+#include <stdint.h>
+
+// This file added dethrace
+//  - have switched out IPX implementation for IP
+//  - cross-platform instead of per-platform implementation
 
 // cannot be a regular sockaddr_in because it is transmitted between OS's
 typedef struct tCopyable_sockaddr_in {
@@ -10,25 +14,17 @@ typedef struct tCopyable_sockaddr_in {
 } tCopyable_sockaddr_in;
 
 typedef struct tPD_net_player_info {
-    // struct sockaddr_ipx addr_ipx;
-    // cannot be a regular sockaddr_in because it is transmitted between machines
+    // cannot be a regular sockaddr_in because it is transmitted between OS's
     tCopyable_sockaddr_in addr_in;
-    // added by dethrace
-    // tU32 pad0;
 
 } tPD_net_player_info;
 
-// has to match `tPD_net_player_info`
+// has to match `tPD_net_player_info` - see `PDNetGetNextJoinGame`
 typedef struct tPD_net_game_info {
-    // struct sockaddr_ipx addr_ipx;
-    // cannot be a regular sockaddr_in because it is transmitted between machines
+    // cannot be a regular sockaddr_in because it is transmitted between OS's
     tCopyable_sockaddr_in addr_in;
 
     uint32_t last_response;
 } tPD_net_game_info;
-
-// typedef struct tIPX_netnum {
-//     unsigned char bNetwork[4];
-// } tIPX_netnum;
 
 #endif

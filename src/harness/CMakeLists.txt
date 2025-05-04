@@ -40,8 +40,6 @@ target_sources(harness PRIVATE
     include/harness/trace.h
     include/harness/config.h
     include/harness/os.h
-    include/harness/win95_polyfill.h
-    include/harness/win95_polyfill_defs.h
     include/harness/audio.h
     # cameras/debug_camera.c
     # cameras/debug_camera.h
@@ -50,8 +48,6 @@ target_sources(harness PRIVATE
     harness.c
     harness.h
     audio/miniaudio.c
-    #win95/polyfill.c
-    #win95/winsock.c
     platforms/null.c
     platforms/null.h
 
