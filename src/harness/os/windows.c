@@ -1,12 +1,12 @@
 // Based on https://gist.github.com/jvranish/4441299
 
-#include <iphlpapi.h>
-#include <winsock2.h>
-#include <ws2tcpip.h>
+#define _WIN32_WINNT 0x0600 // or higher (e.g., 0x0A00 for Windows 10)
 
-// this has to be first
-#include <windows.h>
+#include <iphlpapi.h> // for GetAdaptersAddresses
+#include <winsock2.h>
+#include <ws2tcpip.h> // for getaddrinfo, inet_pton, etc.
 //
+#include <windows.h> // only after winsock2.h
 
 #include <dbghelp.h>
 
@@ -401,7 +401,7 @@ char* OS_GetWorkingDirectory(char* argv0) {
     return OS_Dirname(argv0);
 }
 
-int OS_GetAdapaterAddress(char* name, void* pSockaddr_in) {
+int OS_GetAdapterAddress(char* name, void* pSockaddr_in) {
     DWORD ret, bufLen = 15000;
     IP_ADAPTER_ADDRESSES* adapter_addrs = (IP_ADAPTER_ADDRESSES*)malloc(bufLen);
     int found = 0;
@@ -466,7 +466,7 @@ void OS_CleanupSockets(void) {
 
 int OS_SetSocketNonBlocking(int socket) {
     unsigned long nobio = 1;
-    return ioctlsocket(gSocket, FIONBIO, &nobio);
+    return ioctlsocket(socket, FIONBIO, &nobio);
 }
 
 int OS_CloseSocket(int socket) {
