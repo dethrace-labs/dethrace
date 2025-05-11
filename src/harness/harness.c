@@ -340,9 +340,6 @@ int Harness_ProcessCommandLine(tArgument_config* config, int* argc, char* argv[]
         } else if (strcasecmp(argv[i], "--sound-options") == 0) {
             harness_game_config.sound_options = 1;
             consumed = 1;
-        } else if (strcasecmp(argv[i], "--no-bind") == 0) {
-            harness_game_config.no_bind = 1;
-            consumed = 1;
         } else if (strcasecmp(argv[i], "--opengl") == 0) {
             config->platform_capabilityies &= ~ePlatform_cap_video_mask;
             config->platform_capabilityies |= ePlatform_cap_opengl;
@@ -353,6 +350,13 @@ int Harness_ProcessCommandLine(tArgument_config* config, int* argc, char* argv[]
             consumed = 1;
         } else if (strcasecmp(argv[i], "--game-completed") == 0) {
             harness_game_config.game_completed = 1;
+            consumed = 1;
+        } else if (strcasecmp(argv[i], "--no-bind") == 0) {
+            harness_game_config.no_bind = 1;
+            consumed = 1;
+        } else if (strstr(argv[i], "--network-adapter-name=") != NULL) {
+            char* s = strstr(argv[i], "=");
+            strcpy(harness_game_config.network_adapter_name, s + 1);
             consumed = 1;
         } else if (strcmp(argv[i], "--platform") == 0) {
             if (i < *argc + 1) {

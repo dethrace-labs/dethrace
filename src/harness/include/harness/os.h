@@ -40,4 +40,16 @@ char* OS_Basename(const char* path);
 
 char* OS_GetWorkingDirectory(char* argv0);
 
+int OS_GetAdapterAddress(char* name, void* pSockaddr_in);
+
+int OS_InitSockets(void);
+
+void OS_CleanupSockets(void);
+
+int OS_GetLastSocketError(void);
+
+int OS_SetSocketNonBlocking(int socket);
+
+int OS_CloseSocket(int socket);
+
 #endif

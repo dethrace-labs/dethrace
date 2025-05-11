@@ -161,12 +161,23 @@ target_sources(dethrace_obj PRIVATE
     dr_types.h
     pd/net.h
     pd/sys.h
-    pc-win95/win95sys.c
+
+    # dethrace-added cross platform sys and network implementation
+    pc-all/allnet.c
+    # added in future PR
+    # pc-all/allsys.c
+
+    # original win95 sys and network
+    # pc-win95/win95sys.c
+    # pc-win95/ssdx.c
+    # pc-win95/ssdx.h
+
+    # todo remove from normal compile
     pc-win95/dinput.h
-    pc-win95/ssdx.c
-    pc-win95/ssdx.h
-    pc-win95/win95net.c
-    pc-dos/dosnet.c
+
+    # original dos sys and network
+    #pc-dos/dosnet.c
+    # todo remove from normal compile
     pc-dos/dossys.c
 )
 
