@@ -24,15 +24,9 @@
 #include <sys/stat.h>
 #include <time.h>
 
-// This code comes from DOS, so small changes need to be made to run correctly on windowed systems.
-// Generally the pc-win95 does the same thing
-#define PLAY_NICE_WITH_GUI 1
+// This code is based on `dossys.c`. Some `win95sys.c` code was merged in to handle windowing
 
-#ifdef PLAY_NICE_WITH_GUI
 #define MOUSE_SPEED_MULTIPLIER 1
-#else
-#define MOUSE_SPEED_MULTIPLIER 0.25f
-#endif
 
 int gDOSGfx_initialized;
 int gExtra_mem;
@@ -73,6 +67,12 @@ int gForce_voodoo_mode;
 
 br_device_gl_callback_procs gl_callbacks;
 br_device_virtualfb_callback_procs virtualfb_callbacks;
+
+// from win95sys.c
+int gShow_fatal_error;
+char gFatal_error_string[512];
+int gExit_code;
+br_diaghandler gBr_diaghandler;
 
 // forward declare for `PDInitialiseSystem`
 int InitJoysticks(void);
@@ -222,8 +222,6 @@ void KeyBegin(void) {
 void KeyEnd(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
-
-    // dos_setvect(9, gPrev_keyboard_handler);
 }
 
 // IDA: int __usercall KeyDown22@<EAX>(int pKey_index@<EAX>)
@@ -240,10 +238,8 @@ void PDSetKeyArray(int* pKeys, int pMark) {
     tS32 joyY;
     LOG_TRACE10("(%p, %d)", pKeys, pMark);
 
-#ifdef PLAY_NICE_WITH_GUI
     // Required in some cases like a tight loop waiting for a keypress
     gHarness_platform.ProcessWindowMessages(NULL);
-#endif
 
     gKeys_pressed = 0;
     for (i = 0; i < COUNT_OF(gScan_code); i++) {
@@ -263,46 +259,27 @@ int PDGetASCIIFromKey(int pKey) {
         return gASCII_table[pKey];
 }
 
+void Win32FatalError(char* pStr_1, char* pStr_2) {
+    gShow_fatal_error = 1;
+    sprintf(gFatal_error_string, "%s\n%s", pStr_1, pStr_2);
+    gExit_code = 15;
+    PDShutdownSystem();
+}
+
 // IDA: void __usercall PDFatalError(char *pThe_str@<EAX>)
 void PDFatalError(char* pThe_str) {
-    static int been_here = 0;
     LOG_TRACE("(\"%s\")", pThe_str);
 
-    if (been_here) {
-        exit(1);
-    }
-    been_here = 1;
-    if (gDOSGfx_initialized) {
-        gDOSGfx_initialized = 0;
-        BrDevEndOld();
-    }
-    printf("FATAL ERROR: %s\n", pThe_str);
     dr_dprintf("FATAL ERROR: %s\n", pThe_str);
-#ifdef PLAY_NICE_WITH_GUI
-    gHarness_platform.ShowErrorMessage(NULL, "Carmageddon Fatal Error", pThe_str);
-#endif
-    if (gBrZb_initialized) {
-        gBrZb_initialized = 0;
-        BrZbEnd();
-    }
-    if (gBr_initialized) {
-        gBr_initialized = 0;
-    }
-#ifndef PLAY_NICE_WITH_GUI
-    // There is no window to receive keyboard events from
-    while (PDAnyKeyDown() == -1) {
-    }
-#endif
-    QuitGame();
+    Win32FatalError(pThe_str, "");
 }
 
 // IDA: void __usercall PDNonFatalError(char *pThe_str@<EAX>)
 void PDNonFatalError(char* pThe_str) {
     LOG_TRACE("(\"%s\")", pThe_str);
 
-    printf("ERROR: %s", pThe_str);
-    while (PDAnyKeyDown() == -1) {
-    }
+    dr_dprintf("*** ERROR...");
+    dr_dprintf(pThe_str);
 }
 
 // IDA: void __cdecl PDInitialiseSystem()
@@ -312,8 +289,6 @@ void PDInitialiseSystem(void) {
     int len;
 
     KeyBegin();
-
-    // DOSMouseBegin();
     InitJoysticks();
 
     // Demo's do not ship with KEYBOARD.COK file
@@ -344,14 +319,23 @@ void PDInitialiseSystem(void) {
 
 // IDA: void __cdecl PDShutdownSystem()
 void PDShutdownSystem(void) {
+    static int been_here = 0;
     LOG_TRACE("()");
 
-    // dos_setvect(9, gPrev_keyboard_handler);
-    if (gDOSGfx_initialized) {
-        BrDevEndOld();
+    if (!been_here) {
+        been_here = 1;
+
+        if (gShow_fatal_error) {
+            dr_dprintf("Displaying fatal error...");
+            gHarness_platform.ShowErrorMessage(NULL, "Carmageddon Fatal Error", gFatal_error_string);
+        }
+
+        dr_dprintf("Destroying window...");
+        gHarness_platform.DestroyWindow(NULL);
+        dr_dprintf("End of PDShutdownSystem().");
+        CloseDiagnostics();
     }
-    // DOSMouseEnd();
-    PDRevertPalette();
+    exit(gExit_code);
 }
 
 // IDA: void __cdecl PDSaveOriginalPalette()
@@ -379,20 +363,12 @@ void PDInitScreen(void) {
     LOG_TRACE("()");
 }
 
-// IDA: void __cdecl sub_B4DB4()
-void sub_B4DB4(void) {
-    // if (!gReal_back_screen->pixels_qualifier) {
-    //     gReal_back_screen->pixels_qualifier = (unsigned __int16)__DS__;
-    // }
-}
-
 // IDA: void __cdecl PDLockRealBackScreen()
 // In all retail 3dfx executables, it is void __usercall PDLockRealBackScreen(lock@<EAX>)
 void PDLockRealBackScreen(int lock) {
     LOG_TRACE("()");
 
     if (!gReal_back_screen_locked && !gReal_back_screen->pixels && lock <= gVoodoo_rush_mode) {
-        sub_B4DB4();
         BrPixelmapDirectLock(gReal_back_screen, 1);
         if (!gReal_back_screen->pixels)
             FatalError(kFatalError_CouldntLockPixelmap_S, "gReal_back_screen");
@@ -421,7 +397,6 @@ void PDAllocateScreenAndBack(void) {
 
         if (gGraf_spec_index != 0 && !gNo_voodoo) {
 
-#ifdef PLAY_NICE_WITH_GUI
             gl_callbacks.get_proc_address = gHarness_platform.GL_GetProcAddress;
             gl_callbacks.swap_buffers = gHarness_platform.Swap;
             gl_callbacks.get_viewport = gHarness_platform.GetViewport;
@@ -433,9 +408,6 @@ void PDAllocateScreenAndBack(void) {
                 BRT_OPENGL_CALLBACKS_P, &gl_callbacks,
                 BRT_PIXEL_TYPE_U8, BR_PMT_RGB_565,
                 BR_NULL_TOKEN);
-#else
-            BrDevBegin(&gScreen, "3dfx_dos,w:640,h:480,b:16");
-#endif
         }
     }
 
@@ -466,7 +438,6 @@ void PDAllocateScreenAndBack(void) {
         gInterpolate_textures = 1;
         gExceptions_general_file = "SOFTWARE";
 
-#ifdef PLAY_NICE_WITH_GUI
         // Render framebuffer to memory and call hooks when swapping or palette changing
         virtualfb_callbacks.palette_changed = gHarness_platform.PaletteChanged;
         virtualfb_callbacks.swap_buffers = gHarness_platform.Swap;
@@ -476,9 +447,7 @@ void PDAllocateScreenAndBack(void) {
             BRT_HEIGHT_I32, gGraf_specs[gGraf_spec_index].phys_height,
             BRT_VIRTUALFB_CALLBACKS_P, &virtualfb_callbacks,
             BR_NULL_TOKEN);
-#else
-        gScreen = BrDevBeginOld(gGraf_specs[gGraf_spec_index].gfx_init_string);
-#endif
+
         gDOSGfx_initialized = 1;
     }
     gScreen->origin_x = 0;
@@ -639,10 +608,27 @@ void PDPixelmapVLineOnScreen(br_pixelmap* dst, br_int_16 x1, br_int_16 y1, br_in
     NOT_IMPLEMENTED();
 }
 
+void Win32BRenderWarningFunc(char* msg) {
+    dr_dprintf("*******************************************************************************");
+    dr_dprintf("BRender WARNING: '%s'", msg);
+    dr_dprintf("*******************************************************************************");
+}
+
+void Win32BRenderFailureFunc(char* msg) {
+    dr_dprintf("*******************************************************************************");
+    dr_dprintf("BRender FAILURE: '%s'", msg);
+    dr_dprintf("*******************************************************************************");
+    Win32FatalError("BRender error detected:", msg);
+}
+
 // IDA: void __cdecl PDInstallErrorHandlers()
 void PDInstallErrorHandlers(void) {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gBr_diaghandler.identifier = "LlantisilioBlahBlahBlahOgOgOch";
+    gBr_diaghandler.warning = Win32BRenderWarningFunc;
+    gBr_diaghandler.failure = Win32BRenderFailureFunc;
+    BrDiagHandlerSet(&gBr_diaghandler);
 }
 
 // IDA: void __cdecl PDSetFileVariables()
@@ -769,10 +755,7 @@ int PDGetTotalTime(void) {
 // IDA: int __usercall PDServiceSystem@<EAX>(tU32 pTime_since_last_call@<EAX>)
 int PDServiceSystem(tU32 pTime_since_last_call) {
 
-#ifdef PLAY_NICE_WITH_GUI
-    // Added by dethrace. Win95 code does the same
     gHarness_platform.ProcessWindowMessages(NULL);
-#endif
     return 0;
 }
 

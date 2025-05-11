@@ -35,24 +35,24 @@ extern br_pixelmap* gBack_screen;
 
 #ifdef DETHRACE_SDL_DYNAMIC
 #ifdef _WIN32
-static const char * const possible_locations[] = {
+static const char* const possible_locations[] = {
     "SDL2.dll",
 };
 #elif defined(__APPLE__)
 #define SHARED_OBJECT_NAME "libSDL2"
 #define SDL2_LIBNAME "libSDL2.dylib"
 #define SDL2_FRAMEWORK "SDL2.framework/Versions/A/SDL2"
-static const char * const possible_locations[] = {
-    "@loader_path/" SDL2_LIBNAME, /* MyApp.app/Contents/MacOS/libSDL2_dylib */
-    "@loader_path/../Frameworks/" SDL2_FRAMEWORK, /* MyApp.app/Contents/Frameworks/SDL2_framework */
-    "@executable_path/" SDL2_LIBNAME, /* MyApp.app/Contents/MacOS/libSDL2_dylib */
+static const char* const possible_locations[] = {
+    "@loader_path/" SDL2_LIBNAME,                     /* MyApp.app/Contents/MacOS/libSDL2_dylib */
+    "@loader_path/../Frameworks/" SDL2_FRAMEWORK,     /* MyApp.app/Contents/Frameworks/SDL2_framework */
+    "@executable_path/" SDL2_LIBNAME,                 /* MyApp.app/Contents/MacOS/libSDL2_dylib */
     "@executable_path/../Frameworks/" SDL2_FRAMEWORK, /* MyApp.app/Contents/Frameworks/SDL2_framework */
-    NULL,  /* /Users/username/Library/Frameworks/SDL2_framework */
-    "/Library/Frameworks" SDL2_FRAMEWORK, /* /Library/Frameworks/SDL2_framework */
-    SDL2_LIBNAME /* oh well, anywhere the system can see the .dylib (/usr/local/lib or whatever) */
+    NULL,                                             /* /Users/username/Library/Frameworks/SDL2_framework */
+    "/Library/Frameworks" SDL2_FRAMEWORK,             /* /Library/Frameworks/SDL2_framework */
+    SDL2_LIBNAME                                      /* oh well, anywhere the system can see the .dylib (/usr/local/lib or whatever) */
 };
 #else
-static const char * const possible_locations[] = {
+static const char* const possible_locations[] = {
     "libSDL2-2.0.so.0",
     "libSDL2-2.0.so",
 };
@@ -60,7 +60,7 @@ static const char * const possible_locations[] = {
 #endif
 
 #ifdef DETHRACE_SDL_DYNAMIC
-static void *sdl2_so;
+static void* sdl2_so;
 #endif
 
 #define OBJECT_NAME sdl2_so
@@ -104,7 +104,9 @@ static int SDL2_Harness_SetWindowPos(void* hWnd, int x, int y, int nWidth, int n
 
 static void SDL2_Harness_DestroyWindow(void* hWnd) {
     // SDL2_GL_DeleteContext(context);
-    SDL2_DestroyWindow(window);
+    if (window != NULL) {
+        SDL2_DestroyWindow(window);
+    }
     SDL2_Quit();
     window = NULL;
 }

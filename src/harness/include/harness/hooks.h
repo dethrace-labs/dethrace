@@ -54,8 +54,8 @@ enum {
 };
 
 typedef struct tPlatform_bootstrap {
-    const char *name;
-    const char *description;
+    const char* name;
+    const char* description;
     uint32_t capabilities;
     int (*init)(tHarness_platform* platform);
 } tPlatform_bootstrap;
