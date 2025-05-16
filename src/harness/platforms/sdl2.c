@@ -4,8 +4,8 @@
 #include "harness/config.h"
 #include "harness/hooks.h"
 #include "harness/trace.h"
+#include "sdl2_scancode_map.h"
 #include "sdl2_syms.h"
-#include "sdl_scancode_map.h"
 
 SDL_COMPILE_TIME_ASSERT(sdl2_platform_requires_SDL2, SDL_MAJOR_VERSION == 2);
 
@@ -21,7 +21,7 @@ static int render_width, render_height;
 
 static Uint32 last_frame_time;
 
-void (*gKeyHandler_func)(void);
+static void (*gKeyHandler_func)(void);
 
 // 32 bytes, 1 bit per key. Matches dos executable behavior
 static br_uint_32 key_state[8];
@@ -59,12 +59,11 @@ static const char* const possible_locations[] = {
     "libSDL2-2.0.so",
 };
 #endif
-#endif
 
-#ifdef DETHRACE_SDL_DYNAMIC
 static void* sdl2_so;
 #endif
 
+#define SDL_NAME "SDL2"
 #define OBJECT_NAME sdl2_so
 #define SYMBOL_PREFIX SDL2_
 #define FOREACH_SDLX_SYM FOREACH_SDL2_SYM

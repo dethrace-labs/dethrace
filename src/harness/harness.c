@@ -22,16 +22,22 @@ extern void Harness_Platform_Init(tHarness_platform* platform);
 
 extern const tPlatform_bootstrap SDL1_bootstrap;
 extern const tPlatform_bootstrap SDL2_bootstrap;
+extern const tPlatform_bootstrap SDL3_bootstrap;
 
 static const tPlatform_bootstrap* platform_bootstraps[] = {
-#if defined(DETHRACE_PLATFORM_SDL2) && defined(DETHRACE_PLATFORM_SDL1)
+#if defined(DETHRACE_PLATFORM_SDL2)
     &SDL2_bootstrap,
-    &SDL1_bootstrap
-#elif defined(DETHRACE_PLATFORM_SDL2)
-    &SDL2_bootstrap
-#elif defined(DETHRACE_PLATFORM_SDL1)
-    &SDL1_bootstrap
-#else
+#define HAS_PLATFORM_BOOTSTRAP
+#endif
+#if defined(DETHRACE_PLATFORM_SDL3)
+    &SDL3_bootstrap,
+#define HAS_PLATFORM_BOOTSTRAP
+#endif
+#if defined(DETHRACE_PLATFORM_SDL1)
+    &SDL1_bootstrap,
+#define HAS_PLATFORM_BOOTSTRAP
+#endif
+#ifndef HAS_PLATFORM_BOOTSTRAP
     // This is the case for MSVC 4.20 builds
     NULL
 #endif

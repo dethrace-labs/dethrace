@@ -14,7 +14,7 @@ void debug_print_matrix4(const char* fmt, const char* fn, char* name, br_matrix4
 
 #define BLUE
 
-#if 1 // _MSC_VER == 1020
+#if _MSC_VER == 1020
 
 #define LOG_TRACE()
 #define LOG_TRACE8()
@@ -85,6 +85,13 @@ void debug_print_matrix4(const char* fmt, const char* fn, char* name, br_matrix4
         debug_printf("\033[0;31m[WARN] %s ", __FUNCTION__, "%s", "stubbed"); \
         stub_printed = 1;                                                    \
     }
+
+#define LOG_INFO2(a, b) LOG_INFO(a, b)
+#define LOG_INFO3(a, b, c) LOG_INFO(a, b, c)
+#define LOG_WARN2(a, b) LOG_WARN(a, b)
+#define LOG_WARN3(a, b, c) LOG_WARN(a, b, c)
+#define LOG_PANIC2(a, b) LOG_PANIC(a, b)
+#define LOG_DEBUG2(a, b) LOG_DEBUG(a, b)
 
 #endif
 
