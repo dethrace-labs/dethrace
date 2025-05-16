@@ -38,7 +38,8 @@ static void *Harness_LoadFunction(void *obj, const char *name) {
 #ifdef DETHRACE_SDL_DYNAMIC
 #define X_LOAD_FUNCTION(name, ret, args) \
     STR_JOIN(SYMBOL_PREFIX, name) = Harness_LoadFunction(OBJECT_NAME, "SDL_" #name); \
-    if (STR_JOIN(SYMBOL_PREFIX, name) == NULL) { \
+    if (STR_JOIN(SYMBOL_PREFIX, name) == NULL) {                                     \
+        fprintf(stderr, "Failed to load %s function: %s (%s)\n", SDL_NAME, "SDL_" #name, dlerror()); \
         goto failure; \
     }
 #else
@@ -57,6 +58,7 @@ static int STR_JOIN(SYMBOL_PREFIX,LoadSymbols)(void) {
         }
     }
     if (OBJECT_NAME == NULL) {
+        fputs("Could not find " SDL_NAME " library\n", stderr);
         return 1;
     }
 #endif

@@ -40,6 +40,4 @@
     X(GL_SetSwapInterval, int, (int))                                                   \
     X(GL_SwapWindow, void, (SDL_Window*))
 
-#undef SDL2_SYM
-
 #endif /* sdl2_syms_h */

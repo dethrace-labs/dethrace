@@ -18,10 +18,14 @@ extern void Harness_Platform_Init(tHarness_platform* platform);
 
 extern const tPlatform_bootstrap SDL1_bootstrap;
 extern const tPlatform_bootstrap SDL2_bootstrap;
+extern const tPlatform_bootstrap SDL3_bootstrap;
 
 static const tPlatform_bootstrap *platform_bootstraps[] = {
 #ifdef DETHRACE_PLATFORM_SDL2
     &SDL2_bootstrap,
+#endif
+#ifdef DETHRACE_PLATFORM_SDL3
+    &SDL3_bootstrap,
 #endif
 #ifdef DETHRACE_PLATFORM_SDL1
     &SDL1_bootstrap,
