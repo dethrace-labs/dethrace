@@ -2,9 +2,11 @@
 #define SDL_SCANCODE_MAP_H
 
 #include "dethrace_scancodes.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
-int sdl_scancode_map[SDL_NUM_SCANCODES] = {
+SDL_COMPILE_TIME_ASSERT(sdl2_scancode_map_requires_SDL3, SDL_MAJOR_VERSION == 3);
+
+static int sdl_scancode_map[SDL_SCANCODE_COUNT] = {
     [SDL_SCANCODE_ESCAPE] = SCANCODE_ESCAPE,
     [SDL_SCANCODE_1] = SCANCODE_1,
     [SDL_SCANCODE_2] = SCANCODE_2,

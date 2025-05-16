@@ -44,6 +44,7 @@ option(DETHRACE_SOUND_ENABLED "Include audio support" ON)
 option(DETHRACE_NET_ENABLED "Include net support" ON)
 option(DETHRACE_PLATFORM_SDL1 "Support SDL 1.2 platform driver" OFF)
 option(DETHRACE_PLATFORM_SDL2 "Support SDL 2 platform driver" ON)
+option(DETHRACE_PLATFORM_SDL3 "Support SDL 3 platform driver" OFF)
 
 option(MSVC_42_FOR_RECCMP "Build with MSVC 4.2 to match assembly" OFF)
 
@@ -54,6 +55,7 @@ if(MSVC_42_FOR_RECCMP)
     set(DETHRACE_NET_ENABLED OFF)
     set(DETHRACE_PLATFORM_SDL1 OFF)
     set(DETHRACE_PLATFORM_SDL2 OFF)
+    set(DETHRACE_PLATFORM_SDL3 OFF)
     set(BRENDER_BUILD_DRIVERS OFF)
 
     set(CMAKE_C_FLAGS_DEBUG "/Od /Oi /Zi /MLd")
@@ -104,6 +106,12 @@ if(DETHRACE_PLATFORM_SDL2)
     endif()
 
     list(APPEND DETHRACE_PLATFORMS SDL2)
+    math(EXPR count_sdl_platforms "${count_sdl_platforms} + 1")
+endif()
+
+if(DETHRACE_PLATFORM_SDL3)
+    find_package(SDL3 CONFIG REQUIRED)
+    list(APPEND DETHRACE_PLATFORMS SDL3)
     math(EXPR count_sdl_platforms "${count_sdl_platforms} + 1")
 endif()
 

@@ -99,7 +99,7 @@ endif()
 if(DETHRACE_PLATFORM_SDL2)
     target_sources(harness PRIVATE
         platforms/sdl2.c
-        platforms/sdl_scancode_map.h
+        platforms/sdl2_scancode_map.h
         platforms/sdl2_syms.h
     )
     target_compile_definitions(harness PRIVATE DETHRACE_PLATFORM_SDL2)
@@ -109,6 +109,21 @@ if(DETHRACE_PLATFORM_SDL2)
         set_property(GLOBAL APPEND PROPERTY DETHRACE_BUILD_RPATHS "$<TARGET_FILE_DIR:SDL2::SDL2>")
     else()
         target_link_libraries(harness PRIVATE SDL2::SDL2)
+    endif()
+endif()
+
+if(DETHRACE_PLATFORM_SDL3)
+    target_sources(harness PRIVATE
+        platforms/sdl3.c
+        platforms/sdl2_scancode_map.h
+        platforms/sdl3_syms.h
+    )
+    target_compile_definitions(harness PRIVATE DETHRACE_PLATFORM_SDL3)
+    if(DETHRACE_PLATFORM_SDL_DYNAMIC)
+        set_property(SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/platforms/sdl3.c" APPEND PROPERTY INCLUDE_DIRECTORIES "$<TARGET_PROPERTY:SDL3::SDL3,INTERFACE_INCLUDE_DIRECTORIES>")
+        set_property(GLOBAL APPEND PROPERTY DETHRACE_BUILD_RPATHS "$<TARGET_FILE_DIR:SDL3::SDL3>")
+    else()
+        target_link_libraries(harness PRIVATE SDL3::SDL3)
     endif()
 endif()
 

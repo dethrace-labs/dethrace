@@ -42,6 +42,4 @@
     X(GetPrefPath, char*, (const char* org, const char* app))                           \
     X(free, void, (void*))
 
-#undef SDL2_SYM
-
 #endif /* sdl2_syms_h */
