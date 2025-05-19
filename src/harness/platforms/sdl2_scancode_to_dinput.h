@@ -22,26 +22,24 @@
 
 #include <SDL.h>
 
-#if 0 // Usage Example:
-#include "sdl2_scancode_to_dinput.h"
- static int SDLScanCodeToKeyNum(SDL_Scancode sc)
- {
-   int idx = (int)sc;
-   assert(idx >= 0 && idx < SDL_NUM_SCANCODES);
-   return scanCodeToKeyNum[idx];
- }
+#if 0
+// Usage Example:
+// #include "sdl2_scancode_to_dinput.h"
+static int SDLScanCodeToKeyNum(SDL_Scancode sc) {
+    int idx = (int)sc;
+    assert(idx >= 0 && idx < SDL_NUM_SCANCODES);
+    return scanCodeToKeyNum[idx];
+}
 
- static SDL_Scancode KeyNumToSDLScanCode( int keyNum )
- {
-   if( keyNum >= 0 && keyNum < 0xEF )
-   {
-     for(int i = 0; i < SDL_NUM_SCANCODES; ++i)
-     {
-       if(scanCodeToKeyNum[i] == keyNum) return (SDL_Scancode)i;
-     }
-   }
-   return SDL_SCANCODE_UNKNOWN;
- }
+static SDL_Scancode KeyNumToSDLScanCode(int keyNum) {
+    if (keyNum >= 0 && keyNum < 0xEF) {
+        for (int i = 0; i < SDL_NUM_SCANCODES; ++i) {
+            if (scanCodeToKeyNum[i] == keyNum)
+                return (SDL_Scancode)i;
+        }
+    }
+    return SDL_SCANCODE_UNKNOWN;
+}
 #endif // 0
 
 #ifndef _SDL2_SCANCODE_TO_DINPUT_H_

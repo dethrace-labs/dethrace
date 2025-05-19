@@ -35,7 +35,7 @@ typedef struct tHarness_platform {
     // Get ticks
     uint32_t (*GetTicks)(void);
     // Show error message
-    int (*ShowErrorMessage)(void* window, char* text, char* caption);
+    int (*ShowErrorMessage)(char* title, char* message);
 
     // Create a window. Uses an underscore to avoid name collisions with windows.h `CreateWindow` macro
     void (*CreateWindow_)(const char* title, int nWidth, int nHeight, tHarness_window_type window_type);

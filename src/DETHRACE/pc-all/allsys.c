@@ -327,7 +327,7 @@ void PDShutdownSystem(void) {
 
         if (gShow_fatal_error) {
             dr_dprintf("Displaying fatal error...");
-            gHarness_platform.ShowErrorMessage(NULL, "Carmageddon Fatal Error", gFatal_error_string);
+            gHarness_platform.ShowErrorMessage("Carmageddon Fatal Error", gFatal_error_string);
         }
 
         dr_dprintf("Destroying window...");

@@ -11,7 +11,7 @@ static void null_destroy_window(void* hWnd) {
     null_time += 1;
 }
 
-static int null_show_error_message(void* window, char* text, char* caption) {
+static int null_show_error_message(char* title, char* text) {
     null_time += 1;
     return 0;
 }

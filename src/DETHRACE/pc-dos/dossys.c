@@ -279,7 +279,7 @@ void PDFatalError(char* pThe_str) {
     printf("FATAL ERROR: %s\n", pThe_str);
     dr_dprintf("FATAL ERROR: %s\n", pThe_str);
 #ifdef PLAY_NICE_WITH_GUI
-    gHarness_platform.ShowErrorMessage(NULL, "Carmageddon Fatal Error", pThe_str);
+    gHarness_platform.ShowErrorMessage("Carmageddon Fatal Error", pThe_str);
 #endif
     if (gBrZb_initialized) {
         gBrZb_initialized = 0;

@@ -6,6 +6,7 @@
 #include "harness/trace.h"
 #include "sdl2_scancode_to_dinput.h"
 #include "sdl2_syms.h"
+#include "sdl_scancode_to_set1.h"
 
 SDL_COMPILE_TIME_ASSERT(sdl2_platform_requires_SDL2, SDL_MAJOR_VERSION == 2);
 
@@ -21,7 +22,7 @@ static int render_width, render_height;
 
 static Uint32 last_frame_time;
 
-static uint8_t directinput_key_state[SDL_NUM_SCANCODES];
+static uint8_t shadow_key_state[SDL_NUM_SCANCODES];
 
 static struct {
     int x, y;
@@ -119,7 +120,7 @@ static int is_only_key_modifier(int modifier_flags, int flag_check) {
 
 static void SDL2_Harness_ProcessWindowMessages(MSG_* msg) {
     SDL_Event event;
-    int dinput_key;
+    int set1_scancode;
 
     while (SDL2_PollEvent(&event)) {
         switch (event.type) {
@@ -141,20 +142,21 @@ static void SDL2_Harness_ProcessWindowMessages(MSG_* msg) {
                 }
             }
 
-            // Map incoming SDL scancode to DirectInput DIK_* key code.
-            // https://github.com/DanielGibson/Snippets/blob/master/sdl2_scancode_to_dinput.h
-            dinput_key = sdlScanCodeToDirectInputKeyNum[event.key.keysym.scancode];
-            if (dinput_key == 0) {
+            // Map incoming SDL scancode to PC set 1 scan code as used by game code
+            // set1_scancode = sdl_to_set1_scancode[event.key.keysym.scancode];
+            int x = event.key.keysym.scancode;
+            set1_scancode = sdlScanCodeToDirectInputKeyNum[event.key.keysym.scancode];
+            if (set1_scancode == 0) {
                 LOG_WARN("unexpected scan code %s (%d)", SDL2_GetScancodeName(event.key.keysym.scancode), event.key.keysym.scancode);
                 return;
             }
-            // DInput expects high bit to be set if key is down
-            // https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418261(v=vs.85)
-            directinput_key_state[dinput_key] = (event.type == SDL_KEYDOWN ? 0x80 : 0);
+
             if (event.type == SDL_KEYDOWN) {
-                gKeyboard_bits[dinput_key >> 5] |= (1 << (dinput_key & 0x1F));
+                gKeyboard_bits[set1_scancode >> 5] |= (1 << (set1_scancode & 0x1F));
+                shadow_key_state[set1_scancode] = 0xff;
             } else {
-                gKeyboard_bits[dinput_key >> 5] &= ~(1 << (dinput_key & 0x1F));
+                gKeyboard_bits[set1_scancode >> 5] &= ~(1 << (set1_scancode & 0x1F));
+                shadow_key_state[set1_scancode] = 0;
             }
             break;
 
@@ -171,7 +173,7 @@ static void SDL2_Harness_ProcessWindowMessages(MSG_* msg) {
 }
 
 static void SDL2_Harness_GetKeyboardState(unsigned int count, uint8_t* buffer) {
-    memcpy(buffer, directinput_key_state, count);
+    memcpy(buffer, shadow_key_state, count);
 }
 
 static int SDL2_Harness_GetMouseButtons(int* pButton1, int* pButton2) {
@@ -225,9 +227,9 @@ static void limit_fps(void) {
     last_frame_time = SDL2_GetTicks();
 }
 
-static int SDL2_Harness_ShowErrorMessage(void* window, char* text, char* caption) {
-    fprintf(stderr, "%s", text);
-    SDL2_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, caption, text, window);
+static int SDL2_Harness_ShowErrorMessage(char* title, char* message) {
+    fprintf(stderr, "%s", message);
+    SDL2_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, window);
     return 0;
 }
 

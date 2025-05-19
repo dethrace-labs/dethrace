@@ -30,19 +30,19 @@ static int window_width, window_height;
 
 #ifdef DETHRACE_SDL_DYNAMIC
 #ifdef _WIN32
-static const char * const possible_locations[] = {
+static const char* const possible_locations[] = {
     "SDL.dll",
 };
 #elif defined(__APPLE__)
 #define SHARED_OBJECT_NAME "libSDL"
 #define SDL1_LIBNAME "libSDL.dylib"
-static const char * const possible_locations[] = {
-    "@loader_path/" SDL1_LIBNAME, /* MyApp.app/Contents/MacOS/libSDL2_dylib */
+static const char* const possible_locations[] = {
+    "@loader_path/" SDL1_LIBNAME,     /* MyApp.app/Contents/MacOS/libSDL2_dylib */
     "@executable_path/" SDL1_LIBNAME, /* MyApp.app/Contents/MacOS/libSDL2_dylib */
-    SDL1_LIBNAME /* oh well, anywhere the system can see the .dylib (/usr/local/lib or whatever) */
+    SDL1_LIBNAME                      /* oh well, anywhere the system can see the .dylib (/usr/local/lib or whatever) */
 };
 #else
-static const char * const possible_locations[] = {
+static const char* const possible_locations[] = {
     "libSDL-1.2.so.0",
     "libSDL-1.2.so",
 };
@@ -50,7 +50,7 @@ static const char * const possible_locations[] = {
 #endif
 
 #ifdef DETHRACE_SDL_DYNAMIC
-static void *sdl1_so;
+static void* sdl1_so;
 #endif
 
 #define OBJECT_NAME sdl1_so
@@ -268,7 +268,7 @@ static void SDL1_Harness_PaletteChanged(br_colour entries[256]) {
     }
 }
 
-static int SDL1_Harness_ShowErrorMessage(void* window, char* text, char* caption) {
+static int SDL1_Harness_ShowErrorMessage(char* text, char* caption) {
     fprintf(stderr, "%s", text);
 #ifdef _WIN32
     MessageBoxA(NULL, text, caption, MB_ICONERROR);
@@ -312,4 +312,3 @@ const tPlatform_bootstrap SDL1_bootstrap = {
     ePlatform_cap_software,
     SDL1_Harness_Platform_Init,
 };
-
