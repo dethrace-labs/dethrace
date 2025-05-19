@@ -282,6 +282,7 @@ int PDNetInitialise(void) {
     LOG_TRACE("()");
 
     gPlayer_id = PDGetTotalTime();
+    gNumber_of_networks = 1;
     sa_len = sizeof(struct sockaddr_in);
     dr_dprintf("PDNetInitialise()");
 
