@@ -15,7 +15,10 @@ static br_pixelmap* last_screen_src;
 
 static Uint32 last_frame_time;
 
-static uint8_t directinput_key_state[SDLK_LAST];
+void (*gKeyHandler_func)(void);
+
+// 32 bytes, 1 bit per key. Matches dos executable behavior
+static uint32_t key_state[8];
 
 static struct {
     int x, y;
@@ -128,7 +131,7 @@ static int SDL1_Harness_SetWindowPos(void* hWnd, int x, int y, int nWidth, int n
     return 0;
 }
 
-static void SDL1_Harness_DestroyWindow() {
+static void SDL1_Harness_DestroyWindow(void) {
     SDL1_FreeSurface(screen);
     SDL1_Quit();
     screen = NULL;
@@ -140,7 +143,7 @@ static int is_only_key_modifier(int modifier_flags, int flag_check) {
     return (modifier_flags & flag_check) && (modifier_flags & (KMOD_CTRL | KMOD_SHIFT | KMOD_ALT | KMOD_META)) == (modifier_flags & flag_check);
 }
 
-static void SDL1_Harness_ProcessWindowMessages() {
+static void SDL1_Harness_ProcessWindowMessages(void) {
     SDL_Event event;
     int dinput_key;
 
@@ -168,14 +171,12 @@ static void SDL1_Harness_ProcessWindowMessages() {
                 LOG_WARN("unexpected key \"%s\" (0x%x)", SDL1_GetKeyName(event.key.keysym.sym), event.key.keysym.sym);
                 return;
             }
-            // DInput expects high bit to be set if key is down
-            // https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418261(v=vs.85)
-            directinput_key_state[dinput_key] = (event.type == SDL_KEYDOWN ? 0x80 : 0);
             if (event.type == SDL_KEYDOWN) {
-                gKeyboard_bits[dinput_key >> 5] |= (1 << (dinput_key & 0x1F));
+                key_state[dethrace_scancode >> 5] |= (1 << (dethrace_scancode & 0x1F));
             } else {
-                gKeyboard_bits[dinput_key >> 5] &= ~(1 << (dinput_key & 0x1F));
+                key_state[dethrace_scancode >> 5] &= ~(1 << (dethrace_scancode & 0x1F));
             }
+            gKeyHandler_func();
             break;
 
         case SDL_VIDEORESIZE:
@@ -190,18 +191,22 @@ static void SDL1_Harness_ProcessWindowMessages() {
     return;
 }
 
-static void get_keyboard_state(unsigned int count, uint8_t* buffer) {
-    memcpy(buffer, directinput_key_state, count);
+static void SDL1_Harness_SetKeyHandler(void (*handler_func)(void)) {
+    gKeyHandler_func = handler_func;
 }
 
-static int get_mouse_buttons(int* pButton1, int* pButton2) {
+static void SDL1_Harness_GetKeyboardState(uint32_t* buffer) {
+    memcpy(buffer, key_state, sizeof(key_state));
+}
+
+static int SDL1_Harness_GetMouseButtons(int* pButton1, int* pButton2) {
     int state = SDL1_GetMouseState(NULL, NULL);
     *pButton1 = state & SDL_BUTTON_LMASK;
     *pButton2 = state & SDL_BUTTON_RMASK;
     return 0;
 }
 
-static int get_mouse_position(int* pX, int* pY) {
+static int SDL1_Harness_GetMousePosition(int* pX, int* pY) {
     SDL1_GetMouseState(pX, pY);
     return 0;
 }
@@ -246,7 +251,7 @@ static void SDL1_Renderer_Present(br_pixelmap* src) {
 
 static void SDL1_Harness_Swap(br_pixelmap* back_buffer) {
 
-    SDL1_Harness_ProcessWindowMessages(NULL);
+    SDL1_Harness_ProcessWindowMessages();
 
     if (0) {
         SDL1_GL_SwapBuffers();
@@ -293,9 +298,10 @@ static int SDL1_Harness_Platform_Init(tHarness_platform* platform) {
     platform->ShowCursor = SDL1_ShowCursor;
     platform->SetWindowPos = SDL1_Harness_SetWindowPos;
     platform->DestroyWindow = SDL1_Harness_DestroyWindow;
-    platform->GetKeyboardState = get_keyboard_state;
-    platform->GetMousePosition = get_mouse_position;
-    platform->GetMouseButtons = get_mouse_buttons;
+    platform->SetKeyHandler = SDL1_Harness_SetKeyHandler;
+    platform->GetKeyboardState = SDL1_Harness_GetKeyboardState;
+    platform->GetMousePosition = SDL1_Harness_GetMousePosition;
+    platform->GetMouseButtons = SDL1_Harness_GetMouseButtons;
     platform->ShowErrorMessage = SDL1_Harness_ShowErrorMessage;
 
     platform->CreateWindow_ = SDL1_Harness_CreateWindow;
