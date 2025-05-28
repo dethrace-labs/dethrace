@@ -333,7 +333,7 @@ void PDShutdownSystem(void) {
         }
 
         dr_dprintf("Destroying window...");
-        gHarness_platform.DestroyWindow(NULL);
+        gHarness_platform.DestroyWindow();
         dr_dprintf("End of PDShutdownSystem().");
         CloseDiagnostics();
     }

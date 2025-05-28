@@ -20,7 +20,7 @@ typedef struct tHarness_platform {
     // Get mouse position
     int (*GetMousePosition)(int* pX, int* pY);
     // Close specified window
-    void (*DestroyWindow)(void* window);
+    void (*DestroyWindow)(void);
     // Process window messages, return any WM_QUIT message
     void (*ProcessWindowMessages)(void);
     // Set position of a window

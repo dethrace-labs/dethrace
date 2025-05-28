@@ -7,7 +7,7 @@ static int null_set_window_pos(void* hWnd, int x, int y, int nWidth, int nHeight
     return 0;
 }
 
-static void null_destroy_window(void* hWnd) {
+static void null_destroy_window(void) {
     null_time += 1;
 }
 

@@ -24,15 +24,7 @@
 #include <sys/stat.h>
 #include <time.h>
 
-// This code comes from DOS, so small changes need to be made to run correctly on windowed systems.
-// Generally the pc-win95 does the same thing
-#define PLAY_NICE_WITH_GUI 1
-
-#ifdef PLAY_NICE_WITH_GUI
-#define MOUSE_SPEED_MULTIPLIER 1
-#else
-#define MOUSE_SPEED_MULTIPLIER 0.25f
-#endif
+// Based on VOODOO2C.EXE
 
 int gDOSGfx_initialized;
 int gExtra_mem;
@@ -40,7 +32,6 @@ int gReplay_override;
 tGraf_spec gGraf_specs[2] = {
     { 8, 1, 0, 320, 200, 0, 0, "32X20X8", "MCGA,W:320,H:200,B:8", 320, 320, 200, NULL },
     { 8, 1, 0, 640, 480, 0, 0, "64X48X8", "VESA,W:640,H:480,B:8", 640, 640, 480, NULL }
-    // { 8, 1, 0, 1920, 1080, 0, 0, "64X48X8", "VESA,W:640,H:480,B:8", 640, 1920, 1080, NULL }
 };
 int gASCII_table[128];
 tU32 gKeyboard_bits[8];
@@ -70,9 +61,6 @@ tU8 gScan_code[123][2];
 // Added from retail executable
 int gForce_voodoo_rush_mode;
 int gForce_voodoo_mode;
-
-br_device_gl_callback_procs gl_callbacks;
-br_device_virtualfb_callback_procs virtualfb_callbacks;
 
 // forward declare for `PDInitialiseSystem`
 int InitJoysticks(void);
@@ -242,11 +230,6 @@ void PDSetKeyArray(int* pKeys, int pMark) {
     tS32 joyY;
     LOG_TRACE10("(%p, %d)", pKeys, pMark);
 
-#ifdef PLAY_NICE_WITH_GUI
-    // Required in some cases like a tight loop waiting for a keypress
-    gHarness_platform.ProcessWindowMessages(NULL);
-#endif
-
     gKeys_pressed = 0;
     for (i = 0; i < COUNT_OF(gScan_code); i++) {
         if (KeyDown(gScan_code[i][0]) || KeyDown(gScan_code[i][1])) {
@@ -280,9 +263,7 @@ void PDFatalError(char* pThe_str) {
     }
     printf("FATAL ERROR: %s\n", pThe_str);
     dr_dprintf("FATAL ERROR: %s\n", pThe_str);
-#ifdef PLAY_NICE_WITH_GUI
-    gHarness_platform.ShowErrorMessage("Carmageddon Fatal Error", pThe_str);
-#endif
+
     if (gBrZb_initialized) {
         gBrZb_initialized = 0;
         BrZbEnd();
@@ -290,11 +271,9 @@ void PDFatalError(char* pThe_str) {
     if (gBr_initialized) {
         gBr_initialized = 0;
     }
-#ifndef PLAY_NICE_WITH_GUI
-    // There is no window to receive keyboard events from
+
     while (PDAnyKeyDown() == -1) {
     }
-#endif
     QuitGame();
 }
 
@@ -418,27 +397,8 @@ void PDAllocateScreenAndBack(void) {
 
     gScreen = NULL;
 
-    // added by dethrace. We default to software mode unless we explicitly ask for 3dfx opengl mode
-    if (harness_game_config.opengl_3dfx_mode) {
-
-        if (gGraf_spec_index != 0 && !gNo_voodoo) {
-
-#ifdef PLAY_NICE_WITH_GUI
-            gl_callbacks.get_proc_address = gHarness_platform.GL_GetProcAddress;
-            gl_callbacks.swap_buffers = gHarness_platform.Swap;
-            gl_callbacks.get_viewport = gHarness_platform.GetViewport;
-            gHarness_platform.CreateWindow_("Carmageddon", gGraf_specs[gGraf_spec_index].phys_width, gGraf_specs[gGraf_spec_index].phys_height, eWindow_type_opengl);
-
-            BrDevBeginVar(&gScreen, "glrend",
-                BRT_WIDTH_I32, gGraf_specs[gGraf_spec_index].phys_width,
-                BRT_HEIGHT_I32, gGraf_specs[gGraf_spec_index].phys_height,
-                BRT_OPENGL_CALLBACKS_P, &gl_callbacks,
-                BRT_PIXEL_TYPE_U8, BR_PMT_RGB_565,
-                BR_NULL_TOKEN);
-#else
-            BrDevBegin(&gScreen, "3dfx_dos,w:640,h:480,b:16");
-#endif
-        }
+    if (gGraf_spec_index != 0 && !gNo_voodoo) {
+        BrDevBegin(&gScreen, "3dfx_dos,w:640,h:480,b:16");
     }
 
     if (gScreen != NULL) {
@@ -468,19 +428,7 @@ void PDAllocateScreenAndBack(void) {
         gInterpolate_textures = 1;
         gExceptions_general_file = "SOFTWARE";
 
-#ifdef PLAY_NICE_WITH_GUI
-        // Render framebuffer to memory and call hooks when swapping or palette changing
-        virtualfb_callbacks.palette_changed = gHarness_platform.PaletteChanged;
-        virtualfb_callbacks.swap_buffers = gHarness_platform.Swap;
-        gHarness_platform.CreateWindow_("Carmageddon", gGraf_specs[gGraf_spec_index].phys_width, gGraf_specs[gGraf_spec_index].phys_height, eWindow_type_software);
-        BrDevBeginVar(&gScreen, "virtualframebuffer",
-            BRT_WIDTH_I32, gGraf_specs[gGraf_spec_index].phys_width,
-            BRT_HEIGHT_I32, gGraf_specs[gGraf_spec_index].phys_height,
-            BRT_VIRTUALFB_CALLBACKS_P, &virtualfb_callbacks,
-            BR_NULL_TOKEN);
-#else
         gScreen = BrDevBeginOld(gGraf_specs[gGraf_spec_index].gfx_init_string);
-#endif
         gDOSGfx_initialized = 1;
     }
     gScreen->origin_x = 0;
@@ -758,8 +706,8 @@ void PDGetMousePosition(int* pX_coord, int* pY_coord) {
 
         delta_x = mouse_x - gMouse_last_x_coord;
         delta_y = mouse_y - gMouse_last_y_coord;
-        *pX_coord = gMouse_last_x_coord + (MOUSE_SPEED_MULTIPLIER * delta_x);
-        *pY_coord = gMouse_last_y_coord + (MOUSE_SPEED_MULTIPLIER * delta_y);
+        *pX_coord = gMouse_last_x_coord + (0.25f * delta_x);
+        *pY_coord = gMouse_last_y_coord + (0.25f * delta_y);
     }
 }
 
@@ -770,11 +718,6 @@ int PDGetTotalTime(void) {
 
 // IDA: int __usercall PDServiceSystem@<EAX>(tU32 pTime_since_last_call@<EAX>)
 int PDServiceSystem(tU32 pTime_since_last_call) {
-
-#ifdef PLAY_NICE_WITH_GUI
-    // Added by dethrace. Win95 code does the same
-    gHarness_platform.ProcessWindowMessages(NULL);
-#endif
     return 0;
 }
 

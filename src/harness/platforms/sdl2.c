@@ -104,7 +104,7 @@ static int SDL2_Harness_SetWindowPos(void* hWnd, int x, int y, int nWidth, int n
     return 0;
 }
 
-static void SDL2_Harness_DestroyWindow(void* hWnd) {
+static void SDL2_Harness_DestroyWindow(void) {
     // SDL2_GL_DeleteContext(context);
     if (window != NULL) {
         SDL2_DestroyWindow(window);

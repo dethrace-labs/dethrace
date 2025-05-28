@@ -170,8 +170,6 @@ target_sources(dethrace_obj PRIVATE
     # pc-win95/win95sys.c
     # pc-win95/ssdx.c
     # pc-win95/ssdx.h
-    # todo remove from normal compile
-    pc-win95/dinput.h
 
     # original dos sys and network
     #pc-dos/dosnet.c

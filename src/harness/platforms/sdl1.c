@@ -128,7 +128,7 @@ static int SDL1_Harness_SetWindowPos(void* hWnd, int x, int y, int nWidth, int n
     return 0;
 }
 
-static void SDL1_Harness_DestroyWindow(void* hWnd) {
+static void SDL1_Harness_DestroyWindow() {
     SDL1_FreeSurface(screen);
     SDL1_Quit();
     screen = NULL;
