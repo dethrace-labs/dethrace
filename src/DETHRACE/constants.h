@@ -470,6 +470,17 @@ enum {
     kFatalError_NetContentsTooBig_S = 114,
     kFatalError_FileCorrupt_S = 115,
     kFatalError_RandomNumberOutOfRange_S = 116,
+#ifdef DETHRACE_3DFX_PATCH
+    kFatalError_CouldntLockPixelmap_S = 117,
+    kFatalError_ShouldBeLockedButIsnt_S = 118,
+    kFatalError_CannotPurifyPixelmap_S = 119,
+    kFatalError_FileMustStartWith_S = 120,
+    kFatalError_CantCopeWithVersionFor_S = 121,
+    kFatalError_CannotTilePixelmap_S = 122,
+    kFatalError_Mysterious_S_S = 123,
+    kFatalError_CanOnlyDimRectanglesOfgBack_screen = 124,
+    kFatalError_InvalidMaterialAlpha = 125
+#endif
 };
 
 enum {

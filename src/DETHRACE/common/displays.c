@@ -234,7 +234,7 @@ void DeviouslyDimRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRig
     LOG_TRACE("(%p, %d, %d, %d, %d, %d)", pPixelmap, pLeft, pTop, pRight, pBottom, pKnock_out_corners);
 
     if (pPixelmap != gBack_screen) {
-        FatalError(124);
+        FatalError(kFatalError_CanOnlyDimRectanglesOfgBack_screen);
     }
 
     gDim_model->vertices[1].p.v[0] = pLeft;

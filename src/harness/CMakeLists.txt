@@ -74,7 +74,7 @@ endif()
 if(DETHRACE_PLATFORM_SDL2)
     target_sources(harness PRIVATE
         platforms/sdl2.c
-        platforms/sdl2_scancode_to_dinput.h
+        platforms/sdl_scancode_map.h
         platforms/sdl2_syms.h
     )
     target_compile_definitions(harness PRIVATE DETHRACE_PLATFORM_SDL2)

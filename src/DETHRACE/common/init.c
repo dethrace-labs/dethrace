@@ -354,7 +354,7 @@ void InitLineStuff(void) {
     gLine_material = BrMaterialAllocate("gLine_material");
     gLine_actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
     if (!gLine_model || !gLine_material || !gLine_actor) {
-        FatalError(94);
+        FatalError(kFatalError_OOMCarmageddon_S);
     }
     gLine_actor->identifier = "gLine_actor";
     gLine_actor->render_style = BR_RSTYLE_EDGES;
@@ -387,7 +387,7 @@ void InitSmokeStuff(void) {
     gBlend_material = BrMaterialAllocate("gBlend_material");
     gBlend_actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
     if (!gBlend_model || !gBlend_material || !gBlend_actor) {
-        FatalError(94);
+        FatalError(kFatalError_OOMCarmageddon_S);
     }
     gBlend_actor->identifier = "gBlend_actor";
     gBlend_actor->model = gBlend_model;
@@ -418,7 +418,7 @@ void InitSmokeStuff(void) {
     PathCat(path, path, "SMOKE.PIX");
     gBlend_material->colour_map = DRPixelmapLoad(path);
     if (!gBlend_material->colour_map) {
-        FatalError(79, path);
+        FatalError(kFatalError_LoadPixelmapFile_S, path);
     }
     gBlend_material->colour_map->map = gRender_palette;
     BrMapAdd(gBlend_material->colour_map);
@@ -452,7 +452,7 @@ void Init2DStuff(void) {
     gPrat_material = BrMaterialAllocate("gPrat_material");
     gPrat_actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
     if (!gDim_model || !gDim_material || !gDim_actor || !gPrat_model || !gPrat_material || !gPrat_actor || !g2d_camera) {
-        FatalError(94);
+        FatalError(kFatalError_OOMCarmageddon_S);
     }
     g2d_camera->identifier = "g2d_camera";
     camera = g2d_camera->type_data;

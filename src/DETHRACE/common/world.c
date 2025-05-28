@@ -2425,11 +2425,11 @@ void LoadExceptionsFile(char* pName) {
         GetALineAndDontArgue(f, line);
         tok = strtok(line, delimiters);
         if (DRStricmp(tok, "VERSION")) {
-            FatalError(120, pName, "VERSION");
+            FatalError(kFatalError_FileMustStartWith_S, pName, "VERSION");
         }
         tok = strtok(NULL, delimiters);
         if (sscanf(tok, "%d", &file_version) == 0 || file_version != 1) {
-            FatalError(121, tok, pName);
+            FatalError(kFatalError_CantCopeWithVersionFor_S, tok, pName);
         }
 
         while (1) {
@@ -2456,7 +2456,7 @@ void LoadExceptionsFile(char* pName) {
                 } else if (DRStricmp(tok, "quadruple") == 0) {
                     e->flags |= ExceptionFlag_Quadruple;
                 } else {
-                    FatalError(123, tok, pName);
+                    FatalError(kFatalError_Mysterious_S_S, tok, pName);
                 }
             }
             AddExceptionToList(&gExceptions, e);
