@@ -145,7 +145,7 @@ static int is_only_key_modifier(int modifier_flags, int flag_check) {
 
 static void SDL1_Harness_ProcessWindowMessages(void) {
     SDL_Event event;
-    int dinput_key;
+    int dethrace_scancode;
 
     while (SDL1_PollEvent(&event)) {
         switch (event.type) {
@@ -164,10 +164,9 @@ static void SDL1_Harness_ProcessWindowMessages(void) {
                 }
             }
 
-            // Map incoming SDL scancode to DirectInput DIK_* key code.
-            // https://github.com/DanielGibson/Snippets/blob/master/sdl2_scancode_to_dinput.h
-            dinput_key = sdl1KeyToDirectInputKeyNum[event.key.keysym.sym];
-            if (dinput_key == 0) {
+            // Map incoming SDL key to PC scan code as used by game code
+            dethrace_scancode = sdl1KeyToDirectInputKeyNum[event.key.keysym.sym];
+            if (dethrace_scancode == 0) {
                 LOG_WARN("unexpected key \"%s\" (0x%x)", SDL1_GetKeyName(event.key.keysym.sym), event.key.keysym.sym);
                 return;
             }
