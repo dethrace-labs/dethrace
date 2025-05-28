@@ -15,7 +15,7 @@ static br_pixelmap* last_screen_src;
 
 static Uint32 last_frame_time;
 
-void (*gKeyHandler_func)(void);
+static void (*gKeyHandler_func)(void);
 
 // 32 bytes, 1 bit per key. Matches dos executable behavior
 static uint32_t key_state[8];
@@ -27,7 +27,6 @@ static struct {
 
 // Callbacks back into original game code
 extern void QuitGame(void);
-extern uint32_t gKeyboard_bits[8];
 extern br_pixelmap* gBack_screen;
 static int window_width, window_height;
 
