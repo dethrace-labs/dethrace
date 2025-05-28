@@ -84,6 +84,8 @@ void KeyboardHandler(void) {
     static tU8 extended;
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
+
+    // dos code reads scancodes from interrupt
 }
 
 // IDA: int __usercall KeyDown@<EAX>(tU8 pScan_code@<EAX>)

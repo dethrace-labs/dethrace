@@ -83,7 +83,8 @@ void KeyboardHandler(void) {
     tU8 up;
     static tU8 extended;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gHarness_platform.GetKeyboardState(gKeyboard_bits);
 }
 
 // IDA: int __usercall KeyDown@<EAX>(tU8 pScan_code@<EAX>)
@@ -216,6 +217,7 @@ void KeyBegin(void) {
 
     // gPrev_keyboard_handler = dos_getvect(9);
     // dos_setvect(9, KeyboardHandler);
+    gHarness_platform.SetKeyHandler(KeyboardHandler);
 }
 
 // IDA: void __cdecl KeyEnd()
@@ -239,7 +241,7 @@ void PDSetKeyArray(int* pKeys, int pMark) {
     LOG_TRACE10("(%p, %d)", pKeys, pMark);
 
     // Required in some cases like a tight loop waiting for a keypress
-    gHarness_platform.ProcessWindowMessages(NULL);
+    gHarness_platform.ProcessWindowMessages();
 
     gKeys_pressed = 0;
     for (i = 0; i < COUNT_OF(gScan_code); i++) {
@@ -755,7 +757,7 @@ int PDGetTotalTime(void) {
 // IDA: int __usercall PDServiceSystem@<EAX>(tU32 pTime_since_last_call@<EAX>)
 int PDServiceSystem(tU32 pTime_since_last_call) {
 
-    gHarness_platform.ProcessWindowMessages(NULL);
+    gHarness_platform.ProcessWindowMessages();
     return 0;
 }
 

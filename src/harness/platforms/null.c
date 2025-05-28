@@ -16,11 +16,11 @@ static int null_show_error_message(char* title, char* text) {
     return 0;
 }
 
-static void null_get_and_handle_message(MSG_* msg) {
+static void null_get_and_handle_message(void) {
     null_time += 1;
 }
 
-static void null_get_keyboard_state(unsigned int count, uint8_t* buffer) {
+static void null_get_keyboard_state(uint32_t* buffer) {
     null_time += 1;
 }
 
@@ -39,7 +39,7 @@ static int null_show_cursor(int show) {
     return 0;
 }
 
-static void null_set_palette(PALETTEENTRY_* palette) {
+static void null_set_palette(br_colour* palette) {
     null_time += 1;
 }
 

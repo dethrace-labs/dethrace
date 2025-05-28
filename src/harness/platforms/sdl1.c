@@ -140,7 +140,7 @@ static int is_only_key_modifier(int modifier_flags, int flag_check) {
     return (modifier_flags & flag_check) && (modifier_flags & (KMOD_CTRL | KMOD_SHIFT | KMOD_ALT | KMOD_META)) == (modifier_flags & flag_check);
 }
 
-static void SDL1_Harness_ProcessWindowMessages(MSG_* msg) {
+static void SDL1_Harness_ProcessWindowMessages() {
     SDL_Event event;
     int dinput_key;
 

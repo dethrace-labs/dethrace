@@ -2,7 +2,6 @@
 #define HARNESS_HOOKS_H
 
 #include "brender.h"
-#include "harness/win95_polyfill_defs.h"
 #include <stdio.h>
 
 typedef enum tHarness_window_type {
@@ -15,7 +14,7 @@ typedef struct tHarness_platform {
     // Render a fullscreen quad using the specified pixel data
     void (*Renderer_Present)(br_pixelmap* src);
     // Set the 256 color palette to use (BGRA format)
-    void (*Renderer_SetPalette)(PALETTEENTRY_* palette);
+    void (*Renderer_SetPalette)(br_colour* palette);
     // Get mouse button state
     int (*GetMouseButtons)(int* button_1, int* button_2);
     // Get mouse position
@@ -23,13 +22,16 @@ typedef struct tHarness_platform {
     // Close specified window
     void (*DestroyWindow)(void* window);
     // Process window messages, return any WM_QUIT message
-    void (*ProcessWindowMessages)(MSG_* msg);
+    void (*ProcessWindowMessages)(void);
     // Set position of a window
     int (*SetWindowPos)(void* hWnd, int x, int y, int nWidth, int nHeight);
     // Show/hide the cursor
     int (*ShowCursor)(int show);
-    // Get keyboard state. Expected to be in DirectInput key codes
-    void (*GetKeyboardState)(unsigned int count, uint8_t* buffer);
+    // invoked when key is set up or down
+    void (*SetKeyHandler)(void (*handler_func)(void));
+    // Get keyboard state. Argument expected to point to 32 byte buffer - 1 bit per key
+    void (*GetKeyboardState)(uint32_t* buffer);
+
     // Sleep
     void (*Sleep)(uint32_t dwMilliseconds);
     // Get ticks

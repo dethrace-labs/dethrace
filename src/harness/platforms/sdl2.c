@@ -4,9 +4,8 @@
 #include "harness/config.h"
 #include "harness/hooks.h"
 #include "harness/trace.h"
-#include "sdl2_scancode_to_dinput.h"
 #include "sdl2_syms.h"
-#include "sdl_scancode_to_set1.h"
+#include "sdl_scancode_map.h"
 
 SDL_COMPILE_TIME_ASSERT(sdl2_platform_requires_SDL2, SDL_MAJOR_VERSION == 2);
 
@@ -22,7 +21,10 @@ static int render_width, render_height;
 
 static Uint32 last_frame_time;
 
-static uint8_t shadow_key_state[SDL_NUM_SCANCODES];
+void (*gKeyHandler_func)(void);
+
+// 32 bytes, 1 bit per key. Matches dos executable behavior
+static uint32_t key_state[8];
 
 static struct {
     int x, y;
@@ -31,7 +33,6 @@ static struct {
 
 // Callbacks back into original game code
 extern void QuitGame(void);
-extern uint32_t gKeyboard_bits[8];
 extern br_pixelmap* gBack_screen;
 
 #ifdef DETHRACE_SDL_DYNAMIC
@@ -118,9 +119,8 @@ static int is_only_key_modifier(int modifier_flags, int flag_check) {
     return (modifier_flags & flag_check) && (modifier_flags & (KMOD_CTRL | KMOD_SHIFT | KMOD_ALT | KMOD_GUI)) == (modifier_flags & flag_check);
 }
 
-static void SDL2_Harness_ProcessWindowMessages(MSG_* msg) {
+static void SDL2_Harness_ProcessWindowMessages(void) {
     SDL_Event event;
-    int set1_scancode;
 
     while (SDL2_PollEvent(&event)) {
         switch (event.type) {
@@ -142,22 +142,19 @@ static void SDL2_Harness_ProcessWindowMessages(MSG_* msg) {
                 }
             }
 
-            // Map incoming SDL scancode to PC set 1 scan code as used by game code
-            // set1_scancode = sdl_to_set1_scancode[event.key.keysym.scancode];
-            int x = event.key.keysym.scancode;
-            set1_scancode = sdlScanCodeToDirectInputKeyNum[event.key.keysym.scancode];
-            if (set1_scancode == 0) {
+            // Map incoming SDL scancode to PC scan code as used by game code
+            int dethrace_scancode = sdl_scancode_map[event.key.keysym.scancode];
+            if (dethrace_scancode == 0) {
                 LOG_WARN("unexpected scan code %s (%d)", SDL2_GetScancodeName(event.key.keysym.scancode), event.key.keysym.scancode);
                 return;
             }
 
             if (event.type == SDL_KEYDOWN) {
-                gKeyboard_bits[set1_scancode >> 5] |= (1 << (set1_scancode & 0x1F));
-                shadow_key_state[set1_scancode] = 0xff;
+                key_state[dethrace_scancode >> 5] |= (1 << (dethrace_scancode & 0x1F));
             } else {
-                gKeyboard_bits[set1_scancode >> 5] &= ~(1 << (set1_scancode & 0x1F));
-                shadow_key_state[set1_scancode] = 0;
+                key_state[dethrace_scancode >> 5] &= ~(1 << (dethrace_scancode & 0x1F));
             }
+            gKeyHandler_func();
             break;
 
         case SDL_WINDOWEVENT:
@@ -172,8 +169,12 @@ static void SDL2_Harness_ProcessWindowMessages(MSG_* msg) {
     }
 }
 
-static void SDL2_Harness_GetKeyboardState(unsigned int count, uint8_t* buffer) {
-    memcpy(buffer, shadow_key_state, count);
+static void SDL2_Harness_SetKeyHandler(void (*handler_func)(void)) {
+    gKeyHandler_func = handler_func;
+}
+
+static void SDL2_Harness_GetKeyboardState(uint32_t* buffer) {
+    memcpy(buffer, key_state, sizeof(key_state));
 }
 
 static int SDL2_Harness_GetMouseButtons(int* pButton1, int* pButton2) {
@@ -323,7 +324,7 @@ static void SDL2_Harness_CreateWindow(const char* title, int width, int height, 
 
 static void SDL2_Harness_Swap(br_pixelmap* back_buffer) {
 
-    SDL2_Harness_ProcessWindowMessages(NULL);
+    SDL2_Harness_ProcessWindowMessages();
 
     if (gl_context != NULL) {
         SDL2_GL_SwapWindow(window);
@@ -376,6 +377,7 @@ static int SDL2_Harness_Platform_Init(tHarness_platform* platform) {
     platform->ShowCursor = SDL2_ShowCursor;
     platform->SetWindowPos = SDL2_Harness_SetWindowPos;
     platform->DestroyWindow = SDL2_Harness_DestroyWindow;
+    platform->SetKeyHandler = SDL2_Harness_SetKeyHandler;
     platform->GetKeyboardState = SDL2_Harness_GetKeyboardState;
     platform->GetMousePosition = SDL2_Harness_GetMousePosition;
     platform->GetMouseButtons = SDL2_Harness_GetMouseButtons;
