@@ -202,6 +202,7 @@ void DoGameCompletedAnimation(void) {
     StartMusic();
 }
 
+// DEMO only
 void DoFeatureUnavailableInDemo(void) {
     LOG_TRACE("()");
 
@@ -215,6 +216,7 @@ void DoFeatureUnavailableInDemo(void) {
     PrintMemoryDump(0, "AFTER DEMO-ONLY SCREEN");
 }
 
+// DEMO only
 void DoFullVersionPowerpoint(void) {
     LOG_TRACE("()");
 
@@ -230,6 +232,7 @@ void DoFullVersionPowerpoint(void) {
     gLast_demo_end_anim = PDGetTotalTime();
 }
 
+// DEMO only
 void DoDemoGoodbye(void) {
     if (PDGetTotalTime() - gLast_demo_end_anim > 90000) {
         DoFullVersionPowerpoint();

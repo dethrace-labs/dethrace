@@ -581,8 +581,8 @@ void DrawGames(int pCurrent_choice, int pCurrent_mode) {
         current_index++;
     }
 
-    if (current_index != 0 && (gCurrent_game_selection == 0 || (gLast_graph_sel__newgame >= 0 && (gGames_to_join[gLast_graph_sel__newgame].game == NULL || (!gGames_to_join[gLast_graph_sel__newgame].game->options.open_game && !gGames_to_join[gLast_graph_sel__newgame].game->no_races_yet) || gGames_to_join[gLast_graph_sel__newgame].game->num_players > 5)))) {
-        gCurrent_game_selection = 1;
+    if (current_index != 0 && (gShifted_default_yet == 0 || (gLast_graph_sel__newgame >= 0 && (gGames_to_join[gLast_graph_sel__newgame].game == NULL || (!gGames_to_join[gLast_graph_sel__newgame].game->options.open_game && !gGames_to_join[gLast_graph_sel__newgame].game->no_races_yet) || gGames_to_join[gLast_graph_sel__newgame].game->num_players > 5)))) {
+        gShifted_default_yet = 1;
         for (i = 0; i < COUNT_OF(gGames_to_join); i++) {
             if (gGames_to_join[i].game != NULL && (gGames_to_join[i].game->options.open_game || gGames_to_join[i].game->no_races_yet) && gGames_to_join[i].game->num_players <= 5) {
                 gLast_graph_sel__newgame = i;
@@ -787,7 +787,7 @@ tJoin_or_host_result JoinOrHostGame(tNet_game_details** pGame_to_join) {
     int result;
     LOG_TRACE("(%p)", pGame_to_join);
 
-    gCurrent_game_selection = 0;
+    gShifted_default_yet = 0;
     LoadFont(kFont_GRNDK);
     LoadFont(kFont_GRNLIT);
     LoadFont(kFont_GREENHED);
@@ -1092,7 +1092,7 @@ void RevertToDefaults(void) {
     if (f == NULL) {
         return;
     }
-    for (i = 0; i < gLast_game_type + 1; i++) {
+    for (i = 0; i < gCurrent_game_selection + 1; i++) {
         ReadNetworkSettings(f, &net_options);
     }
     SetNetOptions(&net_options);
@@ -1307,7 +1307,7 @@ void SetOptions(tNet_game_type pGame_type, tNet_game_options* pGame_options) {
 void DrawNetChooseInitial(void) {
     LOG_TRACE("()");
 
-    PlayRadioOn__newgame(gLast_game_type);
+    PlayRadioOn__newgame(gCurrent_game_selection);
 }
 
 // IDA: int __usercall NetChooseGoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
@@ -1317,15 +1317,15 @@ int NetChooseGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     if (*pCurrent_mode == 0) {
         return 1;
     } else {
-        if (*pCurrent_choice - 4 != gLast_game_type) {
+        if (*pCurrent_choice - 4 != gCurrent_game_selection) {
             RemoveTransientBitmaps(1);
             DontLetFlicFuckWithPalettes();
             TurnFlicTransparencyOn();
-            PlayRadioOff__newgame(gLast_game_type);
-            gLast_game_type = *pCurrent_choice - 4;
-            PlayRadioOn__newgame(gLast_game_type);
-            LoadRaces(gRace_list, &gNumber_of_races, gLast_game_type);
-            SetOptions(gLast_game_type, gOptions);
+            PlayRadioOff__newgame(gCurrent_game_selection);
+            gCurrent_game_selection = *pCurrent_choice - 4;
+            PlayRadioOn__newgame(gCurrent_game_selection);
+            LoadRaces(gRace_list, &gNumber_of_races, gCurrent_game_selection);
+            SetOptions(gCurrent_game_selection, gOptions);
             TurnFlicTransparencyOff();
             LetFlicFuckWithPalettes();
             if (gRace_index >= gNumber_of_races) {
@@ -1404,7 +1404,7 @@ void DrawNetChoose(int pCurrent_choice, int pCurrent_mode) {
         gCurrent_graf_data->net_descr_race_bot - gCurrent_graf_data->net_descr_race_top,
         0);
     OoerrIveGotTextInMeBoxMissus(9,
-        GetMiscString(kMiscString_NetworkGameTypeDescriptions_START + (pCurrent_mode ? pCurrent_choice - 4 : gLast_game_type)),
+        GetMiscString(kMiscString_NetworkGameTypeDescriptions_START + (pCurrent_mode ? pCurrent_choice - 4 : gCurrent_game_selection)),
         gBack_screen,
         gCurrent_graf_data->net_descr_race_l,
         gCurrent_graf_data->net_descr_race_top,
@@ -1427,7 +1427,7 @@ void DrawNetChoose(int pCurrent_choice, int pCurrent_mode) {
 int NetChooseLR(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
-    *pCurrent_choice = gLast_game_type + 4;
+    *pCurrent_choice = gCurrent_game_selection + 4;
     return 0;
 }
 
@@ -1524,7 +1524,7 @@ int NetGameChoices(tNet_game_type* pGame_type, tNet_game_options* pGame_options,
     LOG_TRACE("(%p, %p, %p)", pGame_type, pGame_options, pRace_index);
 
     gRace_index = *pRace_index;
-    gLast_game_type = *pGame_type;
+    gCurrent_game_selection = *pGame_type;
     do {
         LoadFont(kFont_GRNLIT);
         LoadFont(kFont_GRNDK);
@@ -1542,7 +1542,7 @@ int NetGameChoices(tNet_game_type* pGame_type, tNet_game_options* pGame_options,
         DisposeFont(10);
         switch (result) {
         case 0:
-            *pGame_type = gLast_game_type;
+            *pGame_type = gCurrent_game_selection;
             *pRace_index = gRace_index;
             break;
         case 2:

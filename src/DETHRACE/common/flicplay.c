@@ -1674,7 +1674,7 @@ void FlushAllFlics(int pBunch_index) {
     int i;
     LOG_TRACE("(%d)", pBunch_index);
 
-    for (i = 0; i < COUNT_OF(gFlic_bunch); i++) {
+    for (i = 0; i < COUNT_OF(gMain_flic_list); i++) {
         FreeFlic(i);
     }
 }

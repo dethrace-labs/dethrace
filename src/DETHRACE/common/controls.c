@@ -2579,7 +2579,7 @@ void EnterUserMessage(void) {
                 }
                 gString[20 + len + 1] = '\0';
             }
-        } else if (the_key < KEY_KP_0 || the_key >  KEY_KP_9) {
+        } else if (the_key < KEY_KP_0 || the_key > KEY_KP_9) {
             gEntering_message = 0;
         } else {
             if (the_key == KEY_KP_0) {
