@@ -674,10 +674,10 @@ void EraseAGraphBox__options(int pIndex) {
 void DrawGraphBox(int pCurrent_choice, int pCurrent_mode) {
     LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
 
-    if (pCurrent_choice != gCurrent_key) {
-        EraseAGraphBox__options(gCurrent_key - 2);
+    if (pCurrent_choice != gLast_graph_sel__options) {
+        EraseAGraphBox__options(gLast_graph_sel__options - 2);
         DrawAGraphBox__options(pCurrent_choice - 2);
-        gCurrent_key = pCurrent_choice;
+        gLast_graph_sel__options = pCurrent_choice;
     }
 }
 
@@ -802,7 +802,7 @@ void DoGraphicsOptions(void) {
     LOG_TRACE("()");
 
     gThe_interface_spec__options = &interface_spec;
-    gCurrent_key = -1;
+    gLast_graph_sel__options = -1;
     LoadFont(kFont_GRYLIT);
     GetGraphicsOptions();
     if (DoInterfaceScreen(&interface_spec, 0, 0) == 0) {
