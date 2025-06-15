@@ -6,7 +6,8 @@
 
 br_allocator gAllocator = { "Death Race", DRStdlibAllocate, DRStdlibFree, DRStdlibInquire, Claim4ByteAlignment };
 int gNon_fatal_allocation_errors = 0;
-char* gMem_names[247] = {
+// Is 247 in DOS executable, last entry NULL
+char* gMem_names[246] = {
     "",
     "BR_MEMORY_SCRATCH",
     "BR_MEMORY_PIXELMAP",
@@ -252,10 +253,11 @@ char* gMem_names[247] = {
     "kMem_DOS_HMI_file_open",
     "kMem_abuse_text",
     "kMem_action_replay_buffer",
-    "kMem_misc",
-    NULL,
+    "kMem_misc"
 };
-br_resource_class gStainless_classes[118];
+
+// Is 118 in DOS executable, with last entry unused
+br_resource_class gStainless_classes[117];
 
 // IDA: void __cdecl SetNonFatalAllocationErrors()
 void SetNonFatalAllocationErrors(void) {

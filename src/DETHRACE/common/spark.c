@@ -1510,7 +1510,6 @@ void ResetSmoke(void) {
     LOG_TRACE("()");
 
     gSmoke_flags = 0;
-    ;
 }
 
 // IDA: void __usercall AdjustSmoke(int pIndex@<EAX>, tU8 pType@<EDX>, br_vector3 *pPos@<EBX>, br_scalar pRadius, br_scalar pStrength)

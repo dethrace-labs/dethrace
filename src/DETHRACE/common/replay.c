@@ -265,7 +265,7 @@ void MoveReplayBuffer(tS32 pMove_amount) {
         ProcessOilSpills(gFrame_period);
     }
     if (gReplay_rate < 0.f) {
-        CheckSound((tPipe_chunk*)old_play_ptr2, old_time, GetTotalTime());
+        ScanAndPlaySoundsToBe(old_play_ptr2, old_time, GetTotalTime());
     }
     if (old_play_ptr == play_ptr) {
         gReplay_rate = 0.f;

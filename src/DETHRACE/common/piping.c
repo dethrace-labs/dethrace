@@ -180,7 +180,7 @@ tU32 LengthOfSession(tPipe_session* pSession) {
     LOG_TRACE("(%p)", pSession);
 
 #define SIZEOF_CHUNK(MEMBER) (offsetof(tPipe_chunk, chunk_data) + sizeof(pSession->chunks.chunk_data.MEMBER))
-#define ROUND_UP(V, M) (((V) + (M)-1) & (~((M)-1)))
+#define ROUND_UP(V, M) (((V) + (M) - 1) & (~((M) - 1)))
 
     REPLAY_DEBUG_ASSERT(pSession->pipe_magic1 == REPLAY_DEBUG_SESSION_MAGIC1);
 
@@ -2171,7 +2171,14 @@ int SoundTimeout(tU32 pTime) {
 void ScanAndPlaySoundsToBe(tU8* pPtr, tU32 pOldest_time, tU32 pYoungest_time) {
     tU8* temp_ptr;
     LOG_TRACE("(%p, %d, %d)", pPtr, pOldest_time, pYoungest_time);
-    NOT_IMPLEMENTED();
+
+    if (!gDisable_sound) {
+        temp_ptr = pPtr;
+        gYoungest_time = pYoungest_time;
+        gOldest_time = pOldest_time;
+        gLast_time = (fabs(GetReplayRate()) * 1500.0f);
+        ScanBuffer(&temp_ptr, ePipe_chunk_sound, pOldest_time, CheckSound, SoundTimeout);
+    }
 }
 
 // IDA: int __usercall CheckCar@<EAX>(tPipe_chunk *pChunk_ptr@<EAX>, int pChunk_count@<EDX>, tU32 pTime@<EBX>)
@@ -2186,11 +2193,11 @@ int CheckCar(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
 
     temp_ptr = pChunk_ptr;
     if (PipeSearchForwards()) {
-        if (pTime <= gOldest_time) {
+        if (pTime <= gEnd_time) {
             return 0;
         }
     } else {
-        if (pTime >= gOldest_time) {
+        if (pTime >= gEnd_time) {
             return 0;
         }
     }
@@ -2224,11 +2231,11 @@ int CarTimeout(tU32 pTime) {
     LOG_TRACE("(%d)", pTime);
 
     if (PipeSearchForwards()) {
-        if (pTime > gYoungest_time) {
+        if (pTime > gLoop_abort_time) {
             return 0;
         }
     } else {
-        if (pTime < gYoungest_time) {
+        if (pTime < gLoop_abort_time) {
             return 0;
         }
     }
@@ -2247,11 +2254,11 @@ void ScanCarsPositions(tCar_spec* pCar, br_vector3* pSource_pos, br_scalar pMax_
     gCar_ptr = pCar;
 
     if (PipeSearchForwards()) {
-        gOldest_time = GetTotalTime() + pOffset_time;
-        gYoungest_time = gOldest_time + pTime_period;
+        gEnd_time = GetTotalTime() + pOffset_time;
+        gLoop_abort_time = gEnd_time + pTime_period;
     } else {
-        gOldest_time = GetTotalTime() - pOffset_time;
-        gYoungest_time = gOldest_time - pTime_period;
+        gEnd_time = GetTotalTime() - pOffset_time;
+        gLoop_abort_time = gEnd_time - pTime_period;
     }
 
     ScanBuffer(&temp_ptr, ePipe_chunk_car, GetTotalTime(), CheckCar, CarTimeout);
@@ -2267,11 +2274,11 @@ int CheckIncident(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
     LOG_TRACE("(%p, %d, %d)", pChunk_ptr, pChunk_count, pTime);
 
     if (PipeSearchForwards()) {
-        if (pTime <= gOldest_time) {
+        if (pTime <= gEnd_time) {
             return 0;
         }
     } else {
-        if (gOldest_time <= pTime) {
+        if (gEnd_time <= pTime) {
             return 0;
         }
     }
@@ -2288,9 +2295,9 @@ int GetNextIncident(tU32 pOffset_time, tIncident_type* pIncident_type, float* pS
     temp_ptr = gPipe_play_ptr;
     gTrigger_time = 0;
     if (PipeSearchForwards()) {
-        gOldest_time = GetTotalTime() + pOffset_time;
+        gEnd_time = GetTotalTime() + pOffset_time;
     } else {
-        gOldest_time = GetTotalTime() - pOffset_time;
+        gEnd_time = GetTotalTime() - pOffset_time;
     }
     ScanBuffer(&temp_ptr, ePipe_chunk_incident, GetTotalTime(), CheckIncident, NULL);
     if (gTrigger_time != 0) {
