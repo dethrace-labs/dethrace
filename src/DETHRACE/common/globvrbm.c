@@ -6,6 +6,8 @@ br_scalar gYon_factor;
 
 // GLOBAL: CARM95 0x530c80
 br_material* gMaterial[2];
+
+// These variables are all used only by the 3dfx patch
 int g16bit_palette_valid;
 tException_list gExceptions;
 br_actor* g2d_camera;

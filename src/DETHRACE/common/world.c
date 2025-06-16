@@ -161,6 +161,7 @@ br_scalar gNearest_distance;
 
 // GLOBAL: CARM95 0x534c50
 br_actor* gNearest_actor;
+
 br_actor* gStandard_lamp;
 
 // GLOBAL: CARM95 0x534abc

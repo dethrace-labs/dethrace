@@ -49,6 +49,7 @@ int gVisible_length;
 
 // GLOBAL: CARM95 0x53a1b8
 int gLetter_y_coords[15];
+
 int gThe_key;
 
 // GLOBAL: CARM95 0x53a444

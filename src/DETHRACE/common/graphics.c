@@ -41,6 +41,7 @@
 
 // GLOBAL: CARM95 0x520040
 int gPalette_munged;
+
 int gColourValues[1];
 
 // GLOBAL: CARM95 0x520048
@@ -177,12 +178,15 @@ br_colour gRGB_colours[9] = {
     16711935u,
     13649666u
 };
+
+// GLOBAL: CARM95 0x5201c8
 br_matrix34 gSheer_mat = {
     { { 1.0, 0.0, 0.0 },
         { 0.0, 1.0, 0.0 },
         { 0.0, 0.0, 1.0 },
         { 0.0, 0.0, 0.0 } }
 };
+// GLOBAL: CARM95 0x5201f8
 br_matrix34 gIdentity34 = {
     { { 1.0, 0.0, 0.0 },
         { 0.0, 1.0, 0.0 },
@@ -192,12 +196,17 @@ br_matrix34 gIdentity34 = {
 
 // GLOBAL: CARM95 0x520228
 tShadow_level gShadow_level = eShadow_us_only;
+
+// GLOBAL: CARM95 0x52022c
 br_scalar gShadow_hither_z_move;
+
+// GLOBAL: CARM95 0x520230
 br_scalar gShadow_hither_min_move;
+
 /* clang-format off */
 // arrows pointing to 180, 202, 224, 246 degrees (step = 90 / 4 = 22(.5) degrees)
-int gArrows[2][4][60] =
-{
+// GLOBAL: CARM95 0x520238
+int gArrows[2][4][60] = {
     {
         // inner arrow (=fill)
         { 10,  0,  0, -1,  0,  1,  0,  0, -1,  0, -2,  0,  1, -1,  1,  1,  1, -2,  2,  2,  2, },
@@ -284,6 +293,7 @@ br_pixelmap* gCursor_giblet_images[18];
 
 // GLOBAL: CARM95 0x53e790
 br_pixelmap* gEval_1;
+
 br_pixelmap* gEval_2;
 
 // GLOBAL: CARM95 0x53f8b8

@@ -6,6 +6,7 @@ tNet_mode gNet_mode;
 
 // GLOBAL: CARM95 0x550fa0
 tNet_game_player_info gNet_players[6];
+
 br_matrix34 gRoot_to_camera;
 
 // GLOBAL: CARM95 0x550af0
@@ -13,6 +14,7 @@ tCar_detail_info gCar_details[60];
 
 // GLOBAL: CARM95 0x550ae0
 int gThis_net_player_index;
+
 br_scalar gPedestrian_distance_squared;
 
 // GLOBAL: CARM95 0x551434
@@ -44,8 +46,11 @@ tNet_game_options* gNet_options;
 
 // GLOBAL: CARM95 0x550ac0
 br_vector3 gCamera_direction;
+
 int gNetwork_available;
+
 int gPedestrian_image;
+
 int gHighest_pedestrian_value;
 
 // GLOBAL: CARM95 0x551430

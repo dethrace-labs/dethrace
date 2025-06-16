@@ -71,6 +71,7 @@ tPipe_reset_proc* gReset_procs[32] = {
     ResetProxRay,
     NULL,
 };
+
 tPiped_registration_snapshot gRegistration_snapshots[5];
 
 // GLOBAL: CARM95 0x531ffc
@@ -78,6 +79,7 @@ tPipe_smudge_data* gSmudge_space;
 
 // GLOBAL: CARM95 0x532010
 tU32 gOldest_time;
+
 int gCurrent_snapshot_registration_index;
 
 // GLOBAL: CARM95 0x531fa0
@@ -130,6 +132,7 @@ tU32 gYoungest_time;
 
 // GLOBAL: CARM95 0x53208c
 tU8* gPipe_buffer_phys_end;
+
 tU8* gLocal_buffer_record_ptr;
 
 // GLOBAL: CARM95 0x532018

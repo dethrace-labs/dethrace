@@ -83,6 +83,8 @@ tU32 gLast_player_list_received;
 
 // GLOBAL: CARM95 0x534c7c
 tMin_message* gMin_messages;
+
+// GLOBAL: CARM95 0x535dc0
 void (*gAdd_proc)(tNet_game_details*);
 
 // GLOBAL: CARM95 0x534c64

@@ -156,6 +156,7 @@ tPed_gib_materials gPed_gib_materials[4];
 
 // GLOBAL: CARM95 0x536b58
 tProximity_ray gProximity_rays[20];
+
 int gPed_colliding;
 
 // GLOBAL: CARM95 0x550a90

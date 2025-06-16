@@ -79,6 +79,7 @@ tNet_sequence_type gNet_race_sequence__newgame; // suffix added to avoid duplica
 
 // GLOBAL: CARM95 0x550098
 tNet_game_type gLast_game_type;
+
 int gCurrent_net_game_count;
 
 // GLOBAL: CARM95 0x53e5f4
@@ -86,6 +87,7 @@ tU32 gAnne_flic_data_length;
 
 // GLOBAL: CARM95 0x53e5a0
 int gShifted_default_yet;
+
 char* gNet_name;
 
 // GLOBAL: CARM95 0x53e598

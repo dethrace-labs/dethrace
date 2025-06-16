@@ -79,7 +79,9 @@ tHeadup_info gHeadup_image_info[32] = {
     { "UWON.PIX", eNet_only },
     { "DTIMEOUT.PIX", eNot_net }, // Only used by the demo, not present in the full version
 };
+
 char* gYour_car_names[2][6];
+
 char* gDrivable_car_names[6];
 
 // GLOBAL: CARM95 0x50a530

@@ -77,7 +77,9 @@ int gTest_toggle;
 
 // GLOBAL: CARM95 0x507118
 int gAlready_elasticating;
+
 int gVertices_used_in_non_edit_paths;
+
 int gFaces_used_in_non_edit_paths;
 
 // GLOBAL: CARM95 0x507124
