@@ -43,6 +43,7 @@
 #define NBR_FUNK_GROVE_FLAGS 30
 #define OPPONENT_APC_IDX 3
 
+// GLOBAL: CARM95 0x50a3f0
 tHeadup_info gHeadup_image_info[32] = {
     // Modified by DethRace to fit the "demo timeout" fancy head-up.
     { "LADY.PIX", eNet_or_otherwise },
@@ -80,6 +81,7 @@ tHeadup_info gHeadup_image_info[32] = {
 };
 char* gYour_car_names[2][6];
 char* gDrivable_car_names[6];
+// GLOBAL: CARM95 0x50a530
 char* gDamage_names[] = {
     "engine",
     "transmission",
@@ -94,6 +96,7 @@ char* gDamage_names[] = {
     "lr_wheel",
     "rr_wheel"
 };
+// GLOBAL: CARM95 0x50a560
 char* gWheel_actor_names[] = {
     "FLWHEEL.ACT",
     "FRWHEEL.ACT",
@@ -102,6 +105,7 @@ char* gWheel_actor_names[] = {
     "IFLWHEEL.ACT",
     "IFRWHEEL.ACT"
 };
+// GLOBAL: CARM95 0x50a578
 char* gRaces_file_names[] = {
     "RACES.TXT",
     "NETRACES.TXT",
@@ -114,11 +118,13 @@ char* gRaces_file_names[] = {
     "NETRACES.TXT"
 };
 char* gNet_avail_names[] = { "never", "eagle", "hawk", "all" };
+// GLOBAL: CARM95 0x50a5b0
 char* gFloorpan_names[] = { "GBUNDER.MAT", "BGLUNDER.MAT", "GRIMBOT.MAT", "DDBASE.MAT", "HFUNDER.MAT" };
 // GLOBAL: CARM95 0x50a5c4
 int gAllow_open_to_fail = 1;
 // GLOBAL: CARM95 0x50a5c8
 int gDecode_thing = '@';
+// GLOBAL: CARM95 0x50a5d0
 char gDecode_string[] = { 0x9B, 0x52, 0x93, 0x9F, 0x52, 0x98, 0x9B, 0x96, 0x96, 0x9E, 0x9B, 0xA0, 0x99, 0x0 };
 int gFunk_groove_flags[30];
 char gDef_def_water_screen_name[32];
@@ -734,6 +740,7 @@ void DRLoadLights(char* pPath_name) {
 }
 
 // IDA: void __usercall LoadInFiles(char *pThe_base_path@<EAX>, char *pThe_dir_name@<EDX>, void (*pLoad_routine)(char*)@<EBX>)
+// FUNCTION: CARM95 0x41d957
 void LoadInFiles(char* pThe_base_path, char* pThe_dir_name, void (*pLoad_routine)(char*)) {
     tPath_name the_path;
     LOG_TRACE("(\"%s\", \"%s\", %p)", pThe_base_path, pThe_dir_name, pLoad_routine);

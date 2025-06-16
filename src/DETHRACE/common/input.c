@@ -17,6 +17,7 @@ int gEdge_trigger_mode;
 tU32 gLast_poll_keys;
 // GLOBAL: CARM95 0x514c78
 int gInsert_mode;
+// GLOBAL: CARM95 0x514c80
 int gGo_ahead_keys[3] = { 51, 52, 106 }; // enter, return, space
 // GLOBAL: CARM95 0x5507c0
 tJoy_array gJoy_array;

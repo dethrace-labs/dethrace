@@ -73,6 +73,7 @@ int gMetal_crunch_sound_id__car[5] = {
     5003,
     5004,
 };
+// GLOBAL: CARM95 0x514d20
 int gMetal_scrape_sound_id__car[3] = {
     // suffix added to avoid duplicate symbol
     5010,
@@ -95,7 +96,9 @@ tU32 gQuite_wild_end = 0;
 tU32 gOn_me_wheels_start = 0;
 // GLOBAL: CARM95 0x514d48
 int gWoz_upside_down_at_all = 0;
+// GLOBAL: CARM95 0x514d50
 tS3_sound_tag gSkid_tag[2] = { 0, 0 };
+// GLOBAL: CARM95 0x514d58
 tCar_spec* gLast_car_to_skid[2] = { NULL, NULL };
 // GLOBAL: CARM95 0x514d60
 int gEliminate_faces = 0;
@@ -114,8 +117,11 @@ int gNet_player_to_view_index = -1;
 int gDouble_pling_water = 0;
 // GLOBAL: CARM95 0x514da0
 int gStop_opponents_moving = 0;
+// GLOBAL: CARM95 0x514da8
 float gDefensive_powerup_factor[6] = { 1.0f, 0.825f, 0.65f, 0.475f, 0.3f, 0.01f };
+// GLOBAL: CARM95 0x514dc0
 float gOffensive_powerup_factor[6] = { 1.0f, 1.5f, 2.0f, 3.0f, 5.0f, 10.0f };
+// GLOBAL: CARM95 0x514dd8
 float gEngine_powerup_factor[6] = { 1.3f, 1.9f, 2.5f, 3.2f, 4.0f, 10.0f };
 // GLOBAL: CARM95 0x514df0
 br_angle gPanning_camera_angle;
@@ -123,6 +129,7 @@ br_angle gPanning_camera_angle;
 br_scalar gPanning_camera_height;
 // GLOBAL: CARM95 0x514cec
 int gFace_count;
+// GLOBAL: CARM95 0x514e00
 float gCar_simplification_factor[2][5] = {
     { 10.0f, 3.0f, 1.5f, 0.75f, 0.0f },
     { 10.0f, 5.0f, 2.5f, 1.5f, 0.0f }

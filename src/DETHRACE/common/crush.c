@@ -25,11 +25,15 @@
 #include "world.h"
 #include <stdlib.h>
 
+// GLOBAL: CARM95 0x521370
 float gWobble_spam_y[8] = { 0.0f, -0.15f, 0.4f, 0.15f, -0.4f, 0.25f, 0.0f, -0.25f };
+// GLOBAL: CARM95 0x521390
 float gWobble_spam_z[8] = { 0.4f, -0.25f, 0.0f, 0.25f, 0.0f, 0.15f, -0.4f, -0.15f };
 // GLOBAL: CARM95 0x5213b0
 br_scalar gWheel_circ_to_width = 0.16f;
+// GLOBAL: CARM95 0x5213b8
 tU8 gSmoke_damage_step[12] = { 20u, 20u, 0u, 10u, 10u, 10u, 10u, 10u, 10u, 10u, 10u, 10u };
+// GLOBAL: CARM95 0x5213c4
 int gSteal_ranks[5] = { 89, 72, 55, 38, 21 };
 
 #define BIGAPC_OPPONENT_INDEX 4

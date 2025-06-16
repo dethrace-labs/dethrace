@@ -11,6 +11,7 @@
 #include <math.h>
 #include <stdlib.h>
 
+// GLOBAL: CARM95 0x509a38
 char* gOil_pixie_names[1] = { "OIL.PIX" };
 // GLOBAL: CARM95 0x509a3c
 int gNext_oil_pixie = 0;

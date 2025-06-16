@@ -5,6 +5,7 @@
 #include "globvars.h"
 #include "pd/sys.h"
 
+// GLOBAL: CARM95 0x50bcf0
 tGraf_data gGraf_data[2] = {
     { 320,
         200,

@@ -37,6 +37,7 @@
 #include "world.h"
 #include <stdlib.h>
 
+// GLOBAL: CARM95 0x51b1c0
 tToggle_element gToggle_array[] = {
     { KEYMAP_MIRROR, -2, 1, 1, 0, ToggleMirror },
     { KEYMAP_MAP, -2, 1, 1, 0, ToggleMap },
@@ -104,6 +105,7 @@ char* gEdit_mode_names[10] = {
 };
 
 // order is: { None, CTRL, ALT, CTRL+ALT, SHIFT, CTRL+SHIFT, ALT+SHIFT, CTRL+ALT+SHIFT }
+// GLOBAL: CARM95 0x51b600
 tEdit_func* gEdit_funcs[10][18][8] = {
     { // CHEAT EDIT MODE
 
@@ -488,6 +490,7 @@ tEdit_func* gEdit_funcs[10][18][8] = {
     }
 };
 
+// GLOBAL: CARM95 0x51cc80
 tCheat gKev_keys[44] = {
     { .code = 0xa11ee75d, .code2 = 0xf805eddd, .action_proc = SetFlag, .num = 0x0a11ee75d },
     { .code = 0x564e78b9, .code2 = 0x99155115, .action_proc = SetFlag, .num = 0x0564e78b9 },

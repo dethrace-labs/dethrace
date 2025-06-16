@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+// GLOBAL: CARM95 0x5120a0
 char* gError_messages[126] = {
     "Unable to support this screen depth setting",
     "Couldn't allocate off-screen buffer",

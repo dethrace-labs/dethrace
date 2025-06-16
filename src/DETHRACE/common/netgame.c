@@ -28,7 +28,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+// GLOBAL: CARM95 0x50c5e0
 int gPowerup_cost[4] = { 1500, 2500, 4000, 6000 };
+// GLOBAL: CARM95 0x50c5f0
 int gGame_scores[6] = { 1, 2, 3, 4, 6, 10 };
 // GLOBAL: CARM95 0x53220c
 int gPed_target;

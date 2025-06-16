@@ -64,6 +64,7 @@ int gCursor_y_offsets[8] = {
     12,
     5,
 };
+// GLOBAL: CARM95 0x520090
 int gCursor_gib_x_offsets[8] = {
     82,
     72,
@@ -74,6 +75,7 @@ int gCursor_gib_x_offsets[8] = {
     66,
     36,
 };
+// GLOBAL: CARM95 0x5200b0
 int gCursor_gib_y_offsets[8] = {
     74,
     86,
@@ -114,6 +116,7 @@ int gCursor_giblet_sequence3[5] = {
     16,
     17,
 };
+// GLOBAL: CARM95 0x520138
 int* gCursor_giblet_sequences[4] = {
     gCursor_giblet_sequence0,
     gCursor_giblet_sequence1,
@@ -143,6 +146,7 @@ char* gFont_names[21] = {
     "LITPLAQ1",
     "DRKPLAQ1"
 };
+// GLOBAL: CARM95 0x5201a0
 br_colour gRGB_colours[9] = {
     0u,
     16777215u,
@@ -213,6 +217,7 @@ int gAR_fudge_headups;
 br_pixelmap* gCurrent_splash;
 // GLOBAL: CARM95 0x5209d8
 br_pixelmap* gCurrent_conversion_table;
+// GLOBAL: CARM95 0x5209e0
 int gMap_colours[4] = { 4, 0, 52, 132 };
 br_vector3 gShadow_points[8];
 // GLOBAL: CARM95 0x53f940

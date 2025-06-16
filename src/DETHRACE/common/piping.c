@@ -31,6 +31,7 @@ int gDisable_advance = 0;
 int gMax_rewind_chunks = 1000;
 // GLOBAL: CARM95 0x50ba10
 float gWall_severity = 0.f;
+// GLOBAL: CARM95 0x50ba18
 tPipe_reset_proc* gReset_procs[32] = {
     NULL,
     NULL,
@@ -2260,6 +2261,7 @@ tU32 FindPrevFrameTime(tU8* pPtr) {
 }
 
 // IDA: void __usercall ScanBuffer(tU8 **pPtr@<EAX>, tPipe_chunk_type pType@<EDX>, tU32 pDefault_time@<EBX>, int (*pCall_back)(tPipe_chunk*, int, tU32)@<ECX>, int (*pTime_check)(tU32))
+// FUNCTION: CARM95 0x42be18
 void ScanBuffer(tU8** pPtr, tPipe_chunk_type pType, tU32 pDefault_time, int (*pCall_back)(tPipe_chunk*, int, tU32), int (*pTime_check)(tU32)) {
     tPipe_chunk* chunk_ptr;
     tU32 the_time;

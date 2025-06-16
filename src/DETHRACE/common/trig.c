@@ -4,6 +4,7 @@
 #include <math.h>
 #include <stdlib.h>
 
+// GLOBAL: CARM95 0x51e620
 float gFloat_sine_table[91] = {
     0.0f,
     0.017452f,

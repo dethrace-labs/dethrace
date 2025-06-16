@@ -38,6 +38,7 @@ int gMirror_on__structur = 1; // suffix added to avoid duplicate symbol
 int gPratcam_on = 1;
 // GLOBAL: CARM95 0x509a6c
 int gCockpit_on = 1;
+// GLOBAL: CARM95 0x509a70
 int gOpponent_mix[10][5] = {
     { 3, 4, 4, 5, 5 },
     { 2, 3, 4, 5, 5 },

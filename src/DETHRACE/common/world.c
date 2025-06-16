@@ -40,16 +40,27 @@ int gSpec_vol_mode;
 tFunkotronic_spec* gFunkotronics_array;
 // GLOBAL: CARM95 0x50c720
 tGroovidelic_spec* gGroovidelics_array;
+// GLOBAL: CARM95 0x50c728
 char* gFunk_type_names[] = { "spin", "rock", "throb", "slither", "roll" };
+// GLOBAL: CARM95 0x50c740
 char* gFunk_anim_names[] = { "frames", "flic" };
+// GLOBAL: CARM95 0x50c748
 char* gTime_mode_names[] = { "approximate", "accurate" };
+// GLOBAL: CARM95 0x50c750
 char* gFunk_move_names[] = { "linear", "harmonic", "flash", "controlled", "absolute", "continuous" };
+// GLOBAL: CARM95 0x50c768
 char* gFunk_nature_names[] = { "constant", "distance", "lastlap", "otherlaps" };
+// GLOBAL: CARM95 0x50c778
 char* gGroove_nature_names[] = { "constant", "distance" };
+// GLOBAL: CARM95 0x50c780
 char* gAxis_names[] = { "x", "y", "z" };
+// GLOBAL: CARM95 0x50c790
 char* gLollipop_names[] = { "xlollipop", "ylollipop", "zlollipop" };
+// GLOBAL: CARM95 0x50c7a0
 char* gGroove_path_names[] = { "straight", "circular" };
+// GLOBAL: CARM95 0x50c7a8
 char* gGroove_object_names[] = { "spin", "rock", "throb", "shear" };
+// GLOBAL: CARM95 0x50c7b8
 char* gDepth_effect_names[] = { "dark", "fog" };
 // GLOBAL: CARM95 0x50c7c0
 br_actor* gGroove_by_proxy_actor;

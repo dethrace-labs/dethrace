@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+// GLOBAL: CARM95 0x50ba98
 tGot_proc* gGot_procs[34] = {
     GotCredits,
     SetPedSpeed,
@@ -59,6 +60,7 @@ tGot_proc* gGot_procs[34] = {
     SetPedHarvest,
     SetVesuvianCorpses,
 };
+// GLOBAL: CARM95 0x50bb20
 tLose_proc* gLose_procs[34] = {
     NULL,
     ResetPedSpeed,
@@ -95,6 +97,7 @@ tLose_proc* gLose_procs[34] = {
     ResetPedHarvest,
     ResetVesuvianCorpses,
 };
+// GLOBAL: CARM95 0x50bba8
 tPeriodic_proc* gPeriodic_procs[34] = {
     NULL,
     NULL,
@@ -133,9 +136,11 @@ tPeriodic_proc* gPeriodic_procs[34] = {
 };
 // GLOBAL: CARM95 0x50bc30
 tU32* gReal_render_palette;
+// GLOBAL: CARM95 0x50bc38
 char* gFizzle_names[3] = { "CIRCLES.PIX", "SQUARES.PIX", "DIAMONDS.PIX" };
 // GLOBAL: CARM95 0x50bc48
 br_vector3 gZero_v__powerup; // suffix added to avoid duplicate symbol
+// GLOBAL: CARM95 0x50bc58
 int gPed_harvest_sounds[4] = { 4010, 4012, 4030, 4032 };
 tHeadup_icon gIcon_list[20];
 br_pixelmap* gFizzle_in[3];

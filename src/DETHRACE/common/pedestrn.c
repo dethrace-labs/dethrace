@@ -52,8 +52,11 @@ int gSend_peds = 1;
 tU32 gLast_ped_message_send = 0;
 // GLOBAL: CARM95 0x511758
 tPedestrian_instruction* gInitial_instruction = NULL;
+// GLOBAL: CARM95 0x511760
 char* gRate_commands[3] = { "fixed", "speed", "variable" };
+// GLOBAL: CARM95 0x51176c
 char* gCollide_commands[1] = { "collide" };
+// GLOBAL: CARM95 0x511770
 char* gInstruc_commands[10] = {
     "point",
     "xpoint",
@@ -69,13 +72,16 @@ char* gInstruc_commands[10] = {
 float gMin_ped_gib_speeds[4] = { 10000.f, .005f, .002f, .001f };
 float gPed_gib_distrib[4] = { 0.f, 0.33f, 0.34f, 0.33f };
 float gPed_gib_speeds[4] = { 0.f, 1.f, 1.f, 1.f };
+// GLOBAL: CARM95 0x5117c8
 int gPed_size_counts[4] = { 3, 5, 5, 5 };
+// GLOBAL: CARM95 0x5117d8
 char* gPed_gib_names[4][5] = {
     { "BIGGIBS.PIX", "BIGGIBS2.PIX", "BIGGIBS3.PIX", "", "" },
     { "ELBOW.PIX", "PELVIS.PIX", "HEAD.PIX", "RIBS.PIX", "BONE.PIX" },
     { "HAND.PIX", "CHUNK02.PIX", "EYEBALL.PIX", "COLON.PIX", "CHUNK01.PIX" },
     { "CHUNK04.PIX", "SPLAT1.PIX", "CHUNK03.PIX", "SPLAT2.PIX", "SPLATOUT.PIX" }
 };
+// GLOBAL: CARM95 0x511828
 char* gPed_geb_names[4][5] = {
     { "GBIGGIBS.PIX", "GBIGGIB2.PIX", "GBIGGIB3.PIX", "", "" },
     { "GELBOW.PIX", "GPELVIS.PIX", "GHEAD.PIX", "GRIBS.PIX", "GBONE.PIX" },

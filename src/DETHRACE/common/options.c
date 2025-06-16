@@ -25,7 +25,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+// GLOBAL: CARM95 0x519ad8
 int gKey_defns[18] = { 48, 49, 46, 47, 53, 44, 59, 57, 55, 45, 50, 51, 52, 56, 62, 63, 64, 66 };
+// GLOBAL: CARM95 0x519b20
 tRadio_bastards gRadio_bastards__options[13] = {
     // suffix added to avoid duplicate symbol
     { 4, 36, 0, { 132, 175, 221, 253, 0 } },

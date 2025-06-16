@@ -48,6 +48,7 @@ tNet_message* gBroadcast_stack;
 tNet_message* gTo_host_stack;
 // GLOBAL: CARM95 0x50d244
 tU32 gLast_flush_message = 0;
+// GLOBAL: CARM95 0x50d248
 int gRace_only_flags[33] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
     1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1,
@@ -322,6 +323,7 @@ void DoNextJoinPoll(void) {
 }
 
 // IDA: void __usercall NetStartProducingJoinList(void (*pAdd_proc)(tNet_game_details*)@<EAX>)
+// FUNCTION: CARM95 0x4467d9
 void NetStartProducingJoinList(void (*pAdd_proc)(tNet_game_details*)) {
     LOG_TRACE("(%p)", pAdd_proc);
 

@@ -32,6 +32,7 @@ tU8* gAnne_flic_data;
 // GLOBAL: CARM95 0x51e918
 int gNet_storage_allocated;
 // clang-format off
+// GLOBAL: CARM95 0x51e920
 tRadio_bastards gRadio_bastards__newgame[11] = { // suffix added to avoid duplicate symbol
     { 1,  32, 0, { 245,   0,   0,   0,   0, }, },
     { 1,  43, 0, { 245,   0,   0,   0,   0, }, },

@@ -34,6 +34,7 @@ int gTrans_enabled = 1;
 br_pixelmap* gPanel_buffer[2];
 // GLOBAL: CARM95 0x514fc8
 tU32 gSound_time;
+// GLOBAL: CARM95 0x514fd0
 tFlic_spec gMain_flic_list[372] = {
     { "MAINSTIL.FLI", 1, 0, 0, 0, 0, 25, NULL, 0u }, // only used by the demo (set to "xxxxxxxx.FLI" by the full version)
     { "DEMSTRT2.FLI", 1, 0, 0, 0, 0, 0, NULL, 0u },
@@ -1488,6 +1489,7 @@ int PlayNextFlicFrame(tFlic_descriptor* pFlic_info) {
 }
 
 // IDA: int __usercall PlayFlic@<EAX>(int pIndex@<EAX>, tU32 pSize@<EDX>, tS8 *pData_ptr@<EBX>, br_pixelmap *pDest_pixelmap@<ECX>, int pX_offset, int pY_offset, void (*DoPerFrame)(), int pInterruptable, int pFrame_rate)
+// FUNCTION: CARM95 0x497278
 int PlayFlic(int pIndex, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap, int pX_offset, int pY_offset, void (*DoPerFrame)(void), int pInterruptable, int pFrame_rate) {
     int finished_playing;
     tFlic_descriptor the_flic;
