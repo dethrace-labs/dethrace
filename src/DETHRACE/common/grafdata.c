@@ -566,10 +566,13 @@ tGraf_data gGraf_data[2] = {
         55 }
 };
 
+// GLOBAL: CARM95 0x551d88
 tGraf_data* gCurrent_graf_data;
+// GLOBAL: CARM95 0x551d84
 int gGraf_data_index;
 
 // IDA: void __cdecl CalcGrafDataIndex()
+// FUNCTION: CARM95 0x42f200
 void CalcGrafDataIndex(void) {
     int i;
 

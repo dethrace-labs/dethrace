@@ -4,7 +4,9 @@
 #include "harness/trace.h"
 #include <stdlib.h>
 
+// GLOBAL: CARM95 0x513600
 br_allocator gAllocator = { "Death Race", DRStdlibAllocate, DRStdlibFree, DRStdlibInquire, Claim4ByteAlignment };
+// GLOBAL: CARM95 0x513614
 int gNon_fatal_allocation_errors = 0;
 // Is 247 in DOS executable, last entry NULL
 char* gMem_names[246] = {
@@ -260,6 +262,7 @@ char* gMem_names[246] = {
 br_resource_class gStainless_classes[117];
 
 // IDA: void __cdecl SetNonFatalAllocationErrors()
+// FUNCTION: CARM95 0x463d80
 void SetNonFatalAllocationErrors(void) {
     LOG_TRACE("()");
 
@@ -267,6 +270,7 @@ void SetNonFatalAllocationErrors(void) {
 }
 
 // IDA: void __cdecl ResetNonFatalAllocationErrors()
+// FUNCTION: CARM95 0x463d95
 void ResetNonFatalAllocationErrors(void) {
     LOG_TRACE("()");
 
@@ -274,11 +278,13 @@ void ResetNonFatalAllocationErrors(void) {
 }
 
 // IDA: int __cdecl AllocationErrorsAreFatal()
+// FUNCTION: CARM95 0x463daa
 int AllocationErrorsAreFatal(void) {
     return gNon_fatal_allocation_errors == 0;
 }
 
 // IDA: void __cdecl MAMSInitMem()
+// FUNCTION: CARM95 0x463dd3
 void MAMSInitMem(void) {
     int i;
     FILE* f;
@@ -287,11 +293,13 @@ void MAMSInitMem(void) {
 }
 
 // IDA: void __usercall PrintMemoryDump(int pFlags@<EAX>, char *pTitle@<EDX>)
+// FUNCTION: CARM95 0x463de4
 void PrintMemoryDump(int pFlags, char* pTitle) {
     LOG_TRACE("(%d, \"%s\")", pFlags, pTitle);
 }
 
 // IDA: void* __cdecl DRStdlibAllocate(br_size_t size, br_uint_8 type)
+// FUNCTION: CARM95 0x463def
 void* DRStdlibAllocate(br_size_t size, br_uint_8 type) {
     void* p;
     int i;
@@ -310,38 +318,45 @@ void* DRStdlibAllocate(br_size_t size, br_uint_8 type) {
 }
 
 // IDA: void __cdecl DRStdlibFree(void *mem)
+// FUNCTION: CARM95 0x463ea1
 void DRStdlibFree(void* mem) {
     int i;
     free(mem);
 }
 
 // IDA: br_size_t __cdecl DRStdlibInquire(br_uint_8 type)
+// FUNCTION: CARM95 0x463ebb
 br_size_t DRStdlibInquire(br_uint_8 type) {
     return 0;
 }
 
 // IDA: br_uint_32 __cdecl Claim4ByteAlignment(br_uint_8 type)
+// FUNCTION: CARM95 0x463ecd
 br_uint_32 Claim4ByteAlignment(br_uint_8 type) {
     return 4;
 }
 
 // IDA: void __cdecl InstallDRMemCalls()
+// FUNCTION: CARM95 0x463ee2
 void InstallDRMemCalls(void) {
     BrAllocatorSet(&gAllocator);
 }
 
 // IDA: void __usercall MAMSUnlock(void **pPtr@<EAX>)
+// FUNCTION: CARM95 0x463efa
 void MAMSUnlock(void** pPtr) {
     DRStdlibFree(*pPtr);
     *pPtr = NULL;
 }
 
 // IDA: void __usercall MAMSLock(void **pPtr@<EAX>)
+// FUNCTION: CARM95 0x463f1c
 void MAMSLock(void** pPtr) {
     LOG_TRACE("(%p)", pPtr);
 }
 
 // IDA: void __cdecl CreateStainlessClasses()
+// FUNCTION: CARM95 0x463f27
 void CreateStainlessClasses(void) {
     int i;
 
@@ -354,5 +369,6 @@ void CreateStainlessClasses(void) {
 }
 
 // IDA: void __cdecl CheckMemory()
+// FUNCTION: CARM95 0x463f97
 void CheckMemory(void) {
 }

@@ -41,19 +41,29 @@
 
 #include "brender.h"
 
+// GLOBAL: CARM95 0x52115c
 int gGame_initialized;
+// GLOBAL: CARM95 0x521160
 int gBr_initialized;
+// GLOBAL: CARM95 0x521164
 int gBrZb_initialized;
+// GLOBAL: CARM95 0x521168
 int gInitialisation_finished;
+// GLOBAL: CARM95 0x52116c
 int gRender_indent;
+// GLOBAL: CARM95 0x53fdd0
 tU32 gAustere_time;
+// GLOBAL: CARM95 0x54b2bc
 int gInitial_rank;
 int gCredits_per_rank[3];
 int gInitial_credits[3];
+// GLOBAL: CARM95 0x54b2a0
 int gNet_mode_of_last_game;
+// GLOBAL: CARM95 0x54b29c
 br_material* gDefault_track_material;
 
 // IDA: void __cdecl AllocateSelf()
+// FUNCTION: CARM95 0x4bbebf
 void AllocateSelf(void) {
     LOG_TRACE("()");
 
@@ -68,6 +78,7 @@ void AllocateSelf(void) {
 }
 
 // IDA: void __cdecl AllocateCamera()
+// FUNCTION: CARM95 0x4bbf22
 void AllocateCamera(void) {
     br_camera* camera_ptr;
     int i;
@@ -116,6 +127,7 @@ void AllocateCamera(void) {
 }
 
 // IDA: void __cdecl ReinitialiseForwardCamera()
+// FUNCTION: CARM95 0x4bb510
 void ReinitialiseForwardCamera(void) {
     br_camera* camera_ptr;
     float the_angle;
@@ -163,6 +175,7 @@ void ReinitialiseForwardCamera(void) {
 }
 
 // IDA: void __cdecl AllocateRearviewPixelmap()
+// FUNCTION: CARM95 0x4bb741
 void AllocateRearviewPixelmap(void) {
     char* rear_screen_pixels;
     LOG_TRACE("()");
@@ -214,6 +227,7 @@ void AllocateRearviewPixelmap(void) {
 }
 
 // IDA: void __cdecl ReinitialiseRearviewCamera()
+// FUNCTION: CARM95 0x4bb887
 void ReinitialiseRearviewCamera(void) {
     br_camera* camera_ptr;
     LOG_TRACE("()");
@@ -229,6 +243,7 @@ void ReinitialiseRearviewCamera(void) {
 }
 
 // IDA: void __cdecl ReinitialiseRenderStuff()
+// FUNCTION: CARM95 0x4bb916
 void ReinitialiseRenderStuff(void) {
     int x_diff;
     int y_diff;
@@ -265,6 +280,7 @@ void InstallFindFailedHooks(void) {
 }
 
 // IDA: void __cdecl AllocateStandardLamp()
+// FUNCTION: CARM95 0x4bbcdb
 void AllocateStandardLamp(void) {
     br_actor* lamp;
     int i;
@@ -282,6 +298,7 @@ void AllocateStandardLamp(void) {
 }
 
 // IDA: void __cdecl InitializeBRenderEnvironment()
+// FUNCTION: CARM95 0x4bbd6c
 void InitializeBRenderEnvironment(void) {
     br_model* arrow_model;
     LOG_TRACE("()");
@@ -316,6 +333,7 @@ void InitializeBRenderEnvironment(void) {
 }
 
 // IDA: void __cdecl InitBRFonts()
+// FUNCTION: CARM95 0x4bc12c
 void InitBRFonts(void) {
     LOG_TRACE("()");
     gBig_font = LoadBRFont("BIGFONT.FNT");
@@ -324,6 +342,7 @@ void InitBRFonts(void) {
 }
 
 // IDA: void __cdecl AustereWarning()
+// FUNCTION: CARM95 0x4bc16d
 void AustereWarning(void) {
     LOG_TRACE("()");
 
@@ -532,6 +551,7 @@ void Init2DStuff(void) {
 }
 
 // IDA: void __usercall InitialiseApplication(int pArgc@<EAX>, char **pArgv@<EDX>)
+// FUNCTION: CARM95 0x4bba54
 void InitialiseApplication(int pArgc, char** pArgv) {
 
     if (harness_game_config.gore_check) {
@@ -632,6 +652,7 @@ void InitialiseApplication(int pArgc, char** pArgv) {
 }
 
 // IDA: void __usercall InitialiseDeathRace(int pArgc@<EAX>, char **pArgv@<EDX>)
+// FUNCTION: CARM95 0x4bba24
 void InitialiseDeathRace(int pArgc, char** pArgv) {
     PDInitialiseSystem();
     InitialiseApplication(pArgc, pArgv);
@@ -639,6 +660,7 @@ void InitialiseDeathRace(int pArgc, char** pArgv) {
 }
 
 // IDA: void __usercall InitGame(int pStart_race@<EAX>)
+// FUNCTION: CARM95 0x4bc22c
 void InitGame(int pStart_race) {
     int i;
     LOG_TRACE("(%d)", pStart_race);
@@ -690,6 +712,7 @@ void InitGame(int pStart_race) {
 }
 
 // IDA: void __cdecl DisposeGameIfNecessary()
+// FUNCTION: CARM95 0x4bc3d0
 void DisposeGameIfNecessary(void) {
     int i;
     LOG_TRACE("()");
@@ -713,6 +736,7 @@ void DisposeGameIfNecessary(void) {
 }
 
 // IDA: void __cdecl LoadInTrack()
+// FUNCTION: CARM95 0x4bc93a
 void LoadInTrack(void) {
     LOG_TRACE("()");
 
@@ -720,6 +744,7 @@ void LoadInTrack(void) {
 }
 
 // IDA: void __cdecl DisposeTrack()
+// FUNCTION: CARM95 0x4bc493
 void DisposeTrack(void) {
     LOG_TRACE("()");
 
@@ -733,6 +758,7 @@ void CopyMaterialColourFromIndex(br_material* pMaterial) {
 }
 
 // IDA: void __cdecl InitRace()
+// FUNCTION: CARM95 0x4bc4b1
 void InitRace(void) {
     LOG_TRACE("()");
 
@@ -870,6 +896,7 @@ void InitRace(void) {
 }
 
 // IDA: void __cdecl DisposeRace()
+// FUNCTION: CARM95 0x4bc968
 void DisposeRace(void) {
     LOG_TRACE("()");
 
@@ -912,6 +939,7 @@ void DisposeRace(void) {
 }
 
 // IDA: int __cdecl GetScreenSize()
+// FUNCTION: CARM95 0x4bca25
 int GetScreenSize(void) {
     LOG_TRACE("()");
 
@@ -919,6 +947,7 @@ int GetScreenSize(void) {
 }
 
 // IDA: void __usercall SetScreenSize(int pNew_size@<EAX>)
+// FUNCTION: CARM95 0x4bca3a
 void SetScreenSize(int pNew_size) {
     LOG_TRACE("(%d)", pNew_size);
 

@@ -37,27 +37,46 @@
 #include "world.h"
 #include <stdlib.h>
 
+// GLOBAL: CARM95 0x514afc
 int gNasty_kludgey_cockpit_variable;
+// GLOBAL: CARM95 0x514b00
 tInfo_mode gInfo_mode;
+// GLOBAL: CARM95 0x514b04
 tU32 gLast_tick_count;
+// GLOBAL: CARM95 0x514b08
 tU32 gActual_last_tick_count;
+// GLOBAL: CARM95 0x514b0c
 tU32 gAverage_frame_period;
+// GLOBAL: CARM95 0x53a1a8
 tU32 gOld_camera_time;
+// GLOBAL: CARM95 0x53a118
 tU32 gLast_wasted_massage_start;
+// GLOBAL: CARM95 0x53a114
 float gMr_odo;
+// GLOBAL: CARM95 0x53a0e8
 tU32 gWasted_last_flash;
+// GLOBAL: CARM95 0x53a120
 tTime_bonus_state gTime_bonus_state;
+// GLOBAL: CARM95 0x53a104
 int gQueued_wasted_massages_count;
+// GLOBAL: CARM95 0x53a11c
 int gTime_bonus;
+// GLOBAL: CARM95 0x53a1a4
 int gRace_bonus_headup;
+// GLOBAL: CARM95 0x53a10c
 int gWasted_flash_state;
+// GLOBAL: CARM95 0x53a110
 int gLast_time_headup;
+// GLOBAL: CARM95 0x53a1a0
 int gTime_bonus_headup;
 int gQueued_wasted_massages[5];
+// GLOBAL: CARM95 0x53a124
 tU32 gTime_bonus_start;
+// GLOBAL: CARM95 0x53a108
 int gLast_credit_headup__mainloop; // suffix added to avoid duplicate symbol
 
 // IDA: void __cdecl ToggleInfo()
+// FUNCTION: CARM95 0x46fd00
 void ToggleInfo(void) {
     LOG_TRACE("()");
 
@@ -80,6 +99,7 @@ void ToggleInfo(void) {
 }
 
 // IDA: void __cdecl CalculateFrameRate()
+// FUNCTION: CARM95 0x4706fa
 void CalculateFrameRate(void) {
     static tU32 last_time;
     tU32 new_time;
@@ -105,6 +125,7 @@ void CalculateFrameRate(void) {
 }
 
 // IDA: void __cdecl LoseOldestWastedMassage()
+// FUNCTION: CARM95 0x46fde6
 void LoseOldestWastedMassage(void) {
     int i;
     LOG_TRACE("()");
@@ -117,6 +138,7 @@ void LoseOldestWastedMassage(void) {
 }
 
 // IDA: void __usercall QueueWastedMassage(int pIndex@<EAX>)
+// FUNCTION: CARM95 0x46fd9c
 void QueueWastedMassage(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
@@ -131,6 +153,7 @@ void QueueWastedMassage(int pIndex) {
 }
 
 // IDA: void __cdecl MungeHeadups()
+// FUNCTION: CARM95 0x4707bd
 void MungeHeadups(void) {
     char the_text[256];
     int flash_rate;
@@ -362,6 +385,7 @@ void MungeHeadups(void) {
 }
 
 // IDA: void __usercall UpdateFramePeriod(tU32 *pCamera_period@<EAX>)
+// FUNCTION: CARM95 0x4712bd
 void UpdateFramePeriod(tU32* pCamera_period) {
     tU32 new_tick_count;
     tU32 new_camera_tick_count;
@@ -446,6 +470,7 @@ tU32 GetLastTickCount(void) {
 }
 
 // IDA: void __cdecl CheckTimer()
+// FUNCTION: CARM95 0x471543
 void CheckTimer(void) {
     tS32 time_in_seconds;
     tS32 time_left;
@@ -490,6 +515,7 @@ void CheckTimer(void) {
 }
 
 // IDA: int __cdecl MungeRaceFinished()
+// FUNCTION: CARM95 0x471607
 int MungeRaceFinished(void) {
     LOG_TRACE("()");
 
@@ -514,6 +540,7 @@ int MungeRaceFinished(void) {
 }
 
 // IDA: tRace_result __cdecl MainGameLoop()
+// FUNCTION: CARM95 0x46fe77
 tRace_result MainGameLoop(void) {
     tU32 camera_period;
     tU32 start_menu_time;
@@ -763,6 +790,7 @@ tRace_result MainGameLoop(void) {
 }
 
 // IDA: tRace_result __cdecl DoRace()
+// FUNCTION: CARM95 0x46fe4f
 tRace_result DoRace(void) {
     tRace_result result;
     LOG_TRACE("()");

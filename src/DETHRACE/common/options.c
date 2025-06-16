@@ -42,16 +42,23 @@ tRadio_bastards gRadio_bastards__options[13] = {
     { 3, 150, 0, { 132, 164, 207, 0, 0 } },
     { 4, 153, 0, { 177, 199, 220, 242, 0 } },
 };
+// GLOBAL: CARM95 0x53d1d4
 int gKey_count;
+// GLOBAL: CARM95 0x53d1d0
 int gLast_graph_sel__options; // suffix added to avoid duplicate symbol
 char* gKey_names[125];
+// GLOBAL: CARM95 0x53d4e4
 int gPending_entry;
+// GLOBAL: CARM95 0x53d2ec
 tInterface_spec* gThe_interface_spec__options; // suffix added to avoid duplicate symbol
 int gOrig_key_mapping[67];
+// GLOBAL: CARM95 0x53d1d8
 br_pixelmap* gDials_pix;
+// GLOBAL: CARM95 0x53d4e8
 int gCurrent_key;
 
 // IDA: void __usercall DrawDial(int pWhich_one@<EAX>, int pWhich_stage@<EDX>)
+// FUNCTION: CARM95 0x49990d
 void DrawDial(int pWhich_one, int pWhich_stage) {
     LOG_TRACE("(%d, %d)", pWhich_one, pWhich_stage);
 
@@ -70,6 +77,7 @@ void DrawDial(int pWhich_one, int pWhich_stage) {
 }
 
 // IDA: void __usercall MoveDialFromTo(int pWhich_one@<EAX>, int pOld_stage@<EDX>, int pNew_stage@<EBX>)
+// FUNCTION: CARM95 0x49998a
 void MoveDialFromTo(int pWhich_one, int pOld_stage, int pNew_stage) {
     tS32 time_diff;
     tU32 start_time;
@@ -110,6 +118,7 @@ void MoveDialFromTo(int pWhich_one, int pOld_stage, int pNew_stage) {
 }
 
 // IDA: void __cdecl SoundOptionsStart()
+// FUNCTION: CARM95 0x4998c0
 void SoundOptionsStart(void) {
     LOG_TRACE("()");
 
@@ -120,6 +129,7 @@ void SoundOptionsStart(void) {
 }
 
 // IDA: int __usercall SoundOptionsDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
+// FUNCTION: CARM95 0x499b6c
 int SoundOptionsDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
 
@@ -129,6 +139,7 @@ int SoundOptionsDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int 
 }
 
 // IDA: int __usercall SoundOptionsLeft@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
+// FUNCTION: CARM95 0x499ba9
 int SoundOptionsLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int old_value;
     int* the_value;
@@ -150,6 +161,7 @@ int SoundOptionsLeft(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall SoundOptionsRight@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
+// FUNCTION: CARM95 0x499c49
 int SoundOptionsRight(int* pCurrent_choice, int* pCurrent_mode) {
     int old_value;
     int* the_value;
@@ -171,6 +183,7 @@ int SoundOptionsRight(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall SoundClick@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
+// FUNCTION: CARM95 0x499ce9
 int SoundClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     float x_delta;
     float y_delta;
@@ -214,6 +227,7 @@ int SoundClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_o
 }
 
 // IDA: void __cdecl DoSoundOptions()
+// FUNCTION: CARM95 0x49b7bf
 void DoSoundOptions(void) {
     static tFlicette flicker_on[3] = {
         { 156, { 26, 52 }, { 21, 50 } },
@@ -299,6 +313,7 @@ void DoSoundOptions(void) {
 }
 
 // IDA: void __cdecl GetGraphicsOptions()
+// FUNCTION: CARM95 0x49b87f
 void GetGraphicsOptions(void) {
     int value;
     br_scalar br_value;
@@ -404,6 +419,7 @@ void GetGraphicsOptions(void) {
 }
 
 // IDA: void __cdecl SetGraphicsOptions()
+// FUNCTION: CARM95 0x49bb74
 void SetGraphicsOptions(void) {
     LOG_TRACE("()");
 
@@ -484,6 +500,7 @@ void SetGraphicsOptions(void) {
 }
 
 // IDA: void __usercall PlayRadioOn2(int pIndex@<EAX>, int pValue@<EDX>)
+// FUNCTION: CARM95 0x499efe
 void PlayRadioOn2(int pIndex, int pValue) {
     LOG_TRACE("(%d, %d)", pIndex, pValue);
 
@@ -493,6 +510,7 @@ void PlayRadioOn2(int pIndex, int pValue) {
 }
 
 // IDA: void __usercall PlayRadioOff2(int pIndex@<EAX>, int pValue@<EDX>)
+// FUNCTION: CARM95 0x49a05d
 void PlayRadioOff2(int pIndex, int pValue) {
     LOG_TRACE("(%d, %d)", pIndex, pValue);
 
@@ -502,6 +520,7 @@ void PlayRadioOff2(int pIndex, int pValue) {
 }
 
 // IDA: void __usercall PlayRadioOn(int pIndex@<EAX>, int pValue@<EDX>)
+// FUNCTION: CARM95 0x499feb
 void PlayRadioOn__options(int pIndex, int pValue) {
     LOG_TRACE("(%d, %d)", pIndex, pValue);
 
@@ -514,6 +533,7 @@ void PlayRadioOn__options(int pIndex, int pValue) {
 }
 
 // IDA: void __usercall PlayRadioOff(int pIndex@<EAX>, int pValue@<EDX>)
+// FUNCTION: CARM95 0x49a024
 void PlayRadioOff__options(int pIndex, int pValue) {
     LOG_TRACE("(%d, %d)", pIndex, pValue);
 
@@ -526,6 +546,7 @@ void PlayRadioOff__options(int pIndex, int pValue) {
 }
 
 // IDA: void __cdecl DrawInitialRadios()
+// FUNCTION: CARM95 0x499e9b
 void DrawInitialRadios(void) {
     int i;
     LOG_TRACE("()");
@@ -542,6 +563,7 @@ void DrawInitialRadios(void) {
 }
 
 // IDA: void __usercall RadioChanged(int pIndex@<EAX>, int pNew_value@<EDX>)
+// FUNCTION: CARM95 0x499fa8
 void RadioChanged(int pIndex, int pNew_value) {
     LOG_TRACE("(%d, %d)", pIndex, pNew_value);
 
@@ -551,6 +573,7 @@ void RadioChanged(int pIndex, int pNew_value) {
 }
 
 // IDA: int __usercall GraphOptLeft@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
+// FUNCTION: CARM95 0x499f34
 int GraphOptLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int new_value;
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
@@ -565,6 +588,7 @@ int GraphOptLeft(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall GraphOptRight@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
+// FUNCTION: CARM95 0x49a093
 int GraphOptRight(int* pCurrent_choice, int* pCurrent_mode) {
     int new_value;
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
@@ -579,6 +603,7 @@ int GraphOptRight(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall GraphOptUp@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
+// FUNCTION: CARM95 0x49a109
 int GraphOptUp(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
@@ -598,6 +623,7 @@ int GraphOptUp(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall GraphOptDown@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
+// FUNCTION: CARM95 0x49a19b
 int GraphOptDown(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
@@ -617,6 +643,7 @@ int GraphOptDown(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall RadioClick@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
+// FUNCTION: CARM95 0x49a22d
 int RadioClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     int i;
     LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
@@ -632,6 +659,7 @@ int RadioClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_o
 }
 
 // IDA: int __usercall GraphOptGoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
+// FUNCTION: CARM95 0x49a2d1
 int GraphOptGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
@@ -641,6 +669,7 @@ int GraphOptGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 
 // IDA: void __usercall PlotAGraphBox(int pIndex@<EAX>, int pColour_value@<EDX>)
 //  Suffix added to avoid duplicate symbol
+// FUNCTION: CARM95 0x49a34d
 void PlotAGraphBox__options(int pIndex, int pColour_value) {
     LOG_TRACE("(%d, %d)", pIndex, pColour_value);
 
@@ -656,6 +685,7 @@ void PlotAGraphBox__options(int pIndex, int pColour_value) {
 
 // IDA: void __usercall DrawAGraphBox(int pIndex@<EAX>)
 //  Suffix added to avoid duplicate symbol
+// FUNCTION: CARM95 0x49a334
 void DrawAGraphBox__options(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
@@ -664,6 +694,7 @@ void DrawAGraphBox__options(int pIndex) {
 
 // IDA: void __usercall EraseAGraphBox(int pIndex@<EAX>)
 //  Suffix added to avoid duplicate symbol
+// FUNCTION: CARM95 0x49a3e1
 void EraseAGraphBox__options(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
@@ -671,6 +702,7 @@ void EraseAGraphBox__options(int pIndex) {
 }
 
 // IDA: void __usercall DrawGraphBox(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
+// FUNCTION: CARM95 0x49a2f3
 void DrawGraphBox(int pCurrent_choice, int pCurrent_mode) {
     LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
 
@@ -682,6 +714,7 @@ void DrawGraphBox(int pCurrent_choice, int pCurrent_mode) {
 }
 
 // IDA: void __cdecl DoGraphicsOptions()
+// FUNCTION: CARM95 0x49b805
 void DoGraphicsOptions(void) {
     static tFlicette flicker_on[14] = {
         { 43, { 45, 90 }, { 166, 398 } },
@@ -817,6 +850,7 @@ void DoGraphicsOptions(void) {
 }
 
 // IDA: void __cdecl CalibrateJoysticks()
+// FUNCTION: CARM95 0x49bf81
 void CalibrateJoysticks(void) {
     tJoy_calib_stage stage;
     int escaped;
@@ -845,6 +879,7 @@ void CalibrateJoysticks(void) {
 }
 
 // IDA: void __usercall StripControls(unsigned char *pStr@<EAX>)
+// FUNCTION: CARM95 0x49c0b4
 void StripControls(unsigned char* pStr) {
     int i;
     int len;
@@ -864,6 +899,7 @@ void StripControls(unsigned char* pStr) {
 }
 
 // IDA: void __cdecl LoadKeyNames()
+// FUNCTION: CARM95 0x49bf9b
 void LoadKeyNames(void) {
     int i;
     FILE* f;
@@ -886,6 +922,7 @@ void LoadKeyNames(void) {
 }
 
 // IDA: void __cdecl DisposeKeyNames()
+// FUNCTION: CARM95 0x49c133
 void DisposeKeyNames(void) {
     int i;
     LOG_TRACE("()");
@@ -896,6 +933,7 @@ void DisposeKeyNames(void) {
 }
 
 // IDA: void __cdecl SaveOrigKeyMapping()
+// FUNCTION: CARM95 0x49ab5e
 void SaveOrigKeyMapping(void) {
     LOG_TRACE("()");
 
@@ -903,6 +941,7 @@ void SaveOrigKeyMapping(void) {
 }
 
 // IDA: void __usercall GetKeyCoords(int pIndex@<EAX>, int *pY@<EDX>, int *pName_x@<EBX>, int *pKey_x@<ECX>, int *pEnd_box)
+// FUNCTION: CARM95 0x49a8e2
 void GetKeyCoords(int pIndex, int* pY, int* pName_x, int* pKey_x, int* pEnd_box) {
     int col;
     LOG_TRACE("(%d, %p, %p, %p, %p)", pIndex, pY, pName_x, pKey_x, pEnd_box);
@@ -928,6 +967,7 @@ void GetKeyCoords(int pIndex, int* pY, int* pName_x, int* pKey_x, int* pEnd_box)
 }
 
 // IDA: void __cdecl SetKeysToDefault()
+// FUNCTION: CARM95 0x49b3f3
 void SetKeysToDefault(void) {
     FILE* f;
     tPath_name the_path;
@@ -947,6 +987,7 @@ void SetKeysToDefault(void) {
 }
 
 // IDA: void __cdecl SaveKeyMapping()
+// FUNCTION: CARM95 0x49ab7a
 void SaveKeyMapping(void) {
     FILE* f;
     tPath_name the_path;
@@ -969,6 +1010,7 @@ void SaveKeyMapping(void) {
 }
 
 // IDA: void __usercall ChangeKeyMapIndex(int pNew_one@<EAX>)
+// FUNCTION: CARM95 0x49ab3c
 void ChangeKeyMapIndex(int pNew_one) {
     LOG_TRACE("(%d)", pNew_one);
 
@@ -979,6 +1021,7 @@ void ChangeKeyMapIndex(int pNew_one) {
 }
 
 // IDA: void __usercall DrawKeyAssignments(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
+// FUNCTION: CARM95 0x49a3fa
 void DrawKeyAssignments(int pCurrent_choice, int pCurrent_mode) {
     int i;
     int y;
@@ -1062,6 +1105,7 @@ void DrawKeyAssignments(int pCurrent_choice, int pCurrent_mode) {
 }
 
 // IDA: int __usercall KeyAssignLeft@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
+// FUNCTION: CARM95 0x49aa3a
 int KeyAssignLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int new_index;
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
@@ -1090,6 +1134,7 @@ int KeyAssignLeft(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall KeyAssignRight@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
+// FUNCTION: CARM95 0x49ac6f
 int KeyAssignRight(int* pCurrent_choice, int* pCurrent_mode) {
     int new_index;
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
@@ -1118,6 +1163,7 @@ int KeyAssignRight(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall KeyAssignUp@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
+// FUNCTION: CARM95 0x49ad71
 int KeyAssignUp(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
@@ -1147,6 +1193,7 @@ int KeyAssignUp(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall KeyAssignDown@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
+// FUNCTION: CARM95 0x49ae9b
 int KeyAssignDown(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
@@ -1177,6 +1224,7 @@ int KeyAssignDown(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall KeyAssignGoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
+// FUNCTION: CARM95 0x49afa5
 int KeyAssignGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     int key;
     int i;
@@ -1304,6 +1352,7 @@ int KeyAssignGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall MouseyClickBastard@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
+// FUNCTION: CARM95 0x49b4bd
 int MouseyClickBastard(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     int i;
     int x_coord;
@@ -1328,6 +1377,7 @@ int MouseyClickBastard(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, 
 }
 
 // IDA: void __cdecl DrawInitialKMRadios()
+// FUNCTION: CARM95 0x49b56c
 void DrawInitialKMRadios(void) {
     int i;
     LOG_TRACE("()");
@@ -1342,6 +1392,7 @@ void DrawInitialKMRadios(void) {
 }
 
 // IDA: void __cdecl DoControlOptions()
+// FUNCTION: CARM95 0x49be2c
 void DoControlOptions(void) {
     static tFlicette flicker_on[4] = {
         { 177, { 51, 102 }, { 166, 398 } },
@@ -1426,6 +1477,7 @@ void DoControlOptions(void) {
 }
 
 // IDA: void __cdecl LoadSoundOptionsData()
+// FUNCTION: CARM95 0x49b5b2
 void LoadSoundOptionsData(void) {
     LOG_TRACE("()");
 
@@ -1436,6 +1488,7 @@ void LoadSoundOptionsData(void) {
 }
 
 // IDA: void __cdecl FreeSoundOptionsData()
+// FUNCTION: CARM95 0x49b5e6
 void FreeSoundOptionsData(void) {
     LOG_TRACE("()");
 
@@ -1443,6 +1496,7 @@ void FreeSoundOptionsData(void) {
 }
 
 // IDA: void __cdecl DrawDisabledOptions()
+// FUNCTION: CARM95 0x49b5ff
 void DrawDisabledOptions(void) {
     br_pixelmap* image;
     LOG_TRACE("()");
@@ -1473,6 +1527,7 @@ void DrawDisabledOptions(void) {
 }
 
 // IDA: void __cdecl DoOptions()
+// FUNCTION: CARM95 0x49b705
 void DoOptions(void) {
     static tFlicette flicker_on[4] = {
         { 43, { 57, 114 }, { 41, 98 } },

@@ -39,29 +39,46 @@ char* gReplay_pixie_names[10] = {
     "FWDEND.PIX",
     "CAMERA.PIX",
 };
+// GLOBAL: CARM95 0x50a1d8
 int gSingle_frame_mode = 0;
+// GLOBAL: CARM95 0x50a1dc
 tU32 gCam_change_time = 0;
+// GLOBAL: CARM95 0x50a1e0
 int gSave_file = 0;
 int gProgress_line_left[2] = { 70, 141 };
 int gProgress_line_right[2] = { 279, 558 };
 int gProgress_line_top[2] = { 178, 429 };
 br_pixelmap* gReplay_pixies[10];
+// GLOBAL: CARM95 0x531db8
 int gKey_down;
 int gNo_cursor;
+// GLOBAL: CARM95 0x531db4
 int gSave_frame_number;
+// GLOBAL: CARM95 0x531da8
 int gCam_change_button_down;
+// GLOBAL: CARM95 0x531da0
 tU32 gAction_replay_start_time;
+// GLOBAL: CARM95 0x531dc4
 tU32 gLast_replay_zappy_screen;
+// GLOBAL: CARM95 0x531dc0
 tS32 gStopped_time;
+// GLOBAL: CARM95 0x531dbc
 float gPending_replay_rate;
+// GLOBAL: CARM95 0x531da4
 tU32 gAction_replay_end_time;
+// GLOBAL: CARM95 0x531dcc
 float gReplay_rate;
+// GLOBAL: CARM95 0x531db0
 int gSave_bunch_ID;
+// GLOBAL: CARM95 0x531dac
 int gPlay_direction;
+// GLOBAL: CARM95 0x531dc8
 int gPaused;
+// GLOBAL: CARM95 0x551db4
 tAction_replay_camera_type gAction_replay_camera_mode;
 
 // IDA: int __cdecl ReplayIsPaused()
+// FUNCTION: CARM95 0x41adc0
 int ReplayIsPaused(void) {
     LOG_TRACE8("()");
 
@@ -69,6 +86,7 @@ int ReplayIsPaused(void) {
 }
 
 // IDA: float __cdecl GetReplayRate()
+// FUNCTION: CARM95 0x41adf3
 float GetReplayRate(void) {
     LOG_TRACE("()");
 
@@ -76,6 +94,7 @@ float GetReplayRate(void) {
 }
 
 // IDA: int __cdecl GetReplayDirection()
+// FUNCTION: CARM95 0x41ae09
 int GetReplayDirection(void) {
     LOG_TRACE("()");
 
@@ -83,6 +102,7 @@ int GetReplayDirection(void) {
 }
 
 // IDA: void __cdecl StopSaving()
+// FUNCTION: CARM95 0x41b5a0
 void StopSaving(void) {
     LOG_TRACE("()");
 
@@ -91,6 +111,7 @@ void StopSaving(void) {
 }
 
 // IDA: void __usercall ActualActionReplayHeadups(int pSpecial_zappy_bastard@<EAX>)
+// FUNCTION: CARM95 0x41ae48
 void ActualActionReplayHeadups(int pSpecial_zappy_bastard) {
     tU32 the_time;
     int x;
@@ -200,6 +221,7 @@ void ActualActionReplayHeadups(int pSpecial_zappy_bastard) {
 }
 
 // IDA: void __cdecl DoActionReplayPostSwap()
+// FUNCTION: CARM95 0x41ae1e
 void DoActionReplayPostSwap(void) {
     LOG_TRACE("()");
 
@@ -207,6 +229,7 @@ void DoActionReplayPostSwap(void) {
 }
 
 // IDA: void __usercall DoZappyActionReplayHeadups(int pSpecial_zappy_bastard@<EAX>)
+// FUNCTION: CARM95 0x41b5bf
 void DoZappyActionReplayHeadups(int pSpecial_zappy_bastard) {
     tU32 the_time;
     LOG_TRACE("(%d)", pSpecial_zappy_bastard);
@@ -222,6 +245,7 @@ void DoZappyActionReplayHeadups(int pSpecial_zappy_bastard) {
 }
 
 // IDA: void __cdecl DoActionReplayHeadups()
+// FUNCTION: CARM95 0x41ae33
 void DoActionReplayHeadups(void) {
     LOG_TRACE("()");
 
@@ -229,6 +253,7 @@ void DoActionReplayHeadups(void) {
 }
 
 // IDA: void __usercall MoveReplayBuffer(tS32 pMove_amount@<EAX>)
+// FUNCTION: CARM95 0x41b41e
 void MoveReplayBuffer(tS32 pMove_amount) {
     tU8* play_ptr;
     tU8* old_play_ptr;
@@ -278,6 +303,7 @@ void MoveReplayBuffer(tS32 pMove_amount) {
 }
 
 // IDA: void __cdecl MoveToEndOfReplay()
+// FUNCTION: CARM95 0x41b3df
 void MoveToEndOfReplay(void) {
     float old_replay_rate;
     LOG_TRACE("()");
@@ -291,6 +317,7 @@ void MoveToEndOfReplay(void) {
 }
 
 // IDA: void __cdecl MoveToStartOfReplay()
+// FUNCTION: CARM95 0x41b622
 void MoveToStartOfReplay(void) {
     float old_replay_rate;
     LOG_TRACE("()");
@@ -304,6 +331,7 @@ void MoveToStartOfReplay(void) {
 }
 
 // IDA: void __cdecl ToggleReplay()
+// FUNCTION: CARM95 0x41b661
 void ToggleReplay(void) {
     LOG_TRACE("()");
 
@@ -352,12 +380,14 @@ void ToggleReplay(void) {
 }
 
 // IDA: void __usercall ReverseSound(tS3_effect_tag pEffect_index@<EAX>, tS3_sound_tag pSound_tag@<EDX>)
+// FUNCTION: CARM95 0x41b7fe
 void ReverseSound(tS3_effect_tag pEffect_index, tS3_sound_tag pSound_tag) {
     LOG_TRACE("(%d, %d)", pEffect_index, pSound_tag);
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl FindUniqueFile()
+// FUNCTION: CARM95 0x41b819
 int FindUniqueFile(void) {
     int index;
     FILE* f;
@@ -379,6 +409,7 @@ int FindUniqueFile(void) {
 }
 
 // IDA: void __usercall PollActionReplayControls(tU32 pFrame_period@<EAX>)
+// FUNCTION: CARM95 0x41b925
 void PollActionReplayControls(tU32 pFrame_period) {
     float old_replay_rate;
     int old_key_down;
@@ -564,6 +595,7 @@ void PollActionReplayControls(tU32 pFrame_period) {
 }
 
 // IDA: void __cdecl CheckReplayTurnOn()
+// FUNCTION: CARM95 0x41c03b
 void CheckReplayTurnOn(void) {
     LOG_TRACE("()");
 
@@ -577,6 +609,7 @@ void CheckReplayTurnOn(void) {
 }
 
 // IDA: void __cdecl InitializeActionReplay()
+// FUNCTION: CARM95 0x41c093
 void InitializeActionReplay(void) {
     int i;
     LOG_TRACE("()");
@@ -588,6 +621,7 @@ void InitializeActionReplay(void) {
 }
 
 // IDA: void __usercall DoActionReplay(tU32 pFrame_period@<EAX>)
+// FUNCTION: CARM95 0x41c0e6
 void DoActionReplay(tU32 pFrame_period) {
     LOG_TRACE("(%d)", pFrame_period);
 
@@ -597,6 +631,7 @@ void DoActionReplay(tU32 pFrame_period) {
 }
 
 // IDA: void __cdecl SynchronizeActionReplay()
+// FUNCTION: CARM95 0x41c11c
 void SynchronizeActionReplay(void) {
     FILE* f;
     tPath_name the_path;

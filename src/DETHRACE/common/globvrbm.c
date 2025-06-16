@@ -1,6 +1,7 @@
 #include "globvrbm.h"
 #include <stdlib.h>
 
+// GLOBAL: CARM95 0x520038
 br_scalar gYon_factor;
 br_material* gMaterial[2];
 int g16bit_palette_valid;

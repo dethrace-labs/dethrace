@@ -26,6 +26,7 @@ int StraightestArcForCorner2D(br_vector2* pCent, br_scalar* pRadius, br_scalar* 
 
 // There appears to be two different implementations of this function in different binaries.
 // One does calculations in 2d space, this one calculates in 3d space.
+// FUNCTION: CARM95 0x49feaa
 static void StraightestArcForCorner(float* p1, float* p2, float* p3, br_vector3* p4, br_vector3* p5, br_vector3* p6, br_vector3* p7, br_vector3* p8, float p9, float p10) {
     br_vector3 rel1;
     br_vector3 rel3;
@@ -62,6 +63,7 @@ static void StraightestArcForCorner(float* p1, float* p2, float* p3, br_vector3*
 }
 
 // IDA: br_scalar __usercall CornerFudge@<ST0>(tCar_spec *pCar_spec@<EAX>)
+// FUNCTION: CARM95 0x4a003e
 br_scalar CornerFudge(tCar_spec* pCar_spec) {
     LOG_TRACE("(%p)", pCar_spec);
 
@@ -69,6 +71,7 @@ br_scalar CornerFudge(tCar_spec* pCar_spec) {
 }
 
 // IDA: br_scalar __usercall MaxCurvatureForCarSpeed@<ST0>(tCar_spec *pCar@<EAX>, br_scalar pSpeed)
+// FUNCTION: CARM95 0x4a0054
 br_scalar MaxCurvatureForCarSpeed(tCar_spec* pCar, br_scalar pSpeed) {
     br_scalar curv;
     LOG_TRACE("(%p, %f)", pCar, pSpeed);
@@ -116,6 +119,7 @@ int GetStraight(br_vector2* pStart, br_vector2* pFinish, br_scalar* pWidth, int 
 }
 
 // IDA: tFollow_path_result __usercall ProcessFollowPath@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, tProcess_objective_command pCommand@<EDX>, int pPursuit_mode@<EBX>, int pIgnore_end@<ECX>, int pNever_struggle)
+// FUNCTION: CARM95 0x49e3a0
 tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand, int pPursuit_mode, int pIgnore_end, int pNever_struggle) {
     tS16 real_section_no;
     tFollow_path_data* data;
@@ -462,6 +466,7 @@ tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_o
 }
 
 // IDA: tFollow_path_result __usercall FollowCheatyPath@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>)
+// FUNCTION: CARM95 0x4a00a4
 tFollow_path_result FollowCheatyPath(tOpponent_spec* pOpponent_spec) {
     tFollow_path_data* data;
     br_vector3 a;

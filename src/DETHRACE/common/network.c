@@ -31,42 +31,69 @@
 tU32 gMess_max_flags;
 tU32 gMess_mid_flags;
 tU32 gMess_min_flags;
+// GLOBAL: CARM95 0x50d224
 tU32 gGuarantee_number;
+// GLOBAL: CARM95 0x50d228
 int gNet_service_disable = 0;
+// GLOBAL: CARM95 0x50d22c
 int gIn_net_service = 0;
+// GLOBAL: CARM95 0x50d230
 int gPlayer_list_batch_number = 0;
 int gOnly_receive_guarantee_replies = 0;
+// GLOBAL: CARM95 0x50d238
 void* gMessage_to_free;
+// GLOBAL: CARM95 0x50d23c
 tNet_message* gBroadcast_stack;
+// GLOBAL: CARM95 0x50d240
 tNet_message* gTo_host_stack;
+// GLOBAL: CARM95 0x50d244
 tU32 gLast_flush_message = 0;
 int gRace_only_flags[33] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
     1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1,
     0
 };
+// GLOBAL: CARM95 0x50d2cc
 int gJoin_list_mode;
 tNet_game_player_info gNew_net_players[6];
 tGuaranteed_message gGuarantee_list[100]; // DOS debug symbols has this as [150]
+// GLOBAL: CARM95 0x534c70
 tMid_message* gMid_messages;
+// GLOBAL: CARM95 0x534c74
 tU32 gLast_player_list_received;
+// GLOBAL: CARM95 0x534c7c
 tMin_message* gMin_messages;
 void (*gAdd_proc)(tNet_game_details*);
+// GLOBAL: CARM95 0x534c64
 int gReceiving_batch_number;
+// GLOBAL: CARM95 0x536250
 int gReceiving_new_players;
+// GLOBAL: CARM95 0x534c80
 tMax_message* gMax_messages;
+// GLOBAL: CARM95 0x534c58
 int gNext_guarantee;
+// GLOBAL: CARM95 0x534c84
 tU32 gAsk_time;
 int gNet_initialised;
+// GLOBAL: CARM95 0x534c60
 int gDont_allow_joiners;
+// GLOBAL: CARM95 0x536254
 tNet_game_details* gCurrent_join_poll_game;
+// GLOBAL: CARM95 0x534c8c
 int gMessage_header_size;
+// GLOBAL: CARM95 0x534c5c
 int gJoin_poll_index;
+// GLOBAL: CARM95 0x534c88
 int gJoin_request_denied;
+// GLOBAL: CARM95 0x534c68
 int gHost_died;
+// GLOBAL: CARM95 0x535dc4
 int gCar_was_taken;
+// GLOBAL: CARM95 0x534c78
 int gBastard_has_answered;
+// GLOBAL: CARM95 0x535dc8
 int gTime_for_next_one;
+// GLOBAL: CARM95 0x5514d4
 int gReceived_game_scores;
 
 #define MIN_MESSAGES_CAPACITY 20
@@ -109,6 +136,7 @@ int NetInitialise(void) {
 }
 
 // IDA: int __cdecl NetShutdown()
+// FUNCTION: CARM95 0x44657f
 int NetShutdown(void) {
     int err;
     int i;
@@ -124,6 +152,7 @@ int NetShutdown(void) {
 }
 
 // IDA: void __cdecl ShutdownNetIfRequired()
+// FUNCTION: CARM95 0x4465d1
 void ShutdownNetIfRequired(void) {
     LOG_TRACE("()");
 
@@ -134,6 +163,7 @@ void ShutdownNetIfRequired(void) {
 }
 
 // IDA: void __cdecl DisableNetService()
+// FUNCTION: CARM95 0x4465f8
 void DisableNetService(void) {
     LOG_TRACE("()");
 
@@ -141,6 +171,7 @@ void DisableNetService(void) {
 }
 
 // IDA: void __cdecl ReenableNetService()
+// FUNCTION: CARM95 0x44660d
 void ReenableNetService(void) {
     LOG_TRACE("()");
 
@@ -148,6 +179,7 @@ void ReenableNetService(void) {
 }
 
 // IDA: int __cdecl PermitNetServiceReentrancy()
+// FUNCTION: CARM95 0x446622
 int PermitNetServiceReentrancy(void) {
     int prev;
     LOG_TRACE("()");
@@ -160,6 +192,7 @@ int PermitNetServiceReentrancy(void) {
 }
 
 // IDA: void __cdecl HaltNetServiceReentrancy()
+// FUNCTION: CARM95 0x44665a
 void HaltNetServiceReentrancy(void) {
     LOG_TRACE("()");
 
@@ -167,6 +200,7 @@ void HaltNetServiceReentrancy(void) {
 }
 
 // IDA: void __usercall NetSendHeadupToAllPlayers(char *pMessage@<EAX>)
+// FUNCTION: CARM95 0x44666f
 void NetSendHeadupToAllPlayers(char* pMessage) {
     tNet_contents* the_contents;
     LOG_TRACE("(\"%s\")", pMessage);
@@ -178,6 +212,7 @@ void NetSendHeadupToAllPlayers(char* pMessage) {
 }
 
 // IDA: void __usercall NetSendHeadupToEverybody(char *pMessage@<EAX>)
+// FUNCTION: CARM95 0x4466c1
 void NetSendHeadupToEverybody(char* pMessage) {
     tNet_contents* the_contents;
     LOG_TRACE("(\"%s\")", pMessage);
@@ -193,6 +228,7 @@ void NetSendHeadupToEverybody(char* pMessage) {
 }
 
 // IDA: void __usercall NetSendHeadupToPlayer(char *pMessage@<EAX>, tPlayer_ID pPlayer@<EDX>)
+// FUNCTION: CARM95 0x446737
 void NetSendHeadupToPlayer(char* pMessage, tPlayer_ID pPlayer) {
     tNet_message* message;
     LOG_TRACE("(\"%s\", %d)", pMessage, pPlayer);
@@ -223,6 +259,7 @@ void InitialisePlayerStati(void) {
 }
 
 // IDA: void __cdecl LeaveTempGame()
+// FUNCTION: CARM95 0x446847
 void LeaveTempGame(void) {
     LOG_TRACE("()");
 
@@ -234,6 +271,7 @@ void LeaveTempGame(void) {
 }
 
 // IDA: void __cdecl DisposeCurrentJoinPollGame()
+// FUNCTION: CARM95 0x446881
 void DisposeCurrentJoinPollGame(void) {
     LOG_TRACE("()");
 
@@ -244,6 +282,7 @@ void DisposeCurrentJoinPollGame(void) {
 }
 
 // IDA: void __cdecl DoNextJoinPoll()
+// FUNCTION: CARM95 0x44a179
 void DoNextJoinPoll(void) {
     tNet_message* the_message;
     LOG_TRACE("()");
@@ -296,6 +335,7 @@ void NetStartProducingJoinList(void (*pAdd_proc)(tNet_game_details*)) {
 }
 
 // IDA: void __cdecl NetEndJoinList()
+// FUNCTION: CARM95 0x446823
 void NetEndJoinList(void) {
     LOG_TRACE("()");
 
@@ -306,6 +346,7 @@ void NetEndJoinList(void) {
 }
 
 // IDA: void __usercall NetDisposePIDGameInfo(tNet_game_details *pDetails@<EAX>)
+// FUNCTION: CARM95 0x4468b1
 void NetDisposePIDGameInfo(tNet_game_details* pDetails) {
     LOG_TRACE("(%p)", pDetails);
 
@@ -315,6 +356,7 @@ void NetDisposePIDGameInfo(tNet_game_details* pDetails) {
 }
 
 // IDA: void __usercall NetDisposeGameDetails(tNet_game_details *pDetails@<EAX>)
+// FUNCTION: CARM95 0x4468d2
 void NetDisposeGameDetails(tNet_game_details* pDetails) {
     LOG_TRACE("(%p)", pDetails);
 
@@ -325,6 +367,7 @@ void NetDisposeGameDetails(tNet_game_details* pDetails) {
 }
 
 // IDA: tNet_game_details* __cdecl NetAllocatePIDGameDetails()
+// FUNCTION: CARM95 0x44759d
 tNet_game_details* NetAllocatePIDGameDetails(void) {
     tNet_game_details* game;
     LOG_TRACE("()");
@@ -333,6 +376,7 @@ tNet_game_details* NetAllocatePIDGameDetails(void) {
 }
 
 // IDA: void __usercall NetLeaveGameLowLevel(tNet_game_details *pDetails@<EAX>)
+// FUNCTION: CARM95 0x4468f3
 void NetLeaveGameLowLevel(tNet_game_details* pDetails) {
     LOG_TRACE("(%p)", pDetails);
 
@@ -344,6 +388,7 @@ void NetLeaveGameLowLevel(tNet_game_details* pDetails) {
 }
 
 // IDA: void __usercall NetLeaveGame(tNet_game_details *pNet_game@<EAX>)
+// FUNCTION: CARM95 0x44692a
 void NetLeaveGame(tNet_game_details* pNet_game) {
     tNet_message* the_message;
     char s[256];
@@ -392,6 +437,7 @@ void NetLeaveGame(tNet_game_details* pNet_game) {
 }
 
 // IDA: void __usercall NetSetPlayerSystemInfo(tNet_game_player_info *pPlayer@<EAX>, void *pSender_address@<EDX>)
+// FUNCTION: CARM95 0x446b3b
 void NetSetPlayerSystemInfo(tNet_game_player_info* pPlayer, void* pSender_address) {
     LOG_TRACE("(%p, %p)", pPlayer, pSender_address);
 
@@ -399,6 +445,7 @@ void NetSetPlayerSystemInfo(tNet_game_player_info* pPlayer, void* pSender_addres
 }
 
 // IDA: void __usercall NetDisposePlayer(tNet_game_player_info *pPlayer@<EAX>)
+// FUNCTION: CARM95 0x446b56
 void NetDisposePlayer(tNet_game_player_info* pPlayer) {
     LOG_TRACE("(%p)", pPlayer);
 
@@ -406,6 +453,7 @@ void NetDisposePlayer(tNet_game_player_info* pPlayer) {
 }
 
 // IDA: void __usercall FillInThisPlayer(tNet_game_details *pGame@<EAX>, tNet_game_player_info *pPlayer@<EDX>, int pCar_index@<EBX>, int pHost@<ECX>)
+// FUNCTION: CARM95 0x4475c5
 void FillInThisPlayer(tNet_game_details* pGame, tNet_game_player_info* pPlayer, int pCar_index, int pHost) {
     LOG_TRACE("(%p, %p, %d, %d)", pGame, pPlayer, pCar_index, pHost);
 
@@ -429,6 +477,7 @@ void FillInThisPlayer(tNet_game_details* pGame, tNet_game_player_info* pPlayer, 
 }
 
 // IDA: void __usercall LoadCarN(int pIndex@<EAX>, tNet_game_player_info *pPlayer@<EDX>)
+// FUNCTION: CARM95 0x44725a
 void LoadCarN(int pIndex, tNet_game_player_info* pPlayer) {
     int switched_res;
     LOG_TRACE("(%d, %p)", pIndex, pPlayer);
@@ -452,6 +501,7 @@ void LoadCarN(int pIndex, tNet_game_player_info* pPlayer) {
 }
 
 // IDA: void __usercall DisposeCarN(int pIndex@<EAX>)
+// FUNCTION: CARM95 0x446b6d
 void DisposeCarN(int pIndex) {
     int i;
     int j;
@@ -482,6 +532,7 @@ void DisposeCarN(int pIndex) {
 }
 
 // IDA: void __usercall PlayerHasLeft(int pIndex@<EAX>)
+// FUNCTION: CARM95 0x44731b
 void PlayerHasLeft(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
@@ -496,6 +547,7 @@ void PlayerHasLeft(int pIndex) {
 }
 
 // IDA: void __usercall NetPlayersChanged(int pNew_count@<EAX>, tNet_game_player_info *pNew_players@<EDX>)
+// FUNCTION: CARM95 0x446ca1
 void NetPlayersChanged(int pNew_count, tNet_game_player_info* pNew_players) {
     int i;
     int j;
@@ -608,6 +660,7 @@ void NetPlayersChanged(int pNew_count, tNet_game_player_info* pNew_players) {
 }
 
 // IDA: tNet_game_details* __usercall NetHostGame@<EAX>(tNet_game_type pGame_type@<EAX>, tNet_game_options *pOptions@<EDX>, int pStart_rank@<EBX>, char *pHost_name@<ECX>, int pCar_index)
+// FUNCTION: CARM95 0x4473b1
 tNet_game_details* NetHostGame(tNet_game_type pGame_type, tNet_game_options* pOptions, int pStart_rank, char* pHost_name, int pCar_index) {
     tNet_game_details* game;
     void* host_address;
@@ -656,6 +709,7 @@ int NetInitClient(tNet_game_details* pDetails) {
 }
 
 // IDA: int __usercall NetJoinGameLowLevel@<EAX>(tNet_game_details *pDetails@<EAX>, char *pPlayer_name@<EDX>)
+// FUNCTION: CARM95 0x447883
 int NetJoinGameLowLevel(tNet_game_details* pDetails, char* pPlayer_name) {
     LOG_TRACE("(%p, \"%s\")", pDetails, pPlayer_name);
 
@@ -669,6 +723,7 @@ DR_STATIC_ASSERT(offsetof(tNet_game_player_info, initial_position) == 0x8c);
 DR_STATIC_ASSERT(offsetof(tNet_game_player_info, car) == 0xbc);
 
 // IDA: int __usercall NetJoinGame@<EAX>(tNet_game_details *pDetails@<EAX>, char *pPlayer_name@<EDX>, int pCar_index@<EBX>)
+// FUNCTION: CARM95 0x4476d9
 int NetJoinGame(tNet_game_details* pDetails, char* pPlayer_name, int pCar_index) {
     int result;
     tNet_message* the_message;
@@ -727,6 +782,7 @@ int NetJoinGame(tNet_game_details* pDetails, char* pPlayer_name, int pCar_index)
 }
 
 // IDA: void __usercall NetObtainSystemUserName(char *pName@<EAX>, int pMax_length@<EDX>)
+// FUNCTION: CARM95 0x4478a3
 void NetObtainSystemUserName(char* pName, int pMax_length) {
 
     PDNetObtainSystemUserName(pName, pMax_length);
@@ -734,6 +790,7 @@ void NetObtainSystemUserName(char* pName, int pMax_length) {
 }
 
 // IDA: tU32 __usercall NetExtractGameID@<EAX>(tNet_game_details *pDetails@<EAX>)
+// FUNCTION: CARM95 0x4478c5
 tU32 NetExtractGameID(tNet_game_details* pDetails) {
     LOG_TRACE("(%p)", pDetails);
 
@@ -741,6 +798,7 @@ tU32 NetExtractGameID(tNet_game_details* pDetails) {
 }
 
 // IDA: tPlayer_ID __usercall NetExtractPlayerID@<EAX>(tNet_game_details *pDetails@<EAX>)
+// FUNCTION: CARM95 0x4478e1
 tPlayer_ID NetExtractPlayerID(tNet_game_details* pDetails) {
     LOG_TRACE("(%p)", pDetails);
 
@@ -748,6 +806,7 @@ tPlayer_ID NetExtractPlayerID(tNet_game_details* pDetails) {
 }
 
 // IDA: int __usercall NetSendMessageToAddress@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>, void *pAddress@<EBX>)
+// FUNCTION: CARM95 0x4478fd
 int NetSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessage, void* pAddress) {
     LOG_TRACE("(%p, %p, %p)", pDetails, pMessage, pAddress);
 
@@ -780,6 +839,7 @@ int NetSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage, 
 }
 
 // IDA: int __usercall NetSendMessageToHost@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>)
+// FUNCTION: CARM95 0x447a10
 int NetSendMessageToHost(tNet_game_details* pDetails, tNet_message* pMessage) {
     LOG_TRACE("(%p, %p)", pDetails, pMessage);
 
@@ -800,6 +860,7 @@ int NetReplyToMessage(tNet_game_details* pDetails, tNet_message* pIncoming_messa
 }
 
 // IDA: int __usercall NetSendMessageToAllPlayers@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>)
+// FUNCTION: CARM95 0x447a99
 int NetSendMessageToAllPlayers(tNet_game_details* pDetails, tNet_message* pMessage) {
     LOG_TRACE("(%p, %p)", pDetails, pMessage);
 
@@ -810,6 +871,7 @@ int NetSendMessageToAllPlayers(tNet_game_details* pDetails, tNet_message* pMessa
 }
 
 // IDA: tU32 __usercall NetGetContentsSize@<EAX>(tNet_message_type pType@<EAX>, tS32 pSize_decider@<EDX>)
+// FUNCTION: CARM95 0x447adb
 tU32 NetGetContentsSize(tNet_message_type pType, tS32 pSize_decider) {
     tU32 the_size;
     LOG_TRACE("(%d, %d)", pType, pSize_decider);
@@ -914,6 +976,7 @@ tS32 NetCalcSizeDecider(tNet_contents* pContents) {
 }
 
 // IDA: tNet_message* __usercall NetBuildMessage@<EAX>(tNet_message_type pType@<EAX>, tS32 pSize_decider@<EDX>)
+// FUNCTION: CARM95 0x447e7f
 tNet_message* NetBuildMessage(tNet_message_type pType, tS32 pSize_decider) {
     tNet_message* the_message;
     tU32 the_size;
@@ -930,6 +993,7 @@ tNet_message* NetBuildMessage(tNet_message_type pType, tS32 pSize_decider) {
 }
 
 // IDA: tNet_contents* __usercall NetGetToHostContents@<EAX>(tNet_message_type pType@<EAX>, tS32 pSize_decider@<EDX>)
+// FUNCTION: CARM95 0x447ee4
 tNet_contents* NetGetToHostContents(tNet_message_type pType, tS32 pSize_decider) {
     tU32 the_size;
     tNet_contents* contents;
@@ -954,6 +1018,7 @@ tNet_contents* NetGetToHostContents(tNet_message_type pType, tS32 pSize_decider)
 }
 
 // IDA: tNet_contents* __usercall NetGetBroadcastContents@<EAX>(tNet_message_type pType@<EAX>, tS32 pSize_decider@<EDX>)
+// FUNCTION: CARM95 0x447fcc
 tNet_contents* NetGetBroadcastContents(tNet_message_type pType, tS32 pSize_decider) {
     tU32 the_size;
     tNet_contents* contents;
@@ -978,6 +1043,7 @@ tNet_contents* NetGetBroadcastContents(tNet_message_type pType, tS32 pSize_decid
 }
 
 // IDA: void __cdecl NetSendMessageStacks()
+// FUNCTION: CARM95 0x4480b4
 void NetSendMessageStacks(void) {
     LOG_TRACE("()");
 
@@ -993,6 +1059,7 @@ void NetSendMessageStacks(void) {
 }
 
 // IDA: tNet_message* __usercall NetAllocateMessage@<EAX>(int pSize@<EAX>)
+// FUNCTION: CARM95 0x44811f
 tNet_message* NetAllocateMessage(int pSize) {
     void* pointer;
     void* last_message;
@@ -1068,6 +1135,7 @@ tNet_message* NetAllocateMessage(int pSize) {
 }
 
 // IDA: void __cdecl NetFreeExcessMemory()
+// FUNCTION: CARM95 0x4483eb
 void NetFreeExcessMemory(void) {
     void* temp;
     LOG_TRACE("()");
@@ -1080,6 +1148,7 @@ void NetFreeExcessMemory(void) {
 }
 
 // IDA: int __usercall NetDisposeMessage@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>)
+// FUNCTION: CARM95 0x448445
 int NetDisposeMessage(tNet_game_details* pDetails, tNet_message* pMessage) {
     LOG_TRACE("(%p, %p)", pDetails, pMessage);
 
@@ -1098,6 +1167,7 @@ tNet_message* NetGetNextMessage(tNet_game_details* pDetails, void** pSender_addr
 }
 
 // IDA: void __usercall ReceivedSendMeDetails(tNet_contents *pContents@<EAX>, void *pSender_address@<EDX>)
+// FUNCTION: CARM95 0x44929e
 void ReceivedSendMeDetails(tNet_contents* pContents, void* pSender_address) {
     tNet_message* message;
     LOG_TRACE("(%p, %p)", pContents, pSender_address);
@@ -1111,6 +1181,7 @@ void ReceivedSendMeDetails(tNet_contents* pContents, void* pSender_address) {
 }
 
 // IDA: void __usercall ReceivedDetails(tNet_contents *pContents@<EAX>)
+// FUNCTION: CARM95 0x4492f6
 void ReceivedDetails(tNet_contents* pContents) {
     LOG_TRACE("(%p)", pContents);
 
@@ -1122,6 +1193,7 @@ void ReceivedDetails(tNet_contents* pContents) {
 }
 
 // IDA: void __cdecl SendOutPlayerList()
+// FUNCTION: CARM95 0x4495e0
 void SendOutPlayerList(void) {
     tNet_message* message;
     int i;
@@ -1149,6 +1221,7 @@ void SendOutPlayerList(void) {
 }
 
 // IDA: void __usercall ReceivedJoin(tNet_contents *pContents@<EAX>, void *pSender_address@<EDX>)
+// FUNCTION: CARM95 0x449330
 void ReceivedJoin(tNet_contents* pContents, void* pSender_address) {
     int i;
     int new_player_count;
@@ -1205,6 +1278,7 @@ void ReceivedJoin(tNet_contents* pContents, void* pSender_address) {
 }
 
 // IDA: void __usercall KickPlayerOut(tPlayer_ID pID@<EAX>)
+// FUNCTION: CARM95 0x4496f8
 void KickPlayerOut(tPlayer_ID pID) {
     int i;
     int j;

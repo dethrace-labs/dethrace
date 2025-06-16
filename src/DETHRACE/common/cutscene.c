@@ -21,6 +21,7 @@
 tS32 gLast_demo_end_anim = -90000;
 
 // IDA: void __usercall ShowCutScene(int pIndex@<EAX>, int pWait_end@<EDX>, int pSound_ID@<EBX>, br_scalar pDelay)
+// FUNCTION: CARM95 0x4a58c0
 void ShowCutScene(int pIndex, int pWait_end, int pSound_ID, br_scalar pDelay) {
     LOG_TRACE("(%d, %d, %d, %f)", pIndex, pWait_end, pSound_ID, pDelay);
 
@@ -47,15 +48,18 @@ void ShowCutScene(int pIndex, int pWait_end, int pSound_ID, br_scalar pDelay) {
 }
 
 // IDA: void __cdecl DoSCILogo()
+// FUNCTION: CARM95 0x4a5974
 void DoSCILogo(void) {
 }
 
 // IDA: void __cdecl DoStainlessLogo()
+// FUNCTION: CARM95 0x4a597f
 void DoStainlessLogo(void) {
     LOG_TRACE("()");
 }
 
 // IDA: void __usercall PlaySmackerFile(char *pSmack_name@<EAX>)
+// FUNCTION: CARM95 0x4a598a
 void PlaySmackerFile(char* pSmack_name) {
     tPath_name the_path;
     br_colour* br_colours_ptr;
@@ -133,6 +137,7 @@ void PlaySmackerFile(char* pSmack_name) {
 }
 
 // IDA: void __cdecl DoOpeningAnimation()
+// FUNCTION: CARM95 0x4a5d73
 void DoOpeningAnimation(void) {
     LOG_TRACE("()");
 
@@ -142,11 +147,13 @@ void DoOpeningAnimation(void) {
 }
 
 // IDA: void __cdecl DoNewGameAnimation()
+// FUNCTION: CARM95 0x4a5de6
 void DoNewGameAnimation(void) {
     LOG_TRACE("()");
 }
 
 // IDA: void __cdecl DoGoToRaceAnimation()
+// FUNCTION: CARM95 0x4a5d9d
 void DoGoToRaceAnimation(void) {
     LOG_TRACE("()");
 
@@ -160,6 +167,7 @@ void DoGoToRaceAnimation(void) {
 }
 
 // IDA: void __cdecl DoEndRaceAnimation()
+// FUNCTION: CARM95 0x4a5df1
 void DoEndRaceAnimation(void) {
     int made_a_profit;
     int went_up_a_rank;
@@ -185,6 +193,7 @@ void DoEndRaceAnimation(void) {
 }
 
 // IDA: void __cdecl DoGameOverAnimation()
+// FUNCTION: CARM95 0x4a5ed6
 void DoGameOverAnimation(void) {
     LOG_TRACE("()");
 
@@ -194,6 +203,7 @@ void DoGameOverAnimation(void) {
 }
 
 // IDA: void __cdecl DoGameCompletedAnimation()
+// FUNCTION: CARM95 0x4a5ef8
 void DoGameCompletedAnimation(void) {
     LOG_TRACE("()");
 
@@ -240,6 +250,7 @@ void DoDemoGoodbye(void) {
 }
 
 // IDA: void __cdecl StartLoadingScreen()
+// FUNCTION: CARM95 0x4a5f1a
 void StartLoadingScreen(void) {
     LOG_TRACE("()");
 

@@ -21,14 +21,21 @@
 #include "utility.h"
 #include <stdlib.h>
 
+// GLOBAL: CARM95 0x536264
 char* gPalette_copy__mainmenu;    // suffix added to avoid duplicate symbol
+// GLOBAL: CARM95 0x53625c
 int gPixel_buffer_size__mainmenu; // suffix added to avoid duplicate symbol
+// GLOBAL: CARM95 0x536260
 tInterface_spec* gMain_menu_spec;
+// GLOBAL: CARM95 0x536268
 int gMouse_was_started__mainmenu; // suffix added to avoid duplicate symbol
+// GLOBAL: CARM95 0x53626c
 int gReplace_background;
+// GLOBAL: CARM95 0x536258
 char* gPixels_copy__mainmenu; // suffix added to avoid duplicate symbol
 
 // IDA: int __usercall MainMenuDone1@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
+// FUNCTION: CARM95 0x44ae90
 int MainMenuDone1(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
 
@@ -72,6 +79,7 @@ int MainMenuDone1(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
 }
 
 // IDA: int __usercall MainMenuDone2@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
+// FUNCTION: CARM95 0x44af61
 int MainMenuDone2(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
 
@@ -110,6 +118,7 @@ int MainMenuDone2(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
 }
 
 // IDA: void __cdecl StartMainMenu()
+// FUNCTION: CARM95 0x44b018
 void StartMainMenu(void) {
     LOG_TRACE("()");
 
@@ -141,6 +150,7 @@ void StartMainMenu(void) {
 }
 
 // IDA: int __usercall DoMainMenuInterface@<EAX>(tU32 pTime_out@<EAX>, int pContinue_allowed@<EDX>)
+// FUNCTION: CARM95 0x44b7cc
 int DoMainMenuInterface(tU32 pTime_out, int pContinue_allowed) {
     static tFlicette flicker_on1[8] = {
         { 14, { 64, 128 }, { 37, 89 } },
@@ -383,6 +393,7 @@ int DoMainMenuInterface(tU32 pTime_out, int pContinue_allowed) {
 }
 
 // IDA: tMM_result __usercall GetMainMenuOption@<EAX>(tU32 pTime_out@<EAX>, int pContinue_allowed@<EDX>)
+// FUNCTION: CARM95 0x44b6bc
 tMM_result GetMainMenuOption(tU32 pTime_out, int pContinue_allowed) {
     int result;
 
@@ -418,6 +429,7 @@ tMM_result GetMainMenuOption(tU32 pTime_out, int pContinue_allowed) {
 }
 
 // IDA: void __cdecl QuitVerifyStart()
+// FUNCTION: CARM95 0x44b101
 void QuitVerifyStart(void) {
     gPixel_buffer_size__mainmenu = gBack_screen->height * gBack_screen->row_bytes;
     gPixels_copy__mainmenu = BrMemAllocate(gPixel_buffer_size__mainmenu, kMem_quit_vfy_pixels);
@@ -428,6 +440,7 @@ void QuitVerifyStart(void) {
 }
 
 // IDA: int __usercall QuitVerifyDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
+// FUNCTION: CARM95 0x44b192
 int QuitVerifyDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     FadePaletteDown();
     TurnOnPanelFlics();
@@ -451,6 +464,7 @@ int QuitVerifyDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pE
 }
 
 // IDA: int __usercall DoVerifyQuit@<EAX>(int pReplace_background@<EAX>)
+// FUNCTION: CARM95 0x44b25a
 int DoVerifyQuit(int pReplace_background) {
     static tFlicette flicker_on[2] = { { 43, { 181, 362 }, { 124, 298 } }, { 43, { 84, 168 }, { 124, 298 } } };
     static tFlicette flicker_off[2] = { { 42, { 181, 362 }, { 124, 298 } }, { 42, { 84, 168 }, { 124, 298 } } };
@@ -561,6 +575,7 @@ int DoVerifyQuit(int pReplace_background) {
 }
 
 // IDA: tMM_result __usercall DoMainMenu@<EAX>(tU32 pTime_out@<EAX>, int pSave_allowed@<EDX>, int pContinue_allowed@<EBX>)
+// FUNCTION: CARM95 0x44b51b
 tMM_result DoMainMenu(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) {
     tMM_result the_result;
     LOG_TRACE("(%d, %d, %d)", pTime_out, pSave_allowed, pContinue_allowed);
@@ -624,6 +639,7 @@ tMM_result DoMainMenu(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) 
 }
 
 // IDA: void __usercall DoMainMenuScreen(tU32 pTime_out@<EAX>, int pSave_allowed@<EDX>, int pContinue_allowed@<EBX>)
+// FUNCTION: CARM95 0x44b3c3
 void DoMainMenuScreen(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) {
     tPlayer_status old_status;
     LOG_TRACE("(%d, %d, %d)", pTime_out, pSave_allowed, pContinue_allowed);

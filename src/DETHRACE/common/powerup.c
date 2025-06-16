@@ -131,20 +131,27 @@ tPeriodic_proc* gPeriodic_procs[34] = {
     NULL,
     NULL,
 };
+// GLOBAL: CARM95 0x50bc30
 tU32* gReal_render_palette;
 char* gFizzle_names[3] = { "CIRCLES.PIX", "SQUARES.PIX", "DIAMONDS.PIX" };
+// GLOBAL: CARM95 0x50bc48
 br_vector3 gZero_v__powerup; // suffix added to avoid duplicate symbol
 int gPed_harvest_sounds[4] = { 4010, 4012, 4030, 4032 };
 tHeadup_icon gIcon_list[20];
 br_pixelmap* gFizzle_in[3];
+// GLOBAL: CARM95 0x5321fc
 int gNumber_of_powerups;
+// GLOBAL: CARM95 0x5321e4
 int gFizzle_height;
+// GLOBAL: CARM95 0x5321e0
 int gNumber_of_icons;
+// GLOBAL: CARM95 0x5321e8
 tPowerup* gPowerup_array;
 
 #define GET_POWERUP_INDEX(POWERUP) ((POWERUP)-gPowerup_array)
 
 // IDA: void __usercall LosePowerupX(tPowerup *pThe_powerup@<EAX>, int pTell_net_players@<EDX>)
+// FUNCTION: CARM95 0x42cff6
 void LosePowerupX(tPowerup* pThe_powerup, int pTell_net_players) {
     int i;
     tNet_message* the_message;
@@ -172,6 +179,7 @@ void LosePowerupX(tPowerup* pThe_powerup, int pTell_net_players) {
 }
 
 // IDA: void __usercall LosePowerup(tPowerup *pThe_powerup@<EAX>)
+// FUNCTION: CARM95 0x42cfdd
 void LosePowerup(tPowerup* pThe_powerup) {
     LOG_TRACE("(%p)", pThe_powerup);
 
@@ -179,6 +187,7 @@ void LosePowerup(tPowerup* pThe_powerup) {
 }
 
 // IDA: void __usercall LoseAllSimilarPowerups(tPowerup *pThe_powerup@<EAX>)
+// FUNCTION: CARM95 0x42cf5e
 void LoseAllSimilarPowerups(tPowerup* pThe_powerup) {
     int i;
     tPowerup* the_powerup;
@@ -194,6 +203,7 @@ void LoseAllSimilarPowerups(tPowerup* pThe_powerup) {
 }
 
 // IDA: int __usercall GotPowerupX@<EAX>(tCar_spec *pCar@<EAX>, int pIndex@<EDX>, int pTell_net_players@<EBX>, int pDisplay_headup@<ECX>, tU32 pTime_left)
+// FUNCTION: CARM95 0x42ca60
 int GotPowerupX(tCar_spec* pCar, int pIndex, int pTell_net_players, int pDisplay_headup, tU32 pTime_left) {
     tPowerup* the_powerup;
     int i;
@@ -292,6 +302,7 @@ int GotPowerupX(tCar_spec* pCar, int pIndex, int pTell_net_players, int pDisplay
 }
 
 // IDA: int __usercall GotPowerup@<EAX>(tCar_spec *pCar@<EAX>, int pIndex@<EDX>)
+// FUNCTION: CARM95 0x42d121
 int GotPowerup(tCar_spec* pCar, int pIndex) {
     LOG_TRACE("(%p, %d)", pCar, pIndex);
 
@@ -299,6 +310,7 @@ int GotPowerup(tCar_spec* pCar, int pIndex) {
 }
 
 // IDA: void __cdecl LoadPowerups()
+// FUNCTION: CARM95 0x42d147
 void LoadPowerups(void) {
     FILE* f;
     tPath_name the_path;
@@ -373,6 +385,7 @@ void LoadPowerups(void) {
 }
 
 // IDA: void __cdecl InitPowerups()
+// FUNCTION: CARM95 0x42d536
 void InitPowerups(void) {
     int i;
     tPowerup* the_powerup;
@@ -385,6 +398,7 @@ void InitPowerups(void) {
 }
 
 // IDA: void __cdecl CloseDownPowerUps()
+// FUNCTION: CARM95 0x42d594
 void CloseDownPowerUps(void) {
     int i;
     tPowerup* the_powerup;
@@ -398,6 +412,7 @@ void CloseDownPowerUps(void) {
 }
 
 // IDA: void __usercall DrawPowerups(tU32 pTime@<EAX>)
+// FUNCTION: CARM95 0x42d5ec
 void DrawPowerups(tU32 pTime) {
     int i;
     int y;
@@ -461,6 +476,7 @@ void DrawPowerups(tU32 pTime) {
 }
 
 // IDA: void __usercall DoPowerupPeriodics(tU32 pFrame_period@<EAX>)
+// FUNCTION: CARM95 0x42d8a9
 void DoPowerupPeriodics(tU32 pFrame_period) {
     int i;
     tPowerup* the_powerup;
@@ -482,6 +498,7 @@ void DoPowerupPeriodics(tU32 pFrame_period) {
 }
 
 // IDA: void __usercall GotPowerupN(int pN@<EAX>)
+// FUNCTION: CARM95 0x42d965
 void GotPowerupN(int pN) {
     int modifiers;
     LOG_TRACE("(%d)", pN);
@@ -500,6 +517,7 @@ void GotPowerupN(int pN) {
 }
 
 // IDA: void __cdecl GotPowerup0()
+// FUNCTION: CARM95 0x42d9e8
 void GotPowerup0(void) {
     LOG_TRACE("()");
 
@@ -507,6 +525,7 @@ void GotPowerup0(void) {
 }
 
 // IDA: void __cdecl GotPowerup1()
+// FUNCTION: CARM95 0x42d9fd
 void GotPowerup1(void) {
     LOG_TRACE("()");
 
@@ -514,6 +533,7 @@ void GotPowerup1(void) {
 }
 
 // IDA: void __cdecl GotPowerup2()
+// FUNCTION: CARM95 0x42da12
 void GotPowerup2(void) {
     LOG_TRACE("()");
 
@@ -521,6 +541,7 @@ void GotPowerup2(void) {
 }
 
 // IDA: void __cdecl GotPowerup3()
+// FUNCTION: CARM95 0x42da27
 void GotPowerup3(void) {
     LOG_TRACE("()");
 
@@ -528,6 +549,7 @@ void GotPowerup3(void) {
 }
 
 // IDA: void __cdecl GotPowerup4()
+// FUNCTION: CARM95 0x42da3c
 void GotPowerup4(void) {
     LOG_TRACE("()");
 
@@ -535,6 +557,7 @@ void GotPowerup4(void) {
 }
 
 // IDA: void __cdecl GotPowerup5()
+// FUNCTION: CARM95 0x42da51
 void GotPowerup5(void) {
     LOG_TRACE("()");
 
@@ -542,6 +565,7 @@ void GotPowerup5(void) {
 }
 
 // IDA: void __cdecl GotPowerup6()
+// FUNCTION: CARM95 0x42da66
 void GotPowerup6(void) {
     LOG_TRACE("()");
 
@@ -549,6 +573,7 @@ void GotPowerup6(void) {
 }
 
 // IDA: void __cdecl GotPowerup7()
+// FUNCTION: CARM95 0x42da7b
 void GotPowerup7(void) {
     LOG_TRACE("()");
 
@@ -556,6 +581,7 @@ void GotPowerup7(void) {
 }
 
 // IDA: void __cdecl GotPowerup8()
+// FUNCTION: CARM95 0x42da90
 void GotPowerup8(void) {
     LOG_TRACE("()");
 
@@ -563,6 +589,7 @@ void GotPowerup8(void) {
 }
 
 // IDA: void __cdecl GotPowerup9()
+// FUNCTION: CARM95 0x42daa5
 void GotPowerup9(void) {
     LOG_TRACE("()");
 
@@ -570,6 +597,7 @@ void GotPowerup9(void) {
 }
 
 // IDA: int __usercall GotCredits@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42daba
 int GotCredits(tPowerup* pPowerup, tCar_spec* pCar) {
     int credits;
     char s[256];
@@ -584,6 +612,7 @@ int GotCredits(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall ImprovePSPowerup(tCar_spec *pCar@<EAX>, int pIndex@<EDX>)
+// FUNCTION: CARM95 0x42db7a
 void ImprovePSPowerup(tCar_spec* pCar, int pIndex) {
     tNet_message* the_message;
     LOG_TRACE("(%p, %d)", pCar, pIndex);
@@ -593,6 +622,7 @@ void ImprovePSPowerup(tCar_spec* pCar, int pIndex) {
 }
 
 // IDA: int __usercall GotTimeOrPower@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42dbba
 int GotTimeOrPower(tPowerup* pPowerup, tCar_spec* pCar) {
     int time;
     int index;
@@ -629,6 +659,7 @@ int GotTimeOrPower(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: int __usercall SetPedSpeed@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42dd8b
 int SetPedSpeed(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -637,6 +668,7 @@ int SetPedSpeed(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: int __usercall SetHades@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42ddb9
 int SetHades(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -645,6 +677,7 @@ int SetHades(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall ResetHades(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42dddf
 void ResetHades(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -652,6 +685,7 @@ void ResetHades(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: int __usercall SetPedSize@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42ddef
 int SetPedSize(tPowerup* pPowerup, tCar_spec* pCar) {
     br_scalar old_scale;
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
@@ -683,6 +717,7 @@ int SetPedSize(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: int __usercall SetPedExplode@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42dec4
 int SetPedExplode(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -691,6 +726,7 @@ int SetPedExplode(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: int __usercall SetInvulnerability@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42deef
 int SetInvulnerability(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -699,6 +735,7 @@ int SetInvulnerability(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall ResetInvulnerability(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42df1d
 void ResetInvulnerability(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -706,6 +743,7 @@ void ResetInvulnerability(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: int __usercall SetFreeRepairs@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42df35
 int SetFreeRepairs(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -716,6 +754,7 @@ int SetFreeRepairs(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall ResetFreeRepairs(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42df6d
 void ResetFreeRepairs(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -725,6 +764,7 @@ void ResetFreeRepairs(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: int __usercall SetBlindPedestrians@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42df8f
 int SetBlindPedestrians(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -733,6 +773,7 @@ int SetBlindPedestrians(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall ResetBlindPedestrians(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42dfba
 void ResetBlindPedestrians(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -740,6 +781,7 @@ void ResetBlindPedestrians(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: int __usercall FreezeTimer@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42dfcf
 int FreezeTimer(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -750,6 +792,7 @@ int FreezeTimer(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall UnfreezeTimer(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e023
 void UnfreezeTimer(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -759,6 +802,7 @@ void UnfreezeTimer(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: int __usercall DoInstantRepair@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e045
 int DoInstantRepair(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -769,6 +813,7 @@ int DoInstantRepair(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall ResetPedSpeed(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e078
 void ResetPedSpeed(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -776,6 +821,7 @@ void ResetPedSpeed(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall ResetPedSize(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e08d
 void ResetPedSize(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -784,6 +830,7 @@ void ResetPedSize(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall ResetPedExplode(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e0ac
 void ResetPedExplode(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -791,6 +838,7 @@ void ResetPedExplode(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: int __usercall SetEngineFactor@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e0c1
 int SetEngineFactor(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -802,6 +850,7 @@ int SetEngineFactor(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: int __usercall SetUnderwater@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e143
 int SetUnderwater(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -810,6 +859,7 @@ int SetUnderwater(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: int __usercall TrashBodywork@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e171
 int TrashBodywork(tPowerup* pPowerup, tCar_spec* pCar) {
     int i;
     tCar_spec* c;
@@ -827,6 +877,7 @@ int TrashBodywork(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: int __usercall TakeDrugs@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e26c
 int TakeDrugs(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -841,6 +892,7 @@ int TakeDrugs(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall PaletteFuckedUpByDrugs(br_pixelmap *pPixelmap@<EAX>, int pOffset@<EDX>)
+// FUNCTION: CARM95 0x42e30a
 void PaletteFuckedUpByDrugs(br_pixelmap* pPixelmap, int pOffset) {
     int i;
     LOG_TRACE("(%p, %d)", pPixelmap, pOffset);
@@ -855,6 +907,7 @@ void PaletteFuckedUpByDrugs(br_pixelmap* pPixelmap, int pOffset) {
 }
 
 // IDA: void __usercall TheEffectsOfDrugs(tPowerup *pPowerup@<EAX>, tU32 pPeriod@<EDX>)
+// FUNCTION: CARM95 0x42e2dd
 void TheEffectsOfDrugs(tPowerup* pPowerup, tU32 pPeriod) {
     LOG_TRACE("(%p, %d)", pPowerup, pPeriod);
 
@@ -863,6 +916,7 @@ void TheEffectsOfDrugs(tPowerup* pPowerup, tU32 pPeriod) {
 }
 
 // IDA: int __usercall SetOpponentsSpeed@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e3af
 int SetOpponentsSpeed(tPowerup* pPowerup, tCar_spec* pCar) {
     int i;
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
@@ -877,6 +931,7 @@ int SetOpponentsSpeed(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: int __usercall SetCopsSpeed@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e445
 int SetCopsSpeed(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -885,6 +940,7 @@ int SetCopsSpeed(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: int __usercall SetGravity@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e473
 int SetGravity(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -893,6 +949,7 @@ int SetGravity(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: int __usercall SetPinball@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e4a1
 int SetPinball(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -901,6 +958,7 @@ int SetPinball(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: int __usercall SetWallclimb@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e4cf
 int SetWallclimb(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -909,6 +967,7 @@ int SetWallclimb(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: int __usercall SetBouncey@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e4fd
 int SetBouncey(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -919,6 +978,7 @@ int SetBouncey(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: int __usercall SetSuspension@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e554
 int SetSuspension(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -929,6 +989,7 @@ int SetSuspension(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: int __usercall SetTyreGrip@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e5b2
 int SetTyreGrip(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -937,6 +998,7 @@ int SetTyreGrip(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: int __usercall SetDamageMultiplier@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e5e4
 int SetDamageMultiplier(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -945,6 +1007,7 @@ int SetDamageMultiplier(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall ResetEngineFactor(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e616
 void ResetEngineFactor(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -954,6 +1017,7 @@ void ResetEngineFactor(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall ResetUnderwater(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e65a
 void ResetUnderwater(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -961,6 +1025,7 @@ void ResetUnderwater(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall PukeDrugsBackUp(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e672
 void PukeDrugsBackUp(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -972,6 +1037,7 @@ void PukeDrugsBackUp(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall ResetOpponentsSpeed(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e6a9
 void ResetOpponentsSpeed(tPowerup* pPowerup, tCar_spec* pCar) {
     int i;
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
@@ -985,6 +1051,7 @@ void ResetOpponentsSpeed(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall ResetCopsSpeed(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e726
 void ResetCopsSpeed(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -992,6 +1059,7 @@ void ResetCopsSpeed(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall ResetGravity(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e73b
 void ResetGravity(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -999,6 +1067,7 @@ void ResetGravity(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall ResetPinball(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e750
 void ResetPinball(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -1006,6 +1075,7 @@ void ResetPinball(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall ResetWallclimb(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e765
 void ResetWallclimb(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -1013,6 +1083,7 @@ void ResetWallclimb(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall ResetBouncey(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e77d
 void ResetBouncey(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -1021,6 +1092,7 @@ void ResetBouncey(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall ResetSuspension(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e7a2
 void ResetSuspension(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -1028,6 +1100,7 @@ void ResetSuspension(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall ResetDamageMultiplier(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e7cc
 void ResetDamageMultiplier(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -1035,6 +1108,7 @@ void ResetDamageMultiplier(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall ResetTyreGrip(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e7e4
 void ResetTyreGrip(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -1043,6 +1117,7 @@ void ResetTyreGrip(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: int __usercall PickAtRandom@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e7fc
 int PickAtRandom(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -1050,6 +1125,7 @@ int PickAtRandom(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: int __usercall PedestrianRespawn@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e834
 int PedestrianRespawn(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -1058,6 +1134,7 @@ int PedestrianRespawn(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: int __usercall GotVouchers@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e85a
 int GotVouchers(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -1068,6 +1145,7 @@ int GotVouchers(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall MungeVouchers(tPowerup *pPowerup@<EAX>, tU32 pPeriod@<EDX>)
+// FUNCTION: CARM95 0x42e899
 void MungeVouchers(tPowerup* pPowerup, tU32 pPeriod) {
     LOG_TRACE("(%p, %d)", pPowerup, pPeriod);
 
@@ -1075,6 +1153,7 @@ void MungeVouchers(tPowerup* pPowerup, tU32 pPeriod) {
 }
 
 // IDA: int __usercall SetInstantHandbrake@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e8af
 int SetInstantHandbrake(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -1085,6 +1164,7 @@ int SetInstantHandbrake(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall ResetInstantHandbrake(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e8e7
 void ResetInstantHandbrake(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -1094,6 +1174,7 @@ void ResetInstantHandbrake(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall DoBouncey(tPowerup *pPowerup@<EAX>, tU32 pPeriod@<EDX>)
+// FUNCTION: CARM95 0x42e909
 void DoBouncey(tPowerup* pPowerup, tU32 pPeriod) {
     LOG_TRACE("(%p, %d)", pPowerup, pPeriod);
 
@@ -1106,6 +1187,7 @@ void DoBouncey(tPowerup* pPowerup, tU32 pPeriod) {
 }
 
 // IDA: int __usercall HitMine@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42e986
 int HitMine(tPowerup* pPowerup, tCar_spec* pCar) {
     int i;
     float fudge_multiplier;
@@ -1128,6 +1210,7 @@ int HitMine(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: int __usercall SetMassMultiplier@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42eb2f
 int SetMassMultiplier(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -1136,6 +1219,7 @@ int SetMassMultiplier(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall ResetMassMultiplier(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42eb61
 void ResetMassMultiplier(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -1143,6 +1227,7 @@ void ResetMassMultiplier(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: int __usercall ShowPedestrians@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42eb79
 int ShowPedestrians(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -1153,6 +1238,7 @@ int ShowPedestrians(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall HidePedestrians(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42ebb1
 void HidePedestrians(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -1162,6 +1248,7 @@ void HidePedestrians(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: int __usercall SetProximity@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42ebd3
 int SetProximity(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -1170,6 +1257,7 @@ int SetProximity(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall ResetProximity(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42ec0d
 void ResetProximity(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -1177,6 +1265,7 @@ void ResetProximity(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: int __usercall SetPedHarvest@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42ec25
 int SetPedHarvest(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -1185,6 +1274,7 @@ int SetPedHarvest(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall ResetPedHarvest(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42ec50
 void ResetPedHarvest(tPowerup* pPowerup, tCar_spec* pCar) {
     int i;
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
@@ -1197,6 +1287,7 @@ void ResetPedHarvest(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: int __usercall SetVesuvianCorpses@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42ecb8
 int SetVesuvianCorpses(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -1205,6 +1296,7 @@ int SetVesuvianCorpses(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall ResetVesuvianCorpses(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
+// FUNCTION: CARM95 0x42ece3
 void ResetVesuvianCorpses(tPowerup* pPowerup, tCar_spec* pCar) {
     LOG_TRACE("(%p, %p)", pPowerup, pCar);
 
@@ -1212,6 +1304,7 @@ void ResetVesuvianCorpses(tPowerup* pPowerup, tCar_spec* pCar) {
 }
 
 // IDA: void __usercall ReceivedPowerup(tNet_contents *pContents@<EAX>)
+// FUNCTION: CARM95 0x42ecf8
 void ReceivedPowerup(tNet_contents* pContents) {
     tPowerup* powerup;
     tCar_spec* car;
@@ -1250,6 +1343,7 @@ void ReceivedPowerup(tNet_contents* pContents) {
 }
 
 // IDA: void __cdecl SendCurrentPowerups()
+// FUNCTION: CARM95 0x42eed9
 void SendCurrentPowerups(void) {
     int i;
     int cat;
@@ -1295,6 +1389,7 @@ void SendCurrentPowerups(void) {
 }
 
 // IDA: void __usercall LoseAllLocalPowerups(tCar_spec *pCar@<EAX>)
+// FUNCTION: CARM95 0x42f043
 void LoseAllLocalPowerups(tCar_spec* pCar) {
     int i;
     LOG_TRACE("(%p)", pCar);
@@ -1309,6 +1404,7 @@ void LoseAllLocalPowerups(tCar_spec* pCar) {
 }
 
 // Added by dethrace
+// FUNCTION: CARM95 0x42f0cc
 void GetPowerupMessage(int pN, char* pMessage) {
     switch (pN) {
     case 0:
